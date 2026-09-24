@@ -52,12 +52,30 @@
 - **Rol:** paso de **finish** — subir resolución/detalle de frames e imagen y de **secuencias de video**.
   Tenemos **MCP y API**.
 
+## Gemini Omni 1.1 Flash — CLI local Cloud (2026-09-24)
+
+`pnpm ai:omni --help` opera en `efeonce-group` la identidad Cloud exacta
+`gemini-omni-1.1-flash-preview` por Interactions `v1beta1` en `global`, con ADC y salida en GCS privado.
+`gemini-omni-1.1-flash` es la identidad distinta de Developer API; no hay fallback entre ellas. La CLI
+ofrece `--task text|image|frames|reference|edit|extend`: usa `--estimate` para validar/cotizar sólo el video
+output nominal sin enviar, y `--yes` para cada POST. Los archivos locales necesitan `--staging-uri`; la
+salida exige `--gcs-output`. Tras un timeout, recupera con `--status` o `--wait` y el interaction ID;
+no reenvíes a ciegas. Contrato, flags y recetas:
+`docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`.
+
+**Evidencia acotada:** los seis modos completaron corridas técnicas 2026-09-24 a 360p, 16:9 y 3 s;
+`extend` produjo 6 s acumulados. Se verificaron MP4 H.264/AAC de 640×360 a 24 fps. No están probados
+720p/1080p/4K, 9:16, edición stateful con `previous_interaction_id`, continuidad temporal fina,
+escucha de audio, C2PA ni factura real. `edit` usa un MP4 fuente y puede llevar imágenes de referencia;
+`extend` usa un MP4 fuente. Ninguna corrida habilita Globe ni aprueba un entregable comercial.
+
 ## Vertex (efeonce-group) — Gemini Omni video-gen (VERIFICADO en vivo 2026-07-05)
 
 > **⛔ HISTÓRICO, NO EJECUTABLE (actualizado 2026-08-27).** El bloque hasta “UI-heavy motion” conserva la
 > evidencia del spot de julio, pero su endpoint `:generateContent`, payload `responseModalities`, auth y techo
-> 720p ya no son el contrato vigente. Omni migró a Interactions el 2026-07-20. Para ejecutar, usa
-> `GEMINI_OMNI_VERTEX.md`; para Globe, route card + reader live. Gemini Omni 1.1 Flash usa IDs distintos por
+> 720p ya no son el contrato vigente. Omni migró a Interactions el 2026-07-20. Para ejecutar 1.1 local,
+> usa la sección anterior y su manual; `GEMINI_OMNI_VERTEX.md` conserva el detalle histórico.
+> Para Globe, route card + reader live. Gemini Omni 1.1 Flash usa IDs distintos por
 > superficie (`gemini-omni-1.1-flash` Developer API; `gemini-omni-1.1-flash-preview` Cloud), añade
 > 360p/first-last/video references/edit/extend/1080p/4K-upscaled y permanece `gated` hasta `TASK-1781`. El modelo
 > anterior tiene shutdown anunciado para el 2026-09-30. No heredes canary, rate, rights ni promotion.
@@ -134,7 +152,9 @@ Ahí la pantalla la renderiza el modelo con pantallas video-safe como referencia
 - **RRSS desde un paquete de stills ficticios, sin copy/practical exacto** → Gemini Omni image-to-video (ver `workflows/living-social-wall-clips.md`); no confundir el canal con la regla de motor.
 - **Dispositivo con UI legible dentro de la toma** → Seedance 2.5 (Higgsfield MCP) con pantallas video-safe como
   `image_references`; nunca pantalla verde + reemplazo por tracking. Titular y logo de la pieza, en overlay.
-- **Broadcast** → Veo 3.1. **Edición conversacional o microescena flexible** → Gemini Omni. Selección completa: `workflows/engine-selection-by-fidelity-contract.md`.
+- **Broadcast** → Veo 3.1. **Microescena flexible o edición de MP4 con instrucción** → Gemini Omni 1.1 por
+  `pnpm ai:omni`; la cadena conversacional stateful aún no está probada. Selección completa:
+  `workflows/engine-selection-by-fidelity-contract.md`.
 - **Tipo kinética / mograph de precisión / 3D** → craft humano (AE/Blender/Houdini), handoff con spec.
 - **VFX / compositing** (keying, roto, tracking/matchmove, integración CGI, simulaciones, cleanup) → craft
   humano (Nuke/Fusion/AE + Mocha) + AI-VFX (Runway roto, Wonder/Flow mocap, Beeble relight); ver `../modules/11`.

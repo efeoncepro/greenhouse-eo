@@ -1,16 +1,18 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-09-23 por Claude — v1.6: 🔴 `--mask` de 2.5 no sirve para mover material que ya está en la foto: sobre un primer plano oscuro y desenfocado, Sunburst rellenó toda la zona editable con un panel plano de borde recto y borró un objeto que el prompt pedía conservar [verificado 2026-09-23] (§5.1). · v1.5: primer motion de Efeonce producido («No fuiste tú», CMP-001). Tres hallazgos medidos: **`h3max-r2v` SÍ acepta `--aspect`, y sin él devuelve 1920×1080 horizontal** aunque todas las referencias sean verticales (§5.5); **`--aspect adaptive` NO adopta el ratio de las referencias** (1152×1440 → 1920×1080); y 🔴 **ningún motor de video del carril soporta 4:5** — medido en los cinco, todos ofrecen `3:4` — siendo 4:5 el formato principal de los estáticos de Efeonce: se genera en 3:4 y se recorta (§3, §4.2). · v1.4: Seedance 2.5 **entrega 1080×1920 verificado** en dos corridas reales (i2v y r2v); nitidez nativa vs reescalado sigue [sin dato]. La contradicción con la tabla oficial (480p/720p) queda parcialmente resuelta. · v1.3: la máscara de 2.5 orienta pero no preserva: la «deriva fuera de zona 2,4/255» es una media; el 2026-09-17 la zona protegida llegó a delta máximo 221/255 (media 4,85) y se recompone desde la base. v1.2: carril **Higgsfield API** dentro de `pnpm ai:fal` (§5.8): 44 capacidades con esquema real y precio exacto por API; Recraft de Higgsfield API: SVG **sin confirmar**. v1.1: brechas de los CLIs corregidas (commit `17196ead1`): estimación de costo previa con confirmación en `ai:fal`, resolución barata por defecto, formato real, `--seed` y tope de referencias validados, flags de LoRA/entrenador; `ai:image` valida `--size`/`--background`, agrega `--format` y estima costo
-> **Alcance:** todos los modelos de imagen y video disponibles en `pnpm ai:image` (OpenAI) y `pnpm ai:fal` (55 capacidades de fal + 44 de Higgsfield API), más los carriles fuera de esos CLIs y los candidatos evaluados que NO están conectados.
+> **Ultima actualizacion:** 2026-09-24 por Codex — v1.7: `pnpm ai:omni` conecta las seis operaciones Cloud de Gemini Omni 1.1, con canaries reales y manual propio.
+> **Historial anterior:** 2026-09-23 por Claude — v1.6: 🔴 `--mask` de 2.5 no sirve para mover material que ya está en la foto: sobre un primer plano oscuro y desenfocado, Sunburst rellenó toda la zona editable con un panel plano de borde recto y borró un objeto que el prompt pedía conservar [verificado 2026-09-23] (§5.1). · v1.5: primer motion de Efeonce producido («No fuiste tú», CMP-001). Tres hallazgos medidos: **`h3max-r2v` SÍ acepta `--aspect`, y sin él devuelve 1920×1080 horizontal** aunque todas las referencias sean verticales (§5.5); **`--aspect adaptive` NO adopta el ratio de las referencias** (1152×1440 → 1920×1080); y 🔴 **ningún motor de video del carril soporta 4:5** — medido en los cinco, todos ofrecen `3:4` — siendo 4:5 el formato principal de los estáticos de Efeonce: se genera en 3:4 y se recorta (§3, §4.2). · v1.4: Seedance 2.5 **entrega 1080×1920 verificado** en dos corridas reales (i2v y r2v); nitidez nativa vs reescalado sigue [sin dato]. La contradicción con la tabla oficial (480p/720p) queda parcialmente resuelta. · v1.3: la máscara de 2.5 orienta pero no preserva: la «deriva fuera de zona 2,4/255» es una media; el 2026-09-17 la zona protegida llegó a delta máximo 221/255 (media 4,85) y se recompone desde la base. v1.2: carril **Higgsfield API** dentro de `pnpm ai:fal` (§5.8): 44 capacidades con esquema real y precio exacto por API; Recraft de Higgsfield API: SVG **sin confirmar**. v1.1: brechas de los CLIs corregidas (commit `17196ead1`): estimación de costo previa con confirmación en `ai:fal`, resolución barata por defecto, formato real, `--seed` y tope de referencias validados, flags de LoRA/entrenador; `ai:image` valida `--size`/`--background`, agrega `--format` y estima costo
+> **Alcance:** todos los modelos de imagen y video disponibles en `pnpm ai:image` (OpenAI), `pnpm ai:fal` (55 capacidades de fal + 44 de Higgsfield API) y `pnpm ai:omni` (Gemini Omni 1.1 Cloud), más los carriles fuera de esos CLIs y los candidatos evaluados que NO están conectados.
 > **Documentación relacionada (no se duplica acá):**
 > [Catálogo de modelos fal](GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) ·
 > [Generador de assets visuales](GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) ·
 > [Manual del CLI fal](../manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md) ·
+> [Manual del CLI Omni](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md) ·
 > [Selección de motor por contrato de fidelidad](../../.claude/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md)
-> **Código fuente de verdad:** `src/lib/ai/fal-capabilities.ts` (registro), `src/lib/ai/higgsfield-capabilities.ts` + `higgsfield-schemas.json` (registro Higgsfield), `scripts/ai/higgsfield-lane.ts` (carril Higgsfield), `scripts/ai/fal-image.ts` (CLI `ai:fal`), `src/lib/ai/openai-image.ts` + `scripts/ai/generate-image.ts` (CLI `ai:image`), `src/lib/ai/fal.ts` (cuentas).
+> **Código fuente de verdad:** `src/lib/ai/fal-capabilities.ts` (registro), `src/lib/ai/higgsfield-capabilities.ts` + `higgsfield-schemas.json` (registro Higgsfield), `scripts/ai/higgsfield-lane.ts` (carril Higgsfield), `scripts/ai/fal-image.ts` (CLI `ai:fal`), `src/lib/ai/gemini-omni-cli.ts` + `scripts/ai/gemini-omni.ts` (CLI `ai:omni`), `src/lib/ai/openai-image.ts` + `scripts/ai/generate-image.ts` (CLI `ai:image`), `src/lib/ai/fal.ts` (cuentas).
 
 ---
 
@@ -29,7 +31,7 @@ Reglas que mandan sobre cualquier tabla de esta guía:
 - **Fidelidad por toma, no precio por clip.** El motor se elige por el contrato de fidelidad de la toma (qué debe quedar idéntico, qué puede interpretar el modelo); los defectos editoriales (crop, texto, grade, foley, mezcla) se arreglan en post, no regenerando. Canon: [engine-selection-by-fidelity-contract.md](../../.claude/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md). [decisión]
 - **Ningún ranking reemplaza la prueba con tu propio brief** (§9). [decisión]
 - **Copy final, logotipo y texto legal se componen fuera del modelo.** Todo texto generado dentro de la imagen o el video es concept-only. El logotipo de Efeonce es `efe[isotipo]nce` completo; no confundirlo con el isotipo solo ni duplicarlo. [decisión]
-- **Salidas fuera del repo público:** usa `--out`/`--out-dir` hacia `ai-generations/` o el scratchpad; nunca `public/` ni `.captures/`. Ambos CLIs, sin `--out`, escriben en `public/images/generated` [contrato]. [decisión]
+- **Salidas fuera del repo público:** usa `--out`/`--out-dir` hacia `ai-generations/` o el scratchpad; nunca `public/` ni `.captures/`. `ai:image` y `ai:fal`, sin `--out`, escriben en `public/images/generated` [contrato]; `ai:omni` exige `--gcs-output` privado y sólo descarga a la ruta explícita de `--out` [contrato]. [decisión]
 - **`pnpm ai:fal` es out-of-band**: NUNCA es runtime del producto. El runtime de imagen del producto es `generateImage` (`src/lib/ai/image-generator.ts`) con providers `openai-image` (default) y `google-gemini-image`. [contrato]
 
 ---
@@ -91,7 +93,7 @@ Formato: *si necesitas X → usa Y · por qué · alternativa · qué evitar*.
 
 ## 3. Árbol de decisión — VIDEO
 
-Todo el video vive en `pnpm ai:fal`, salvo Gemini Omni Flash (Google directo, sin CLI) [decisión].
+El video se opera con `pnpm ai:fal` para fal/Higgsfield y `pnpm ai:omni` para Gemini Omni 1.1 Cloud directo por Google. La CLI Omni cubre texto, imagen, primer/último cuadro, referencias, edición y extensión; seis canaries reales del 2026-09-24 están en el [manual](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md). No implica disponibilidad en Globe.
 
 | Si necesitas | Usa | Por qué | Alternativa | Evita |
 |---|---|---|---|---|
@@ -147,6 +149,7 @@ Precio: **registro** = lo que guarda `fal-capabilities.ts` (escalón más bajo d
 
 | Familia · ids | Entradas | Salida máx. real | Duración | fps | Audio | Referencias | Controles especiales | Precio registro → publicado por escalón | Latencia | Estado | Ranking (§9) |
 |---|---|---|---|---|---|---|---|---|---|---|---|
+| **Gemini Omni 1.1 Cloud** · `gemini-omni-1.1-flash-preview` vía `ai:omni` | Texto · imagen · primer/último cuadro · referencias · MP4 para `edit`/`extend` [contrato] | 360p/3 s entregados [verificado 2026-09-24]; 720p/1080p/4K declarados, 1080p/4K reescalados [oficial] | 3–10 s [oficial] | 24 a 360p [verificado] | AAC en seis canaries [verificado] | Hasta 10 imágenes y 3 videos por prompt; video fuente ≤ 10 s [oficial] | `text_to_video`, `image_to_video`, `reference_to_video`, `edit`, `extend`; `global`, GCS privado, cuota fija [contrato] [oficial] | Video output nominal: 360p 0,0338/s · 720p 0,1014/s · 1080p 0,1520/s · 4K 0,3041/s; input y otros tokens aparte [oficial] | Ver [manual](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md) | Seis rutas MP4 verificadas 2026-09-24 a 360p [verificado] | El ranking de §9 corresponde al modelo anterior |
 | **Seedance 2.5** · `seedance25-t2v`, `-i2v`, `-r2v` | Texto · imagen (+ `--end-image`) · refs [contrato] | **1080p ENTREGADO [verificado 2026-09-22]**: dos corridas `seedance25-i2v` y `-r2v` devolvieron 1080×1920 reales (145 cuadros, 24 fps). Nitidez nativa vs reescalado: [sin dato]. La tabla oficial de la ficha sigue listando sólo 480p/720p [oficial, contradicción parcialmente resuelta] | 4–30 s o `auto` [contrato] | 24 [oficial] | Sí, `--no-audio` [contrato] | 30 img · 10 video (1,8–30,2 s c/u, ≤ 30,2 s total) · 10 audio [contrato] | `--task reference|editing|extension` (único), `--bitrate`, `--aspect` [contrato] | 0,0214/1.000 tokens → 480p ≈ 0,2205/s · 720p ≈ 0,4730/s · 1080p ≈ 1,164/s; con videos de referencia 720p ≈ 0,2838/s, 480p ≈ 0,1323/s [oficial] | r2v reference > 15 min [verificado] | Verificadas 2026-09-16 (a 480p) | OpenArt #1 [tercero] |
 | **Seedance 2.0 base** · `seedance20-t2v`, `-i2v`, `-r2v` | Igual [contrato] | **4K 3840×2160** [verificado 2026-09-16]; nativo o reescalado [sin dato] | 4–15 s o `auto` | 24 | Sí, `--no-audio` | 9 img · 3 video (2–15 s total, 480p–720p) · 3 audio; **video sólo guía**, sin `--task` [contrato] | `--bitrate`, multi-shot dentro de la generación [oficial] | 0,014/1.000 tokens → 720p 0,3024/s [oficial]; 480p ≈ 0,141/s · 1080p ≈ 0,685/s · 4K ≈ 2,72/s [cálculo] | "menos de 2 minutos" [oficial] | Verificadas 2026-09-16 | OpenArt #3; AA I2V con audio #2 (720p) [tercero] |
 | **Seedance 2.0 fast** · `seedance20-fast-*` | Igual | 720p [contrato] | 4–15 s | 24 | Sí | 9/3/3 [contrato] | `--bitrate`; "Output quality: Same" que base según fal [oficial] | 0,0112/1.000 tokens → 480p ≈ 0,1125/s · 720p 0,2419/s [oficial] | [sin dato] | Verificadas 2026-09-16 | — |
@@ -167,7 +170,7 @@ Precio: **registro** = lo que guarda `fal-capabilities.ts` (escalón más bajo d
 | **Wan 3.0** · `wan3-t2v`, `-i2v`, `-r2v` | Texto · imagen (prompt opcional, `--end-image`) · refs; web/documento en r2v [contrato] | 1080p (default del proveedor; el CLI envía 480p si omites `--resolution`) [contrato] | 2–30 s o `auto` (se envía `null`; verificado → 5,04 s) [contrato] [verificado] | **30** [oficial] | Sí, `--no-audio` [contrato] | 10 img · 5 video (≤ 15 s total, ≥ 16 fps) · 5 audio [contrato] | `--thinking`, `--web-url`, `--file` (r2v), `--no-prompt-expansion`, `--seed` [contrato] | 0,05/s registro → 480p 0,05 · 720p 0,10 · **1080p 0,20** [oficial] | Sin expansión ahorra 20–60 s [contrato]; típica 1–5 min [tercero] | Verificadas 2026-09-16 (`--file` sin corrida) | OpenArt #2; AA T2V con y sin audio **#1** [tercero] |
 | **Wan 3.0 Prime** · `wan3prime-t2v`, `-i2v`, `-r2v` | Igual que base [contrato] | 1080p [contrato] | Igual | 30 | Igual | Igual | Igual; "versión acelerada" [oficial] | 0,05/s registro → 480p 0,068 · 720p 0,14 · **1080p 0,28** (más cara que base) [oficial] | Más rápida [oficial]; "hasta 7×" [tercero]; sin medir | Verificadas 2026-09-16 | No figura [tercero] |
 
-🔴 **Ninguna familia de esta matriz ofrece `4:5`** — medido en las cinco [verificado 2026-09-22]. El aspecto más cercano es `3:4`, y el camino a 4:5 es generar en 3:4 y recortar: ver la fila de 4:5 en §3.
+🔴 **Ninguna familia de esta matriz ofrece `4:5`** — medido en los cinco motores fal [verificado 2026-09-22]; Gemini Omni 1.1 Cloud publica sólo `16:9`/`9:16` [oficial]. En fal, el aspecto más cercano es `3:4`, y el camino a 4:5 es generar en 3:4 y recortar: ver la fila de 4:5 en §3.
 
 ---
 
@@ -944,7 +947,7 @@ OpenArt completo (2026-09-16): 1 Seedream 5.0 Pro · 2 GPT Image 2 · 3 Nano Ban
 | Wan 3.0 | #2 · 1047 | **#1 · 1240** | **#1 · 1335** | #6 · 1178 | #2 · 1360 |
 | Seedance 2.0 | #3 · 1044 | #5 · 1220 (720p) | — | #2 · 1197 (720p) | #4 · 1342 |
 | Seedance 2.0 Mini | #4 · 1033 | — | — | — | — |
-| Gemini Omni Flash (no en CLIs) | #5 · 1029 | #2 · 1237 | #2 · 1325 | #5 · 1181 | **#1 · 1365** |
+| Gemini Omni Flash (ranking histórico del modelo anterior) | #5 · 1029 | #2 · 1237 | #2 · 1325 | #5 · 1181 | **#1 · 1365** |
 | Flux 3 Video | #6 · 1003 | no incluido | no incluido | no incluido | no incluido |
 | MiniMax H3 | #7 · 1000 (ancla) | #4 · 1225 | #3 | #3 · 1190 | #3 · 1351 |
 | H3 Max (post-entrenado por fal) | — | #3 · 1231 | — | **#1 · 1206** | — |
@@ -956,7 +959,7 @@ OpenArt 9–11: HappyHorse 1.1 · Grok Imagine 1.5 · PixVerse V6. Subcategoría
 
 ---
 
-## 10. Carriles fuera de los CLIs y candidatos NO conectados
+## 10. Carriles Google directos y candidatos NO conectados
 
 ### 10.1 Disponibles fuera de `ai:image` / `ai:fal`
 
@@ -964,7 +967,7 @@ OpenArt 9–11: HappyHorse 1.1 · Grok Imagine 1.5 · PixVerse V6. Subcategoría
 |---|---|---|---|
 | Google directo (Vertex, location `global`), runtime `generateImage` provider `google-gemini-image` | **Nano Banana 2** = `gemini-3.1-flash-image` (default del provider; sobrescribible con `GOOGLE_GEMINI_IMAGE_MODEL`) | En runtime del producto; **sin CLI** [contrato] | Cambiar la env cambia todo el carril del producto [contrato] |
 | Google directo (Vertex) | **Nano Banana Pro** = `gemini-3-pro-image` | Disponible (models.get OK 2026-09-16) pero **ninguna superficie lo usa**; `gemini-3.1-pro-image` responde 404 [verificado] | Siempre directo por Google, nunca por fal [decisión]; exponerlo es decisión pendiente |
-| Google directo | **Gemini Omni Flash** (video) | Sin CLI en el repo [contrato] | Siempre directo por Google (más barato, misma calidad), nunca por fal [decisión]. Rankings: OpenArt #5; AA #1 imagen a video sin audio [tercero] |
+| Google directo (Cloud Interactions `global`) | **Gemini Omni 1.1 Flash** (`gemini-omni-1.1-flash-preview`) | `pnpm ai:omni` local, seis operaciones verificadas con MP4 reales el 2026-09-24; [manual](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md) | Directo por Google, nunca por fal; separado de Globe y del ID Developer `gemini-omni-1.1-flash` |
 | Higgsfield CLI `~/.local/bin/higgsfield` (cuenta mkt@efeoncepro.com), out-of-band | **Recraft V4.1** vectores reales (SVG) | `Not authenticated` al 2026-09-16 [verificado] | Requiere `higgsfield auth login` por una persona. Distinto del carril Higgsfield **API** de `ai:fal` (§5.8) |
 
 ### 10.2 Evaluados y NO conectados (no usar como si existieran)

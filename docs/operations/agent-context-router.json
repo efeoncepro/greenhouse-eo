@@ -241,6 +241,29 @@
       ]
     },
     {
+      "id": "gemini-omni-video-cli",
+      "triggers": [
+        "Gemini Omni 1.1",
+        "gemini-omni-1.1-flash-preview",
+        "pnpm ai:omni",
+        "Omni video CLI",
+        "Omni edit video",
+        "Omni extend video"
+      ],
+      "skills": [
+        "motion-design-studio",
+        "greenhouse-secret-hygiene",
+        "greenhouse-gcloud-auth-playwright"
+      ],
+      "sources": [
+        "docs/architecture/GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md",
+        "docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md",
+        "docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md",
+        "scripts/ai/gemini-omni.ts",
+        "src/lib/ai/gemini-omni-cli.ts"
+      ]
+    },
+    {
       "id": "release-cloud-secrets",
       "triggers": [
         "release",

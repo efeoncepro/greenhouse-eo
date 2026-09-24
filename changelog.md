@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-24 — Gemini Omni 1.1 en la CLI local de video
+
+`pnpm ai:omni` conecta Cloud Interactions API con ADC y GCS privado para generar desde texto, imagen, cuadros o referencias, editar y extender video. Los seis modos completaron canaries reales a 360p/16:9; se verificaron MP4 y tests locales. La operación requiere confirmación de gasto, estima el componente de salida y permite retomar por ID/estado local. [ADR](docs/architecture/GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md) · [manual y evidencia](docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md). Sin cambios en Globe ni despliegue. Resoluciones/ratios superiores y política de ciclo de vida GCS siguen pendientes.
+
 ## 2026-09-23 — Compositor de piezas con CTA: tramo 16 y corte de la novena auditoría
 
 `pnpm foto:componer:cta` y `pnpm foto:cta:gate`, auditados dos veces por dos subagentes adversariales (diseño y
@@ -674,15 +678,3 @@ aprobación, calidad normativa, programación, publicación y performance. El La
 tracking/leading, seis pruebas visuales y rangos por tamaño; el supuesto DO de “rediseño” se corrigió porque
 `-0.060em`/`0.84` comprimía letras e interlínea en exceso. No se llamó a Fal: el Reel real ya cubre
 video y las animaciones didácticas se resuelven localmente.
-
-## 2026-09-13 — Pódcast: fotohistoria, biblioteca Nexa y entrega documentada
-
-[Bitácora y evidencia](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md):
-decisiones y rechazos de video, continuidad/identidad, logo físico, globos, texto compacto, seis slides,
-PDF, captions y readback Metricool. Programado 30/09: LinkedIn11:00 e Instagram19:00 Chile; no publicado.
-Manual, funcional y skills Codex/Claude actualizados; [recursos Nexa](docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md)
-localizados para reuso. Sin nuevas generaciones, publicación, cambio de runtime ni push.
-
-Complemento: [inventario completo de Marketing con Manzanitas](docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md):
-nueve SVG verificados, cuatro logos y cinco símbolos, colores/viewBox y rutas exactas; enlaces en
-Design/Social de ambos agentes, manual y descripción funcional. Sin modificar los originales.

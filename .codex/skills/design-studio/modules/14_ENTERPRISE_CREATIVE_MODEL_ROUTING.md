@@ -53,7 +53,7 @@ revision y expiración. Aprobar una ruta, delivery o publicación permanece en u
 | Edición/acabado premium | Gemini 3 Pro Image / Vertex | GPT Image 2 directo según máscara/composición |
 | Vector editable | Recraft 4.1 / Fal | humano en Illustrator/Figma para identidad final |
 | Premium video | Veo 3.1 / Vertex | Kling 3 4K / Fal según control/costo |
-| Reference-to-video | Seedance 2.0 / Fal | Gemini Omni / Vertex sólo canary |
+| Reference-to-video | Seedance 2.0 / Fal | Gemini Omni 1.1 / `pnpm ai:omni` Cloud directo: prueba técnica 360p/16:9/3 s; no disponibilidad de Globe |
 | Video de volumen | PixVerse V6 / Fal | Veo 3.1 Fast / Vertex |
 | Voz/localización | Gemini TTS + Chirp/Translation / Google Cloud | ElevenLabs / Fal con consentimiento |
 | Música | Lyria 3 / Vertex canary | ElevenLabs / Fal después de rights review |

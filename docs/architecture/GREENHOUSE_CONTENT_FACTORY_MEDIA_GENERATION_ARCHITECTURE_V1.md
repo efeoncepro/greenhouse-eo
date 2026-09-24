@@ -9,6 +9,13 @@
 > **Domain boundary:** `content.media` — generación multimodal (imagen / video / audio / 3D). Hermano del plano editorial `content.editorial` (TASK-1123, EPIC-019).
 > **Validated as of:** 2026-07-04 (pricing Vertex/Magnific/Higgsfield + disponibilidad de modelos verificados en vivo esta fecha)
 
+> **Nota de lectura 2026-09-24:** las tablas de Omni, precio, región y slices siguientes describen la propuesta
+> del 2026-07-04 y no el carril actual. La CLI local vigente es `pnpm ai:omni`, con Gemini Omni 1.1 Cloud
+> `gemini-omni-1.1-flash-preview` por Cloud Interactions en `global`; ofrece generación, edición y extensión.
+> Consultar la [guía de selección](GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md) y el
+> [manual de la CLI](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md) para límites, cuota, precio y evidencia.
+> Esta nota no reactiva el Media Generation Foundry ni cambia el estado `superseded` de esta arquitectura.
+
 ---
 
 ## 1. Executive summary

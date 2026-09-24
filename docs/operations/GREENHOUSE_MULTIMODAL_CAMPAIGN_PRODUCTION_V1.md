@@ -4,8 +4,8 @@
 > Layout Design & Finishing sobre Seedream 5 Lite/Pro,
 > GPT Image 2, Gemini Omni Flash y post determinístico. Seedance 2.0 queda como fallback condicionado;
 > no fue necesario para el release validado. No modifica el runtime del portal.
-> Ultima actualizacion: 2026-09-16 por Claude — puntero a la guía canónica de selección de modelos y correcciones
-> de costo y ranking (precios de fal por escalón de resolución, rankings externos contradictorios).
+> Ultima actualizacion: 2026-09-24 por Codex — contrato operativo de Gemini Omni 1.1 Cloud y CLI local;
+> el piloto de 2026-07-18 permanece como evidencia histórica del modelo anterior.
 
 ## Propósito
 
@@ -37,7 +37,7 @@ ranking universal**. Para otra corrida, descubrir schema y seleccionar por delta
 
 > **➡️ Qué modelo elegir hoy, cuándo y cómo:** la guía canónica es
 > [GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md](../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md)
-> (todos los modelos de `pnpm ai:image` y `pnpm ai:fal`). Este documento conserva el flujo de campaña, las manos y los
+> (modelos de `pnpm ai:image`, `pnpm ai:fal` y `pnpm ai:omni`). Este documento conserva el flujo de campaña, las manos y los
 > gates; la selección vigente de motor vive allá. Dos correcciones del 2026-09-16 que afectan a este flujo: (1) los
 > rankings externos no coinciden — OpenArt pone a Seedream 5 Pro #1 en imagen, mientras Arena (2026-09-07) y
 > Artificial Analysis (2026-09-16) ponen a GPT Image 2.5 Sunburst y Flare #1/#2 y a Seedream 5 Pro entre #8 y #15;
@@ -167,10 +167,12 @@ campaña; no reemplaza lineage, gates ni aprobación humana.
 | Copy/firma editorial/legal exactos                         | composición determinista               | precisión, localización, compliance y reemplazo sin regenerar                 |
 | Aprobación                                      | director/a de arte + brand/legal/media | el modelo no es autoridad de marca ni de lanzamiento                          |
 
-Gemini Omni Flash es **video**, no un tercer generador de stills. Al 2026-07-18 está en preview como
-`gemini-omni-flash-preview`: genera 720p, 3–10 s, 16:9 o 9:16, admite texto/imagen y edición conversacional.
+Gemini Omni Flash es **video**, no un tercer generador de stills. El piloto de 2026-07-18 usó el modelo
+anterior `gemini-omni-flash-preview`; sus resultados y límites no certifican el reemplazo. La ruta local vigente
+es `pnpm ai:omni` con Gemini Omni 1.1 Cloud `gemini-omni-1.1-flash-preview` en `global`. Cubre texto, imagen,
+primer/último cuadro, referencias, edición y extensión mediante [su manual](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md).
 Fal lista `google/gemini-omni-flash`, `/image-to-video`, `/reference-to-video` y `/edit`, pero Greenhouse **no**
-opera Omni por Fal: se conecta directo por las plataformas de Google (el registro de `pnpm ai:fal` no lo incluye).
+opera Omni por Fal: se conecta directo por Google (el registro de `pnpm ai:fal` no lo incluye).
 **Reafirmado 2026-09-16 por el operador:** Omni Flash y Nano Banana Pro van directo por Google, nunca por Fal (por
 Google es más barato con la misma calidad). Los motores de video que sí operan por `pnpm ai:fal` como alternativa
 out-of-band son Seedance, Minimax H3, Flux 3 y Wan 3.0. **Delta 2026-09-16:** el bloqueo por saldo agotado de ese
@@ -308,7 +310,9 @@ el release humano permanece como checkpoint separado. Contrato técnico:
 ### 7. Iteración conversacional Gemini Omni
 
 Si el single-shot necesita un cambio generativo localizado, cada edición usa un delta simple y termina con
-`Keep everything else the same`. Conservar el interaction/video parent y no reabrir simultáneamente cámara,
+`Keep everything else the same`. En el CLI Cloud 1.1, pasar el **MP4 fuente** a `--task edit --video`; conservar
+el ID de interacción para trazabilidad, sin asumir que `previous_interaction_id` reanuda la edición en Cloud.
+No reabrir simultáneamente cámara,
 sujeto, ambiente y audio. El output generativo sigue siendo un master de motion: captions, firmas editoriales, CTA, legal,
 familia 15/10/6, format wall, mezcla y loudness se terminan fuera del modelo. Si lo solicitado es una nueva
 toma/ángulo o continuidad física ausente, no forzar la edición conversacional: abrir el fallback Seedance 2.0.
@@ -345,13 +349,17 @@ regla de marca universal por una sola campaña.
 
 ## Contrato de relevo still → motion
 
+El siguiente YAML registra el relevo del piloto de 2026-07-18 y conserva su ID de modelo histórico. Para
+una corrida nueva, elegir `gemini-omni-1.1-flash-preview` y ejecutar `pnpm ai:omni` con las entradas, GCS
+privado y controles del [manual vigente](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md).
+
 ```yaml
 anchor_id: campaign-kv-v1
 parent_asset: path/to/clean-plate.png
 parent_sha256: '...'
 source_stage: gpt-organized-plate
 target_model: gemini-omni-flash-preview
-target_provider: google-direct  # Omni no se opera por Fal; declarar el endpoint Google al cablearlo
+target_provider: google-direct  # piloto histórico; no se operó por Fal
 brand_mode: editorial-neutral
 channel_mode: digital-motion
 role: FIRST_FRAME
@@ -370,21 +378,29 @@ acceptance:
   - audio and motion have no abrupt cut
 ```
 
-## Limitaciones vigentes de Gemini Omni
+## Limitaciones vigentes de Gemini Omni 1.1 Cloud
 
-- Preview: model/version/rate limits pueden cambiar; pinnear ID y validar antes de cada producción.
-- 720p, 3–10 s; sólo 16:9/9:16 en el contrato revisado.
-- No soporta actualmente extensión ni interpolación first/last frame.
-- Referencias de video, múltiples videos y audio subido tienen limitaciones documentadas; no diseñar el flujo
-  suponiendo que funcionan hasta probar el endpoint exacto.
-- Sin system instructions, temperature, `top_p` ni negative prompt dedicado; prohibiciones viven en prompt.
-- Inglés está plenamente evaluado; otras lenguas pueden variar. Copy final continúa fuera del modelo.
-- Todo video generado incluye SynthID invisible; registrar además provenance propio.
+- Es **Preview** y usa el ID Cloud `gemini-omni-1.1-flash-preview`, distinto del ID Developer
+  `gemini-omni-1.1-flash`. El endpoint de Cloud Interactions está en `global`; fijar el ID y validar cuota y
+  acceso del proyecto antes de producir. La cuota Cloud es fija y no ofrece PayGo para este modelo.
+- La salida admite 3–10 s, `16:9`/`9:16` y `360p`/`720p`/`1080p`/`4k`; 1080p y 4K son reescalados según Google.
+  La entrada admite hasta 10 imágenes y 3 videos por prompt; cada video fuente, hasta 10 s.
+- `edit` y `extend` son tareas Cloud disponibles; reemplazo de objetos y cambio de estilo son instrucciones
+  dentro de `edit`. Para primer y último cuadro se usa `image_to_video` con dos imágenes ordenadas.
+- La edición del CLI usa un MP4 fuente explícito. El esquema expone `previous_interaction_id`, pero su uso
+  stateful en Omni Cloud no está probado aquí. Audio subido no forma parte de las seis rutas del CLI.
+- Los seis canaries locales del 2026-09-24 prueban conectividad y salida MP4 de las seis rutas a baja resolución;
+  no validan por sí solos continuidad visual, calidad a 1080p/4K ni aprobación de marca. Detalle y comandos:
+  [manual `ai:omni`](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md).
+- Copy final continúa fuera del modelo. Revisar audio, procedencia, derechos y cada cuadro de salida antes
+  de incorporar el video al master de campaña.
 
-Fuentes oficiales: [Google Gemini Omni](https://ai.google.dev/gemini-api/docs/omni),
-[release notes](https://ai.google.dev/gemini-api/docs/changelog),
-[pricing](https://ai.google.dev/gemini-api/docs/pricing) y
-[Fal image-to-video](https://fal.ai/models/google/gemini-omni-flash/image-to-video/api).
+Fuentes oficiales: [ficha Cloud](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-1-1-flash),
+[referencia Interactions](https://docs.cloud.google.com/gemini-enterprise-agent-platform/reference/rpc/genai.vertex.v1beta1),
+[edición](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/video/edit-videos),
+[extensión](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/video/extend-videos),
+[cuotas](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/quotas) y
+[precios Cloud](https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing).
 
 ## Worked example
 

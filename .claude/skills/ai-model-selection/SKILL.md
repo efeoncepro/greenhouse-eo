@@ -37,8 +37,11 @@ recetas por caso (§6), presupuesto (§7), brechas conocidas (§8) y rankings ex
 copiado acá se desincroniza en silencio y produce lo peor: dos fuentes que se contradicen y ninguna que
 avise. Acá vive el **método**; allá, el **dato**. Si necesitas el número, ábrelo.
 
-**Contratos de código (lo que el CLI puede ejecutar de verdad):**
-`src/lib/ai/fal-capabilities.ts` · `src/lib/ai/higgsfield-capabilities.ts` · `src/lib/ai/openai-image.ts`
+**Contratos de código (lo que cada CLI puede ejecutar de verdad):**
+`src/lib/ai/fal-capabilities.ts` · `src/lib/ai/higgsfield-capabilities.ts` · `src/lib/ai/openai-image.ts` ·
+`src/lib/ai/gemini-omni-cli.ts` (Google Cloud directo, tooling local). Para Omni 1.1, el manual
+`docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md` conserva modos, límites y evidencia fechada;
+la route card de Globe mide otra superficie y no acredita disponibilidad de la CLI ni al revés.
 
 **Fichas de ruta (capacidad declarada por endpoint, con evidencia por cable):**
 [`docs/architecture/creative-studio/model-fleet/routes/*.json`](../../../docs/architecture/creative-studio/model-fleet/routes/)
@@ -93,8 +96,17 @@ contradicción por accidente y pagando de más: la mitad barata era una prueba d
    resolución que vas a pedir** — no a la del titular.
 4. **Ficha** (§5): lee «cuándo NO», las trampas y los filtros de contenido.
 5. **Estima antes de gastar.** `--estimate` en `pnpm ai:fal` valida e imprime el costo **sin encolar**.
-   `--list`, `--balance` y `--status` son gratis. Todo lo demás cobra.
+   `--list`, `--balance` y `--status` son gratis. En `pnpm ai:omni`, `--estimate` tampoco envía, pero
+   estima sólo el video output nominal: input, texto y redondeo se suman. Cada POST exige `--yes`.
 6. **Comando** desde la ficha o la receta.
+
+**Omni 1.1, corte 2026-09-24:** `pnpm ai:omni` usa el ID Cloud
+`gemini-omni-1.1-flash-preview`; el ID Developer API `gemini-omni-1.1-flash` es distinto. Los seis modos
+`text|image|frames|reference|edit|extend` completaron corridas técnicas en Cloud a 360p/16:9/3 s
+(`extend`: 6 s acumulados). La edición de un MP4 fuente está probada técnicamente; la cadena
+stateful `previous_interaction_id`, 720p/1080p/4K, 9:16, fidelidad temporal, C2PA y factura real
+siguen sin verificar. Para operar, lee el manual antes del POST y usa el interaction ID con
+`--status`/`--wait` si necesitas retomar: no hagas un segundo envío por timeout.
 
 ### Tres trampas que ya costaron dinero
 

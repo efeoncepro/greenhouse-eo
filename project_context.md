@@ -69,8 +69,7 @@ canary y readback. Desde 2026-09-08 existe `gpt-image-2.5` (Sunburst/Flare): pro
 sin ruta Globe, sin Batch y **sin calculadora de costo por imagen**; `gpt-image-2` no quedó deprecado y el
 helper local no transporta 2.5. Matriz canónica:
 `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`.
-`TASK-1781` gobierna Omni 1.1: Developer `gemini-omni-1.1-flash` y Cloud
-`gemini-omni-1.1-flash-preview` no se colapsan; gated hasta canary/readback y el modelo anterior cierra el 2026-09-30.
+Omni 1.1 CLI: [ADR](docs/architecture/GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md). Globe: `TASK-1781` gated; modelo anterior cierra 30/09.
 Seedream T2I, GPT Image 2 y Nano Banana 2/Pro están disponibles
 según el reader live; Seedream Edit queda `gated` por binding deshabilitado. Seedream Lite, edición de OpenAI/Nano
 Banana y video-to-image de Nano Banana son superficies no públicas hasta tener ruta, binding, canary y readback

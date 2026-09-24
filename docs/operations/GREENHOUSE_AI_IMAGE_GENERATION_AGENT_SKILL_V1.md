@@ -633,6 +633,7 @@ digital/offline a escala, usar por defecto:
 - **Seedream 5 Pro:** desarrollo de materialidad, color, atmósfera, energía y continuidad visual de una dirección seleccionada.
 - **GPT Image 2:** organización espacial, instrucciones complejas, reparación localizada, adaptación de formatos y creación de campos de copy.
 - **Gemini Omni Flash:** motion 9:16/16:9 desde un clean plate, audio nativo y edición conversacional. Se conecta directo por las plataformas de Google, no por fal ni por `pnpm ai:fal`, aunque fal lo liste (reafirmado por el operador 2026-09-16: por Google es más barato con la misma calidad).
+- **Gemini Omni 1.1 Cloud, carril local vigente:** `pnpm ai:omni` usa `gemini-omni-1.1-flash-preview` en `global`. Conecta texto, imagen, primer/último cuadro, referencias, edición y extensión; las seis rutas tuvieron canary MP4 el 2026-09-24. Para parámetros, costo estimado, GCS privado y recuperación por ID, seguir el [manual de `ai:omni`](../manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md). El modelo anterior del piloto de 2026-07-18 no determina los límites de 1.1.
 - **Composición determinista:** texto, logos, claims, legal, grillas y exports finales. Un modelo generativo no es la fuente de verdad tipográfica.
 
 El paso `anchor` es obligatorio antes de escalar. Debe aprobar identidad, silueta, paleta, sistema de luz, fondo, zona de copy y invariantes protegidos. Desde ese anchor se derivan todas las piezas en una topología estrella; no se encadenan treinta derivados entre sí.

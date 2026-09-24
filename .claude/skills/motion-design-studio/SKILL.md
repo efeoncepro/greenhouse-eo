@@ -89,6 +89,8 @@ hipótesis de montaje, no benchmarks; revisar secuencia completa y no sólo el p
    (`SOURCES.md`).
 4. **Si hay que ejecutar** (dirigir/producir/editar/finalizar), abre `efeonce/STUDIO_TOOLING.md`
    y usa el pipeline con las herramientas conectadas + confirmación humana antes de producir/entregar.
+   Para Gemini Omni 1.1 Flash en la CLI local, usa `pnpm ai:omni` y
+   `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`; es un carril Cloud directo, separado de Globe.
    Para **recetas de producción validadas** (qué combinación funcionó y cómo — reference→Omni enhance,
    reference-chaining, UI-sin-AE, híbrido), consulta la **biblioteca viva** `workflows/README.md`; el
    **contrato completo de Gemini Omni en Vertex** está en `efeonce/GEMINI_OMNI_VERTEX.md`. La capacidad
@@ -164,7 +166,8 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   #2 en video y #1 en Video Editing en OpenArt Arena 2026-09-16, pero **sin endpoint de edición** en fal),
   **Kling** (Voice
   Binding vía Higgsfield; Kling 3 vía fal y Grok Imagine video **evaluados, no conectados** — ver el workflow),
-  **Veo** (broadcast), **Gemini Omni** (edición conversacional; **directo por Google, nunca por fal**).
+  **Veo** (broadcast), **Gemini Omni 1.1** (`pnpm ai:omni` Cloud directo; seis modos probados a 360p,
+  cadena conversacional stateful sin probar; nunca por fal).
 - 🔴 **Antes de elegir motor de video**: aplicar el contrato de fidelidad y luego el **árbol por necesidad +
   costos por resolución** de `workflows/engine-selection-by-fidelity-contract.md` (fal cobra por escalón: el precio
   registrado es el más bajo; Flux 3 publicado es el doble del registrado → confirmar con `pnpm ai:fal --balance`).

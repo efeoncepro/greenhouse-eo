@@ -96,11 +96,13 @@ ranking fechado · **[decisión]** del operador · **sin dato** = no existe evid
 |---|---|---|
 | OpenAI directo | `pnpm ai:image` (out-of-band) · runtime `generateImage` provider `openai-image` (default del producto) | GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare |
 | Google directo (Vertex, `global`) | **sólo** runtime `generateImage` provider `google-gemini-image`; **no hay CLI** | Nano Banana 2 (`gemini-3.1-flash-image`, default); Nano Banana Pro (`gemini-3-pro-image`) disponible pero **sin superficie** |
+| Google Cloud directo (Interactions, `global`) | `pnpm ai:omni` (tooling local, fuera de Globe) | Gemini Omni 1.1 Flash `gemini-omni-1.1-flash-preview`: texto, imagen, cuadros inicial/final, referencias, edición y extensión de video |
 | Higgsfield CLI (out-of-band) | `higgsfield` | Recraft V4.1, **vectores SVG reales**. Estado 2026-09-16: `Not authenticated` → sin vía hasta que una persona corra `higgsfield auth login` |
 | fal.ai (out-of-band, NUNCA runtime) | `pnpm ai:fal` | Seedream 5 Pro/Lite/edit/layerize (imagen); Seedance, Minimax H3, Flux 3, Wan 3.0 (video) |
 | Higgsfield API (out-of-band, NUNCA runtime) | `pnpm ai:fal --capability hf-*` | SOUL 2/Cinema, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image Turbo, Grok Image 2.0, Recraft 4.1 (SVG **sin confirmar**: `model_type: vector` de la app, sin probar por API); video Kling/PixVerse/LTX/Happy Horse y otra vía para Seedance/Wan/H3. `--estimate` cotiza exacto sin cobrar. Estado 2026-09-16: 44/44 cotizan, **0 generaciones reales** (cuenta de API sin créditos). Guía §5.8 |
 
-Nano Banana Pro y Gemini Omni Flash van **siempre directo por Google, nunca por fal** [decisión]. Recraft por fal
+Nano Banana Pro y Gemini Omni van **siempre directo por Google, nunca por fal** [decisión]. La CLI de video 1.1
+usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiable. Recraft por fal
 (23 endpoints) no está conectado.
 
 ### Árbol de decisión — imagen
@@ -176,6 +178,15 @@ Flare #1/#2 en texto a imagen y en edición (Sunburst gana edición), Seedream 5
 
 Toda elección de video se hace con `motion-design-studio` → `workflows/engine-selection-by-fidelity-contract.md`
 (contrato de fidelidad por toma). Lo mínimo que debes saber desde esta skill:
+
+**Gemini Omni 1.1 Flash:** `pnpm ai:omni --help` y
+`docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md` son la entrada operativa para Cloud directo.
+Los seis modos CLI `text|image|frames|reference|edit|extend` completaron una corrida técnica real en
+`efeonce-group` el 2026-09-24 a 360p, 16:9 y 3 s; `extend` devolvió 6 s acumulados. `edit` recibe video
+fuente e imagen opcional; **no** se ha probado la cadena `previous_interaction_id`/edición stateful en 1.1.
+720p/1080p/4K, 9:16, continuidad fina, C2PA y factura real siguen sin verificar. La CLI sólo produce
+salidas en GCS privado, con descarga local opcional; no activa ni cambia rutas de Globe. Usa `--estimate` sin gasto antes de `--yes`, conserva el
+interaction ID y retoma con `--status`/`--wait` sin enviar otro POST.
 
 | Necesidad | Motor (`pnpm ai:fal --capability …`) |
 |---|---|
@@ -702,8 +713,9 @@ diagnostica sin costo.
   en location `global`, 2026-09-16: `gemini-3-pro-image` y `gemini-3-pro-image-preview` OK, `gemini-3.1-flash-image`
   OK, `gemini-3.1-pro-image` 404), pero **ninguna superficie lo usa**. No cambies la env global para probarlo:
   cambiaría todo el carril `google-gemini-image` del producto; lo correcto sería exponerlo como modelo elegible por
-  pedido (no hecho, decisión del operador). Nano Banana Pro y Gemini Omni Flash van **directo por Google, nunca por
-  fal** (decisión del operador), aunque fal ofrezca Omni Flash (`google/gemini-omni-flash/*`). Referencia externa: OpenArt Arena imagen (2026-09-16) ubica a Nano Banana Pro #3 y
+  pedido (no hecho, decisión del operador). Nano Banana Pro y Gemini Omni van **directo por Google, nunca por
+  fal** (decisión del operador). La CLI Omni 1.1 Cloud es `pnpm ai:omni`; el slug fal del modelo anterior
+  (`google/gemini-omni-flash/*`) no es su transporte. Referencia externa: OpenArt Arena imagen (2026-09-16) ubica a Nano Banana Pro #3 y
   Nano Banana 2 #5.
 - **Grok Imagine imagen v2.0 (xAI): evaluado, no conectado.** `xai/grok-imagine-image/v2.0/{text-to-image,edit}`
   en fal: `quality` low|medium, 1k/2k, 1–4 imágenes, aspectos amplios (incluye 19.5:9 y 20:9), devuelve
@@ -714,7 +726,7 @@ diagnostica sin costo.
   (built on `src/lib/ai/fal.ts`), never a parallel fal client, ad-hoc script or product runtime wiring.
 - For campaign systems, do not choose one provider globally. Load
   `references/seedream-5-gpt-image-2-hybrid-production.md` and route each operation through an
-  explicit anchor/handoff contract. If the system adds Gemini Omni motion or offline outputs, also load
+  explicit anchor/handoff contract. Si la campaña incluye Gemini Omni motion u outputs offline, carga también
   `docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md`; keep clean plates separate from the
   deterministic brand/channel layer.
 - Campaign derivation uses a governed **star topology**: the approved `anchor_id`/`anchor_revision` is the

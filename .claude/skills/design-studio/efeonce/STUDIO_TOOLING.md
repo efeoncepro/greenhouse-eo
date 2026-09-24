@@ -44,14 +44,16 @@
   con alfa real + `layers.json`. Es dirección de arte sobre capas; el logo oficial y el copy final siguen
   saliendo del vector y de la composición determinística.
 - **¿Es video/motion?** → Seedance 2.5 (Fal: T2V/I2V/R2V, audio y referencias multimodales) o Seedance 2.0 (control por referencias, Fal) / Minimax H3 (Fal, conectado 2026-09-16: Max Turbo exploración barata · Max `camera-controls` cámara sobre imagen congelada · base 2K/4K) / Flux 3 (Fal, conectado y verificado 2026-09-16: video, no imagen; draft → enhance · primer/último cuadro y keyframes · edit y extend para video a video) / Wan 3.0 (Fal, conectado y verificado 2026-09-16: hasta 30 s con duración inteligente · video desde una web o documento) / Veo 3.1 (premium, Vertex) /
-  PixVerse V6 (escala, Fal) / Kling 3 (4K/specialist, Fal; **evaluado, no conectado**) / Grok Imagine video (Fal; **evaluado, no conectado**) / Gemini Omni (canary, Vertex directo, nunca Fal);
+  PixVerse V6 (escala, Fal) / Kling 3 (4K/specialist, Fal; **evaluado, no conectado**) / Grok Imagine video (Fal; **evaluado, no conectado**) / Gemini Omni 1.1 (`pnpm ai:omni`, Cloud directo, nunca Fal; seis modos probados sólo a 360p/16:9/3 s);
   Seedance, H3, Flux 3 y Wan 3.0 se operan con `pnpm ai:fal` y el endpoint (Seedance 2.5 larga · 2.0 base 4K · H3 Turbo exploración · Flux 3 draft/edit/extend · Wan 3.0 duración `auto`/web/documento) se elige en
   `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md` (árbol por necesidad + costos por
   resolución: fal cobra por escalón y el precio registrado es el más bajo; Seedance: sin marcas ni personas reales,
   su filtro rechaza tras encolar y cobra); el CLI estima el costo antes de encolar, pide `--yes` sobre el tope
   (USD 1, `FAL_COST_CONFIRM_USD` o `--max-usd`) y, sin `--resolution`, usa el escalón más barato; usa dos cuentas de fal con failover por saldo
   (`docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`);
-  producción y formato social →
+  Gemini Omni tiene CLI y contrato propios (`docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`):
+  `--estimate` no envía, `--yes` autoriza cada POST y `--status`/`--wait` retoman el mismo interaction ID;
+  la edición stateful, 720p/1080p/4K y 9:16 siguen sin verificar. Producción y formato social →
   `social-media-studio`. Un clip de duración mínima sólo valida el endpoint: el release profesional exige
   master + cutdown por ratio, end card, poster, audio/captions y QA temporal.
 - **¿Es un logo real de tercero?** → `greenhouse-digital-brand-asset-designer`.

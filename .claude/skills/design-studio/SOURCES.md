@@ -54,7 +54,7 @@ Guía de arquitectura y compras, no tarifario. Verificar endpoint, región, cuot
 | FLUX.2 | BFL directo o Fal | Paridad pública en los endpoints comparados; decidir por SLA, auth y observabilidad. |
 | Recraft v4 | Recraft directo o Fal | Paridad pública en los endpoints comparados; directo si pesa el control contractual. |
 | GPT Image 2 / 2.5 (Sunburst, Flare) | OpenAI directo (`pnpm ai:image`) | Ruta canónica; Fal sólo para pruebas o gateway explícitamente justificado. 2.5 sin Batch; costo estimable por fórmula oficial y rate limits publicados (iguales a GPT Image 2). |
-| Nano Banana / Gemini | Google AI Studio o Vertex directo | Google nativo nunca por Fal; separar API, Batch, región y cuotas. Estado 2026-09-16: **Nano Banana 2** (`gemini-3.1-flash-image`) es el default del provider `google-gemini-image` del producto; **Nano Banana Pro** (`gemini-3-pro-image`) está disponible en nuestro Vertex (`models.get`, location `global`) pero **ninguna superficie lo usa**; no hay CLI de Gemini Image. Gemini Omni Flash también va directo aunque fal lo ofrezca. |
+| Nano Banana / Gemini | Google AI Studio o Vertex directo | Google nativo nunca por Fal; separar API, Batch, región y cuotas. Estado 2026-09-16: **Nano Banana 2** (`gemini-3.1-flash-image`) es el default del provider `google-gemini-image` del producto; **Nano Banana Pro** (`gemini-3-pro-image`) está disponible en nuestro Vertex (`models.get`, location `global`) pero **ninguna superficie lo usa**; no hay CLI de Gemini Image. Gemini Omni **1.1 video** se opera con `pnpm ai:omni` directo a Cloud (2026-09-24). |
 | Wan 3.0 / Prime | Fal (`pnpm ai:fal`, out-of-band) | Conectado 2026-09-16: 6 endpoints de video `alibaba/wan-3.0{,-prime}/*` (t2v/i2v/r2v); USD/s por resolución base 0,05 · 0,10 · **0,20 a 1080p (default)**, Prime 0,068 · 0,14 · 0,28; 30 fps. Los 6 verificados en real 2026-09-16. Sin edición ni imagen en 3.0. #2 video y #1 Video Editing en OpenArt Arena 2026-09-16 (ranking externo). |
 | Kling 3 · Grok Imagine | Fal (evaluado, **no conectado**) | Revisión de catálogo/OpenAPI 2026-09-16, sin corridas: Kling O3 0,14 USD/s (4k 0,42/s; multi-shot, elements con voz, motion-control, 4K); Grok Imagine video v1.5 0,01/s (#10 OpenArt), imagen v2.0 (#4 OpenArt). Conectarlos es decisión del operador. |
 | Flux 3 | Fal (`pnpm ai:fal`, out-of-band) | Anunciado por BFL el 2026-07-23. En Fal es un modelo de **video** (no de imagen): 12 endpoints `blackforestlabs/flux-3/*` conectados y verificados en real 2026-09-16 (catálogo y OpenAPI de fal + API de pricing + corridas reales): registro finales 0,085 USD/s · drafts 0,03/s · edit 0,03/s · extend 0,205/s; **publicado por BFL/fal: final 0,17 (720p) / 0,29 (1080p), draft 0,06, extend 0,41** → confirmar con `pnpm ai:fal --balance`. Ruta directa BFL sin evaluar. |
@@ -63,7 +63,7 @@ Guía de arquitectura y compras, no tarifario. Verificar endpoint, región, cuot
 datos; `fallback` → Fal sólo con slug/schema verificados y salida normalizada. Registrar fecha, resolución,
 duración, reintentos y costo efectivo por output.
 
-## Matriz de disponibilidad real en Greenhouse (as-of 2026-09-16)
+## Matriz de disponibilidad real en Greenhouse (as-of 2026-09-24 para Omni; otras filas 2026-09-16)
 
 Guía canónica de qué modelo elegir, cuándo y cómo: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`. Esta matriz separa lo que **se puede
 producir hoy** de lo que sólo está evaluado; la tabla de "Fuentes base" de abajo es un mapa de fortalezas, no de
@@ -71,8 +71,8 @@ disponibilidad.
 
 | Estado | Imagen | Video |
 |---|---|---|
-| **Disponible en CLI** (out-of-band, gasta) | `pnpm ai:image`: GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare (`xhigh`/`max` sólo en 2.5). `pnpm ai:fal`: Seedream 5 Pro, Pro edit, Pro layerize, Lite, Lite edit | `pnpm ai:fal`: Seedance 2.5 y 2.0 (base/fast/mini/us), Minimax H3 (base/Max/Max Turbo/camera; LoRA y entrenadores sin verificar; Director no operable), Flux 3 (12), Wan 3.0 y Prime |
-| **Directo, sin CLI** | Nano Banana 2 (default del runtime `google-gemini-image`); Nano Banana Pro disponible en Vertex **sin superficie**; Recraft V4.1 SVG vía Higgsfield CLI (**sin sesión** 2026-09-16) | Gemini Omni Flash (directo por Google, nunca fal [decisión]); Veo 3.1 (Vertex) |
+| **Disponible en CLI** (out-of-band, gasta) | `pnpm ai:image`: GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare (`xhigh`/`max` sólo en 2.5). `pnpm ai:fal`: Seedream 5 Pro, Pro edit, Pro layerize, Lite, Lite edit | `pnpm ai:fal`: Seedance 2.5 y 2.0 (base/fast/mini/us), Minimax H3 (base/Max/Max Turbo/camera; LoRA y entrenadores sin verificar; Director no operable), Flux 3 (12), Wan 3.0 y Prime. `pnpm ai:omni`: Cloud Gemini Omni 1.1 Flash, seis modos probados a 360p/16:9/3 s (extend 6 s acumulados) |
+| **Directo, sin CLI** | Nano Banana 2 (default del runtime `google-gemini-image`); Nano Banana Pro disponible en Vertex **sin superficie**; Recraft V4.1 SVG vía Higgsfield CLI (**sin sesión** 2026-09-16) | Veo 3.1 (Vertex) |
 | **Evaluado, no conectado** | Grok Imagine imagen v2.0, Qwen Image 3, Flux.2 Pro, Kling imagen O3, Recraft por fal (23 endpoints) | Kling 3 (O3/V3), Grok Imagine video, Wan 2.7 (edición), HappyHorse 1.1, PixVerse V6 |
 | **Workbench watch** | Midjourney, Ideogram, Adobe Firefly, Magnific (upscale) | Higgsfield (Seedance 2.5 `omni_reference`, Kling, Soul ID), Runway |
 
@@ -124,7 +124,8 @@ tokens de fal (lo que subestimaba ~2× era la equivalencia de OpenArt).
 - Storytool — Best AI Image Generators 2026 — https://storytool.io/blogs/best-ai-image-generators-2026
 
 **Modelos IA de video**
-- Google Cloud — Gemini Omni Flash Preview — https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-flash-preview
+- Google Cloud — Gemini Omni 1.1 Flash Preview (CLI vigente) — https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-1-1-flash
+- Google Cloud — Gemini Omni Flash Preview (modelo anterior, evidencia histórica) — https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-flash-preview
 - Google AI — Gemini video generation / Omni — https://ai.google.dev/gemini-api/docs/video
 - Google DeepMind — Gemini Omni — https://deepmind.google/models/gemini-omni/
 - Google Cloud — Veo 3.1 — https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/veo/3-1-generate
@@ -184,7 +185,7 @@ tokens de fal (lo que subestimaba ~2× era la equivalencia de OpenArt).
 | **Kling 3 Pro/4K** (Fal) — **evaluado, no conectado a `pnpm ai:fal`** (2026-09-16) | start/end, elements con voz, multi-shot, motion-control y 4K | límites de audio/idioma y concurrencia; O3 0,14 USD/s, 4k 0,42/s | especialista premium/4K si el operador lo conecta; Kling vía Higgsfield es otro carril |
 | **Grok Imagine video v1.5** (xAI, Fal) — **evaluado, no conectado** (2026-09-16) | exploración masiva a USD 0,01/s; 1–15 s hasta 1080p | #10 en OpenArt Arena; sin control de audio | candidato de exploración barata |
 | **PixVerse V6** (Fal) | 1080p, audio, cámara y costo de volumen | límites por resolución/duración | scale social/motion |
-| **Gemini Omni Flash** (Google Vertex) | reference/video edit + audio | preview, 720p, máx. 10 s | canary con fallback; nunca Fal |
+| **Gemini Omni 1.1 Flash** (Google Cloud, `pnpm ai:omni`) | generación por texto/imagen/cuadros/referencias; edit y extend desde MP4; audio en MP4 | Preview; sólo 360p/16:9/3 s verificados en CLI; 720p/1080p/4K, 9:16 y edición stateful sin probar | tooling local directo, nunca Fal; manual `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md` |
 | **Flux 3** (Black Forest Labs, Fal) | video con audio: T2V/I2V, primer-último cuadro, keyframes, edit que conserva movimiento, extend, draft barato → enhance; 5–20 s, 720p/1080p | en Fal no genera imágenes; más lento que H3; `extend` exige audio en el origen y entrega sólo la continuación | explorar movimiento en draft, fijar trayectoria con cuadros, video a video verificado; detalle en `motion-design-studio` |
 | ~~**Sora 2** (OpenAI)~~ | físico/consistencia | **DEPRECADO**: API deprecada 2026-03-24, shutdown 2026-09-24 | **NO** usar para proyectos nuevos |
 
@@ -198,7 +199,7 @@ tokens de fal (lo que subestimaba ~2× era la equivalencia de OpenArt).
   → Midjourney**; **vector/logo escalable → Recraft**; **realismo/cámara → FLUX.2**; **realista diario →
   GPT Image 2.5 Flare; edición precisa/pieza final → 2.5 Sunburst; Batch → GPT Image 2**; **divergencia de campaña → Seedream 5 Lite**; **material/color/región semántica →
   Seedream 5 Pro**; **secuencia híbrida → módulo 12 + anchor/handoff**; **Photoshop/Firefly → workbench watch tras rights review**; **video con control por referencias → Seedance**;
-  **broadcast/cine → Veo**; **económico simple → Kling**; **edición conversacional → Gemini Omni**;
+  **broadcast/cine → Veo**; **económico simple → Kling**; **edición de un MP4 con instrucción → Gemini Omni 1.1 CLI** (cadena conversacional stateful sin probar);
   **draft barato de video → enhance, trayectoria por cuadros o video a video → Flux 3 (Fal; en Fal es video, no imagen)**;
   **toma de hasta 30 s con duración inteligente o video desde una web/documento → Wan 3.0 (Fal)**.
 - Sora 2 deprecado (shutdown 2026-09-24) — no basar nada nuevo en él.

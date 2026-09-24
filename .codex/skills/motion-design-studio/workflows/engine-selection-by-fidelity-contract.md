@@ -338,8 +338,13 @@ del catálogo/OpenAPI de fal el 2026-09-16, sin corridas.
 
 Estos datos de Kling vía fal son un carril distinto de Kling vía Higgsfield (MCP): no los mezcles.
 
-**Gemini Omni Flash va directo por Google, nunca por fal**, aunque fal lo ofrezca (`google/gemini-omni-flash/*`):
-decisión del operador (más barato, misma calidad).
+**Gemini Omni 1.1 Flash va directo por Google, nunca por fal.** Para producción local usa
+`pnpm ai:omni --help` y `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`.
+La CLI Cloud separa `text|image|frames|reference|edit|extend`; los seis modos completaron un canary técnico
+en `efeonce-group` a 360p/16:9/3 s (extensión: 6 s acumulados) el 2026-09-24. `edit` recibe video fuente
+e imágenes opcionales; no implica edición conversacional stateful. Ni 720p/1080p/4K ni 9:16 ni la
+fidelidad fina, C2PA o factura real se verificaron en esa prueba. `--estimate` no envía; `--yes` autoriza
+el POST y el interaction ID permite `--status`/`--wait` sin otro envío. Esta CLI no modifica Globe.
 
 ## Previs 3D → Seedance: capacidad investigada, no evidencia interna
 
