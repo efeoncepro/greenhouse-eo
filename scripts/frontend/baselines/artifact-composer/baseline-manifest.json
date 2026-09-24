@@ -61,6 +61,16 @@
     "templates/TeamSplit.png": "db9773a534741cb33e5f5912fb9d40af848d687f875e4a0fb87d76b1cf10ab04",
     "templates/TestimonialsFull.png": "411f3511bdd12fafc4f5cd60ee0b3265a0414226d968246463a4eddf65fb48f2",
     "templates/TimelineFull.png": "3766f4f9b76b9f94dce36406bf6e93ce4456d3d7a1b3fac40045489dbfe1fbeb",
-    "templates/ToolStackFull.png": "9598e3b8db33c91e71ebdf16af192f17f2de700ceaf632dd7ac0919d6569027b"
+    "templates/ToolStackFull.png": "9598e3b8db33c91e71ebdf16af192f17f2de700ceaf632dd7ac0919d6569027b",
+    "templates-insights-deck/InsightsCoverSlide.png": "58ec70192d29663b8c79be93a2eeea382f621829603814f89507ebe286fa21e5",
+    "templates-insights-deck/InsightsEvidenceSlide.png": "6680cb4c75a668e545b4680525bf7770a64d429e53af334ba95a2bfbd32bccfa",
+    "templates-insights-deck/InsightsLimitsSlide.png": "14a80bc81128a0187f679f84c35c0afb3f2434db8e4c3754e356c7b36b019191",
+    "templates-insights-deck/InsightsNarrativeSlide.png": "571f2dd0b38ee9c60fd8b62911cd326b7a9f6528755af0291796ad586ac87795",
+    "templates-insights-report/ReportAnalysisPage.png": "21a6800658cb2d28c3a79deac45debeed58ec75afd823534a013863e2d439982",
+    "templates-insights-report/ReportCoverPage.png": "69f86d5166320f079dd75dcebdf20f26c4437b11c41c483571213cf0c13a5437",
+    "templates-insights-report/ReportIndexPage.png": "65b4c5811c352d99dde46c2a37c39f66aaa4160eb3ac3b631d598444433fce02",
+    "templates-insights-report/ReportLimitsPage.png": "cb8a6168e7c5cbea9d0b14a7ac28d1749265318e8c56847ac5028b60e3eb8b55",
+    "templates-insights-report/ReportNarrativePage.png": "88d684d2f6a063328e892abaaece6ee981f7a65300e43ae9956fc5234da1bc0c",
+    "templates-insights-report/ReportTablePage.png": "938726d5ea87626acc588450d96ef5d4f495afe74f21acd8189c1bfe856a600f"
   }
 }

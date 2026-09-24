@@ -36,6 +36,23 @@
   /* Lead y resto se separan por LUMINANCIA: el deck también se imprime y se fotocopia. */
   .fill.tone-lead { background: var(--axis-deck-role-accent); }
   .fill.tone-rest { background: var(--axis-deck-role-surfaceEdge); opacity: 0.6; }
+  .row[data-chart-family]:not([data-chart-family^="bar"]) .track { display: none; }
+  .chart-svg { display: none; width: 100%; height: 360px; overflow: visible; }
+  .row[data-chart-family]:first-child .chart-svg { display: none; }
+  .row[data-chart-family]:not([data-chart-family^="bar"]):first-child .chart-svg { display: block; }
+  .chart-axis { fill: none; stroke: var(--axis-deck-role-fieldEdge); stroke-width: .5; }
+  .chart-mark { display: none; }
+  .row[data-chart-family="line"] .mark-line,
+  .row[data-chart-family="scatter"] .mark-scatter,
+  .row[data-chart-family="pie"] .mark-pie,
+  .row[data-chart-family="donut"] .mark-donut { display: block; }
+  .mark-line { fill: none; stroke: var(--axis-deck-role-accent); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .mark-line.line-2 { stroke-dasharray: 3 2; }
+  .mark-line.line-3 { stroke-dasharray: 1 2; }
+  .mark-scatter { fill: var(--axis-deck-role-accent); }
+  .mark-pie.slice-1, .mark-donut.slice-1 { fill: var(--axis-deck-role-accent); }
+  .mark-pie.slice-2, .mark-donut.slice-2 { fill: var(--axis-deck-role-fieldMid); }
+  .mark-pie.slice-3, .mark-donut.slice-3 { fill: var(--axis-deck-role-surfaceEdge); }
 
   .provenance {
     margin-top: auto;
@@ -59,6 +76,19 @@
           <span class="row-name" data-slot-field="name">Páginas publicadas en el período</span>
           <span class="row-value" data-slot-field="printedValue">+61,4%</span>
         </div>
+        <svg class="chart-svg" viewBox="0 0 100 100" role="img" aria-label="Figura cuantitativa">
+          <path class="chart-axis" d="M 8 8 V 92 H 92" />
+          <path class="chart-mark mark-line line-1" d="" />
+          <path class="chart-mark mark-line line-2" d="" />
+          <path class="chart-mark mark-line line-3" d="" />
+          <path class="chart-mark mark-scatter" d="" />
+          <path class="chart-mark mark-pie slice-1" d="" />
+          <path class="chart-mark mark-pie slice-2" d="" />
+          <path class="chart-mark mark-pie slice-3" d="" />
+          <path class="chart-mark mark-donut slice-1" d="" />
+          <path class="chart-mark mark-donut slice-2" d="" />
+          <path class="chart-mark mark-donut slice-3" d="" />
+        </svg>
         <div class="track"><div class="fill tone-lead"></div></div>
       </div>
       <div class="row">

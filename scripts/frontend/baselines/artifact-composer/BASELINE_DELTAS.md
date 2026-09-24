@@ -4,7 +4,9 @@
 
 La ampliación de TASK-1847 agrega `ReportIndexPage.png` al set visual. El índice se deriva del plan
 de páginas y muestra los folios físicos calculados antes del render; el probe confirma el molde y los
-slots, mientras las pruebas del mapper verifican el contenido y la numeración.
+slots, mientras las pruebas del mapper verifican el contenido y la numeración. La revisión en grises
+también llevó el énfasis y las marcas principales del informe al token oscuro `--axis-deck-teal-750`,
+sin cambiar el pack compartido ni el catálogo comercial.
 
 **Frames declarados para promoción (10 nuevos):** nueve plantillas de deck/informe declaradas el
 2026-09-21 más el nuevo `ReportIndexPage`. En tres ejecuciones frescas previas al índice y tres
@@ -380,7 +382,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 85bf36e29053b59a9d64cf1493b7921eca0b39351e2f997ff8a5547657e6ab3b -->
+<!-- manifest-digest: e959a6f6f779a2149617cbbc50621e30d2fe8fdd62ca7c23c250ca272a17121a -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

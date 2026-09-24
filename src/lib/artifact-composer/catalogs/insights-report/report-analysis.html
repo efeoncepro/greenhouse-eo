@@ -62,8 +62,25 @@
   .fill { position: absolute; inset: 0 auto 0 0; border-radius: 2px; }
 
   /* Lead vs resto se distinguen por LUMINANCIA, no por tono: el informe se revisa impreso en gris. */
-  .fill.tone-lead { background: var(--axis-report-role-accentDeep); }
+  .fill.tone-lead { background: var(--axis-deck-teal-750); }
   .fill.tone-rest { background: var(--axis-report-role-fieldMid); opacity: 0.3; }
+  .row[data-chart-family]:not([data-chart-family^="bar"]) .track { display: none; }
+  .chart-svg { display: none; width: 100%; height: 210px; overflow: visible; }
+  .row[data-chart-family]:first-child .chart-svg { display: none; }
+  .row[data-chart-family]:not([data-chart-family^="bar"]):first-child .chart-svg { display: block; }
+  .chart-axis { fill: none; stroke: var(--axis-report-role-surfaceEdge); stroke-width: .6; }
+  .chart-mark { display: none; }
+  .row[data-chart-family="line"] .mark-line,
+  .row[data-chart-family="scatter"] .mark-scatter,
+  .row[data-chart-family="pie"] .mark-pie,
+  .row[data-chart-family="donut"] .mark-donut { display: block; }
+  .mark-line { fill: none; stroke: var(--axis-deck-teal-750); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .mark-line.line-2 { stroke-dasharray: 3 2; }
+  .mark-line.line-3 { stroke-dasharray: 1 2; }
+  .mark-scatter { fill: var(--axis-deck-teal-750); }
+  .mark-pie.slice-1, .mark-donut.slice-1 { fill: var(--axis-deck-teal-750); }
+  .mark-pie.slice-2, .mark-donut.slice-2 { fill: var(--axis-report-role-fieldMid); }
+  .mark-pie.slice-3, .mark-donut.slice-3 { fill: var(--axis-report-role-accent); }
   /* Un dato opcional ausente se calla ENTERO: el motor vacía el valor, y el rótulo sin valor («Cobertura»
      y nada) se leía como una cobertura que falta en vez de una que no aplica. */
   dt:has(+ dd:empty), dd:empty { display: none; }
@@ -114,11 +131,24 @@
         <h2 class="figure-title" data-slot="figureTitle">Variación de impresiones por tipo de página</h2>
         <div class="series" data-slot="figureSeries">
           <div class="row">
-            <div class="row-head">
+          <div class="row-head">
               <span class="row-name" data-slot-field="name">Páginas publicadas en el período</span>
               <span class="row-value" data-slot-field="printedValue">+61,4%</span>
-            </div>
-            <div class="track"><div class="fill tone-lead"></div></div>
+          </div>
+          <svg class="chart-svg" viewBox="0 0 100 100" role="img" aria-label="Figura cuantitativa">
+            <path class="chart-axis" d="M 8 8 V 92 H 92" />
+            <path class="chart-mark mark-line line-1" d="" />
+            <path class="chart-mark mark-line line-2" d="" />
+            <path class="chart-mark mark-line line-3" d="" />
+            <path class="chart-mark mark-scatter" d="" />
+            <path class="chart-mark mark-pie slice-1" d="" />
+            <path class="chart-mark mark-pie slice-2" d="" />
+            <path class="chart-mark mark-pie slice-3" d="" />
+            <path class="chart-mark mark-donut slice-1" d="" />
+            <path class="chart-mark mark-donut slice-2" d="" />
+            <path class="chart-mark mark-donut slice-3" d="" />
+          </svg>
+          <div class="track"><div class="fill tone-lead"></div></div>
           </div>
           <div class="row">
             <div class="row-head">

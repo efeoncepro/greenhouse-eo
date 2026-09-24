@@ -1,4 +1,12 @@
+import { mkdtemp, readFile, rm } from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
+
 import { describe, expect, it } from 'vitest'
+import { PDFDocument } from 'pdf-lib'
+
+import { composeArtifact } from '@/lib/artifact-composer'
+import { insightsReportCatalog } from '@/lib/artifact-composer/catalogs/insights-report'
 
 import { buildInsightReportPlanInput } from './report-mapper'
 import { InsightsRenderRejectedError } from '../errors'
@@ -93,6 +101,37 @@ describe('buildInsightReportPlanInput', () => {
       input.slides.map((_page, pageIndex) => String(pageIndex + 1))
     )
   })
+
+  it('renderiza un PDF real de 30 páginas con índice y folios convergentes', async () => {
+    const chapters = Array.from({ length: 27 }, (_, index) =>
+      chapter({ chapterId: `chapter-${index + 1}`, title: `Capítulo ${index + 1}` })
+    )
+
+    const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ chapters }) })
+    const outDir = await mkdtemp(path.join(os.tmpdir(), 'task-1847-report-30-pages-'))
+
+    try {
+      expect(input.slides).toHaveLength(30)
+      expect(input.slides[1]!.contentType).toBe('report-index')
+
+      for (const slide of input.slides.slice(1)) {
+        expect((slide.slots as { runningChapter?: string }).runningChapter).toBeTruthy()
+        expect((slide.slots as { runningPeriod?: string }).runningPeriod).toBeTruthy()
+      }
+
+      const result = await composeArtifact(insightsReportCatalog, input as never, outDir, { concurrency: 4 })
+
+      expect(result.pdfPath).toBeDefined()
+      const pdf = await PDFDocument.load(await readFile(result.pdfPath!))
+
+      expect(pdf.getPageCount()).toBe(30)
+      expect(input.slides.map(slide => (slide.slots as { pageFolio: string }).pageFolio)).toEqual(
+        input.slides.map((_slide, pageIndex) => String(pageIndex + 1))
+      )
+    } finally {
+      await rm(outDir, { recursive: true, force: true })
+    }
+  }, 120_000)
 
   it('pagina el índice cuando hay más de 28 secciones y conserva los folios reales', () => {
     const chapters = Array.from({ length: 29 }, (_, index) =>
@@ -243,6 +282,75 @@ describe('buildInsightReportPlanInput', () => {
     // Cada barra se nombra por su métrica (dimensionLabels), no por la etiqueta de la serie.
     expect((analysis!.slots as { figureSeries: { name: string }[] }).figureSeries.map(row => row.name)).toEqual(['Nuevas', 'Optimizadas'])
     expect((analysis!.slots as { figureUnit: string }).figureUnit).toBe('Porcentaje')
+  })
+
+  it('compone line, pie, donut y scatter desde sus hechos como SVG en el PDF A4', async () => {
+    const facts = [
+      ...[
+        ['line-1', 10], ['line-2', 30], ['line-3', 20],
+        ['pie-1', 6], ['pie-2', 3], ['pie-3', 1],
+        ['donut-1', 2], ['donut-2', 5], ['donut-3', 3],
+        ['scatter-x1', 1], ['scatter-x2', 2], ['scatter-x3', 3],
+        ['scatter-y1', 4], ['scatter-y2', 2], ['scatter-y3', 8]
+      ] as const
+    ].map(([factId, value]) => ({ factId, value, unit: 'count', evidenceRef: `ev-${factId}` }))
+
+    const chart = (family: 'line' | 'pie' | 'donut' | 'scatter', series: { seriesId: string; label: string; factIds: string[]; unit: string }[]) => ({
+      specVersion: 'chart_spec_v1' as const,
+      chartId: `chart-${family}`,
+      family,
+      relation: family === 'line' ? 'trend' as const : family === 'scatter' ? 'correlation' as const : 'composition' as const,
+      title: `Figura ${family}`,
+      series,
+      dimensionLabels: ['Punto 1', 'Punto 2', 'Punto 3'],
+      unit: 'count',
+      scale: { kind: 'linear' as const, baseline: family === 'line' ? null : 0 },
+      references: [],
+      tabularEquivalent: { columns: series.map(item => item.label), rows: [0, 1, 2].map(index => series.map(item => item.factIds[index]!)) }
+    })
+
+    const charts = [
+      chart('line', [{ seriesId: 'line', label: 'Tendencia', factIds: ['line-1', 'line-2', 'line-3'], unit: 'count' }]),
+      chart('pie', [{ seriesId: 'pie', label: 'Composición', factIds: ['pie-1', 'pie-2', 'pie-3'], unit: 'count' }]),
+      chart('donut', [{ seriesId: 'donut', label: 'Composición', factIds: ['donut-1', 'donut-2', 'donut-3'], unit: 'count' }]),
+      chart('scatter', [
+        { seriesId: 'x', label: 'X', factIds: ['scatter-x1', 'scatter-x2', 'scatter-x3'], unit: 'count' },
+        { seriesId: 'y', label: 'Y', factIds: ['scatter-y1', 'scatter-y2', 'scatter-y3'], unit: 'count' }
+      ])
+    ]
+
+    const input = buildInsightReportPlanInput({
+      edition,
+      report,
+      snapshot: { facts, sources: [], rejections: [] } as never,
+      plan: plan({ chapters: [chapter({ charts: charts as never })] })
+    })
+
+    const figures = input.slides.filter(slide => slide.contentType === 'report-analysis')
+
+    expect(figures).toHaveLength(4)
+    expect(figures.map(slide => (slide.slots as { figureSeries: { chartFamily: string; geometryPath1: string }[] }).figureSeries[0])).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ chartFamily: 'line', geometryPath1: expect.stringMatching(/^M /) }),
+        expect.objectContaining({ chartFamily: 'pie', geometryPath1: expect.stringMatching(/^M /) }),
+        expect.objectContaining({ chartFamily: 'donut', geometryPath1: expect.stringMatching(/^M /) }),
+        expect.objectContaining({ chartFamily: 'scatter', geometryPath1: expect.stringMatching(/^M /) })
+      ])
+    )
+
+    const outDir = await mkdtemp(path.join(os.tmpdir(), 'insights-chart-families-'))
+
+    try {
+      const result = await composeArtifact(insightsReportCatalog, input as never, outDir, { concurrency: 2 })
+
+      expect(result.pdfPath).toBeDefined()
+      const pdf = await PDFDocument.load(await readFile(result.pdfPath!))
+
+      expect(pdf.getPageCount()).toBe(input.slides.length)
+      expect(result.slidePaths).toHaveLength(input.slides.length)
+    } finally {
+      await rm(outDir, { recursive: true, force: true })
+    }
   })
 
   // Forma real de un plan SEO (canary Berel, 2026-09-22): comparación de períodos por métrica.

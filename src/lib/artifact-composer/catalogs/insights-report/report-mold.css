@@ -79,7 +79,7 @@ html, body { margin: 0; padding: 0; }
   letter-spacing: -0.01em;
 }
 
-.assertion em { font-style: italic; color: var(--axis-report-role-accentDeep); }
+.assertion em { font-style: italic; font-weight: 700; color: var(--axis-deck-teal-750); }
 
 .lead {
   margin: 14px 0 0;

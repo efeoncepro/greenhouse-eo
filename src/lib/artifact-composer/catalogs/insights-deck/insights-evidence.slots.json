@@ -53,7 +53,7 @@
           "printedValue": {
             "type": "string",
             "required": true,
-            "maxCharacters": 12,
+            "maxCharacters": 28,
             "maxLines": 1,
             "requires": [
               "valuePct",
@@ -63,7 +63,6 @@
           "valuePct": {
             "type": "number",
             "required": true,
-            "min": 0,
             "consumer": "resolver-only",
             "resolver": "insights-bar-geometry"
           },
@@ -86,6 +85,34 @@
             "type": "string",
             "required": true,
             "consumer": "validation-only"
+          },
+          "chartFamily": {
+            "type": "enum",
+            "required": true,
+            "values": ["bar", "bar_grouped", "bar_stacked", "line", "pie", "donut", "scatter"],
+            "consumer": "resolver-only",
+            "resolver": "insights-chart-family"
+          },
+          "geometryPath1": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 1200,
+            "consumer": "resolver-only",
+            "resolver": "insights-chart-path-1"
+          },
+          "geometryPath2": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 1200,
+            "consumer": "resolver-only",
+            "resolver": "insights-chart-path-2"
+          },
+          "geometryPath3": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 1200,
+            "consumer": "resolver-only",
+            "resolver": "insights-chart-path-3"
           }
         }
       },

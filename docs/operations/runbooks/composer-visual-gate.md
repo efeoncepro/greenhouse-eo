@@ -43,6 +43,25 @@ sus cambios se mezclan en el render y cualquier `--freeze` co-mingla el trabajo 
 6. git add <tu deck-plan> <las plantillas> scripts/frontend/baselines/artifact-composer + COMMIT (atómico).
 ```
 
+### Scope de catálogos Insights
+
+El gate global también contiene `deck-axis` y el deck SKY. Mientras `ISSUE-122` mantenga diferencias
+históricas en frames que esta task no toca, un freeze global obliga a rebaselinar trabajo ajeno. Para
+promover o verificar únicamente los dos catálogos Insights usa:
+
+```bash
+pnpm composer:visual-gate --catalog=insights --selftest
+pnpm composer:visual-gate --catalog=insights --freeze
+pnpm composer:visual-gate --catalog=insights
+```
+
+El freeze scoped agrega o actualiza sólo `templates-insights-deck/**` y
+`templates-insights-report/**`, conserva los demás PNG y hashes del manifest y vuelve a sellar su
+digest. Igual requiere declarar cada frame cambiado en `BASELINE_DELTAS.md`; el freeze y commit deben
+ser atómicos. El gate scoped valida el manifest completo y diffea a cero píxeles sólo los frames de
+Insights. El gate global sigue siendo la verificación para cambios en `deck-axis` o en SKY; este scope
+no limpia ni oculta sus diferencias históricas.
+
 ## 4. 🩸 El gotcha que TIENES que conocer: las fotos raster no son deterministas (ISSUE-122)
 
 Las láminas con **fotos** (`TeamGalleryFull` / la lámina del equipo) **driftean unos píxeles entre
