@@ -1,0 +1,91 @@
+{
+  "$schema": "../deck-axis/registry.schema.json",
+  "version": "0.1",
+  "status": "draft",
+  "note": "Registry del catálogo `insights-deck` — deck ejecutivo 16:9 de Efeonce Insights (TASK-1847). Catálogo propio y no extensión de `deck-axis`: aquel imprime vocabulario de propuesta comercial en su portada y sus presupuestos de slot están dimensionados para copy de licitación. Comparte brand pack, compilación de marca y geometría de gráficos; no comparte molde, porque una lámina que se proyecta y una hoja que se lee no tienen la misma densidad.",
+  "canvas": {
+    "w": 1920,
+    "h": 1080,
+    "aspect": "16:9"
+  },
+  "figmaFileKey": null,
+  "contentTypeTaxonomy": [
+    "insights-cover",
+    "insights-evidence",
+    "insights-narrative",
+    "insights-limits"
+  ],
+  "templates": [
+    {
+      "name": "InsightsCoverSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-cover"
+      ],
+      "prototype": "insights-cover.html",
+      "slotsRef": "insights-cover.slots.json"
+    },
+    {
+      "name": "InsightsEvidenceSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-evidence"
+      ],
+      "prototype": "insights-evidence.html",
+      "slotsRef": "insights-evidence.slots.json"
+    },
+    {
+      "name": "InsightsNarrativeSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-narrative"
+      ],
+      "prototype": "insights-narrative.html",
+      "slotsRef": "insights-narrative.slots.json"
+    },
+    {
+      "name": "InsightsLimitsSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-limits"
+      ],
+      "prototype": "insights-limits.html",
+      "slotsRef": "insights-limits.slots.json"
+    }
+  ],
+  "selector": {
+    "model": "El autor declara intención (`contentType` + slots); el selector resuelve la plantilla. Un autor NUNCA elige plantilla.",
+    "map": {
+      "insights-cover": "InsightsCoverSlide",
+      "insights-evidence": "InsightsEvidenceSlide",
+      "insights-narrative": "InsightsNarrativeSlide",
+      "insights-limits": "InsightsLimitsSlide"
+    },
+    "disambiguation": [
+      "una conclusión con la figura que la prueba => InsightsEvidenceSlide.",
+      "un capítulo cuya evidencia no alcanzó para una figura => InsightsNarrativeSlide. NUNCA se omite el capítulo.",
+      "lo que la edición no puede afirmar => InsightsLimitsSlide, y siempre cierra el deck."
+    ],
+    "rules": [
+      "Una lámina = un content-type = una plantilla.",
+      "NUNCA componer freehand: si ningún content-type calza, es un gap del catálogo.",
+      "El pie lleva como máximo la URL bubble; dirección, teléfonos y folio son del informe escrito."
+    ]
+  }
+}

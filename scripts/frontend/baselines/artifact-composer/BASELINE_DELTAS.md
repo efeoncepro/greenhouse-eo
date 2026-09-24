@@ -1,5 +1,75 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-24 — Declaración del set de Insights con el índice A4
+
+La ampliación de TASK-1847 agrega `ReportIndexPage.png` al set visual. El índice se deriva del plan
+de páginas y muestra los folios físicos calculados antes del render; el probe confirma el molde y los
+slots, mientras las pruebas del mapper verifican el contenido y la numeración. La revisión en grises
+también llevó el énfasis y las marcas principales del informe al token oscuro `--axis-deck-teal-750`,
+sin cambiar el pack compartido ni el catálogo comercial.
+
+**Frames declarados para promoción (10 nuevos):** nueve plantillas de deck/informe declaradas el
+2026-09-21 más el nuevo `ReportIndexPage`. En tres ejecuciones frescas previas al índice y tres
+posteriores, los frames ya existentes del catálogo y del deck SKY coincidieron con su baseline; el
+único delta observado fue el nacimiento de las plantillas Insights. Se declaran esos diez frames para su primera
+promoción, sin rebaselinear las plantillas ajenas.
+
+- `templates-insights-deck/InsightsCoverSlide.png`
+- `templates-insights-deck/InsightsEvidenceSlide.png`
+- `templates-insights-deck/InsightsNarrativeSlide.png`
+- `templates-insights-deck/InsightsLimitsSlide.png`
+- `templates-insights-report/ReportCoverPage.png`
+- `templates-insights-report/ReportIndexPage.png`
+- `templates-insights-report/ReportNarrativePage.png`
+- `templates-insights-report/ReportAnalysisPage.png`
+- `templates-insights-report/ReportTablePage.png`
+- `templates-insights-report/ReportLimitsPage.png`
+
+Las seis corridas pertenecen a la misma sesión de septiembre 24. Estos frames siguen declarados y sin promover:
+`--freeze` requiere el commit atómico con los cambios de catálogo.
+
+## 2026-09-21 — Dos catálogos nuevos entran al gate: `insights-deck` (16:9) e `insights-report` (A4)
+
+**Qué cambia y qué no.** El gate pasa de fotografiar UN catálogo a fotografiar tres, cada uno en su
+propia carpeta de frames. Los de `deck-axis` conservan su ruta histórica (`templates/`) y su
+baseline **no se toca**: siguen en cero diffs después del cambio, que es la verificación de que
+generalizar el harness no movió nada ajeno.
+
+**Nueve frames nuevos, todos de plantillas que nacen en TASK-1847.** No son cambios de una lámina
+existente: son composiciones que antes no existían, así que su primera promoción es su nacimiento.
+
+| Frame | Qué es |
+|---|---|
+| `templates-insights-deck/InsightsCoverSlide.png` | 🆕 portada del deck Insights — reemplaza a `CoverFull`, que imprime «Propuesta Técnica» (vocabulario de oferta comercial, no de informe) |
+| `templates-insights-deck/InsightsEvidenceSlide.png` | 🆕 ficha de evidencia: una conclusión por lámina, con la figura que la prueba y su procedencia |
+| `templates-insights-deck/InsightsNarrativeSlide.png` | 🆕 capítulo cuya evidencia no alcanzó para una figura — se narra, NO se omite |
+| `templates-insights-deck/InsightsLimitsSlide.png` | 🆕 cierre: lo que la edición no puede afirmar |
+| `templates-insights-report/ReportCoverPage.png` | 🆕 portada A4, con pie institucional completo (el estándar lo exige también en la portada) |
+| `templates-insights-report/ReportNarrativePage.png` | 🆕 capítulo narrado y resumen ejecutivo del informe |
+| `templates-insights-report/ReportAnalysisPage.png` | 🆕 página analítica: afirmación, figura y marginalia con unidad, fuente y cobertura |
+| `templates-insights-report/ReportTablePage.png` | 🆕 tabla densa con cabecera propia — el reparto de filas lo hace `paginateFlow()` antes de imprimir |
+| `templates-insights-report/ReportLimitsPage.png` | 🆕 cierre del informe, cada límite con su causa |
+
+**⚠️ DECLARADOS, NO PROMOVIDOS (2026-09-21).** Estos nueve frames **no tienen baseline todavía**, y
+es deliberado: `--freeze` exige declarar *todos* los frames cambiados, y en este repo los de
+`deck-axis` difieren entre corridas por el no-determinismo de ISSUE-122. Congelar los nuevos
+obligaría a rebaselinear de paso los ajenos con el entorno de quien corre — exactamente el
+«rebaseline silencioso» que este archivo existe para impedir. La promoción queda pendiente de la
+mitigación de ISSUE-122.
+
+**Un acoplamiento del probe que esto destapó y quedó corregido.** `synthesizeProbeSlots` decidía si
+un campo de geometría recibía un número consultando una LISTA DE NOMBRES de resolvers, escrita con
+los de `deck-axis`. Un catálogo nuevo caía al fallback y recibía `10` mientras su etiqueta decía
+`"1%"` — es decir, **el probe generaba un par incoherente y la guarda anti-fabricación lo rechazaba,
+correctamente**. El catálogo fallaba el gate por hacer lo correcto. Ahora la condición se deriva del
+contrato (`type: 'number'` → `1`), no de una lista que hay que editar por catálogo.
+
+Se verificó que ese cambio **no movió ningún frame de `deck-axis`**: los dos únicos campos
+`type: 'number'` del catálogo (`case-study-split.barScale`, `chart-split.valuePct`) declaran
+resolvers que ya estaban en la lista previa, que se evalúa antes; y los frames que difieren entre
+corridas no tienen campos numéricos. La diferencia es el drift de ISSUE-122, no el probe.
+
+
 ## 2026-08-13 — Dos slots opcionales que el probe rellena: `partnerBadge` y el `heroAsset` que llevaba 13 días sin declarar
 
 Ambas láminas driftean por **la misma mecánica**, la del runbook §4bis: el gate no renderiza la
@@ -312,7 +382,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 85bf36e29053b59a9d64cf1493b7921eca0b39351e2f997ff8a5547657e6ab3b -->
+<!-- manifest-digest: e959a6f6f779a2149617cbbc50621e30d2fe8fdd62ca7c23c250ca272a17121a -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

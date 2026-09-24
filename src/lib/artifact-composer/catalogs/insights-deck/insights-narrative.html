@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!-- InsightsNarrativeSlide — capítulo cuya evidencia no alcanzó para una figura. No se omite: se narra. -->
+<link rel="stylesheet" href="deck-tokens.css" />
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="deck-mold.css" />
+<style>
+  .points { margin-top: 48px; display: flex; flex-direction: column; gap: 26px; max-width: 1240px; }
+
+  .point { display: grid; grid-template-columns: 56px 1fr; gap: 24px; align-items: start; }
+
+  .point-mark {
+    font-family: var(--axis-deck-type-display);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--axis-deck-role-accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .point-text { font-size: 25px; line-height: 1.5; color: var(--axis-deck-role-surfaceEdge); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <span class="eyebrow" data-slot="chapterLabel">ENTREGA</span>
+    <h1 class="headline" data-slot="assertion">La afirmación que ordena este capítulo</h1>
+    <div class="points" data-slot="points">
+      <div class="point">
+        <span class="point-mark">01</span>
+        <span class="point-text" data-slot-field="text">Desarrollo del capítulo.</span>
+      </div>
+    </div>
+    <footer class="deck-foot"><span data-slot="urlBubble"><img src="assets/url-lum.svg" alt="efeoncepro.com" /></span></footer>
+  </div>
+</body>
+</html>

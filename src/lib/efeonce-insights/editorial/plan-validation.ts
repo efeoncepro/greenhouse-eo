@@ -18,6 +18,20 @@ export interface PlanViolation {
 
 const YEAR_OR_DATE = /^\d{4}(-\d{2}(-\d{2})?)?$/
 
+/**
+ * Las cifras DENTRO del nombre de un hecho referenciado («Keywords en primera página (≤10)»,
+ * «RpA · Sky · 2026-08») son identidad del hecho —texto de la evidencia, escrito por el adapter—,
+ * no afirmaciones de la claim. Se enmascara sólo la etiqueta LITERAL y sólo la de los hechos que
+ * la claim referencia: una cifra fuera de la etiqueta, o la etiqueta de un hecho no referenciado,
+ * se sigue validando. Una etiqueta sin letras no se enmascara (borraría esa cifra en todo el texto).
+ * El espacio de reemplazo impide que dos fragmentos numéricos vecinos se fundan en un token.
+ */
+const maskReferencedLabels = (text: string, labels: string[]): string =>
+  [...new Set(labels)]
+    .filter(label => /\p{L}/u.test(label))
+    .sort((left, right) => right.length - left.length)
+    .reduce((masked, label) => masked.split(label).join(' '), text)
+
 export const validateEditorialPlan = (plan: EditorialPlanV1, snapshot: EvidenceSnapshotContentV1): PlanViolation[] => {
   const byId = new Map(snapshot.facts.map(fact => [fact.factId, fact]))
   const knownIds = new Set(byId.keys())
@@ -41,7 +55,7 @@ export const validateEditorialPlan = (plan: EditorialPlanV1, snapshot: EvidenceS
       if (fact.freshness.asOf) dateTokens.add(fact.freshness.asOf)
     }
 
-    for (const token of extractNumberTokens(claim.text)) {
+    for (const token of extractNumberTokens(maskReferencedLabels(claim.text, facts.map(fact => fact.label)))) {
       const normalized = token.trim()
 
       if (allowed.has(normalized)) continue

@@ -13,7 +13,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1 } from '../contracts/evidence'
 import type { ResolvedInsightWindow } from '../window'
-import { type AdapterCollectInput, type ModuleReportAdapterV1, factId } from './contract'
+import { type AdapterCollectInput, type ModuleReportAdapterV1, asComparisonRejections, factId } from './contract'
 
 export const ICO_ADAPTER_VERSION = 'ico_report_adapter_v1'
 
@@ -21,6 +21,14 @@ interface SpaceRow extends Record<string, unknown> {
   space_id: string
   space_name: string
 }
+
+/**
+ * Ids que este adapter lee del snapshot, tal como los declara el registro canónico del motor ICO
+ * (`ICO_METRIC_REGISTRY`). El `metricId` del hecho de Insights (`rpa`, `otd`) es vocabulario propio;
+ * el del snapshot NO. Se buscó `'otd'` cuando el motor lo llama `'otd_pct'`, y OTD no llegó a ningún
+ * informe sin que nada fallara (TASK-1847 canary, 2026-09-22). Un test cruza estos ids con el registro.
+ */
+export const ICO_SNAPSHOT_METRIC_IDS = { rpa: 'rpa', otd: 'otd_pct' } as const
 
 export const listOrganizationSpaces = async (organizationId: string): Promise<SpaceRow[]> =>
   runGreenhousePostgresQuery<SpaceRow>(
@@ -71,8 +79,8 @@ const collectForWindow = async (spaces: SpaceRow[], window: ResolvedInsightWindo
         dimension: { spaceId: space.space_id, spaceName: space.space_name, month }
       }
 
-      const rpa = snapshot.metrics.find(metric => metric.metricId === 'rpa')
-      const otd = snapshot.metrics.find(metric => metric.metricId === 'otd')
+      const rpa = snapshot.metrics.find(metric => metric.metricId === ICO_SNAPSHOT_METRIC_IDS.rpa)
+      const otd = snapshot.metrics.find(metric => metric.metricId === ICO_SNAPSHOT_METRIC_IDS.otd)
 
       if (rpa) {
         const suppressed = rpa.dataStatus === 'suppressed' || rpa.dataStatus === 'unavailable'
@@ -82,6 +90,10 @@ const collectForWindow = async (spaces: SpaceRow[], window: ResolvedInsightWindo
         } else {
           facts.push({ ...base, factId: factId('ico', 'rpa', window, dimension), metricId: 'rpa', label: `RpA · ${space.space_name} · ${month}`, value: rpa.value, unit: 'ratio', numerator: null, denominator: null, coverage: { kind: rpa.dataStatus === 'low_confidence' ? 'partial' : 'complete', ratio: null, populationSize: rpa.evidence?.eligibleTasks ?? snapshot.context.completedTasks }, comparisonFactId: comparisonIds[`rpa.${space.space_id}`] ?? null })
         }
+      } else {
+        // Una métrica esperada que el snapshot no trae se NARRA como límite: omitirla en silencio haría que el
+        // informe calle justo lo que no pudo medir.
+        rejections.push({ module: 'ico', metricId: 'rpa', reason: 'no_data', detail: `El snapshot ICO de ${space.space_name} en ${month} no trae RpA` })
       }
 
       if (otd) {
@@ -93,6 +105,8 @@ const collectForWindow = async (spaces: SpaceRow[], window: ResolvedInsightWindo
         } else {
           facts.push({ ...base, factId: factId('ico', 'otd', window, dimension), metricId: 'otd', label: `OTD · ${space.space_name} · ${month}`, value: otd.value, unit: 'percent', numerator, denominator, coverage: { kind: 'complete', ratio: 1, populationSize: denominator }, comparisonFactId: comparisonIds[`otd.${space.space_id}`] ?? null })
         }
+      } else {
+        rejections.push({ module: 'ico', metricId: 'otd', reason: 'no_data', detail: `El snapshot ICO de ${space.space_name} en ${month} no trae OTD` })
       }
 
       source = source ?? { module: 'ico', adapterVersion: ICO_ADAPTER_VERSION, reader: 'readSpaceMetrics', asOf, method, coverage: { kind: 'complete', ratio: null, populationSize: spaces.length }, servedWindow: { start: `${window.months[0]}-01`, endExclusive: window.endExclusive, granularity: 'month', partial: window.partial } }
@@ -129,7 +143,7 @@ export const icoReportAdapter: ModuleReportAdapterV1 = {
     return {
       facts: [...current.facts, ...(comparison?.facts ?? [])],
       sources: [current.source, comparison?.source ?? null].filter((source): source is EvidenceSourceV1 => source !== null),
-      rejections: [...current.rejections, ...(comparison?.rejections ?? [])]
+      rejections: [...current.rejections, ...asComparisonRejections(comparison?.rejections ?? [])]
     }
   }
 }

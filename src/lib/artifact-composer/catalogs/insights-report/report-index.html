@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  ReportIndexPage — navegación editorial derivada del plan físico de páginas.
+  Los folios vienen del mapper; esta plantilla no estima ni recalcula páginas.
+-->
+<link rel="stylesheet" href="report-tokens.css" />
+<link rel="stylesheet" href="report-fonts.css" />
+<link rel="stylesheet" href="report-mold.css" />
+<style>
+  .index-title { margin: 34px 0 24px; font-family: var(--axis-report-type-display); font-size: 30px; line-height: 1.2; }
+
+  .index-head { display: flex; justify-content: space-between; padding: 0 0 9px; border-bottom: 1.5px solid var(--axis-report-role-accent); color: var(--axis-report-role-fieldMid); font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+
+  .index-entries { display: flex; flex-direction: column; margin-top: 8px; }
+
+  .index-row { display: grid; grid-template-columns: minmax(0, 1fr) 32px; align-items: baseline; gap: 16px; min-height: 26px; padding: 5px 0; border-bottom: 1px solid var(--axis-report-role-surfaceEdge); font-size: 12px; line-height: 1.35; }
+
+  .index-section { overflow-wrap: anywhere; }
+
+  .index-page { text-align: right; color: var(--axis-deck-teal-750); font-variant-numeric: tabular-nums; font-weight: 700; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="running">
+      <span class="chapter" data-slot="runningChapter">ÍNDICE</span>
+      <span data-slot="runningPeriod">Agosto 2026</span>
+    </header>
+
+    <h1 class="index-title" data-slot="indexTitle">Índice</h1>
+
+    <div class="index-head">
+      <span>Sección</span>
+      <span data-slot="indexPageColumn">Pág.</span>
+    </div>
+    <div class="index-entries" data-slot="indexEntries">
+      <div class="index-row">
+        <span class="index-section" data-slot-field="title">Resumen ejecutivo</span>
+        <span class="index-page" data-slot-field="pageNumber">3</span>
+      </div>
+    </div>
+
+    <footer class="foot">
+      <div class="foot-contact" data-slot="contactDetails">
+        <span class="foot-line">
+          <img src="assets/contact/map-point-bold.svg" alt="" />
+          <span>Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile</span>
+        </span>
+        <span class="foot-line">
+          <img src="assets/contact/phone-calling-bold.svg" alt="" />
+          <span>+56 9 3732 3064</span>
+        </span>
+      </div>
+      <span class="foot-bubble" data-slot="urlBubble">
+        <img src="assets/url-lum.svg" alt="efeoncepro.com" />
+      </span>
+      <span class="folio" data-slot="pageFolio">2</span>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,97 @@
+/**
+ * GENERADO — NO EDITAR A MANO.
+ * Font pack del brand pack "axis" (brand-packs/axis/fonts.json) compilado por
+ * `pnpm composer:brand-pack`. Fuentes locales con licencia y checksum declarados:
+ * el render bloquea la red — un @import de Google Fonts acá es una regresión.
+ */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('fonts/geist-400.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: block;
+  src: url('fonts/geist-500.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: block;
+  src: url('fonts/geist-600.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url('fonts/geist-700.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: italic;
+  font-weight: 600;
+  font-display: block;
+  src: url('fonts/poppins-600-italic.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: italic;
+  font-weight: 700;
+  font-display: block;
+  src: url('fonts/poppins-700-italic.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: italic;
+  font-weight: 800;
+  font-display: block;
+  src: url('fonts/poppins-800-italic.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: italic;
+  font-weight: 900;
+  font-display: block;
+  src: url('fonts/poppins-900-italic.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 300;
+  font-display: block;
+  src: url('fonts/poppins-300.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-display: block;
+  src: url('fonts/poppins-600.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url('fonts/poppins-700.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 800;
+  font-display: block;
+  src: url('fonts/poppins-800.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 900;
+  font-display: block;
+  src: url('fonts/poppins-900.ttf') format('truetype');
+}

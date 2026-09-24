@@ -23,14 +23,21 @@ import type { InsightOutputRecord, InsightRenderFailureCode } from '@/lib/efeonc
 import { hashResolvedManifest } from '@/lib/artifact-composer/manifest-hash'
 import { storeSystemGeneratedPrivateAsset } from '@/lib/storage/greenhouse-assets'
 
+import { insightsDeckCatalog } from '@/lib/artifact-composer/catalogs/insights-deck'
+import { insightsReportCatalog } from '@/lib/artifact-composer/catalogs/insights-report'
+
 import type { RenderConsumer, RenderJobView, RenderedArtifact } from '../consumer-contract'
 
 const WORKER_ACTOR_USER = null
 
-// Hoy sólo el catálogo deck. El catálogo A4 del informe vertical llega con TASK-1847; hasta
-// entonces un output `report_pdf` encolado con otro catálogo falla como manifest_drift, que es la
-// respuesta honesta (el worker no improvisa un catálogo que no tiene empaquetado).
-const CATALOGS = new Map([[deckAxisCatalog.name, deckAxisCatalog]])
+// Los catálogos que el worker tiene EMPAQUETADOS. Un output encolado con un catálogo ausente de
+// este mapa falla como manifest_drift, que es la respuesta honesta: el worker no improvisa un
+// catálogo que no tiene. TASK-1847 suma el A4 del informe vertical.
+const CATALOGS = new Map([
+  [deckAxisCatalog.name, deckAxisCatalog],
+  [insightsDeckCatalog.name, insightsDeckCatalog],
+  [insightsReportCatalog.name, insightsReportCatalog]
+])
 
 export const createInsightsConsumer = (): RenderConsumer => {
   let claimed: InsightOutputRecord | null = null

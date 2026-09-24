@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  ReportNarrativePage — capítulo sin figura, y el resumen ejecutivo.
+
+  Existe porque un capítulo cuya evidencia no alcanzó para un gráfico NO desaparece del informe:
+  desaparecerlo convertiría la falta de datos en silencio, que es justo lo que la página de límites
+  existe para impedir. Sin esta plantilla, componer ese plan sería un rechazo.
+-->
+<link rel="stylesheet" href="report-tokens.css" />
+<link rel="stylesheet" href="report-fonts.css" />
+<link rel="stylesheet" href="report-mold.css" />
+<style>
+  .body-text { margin-top: 30px; display: flex; flex-direction: column; gap: 13px; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="running">
+      <span class="chapter" data-slot="runningChapter">RESUMEN EJECUTIVO</span>
+      <span data-slot="runningPeriod">Agosto 2026</span>
+    </header>
+
+    <h1 class="assertion" data-slot="assertion">La afirmación que ordena este capítulo</h1>
+
+    <p class="lead" data-slot="lead">Lo que el lector debe entender antes del detalle.</p>
+
+    <div class="body-text" data-slot="paragraphs">
+      <p>Desarrollo del capítulo.</p>
+    </div>
+
+    <footer class="foot">
+      <div class="foot-contact" data-slot="contactDetails">
+        <span class="foot-line">
+          <img src="assets/contact/map-point-bold.svg" alt="" />
+          <span>Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile</span>
+        </span>
+        <span class="foot-line">
+          <img src="assets/contact/phone-calling-bold.svg" alt="" />
+          <span>+56 9 3732 3064</span>
+        </span>
+      </div>
+      <span class="foot-bubble" data-slot="urlBubble">
+        <img src="assets/url-lum.svg" alt="efeoncepro.com" />
+      </span>
+      <span class="folio" data-slot="pageFolio">3</span>
+    </footer>
+  </div>
+</body>
+</html>

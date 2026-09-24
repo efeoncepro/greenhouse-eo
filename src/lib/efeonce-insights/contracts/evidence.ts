@@ -107,6 +107,12 @@ export interface EvidenceRejectionV1 {
   detail: string
   /** Ventana/grano alternativos que SÍ podría servir el reader, si existen. */
   alternative?: { granularity: EvidenceGranularity; note: string } | null
+  /**
+   * A qué ventana pertenece el rechazo. Ausente = la ventana actual (así se leen los snapshots sellados antes de
+   * 2026-09-22). Sin este dato, un rechazo del período de COMPARACIÓN se leía como si la ventana actual no tuviera
+   * datos, justo al lado de las cifras que sí tiene (canary Berel, TASK-1847).
+   */
+  scope?: 'current' | 'comparison'
 }
 
 export interface EvidenceSourceV1 {

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  ReportTablePage — página de tabla densa.
+
+  La cabecera "se repite al cortar" sin ningún truco de CSS: cada página de tabla es una lámina
+  autocontenida con SU cabecera, y el reparto de filas lo hizo `paginateFlow()` antes de imprimir.
+  Es la ventaja de paginar en el catálogo en vez de delegarlo al navegador — no hay corte que
+  adivinar ni `thead` que confiar.
+
+  `continuationLabel` marca explícitamente que la tabla viene de la página anterior: una tabla que
+  continúa sin decirlo obliga al lector a retroceder para saber qué está mirando.
+-->
+<link rel="stylesheet" href="report-tokens.css" />
+<link rel="stylesheet" href="report-fonts.css" />
+<link rel="stylesheet" href="report-mold.css" />
+<style>
+  .table-head { margin: 26px 0 0; display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+
+  .table-title { margin: 0; font-size: 15px; font-weight: 700; }
+
+  .continuation {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--axis-report-role-fieldMid);
+  }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 11px; }
+
+  thead th {
+    text-align: left;
+    padding: 0 8px 8px 0;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--axis-report-role-fieldMid);
+    border-bottom: 1.5px solid var(--axis-report-role-accent);
+  }
+
+  tbody td {
+    padding: 7px 8px 7px 0;
+    border-bottom: 1px solid var(--axis-report-role-surfaceEdge);
+    line-height: 1.4;
+  }
+
+  /*
+   * Convención del molde: la primera columna nombra la entidad, las siguientes son numéricas.
+   * Alinear el dígito a la derecha es lo que permite comparar de un vistazo, y resolverlo acá evita
+   * que cada fila tenga que declarar su alineación — un dato de presentación que se repetiría por
+   * celda y driftearía.
+   */
+  thead th:not(:first-child),
+  tbody td:not(:first-child) { text-align: right; padding-right: 0; font-variant-numeric: tabular-nums; }
+
+  .table-source { margin-top: 14px; font-size: 9px; color: var(--axis-report-role-fieldMid); }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="running">
+      <span class="chapter" data-slot="runningChapter">VISIBILIDAD ORGÁNICA</span>
+      <span data-slot="runningPeriod">Agosto 2026</span>
+    </header>
+
+    <div class="table-head">
+      <h2 class="table-title" data-slot="tableTitle">Páginas con mayor variación</h2>
+      <span class="continuation" data-slot="continuationLabel">Continúa de la página anterior</span>
+    </div>
+
+    <table>
+      <thead>
+        <tr data-slot="tableColumns">
+          <th><span data-slot-field="label">Página</span></th>
+        </tr>
+      </thead>
+      <tbody data-slot="tableRows">
+        <tr>
+          <td><span data-slot-field="entity">/servicios/consultoria</span></td>
+          <td><span data-slot-field="valueA">12.480</span></td>
+          <td><span data-slot-field="valueB">+61,4%</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="table-source" data-slot="tableSource">Search Console, propiedad verificada del cliente</p>
+
+    <footer class="foot">
+      <div class="foot-contact" data-slot="contactDetails">
+        <span class="foot-line">
+          <img src="assets/contact/map-point-bold.svg" alt="" />
+          <span>Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile</span>
+        </span>
+        <span class="foot-line">
+          <img src="assets/contact/phone-calling-bold.svg" alt="" />
+          <span>+56 9 3732 3064</span>
+        </span>
+      </div>
+      <span class="foot-bubble" data-slot="urlBubble">
+        <img src="assets/url-lum.svg" alt="efeoncepro.com" />
+      </span>
+      <span class="folio" data-slot="pageFolio">12</span>
+    </footer>
+  </div>
+</body>
+</html>

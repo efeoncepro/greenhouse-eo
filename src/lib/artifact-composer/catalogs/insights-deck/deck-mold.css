@@ -1,0 +1,72 @@
+/**
+ * Molde compartido del deck Insights — el chrome de TODA lámina del catálogo.
+ *
+ * Una sola casa para el lienzo, la safe-area y la firma. El ADR del Composer documenta que
+ * re-declarar el molde por plantilla fue la bug class que ese refactor vino a matar.
+ *
+ * Fondo oscuro a propósito: la lámina se proyecta. El informe A4 es claro porque se lee a treinta
+ * centímetros. No es estilo — es la condición de lectura de cada formato.
+ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+.slide {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--axis-deck-role-field);
+  color: var(--axis-deck-role-onDark);
+  font-family: var(--axis-deck-type-text);
+  padding: 96px 112px 132px;
+  display: flex;
+  flex-direction: column;
+}
+
+.eyebrow {
+  font-size: 20px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--axis-deck-role-accent);
+}
+
+.headline {
+  margin: 28px 0 0;
+  font-family: var(--axis-deck-type-display);
+  font-size: 62px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  max-width: 22ch;
+}
+
+.headline em { font-style: italic; color: var(--axis-deck-role-accent); }
+
+.deck-lead {
+  margin: 28px 0 0;
+  font-size: 26px;
+  line-height: 1.5;
+  max-width: 62ch;
+  color: var(--axis-deck-role-surfaceEdge);
+}
+
+.deck-lead b { font-weight: 600; color: var(--axis-deck-role-onDark); }
+
+/*
+ * Pie de lámina: SÓLO la URL bubble. Dirección, teléfonos y folio pertenecen al informe escrito
+ * (distinción de formato del estándar de marca, 2026-09-04) y no se trasladan a un deck.
+ */
+.deck-foot {
+  position: absolute;
+  left: 112px;
+  right: 112px;
+  bottom: 56px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.deck-foot img { height: 34px; width: auto; display: block; }

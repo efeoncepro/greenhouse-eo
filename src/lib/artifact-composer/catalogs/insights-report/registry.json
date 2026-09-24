@@ -1,0 +1,123 @@
+{
+  "$schema": "../deck-axis/registry.schema.json",
+  "version": "0.1",
+  "status": "draft",
+  "note": "Registry del catálogo `insights-report` — informe editorial A4 vertical de Efeonce Insights (TASK-1847). Canvas A4 retrato: 794×1123 px a 96 dpi = 210,06 × 297,04 mm. El motor imprime `${viewport}px`, así que el canvas se declara en píxeles enteros; esa es la aproximación más cercana a A4 exacto y queda dentro de la tolerancia de ±0,5 mm. Cada página es una lámina autocontenida: el pie institucional y el folio son slots de la plantilla, nunca post-proceso sobre el PDF. El reparto de contenido entre páginas lo resuelve `paginateFlow()` antes de imprimir — decisión en GREENHOUSE_ARTIFACT_VERTICAL_PAGINATION_DECISION_V1.md.",
+  "canvas": {
+    "w": 794,
+    "h": 1123,
+    "aspect": "A4-portrait"
+  },
+  "figmaFileKey": null,
+  "contentTypeTaxonomy": [
+    "report-cover",
+    "report-index",
+    "report-narrative",
+    "report-analysis",
+    "report-table",
+    "report-limits"
+  ],
+  "templates": [
+    {
+      "name": "ReportIndexPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-index"
+      ],
+      "prototype": "report-index.html",
+      "slotsRef": "report-index.slots.json"
+    },
+    {
+      "name": "ReportAnalysisPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-analysis"
+      ],
+      "prototype": "report-analysis.html",
+      "slotsRef": "report-analysis.slots.json"
+    },
+    {
+      "name": "ReportCoverPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-cover"
+      ],
+      "prototype": "report-cover.html",
+      "slotsRef": "report-cover.slots.json"
+    },
+    {
+      "name": "ReportTablePage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-table"
+      ],
+      "prototype": "report-table.html",
+      "slotsRef": "report-table.slots.json"
+    },
+    {
+      "name": "ReportLimitsPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-limits"
+      ],
+      "prototype": "report-limits.html",
+      "slotsRef": "report-limits.slots.json"
+    },
+    {
+      "name": "ReportNarrativePage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-narrative"
+      ],
+      "prototype": "report-narrative.html",
+      "slotsRef": "report-narrative.slots.json"
+    }
+  ],
+  "selector": {
+    "model": "El autor clasifica el contenido de cada página en un content-type de la taxonomía; el selector devuelve la plantilla cuyo `contentTypes` lo incluye. Un autor NUNCA elige plantilla: eso es autoridad del catálogo.",
+    "map": {
+      "report-cover": "ReportCoverPage",
+      "report-index": "ReportIndexPage",
+      "report-analysis": "ReportAnalysisPage",
+      "report-table": "ReportTablePage",
+      "report-limits": "ReportLimitsPage",
+      "report-narrative": "ReportNarrativePage"
+    },
+    "disambiguation": [
+      "el índice real deriva de la primera página de cada sección del plan físico; nunca se calcula desde el título ni se pagina después del render.",
+      "capítulo cuya evidencia no alcanzó para una figura, y el resumen ejecutivo => ReportNarrativePage. NUNCA se omite el capítulo: desaparecerlo convierte la falta de datos en silencio.",
+      "página analítica: una afirmación con la figura que la prueba => ReportAnalysisPage.",
+      "filas comparables que el lector va a auditar => ReportTablePage. Una tabla NO es una figura: no se convierte en gráfico para «verse mejor».",
+      "lo que la edición no puede afirmar, con su causa => ReportLimitsPage. Nunca se omite porque «quedó pobre»."
+    ],
+    "rules": [
+      "Una página = un content-type = una plantilla. Si el contenido mezcla dos intenciones, son dos páginas.",
+      "NUNCA componer freehand: si ningún content-type calza, es un gap del catálogo — se abre y se diseña la plantilla.",
+      "El folio y el pie institucional son slots de la plantilla. NUNCA se estampan sobre el PDF después de paginar."
+    ]
+  }
+}

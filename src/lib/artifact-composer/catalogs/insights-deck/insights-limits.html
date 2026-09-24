@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!-- InsightsLimitsSlide — cierre. Declarar el límite es lo que vuelve auditable lo que sí se afirma. -->
+<link rel="stylesheet" href="deck-tokens.css" />
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="deck-mold.css" />
+<style>
+  .limits { margin-top: 52px; display: flex; flex-direction: column; }
+
+  .limit {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 48px;
+    padding: 26px 0;
+    border-bottom: 1px solid var(--axis-deck-role-fieldMid);
+    font-size: 24px;
+    line-height: 1.45;
+  }
+
+  .limit:first-child { border-top: 2px solid var(--axis-deck-role-accent); }
+
+  .limit-subject { font-weight: 600; }
+
+  .limit-cause { color: var(--axis-deck-role-surfaceEdge); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <span class="eyebrow">LÍMITES</span>
+    <h1 class="headline" data-slot="assertion">Lo que esta edición <em>no</em> puede afirmar</h1>
+    <div class="limits" data-slot="limits">
+      <div class="limit">
+        <span class="limit-subject" data-slot-field="subject">Entrega y cumplimiento</span>
+        <span class="limit-cause" data-slot-field="cause">sin datos</span>
+      </div>
+    </div>
+    <footer class="deck-foot"><span data-slot="urlBubble"><img src="assets/url-lum.svg" alt="efeoncepro.com" /></span></footer>
+  </div>
+</body>
+</html>
