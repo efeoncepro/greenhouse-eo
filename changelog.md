@@ -7,7 +7,7 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-09-23 — Compositor de piezas con CTA: nueve tramos de certificación adversarial
+## 2026-09-23 — Compositor de piezas con CTA: tramo 16 y corte de la novena auditoría
 
 `pnpm foto:componer:cta` y `pnpm foto:cta:gate`, auditados dos veces por dos subagentes adversariales (diseño y
 arquitectura) y robustecidos sin cambiar ninguna pieza aprobada (regresión: 132 de 132 idénticas):
@@ -21,8 +21,11 @@ arquitectura) y robustecidos sin cambiar ninguna pieza aprobada (regresión: 132
 - proceso: bloqueo sin carreras, regresión que compara el veredicto del gate, mutantes contra corrida base y canarios.
 
 Docs: [contrato §18–§19](docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md), funcional y manual en `creative/`,
-skill `efeonce-advertising-creative`. Pendiente: tercera certificación y decisiones del operador (firma en 16:9, margen,
-firma de las stories de v07).
+skill `efeonce-advertising-creative`. La novena auditoría no emitió informes por límite semanal de Claude; no habrá
+más rondas por instrucción del operador. La segunda corrida completa de 175 mutantes se detuvo con 81 detecciones
+registradas, sin puntuación final. Persiste la intermitencia de P10; decisiones y cobertura faltante en §19.10.
+CMP001-04 se reemplazó en la carpeta local sincronizada de OneDrive con respaldo y hash de lectura posterior;
+sin readback del servidor, publicación ni pauta.
 
 ## 2026-09-22 — ISSUE-177 resuelto: ninguna función de Vercel vuelve a cargar el motor de PDF
 

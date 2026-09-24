@@ -1,12 +1,17 @@
 # Compositor de piezas con CTA — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-23 por Claude
-> **Ultima actualizacion:** 2026-09-23 por Claude — (1.4) tramo 16: voces que se tocan y aire mínimo de 0,25 em; ritmo entre el concepto y la acción; firma sobre el canto del lecho; plate bajo 780 px; caracteres invisibles, barra en la etiqueta de un cursor y entidades en el texto alternativo; receta 16:9 con `cta.gapAfterNote` 56; KV-06-916 como decisión pendiente; la tabla de excepciones suma `firma-canto` y `ritmo`
+> **Ultima actualizacion:** 2026-09-23 por Codex — (1.5) corte de certificación sin novena auditoría ni puntuación completa de mutantes
 > **Modulo:** Creative · piezas publicitarias y sociales con CTA sobre fotografía
 > **Ruta en portal:** no aplica — son comandos locales del repositorio (`pnpm foto:*`)
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/compositor-piezas-cta.md) · [Contrato técnico](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) · [Tres voces + acción](../../operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md) · [Producir una foto de marca](../marketing/fotografia-de-marca-efeonce.md)
+
+**Estado al corte:** usa los comandos de esta guía para una pieza concreta, pero no presentes el compositor como
+certificado por la novena auditoría: no produjo informes. El catálogo de 175 mutantes se interrumpió tras 81 detecciones
+registradas, sin puntaje final; P10 conserva una falla intermitente. El operador cerró el ciclo sin más rondas.
+[Evidencia y pendientes](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#1910-regresión-y-mutantes-cómo-leerlos).
 
 ## Lo más corto que funciona
 

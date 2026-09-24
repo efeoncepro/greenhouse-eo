@@ -245,7 +245,7 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 - **Proyección** (`palanca: proyeccion`) — la obra proyectada sobre materia áspera, cuyo grano **se ve a través**
   de ella, y sobre el cuerpo de quien está en el haz. **Ni pantalla ni monitor.**
 
-> **Las 33 palancas en cuatro familias —5 siempre activas · 4 atmósferas · 1 acción suspendida · estas 23 de
+> **Las 34 palancas en cuatro familias —5 siempre activas · 4 atmósferas · 1 acción suspendida · estas 24 de
 > encuadre—, las 20 tomas de cámara y las cinco descartadas con su
 > razón medida:** [catálogo de palancas](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md).
 
@@ -415,7 +415,7 @@ todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `
 - **`pnpm foto:prompt <ficha.json> [--batch <out.json>]`** — arma el prompt desde una ficha de toma. El formato,
   el porcentaje del lecho y el límite de sujetos salen de **una tabla**, no de un bloque copiado. La ficha declara
   además `identidad` (personas, con vista por ángulo), `objetos` (kits de marca: logo, mascota, prenda, merch),
-  `palanca` (**una sola** de las 23 de encuadre, con su campo obligatorio si lo pide), `atmosfera`
+  `palanca` (**una sola** de las 24 de encuadre, con su campo obligatorio si lo pide), `atmosfera`
   (`polvo`/`bruma`/`vapor`/`humo`) y `suspendido` (qué está en el aire). Aborta si un
   bloque compartido trae un valor de formato adentro, si se pide una reserva en una toma que no la admite, o si un
   batch mezcla formatos. `--ficha-ejemplo` imprime la plantilla.
@@ -486,7 +486,7 @@ sesión las tenía delante al armar.
 ## Espacio para texto y formatos (2026-09-19)
 
 - La zona del titular se pide en la toma con **tono declarado** («DEEP warm shadow… for white text» / «VERY LIGHT warm-white wall… for dark text») y **límite de cabezas** (verticales: bajo 36% del alto; 16:9: gente dentro del 55% derecho).
-- Zonas: 4:5 tercio superior; 9:16 franja 11–31% (firma a 0,875); 16:9 costado izquierdo 42%. Firma al 20% del lado corto (decisión posterior del operador).
+- Zonas: 4:5 tercio superior; 9:16 franja 11–31% (la firma de esa ronda estaba a 0,875); 16:9 costado izquierdo 42% en `foto:prompt`. Para una pieza nueva con CTA en 16:9, el piso de legibilidad requiere cerca del 57% del ancho: reservar 58% o reducir el copy sigue pendiente de decisión, así que el comando conserva 42%. La firma de una pieza nueva es 25% del lado corto en horizontales y 20% en verticales/cuadrados; no se regeneran las aprobadas por ese cambio. [Contrato y corte](../../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
 - Compositor `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/titular.mjs` (Bricolage `ideaImpact` a trazos, color por contraste, autoajuste de zona ≥4,5:1).
 - **Canon operativo (aprobado, capa fotográfica):** [reserva de espacio en la toma](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) — las seis reservas, tono declarado, límite de cabezas, formato nativo, nunca scrim, medir antes de componer.
 - Bitácora de la ronda (composición **no aprobada**): [zonas de composición y formatos](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md).

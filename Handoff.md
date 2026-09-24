@@ -2,12 +2,11 @@
 
 **Ads (22/09):** [CMP-001](docs/operations/social/2026-09-22-cmp-001-campaign-brief-handoff.md): seis pilotos definidos; roles, receta portable y hashes; 25 exports existentes, sin pauta.
 
-**Paid visual (21/09):** [playbook](.codex/skills/efeonce-advertising-creative/references/paid-visual-attention-playbook.md)
-Codex/Claude: doce palancas sin resultados paid; registro C en construcción.
+**Paid visual:** [playbook](.codex/skills/efeonce-advertising-creative/references/paid-visual-attention-playbook.md); sin resultados paid.
 
-**Fotografía (19–20/09):** lenguaje aprobado; gráficos históricos rechazados; CTA: ver arriba.
-`pnpm foto:{doctor,prompt,validar}`; reserva 2 abierta.
-[Canon y estado](docs/operations/brand-photography/README.md).
+**Fotografía:** [canon](docs/operations/brand-photography/README.md) aprobado; reserva 2 abierta.
+
+**CTA:** [corte](docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#1910-regresión-y-mutantes-cómo-leerlos): tramo 16 local; novena sin informe, mutantes 81/175 parciales y P10 intermitente. No más rondas.
 
 [EPIC-048](docs/epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md): revisión adversarial aplicada; ADR Proposed, tasks to-do; sin runtime/bono.
 

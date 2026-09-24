@@ -232,6 +232,11 @@ acción, en las piezas nuevas).
   ponen a prueba al propio arnés. **Una guarda nueva nace con un mutante que alguna prueba detecte** (y se corre la
   puntuación de las viejas). Para recomponer un set aprobado sin que el texto crezca: `"textGrowth": false`. §15
   y §18.
+- **Cierre de auditorías acotado.** Acuerda el máximo de rondas con el operador antes de iniciar. Un auditor que se
+  queda sin créditos no emitió veredicto; una corrida de mutantes interrumpida sólo da progreso parcial, nunca
+  puntuación. Registra el último pase completo, la cobertura que faltó, la deuda y las decisiones abiertas en el
+  contrato y `Handoff.md`. Para el compositor CTA, la novena auditoría del 2026-09-23 no produjo informes y el
+  operador prohibió más rondas; estado exacto en §19.10 del contrato. No abras un tramo nuevo por inercia.
 - **CTA: corchetes sólo en el de texto** (operador, 2026-09-23). Contorno y relleno van sin marco —su rectángulo ya
   delimita la acción—; el de texto conserva los corchetes porque sin rectángulo queda huérfano. El cursor va en los
   tres. El CTA es un destino seleccionable del contrato AXIS (`cta.seleccion`: 8 anclas, colaboradores con etiqueta

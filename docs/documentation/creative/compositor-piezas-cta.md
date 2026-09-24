@@ -1,12 +1,18 @@
 # Compositor de piezas con CTA — Composición y certificación
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-23 por Claude
-> **Ultima actualizacion:** 2026-09-23 por Claude
+> **Ultima actualizacion:** 2026-09-23 por Codex — estado de la novena auditoría
 > **Documentacion tecnica:** [Compositor de CTA — comando canónico](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) (§14 guarda de sujeto · §15 red de seguridad · §16 accesibilidad · §17 variantes · §18 certificación y tramos)
 > **Manual de uso:** [Compositor de piezas con CTA — manual de uso](../../manual-de-uso/creative/compositor-piezas-cta.md)
 > **Regla creativa que implementa:** [Tres voces + acción](../../operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md)
+
+**Estado de certificación del sistema:** el tramo 16 tiene suite previa 10/10 y regresión cubierta sin cambios; la
+novena auditoría de arquitectura/diseño no entregó informes por límite de uso, la corrida completa de mutantes se
+interrumpió y P10 conserva una intermitencia. No se ha certificado el cierre adversarial. El
+[corte exacto y sus límites](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#1910-regresión-y-mutantes-cómo-leerlos)
+son distintos del veredicto que `foto:cta:gate` da a cada pieza concreta.
 
 ## Qué es
 

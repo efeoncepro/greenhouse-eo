@@ -723,11 +723,12 @@ contraste sí frena.
 | 14 · Sexta certificación | cerrado | `00732f136` |
 | 15 · Séptima certificación | cerrado | `2577aee93` |
 | 16 · Octava certificación | cerrado | `d50756f78` |
-| Novena certificación | en curso | — |
+| Novena certificación | interrumpida sin informes por límite semanal de Claude; sin veredicto | — |
 
 Los tramos 1–5 cierran la primera certificación; la segunda (NO CERTIFICA) abrió los tramos 6–9, y el gesto manuscrito
 quedó fuera de alcance. La tercera abrió los tramos 10 y 11 y, desde la cuarta, cada certificación abre el suyo (12 a
-16); todas dieron NO CERTIFICA. La novena, sobre el tramo 16, está en curso. El detalle de cada tramo sigue abajo.
+16); todas dieron NO CERTIFICA. La novena, sobre el tramo 16, quedó sin informes y no se abre otra ronda por decisión
+del operador. El corte verificable queda en §19.10. El detalle de cada tramo sigue abajo.
 
 **Tramo 1 · Integridad — cerrado (2026-09-23).**
 
@@ -1454,7 +1455,8 @@ líneas que cambiaron: 19 de 19 detectados y 2 de 2 canarios. La primera corrida
 juzgar: la base de P10 falló, y sin base el catálogo no se juzga. Falló un caso nuevo, «el techo de un CTA de texto mide
 su texto»: su composición no terminó en 2 de 9 corridas de P10, y pasó en las otras 7 y en 32 composiciones simultáneas
 de los casos del tramo. Leyendo el código no apareció la causa (se descartaron la caché de máscaras, `node_modules`, `git`
-y los temporales). La corrida se repite con un registro del error de cada composición que aborta.
+y los temporales). La segunda corrida se lanzó con un registro del error de cada composición, pero se detuvo antes de
+terminar; el corte y la deuda quedan documentados en §19.10.
 
 **KV-06-916, aprobada con el mismo defecto.** La story `KV-06-916` (1152×2048, CMP-002 HubSpot;
 `ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json`) tiene el logo montado en el canto
@@ -1477,7 +1479,7 @@ descarta un canto. Ahora se mide.
 | Resilience | 3/5 | 4/5 | 4/5 | caché que se regenera sola; nada a medias tras abortar; bloqueo por carpeta; errores que nombran pieza, campo y causa |
 | Scalability | 3/5 | 4/5 | 4/5 | referencia hermética; manifiesto de cobertura; avisos comparados; puntuación de mutantes como comando |
 
-**Las notas no se vuelven a puntuar hasta la tercera certificación.** Son la autoevaluación al cerrar los tramos 1–5;
+**Notas históricas, no puntuación vigente.** Son la autoevaluación al cerrar los tramos 1–5;
 la segunda certificación no las confirmó (NO CERTIFICA), y lo que encontró lo cierran los tramos 6–9: el gate que no
 miente —código 3 y `--reproducir`— y las excepciones con aprobador, plate y tope (Safety); umbrales que no se aflojan y
 entradas y bordes validados (Robustness); bloqueo sin carreras, señales que lo sueltan y aviso entre planes
@@ -1546,7 +1548,8 @@ Nada de esto cambia una pieza aprobada.
 
 - **Firma de las piezas existentes:** sólo se mueve en las stories finales de v07, dentro de la zona story de AXIS
   (centro 0,8565; commit `64a9b99c5`). Ninguna imagen se regenera. En OneDrive se reemplazaron CMP001-05 a 07;
-  CMP001-04 quedó pendiente porque OneDrive no deja descargarla ni sobrescribirla.
+  CMP001-04 quedó pendiente en esa operación porque OneDrive no dejaba descargarla ni sobrescribirla; el cierre local
+  posterior y el límite de readback constan en el [LEEME de v07](../../ai-generations/2026-09-22_aeo-final-safe-v07/LEEME.md).
 - **Lecho de «Que te elijan» (v07, 04-elegida-916):** con la firma ya subida, en esta story quedaba sobre el canto
   iluminado del lecho y no dentro de su materia desenfocada —lo detectó el operador; la revisión había mirado el
   contraste (6,53:1, pasaba) y no el pie al 100 %—, así que se sube el primer plano completo, lecho y apoyabrazos, como
@@ -2130,7 +2133,29 @@ La línea final dice `Puntuación: N de M mutantes detectados por la razón espe
 falla por otra razón`, y sale con 0 sólo si están todos. Historial: 35 de 35 al cerrar el tramo 5, 48 de 48 al cerrar
 el 6 y 12 de 12 los del 7; el tramo 8 sumó ocho y el 9, la corrida base, los canarios y los mutantes del proceso. Los del
 tramo 15: 10 de 10 y 2 de 2 canarios; los del 16: 19 de 19 (15 nuevos y 4 reajustados por líneas que cambiaron) y 2 de 2
-canarios. La corrida completa del catálogo con el tramo 16: en curso.
+canarios. La corrida completa del catálogo con el tramo 16 fue interrumpida: 81 de 175 aparecían como `detectado` en
+el registro, sin línea final ni código de salida. Ese 81/175 es progreso parcial, **no una puntuación ni una certificación**.
+
+### Corte de la novena auditoría · 2026-09-23
+
+Los dos auditores de la novena ronda (arquitectura y diseño) fallaron por el límite semanal de Claude antes de entregar
+informes. No existe un veredicto ni hallazgos de esa ronda. El operador fijó que esta era la última auditoría y que no
+habría tramo 17. Por tanto, la certificación adversarial queda **sin cerrar**, sin inferir que hay cero 🔴 o 🟠.
+
+El último código registrado es `d50756f78` (tramo 16) y `070f34642` (documentación del tramo 16), ambos locales en
+`develop` al corte. La suite P01–P10 previa pasó 10/10; P02 comparó 132 resultados cubiertos (114 composiciones y
+18 abortos) sin cambio de píxeles, layout ni veredicto, y señaló otras 68 piezas con CTA sin plate local. Las 51
+unitarias y los 19 mutantes del tramo, más dos canarios, constan en el cierre previo del tramo 16. La base de una
+primera corrida completa de mutantes falló por un
+caso intermitente de P10: el CTA de texto largo no terminó de componer en 2 de 9 ejecuciones; la causa no se estableció.
+La segunda corrida quedó detenida antes del puntaje final. Ni el pase previo de la suite ni 81 detecciones parciales
+resuelven esa incertidumbre. Se conserva como deuda técnica, sin reabrir rondas de auditoría.
+
+Siguen abiertas las decisiones sobre la reserva 16:9 con CTA (42 % vigente frente a la propuesta de 58 %), el aviso
+`ctaVariante.sinMargen`, KV-06-916 y el grosor de corchetes AXIS; ninguna se aplica por inferencia. CMP001-04 se
+reemplazó y se verificó por hash en la carpeta local sincronizada de OneDrive, con respaldo; falta readback del servidor.
+La página de estado de Claude refleja una foto de las 20:52 y no
+se actualiza sola; este corte y `Handoff.md` llevan la continuidad del repositorio.
 
 ### 19.11 Problemas comunes
 
