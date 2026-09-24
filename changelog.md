@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-24 — Insights: renderer local de familias de gráficos
+
+Los catálogos `insights-deck` e `insights-report` componen line, pie, donut y scatter desde `ChartSpec`; las suites dirigidas pasan (114/114) y un PDF sintético A4 de 30 páginas valida fuentes embebidas, pie/folio 30/30 y lectura en grises. Evidencia y gates pendientes en [TASK-1847](docs/tasks/in-progress/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md); sin deploy ni release.
+
 ## 2026-09-24 — SKY: producción, correcciones y método de video
 
 Profundización con tres subagentes: [método completo](docs/operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md), companions de preproducción/cámaras/piezas, posproducción/sonido y 13 aciertos/20 fallas; dos plantillas. Incluye preparación con Claude, corrige reglas universales de planos/tramos y límites estimados, y conecta skills espejo Motion/Audio. Motion/Audio incorporados al gate de espejos. Sin nuevos renders ni gasto.
@@ -19,7 +23,7 @@ Profundización con tres subagentes: [método completo](docs/operations/creative
 
 ## 2026-09-23 — Compositor de piezas con CTA: tramo 16 y corte de la novena auditoría
 
-`pnpm foto:componer:cta` y `pnpm foto:cta:gate`, auditados dos veces por dos subagentes adversariales (diseño y
+`pnpm foto:componer:cta` y `pnpm foto:cta:gate`, auditados nueve veces por pares de subagentes adversariales (diseño y
 arquitectura) y robustecidos sin cambiar ninguna pieza aprobada (regresión: 132 de 132 idénticas):
 
 - el gate distingue falla (1) de **no certificable (3)** y certifica por reproducción (`--reproducir`);
@@ -665,12 +669,3 @@ Bricolage, Poppins y Guttery reales, expuso el asesor interactivo y no mostró o
 enlaza la experiencia desde el contrato operativo, la descripción funcional y el manual sin duplicar recetas.
 El despliegue del Lab no cambia `efeonce.advertising-typography` de `trial` a `stable`, no activa tipografía
 publicitaria en la UI de producto y no aprueba automáticamente ninguna pieza.
-
-## 2026-09-13 — Publicidad tipográfica activable por Codex y Claude
-
-Se añade la skill espejo `efeonce-advertising-creative`, su brief/gate DO/DON'T y la activación por los routers
-humano y machine-readable. La orquestadora usa `axisAdvertising` y `efeonce.advertising-typography` como fuente,
-compone Typography/Social/Motion/Image/Copy/Brand según el soporte y exige prueba de peso, tracking, leading,
-contraste local, safe area, logo y estado. Documentación técnica, funcional y manual explican invocación automática
-y explícita. `mcp.efeonce.org` se evaluó y no se usó como atajo: su catálogo sólo admite manuales ligados a tools
-reales y no existe una tool creativa federada; no hubo cambio de manifiesto, gateway, runtime ni publicación.
