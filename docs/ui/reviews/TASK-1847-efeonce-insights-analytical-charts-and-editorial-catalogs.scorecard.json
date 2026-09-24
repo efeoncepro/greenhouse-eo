@@ -53,8 +53,8 @@
     },
     "color": {
       "score": 4,
-      "rationale": "Todo sale de roles del pack, sin un solo HEX, y la separación lead/resto es de luminancia. Pero el acento teal pierde contraste en escala de grises y el énfasis del titular se apaga en una fotocopia.",
-      "nextAction": "Subir la separación de luminancia del acento o sumar un segundo canal al énfasis del titular.",
+      "rationale": "La primera revisión encontró que el teal medio perdía separación en grises. El informe ahora aplica el token AXIS teal-750 a las marcas principales y conserva peso/cursiva en el énfasis; el probe A4 actualizado mantiene la distinción al convertirlo a grises.",
+      "nextAction": "Confirmar la misma separación en la exportación completa de 30 páginas, impresa a tamaño físico.",
       "evidence": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/informe-analitica-gris.png"
     },
     "iconography": {

@@ -1,7 +1,7 @@
 # TASK-1847 — Dossier de revisión visual
 
 > **Evidencia:** render real del Artifact Composer, no capturas de una ruta web.
-> **Fecha:** 2026-09-21 · **Revisó:** Claude (Opus 5)
+> **Dossier inicial:** 2026-09-21 · **Revisión del renderer:** 2026-09-24 · **QA multipágina:** 2026-09-24
 
 ## Por qué la evidencia no es una captura GVC de una ruta
 
@@ -16,7 +16,8 @@ acá para que nadie lo lea como un viewport.
 
 El harness de inspección canónico del Composer es su **gate visual**, que compone cada plantilla con
 payload sintético y captura su frame. TASK-1847 lo generalizó para que fotografíe los tres catálogos
-en vez de uno.
+en vez de uno. El scope `--catalog=insights` permite verificar y promover los frames nuevos de esta
+task sin rebaselinar `deck-axis` ni SKY, cuyo drift histórico sigue abierto en ISSUE-122.
 
 ## Qué se revisó
 
@@ -27,6 +28,8 @@ en vez de uno.
 | `informe-analitica.png` | Página analítica: afirmación, figura y marginalia |
 | `informe-tabla.png` | Tabla densa con cabecera propia y celda ausente como «—» |
 | `*-gris.png` | Las mismas, en escala de grises — el informe se imprime |
+| `informe-a4-30-paginas-sintetico-qa.pdf` | Exportación sintética completa de 30 páginas, A4, con fuentes incrustadas y folio/pie |
+| `informe-a4-30-paginas-gris.png` | Hoja de contacto de las 30 páginas renderizadas en escala de grises |
 
 ## Hallazgos que salieron de mirar, no de la suite
 
@@ -38,12 +41,17 @@ en vez de uno.
 3. **La verificación de coherencia no podía fallar nunca.** `printedValue` es `string` y el helper
    sólo aceptaba `number`: siempre daba `null` y la comparación se saltaba entera.
 
+4. **El énfasis teal perdía separación en escala de grises.** El informe ahora usa el token oscuro
+   `--axis-deck-teal-750` para el énfasis, la serie principal, la línea y los marcadores principales;
+   el énfasis tipográfico también conserva cursiva y peso alto. Las capturas de probe A4 y la hoja de
+   contacto multipágina se revisaron en grises. El PDF sintético multipágina no incluye páginas con
+   figuras; la lectura gris de figuras queda respaldada por `informe-analitica-gris.png`.
+
 ## Deuda visual conocida, declarada
 
-- **El acento teal pierde contraste en escala de grises.** El énfasis del titular (`<em>`) y la
-  barra destacada se distinguen, pero con poca separación de luminancia. En color funciona bien; en
-  una fotocopia el énfasis se apaga. Pendiente: evaluar un segundo canal para el énfasis del titular
-  (peso o cursiva ya presentes) y subir la separación de luminancia de la barra destacada.
+- **El separador teal claro pierde contraste en escala de grises.** El texto y las marcas principales
+  ahora usan el teal oscuro; los filetes teal siguen siendo decorativos y no llevan significado propio.
+  La captura del probe y las páginas índice/cuerpo del PDF multipágina se revisaron en grises.
 - **Páginas con poco contenido dejan un hueco inferior grande.** No es defecto del molde: es el
   reparto. Se resuelve cuando el mapper llene las páginas con contenido real, y el techo por
   plantilla ya evita el caso contrario.
@@ -52,7 +60,7 @@ en vez de uno.
 
 ## Lo que este dossier NO acredita
 
-No acredita rollout. Nada de esto está desplegado; el `deck_pdf` productivo sigue componiendo con el
-catálogo comercial. Tampoco acredita baseline: los 9 frames nuevos quedaron **declarados y no
-promovidos** en `BASELINE_DELTAS.md`, porque congelarlos obligaría a rebaselinear de paso los de
-`deck-axis` (ISSUE-122).
+El PDF de QA es sintético y local; no sustituye el canary real de staging del 22 de septiembre ni acredita
+disponibilidad en producción. El baseline de Insights sí queda acreditado por `composer:visual-gate
+--catalog=insights --selftest`, el freeze scoped y `composer:visual-gate --catalog=insights`, incluidos
+en el mismo commit que los catálogos. El gate global sigue condicionado por ISSUE-122.

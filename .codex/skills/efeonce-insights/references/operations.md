@@ -1,5 +1,19 @@
 # Efeonce Insights — operations (flags, assignment, canaries, rollback)
 
+## TASK-1847 production status (2026-09-24)
+
+The chart catalogs and worker cutover are verified in staging; no production release of TASK-1847 is confirmed.
+Remote `develop` is `ebee018`: its CI (`36057463056`) and Playwright smoke (`36058226183`) pass. The task-scoped
+candidate `ef1a5c8` has not yet been pushed, so those checks do not certify it. The production preflight for the
+remote base passes runtime health, migration parity (656/656), GCP WIF, and Sentry; it still reports
+`split_batch` over 3,279 files and an Azure federated-credential warning. Re-run preflight on the exact candidate
+before opening the promotion PR. Do not use the shared `develop` HEAD, which is 60 commits/1,063 files ahead.
+
+The Composer's historical global visual set also drifts on clean, unrelated frames (ISSUE-122). Use
+`pnpm composer:visual-gate --catalog=insights --selftest`, then the declared scoped freeze and scoped gate for the
+new Insights templates. This scope preserves existing `deck-axis`/SKY baseline images and hashes; it does not
+claim the global gate is green or resolve ISSUE-122.
+
 ## Flags (ledger: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`)
 
 | Flag | Gates | Read in | State 2026-09-16 |

@@ -7,7 +7,7 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | --- | --- | --- | --- | --- |
 | TASK-1845 | Domain, evidence, adapters, lanes, MCP, gateway federation | **complete** | Cloud SQL (single instance), Vercel staging + Production (generation ON), gateway v1.5.0, Entra scope | 2026-09-16 |
 | TASK-1846 | Durable rendering + Artifact Worker (RenderRun / InsightOutput), outputs port | **complete** | Cloud SQL (migrations applied), Vercel staging + Production (render ON), Cloud Run Job `artifact-worker` (first productive deploy in release `917491fd02e4`) + `ops-worker` dispatcher (flag ON, shared by staging/prod), gateway v1.6.0 deployed | 2026-09-16 |
-| TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | **in-progress — staging only** (code complete; canary with real data) | `develop` → staging + Job `artifact-worker`: `report_pdf` on `insights-report`, `deck_pdf` on `insights-deck` (cutover 2026-09-22). NOT in production | — |
+| TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | **in-progress — in production 2026-09-24** (release `ebb9212a32ce`, PR #239; contract canary green; production render canary pending) | Job `artifact-worker` in staging and production: `report_pdf` on `insights-report`, `deck_pdf` on `insights-deck` (cutover 2026-09-22 staging, 2026-09-24 production) | — |
 | TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — in production with flags OFF** | Cloud SQL (4 migrations applied); release `bda1cf2cd938` (2026-09-18, Vercel + 6 Cloud Run); staging flags ON (sharing/delivery/schedules/issuance), production OFF until TASK-1875; gateway `efeonce-mcp` 1.7.0 (rev `00055-gk6`, 58 tools); open: in-app/Teams channels, portal route (1849), ISSUE-174 → TASK-1876 | 2026-09-18 |
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
 | TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | to-do (blocked by 1848) | — | — |
@@ -150,22 +150,24 @@ Mapper V1 `render/deck-mapper.ts` (plan → deck-axis slides; no CoverFull; neve
 production canary, gateway federation of the 4 tools in `efeonce-mcp`, and any `git push`. Status:
 `code complete, rollout pendiente`. Slice 4 ran a bounded LOCAL benchmark (see task file); no Cloud Run measurement.
 
-**Hand-off pending for 1847/1848:** `report_pdf`/`web` are rejected at request time (`render_rejected`) until
-their catalogs/model exist; the asset id returned by the run is not a download — authorized download/share is
-TASK-1848. The `MetricsSplit` `unit` slot has a pre-existing visual defect (glued/wrapped) visible in delivered
-tender decks: separate issue for the catalog owner.
+**Hand-off for 1847/1848:** staging and production (since 2026-09-24, release `ebb9212a32ce`) have the
+`report_pdf` and `deck_pdf` catalogs. `web` remains outside the renderable output set until its model/runtime owner ships it. The asset
+id returned by a run is not a download — authorized download/share is TASK-1848. The `MetricsSplit` `unit` slot has a
+pre-existing visual defect (glued/wrapped) visible in delivered tender decks: separate issue for the catalog owner.
 
 ## TASK-1847 — charts and catalogs (in-progress desde 2026-09-21)
 
-**Estado (2026-09-22): code complete, desplegado en staging, sin release a producción.** Canary con datos reales
+**Estado (2026-09-22): desplegado en staging, sin release a producción.** Canary con datos reales
 (Berel SEO+AEO `EO-INS-000019`, Sky ICO `EO-INS-000020`, audiencia interna, sin emitir) y módulo `insights_v1`
 asignado a ambas orgs. El canary encontró y cerró: validador de cifras con falsos positivos (fecha partida, cifras de
 la etiqueta), OTD que nunca llegó (`otd` vs `otd_pct`), ids internos en límites/metodología, dimensiones AEO en inglés,
 figuras del A4 (formato propio, nombres, recortes, barra destacada invisible), rótulo de período y el deck productivo
 sobre `deck-axis`, reemplazado por `insights-deck` (`insights-deck-mapper.ts`). Vista previa local sobre datos reales:
 Berel A4 15 págs / deck 13 láminas, Sky A4 7 / deck 5, 0 violaciones. **Runtime de staging verificado**: Berel v2
-(`EO-INS-000019 v2`) y Sky v2 (`EO-INS-000020 v2`, con OTD) renderizaron deck + A4 al primer intento. Rechazos con `scope` (`b6e32a09e`). Pendiente: release a
-producción cuando haya consumidor, baseline visual (ISSUE-122) e índice paginado del A4.
+(`EO-INS-000019 v2`) y Sky v2 (`EO-INS-000020 v2`, con OTD) renderizaron deck + A4 al primer intento. Rechazos con
+`scope` (`b6e32a09e`). El 2026-09-24 se compusieron localmente PDFs de prueba de 30 páginas A4 y 25 láminas, con
+line/pie/donut/scatter en ambos catálogos; el scatter vacío ahora conserva su path SVG. Falta promover el baseline
+visual, inspeccionar el PDF multipágina completo y liberar a producción.
 
 **Módulos compartidos nuevos:** `artifact-composer/bar-figure.ts` (guarda barra↔etiqueta con tolerancia de redondeo,
 escala por `scaleGroup`, tono `tone-*`), `render/figure-pages.ts`, `render/composition-helpers.ts`, `render/labels.ts`.
@@ -189,7 +191,8 @@ y `report_pdf` admitido en sus 4 puntos (contrato, command por output, mapper, w
 actualizada: arquitectura §14.7, funcional v1.7 y manual.
 
 **Superado el 2026-09-22 (ver Estado arriba):** el rollout a staging, el canary y el cutover de `deck_pdf`.
-Sigue faltando el baseline visual de los catálogos nuevos (ISSUE-122) y el release a producción.
+El índice A4 y las cuatro familias de gráfico se verificaron localmente el 2026-09-24; la disponibilidad productiva
+no se infiere del staging ni del render local.
 
 **Gap heredado que esta task NO cierra:** el planner determinista emite **2 de 15** familias (`bar`,
 `bar_grouped`). Las otras 13 tienen geometría probada con fixtures y **ningún productor**. Ampliar el planner es
@@ -290,20 +293,28 @@ _Fill at closure._
 ## TASK-1875 — Think shared web render (to-do)
 _Fill at closure: Astro route, token handling, `no-store`, GVC evidence._
 
-**Sesión 2026-09-24 — índice A4 preparado localmente; release bloqueado.** Se añadió `ReportIndexPage` y el mapper
-inserta índice con folios físicos antes del body; `report-mapper.test.ts` verifica 30 páginas y la paginación del
-índice (18 tests verdes), `pnpm typecheck` y `pnpm task:lint --task TASK-1847` verdes. El gate visual reconoce los 10
-frames Insights declarados, aún sin promover porque `--freeze` requiere un commit atómico del catálogo. El SHA de
-staging `d8afbf50a06e99f471be17fa0981c09e952c8e5d` queda bloqueado: CI fallido, sin Playwright smoke y
-`release_batch_policy=split_batch` (3.279 archivos; `auth_access` + `cloud_release`); no se dispatchó el orquestador.
-La geometría adicional sin productor sigue siendo el gap deliberado ya registrado, fuera de este release.
+**Sesión 2026-09-24 — índice A4, familias de gráfico y auditoría de release.** El mapper compone un índice A4 con
+folios físicos; los tests locales cargan PDFs reales de 30 páginas y 25 láminas y ejercitan line/pie/donut/scatter en
+ambos catálogos. `pnpm typecheck`, 349 tests dirigidos, foto (510/510) y `composer:brand-pack --check` pasan. El
+  `composer:visual-gate --selftest` da 71 frames deterministas. `--freeze` no escribió baseline: además de los diez
+  frames Insights declarados, el guard rechazó veinte frames `deck-axis` no declarados; sus plantillas están limpias
+  en Git y se preservaron. El preflight del SHA remoto d8afbf50 falla por 12 tests de referencias de
+vestuario, ausencia de Playwright smoke, `split_batch` (3.279 archivos) y autenticación de Postgres para
+`greenhouse_ops`; migraciones 656/656, GCP WIF y Sentry pasan. El `develop` local está 60 commits y 1.063 archivos
+por delante de `origin/develop`; no es un candidato acotado a esta task. No se dispatchó el orquestador.
 
 ## Sessions (append as you go; newest first)
 
-- **2026-09-24 · TASK-1847 · índice A4 y auditoría de release.** Índice local con folios reales y paginación, prueba
-  de 30 páginas e índice de más de 28 entradas; typecheck, task lint y 18 tests del mapper verdes. Sin commit ni
-  promoción de baseline. Preflight del SHA de staging bloqueado por CI fallido, smoke ausente y batch de 3.279 archivos;
-  no hubo dispatch ni cambio de runtime.
+- **2026-09-24 · TASK-1847 · release a producción.** Codex armó una rama acotada sobre `main` (PR #239) y la
+  despachó; tras ~4 h el operador lo detuvo y Claude tomó la coordinación sólo para verificar y cerrar. Manifest
+  `ebb9212a32ce-388b8af7-e133-4ea3-9441-2bbf00a157b7` `released`; 6 runtimes en el SHA, Vercel READY, watchdog `ok`;
+  canary de contrato productivo con `renderableOutputs` deck_pdf+report_pdf. Pendiente: primer render productivo.
+  El código del release vivía sin commitear en `develop`: `e15d71648` lo trae byte a byte.
+- **2026-09-24 · TASK-1847 · render A4/deck y auditoría de release.** Índice local con folios reales; PDFs de prueba
+  de 30 páginas y 25 láminas; cuatro familias nuevas en ambos formatos; fix de paths SVG vacíos; contraste de acentos
+  A4 ajustado con token AXIS teal-750. El freeze visual rechazó veinte frames `deck-axis` ajenos y no escribió el
+  baseline. Preflight del SHA remoto bloqueado por CI, smoke ausente, batch de 3.279
+  archivos y auth de Postgres. Migraciones/WIF/Sentry pasan. Sin baseline promovido ni release productivo.
 
 - **2026-09-18 · TASK-1848 production + gateway.** Staging canary green (incl. real email to the operator inbox, confirmed
   by the operator); ISSUE-174 caused by a concurrent burst (→ TASK-1876); release `bda1cf2cd938` with flags OFF in

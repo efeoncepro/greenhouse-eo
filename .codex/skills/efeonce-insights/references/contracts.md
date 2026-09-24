@@ -53,7 +53,7 @@ Internal bindings must pass `organizationId`; org-scoped bindings read their own
 - `POST …/insights/editions/{editionId}/render` body `{ organizationId?, outputs?: InsightOutput[] }` → `202 { run, outputs, idempotent:false }`
   or `200 { …, idempotent:true }` when a live run already covers the targets. Precondition: edition `ready_for_review`
   with sealed snapshot + frozen plan; `outputs` ⊆ edition outputs and ⊆ `INSIGHT_RENDERABLE_OUTPUTS` (`deck_pdf`, `report_pdf` since
-  TASK-1847: staging 2026-09-22, production at the next release). Catalog per output: `deck_pdf` → `insights-deck`, `report_pdf` → `insights-report`.
+  TASK-1847: staging 2026-09-22; production remains unavailable until the TASK-1847 release). Catalog per output: `deck_pdf` → `insights-deck`, `report_pdf` → `insights-report`.
 - `GET …/insights/editions/{editionId}/render` (paginated runs) · `GET …/insights/render-runs/{renderRunId}` → run DTO
   `{ renderRunId, editionId, audience, requestedOutputs, state, startedAt, finishedAt, cancelledAt, createdAt, outputs[] }`,
   output DTO `{ insightOutputId, output, state, attempts, failureCode, outputAssetId, manifestHash, finishedAt }`.

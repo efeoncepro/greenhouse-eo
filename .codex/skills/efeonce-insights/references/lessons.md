@@ -1,5 +1,18 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-24 · El gate global puede bloquear un catálogo nuevo por drift histórico ajeno.** El baseline de
+  `deck-axis`/SKY ya difería en el `develop` limpio. Usa `--catalog=insights` para congelar y comparar sólo los
+  frames de Insights, preservando hashes ajenos; valida ambos comandos y mantén ISSUE-122 abierta para el gate global.
+
+- **2026-09-24 · Campos geométricos vacíos pueden borrar geometría SVG authored.** El resolver scatter escribía
+  `d=""` desde slots vacíos aunque el SVG ya tuviera path; el PDF quedaba sin puntos. Regla: un efecto de figura
+  vacío debe ser no-op y no sobrescribir la geometría del molde; cubrirlo con una regresión y abrir el PDF real.
+
+- **2026-09-24 · El baseline de Insights no puede promoverse sobre veinte frames ajenos.** El freeze halló cambios
+  declarados en diez plantillas nuevas y veinte frames `deck-axis` no declarados; las plantillas comerciales estaban
+  limpias en Git. Regla: conservar el baseline y resolver esa deriva con su dueño; no añadir frames ajenos al ledger
+  para forzar el freeze de otra task.
+
 - **2026-09-24 · El primer baseline de un catálogo nuevo sigue sujeto al commit atómico.** `composer:visual-gate`
   reportó diez frames Insights aún no promovidos; el nuevo índice ya estaba declarado y el resto era el set del
   2026-09-21. Regla: conserva los frames ajenos intactos y no ejecutes `--freeze` sin poder incluir baseline y

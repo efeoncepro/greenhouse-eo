@@ -857,8 +857,27 @@ typecheck limpio, gates del worker OK):
 
 Verificado en el runtime de staging: las revisiones v2 de Berel (deck `insights-deck` 13 láminas + A4 15 páginas) y Sky
 (deck 5 + A4 7, con OTD) completaron al primer intento, idénticas a la vista previa local
-(`scripts/insights/preview-edition.ts`). **Falta:** release
-a producción cuando haya consumidor, baseline visual (ISSUE-122) e índice paginado del A4.
+(`scripts/insights/preview-edition.ts`). **Falta:** baseline visual (ISSUE-122) y promoción a producción.
+
+**Delta 2026-09-24 — QA A4 y estado del release.** La paginación/índice A4 ya está implementada y se verificó con una
+exportación sintética local de 30 páginas: `pdfinfo` reporta A4 (595.92 × 842.88 pt), `pdffonts` encuentra 120/120
+recursos embebidos, `pdftotext` confirma pie y folio en 30/30 páginas y el renderer carga fuentes locales y aborta
+solicitudes HTTP(S). La hoja de contacto de las 30 páginas en gris quedó en el dossier de TASK-1847; esto es evidencia
+local sintética, no de disponibilidad productiva. Las suites focales de ChartSpec/geometría/render (83 pruebas) y
+API/tenant/errores (31) pasan; `task:lint`, `epic:lint`, `design-contract:lint`, `ui:quality`, `composer:brand-pack
+--check`, `skills:mirrors` y `docs:context-check:strict` también pasan.
+
+El baseline visual de los catálogos Insights se promueve y verifica con `pnpm composer:visual-gate
+--catalog=insights`; su freeze preserva el resto del manifest. En el snapshot del candidato `ef1a5c8`, los diez
+frames pasan determinismo y comparación a cero píxeles. El gate global continúa mostrando drift previo en `deck-axis`
+y SKY, registrado en ISSUE-122; esta task no rebaselina esos frames. El baseline scoped queda ligado al commit que
+incluye catálogo y PNGs.
+
+**Delta 2026-09-24 — en producción.** El release salió acotado a TASK-1847 desde `release/task-1847-insights-catalogs`
+(sobre `main`, PR #239 → `ebb9212a3`); manifest `ebb9212a32ce-388b8af7-e133-4ea3-9441-2bbf00a157b7` en `released`.
+Producción rinde `report_pdf` con `insights-report` y `deck_pdf` con `insights-deck`; el canary de contrato del lane
+ecosystem devolvió `renderableOutputs` = `["deck_pdf","report_pdf"]`. El primer render productivo de esos catálogos
+todavía no se ejercitó. `develop` recibió el código del release en `e15d71648`.
 
 **Límite honesto de las familias:** el planner determinista emite `bar` y `bar_grouped`. Las otras
 13 tienen geometría probada con fixtures y **ningún productor**; no se ofrecen como disponibles.

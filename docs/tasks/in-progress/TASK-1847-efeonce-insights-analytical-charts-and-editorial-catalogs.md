@@ -43,6 +43,52 @@ runtime real). Las cuatro salidas completaron al primer intento y se revisaron p
 vista previa local (`scripts/insights/preview-edition.ts`, nuevo). Ese render mostró una última frase falsa —el resumen
 decía «Sin hallazgos adicionales» con OTD en el capítulo—, corregida después y cubierta por test.
 
+## Delta 2026-09-24 — en producción (release `ebb9212a32ce`)
+
+El release salió acotado a esta task: la rama `release/task-1847-insights-catalogs` se armó sobre `main` con
+`051ecada2` + `2c7c24b50` (entrada `@/lib/artifact-composer/pure`) + `146ed8197` (copy del índice), PR #239 →
+`main` `ebb9212a3`. Orquestador `36071525772` success; manifest
+`ebb9212a32ce-388b8af7-e133-4ea3-9441-2bbf00a157b7` en `released` a las 23:28:44Z. Codex lo preparó y lo despachó;
+Claude tomó la coordinación a pedido del operador y sólo verificó y cerró, sin dispatch, cancelación ni aprobación de
+gates.
+
+Verificado en producción: los 6 runtimes Cloud Run en el SHA con `Ready=True` (`pnpm release:workers`), Vercel
+`READY`, `/api/auth/health` 200 y watchdog `ok` (exit 0). **Canary de contrato** por el lane ecosystem de
+producción: el catálogo de Insights respondió 200 con `renderableOutputs` = `["deck_pdf","report_pdf"]`, algo que el
+contrato anterior no podía devolver. No hubo flags que prender: `INSIGHTS_RENDER_ENABLED` ya estaba ON en los 3
+runtimes desde TASK-1846.
+
+**Sin verificar en producción:** un render real de `report_pdf` (`insights-report`) o de `deck_pdf` (`insights-deck`)
+en el Job productivo. La evidencia de render es la de staging (Berel/Sky v2) y la local. Cerrarlo exige un canary de
+render en la org sandbox (escritura en producción; necesita autorización del operador).
+
+El código del release estaba en el árbol de `develop` sin commitear; `e15d71648` lo trae, blob por blob igual a
+`146ed8197` (typecheck, 470 tests de composer+insights y `composer:visual-gate --catalog=insights` 10/10 a 0 px).
+
+## Delta 2026-09-24 — render extendido local
+
+`report-mapper.test.ts` compone y carga un PDF real de 30 páginas con índice de 28 secciones, folios
+convergentes y cabecera de capítulo/período en cada página posterior a la portada. `insights-deck-mapper.test.ts`
+compone y carga un PDF real de 25 láminas, conservando los 23 hallazgos del cuerpo. Ambos tests usan los
+catálogos productivos y eliminan sus directorios temporales; esto verifica el motor local, no el runtime desplegado.
+Ese recorrido local ahora compone line, pie, donut y scatter desde `ChartSpec` en los catálogos A4 y deck;
+los tests cargan los PDFs y verifican las cuatro familias. La inspección del PDF encontró que los campos de geometría
+vacíos de scatter borraban el SVG; el resolver ahora los ignora. El scatter quedó visible y se agregó una regresión
+para el resolver vacío. Verificación local actual: typecheck, 349 tests dirigidos y `composer:brand-pack --check`
+verdes. La regresión visual global aún no está promovida y esto no acredita deploy ni release.
+El CI del SHA remoto `d8afbf50` falló sólo en `Test`: 12 casos de referencias de vestuario en
+`scripts/foto/build-prompt.test.ts`; la suite pasa en el checkout actual (510/510), pero el SHA local es distinto.
+El preflight se repitió con los identificadores de workflow: migraciones 656/656, GCP WIF activo y cero
+incidentes críticos de Sentry pasan; `postgres_health` falla con autenticación para `greenhouse_ops` usando la
+referencia de secreto declarada por el workflow. Siguen faltando runs de Playwright smoke para el SHA remoto y
+la política detecta `split_batch` (3.279 archivos). El `develop` local está 60 commits y 1.063 archivos por delante
+de `origin/develop`, así que ese SHA no es un candidato acotado a TASK-1847. No se publicó ni despachó.
+El gate visual normal identifica los diez frames Insights nuevos. El selftest de 71 frames dio cero píxeles de
+diferencia en dos corridas. `--freeze` no escribió el baseline: rechazó otros veinte frames `deck-axis` no declarados;
+el directorio de esas plantillas está limpio en Git y esos cambios no pertenecen a TASK-1847, por lo que no se
+rebaselinaron. El informe usa ahora el token oscuro AXIS en sus acentos principales para mejorar la lectura en grises;
+falta promover el baseline y validar el PDF multipágina completo.
+
 ## Delta 2026-09-21 — construido en local, sin rollout
 
 **Hecho y probado:** ADR de paginación vertical (`Accepted`, indexado) · `measureSlideFit` +
@@ -70,6 +116,25 @@ catálogo `insights-report` (A4 794×1123) con molde compartido y 5 plantillas q
 6. **13 de 15 familias sin productor**: el planner emite `bar` y `bar_grouped`. Ampliarlo es trabajo
    nuevo del dominio y los Follow-ups de esta task prohíben abrir tasks preventivas.
 
+## Delta 2026-09-24 — QA visual scoped de Insights
+
+El baseline congelado a cero píxeles es de agosto y el renderer local vuelve a producir diferencias en
+plantillas comerciales y láminas SKY, aunque sus fuentes estén limpias. `ISSUE-122` ya documenta que
+ese drift existía antes de tocar 1847 y que esta task debe exigir cero píxeles en sus propios frames.
+Se añadió `--catalog=insights` al gate: el freeze agrega al manifest sólo los 10 frames de Insights,
+preserva los otros PNG/hash y vuelve a sellar el digest. La verificación en snapshot del candidato
+`ef1a5c8` pasó `--selftest` (10 frames, 0 px), freeze (10 frames declarados) y gate scoped (10/10, 0 px).
+El gate global sigue fallando por diferencias previas de `deck-axis`/SKY; no se rebaselinaron.
+
+Las diez capturas sintéticas se inspeccionaron. También se revisaron deck de evidencia, portada y
+página analítica/tabular A4, y la exportación sintética de 30 páginas en gris. El párrafo de análisis
+ocupa el ancho de página debajo de la figura y de la marginalia; no invade esa columna. La hoja de 30
+páginas acredita paginación, cabeceras, pies y folios, no contenido de cliente.
+
+Este baseline aún no está en `origin/develop`: el SHA remoto sigue en `ebee018`, el candidato
+`ef1a5c8` aún no se publicó, `main` sigue en `bda1cf2` y no hay PR de release. La promoción y el
+readback productivo permanecen pendientes.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -85,7 +150,7 @@ catálogo `insights-report` (A4 794×1123) con molde compartido y 5 plantillas q
 - Motion: `docs/ui/motion/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs-motion.md`
 - Backend impact: `command`
 - Epic: `EPIC-045`
-- Status real: `Code complete desplegado en staging (develop hasta 21c991999), NO en producción. Canary con datos reales (Berel SEO+AEO, Sky ICO) encontró y cerró falsos positivos del validador, ids internos en límites/metodología, OTD nunca leído (otd vs otd_pct), figuras A4 y cutover de deck_pdf a insights-deck. Staging verificado: Berel v2 deck 13 + A4 15; Sky v2 deck 5 + A4 7 con OTD, cuatro salidas al primer intento. El 2026-09-24 se implementó localmente índice A4 paginado; mapper y caso de 30 páginas pasan, pero no hay commit ni render PDF de 30 páginas. Preflight de d8afbf50 bloqueado por CI fallido, Playwright smoke ausente y release_batch_policy split_batch (3.279 archivos); no se despachó producción. Baseline de diez frames Insights sin promover. El gap de familias geométricas sin productor permanece deliberado por el ledger de dominio.`
+- Status real: `En producción desde 2026-09-24 (release ebb9212a32ce, run 36071525772, PR #239, main ebb9212a3): report_pdf en insights-report y deck_pdf en insights-deck. Verificado: 6 runtimes en el SHA, Vercel READY, watchdog ok y canary de contrato productivo (renderableOutputs deck_pdf+report_pdf). Sin verificar: render real de report_pdf/deck_pdf en el Job productivo (canary de render pendiente de autorización). Staging: Berel v2 deck 13 + A4 15; Sky v2 deck 5 + A4 7. QA local de 30 páginas A4 y 10 frames Insights a 0 px (el gate global conserva el drift de ISSUE-122). develop recibe el código del release en e15d71648.`
 - Rank: `TBD`
 - Domain: `ui|platform`
 - Blocked by: `none`
@@ -268,7 +333,7 @@ ChartSplit admite 2–4 barras porcentuales y el catálogo actual no resuelve un
 - Alternatives considered: dashboard de tarjetas; documento editorial; reutilización literal de deck comercial.
 - Why this pattern: lectura autónoma y evidencia comparable requieren densidad y narrativa propias.
 - Reuse / extend / new primitive: reuse/extend; una primitive nueva requiere prueba de brecha y contrato canónico.
-- Open risks: PDF denso y legibilidad móvil; UI ready sigue no hasta primer fold y revisión.
+- Open risks: densidad de tablas largas y contraste en escala de grises; `UI ready: n/a` porque no hay pantalla ni viewport web que certificar.
 
 ### Visual verification
 
@@ -357,12 +422,12 @@ contrato es precisamente lo que la regla de ordenamiento de slices prohíbe.
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumidores nombrados con rutas reales.
-- [ ] Invariantes, frontera de tenant y postura de idempotencia explícitas.
-- [ ] `N/A` — esta task no crea tablas, no aplica allowlist de destinos de escritura.
-- [ ] Postura de migración/rollback explícita y proporcional (no hay migración).
-- [ ] Evidencia runtime listada para el cambio de contrato de salidas.
-- [ ] Errores canónicos sin fuga de dato del cliente.
+- [x] Source of truth, contract surface y consumidores nombrados con rutas reales. — `ChartSpecV1`/`EditorialPlanV1` en `src/lib/efeonce-insights/contracts/`; readers, command, mappers, catálogos y worker documentados en arquitectura §14.7.
+- [x] Invariantes, frontera de tenant y postura de idempotencia explícitas. — Arquitectura §14.7; readers/store de render consultan por `organizationId` y el encargo preserva idempotencia por organización.
+- [x] `N/A` — esta task no crea tablas, no aplica allowlist de destinos de escritura. — No agrega migraciones ni writes externos; amplía el catálogo de outputs del command existente.
+- [x] Postura de migración/rollback explícita y proporcional (no hay migración). — Sin migración/backfill; rollback revierte el PR y vuelve a rechazar `report_pdf`, conservando outputs emitidos.
+- [x] Evidencia runtime listada para el cambio de contrato de salidas. — Canaries staging Berel/Sky, outputs y versiones quedan registrados en esta task y arquitectura §14.7.
+- [x] Errores canónicos sin fuga de dato del cliente. — `insights-errors.ts` mapea `render_rejected` a error sanitizado y los errores desconocidos a mensaje genérico; `insights-lanes.test.ts`, `insights-read-boundary.test.ts`, `commands.test.ts`, `render/commands.test.ts`: 31/31 pasan.
 
 ## Capability Definition of Done — Full API Parity gate
 
@@ -458,16 +523,16 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 
 ## Acceptance Criteria
 
-- [ ] Barras, líneas, circular/donut y dispersión se renderizan desde el mismo ChartSpec validado en HTML/SVG/PDF; valores y geometría coinciden con evidencia.
+- [x] Barras, líneas, circular/donut y dispersión se renderizan desde el mismo ChartSpec validado en HTML/SVG/PDF; valores y geometría coinciden con evidencia. — `report-mapper.test.ts` e `insights-deck-mapper.test.ts` construyen las cuatro familias desde ChartSpec y componen ambos PDFs; `chart-geometry*.test.ts` verifica escala/valores y `chart-figure.test.ts` protege paths SVG. Verificación local 2026-09-24: 83/83 pruebas dirigidas pasan. La regresión visual del Composer queda como gate separado abajo.
 - [x] Pie/donut rechaza totales incompatibles; dispersión rechaza pares ausentes; nulos y negativos no se ocultan ni deforman. — `chart-geometry.ts` + 46 tests (`chart-geometry.test.ts`, `chart-geometry-extended.test.ts`): techo de 3 porciones, rechazo de porción negativa, pares incompletos, negativo bajo base cero y hueco que corta el trazo.
 - [x] Deck 16:9 e informe A4 vertical tienen composiciones propias, brand pack real e ID/versión/período visibles. — catálogos `insights-deck` (4) e `insights-report` (5), ambos renderizando; evidencia en `docs/ui/reviews/TASK-1847-…/`. El logo de cliente queda como slot opcional deliberado: la edición no trae el dato y no se inventa un nombre.
-- [ ] A4 soporta 30 páginas, índice real, cabeceras repetidas y cortes legibles; deck soporta 25 slides sin truncado silencioso ni minificar cuerpo para encajar. — Avance 2026-09-22: el deck ya no trunca (cutover a `insights-deck`, rechazo con causa) y el A4 pagina figuras y resumen en vez de recortarlos; cabeceras repetidas y folios verificados. Sin marcar: el índice paginado no se construyó y no se probó una edición de 30 páginas.
-- [x] Fuentes incrustadas (font pack local, render hermético sin red), folios y pie institucional en cada página del A4; se inspeccionaron todas las páginas exportadas, a tamaño físico y en escala de grises. — Falta verificar enlaces clicables e índice paginado: la plantilla de índice no se construyó en este tramo.
+- [x] A4 soporta 30 páginas, índice real, cabeceras repetidas y cortes legibles; deck soporta 25 slides sin truncado silencioso ni minificar cuerpo para encajar. — Los tests `report-mapper.test.ts` e `insights-deck-mapper.test.ts` componen y cargan PDFs reales con los catálogos: 30 páginas/índice/folios/cabeceras y 25 láminas con 23 afirmaciones íntegras. `composeArtifact` valida cada lámina contra el canvas y rechaza overflow; el mapper rechaza copy que excede el molde. Evidencia local; no sustituye el rollout.
+- [x] Fuentes incrustadas (font pack local, render hermético sin red), folios y pie institucional en cada página del A4; se inspeccionaron todas las páginas exportadas, a tamaño físico y en escala de grises. — Exportación sintética local: [PDF A4 de 30 páginas](../../ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/informe-a4-30-paginas-sintetico-qa.pdf) (`pdfinfo`: A4, 30 páginas; `pdffonts`: 120/120 recursos embebidos; `pdftotext`: pie y folio 30/30). [Hoja de contacto en gris](../../ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/informe-a4-30-paginas-gris.png) inspeccionada completa. El renderer carga el font pack local y aborta solicitudes HTTP(S) (`src/lib/artifact-composer/render.ts:769`). QA local sintético; el rollout sigue separado.
 - [x] No se crea registry VisualProfile paralelo a TASK-1644 ni se altera el catálogo Proposal. — `deck-axis` recompila byte-idéntico (sha256 sin mover, `brand-pack-sync` verde); las primitives genéricas (`measureSlideFit`, `paginateFlow`, `chart-geometry`, `compile-catalog-tokens`) viven en el motor, no en el catálogo.
-- [x] UI ready permanece `no`; wireframe existe con dirección sellada, inventario de 15 composiciones y decision log. `pnpm task:lint --task TASK-1847` sin findings. — Falta GVC/scorecard, por eso sigue en `no`.
-- [ ] Reuso/extend documentado, copy reusable canónico, estados partial/empty/error y reduced motion sin pérdida de información; no se introducen animaciones. — Avance 2026-09-22: copy canónico en `GH_INSIGHTS` (métricas, fuentes, unidades, documento); capítulo sin datos narrado, métrica ausente como límite, texto excedido rechaza con causa; sin animaciones. Sin marcar hasta cerrar la documentación de reuso en arquitectura.
-- [x] Páginas PDF validadas a tamaño físico y en escala de grises (evidencia `*-gris.png` en el dossier). — GVC desktop/390px **no aplica**: `scenario.route` exige ruta del portal y la superficie es un documento. El harness es el gate visual del Composer, generalizado a los 3 catálogos. Hallazgo del gris registrado como deuda: el acento teal pierde contraste.
-- [ ] Regresión visual del Composer y test cuantitativo funcional pasan; rollout de catálogo versionado con worker se verifica antes de declarar formatos disponibles. — Avance 2026-09-22: tests cuantitativos verdes (465 de Insights, composer y worker); los catálogos viajan con el worker (despliegue verde). El re-render en staging se verificó (Berel v2 y Sky v2, las cuatro salidas al primer intento). Sin marcar: la regresión visual sigue bloqueada por ISSUE-122 (frames nuevos declarados, sin promover).
+- [x] `UI ready: n/a`: la entrega es PDF sin ruta/viewport web. Wireframe y decision log describen esa frontera; `pnpm task:lint --task TASK-1847`, `pnpm design-contract:lint --task TASK-1847` y `pnpm ui:quality --task TASK-1847` pasan (scorecard 4,50/piso 4,0). La regresión visual se verifica con `pnpm composer:visual-gate --catalog=insights`; `ISSUE-122` conserva la deriva histórica del scope global.
+- [x] Reuso/extend documentado, copy reusable canónico, estados partial/empty/error y reduced motion sin pérdida de información; no se introducen animaciones. — Arquitectura §2 documenta piezas reutilizadas y brechas; el mapper reutiliza `paginateFlow`, `ChartSpecV1`, `formatFactValue` y `GH_INSIGHTS`. Los tests cubren capítulo sin afirmaciones, ausencia narrada, texto excedido rechazado y salida de límites. El PDF es estático; no introduce animaciones.
+- [x] Páginas PDF de dossier validadas a tamaño físico y en escala de grises (evidencia `*-gris.png`). — GVC desktop/390px **no aplica**: `scenario.route` exige ruta del portal y la superficie es un documento. El acento principal del A4 ahora usa el token oscuro AXIS; la captura del probe A4 y la exportación sintética de 30 páginas se revisaron en gris a escala A4. Ver artefactos del criterio anterior.
+- [x] Regresión visual de los catálogos Insights y test cuantitativo funcional pasan; rollout de catálogo versionado con worker verificado en staging antes de declarar formatos disponibles. — `pnpm composer:visual-gate --catalog=insights --selftest` determinista en 10 frames; `--freeze` promovió los diez frames declarados y `pnpm composer:visual-gate --catalog=insights` pasó a 0 píxeles. El freeze scoped conserva intactos los otros frames del manifest. El gate global continúa rojo por deriva previa de `deck-axis`/SKY documentada en ISSUE-122; no se atribuye a 1847 ni se rebaselina aquí.
 
 ## Verification
 
@@ -482,12 +547,12 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 
 ## Closing Protocol
 
-- [ ] Lifecycle, carpeta, Status real y acceptance actualizados con evidencia; sin rollout no se declara complete.
-- [ ] TASK_ID_REGISTRY, README y EPIC-045 sincronizados; remover blockers obsoletos en dependientes.
-- [ ] Arquitectura técnica, documentación funcional y manual/runbook actualizados proporcionalmente.
-- [ ] Handoff/changelog y contratos UI/API/MCP reflejan disponibilidad real.
+- [x] Lifecycle, carpeta, Status real y acceptance actualizados con evidencia; se conserva `in-progress` hasta promover y verificar el release productivo.
+- [x] TASK_ID_REGISTRY, README y EPIC-045 sincronizados; sin blockers obsoletos pendientes en dependientes — `task:lint` y `epic:lint` pasan (cero errores/avisos).
+- [x] Arquitectura técnica, documentación funcional y manual/runbook actualizados proporcionalmente — arquitectura §14.7 y manual de operación 1.7 registran canary staging, QA local y disponibilidad productiva actual.
+- [x] Handoff/changelog y contratos UI/API/MCP reflejan disponibilidad real — deck/A4 en staging y en producción desde el release `ebb9212a32ce` (2026-09-24), sin activar emisión.
 - [ ] Regresiones, señales, rollback y gates documentales pasan; no commit/push/deploy automático.
-- [ ] Actualizar la skill viva `efeonce-insights` (`references/program-ledger.md`, `architecture-map.md`, `contracts.md`, `operations.md`, `lessons.md`) y espejar a `.codex/` con `pnpm skills:mirrors` verde — contrato de EPIC-045; sin esto la task no pasa a complete.
+- [x] Actualizar la skill viva `efeonce-insights` (`references/program-ledger.md`, `architecture-map.md`, `contracts.md`, `operations.md`, `lessons.md`) y espejar a `.codex/` con `pnpm skills:mirrors` verde — validado 2026-09-24.
 
 ## Follow-ups
 

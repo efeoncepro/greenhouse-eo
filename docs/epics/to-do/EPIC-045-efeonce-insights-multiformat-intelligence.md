@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `En ejecución — TASK-1845 (foundation) COMPLETE 2026-09-16: en producción desde 2026-09-15 con generación ON (emisión/IA OFF), rollback ensayado; TASK-1846 (render durable) COMPLETE 2026-09-16: en producción (release 917491fd02e4, render ON en los 3 runtimes, gateway v1.6.0, canary productivo deck_pdf verde); TASK-1848 (compartir/correo/recurrencia) en producción 2026-09-18 con flags OFF (release bda1cf2cd938, gateway 1.7.0), in-progress por in-app/Teams, portal_link, Think e ISSUE-174 → TASK-1876; TASK-1847 in-progress desde 2026-09-21 (Slice 1: dirección y contrato visual, UI ready no); TASK-1849 y TASK-1875 en diseño (1875 ya desbloqueada)`
+- Status real: `En ejecución — TASK-1845 (foundation) COMPLETE 2026-09-16: en producción desde 2026-09-15 con generación ON (emisión/IA OFF), rollback ensayado; TASK-1846 (render durable) COMPLETE 2026-09-16: en producción (release 917491fd02e4, render ON en los 3 runtimes, gateway v1.6.0, canary productivo deck_pdf verde); TASK-1848 (compartir/correo/recurrencia) en producción 2026-09-18 con flags OFF (release bda1cf2cd938, gateway 1.7.0), in-progress por in-app/Teams, portal_link, Think e ISSUE-174 → TASK-1876; TASK-1847 en producción 2026-09-24 (release ebb9212a32ce, PR #239: report_pdf en insights-report y deck_pdf en insights-deck; canary de contrato productivo verde, canary de render productivo pendiente; staging verificado con Berel/Sky); TASK-1849 y TASK-1875 en diseño (1875 ya desbloqueada)`
 - Rank: `TBD`
 - Domain: `platform|growth|delivery|ui|cross-domain`
 - Owner: `Platform / Client Experience; Julio Reyes (producto)`
