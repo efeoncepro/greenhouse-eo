@@ -337,10 +337,11 @@ es llenar la columna: el compositor escala el bloque hasta que el dominante llen
 [compositor de CTA](../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
 
 🔴 **«Sobra texto» se resuelve acortando cada voz, nunca eliminando una.** Dirigir una pieza a «dominante +
-puente + CTA» rompe el concepto —entrada · titular · remate— y **el gate igual la da por verde**: mide contraste
-y protección de sujeto, no completitud. Al restituir la entrada, releer el ratio dominante/entrada: puede bajar
-solo, porque el compositor achica el dominante cuando no cabe en `dominantMax`. §El concepto completo no es
-opcional en [Tres voces + acción](../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md).
+puente + CTA» rompe el concepto —entrada · titular · remate—. El gate de `foto:componer:cta` **bloquea**
+la falta de entrada o remate desde el 2026-09-23, salvo `conceptoReducido` con aprobador registrado.
+Al restituir la entrada, releer el ratio dominante/entrada: puede bajar porque el compositor achica
+el dominante cuando no cabe en `dominantMax`. §El concepto completo no es opcional en
+[Tres voces + acción](../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md).
 
 ## Paid Media: zonas seguras y handoff completo
 

@@ -5,10 +5,39 @@
 > *«los campos `cta` del JSON piloto son locales de corrida: el comando canónico no se anuncia como compatible
 > hasta una implementación y verificación explícitas»*. Esta es esa implementación y esa verificación.
 >
-> **Actualizado el 2026-09-23.** ¿Vas a componer o certificar una pieza? Empieza por **§19 · Cómo usarlo**: flujo de
+> **Actualizado el 2026-09-24.** ¿Vas a componer o certificar una pieza? Empieza por **§19 · Cómo usarlo**: flujo de
 > punta a punta, plantilla de plan que pasa el gate, códigos de salida y problemas comunes. El estado de la
 > certificación adversarial y de sus tramos vive en **§18**. Nada de esto autoriza publicar: el gate certifica la
 > pieza, no la campaña.
+
+## Mapa técnico vigente · lectura rápida
+
+Esta sección describe el **comando actual**; las secciones de auditoría siguientes conservan la secuencia histórica
+de decisiones. La [documentación funcional](../documentation/creative/compositor-piezas-cta.md) explica el resultado y
+el [manual](../manual-de-uso/creative/compositor-piezas-cta.md) da el procedimiento para una pieza real. El
+[informe de auditoría del 2026-09-24](../audits/social/2026-09-24-cta-cli-detailed-review.md) reúne hallazgos,
+pruebas y deudas de este corte.
+
+| Etapa | Dueño en código | Entrada, salida y condición relevante |
+|---|---|---|
+| Plan y preflight | `componer-cta.mjs`, `cta-esquema.mjs` | Arreglo JSON por pieza; valida IDs, tipos, campos CTA, plate relativo, glifos y activos antes de dibujar. El plate debe ser raster opaco y limpio. |
+| Composición | `componer-cta.mjs`, `cta-variantes.mjs`, `cta-invariantes.mjs` | Segmenta sujeto con caché por SHA; mide cajas reales, zona AXIS, jerarquía, CTA y firma; escribe PNG, preview de 390 px, SVG auxiliares, layout, texto alternativo y evidencia del CTA. `auto` usa intención declarada y medición de escena; si se omite `prominencia`, el código actual toma `delimitada`: declarar siempre la intención. |
+| Integridad | `cta-integridad.mjs` | Lock de carpeta, escritura atómica por pieza, QA por plan y huellas de plan, plate, código, dependencias y PNG. Una composición parcial conserva las demás piezas del mismo plan. |
+| Gate rápido | `componer-cta.gate.mjs` | Recalcula huellas, geometría y reglas medibles contra el QA; 0 certificado, 1 falla, 2 uso inválido, 3 no certificable. El código 0 de esta vía se apoya en evidencia escrita por el compositor. |
+| Reproducción | `foto:cta:gate <plan> --reproducir` | Recompone con el comando vigente y compara PNG, layout, texto alternativo y fila QA. No sustituye la revisión visual ni la autorización de pauta. |
+| Excepciones | `cta-esquema.mjs`, `componer-cta.gate.mjs`, `aprobadores.json` | Regla específica, razón, aprobador registrado, SHA del plate y `hasta` si hay umbral numérico. El registro del canon anterior conserva las piezas aprobadas sin reescribirlas. |
+
+**Invariantes de entrega:** una pieza nueva con CTA necesita entrada, dominante, cierre, acción, descriptor y firma
+declarada, salvo excepción aprobada; el esquema rechaza `scrimTop`/`scrimBottom`. AXIS es la zona por defecto para
+una pieza nueva. La firma nueva mide al menos 25 % del lado corto en horizontal, 20 % en vertical o cuadrado, y
+máximo 35 %. Una pieza histórica aprobada no se regenera para aplicar estos umbrales.
+
+**Límites del certificado:** identidad, anatomía, calidad del concepto, aspecto del lecho, lectura visual a tamaño
+real y a 390 px, derechos, oclusión del placement y publicación siguen fuera del veredicto automático. El último
+corte verificable del sistema está en [§19.10](#1910-regresión-y-mutantes-cómo-leerlos): **52 unitarias** y **P02
+132/132** pasan al 2026-09-24 (114 componen, 18 abortan como en HEAD); la novena auditoría no produjo informes,
+el catálogo completo de mutantes no tiene puntuación y P10
+conserva una intermitencia. No convertir un código 0 de una pieza en certificación global.
 
 ## 1. Qué problema cierra
 
@@ -1566,17 +1595,15 @@ Nada de esto cambia una pieza aprobada.
 
 **Pendientes** (sin respuesta; lo implementado mientras tanto va entre paréntesis):
 
-1. ~~**Firma en 16:9**~~ → resuelta el 2026-09-23: 25 % del lado corto en las piezas nuevas (tramo 11). Medido en la misma campaña: en 16:9 la firma ocupa 7,3–7,9 % del ancho del cuadro, contra 20 % en
-   4:5 y 9:16 (18 % en 1:1); en el feed de un teléfono (390 px de ancho) mide 31 px contra 78 px en el 4:5, 2,5 veces
-   más chica. Dos causas: las piezas 16:9 de CMP-002 y del registro C se hicieron con 13–14 % del lado corto (bajo el
-   canon; el gate ya lo bloquea y se corrigen al recomponer), y aun en el canon —20 % del lado corto— la firma 16:9
-   queda en 11 % del ancho y 44 px en el teléfono. **Opción recomendada, a decidir:** 25 % del lado corto en los
-   formatos horizontales (≈ 14 % del ancho y 55 px en el teléfono; iguala la relación firma/titular del 4:5) y 20 % en
-   los verticales y cuadrados. Si se aprueba, cambian el gate, el compositor y `firma-placement.mjs`. *(Hoy el gate
-   exige 20 % del lado corto en todos los formatos.)*
-2. ~~**Margen por defecto del compositor**~~ → resuelta el 2026-09-23: AXIS por defecto en las piezas nuevas (tramo 11). Margen por defecto (7 %) frente a AXIS (7,5 % en feed, 10 % en story). Recomendación: mantener
-   el 7 % y exigir `safeArea: "axis"` en los planes nuevos. *(Con `safeArea: "axis"` el texto ya arranca dentro de la
-   zona también por arriba, commit `4cb6dd154`.)*
+1. ~~**Firma en 16:9**~~ → resuelta el 2026-09-23: el gate exige **25 % del lado corto en piezas nuevas
+   horizontales**, **20 % en verticales o cuadradas** y hasta **35 %** en todos los formatos (tramo 11). La medición
+   que motivó la decisión fue 31 px en teléfono para firmas históricas al 13–14 %, 44 px al 20 % y ≈ 55 px al 25 %
+   en 16:9. Las piezas aprobadas conservan sus píxeles; al recomponer se aplica el canon nuevo. La firma externa
+   conserva su geometría fija de 20 % y por eso no se debe prometer que pase una pieza nueva horizontal sin
+   verificar y resolver esa diferencia.
+2. ~~**Margen por defecto del compositor**~~ → resuelta el 2026-09-23: el compositor inyecta
+   `safeArea: "axis"` en una pieza nueva cuando el plan no declara otra (tramo 11). El margen histórico de 7 %
+   permanece para piezas del canon anterior; una zona explícita nueva puede estrechar AXIS, no aflojarla.
 3. ~~**Las stories de v07 ponen la firma en la franja inferior que Reels tapa**~~ → resuelta el 2026-09-23: la firma se
    subió dentro de AXIS en las cuatro stories finales (tercera ronda, arriba). Sigue fuera de la guarda conservadora de
    Reels (65 %), como dice su LEEME.
@@ -1757,7 +1784,7 @@ que no actúan sin `label`. Cópiala a tu carpeta, cambia `id`, `plate`, copy y 
 
 | Campo | Para qué |
 |---|---|
-| `final: [ancho, alto]` | Tamaño de entrega: cada lado entre 320 y 8192 px y con la proporción del plate |
+| `final: [ancho, alto]` | Tamaño de entrega: cada lado entre 320 y 8192 px; el ratio sólo admite hasta 1 px de redondeo medido en el plate. Sharp puede recortar esa fracción subpíxel; otro formato exige otro plate |
 | `protect: [{ "box": [x0, y0, x1, y1], "reason": "…" }]` | Objetos de la escena que el texto no tapa aunque no sean una persona; fracciones del lienzo y una razón de al menos 10 caracteres |
 | `editorialReserve: { "maxRight": px, "maxBottom": px }` | Reserva editorial en px del plate: el crecimiento no la cruza y el gate la exige |
 | `subjectGuard.ignore: [{ "box", "reason", "aprobadoPor" }]` | Falso positivo de la segmentación (un afiche del fondo): hasta 10 % del lienzo por zona y 15 % en total, con un aprobador del registro |
@@ -2075,7 +2102,7 @@ se consultan:
 | `firma.anchoLadoCorto` · `firma.y` | Tamaño de la firma (fracción del lado corto) y su Y: el borde superior del logo o, en la externa, el centro | Bajo 0,2 → `firma-tamano` |
 | `firma.externa` · `firma.variante` · `contraste.firmaExterna` | La firma que pone otra herramienta: la caja reservada, la tinta que mejor se lee y su contraste | Bajo 4,5:1 → `firma-contraste` |
 | `firmaCanto` | La pendiente de luz bajo la firma real —el logo dibujado o la caja reservada para la firma externa—, normalizada al lado corto, con dos decimales; `null` si la pieza no tiene firma en el layout (tramo 16) | Sobre 18,5 hay un canto bajo la firma: en una pieza nueva bloquea (`firma-canto`) y en una aprobada avisa. Si falta en una pieza nueva con `logo` o firma externa, su QA es de un comando anterior: sale con 3 → recompón |
-| `accesibilidad.rescate` | Voces que pasan sólo gracias al velo: `{ por: ["scrimTop", …], voces: [{ voz, sinVelo, conVelo }] }` | Aviso: la foto se oscurece para leerse (pendiente 4) |
+| `accesibilidad.rescate` (histórico) | Campo de las pruebas anteriores con velo | No se emite en el canon vigente: `scrimTop` y `scrimBottom` se rechazan al validar el plan. |
 | `accesibilidad.corchetes` | Corchetes del CTA de texto: grosor en CSS px en un teléfono, el peor contraste de las cuatro esquinas y su umbral (3:1) | Aviso bajo 1 CSS px o bajo 3:1 (pendiente 7) |
 | `ctaVariante` | Con `variant: "auto"`: `prominencia`, `elegida`, `escalo`, `motivo` y, si aplica, `tintaDegradada` | El motivo nombra la condición que decidió |
 | `ctaVariante.sinMargen` | Ninguna variante alcanzó con margen y quedó la que más separa | Aviso: pasa por poco; con otra pantalla o con compresión puede no alcanzar (pendiente 5) |
@@ -2088,7 +2115,8 @@ se consultan:
 **Regresión.** Antes de commitear un cambio al compositor o a sus módulos, corre `pnpm foto:componer:cta:regresion`.
 Compone cada pieza con CTA del repo con la referencia (HEAD, extraída de git de forma **hermética**, con todo su cierre
 de dependencias) y con tu versión, cada una sola en un temporal: las carpetas aprobadas no se tocan. Al 2026-09-23: 132
-piezas únicas, de las que 114 componen y 18 abortan en la referencia, y 84 piezas con CTA sin plate en esta máquina.
+piezas únicas, de las que 114 componen y 18 abortan en la referencia. El corte anterior contó 84 piezas con CTA sin
+plate; el último reporte conservado del tramo 16 contó 68. Ningún conteo de cobertura prueba las piezas sin plate.
 
 | Línea del reporte | Qué significa | ¿Falla? |
 |---|---|---|
@@ -2239,7 +2267,7 @@ piezas del canon anterior; en una nueva el piso bloquea (`legibilidad`, tramo 13
 | `<id>: el texto tapa al sujeto — <caja> (N px)…` | Una caja toca la silueta segmentada | Subir el `top`, acortar el copy o regenerar el plate con más reserva; `subjectGuard.ignore` sólo para un falso positivo, con aprobador |
 | `<id>: el texto tapa una zona protegida — …` | Una caja cae sobre una zona `protect` | Mover el texto o acotar la zona |
 | `<id>: la maquetación no cumple — …` | Choques entre texto, botón, firma y selección | Cambiar la esquina del colaborador, el ancla del cursor o la posición de la firma |
-| `` <id>: `final` A×B no tiene la proporción del plate … `` | `final` con otra proporción: el reescalado recortaría la pieza | La proporción del plate; para otro formato, otro plate |
+| `` <id>: `final` A×B cambia la proporción del plate … `` | `final` recortaría más de 1 px del máster | El ratio del plate; para otro formato, otro plate |
 | `⚠ N pieza(s) eligen variante de CTA sin cta.variantReason…` | Variante sin motivo | `variantReason`, o `variant: "auto"` con `prominencia`, o comparar con `--variantes` |
 | `⚠ <id>: campos que este comando no lee — …` | Un campo desconocido en la raíz del plan (dentro de un objeto propio es error) | Quitarlo o corregir el nombre |
 | `<id>: la esquina del botón entra en el texto del CTA (radius R con relleno X×Y)…` | El radio vuelve el botón una elipse que corta las letras (tramo 13) | Bajar `cta.radius` hasta el máximo que da el mensaje, o subir el relleno |

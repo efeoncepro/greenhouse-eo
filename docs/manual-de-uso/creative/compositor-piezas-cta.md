@@ -1,12 +1,13 @@
 # Compositor de piezas con CTA — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-23 por Claude
-> **Ultima actualizacion:** 2026-09-23 por Codex — (1.5) corte de certificación sin novena auditoría ni puntuación completa de mutantes
+> **Ultima actualizacion:** 2026-09-24 por Codex — (1.6) canon por formato y uso de la CLI
 > **Modulo:** Creative · piezas publicitarias y sociales con CTA sobre fotografía
 > **Ruta en portal:** no aplica — son comandos locales del repositorio (`pnpm foto:*`)
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/compositor-piezas-cta.md) · [Contrato técnico](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) · [Tres voces + acción](../../operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md) · [Producir una foto de marca](../marketing/fotografia-de-marca-efeonce.md)
+> **Auditoría reciente:** [Revisión técnica y funcional 2026-09-24](../../audits/social/2026-09-24-cta-cli-detailed-review.md)
 
 **Estado al corte:** usa los comandos de esta guía para una pieza concreta, pero no presentes el compositor como
 certificado por la novena auditoría: no produjo informes. El catálogo de 175 mutantes se interrumpió tras 81 detecciones
@@ -31,6 +32,20 @@ Tres reglas que evitan casi todos los problemas:
    [Lo que el gate no ve](../../documentation/creative/compositor-piezas-cta.md#lo-que-el-gate-no-ve)).
 3. **Nunca inventes un aprobador.** Si una regla necesita excepción, pregúntale al operador y usa sólo nombres del
    registro `scripts/foto/aprobadores.json`.
+
+## Ruta de trabajo para humanos y agentes
+
+| Responsable | Acción y evidencia que deja |
+|---|---|
+| Dirección humana | Define brief, copy literal, CTA, ratio, placement, derechos y criterio de aprobación. Elige la intención del CTA; `auto` siempre lleva `cta.prominencia` (`discreta`, `delimitada` o `destacada`). |
+| Agente de producción | Comprueba referencias y hashes, prepara plate limpio y nativo, corre `foto:validar --zona-texto`, escribe el plan y compone con `foto:componer:cta`. No usa el compositor archivado de «Nivel de búsqueda» ni repara contraste con velos. |
+| Agente de verificación | Abre PNG completo y preview de 390 px; comprueba identidad, anatomía, lectura, jerarquía, lecho y firma. Corre gate rápido y `--reproducir`, guarda códigos y QA, revisa SVG auxiliares y el alternativo. Si sale 1 o 3, registra la causa y vuelve a producir; no lo llama certificado. |
+| Aprobador humano | Revisa la pieza y las excepciones nominativas. Un código 0 certifica mediciones de esa pieza, pero no sustituye juicio creativo, aprobación de la campaña ni autorización de pauta. |
+| Operación de canal | Comprueba preview real del placement, derechos, paquete final y autorización antes de programar o publicar. |
+
+El gate rápido valida huellas y reglas a partir del QA; `--reproducir` recompone y compara PNG, layout, texto
+alternativo y fila QA. Ni el preview ni los SVG auxiliares entran en esa comparación, así que se miran aparte.
+La v07 histórica se reproduce con su snapshot congelado y **no** se presenta como salida 0 del gate vigente.
 
 ## Para qué sirve
 
@@ -135,6 +150,12 @@ pase depende de tu foto: la plantilla asegura la forma, no el resultado.
 ]
 ```
 
+La plantilla es **9:16**, por eso `logo.width: 0.2` pasa su regla de tamaño. Si creas una pieza **horizontal**
+nueva, usa al menos `0.25` del lado corto (hasta `0.35`); en vertical o cuadrado el mínimo es `0.20`.
+La firma externa que reserva el compositor mide `0.20` fijo: en una pieza nueva horizontal el gate la reprobará
+por tamaño salvo una excepción auditada. Elige una firma dibujada con `logo.width` adecuado si necesitas un
+horizontal certificable sin excepción. Las piezas aprobadas bajo el canon anterior conservan sus píxeles.
+
 **Qué es obligatorio y quién lo exige:**
 
 | Campo | Lo exige | Qué pasa si falta |
@@ -147,7 +168,7 @@ pase depende de tu foto: la plantilla asegura la forma, no el resultado.
 | `note.gapAfterClosure` o `note.y` | el esquema | Si hay nota, no compone sin uno de los dos |
 | `lead` y `after` | el gate | Compone, pero falla «concepto completo» (salvo `conceptoReducido` con aprobador) |
 | `logo` o `firma` | el gate | Compone, pero falla «la pieza no declara firma» |
-| `safeArea: "axis"` (o una zona propia más estrecha) | el gate, en la práctica | Sin ella, el margen por defecto del compositor (7 %) queda fuera de la zona de AXIS y falla «zona segura» |
+| `safeArea: "axis"` (o una zona propia más estrecha) | el compositor y el gate | En una pieza nueva AXIS se aplica por defecto; declararla hace explícita la intención. En una aprobada bajo el canon anterior se conserva el margen histórico |
 | `altText` | recomendado | Aviso: la alternativa no describe la escena |
 | `cta.variantReason` (o `variant: "auto"`) | recomendado | Aviso: la variante se eligió sin motivo |
 
@@ -167,7 +188,7 @@ pase depende de tu foto: la plantilla asegura la forma, no el resultado.
 | `surfaceToken`, `inkToken` | Color del acento y de la tinta del CTA | Tokens AXIS; acentos válidos: `accentSurface`, `growthOnDark`, `accentInkOnLight` |
 | `logo` | Firma dibujada por el compositor | `width` (0,2 = 20 % del lado corto), `x`, `y` (`"auto"` o fracción del alto: borde superior; con `"auto"`, en una pieza nueva la búsqueda evita el canto del lecho), `variant` (`auto`, `negative` blanca o `color` navy) |
 | `firma` | Firma externa o pieza sin firma | Ver más abajo |
-| `final` | Tamaño entregado `[ancho, alto]` | Cada lado entre 320 y 8192 px, con la proporción del plate |
+| `final` | Tamaño entregado `[ancho, alto]` | Cada lado entre 320 y 8192 px; se tolera sólo hasta 1 px de redondeo del plate. Para otro ratio, produce otro plate |
 | `textGrowth` | `false` congela una pieza aprobada a su tamaño declarado | Booleano |
 | `protect` | Objetos que el texto no puede tapar | `[{ "box": [x0, y0, x1, y1], "reason": "…" }]`, fracciones del lienzo, razón de 10 caracteres o más |
 | `editorialReserve` | Reserva editorial: el texto no pasa de ahí | `{ "maxRight": px, "maxBottom": px }` en px del plate |
@@ -191,7 +212,8 @@ El compositor reserva su caja (20 % del lado corto, centrada, con su centro vert
 contraste como lo hará esa herramienta. Si la firma va en otra altura, declara `"signatureY"` (centro vertical, fracción
 del alto): es el campo que lee `firmar.mjs`, así que la caja que se mide es la firma que se dibuja. El ancho es siempre
 20 % del lado corto; `firma` no acepta `y` ni `ancho`. Los planes que ya usan `signatureY` quedan declarados como firma
-externa.
+externa. En un horizontal nuevo, esa caja fija de 20 % queda bajo el mínimo de 25 % del gate: usa `logo` con el
+ancho correcto o tramita una excepción específica; la firma externa no pasa sola.
 
 **Si el bloque va centrado:** `"align": "center"` y `"cta": { "align": "center", … }` sin `cta.x`. No uses `"columna"`
 en un bloque centrado, y mantén `centerX` a 0,15 o menos del centro; si el aire libre está a un costado, alinea el
@@ -499,7 +521,7 @@ Para proteger un objeto que no es el sujeto no hace falta aprobador; basta la ra
 
 ## Decisiones pendientes que te afectan
 
-El operador todavía no decide estos puntos. Mientras tanto, rige lo que dice la columna «Hoy».
+Esta tabla separa decisiones tomadas de decisiones abiertas. Para las abiertas rige la columna «Hoy».
 
 | # | Pendiente | Hoy |
 |---|---|---|
@@ -514,18 +536,14 @@ El operador todavía no decide estos puntos. Mientras tanto, rige lo que dice la
 | 9 | Reserva de texto del plate 16:9 para piezas con CTA | Hoy 42 % izquierdo (`foto:prompt`); con el piso de legibilidad el texto usa cerca del 57 % |
 | 10 | Firma de KV-06-916 (CMP-002) sobre el canto de una mesa | Aviso: es una pieza aprobada. Se corrige el lecho o queda con el aviso |
 
-**1 · La firma en 16:9 (decidido el 2026-09-23: 25 % en las piezas nuevas).** Medido en una misma campaña: en 16:9 la firma ocupa entre 7,3 % y 7,9 % del ancho del cuadro,
-contra 20 % en 4:5 y 9:16 (18 % en 1:1). En el feed de un teléfono (390 px de ancho) mide 31 px contra 78 px en el 4:5:
-dos veces y media más chica. Tiene dos causas. Las piezas 16:9 de CMP-002 y del registro C se hicieron con 13–14 % del
-lado corto, bajo el canon: el gate ya lo bloquea y se corrigen al recomponer. Y aun dentro del canon, el 20 % del lado
-corto en 16:9 queda en 11 % del ancho y 44 px en el teléfono. La opción recomendada, **a decidir**, es 25 % del lado corto
-en formatos horizontales (cerca de 14 % del ancho y 55 px en el teléfono, la misma relación firma/titular del 4:5) y 20 %
-en verticales y cuadrados. Si se aprueba, cambian el gate, el compositor y `firma-placement.mjs`.
+**1 · Firma horizontal (decidido el 2026-09-23).** El gate exige al menos 25 % del lado corto en una pieza nueva
+horizontal y 20 % en vertical o cuadrada, con máximo de 35 %. La medición que motivó la decisión fue 31 px en
+teléfono para las firmas históricas al 13–14 %, 44 px al 20 % y ≈ 55 px al 25 % en 16:9. Al recomponer una pieza
+aprobada se aplica el canon vigente. Para una firma externa nueva en horizontal, consulta la advertencia tras la
+plantilla: el compositor reserva 20 % fijo y no basta para pasar el gate sin excepción.
 
-**2 · El margen por defecto.** El compositor usa 7 % de margen cuando el plan no declara zona; AXIS pide 7,5 % en feed y
-10 % en story. La recomendación registrada es mantener el 7 % y exigir `safeArea: "axis"` en los planes nuevos (el
-ajuste que hace arrancar el texto dentro de la zona también por arriba ya está aplicado). Cambiar el defecto movería
-todas las piezas alineadas a la izquierda al recomponerlas.
+**2 · Margen por defecto.** En una pieza nueva, si no declaras `safeArea`, el compositor aplica AXIS. Una zona
+explícita puede estrecharla. El 7 % sólo describe el comportamiento del canon anterior para piezas aprobadas.
 
 **3 · Las stories de v07 (decidido el 2026-09-23).** Ponían la firma con su centro en 0,90 de la altura, bajo el límite de
 la zona de AXIS (0,87). Se subió a 0,8565 en las cuatro stories finales, sin tocar nada más (las otras 12 piezas quedaron
@@ -593,7 +611,7 @@ capa, con su visto bueno) o si queda con el aviso.
 | `` el plate `…` no es una imagen legible `` | Archivo dañado, vacío o no descargado de la nube | Recupera el archivo |
 | `usa caracteres que su fuente no tiene (saldrían como cuadros vacíos)` | Emoji u otro alfabeto que la fuente no cubre | Cambia el carácter |
 | `trae una entidad que no es un carácter Unicode` | Un `&#…;` inválido en el texto | Corrígelo |
-| `` `final` … no tiene la proporción del plate `` | El tamaño entregado recortaría la pieza | Usa la misma proporción del plate |
+| `` `final` … cambia la proporción del plate `` | El tamaño entregado recortaría más de 1 px del máster | Usa el ratio del plate; para otro formato, produce otro plate |
 | `bloque centrado sobre un eje corrido (centerX …)` | Bloque centrado a más de 0,15 del centro | `align: "left"` (y `cta.align: "left"`) sin `centerX` |
 | `el texto tapa al sujeto — <caja> (N px)` | Una caja toca la silueta | Sube `top`, acorta el copy o regenera el plate con más reserva |
 | `el texto tapa una zona protegida` | Choca con una zona `protect` | Mueve el texto o acota la zona |
@@ -649,7 +667,7 @@ capa, con su visto bueno) o si queda con el aviso.
 | `` `surfaceToken: X` no es un acento `` (o `inkToken` en texto) | El portador del acento tiene un color neutro | Usa `accentSurface`, `growthOnDark` o `accentInkOnLight` |
 | `fuera de la zona segura <perfil> de AXIS: …` | Algo sale de la zona de AXIS | Declara `safeArea: "axis"`; si ya está, acorta el texto, baja su tamaño o sube el bloque |
 | `la pieza no declara firma` | Falta `logo` o `firma` | Declara una |
-| `la firma mide N % del lado corto (canon: 20 %)` | Firma chica | `logo.width: 0.2` |
+| `la firma mide N % del lado corto (canon: …)` | Firma chica | `logo.width: 0.25` en horizontal nuevo; `0.20` en vertical o cuadrado nuevo |
 | `la firma mide X:1 contra su fondo` / `el 1 % peor del trazo de la firma …` | La firma no contrasta | Prueba `logo.y: "auto"` |
 | `la firma queda sobre el sujeto` / `la firma externa cae sobre el sujeto` | La firma tapa la silueta | Cambia su posición |
 | `la firma automática quedó por encima del contenido` | Error del compositor; no se exceptúa | Recompón con el comando vigente y avisa al responsable del comando |

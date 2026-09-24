@@ -37,9 +37,9 @@ botón, selección y firma que salgan de ella bloquean, salvo excepción `zona-s
 - 🔴 **El piso no es la safe zone de la plataforma.** En 9:16 AXIS reserva el 13% superior y la UI de cuenta llega al
   14%: con `"axis"` solo, el titular puede quedar debajo del nombre de la cuenta. Para pauta 9:16 declara además un
   `top` o una zona más estrecha, como en la tabla: sigue mandando la más restrictiva.
-- **El margen por defecto del compositor es el 7% del ancho**, bajo AXIS: una pieza sin `safeArea: "axis"` compone
-  (el compositor sólo avisa) y el gate la reprueba. Cambiar ese defecto o seguir exigiendo `"axis"` en el plan es una
-  **decisión pendiente del operador**; la recomendación es mantener el 7% y exigir `"axis"` en los planes nuevos.
+- **AXIS es el perfil por defecto en una pieza nueva** desde el 2026-09-23. Declarar
+  `safeArea: "axis"` conserva la intención en el plan; una zona propia sólo puede estrecharla. El 7 % describe
+  el comportamiento histórico de piezas aprobadas bajo el canon anterior.
 - Las piezas aprobadas que el canon ahora reprueba **se dejan como están y se corrigen al recomponer** (decisión del
   operador, 2026-09-23).
 
@@ -156,7 +156,7 @@ del ancho; en 16:9, no (abajo).
 🔴 **Ojo con la unidad de la Y:** `logo.y` es el **borde superior**; `signatureY`, el **centro**. Pasar un
 valor de un campo al otro corre la firma media altura del logo.
 
-### 16:9: una firma chica aun dentro del canon — decisión PENDIENTE del operador
+### 16:9: firma horizontal nueva — decisión vigente desde 2026-09-23
 
 Medido en la misma campaña: en 16:9 la firma ocupa el **7,3–7,9% del ancho** del cuadro, contra el **20%** en 4:5 y
 9:16 (**18%** en 1:1). En el feed de un teléfono (390 px de ancho) mide **31 px** contra **78 px** en el 4:5: **2,5
@@ -167,10 +167,11 @@ veces más chica**. Dos causas:
 2. **Aun en el canon el formato la achica:** el 20% del lado corto de un 16:9 es el **11% del ancho** y **44 px** en
    el teléfono.
 
-**Opción recomendada, sin aplicar:** 25% del lado corto en formatos horizontales (≈ **14%** del ancho, **55 px** en el
-teléfono; iguala la relación firma/titular del 4:5) y 20% en verticales y cuadrados. Si el operador la aprueba,
-cambian el gate, el compositor y `firma-placement.mjs`. **Hasta entonces el contrato es 20% del lado corto en todo
-formato**: no presentes el 25% como canon ni lo apliques como regla.
+**Canon aplicado:** en una pieza nueva horizontal el gate exige al menos **25 % del lado corto** (≈ **14 %** del ancho
+y **55 px** en ese teléfono); en verticales y cuadrados, **20 %**. El máximo es **35 %** en todos. Las piezas
+aprobadas bajo el canon anterior conservan sus píxeles; al recomponer se evalúan con las reglas actuales. La firma
+externa tiene una caja fija del 20 %, así que no la presentes como certificable en un horizontal nuevo sin resolver
+el tamaño o registrar una excepción auditada.
 
 ## 3. En 16:9 el cursor no cabe
 

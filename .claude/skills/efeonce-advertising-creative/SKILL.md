@@ -353,7 +353,8 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    escena o si `altText` transcribe el copy.
 8. **Escena y tamaño:** `protect: [{ box: [x0, y0, x1, y1], reason }]` (fracciones del lienzo) para lo que el texto no
    puede tapar aunque no sea una persona; `editorialReserve: { maxRight, maxBottom }` (px) si el plan reserva área;
-   `final: [ancho, alto]` si el PNG no mide lo mismo que el plate (misma proporción; al menos el 85 % del ancho del
+   `final: [ancho, alto]` si el PNG no mide lo mismo que el plate (mismo ratio; sólo se tolera hasta 1 px de
+   redondeo del plate, porque Sharp recorta al llenar ambos lados; al menos el 85 % del ancho del
    máster y 780 px, porque la accesibilidad se mide en el máster; el gate verifica el tamaño entregado). Sin `final` se
    entrega el plate, que también necesita 780 px de ancho: si no, la pieza aborta (tramo 16). Ojo con los nombres:
    `protect` y `subjectGuard.ignore` usan `reason`; `excepciones`, `firma`, `conceptoReducido` y `placement` usan
@@ -585,8 +586,8 @@ La jerarquía también vive dentro de la línea. El compositor de referencia exp
   [lenguaje fotográfico](../design-studio/references/efeonce-photographic-language.md): antes de generar, abre
   imágenes aprobadas comparables y registra los portadores reales del azul activo y del acento naranja **o** lima
   en la ficha; después comprueba su presencia en el plate. La firma sobre el lecho desenfocado usa el SVG oficial
-  **compuesto** (20 % del lado corto por decisión del operador 2026-09-20 —en 4:5 y 9:16 es el ancho; en 16:9 no, y
-  su tamaño en 16:9 está pendiente—, contraste ≥ 4,5:1 medido), **nunca generado**.
+  **compuesto** (en pieza nueva, mínimo 25 % del lado corto en horizontal y 20 % en vertical/cuadrado; máximo 35 %,
+  contraste ≥ 4,5:1 medido), **nunca generado**. Las aprobadas bajo el canon anterior conservan sus píxeles.
 - **La frontera con la toma (2026-09-20).** Lo que la **foto** debe reservar son **seis reservas** —zona de texto,
   objeto para enmarcar, lecho de la firma, aire para cursores, campo profundo al margen y **lecho por formato**
   (**[medido]**: 4:5 **18%** · 9:16 **22%** · 16:9 **16%** · 1:1 **18%**, este último *sin validar*)— y **no se piden

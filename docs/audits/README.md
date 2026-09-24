@@ -14,6 +14,8 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 
 ## Categorias
 
+- [CLI de composición de ads con CTA — auditoría técnica, funcional y documental — 2026-09-24](social/2026-09-24-cta-cli-detailed-review.md) — arquitectura ejecutable, corrección de recorte, 52 unitarias, P02 132/132 y deudas de certificación.
+
 - [Valentina — cobertura documental y skills — 2026-09-03](payroll/VALENTINA_DOCUMENTATION_SKILLS_CLOSURE_2026-09-03.md).
 - [Valentina Hoyos — reingreso y recuperación verificados — 2026-09-03](payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md) — contractor activa desde 20/08, disponibilidad restaurada y release cerrado; historia/pagos preservados. Agosto 12/31 registrado, pendiente boleta; login interactivo no probado.
 

@@ -164,9 +164,10 @@ se falsifica. Conserva la salida del gate junto a la versión revisada.
   (excepción: `acento-cta`).
 - **Jerarquía:** concepto completo (o `conceptoReducido` con aprobador), dominante ≥ 3× la entrada y **el dominante
   como voz mayor**.
-- **Firma:** declarada, ≥ 20 % del lado corto, ≥ 4,5:1 (en la caja y en el trazo; la externa, en el peor píxel de su
-  caja), fuera del sujeto y dentro de su zona; la automática, debajo de todo el contenido. Por formato, con el caso
-  pendiente del 16:9:
+- **Firma:** declarada, ≥ 25 % del lado corto en horizontal nuevo y ≥ 20 % en vertical/cuadrado nuevo (máximo 35 %),
+  ≥ 4,5:1 (en la caja y en el trazo; la externa, en el peor píxel de su caja), fuera del sujeto y dentro de su zona;
+  la automática, debajo de todo el contenido. La firma externa se reserva al 20 % fijo y requiere atención
+  especial en un horizontal nuevo. Por formato:
   [safe zones y firma §2c](paid-format-safe-zones-and-craft.md#2c-la-firma-en-cada-formato-el-contrato-del-gate).
 - **Maquetación:** zona segura de AXIS como piso, reserva editorial, nada encimado y ninguna selección sobre otra voz.
 

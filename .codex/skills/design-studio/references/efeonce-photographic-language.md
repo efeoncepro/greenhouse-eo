@@ -273,8 +273,10 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 
 > **Dos categorías de pieza** **[operador, 2026-09-20]**: la **muda** —sólo foto y firma— es legítima y sirve de
 > **descanso visual** para relajar el feed; la **con voz** lleva la capa gráfica. La diferencia se decide **antes**
-> de generar, no después. Muda: `foto:prompt` → `foto:validar`. Con voz: `foto:prompt` con `reservas` →
-> `foto:validar --zona-texto` → **`pnpm foto:componer`**. La capa de la segunda **sigue sin aprobar**.
+> de generar, no después. Muda: `foto:prompt` → `foto:validar`. Con CTA: `foto:prompt` con `reservas` →
+> `foto:validar --zona-texto` → **`pnpm foto:componer:cta`** → **`pnpm foto:cta:gate`** → revisión humana.
+> `foto:componer` conserva las piezas sin CTA. El prototipo gráfico rechazado el 2026-09-19 es histórico;
+> el sistema Tres voces + acción se aprobó después, sin aprobar automáticamente cada pieza.
 
 > **Si la pieza va a llevar titular, copy o cursores, `reservas` se declara EN LA TOMA** y se valida con
 > `pnpm foto:validar <plate> --zona-texto`. Medido: **12 de 12** piezas auditadas reprobaron la banda de texto
@@ -500,12 +502,13 @@ local) o **cursores multiplayer**, y la firma. Reservar en la toma: zona de text
 enmarcar, zona pareja para HUD y para el gesto. Compositor: `scripts/composicion.mjs` (contraste por capa, autoajuste,
 falla con glifos inexistentes como «→» y con gesto bajo 4,5:1). **Lo que la foto debe reservar** para todo esto está
 en [reserva de espacio en la toma](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md);
-**cómo se compone encima NO está aprobado** y su canon es `efeonce-advertising-creative` (brief + ficha tipográfica + gate).
+**cómo se compone encima** sigue el sistema Tres voces + acción para piezas con CTA y la skill
+`efeonce-advertising-creative` (brief + ficha tipográfica + gate); cada resultado exige revisión humana.
 
-**Compositor canónico:** `pnpm foto:componer` (`scripts/foto/componer.mjs`), adaptación
-declarada del compositor del carrusel GTA VI (`2026-09-19_nivel-de-busqueda/componer-v2.mjs`): misma gramática de voces,
-`richBlock`, scrims, tarjeta de vidrio, selección AXIS y QA de contraste; adaptado a foto, multiformato, tinta por pieza,
-selección sobre objeto y logo automático. **NUNCA** escribir un compositor nuevo para una pieza: se extiende éste.
+**Compositor de ads con CTA:** `pnpm foto:componer:cta` (`scripts/foto/componer-cta.mjs`) y
+`pnpm foto:cta:gate` son el par canónico. `pnpm foto:componer` cubre la pieza sin CTA; el compositor del
+carrusel GTA VI (`2026-09-19_nivel-de-busqueda/componer-v2.mjs`) es antecedente archivado, no punto de partida
+para una campaña nueva. **Nunca** copies uno de esos scripts a la carpeta de una corrida.
 
 **NUNCA scrims ni overlays sobre la foto** para ganar contraste (decisión del operador 2026-09-19: «es muy 2010, le
 resta limpieza»). El contraste se planifica en la toma con el tono declarado de la zona; si no pasa 4,5:1 se
@@ -531,11 +534,10 @@ entrada, cierre y notas van en **Poppins** (`structureLabel` en mayúsculas +0,0
 El aire entre tramos se mide como **gap de tinta** ≈ **0,09 del tamaño del dominante** (0,10 tras la etiqueta), no
 como leading; `foto:componer` lo reporta en `qa.json`.
 
-> **Estado:** la **fotografía** de este lenguaje está aprobada (2026-09-19). La **capa de composición gráfica**
-> (titulares, jerarquía, cursores sobre la foto) **NO**: las piezas de prueba fueron rechazadas por el operador.
-> Valen las prohibiciones y las reglas de craft de arriba; para componer una pieza real, partir del brief y la
-> ficha tipográfica de `efeonce-advertising-creative` y del compositor de «Nivel de búsqueda», y someterla a
-> revisión humana: un contraste que pasa NO prueba que la composición esté bien.
+> **Estado:** la fotografía de este lenguaje está aprobada (2026-09-19); el prototipo de capa gráfica de ese
+> día fue rechazado. El sistema publicitario Tres voces + acción se aprobó el 2026-09-22. Una pieza real con CTA
+> usa el compositor y gate vigentes, además de revisión humana: un contraste que pasa no demuestra calidad visual
+> ni autoriza pauta. La certificación adversarial global de la CLI sigue inconclusa.
 
 
 ## Recorrido de la vista **[criterio del operador, 2026-09-21]**
@@ -628,10 +630,11 @@ registrar el posible solapamiento y revisar el placement real. Ver §Zonas segur
 
 El operador rechazó el lecho de los verticales SEO/AEO v05/v06: había nacido para la firma alta y ocupaba casi media foto. Bajar el SVG dejó la escena comprimida. Corregir el plate para recuperar área narrativa, conservar un primer plano físico desenfocado sólo donde necesita descansar la firma y revisar el conjunto a 390 px. La v07 busca aproximadamente el quinto inferior; no convertirlo en nueva tabla universal. Prohibidos banda añadida, scrim o desenfoque artificial usado como sustituto de materia. [Método y evidencia](../../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md).
 
-**Corrección del operador, misma sesión:** además de reducir el lecho, la firma debe estar DENTRO de su materia desenfocada, separada del borde de transición. No trasladar el Y de Claude o de v06 a otra foto. Si el logo queda encima del lecho, es REWORK aunque contraste y bounds den PASS. V07 usa centro 90% después de esa revisión; es caso, no token.
+**Corrección del operador, misma sesión:** además de reducir el lecho, la firma debe estar DENTRO de su materia desenfocada, separada del borde de transición. No trasladar el Y de Claude o de v06 a otra foto. Si el logo queda encima del lecho, es REWORK aunque contraste y bounds den PASS. El centro 90% fue una iteración anterior; las cuatro stories finales v07 se fijaron en 0,8565, dentro de AXIS. Es un caso, no un token.
 
 **Criterio vigente para nuevas adaptaciones 9:16 (operador):** si bajar la firma la saca de la zona segura y
 subirla mucho destruye el cierre, elevar ligeramente el inicio del lecho para alojarla dentro de su materia y
-de la zona segura, con aire, manteniéndola visualmente al pie. No convertir el 90% ni la franja de v07 en preset.
-No agrandar de nuevo el lecho hasta comprimir la escena. Verificar ambos límites sobre el export y el preview
-del placement; esta instrucción no afirma que los exports históricos ya hayan sido recompuestos.
+de la zona segura, con aire, manteniéndola visualmente al pie. No convertir el 90% histórico ni el 0,8565 de las
+cuatro stories finales v07 en preset. Esas cuatro finales sí se recompusieron dentro de AXIS; siguen fuera de la
+guarda conservadora de Reels. No agrandar de nuevo el lecho hasta comprimir la escena. Verificar ambos límites
+sobre el export y el preview del placement antes de pautar.

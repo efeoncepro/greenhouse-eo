@@ -15,6 +15,14 @@
 //   dentroDe: id del elemento que lo contiene por construcción (el texto del botón dentro del botón)
 export const TIPOS = ['texto', 'cta', 'firma', 'seleccion', 'acento']
 
+// Sharp usa fit:cover al recibir ancho y alto. Expresa el recorte en píxeles DEL PLATE, no como porcentaje del
+// aspect ratio: un 1 % admitía quitar 10 px a una story. Los planes históricos tienen redondeos menores a 1 px.
+export function recorteFinalEnPlate({ ancho, alto, finalAncho, finalAlto }) {
+  const escala = Math.max(finalAncho / ancho, finalAlto / alto)
+
+  return Math.max(0, ancho - finalAncho / escala, alto - finalAlto / escala)
+}
+
 const choca = (a, b, holgura) => a.left < b.right + holgura && a.right > b.left - holgura && a.top < b.bottom + holgura && a.bottom > b.top - holgura
 
 export function invariantesMaquetacion({ ancho, alto, elementos, holgura = Math.min(ancho, alto) * 0.004 }) {

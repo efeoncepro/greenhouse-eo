@@ -103,7 +103,7 @@ registrada para que Claude/Codex puedan reproducirla. Los números describen est
 | 9:16 | 1080×1920 | Vertical; comprobar además obstrucciones del placement. |
 | 16:9 | 1920×1080 | Horizontal; redistribuir escena y bloque gráfico. |
 
-**Tamaño de la firma en 16:9 — decisión pendiente del operador** (medido el 2026-09-23). Al 20 % del lado corto que fija el canon, la firma 16:9 ocupa ≈ 11 % del ancho y ≈ 44 px en el feed de un teléfono (390 px de ancho), contra 78 px en 4:5. Las piezas 16:9 de CMP-002 y del registro C, hechas al 13–14 % del lado corto, quedan en 7,3–7,9 % del ancho y 31 px; el gate ya las bloquea y se corrigen al recomponer. Opción recomendada, sin aprobar: 25 % del lado corto en formatos horizontales (≈ 14 % del ancho, 55 px en el teléfono) y 20 % en verticales y cuadrados; si se aprueba, cambian el gate, el compositor y `firma-placement.mjs`. Mientras no se decida, rige el 20 % y el gate lo exige.
+**Tamaño de la firma en 16:9 — decidido el 2026-09-23.** La medición previa mostró que una firma al 20 % del lado corto ocupaba ≈ 44 px en el feed de un teléfono (390 px de ancho), contra 78 px en 4:5; las firmas de CMP-002 y del registro C hechas al 13–14 % medían ≈ 31 px. Para una **pieza nueva horizontal** el gate vigente exige al menos **25 % del lado corto** (≈ 55 px en ese teléfono); para verticales y cuadrados exige **20 %**. El máximo es 35 % en todos los formatos. Las piezas aprobadas bajo el canon anterior conservan sus píxeles; al recomponer se aplica el canon vigente. La firma externa tiene geometría fija propia y debe verificarse contra el gate, sin inferir que `firma-placement.mjs` ya produce 25 %.
 
 La adaptación exige foto nativa y composición editable por ratio: no estirar, recortar personajes/manos/pantallas, añadir bandas ni reducir el maestro automáticamente. Reusar el plate sólo si ya corresponde al ratio; para fotografía Efeonce, construir la ficha con `foto:prompt` y editar la referencia corregida para conservar identidad. Comparar cada salida completa y al tamaño de consumo, incluyendo jerarquía, reserva editorial, puntero completo, lecho/firma y contraste mínimo. Una aprobación en 9:16 no valida 4:5 ni 1:1.
 
@@ -196,13 +196,14 @@ El [método SEO/AEO](social/2026-09-22-seo-aeo-paid-media-production-method.md) 
 
 ## Corrección de lecho y firma v07
 
-La v06 también fue corregida: había bajado el logo pero conservaba un primer plano que ocultaba casi media foto. La v07 edita las cuatro tomas 9:16 para recuperar escena y limitar el lecho al tramo inferior. **Ubicar el SVG dentro de la materia ya desenfocada, con aire bajo su transición; nunca por encima o montado en el canto.** La referencia de Claude orienta el cierre, no impone un Y universal. En estos plates la última revisión sitúa el centro al 90%; eso no acredita safe zone de plataforma. Medir contraste allí y declarar oclusión posible antes de pauta. Con la firma declarada como externa (`signatureY`), el gate la mide contra la zona de AXIS estrechada por `signatureSafeArea`: las tres stories de v07 que hoy componen quedan fuera (centro en 0,90; AXIS termina en 0,87). **Pendiente del operador:** aprobarlas como excepción `zona-segura` con su nombre o subir la firma al recomponer. Las coordenadas de §v06 son historia del caso, no receta a heredar.
+La v06 también fue corregida: había bajado el logo pero conservaba un primer plano que ocultaba casi media foto. La v07 edita las cuatro tomas 9:16 para recuperar escena y limitar el lecho al tramo inferior. **Ubicar el SVG dentro de la materia ya desenfocada, con aire bajo su transición; nunca por encima o montado en el canto.** La referencia de Claude orienta el cierre, no impone un Y universal. El centro 0,90 y el problema de safe zone describen una revisión anterior. Las cuatro stories finales v07 se recompusieron con centro **0,8565**, dentro de AXIS, sin alterar las otras 12 piezas. Siguen fuera de la guarda conservadora de Reels: medir oclusión en el preview del placement antes de pautar. La v07 histórica requiere su snapshot congelado para reproducción y no se presenta como salida 0 del gate vigente. Las coordenadas de §v06 son historia del caso, no receta a heredar.
 
 **Criterio vigente para nuevas adaptaciones 9:16 (operador):** si bajar la firma la saca de la zona segura y
 subirla mucho destruye el cierre, elevar ligeramente el inicio del lecho para alojarla dentro de su materia y
-de la zona segura, con aire, manteniéndola visualmente al pie. No convertir el 90% ni la franja de v07 en preset.
-No agrandar de nuevo el lecho hasta comprimir la escena. Verificar ambos límites sobre el export y el preview
-del placement; esta instrucción no afirma que los exports históricos ya hayan sido recompuestos.
+de la zona segura, con aire, manteniéndola visualmente al pie. No convertir el 90% histórico ni el 0,8565 de
+las cuatro stories finales v07 en preset. No agrandar de nuevo el lecho hasta comprimir la escena. Verificar
+ambos límites sobre el export y el preview del placement; las cuatro stories finales sí se recompusieron dentro
+de AXIS, sin afirmar por ello que pasen la guarda conservadora de Reels o el gate vigente.
 
 ## 🔴 El concepto completo no es opcional — el gate lo verifica desde el 2026-09-23
 

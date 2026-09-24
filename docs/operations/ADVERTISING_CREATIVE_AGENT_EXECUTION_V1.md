@@ -90,10 +90,12 @@ contrato de abajo (el plate se genera antes). El detalle vive en el
   `pnpm foto:cta:gate <plan.json> --reproducir`, que recompone en un temporal con el comando vigente y exige PNG y
   layout idénticos byte a byte. Una pieza con gesto manuscrito o tarjeta sale siempre con 3: el gesto quedó fuera de
   alcance (decisión del operador, 2026-09-23). El `PASS` del paso 7 exige 0; un 3 nunca se informa como verde.
-- **Plan nuevo que deba pasar el gate:** `safeArea: "axis"` (el margen por defecto del compositor, 7 %, queda bajo
-  el de AXIS); `cta.x: "columna"`, sólo con alineación a la izquierda —con `align: "center"` el plan se rechaza—;
-  firma declarada: `logo: { width: 0.2, x: 0.5, y: "auto" }` o, si la pone otra herramienta,
-  `firma: { modo: "externa", razon }`; `lead` y `after`; y `altText` que describa la escena sin transcribir el copy.
+- **Plan nuevo que deba pasar el gate:** AXIS es el perfil por defecto; declararlo como
+  `safeArea: "axis"` hace explícita la intención. `cta.x: "columna"` se usa sólo con alineación a la izquierda
+  —con `align: "center"` el plan se rechaza—. Declara `lead`, `after` y `altText` de la escena sin transcribir
+  el copy; `variant: "auto"` lleva `prominencia` explícita. La firma dibujada declara
+  `logo: { width: 0.25, x: 0.5, y: "auto" }` en 16:9 nuevo y `width: 0.2` en vertical/cuadrado nuevo.
+  La firma externa se reserva al 20 % fijo y no pasa el mínimo horizontal nuevo sin excepción auditada.
 - **Umbrales que no se aflojan:** el CTA exige 4,5:1 a cualquier tamaño y, sólo en el CTA, APCA y daltonismo
   bloquean (exceptuables como `cta-perceptual`). Cada voz se mide con WCAG 2.2 AA según su tamaño en un teléfono de
   390 CSS px, sobre el trazo y no sólo sobre la caja. `placement` sólo endurece la medición; nunca la afloja.
@@ -106,13 +108,11 @@ contrato de abajo (el plate se genera antes). El detalle vive en el
   orden de lectura, con el rol del CTA siempre anunciado («Llamado a la acción: «…»», nunca «Botón»). Se publica
   donde la plataforma lo permita.
 - **Lo que el gate no decide:** identidad, anatomía, cierre visual de la firma, la revisión al 100 % y a 390 px y el
-  preview del placement. Certifica la pieza, no la campaña, y no autoriza publicar. Tampoco hace cumplir «nunca un
-  scrim»: si una voz pasa sólo gracias al velo (`scrimTop`/`scrimBottom`), hoy **avisa** y no bloquea (decisión
-  pendiente del operador). No uses el velo para rescatar contraste.
-- **Pendiente del operador — firma en 16:9.** Medido el 2026-09-23: en las piezas 16:9 de CMP-002 y del registro C
-  (hechas al 13–14 % del lado corto, bajo el canon) la firma mide 31 px en un teléfono, contra 78 px en 4:5; aun al
-  20 % del canon quedaría en ≈ 11 % del ancho y ≈ 44 px. Opción recomendada, sin aprobar: 25 % del lado corto en
-  horizontales y 20 % en verticales y cuadrados. Mientras no se decida, rige el 20 % y el gate lo exige.
+  preview del placement. Certifica la pieza, no la campaña, y no autoriza publicar. El esquema vigente rechaza
+  `scrimTop` y `scrimBottom`: el contraste se resuelve en el plate.
+- **Firma por formato en una pieza nueva:** mínimo 25 % del lado corto en horizontales y 20 % en verticales o
+  cuadrados; máximo 35 % en todos. El gate lo exige desde el canon del 2026-09-23. Las piezas aprobadas bajo el
+  canon anterior no se regeneran por esta decisión; una recomposición se evalúa con el canon vigente.
 
 ## Contrato de ejecución
 

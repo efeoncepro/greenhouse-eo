@@ -31,7 +31,7 @@ import { compositeLuminosity } from '../../scripts/creative/layout-compiler/comp
 import { ANCHO_PANTALLA, DPR_REFERENCIA, TECHO_CANTO, UMBRALES, hexARgb, medicionImposible, pendienteBajoCaja, medirAnillo, medirContraColor, medirGlifos, medirVoz, tamanoEnPantalla, textoAlternativo, umbralWcag } from './accesibilidad.mjs'
 import { ORDEN as ORDEN_VARIANTES, elegirVariante } from './cta-variantes.mjs'
 import { validarPiezaEsquema } from './cta-esquema.mjs'
-import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
+import { fueraDeReserva, invariantesMaquetacion, recorteFinalEnPlate } from './cta-invariantes.mjs'
 import { desescaparXml } from './svg-texto.mjs'
 import { CANON_VIGENTE, canonDe, escribirAtomico, huellaComando, huellaPieza, rutaQa, sha, tomarBloqueo, versionPaquete } from './cta-integridad.mjs'
 
@@ -1018,9 +1018,12 @@ async function composePiece(s, opts = {}) {
   // sin aprobador y sin que el gate lo mencionara (auditorías de diseño N3 y de arquitectura N3, tramo 7).
   const ANCHO = Math.min(ANCHO_PANTALLA, s.placement?.anchoCssPx ?? ANCHO_PANTALLA)
 
-  // `final` reescala el máster. Con otra proporción, `resize` RECORTA por defecto — y lo recortado puede ser texto.
-  if (s.final && Math.abs(s.final[0] / s.final[1] - W / H) / (W / H) > 0.01) {
-    throw new Error(`${s.id}: \`final\` ${s.final.join('×')} no tiene la proporción del plate ${W}×${H} — el reescalado recortaría la pieza`)
+  // `final` reescala el máster. Sharp recorta por defecto; se tolera sólo el redondeo subpíxel que ya existe en
+  // planes aprobados. Un cambio de ratio real (antes pasaba hasta 1 %) puede quitar texto o bordes de la foto.
+  const recorteFinal = s.final ? recorteFinalEnPlate({ ancho: W, alto: H, finalAncho: s.final[0], finalAlto: s.final[1] }) : 0
+
+  if (recorteFinal > 1 + 1e-9) {
+    throw new Error(`${s.id}: \`final\` ${s.final.join('×')} cambia la proporción del plate ${W}×${H} y recortaría ${recorteFinal.toFixed(2)} px del máster (máximo: 1 px por redondeo). Usa un plate del formato de entrega`)
   }
 
   // `final` no puede alejar lo entregado de lo medido (tramo 10; auditorías de arquitectura, hallazgo 10, y de diseño,

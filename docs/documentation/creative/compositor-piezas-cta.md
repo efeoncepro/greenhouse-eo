@@ -1,18 +1,25 @@
 # Compositor de piezas con CTA — Composición y certificación
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-09-23 por Claude
-> **Ultima actualizacion:** 2026-09-23 por Codex — estado de la novena auditoría
+> **Ultima actualizacion:** 2026-09-24 por Codex — contrato vigente y límites de certificación
 > **Documentacion tecnica:** [Compositor de CTA — comando canónico](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) (§14 guarda de sujeto · §15 red de seguridad · §16 accesibilidad · §17 variantes · §18 certificación y tramos)
 > **Manual de uso:** [Compositor de piezas con CTA — manual de uso](../../manual-de-uso/creative/compositor-piezas-cta.md)
 > **Regla creativa que implementa:** [Tres voces + acción](../../operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md)
+> **Auditoría reciente:** [Revisión técnica y funcional 2026-09-24](../../audits/social/2026-09-24-cta-cli-detailed-review.md)
 
 **Estado de certificación del sistema:** el tramo 16 tiene suite previa 10/10 y regresión cubierta sin cambios; la
 novena auditoría de arquitectura/diseño no entregó informes por límite de uso, la corrida completa de mutantes se
 interrumpió y P10 conserva una intermitencia. No se ha certificado el cierre adversarial. El
 [corte exacto y sus límites](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#1910-regresión-y-mutantes-cómo-leerlos)
 son distintos del veredicto que `foto:cta:gate` da a cada pieza concreta.
+
+**Límites prácticos:** el gate rápido confía en el QA y sus huellas; `--reproducir` recompone y compara PNG, layout,
+alternativo y fila QA, pero no compara el preview ni los SVG auxiliares. En `final` se admite como máximo 1 px de
+redondeo respecto del plate para conservar entregas históricas; un cambio real de ratio se rechaza. Con
+`cta.variant: "auto"`, declara siempre `cta.prominencia`: el esquema aún permite omitirla y el compositor entonces elige
+`delimitada` por defecto, un sesgo conocido hacia contorno. Revisa los SVG, el preview y la pieza en el placement.
 
 ## Qué es
 
@@ -592,7 +599,7 @@ Reglas que se pueden exceptuar:
 |---|---|
 | `zona-segura` | Algo fuera de la zona segura de AXIS |
 | `firma-contraste` | Firma bajo 4,5:1 |
-| `firma-tamano` | Firma bajo el 20 % del lado corto |
+| `firma-tamano` | Firma bajo el mínimo por formato: 25 % horizontal nuevo, 20 % vertical/cuadrado nuevo; las aprobadas conservan su canon |
 | `firma-sobre-sujeto` | Firma sobre la silueta |
 | `acento-cta` | CTA sin un color de acento válido (el contrato cita el caso de ceder el acento a un personaje como Gigi) |
 | `cta-perceptual` | CTA bajo APCA o daltonismo |
@@ -671,8 +678,8 @@ completa, con todas sus dependencias, para que un cambio en ellas se note. Si ca
 la referencia, lo avisa, porque esa diferencia no la puede ver.
 
 No se achica en silencio: con cero casos falla, sin su manifiesto de cobertura falla, y una pieza del manifiesto que
-falte también falla. Las piezas sin plate en la máquina se cuentan. Al 2026-09-23: 132 piezas únicas, 114 componen y 18
-abortan en la referencia, y 84 piezas con CTA no tienen plate en la máquina del operador (las imágenes no se guardan en
+falte también falla. Las piezas sin plate en la máquina se cuentan. Al 2026-09-24: 132 piezas únicas, 114 componen y 18
+abortan en la referencia, y 68 piezas con CTA no tienen plate en el último reporte conservado (las imágenes no se guardan en
 el repositorio).
 
 ### Mutantes
@@ -687,7 +694,8 @@ anterior, que el tramo 9 endureció justamente porque podía sobrestimar. Con el
 77 en la corrida completa más los dos canarios bien clasificados; los dos restantes los clasificaba mal el propio
 criterio nuevo, se ajustó y, junto con los dos mutantes de los últimos arreglos, dieron 6 de 6. Al cerrar el tramo 16,
 sus mutantes (15 nuevos y 4 reajustados porque cambiaron las líneas que rompen) dieron 19 de 19, con los dos canarios
-bien clasificados; la corrida completa de ese tramo está en curso.
+bien clasificados. La corrida completa del catálogo del tramo 16 se interrumpió tras 81 de 175 entradas registradas,
+sin puntuación final; P10 conserva una falla intermitente en 2 de 9 ejecuciones observadas.
 
 > Detalle técnico: [`componer-cta.pruebas.mjs`](../../../scripts/foto/componer-cta.pruebas.mjs),
 > [`componer-cta.regresion.mjs`](../../../scripts/foto/componer-cta.regresion.mjs) (referencia hermética en
@@ -739,8 +747,8 @@ Entre los tramos 5 y 6 se sumaron la medición de la firma externa, el bloqueo d
   patrón común: la regla revisaba lo que el plan declara y el compositor dibujaba otra cosa. El **tramo 16 los cerró**
   midiendo todo como se dibuja: aire mínimo de 0,25 em, ritmo en las piezas nuevas, canto bajo la firma, texto sin
   invisibles, alternativo sin entidades y plate de al menos 780 px. Ninguna pieza aprobada cambió de píxeles,
-  maquetación ni veredicto: el registro sólo suma la medida `firmaCanto`. La **novena certificación** está en curso. La
-  certificación se da por cerrada con cero hallazgos graves y medios.
+  maquetación ni veredicto: el registro sólo suma la medida `firmaCanto`. La novena auditoría no produjo informes por
+  límite de uso y el operador cerró las rondas; no hay veredicto adversarial final ni base para afirmar cero hallazgos.
 - Queda deuda menor (🟡 y 🟢) que no impide cerrar: por ejemplo, el gate todavía no exige que el compositor sea el del
   último commit (un compositor editado sin commit todavía certifica), y algunos techos del CTA y del descriptor son más
   holgados que lo aprobado. El detalle está en §18 del contrato.

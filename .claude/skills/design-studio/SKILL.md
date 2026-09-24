@@ -332,17 +332,16 @@ Cuando el brief sea Paid Media multiformato, aplicar la matriz del canon **Tres 
 [medido 2026-09-22, CMP-001]: 4:5 da **968 px** de columna y 16:9 da **901 px** — casi la misma columna en un
 lienzo del doble de ancho, así que el bloque ocupa poco del cuadro, no poco de su caja. **Escalar por ancho de
 LIENZO aplana la jerarquía** (el ratio dominante/entrada cayó a 2,3, bajo el mínimo de 3). La dirección correcta
-es llenar la columna: el compositor escala el bloque hasta que el dominante llene su `dominantMax`, en 16:9 y
-9:16, y 4:5 y 1:1 quedan idénticos. El crecimiento se detiene cuando el texto se acerca a menos de 3,5 % del
-sujeto **segmentado** —personas, personajes y el objeto que protagonizan— o cuando una voz pierde contraste.
-Si alguna caja toca al sujeto, la pieza aborta. §13–§14 de
+es llenar la columna: el compositor escala el bloque hasta que el dominante llene su `dominantMax`, sólo cuando
+`W > H`, y 4:5 y 9:16 quedan idénticos. §13 de
 [compositor de CTA](../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
 
 🔴 **«Sobra texto» se resuelve acortando cada voz, nunca eliminando una.** Dirigir una pieza a «dominante +
-puente + CTA» rompe el concepto —entrada · titular · remate— y **el gate igual la da por verde**: mide contraste
-y protección de sujeto, no completitud. Al restituir la entrada, releer el ratio dominante/entrada: puede bajar
-solo, porque el compositor achica el dominante cuando no cabe en `dominantMax`. §El concepto completo no es
-opcional en [Tres voces + acción](../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md).
+puente + CTA» rompe el concepto —entrada · titular · remate—. El gate de `foto:componer:cta` **bloquea**
+la falta de entrada o remate desde el 2026-09-23, salvo `conceptoReducido` con aprobador registrado.
+Al restituir la entrada, releer el ratio dominante/entrada: puede bajar porque el compositor achica
+el dominante cuando no cabe en `dominantMax`. §El concepto completo no es opcional en
+[Tres voces + acción](../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md).
 
 ## Paid Media: zonas seguras y handoff completo
 

@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
+import { fueraDeReserva, invariantesMaquetacion, recorteFinalEnPlate } from './cta-invariantes.mjs'
+
+test('final sólo tolera el redondeo subpíxel del plate, no un cambio de ratio que recorta la escena', () => {
+  assert.equal(recorteFinalEnPlate({ ancho: 1080, alto: 1920, finalAncho: 1080, finalAlto: 1920 }), 0)
+  assert.ok(recorteFinalEnPlate({ ancho: 941, alto: 1672, finalAncho: 1080, finalAlto: 1920 }) < 1)
+  assert.ok(recorteFinalEnPlate({ ancho: 1080, alto: 1920, finalAncho: 1080, finalAlto: 1910 }) > 9)
+})
 
 const caja = (left, top, right, bottom) => ({ left, top, right, bottom })
 
