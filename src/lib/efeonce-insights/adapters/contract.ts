@@ -5,7 +5,7 @@
  * frescura y razones de ausencia. Cero componentes visuales.
  */
 
-import type { EvidenceGranularity, EvidenceSnapshotContentV1 } from '../contracts/evidence'
+import type { EvidenceGranularity, EvidenceRejectionV1, EvidenceSnapshotContentV1 } from '../contracts/evidence'
 import type { InsightAudience, InsightModule } from '../contracts/request'
 import type { ResolvedInsightWindow } from '../window'
 
@@ -46,3 +46,7 @@ export const evidenceWindow = (window: ResolvedInsightWindow, granularity: Evide
   granularity,
   partial: window.partial
 })
+
+/** Marca los rechazos recolectados para la ventana de comparación: el planner los redacta como tales. */
+export const asComparisonRejections = (rejections: readonly EvidenceRejectionV1[]): EvidenceRejectionV1[] =>
+  rejections.map(rejection => ({ ...rejection, scope: 'comparison' as const }))

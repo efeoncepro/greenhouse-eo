@@ -1,0 +1,109 @@
+{
+  "template": "ReportIndexPage",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "viewport": {
+    "width": 794,
+    "height": 1123
+  },
+  "slots": {
+    "runningChapter": {
+      "selector": "[data-slot='runningChapter']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 40,
+        "maxLines": 1,
+        "transform": "uppercase",
+        "overflow": "reject"
+      }
+    },
+    "runningPeriod": {
+      "selector": "[data-slot='runningPeriod']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "indexTitle": {
+      "selector": "[data-slot='indexTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 40,
+        "maxLines": 2,
+        "overflow": "reject"
+      }
+    },
+    "indexPageColumn": {
+      "selector": "[data-slot='indexPageColumn']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 8,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "indexEntries": {
+      "selector": "[data-slot='indexEntries']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 28,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "title": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 80,
+            "maxLines": 2
+          },
+          "pageNumber": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 3,
+            "maxLines": 1
+          }
+        }
+      },
+      "notes": "Cada fila se deriva del primer folio físico de una sección. La capacidad de 28 filas determina cuántas páginas ocupa el índice antes de numerar el informe."
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "fixed-contactDetails": {
+      "selector": "[data-slot='contactDetails']",
+      "type": "fixed-contact-set",
+      "required": true,
+      "agentMayOverride": false,
+      "value": {
+        "chilePhone": "+56 9 3732 3064",
+        "address": "Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile"
+      },
+      "note": "Pie institucional completo en cada página del informe."
+    },
+    "pageFolio": {
+      "selector": "[data-slot='pageFolio']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 8,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Asignado por el plan de páginas ANTES de imprimir."
+    }
+  }
+}

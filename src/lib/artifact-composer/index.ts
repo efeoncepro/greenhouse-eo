@@ -120,3 +120,50 @@ export {
 
 // TASK-1846 — hash canónico del manifest (domain-free: lo comparten todos los consumers del worker)
 export { canonicalManifestJson, hashResolvedManifest } from './manifest-hash'
+export {
+  BlockTooTallError,
+  paginateFlow,
+  type FlowBlock,
+  type PageBudget,
+  type PaginatedPage
+} from './paginate'
+export {
+  barGeometry,
+  ChartGeometryError,
+  lineGeometry,
+  MAX_SLICES,
+  resolveScale,
+  scatterGeometry,
+  sliceGeometry,
+  type AxisScale,
+  type BarGeometry,
+  type GeometrySeries,
+  type LineGeometry,
+  type LinePoint,
+  type ScatterPoint,
+  type SliceGeometry
+} from './chart-geometry'
+export {
+  bulletGeometry,
+  funnelGeometry,
+  gaugeGeometry,
+  heatmapGeometry,
+  upsetGeometry,
+  vennTwoGeometry,
+  waffleGeometry,
+  waterfallGeometry,
+  WAFFLE_CELLS,
+  type BulletGeometry,
+  type FunnelStage,
+  type FunnelStageGeometry,
+  type GaugeGeometry,
+  type HeatmapCell,
+  type HeatmapCellGeometry,
+  type UpsetGeometry,
+  type UpsetIntersection,
+  type VennTwoGeometry,
+  type WaffleCellGeometry,
+  type WaterfallBar,
+  type WaterfallStep
+} from './chart-geometry'
+

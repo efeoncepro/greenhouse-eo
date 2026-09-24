@@ -23,14 +23,60 @@ import {
   DECK_FONTS_PATH,
   DECK_TOKENS_PATH
 } from '@/lib/artifact-composer/catalogs/deck-axis/compile-tokens'
+import {
+  buildInsightsReportTokensCss,
+  syncReportFontBinaries,
+  REPORT_FONTS_PATH,
+  REPORT_TOKENS_PATH
+} from '@/lib/artifact-composer/catalogs/insights-report/compile-tokens'
+import {
+  buildInsightsDeckTokensCss,
+  syncInsightsDeckFontBinaries,
+  INSIGHTS_DECK_FONTS_PATH,
+  INSIGHTS_DECK_TOKENS_PATH
+} from '@/lib/artifact-composer/catalogs/insights-deck/compile-tokens'
+import type { CatalogTokensBuild, PackFontEntry } from '@/lib/artifact-composer/compile-catalog-tokens'
 
-const main = () => {
-  const check = process.argv.includes('--check')
+/**
+ * Los catálogos que compilan marca. La lista es explícita a propósito: un catálogo nuevo se
+ * agrega acá o su CSS no existe — y el test de sincronía lo delata. Desde TASK-1847 son dos, y por
+ * eso el script dejó de estar atado al primero.
+ */
+const CATALOGS: {
+  name: string
+  build: () => CatalogTokensBuild
+  tokensPath: string
+  fontsPath: string
+  syncFonts: (fonts: PackFontEntry[]) => void
+}[] = [
+  {
+    name: 'deck-axis',
+    build: buildDeckAxisTokensCss,
+    tokensPath: DECK_TOKENS_PATH,
+    fontsPath: DECK_FONTS_PATH,
+    syncFonts: syncPackFontBinaries
+  },
+  {
+    name: 'insights-deck',
+    build: buildInsightsDeckTokensCss,
+    tokensPath: INSIGHTS_DECK_TOKENS_PATH,
+    fontsPath: INSIGHTS_DECK_FONTS_PATH,
+    syncFonts: syncInsightsDeckFontBinaries
+  },
+  {
+    name: 'insights-report',
+    build: buildInsightsReportTokensCss,
+    tokensPath: REPORT_TOKENS_PATH,
+    fontsPath: REPORT_FONTS_PATH,
+    syncFonts: syncReportFontBinaries
+  }
+]
 
-  const { css, fontsCss, fonts, contrastFindings, packName, contrastEnforcement } = buildDeckAxisTokensCss()
+const compileCatalog = (catalog: (typeof CATALOGS)[number], check: boolean): boolean => {
+  const { css, fontsCss, fonts, contrastFindings, packName, contrastEnforcement } = catalog.build()
 
   if (contrastFindings.length > 0) {
-    console.log(`\n⚠️  Contraste WCAG AA (pack "${packName}", enforcement=${contrastEnforcement}):`)
+    console.log(`\n⚠️  Contraste WCAG AA (pack "${packName}", enforcement=${contrastEnforcement}, catálogo "${catalog.name}"):`)
 
     for (const finding of contrastFindings) {
       console.log(
@@ -40,28 +86,42 @@ const main = () => {
 
     console.log('  → follow-up de diseño; un refactor no arregla una decisión de marca: la revela.\n')
   } else {
-    console.log(`\n✓ Contraste WCAG AA: todos los pares declarados pasan (pack "${packName}").\n`)
+    console.log(`\n✓ Contraste WCAG AA: todos los pares declarados pasan (pack "${packName}", catálogo "${catalog.name}").\n`)
   }
 
   if (check) {
-    const committedTokens = fs.existsSync(DECK_TOKENS_PATH) ? fs.readFileSync(DECK_TOKENS_PATH, 'utf8') : ''
-    const committedFonts = fs.existsSync(DECK_FONTS_PATH) ? fs.readFileSync(DECK_FONTS_PATH, 'utf8') : ''
+    const committedTokens = fs.existsSync(catalog.tokensPath) ? fs.readFileSync(catalog.tokensPath, 'utf8') : ''
+    const committedFonts = fs.existsSync(catalog.fontsPath) ? fs.readFileSync(catalog.fontsPath, 'utf8') : ''
 
     if (committedTokens !== css || committedFonts !== fontsCss) {
-      console.error('✗ deck-tokens.css/deck-fonts.css NO sincronizados. Corre: pnpm composer:brand-pack')
-      process.exit(1)
+      console.error(
+        `✗ ${catalog.name}: tokens/fonts NO sincronizados. Corre: pnpm composer:brand-pack`
+      )
+
+      return false
     }
 
-    console.log('✓ deck-tokens.css + deck-fonts.css sincronizados con el pack + recipes.')
+    console.log(`✓ ${catalog.name}: tokens + fonts sincronizados con el pack.`)
 
-    return
+    return true
   }
 
-  fs.writeFileSync(DECK_TOKENS_PATH, css, 'utf8')
-  fs.writeFileSync(DECK_FONTS_PATH, fontsCss, 'utf8')
-  syncPackFontBinaries(fonts)
-  console.log(`✓ tokens + recipes → ${path.relative(process.cwd(), DECK_TOKENS_PATH)}`)
-  console.log(`✓ ${fonts.length} fuentes del pack → deck-fonts.css + catalogs/deck-axis/fonts/ (render hermético)`)
+  fs.writeFileSync(catalog.tokensPath, css, 'utf8')
+  fs.writeFileSync(catalog.fontsPath, fontsCss, 'utf8')
+  catalog.syncFonts(fonts)
+  console.log(`✓ tokens → ${path.relative(process.cwd(), catalog.tokensPath)}`)
+  console.log(`✓ ${fonts.length} fuentes del pack → ${catalog.name}/ (render hermético)`)
+
+  return true
+}
+
+const main = () => {
+  const check = process.argv.includes('--check')
+  const results = CATALOGS.map(catalog => compileCatalog(catalog, check))
+
+  if (results.some(ok => !ok)) {
+    process.exit(1)
+  }
 }
 
 main()

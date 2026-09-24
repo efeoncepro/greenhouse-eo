@@ -19,14 +19,25 @@ import type { InsightAudience, InsightOutput } from '../contracts/request'
  * fail-closed (`render_rejected`), nunca se encola "para después".
  */
 /**
- * Catálogo que el worker tiene empaquetado. Es un STRING a propósito: importar el catálogo como
- * valor desde un command arrastra sus 19 MB de fuentes y assets al bundle de Vercel (la función
- * `insights/catalog` llegó a 434 MB y rompió el build de staging el 2026-09-16). El catálogo se
- * resuelve donde vive: en el worker.
+ * Catálogo por salida. El deck horizontal y el informe vertical no comparten molde, presupuestos ni
+ * vocabulario. Es un STRING a propósito: importar el catálogo como valor arrastra sus fuentes y assets
+ * al bundle de Vercel (434 MB el 2026-09-16, 441 MB el 2026-09-22 — ISSUE-177). El catálogo se resuelve
+ * donde vive: en el worker.
+ *
+ * `deck_pdf` compone con `insights-deck` desde 2026-09-22 (TASK-1847): `deck-axis` es vocabulario de
+ * licitación y el canary con datos reales mostró recortes y métricas calladas. Lo ya encolado con
+ * `deck-axis` sigue componiendo igual: el worker usa el input sellado de cada output y el catálogo que
+ * éste nombra.
  */
-export const INSIGHT_RENDER_CATALOG_NAME = 'deck-axis'
+export const INSIGHT_RENDER_CATALOG_BY_OUTPUT = {
+  deck_pdf: 'insights-deck',
+  report_pdf: 'insights-report'
+} as const satisfies Partial<Record<InsightOutput, string>>
 
-export const INSIGHT_RENDERABLE_OUTPUTS = ['deck_pdf'] as const satisfies readonly InsightOutput[]
+export const INSIGHT_RENDERABLE_OUTPUTS = [
+  'deck_pdf',
+  'report_pdf'
+] as const satisfies readonly InsightOutput[]
 
 /** Estado del run agregado. `partial_failed` existe porque un output puede caer sin arrastrar al resto. */
 export const INSIGHT_RENDER_RUN_STATES = [

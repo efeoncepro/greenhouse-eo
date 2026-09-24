@@ -91,8 +91,10 @@ describe('requestInsightRender', () => {
     stores.getInsightEditionById.mockResolvedValue(edition({ state: 'collecting' }))
     await expect(requestInsightRender(scope)).rejects.toMatchObject({ code: 'not_ready' })
 
-    stores.getInsightEditionById.mockResolvedValue(edition({ outputs: ['deck_pdf', 'report_pdf'] }))
-    await expect(requestInsightRender({ ...scope, outputs: ['report_pdf'] })).rejects.toMatchObject({ code: 'render_rejected', details: { unsupported: ['report_pdf'] } })
+    // TASK-1847: `report_pdf` pasó a renderizable (catálogo `insights-report`). El output que sigue
+    // sin catálogo es `web`, que es de TASK-1848 — y por eso es el que debe rechazarse acá.
+    stores.getInsightEditionById.mockResolvedValue(edition({ outputs: ['deck_pdf', 'web'] }))
+    await expect(requestInsightRender({ ...scope, outputs: ['web'] })).rejects.toMatchObject({ code: 'render_rejected', details: { unsupported: ['web'] } })
     expect(render.insertInsightRenderRun).not.toHaveBeenCalled()
   })
 
@@ -110,7 +112,7 @@ describe('requestInsightRender', () => {
 
     expect(inserted.audience).toBe('client')
     expect(inserted.outputs[0]!.manifestHash).toMatch(/^[0-9a-f]{64}$/)
-    expect(inserted.outputs[0]!.catalogName).toBe('deck-axis')
+    expect(inserted.outputs[0]!.catalogName).toBe('insights-deck')
     // El catálogo NO se importa acá: se sella el input canónico y el worker resuelve (bundle de Vercel).
     expect((infra.publish.mock.calls as unknown as Array<[{ eventType: string }]>).map(c => c[0].eventType)).toEqual(['insights.render.requested'])
   })
