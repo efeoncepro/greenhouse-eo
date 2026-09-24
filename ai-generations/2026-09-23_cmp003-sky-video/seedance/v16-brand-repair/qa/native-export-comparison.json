@@ -1,0 +1,11 @@
+{
+  "source": "native V11 10.125s",
+  "export": "V15 9.25s",
+  "sameResolution": [
+    1080,
+    1920
+  ],
+  "meanAbsoluteRgbDifference": 2.101842528292181,
+  "rootMeanSquareDifference": 2.441807421257927,
+  "finding": "Native UI zoom already has soft and irregular generated lettering; export does not recover it."
+}

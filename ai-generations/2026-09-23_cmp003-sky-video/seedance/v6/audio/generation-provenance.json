@@ -1,0 +1,812 @@
+{
+  "flow_id": "Nh1f7JmQid38dud8JZST",
+  "run": {
+    "flow_id": "Nh1f7JmQid38dud8JZST",
+    "flow_created": false,
+    "url": "https://elevenlabs.io/app/flows/Nh1f7JmQid38dud8JZST?vs=viewstate_01m38gw13bfc1rhasa9722z33b",
+    "flow_url": "https://elevenlabs.io/app/flows/Nh1f7JmQid38dud8JZST",
+    "results": [
+      {
+        "success": true,
+        "node_id": "BVXTtY2HfDkXMlU01Jpl",
+        "session_id": "AIFZQxs69RuuJdA3YzLL"
+      },
+      {
+        "success": true,
+        "node_id": "BVXTtY2HfDkXMlU01Jpl",
+        "session_id": "jsdLPpUJyDNLXtye5IZ0"
+      },
+      {
+        "success": true,
+        "node_id": "BVXTtY2HfDkXMlU01Jpl",
+        "session_id": "LQPy3oWbUIdrQeV0k0tX"
+      },
+      {
+        "success": true,
+        "node_id": "BVXTtY2HfDkXMlU01Jpl",
+        "session_id": "qJxUbqB3O5fZsb8VLvkM"
+      },
+      {
+        "success": true,
+        "node_id": "faGrDPUH9IiiOtsKBTUY",
+        "session_id": "DSQfDu2hn0Gkpxcl3Pp7"
+      },
+      {
+        "success": true,
+        "node_id": "faGrDPUH9IiiOtsKBTUY",
+        "session_id": "VWMMWMb1UlUa5rBxx5dX"
+      },
+      {
+        "success": true,
+        "node_id": "faGrDPUH9IiiOtsKBTUY",
+        "session_id": "f9oRKWZrF74T9AsUhEui"
+      },
+      {
+        "success": true,
+        "node_id": "faGrDPUH9IiiOtsKBTUY",
+        "session_id": "sUjKq9RPFqvISvd2J7CG"
+      },
+      {
+        "success": true,
+        "node_id": "6627FFlkDFYzmHhHCWhs",
+        "session_id": "LCAlW534Hvy5ijNWp2AD"
+      },
+      {
+        "success": true,
+        "node_id": "6627FFlkDFYzmHhHCWhs",
+        "session_id": "onB5yBq5O0SY5fxTHTvv"
+      },
+      {
+        "success": true,
+        "node_id": "6627FFlkDFYzmHhHCWhs",
+        "session_id": "EtxHxIhSAjaiWKiyReQ7"
+      },
+      {
+        "success": true,
+        "node_id": "6627FFlkDFYzmHhHCWhs",
+        "session_id": "5ViICEyAYe56M95WPmvJ"
+      },
+      {
+        "success": true,
+        "node_id": "gQtrMgAC8zqbY9t2Ecol",
+        "session_id": "CGbm4eALT03Vunm4kwy6"
+      },
+      {
+        "success": true,
+        "node_id": "gQtrMgAC8zqbY9t2Ecol",
+        "session_id": "GWXpNLYZyvPkxGOnDSpi"
+      },
+      {
+        "success": true,
+        "node_id": "gQtrMgAC8zqbY9t2Ecol",
+        "session_id": "3fmSwjL2qkaaL90wcKbd"
+      },
+      {
+        "success": true,
+        "node_id": "gQtrMgAC8zqbY9t2Ecol",
+        "session_id": "cc1DeztYnYML7r60kWip"
+      }
+    ],
+    "summary": {
+      "nodes_run": 4,
+      "generations_started": 16,
+      "failed": 0,
+      "generations_by_node": {
+        "BVXTtY2HfDkXMlU01Jpl": 4,
+        "faGrDPUH9IiiOtsKBTUY": 4,
+        "6627FFlkDFYzmHhHCWhs": 4,
+        "gQtrMgAC8zqbY9t2Ecol": 4
+      }
+    },
+    "session_ids": [
+      "AIFZQxs69RuuJdA3YzLL",
+      "jsdLPpUJyDNLXtye5IZ0",
+      "LQPy3oWbUIdrQeV0k0tX",
+      "qJxUbqB3O5fZsb8VLvkM",
+      "DSQfDu2hn0Gkpxcl3Pp7",
+      "VWMMWMb1UlUa5rBxx5dX",
+      "f9oRKWZrF74T9AsUhEui",
+      "sUjKq9RPFqvISvd2J7CG",
+      "LCAlW534Hvy5ijNWp2AD",
+      "onB5yBq5O0SY5fxTHTvv",
+      "EtxHxIhSAjaiWKiyReQ7",
+      "5ViICEyAYe56M95WPmvJ",
+      "CGbm4eALT03Vunm4kwy6",
+      "GWXpNLYZyvPkxGOnDSpi",
+      "3fmSwjL2qkaaL90wcKbd",
+      "cc1DeztYnYML7r60kWip"
+    ],
+    "pending": [
+      {
+        "generation_id": "K0cXxJzYlhad4PLppamj",
+        "kind": "audio"
+      },
+      {
+        "generation_id": "XCqLNv9z88go1RkYOjce",
+        "kind": "audio"
+      },
+      {
+        "generation_id": "oMgb1bb0BcEGoq6jz30u",
+        "kind": "audio"
+      },
+      {
+        "generation_id": "1DUmkdkl6zVbWATShRWY",
+        "kind": "audio"
+      },
+      {
+        "generation_id": "E04n9irepFw44O6dlupQ",
+        "kind": "audio"
+      },
+      {
+        "generation_id": "h4KDjDVEnULB9FEL6zfP",
+        "kind": "audio"
+      },
+      {
+        "generation_id": "3FtojdxmpVRS6WZVR9YJ",
+        "kind": "audio"
+      },
+      {
+        "generation_id": "CzuE3dkF4bzLQSv9Dv3V",
+        "kind": "audio"
+      },
+      {
+        "generation_id": "GMf9rXr8r8DjYDgDm3bT",
+        "kind": "audio"
+      },
+      {
+        "generation_id": "6JWx6QZoPAUzs0hGwPIu",
+        "kind": "audio"
+      },
+      {
+        "generation_id": "fUsfMktomXlP08r7fJaW",
+        "kind": "audio"
+      },
+      {
+        "generation_id": "JV5Gvwjd8FtwnuCR3tsn",
+        "kind": "audio"
+      },
+      {
+        "generation_id": "Y0NfEQpOIxsEvp0K8DEN",
+        "kind": "audio"
+      },
+      {
+        "generation_id": "GxF0WSHLxUu3TDeDAaMK",
+        "kind": "audio"
+      },
+      {
+        "generation_id": "vAMw0quDT3JIOhV6XHVW",
+        "kind": "audio"
+      },
+      {
+        "generation_id": "E6606DJE6Gk5NDEXodHD",
+        "kind": "audio"
+      }
+    ],
+    "poll_after_seconds": 3,
+    "notes": "Not finished yet. If a generation view is shown it tracks progress and polls by itself, so there is nothing to do here. Only call creative_get_flow_run_status yourself if no view appeared: wait poll_after_seconds, then call it with this flow_id and session_ids, repeating until all_completed or has_failures is true.",
+    "view_state_id": "viewstate_01m38gw13bfc1rhasa9722z33b"
+  },
+  "generation_status": {
+    "flow_id": "Nh1f7JmQid38dud8JZST",
+    "flow_created": false,
+    "url": "https://elevenlabs.io/app/flows/Nh1f7JmQid38dud8JZST",
+    "flow_url": "https://elevenlabs.io/app/flows/Nh1f7JmQid38dud8JZST",
+    "session_id": "AIFZQxs69RuuJdA3YzLL",
+    "generations": [
+      {
+        "id": "K0cXxJzYlhad4PLppamj",
+        "status": "completed",
+        "model_id": "eleven_music_v2",
+        "modality": "audio",
+        "prompt": "Original 30-second cinematic electronic orchestral instrumental advertising score. Absolutely no voice, vocals, choir, chants or spoken words. Precise sophisticated 120 BPM pulse, warm analog bass, cr",
+        "duration_secs": 66,
+        "created_at_unix_ms": 1790213751776,
+        "price": {
+          "credits": 795.4545454545454,
+          "price_cents": 17.5,
+          "cost_fiat_currency": "usd"
+        }
+      },
+      {
+        "id": "XCqLNv9z88go1RkYOjce",
+        "status": "completed",
+        "model_id": "eleven_music_v2",
+        "modality": "audio",
+        "prompt": "Original 30-second cinematic electronic orchestral instrumental advertising score. Absolutely no voice, vocals, choir, chants or spoken words. Precise sophisticated 120 BPM pulse, warm analog bass, cr",
+        "duration_secs": 48,
+        "created_at_unix_ms": 1790213751827,
+        "price": {
+          "credits": 795.4545454545454,
+          "price_cents": 17.5,
+          "cost_fiat_currency": "usd"
+        }
+      },
+      {
+        "id": "oMgb1bb0BcEGoq6jz30u",
+        "status": "completed",
+        "model_id": "eleven_music_v2",
+        "modality": "audio",
+        "prompt": "Original 30-second cinematic electronic orchestral instrumental advertising score. Absolutely no voice, vocals, choir, chants or spoken words. Precise sophisticated 120 BPM pulse, warm analog bass, cr",
+        "duration_secs": 30,
+        "created_at_unix_ms": 1790213751860,
+        "price": {
+          "credits": 795.4545454545454,
+          "price_cents": 17.5,
+          "cost_fiat_currency": "usd"
+        }
+      },
+      {
+        "id": "1DUmkdkl6zVbWATShRWY",
+        "status": "completed",
+        "model_id": "eleven_music_v2",
+        "modality": "audio",
+        "prompt": "Original 30-second cinematic electronic orchestral instrumental advertising score. Absolutely no voice, vocals, choir, chants or spoken words. Precise sophisticated 120 BPM pulse, warm analog bass, cr",
+        "duration_secs": 30,
+        "created_at_unix_ms": 1790213751896,
+        "price": {
+          "credits": 795.4545454545454,
+          "price_cents": 17.5,
+          "cost_fiat_currency": "usd"
+        }
+      },
+      {
+        "id": "E04n9irepFw44O6dlupQ",
+        "status": "completed",
+        "model_id": "eleven_text_to_sound_v2",
+        "modality": "audio",
+        "prompt": "Realistic close Airbus twin turbofan flyby recorded outdoors above clouds. A powerful approaching turbine whine and low roar grows for 2 seconds, peaks as a huge jet passes overhead at 3 seconds, then",
+        "duration_secs": 6,
+        "created_at_unix_ms": 1790213751777,
+        "price": {
+          "credits": 60,
+          "price_cents": 1.32,
+          "cost_fiat_currency": "usd"
+        }
+      },
+      {
+        "id": "h4KDjDVEnULB9FEL6zfP",
+        "status": "completed",
+        "model_id": "eleven_text_to_sound_v2",
+        "modality": "audio",
+        "prompt": "Realistic close Airbus twin turbofan flyby recorded outdoors above clouds. A powerful approaching turbine whine and low roar grows for 2 seconds, peaks as a huge jet passes overhead at 3 seconds, then",
+        "duration_secs": 6,
+        "created_at_unix_ms": 1790213751823,
+        "price": {
+          "credits": 60,
+          "price_cents": 1.32,
+          "cost_fiat_currency": "usd"
+        }
+      },
+      {
+        "id": "3FtojdxmpVRS6WZVR9YJ",
+        "status": "completed",
+        "model_id": "eleven_text_to_sound_v2",
+        "modality": "audio",
+        "prompt": "Realistic close Airbus twin turbofan flyby recorded outdoors above clouds. A powerful approaching turbine whine and low roar grows for 2 seconds, peaks as a huge jet passes overhead at 3 seconds, then",
+        "duration_secs": 6,
+        "created_at_unix_ms": 1790213751859,
+        "price": {
+          "credits": 60,
+          "price_cents": 1.32,
+          "cost_fiat_currency": "usd"
+        }
+      },
+      {
+        "id": "CzuE3dkF4bzLQSv9Dv3V",
+        "status": "completed",
+        "model_id": "eleven_text_to_sound_v2",
+        "modality": "audio",
+        "prompt": "Realistic close Airbus twin turbofan flyby recorded outdoors above clouds. A powerful approaching turbine whine and low roar grows for 2 seconds, peaks as a huge jet passes overhead at 3 seconds, then",
+        "duration_secs": 6,
+        "created_at_unix_ms": 1790213751893,
+        "price": {
+          "credits": 60,
+          "price_cents": 1.32,
+          "cost_fiat_currency": "usd"
+        }
+      },
+      {
+        "id": "GMf9rXr8r8DjYDgDm3bT",
+        "status": "completed",
+        "model_id": "eleven_text_to_sound_v2",
+        "modality": "audio",
+        "prompt": "Three premium tactile cinematic interface clicks with short airy swishes, spaced one second apart. Crisp precise satisfying mechanical transients, subtle low-end impact, clean studio sound effects onl",
+        "duration_secs": 3,
+        "created_at_unix_ms": 1790213751775,
+        "price": {
+          "credits": 30,
+          "price_cents": 0.66,
+          "cost_fiat_currency": "usd"
+        }
+      },
+      {
+        "id": "6JWx6QZoPAUzs0hGwPIu",
+        "status": "completed",
+        "model_id": "eleven_text_to_sound_v2",
+        "modality": "audio",
+        "prompt": "Three premium tactile cinematic interface clicks with short airy swishes, spaced one second apart. Crisp precise satisfying mechanical transients, subtle low-end impact, clean studio sound effects onl",
+        "duration_secs": 3,
+        "created_at_unix_ms": 1790213751822,
+        "price": {
+          "credits": 30,
+          "price_cents": 0.66,
+          "cost_fiat_currency": "usd"
+        }
+      },
+      {
+        "id": "fUsfMktomXlP08r7fJaW",
+        "status": "completed",
+        "model_id": "eleven_text_to_sound_v2",
+        "modality": "audio",
+        "prompt": "Three premium tactile cinematic interface clicks with short airy swishes, spaced one second apart. Crisp precise satisfying mechanical transients, subtle low-end impact, clean studio sound effects onl",
+        "duration_secs": 3,
+        "created_at_unix_ms": 1790213751857,
+        "price": {
+          "credits": 30,
+          "price_cents": 0.66,
+          "cost_fiat_currency": "usd"
+        }
+      },
+      {
+        "id": "JV5Gvwjd8FtwnuCR3tsn",
+        "status": "completed",
+        "model_id": "eleven_text_to_sound_v2",
+        "modality": "audio",
+        "prompt": "Three premium tactile cinematic interface clicks with short airy swishes, spaced one second apart. Crisp precise satisfying mechanical transients, subtle low-end impact, clean studio sound effects onl",
+        "duration_secs": 3,
+        "created_at_unix_ms": 1790213751891,
+        "price": {
+          "credits": 30,
+          "price_cents": 0.66,
+          "cost_fiat_currency": "usd"
+        }
+      },
+      {
+        "id": "Y0NfEQpOIxsEvp0K8DEN",
+        "status": "completed",
+        "model_id": "eleven_text_to_sound_v2",
+        "modality": "audio",
+        "prompt": "Cinematic glass shimmer rising into one brilliant crystalline flash, followed by a deep clean bass impact and short airy decay. Magical but refined technological energy. No voice, choir, speech or mus",
+        "duration_secs": 3,
+        "created_at_unix_ms": 1790213751786,
+        "price": {
+          "credits": 30,
+          "price_cents": 0.66,
+          "cost_fiat_currency": "usd"
+        }
+      },
+      {
+        "id": "GxF0WSHLxUu3TDeDAaMK",
+        "status": "completed",
+        "model_id": "eleven_text_to_sound_v2",
+        "modality": "audio",
+        "prompt": "Cinematic glass shimmer rising into one brilliant crystalline flash, followed by a deep clean bass impact and short airy decay. Magical but refined technological energy. No voice, choir, speech or mus",
+        "duration_secs": 3,
+        "created_at_unix_ms": 1790213751830,
+        "price": {
+          "credits": 30,
+          "price_cents": 0.66,
+          "cost_fiat_currency": "usd"
+        }
+      },
+      {
+        "id": "vAMw0quDT3JIOhV6XHVW",
+        "status": "completed",
+        "model_id": "eleven_text_to_sound_v2",
+        "modality": "audio",
+        "prompt": "Cinematic glass shimmer rising into one brilliant crystalline flash, followed by a deep clean bass impact and short airy decay. Magical but refined technological energy. No voice, choir, speech or mus",
+        "duration_secs": 3,
+        "created_at_unix_ms": 1790213751860,
+        "price": {
+          "credits": 30,
+          "price_cents": 0.66,
+          "cost_fiat_currency": "usd"
+        }
+      },
+      {
+        "id": "E6606DJE6Gk5NDEXodHD",
+        "status": "completed",
+        "model_id": "eleven_text_to_sound_v2",
+        "modality": "audio",
+        "prompt": "Cinematic glass shimmer rising into one brilliant crystalline flash, followed by a deep clean bass impact and short airy decay. Magical but refined technological energy. No voice, choir, speech or mus",
+        "duration_secs": 3,
+        "created_at_unix_ms": 1790213751896,
+        "price": {
+          "credits": 30,
+          "price_cents": 0.66,
+          "cost_fiat_currency": "usd"
+        }
+      }
+    ],
+    "all_completed": true,
+    "has_failures": false,
+    "session_ids": [
+      "AIFZQxs69RuuJdA3YzLL",
+      "jsdLPpUJyDNLXtye5IZ0",
+      "LQPy3oWbUIdrQeV0k0tX",
+      "qJxUbqB3O5fZsb8VLvkM",
+      "DSQfDu2hn0Gkpxcl3Pp7",
+      "VWMMWMb1UlUa5rBxx5dX",
+      "f9oRKWZrF74T9AsUhEui",
+      "sUjKq9RPFqvISvd2J7CG",
+      "LCAlW534Hvy5ijNWp2AD",
+      "onB5yBq5O0SY5fxTHTvv",
+      "EtxHxIhSAjaiWKiyReQ7",
+      "5ViICEyAYe56M95WPmvJ",
+      "CGbm4eALT03Vunm4kwy6",
+      "GWXpNLYZyvPkxGOnDSpi",
+      "3fmSwjL2qkaaL90wcKbd",
+      "cc1DeztYnYML7r60kWip"
+    ],
+    "media": [
+      {
+        "generation_id": "K0cXxJzYlhad4PLppamj",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/AIFZQxs69RuuJdA3YzLL/K0cXxJzYlhad4PLppamj/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013648Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=3ceceb139d0fb2ae7a53e81a06bc50974afc7f2849de4f4c6661dcebd33054d02d474a1cd8bdca43db51707102dd5c44ce92ffbc18f46c959916a5547fc49e01d367e52a1fa0f87fbe15c16510e9319095dd4a280f9cd8c9a194ed52bfa604a21ada54a79d5c1a16ff3a2c6624da294e8be68e41f439347e8855134814db417342717c7a405b15b1cc9f173f2eb9a4be8d32d61c5e8827656562a15506d8427f6005fa740c7870a72c7a5abd621d6afed556f0eee0585834cb48223d93bbfab5cf82032fd2afbcdca7718d30fa1644a51451b98623cbd3c42aadd4f3dd48a600f34c5b4cbb7d24579120cd79a370aae12867947c605a2454d210c719a85766d8",
+        "prompt": "Original 30-second cinematic electronic orchestral instrumental advertising score. Absolutely no voice, vocals, choir, chants or spoken words. Precise sophisticated 120 BPM pulse, warm analog bass, crystalline plucks, tight cinematic percussion, expansive strings. 0-8 seconds curiosity and forward energy, 8-10 rising anticipation, short breath then bold orchestral bass impact at 12 seconds for jet flyby, 12-16 energetic ascent, 16-25 confident uplifting steady rhythm with room for readable titles, 25-30 warm premium resolved finale with clean musical ending. No lyrics, no imitation of any artist. Instrumental music only.",
+        "duration_secs": 66,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/AIFZQxs69RuuJdA3YzLL/K0cXxJzYlhad4PLppamj/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013648Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=3ceceb139d0fb2ae7a53e81a06bc50974afc7f2849de4f4c6661dcebd33054d02d474a1cd8bdca43db51707102dd5c44ce92ffbc18f46c959916a5547fc49e01d367e52a1fa0f87fbe15c16510e9319095dd4a280f9cd8c9a194ed52bfa604a21ada54a79d5c1a16ff3a2c6624da294e8be68e41f439347e8855134814db417342717c7a405b15b1cc9f173f2eb9a4be8d32d61c5e8827656562a15506d8427f6005fa740c7870a72c7a5abd621d6afed556f0eee0585834cb48223d93bbfab5cf82032fd2afbcdca7718d30fa1644a51451b98623cbd3c42aadd4f3dd48a600f34c5b4cbb7d24579120cd79a370aae12867947c605a2454d210c719a85766d8",
+        "model_id": "eleven_music_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "30.0"
+          },
+          {
+            "label": "Lyrics type",
+            "value": "instrumental"
+          },
+          {
+            "label": "Instrumental",
+            "value": "True"
+          }
+        ]
+      },
+      {
+        "generation_id": "XCqLNv9z88go1RkYOjce",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/jsdLPpUJyDNLXtye5IZ0/XCqLNv9z88go1RkYOjce/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013854Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=4e82bbeff747fc69bac0fa452149eaa72b12f7c276b1ac2ec6db1bdf1fee30312021ebba57f37ecaa72a4ba3ed05bd5145f2991e41f923fc9e30a28de38d9a2ad7730df9c401e9be7cad1c2087e636054178e549a2602d193d81734dc2db0b022bf60807e51ff056ed5d24dacef213a783b3f95f970032228b30703e0a6bc1a61d2a5a78f200e4fba4e683002df0feb049c8634be3d845c8072581b44cd90c1d7bee288c0440106d29bfc57d022b9e553c5989cec394039f55d675625a9bfd46d917c2c600d9ac4376b8cd4d95461148e1cfe4857e650a9e08d95393e62d07009ce94b555dad0cc635fd04ac2440deda3912201b928aa22b764a30d281958ccf",
+        "prompt": "Original 30-second cinematic electronic orchestral instrumental advertising score. Absolutely no voice, vocals, choir, chants or spoken words. Precise sophisticated 120 BPM pulse, warm analog bass, crystalline plucks, tight cinematic percussion, expansive strings. 0-8 seconds curiosity and forward energy, 8-10 rising anticipation, short breath then bold orchestral bass impact at 12 seconds for jet flyby, 12-16 energetic ascent, 16-25 confident uplifting steady rhythm with room for readable titles, 25-30 warm premium resolved finale with clean musical ending. No lyrics, no imitation of any artist. Instrumental music only.",
+        "duration_secs": 48,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/jsdLPpUJyDNLXtye5IZ0/XCqLNv9z88go1RkYOjce/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013854Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=4e82bbeff747fc69bac0fa452149eaa72b12f7c276b1ac2ec6db1bdf1fee30312021ebba57f37ecaa72a4ba3ed05bd5145f2991e41f923fc9e30a28de38d9a2ad7730df9c401e9be7cad1c2087e636054178e549a2602d193d81734dc2db0b022bf60807e51ff056ed5d24dacef213a783b3f95f970032228b30703e0a6bc1a61d2a5a78f200e4fba4e683002df0feb049c8634be3d845c8072581b44cd90c1d7bee288c0440106d29bfc57d022b9e553c5989cec394039f55d675625a9bfd46d917c2c600d9ac4376b8cd4d95461148e1cfe4857e650a9e08d95393e62d07009ce94b555dad0cc635fd04ac2440deda3912201b928aa22b764a30d281958ccf",
+        "model_id": "eleven_music_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "30.0"
+          },
+          {
+            "label": "Lyrics type",
+            "value": "instrumental"
+          },
+          {
+            "label": "Instrumental",
+            "value": "True"
+          }
+        ]
+      },
+      {
+        "generation_id": "oMgb1bb0BcEGoq6jz30u",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/LQPy3oWbUIdrQeV0k0tX/oMgb1bb0BcEGoq6jz30u/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013904Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=2b931dee4ffa148e91ec3e2c972d62c74249f9cec1e84591ed3491c99ae13517dfe15080f3fea231d1446160f124524706abcf19220c722dae0337bb0320a52955750a24229b840dc94a159cfffefcaae4beefff68dc109cd725f9f16f9405295e3d5b27fc64c05220cf7ddde5ea8c0e35301d66edcdf6357e3480321c205b51919e752615c37e5437ded71ff0df99face74c577c50cc0eba46d60c3581c6b1ec9a40b508686297a731fc6b8e0ec937cde5d563ba36477a14da12166879b8aa58bd31c368765dd3cafbdde69594212c56e6392d180d3e00a34e08cacf38d0b32a784e5ac755eaad65fc8e651c3b1a864da6bebc5343b484831f5f5abdadb6270",
+        "prompt": "Original 30-second cinematic electronic orchestral instrumental advertising score. Absolutely no voice, vocals, choir, chants or spoken words. Precise sophisticated 120 BPM pulse, warm analog bass, crystalline plucks, tight cinematic percussion, expansive strings. 0-8 seconds curiosity and forward energy, 8-10 rising anticipation, short breath then bold orchestral bass impact at 12 seconds for jet flyby, 12-16 energetic ascent, 16-25 confident uplifting steady rhythm with room for readable titles, 25-30 warm premium resolved finale with clean musical ending. No lyrics, no imitation of any artist. Instrumental music only.",
+        "duration_secs": 30,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/LQPy3oWbUIdrQeV0k0tX/oMgb1bb0BcEGoq6jz30u/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013904Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=2b931dee4ffa148e91ec3e2c972d62c74249f9cec1e84591ed3491c99ae13517dfe15080f3fea231d1446160f124524706abcf19220c722dae0337bb0320a52955750a24229b840dc94a159cfffefcaae4beefff68dc109cd725f9f16f9405295e3d5b27fc64c05220cf7ddde5ea8c0e35301d66edcdf6357e3480321c205b51919e752615c37e5437ded71ff0df99face74c577c50cc0eba46d60c3581c6b1ec9a40b508686297a731fc6b8e0ec937cde5d563ba36477a14da12166879b8aa58bd31c368765dd3cafbdde69594212c56e6392d180d3e00a34e08cacf38d0b32a784e5ac755eaad65fc8e651c3b1a864da6bebc5343b484831f5f5abdadb6270",
+        "model_id": "eleven_music_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "30.0"
+          },
+          {
+            "label": "Lyrics type",
+            "value": "instrumental"
+          },
+          {
+            "label": "Instrumental",
+            "value": "True"
+          }
+        ]
+      },
+      {
+        "generation_id": "1DUmkdkl6zVbWATShRWY",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/qJxUbqB3O5fZsb8VLvkM/1DUmkdkl6zVbWATShRWY/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013708Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=63eba8e216fe9953c4e747957bf7a51b25988a09a4d8f01000c0f41f6cf80fdb2deb2d3e9e8c292b571525850a89f36e56344b319262f6e012c15c20870bc6585064c4de4ff375e2d0a64cea4ddb8b9ebe41d02a9413e6d83e21020a5fef594fc0ba8e14ffa70896e3ec3ec3b796a76b63de6b92aef08c03d2481ed32934f4ef2a9e4fd4e63cd8ceebe5c78888369c8b172fabe0d877d7a6bff4da92e2118aad31fded018bdec6b555f07afc4546552fbc8bce5c3b8077071562940435238a586adc8b6bf48d90d10bd7bb9e39f0731a5464a169e23e48fed3bcfabac9b3046cf77a367b6c0acdf1a2b130b799a11eb6c8c3d208ba104abbc2db3e5edffe286d",
+        "prompt": "Original 30-second cinematic electronic orchestral instrumental advertising score. Absolutely no voice, vocals, choir, chants or spoken words. Precise sophisticated 120 BPM pulse, warm analog bass, crystalline plucks, tight cinematic percussion, expansive strings. 0-8 seconds curiosity and forward energy, 8-10 rising anticipation, short breath then bold orchestral bass impact at 12 seconds for jet flyby, 12-16 energetic ascent, 16-25 confident uplifting steady rhythm with room for readable titles, 25-30 warm premium resolved finale with clean musical ending. No lyrics, no imitation of any artist. Instrumental music only.",
+        "duration_secs": 30,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/qJxUbqB3O5fZsb8VLvkM/1DUmkdkl6zVbWATShRWY/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013708Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=63eba8e216fe9953c4e747957bf7a51b25988a09a4d8f01000c0f41f6cf80fdb2deb2d3e9e8c292b571525850a89f36e56344b319262f6e012c15c20870bc6585064c4de4ff375e2d0a64cea4ddb8b9ebe41d02a9413e6d83e21020a5fef594fc0ba8e14ffa70896e3ec3ec3b796a76b63de6b92aef08c03d2481ed32934f4ef2a9e4fd4e63cd8ceebe5c78888369c8b172fabe0d877d7a6bff4da92e2118aad31fded018bdec6b555f07afc4546552fbc8bce5c3b8077071562940435238a586adc8b6bf48d90d10bd7bb9e39f0731a5464a169e23e48fed3bcfabac9b3046cf77a367b6c0acdf1a2b130b799a11eb6c8c3d208ba104abbc2db3e5edffe286d",
+        "model_id": "eleven_music_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "30.0"
+          },
+          {
+            "label": "Lyrics type",
+            "value": "instrumental"
+          },
+          {
+            "label": "Instrumental",
+            "value": "True"
+          }
+        ]
+      },
+      {
+        "generation_id": "E04n9irepFw44O6dlupQ",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/DSQfDu2hn0Gkpxcl3Pp7/E04n9irepFw44O6dlupQ/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013602Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=6c21d540c87166a22f8f15bf6d211418b5022014df323842abe73f87cffa187490cb96156e9271359c5e44404ce40b730f291728a214625fdcd685d8c76278a8c52fb2f5773ec23ff84ff0e078445c7c63295e26ff36fc272ef61e878aa494e2417cd8dae7203e28546718b2990b483f4c5404509b9b67e8672966d23c4362cd59b3d47a28978feee1ad52df022d6c57509efdaaf5b5ce6f6f28196afea9364a1e4ff05cc8a5bfa4e3d8937473635a2cb771a68a30a57defcc25750a609c89fbd4f63f9d198e40fcdecb03593eeaf4187c68ea48900eac254e793c260460ea26946cdc93ac13475e00d00d77be6186c8858b151ba995599735a04497a2dddabb",
+        "prompt": "Realistic close Airbus twin turbofan flyby recorded outdoors above clouds. A powerful approaching turbine whine and low roar grows for 2 seconds, peaks as a huge jet passes overhead at 3 seconds, then Doppler pitch falls and tails away behind listener for 3 seconds. One uninterrupted pass. No voice, radio, speech, crowd or music.",
+        "duration_secs": 6,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/DSQfDu2hn0Gkpxcl3Pp7/E04n9irepFw44O6dlupQ/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013602Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=6c21d540c87166a22f8f15bf6d211418b5022014df323842abe73f87cffa187490cb96156e9271359c5e44404ce40b730f291728a214625fdcd685d8c76278a8c52fb2f5773ec23ff84ff0e078445c7c63295e26ff36fc272ef61e878aa494e2417cd8dae7203e28546718b2990b483f4c5404509b9b67e8672966d23c4362cd59b3d47a28978feee1ad52df022d6c57509efdaaf5b5ce6f6f28196afea9364a1e4ff05cc8a5bfa4e3d8937473635a2cb771a68a30a57defcc25750a609c89fbd4f63f9d198e40fcdecb03593eeaf4187c68ea48900eac254e793c260460ea26946cdc93ac13475e00d00d77be6186c8858b151ba995599735a04497a2dddabb",
+        "model_id": "eleven_text_to_sound_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "6.0"
+          },
+          {
+            "label": "Prompt influence",
+            "value": "0.8"
+          },
+          {
+            "label": "Loop",
+            "value": "False"
+          }
+        ]
+      },
+      {
+        "generation_id": "h4KDjDVEnULB9FEL6zfP",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/VWMMWMb1UlUa5rBxx5dX/h4KDjDVEnULB9FEL6zfP/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013636Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=55619134633a19f92938d8bd44aa09889f03157c0b0e69ba23be65e45f27807ae5dace1cef8923a696b10ef021475c3a6d511521afc045fdae5b17c8d8537ed62d6cb3957a4769e8858f18531ca14d84809c40feeda1cdb85137350a56ecc807d75f0ea7f6ec9f1081d0803b458aa7d188a0605920b16ed482eb42f6d42befa5ea4abd098de42b16f6e81f5a8e746ea399c6c90010e956bd11a96675d218c2790b0887423af7c8fc3b6a1dc1308e49aec988cd90f8c23b384d6e4afeba02a2fb4292e87c2dd89263e360c39e5a09da6117b9d852bd8d16856252b0a5c9c23d6e5f9906153961737da5cbc76c94ef161e3ceb65b1448ff6af2c1ff4d78120f264",
+        "prompt": "Realistic close Airbus twin turbofan flyby recorded outdoors above clouds. A powerful approaching turbine whine and low roar grows for 2 seconds, peaks as a huge jet passes overhead at 3 seconds, then Doppler pitch falls and tails away behind listener for 3 seconds. One uninterrupted pass. No voice, radio, speech, crowd or music.",
+        "duration_secs": 6,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/VWMMWMb1UlUa5rBxx5dX/h4KDjDVEnULB9FEL6zfP/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013636Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=55619134633a19f92938d8bd44aa09889f03157c0b0e69ba23be65e45f27807ae5dace1cef8923a696b10ef021475c3a6d511521afc045fdae5b17c8d8537ed62d6cb3957a4769e8858f18531ca14d84809c40feeda1cdb85137350a56ecc807d75f0ea7f6ec9f1081d0803b458aa7d188a0605920b16ed482eb42f6d42befa5ea4abd098de42b16f6e81f5a8e746ea399c6c90010e956bd11a96675d218c2790b0887423af7c8fc3b6a1dc1308e49aec988cd90f8c23b384d6e4afeba02a2fb4292e87c2dd89263e360c39e5a09da6117b9d852bd8d16856252b0a5c9c23d6e5f9906153961737da5cbc76c94ef161e3ceb65b1448ff6af2c1ff4d78120f264",
+        "model_id": "eleven_text_to_sound_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "6.0"
+          },
+          {
+            "label": "Prompt influence",
+            "value": "0.8"
+          },
+          {
+            "label": "Loop",
+            "value": "False"
+          }
+        ]
+      },
+      {
+        "generation_id": "3FtojdxmpVRS6WZVR9YJ",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/f9oRKWZrF74T9AsUhEui/3FtojdxmpVRS6WZVR9YJ/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013636Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=a1efbf86f7fb1cd3ced469f6544f563f46283da610c8358de05bd345275041e6bc262e687ecc27e32defdddbaf865872d99ad7575ca77fde5ea92ad73490f6cfbec0e99622d627466bebf2a32168a3ed8e0ec06e8a0b61293292be38c27d8d745d2998f141a4709bda714997a9476a6971d3d0412267e9df24bd2391d5db9556837cfe4b4e82edceb9212762e3095208374de805006efea16c9ae783d166c081320945596c362c35f5d3d46658f13b78f4565963d1acc9d87611e4650db1afa466a85f7a15ae18e8d9eaf3bb6f203c37318b854076e213b068d072e25ba1be0e4ab17138799690ab991419bb981ab2e33f9e7ca4837808aec481e99414d7045d",
+        "prompt": "Realistic close Airbus twin turbofan flyby recorded outdoors above clouds. A powerful approaching turbine whine and low roar grows for 2 seconds, peaks as a huge jet passes overhead at 3 seconds, then Doppler pitch falls and tails away behind listener for 3 seconds. One uninterrupted pass. No voice, radio, speech, crowd or music.",
+        "duration_secs": 6,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/f9oRKWZrF74T9AsUhEui/3FtojdxmpVRS6WZVR9YJ/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013636Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=a1efbf86f7fb1cd3ced469f6544f563f46283da610c8358de05bd345275041e6bc262e687ecc27e32defdddbaf865872d99ad7575ca77fde5ea92ad73490f6cfbec0e99622d627466bebf2a32168a3ed8e0ec06e8a0b61293292be38c27d8d745d2998f141a4709bda714997a9476a6971d3d0412267e9df24bd2391d5db9556837cfe4b4e82edceb9212762e3095208374de805006efea16c9ae783d166c081320945596c362c35f5d3d46658f13b78f4565963d1acc9d87611e4650db1afa466a85f7a15ae18e8d9eaf3bb6f203c37318b854076e213b068d072e25ba1be0e4ab17138799690ab991419bb981ab2e33f9e7ca4837808aec481e99414d7045d",
+        "model_id": "eleven_text_to_sound_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "6.0"
+          },
+          {
+            "label": "Prompt influence",
+            "value": "0.8"
+          },
+          {
+            "label": "Loop",
+            "value": "False"
+          }
+        ]
+      },
+      {
+        "generation_id": "CzuE3dkF4bzLQSv9Dv3V",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/sUjKq9RPFqvISvd2J7CG/CzuE3dkF4bzLQSv9Dv3V/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013636Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=34a5852c592c2062cc564ecfd9cd64f9d79b99697f9acb32acc98763ddc8fbf3c2bedfd0fad37193c165345aedd09daffaf88a44908efdf621dfef03918c68f59b9fbf63cb4cc86e8df8043d30e1821101aaa51ced2af59699fcc4fac75683bab16744286cac00aebe604fcdd6a913447bf57a62e7de60fa46fb026c746d5218b4d31ac49c6d6ff9adda2f72ee62d8f14a9a3be6c82da3e8846df6df99aff938b3710908f231f2bfcd122499ca3804efee79a08c028e42450874904a9ab8b4bd54c7a07c85fad22b73c6113a575723f8097e1fae9fe8ad849d7e0858bcc03bb75ab5b1e7b030010fc06e757245febb3dc578cd0710601b1c5dbcf33ddea25556",
+        "prompt": "Realistic close Airbus twin turbofan flyby recorded outdoors above clouds. A powerful approaching turbine whine and low roar grows for 2 seconds, peaks as a huge jet passes overhead at 3 seconds, then Doppler pitch falls and tails away behind listener for 3 seconds. One uninterrupted pass. No voice, radio, speech, crowd or music.",
+        "duration_secs": 6,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/sUjKq9RPFqvISvd2J7CG/CzuE3dkF4bzLQSv9Dv3V/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013636Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=34a5852c592c2062cc564ecfd9cd64f9d79b99697f9acb32acc98763ddc8fbf3c2bedfd0fad37193c165345aedd09daffaf88a44908efdf621dfef03918c68f59b9fbf63cb4cc86e8df8043d30e1821101aaa51ced2af59699fcc4fac75683bab16744286cac00aebe604fcdd6a913447bf57a62e7de60fa46fb026c746d5218b4d31ac49c6d6ff9adda2f72ee62d8f14a9a3be6c82da3e8846df6df99aff938b3710908f231f2bfcd122499ca3804efee79a08c028e42450874904a9ab8b4bd54c7a07c85fad22b73c6113a575723f8097e1fae9fe8ad849d7e0858bcc03bb75ab5b1e7b030010fc06e757245febb3dc578cd0710601b1c5dbcf33ddea25556",
+        "model_id": "eleven_text_to_sound_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "6.0"
+          },
+          {
+            "label": "Prompt influence",
+            "value": "0.8"
+          },
+          {
+            "label": "Loop",
+            "value": "False"
+          }
+        ]
+      },
+      {
+        "generation_id": "GMf9rXr8r8DjYDgDm3bT",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/LCAlW534Hvy5ijNWp2AD/GMf9rXr8r8DjYDgDm3bT/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013602Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=84e8c5e92b284bf9dd1ba710f5df404947d8eee1e27d642bf14c8da971dcf18b1793b3c5c911cab9557c8ee42a3f1030e0ac4460d0327ffcaf148b85594adb4fa754b7945ea3aff38f1ec1f0679c231bd0cf646afccfd528a83f13a51866fddd55fb1a69139cbadf2a2c77c8c7a6587171e41f9ba5c15eb4c26410d3751439108fa2a8c6ab97cc6b12719597c3e53bd78b2279eb972e3135766424efcc15fe497deb52505a7a9a21f2ee45b9f8bbc2503802f20290b67394b790ad56c5973d027029445dcb7ce06fe6cfa766957e27a59b0099199ed68c108572e894a73c19607251c3f6a8c264ee6d92b46d56a74fddfff50b83d90acb24ee461c0598d6be68",
+        "prompt": "Three premium tactile cinematic interface clicks with short airy swishes, spaced one second apart. Crisp precise satisfying mechanical transients, subtle low-end impact, clean studio sound effects only. No voice or music.",
+        "duration_secs": 3,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/LCAlW534Hvy5ijNWp2AD/GMf9rXr8r8DjYDgDm3bT/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013602Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=84e8c5e92b284bf9dd1ba710f5df404947d8eee1e27d642bf14c8da971dcf18b1793b3c5c911cab9557c8ee42a3f1030e0ac4460d0327ffcaf148b85594adb4fa754b7945ea3aff38f1ec1f0679c231bd0cf646afccfd528a83f13a51866fddd55fb1a69139cbadf2a2c77c8c7a6587171e41f9ba5c15eb4c26410d3751439108fa2a8c6ab97cc6b12719597c3e53bd78b2279eb972e3135766424efcc15fe497deb52505a7a9a21f2ee45b9f8bbc2503802f20290b67394b790ad56c5973d027029445dcb7ce06fe6cfa766957e27a59b0099199ed68c108572e894a73c19607251c3f6a8c264ee6d92b46d56a74fddfff50b83d90acb24ee461c0598d6be68",
+        "model_id": "eleven_text_to_sound_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "3.0"
+          },
+          {
+            "label": "Prompt influence",
+            "value": "0.8"
+          },
+          {
+            "label": "Loop",
+            "value": "False"
+          }
+        ]
+      },
+      {
+        "generation_id": "6JWx6QZoPAUzs0hGwPIu",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/onB5yBq5O0SY5fxTHTvv/6JWx6QZoPAUzs0hGwPIu/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013602Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=b229881da8186a3522caecc2deddb9569bc74b047350cfb7838d9cf8a10639397697c46c494dedc31717e3f2f921801bc3c8a056838f113a5706f6112d328ac2db620e105d1b2d128e40c4c5e111a35e0ac8d9ee233444af46c9ddc95ba8493c7f859671bf6d7b8caa0225608b92b2e5a8b50a5e6651f9a9c9e24444c2f1d3a07404525a5d96bd4db847e79c8e752b81c6f155cac8c25a601802fbe20a9589768ed86d4b59905e9d152306e21e667a337153a9dd49165f647de5f114e161be33cd1fe7449803aa02b207f51c39678e898a6c800d4daffd9af5892eb4e136b955accee7c6571b9be54204c1cd91bdae4f8b659b4a9242d3bd253af5029ac0568a",
+        "prompt": "Three premium tactile cinematic interface clicks with short airy swishes, spaced one second apart. Crisp precise satisfying mechanical transients, subtle low-end impact, clean studio sound effects only. No voice or music.",
+        "duration_secs": 3,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/onB5yBq5O0SY5fxTHTvv/6JWx6QZoPAUzs0hGwPIu/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013602Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=b229881da8186a3522caecc2deddb9569bc74b047350cfb7838d9cf8a10639397697c46c494dedc31717e3f2f921801bc3c8a056838f113a5706f6112d328ac2db620e105d1b2d128e40c4c5e111a35e0ac8d9ee233444af46c9ddc95ba8493c7f859671bf6d7b8caa0225608b92b2e5a8b50a5e6651f9a9c9e24444c2f1d3a07404525a5d96bd4db847e79c8e752b81c6f155cac8c25a601802fbe20a9589768ed86d4b59905e9d152306e21e667a337153a9dd49165f647de5f114e161be33cd1fe7449803aa02b207f51c39678e898a6c800d4daffd9af5892eb4e136b955accee7c6571b9be54204c1cd91bdae4f8b659b4a9242d3bd253af5029ac0568a",
+        "model_id": "eleven_text_to_sound_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "3.0"
+          },
+          {
+            "label": "Prompt influence",
+            "value": "0.8"
+          },
+          {
+            "label": "Loop",
+            "value": "False"
+          }
+        ]
+      },
+      {
+        "generation_id": "fUsfMktomXlP08r7fJaW",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/EtxHxIhSAjaiWKiyReQ7/fUsfMktomXlP08r7fJaW/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013636Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=71c77312cf9d6892fde1efae053a7c016d9ecbe5a8ee13845ff86cc1233216841f4842a7fc4fbd686abe8706d20aae1aa776cd88abf35db5d00365dad29694e4d2b2e82e3abdcdb71f305fe7b60152539000780e99906132fb4d2ba2dd3ad7eeb3df321536994d8a17c17f501859730d80cc8236247ebdc4bf7a1b4bdb76f791548683210b8579da1b28489ea482c5a2c5a748b55874dc6757d863acba87058d76643ece4a3b91aeef4226765f55928f9e016950abb06d3c3785a527436a4f20aa20e091e31619243e6e13c8fc90ca3e6e45b14b0c7e2073b8e1105ae77b7800fc2469ecf760eb0875a4ccf2020d0f57785e6e6edc2105ed2727c0c239d00801",
+        "prompt": "Three premium tactile cinematic interface clicks with short airy swishes, spaced one second apart. Crisp precise satisfying mechanical transients, subtle low-end impact, clean studio sound effects only. No voice or music.",
+        "duration_secs": 3,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/EtxHxIhSAjaiWKiyReQ7/fUsfMktomXlP08r7fJaW/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013636Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=71c77312cf9d6892fde1efae053a7c016d9ecbe5a8ee13845ff86cc1233216841f4842a7fc4fbd686abe8706d20aae1aa776cd88abf35db5d00365dad29694e4d2b2e82e3abdcdb71f305fe7b60152539000780e99906132fb4d2ba2dd3ad7eeb3df321536994d8a17c17f501859730d80cc8236247ebdc4bf7a1b4bdb76f791548683210b8579da1b28489ea482c5a2c5a748b55874dc6757d863acba87058d76643ece4a3b91aeef4226765f55928f9e016950abb06d3c3785a527436a4f20aa20e091e31619243e6e13c8fc90ca3e6e45b14b0c7e2073b8e1105ae77b7800fc2469ecf760eb0875a4ccf2020d0f57785e6e6edc2105ed2727c0c239d00801",
+        "model_id": "eleven_text_to_sound_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "3.0"
+          },
+          {
+            "label": "Prompt influence",
+            "value": "0.8"
+          },
+          {
+            "label": "Loop",
+            "value": "False"
+          }
+        ]
+      },
+      {
+        "generation_id": "JV5Gvwjd8FtwnuCR3tsn",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/5ViICEyAYe56M95WPmvJ/JV5Gvwjd8FtwnuCR3tsn/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013843Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=ba52f0fce102e0dd147250c8462a3cb66c41331e108b1115ad9db4744f68fb0ab78f1cfeee100e48fa4e3302cb1a7f5fe968b7bb8bf08a3712916893a87c5d52c5ae632e5ea0241f1ec601f975a15f23cb3d379895f1e11b2886d5d4c1fcbee37ed4c2c2408c22a2791a6ab0c4e28023a922a6d291a59c6cf3c64c53c55447a2ebe7f1e0f892c16a36cc882316c2c20beb6d7632a3bb159ff7c48a4abdbbcf04f4fa09a035de90bf29bce1dbfb391d6d27395648afd9906bf240570505754944efebd38e56c9975d484e90099ceac455c78ac0b038c0542c250f4a6aeb1a1cc05290d6983b4e96ab193471314541148d78f35abe0b8c7b89af42ac3574347362",
+        "prompt": "Three premium tactile cinematic interface clicks with short airy swishes, spaced one second apart. Crisp precise satisfying mechanical transients, subtle low-end impact, clean studio sound effects only. No voice or music.",
+        "duration_secs": 3,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/5ViICEyAYe56M95WPmvJ/JV5Gvwjd8FtwnuCR3tsn/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013843Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=ba52f0fce102e0dd147250c8462a3cb66c41331e108b1115ad9db4744f68fb0ab78f1cfeee100e48fa4e3302cb1a7f5fe968b7bb8bf08a3712916893a87c5d52c5ae632e5ea0241f1ec601f975a15f23cb3d379895f1e11b2886d5d4c1fcbee37ed4c2c2408c22a2791a6ab0c4e28023a922a6d291a59c6cf3c64c53c55447a2ebe7f1e0f892c16a36cc882316c2c20beb6d7632a3bb159ff7c48a4abdbbcf04f4fa09a035de90bf29bce1dbfb391d6d27395648afd9906bf240570505754944efebd38e56c9975d484e90099ceac455c78ac0b038c0542c250f4a6aeb1a1cc05290d6983b4e96ab193471314541148d78f35abe0b8c7b89af42ac3574347362",
+        "model_id": "eleven_text_to_sound_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "3.0"
+          },
+          {
+            "label": "Prompt influence",
+            "value": "0.8"
+          },
+          {
+            "label": "Loop",
+            "value": "False"
+          }
+        ]
+      },
+      {
+        "generation_id": "Y0NfEQpOIxsEvp0K8DEN",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/CGbm4eALT03Vunm4kwy6/Y0NfEQpOIxsEvp0K8DEN/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013602Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=3746a59ed31b08bc2e76e4155a56227e5de1eec599f56507cd2109cfa97b080cf5cc74644ee6da6c1e9c010b20fe4caafb8de712a5b61ec8b846f3871ba36af888c1c062278c321c6fcb262b54b2d41db92cf6f2abca3ba3a997ced543fbf6b4506c41dc53e47839f6ccfab461cd3e0bef932b7b317bfe26a45b2fbf6542f8746e175b19fe4258ab6c630fc741261d31145a077f136e396c0be6f3d3e542f1ab85ab625865a77cef4431f6b6a2d8c5a08cb850889a7799daf812781336b1c50e0cb03f537b9725980ed8e1d003ed17d6bb55bd9ed07e179a5c3f4f0cd07fda4af76859303ad6ce08437c62b125d6436dedeb67fb5b0476bc00b99ea9a8338050",
+        "prompt": "Cinematic glass shimmer rising into one brilliant crystalline flash, followed by a deep clean bass impact and short airy decay. Magical but refined technological energy. No voice, choir, speech or music.",
+        "duration_secs": 3,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/CGbm4eALT03Vunm4kwy6/Y0NfEQpOIxsEvp0K8DEN/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013602Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=3746a59ed31b08bc2e76e4155a56227e5de1eec599f56507cd2109cfa97b080cf5cc74644ee6da6c1e9c010b20fe4caafb8de712a5b61ec8b846f3871ba36af888c1c062278c321c6fcb262b54b2d41db92cf6f2abca3ba3a997ced543fbf6b4506c41dc53e47839f6ccfab461cd3e0bef932b7b317bfe26a45b2fbf6542f8746e175b19fe4258ab6c630fc741261d31145a077f136e396c0be6f3d3e542f1ab85ab625865a77cef4431f6b6a2d8c5a08cb850889a7799daf812781336b1c50e0cb03f537b9725980ed8e1d003ed17d6bb55bd9ed07e179a5c3f4f0cd07fda4af76859303ad6ce08437c62b125d6436dedeb67fb5b0476bc00b99ea9a8338050",
+        "model_id": "eleven_text_to_sound_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "3.0"
+          },
+          {
+            "label": "Prompt influence",
+            "value": "0.8"
+          },
+          {
+            "label": "Loop",
+            "value": "False"
+          }
+        ]
+      },
+      {
+        "generation_id": "GxF0WSHLxUu3TDeDAaMK",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/GWXpNLYZyvPkxGOnDSpi/GxF0WSHLxUu3TDeDAaMK/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013844Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=c7c09f1729a9101810ebe5c342eecff6374ac29353e08102ed1e8eacbab2fcc0ca09114b5f5ae26bfeaadc741f1f3f89773f1d4b0a22a62d9852cac2ce2bfe82902dedf1d0ef6c625dec8f262700854e7f55eb56ba80ac5ce66dbebb547bf28e0ef7b4fc6a58506a42b50741ead84787fade6604e8c63d7314608ab2b2a1855db399928ffd1db7aa66a81aef4238cc8dbe683d69246e1287eefa67bae97d0503c5991b50d705ebee0e8913654efcf8e55984696e0a31ece5695f640d34f701fa76782b804ce857d0ae3d1ef9a102c31024b22ae0707914b2dba662e3e3af9849518925905657dd1ef054cfc0d2bb44aaacf3ef23c62a4e2ff47365e5b8db00b2",
+        "prompt": "Cinematic glass shimmer rising into one brilliant crystalline flash, followed by a deep clean bass impact and short airy decay. Magical but refined technological energy. No voice, choir, speech or music.",
+        "duration_secs": 3,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/GWXpNLYZyvPkxGOnDSpi/GxF0WSHLxUu3TDeDAaMK/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013844Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=c7c09f1729a9101810ebe5c342eecff6374ac29353e08102ed1e8eacbab2fcc0ca09114b5f5ae26bfeaadc741f1f3f89773f1d4b0a22a62d9852cac2ce2bfe82902dedf1d0ef6c625dec8f262700854e7f55eb56ba80ac5ce66dbebb547bf28e0ef7b4fc6a58506a42b50741ead84787fade6604e8c63d7314608ab2b2a1855db399928ffd1db7aa66a81aef4238cc8dbe683d69246e1287eefa67bae97d0503c5991b50d705ebee0e8913654efcf8e55984696e0a31ece5695f640d34f701fa76782b804ce857d0ae3d1ef9a102c31024b22ae0707914b2dba662e3e3af9849518925905657dd1ef054cfc0d2bb44aaacf3ef23c62a4e2ff47365e5b8db00b2",
+        "model_id": "eleven_text_to_sound_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "3.0"
+          },
+          {
+            "label": "Prompt influence",
+            "value": "0.8"
+          },
+          {
+            "label": "Loop",
+            "value": "False"
+          }
+        ]
+      },
+      {
+        "generation_id": "vAMw0quDT3JIOhV6XHVW",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/3fmSwjL2qkaaL90wcKbd/vAMw0quDT3JIOhV6XHVW/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013636Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=17a67bc7c063c5f30d3f9abd0ea54f5457e4102292da315d14dea0df507c58d0a1c2878377fb4d7e9258640a66973019d2726c55950921ec895da51899e09c1d6c5eaf216027c9561dd00ff92085faa86004fcee92adb3f3539e0230591c91bd47fe35d625f7f106ba8b8cf352bd8127691b8d23aad61bb6be5b074b7898dea8af7d0faa401bd50ad1a103c3a7edb4da11faac679bc41d7659220585f967812913a041b11c64b3eb14bbb8afa0af9178d512448766c7f2358b48e1c375b2a84a66bf0e934830f141714f9cd8198ad715c012182af42907b2395310b402c634881c90116642f549f00047f30250ecfd2fa714f477e7acbd2a0c4c309cd48d99c8",
+        "prompt": "Cinematic glass shimmer rising into one brilliant crystalline flash, followed by a deep clean bass impact and short airy decay. Magical but refined technological energy. No voice, choir, speech or music.",
+        "duration_secs": 3,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/3fmSwjL2qkaaL90wcKbd/vAMw0quDT3JIOhV6XHVW/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013636Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=17a67bc7c063c5f30d3f9abd0ea54f5457e4102292da315d14dea0df507c58d0a1c2878377fb4d7e9258640a66973019d2726c55950921ec895da51899e09c1d6c5eaf216027c9561dd00ff92085faa86004fcee92adb3f3539e0230591c91bd47fe35d625f7f106ba8b8cf352bd8127691b8d23aad61bb6be5b074b7898dea8af7d0faa401bd50ad1a103c3a7edb4da11faac679bc41d7659220585f967812913a041b11c64b3eb14bbb8afa0af9178d512448766c7f2358b48e1c375b2a84a66bf0e934830f141714f9cd8198ad715c012182af42907b2395310b402c634881c90116642f549f00047f30250ecfd2fa714f477e7acbd2a0c4c309cd48d99c8",
+        "model_id": "eleven_text_to_sound_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "3.0"
+          },
+          {
+            "label": "Prompt influence",
+            "value": "0.8"
+          },
+          {
+            "label": "Loop",
+            "value": "False"
+          }
+        ]
+      },
+      {
+        "generation_id": "E6606DJE6Gk5NDEXodHD",
+        "kind": "audio",
+        "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/cc1DeztYnYML7r60kWip/E6606DJE6Gk5NDEXodHD/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013631Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=3aa45bd97c665347e17b26915a75f700b17e5f2e6e3a2d16f5b7dd72eddd254c27ad450e1374813dbee612e280b69dd098984f6bcf30f1fe39b9d5aa225ea7cd523b725dbdc30d97f0a98268cb862db43fbdcfdfa2a4072a1b07302d98ea83f6e1c0e2a2695754cc1048f614f2dc3ff33a71819896488654150aec53c5d6c4ecfd829ccdc0c2b0389333382a01647290babafbfe62bcd67fa2931c925dbb450ebcc2785bbb23d0ed01f60e47376d6616bed4de4f3c060b46e09fade3e00800b9bb036fab213a89488f51d26d9bedfc6c6ee3555a0a696e8503e4b5b4ebaf1457f9d41a64b2d53338712bd3eb615835d845f8c6c7df7655bbfd2cc2e2c6a7eb59",
+        "prompt": "Cinematic glass shimmer rising into one brilliant crystalline flash, followed by a deep clean bass impact and short airy decay. Magical but refined technological energy. No voice, choir, speech or music.",
+        "duration_secs": 3,
+        "master_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/cc1DeztYnYML7r60kWip/E6606DJE6Gk5NDEXodHD/content.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T013631Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=3aa45bd97c665347e17b26915a75f700b17e5f2e6e3a2d16f5b7dd72eddd254c27ad450e1374813dbee612e280b69dd098984f6bcf30f1fe39b9d5aa225ea7cd523b725dbdc30d97f0a98268cb862db43fbdcfdfa2a4072a1b07302d98ea83f6e1c0e2a2695754cc1048f614f2dc3ff33a71819896488654150aec53c5d6c4ecfd829ccdc0c2b0389333382a01647290babafbfe62bcd67fa2931c925dbb450ebcc2785bbb23d0ed01f60e47376d6616bed4de4f3c060b46e09fade3e00800b9bb036fab213a89488f51d26d9bedfc6c6ee3555a0a696e8503e4b5b4ebaf1457f9d41a64b2d53338712bd3eb615835d845f8c6c7df7655bbfd2cc2e2c6a7eb59",
+        "model_id": "eleven_text_to_sound_v2",
+        "settings": [
+          {
+            "label": "Duration seconds",
+            "value": "3.0"
+          },
+          {
+            "label": "Prompt influence",
+            "value": "0.8"
+          },
+          {
+            "label": "Loop",
+            "value": "False"
+          }
+        ]
+      }
+    ]
+  }
+}

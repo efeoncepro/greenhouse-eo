@@ -1,0 +1,28 @@
+{
+  "generatedAt": "2026-09-24T08:53:09.524Z",
+  "paidCalls": 0,
+  "scope": "Only post-aircraft titles and closing graphics. No background, camera, UI or aircraft generation.",
+  "assets": {
+    "eo": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/kit/refs/logo-negative.svg",
+      "sha256": "f221fc925c15cddad307a81362a0ec948e1b850fc6679a49a1bc88bad2eb6b3f"
+    },
+    "sky": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/kit/refs/sky-white.svg",
+      "sha256": "808513ef04ba0ddfc603822efa753d7a037af26284cf14514b710d313e87f16a"
+    },
+    "bubble": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/kit/refs/url-lum.svg",
+      "sha256": "a790de41e7140f9e9f33c5b14e0f43556e4813f3afffe8614d9f8a19f1383dc1"
+    },
+    "canonical": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
+      "sha256": "a790de41e7140f9e9f33c5b14e0f43556e4813f3afffe8614d9f8a19f1383dc1"
+    },
+    "background": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/cielo/C1-b.png",
+      "sha256": "3b411ee2cc9263dd4e1ef6a83f58a27a960a1da5993c64d5978e25ff4ed61b98"
+    }
+  },
+  "urlBubbleCanonicalMatch": true
+}

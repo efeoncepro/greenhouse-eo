@@ -1,0 +1,38 @@
+[
+  {
+    "name": "blue",
+    "method": "non-separable-luminosity",
+    "backdrop": "composed-master-before-url-bubble",
+    "opacity": 0.72,
+    "region": {
+      "left": 230,
+      "top": 1215,
+      "width": 620,
+      "height": 122
+    },
+    "changedChannels": 63951,
+    "maxChannelDelta": 84,
+    "visible": true,
+    "comparedChannels": 64200,
+    "meanChannelError": 2.127803738317757,
+    "maxChannelError": 19
+  },
+  {
+    "name": "purple",
+    "method": "non-separable-luminosity",
+    "backdrop": "composed-master-before-url-bubble",
+    "opacity": 0.72,
+    "region": {
+      "left": 230,
+      "top": 1215,
+      "width": 620,
+      "height": 122
+    },
+    "changedChannels": 63189,
+    "maxChannelDelta": 63,
+    "visible": true,
+    "comparedChannels": 63345,
+    "meanChannelError": 1.558939142789486,
+    "maxChannelError": 14
+  }
+]

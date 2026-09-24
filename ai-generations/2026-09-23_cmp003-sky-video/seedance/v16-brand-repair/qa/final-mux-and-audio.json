@@ -1,0 +1,17 @@
+{
+  "picturePayloadUnchangedByAudioMux": true,
+  "videoHash": "SHA256=69825873df8e5307be28f0e929225bafdb97bc8c5fee6bcc79aaa9ad26ea21ee",
+  "audioMeasurement": {
+    "input_i": "-16.03",
+    "input_tp": "-1.38",
+    "input_lra": "6.80",
+    "input_thresh": "-26.93",
+    "output_i": "-16.09",
+    "output_tp": "-1.61",
+    "output_lra": "3.00",
+    "output_thresh": "-26.65",
+    "normalization_type": "dynamic",
+    "target_offset": "0.09"
+  },
+  "perceptualAudioReview": "not performed; audio perception unavailable"
+}

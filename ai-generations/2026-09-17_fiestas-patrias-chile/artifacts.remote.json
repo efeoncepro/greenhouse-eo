@@ -1,0 +1,89 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:43:57.935Z",
+  "run": "ai-generations/2026-09-17_fiestas-patrias-chile",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-17_fiestas-patrias-chile",
+  "totalBytes": 28939722,
+  "fileCount": 13,
+  "files": [
+    {
+      "path": "contact-v01.png",
+      "sizeBytes": 2404356,
+      "sha256": "8852c7216695bedbb5d319984e2026446ce42dff902f85aa709ef9ced27c5f14",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_fiestas-patrias-chile/contact-v01.png"
+    },
+    {
+      "path": "entrega/fiestas-patrias-chile-1-volantin-16x9-v02.png",
+      "sizeBytes": 2104697,
+      "sha256": "d3abd6e69d1e7cbe2d824505fe37a0424439efca4e2e99cc3f8511cb2c58669f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_fiestas-patrias-chile/entrega/fiestas-patrias-chile-1-volantin-16x9-v02.png"
+    },
+    {
+      "path": "entrega/fiestas-patrias-chile-1-volantin-4x5-v02.png",
+      "sizeBytes": 2351252,
+      "sha256": "d8d23c4ef641458523f18e0d9dbf128b0460539ca0583f7e12bf61d7602eae90",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_fiestas-patrias-chile/entrega/fiestas-patrias-chile-1-volantin-4x5-v02.png"
+    },
+    {
+      "path": "entrega/fiestas-patrias-chile-1-volantin-v01.png",
+      "sizeBytes": 2244143,
+      "sha256": "71e205258cdd7ee32224d60e3d19cba20eca4c137ef7e0eacf294678c420c72e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_fiestas-patrias-chile/entrega/fiestas-patrias-chile-1-volantin-v01.png"
+    },
+    {
+      "path": "entrega/fiestas-patrias-chile-3-panuelo-v01.png",
+      "sizeBytes": 2707069,
+      "sha256": "5d3d2e05dbc80c1a1eb25044e18337a19363ac841f4e3ec69845739dd3e21865",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_fiestas-patrias-chile/entrega/fiestas-patrias-chile-3-panuelo-v01.png"
+    },
+    {
+      "path": "entrega/fiestas-patrias-chile-4-fonda-v01.png",
+      "sizeBytes": 2992949,
+      "sha256": "bc11d1cd877c6b6eeafd55df1044c9828afab7f5878667c022ea115277685c56",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_fiestas-patrias-chile/entrega/fiestas-patrias-chile-4-fonda-v01.png"
+    },
+    {
+      "path": "plates/a-volantin-h-v02.png",
+      "sizeBytes": 1873121,
+      "sha256": "cf4fbdf33548d1c99fa5744f4a93bb79651ef75422ac6815a780c1c481773541",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_fiestas-patrias-chile/plates/a-volantin-h-v02.png"
+    },
+    {
+      "path": "plates/a-volantin-h-v03.png",
+      "sizeBytes": 1908151,
+      "sha256": "3fb87a47865e3eb3f389f2f1a5adc805ff14c25e40d9d75d894857760319cf47",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_fiestas-patrias-chile/plates/a-volantin-h-v03.png"
+    },
+    {
+      "path": "plates/a-volantin-v02.png",
+      "sizeBytes": 1945173,
+      "sha256": "241492fe957134089b0c30ac71376add40f95ec6affea35f378d2717f33eeab0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_fiestas-patrias-chile/plates/a-volantin-v02.png"
+    },
+    {
+      "path": "plates/a-volantin-v03.png",
+      "sizeBytes": 1968427,
+      "sha256": "ae5bef7e497014c27c6ecb4051e533f1390142a783e8ecabab662ffab64c7d66",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_fiestas-patrias-chile/plates/a-volantin-v03.png"
+    },
+    {
+      "path": "plates/a-volantin.png",
+      "sizeBytes": 1945305,
+      "sha256": "0de6506c3ee5ded7a14d937659e1ff1310690773b1dfc295f60810717333da9f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_fiestas-patrias-chile/plates/a-volantin.png"
+    },
+    {
+      "path": "plates/b-panuelo.png",
+      "sizeBytes": 1844706,
+      "sha256": "4a474a7f50b99f05ebab896c60a463c38cf4b80f95aa2ed108a7cdc1cadca172",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_fiestas-patrias-chile/plates/b-panuelo.png"
+    },
+    {
+      "path": "plates/c-fonda.png",
+      "sizeBytes": 2650373,
+      "sha256": "9e686453f50cf87d3d4af311d6ac1bf0a35676d6e714cbb90a8552f507b9eedb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-17_fiestas-patrias-chile/plates/c-fonda.png"
+    }
+  ]
+}

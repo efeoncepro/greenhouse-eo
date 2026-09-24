@@ -1,0 +1,28 @@
+{
+  "reviewedAtUtc": "2026-09-24T12:49:25.440167+00:00",
+  "decision": "accept_restoration_for_composition",
+  "coverage": {
+    "sampledWholeFilmFrames": 52,
+    "denseBrandFrames": 24,
+    "densePassFrames": 24,
+    "fullSizeFrames": [
+      "3.50",
+      "11.75"
+    ],
+    "numericalComparisonFrames": 624
+  },
+  "findings": [
+    "Search/results/chat sequence and geometry remain consistent with input montage",
+    "SKY activation retains continuous luminous expansion into aircraft",
+    "Close aircraft pass and Omni occlusion join remain in place",
+    "Aircraft windows, cockpit and wing shapes show sharper edges without observed added parts in inspected frames",
+    "Moving cloud reserve remains free of text, with blue reveal already in plate",
+    "No additional timing shifts indicated by 624-frame comparison (temporal step correlation 0.999878)"
+  ],
+  "limitations": [
+    "Sampled human visual review, not perceptual playback certification",
+    "Restored/upscaled detail from existing 1080p edit; source motion blur and generative imperfections remain",
+    "Audio perception unavailable; no claim of listening or absence-of-voice certification"
+  ],
+  "next": "Compose approved overlays and inspect actual final exports"
+}

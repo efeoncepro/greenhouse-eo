@@ -15,7 +15,7 @@
 | Un paquete de stills ficticios define tono/campaña, pero cada microescena puede interpretarse; no hay texto ni objeto diegético que deba ser exacto | **Gemini Omni image-to-video** | Convierte cada key visual en un beat vivo y breve; funciona especialmente bien para UGC, Reel, Historia y Creador si se describe la acción humana concreta. |
 | Un key visual existente es la verdad del set y hace falta una **toma nueva**: composición, producto/practical, color y profundidad deben seguir reconocibles | **Seedance 2.x image/reference-to-video** (`pnpm ai:fal`) | Fallback de producción para ángulo, acción o continuidad nuevos preservando mundo/objeto. Sigue siendo candidato técnico y debe pasar actuación, texto y sonido. |
 | La toma necesita cámara, blocking o timing espacial preplaneados; el look puede reinterpretarse | **Seedance reference-to-video** con playblast/viewport **exportado** + keyframe de look | El modelo puede tomar video e imagen como referencias; requiere un endpoint que exponga ambos y una prueba aislada. Capacidad investigada, no receta validada. |
-| Falta una acción/objeto que no existe y se necesita explorar o editar hablando sobre una escena que tolera reinterpretación | **Gemini Omni edit/generation** | Su valor diferencial es el loop conversacional, no una promesa de fidelidad frame-perfect. |
+| Falta una acción/objeto que no existe y se necesita explorar o editar hablando sobre una escena que tolera reinterpretación | **Gemini Omni edit/generation** | Permite instruir una edición sobre MP4. La cadena stateful no está verificada en la CLI local; no prometer fidelidad por cuadro. |
 | Sólo cambia orden, pausa, trim, freeze, grade o copy no diegético exacto | **Post determinista / mograph** | No gastar generación ni fingir física que no existe en los frames. |
 | El clip tiene crop, pacing, safe-zone, texto/logo, captions, grade, foley, mezcla o loudness defectuosos | **Post determinista / audio post** | Son defectos editoriales; Seedance no es un reparador de finish. |
 
@@ -33,15 +33,15 @@ Etiquetas: [verificado] corrida real 2026-09-16 · [oficial] fal/fabricante · [
 | Necesidad | Primera mano | Alternativa | Lo que decide |
 | --- | --- | --- | --- |
 | **Explorar** movimiento/actuación barato y rápido | `h3turbo-t2v`/`-i2v` a 480P (latencia 2,7–8 s [verificado]) | `flux3-*-draft` → `flux3-enhance` sólo del elegido · `seedance20-mini-*` a 480p | Subir de tier sólo con el take aprobado; no asumir que Turbo rinde como Max (diferencia técnica: sin dato) |
-| **Hero** de máxima calidad | `seedance25-*` (lidera OpenArt en adherencia, estética, física y consistencia [tercero 2026-09-16]) | `h3max-i2v` (#1 imagen a video con audio en Artificial Analysis [tercero 2026-09-16]) · `wan3-*` | Los rankings **no coinciden**: probar con un take corto. El 1080p de Seedance 2.5 está **sin verificar** (fuentes contradictorias; podría ser reescalado) |
-| **Toma larga** (> 15 s) | `seedance25-*` (≤ 30 s, toma continua) | `wan3-*` (≤ 30 s o `auto`; un job de 30 s **puede cortar** entre encuadres [tercero]) · `flux3-*` (≤ 20 s) | Seedance 2.5 se vende como toma sin cortes; para multi-shot con cortes, Wan o Flux 3 |
+| **Hero** de máxima calidad | `seedance25-*` (lidera OpenArt en adherencia, estética, física y consistencia [tercero 2026-09-16]) | `h3max-i2v` (#1 imagen a video con audio en Artificial Analysis [tercero 2026-09-16]) · `wan3-*` | Los rankings **no coinciden**: probar con un take corto. SKY V11 verificó salida 1080×1920/24 fps el 2026-09-24; dimensiones verificadas no demuestran detalle nativo |
+| **Toma larga** (> 15 s) | `seedance25-*` (≤ 30 s por solicitud; continuidad a revisar) | `wan3-*` (≤ 30 s o `auto`; un job de 30 s **puede cortar** entre encuadres [tercero]) · `flux3-*` (≤ 20 s) | Una solicitud de 30 s no garantiza un plano continuo ni respeta automáticamente una secuencia multi-shot. Fijar y revisar ambos contratos |
 | **4K** | `seedance20-*` base (3840×2160 [verificado]; nativo o reescalado: sin dato) | `h3-*` base 4K | H3 base 2K/4K son **reescalados desde 768P** [oficial fal]; Flux 3 4K sólo en BFL directo (no conectado; fal llega a 1080p) |
 | **Cámara** precisa sobre una imagen fija | `h3max-camera` (≤ 12 keyframes; empezar y terminar en el encuadre original [oficial]) | — | La escena queda congelada: si el sujeto debe actuar, no sirve |
 | **Inicio y fin** exactos | `flux3-flf` (ambos obligatorios) | `wan3-i2v --end-image` · `seedance25-i2v --end-image` · `h3*-i2v --end-image` | Flux 3 flf no acepta `auto` |
 | Pasar por **varios cuadros clave** | `flux3-keyframes` (1–10 `--keyframe img@frame_index`) | — | fal expone índice de cuadro; timestamps en segundos sólo en BFL directo |
-| **Editar** un video **sin** personas ni marcas | `seedance25-r2v --task editing --video` | `flux3-edit` | Filtro de ByteDance cobra el rechazo |
-| **Editar** un video **con** personas o marcas | `flux3-edit` (USD 0,03/s, conserva movimiento y encuadre; salida 720p) | — | Si conserva el audio: sin dato |
-| **Extender** un video | sin personas/marcas: `seedance25-r2v --task extension --video` | con personas: `flux3-extend` | Flux 3 extend usa **hasta 4 s del video y su audio** como contexto [oficial BFL] → origen mudo = 422; entrega sólo la continuación |
+| **Editar** un video con referencias admisibles por la ruta vigente | `seedance25-r2v --task editing --video` | `flux3-edit` | Filtro de ByteDance cobra el rechazo |
+| **Editar** un video con referencias que otra ruta rechazó | `flux3-edit` (USD 0,03/s, conserva movimiento y encuadre; salida 720p) | — | Si conserva el audio: sin dato |
+| **Extender** un video | `seedance25-r2v --task extension --video` según admisibilidad de la ruta | `flux3-extend` según contrato | Flux 3 extend usa **hasta 4 s del video y su audio** como contexto [oficial BFL] → origen mudo = 422; entrega sólo la continuación |
 | **Muchas referencias** multimodales | `seedance25-r2v` (30 img / 10 video / 10 audio) | `wan3-r2v` (10/5/5) · `h3*-r2v` (9/3/3) · `seedance20-*-r2v` (9/3/3, video sólo guía) | Con videos de referencia, Seedance 2.5 r2v cobra también la duración del video de entrada [oficial] |
 | Video basado en una **web o documento** | `wan3-r2v --thinking --web-url <url>` / `--file <doc>` | — | Único conectado; exige prompt con guion (sin guion salió animación de la portada [verificado]). `--file`: sin corrida real |
 | **Consistencia** de personaje/producto entre tomas | referencias `r2v` (Seedance / Wan / H3) | LoRA de H3 (sin verificar, postergada [decisión]) · Kling `elements` (no conectado) · Higgsfield Soul ID (otro carril) | Anclar siempre al mismo canónico |
@@ -55,6 +55,15 @@ provisional si hay diseño sonoro. Detalle en `audio-studio/SOURCES.md`.
 en NLE para no introducir judder al mezclar motores.
 
 ## Costo por resolución: fal cobra por escalón
+
+**Corrección SKY, 2026-09-24:** las coincidencias de pruebas cortas abajo no validan una fórmula universal.
+V11 fue estimado en USD 23,88204, autorizado hasta USD 25 y facturado USD 34,162558 por request ID.
+`--max-usd` es un control sobre la estimación local, **no un techo de facturación del proveedor**.
+Incluir videos de entrada y salida, resolución efectiva, variantes y tarifa de esa ruta; no extrapolar
+descuentos. Ante diferencia no reconciliada, detener gasto. Ver
+[lecciones y fallas](../companions/video-lessons-and-failure-modes.md). Las tablas siguientes son historial
+fechado; verificar el precio actual antes de otra operación.
+
 
 🔴 **El precio del registro (`fal-capabilities.ts`, API de pricing) es el escalón MÁS BAJO**, no el de la resolución
 por defecto del proveedor. Presupuesta por la resolución que realmente pides y confirma con `pnpm ai:fal --balance`
@@ -148,11 +157,11 @@ La duración mínima es **4 s** en todos (el registro decía 1 hasta 2026-09-16;
   `seedance20-t2v` (4K), `seedance20-i2v`, `seedance20-r2v`, los 9 `seedance20-{fast,mini,us}-{t2v,i2v,r2v}` y
   `seedance25-r2v` con `--task reference`, `editing` y `extension`.
 - **Costo:** la equivalencia de tokens de OpenArt subestima ~2× y **no sirve para presupuestar**; la fórmula de fal
-  (`alto × ancho × segundos × 24 / 1024`, ver §Costo por resolución) sí calzó con lo medido. Referencias medidas: 3 corridas `seedance20-fast` de 4 s a 480p ≈ USD 1,37; 3 `mini`
+  (`alto × ancho × segundos × 24 / 1024`, ver §Costo por resolución) calzó sólo en las pruebas cortas citadas; no generalizar a SKY V11 ni a R2V con entradas. Referencias medidas: 3 corridas `seedance20-fast` de 4 s a 480p ≈ USD 1,37; 3 `mini`
   ≈ USD 0,85. La tanda completa de verificación (17 corridas, incluidas 3 rechazadas) costó USD 7,71.
 - **Filtro de contenido de ByteDance:** rechaza **después de encolar, y se cobra** (422 `content_policy_violation`,
   `partner_validation_failed`). Casos medidos: referencia con el isotipo de Efeonce → "potential copyright violation";
-  video con una persona → "likenesses of real people". No mandes marcas ni personas identificables a Seedance.
+  video con una persona → "likenesses of real people". Estos rechazos son evidencia de esas rutas/fechas, no una prohibición universal inferida: SKY posterior produjo marca con Seedance. Verifica políticas y derechos de la ruta concreta; no evadas un rechazo ni repitas a ciegas.
 
 **Criterio de elección:** toma larga (más de 15 s) → **2.5**; entrega en **4K** → **2.0 base**; exploración barata
 de movimiento o actuación → **2.0 `mini`/`fast` a 480p**, y subir de tier sólo con el take aprobado. Catálogo
@@ -303,7 +312,7 @@ Contrato (leído del OpenAPI 2026-09-16, igual en base y Prime; el CLI valida an
 **Cuándo elegir Wan 3.0:** toma de **hasta 30 s con duración decidida por el modelo** (`auto`); **video explicativo
 basado en una web o un documento** (`--web-url`/`--file` + `--thinking`), que ningún otro motor conectado ofrece;
 **R2V que mezcla imagen, video y audio** con topes intermedios (10/5/5). Para 4K sigue Seedance 2.0 base o H3 base
-(Wan tope 1080p); para edición/extensión, Flux 3 o Seedance 2.5 (esta última sólo sin personas ni marcas). El #1 de OpenArt en edición **no se traduce** a edición
+(Wan tope 1080p); para edición/extensión, Flux 3 o Seedance 2.5 (ver admisibilidad y rechazos observados por ruta/fecha). El #1 de OpenArt en edición **no se traduce** a edición
 operable acá: Wan 3.0 no tiene endpoint de edición en fal.
 
 ## Video a video: qué motor
@@ -320,11 +329,7 @@ opciones con estado distinto:
 | Usar un video sólo como **guía** (cámara, blocking, ritmo) | `seedance20-*-r2v` (se cita como `@Video1`) o `seedance25-r2v --task reference` | Endpoints verificados en real 2026-09-16 (`reference` incluido) | Seedance 2.0 no edita ni extiende: sólo condiciona la generación nueva |
 | Usar un video como **referencia** junto a imágenes y audio | `wan3-r2v` / `wan3prime-r2v` (se cita como `Video 1`) | Endpoint **verificado** en real 2026-09-16; topes leídos del OpenAPI | Hasta 5 videos ≤ 15 s en total, ≥ 16 fps; genera una toma nueva, no edita el clip |
 
-**Regla del filtro:** Seedance 2.5 `editing`/`extension` ya está verificado, pero el filtro de ByteDance rechaza
-**después de encolar y cobra** el material con **marcas** o **personas reales identificables**. Úsalo sólo con
-material sin personas ni marcas (paisaje, producto genérico, ambiente); con personas, la mano es **Flux 3**
-(`flux3-edit`/`flux3-extend`) o **Wan 3.0** (r2v, toma nueva). Wan 3.0 **no edita** en fal (la edición de Wan es la 2.7, no conectada), aunque rankee #1 en
-Video Editing en OpenArt.
+**Rechazos observados:** pruebas2026-09-16 devolvieron rechazo cobrado tras encolar algunas referencias de marcas/personas. Es evidencia específica, no veto universal; SKY posterior produjo marca. Verifica políticas/derechos del endpoint y no evadas ni repitas un rechazo. Flux3 edit/extend o Wan3 R2V tienen contratos distintos: Wan3 no exponía edición en fal en esa revisión, aunque tuviera ranking de edición.
 
 ## Candidatos evaluados, no conectados (revisión 2026-09-16)
 
@@ -343,7 +348,7 @@ Estos datos de Kling vía fal son un carril distinto de Kling vía Higgsfield (M
 La CLI Cloud separa `text|image|frames|reference|edit|extend`; los seis modos completaron un canary técnico
 en `efeonce-group` a 360p/16:9/3 s (extensión: 6 s acumulados) el 2026-09-24. `edit` recibe video fuente
 e imágenes opcionales; no implica edición conversacional stateful. Ni 720p/1080p/4K ni 9:16 ni la
-fidelidad fina, C2PA o factura real se verificaron en esa prueba. `--estimate` no envía; `--yes` autoriza
+fidelidad fina, C2PA o factura real se verificaron en esa prueba. SKY posterior sí verificó edición1080×1920/24fps: piloto9,5s rechazado y ventana6,5s integrada; ver companion de posproducción. Esa evidencia no certifica4K ni preservación general. `--estimate` no envía; `--yes` autoriza
 el POST y el interaction ID permite `--status`/`--wait` sin otro envío. Esta CLI no modifica Globe.
 
 ## Previs 3D → Seedance: capacidad investigada, no evidencia interna

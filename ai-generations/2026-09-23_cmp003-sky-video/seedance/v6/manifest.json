@@ -1,0 +1,46 @@
+{
+  "request_id": "01a0d110-aa66-7542-b5c0-c257696cf221",
+  "model": "bytedance/seedance-2.5/reference-to-video",
+  "duration": 30,
+  "resolution": "720p",
+  "aspect_ratio": "9:16",
+  "generate_audio": false,
+  "files": [
+    {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/sky-v6.prompt.txt",
+      "sha256": "eb8086e8e73868b34b07162f8c21533061018934bb03edb7dbb5a00cc54e8cee"
+    },
+    {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/references.json",
+      "sha256": "d3f0d7b2f9931bb9824f509ddf61bfc5e77f951ed590e42efd33153d4e9e1bb4"
+    },
+    {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/refs/minimax-ui-camera-motion-only.mp4",
+      "sha256": "03e3b160bc57ef315a54ca2a02080a16744077a089dc9b935ed5cd88e39d3540"
+    },
+    {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/audio/ui.mp3",
+      "sha256": "93a79b1cc038be2f80f728d00270b3c9e0595bcc87da645d43eefbb7bc2db3a8"
+    },
+    {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/audio/jet.mp3",
+      "sha256": "bc11a1d639eefba2ab3c28ad00047fc2df96f527227de397bbbad414c2d5ab43"
+    },
+    {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/audio/spark.mp3",
+      "sha256": "f7e77fab00281b5be7284ea3da77833c14ab0bd7d524d6ec755ed041b3aee7a3"
+    },
+    {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/audio/music.mp3",
+      "sha256": "1dd437294fc6eb2345141e07315f8dc18e8ffe82d6c227726e79cff99ff05d7e"
+    }
+  ],
+  "corrective_edit": {
+    "request_id": "01a0d11d-3a47-7db0-a919-0f6d1a1bc1d2",
+    "task": "editing",
+    "scope": "entire 30-second film",
+    "generate_audio": false,
+    "prompt": "correct-full-film.prompt.txt",
+    "reason": "Duplicate search sequences and absent user-only beat; excessive flight duration and weak typography camera moves"
+  }
+}

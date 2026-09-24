@@ -1,0 +1,65 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:28:22.225Z",
+  "run": "ai-generations/2026-07-17_anam-revops-cover-v4-negative-reference",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-17_anam-revops-cover-v4-negative-reference",
+  "totalBytes": 10041615,
+  "fileCount": 9,
+  "files": [
+    {
+      "path": "delivery/anam-revops-chart-sculpture-og-1440x757-v4.jpg",
+      "sizeBytes": 52485,
+      "sha256": "87b10cf16450652913dd378621b194de7298288b1ce52487d38a638e4bd7898c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v4-negative-reference/delivery/anam-revops-chart-sculpture-og-1440x757-v4.jpg"
+    },
+    {
+      "path": "delivery/anam-revops-chart-sculpture-web-1600-v4.webp",
+      "sizeBytes": 38316,
+      "sha256": "4bb85b9de1cbed083116c938eab9ed68a4ff6cc2e18ead0b366ca542be288777",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v4-negative-reference/delivery/anam-revops-chart-sculpture-web-1600-v4.webp"
+    },
+    {
+      "path": "refs/01-positive-chart-sculpture-v3.png",
+      "sizeBytes": 2358738,
+      "sha256": "4634f0b7b01eaf719d27ddec32a8fe7011ec233edf18b589cdbfcfc57732d361",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v4-negative-reference/refs/01-positive-chart-sculpture-v3.png"
+    },
+    {
+      "path": "refs/02-negative-rejected-dashboard-v2.png",
+      "sizeBytes": 2325428,
+      "sha256": "6a0890df700ac987ca4ee62ef9c47235fe94f763dff3ea91d6f6c26049671780",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v4-negative-reference/refs/02-negative-rejected-dashboard-v2.png"
+    },
+    {
+      "path": "refs/03-positive-hubspot-bars.png",
+      "sizeBytes": 97583,
+      "sha256": "cf212c0ede6c7340110207e6bb295b4936c3f1200c13ef0a32b3f752e21b2b7d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v4-negative-reference/refs/03-positive-hubspot-bars.png"
+    },
+    {
+      "path": "refs/04-positive-efeonce-data-discipline.png",
+      "sizeBytes": 122660,
+      "sha256": "b43ca9d3e37e6e20d1520b85705765ed1a481b439449465576733dc17fb24253",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v4-negative-reference/refs/04-positive-efeonce-data-discipline.png"
+    },
+    {
+      "path": "review/anam-revops-chart-sculpture-square-crop-v4.png",
+      "sizeBytes": 1177718,
+      "sha256": "60f81a05a168b024018035ba16ec0d15dfa5729b1c7656ab5c31f3d79e2d680f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v4-negative-reference/review/anam-revops-chart-sculpture-square-crop-v4.png"
+    },
+    {
+      "path": "source/anam-revops-chart-sculpture-generated-v4.png",
+      "sizeBytes": 2519312,
+      "sha256": "e3e1660fe885c00965807d9334e3c8cb9f7536a029b5fff106cb28dccb8b22ec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v4-negative-reference/source/anam-revops-chart-sculpture-generated-v4.png"
+    },
+    {
+      "path": "source/anam-revops-chart-sculpture-master-v4.png",
+      "sizeBytes": 1349375,
+      "sha256": "db2cb70ffd99f4ffe0139461feb42881daacc6d6c7a50209188e8dbcc2d9f3c9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v4-negative-reference/source/anam-revops-chart-sculpture-master-v4.png"
+    }
+  ]
+}

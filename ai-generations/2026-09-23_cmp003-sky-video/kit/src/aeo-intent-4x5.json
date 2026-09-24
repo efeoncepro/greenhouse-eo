@@ -1,0 +1,22 @@
+{
+  "contract": "efeonce.aeo-conversation-composition.candidate.v1",
+  "provider": "chatgpt",
+  "surface": "web-desktop",
+  "locale": "es-CL",
+  "campaignBrand": "Efeonce",
+  "querySubject": "SKY Airline",
+  "provenance": { "mode": "editorial-sample" },
+  "turns": [
+    { "id": "1", "question": "¿A dónde viajar en Sudamérica?",
+      "answer": "Tres ideas: Camboriú, por sus playas [[1]]; Mendoza, por sus bodegas [[2]]; y Puerto Fuy, por sus lagos y volcanes [[3]]." }
+  ],
+  "sources": [
+    { "id": 1, "turnId": "1", "role": "cited", "publisher": "SKY Airline", "title": "Balneário Camboriú: qué hacer, cómo llegar y por qué enamora a los chilenos", "url": "https://www.skyairline.com/blog/camboriu" },
+    { "id": 2, "turnId": "1", "role": "cited", "publisher": "SKY Airline", "title": "¿Cuáles son las mejores bodegas en Mendoza?", "url": "https://www.skyairline.com/blog/bodegas-en-mendoza" },
+    { "id": 3, "turnId": "1", "role": "cited", "publisher": "SKY Airline", "title": "Puerto Fuy, un destino escondido en el corazón de los Andes", "url": "https://www.skyairline.com/blog/puerto-fuy" }
+  ],
+  "composer": { "text": "", "search": false },
+  "state": "cited",
+  "modules": ["app", "user", "answer", "citation", "composer"],
+  "format": "4x5"
+}

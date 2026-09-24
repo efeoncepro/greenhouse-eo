@@ -1,0 +1,118 @@
+{
+  "schema": "efeonce.aeo-composition-output.candidate.v1",
+  "provider": "chatgpt",
+  "surface": "web-desktop",
+  "locale": "es-CL",
+  "campaignBrand": "Efeonce",
+  "querySubject": "SKY Airline",
+  "provenance": {
+    "mode": "editorial-sample"
+  },
+  "state": "cited",
+  "format": "9x16",
+  "targets": {},
+  "turns": [
+    {
+      "id": "1",
+      "question": "¿A dónde viajar en Sudamérica?",
+      "answer": "Tres ideas: Camboriú, por sus playas [[1]]; Mendoza, por sus bodegas [[2]]; y Puerto Fuy, por sus lagos y volcanes [[3]].",
+      "citedSourceIds": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": 1,
+      "turnId": "1",
+      "role": "cited",
+      "publisher": "SKY Airline",
+      "title": "Balneário Camboriú: qué hacer, cómo llegar y por qué enamora a los chilenos",
+      "url": "https://www.skyairline.com/blog/camboriu",
+      "visibleHost": "skyairline.com",
+      "favicon": null
+    },
+    {
+      "id": 2,
+      "turnId": "1",
+      "role": "cited",
+      "publisher": "SKY Airline",
+      "title": "¿Cuáles son las mejores bodegas en Mendoza?",
+      "url": "https://www.skyairline.com/blog/bodegas-en-mendoza",
+      "visibleHost": "skyairline.com",
+      "favicon": null
+    },
+    {
+      "id": 3,
+      "turnId": "1",
+      "role": "cited",
+      "publisher": "SKY Airline",
+      "title": "Puerto Fuy, un destino escondido en el corazón de los Andes",
+      "url": "https://www.skyairline.com/blog/puerto-fuy",
+      "visibleHost": "skyairline.com",
+      "favicon": null
+    }
+  ],
+  "outputs": [
+    {
+      "scope": "app",
+      "file": "chatgpt-app-9x16.svg",
+      "target": null,
+      "sourceIds": [],
+      "sha256": "152981e9d8bc124e76ad5642fcb0e44bdd3fb33907821c59b9d1882a7ff9f754",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "scope": "user",
+      "file": "chatgpt-user-9x16.svg",
+      "target": {
+        "turnId": "1"
+      },
+      "sourceIds": [],
+      "sha256": "3e3546f914d9cff21c525a12f783cfcfb0857a86f7b8d01f2383e8fbaf683f84",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "scope": "answer",
+      "file": "chatgpt-answer-9x16.svg",
+      "target": {
+        "turnId": "1"
+      },
+      "sourceIds": [
+        1,
+        2,
+        3
+      ],
+      "sha256": "ff3b69e3d322f5156be7dd9755a7a0421dc7e6cca9e02f3b25b76056ad9cf391",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "scope": "citation",
+      "file": "chatgpt-citation-9x16.svg",
+      "target": {
+        "turnId": "1",
+        "citationIndex": 1
+      },
+      "sourceIds": [
+        1
+      ],
+      "sha256": "66218cc2a122069254f1e3c93d745c4356a921a910924301a860dd103d5b4b96",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "scope": "composer",
+      "file": "chatgpt-composer-9x16.svg",
+      "target": null,
+      "sourceIds": [],
+      "sha256": "a6163568551aacec5eac6049108e1ef8c98a52271922c4ec406ced923336feae",
+      "width": 1080,
+      "height": 1920
+    }
+  ]
+}

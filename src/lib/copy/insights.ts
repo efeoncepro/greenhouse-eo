@@ -107,6 +107,9 @@ export const GH_INSIGHTS = {
     evidenceAbsent: 'Ausente',
     unissued: 'Sin emitir',
     executiveSummary: 'Resumen ejecutivo',
+    indexTitle: 'Índice',
+    indexContinued: 'Índice (continuación)',
+    indexPageColumn: 'Pág.',
     // El resumen toma una afirmación por módulo: decir «no hay más» era falso cuando el capítulo traía otras.
     summaryInChapters: 'El detalle de cada módulo, con todas sus cifras, está en los capítulos siguientes.',
     chapterInFigures: 'Las demás cifras de este capítulo están en sus figuras.',

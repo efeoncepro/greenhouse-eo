@@ -1,0 +1,5 @@
+file '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v12-recovery/segments/01-search.mp4'
+file '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v12-recovery/segments/02-chat.mp4'
+file '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v12-recovery/segments/03-bloom.mp4'
+file '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v12-recovery/segments/04-flight-sky.mp4'
+file '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v12-recovery/segments/05-closing.mp4'

@@ -1,0 +1,16 @@
+{
+  "stage": "final AAC readback extracted from delivered MP4",
+  "checkedAt": "2026-09-24T08:23:43.169Z",
+  "flow_id": "c1xwy5PjHyOFVHtKgBAy",
+  "session_ids": [
+    "XrDwPnSdQYBeg5LSGpcW"
+  ],
+  "transcripts": [
+    {
+      "text": "",
+      "generation_id": "XGTiAkjnyCReUdZddUdb",
+      "language_code": "eng"
+    }
+  ],
+  "all_completed": true
+}

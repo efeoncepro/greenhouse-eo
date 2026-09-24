@@ -1,0 +1,26 @@
+{
+  "id": "design-context-lab-cover-v1",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "julio",
+      "vista": "45-izq"
+    },
+    {
+      "persona": "nexa",
+      "vista": "cuerpo-tresquartos"
+    }
+  ],
+  "escena": "SCENE (Efeonce creative studio, Santiago, late afternoon): a composed editorial photograph, not an illustration or cartoon. Julio is the creative director acting as the professor at the LEFT of a real worktable; Nexa is his AI creative partner at the RIGHT. They lean toward one shared experiment, looking at the work rather than the camera. Julio turns slightly toward the centre from the left; Nexa turns slightly toward the centre from the right. Preserve each person's real identity, facial features, skin texture, and distinct three-quarter body angle shown in the attached photographic references. Julio wears a warm-white cotton shirt under a graphite overshirt; Nexa wears a warm-white blouse under a light stone-grey jacket. No large navy blocks. The experiment is a shallow, hand-sized brushed-metal mixing vessel, physically plausible and integrated into the creative studio, not a fantasy cauldron. At the instant Julio lowers one small color proof into it, Nexa steadies a fan of real printed creative pieces beside the bowl: a contact sheet of campaign photography, a tactile color strip, and a marked-up composition proof. The pieces read as ingredients for a digital creative, with no readable text or legible screen UI. The proof catches a thin, real warm-orange reflection; no magical glow, floating papers, smoke, or decorative laboratory props. Natural azure-blue light appears only as a restrained reflection from studio glass, balanced by warm-neutral light and open shadows. The studio is clean and in operation, with real photographic equipment softly out of focus in the background. Three depth planes, precise material detail, graphic natural shadows, one clear visual idea. 50mm lens at f/2.8; medium-wide framing holds both people, their working hands and the vessel without enlarging the faces unnaturally. The upper third is clear, softly textured warm-grey studio wall for a later headline. No superhero costumes, cartoon people, franchise characters, logos, speech balloons, lettering, or comic bursts in the photograph; comic energy will come from the later editorial treatment, not from altering the photographic language.",
+  "lecho": {
+    "objeto": "the near edge of the matte-black camera monitor hood in the foreground",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the clear softly textured warm-grey studio wall across the upper third",
+      "tinta": "oscura"
+    }
+  }
+}

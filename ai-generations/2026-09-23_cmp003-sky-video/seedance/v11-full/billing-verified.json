@@ -1,0 +1,14 @@
+{
+  "verifiedAt": "2026-09-24T09:57:39.964070+00:00",
+  "method": "Computer Use; authenticated fal request-level billing table",
+  "url": "https://fal.ai/dashboard/usage-billing/usage/bytedance/seedance-2.5/reference-to-video?dateRange=current_month",
+  "requestId": "01a0d2c8-444a-7fd0-b606-5a2987148e87",
+  "authMethod": "Efeonce 2",
+  "quantityDisplayed": 1596.38,
+  "unitPriceUsdDisplayed": 0.0214,
+  "totalCostUsd": 34.162558,
+  "estimateUsd": 23.88204,
+  "budgetUsd": 25,
+  "overBudgetUsd": 9.162558,
+  "cause": "Unresolved discrepancy between public pricing estimate and billed quantity. No claim of concurrent spend or duplicate generation."
+}

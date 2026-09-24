@@ -67,6 +67,47 @@ describe('buildInsightReportPlanInput', () => {
     expect(input.slides.map(s => (s.slots as { pageFolio: string }).pageFolio)).toEqual(
       input.slides.map((_s, i) => String(i + 1))
     )
+    expect(input.slides[1]!.contentType).toBe('report-index')
+    expect((input.slides[1]!.slots as { indexEntries: { title: string; pageNumber: string }[] }).indexEntries).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ title: 'Visibilidad orgánica', pageNumber: '3' }),
+        expect.objectContaining({ title: 'Límites y metodología', pageNumber: '4' })
+      ])
+    )
+  })
+
+  it('compone una edición de 30 páginas con índice real y folios físicos', () => {
+    const chapters = Array.from({ length: 27 }, (_, index) =>
+      chapter({ chapterId: `chapter-${index + 1}`, title: `Capítulo ${index + 1}` })
+    )
+
+    const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ chapters }) })
+    const index = input.slides.find(page => page.contentType === 'report-index')!
+    const entries = (index.slots as { indexEntries: { title: string; pageNumber: string }[] }).indexEntries
+
+    expect(input.slides).toHaveLength(30)
+    expect(entries).toHaveLength(28) // 27 capítulos + límites y metodología
+    expect(entries[0]).toEqual({ title: 'Capítulo 1', pageNumber: '3' })
+    expect(entries.at(-1)).toEqual({ title: 'Límites y metodología', pageNumber: '30' })
+    expect(input.slides.map(page => (page.slots as { pageFolio: string }).pageFolio)).toEqual(
+      input.slides.map((_page, pageIndex) => String(pageIndex + 1))
+    )
+  })
+
+  it('pagina el índice cuando hay más de 28 secciones y conserva los folios reales', () => {
+    const chapters = Array.from({ length: 29 }, (_, index) =>
+      chapter({ chapterId: `chapter-${index + 1}`, title: `Capítulo ${index + 1}` })
+    )
+
+    const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ chapters }) })
+    const indexPages = input.slides.filter(page => page.contentType === 'report-index')
+    const secondIndex = indexPages[1]!
+    const entries = (secondIndex.slots as { indexEntries: { title: string; pageNumber: string }[] }).indexEntries
+
+    expect(indexPages).toHaveLength(2)
+    expect((secondIndex.slots as { indexTitle: string }).indexTitle).toBe('Índice (continuación)')
+    expect(entries[0]).toEqual({ title: 'Capítulo 29', pageNumber: '32' })
+    expect(entries.at(-1)).toEqual({ title: 'Límites y metodología', pageNumber: '33' })
   })
 
   it('NO omite un capítulo sin figura: lo narra', () => {

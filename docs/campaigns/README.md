@@ -63,6 +63,7 @@ Sólo `CDR-###` y `EPIC-CMP-###` tienen numeración propia.
 - [CDR-005](decisions/CDR-005-cmp001-embudo-momento-y-accion.md) · Proposed: el embudo se ordena por momento del usuario y acción encadenada; mismo mundo otro ángulo; densidad de texto por etapa; el tamaño del momento manda sobre su urgencia.
 - [CDR-006](decisions/CDR-006-cmp001-manifiesto-copy-y-pauta.md) · Proposed: países confirmados, copy externo y presupuesto sugerido; manifiesto operativo en OneDrive.
 - [CDR-007](decisions/CDR-007-cmp001-bofu-conversion-a-landing.md) · Proposed: BOFU pasa a conversión con destino a las landings de servicio; dos bloqueos verificados (canonical AEO no propio · la landing AEO sólo ofrece la conversión de TOFU) y el evento medido como prerrequisito.
+- [CDR-008](decisions/CDR-008-cmp003-cartelas-postproduccion-y-audio-separado.md) · Accepted: CMP-003 SKY, cartelas punch-v3 y cierre; película generativa y música/SFX sin voz. Correcciones y presupuesto futuro pendientes.
 - [CMP-001 · Media plan Q4 2026](CMP-001-MEDIA-PLAN-Q4-2026.md) · Borrador: estructura por etapa×objetivo, reparto que cambia en el tiempo, rotación y convención UTM. Bloqueado por presupuesto, cuentas de pauta y las dos decisiones de CDR-007.
 
 Handoff operativo de pauta: [contrato transversal](../operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md). El Markdown completo se genera junto a catálogo/CSV en Finales desde el JSON de Recursos; no duplicar copy en el repo.

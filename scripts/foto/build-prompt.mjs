@@ -252,25 +252,24 @@ export const PERSONAS = {
       'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png'
     ],
     cuerpo: 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png',
-    // Vistas que las referencias base no cubren. Las que vienen de `1-anclas/` son fotográficas y de alta
-    // resolución; las de `2-angulos/` conservan el acabado SINTÉTICO del maestro anterior (deuda declarada
-    // en el LEEME): sirven para ángulo y encuadre, pero si la pieza necesita piel creíble en primer plano,
-    // prefiere un ancla.
+    // Vistas aprobadas de Nexa. Las ocho direcciones del set gris son fotográficas y fueron editadas desde
+    // la identidad A; no usar `2-angulos/`, que conserva el rostro/ acabado anterior y queda retirado como
+    // referencia de identidad. Las vistas que el set no cubre se resuelven con las anclas fotográficas.
     vistas: {
       // fotográficas, alta resolución
-      'perfil-der': 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-3-rostro-perfil.png',
       busto: 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-4-busto-tresquartos.png',
       'cuerpo-tresquartos': 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-6-cuerpo-tresquartos.png',
       'cuerpo-perfil-der': 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-7-cuerpo-perfil.png',
       manos: 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-8-manos.png',
-      // acabado anterior — ángulos que las anclas no cubren
-      '45-izq': 'ai-generations/_identidad-nexa/2-angulos/nexa-45-izq.png',
-      '45-der': 'ai-generations/_identidad-nexa/2-angulos/nexa-45-der.png',
-      'perfil-izq': 'ai-generations/_identidad-nexa/2-angulos/nexa-perfil-izq.png',
-      trasero: 'ai-generations/_identidad-nexa/2-angulos/nexa-135-trasero.png',
-      espalda: 'ai-generations/_identidad-nexa/2-angulos/nexa-espalda.png',
-      'cuerpo-perfil-izq': 'ai-generations/_identidad-nexa/2-angulos/nexa-cuerpo-perfil-izq.png',
-      'cuerpo-espalda': 'ai-generations/_identidad-nexa/2-angulos/nexa-cuerpo-espalda.png'
+      // set fotorrealista aprobado: polera gris, seis vistas de rostro + dos vistas de cuerpo
+      '45-izq': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-45-izq.png',
+      '45-der': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-45-der.png',
+      'perfil-izq': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-perfil-izq.png',
+      'perfil-der': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-perfil-der.png',
+      trasero: 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-135-trasero.png',
+      espalda: 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-espalda.png',
+      'cuerpo-perfil-izq': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-cuerpo-perfil-izq.png',
+      'cuerpo-espalda': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-cuerpo-espalda.png'
     },
     vistasDeCuerpo: ['cuerpo-tresquartos', 'cuerpo-perfil-der', 'cuerpo-perfil-izq', 'cuerpo-espalda'],
     // Las OCHO expresiones canónicas del Character Bible §6, que pide usar estos nombres como shorthand de

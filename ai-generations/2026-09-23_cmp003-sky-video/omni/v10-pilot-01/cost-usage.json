@@ -1,0 +1,39 @@
+{
+  "date": "2026-09-24",
+  "interaction_id": "ChBiZWNiNjVlMDA5NjZkOTJhEAgaATAqBG1haW4",
+  "usage": {
+    "total_tokens": 141190,
+    "total_input_tokens": 58012,
+    "input_tokens_by_modality": [
+      {
+        "modality": "video",
+        "tokens": 53100
+      },
+      {
+        "modality": "text",
+        "tokens": 512
+      },
+      {
+        "modality": "image",
+        "tokens": 4400
+      }
+    ],
+    "total_output_tokens": 82536,
+    "output_tokens_by_modality": [
+      {
+        "modality": "video",
+        "tokens": 82536
+      }
+    ],
+    "total_thought_tokens": 642
+  },
+  "usd_per_million": {
+    "input": 1.5,
+    "video_output": 17.5,
+    "thought": 9
+  },
+  "estimated_usd_from_usage": 1.537176,
+  "billing_verified": false,
+  "generation_count": 1,
+  "pricing_source": "https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing"
+}

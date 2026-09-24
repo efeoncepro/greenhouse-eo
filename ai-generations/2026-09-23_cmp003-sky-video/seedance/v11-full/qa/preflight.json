@@ -1,0 +1,18 @@
+{
+  "checks": {
+    "request_hash": true,
+    "single_complete_generation": true,
+    "format": true,
+    "native_audio_disabled": true,
+    "all_references_uploaded": true,
+    "local_hashes_match": true,
+    "prompt_refs_match": true,
+    "no_generation_submitted": true,
+    "no_title_reference_uploaded": true
+  },
+  "status": "pass",
+  "budget_confirmation": "approved",
+  "approved_assets_unchanged": true,
+  "prompt_matches_request": true,
+  "reviewedAt": "2026-09-24T09:38:50.150478+00:00"
+}

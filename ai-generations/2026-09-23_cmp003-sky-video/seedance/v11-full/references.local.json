@@ -1,0 +1,90 @@
+[
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v11-full/refs/01-search-side-empty.png",
+    "kind": "image",
+    "prompt_ref": "@Image1",
+    "role": "empty search, lateral camera",
+    "sha256": "02b54bcf5b0fa6d502f90674f4de3713ccaf07b9ff63fd7f8ec99b93170f7659",
+    "bytes": 1617141
+  },
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v11-full/refs/02-search-side-question.png",
+    "kind": "image",
+    "prompt_ref": "@Image2",
+    "role": "completed search, same lateral camera",
+    "sha256": "3a8bccb19c6fb47b3884fcc825f2cac2ccc4d42e9af97e433c71296bdf8cd3cf",
+    "bytes": 1636824
+  },
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/02-results.png",
+    "kind": "image",
+    "prompt_ref": "@Image3",
+    "role": "three search results",
+    "sha256": "a887f7d91d08d1b65535190e4bade36f3b41367f304c0f06a7fd2b1cb35d3012",
+    "bytes": 1215491
+  },
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/03-user.png",
+    "kind": "image",
+    "prompt_ref": "@Image4",
+    "role": "user turn alone",
+    "sha256": "2faa96819d1d76a679413bf81d04b54d7a885c9421521f534b21c6ae1976c1ab",
+    "bytes": 1573953
+  },
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/05-answer-complete.png",
+    "kind": "image",
+    "prompt_ref": "@Image5",
+    "role": "assistant answer and attached source citation",
+    "sha256": "330498dcd2c00f1bc791a6bba2f5931be8e90cd113b5e2729465947eae6dcfb3",
+    "bytes": 1272674
+  },
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/06-citation-focus.png",
+    "kind": "image",
+    "prompt_ref": "@Image6",
+    "role": "citation activation, not an independent button",
+    "sha256": "74af8bf6b95e5bcef0ad146f4180a76f050f270e8314af51076b2fdd94b32ca1",
+    "bytes": 1289845
+  },
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/aircraft-inputs/V02.png",
+    "kind": "image",
+    "prompt_ref": "@Image7",
+    "role": "same aircraft identity V02, no background or motion authority",
+    "sha256": "d1677e50b8883f54a68c7077f7ecf7a2b4a89d2e1f9176fdb848417990e14749",
+    "bytes": 140243
+  },
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/aircraft-inputs/V10.png",
+    "kind": "image",
+    "prompt_ref": "@Image8",
+    "role": "same aircraft identity V10, no background or motion authority",
+    "sha256": "9060200ce6393c37e476991f639eb98f85446992c911f8c031df3e5e30a1f0dc",
+    "bytes": 213030
+  },
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/aircraft-inputs/VR.png",
+    "kind": "image",
+    "prompt_ref": "@Image9",
+    "role": "same aircraft identity VR, no background or motion authority",
+    "sha256": "96564feb574f8db0800dc728c6561cb7e4927305f7869292680c972e1f6df1d9",
+    "bytes": 143701
+  },
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/aircraft-inputs/V16.png",
+    "kind": "image",
+    "prompt_ref": "@Image10",
+    "role": "same aircraft identity V16, no background or motion authority",
+    "sha256": "9a8409d89324f6fb6f9e97887d7a43286706a4e7a833589eabf19e8ef6251d32",
+    "bytes": 188423
+  },
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v11-full/refs/10-flight-motion-5s.mp4",
+    "kind": "video",
+    "prompt_ref": "@Video1",
+    "role": "flight approach, pass and rear-quarter departure only; source v9 at 10.5–15.5s",
+    "sha256": "cd71475a8ed08ba0a664aa7829a310066b5f2e01b51a042b53308051594bb553",
+    "bytes": 4971567
+  }
+]

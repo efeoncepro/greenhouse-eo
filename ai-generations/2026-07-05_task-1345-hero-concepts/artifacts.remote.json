@@ -1,0 +1,29 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:26:03.126Z",
+  "run": "ai-generations/2026-07-05_task-1345-hero-concepts",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-05_task-1345-hero-concepts",
+  "totalBytes": 3735125,
+  "fileCount": 3,
+  "files": [
+    {
+      "path": "concept-A-device-real.png",
+      "sizeBytes": 1141487,
+      "sha256": "41251d6fea5b1e51037b1e0421e080cf0164c6c06351ed414a7f1e9403aa82ea",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-concepts/concept-A-device-real.png"
+    },
+    {
+      "path": "concept-B-infrastructure-built.png",
+      "sizeBytes": 1414409,
+      "sha256": "7b086bef43dfb8698055b0ede9083565dc907b75f4fe385c664529b52354c753",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-concepts/concept-B-infrastructure-built.png"
+    },
+    {
+      "path": "concept-C-human-and-machine.png",
+      "sizeBytes": 1179229,
+      "sha256": "e6b19f3ecb1392bd7cf71de597dd35c3ad94d2f70f9efc16def1216296b92506",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-concepts/concept-C-human-and-machine.png"
+    }
+  ]
+}

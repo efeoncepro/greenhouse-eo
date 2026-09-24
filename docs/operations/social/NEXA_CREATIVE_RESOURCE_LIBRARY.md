@@ -18,12 +18,34 @@ de vestuario contienen dos espacios. Resolver con listado real, no normalizar/re
 
 | Carpeta relativa | Uso |
 | --- | --- |
-| 01. Material/01. Avatar | Candidatos de referencia de identidad; elegir tras inspección visual. |
+| 01. Material/01. Avatar | Familia Avatar A confirmada por el operador como identidad fotorrealista de Nexa; usar sus referencias faciales con la continuidad de polera gris aprobada. |
 | 01. Material/02. Entornos y Fondos | Entornos y composición, no fuente de identidad facial. |
-| Poses y expresiones | Deep Work, Got It, Mic Drop, The Breakdown, The Listen, The Point, The Read, The Spark. |
+| Poses y expresiones | Banco para gesto y cuerpo: Deep Work, Got It, Mic Drop, The Breakdown, The Listen, The Point, The Read, The Spark. No usar como ancla facial. |
 | Vestuario | Behind-the-scenes  Home office; Contenido casual  Redes; Lifestyle  Exterior urbano; Profesional  Presentaciones; Tech  Conferencias como speaker. |
 | Voz final/voice_preview_influencer nexa.mp3 | Muestra de voz existente; no prueba por sí sola un voice ID o autorización de clonación. |
 | 02. Contenidos Nexa | Derivados existentes, incluidos NEXA_AVATAR_EFEONCE_POST.mp4, NEXA_AVATAR_EFEONCE_YT.mp4 y NEXA_AVATAR_EFEONCE_STORY.mp4. |
+
+## Identidad visual aprobada — 2026-09-24
+
+El operador confirmó como Nexa la **identidad humana fotorrealista de rostro real y polera gris** que aparece en
+las hojas de referencias revisadas. Su set de ocho vistas está en
+[`ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`](../../../ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/): seis ángulos de rostro
+(`nexa-45-izq`, `nexa-45-der`, `nexa-perfil-izq`, `nexa-perfil-der`, `nexa-135-trasero`, `nexa-espalda`)
+y dos vistas de cuerpo (`nexa-cuerpo-perfil-izq`, `nexa-cuerpo-espalda`). Es un set de identidad y continuidad
+fotográfica; la polera gris es vestuario neutro de referencia, no una prenda obligatoria para todas las piezas.
+
+Las anclas fotográficas y los registros de rostro/expresión están en
+[`ai-generations/_identidad-nexa/1-anclas/`](../../../ai-generations/_identidad-nexa/1-anclas/) y
+[`5-expresiones/`](../../../ai-generations/_identidad-nexa/5-expresiones/). Son referencias complementarias
+de la misma identidad A, no una familia alternativa. El banco OneDrive `Poses y expresiones` sirve para estudiar
+actuación, gesto y cuerpo; **no es fuente de rostro ni reemplaza estas referencias aprobadas**. Los antiguos
+renders en `_identidad-nexa/2-angulos/` y `3-poses/` quedan retirados como identidad facial y no se deben
+mezclar con el rostro aprobado.
+
+Para producción, pedir las vistas mediante `pnpm foto:prompt` y el catálogo de
+[`build-prompt.mjs`](../../../scripts/foto/build-prompt.mjs); no copiar rutas manualmente ni usar el set histórico
+como ancla facial. Las seis expresiones fotográficas aprobadas que sí se distinguen con claridad se documentan en
+[`_identidad-nexa/LEEME.md`](../../../ai-generations/_identidad-nexa/LEEME.md).
 
 ## Selección segura y continuidad
 

@@ -57,11 +57,10 @@ catálogo `insights-report` (A4 794×1123) con molde compartido y 5 plantillas q
 1. **Cutover del `deck_pdf` al catálogo propio.** El catálogo `insights-deck` ya existe, renderiza y está
    registrado en el worker, pero `deck_pdf` sigue componiendo con `deck-axis`. Cambiarlo altera un
    comportamiento productivo y necesita su canary; no es el final de una sesión.
-2. **Promoción del baseline visual.** El gate ya fotografía los tres catálogos y los 9 frames nuevos están
-   declarados en `BASELINE_DELTAS.md`, pero **sin promover**: `--freeze` exige declarar todos los frames
-   cambiados, y los de `deck-axis` difieren entre corridas (19 y 20 en dos corridas de la misma máquina).
-   Congelar los propios obligaría a rebaselinear los ajenos — el rebaseline silencioso que el gate impide.
-   Bloqueado por ISSUE-122, que ahora tiene esa evidencia.
+2. **Promoción del baseline visual.** El 2026-09-24 se declaró `ReportIndexPage` (10 frames Insights en total);
+   seis renders frescos mantuvieron estables los frames conocidos. Los diez siguen sin promover: `--freeze` exige
+   incluir baseline y catálogo en el mismo commit. Los frames ajenos se conservan. ISSUE-122 mantiene el contexto
+   histórico de drift de `deck-axis`.
 3. ~~**`UI ready: yes`**~~ — resuelto como **`n/a`** el 2026-09-22: el contrato de `UI ready` mide una pantalla
    del portal y esta superficie es un documento exportado a PDF. Los gates que aplican están verdes
    (`design-contract:lint`, `ui:code-lint`, `ui:quality` 4,50/piso 4,0) con dossier y scorecard sobre el render
@@ -86,7 +85,7 @@ catálogo `insights-report` (A4 794×1123) con molde compartido y 5 plantillas q
 - Motion: `docs/ui/motion/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs-motion.md`
 - Backend impact: `command`
 - Epic: `EPIC-045`
-- Status real: `Code complete, rollout pendiente (2026-09-22). Desplegado en staging (develop hasta 21c991999), NO en producción. Canary con datos reales (Berel SEO+AEO, Sky ICO) encontró y cerró: falsos positivos del validador, ids internos en límites/metodología, OTD nunca leído (otd vs otd_pct), figuras del A4 (formato, nombres, recortes, barra destacada invisible, guarda sin tolerancia de redondeo) y el deck sobre deck-axis; deck_pdf pasó a insights-deck. Vista previa local con datos reales: Berel 15 págs/13 láminas, Sky 7/5, 0 violaciones. Verificado en el runtime de staging (Berel v2 deck 13 + A4 15; Sky v2 deck 5 + A4 7 con OTD; las 4 salidas al primer intento). Falta: release a producción cuando haya consumidor, baseline visual (ISSUE-122) e índice paginado A4.`
+- Status real: `Code complete desplegado en staging (develop hasta 21c991999), NO en producción. Canary con datos reales (Berel SEO+AEO, Sky ICO) encontró y cerró falsos positivos del validador, ids internos en límites/metodología, OTD nunca leído (otd vs otd_pct), figuras A4 y cutover de deck_pdf a insights-deck. Staging verificado: Berel v2 deck 13 + A4 15; Sky v2 deck 5 + A4 7 con OTD, cuatro salidas al primer intento. El 2026-09-24 se implementó localmente índice A4 paginado; mapper y caso de 30 páginas pasan, pero no hay commit ni render PDF de 30 páginas. Preflight de d8afbf50 bloqueado por CI fallido, Playwright smoke ausente y release_batch_policy split_batch (3.279 archivos); no se despachó producción. Baseline de diez frames Insights sin promover. El gap de familias geométricas sin productor permanece deliberado por el ledger de dominio.`
 - Rank: `TBD`
 - Domain: `ui|platform`
 - Blocked by: `none`

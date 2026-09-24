@@ -1,0 +1,39 @@
+{
+  "project": "efeonce-group",
+  "model": "gemini-omni-1.1-flash-preview",
+  "id": "ChBiZWNiNjVlMDA5NjZkOTJhEAgaATAqBG1haW4",
+  "status": "completed",
+  "videos": [
+    {
+      "uri": "gs://efeonce-group-greenhouse-private-assets-dev/ai-tooling/cmp003-sky/v10-pilot-01/output/2182662994034398922.mp4",
+      "mimeType": "video/mp4"
+    }
+  ],
+  "inlineVideoCount": 0,
+  "usage": {
+    "total_tokens": 141190,
+    "total_input_tokens": 58012,
+    "input_tokens_by_modality": [
+      {
+        "modality": "video",
+        "tokens": 53100
+      },
+      {
+        "modality": "text",
+        "tokens": 512
+      },
+      {
+        "modality": "image",
+        "tokens": 4400
+      }
+    ],
+    "total_output_tokens": 82536,
+    "output_tokens_by_modality": [
+      {
+        "modality": "video",
+        "tokens": 82536
+      }
+    ],
+    "total_thought_tokens": 642
+  }
+}

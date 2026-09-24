@@ -1,0 +1,26 @@
+{
+  "date": "2026-09-24",
+  "approval_file_hashes": "9/9 matched",
+  "owned_skill_mirrors": "9/9 byte identical; prior unique content retained",
+  "git_diff_check": "pass",
+  "skills_mirrors_gate": "pass; manual check additionally covers motion and audio",
+  "closure_gate": "global pass and scoped zero warnings",
+  "generations_submitted": 0,
+  "uploads_to_generation_providers": 0,
+  "local_pilot_probe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_type": "video",
+        "width": 1080,
+        "height": 1920,
+        "r_frame_rate": "24/1"
+      }
+    ],
+    "format": {
+      "duration": "9.500000"
+    }
+  },
+  "scope": "Documentation and planning only. Whole-film integration and final audio pending."
+}

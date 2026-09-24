@@ -1,0 +1,19 @@
+{
+  "file": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v12-recovery/sky-v12-recovery-1080p.mp4",
+  "sha256": "8dc06d21de38a3d76d5f43bb5724c1cdccc9901bcb05b21b7e9794f0db634c1e",
+  "width": 1080,
+  "height": 1920,
+  "fps": 24,
+  "frames": 720,
+  "duration": 30,
+  "audioCodec": "aac",
+  "audioRate": 48000,
+  "audioChannels": 2,
+  "decodeErrors": 0,
+  "videoPacketsMatchReviewedPicture": true,
+  "visualReview": "720 frames in contact sheets and native resolution holds; citation transition extra12fps sheet",
+  "newProviderCalls": 0,
+  "newCostUsd": 0,
+  "userApproval": "pending",
+  "audioListening": "not available to agent; required for perceptual sign-off"
+}

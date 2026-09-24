@@ -1,0 +1,43 @@
+{
+  "checked": "2026-09-24",
+  "model": "seedance_2_5_draft",
+  "source": "Exact model identifier observed in Higgsfield web model picker and WebMCP",
+  "models_search": {
+    "items": [],
+    "has_more": false,
+    "free_gens": [
+      {
+        "job_set_types": [
+          "hf_mult_motion_control",
+          "hf_mult_replace_object"
+        ],
+        "remaining": 1,
+        "parameters": {
+          "resolution": [
+            "480p",
+            "720p"
+          ]
+        },
+        "max_duration": 30
+      },
+      {
+        "job_set_types": [
+          "viral_hub_video"
+        ],
+        "remaining": 1,
+        "parameters": {
+          "resolution": [
+            "480p",
+            "720p"
+          ]
+        },
+        "max_duration": null
+      }
+    ]
+  },
+  "models_get": {
+    "error": "Model not found: seedance_2_5_draft",
+    "error_code": "INVALID_ARGUMENT"
+  },
+  "conclusion": "Available in website; not available in current MCP model catalog. No generation or billable probe submitted."
+}

@@ -1,0 +1,10 @@
+{
+  "id": "design-context-v2-07-cierre",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["julio", "nexa"],
+  "escena": "SCENE (Efeonce creative studio, Santiago, late afternoon): Julio, the exact real person in the approved identity references, and Nexa, the exact real person in her approved photographic anchors, review the final large-format campaign proof together at a tall light table. Julio is wearing a crisp warm-white shirt and his familiar glasses; Nexa wears her neutral grey t-shirt. Their real skin texture, facial proportions and features are preserved. Julio gestures toward one decisive detail in the finished visual; Nexa smiles with the satisfaction of a good answer, eyes on the work. The printed artwork is a bold abstract visual with no readable text or logo. A deep metal experiment bowl sits behind the proof, now empty; a few color and photo references remain neatly arranged at the far edge. Strong warm-neutral window light from left, natural azure-blue reflection at the edge of the paper from real blue-tinted window glass, one orange visual accent, clear shadows and three physical depth planes. This is a real creative review, not a corporate meeting or stock photo. Medium side angle, decisive hands visible, both recognizable in profile/three-quarter view, honest candid expression, uncluttered light wall in upper left reserved for an editorial caption. No illustration, no cartoon styling, no franchise characters, no costume, no text, no logo or speech bubbles in the photograph; comic language comes from the later graphic layout.",
+  "palanca": "luz-motivada",
+  "lecho": { "objeto": "the dark edge of the light table close to the camera across the lower foreground", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "clean warm-neutral wall in the upper left", "tinta": "oscura" } }
+}

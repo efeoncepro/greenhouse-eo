@@ -236,8 +236,12 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 
 ## Reglas duras que el comando ya hace cumplir (no las repitas a mano, no las esquives)
 
-- **Identidad:** el set de Julio es `2026-09-20_identidad-julio-nexa/refs-aprobadas/` (+ 6 ángulos derivados).
-  El set viejo de `2026-09-17_equipo-vestuario/` **idealizaba el rostro** y arrastraba deriva.
+- **Identidad de Julio (confirmada por el operador el 2026-09-24):** usa las **11 referencias aprobadas** de
+  `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/` y los **seis ángulos** de
+  `set-identidad/angulos/`. El manifiesto es la lista de autoridad: `julio-ap-04` primero para rostro y
+  `julio-ap-11` para cuerpo. `julio-ap-02.png` es una composición publicitaria excluida; `refs-reales/` y sus
+  descartes no sustituyen las imágenes aprobadas. `foto:prompt` resuelve la vista. El set de
+  `2026-09-17_equipo-vestuario/` **idealizaba el rostro**, está retirado como ancla y no se mezcla con el vigente.
 - 🔴 **Dos identidades conviven bajo el nombre «Nexa». La canónica es la A** **[decisión del operador, 2026-09-21]**.
   Conviven **dentro de la misma carpeta** `01. Avatar/`: los bustos con hoodie son **A** (la del KV «Tu IA no conoce
   tu negocio», aprobado el 2026-09-17); los `hf_*` con blazer son **B** (la del turnaround de 9 vistas, `Poses y

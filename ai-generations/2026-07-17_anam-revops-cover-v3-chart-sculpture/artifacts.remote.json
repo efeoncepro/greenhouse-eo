@@ -1,0 +1,35 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:27:31.050Z",
+  "run": "ai-generations/2026-07-17_anam-revops-cover-v3-chart-sculpture",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-17_anam-revops-cover-v3-chart-sculpture",
+  "totalBytes": 2711147,
+  "fileCount": 4,
+  "files": [
+    {
+      "path": "refs/01-hubspot-bars-sanitized.png",
+      "sizeBytes": 97583,
+      "sha256": "cf212c0ede6c7340110207e6bb295b4936c3f1200c13ef0a32b3f752e21b2b7d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v3-chart-sculpture/refs/01-hubspot-bars-sanitized.png"
+    },
+    {
+      "path": "refs/02-efeonce-data-discipline.png",
+      "sizeBytes": 122660,
+      "sha256": "b43ca9d3e37e6e20d1520b85705765ed1a481b439449465576733dc17fb24253",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v3-chart-sculpture/refs/02-efeonce-data-discipline.png"
+    },
+    {
+      "path": "refs/03-efeonce-editorial-language.png",
+      "sizeBytes": 132166,
+      "sha256": "4d3cd262ecf62dacdd697201fd6f7f2ff531e216c989e847183fa32b55603052",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v3-chart-sculpture/refs/03-efeonce-editorial-language.png"
+    },
+    {
+      "path": "source/anam-revops-chart-sculpture-generated-v3.png",
+      "sizeBytes": 2358738,
+      "sha256": "4634f0b7b01eaf719d27ddec32a8fe7011ec233edf18b589cdbfcfc57732d361",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v3-chart-sculpture/source/anam-revops-chart-sculpture-generated-v3.png"
+    }
+  ]
+}

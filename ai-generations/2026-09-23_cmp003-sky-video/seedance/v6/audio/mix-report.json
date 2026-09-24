@@ -1,0 +1,23 @@
+{
+  "source_video": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/sky-v6-finished-silent.mp4",
+  "zero_source_audio_streams": true,
+  "timing": {
+    "video": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/sky-v6-finished-silent.mp4",
+    "jet_peak": 12.7,
+    "flash": 9.2,
+    "ui": 0.1
+  },
+  "premix_measurement": {
+    "input_i": "-16.34",
+    "input_tp": "-2.55",
+    "input_lra": "10.90",
+    "input_thresh": "-27.01",
+    "output_i": "-14.90",
+    "output_tp": "-1.20",
+    "output_lra": "4.50",
+    "output_thresh": "-25.25",
+    "normalization_type": "dynamic",
+    "target_offset": "-1.10"
+  },
+  "output": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/sky-v6-30s-musica-sfx-sin-voz.mp4"
+}

@@ -3,8 +3,10 @@
 **Esto es lo vigente. Si vas a generar cualquier cosa con Nexa, sale de aquí.**
 
 No es una carpeta de corrida: las que llevan fecha (`2026-09-17_…`, `2026-09-20_…`, `2026-09-21_…`) son el
-histórico de cada sesión y no se tocan. Ésta es el estado actual, y el catálogo de
-[`scripts/foto/build-prompt.mjs`](../../scripts/foto/build-prompt.mjs) apunta sólo aquí.
+histórico de cada sesión y no se tocan, salvo el set de ocho ángulos grises confirmado el 2026-09-24 en
+`2026-09-20_identidad-julio-nexa/set-identidad/angulos/`. Ésta conserva las anclas y expresiones; el catálogo de
+[`scripts/foto/build-prompt.mjs`](../../scripts/foto/build-prompt.mjs) combina estas referencias con ese set
+aprobado de ángulos.
 
 ## Cómo se usa (no copies rutas a mano)
 
@@ -206,3 +208,16 @@ pnpm foto:assets:check   # catálogo y lock deben coincidir por sha256
 
 Si alguien sustituye un archivo declarado, ese comando falla. **Ojo:** hoy sella `refs` y `vistas`, pero **no**
 `assetDeUso` ni `usoPorPersona` — ver el `[pendiente]` del canon.
+
+## Estado vigente 2026-09-24 — identidad aprobada por el operador
+
+La identidad confirmada es Nexa **humana fotorrealista**, con rostro real y el set de continuidad de polera gris.
+Las ocho imágenes aprobadas están en
+`ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`: `nexa-45-izq.png`,
+`nexa-45-der.png`, `nexa-perfil-izq.png`, `nexa-perfil-der.png`, `nexa-135-trasero.png`, `nexa-espalda.png`,
+`nexa-cuerpo-perfil-izq.png` y `nexa-cuerpo-espalda.png`. El catálogo de `foto:prompt` apunta ahora a ese set
+y su lock registra las huellas. La camiseta es neutral para las referencias, no una condición de vestuario.
+
+`1-anclas/` y `5-expresiones/` son referencias fotográficas complementarias de esta misma cara. Las etiquetas
+históricas de “sintético/deuda” para los ángulos ya cubiertos por este set están **superadas**. Las poses del
+Character Bible y del OneDrive son una dimensión de actuación/cuerpo aparte; no reemplazan la referencia facial.

@@ -1,0 +1,21 @@
+{
+  "date": "2026-09-24",
+  "model": "bytedance/seedance-2.5/reference-to-video",
+  "task": "reference",
+  "output_seconds": 30,
+  "input_video_seconds": 5,
+  "width": 1080,
+  "height": 1920,
+  "billing_fps": 24,
+  "rate_usd_per_1000_tokens": 0.0234,
+  "video_reference_factor": 0.6,
+  "formula": "1080*1920*(5+30)*24/1024/1000*0.0234*0.6",
+  "estimated_usd": 23.88204,
+  "proposed_budget_usd": 25,
+  "max_attempts": 1,
+  "audio_generation": false,
+  "audio_budget_included": false,
+  "billing_cap_enforced_by_provider": false,
+  "source": "https://fal.ai/models/bytedance/seedance-2.5/reference-to-video",
+  "status": "prepared-awaiting-budget-confirmation"
+}

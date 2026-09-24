@@ -1,0 +1,21 @@
+{
+  "status": "visual crop checks passed; awaiting operator approval",
+  "native": [
+    941,
+    1672
+  ],
+  "export": [
+    1080,
+    1920
+  ],
+  "allTextAndMarksInsideTestCrops": true,
+  "platformLivePreview": false,
+  "logoVerification": "visual only, not pixel identity",
+  "currentCopy": [
+    "SKY official mark",
+    "nos eligió",
+    "de nuevo.",
+    "Efeonce mark",
+    "efeoncepro.com"
+  ]
+}

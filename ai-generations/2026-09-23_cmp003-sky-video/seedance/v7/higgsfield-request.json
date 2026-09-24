@@ -1,0 +1,151 @@
+{
+  "params": {
+    "model": "seedance_2_5",
+    "mode": "video_edit",
+    "resolution": "720p",
+    "generate_audio": true,
+    "bitrate_mode": "high",
+    "count": 1,
+    "prompt": "Edit the supplied COMPLETE approved 30-second SKY x Efeonce film. Return ONE complete vertical film with native synchronized instrumental music and SFX. The VIDEO is the primary authority for sequence, scene durations, layouts, exact text, aircraft and final logos. All still references are identity/design anchors only. Preserve the existing camera changes: no added cuts, repeated scenes, new story, slideshow or extra outro. Improve only audio synchronization, modern chat reveal, purposeful typography and smooth camera momentum.\n\nAUDIO: ONLY instrumental music and sound effects. Absolutely no narration, dialogue, announcements, singing, humming, chanting, choir, whispers or processed vocal samples. NEVER read on-screen text. Original uplifting epic electronic/orchestral score near 120 BPM, bright triumphant harmony, forward pulse, precise percussion, wide strings and brass synths. Positive aviation scale and accomplishment; no mystery, ominous drones or suspense. Grow layers after Enter and reach heroic expansion with the airplane. Match sounds to visible actions, not arbitrary periodic effects.\n\n0.00-0.20 silence; then soft dry keyboard taps synchronized with visible typing, NO MUSIC. Search text remains “¿A dónde viajar en Sudamérica?”. At typing completion about 0.8-1.0s add a tiny visible Enter acknowledgement, crisp confirm click and low musical impact. ONLY THEN begin the musical pulse. Preserve the lateral macro camera sweep with smooth inertia and parallax.\n2.00-3.75: preserve the three search results and exact source wording. Distinct soft digital ticks, slightly ascending pitch, match each result appearance/focus. No additional results screens.\n3.75-4.85: search becomes the right-aligned user chat turn. Show user turn ALONE first. It gently rises to make space. Camera descends smoothly to follow the response. Restrained airy slide SFX.\n4.85-6.10: assistant response unfolds downward in 2-3 meaningful phrase groups, subtle vertical expansion with crisp readable type. Exact text: “Tres ideas: Camboriú, por sus playas; Mendoza, por sus bodegas; y Puerto Fuy, por sus lagos y volcanes”. Preserve source layout. Purple “SKY Airline” citation chip appears attached to the answer after its phrases. It is a source citation, not a detached CTA. Tiny reveal ticks.\n6.10-8.00: hold the completed answer readable, camera settles. At 7.8-8.0 the citation subtly presses/focuses with a precise tactile click and small ringing sparkle.\n8.00-9.50: preserve camera push into citation and luminous transition. Bloom originates from the chip. Brief 120-180ms musical dip before bloom releases, then bright rising musical lift. Distant approaching jet anticipates the airplane. No added portal rings.\n9.50-15.50: preserve the same realistic full-size SKY A320neo in its existing three views: approach to 12.125, underside pass to 13.125, rear departure to 15.50. Refine momentum: stable approach with cloud parallax, fast overhead passage, uninterrupted departure at consistent forward speed. Rear camera does NOT chase/overtake the aircraft. No hovering, braking, reversal, turnaround or slow-motion reset. Exact reference white/purple/lime livery, two CFM engines, correct wings/tail, gear up, real metal/light/cloud scale. No toy/plastic look, wing smoke, contrails or sparks. Jet audio approaches, peaks at overhead pass near 12.6, then drops in pitch/level as it recedes. Music reaches heroic full arrangement and ducks slightly for jet impact.\n15.50-18.00: exact “Un año creando con SKY.”. Flight direction guides the camera into the title. Brief depth-based arrival with weight and one confident musical accent; settle within 0.5s and hold readable.\n18.00-20.50: exact “+2.000 piezas.”. Animate lime PLUS independently as leading graphic actor: it arrives from foreground along existing motion direction, makes a short controlled axial turn, lands LEFT of number with damped settle. Always recognizable PLUS, not multiplication sign. Its landing unveils “2.000”, then “piezas.” 0.15s later. Satisfying short impact on PLUS landing; softer number/noun accents. Complete entrance within 0.55s, then hold full phrase readable. No counting, extra symbols, continuous bouncing or broken letters.\n20.50-23.00: exact “Y ahora nos eligió como su agencia SEO/AEO.”. Eye follows introductory phrase, then “su agencia”, then “SEO/AEO”, using a short stagger and subtle oblique-to-frontal camera motion. Fully settled by 21.15. Music accent on SEO/AEO, then hold.\n23.00-25.00: exact “¡Gracias, SKY!”. Broad confident arrival, gentle camera settle, generous musical resolution. Preserve transition to blue closing background.\n25.00-27.00: preserve exact official white Efeonce | SKY logos and “efeoncepro.com” URL bubble on BLUE, identical geometry/position to source. Stable and legible.\n27.00-28.20: ONLY background transitions blue to SKY purple. Logos and URL stay fixed. Soft resolving shimmer.\n28.20-30.00: hold purple closing; music decays cleanly to end.\n\nThree-camera language applies across UI, chat, airplane and typography. Keep photographic sky, safe margins and source continuity. Depth/timing/sound guide attention, never extra cuts. Preserve exact text and logo geometry. The complete edit must include newly generated Seedance instrumental music and synchronized SFX with ZERO VOICE.",
+    "medias": [
+      {
+        "role": "video",
+        "value": "3380fb23-f1c4-4ff9-9e00-f2f5a2ee2816"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba63f/DiU1n69iJAGtd-sUOPWpk_C1-b.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba63f/HnVjmy0EgaswWSm2JxiW__01-search-empty.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba640/KldEJbKEIWNKs3HyjxpMP_02-search-question.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba640/yCxiwl0tjrnnVi1BYDACM_03-results.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba640/R9Y0Dg6lsg8KpbGNy0XZ4_camera-A-user-alone.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba640/u9GozSdS_lwkYxAoRjOof_05-answer-citation.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba641/tTfeYQ-Fg82BFzQLV-wm2_06-chip-glow.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba641/k06KDeF7PJkMvnP2d4ufK_cam-A-frontal-photo.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba641/juWE__oTnvKzY1_F3dQiT_cam-C-overhead-photo.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba641/a6gfarheNO2Nyw9BERcvm_cam-B-rear-departure.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba642/sjFAqAysdiqvqhg5JNUMV_A320neo_CFM_SKY_V02.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba642/ZvZ34xRTLWU-u7zOzOnos_A320neo_CFM_SKY_V10.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba642/azZdvRtbfXaaXy2nRaFQA_A320neo_CFM_SKY_VR.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba642/4NgNOfRo1WZRX_cN3ztSl_A320neo_CFM_SKY_V16.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba642/ilotr8d1cwd779dYWrUki_07-year.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba643/qRGpH1A40XqFZVRJayTGk_08-2000.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba643/NazBCicFnIjkh92uuw1RK_09-agency.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba643/InkIMaI1pR_3ZrPEDXTi7_10-thanks.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba644/sOzGei0ClyIuk-AeGWdhi_11-close-blue-9x16.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba644/4VnByMiIN47aT2kXs7BDP_cierre-9x16.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba644/KXEVNZWk0mtsiQAcs6fvv_T08-un-ano-creando-con-sky.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba644/Jw2m0nw9KSmMQ2fmqA3wI_T09-mas-2000-piezas.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba644/US-XVu6ZOEqktNxPXTj6__T10a-y-ahora-nos-eligio-como.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba644/LaLEY_vdzg01b3DASEuWJ_T10b-su-agencia-seo-aeo.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba644/vc7w2p_70l2HDkpkf8Sam_T11-gracias-sky.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba644/YVgSGDK3O15JCNthjg6TF_L01-logo-efeonce-negativo.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba644/6uIfrkDDZaSNJzWEAdg4h_L02-logo-sky-blanco.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba644/s8DvrOcLbNWytrI4kRLSV_camera-B-ui-side.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba645/Rn8vDAr-MLpSWtp02IWnp_camera-C-results-oblique.png"
+      },
+      {
+        "role": "image",
+        "value": "https://v3b.fal.media/files/b/0aaba645/OTYpmjsJJ50p6Y7xxN-Xz_camera-C-agency-orbit.png"
+      }
+    ]
+  },
+  "estimate": {
+    "cost": {
+      "credits": 225,
+      "credits_exact": 225
+    },
+    "adjustments": {
+      "medias[0].role": {
+        "requested": "video",
+        "used": "video_references",
+        "reason": "Seedance 2.5 backend expects schema-key media roles"
+      }
+    }
+  },
+  "reason": "Fallback autorizado tras dos fallos terminales de validación en ElevenLabs; master 30s exportado sin audio, las mismas 30 referencias."
+}

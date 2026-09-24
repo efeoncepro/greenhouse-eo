@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-24T09:32:54.131Z",
+  "balances": [
+    {
+      "account": "FAL_API_KEY",
+      "balance": -3.86
+    },
+    {
+      "account": "FAL_API_KEY_B",
+      "balance": 55.747999486
+    }
+  ]
+}

@@ -117,6 +117,23 @@ The portable advertising and collaboration contracts are published in the AXIS `
 pins that exact set and its Campaign Layout Compiler implements the first non-Lab adapter for
 `headline|support|hook|lockup`; this evidence does not imply that Globe or another runtime has adopted it.
 
+### AEO conversation graphics for creative agents (local candidate)
+
+For a commercial creative piece that evokes a ChatGPT or Gemini conversation, use the sibling AXIS
+[composition contract](../../../../axis-design-system/docs/agent-composition/llm-answer-interfaces.md) and its
+[JSON intent schema](../../../../axis-design-system/docs/agent-composition/aeo-conversation-intent.schema.json).
+Author the question, answer, source IDs, URLs, favicon provenance, provider, state, output modules and format.
+From `../axis-design-system` run:
+
+```bash
+pnpm aeo:compose --input docs/examples/aeo-composition/efeonce-chatgpt.json --out-dir /tmp/pieza-aeo
+```
+
+The local command emits editable SVG modules and a manifest with source bindings. For a provider-specific desktop application scene, request `app` for ChatGPT or Gemini; `full` means the conversation module. Gemini `app` uses the observed anonymous dark shell. It uses the Lab renderer;
+review the final pixels and the actual support for every cited claim. Keep `editorial-sample` visible unless
+transcribing one observed interaction with its reference and date. The CLI and schema are candidate, local-only:
+not a published AXIS package contract, a live LLM result, a product adapter or creative approval.
+
 ### AXIS Lab
 
 The Lab lives in `../axis-design-system/apps/lab`, not in Greenhouse. Its current runtime is Astro 7.1.6

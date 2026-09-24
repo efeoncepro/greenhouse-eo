@@ -1,0 +1,34 @@
+{
+  "reviewedAt": "2026-09-24T09:57:39.964070+00:00",
+  "status": "rejected-for-final-composition",
+  "acceptForTitleComposition": false,
+  "sourceSha256": "f5d2a72c3471cc6c614f257028a1ff9db810355424ebf8203b4f9f12c529025a",
+  "framesReviewed": 713,
+  "reviewMethod": "All 713 frames inspected in 24 contact sheets; answer inspected at native resolution; browser playback verified at 1x by sampled states, not continuous visual observation.",
+  "fps": 24,
+  "durationSeconds": 29.708333,
+  "audioStreams": 0,
+  "blockingFindings": [
+    "Search/results timing drift: results arrive around 5.0s instead of 1.8s",
+    "No distinct user-only beat; full answer arrives around 6.46s without progressive reveal",
+    "Citation-to-aircraft switches from rapid push to distant slow approach around 10.58-10.75s",
+    "Aircraft remains visible through 26.17s; no clean sky interval for approved titles at15.75-25.75s"
+  ],
+  "compositionRun": false,
+  "audioGenerated": false,
+  "retryAuthorized": false,
+  "billing": {
+    "verifiedAt": "2026-09-24T09:57:39.964070+00:00",
+    "method": "Computer Use; authenticated fal request-level billing table",
+    "url": "https://fal.ai/dashboard/usage-billing/usage/bytedance/seedance-2.5/reference-to-video?dateRange=current_month",
+    "requestId": "01a0d2c8-444a-7fd0-b606-5a2987148e87",
+    "authMethod": "Efeonce 2",
+    "quantityDisplayed": 1596.38,
+    "unitPriceUsdDisplayed": 0.0214,
+    "totalCostUsd": 34.162558,
+    "estimateUsd": 23.88204,
+    "budgetUsd": 25,
+    "overBudgetUsd": 9.162558,
+    "cause": "Unresolved discrepancy between public pricing estimate and billed quantity. No claim of concurrent spend or duplicate generation."
+  }
+}

@@ -19,6 +19,19 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    // El método de video debe conservar producción, post y evidencia entre ambos agentes.
+    id: 'motion-design-studio',
+    mode: 'byte-identical',
+    codex: '.codex/skills/motion-design-studio',
+    claude: '.claude/skills/motion-design-studio',
+  },
+  {
+    id: 'audio-studio',
+    mode: 'byte-identical',
+    codex: '.codex/skills/audio-studio',
+    claude: '.claude/skills/audio-studio',
+  },
+  {
     // La barra creativa no puede depender de qué agente atienda. Si Codex y Claude sostienen criterios
     // distintos para juzgar una idea, el cliente recibe dos estándares con la misma firma — y el drift
     // es invisible porque nadie compara dos juicios subjetivos. Va byte-identical desde su nacimiento.

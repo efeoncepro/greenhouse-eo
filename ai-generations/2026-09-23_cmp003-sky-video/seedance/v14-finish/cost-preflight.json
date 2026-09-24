@@ -1,0 +1,11 @@
+{
+  "authorizedBy": "User: Vamos con todo, follows V14 one-window plan",
+  "attempts": 1,
+  "sourceSeconds": 6.5,
+  "videoInputEstimatedUsd": 0.056472,
+  "videoOutputEstimatedUsd": 0.98826,
+  "textThoughtAllowanceUsd": 0.05,
+  "nominalOutputGuardOnly": 1.53,
+  "notBillingHardCap": true,
+  "inputSha256": "0f164ff47f7458b3897ddd226124d132d12817a2f57d967a2c362e3792f27ea6"
+}

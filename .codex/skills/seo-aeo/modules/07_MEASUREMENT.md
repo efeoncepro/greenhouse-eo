@@ -8,6 +8,62 @@
 > de la serie) **medidas** as-of 2026-08; **medición no nativa** (canal operado por
 > un tercero) as-of 2026-08-25.
 
+> **Delta 2026-09-24 — Search Console multimodal web:** filtro anunciado y en
+> despliegue global; el desglose visual se confirma en la propiedad, no se asume
+> disponible por igual para todas.
+
+### Búsqueda web multimodal — nuevo corte de GSC (2026-09-24)
+
+Google añadió **Web: multimodal** a los informes de rendimiento de resultados
+de búsqueda y de funciones generativas. Agrupa resultados web donde el usuario
+usó una imagen al buscar. Google enumera Lens, Circle to Search en Android,
+imágenes subidas a Search y “Search this image” de Chrome. El despliegue global
+empieza el 24 de septiembre; una propiedad puede no mostrar métricas si no
+recibe tráfico de estas búsquedas.
+
+**Lectura operativa**
+
+1. En Search Console, abre **Rendimiento → Resultados de búsqueda** y compara
+   `Web: multimodal` con `Web: text-based`, con idénticas fechas, país,
+   dispositivo y nivel de agregación. Repite en **Rendimiento → Funciones
+   generativas** para observar las impresiones de resultados generativos web
+   iniciados con imagen.
+2. Exporta los cortes y conserva fecha, propiedad, filtro, zona horaria, tipo de
+   informe y dimensiones para que la comparación se pueda repetir. Compara
+   impresiones, clics, CTR y posición donde el informe los ofrezca; el informe
+   de funciones generativas se centra en impresiones y sus agregaciones pueden
+   diferir del informe principal.
+3. Mira páginas y dispositivos junto con el volumen. Usa consultas solo cuando
+   el informe las ofrezca; no infieras la imagen que inició la búsqueda, el
+   objeto fotografiado ni la intención del usuario a partir de una URL o una
+   subida general de clics.
+4. Para páginas con imágenes, inspecciona luego HTML indexable, imagen rastreable,
+   `src` real, contexto/caption, ALT útil, dimensiones y carga móvil según
+   `references/editorial-image-seo.md`. El corte puede orientar qué revisar;
+   por sí solo no identifica la causa ni prueba que una optimización produjo
+   más tráfico.
+5. Anota la fecha de despliegue en el análisis. La disponibilidad gradual,
+   el tráfico escaso, las consultas anonimizadas, los límites de filas y las
+   diferencias de agregación impiden tratar ausencia o discrepancias como cero
+   real sin diagnóstico.
+
+**No asumir paridad API.** La documentación vigente de Search Analytics API
+enumera `type=web`, `image`, `video`, `news`, `discover` y `googleNews`, pero no
+expone un tipo o filtro `multimodal`. Hasta que la API lo documente y una
+consulta canaria lo confirme, este corte se analiza desde la interfaz y su
+exportación. No etiquetes `type=web` completo ni `type=image` como multimodal.
+
+**Separar de Platform Properties.** Search Console tiene propiedades para
+cuentas o canales de Instagram, TikTok, X y YouTube, con datos de su rendimiento
+en Google Search. Es una capacidad separada y con despliegue gradual. No afirma
+que el filtro multimodal informe sobre impresiones dentro de esas plataformas,
+ni que cada propiedad de plataforma exponga ya ese filtro.
+
+**Qué significa para SEO:** por primera vez este informe separa tráfico web
+según haya empezado con una imagen. Es observabilidad adicional para priorizar
+QA de imágenes y comparar tendencias; no es una señal de ranking, una medida de
+“calidad de indexación de imágenes”, ni evidencia causal de lift.
+
 ## PARTE A — Medición SEO clásica
 
 ### Google Search Console (la fuente de verdad orgánica)

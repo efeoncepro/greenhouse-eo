@@ -1,5 +1,31 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-24 — Declaración del set de Insights con el índice A4
+
+La ampliación de TASK-1847 agrega `ReportIndexPage.png` al set visual. El índice se deriva del plan
+de páginas y muestra los folios físicos calculados antes del render; el probe confirma el molde y los
+slots, mientras las pruebas del mapper verifican el contenido y la numeración.
+
+**Frames declarados para promoción (10 nuevos):** nueve plantillas de deck/informe declaradas el
+2026-09-21 más el nuevo `ReportIndexPage`. En tres ejecuciones frescas previas al índice y tres
+posteriores, los frames ya existentes del catálogo y del deck SKY coincidieron con su baseline; el
+único delta observado fue el nacimiento de las plantillas Insights. Se declaran esos diez frames para su primera
+promoción, sin rebaselinear las plantillas ajenas.
+
+- `templates-insights-deck/InsightsCoverSlide.png`
+- `templates-insights-deck/InsightsEvidenceSlide.png`
+- `templates-insights-deck/InsightsNarrativeSlide.png`
+- `templates-insights-deck/InsightsLimitsSlide.png`
+- `templates-insights-report/ReportCoverPage.png`
+- `templates-insights-report/ReportIndexPage.png`
+- `templates-insights-report/ReportNarrativePage.png`
+- `templates-insights-report/ReportAnalysisPage.png`
+- `templates-insights-report/ReportTablePage.png`
+- `templates-insights-report/ReportLimitsPage.png`
+
+Las seis corridas pertenecen a la misma sesión de septiembre 24. Estos frames siguen declarados y sin promover:
+`--freeze` requiere el commit atómico con los cambios de catálogo.
+
 ## 2026-09-21 — Dos catálogos nuevos entran al gate: `insights-deck` (16:9) e `insights-report` (A4)
 
 **Qué cambia y qué no.** El gate pasa de fotografiar UN catálogo a fotografiar tres, cada uno en su

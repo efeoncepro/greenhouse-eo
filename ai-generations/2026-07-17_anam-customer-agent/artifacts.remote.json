@@ -1,0 +1,467 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:32:34.238Z",
+  "run": "ai-generations/2026-07-17_anam-customer-agent",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-17_anam-customer-agent",
+  "totalBytes": 7902397,
+  "fileCount": 76,
+  "files": [
+    {
+      "path": "delivery/anam-ca-autonomy-desktop-dark-web-1600-v1.webp",
+      "sizeBytes": 55898,
+      "sha256": "3ab0ec8442dd41f52818878060cb28a77edca882a2e3844c3e2aced1fa34adc3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-autonomy-desktop-dark-web-1600-v1.webp"
+    },
+    {
+      "path": "delivery/anam-ca-autonomy-desktop-dark-web-1600-v2.webp",
+      "sizeBytes": 74316,
+      "sha256": "b33fe50898f5ea70e64321fe987abd2f9f403a1828c86012f0c66e1d019fd94e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-autonomy-desktop-dark-web-1600-v2.webp"
+    },
+    {
+      "path": "delivery/anam-ca-autonomy-desktop-web-1600-v1.webp",
+      "sizeBytes": 58892,
+      "sha256": "cdd061bb189906b938a0fbf7dc9744911a9b9bbcbc79fd400facbb171ccd572d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-autonomy-desktop-web-1600-v1.webp"
+    },
+    {
+      "path": "delivery/anam-ca-autonomy-desktop-web-1600-v2.webp",
+      "sizeBytes": 77164,
+      "sha256": "6cad9291092601473f25399ba489e02f2e64f4e6d855821b53d4c54545cff14b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-autonomy-desktop-web-1600-v2.webp"
+    },
+    {
+      "path": "delivery/anam-ca-autonomy-mobile-dark-web-1200-v1.webp",
+      "sizeBytes": 59918,
+      "sha256": "250a816a8815c21d36aa08de3042d0e183326662295bb5ba8d60a38b777adf30",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-autonomy-mobile-dark-web-1200-v1.webp"
+    },
+    {
+      "path": "delivery/anam-ca-autonomy-mobile-dark-web-1200-v2.webp",
+      "sizeBytes": 75834,
+      "sha256": "2ae52e35f9266ab13e45bbe95e0e91632209968e765952889ca148d8b4af5cc5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-autonomy-mobile-dark-web-1200-v2.webp"
+    },
+    {
+      "path": "delivery/anam-ca-autonomy-mobile-web-1200-v1.webp",
+      "sizeBytes": 62932,
+      "sha256": "f0dbfb0c35cd568816dbd541e43c229a79ca9977989ebfebcae79087615ccd2d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-autonomy-mobile-web-1200-v1.webp"
+    },
+    {
+      "path": "delivery/anam-ca-autonomy-mobile-web-1200-v2.webp",
+      "sizeBytes": 77186,
+      "sha256": "bf340205a55b15a94002409b116460bd4d6843fb2ec7d0dbf62e7ea9fb1788aa",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-autonomy-mobile-web-1200-v2.webp"
+    },
+    {
+      "path": "delivery/anam-ca-evidence-desktop-dark-web-1600-v1.webp",
+      "sizeBytes": 53224,
+      "sha256": "cc7c49e1909f8ab2dbc6c21a2dff5e603112a74774bbf9034d65df9348bf7e27",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-evidence-desktop-dark-web-1600-v1.webp"
+    },
+    {
+      "path": "delivery/anam-ca-evidence-desktop-dark-web-1600-v2.webp",
+      "sizeBytes": 83690,
+      "sha256": "77920111b925da9e6ba2c2f1fba3242b79dad4a9fc8f31f31b6731fb9e09c2c2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-evidence-desktop-dark-web-1600-v2.webp"
+    },
+    {
+      "path": "delivery/anam-ca-evidence-desktop-web-1600-v1.webp",
+      "sizeBytes": 54254,
+      "sha256": "f187f9515688864a6062ee4b0f3020cd0fae0ad6d09d64958d46608010246cfc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-evidence-desktop-web-1600-v1.webp"
+    },
+    {
+      "path": "delivery/anam-ca-evidence-desktop-web-1600-v2.webp",
+      "sizeBytes": 84566,
+      "sha256": "1587004f7448172e2df63896307245f419dc756f658a0eea3b507e1fbe9deabb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-evidence-desktop-web-1600-v2.webp"
+    },
+    {
+      "path": "delivery/anam-ca-evidence-mobile-dark-web-1200-v1.webp",
+      "sizeBytes": 58608,
+      "sha256": "db2b4af69869cc4511618aed8a2e90af7476b618d58af3c5d5b67715c7282cef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-evidence-mobile-dark-web-1200-v1.webp"
+    },
+    {
+      "path": "delivery/anam-ca-evidence-mobile-dark-web-1200-v2.webp",
+      "sizeBytes": 79350,
+      "sha256": "2230e82eedc1ebb021139959597567974b835f6f5bc0adede76cd0e58dca1099",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-evidence-mobile-dark-web-1200-v2.webp"
+    },
+    {
+      "path": "delivery/anam-ca-evidence-mobile-web-1200-v1.webp",
+      "sizeBytes": 59852,
+      "sha256": "3d500718eae037b3ba0816337d7899315214bb2f2ec42bdf309dc1f6724c0673",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-evidence-mobile-web-1200-v1.webp"
+    },
+    {
+      "path": "delivery/anam-ca-evidence-mobile-web-1200-v2.webp",
+      "sizeBytes": 80462,
+      "sha256": "5a29617ce42dec708d3d10a0aac0610fac94a22a134c1c9f30cf73d10296e31c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-evidence-mobile-web-1200-v2.webp"
+    },
+    {
+      "path": "delivery/anam-ca-hero-og-1440x757-v1.jpg",
+      "sizeBytes": 65782,
+      "sha256": "0bdf2c8a4c5b45695c45c10d738721bafe8fba4e1d17305ff2be5877729dbef7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-hero-og-1440x757-v1.jpg"
+    },
+    {
+      "path": "delivery/anam-ca-hero-web-1600-v1.webp",
+      "sizeBytes": 43254,
+      "sha256": "18065f32f9f1a6dc4b9778c4ca3f0c538c2f5b2bc0b4c157e8c6d4e2f178bb6d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-hero-web-1600-v1.webp"
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-desktop-dark-web-1600-v1.webp",
+      "sizeBytes": 53230,
+      "sha256": "d38ecc9e8c6418672e8e8fa63ceffbe91eae1d13848d04c0c4ea372cb309c275",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-knowledge-desktop-dark-web-1600-v1.webp"
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-desktop-dark-web-1600-v2.webp",
+      "sizeBytes": 67624,
+      "sha256": "dd0cdaeee0db651b3f0d94968e2e62cdae6022db08f61e9237e1bd6e90ecc293",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-knowledge-desktop-dark-web-1600-v2.webp"
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-desktop-web-1600-v1.webp",
+      "sizeBytes": 55224,
+      "sha256": "c9a60335a7f15de255f0069226710890f997959f6b78332dc15f86907b80c227",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-knowledge-desktop-web-1600-v1.webp"
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-desktop-web-1600-v2.webp",
+      "sizeBytes": 69398,
+      "sha256": "19f0e69f1767166014b939aa7120157927dec675c9b3bbb64ecda6ffc2d696cf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-knowledge-desktop-web-1600-v2.webp"
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-mobile-dark-web-1200-v1.webp",
+      "sizeBytes": 61060,
+      "sha256": "0ee8ae778a5b66ea893715f86e5a6d478a1a18c3d88c50fd8768feb65215dd15",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-knowledge-mobile-dark-web-1200-v1.webp"
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-mobile-dark-web-1200-v2.webp",
+      "sizeBytes": 84340,
+      "sha256": "d6073f23d662bbfda9da581b6cd2538e6ff71d72ee397e9e55eb3fb59fc360f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-knowledge-mobile-dark-web-1200-v2.webp"
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-mobile-web-1200-v1.webp",
+      "sizeBytes": 63268,
+      "sha256": "1d3f125c53b89bba49c125b98070308e2e2f4a2b5b31cf781ef6a2def115b422",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-knowledge-mobile-web-1200-v1.webp"
+    },
+    {
+      "path": "delivery/anam-ca-knowledge-mobile-web-1200-v2.webp",
+      "sizeBytes": 85882,
+      "sha256": "bdfd3413e69b44f33dfc2b5e307f40dcd58deefb0a4647c3a8c9e813d72b2e79",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/delivery/anam-ca-knowledge-mobile-web-1200-v2.webp"
+    },
+    {
+      "path": "masters/anam-ca-autonomy-desktop-dark-master-v1.png",
+      "sizeBytes": 97210,
+      "sha256": "038c5d459273a83603e19c84e4ec27cda7a4367ebcad5debd7ab9c6e5c4c2ca4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-autonomy-desktop-dark-master-v1.png"
+    },
+    {
+      "path": "masters/anam-ca-autonomy-desktop-dark-master-v2.png",
+      "sizeBytes": 119106,
+      "sha256": "d2b47e75d4de5904c03fa2b6eb009dada1ad231f3af9f39e5e1c9b021b7eaf4b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-autonomy-desktop-dark-master-v2.png"
+    },
+    {
+      "path": "masters/anam-ca-autonomy-desktop-master-v1.png",
+      "sizeBytes": 98086,
+      "sha256": "11481ca67deba856393b6ae13981d9bbc867a7781653efbf9d472aa4491f7e96",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-autonomy-desktop-master-v1.png"
+    },
+    {
+      "path": "masters/anam-ca-autonomy-desktop-master-v2.png",
+      "sizeBytes": 120252,
+      "sha256": "42f6b954a7aa7a19f22e3551cde470e56e8f91d96260e67d371620a9b30c3413",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-autonomy-desktop-master-v2.png"
+    },
+    {
+      "path": "masters/anam-ca-autonomy-mobile-dark-master-v1.png",
+      "sizeBytes": 101001,
+      "sha256": "18f8b614ca8fd5921d3a0b549319652a4ea79d30daeab6b06a672deb4b67ea7b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-autonomy-mobile-dark-master-v1.png"
+    },
+    {
+      "path": "masters/anam-ca-autonomy-mobile-dark-master-v2.png",
+      "sizeBytes": 118833,
+      "sha256": "7e189ea9ae038b9795e86d1688522107bfdaaaf90236597ea8db9dd6943397ac",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-autonomy-mobile-dark-master-v2.png"
+    },
+    {
+      "path": "masters/anam-ca-autonomy-mobile-master-v1.png",
+      "sizeBytes": 101566,
+      "sha256": "12f85c8d4f9f74c92cd777b8df356eba46297bfb3800f9738a7cf1dce64d371f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-autonomy-mobile-master-v1.png"
+    },
+    {
+      "path": "masters/anam-ca-autonomy-mobile-master-v2.png",
+      "sizeBytes": 119691,
+      "sha256": "be58f59dbf53b0655819640e1a5775adfb20bbf181ea6348999e6be9e47d2162",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-autonomy-mobile-master-v2.png"
+    },
+    {
+      "path": "masters/anam-ca-evidence-desktop-dark-master-v1.png",
+      "sizeBytes": 94874,
+      "sha256": "b19f980dadde7f3b586b58f43ad9b14fb8e74f22e6b709d1d697aecc61f30329",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-evidence-desktop-dark-master-v1.png"
+    },
+    {
+      "path": "masters/anam-ca-evidence-desktop-dark-master-v2.png",
+      "sizeBytes": 137830,
+      "sha256": "6932277f80f5d5758746a925c46bba9f5d2dff686defd16af00b3b9826565819",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-evidence-desktop-dark-master-v2.png"
+    },
+    {
+      "path": "masters/anam-ca-evidence-desktop-master-v1.png",
+      "sizeBytes": 96143,
+      "sha256": "c22e77744d08b725d1ad4eaf1a589f3513eaa220b2b375b6908101e112b4d556",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-evidence-desktop-master-v1.png"
+    },
+    {
+      "path": "masters/anam-ca-evidence-desktop-master-v2.png",
+      "sizeBytes": 138666,
+      "sha256": "df8473e70c43d8919a41070837dae800139b62a4e07badc3b93951fa643f2dd7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-evidence-desktop-master-v2.png"
+    },
+    {
+      "path": "masters/anam-ca-evidence-mobile-dark-master-v1.png",
+      "sizeBytes": 99668,
+      "sha256": "62a142a26b4146b3b4cf5c67c142ae5d2fce862e4317a7583cddfeffcbbf3537",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-evidence-mobile-dark-master-v1.png"
+    },
+    {
+      "path": "masters/anam-ca-evidence-mobile-dark-master-v2.png",
+      "sizeBytes": 123101,
+      "sha256": "ebd5505976a773918062e4bdfd30ad64ed4cfdb67415efcf97ede923260de1f8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-evidence-mobile-dark-master-v2.png"
+    },
+    {
+      "path": "masters/anam-ca-evidence-mobile-master-v1.png",
+      "sizeBytes": 102381,
+      "sha256": "e2c60428ee6c933f487920cd0982421ff41a1c538715951ab0a7a073da8298b2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-evidence-mobile-master-v1.png"
+    },
+    {
+      "path": "masters/anam-ca-evidence-mobile-master-v2.png",
+      "sizeBytes": 123887,
+      "sha256": "4a9cfaa3553ec20b1714226be25de45626c024d4a36fd9c00695afdb9d010310",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-evidence-mobile-master-v2.png"
+    },
+    {
+      "path": "masters/anam-ca-hero-master-v1.png",
+      "sizeBytes": 163430,
+      "sha256": "b2a7374eeff6a6bf7b6e97597ef50aad8c443883469e76b8056eea0140b457fc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-hero-master-v1.png"
+    },
+    {
+      "path": "masters/anam-ca-knowledge-desktop-dark-master-v1.png",
+      "sizeBytes": 92073,
+      "sha256": "c00332dcf0c2509bf537ec4fd43581e86a368169613aeb80f1d01164061a8850",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-knowledge-desktop-dark-master-v1.png"
+    },
+    {
+      "path": "masters/anam-ca-knowledge-desktop-dark-master-v2.png",
+      "sizeBytes": 114239,
+      "sha256": "79ee45ad353482a3ff25f41e51e029dc8b478ab89252939b7734c175c3c49405",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-knowledge-desktop-dark-master-v2.png"
+    },
+    {
+      "path": "masters/anam-ca-knowledge-desktop-master-v1.png",
+      "sizeBytes": 92941,
+      "sha256": "882ecf79c08a458a68ef968ab7d26fe3f27d5ff86b3481f6c4cf7ebf2ded817f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-knowledge-desktop-master-v1.png"
+    },
+    {
+      "path": "masters/anam-ca-knowledge-desktop-master-v2.png",
+      "sizeBytes": 115370,
+      "sha256": "37cd37207e3b5e001796ba4059087d807c645d88aa7e893be6f4cee23f7b6c21",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-knowledge-desktop-master-v2.png"
+    },
+    {
+      "path": "masters/anam-ca-knowledge-mobile-dark-master-v1.png",
+      "sizeBytes": 102334,
+      "sha256": "482edb9a044dd14bc15e016b6901c0c97176ec420945b1cd9b0a9e931cb80378",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-knowledge-mobile-dark-master-v1.png"
+    },
+    {
+      "path": "masters/anam-ca-knowledge-mobile-dark-master-v2.png",
+      "sizeBytes": 135061,
+      "sha256": "75377ff864b75a27936a7634b869b6787c0eab56950b90095b764c186b7500cb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-knowledge-mobile-dark-master-v2.png"
+    },
+    {
+      "path": "masters/anam-ca-knowledge-mobile-master-v1.png",
+      "sizeBytes": 103184,
+      "sha256": "41fbcf9b86ce4553e693d222ef2863688fd5c0b1a83f7768240332eb8853312b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-knowledge-mobile-master-v1.png"
+    },
+    {
+      "path": "masters/anam-ca-knowledge-mobile-master-v2.png",
+      "sizeBytes": 136365,
+      "sha256": "e7e35c9735b43979ec482099805cbb19b0a2f0601c4c8b97bb4bd074824cc4a4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/masters/anam-ca-knowledge-mobile-master-v2.png"
+    },
+    {
+      "path": "review/anam-ca-autonomy-desktop-dark-proof-v1.png",
+      "sizeBytes": 119629,
+      "sha256": "f5a79106d9dfd181559b7f8af0e20491989ec300d91bfcb6acfd4a3df5878f61",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-autonomy-desktop-dark-proof-v1.png"
+    },
+    {
+      "path": "review/anam-ca-autonomy-desktop-dark-proof-v2.png",
+      "sizeBytes": 142419,
+      "sha256": "ae8b66241d5e449f2b807fc17623db4f80e925a25eb0eb5aa395df116c4257b6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-autonomy-desktop-dark-proof-v2.png"
+    },
+    {
+      "path": "review/anam-ca-autonomy-desktop-proof-v1.png",
+      "sizeBytes": 110663,
+      "sha256": "19fad49bf3e7c5c3fcb959dfcc89b12bb178e35914ec82639d8903fe3de76868",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-autonomy-desktop-proof-v1.png"
+    },
+    {
+      "path": "review/anam-ca-autonomy-desktop-proof-v2.png",
+      "sizeBytes": 134470,
+      "sha256": "31a90b278f45df9907eef75dc9540abd8371ded2fa3f471e78dbaac868e5434e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-autonomy-desktop-proof-v2.png"
+    },
+    {
+      "path": "review/anam-ca-autonomy-mobile-dark-proof-v1.png",
+      "sizeBytes": 125899,
+      "sha256": "9b0d654b39445eb04fb3abff16a97644d82a12404b6536d26accdf2a0951aab3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-autonomy-mobile-dark-proof-v1.png"
+    },
+    {
+      "path": "review/anam-ca-autonomy-mobile-dark-proof-v2.png",
+      "sizeBytes": 147573,
+      "sha256": "a2d7b7f8669d63c146cc0dca3e57c446e3750ddab021fd8cc936371d69a12b8f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-autonomy-mobile-dark-proof-v2.png"
+    },
+    {
+      "path": "review/anam-ca-autonomy-mobile-proof-v1.png",
+      "sizeBytes": 119948,
+      "sha256": "3aa7f79d53938b17114ae5c2134aea5f40f8cffb8cd32c7356c3eb9f5c0c872c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-autonomy-mobile-proof-v1.png"
+    },
+    {
+      "path": "review/anam-ca-autonomy-mobile-proof-v2.png",
+      "sizeBytes": 142688,
+      "sha256": "7d98a891f2ce27be78ffa9c87dc4a037e3c09c6ebf74368c4790193a7ed21d24",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-autonomy-mobile-proof-v2.png"
+    },
+    {
+      "path": "review/anam-ca-evidence-desktop-dark-proof-v1.png",
+      "sizeBytes": 112207,
+      "sha256": "80e80d08edbf78c2fed6341a2b0d9bca3bf3ca6c7609f2db01b969bfdad6fe61",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-evidence-desktop-dark-proof-v1.png"
+    },
+    {
+      "path": "review/anam-ca-evidence-desktop-dark-proof-v2.png",
+      "sizeBytes": 162433,
+      "sha256": "e366d4508d0842c83e91a64fccfdf34f3d2d2140dec201ca33e053d881db65b8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-evidence-desktop-dark-proof-v2.png"
+    },
+    {
+      "path": "review/anam-ca-evidence-desktop-proof-v1.png",
+      "sizeBytes": 105974,
+      "sha256": "253d394c93516716d915fc2aba99ec8032e1fdaf72c0d37efb2a9108b70e3921",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-evidence-desktop-proof-v1.png"
+    },
+    {
+      "path": "review/anam-ca-evidence-desktop-proof-v2.png",
+      "sizeBytes": 148961,
+      "sha256": "abc87f1acf716ab9056f06131a662261e78a1fe4958c4d5e58f14ac9adeacea9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-evidence-desktop-proof-v2.png"
+    },
+    {
+      "path": "review/anam-ca-evidence-mobile-dark-proof-v1.png",
+      "sizeBytes": 120258,
+      "sha256": "eb2d5242d8c7687f975abb93c68b3edc26e858292d61fe9d46f1ed31ae533059",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-evidence-mobile-dark-proof-v1.png"
+    },
+    {
+      "path": "review/anam-ca-evidence-mobile-dark-proof-v2.png",
+      "sizeBytes": 152497,
+      "sha256": "0d22b9124d24dd165b4ab7ae9864d56a551268a5e266e8a541052959a20c9fa6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-evidence-mobile-dark-proof-v2.png"
+    },
+    {
+      "path": "review/anam-ca-evidence-mobile-proof-v1.png",
+      "sizeBytes": 115840,
+      "sha256": "534aa2ec6fa58ab21966414bbfd7b9493d6dae6305f6adf5e584a397055d7f26",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-evidence-mobile-proof-v1.png"
+    },
+    {
+      "path": "review/anam-ca-evidence-mobile-proof-v2.png",
+      "sizeBytes": 145374,
+      "sha256": "b89b5f98284577eb047654aed7b87e6fd76b5805affa3e37e339a45b078acecb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-evidence-mobile-proof-v2.png"
+    },
+    {
+      "path": "review/anam-ca-hero-square-proof-v1.png",
+      "sizeBytes": 145171,
+      "sha256": "58661d26de8b02d1248ed390e9f0c2a5cd284e7f7a3480c0664f18d5c1d85d6b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-hero-square-proof-v1.png"
+    },
+    {
+      "path": "review/anam-ca-knowledge-desktop-dark-proof-v1.png",
+      "sizeBytes": 112476,
+      "sha256": "169fd4a5d136707c39442a4f4f50c176355f80a686bcb52ca435e2cb8b262cf2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-knowledge-desktop-dark-proof-v1.png"
+    },
+    {
+      "path": "review/anam-ca-knowledge-desktop-dark-proof-v2.png",
+      "sizeBytes": 142856,
+      "sha256": "2c7011564e793225d630c7f80c3b2a5ec59fe88d920c99c2aa1bba1b3280fc78",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-knowledge-desktop-dark-proof-v2.png"
+    },
+    {
+      "path": "review/anam-ca-knowledge-desktop-proof-v1.png",
+      "sizeBytes": 103561,
+      "sha256": "ba84be7365765883fb83dfa5ae82460dde4dd856f03a8837cb791615cefb6946",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-knowledge-desktop-proof-v1.png"
+    },
+    {
+      "path": "review/anam-ca-knowledge-desktop-proof-v2.png",
+      "sizeBytes": 127925,
+      "sha256": "2850969b3869069de01a9c7959a6a58c3202a9234a6bbea2e9c0408845e09c84",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-knowledge-desktop-proof-v2.png"
+    },
+    {
+      "path": "review/anam-ca-knowledge-mobile-dark-proof-v1.png",
+      "sizeBytes": 126861,
+      "sha256": "7b3f01c7219d5b4164dfe0505268e57dfd5e7272bfa4c67dd5fc6fe0528f9b64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-knowledge-mobile-dark-proof-v1.png"
+    },
+    {
+      "path": "review/anam-ca-knowledge-mobile-dark-proof-v2.png",
+      "sizeBytes": 165430,
+      "sha256": "55e858f9d84f0d3a4447901f877c8eca846e15e26f81d78e838f4bda3ff71dc2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-knowledge-mobile-dark-proof-v2.png"
+    },
+    {
+      "path": "review/anam-ca-knowledge-mobile-proof-v1.png",
+      "sizeBytes": 120469,
+      "sha256": "1ce2f7b5ac7e153044ca1f0f3240097facd9cda80f015aea4ffe9e1f89a460ab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-knowledge-mobile-proof-v1.png"
+    },
+    {
+      "path": "review/anam-ca-knowledge-mobile-proof-v2.png",
+      "sizeBytes": 158315,
+      "sha256": "2ad0bd4d3449bdcb6b2de55e2cdbccbf44c64a520ca3c5b4f8ef58367613906f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-customer-agent/review/anam-ca-knowledge-mobile-proof-v2.png"
+    }
+  ]
+}

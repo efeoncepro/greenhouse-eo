@@ -1,0 +1,30 @@
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v7/sky-v7-seedance-native.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf58.76.100
+  Duration: 00:00:29.71, start: 0.000000, bitrate: 7834 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 720x1280, 7558 kb/s, 24 fps, 24 tbr, 90k tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+  Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 32000 Hz, stereo, fltp, 264 kb/s (default)
+    Metadata:
+      handler_name    : SoundHandler
+Stream mapping:
+  Stream #0:1 -> #0:0 (aac (native) -> pcm_s16le (native))
+Press [q] to stop, [?] for help
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf62.12.101
+  Stream #0:0(und): Audio: pcm_s16le, 32000 Hz, stereo, s16, 1024 kb/s (default)
+    Metadata:
+      encoder         : Lavc62.28.101 pcm_s16le
+      handler_name    : SoundHandler
+[Parsed_silencedetect_0 @ 0x77b9064a80] silence_start: 29.53975
+[Parsed_silencedetect_0 @ 0x77b9064a80] silence_end: 29.728 | silence_duration: 0.18825
+[out#0/null @ 0x77b9064300] video:0KiB audio:3716KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+size=N/A time=00:00:29.72 bitrate=N/A speed=2.2e+03x elapsed=0:00:00.01    

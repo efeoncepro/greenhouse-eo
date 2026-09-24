@@ -121,3 +121,10 @@ más las ocho vistas derivadas, todas ancladas al mismo retrato cercano.
 - La biblioteca catalogada de Nexa **no tiene una sola hoja de expresiones**: las 24 poses son planos
   enteros donde la cabeza ocupa ~16% del alto, y 8 de esos 24 archivos repiten el mismo registro de media
   sonrisa. Con la identidad ya resuelta, ése es el hueco siguiente.
+
+## Confirmación de identidad 2026-09-24
+
+El operador revisó y confirmó el set fotorrealista de Nexa con polera gris. Este directorio de ángulos contiene
+las ocho vistas aprobadas (seis de rostro y dos de cuerpo); es la referencia de continuidad fotográfica que
+debe abrirse y usarse mediante `foto:prompt`. La camiseta gris identifica el set de referencia y no fija el
+vestuario de futuras escenas. La biblioteca de poses sigue siendo una fuente distinta para gesto/cuerpo.

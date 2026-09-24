@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "httpStatus": 200,
+  "model": "bytedance/seedance-2.5/reference-to-video",
+  "requestId": "01a0d2c8-444a-7fd0-b606-5a2987148e87",
+  "output": {
+    "video": {
+      "url": "https://v3b.fal.media/files/b/0aabb1da/oXlSaUXjv5F6x8371_ONx_video.mp4",
+      "content_type": "video/mp4",
+      "file_name": "video.mp4",
+      "file_size": 27446744
+    },
+    "seed": 306824234
+  },
+  "errorDetail": null,
+  "latencyMs": 45556,
+  "secretSource": "secret_manager",
+  "account": "FAL_API_KEY_B"
+}

@@ -1,0 +1,12 @@
+{
+  "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v13-refinement/sky-v13-picture-conformed.mp4",
+  "patch": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v14-finish/omni-window-a-native.mp4",
+  "cutFrame": 301,
+  "cloudDissolve": [
+    420,
+    432
+  ],
+  "nativeAudioDiscarded": true,
+  "allOmniFramesVisuallyInspected": 156,
+  "status": "pending montage review"
+}

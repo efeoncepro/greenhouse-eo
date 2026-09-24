@@ -45,7 +45,10 @@ para fondo oscuro; light es navy para fondo claro. No inferirlo al revés.
 **Nexa:** poses, vestuario, avatar, fondos, voz y contenidos viven en
 `10. Nexa (Influencer IA)` bajo esta raíz. Cargar el
 [inventario y contrato de selección](../../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md)
-antes de reutilizarla; incluye rutas y particularidades Unicode verificadas.
+antes de reutilizarla; incluye rutas y particularidades Unicode verificadas. Identidad vigente confirmada
+2026-09-24: rostro humano fotorrealista Avatar A, con set de ocho vistas de polera gris en
+`ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`, resuelto con `foto:prompt`. El banco
+OneDrive de poses guía actuación/cuerpo, no identidad facial.
 
 **Mascotas de partners:** `14. Mascotas de partners/<Mascota (Partner)>/` (incluye `Sprocket (HubSpot)`, logo de uso interno hasta aprobación) con subcarpetas por familia y versión
 (p. ej. `Clawd (Claude)/`, `Codex (OpenAI)/` y `Gigi (Google Gemini)/`, cada una con `Fuente oficial/`, `Poses 3D/v01/` y

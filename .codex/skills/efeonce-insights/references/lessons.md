@@ -1,5 +1,10 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-24 · El primer baseline de un catálogo nuevo sigue sujeto al commit atómico.** `composer:visual-gate`
+  reportó diez frames Insights aún no promovidos; el nuevo índice ya estaba declarado y el resto era el set del
+  2026-09-21. Regla: conserva los frames ajenos intactos y no ejecutes `--freeze` sin poder incluir baseline y
+  catálogo en el mismo commit.
+
 - **2026-09-22 · OTD nunca llegó a un informe, y nada falló.** El adapter ICO buscaba `metricId === 'otd'`; el
   registro del motor lo llama `otd_pct`. Sin match, el `if (otd)` sin `else` omitía la métrica en silencio, y el
   fixture del test repetía el id equivocado, así que el test confirmaba el error en vez de detectarlo. Regla: los ids que

@@ -1,0 +1,41 @@
+{
+  "native": {
+    "width": 941,
+    "height": 1672
+  },
+  "export": {
+    "width": 1080,
+    "height": 1920,
+    "colour": "sRGB",
+    "note": "Resized from generated raster; not native 1080p"
+  },
+  "checks": [
+    "9:16 full canvas",
+    "3:4 centred crop",
+    "4:5 centred crop",
+    "1:1 conservative legacy crop"
+  ],
+  "importantArtworkApprox": {
+    "x": [
+      105,
+      872
+    ],
+    "y": [
+      446,
+      1330
+    ]
+  },
+  "conservativeReelUIExclusion": {
+    "top": 250,
+    "bottom": 420,
+    "right": 130
+  },
+  "status": "pending visual crop review",
+  "platformPreview": false,
+  "officialHelpStatus": "429 unavailable",
+  "sources": [
+    "https://www.creobee.com/tools/instagram-reel-cover-safe-zone",
+    "https://shotmod.com/sizes/instagram-reel-cover-size/"
+  ],
+  "copyRemoved": "Ahora, también para SEO y AEO."
+}

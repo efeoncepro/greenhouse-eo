@@ -1,0 +1,9 @@
+{
+  "id": "design-context-v3-04-revision",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["julio", "nexa"],
+  "escena": "SCENE (Efeonce creative studio, Santiago, late afternoon): the real Julio and Nexa from the approved identity photographs are checking the finished creative at the same workbench. At the instant Nexa points to one precise detail in a bold, richly composed campaign proof on the light table, Julio leans into the scene and follows her finger, reconsidering the piece. Nexa wears her neutral grey t-shirt; Julio wears his warm-white shirt and familiar glasses. Their exact identities, natural facial features and skin texture stay intact. This is the active instant of creative judgment, not a posed team portrait: Nexa is speaking while Julio takes in the change, both eyes on the proof. The large printed creative contains abstract photography and shapes only, without legible text or marks; the original steel bowl now rests empty farther back. A real studio window is the light source, giving a warm-neutral highlight and one natural azure reflection along the light table, with a restrained orange accent in the artwork. Leave a clean warm-neutral wall in the upper right for a short comic dialogue balloon. Medium side angle, shoulders, hands and artwork visible, strong natural shadow, real paper surface, tidy premium creative studio, 50mm editorial photography. No stock-photo smiles, no meeting props, no fantasy glow, no cartoon, no franchise characters, no text, no logo, no comic effects in the photo; captions and dialogue are added during page composition.",
+  "lecho": { "objeto": "the dark near edge of the light table, close to the lens", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "clean warm-neutral studio wall in the upper right", "tinta": "oscura" } }
+}

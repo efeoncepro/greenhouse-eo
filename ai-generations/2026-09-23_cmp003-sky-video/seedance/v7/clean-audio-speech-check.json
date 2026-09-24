@@ -1,0 +1,13 @@
+{
+  "file": "audio-clean.wav",
+  "method": "demucs htdemucs_ft two-stems vocals",
+  "verification": {
+    "model": "eleven_scribe_v1",
+    "flow_id": "c1xwy5PjHyOFVHtKgBAy",
+    "session_id": "dHSkwGY49eWvJh0s4DuX",
+    "generation_id": "nOtcRJVUN9LJ2lISwDbq",
+    "status": "completed",
+    "transcript": ""
+  },
+  "limitation": "No speech recognized by ASR; this does not establish perceptual fidelity of music/SFX or exclude all residual vocal artifacts."
+}

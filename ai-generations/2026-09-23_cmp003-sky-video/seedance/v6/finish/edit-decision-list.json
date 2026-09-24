@@ -1,0 +1,40 @@
+{
+  "generated_source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/sky-v6-silent-30s-916.mp4",
+  "cuts": [
+    [
+      "intro",
+      0,
+      3.75,
+      3.75
+    ],
+    [
+      "approach",
+      9.75,
+      12.375,
+      2.625
+    ],
+    [
+      "pass",
+      12.375,
+      15,
+      1
+    ],
+    [
+      "departure",
+      15,
+      18,
+      2.375
+    ]
+  ],
+  "assembled_inputs": [
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/finish/intro.mp4",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/finish/chat.mp4",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/finish/approach.mp4",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/finish/pass.mp4",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/finish/departure.mp4",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/finish/titles.mp4",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/closing-official-5s.mp4"
+  ],
+  "native_finishing": "user/answer/citation, typography, official closing",
+  "output": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/sky-v6-finished-silent.mp4"
+}

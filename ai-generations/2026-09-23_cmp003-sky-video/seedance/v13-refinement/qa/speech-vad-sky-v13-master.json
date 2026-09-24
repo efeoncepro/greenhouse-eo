@@ -1,0 +1,44 @@
+[
+  {
+    "start": 1.65,
+    "end": 2.69,
+    "text": " Subt\u00edtulos por la comunidad de Amara.org",
+    "words": [
+      {
+        "word": " Subt\u00edtulos",
+        "start": 1.65,
+        "end": 2.45
+      },
+      {
+        "word": " por",
+        "start": 2.45,
+        "end": 2.45
+      },
+      {
+        "word": " la",
+        "start": 2.45,
+        "end": 2.45
+      },
+      {
+        "word": " comunidad",
+        "start": 2.45,
+        "end": 2.45
+      },
+      {
+        "word": " de",
+        "start": 2.45,
+        "end": 2.47
+      },
+      {
+        "word": " Amara",
+        "start": 2.47,
+        "end": 2.47
+      },
+      {
+        "word": ".org",
+        "start": 2.47,
+        "end": 2.69
+      }
+    ]
+  }
+]

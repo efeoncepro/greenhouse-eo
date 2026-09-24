@@ -1,0 +1,28 @@
+{
+  "omni": {
+    "requests": 1,
+    "duration": 6.5,
+    "resolution": "1080p",
+    "usage": {
+      "total_input_tokens": 36680,
+      "total_output_tokens": 56472,
+      "total_thought_tokens": 371
+    },
+    "usageEstimatedUsd": 1.046619,
+    "invoiceVerified": false
+  },
+  "audio": {
+    "musicModel": "music_v2_5",
+    "surface": "Eleven Music UI authenticated",
+    "fullGenerations": 3,
+    "localizedIntroEdits": 1,
+    "quoteFull30sCreditsEach": 795,
+    "quoteEditCreditsPerMinute": 1591,
+    "actualMusicBillingVerified": false,
+    "sfxModel": "eleven_text_to_sound_v2",
+    "sfxGenerationCount": 5,
+    "sfxReportedCredits": 97,
+    "sfxReportedUsd": 0.02134
+  },
+  "noFurtherGenerationPlanned": true
+}

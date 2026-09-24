@@ -1,0 +1,47 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:30:13.055Z",
+  "run": "ai-generations/2026-08-21_hiring-selected-email-hero",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-08-21_hiring-selected-email-hero",
+  "totalBytes": 5315247,
+  "fileCount": 6,
+  "files": [
+    {
+      "path": "rejected/hiring-selected-email-hero-v1.png",
+      "sizeBytes": 152857,
+      "sha256": "3e264e30ef0f15e49c2a5c918cf9a9558897098a9ef6f1eaf9975eb0bb5c143a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-08-21_hiring-selected-email-hero/rejected/hiring-selected-email-hero-v1.png"
+    },
+    {
+      "path": "rejected/hiring-selected-email-illustration-v2.png",
+      "sizeBytes": 143187,
+      "sha256": "aed75bfb0a1db41ac1c84fd07e58ddb43dd355f9bbe52e6b15e0d7b76cfce16e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-08-21_hiring-selected-email-hero/rejected/hiring-selected-email-illustration-v2.png"
+    },
+    {
+      "path": "rejected/hiring-selected-email-illustration-v3.png",
+      "sizeBytes": 25228,
+      "sha256": "a88408e636adf915b8d9fdb024e42ba89bb6eb826b2216cbd839a722c598cdc0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-08-21_hiring-selected-email-hero/rejected/hiring-selected-email-illustration-v3.png"
+    },
+    {
+      "path": "source/hiring-selected-email-hero-master-v1.png",
+      "sizeBytes": 1473765,
+      "sha256": "b8606bc095893d3827244cb778500d274930ae4451076bfed14a81edc0adf033",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-08-21_hiring-selected-email-hero/source/hiring-selected-email-hero-master-v1.png"
+    },
+    {
+      "path": "source/hiring-selected-email-illustration-master-v2.png",
+      "sizeBytes": 2020332,
+      "sha256": "dd4eaa2d1508b9849e5cf63a63ad435c797481b8f1177216a55e4810f0ca55f9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-08-21_hiring-selected-email-hero/source/hiring-selected-email-illustration-master-v2.png"
+    },
+    {
+      "path": "source/hiring-selected-email-mail-icon-master-v4.png",
+      "sizeBytes": 1499878,
+      "sha256": "ba932c38ee82b36212d29f4735cfa318bb44658541836e8848944c7307537601",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-08-21_hiring-selected-email-hero/source/hiring-selected-email-mail-icon-master-v4.png"
+    }
+  ]
+}

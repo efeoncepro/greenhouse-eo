@@ -1,0 +1,29 @@
+{
+  "file": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/sky-v9-fal-1080p-musica-sfx-sin-voz.mp4",
+  "sha256": "91c15248b54204114093080e4ed4e5a0eb101d7b5c11256015c380aabd80e0ee",
+  "native_video_stream_hash": "SHA256=65b6a72197534ad00eac2eb78bf4cd628d1af031907782377926a4668bfd943d",
+  "final_video_stream_hash": "SHA256=65b6a72197534ad00eac2eb78bf4cd628d1af031907782377926a4668bfd943d",
+  "unchanged_generated_video_stream": true,
+  "first_190ms_peak_amplitude": 0.0,
+  "loudness": {
+    "input_i": "-16.47",
+    "input_tp": "-1.49",
+    "input_lra": "10.40",
+    "input_thresh": "-27.13",
+    "output_i": "-16.74",
+    "output_tp": "-1.50",
+    "output_lra": "7.60",
+    "output_thresh": "-27.25",
+    "normalization_type": "dynamic",
+    "target_offset": "0.74"
+  },
+  "duration": "30.041667",
+  "dimensions": [
+    1080,
+    1920
+  ],
+  "reviewed_samples": 361,
+  "sample_fps": 12,
+  "speech_review": "Final AAC readback: Scribe completed, empty transcript, generation XGTiAkjnyCReUdZddUdb",
+  "creative_status": "Candidate for operator review; UI/title camera impact remains partial"
+}

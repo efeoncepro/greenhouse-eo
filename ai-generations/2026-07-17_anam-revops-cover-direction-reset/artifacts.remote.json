@@ -1,0 +1,17 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:27:02.809Z",
+  "run": "ai-generations/2026-07-17_anam-revops-cover-direction-reset",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-17_anam-revops-cover-direction-reset",
+  "totalBytes": 89329,
+  "fileCount": 1,
+  "files": [
+    {
+      "path": "concept-board-v1.png",
+      "sizeBytes": 89329,
+      "sha256": "189c338188af62b4c7e176af679aa0f780c036d2981fcecc1483fab398c5c227",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-direction-reset/concept-board-v1.png"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/sky-v9-fal-native.mp4",
+  "sha256": "0dd232cd6da53aa44329043c624dd473736f87ad14666507eae6a6356cc14319",
+  "duration": "30.041667",
+  "streams": [
+    {
+      "codec_type": "video",
+      "codec_name": "h264",
+      "width": 1080,
+      "height": 1920,
+      "avg_frame_rate": "24/1",
+      "nb_frames": "721"
+    }
+  ],
+  "sample_count": 361,
+  "sample_fps": 12,
+  "review": "contact-sheets-reviewed-2026-09-24",
+  "coverage": "All 16 sheets, 361 samples at 12 fps viewed. Not all 721 original frames; no new audio listening claim. Source has no audio.",
+  "creative_status": "corrections-required",
+  "plan": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/2. Campañas/CMP-003_sky-nos-eligio-seo-aeo/PLAN-VIDEO-AUDIO-V10.md"
+}

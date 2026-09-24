@@ -1,6 +1,6 @@
 # Creative Workflows — biblioteca viva (motion-design-studio)
 
-> **Qué es esto.** El **índice de recetas creativas validadas end-to-end** — no teoría de craft ni
+> **Qué es esto.** El **índice de recetas creativas con estado y evidencia explícitos** — no teoría de craft ni
 > catálogo de herramientas, sino los **flujos encadenados que probamos y funcionaron** (o que fallaron y
 > por qué). Cada archivo = **un workflow** con: *cuándo usarla · pasos · plantilla de prompt · evidencia ·
 > estado (validado/experimental/descartado)*. Esta carpeta **crece** con cada producción: cuando algo
@@ -20,8 +20,16 @@
 - **Para producir:** identifica tu necesidad en la tabla → abre ese workflow → sigue los pasos.
 - **Para agregar aprendizaje:** al cerrar una producción, **crea `workflows/<slug>.md`** (o enriquece uno
   existente) con la estructura estándar (abajo) y agrega su fila a la tabla. Marca su **estado** y la
-  **evidencia** (ruta del render, fecha). Sincroniza a `.codex/skills/...` y commitea.
+  **evidencia** (ruta del render, fecha). Sincroniza los espejos `.codex`/`.claude`; haz commit sólo si el operador lo solicita.
 - **Regla de honestidad:** documenta también lo que **NO** funcionó (con la razón), no solo los éxitos.
+
+## Método de principio a fin
+
+[Método operativo](../../../../docs/operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md):
+lee el companion de [preproducción](../companions/video-preproduction-and-production.md),
+[posproducción](../companions/video-postproduction-and-delivery.md) o
+[lecciones/fallas](../companions/video-lessons-and-failure-modes.md) según el punto de trabajo.
+Las recetas siguientes son aplicaciones con límites propios; no todas están aprobadas de principio a fin.
 
 ## Índice de workflows
 
@@ -35,6 +43,7 @@
 | **Omni in-place edit → deterministic finish** | editar un clip existente con Omni sólo si faltan píxeles; si no, retime/composite/foley sobre el mismo master | **validado con caveat** 2026-07-11 | `omni-in-place-edit-and-deterministic-finish.md` |
 | **Selección por contrato de fidelidad** | elegir Omni, Seedance o post según reinterpretación permitida, practical y física; no por canal | **evidencia limitada** 2026-07-11 | `engine-selection-by-fidelity-contract.md` |
 | **Clean shot → deterministic 15/10/6 family** | convertir un shot 5–10 s + stills exactos en masters 15/10/6 con arco propio, format wall y audio medido | **validado** 2026-07-18 | `single-shot-to-deterministic-campaign-hero.md` |
+
 | **Key visual estático → loop de social** ⭐ | llevar una pieza estática aprobada a movimiento sin inventar un lenguaje paralelo: referencias, arco entrada→sostén→fade, sonido por sustracción y QA del loop | **validado** 2026-09-22 | `static-key-visual-to-looping-social-motion.md` |
 
 ## Estructura estándar de un workflow
@@ -52,9 +61,12 @@
 
 ## Regla transversal (aplica a todas)
 
-**El *look* puede venir de IA; la *exactitud* (texto, citas, logos, números, marca) SIEMPRE de assets/
-mograph reales compuestos.** El operador aprueba antes de entregar; **gasto gobernado** en cada generación
-IA. Contrato del modelo Omni: `efeonce/GEMINI_OMNI_VERTEX.md`.
+**La exactitud se decide por elemento.** Usa assets/mograph oficiales donde se exija reproducción exacta.
+Si el operador conserva una UI o marca diegética generativa, registra esa tolerancia y revisa los píxeles;
+no amplíes por tu cuenta la composición local a toda la película. En SKY se autorizaron cartelas/cierre
+locales, con UI y avión generativos. Reusa la autorización vigente para entregar a revisión; aprobación
+creativa final y publicación siguen separadas. **Gasto gobernado** en cada generación. Contrato Omni:
+[manual CLI Omni1.1](../../../../docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md); `efeonce/GEMINI_OMNI_VERTEX.md` conserva el contrato/historial de su carril.
 
 **El estado técnico no es aprobación creativa.** Un video Omni o Seedance `completed` entra a revisión temporal; sólo si requiere geometría/acción inexistente se itera con el modelo. Retime, orden, repetición y texto exacto se resuelven sobre el clip existente. Si se pide foley nativo, revisar audio y video por separado y rescatar sólo eventos aprobados sobre la placa aceptada.
 
@@ -77,6 +89,12 @@ resuelve 9:16 con una nueva toma cuando corresponde y verifica masters/portadas 
 del personaje **no celebra** cuando el copy señala al espectador; el audio se corrige **quitando los términos que
 inducen habla**, no prohibiendo más fuerte (13 inductores contra 2 prohibiciones); y el loop se mide entre el
 **primer y el último cuadro reales**, no contra una muestra cómoda. Capacidades, tarifas y ratios reales por motor
-—incluido que **4:5 no existe en ningún motor de video**— viven en la
+y el soporte de ratios por endpoint viven en la
 [guía canónica de selección de modelos](../../../../docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md),
 no en el workflow.
+
+## Película generativa y cartelas exactas
+
+[Película generativa → cartelas aprobadas → sonido separado](generative-film-with-approved-title-overlays.md):
+CMP-003 SKY, 2026-09-24. Cartelas punch-v3 y cierre aprobados; alpha/Luminosidad verificados localmente.
+V17 integra cielo generado, sonido separado y cierre corregido: 29,5 s/708 cuadros, 4K restaurado y1080p. QA técnica/visual documentada; escucha y aprobación final pendientes, no validación creativa integral.

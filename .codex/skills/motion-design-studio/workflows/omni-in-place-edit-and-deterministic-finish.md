@@ -2,7 +2,9 @@
 
 > **Estado:** validado sólo para ajustes editoriales que no cambian la verdad física del plano. La recuperación Glitch V2 (2026-07-11) delimita una excepción importante.
 >
-> **⚠️ Cambio de API (2026-07-20):** la **edición Omni migró a la Interactions API** y ahora vive **solo en la superficie Gemini-key** (`generativelanguage.googleapis.com/v1beta/interactions?key=…`), con `previous_interaction_id` + `store:true`. La **Vertex KEYLESS no edita** (`previous_interaction_id` → `400`; `GET /interactions/{id}` → `500`) — sirve solo generación. El piloto Glitch (`@google/genai` con `vertexai:true` sobre `generateContent`) usó un camino **ya retirado**; el aprendizaje operativo (clasificar el cambio, gate temporal, finish determinista) **sigue vigente**, pero el contrato de invocación cambió. Ver `../efeonce/GEMINI_OMNI_VERTEX.md §0/§4`.
+> **Contrato vigente 2026-09-24 — Omni 1.1:** la CLI `pnpm ai:omni --task edit` usa Cloud Interactions, ADC y MP4 existente; no requiere que la fuente haya sido generada por Omni. Entrada de hasta 10 s; edición hereda duración/aspecto y envía resolución. Ver `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md` y su ADR. Los canaries de 360p prueban cableado, no fidelidad de campaña. No asumir máscaras, región inmutable, silencio garantizado o turnos stateful: no están verificados por esa CLI. La nota de julio siguiente se conserva sólo como historia de otra versión.
+>
+> **Historia, contrato anterior (2026-07-20):** la **edición Omni migró a la Interactions API** y ahora vive **solo en la superficie Gemini-key** (`generativelanguage.googleapis.com/v1beta/interactions?key=…`), con `previous_interaction_id` + `store:true`. La **Vertex KEYLESS no edita** (`previous_interaction_id` → `400`; `GET /interactions/{id}` → `500`) — sirve solo generación. El piloto Glitch (`@google/genai` con `vertexai:true` sobre `generateContent`) usó un camino **ya retirado**; el aprendizaje operativo (clasificar el cambio, gate temporal, finish determinista) **sigue vigente**, pero el contrato de invocación cambió. Ver `../efeonce/GEMINI_OMNI_VERTEX.md §0/§4`.
 >
 > **Evidencia:** `ai-generations/2026-07-11_glitch-microphone-intro/pilot-retrospective.md` y [recovery-plan-v2-integral-practical-and-foley.md](../../../../ai-generations/2026-07-11_glitch-microphone-intro/recovery-plan-v2-integral-practical-and-foley.md). El candidato I está rechazado creativamente.
 >
@@ -48,7 +50,7 @@
 
 1. Verificar duración, fps, dimensiones, audio y hash del master. Guardar un export de rollback.
 2. Escribir un prompt de una sola intención: **qué cambia, cuándo cambia, qué se preserva y qué no debe aparecer**. No combinar cámara, anatomía, estilo, señal y tipografía en un mismo pedido.
-3. Editar es **stateful** y corre en la **superficie Gemini-key** (`POST https://generativelanguage.googleapis.com/v1beta/interactions?key=API_KEY`) encadenando `previous_interaction_id` — la Vertex keyless **no** edita (`400`). El clip base tuvo que generarse con `store:true`; el preview aguanta ~3 ediciones secuenciales y el store retiene 55 días (pago) / 1 día (free). Para una edición que puede tardar, crea la interacción con `background:true` + `store:true` y haz polling por ID.
+3. Para Omni 1.1 usa la CLI Cloud actual y su manual, `--task edit`, MP4 local de hasta 10 s y resolución declarada. Ejecuta `--estimate` antes de aprobar gasto; conserva ID/estado para recuperar sin volver a enviar POST. El contrato Gemini-key/stateful del encabezado es histórico y no se aplica a este carril.
 4. Para `task:'edit'`, **no enviar `response_format.aspect_ratio`**: devolvió `400 Aspect ratio cannot be set in response format for edit task`. El edit preserva el aspect del input.
 5. Extraer video sólo de `steps[type='model_output'].content[type='video']`; no recorrer recursivamente la interacción, porque podrías escribir el video de entrada como falso output.
 

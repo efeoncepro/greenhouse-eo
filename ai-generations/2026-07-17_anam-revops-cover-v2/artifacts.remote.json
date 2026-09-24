@@ -1,0 +1,65 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:27:57.795Z",
+  "run": "ai-generations/2026-07-17_anam-revops-cover-v2",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-17_anam-revops-cover-v2",
+  "totalBytes": 7575967,
+  "fileCount": 9,
+  "files": [
+    {
+      "path": "delivery/anam-dashboard-confiable-portada-og-1440x757-v2.jpg",
+      "sizeBytes": 124444,
+      "sha256": "f8c36e7f5a07ed20dd5b3a456f5625e68568d53e1ab26f504dea255d09a92dc6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v2/delivery/anam-dashboard-confiable-portada-og-1440x757-v2.jpg"
+    },
+    {
+      "path": "delivery/anam-dashboard-confiable-portada-web-1600-v2.webp",
+      "sizeBytes": 80980,
+      "sha256": "49b8682489ed2cb07de4170fe7a36de2533100b76f3e0c3e94d25ea8dd01c9c2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v2/delivery/anam-dashboard-confiable-portada-web-1600-v2.webp"
+    },
+    {
+      "path": "refs/composition-anchor-v1.png",
+      "sizeBytes": 1356479,
+      "sha256": "4aac72237c6d9bc3d575d4cb4f4d5e0282123e54f2c30e88bc86b21157fe9986",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v2/refs/composition-anchor-v1.png"
+    },
+    {
+      "path": "refs/efeonce-editorial-system-v1.png",
+      "sizeBytes": 132166,
+      "sha256": "4d3cd262ecf62dacdd697201fd6f7f2ff531e216c989e847183fa32b55603052",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v2/refs/efeonce-editorial-system-v1.png"
+    },
+    {
+      "path": "refs/hubspot-report-bars-sanitized.png",
+      "sizeBytes": 97583,
+      "sha256": "cf212c0ede6c7340110207e6bb295b4936c3f1200c13ef0a32b3f752e21b2b7d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v2/refs/hubspot-report-bars-sanitized.png"
+    },
+    {
+      "path": "refs/hubspot-report-kpi-sanitized.png",
+      "sizeBytes": 48523,
+      "sha256": "654059d7909967204e51a5b6929ab46012f992e2e2de4bb9d23c8f873b3a1cca",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v2/refs/hubspot-report-kpi-sanitized.png"
+    },
+    {
+      "path": "review/anam-dashboard-confiable-portada-square-crop-v2.png",
+      "sizeBytes": 1351710,
+      "sha256": "14c63fcf9abc4846a697ff05d09eae8f633e013acb7f3b63511502fdb29a96d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v2/review/anam-dashboard-confiable-portada-square-crop-v2.png"
+    },
+    {
+      "path": "source/anam-revops-cover-generated-v2.png",
+      "sizeBytes": 2058654,
+      "sha256": "255abd3be5e24178253b967d2b8ac83c136a22befb717b965c218fe72fa2b77e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v2/source/anam-revops-cover-generated-v2.png"
+    },
+    {
+      "path": "source/anam-revops-cover-master-v2.png",
+      "sizeBytes": 2325428,
+      "sha256": "6a0890df700ac987ca4ee62ef9c47235fe94f763dff3ea91d6f6c26049671780",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v2/source/anam-revops-cover-master-v2.png"
+    }
+  ]
+}

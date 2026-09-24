@@ -80,6 +80,10 @@ marca física integrada de gráfico plano. No inventar lockups con efeonce.
 
 Para Nexa como personaje creativo, cargar
 [su biblioteca de recursos](../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md).
+La identidad vigente es la Nexa humana fotorrealista confirmada el 2026-09-24: rostro de la familia Avatar A y
+ocho vistas de continuidad con polera gris en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`.
+Resolver vistas por `pnpm foto:prompt`; usar las poses OneDrive para gesto/cuerpo, nunca como ancla facial.
+No recuperar el antiguo set sintético como rostro.
 Para globos fotorealistas y continuidad, cargar
 [la referencia de fotohistorias](../social-media-studio/references/dialogue-carousel-and-document-delivery.md).
 Separar referencias de identidad de placas de escena; no extender textura de pared a rostros.
@@ -89,6 +93,12 @@ Para fotografía propia Efeonce, cargar
 **preflight visual**: abrir imágenes aprobadas comparables antes de generar, declarar cómo se integra el color en
 la composición sin forzar utilería y comparar los píxeles finales con esas referencias. Haber leído la guía o
 reutilizado un prompt no lo cumple.
+
+Cuando aparezca Julio, usar su identidad fotorrealista aprobada: `refs-aprobadas/` (11 referencias; `julio-ap-04`
+primera opción de rostro y `julio-ap-11` de cuerpo) más `set-identidad/angulos/` (seis ángulos), ambos bajo
+`ai-generations/2026-09-20_identidad-julio-nexa/`. Consultar el manifiesto y resolver vistas con `foto:prompt`;
+no usar `julio-ap-02` como ancla —es una pieza compuesta— ni mezclar las fotos fuente/descartes con el set aprobado.
+Canon: [`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
 
 1. **Clasifica la intención** (§2). ¿Es dirección de arte / diseño gráfico / auditoría de
    KV / imagen de marketing? Si pertenece a otra skill, **delega explícito** (§5) y para.

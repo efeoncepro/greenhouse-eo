@@ -290,7 +290,20 @@ _Fill at closure._
 ## TASK-1875 — Think shared web render (to-do)
 _Fill at closure: Astro route, token handling, `no-store`, GVC evidence._
 
+**Sesión 2026-09-24 — índice A4 preparado localmente; release bloqueado.** Se añadió `ReportIndexPage` y el mapper
+inserta índice con folios físicos antes del body; `report-mapper.test.ts` verifica 30 páginas y la paginación del
+índice (18 tests verdes), `pnpm typecheck` y `pnpm task:lint --task TASK-1847` verdes. El gate visual reconoce los 10
+frames Insights declarados, aún sin promover porque `--freeze` requiere un commit atómico del catálogo. El SHA de
+staging `d8afbf50a06e99f471be17fa0981c09e952c8e5d` queda bloqueado: CI fallido, sin Playwright smoke y
+`release_batch_policy=split_batch` (3.279 archivos; `auth_access` + `cloud_release`); no se dispatchó el orquestador.
+La geometría adicional sin productor sigue siendo el gap deliberado ya registrado, fuera de este release.
+
 ## Sessions (append as you go; newest first)
+
+- **2026-09-24 · TASK-1847 · índice A4 y auditoría de release.** Índice local con folios reales y paginación, prueba
+  de 30 páginas e índice de más de 28 entradas; typecheck, task lint y 18 tests del mapper verdes. Sin commit ni
+  promoción de baseline. Preflight del SHA de staging bloqueado por CI fallido, smoke ausente y batch de 3.279 archivos;
+  no hubo dispatch ni cambio de runtime.
 
 - **2026-09-18 · TASK-1848 production + gateway.** Staging canary green (incl. real email to the operator inbox, confirmed
   by the operator); ISSUE-174 caused by a concurrent burst (→ TASK-1876); release `bda1cf2cd938` with flags OFF in

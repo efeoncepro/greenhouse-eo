@@ -1,0 +1,18 @@
+{
+  "acceptForTitleComposition": true,
+  "sourceSha256": "7f0dd08218e80a5133bb954ced8f7e8ea0f84a3d127f39d07dbe0d1810ceba9a",
+  "evidence": [
+    "output-all-0.jpg",
+    "output-all-1.jpg",
+    "output-all-2.jpg",
+    "output-all-3.jpg",
+    "integrated-seams.jpg"
+  ],
+  "findings": [
+    "One aircraft, identity and sky retained",
+    "Cut hidden by close-pass occlusion, no double-aircraft dissolve",
+    "Aircraft leaves before first title",
+    "Cloud-only endpoint transition retains moving sky"
+  ],
+  "limitations": "Perceptual real-time movement approval remains operator review"
+}

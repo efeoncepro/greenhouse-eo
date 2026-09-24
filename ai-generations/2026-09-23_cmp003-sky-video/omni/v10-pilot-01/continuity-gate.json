@@ -1,0 +1,38 @@
+{
+  "source_window_seconds": [
+    6.5,
+    16.0
+  ],
+  "source_fps": 24,
+  "expected_source_frames": 228,
+  "review_modes": [
+    "all output frames at 24 fps",
+    "same-time source/output comparison",
+    "full-resolution inspection of UI and aircraft identity",
+    "playback at 1x and 0.5x around proposed joins"
+  ],
+  "acceptance": {
+    "entry": "UI geometry, lettering, sky, illumination and motion match the source before 6.5s without a visible step.",
+    "core": "Citation push carries momentum into the same realistic plane; no braking/static far-shot reset.",
+    "preservation": "Close lateral pass and three-quarter rear departure retain aircraft geometry/livery, direction and usable timing.",
+    "exit": "Sky/plane motion remain coherent into following footage; no frozen sky or premature aircraft dissolve. Removal of post-flight lettering is expected, not a failure of pixel equality.",
+    "scope": "Pilot alone does not approve downstream clean sky/closing or whole-film continuity; inspect final assembly after all visual work.",
+    "audio": "Discard native model audio. Generate music and SFX only after approved full visual timing."
+  },
+  "status": "rejected",
+  "technical_status": "completed",
+  "review_report": "REVIEW.md",
+  "reviewed_output_frames": 228,
+  "full_resolution_evidence": [
+    "qa/double-aircraft-f106.png"
+  ],
+  "playback_review_completed": false,
+  "integrated_into_master": false,
+  "failures": [
+    "entry_sky_discontinuity",
+    "double_aircraft_f102_f111",
+    "exit_scale_and_sky_reset"
+  ],
+  "native_audio_discarded_for_review": true,
+  "audio_generation_deferred_until_picture_lock": true
+}

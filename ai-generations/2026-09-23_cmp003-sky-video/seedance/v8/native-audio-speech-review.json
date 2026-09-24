@@ -1,0 +1,8 @@
+{
+  "job_id": "d95bc588-b929-4715-8ff7-ea26fe7128cd",
+  "generation_id": "MDqcRbw6UnEZRs3qBwOk",
+  "model": "eleven_scribe_v1",
+  "text": "Un año creando con Sky. Dos mil piezas. Y ahora nos eligió como su agencia SEO-DO. Gracias, Sky. ",
+  "language": "spa",
+  "verdict": "Voice present. ASR renders SEO/AEO as SEO-DO; ASR is supporting evidence, not an exact phonetic judgment."
+}

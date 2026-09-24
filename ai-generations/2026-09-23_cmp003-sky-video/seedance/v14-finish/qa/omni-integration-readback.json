@@ -1,0 +1,22 @@
+[
+  {
+    "second": 13,
+    "meanAbsolutePixelDifferenceToOmni": 2.3988425925925925,
+    "meanAbsolutePixelDifferenceToBefore": 3.0592026748971195
+  },
+  {
+    "second": 14,
+    "meanAbsolutePixelDifferenceToOmni": 2.465506687242798,
+    "meanAbsolutePixelDifferenceToBefore": 5.8219933127572014
+  },
+  {
+    "second": 15,
+    "meanAbsolutePixelDifferenceToOmni": 2.0223533950617285,
+    "meanAbsolutePixelDifferenceToBefore": 2.8282175925925928
+  },
+  {
+    "second": 17,
+    "meanAbsolutePixelDifferenceToOmni": 7.374377572016461,
+    "meanAbsolutePixelDifferenceToBefore": 8.236911008230452
+  }
+]

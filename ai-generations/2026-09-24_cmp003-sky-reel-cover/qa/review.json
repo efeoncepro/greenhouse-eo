@@ -1,0 +1,95 @@
+{
+  "status": "PASS technical; visual review recorded in README",
+  "contrast": {
+    "skyTitle": {
+      "contrastP98": 8.16,
+      "inkPixels": 237938,
+      "inkBounds": [
+        106.5,
+        412,
+        615,
+        625.5
+      ],
+      "pass": true
+    },
+    "chosen": {
+      "contrastP98": 9.03,
+      "inkPixels": 155101,
+      "inkBounds": [
+        115,
+        675.5,
+        779,
+        817
+      ],
+      "pass": true
+    },
+    "gesture": {
+      "contrastP98": 6.28,
+      "inkPixels": 98201,
+      "inkBounds": [
+        329,
+        870,
+        816.5,
+        1049.5
+      ],
+      "pass": true
+    },
+    "support": {
+      "contrastP98": 11.46,
+      "inkPixels": 30283,
+      "inkBounds": [
+        114,
+        1096,
+        515.5,
+        1212.5
+      ],
+      "pass": true
+    },
+    "efeonce": {
+      "contrastP98": 13.57,
+      "inkPixels": 40407,
+      "inkBounds": [
+        234,
+        1403,
+        563,
+        1480
+      ],
+      "pass": true
+    },
+    "skyMark": {
+      "contrastP98": 12.33,
+      "inkPixels": 34180,
+      "inkBounds": [
+        631,
+        1402.5,
+        843.5,
+        1480.5
+      ],
+      "pass": true
+    }
+  },
+  "fonts": [
+    {
+      "name": "Bricolage",
+      "loaded": true
+    },
+    {
+      "name": "Poppins",
+      "loaded": true
+    },
+    {
+      "name": "Guttery",
+      "loaded": true
+    }
+  ],
+  "url": "non-separable-luminosity",
+  "preview": {
+    "mobile": 390,
+    "crop": "central 3:4 editorial test, not a live platform preview"
+  },
+  "limits": [
+    "Not published",
+    "Guttery uses the existing local campaign font asset; no new license verification or font redistribution claimed",
+    "No CTA-compositor certification claimed: this is a typographic cover without CTA or photographic plate"
+  ]
+}

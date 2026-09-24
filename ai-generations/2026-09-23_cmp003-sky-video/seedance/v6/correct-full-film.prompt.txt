@@ -1,0 +1,24 @@
+EDIT @Video1 into ONE coherent 30-second silent commercial. This is a FULL FILM EDIT. Keep the photoreal sky, aircraft identity and flight direction. Correct the narrative errors, repeated scenes and sluggish rhythm throughout the existing film. Do not prepend the original video, append a new story or repeat any scene. Replace the existing timeline with the exact edited timeline below.
+
+CRITICAL CORRECTIONS: There must be only ONE search, ONE results view, ONE user message, ONE assistant answer, ONE citation transformation, ONE airplane pass, then the announcement. The original film wrongly repeats search at 5.8s and 18s. DELETE BOTH repetitions. The citation must belong to the ASSISTANT ANSWER, never the search results. The user bubble appears ALONE for a visible beat before the answer. After the aircraft, only the four announcement messages and closing are permitted.
+
+REFERENCE MAP: @Image1 sky; 2 empty search; 3 typed search; 4 results; 5 USER BUBBLE ALONE; 6 user and assistant answer WITH citation; 7 citation glow. 8 approach, 9 overhead, 10 rear departure. 11–14 official A320neo geometry/livery. 15 year, 16 2000, 17 agency, 18 thanks. 19 blue close, 20 purple close. 21–25 exact text graphics. 26–27 logos. 28 side UI camera, 29 oblique results camera, 30 oblique agency camera.
+
+EDITED TIMELINE, each event appears exactly ONCE:
+0–2s giant search field, type “¿A dónde viajar en Sudamérica?”. A aerial establishing shot then B side tracking macro: skim the rounded edge with a dramatic change of perspective. Use Poppins as @Image3 and28; do not stretch or condense letters.
+2–4s three SKY destination results appear as @Image4. Camera C is a low drone orbit, moving from side to front three-quarter. Genuine parallax between panels and cloud layers. Let the complete cards read.
+4–5.2s results completely disappear. The search becomes the right-aligned user chat bubble @Image5. Hold ONLY that user bubble, with no other panel.
+5.2–8s the assistant response appears below: “Tres ideas: Camboriú, por sus playas; Mendoza, por sus bodegas; y Puerto Fuy, por sus lagos y volcanes”. End with one purple “SKY Airline” citation exactly as @Image6. Camera arcs slightly then holds the chat readable. This is the answer, not search result cards.
+8–9.5s macro camera dives into that attached citation. Purple/lime light and rainbow AI shimmer flare. All UI disappears permanently.
+9.5–12s aircraft approaches once, same plane from source video. Camera remains anchored; plane rapidly grows in scale toward lens.
+12–13s whole fuselage and tail race overhead. Compress the source's slow underside segment into a decisive one-second pass. No smoke or wing trails.
+13–15.5s camera B behind the aircraft sees tail and engine exhausts; nose points away. Plane gets continuously SMALLER as it flies away. Retain the source's rear-departure direction and photographic metal. No return to frontal view, no morphing.
+15.5–18s ONLY “Un año creando con SKY.”, large centered type @Image15. Full phrase appears together. Camera A trucks laterally with foreground cloud parallax; typography stays in world space.
+18–20.5s add huge “+2.000 piezas.” as @Image16. Camera B punches closer then settles to read. Lime plus, white numbers. No UI/citation.
+20.5–23s ONLY complete “Y ahora nos eligió como” / “su agencia SEO/AEO.” @Image17. Camera C orbits from oblique @Image30 toward frontal; FULL phrase visible from 20.8s onwards, no slow word-by-word typing.
+23–25s ONLY “¡Gracias, SKY!” @Image18. Camera A cranes upward into blue; keep full message readable.
+25–27s exact BLUE branded end card @Image19: Efeonce | SKY, efeoncepro.com bubble already present.
+27–28.2s change only the background to SKY purple. Logos and URL stay absolutely fixed.
+28.2–30s hold exact @Image20 purple end card.
+
+High-impact premium aerial cinematography. Three cameras cover UI, aircraft and spatial typography. Strong edge glints, real cloud depth, motivated sunlight, decisive camera moves followed by reading holds. Consistent real A320neo, two CFM engines, official white/purple/lime paint, no toy materials, no vapor. No additional text or return to UI after 9.5s. SILENT output, audio disabled.

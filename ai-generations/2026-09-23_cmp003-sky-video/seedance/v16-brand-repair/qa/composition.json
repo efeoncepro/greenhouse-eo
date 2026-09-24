@@ -1,0 +1,91 @@
+{
+  "sourceSha256": "24f60a54dd80ea7d868b3bdd8d21857adcbab1ecd3994436fbcc149ce07c41d4",
+  "outputSha256": "a3443cbd877877cebc8ab31f2b24cb0c41c383eec37a785c052b31183809494b",
+  "frames": 720,
+  "titleOffset": 15.75,
+  "urlOffset": 26,
+  "urlWidth": 640,
+  "urlMode": "non-separable-luminosity",
+  "opacity": "1 on approved alpha containing original .72 and fade",
+  "audio": false,
+  "approvedSourceHashesVerified": true,
+  "samples": [
+    {
+      "frame": 624,
+      "method": "non-separable-luminosity",
+      "backdrop": "composed-master-before-url-bubble",
+      "opacity": 1,
+      "region": {
+        "left": 760,
+        "top": 2490,
+        "width": 640,
+        "height": 165
+      },
+      "changedChannels": 0,
+      "maxChannelDelta": 0,
+      "visible": false
+    },
+    {
+      "frame": 630,
+      "method": "non-separable-luminosity",
+      "backdrop": "composed-master-before-url-bubble",
+      "opacity": 1,
+      "region": {
+        "left": 760,
+        "top": 2490,
+        "width": 640,
+        "height": 165
+      },
+      "changedChannels": 69852,
+      "maxChannelDelta": 80,
+      "visible": true
+    },
+    {
+      "frame": 648,
+      "method": "non-separable-luminosity",
+      "backdrop": "composed-master-before-url-bubble",
+      "opacity": 1,
+      "region": {
+        "left": 760,
+        "top": 2490,
+        "width": 640,
+        "height": 165
+      },
+      "changedChannels": 69852,
+      "maxChannelDelta": 80,
+      "visible": true
+    },
+    {
+      "frame": 684,
+      "method": "non-separable-luminosity",
+      "backdrop": "composed-master-before-url-bubble",
+      "opacity": 1,
+      "region": {
+        "left": 760,
+        "top": 2490,
+        "width": 640,
+        "height": 165
+      },
+      "changedChannels": 69825,
+      "maxChannelDelta": 80,
+      "visible": true
+    },
+    {
+      "frame": 719,
+      "method": "non-separable-luminosity",
+      "backdrop": "composed-master-before-url-bubble",
+      "opacity": 1,
+      "region": {
+        "left": 760,
+        "top": 2490,
+        "width": 640,
+        "height": 165
+      },
+      "changedChannels": 69825,
+      "maxChannelDelta": 80,
+      "visible": true
+    }
+  ],
+  "review": "candidate; restore pilot accepted, full picture review required",
+  "closingCorrection": "thanks exit softened 25.35-26; cloud-shaped blue reveal; logos and URL timing retained"
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/sky-v6-30s-musica-sfx-sin-voz.mp4",
+    "sha256": "d3c2357cbaf6eb03d11abbb87baa00898849b4bb908bc1445d82fef8385def28",
+    "duration": "30.000000",
+    "streams": [
+      {
+        "codec_type": "video",
+        "codec_name": "h264",
+        "width": 720,
+        "height": 1280,
+        "r_frame_rate": "24/1",
+        "sample_rate": null,
+        "channels": null
+      },
+      {
+        "codec_type": "audio",
+        "codec_name": "aac",
+        "width": null,
+        "height": null,
+        "r_frame_rate": "0/0",
+        "sample_rate": "48000",
+        "channels": 2
+      }
+    ]
+  },
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/sky-v6-30s-4x5-musica-sfx-sin-voz.mp4",
+    "sha256": "aca0271df84c719b142242ffc11274a597856de8ea202a3be76ba5a86178b835",
+    "duration": "30.000000",
+    "streams": [
+      {
+        "codec_type": "video",
+        "codec_name": "h264",
+        "width": 720,
+        "height": 900,
+        "r_frame_rate": "24/1",
+        "sample_rate": null,
+        "channels": null
+      },
+      {
+        "codec_type": "audio",
+        "codec_name": "aac",
+        "width": null,
+        "height": null,
+        "r_frame_rate": "0/0",
+        "sample_rate": "48000",
+        "channels": 2
+      }
+    ]
+  }
+]

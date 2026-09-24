@@ -1,0 +1,169 @@
+{
+  "date": "2026-09-24",
+  "campaign": "CMP-003",
+  "scope": "Organic reel static cover; no publication",
+  "copy": [
+    "SKY nos eligió.",
+    "de nuevo.",
+    "Ahora, también para SEO y AEO."
+  ],
+  "palette": {
+    "blue": "#023c70",
+    "purple": "#50015c",
+    "green": "#46DC28"
+  },
+  "recipes": {
+    "hero": {
+      "role": "idea",
+      "weight": 780,
+      "width": 96,
+      "opticalSize": 88,
+      "tracking": "-0.035em",
+      "lineHeight": 0.9,
+      "maxWords": 3
+    },
+    "verb": {
+      "role": "idea",
+      "weight": 720,
+      "width": 96,
+      "opticalSize": 72,
+      "tracking": "-0.025em",
+      "lineHeight": 0.92
+    },
+    "gesture": {
+      "role": "gesture",
+      "weight": 400,
+      "style": "normal",
+      "tracking": "normal",
+      "lineHeight": 0.9,
+      "maxOccurrences": 1
+    },
+    "support": {
+      "role": "structure",
+      "weight": 400,
+      "style": "normal",
+      "tracking": "0em",
+      "lineHeight": 1.55
+    }
+  },
+  "layout": {
+    "skyTitle": {
+      "x": 99,
+      "y": 380,
+      "w": 873,
+      "h": 279,
+      "font": "Bricolage",
+      "size": "310px",
+      "weight": "780",
+      "color": "rgb(255, 255, 255)"
+    },
+    "chosen": {
+      "x": 108,
+      "y": 665,
+      "w": 864,
+      "h": 151.796875,
+      "font": "Bricolage",
+      "size": "165px",
+      "weight": "720",
+      "color": "rgb(255, 255, 255)"
+    },
+    "gesture": {
+      "x": 319.3670654296875,
+      "y": 821.2188720703125,
+      "w": 496.718994140625,
+      "h": 228.156005859375,
+      "font": "Guttery",
+      "size": "190px",
+      "weight": "400",
+      "color": "rgb(70, 220, 40)"
+    },
+    "support": {
+      "x": 113,
+      "y": 1084,
+      "w": 405.140625,
+      "h": 132.28125,
+      "font": "Poppins",
+      "size": "39px",
+      "weight": "400",
+      "color": "rgb(255, 255, 255)"
+    },
+    "efeonce": {
+      "x": 234,
+      "y": 1402.84375,
+      "w": 329,
+      "h": 77.296875,
+      "font": "Times",
+      "size": "16px",
+      "weight": "400",
+      "color": "rgb(255, 255, 255)"
+    },
+    "skyMark": {
+      "x": 631,
+      "y": 1400.390625,
+      "w": 215,
+      "h": 82.203125,
+      "font": "Times",
+      "size": "16px",
+      "weight": "400",
+      "color": "rgb(255, 255, 255)"
+    },
+    "lockup": {
+      "x": 234,
+      "y": 1400,
+      "w": 612,
+      "h": 83,
+      "font": "Times",
+      "size": "16px",
+      "weight": "400",
+      "color": "rgb(255, 255, 255)"
+    }
+  },
+  "url": {
+    "method": "non-separable-luminosity",
+    "backdrop": "composed-master-before-url-bubble",
+    "opacity": 0.72,
+    "region": {
+      "left": 780,
+      "top": 3110,
+      "width": 600,
+      "height": 118
+    },
+    "changedChannels": 58566,
+    "maxChannelDelta": 67,
+    "visible": true
+  },
+  "assets": {
+    "bricolage": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/src/assets/fonts/BricolageGrotesque-Variable.ttf",
+      "sha256": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    "poppins": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/src/assets/fonts/Poppins-Regular.ttf",
+      "sha256": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    "poppinsMedium": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/src/assets/fonts/Poppins-Medium.ttf",
+      "sha256": "90373e7d838d32468438fc3e152dca0bdb12edcab99ea639f158790b1ba1fd05"
+    },
+    "guttery": {
+      "path": "/Users/jreye/Library/Fonts/Guttery.otf",
+      "sha256": "fbf6b68787b5590b24219cc199975305b97927d3794c2616f6f99303ce2bc6cc"
+    },
+    "efeonce": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/public/branding/logo-negative.svg",
+      "sha256": "f221fc925c15cddad307a81362a0ec948e1b850fc6679a49a1bc88bad2eb6b3f"
+    },
+    "sky": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v17-refinement-plan/sky-white-separated.svg",
+      "sha256": "14386747a32bf499a365db6f0034d588d03c4e5d9850e6904af5c29f43a89dcc"
+    },
+    "skyColor": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky-on-dark.svg",
+      "sha256": "b016f4158dcf6a4235f9a8f3b0433f224bf3f74d6298fe168569aaf732f99231"
+    },
+    "url": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
+      "sha256": "a790de41e7140f9e9f33c5b14e0f43556e4813f3afffe8614d9f8a19f1383dc1"
+    }
+  }
+}

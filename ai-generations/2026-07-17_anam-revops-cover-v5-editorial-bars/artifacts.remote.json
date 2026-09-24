@@ -1,0 +1,47 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:28:31.760Z",
+  "run": "ai-generations/2026-07-17_anam-revops-cover-v5-editorial-bars",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-17_anam-revops-cover-v5-editorial-bars",
+  "totalBytes": 8313236,
+  "fileCount": 6,
+  "files": [
+    {
+      "path": "refs/01-positive-editorial-bars-concept.png",
+      "sizeBytes": 10907,
+      "sha256": "3a55463f215a99b402b8655a97f416c45a716f8da61bf41d0f380ddd26fede37",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v5-editorial-bars/refs/01-positive-editorial-bars-concept.png"
+    },
+    {
+      "path": "refs/02-positive-hubspot-bars.png",
+      "sizeBytes": 97583,
+      "sha256": "cf212c0ede6c7340110207e6bb295b4936c3f1200c13ef0a32b3f752e21b2b7d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v5-editorial-bars/refs/02-positive-hubspot-bars.png"
+    },
+    {
+      "path": "refs/03-positive-efeonce-discipline.png",
+      "sizeBytes": 122660,
+      "sha256": "b43ca9d3e37e6e20d1520b85705765ed1a481b439449465576733dc17fb24253",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v5-editorial-bars/refs/03-positive-efeonce-discipline.png"
+    },
+    {
+      "path": "refs/04-negative-dashboard-v2.png",
+      "sizeBytes": 2325428,
+      "sha256": "6a0890df700ac987ca4ee62ef9c47235fe94f763dff3ea91d6f6c26049671780",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v5-editorial-bars/refs/04-negative-dashboard-v2.png"
+    },
+    {
+      "path": "refs/05-negative-glass-sculpture-v4.png",
+      "sizeBytes": 2519312,
+      "sha256": "e3e1660fe885c00965807d9334e3c8cb9f7536a029b5fff106cb28dccb8b22ec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v5-editorial-bars/refs/05-negative-glass-sculpture-v4.png"
+    },
+    {
+      "path": "source/anam-revops-editorial-bars-generated-v5.png",
+      "sizeBytes": 3237346,
+      "sha256": "2b48d86eb31648de3157eedf18501e9f60db9595f46e0ba3758831c514b49e77",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v5-editorial-bars/source/anam-revops-editorial-bars-generated-v5.png"
+    }
+  ]
+}

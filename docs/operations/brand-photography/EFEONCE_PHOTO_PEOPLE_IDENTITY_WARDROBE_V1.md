@@ -706,5 +706,28 @@ encuadre visto desde el otro lado.
    — que son justamente los que viajan a las escenas. Verificado: al cablear el lanyard el lock siguió
    marcando 66 assets. Si alguien sustituye uno de esos archivos, ningún gate lo detecta.
 
+## Delta Nexa 2026-09-24 — identidad fotorrealista confirmada por el operador
+
+La selección visual de Nexa queda confirmada sobre el **rostro real fotorrealista** de la familia Avatar A,
+con el set de continuidad de **polera gris**. Las seis vistas de rostro y dos de cuerpo en
+`ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-*.png` son el set aprobado para
+ángulos. El catálogo `scripts/foto/build-prompt.mjs` ahora las resuelve directamente; `assets.lock.json` debe
+sellar sus hashes. La polera gris es un ancla neutral, no una regla universal de vestuario.
+
+`ai-generations/_identidad-nexa/1-anclas/` y `5-expresiones/` siguen siendo referencias fotográficas de la misma
+identidad. `2-angulos/` y `3-poses/` quedan retirados para identidad facial; el banco de poses OneDrive puede
+orientar gesto/cuerpo únicamente y nunca reemplaza las referencias aprobadas de rostro. Este delta prevalece
+sobre las notas históricas de deuda sintética para las vistas ya cubiertas por el set gris.
+
+## Confirmación de Julio 2026-09-24 — set propio reconocido por el operador
+
+El operador confirmó como propias las referencias mostradas de Julio. El set canónico de 11 retratos aprobados
+está en `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/`, con orden, función y exclusiones en
+`refs-aprobadas/MANIFIESTO.json`: `julio-ap-04` es la primera opción de rostro y `julio-ap-11` la primera de
+cuerpo. `julio-ap-02.png` queda excluida como pieza compuesta; `refs-reales/` conserva dos fuentes originales y
+dos descartes, separados de las referencias aprobadas. Los seis ángulos de continuidad están en
+`set-identidad/angulos/julio-*.png` y también se resuelven por `foto:prompt`. Esta confirmación ratifica la
+selección existente; no altera los assets ni el orden del manifiesto.
+
 Bitácora con las seis piezas, sus palancas y los errores de proceso:
 `ai-generations/2026-09-21_nexa-uniforme-terreno/LEEME.md`.

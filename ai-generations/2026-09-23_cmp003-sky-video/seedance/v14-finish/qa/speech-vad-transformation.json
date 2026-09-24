@@ -1,0 +1,49 @@
+[
+  {
+    "start": 0.08,
+    "end": 0.5,
+    "text": " Subt\u00edtulos realizados por la comunidad de Amara.org",
+    "words": [
+      {
+        "word": " Subt\u00edtulos",
+        "start": 0.08,
+        "end": 0.08
+      },
+      {
+        "word": " realizados",
+        "start": 0.08,
+        "end": 0.08
+      },
+      {
+        "word": " por",
+        "start": 0.08,
+        "end": 0.08
+      },
+      {
+        "word": " la",
+        "start": 0.08,
+        "end": 0.08
+      },
+      {
+        "word": " comunidad",
+        "start": 0.08,
+        "end": 0.08
+      },
+      {
+        "word": " de",
+        "start": 0.08,
+        "end": 0.08
+      },
+      {
+        "word": " Amara",
+        "start": 0.08,
+        "end": 0.3
+      },
+      {
+        "word": ".org",
+        "start": 0.3,
+        "end": 0.5
+      }
+    ]
+  }
+]

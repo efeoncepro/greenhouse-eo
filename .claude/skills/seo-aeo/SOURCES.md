@@ -19,6 +19,14 @@
 > Todo lo de tiendas es 🔴: Apple y Google cambian la búsqueda de sus tiendas en
 > cada WWDC e I/O, sin documentar el algoritmo.
 
+> **Delta 2026-09-24:** Google anunció el filtro de rendimiento `Web:
+> multimodal` en Search Console; alcance visual, despliegue y límite de API
+> documentados en `modules/07_MEASUREMENT.md`.
+
+> **Delta 2026-09-24:** Google anunció el filtro de rendimiento `Web:
+> multimodal` en Search Console; alcance visual, despliegue y límite de API
+> documentados en `modules/07_MEASUREMENT.md`.
+
 ## 1. Niveles de volatilidad (qué reverificar y cada cuánto)
 
 **Verificado 2026-08-30:** [Search Central updates](https://developers.google.com/search/updates):
@@ -55,6 +63,13 @@ proveedor— y fecha. Nunca cites una cifra 🔴 de memoria en un entregable.
 - Search Console Help + API (`support.google.com/webmasters` y
   `developers.google.com/webmaster-tools`) — propiedades, Search Analytics, URL
   Inspection y sitemaps. Platform Properties y su paridad API son 🔴 volátiles.
+- [Google Search Central — Web multimodal Search performance reporting (2026-09-24)](https://developers.google.com/search/blog/2026/09/web-multimodal-in-sc) — alcance del filtro y despliegue.
+- [Search Console Help — Generative AI performance report](https://support.google.com/webmasters/answer/16984139) — `Web: text-based` / `Web: multimodal` y lectura del informe.
+- [Search Console Help — Platform properties](https://support.google.com/webmasters/answer/34592) — medición en Google Search de cuentas/canales compatibles; función separada del filtro multimodal.
+- [Search Analytics API](https://developers.google.com/webmaster-tools/v1/searchanalytics/query) — tipos documentados; no asumir que el filtro multimodal de interfaz es una dimensión API.
+- [Google Search Central — Web multimodal Search performance reporting (2026-09-24)](https://developers.google.com/search/blog/2026/09/web-multimodal-in-sc) — alcance del filtro y despliegue.
+- [Search Console Help — Generative AI performance report](https://support.google.com/webmasters/answer/16984139) — `Web: text-based` / `Web: multimodal` y lectura del informe.
+- [Search Analytics API](https://developers.google.com/webmaster-tools/v1/searchanalytics/query) — tipos documentados; no asumir que el filtro multimodal de interfaz es una dimensión API.
 - Google Search Status Dashboard — ranking updates confirmados.
 - Search Quality Rater Guidelines (PDF oficial) — E-E-A-T.
 - `web.dev` / Chrome — Core Web Vitals, CrUX.

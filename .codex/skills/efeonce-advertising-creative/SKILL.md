@@ -26,6 +26,14 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    `greenhouse-ai-image-generator` y `greenhouse-ai-creative-rights-governance`; para video/motion, con
    `motion-design-studio`; para copy, con `copywriting`; para marca Efeonce, con `efeonce-brand-studio`.
    Si una de esas skills ya inició el encargo, no la vuelvas a cargar ni reinicies el brief.
+   En piezas con Nexa, usa la identidad humana fotorrealista confirmada el 2026-09-24 y su set de ocho vistas
+   de polera gris en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`, resuelto con
+   `foto:prompt`. La polera es una referencia neutral, no vestuario obligatorio. Las poses OneDrive guían gesto
+   y cuerpo, no el rostro; el set sintético previo no es ancla facial.
+   Si la pieza muestra a Julio, usa las 11 referencias aprobadas de `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/`
+   y sus seis ángulos en `set-identidad/angulos/`; consulta `refs-aprobadas/MANIFIESTO.json` y resuelve la vista
+   con `foto:prompt`. No uses `julio-ap-02.png` (composición publicitaria) ni mezcles fuentes y descartes con
+   el set aprobado. Canon: [`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
 5. Usa [brief y gate de calidad](references/creative-brief-and-qa.md) para registrar la decisión y revisar
    el archivo final.
 6. **Para paid media, scroll-stop, hook/hold, cinematic ads o híbridos**, carga primero

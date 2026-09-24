@@ -1,0 +1,10 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 ai:fal /Users/jreye/Documents/greenhouse-eo
+> tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/fal-image.ts --capability seedance25-r2v --request-id 01a0d11d-3a47-7db0-a919-0f6d1a1bc1d2 --fal-account FAL_API_KEY_B --out ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/sky-v6-corrected-silent.mp4 --json
+
+↻ retomando bytedance/seedance-2.5/reference-to-video · request 01a0d11d-3a47-7db0-a919-0f6d1a1bc1d2
+FATAL: bytedance/seedance-2.5/reference-to-video falló (HTTP 408): fal.ai no completó el trabajo dentro de 1800000 ms.
+  request_id 01a0d11d-3a47-7db0-a919-0f6d1a1bc1d2
+  el trabajo sigue en fal; retómalo con:
+  pnpm ai:fal --capability seedance25-r2v --request-id 01a0d11d-3a47-7db0-a919-0f6d1a1bc1d2 --fal-account FAL_API_KEY_B
+ ELIFECYCLE  Command failed with exit code 1.

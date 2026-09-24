@@ -1,0 +1,487 @@
+{
+  "costUsd": 0,
+  "videoAudioUsed": false,
+  "musicSpeed": 1,
+  "musicBeginsAfterEnter": 1,
+  "sources": {
+    "music": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/audio/music.mp3",
+      "sha256": "1dd437294fc6eb2345141e07315f8dc18e8ffe82d6c227726e79cff99ff05d7e"
+    },
+    "ui": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/audio/ui.mp3",
+      "sha256": "93a79b1cc038be2f80f728d00270b3c9e0595bcc87da645d43eefbb7bc2db3a8"
+    },
+    "spark": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/audio/spark.mp3",
+      "sha256": "f7e77fab00281b5be7284ea3da77833c14ab0bd7d524d6ec755ed041b3aee7a3"
+    },
+    "jet": {
+      "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/audio/jet.mp3",
+      "sha256": "bc11a1d639eefba2ab3c28ad00047fc2df96f527227de397bbbad414c2d5ab43"
+    }
+  },
+  "cues": [
+    {
+      "event": "typing-0",
+      "visualSeconds": 0.041666666666666664,
+      "visualFrame": 1,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.465,
+        0.52
+      ],
+      "startSeconds": 0.036645833333333336,
+      "peakSeconds": 0.041666666666666664,
+      "alignment": "peak",
+      "peakAmplitude": 0.065
+    },
+    {
+      "event": "typing-1",
+      "visualSeconds": 0.125,
+      "visualFrame": 3,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.465,
+        0.52
+      ],
+      "startSeconds": 0.11997916666666666,
+      "peakSeconds": 0.125,
+      "alignment": "peak",
+      "peakAmplitude": 0.055
+    },
+    {
+      "event": "typing-2",
+      "visualSeconds": 0.20833333333333334,
+      "visualFrame": 5,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.465,
+        0.52
+      ],
+      "startSeconds": 0.2033125,
+      "peakSeconds": 0.20833333333333334,
+      "alignment": "peak",
+      "peakAmplitude": 0.065
+    },
+    {
+      "event": "typing-3",
+      "visualSeconds": 0.2916666666666667,
+      "visualFrame": 7,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.465,
+        0.52
+      ],
+      "startSeconds": 0.2866458333333333,
+      "peakSeconds": 0.2916666666666667,
+      "alignment": "peak",
+      "peakAmplitude": 0.055
+    },
+    {
+      "event": "typing-4",
+      "visualSeconds": 0.4166666666666667,
+      "visualFrame": 10,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.465,
+        0.52
+      ],
+      "startSeconds": 0.4116458333333333,
+      "peakSeconds": 0.4166666666666667,
+      "alignment": "peak",
+      "peakAmplitude": 0.065
+    },
+    {
+      "event": "typing-5",
+      "visualSeconds": 0.5,
+      "visualFrame": 12,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.465,
+        0.52
+      ],
+      "startSeconds": 0.4949791666666667,
+      "peakSeconds": 0.5,
+      "alignment": "peak",
+      "peakAmplitude": 0.055
+    },
+    {
+      "event": "typing-6",
+      "visualSeconds": 0.625,
+      "visualFrame": 15,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.465,
+        0.52
+      ],
+      "startSeconds": 0.6199791666666666,
+      "peakSeconds": 0.625,
+      "alignment": "peak",
+      "peakAmplitude": 0.065
+    },
+    {
+      "event": "typing-7",
+      "visualSeconds": 0.75,
+      "visualFrame": 18,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.465,
+        0.52
+      ],
+      "startSeconds": 0.7449791666666666,
+      "peakSeconds": 0.75,
+      "alignment": "peak",
+      "peakAmplitude": 0.055
+    },
+    {
+      "event": "typing-8",
+      "visualSeconds": 0.8333333333333334,
+      "visualFrame": 20,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.465,
+        0.52
+      ],
+      "startSeconds": 0.8283125,
+      "peakSeconds": 0.8333333333333334,
+      "alignment": "peak",
+      "peakAmplitude": 0.065
+    },
+    {
+      "event": "enter",
+      "visualSeconds": 1.0,
+      "visualFrame": 24,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 0.9681041666666667,
+      "peakSeconds": 1.0,
+      "alignment": "peak",
+      "peakAmplitude": 0.15
+    },
+    {
+      "event": "result-1",
+      "visualSeconds": 2.0416666666666665,
+      "visualFrame": 49,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 2.0097708333333335,
+      "peakSeconds": 2.0416666666666665,
+      "alignment": "peak",
+      "peakAmplitude": 0.12
+    },
+    {
+      "event": "result-2",
+      "visualSeconds": 2.3333333333333335,
+      "visualFrame": 56,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 2.3014375,
+      "peakSeconds": 2.3333333333333335,
+      "alignment": "peak",
+      "peakAmplitude": 0.11
+    },
+    {
+      "event": "result-3",
+      "visualSeconds": 2.5833333333333335,
+      "visualFrame": 62,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 2.5514375,
+      "peakSeconds": 2.5833333333333335,
+      "alignment": "peak",
+      "peakAmplitude": 0.1
+    },
+    {
+      "event": "user-turn",
+      "visualSeconds": 4.0,
+      "visualFrame": 96,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 3.9681041666666665,
+      "peakSeconds": 4.0,
+      "alignment": "peak",
+      "peakAmplitude": 0.095
+    },
+    {
+      "event": "assistant-open",
+      "visualSeconds": 4.333333333333333,
+      "visualFrame": 104,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 4.3014375,
+      "peakSeconds": 4.333333333333333,
+      "alignment": "peak",
+      "peakAmplitude": 0.09
+    },
+    {
+      "event": "reply-line-1",
+      "visualSeconds": 4.5,
+      "visualFrame": 108,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 4.4681041666666665,
+      "peakSeconds": 4.5,
+      "alignment": "peak",
+      "peakAmplitude": 0.045
+    },
+    {
+      "event": "reply-line-2",
+      "visualSeconds": 4.791666666666667,
+      "visualFrame": 115,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 4.7597708333333335,
+      "peakSeconds": 4.791666666666667,
+      "alignment": "peak",
+      "peakAmplitude": 0.04
+    },
+    {
+      "event": "reply-line-3",
+      "visualSeconds": 5.25,
+      "visualFrame": 126,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 5.2181041666666665,
+      "peakSeconds": 5.25,
+      "alignment": "peak",
+      "peakAmplitude": 0.04
+    },
+    {
+      "event": "citation-appears",
+      "visualSeconds": 5.75,
+      "visualFrame": 138,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 5.7181041666666665,
+      "peakSeconds": 5.75,
+      "alignment": "peak",
+      "peakAmplitude": 0.15
+    },
+    {
+      "event": "citation-bloom",
+      "visualSeconds": 9.833333333333334,
+      "visualFrame": 236,
+      "source": "spark.mp3",
+      "sourceRange": [
+        0,
+        2.6
+      ],
+      "startSeconds": 8.5168125,
+      "peakSeconds": 9.833333333333334,
+      "alignment": "peak",
+      "peakAmplitude": 0.32
+    },
+    {
+      "event": "jet-closest-pass",
+      "visualSeconds": 11.916666666666666,
+      "visualFrame": 286,
+      "source": "jet.mp3",
+      "sourceRange": [
+        0,
+        6
+      ],
+      "startSeconds": 9.004375,
+      "peakSeconds": 11.916666666666666,
+      "alignment": "peak",
+      "peakAmplitude": 0.38
+    },
+    {
+      "event": "yearTop-land",
+      "visualSeconds": 16.0,
+      "visualFrame": 384,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 15.968104166666667,
+      "peakSeconds": 16.0,
+      "alignment": "peak",
+      "peakAmplitude": 0.06
+    },
+    {
+      "event": "yearBottom-land",
+      "visualSeconds": 16.333333333333332,
+      "visualFrame": 392,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 16.3014375,
+      "peakSeconds": 16.333333333333332,
+      "alignment": "peak",
+      "peakAmplitude": 0.06
+    },
+    {
+      "event": "plus-land",
+      "visualSeconds": 18.541666666666668,
+      "visualFrame": 445,
+      "source": "spark.mp3",
+      "sourceRange": [
+        1.3,
+        1.74
+      ],
+      "startSeconds": 18.428583333333332,
+      "peakSeconds": 18.541666666666668,
+      "alignment": "peak",
+      "peakAmplitude": 0.19
+    },
+    {
+      "event": "number-land",
+      "visualSeconds": 18.875,
+      "visualFrame": 453,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 18.843104166666667,
+      "peakSeconds": 18.875,
+      "alignment": "peak",
+      "peakAmplitude": 0.06
+    },
+    {
+      "event": "pieces-land",
+      "visualSeconds": 19.166666666666668,
+      "visualFrame": 460,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 19.134770833333334,
+      "peakSeconds": 19.166666666666668,
+      "alignment": "peak",
+      "peakAmplitude": 0.06
+    },
+    {
+      "event": "intro-land",
+      "visualSeconds": 21.041666666666668,
+      "visualFrame": 505,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 21.009770833333334,
+      "peakSeconds": 21.041666666666668,
+      "alignment": "peak",
+      "peakAmplitude": 0.06
+    },
+    {
+      "event": "agency-land",
+      "visualSeconds": 21.25,
+      "visualFrame": 510,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 21.218104166666667,
+      "peakSeconds": 21.25,
+      "alignment": "peak",
+      "peakAmplitude": 0.06
+    },
+    {
+      "event": "seo-land",
+      "visualSeconds": 21.708333333333332,
+      "visualFrame": 521,
+      "source": "spark.mp3",
+      "sourceRange": [
+        1.3,
+        1.74
+      ],
+      "startSeconds": 21.59525,
+      "peakSeconds": 21.708333333333332,
+      "alignment": "peak",
+      "peakAmplitude": 0.24
+    },
+    {
+      "event": "thanksText-land",
+      "visualSeconds": 24.375,
+      "visualFrame": 585,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 24.343104166666667,
+      "peakSeconds": 24.375,
+      "alignment": "peak",
+      "peakAmplitude": 0.09
+    },
+    {
+      "event": "lockup-land",
+      "visualSeconds": 26.166666666666668,
+      "visualFrame": 628,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 26.134770833333334,
+      "peakSeconds": 26.166666666666668,
+      "alignment": "peak",
+      "peakAmplitude": 0.09
+    },
+    {
+      "event": "urlBubble-land",
+      "visualSeconds": 26.25,
+      "visualFrame": 630,
+      "source": "ui.mp3",
+      "sourceRange": [
+        0.77,
+        0.92
+      ],
+      "startSeconds": 26.218104166666667,
+      "peakSeconds": 26.25,
+      "alignment": "peak",
+      "peakAmplitude": 0.045
+    }
+  ],
+  "aacReadback": {
+    "input_i": "-16.25",
+    "input_tp": "-1.47",
+    "input_lra": "13.20",
+    "input_thresh": "-27.31",
+    "output_i": "-14.97",
+    "output_tp": "-1.50",
+    "output_lra": "6.80",
+    "output_thresh": "-25.35",
+    "normalization_type": "dynamic",
+    "target_offset": "-1.03"
+  },
+  "auditoryReview": "Not performed: this session cannot receive audio input. Original instrumental provenance and previous empty speech checks support selection, but do not replace listening."
+}

@@ -1,0 +1,8 @@
+{
+  "acceptForTitleComposition": true,
+  "scope": "Local montage candidate; not user approval or final QA",
+  "sourceSha256": "faedc296479b392a8632a4b80ec45aceaafff85bf5742a435f4612029e9f964d",
+  "review": "60 half-second samples inspected; generated footage retained, sky clear by15.25; dense final QA follows composition",
+  "changes": "Editorial selection/reframe only; exact canonical closing; no new generation",
+  "conform": "Uniform pixel format/color metadata prevents filter reinitialization at concat boundaries; source frame order retained"
+}

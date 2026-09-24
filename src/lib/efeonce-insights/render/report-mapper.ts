@@ -56,6 +56,9 @@ const FIGURE_ROWS = 6
 /** Párrafos de desarrollo que admite la página analítica (`development.maxItems`). */
 const DEVELOPMENT_ITEMS = 3
 
+/** Entradas por página: el molde admite 28 filas con dos líneas como máximo. */
+const INDEX_ENTRIES_PER_PAGE = 28
+
 const BUDGET = {
   assertion: 130,
   development: 340,
@@ -182,18 +185,19 @@ export const buildInsightReportPlanInput = ({
     throw new InsightsRenderRejectedError('El plan no tiene capítulos: no hay informe que componer.')
   }
 
-  const pages: Omit<CompositionSlideInput, 'slideId'>[] = [
-    {
-      contentType: 'report-cover',
-      slots: {
-        editionId: `${report.reportCode} · v${edition.version}`,
-        reportTitle: rejectIfLonger(report.title, 64, 'report.title'),
-        periodLabel,
-        versionLabel: `v${edition.version}`,
-        issuedLabel: issuedLabelOf(edition, GH_INSIGHTS.document.unissued)
-      }
+  const cover: Omit<CompositionSlideInput, 'slideId'> = {
+    contentType: 'report-cover',
+    slots: {
+      editionId: `${report.reportCode} · v${edition.version}`,
+      reportTitle: rejectIfLonger(report.title, 64, 'report.title'),
+      periodLabel,
+      versionLabel: `v${edition.version}`,
+      issuedLabel: issuedLabelOf(edition, GH_INSIGHTS.document.unissued)
     }
-  ]
+  }
+
+  const bodyPages: Omit<CompositionSlideInput, 'slideId'>[] = []
+  const sectionStarts: { title: string; bodyIndex: number }[] = []
 
   if (frozen.executiveSummary.length > 0) {
     const [headline, ...rest] = frozen.executiveSummary.map(c => c.text)
@@ -206,8 +210,10 @@ export const buildInsightReportPlanInput = ({
       (_p, i) => `summary-p${i}`
     )
 
+    sectionStarts.push({ title: GH_INSIGHTS.document.executiveSummary, bodyIndex: bodyPages.length })
+
     summaryPages.forEach(paragraphs => {
-      pages.push({
+      bodyPages.push({
         contentType: 'report-narrative',
         slots: {
           runningChapter: GH_INSIGHTS.document.executiveSummary,
@@ -220,15 +226,20 @@ export const buildInsightReportPlanInput = ({
   }
 
   for (const chapter of frozen.chapters) {
-    pages.push(...chapterPages(chapter, periodLabel, factsById, frozen.locale))
+    const pages = chapterPages(chapter, periodLabel, factsById, frozen.locale)
+
+    if (pages.length > 0) sectionStarts.push({ title: chapter.title, bodyIndex: bodyPages.length })
+    bodyPages.push(...pages)
   }
 
   const limitEntries = limitEntriesOf(frozen.limits)
 
   const limitPages = chunkByCapacity(limitEntries, CAPACITY.limits, (_l, i) => `limit-${i}`)
 
+  sectionStarts.push({ title: GH_INSIGHTS.document.limitsAndMethod, bodyIndex: bodyPages.length })
+
   limitPages.forEach(limits => {
-    pages.push({
+    bodyPages.push({
       contentType: 'report-limits',
       slots: {
         runningChapter: GH_INSIGHTS.document.limitsAndMethod,
@@ -246,8 +257,30 @@ export const buildInsightReportPlanInput = ({
     })
   })
 
-  // El folio se asigna acá, con todas las páginas ya resueltas: por eso el índice no necesita una
-  // segunda pasada de render para saber su numeración.
+  // El índice se deriva del flujo de páginas ya compuesto: cada sección apunta a su primera página
+  // real. Como el índice mismo tiene capacidad fija, se conoce cuántas páginas ocupa antes de
+  // calcular los folios y no hace falta renderizar para descubrir la numeración.
+  const entries = sectionStarts.map(({ title, bodyIndex }) => ({
+    title: rejectIfLonger(title, 80, 'index.title'),
+    pageNumber: '' + (2 + Math.ceil(sectionStarts.length / INDEX_ENTRIES_PER_PAGE) + bodyIndex)
+  }))
+
+  const indexPageCount = Math.ceil(entries.length / INDEX_ENTRIES_PER_PAGE)
+
+  const indexPages: Omit<CompositionSlideInput, 'slideId'>[] = Array.from({ length: indexPageCount }, (_, index) => ({
+    contentType: 'report-index',
+    slots: {
+      runningChapter: GH_INSIGHTS.document.indexTitle,
+      runningPeriod: periodLabel,
+      indexTitle: index === 0 ? GH_INSIGHTS.document.indexTitle : GH_INSIGHTS.document.indexContinued,
+      indexPageColumn: GH_INSIGHTS.document.indexPageColumn,
+      indexEntries: entries.slice(index * INDEX_ENTRIES_PER_PAGE, (index + 1) * INDEX_ENTRIES_PER_PAGE)
+    }
+  }))
+
+  const pages = [cover, ...indexPages, ...bodyPages]
+
+  // El folio se asigna después de insertar el índice: siempre coincide con la página física.
   return {
     artifactId: edition.editionId,
     slides: pages.map((page, i) => ({

@@ -1,0 +1,127 @@
+{
+  "checkedAt": "2026-09-24T15:00:32.026Z",
+  "posts": [
+    {
+      "key": "instagram-efeonce",
+      "brandId": "3961547",
+      "id": 381420638,
+      "uuid": "2865505689355437489",
+      "publicationDate": {
+        "dateTime": "2026-10-13T16:00:00",
+        "timezone": "America/Santiago"
+      },
+      "text": "SKY nos eligió. De nuevo. 💚\n\nPrimero, creatividad. Ahora, también SEO y AEO.\n\nMás de 2.000 piezas creadas juntos y una relación que sigue creciendo.\n\nEl próximo desafío empieza antes de comprar un pasaje: en esa búsqueda, esa pregunta, esas ganas de descubrir un destino.\n\nVamos a trabajar para que SKY esté presente desde ahí.\n\nGracias, SKY, por volver a elegirnos. Y a nuestro equipo, por todo lo que hacemos juntos. Tenemos mucho más por crear. ✈️\n\n#Efeonce #SKY #SEO #AEO",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING",
+          "detailedStatus": "Pending"
+        }
+      ],
+      "media": [
+        "https://static.metricool.com/planner/202609/3961547-file-5328602575804224458.mp4"
+      ],
+      "videoThumbnailUrl": "https://static.metricool.com/planner/202609/3961547-file-11960751611680874273.png",
+      "autoPublish": true,
+      "draft": false,
+      "instagramData": {
+        "autoPublish": true,
+        "type": "REEL",
+        "showReelOnFeed": true,
+        "isAiGenerated": true
+      },
+      "plannerUrl": "https://app.metricool.com/planner/calendar?blogId=3961547&openWithPostUuid=2865505689355437489",
+      "checks": {
+        "text": true,
+        "date": true,
+        "timezone": true,
+        "pending": true,
+        "autoPublish": true,
+        "draft": true,
+        "video": true,
+        "thumbnail": true,
+        "reel": true
+      }
+    },
+    {
+      "key": "linkedin-efeonce",
+      "brandId": "3961547",
+      "id": 381420730,
+      "uuid": "-6530324135053210327",
+      "publicationDate": {
+        "dateTime": "2026-10-15T11:00:00",
+        "timezone": "America/Santiago"
+      },
+      "text": "Más de 2.000 piezas después, SKY nos eligió para un nuevo desafío.\n\nA nuestra relación como agencia creativa se suma una nueva responsabilidad: ser su agencia SEO y AEO.\n\nUn año de trabajo conjunto. 39 campañas. 5 mercados. Y ahora, una nueva forma de conectar la marca con las personas que están pensando en viajar.\n\nUna pregunta como «¿a dónde viajar en Sudamérica?» puede ser el comienzo de esa conexión. Nuestro trabajo será crear contenido que ayude a responderla y fortalecer la visibilidad de SKY en buscadores y respuestas de IA.\n\nSeguimos creando con SKY. Ahora también trabajaremos para que más personas la encuentren mientras deciden su próximo destino.\n\nGracias al equipo de SKY por ampliar su confianza en nosotros. Y a nuestro equipo, por el trabajo con el que nos ganamos cada nuevo desafío.\n\nNos eligió de nuevo. El desafío también crece.\n\n#Efeonce #SEO #AEO",
+      "providers": [
+        {
+          "network": "linkedin",
+          "status": "PENDING",
+          "detailedStatus": "Pending"
+        }
+      ],
+      "media": [
+        "https://static.metricool.com/planner/202609/3961547-file-14270027560866713360.mp4"
+      ],
+      "videoThumbnailUrl": "https://static.metricool.com/planner/202609/3961547-file-6497201523792386739.png",
+      "autoPublish": true,
+      "draft": false,
+      "linkedinData": {
+        "previewIncluded": false,
+        "type": "POST"
+      },
+      "plannerUrl": "https://app.metricool.com/planner/calendar?blogId=3961547&openWithPostUuid=-6530324135053210327",
+      "checks": {
+        "text": true,
+        "date": true,
+        "timezone": true,
+        "pending": true,
+        "autoPublish": true,
+        "draft": true,
+        "video": true,
+        "thumbnail": true,
+        "reel": true
+      }
+    },
+    {
+      "key": "linkedin-julio",
+      "brandId": "5105024",
+      "id": 381420855,
+      "uuid": "5258866990716306833",
+      "publicationDate": {
+        "dateTime": "2026-10-16T11:00:00",
+        "timezone": "America/Santiago"
+      },
+      "text": "SKY ya sabía cómo trabajamos. Nos eligió de nuevo.\n\nEso le da un peso especial a esta noticia.\n\nDespués de un año trabajando juntos en creatividad, SKY eligió a Efeonce también como su agencia SEO y AEO.\n\nHay más de 2.000 piezas y 39 campañas detrás de esta relación. También hay algo que las cifras no cuentan: todo lo que un equipo aprende de una marca cuando trabaja con ella todos los días.\n\nAhora llevamos ese conocimiento a un nuevo desafío: conectar lo que SKY tiene para ofrecer con las preguntas que las personas hacen antes de viajar.\n\nCreatividad, contenido y búsqueda trabajando juntos.\n\nGracias al equipo de SKY por abrirnos este nuevo espacio. Y a mi equipo Efeonce: ese «de nuevo» también es suyo.\n\nLa confianza creció. Nos toca estar a la altura, otra vez.",
+      "providers": [
+        {
+          "network": "linkedin",
+          "status": "PENDING",
+          "detailedStatus": "Pending"
+        }
+      ],
+      "media": [
+        "https://static.metricool.com/planner/202609/3961547-file-15757752957466188943.mp4"
+      ],
+      "videoThumbnailUrl": "https://static.metricool.com/planner/202609/3961547-file-5361396444572723571.png",
+      "autoPublish": true,
+      "draft": false,
+      "linkedinData": {
+        "previewIncluded": false,
+        "type": "POST"
+      },
+      "plannerUrl": "https://app.metricool.com/planner/calendar?blogId=5105024&openWithPostUuid=5258866990716306833",
+      "checks": {
+        "text": true,
+        "date": true,
+        "timezone": true,
+        "pending": true,
+        "autoPublish": true,
+        "draft": true,
+        "video": true,
+        "thumbnail": true,
+        "reel": true
+      }
+    }
+  ]
+}

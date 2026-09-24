@@ -246,8 +246,9 @@ Rutas de referencia:
 
 | Referencia | Ruta |
 |---|---|
-| Julio (rostro) | `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/`; `foto:prompt` selecciona según la vista (`julio-ap-04` es primera opción) |
+| Julio (rostro) | `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/`; **11 referencias aprobadas**, `julio-ap-04` primera opción. Ver `refs-aprobadas/MANIFIESTO.json` y resolver con `foto:prompt` |
 | Julio (cuerpo) | El mismo set aprobado; `julio-ap-11` es primera opción. No usar el set de 2026-09-17 como ancla |
+| Julio (ángulo) | `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`; seis vistas editadas desde `julio-ap-08`, resueltas por `foto:prompt`. `julio-ap-02` es una pieza compuesta y está excluida; fuentes y descartes viven aparte |
 | Nexa | `ai-generations/_identidad-nexa/1-anclas/`; `foto:prompt` selecciona según la vista (`nexa-ancla-2-rostro-tresquartos` es primera opción, `nexa-ancla-5-cuerpo-frontal` para cuerpo). 🔴 Las rutas anteriores quedan retiradas [2026-09-21]: `nexa-the-point` y `nexa-the-listen` **son identidad B** |
 | Polo | `ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-01-frente…png`, `…-10-detalle-bordado…png` |
 

@@ -1,0 +1,206 @@
+{
+  "musicModel": "music_v2_5",
+  "sfxModel": "eleven_text_to_sound_v2",
+  "musicSpeed": 1,
+  "musicRepriseCount": 0,
+  "musicSource": "music-v2.5-heroic-reference.wav",
+  "musicEdits": "gain envelope only; no splice, loop, retiming or source replacement",
+  "musicNativeVideoSource": false,
+  "jetInstances": 1,
+  "jetPeakSourceSecond": 2.199875,
+  "cues": [
+    {
+      "name": "key-1",
+      "bus": "ui",
+      "start": 0.03766666666666667,
+      "duration": 0.057,
+      "source": "keyboard.mp3",
+      "peakGain": 0.055,
+      "visualAnchor": 1
+    },
+    {
+      "name": "key-2",
+      "bus": "ui",
+      "start": 0.121,
+      "duration": 0.057,
+      "source": "keyboard.mp3",
+      "peakGain": 0.063,
+      "visualAnchor": 3
+    },
+    {
+      "name": "key-3",
+      "bus": "ui",
+      "start": 0.20433333333333334,
+      "duration": 0.057,
+      "source": "keyboard.mp3",
+      "peakGain": 0.07100000000000001,
+      "visualAnchor": 5
+    },
+    {
+      "name": "key-4",
+      "bus": "ui",
+      "start": 0.2876666666666667,
+      "duration": 0.057,
+      "source": "keyboard.mp3",
+      "peakGain": 0.055,
+      "visualAnchor": 7
+    },
+    {
+      "name": "key-5",
+      "bus": "ui",
+      "start": 0.4126666666666667,
+      "duration": 0.057,
+      "source": "keyboard.mp3",
+      "peakGain": 0.063,
+      "visualAnchor": 10
+    },
+    {
+      "name": "key-6",
+      "bus": "ui",
+      "start": 0.496,
+      "duration": 0.057,
+      "source": "keyboard.mp3",
+      "peakGain": 0.07100000000000001,
+      "visualAnchor": 12
+    },
+    {
+      "name": "key-7",
+      "bus": "ui",
+      "start": 0.621,
+      "duration": 0.057,
+      "source": "keyboard.mp3",
+      "peakGain": 0.055,
+      "visualAnchor": 15
+    },
+    {
+      "name": "key-8",
+      "bus": "ui",
+      "start": 0.746,
+      "duration": 0.057,
+      "source": "keyboard.mp3",
+      "peakGain": 0.063,
+      "visualAnchor": 18
+    },
+    {
+      "name": "key-9",
+      "bus": "ui",
+      "start": 0.8293333333333334,
+      "duration": 0.057,
+      "source": "keyboard.mp3",
+      "peakGain": 0.07100000000000001,
+      "visualAnchor": 20
+    },
+    {
+      "name": "enter",
+      "bus": "ui",
+      "start": 0.996,
+      "duration": 0.075,
+      "source": "keyboard.mp3",
+      "peakGain": 0.105,
+      "visualAnchor": 24
+    },
+    {
+      "name": "result-1",
+      "bus": "ui",
+      "start": 1.7116666666666664,
+      "duration": 0.68025,
+      "source": "ui-slide.mp3",
+      "peakGain": 0.055,
+      "visualAnchor": 49
+    },
+    {
+      "name": "result-2",
+      "bus": "ui",
+      "start": 2.0033333333333334,
+      "duration": 0.68025,
+      "source": "ui-slide.mp3",
+      "peakGain": 0.052,
+      "visualAnchor": 56
+    },
+    {
+      "name": "result-3",
+      "bus": "ui",
+      "start": 2.2533333333333334,
+      "duration": 0.68025,
+      "source": "ui-slide.mp3",
+      "peakGain": 0.049,
+      "visualAnchor": 62
+    },
+    {
+      "name": "user-turn",
+      "bus": "ui",
+      "start": 3.67,
+      "duration": 0.68025,
+      "source": "ui-slide.mp3",
+      "peakGain": 0.045,
+      "visualAnchor": 96
+    },
+    {
+      "name": "answer-unfold",
+      "bus": "ui",
+      "start": 4.32,
+      "duration": 0.68025,
+      "source": "ui-slide.mp3",
+      "peakGain": 0.037,
+      "visualAnchor": 112
+    },
+    {
+      "name": "citation-attach",
+      "bus": "ui",
+      "start": 5.746,
+      "duration": 0.075,
+      "source": "keyboard.mp3",
+      "peakGain": 0.053,
+      "visualAnchor": 138
+    },
+    {
+      "name": "luminous-expansion",
+      "bus": "portal",
+      "start": 9.47,
+      "duration": 1.2,
+      "source": "portal.mp3",
+      "peakGain": 0.31,
+      "visualAnchor": 228
+    },
+    {
+      "name": "single-aircraft-pass",
+      "bus": "jet",
+      "start": 10.300125,
+      "duration": 5.0,
+      "source": "jet.mp3",
+      "peakGain": 0.25,
+      "visualAnchor": 300
+    },
+    {
+      "name": "plus-land",
+      "bus": "titles",
+      "start": 18.531666666666666,
+      "duration": 0.8,
+      "source": "title-impact.mp3",
+      "peakGain": 0.17,
+      "visualAnchor": 445
+    },
+    {
+      "name": "seo-land",
+      "bus": "titles",
+      "start": 21.69833333333333,
+      "duration": 0.8,
+      "source": "title-impact.mp3",
+      "peakGain": 0.21,
+      "visualAnchor": 521
+    }
+  ],
+  "aacReadback": {
+    "input_i": "-16.05",
+    "input_tp": "-1.73",
+    "input_lra": "14.20",
+    "input_thresh": "-26.90",
+    "output_i": "-13.70",
+    "output_tp": "-1.50",
+    "output_lra": "5.30",
+    "output_thresh": "-24.18",
+    "normalization_type": "dynamic",
+    "target_offset": "-2.30"
+  },
+  "listening": "Agent audio perception unavailable. Human perceptual review pending; technical checks are not a substitute."
+}

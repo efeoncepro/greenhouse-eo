@@ -1,0 +1,192 @@
+{
+  "width": 1080,
+  "height": 1920,
+  "fps": 24,
+  "duration": 14.25,
+  "insertAt": 15.75,
+  "scope": "Only post-aircraft titles and closing graphics. No background, camera, UI or aircraft generation.",
+  "scenes": [
+    {
+      "id": "year",
+      "start": 0,
+      "end": 2.5,
+      "elements": [
+        {
+          "id": "yearTop",
+          "text": "Un año creando",
+          "start": 0.02,
+          "duration": 0.45,
+          "land": 0.27,
+          "preset": "sweep",
+          "from": {
+            "x": -780,
+            "y": 40,
+            "ry": -25,
+            "rz": -8,
+            "scale": 1.1
+          }
+        },
+        {
+          "id": "yearBottom",
+          "text": "con SKY.",
+          "start": 0.25,
+          "duration": 0.5,
+          "land": 0.53,
+          "preset": "slam",
+          "from": {
+            "y": -220,
+            "z": 340,
+            "rx": 28,
+            "rz": 6,
+            "scale": 2.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "proof",
+      "start": 2.5,
+      "end": 5.0,
+      "elements": [
+        {
+          "id": "plus",
+          "asset": "plus",
+          "start": 2.5,
+          "duration": 0.6,
+          "land": 2.91,
+          "preset": "arc",
+          "from": {
+            "x": -780,
+            "y": -330,
+            "z": 350,
+            "rz": -270
+          }
+        },
+        {
+          "id": "number",
+          "text": "2.000",
+          "start": 2.84,
+          "duration": 0.48,
+          "land": 3.1,
+          "preset": "slam",
+          "from": {
+            "x": 120,
+            "y": -170,
+            "z": 320,
+            "rx": 18,
+            "scale": 2.4
+          }
+        },
+        {
+          "id": "pieces",
+          "text": "piezas.",
+          "start": 3.07,
+          "duration": 0.46,
+          "land": 3.33,
+          "preset": "sweep",
+          "from": {
+            "x": 650,
+            "y": 100,
+            "ry": 28,
+            "rz": 7,
+            "scale": 1.15
+          }
+        }
+      ]
+    },
+    {
+      "id": "news",
+      "start": 5.0,
+      "end": 8.5,
+      "elements": [
+        {
+          "id": "intro",
+          "text": "Y ahora nos eligió como",
+          "start": 5.02,
+          "duration": 0.4,
+          "land": 5.28,
+          "preset": "sweep",
+          "from": {
+            "x": -500,
+            "y": 0,
+            "ry": -20
+          }
+        },
+        {
+          "id": "agency",
+          "text": "su agencia",
+          "start": 5.28,
+          "duration": 0.45,
+          "land": 5.53,
+          "preset": "sweep",
+          "from": {
+            "x": 780,
+            "y": 50,
+            "ry": 30,
+            "rz": 5
+          }
+        },
+        {
+          "id": "seo",
+          "text": "SEO/AEO.",
+          "start": 5.69,
+          "duration": 0.5,
+          "land": 5.97,
+          "preset": "slam",
+          "from": {
+            "y": -230,
+            "z": 400,
+            "rx": -30,
+            "scale": 2.8
+          }
+        }
+      ]
+    },
+    {
+      "id": "thanks",
+      "start": 8.5,
+      "end": 10.25,
+      "elements": [
+        {
+          "id": "thanksText",
+          "text": "¡Gracias, SKY!",
+          "start": 8.5,
+          "duration": 0.56,
+          "land": 8.82,
+          "preset": "slam",
+          "from": {
+            "y": 250,
+            "z": -420,
+            "rx": -24,
+            "scale": 0.45
+          }
+        }
+      ]
+    },
+    {
+      "id": "closing",
+      "start": 10.25,
+      "end": 14.25,
+      "elements": [
+        {
+          "id": "lockup",
+          "asset": "official-svg-lockup",
+          "start": 10.25,
+          "duration": 0.18,
+          "land": 10.43,
+          "preset": "fade",
+          "from": {}
+        },
+        {
+          "id": "urlBubble",
+          "asset": "canonical-url-lum.svg",
+          "start": 10.3,
+          "duration": 0.2,
+          "land": 10.5,
+          "preset": "fade",
+          "from": {}
+        }
+      ]
+    }
+  ]
+}

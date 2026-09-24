@@ -7,6 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-24 — SKY: producción, correcciones y método de video
+
+Profundización con tres subagentes: [método completo](docs/operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md), companions de preproducción/cámaras/piezas, posproducción/sonido y 13 aciertos/20 fallas; dos plantillas. Incluye preparación con Claude, corrige reglas universales de planos/tramos y límites estimados, y conecta skills espejo Motion/Audio. Motion/Audio incorporados al gate de espejos. Sin nuevos renders ni gasto.
+
+[CDR-008](docs/campaigns/decisions/CDR-008-cmp003-cartelas-postproduccion-y-audio-separado.md) registra aprobación de punch-v3 y su alcance: cartelas/cierre, película generativa. Fuentes y hashes congelados; guion/cámaras/audio/costos en el plan V10 de OneDrive. Skills motion/audio espejadas incorporan alpha, URL Luminosidad, música instrumental limpia y controles actuales de ElevenLabs/Omni. [Método y evidencia](docs/operations/social/2026-09-24-sky-generative-film-title-overlay-method.md). Tras autorización condicionada, un piloto Omni de 9,5 s fue rechazado por discontinuidad (228 cuadros revisados, ~USD 1,54 estimados desde uso). Master sin integrar; audio posterior al cierre de imagen. No se encadenaron intentos. V11 posterior: un intento completo 1080p rechazado tras 713 cuadros; costo individual confirmado USD34,162558 excedió USD25 autorizados. Informe en CDR-008. V12 posterior rescata fuentes existentes y compone cartelas/cierre: 30 s/1080p/720 cuadros, música/SFX originales sincronizados, USD0 adicionales. V13 corrige portal, URL, morado y recupera música V7; export y QA en CDR-008. Escucha y aprobación final pendientes. V14 integra Omni localizado y Heroic Ascent Music2.5 elegido por el operador, tras rechazar el puente local genera Heroic Ascent Finale con referencia nativa, sin empalmes, y mezcla cinco SFXv2; master30s/1080p revisable, escucha pendiente. Costos y errores en CDR-008. V15 adopta el rock aportado por el operador; V16 reemplaza el acento de marca y restaura metraje con Topaz, luego recompone capas aprobadas. Entregas30s/4K restaurado y1080p verificadas; coste de restauraciónUSD5,59944 dentro deUSD5,60. V17 posterior, autorizado: reduce lectura0,5s y corrige la flecha del logo blanco; entregas29,5s/4K restaurado y1080p revisadas, música sin empalmes, USD0. Escucha/aprobación pendientes; evidencia en CDR-008. [Retrospectiva integral](docs/operations/social/2026-09-24-sky-retrospectiva-produccion-v17.md): historia, fuentes finales, errores, aciertos, herramientas y límites de costos.
+
 ## 2026-09-24 — Gemini Omni 1.1 en la CLI local de video
 
 `pnpm ai:omni` conecta Cloud Interactions API con ADC y GCS privado para generar desde texto, imagen, cuadros o referencias, editar y extender video. Los seis modos completaron canaries reales a 360p/16:9; se verificaron MP4 y tests locales. La operación requiere confirmación de gasto, estima el componente de salida y permite retomar por ID/estado local. [ADR](docs/architecture/GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md) · [manual y evidencia](docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md). Sin cambios en Globe ni despliegue. Resoluciones/ratios superiores y política de ciclo de vida GCS siguen pendientes.
@@ -96,6 +102,10 @@ Content, 25 exports por ruta; historial preservado. Corrección del lecho para n
 sin regenerar finales, modificar runtime ni publicar/pautar.
 
 Reconciliación: CDR-002 registra el set de seis pilotos; BRIEF asigna roles vigentes. Template y guía separan recursos, contrato y motor; comprobar archivo adjunto/hash además del checker, que tolera ausentes en CI. Sin generación nueva.
+
+Entrega CMP-001 unificada para humanos/agentes: manifiesto único, catálogo visual y CSV generado; 28 exports por tipo/ratio, recetas históricas en Recursos con mapa de rutas.
+
+Manifiesto v2: copy externo, audiencias, UTM y presupuesto propuesto; handoff MCP íntegro generado con checksum, deduplicación y readback. Contrato transversal y template reusable sincronizados en skills Claude/Codex y OneDrive. Sin publicación.
 
 ## 2026-09-22 — Ads: Tres voces + acción
 
@@ -664,17 +674,3 @@ compone Typography/Social/Motion/Image/Copy/Brand según el soporte y exige prue
 contraste local, safe area, logo y estado. Documentación técnica, funcional y manual explican invocación automática
 y explícita. `mcp.efeonce.org` se evaluó y no se usó como atajo: su catálogo sólo admite manuales ligados a tools
 reales y no existe una tool creativa federada; no hubo cambio de manifiesto, gateway, runtime ni publicación.
-
-## 2026-09-13 — Casos tipográficos reales para diseñadores y agentes
-
-La guía pública de aplicaciones creativas de AXIS incorpora las portadas 4:5/9:16 y el Reel aprobado de
-Fiestas Patrias 2026 como caso auditado, no como patrón automático. Se documenta el límite 750/800 de las
-portadas, el mejor relevo temporal del Reel y una comparación 580/760 sobre el plate limpio: el ritmo vertical
-fragmentado se documenta como **DON’T** y el ajuste óptico como **DO**. Además se produjo
-con ImageGen un fondo editorial sin texto ni marca para cuatro composiciones normativas resueltas con overlays
-deterministas y motion accesible. El brochure compara además el logo negativo perdido sobre fotografía clara
-como **DON’T** con el wordmark positivo sobre blanco estable como **DO**. Typography y Social Media Studio comparten una referencia espejo que separa
-aprobación, calidad normativa, programación, publicación y performance. El Lab incorpora además un control de
-tracking/leading, seis pruebas visuales y rangos por tamaño; el supuesto DO de “rediseño” se corrigió porque
-`-0.060em`/`0.84` comprimía letras e interlínea en exceso. No se llamó a Fal: el Reel real ya cubre
-video y las animaciones didácticas se resuelven localmente.

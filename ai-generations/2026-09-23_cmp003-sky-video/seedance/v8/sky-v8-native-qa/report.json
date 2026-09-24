@@ -1,0 +1,20 @@
+{
+  "file": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v8/sky-v8-native.mp4",
+  "sha256": "66b42316050d82a7700382db6ac809e380de61fdea0187f83173b35305bb18c9",
+  "duration": 30.05,
+  "audio_present": true,
+  "visual_review": "failed: repeated results replace LLM response; weak URL; see ../REVISION.md",
+  "speech_check": "failed: speech present; ASR renders SEO/AEO as SEO-DO; see ../native-audio-speech-review.json",
+  "loudness": {
+    "input_i": "-16.98",
+    "input_tp": "-1.42",
+    "input_lra": "14.30",
+    "input_thresh": "-28.45",
+    "output_i": "-15.21",
+    "output_tp": "-1.50",
+    "output_lra": "7.00",
+    "output_thresh": "-26.45",
+    "normalization_type": "dynamic",
+    "target_offset": "-0.79"
+  }
+}

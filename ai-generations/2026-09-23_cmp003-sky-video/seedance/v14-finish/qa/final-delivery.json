@@ -1,0 +1,24 @@
+{
+  "file": "sky-v14-brand-accent-1080p.mp4",
+  "sha256": "71174e56f81628e216b8b219a5da4ab5d8fba1babb9b92182853df0809d53ecd",
+  "duration": "30.000000",
+  "video": {
+    "width": 1080,
+    "height": 1920,
+    "nb_frames": "720",
+    "r_frame_rate": "24/1",
+    "duration": "30.000000"
+  },
+  "audio": {
+    "codec_name": "aac",
+    "sample_rate": "48000",
+    "channels": 2,
+    "duration": "30.000000"
+  },
+  "decode": "pass",
+  "pictureEssenceUnchangedByMux": true,
+  "musicStemBitIdenticalToPriorMix": true,
+  "musicSplices": 0,
+  "finalApproval": "pending operator perceptual review",
+  "canonicalAlias": "sky-v14-finished-1080p.mp4"
+}

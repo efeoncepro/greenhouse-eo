@@ -73,6 +73,15 @@ description: >-
 
 ## 1. Cómo se usa esta skill (router)
 
+Para producción de principio a fin, empieza por el
+[método operativo](../../../docs/operations/creative-production/VIDEO_PRODUCTION_AND_POSTPRODUCTION_V1.md).
+Carga sólo la etapa necesaria: [preproducción y producción](companions/video-preproduction-and-production.md),
+[posproducción y entrega](companions/video-postproduction-and-delivery.md), o
+[lecciones y modos de falla](companions/video-lessons-and-failure-modes.md).
+Incluye construcción de piezas, vistas del sujeto y cobertura de cámaras antes de generar; conserva las
+aprobaciones y fuentes de otros agentes. Tres cámaras y el montaje SKY son un caso, no un preset universal.
+
+
 Para **cinematic ads, video de performance o híbridos foto-video**, carga
 [palancas visuales para ads](../efeonce-advertising-creative/references/paid-visual-attention-playbook.md),
 especialmente §3 y §5–7. Convierte el tratamiento en planos, acción y tiempos; compara con una ejecución
@@ -88,7 +97,7 @@ hipótesis de montaje, no benchmarks; revisar secuencia completa y no sólo el p
 3. **Chequea frescura**: si vas a nombrar un modelo IA de video, feature o pipeline, reverifica
    (`SOURCES.md`).
 4. **Si hay que ejecutar** (dirigir/producir/editar/finalizar), abre `efeonce/STUDIO_TOOLING.md`
-   y usa el pipeline con las herramientas conectadas + confirmación humana antes de producir/entregar.
+   y usa el pipeline con las herramientas conectadas y la autorización vigente para su alcance. No repitas una aprobación ya concedida; publicación es un acto separado.
    Para Gemini Omni 1.1 Flash en la CLI local, usa `pnpm ai:omni` y
    `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`; es un carril Cloud directo, separado de Globe.
    Para **recetas de producción validadas** (qué combinación funcionó y cómo — reference→Omni enhance,
@@ -151,9 +160,7 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   (cine dirigido, beats/coreografía de cámara), **Seedance 2.5/2.0** (refs + camera moves; se opera con
   `pnpm ai:fal` y el endpoint se elige por duración/4K/costo en
   `workflows/engine-selection-by-fidelity-contract.md`; los 15 endpoints verificados 2026-09-16, incluido 2.5
-  `editing`/`extension`; su filtro rechaza **tras encolar y cobra** marcas y personas reales; el costo se estima
-  con la fórmula de fal `alto × ancho × segundos × 24 / 1024` tokens, que calzó con lo medido —la equivalencia de
-  OpenArt subestima ~2×—), **Minimax H3** (también con `pnpm ai:fal`: Max Turbo =
+  `editing`/`extension`; se observaron rechazos cobrados tras encolar referencias de marcas/personas en pruebas de septiembre; no generalizar a todos los endpoints. La fórmula por tokens tuvo coincidencia en pruebas cortas, pero subestimó SKY V11: incluir entradas, salida y tarifa de la ruta, y reconciliar por solicitud), **Minimax H3** (también con `pnpm ai:fal`: Max Turbo =
   divergencia barata y rápida; Max `camera-controls` = cámara real sobre imagen congelada; base = única H3 con
   2K/4K, **reescalados desde 768P**; Max es post-entrenado por fal; LoRA/entrenadores = consistencia de
   marca/personaje, sin verificar, mínimo 100 steps facturables; 5–15 s, entrega audio sin toggle),
@@ -173,7 +180,7 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   registrado es el más bajo; Flux 3 publicado es el doble del registrado → confirmar con `pnpm ai:fal --balance`).
   Desde 2026-09-16 `pnpm ai:fal` imprime `$ costo estimado` antes de encolar y pide `--yes` sobre el tope (USD 1,
   `FAL_COST_CONFIRM_USD` o `--max-usd`); en video, sin `--resolution` usa el escalón más barato: pasa la
-  resolución de entrega explícita.
+  resolución de entrega explícita. `--max-usd` controla la estimación local, no garantiza un techo de factura; SKY V11 excedió el presupuesto autorizado. Antes de repetir, resolver la discrepancia según el companion de fallas.
   Guía canónica imagen + video: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`.
   **Higgsfield API** en el mismo CLI (`--capability hf-*`, desde 2026-09-16): Kling 3.0 std/pro/4K/Turbo, Kling O3 y
   Omni primer-último cuadro, PixVerse 6, LTX 2.5, Happy Horse, Hailuo 2.3, Grok Video 1.5 y otra vía para Seedance
@@ -288,3 +295,9 @@ no extrapolar atención de referencias a performance. Storyboard y receta viven 
 
 Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
 Registrar MP4, ratio, duración y evidencia del archivo final. No ofrecer master estático como video ni asumir formatos no producidos. El copy exterior del video tiene perfil propio; audio/preview/safe zones se verifican por placement.
+
+## Cartelas exactas sobre película generativa
+
+Para conservar cámaras, interfaz y escena generativas y animar sólo títulos/cierre, cargar
+`workflows/generative-film-with-approved-title-overlays.md`. El caso SKY aprobó la coreografía punch-v3;
+V17 integra imagen/sonido; escucha y aprobación final siguen pendientes. No ampliar el alcance determinista por inferencia.

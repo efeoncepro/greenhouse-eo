@@ -1,0 +1,4 @@
+Edit only the transparent areas of the mask on image 1 (a real night photograph of a SKY Airline A320neo in a hangar).
+AREA 1 — the vertical tail fin at the left: repaint the tail in SKY's exact livery as in the official render (image 2): a saturated PURPLE fin (hex #701C74, the same purple as the SKY logo), NOT navy, NOT black, NOT blue, with the large lime-green chevron pointing right, and the thin white leading/top edge. Keep the fin's shape, perspective and the hangar lighting falling on it (darker at the base, glossy highlights).
+AREA 2 — the forward fuselage: REMOVE all painted lettering and colored paint and continue the plain glossy white fuselage paint seamlessly; keep the row of cabin windows running through the area with exactly the same spacing, size, oval shape, frame and dark tint as the neighbouring windows, same panel lines and reflections. No letters, no logo there.
+Everything outside the transparent areas stays identical.

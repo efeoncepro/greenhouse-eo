@@ -1,0 +1,65 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:27:06.184Z",
+  "run": "ai-generations/2026-07-11_tender-deck-clay3d",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-11_tender-deck-clay3d",
+  "totalBytes": 9235615,
+  "fileCount": 9,
+  "files": [
+    {
+      "path": "clay-ai-visibility.png",
+      "sizeBytes": 1057463,
+      "sha256": "4a7284d733bf87ea5dc7b810faa9de334b27136e6c66c9b3fec847cfd5d27ee1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_tender-deck-clay3d/clay-ai-visibility.png"
+    },
+    {
+      "path": "clay-compliance-certificate.png",
+      "sizeBytes": 1052608,
+      "sha256": "866b35b1ead79fb9a0339cdaa8c7979ba21539e474c70be4a62a119c3da42a3c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_tender-deck-clay3d/clay-compliance-certificate.png"
+    },
+    {
+      "path": "clay-guarantee-shield.png",
+      "sizeBytes": 1050005,
+      "sha256": "0ec437e67a9cc96c33a1342fd527cc5cb32ca1fb75ac8db3857b3130585afab8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_tender-deck-clay3d/clay-guarantee-shield.png"
+    },
+    {
+      "path": "clay-method-steps.png",
+      "sizeBytes": 919533,
+      "sha256": "43959ed86960e82c0ea4bbe6b4d2e592d3d8c95c5897bb0de921c646811f73c9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_tender-deck-clay3d/clay-method-steps.png"
+    },
+    {
+      "path": "clay-metrics-analysis.png",
+      "sizeBytes": 1004338,
+      "sha256": "a0bbe2995cabcf643b5d8aa48aad4c2bd0ed9f98d74b3fdbf3c1e8a742a7411e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_tender-deck-clay3d/clay-metrics-analysis.png"
+    },
+    {
+      "path": "clay-requirements-matrix.png",
+      "sizeBytes": 1023773,
+      "sha256": "ea07e08c2fc77dc7b3d915a5c0008c71872ed2aff5c8d9235eefc712fd568e37",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_tender-deck-clay3d/clay-requirements-matrix.png"
+    },
+    {
+      "path": "clay-results-board.png",
+      "sizeBytes": 1050922,
+      "sha256": "771d266c66edb53899ad7584c2a681f510ee5c154072fe97ba8bdfc0637b38e8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_tender-deck-clay3d/clay-results-board.png"
+    },
+    {
+      "path": "clay-search-visibility.png",
+      "sizeBytes": 992399,
+      "sha256": "94036a3b80959b78285cc75515acf61df434683298bec3bc160d786722c6ca44",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_tender-deck-clay3d/clay-search-visibility.png"
+    },
+    {
+      "path": "clay-timeline-schedule.png",
+      "sizeBytes": 1084574,
+      "sha256": "4d2a59ac276a1f7c77e99e84c290043d59e49a97eccb2c3e46fe0dcb937b6e36",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-11_tender-deck-clay3d/clay-timeline-schedule.png"
+    }
+  ]
+}

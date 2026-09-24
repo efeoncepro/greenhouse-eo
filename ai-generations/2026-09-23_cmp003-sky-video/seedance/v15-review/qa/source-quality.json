@@ -1,0 +1,98 @@
+[
+  {
+    "file": "v11-full/sky-v11-fal-native.mp4",
+    "video": {
+      "width": 1080,
+      "height": 1920,
+      "codec_name": "h264",
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "24/1",
+      "bit_rate": "7388447",
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_transfer": "bt709",
+      "color_primaries": "bt709"
+    },
+    "videoStreamHash": "SHA256=06285f3b65aad2c068e521767108f1d646be33e520f47e924599b79c0a9f29e0"
+  },
+  {
+    "file": "v13-refinement/sky-v13-picture-conformed.mp4",
+    "video": {
+      "width": 1080,
+      "height": 1920,
+      "codec_name": "h264",
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "24/1",
+      "bit_rate": "6807509",
+      "color_range": "tv",
+      "color_space": "bt709",
+      "color_transfer": null,
+      "color_primaries": null
+    },
+    "videoStreamHash": "SHA256=84479122babe223b4fb801668622aa8aafbfd470cf328e05dab60d745b5398a8"
+  },
+  {
+    "file": "v14-finish/omni-window-a-native.mp4",
+    "video": {
+      "width": 1080,
+      "height": 1920,
+      "codec_name": "h264",
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "24/1",
+      "bit_rate": "6433236",
+      "color_range": null,
+      "color_space": null,
+      "color_transfer": null,
+      "color_primaries": null
+    },
+    "videoStreamHash": "SHA256=72220867429ae1c6ddf3aced6451c6ca16c24352404f19ea166632737b9d9106"
+  },
+  {
+    "file": "v14-finish/sky-v14-picture-final.mp4",
+    "video": {
+      "width": 1080,
+      "height": 1920,
+      "codec_name": "h264",
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "24/1",
+      "bit_rate": "7623813",
+      "color_range": null,
+      "color_space": null,
+      "color_transfer": null,
+      "color_primaries": null
+    },
+    "videoStreamHash": "SHA256=0eccd1c964e72a2540c09202888eaae97a16fb53e2457db3cd636f009fa1b0db"
+  },
+  {
+    "file": "v14-finish/sky-v14-before-brand-accent.mp4",
+    "video": {
+      "width": 1080,
+      "height": 1920,
+      "codec_name": "h264",
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "24/1",
+      "bit_rate": "7623813",
+      "color_range": null,
+      "color_space": null,
+      "color_transfer": null,
+      "color_primaries": null
+    },
+    "videoStreamHash": "SHA256=0eccd1c964e72a2540c09202888eaae97a16fb53e2457db3cd636f009fa1b0db"
+  },
+  {
+    "file": "v14-finish/sky-v14-brand-accent-1080p.mp4",
+    "video": {
+      "width": 1080,
+      "height": 1920,
+      "codec_name": "h264",
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "24/1",
+      "bit_rate": "7623813",
+      "color_range": null,
+      "color_space": null,
+      "color_transfer": null,
+      "color_primaries": null
+    },
+    "videoStreamHash": "SHA256=0eccd1c964e72a2540c09202888eaae97a16fb53e2457db3cd636f009fa1b0db"
+  }
+]

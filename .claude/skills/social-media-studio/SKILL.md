@@ -57,7 +57,16 @@ Para continuar **CMP-003 SKY**, leer primero [CDR-009](../../../docs/campaigns/d
 
 Para fotohistorias, globos y PDF social, cargar
 [dialogue-carousel-and-document-delivery.md](references/dialogue-carousel-and-document-delivery.md).
-Para Nexa, cargar el inventario enlazado en efeonce/ONEDRIVE_DELIVERY.md antes de generar.
+Para Nexa, cargar el inventario enlazado en efeonce/ONEDRIVE_DELIVERY.md antes de generar. La identidad humana
+fotorrealista aprobada el 2026-09-24 es la familia Avatar A con continuidad de polera gris; sus ocho vistas
+están en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/` y se resuelven por `foto:prompt`.
+Las poses de OneDrive son guías de actuación/cuerpo, no anclas faciales. No reutilizar el set sintético anterior
+como rostro de Nexa.
+Cuando Julio aparezca como vocero o personaje de una pieza, aplicar el mismo preflight de identidad: usar las 11
+referencias aprobadas y los seis ángulos de `ai-generations/2026-09-20_identidad-julio-nexa/`, revisar su
+`refs-aprobadas/MANIFIESTO.json` y seleccionar por `foto:prompt`. No usar el archivo excluido `julio-ap-02.png`
+ni fotos fuente/descartes como anclas. Canon:
+[`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
 
 1. **Clasifica la intención** con el árbol de §2. ¿Es realmente social de ejecución
    profunda, o pertenece a una skill hermana? Si pertenece a otra, carga la skill dueña (§5). Para encargos sociales integrales,

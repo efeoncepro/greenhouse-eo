@@ -1,0 +1,89 @@
+{
+  "sourceSha256": "faedc296479b392a8632a4b80ec45aceaafff85bf5742a435f4612029e9f964d",
+  "outputSha256": "167c54cdedb26735324c4325766c627dd3b0945edb4002d44483334dc129dfda",
+  "frames": 720,
+  "titleOffset": 15.75,
+  "urlOffset": 26,
+  "urlMode": "non-separable-luminosity",
+  "opacity": "1 on approved alpha containing original .72 and fade",
+  "audio": false,
+  "approvedSourceHashesVerified": true,
+  "samples": [
+    {
+      "frame": 624,
+      "method": "non-separable-luminosity",
+      "backdrop": "composed-master-before-url-bubble",
+      "opacity": 1,
+      "region": {
+        "left": 230,
+        "top": 1215,
+        "width": 620,
+        "height": 160
+      },
+      "changedChannels": 0,
+      "maxChannelDelta": 0,
+      "visible": false
+    },
+    {
+      "frame": 630,
+      "method": "non-separable-luminosity",
+      "backdrop": "composed-master-before-url-bubble",
+      "opacity": 1,
+      "region": {
+        "left": 230,
+        "top": 1215,
+        "width": 620,
+        "height": 160
+      },
+      "changedChannels": 63417,
+      "maxChannelDelta": 73,
+      "visible": true
+    },
+    {
+      "frame": 648,
+      "method": "non-separable-luminosity",
+      "backdrop": "composed-master-before-url-bubble",
+      "opacity": 1,
+      "region": {
+        "left": 230,
+        "top": 1215,
+        "width": 620,
+        "height": 160
+      },
+      "changedChannels": 63417,
+      "maxChannelDelta": 73,
+      "visible": true
+    },
+    {
+      "frame": 684,
+      "method": "non-separable-luminosity",
+      "backdrop": "composed-master-before-url-bubble",
+      "opacity": 1,
+      "region": {
+        "left": 230,
+        "top": 1215,
+        "width": 620,
+        "height": 160
+      },
+      "changedChannels": 59076,
+      "maxChannelDelta": 44,
+      "visible": true
+    },
+    {
+      "frame": 719,
+      "method": "non-separable-luminosity",
+      "backdrop": "composed-master-before-url-bubble",
+      "opacity": 1,
+      "region": {
+        "left": 230,
+        "top": 1215,
+        "width": 620,
+        "height": 160
+      },
+      "changedChannels": 59076,
+      "maxChannelDelta": 44,
+      "visible": true
+    }
+  ],
+  "review": "pending"
+}

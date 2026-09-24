@@ -147,6 +147,27 @@ resultado nuestro ni le cuelgues encima una promesa de tráfico. **Las reglas de
 consolida con ~48h de retraso. **Nunca muestres "ayer"** — es un cero que no existe. → `seo-aeo`,
 `modules/07_MEASUREMENT.md`.
 
+### Delta 2026-09-24: diagnóstico visual en GSC
+
+El segundo diagnóstico también puede segmentar `Web: multimodal`, un nuevo
+filtro de Search Console para resultados web donde el usuario inició con una
+imagen (Lens, Circle to Search, subida a Google Search o “Search this image” en
+Chrome). Compararlo con `Web: text-based` en la misma ventana puede mostrar si
+existe demanda visual observada para el prospecto y qué páginas conviene revisar.
+
+Preséntalo como **un corte de medición gratuito sujeto a disponibilidad y
+muestra**, no como prueba de visibilidad total en búsqueda visual, lift causado
+por nuestro trabajo ni oportunidad de revenue garantizada. La API de Search
+Analytics aún no documenta este subfiltro: consulta la interfaz/exportación y
+no lo sustituyas por todo `type=web` o `type=image`. Ver `seo-aeo`,
+`modules/07_MEASUREMENT.md`.
+
+La mención de la captura a Instagram, TikTok y YouTube alude a **Platform
+Properties**, otra capacidad de Search Console que informa cómo aparecen
+cuentas/canales compatibles en Google Search. No es analítica de impresiones en
+sus feeds ni prueba que el nuevo subfiltro multimodal esté disponible para esas
+propiedades. Declara el alcance con precisión.
+
 ---
 
 ## 7. Reglas duras

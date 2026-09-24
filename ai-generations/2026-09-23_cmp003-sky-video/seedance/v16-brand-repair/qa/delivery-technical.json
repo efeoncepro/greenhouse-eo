@@ -1,0 +1,48 @@
+{
+  "outputs": [
+    {
+      "file": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v16-brand-repair/sky-v16-restored-4k.mp4",
+      "sha256": "7efd0cf407ac9ef1c606ccb82df93de0d0ea982493453621d329ed4a9f72e093",
+      "width": 2160,
+      "height": 3840,
+      "fps": 24,
+      "frames": 720,
+      "seconds": 30,
+      "rec709": true,
+      "videoBitrate": "29843965",
+      "audioBitrate": "309889",
+      "audioPayloadHash": "SHA256=3b919ee94d658d5d50d899a6a249b512eb195a9028bd8d06a7b4686ac65fde2d",
+      "decode": "pass"
+    },
+    {
+      "file": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v16-brand-repair/sky-v16-restored-1080p.mp4",
+      "sha256": "6f4b1ed492a89ae20dee36a7c16a9972e8028ef59e51a9f9239d3c76840ed996",
+      "width": 1080,
+      "height": 1920,
+      "fps": 24,
+      "frames": 720,
+      "seconds": 30,
+      "rec709": true,
+      "videoBitrate": "10429026",
+      "audioBitrate": "309889",
+      "audioPayloadHash": "SHA256=3b919ee94d658d5d50d899a6a249b512eb195a9028bd8d06a7b4686ac65fde2d",
+      "decode": "pass"
+    }
+  ],
+  "resolutionNote": "4K restored/upscaled from the 1080p edit; not native 4K",
+  "perceptualAudioReview": "not performed; no audio perception in this session",
+  "visualReview": "pass for delivery as review candidate",
+  "visualEvidence": [
+    "qa/full-restoration-review.json",
+    "qa/final-picture/film-02.jpg",
+    "qa/final-picture/film-03.jpg",
+    "qa/final-picture/closing-dense.png",
+    "qa/final-1080p/frame-09.25.png",
+    "qa/final-1080p/film-03.jpg"
+  ],
+  "approvedTitlesAndClosingPreserved": true,
+  "deliveryReadyAtUtc": "2026-09-24T12:53:07.636157+00:00",
+  "operatorApproval": "pending",
+  "monitorStatus": "paused after successful export and verification",
+  "documentationChecks": "closure, context strict and scoped diff check pass"
+}

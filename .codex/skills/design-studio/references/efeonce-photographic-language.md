@@ -346,8 +346,10 @@ pantalla desde el plate original. La máscara no preserva píxeles: verificar id
 
 - Motor **`gpt-image-2.5-sunburst`** `--quality high` 1152×1440, referencias con rol («Images 1-3 are Julio
   (identity only; ignore their clothing and backgrounds)») + bloque **IDENTITY** con rasgos.
-- Referencias: Julio `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/` (selección según vista mediante `foto:prompt`; el set de 2026-09-17 quedó retirado como ancla de identidad);
-  Nexa `ai-generations/_identidad-nexa/1-anclas/` (resuelto por `foto:prompt`). 🔴 Las rutas anteriores
+- Referencias: Julio `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/` —11 retratos aprobados, `julio-ap-04` primero para rostro y `julio-ap-11` para cuerpo, según `MANIFIESTO.json`— más seis ángulos en `set-identidad/angulos/`; selección por `foto:prompt`. `julio-ap-02.png` es pieza compuesta y no sirve de ancla; las fotos fuente y descartes permanecen aparte. El set de 2026-09-17 quedó retirado como ancla de identidad;
+  Nexa `ai-generations/_identidad-nexa/1-anclas/` y sus ocho ángulos fotorrealistas confirmados por el operador
+  el 2026-09-24 en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/` (polera gris neutra,
+  vista resuelta mediante `foto:prompt`). Esa ropa no es obligatoria en todas las escenas. 🔴 Las rutas anteriores
   —`nexa-the-point.png`, `nexa-the-listen.png`— **son identidad B y quedan retiradas como ancla de rostro**
   [2026-09-21]. Identidad sostenida en 5 tomas (135/24/200/50/200 mm) con el set anterior.
 - Uniforme: kit del polo como Images 4-5; **revisar el emblema letra por letra** antes de publicar. El

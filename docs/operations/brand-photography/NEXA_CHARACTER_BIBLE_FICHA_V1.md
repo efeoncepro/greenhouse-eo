@@ -20,9 +20,20 @@ poses, vestuario, el catálogo de [`build-prompt.mjs`](../../../scripts/foto/bui
 La decisión fue correcta y este documento la respalda (ver §Veredicto). El punto es que el árbitro existía y
 no se abrió.
 
+## Delta de identidad 2026-09-24 — selección visual confirmada
+
+El operador confirmó como identidad visual de Nexa el rostro humano **fotorrealista y real**, en el set de
+referencia de polera gris revisado. Para las ocho vistas disponibles, usa el directorio
+`ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/` y el catálogo `foto:prompt` ya
+actualizado. La polera gris funciona como ropa neutra de continuidad, no como vestuario obligatorio. El banco de
+poses OneDrive informa cuerpo y actuación; no define la cara. Las notas históricas que describen las vistas
+aprobadas como deuda sintética quedan superadas por esta confirmación.
+
 ## 1. Mapeo — nombre del Bible → referencia del repo
 
-Todo lo de Nexa vive en `ai-generations/_identidad-nexa/`. Se pide por ficha, nunca por ruta a mano:
+Las anclas y expresiones fotográficas de Nexa viven en `ai-generations/_identidad-nexa/`; el set de ocho
+ángulos grises aprobado está en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`.
+Se pide por ficha, nunca por ruta a mano:
 
 ```bash
 pnpm foto:prompt <ficha.json>
@@ -189,8 +200,12 @@ Sony o Canon— son **props de escena** y se declaran en la `escena` de la ficha
 
 ## Verificación
 
+**Actualización 2026-09-24:** la deuda de acabado indicada para los ocho ángulos de Nexa queda cerrada por el
+set fotorrealista de polera gris aprobado por el operador. La tabla de pendientes anterior conserva el estado de
+poses y vestuario; no debe usarse para sustituir la identidad fotográfica confirmada.
+
 ```bash
-pnpm foto:assets:check   # catálogo y lock coinciden por sha256 · 104 assets
+pnpm foto:assets:check   # catálogo y lock coinciden por sha256 · 149 assets
 pnpm vitest run scripts/foto/build-prompt.test.ts
 ```
 
