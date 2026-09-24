@@ -14,6 +14,8 @@ OneDrive local, bajo `Alineación/5. Contenidos/15. Paid Media/`:
 
 ## Decisiones y estado
 
+- **Programación orgánica CMP-001 + CMP-002:** las 28 publicaciones quedaron programadas y verificadas en Metricool el 24/09/2026 para LinkedIn e Instagram de Efeonce y LinkedIn personal de Julio Reyes. La secuencia, los estados y el readback por post están en el [registro de programación](2026-09-24-cmp001-cmp002-organic-programming.md). `PENDING` no significa publicado.
+
 - [CDR-001](../../campaigns/decisions/CDR-001-cmp001-always-on-q4-2026.md) Accepted: Q4/renovación Q1 y derechos de criaturas declarados por operador; no reabrir permisos.
 - [CDR-006](../../campaigns/decisions/CDR-006-cmp001-manifiesto-copy-y-pauta.md) Proposed: CL/CO/MX/PE confirmados; US$4.000/mes base sugeridos, diciembre US$3.000; Q4 US$11.000. Presupuesto sin aprobación.
 - [CDR-005](../../campaigns/decisions/CDR-005-cmp001-embudo-momento-y-accion.md) Proposed: propuesta posterior del embudo. No resolver su dirección contra CDR-002 por fecha solamente. Este manifiesto cubre artes existentes de diagnóstico; nuevos MOFU/BOFU no producidos ni activados.

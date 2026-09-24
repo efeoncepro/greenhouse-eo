@@ -3,6 +3,8 @@
 **Estado:** `Proposed` · **Fecha:** 2026-09-22 · **Decide:** el operador · **Campaña:** narrativa Q4 2026–Q3 2027
 «Tu IA no conoce tu negocio» · **Ámbito:** carril provider-specific HubSpot sobre los cinco capítulos.
 
+**Distribución orgánica:** las seis piezas HubSpot del set 4:5 se programaron en Metricool el 24/09/2026 en LinkedIn e Instagram de Efeonce; KV-06 y KV-07 también se programaron en el LinkedIn personal de Julio Reyes. Ver fechas, copys persistidos y readback en el [registro CMP-001 + CMP-002](../../operations/social/2026-09-24-cmp001-cmp002-organic-programming.md). El estado leído fue `PENDING` (programado), no publicado.
+
 ## Contexto
 
 La narrativa canónica declara: **«No es una campaña de temporada ni una campaña de HubSpot»**. Al mismo tiempo,

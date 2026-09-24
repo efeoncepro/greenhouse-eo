@@ -387,3 +387,7 @@ Distinguir programación orgánica de paid: descubrir capacidad real del MCP ant
 ## Lanzamiento del grader y programación aprobada
 
 Para programar lanzamientos con menciones y videos reutilizados de paid, aplicar [video-delivery-metricool](references/video-delivery-metricool.md). Conservar texto aprobado, identidad por red, destino y readback por ID; PENDING no significa publicado.
+
+### Programación activa CMP-001 + CMP-002 · 24/09/2026
+
+Antes de modificar, duplicar o reportar como publicados los posts orgánicos AEO/HubSpot del set 4:5, consulta el [registro de programación en Metricool](../../../docs/operations/social/2026-09-24-cmp001-cmp002-organic-programming.md) y verifica el estado actual por ID. El registro confirma 28 posts programados para LinkedIn e Instagram de Efeonce y LinkedIn personal de Julio Reyes, con publicaciones entre el 28/09 y el 18/11/2026. `PENDING` significa programado, no publicado; el registro no autoriza pauta.
