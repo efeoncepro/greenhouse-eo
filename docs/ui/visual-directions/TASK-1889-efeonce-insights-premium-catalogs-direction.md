@@ -12,6 +12,11 @@
     láminas 16:9 equivalentes.
   - [`a4-escala-de-grises.png`](./TASK-1889-efeonce-insights-premium-catalogs/a4-escala-de-grises.png) — prueba de
     impresora en gris.
+  - [`paginas/`](./TASK-1889-efeonce-insights-premium-catalogs/paginas/) — **las 41 páginas aprobadas a tamaño
+    nativo** (A4 794×1123, lámina 1280×720): la referencia contra la que se mide la fidelidad.
+  - [`fuente-canvas-2026-09-25.tar.gz`](./TASK-1889-efeonce-insights-premium-catalogs/fuente-canvas-2026-09-25.tar.gz) —
+    fuentes `.dc.html` del canvas (datos de ejemplo y valores exactos) y `render-referencia.mjs`, que regenera
+    `paginas/` desde la raíz del repo. Empaquetado para que el escaneo de Tailwind no lea su marcado.
 - Provenance / approval: canvas «Gráficos de Efeonce Insights» (Artifact de tipo Design, privado del operador,
   <https://claude.ai/artifact/M2GiA4NdBfgGkiAvwPjZYb>, versión 36). El operador aprobó página por página durante la
   sesión del 2026-09-24/25 y cerró con «así quiero que se vea un informe». El Artifact es la fuente editable; las

@@ -131,7 +131,10 @@ series se distingue sólo por color; lectura verificada en escala de grises; enl
   un frame por plantilla nueva o rehecha, más el render real de ediciones internas de Berel (`seo`,`aeo`) y Sky (`ico`).
 - Capturas: portada navy, portada blanca con y sin canales, contraportada, capítulo, resumen, lectura, plan, una
   página por familia con productor y las láminas equivalentes; cada una en color y en gris.
-- Assertions: cifras iguales al snapshot; fuentes embebidas; sin identificadores internos; sin datos de ejemplo.
+- Assertions: cifras iguales al snapshot; fuentes embebidas; sin identificadores internos; sin datos de ejemplo en
+  producción.
+- **Fidelidad al canvas:** cada plantilla con el fixture del canvas contra `paginas/<Board>.png` de la dirección, con
+  `pixelmatch` (umbral 0,1) y ≤ 1 % de píxeles distintos por página; hoja lado a lado en el dossier.
 - Scroll-width: no aplica a PDF; el harness HTML verifica que ningún bloque desborde el lienzo.
 - Review dossier: `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/` con PDFs, hojas de contacto y scorecard.
 - Baseline decision: rebaseline declarado sólo de los frames Insights; los frames de `deck-axis` y SKY no se tocan

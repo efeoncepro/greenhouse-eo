@@ -58,6 +58,8 @@ dentro de esta task.
 - La portada (navy o blanca, con o sin canales) se dibuja según lo que TASK-1888 selló en la edición.
 - Las familias con productor se dibujan con su página premium; ninguna familia sin evidencia aparece.
 - Ediciones internas reales de Berel y Sky revisadas por el operador antes de compartir algo con un cliente.
+- **Fidelidad al canvas exigible:** con los datos de ejemplo del canvas, cada plantilla reproduce su página aprobada;
+  la diferencia se mide por página contra las referencias versionadas, no se juzga a ojo.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -314,6 +316,8 @@ Reglas obligatorias:
 
 ### Slice 5 — Verificación con datos reales y release
 
+- **Gate de fidelidad al canvas** (ver «Contrato de fidelidad» en Detailed Spec): fixture con los datos de ejemplo
+  del canvas por plantilla, render, comparación contra `paginas/<Board>.png` y hoja lado a lado en el dossier.
 - Frames nuevos en el gate visual, dossier y scorecard.
 - Ediciones internas reales de Berel (`seo`,`aeo`) y Sky (`ico`) en staging; revisión del operador de cada PDF.
 - Release por el control plane junto con el flag de TASK-1888; edición interna en producción; recién entonces se
@@ -337,6 +341,25 @@ visual. Dos reglas que no se repiten allí:
   edición. El catálogo nunca consulta la organización ni el logo en vivo.
 - **Folio total:** «NN / total» sale del plan de páginas de `paginateFlow()` de la misma composición; nunca un número
   fijo.
+
+### Contrato de fidelidad al canvas
+
+El operador exige que el informe quede **igual al canvas**. «Igual» se define y se mide así:
+
+- **Referencia:** `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs/paginas/` guarda las 41
+  páginas aprobadas a tamaño nativo (A4 794×1123, lámina 1280×720). Se regeneran desde
+  `fuente-canvas-2026-09-25.tar.gz` (fuentes `.dc.html` del canvas + `render-referencia.mjs`); se verificó que el
+  paquete reproduce 40 de 41 páginas byte a byte y la restante con 0,008 % de píxeles distintos (antialiasing).
+- **Fixture del canvas:** por cada plantilla, un fixture de pruebas con **los mismos datos de ejemplo** que muestra su
+  página del canvas (cifras, textos, series, canales). Nunca se usa en producción.
+- **Medición:** render de la plantilla con su fixture al tamaño nativo y `pixelmatch` (umbral 0,1) contra la
+  referencia. Criterio: **≤ 1 % de píxeles distintos por página**. Toda página por encima se corrige, o se justifica
+  por escrito en el dossier con la región exacta y la aprobación del operador (por ejemplo, el rasterizado de las
+  fuentes locales del font pack frente a Google Fonts).
+- **Evidencia:** tabla por página (plantilla, referencia, % distinto) y hoja lado a lado referencia | render en
+  `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/`.
+- **Qué no entra en «igual»:** las cifras y textos de un informe real (son del cliente), las familias sin productor
+  (no se emiten) y la portada, apertura y contraportada del deck (no diseñadas en el canvas; las aprueba el operador).
 
 ## Rollout Plan & Risk Matrix
 
@@ -405,6 +428,9 @@ visual. Dos reglas que no se repiten allí:
 - [ ] El copy visible reusable vive en `src/lib/copy/insights.ts`.
 - [ ] `pnpm composer:visual-gate --catalog=insights` pasa a cero píxeles con los frames nuevos declarados.
 - [ ] Dossier y scorecard con promedio ≥ 4,5 y piso ≥ 4 sobre el render real.
+- [ ] Cada plantilla renderizada con el fixture del canvas queda a ≤ 1 % de píxeles distintos de su página en
+  `paginas/` (tabla por página en el dossier); las excepciones están justificadas y aprobadas por el operador.
+- [ ] El dossier incluye la hoja lado a lado referencia | render de cada página, en color y en gris.
 - [ ] El operador aprobó los PDFs internos de Berel y Sky y la estructura del deck.
 - [ ] En producción, una edición interna real compone con el diseño nuevo antes de compartir con clientes.
 
