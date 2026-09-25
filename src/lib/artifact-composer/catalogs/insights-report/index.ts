@@ -26,7 +26,7 @@ import type { ArtifactCatalog } from '../../catalog'
 import { axisPackDir } from '../../brand-packs/axis'
 import { makeColumnsHook, makeLinesHook } from '../insights-shared/figure-hooks'
 import { REPORT_COLUMNS_BOX, REPORT_LINES_BOX } from '../insights-shared/figure-svg'
-import { chapterNumeralHook, coverSatellitesHook } from '../insights-shared/layout-hooks'
+import { chapterNumeralHook, coverSatellitesHook, narrativeDropCapHook } from '../insights-shared/layout-hooks'
 import { insightsReportResolvers } from './resolvers'
 
 export const insightsReportCatalogDir = path.dirname(fileURLToPath(import.meta.url))
@@ -40,6 +40,7 @@ export const insightsReportCatalog: ArtifactCatalog = {
   layoutHooks: {
     ReportChapterPage: chapterNumeralHook,
     ReportCoverLightPage: coverSatellitesHook,
+    ReportNarrativePage: narrativeDropCapHook,
     ReportFigureColumnsPage: makeColumnsHook(REPORT_COLUMNS_BOX),
     ReportFigureTrendPage: makeLinesHook(REPORT_LINES_BOX)
   },

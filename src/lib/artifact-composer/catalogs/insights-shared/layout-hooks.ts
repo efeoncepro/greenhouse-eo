@@ -74,3 +74,22 @@ export const coverSatellitesHook: CatalogLayoutHook = async page => {
     satelliteCenters(count)
   )
 }
+
+/**
+ * Capitular de la narrada: una letra de 52 px sólo se sostiene junto a un párrafo de tres líneas o más. Con
+ * afirmaciones cortas (datos reales: «Visibilidad en IA: 0.») quedaba una letra suelta. El hook mide el
+ * primer párrafo YA compuesto y enciende la capitular sólo cuando cabe.
+ */
+export const narrativeDropCapHook: CatalogLayoutHook = async page => {
+  await page.evaluate(() => {
+    const body = document.querySelector('.narrative-body')
+    const first = body?.querySelector('p')
+
+    if (!body || !first) return
+
+    const lineHeight = parseFloat(getComputedStyle(first).lineHeight)
+    const lines = Math.round(first.getBoundingClientRect().height / lineHeight)
+
+    if (lines >= 3) body.classList.add('has-dropcap')
+  })
+}

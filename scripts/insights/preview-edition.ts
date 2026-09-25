@@ -9,6 +9,10 @@
  * 2026-09-22 (validador, OTD, figuras, barra invisible, deck recortado) salieron con datos reales; una
  * edición de demostración sin datos los escondía todos.
  *
+ * Logo del cliente (TASK-1889): si la portada sellada lo pide (`asset-ref:org-logo:<id>`), los bytes se leen con
+ * el MISMO lector acotado del worker (`readOrganizationLogoForRender`: sólo el logo adjunto de esa organización).
+ * Ese lector registra el acceso en la bitácora de assets: es la única escritura del script, y es auditoría.
+ *
  * Ojo: vuelve a recolectar la evidencia con el código actual, así que el resultado es lo que produciría
  * una edición NUEVA (o revisada) con esta ventana, no el plan ya sellado de esa edición.
  *
@@ -42,12 +46,30 @@ import { buildInsightsDeckPlanInput } from '@/lib/efeonce-insights/render/insigh
 import { buildInsightReportPlanInput } from '@/lib/efeonce-insights/render/report-mapper'
 import { getInsightEditionById } from '@/lib/efeonce-insights/stores/edition-store'
 import { getInsightReportById } from '@/lib/efeonce-insights/stores/report-store'
+import { readOrganizationLogoForRender } from '@/lib/storage/greenhouse-assets'
 import { resolveInsightWindows } from '@/lib/efeonce-insights/window'
 
 const arg = (name: string): string | undefined => {
   const hit = process.argv.find(a => a.startsWith(`--${name}=`))
 
   return hit ? hit.slice(name.length + 3) : undefined
+}
+
+/** Referencias `asset-ref:org-logo:<id>` en los slots (misma forma que el consumer del worker). */
+const ORG_LOGO_REF = /^asset-ref:(org-logo:([A-Za-z0-9_-]+))$/
+
+const collectOrgLogoRefs = (value: unknown, found = new Map<string, string>()): Map<string, string> => {
+  if (typeof value === 'string') {
+    const match = ORG_LOGO_REF.exec(value)
+
+    if (match) found.set(match[1]!, match[2]!)
+  } else if (Array.isArray(value)) {
+    for (const item of value) collectOrgLogoRefs(item, found)
+  } else if (value && typeof value === 'object') {
+    for (const item of Object.values(value)) collectOrgLogoRefs(item, found)
+  }
+
+  return found
 }
 
 const main = async () => {
@@ -123,7 +145,13 @@ const main = async () => {
       : buildInsightReportPlanInput({ edition, report, plan, snapshot })
 
     const outDir = path.join(process.cwd(), '.captures', 'insights-preview', `${report.reportCode}-${target}`)
-    const result = (await composeArtifact(isDeck ? insightsDeckCatalog : insightsReportCatalog, input as never, outDir)) as { pdfPath?: string }
+    const externalAssets: Record<string, string> = {}
+
+    for (const [key, assetId] of collectOrgLogoRefs(input)) {
+      externalAssets[key] = (await readOrganizationLogoForRender({ organizationId, assetId, accessMetadata: { purpose: 'insights-preview-edition', editionId } })).dataUri
+    }
+
+    const result = (await composeArtifact(isDeck ? insightsDeckCatalog : insightsReportCatalog, input as never, outDir, { externalAssets })) as { pdfPath?: string }
     const pdf = result.pdfPath ? path.join(outDir, `${report.reportCode}-${target}.pdf`) : null
 
     if (result.pdfPath && pdf) await rename(result.pdfPath, pdf)

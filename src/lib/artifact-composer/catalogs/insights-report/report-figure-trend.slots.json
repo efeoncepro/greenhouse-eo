@@ -35,7 +35,7 @@
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 32,
+        "maxCharacters": 44,
         "maxLines": 1,
         "overflow": "reject"
       },

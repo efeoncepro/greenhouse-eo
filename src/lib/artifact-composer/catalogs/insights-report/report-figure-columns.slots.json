@@ -35,7 +35,7 @@
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 32,
+        "maxCharacters": 44,
         "maxLines": 1,
         "overflow": "reject"
       },
@@ -179,8 +179,8 @@
           "label": {
             "type": "string",
             "required": true,
-            "maxCharacters": 16,
-            "maxLines": 1
+            "maxCharacters": 40,
+            "maxLines": 3
           },
           "current": {
             "type": "string",

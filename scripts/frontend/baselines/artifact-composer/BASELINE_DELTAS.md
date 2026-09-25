@@ -1,5 +1,13 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-25 (j) — TASK-1889 Slice 5: la capitular de la narrada sólo con cuerpo que la sostenga
+
+Las ediciones reales de Berel y Sky mostraron una capitular suelta («V isibilidad en IA: 0.») en narradas de
+afirmaciones cortas. La capitular ahora la enciende un hook sólo cuando el primer párrafo compuesto ocupa tres
+líneas o más; el probe (texto corto) queda sin capitular. La fidelidad de las narradas del canvas no cambia.
+
+- `templates-insights-report/ReportNarrativePage.png` — sin capitular con texto corto
+
 ## 2026-09-25 (i) — TASK-1889 Slice 4: se retiran las páginas de gráfico v1; la zona de metas sale del dato
 
 Los mappers ya componen cada gráfico del plan en su página de figura premium, y salen del catálogo la página
@@ -523,7 +531,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 6d2bda93c0047edf4d4ad9f19bd1708e71ba54d360064e460af63eed54798f74 -->
+<!-- manifest-digest: d4f2394c3bc08416bf750b75f83f4671fc036fc40be90c802d751ebaa4ec1e56 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

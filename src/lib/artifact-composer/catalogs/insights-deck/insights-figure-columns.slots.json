@@ -24,7 +24,7 @@
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 32,
+        "maxCharacters": 44,
         "maxLines": 1,
         "overflow": "reject"
       }
@@ -107,7 +107,7 @@
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 44,
+        "maxCharacters": 56,
         "maxLines": 1,
         "overflow": "reject"
       }
@@ -163,7 +163,7 @@
       "consumer": "validation-only",
       "constraints": {
         "minItems": 2,
-        "maxItems": 6
+        "maxItems": 4
       },
       "item": {
         "type": "object",
@@ -171,8 +171,8 @@
           "label": {
             "type": "string",
             "required": true,
-            "maxCharacters": 16,
-            "maxLines": 1
+            "maxCharacters": 40,
+            "maxLines": 3
           },
           "current": {
             "type": "string",
@@ -218,7 +218,8 @@
           "delta": "+2",
           "direction": "up"
         }
-      ]
+      ],
+      "notes": "Grupos de la lámina (los dibuja el hook). Hasta cuatro: proyectada, cada columna necesita ancho para su etiqueta en dos líneas; más grupos se reparten en láminas equilibradas."
     },
     "columnBand": {
       "selector": "[data-slot='columnBand']",

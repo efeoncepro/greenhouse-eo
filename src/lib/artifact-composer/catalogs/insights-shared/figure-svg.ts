@@ -45,6 +45,35 @@ export const niceAxis = (max: number, maxIntervals = 4): { top: number; step: nu
   return { top: max, step: max }
 }
 
+/**
+ * Corta una etiqueta en a lo más tres líneas por palabra para el ancho del grupo (≈ 0,56 em por carácter en
+ * Geist). Una palabra que no cabe ni sola en una línea, o un texto que no cabe en tres, falla cerrado: el SVG
+ * no se desborda ni recorta en silencio.
+ */
+export const wrapLabel = (text: string, width: number, fontSize: number): string[] => {
+  const perLine = Math.max(4, Math.floor(width / (fontSize * 0.56)))
+  const lines: string[] = []
+  let line = ''
+
+  for (const word of text.split(/\s+/).filter(Boolean)) {
+    if (word.length > perLine) throw new FigureDataError(`La etiqueta «${text}» tiene una palabra que no cabe en su grupo.`)
+
+    const next = line ? `${line} ${word}` : word
+
+    if (next.length <= perLine) line = next
+    else {
+      lines.push(line)
+      line = word
+    }
+  }
+
+  if (line) lines.push(line)
+
+  if (lines.length > 3) throw new FigureDataError(`La etiqueta «${text}» no cabe en tres líneas de su grupo.`)
+
+  return lines
+}
+
 const tickLabel = (value: number): string => (Number.isInteger(value) ? String(value) : String(value).replace('.', ','))
 
 // ─── Columnas agrupadas ─────────────────────────────────────────────────────────────────────────────
@@ -163,10 +192,15 @@ export const groupedColumnsSvg = (
   const y = (value: number) => box.plotBottom - (value / top) * plotHeight
   const pairWidth = paired ? box.barWidth * 2 + box.barGap : box.barWidth
   const out: string[] = []
+  const labelLines = groups.map(group => wrapLabel(group.label, slot - 8, box.fonts.dimension))
+  const lineHeight = Math.round(box.fonts.dimension * 1.25)
+  // Cada línea extra de etiqueta hace crecer la figura: nada se monta sobre la variación.
+  const extra = (Math.max(...labelLines.map(lines => lines.length)) - 1) * lineHeight
+  const height = box.height + extra
 
   const display = box.optics.display ?? { width: box.width, height: box.height }
 
-  out.push(`<svg class="fig-columns" width="${display.width}" height="${display.height}" viewBox="0 0 ${box.width} ${box.height}" role="img" aria-label="${esc(options.ariaLabel)}">`)
+  out.push(`<svg class="fig-columns" width="${display.width}" height="${display.height + extra}" viewBox="0 0 ${box.width} ${height}" role="img" aria-label="${esc(options.ariaLabel)}">`)
 
   if (options.band) {
     const { from, to, label } = options.band
@@ -225,12 +259,18 @@ export const groupedColumnsSvg = (
       labels.push(`<text class="${bar.cls}-value" x="${n(bar.x + box.barWidth / 2)}" y="${n(barTop - box.optics.valueGap)}" font-size="${bar.font}">${esc(bar.text)}</text>`)
     }
 
-    labels.push(`<text class="fig-dimension" x="${n(c)}" y="${box.dimensionY}" font-size="${box.fonts.dimension}">${esc(group.label)}</text>`)
+    const lines = labelLines[index]!
+
+    labels.push(
+      `<text class="fig-dimension" x="${n(c)}" y="${box.dimensionY}" font-size="${box.fonts.dimension}">` +
+        lines.map((line, k) => (k === 0 ? esc(line) : `<tspan x="${n(c)}" dy="${lineHeight}">${esc(line)}</tspan>`)).join('') +
+        '</text>'
+    )
 
     if (group.delta) {
       const mark = group.direction === 'up' ? '▲ ' : group.direction === 'down' ? '▼ ' : ''
 
-      labels.push(`<text class="fig-delta fig-delta--${group.direction ?? 'flat'}" x="${n(c)}" y="${box.deltaY}" font-size="${box.fonts.delta}">${mark}${esc(group.delta)}</text>`)
+      labels.push(`<text class="fig-delta fig-delta--${group.direction ?? 'flat'}" x="${n(c)}" y="${box.deltaY + extra}" font-size="${box.fonts.delta}">${mark}${esc(group.delta)}</text>`)
     }
   })
 

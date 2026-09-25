@@ -13,7 +13,8 @@ import {
   lineChartSvg,
   niceAxis,
   REPORT_COLUMNS_BOX,
-  REPORT_LINES_BOX
+  REPORT_LINES_BOX,
+  wrapLabel
 } from '../catalogs/insights-shared/figure-svg'
 
 describe('eje redondo', () => {
@@ -41,6 +42,18 @@ describe('columnas agrupadas', () => {
   it('una cifra ilegible o negativa no se dibuja', () => {
     expect(() => groupedColumnsSvg([{ label: 'a', current: 'n/d' }, { label: 'b', current: '3' }], REPORT_COLUMNS_BOX, { ariaLabel: 'x' })).toThrow(FigureDataError)
     expect(() => groupedColumnsSvg([{ label: 'a', current: '-2' }, { label: 'b', current: '3' }], REPORT_COLUMNS_BOX, { ariaLabel: 'x' })).toThrow(FigureDataError)
+  })
+
+  it('una etiqueta larga se corta por palabra en hasta tres líneas y la figura crece (caso real Berel)', () => {
+    expect(wrapLabel('Participación frente a competencia', 211, 13.5)).toEqual(['Participación frente a', 'competencia'])
+    expect(() => wrapLabel('Participación frente a competencia en respuestas de motores', 60, 13.5)).toThrow(FigureDataError)
+
+    const six = ['Participación frente a competencia', 'B', 'C', 'D', 'E', 'F'].map((label, i) => ({ label, current: String(i + 1) }))
+    const svg = groupedColumnsSvg(six, REPORT_COLUMNS_BOX, { ariaLabel: 'x' })
+
+    expect(svg).toContain('<tspan')
+    // A seis grupos (94 px por columna) la etiqueta ocupa tres líneas: la figura crece dos interlíneas de 15 px.
+    expect(svg).toContain(`height="${REPORT_COLUMNS_BOX.height + 30}"`)
   })
 
   it('o todos los grupos traen el anterior o ninguno', () => {

@@ -50,7 +50,7 @@ const BUDGET = {
   chapterLabel: 40,
   chapterTitle: 44,
   chapterLead: 150,
-  section: 32,
+  section: 44,
   assertion: 120,
   point: 190,
   limitSubject: 38,
@@ -133,7 +133,7 @@ const chapterSlides = (
             keyFigure: rejectIfLonger(figure.keyFigure, 9, `${where}.keyFigure`),
             keyCaption: rejectIfLonger(figure.keyCaption, 96, `${where}.keyCaption`),
             conclusion: rejectIfLonger(figure.conclusion, 90, `${where}.conclusion`),
-            figureTitle: rejectIfLonger(figure.figureTitle, 44, `${where}.figureTitle`),
+            figureTitle: rejectIfLonger(figure.figureTitle, 56, `${where}.figureTitle`),
             source: { label: L.sourceCaption, text: rejectIfLonger(figure.sourceText, 36, `${where}.source`) },
             ...figure.body,
             ...(figure.closing.length > 0

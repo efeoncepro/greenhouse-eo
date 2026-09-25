@@ -82,7 +82,8 @@
 
   .narrative-body strong { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--axis-report-role-paperInk); }
 
-  .narrative-body p:first-child::first-letter {
+  /* Capitular sólo si el primer párrafo tiene cuerpo para sostenerla (≥ 3 líneas; lo mide el hook). */
+  .narrative-body.has-dropcap p:first-child::first-letter {
     float: left;
     margin: 4px 10px 0 0;
     font-family: var(--axis-report-type-display);

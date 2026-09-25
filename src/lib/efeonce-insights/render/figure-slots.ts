@@ -59,7 +59,7 @@ const L = GH_INSIGHTS.catalog
 /** Capacidad de cada plantilla de figura (`*.slots.json`): métricas, grupos y filas por página. */
 export const FIGURE_CAPACITY: Readonly<Record<'report' | 'deck', FigureCapacity>> = {
   report: { metrics: 5, groups: 6, bulletRows: 6 },
-  deck: { metrics: 4, groups: 6, bulletRows: 5 }
+  deck: { metrics: 4, groups: 4, bulletRows: 5 }
 }
 
 /** El contentType de cada página de figura, por catálogo. */
@@ -137,7 +137,11 @@ const kindOf = (chart: ChartSpecV1): FigureKind => {
   if (chart.family === 'line') return 'trend'
 
   if (chart.family === 'bar' || chart.family === 'bar_grouped') {
-    const byChannel = (chart.dimensionChannelIds ?? []).some(Boolean)
+    // Columnas sólo cuando las dimensiones son CANALES distintos (comparables en un mismo eje). Todas las
+    // métricas SEO traen el mismo canal (`google`): siguen siendo métricas distintas, cada una en su escala.
+    // Caso real Berel 2026-09-25: clics e impresiones en un eje dejaban 9.377 contra 512.113 invisible.
+    const channels = chart.dimensionChannelIds ?? []
+    const byChannel = channels.length > 1 && channels.every(Boolean) && new Set(channels).size === channels.length
 
     return chart.family === 'bar_grouped' && !byChannel ? 'comparison' : 'columns'
   }
