@@ -183,12 +183,31 @@ describe('una sola regla de variación: triángulo = valor, tono = mejor o peor'
     expect(trendOf(5.8, 6.6, position, []).value).toBe('down:better')
   })
 
-  it('RpA: 1,44 → 1,33 baja y es mejor porque su meta declara «menor es mejor» (caso Sky)', async () => {
-    const { trendOf } = await import('./figure-slots')
-    const rpa = f({ metricId: 'rpa' })
-    const target = f({ metricId: 'rpa', role: 'reference', dimension: { metric: 'rpa', direction: 'lower_is_better' } })
+  // Forma REAL de los hechos del adapter ICO (ico-adapter.ts `targetFacts`): el hecho de valor es `rpa`/`otd`/`ftr` y
+  // sus referencias son `target.<métrica>`/`band.<métrica>` con la métrica en `dimension.metric`. Un fixture que
+  // compartiera `metricId` pasaba por construcción mientras Sky salía neutro (revisión de 1846, 2026-09-25).
+  const reference = (kind: 'target' | 'band', metric: string, direction: string) =>
+    f({ metricId: `${kind}.${metric}`, role: 'reference', dimension: { metric, direction } })
 
-    expect(trendOf(1.33, 1.44, rpa, [target])).toMatchObject({ direction: 'down', tone: 'better', value: 'down:better' })
+  const icoReferences = [
+    reference('target', 'rpa', 'lower_is_better'), reference('band', 'rpa', 'lower_is_better'),
+    reference('target', 'otd', 'higher_is_better'), reference('band', 'otd', 'higher_is_better'),
+    reference('target', 'ftr', 'higher_is_better'), reference('band', 'ftr', 'higher_is_better')
+  ]
+
+  it('Sky con las referencias ICO reales: RpA ▼ mejor, OTD ▲ mejor, FTR ▼ peor', async () => {
+    const { trendOf } = await import('./figure-slots')
+
+    expect(trendOf(1.33, 1.44, f({ metricId: 'rpa' }), icoReferences).value).toBe('down:better')
+    expect(trendOf(92.1, 90.3, f({ metricId: 'otd', unit: 'percent' }), icoReferences).value).toBe('up:better')
+    expect(trendOf(80.2, 85.8, f({ metricId: 'ftr', unit: 'percent' }), icoReferences).value).toBe('down:worse')
+  })
+
+  it('la dirección que declara el propio hecho manda sobre la inferida', async () => {
+    const { trendOf } = await import('./figure-slots')
+    const own = f({ metricId: 'rpa', dimension: { direction: 'lower_is_better' } })
+
+    expect(trendOf(1.33, 1.44, own, []).value).toBe('down:better')
   })
 
   it('sin dirección declarada, tono neutro (nunca adivinado); sin cambio, plano', async () => {

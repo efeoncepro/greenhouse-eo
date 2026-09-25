@@ -103,16 +103,28 @@ export const directionOf = (current: number, previous: number): 'up' | 'down' | 
   current > previous ? 'up' : current < previous ? 'down' : 'flat'
 
 /**
- * Si subir es mejor para la métrica del hecho: la posición siempre es «menor es mejor»; si no, la dirección que declara
- * el hecho de referencia (meta) de la misma métrica. Sin dirección conocida ⇒ null (tono neutro, nunca adivinado).
+ * Si subir es mejor para la métrica del hecho, en este orden: la dirección que declara el propio hecho
+ * (`dimension.direction`); la posición, que siempre es «menor es mejor»; la dirección de un hecho de referencia (meta o
+ * banda) de la misma métrica. Las referencias ICO reales se llaman `target.rpa`/`band.rpa` y nombran su métrica en
+ * `dimension.metric`: se casan por ahí, no por `metricId`. Sin dirección conocida ⇒ null (tono neutro, nunca adivinado).
+ * Se resuelve en el render para que también lo lean los snapshots ya sellados.
  */
+const directionValue = (direction: string | undefined): boolean | null =>
+  direction === 'higher_is_better' ? true : direction === 'lower_is_better' ? false : null
+
 export const higherIsBetterOf = (fact: EvidenceFactV1, facts: Iterable<EvidenceFactV1>): boolean | null => {
+  const own = directionValue(fact.dimension?.direction)
+
+  if (own !== null) return own
   if (fact.unit === 'position') return false
 
   for (const other of facts) {
-    const direction = other.dimension?.direction
+    if (other === fact || other.module !== fact.module) continue
 
-    if (other.module === fact.module && other.metricId === fact.metricId && direction) return direction === 'higher_is_better'
+    const names = other.dimension?.metric === fact.metricId || other.metricId === fact.metricId
+    const declared = directionValue(other.dimension?.direction)
+
+    if (names && declared !== null) return declared
   }
 
   return null
