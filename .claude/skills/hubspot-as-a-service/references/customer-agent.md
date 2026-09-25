@@ -12,6 +12,10 @@ Treat these as independent layers:
 6. **Channel/entry:** landing buttons, query parameters, privacy consent, chatflow targeting and widget constraints.
 7. **Measurement:** resolution definition, handoff rate, contained intents, exceptions, quality and cost.
 
+For a visual identity change, inventory the Customer Agent profile image and every active channel/chatflow avatar
+separately. Saving one does not prove the other changed. Read back each setting and inspect the published channel;
+opening a chat widget to check its avatar is a visual test, not a conversational outcome test.
+
 ## Deployment through workflows and rule-based bots
 
 HubSpot's `Deployment > Workflows and bots` surface is a **selective conversation-assignment layer**. It controls when a conversation is handed to the Customer Agent; it does not add knowledge, grant an external action or execute an arbitrary business workflow on the visitor's behalf.

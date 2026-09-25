@@ -76,3 +76,12 @@ submitted. Evidence:
 
 - `.captures/anam-emma-premium-build27-2026-09-01/`
 - `.captures/anam-emma-corporate-name-build28-2026-09-01/`
+
+## Current client asset — 2026-09-24
+
+Build `#30` preserves the editorial composition but replaces the historical generated character with
+`emma-anam-portrait-2026-09-23.png`, the transparent headset portrait supplied by María Paz/ANAM. The visible
+role is `Ejecutivo comercial ANAM`. The chat avatar derives from that same portrait with a pale mint background;
+HubSpot stores it independently in Customer Agent identity and the active chatflow. The build #28 embroidery
+requirement above describes the previous illustration only. Public readback confirmed the portrait, role and
+open chat avatar on desktop; the full mobile, keyboard and conversation regression was not repeated for #30.

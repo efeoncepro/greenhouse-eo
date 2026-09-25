@@ -1,5 +1,12 @@
 # Handoff activo
 
+**ANAM Emma (24/09):** landing pública HubSpot `kortex-cms-react/30` verificada con el PNG entregado por María Paz,
+cargo `Ejecutivo comercial ANAM` y avatar derivado con fondo menta en identidad de Customer Agent y chatflow
+`96601133`. Canon técnico, funcional, manual y skill `hubspot-as-a-service` actualizados en
+[caso ANAM](docs/architecture/kortex/hubspot-cms/anam-chat-landing.md). La verificación abrió el widget sin enviar
+mensajes; no se repitió la regresión móvil ni conversacional del build anterior. Fuente CMS en
+`../dev/kortex/hubspot-cms-react-project`, commit local `2229965` (sin push).
+
 SKY: CDR-009.
 
 **SKY Blog SEO/AEO (24/09):** HECHO end-to-end: `SVC-HS-591725750952`, términos `7c38b899…`, apply `EO-APC-9676214B`; SEO+AEO `contracted` ([delta TASK-1852](docs/tasks/in-progress/TASK-1852-berel-sky-service-access-and-channel-enablement.md#delta-2026-09-24--sky-blog-seoaeo-segundo-servicio-de-la-misma-organización)). Falta humano: login Sky, Search Console y keywords del blog (octubre).

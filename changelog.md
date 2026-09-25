@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-24 — ANAM: foto oficial de Emma, avatar de chat y cargo comercial
+
+La landing pública sirve `kortex-cms-react/30` con el retrato PNG enviado por María Paz y el cargo `Ejecutivo comercial ANAM`. El avatar derivado con fondo menta se guardó en la identidad de Customer Agent y en el chatflow `96601133`; el widget público mostró la nueva imagen sin enviar mensajes. Se actualizaron el [caso ANAM](docs/architecture/kortex/hubspot-cms/anam-chat-landing.md), la documentación funcional, el manual y las referencias espejo de `hubspot-as-a-service`. La QA completa móvil y conversacional del build #30 no se repitió.
+
 ## 2026-09-24 — Insights: renderer local de familias de gráficos
 
 Los catálogos `insights-deck` e `insights-report` componen line, pie, donut y scatter desde `ChartSpec`; las suites dirigidas pasan (114/114) y un PDF sintético A4 de 30 páginas valida fuentes embebidas, pie/folio 30/30 y lectura en grises. Evidencia y gates pendientes en [TASK-1847](docs/tasks/in-progress/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md); sin deploy ni release.
@@ -658,14 +662,3 @@ SVG presente pero no rasterizado produzca un falso positivo.
 La skill publicitaria incluye contrato e intent reutilizables para sesiones nuevas. Sus fixtures cubren texto y
 objeto en 16:9/9:16. No se generó una pieza de campaña, no hubo publicación ni cambio MCP. Advertising permanece
 `trial`, collaboration `candidate` y Globe/otros runtimes `pending adapter` hasta implementar y comparar su motor.
-
-## 2026-09-13 — Creative Typography Workbench de AXIS desplegado
-
-La guía pública [Creative Typography Workbench](https://axis.efeonce.org/references/creative-typography/) quedó
-desplegada desde AXIS: implementación `93810997c72a2664e8be6d3a85be410b5b5985f9`, release HEAD
-`e2694025f8f7cb06fbb3ebe85ea0d2b4687d8786`, deployment Vercel `dpl_G9gbrg5gkzR4RQotfZes9G3eoduS` y
-GitHub verify verde. El readback público respondió `200`, encontró
-Bricolage, Poppins y Guttery reales, expuso el asesor interactivo y no mostró overflow en desktop. Greenhouse
-enlaza la experiencia desde el contrato operativo, la descripción funcional y el manual sin duplicar recetas.
-El despliegue del Lab no cambia `efeonce.advertising-typography` de `trial` a `stable`, no activa tipografía
-publicitaria en la UI de producto y no aprueba automáticamente ninguna pieza.

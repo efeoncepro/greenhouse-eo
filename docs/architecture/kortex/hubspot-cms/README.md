@@ -20,7 +20,7 @@ La operación integral del portal cliente, RevOps y Customer Agent vive en [`../
 - [`anam-portal-access.md`](anam-portal-access.md): estado de acceso OAuth del portal ANAM y capacidades observadas.
 - [`anam-chat-landing.md`](anam-chat-landing.md): landing de contacto ANAM en CMS React, builds, copy, diseno, comandos CLI, verificacion y guardrails.
 
-La landing ANAM está operativa en el build `#28`. El contrato funcional se explica en
+La landing ANAM está operativa en el build `#30`: usa el retrato PNG entregado por María Paz, muestra a Emma como `Ejecutivo comercial ANAM` y comparte identidad visual con el avatar del chat. El contrato funcional se explica en
 [`../../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md`](../../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md),
 la operación diaria en
 [`../../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md`](../../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)

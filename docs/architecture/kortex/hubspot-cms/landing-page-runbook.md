@@ -133,7 +133,7 @@ La landing `https://anam-2.hubspotpagebuilder.com/agente-anam` quedo publicada d
 projectName: kortex-cms-react
 projectId: 103589049
 component UID: kortex-anam-cms-react-theme
-deployedBuildId: 28
+deployedBuildId: 30
 ```
 
 Documentacion especifica: [`anam-chat-landing.md`](anam-chat-landing.md).
@@ -147,13 +147,16 @@ Lecciones operativas:
   `data-chat-intent`.
 - La copy visible no debe mencionar `widget de HubSpot`; usar lenguaje de accion del usuario final.
 - Para abrir chatflows especificos desde botones, usar query params + `HubSpotConversations.widget.refresh({ openToNewThread: true })`; en ANAM el contrato vigente es `anam_intent=cotizar|seguimiento_servicio|requerimiento_calidad`.
-- El header usa el wordmark horizontal ANAM del catálogo del repo, sin el círculo superior. Emma es la asistente
-  femenina y el bordado de su uniforme debe decir exactamente `ANÁLISIS AMBIENTALES S.A.`.
-- Las correcciones integradas en el personaje o la tela se resuelven mediante edición generativa del asset,
-  guardando una versión nueva y conservando la anterior para rollback. El operador descartó el texto
-  determinista superpuesto porque rompe el acabado visual.
+- El header usa el wordmark horizontal ANAM del catálogo del repo, sin el círculo superior. La landing sirve
+  `emma-anam-portrait-2026-09-23.png`, copia del PNG transparente entregado por ANAM, y el cargo visible es
+  `Ejecutivo comercial ANAM`. El requisito de bordado pertenecía a la ilustración anterior del build #28.
+- El avatar del chat es un derivado del retrato con fondo menta claro. Actualizar la identidad de Customer Agent y
+  el avatar del chatflow activo `96601133` como superficies separadas; guardar ambas y verificar el widget público.
+  Conservar las fuentes y el asset anterior para rollback. Si ANAM pide una nueva edición del personaje, revisar
+  el resultado visual completo antes de publicarlo.
 - Verificar desktop y 390 px, click y teclado, `aria-pressed`, contexto del CTA, overflow, consola/red y margen
-  exterior. El smoke no debe abrir ni enviar una conversación real.
+  exterior. Un cambio de imagen puede requerir abrir el widget para comprobar el avatar; no enviar una
+  conversación real durante el smoke.
 - El endpoint `draft/push-live` de Pages API requiere scopes `content` y `content.landing_pages.write`; si faltan, el refresh/publicacion debe hacerse desde editor o con un token nuevo autorizado para ese scope.
 
 ## Evidencia esperada de cierre
