@@ -216,7 +216,12 @@ With the flag OFF the adapters return v1 evidence and the planner emits a v1 pla
   positive, on the not-yet-reached side of the target). They never produce claims, tables or references and never count
   as module evidence in `validating`. The render draws the band only from that fact — never `target × 0.85`.
 - **Plan (all optional)** — `contracts/plan.ts`: `chapter.opening` (claim), `chapter.readings[]` =
-  `{ chartId, keyFigure?: { factId, value (must equal formatFactValue), caption }, conclusion?, meaning, nextStep | null }`;
+  `{ chartId, keyFigure?: { factId, value (must equal formatFactValue), caption }, conclusion?, meaning?, nextStep | null }`
+  — the v2 planner ALWAYS emits `conclusion` as a deterministic FINDING (bullet: meets/misses the target of <metric>;
+  bars: the largest change among ≥ 2 comparables, the direction of a single fact, or the highest value; line: the
+  direction from/to), using only numbers the validator already admits (value, target, previous, delta — never
+  «by how much» vs the target). `meaning` only when it adds something (other spaces/series, or the previous period
+  for a bullet); `meaning === conclusion` is rejected (`invalid_field`);
   `essentials` (≤ `PLAN_ESSENTIALS_MAX` = 5); `scopeLines` (copy, no numbers allowed); `decision`, `measurement`, `ask`
   (claims; NO deterministic producer); `cover`; actions gain `impact`/`effort` 1–3 and `weeks` `N` or `N-M` (1–4).
   Every text is a `PlanClaimV1` checked by the same figure rule (`invalid_field` for shape errors).

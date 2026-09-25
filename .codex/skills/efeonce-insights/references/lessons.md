@@ -1,5 +1,10 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-25 · A per-figure reading that repeats the page is not a reading.** Real PDFs (Berel p. 5, Sky p. 7)
+  printed the same sentence twice, and the targets page was titled with the period comparison because the planner
+  emitted no `conclusion`. Also: bounded AI authoring only REWRITES, so interpretation has to be computed by the
+  deterministic planner (findings over cited facts), never expected from the model. Rule: `conclusion` is always a
+  finding; `meaning` only if it says something else; check real PDFs, not only the plan JSON.
 - **2026-09-25 · TASK-1889 · Sólo los datos reales revelaron cinco defectos que el canvas no mostraba.** Con el canvas
   en 20/21 de fidelidad y el visual gate a 0 px, las ediciones reales de Berel (`EO-INS-000019`) y Sky
   (`EO-INS-000022`) destaparon: métricas SEO agrupadas en un eje común, la capitular suelta y presupuestos de texto
