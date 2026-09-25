@@ -1,5 +1,19 @@
 # TASK-1847 — Efeonce Insights: gráficos y catálogos premium para deck e informe vertical
 
+## Delta 2026-09-25 — canary de render productivo y gate de cierre
+
+- **deck_pdf en producción:** edición interna sandbox `insed-afdbff0a…` → run `irun-cc329478-d7c7-4a1d-be8b-eb7b359e2851`
+  encolado por el lane ecosystem de producción con catálogo `insights-deck`; el dispatcher lo tomó a los ~2,6 min y
+  compuso en 3,9 s al primer intento (3 láminas, 42 760 bytes, Geist/Poppins embebidas). El contenido dice «sin datos»:
+  correcto para esa org.
+- **report_pdf en producción: pendiente.** Los espacios de la org sandbox (`Greenhouse Demo`, `Agent Client Sandbox`)
+  no tienen ninguna fila en `ico_engine.metric_snapshots_monthly`; una edición nueva falla en `validating` con
+  `evidence_rejected` (edición `insed-4873a166…`, comportamiento correcto) y la única edición sandbox con A4 ya tiene
+  su salida viva desde el 2026-09-22 (el render es idempotente por salida). Cerrar esto exige una edición interna de un
+  cliente real con datos (Sky tiene 11 meses de ICO); espera autorización del operador.
+- **Gate de cierre:** `pnpm test` completo verde (1821 archivos, 15 303 tests, 0 fallas) y `pnpm build` verde
+  (compilado en 70 s, 23/23 páginas estáticas, exit real 0) sobre `35f208553`.
+
 ## Delta 2026-09-25 — rediseño premium traspasado a TASK-1888 y TASK-1889
 
 - El operador aprobó un rediseño completo de los informes en el canvas «Gráficos de Efeonce Insights»
@@ -160,7 +174,7 @@ readback productivo permanecen pendientes.
 - Motion: `docs/ui/motion/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs-motion.md`
 - Backend impact: `command`
 - Epic: `EPIC-045`
-- Status real: `En producción desde 2026-09-24 (release ebb9212a32ce, run 36071525772, PR #239, main ebb9212a3): report_pdf en insights-report y deck_pdf en insights-deck. Verificado: 6 runtimes en el SHA, Vercel READY, watchdog ok y canary de contrato productivo (renderableOutputs deck_pdf+report_pdf). Sin verificar: render real de report_pdf/deck_pdf en el Job productivo (canary de render pendiente de autorización). Staging: Berel v2 deck 13 + A4 15; Sky v2 deck 5 + A4 7. QA local de 30 páginas A4 y 10 frames Insights a 0 px (el gate global conserva el drift de ISSUE-122). develop recibe el código del release en e15d71648.`
+- Status real: `En producción desde 2026-09-24 (release ebb9212a32ce, run 36071525772, PR #239, main ebb9212a3): report_pdf en insights-report y deck_pdf en insights-deck. Verificado: 6 runtimes en el SHA, Vercel READY, watchdog ok y canary de contrato productivo (renderableOutputs deck_pdf+report_pdf). Verificado 2026-09-25: render real de deck_pdf en producción (run irun-cc329478-d7c7-4a1d-be8b-eb7b359e2851, catálogo insights-deck, primer intento, 3 láminas, fuentes embebidas, org sandbox), pnpm test completo verde (1821 archivos, 15303 tests) y pnpm build verde (HEAD 35f208553). Sin verificar: render real de report_pdf en producción; la org sandbox no tiene snapshots ICO y requiere una edición interna de un cliente real (decisión del operador). Staging: Berel v2 deck 13 + A4 15; Sky v2 deck 5 + A4 7. QA local de 30 páginas A4 y 10 frames Insights a 0 px (el gate global conserva el drift de ISSUE-122). develop recibe el código del release en e15d71648.`
 - Rank: `TBD`
 - Domain: `ui|platform`
 - Blocked by: `none`

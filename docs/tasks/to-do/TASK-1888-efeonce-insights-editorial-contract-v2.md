@@ -156,8 +156,8 @@ Reglas obligatorias:
 - `src/lib/efeonce-insights/editorial/ai-authoring.ts`
 - `src/lib/efeonce-insights/editorial/author-plan.ts`
 - `src/lib/efeonce-insights/editorial/plan-validation.ts`
-- `src/lib/efeonce-insights/adapters/aeo-adapter.ts`, `seo-adapter.ts`, `ico-adapter.ts` (sólo `channelId` y
-  referencias; sin métricas nuevas)
+- `src/lib/efeonce-insights/adapters/aeo-adapter.ts`, `seo-adapter.ts`, `ico-adapter.ts` (`channelId`, referencias y
+  lectura de `ftr_pct` del snapshot ICO; sin métricas calculadas en Insights)
 - `src/lib/efeonce-insights/commands/validate-request.ts`
 - `src/lib/efeonce-insights/request-hash.ts`
 - `src/lib/efeonce-insights/commands/cover-preference.ts` (nuevo) y su reader
@@ -178,8 +178,12 @@ Reglas obligatorias:
 - `src/lib/efeonce-insights/contracts/chart-spec.ts` — `ChartSpecV1` con 7 familias, relaciones y validación.
 - `src/lib/efeonce-insights/contracts/plan.ts` — `EditorialPlanV1` (`EDITORIAL_PLAN_VERSION = 'editorial_plan_v1'`).
 - `src/lib/efeonce-insights/editorial/` — planner determinista, autoría IA acotada, validación de cifras y formato.
-- Adapters: SEO emite `clicks`, `impressions`, `ctr`, `position`, `rank` con granularidad `period`; AEO emite
-  puntajes por dimensión y `presence.<provider>`; ICO emite `rpa` y `otd` (lee `otd_pct`) con granularidad `month`.
+- Adapters: SEO emite `clicks`, `impressions`, `ctr`, `position`, `rank` y declara granularidades `day`, `month` y
+  `period`; AEO emite puntajes por dimensión y `presence.<provider>` (sólo `period`); ICO emite `rpa` y `otd` (lee
+  `otd_pct`) con granularidad `month`.
+- El snapshot ICO (`ico_engine.metric_snapshots_monthly`) trae además `ftr_pct`, ciclo, throughput y conteos, que el
+  adapter no lee. Verificado el 2026-09-25 en BigQuery: Sky Airlines tiene 11 meses seguidos (2025-11 a 2026-09,
+  jul–sep recalculados ese día); los espacios de la org sandbox «Greenhouse Demo» no tienen ninguna fila.
 - Proveedores AEO con nombre visible en `src/lib/copy/growth.ts` (`provider_display_label`: `openai`, `anthropic`,
   `perplexity`, `gemini`, `google_ai_overview`).
 - `src/lib/efeonce-insights/request-hash.ts` e idempotencia por `(org, key)` + hash.
@@ -195,9 +199,10 @@ Reglas obligatorias:
 - Sin `channelId`; los catálogos no pueden asociar un isotipo a una serie.
 - Sin preferencia de portada, sin cambio en el encargo, sin variante de logo para fondo oscuro y sin resolución sellada.
 - `clientBrandRef` no se resuelve a un asset: la portada no puede mostrar el logo del cliente.
-- Evidencia que el canvas usa y **no existe** hoy en los adapters (queda fuera, ver Follow-ups): series diarias o
-  semanales de SEO, métricas por página o por keyword, conjuntos por consulta de IA (Venn/UpSet), FTR de ICO, embudo
-  hasta oportunidad (CRM).
+- FTR ya está calculado por el dueño (ICO) y el adapter no lo lee: se incorpora en esta task (Slice 3), igual que OTD.
+- Evidencia que el canvas usa y **no existe** hoy en los adapters (queda fuera, ver Follow-ups): métricas por página o
+  por keyword de SEO, conjuntos por consulta de IA (Venn/UpSet), embudo hasta oportunidad (CRM). Las series temporales
+  sí existen (SEO `day`/`month`, ICO `month`); falta que el planner las pida y que la matriz lo confirme.
 
 ## Modular Placement Contract
 
@@ -344,7 +349,8 @@ Reglas obligatorias:
 ### Slice 3 — Productores
 
 - Planner determinista y autoría IA emiten las familias que la matriz marca como `productor ahora`. Conjunto mínimo
-  esperado, a confirmar en la matriz: bullet para OTD% y RpA de ICO contra sus umbrales del registro; barras de
+  esperado, a confirmar en la matriz: bullet para OTD%, RpA y FTR% de ICO contra sus umbrales del registro; línea de
+  tendencia mensual de ICO y, si el adapter entrega la serie, diaria de SEO; barras de
   presencia por motor de AEO con `channelId`; medidor para un puntaje AEO de 0 a 100 con el período anterior como
   referencia, si el reader entrega ese puntaje [verificar]; donut sólo con 3 partes o menos.
 - Prompt de autoría versionado para la lectura por figura; fallback determinista redacta una lectura factual sin
@@ -377,8 +383,8 @@ Reglas obligatorias:
 
 - Plantillas, tokens, logos dibujados, portadas y páginas visuales: `TASK-1889`.
 - UI para elegir la preferencia o el cambio en el encargo: `TASK-1849` (consumer).
-- Métricas o granularidades nuevas en adapters (series diarias/semanales SEO, por página o keyword, conjuntos por
-  consulta de IA, FTR de ICO, embudo CRM): quedan como Follow-ups en el dominio dueño de cada fuente.
+- Métricas nuevas en adapters (SEO por página o keyword, conjuntos por consulta de IA, embudo CRM): quedan como
+  Follow-ups en el dominio dueño de cada fuente. Leer `ftr_pct` no cuenta: ya lo calcula ICO.
 - Venn de tres conjuntos (no existe con áreas exactas), PPTX/DOCX, sangrado de imprenta.
 - Cambiar `deck-axis`, Proposal Studio o `VisualProfile` (TASK-1644).
 
@@ -389,11 +395,11 @@ Reglas obligatorias:
 | Familia | Pregunta | Datos que exige | Evidencia hoy |
 |---|---|---|---|
 | `bar` / `bar_grouped` | comparar / contra período anterior | valores por dimensión | sí (ya emitidas) |
-| `bar_stacked` | composición en el tiempo | partes por período | no: SEO y AEO sólo `period` |
-| `line` | tendencia | serie temporal | no: sin serie diaria/semanal |
+| `bar_stacked` | composición en el tiempo | partes por período | por confirmar: SEO declara `day`/`month`; faltan partes (marca/sin marca) [verificar] |
+| `line` | tendencia | serie temporal | sí, a confirmar: SEO `day`/`month` y tendencia mensual ICO (Sky: 11 meses) |
 | `pie` / `donut` | parte de un total (≤ 3) | partes no superpuestas | parcial: presencia AEO si el reader entrega conteos por categoría [verificar] |
 | `scatter` | relación entre dos métricas | pares por observación | no: SEO sólo agregados |
-| `bullet` | resultado contra meta | valor + meta oficial | sí: OTD% y RpA de ICO contra el registro |
+| `bullet` | resultado contra meta | valor + meta oficial | sí: OTD%, RpA y FTR% de ICO contra el registro (FTR requiere que el adapter lea `ftr_pct`) |
 | `gauge` | nivel en escala 0–100 | valor + anterior (+ meta opcional) | parcial: puntaje AEO [verificar] |
 | `waterfall` | qué explica un cambio | aportes que suman | no |
 | `funnel` | conversión por etapas | etapas subconjunto | no: requiere CRM |
@@ -511,8 +517,8 @@ eso lo resuelve el catálogo en TASK-1889 desde `modules` y `channelId`, sin cam
 
 ## Follow-ups
 
-- Evidencia nueva por dominio dueño, sólo cuando un informe real la pida: series temporales y métricas por página de
-  SEO (Search Console), conjuntos por consulta de IA (grader), FTR en el adapter ICO, embudo hasta oportunidad (CRM).
+- Evidencia nueva por dominio dueño, sólo cuando un informe real la pida: métricas por página o keyword de SEO
+  (Search Console), conjuntos por consulta de IA (grader), embudo hasta oportunidad (CRM).
   Cada una habilita familias de la matriz sin tocar este contrato.
 
 ## Open Questions
