@@ -226,6 +226,7 @@ distribución) son marcas de producto. **Un lenguaje, cuatro acentos.**
 | Tamaño mínimo | **96 px en pantalla · 25 mm impreso**; recomendado ≥ 160 px. Bajo el mínimo, el isotipo [propuesta, validar con prueba de impresión] |
 | Familia | cada marca con su propio archivo, a color o en negativo (productos sobre `#091951`) |
 | Logo con eslogan | sólo el bloque oficial, en cierres |
+| En una frase de display | **sí, con reglas**: sólo en titulares grandes (el logo sobre 96 px); misma altura de x y misma línea base que el texto (la altura de x de «efeonce» es el 55 % del alto del archivo y su línea base cae al 80 %: con Bricolage 760, `height: 0.94em; vertical-align: -0.19em`); una vez por pieza y sin repetir el logo como firma en la misma vista; reemplaza sólo la palabra Efeonce; color oficial y el punto final al cierre de la frase, nunca pegado al logo |
 
 **Cómo elegir:** ¿cabe a 96 px? Logo completo; si no, isotipo. ¿Fondo oscuro? Negativo. ¿Claro? A color. ¿Foto?
 Zona calma o cambia la foto; no se oscurece encima. En objetos, el logo va en el dorso, solo.
@@ -243,7 +244,7 @@ Zona calma o cambia la foto; no se oscurece encima. En objetos, el logo va en el
 9. Agregarle la esfera o un punto: la esfera es de la palabra, no del logo.
 10. Escribirlo con una fuente: se usa el archivo, no se tipea.
 11. Logo e isotipo juntos: uno u otro en cada vista.
-12. Dentro de una frase («Somos efeonce y…»): el logo no reemplaza una palabra.
+12. En texto corrido (párrafos, interfaz, tamaño chico): el logo no reemplaza una palabra. En titulares de display sí, con las reglas de §8.2.
 
 La causa es siempre la misma: tratar el logo como una imagen editable. **Si ninguna versión funciona, cambia el
 fondo o la foto, no el logo.** Si falta una versión (por ejemplo, un negativo todo blanco de Wave), se pide a
@@ -393,7 +394,7 @@ vectoriales y de una muestra física del proveedor. Prompts y runner: `exploraci
 | Eslogan | bloque oficial, en cierres | traducido, con esfera, en mayúsculas, con otros pesos |
 | Objetos | frente: palabra; dorso: logo solo | logo y órbita juntos al frente |
 | Foto | oficio real, luz con carácter, sin emblema legible | velo navy encima, foto de banco |
-| Logo | archivo oficial, con resguardo X y contraste | los doce usos incorrectos de §8.3 |
+| Logo | archivo oficial, con resguardo X y contraste; en titulares puede ocupar el lugar de la palabra Efeonce | los doce usos incorrectos de §8.3 |
 | Isotipo | solo, en formatos chicos, ≥ 24 px | con otra órbita, recoloreado, rotado, combinado |
 | Terceros | satélites de canal que muestran dónde medimos | logos de terceros como si fueran alianzas |
 
