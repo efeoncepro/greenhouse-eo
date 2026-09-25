@@ -451,3 +451,10 @@ Contrato cross-métrica/estados/cadencia/acceso: [Operational Leadership Measure
 ### 14.5 Lectura conjunta con RpA
 
 [LEADERSHIP_RPA_V1](LEADERSHIP_RPA_V1.md) define intensidad y distribución de correcciones, identidad matemática con FTR, casos numéricos y cola abierta. Compartir K, manifest, método dependiente, corte y revisión. Si difieren las poblaciones, no presentar la relación como válida. FTR responde si hubo cambios; RpA cuántos. No sumarlos como dos incentivos independientes; las señales abiertas no generan pass final.
+
+## Delta 2026-09-25 — umbral operativo = registro ICO (decisión del operador)
+
+- El semáforo operativo de FTR% es el de `ICO_METRIC_REGISTRY`: **óptimo ≥80 %, atención 60–80 %, crítico <60 %**.
+  La tabla de §8 (85 / 70) queda como referencia de benchmark, no como semáforo. La frase de §8 que la declaraba
+  «alineada con metric-registry.ts» no era cierta: el registro ya decía 80 / 60.
+- FTR no es input de bono (sin cambio).

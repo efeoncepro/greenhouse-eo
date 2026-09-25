@@ -1,5 +1,14 @@
 # Contrato de métricas ICO
 
+## Delta 2026-09-25 — semáforo operativo = registro ICO (decisión del operador)
+
+- La tabla de §7.1 (World-class / Strong / Attention / Critical) es una **referencia de benchmark externo**, no el
+  semáforo operativo. El semáforo que muestran los dashboards y la meta que imprime Efeonce Insights salen de
+  `ICO_METRIC_REGISTRY` (`src/lib/ico-engine/metric-registry.ts`): OTD% óptimo ≥90 / atención 70–90 / crítico <70; FTR% óptimo ≥80 / atención 60–80 / crítico <60; RpA óptimo ≤1,5 / atención >1,5–2,5 / crítico >2,5.
+- Motivo: al revisar TASK-1888 aparecieron cuatro versiones distintas de los umbrales (registro, specs V1, este
+  contrato y el glosario). El operador decidió que manda el registro, que es lo que ya corre.
+- El **bono** no usa estos umbrales: lee `greenhouse_payroll.payroll_bonus_config` (vigencia por fecha). Vigente desde 2026-04-01: OTD $0 bajo 70 %, prorrateo lineal 70–94 %, 100 % desde 94 %; RpA 100 % hasta 1,7, banda suave hasta 2,0 (80 %), $0 desde 3,0. Historia: 2026-01-01 OTD 89 / RpA corte 2,0; 2026-03-01 OTD 89 / RpA corte 3,0; 2026-04-01 OTD 94 / RpA corte 3,0. El default del código (`src/lib/payroll/bonus-config.ts`, OTD 89) es sólo respaldo si no hay fila.
+
 ## Delta 2026-05-17 — Precisión implementacional sesión RpA / Indicador de Performance / Cumplimiento / Cycle Time
 
 Post-incidente TASK-877 follow-up (commit `4fc8c0c4` 2026-05-16) que recuperó el bridge Notion↔member, esta sesión hizo deep-dive del contrato de métricas para detectar gaps entre el conceptual (este doc + `Greenhouse_ICO_Engine_v1.md`) y la implementación runtime (`src/lib/ico-engine/`, formulas Notion en Sky y Efeonce DBs). Esta Delta consolida (A) confirmaciones canonical del estado actual, (B) gaps implementacionales detectados pendientes de remediation, y (C) decisiones pendientes sobre Cycle Time antes de canonizar el compute helper.

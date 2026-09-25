@@ -45,9 +45,9 @@ Toda métrica ICO cae en una de cuatro dimensiones. Cada rol recibe un perfil de
 
 | Sigla | Nombre canónico | Definición | Fuente | Dirección / Meta |
 |---|---|---|---|---|
-| **RpA** | **Rounds per Asset** | Rondas de revisión promedio por pieza. | Frame.io + Notion | ↓ · ≤1.5 (saludable) / ≤2 (ref. v1.1) |
+| **RpA** | **Rounds per Asset** | Rondas de revisión promedio por pieza. | Frame.io + Notion | ↓ · ≤1.5 (óptimo; registro ICO) |
 | **OTD%** | On-Time Delivery Rate | % de piezas entregadas dentro del plazo del brief. | Notion (auto) | ↑ · ≥90% (≥95% para entregables de strategy) |
-| **FTR%** | First Time Right | % de piezas aprobadas en primera ronda. | Frame.io + Notion | ↑ · ≥70% (≥85% ref. v1.1) |
+| **FTR%** | First Time Right | % de piezas aprobadas en primera ronda. | Frame.io + Notion | ↑ · ≥80% (óptimo; registro ICO) |
 | **Cycle Time** (CT) | Cycle Time | Tiempo promedio desde brief aprobado hasta entrega. | Notion | ↓ · dentro de estándar por tipo |
 | **CTV** | Cycle Time Variance | Desviación estándar del CT. Detecta dónde está la fricción. | Notion | ↓ · DE <30% del promedio |
 | **BCS** | Brief Clarity Score | Completitud del brief, validada automáticamente por AI Agent. | Notion + AI Agent | ↑ · ≥80/100 |
@@ -115,13 +115,17 @@ Sirven para diagnóstico quirúrgico: si Outcome está rojo pero los inputs prop
 
 | Métrica | Saludable ✅ | Alerta ⚠️ | Crítico 🛑 |
 |---|---|---|---|
-| OTD% | ≥90% | 75–89% | <75% |
+| OTD% | ≥90% | 70–89% | <70% |
 | Cycle Time | dentro de estándar | +20–40% | +40% |
 | CTV | DE <30% | DE 30–60% | DE >60% |
-| RpA | ≤1.5 | 1.6–2.5 | >2.5 |
-| FTR% | ≥70% | 50–69% | <50% |
+| RpA | ≤1.5 | >1.5–2.5 | >2.5 |
+| FTR% | ≥80% | 60–79% | <60% |
 | BCS | ≥80/100 | 60–79/100 | <60/100 |
 
+> **Fuente de verdad de OTD%, RpA y FTR% (decisión del operador, 2026-09-25):** `ICO_METRIC_REGISTRY` en
+> `src/lib/ico-engine/metric-registry.ts` — OTD% óptimo ≥90 / atención 70–90 / crítico <70; FTR% óptimo ≥80 / atención 60–80 / crítico <60; RpA óptimo ≤1,5 / atención >1,5–2,5 / crítico >2,5. Es lo que muestran los semáforos del portal y la meta que imprime
+> Efeonce Insights. Esta tabla lo refleja; si difieren, manda el registro. El **bono** no usa estos umbrales: lee `greenhouse_payroll.payroll_bonus_config` (vigencia por fecha). Vigente desde 2026-04-01: OTD $0 bajo 70 %, prorrateo lineal 70–94 %, 100 % desde 94 %; RpA 100 % hasta 1,7, banda suave hasta 2,0 (80 %), $0 desde 3,0. Historia: 2026-01-01 OTD 89 / RpA corte 2,0; 2026-03-01 OTD 89 / RpA corte 3,0; 2026-04-01 OTD 94 / RpA corte 3,0. El default del código (`src/lib/payroll/bonus-config.ts`, OTD 89) es sólo respaldo si no hay fila.
+>
 > Los umbrales se calibran en el mes 1 de baseline por cuenta. Una cuenta regulada (financiero, farma) tiene umbrales distintos a retail.
 
 ---
