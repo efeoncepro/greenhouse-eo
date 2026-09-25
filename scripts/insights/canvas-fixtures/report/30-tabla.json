@@ -7,8 +7,11 @@
     "runningSection": "01 · Visibilidad orgánica",
     "runningPeriod": "Agosto 2026 · contra julio 2026",
     "eyebrow": "Tabla de respaldo",
-    "tableTitle": "Páginas con más impresiones y CTR bajo",
+    "tableTitle": "Ocho páginas concentran las impresiones que no se convierten en clics",
     "tableColumns": [
+      {
+        "label": "#"
+      },
       {
         "label": "Página"
       },
@@ -61,7 +64,6 @@
         "valueB": "2,4 %"
       }
     ],
-    "tableSource": "Fuente: Google Search Console · 31 de 31 días con dato",
     "footerEdition": "Insights · Informe de agosto 2026",
     "footerContact": {
       "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
@@ -70,6 +72,17 @@
     "folio": {
       "page": "13",
       "total": "24"
+    },
+    "heroFigure": "8",
+    "heroText": "páginas con más impresiones y un CTR bajo la mediana del sitio",
+    "barScaleMax": "14.920",
+    "source": {
+      "label": "Fuente",
+      "text": "Google Search Console, propiedad verificada del cliente"
+    },
+    "coverage": {
+      "label": "Cobertura",
+      "text": "31 de 31 días con dato en el período"
     }
   }
 }

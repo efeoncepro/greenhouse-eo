@@ -1,5 +1,18 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-25 (c) — TASK-1889: narrada, tabla y límites elevadas al nivel del canvas
+
+Pedido del operador («muy sencillas para lo premium del diseño V2»). Las cinco piezas sin página propia en
+el canvas pasan a la gramática aprobada: momento dominante (capitular o cifra protagonista contada del dato),
+columna lateral o lista numerada, y cierre (panel navy o franja). La barra de la tabla sale del dato
+(`report-table-bar`, escala de la tabla completa).
+
+- `templates-insights-report/ReportNarrativePage.png` — capitular + columna lateral (frase clave o marca del capítulo)
+- `templates-insights-report/ReportTablePage.png` — cifra contada, ranking, barra desde el dato, procedencia
+- `templates-insights-report/ReportLimitsPage.png` — cifra contada, límites numerados, metodología en panel navy
+- `templates-insights-deck/InsightsNarrativeSlide.png` — gramática de «Lectura» del deck + franja «En una frase»
+- `templates-insights-deck/InsightsLimitsSlide.png` — cifra de 132 px, lista numerada, franja «Cómo se midió»
+
 ## 2026-09-25 (b) — TASK-1889: las plantillas editoriales REEMPLAZAN a las v1
 
 Decisión del operador: las v2 no conviven con las v1; ningún agente debe poder componer con una v1
@@ -441,7 +454,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: e9497bf191731e7b241b7241b81fd648ca10fc220438d6d01058bbd82e717f1b -->
+<!-- manifest-digest: 9d3a41f406149e80f0bd243a1d66da55a555a9c02a0f4d75f598bc1b2af5efb6 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

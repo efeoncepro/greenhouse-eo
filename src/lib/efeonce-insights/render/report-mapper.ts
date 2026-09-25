@@ -41,6 +41,7 @@ import {
   EFEONCE_OPERATING_MARKETS,
   EFEONCE_TAX_ID_FALLBACK
 } from '@/config/efeonce-brand'
+import { parsePrintedNumber } from '@/lib/artifact-composer/pure'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
 import type { EditorialPlanV1, PlanChapterV1 } from '../contracts/plan'
@@ -55,11 +56,11 @@ import { withDedupedLimits } from './plan-limits'
 /** Capacidades declaradas por plantilla (`*.slots.json`). Son del molde, no preferencias. */
 const CAPACITY = {
   /** Filas por página de tabla (`tableRows.maxItems`). */
-  tableRows: 24,
+  tableRows: 20,
   /** Párrafos por página narrativa (`paragraphs.maxItems`). */
   paragraphs: 6,
   /** Límites por página de cierre (`limits.maxItems`). */
-  limits: 12,
+  limits: 9,
   /** Entradas por página de índice (`entries.maxItems`). */
   indexEntries: 20,
   /** Entradas del índice de una apertura de capítulo (`contents.entries.maxItems`). */
@@ -112,6 +113,7 @@ const L = GH_INSIGHTS.catalog
 const chapterBodyPages = (
   chapter: PlanChapterV1,
   running: { runningSection: string; runningPeriod: string },
+  chapterMark: { numeral: string; label: string },
   legacyRunning: { runningChapter: string; runningPeriod: string },
   factsById: ReadonlyMap<string, EvidenceFactV1>,
   locale: string
@@ -167,6 +169,7 @@ const chapterBodyPages = (
           ...running,
           eyebrow: chapter.title,
           assertion: rejectIfLonger(headline!, BUDGET.assertion, `${chapter.chapterId}.assertion`),
+          chapterMark,
           paragraphs: paragraphs.map(p => rejectIfLonger(p, BUDGET.paragraph, `${chapter.chapterId}.paragraph`))
         }
       }
@@ -174,6 +177,9 @@ const chapterBodyPages = (
   })
 
   for (const table of chapter.tables) {
+    // La barra de la primera columna de valor se escala contra la tabla COMPLETA, no contra la página.
+    const scale = Math.max(0, ...table.rows.map(row => parsePrintedNumber(row[1]) ?? 0))
+
     chunkByCapacity(table.rows, CAPACITY.tableRows, (_r, i) => `${table.tableId}-r${i}`).forEach((rows, i) => {
       pages.push({
         contentsTitle: table.title,
@@ -182,16 +188,19 @@ const chapterBodyPages = (
           slots: {
             ...running,
             eyebrow: L.tableEyebrow,
+            heroFigure: String(table.rows.length),
+            heroText: L.tableRowsText,
             tableTitle: rejectIfLonger(table.title, BUDGET.tableTitle, `${table.tableId}.title`),
             // La continuación se declara: una tabla que sigue sin decirlo obliga a retroceder.
             ...(i > 0 ? { continuationLabel: L.tableContinued } : {}),
-            tableColumns: table.columns.slice(0, 3).map(label => ({ label })),
+            tableColumns: ['#', ...table.columns.slice(0, 3)].map(label => ({ label })),
             tableRows: rows.map(row => ({
               entity: String(row[0] ?? '—'),
               valueA: String(row[1] ?? '—'),
               ...(row[2] != null ? { valueB: String(row[2]) } : {})
             })),
-            tableSource: GH_INSIGHTS.document.evidenceSource
+            ...(scale > 0 ? { barScaleMax: String(scale) } : {}),
+            source: { label: GH_INSIGHTS.document.sourceLabel, text: GH_INSIGHTS.document.evidenceSource }
           }
         }
       })
@@ -263,7 +272,8 @@ export const buildInsightReportPlanInput = ({
   frozen.chapters.forEach((chapter, index) => {
     const number = pad2(index + 1)
     const running = { runningSection: `${number} · ${chapter.title}`, runningPeriod: periodLabel }
-    const body = chapterBodyPages(chapter, running, { runningChapter: chapter.title, runningPeriod: periodLabel }, factsById, frozen.locale)
+    const mark = { numeral: number, label: rejectIfLonger(`${L.chapter} ${number} · ${chapter.title}`, 48, `${chapter.chapterId}.mark`) }
+    const body = chapterBodyPages(chapter, running, mark, { runningChapter: chapter.title, runningPeriod: periodLabel }, factsById, frozen.locale)
 
     // La apertura abre el capítulo; su índice se completa con folios reales cuando se conoce el plan.
     const opening: BodyPage = {
@@ -284,19 +294,23 @@ export const buildInsightReportPlanInput = ({
     sections.push({ mark: number, title: chapter.title, pages: [opening, ...body] })
   })
 
-  const limitPages = chunkByCapacity(limitEntriesOf(frozen.limits), CAPACITY.limits, (_l, i) => `limit-${i}`).map(limits => ({
+  const allLimits = limitEntriesOf(frozen.limits)
+
+  const limitPages = chunkByCapacity(allLimits, CAPACITY.limits, (_l, i) => `limit-${i}`).map(limits => ({
     page: {
       contentType: 'report-limits',
       slots: {
         runningSection: GH_INSIGHTS.document.limitsAndMethod,
         runningPeriod: periodLabel,
         eyebrow: L.limitsEyebrow,
+        heroFigure: String(allLimits.length),
+        heroText: L.limitsCountText,
         assertion: L.limitsTitleRich,
         limits: limits.map(entry => ({
           subject: rejectIfLonger(entry.subject, BUDGET.limitSubject, 'limit.subject'),
           cause: rejectIfLonger(entry.cause, BUDGET.limitCause, 'limit.cause')
         })),
-        methodologyLabel: L.methodology,
+        methodologyLabel: L.howMeasured,
         methodology: frozen.methodology.length > 0 ? frozen.methodology : [GH_INSIGHTS.methodology.fallback]
       }
     }

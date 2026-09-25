@@ -2,7 +2,7 @@
   "template": "ReportTablePage",
   "figmaNodeId": null,
   "version": "0.1",
-  "note": "TASK-1889 — tabla densa de respaldo A4 (el canvas no la diseñó).",
+  "note": "TASK-1889 — tabla de respaldo A4: cifra protagonista, ranking, barra desde el dato y procedencia. Sin página propia en el canvas.",
   "viewport": {
     "width": 794,
     "height": 1123
@@ -51,13 +51,34 @@
         "overflow": "reject"
       }
     },
+    "heroFigure": {
+      "selector": "[data-slot='heroFigure']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 4,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Cuántas filas tiene la tabla completa (se cuenta, no se escribe)."
+    },
+    "heroText": {
+      "selector": "[data-slot='heroText']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 64,
+        "maxLines": 3,
+        "overflow": "reject"
+      }
+    },
     "tableTitle": {
       "selector": "[data-slot='tableTitle']",
       "type": "string",
       "required": true,
       "constraints": {
         "maxCharacters": 80,
-        "maxLines": 2,
+        "maxLines": 3,
         "overflow": "reject"
       }
     },
@@ -76,8 +97,8 @@
       "type": "array",
       "required": true,
       "constraints": {
-        "minItems": 2,
-        "maxItems": 3
+        "minItems": 3,
+        "maxItems": 4
       },
       "item": {
         "type": "object",
@@ -97,16 +118,28 @@
       "required": true,
       "constraints": {
         "minItems": 1,
-        "maxItems": 24
+        "maxItems": 20
       },
       "item": {
         "type": "object",
         "shape": {
+          "rank": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-ordinal",
+            "consumer": "resolver-only"
+          },
           "entity": {
             "type": "string",
             "required": true,
-            "maxCharacters": 64,
+            "maxCharacters": 48,
             "maxLines": 1
+          },
+          "bar": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-table-bar",
+            "consumer": "resolver-only"
           },
           "valueA": {
             "type": "string",
@@ -123,14 +156,54 @@
         }
       }
     },
-    "tableSource": {
-      "selector": "[data-slot='tableSource']",
+    "barScaleMax": {
+      "selector": "[data-slot='barScaleMax']",
       "type": "string",
-      "required": true,
+      "required": false,
+      "consumer": "validation-only",
       "constraints": {
-        "maxCharacters": 120,
-        "maxLines": 2,
+        "maxCharacters": 24,
+        "maxLines": 1,
         "overflow": "reject"
+      },
+      "notes": "Máximo de la primera columna de valor en la tabla COMPLETA: la escala de la barra no cambia entre páginas."
+    },
+    "source": {
+      "selector": "[data-slot='source']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 90,
+          "maxLines": 2
+        }
+      }
+    },
+    "coverage": {
+      "selector": "[data-slot='coverage']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 90,
+          "maxLines": 2
+        }
       }
     },
     "footerEdition": {

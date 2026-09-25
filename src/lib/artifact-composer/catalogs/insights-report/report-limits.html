@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <!--
-  ReportLimitsPage — límites y metodología con el estilo editorial; reemplaza a la página v1 (TASK-1889). El canvas no la
-  diseñó: hereda el molde en papel aprobado. Lo que la edición no puede afirmar, con su causa; nunca
-  se omite porque «quedó pobre».
+  ReportLimitsPage — límites y metodología del informe A4 (TASK-1889). Sin página propia en el
+  canvas: toma la gramática aprobada — cifra protagonista (cuántos límites declara la edición), límites
+  numerados con su causa y la metodología en el panel navy de cierre. Declarar un límite es parte de la
+  evidencia: la página tiene el mismo peso que las demás. Nunca se omite porque «quedó pobre».
 -->
 <link rel="stylesheet" href="report-tokens.css" />
 <link rel="stylesheet" href="report-fonts.css" />
@@ -13,46 +14,77 @@
 <style>
   .v2-eyebrow { margin-top: 38px; }
 
-  .v2-title {
-    margin: 16px 0 0;
-    max-width: 620px;
+  /* Cifra protagonista + título (gramática del plan aprobado). */
+  .hero { margin-top: 16px; display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 30px; align-items: start; }
+
+  .hero-count { display: flex; flex-direction: column; gap: 10px; }
+
+  .hero-figure {
     font-family: var(--axis-report-type-display);
-    font-size: 30px;
-    line-height: 1.16;
+    font-size: 76px;
+    line-height: 0.95;
     font-weight: 700;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-report-role-paperAccent);
   }
 
-  .v2-title em { font-style: normal; color: var(--axis-report-role-paperAccent); }
+  .hero-figure-text { max-width: 185px; font-size: 12.5px; line-height: 1.45; color: var(--axis-report-role-paperAccent); }
+
+  .hero-heading { display: flex; flex-direction: column; gap: 12px; padding-top: 4px; }
+
+  .hero-title {
+    margin: 0;
+    font-family: var(--axis-report-type-display);
+    font-size: 23px;
+    line-height: 1.24;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .hero-title em { font-style: normal; color: var(--axis-report-role-paperAccent); }
+
+  .hero-lead { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--axis-report-role-paperAccent); }
+
+  .hero-lead:empty { display: none; }
+
+  .col-label {
+    font-family: var(--axis-report-type-display);
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--axis-report-role-labelMuted);
+  }
 
   .limits { margin-top: 26px; display: flex; flex-direction: column; }
 
   .limit {
     display: grid;
-    grid-template-columns: 190px minmax(0, 1fr);
-    column-gap: 20px;
+    grid-template-columns: 30px 170px minmax(0, 1fr);
+    column-gap: 16px;
     align-items: baseline;
-    padding: 11px 0;
+    padding: 13px 0;
     border-top: 1px solid var(--axis-report-role-rule);
   }
 
+  .limit:first-child { border-top: 2px solid var(--axis-report-role-paperAccent); }
+
   .limit:last-child { border-bottom: 1px solid var(--axis-report-role-rule); }
 
-  .limit-subject {
-    font-family: var(--axis-report-type-display);
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1.35;
-    color: var(--axis-report-role-paperInk);
-  }
+  .limit-ordinal { font-family: var(--axis-report-type-display); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--axis-report-role-labelMuted); }
 
-  .limit-cause { font-size: 12.5px; line-height: 1.5; color: var(--axis-report-role-paperAccent); }
+  .limit-subject { font-family: var(--axis-report-type-display); font-size: 13.5px; font-weight: 600; line-height: 1.35; color: var(--axis-report-role-paperInk); }
 
-  .method { margin-top: 34px; display: flex; flex-direction: column; gap: 10px; }
+  .limit-cause { font-size: 12.5px; line-height: 1.55; color: var(--axis-report-role-paperAccent); }
 
-  .method ul { margin: 0; padding: 0 0 0 16px; display: flex; flex-direction: column; gap: 6px; }
+  .method-panel { margin-top: 28px; }
 
-  .method li { font-size: 12.5px; line-height: 1.5; color: var(--axis-report-role-paperAccent); }
+  .method-panel ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+  .method-panel li { position: relative; padding-left: 16px; font-size: 12.5px; line-height: 1.55; color: var(--axis-report-role-navyInk); }
+
+  .method-panel li::before { content: ''; position: absolute; left: 0; top: 8px; width: 6px; height: 6px; border-radius: 50%; background: var(--axis-report-role-navyAccent); }
 </style>
 </head>
 <body>
@@ -70,18 +102,29 @@
       <svg class="stroke-icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828"></path><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87"></path><path d="M3 3l18 18"></path></svg><span data-slot="eyebrow">Límites de la edición</span>
     </span>
 
-    <h1 class="v2-title" data-slot="assertion">Lo que esta edición <em>no</em> puede afirmar</h1>
-
-    <div class="limits" data-slot="limits">
-      <div class="limit"><span class="limit-subject" data-slot-field="subject">Posiciones promedio</span><span class="limit-cause" data-slot-field="cause">Search Console entrega un promedio ponderado.</span></div>
+    <div class="hero">
+      <div class="hero-count">
+        <span class="hero-figure" data-slot="heroFigure">3</span>
+        <span class="hero-figure-text" data-slot="heroText">límites que esta edición declara antes de afirmar</span>
+      </div>
+      <div class="hero-heading">
+        <h1 class="hero-title" data-slot="assertion">Lo que esta edición <em>no</em> puede afirmar</h1>
+        <p class="hero-lead" data-slot="lead">Cada límite dice qué falta y por qué.</p>
+      </div>
     </div>
 
-    <section class="method">
-      <span class="rule-label"><span class="rule-label-bar"></span><span data-slot="methodologyLabel">Metodología</span></span>
-      <ul data-slot="methodology">
-        <li data-slot-field="item">Las cifras provienen del snapshot sellado de la edición.</li>
-      </ul>
-    </section>
+    <div class="limits" data-slot="limits">
+      <div class="limit"><span class="limit-ordinal" data-slot-field="ordinal">01</span><span class="limit-subject" data-slot-field="subject">Posiciones promedio</span><span class="limit-cause" data-slot-field="cause">Search Console entrega un promedio ponderado.</span></div>
+    </div>
+
+    <div class="grow"></div>
+
+    <div class="closing method-panel">
+      <div class="closing-block">
+        <span class="closing-label"><svg class="stroke-icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a1 1 0 0 1 1 1v5a1 1 0 0 1 -1 1h-7a1 1 0 0 0 -1 1v7a1 1 0 0 1 -1 1h-5a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1"></path><path d="M4 8l2 0"></path><path d="M4 12l3 0"></path><path d="M4 16l2 0"></path><path d="M8 4l0 2"></path><path d="M12 4l0 3"></path><path d="M16 4l0 2"></path></svg><span data-slot="methodologyLabel">Cómo se midió</span></span>
+        <ul data-slot="methodology"><li data-slot-field="item">Las cifras provienen del snapshot sellado de la edición.</li></ul>
+      </div>
+    </div>
     <footer class="paper-foot">
       <div class="paper-foot-rule"><span class="accent"></span><span class="line"></span></div>
       <div class="paper-foot-row">

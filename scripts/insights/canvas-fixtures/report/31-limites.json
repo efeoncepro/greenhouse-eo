@@ -22,7 +22,7 @@
         "cause": "Los formularios se cuentan desde el CRM; las llamadas telefónicas no quedan registradas."
       }
     ],
-    "methodologyLabel": "Metodología",
+    "methodologyLabel": "Cómo se midió",
     "methodology": [
       "Las cifras provienen del snapshot sellado de la edición; ninguna se recalcula al dibujar.",
       "Cada variación compara la misma ventana del período anterior."
@@ -35,6 +35,9 @@
     "folio": {
       "page": "23",
       "total": "24"
-    }
+    },
+    "heroFigure": "3",
+    "heroText": "límites que esta edición declara antes de afirmar",
+    "lead": "Cada límite dice qué falta y por qué; ninguno cambia las conclusiones del mes."
   }
 }

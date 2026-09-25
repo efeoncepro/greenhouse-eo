@@ -3,18 +3,62 @@
 <head>
 <meta charset="utf-8" />
 <!--
-  ReportNarrativePage — capítulo narrado del informe A4 con el estilo editorial (TASK-1889);
-  reemplaza a la página narrativa v1. El canvas no la diseñó: hereda el molde en papel aprobado y la
-  gramática de «Nuestra lectura» (afirmación en Poppins, lectura en Geist con cifras en <strong>).
+  ReportNarrativePage — capítulo narrado del informe A4 (TASK-1889). Sin página propia en el canvas:
+  toma la gramática de «Nuestra lectura» aprobada — afirmación, lectura con capitular y columna lateral
+  que respalda — para que una página sin figura tenga el mismo peso que una con figura.
 
-  Sirve al capítulo cuya evidencia no alcanzó para una figura (se narra, NUNCA se omite) y a las
-  afirmaciones que ninguna figura tituló.
+  Columna lateral: la frase clave (`pullQuote`) si el plan la trae; si no, la marca del capítulo en
+  contorno (número y nombre), que ancla la página en su sección. Sirve al capítulo sin figura (se
+  narra, NUNCA se omite) y a las afirmaciones que ninguna figura tituló.
 -->
 <link rel="stylesheet" href="report-tokens.css" />
 <link rel="stylesheet" href="report-fonts.css" />
 <link rel="stylesheet" href="report-editorial.css" />
 <style>
-  .narrative-eyebrow { margin-top: 38px; }
+  .v2-eyebrow { margin-top: 38px; }
+
+  /* Cifra protagonista + título (gramática del plan aprobado). */
+  .hero { margin-top: 16px; display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 30px; align-items: start; }
+
+  .hero-count { display: flex; flex-direction: column; gap: 10px; }
+
+  .hero-figure {
+    font-family: var(--axis-report-type-display);
+    font-size: 76px;
+    line-height: 0.95;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-report-role-paperAccent);
+  }
+
+  .hero-figure-text { max-width: 185px; font-size: 12.5px; line-height: 1.45; color: var(--axis-report-role-paperAccent); }
+
+  .hero-heading { display: flex; flex-direction: column; gap: 12px; padding-top: 4px; }
+
+  .hero-title {
+    margin: 0;
+    font-family: var(--axis-report-type-display);
+    font-size: 23px;
+    line-height: 1.24;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .hero-title em { font-style: normal; color: var(--axis-report-role-paperAccent); }
+
+  .hero-lead { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--axis-report-role-paperAccent); }
+
+  .hero-lead:empty { display: none; }
+
+  .col-label {
+    font-family: var(--axis-report-type-display);
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--axis-report-role-labelMuted);
+  }
 
   .narrative-assertion {
     margin: 16px 0 0;
@@ -26,15 +70,83 @@
     letter-spacing: -0.015em;
   }
 
-  .narrative-lead { margin: 16px 0 0; max-width: 610px; font-size: 14.5px; line-height: 1.65; color: var(--axis-report-role-paperAccent); }
+  .narrative-lead { margin: 14px 0 0; max-width: 610px; font-size: 14.5px; line-height: 1.65; color: var(--axis-report-role-paperAccent); }
 
   .narrative-lead:empty { display: none; }
 
-  .narrative-body { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--axis-report-role-rule); display: flex; flex-direction: column; gap: 14px; max-width: 610px; }
+  .narrative-rule { margin-top: 26px; display: flex; align-items: center; }
+
+  .narrative-rule .accent { width: 32px; height: 2px; background: var(--axis-report-role-paperAccent); }
+
+  .narrative-rule .line { flex-grow: 1; height: 1px; background: var(--axis-report-role-rule); }
+
+  .narrative-grid { margin-top: 24px; display: grid; grid-template-columns: minmax(0, 1fr) 196px; gap: 38px; align-items: start; }
+
+  .narrative-body { display: flex; flex-direction: column; gap: 14px; }
 
   .narrative-body p { margin: 0; font-size: 13.5px; line-height: 1.72; color: var(--axis-report-role-paperAccent); }
 
   .narrative-body strong { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--axis-report-role-paperInk); }
+
+  .narrative-body p:first-child::first-letter {
+    float: left;
+    margin: 4px 10px 0 0;
+    font-family: var(--axis-report-type-display);
+    font-size: 52px;
+    line-height: 0.8;
+    font-weight: 700;
+    color: var(--axis-report-role-paperAccent);
+  }
+
+  .narrative-aside { display: flex; flex-direction: column; gap: 22px; }
+
+  .pull { padding-top: 14px; border-top: 2px solid var(--axis-report-role-paperAccent); display: flex; flex-direction: column; gap: 10px; }
+
+  .pull:empty { display: none; }
+
+  .pull .stroke-icon { stroke: var(--axis-deck-teal-650); }
+
+  .pull-text {
+    font-family: var(--axis-report-type-display);
+    font-size: 17px;
+    line-height: 1.32;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--axis-report-role-paperAccent);
+  }
+
+  .pull-source {
+    font-family: var(--axis-report-type-display);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--axis-report-role-labelMuted);
+  }
+
+  /* Marca del capítulo: el número en contorno de la apertura, a escala de columna. */
+  .mark { padding-top: 14px; border-top: 1px solid var(--axis-report-role-rule); display: flex; flex-direction: column; gap: 6px; }
+
+  .mark:empty { display: none; }
+
+  .mark-numeral {
+    font-family: var(--axis-report-type-display);
+    font-size: 132px;
+    line-height: 0.9;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(var(--axis-report-role-paperAccent-rgb), 0.45);
+  }
+
+  .mark-label {
+    font-family: var(--axis-report-type-display);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--axis-report-role-labelMuted);
+  }
 </style>
 </head>
 <body>
@@ -48,15 +160,21 @@
       </span>
     </header>
 
-    <span class="page-eyebrow narrative-eyebrow">
+    <span class="page-eyebrow v2-eyebrow">
       <svg class="stroke-icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v4a1 1 0 0 0 1 1h4"></path><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path><path d="M9 9h1"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg><span data-slot="eyebrow">Visibilidad orgánica</span>
     </span>
 
     <h1 class="narrative-assertion" data-slot="assertion">La afirmación que ordena este capítulo</h1>
     <p class="narrative-lead" data-slot="lead">Lo que el lector debe entender antes del detalle.</p>
+    <div class="narrative-rule"><span class="accent"></span><span class="line"></span></div>
 
-    <div class="narrative-body" data-slot="paragraphs"><p>Desarrollo del capítulo.</p></div>
-
+    <div class="narrative-grid">
+      <div class="narrative-body" data-slot="paragraphs"><p>Desarrollo del capítulo.</p></div>
+      <aside class="narrative-aside">
+        <div class="pull" data-slot="pullQuote"><svg class="stroke-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 11h-4a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h3a1 1 0 0 1 1 1v6c0 2.667 -1.333 4.333 -4 5"></path><path d="M19 11h-4a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h3a1 1 0 0 1 1 1v6c0 2.667 -1.333 4.333 -4 5"></path></svg><span class="pull-text" data-slot-field="text">La frase que el lector se lleva.</span><span class="pull-source" data-slot-field="source">Lectura de Efeonce</span></div>
+        <div class="mark" data-slot="chapterMark"><span class="mark-numeral" data-slot-field="numeral">03</span><span class="mark-label" data-slot-field="label">Capítulo 03 · Del clic al negocio</span></div>
+      </aside>
+    </div>
     <footer class="paper-foot">
       <div class="paper-foot-rule"><span class="accent"></span><span class="line"></span></div>
       <div class="paper-foot-row">

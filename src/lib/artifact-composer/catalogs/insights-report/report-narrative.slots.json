@@ -2,7 +2,7 @@
   "template": "ReportNarrativePage",
   "figmaNodeId": null,
   "version": "0.1",
-  "note": "TASK-1889 — capítulo narrado A4 con el estilo editorial; reemplaza a la v1 (el canvas no la diseñó).",
+  "note": "TASK-1889 — capítulo narrado A4: afirmación, lectura con capitular y columna lateral (frase clave o marca del capítulo). Sin página propia en el canvas.",
   "viewport": {
     "width": 794,
     "height": 1123
@@ -86,6 +86,45 @@
           "strong"
         ]
       }
+    },
+    "pullQuote": {
+      "selector": "[data-slot='pullQuote']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 90,
+          "maxLines": 4
+        },
+        "source": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 40,
+          "maxLines": 1
+        }
+      }
+    },
+    "chapterMark": {
+      "selector": "[data-slot='chapterMark']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "numeral": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 2,
+          "maxLines": 1
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 48,
+          "maxLines": 2
+        }
+      },
+      "notes": "Número y nombre del capítulo en la columna lateral."
     },
     "footerEdition": {
       "selector": "[data-slot='footerEdition']",

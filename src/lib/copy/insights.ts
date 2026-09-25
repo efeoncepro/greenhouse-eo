@@ -215,6 +215,9 @@ export const GH_INSIGHTS = {
     /** El `<em>` resalta la negación en el título de límites (slot rich-string de la plantilla). */
     limitsTitleRich: 'Lo que esta edición <em>no</em> puede afirmar',
     methodology: 'Metodología',
+    howMeasured: 'Cómo se midió',
+    tableRowsText: 'filas de evidencia respaldan esta tabla',
+    limitsCountText: 'límites que esta edición declara antes de afirmar',
     essentials: 'Lo esencial del mes',
     thesisOfTheMonth: 'La tesis del mes',
     decideInMeeting: 'Para decidir en la reunión',

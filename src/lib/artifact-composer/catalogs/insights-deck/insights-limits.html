@@ -3,34 +3,67 @@
 <head>
 <meta charset="utf-8" />
 <!--
-  InsightsLimitsSlide — cierre del deck con el estilo editorial (TASK-1889); reemplaza a la v1. El
-  canvas no la diseñó. Lo que la edición no puede afirmar, cada límite con su causa: nunca se omite.
+  InsightsLimitsSlide — límites del deck (TASK-1889). Sin lámina propia en el canvas: usa la gramática
+  aprobada del plan del deck — cifra protagonista (cuántos límites declara la edición) y título a la
+  izquierda, límites numerados a la derecha, y la franja «Cómo se midió» con la metodología. Declarar un
+  límite es evidencia: nunca se omite.
 -->
 <link rel="stylesheet" href="deck-tokens.css" />
 <link rel="stylesheet" href="deck-fonts.css" />
 <link rel="stylesheet" href="deck-editorial.css" />
 <style>
-  .v2-main { position: absolute; left: 72px; right: 72px; top: 104px; display: flex; flex-direction: column; }
-
-  .v2-assertion {
-    margin: 22px 0 0;
-    max-width: 1000px;
-    font-family: var(--axis-deck-type-display);
-    font-size: 40px;
-    line-height: 1.1;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+  .lim-main {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 100px;
+    display: grid;
+    grid-template-columns: 330px minmax(0, 1fr);
+    gap: 56px;
+    align-items: start;
   }
 
-  .v2-assertion em { font-style: normal; color: var(--axis-deck-role-navyAccent); }
+  .lim-lead { display: flex; flex-direction: column; }
 
-  .limits { margin-top: 40px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 56px; }
+  .lim-figure {
+    margin-top: 18px;
+    font-family: var(--axis-deck-type-display);
+    font-size: 132px;
+    line-height: 0.88;
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-deck-role-navyAccent);
+  }
 
-  .limit { display: flex; flex-direction: column; gap: 6px; padding: 14px 0; border-top: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14); }
+  .lim-figure-text { margin-top: 16px; font-size: 15px; line-height: 1.45; color: var(--axis-deck-role-navyMuted); }
 
-  .limit-subject { font-family: var(--axis-deck-type-display); font-size: 15px; font-weight: 600; line-height: 1.3; }
+  .lim-lead .deck-rule { margin-top: 26px; }
 
-  .limit-cause { font-size: 14px; line-height: 1.5; color: var(--axis-deck-role-navyLead); }
+  .lim-title { margin: 22px 0 0; font-family: var(--axis-deck-type-display); font-size: 27px; line-height: 1.2; font-weight: 700; }
+
+  .lim-title em { font-style: normal; color: var(--axis-deck-role-navyAccent); }
+
+  .lim-list { display: flex; flex-direction: column; padding-top: 6px; }
+
+  .lim-row {
+    display: grid;
+    grid-template-columns: 34px 220px minmax(0, 1fr);
+    column-gap: 18px;
+    align-items: baseline;
+    padding: 15px 0;
+    border-top: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14);
+  }
+
+  .lim-row:first-child { border-top: 2px solid var(--axis-deck-role-navyAccent); }
+
+  .lim-row:last-child { border-bottom: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14); }
+
+  .lim-ordinal { font-family: var(--axis-deck-type-display); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--axis-deck-role-dataPriorOnNavy); }
+
+  .lim-subject { font-family: var(--axis-deck-type-display); font-size: 15px; font-weight: 600; line-height: 1.3; }
+
+  .lim-cause { font-size: 14px; line-height: 1.5; color: var(--axis-deck-role-navyLead); }
 </style>
 </head>
 <body>
@@ -59,13 +92,21 @@
       <span class="deck-period" data-slot="period">Agosto 2026 · contra julio 2026</span>
     </header>
 
-    <main class="v2-main">
-      <span class="deck-eyebrow"><svg class="stroke-icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828"></path><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87"></path><path d="M3 3l18 18"></path></svg><span data-slot="eyebrow">Límites de la edición</span></span>
-      <h1 class="v2-assertion" data-slot="assertion">Lo que esta edición <em>no</em> puede afirmar</h1>
-      <div class="limits" data-slot="limits">
-        <div class="limit"><span class="limit-subject" data-slot-field="subject">Posiciones promedio</span><span class="limit-cause" data-slot-field="cause">Search Console entrega un promedio ponderado.</span></div>
+    <main class="lim-main">
+      <div class="lim-lead">
+        <span class="deck-eyebrow"><svg class="stroke-icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828"></path><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87"></path><path d="M3 3l18 18"></path></svg><span data-slot="eyebrow">Límites de la edición</span></span>
+        <span class="lim-figure" data-slot="heroFigure">3</span>
+        <span class="lim-figure-text" data-slot="heroText">límites que esta edición declara antes de afirmar</span>
+        <span class="deck-rule"></span>
+        <h1 class="lim-title" data-slot="assertion">Lo que esta edición <em>no</em> puede afirmar</h1>
+      </div>
+      <div class="lim-list" data-slot="limits">
+        <div class="lim-row"><span class="lim-ordinal" data-slot-field="ordinal">01</span><span class="lim-subject" data-slot-field="subject">Posiciones promedio</span><span class="lim-cause" data-slot-field="cause">Search Console entrega un promedio ponderado.</span></div>
       </div>
     </main>
+
+    <div class="deck-band" data-slot="method"><span class="deck-band-label"><svg class="stroke-icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a1 1 0 0 1 1 1v5a1 1 0 0 1 -1 1h-7a1 1 0 0 0 -1 1v7a1 1 0 0 1 -1 1h-5a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1"></path><path d="M4 8l2 0"></path><path d="M4 12l3 0"></path><path d="M4 16l2 0"></path><path d="M8 4l0 2"></path><path d="M12 4l0 3"></path><path d="M16 4l0 2"></path></svg><span data-slot-field="label">Cómo se midió</span></span><span class="deck-band-text" data-slot-field="text">Las cifras provienen del snapshot sellado de la edición.</span></div>
+
     <footer class="deck-foot2">
       <span class="deck-foot2-id">
         <img src="assets/brand/logo-negative.svg" alt="Efeonce" />

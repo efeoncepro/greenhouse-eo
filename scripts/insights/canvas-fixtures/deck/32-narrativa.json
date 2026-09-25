@@ -24,6 +24,10 @@
     "folio": {
       "page": "20",
       "total": "24"
+    },
+    "oneLiner": {
+      "label": "En una frase",
+      "text": "<em>El tráfico ya llega:</em> lo que falta es un paso a contacto más corto."
     }
   }
 }

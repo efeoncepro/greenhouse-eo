@@ -2,7 +2,7 @@
   "template": "InsightsNarrativeSlide",
   "figmaNodeId": null,
   "version": "0.1",
-  "note": "TASK-1889 — lámina narrada del deck con el estilo editorial; reemplaza a la v1 (sin diseño en el canvas).",
+  "note": "TASK-1889 — lámina narrada del deck con la gramática de «Nuestra lectura» (sin lámina propia en el canvas).",
   "viewport": {
     "width": 1280,
     "height": 720
@@ -51,12 +51,15 @@
     },
     "assertion": {
       "selector": "[data-slot='assertion']",
-      "type": "string",
+      "type": "rich-string",
       "required": true,
       "constraints": {
         "maxCharacters": 120,
         "maxLines": 3,
-        "overflow": "reject"
+        "overflow": "reject",
+        "allowedTags": [
+          "em"
+        ]
       }
     },
     "points": {
@@ -80,11 +83,33 @@
             "type": "rich-string",
             "required": true,
             "maxCharacters": 190,
-            "maxLines": 4,
+            "maxLines": 6,
             "allowedTags": [
               "strong"
             ]
           }
+        }
+      }
+    },
+    "oneLiner": {
+      "selector": "[data-slot='oneLiner']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "rich-string",
+          "required": true,
+          "maxCharacters": 150,
+          "maxLines": 2,
+          "allowedTags": [
+            "em"
+          ]
         }
       }
     },

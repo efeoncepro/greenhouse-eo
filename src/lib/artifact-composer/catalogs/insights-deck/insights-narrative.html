@@ -3,38 +3,47 @@
 <head>
 <meta charset="utf-8" />
 <!--
-  InsightsNarrativeSlide — lámina narrada del deck con el estilo editorial (TASK-1889); reemplaza
-  a la v1. El canvas no la diseñó: toma la gramática de «Nuestra lectura» del deck (afirmación grande,
-  puntos numerados). Sirve a lo que ninguna figura tituló y al capítulo sin figura (se narra, no se
-  omite). El ordinal sale de la posición.
+  InsightsNarrativeSlide — lámina narrada del deck (TASK-1889). Sin lámina propia en el canvas: usa
+  la gramática aprobada de «Nuestra lectura» del deck — afirmación grande, puntos numerados en columnas
+  con filete y la franja «En una frase» si el plan trae la frase clave. El primer punto lleva el filete
+  teal (el que abre el argumento); el ordinal sale de la posición. Sirve a lo que ninguna figura tituló y
+  al capítulo sin figura (se narra, no se omite).
 -->
 <link rel="stylesheet" href="deck-tokens.css" />
 <link rel="stylesheet" href="deck-fonts.css" />
 <link rel="stylesheet" href="deck-editorial.css" />
 <style>
-  .v2-main { position: absolute; left: 72px; right: 72px; top: 104px; display: flex; flex-direction: column; }
+  .narr-main { position: absolute; left: 72px; right: 72px; top: 104px; display: flex; flex-direction: column; }
 
-  .v2-assertion {
+  .narr-assertion {
     margin: 22px 0 0;
     max-width: 1000px;
     font-family: var(--axis-deck-type-display);
-    font-size: 40px;
-    line-height: 1.1;
+    font-size: 46px;
+    line-height: 1.08;
     font-weight: 700;
     letter-spacing: -0.02em;
   }
 
-  .v2-assertion em { font-style: normal; color: var(--axis-deck-role-navyAccent); }
+  .narr-assertion em { font-style: normal; color: var(--axis-deck-role-navyAccent); }
 
-  .points { margin-top: 44px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 56px; }
+  .points { margin-top: 52px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 44px; }
 
-  .point { display: grid; grid-template-columns: 34px minmax(0, 1fr); column-gap: 14px; padding-top: 16px; border-top: 2px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.3); }
+  .points:has(.point:nth-child(4)) { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 36px; }
 
-  .point-ordinal { font-family: var(--axis-deck-type-display); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--axis-deck-role-dataPriorOnNavy); padding-top: 3px; }
+  .points:not(:has(.point:nth-child(3))) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .point { display: flex; flex-direction: column; gap: 12px; padding-top: 18px; border-top: 2px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.3); }
+
+  .point:first-child { border-top-color: var(--axis-deck-role-navyAccent); }
+
+  .point-ordinal { font-family: var(--axis-deck-type-display); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--axis-deck-role-dataPriorOnNavy); }
 
   .point-text { margin: 0; font-size: 16px; line-height: 1.55; color: var(--axis-deck-role-navyLead); }
 
-  .point-text strong { font-weight: 600; color: var(--axis-deck-role-navyInk); }
+  .point-text strong { font-weight: 700; color: var(--axis-deck-role-navyInk); }
+
+  .deck-band-text em { font-style: italic; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -63,13 +72,16 @@
       <span class="deck-period" data-slot="period">Agosto 2026 · contra julio 2026</span>
     </header>
 
-    <main class="v2-main">
+    <main class="narr-main">
       <span class="deck-eyebrow"><svg class="stroke-icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v4a1 1 0 0 0 1 1h4"></path><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path><path d="M9 9h1"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg><span data-slot="eyebrow">Visibilidad orgánica</span></span>
-      <h1 class="v2-assertion" data-slot="assertion">La afirmación que ordena este capítulo</h1>
+      <h1 class="narr-assertion" data-slot="assertion">La afirmación que ordena este capítulo</h1>
       <div class="points" data-slot="points">
         <div class="point"><span class="point-ordinal" data-slot-field="ordinal">01</span><p class="point-text" data-slot-field="text">Desarrollo.</p></div>
       </div>
     </main>
+
+    <div class="deck-band" data-slot="oneLiner"><span class="deck-band-label"><svg class="stroke-icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 11h-4a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h3a1 1 0 0 1 1 1v6c0 2.667 -1.333 4.333 -4 5"></path><path d="M19 11h-4a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h3a1 1 0 0 1 1 1v6c0 2.667 -1.333 4.333 -4 5"></path></svg><span data-slot-field="label">En una frase</span></span><span class="deck-band-text" data-slot-field="text">La frase que el lector se lleva.</span></div>
+
     <footer class="deck-foot2">
       <span class="deck-foot2-id">
         <img src="assets/brand/logo-negative.svg" alt="Efeonce" />

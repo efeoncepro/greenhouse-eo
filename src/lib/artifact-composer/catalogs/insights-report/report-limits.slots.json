@@ -2,7 +2,7 @@
   "template": "ReportLimitsPage",
   "figmaNodeId": null,
   "version": "0.1",
-  "note": "TASK-1889 — límites y metodología A4 (el canvas no la diseñó).",
+  "note": "TASK-1889 — límites y metodología A4: cifra protagonista, límites numerados y metodología en panel navy. Sin página propia en el canvas.",
   "viewport": {
     "width": 794,
     "height": 1123
@@ -51,17 +51,48 @@
         "overflow": "reject"
       }
     },
+    "heroFigure": {
+      "selector": "[data-slot='heroFigure']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 3,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Cuántos límites declara la edición (se cuenta)."
+    },
+    "heroText": {
+      "selector": "[data-slot='heroText']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 64,
+        "maxLines": 3,
+        "overflow": "reject"
+      }
+    },
     "assertion": {
       "selector": "[data-slot='assertion']",
       "type": "rich-string",
       "required": true,
       "constraints": {
         "maxCharacters": 80,
-        "maxLines": 2,
+        "maxLines": 3,
         "overflow": "reject",
         "allowedTags": [
           "em"
         ]
+      }
+    },
+    "lead": {
+      "selector": "[data-slot='lead']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 140,
+        "maxLines": 2,
+        "overflow": "reject"
       }
     },
     "limits": {
@@ -70,11 +101,17 @@
       "required": true,
       "constraints": {
         "minItems": 1,
-        "maxItems": 12
+        "maxItems": 9
       },
       "item": {
         "type": "object",
         "shape": {
+          "ordinal": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-ordinal",
+            "consumer": "resolver-only"
+          },
           "subject": {
             "type": "string",
             "required": true,
@@ -85,7 +122,7 @@
             "type": "string",
             "required": true,
             "maxCharacters": 140,
-            "maxLines": 2
+            "maxLines": 3
           }
         }
       }

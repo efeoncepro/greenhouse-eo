@@ -1,6 +1,6 @@
 {
   "reference": null,
-  "name": "narrativa",
+  "name": "narrativa-con-frase",
   "catalog": "report",
   "contentType": "report-narrative",
   "slots": {
@@ -23,9 +23,9 @@
       "page": "20",
       "total": "24"
     },
-    "chapterMark": {
-      "numeral": "03",
-      "label": "Capítulo 03 · Del clic al negocio"
+    "pullQuote": {
+      "text": "Nueve campos son cinco de más para quien ya decidió escribir.",
+      "source": "Lectura de Efeonce · p. 20"
     }
   }
 }

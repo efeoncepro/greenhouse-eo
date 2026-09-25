@@ -54,7 +54,8 @@ const BUDGET = {
   point: 190,
   limitSubject: 38,
   limitCause: 110,
-  contentsTitle: 56
+  contentsTitle: 56,
+  method: 150
 } as const
 
 export interface BuildInsightsDeckInput {
@@ -209,7 +210,12 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
     slides.push(...body.map(entry => entry.slide))
   })
 
-  for (const limits of chunkByCapacity(limitEntriesOf(frozen.limits), CAPACITY.limits, (_l, i) => `limit-${i}`)) {
+  const allLimits = limitEntriesOf(frozen.limits)
+  const methodText = frozen.methodology.length > 0 ? frozen.methodology.join(' ') : GH_INSIGHTS.methodology.fallback
+  // La franja admite una o dos frases; una metodología más larga vive completa en el informe A4.
+  const method = methodText.length <= BUDGET.method ? { label: L.howMeasured, text: methodText } : null
+
+  for (const limits of chunkByCapacity(allLimits, CAPACITY.limits, (_l, i) => `limit-${i}`)) {
     slides.push({
       contentType: 'insights-limits',
       slots: {
@@ -217,7 +223,10 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
         section: GH_INSIGHTS.document.limitsAndMethod,
         period,
         eyebrow: L.limitsEyebrow,
+        heroFigure: String(allLimits.length),
+        heroText: L.limitsCountText,
         assertion: L.limitsTitleRich,
+        ...(method ? { method } : {}),
         limits: limits.map(entry => ({
           subject: rejectIfLonger(entry.subject, BUDGET.limitSubject, 'limit.subject'),
           cause: rejectIfLonger(entry.cause, BUDGET.limitCause, 'limit.cause')

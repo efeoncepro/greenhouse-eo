@@ -2,7 +2,7 @@
   "template": "InsightsLimitsSlide",
   "figmaNodeId": null,
   "version": "0.1",
-  "note": "TASK-1889 — cierre del deck con el estilo editorial; reemplaza a la v1 (sin diseño en el canvas).",
+  "note": "TASK-1889 — límites del deck con la gramática del plan del deck (sin lámina propia en el canvas).",
   "viewport": {
     "width": 1280,
     "height": 720
@@ -49,13 +49,33 @@
         "overflow": "reject"
       }
     },
+    "heroFigure": {
+      "selector": "[data-slot='heroFigure']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 3,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "heroText": {
+      "selector": "[data-slot='heroText']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 64,
+        "maxLines": 3,
+        "overflow": "reject"
+      }
+    },
     "assertion": {
       "selector": "[data-slot='assertion']",
       "type": "rich-string",
       "required": true,
       "constraints": {
-        "maxCharacters": 90,
-        "maxLines": 2,
+        "maxCharacters": 80,
+        "maxLines": 3,
         "overflow": "reject",
         "allowedTags": [
           "em"
@@ -73,18 +93,43 @@
       "item": {
         "type": "object",
         "shape": {
+          "ordinal": {
+            "type": "string",
+            "required": false,
+            "resolver": "deck-ordinal",
+            "consumer": "resolver-only"
+          },
           "subject": {
             "type": "string",
             "required": true,
             "maxCharacters": 38,
-            "maxLines": 1
+            "maxLines": 2
           },
           "cause": {
             "type": "string",
             "required": true,
             "maxCharacters": 110,
-            "maxLines": 2
+            "maxLines": 3
           }
+        }
+      }
+    },
+    "method": {
+      "selector": "[data-slot='method']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 150,
+          "maxLines": 2
         }
       }
     },

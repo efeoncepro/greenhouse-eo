@@ -66,8 +66,8 @@
     "templates-insights-deck/InsightsChapterSlide.png": "16d0567e762e612cff5625aada579d5d8ecf1b9a57988657ad74fc4269ac13d7",
     "templates-insights-deck/InsightsCoverSlide.png": "a27990b93ac74924f51b6bdef7c0907baccb0fc9eb1d3048177dd6fec1308db7",
     "templates-insights-deck/InsightsEvidenceSlide.png": "6680cb4c75a668e545b4680525bf7770a64d429e53af334ba95a2bfbd32bccfa",
-    "templates-insights-deck/InsightsLimitsSlide.png": "6992add4c4d37357efcd9054d8e7398ced0707f400dd499f35ebda0d5b8d2a78",
-    "templates-insights-deck/InsightsNarrativeSlide.png": "a3828a08e0440adb46531e77b78e8fde1f9dc4103f46ab31500d794ab5563287",
+    "templates-insights-deck/InsightsLimitsSlide.png": "e54170a5a9da61db895cae96ea2e058727bc8574f98984394f4cde55ca5ff86e",
+    "templates-insights-deck/InsightsNarrativeSlide.png": "006b050c41c6795e4bde82a35b3f533c8e843b0bd5a6f3c75f41bb2152c8d833",
     "templates-insights-deck/InsightsPlanSlide.png": "cd8b2d7b0bc187f152f0f05d4abf0ecf427a8db37003cd6f6805140cdbea3b10",
     "templates-insights-deck/InsightsReadingSlide.png": "e3bfdef3fe0083066df0a4de680b65e4485a00ff646fc761710cfcef7fe03101",
     "templates-insights-deck/InsightsSummarySlide.png": "7550ea8813ca092d1bda60200f9b531eda02c9bc7c9016f4d201335d6a6707bb",
@@ -76,11 +76,11 @@
     "templates-insights-report/ReportChapterPage.png": "04d3e0682cd5c4982445fa055fb6e94972f9cc5586710144747e9a0d17bf2bff",
     "templates-insights-report/ReportCoverPage.png": "d6a539578bfb08de2a78ff3b3fcc74978182e554adc2e32e3b11a155bcf1d02b",
     "templates-insights-report/ReportIndexPage.png": "1748c5b6331fb4389dea0aec958eb7a8736a7065552bae687f95c295ca8ce98c",
-    "templates-insights-report/ReportLimitsPage.png": "ad60913b8b3f5d1090488fd267232f31091a7c5ff66197996438775cfc7b87d3",
-    "templates-insights-report/ReportNarrativePage.png": "17d92cfcaa01c7b0dadeefc0a586464a2c873a42d55068dc7230669f8f1c0517",
+    "templates-insights-report/ReportLimitsPage.png": "deac6ce3c1b77229d36acc452e612055c49f5bd98a9da9786b2c74e554a781cf",
+    "templates-insights-report/ReportNarrativePage.png": "d2c77d8e0daa716e790a490df3f3308131d7f66b4ec6a6c4768a272d92b5b6bf",
     "templates-insights-report/ReportPlanPage.png": "299a632054e0f641d1a48791c78b5de22e94ae1c221bef2e4e4d56e183e7fce8",
     "templates-insights-report/ReportReadingPage.png": "9285d5c99acc3c57c7c1eee64e55157dd590c39955d1b9d082af79a8c65c9177",
     "templates-insights-report/ReportSummaryPage.png": "30a51db900c0edc34211cbbebcded87eedd3eb08f114363d1e24a17ee963ea60",
-    "templates-insights-report/ReportTablePage.png": "aa8d970cadea046daadbb442266ca7ce5a37e8d41b631ac2b31a426230f13ce1"
+    "templates-insights-report/ReportTablePage.png": "90f146ae3a0c9fcf20c8561124d16ae3058ddaf582c78144c7eee174330c26d4"
   }
 }

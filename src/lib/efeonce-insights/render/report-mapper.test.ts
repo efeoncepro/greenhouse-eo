@@ -194,6 +194,23 @@ describe('buildInsightReportPlanInput', () => {
     expect((tablePages[1]!.slots as Record<string, unknown>).continuationLabel).toBeDefined()
   })
 
+  it('la tabla lleva su cifra contada, la escala de la tabla COMPLETA y su procedencia (TASK-1889)', () => {
+    const rows = Array.from({ length: 30 }, (_, i) => [`/p${i}`, String((i + 1) * 100), null])
+
+    const pages = buildInsightReportPlanInput({
+      edition, report, snapshot,
+      plan: plan({ chapters: [chapter({ tables: [{ tableId: 't1', title: 'Páginas', columns: ['Página', 'Clics'], rows }] })] })
+    }).slides.filter(p => p.contentType === 'report-table')
+
+    expect(pages).toHaveLength(2)
+
+    for (const page of pages) {
+      // La misma escala en las dos páginas: la barra de /p0 no cambia de tamaño al pasar la hoja.
+      expect(page.slots).toMatchObject({ heroFigure: '30', barScaleMax: '3000', source: { label: 'Fuente' } })
+      expect((page.slots as { tableColumns: { label: string }[] }).tableColumns[0]).toEqual({ label: '#' })
+    }
+  })
+
   it('ninguna página de tabla excede la capacidad declarada del molde', () => {
     const rows = Array.from({ length: 60 }, (_, i) => [`/p${i}`, String(i), '+1%'])
 

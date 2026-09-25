@@ -27,6 +27,12 @@
     "folio": {
       "page": "23",
       "total": "24"
+    },
+    "heroFigure": "3",
+    "heroText": "límites que esta edición declara antes de afirmar",
+    "method": {
+      "label": "Cómo se midió",
+      "text": "Las cifras provienen del snapshot sellado de la edición; cada variación compara la misma ventana del período anterior."
     }
   }
 }

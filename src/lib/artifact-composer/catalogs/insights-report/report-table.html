@@ -3,9 +3,15 @@
 <head>
 <meta charset="utf-8" />
 <!--
-  ReportTablePage — tabla densa de respaldo con el estilo editorial; reemplaza a la tabla v1 (TASK-1889). El canvas no
-  la diseñó: hereda el molde en papel aprobado. Una tabla NO es una figura: se lee y se audita. Las
-  columnas de valor se alinean a la derecha en cifras tabulares; una tabla que sigue lo declara.
+  ReportTablePage — tabla de respaldo del informe A4 (TASK-1889). Sin página propia en el canvas:
+  toma la gramática aprobada — cifra protagonista (cuántas filas respaldan el capítulo), título que
+  afirma, filas con ranking y la primera columna de valor con barra proporcional, y la procedencia en
+  las columnas «Unidad · Fuente» de las páginas de gráfico.
+
+  La barra SALE DEL DATO: el resolver lee el número impreso de cada fila y lo escala contra el máximo
+  de la tabla completa (`barScaleMax`, lo pasa el mapper) para que dos páginas de la misma tabla no se
+  contradigan. Una fila sin número legible queda sin barra; nunca se dibuja una barra inventada. Una
+  tabla NO es una figura: se lee y se audita; la barra sólo ayuda a comparar.
 -->
 <link rel="stylesheet" href="report-tokens.css" />
 <link rel="stylesheet" href="report-fonts.css" />
@@ -13,20 +19,27 @@
 <style>
   .v2-eyebrow { margin-top: 38px; }
 
-  .v2-title {
-    margin: 16px 0 0;
-    max-width: 620px;
+  /* Cifra protagonista + título (gramática del plan aprobado). */
+  .hero { margin-top: 16px; display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 30px; align-items: start; }
+
+  .hero-count { display: flex; flex-direction: column; gap: 10px; }
+
+  .hero-figure {
     font-family: var(--axis-report-type-display);
-    font-size: 30px;
-    line-height: 1.16;
+    font-size: 76px;
+    line-height: 0.95;
     font-weight: 700;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-report-role-paperAccent);
   }
 
-  .v2-title em { font-style: normal; color: var(--axis-report-role-paperAccent); }
+  .hero-figure-text { max-width: 185px; font-size: 12.5px; line-height: 1.45; color: var(--axis-report-role-paperAccent); }
 
-  .table-title {
-    margin: 16px 0 0;
+  .hero-heading { display: flex; flex-direction: column; gap: 12px; padding-top: 4px; }
+
+  .hero-title {
+    margin: 0;
     font-family: var(--axis-report-type-display);
     font-size: 23px;
     line-height: 1.24;
@@ -34,14 +47,30 @@
     letter-spacing: -0.01em;
   }
 
+  .hero-title em { font-style: normal; color: var(--axis-report-role-paperAccent); }
+
+  .hero-lead { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--axis-report-role-paperAccent); }
+
+  .hero-lead:empty { display: none; }
+
+  .col-label {
+    font-family: var(--axis-report-type-display);
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--axis-report-role-labelMuted);
+  }
+
   .table-continued { margin-top: 6px; font-size: 11px; font-style: italic; color: var(--axis-report-role-labelMuted); }
 
   .table-continued:empty { display: none; }
 
-  table { margin-top: 22px; width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  table { margin-top: 26px; width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 
-  th {
-    padding: 0 0 8px;
+  thead th {
+    padding: 0 0 9px;
+    border-bottom: 2px solid var(--axis-report-role-paperAccent);
     text-align: left;
     font-family: var(--axis-report-type-display);
     font-size: 8.5px;
@@ -51,16 +80,37 @@
     color: var(--axis-report-role-labelMuted);
   }
 
-  td { padding: 7px 0; border-top: 1px solid var(--axis-report-role-rule); font-size: 12px; line-height: 1.4; color: var(--axis-report-role-paperInk); }
+  th:first-child { width: 30px; }
 
-  tbody tr:last-child td { border-bottom: 1px solid var(--axis-report-role-rule); }
+  td { padding: 8px 0; border-bottom: 1px solid var(--axis-report-role-rule); font-size: 12px; line-height: 1.4; color: var(--axis-report-role-paperInk); vertical-align: middle; }
 
-  th:not(:first-child),
-  td:not(:first-child) { text-align: right; padding-left: 16px; }
+  th:nth-child(n + 3),
+  td:nth-child(n + 3) { text-align: right; padding-left: 16px; }
 
-  td:first-child { color: var(--axis-report-role-paperAccent); }
+  .row-rank { font-family: var(--axis-report-type-display); font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: var(--axis-report-role-labelMuted); }
 
-  .table-source { margin: 12px 0 0; font-size: 10.5px; color: var(--axis-report-role-labelMuted); }
+  .row-entity { font-weight: 500; color: var(--axis-report-role-paperAccent); }
+
+  /* Primera columna de valor: la cifra que se compara, con su barra. */
+  .lead-cell { width: 190px; }
+
+  .lead-wrap { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+
+  .lead-bar-track { flex-grow: 1; height: 6px; border-radius: 3px; background: var(--axis-report-role-ruleSoft); position: relative; }
+
+  .lead-bar { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: var(--axis-report-role-dataCurrentOnPaper); }
+
+  .lead-value { min-width: 54px; font-family: var(--axis-report-type-display); font-size: 12.5px; font-weight: 700; color: var(--axis-report-role-paperInk); }
+
+  .second-value { font-weight: 500; color: var(--axis-report-role-paperAccent); }
+
+  .provenance { margin-top: 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+
+  .provenance-item { display: flex; flex-direction: column; gap: 5px; }
+
+  .provenance-item:empty { display: none; }
+
+  .provenance-text { font-size: 11px; line-height: 1.5; color: var(--axis-report-role-paperAccent); }
 </style>
 </head>
 <body>
@@ -68,7 +118,7 @@
     <header class="running">
       <span class="running-client"><span class="running-client-name" data-slot="clientName">Nombre del cliente</span></span>
       <span class="running-meta">
-        <span class="running-section" data-slot="runningSection">Resumen ejecutivo</span>
+        <span class="running-section" data-slot="runningSection">01 · Visibilidad orgánica</span>
         <span class="running-divider"></span>
         <span data-slot="runningPeriod">Agosto 2026 · contra julio 2026</span>
       </span>
@@ -78,23 +128,35 @@
       <svg class="stroke-icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14z"></path><path d="M3 10h18"></path><path d="M10 3v18"></path></svg><span data-slot="eyebrow">Tabla de respaldo</span>
     </span>
 
-    <h2 class="table-title" data-slot="tableTitle">Páginas con más impresiones y CTR bajo</h2>
-    <p class="table-continued" data-slot="continuationLabel">Continúa de la página anterior</p>
+    <div class="hero">
+      <div class="hero-count">
+        <span class="hero-figure" data-slot="heroFigure">8</span>
+        <span class="hero-figure-text" data-slot="heroText">páginas concentran las impresiones con CTR bajo</span>
+      </div>
+      <div class="hero-heading">
+        <h1 class="hero-title" data-slot="tableTitle">Páginas con más impresiones y CTR bajo</h1>
+        <p class="table-continued" data-slot="continuationLabel">Continúa de la página anterior</p>
+      </div>
+    </div>
 
     <table>
       <thead>
-        <tr data-slot="tableColumns"><th><span data-slot-field="label">Página</span></th></tr>
+        <tr data-slot="tableColumns"><th><span data-slot-field="label">#</span></th></tr>
       </thead>
       <tbody data-slot="tableRows">
         <tr>
-          <td><span data-slot-field="entity">/precios</span></td>
-          <td><span data-slot-field="valueA">12.480</span></td>
-          <td><span data-slot-field="valueB">0,9 %</span></td>
+          <td><span class="row-rank" data-slot-field="rank">01</span></td>
+          <td><span class="row-entity" data-slot-field="entity">/precios</span></td>
+          <td class="lead-cell"><span class="lead-wrap"><span class="lead-bar-track" data-slot-field="bar"><span class="lead-bar"></span></span><span class="lead-value" data-slot-field="valueA">14.920</span></span></td>
+          <td><span class="second-value" data-slot-field="valueB">0,9 %</span></td>
         </tr>
       </tbody>
     </table>
 
-    <p class="table-source" data-slot="tableSource">Fuente: evidencia sellada de la edición</p>
+    <div class="provenance">
+      <div class="provenance-item" data-slot="source"><span class="col-label" data-slot-field="label">Fuente</span><span class="provenance-text" data-slot-field="text">Google Search Console</span></div>
+      <div class="provenance-item" data-slot="coverage"><span class="col-label" data-slot-field="label">Cobertura</span><span class="provenance-text" data-slot-field="text">31 de 31 días con dato</span></div>
+    </div>
     <footer class="paper-foot">
       <div class="paper-foot-rule"><span class="accent"></span><span class="line"></span></div>
       <div class="paper-foot-row">
