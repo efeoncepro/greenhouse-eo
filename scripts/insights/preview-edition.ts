@@ -138,7 +138,8 @@ const main = async () => {
         module: chapter.module,
         families: chapter.charts.map(chart => `${chart.family}:${chart.chartId}`),
         readings: (chapter.readings ?? []).map(reading => ({ chartId: reading.chartId, keyFigure: reading.keyFigure?.value ?? null, conclusion: reading.conclusion?.text ?? null, meaning: reading.meaning?.text ?? null, nextStep: reading.nextStep?.text ?? null })),
-        opening: chapter.opening?.text ?? null
+        opening: chapter.opening?.text ?? null,
+        claims: chapter.claims.map(item => item.text)
       })),
       essentials: (plan.essentials ?? []).map(claim => claim.text),
       scopeLines: plan.scopeLines ?? [],

@@ -8,7 +8,7 @@ import type { ChartSpecV1 } from '../contracts/chart-spec'
 import { isReferenceFact, type EvidenceFactV1, type EvidenceRejectionV1, type EvidenceSnapshotContentV1, type EvidenceSourceV1 } from '../contracts/evidence'
 import type { EditorialPlanV1, PlanChapterV1, PlanClaimV1, PlanCoverV1, PlanTableV1 } from '../contracts/plan'
 import type { InsightModule } from '../contracts/request'
-import { assertChartsAllowed, bulletCharts, essentialsFor, lineCharts, openingFor, readingsFor, scopeLinesFor, summaryFindingsFor } from './editorial-v2'
+import { assertChartsAllowed, bulletCharts, contextOfFacts, essentialsFor, humanFactSentence, lineCharts, openingFor, readingsFor, scopeLinesFor, summaryFindingsFor, type ChapterContext as ChapterContextV2 } from './editorial-v2'
 import { formatDeltaForUnit, formatFactValue } from './format'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
@@ -57,7 +57,7 @@ const unique = (lines: string[]): string[] => [...new Set(lines)]
 
 const windowLabel = (fact: EvidenceFactV1): string => `${fact.window.start} a ${fact.window.endExclusive}`
 
-const claimFor = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, locale: string): PlanClaimV1 => {
+const claimFor = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, locale: string, v2Context: ChapterContextV2 | null = null): PlanClaimV1 => {
   const comparison = fact.comparisonFactId ? byId.get(fact.comparisonFactId) : null
   // Un conteo que es parte de un total («21 keywords en primera página», «presente en 2 consultas») sin su total no
   // dice nada: se escribe «21 de 31». El total sale del mismo hecho (denominador), que la validación ya admite.
@@ -76,6 +76,11 @@ const claimFor = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, local
       ? `${fact.label}: ${value} (período anterior ${previous}, variación ${delta}).`
       : `${fact.label}: ${value} (período anterior ${previous}).`
   }
+
+  // TASK-1888 — v2: la misma redacción humana de las lecturas («Las impresiones bajaron de…»), mismas cifras citadas.
+  const human = v2Context ? humanFactSentence(fact, byId, locale, v2Context) : null
+
+  if (human) text = human
 
   if (fact.window.partial) text += ' Período parcial: la fuente aún no cerró.'
   if (fact.observation === 'estimated') text += ' Valor estimado por la fuente.'
@@ -160,7 +165,8 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     const facts = snapshot.facts.filter(fact => fact.module === moduleKey && !comparisonIds.has(fact.factId) && !isReferenceFact(fact))
     const referenceFacts = snapshot.facts.filter(fact => fact.module === moduleKey && isReferenceFact(fact))
     const rejections = snapshot.rejections.filter(rejection => rejection.module === moduleKey)
-    const claims = facts.map(fact => claimFor(fact, byId, input.locale))
+    const v2Context = editorialV2 ? contextOfFacts(facts) : null
+    const claims = facts.map(fact => claimFor(fact, byId, input.locale, v2Context))
     const charts: ChartSpecV1[] = []
     const byUnit = new Map<string, EvidenceFactV1[]>()
 

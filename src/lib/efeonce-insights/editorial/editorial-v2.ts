@@ -167,13 +167,15 @@ const upperFirst = (text: string): string => `${text.charAt(0).toUpperCase()}${t
  * cuando el capítulo tiene más de uno (el encabezado ya dice cliente y período). «RpA · Sky Airline · 2026-08» como
  * sujeto era la etiqueta interna del hecho filtrándose al texto (hallazgo de 1846, 2026-09-25).
  */
-interface ChapterContext {
+export interface ChapterContext {
   multiSpace: boolean
   multiMonth: boolean
 }
 
-const contextOf = (charts: ChartSpecV1[], byId: Map<string, EvidenceFactV1>): ChapterContext => {
-  const facts = charts.flatMap(chartSpecFactIdsOf).map(id => byId.get(id)).filter((fact): fact is EvidenceFactV1 => Boolean(fact) && fact!.role !== 'reference')
+const contextOf = (charts: ChartSpecV1[], byId: Map<string, EvidenceFactV1>): ChapterContext =>
+  contextOfFacts(charts.flatMap(chartSpecFactIdsOf).map(id => byId.get(id)).filter((fact): fact is EvidenceFactV1 => Boolean(fact) && fact!.role !== 'reference'))
+
+export const contextOfFacts = (facts: EvidenceFactV1[]): ChapterContext => {
   // Sólo el período actual: el mes del comparable es «período anterior» y la frase ya lo dice.
   const comparisonIds = new Set(facts.map(fact => fact.comparisonFactId).filter(Boolean))
   const current = facts.filter(fact => !comparisonIds.has(fact.factId))
@@ -211,9 +213,53 @@ const changeOf = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, local
   return { previous, text, magnitude }
 }
 
+/**
+ * Afirmación v2 de un hecho de capítulo, en lenguaje humano: «Las impresiones bajaron de 566.297 a 512.113 (-9,6 %).»,
+ * «Las keywords con medición se mantuvieron en 31.». El verbo sólo con sujeto de concordancia conocida
+ * (`metricSubjects`) y sin calificadores de space/mes; si no, la forma compacta sin verbo. Posiciones: verbo neutro
+ * (una posición más alta es peor). Sin comparable, el valor; sin valor, `null` (el planner escribe «sin dato»).
+ */
+export const humanFactSentence = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, locale: string, context: ChapterContext): string | null => {
+  if (fact.value === null) return null
+
+  const subject = subjectOf(fact, context)
+  const known = GH_INSIGHTS.metricSubjects[fact.metricId]
+  const agreed = known && subject === (GH_INSIGHTS.metrics[fact.metricId] ?? fact.label) ? known : null
+  const change = changeOf(fact, byId, locale)
+
+  // Sin comparable no hay verbo que conjugar: el nombre y su valor («Puntaje de visibilidad en IA: 39.»).
+  if (!change) return `${subject}: ${valueText(fact, locale)}.`
+  if (!agreed) return `${subject}: ${fromTo(fact, change, locale)}.`
+
+  const before = fmt(change.previous, locale)
+  const after = valueText(fact, locale)
+  const many = agreed.plural
+
+  if (before === fmt(fact, locale)) return `${agreed.subject} ${many ? R.heldMany : R.held} ${R.heldAt} ${after}.`
+
+  const verb = fact.unit === 'position' ? (many ? R.changedMany : R.changed) : fact.value > change.previous.value! ? (many ? R.roseMany : R.rose) : many ? R.fellMany : R.fell
+
+  return `${agreed.subject} ${verb} ${R.from} ${before} ${R.lineTo} ${after} (${change.text}).`
+}
+
+/** ¿El hecho cambió en lo que el documento IMPRIME? Una variación de 0,0 % no es un hallazgo. */
+const printedChange = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, locale: string) => {
+  const change = changeOf(fact, byId, locale)
+
+  return change && fmt(change.previous, locale) !== fmt(fact, locale) ? change : null
+}
+
+/** Enumeración humana: «A», «A y B», «A, B y C». */
+const listOf = (names: string[]): string => (names.length <= 1 ? names.join('') : `${names.slice(0, -1).join(', ')} ${R.and} ${names.at(-1)}`)
+
 /** «de 96,5 % a 90,9 % (-5,6 pp)»: compacto, sin concordancia de verbos, las cifras dicen la dirección. */
-const fromTo = (fact: EvidenceFactV1, change: NonNullable<ReturnType<typeof changeOf>>, locale: string): string =>
-  `${R.from} ${fmt(change.previous, locale)} ${R.lineTo} ${valueText(fact, locale)} (${change.text})`
+// Con las dos cifras IMPRESAS iguales, «de 31 a 31 (0,0 %)» no dice nada: «se mantuvo en 31».
+const fromTo = (fact: EvidenceFactV1, change: NonNullable<ReturnType<typeof changeOf>>, locale: string): string => {
+  const before = fmt(change.previous, locale)
+  const after = valueText(fact, locale)
+
+  return before === after ? `${R.held} ${R.heldAt} ${after}` : `${R.from} ${before} ${R.lineTo} ${after} (${change.text})`
+}
 
 /** Estado de un bullet contra su meta: el ítem con mayor brecha manda. Lo usan la lectura y la tesis del resumen. */
 const bulletStatus = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>) => {
@@ -271,8 +317,9 @@ const bulletReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, lo
     ...(conclusionText ? { conclusion: claim(`${chart.chartId}.conclusion`, conclusionText, [lead.value.factId, lead.target.factId]) } : {}),
     ...(meaningText ? { meaning: claim(`${chart.chartId}.meaning`, meaningText, items.length > 1 ? items.flatMap(entry => [entry.value.factId, entry.target.factId]) : [lead.value.factId, leadChange!.previous.factId]) } : {}),
     // «Revisar primero X» sólo tiene sentido cuando hay entre qué elegir: dos o más spaces, uno con brecha.
+    // «Primero» exige una brecha mayor ÚNICA: con empate no hay por dónde empezar.
     nextStep:
-      items.length > 1 && missing.length > 0
+      items.length > 1 && missing.length > 0 && items.filter(entry => gap(entry) === gap(lead)).length === 1
         ? claim(`${chart.chartId}.next`, `${R.nextStepGap} ${lead.item.label}: ${R.nextStepGapReason}`, [lead.value.factId])
         : null
   }
@@ -291,7 +338,9 @@ const lineReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, loca
     // Con un solo space la serie es la métrica; con varios, el space.
     const subject = context.multiSpace ? series.label : subjectOf(first, { multiSpace: false, multiMonth: false })
 
-    return [{ series, first, last, text: `${subject}: ${R.from} ${fmt(first, locale)} ${R.lineIn} ${firstMonth} ${R.lineTo} ${fmt(last, locale)} ${R.lineIn} ${lastMonth}` }]
+    const held = fmt(first, locale) === fmt(last, locale)
+
+    return [{ series, first, last, held, text: held ? `${subject}: ${R.held} ${R.heldAt} ${fmt(last, locale)}` : `${subject}: ${R.from} ${fmt(first, locale)} ${R.lineIn} ${firstMonth} ${R.lineTo} ${fmt(last, locale)} ${R.lineIn} ${lastMonth}` }]
   })
 
   const lead = phrases[0]
@@ -304,23 +353,44 @@ const lineReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, loca
   return {
     chartId: chart.chartId,
     keyFigure: { factId: lead.last.factId, value: fmt(lead.last, locale), caption: claim(`${chart.chartId}.key`, `${lead.series.label} · ${lastMonth}.`, [lead.last.factId]) },
-    ...(conclusionText ? { conclusion: claim(`${chart.chartId}.conclusion`, conclusionText, [lead.first.factId, lead.last.factId]) } : {}),
+    // Una serie plana no es un hallazgo: conclusión de su página, fuera de «Lo esencial» (`.value`).
+    ...(conclusionText ? { conclusion: claim(`${chart.chartId}.${lead.held ? 'value' : 'conclusion'}`, conclusionText, [lead.first.factId, lead.last.factId]) } : {}),
     ...(meaningText ? { meaning: claim(`${chart.chartId}.meaning`, meaningText, phrases.flatMap(phrase => [phrase.first.factId, phrase.last.factId])) } : {}),
     nextStep: null
   }
 }
 
-/** «La cifra más alta» con el verbo de su familia: un motor que menciona, una dimensión evaluada, o genérico. */
-const highestText = (fact: EvidenceFactV1, context: ChapterContext, locale: string): string => {
-  if (fact.metricId.startsWith('presence.')) {
-    const engine = (fact.channelId ? GH_INSIGHTS.channels[fact.channelId] : undefined) ?? fact.label.replace(/^Presencia en\s+/i, '')
+/**
+ * «La cifra más alta» con el verbo de su familia: un motor que menciona, una dimensión evaluada, o genérico. Un
+ * superlativo exige un máximo ÚNICO en lo impreso: con empate se dice el empate («Todos los motores mencionan la marca
+ * en 2 de 6.», «Gemini y ChatGPT son los motores que…»), nunca «el que más» (Berel p. 11, 2026-09-25).
+ */
+const highestText = (facts: EvidenceFactV1[], context: ChapterContext, locale: string): string | null => {
+  const highest = [...facts].sort((a, b) => (b.value as number) - (a.value as number))[0]!
+  const tied = facts.filter(fact => fmt(fact, locale) === fmt(highest, locale))
+  const value = valueText(highest, locale)
+  const all = tied.length === facts.length
 
-    return `${engine} ${R.mostMentions}: ${valueText(fact, locale)}.`
+  if (highest.metricId.startsWith('presence.')) {
+    const engine = (fact: EvidenceFactV1) => (fact.channelId ? GH_INSIGHTS.channels[fact.channelId] : undefined) ?? fact.label.replace(/^Presencia en\s+/i, '')
+
+    if (tied.length === 1) return firstFitting(L.conclusion, `${engine(highest)} ${R.mostMentions}: ${value}.`)
+    if (all) return firstFitting(L.conclusion, `${R.allEnginesMention} ${value}.`)
+
+    return firstFitting(L.conclusion, `${listOf(tied.map(engine))} ${R.mostMentionsTied}: ${value}.`, `${R.severalEnginesShare}: ${value}.`)
   }
 
-  if (fact.metricId.startsWith('dimension.')) return `${R.bestDimension} ${lowerFirst(fact.label)}: ${valueText(fact, locale)}.`
+  if (highest.metricId.startsWith('dimension.')) {
+    if (tied.length === 1) return firstFitting(L.conclusion, `${R.bestDimension} ${lowerFirst(highest.label)}: ${value}.`)
+    if (all) return firstFitting(L.conclusion, `${R.allDimensions} ${value}.`)
 
-  return `${R.highest} ${subjectOf(fact, context)}: ${valueText(fact, locale)}.`
+    return firstFitting(L.conclusion, `${R.bestDimensionsTied} ${listOf(tied.map(fact => lowerFirst(fact.label)))}: ${value}.`, `${R.severalDimensionsShare}: ${value}.`)
+  }
+
+  if (tied.length === 1) return firstFitting(L.conclusion, `${R.highest} ${subjectOf(highest, context)}: ${value}.`)
+  if (all) return firstFitting(L.conclusion, `${R.allEqual} ${value}.`)
+
+  return firstFitting(L.conclusion, `${R.highestTied} ${listOf(tied.map(fact => lowerFirst(subjectOf(fact, context))))}: ${value}.`, `${R.severalShare}: ${value}.`)
 }
 
 /**
@@ -334,32 +404,42 @@ const barReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, local
 
   if (!first) return null
 
+  // Sólo cambios que se IMPRIMEN (una variación de 0,0 % no es hallazgo) y, para «el mayor», un máximo ÚNICO.
   const changes = facts.flatMap(fact => {
-    const change = changeOf(fact, byId, locale)
+    const change = printedChange(fact, byId, locale)
 
     return change ? [{ fact, change }] : []
   })
 
-  const biggest = [...changes].sort((a, b) => b.change.magnitude - a.change.magnitude)[0]
+  const ordered = [...changes].sort((a, b) => b.change.magnitude - a.change.magnitude)
+  const biggest = ordered[0]
+  const uniqueBiggest = biggest && (ordered.length === 1 || ordered[1]!.change.text.replace('-', '') !== biggest.change.text.replace('-', ''))
   const highest = [...facts].sort((a, b) => (b.value as number) - (a.value as number))[0]!
+  const highestUnique = facts.filter(fact => fmt(fact, locale) === fmt(highest, locale)).length === 1
 
   const conclusionText = biggest
     ? firstFitting(
         L.conclusion,
-        changes.length > 1 ? `${R.largestChange} ${lowerFirst(subjectOf(biggest.fact, context))}: ${fromTo(biggest.fact, biggest.change, locale)}.` : null,
+        changes.length > 1 && uniqueBiggest ? `${R.largestChange} ${lowerFirst(subjectOf(biggest.fact, context))}: ${fromTo(biggest.fact, biggest.change, locale)}.` : null,
         `${subjectOf(biggest.fact, context)}: ${fromTo(biggest.fact, biggest.change, locale)}.`
       )
-    : firstFitting(L.conclusion, facts.length > 1 ? highestText(highest, context, locale) : `${subjectOf(first, context)}: ${valueText(first, locale)}.`)
+    : facts.length > 1
+      ? highestText(facts, context, locale)
+      : firstFitting(L.conclusion, `${subjectOf(first, context)}: ${valueText(first, locale)}.`)
 
-  const key = biggest?.fact ?? (facts.length > 1 ? highest : first)
-  const cited = biggest ? [biggest.fact.factId, biggest.change.previous.factId] : [key.factId]
+  const key = biggest?.fact ?? (facts.length > 1 && highestUnique ? highest : first)
+  const cited = biggest ? [biggest.fact.factId, biggest.change.previous.factId] : facts.length > 1 ? facts.filter(fact => fmt(fact, locale) === fmt(highest, locale)).map(fact => fact.factId) : [key.factId]
 
   if (!conclusionText) return null
+
+  // Un valor suelto (una sola cifra, sin cambio) es la conclusión de su página, pero no un HALLAZGO: `.value` lo marca
+  // para que «Lo esencial» no lo cite (revisión de 1846, 2026-09-25).
+  const finding = Boolean(biggest) || facts.length > 1
 
   return {
     chartId: chart.chartId,
     keyFigure: { factId: key.factId, value: fmt(key, locale), caption: claim(`${chart.chartId}.key`, `${subjectOf(key, context)}.`, [key.factId]) },
-    conclusion: claim(`${chart.chartId}.conclusion`, conclusionText, cited),
+    conclusion: claim(`${chart.chartId}.${finding ? 'conclusion' : 'value'}`, conclusionText, cited),
     nextStep: null
   }
 }
@@ -403,7 +483,7 @@ export const summaryFindingsFor = (chapters: PlanChapterV1[], byId: Map<string, 
   const bullets = chapters.flatMap(chapter => chapter.charts.filter(chart => chart.family === 'bullet' && (chapter.readings ?? []).some(reading => reading.chartId === chart.chartId)))
   const statuses = bullets.map(chart => ({ chart, status: bulletStatus(chart, byId)! })).filter(entry => entry.status)
   const missed = statuses.filter(entry => entry.status.missing.length > 0)
-  const ordered = chapters.flatMap(conclusionsOf)
+  const ordered = chapters.flatMap(conclusionsOf).filter(item => !item.claimId.endsWith('.value'))
   let thesis: PlanClaimV1 | null = null
 
   if (missed.length === 1 && statuses.length > 1 && missed[0]!.status.metricName) {
@@ -438,18 +518,24 @@ export const essentialsFor = (chapters: PlanChapterV1[], byId: Map<string, Evide
   const candidates = chapters.map(chapter => {
     const context = contextOf(chapter.charts, byId)
 
+    // Sólo hechos que alguna figura CON PÁGINA dibuja (mismo `hasFigurePage` del render): una esencial cuya cifra no
+    // tiene página no tiene folio que la respalde y el render falla cerrado (Berel CTR, 2026-09-25).
+    const paged = new Set(chapter.charts.filter(chart => hasFigurePage(chart, byId, locale)).flatMap(chartSpecFactIdsOf))
+
+    // Sólo HALLAZGOS: un cambio que se imprime (con dirección), nunca un valor suelto ni una variación de 0,0 %. El tope
+    // es un techo, no una cuota: menos esenciales es mejor que relleno (revisión de 1846, 2026-09-25).
     const facts = chapter.claims.flatMap(item => {
       const fact = item.factIds[0] ? byId.get(item.factIds[0]) : undefined
 
-      if (!fact || fact.value === null) return []
+      if (!fact || fact.value === null || !paged.has(fact.factId)) return []
 
-      const change = changeOf(fact, byId, locale)
-      const text = change ? `${subjectOf(fact, context)}: ${fromTo(fact, change, locale)}.` : `${subjectOf(fact, context)}: ${valueText(fact, locale)}.`
+      const change = printedChange(fact, byId, locale)
+      const text = change ? humanFactSentence(fact, byId, locale, context) : null
 
-      return [claim(`fact.${fact.factId}`, text, change ? [fact.factId, change.previous.factId] : [fact.factId])]
+      return change && text ? [claim(`fact.${fact.factId}`, text, [fact.factId, change.previous.factId])] : []
     })
 
-    return [...conclusionsOf(chapter), ...facts]
+    return [...conclusionsOf(chapter).filter(item => !item.claimId.endsWith('.value')), ...facts]
   })
 
   const essentials: PlanClaimV1[] = []

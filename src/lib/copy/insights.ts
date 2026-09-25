@@ -144,6 +144,7 @@ export const GH_INSIGHTS = {
     rose: 'subió',
     fell: 'bajó',
     held: 'se mantuvo',
+    heldAt: 'en',
     // Una posición más alta es peor: «subió» se leería como mejora. Para posiciones, el verbo neutro.
     changed: 'cambió',
     metricOf: 'de',
@@ -151,8 +152,41 @@ export const GH_INSIGHTS = {
     from: 'de',
     mostMentions: 'es el motor que más menciona la marca',
     bestDimension: 'La dimensión mejor evaluada es',
-    onlyMissed: 'es la única meta sin cumplir'
+    onlyMissed: 'es la única meta sin cumplir',
+    // Plural del verbo (sujeto plural: «Las impresiones bajaron»).
+    roseMany: 'subieron',
+    fellMany: 'bajaron',
+    heldMany: 'se mantuvieron',
+    changedMany: 'cambiaron',
+    and: 'y',
+    // Un superlativo exige un máximo ÚNICO; con empate se dice el empate (revisión de 1846, 2026-09-25).
+    allEnginesMention: 'Todos los motores mencionan la marca en',
+    mostMentionsTied: 'son los motores que más mencionan la marca',
+    severalEnginesShare: 'Varios motores comparten la mención más alta',
+    allDimensions: 'Todas las dimensiones marcan',
+    bestDimensionsTied: 'Las dimensiones mejor evaluadas son',
+    severalDimensionsShare: 'Varias dimensiones comparten la mejor evaluación',
+    allEqual: 'Todas las cifras de la figura son',
+    highestTied: 'Las cifras más altas son',
+    severalShare: 'Varias cifras comparten el valor más alto'
   },
+
+  /**
+   * TASK-1888 — sujeto con concordancia de cada métrica para las afirmaciones v2 («Las impresiones bajaron de…»). Sin
+   * entrada, la forma compacta sin verbo («Presencia en Gemini: 2 de 6.»): nunca un verbo con la concordancia adivinada.
+   */
+  metricSubjects: {
+    clicks: { subject: 'Los clics orgánicos', plural: true },
+    impressions: { subject: 'Las impresiones', plural: true },
+    ctr: { subject: 'El CTR', plural: false },
+    position: { subject: 'La posición media', plural: false },
+    keywords_tracked: { subject: 'Las keywords con medición', plural: true },
+    page_one_keywords: { subject: 'Las keywords en primera página', plural: true },
+    overall_score: { subject: 'El puntaje de visibilidad en IA', plural: false },
+    otd: { subject: 'Las entregas a tiempo', plural: true },
+    ftr: { subject: 'La primera entrega correcta', plural: false },
+    rpa: { subject: 'Las rondas de revisión por pieza', plural: true }
+  } as Readonly<Record<string, { subject: string; plural: boolean }>>,
 
   /**
    * Fuente legible de cada método del snapshot (por `method.name`). El nombre de la función lectora

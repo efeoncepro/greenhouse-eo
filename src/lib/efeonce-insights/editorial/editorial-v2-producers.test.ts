@@ -270,6 +270,22 @@ describe('TASK-1888 — topes, varios spaces y verbos por familia', () => {
     expect(validateEditorialPlan(seo, snapshot)).toEqual([])
   })
 
+  it('una esencial nunca cita un hecho sin página (caso Berel: CTR solo en su figura, que no se dibuja)', () => {
+    const seo = (metricId: string, value: number, unit: EvidenceFactV1['unit'], comparisonFactId: string | null = null): EvidenceFactV1 => ({ ...aeo(metricId, value), factId: `seo.${metricId}`, module: 'seo', metricId, label: metricId, unit, numerator: null, denominator: null, dimension: undefined, channelId: 'google', comparisonFactId })
+
+    const snapshot = {
+      facts: [seo('clicks', 9377, 'count', 'seo.clicks.prev'), { ...seo('clicks', 10662, 'count'), factId: 'seo.clicks.prev' }, seo('impressions', 512113, 'count', 'seo.impressions.prev'), { ...seo('impressions', 566297, 'count'), factId: 'seo.impressions.prev' }, seo('ctr', 1.83, 'percent', 'seo.ctr.prev'), { ...seo('ctr', 1.87, 'percent'), factId: 'seo.ctr.prev' }],
+      sources: [],
+      rejections: []
+    }
+
+    const plan = v2(snapshot, ['seo'])
+
+    expect(plan.chapters[0]!.charts.find(chart => chart.chartId === 'chart.seo.percent')).toBeDefined()
+    expect(plan.essentials!.flatMap(item => item.factIds)).not.toContain('seo.ctr')
+    expect(plan.executiveSummary.flatMap(item => item.factIds)).not.toContain('seo.ctr')
+  })
+
   it('el validador rechaza una conclusión que no cabe en el molde (90)', () => {
     const plan = v2(icoSnapshot, ['ico'])
     const long = { ...plan, chapters: plan.chapters.map(chapter => ({ ...chapter, readings: chapter.readings!.map(item => (item.conclusion ? { ...item, conclusion: { ...item.conclusion, text: `${item.conclusion.text} ${'x'.repeat(90)}` } } : item)) })) }
@@ -303,5 +319,51 @@ describe('TASK-1888 — autoría IA v2', () => {
 
     expect(fallback.provenance.mode).toBe('deterministic')
     expect(fallback.plan).toEqual(deterministic)
+  })
+})
+
+describe('TASK-1888 — superlativos únicos, esenciales sólo de hallazgos y afirmaciones humanas (Berel 2026-09-25)', () => {
+  const conclusionOf = (plan: ReturnType<typeof v2>, chartId: string) => plan.chapters.flatMap(chapter => chapter.readings ?? []).find(reading => reading.chartId === chartId)?.conclusion
+
+  it('cuatro motores empatados en 2 de 6 se dicen como empate, nunca «el que más»', () => {
+    const tie = { facts: [aeo('gemini', 2, 'gemini'), aeo('google_ai_overview', 2, 'google_ai_overview'), aeo('openai', 2, 'chatgpt'), aeo('perplexity', 2, 'perplexity')].map(fact => ({ ...fact, denominator: 6 })), sources: [], rejections: [] }
+    const plan = v2(tie, ['aeo'])
+    const texts = [conclusionOf(plan, 'chart.aeo.count')?.text, ...plan.essentials!.map(item => item.text), ...plan.executiveSummary.map(item => item.text)]
+
+    expect(conclusionOf(plan, 'chart.aeo.count')?.text).toBe('Todos los motores mencionan la marca en 2 de 6.')
+    expect(texts.join(' ')).not.toMatch(/el motor que más/)
+  })
+
+  it('un empate parcial nombra a los empatados; un máximo único conserva el superlativo', () => {
+    const partial = v2({ facts: [aeo('openai', 4, 'chatgpt'), aeo('gemini', 4, 'gemini'), aeo('mistral', 1)], sources: [], rejections: [] }, ['aeo'])
+    const unique = v2(aeoSnapshot, ['aeo'])
+
+    expect(conclusionOf(partial, 'chart.aeo.count')?.text).toBe('ChatGPT y Gemini son los motores que más mencionan la marca: 4 de 10.')
+    expect(conclusionOf(unique, 'chart.aeo.count')?.text).toMatch(/^ChatGPT es el motor que más menciona la marca/)
+  })
+
+  it('dos dimensiones en 100 no producen «la mejor evaluada»', () => {
+    const dimension = (key: string, label: string, value: number): EvidenceFactV1 => ({ ...aeo(key, value), factId: `aeo.dimension.${key}.w`, metricId: `dimension.${key}`, label, unit: 'score', numerator: null, denominator: null, dimension: { dimension: key } })
+    const plan = v2({ facts: [dimension('entity_clarity', 'Claridad de entidad', 100), dimension('competitive_sov', 'Share of voice competitivo', 100), dimension('ai_visibility', 'Visibilidad en IA', 0)], sources: [], rejections: [] }, ['aeo'])
+    const text = conclusionOf(plan, 'chart.aeo.score')?.text ?? ''
+
+    expect(text).not.toMatch(/La dimensión mejor evaluada es/)
+    expect(text).toBe('Las dimensiones mejor evaluadas son claridad de entidad y share of voice competitivo: 100.')
+  })
+
+  it('«Lo esencial» no cita valores sueltos ni variaciones de 0,0 %; las afirmaciones del capítulo usan verbo con concordancia', () => {
+    const seo = (metricId: string, value: number, unit: EvidenceFactV1['unit'], comparisonFactId: string | null = null): EvidenceFactV1 => ({ ...aeo(metricId, value), factId: `seo.${metricId}`, module: 'seo', metricId, label: metricId, unit, numerator: null, denominator: null, dimension: undefined, channelId: 'google', comparisonFactId })
+    const prev = (fact: EvidenceFactV1, value: number): EvidenceFactV1 => ({ ...fact, factId: `${fact.factId}.prev`, value, comparisonFactId: null })
+    const clicks = seo('clicks', 9377, 'count', 'seo.clicks.prev')
+    const impressions = seo('impressions', 512113, 'count', 'seo.impressions.prev')
+    const tracked = seo('keywords_tracked', 31, 'count', 'seo.keywords_tracked.prev')
+    const plan = v2({ facts: [clicks, prev(clicks, 10662), impressions, prev(impressions, 566297), tracked, prev(tracked, 31)], sources: [], rejections: [] }, ['seo'])
+    const claims = plan.chapters[0]!.claims.map(item => item.text)
+    const essentials = plan.essentials!.map(item => item.text)
+
+    expect(claims).toContain('Las impresiones bajaron de 566.297 a 512.113 (-9,6 %).')
+    expect(claims).toContain('Las keywords con medición se mantuvieron en 31.')
+    expect(essentials.join(' ')).not.toMatch(/0,0 %|se mantuvieron/)
+    expect(plan.essentials!.flatMap(item => item.factIds)).not.toContain('seo.keywords_tracked')
   })
 })
