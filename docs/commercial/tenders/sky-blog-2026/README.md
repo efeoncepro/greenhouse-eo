@@ -15,6 +15,7 @@
 > | **Inicio del servicio** | **2026-11-01** |
 > | **Equipo operativo** | **Valentina Hoyos — Redactora SEO**; el operador va a contratar más equipo. El mapeo de squad del deck (Julio 12% · María Fernanda SEO Copywriter · Daniela · Melkin · Andrés como "SEO Specialist") era el de la **propuesta** y es **histórico**: no es el equipo operativo confirmado. |
 > | **HubSpot** | Deal `62535094842` "SKY Airline — Licitación Blog SEO/AEO (Wherex)" → **Cierre ganado**, closedate 2026-09-23, monto CLP 72.000.000; nota de adjudicación `117311269190`. |
+> | **Greenhouse (2026-09-24)** | AEO de Sky en tier `contracted` y target SEO `skyairline.com` creados por `scripts/growth/provision-sky-blog-seo.ts`. El módulo `seo_v2` se asigna por el camino gobernado: SERVICE del blog en HubSpot → `SVC-HS-<id>` → términos con `bundledModules=[seo_v2, ai_visibility_v1]` → preview/apply de habilitación (TASK-1852) → re-correr el script para `seo_tier=contracted`. Search Console y keywords del blog se conectan en la transición de octubre. |
 > | **Práctica dueña** | `seo-aeo-practice` (NO `creative-practice`). No mezclar alcance ni márgenes con la Agencia Creativa de SKY. |
 >
 > **Por qué ganamos:** (1) relación y confianza — cuenta ancla desde 2023, el comité lo reconoció como

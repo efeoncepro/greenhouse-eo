@@ -1,9 +1,9 @@
 # Manual — Asignar el modulo SEO a una organizacion
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-08-05 por Claude (TASK-1301)
-> **Ultima actualizacion:** 2026-08-09 por Claude (TASK-1677: la clave vigente es `seo_v2`)
+> **Ultima actualizacion:** 2026-09-24 por Claude (caso Sky Blog: alta de cliente contratado por el camino gobernado de TASK-1852 + script de tier)
 > **Modulo:** Growth / SEO (Search Visibility 360)
 > **Ruta en portal:** sin UI todavia (paso manual SQL; UI llega con TASK-1306+)
 > **Documentacion relacionada:** [doc funcional del modulo](../../documentation/growth/modulo-seo-search-visibility-360.md) · [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
@@ -121,6 +121,22 @@ Por qué no se ve afectado: **el módulo se resuelve por `module_assignments`, n
 Consecuencia práctica: **puedes asignar `seo_v2` a cualquier organización del backbone canónico** — cliente, prospecto, la propia operadora — sin tocar su `organization_type`. En particular, `'other'` significa *sin rol comercial*, no *sin clasificar*: la operadora lo lleva a propósito porque Efeonce no se vende a sí misma.
 
 > Contrato: [`GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md` §Organization Types](../../architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md) · invariantes para agentes: [`ORG_CLIENT_AGENT_INVARIANTS.md`](../../architecture/agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md).
+
+## Caso ejecutado: Sky Airlines — Blog SEO/AEO (2026-09-24)
+
+Segundo alta real de un cliente, y la primera con el camino gobernado de TASK-1852 ya en producción. Lo que cambia
+respecto del SQL manual de arriba:
+
+- **El assignment `seo_v2` de un cliente contratado nace por preview/apply de habilitación** (`applyServiceEnablement`),
+  que exige un término vigente del servicio con `bundled_modules=[seo_v2, …]` y la aprobación de una persona
+  administradora. No se hace el `INSERT` a mano: la atribución contractual (servicio, término, recibo) sólo existe por
+  ese camino. Runbook: `docs/operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md`.
+- **El apply no pasa metadata**, así que el assignment nace sin `seo_tier` y el chokepoint lo lee como `trial` (1 audit,
+  USD 2). Después del apply hay que fijar el tier: [`scripts/growth/provision-sky-blog-seo.ts`](../../../scripts/growth/provision-sky-blog-seo.ts)
+  lo hace con el `UPDATE` canónico de este manual (idempotente; también sube el tier AEO con `assignAeoTier` y crea el
+  `seo_target`). Es la plantilla para el próximo cliente: cambiar organización, dominio, mercado y razón.
+- **Orden real del caso:** AEO `trial → contracted` + target `seot-sky-blog-cl` (skyairline.com, CL/es) el 2026-09-24;
+  `seo_v2` pendiente de que el servicio del blog exista en HubSpot (`SVC-HS-<id>`), sus términos y el apply.
 
 ## Como revocar
 
