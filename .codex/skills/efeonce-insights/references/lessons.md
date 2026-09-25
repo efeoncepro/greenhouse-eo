@@ -250,3 +250,10 @@
   decks too — it is a catalog defect, invisible to slot validation and to the pixel gate (baselined). Separate issue.
 - **2026-09-16 · macOS `xargs` has no `-a`.** Use `git add --pathspec-from-file=<file>` / `git commit --pathspec-from-file`
   for explicit-path commits in the shared checkout.
+- **2026-09-25 · The sandbox org cannot prove a report with data.** «Greenhouse Demo» has no ICO snapshots, so a
+  productive canary with figures needs an internal edition of a real client (operator authorization). Check the
+  source (BigQuery) before concluding a client "has no data": Sky had 11 months while the sandbox had none.
+- **2026-09-25 · A percentage delta printed as a relative percent is ambiguous.** OTD 80,1 → 81,9 printed
+  «+2,2 %»; the reader expects «+1,8 pp». Owned by TASK-1888 (plan contract), not a catalog fix.
+- **2026-09-25 · `cmd; echo EXIT=$?; tail log` reports tail's exit code.** A background gate must end with
+  `exit $rc` of the gated command, or its green notification proves nothing.

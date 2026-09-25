@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-24 por Codex y Claude (TASK-1847: catálogos A4/deck en staging y en producción, release `ebb9212a32ce`)
+> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1847 cerrada: primer render productivo de A4 y deck con datos reales)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
@@ -197,6 +197,24 @@ credenciales que «Canary por lane ecosystem»):
 4. Negativo: pedir `outputs: ["web"]` → `422 render_rejected`, sin encolar.
 5. Gateway: en el repo `efeonce-mcp`, `scripts/greenhouse-insights-canary.mjs --render-run` → catalog (renderable=1),
    list, render run `completed` y deny `404` verdes.
+
+### Canary de render en producción con datos reales (receta usada el 2026-09-25)
+
+La org sintética «Greenhouse Demo» sirve para probar el deck vacío, pero **no para un informe con datos**: sus
+espacios no tienen snapshots ICO y el encargo falla en validación con `evidence_rejected`, que es lo correcto.
+Para probar A4 y deck con datos reales:
+
+1. Pedir autorización explícita al operador: es una escritura en producción bajo la organización de un cliente.
+2. Confirmar en `GET …/catalog?organizationId=<org>` que el módulo está disponible y que `renderableOutputs`
+   incluye `deck_pdf` y `report_pdf`.
+3. Crear la edición con `audience: "internal"` y una `Idempotency-Key` fija. Con emisión y sharing apagados en
+   producción, el cliente no la ve ni recibe nada.
+4. `POST …/editions/<editionId>/render` con `{}` (las dos salidas) → `202`. Si responde `200 idempotent:true`, esa
+   edición ya tenía una salida viva: el render no se repite; usar otra edición.
+5. Esperar al dispatcher: una salida por tick de 2 min. Bajar los PDF del asset (`greenhouse_core.assets`) y
+   revisar páginas, fuentes (`pdffonts`) y que las cifras (`pdftotext`) sean las del snapshot.
+
+El 2026-09-25 se usó Sky Airlines (`EO-INS-000022`): deck 5 láminas y A4 8 páginas al primer intento.
 
 ### Canary de render en staging (receta usada el 2026-09-16)
 

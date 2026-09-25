@@ -882,6 +882,14 @@ todavía no se ejercitó. `develop` recibió el código del release en `e15d7164
 **Límite honesto de las familias:** el planner determinista emite `bar` y `bar_grouped`. Las otras
 13 tienen geometría probada con fixtures y **ningún productor**; no se ofrecen como disponibles.
 
+**Delta 2026-09-25 — cierre de TASK-1847.** Primer render productivo de los dos catálogos: edición interna de
+Sky Airlines `EO-INS-000022` (ICO, agosto contra julio 2026) → `deck_pdf` 5 láminas con `insights-deck` y
+`report_pdf` 8 páginas A4 con `insights-report`, primer intento, cifras iguales al snapshot ICO de BigQuery. La org
+sandbox «Greenhouse Demo» no sirve para este canary: sus espacios no tienen filas en
+`ico_engine.metric_snapshots_monthly`, y una edición sin hechos falla en `validating` con `evidence_rejected`
+(correcto). El render es idempotente por salida viva: una edición ya renderizada devuelve su run anterior.
+El rediseño premium aprobado por el operador sigue en TASK-1888 (contrato) y TASK-1889 (catálogos).
+
 ### 14.6 Estado de TASK-1848 — sharing, correo y recurrencia (en producción con flags OFF, 2026-09-18)
 
 > Los bloques «Construido» y «Pendiente» de abajo registran el estado al cerrar el código (commits locales, sin

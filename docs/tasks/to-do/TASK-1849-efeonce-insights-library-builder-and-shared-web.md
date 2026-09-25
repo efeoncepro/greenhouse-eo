@@ -1,5 +1,11 @@
 # TASK-1849 — Efeonce Insights: biblioteca, creación y experiencia web compartida
 
+## Delta 2026-09-25
+
+- TASK-1847 cerrada (complete 2026-09-25): catálogos `insights-report` e `insights-deck` en producción desde el
+  2026-09-24 y render productivo de A4 y deck verificado con datos reales. Se retira de `Blocked by`. El rediseño
+  premium aprobado por el operador vive en TASK-1888/TASK-1889. — cerrado por trabajo en TASK-1847
+
 ## Delta 2026-09-18
 
 - **TASK-1848 en producción 2026-09-18** (release `bda1cf2cd938`, flags OFF en producción; ON en staging): ya existen en el lane App `/api/platform/app/insights/**` las rutas de **shares** (crear/listar/revocar), **deliveries** (crear, leer, cancel/retry/reconcile) y **schedules** (crear, leer, activate/pause/retire); ecosystem y MCP sólo leen envíos y recurrencias. Errores de lane: 503 `sharing_disabled|delivery_disabled|schedules_disabled`, 429 `quota_exceeded`, 409 `not_ready`. La modalidad de envío **`portal_link` responde `not_ready` hasta que esta task construya la ruta de la edición en el portal**. In-app/Teams siguen fuera de V1 (TASK-690–693 / esta task). Ya no bloquea: queda TASK-1847. — por TASK-1848
@@ -35,7 +41,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui|agency`
-- Blocked by: `TASK-1847`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin branch dedicada ni worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

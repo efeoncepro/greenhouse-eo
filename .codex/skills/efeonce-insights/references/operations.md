@@ -1,18 +1,20 @@
 # Efeonce Insights — operations (flags, assignment, canaries, rollback)
 
-## TASK-1847 production status (2026-09-24)
+## TASK-1847 production status (complete 2026-09-25)
 
-The chart catalogs and worker cutover are verified in staging; no production release of TASK-1847 is confirmed.
-Remote `develop` is `ebee018`: its CI (`36057463056`) and Playwright smoke (`36058226183`) pass. The task-scoped
-candidate `ef1a5c8` has not yet been pushed, so those checks do not certify it. The production preflight for the
-remote base passes runtime health, migration parity (656/656), GCP WIF, and Sentry; it still reports
-`split_batch` over 3,279 files and an Azure federated-credential warning. Re-run preflight on the exact candidate
-before opening the promotion PR. Do not use the shared `develop` HEAD, which is 60 commits/1,063 files ahead.
+In production since release `ebb9212a32ce` (2026-09-24): `deck_pdf` → `insights-deck`, `report_pdf` →
+`insights-report`. First productive renders verified 2026-09-25: sandbox deck (`irun-cc329478…`) and a real-data
+internal edition for Sky Airlines (`EO-INS-000022`, run `irun-166f4ed0…`: deck 5 slides + A4 8 pages, first attempt).
+
+Production render canary with data: the sandbox org has NO ICO snapshots (`ico_engine.metric_snapshots_monthly`
+returns zero rows for its two spaces), so a new sandbox edition fails in `validating` with `evidence_rejected` — that
+is correct. Use an `internal` edition of a real client with data, only with explicit operator authorization
+(issuance and sharing are OFF in production, so the client sees nothing). Render is idempotent per live output: an
+edition whose outputs already exist returns the old run (`200 idempotent:true`).
 
 The Composer's historical global visual set also drifts on clean, unrelated frames (ISSUE-122). Use
-`pnpm composer:visual-gate --catalog=insights --selftest`, then the declared scoped freeze and scoped gate for the
-new Insights templates. This scope preserves existing `deck-axis`/SKY baseline images and hashes; it does not
-claim the global gate is green or resolve ISSUE-122.
+`pnpm composer:visual-gate --catalog=insights --selftest`, then the declared scoped freeze and scoped gate for
+Insights templates. This scope preserves existing `deck-axis`/SKY baseline images and hashes.
 
 ## Flags (ledger: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`)
 

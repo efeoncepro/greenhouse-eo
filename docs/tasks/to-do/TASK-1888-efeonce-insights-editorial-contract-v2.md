@@ -24,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-1847` (cierre: render real en el Job productivo + gate de cierre; esta task toca archivos que 1847 aún posee)
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees ni rama por task`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -131,8 +131,7 @@ Reglas obligatorias:
 - `TASK-1845` (complete) — contratos `InsightRequestV1`, `EvidenceSnapshotV1`, `ChartSpecV1`, `EditorialPlanV1`,
   adapters SEO/AEO/ICO y commands de generación.
 - `TASK-1846` (complete) — render durable en el Job `artifact-worker`.
-- `TASK-1847` (in-progress, en producción) — catálogos v1 y geometría de 15 familias; debe cerrar antes de tocar
-  `render/*` y los contratos que posee.
+- `TASK-1847` (complete 2026-09-25) — catálogos v1 en producción y geometría de 15 familias.
 - `TASK-999` — assets de marca de organizaciones (`greenhouse_core.organizations.logo_asset_id`,
   `src/lib/account-360/organization-brand-assets.ts`) [verificar lifecycle y dueño vigente].
 - Schema `greenhouse_insights` (tablas vigentes en `src/types/db.d.ts`).

@@ -24,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-1888` (Slices 3–5 necesitan su contrato; Slices 1–2 pueden empezar cuando cierre TASK-1847)
+- Blocked by: `TASK-1888` (Slices 3–5 necesitan su contrato; Slices 1–2 ya pueden empezar)
 - Branch: `Greenhouse develop; sin worktrees ni rama por task`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -103,8 +103,7 @@ Reglas obligatorias:
 
 - `TASK-1888` — contrato de 15 familias, lectura por figura, cifra principal, entrada de capítulo, hechos esenciales,
   `channelId` y portada sellada.
-- `TASK-1847` (in-progress, en producción) — catálogos v1, geometría y gate visual scoped; debe cerrar antes de tocar
-  sus archivos.
+- `TASK-1847` (complete 2026-09-25) — catálogos v1 en producción, geometría y gate visual scoped.
 - `TASK-1846` (complete) — render en el Job `artifact-worker`.
 
 ### Blocks / Impacts

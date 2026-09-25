@@ -7,7 +7,7 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | --- | --- | --- | --- | --- |
 | TASK-1845 | Domain, evidence, adapters, lanes, MCP, gateway federation | **complete** | Cloud SQL (single instance), Vercel staging + Production (generation ON), gateway v1.5.0, Entra scope | 2026-09-16 |
 | TASK-1846 | Durable rendering + Artifact Worker (RenderRun / InsightOutput), outputs port | **complete** | Cloud SQL (migrations applied), Vercel staging + Production (render ON), Cloud Run Job `artifact-worker` (first productive deploy in release `917491fd02e4`) + `ops-worker` dispatcher (flag ON, shared by staging/prod), gateway v1.6.0 deployed | 2026-09-16 |
-| TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | **in-progress — in production 2026-09-24** (release `ebb9212a32ce`, PR #239; contract canary green; production render canary pending) | Job `artifact-worker` in staging and production: `report_pdf` on `insights-report`, `deck_pdf` on `insights-deck` (cutover 2026-09-22 staging, 2026-09-24 production) | — |
+| TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | **complete** (in production since 2026-09-24, release `ebb9212a32ce`; first productive A4 + deck render 2026-09-25) | Job `artifact-worker` in staging and production: `report_pdf` on `insights-report`, `deck_pdf` on `insights-deck` (cutover 2026-09-22 staging, 2026-09-24 production) | 2026-09-25 |
 | TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — in production with flags OFF** | Cloud SQL (4 migrations applied); release `bda1cf2cd938` (2026-09-18, Vercel + 6 Cloud Run); staging flags ON (sharing/delivery/schedules/issuance), production OFF until TASK-1875; gateway `efeonce-mcp` 1.7.0 (rev `00055-gk6`, 58 tools); open: in-app/Teams channels, portal route (1849), ISSUE-174 → TASK-1876 | 2026-09-18 |
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
 | TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | to-do (blocked by 1848) | — | — |
@@ -155,7 +155,15 @@ production canary, gateway federation of the 4 tools in `efeonce-mcp`, and any `
 id returned by a run is not a download — authorized download/share is TASK-1848. The `MetricsSplit` `unit` slot has a
 pre-existing visual defect (glued/wrapped) visible in delivered tender decks: separate issue for the catalog owner.
 
-## TASK-1847 — charts and catalogs (in-progress desde 2026-09-21)
+## TASK-1847 — charts and catalogs (complete 2026-09-25)
+
+**Cierre (2026-09-25):** primer render productivo de los dos catálogos con datos reales — edición interna de Sky
+Airlines `EO-INS-000022` (ICO, agosto vs julio 2026), run `irun-166f4ed0-f3b9-4d31-8837-26035ec46db5`: `deck_pdf`
+5 láminas (`insights-deck`) y `report_pdf` 8 páginas A4 (`insights-report`), primer intento, cifras = BigQuery.
+Gate de cierre: `pnpm test` completo (1821 archivos, 15 303 tests) y `pnpm build` verdes sobre `35f208553`. La
+edición queda interna y sin emitir. **Hand-off:** el rediseño premium aprobado por el operador vive en TASK-1888
+(contrato v2: 15 familias, lectura por figura, `channelId`, portada sellada) y TASK-1889 (catálogos premium +
+verificación Berel/Sky + release); el gap «13 de 15 familias sin productor» pasa a TASK-1888.
 
 **Estado (2026-09-22): desplegado en staging, sin release a producción.** Canary con datos reales
 (Berel SEO+AEO `EO-INS-000019`, Sky ICO `EO-INS-000020`, audiencia interna, sin emitir) y módulo `insights_v1`
@@ -305,6 +313,10 @@ por delante de `origin/develop`; no es un candidato acotado a esta task. No se d
 
 ## Sessions (append as you go; newest first)
 
+- **2026-09-25 · TASK-1847 · cierre.** Canary de render productivo: deck vacío en la org sandbox (`irun-cc329478…`,
+  `insights-deck`, 3 láminas) y, con autorización del operador, A4 + deck con datos reales de Sky (`EO-INS-000022`).
+  La sandbox no tiene snapshots ICO: una edición nueva falla en `validating` (`evidence_rejected`). El operador aprobó
+  en un canvas el rediseño premium; se registraron TASK-1888 y TASK-1889 en EPIC-045.
 - **2026-09-24 · TASK-1847 · release a producción.** Codex armó una rama acotada sobre `main` (PR #239) y la
   despachó; tras ~4 h el operador lo detuvo y Claude tomó la coordinación sólo para verificar y cerrar. Manifest
   `ebb9212a32ce-388b8af7-e133-4ea3-9441-2bbf00a157b7` `released`; 6 runtimes en el SHA, Vercel READY, watchdog `ok`;

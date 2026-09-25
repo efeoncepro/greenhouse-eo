@@ -2,6 +2,8 @@
 
 **Marketing Studio (25/09):** [TASK-1887](docs/tasks/complete/TASK-1887-marketing-studio-foundation.md) completa: en vivo en https://studio.efeonce.org, con acceso abierto de solo lectura y noindex. Siguientes hijas de [EPIC-049](docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md): login con auth.efeonce.org (task dedicada), métricas desde la API ecosystem de Greenhouse, escrituras gobernadas y worker. Runbook: [runtime handoff](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
 
+**Insights (25/09):** TASK-1847 cerrada (A4 y deck en producción con datos reales, Sky interno `EO-INS-000022`); rediseño premium → TASK-1888/1889.
+
 **ANAM Emma (24/09):** landing pública HubSpot `kortex-cms-react/30` verificada con el PNG entregado por María Paz,
 cargo `Ejecutivo comercial ANAM` y avatar derivado con fondo menta en identidad de Customer Agent y chatflow
 `96601133`. Canon técnico, funcional, manual y skill `hubspot-as-a-service` actualizados en

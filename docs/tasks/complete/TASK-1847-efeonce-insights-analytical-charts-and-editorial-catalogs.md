@@ -1,5 +1,16 @@
 # TASK-1847 — Efeonce Insights: gráficos y catálogos premium para deck e informe vertical
 
+## Delta 2026-09-25 — cierre: A4 y deck renderizados en producción con datos reales
+
+- Con autorización del operador, edición Sky Airlines interna `EO-INS-000022` (`insed-0729ee9e-2fd6-434f-bc5a-3c77736270ee`), run `irun-166f4ed0-f3b9-4d31-8837-26035ec46db5`: `deck_pdf` con `insights-deck` (5 láminas) y `report_pdf` con `insights-report` (8 páginas A4), ambos al primer intento. Dispatcher → Job sin intervención; deck 15:57Z, A4 15:59Z.
+- Cifras del PDF = BigQuery `ico_engine.metric_snapshots_monthly`: OTD 81,9 % (jul 80,1 %), RpA 1,33 (jul 1,44);
+  variaciones bien calculadas. Fuentes Geist/Poppins embebidas; A4 595,92 × 842,88 pt.
+- La edición queda **interna** y sin emitir (emisión y sharing OFF en producción): Sky no la ve ni recibe nada.
+- Observación editorial para `TASK-1888`: una variación de una métrica en porcentaje se imprime como porcentaje
+  relativo («+2,2 %»); lo claro es puntos porcentuales («+1,8 pp»). Los títulos del plan determinista repiten la
+  etiqueta del hecho: es lo que el rediseño resuelve.
+- La sección anterior («report_pdf en producción: pendiente») queda superada por este cierre.
+
 ## Delta 2026-09-25 — canary de render productivo y gate de cierre
 
 - **deck_pdf en producción:** edición interna sandbox `insed-afdbff0a…` → run `irun-cc329478-d7c7-4a1d-be8b-eb7b359e2851`
@@ -161,7 +172,7 @@ readback productivo permanecen pendientes.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -174,7 +185,7 @@ readback productivo permanecen pendientes.
 - Motion: `docs/ui/motion/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs-motion.md`
 - Backend impact: `command`
 - Epic: `EPIC-045`
-- Status real: `En producción desde 2026-09-24 (release ebb9212a32ce, run 36071525772, PR #239, main ebb9212a3): report_pdf en insights-report y deck_pdf en insights-deck. Verificado: 6 runtimes en el SHA, Vercel READY, watchdog ok y canary de contrato productivo (renderableOutputs deck_pdf+report_pdf). Verificado 2026-09-25: render real de deck_pdf en producción (run irun-cc329478-d7c7-4a1d-be8b-eb7b359e2851, catálogo insights-deck, primer intento, 3 láminas, fuentes embebidas, org sandbox), pnpm test completo verde (1821 archivos, 15303 tests) y pnpm build verde (HEAD 35f208553). Sin verificar: render real de report_pdf en producción; la org sandbox no tiene snapshots ICO y requiere una edición interna de un cliente real (decisión del operador). Staging: Berel v2 deck 13 + A4 15; Sky v2 deck 5 + A4 7. QA local de 30 páginas A4 y 10 frames Insights a 0 px (el gate global conserva el drift de ISSUE-122). develop recibe el código del release en e15d71648.`
+- Status real: `Complete 2026-09-25. En producción desde 2026-09-24 (release ebb9212a32ce, run 36071525772, PR #239, main ebb9212a3): report_pdf en insights-report y deck_pdf en insights-deck. Verificado: 6 runtimes en el SHA, Vercel READY, watchdog ok y canary de contrato productivo (renderableOutputs deck_pdf+report_pdf). Verificado 2026-09-25: render real de deck_pdf en producción (run irun-cc329478-d7c7-4a1d-be8b-eb7b359e2851, catálogo insights-deck, primer intento, 3 láminas, fuentes embebidas, org sandbox), pnpm test completo verde (1821 archivos, 15303 tests) y pnpm build verde (HEAD 35f208553). Render real de report_pdf verificado en producción el 2026-09-25 con una edición interna de Sky (EO-INS-000022, run irun-166f4ed0…): A4 8 páginas y deck 5 láminas al primer intento, cifras iguales a BigQuery. Staging: Berel v2 deck 13 + A4 15; Sky v2 deck 5 + A4 7. QA local de 30 páginas A4 y 10 frames Insights a 0 px (el gate global conserva el drift de ISSUE-122). develop recibe el código del release en e15d71648.`
 - Rank: `TBD`
 - Domain: `ui|platform`
 - Blocked by: `none`
@@ -575,7 +586,7 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - [x] TASK_ID_REGISTRY, README y EPIC-045 sincronizados; sin blockers obsoletos pendientes en dependientes — `task:lint` y `epic:lint` pasan (cero errores/avisos).
 - [x] Arquitectura técnica, documentación funcional y manual/runbook actualizados proporcionalmente — arquitectura §14.7 y manual de operación 1.7 registran canary staging, QA local y disponibilidad productiva actual.
 - [x] Handoff/changelog y contratos UI/API/MCP reflejan disponibilidad real — deck/A4 en staging y en producción desde el release `ebb9212a32ce` (2026-09-24), sin activar emisión.
-- [ ] Regresiones, señales, rollback y gates documentales pasan; no commit/push/deploy automático.
+- [x] Regresiones, señales, rollback y gates documentales pasan; no commit/push/deploy automático. — `pnpm test` completo (1821 archivos, 15 303 tests) y `pnpm build` verdes sobre `35f208553`; render productivo de deck y A4 verificado el 2026-09-25; `task:lint`, `epic:lint` y `docs:closure-check` verdes en el commit de cierre.
 - [x] Actualizar la skill viva `efeonce-insights` (`references/program-ledger.md`, `architecture-map.md`, `contracts.md`, `operations.md`, `lessons.md`) y espejar a `.codex/` con `pnpm skills:mirrors` verde — validado 2026-09-24.
 
 ## Follow-ups
