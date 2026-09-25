@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-046`
-- Status real: `Production sirve f69b9d326a6f (release 2026-09-10 03:16Z, manifest released, watchdog 5/5, canary 5/5) con CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED=true. Mapping comercial declarado (Berel seo_v2+ai_visibility_v1, Sky creative_hub_globe_v1), tres Berel provisionados con invitación diferida, chats Teams de ambas cuentas ready, preferencias client_service_default_v1 en las seis personas; preview Sky limpio (fingerprint e2e5d938…). Contrato delegated_oauth servido. Canal MCP delegado vivo y certificado punta a punta el 2026-09-10 ~07:40Z (Entra → gateway 1.4.0+80ea8d7 → exchange → lane App): apply de Sky ejecutado el 2026-09-10 ~07:40Z por el canal MCP delegado con el token Entra del operador (operación `EO-APC-ECD63852`, actor `user-efeonce-admin-julio-reyes`, authority `delegated_oauth`/`efeonce-mcp-client-services`, 0 altas, 1 conservada `cpma-ec0041f7…`, replay idempotente `replayed=true`). Pendiente humano: invitaciones Berel bloqueadas por el operador hasta tener interfaces; login/rutas con sesión propia de las seis personas; /creative-hub 404 → TASK-1857 (Creative Hub ES el módulo de Sky; TASK-1687 no supersede). Delta 2026-09-24: SKY adjudicó el Blog SEO/AEO (deal 62535094842); AEO de Sky subió a contracted (cpma-9525b6ce…) y nació seot-sky-blog-cl por `scripts/growth/provision-sky-blog-seo.ts`; seo_v2 espera servicio HubSpot → SVC-HS → términos [seo_v2, ai_visibility_v1] → preview/apply con autoridad humana`
+- Status real: `Production sirve f69b9d326a6f (release 2026-09-10 03:16Z, manifest released, watchdog 5/5, canary 5/5) con CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED=true. Mapping comercial declarado (Berel seo_v2+ai_visibility_v1, Sky creative_hub_globe_v1), tres Berel provisionados con invitación diferida, chats Teams de ambas cuentas ready, preferencias client_service_default_v1 en las seis personas; preview Sky limpio (fingerprint e2e5d938…). Contrato delegated_oauth servido. Canal MCP delegado vivo y certificado punta a punta el 2026-09-10 ~07:40Z (Entra → gateway 1.4.0+80ea8d7 → exchange → lane App): apply de Sky ejecutado el 2026-09-10 ~07:40Z por el canal MCP delegado con el token Entra del operador (operación `EO-APC-ECD63852`, actor `user-efeonce-admin-julio-reyes`, authority `delegated_oauth`/`efeonce-mcp-client-services`, 0 altas, 1 conservada `cpma-ec0041f7…`, replay idempotente `replayed=true`). Pendiente humano: invitaciones Berel bloqueadas por el operador hasta tener interfaces; login/rutas con sesión propia de las seis personas; /creative-hub 404 → TASK-1857 (Creative Hub ES el módulo de Sky; TASK-1687 no supersede). Delta 2026-09-24: SKY adjudicó el Blog SEO/AEO (deal 62535094842); AEO de Sky subió a contracted (cpma-9525b6ce…) y nació seot-sky-blog-cl por `scripts/growth/provision-sky-blog-seo.ts`; con autorización end-to-end del operador: SERVICE HubSpot 591725750952 → SVC-HS-591725750952, términos 7c38b899… [seo_v2, ai_visibility_v1], apply EO-APC-9676214B (enable seo_v2 cpma-6880e80f…, preserve AEO), seo_tier=contracted; chokepoints SEO 8/8 + AEO 20/20. Readiness pendiente: login/rutas de las tres personas y Search Console`
 - Rank: `1`
 - Domain: `platform|identity|delivery`
 - Blocked by: `none`
@@ -353,7 +353,27 @@ Las dueñas citadas conservan su scope y epic. No crear tareas por gráfico, cue
   5. Operativo (octubre, con Natalia Ortiz): conectar la propiedad de Search Console de skyairline.com (manual
      `conectar-search-console.md`; requiere que SKY comparta la propiedad con la cuenta del operador), sembrar keyword
      sets/competidores del blog y correr el primer AEO de portal.
-- **Rollback:** `assignAeoTier(trial)` restaura el tier; `UPDATE seo_targets SET status='paused'` retira el target
+- **Ejecutado end-to-end el mismo día (autorización explícita del operador: «Te autorizo para que avances end-to-end»):**
+  1. SERVICE HubSpot `591725750952` «Sky Airline - Blog SEO/AEO» creado por el conector (Onboarding, `efeonce_digital`/`seo_aeo`,
+     continua/mensual/regular, CL/CLP, TCV 72.000.000, fin 2028-10-31, `ef_deal_id=62535094842`, asociado a company y deal). El
+     webhook `p_services.creation` lo materializó como `SVC-HS-591725750952` en la organización y space de Sky (`synced`). El
+     preview lo bloqueó por `service_not_current` (start_date 2026-11-01 > hoy): se fijó `ef_start_date=2026-09-24` (inicio del
+     onboarding en Greenhouse; el contractual/facturación 2026-11-01 queda en la descripción y en los términos). El
+     propertyChange no llegó en 60 s; se re-upsertó con el mismo helper canónico del webhook (`upsertServiceFromHubSpot`,
+     `batchReadServices` directo; el bridge Cloud Run devuelve 404 para `/companies/{id}/services`, bug conocido).
+  2. Términos `7c38b899-ed46-46f0-9960-ed01299bacc8`: committed, effective 2026-09-24, CLP 3.000.000, `bundled_modules=[seo_v2,
+     ai_visibility_v1]` (`declareCommercialTerms`, audit + outbox).
+  3. Preview `canApply=true` (fingerprint `4ac57301…`): `enable seo_v2` + `preserve ai_visibility_v1`. Apply
+     `EO-APC-9676214B` (`applyServiceEnablement`, actor `user-agent-e2e-001`, clave `task1852-sky-blog-apply-1`): creó
+     `cpma-6880e80f-9b0c-4f26-ab42-971048872e63`, conservó `cpma-9525b6ce…`. Recibo en el command store; `authority` queda
+     `app_session` (default del primitive: no hubo bearer delegado; la autoridad real es esta autorización, registrada acá).
+  4. `seo_tier=contracted` fijado en el assignment nuevo. Chokepoints: SEO `hasModule=true contracted 8/8 audits USD 50`; AEO
+     `contracted 20/20`. Re-ejecución: preview sólo `preserve` → apply omitido (la misma clave con otro fingerprint da `409
+     idempotency_conflict`, comportamiento del contrato). Script: `scripts/client-portal/enable-sky-blog-seo-aeo.ts`.
+  5. Las tres personas Sky ganan `cliente.growth_seo_dashboard` y `cliente.growth_seo_report` (AEO ya lo tenían). Readiness que
+     sigue abierta y es humana: `human_login_unverified` (sin login observado), `authenticated_route_unverified`,
+     `producer_coverage_unverified` (Search Console del blog + keywords en la transición de octubre).
+- **Rollback:** `rollbackServiceEnablement(EO-APC-9676214B)` pausa el alta propia; `assignAeoTier(trial)` restaura el tier; `UPDATE seo_targets SET status='paused'` retira el target
   (no borrar si ya hay mediciones). Nada de esto envió mensajes ni tocó a las personas cliente.
 
 ## Open Questions

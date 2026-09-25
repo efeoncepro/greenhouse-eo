@@ -135,8 +135,12 @@ respecto del SQL manual de arriba:
   USD 2). Después del apply hay que fijar el tier: [`scripts/growth/provision-sky-blog-seo.ts`](../../../scripts/growth/provision-sky-blog-seo.ts)
   lo hace con el `UPDATE` canónico de este manual (idempotente; también sube el tier AEO con `assignAeoTier` y crea el
   `seo_target`). Es la plantilla para el próximo cliente: cambiar organización, dominio, mercado y razón.
-- **Orden real del caso:** AEO `trial → contracted` + target `seot-sky-blog-cl` (skyairline.com, CL/es) el 2026-09-24;
-  `seo_v2` pendiente de que el servicio del blog exista en HubSpot (`SVC-HS-<id>`), sus términos y el apply.
+- **Orden real del caso (todo el 2026-09-24):** AEO `trial → contracted` + target `seot-sky-blog-cl` (skyairline.com, CL/es) →
+  SERVICE del blog en HubSpot (`591725750952`, materializado por webhook como `SVC-HS-591725750952`; ojo: el preview exige
+  `start_date <= hoy`, un inicio contractual futuro bloquea con `service_not_current`) → términos con `bundledModules` →
+  preview limpio → apply `EO-APC-9676214B` (`seo_v2` = `cpma-6880e80f…`) → `seo_tier=contracted` con
+  [`scripts/client-portal/enable-sky-blog-seo-aeo.ts`](../../../scripts/client-portal/enable-sky-blog-seo-aeo.ts) (idempotente:
+  cuando todo es `preserve` omite el apply). Chokepoint final: `hasModule=true tier=contracted 8/8 audits`.
 
 ## Como revocar
 

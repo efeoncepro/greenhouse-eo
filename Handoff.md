@@ -2,7 +2,7 @@
 
 SKY: CDR-009.
 
-**SKY Blog SEO/AEO (24/09):** AEO `contracted` + `seot-sky-blog-cl` hechos; `seo_v2` espera SERVICE HubSpot → términos → apply humano ([delta TASK-1852](docs/tasks/in-progress/TASK-1852-berel-sky-service-access-and-channel-enablement.md#delta-2026-09-24--sky-blog-seoaeo-segundo-servicio-de-la-misma-organización)).
+**SKY Blog SEO/AEO (24/09):** HECHO end-to-end: `SVC-HS-591725750952`, términos `7c38b899…`, apply `EO-APC-9676214B`; SEO+AEO `contracted` ([delta TASK-1852](docs/tasks/in-progress/TASK-1852-berel-sky-service-access-and-channel-enablement.md#delta-2026-09-24--sky-blog-seoaeo-segundo-servicio-de-la-misma-organización)). Falta humano: login Sky, Search Console y keywords del blog (octubre).
 
 SKY V17: companions Motion/Audio.
 

@@ -91,7 +91,7 @@
     },
     {
       "label": "Sky Airlines",
-      "note": "Servicio confirmado; términos declarados el 2026-09-10 (kind committed, importes ausentes) con mapping creative_hub_globe_v1; ai_visibility_v1 existente se conserva sin atribución contractual. Preview limpio (canApply=true, sólo preserve). Apply ejecutado el 2026-09-10 ~07:40Z por el canal MCP delegado con la autoridad del operador (operación EO-APC-ECD63852, delegated_oauth, 0 altas, 1 conservada, replay idempotente). cliente.creative_hub sigue 404 en producción; por decisión del operador (2026-09-10) Creative Hub ES el módulo contratado, así que TASK-1687 no supersede el bundle y la página se construye en TASK-1857. Delta 2026-09-24: SKY adjudicó a Efeonce el Blog SEO/AEO (Wherex, deal HubSpot 62535094842, CLP 3.000.000 netos/mes × 24 meses, inicio 2026-11-01). Es un SEGUNDO servicio de la misma organización, distinto de Diseño digital. Hecho por primitives canónicos (scripts/growth/provision-sky-blog-seo.ts, idempotente): ai_visibility_v1 subió de trial a contracted (assignAeoTier, supersede cpma-44c05156… → cpma-9525b6ce…) y nació el seo_target seot-sky-blog-cl (skyairline.com, CL/es). seo_v2 NO se asigna a mano: requiere el servicio del blog en HubSpot (aún no existe como SERVICE 0-162) → sync a SVC-HS-<id> → términos bundled_modules=[seo_v2, ai_visibility_v1] → preview/apply gobernado con autoridad humana; después el mismo script fija seo_tier=contracted.",
+      "note": "Servicio confirmado; términos declarados el 2026-09-10 (kind committed, importes ausentes) con mapping creative_hub_globe_v1; ai_visibility_v1 existente se conserva sin atribución contractual. Preview limpio (canApply=true, sólo preserve). Apply ejecutado el 2026-09-10 ~07:40Z por el canal MCP delegado con la autoridad del operador (operación EO-APC-ECD63852, delegated_oauth, 0 altas, 1 conservada, replay idempotente). cliente.creative_hub sigue 404 en producción; por decisión del operador (2026-09-10) Creative Hub ES el módulo contratado, así que TASK-1687 no supersede el bundle y la página se construye en TASK-1857. Delta 2026-09-24: SKY adjudicó a Efeonce el Blog SEO/AEO (Wherex, deal HubSpot 62535094842, CLP 3.000.000 netos/mes × 24 meses, inicio 2026-11-01). Es un SEGUNDO servicio de la misma organización, distinto de Diseño digital. Hecho por primitives canónicos (scripts/growth/provision-sky-blog-seo.ts, idempotente): ai_visibility_v1 subió de trial a contracted (assignAeoTier, supersede cpma-44c05156… → cpma-9525b6ce…) y nació el seo_target seot-sky-blog-cl (skyairline.com, CL/es). Con autorización end-to-end del operador (mismo día): SERVICE HubSpot 591725750952 creado (webhook lo materializó como SVC-HS-591725750952; start_date 2026-09-24 = onboarding, contractual 2026-11-01), términos 7c38b899… bundled_modules=[seo_v2, ai_visibility_v1] CLP 3.000.000, preview limpio y apply EO-APC-9676214B (enable seo_v2 cpma-6880e80f…, preserve AEO), seo_tier=contracted. Readiness pendiente: login humano de las tres personas, rutas autenticadas y cobertura de productor (Search Console + keywords en la transición de octubre).",
       "request": {
         "organizationId": "org-b9977f96-f7ef-4afb-bb26-7355d78c981f",
         "targets": [
@@ -116,14 +116,14 @@
         },
         {
           "service": "Blog SEO/AEO (Visibility Core)",
-          "serviceId": null,
+          "serviceId": "SVC-HS-591725750952",
           "hubspotDealId": "62535094842",
-          "termsId": null,
+          "termsId": "7c38b899-ed46-46f0-9960-ed01299bacc8",
           "moduleKeys": [
             "seo_v2",
             "ai_visibility_v1"
           ],
-          "status": "hubspot_service_missing_terms_pending_apply_pending",
+          "status": "terms_declared_modules_mapped_assignments_active",
           "prepared": {
             "hubspotServiceProposal": ".captures/task-1852/private-scope/sky-blog-hubspot-service.json",
             "termsBody": ".captures/task-1852/private-scope/sky-blog-terms.json",
@@ -133,7 +133,25 @@
           "applied2026_09_24": {
             "aeoTier": "contracted (assignment cpma-9525b6ce-31b5-4569-b323-292a28542bb4; supersedió cpma-44c05156-db5d-4354-a04d-385887fdbdb1 trial)",
             "seoTarget": "seot-sky-blog-cl skyairline.com CL/es",
-            "seoAssignment": "ausente hasta el apply gobernado (chokepoint no_entitlement)"
+            "seoAssignment": "cpma-6880e80f-9b0c-4f26-ab42-971048872e63 (apply EO-APC-9676214B), seo_tier=contracted"
+          },
+          "hubspotServiceId": "591725750952",
+          "applyReceipt": {
+            "appliedAt": "2026-09-25T00:3xZ (2026-09-24 21:3x Chile)",
+            "operationId": "EO-APC-9676214B",
+            "channel": "primitive applyServiceEnablement desde scripts/client-portal/enable-sky-blog-seo-aeo.ts (autorización end-to-end del operador 2026-09-24; sin bearer delegado → authority app_session por default del primitive)",
+            "actor": "user-agent-e2e-001",
+            "fingerprint": "4ac573010562fb4b2308b0ee2e2b0b26291a5e2e659953368aeb8ac661cae5ff",
+            "idempotencyKey": "task1852-sky-blog-apply-1",
+            "created": [
+              "seo_v2:cpma-6880e80f-9b0c-4f26-ab42-971048872e63"
+            ],
+            "preserved": [
+              "cpma-9525b6ce-31b5-4569-b323-292a28542bb4"
+            ],
+            "seoTierSetAfterApply": "contracted (el apply no pasa metadata)",
+            "chokepoints": "SEO hasModule=true contracted 8/8 USD 50; AEO hasModule=true contracted 20/20",
+            "rerun": "preview sólo preserve → apply omitido; misma clave con otro fingerprint devuelve 409 idempotency_conflict por contrato"
           }
         }
       ],
