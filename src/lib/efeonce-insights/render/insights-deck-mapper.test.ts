@@ -33,7 +33,7 @@ const plan = (over: Partial<EditorialPlanV1> = {}): EditorialPlanV1 =>
 // Forma real de un capítulo SEO: comparación de períodos por métrica, una afirmación por métrica.
 const seo = (metrics: number) => {
   const facts = Array.from({ length: metrics }, (_, i) => [
-    { factId: `cur${i}`, value: (i + 1) * 1000, unit: 'count', evidenceRef: `c${i}` },
+    { factId: `cur${i}`, value: (i + 1) * 1000, unit: 'count', evidenceRef: `c${i}`, comparisonFactId: `prev${i}` },
     { factId: `prev${i}`, value: (i + 1) * 900, unit: 'count', evidenceRef: `p${i}` }
   ]).flat()
 

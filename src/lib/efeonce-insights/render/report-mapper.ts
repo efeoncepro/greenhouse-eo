@@ -44,13 +44,14 @@ import { parsePrintedNumber } from '@/lib/artifact-composer/pure'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
 import type { EditorialPlanV1, PlanChapterV1, PlanClaimV1 } from '../contracts/plan'
+import type { ChartSpecV1 } from '../contracts/chart-spec'
 import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { EvidenceSnapshotRecord, InsightEditionRecord, InsightReportRecord } from '../stores/records'
 import { InsightsRenderRejectedError } from '../errors'
 import { formatFactValue } from '../editorial/format'
 import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
 import { channelNameOf, channelsOf, coverPage } from './cover'
-import { buildFigureSlides, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, readingFor } from './figure-slots'
+import { buildFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, readingFor } from './figure-slots'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
 import { withDedupedLimits } from './plan-limits'
 
@@ -114,14 +115,14 @@ const escapeRich = (text: string): string => text.replace(/&/g, '&amp;').replace
  * principal con el formateador canónico, el título es la métrica y el detalle, la afirmación completa.
  * El folio se resuelve después, con el plan de páginas completo.
  */
-const essentialOf = (item: PlanClaimV1, factsById: ReadonlyMap<string, EvidenceFactV1>, locale: string): Record<string, string> => {
+const essentialOf = (item: PlanClaimV1, factsById: ReadonlyMap<string, EvidenceFactV1>, locale: string, charts: readonly ChartSpecV1[]): Record<string, string> => {
   const fact = item.factIds[0] ? factsById.get(item.factIds[0]) : undefined
 
   if (!fact || fact.value === null) throw new InsightsRenderRejectedError(`«Lo esencial» ${item.claimId}: su hecho principal no tiene valor medido.`)
 
   return {
     figure: rejectIfLonger(formatFactValue(fact.value, fact.unit, locale), 12, `${item.claimId}.figure`),
-    title: rejectIfLonger(fact.label, 60, `${item.claimId}.title`),
+    title: rejectIfLonger(essentialTitleOf(item, factsById, charts), 60, `${item.claimId}.title`),
     detail: escapeRich(rejectIfLonger(item.text, 170, `${item.claimId}.detail`)),
     folio: '—'
   }
@@ -324,7 +325,7 @@ export const buildInsightReportPlanInput = ({
           thesis: rejectIfLonger(headline!, 120, 'executiveSummary.thesis'),
           ...(lead ? { thesisLead: rejectIfLonger(lead, 320, 'executiveSummary.thesisLead') } : {}),
           essentialsLabel: L.essentials,
-          essentials: essentials.map(item => essentialOf(item, factsById, frozen.locale)),
+          essentials: essentials.map(item => essentialOf(item, factsById, frozen.locale, frozen.chapters.flatMap(chapter => chapter.charts))),
           ...(frozen.decision
             ? { decision: { label: L.decideInMeeting, text: rejectIfLonger(frozen.decision.text, 240, 'decision'), signature: L.signature } }
             : {})

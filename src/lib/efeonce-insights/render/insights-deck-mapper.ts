@@ -38,7 +38,7 @@ import { InsightsRenderRejectedError } from '../errors'
 import { formatFactValue } from '../editorial/format'
 import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
 import { channelNameOf, channelsOf, coverPage } from './cover'
-import { buildFigureSlides, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, readingFor } from './figure-slots'
+import { buildFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, readingFor } from './figure-slots'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
 import { withDedupedLimits } from './plan-limits'
 
@@ -210,7 +210,7 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
 
           return {
             figure: rejectIfLonger(formatFactValue(fact.value, fact.unit, frozen.locale), 12, `${item.claimId}.figure`),
-            title: rejectIfLonger(fact.label, 60, `${item.claimId}.title`),
+            title: rejectIfLonger(essentialTitleOf(item, factsById, frozen.chapters.flatMap(chapter => chapter.charts)), 60, `${item.claimId}.title`),
             folio: '—'
           }
         }),

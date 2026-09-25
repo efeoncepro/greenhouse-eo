@@ -211,9 +211,10 @@ export const buildFigureSlides = (
     const ordered = kind === 'targets' ? [...aboutTarget, ...citing.filter(claim => !aboutTarget.includes(claim))] : citing
     const conclusionClaim = reading?.conclusion ?? ordered[0]
     const conclusion = conclusionClaim?.text ?? chart.title
-    // La bajada no repite el HECHO de la conclusión con otras palabras (Berel clics, Sky FTR): sin otro hecho, no hay bajada.
-    const mainFact = conclusionClaim?.factIds[0]
-    const lead = ordered.find(claim => claim.text !== conclusion && (mainFact === undefined || claim.factIds[0] !== mainFact))?.text ?? null
+    // La bajada no repite un HECHO de la conclusión con otras palabras (Berel clics, Sky FTR): sin otro hecho, no hay bajada.
+    // Tampoco repite un miembro de la conclusión: en un empate («todos los motores…») la conclusión cita a todos.
+    const concluded = new Set(conclusionClaim?.factIds ?? [])
+    const lead = ordered.find(claim => claim.text !== conclusion && !(claim.factIds[0] !== undefined && concluded.has(claim.factIds[0])))?.text ?? null
 
     factIds.forEach(id => drawn.add(id))
 
@@ -417,3 +418,37 @@ export const hasFigurePage = (chart: ChartSpecV1, byId: ReadonlyMap<string, Evid
 /** La lectura del plan que corresponde a un gráfico (a lo más una por `chartId`). */
 export const readingFor = (readings: readonly PlanFigureReadingV1[] | undefined, chart: ChartSpecV1): PlanFigureReadingV1 | undefined =>
   readings?.find(reading => reading.chartId === chart.chartId)
+
+/**
+ * Título de una esencial en el resumen. Si la esencial cita UN solo hecho medido (sin contar el período anterior ni
+ * la meta), es el nombre de ese hecho. Si cita varios —un empate, «todos los motores mencionan la marca»—, no es de
+ * ninguno: el título es el de la figura que los dibuja juntos. Regla estructural sobre los hechos citados, nunca
+ * sobre el texto (caso real Berel: «Presencia en Gemini» titulaba un empate de cuatro motores).
+ */
+export const essentialTitleOf = (
+  item: PlanClaimV1,
+  byId: ReadonlyMap<string, EvidenceFactV1>,
+  charts: readonly ChartSpecV1[]
+): string => {
+  const cited = item.factIds.map(id => byId.get(id)).filter((fact): fact is EvidenceFactV1 => Boolean(fact))
+  const comparisons = new Set(cited.map(fact => fact.comparisonFactId).filter(Boolean))
+  // El período anterior no es otro miembro: se descarta por su enlace (`comparisonFactId`) o por su ventana.
+  const primary = cited.find(fact => fact.role !== 'reference' && !comparisons.has(fact.factId))
+  const windowKey = (fact: EvidenceFactV1) => JSON.stringify(fact.window ?? null)
+
+  const measured = cited.filter(
+    fact => fact.role !== 'reference' && !comparisons.has(fact.factId) && (!primary || windowKey(fact) === windowKey(primary))
+  )
+
+  if (measured.length <= 1) return (measured[0] ?? cited[0])?.label ?? item.text
+
+  const ids = new Set(measured.map(fact => fact.factId))
+
+  const figure = charts.find(chart => {
+    const drawn = [...chart.series.flatMap(serie => serie.factIds), ...(chart.data?.kind === 'bullet' ? chart.data.items.map(i => i.valueFactId) : [])]
+
+    return drawn.filter(id => ids.has(id)).length >= 2
+  })
+
+  return figure?.title ?? measured[0]!.label
+}

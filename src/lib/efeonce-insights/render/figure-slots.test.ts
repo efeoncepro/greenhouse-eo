@@ -119,3 +119,40 @@ describe('bajada', () => {
     expect(alone!.lead).toBeNull()
   })
 })
+
+describe('empates (caso Berel: cuatro motores con 2 de 6)', () => {
+  const engines = ['gemini', 'aio', 'chatgpt', 'perplexity']
+
+  const entries: Array<[string, Record<string, unknown>]> = [
+    ...engines.map((id): [string, Record<string, unknown>] => [id, { factId: id, value: 2, unit: 'count', label: `Presencia en ${id}`, metricId: 'presence', evidenceRef: 'e' }]),
+    ['clicks', { factId: 'clicks', value: 10, unit: 'count', label: 'Clics', metricId: 'clicks', evidenceRef: 'e', comparisonFactId: 'clicks-prev' }],
+    ['clicks-prev', { factId: 'clicks-prev', value: 12, unit: 'count', label: 'Clics', metricId: 'clicks', evidenceRef: 'e' }]
+  ]
+
+  const facts = new Map(entries) as never
+
+  const chart = {
+    specVersion: 'chart_spec_v1', chartId: 'chart.aeo.count', family: 'bar', relation: 'comparison', title: 'Presencia por motor', unit: 'count',
+    dimensionLabels: engines, dimensionChannelIds: ['gemini', 'google_ai_overview', 'chatgpt', 'perplexity'], references: [],
+    scale: { kind: 'linear', baseline: 0 }, tabularEquivalent: { columns: [], rows: [] },
+    series: [{ seriesId: 's', label: 'Período', factIds: engines, unit: 'count' }]
+  } as never
+
+  const tie = { claimId: 'chart.aeo.count.conclusion', text: 'Todos los motores mencionan la marca en 2 de 6.', factIds: engines }
+
+  it('el título de una esencial de empate es el de la figura, no el del primer motor', async () => {
+    const { essentialTitleOf } = await import('./figure-slots')
+
+    expect(essentialTitleOf(tie, facts, [chart])).toBe('Presencia por motor')
+    // Un solo hecho con su período anterior sigue titulándose con su métrica.
+    expect(essentialTitleOf({ claimId: 'k', text: 'Clics…', factIds: ['clicks', 'clicks-prev'] }, facts, [chart])).toBe('Clics')
+  })
+
+  it('la bajada no repite un miembro del empate', () => {
+    const member = { claimId: 'm', text: 'Presencia en Google AI Overview: 2 de 6.', factIds: ['aio'] }
+    const [slide] = buildFigureSlides(chart, facts, { chartId: 'chart.aeo.count', conclusion: tie, nextStep: null } as never, [member], 'es-CL', FIGURE_CAPACITY.report)
+
+    expect(slide!.conclusion).toBe(tie.text)
+    expect(slide!.lead).toBeNull()
+  })
+})

@@ -407,7 +407,7 @@ describe('buildInsightReportPlanInput', () => {
 
   it('«Lo esencial» (v2) va en la página de resumen, con el folio real de la figura que lo respalda', async () => {
     const facts = [
-      { factId: 'c1', value: 1284, unit: 'count', label: 'Clics', metricId: 'clicks', evidenceRef: 'e1' },
+      { factId: 'c1', value: 1284, unit: 'count', label: 'Clics', metricId: 'clicks', evidenceRef: 'e1', comparisonFactId: 'p1' },
       { factId: 'p1', value: 1102, unit: 'count', label: 'Clics', metricId: 'clicks', evidenceRef: 'e2' },
       { factId: 'c2', value: 48310, unit: 'count', label: 'Impresiones', metricId: 'impressions', evidenceRef: 'e3' },
       { factId: 'p2', value: 51940, unit: 'count', label: 'Impresiones', metricId: 'impressions', evidenceRef: 'e4' }
