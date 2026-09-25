@@ -102,6 +102,13 @@
     color: rgba(var(--axis-deck-role-navyMuted-rgb), 0.75);
   }
 
+  /* Logo del cliente en negativo (variante on_dark sellada por TASK-1888) o, sin él, su nombre. */
+  .prepared-mark { display: flex; align-items: center; min-height: 30px; }
+
+  .prepared-logo { max-width: 160px; max-height: 30px; display: block; object-fit: contain; }
+
+  .prepared-mark:has(.prepared-logo) .prepared-name { display: none; }
+
   .prepared-name { font-family: var(--axis-deck-type-display); font-size: 15px; font-weight: 600; }
 
   .cover-sign { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
@@ -148,7 +155,7 @@
       <footer class="cover-foot">
         <div class="prepared" data-slot="preparedFor">
           <span class="prepared-label" data-slot-field="label">Preparado para</span>
-          <span class="prepared-name" data-slot-field="clientName">Nombre del cliente</span>
+          <span class="prepared-mark"><img class="prepared-logo" data-slot-field="logo" src="assets/url-lum.svg" alt="" /><span class="prepared-name" data-slot-field="clientName">Nombre del cliente</span></span>
         </div>
         <div class="cover-sign">
           <span class="slogan" data-brand="slogan"><span class="slogan-empower">Empower</span> <span class="slogan-your">your</span> <span class="slogan-growth">Growth</span></span>

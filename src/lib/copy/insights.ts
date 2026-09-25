@@ -198,6 +198,9 @@ export const GH_INSIGHTS = {
     editionKind: 'Informe mensual',
     readingEyebrow: 'Lectura de Efeonce',
     preparedFor: 'Preparado para',
+    scopeLabel: 'Qué mide este informe',
+    /** Plan sin `scopeLines` (sólo pasa con una portada blanca sellada a mano): nunca se deja la zona vacía. */
+    scopeFallback: 'Lo que midió esta edición, con su evidencia sellada.',
     confidential: 'Confidencial',
     version: 'Versión',
     reportOf: 'Informe de',

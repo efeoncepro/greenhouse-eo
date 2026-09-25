@@ -58,6 +58,23 @@ export const weekSpanEffects = (value: string): FieldEffect[] | null => {
   ]
 }
 
+/** Referencia sellada al logo privado de la organización cliente: `asset-ref:org-logo:<assetId>`. */
+export const ORG_LOGO_REF = /^asset-ref:org-logo:[A-Za-z0-9_-]+$/
+
+/**
+ * Logo del cliente en la portada. Acepta sólo dos formas: un asset del PROPIO catálogo (`assets/…`,
+ * el probe del gate visual) o la referencia sellada al logo de la organización, cuyos bytes entrega
+ * quien compone (`ComposeOptions.externalAssets`). Sin logo, el `<img>` se quita y queda el nombre.
+ */
+export const clientLogoEffects = (value: string): FieldEffect[] | null => {
+  if (value === 'undefined' || value === 'null' || value.trim() === '') return [{ selector: ':field', remove: true }]
+
+  if (/^assets\/[\w./-]+$/.test(value) || ORG_LOGO_REF.test(value)) return [{ selector: ':field', attr: 'src', value }]
+
+  return null
+}
+
+
 export const insightsEditorialResolvers = (prefix: string): ResolverRegistry => ({
   /** `channelId` → isotipo del canal. Un canal desconocido se dibuja sin isotipo (no rompe). */
   [`${prefix}-channel-isotype`]: {
@@ -85,6 +102,10 @@ export const insightsEditorialResolvers = (prefix: string): ResolverRegistry => 
   [`${prefix}-week-span`]: {
     known: ['<N> o <N>-<M> con 1 ≤ N ≤ M ≤ 4'],
     build: value => weekSpanEffects(value)
+  },
+  [`${prefix}-client-logo`]: {
+    known: ['assets/<archivo del catálogo>', 'asset-ref:org-logo:<assetId>'],
+    build: value => clientLogoEffects(value)
   },
   /** Ícono de un bloque de cierre: `measure` (bombilla) o `action` (flecha). */
   [`${prefix}-closing-icon`]: {

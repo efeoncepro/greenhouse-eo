@@ -64,12 +64,17 @@
         },
         "clientName": {
           "type": "string",
-          "required": true,
+          "required": false,
           "maxCharacters": 48,
           "maxLines": 1
+        },
+        "logo": {
+          "type": "asset",
+          "required": false,
+          "resolver": "report-client-logo"
         }
       },
-      "notes": "Sin nombre de cliente, el bloque desaparece: nunca un nombre inventado. El logo del cliente llega con la portada sellada de TASK-1888 (Slice 3)."
+      "notes": "Logo del cliente en negativo (`asset-ref:org-logo:<id>`, variante on_dark sellada por TASK-1888) o su nombre. Sin ninguno, el bloque desaparece; nunca un nombre inventado."
     },
     "confidentialityLine": {
       "selector": "[data-slot='confidentialityLine']",

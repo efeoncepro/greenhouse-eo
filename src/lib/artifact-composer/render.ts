@@ -31,6 +31,7 @@ import type {
   SlotValue,
   TemplateContract
 } from './contracts'
+import { EXTERNAL_ASSET_PREFIX } from './contracts'
 import { assertAllImagesResolved, assertNoFontFallback, assertSlideHasInk } from './quality-gates'
 import { resolveFieldDirective, type FieldDirective, type ResolverRegistry } from './resolver-contract'
 
@@ -42,7 +43,13 @@ import { resolveFieldDirective, type FieldDirective, type ResolverRegistry } fro
 export interface CatalogRenderRuntime {
   resolvers: ResolverRegistry
   layoutHooks?: Record<string, CatalogLayoutHook>
+  /**
+   * Assets externos al catálogo (`asset-ref:<clave>` → data URI), entregados por quien compone ya
+   * autorizados (TASK-1889: logo privado del cliente). Ver `ComposeOptions.externalAssets`.
+   */
+  externalAssets?: Readonly<Record<string, string>>
 }
+
 
 /**
  * Launch canónico del Chromium del composer — DETERMINISTA por contrato.
@@ -777,6 +784,36 @@ export const fillSlide = async (
   if (problems.length > 0) {
     throw new SlotFillError(slide.slideId, problems)
   }
+
+  // Assets externos: una imagen que quedó apuntando a `asset-ref:<clave>` toma los bytes que entregó
+  // quien compone. Sin entrada en el mapa, NO se dibuja: se aborta (fail-closed). El plan sella la
+  // referencia; los bytes nunca viajan en el manifest.
+  const unresolvedRefs = await page.evaluate(
+    ({ prefix, assets }) => {
+      const missing: string[] = []
+
+      document.querySelectorAll(`img[src^="${prefix}"]`).forEach(node => {
+        const img = node as HTMLImageElement
+        const ref = img.getAttribute('src')!.slice(prefix.length)
+        const dataUri = assets[ref]
+
+        if (dataUri) img.setAttribute('src', dataUri)
+        else missing.push(ref)
+      })
+
+      return missing
+    },
+    { prefix: EXTERNAL_ASSET_PREFIX, assets: runtime.externalAssets ?? {} }
+  )
+
+  if (unresolvedRefs.length > 0) {
+    throw new SlotFillError(
+      slide.slideId,
+      unresolvedRefs.map(ref => `asset externo sin bytes autorizados: "${ref}" (falta en externalAssets)`)
+    )
+  }
+
+  await page.evaluate(() => Promise.all([...document.images].map(img => img.decode().catch(() => undefined))))
 
   // Layout derivado post-fill del catálogo (los conectores de TimelineFull no pueden ser un slot
   // autorado: labels, rombos y conectores deben salir del MISMO schedule o podrían discrepar).

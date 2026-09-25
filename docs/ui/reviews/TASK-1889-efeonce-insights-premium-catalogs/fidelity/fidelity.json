@@ -82,6 +82,22 @@
       "pass": true
     },
     {
+      "reference": "Premium-Portada-Clara",
+      "template": "ReportCoverLightPage",
+      "changed": 463,
+      "total": 891662,
+      "ratio": 0.0005192550540451426,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Portada-Clara-Creativo",
+      "template": "ReportCoverLightPage",
+      "changed": 1655,
+      "total": 891662,
+      "ratio": 0.0018560844804421405,
+      "pass": true
+    },
+    {
       "reference": "Premium-Resumen",
       "template": "ReportSummaryPage",
       "changed": 262,

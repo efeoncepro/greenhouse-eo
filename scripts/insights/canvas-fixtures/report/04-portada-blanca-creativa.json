@@ -1,0 +1,19 @@
+{
+  "reference": "Premium-Portada-Clara-Creativo",
+  "catalog": "report",
+  "contentType": "report-cover-light",
+  "slots": {
+    "editionLabel": "Informe mensual · Agosto 2026",
+    "scopeLabel": "Qué mide este informe",
+    "eyebrow": "Lectura de Efeonce",
+    "confidentialityLine": "Confidencial · Versión 1 · 2 de septiembre de 2026",
+    "scopeLines": [
+      "Entrega creativa: plazos, rondas de revisión y aprobación a la primera"
+    ],
+    "reportTitle": "Producción y entrega creativa",
+    "reportSubtitle": "Qué se entregó en agosto, cómo avanzó cada pieza y qué ajustaremos en septiembre."
+  },
+  "knownDifferences": [
+    "«Preparado para» + recuadro punteado «Logo del cliente»: marcador del canvas."
+  ]
+}

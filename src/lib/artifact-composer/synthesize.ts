@@ -69,6 +69,10 @@ export const synthesizeSlotValue = (slot: SlotContract): unknown => {
     // cada catálogo no prueba que el motor sea reutilizable: prueba que el primero sigue igual.
     if (field.type === 'number') return '1'
 
+    // Un campo `asset` de un objeto recibe el mismo asset del catálogo que un slot `asset` (la burbuja
+    // de URL): el probe no puede darle texto de relleno a un `src` (TASK-1889, logo del cliente).
+    if (field.type === 'asset' || field.type === 'asset-ref') return 'assets/url-lum.svg'
+
     // Un resolver de geometría deriva de los campos VECINOS del item (`beforeValue`/`afterValue`, el
     // eje del timeline). Si el probe les diera texto, el resolver no podría calcular y abortaría —
     // correctamente: una barra sin dato es una barra que miente. El probe tiene que darle números.

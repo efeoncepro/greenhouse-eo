@@ -37,6 +37,7 @@ import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { EvidenceSnapshotRecord, InsightEditionRecord, InsightReportRecord } from '../stores/records'
 import { InsightsRenderRejectedError } from '../errors'
 import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
+import { channelNameOf, channelsOf, coverPage } from './cover'
 import { buildFigurePages, claimsForFigure } from './figure-pages'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
 import { withDedupedLimits } from './plan-limits'
@@ -160,15 +161,17 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
   }
 
   const slides: Slide[] = [
-    {
-      contentType: 'insights-cover',
-      slots: {
+    coverPage(
+      frozen,
+      {
         editionLabel: `${L.editionKind} · ${period}`,
         eyebrow: L.readingEyebrow,
         reportTitle: rejectIfLonger(report.title, BUDGET.reportTitle, 'cover.reportTitle'),
         confidentialityLine: `${L.confidential} · ${L.version} ${edition.version} · ${issuedLongLabelOf(edition, GH_INSIGHTS.document.unissued, frozen.locale)}`
-      }
-    }
+      },
+      // El deck se proyecta: su portada es siempre navy; el logo sólo si hay variante para fondo oscuro.
+      { contentTypes: { dark: 'insights-cover', light: null } }
+    )
   ]
 
   slides.push(
@@ -203,6 +206,14 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
         chapterTitle: rejectIfLonger(chapter.title, BUDGET.chapterTitle, `${chapter.chapterId}.title`),
         ...(chapter.opening
           ? { chapterLead: rejectIfLonger(chapter.opening.text, BUDGET.chapterLead, `${chapter.chapterId}.opening`) }
+          : {}),
+        ...(channelsOf([chapter]).length > 0
+          ? {
+              measuredChannels: {
+                label: L.measuredIn,
+                channels: channelsOf([chapter]).map(channelId => ({ channelId, name: channelNameOf(channelId) }))
+              }
+            }
           : {})
       }
     })

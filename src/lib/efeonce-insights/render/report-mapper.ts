@@ -34,7 +34,7 @@ import 'server-only'
 // Los valores del composer que necesita el render (`paginateFlow`) entran por la entrada liviana
 // `@/lib/artifact-composer/pure`, vía `composition-helpers.ts` y `figure-pages.ts`. La regla eslint
 // `greenhouse/no-worker-only-module-in-vercel-code` rechaza un valor del barrel en este archivo.
-import type { CompositionPlanInput, CompositionSlideInput } from '@/lib/artifact-composer'
+import type { CompositionPlanInput, CompositionSlideInput, SlotValues } from '@/lib/artifact-composer'
 import {
   EFEONCE_CONTACT,
   EFEONCE_LEGAL_NAME_FALLBACK,
@@ -49,6 +49,7 @@ import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { EvidenceSnapshotRecord, InsightEditionRecord, InsightReportRecord } from '../stores/records'
 import { InsightsRenderRejectedError } from '../errors'
 import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
+import { channelNameOf, channelsOf, coverPage } from './cover'
 import { buildFigurePages, claimsForFigure, figureLegendOf } from './figure-pages'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
 import { withDedupedLimits } from './plan-limits'
@@ -107,6 +108,15 @@ interface BodyPage {
 }
 
 const pad2 = (n: number): string => String(n).padStart(2, '0')
+
+/** «Medimos la marca en»: los canales que miden los gráficos del capítulo (`channelId`, TASK-1888). */
+const measuredChannelsOf = (chapter: PlanChapterV1): SlotValues => {
+  const channels = channelsOf([chapter])
+
+  return channels.length > 0
+    ? { measuredChannels: { label: GH_INSIGHTS.catalog.measuredIn, channels: channels.map(channelId => ({ channelId, name: channelNameOf(channelId) })) } }
+    : {}
+}
 
 /** Páginas en papel: llevan cabecera corrida, pie institucional y folio «NN / total». */
 const PAPER_TYPES = new Set(['report-index', 'report-narrative', 'report-table', 'report-limits'])
@@ -250,15 +260,16 @@ export const buildInsightReportPlanInput = ({
     footerContact: { address: EFEONCE_CONTACT.addressDisplay, phone: EFEONCE_CONTACT.phones[0].display }
   }
 
-  const cover: Page = {
-    contentType: 'report-cover',
-    slots: {
+  const cover: Page = coverPage(
+    frozen,
+    {
       editionLabel: `${L.editionKind} · ${periodLabel}`,
       eyebrow: L.readingEyebrow,
       reportTitle: rejectIfLonger(report.title, BUDGET.reportTitle, 'report.title'),
       confidentialityLine: `${L.confidential} · ${L.version} ${edition.version} · ${issuedLongLabelOf(edition, GH_INSIGHTS.document.unissued, frozen.locale)}`
-    }
-  }
+    },
+    { contentTypes: { dark: 'report-cover', light: 'report-cover-light' } }
+  )
 
   // Secciones del cuerpo, en orden. Cada una sabe su marca de índice y sus páginas.
   const sections: { mark: string; title: string; pages: BodyPage[] }[] = []
@@ -317,7 +328,8 @@ export const buildInsightReportPlanInput = ({
           chapterTitle: rejectIfLonger(chapter.title, BUDGET.chapterTitle, `${chapter.chapterId}.title`),
           ...(chapter.opening
             ? { chapterLead: rejectIfLonger(chapter.opening.text, BUDGET.chapterLead, `${chapter.chapterId}.opening`) }
-            : {})
+            : {}),
+          ...measuredChannelsOf(chapter)
         }
       }
     }

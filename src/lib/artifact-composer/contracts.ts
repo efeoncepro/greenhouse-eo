@@ -156,3 +156,9 @@ export interface SlotViolation {
     | 'missing_required_field'
   message: string
 }
+
+/**
+ * Prefijo de una referencia a un asset EXTERNO al catálogo (`asset-ref:<clave>`, TASK-1889). El plan
+ * sella la referencia; los bytes los entrega quien compone en `ComposeOptions.externalAssets`.
+ */
+export const EXTERNAL_ASSET_PREFIX = 'asset-ref:'

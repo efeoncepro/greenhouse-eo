@@ -20,7 +20,8 @@
     "report-reading",
     "report-plan",
     "report-limits",
-    "report-back-cover"
+    "report-back-cover",
+    "report-cover-light"
   ],
   "templates": [
     {
@@ -166,6 +167,19 @@
       ],
       "prototype": "report-back-cover.html",
       "slotsRef": "report-back-cover.slots.json"
+    },
+    {
+      "name": "ReportCoverLightPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-cover-light"
+      ],
+      "prototype": "report-cover-light.html",
+      "slotsRef": "report-cover-light.slots.json"
     }
   ],
   "selector": {
@@ -181,7 +195,8 @@
       "report-reading": "ReportReadingPage",
       "report-plan": "ReportPlanPage",
       "report-limits": "ReportLimitsPage",
-      "report-back-cover": "ReportBackCoverPage"
+      "report-back-cover": "ReportBackCoverPage",
+      "report-cover-light": "ReportCoverLightPage"
     },
     "disambiguation": [
       "el índice real deriva de la primera página de cada sección del plan físico; nunca se calcula desde el título ni se pagina después del render.",

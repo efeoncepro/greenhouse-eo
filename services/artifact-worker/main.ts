@@ -73,11 +73,15 @@ const renderJob = async (consumer: RenderConsumer, job: RenderJobView): Promise<
   try {
     // composeArtifact re-resuelve el manifest contra la copia LOCAL del catálogo (selector,
     // hashes de template/contrato/brand pack/fuentes, validadores) y lo emite junto al PDF.
+    const externalAssets = consumer.resolveExternalAssets
+      ? await consumer.resolveExternalAssets(job, manifest.input as Record<string, unknown>)
+      : undefined
+
     const result = await composeArtifact(
       catalog,
       { tenderId: input.artifactId, slides: input.slides as never },
       outDir,
-      { maxPdfMb: (job.constraints?.maxPdfMb as number | undefined) ?? 20 }
+      { maxPdfMb: (job.constraints?.maxPdfMb as number | undefined) ?? 20, externalAssets }
     )
 
     // DRIFT CHECK: el manifest re-resuelto DEBE ser byte a byte el encolado. Si una plantilla,

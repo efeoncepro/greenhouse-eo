@@ -59,3 +59,25 @@ describe('clasificación de fallos del artifact-worker', () => {
     expect(INSIGHT_NON_RETRYABLE_FAILURES.has('render_error')).toBe(false)
   })
 })
+
+describe('referencias al logo de la organización en el input sellado', () => {
+  it('se recolectan sin repetir, a cualquier profundidad', async () => {
+    const { collectOrgLogoRefs } = await import('./consumers/insights')
+
+    const refs = collectOrgLogoRefs({
+      slides: [
+        { slots: { preparedFor: { logo: 'asset-ref:org-logo:a1' } } },
+        { slots: { preparedFor: { logo: 'asset-ref:org-logo:a1' }, other: ['asset-ref:org-logo:b2', 'assets/url-lum.svg'] } }
+      ]
+    })
+
+    expect([...refs]).toEqual([
+      ['org-logo:a1', 'a1'],
+      ['org-logo:b2', 'b2']
+    ])
+  })
+
+  it('un logo ajeno o no incrustable se rechaza sin reintento', () => {
+    expect(classifyFailure(new Error('organization_logo_not_renderable')).code).toBe('semantic_rejected')
+  })
+})

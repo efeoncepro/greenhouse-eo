@@ -42,5 +42,10 @@ export const classifyFailure = (error: unknown): { code: string; detail: string 
     return { code: 'semantic_rejected', detail: error.message }
   }
 
+  // Un logo que no pertenece a la organización (o no es una imagen incrustable) no cambia al reintentar.
+  if (error instanceof Error && error.message === 'organization_logo_not_renderable') {
+    return { code: 'semantic_rejected', detail: 'El logo sellado en la portada no es un logo incrustable de la organización.' }
+  }
+
   return { code: 'render_error', detail: error instanceof Error ? error.message : String(error) }
 }

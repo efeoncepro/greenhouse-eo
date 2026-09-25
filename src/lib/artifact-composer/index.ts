@@ -46,6 +46,7 @@ export {
 
 // El pipeline (valida TODO antes de renderizar NADA + emite según el outputTarget del catálogo)
 export { composeArtifact, TemplateAuthorityError, type ComposeOptions, type ComposeResult } from './compose'
+export { EXTERNAL_ASSET_PREFIX } from './contracts'
 
 // Contratos de plantilla/plan (browser-safe)
 export type {

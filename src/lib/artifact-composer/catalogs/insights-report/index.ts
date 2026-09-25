@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url'
 
 import type { ArtifactCatalog } from '../../catalog'
 import { axisPackDir } from '../../brand-packs/axis'
-import { chapterNumeralHook } from '../insights-shared/layout-hooks'
+import { chapterNumeralHook, coverSatellitesHook } from '../insights-shared/layout-hooks'
 import { insightsReportResolvers } from './resolvers'
 
 export const insightsReportCatalogDir = path.dirname(fileURLToPath(import.meta.url))
@@ -35,7 +35,7 @@ export const insightsReportCatalog: ArtifactCatalog = {
   templatesDir: insightsReportCatalogDir,
   outputTarget: 'pdf-merged',
   resolvers: insightsReportResolvers,
-  layoutHooks: { ReportChapterPage: chapterNumeralHook },
+  layoutHooks: { ReportChapterPage: chapterNumeralHook, ReportCoverLightPage: coverSatellitesHook },
   brand: {
     packName: 'axis',
     compiledFiles: ['report-tokens.css', 'report-fonts.css'],

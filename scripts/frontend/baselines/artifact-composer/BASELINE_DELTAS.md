@@ -1,5 +1,16 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-25 (g) — TASK-1889 Slice 3: portada blanca y logo del cliente
+
+Nace la portada blanca (`Premium-Portada-Clara` / `-Creativo`: satélites por canal o arco corto, según el
+dato). Las portadas navy ganan el logo del cliente (variante `on_dark`), que el plan sella como
+`asset-ref:org-logo:<id>` y el worker entrega autorizado (`ComposeOptions.externalAssets`). El probe dibuja
+el asset del catálogo en ese campo (regla nueva del sintetizador para campos `asset`).
+
+- `templates-insights-report/ReportCoverLightPage.png` — nueva
+- `templates-insights-report/ReportCoverPage.png` — «Preparado para» con logo
+- `templates-insights-deck/InsightsCoverSlide.png` — «Preparado para» con logo
+
 ## 2026-09-25 (f) — TASK-1889: narrada y límites con la misma crítica
 
 La narrada sigue la anatomía de «Nuestra lectura»: se retira el número en contorno decorativo y el filete
@@ -481,7 +492,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 17d7db258ca983f666fd5b90ab40e4b5dd887d5fd336d5c67e6344dabcc450c5 -->
+<!-- manifest-digest: ddf74e508e9a75932e6d4fcca3131e4c252b8afd995f94def26c3caef4e7e6ab -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

@@ -1,0 +1,36 @@
+{
+  "reference": "Premium-Portada-Clara",
+  "catalog": "report",
+  "contentType": "report-cover-light",
+  "slots": {
+    "editionLabel": "Informe mensual · Agosto 2026",
+    "scopeLabel": "Qué mide este informe",
+    "eyebrow": "Lectura de Efeonce",
+    "confidentialityLine": "Confidencial · Versión 1 · 2 de septiembre de 2026",
+    "scopeLines": [
+      "Visibilidad en Google, ChatGPT, Gemini, Claude y Perplexity"
+    ],
+    "channels": [
+      {
+        "channelId": "google"
+      },
+      {
+        "channelId": "chatgpt"
+      },
+      {
+        "channelId": "gemini"
+      },
+      {
+        "channelId": "claude"
+      },
+      {
+        "channelId": "perplexity"
+      }
+    ],
+    "reportTitle": "Visibilidad, respuestas de IA y entrega",
+    "reportSubtitle": "Qué cambió en agosto, por qué cambió y qué haremos en septiembre."
+  },
+  "knownDifferences": [
+    "«Preparado para» + recuadro punteado «Logo del cliente» (y 1040–1100): marcador del canvas; el informe real dibuja el logo o el nombre del cliente."
+  ]
+}

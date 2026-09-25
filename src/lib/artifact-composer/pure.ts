@@ -39,6 +39,9 @@ export * from './bar-figure'
 // Hash canónico del manifest (sólo `node:crypto`): el command lo sella al encolar y el worker lo compara
 export * from './manifest-hash'
 
+// Prefijo de referencia a un asset externo al catálogo (TASK-1889): el mapper lo usa para sellarla.
+export { EXTERNAL_ASSET_PREFIX } from './contracts'
+
 // Contratos de plantilla/plan — sólo tipos
 export type {
   ContentType,

@@ -38,3 +38,39 @@ export const makeChapterNumeralHook = (baseX: number): CatalogLayoutHook => asyn
 }
 
 export const chapterNumeralHook = makeChapterNumeralHook(850)
+
+/**
+ * Satélites de canal de la portada blanca (TASK-1889): uno por canal medido, repartidos sobre el anillo
+ * exterior (centro 572,404; radio 258) entre 165° y 305°, como en el canvas aprobado (cinco canales =
+ * 35° de paso). Un canal sin isotipo conocido no se dibuja en la portada (queda sin disco).
+ */
+export const satelliteCenters = (count: number, cx = 572, cy = 404, radius = 258): Array<{ x: number; y: number }> => {
+  if (count <= 0) return []
+
+  const angles = count === 1 ? [270] : Array.from({ length: count }, (_, i) => 165 + (140 * i) / (count - 1))
+
+  return angles.map(deg => ({
+    x: Math.round((cx + radius * Math.cos((deg * Math.PI) / 180)) * 10) / 10,
+    y: Math.round((cy + radius * Math.sin((deg * Math.PI) / 180)) * 10) / 10
+  }))
+}
+
+export const coverSatellitesHook: CatalogLayoutHook = async page => {
+  const count = await page.evaluate(() => {
+    document.querySelectorAll('.satellite').forEach(node => {
+      if (!node.querySelector('.channel-disc')) node.remove()
+    })
+
+    return document.querySelectorAll('.satellite').length
+  })
+
+  await page.evaluate(
+    centers => {
+      document.querySelectorAll<HTMLElement>('.satellite').forEach((node, i) => {
+        node.style.left = `${centers[i]!.x - 15}px`
+        node.style.top = `${centers[i]!.y - 15}px`
+      })
+    },
+    satelliteCenters(count)
+  )
+}
