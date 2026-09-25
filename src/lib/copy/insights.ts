@@ -179,6 +179,9 @@ export const GH_INSIGHTS = {
    * TASK-1888 — nombre común de un grupo de hechos empatados (bajada de la cifra principal cuando la conclusión es un
    * empate), por familia de métrica. Sin cifras: la bajada es una afirmación validada y «(0 a 100)» serían números.
    */
+  /** TASK-1888 — sufijo del título de la tabla de respaldo v2: «Visibilidad orgánica: todas las cifras». */
+  tableAllFigures: 'todas las cifras',
+
   tieSubjects: {
     presence: 'Presencia por motor',
     dimension: 'Dimensiones evaluadas'

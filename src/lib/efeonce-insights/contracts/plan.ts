@@ -106,7 +106,9 @@ export const PLAN_TEXT_LIMITS = {
   summaryThesis: 120,
   summaryLead: 200,
   decision: 140,
-  essential: 170
+  essential: 170,
+  /** Título de la tabla de respaldo (presupuesto del informe A4; el deck no dibuja tablas). */
+  tableTitle: 80
 } as const
 
 /** @deprecated alias de `PLAN_TEXT_LIMITS.conclusion` (acuerdo con TASK-1889). */

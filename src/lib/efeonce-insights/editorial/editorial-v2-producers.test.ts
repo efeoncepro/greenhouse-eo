@@ -377,3 +377,18 @@ describe('TASK-1888 — superlativos únicos, esenciales sólo de hallazgos y af
     expect(plan.essentials!.flatMap(item => item.factIds)).not.toContain('seo.keywords_tracked')
   })
 })
+
+describe('TASK-1888 — tabla de respaldo y hallazgo principal primero (Sky 2026-09-25)', () => {
+  it('la primera lectura es la meta sin cumplir y la tabla se titula «…: todas las cifras»', () => {
+    const plan = v2(icoSnapshot, ['ico'])
+    const chapter = plan.chapters[0]!
+    const first = chapter.readings![0]!
+    const missed = chapter.charts.filter(chart => chart.family === 'bullet').find(chart => chapter.readings!.find(reading => reading.chartId === chart.chartId)?.conclusion?.text.match(/no alcanza/i))
+
+    expect(missed).toBeDefined()
+    expect(first.chartId).toBe(missed!.chartId)
+    expect(chapter.tables[0]!.title).toBe('Entrega y cumplimiento: todas las cifras')
+    // El orden de las figuras (y de sus páginas) no cambia.
+    expect(chapter.charts.map(chart => chart.chartId)).toEqual(v2(icoSnapshot, ['ico']).chapters[0]!.charts.map(chart => chart.chartId))
+  })
+})

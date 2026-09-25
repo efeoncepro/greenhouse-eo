@@ -191,7 +191,8 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       title: MODULE_TITLES[moduleKey],
       claims,
       charts,
-      tables: facts.length > 0 ? [tableFor(`table.${moduleKey}`, `${MODULE_TITLES[moduleKey]} · resumen`, facts, byId, input.locale)] : [],
+      // v2: la tabla es el respaldo de TODO el capítulo, no un resumen (revisión del operador, 2026-09-25).
+      tables: facts.length > 0 ? [tableFor(`table.${moduleKey}`, editorialV2 ? `${MODULE_TITLES[moduleKey]}: ${GH_INSIGHTS.tableAllFigures}` : `${MODULE_TITLES[moduleKey]} · resumen`, facts, byId, input.locale)] : [],
       limits: unique(rejections.map(limitFor)),
       ...(editorialV2 ? { opening: openingFor(moduleKey), readings: readingsFor(charts, byId, input.locale) } : {})
     })

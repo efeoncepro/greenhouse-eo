@@ -128,6 +128,8 @@ export const validateEditorialPlan = (plan: EditorialPlanV1, snapshot: EvidenceS
       }
     }
 
+    for (const table of chapter.tables) fits(`${chapter.chapterId}.${table.tableId}`, table.title, PLAN_TEXT_LIMITS.tableTitle, 'title')
+
     // TASK-1888 — entrada de capítulo y lectura por figura: mismas reglas de cifras que cualquier claim.
     if (chapter.opening) checkClaim(`${chapter.chapterId}.opening`, chapter.opening)
 

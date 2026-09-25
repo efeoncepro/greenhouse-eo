@@ -475,11 +475,19 @@ const barReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, local
 export const readingsFor = (charts: ChartSpecV1[], byId: Map<string, EvidenceFactV1>, locale: string): PlanFigureReadingV1[] => {
   const context = contextOf(charts, byId)
 
-  return charts.filter(chart => hasFigurePage(chart, byId, locale)).flatMap(chart => {
+  const readings = charts.filter(chart => hasFigurePage(chart, byId, locale)).flatMap(chart => {
     const reading = chart.family === 'bullet' ? bulletReading(chart, byId, locale, context) : chart.family === 'line' ? lineReading(chart, byId, locale, context) : barReading(chart, byId, locale, context)
 
-    return reading ? [reading] : []
+    return reading ? [{ chart, reading }] : []
   })
+
+  // La PRIMERA lectura es el hallazgo principal del capítulo (1889 la usa como cifra de la tabla): meta sin cumplir →
+  // mayor cambio único → resto, la misma prioridad de la tesis. Sólo ordena el arreglo: las páginas de figura siguen el
+  // orden de `charts` (el render busca la lectura por `chartId`).
+  const rank = ({ chart, reading }: (typeof readings)[number]) =>
+    (bulletStatus(chart, byId)?.missing.length ?? 0) > 0 ? 0 : reading.conclusion?.text.startsWith(R.largestChange) ? 1 : 2
+
+  return readings.map((entry, index) => ({ entry, index })).sort((a, b) => rank(a.entry) - rank(b.entry) || a.index - b.index).map(({ entry }) => entry.reading)
 }
 
 // ─── Plan ────────────────────────────────────────────────────────────────────────────────────────
