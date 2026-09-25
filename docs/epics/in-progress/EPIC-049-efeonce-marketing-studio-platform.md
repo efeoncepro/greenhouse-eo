@@ -49,11 +49,12 @@ identidad (Efeonce ID), UI e integraciones (Metricool, plataformas de pauta, Glo
 ## Child Tasks
 
 - `TASK-1887` — Fundación: repo, bases y roles, modelo de dominio, API v1, import del catálogo, renditions privadas, UI aprobada (claro/oscuro), Vercel + dominio (modo `open`). Completa: en vivo en `https://studio.efeonce.org`.
-- _Por crear_ — **Login con Efeonce ID** (`auth.efeonce.org`) y cambio de `STUDIO_ACCESS_MODE` a `efeonce_id`. Task dedicada por decisión del operador (2026-09-25); hasta entonces Studio queda abierto y de solo lectura.
+- _Por crear, al final del programa por decisión del operador (2026-09-25)_ — **Login con Efeonce ID** (`auth.efeonce.org`) y cambio de `STUDIO_ACCESS_MODE` a `efeonce_id`. Task dedicada por decisión del operador (2026-09-25); hasta entonces Studio queda abierto y de solo lectura.
 - _Por crear_ — **Métricas de marketing desde Greenhouse.** Greenhouse ya tiene Search Console (`src/lib/growth/search-console`), GA4 (`src/lib/growth/analytics-ga4`, `src/lib/growth/ga4`) y el módulo SEO / Search Visibility 360, expuestos por organización en `/api/platform/ecosystem/growth/*` (p. ej. `seo/performance`, `seo/overview-kpis`). Studio los consume como sister platform con token de consumidor y la organización de la campaña, **nunca por SQL**. Arquitectura base: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`, `GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`, `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`. Métricas de pauta (Meta/LinkedIn) y de social orgánico (Metricool) quedan en adapters propios de Studio.
 - _Por crear_ — Commands de escritura (campaña, asset/versión, copy, revisión/aprobación) con idempotencia, `If-Match` y auditoría; corte de autoridad desde OneDrive.
 - _Por crear_ — Worker Cloud Run: renditions automáticas, readback de Metricool, publicación programada.
-- _Por crear_ — Adapter Efeonce MCP sobre `/api/v1` (lectura primero).
+- `TASK-1890` — Studio listo para agentes: manifiesto de tools con paridad, semántica, bearer de servicio, organización canónica, capability y manual servido.
+- `TASK-1891` — Federación en Efeonce MCP de todas las tools del manifiesto (bloqueada por TASK-1890). Regla desde aquí: toda capacidad nueva de Studio nace con su tool en el manifiesto o una exclusión con razón.
 - _Por crear_ — Observabilidad (Sentry, alertas, restauración verificada).
 - _Por crear (Greenhouse)_ — Revocar `CONNECT` de PUBLIC en la base `greenhouse_app` y otorgarlo explícito a los roles de Greenhouse, para cerrar el acceso de conexión residual de roles ajenos.
 
