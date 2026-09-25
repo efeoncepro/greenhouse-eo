@@ -56,21 +56,25 @@
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 4,
+        "maxCharacters": 12,
         "maxLines": 1,
         "overflow": "reject"
       },
-      "notes": "Cuántas filas tiene la tabla completa (se cuenta, no se escribe)."
+      "notes": "Valor de la fila más alta de la tabla completa (lo calcula el mapper del dato)."
     },
     "heroText": {
       "selector": "[data-slot='heroText']",
-      "type": "string",
+      "type": "rich-string",
       "required": true,
       "constraints": {
-        "maxCharacters": 64,
+        "maxCharacters": 110,
         "maxLines": 3,
-        "overflow": "reject"
-      }
+        "overflow": "reject",
+        "allowedTags": [
+          "strong"
+        ]
+      },
+      "notes": "Qué es la cifra: columna y fila («impresiones en <strong>/precios</strong>, la fila más alta de la tabla»)."
     },
     "tableTitle": {
       "selector": "[data-slot='tableTitle']",
@@ -82,6 +86,16 @@
         "overflow": "reject"
       }
     },
+    "lead": {
+      "selector": "[data-slot='lead']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 140,
+        "maxLines": 2,
+        "overflow": "reject"
+      }
+    },
     "continuationLabel": {
       "selector": "[data-slot='continuationLabel']",
       "type": "string",
@@ -90,6 +104,29 @@
         "maxCharacters": 48,
         "maxLines": 1,
         "overflow": "reject"
+      }
+    },
+    "boardTitle": {
+      "selector": "[data-slot='boardTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "legend": {
+      "selector": "[data-slot='legend']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        }
       }
     },
     "tableColumns": {
@@ -168,6 +205,18 @@
       },
       "notes": "Máximo de la primera columna de valor en la tabla COMPLETA: la escala de la barra no cambia entre páginas."
     },
+    "rankOffset": {
+      "selector": "[data-slot='rankOffset']",
+      "type": "string",
+      "required": false,
+      "consumer": "validation-only",
+      "constraints": {
+        "maxCharacters": 4,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Filas de la tabla ya mostradas en páginas anteriores: el ranking continúa."
+    },
     "source": {
       "selector": "[data-slot='source']",
       "type": "object",
@@ -205,6 +254,48 @@
           "maxLines": 2
         }
       }
+    },
+    "closing": {
+      "selector": "[data-slot='closing']",
+      "type": "array",
+      "required": false,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 2
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "kind": {
+            "type": "string",
+            "required": true,
+            "resolver": "report-closing-icon",
+            "values": [
+              "measure",
+              "action"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40,
+            "maxLines": 1
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 220,
+            "maxLines": 4
+          },
+          "signature": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 40,
+            "maxLines": 1
+          }
+        }
+      },
+      "notes": "Lo que significa / Próximo paso de la tabla, cuando el plan trae la lectura. Sin ella, la página compone sin panel."
     },
     "footerEdition": {
       "selector": "[data-slot='footerEdition']",
@@ -263,18 +354,6 @@
         }
       },
       "notes": "«NN / total»: ambos del plan de páginas de la misma composición (paginateFlow), nunca un número fijo."
-    },
-    "rankOffset": {
-      "selector": "[data-slot='rankOffset']",
-      "type": "string",
-      "required": false,
-      "consumer": "validation-only",
-      "constraints": {
-        "maxCharacters": 4,
-        "maxLines": 1,
-        "overflow": "reject"
-      },
-      "notes": "Filas de la tabla ya mostradas en páginas anteriores: el ranking continúa."
     }
   }
 }

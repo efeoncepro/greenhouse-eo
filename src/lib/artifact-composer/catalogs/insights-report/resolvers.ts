@@ -30,7 +30,12 @@ export const tableBarEffects = (item: Record<string, unknown>, slots: Record<str
   if (value === null || value < 0 || max <= 0) return [{ selector: ':field', remove: true }]
 
   const pct = Math.min(100, (value / max) * 100)
-  const effects: FieldEffect[] = [{ selector: '.row-bar', styleProp: 'width', styleValue: `${pct.toFixed(2)}%` }]
+
+  // El valor impreso va al FINAL de la barra (gramática de la evidencia aprobada): la barra ocupa su
+  // fracción de la celda descontando el lugar de la cifra (64 px + 10 px de aire).
+  const effects: FieldEffect[] = [
+    { selector: '.row-bar', styleProp: 'width', styleValue: `calc((100% - 74px) * ${(pct / 100).toFixed(4)})` }
+  ]
 
   if (value === max) effects.push({ selector: ':self', toneClass: 'row--lead', toneGroup: ['row--lead'] })
 
@@ -39,14 +44,12 @@ export const tableBarEffects = (item: Record<string, unknown>, slots: Record<str
 
 /**
  * Ranking de la fila en la tabla COMPLETA: `rankOffset` (lo pasa el mapper) + posición en la página.
- * Sin él, una tabla que continúa volvería a empezar en 01. Los tres primeros van en acento.
+ * Sin él, una tabla que continúa volvería a empezar en 01.
  */
 export const tableRankEffects = (index: number, slots: Record<string, unknown>): FieldEffect[] => {
   const offset = Number(slots.rankOffset ?? 0)
   const rank = (Number.isFinite(offset) ? offset : 0) + index + 1
   const effects: FieldEffect[] = [{ selector: ':field', asText: true, value: String(rank).padStart(2, '0') }]
-
-  if (rank <= 3) effects.push({ selector: ':field', toneClass: 'rank--top', toneGroup: ['rank--top'] })
 
   return effects
 }

@@ -177,8 +177,25 @@ const chapterBodyPages = (
   })
 
   for (const table of chapter.tables) {
-    // La barra de la primera columna de valor se escala contra la tabla COMPLETA, no contra la página.
-    const scale = Math.max(0, ...table.rows.map(row => parsePrintedNumber(row[1]) ?? 0))
+    // La barra de la primera columna de valor se escala contra la tabla COMPLETA, no contra la página,
+    // y la cifra protagonista es el valor de la fila más alta de esa misma tabla.
+    const values = table.rows.map(row => parsePrintedNumber(row[1]))
+    const scale = Math.max(0, ...values.map(v => v ?? 0))
+    const leadIndex = scale > 0 ? values.findIndex(v => v === scale) : -1
+    const leadRow = leadIndex >= 0 ? table.rows[leadIndex]! : null
+    const entityColumn = table.columns[0] ?? L.tableEyebrow
+    const valueColumn = table.columns[1] ?? ''
+
+    const hero = leadRow
+      ? {
+          heroFigure: rejectIfLonger(String(leadRow[1]), 12, `${table.tableId}.heroFigure`),
+          heroText: rejectIfLonger(
+            `${valueColumn.toLowerCase()} ${L.tableLeadIn} <strong>${String(leadRow[0] ?? '—')}</strong>, ${L.tableLeadSuffix}`,
+            110,
+            `${table.tableId}.heroText`
+          )
+        }
+      : { heroFigure: String(table.rows.length), heroText: L.tableRowsText }
 
     chunkByCapacity(table.rows, CAPACITY.tableRows, (_r, i) => `${table.tableId}-r${i}`).forEach((rows, i) => {
       pages.push({
@@ -188,11 +205,13 @@ const chapterBodyPages = (
           slots: {
             ...running,
             eyebrow: L.tableEyebrow,
-            heroFigure: String(table.rows.length),
-            heroText: L.tableRowsText,
+            ...hero,
             tableTitle: rejectIfLonger(table.title, BUDGET.tableTitle, `${table.tableId}.title`),
+            ...(valueColumn ? { lead: L.tableRowsOrderedBy(table.rows.length, valueColumn) } : {}),
             // La continuación se declara: una tabla que sigue sin decirlo obliga a retroceder.
             ...(i > 0 ? { continuationLabel: L.tableContinued, rankOffset: String(i * CAPACITY.tableRows) } : {}),
+            boardTitle: rejectIfLonger(`${L.tableDetailBy} ${entityColumn.toLowerCase()}`, 48, `${table.tableId}.boardTitle`),
+            legend: { label: rejectIfLonger(valueColumn || entityColumn, 24, `${table.tableId}.legend`) },
             tableColumns: ['#', ...table.columns.slice(0, 3)].map(label => ({ label })),
             tableRows: rows.map(row => ({
               entity: String(row[0] ?? '—'),

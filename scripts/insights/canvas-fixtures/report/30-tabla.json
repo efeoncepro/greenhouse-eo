@@ -73,8 +73,8 @@
       "page": "13",
       "total": "24"
     },
-    "heroFigure": "8",
-    "heroText": "páginas con más impresiones y un CTR bajo la mediana del sitio",
+    "heroFigure": "14.920",
+    "heroText": "impresiones en <strong>/precios</strong>, la fila más alta de la tabla",
     "barScaleMax": "14.920",
     "source": {
       "label": "Fuente",
@@ -83,6 +83,24 @@
     "coverage": {
       "label": "Cobertura",
       "text": "31 de 31 días con dato en el período"
-    }
+    },
+    "lead": "Ocho filas, ordenadas por impresiones. Las tres primeras suman más de la mitad.",
+    "boardTitle": "Detalle por página",
+    "legend": {
+      "label": "Impresiones"
+    },
+    "closing": [
+      {
+        "kind": "measure",
+        "label": "Lo que significa",
+        "text": "Tres páginas reciben más de la mitad de las impresiones con el CTR más bajo del sitio: ahí está el clic que falta."
+      },
+      {
+        "kind": "action",
+        "label": "Próximo paso",
+        "text": "Reescribir títulos y descripciones de /precios, /servicios y /preguntas-frecuentes (acción 1 del plan).",
+        "signature": "Recomendación de Efeonce"
+      }
+    ]
   }
 }

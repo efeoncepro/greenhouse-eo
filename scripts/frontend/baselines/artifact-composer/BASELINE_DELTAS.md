@@ -1,5 +1,15 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-25 (e) — TASK-1889: la tabla vuelve a la anatomía de la evidencia aprobada
+
+Crítica de diseño (operador: «no se ve premium»): la versión anterior cargaba navy arriba (cabecera y
+fila líder) y dejaba vacío el último tercio; las barras pálidas detrás del texto leían como interfaz. Se
+rehace con la anatomía de `Premium-Evidencia`: cifra de la fila más alta y tesis sobre papel, barras finas
+con el valor al final, segunda columna en pastilla, procedencia y panel navy de cierre (si el plan trae la
+lectura). El navy aparece sólo en el cierre.
+
+- `templates-insights-report/ReportTablePage.png` — anatomía de evidencia
+
 ## 2026-09-25 (d) — TASK-1889: la tabla de respaldo gana punch
 
 Pedido del operador («la tabla necesita más punch»). Cabecera navy con la cifra contada en teal, tablero de
@@ -462,7 +472,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: f659c5b36f484774683a13e59be0371a6cd0aadd034446160b80b73318f56731 -->
+<!-- manifest-digest: 161a8d1e74acc344218982a459b556503ff2c390c4398a78acb611c1926b1f58 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

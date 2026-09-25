@@ -206,7 +206,9 @@ describe('buildInsightReportPlanInput', () => {
 
     for (const page of pages) {
       // La misma escala en las dos páginas: la barra de /p0 no cambia de tamaño al pasar la hoja.
-      expect(page.slots).toMatchObject({ heroFigure: '30', barScaleMax: '3000', source: { label: 'Fuente' } })
+      // La cifra protagonista es el valor de la fila más alta de la tabla COMPLETA, con su bajada.
+      expect(page.slots).toMatchObject({ heroFigure: '3000', barScaleMax: '3000', source: { label: 'Fuente' }, legend: { label: 'Clics' } })
+      expect((page.slots as { heroText: string }).heroText).toBe('clics en <strong>/p29</strong>, la fila más alta de la tabla')
       expect((page.slots as { tableColumns: { label: string }[] }).tableColumns[0]).toEqual({ label: '#' })
     }
 
