@@ -3,107 +3,141 @@
 <head>
 <meta charset="utf-8" />
 <!--
-  ReportCoverPage — portada del informe A4.
+  ReportCoverPage — portada navy del informe A4 (TASK-1889, canvas aprobado 2026-09-25,
+  página `Premium-Portada`).
 
-  Lleva pie institucional completo como cualquier otra página: el estándar lo exige explícitamente
-  "incluida la portada, adaptando contraste y espacio sin omitir los datos".
+  Reemplaza a la portada v1 de TASK-1847. Una sola portada con variantes: ésta es la navy. La blanca (con y sin canales) llega en el Slice 3
+  y la elige la portada sellada por TASK-1888; el catálogo nunca decide cuál.
 
-  Identidad de la edición arriba y grande: identificador, período y versión. Un informe sin esos
-  tres datos no se puede citar ni auditar después.
+  La geometría (márgenes 60/68/56, órbita centrada en 520,376 con radio 236, arco de 196° a 237°) es
+  la del canvas: la fidelidad se mide contra la página aprobada, no a ojo. Todo color sale de roles
+  del brand pack (`report-tokens.css`); toda familia, de los type roles.
+
+  Chrome de la PLANTILLA (no del autor): logo negativo, «Insights», órbita y eslogan. El eslogan es
+  marca (`EFEONCE_SLOGAN_TEXT`); un test compara este HTML contra el SSOT.
 -->
 <link rel="stylesheet" href="report-tokens.css" />
 <link rel="stylesheet" href="report-fonts.css" />
-<link rel="stylesheet" href="report-mold.css" />
+<link rel="stylesheet" href="report-editorial.css" />
 <style>
-  .cover-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+  .cover { padding: 60px 68px 56px; }
 
-  .edition-id {
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--axis-deck-teal-750);
-    font-variant-numeric: tabular-nums;
-  }
+  .cover-orbit .halo-stop { stop-color: var(--axis-report-role-navyAccent); }
 
-  .client { font-size: 11px; color: var(--axis-report-role-fieldMid); text-align: right; }
+  .cover-orbit .ring { fill: none; stroke: var(--axis-report-role-halo); stroke-opacity: 0.16; stroke-width: 1; }
+
+  .cover-orbit .arc { fill: none; stroke: var(--axis-report-role-navyAccent); stroke-width: 1.6; stroke-linecap: round; }
+
+  .cover-orbit .dot { fill: var(--axis-report-role-navyAccent); }
+
+  .cover-body { position: relative; height: 100%; display: flex; flex-direction: column; }
+
+  .cover-head { display: flex; justify-content: space-between; align-items: center; }
 
   .cover-title {
-    margin: 120px 0 0;
+    margin: 22px 0 0;
+    max-width: 430px;
     font-family: var(--axis-report-type-display);
-    font-size: 40px;
-    line-height: 1.12;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    max-width: 16ch;
+    font-size: 52px;
+    line-height: 1.07;
+    font-weight: 600;
+    letter-spacing: -0.024em;
   }
 
   .cover-subtitle {
-    margin: 20px 0 0;
+    margin: 26px 0 0;
+    max-width: 272px;
     font-size: 15px;
-    line-height: 1.5;
-    max-width: 48ch;
-    color: var(--axis-report-role-fieldMid);
+    line-height: 1.62;
+    color: var(--axis-report-role-navyMuted);
   }
 
-  .cover-meta {
-    margin-top: auto;
-    display: flex;
-    gap: 40px;
+  /* Alto fijo: con o sin cliente, el título no se mueve (el canvas mide 77 px con el bloque). */
+  .cover-foot {
+    min-height: 77px;
+    margin-top: 88px;
     padding-top: 24px;
-    border-top: 2px solid var(--axis-report-role-accent);
+    border-top: 1px solid rgba(var(--axis-report-role-navyInk-rgb), 0.12);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
   }
 
-  .cover-meta dt {
-    font-size: 9px;
-    font-weight: 700;
+  .prepared { display: flex; flex-direction: column; gap: 10px; }
+
+  .prepared-label {
+    font-family: var(--axis-report-type-display);
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 0.26em;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--axis-report-role-fieldMid);
+    color: rgba(var(--axis-report-role-navyMuted-rgb), 0.75);
   }
 
-  .cover-meta dd {
-    margin: 4px 0 0;
+  .prepared-name {
+    font-family: var(--axis-report-type-display);
     font-size: 13px;
     font-weight: 600;
+    color: var(--axis-report-role-navyInk);
+  }
+
+  .cover-sign { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+
+  .cover-sign .slogan { font-size: 15px; letter-spacing: -0.005em; color: var(--axis-report-role-navyInk); }
+
+  .confidential {
+    font-size: 9.5px;
+    letter-spacing: 0.05em;
     font-variant-numeric: tabular-nums;
+    color: rgba(var(--axis-report-role-navyMuted-rgb), 0.8);
   }
 </style>
 </head>
 <body>
-  <div class="page">
-    <header class="cover-top">
-      <span class="edition-id" data-slot="editionId">EO-INS-000014</span>
-      <span class="client" data-slot="clientName">Nombre del cliente</span>
-    </header>
+  <div class="sheet sheet--navy cover">
+    <svg class="cover-orbit art" width="794" height="1123" viewBox="0 0 794 1123" aria-hidden="true">
+      <defs>
+        <radialGradient id="coverHalo" cx="520" cy="376" r="440" gradientUnits="userSpaceOnUse">
+          <stop class="halo-stop" offset="0" stop-opacity="0.13"></stop>
+          <stop class="halo-stop" offset="0.6" stop-opacity="0.03"></stop>
+          <stop class="halo-stop" offset="1" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+      <rect width="794" height="1123" fill="url(#coverHalo)"></rect>
+      <circle class="ring" cx="520" cy="376" r="236"></circle>
+      <path class="arc" d="M 298.2 295.3 A 236 236 0 0 1 439.3 154.2"></path>
+      <circle class="dot" cx="439.3" cy="154.2" r="3.5"></circle>
+    </svg>
 
-    <h1 class="cover-title" data-slot="reportTitle">Informe de visibilidad y entrega</h1>
-    <p class="cover-subtitle" data-slot="reportSubtitle">
-      Evidencia sellada de la ventana declarada, con sus límites explícitos.
-    </p>
+    <div class="cover-body">
+      <header class="cover-head">
+        <div class="brand-lockup">
+          <img class="brand-logo" src="assets/brand/logo-negative.svg" alt="Efeonce" />
+          <span class="brand-divider"></span>
+          <span class="brand-product">Insights</span>
+        </div>
+        <span class="kicker kicker--navy" data-slot="editionLabel">Informe mensual · Agosto 2026</span>
+      </header>
 
-    <dl class="cover-meta">
-      <div><dt>Período</dt><dd data-slot="periodLabel">Agosto 2026</dd></div>
-      <div><dt>Versión</dt><dd data-slot="versionLabel">v1</dd></div>
-      <div><dt>Emitido</dt><dd data-slot="issuedLabel">2026-09-03</dd></div>
-    </dl>
+      <div class="grow"></div>
 
-    <footer class="foot">
-      <div class="foot-contact" data-slot="contactDetails">
-        <span class="foot-line">
-          <img src="assets/contact/map-point-bold.svg" alt="" />
-          <span>Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile</span>
-        </span>
-        <span class="foot-line">
-          <img src="assets/contact/phone-calling-bold.svg" alt="" />
-          <span>+56 9 3732 3064</span>
-        </span>
+      <div>
+        <span class="eyebrow eyebrow--navy"><span class="eyebrow-rule"></span><span data-slot="eyebrow">Lectura de Efeonce</span></span>
+        <h1 class="cover-title" data-slot="reportTitle">Visibilidad, respuestas de IA y entrega</h1>
+        <p class="cover-subtitle" data-slot="reportSubtitle">Qué cambió en agosto, por qué cambió y qué haremos en septiembre.</p>
       </div>
-      <span class="foot-bubble" data-slot="urlBubble">
-        <img src="assets/url-lum.svg" alt="efeoncepro.com" />
-      </span>
-      <span class="folio" data-slot="pageFolio">1</span>
-    </footer>
+
+      <footer class="cover-foot">
+        <div class="prepared" data-slot="preparedFor">
+          <span class="prepared-label" data-slot-field="label">Preparado para</span>
+          <span class="prepared-name" data-slot-field="clientName">Nombre del cliente</span>
+        </div>
+        <div class="cover-sign">
+          <span class="slogan" data-brand="slogan"><span class="slogan-empower">Empower</span> <span class="slogan-your">your</span> <span class="slogan-growth">Growth</span></span>
+          <span class="confidential" data-slot="confidentialityLine">Confidencial · Versión 1 · 2 de septiembre de 2026</span>
+        </div>
+      </footer>
+    </div>
   </div>
 </body>
 </html>

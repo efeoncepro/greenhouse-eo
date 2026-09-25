@@ -1,5 +1,31 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-25 (b) — TASK-1889: las plantillas editoriales REEMPLAZAN a las v1
+
+Decisión del operador: las v2 no conviven con las v1; ningún agente debe poder componer con una v1
+cuando existe su v2. Cada v2 toma el nombre y el contentType canónicos de la v1 que reemplaza, y la
+v1 se borra del catálogo. Los mappers componen desde el plan actual con las plantillas nuevas. Única
+excepción declarada: las páginas de gráfico (`ReportAnalysisPage`, `InsightsEvidenceSlide`, status
+`legacy` con `replacedBy`) hasta el Slice 4. Guarda: `__tests__/insights-catalogs-v2-only.test.ts`.
+
+**Frames que cambian (v1 → diseño editorial):**
+
+- `templates-insights-report/ReportCoverPage.png` — ahora la portada navy (antes `ReportCoverNavyPage`)
+- `templates-insights-report/ReportIndexPage.png` — índice editorial (antes `ReportContentsPage`)
+- `templates-insights-report/ReportTablePage.png` — tabla densa editorial (antes `ReportDenseTablePage`)
+- `templates-insights-report/ReportLimitsPage.png` — límites editoriales (antes `ReportLimitsV2Page`)
+- `templates-insights-report/ReportNarrativePage.png` — narrativa editorial nueva (sin página en el canvas)
+- `templates-insights-deck/InsightsCoverSlide.png` — portada navy 1280×720 (antes `InsightsCoverNavySlide`)
+- `templates-insights-deck/InsightsNarrativeSlide.png` — narrativa editorial 1280×720 (sin página en el canvas)
+- `templates-insights-deck/InsightsLimitsSlide.png` — límites editoriales 1280×720 (sin página en el canvas)
+
+**Frames retirados (nombres de transición, vivieron sólo en el commit anterior):**
+`templates-insights-report/ReportCoverNavyPage.png`, `templates-insights-report/ReportContentsPage.png`,
+`templates-insights-report/ReportDenseTablePage.png`, `templates-insights-report/ReportLimitsV2Page.png`,
+`templates-insights-deck/InsightsCoverNavySlide.png`.
+
+La narrativa (A4 y deck) y los límites del deck son piezas derivadas, en revisión del operador.
+
 ## 2026-09-25 — TASK-1889: plantillas editoriales de Insights (canvas aprobado)
 
 Nacen las plantillas del diseño premium aprobado por el operador el 2026-09-25. **Todas son
@@ -415,7 +441,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 1e84b71ea66898556412eabfc295952567f9b29dda4340e3fb246d1fe5f7a165 -->
+<!-- manifest-digest: e9497bf191731e7b241b7241b81fd648ca10fc220438d6d01058bbd82e717f1b -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

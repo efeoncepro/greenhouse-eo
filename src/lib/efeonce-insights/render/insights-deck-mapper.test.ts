@@ -55,12 +55,26 @@ const textOf = (slides: { slots: Record<string, unknown> }[]) =>
   slides.flatMap(slide => [slide.slots.assertion, ...((slide.slots.points as { text: string }[] | undefined) ?? []).map(p => p.text)]).filter(Boolean) as string[]
 
 describe('buildInsightsDeckPlanInput', () => {
-  it('abre con portada, rotula la ventana medida y cierra con límites', () => {
+  it('abre con portada, rotula la ventana medida y cierra con límites y contraportada (TASK-1889)', () => {
     const slides = buildInsightsDeckPlanInput({ edition, report, plan: plan(), snapshot: { facts: [] } as never }).slides
 
     expect(slides[0]!.contentType).toBe('insights-cover')
-    expect(slides[0]!.slots.periodLabel).toBe('1–20 de septiembre de 2026')
-    expect(slides.at(-1)!.contentType).toBe('insights-limits')
+    expect(slides[0]!.slots.editionLabel).toBe('Informe mensual · 1–20 de septiembre de 2026')
+    expect(slides.at(-2)!.contentType).toBe('insights-limits')
+    expect(slides.at(-1)!.contentType).toBe('insights-back-cover')
+  })
+
+  it('cada capítulo abre con su apertura, y las láminas editoriales llevan folio «NN / total»', () => {
+    const slides = buildInsightsDeckPlanInput({ edition, report, plan: plan(), snapshot: { facts: [] } as never }).slides
+    const opening = slides.find(slide => slide.contentType === 'insights-chapter')!
+
+    expect(opening.slots).toMatchObject({ chapterLabel: 'Capítulo 01', chapterNumeral: '01', chapterTitle: 'Visibilidad orgánica' })
+
+    for (const [i, slide] of slides.entries()) {
+      const folio = slide.slots.folio as { page: string; total: string } | undefined
+
+      if (folio) expect(folio).toEqual({ page: String(i + 1).padStart(2, '0'), total: String(slides.length).padStart(2, '0') })
+    }
   })
 
   it('ninguna afirmación del plan queda fuera: el deck no tiene tabla que la sostenga', () => {
@@ -98,7 +112,7 @@ describe('buildInsightsDeckPlanInput', () => {
   it('un capítulo sin datos se narra; un plan sin capítulos se rechaza', () => {
     const slides = buildInsightsDeckPlanInput({ edition, report, plan: plan(), snapshot: { facts: [] } as never }).slides
 
-    expect(slides.some(slide => slide.contentType === 'insights-narrative' && slide.slots.chapterLabel === 'Visibilidad orgánica')).toBe(true)
+    expect(slides.some(slide => slide.contentType === 'insights-narrative' && slide.slots.section === 'Visibilidad orgánica')).toBe(true)
     expect(() => buildInsightsDeckPlanInput({ edition, report, plan: plan({ chapters: [] }), snapshot: { facts: [] } as never })).toThrow(InsightsRenderRejectedError)
   })
 
@@ -108,8 +122,8 @@ describe('buildInsightsDeckPlanInput', () => {
     expect(() => buildInsightsDeckPlanInput({ edition, report, plan: plan({ chapters: [chapter({ claims: [long] })] }), snapshot: { facts: [] } as never })).toThrow(InsightsRenderRejectedError)
   })
 
-  it('renderiza un deck PDF real de 25 láminas y conserva todas las afirmaciones', async () => {
-    const chapters = Array.from({ length: 23 }, (_, index) =>
+  it('renderiza un deck PDF real con el catálogo editorial y conserva todas las afirmaciones', async () => {
+    const chapters = Array.from({ length: 10 }, (_, index) =>
       chapter({
         chapterId: `chapter-${index + 1}`,
         title: `Capítulo ${index + 1}`,
@@ -121,10 +135,10 @@ describe('buildInsightsDeckPlanInput', () => {
     const outDir = await mkdtemp(path.join(os.tmpdir(), 'task-1847-deck-25-slides-'))
 
     try {
-      expect(input.slides).toHaveLength(25) // portada + 23 capítulos + cierre de límites
+      expect(input.slides).toHaveLength(23) // portada + 10 × (apertura + narrativa) + límites + contraportada
       const printed = textOf(input.slides.map(slide => ({ slots: slide.slots as Record<string, unknown> })))
 
-      for (let index = 1; index <= 23; index++) {
+      for (let index = 1; index <= 10; index++) {
         expect(printed).toContain(`Hallazgo íntegro ${index}: la evidencia conserva cada período y su alcance.`)
       }
 
@@ -133,7 +147,7 @@ describe('buildInsightsDeckPlanInput', () => {
       expect(result.pdfPath).toBeDefined()
       const pdf = await PDFDocument.load(await readFile(result.pdfPath!))
 
-      expect(pdf.getPageCount()).toBe(25)
+      expect(pdf.getPageCount()).toBe(23)
     } finally {
       await rm(outDir, { recursive: true, force: true })
     }
@@ -215,7 +229,7 @@ describe('buildInsightsDeckPlanInput', () => {
   it('el resumen con una sola afirmación dice dónde está el resto, nunca que no hay más', () => {
     // Caso real (Sky): el resumen toma una afirmación por módulo; el capítulo traía además OTD.
     const slides = buildInsightsDeckPlanInput({ edition, report, plan: plan({ executiveSummary: [claim('s0', 'RpA: 1,33.')] }), snapshot: { facts: [] } as never }).slides
-    const summary = slides.find(slide => slide.slots.chapterLabel === 'Resumen ejecutivo')!
+    const summary = slides.find(slide => slide.contentType === 'insights-narrative' && slide.slots.section === 'Resumen ejecutivo')!
 
     expect((summary.slots.points as { text: string }[]).map(point => point.text)).toEqual([
       'El detalle de cada módulo, con todas sus cifras, está en los capítulos siguientes.'

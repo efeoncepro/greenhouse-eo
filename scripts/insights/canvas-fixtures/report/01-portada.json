@@ -1,7 +1,7 @@
 {
   "reference": "Premium-Portada",
   "catalog": "report",
-  "contentType": "report-cover-navy",
+  "contentType": "report-cover",
   "slots": {
     "editionLabel": "Informe mensual · Agosto 2026",
     "eyebrow": "Lectura de Efeonce",

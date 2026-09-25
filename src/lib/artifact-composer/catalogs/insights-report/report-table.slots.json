@@ -2,24 +2,47 @@
   "template": "ReportTablePage",
   "figmaNodeId": null,
   "version": "0.1",
+  "note": "TASK-1889 — tabla densa de respaldo A4 (el canvas no la diseñó).",
   "viewport": {
     "width": 794,
     "height": 1123
   },
   "slots": {
-    "runningChapter": {
-      "selector": "[data-slot='runningChapter']",
+    "clientName": {
+      "selector": "[data-slot='clientName']",
       "type": "string",
-      "required": true,
+      "required": false,
       "constraints": {
         "maxCharacters": 40,
         "maxLines": 1,
-        "transform": "uppercase",
         "overflow": "reject"
-      }
+      },
+      "notes": "Nombre del cliente en la cabecera. Sin cliente, la caja queda vacía y la página no se mueve; nunca un nombre inventado. El logo llega con la portada sellada de TASK-1888."
+    },
+    "runningSection": {
+      "selector": "[data-slot='runningSection']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Sección de la página («Resumen ejecutivo»)."
     },
     "runningPeriod": {
       "selector": "[data-slot='runningPeriod']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Período y comparación («Agosto 2026 · contra julio 2026»)."
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
       "type": "string",
       "required": true,
       "constraints": {
@@ -33,7 +56,7 @@
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 60,
+        "maxCharacters": 80,
         "maxLines": 2,
         "overflow": "reject"
       }
@@ -43,11 +66,10 @@
       "type": "string",
       "required": false,
       "constraints": {
-        "maxCharacters": 34,
+        "maxCharacters": 48,
         "maxLines": 1,
         "overflow": "reject"
-      },
-      "notes": "Sólo en páginas que continúan una tabla. Una tabla que sigue sin decirlo obliga a retroceder."
+      }
     },
     "tableColumns": {
       "selector": "[data-slot='tableColumns']",
@@ -55,8 +77,7 @@
       "required": true,
       "constraints": {
         "minItems": 2,
-        "maxItems": 3,
-        "overflow": "reject"
+        "maxItems": 3
       },
       "item": {
         "type": "object",
@@ -64,12 +85,11 @@
           "label": {
             "type": "string",
             "required": true,
-            "maxCharacters": 22,
-            "maxLines": 2
+            "maxCharacters": 24,
+            "maxLines": 1
           }
         }
-      },
-      "notes": "Entre 2 y 3 columnas. Un catálogo cerrado no estira una plantilla para cualquier ancho: si hace falta otra forma de tabla, es un gap del catálogo y se diseña su plantilla."
+      }
     },
     "tableRows": {
       "selector": "[data-slot='tableRows']",
@@ -77,8 +97,7 @@
       "required": true,
       "constraints": {
         "minItems": 1,
-        "maxItems": 26,
-        "overflow": "reject"
+        "maxItems": 24
       },
       "item": {
         "type": "object",
@@ -86,34 +105,64 @@
           "entity": {
             "type": "string",
             "required": true,
-            "maxCharacters": 44,
-            "maxLines": 2
+            "maxCharacters": 64,
+            "maxLines": 1
           },
           "valueA": {
             "type": "string",
             "required": true,
-            "maxCharacters": 14,
+            "maxCharacters": 16,
             "maxLines": 1
           },
           "valueB": {
             "type": "string",
             "required": false,
-            "maxCharacters": 14,
+            "maxCharacters": 16,
             "maxLines": 1
           }
         }
-      },
-      "notes": "El TECHO DE FILAS es del molde, no una preferencia: más de 26 no caben en el alto útil, y el reparto entre páginas lo hace paginateFlow() antes de imprimir. Una celda sin dato se escribe «—», nunca 0."
+      }
     },
     "tableSource": {
       "selector": "[data-slot='tableSource']",
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 110,
+        "maxCharacters": 120,
         "maxLines": 2,
         "overflow": "reject"
       }
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "footerContact": {
+      "selector": "[data-slot='footerContact']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "address": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 72,
+          "maxLines": 1
+        },
+        "phone": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        }
+      },
+      "notes": "Desde EFEONCE_CONTACT (dirección de presentación y teléfono de Chile)."
     },
     "fixed-urlBubble": {
       "selector": "[data-slot='urlBubble']",
@@ -122,27 +171,25 @@
       "agentMayOverride": false,
       "note": "template-owned: el HTML ya lo trae."
     },
-    "fixed-contactDetails": {
-      "selector": "[data-slot='contactDetails']",
-      "type": "fixed-contact-set",
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
       "required": true,
-      "agentMayOverride": false,
-      "value": {
-        "chilePhone": "+56 9 3732 3064",
-        "address": "Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile"
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
       },
-      "note": "Dueño del valor: back-cover-full.slots.json de deck-axis. Pie completo en CADA página, incluida la portada."
-    },
-    "pageFolio": {
-      "selector": "[data-slot='pageFolio']",
-      "type": "string",
-      "required": true,
-      "constraints": {
-        "maxCharacters": 8,
-        "maxLines": 1,
-        "overflow": "reject"
-      },
-      "notes": "Asignado por el plan de páginas ANTES de imprimir."
+      "notes": "«NN / total»: ambos del plan de páginas de la misma composición (paginateFlow), nunca un número fijo."
     }
   }
 }

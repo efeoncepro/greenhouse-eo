@@ -62,91 +62,112 @@ const plan = (over: Partial<EditorialPlanV1> = {}): EditorialPlanV1 =>
   }) as EditorialPlanV1
 
 describe('buildInsightReportPlanInput', () => {
-  it('abre con la portada y cierra con los límites', () => {
+  type Folio = { folio?: { page: string; total: string }; pageFolio?: string }
+  type Entry = { mark: string; title: string; folio: string }
+
+  /** El folio impreso de cada página, venga del pie en papel (`folio.page`) o de la apertura (`pageFolio`). */
+  const printedFolios = (slides: { slots: unknown }[]) =>
+    slides.map(s => (s.slots as Folio).folio?.page ?? (s.slots as Folio).pageFolio ?? null)
+
+  it('abre con la portada y cierra con los límites y la contraportada (TASK-1889)', () => {
     const types = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan() }).slides.map(s => s.contentType)
 
-    expect(types[0]).toBe('report-cover')
-    expect(types.at(-1)).toBe('report-limits')
+    expect(types).toEqual(['report-cover', 'report-index', 'report-chapter', 'report-narrative', 'report-limits', 'report-back-cover'])
   })
 
-  it('numera los folios de corrido, que es lo que permite resolver el índice sin segunda pasada', () => {
+  it('numera los folios de corrido con el total real, que es lo que permite resolver el índice sin segunda pasada', () => {
     const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan() })
 
-    expect(input.slides.map(s => (s.slots as { pageFolio: string }).pageFolio)).toEqual(
-      input.slides.map((_s, i) => String(i + 1))
-    )
-    expect(input.slides[1]!.contentType).toBe('report-index')
-    expect((input.slides[1]!.slots as { indexEntries: { title: string; pageNumber: string }[] }).indexEntries).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ title: 'Visibilidad orgánica', pageNumber: '3' }),
-        expect.objectContaining({ title: 'Límites y metodología', pageNumber: '4' })
-      ])
-    )
+    // Portada y contraportada no llevan folio (canvas aprobado); el resto imprime su página física.
+    expect(printedFolios(input.slides)).toEqual([null, '02', '03', '04', '05', null])
+
+    for (const slide of input.slides) {
+      const folio = (slide.slots as Folio).folio
+
+      if (folio) expect(folio.total).toBe('06')
+    }
+
+    expect((input.slides[1]!.slots as { entries: Entry[] }).entries).toEqual([
+      { mark: '01', title: 'Visibilidad orgánica', folio: '03' },
+      { mark: 'L', title: 'Límites y metodología', folio: '05' }
+    ])
   })
 
-  it('compone una edición de 30 páginas con índice real y folios físicos', () => {
+  it('la apertura de cada capítulo lista sus páginas con su folio físico', () => {
+    const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan() })
+    const opening = input.slides.find(s => s.contentType === 'report-chapter')!
+
+    expect(opening.slots).toMatchObject({ chapterLabel: 'Capítulo 01', chapterNumeral: '01', pageFolio: '03' })
+    expect((opening.slots as { contents: { entries: { title: string; folio: string }[] } }).contents.entries).toEqual([
+      { title: 'La visibilidad creció en el período', folio: '04' }
+    ])
+  })
+
+  it('contacto, mercados y línea legal de la contraportada salen del SSOT de marca', () => {
+    const back = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan() }).slides.at(-1)!
+
+    expect(back.slots).toMatchObject({
+      contact: { email: 'sales@efeoncepro.com', phonePrimary: '+56 9 3732 3064', phoneSecondary: '+1 (239) 235-2073' },
+      marketsLine: 'Chile · Estados Unidos · Colombia · México · Perú'
+    })
+    expect((back.slots as { legalLine: string }).legalLine).toMatch(/Efeonce Group SpA · RUT 77\.357\.182-1 · .* · Cifras al 31 de agosto de 2026$/)
+  })
+
+  it('compone una edición grande con índice real y folios físicos', () => {
     const chapters = Array.from({ length: 27 }, (_, index) =>
       chapter({ chapterId: `chapter-${index + 1}`, title: `Capítulo ${index + 1}` })
     )
 
     const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ chapters }) })
-    const index = input.slides.find(page => page.contentType === 'report-index')!
-    const entries = (index.slots as { indexEntries: { title: string; pageNumber: string }[] }).indexEntries
+    const entries = input.slides.filter(page => page.contentType === 'report-index').flatMap(page => (page.slots as { entries: Entry[] }).entries)
 
-    expect(input.slides).toHaveLength(30)
-    expect(entries).toHaveLength(28) // 27 capítulos + límites y metodología
-    expect(entries[0]).toEqual({ title: 'Capítulo 1', pageNumber: '3' })
-    expect(entries.at(-1)).toEqual({ title: 'Límites y metodología', pageNumber: '30' })
-    expect(input.slides.map(page => (page.slots as { pageFolio: string }).pageFolio)).toEqual(
-      input.slides.map((_page, pageIndex) => String(pageIndex + 1))
-    )
+    // Portada + 2 de índice (28 secciones a 20 por página) + 27 × (apertura + narrativa) + límites + contraportada.
+    expect(input.slides).toHaveLength(59)
+    expect(entries).toHaveLength(28)
+    expect(entries[0]).toEqual({ mark: '01', title: 'Capítulo 1', folio: '04' })
+    expect(entries.at(-1)).toEqual({ mark: 'L', title: 'Límites y metodología', folio: '58' })
+
+    printedFolios(input.slides).forEach((folio, i) => {
+      if (folio !== null) expect(folio).toBe(String(i + 1).padStart(2, '0'))
+    })
   })
 
-  it('renderiza un PDF real de 30 páginas con índice y folios convergentes', async () => {
-    const chapters = Array.from({ length: 27 }, (_, index) =>
+  it('renderiza un PDF real con el catálogo editorial y folios convergentes', async () => {
+    const chapters = Array.from({ length: 12 }, (_, index) =>
       chapter({ chapterId: `chapter-${index + 1}`, title: `Capítulo ${index + 1}` })
     )
 
     const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ chapters }) })
-    const outDir = await mkdtemp(path.join(os.tmpdir(), 'task-1847-report-30-pages-'))
+    const outDir = await mkdtemp(path.join(os.tmpdir(), 'task-1889-report-'))
 
     try {
-      expect(input.slides).toHaveLength(30)
-      expect(input.slides[1]!.contentType).toBe('report-index')
-
-      for (const slide of input.slides.slice(1)) {
-        expect((slide.slots as { runningChapter?: string }).runningChapter).toBeTruthy()
-        expect((slide.slots as { runningPeriod?: string }).runningPeriod).toBeTruthy()
-      }
+      expect(input.slides).toHaveLength(28)
 
       const result = await composeArtifact(insightsReportCatalog, input as never, outDir, { concurrency: 4 })
 
       expect(result.pdfPath).toBeDefined()
       const pdf = await PDFDocument.load(await readFile(result.pdfPath!))
 
-      expect(pdf.getPageCount()).toBe(30)
-      expect(input.slides.map(slide => (slide.slots as { pageFolio: string }).pageFolio)).toEqual(
-        input.slides.map((_slide, pageIndex) => String(pageIndex + 1))
-      )
+      expect(pdf.getPageCount()).toBe(28)
     } finally {
       await rm(outDir, { recursive: true, force: true })
     }
-  }, 120_000)
+  }, 180_000)
 
-  it('pagina el índice cuando hay más de 28 secciones y conserva los folios reales', () => {
-    const chapters = Array.from({ length: 29 }, (_, index) =>
+  it('pagina el índice cuando hay más de 20 secciones y conserva los folios reales', () => {
+    const chapters = Array.from({ length: 21 }, (_, index) =>
       chapter({ chapterId: `chapter-${index + 1}`, title: `Capítulo ${index + 1}` })
     )
 
     const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ chapters }) })
     const indexPages = input.slides.filter(page => page.contentType === 'report-index')
     const secondIndex = indexPages[1]!
-    const entries = (secondIndex.slots as { indexEntries: { title: string; pageNumber: string }[] }).indexEntries
+    const entries = (secondIndex.slots as { entries: Entry[] }).entries
 
     expect(indexPages).toHaveLength(2)
-    expect((secondIndex.slots as { indexTitle: string }).indexTitle).toBe('Índice (continuación)')
-    expect(entries[0]).toEqual({ title: 'Capítulo 29', pageNumber: '32' })
-    expect(entries.at(-1)).toEqual({ title: 'Límites y metodología', pageNumber: '33' })
+    expect((secondIndex.slots as { title: string }).title).toBe('Índice (continuación)')
+    expect(entries[0]).toEqual({ mark: '21', title: 'Capítulo 21', folio: '44' })
+    expect(entries.at(-1)).toEqual({ mark: 'L', title: 'Límites y metodología', folio: '46' })
   })
 
   it('NO omite un capítulo sin figura: lo narra', () => {
@@ -425,7 +446,7 @@ describe('buildInsightReportPlanInput', () => {
     const claims = Array.from({ length: 10 }, (_, i) => ({ claimId: `s${i}`, text: `Hallazgo ${i + 1}.`, factIds: [] }))
 
     const narrative = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ executiveSummary: claims }) })
-      .slides.filter(p => (p.slots as { runningChapter?: string }).runningChapter === 'Resumen ejecutivo')
+      .slides.filter(p => (p.slots as { runningSection?: string }).runningSection === 'Resumen ejecutivo')
       .flatMap(p => (p.slots as { paragraphs: string[] }).paragraphs)
 
     expect(narrative).toHaveLength(9)

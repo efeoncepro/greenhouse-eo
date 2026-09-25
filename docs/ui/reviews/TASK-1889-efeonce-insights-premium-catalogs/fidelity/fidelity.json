@@ -75,7 +75,7 @@
     },
     {
       "reference": "Premium-Portada",
-      "template": "ReportCoverNavyPage",
+      "template": "ReportCoverPage",
       "changed": 426,
       "total": 891662,
       "ratio": 0.0004777595097693969,

@@ -2,24 +2,47 @@
   "template": "ReportIndexPage",
   "figmaNodeId": null,
   "version": "0.1",
+  "note": "TASK-1889 — índice editorial A4 (el canvas no lo diseñó; hereda el molde en papel aprobado).",
   "viewport": {
     "width": 794,
     "height": 1123
   },
   "slots": {
-    "runningChapter": {
-      "selector": "[data-slot='runningChapter']",
+    "clientName": {
+      "selector": "[data-slot='clientName']",
       "type": "string",
-      "required": true,
+      "required": false,
       "constraints": {
         "maxCharacters": 40,
         "maxLines": 1,
-        "transform": "uppercase",
         "overflow": "reject"
-      }
+      },
+      "notes": "Nombre del cliente en la cabecera. Sin cliente, la caja queda vacía y la página no se mueve; nunca un nombre inventado. El logo llega con la portada sellada de TASK-1888."
+    },
+    "runningSection": {
+      "selector": "[data-slot='runningSection']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Sección de la página («Resumen ejecutivo»)."
     },
     "runningPeriod": {
       "selector": "[data-slot='runningPeriod']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Período y comparación («Agosto 2026 · contra julio 2026»)."
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
       "type": "string",
       "required": true,
       "constraints": {
@@ -28,18 +51,28 @@
         "overflow": "reject"
       }
     },
-    "indexTitle": {
-      "selector": "[data-slot='indexTitle']",
+    "title": {
+      "selector": "[data-slot='title']",
       "type": "string",
       "required": true,
       "constraints": {
         "maxCharacters": 40,
-        "maxLines": 2,
+        "maxLines": 1,
         "overflow": "reject"
       }
     },
-    "indexPageColumn": {
-      "selector": "[data-slot='indexPageColumn']",
+    "titleColumn": {
+      "selector": "[data-slot='titleColumn']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 16,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "pageColumn": {
+      "selector": "[data-slot='pageColumn']",
       "type": "string",
       "required": true,
       "constraints": {
@@ -48,25 +81,30 @@
         "overflow": "reject"
       }
     },
-    "indexEntries": {
-      "selector": "[data-slot='indexEntries']",
+    "entries": {
+      "selector": "[data-slot='entries']",
       "type": "array",
       "required": true,
       "constraints": {
         "minItems": 1,
-        "maxItems": 28,
-        "overflow": "reject"
+        "maxItems": 20
       },
       "item": {
         "type": "object",
         "shape": {
+          "mark": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 3,
+            "maxLines": 1
+          },
           "title": {
             "type": "string",
             "required": true,
-            "maxCharacters": 80,
-            "maxLines": 2
+            "maxCharacters": 72,
+            "maxLines": 1
           },
-          "pageNumber": {
+          "folio": {
             "type": "string",
             "required": true,
             "maxCharacters": 3,
@@ -74,7 +112,38 @@
           }
         }
       },
-      "notes": "Cada fila se deriva del primer folio físico de una sección. La capacidad de 28 filas determina cuántas páginas ocupa el índice antes de numerar el informe."
+      "notes": "Cada sección con el folio de su primera página REAL (plan de páginas de la misma composición)."
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "footerContact": {
+      "selector": "[data-slot='footerContact']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "address": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 72,
+          "maxLines": 1
+        },
+        "phone": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        }
+      },
+      "notes": "Desde EFEONCE_CONTACT (dirección de presentación y teléfono de Chile)."
     },
     "fixed-urlBubble": {
       "selector": "[data-slot='urlBubble']",
@@ -83,27 +152,25 @@
       "agentMayOverride": false,
       "note": "template-owned: el HTML ya lo trae."
     },
-    "fixed-contactDetails": {
-      "selector": "[data-slot='contactDetails']",
-      "type": "fixed-contact-set",
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
       "required": true,
-      "agentMayOverride": false,
-      "value": {
-        "chilePhone": "+56 9 3732 3064",
-        "address": "Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile"
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
       },
-      "note": "Pie institucional completo en cada página del informe."
-    },
-    "pageFolio": {
-      "selector": "[data-slot='pageFolio']",
-      "type": "string",
-      "required": true,
-      "constraints": {
-        "maxCharacters": 8,
-        "maxLines": 1,
-        "overflow": "reject"
-      },
-      "notes": "Asignado por el plan de páginas ANTES de imprimir."
+      "notes": "«NN / total»: ambos del plan de páginas de la misma composición (paginateFlow), nunca un número fijo."
     }
   }
 }

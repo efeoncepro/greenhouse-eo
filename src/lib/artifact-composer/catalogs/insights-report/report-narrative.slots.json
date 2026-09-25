@@ -2,55 +2,72 @@
   "template": "ReportNarrativePage",
   "figmaNodeId": null,
   "version": "0.1",
+  "note": "TASK-1889 — capítulo narrado A4 con el estilo editorial; reemplaza a la v1 (el canvas no la diseñó).",
   "viewport": {
     "width": 794,
     "height": 1123
   },
   "slots": {
-    "runningChapter": {
-      "selector": "[data-slot='runningChapter']",
+    "clientName": {
+      "selector": "[data-slot='clientName']",
       "type": "string",
-      "required": true,
+      "required": false,
       "constraints": {
         "maxCharacters": 40,
         "maxLines": 1,
-        "transform": "uppercase",
         "overflow": "reject"
-      }
+      },
+      "notes": "Nombre del cliente en la cabecera. Sin cliente, la caja queda vacía y la página no se mueve; nunca un nombre inventado. El logo llega con la portada sellada de TASK-1888."
     },
-    "runningPeriod": {
-      "selector": "[data-slot='runningPeriod']",
+    "runningSection": {
+      "selector": "[data-slot='runningSection']",
       "type": "string",
       "required": true,
       "constraints": {
         "maxCharacters": 32,
         "maxLines": 1,
         "overflow": "reject"
+      },
+      "notes": "Sección de la página («Resumen ejecutivo»)."
+    },
+    "runningPeriod": {
+      "selector": "[data-slot='runningPeriod']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Período y comparación («Agosto 2026 · contra julio 2026»)."
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 40,
+        "maxLines": 1,
+        "overflow": "reject"
       }
     },
     "assertion": {
       "selector": "[data-slot='assertion']",
-      "type": "rich-string",
+      "type": "string",
       "required": true,
       "constraints": {
         "maxCharacters": 130,
         "maxLines": 3,
-        "allowedTags": [
-          "em"
-        ],
         "overflow": "reject"
       }
     },
     "lead": {
       "selector": "[data-slot='lead']",
-      "type": "rich-string",
+      "type": "string",
       "required": false,
       "constraints": {
         "maxCharacters": 260,
         "maxLines": 4,
-        "allowedTags": [
-          "b"
-        ],
         "overflow": "reject"
       }
     },
@@ -60,17 +77,46 @@
       "required": true,
       "constraints": {
         "minItems": 1,
-        "maxItems": 7,
-        "maxCharactersPerItem": 420,
-        "overflow": "reject"
+        "maxItems": 6,
+        "maxCharactersPerItem": 420
       },
       "item": {
         "type": "rich-string",
         "allowedTags": [
-          "b"
+          "strong"
         ]
+      }
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
       },
-      "notes": "El TECHO de 7 párrafos es del molde: más no cabe en el alto útil y el reparto entre páginas lo hace paginateFlow() antes de imprimir."
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "footerContact": {
+      "selector": "[data-slot='footerContact']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "address": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 72,
+          "maxLines": 1
+        },
+        "phone": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        }
+      },
+      "notes": "Desde EFEONCE_CONTACT (dirección de presentación y teléfono de Chile)."
     },
     "fixed-urlBubble": {
       "selector": "[data-slot='urlBubble']",
@@ -79,27 +125,25 @@
       "agentMayOverride": false,
       "note": "template-owned: el HTML ya lo trae."
     },
-    "fixed-contactDetails": {
-      "selector": "[data-slot='contactDetails']",
-      "type": "fixed-contact-set",
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
       "required": true,
-      "agentMayOverride": false,
-      "value": {
-        "chilePhone": "+56 9 3732 3064",
-        "address": "Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile"
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
       },
-      "note": "Dueño del valor: back-cover-full.slots.json de deck-axis. Pie completo en CADA página, incluida la portada."
-    },
-    "pageFolio": {
-      "selector": "[data-slot='pageFolio']",
-      "type": "string",
-      "required": true,
-      "constraints": {
-        "maxCharacters": 8,
-        "maxLines": 1,
-        "overflow": "reject"
-      },
-      "notes": "Asignado por el plan de páginas ANTES de imprimir."
+      "notes": "«NN / total»: ambos del plan de páginas de la misma composición (paginateFlow), nunca un número fijo."
     }
   }
 }

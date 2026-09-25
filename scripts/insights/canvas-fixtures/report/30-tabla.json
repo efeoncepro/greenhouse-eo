@@ -2,7 +2,7 @@
   "reference": null,
   "name": "tabla",
   "catalog": "report",
-  "contentType": "report-dense-table",
+  "contentType": "report-table",
   "slots": {
     "runningSection": "01 · Visibilidad orgánica",
     "runningPeriod": "Agosto 2026 · contra julio 2026",

@@ -1,0 +1,29 @@
+{
+  "reference": null,
+  "name": "deck-narrativa",
+  "catalog": "deck",
+  "contentType": "insights-narrative",
+  "slots": {
+    "tabNumber": "03",
+    "section": "Del clic al negocio",
+    "period": "Agosto 2026",
+    "eyebrow": "Del clic al negocio",
+    "assertion": "Las visitas llegan y se quedan; el paso a contacto es el que falta.",
+    "points": [
+      {
+        "text": "De <strong>690 visitas</strong> con interacción salieron <strong>41 formularios</strong>: el paso convierte 5,9 %."
+      },
+      {
+        "text": "/precios y /servicios reciben seis de cada diez visitas que terminan en formulario."
+      },
+      {
+        "text": "El formulario pide nueve campos; la competencia directa, entre tres y cinco."
+      }
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "folio": {
+      "page": "20",
+      "total": "24"
+    }
+  }
+}

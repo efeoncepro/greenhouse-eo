@@ -1,24 +1,23 @@
 {
   "$schema": "../deck-axis/registry.schema.json",
-  "version": "0.1",
+  "version": "0.2",
   "status": "draft",
-  "note": "Registry del catálogo `insights-deck` — deck ejecutivo 16:9 de Efeonce Insights (TASK-1847). Catálogo propio y no extensión de `deck-axis`: aquel imprime vocabulario de propuesta comercial en su portada y sus presupuestos de slot están dimensionados para copy de licitación. Comparte brand pack, compilación de marca y geometría de gráficos; no comparte molde, porque una lámina que se proyecta y una hoja que se lee no tienen la misma densidad.",
+  "note": "Registry del catálogo `insights-deck` — deck ejecutivo 16:9 de Efeonce Insights (TASK-1847). Catálogo propio y no extensión de `deck-axis`: aquel imprime vocabulario de propuesta comercial en su portada y sus presupuestos de slot están dimensionados para copy de licitación. Comparte brand pack, compilación de marca y geometría de gráficos; no comparte molde, porque una lámina que se proyecta y una hoja que se lee no tienen la misma densidad. TASK-1889 (2026-09-25): el catálogo es el del canvas editorial aprobado, a 1280×720; las láminas v1 (1920×1080) se REEMPLAZARON bajo los mismos contentTypes. Única excepción: `InsightsEvidenceSlide` sigue en v1 (status `legacy`, 1920×1080) hasta que el Slice 4 de TASK-1889 la reemplace por la lámina de gráfico premium.",
   "canvas": {
-    "w": 1920,
-    "h": 1080,
+    "w": 1280,
+    "h": 720,
     "aspect": "16:9"
   },
   "figmaFileKey": null,
   "contentTypeTaxonomy": [
     "insights-cover",
+    "insights-summary",
+    "insights-chapter",
     "insights-evidence",
     "insights-narrative",
-    "insights-limits",
-    "insights-summary",
     "insights-reading",
     "insights-plan",
-    "insights-cover-navy",
-    "insights-chapter",
+    "insights-limits",
     "insights-back-cover"
   ],
   "templates": [
@@ -36,17 +35,44 @@
       "slotsRef": "insights-cover.slots.json"
     },
     {
-      "name": "InsightsEvidenceSlide",
+      "name": "InsightsSummarySlide",
       "kind": "full-bleed",
       "source": "design",
       "figmaNode": null,
       "owner": "claude",
       "status": "built",
       "contentTypes": [
+        "insights-summary"
+      ],
+      "prototype": "insights-summary.html",
+      "slotsRef": "insights-summary.slots.json"
+    },
+    {
+      "name": "InsightsChapterSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-chapter"
+      ],
+      "prototype": "insights-chapter.html",
+      "slotsRef": "insights-chapter.slots.json"
+    },
+    {
+      "name": "InsightsEvidenceSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "legacy",
+      "contentTypes": [
         "insights-evidence"
       ],
       "prototype": "insights-evidence.html",
-      "slotsRef": "insights-evidence.slots.json"
+      "slotsRef": "insights-evidence.slots.json",
+      "replacedBy": "TASK-1889 Slice 4 — lámina de gráfico premium por familia"
     },
     {
       "name": "InsightsNarrativeSlide",
@@ -60,32 +86,6 @@
       ],
       "prototype": "insights-narrative.html",
       "slotsRef": "insights-narrative.slots.json"
-    },
-    {
-      "name": "InsightsLimitsSlide",
-      "kind": "full-bleed",
-      "source": "design",
-      "figmaNode": null,
-      "owner": "claude",
-      "status": "built",
-      "contentTypes": [
-        "insights-limits"
-      ],
-      "prototype": "insights-limits.html",
-      "slotsRef": "insights-limits.slots.json"
-    },
-    {
-      "name": "InsightsSummarySlide",
-      "kind": "full-bleed",
-      "source": "design",
-      "figmaNode": null,
-      "owner": "claude",
-      "status": "built",
-      "contentTypes": [
-        "insights-summary"
-      ],
-      "prototype": "insights-summary.html",
-      "slotsRef": "insights-summary.slots.json"
     },
     {
       "name": "InsightsReadingSlide",
@@ -114,30 +114,17 @@
       "slotsRef": "insights-plan.slots.json"
     },
     {
-      "name": "InsightsCoverNavySlide",
+      "name": "InsightsLimitsSlide",
       "kind": "full-bleed",
       "source": "design",
       "figmaNode": null,
       "owner": "claude",
       "status": "built",
       "contentTypes": [
-        "insights-cover-navy"
+        "insights-limits"
       ],
-      "prototype": "insights-cover-navy.html",
-      "slotsRef": "insights-cover-navy.slots.json"
-    },
-    {
-      "name": "InsightsChapterSlide",
-      "kind": "full-bleed",
-      "source": "design",
-      "figmaNode": null,
-      "owner": "claude",
-      "status": "built",
-      "contentTypes": [
-        "insights-chapter"
-      ],
-      "prototype": "insights-chapter.html",
-      "slotsRef": "insights-chapter.slots.json"
+      "prototype": "insights-limits.html",
+      "slotsRef": "insights-limits.slots.json"
     },
     {
       "name": "InsightsBackCoverSlide",
@@ -157,14 +144,13 @@
     "model": "El autor declara intención (`contentType` + slots); el selector resuelve la plantilla. Un autor NUNCA elige plantilla.",
     "map": {
       "insights-cover": "InsightsCoverSlide",
+      "insights-summary": "InsightsSummarySlide",
+      "insights-chapter": "InsightsChapterSlide",
       "insights-evidence": "InsightsEvidenceSlide",
       "insights-narrative": "InsightsNarrativeSlide",
-      "insights-limits": "InsightsLimitsSlide",
-      "insights-summary": "InsightsSummarySlide",
       "insights-reading": "InsightsReadingSlide",
       "insights-plan": "InsightsPlanSlide",
-      "insights-cover-navy": "InsightsCoverNavySlide",
-      "insights-chapter": "InsightsChapterSlide",
+      "insights-limits": "InsightsLimitsSlide",
       "insights-back-cover": "InsightsBackCoverSlide"
     },
     "disambiguation": [

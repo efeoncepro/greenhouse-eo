@@ -1,0 +1,27 @@
+{
+  "reference": null,
+  "name": "narrativa",
+  "catalog": "report",
+  "contentType": "report-narrative",
+  "slots": {
+    "runningSection": "03 · Del clic al negocio",
+    "runningPeriod": "Agosto 2026",
+    "eyebrow": "Del clic al negocio",
+    "assertion": "Las visitas llegan y se quedan; el paso a contacto es el que falta.",
+    "lead": "El capítulo no tiene figura propia este mes: el embudo completo se mide desde septiembre.",
+    "paragraphs": [
+      "De <strong>690 visitas</strong> con interacción salieron <strong>41 formularios</strong>, un paso que convierte 5,9 %.",
+      "Las páginas de servicios concentran la intención: /precios y /servicios reciben seis de cada diez visitas que terminan en formulario.",
+      "El formulario actual pide nueve campos; los de la competencia directa, entre tres y cinco."
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "footerContact": {
+      "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+      "phone": "+56 9 3732 3064"
+    },
+    "folio": {
+      "page": "20",
+      "total": "24"
+    }
+  }
+}

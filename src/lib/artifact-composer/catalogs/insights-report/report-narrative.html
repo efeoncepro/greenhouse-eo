@@ -3,49 +3,77 @@
 <head>
 <meta charset="utf-8" />
 <!--
-  ReportNarrativePage — capítulo sin figura, y el resumen ejecutivo.
+  ReportNarrativePage — capítulo narrado del informe A4 con el estilo editorial (TASK-1889);
+  reemplaza a la página narrativa v1. El canvas no la diseñó: hereda el molde en papel aprobado y la
+  gramática de «Nuestra lectura» (afirmación en Poppins, lectura en Geist con cifras en <strong>).
 
-  Existe porque un capítulo cuya evidencia no alcanzó para un gráfico NO desaparece del informe:
-  desaparecerlo convertiría la falta de datos en silencio, que es justo lo que la página de límites
-  existe para impedir. Sin esta plantilla, componer ese plan sería un rechazo.
+  Sirve al capítulo cuya evidencia no alcanzó para una figura (se narra, NUNCA se omite) y a las
+  afirmaciones que ninguna figura tituló.
 -->
 <link rel="stylesheet" href="report-tokens.css" />
 <link rel="stylesheet" href="report-fonts.css" />
-<link rel="stylesheet" href="report-mold.css" />
+<link rel="stylesheet" href="report-editorial.css" />
 <style>
-  .body-text { margin-top: 30px; display: flex; flex-direction: column; gap: 13px; }
+  .narrative-eyebrow { margin-top: 38px; }
+
+  .narrative-assertion {
+    margin: 16px 0 0;
+    max-width: 620px;
+    font-family: var(--axis-report-type-display);
+    font-size: 30px;
+    line-height: 1.16;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+
+  .narrative-lead { margin: 16px 0 0; max-width: 610px; font-size: 14.5px; line-height: 1.65; color: var(--axis-report-role-paperAccent); }
+
+  .narrative-lead:empty { display: none; }
+
+  .narrative-body { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--axis-report-role-rule); display: flex; flex-direction: column; gap: 14px; max-width: 610px; }
+
+  .narrative-body p { margin: 0; font-size: 13.5px; line-height: 1.72; color: var(--axis-report-role-paperAccent); }
+
+  .narrative-body strong { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--axis-report-role-paperInk); }
 </style>
 </head>
 <body>
-  <div class="page">
+  <div class="sheet sheet--paper paper-page">
     <header class="running">
-      <span class="chapter" data-slot="runningChapter">RESUMEN EJECUTIVO</span>
-      <span data-slot="runningPeriod">Agosto 2026</span>
+      <span class="running-client"><span class="running-client-name" data-slot="clientName">Nombre del cliente</span></span>
+      <span class="running-meta">
+        <span class="running-section" data-slot="runningSection">01 · Visibilidad orgánica</span>
+        <span class="running-divider"></span>
+        <span data-slot="runningPeriod">Agosto 2026 · contra julio 2026</span>
+      </span>
     </header>
 
-    <h1 class="assertion" data-slot="assertion">La afirmación que ordena este capítulo</h1>
+    <span class="page-eyebrow narrative-eyebrow">
+      <svg class="stroke-icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v4a1 1 0 0 0 1 1h4"></path><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path><path d="M9 9h1"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg><span data-slot="eyebrow">Visibilidad orgánica</span>
+    </span>
 
-    <p class="lead" data-slot="lead">Lo que el lector debe entender antes del detalle.</p>
+    <h1 class="narrative-assertion" data-slot="assertion">La afirmación que ordena este capítulo</h1>
+    <p class="narrative-lead" data-slot="lead">Lo que el lector debe entender antes del detalle.</p>
 
-    <div class="body-text" data-slot="paragraphs">
-      <p>Desarrollo del capítulo.</p>
-    </div>
+    <div class="narrative-body" data-slot="paragraphs"><p>Desarrollo del capítulo.</p></div>
 
-    <footer class="foot">
-      <div class="foot-contact" data-slot="contactDetails">
-        <span class="foot-line">
-          <img src="assets/contact/map-point-bold.svg" alt="" />
-          <span>Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile</span>
-        </span>
-        <span class="foot-line">
-          <img src="assets/contact/phone-calling-bold.svg" alt="" />
-          <span>+56 9 3732 3064</span>
-        </span>
+    <footer class="paper-foot">
+      <div class="paper-foot-rule"><span class="accent"></span><span class="line"></span></div>
+      <div class="paper-foot-row">
+        <div class="paper-foot-id">
+          <div class="paper-foot-lockup">
+            <img src="assets/brand/logo-full.svg" alt="Efeonce" />
+            <span class="divider"></span>
+            <span class="paper-foot-edition" data-slot="footerEdition">Insights · Informe de agosto 2026</span>
+          </div>
+          <div class="paper-foot-contact" data-slot="footerContact"><span data-slot-field="address">Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile</span><span class="dot"></span><span class="num" data-slot-field="phone">+56 9 3732 3064</span></div>
+        </div>
+        <div class="paper-foot-end">
+          <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+          <span class="divider"></span>
+          <span class="paper-folio" data-slot="folio"><span class="paper-folio-page" data-slot-field="page">03</span><span class="paper-folio-total">/ <span data-slot-field="total">24</span></span></span>
+        </div>
       </div>
-      <span class="foot-bubble" data-slot="urlBubble">
-        <img src="assets/url-lum.svg" alt="efeoncepro.com" />
-      </span>
-      <span class="folio" data-slot="pageFolio">3</span>
     </footer>
   </div>
 </body>

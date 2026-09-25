@@ -186,5 +186,57 @@ export const GH_INSIGHTS = {
     unitLabel: 'Unidad',
     sourceLabel: 'Fuente',
     coverageLabel: 'Cobertura'
+  },
+
+  /**
+   * TASK-1889 — rótulos de las plantillas editoriales (canvas aprobado 2026-09-25). Son copy fijo del
+   * documento; cifras, títulos y lecturas salen del plan sellado. Bloque de TASK-1889: TASK-1888 no lo
+   * edita (acuerdo entre sesiones del 2026-09-25).
+   */
+  catalog: {
+    product: 'Insights',
+    editionKind: 'Informe mensual',
+    readingEyebrow: 'Lectura de Efeonce',
+    preparedFor: 'Preparado para',
+    confidential: 'Confidencial',
+    version: 'Versión',
+    reportOf: 'Informe de',
+    backCoverPrefix: 'Efeonce Insights',
+    legalConfidential: 'Documento confidencial para uso exclusivo del cliente',
+    figuresAsOf: 'Cifras al',
+    chapter: 'Capítulo',
+    inThisChapter: 'En este capítulo',
+    measuredIn: 'Medimos la marca en',
+    indexEyebrow: 'Contenido',
+    indexSectionColumn: 'Sección',
+    tableEyebrow: 'Tabla de respaldo',
+    tableContinued: 'Continúa de la página anterior',
+    limitsEyebrow: 'Límites de la edición',
+    /** El `<em>` resalta la negación en el título de límites (slot rich-string de la plantilla). */
+    limitsTitleRich: 'Lo que esta edición <em>no</em> puede afirmar',
+    methodology: 'Metodología',
+    essentials: 'Lo esencial del mes',
+    thesisOfTheMonth: 'La tesis del mes',
+    decideInMeeting: 'Para decidir en la reunión',
+    decide: 'Para decidir',
+    ourReading: 'Nuestra lectura',
+    inOneSentence: 'En una frase',
+    planOf: 'Plan de',
+    actionPlan: 'Plan de acción',
+    howWeMeasure: 'Cómo lo mediremos',
+    whatWeNeed: 'Qué necesitamos de ustedes',
+    whatWeNeedShort: 'Qué necesitamos',
+    whatItMeans: 'Lo que significa',
+    nextStep: 'Próximo paso',
+    signature: 'Recomendación de Efeonce',
+    evidence: 'Evidencia',
+    evidencePage: 'p.',
+    impact: 'Impacto',
+    effort: 'Esfuerzo',
+    planColumns: { number: '#', action: 'Acción', metric: 'Métrica de éxito', weeks: ['S1', 'S2', 'S3', 'S4'] },
+    /** Pestaña del deck para secciones sin número de capítulo. */
+    tabMarks: { summary: '00', reading: 'C', plan: 'P', limits: 'L' },
+    /** Marca del índice para secciones sin número de capítulo. */
+    indexMarks: { summary: 'R', limits: 'L' }
   }
 } as const

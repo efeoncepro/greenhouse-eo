@@ -2,7 +2,7 @@
   "reference": null,
   "name": "limites",
   "catalog": "report",
-  "contentType": "report-limits-v2",
+  "contentType": "report-limits",
   "slots": {
     "runningSection": "Límites y metodología",
     "runningPeriod": "Agosto 2026",

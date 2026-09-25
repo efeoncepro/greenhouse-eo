@@ -1,0 +1,32 @@
+{
+  "reference": null,
+  "name": "deck-limites",
+  "catalog": "deck",
+  "contentType": "insights-limits",
+  "slots": {
+    "tabNumber": "L",
+    "section": "Límites y metodología",
+    "period": "Agosto 2026",
+    "eyebrow": "Límites de la edición",
+    "assertion": "Lo que esta edición <em>no</em> puede afirmar",
+    "limits": [
+      {
+        "subject": "Posiciones promedio",
+        "cause": "Search Console entrega un promedio ponderado por impresiones."
+      },
+      {
+        "subject": "Respuestas de IA",
+        "cause": "50 consultas por motor en 7 días; las respuestas cambian entre corridas."
+      },
+      {
+        "subject": "Conversiones",
+        "cause": "Los formularios salen del CRM; las llamadas no quedan registradas."
+      }
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "folio": {
+      "page": "23",
+      "total": "24"
+    }
+  }
+}

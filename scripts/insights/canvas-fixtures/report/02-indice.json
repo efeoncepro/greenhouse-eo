@@ -2,7 +2,7 @@
   "reference": null,
   "name": "indice",
   "catalog": "report",
-  "contentType": "report-contents",
+  "contentType": "report-index",
   "slots": {
     "runningSection": "Índice",
     "runningPeriod": "Agosto 2026",
