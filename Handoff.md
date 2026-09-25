@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Marketing Studio (25/09):** [TASK-1887](docs/tasks/in-progress/TASK-1887-marketing-studio-foundation.md) in-progress (EPIC-049). Repo nuevo `efeoncepro/efeonce-marketing-studio`, base `marketing_studio` en `greenhouse-pg-dev`, Vercel + `studio.efeonce.org` en modo `open` (sólo lectura). Autorizado por el operador: repo, bases, Vercel y dominio.
+
 **ANAM Emma (24/09):** landing pública HubSpot `kortex-cms-react/30` verificada con el PNG entregado por María Paz,
 cargo `Ejecutivo comercial ANAM` y avatar derivado con fondo menta en identidad de Customer Agent y chatflow
 `96601133`. Canon técnico, funcional, manual y skill `hubspot-as-a-service` actualizados en
