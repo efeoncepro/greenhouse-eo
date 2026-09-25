@@ -9,7 +9,7 @@
 
 | Pieza | Estado |
 |---|---|
-| Web + API `/api/v1` | Deploy de producción `READY` en Vercel (`dpl_128uickaRf8PoKVGEzxGgtR1MuTB`, commit `77e58e4`, toolchain TS 7 · React 19.3) |
+| Web + API `/api/v1` | Deploy de producción `READY` en Vercel (`c949d3f`, toolchain TS 7 · React 19.3, imágenes por enlace firmado) |
 | `studio.efeonce.org` | En vivo: CNAME en HostGator + certificado Let's Encrypt (renovación automática de Vercel) |
 | Base de producción `marketing_studio` | Migrada (2 migraciones), import aplicado: 5 campañas, 21 conceptos, 54 piezas, 48 copys, 72 anuncios, 4 audiencias, 1 flight, 7 líneas de presupuesto, 6 posts |
 | Base de staging `marketing_studio_staging` | Igual que producción |
@@ -45,6 +45,7 @@ Node 24 LTS · pnpm 10 · Next.js 16.3 (Turbopack) · React 19.3 · **TypeScript
 | `GCP_SERVICE_ACCOUNT_EMAIL` | `marketing-studio-runtime@efeonce-group.iam.gserviceaccount.com` | `marketing-studio-runtime-stg@…` |
 | `STUDIO_ACCESS_MODE` | sin definir (= `open`) | `open` |
 | `STUDIO_PUBLIC_URL` | `https://studio.efeonce.org` | — |
+| `STUDIO_MEDIA_URL_SECRET` | secreto HMAC de enlaces de imagen (sensitive) | uno distinto por ambiente |
 | `NODE_AUTH_TOKEN` | token de lectura de paquetes (encrypted) | igual |
 
 ## DNS (aplicado 2026-09-25)
@@ -86,6 +87,10 @@ pnpm --filter @studio/web theme:generate
 ```
 
 Probar un deployment protegido por SSO sin crear bypass manual: `vercel curl /api/v1/health --deployment <url> --scope efeonce-7670142f`.
+
+## Imágenes (renditions)
+
+Los readers devuelven `thumbUrl`/`previewUrl` como enlaces firmados `/api/v1/media/{token}` (HMAC con `STUDIO_MEDIA_URL_SECRET`, vencen a la semana redondeada) que se sirven desde el bucket **sin consultar Postgres**. Sin secreto caen a `/api/v1/renditions/{id}`, que sí consulta la base. Incidente 2026-09-25: con una consulta por imagen, una grilla de 20+ miniaturas agotaba el tope de 20 conexiones de `marketing_studio_app` (`too many connections for role`) y 18 de 40 pedidos simultáneos daban 500. Rotar el secreto invalida los enlaces vigentes; la página los regenera al recargar.
 
 ## Rollback
 
