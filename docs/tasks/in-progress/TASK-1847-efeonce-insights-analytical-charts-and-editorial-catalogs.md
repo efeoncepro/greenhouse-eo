@@ -1,5 +1,15 @@
 # TASK-1847 — Efeonce Insights: gráficos y catálogos premium para deck e informe vertical
 
+## Delta 2026-09-25 — rediseño premium traspasado a TASK-1888 y TASK-1889
+
+- El operador aprobó un rediseño completo de los informes en el canvas «Gráficos de Efeonce Insights»
+  (dirección durable en `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`).
+- Esta task **cierra con su alcance v1** (catálogos en producción desde el 2026-09-24): le falta sólo el render real
+  en el Job productivo y el gate de cierre. No absorbe el rediseño.
+- El límite «13 de 15 familias sin productor» pasa a `TASK-1888` (contrato y productores); el rediseño de plantillas,
+  portadas por módulo, contraportada, capítulos y prosa pasa a `TASK-1889`, que espera este cierre antes de tocar
+  los archivos de esta task.
+
 ## Delta 2026-09-15
 
 - `ChartSpecV1` (familias bar/bar_grouped/bar_stacked/line/pie/donut/scatter, `validateChartSpec`) y `EditorialPlanV1` ya existen en `src/lib/efeonce-insights/contracts/`; el planner determinista emite barras con origen cero y equivalente tabular. Esta task construye la librería/catálogos sobre ese contrato, no otro. — por TASK-1845

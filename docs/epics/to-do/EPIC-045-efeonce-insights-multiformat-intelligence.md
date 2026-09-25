@@ -62,6 +62,8 @@ implícita. Es una recomendación de reparto, no una certificación comparativa 
 | TASK-1848 | Codex · GPT-6 Astra | xhigh | Sharing, revocación, correo/recurrencia y prevención de duplicados |
 | TASK-1849 | Claude · Opus 5 | xhigh | Biblioteca/builder/visor: recorridos cliente/interno, responsive y GVC |
 | TASK-1875 | Claude · Opus 5 | xhigh | Render Astro en `efeonce-think`: fidelidad de cifras, no-leak, revocación por request, GVC del hub |
+| TASK-1888 | Codex · GPT-6 Astra | xhigh | Contrato editorial v2: familias, plan, `channelId`, preferencia de portada y compatibilidad con ediciones selladas |
+| TASK-1889 | Claude · Opus 5 | xhigh | Catálogos premium aprobados: fidelidad al canvas, portadas por módulo, gráficos y revisión de PDFs reales |
 
 **Orden:** TASK-1845 → TASK-1846/1847 → TASK-1848 → TASK-1849, respetando las dependencias de la tabla
 Child Tasks. TASK-1847 prepara catálogos tras 1845; su export final depende de 1846. Preparar 1845 durante
@@ -95,8 +97,19 @@ pequeños. No agregar una task por módulo, gráfico, formato, endpoint ni otra 
 | U04 | [TASK-1848](../../tasks/in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados — **en producción 2026-09-18 con flags OFF** (release `bda1cf2cd938`; staging ON; gateway 1.7.0); in-progress | none |
 | U05 | [TASK-1849](../../tasks/to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md) | biblioteca, creación y experiencia web compartida | TASK-1847, TASK-1848 |
 | U06 | [TASK-1875](../../tasks/to-do/TASK-1875-efeonce-insights-shared-web-render-think.md) | vista web compartida por token renderizada en `efeonce-think` (nodo S6; decisión 2026-09-15) | TASK-1848 |
+| U07 | [TASK-1888](../../tasks/to-do/TASK-1888-efeonce-insights-editorial-contract-v2.md) | contrato editorial v2: 15 familias de gráfico, lectura por figura, `channelId` y portada por cliente/encargo sellada | TASK-1847 (cierre) |
+| U08 | [TASK-1889](../../tasks/to-do/TASK-1889-efeonce-insights-premium-catalogs.md) | catálogos premium aprobados (canvas 2026-09-25), verificación con Berel y Sky y release | TASK-1888 |
 
 TASK-1847 puede preparar catálogos tras TASK-1845; integración/export final requiere TASK-1846.
+
+**Delta 2026-09-25 — rediseño premium aprobado.** El operador aprobó en el canvas «Gráficos de Efeonce Insights» el
+aspecto que debe tener todo informe. TASK-1847 cierra con los catálogos v1 ya en producción; el rediseño se reparte
+en dos unidades según el proceso de tasks híbridas: TASK-1888 (contrato, `backend-data`) y TASK-1889 (catálogos,
+`ui-ux`). No es trabajo preventivo: nace de la demanda que el Follow-up de TASK-1847 exigía. Conforme a esta épica,
+no hay task aparte de QA/rollout: la verificación con ediciones internas reales de Berel y Sky y el release viven en
+TASK-1889. Decisiones del operador: portada por cliente con cambio opcional en el encargo (`auto` = blanca si el
+logo no tiene versión para fondo oscuro), y ninguna edición con el diseño nuevo se comparte con un cliente antes de
+su revisión.
 TASK-1849 es consumer UI, backend none; si encuentra un gap de command vuelve a la dueña backend.
 
 ## Existing Related Work
