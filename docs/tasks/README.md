@@ -81,7 +81,7 @@ TASK-690–693 para Hub/preferencias y TASK-303/387/694 para audiencia/digest/me
 | [TASK-1849](to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md) | biblioteca, creación y experiencia web compartida | to-do |
 | [TASK-1875](to-do/TASK-1875-efeonce-insights-shared-web-render-think.md) | vista web compartida por token renderizada en Think (`efeonce-think`) | to-do |
 | [TASK-1888](in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md) | contrato editorial v2: 15 familias de gráfico, lectura por figura, `channelId` y portada por cliente/encargo sellada | In Progress |
-| [TASK-1889](in-progress/TASK-1889-efeonce-insights-premium-catalogs.md) | catálogos premium aprobados (canvas 2026-09-25): portadas por módulo, contraportada, capítulos, prosa y gráficos premium; verificación con Berel y Sky y release | in-progress |
+| [TASK-1889](in-progress/TASK-1889-efeonce-insights-premium-catalogs.md) | catálogos premium aprobados (canvas 2026-09-25): portadas por módulo, contraportada, capítulos, prosa y gráficos premium; verificación con Berel y Sky y release — **Slices 1–5 code complete en develop (sin push); rollout pendiente** (aprobación de PDFs reales, staging con el flag de TASK-1888, release) | in-progress |
 
 ## Proveedor de imagen OpenAI
 

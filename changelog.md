@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-25 — Insights: el diseño aprobado llega al informe y al deck (TASK-1889)
+
+Los catálogos `insights-report` (A4) e `insights-deck` (16:9) componen sólo con el canvas aprobado el mismo día: portada navy o blanca con el logo privado del cliente (sellado como referencia, bytes autorizados por el worker), índice, «Lo esencial» con el folio real de su evidencia, aperturas de capítulo, una página de figura por familia (comparación de períodos, columnas por canal, metas con banda del registro ICO, tendencia), tabla, límites y contraportada desde el SSOT de marca. Se retiraron la página analítica y la lámina de evidencia v1. Fidelidad al canvas 20/21 ≤ 1 % (Deck-Agrupadas con excepción aprobada); gate visual de Insights a 0 px; ediciones reales de Berel y Sky compuestas en local, que revelaron y corrigieron cinco defectos. Code complete en develop, sin push; rollout pendiente. [Dossier](docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md).
+
 ## 2026-09-25 — Marketing Studio listo para agentes (TASK-1890)
 
 Studio publica un registro único de operaciones del que se derivan su OpenAPI (1.1.0) y el manifiesto `studio-tool-manifest.v1` (12 tools de lectura `studio.*` + 5 exclusiones con razón, `manifestHash`, leak test y paridad con los route handlers). La API acepta bearer de `api_client` con organizaciones permitidas (`organizationId` nunca amplía), las campañas usan el id canónico de organización de Greenhouse y hay detalle y preview por pieza. Imágenes por enlace firmado sin consulta a la base (incidente de conexiones del mismo día). En Greenhouse: capability `marketing_studio.campaign.read` y manual MCP `marketing-studio` (manuales con `provider` externo). Toolchain de Studio al día (TypeScript 7, React 19.3, catálogo único de versiones). [Arquitectura §4.1](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md).

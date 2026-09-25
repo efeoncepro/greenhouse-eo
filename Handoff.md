@@ -4,6 +4,8 @@
 
 **Insights (25/09):** [TASK-1888](docs/tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md) code complete, rollout pendiente (flag OFF, migración aplicada, [efeonce-mcp#18](https://github.com/efeoncepro/efeonce-mcp/pull/18) sin deploy; sin push). Plan de rollout: arquitectura §14.8.
 
+**Insights diseño (25/09):** [TASK-1889](docs/tasks/in-progress/TASK-1889-efeonce-insights-premium-catalogs.md) Slices 1–5 code complete en develop (sin push): catálogos A4 y deck del canvas aprobado, páginas de figura por familia, «Lo esencial», portada con logo privado; legado v1 retirado. Canvas 20/21 ≤ 1 % + excepción Deck-Agrupadas aprobada; gate insights 27/27 a 0 px; `ui:quality` PASS. Ediciones reales Berel/Sky compuestas en local (PDFs en `.captures/insights-preview/`, no versionados). **Falta:** aprobación del operador de esos PDFs y de las piezas derivadas, push, staging con `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888) y release por el control plane (el Job `artifact-worker` es compartido). [Dossier](docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md).
+
 **ANAM Emma (24/09):** landing pública HubSpot `kortex-cms-react/30` verificada con el PNG entregado por María Paz,
 cargo `Ejecutivo comercial ANAM` y avatar derivado con fondo menta en identidad de Customer Agent y chatflow
 `96601133`. Canon técnico, funcional, manual y skill `hubspot-as-a-service` actualizados en
