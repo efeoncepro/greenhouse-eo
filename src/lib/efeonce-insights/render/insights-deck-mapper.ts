@@ -337,11 +337,20 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
 
       const chapterIndex = frozen.chapters.findIndex(chapter => (chapter.claims.some(c => `essential.${c.claimId}` === source.claimId || c.claimId === source.claimId) ||
           // Un esencial que es la conclusión de una figura (TASK-1888): su capítulo es el del gráfico, se dibuje o no.
-          chapter.charts.some(chart => source.claimId.includes(chart.chartId))))
+          chapter.charts.some(chart => source.claimId.includes(chart.chartId)) ||
+          // Último respaldo: el capítulo del módulo de su hecho (todo hecho es de un módulo con capítulo).
+          (factId !== undefined && chapter.module === factsById.get(factId)?.module)))
+
+      // La narrativa que afirma ese texto (un hecho sin figura se cuenta en prosa: Berel CTR).
+      const narrated = slides.findIndex(slide => {
+        const slots = slide.slots as { assertion?: string; points?: Array<{ text: string }> }
+
+        return slide.contentType === 'insights-narrative' && (slots.assertion === source.text || (slots.points ?? []).some(point => point.text === source.text))
+      })
 
       const opening = chapterIndex >= 0 ? openings[chapterIndex]?.slideIndex : undefined
       const concluded = [...slideConclusions].find(([, text]) => text === source.text)?.[0]
-      const at = concluded ?? drawn ?? opening
+      const at = concluded ?? drawn ?? (narrated >= 0 ? narrated : undefined) ?? opening
 
       if (at === undefined) throw new InsightsRenderRejectedError(`«Lo esencial» ${source.claimId}: no hay lámina que respalde su cifra.`)
 

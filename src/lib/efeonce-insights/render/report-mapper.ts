@@ -566,10 +566,30 @@ export const buildInsightReportPlanInput = ({
       return null
     }
 
-    const chapterOfClaim = (claimId: string): number | null => {
+    // La narrada que afirma ese texto (un hecho sin figura se cuenta en prosa: Berel CTR).
+    const pageOfText = (text: string): number | null => {
+      for (const [i, section] of sections.entries()) {
+        const offset = section.pages.findIndex(body => {
+          const slots = body.page.slots as { assertion?: string; paragraphs?: string[] }
+
+          return body.page.contentType === 'report-narrative' && (slots.assertion === text || (slots.paragraphs ?? []).includes(text))
+        })
+
+        if (offset >= 0) return folioOf[i]! + offset
+      }
+
+      return null
+    }
+
+    // Último respaldo: la apertura del capítulo que lo afirma o, por el módulo de su hecho, del capítulo de ese
+    // módulo. Todo hecho es de un módulo y todo módulo tiene capítulo: una esencial real siempre tiene página.
+    const chapterOfClaim = (claimId: string, factId: string | undefined): number | null => {
+      const factModule = factId ? factsById.get(factId)?.module : undefined
+
       const index = frozen.chapters.findIndex(chapter => (chapter.claims.some(item => `essential.${item.claimId}` === claimId || item.claimId === claimId) ||
           // Un esencial que es la conclusión de una figura (TASK-1888): su capítulo es el del gráfico, se dibuje o no.
-          chapter.charts.some(chart => claimId.includes(chart.chartId))))
+          chapter.charts.some(chart => claimId.includes(chart.chartId)) ||
+          (factModule !== undefined && chapter.module === factModule)))
 
       const section = index >= 0 ? sections.findIndex(sec => sec.title === frozen.chapters[index]!.title) : -1
 
@@ -580,7 +600,7 @@ export const buildInsightReportPlanInput = ({
 
     items.forEach((item, index) => {
       const source = essentials[index]!
-      const folio = pageOfConclusion(source.text) ?? pageOfFact(source.factIds[0]) ?? chapterOfClaim(source.claimId)
+      const folio = pageOfConclusion(source.text) ?? pageOfFact(source.factIds[0]) ?? pageOfText(source.text) ?? chapterOfClaim(source.claimId, source.factIds[0])
 
       if (folio === null) throw new InsightsRenderRejectedError(`«Lo esencial» ${source.claimId}: no hay página que respalde su cifra.`)
 

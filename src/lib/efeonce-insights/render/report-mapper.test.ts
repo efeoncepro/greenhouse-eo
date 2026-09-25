@@ -489,6 +489,37 @@ describe('buildInsightReportPlanInput', () => {
     expect((summary.slots.essentials as Array<{ folio: string }>)[0]!.folio).toBe(`p. ${String(targetsIndex + 1).padStart(2, '0')}`)
   })
 
+  it('una esencial de un hecho sin figura apunta a la narrada que lo afirma (caso Berel CTR)', () => {
+    const facts = [
+      { factId: 'ctr', value: 1.8, unit: 'percent', label: 'CTR', metricId: 'ctr', module: 'seo', evidenceRef: 'e' },
+      { factId: 'ctr-prev', value: 1.9, unit: 'percent', label: 'CTR', metricId: 'ctr', module: 'seo', evidenceRef: 'e' }
+    ]
+
+    // Una comparación de una sola métrica no tiene página: el CTR sólo se cuenta en prosa.
+    const ctrOnly = { specVersion: 'chart_spec_v1', chartId: 'chart.seo.percent', family: 'bar_grouped', relation: 'comparison', title: 'CTR', unit: 'percent',
+      dimensionLabels: ['CTR'], references: [], scale: { kind: 'linear', baseline: 0 }, tabularEquivalent: { columns: [], rows: [] },
+      series: [{ seriesId: 'p', label: 'Período anterior', factIds: ['ctr-prev'], unit: 'percent' }, { seriesId: 'c', label: 'Período', factIds: ['ctr'], unit: 'percent' }] }
+
+    const headline = { claimId: 'claim.head', text: 'Visibilidad orgánica en agosto.', factIds: [] }
+    const ctrClaim = { claimId: 'claim.fact.seo.ctr', text: 'CTR: 1,8 % (período anterior 1,9 %).', factIds: ['ctr', 'ctr-prev'] }
+
+    const input = buildInsightReportPlanInput({
+      edition, report,
+      snapshot: { facts, sources: [], rejections: [] } as never,
+      plan: plan({
+        executiveSummary: [{ claimId: 's0', text: 'El CTR se mantuvo.', factIds: [] }],
+        essentials: [{ ...ctrClaim, claimId: 'essential.fact.seo.ctr.2026-09-01_2026-09-21' }],
+        chapters: [chapter({ module: 'seo', claims: [headline, ctrClaim], charts: [ctrOnly] as never })]
+      } as never)
+    })
+
+    const narrativeIndex = input.slides.findIndex(slide => slide.contentType === 'report-narrative' && ((slide.slots.paragraphs as string[] | undefined) ?? []).includes(ctrClaim.text))
+    const summary = input.slides.find(slide => slide.contentType === 'report-summary')!
+
+    expect(narrativeIndex).toBeGreaterThan(0)
+    expect((summary.slots.essentials as Array<{ folio: string }>)[0]!.folio).toBe(`p. ${String(narrativeIndex + 1).padStart(2, '0')}`)
+  })
+
   const periodComparison = (metrics: number) => {
     const facts = Array.from({ length: metrics }, (_, i) => [
       { factId: `cur${i}`, value: (i + 1) * 1000, unit: 'count', evidenceRef: `ev-c${i}` },
