@@ -98,3 +98,24 @@ describe('predicado compartido con el planner', () => {
     expect(hasFigurePage(grouped([null, null]), new Map() as never)).toBe(false)
   })
 })
+
+describe('bajada', () => {
+  it('no repite el hecho principal de la conclusión con otras palabras (caso Berel clics)', () => {
+    const facts = new Map([
+      ['c1', { factId: 'c1', value: 9377, unit: 'count', label: 'Clics', metricId: 'clicks', evidenceRef: 'e' }],
+      ['p1', { factId: 'p1', value: 10662, unit: 'count', label: 'Clics', metricId: 'clicks', evidenceRef: 'e' }],
+      ['c2', { factId: 'c2', value: 5, unit: 'count', label: 'Imp', metricId: 'impressions', evidenceRef: 'e' }],
+      ['p2', { factId: 'p2', value: 6, unit: 'count', label: 'Imp', metricId: 'impressions', evidenceRef: 'e' }]
+    ]) as never
+
+    const reading = { chartId: 'c', conclusion: { claimId: 'k', text: 'Los clics bajaron de 10.662 a 9.377 (−12,1 %).', factIds: ['c1', 'p1'] }, nextStep: null }
+    const sameFact = { claimId: 'a', text: 'Clics orgánicos: 9.377 (período anterior 10.662).', factIds: ['c1', 'p1'] }
+    const other = { claimId: 'b', text: 'Impresiones: 5 (período anterior 6).', factIds: ['c2', 'p2'] }
+
+    const [withOther] = buildFigureSlides(grouped([null, null]), facts, reading as never, [sameFact, other], 'es-CL', FIGURE_CAPACITY.report)
+    const [alone] = buildFigureSlides(grouped([null, null]), facts, reading as never, [sameFact], 'es-CL', FIGURE_CAPACITY.report)
+
+    expect(withOther!.lead).toBe(other.text)
+    expect(alone!.lead).toBeNull()
+  })
+})

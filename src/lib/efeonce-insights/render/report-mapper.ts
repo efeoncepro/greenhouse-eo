@@ -101,6 +101,8 @@ interface BodyPage {
   readonly contentsTitle?: string
   /** Hechos que la página dibuja: con ellos «Lo esencial» apunta a la página real de su evidencia. */
   readonly factIds?: readonly string[]
+  /** Conclusión impresa de una página de figura: una esencial que la repite apunta a ESTA página. */
+  readonly conclusion?: string
 }
 
 const pad2 = (n: number): string => String(n).padStart(2, '0')
@@ -166,6 +168,7 @@ const chapterBodyPages = (
       pages.push({
         contentsTitle: figure.figureTitle,
         factIds: figure.factIds,
+        conclusion: figure.conclusion,
         page: {
           contentType: FIGURE_CONTENT_TYPE.report[figure.kind],
           slots: {
@@ -551,6 +554,18 @@ export const buildInsightReportPlanInput = ({
       return null
     }
 
+    // Una esencial que ES la conclusión de una figura (p. ej. «Cumple la meta de…») apunta a esa figura, no a la
+    // primera página que dibuja su hecho (Sky: la comparación de p. 05 en vez de las metas de p. 07).
+    const pageOfConclusion = (text: string): number | null => {
+      for (const [i, section] of sections.entries()) {
+        const offset = section.pages.findIndex(body => body.conclusion === text)
+
+        if (offset >= 0) return folioOf[i]! + offset
+      }
+
+      return null
+    }
+
     const chapterOfClaim = (claimId: string): number | null => {
       const index = frozen.chapters.findIndex(chapter => (chapter.claims.some(item => `essential.${item.claimId}` === claimId || item.claimId === claimId) ||
           // Un esencial que es la conclusión de una figura (TASK-1888): su capítulo es el del gráfico, se dibuje o no.
@@ -565,7 +580,7 @@ export const buildInsightReportPlanInput = ({
 
     items.forEach((item, index) => {
       const source = essentials[index]!
-      const folio = pageOfFact(source.factIds[0]) ?? chapterOfClaim(source.claimId)
+      const folio = pageOfConclusion(source.text) ?? pageOfFact(source.factIds[0]) ?? chapterOfClaim(source.claimId)
 
       if (folio === null) throw new InsightsRenderRejectedError(`«Lo esencial» ${source.claimId}: no hay página que respalde su cifra.`)
 

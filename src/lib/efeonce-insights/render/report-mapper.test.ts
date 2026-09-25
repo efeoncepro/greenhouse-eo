@@ -454,6 +454,41 @@ describe('buildInsightReportPlanInput', () => {
     }
   }, 120_000)
 
+  it('una esencial que ES la conclusión de una figura apunta a esa figura, no a la primera que dibuja su hecho (caso Sky)', () => {
+    const facts = [
+      { factId: 'ftr', value: 90.9, unit: 'percent', label: 'FTR', metricId: 'ftr', evidenceRef: 'e' },
+      { factId: 'ftr-prev', value: 96.5, unit: 'percent', label: 'FTR', metricId: 'ftr', evidenceRef: 'e' },
+      { factId: 'otd', value: 81.9, unit: 'percent', label: 'OTD', metricId: 'otd', evidenceRef: 'e' },
+      { factId: 'otd-prev', value: 80.1, unit: 'percent', label: 'OTD', metricId: 'otd', evidenceRef: 'e' },
+      { factId: 'ftr-target', value: 80, unit: 'percent', label: 'Meta FTR', metricId: 'target.ftr', evidenceRef: 'e', role: 'reference' }
+    ]
+
+    const base = { specVersion: 'chart_spec_v1', references: [], scale: { kind: 'linear', baseline: 0 }, tabularEquivalent: { columns: [], rows: [] } }
+
+    const comparison = { ...base, chartId: 'chart.cmp', family: 'bar_grouped', relation: 'comparison', title: 'Entrega', unit: 'percent', dimensionLabels: ['FTR', 'OTD'],
+      series: [{ seriesId: 'p', label: 'Período anterior', factIds: ['ftr-prev', 'otd-prev'], unit: 'percent' }, { seriesId: 'c', label: 'Período', factIds: ['ftr', 'otd'], unit: 'percent' }] }
+
+    const bullet = { ...base, chartId: 'chart.bullet', family: 'bullet', relation: 'target', title: 'FTR contra la meta', unit: 'percent', series: [], dimensionLabels: ['Sky'],
+      data: { kind: 'bullet', direction: 'higher_is_better', items: [{ itemId: 'i', label: 'Sky', valueFactId: 'ftr', targetFactId: 'ftr-target' }] } }
+
+    const meets = { claimId: 'chart.bullet.conclusion', text: 'Cumple la meta de primera entrega correcta: 90,9 % (meta 80,0 %).', factIds: ['ftr', 'ftr-target'] }
+
+    const input = buildInsightReportPlanInput({
+      edition, report,
+      snapshot: { facts, sources: [], rejections: [] } as never,
+      plan: plan({
+        executiveSummary: [{ claimId: 's0', text: 'La entrega cumple su meta de calidad.', factIds: [] }],
+        essentials: [{ ...meets, claimId: `essential.${meets.claimId}` }],
+        chapters: [chapter({ claims: [], charts: [comparison, bullet] as never, readings: [{ chartId: 'chart.bullet', conclusion: meets, nextStep: null }] } as never)]
+      } as never)
+    })
+
+    const targetsIndex = input.slides.findIndex(slide => slide.contentType === 'report-figure-targets')
+    const summary = input.slides.find(slide => slide.contentType === 'report-summary')!
+
+    expect((summary.slots.essentials as Array<{ folio: string }>)[0]!.folio).toBe(`p. ${String(targetsIndex + 1).padStart(2, '0')}`)
+  })
+
   const periodComparison = (metrics: number) => {
     const facts = Array.from({ length: metrics }, (_, i) => [
       { factId: `cur${i}`, value: (i + 1) * 1000, unit: 'count', evidenceRef: `ev-c${i}` },

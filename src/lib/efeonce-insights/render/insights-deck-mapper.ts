@@ -109,8 +109,8 @@ const chapterSlides = (
   tab: Tabbed,
   factsById: ReadonlyMap<string, EvidenceFactV1>,
   locale: string
-): { slide: Slide; contentsTitle?: string; factIds?: readonly string[] }[] => {
-  const slides: { slide: Slide; contentsTitle?: string; factIds?: readonly string[] }[] = []
+): { slide: Slide; contentsTitle?: string; factIds?: readonly string[]; conclusion?: string }[] => {
+  const slides: { slide: Slide; contentsTitle?: string; factIds?: readonly string[]; conclusion?: string }[] = []
   const used = new Set<string>()
 
   // Láminas de figura premium (TASK-1889 Slice 4): la misma figura que la página A4, con su cifra
@@ -125,6 +125,7 @@ const chapterSlides = (
       slides.push({
         contentsTitle: figure.figureTitle,
         factIds: figure.factIds,
+        conclusion: figure.conclusion,
         slide: {
           contentType: FIGURE_CONTENT_TYPE.deck[figure.kind],
           slots: {
@@ -226,6 +227,8 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
 
   // Hechos que dibuja cada lámina de figura: con ellos «Lo esencial» apunta a su lámina.
   const slideFacts = new Map<number, readonly string[]>()
+  // Conclusión impresa de cada lámina de figura: una esencial que la repite apunta a ESA lámina.
+  const slideConclusions = new Map<number, string>()
 
   // Aperturas con su índice: los folios se conocen cuando el plan de láminas está completo.
   const openings: { slideIndex: number; entries: { title: string; offset: number }[] }[] = []
@@ -263,6 +266,7 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
 
     body.forEach(entry => {
       if (entry.factIds) slideFacts.set(slides.length, entry.factIds)
+      if (entry.conclusion) slideConclusions.set(slides.length, entry.conclusion)
       slides.push(entry.slide)
     })
   })
@@ -336,7 +340,8 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
           chapter.charts.some(chart => source.claimId.includes(chart.chartId))))
 
       const opening = chapterIndex >= 0 ? openings[chapterIndex]?.slideIndex : undefined
-      const at = drawn ?? opening
+      const concluded = [...slideConclusions].find(([, text]) => text === source.text)?.[0]
+      const at = concluded ?? drawn ?? opening
 
       if (at === undefined) throw new InsightsRenderRejectedError(`«Lo esencial» ${source.claimId}: no hay lámina que respalde su cifra.`)
 

@@ -201,17 +201,19 @@ export const buildFigureSlides = (
 
   const keyCaption = reading?.keyFigure?.caption.text ?? (fallbackFact?.label ?? chart.title)
   const drawn = new Set<string>()
-  const own = (ids: string[]) => claims.filter(claim => claim.factIds.some(id => ids.includes(id))).map(claim => claim.text)
 
   // Metas: la conclusión es la afirmación que cita la META, no la de comparación con el período anterior.
   const targetIds = new Set(chart.data?.kind === 'bullet' ? chart.data.items.map(item => item.targetFactId) : [])
 
   const base = (factIds: string[], body: Slots, unitText: string, icon: string | undefined): Omit<FigureSlide, 'kind'> => {
-    const cited = own(factIds)
-    const aboutTarget = claims.filter(claim => claim.factIds.some(id => targetIds.has(id))).map(claim => claim.text)
-    const narrated = kind === 'targets' ? [...aboutTarget, ...cited.filter(text => !aboutTarget.includes(text))] : cited
-    const conclusion = reading?.conclusion?.text ?? narrated[0] ?? chart.title
-    const lead = narrated.find(text => text !== conclusion) ?? null
+    const citing = claims.filter(claim => claim.factIds.some(id => factIds.includes(id)))
+    const aboutTarget = claims.filter(claim => claim.factIds.some(id => targetIds.has(id)))
+    const ordered = kind === 'targets' ? [...aboutTarget, ...citing.filter(claim => !aboutTarget.includes(claim))] : citing
+    const conclusionClaim = reading?.conclusion ?? ordered[0]
+    const conclusion = conclusionClaim?.text ?? chart.title
+    // La bajada no repite el HECHO de la conclusión con otras palabras (Berel clics, Sky FTR): sin otro hecho, no hay bajada.
+    const mainFact = conclusionClaim?.factIds[0]
+    const lead = ordered.find(claim => claim.text !== conclusion && (mainFact === undefined || claim.factIds[0] !== mainFact))?.text ?? null
 
     factIds.forEach(id => drawn.add(id))
 
