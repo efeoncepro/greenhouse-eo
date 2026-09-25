@@ -106,10 +106,22 @@ describe('resolvers de figura', () => {
     expect(bulletRowEffects(rows[1]!, slots)?.some(e => e.toneClass === 'bullet--gap')).toBe(false)
     expect(bulletRowEffects(rows[0]!, slots)).toContainEqual({ selector: ':self', styleProp: '--achieved', styleValue: '90.9%' })
 
+    // La zona de atención sale sólo del dato: sin `band` no hay zona (nunca un umbral a mano).
+    expect(bulletRowEffects(rows[1]!, slots)).toContainEqual({ selector: ':self', styleProp: '--zone', styleValue: '0%' })
+    expect(bulletRowEffects({ ...rows[1]!, band: '25,5' }, slots)).toContainEqual({ selector: ':self', styleProp: '--zone', styleValue: '77.3%' })
+    expect(bulletRowEffects({ ...rows[1]!, band: 'n/d' }, slots)).toBeNull()
+
     // Con «menos es mejor», quedar sobre la meta es la brecha.
     const lower = { bulletRows: [{ value: '3', target: '2' }, { value: '1', target: '2' }], bulletDirection: 'lower_is_better' }
 
     expect(bulletRowEffects({ value: '3', target: '2' }, lower)).toContainEqual({ selector: ':self', toneClass: 'bullet--gap', toneGroup: ['bullet--gap'] })
+
+    // RpA: 1,33 contra meta 1,5 y límite de atención 2,5. Alcanzó; la zona oscura queda SOBRE 2,5.
+    const rpa = bulletRowEffects({ value: '1,33', target: '1,5', band: '2,5' }, { bulletRows: [{ value: '1,33', target: '1,5', band: '2,5' }], bulletDirection: 'lower_is_better' })
+
+    expect(rpa).toContainEqual({ selector: ':self', toneClass: 'bullet--lower', toneGroup: ['bullet--lower'] })
+    expect(rpa).toContainEqual({ selector: ':self', styleProp: '--zone', styleValue: '90.9%' })
+    expect(rpa).toContainEqual({ selector: '.delta-pill', toneClass: 'delta--up', toneGroup: ['delta--up', 'delta--down'] })
   })
 
   it('el cuerpo de la cifra del deck sale de su largo', () => {

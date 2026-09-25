@@ -2,7 +2,7 @@
   "$schema": "../deck-axis/registry.schema.json",
   "version": "0.2",
   "status": "draft",
-  "note": "Registry del catálogo `insights-deck` — deck ejecutivo 16:9 de Efeonce Insights (TASK-1847). Catálogo propio y no extensión de `deck-axis`: aquel imprime vocabulario de propuesta comercial en su portada y sus presupuestos de slot están dimensionados para copy de licitación. Comparte brand pack, compilación de marca y geometría de gráficos; no comparte molde, porque una lámina que se proyecta y una hoja que se lee no tienen la misma densidad. TASK-1889 (2026-09-25): el catálogo es el del canvas editorial aprobado, a 1280×720; las láminas v1 (1920×1080) se REEMPLAZARON bajo los mismos contentTypes. Única excepción: `InsightsEvidenceSlide` sigue en v1 (status `legacy`, 1920×1080) hasta que el Slice 4 de TASK-1889 la reemplace por la lámina de gráfico premium.",
+  "note": "Registry del catálogo `insights-deck` — deck ejecutivo 16:9 de Efeonce Insights (TASK-1847). Catálogo propio y no extensión de `deck-axis`: aquel imprime vocabulario de propuesta comercial en su portada y sus presupuestos de slot están dimensionados para copy de licitación. Comparte brand pack, compilación de marca y geometría de gráficos; no comparte molde, porque una lámina que se proyecta y una hoja que se lee no tienen la misma densidad. TASK-1889 (2026-09-25): el catálogo es el del canvas editorial aprobado, a 1280×720; las láminas v1 (1920×1080) se REEMPLAZARON bajo los mismos contentTypes. Las páginas de gráfico v1 se retiraron en el Slice 4 de TASK-1889: cada familia con productor tiene su página de figura premium.",
   "canvas": {
     "w": 1280,
     "h": 720,
@@ -13,7 +13,6 @@
     "insights-cover",
     "insights-summary",
     "insights-chapter",
-    "insights-evidence",
     "insights-narrative",
     "insights-reading",
     "insights-plan",
@@ -63,20 +62,6 @@
       ],
       "prototype": "insights-chapter.html",
       "slotsRef": "insights-chapter.slots.json"
-    },
-    {
-      "name": "InsightsEvidenceSlide",
-      "kind": "full-bleed",
-      "source": "design",
-      "figmaNode": null,
-      "owner": "claude",
-      "status": "legacy",
-      "contentTypes": [
-        "insights-evidence"
-      ],
-      "prototype": "insights-evidence.html",
-      "slotsRef": "insights-evidence.slots.json",
-      "replacedBy": "TASK-1889 Slice 4 — lámina de gráfico premium por familia"
     },
     {
       "name": "InsightsNarrativeSlide",
@@ -202,7 +187,6 @@
       "insights-cover": "InsightsCoverSlide",
       "insights-summary": "InsightsSummarySlide",
       "insights-chapter": "InsightsChapterSlide",
-      "insights-evidence": "InsightsEvidenceSlide",
       "insights-narrative": "InsightsNarrativeSlide",
       "insights-reading": "InsightsReadingSlide",
       "insights-plan": "InsightsPlanSlide",
@@ -214,7 +198,6 @@
       "insights-figure-trend": "InsightsFigureTrendSlide"
     },
     "disambiguation": [
-      "una conclusión con la figura que la prueba => InsightsEvidenceSlide.",
       "un capítulo cuya evidencia no alcanzó para una figura => InsightsNarrativeSlide. NUNCA se omite el capítulo.",
       "lo que la edición no puede afirmar => InsightsLimitsSlide, y siempre cierra el deck."
     ],

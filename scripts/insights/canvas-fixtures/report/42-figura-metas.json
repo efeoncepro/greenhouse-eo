@@ -29,7 +29,8 @@
         "achievedLabel": "logrado",
         "targetLabel": "meta",
         "target": "1.200",
-        "pct": "107 %"
+        "pct": "107 %",
+        "band": "1.020"
       },
       {
         "icon": "search",
@@ -39,7 +40,8 @@
         "achievedLabel": "logrado",
         "targetLabel": "meta",
         "target": "30",
-        "pct": "87 %"
+        "pct": "87 %",
+        "band": "25,5"
       },
       {
         "icon": "ctr",
@@ -49,7 +51,8 @@
         "achievedLabel": "logrado",
         "targetLabel": "meta",
         "target": "3,00 %",
-        "pct": "89 %"
+        "pct": "89 %",
+        "band": "2,55 %"
       },
       {
         "icon": "link",
@@ -59,7 +62,8 @@
         "achievedLabel": "logrado",
         "targetLabel": "meta",
         "target": "25",
-        "pct": "76 %"
+        "pct": "76 %",
+        "band": "21,25"
       }
     ],
     "note": {

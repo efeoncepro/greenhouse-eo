@@ -46,6 +46,11 @@
 
   .track-rest { left: var(--zone); top: 0; bottom: 0; width: calc(100% - var(--zone)); background: rgba(var(--axis-deck-role-navyMuted-rgb), 0.06); border-radius: 0 3px 3px 0; }
 
+  /* Menos es mejor: lo oscuro (crítico) queda sobre el límite de atención. */
+  .bullet--lower .track-zone { background: rgba(var(--axis-deck-role-navyMuted-rgb), 0.06); }
+
+  .bullet--lower .track-rest { background: rgba(var(--axis-deck-role-navyMuted-rgb), 0.14); }
+
   .track-achieved { left: 0; top: 6px; height: 10px; width: var(--achieved); background: var(--axis-deck-role-dataCurrentOnNavy); border-radius: 2px; }
 
   .track-target { left: calc(var(--target) - 1.5px); top: -3px; width: 3px; height: 28px; background: var(--axis-deck-role-navyInk); border-radius: 1px; }

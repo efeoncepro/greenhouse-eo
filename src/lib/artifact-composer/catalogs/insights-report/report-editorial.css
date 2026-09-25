@@ -2,8 +2,8 @@
  * Molde editorial del informe A4 (TASK-1889) — el chrome compartido por las páginas del canvas
  * aprobado el 2026-09-25 («Gráficos de Efeonce Insights»).
  *
- * Convive con `report-mold.css` mientras las plantillas v1 no se rehacen: cada plantilla enlaza el
- * molde que usa, y los dos nunca se mezclan en la misma página.
+ * Es el ÚNICO molde del catálogo: el v1 (`report-mold.css`) se retiró con las páginas de gráfico v1
+ * en el Slice 4 de TASK-1889.
  *
  * Reglas: ningún HEX ni familia literal (todo sale de `report-tokens.css`: roles del pack y de la
  * extensión editorial); la geometría es la del canvas, porque la fidelidad se mide en píxeles contra

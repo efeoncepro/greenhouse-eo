@@ -252,6 +252,21 @@ export const GH_INSIGHTS = {
     impact: 'Impacto',
     effort: 'Esfuerzo',
     planColumns: { number: '#', action: 'Acción', metric: 'Métrica de éxito', weeks: ['S1', 'S2', 'S3', 'S4'] },
+    /** TASK-1889 Slice 4 — páginas de figura: antetítulo por tipo, palabras de las metas, leyenda. */
+    figureEyebrow: {
+      comparison: 'Comparación de períodos',
+      columns: 'Comparación por dimensión',
+      targets: 'Resultado contra la meta',
+      trend: 'Evolución en el tiempo'
+    },
+    achieved: 'Logrado',
+    achievedRow: 'logrado',
+    target: 'Meta',
+    targetRow: 'meta',
+    largestGap: 'Mayor brecha',
+    unitCaption: 'Unidad',
+    sourceCaption: 'Fuente',
+    ownScale: 'Cada métrica en su escala.',
     /** Pestaña del deck para secciones sin número de capítulo. */
     tabMarks: { summary: '00', reading: 'C', plan: 'P', limits: 'L' },
     /** Marca del índice para secciones sin número de capítulo. */

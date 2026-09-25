@@ -7,8 +7,8 @@
  * que el selector usa para elegir—, no el render. El render lo verifican `pnpm composer:visual-gate
  * --catalog=insights` (cero píxeles) y `pnpm insights:canvas-fidelity` (contra el canvas aprobado).
  *
- * La única salida permitida es una plantilla `legacy` con `replacedBy` explícito: hoy, las páginas de
- * gráfico (`ReportAnalysisPage`, `InsightsEvidenceSlide`), que reemplaza el Slice 4 de TASK-1889.
+ * Legado: NINGUNO. Las páginas de gráfico v1 (`ReportAnalysisPage`, `InsightsEvidenceSlide`) y sus moldes
+ * v1 se retiraron en el Slice 4 de TASK-1889; cada familia con productor tiene su página de figura premium.
  */
 
 import fs from 'node:fs'
@@ -38,11 +38,14 @@ const RETIRED_TEMPLATE_NAMES = [
   'ReportContentsPage',
   'ReportDenseTablePage',
   'ReportLimitsV2Page',
-  'InsightsCoverNavySlide'
+  'InsightsCoverNavySlide',
+  // Retiradas en el Slice 4: las reemplazan las páginas de figura premium.
+  'ReportAnalysisPage',
+  'InsightsEvidenceSlide'
 ]
 
-/** Legado explícito, con fecha de retiro: se vacía cuando el Slice 4 de TASK-1889 cierra. */
-const ALLOWED_LEGACY = new Set(['ReportAnalysisPage', 'InsightsEvidenceSlide'])
+/** Legado permitido: ninguno desde el Slice 4 de TASK-1889. */
+const ALLOWED_LEGACY = new Set<string>()
 
 describe.each(CATALOGS)('catálogo $name: sólo diseño editorial', ({ dir, editorialMold, legacyMold }) => {
   const registry = JSON.parse(fs.readFileSync(path.join(dir, 'registry.json'), 'utf8')) as {
@@ -84,5 +87,7 @@ describe.each(CATALOGS)('catálogo $name: sólo diseño editorial', ({ dir, edit
 
     expect(files).not.toMatch(/-(navy|v2)\.(html|slots\.json)$/m)
     expect(files).not.toMatch(/report-(contents|dense-table)\./)
+    // El molde v1 no vuelve: una plantilla nueva no puede enlazarlo porque ya no existe.
+    expect(fs.existsSync(path.join(dir, legacyMold))).toBe(false)
   })
 })

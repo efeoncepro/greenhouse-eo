@@ -132,11 +132,12 @@ export const pairBarsEffects = (item: Record<string, unknown>): FieldEffect[] =>
 
 /**
  * Fila de metas (bullet, canvas `Premium-Metas`). Cada fila mide en su PROPIA escala: el mayor entre
- * lo logrado y la meta ocupa el 91 % del carril (1,1 × máximo, la regla del canvas), la marca vertical
- * es la meta y la pista se aclara desde el 85 % de la meta (zona «cerca»; con `lower_is_better`, la
- * zona es la meta misma). La fila «mayor brecha» es la que queda más lejos de su meta en la dirección
- * que empeora —se decide con TODAS las filas, no por posición— y el tono de la píldora sale de si se
- * alcanzó. Todo desde las cifras impresas: nada que el dato no sostenga.
+ * lo logrado y la meta ocupa el 91 % del carril (1,1 × máximo, la regla del canvas) y la marca vertical
+ * es la meta. La zona de ATENCIÓN sólo se dibuja si el ítem trae `band` —el límite de atención del
+ * registro dueño de la métrica, como cifra impresa—: ningún umbral se escribe acá (un 0,85 a mano daba
+ * una tercera versión de los umbrales ICO). Sin banda, la pista es una sola. La fila «mayor brecha» es
+ * la que queda más lejos de su meta en la dirección que empeora —decidida con TODAS las filas— y el tono
+ * de la píldora sale de si se alcanzó.
  */
 export const bulletRowEffects = (item: Record<string, unknown>, slots: Record<string, unknown>): FieldEffect[] | null => {
   const lowerIsBetter = slots.bulletDirection === 'lower_is_better'
@@ -160,16 +161,22 @@ export const bulletRowEffects = (item: Record<string, unknown>, slots: Record<st
   const own = ratio(item)!
   const met = own <= 1
   const worst = gaps.length > 0 ? Math.max(...gaps) : null
-  const scale = Math.max(value, target) * 1.1
-  const zone = lowerIsBetter ? target : target * 0.85
+  const band = item.band === undefined ? null : parsePrintedNumber(item.band)
+
+  if (item.band !== undefined && (band === null || band < 0)) return null
+
+  const scale = Math.max(value, target, band ?? 0) * 1.1
 
   const effects: FieldEffect[] = [
     { selector: ':self', styleProp: '--achieved', styleValue: `${((value / scale) * 100).toFixed(1)}%` },
     { selector: ':self', styleProp: '--target', styleValue: `${((target / scale) * 100).toFixed(1)}%` },
-    { selector: ':self', styleProp: '--zone', styleValue: `${((zone / scale) * 100).toFixed(1)}%` },
+    { selector: ':self', styleProp: '--zone', styleValue: band === null ? '0%' : `${((band / scale) * 100).toFixed(1)}%` },
     { selector: '.delta-pill', toneClass: met ? 'delta--up' : 'delta--down', toneGroup: ['delta--up', 'delta--down'] },
     { selector: met ? '.delta-mark-down' : '.delta-mark-up', remove: true }
   ]
+
+  // Más oscuro = peor (Few): con «menos es mejor» la zona crítica queda SOBRE el límite, no bajo él.
+  if (lowerIsBetter) effects.push({ selector: ':self', toneClass: 'bullet--lower', toneGroup: ['bullet--lower'] })
 
   if (!met && worst !== null && own === worst) effects.push({ selector: ':self', toneClass: 'bullet--gap', toneGroup: ['bullet--gap'] })
 
@@ -235,7 +242,7 @@ export const insightsEditorialResolvers = (prefix: string): ResolverRegistry => 
   },
   /** Fila de metas: escala propia, marca de meta, zona y mayor brecha, desde las cifras. */
   [`${prefix}-bullet-row`]: {
-    known: ['<derivado de value, target, bulletDirection y las demás filas>'],
+    known: ['<derivado de value, target, band, bulletDirection y las demás filas>'],
     build: (_value, ctx) => bulletRowEffects(ctx.item, ctx.slots)
   },
   /** Muestra de línea de la leyenda según el rol de la serie (el mismo trazo que en la figura). */

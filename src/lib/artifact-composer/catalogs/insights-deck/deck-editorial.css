@@ -2,8 +2,8 @@
  * Molde editorial del deck Insights (TASK-1889) — láminas 1280×720 del canvas aprobado el
  * 2026-09-25 («Gráficos de Efeonce Insights»).
  *
- * Convive con `deck-mold.css` (láminas v1 a 1920×1080) mientras el mapper no cambia de plantillas;
- * cada lámina enlaza el molde que usa. Ningún HEX ni familia literal: todo sale de
+ * Es el ÚNICO molde del catálogo: el v1 (`deck-mold.css`, láminas a 1920×1080) se retiró con la lámina
+ * de evidencia v1 en el Slice 4 de TASK-1889. Ningún HEX ni familia literal: todo sale de
  * `deck-tokens.css` (roles del pack y de su extensión editorial).
  *
  * GENERADO NO — este archivo se edita a mano.

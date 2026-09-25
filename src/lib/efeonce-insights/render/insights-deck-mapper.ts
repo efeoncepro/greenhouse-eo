@@ -10,12 +10,11 @@
  * - Cada afirmación del plan aparece en alguna lámina: como titular de la figura que la respalda o
  *   como punto narrativo. El deck no tiene tablas; por eso ninguna afirmación puede quedar fuera.
  * - Nada se recorta: un texto que excede su slot rechaza el render con causa.
- * - Las figuras salen del módulo compartido (`figure-pages`): mismo formato, nombres, escala y
- *   paginación que el informe.
+ * - Las figuras salen del módulo compartido (`figure-slots`): misma página por familia, mismas cifras,
+ *   misma lectura y paginación que el informe.
  *
  * TASK-1889: compone con las láminas editoriales del canvas aprobado (1280×720): portada navy,
- * apertura de capítulo, narrativa, límites y contraportada. La lámina de evidencia sigue en v1
- * (legado declarado, 1920×1080) hasta que el Slice 4 la reemplace por la lámina de gráfico premium.
+ * apertura de capítulo, láminas de figura por familia, narrativa, límites y contraportada.
  *
  * Browser-safe en su frontera: sólo tipos y módulos puros del composer (un import de VALOR del barrel
  * arrastra Playwright y los catálogos a la función de Vercel — ISSUE-177).
@@ -23,7 +22,7 @@
 
 import 'server-only'
 
-import type { CompositionPlanInput, CompositionSlideInput } from '@/lib/artifact-composer'
+import type { CompositionPlanInput, CompositionSlideInput, SlotValues } from '@/lib/artifact-composer'
 import {
   EFEONCE_CONTACT,
   EFEONCE_LEGAL_NAME_FALLBACK,
@@ -38,12 +37,12 @@ import type { EvidenceSnapshotRecord, InsightEditionRecord, InsightReportRecord 
 import { InsightsRenderRejectedError } from '../errors'
 import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
 import { channelNameOf, channelsOf, coverPage } from './cover'
-import { buildFigurePages, claimsForFigure } from './figure-pages'
+import { buildFigureSlides, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, readingFor } from './figure-slots'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
 import { withDedupedLimits } from './plan-limits'
 
 /** Capacidades declaradas por las plantillas del catálogo (`*.slots.json`). Son del molde. */
-const CAPACITY = { figureRows: 5, points: 4, limits: 6, chapterContents: 9 } as const
+const CAPACITY = { points: 4, limits: 6, chapterContents: 9 } as const
 
 const BUDGET = {
   reportTitle: 64,
@@ -79,7 +78,7 @@ const L = GH_INSIGHTS.catalog
 const pad2 = (n: number): string => String(n).padStart(2, '0')
 
 /** Láminas editoriales con pie «NN / total». La de evidencia (legado v1) no lo trae. */
-const FOLIO_TYPES = new Set(['insights-narrative', 'insights-limits'])
+const FOLIO_TYPES = new Set(['insights-narrative', 'insights-limits', ...Object.values(FIGURE_CONTENT_TYPE.deck)])
 
 /**
  * Láminas narrativas: el primer texto es el titular y el resto se reparte en puntos, sin recortar. La plantilla exige
@@ -113,25 +112,35 @@ const chapterSlides = (
   const slides: { slide: Slide; contentsTitle?: string }[] = []
   const used = new Set<string>()
 
-  for (const figure of chapter.charts.flatMap(chart => buildFigurePages(chart, factsById, locale, CAPACITY.figureRows))) {
-    const own = claimsForFigure(chapter.claims, figure)
-    const assertion = own.find(text => !used.has(text)) ?? own[0] ?? chapter.title
+  // Láminas de figura premium (TASK-1889 Slice 4): la misma figura que la página A4, con su cifra
+  // principal y su lectura; lo que ninguna figura tituló se narra después.
+  for (const chart of chapter.charts) {
+    for (const figure of buildFigureSlides(chart, factsById, readingFor(chapter.readings, chart), chapter.claims, locale, FIGURE_CAPACITY.deck)) {
+      const where = `${chapter.chapterId}.${chart.chartId}`
 
-    used.add(assertion)
+      // Sólo la conclusión se imprime en la lámina (el deck no tiene bajada): el resto se narra después.
+      used.add(figure.conclusion)
 
-    slides.push({
-      contentsTitle: figure.title,
-      slide: {
-        contentType: 'insights-evidence',
-        slots: {
-          chapterLabel: rejectIfLonger(chapter.title, BUDGET.chapterLabel, `${chapter.chapterId}.chapterLabel`),
-          assertion: rejectIfLonger(assertion, BUDGET.assertion, `${chapter.chapterId}.assertion`),
-          figureSeries: figure.rows,
-          figureUnit: figure.unit,
-          figureSource: GH_INSIGHTS.document.evidenceSource
+      slides.push({
+        contentsTitle: figure.figureTitle,
+        slide: {
+          contentType: FIGURE_CONTENT_TYPE.deck[figure.kind],
+          slots: {
+            ...tab,
+            eyebrow: figure.eyebrow,
+            keyFigure: rejectIfLonger(figure.keyFigure, 9, `${where}.keyFigure`),
+            keyCaption: rejectIfLonger(figure.keyCaption, 96, `${where}.keyCaption`),
+            conclusion: rejectIfLonger(figure.conclusion, 90, `${where}.conclusion`),
+            figureTitle: rejectIfLonger(figure.figureTitle, 44, `${where}.figureTitle`),
+            source: { label: L.sourceCaption, text: rejectIfLonger(figure.sourceText, 36, `${where}.source`) },
+            ...figure.body,
+            ...(figure.closing.length > 0
+              ? { closing: figure.closing.map(block => ({ ...block, text: rejectIfLonger(block.text, 160, `${where}.closing`) })) }
+              : {})
+          } as SlotValues
         }
-      }
-    })
+      })
+    }
   }
 
   // Lo que ninguna lámina de evidencia tituló se narra: en el deck no hay tabla que lo sostenga.

@@ -1,11 +1,10 @@
 /**
  * Plan editorial congelado → páginas del catálogo `insights-report` (A4 vertical).
  *
- * TASK-1889: compone SÓLO con las plantillas editoriales del canvas aprobado (portada navy, índice,
- * apertura de capítulo, narrativa, tabla, límites, contraportada). La única página v1 que queda es
- * la analítica (`report-analysis`, legado declarado) hasta que el Slice 4 la reemplace por las
- * páginas de gráfico premium. Resumen con «Lo esencial», lectura y plan necesitan campos del plan v2
- * (TASK-1888) que el planner todavía no emite: hasta entonces el resumen se narra.
+ * TASK-1889: compone SÓLO con las plantillas editoriales del canvas aprobado (portada navy o blanca,
+ * índice, apertura de capítulo, narrativa, páginas de figura por familia, tabla, límites, contraportada).
+ * Cada gráfico del plan va a la página de figura de su familia con su cifra principal y su lectura
+ * (`figure-slots.ts`, compartido con el deck).
  *
  * QUÉ ES: el mapper del informe vertical. Decide QUÉ va en cada página y en qué orden, y reparte
  * el contenido largo entre páginas ANTES de imprimir, que es lo que permite resolver el folio y el
@@ -32,7 +31,7 @@ import 'server-only'
 // la misma bug class que el 2026-09-16 obligó a que el catálogo viajara como STRING.
 //
 // Los valores del composer que necesita el render (`paginateFlow`) entran por la entrada liviana
-// `@/lib/artifact-composer/pure`, vía `composition-helpers.ts` y `figure-pages.ts`. La regla eslint
+// `@/lib/artifact-composer/pure`, vía `composition-helpers.ts`. La regla eslint
 // `greenhouse/no-worker-only-module-in-vercel-code` rechaza un valor del barrel en este archivo.
 import type { CompositionPlanInput, CompositionSlideInput, SlotValues } from '@/lib/artifact-composer'
 import {
@@ -50,7 +49,7 @@ import type { EvidenceSnapshotRecord, InsightEditionRecord, InsightReportRecord 
 import { InsightsRenderRejectedError } from '../errors'
 import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
 import { channelNameOf, channelsOf, coverPage } from './cover'
-import { buildFigurePages, claimsForFigure, figureLegendOf } from './figure-pages'
+import { buildFigureSlides, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, readingFor } from './figure-slots'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
 import { withDedupedLimits } from './plan-limits'
 
@@ -69,12 +68,6 @@ const CAPACITY = {
   /** Entradas de la columna «En este capítulo» de la narrada (`evidence.items.maxItems`). */
   asideItems: 8
 } as const
-
-/** Barras por figura: lo que declara la plantilla analítica (`figureSeries.maxItems`). */
-const FIGURE_ROWS = 6
-
-/** Párrafos de desarrollo que admite la página analítica (`development.maxItems`). */
-const DEVELOPMENT_ITEMS = 3
 
 const BUDGET = {
   assertion: 130,
@@ -119,14 +112,13 @@ const measuredChannelsOf = (chapter: PlanChapterV1): SlotValues => {
 }
 
 /** Páginas en papel: llevan cabecera corrida, pie institucional y folio «NN / total». */
-const PAPER_TYPES = new Set(['report-index', 'report-narrative', 'report-table', 'report-limits'])
+const PAPER_TYPES = new Set(['report-index', 'report-narrative', 'report-table', 'report-limits', ...Object.values(FIGURE_CONTENT_TYPE.report)])
 
 const L = GH_INSIGHTS.catalog
 
 const chapterBodyPages = (
   chapter: PlanChapterV1,
   running: { runningSection: string; runningPeriod: string },
-  legacyRunning: { runningChapter: string; runningPeriod: string },
   factsById: ReadonlyMap<string, EvidenceFactV1>,
   locale: string
 ): BodyPage[] => {
@@ -138,33 +130,47 @@ const chapterBodyPages = (
 
   const pages: BodyPage[] = []
 
-  // Página analítica (legado v1 hasta el Slice 4): cada figura se narra con las afirmaciones que
-  // citan los hechos que dibuja; figura y texto afirman lo mismo.
-  for (const figure of chapter.charts.flatMap(chart => buildFigurePages(chart, factsById, locale, FIGURE_ROWS))) {
-    const own = claimsForFigure(chapter.claims, figure)
-    const [figureHeadline, figureLead, ...figureRest] = own.length > 0 ? own : [headline!]
+  // Páginas de figura premium (TASK-1889 Slice 4): cada gráfico del plan a la página que el canvas
+  // aprobado diseñó para su familia, con su cifra principal y su lectura («Lo que significa / Próximo
+  // paso») de TASK-1888. Figura y texto afirman lo mismo: la conclusión es la de la lectura o la
+  // afirmación del plan que cita los hechos que la figura dibuja.
+  const chapterTab = running.runningSection.split(' · ')[0]!
 
-    pages.push({
-      contentsTitle: figure.title,
-      page: {
-        contentType: 'report-analysis',
-        slots: {
-          ...legacyRunning,
-          assertion: rejectIfLonger(figureHeadline!, BUDGET.assertion, `${chapter.chapterId}.assertion`),
-          conclusion: rejectIfLonger(figureLead ?? figureLegendOf(figure), BUDGET.lead, `${chapter.chapterId}.conclusion`),
-          figureTitle: figure.title,
-          figureSeries: figure.rows,
-          figureUnit: figure.unit,
-          figureSource: GH_INSIGHTS.document.evidenceSource,
-          development: (figureRest.length === 0
-            ? [GH_INSIGHTS.document.figureDetailInTable]
-            : figureRest.length <= DEVELOPMENT_ITEMS
-              ? figureRest
-              : [...figureRest.slice(0, DEVELOPMENT_ITEMS - 1), GH_INSIGHTS.document.figureMoreInNarrative]
-          ).map(text => rejectIfLonger(text, BUDGET.development, `${chapter.chapterId}.development`))
+  for (const chart of chapter.charts) {
+    for (const figure of buildFigureSlides(chart, factsById, readingFor(chapter.readings, chart), chapter.claims, locale, FIGURE_CAPACITY.report)) {
+      const where = `${chapter.chapterId}.${chart.chartId}`
+
+      pages.push({
+        contentsTitle: figure.figureTitle,
+        page: {
+          contentType: FIGURE_CONTENT_TYPE.report[figure.kind],
+          slots: {
+            ...running,
+            chapterTab,
+            eyebrow: figure.eyebrow,
+            keyFigure: rejectIfLonger(figure.keyFigure, 12, `${where}.keyFigure`),
+            keyCaption: rejectIfLonger(figure.keyCaption, 110, `${where}.keyCaption`),
+            conclusion: rejectIfLonger(figure.conclusion, 96, `${where}.conclusion`),
+            ...(figure.lead ? { lead: rejectIfLonger(figure.lead, 170, `${where}.lead`) } : {}),
+            figureTitle: rejectIfLonger(figure.figureTitle, 56, `${where}.figureTitle`),
+            ...figure.body,
+            provenance: [
+              { label: L.unitCaption, text: rejectIfLonger(figure.unitText, 96, `${where}.unit`) },
+              { label: L.sourceCaption, text: figure.sourceText }
+            ],
+            ...(figure.closing.length > 0
+              ? {
+                  closing: figure.closing.map(block => ({
+                    ...block,
+                    text: rejectIfLonger(block.text, 190, `${where}.closing`),
+                    ...(block.kind === 'action' ? { signature: L.signature } : {})
+                  }))
+                }
+              : {})
+          } as SlotValues
         }
-      }
-    })
+      })
+    }
   }
 
   // Un capítulo SIN figura no se omite: se narra.
@@ -315,7 +321,7 @@ export const buildInsightReportPlanInput = ({
   frozen.chapters.forEach((chapter, index) => {
     const number = pad2(index + 1)
     const running = { runningSection: `${number} · ${chapter.title}`, runningPeriod: periodLabel }
-    const body = chapterBodyPages(chapter, running, { runningChapter: chapter.title, runningPeriod: periodLabel }, factsById, frozen.locale)
+    const body = chapterBodyPages(chapter, running, factsById, frozen.locale)
 
     // La apertura abre el capítulo; su índice se completa con folios reales cuando se conoce el plan.
     const opening: BodyPage = {
@@ -478,7 +484,6 @@ export const buildInsightReportPlanInput = ({
 
       if (PAPER_TYPES.has(page.contentType)) Object.assign(slots, footer, { folio: { page: pad2(folio), total: pad2(total) } })
       if (page.contentType === 'report-chapter') slots.pageFolio = pad2(folio)
-      if (page.contentType === 'report-analysis') slots.pageFolio = String(folio)
 
       return { ...page, slideId: `page-${pad2(folio)}`, slots }
     }) as CompositionSlideInput[]

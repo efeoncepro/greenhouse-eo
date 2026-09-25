@@ -340,91 +340,71 @@ describe('buildInsightReportPlanInput', () => {
       plan: withChart
     }).slides
 
-    const analysis = pages.find(p => p.contentType === 'report-analysis')
+    const figure = pages.find(p => p.contentType === 'report-figure-columns')
 
-    expect(analysis).toBeDefined()
+    expect(figure).toBeDefined()
 
-    const series = (analysis!.slots as { figureSeries: { printedValue: string; emphasis: string }[] }).figureSeries
+    const slots = figure!.slots as { columnGroups: { label: string; current: string }[]; provenance: { label: string; text: string }[]; keyFigure: string }
 
-    expect(series).toHaveLength(2)
-    // El formateador canónico del plan (el de tablas y afirmaciones), no uno propio: un nivel no lleva «+».
-    expect(series[0]!.printedValue).toBe('61,4 %')
-    expect(series[0]!.emphasis).toBe('lead')
-    // Cada barra se nombra por su métrica (dimensionLabels), no por la etiqueta de la serie.
-    expect((analysis!.slots as { figureSeries: { name: string }[] }).figureSeries.map(row => row.name)).toEqual(['Nuevas', 'Optimizadas'])
-    expect((analysis!.slots as { figureUnit: string }).figureUnit).toBe('Porcentaje')
+    // Cada columna se nombra por su dimensión y lleva la cifra del formateador canónico (un nivel no lleva «+»).
+    expect(slots.columnGroups.map(group => [group.label, group.current])).toEqual([['Nuevas', '61,4 %'], ['Optimizadas', '3,1 %']])
+    expect(slots.keyFigure).toBe('61,4 %')
+    expect(slots.provenance[0]).toEqual({ label: 'Unidad', text: 'porcentaje' })
   })
 
-  it('compone line, pie, donut y scatter desde sus hechos como SVG en el PDF A4', async () => {
+  it('compone metas, tendencia, columnas y comparación en el PDF A4; una familia sin página se rechaza', async () => {
     const facts = [
-      ...[
-        ['line-1', 10], ['line-2', 30], ['line-3', 20],
-        ['pie-1', 6], ['pie-2', 3], ['pie-3', 1],
-        ['donut-1', 2], ['donut-2', 5], ['donut-3', 3],
-        ['scatter-x1', 1], ['scatter-x2', 2], ['scatter-x3', 3],
-        ['scatter-y1', 4], ['scatter-y2', 2], ['scatter-y3', 8]
-      ] as const
-    ].map(([factId, value]) => ({ factId, value, unit: 'count', evidenceRef: `ev-${factId}` }))
+      ['otd', 82, 'percent'], ['otd-target', 90, 'percent'], ['otd-band', 70, 'percent'],
+      ['m1', 10, 'count'], ['m2', 30, 'count'], ['m3', 20, 'count'],
+      ['gpt', 12, 'count'], ['gem', 8, 'count'],
+      ['c1', 1284, 'count'], ['p1', 1102, 'count'], ['c2', 48310, 'count'], ['p2', 51940, 'count']
+    ].map(([factId, value, unit]) => ({ factId: String(factId), value, unit, label: String(factId), metricId: String(factId), evidenceRef: `ev-${factId}` }))
 
-    const chart = (family: 'line' | 'pie' | 'donut' | 'scatter', series: { seriesId: string; label: string; factIds: string[]; unit: string }[]) => ({
-      specVersion: 'chart_spec_v1' as const,
-      chartId: `chart-${family}`,
-      family,
-      relation: family === 'line' ? 'trend' as const : family === 'scatter' ? 'correlation' as const : 'composition' as const,
-      title: `Figura ${family}`,
-      series,
-      dimensionLabels: ['Punto 1', 'Punto 2', 'Punto 3'],
-      unit: 'count',
-      scale: { kind: 'linear' as const, baseline: family === 'line' ? null : 0 },
-      references: [],
-      tabularEquivalent: { columns: series.map(item => item.label), rows: [0, 1, 2].map(index => series.map(item => item.factIds[index]!)) }
-    })
+    const base = { specVersion: 'chart_spec_v1' as const, references: [], scale: { kind: 'linear' as const, baseline: 0 as const }, tabularEquivalent: { columns: [], rows: [] } }
 
     const charts = [
-      chart('line', [{ seriesId: 'line', label: 'Tendencia', factIds: ['line-1', 'line-2', 'line-3'], unit: 'count' }]),
-      chart('pie', [{ seriesId: 'pie', label: 'Composición', factIds: ['pie-1', 'pie-2', 'pie-3'], unit: 'count' }]),
-      chart('donut', [{ seriesId: 'donut', label: 'Composición', factIds: ['donut-1', 'donut-2', 'donut-3'], unit: 'count' }]),
-      chart('scatter', [
-        { seriesId: 'x', label: 'X', factIds: ['scatter-x1', 'scatter-x2', 'scatter-x3'], unit: 'count' },
-        { seriesId: 'y', label: 'Y', factIds: ['scatter-y1', 'scatter-y2', 'scatter-y3'], unit: 'count' }
-      ])
+      { ...base, chartId: 'chart.bullet', family: 'bullet', relation: 'target', title: 'Entregas a tiempo', series: [], dimensionLabels: ['Space'], unit: 'percent',
+        data: { kind: 'bullet', direction: 'higher_is_better', items: [{ itemId: 'i1', label: 'Space', valueFactId: 'otd', targetFactId: 'otd-target', bandFactId: 'otd-band' }] } },
+      { ...base, chartId: 'chart.line', family: 'line', relation: 'trend', title: 'Tendencia', unit: 'count', dimensionLabels: ['2026-07', '2026-08', '2026-09'],
+        series: [{ seriesId: 's', label: 'Clics', factIds: ['m1', 'm2', 'm3'], unit: 'count' }] },
+      { ...base, chartId: 'chart.bar', family: 'bar', relation: 'comparison', title: 'Menciones por motor', unit: 'count', dimensionLabels: ['ChatGPT', 'Gemini'],
+        dimensionChannelIds: ['chatgpt', 'gemini'], series: [{ seriesId: 's', label: 'Período', factIds: ['gpt', 'gem'], unit: 'count' }] },
+      { ...base, chartId: 'chart.cmp', family: 'bar_grouped', relation: 'comparison', title: 'Search Console', unit: 'count', dimensionLabels: ['Clics', 'Impresiones'],
+        series: [
+          { seriesId: 'p', label: 'Período anterior', factIds: ['p1', 'p2'], unit: 'count' },
+          { seriesId: 'c', label: 'Período', factIds: ['c1', 'c2'], unit: 'count' }
+        ] }
     ]
 
     const input = buildInsightReportPlanInput({
-      edition,
-      report,
+      edition, report,
       snapshot: { facts, sources: [], rejections: [] } as never,
-      plan: plan({ chapters: [chapter({ charts: charts as never })] })
+      plan: plan({ chapters: [chapter({ claims: [{ claimId: 'c', text: 'Los datos sostienen estas figuras.', factIds: facts.map(f => f.factId) }], charts: charts as never })] })
     })
 
-    const figures = input.slides.filter(slide => slide.contentType === 'report-analysis')
-
-    expect(figures).toHaveLength(4)
-    expect(figures.map(slide => (slide.slots as { figureSeries: { chartFamily: string; geometryPath1: string }[] }).figureSeries[0])).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ chartFamily: 'line', geometryPath1: expect.stringMatching(/^M /) }),
-        expect.objectContaining({ chartFamily: 'pie', geometryPath1: expect.stringMatching(/^M /) }),
-        expect.objectContaining({ chartFamily: 'donut', geometryPath1: expect.stringMatching(/^M /) }),
-        expect.objectContaining({ chartFamily: 'scatter', geometryPath1: expect.stringMatching(/^M /) })
-      ])
+    expect(input.slides.map(slide => slide.contentType)).toEqual(
+      expect.arrayContaining(['report-figure-targets', 'report-figure-trend', 'report-figure-columns', 'report-figure-comparison'])
     )
 
-    const outDir = await mkdtemp(path.join(os.tmpdir(), 'insights-chart-families-'))
+    const outDir = await mkdtemp(path.join(os.tmpdir(), 'insights-report-figures-'))
 
     try {
       const result = await composeArtifact(insightsReportCatalog, input as never, outDir, { concurrency: 2 })
-
-      expect(result.pdfPath).toBeDefined()
       const pdf = await PDFDocument.load(await readFile(result.pdfPath!))
 
       expect(pdf.getPageCount()).toBe(input.slides.length)
-      expect(result.slidePaths).toHaveLength(input.slides.length)
     } finally {
       await rm(outDir, { recursive: true, force: true })
     }
-  })
 
-  // Forma real de un plan SEO (canary Berel, 2026-09-22): comparación de períodos por métrica.
+    const pie = { ...base, chartId: 'chart.pie', family: 'pie', relation: 'composition', title: 'Composición', unit: 'count', dimensionLabels: ['A', 'B'],
+      series: [{ seriesId: 's', label: 'Partes', factIds: ['m1', 'm2'], unit: 'count' }] }
+
+    expect(() =>
+      buildInsightReportPlanInput({ edition, report, snapshot: { facts, sources: [], rejections: [] } as never, plan: plan({ chapters: [chapter({ charts: [pie] as never })] }) })
+    ).toThrow(InsightsRenderRejectedError)
+  }, 120_000)
+
   const periodComparison = (metrics: number) => {
     const facts = Array.from({ length: metrics }, (_, i) => [
       { factId: `cur${i}`, value: (i + 1) * 1000, unit: 'count', evidenceRef: `ev-c${i}` },
@@ -445,33 +425,24 @@ describe('buildInsightReportPlanInput', () => {
       edition, report,
       snapshot: { facts, sources: [], rejections: [] } as never,
       plan: plan({ chapters: [chapter({ charts: [chart] as never })] })
-    }).slides.filter(p => p.contentType === 'report-analysis').map(p => p.slots as { figureTitle: string; figureSeries: { name: string; printedValue: string; scaleGroup?: string }[] })
+    }).slides.filter(p => p.contentType === 'report-figure-comparison').map(p => p.slots as { figureTitle: string; metrics: { name: string; current: string; prior: string; direction: string; delta: string }[] })
   }
 
-  it('una comparación de períodos dibuja pares con nombre de métrica y escala propia', () => {
+  it('una comparación de períodos dibuja, por métrica, el período, el anterior y la variación', () => {
     const [figure] = periodComparison(2)
 
-    expect(figure!.figureSeries.map(row => [row.name, row.printedValue, row.scaleGroup])).toEqual([
-      ['Métrica 1', '1.000', 'dimension-0'],
-      ['Período anterior', '900', 'dimension-0'],
-      ['Métrica 2', '2.000', 'dimension-1'],
-      ['Período anterior', '1.800', 'dimension-1']
+    expect(figure!.metrics.map(row => [row.name, row.current, row.prior, row.direction, row.delta])).toEqual([
+      ['Métrica 1', '1.000', '900', 'up', '11,1 %'],
+      ['Métrica 2', '2.000', '1.800', 'up', '11,1 %']
     ])
   })
 
-  it('una figura que no cabe se PAGINA sin recortar barras ni partir un par', () => {
+  it('una figura que no cabe se PAGINA equilibrada, sin recortar métricas ni partir un par', () => {
     const figures = periodComparison(6)
-    const rows = figures.flatMap(figure => figure.figureSeries)
 
-    expect(rows).toHaveLength(12)
-    expect(figures.map(figure => figure.figureSeries.length)).toEqual([6, 6])
-    expect(figures[1]!.figureTitle).toBe('Visibilidad orgánica · Cantidad (continuación)')
+    expect(figures.map(figure => figure.metrics.length)).toEqual([3, 3])
 
-    for (const figure of figures) {
-      const groups = figure.figureSeries.map(row => row.scaleGroup)
-
-      for (const group of new Set(groups)) expect(groups.filter(g => g === group)).toHaveLength(2)
-    }
+    for (const row of figures.flatMap(figure => figure.metrics)) expect(row.prior).toBeTruthy()
   })
 
   it('reparte las barras de una serie para que ninguna página quede con una sola', () => {
@@ -487,7 +458,7 @@ describe('buildInsightReportPlanInput', () => {
       edition, report,
       snapshot: { facts, sources: [], rejections: [] } as never,
       plan: plan({ chapters: [chapter({ charts: [chart] as never })] })
-    }).slides.filter(p => p.contentType === 'report-analysis').map(p => (p.slots as { figureSeries: unknown[] }).figureSeries.length)
+    }).slides.filter(p => p.contentType === 'report-figure-columns').map(p => (p.slots as { columnGroups: unknown[] }).columnGroups.length)
 
     expect(figures).toEqual([4, 3])
   })
@@ -524,7 +495,7 @@ describe('buildInsightReportPlanInput', () => {
       plan: withChart
     }).slides
 
-    expect(pages.some(p => p.contentType === 'report-analysis')).toBe(false)
+    expect(pages.some(p => p.contentType.startsWith('report-figure-'))).toBe(false)
     expect(pages.some(p => p.contentType === 'report-narrative')).toBe(true)
   })
 })

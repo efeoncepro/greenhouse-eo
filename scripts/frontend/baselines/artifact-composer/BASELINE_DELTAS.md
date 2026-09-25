@@ -1,5 +1,18 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-25 (i) — TASK-1889 Slice 4: se retiran las páginas de gráfico v1; la zona de metas sale del dato
+
+Los mappers ya componen cada gráfico del plan en su página de figura premium, y salen del catálogo la página
+analítica v1 y la lámina de evidencia v1 (1920×1080), con sus moldes v1. La zona de atención de las metas deja
+de ser un umbral escrito a mano (0,85 × meta): se dibuja sólo desde `band`, el límite de atención del
+registro dueño (hecho de referencia de TASK-1888); sin banda, la pista es una sola. Con «menos es mejor», lo
+oscuro queda sobre el límite. El probe ejerce la banda con su `example`.
+
+- `templates-insights-report/ReportAnalysisPage.png` — retirada
+- `templates-insights-deck/InsightsEvidenceSlide.png` — retirada
+- `templates-insights-report/ReportFigureTargetsPage.png` — zona desde `band`
+- `templates-insights-deck/InsightsFigureTargetsSlide.png` — zona desde `band`
+
 ## 2026-09-25 (h) — TASK-1889 Slice 4: páginas de figura premium
 
 Nacen las páginas de figura del canvas aprobado, una por familia con productor: comparación de períodos por
@@ -510,7 +523,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: fa9b06157e55b180158bdac6246eda619c7c8184db014a2e38a364581d48aba6 -->
+<!-- manifest-digest: 6d2bda93c0047edf4d4ad9f19bd1708e71ba54d360064e460af63eed54798f74 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

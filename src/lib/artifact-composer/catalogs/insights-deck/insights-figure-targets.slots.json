@@ -236,6 +236,15 @@
             "maxLines": 1,
             "example": "10"
           },
+          "band": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 14,
+            "maxLines": 1,
+            "consumer": "resolver-only",
+            "notes": "Límite de atención del registro dueño de la métrica (hecho de referencia), como cifra impresa. Sin él no hay zona.",
+            "example": "8"
+          },
           "pct": {
             "type": "string",
             "required": true,
