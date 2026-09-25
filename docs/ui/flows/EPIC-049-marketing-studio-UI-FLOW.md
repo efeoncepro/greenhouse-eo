@@ -242,12 +242,19 @@ transacción, errores canónicos `{ error, code, actionable }`: `write_not_allow
 3. **Confirmar:** sólo con aceptación explícita de la persona en la conversación, el agente repite la llamada sin
    `dryRun`, con la misma `Idempotency-Key` y el mismo `If-Match`. Un `412` obliga a volver al paso 1; el agente nunca
    reintenta con la revisión nueva sin volver a mostrar el diff.
-4. **Reservado a personas en la UI (propuesta de este contrato):** registrar aprobación de presupuesto y las
-   transiciones a `approved` (Creatividad) y `authorized` (Autorización de medios). El agente puede proponerlas y deja
-   el enlace `https://studio.efeonce.org/campaigns/{id}?review=media` para que la persona confirme en `MS-N3.9`. Mismo
-   criterio que Insights («emitir nunca desde MCP»). Lo decide el operador (§18, pregunta 1).
-5. La federación de escrituras en el gateway **no tiene task todavía**: TASK-1891 federa sólo lecturas y TASK-1894
-   publica las tools de clase `write` en el manifiesto sin federarlas. Hasta que exista, `MS-N7` es sólo lectura.
+4. **Aprobar también por MCP (decisión del operador 2026-09-25).** Regla del programa: *todo lo que se puede hacer
+   en la UI se puede hacer por la API y, por consiguiente, por MCP*. Las aprobaciones (presupuesto `approved`,
+   Creatividad `→ approved`, Autorización de medios `→ authorized`, aprobación del brief) **las decide siempre una
+   persona**, pero la persona puede ejecutarlas desde un agente:
+   - el agente actúa con el token delegado de esa persona (Efeonce ID + consentimiento del cliente MCP), así que el
+     actor auditado es la persona, nunca el gateway ni el modelo;
+   - el agente muestra el diff de `dryRun` y la persona confirma explícitamente en la conversación; sin esa
+     confirmación no hay aprobación;
+   - un `api_client` de máquina sin persona detrás **no puede aprobar** (`approval_requires_person`, 403);
+   - la persona debe tener la capability y la membership de la organización, igual que en la UI.
+   El enlace `?review=` sigue disponible como alternativa, no como obligación.
+5. La federación de escrituras y aprobaciones en el gateway es **`TASK-1899`**: TASK-1891 federa las lecturas y
+   TASK-1894 publica las tools de clase `write` en el manifiesto. Hasta que 1899 cierre, `MS-N7` es sólo lectura.
 
 ## 6. Journeys cross-surface
 
@@ -589,8 +596,8 @@ Declarados aquí para que la sesión que gobierna el programa los registre en ca
 
 ## 18. Preguntas abiertas
 
-1. ¿Las aprobaciones (presupuesto `approved`, Creatividad `→ approved`, Autorización de medios `→ authorized`) quedan
-   reservadas a personas en la UI, con el agente limitado a proponer y enlazar `?review=`? (Propuesta de este contrato.)
+1. ~~¿Aprobaciones sólo en la UI?~~ Resuelto 2026-09-25: las decide una persona, pero también se ejecutan por API
+   y MCP con su identidad delegada y confirmación explícita (§5.3 punto 4, TASK-1899).
 2. ¿Aprobar presupuesto o autorizar medios requieren una capability distinta de `marketing_studio.campaign.write`, o
    bastan los cuatro roles decididos? (TASK-1894 / TASK-1898.)
 3. ¿Crear campaña, concepto y copy, y programar posts, tendrán superficie web? Si sí, ¿en qué task y dónde vive

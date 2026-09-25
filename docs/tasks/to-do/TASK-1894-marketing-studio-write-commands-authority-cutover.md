@@ -8,7 +8,9 @@
 
 ## Delta 2026-09-25
 
+- TASK-1899 pide: cada aprobación como command y tool propios con `requiresPerson` (`brief.approve`, `creative.approve`, `media_authorization.authorize`, `budget_line.approve`); las tools genéricas rechazan destinos aprobatorios; `dryRun` devuelve `proposalDigest` y las aprobaciones y acciones destructivas exigen repetirlo (sin él 428, alterado 409) por cualquier vía, UI incluida. Capability `marketing_studio.campaign.approve` separada de `write`.
 - La URL firmada de subida es de esta task (`requestAssetUpload` + `registerAssetVersion`); TASK-1893 sólo entrega el almacén y la descarga.
+- Regla del operador: todo lo de la UI se puede por API y por MCP, **incluidas las aprobaciones**. Toda aprobación (brief, presupuesto `approved`, Creatividad `→ approved`, Autorización `→ authorized`) exige un actor **persona** (sesión o identidad delegada verificable); un `api_client` de máquina sin persona recibe `approval_requires_person` (403). Las tools de aprobación se marcan en el manifiesto como clase `write` con `requiresPerson: true`; su federación es TASK-1899.
 - Decisiones del operador: escriben `efeonce_admin`, `efeonce_operations`, `efeonce_account` y `designer`; el brief es entidad estructurada propia (sección «Brief como entidad»).
 - TASK-1895 (UI consumidora) pide dos cosas a esta task: (1) una proyección de permisos en el reader de campaña — `writable`, `lockReason` (`open_mode` | `missing_capability` | `authority_onedrive`), transiciones permitidas por estado y `revision`; (2) un actor de prueba local y una campaña sandbox en staging para ejercitar escrituras antes del login (TASK-1898). Sin ellas, TASK-1895 se detiene en su Slice 1.
 - TASK-1896 (observabilidad) debe cerrar antes de que estas escrituras lleguen a producción.

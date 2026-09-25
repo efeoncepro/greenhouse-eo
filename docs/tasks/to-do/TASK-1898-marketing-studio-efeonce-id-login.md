@@ -6,6 +6,10 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-25
+
+- TASK-1899 comparte con esta task el reader de acceso a producto de Greenhouse y el verificador JWKS de Studio; quien llegue primero lo construye.
+
 ## Status
 
 - Lifecycle: `to-do`

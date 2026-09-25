@@ -48,7 +48,9 @@ identidad (Efeonce ID), UI e integraciones (Metricool, plataformas de pauta, Glo
 
 ## Child Tasks
 
-Orden recomendado (2026-09-25): 1890 → 1891 · 1893 en paralelo · 1896 → 1892 → 1894 → 1895 → 1897 (cuando convenga) → 1898 al final.
+Orden recomendado (2026-09-25): 1890 → 1891 · 1893 en paralelo · 1896 → 1892 → 1894 → 1895 · 1899 → 1897 (cuando convenga) → 1898 al final.
+
+**Regla de paridad del programa (operador, 2026-09-25):** todo lo que se puede hacer en la UI se puede hacer por la API y, por consiguiente, por MCP — incluidas las aprobaciones. Las aprobaciones las decide una persona; un agente puede ejecutarlas con la identidad delegada de esa persona y su confirmación explícita. Ninguna capacidad nace sólo en la UI.
 
 - `TASK-1887` — Fundación: repo, bases y roles, modelo de dominio, API v1, import del catálogo, renditions privadas, UI aprobada (claro/oscuro), Vercel + dominio (modo `open`). Completa: en vivo en `https://studio.efeonce.org`.
 - `TASK-1890` — Studio listo para agentes: manifiesto de tools con paridad, semántica, bearer de servicio, organización canónica, capability y manual servido.
@@ -59,6 +61,7 @@ Orden recomendado (2026-09-25): 1890 → 1891 · 1893 en paralelo · 1896 → 18
 - `TASK-1895` — UI de edición, revisión, subida de versiones y panel de métricas (consumidora de 1892–1894).
 - `TASK-1896` — Observabilidad, alertas y restauración verificada de `marketing_studio`. Antes de que las escrituras lleguen a producción.
 - `TASK-1897` — (Greenhouse) Cerrar `CONNECT` de PUBLIC en `greenhouse_app` y en las bases de Studio.
+- `TASK-1899` — Escrituras y aprobaciones por MCP: todas las tools de clase `write` federadas con scope propio e identidad delegada de la persona (el actor auditado es la persona), `dryRun` → confirmación explícita. Bloqueada por TASK-1891 y TASK-1894.
 - `TASK-1898` — Login con Efeonce ID (`auth.efeonce.org`) y cambio de `STUDIO_ACCESS_MODE` a `efeonce_id`. Última del programa por decisión del operador (2026-09-25).
 
 ## Existing Related Work

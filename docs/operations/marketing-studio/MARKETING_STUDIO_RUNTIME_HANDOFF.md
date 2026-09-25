@@ -16,6 +16,10 @@
 | Renditions | 108 en cada bucket (miniatura + preview de 54 piezas) |
 | Acceso | `STUDIO_ACCESS_MODE=open` (sólo lectura, sin login, noindex). Login con `auth.efeonce.org` = task hija de EPIC-049 |
 
+## Toolchain (2026-09-25)
+
+Node 24 LTS · pnpm 10 · Next.js 16.3 (Turbopack) · React 19.3 · **TypeScript 7** (Next lo usa en el chequeo del build) · Vitest 5 · Kysely 0.29 · Zod 4.6. Versiones únicas en el `catalog:` de `pnpm-workspace.yaml`; `dependency-catalog-gate` (en `pnpm gates`) falla ante versiones propias por paquete o dependencias duplicadas. Detalle en `AGENTS.md` del repo de Studio.
+
 ## Recursos
 
 | Recurso | Valor |
