@@ -9,7 +9,7 @@
 
 | Pieza | Estado |
 |---|---|
-| Web + API `/api/v1` | Deploy de producción `READY` en Vercel (`dpl_7hMKbww8Byoy1CJFZuNyLp3Qr7S2`, commit `ea32ee6`) |
+| Web + API `/api/v1` | Deploy de producción `READY` en Vercel (`dpl_128uickaRf8PoKVGEzxGgtR1MuTB`, commit `77e58e4`, toolchain TS 7 · React 19.3) |
 | `studio.efeonce.org` | En vivo: CNAME en HostGator + certificado Let's Encrypt (renovación automática de Vercel) |
 | Base de producción `marketing_studio` | Migrada (2 migraciones), import aplicado: 5 campañas, 21 conceptos, 54 piezas, 48 copys, 72 anuncios, 4 audiencias, 1 flight, 7 líneas de presupuesto, 6 posts |
 | Base de staging `marketing_studio_staging` | Igual que producción |
