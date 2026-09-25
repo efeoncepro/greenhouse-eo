@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<title>La órbita · Línea gráfica Efeonce · Manual V1</title>
+<style>
+{{FONTS}}
+@page { size: A4; margin: 0; }
+:root{--dark:#001A33;--navy:#023C70;--teal:#36C8BF;--tealDark:#0E8C82;--halo:#72DED8;--ink:#00284D;--text:#2A3547;--muted:#5F5A69;--line:#DCE2E8;--paper:#F7F8F6;--ok:#1E7F4F;--no:#B3261E}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Poppins',sans-serif;color:var(--text);font-size:9.4pt;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sheet{width:210mm;height:297mm;position:relative;overflow:hidden;break-after:page;background:#fff}
+.sheet:last-child{break-after:auto}
+.body{position:absolute;top:27mm;bottom:24mm;left:18mm;right:18mm;overflow:hidden}
+.hdr{position:absolute;top:0;left:18mm;right:18mm;height:19mm;display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:3mm;border-bottom:.6pt solid var(--line)}
+.hdr img{height:6mm;display:block}
+.hdr .r{text-align:right;font-size:7.2pt;line-height:1.35;color:var(--muted)}
+.hdr .r b{display:block;color:var(--navy);font-weight:600}
+.ftr{position:absolute;bottom:0;left:0;right:0;height:17mm;padding:0 18mm 7mm;display:flex;align-items:flex-end;gap:5mm;font-size:7.1pt;color:var(--muted)}
+.ftr .rule{position:absolute;left:18mm;right:18mm;top:4mm;border-top:.6pt solid var(--line)}
+.ftr a{color:var(--muted);text-decoration:none}
+.ftr .bubble img{height:5.4mm;display:block}
+.ftr .pn{margin-left:auto;white-space:nowrap}
+.dark .ftr,.dark .ftr a{color:#9FB3C8}
+.dark .ftr .rule{border-color:rgba(255,255,255,.18)}
+/* tipografía de la línea: Bricolage para decir, Poppins para explicar */
+.kicker{font:600 7.6pt 'Poppins';letter-spacing:.14em;text-transform:uppercase;color:var(--navy);margin:0 0 2mm}
+h1{font-family:'Bricolage Grotesque';font-weight:760;font-variation-settings:'wght' 760,'opsz' 48;font-size:25pt;line-height:1.02;letter-spacing:-.035em;color:var(--navy);margin:0 0 4mm}
+h1 .s,.cv .s,.bk .s{display:inline-block;width:.2em;height:.2em;border-radius:50%;background:var(--tealDark);margin-left:.035em}
+h2{font-family:'Bricolage Grotesque';font-variation-settings:'wght' 700,'opsz' 24;font-size:13pt;line-height:1.2;letter-spacing:-.02em;color:var(--navy);margin:5mm 0 2mm}
+h3{font:600 9.4pt/1.3 'Poppins';color:var(--ink);margin:3mm 0 1mm}
+p{margin:0 0 2.2mm}
+.lead{font-size:11pt;line-height:1.5;color:var(--ink);margin:0 0 4mm}
+ul,ol{margin:0 0 3mm;padding-left:4.6mm}
+li{margin:0 0 1mm}
+b,strong{font-weight:600;color:var(--ink)}
+.q{font-weight:300}
+table.t{width:100%;border-collapse:collapse;font-size:8.2pt;line-height:1.38;margin:1mm 0 3.5mm}
+.t th{text-align:left;font-weight:600;color:var(--navy);border-bottom:1.1pt solid var(--navy);padding:1.4mm 2.4mm 1.4mm 0;vertical-align:bottom}
+.t td{border-bottom:.5pt solid var(--line);padding:1.4mm 2.4mm 1.4mm 0;vertical-align:top}
+.note{background:var(--paper);border-left:2.4pt solid var(--tealDark);padding:2.6mm 4mm;font-size:8.8pt;line-height:1.45;margin:3mm 0}
+.note p:last-child{margin:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:3mm 7mm}
+.sw{display:inline-block;width:3.2mm;height:3.2mm;border-radius:50%;vertical-align:-.5mm;margin-right:1.4mm;border:.4pt solid rgba(0,0,0,.12)}
+.ok{color:var(--ok);font-weight:600}.no{color:var(--no);font-weight:600}
+.fig{margin:3mm 0 1mm;border:.5pt solid var(--line)}
+.fig img{display:block;width:100%}
+.cap{font-size:7.2pt;color:var(--muted);margin:1mm 0 3mm}
+.big{font-family:'Bricolage Grotesque';font-variation-settings:'wght' 760,'opsz' 48;font-size:17pt;letter-spacing:-.03em;color:var(--navy);line-height:1.05}
+.ring{display:inline-block;width:.62em;height:.62em;border-radius:50%;border:.1em solid var(--tealDark);margin-right:.4em;vertical-align:-.05em}
+.voice{margin:2mm 0 4mm}
+.voice .qq{font-weight:300;font-size:11pt;color:var(--ink)}
+.voice .aa{font-family:'Bricolage Grotesque';font-variation-settings:'wght' 760,'opsz' 48;font-size:30pt;line-height:1.05;letter-spacing:-.035em;color:var(--navy)}
+.toc{list-style:none;padding:0;margin:4mm 0 6mm}
+.toc li{display:flex;align-items:baseline;gap:3mm;padding:2.1mm 0;border-bottom:.5pt solid var(--line);margin:0;font-size:10.2pt}
+.toc .k{font:600 8pt 'Poppins';color:var(--tealDark);width:7mm}
+.toc a{color:var(--ink);text-decoration:none;flex:1}
+.toc .num{font-variant-numeric:tabular-nums;color:var(--muted);font-size:9.2pt}
+/* portada y contraportada */
+.dark{background:var(--dark)}
+.orb{position:absolute;inset:0}
+.cover .in{position:absolute;top:0;left:0;right:0;bottom:17mm;padding:22mm 20mm 18mm;color:#fff;display:flex;flex-direction:column}
+.cover .logo{height:10mm;width:auto;align-self:flex-start;position:relative}
+.cover .eyebrow{margin-top:auto;font:600 8.6pt 'Poppins';letter-spacing:.14em;text-transform:uppercase;color:var(--halo);position:relative}
+.cover .q0{font-weight:300;font-size:14pt;color:#F4F6F8;margin:6mm 0 1mm;position:relative}
+.cover .q0 .ring{border-color:var(--teal)}
+.cover h1.cv{font-size:62pt;line-height:.98;color:#fff;margin:0 0 6mm;position:relative}
+.cover h1.cv .s{background:var(--teal)}
+.cover .sub{font-size:12.4pt;line-height:1.45;color:#C9D6E3;max-width:150mm;margin:0 0 9mm;position:relative}
+.cover .meta{display:flex;gap:6mm;align-items:center;font-size:9pt;color:#C9D6E3;position:relative}
+.cover .conf{border:.8pt solid var(--halo);color:var(--halo);border-radius:10pt;padding:.8mm 3mm;font-weight:600;font-size:7.8pt}
+.bk .in{position:absolute;top:0;left:0;right:0;bottom:17mm;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center}
+.bk .in img{width:78mm;position:relative}
+/* anexo */
+.lam .body{display:flex;flex-direction:column}
+.lam .ttl{font:600 8pt 'Poppins';letter-spacing:.12em;text-transform:uppercase;color:var(--navy);margin:0 0 2.5mm}
+.lam .frame{flex:1;display:flex;align-items:flex-start;justify-content:center;overflow:hidden}
+.lam .frame img{max-width:100%;max-height:100%;display:block;border:.5pt solid var(--line)}
+</style>
+</head>
+<body>
+
+<!-- 1 · Portada -->
+<section class="sheet dark cover" data-cover="1">
+ <svg class="orb" viewBox="0 0 794 1123" preserveAspectRatio="none" aria-hidden="true"><defs><radialGradient id="h" cx="560" cy="380" r="440" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#36C8BF" stop-opacity=".14"/><stop offset=".6" stop-color="#36C8BF" stop-opacity=".03"/><stop offset="1" stop-color="#36C8BF" stop-opacity="0"/></radialGradient></defs><rect width="794" height="1123" fill="url(#h)"/><circle cx="560" cy="380" r="238" fill="none" stroke="#72DED8" stroke-opacity=".2" stroke-width="1.6"/><circle cx="560" cy="380" r="171" fill="none" stroke="#72DED8" stroke-opacity=".1" stroke-width="1.2"/><path d="M 336.4 298.6 A 238 238 0 0 1 479.6 156.4" fill="none" stroke="#36C8BF" stroke-width="3" stroke-linecap="round"/><circle cx="479.6" cy="156.4" r="6.5" fill="#36C8BF"/></svg>
+ <div class="in">
+  <img class="logo" src="{{LOGO_NEG}}" alt="Efeonce">
+  <div class="eyebrow">Manual de marca · Línea gráfica · Versión 1</div>
+  <div class="q0"><span class="ring"></span>¿Qué se reconoce de Efeonce aunque no esté el logo?</div>
+  <h1 class="cv">La órbita<span class="s"></span></h1>
+  <p class="sub">Una esfera que recorre su órbita: el avance se ve, el oficio está a la vista y la conversación cierra con una respuesta.</p>
+  <div class="meta"><span>Septiembre 2026</span><span class="conf">Confidencial · Uso interno</span></div>
+ </div>
+</section>
+
+<!-- 2 · Índice -->
+<section class="sheet">
+ <div class="body">
+  <div class="kicker">Contenido</div>
+  <h1>Índice<span class="s"></span></h1>
+  <ul class="toc">
+   <li><span class="k">0</span><a href="#s0" data-toc="s0">La idea</a><span class="num"></span></li>
+   <li><span class="k">1</span><a href="#s1" data-toc="s1">La esfera: punto final, órbita, foco y lente</a><span class="num"></span></li>
+   <li><span class="k">2</span><a href="#s2" data-toc="s2">Color y tipografía</a><span class="num"></span></li>
+   <li><span class="k">3</span><a href="#s3" data-toc="s3">La voz, el eslogan y el oficio a la vista</a><span class="num"></span></li>
+   <li><span class="k">4</span><a href="#s4" data-toc="s4">La familia de marcas</a><span class="num"></span></li>
+   <li><span class="k">5</span><a href="#s5" data-toc="s5">Logo e isotipo: uso correcto, incorrecto y tamaños</a><span class="num"></span></li>
+   <li><span class="k">6</span><a href="#s6" data-toc="s6">Fotografía</a><span class="num"></span></li>
+   <li><span class="k">7</span><a href="#s7" data-toc="s7">Aplicaciones: pantalla, oficina, objetos y eventos</a><span class="num"></span></li>
+   <li><span class="k">8</span><a href="#s8" data-toc="s8">Sí y no: resumen</a><span class="num"></span></li>
+   <li><span class="k">9</span><a href="#s9" data-toc="s9">Decisiones y lo que falta</a><span class="num"></span></li>
+   <li><span class="k">A</span><a href="#anexo" data-toc="anexo">Anexo: las 37 láminas</a><span class="num"></span></li>
+  </ul>
+  <div class="note"><p><b>Sobre este documento.</b> Reúne la línea gráfica de Efeonce tal como quedó aprobada en dirección el 25 de septiembre de 2026. Es la versión 1: algunas decisiones siguen abiertas y se marcan como pendientes en el capítulo 9. Las fotos de producto del anexo son maquetas de presentación generadas a partir del diseño exacto; la producción sale siempre de los archivos originales y de una muestra física del proveedor.</p></div>
+ </div>
+</section>
+
+<!-- 3 · Idea + esfera -->
+<section class="sheet">
+ <div class="body">
+  <div class="kicker" id="s0">0 · La idea</div>
+  <h1>Una esfera que recorre su órbita<span class="s"></span></h1>
+  <p class="lead">La esfera del isotipo —la nave con su anillo y su esfera— es el activo que se reconoce de Efeonce aunque no esté el logo. Tres ideas sostienen todo lo demás.</p>
+  <div class="grid2">
+   <div><h3>1 · La forma viene del isotipo</h3><p>La nave ya tiene un anillo y una esfera. La línea no inventa un símbolo nuevo: extiende el que existe. Por eso el isotipo nunca lleva otra órbita.</p></div>
+   <div><h3>2 · Anillo = pregunta, esfera = respuesta</h3><p>El anillo es lo abierto, lo libre, lo que todavía se pregunta. La esfera es lo decidido, lo ocupado, lo que cierra. Esta gramática rige la voz, la oficina, las credenciales y los objetos.</p></div>
+   <div><h3>3 · Línea fina y luz</h3><p>La órbita es un trazo tenue con un arco y una esfera en la punta; el halo es luz. Nunca un disco plano, brillos, reflejos ni esferas de vidrio.</p></div>
+   <div><h3>Una por pieza</h3><p>Una esfera, una órbita y un acento por pieza. Lo que se repite deja de significar.</p></div>
+  </div>
+  <div class="kicker" id="s1" style="margin-top:7mm">1 · La esfera</div>
+  <h2>Tres estados</h2>
+  <table class="t"><tr><th>Estado</th><th>Forma</th><th>Dónde se usa</th></tr>
+   <tr><td><b>Punto final</b></td><td>la esfera cierra la palabra respuesta</td><td>titulares, firma de mail, taza blanca, credenciales</td></tr>
+   <tr><td><b>Órbita</b></td><td>anillo tenue, arco, esfera en la punta y halo</td><td>portadas, cierres, carga, avance, objetos</td></tr>
+   <tr><td><b>Foco</b></td><td>la órbita leída como foco de escenario sobre una foto</td><td>fotografía, «Te hacemos visible»</td></tr>
+  </table>
+  <h2>El punto final</h2>
+  <ul>
+   <li>La esfera mide el <b>24 % del alto del isotipo</b>; se toma entera, sin la órbita.</li>
+   <li><b>Diámetro: 0,20 em</b> de la palabra dominante, apoyada en la línea base, sin superar la altura de x.</li>
+   <li><b>Mínimo:</b> 4 px en pantalla y 1,5 mm impresa. Bajo eso, se omite. Sola, con 2 diámetros de aire.</li>
+   <li><b>Tintas:</b> <span class="sw" style="background:#36C8BF"></span>#36C8BF sobre oscuro (8,5:1) y <span class="sw" style="background:#0E8C82"></span>#0E8C82 sobre claro (3,9:1). El teal claro sobre blanco da 2,1:1: no se usa en claro.</li>
+   <li><b>Espaciado después de la última letra:</b> r −0,02 em · a, s, í, z 0,03 em · o, n, e, d 0,035 em.</li>
+   <li><b>Nunca:</b> otro color · volumen, brillo o sombra · agrandarla · repetirla como patrón · reemplazar letras · en una pregunta · como viñeta.</li>
+  </ul>
+ </div>
+</section>
+
+<!-- 4 · Órbita, foco, lente -->
+<section class="sheet">
+ <div class="body">
+  <div class="kicker">1 · La esfera</div>
+  <h1>La órbita<span class="s"></span></h1>
+  <p class="lead">Un anillo tenue es el recorrido; el arco, lo avanzado; la esfera en la punta, dónde vamos; el halo, el foco sobre lo importante. Las medidas se escalan por cada 794 px de ancho del lienzo.</p>
+  <table class="t"><tr><th style="width:30mm">Elemento</th><th>Regla</th></tr>
+   <tr><td><b>Anillo</b></td><td>1 px por cada 794 px, opacidad 16–22 %. Máximo dos órbitas interiores (72 % y 44 % del radio, al 11 % y 6 %).</td></tr>
+   <tr><td><b>Arco</b></td><td>1,6–2 px, punta redonda, sentido horario. Corto (40–60°) con esfera; largo (hasta 140°) en degradé cuando lleva satélites, y entonces sin esfera.</td></tr>
+   <tr><td><b>Esfera</b></td><td>radio 3,5–4 px; siempre en la punta del arco, nunca suelta.</td></tr>
+   <tr><td><b>Radio</b></td><td>30 % del ancho en retrato; 40 % del alto en horizontal.</td></tr>
+   <tr><td><b>Halo</b></td><td>radial: 13 % en el centro, 3 % al 60 %, 0 al borde. Sin brillos ni reflejos.</td></tr>
+   <tr><td><b>Arco de avance</b></td><td>sólo con un dato real: el arco mide el dato. Sin dato, no hay arco.</td></tr>
+   <tr><td><b>Satélites</b></td><td>discos de 30 px con el ícono del canal o producto, sobre la órbita exterior.</td></tr>
+   <tr><td><b>Redes</b></td><td>en lienzos de hasta 1200 px de ancho, grosores ×1,75. Verificado a 390 px de ancho.</td></tr>
+  </table>
+  <p><b>Posición.</b> Centro fuera del eje, hacia la derecha y arriba. El texto vive en el tercio inferior izquierdo y nunca cruza la órbita. Una sola órbita por pieza.</p>
+  <h2>El foco: «Te hacemos visible.»</h2>
+  <p>La órbita leída como foco de escenario: la esfera es la lámpara, el círculo su luz y lo que queda dentro, el cliente. Siempre va con su prueba: <b>«Te hacemos visible. Y lo medimos.»</b> Penumbra navy y una sola luz por pieza; nunca nombres reales de competidores en la penumbra. El claim requiere revisión legal antes de pauta.</p>
+  <h2>La lente</h2>
+  <p>La foto entera en navy apagado; dentro del círculo, a todo color y ampliada. La esfera muestra dónde está la decisión. Exige una foto con un punto de interés claro: con una foto débil, se nota el truco.</p>
+ </div>
+</section>
+
+<!-- 5 · Color y tipografía -->
+<section class="sheet">
+ <div class="body">
+  <div class="kicker" id="s2">2 · Color y tipografía</div>
+  <h1>Navy profundo y un acento<span class="s"></span></h1>
+  <table class="t"><tr><th>Contexto</th><th>Fondo</th><th>Texto</th><th>Acento</th><th>Halo</th></tr>
+   <tr><td><b>Efeonce, oscuro</b></td><td><span class="sw" style="background:#001A33"></span>#001A33</td><td>blanco</td><td><span class="sw" style="background:#36C8BF"></span>#36C8BF</td><td><span class="sw" style="background:#72DED8"></span>#72DED8</td></tr>
+   <tr><td><b>Efeonce, papel</b></td><td><span class="sw" style="background:#F7F8F6"></span>#F7F8F6</td><td><span class="sw" style="background:#023C70"></span>#023C70</td><td><span class="sw" style="background:#0E8C82"></span>#0E8C82 sólo gráfico</td><td>navy al 6 %</td></tr>
+   <tr><td><b>Productos, oscuro</b></td><td><span class="sw" style="background:#091951"></span>#091951</td><td>blanco</td><td>Globe <span class="sw" style="background:#FF6500"></span>#FF6500 · Wave <span class="sw" style="background:#0375DB"></span>#0375DB · Reach <span class="sw" style="background:#F83902"></span>#F83902</td><td>el acento</td></tr>
+   <tr><td><b>Productos, claro</b></td><td>papel</td><td>#091951</td><td>Globe <span class="sw" style="background:#BB1954"></span>#BB1954 · Wave #0375DB · Reach #F83902</td><td>el acento</td></tr>
+  </table>
+  <p>Contraste medido de la esfera: Efeonce 8,5:1 (oscuro) y 3,9:1 (claro) · Globe 5,6:1 y 5,8:1 · Wave 3,6:1 y 4,3:1 · Reach 4,4:1 y 3,5:1. La esfera es gráfico; el texto cumple siempre 4,5:1.</p>
+  <ul>
+   <li>Una marca, un acento por pieza. El teal es sólo de Efeonce y nunca aparece en una pieza de producto.</li>
+   <li>El halo toma el color del acento; nunca dos acentos en la misma órbita.</li>
+   <li>Los valores son sRGB. La conversión a CMYK o Pantone se fija con prueba física del proveedor, nunca sin ella.</li>
+  </ul>
+  <h2>Tipografía</h2>
+  <div class="voice"><div class="aa">Crear<span class="s" style="display:inline-block;width:.2em;height:.2em;border-radius:50%;background:#BB1954;margin-left:.035em"></span></div><div>Del brief a la pieza aprobada.</div></div>
+  <ul>
+   <li><b>Bricolage Grotesque, peso 760</b>, tracking −0,035 em: la palabra dominante, la que responde.</li>
+   <li><b>Poppins:</b> Light para la pregunta; Regular y Medium para el texto; cifras tabulares para los números.</li>
+   <li>El eslogan conserva sus pesos oficiales.</li>
+   <li><b>Nunca:</b> Bricolage en párrafos · monoespaciadas · cursivas falsas.</li>
+  </ul>
+ </div>
+</section>
+
+<!-- 6 · Voz, eslogan, oficio -->
+<section class="sheet">
+ <div class="body">
+  <div class="kicker" id="s3">3 · La voz, el eslogan y el oficio</div>
+  <h1>Siempre hay dos voces<span class="s"></span></h1>
+  <div class="voice"><div class="qq"><span class="ring"></span>¿Lo medimos?</div><div class="aa">Siempre<span class="s" style="display:inline-block;width:.2em;height:.2em;border-radius:50%;background:#0E8C82;margin-left:.035em"></span></div></div>
+  <table class="t"><tr><th>Voz</th><th>Tipo</th><th>Regla</th></tr>
+   <tr><td><b>Pregunta</b></td><td>Poppins Light con anillo</td><td>una pregunta real del cliente, no retórica; abre</td></tr>
+   <tr><td><b>Respuesta</b></td><td>Bricolage con su esfera</td><td>una a tres palabras; es la dominante y mide al menos 3 veces la pregunta; cierra</td></tr>
+   <tr><td><b>Evidencia</b></td><td>Poppins, una palabra en negrita</td><td>dato, fuente o mecanismo; puede faltar</td></tr>
+  </table>
+  <p>En cuadernos, pizarras y formularios la pregunta queda sola con su anillo: responde quien lo usa. Tuteo neutro, sin voseo ni modismos; nunca dos preguntas ni dos respuestas seguidas; la respuesta no promete lo que no se puede probar.</p>
+  <p><b>Banco de pares (propuesta, por aprobar):</b> ¿Lo medimos? Siempre. · ¿Quién decide? Tú, con evidencia. · ¿Cuánto rindió? Te mostramos todo. · ¿Cómo va? En vivo. · ¿Otra agencia más? No. Un sistema. · ¿Y si lo probamos? Hoy.</p>
+  <h2>El eslogan</h2>
+  <p>«Empower your Growth» tiene dos formas oficiales: el bloque con el logo y el eslogan solo, con la palabra final destacada. La palabra final rota por marca y toma su acento: <b>Growth</b> (Efeonce), <b>Brand</b> (Globe), <b>Engine</b> (Wave), <b>Voice</b> (Reach). Va en cierres —final de video, última lámina, contratapa, firma, recepción, merch—, no en cada post. Nunca se traduce, se le pega la esfera ni se le cambian pesos o cursivas.</p>
+  <h2>Oficio a la vista</h2>
+  <p>El trabajo se ve mientras ocurre. Cinco herramientas, máximo dos por pieza además de la esfera: la guía de 1 px, las marcas de corte, la selección del sistema de diseño AXIS, la nota al margen firmada y los cursores de colaboración de AXIS, tal como se ven en el producto.</p>
+ </div>
+</section>
+
+<!-- 7 · Familia -->
+<section class="sheet">
+ <div class="body">
+  <div class="kicker" id="s4">4 · La familia</div>
+  <h1>Un lenguaje, cuatro acentos<span class="s"></span></h1>
+  <p class="lead">Efeonce es la marca principal; Globe (estudio creativo), Wave (búsqueda, web y medición) y Reach (medios y distribución) son sus marcas de producto. Todas hablan con la esfera, el oficio y la conversación; cambia sólo el acento.</p>
+  <div class="grid2">
+   <div><h3>Igual en toda la familia</h3><ul><li>La esfera y el anillo: forma, 0,20 em y comportamiento.</li><li>El oficio a la vista y los cursores.</li><li>La voz: pregunta, respuesta y evidencia.</li><li>Bricolage y Poppins; el papel como fondo claro.</li></ul></div>
+   <div><h3>Cambia por marca</h3><ul><li>El color de la esfera y del anillo.</li><li>El fondo oscuro: navy para Efeonce, tinta #091951 para los productos.</li><li>La firma: el logo de cada producto, «by efeonce».</li><li>La palabra final del eslogan.</li></ul></div>
+  </div>
+  <div class="fig"><img src="{{FIG_FAMILIA}}" alt="La órbita en la familia: Efeonce, Globe, Wave y Reach, cada una con su acento"></div>
+  <p class="cap">La órbita en la familia y el mapa de portafolio: el arco y el centro son de Efeonce; los productos van como satélites con su isotipo.</p>
+ </div>
+</section>
+
+<!-- 8 · Logo -->
+<section class="sheet">
+ <div class="body">
+  <div class="kicker" id="s5">5 · Logo e isotipo</div>
+  <h1>El logo se usa desde el archivo oficial<span class="s"></span></h1>
+  <p><b>Logo completo:</b> post, lámina, portada, correo, reverso de taza, muro, stand; siempre que quepa a 96 px o más. <b>Isotipo:</b> avatar, favicon, ícono de app, pin, sticker, credencial, marca de agua en video. <b>Nunca los dos en la misma vista.</b></p>
+  <table class="t"><tr><th style="width:42mm"><span class="ok">✓</span> Uso correcto</th><th>Detalle</th></tr>
+   <tr><td>A color sobre blanco o papel</td><td>el navy oficial, desde el archivo</td></tr>
+   <tr><td>Negativo sobre navy</td><td>siempre el archivo negativo, todo blanco</td></tr>
+   <tr><td>Sobre foto</td><td>sólo en una zona calma, con contraste de 4,5:1 medido; nunca con un velo encima</td></tr>
+   <tr><td>Área de resguardo</td><td><b>X = alto de la nave</b>, en los cuatro lados; nada entra: ni texto, ni bordes, ni la órbita</td></tr>
+   <tr><td>Tamaño mínimo</td><td><b>96 px en pantalla · 25 mm impreso</b>; recomendado desde 160 px. Bajo eso, el isotipo (a validar con prueba de impresión)</td></tr>
+   <tr><td>Familia</td><td>cada marca con su propio archivo; productos en negativo sobre #091951</td></tr>
+   <tr><td>Logo con eslogan</td><td>sólo el bloque oficial, en cierres</td></tr>
+  </table>
+  <h2><span class="no">✕</span> Doce cosas que nunca se le hacen al logo</h2>
+  <ol>
+   <li>Estirarlo o comprimirlo.</li><li>Rotarlo o inclinarlo.</li><li>Recolorearlo: ni teal, ni el acento de otra marca.</li><li>Degradados o efectos.</li><li>Sombras, brillos o contornos.</li><li>Ponerlo sin contraste: navy sobre azul oscuro o sobre textura.</li><li>Ponerlo sobre una foto cargada.</li><li>Rodearlo con una órbita: la órbita rodea palabras, nunca el logo.</li><li>Agregarle la esfera o un punto.</li><li>Escribirlo con una fuente.</li><li>Juntar logo e isotipo.</li><li>Usarlo dentro de una frase, en lugar de una palabra.</li>
+  </ol>
+  <div class="note"><p>La causa es siempre la misma: tratar el logo como una imagen editable. Si ninguna versión funciona, se cambia el fondo o la foto, no el logo. Si falta una versión, se pide a diseño; no se arma en la pieza.</p></div>
+ </div>
+</section>
+
+<!-- 9 · Isotipo -->
+<section class="sheet">
+ <div class="body">
+  <div class="kicker">5 · Logo e isotipo</div>
+  <h1>El isotipo ya es una órbita<span class="s"></span></h1>
+  <p class="lead">La nave con su anillo y su esfera es el origen de la línea. Por eso firma sola en formatos chicos y nunca lleva otra órbita, otro punto ni otro color.</p>
+  <div class="grid2">
+   <div><h3><span class="ok">✓</span> Correcto</h3><ul><li>A color sobre blanco o papel.</li><li>Blanco sobre navy, con el archivo blanco oficial.</li><li>Avatar: círculo navy con el isotipo al 60 % del ancho.</li><li>Ícono de app o favicon: cuadrado redondeado, mismo margen.</li><li><b>Resguardo:</b> X = diámetro de la esfera del isotipo.</li><li><b>Mínimo:</b> 24 px en pantalla y 8 mm impreso. A 16 px se pierden las ventanas de la nave: ese favicon se valida aparte.</li></ul></div>
+   <div><h3><span class="no">✕</span> Incorrecto</h3><ul><li>Rotarlo o voltearlo: la nave sube hacia la derecha, siempre.</li><li>Recolorearlo o ponerle degradé.</li><li>Estirarlo.</li><li>Ponerle otra órbita.</li><li>Recortarlo en un círculo que lo corta: el círculo contiene, no corta.</li><li>Armar un logo propio con el isotipo y una palabra tipeada.</li><li>Ponerlo sin contraste.</li><li>Mezclarlo con otro isotipo.</li></ul></div>
+  </div>
+  <div class="fig"><img src="{{FIG_ISOTIPO}}" alt="Lámina de isotipo: usos correctos, área de resguardo, escala de tamaños y usos incorrectos"></div>
+  <p class="cap">Detalle completo en el anexo: logo correcto, logo incorrecto e isotipo.</p>
+ </div>
+</section>
+
+<!-- 10 · Fotografía + pantalla -->
+<section class="sheet">
+ <div class="body">
+  <div class="kicker" id="s6">6 · Fotografía</div>
+  <h1>Fotos pensadas para un círculo<span class="s"></span></h1>
+  <p>La foto va en la lente o en el foco, con su luz y sin velo. Personas reales del equipo o escenas del oficio; nunca banco de imágenes.</p>
+  <ul>
+   <li>El sujeto cabe en un círculo del 55 % del lado corto, con 15 % de aire.</li>
+   <li>Fuera del círculo la foto tolera quedar en navy apagado: nada esencial vive ahí.</li>
+   <li>Sin emblema legible en la ropa: el logo lo pone la pieza, no la prenda.</li>
+   <li>Un acento cálido dentro del círculo, nunca en el fondo. La obra en proceso. Nadie mira al lente.</li>
+  </ul>
+  <p><b>Banco propio (listo para producir, pendiente de presupuesto):</b> ocho tomas —manos ajustando una curva de color, dos personas decidiendo entre dos versiones, la pizarra con la órbita, la cámara detrás del monitor, un informe impreso, la escucha en una llamada, la pieza aprobada en pantalla grande y la mesa al final del ciclo—.</p>
+  <div class="kicker" id="s7" style="margin-top:6mm">7 · Aplicaciones</div>
+  <h2>Pantalla y campaña</h2>
+  <ul>
+   <li><b>Deck:</b> la órbita es la navegación. La portada lleva un arco corto; cada sección suma su tramo; el cierre la completa.</li>
+   <li><b>Campaña:</b> la órbita rodea la lente con aire; la esfera va arriba a la izquierda, lejos de la cara.</li>
+   <li><b>Cierre de marca en video (4,5 s):</b> aparece el anillo, crece el arco, la esfera asienta, sube el halo y llegan el logo y el eslogan. Con movimiento reducido, cuadro fijo.</li>
+   <li><b>Grillas:</b> margen del 9 % del lado corto en redes y 140 px en 16:9; en 9:16 se respeta la zona que tapa la interfaz.</li>
+  </ul>
+  <h2>Firma de mail</h2>
+  <p>Texto vivo y máximo dos imágenes; en Outlook de escritorio, 460 px fijos. Dos opciones con la órbita en la foto: <b>A · clara</b>, con un divisor que termina en la esfera, y <b>B · tarjeta navy</b>, recomendada porque se reconoce de lejos y funciona en modo oscuro. <b>Pendiente: elegir A o B.</b></p>
+ </div>
+</section>
+
+<!-- 11 · Oficina y objetos -->
+<section class="sheet">
+ <div class="body">
+  <div class="kicker">7 · Aplicaciones</div>
+  <h1>La oficina habla con la forma<span class="s"></span></h1>
+  <div class="grid2">
+   <div><h3>Llegar</h3><p>El logo completo va una sola vez, en el muro de recepción. Salas con verbos (Hacer, Medir, Crear); en el directorio, cada área con la esfera en su acento. La señalética de servicio en Poppins, sin esfera ni órbita: se lee, no decora.</p></div>
+   <div><h3>Trabajar</h3><p><b>Anillo = libre; esfera = ocupado.</b> Nunca como semáforo de colores. El arco del estado de sala mide tiempo real. Una lente o una órbita por muro; nada de patrones. Muro de voz: una pregunta y su respuesta.</p></div>
+   <div><h3>Convivir</h3><p>Tazas, cuaderno, credencial, stickers, fondos de pantalla con la zona izquierda libre para la cámara y tarjetas de mesa con la voz. Los datos reales los completa la oficina.</p></div>
+   <div><h3>La regla de los objetos</h3><p><b>Frente:</b> la palabra en Bricolage con su punto; la órbita es opcional y siempre alrededor de la palabra. <b>Dorso:</b> el logo solo, chico y abajo. La órbita alrededor del logo está descartada.</p></div>
+  </div>
+  <h2>Objetos</h2>
+  <table class="t"><tr><th style="width:36mm">Objeto</th><th>Cómo lleva la línea</th></tr>
+   <tr><td>Tazas</td><td>la blanca con «Hacer.» es la favorita; en cerámica no hay halo (anillo 0,5 mm, arco 1,2 mm, esfera 4,4 mm, órbita 74 mm); el interior toma el acento</td></tr>
+   <tr><td>Vaso térmico y botella</td><td>acero con pintura en polvo; el verbo en su órbita adelante, el logo atrás; diseño propio, nunca la forma de una marca existente</td></tr>
+   <tr><td>Lapiceros</td><td>el botón superior es la esfera, en el acento de cada marca</td></tr>
+   <tr><td>Pulseras</td><td>un verbo con su punto; en las de color, texto y punto en blanco</td></tr>
+   <tr><td>Alfombra de escritorio</td><td>90 × 40 cm, la órbita a la derecha, bajo el mouse</td></tr>
+   <tr><td>Llavero</td><td>la argolla es el anillo y la cuenta teal, la esfera; la placa dice «Adelante.»</td></tr>
+   <tr><td>Paraguas</td><td>desde arriba, una órbita con «Siempre.»; de lado, el logo en un paño</td></tr>
+  </table>
+  <div class="fig"><img src="{{FIG_OBJETOS}}" alt="Lapiceros, pulseras, alfombra, polo, polera, gorra y pin fotografiados"></div>
+ </div>
+</section>
+
+<!-- 12 · Vestir, identificarse, bienvenida -->
+<section class="sheet">
+ <div class="body">
+  <div class="kicker">7 · Aplicaciones</div>
+  <h1>Vestir, identificarse y dar la bienvenida<span class="s"></span></h1>
+  <h3>Vestir</h3>
+  <p>El uniforme actual —polo, hoodie, gorra, chaqueta y lanyard— sigue vigente; lo nuevo son ediciones. <b>Polo navy:</b> «Hacer.» bordado chico y el botón superior en teal. <b>Polera navy:</b> la órbita con «Hacer.» en el pecho (en el hoodie no: la capucha y el bolsillo la cortan). <b>Gorra:</b> «Hacer.» bordado y el botón superior en teal. Bordado en piqué y softshell; estampado en algodón.</p>
+  <h3>Identificarse</h3>
+  <p><b>Carnet:</b> la foto con su órbita, el nombre con su punto, el cargo y el logo; atrás, «¿Lo encontraste? Devuélvelo.». <b>Credencial de evento:</b> el rol se lee por la forma —anillo para asistentes, órbita para speakers, esfera para staff—, no por colores. <b>Tarjeta:</b> adelante la persona; atrás la órbita con el logo y el eslogan.</p>
+  <h3>Bienvenida y envíos</h3>
+  <p><b>Caja de bienvenida:</b> la tapa pregunta y responde («¿Primer día? Adelante.»); adentro, «Esto es tuyo.» con el nombre y el kit. <b>Envío a clientes:</b> por fuera sobrio —lo que viaja por correo no anuncia lo que lleva—; por dentro, «Gracias.» y el papel de seda cerrado con un sello teal.</p>
+  <h3>Papelería y eventos</h3>
+  <p><b>Hoja membretada A4:</b> logo arriba, la órbita recortada en la esquina al 18 % y un pie cuya línea termina en la esfera; nunca la órbita detrás del texto. <b>Sobre:</b> el sello del dorso es la esfera: cerrado es respondido. <b>Stand de 3 × 2,4 m:</b> el telón pregunta y responde por encima del mesón, el pendón deja libres sus 20 cm de abajo y el mesón firma con el logo solo.</p>
+  <div class="fig"><img src="{{FIG_BIENVENIDA}}" alt="Carnet, credencial, tarjetas, caja de bienvenida y envío fotografiados"></div>
+  <p class="cap">Fotos de producto generadas a partir del diseño exacto de cada pieza y de las prendas reales del uniforme. Son maquetas de presentación.</p>
+ </div>
+</section>
+
+<!-- 13 · Sí y no -->
+<section class="sheet">
+ <div class="body">
+  <div class="kicker" id="s8">8 · Sí y no</div>
+  <h1>Cada elemento tiene un trabajo<span class="s"></span></h1>
+  <table class="t"><tr><th style="width:28mm">Elemento</th><th><span class="ok">✓</span> Sí</th><th><span class="no">✕</span> No</th></tr>
+   <tr><td><b>Esfera</b></td><td>al final de la respuesta, 0,2 em, en el acento; una por pieza</td><td>en preguntas, como viñeta, repetida, con volumen o brillo</td></tr>
+   <tr><td><b>Órbita</b></td><td>anillo fino al 16–22 %, arco y esfera, al costado del texto</td><td>anillos gruesos o muchos, detrás del texto, alrededor del logo</td></tr>
+   <tr><td><b>Arco de avance</b></td><td>mide un dato real</td><td>decorativo o inventado</td></tr>
+   <tr><td><b>Voz</b></td><td>pregunta chica, respuesta grande de una a tres palabras</td><td>pregunta grande, respuesta larga y chica</td></tr>
+   <tr><td><b>Color</b></td><td>navy profundo con teal; teal oscuro sólo en gráfico sobre claro</td><td>teal claro como texto sobre blanco; dos acentos en una pieza</td></tr>
+   <tr><td><b>Tipografía</b></td><td>Bricolage para decir, Poppins para explicar</td><td>Bricolage en párrafos, monoespaciadas</td></tr>
+   <tr><td><b>Eslogan</b></td><td>bloque oficial, en cierres</td><td>traducido, con esfera, en mayúsculas o con otros pesos</td></tr>
+   <tr><td><b>Objetos</b></td><td>frente: la palabra; dorso: el logo solo</td><td>logo y órbita juntos al frente</td></tr>
+   <tr><td><b>Foto</b></td><td>oficio real, luz con carácter, sin emblema legible</td><td>velo navy encima, foto de banco</td></tr>
+   <tr><td><b>Logo</b></td><td>archivo oficial, con resguardo y contraste</td><td>los doce usos incorrectos del capítulo 5</td></tr>
+   <tr><td><b>Isotipo</b></td><td>solo, en formatos chicos, desde 24 px</td><td>con otra órbita, recoloreado, rotado o combinado</td></tr>
+   <tr><td><b>Terceros</b></td><td>satélites de canal que muestran dónde medimos</td><td>logos de terceros como si fueran alianzas</td></tr>
+  </table>
+  <div class="fig"><img src="{{FIG_SINO}}" alt="Lámina de elementos: sí y no"></div>
+ </div>
+</section>
+
+<!-- 14 · Decisiones -->
+<section class="sheet">
+ <div class="body">
+  <div class="kicker" id="s9">9 · Decisiones y lo que falta</div>
+  <h1>Lo decidido y cómo lo medimos<span class="s"></span></h1>
+  <h3>Decidido el 25 de septiembre de 2026 (revisable)</h3>
+  <ul>
+   <li>La órbita es la forma canónica; el punto final se mantiene en titulares, firma de mail y taza blanca; el foco, en fotos.</li>
+   <li>En oscuro manda la paleta de la órbita; en papel, navy #023C70 y teal #0E8C82.</li>
+   <li>El hilo de la familia es la órbita más la palabra final del eslogan.</li>
+   <li>En redes, grosores ×1,75 en lienzos de hasta 1200 px.</li>
+   <li>En objetos, la palabra al frente y el logo solo atrás.</li>
+  </ul>
+  <h3>Prueba sin logo</h3>
+  <p>¿Se reconoce a Efeonce sin su logo? Primero se aprende la marca con logo; después se atribuyen piezas nuevas sin él. 600 personas (300 por versión), decisores de marketing y comercial en Chile, empresas de 50 o más personas. Se mide el porcentaje que elige «Efeonce» entre Efeonce, cinco competidores y «No sé». Éxito: 10 puntos sobre el distractor con 95 % de confianza. El kit está listo para el proveedor del panel.</p>
+  <h3>Decisiones pendientes</h3>
+  <ol>
+   <li>Presupuesto del banco de fotos propio (ocho tomas, del orden de USD 5–10).</li>
+   <li>Proveedor del panel de la prueba sin logo (a cotizar).</li>
+   <li>Firma de mail: opción A o B, e instalarla.</li>
+   <li>Aprobar el banco de pares de voz.</li>
+   <li>Canonizar la línea en el sistema de diseño.</li>
+  </ol>
+  <h3>Producción pendiente</h3>
+  <p>Archivos de impresión y plantillas editables · componente de órbita en el sistema de diseño · frontera entre Greenhouse y Efeonce (esta línea es de Efeonce) · que la línea no se filtre al trabajo de clientes · copy en inglés · revisión legal de «Te hacemos visible» · accesibilidad medida en las piezas reales · tamaños mínimos del logo validados con prueba de impresión.</p>
+ </div>
+</section>
+
+{{ANNEX}}
+
+<!-- Contraportada -->
+<section class="sheet dark bk" data-back="1">
+ <!-- La órbita nunca rodea al logo: vive en la esquina y el bloque con eslogan queda solo, con aire. -->
+ <svg class="orb" viewBox="0 0 794 1123" preserveAspectRatio="none" aria-hidden="true"><circle cx="700" cy="150" r="238" fill="none" stroke="#72DED8" stroke-opacity=".2" stroke-width="1.6"/><path d="M 581 356.1 A 238 238 0 0 1 476.4 231.4" fill="none" stroke="#36C8BF" stroke-width="3" stroke-linecap="round"/><circle cx="476.4" cy="231.4" r="6.5" fill="#36C8BF"/></svg>
+ <div class="in"><img src="{{LOCK_NEG}}" alt="Efeonce · Empower your Growth"></div>
+</section>
+
+</body>
+</html>
