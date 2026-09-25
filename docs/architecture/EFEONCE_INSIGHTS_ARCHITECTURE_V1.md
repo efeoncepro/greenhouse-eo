@@ -1100,4 +1100,3 @@ Insights, y se resuelve fuera de TASK-1888. Si el registro cambia, el informe lo
 **Límites honestos.** `decision`, `measurement` y `ask` no tienen productor determinista; la conclusión de página
 (`reading.conclusion`) tampoco. El medidor necesita que el adapter AEO elija el run por ventana (follow-up en el
 dominio del grader). Métricas por página o keyword de SEO, conjuntos por consulta de IA y embudo CRM siguen fuera.
-
