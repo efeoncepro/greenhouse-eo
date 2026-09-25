@@ -232,3 +232,34 @@ With the flag OFF the adapters return v1 evidence and the planner emits a v1 pla
   reused; gateway PR efeonce-mcp#18, 1.9.0 on top of Marketing Studio 1.8.0, contract `task-1888-v1`, not deployed).
 - **Percent deltas** — a metric already in percent varies in pp (`formatDeltaPoints`, «+1,8 pp»; two decimals under
   0,05 pp). Relative deltas stay for absolute metrics. Sealed plans with the old relative text still validate.
+
+## Render contract of the premium catalogs (TASK-1889 — code complete 2026-09-25, not pushed)
+
+Verified against code on 2026-09-25. Detail: architecture §14.9.
+
+- **Catalogs v2 only** — `insights-report` (A4 794×1123) and `insights-deck` (1280×720). No legacy template may exist
+  (`__tests__/insights-catalogs-v2-only.test.ts`). A v1 plan still composes on the v2 templates.
+- **Family → page** (`render/figure-slots.ts`, shared by both mappers). `bar_grouped` whose dimensions are METRICS →
+  comparison (each metric on its own scale); `bar`, or `bar_grouped` whose dimensions are DISTINCT CHANNELS
+  (`dimensionChannelIds` all non-null and distinct) → columns on one axis; `bullet` → targets; `line` → trend (≤ 3 series
+  by role `primary`/`reference`/`detail`). contentType → template: `report-figure-{comparison,columns,targets,trend}` →
+  `ReportFigure*Page`; `insights-figure-{…}` → `InsightsFigure*Slide`. A family without a page ⇒
+  `InsightsRenderRejectedError` with its cause; a figure without enough facts is NOT emitted (the chapter narrates it).
+- **Capacities** (`FIGURE_CAPACITY`): A4 `metrics 5, groups 6, bulletRows 6`; deck `metrics 4, groups 4, bulletRows 5`;
+  overflow splits with `balancedPages` (7 groups → 4+3).
+- **Figure content** — key figure, conclusion and «Lo que significa / Próximo paso» from `chapter.readings` (TASK-1888);
+  without a reading (v1 plan): first fact + the claim that cites the figure. Only derived number: percent of target
+  (achieved ÷ target, integer).
+- **Targets (`bullet`)** — own scale per row (1.1 × max), target mark, «mayor brecha» decided over all rows and the
+  direction. Attention zone ONLY from `band` = `bandFactId`; without it, a single track. Never a hand-written threshold.
+  `lower_is_better` ⇒ class `bullet--lower` (inverts the dark side).
+- **«Lo esencial»** (`plan.essentials`) — `report-summary` / `insights-summary`: thesis, lede, ≤ 5 essentials (figure =
+  primary fact formatted, title = metric, A4 detail = claim), real folio = first page drawing the fact, else the
+  chapter opening; decision «Para decidir en la reunión» (A4) / «Para decidir» (deck). No essentials ⇒ narrated summary.
+- **Cover** — white (`ReportCoverLightPage`) or navy per `plan.cover`; deck always navy. Client logo travels as the sealed
+  ref `asset-ref:org-logo:<id>` (`render/cover.ts` `orgLogoRef`); bytes arrive through `ComposeOptions.externalAssets`.
+  The worker reads them with `readOrganizationLogoForRender` (only the attached logo of THAT org, image, ≤ 2 MB, access
+  log). No bytes ⇒ fail closed; non-embeddable logo ⇒ `semantic_rejected` (`services/artifact-worker/classify-failure.ts`).
+- **Color** — only `fig-*` classes painted by each catalog; zero HEX in code. `delta-tone` = direction, not judgment.
+- **Composer contract** — `SlotContract.example?` / `SlotFieldContract.example?` (`artifact-composer/contracts.ts`): the
+  visual-gate probe (`synthesize.ts`) uses it verbatim; catalog data, not engine data (runbook `composer-visual-gate.md`).

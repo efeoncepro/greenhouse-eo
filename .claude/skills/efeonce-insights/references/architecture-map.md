@@ -122,10 +122,10 @@ sharing/delivery/schedules flags OFF there (ON in staging); the four migrations 
 | MCP | `src/mcp/greenhouse/{tool-manifest,server,tools,http-client}.ts` | 7 tools (62 total, hash `9fc46c8d90d3`) |
 | Gateway | `efeonce-mcp` 1.7.0 (PR #16 `4c9d7c44`, revision `00055-gk6`, 58 tools), provider `greenhouse-insights` contract `task-1848-v1` | federates the 7 tools; share create/revoke on `efeonce.mcp.insights.write` (fail-closed: no client carries it), 5 reads on the base scope; native authority `unsupported` per tool with the surface's real capability |
 
-## TASK-1888 / TASK-1889 — approved redesign (2026-09-25): references exist, code is PLANNED
+## TASK-1888 / TASK-1889 — approved redesign (2026-09-25): code complete, rollout pending
 
 Status legend: **exists** = committed and verified in the repo; **planificado (TASK-18xx)** = named by the task, not built.
-Production still renders with the TASK-1847 v1 catalogs and the v1 contract.
+Production still renders with the TASK-1847 v1 catalogs and the v1 contract until the 1888/1889 release.
 
 ### Design references (exist, committed in `1ae82624d` and `568bfa669`)
 
@@ -138,7 +138,7 @@ Production still renders with the TASK-1847 v1 catalogs and the v1 contract.
 | Wireframe | `docs/ui/wireframes/TASK-1889-efeonce-insights-premium-catalogs.md` | region-by-region spec of every A4 page and slide, with data, states and rules |
 | Editable source | canvas «Gráficos de Efeonce Insights» (private Artifact of the operator, version 36) | editable origin; the repo copies above are the durable contract |
 
-### Existing pieces the redesign builds on (exist, TASK-1847)
+### Pieces the redesign built on (TASK-1847; v1 templates replaced by TASK-1889 in `develop`)
 
 | Piece | Where |
 | --- | --- |
@@ -168,18 +168,25 @@ Production still renders with the TASK-1847 v1 catalogs and the v1 contract.
 | Copy | `src/lib/copy/insights.ts` (`scopeLines`, `chapterOpenings`, `channels`, `targets`, `figures`, `reading`) | TASK-1889 owns `GH_INSIGHTS.catalog` |
 | Preview | `scripts/insights/preview-edition.ts --editorial-v2 --plan-only` | read-only v2 plan over real data |
 
-### Planned by TASK-1889 (ui-ux) — not built; Slices 1–2 in progress, uncommitted
+### Built by TASK-1889 (ui-ux) — code complete 2026-09-25, not pushed (rollout pending)
 
-| Piece | Where (per the task's Files owned) | Responsibility |
+Detail: architecture §14.9, implementation record §8.z.
+
+| Piece | Where | Responsibility |
 | --- | --- | --- |
-| Catalog templates | `catalogs/insights-report/**`, `catalogs/insights-deck/**` — planificado (TASK-1889) | navy and white covers, back cover, chapter opener, summary, reading, plan, premium chart page per family with a producer |
-| Mappers | `render/{report-mapper,insights-deck-mapper,figure-pages}.ts` — planificado (TASK-1889) | map the sealed v2 plan and cover theme to templates; a v1 plan still composes |
-| Brand SSOT | `src/config/efeonce-brand.ts` — planificado (TASK-1889) | back-cover contact data (email, phones, address) |
-| Tokens and assets | brand pack roles (actual / anterior / oportunidad / ausencia × papel / navy) + channel isotypes by `channelId`, social and contact icons in both catalogs — planificado (TASK-1889) | color with a role; `deck-axis` recompiles byte-identical |
-| Fidelity gate | per-template canvas fixtures + `pixelmatch` (0.1) against `paginas/` — planificado (TASK-1889) | ≤ 1 % differing pixels per page |
-| Review dossier | `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/` + `.scorecard.json` — planificado (TASK-1889) | per-page fidelity table, side-by-side sheets in color and gray, scorecard |
-| Visual baseline | Insights frames of `pnpm composer:visual-gate --catalog=insights` — planificado (TASK-1889) | declared rebaseline of Insights frames only |
+| A4 catalog v2 (794×1123) | `src/lib/artifact-composer/catalogs/insights-report/` | navy + white cover (`ReportCoverLightPage`), index, chapter, narrative, summary, reading, plan, table, limits, back cover, `report-figure-{comparison,columns,targets,trend}` → `ReportFigure*Page` |
+| Deck catalog v2 (1280×720) | `src/lib/artifact-composer/catalogs/insights-deck/` | cover (always navy), chapter, summary, reading, plan, narrative, limits, back cover, `insights-figure-{comparison,columns,targets,trend}` → `InsightsFigure*Slide` |
+| v2-only guard | `src/lib/artifact-composer/__tests__/insights-catalogs-v2-only.test.ts` | fails if a legacy template comes back |
+| Figure geometry (pure) | `catalogs/insights-shared/figure-svg.ts` | `niceAxis`, `groupedColumnsSvg`, `lineChartSvg`, `wrapLabel` (≤ 3 lines), `REPORT_/DECK_COLUMNS_BOX`, `REPORT_/DECK_LINES_BOX` |
+| Drawing hooks | `catalogs/insights-shared/figure-hooks.ts` (`makeColumnsHook`, `makeLinesHook`, `withDeckFigureSize` 132/112/104 px), `layout-hooks.ts` (`narrativeDropCapHook`) | hooks draw; templates do not compute |
+| Editorial resolvers | `catalogs/insights-shared/editorial-resolvers.ts` (`report-`/`deck-` × `icon`, `delta-tone`, `pair-bars`, `bullet-row`, `line-role`) | color only via `fig-*` classes painted per catalog |
+| Family rule | `src/lib/efeonce-insights/render/figure-slots.ts` (`FIGURE_CAPACITY`, `FIGURE_CONTENT_TYPE`, `balancedPages`, `buildFigureSlides`) | shared by `report-mapper.ts` and `insights-deck-mapper.ts`; replaced the deleted `figure-pages.ts` |
+| Mappers | `render/report-mapper.ts`, `render/insights-deck-mapper.ts` | readings, «Lo esencial» with real folios, cover per `plan.cover` |
+| Cover + client logo | `render/cover.ts` (`orgLogoRef`), `src/lib/storage/greenhouse-assets.ts` (`readOrganizationLogoForRender`), `services/artifact-worker/consumers/insights.ts`, `classify-failure.ts` | sealed `asset-ref:org-logo:<id>`; bytes via `ComposeOptions.externalAssets`; fails closed |
+| Shared engine | `artifact-composer/render.ts` (`img.decode()` before capture), `contracts.ts` + `synthesize.ts` (`example?`) | probe uses the contract's sample value |
+| Fidelity gate | `pnpm insights:canvas-fidelity [--gray]` → `scripts/insights/canvas-fidelity.ts` + `canvas-fixtures/{report,deck}` | ≤ 1 % per page; `approvedException` only with operator approval |
+| Review dossier | `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/` | fidelity table, gray sheets, scorecard (`ui:quality` 4,59) |
+| Visual baseline | Insights frames of `pnpm composer:visual-gate --catalog=insights` | 27 frames at 0 px; deltas g–j in `BASELINE_DELTAS.md` |
 
-On 2026-09-25 `git status` shows uncommitted TASK-1889 work in the shared checkout (e.g. `scripts/insights/canvas-fidelity.ts`,
-`scripts/insights/canvas-fixtures/`, `catalogs/insights-shared/`, new `report-*` templates, the review dossier folder).
-Treat those names as provisional until the owning session commits and verifies them; then move the rows above to "exists".
+Removed: `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css`, `render/figure-pages.ts`, v1
+bar/family/path resolvers. `artifact-composer/chart-figure.ts` has no consumers left (own test kept; follow-up to retire).

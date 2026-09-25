@@ -1,5 +1,25 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-25 · TASK-1889 · Sólo los datos reales revelaron cinco defectos que el canvas no mostraba.** Con el canvas
+  en 20/21 de fidelidad y el visual gate a 0 px, las ediciones reales de Berel (`EO-INS-000019`) y Sky
+  (`EO-INS-000022`) destaparon: métricas SEO agrupadas en un eje común, la capitular suelta y presupuestos de texto
+  cortos (sección del A4 y del deck, título de figura del deck, nombre de métrica, etiqueta de columna). Regla: un
+  catálogo no está verificado hasta componer ediciones reales con `preview-edition.ts --editorial-v2`; el fixture de
+  ejemplo prueba la forma, no el contenido.
+- **2026-09-25 · TASK-1889 · Un umbral de negocio no se escribe en una plantilla: viene del registro dueño.** La zona de
+  atención de las metas se dibujó primero con `0,85 × meta`; la revisión de la sesión de TASK-1846 lo detectó y se
+  quitó. Ahora sólo existe si el plan trae `band` (`bandFactId`, límite del registro ICO emitido por TASK-1888); sin
+  banda, pista única. Regla: ninguna cifra de negocio (meta, umbral, banda) se inventa en el render; si falta el hecho,
+  la figura muestra menos, no algo supuesto.
+- **2026-09-25 · TASK-1889 · Un canal compartido no hace comparables dos métricas.** Las métricas SEO de Berel llevaban
+  todas `channelId = google` y caían en «columnas sobre un eje», mezclando clics con CTR. Regla: van a un eje común
+  sólo si `dimensionChannelIds` son todos no nulos y **distintos** (la dimensión ES el canal); si las dimensiones son
+  métricas, comparación con escala propia por métrica.
+- **2026-09-25 · TASK-1889 · Una capitular CSS se aplica aunque el párrafo tenga una línea.** `::first-letter` no mide:
+  con un párrafo corto la letra grande quedaba colgando. Se movió a un hook (`narrativeDropCapHook`) que mide el
+  layout compuesto y la aplica sólo con ≥ 3 líneas. Regla: toda decisión tipográfica que depende del largo real del
+  texto se toma midiendo el layout compuesto, no con CSS estático.
+
 - **2026-09-25 · `artifact-composer/pure` is not browser-safe.** Importing the chart geometry into `contracts/` to
   validate value invariants failed the worker-in-Vercel lint and would have dragged Node crypto (manifest hash) into
   every browser consumer of the contracts. Rule: `contracts/**` stays structural; anything that needs the geometry

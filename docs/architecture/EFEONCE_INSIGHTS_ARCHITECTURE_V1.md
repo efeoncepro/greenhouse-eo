@@ -4,8 +4,8 @@
 > staging y producción, emisión e IA apagadas; render en producción (TASK-1846, §14.5); enlaces compartidos, correo
 > y recurrencia en producción con flags OFF (TASK-1848, release `bda1cf2cd938`, §14.6); catálogos v1 A4 (`report_pdf`)
 > y deck (`insights-deck`) en producción desde el 2026-09-24 (TASK-1847, complete 2026-09-25, §14.7); UI y vista web en
-> Think siguen pendientes (TASK-1849, TASK-1875); el rediseño premium aprobado el 2026-09-25 está **planificado, no
-> construido** (TASK-1888, TASK-1889; delta de §6). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
+> Think siguen pendientes (TASK-1849, TASK-1875); el rediseño premium aprobado el 2026-09-25 está **code complete,
+> rollout pendiente** (TASK-1888 §14.8, TASK-1889 §14.9; delta de §6). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
 > rollout verificado, sus límites honestos y las invariantes que un agente debe respetar al tocar el dominio.
 > Owner: Platform + Client Experience.
 > [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
@@ -176,7 +176,7 @@ TASK-1846 incorpora únicamente la primitive domain-free, y TASK-1847 conserva l
 Versionar y fijar brand pack, fuentes, catálogo, plan y renderer. Fidelidad semántica/visual es obligatoria;
 igualdad de bytes PDF sólo si el renderer normaliza metadatos y el benchmark la demuestra.
 
-### Delta 2026-09-25 — rediseño premium aprobado (contrato construido, catálogos en curso)
+### Delta 2026-09-25 — rediseño premium aprobado (contrato y catálogos construidos; rollout pendiente, §14.9)
 
 > **Estado (2026-09-25).** El contrato editorial v2 (TASK-1888) está **construido y apagado** detrás de
 > `INSIGHTS_EDITORIAL_V2_ENABLED` (code complete en `develop`, sin release; estado en §14.8). Las plantillas las
@@ -1101,3 +1101,75 @@ TASK-1900. Si el registro cambia, el informe lo sigue sin tocar este dominio.
 **Límites honestos.** `decision`, `measurement` y `ask` no tienen productor determinista; la conclusión de página
 (`reading.conclusion`) tampoco. El medidor necesita que el adapter AEO elija el run por ventana (follow-up en el
 dominio del grader). Métricas por página o keyword de SEO, conjuntos por consulta de IA y embudo CRM siguen fuera.
+
+### 14.9 Estado de TASK-1889 — catálogos premium del canvas (code complete 2026-09-25, rollout pendiente)
+
+**Qué existe (en `develop`, sin push ni release).** Commits: Slices 1–2 `d357e0224`, `b649080c7`; Slice 3
+`4ff72fe3a` (+ evidencia `2410e5156`); Slice 4 `3fa493efe` (plantillas de figura) y `85785e7fc` (mappers + retiro del
+legado), docs `1120e86e4`/`5968e35e8`; excepción aprobada `289b6eca4`; «Lo esencial» `738ceb748`; correcciones por
+ediciones reales `b88fd447c`; dossier + scorecard `9529a1b25`.
+
+| Pieza | Dónde | Estado |
+|---|---|---|
+| Catálogos editoriales v2 | `artifact-composer/catalogs/insights-report` (A4 794×1123) e `insights-deck` (1280×720) | construidos; **sólo** diseño editorial v2 — la guarda `__tests__/insights-catalogs-v2-only.test.ts` no admite legado |
+| Legado retirado | `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css`, `efeonce-insights/render/figure-pages.ts` y los resolvers v1 de barra/familia/path | borrado. `artifact-composer/chart-figure.ts` quedó sin consumidores (conserva su test); candidato a retiro en follow-up |
+| Páginas de figura (A4) | `report-figure-{comparison,columns,targets,trend}` → `ReportFigure{Comparison,Columns,Targets,Trend}Page` | construidas |
+| Láminas de figura (deck) | `insights-figure-{comparison,columns,targets,trend}` → `InsightsFigure{Comparison,Columns,Targets,Trend}Slide` | construidas |
+| Regla de familia (compartida por `report-mapper` e `insights-deck-mapper`) | `efeonce-insights/render/figure-slots.ts` | construida (ver abajo) |
+| Geometría pura | `catalogs/insights-shared/figure-svg.ts` (`niceAxis`, `groupedColumnsSvg`, `lineChartSvg`, `wrapLabel`; cajas `REPORT_/DECK_COLUMNS_BOX`, `REPORT_/DECK_LINES_BOX`) | construida |
+| Hooks que dibujan | `catalogs/insights-shared/figure-hooks.ts` (`makeColumnsHook`, `makeLinesHook`, `withDeckFigureSize`) y `layout-hooks.ts` (`narrativeDropCapHook`) | construidos |
+| Resolvers editoriales | `catalogs/insights-shared/editorial-resolvers.ts` con prefijo `report-`/`deck-`: `icon`, `delta-tone`, `pair-bars`, `bullet-row`, `line-role` | construidos |
+| Portada blanca/navy + logo del cliente | `efeonce-insights/render/cover.ts`, `ReportCoverLightPage`, `storage/greenhouse-assets.ts` (`readOrganizationLogoForRender`), `services/artifact-worker/consumers/insights.ts`, `classify-failure.ts` | construido; el deck es siempre navy |
+| «Lo esencial» del plan v2 | `report-summary` / `insights-summary` vía `report-mapper.ts` e `insights-deck-mapper.ts` | construido |
+| Motor compartido | `artifact-composer/render.ts` (espera `img.decode()` antes de capturar), `synthesize.ts` + `contracts.ts` (`example?` del contrato) | construido |
+| Gate de fidelidad al canvas | `pnpm insights:canvas-fidelity [--gray]` (`scripts/insights/canvas-fidelity.ts`, fixtures `scripts/insights/canvas-fixtures/{report,deck}`) | 20/21 dentro de ≤1 %; ver excepción |
+
+**Regla de familia.** `bar_grouped` cuyas dimensiones son **métricas** → comparación (cada métrica en su escala);
+`bar`, o `bar_grouped` cuyas dimensiones son **canales distintos** (`dimensionChannelIds` todos no nulos y distintos)
+→ columnas sobre un eje; `bullet` → metas; `line` → tendencia (hasta 3 series por rol `primary`/`reference`/`detail`).
+Una familia sin página lanza `InsightsRenderRejectedError` con causa; una figura sin hechos suficientes no se emite
+(el capítulo la narra). Reparto equilibrado entre páginas (`balancedPages`: 7 grupos → 4+3). Capacidades
+(`FIGURE_CAPACITY`): A4 `metrics 5, groups 6, bulletRows 6`; deck `metrics 4, groups 4, bulletRows 5`.
+
+**Contenido de la figura.** Cifra principal, conclusión y cierre «Lo que significa / Próximo paso» salen de
+`chapter.readings` (TASK-1888); sin lectura (plan v1), el primer hecho y la afirmación que cita la figura. La única
+cifra derivada es el porcentaje de la meta (logrado ÷ meta, entero).
+
+**Geometría y color.** El SVG es puro y lo dibujan los hooks; `wrapLabel` parte etiquetas en hasta 3 líneas y la
+figura crece. `withDeckFigureSize` elige 132/112/104 px según el largo de la cifra. El color sale sólo de clases
+`fig-*` que pinta cada catálogo: cero HEX en código. `delta-tone` expresa dirección, no juicio.
+
+**Metas (`bullet`).** Escala propia por fila (1,1 × máximo), marca de meta y «mayor brecha» decidida con todas las
+filas y la dirección. La zona de atención se dibuja **sólo** desde `band` = `bandFactId` (límite del registro ICO,
+emitido por TASK-1888, `80952ed7f`); sin banda, pista única. Nunca un umbral a mano: se quitó un `0,85 × meta` tras
+la revisión de la sesión de TASK-1846. `lower_is_better` usa la clase `bullet--lower`, que invierte el lado oscuro.
+
+**«Lo esencial» (`plan.essentials` v2).** `report-summary` / `insights-summary` con tesis, bajada y hasta 5
+esenciales (cifra = hecho principal formateado, título = métrica, detalle A4 = afirmación); el folio es real: la
+primera página que dibuja el hecho o la apertura del capítulo. Decisión «Para decidir en la reunión» (A4) / «Para
+decidir» (deck). Sin esenciales, el resumen narrado de antes.
+
+**Portada y logo (Slice 3).** Blanca (`ReportCoverLightPage`) o navy según `plan.cover`. El logo privado viaja como
+`asset-ref:org-logo:<id>` sellado; los bytes entran por `ComposeOptions.externalAssets`. El `artifact-worker` los lee
+con `readOrganizationLogoForRender` (sólo el logo adjunto de **esa** organización, imagen, ≤ 2 MB, con access log);
+sin bytes, falla cerrado; logo no incrustable = `semantic_rejected` (`services/artifact-worker/classify-failure.ts`).
+
+**Gates y fidelidad.** `pnpm insights:canvas-fidelity`: 20/21 dentro de ≤ 1 %; `Deck-Agrupadas` da 2,2 % por un
+corrimiento de 3 px del propio canvas — excepción **aprobada por el operador el 2026-09-25** (fixture con
+`approvedException`, techo 2,5 %; el gate la reporta con ⚠). `pnpm composer:visual-gate --catalog=insights`: 27
+frames a 0 px (deltas g, h, i, j en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`). El
+`img.decode()` de `render.ts` se probó con A/B: no mueve `deck-axis` ni SKY (la deriva global de 59 frames es
+ISSUE-122). `ui:quality` PASS 4,59 (piso 4,2 en densidad: una figura ICO de una fila deja espacio). Dossier:
+`docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md`.
+
+**Verificado con ediciones reales (local).** `scripts/insights/preview-edition.ts --editorial-v2` entrega el logo con
+el mismo lector del worker (su única escritura es el access log): Berel SEO+AEO `EO-INS-000019` (16 páginas / 13
+láminas) y Sky ICO `EO-INS-000022` (12 / 9). Revelaron y quedó corregido en `b88fd447c`: métricas SEO con el mismo
+canal `google` iban a un eje común (ahora comparación); la capitular quedaba suelta en párrafos cortos (ahora
+`narrativeDropCapHook`, sólo con ≥ 3 líneas); presupuestos de texto — `runningSection` A4 44, sección del deck 44,
+`figureTitle` del deck 56, nombre de métrica en 2 líneas, etiqueta de columna hasta 3 líneas.
+
+**Pendiente de rollout (no es «listo»).** Push; staging con `INSIGHTS_EDITORIAL_V2_ENABLED` de TASK-1888; release por
+el control plane (el Job `artifact-worker` es único para staging y producción, así que el render nuevo llega a ambos
+con el release); aprobación del operador de las piezas derivadas y de los PDFs reales; una edición interna en
+producción antes de compartir con un cliente.

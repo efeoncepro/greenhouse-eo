@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.9
+> **Version:** 1.10
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1888: portada preferida por cliente, logo para fondo oscuro, preview del contrato editorial v2)
+> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1889: revisar el diseño aprobado antes de compartir; antes, TASK-1888: portada preferida por cliente, logo para fondo oscuro, preview del contrato editorial v2)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
@@ -434,6 +434,95 @@ edición **interna** (Berel `seo`+`aeo`, Sky `ico`) antes de compartir nada con 
 - `403 scope_not_allowed` por el lane ecosystem: el binding es de una organización; sólo un binding interno escribe.
 - `400 invalid_request`: `coverTheme` fuera de `auto|dark|light`.
 - La portada salió blanca con preferencia `auto`: la organización no tiene logo para fondo oscuro.
+
+## Revisar el diseño antes de compartir (TASK-1889 — code complete, rollout pendiente)
+
+Para qué: ver cómo sale un informe A4 o un deck con el diseño aprobado (portada, índice, «Lo esencial», páginas de
+gráfico, límites, contraportada) usando datos reales, y comprobar que las plantillas siguen fieles al canvas aprobado.
+Nada de esto comparte ni emite: es revisión local. Estado al 2026-09-25: los catálogos `insights-report` e
+`insights-deck` están sólo en v2 en develop (sin push); falta staging con el flag de TASK-1888, release por el control
+plane y la aprobación del operador de las piezas derivadas y los PDF reales.
+
+**Antes de empezar.**
+
+1. Proxy de Cloud SQL arriba: `pnpm pg:connect`.
+2. El id de una edición existente (`insed-…`) y su organización (`org-…`). Para la revisión se usan ediciones
+   **internas** de Berel (`seo`+`aeo`) y Sky (`ico`).
+3. Un árbol de trabajo con el código que quieres revisar: el script compone con tu árbol, no con lo desplegado.
+
+**Paso a paso.**
+
+1. **Vista previa con datos reales.**
+
+   ```bash
+   GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false \
+     pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/insights/preview-edition.ts \
+     --edition=<insed-…> --org=<org-…> --editorial-v2 [--output=report_pdf|deck_pdf|both] [--plan-only]
+   ```
+
+   - `--editorial-v2` recorre el contrato del diseño nuevo (familias, lecturas, lo esencial, portada resuelta).
+   - `--plan-only` imprime el plan sin componer PDF: úsalo primero; `0 violaciones` es la condición para seguir.
+   - Los PDF quedan en `.captures/insights-preview/<código>-<salida>/`. **Nunca los copies al repo**: son datos de
+     cliente. `.captures/` es taller local y no acredita que la salida exista en producción.
+   - No escribe en la base ni encola nada. La **única** escritura es el registro de acceso al logo privado del
+     cliente en la bitácora de assets (auditoría), cuando la portada lleva logo.
+
+2. **Mira cada página, a tamaño físico y en gris.** Cada página de gráfico debe abrir con la cifra, decir la
+   conclusión, mostrar la figura con su procedencia (unidad y fuente) y cerrar con «Lo que significa / Próximo paso».
+   «Lo esencial» debe citar el folio real donde está su evidencia.
+
+3. **Fidelidad al canvas.**
+
+   ```bash
+   pnpm insights:canvas-fidelity          # plantillas contra las páginas aprobadas
+   pnpm insights:canvas-fidelity --gray   # además, la comparación en escala de grises
+   ```
+
+   Criterio: ≤ 1 % de píxeles distintos por página (`✓`). Una excepción aprobada por el operador sale con `⚠`, su
+   fecha y su techo; si la diferencia supera el techo, vuelve a fallar (`✗`). Hoy hay una sola: Deck-Agrupadas,
+   2,2 % por 3 px del propio canvas, aprobada el 2026-09-25 con techo 2,5 %. Estado: 20 de 21 páginas ≤ 1 %.
+
+4. **Gate visual del catálogo.**
+
+   ```bash
+   pnpm composer:visual-gate --catalog=insights
+   ```
+
+   Debe dar 0 píxeles contra la línea base. Rebaselinear sólo se hace declarado en `BASELINE_DELTAS.md`.
+
+**Qué significan los rechazos.** Son información, no fallas del script:
+
+| Rechazo | Significa | Qué hacer |
+| --- | --- | --- |
+| `El campo "<campo>" mide N caracteres y el molde admite M` | Un texto no cabe: el render falla cerrado, nunca recorta | Corregir el texto en el plan o el mapper, no el molde a ojo |
+| `La figura <id> no tiene página: la familia <familia> no tiene página de figura…` | Una familia de gráfico sin plantilla propia | Se rechaza por diseño; nunca se dibuja en una plantilla ajena |
+| Output `semantic_rejected` «El logo sellado en la portada no es un logo incrustable…» | El logo de la portada no se pudo incrustar | Cargar un logo válido de la organización y pedir un render nuevo (no reintentar) |
+| Una figura que no aparece, con su falta en la tabla y en límites | No había hechos suficientes para dibujarla | Esperado: el capítulo se narra; nunca se inventa el hueco |
+
+**Qué no hacer.**
+
+- No subas los PDF de `.captures/insights-preview/` al repo ni los compartas: son datos de cliente.
+- No compartas con un cliente ninguna edición con el diseño nuevo antes de una edición interna en producción
+  revisada por el operador.
+- No recortes un texto ni cambies un molde para que un rechazo desaparezca.
+- No rebaselinees el gate visual ni ensanches una excepción de fidelidad sin aprobación del operador.
+
+**Problemas comunes.**
+
+- **La portada con logo falla sin PDF:** el logo no tiene bytes o no es incrustable; la portada falla cerrada en
+  vez de salir con un hueco. Revisa los logos de la organización.
+- **Métricas que parecen mal agrupadas:** la regla es que van en columnas sobre un eje sólo canales distintos de una
+  misma métrica; métricas distintas (clics, impresiones, CTR) van en comparación, cada una en su escala. Si ves
+  métricas distintas en columnas, es un bug del mapper (`render/figure-slots.ts`), no del dato.
+- **La vista previa no coincide con una edición ya renderizada:** el script recolecta la evidencia de nuevo; muestra
+  lo que produciría una edición nueva o revisada, no el plan sellado.
+- **Portada blanca con preferencia `auto`:** la organización no tiene logo para fondo oscuro (ver la sección de
+  portada).
+
+**Referencias.** Arquitectura §14.9 (estado de TASK-1889) y §6; `scripts/insights/preview-edition.ts`;
+`scripts/insights/canvas-fidelity.ts` y `scripts/insights/canvas-fixtures/`; catálogos
+`src/lib/artifact-composer/catalogs/insights-report/` e `insights-deck/`;
+`services/artifact-worker/classify-failure.ts`.
 
 ## Qué significan los estados
 

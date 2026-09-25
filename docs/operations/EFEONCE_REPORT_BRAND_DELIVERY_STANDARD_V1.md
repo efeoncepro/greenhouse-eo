@@ -1,7 +1,7 @@
 # Estándar de marca y entrega de informes Efeonce
 
 **Estado:** vigente · **Origen:** instrucción del operador, 2026-09-04 · **Última actualización:** 2026-09-25
-(dirección premium de Efeonce Insights).
+(dirección premium de Efeonce Insights; dueño del contacto por tipo de documento tras TASK-1889).
 **Alcance:** todos los informes de Efeonce, internos o dirigidos a clientes, cualquiera que sea su disciplina.
 La metodología y las cifras siguen bajo el contrato del dominio; este estándar gobierna su presentación.
 
@@ -18,11 +18,22 @@ La metodología y las cifras siguen bajo el contrato del dominio; este estándar
   proporción. Su URL se verifica en `back-cover-full.html`, junto al mismo catálogo. No sustituyas
   el bubble por texto, una cápsula dibujada ni una aproximación generada. En PDF conserva un enlace
   clicable sobre el asset, además de su identificación visual.
-- Resuelve dirección y teléfono desde `slots.contactDetails.value` en
-  `src/lib/artifact-composer/catalogs/deck-axis/back-cover-full.slots.json`; contrasta el contexto
-  institucional en [Quiénes somos](../context/01_quienes-somos.md). Estos son los dueños de los valores:
-  no mantengas otra copia manual en skills. Selecciona el teléfono regional aplicable y no infieras
-  WhatsApp, horarios ni presencia física estadounidense. Ante discrepancias, resuélvelas antes de entregar.
+- Resuelve correo, dirección y teléfonos desde su dueño según el tipo de documento:
+  - **Informes de Efeonce Insights** (catálogos `insights-report` e `insights-deck`): desde el SSOT de marca
+    `src/config/efeonce-brand.ts` (`EFEONCE_CONTACT`: correo, teléfonos de Chile y Estados Unidos, dirección de
+    presentación). Los mappers de `src/lib/efeonce-insights/render/` lo inyectan en el pie y la contraportada; la
+    plantilla no escribe ningún valor de contacto. El eslogan y el set de redes, que sí van escritos en el HTML
+    de esas plantillas, los vigila `src/lib/efeonce-insights/render/catalog-brand-ssot.test.ts`: si el SSOT
+    cambia y la plantilla no, el test falla antes de que salga un PDF distinto.
+  - **Deck de propuestas (`deck-axis`) y documentos que reutilizan su contraportada** (como el ejemplo vivo de
+    Channel & Commerce, más abajo): siguen resolviendo desde `slots.contactDetails.value` en
+    `src/lib/artifact-composer/catalogs/deck-axis/back-cover-full.slots.json`, que conserva su propio valor
+    fijo. Al 2026-09-25 los valores coinciden con `EFEONCE_CONTACT` (sólo cambia la forma de escribir la
+    oficina); si se cambia uno, cambia el otro en el mismo trabajo.
+
+  Contrasta el contexto institucional en [Quiénes somos](../context/01_quienes-somos.md). Estos son los dueños
+  de los valores: no mantengas otra copia manual en skills. Selecciona el teléfono regional aplicable y no
+  infieras WhatsApp, horarios ni presencia física estadounidense. Ante discrepancias, resuélvelas antes de entregar.
 - Todos los informes incorporan el **logo oficial de Efeonce**, con su variante positiva, negativa o
   monocromática autorizada según el fondo. Los informes para un cliente incorporan también su logo
   oficial. Mantén proporción, contraste y área de protección; no recrees ni recolorees logos.
@@ -86,7 +97,7 @@ Antes de entregar:
 **Ejemplo vivo, no plantilla obligatoria:** el documento de modelo de negocio de Channel & Commerce
 ([cómo se mantiene](../business-models/channel-commerce/deliverables/README.md)), renderizado con
 `scripts/documents/render-channel-commerce-business-model.mjs`. El script inyecta fuentes y logos oficiales,
-resuelve el contacto desde `back-cover-full.slots.json`, pone cabecera en las páginas interiores y pie en todas,
+resuelve el contacto desde `back-cover-full.slots.json` de `deck-axis` (no es un informe de Insights), pone cabecera en las páginas interiores y pie en todas,
 calcula el índice desde la página real de cada sección, falla si una página desborda o si fuentes o imágenes no
 cargan, y escribe el PDF de forma atómica. Otro documento puede resolverlo de otra forma mientras cumpla el
 estándar.
@@ -158,9 +169,13 @@ Navy, con logo y eslogan al centro. Su pie reúne URL bubble, seis redes (Spotif
 YouTube y TikTok), correo, teléfonos de Chile y Estados Unidos, dirección, mercados (Chile · Estados Unidos ·
 Colombia · México · Perú) y la línea legal con razón social, RUT, confidencialidad y fecha de corte. Ningún valor se
 escribe en la plantilla: salen del SSOT de marca `src/config/efeonce-brand.ts`, que ya contiene URL, razón social,
-RUT, mercados, eslogan y los cuatro perfiles sociales con URL canónica. TASK-1889 está trasladando ahí el correo, los
-teléfonos, la dirección de presentación y los seis canales sociales de documentos. Mientras ese cambio no se integre,
-el dueño vigente del correo, los teléfonos y la dirección sigue siendo `back-cover-full.slots.json`.
+RUT, mercados, eslogan y los cuatro perfiles sociales con URL canónica. Desde TASK-1889 (code complete 2026-09-25)
+contiene además el contacto (`EFEONCE_CONTACT`: correo, teléfonos de Chile y Estados Unidos y dirección de
+presentación) y los seis canales sociales de documentos (`EFEONCE_DOCUMENT_SOCIAL_CHANNELS`). Para los catálogos de
+Insights ese es el único dueño del contacto: los mappers lo inyectan, y
+`src/lib/efeonce-insights/render/catalog-brand-ssot.test.ts` impide que el eslogan y las redes escritos en las
+plantillas diverjan del SSOT. `back-cover-full.slots.json` sigue siendo el dueño del contacto sólo para `deck-axis` y
+los documentos que reutilizan su contraportada.
 
 ### Deck de Insights
 

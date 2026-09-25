@@ -16,6 +16,32 @@ The Composer's historical global visual set also drifts on clean, unrelated fram
 `pnpm composer:visual-gate --catalog=insights --selftest`, then the declared scoped freeze and scoped gate for
 Insights templates. This scope preserves existing `deck-axis`/SKY baseline images and hashes.
 
+## TASK-1889 premium catalogs — how to operate (code complete 2026-09-25, not pushed)
+
+Nothing is deployed: staging and production keep rendering the TASK-1847 v1 catalogs until the release. No own flag;
+the v2 content (readings, essentials, cover, bands) only exists in plans generated with `INSIGHTS_EDITORIAL_V2_ENABLED`
+(TASK-1888). A v1 plan composes on the v2 templates with the documented fallbacks.
+
+- **Canvas fidelity**: `pnpm insights:canvas-fidelity` (`--only=<name>` to filter, `--gray` for the grayscale sheet).
+  Criterion ≤ 1 % differing pixels per page against `docs/ui/visual-directions/TASK-1889-…/paginas/`. State: 20/21
+  inside; `Deck-Agrupadas` 2,2 % is an operator-APPROVED exception (2026-09-25, `approvedException` in its fixture,
+  ceiling 2,5 %, reported with ⚠). A new exception needs the operator's approval, never a silent threshold bump.
+- **Visual gate**: `pnpm composer:visual-gate --catalog=insights` (27 frames at 0 px; deltas g–j). A figure contract
+  may declare `example` so the probe exercises real geometry — changing it moves the frame (declare + scoped freeze;
+  runbook `docs/operations/runbooks/composer-visual-gate.md`).
+- **Real-data preview (local, before any release)**: `preview-edition.ts --edition=<insed-…> --org=<org-…>
+  --editorial-v2 [--output=report_pdf|deck_pdf|both]` (same env prefix as the `--plan-only` recipe below) leaves the PDF
+  in `.captures/insights-preview/`. It delivers the client logo with the worker's own reader
+  (`readOrganizationLogoForRender`); its only write is that reader's access log. Reference runs 2026-09-25: Berel
+  `EO-INS-000019` (16 pages / 13 slides), Sky `EO-INS-000022` (12 / 9).
+- **Logo failures**: missing bytes fail closed; a non-embeddable logo is `semantic_rejected` (no retry helps — fix the
+  org's attached logo).
+- **Rollout order**: push → staging with `INSIGHTS_EDITORIAL_V2_ENABLED` ON only in Vercel staging (the `ops-worker`
+  is shared with production) → internal Berel/Sky editions → release through the control plane (the Job
+  `artifact-worker` is ONE for staging and production, so the release switches both) → operator approves derived
+  pieces and real PDFs → one internal edition in production before sharing with a client.
+- **Rollback**: revert the release; sealed plans are unaffected (render reads the frozen plan).
+
 ## Flags (ledger: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`)
 
 | Flag | Gates | Read in | State 2026-09-16 |

@@ -12,7 +12,7 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
 | TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | to-do (blocked by 1848) | — | — |
 | TASK-1888 | Editorial contract v2: `ChartSpec` 7 → 15 families, per-figure reading and hero figure in the plan, `channelId`, per-org cover preference + sealed cover, flag `INSIGHTS_EDITORIAL_V2_ENABLED` | **in-progress — code complete 2026-09-25, rollout pending** (local `develop`, not pushed; migration applied; gateway PR efeonce-mcp#18 open) | none in production (flag OFF everywhere; v1 contract still served) | read-only v2 preview over Sky `EO-INS-000022` and Berel `EO-INS-000019`, 0 violations |
-| TASK-1889 | Premium catalogs from the approved canvas (A4 + deck), canvas-fidelity gate, internal Berel/Sky editions, release together with the 1888 flag | **to-do — PLANNED** (blocked by 1888 only in Slices 3–5; owner Claude; another session started Slices 1–2 on 2026-09-25, uncommitted in the shared checkout) | — (production serves the TASK-1847 v1 catalogs) | — |
+| TASK-1889 | Premium catalogs from the approved canvas (A4 + deck), canvas-fidelity gate, internal Berel/Sky editions, release together with the 1888 flag | **in-progress — code complete 2026-09-25, rollout pending** (local `develop`, not pushed; last commit `9529a1b25`) | none (production serves the TASK-1847 v1 catalogs until the release) | local real editions Berel `EO-INS-000019` (16 pp / 13 slides) and Sky `EO-INS-000022` (12 / 9); fidelity 20/21 + 1 approved exception; visual gate 27 frames at 0 px |
 
 ## TASK-1845 — foundation (complete 2026-09-16)
 
@@ -349,13 +349,40 @@ opcionales de `InsightWebModelV1`.
 flag ON sólo en Vercel staging; merge y deploy de efeonce-mcp#18 después de ese release; el operador fija la
 preferencia de Berel y Sky y carga logos oscuros si los hay.
 
-## TASK-1889 — catálogos premium (to-do · PLANIFICADA; Slices 1–2 en curso sin commit)
+## TASK-1889 — catálogos premium (in-progress · code complete 2026-09-25, rollout pendiente)
 
 **Qué es:** llevar a `insights-report` (A4) e `insights-deck` (16:9) el diseño aprobado, verificarlo con ediciones
-internas reales y liberarlo. `ui-ux`, `UI impact: layout`, `UI ready: no`, asignación Claude. Bloqueada por TASK-1888
-sólo en Slices 3–5. El 2026-09-25 otra sesión empezó Slices 1–2 en el checkout compartido: plantillas, assets y
-`scripts/insights/canvas-fidelity.ts` aparecen sin commitear. **No cuenta como construido** hasta que esa sesión lo
-commitee y verifique; producción sigue sirviendo los catálogos v1 de TASK-1847.
+internas reales y liberarlo. `ui-ux`, `UI impact: layout`, asignación Claude. Detalle: arquitectura §14.9 y registro de
+implementación §8.z.
+
+**Qué construyó (en `develop`, sin push).** Commits `d357e0224`, `b649080c7` (Slices 1–2), `4ff72fe3a` + `2410e5156`
+(Slice 3), `3fa493efe`, `85785e7fc` (Slice 4), `1120e86e4`/`5968e35e8` (docs), `289b6eca4` (excepción aprobada),
+`738ceb748` («Lo esencial»), `b88fd447c` (fixes por ediciones reales), `9529a1b25` (dossier + scorecard).
+
+- Catálogos **sólo v2** (A4 794×1123, deck 1280×720); la guarda `insights-catalogs-v2-only.test.ts` no admite legado.
+  Retirados `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css`, `render/figure-pages.ts`
+  y los resolvers v1 de barra/familia/path. `artifact-composer/chart-figure.ts` quedó sin consumidores (follow-up).
+- Cuatro páginas A4 y cuatro láminas de figura (`report-figure-*` / `insights-figure-*`: comparación, columnas, metas,
+  tendencia) con la regla de familia de `render/figure-slots.ts`, compartida por ambos mappers.
+- Portada blanca o navy según `plan.cover`, logo del cliente por `asset-ref:org-logo:<id>` leído en el worker con
+  `readOrganizationLogoForRender`; el deck siempre navy.
+- «Lo esencial» del plan v2 en `report-summary` / `insights-summary` con folio real.
+- Motor compartido: `render.ts` espera `img.decode()`; `synthesize.ts` honra `example` del contrato.
+
+**Dónde corre:** en ningún runtime todavía. Producción y staging siguen sirviendo los catálogos v1 de TASK-1847.
+
+**Verificación:** `pnpm insights:canvas-fidelity` 20/21 ≤ 1 % + `Deck-Agrupadas` 2,2 % con excepción aprobada por el
+operador (techo 2,5 %); `pnpm composer:visual-gate --catalog=insights` 27 frames a 0 px (deltas g–j); `ui:quality`
+PASS 4,59; ediciones reales locales Berel `EO-INS-000019` y Sky `EO-INS-000022`.
+
+**Pendiente de rollout:** push; staging con `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888); release por el control plane
+(Job `artifact-worker` único para staging y producción); aprobación del operador de piezas derivadas y PDFs reales;
+edición interna en producción antes de compartir.
+
+**Hand-off:** TASK-1849 y TASK-1875 mantienen en la web los mismos roles de color y la misma lectura; follow-up para
+retirar `chart-figure.ts`.
+
+> Lo que sigue es el plan original de la task (2026-09-25); se conserva como historia de la decisión.
 
 **Dirección aprobada (source-led):** `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`
 — canvas «Gráficos de Efeonce Insights» (Artifact privado del operador, versión 36). Alternativas: v1 (en producción),
@@ -399,6 +426,10 @@ producción antes de compartir con clientes. Sin flag propio.
 
 ## Sessions (append as you go; newest first)
 
+- **2026-09-25 · TASK-1889 · implementación.** Slices 1–4 + «Lo esencial» + fixes por ediciones reales en
+  `develop` local (sin push, último commit `9529a1b25`). Fidelidad 20/21 + excepción aprobada `Deck-Agrupadas`;
+  visual gate Insights 27 frames a 0 px; ediciones reales Berel/Sky revelaron 5 defectos que el canvas no mostraba,
+  todos corregidos. Nada desplegado; rollout pendiente junto al flag de TASK-1888.
 - **2026-09-25 · TASK-1888 · implementación.** Slices 1–6 en `develop` local (sin push), migración aplicada, gateway
   PR efeonce-mcp#18 abierto; preview v2 con datos reales de Sky y Berel en 0 violaciones. Coordinado con la sesión de
   TASK-1889 (copy `GH_INSIGHTS.catalog` de ella; campos del plan acordados por mensaje).

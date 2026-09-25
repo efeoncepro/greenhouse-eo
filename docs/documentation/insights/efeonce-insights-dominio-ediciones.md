@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.10
+> **Version:** 1.11
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1888: los datos del diseño nuevo quedan construidos y apagados; preferencia de portada por cliente; variación de porcentajes en puntos)
+> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1889: cómo se ve un informe y un deck con el diseño aprobado y qué pasa cuando falta un dato; antes, TASK-1888: datos del diseño nuevo, portada por cliente y variación en puntos)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -125,9 +125,11 @@ devuelve el mismo pedido anterior, no produce archivos duplicados.
 
 ## Qué viene: el diseño aprobado para todos los informes (planificado)
 
-> Estado (2026-09-25): **los datos que el diseño necesita ya están construidos pero apagados** (TASK-1888); las
-> plantillas las construye TASK-1889. Hasta que ambas salgan juntas a producción, los informes usan el diseño vigente.
-> La única mejora que ya aplica siempre es cómo se imprime el cambio de un porcentaje (en puntos, ver abajo).
+> Estado (2026-09-25): **los datos que el diseño necesita ya están construidos pero apagados** (TASK-1888) y **las
+> plantillas ya están construidas** (TASK-1889, lista en el código y probada en local con datos reales de Berel y Sky;
+> ver la sección siguiente). Ninguna de las dos está todavía en producción: hasta que salgan juntas, los informes de
+> producción usan el diseño vigente. La única mejora que ya aplica siempre es cómo se imprime el cambio de un
+> porcentaje (en puntos, ver abajo).
 
 El operador revisó página por página un diseño nuevo de informe y lo aprobó como el aspecto que debe tener **todo**
 informe de Insights, en A4 y en deck:
@@ -183,6 +185,65 @@ internos: no se comparten con el cliente hasta que el operador las revise.
 > `docs/tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md` (estado en arquitectura §14.8);
 > `docs/tasks/to-do/TASK-1889-efeonce-insights-premium-catalogs.md`; dirección visual
 > `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`.
+
+## Cómo se ve un informe y un deck con el diseño aprobado (construido, todavía no en producción)
+
+> Estado (2026-09-25): las plantillas del informe A4 y del deck ya tienen **sólo** el diseño aprobado por el operador;
+> el diseño anterior se retiró del código. Está listo en el código de desarrollo y se revisó en local con ediciones
+> reales de Berel (visibilidad orgánica y en IA) y Sky (entrega). **Todavía no está en producción**: falta probarlo en
+> staging, publicarlo con el proceso de release y que el operador apruebe los PDF reales. Nada se comparte con un
+> cliente hasta que una edición interna en producción haya pasado por su revisión.
+
+El informe A4 y el deck dicen lo mismo, en el mismo orden; cambia cuánto cabe en cada página.
+
+| Parte | Qué muestra |
+|---|---|
+| **Portada** | Azul marino o blanca (con un bloque azul marino arriba), con el logo del cliente, el período y «Preparado para». La blanca de visibilidad lleva alrededor los logos de los canales medidos. Sobre azul marino sólo va la versión del logo para fondo oscuro; si no existe, la portada va sin logo del cliente |
+| **Índice** | Los capítulos con el número de página real donde empieza cada uno |
+| **Resumen y «Lo esencial»** | La tesis del período en una afirmación y hasta cinco hallazgos, cada uno con su cifra y el número real de la página donde está su evidencia |
+| **Aperturas de capítulo** | Una página azul marino que anuncia cada módulo (visibilidad, respuestas de IA, entrega) |
+| **Páginas de gráfico** | Una por gráfico, con la forma que corresponde a su pregunta (ver abajo) |
+| **Tabla** | Las cifras en detalle, en filas ordenadas; si no caben, siguen en la página siguiente con la misma escala |
+| **Límites** | «Lo que esta edición no puede afirmar»: cada dato faltante, con su motivo |
+| **Contraportada** | Logo, eslogan, redes, correo, teléfonos, dirección, mercados y la línea legal de Efeonce |
+
+**Cada página de gráfico se lee igual.** Abre con la cifra principal, dice la conclusión en una frase, muestra el
+gráfico, indica de dónde sale el dato (unidad y fuente) y cierra con «Lo que significa» y «Próximo paso». Ese cierre
+sale de la lectura del plan: no se escribe a mano y nunca inventa una causa. Si el dato ya alcanzó la meta, no hay
+«Próximo paso» que la evidencia sostenga, y no se escribe.
+
+**Cuatro formas de gráfico, según la pregunta:**
+
+| Forma | Cuándo se usa | Cómo se lee |
+|---|---|---|
+| **Comparación de períodos** | Métricas distintas entre sí (clics, impresiones, CTR) | Cada métrica en su propia escala, período actual contra anterior. La variación lleva un triángulo que indica si subió o bajó: dice la dirección, no si es bueno o malo |
+| **Columnas** | Canales comparables entre sí (por ejemplo, motores de IA) sobre un mismo eje | Una columna por canal. La franja de referencia y la marca de oportunidad aparecen sólo cuando el plan las declara |
+| **Metas** | Entrega contra su meta oficial (entregas a tiempo, primera entrega correcta, rondas por pieza) | Lo logrado contra la meta, marcando la «mayor brecha». La zona de atención aparece sólo si el registro de métricas de entrega trae su límite; nunca se escribe a mano. En métricas donde «menos es mejor» (como las rondas), la lectura se invierte |
+| **Tendencia** | Ventanas de tres meses o más | Hasta tres líneas, distinguibles también en gris. Si falta un mes, la línea se corta: nunca se une el trazo ni se inventa el valor |
+
+**Una regla para no mezclar peras con manzanas:** van en columnas sobre un mismo eje sólo canales distintos de una
+misma métrica. Métricas distintas van siempre en comparación, cada una en su escala.
+
+**Qué pasa cuando falta un dato.**
+
+- **La figura no se dibuja.** Si un gráfico no tiene hechos suficientes, no sale: el capítulo lo cuenta en palabras,
+  y la falta aparece en la tabla y en «Lo que esta edición no puede afirmar».
+- **Nunca se recorta.** Si un texto no cabe en su espacio, el informe no sale y el rechazo dice qué campo es y cuánto
+  mide. La corrección va en el plan, no en amputar la frase.
+- **Nunca se inventa.** Ni un cero donde no hay dato, ni un valor interpolado en una línea, ni un gráfico en una forma
+  que no le corresponde: un tipo de gráfico que no tiene página propia se rechaza con su causa.
+- **Portada sin logo utilizable.** Si el logo elegido no se puede incrustar, el informe se detiene en vez de salir con
+  un hueco en la portada.
+
+**Cómo se verificó.** Cada plantilla se compara con la página aprobada del diseño: 20 de 21 páginas difieren en 1 % o
+menos. La restante (la lámina de columnas agrupadas del deck) difiere 2,2 % porque el propio diseño la corrió 3
+píxeles; el operador aprobó la diferencia el 2026-09-25 y queda vigilada con un techo. Las ediciones reales de Berel y
+Sky, revisadas en local, destaparon cinco defectos que los datos de ejemplo no mostraban; los cinco se corrigieron.
+
+> Detalle técnico: [arquitectura §14.9](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) (estado de
+> TASK-1889) y §6 (dirección premium); catálogos `src/lib/artifact-composer/catalogs/insights-report/` e
+> `insights-deck/`; página por forma de gráfico en `src/lib/efeonce-insights/render/figure-slots.ts`;
+> task `docs/tasks/in-progress/TASK-1889-efeonce-insights-premium-catalogs.md`.
 
 ## Estado de disponibilidad (2026-09-25)
 
