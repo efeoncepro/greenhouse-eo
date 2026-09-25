@@ -32,6 +32,9 @@ import {
   MCP_CLIENT_SERVICES_INPUT_SCOPE,
   MCP_CLIENT_SERVICES_OAUTH_CLIENT_ID,
   MCP_HIRING_INPUT_SCOPE,
+  MCP_MARKETING_STUDIO_GREENHOUSE_SCOPE,
+  MCP_MARKETING_STUDIO_INPUT_SCOPE,
+  MCP_MARKETING_STUDIO_OAUTH_CLIENT_ID,
   MCP_HIRING_OAUTH_CLIENT_ID,
   MCP_HIRING_REVIEW_OAUTH_CLIENT_ID,
   MCP_TALENT_POOL_GREENHOUSE_SCOPE,
@@ -308,6 +311,61 @@ describe('MCP RFC8693 token exchange', () => {
     // The hiring client cannot be reused for this family even with the right scope on paper.
     await expect(
       exchangeMcpGatewayToken(exchange, { ...dependencies, loadClient: vi.fn(async (): Promise<any> => ({ ...clientServicesClient, metadata: { resourceFamily: 'hiring' } })) }, clientServicesEnv)
+    ).rejects.toMatchObject({ code: 'invalid_client' })
+
+    // Not allowlisted as consumer → fail closed.
+    await expect(exchangeMcpGatewayToken(exchange, dependencies, env)).rejects.toMatchObject({ code: 'invalid_client' })
+  })
+
+  it('mints the Marketing Studio read token only for a person who holds marketing_studio.campaign.read (TASK-1891)', async () => {
+    const studioClient = {
+      ...client,
+      oauthClientId: 'spoauth-client-efeonce-mcp-marketing-studio',
+      clientId: MCP_MARKETING_STUDIO_OAUTH_CLIENT_ID,
+      allowedScopes: [MCP_MARKETING_STUDIO_GREENHOUSE_SCOPE],
+      policy: {
+        ...client.policy,
+        requiredScopes: [MCP_MARKETING_STUDIO_GREENHOUSE_SCOPE],
+        capabilityScopes: [MCP_MARKETING_STUDIO_GREENHOUSE_SCOPE]
+      },
+      metadata: { resourceFamily: 'marketing_studio' }
+    }
+
+    const entra = vi.fn(async () => ({
+      tenantId: 'tenant-1', objectId: 'oid-1', authorizedParty: 'mcp-client-app-id', scopes: [MCP_MARKETING_STUDIO_INPUT_SCOPE]
+    }))
+
+    const dependencies = {
+      ...baseDependencies(), verifyEntraToken: entra,
+      loadClient: vi.fn(async (): Promise<any> => studioClient),
+      authorizeMarketingStudio: vi.fn(() => true),
+      authorizeClientServices: vi.fn(() => true), authorizeFunding: vi.fn(() => true), authorizeTalentPool: vi.fn(() => true)
+    }
+
+    const studioEnv = {
+      ...env,
+      GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS: `${MCP_GATEWAY_OAUTH_CLIENT_ID},${MCP_MARKETING_STUDIO_OAUTH_CLIENT_ID}`
+    }
+
+    const exchange = { ...request, clientId: MCP_MARKETING_STUDIO_OAUTH_CLIENT_ID, requestedScope: MCP_MARKETING_STUDIO_GREENHOUSE_SCOPE }
+
+    await expect(exchangeMcpGatewayToken(exchange, dependencies, studioEnv)).resolves.toMatchObject({ scope: MCP_MARKETING_STUDIO_GREENHOUSE_SCOPE })
+    expect(dependencies.authorizeMarketingStudio).toHaveBeenCalledOnce()
+    expect(dependencies.authorizeTalentPool).not.toHaveBeenCalled()
+    expect(dependencies.authorizeClientServices).not.toHaveBeenCalled()
+
+    // A person without the Studio read capability never receives the bearer.
+    await expect(
+      exchangeMcpGatewayToken(exchange, { ...dependencies, authorizeMarketingStudio: vi.fn(() => false) }, studioEnv)
+    ).rejects.toMatchObject({ code: 'user_not_eligible', statusCode: 403 })
+
+    // An Entra token without the base read scope is refused.
+    entra.mockResolvedValueOnce({ tenantId: 'tenant-1', objectId: 'oid-1', authorizedParty: 'mcp-client-app-id', scopes: [MCP_HIRING_INPUT_SCOPE] })
+    await expect(exchangeMcpGatewayToken(exchange, dependencies, studioEnv)).rejects.toMatchObject({ code: 'invalid_grant' })
+
+    // Another family's client cannot be reused for Studio.
+    await expect(
+      exchangeMcpGatewayToken(exchange, { ...dependencies, loadClient: vi.fn(async (): Promise<any> => ({ ...studioClient, metadata: { resourceFamily: 'hiring' } })) }, studioEnv)
     ).rejects.toMatchObject({ code: 'invalid_client' })
 
     // Not allowlisted as consumer → fail closed.
