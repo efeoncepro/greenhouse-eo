@@ -3,7 +3,7 @@
 > **Tipo:** arquitectura técnica (contrato para agentes y desarrolladores)
 > **Versión:** 1.1
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Estado:** Accepted. Runtime vivo en Vercel (TASK-1887); dominio `studio.efeonce.org` pendiente de DNS
+> **Estado:** Accepted. En vivo en `https://studio.efeonce.org` desde 2026-09-25 (TASK-1887)
 > **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + delta de placement 2026-09-25)
 > **Programa:** [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
 

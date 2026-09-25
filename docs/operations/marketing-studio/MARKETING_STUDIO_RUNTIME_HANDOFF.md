@@ -10,7 +10,7 @@
 | Pieza | Estado |
 |---|---|
 | Web + API `/api/v1` | Deploy de producción `READY` en Vercel (`dpl_7hMKbww8Byoy1CJFZuNyLp3Qr7S2`, commit `ea32ee6`) |
-| `studio.efeonce.org` | Agregado al proyecto y verificado; **DNS pendiente** (CNAME en HostGator, ver abajo) |
+| `studio.efeonce.org` | En vivo: CNAME en HostGator + certificado Let's Encrypt (renovación automática de Vercel) |
 | Base de producción `marketing_studio` | Migrada (2 migraciones), import aplicado: 5 campañas, 21 conceptos, 54 piezas, 48 copys, 72 anuncios, 4 audiencias, 1 flight, 7 líneas de presupuesto, 6 posts |
 | Base de staging `marketing_studio_staging` | Igual que producción |
 | Renditions | 108 en cada bucket (miniatura + preview de 54 piezas) |
@@ -43,7 +43,7 @@
 | `STUDIO_PUBLIC_URL` | `https://studio.efeonce.org` | — |
 | `NODE_AUTH_TOKEN` | token de lectura de paquetes (encrypted) | igual |
 
-## DNS pendiente (operador)
+## DNS (aplicado 2026-09-25)
 
 En el panel DNS de HostGator para `efeonce.org`:
 
@@ -53,7 +53,7 @@ En el panel DNS de HostGator para `efeonce.org`:
 
 Alternativa si el panel no acepta ese destino: `CNAME studio → cname.vercel-dns.com.`. Verificación:
 `dig +short CNAME studio.efeonce.org` y `curl -I https://studio.efeonce.org/api/v1/health` (200). Vercel emite el
-certificado solo tras la propagación.
+certificado solo tras la propagación. El 2026-09-25 no lo emitió solo en ~7 min; se destrabó con `vercel certs issue studio.efeonce.org --scope efeonce-7670142f`. El CNAME en `studio` no afecta el correo (MX, `autodiscover` y SPF de Outlook viven en la raíz y en `autodiscover`).
 
 ## Comandos (desde `../efeonce-marketing-studio`)
 

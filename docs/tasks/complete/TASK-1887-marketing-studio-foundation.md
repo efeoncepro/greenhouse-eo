@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `db`
 - Epic: `EPIC-049`
-- Status real: `En producción en Vercel (deploy dpl_7hMKbww8Byoy1CJFZuNyLp3Qr7S2); rollout pendiente: CNAME de studio.efeonce.org en HostGator (operador)`
+- Status real: `Completa 2026-09-25: en vivo en https://studio.efeonce.org (Let's Encrypt, noindex, acceso abierto de solo lectura)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -288,7 +288,7 @@ El modelo, el contrato, el acceso y la conexión están especificados en
 - [x] `GET /api/v1/openapi.json` devuelve OpenAPI 3.1 con las 8 rutas. — OpenAPI 3.1 con 12 rutas: las 8 originales + `attention`, `calendar`, `search`, `renditions/{id}` (test de contrato).
 - [x] `GET /api/v1/health` y `/api/v1/campaigns` responden 200 en el deployment de producción. — `vercel curl` al deployment de producción: health `{"status":"ok","database":"reachable"}`, campaigns con 5 campañas, rendition 200 `image/webp`, attention con las 4 decisiones y home 200.
 - [x] La respuesta incluye `X-Robots-Tag: noindex`. — Verificado en producción.
-- [x] Registros DNS de `studio.efeonce.org` entregados al operador; dominio verificado o marcado pendiente de propagación. — Dominio agregado y verificado en Vercel; falta el `CNAME studio → e33b47bdb5fb489f.vercel-dns-016.com.` en HostGator (runtime handoff).
+- [x] Registros DNS de `studio.efeonce.org` entregados al operador; dominio verificado o marcado pendiente de propagación. — CNAME creado por el operador en HostGator; certificado emitido con `vercel certs issue`. `https://studio.efeonce.org` responde 200 en home, campañas y calendario; health `database: reachable`; OpenAPI con `servers: studio.efeonce.org`; renditions 200.
 - [x] Arquitectura, runtime handoff, documentación funcional y manual existen en este repo.
 
 ## Verification
