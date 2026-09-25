@@ -150,7 +150,8 @@ export const GH_INSIGHTS = {
     targetShort: 'meta',
     from: 'de',
     mostMentions: 'es el motor que más menciona la marca',
-    bestDimension: 'La dimensión mejor evaluada es'
+    bestDimension: 'La dimensión mejor evaluada es',
+    onlyMissed: 'es la única meta sin cumplir'
   },
 
   /**

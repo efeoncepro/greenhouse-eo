@@ -167,7 +167,17 @@ describe('TASK-1888 — productores v2 (ICO)', () => {
     expect(reading('chart.ico.percent').conclusion!.text).toBe('El mayor cambio fue en primera entrega correcta: de 96,5 % a 90,9 % (-5,6 pp).')
     expect(reading('chart.ico.bullet.ftr').conclusion!.text).toBe('Cumple la meta de primera entrega correcta: 90,9 % (meta 80,0 %).')
     expect(reading('chart.ico.bullet.ftr').meaning!.text).toBe('Contra el período anterior: de 96,5 % a 90,9 % (-5,6 pp).')
-    expect(plan.essentials!.map(item => item.text)[0]).toBe(reading('chart.ico.percent').conclusion!.text)
+    // Tesis = la única meta sin cumplir (selección, sin cifra nueva); la bajada, el siguiente hallazgo sobre OTRO hecho.
+    expect(plan.executiveSummary.map(item => item.text)).toEqual([
+      'Entregas a tiempo es la única meta sin cumplir: 81,9 % (meta 90,0 %).',
+      'Cumple la meta de primera entrega correcta: 90,9 % (meta 80,0 %).'
+    ])
+    // Un hecho, una esencial: ni los de la tesis y su bajada, ni FTR dos veces (mayor cambio y meta).
+    const essentialFacts = plan.essentials!.map(item => item.factIds[0])
+
+    expect(essentialFacts).not.toContain('ico.otd.cur')
+    expect(essentialFacts).not.toContain('ico.ftr.cur')
+    expect(new Set(essentialFacts).size).toBe(essentialFacts.length)
   })
 
   it('con dos meses no hay línea (la matriz exige ≥ 3 puntos)', () => {
@@ -179,9 +189,11 @@ describe('TASK-1888 — productores v2 (ICO)', () => {
   it('esenciales ≤ 5 y líneas de alcance en el orden de los módulos', () => {
     const plan = buildDeterministicPlan({ ...icoSnapshot, facts: [...icoSnapshot.facts, ...aeoSnapshot.facts] }, { modules: ['aeo', 'ico'], locale: 'es-CL', editorialV2: true })
 
-    expect(plan.essentials!.length).toBe(5)
-    expect(plan.essentials![0]!.factIds[0]).toBe('aeo.presence.openai.w')
-    expect(plan.essentials![1]!.factIds[0]!.startsWith('ico.')).toBe(true)
+    expect(plan.executiveSummary[0]!.text).toBe('Entregas a tiempo es la única meta sin cumplir: 81,9 % (meta 90,0 %).')
+    expect(plan.executiveSummary[1]!.factIds[0]).toBe('aeo.presence.openai.w')
+    expect(plan.essentials!.length).toBeLessThanOrEqual(5)
+    expect(plan.essentials!.map(item => item.factIds[0])).not.toContain('aeo.presence.openai.w')
+    expect(new Set(plan.essentials!.map(item => item.factIds[0])).size).toBe(plan.essentials!.length)
     expect(plan.scopeLines).toHaveLength(2)
     expect(plan.scopeLines![0]).toMatch(/^Motores de respuesta/)
   })

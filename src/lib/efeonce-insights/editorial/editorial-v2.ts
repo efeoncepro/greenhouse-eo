@@ -215,7 +215,8 @@ const changeOf = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, local
 const fromTo = (fact: EvidenceFactV1, change: NonNullable<ReturnType<typeof changeOf>>, locale: string): string =>
   `${R.from} ${fmt(change.previous, locale)} ${R.lineTo} ${valueText(fact, locale)} (${change.text})`
 
-const bulletReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, locale: string, context: ChapterContext): PlanFigureReadingV1 | null => {
+/** Estado de un bullet contra su meta: el ítem con mayor brecha manda. Lo usan la lectura y la tesis del resumen. */
+const bulletStatus = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>) => {
   if (chart.data?.kind !== 'bullet') return null
 
   const lowerIsBetter = chart.data.direction === 'lower_is_better'
@@ -229,9 +230,17 @@ const bulletReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, lo
   // Brecha en la dirección que empeora: positiva = no alcanzó la meta.
   const gap = (entry: (typeof items)[number]) => (lowerIsBetter ? entry.value.value! - entry.target.value! : entry.target.value! - entry.value.value!)
   const lead = [...items].sort((a, b) => gap(b) - gap(a))[0]!
-  const missing = items.filter(entry => gap(entry) > 0)
   const metricId = chart.chartId.split('.').at(-1) ?? ''
-  const metricName = GH_INSIGHTS.metrics[metricId]
+
+  return { items, gap, lead, missing: items.filter(entry => gap(entry) > 0), metricName: GH_INSIGHTS.metrics[metricId] }
+}
+
+const bulletReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, locale: string, context: ChapterContext): PlanFigureReadingV1 | null => {
+  const status = bulletStatus(chart, byId)
+
+  if (!status) return null
+
+  const { items, gap, lead, missing, metricName } = status
   const verdict = gap(lead) > 0 ? R.missesTarget : R.meetsTarget
   const target = `${fmt(lead.value, locale)} (${R.targetShort} ${fmt(lead.target, locale)})`
 
@@ -376,19 +385,58 @@ export const openingFor = (moduleKey: InsightModule): PlanClaimV1 => ({ claimId:
 
 export const scopeLinesFor = (modules: InsightModule[]): string[] => modules.map(moduleKey => GH_INSIGHTS.scopeLines[moduleKey])
 
+/** Conclusiones de un capítulo en orden de peso editorial: metas primero, luego tendencias, luego comparaciones. */
+const conclusionsOf = (chapter: PlanChapterV1): PlanClaimV1[] => {
+  const rank = (chartId: string) => (chartId.includes('.bullet.') ? 0 : chartId.includes('.line.') ? 1 : 2)
+
+  return [...(chapter.readings ?? [])]
+    .sort((a, b) => rank(a.chartId) - rank(b.chartId))
+    .flatMap(reading => (reading.conclusion ? [reading.conclusion] : []))
+}
+
 /**
- * «Lo esencial del mes»: hasta 5 hallazgos, alternando capítulos para que ningún módulo se coma el resumen. Primero las
- * conclusiones de sus figuras con página; si no alcanzan, cada hecho del capítulo que ninguna esencial citó todavía,
- * en la misma forma compacta (nombre humano, «de A a B (variación)»): nunca la etiqueta interna del hecho, nunca el
- * mismo hecho dos veces (Sky y Berel, 2026-09-25).
+ * Tesis del resumen (y su bajada) como HALLAZGO del informe, no la primera afirmación del primer módulo (revisión de
+ * 1846, 2026-09-25). Prioridad: una meta sin cumplir («Entregas a tiempo es la única meta sin cumplir…», donde «única»
+ * es selección, no cifra nueva); si no hay, el hallazgo de mayor peso. La bajada, el siguiente hallazgo sobre OTRO hecho.
  */
-export const essentialsFor = (chapters: PlanChapterV1[], byId: Map<string, EvidenceFactV1>, locale: string): PlanClaimV1[] => {
-  const cited = new Set<string>()
-  const texts = new Set<string>()
+export const summaryFindingsFor = (chapters: PlanChapterV1[], byId: Map<string, EvidenceFactV1>, locale: string): PlanClaimV1[] => {
+  const bullets = chapters.flatMap(chapter => chapter.charts.filter(chart => chart.family === 'bullet' && (chapter.readings ?? []).some(reading => reading.chartId === chart.chartId)))
+  const statuses = bullets.map(chart => ({ chart, status: bulletStatus(chart, byId)! })).filter(entry => entry.status)
+  const missed = statuses.filter(entry => entry.status.missing.length > 0)
+  const ordered = chapters.flatMap(conclusionsOf)
+  let thesis: PlanClaimV1 | null = null
+
+  if (missed.length === 1 && statuses.length > 1 && missed[0]!.status.metricName) {
+    const { status } = missed[0]!
+    const text = firstFitting(L.summaryThesis, `${status.metricName} ${R.onlyMissed}: ${fmt(status.lead.value, locale)} (${R.targetShort} ${fmt(status.lead.target, locale)}).`)
+
+    if (text) thesis = claim('summary.thesis', text, [status.lead.value.factId, status.lead.target.factId])
+  }
+
+  thesis ??= (() => {
+    const first = ordered.find(item => item.text.length <= L.summaryThesis)
+
+    return first ? { ...first, claimId: 'summary.thesis' } : null
+  })()
+
+  if (!thesis) return []
+
+  const lead = ordered.find(item => item.factIds[0] !== thesis!.factIds[0] && item.text.length <= L.summaryLead)
+
+  return [thesis, ...(lead ? [{ ...lead, claimId: 'summary.lead' }] : [])]
+}
+
+/**
+ * «Lo esencial del mes»: hasta 5 hallazgos, alternando capítulos para que ningún módulo se coma el resumen. UN HECHO,
+ * UNA ESENCIAL: ni el hecho de la tesis o su bajada, ni dos esenciales sobre el mismo hecho (Sky: FTR aparecía como
+ * mayor cambio y como meta cumplida). Primero las conclusiones (metas, tendencias, comparaciones); si no alcanzan,
+ * cada hecho aún no citado en la misma forma compacta, nunca con la etiqueta interna.
+ */
+export const essentialsFor = (chapters: PlanChapterV1[], byId: Map<string, EvidenceFactV1>, locale: string, exclude: PlanClaimV1[] = []): PlanClaimV1[] => {
+  const cited = new Set<string>(exclude.flatMap(item => (item.factIds[0] ? [item.factIds[0]] : [])))
 
   const candidates = chapters.map(chapter => {
     const context = contextOf(chapter.charts, byId)
-    const conclusions = (chapter.readings ?? []).flatMap(reading => (reading.conclusion ? [reading.conclusion] : []))
 
     const facts = chapter.claims.flatMap(item => {
       const fact = item.factIds[0] ? byId.get(item.factIds[0]) : undefined
@@ -401,7 +449,7 @@ export const essentialsFor = (chapters: PlanChapterV1[], byId: Map<string, Evide
       return [claim(`fact.${fact.factId}`, text, change ? [fact.factId, change.previous.factId] : [fact.factId])]
     })
 
-    return [...conclusions, ...facts]
+    return [...conclusionsOf(chapter), ...facts]
   })
 
   const essentials: PlanClaimV1[] = []
@@ -410,13 +458,8 @@ export const essentialsFor = (chapters: PlanChapterV1[], byId: Map<string, Evide
     for (const list of candidates) {
       const item = list[round]
 
-      if (!item || essentials.length >= PLAN_ESSENTIALS_MAX || item.text.length > PLAN_TEXT_LIMITS.essential || texts.has(item.text)) continue
-
-      // Dos conclusiones sobre el mismo hecho son hallazgos distintos (mayor cambio / meta); el RESPALDO de un hecho que
-      // una esencial ya citó sólo repetiría la cifra.
-      if (item.claimId.startsWith('fact.') && cited.has(item.factIds[0]!)) continue
-      item.factIds.forEach(id => cited.add(id))
-      texts.add(item.text)
+      if (!item || essentials.length >= PLAN_ESSENTIALS_MAX || item.text.length > PLAN_TEXT_LIMITS.essential || cited.has(item.factIds[0]!)) continue
+      cited.add(item.factIds[0]!)
       essentials.push({ ...item, claimId: `essential.${item.claimId}` })
     }
   }

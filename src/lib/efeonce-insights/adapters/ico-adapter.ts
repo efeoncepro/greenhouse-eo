@@ -92,6 +92,18 @@ const collectForWindow = async (spaces: SpaceRow[], window: ResolvedInsightWindo
       }
 
       const method = { name: 'ico_engine_monthly', version: snapshot.engineVersion }
+
+      // TASK-1888 — con el contrato v2 la etiqueta es el NOMBRE HUMANO de la métrica; space y mes sólo si la ventana
+      // tiene más de uno (el encabezado del informe ya dice cliente y período). La etiqueta compuesta «OTD · Sky ·
+      // 2026-08» llegaba tal cual a filas, esenciales y bajadas (revisión de 1846, 2026-09-25). Sin v2, la de siempre.
+      const labelFor = (metricId: 'rpa' | 'otd' | 'ftr', legacy: string): string => {
+        if (!editorialV2) return legacy
+
+        const qualifiers = [spaces.length > 1 ? space.space_name : null, window.months.length > 1 ? month : null].filter(Boolean)
+
+        return `${GH_INSIGHTS.metrics[metricId] ?? legacy}${qualifiers.length > 0 ? ` · ${qualifiers.join(' · ')}` : ''}`
+      }
+
       const asOf = snapshot.computedAt
       const dimension = `${space.space_id}.${month}`
 
@@ -117,7 +129,7 @@ const collectForWindow = async (spaces: SpaceRow[], window: ResolvedInsightWindo
         if (suppressed) {
           rejections.push({ module: 'ico', metricId: 'rpa', reason: 'suppressed', detail: `RpA ${rpa.dataStatus} en ${space.space_name} ${month}: ${rpa.suppressionReason ?? 'sin motivo'}` })
         } else {
-          facts.push({ ...base, factId: factId('ico', 'rpa', window, dimension), metricId: 'rpa', label: `RpA · ${space.space_name} · ${month}`, value: rpa.value, unit: 'ratio', numerator: null, denominator: null, coverage: { kind: rpa.dataStatus === 'low_confidence' ? 'partial' : 'complete', ratio: null, populationSize: rpa.evidence?.eligibleTasks ?? snapshot.context.completedTasks }, comparisonFactId: comparisonIds[`rpa.${space.space_id}`] ?? null })
+          facts.push({ ...base, factId: factId('ico', 'rpa', window, dimension), metricId: 'rpa', label: labelFor('rpa', `RpA · ${space.space_name} · ${month}`), value: rpa.value, unit: 'ratio', numerator: null, denominator: null, coverage: { kind: rpa.dataStatus === 'low_confidence' ? 'partial' : 'complete', ratio: null, populationSize: rpa.evidence?.eligibleTasks ?? snapshot.context.completedTasks }, comparisonFactId: comparisonIds[`rpa.${space.space_id}`] ?? null })
         }
       } else {
         // Una métrica esperada que el snapshot no trae se NARRA como límite: omitirla en silencio haría que el
@@ -132,7 +144,7 @@ const collectForWindow = async (spaces: SpaceRow[], window: ResolvedInsightWindo
         if (denominator <= 0 || otd.value === null) {
           rejections.push({ module: 'ico', metricId: 'otd', reason: 'insufficient_data', detail: `OTD sin denominador en ${space.space_name} ${month} (0 tareas elegibles)` })
         } else {
-          facts.push({ ...base, factId: factId('ico', 'otd', window, dimension), metricId: 'otd', label: `OTD · ${space.space_name} · ${month}`, value: otd.value, unit: 'percent', numerator, denominator, coverage: { kind: 'complete', ratio: 1, populationSize: denominator }, comparisonFactId: comparisonIds[`otd.${space.space_id}`] ?? null })
+          facts.push({ ...base, factId: factId('ico', 'otd', window, dimension), metricId: 'otd', label: labelFor('otd', `OTD · ${space.space_name} · ${month}`), value: otd.value, unit: 'percent', numerator, denominator, coverage: { kind: 'complete', ratio: 1, populationSize: denominator }, comparisonFactId: comparisonIds[`otd.${space.space_id}`] ?? null })
         }
       } else {
         rejections.push({ module: 'ico', metricId: 'otd', reason: 'no_data', detail: `El snapshot ICO de ${space.space_name} en ${month} no trae OTD` })
@@ -144,7 +156,7 @@ const collectForWindow = async (spaces: SpaceRow[], window: ResolvedInsightWindo
         const ftr = snapshot.metrics.find(metric => metric.metricId === ICO_SNAPSHOT_METRIC_IDS.ftr)
 
         if (ftr && ftr.value !== null) {
-          facts.push({ ...base, factId: factId('ico', 'ftr', window, dimension), metricId: 'ftr', label: `FTR · ${space.space_name} · ${month}`, value: ftr.value, unit: 'percent', numerator: null, denominator: null, coverage: { kind: ftr.qualityGateStatus === 'degraded' ? 'partial' : 'complete', ratio: null, populationSize: ftr.trustEvidence?.sampleSize ?? null }, comparisonFactId: comparisonIds[`ftr.${space.space_id}`] ?? null })
+          facts.push({ ...base, factId: factId('ico', 'ftr', window, dimension), metricId: 'ftr', label: labelFor('ftr', `FTR · ${space.space_name} · ${month}`), value: ftr.value, unit: 'percent', numerator: null, denominator: null, coverage: { kind: ftr.qualityGateStatus === 'degraded' ? 'partial' : 'complete', ratio: null, populationSize: ftr.trustEvidence?.sampleSize ?? null }, comparisonFactId: comparisonIds[`ftr.${space.space_id}`] ?? null })
         } else {
           rejections.push({ module: 'ico', metricId: 'ftr', reason: ftr ? 'insufficient_data' : 'no_data', detail: ftr ? `FTR sin valor en ${space.space_name} ${month}` : `El snapshot ICO de ${space.space_name} en ${month} no trae FTR` })
         }

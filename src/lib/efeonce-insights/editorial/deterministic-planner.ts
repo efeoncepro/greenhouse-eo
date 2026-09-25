@@ -8,7 +8,7 @@ import type { ChartSpecV1 } from '../contracts/chart-spec'
 import { isReferenceFact, type EvidenceFactV1, type EvidenceRejectionV1, type EvidenceSnapshotContentV1, type EvidenceSourceV1 } from '../contracts/evidence'
 import type { EditorialPlanV1, PlanChapterV1, PlanClaimV1, PlanCoverV1, PlanTableV1 } from '../contracts/plan'
 import type { InsightModule } from '../contracts/request'
-import { assertChartsAllowed, bulletCharts, essentialsFor, lineCharts, openingFor, readingsFor, scopeLinesFor } from './editorial-v2'
+import { assertChartsAllowed, bulletCharts, essentialsFor, lineCharts, openingFor, readingsFor, scopeLinesFor, summaryFindingsFor } from './editorial-v2'
 import { formatDeltaForUnit, formatFactValue } from './format'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
@@ -195,10 +195,14 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     .filter(fact => !comparisonIds.has(fact.factId) && !isReferenceFact(fact))
     .map(fact => ({ referenceId: `ref.${fact.factId}`, label: `${fact.label} (${windowLabel(fact)})`, evidenceRef: fact.evidenceRef }))
 
+  // TASK-1888 — con v2 la tesis del resumen y su bajada son hallazgos del informe; sin hallazgos, la afirmación v1.
+  const findings = editorialV2 ? summaryFindingsFor(chapters, byId, input.locale) : []
+  const executiveSummary = findings.length > 0 ? findings : summary
+
   return {
     planVersion: 'editorial_plan_v1',
     locale: input.locale,
-    executiveSummary: summary,
+    executiveSummary,
     chapters,
     actions: [],
     limits: unique(snapshot.rejections.map(limitFor)),
@@ -207,7 +211,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     // TASK-1888 — campos v2: sólo con el contrato encendido; un plan v1 no los trae.
     ...(editorialV2
       ? {
-          essentials: essentialsFor(chapters, byId, input.locale),
+          essentials: essentialsFor(chapters, byId, input.locale, findings),
           scopeLines: scopeLinesFor(input.modules),
           ...(input.cover ? { cover: input.cover } : {})
         }

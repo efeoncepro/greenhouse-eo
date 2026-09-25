@@ -295,6 +295,8 @@ describe('TASK-1888 — evidencia del contrato editorial v2', () => {
     const result = await icoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
 
     expect(result.facts.find(fact => fact.metricId === 'ftr')).toMatchObject({ value: 86, unit: 'percent', coverage: { populationSize: 9 } })
+    // Un space y un mes: la etiqueta es el nombre humano, sin «OTD · Sky · Diseño · 2026-08» (revisión de 1846).
+    expect(result.facts.find(fact => fact.metricId === 'otd')!.label).toBe('Entregas a tiempo')
 
     const targets = Object.fromEntries(result.facts.filter(fact => fact.role === 'reference').map(fact => [fact.metricId, [fact.value, fact.dimension?.direction]]))
     const { ICO_METRIC_REGISTRY } = await vi.importActual<typeof MetricRegistry>('@/lib/ico-engine/metric-registry')
@@ -319,6 +321,7 @@ describe('TASK-1888 — evidencia del contrato editorial v2', () => {
     const result = await icoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
 
     expect(result.facts.map(fact => fact.metricId).sort()).toEqual(['otd', 'rpa'])
+    expect(result.facts.find(fact => fact.metricId === 'otd')!.label).toBe('OTD · Sky · Diseño · 2026-08')
   })
 
   it('ICO con v2 y un snapshot sin FTR lo narra como límite; sin FTR medido no hay meta de FTR', async () => {
