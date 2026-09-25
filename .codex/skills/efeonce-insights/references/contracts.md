@@ -209,8 +209,10 @@ With the flag OFF the adapters return v1 evidence and the planner emits a v1 pla
   the channel fields of bullet/waffle/venn/upset data.
 - **Reference facts** — `EvidenceFactV1.role?: 'measure' | 'reference'` (absent = measure). ICO targets are
   `role: 'reference'`, metricId `target.{otd|ftr|rpa}`, value from `ICO_METRIC_REGISTRY` (optimal min, or max for
-  lower-is-better), `dimension.direction`. They never produce claims, tables or references and never count as module
-  evidence in `validating`.
+  lower-is-better), `dimension.direction`; plus `band.{otd|ftr|rpa}` = outer edge of the registry's `attention` zone
+  (attention.min, or max for lower-is-better), cited by each bullet item as optional `bandFactId` (validated: exists,
+  positive, on the not-yet-reached side of the target). They never produce claims, tables or references and never count
+  as module evidence in `validating`. The render draws the band only from that fact — never `target × 0.85`.
 - **Plan (all optional)** — `contracts/plan.ts`: `chapter.opening` (claim), `chapter.readings[]` =
   `{ chartId, keyFigure?: { factId, value (must equal formatFactValue), caption }, conclusion?, meaning, nextStep | null }`;
   `essentials` (≤ `PLAN_ESSENTIALS_MAX` = 5); `scopeLines` (copy, no numbers allowed); `decision`, `measurement`, `ask`
