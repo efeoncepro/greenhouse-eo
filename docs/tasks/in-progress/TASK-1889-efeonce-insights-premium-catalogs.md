@@ -61,8 +61,8 @@
   catálogo): `deck-axis` pide Poppins 500 y hoy la resuelve a 300; darle la cara cambiaba propuestas
   entregadas. Coral sobre papel = 2,94:1 (advisory): la serie «oportunidad» nunca se distingue sólo por
   color.
-- Pendiente de aprobación del operador: portada, apertura y contraportada del deck; índice, tabla,
-  límites y narrativa A4; narrativa y límites del deck (sin página en el canvas).
+- Aprobadas por el operador (2026-09-25, sobre los PDFs reales de Berel y Sky): portada, apertura y contraportada
+  del deck; índice, tabla, límites y narrativa A4; narrativa y límites del deck (sin página en el canvas).
 - Pendiente de cablear (datos ya emitidos por el planner v2 de TASK-1888 bajo su flag): «Lo esencial»
   en el resumen. `chapter.opening` y las lecturas por figura ya se leen (Slice 4).
 
@@ -81,7 +81,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Slices 1–5 code complete en develop (sin push); rollout pendiente: aprobación de PDFs reales, staging, release`
+- Status real: `Slices 1–5 code complete en develop (sin push); rollout pendiente: staging, release (PDFs reales aprobados 2026-09-25)`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1888` (Slices 3–5 necesitan su contrato; Slices 1–2 ya pueden empezar)
@@ -491,9 +491,18 @@ El operador exige que el informe quede **igual al canvas**. «Igual» se define 
 - [x] Cada plantilla renderizada con el fixture del canvas queda a ≤ 1 % de píxeles distintos de su página en
   `paginas/` (tabla por página en el dossier); las excepciones están justificadas y aprobadas por el operador.
 - [x] El dossier incluye la hoja lado a lado referencia | render de cada página, en color y en gris.
-- [ ] El operador aprobó los PDFs internos de Berel y Sky y la estructura del deck.
+- [x] El operador aprobó los PDFs internos de Berel y Sky y la estructura del deck.
 - [ ] En producción, una edición interna real compone con el diseño nuevo antes de compartir con clientes.
 
+> Evidencia 2026-09-25 (aprobación): el operador aprobó los cuatro PDFs con «Bien, aprobado» en el chat de la
+> sesión TASK-1846 (procedencia: esa sesión lo informó a ésta, no se dijo en este hilo). Aprobado: Berel EO-INS-000019
+> (`insed-8fdb55a9-…`), informe 16 páginas + deck 15 láminas; Sky EO-INS-000022 (`insed-0729ee9e-…`), informe 12 + deck
+> 10. Generados con `preview-edition --editorial-v2 --ai-authoring` sobre HEAD `667b4c12a` (incluye `26937733b` y
+> `d8354471b`: triángulo = valor, tono = mejor/peor según la métrica); autoría gemini-2.5-flash-lite, un intento, sin
+> fallback; vista previa local, nada compartido con clientes. Cubre la estructura del deck (portada, aperturas y
+> contraportada derivadas de A4) y la excepción Deck-Agrupadas. Sigue abierto: edición interna en producción; el paso
+> a producción va sólo por el release control plane y requiere decisión aparte del operador.
+>
 > Evidencia 2026-09-25 (Slices 3–5): plantillas componen desde fixtures (`pnpm insights:canvas-fidelity`: 20/21
 > ≤ 1 %, Deck-Agrupadas 2,2 % con excepción aprobada) y desde ediciones reales (Berel EO-INS-000019 y Sky
 > EO-INS-000022, `preview-edition --editorial-v2`); hojas en gris (`--gray`); portada según `plan.cover` (tests de
