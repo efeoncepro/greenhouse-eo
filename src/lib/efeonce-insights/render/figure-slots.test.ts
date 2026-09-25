@@ -88,3 +88,13 @@ describe('metas', () => {
     expect(slide!.conclusion).toBe(againstTarget.text)
   })
 })
+
+describe('predicado compartido con el planner', () => {
+  it('hasFigurePage es el mismo criterio del render: familia sin página o sin hechos ⇒ false', async () => {
+    const { hasFigurePage } = await import('./figure-slots')
+
+    expect(hasFigurePage(grouped([null, null]), byId)).toBe(true)
+    expect(hasFigurePage({ ...(grouped([null, null]) as object), family: 'pie' } as never, byId)).toBe(false)
+    expect(hasFigurePage(grouped([null, null]), new Map() as never)).toBe(false)
+  })
+})

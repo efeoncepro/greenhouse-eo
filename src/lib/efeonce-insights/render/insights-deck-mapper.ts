@@ -330,7 +330,11 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
       const source = essentials[index]!
       const factId = source.factIds[0]
       const drawn = [...slideFacts].find(([, ids]) => factId !== undefined && ids.includes(factId))?.[0]
-      const chapterIndex = frozen.chapters.findIndex(chapter => chapter.claims.some(c => `essential.${c.claimId}` === source.claimId || c.claimId === source.claimId))
+
+      const chapterIndex = frozen.chapters.findIndex(chapter => (chapter.claims.some(c => `essential.${c.claimId}` === source.claimId || c.claimId === source.claimId) ||
+          // Un esencial que es la conclusión de una figura (TASK-1888): su capítulo es el del gráfico, se dibuje o no.
+          chapter.charts.some(chart => source.claimId.includes(chart.chartId))))
+
       const opening = chapterIndex >= 0 ? openings[chapterIndex]?.slideIndex : undefined
       const at = drawn ?? opening
 

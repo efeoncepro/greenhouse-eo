@@ -552,7 +552,10 @@ export const buildInsightReportPlanInput = ({
     }
 
     const chapterOfClaim = (claimId: string): number | null => {
-      const index = frozen.chapters.findIndex(chapter => chapter.claims.some(item => `essential.${item.claimId}` === claimId || item.claimId === claimId))
+      const index = frozen.chapters.findIndex(chapter => (chapter.claims.some(item => `essential.${item.claimId}` === claimId || item.claimId === claimId) ||
+          // Un esencial que es la conclusión de una figura (TASK-1888): su capítulo es el del gráfico, se dibuje o no.
+          chapter.charts.some(chart => claimId.includes(chart.chartId))))
+
       const section = index >= 0 ? sections.findIndex(sec => sec.title === frozen.chapters[index]!.title) : -1
 
       return section >= 0 ? folioOf[section]! : null

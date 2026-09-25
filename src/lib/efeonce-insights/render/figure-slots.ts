@@ -399,6 +399,19 @@ export const buildFigureSlides = (
   }]
 }
 
+/**
+ * ¿Esta figura tendrá página? El MISMO predicado que usa el render, exportado para que el planner no elija como
+ * esencial la conclusión de un gráfico que no se dibuja (familia sin página o hechos insuficientes). Un solo lugar:
+ * si el render cambia qué dibuja, el planner lo sabe sin copiar la regla.
+ */
+export const hasFigurePage = (chart: ChartSpecV1, byId: ReadonlyMap<string, EvidenceFactV1>, locale = 'es-CL'): boolean => {
+  try {
+    return buildFigureSlides(chart, byId, undefined, [], locale, FIGURE_CAPACITY.report).length > 0
+  } catch {
+    return false
+  }
+}
+
 /** La lectura del plan que corresponde a un gráfico (a lo más una por `chartId`). */
 export const readingFor = (readings: readonly PlanFigureReadingV1[] | undefined, chart: ChartSpecV1): PlanFigureReadingV1 | undefined =>
   readings?.find(reading => reading.chartId === chart.chartId)
