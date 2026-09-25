@@ -724,9 +724,9 @@ convierte la creación en `503 generation_disabled` (`policy_blocked` en el gate
 
 ## Provider Marketing Studio (Efeonce Marketing Studio)
 
-> Task dueña: `TASK-1891` (EPIC-049). Estado 2026-09-25: code complete en la rama `feat/task-1891-marketing-studio-provider`
-> de `efeonce-mcp` (gateway `1.8.0`, 70 tools con el provider habilitado); **sin deploy**. El rollout depende del
-> release de Greenhouse que publica el cliente de canje y el manual.
+> Task dueña: `TASK-1891` (EPIC-049). Estado 2026-09-25: gateway `1.8.0` desplegado (PR #19 `9b93d6a`, run
+> `36183601792`, revisión `efeonce-mcp-gateway-00057-w8h` al 100 %) con `MARKETING_STUDIO_PROVIDER_ENABLED=false`.
+> Prender el flag espera el release de Greenhouse (cliente de canje + manual) y el canary con token humano.
 
 El provider `marketing-studio` (`src/providers/marketing-studio.ts`) federa las 12 tools de lectura `studio.*` que
 declara el manifiesto de Studio (`studio-tool-manifest.v1`). **Studio no conoce personas**, así que la autoridad de

@@ -16,6 +16,14 @@
 - La política `read([...capability])` + membership de la spec no protegía nada: con issuer Entra el gateway autoriza sin revisar capability (delega en el proveedor, y Studio no conoce personas), y con issuer nativo v2 sólo se delega `growth.seo.observation.read` (sumar otra exige consentimiento nuevo, D10). Implementado como Hiring/Client Services: canje RFC 8693 en Greenhouse (cliente `efeonce-mcp-marketing-studio`, `can(persona, 'marketing_studio.campaign.read')`) antes de cada llamada; nativo `unsupported` con razón. Aprobado por el operador.
 - El deploy del gateway es por dispatch manual (runbook §Deploy), no automático al merge.
 
+## Delta 2026-09-25 — rollout parcial (autorizado por el operador)
+
+- Studio `d3ab68e` en producción (preview por defecto 640 px; hash del manifiesto `96d1f0caf6e5` = el sincronizado).
+- `secretAccessor` de `efeonce-mcp-gateway@` sobre `marketing-studio-mcp-gateway-token`.
+- Vercel de Greenhouse: `efeonce-mcp-marketing-studio` agregado a `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` en production y staging (readback OK; efectivo en el próximo deploy).
+- Gateway: PR [efeoncepro/efeonce-mcp#19](https://github.com/efeoncepro/efeonce-mcp/pull/19) mergeado (`9b93d6a`), variables `MARKETING_STUDIO_*` (flag `false`), deploy `36183601792` → revisión `efeonce-mcp-gateway-00057-w8h` al 100 %, `/health` ok, `/mcp` sin token 401. Con el flag OFF el secreto no se monta.
+- Pendiente: release de Greenhouse (canje + manual; bloqueado por WIP ajeno en `scripts/foto` al integrar develop), luego `MARKETING_STUDIO_PROVIDER_ENABLED=true` + dispatch + `pnpm studio:canary` con token Entra humano + sesión MCP.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -31,7 +39,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-049`
-- Status real: `Code complete (gateway 1.8.0 en rama local + canje en Greenhouse); rollout pendiente de autorización y del release de Greenhouse`
+- Status real: `Gateway 1.8.0 desplegado con el flag OFF (PR #19, revisión 00057-w8h); falta el release de Greenhouse (canje + manual) y luego flag ON + canary con token humano`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `TASK-1890`
