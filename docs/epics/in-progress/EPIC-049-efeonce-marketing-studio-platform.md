@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Fundación completa y en vivo en studio.efeonce.org (TASK-1887); siguientes: login, métricas, escrituras`
+- Status real: `Fundación completa y en vivo en studio.efeonce.org (TASK-1887); programa completo planificado (TASK-1890…1898); login al final`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Julio Reyes`
@@ -48,15 +48,18 @@ identidad (Efeonce ID), UI e integraciones (Metricool, plataformas de pauta, Glo
 
 ## Child Tasks
 
+Orden recomendado (2026-09-25): 1890 → 1891 · 1893 en paralelo · 1896 → 1892 → 1894 → 1895 → 1897 (cuando convenga) → 1898 al final.
+
 - `TASK-1887` — Fundación: repo, bases y roles, modelo de dominio, API v1, import del catálogo, renditions privadas, UI aprobada (claro/oscuro), Vercel + dominio (modo `open`). Completa: en vivo en `https://studio.efeonce.org`.
-- _Por crear, al final del programa por decisión del operador (2026-09-25)_ — **Login con Efeonce ID** (`auth.efeonce.org`) y cambio de `STUDIO_ACCESS_MODE` a `efeonce_id`. Task dedicada por decisión del operador (2026-09-25); hasta entonces Studio queda abierto y de solo lectura.
-- _Por crear_ — **Métricas de marketing desde Greenhouse.** Greenhouse ya tiene Search Console (`src/lib/growth/search-console`), GA4 (`src/lib/growth/analytics-ga4`, `src/lib/growth/ga4`) y el módulo SEO / Search Visibility 360, expuestos por organización en `/api/platform/ecosystem/growth/*` (p. ej. `seo/performance`, `seo/overview-kpis`). Studio los consume como sister platform con token de consumidor y la organización de la campaña, **nunca por SQL**. Arquitectura base: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`, `GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`, `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`. Métricas de pauta (Meta/LinkedIn) y de social orgánico (Metricool) quedan en adapters propios de Studio.
-- _Por crear_ — Commands de escritura (campaña, asset/versión, copy, revisión/aprobación) con idempotencia, `If-Match` y auditoría; corte de autoridad desde OneDrive.
-- _Por crear_ — Worker Cloud Run: renditions automáticas, readback de Metricool, publicación programada.
 - `TASK-1890` — Studio listo para agentes: manifiesto de tools con paridad, semántica, bearer de servicio, organización canónica, capability y manual servido.
 - `TASK-1891` — Federación en Efeonce MCP de todas las tools del manifiesto (bloqueada por TASK-1890). Regla desde aquí: toda capacidad nueva de Studio nace con su tool en el manifiesto o una exclusión con razón.
-- _Por crear_ — Observabilidad (Sentry, alertas, restauración verificada).
-- _Por crear (Greenhouse)_ — Revocar `CONNECT` de PUBLIC en la base `greenhouse_app` y otorgarlo explícito a los roles de Greenhouse, para cerrar el acceso de conexión residual de roles ajenos.
+- `TASK-1892` — Métricas de marketing desde Greenhouse (Search Console, GA4, SEO) por el lane ecosystem `/api/platform/ecosystem/growth/*`, nunca por SQL. Pauta (Meta/LinkedIn) y social orgánico (Metricool) quedan en adapters propios de Studio.
+- `TASK-1893` — Almacén de originales en GCS (finales aprobados, sha256, versionado, derechos) y worker Cloud Run de medios: renditions automáticas, portadas de video, recortes y readback de Metricool.
+- `TASK-1894` — Commands de escritura con idempotencia, `If-Match` y auditoría; corte de autoridad desde OneDrive.
+- `TASK-1895` — UI de edición, revisión, subida de versiones y panel de métricas (consumidora de 1892–1894).
+- `TASK-1896` — Observabilidad, alertas y restauración verificada de `marketing_studio`. Antes de que las escrituras lleguen a producción.
+- `TASK-1897` — (Greenhouse) Cerrar `CONNECT` de PUBLIC en `greenhouse_app` y en las bases de Studio.
+- `TASK-1898` — Login con Efeonce ID (`auth.efeonce.org`) y cambio de `STUDIO_ACCESS_MODE` a `efeonce_id`. Última del programa por decisión del operador (2026-09-25).
 
 ## Existing Related Work
 
