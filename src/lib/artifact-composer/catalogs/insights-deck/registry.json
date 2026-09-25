@@ -13,7 +13,13 @@
     "insights-cover",
     "insights-evidence",
     "insights-narrative",
-    "insights-limits"
+    "insights-limits",
+    "insights-summary",
+    "insights-reading",
+    "insights-plan",
+    "insights-cover-navy",
+    "insights-chapter",
+    "insights-back-cover"
   ],
   "templates": [
     {
@@ -67,6 +73,84 @@
       ],
       "prototype": "insights-limits.html",
       "slotsRef": "insights-limits.slots.json"
+    },
+    {
+      "name": "InsightsSummarySlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-summary"
+      ],
+      "prototype": "insights-summary.html",
+      "slotsRef": "insights-summary.slots.json"
+    },
+    {
+      "name": "InsightsReadingSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-reading"
+      ],
+      "prototype": "insights-reading.html",
+      "slotsRef": "insights-reading.slots.json"
+    },
+    {
+      "name": "InsightsPlanSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-plan"
+      ],
+      "prototype": "insights-plan.html",
+      "slotsRef": "insights-plan.slots.json"
+    },
+    {
+      "name": "InsightsCoverNavySlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-cover-navy"
+      ],
+      "prototype": "insights-cover-navy.html",
+      "slotsRef": "insights-cover-navy.slots.json"
+    },
+    {
+      "name": "InsightsChapterSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-chapter"
+      ],
+      "prototype": "insights-chapter.html",
+      "slotsRef": "insights-chapter.slots.json"
+    },
+    {
+      "name": "InsightsBackCoverSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-back-cover"
+      ],
+      "prototype": "insights-back-cover.html",
+      "slotsRef": "insights-back-cover.slots.json"
     }
   ],
   "selector": {
@@ -75,7 +159,13 @@
       "insights-cover": "InsightsCoverSlide",
       "insights-evidence": "InsightsEvidenceSlide",
       "insights-narrative": "InsightsNarrativeSlide",
-      "insights-limits": "InsightsLimitsSlide"
+      "insights-limits": "InsightsLimitsSlide",
+      "insights-summary": "InsightsSummarySlide",
+      "insights-reading": "InsightsReadingSlide",
+      "insights-plan": "InsightsPlanSlide",
+      "insights-cover-navy": "InsightsCoverNavySlide",
+      "insights-chapter": "InsightsChapterSlide",
+      "insights-back-cover": "InsightsBackCoverSlide"
     },
     "disambiguation": [
       "una conclusión con la figura que la prueba => InsightsEvidenceSlide.",

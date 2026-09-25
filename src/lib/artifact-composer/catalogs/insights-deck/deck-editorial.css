@@ -1,0 +1,183 @@
+/**
+ * Molde editorial del deck Insights (TASK-1889) — láminas 1280×720 del canvas aprobado el
+ * 2026-09-25 («Gráficos de Efeonce Insights»).
+ *
+ * Convive con `deck-mold.css` (láminas v1 a 1920×1080) mientras el mapper no cambia de plantillas;
+ * cada lámina enlaza el molde que usa. Ningún HEX ni familia literal: todo sale de
+ * `deck-tokens.css` (roles del pack y de su extensión editorial).
+ *
+ * GENERADO NO — este archivo se edita a mano.
+ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body { background: var(--axis-deck-role-navy); }
+
+.lamina {
+  position: relative;
+  width: 1280px;
+  height: 720px;
+  overflow: hidden;
+  background: var(--axis-deck-role-navy);
+  color: var(--axis-deck-role-navyInk);
+  font-family: var(--axis-deck-type-text);
+}
+
+.art { position: absolute; left: 0; top: 0; display: block; }
+
+.halo-stop { stop-color: var(--axis-deck-role-navyAccent); }
+
+.orbit-rings { fill: none; stroke: var(--axis-deck-role-halo); stroke-opacity: 0.08; }
+
+.num { font-variant-numeric: tabular-nums; }
+
+.stroke-icon { display: block; flex-shrink: 0; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Cabecera: pestaña con el número de capítulo + sección; período a la derecha. */
+.deck-head {
+  position: absolute;
+  left: 72px;
+  right: 72px;
+  top: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deck-tab { display: flex; align-items: center; gap: 12px; }
+
+.deck-tab-number {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--axis-deck-role-navyAccent);
+  color: var(--axis-deck-role-navy);
+  font-family: var(--axis-deck-type-display);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.deck-tab-section,
+.deck-period {
+  font-family: var(--axis-deck-type-display);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.deck-tab-section { font-weight: 600; letter-spacing: 0.22em; color: var(--axis-deck-role-navyAccent); }
+
+.deck-period { font-weight: 500; letter-spacing: 0.12em; color: var(--axis-deck-role-navyMuted); }
+
+/* Antetítulo con ícono. */
+.deck-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--axis-deck-type-display);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--axis-deck-role-navyAccent);
+}
+
+.deck-eyebrow .stroke-icon { stroke: var(--axis-deck-role-navyAccent); }
+
+.deck-rule { width: 40px; height: 3px; background: var(--axis-deck-role-navyAccent); }
+
+.deck-label {
+  font-family: var(--axis-deck-type-display);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--axis-deck-role-navyMuted);
+}
+
+.deck-chip {
+  display: inline-flex;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(var(--axis-deck-role-navyMuted-rgb), 0.14);
+  font-family: var(--axis-deck-type-display);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--axis-deck-role-navyMuted);
+  white-space: nowrap;
+}
+
+/* Franja de cierre sobre el pie: «Para decidir», «Lo que significa / Próximo paso». */
+.deck-band {
+  position: absolute;
+  left: 72px;
+  right: 72px;
+  bottom: 86px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(var(--axis-deck-role-navyInk-rgb), 0.14);
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+}
+
+.deck-band:empty { display: none; }
+
+.deck-band-label {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--axis-deck-type-display);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--axis-deck-role-navyAccent);
+}
+
+.deck-band-label .stroke-icon { stroke: var(--axis-deck-role-navyAccent); }
+
+.deck-band-text { font-family: var(--axis-deck-type-display); font-size: 16px; font-weight: 500; line-height: 1.45; color: var(--axis-deck-role-navyInk); }
+
+/* Pie: lockup + edición; URL, filete y folio «NN / total». */
+.deck-foot2 {
+  position: absolute;
+  left: 72px;
+  right: 72px;
+  bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deck-foot2-id { display: flex; align-items: center; gap: 12px; }
+
+.deck-foot2-id img { height: 13px; width: auto; display: block; }
+
+.deck-foot2-id .divider { width: 1px; height: 12px; background: rgba(var(--axis-deck-role-navyInk-rgb), 0.3); }
+
+.deck-foot2-edition {
+  font-family: var(--axis-deck-type-display);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--axis-deck-role-navyMuted);
+}
+
+.deck-foot2-end { display: flex; align-items: center; gap: 18px; }
+
+.deck-foot2-end .url-bubble { height: 20px; width: auto; display: block; mix-blend-mode: luminosity; }
+
+.deck-foot2-end .divider { width: 1px; height: 22px; background: rgba(var(--axis-deck-role-navyInk-rgb), 0.22); }
+
+.deck-folio { display: flex; align-items: baseline; gap: 5px; font-variant-numeric: tabular-nums; }
+
+.deck-folio-page { font-family: var(--axis-deck-type-display); font-size: 18px; font-weight: 600; }
+
+.deck-folio-total { font-size: 10px; color: var(--axis-deck-role-navyMuted); }

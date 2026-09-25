@@ -8,10 +8,14 @@
 
 import type { ResolverRegistry } from '../../resolver-contract'
 import { familyAwareBarEffects, figureFamilyEffects, figurePathEffects } from '../../chart-figure'
+import { insightsEditorialResolvers } from '../insights-shared/editorial-resolvers'
 
 export { parsePrintedNumber, roundingToleranceOf } from '../../bar-figure'
 
 export const insightsReportResolvers: ResolverRegistry = {
+  /** Resolvers editoriales compartidos (TASK-1889): canal, ordinal, número, puntos, semanas, cierre. */
+  ...insightsEditorialResolvers('report'),
+
   /**
    * `report-bar-geometry` — el largo de cada barra sale de su valor, recalculado desde el dato. Si la
    * etiqueta impresa no representa el valor que dibuja la barra, el render falla: una barra cuyo

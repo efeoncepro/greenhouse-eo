@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  ReportPlanPage — plan de acción del informe A4 (TASK-1889, canvas aprobado 2026-09-25, página
+  `Premium-Plan`).
+
+  Cifra protagonista (cuántas acciones) + título; una fila por acción con su métrica de éxito,
+  evidencia, impacto y esfuerzo (niveles 1–3) y el calendario por semana; panel de cierre «Cómo lo
+  mediremos / Qué necesitamos de ustedes». El responsable se muestra sólo si existe (`ownerRef`).
+
+  La geometría del calendario y los puntos salen de resolvers del catálogo: el autor declara
+  `weeks: "1-2"` y `impact: "3"`, nunca un ancho ni un color.
+-->
+<link rel="stylesheet" href="report-tokens.css" />
+<link rel="stylesheet" href="report-fonts.css" />
+<link rel="stylesheet" href="report-editorial.css" />
+<style>
+  .plan-eyebrow { margin-top: 38px; }
+
+  .plan-hero { margin-top: 16px; display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 30px; align-items: start; }
+
+  .plan-count { display: flex; flex-direction: column; gap: 10px; }
+
+  .plan-figure {
+    font-family: var(--axis-report-type-display);
+    font-size: 76px;
+    line-height: 0.95;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-report-role-paperAccent);
+  }
+
+  .plan-figure-text { max-width: 175px; font-size: 12.5px; line-height: 1.45; color: var(--axis-report-role-paperAccent); }
+
+  .plan-heading { display: flex; flex-direction: column; gap: 12px; padding-top: 4px; }
+
+  .plan-title {
+    margin: 0;
+    font-family: var(--axis-report-type-display);
+    font-size: 23px;
+    line-height: 1.24;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .plan-lead { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--axis-report-role-paperAccent); }
+
+  .plan-table { margin-top: 26px; display: flex; flex-direction: column; }
+
+  .plan-cols,
+  .action {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 168px 92px;
+    column-gap: 14px;
+  }
+
+  .plan-cols {
+    padding-bottom: 8px;
+    font-family: var(--axis-report-type-display);
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--axis-report-role-labelMuted);
+  }
+
+  .plan-weeks { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; }
+
+  .action { align-items: start; padding: 11px 0; border-top: 1px solid var(--axis-report-role-rule); }
+
+  .action:last-child { border-bottom: 1px solid var(--axis-report-role-rule); }
+
+  .action-number {
+    font-family: var(--axis-report-type-display);
+    font-size: 22px;
+    line-height: 1;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-report-role-paperAccent);
+  }
+
+  .action-copy { display: flex; flex-direction: column; gap: 5px; }
+
+  .action-title {
+    font-family: var(--axis-report-type-display);
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--axis-report-role-paperInk);
+  }
+
+  .action-detail { font-size: 12px; line-height: 1.5; color: var(--axis-report-role-paperAccent); }
+
+  .action-meta {
+    margin-top: 3px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 14px;
+    font-size: 10px;
+    color: var(--axis-report-role-labelMuted);
+  }
+
+  .action-meta .folio-chip { font-size: 9px; }
+
+  .level { display: inline-flex; align-items: center; gap: 6px; }
+
+  .dots { display: inline-flex; gap: 3px; }
+
+  .pip { width: 6px; height: 6px; border-radius: 50%; background: var(--axis-report-role-rule); }
+
+  .impact-dots .pip--on { background: var(--axis-report-role-paperAccent); }
+
+  .effort-dots .pip--on { background: var(--axis-deck-teal-650); }
+
+  .pip--off { background: var(--axis-report-role-rule); }
+
+  .action-metric { display: flex; flex-direction: column; gap: 3px; }
+
+  .action-metric-value {
+    font-family: var(--axis-report-type-display);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-report-role-paperInk);
+  }
+
+  .action-metric-note { font-size: 10.5px; color: var(--axis-report-role-labelMuted); }
+
+  .action-weeks { padding-top: 6px; }
+
+  .week-track { position: relative; height: 10px; border-radius: 5px; background: var(--axis-report-role-ruleSoft); }
+
+  .week-bar { position: absolute; top: 0; bottom: 0; border-radius: 5px; background: var(--axis-report-role-paperAccent); }
+
+  /* El ícono del bloque lo elige su `kind`; su contenedor no es una caja. */
+  .closing-kind { display: contents; }
+
+  .closing--plan { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+
+  .closing--plan:empty { display: none; }
+</style>
+</head>
+<body>
+  <div class="sheet sheet--paper paper-page">
+    <header class="running">
+      <span class="running-client"><span class="running-client-name" data-slot="clientName">Nombre del cliente</span></span>
+      <span class="running-meta">
+        <span class="running-section" data-slot="runningSection">Plan de acción</span>
+        <span class="running-divider"></span>
+        <span data-slot="runningPeriod">Septiembre 2026</span>
+      </span>
+    </header>
+
+    <span class="page-eyebrow plan-eyebrow">
+      <svg class="stroke-icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 5.5l1.5 1.5l2.5 -2.5"></path><path d="M3.5 11.5l1.5 1.5l2.5 -2.5"></path><path d="M3.5 17.5l1.5 1.5l2.5 -2.5"></path><path d="M11 6l9 0"></path><path d="M11 12l9 0"></path><path d="M11 18l9 0"></path></svg><span data-slot="eyebrow">Plan de septiembre</span>
+    </span>
+
+    <div class="plan-hero">
+      <div class="plan-count">
+        <span class="plan-figure" data-slot="heroFigure">5</span>
+        <span class="plan-figure-text" data-slot="heroText">acciones para convertir mejor el tráfico que ya llega</span>
+      </div>
+      <div class="plan-heading">
+        <h1 class="plan-title" data-slot="title">Cinco acciones, ordenadas por el impacto que esperamos</h1>
+        <p class="plan-lead" data-slot="lead">Cada una apunta a una métrica que leeremos en el informe de septiembre.</p>
+      </div>
+    </div>
+
+    <div class="plan-table">
+      <div class="plan-cols" data-slot="columns">
+        <span data-slot-field="number">#</span>
+        <span data-slot-field="action">Acción</span>
+        <span data-slot-field="metric">Métrica de éxito</span>
+        <span class="plan-weeks" data-slot-field="weeks"><span>S1</span></span>
+      </div>
+      <div class="plan-actions" data-slot="actions">
+        <div class="action">
+          <span class="action-number" data-slot-field="number">1</span>
+          <div class="action-copy">
+            <span class="action-title" data-slot-field="title">Reescribir títulos y descripciones de tres páginas</span>
+            <span class="action-detail" data-slot-field="detail">/precios, /servicios y /preguntas-frecuentes.</span>
+            <div class="action-meta">
+              <span class="folio-chip" data-slot-field="evidence">Evidencia p. 13</span>
+              <span class="level"><span data-slot-field="impactLabel">Impacto</span><span class="dots impact-dots" data-slot-field="impact"><span class="pip"></span><span class="pip"></span><span class="pip"></span></span></span>
+              <span class="level"><span data-slot-field="effortLabel">Esfuerzo</span><span class="dots effort-dots" data-slot-field="effort"><span class="pip"></span><span class="pip"></span><span class="pip"></span></span></span>
+            </div>
+          </div>
+          <div class="action-metric">
+            <span class="action-metric-value" data-slot-field="metric">CTR de 0,9 % a 3,5 %</span>
+            <span class="action-metric-note" data-slot-field="metricNote">+380 clics al mes</span>
+          </div>
+          <div class="action-weeks"><div class="week-track" data-slot-field="weeks"><span class="week-bar"></span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grow"></div>
+
+    <div class="closing closing--plan" data-slot="closing"><div class="closing-block">
+        <span class="closing-label"><span class="closing-kind" data-slot-field="kind"><svg class="stroke-icon closing-icon--measure" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7"></path><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3"></path><path d="M9.7 17h4.6"></path></svg><svg class="stroke-icon closing-icon--action" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 18l6 -6"></path><path d="M13 6l6 6"></path></svg></span><span data-slot-field="label">Cómo lo mediremos</span></span>
+        <p class="closing-text" data-slot-field="text">Contra la línea base de agosto.</p>
+        <span class="closing-signature" data-slot-field="signature">Recomendación de Efeonce</span>
+      </div></div>
+
+    <footer class="paper-foot">
+      <div class="paper-foot-rule"><span class="accent"></span><span class="line"></span></div>
+      <div class="paper-foot-row">
+        <div class="paper-foot-id">
+          <div class="paper-foot-lockup">
+            <img src="assets/brand/logo-full.svg" alt="Efeonce" />
+            <span class="divider"></span>
+            <span class="paper-foot-edition" data-slot="footerEdition">Insights · Informe de agosto 2026</span>
+          </div>
+          <div class="paper-foot-contact" data-slot="footerContact"><span data-slot-field="address">Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile</span><span class="dot"></span><span class="num" data-slot-field="phone">+56 9 3732 3064</span></div>
+        </div>
+        <div class="paper-foot-end">
+          <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+          <span class="divider"></span>
+          <span class="paper-folio" data-slot="folio"><span class="paper-folio-page" data-slot-field="page">22</span><span class="paper-folio-total">/ <span data-slot-field="total">24</span></span></span>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

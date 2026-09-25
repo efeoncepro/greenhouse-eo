@@ -1,0 +1,86 @@
+{
+  "template": "ReportCoverNavyPage",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "TASK-1889 — portada navy del canvas aprobado (página `Premium-Portada`). La portada del canvas no lleva pie institucional ni folio: el operador la aprobó así, con eslogan y línea de confidencialidad. El identificador de la edición viaja en la línea de confidencialidad (versión) y en el pie de las páginas interiores.",
+  "viewport": {
+    "width": 794,
+    "height": 1123
+  },
+  "slots": {
+    "editionLabel": {
+      "selector": "[data-slot='editionLabel']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Informe mensual · <período>». El período sale de `render/labels.ts`; la etiqueta, de `src/lib/copy/insights.ts`."
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Lectura de Efeonce», desde el copy."
+    },
+    "reportTitle": {
+      "selector": "[data-slot='reportTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 64,
+        "maxLines": 3,
+        "overflow": "reject"
+      },
+      "notes": "Título en tres líneas como máximo: la medida de 430 px es la del canvas."
+    },
+    "reportSubtitle": {
+      "selector": "[data-slot='reportSubtitle']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 110,
+        "maxLines": 3,
+        "overflow": "reject"
+      }
+    },
+    "preparedFor": {
+      "selector": "[data-slot='preparedFor']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        },
+        "clientName": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 48,
+          "maxLines": 1
+        }
+      },
+      "notes": "Sin nombre de cliente, el bloque desaparece: nunca un nombre inventado. El logo del cliente llega con la portada sellada de TASK-1888 (Slice 3)."
+    },
+    "confidentialityLine": {
+      "selector": "[data-slot='confidentialityLine']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 72,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Confidencial · Versión N · <fecha de emisión>». Sin emitir, dice «Sin emitir»."
+    }
+  }
+}

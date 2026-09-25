@@ -70,6 +70,13 @@
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
+  font-weight: 500;
+  font-display: block;
+  src: url('fonts/poppins-500.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
   font-weight: 600;
   font-display: block;
   src: url('fonts/poppins-600.ttf') format('truetype');

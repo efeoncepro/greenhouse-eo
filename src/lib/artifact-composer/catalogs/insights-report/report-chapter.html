@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  ReportChapterPage — apertura de capítulo del informe A4 (TASK-1889, canvas aprobado 2026-09-25,
+  páginas `Premium-Capitulo`, `Premium-Capitulo-02` y `Premium-Capitulo-03`).
+
+  Una plantilla para las tres aperturas. Lo que cambia entre ellas es dato, no plantilla:
+  - «Medimos la marca en» + canales aparece sólo si el capítulo mide canales (`measuredChannels`);
+  - el índice del capítulo (`contents`) lista sus páginas con folio real.
+
+  El número en contorno sangra fuera del lienzo: lo escribe el layout hook del catálogo desde el
+  slot `chapterNumeral` (ver `layout-hooks.ts`), con la compensación óptica del canvas.
+-->
+<link rel="stylesheet" href="report-tokens.css" />
+<link rel="stylesheet" href="report-fonts.css" />
+<link rel="stylesheet" href="report-editorial.css" />
+<style>
+  .numeral-art .chapter-numeral {
+    font-family: var(--axis-report-type-display);
+    font-size: 460px;
+    font-weight: 700;
+    letter-spacing: -20px;
+    fill: none;
+    stroke: var(--axis-report-role-navyAccent);
+    stroke-opacity: 0.32;
+    stroke-width: 1.5;
+  }
+
+  .chapter { position: relative; height: 1123px; padding: 60px 68px 52px; display: flex; flex-direction: column; }
+
+  .chapter-head { display: flex; justify-content: space-between; align-items: baseline; }
+
+  .chapter-label {
+    font-family: var(--axis-report-type-display);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--axis-report-role-navyAccent);
+  }
+
+  .chapter-running {
+    font-family: var(--axis-report-type-display);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--axis-report-role-navyMuted);
+  }
+
+  .chapter-intro { margin-top: 150px; display: flex; flex-direction: column; }
+
+  .chapter-rule { width: 40px; height: 3px; background: var(--axis-report-role-navyAccent); }
+
+  .chapter-title {
+    margin: 26px 0 0;
+    font-family: var(--axis-report-type-display);
+    font-size: 50px;
+    line-height: 1.04;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+
+  .chapter-lead { margin: 22px 0 0; max-width: 480px; font-size: 20px; line-height: 1.45; color: var(--axis-report-role-navyLead); }
+
+  .section-label {
+    font-family: var(--axis-report-type-display);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--axis-report-role-navyAccent);
+  }
+
+  /* Canales medidos: sólo existe si el capítulo mide canales (el slot ausente deja el nodo vacío). */
+  .measured { margin-top: 34px; display: flex; flex-direction: column; gap: 14px; }
+
+  .measured:empty { display: none; }
+
+  .channels { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; max-width: 560px; }
+
+  .channel { display: inline-flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 500; color: var(--axis-report-role-navyLead); }
+
+  /* Disco blanco: el isotipo se lee igual en papel y en navy. */
+  .channel-disc {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--axis-report-role-navyInk);
+    box-shadow: 0 0 0 1px rgba(var(--axis-report-role-navyInk-rgb), 0.35);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .channel-disc img { width: 18px; height: 18px; display: block; object-fit: contain; }
+
+  /* Índice del capítulo. Con 7 entradas o más sube 16 px para respirar (así en el canvas). */
+  .contents { margin-top: 72px; max-width: 430px; display: flex; flex-direction: column; }
+
+  .contents:has(.contents-entry:nth-child(7)) { margin-top: 56px; }
+
+  .contents:empty { display: none; }
+
+  .contents .section-label { margin-bottom: 10px; }
+
+  .contents-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 9px 0;
+    border-top: 1px solid rgba(var(--axis-report-role-navyInk-rgb), 0.14);
+    font-size: 13.5px;
+  }
+
+  .contents-entry:last-child { border-bottom: 1px solid rgba(var(--axis-report-role-navyInk-rgb), 0.14); }
+
+  .contents-folio { font-family: var(--axis-report-type-display); font-weight: 600; color: var(--axis-report-role-navyAccent); }
+
+  .chapter-foot { display: flex; justify-content: space-between; align-items: center; }
+
+  .mini-lockup { display: flex; align-items: center; gap: 10px; }
+
+  .mini-lockup img { height: 12px; width: auto; display: block; }
+
+  .mini-lockup .divider { width: 1px; height: 10px; background: rgba(var(--axis-report-role-navyInk-rgb), 0.3); }
+
+  .mini-lockup .product {
+    font-family: var(--axis-report-type-display);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--axis-report-role-navyMuted);
+  }
+
+  .chapter-folio {
+    font-family: var(--axis-report-type-display);
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(var(--axis-report-role-navyInk-rgb), 0.85);
+  }
+</style>
+</head>
+<body>
+  <div class="sheet sheet--navy">
+    <svg class="numeral-art art" width="794" height="1123" viewBox="0 0 794 1123" aria-hidden="true">
+      <text class="chapter-numeral" x="850" y="1010" text-anchor="end">01</text>
+    </svg>
+
+    <div class="chapter">
+      <div class="chapter-head">
+        <span class="chapter-label" data-slot="chapterLabel">Capítulo 01</span>
+        <span class="chapter-running" data-slot="runningLabel">Informe de agosto 2026</span>
+      </div>
+
+      <div class="chapter-intro">
+        <span class="chapter-rule"></span>
+        <h1 class="chapter-title" data-slot="chapterTitle">Visibilidad orgánica</h1>
+        <p class="chapter-lead" data-slot="chapterLead">El sitio convierte mejor lo que muestra: agosto trajo más clics con menos impresiones, y el alza se sostuvo todo el mes.</p>
+        <div class="measured" data-slot="measuredChannels"><span class="section-label" data-slot-field="label">Medimos la marca en</span><div class="channels" data-slot-field="channels"><span class="channel"><span class="channel-disc"><img data-slot-field="channelId" src="assets/channels/google.svg" alt="" /></span><span data-slot-field="name">Google</span></span></div></div>
+      </div>
+
+      <div class="contents" data-slot="contents"><span class="section-label" data-slot-field="label">En este capítulo</span><div class="contents-list" data-slot-field="entries"><div class="contents-entry"><span data-slot-field="title">Clics, impresiones y CTR</span><span class="contents-folio num" data-slot-field="folio">06</span></div></div></div>
+
+      <div class="grow"></div>
+
+      <div class="chapter-foot">
+        <div class="mini-lockup">
+          <img src="assets/brand/logo-negative.svg" alt="Efeonce" />
+          <span class="divider"></span>
+          <span class="product">Insights</span>
+        </div>
+        <span class="chapter-folio num" data-slot="pageFolio">05</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

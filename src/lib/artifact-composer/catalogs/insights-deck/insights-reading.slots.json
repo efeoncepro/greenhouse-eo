@@ -1,0 +1,180 @@
+{
+  "template": "InsightsReadingSlide",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "TASK-1889 — «Nuestra lectura» del deck (lámina `Deck-Lectura`, 1280×720).",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "slots": {
+    "tabNumber": {
+      "selector": "[data-slot='tabNumber']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 2,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Número de capítulo de la pestaña («00» en el resumen)."
+    },
+    "section": {
+      "selector": "[data-slot='section']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "period": {
+      "selector": "[data-slot='period']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "thesis": {
+      "selector": "[data-slot='thesis']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 110,
+        "maxLines": 2,
+        "overflow": "reject",
+        "allowedTags": [
+          "em"
+        ]
+      },
+      "notes": "La segunda mitad resaltada va en <em>."
+    },
+    "blocks": {
+      "selector": "[data-slot='blocks']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 3
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "tone": {
+            "type": "string",
+            "required": false,
+            "resolver": "deck-block-tone",
+            "values": [
+              "default",
+              "focus"
+            ]
+          },
+          "ordinal": {
+            "type": "string",
+            "required": false,
+            "resolver": "deck-ordinal",
+            "consumer": "resolver-only"
+          },
+          "heading": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40,
+            "maxLines": 2
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 170,
+            "maxLines": 4
+          },
+          "folios": {
+            "type": "array",
+            "required": true,
+            "constraints": {
+              "minItems": 1,
+              "maxItems": 4
+            },
+            "item": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "notes": "Qué muestran los datos · dónde está la brecha · qué cambia; `tone: focus` en el que carga el argumento."
+    },
+    "oneLiner": {
+      "selector": "[data-slot='oneLiner']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "rich-string",
+          "required": true,
+          "maxCharacters": 160,
+          "maxLines": 2,
+          "allowedTags": [
+            "em"
+          ]
+        }
+      }
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
+      },
+      "notes": "«NN / total» del plan de láminas de la misma composición."
+    }
+  }
+}

@@ -27,6 +27,11 @@ export interface PackFontEntry {
   sha256: string
   license: string
   embedRights: boolean
+  /**
+   * Extensión del pack a la que pertenece la fuente. Sin extensión, la compilan todos los
+   * catálogos; con extensión, sólo los que la declaran en `packExtensions`.
+   */
+  extension?: string
 }
 
 export interface CatalogTokensBuild {
@@ -69,6 +74,13 @@ export interface CatalogTokensOptions {
    * tener ninguna, y eso no es un error — es un catálogo que todavía no las necesita.
    */
   readonly gradientRecipesPath?: string
+
+  /**
+   * Extensiones del pack que el catálogo adopta (hoy sólo `editorial`, TASK-1889). Una fuente de
+   * extensión no llega a un catálogo que no la pidió: `deck-axis` pide Poppins 500 en láminas que
+   * hoy se resuelven a 300, y darle la cara cambiaría propuestas ya entregadas.
+   */
+  readonly packExtensions?: readonly string[]
 }
 
 /**
@@ -76,10 +88,15 @@ export interface CatalogTokensOptions {
  * materializa dentro del catálogo (CSS + binarios copiados) para que el render sea hermético — sin
  * red, sin Google Fonts, sin fallback silencioso.
  */
-const buildFontsCss = (packDir: string): { fontsCss: string; fonts: PackFontEntry[] } => {
+const buildFontsCss = (
+  packDir: string,
+  packExtensions: readonly string[] = []
+): { fontsCss: string; fonts: PackFontEntry[] } => {
   const manifest = JSON.parse(fs.readFileSync(path.join(packDir, 'fonts.json'), 'utf8')) as {
     fonts: PackFontEntry[]
   }
+
+  const fonts = manifest.fonts.filter(font => !font.extension || packExtensions.includes(font.extension))
 
   const lines: string[] = [
     '/**',
@@ -90,7 +107,7 @@ const buildFontsCss = (packDir: string): { fontsCss: string; fonts: PackFontEntr
     ' */'
   ]
 
-  for (const font of manifest.fonts) {
+  for (const font of fonts) {
     if (!font.embedRights) {
       throw new FontEmbedRightsError(font.family, font.file)
     }
@@ -106,7 +123,7 @@ const buildFontsCss = (packDir: string): { fontsCss: string; fonts: PackFontEntr
     )
   }
 
-  return { fontsCss: `${lines.join('\n')}\n`, fonts: manifest.fonts }
+  return { fontsCss: `${lines.join('\n')}\n`, fonts }
 }
 
 /** Copia los binarios del pack al catálogo (el catálogo es autocontenido — lección del Slice 1b). */
@@ -122,7 +139,7 @@ export const syncPackFontBinariesTo = (catalogDir: string, packDir: string, font
 
 export const buildCatalogTokensCss = (options: CatalogTokensOptions): CatalogTokensBuild => {
   const compiled = compileBrandPack(options.pack, { rolePrefix: options.rolePrefix })
-  const { fontsCss, fonts } = buildFontsCss(options.packDir)
+  const { fontsCss, fonts } = buildFontsCss(options.packDir, options.packExtensions)
 
   // Type-family roles del pack: una plantilla pide el ROL (display/text), nunca 'Poppins'.
   const typeRoleLines = [

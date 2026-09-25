@@ -15,7 +15,16 @@
     "report-narrative",
     "report-analysis",
     "report-table",
-    "report-limits"
+    "report-limits",
+    "report-back-cover",
+    "report-chapter",
+    "report-summary",
+    "report-reading",
+    "report-plan",
+    "report-cover-navy",
+    "report-contents",
+    "report-dense-table",
+    "report-limits-v2"
   ],
   "templates": [
     {
@@ -95,6 +104,123 @@
       ],
       "prototype": "report-narrative.html",
       "slotsRef": "report-narrative.slots.json"
+    },
+    {
+      "name": "ReportBackCoverPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-back-cover"
+      ],
+      "prototype": "report-back-cover.html",
+      "slotsRef": "report-back-cover.slots.json"
+    },
+    {
+      "name": "ReportChapterPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-chapter"
+      ],
+      "prototype": "report-chapter.html",
+      "slotsRef": "report-chapter.slots.json"
+    },
+    {
+      "name": "ReportSummaryPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-summary"
+      ],
+      "prototype": "report-summary.html",
+      "slotsRef": "report-summary.slots.json"
+    },
+    {
+      "name": "ReportReadingPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-reading"
+      ],
+      "prototype": "report-reading.html",
+      "slotsRef": "report-reading.slots.json"
+    },
+    {
+      "name": "ReportPlanPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-plan"
+      ],
+      "prototype": "report-plan.html",
+      "slotsRef": "report-plan.slots.json"
+    },
+    {
+      "name": "ReportCoverNavyPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-cover-navy"
+      ],
+      "prototype": "report-cover-navy.html",
+      "slotsRef": "report-cover-navy.slots.json"
+    },
+    {
+      "name": "ReportContentsPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-contents"
+      ],
+      "prototype": "report-contents.html",
+      "slotsRef": "report-contents.slots.json"
+    },
+    {
+      "name": "ReportDenseTablePage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-dense-table"
+      ],
+      "prototype": "report-dense-table.html",
+      "slotsRef": "report-dense-table.slots.json"
+    },
+    {
+      "name": "ReportLimitsV2Page",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-limits-v2"
+      ],
+      "prototype": "report-limits-v2.html",
+      "slotsRef": "report-limits-v2.slots.json"
     }
   ],
   "selector": {
@@ -105,7 +231,16 @@
       "report-analysis": "ReportAnalysisPage",
       "report-table": "ReportTablePage",
       "report-limits": "ReportLimitsPage",
-      "report-narrative": "ReportNarrativePage"
+      "report-narrative": "ReportNarrativePage",
+      "report-back-cover": "ReportBackCoverPage",
+      "report-chapter": "ReportChapterPage",
+      "report-summary": "ReportSummaryPage",
+      "report-reading": "ReportReadingPage",
+      "report-plan": "ReportPlanPage",
+      "report-cover-navy": "ReportCoverNavyPage",
+      "report-contents": "ReportContentsPage",
+      "report-dense-table": "ReportDenseTablePage",
+      "report-limits-v2": "ReportLimitsV2Page"
     },
     "disambiguation": [
       "el índice real deriva de la primera página de cada sección del plan físico; nunca se calcula desde el título ni se pagina después del render.",

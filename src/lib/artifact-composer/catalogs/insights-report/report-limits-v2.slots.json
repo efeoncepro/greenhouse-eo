@@ -1,0 +1,175 @@
+{
+  "template": "ReportLimitsV2Page",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "TASK-1889 — límites y metodología A4 (el canvas no la diseñó).",
+  "viewport": {
+    "width": 794,
+    "height": 1123
+  },
+  "slots": {
+    "clientName": {
+      "selector": "[data-slot='clientName']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 40,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Nombre del cliente en la cabecera. Sin cliente, la caja queda vacía y la página no se mueve; nunca un nombre inventado. El logo llega con la portada sellada de TASK-1888."
+    },
+    "runningSection": {
+      "selector": "[data-slot='runningSection']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Sección de la página («Resumen ejecutivo»)."
+    },
+    "runningPeriod": {
+      "selector": "[data-slot='runningPeriod']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Período y comparación («Agosto 2026 · contra julio 2026»)."
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "assertion": {
+      "selector": "[data-slot='assertion']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 80,
+        "maxLines": 2,
+        "overflow": "reject",
+        "allowedTags": [
+          "em"
+        ]
+      }
+    },
+    "limits": {
+      "selector": "[data-slot='limits']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 12
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "subject": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 38,
+            "maxLines": 2
+          },
+          "cause": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 140,
+            "maxLines": 2
+          }
+        }
+      }
+    },
+    "methodologyLabel": {
+      "selector": "[data-slot='methodologyLabel']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 24,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "methodology": {
+      "selector": "[data-slot='methodology']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 8,
+        "maxCharactersPerItem": 200
+      },
+      "item": {
+        "type": "string"
+      }
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "footerContact": {
+      "selector": "[data-slot='footerContact']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "address": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 72,
+          "maxLines": 1
+        },
+        "phone": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        }
+      },
+      "notes": "Desde EFEONCE_CONTACT (dirección de presentación y teléfono de Chile)."
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
+      },
+      "notes": "«NN / total»: ambos del plan de páginas de la misma composición (paginateFlow), nunca un número fijo."
+    }
+  }
+}

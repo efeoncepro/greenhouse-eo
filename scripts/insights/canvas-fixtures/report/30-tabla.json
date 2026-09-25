@@ -1,0 +1,75 @@
+{
+  "reference": null,
+  "name": "tabla",
+  "catalog": "report",
+  "contentType": "report-dense-table",
+  "slots": {
+    "runningSection": "01 · Visibilidad orgánica",
+    "runningPeriod": "Agosto 2026 · contra julio 2026",
+    "eyebrow": "Tabla de respaldo",
+    "tableTitle": "Páginas con más impresiones y CTR bajo",
+    "tableColumns": [
+      {
+        "label": "Página"
+      },
+      {
+        "label": "Impresiones"
+      },
+      {
+        "label": "CTR"
+      }
+    ],
+    "tableRows": [
+      {
+        "entity": "/precios",
+        "valueA": "14.920",
+        "valueB": "0,9 %"
+      },
+      {
+        "entity": "/servicios",
+        "valueA": "11.305",
+        "valueB": "1,0 %"
+      },
+      {
+        "entity": "/preguntas-frecuentes",
+        "valueA": "8.410",
+        "valueB": "1,1 %"
+      },
+      {
+        "entity": "/blog/seo-local",
+        "valueA": "6.980",
+        "valueB": "1,4 %"
+      },
+      {
+        "entity": "/blog/que-es-aeo",
+        "valueA": "5.215",
+        "valueB": "1,6 %"
+      },
+      {
+        "entity": "/casos/retail",
+        "valueA": "4.870",
+        "valueB": "1,8 %"
+      },
+      {
+        "entity": "/nosotros",
+        "valueA": "3.990",
+        "valueB": "2,0 %"
+      },
+      {
+        "entity": "/contacto",
+        "valueA": "2.705",
+        "valueB": "2,4 %"
+      }
+    ],
+    "tableSource": "Fuente: Google Search Console · 31 de 31 días con dato",
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "footerContact": {
+      "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+      "phone": "+56 9 3732 3064"
+    },
+    "folio": {
+      "page": "13",
+      "total": "24"
+    }
+  }
+}

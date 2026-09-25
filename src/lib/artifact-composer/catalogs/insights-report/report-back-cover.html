@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  ReportBackCoverPage — contraportada institucional del informe A4 (TASK-1889, canvas aprobado
+  2026-09-25, página `Premium-Contraportada`).
+
+  La órbita cierra el recorrido que abrió la portada: el mismo anillo, con el arco y el punto en el
+  lado opuesto. Logo y eslogan al centro; abajo, el contacto institucional.
+
+  El contacto (correo, teléfonos, dirección), los mercados y la línea legal son SLOTS: el mapper los
+  lee de `src/config/efeonce-brand.ts`. Antes vivían escritos a mano en la contraportada de
+  `deck-axis`; un dato de contacto repetido en cada plantilla es un dato que tarde o temprano miente.
+
+  Chrome de la plantilla: logo, eslogan, burbuja de URL y el set de redes (orden y canales de
+  `EFEONCE_DOCUMENT_SOCIAL_CHANNELS`; un test compara este HTML contra el SSOT). Los íconos son SVG
+  del catálogo en línea: el trazado es el del asset y el color, un rol del pack.
+-->
+<link rel="stylesheet" href="report-tokens.css" />
+<link rel="stylesheet" href="report-fonts.css" />
+<link rel="stylesheet" href="report-editorial.css" />
+<style>
+  .orbit .halo-stop { stop-color: var(--axis-report-role-navyAccent); }
+
+  .orbit .ring { fill: none; stroke: var(--axis-report-role-halo); stroke-opacity: 0.14; stroke-width: 1; }
+
+  .orbit .arc { fill: none; stroke: var(--axis-report-role-navyAccent); stroke-width: 1.6; stroke-linecap: round; }
+
+  .orbit .dot { fill: var(--axis-report-role-navyAccent); }
+
+  .back-kicker {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 60px;
+    text-align: center;
+    font-family: var(--axis-report-type-display);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: rgba(var(--axis-report-role-navyMuted-rgb), 0.55);
+  }
+
+  .back-center {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 448px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .back-center .brand-logo { height: 46px; }
+
+  .back-rule { margin-top: 26px; width: 28px; height: 1.5px; background: var(--axis-report-role-navyAccent); }
+
+  .back-center .slogan {
+    margin-top: 22px;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    color: rgba(var(--axis-report-role-navyInk-rgb), 0.92);
+  }
+
+  .back-foot {
+    position: absolute;
+    left: 68px;
+    right: 68px;
+    bottom: 54px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .url-bubble { height: 18px; width: auto; display: block; mix-blend-mode: luminosity; }
+
+  .socials { display: flex; align-items: center; gap: 16px; opacity: 0.9; }
+
+  /* Íconos en línea: la forma es la del asset del catálogo y el color, un rol del pack. No se usa
+     `mask-image`: el catálogo se abre como archivo local y Chromium bloquea ese fetch (CORS): el ícono desaparece. */
+  .social { display: block; flex-shrink: 0; fill: var(--axis-report-role-navyMuted); }
+
+  /* El bloque de contacto no es una caja: sus dos líneas son hijas directas del pie (gap 14 px). */
+  .contact { display: contents; }
+
+  .contact-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    color: var(--axis-report-role-navyMuted);
+  }
+
+  /* Correo y teléfonos en cifras tabulares; la dirección, en proporcionales (así en el canvas). */
+  .contact-line--first { margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+  .contact-item { display: inline-flex; align-items: center; gap: 7px; }
+
+  .contact-icon { display: block; flex-shrink: 0; fill: var(--axis-report-role-halo); }
+
+  .contact-dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(var(--axis-report-role-halo-rgb), 0.55); }
+
+  .markets {
+    font-family: var(--axis-report-type-display);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(var(--axis-report-role-halo-rgb), 0.75);
+  }
+
+  .legal-rule { margin-top: 6px; width: 32px; height: 1px; background: rgba(var(--axis-report-role-navyInk-rgb), 0.18); }
+
+  .legal {
+    text-align: center;
+    font-size: 8px;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
+    color: rgba(var(--axis-report-role-navyMuted-rgb), 0.55);
+  }
+</style>
+</head>
+<body>
+  <div class="sheet sheet--navy">
+    <svg class="orbit art" width="794" height="1123" viewBox="0 0 794 1123" aria-hidden="true">
+      <defs>
+        <radialGradient id="backHalo" cx="397" cy="500" r="430" gradientUnits="userSpaceOnUse">
+          <stop class="halo-stop" offset="0" stop-opacity="0.11"></stop>
+          <stop class="halo-stop" offset="0.6" stop-opacity="0.025"></stop>
+          <stop class="halo-stop" offset="1" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+      <rect width="794" height="1123" fill="url(#backHalo)"></rect>
+      <circle class="ring" cx="397" cy="500" r="236"></circle>
+      <path class="arc" d="M 610.9 599.7 A 236 236 0 0 1 477.7 721.8"></path>
+      <circle class="dot" cx="477.7" cy="721.8" r="3.5"></circle>
+    </svg>
+
+    <span class="back-kicker" data-slot="editionLabel">Efeonce Insights · Agosto 2026</span>
+
+    <div class="back-center">
+      <img class="brand-logo" src="assets/brand/logo-negative.svg" alt="Efeonce" />
+      <span class="back-rule"></span>
+      <span class="slogan" data-brand="slogan"><span class="slogan-empower">Empower</span> <span class="slogan-your">your</span> <span class="slogan-growth">Growth</span></span>
+    </div>
+
+    <div class="back-foot">
+      <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+      <nav class="socials" data-slot="socialSet" aria-label="Redes sociales de Efeonce">
+        <svg class="social" data-channel="spotify" role="img" aria-label="Spotify" width="17" height="17" viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12s12-5.4 12-12S18.66 0 12 0m5.521 17.34c-.24.359-.66.48-1.021.24c-2.82-1.74-6.36-2.101-10.561-1.141c-.418.122-.779-.179-.899-.539c-.12-.421.18-.78.54-.9c4.56-1.021 8.52-.6 11.64 1.32c.42.18.479.659.301 1.02m1.44-3.3c-.301.42-.841.6-1.262.3c-3.239-1.98-8.159-2.58-11.939-1.38c-.479.12-1.02-.12-1.14-.6s.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2m.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721c-.18-.601.18-1.2.72-1.381c4.26-1.26 11.28-1.02 15.721 1.621c.539.3.719 1.02.419 1.56c-.299.421-1.02.599-1.559.3"/></svg>
+        <svg class="social" data-channel="instagram" role="img" aria-label="Instagram" width="17" height="17" viewBox="0 0 24 24"><path d="M7.03.084c-1.277.06-2.149.264-2.91.563a5.9 5.9 0 0 0-2.124 1.388a5.9 5.9 0 0 0-1.38 2.127C.321 4.926.12 5.8.064 7.076s-.069 1.688-.063 4.947s.021 3.667.083 4.947c.061 1.277.264 2.149.563 2.911c.308.789.72 1.457 1.388 2.123a5.9 5.9 0 0 0 2.129 1.38c.763.295 1.636.496 2.913.552c1.278.056 1.689.069 4.947.063s3.668-.021 4.947-.082c1.28-.06 2.147-.265 2.91-.563a5.9 5.9 0 0 0 2.123-1.388a5.9 5.9 0 0 0 1.38-2.129c.295-.763.496-1.636.551-2.912c.056-1.28.07-1.69.063-4.948c-.006-3.258-.02-3.667-.081-4.947c-.06-1.28-.264-2.148-.564-2.911a5.9 5.9 0 0 0-1.387-2.123a5.9 5.9 0 0 0-2.128-1.38c-.764-.294-1.636-.496-2.914-.55C15.647.009 15.236-.006 11.977 0S8.31.021 7.03.084m.14 21.693c-1.17-.05-1.805-.245-2.228-.408a3.7 3.7 0 0 1-1.382-.895a3.7 3.7 0 0 1-.9-1.378c-.165-.423-.363-1.058-.417-2.228c-.06-1.264-.072-1.644-.08-4.848c-.006-3.204.006-3.583.061-4.848c.05-1.169.246-1.805.408-2.228c.216-.561.477-.96.895-1.382a3.7 3.7 0 0 1 1.379-.9c.423-.165 1.057-.361 2.227-.417c1.265-.06 1.644-.072 4.848-.08c3.203-.006 3.583.006 4.85.062c1.168.05 1.804.244 2.227.408c.56.216.96.475 1.382.895s.681.817.9 1.378c.165.422.362 1.056.417 2.227c.06 1.265.074 1.645.08 4.848c.005 3.203-.006 3.583-.061 4.848c-.051 1.17-.245 1.805-.408 2.23c-.216.56-.477.96-.896 1.38a3.7 3.7 0 0 1-1.378.9c-.422.165-1.058.362-2.226.418c-1.266.06-1.645.072-4.85.079s-3.582-.006-4.848-.06m9.783-16.192a1.44 1.44 0 1 0 1.437-1.442a1.44 1.44 0 0 0-1.437 1.442M5.839 12.012a6.161 6.161 0 1 0 12.323-.024a6.162 6.162 0 0 0-12.323.024M8 12.008A4 4 0 1 1 12.008 16A4 4 0 0 1 8 12.008"/></svg>
+        <svg class="social" data-channel="linkedin" role="img" aria-label="LinkedIn" width="17" height="17" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037c-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85c3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.06 2.06 0 0 1-2.063-2.065a2.064 2.064 0 1 1 2.063 2.065m1.782 13.019H3.555V9h3.564zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
+        <svg class="social" data-channel="threads" role="img" aria-label="Threads" width="17" height="17" viewBox="0 0 24 24"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098c1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015c-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164c1.43 1.783 3.631 2.698 6.54 2.717c2.623-.02 4.358-.631 5.8-2.045c1.647-1.613 1.618-3.593 1.09-4.798c-.31-.71-.873-1.3-1.634-1.75c-.192 1.352-.622 2.446-1.284 3.272c-.886 1.102-2.14 1.704-3.73 1.79c-1.202.065-2.361-.218-3.259-.801c-1.063-.689-1.685-1.74-1.752-2.964c-.065-1.19.408-2.285 1.33-3.082c.88-.76 2.119-1.207 3.583-1.291a14 14 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757c-.513-.586-1.308-.883-2.359-.89h-.029c-.844 0-1.992.232-2.721 1.32l-1.757-1.18c.98-1.454 2.568-2.256 4.478-2.256h.044c3.194.02 5.097 1.975 5.287 5.388q.163.07.321.142c1.49.7 2.58 1.761 3.154 3.07c.797 1.82.871 4.79-1.548 7.158c-1.85 1.81-4.094 2.628-7.277 2.65Zm1.003-11.69q-.362 0-.739.021c-1.836.103-2.98.946-2.916 2.143c.067 1.256 1.452 1.839 2.784 1.767c1.224-.065 2.818-.543 3.086-3.71a10.5 10.5 0 0 0-2.215-.221"/></svg>
+        <svg class="social" data-channel="youtube" role="img" aria-label="YouTube" width="17" height="17" viewBox="0 0 24 24"><path d="M23.498 6.186a3.02 3.02 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.02 3.02 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.02 3.02 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.02 3.02 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814M9.545 15.568V8.432L15.818 12z"/></svg>
+        <svg class="social" data-channel="tiktok" role="img" aria-label="TikTok" width="17" height="17" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02c.08 1.53.63 3.09 1.75 4.17c1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97c-.57-.26-1.1-.59-1.62-.93c-.01 2.92.01 5.84-.02 8.75c-.08 1.4-.54 2.79-1.35 3.94c-1.31 1.92-3.58 3.17-5.91 3.21c-1.43.08-2.86-.31-4.08-1.03c-2.02-1.19-3.44-3.37-3.65-5.71c-.02-.5-.03-1-.01-1.49c.18-1.9 1.12-3.72 2.58-4.96c1.66-1.44 3.98-2.13 6.15-1.72c.02 1.48-.04 2.96-.04 4.44c-.99-.32-2.15-.23-3.02.37c-.63.41-1.11 1.04-1.36 1.75c-.21.51-.15 1.07-.14 1.61c.24 1.64 1.82 3.02 3.5 2.87c1.12-.01 2.19-.66 2.77-1.61c.19-.33.4-.67.41-1.06c.1-1.79.06-3.57.07-5.36c.01-4.03-.01-8.05.02-12.07"/></svg>
+      </nav>
+      <div class="contact" data-slot="contact">
+        <span class="contact-line contact-line--first">
+          <span class="contact-item"><svg class="contact-icon" aria-hidden="true" width="13" height="13" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M3.172 5.172C2 6.343 2 8.229 2 12s0 5.657 1.172 6.828S6.229 20 10 20h4c3.771 0 5.657 0 6.828-1.172S22 15.771 22 12s0-5.657-1.172-6.828S17.771 4 14 4h-4C6.229 4 4.343 4 3.172 5.172M18.576 7.52a.75.75 0 0 1-.096 1.056l-2.196 1.83c-.887.74-1.605 1.338-2.24 1.746c-.66.425-1.303.693-2.044.693s-1.384-.269-2.045-.693c-.634-.408-1.352-1.007-2.239-1.745L5.52 8.577a.75.75 0 0 1 .96-1.153l2.16 1.799c.933.777 1.58 1.315 2.128 1.667c.529.34.888.455 1.233.455s.704-.114 1.233-.455c.547-.352 1.195-.89 2.128-1.667l2.159-1.8a.75.75 0 0 1 1.056.097" clip-rule="evenodd"/></svg><span data-slot-field="email">sales@efeoncepro.com</span></span>
+          <span class="contact-dot"></span>
+          <span class="contact-item"><svg class="contact-icon" aria-hidden="true" width="13" height="13" viewBox="0 0 24 24"><path d="m15.556 14.548l-.455.48s-1.083 1.139-4.038-1.972s-1.872-4.25-1.872-4.25l.287-.303c.706-.744.773-1.938.156-2.81L8.374 3.91C7.61 2.83 6.135 2.688 5.26 3.609L3.691 5.26c-.433.457-.723 1.048-.688 1.705c.09 1.68.808 5.293 4.812 9.51c4.247 4.47 8.232 4.648 9.861 4.487c.516-.05.964-.329 1.325-.709l1.42-1.496c.96-1.01.69-2.74-.538-3.446l-1.91-1.1c-.806-.463-1.787-.327-2.417.336M13.26 1.88a.75.75 0 0 1 .861-.62c.025.005.107.02.15.03q.129.027.352.09c.297.087.712.23 1.21.458c.996.457 2.321 1.256 3.697 2.631c1.376 1.376 2.175 2.702 2.632 3.698c.228.498.37.912.457 1.21a6 6 0 0 1 .113.454l.005.031a.765.765 0 0 1-.617.878a.75.75 0 0 1-.86-.617a3 3 0 0 0-.081-.327a7.4 7.4 0 0 0-.38-1.004c-.39-.85-1.092-2.024-2.33-3.262s-2.411-1.939-3.262-2.329a7.4 7.4 0 0 0-1.003-.38a6 6 0 0 0-.318-.08a.76.76 0 0 1-.626-.861"/><path fill-rule="evenodd" d="M13.486 5.33a.75.75 0 0 1 .927-.516l-.206.721l.206-.72h.003l.003.001l.008.002l.02.006l.056.02q.067.023.177.07c.146.062.345.158.59.303c.489.29 1.157.77 1.942 1.556c.785.785 1.266 1.453 1.556 1.942c.145.245.241.444.303.59a3 3 0 0 1 .09.233l.005.02l.003.008v.003l.001.001s0 .002-.72.208l.72-.206a.75.75 0 0 1-1.439.422l-.003-.01l-.035-.088a4 4 0 0 0-.216-.417c-.223-.376-.626-.946-1.326-1.646s-1.269-1.102-1.646-1.325a4 4 0 0 0-.504-.25l-.01-.004a.75.75 0 0 1-.505-.925" clip-rule="evenodd"/></svg><span data-slot-field="phonePrimary">+56 9 3732 3064</span></span>
+          <span class="contact-dot"></span>
+          <span class="contact-item"><svg class="contact-icon" aria-hidden="true" width="13" height="13" viewBox="0 0 24 24"><path d="m15.556 14.548l-.455.48s-1.083 1.139-4.038-1.972s-1.872-4.25-1.872-4.25l.287-.303c.706-.744.773-1.938.156-2.81L8.374 3.91C7.61 2.83 6.135 2.688 5.26 3.609L3.691 5.26c-.433.457-.723 1.048-.688 1.705c.09 1.68.808 5.293 4.812 9.51c4.247 4.47 8.232 4.648 9.861 4.487c.516-.05.964-.329 1.325-.709l1.42-1.496c.96-1.01.69-2.74-.538-3.446l-1.91-1.1c-.806-.463-1.787-.327-2.417.336M13.26 1.88a.75.75 0 0 1 .861-.62c.025.005.107.02.15.03q.129.027.352.09c.297.087.712.23 1.21.458c.996.457 2.321 1.256 3.697 2.631c1.376 1.376 2.175 2.702 2.632 3.698c.228.498.37.912.457 1.21a6 6 0 0 1 .113.454l.005.031a.765.765 0 0 1-.617.878a.75.75 0 0 1-.86-.617a3 3 0 0 0-.081-.327a7.4 7.4 0 0 0-.38-1.004c-.39-.85-1.092-2.024-2.33-3.262s-2.411-1.939-3.262-2.329a7.4 7.4 0 0 0-1.003-.38a6 6 0 0 0-.318-.08a.76.76 0 0 1-.626-.861"/><path fill-rule="evenodd" d="M13.486 5.33a.75.75 0 0 1 .927-.516l-.206.721l.206-.72h.003l.003.001l.008.002l.02.006l.056.02q.067.023.177.07c.146.062.345.158.59.303c.489.29 1.157.77 1.942 1.556c.785.785 1.266 1.453 1.556 1.942c.145.245.241.444.303.59a3 3 0 0 1 .09.233l.005.02l.003.008v.003l.001.001s0 .002-.72.208l.72-.206a.75.75 0 0 1-1.439.422l-.003-.01l-.035-.088a4 4 0 0 0-.216-.417c-.223-.376-.626-.946-1.326-1.646s-1.269-1.102-1.646-1.325a4 4 0 0 0-.504-.25l-.01-.004a.75.75 0 0 1-.505-.925" clip-rule="evenodd"/></svg><span data-slot-field="phoneSecondary">+1 (239) 235-2073</span></span>
+        </span>
+        <span class="contact-line contact-line--address">
+          <span class="contact-item"><svg class="contact-icon" aria-hidden="true" width="13" height="13" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2c-4.418 0-8 4.003-8 8.5c0 4.462 2.553 9.312 6.537 11.174a3.45 3.45 0 0 0 2.926 0C17.447 19.812 20 14.962 20 10.5C20 6.003 16.418 2 12 2m0 10a2 2 0 1 0 0-4a2 2 0 0 0 0 4" clip-rule="evenodd"/></svg><span data-slot-field="address">Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile</span></span>
+        </span>
+      </div>
+      <span class="markets" data-slot="marketsLine">Chile · Estados Unidos · Colombia · México · Perú</span>
+      <span class="legal-rule"></span>
+      <span class="legal" data-slot="legalLine">Efeonce Group SpA · RUT 77.357.182-1 · Documento confidencial para uso exclusivo del cliente · Cifras al 31 de agosto de 2026</span>
+    </div>
+  </div>
+</body>
+</html>

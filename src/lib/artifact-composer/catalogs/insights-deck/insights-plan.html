@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  InsightsPlanSlide — plan de acción del deck (TASK-1889, canvas aprobado 2026-09-25, lámina
+  `Deck-Plan`, 1280×720).
+
+  Cifra protagonista (cuántas acciones), título y una fila por acción con su métrica de éxito y el
+  calendario por semana; franja «Qué necesitamos». Número y barra salen de resolvers: el autor
+  declara `weeks: "1-2"`, nunca un ancho.
+-->
+<link rel="stylesheet" href="deck-tokens.css" />
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="deck-editorial.css" />
+<style>
+  .plan-main {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 100px;
+    display: grid;
+    grid-template-columns: 330px minmax(0, 1fr);
+    gap: 56px;
+    align-items: start;
+  }
+
+  .plan-lead-col { display: flex; flex-direction: column; }
+
+  .plan-figure {
+    margin-top: 18px;
+    font-family: var(--axis-deck-type-display);
+    font-size: 132px;
+    line-height: 0.88;
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-deck-role-navyAccent);
+  }
+
+  .plan-figure-text { margin-top: 16px; font-size: 15px; line-height: 1.45; color: var(--axis-deck-role-navyMuted); }
+
+  .plan-lead-col .deck-rule { margin-top: 26px; }
+
+  .plan-title { margin: 22px 0 0; font-family: var(--axis-deck-type-display); font-size: 27px; line-height: 1.2; font-weight: 700; }
+
+  .plan-table { display: flex; flex-direction: column; padding-top: 6px; }
+
+  .plan-cols,
+  .action { display: grid; grid-template-columns: 34px minmax(0, 1fr) 210px 170px; column-gap: 18px; }
+
+  .plan-cols {
+    padding-bottom: 10px;
+    font-family: var(--axis-deck-type-display);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--axis-deck-role-dataPriorOnNavy);
+  }
+
+  .plan-weeks { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; }
+
+  .action { align-items: center; padding: 13px 0; border-top: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14); }
+
+  .action:last-child { border-bottom: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14); }
+
+  .action-number {
+    font-family: var(--axis-deck-type-display);
+    font-size: 22px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-deck-role-navyAccent);
+  }
+
+  .action-title { font-family: var(--axis-deck-type-display); font-size: 15px; font-weight: 600; line-height: 1.3; }
+
+  .action-metric { display: flex; flex-direction: column; gap: 2px; }
+
+  .action-metric-value { font-family: var(--axis-deck-type-display); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .action-metric-note { font-size: 12px; color: var(--axis-deck-role-dataPriorOnNavy); }
+
+  .week-track { position: relative; height: 10px; border-radius: 5px; background: rgba(var(--axis-deck-role-navyMuted-rgb), 0.14); }
+
+  .week-bar { position: absolute; top: 0; bottom: 0; border-radius: 5px; background: var(--axis-deck-role-navyAccent); }
+</style>
+</head>
+<body>
+  <div class="lamina">
+    <svg class="art" width="1280" height="720" viewBox="0 0 1280 720" aria-hidden="true">
+      <defs>
+        <radialGradient id="planHalo" cx="0.5" cy="0.5" r="0.5">
+          <stop class="halo-stop" offset="0" stop-opacity="0.2"></stop>
+          <stop class="halo-stop" offset="0.55" stop-opacity="0.06"></stop>
+          <stop class="halo-stop" offset="1" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+      <circle cx="230" cy="250" r="380" fill="url(#planHalo)"></circle>
+      <g class="orbit-rings">
+        <circle cx="1290" cy="740" r="230"></circle>
+        <circle cx="1290" cy="740" r="330"></circle>
+        <circle cx="1290" cy="740" r="430"></circle>
+      </g>
+    </svg>
+
+    <header class="deck-head">
+      <span class="deck-tab">
+        <span class="deck-tab-number" data-slot="tabNumber">P</span>
+        <span class="deck-tab-section" data-slot="section">Plan de acción</span>
+      </span>
+      <span class="deck-period" data-slot="period">Septiembre 2026</span>
+    </header>
+
+    <main class="plan-main">
+      <div class="plan-lead-col">
+        <span class="deck-eyebrow"><svg class="stroke-icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 5.5l1.5 1.5l2.5 -2.5"></path><path d="M3.5 11.5l1.5 1.5l2.5 -2.5"></path><path d="M3.5 17.5l1.5 1.5l2.5 -2.5"></path><path d="M11 6l9 0"></path><path d="M11 12l9 0"></path><path d="M11 18l9 0"></path></svg><span data-slot="eyebrow">Plan de septiembre</span></span>
+        <span class="plan-figure" data-slot="heroFigure">5</span>
+        <span class="plan-figure-text" data-slot="heroText">acciones para convertir mejor el tráfico que ya llega</span>
+        <span class="deck-rule"></span>
+        <h1 class="plan-title" data-slot="title">Cinco acciones, ordenadas por el impacto que esperamos</h1>
+      </div>
+      <div class="plan-table">
+        <div class="plan-cols" data-slot="columns">
+          <span data-slot-field="number">#</span>
+          <span data-slot-field="action">Acción</span>
+          <span data-slot-field="metric">Métrica de éxito</span>
+          <span class="plan-weeks" data-slot-field="weeks"><span>S1</span></span>
+        </div>
+        <div class="plan-actions" data-slot="actions">
+          <div class="action">
+            <span class="action-number" data-slot-field="number">1</span>
+            <span class="action-title" data-slot-field="title">Reescribir títulos y descripciones de tres páginas</span>
+            <span class="action-metric"><span class="action-metric-value" data-slot-field="metric">CTR de 0,9 % a 3,5 %</span><span class="action-metric-note" data-slot-field="metricNote">+380 clics al mes</span></span>
+            <div class="week-track" data-slot-field="weeks"><span class="week-bar"></span></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="deck-band" data-slot="ask"><span class="deck-band-label"><svg class="stroke-icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 18l6 -6"></path><path d="M13 6l6 6"></path></svg><span data-slot-field="label">Qué necesitamos</span></span><span class="deck-band-text" data-slot-field="text">Aprobar el plan de septiembre.</span></div>
+
+    <footer class="deck-foot2">
+      <span class="deck-foot2-id">
+        <img src="assets/brand/logo-negative.svg" alt="Efeonce" />
+        <span class="divider"></span>
+        <span class="deck-foot2-edition" data-slot="footerEdition">Insights · Informe de agosto 2026</span>
+      </span>
+      <span class="deck-foot2-end">
+        <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+        <span class="divider"></span>
+        <span class="deck-folio" data-slot="folio"><span class="deck-folio-page" data-slot-field="page">22</span><span class="deck-folio-total">/ <span data-slot-field="total">24</span></span></span>
+      </span>
+    </footer>
+  </div>
+</body>
+</html>

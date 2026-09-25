@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  ReportDenseTablePage — tabla densa de respaldo con el estilo editorial (TASK-1889). El canvas no
+  la diseñó: hereda el molde en papel aprobado. Una tabla NO es una figura: se lee y se audita. Las
+  columnas de valor se alinean a la derecha en cifras tabulares; una tabla que sigue lo declara.
+  Convive con la tabla v1 (`ReportTablePage`).
+-->
+<link rel="stylesheet" href="report-tokens.css" />
+<link rel="stylesheet" href="report-fonts.css" />
+<link rel="stylesheet" href="report-editorial.css" />
+<style>
+  .v2-eyebrow { margin-top: 38px; }
+
+  .v2-title {
+    margin: 16px 0 0;
+    max-width: 620px;
+    font-family: var(--axis-report-type-display);
+    font-size: 30px;
+    line-height: 1.16;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+
+  .v2-title em { font-style: normal; color: var(--axis-report-role-paperAccent); }
+
+  .table-title {
+    margin: 16px 0 0;
+    font-family: var(--axis-report-type-display);
+    font-size: 23px;
+    line-height: 1.24;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .table-continued { margin-top: 6px; font-size: 11px; font-style: italic; color: var(--axis-report-role-labelMuted); }
+
+  .table-continued:empty { display: none; }
+
+  table { margin-top: 22px; width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+
+  th {
+    padding: 0 0 8px;
+    text-align: left;
+    font-family: var(--axis-report-type-display);
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--axis-report-role-labelMuted);
+  }
+
+  td { padding: 7px 0; border-top: 1px solid var(--axis-report-role-rule); font-size: 12px; line-height: 1.4; color: var(--axis-report-role-paperInk); }
+
+  tbody tr:last-child td { border-bottom: 1px solid var(--axis-report-role-rule); }
+
+  th:not(:first-child),
+  td:not(:first-child) { text-align: right; padding-left: 16px; }
+
+  td:first-child { color: var(--axis-report-role-paperAccent); }
+
+  .table-source { margin: 12px 0 0; font-size: 10.5px; color: var(--axis-report-role-labelMuted); }
+</style>
+</head>
+<body>
+  <div class="sheet sheet--paper paper-page">
+    <header class="running">
+      <span class="running-client"><span class="running-client-name" data-slot="clientName">Nombre del cliente</span></span>
+      <span class="running-meta">
+        <span class="running-section" data-slot="runningSection">Resumen ejecutivo</span>
+        <span class="running-divider"></span>
+        <span data-slot="runningPeriod">Agosto 2026 · contra julio 2026</span>
+      </span>
+    </header>
+
+    <span class="page-eyebrow v2-eyebrow">
+      <svg class="stroke-icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14z"></path><path d="M3 10h18"></path><path d="M10 3v18"></path></svg><span data-slot="eyebrow">Tabla de respaldo</span>
+    </span>
+
+    <h2 class="table-title" data-slot="tableTitle">Páginas con más impresiones y CTR bajo</h2>
+    <p class="table-continued" data-slot="continuationLabel">Continúa de la página anterior</p>
+
+    <table>
+      <thead>
+        <tr data-slot="tableColumns"><th><span data-slot-field="label">Página</span></th></tr>
+      </thead>
+      <tbody data-slot="tableRows">
+        <tr>
+          <td><span data-slot-field="entity">/precios</span></td>
+          <td><span data-slot-field="valueA">12.480</span></td>
+          <td><span data-slot-field="valueB">0,9 %</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="table-source" data-slot="tableSource">Fuente: evidencia sellada de la edición</p>
+    <footer class="paper-foot">
+      <div class="paper-foot-rule"><span class="accent"></span><span class="line"></span></div>
+      <div class="paper-foot-row">
+        <div class="paper-foot-id">
+          <div class="paper-foot-lockup">
+            <img src="assets/brand/logo-full.svg" alt="Efeonce" />
+            <span class="divider"></span>
+            <span class="paper-foot-edition" data-slot="footerEdition">Insights · Informe de agosto 2026</span>
+          </div>
+          <div class="paper-foot-contact" data-slot="footerContact"><span data-slot-field="address">Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile</span><span class="dot"></span><span class="num" data-slot-field="phone">+56 9 3732 3064</span></div>
+        </div>
+        <div class="paper-foot-end">
+          <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+          <span class="divider"></span>
+          <span class="paper-folio" data-slot="folio"><span class="paper-folio-page" data-slot-field="page">03</span><span class="paper-folio-total">/ <span data-slot-field="total">24</span></span></span>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

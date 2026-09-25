@@ -1,0 +1,112 @@
+{
+  "reference": "Premium-Plan",
+  "catalog": "report",
+  "contentType": "report-plan",
+  "slots": {
+    "runningSection": "Plan de acción",
+    "runningPeriod": "Septiembre 2026",
+    "eyebrow": "Plan de septiembre",
+    "heroFigure": "5",
+    "heroText": "acciones para convertir mejor el tráfico que ya llega",
+    "title": "Cinco acciones, ordenadas por el impacto que esperamos",
+    "lead": "Cada una apunta a una métrica que leeremos en el informe de septiembre.",
+    "columns": {
+      "number": "#",
+      "action": "Acción",
+      "metric": "Métrica de éxito",
+      "weeks": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ]
+    },
+    "actions": [
+      {
+        "title": "Reescribir títulos y descripciones de tres páginas",
+        "detail": "/precios, /servicios y /preguntas-frecuentes: 31 % de las impresiones, CTR bajo 1,1 %.",
+        "evidence": "Evidencia p. 13",
+        "impactLabel": "Impacto",
+        "impact": "3",
+        "effortLabel": "Esfuerzo",
+        "effort": "1",
+        "metric": "CTR de 0,9 % a 3,5 %",
+        "metricNote": "+380 clics al mes",
+        "weeks": "1-2"
+      },
+      {
+        "title": "Probar un formulario corto en /servicios y /precios",
+        "detail": "Es el paso más débil del embudo: hoy convierte 5,9 %.",
+        "evidence": "Evidencia p. 20",
+        "impactLabel": "Impacto",
+        "impact": "3",
+        "effortLabel": "Esfuerzo",
+        "effort": "2",
+        "metric": "De 5,9 % a 8 %",
+        "metricNote": "visita a formulario",
+        "weeks": "1-3"
+      },
+      {
+        "title": "Publicar contenido citable por la IA",
+        "detail": "Respuestas directas y datos con fuente en las 14 páginas que ya rankean.",
+        "evidence": "Evidencia p. 16",
+        "impactLabel": "Impacto",
+        "impact": "3",
+        "effortLabel": "Esfuerzo",
+        "effort": "3",
+        "metric": "Citas con enlace de 19 a 25",
+        "metricNote": "de 50 respuestas",
+        "weeks": "2-4"
+      },
+      {
+        "title": "Enlazar internamente las keywords cercanas",
+        "detail": "Las 21 keywords en posiciones 11 a 20 están a un paso de la página 1.",
+        "evidence": "Evidencia p. 07",
+        "impactLabel": "Impacto",
+        "impact": "2",
+        "effortLabel": "Esfuerzo",
+        "effort": "1",
+        "metric": "+5 keywords",
+        "metricNote": "en primera página",
+        "weeks": "1-4"
+      },
+      {
+        "title": "Comprimir las imágenes del blog",
+        "detail": "Pasarlas a WebP es lo único que falta para llegar a la meta técnica.",
+        "evidence": "Evidencia p. 14",
+        "impactLabel": "Impacto",
+        "impact": "2",
+        "effortLabel": "Esfuerzo",
+        "effort": "1",
+        "metric": "Salud técnica de 78 a 85",
+        "metricNote": "de 100 puntos",
+        "weeks": "1"
+      }
+    ],
+    "closing": [
+      {
+        "kind": "measure",
+        "label": "Cómo lo mediremos",
+        "text": "Contra la línea base de agosto, en el informe de septiembre."
+      },
+      {
+        "kind": "action",
+        "label": "Qué necesitamos de ustedes",
+        "text": "Aprobar el plan y dar acceso de edición a /precios y /servicios.",
+        "signature": "Recomendación de Efeonce"
+      }
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "footerContact": {
+      "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+      "phone": "+56 9 3732 3064"
+    },
+    "folio": {
+      "page": "22",
+      "total": "24"
+    }
+  },
+  "knownDifferences": [
+    "Cabecera, recuadro punteado «Logo del cliente»: marcador de posición del canvas."
+  ]
+}

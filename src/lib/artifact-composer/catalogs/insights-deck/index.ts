@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url'
 
 import type { ArtifactCatalog } from '../../catalog'
 import { axisPackDir } from '../../brand-packs/axis'
+import { makeChapterNumeralHook } from '../insights-shared/layout-hooks'
 import { insightsDeckResolvers } from './resolvers'
 
 export const insightsDeckCatalogDir = path.dirname(fileURLToPath(import.meta.url))
@@ -30,9 +31,11 @@ export const insightsDeckCatalog: ArtifactCatalog = {
   templatesDir: insightsDeckCatalogDir,
   outputTarget: 'pdf-merged',
   resolvers: insightsDeckResolvers,
+  layoutHooks: { InsightsChapterSlide: makeChapterNumeralHook(1330) },
   brand: {
     packName: 'axis',
     compiledFiles: ['deck-tokens.css', 'deck-fonts.css'],
-    fontsManifestPath: path.join(axisPackDir, 'fonts.json')
+    fontsManifestPath: path.join(axisPackDir, 'fonts.json'),
+    packExtensions: ['editorial']
   }
 }

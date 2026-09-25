@@ -1,0 +1,40 @@
+{
+  "reference": null,
+  "name": "limites",
+  "catalog": "report",
+  "contentType": "report-limits-v2",
+  "slots": {
+    "runningSection": "Límites y metodología",
+    "runningPeriod": "Agosto 2026",
+    "eyebrow": "Límites de la edición",
+    "assertion": "Lo que esta edición <em>no</em> puede afirmar",
+    "limits": [
+      {
+        "subject": "Posiciones promedio",
+        "cause": "Search Console entrega un promedio ponderado por impresiones; no es la posición de cada búsqueda."
+      },
+      {
+        "subject": "Respuestas de IA",
+        "cause": "50 consultas por motor en una ventana de 7 días; los motores cambian sus respuestas entre corridas."
+      },
+      {
+        "subject": "Conversiones",
+        "cause": "Los formularios se cuentan desde el CRM; las llamadas telefónicas no quedan registradas."
+      }
+    ],
+    "methodologyLabel": "Metodología",
+    "methodology": [
+      "Las cifras provienen del snapshot sellado de la edición; ninguna se recalcula al dibujar.",
+      "Cada variación compara la misma ventana del período anterior."
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "footerContact": {
+      "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+      "phone": "+56 9 3732 3064"
+    },
+    "folio": {
+      "page": "23",
+      "total": "24"
+    }
+  }
+}

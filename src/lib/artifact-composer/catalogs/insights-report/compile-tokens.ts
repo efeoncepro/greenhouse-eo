@@ -18,7 +18,7 @@ import {
   type PackFontEntry
 } from '../../compile-catalog-tokens'
 import { buildAxisBrandPack, axisPackDir } from '../../brand-packs/axis'
-import { insightsReportCatalogDir } from './index'
+import { insightsReportCatalogDir, insightsReportCatalog } from './index'
 
 export const REPORT_TOKENS_PATH = path.join(insightsReportCatalogDir, 'report-tokens.css')
 export const REPORT_FONTS_PATH = path.join(insightsReportCatalogDir, 'report-fonts.css')
@@ -35,5 +35,6 @@ export const buildInsightsReportTokensCss = (): InsightsReportTokensBuild =>
     catalogName: 'insights-report',
     packDir: axisPackDir,
     rolePrefix: 'axis-report',
-    pack: buildAxisBrandPack()
+    pack: buildAxisBrandPack({ editorial: true }),
+    packExtensions: insightsReportCatalog.brand?.packExtensions
   })

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  ReportSummaryPage — resumen ejecutivo del informe A4 (TASK-1889, canvas aprobado 2026-09-25,
+  página `Premium-Resumen`).
+
+  Tesis del mes + «Lo esencial del mes» (hasta 5 hechos, cada uno con su cifra y el folio de la
+  página que lo prueba) + panel «Para decidir». El ordinal de cada hecho sale de su posición, no
+  lo escribe el autor. Un plan sin decisión compone sin panel.
+-->
+<link rel="stylesheet" href="report-tokens.css" />
+<link rel="stylesheet" href="report-fonts.css" />
+<link rel="stylesheet" href="report-editorial.css" />
+<style>
+  .summary-eyebrow { margin-top: 38px; }
+
+  .summary-thesis {
+    margin: 16px 0 0;
+    max-width: 610px;
+    font-family: var(--axis-report-type-display);
+    font-size: 30px;
+    line-height: 1.16;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+
+  .summary-lead { margin: 16px 0 0; max-width: 610px; font-size: 14.5px; line-height: 1.65; color: var(--axis-report-role-paperAccent); }
+
+  .essentials-label { margin-top: 30px; }
+
+  .essentials { margin-top: 12px; display: flex; flex-direction: column; }
+
+  .essential {
+    display: grid;
+    grid-template-columns: 30px 124px minmax(0, 1fr) 46px;
+    align-items: start;
+    column-gap: 16px;
+    padding: 15px 0;
+    border-top: 1px solid var(--axis-report-role-rule);
+  }
+
+  .essential:last-child { border-bottom: 1px solid var(--axis-report-role-rule); }
+
+  .essential-ordinal {
+    font-family: var(--axis-report-type-display);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-report-role-labelMuted);
+    padding-top: 5px;
+  }
+
+  .essential-figure {
+    font-family: var(--axis-report-type-display);
+    font-size: 25px;
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-report-role-paperAccent);
+    white-space: nowrap;
+  }
+
+  .essential-copy { display: flex; flex-direction: column; gap: 4px; }
+
+  .essential-title {
+    font-family: var(--axis-report-type-display);
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--axis-report-role-paperInk);
+  }
+
+  .essential-detail { font-size: 12.5px; line-height: 1.55; color: var(--axis-report-role-paperAccent); }
+
+  .essential-detail strong { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--axis-report-role-paperInk); }
+
+  .essential-folio { justify-self: end; padding-top: 4px; }
+
+  .summary-decision:empty { display: none; }
+</style>
+</head>
+<body>
+  <div class="sheet sheet--paper paper-page">
+    <header class="running">
+      <span class="running-client"><span class="running-client-name" data-slot="clientName">Nombre del cliente</span></span>
+      <span class="running-meta">
+        <span class="running-section" data-slot="runningSection">Resumen ejecutivo</span>
+        <span class="running-divider"></span>
+        <span data-slot="runningPeriod">Agosto 2026 · contra julio 2026</span>
+      </span>
+    </header>
+
+    <span class="page-eyebrow summary-eyebrow">
+      <svg class="stroke-icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v4a1 1 0 0 0 1 1h4"></path><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path><path d="M9 9h1"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg><span data-slot="eyebrow">Resumen ejecutivo</span>
+    </span>
+
+    <h1 class="summary-thesis" data-slot="thesis">Agosto trajo más clics y más oportunidades. La brecha ahora está en convertir.</h1>
+    <p class="summary-lead" data-slot="thesisLead">El sitio recibió más clics desde Google con menos impresiones.</p>
+
+    <span class="rule-label essentials-label"><span class="rule-label-bar"></span><span data-slot="essentialsLabel">Lo esencial del mes</span></span>
+
+    <div class="essentials" data-slot="essentials">
+      <div class="essential">
+        <span class="essential-ordinal" data-slot-field="ordinal">01</span>
+        <span class="essential-figure" data-slot-field="figure">+16,5 %</span>
+        <div class="essential-copy">
+          <span class="essential-title" data-slot-field="title">Más clics con menos impresiones.</span>
+          <span class="essential-detail" data-slot-field="detail">El CTR subió de 2,12 % a 2,66 %.</span>
+        </div>
+        <span class="essential-folio"><span class="folio-chip" data-slot-field="folio">p. 06</span></span>
+      </div>
+    </div>
+
+    <div class="grow"></div>
+
+    <div class="closing summary-decision" data-slot="decision"><div class="closing-block">
+        <span class="closing-label"><svg class="stroke-icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 18l6 -6"></path><path d="M13 6l6 6"></path></svg><span data-slot-field="label">Para decidir en la reunión</span></span>
+        <p class="closing-text" data-slot-field="text">Aprobar el plan de septiembre.</p>
+        <span class="closing-signature" data-slot-field="signature">Recomendación de Efeonce</span>
+      </div></div>
+
+    <footer class="paper-foot">
+      <div class="paper-foot-rule"><span class="accent"></span><span class="line"></span></div>
+      <div class="paper-foot-row">
+        <div class="paper-foot-id">
+          <div class="paper-foot-lockup">
+            <img src="assets/brand/logo-full.svg" alt="Efeonce" />
+            <span class="divider"></span>
+            <span class="paper-foot-edition" data-slot="footerEdition">Insights · Informe de agosto 2026</span>
+          </div>
+          <div class="paper-foot-contact" data-slot="footerContact"><span data-slot-field="address">Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile</span><span class="dot"></span><span class="num" data-slot-field="phone">+56 9 3732 3064</span></div>
+        </div>
+        <div class="paper-foot-end">
+          <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+          <span class="divider"></span>
+          <span class="paper-folio" data-slot="folio"><span class="paper-folio-page" data-slot-field="page">03</span><span class="paper-folio-total">/ <span data-slot-field="total">24</span></span></span>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

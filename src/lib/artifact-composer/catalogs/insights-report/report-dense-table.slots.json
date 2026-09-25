@@ -1,0 +1,195 @@
+{
+  "template": "ReportDenseTablePage",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "TASK-1889 — tabla densa de respaldo A4 (el canvas no la diseñó).",
+  "viewport": {
+    "width": 794,
+    "height": 1123
+  },
+  "slots": {
+    "clientName": {
+      "selector": "[data-slot='clientName']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 40,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Nombre del cliente en la cabecera. Sin cliente, la caja queda vacía y la página no se mueve; nunca un nombre inventado. El logo llega con la portada sellada de TASK-1888."
+    },
+    "runningSection": {
+      "selector": "[data-slot='runningSection']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Sección de la página («Resumen ejecutivo»)."
+    },
+    "runningPeriod": {
+      "selector": "[data-slot='runningPeriod']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Período y comparación («Agosto 2026 · contra julio 2026»)."
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "tableTitle": {
+      "selector": "[data-slot='tableTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 80,
+        "maxLines": 2,
+        "overflow": "reject"
+      }
+    },
+    "continuationLabel": {
+      "selector": "[data-slot='continuationLabel']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "tableColumns": {
+      "selector": "[data-slot='tableColumns']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 2,
+        "maxItems": 3
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 24,
+            "maxLines": 1
+          }
+        }
+      }
+    },
+    "tableRows": {
+      "selector": "[data-slot='tableRows']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 24
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "entity": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 64,
+            "maxLines": 1
+          },
+          "valueA": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 16,
+            "maxLines": 1
+          },
+          "valueB": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 16,
+            "maxLines": 1
+          }
+        }
+      }
+    },
+    "tableSource": {
+      "selector": "[data-slot='tableSource']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 120,
+        "maxLines": 2,
+        "overflow": "reject"
+      }
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "footerContact": {
+      "selector": "[data-slot='footerContact']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "address": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 72,
+          "maxLines": 1
+        },
+        "phone": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        }
+      },
+      "notes": "Desde EFEONCE_CONTACT (dirección de presentación y teléfono de Chile)."
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
+      },
+      "notes": "«NN / total»: ambos del plan de páginas de la misma composición (paginateFlow), nunca un número fijo."
+    }
+  }
+}

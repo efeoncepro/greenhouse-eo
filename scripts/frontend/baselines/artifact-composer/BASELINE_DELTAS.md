@@ -1,5 +1,38 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-25 — TASK-1889: plantillas editoriales de Insights (canvas aprobado)
+
+Nacen las plantillas del diseño premium aprobado por el operador el 2026-09-25. **Todas son
+plantillas NUEVAS con contentType propio.** Las v1 de TASK-1847 siguen intactas porque las ediciones
+v1 (flag de TASK-1888 apagado) componen con ellas: sus 10 frames se verificaron **byte-idénticos** al
+baseline después del cambio de pack (Poppins 500 y extensión editorial, opt-in de los catálogos
+Insights; `deck-axis` no los recibe y su CSS compilado queda byte-idéntico).
+
+La fidelidad al canvas se mide aparte (`pnpm insights:canvas-fidelity`): 11 páginas con referencia,
+todas ≤ 0,05 % de píxeles distintos (seis en 0 px). Estos frames son el probe sintético de siempre, el
+guard de regresión del molde y los slots, no la prueba de fidelidad.
+
+**Frames declarados para promoción (15 nuevos):**
+
+- `templates-insights-report/ReportCoverNavyPage.png` — portada navy (`Premium-Portada`)
+- `templates-insights-report/ReportBackCoverPage.png` — contraportada (`Premium-Contraportada`)
+- `templates-insights-report/ReportChapterPage.png` — apertura de capítulo (`Premium-Capitulo*`)
+- `templates-insights-report/ReportSummaryPage.png` — resumen ejecutivo (`Premium-Resumen`)
+- `templates-insights-report/ReportReadingPage.png` — nuestra lectura (`Premium-Lectura`)
+- `templates-insights-report/ReportPlanPage.png` — plan de acción (`Premium-Plan`)
+- `templates-insights-report/ReportContentsPage.png` — índice editorial (sin página en el canvas)
+- `templates-insights-report/ReportDenseTablePage.png` — tabla densa editorial (sin página en el canvas)
+- `templates-insights-report/ReportLimitsV2Page.png` — límites editoriales (sin página en el canvas)
+- `templates-insights-deck/InsightsSummarySlide.png` — resumen (`Deck-Resumen`, 1280×720)
+- `templates-insights-deck/InsightsReadingSlide.png` — lectura (`Deck-Lectura`)
+- `templates-insights-deck/InsightsPlanSlide.png` — plan (`Deck-Plan`)
+- `templates-insights-deck/InsightsCoverNavySlide.png` — portada del deck, derivada de la A4
+- `templates-insights-deck/InsightsChapterSlide.png` — apertura del deck, derivada de la A4
+- `templates-insights-deck/InsightsBackCoverSlide.png` — contraportada del deck, derivada de la A4
+
+⚠️ Las tres últimas no tienen diseño en el canvas y están **en revisión del operador**. Si cambian,
+se re-declaran aquí y se re-promueven; no se edita el PNG a mano.
+
 ## 2026-09-24 — Declaración del set de Insights con el índice A4
 
 La ampliación de TASK-1847 agrega `ReportIndexPage.png` al set visual. El índice se deriva del plan
@@ -382,7 +415,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: e959a6f6f779a2149617cbbc50621e30d2fe8fdd62ca7c23c250ca272a17121a -->
+<!-- manifest-digest: 1e84b71ea66898556412eabfc295952567f9b29dda4340e3fb246d1fe5f7a165 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

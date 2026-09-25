@@ -1,0 +1,62 @@
+{
+  "reference": "Premium-Resumen",
+  "catalog": "report",
+  "contentType": "report-summary",
+  "slots": {
+    "runningSection": "Resumen ejecutivo",
+    "runningPeriod": "Agosto 2026 · contra julio 2026",
+    "eyebrow": "Resumen ejecutivo",
+    "thesis": "Agosto trajo más clics y más oportunidades. La brecha ahora está en convertir.",
+    "thesisLead": "El sitio recibió 16,5 % más clics desde Google con menos impresiones, y la marca ya aparece en 31 de cada 50 respuestas de IA. El freno está en dos pasos: que la IA nos cite con enlace y que las visitas se conviertan en contacto. El plan de septiembre ataca ambos.",
+    "essentialsLabel": "Lo esencial del mes",
+    "essentials": [
+      {
+        "figure": "+16,5 %",
+        "title": "Más clics con menos impresiones.",
+        "detail": "El CTR subió de 2,12 % a 2,66 %: cada punto de CTR vale unos <strong>480 clics al mes</strong>.",
+        "folio": "p. 06"
+      },
+      {
+        "figure": "60 %",
+        "title": "El alza viene de audiencia nueva.",
+        "detail": "<strong>772 de 1.284</strong> clics llegaron sin buscar la marca; crecieron 28 % contra julio.",
+        "folio": "p. 10"
+      },
+      {
+        "figure": "31 de 50",
+        "title": "La IA ya conoce la marca, pero no siempre la cita.",
+        "detail": "Sólo <strong>19 respuestas</strong> enlazan al sitio; en 14 consultas rankeamos en Google y la IA no nos cita.",
+        "folio": "p. 16"
+      },
+      {
+        "figure": "5,9 %",
+        "title": "La fuga está en el paso a contacto.",
+        "detail": "De 690 visitas con interacción salieron 41 formularios y <strong>18 oportunidades</strong> calificadas.",
+        "folio": "p. 20"
+      },
+      {
+        "figure": "78 / 100",
+        "title": "La base técnica acompaña.",
+        "detail": "Velocidad y rastreo están sanos; las <strong>imágenes del blog</strong> son lo único que deja el sitio bajo la meta.",
+        "folio": "p. 14"
+      }
+    ],
+    "decision": {
+      "label": "Para decidir en la reunión",
+      "text": "Aprobar el plan de septiembre (p. 22): cinco acciones para convertir mejor el tráfico que ya llega. Las dos primeras pueden estar en producción en dos semanas.",
+      "signature": "Recomendación de Efeonce"
+    },
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "footerContact": {
+      "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+      "phone": "+56 9 3732 3064"
+    },
+    "folio": {
+      "page": "03",
+      "total": "24"
+    }
+  },
+  "knownDifferences": [
+    "Cabecera, recuadro punteado «Logo del cliente» (x 68–188, y 48–78): marcador de posición del canvas; el informe real muestra el nombre o el logo del cliente."
+  ]
+}

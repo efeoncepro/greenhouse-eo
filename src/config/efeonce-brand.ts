@@ -56,6 +56,37 @@ export const EFEONCE_LEGAL_ADDRESS_FALLBACK = 'Dr. Manuel Barros Borgoño 71 Of 
 export const EFEONCE_OPERATING_MARKETS = ['Chile', 'Estados Unidos', 'Colombia', 'México', 'Perú'] as const
 
 /**
+ * Institutional contact printed on documents (TASK-1889: back cover and footer of every Insights
+ * report). Before this constant the same data lived hand-typed inside catalog templates
+ * (`deck-axis/back-cover-full.html`); documents now read it from here.
+ *
+ * `addressDisplay` is the presentation form (short, legible in a footer). The legal address stays
+ * `EFEONCE_LEGAL_ADDRESS_FALLBACK` / `getOperatingEntityIdentity()`.
+ */
+export const EFEONCE_CONTACT = {
+  email: 'sales@efeoncepro.com',
+  phones: [
+    { market: 'Chile', display: '+56 9 3732 3064' },
+    { market: 'Estados Unidos', display: '+1 (239) 235-2073' }
+  ],
+  addressDisplay: 'Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile'
+} as const
+
+/**
+ * Social channels shown (as icons, in this order) on printed documents. Wider than
+ * `EFEONCE_SOCIAL_LINKS`, which feeds clickable surfaces (emails) and only lists profiles with a
+ * canonical URL there.
+ */
+export const EFEONCE_DOCUMENT_SOCIAL_CHANNELS = [
+  { channel: 'spotify', label: 'Spotify' },
+  { channel: 'instagram', label: 'Instagram' },
+  { channel: 'linkedin', label: 'LinkedIn' },
+  { channel: 'threads', label: 'Threads' },
+  { channel: 'youtube', label: 'YouTube' },
+  { channel: 'tiktok', label: 'TikTok' }
+] as const
+
+/**
  * Efeonce slogan — "Empower your Growth".
  *
  * Typography contract (Poppins, per the operator + DESIGN.md):

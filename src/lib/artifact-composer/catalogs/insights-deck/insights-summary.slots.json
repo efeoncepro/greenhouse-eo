@@ -1,0 +1,178 @@
+{
+  "template": "InsightsSummarySlide",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "TASK-1889 — resumen ejecutivo del deck (lámina `Deck-Resumen`, 1280×720).",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "slots": {
+    "tabNumber": {
+      "selector": "[data-slot='tabNumber']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 2,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Número de capítulo de la pestaña («00» en el resumen)."
+    },
+    "section": {
+      "selector": "[data-slot='section']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "period": {
+      "selector": "[data-slot='period']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "thesis": {
+      "selector": "[data-slot='thesis']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 120,
+        "maxLines": 4,
+        "overflow": "reject"
+      }
+    },
+    "thesisLead": {
+      "selector": "[data-slot='thesisLead']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 200,
+        "maxLines": 4,
+        "overflow": "reject"
+      }
+    },
+    "essentialsLabel": {
+      "selector": "[data-slot='essentialsLabel']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "essentials": {
+      "selector": "[data-slot='essentials']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 5
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "ordinal": {
+            "type": "string",
+            "required": false,
+            "resolver": "deck-ordinal",
+            "consumer": "resolver-only"
+          },
+          "figure": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 12,
+            "maxLines": 1
+          },
+          "title": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 60,
+            "maxLines": 2
+          },
+          "folio": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 8,
+            "maxLines": 1
+          }
+        }
+      }
+    },
+    "decision": {
+      "selector": "[data-slot='decision']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 140,
+          "maxLines": 2
+        }
+      }
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
+      },
+      "notes": "«NN / total» del plan de láminas de la misma composición."
+    }
+  }
+}

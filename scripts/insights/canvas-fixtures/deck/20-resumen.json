@@ -1,0 +1,50 @@
+{
+  "reference": "Deck-Resumen",
+  "catalog": "deck",
+  "contentType": "insights-summary",
+  "slots": {
+    "tabNumber": "00",
+    "section": "Resumen ejecutivo",
+    "period": "Agosto 2026 · contra julio 2026",
+    "eyebrow": "La tesis del mes",
+    "thesis": "Agosto trajo más clics y más oportunidades. La brecha ahora está en convertir.",
+    "thesisLead": "El freno está en dos pasos: que la IA nos cite con enlace y que las visitas se conviertan en contacto. El plan de septiembre ataca ambos.",
+    "essentialsLabel": "Lo esencial del mes",
+    "essentials": [
+      {
+        "figure": "+16,5 %",
+        "title": "Más clics con menos impresiones.",
+        "folio": "p. 06"
+      },
+      {
+        "figure": "60 %",
+        "title": "El alza viene de audiencia nueva.",
+        "folio": "p. 10"
+      },
+      {
+        "figure": "31 de 50",
+        "title": "La IA ya conoce la marca, pero no siempre la cita.",
+        "folio": "p. 16"
+      },
+      {
+        "figure": "5,9 %",
+        "title": "La fuga está en el paso a contacto.",
+        "folio": "p. 20"
+      },
+      {
+        "figure": "78 / 100",
+        "title": "La base técnica acompaña.",
+        "folio": "p. 14"
+      }
+    ],
+    "decision": {
+      "label": "Para decidir",
+      "text": "Aprobar el plan de septiembre: las dos primeras acciones pueden estar en producción en dos semanas."
+    },
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "folio": {
+      "page": "03",
+      "total": "24"
+    }
+  }
+}

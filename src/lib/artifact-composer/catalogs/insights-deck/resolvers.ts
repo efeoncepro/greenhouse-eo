@@ -8,10 +8,22 @@
 
 import type { ResolverRegistry } from '../../resolver-contract'
 import { familyAwareBarEffects, figureFamilyEffects, figurePathEffects } from '../../chart-figure'
+import { insightsEditorialResolvers } from '../insights-shared/editorial-resolvers'
 
 export { parsePrintedNumber } from '../../bar-figure'
 
 export const insightsDeckResolvers: ResolverRegistry = {
+  /** Resolvers editoriales compartidos (TASK-1889): canal, ordinal, número, puntos, semanas, cierre. */
+  ...insightsEditorialResolvers('deck'),
+  /** Tono de un bloque de la lectura: `focus` lleva el filete teal (el bloque que carga el argumento). */
+  'deck-block-tone': {
+    known: ['default', 'focus'],
+    build: value =>
+      value === 'focus' || value === 'default'
+        ? [{ selector: ':self', toneClass: `block--${value}`, toneGroup: ['block--default', 'block--focus'] }]
+        : null
+  },
+
   /** El largo de cada barra sale del dato, recalculado. Una barra escrita a mano es fabricación. */
   'insights-bar-geometry': {
     known: ['<derivado de value/valuePct>'],

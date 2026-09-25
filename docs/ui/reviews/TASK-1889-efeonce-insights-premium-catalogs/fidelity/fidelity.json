@@ -1,0 +1,93 @@
+{
+  "criterion": "≤ 1 % de píxeles distintos (pixelmatch, umbral 0,1)",
+  "rows": [
+    {
+      "reference": "Deck-Lectura",
+      "template": "InsightsReadingSlide",
+      "changed": 0,
+      "total": 921600,
+      "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Deck-Plan",
+      "template": "InsightsPlanSlide",
+      "changed": 0,
+      "total": 921600,
+      "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Deck-Resumen",
+      "template": "InsightsSummarySlide",
+      "changed": 0,
+      "total": 921600,
+      "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Capitulo",
+      "template": "ReportChapterPage",
+      "changed": 0,
+      "total": 891662,
+      "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Capitulo-02",
+      "template": "ReportChapterPage",
+      "changed": 0,
+      "total": 891662,
+      "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Capitulo-03",
+      "template": "ReportChapterPage",
+      "changed": 0,
+      "total": 891662,
+      "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Contraportada",
+      "template": "ReportBackCoverPage",
+      "changed": 0,
+      "total": 891662,
+      "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Lectura",
+      "template": "ReportReadingPage",
+      "changed": 243,
+      "total": 891662,
+      "ratio": 0.0002725247907839518,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Plan",
+      "template": "ReportPlanPage",
+      "changed": 234,
+      "total": 891662,
+      "ratio": 0.0002624312800141758,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Portada",
+      "template": "ReportCoverNavyPage",
+      "changed": 426,
+      "total": 891662,
+      "ratio": 0.0004777595097693969,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Resumen",
+      "template": "ReportSummaryPage",
+      "changed": 262,
+      "total": 891662,
+      "ratio": 0.0002938333135201455,
+      "pass": true
+    }
+  ]
+}

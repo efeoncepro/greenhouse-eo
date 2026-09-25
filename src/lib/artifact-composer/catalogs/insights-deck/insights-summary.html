@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  InsightsSummarySlide — resumen ejecutivo del deck (TASK-1889, canvas aprobado 2026-09-25, lámina
+  `Deck-Resumen`, 1280×720).
+
+  Misma gramática que la A4 en formato de proyección: tesis a la izquierda, «Lo esencial del mes» a
+  la derecha (cifra + frase + folio), franja «Para decidir» sobre el pie. El ordinal de cada hecho
+  sale de su posición.
+-->
+<link rel="stylesheet" href="deck-tokens.css" />
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="deck-editorial.css" />
+<style>
+  .summary-main {
+    position: absolute;
+    left: 72px;
+    right: 72px;
+    top: 100px;
+    display: grid;
+    grid-template-columns: 420px minmax(0, 1fr);
+    gap: 60px;
+    align-items: start;
+  }
+
+  .summary-thesis-col { display: flex; flex-direction: column; }
+
+  .summary-thesis {
+    margin: 20px 0 0;
+    font-family: var(--axis-deck-type-display);
+    font-size: 38px;
+    line-height: 1.12;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+
+  .summary-thesis-col .deck-rule { margin-top: 26px; }
+
+  .summary-lead { margin: 22px 0 0; font-size: 16px; line-height: 1.6; color: var(--axis-deck-role-navyLead); }
+
+  .essentials-col { display: flex; flex-direction: column; }
+
+  .essentials-col .deck-label { margin-bottom: 12px; }
+
+  .essential {
+    display: grid;
+    grid-template-columns: 30px 150px minmax(0, 1fr) 54px;
+    column-gap: 16px;
+    align-items: center;
+    padding: 14px 0;
+    border-top: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14);
+  }
+
+  .essential:last-child { border-bottom: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14); }
+
+  .essential-ordinal {
+    font-family: var(--axis-deck-type-display);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-deck-role-dataPriorOnNavy);
+  }
+
+  .essential-figure {
+    font-family: var(--axis-deck-type-display);
+    font-size: 28px;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-deck-role-navyAccent);
+    white-space: nowrap;
+  }
+
+  .essential-title {
+    font-family: var(--axis-deck-type-display);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--axis-deck-role-navyInk);
+  }
+
+  .essential-folio { justify-self: end; }
+</style>
+</head>
+<body>
+  <div class="lamina">
+    <svg class="art" width="1280" height="720" viewBox="0 0 1280 720" aria-hidden="true">
+      <defs>
+        <radialGradient id="summaryHalo" cx="0.5" cy="0.5" r="0.5">
+          <stop class="halo-stop" offset="0" stop-opacity="0.2"></stop>
+          <stop class="halo-stop" offset="0.55" stop-opacity="0.06"></stop>
+          <stop class="halo-stop" offset="1" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+      <circle cx="230" cy="250" r="380" fill="url(#summaryHalo)"></circle>
+      <g class="orbit-rings">
+        <circle cx="1290" cy="740" r="230"></circle>
+        <circle cx="1290" cy="740" r="330"></circle>
+        <circle cx="1290" cy="740" r="430"></circle>
+      </g>
+    </svg>
+
+    <header class="deck-head">
+      <span class="deck-tab">
+        <span class="deck-tab-number" data-slot="tabNumber">00</span>
+        <span class="deck-tab-section" data-slot="section">Resumen ejecutivo</span>
+      </span>
+      <span class="deck-period" data-slot="period">Agosto 2026 · contra julio 2026</span>
+    </header>
+
+    <main class="summary-main">
+      <div class="summary-thesis-col">
+        <span class="deck-eyebrow"><svg class="stroke-icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v4a1 1 0 0 0 1 1h4"></path><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path><path d="M9 9h1"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg><span data-slot="eyebrow">La tesis del mes</span></span>
+        <h1 class="summary-thesis" data-slot="thesis">Agosto trajo más clics y más oportunidades.</h1>
+        <span class="deck-rule"></span>
+        <p class="summary-lead" data-slot="thesisLead">El freno está en dos pasos.</p>
+      </div>
+      <div class="essentials-col">
+        <span class="deck-label" data-slot="essentialsLabel">Lo esencial del mes</span>
+        <div class="essentials" data-slot="essentials">
+          <div class="essential">
+            <span class="essential-ordinal" data-slot-field="ordinal">01</span>
+            <span class="essential-figure" data-slot-field="figure">+16,5 %</span>
+            <span class="essential-title" data-slot-field="title">Más clics con menos impresiones.</span>
+            <span class="essential-folio"><span class="deck-chip" data-slot-field="folio">p. 06</span></span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="deck-band" data-slot="decision"><span class="deck-band-label"><svg class="stroke-icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 18l6 -6"></path><path d="M13 6l6 6"></path></svg><span data-slot-field="label">Para decidir</span></span><span class="deck-band-text" data-slot-field="text">Aprobar el plan de septiembre.</span></div>
+
+    <footer class="deck-foot2">
+      <span class="deck-foot2-id">
+        <img src="assets/brand/logo-negative.svg" alt="Efeonce" />
+        <span class="divider"></span>
+        <span class="deck-foot2-edition" data-slot="footerEdition">Insights · Informe de agosto 2026</span>
+      </span>
+      <span class="deck-foot2-end">
+        <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+        <span class="divider"></span>
+        <span class="deck-folio" data-slot="folio"><span class="deck-folio-page" data-slot-field="page">03</span><span class="deck-folio-total">/ <span data-slot-field="total">24</span></span></span>
+      </span>
+    </footer>
+  </div>
+</body>
+</html>
