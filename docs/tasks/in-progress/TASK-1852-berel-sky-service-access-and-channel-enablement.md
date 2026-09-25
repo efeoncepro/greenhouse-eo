@@ -358,9 +358,13 @@ Las dueñas citadas conservan su scope y epic. No crear tareas por gráfico, cue
      continua/mensual/regular, CL/CLP, TCV 72.000.000, fin 2028-10-31, `ef_deal_id=62535094842`, asociado a company y deal). El
      webhook `p_services.creation` lo materializó como `SVC-HS-591725750952` en la organización y space de Sky (`synced`). El
      preview lo bloqueó por `service_not_current` (start_date 2026-11-01 > hoy): se fijó `ef_start_date=2026-09-24` (inicio del
-     onboarding en Greenhouse; el contractual/facturación 2026-11-01 queda en la descripción y en los términos). El
-     propertyChange no llegó en 60 s; se re-upsertó con el mismo helper canónico del webhook (`upsertServiceFromHubSpot`,
-     `batchReadServices` directo; el bridge Cloud Run devuelve 404 para `/companies/{id}/services`, bug conocido).
+     onboarding en Greenhouse; el contractual/facturación 2026-11-01 queda en la descripción y en los términos).
+     **Corrección post-mortem (mismo día):** el `propertyChange` SÍ llegó (inbox `wh-inbox-5e7d4536…` 00:28:44Z, `processed`) y
+     el intake async convergió en 83 s (`intake_requested` → publisher `*/2` 00:30:03 → lane finance `*/5` 00:30:07,
+     `materialized=1/1`); mi poll de 60 s era más corto que la latencia diseñada (hasta ~7 min) y el re-upsert manual de
+     00:30:14 fue redundante (idempotente; dejó un `materialized` extra). El 404 del bridge no fue un bug del bridge: el
+     `.env.production.local` local tiene `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` con `\r\n` literal (Vercel está limpio).
+     ADR `Proposed`: `docs/architecture/GREENHOUSE_HUBSPOT_SERVICE_SYNC_READ_PATH_DECISION_V1.md`.
   2. Términos `7c38b899-ed46-46f0-9960-ed01299bacc8`: committed, `effective_from=2026-09-25` (fecha UTC del writer; eran las
      21:30 del 2026-09-24 en Chile), CLP 3.000.000, `bundled_modules=[seo_v2,
      ai_visibility_v1]` (`declareCommercialTerms`, audit + outbox).

@@ -567,6 +567,26 @@ migrations/
 
 ---
 
+## Delta 2026-09-24 — Latencia diseñada del intake async, dos read paths y `\r\n` en env local (post-mortem Sky Blog)
+
+Post-mortem del alta `SVC-HS-591725750952` (Sky Blog SEO/AEO). Hechos verificados en PostgreSQL, Vercel y Cloud Run:
+
+- **El intake de `p_services` es async por diseño y su latencia es de hasta ~7 min**: webhook → `intake_requested` en el
+  outbox → `ops-outbox-publish` (`*/2`) → lane `ops-reactive-finance` (`*/5`) → `hubspot_services_intake`. El caso real
+  convergió en 83 s. Un consumidor que espere menos (poll de 60 s) concluye falsamente «no llegó» y re-upsertea a mano.
+- **Dos read paths para el mismo objeto:** webhook intake y backfill leen HubSpot directo (`batchReadServices`); `service-sync.ts`
+  (cron `services-sync`, `admin/ops/services-sync`, `orphan-services`, `integrations/hubspot/services/sync`) lee vía el bridge
+  Cloud Run y fuerza `syncStatus='synced'`.
+- **El «404 del bridge» fue corrupción del env local**: `.env.production.local` con `\r\n` literal en
+  `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`; el parser propio de `load-greenhouse-tool-env.ts` no des-escapa como dotenv.
+  Vercel Production y el bridge desplegado están sanos.
+- **Servicios recién creados reintentan**: 4 de los últimos 6 batches fallaron el primer intento con `organization_unresolved`
+  y convergieron tras 2 reintentos (~45 min).
+
+Decisión propuesta y slices: [`GREENHOUSE_HUBSPOT_SERVICE_SYNC_READ_PATH_DECISION_V1.md`](GREENHOUSE_HUBSPOT_SERVICE_SYNC_READ_PATH_DECISION_V1.md).
+**Regla desde hoy:** antes de re-upsertear un servicio «porque el webhook no llegó», leer la traza
+`webhook_inbox_events → outbox_events → outbox_reactive_log` y esperar la ventana diseñada.
+
 ## Invariantes operativos para agentes — HubSpot bridge/intake (TASK-574…837)
 
 > **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim — cero cambio semántico.** Espejo operativo (NUNCA/SIEMPRE) que un agente carga al tocar este dominio; el contrato técnico vive en su spec. Dedup = TASK-1160 Slice 4.
