@@ -17,6 +17,18 @@
   declarada: `ReportAnalysisPage` e `InsightsEvidenceSlide` (status `legacy`) hasta el Slice 4. Esto
   reemplaza la regla anterior de «entran con el flag de TASK-1888»: el diseño nuevo aplica a toda
   edición nueva, con o sin ese flag.
+- **Slice 3 code complete** (commit `4ff72fe3a`, sin push). Portada blanca 0,052 % / 0,186 % contra el
+  canvas; logo privado por `asset-ref:org-logo:<id>` + `externalAssets` (falla cerrado sin bytes). Gate
+  scoped `--catalog=insights` 21/21 a 0 px. **Verificación del núcleo compartido** (pedido de la sesión
+  de TASK-1846, porque `renderSlide` ahora espera `img.decode()` para todo catálogo):
+  `pnpm composer:brand-pack --check` → exit 0 (deck-axis sincronizado). Con el gate completo sin
+  rebaselinear, insights pasa entero, pero en deck-axis y SKY fallan 59 frames, con diferencias de 1 a
+  7 896 px. **A/B:** con la línea `decode()` desactivada, los mismos 59 frames fallan con la MISMA
+  cuenta de píxeles uno por uno (`diff` vacío). La causa es la deriva de entorno `ISSUE-122`, no este
+  slice. Nada de deck-axis/SKY se congeló.
+- **Despliegue del worker:** `services/artifact-worker` cambió (consumer Insights, `main.ts`,
+  contrato). El Job es único para staging y producción: se despliega sólo por el control plane, junto
+  con el flag de TASK-1888.
 - **🔴 Condición de release:** develop lleva hoy el diseño a medias (portada, índice, capítulos,
   narrativa, tabla, límites y contraportada v2 junto a las páginas de gráfico v1; en el deck, la lámina
   de evidencia sigue a 1920×1080 junto a láminas de 1280×720). **No promover a producción** hasta cerrar
