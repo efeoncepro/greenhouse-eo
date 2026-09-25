@@ -261,7 +261,7 @@ N/A — no capability de negocio: la task agrega observabilidad y recuperación 
 
 - Reader `src/lib/reliability/queries/marketing-studio-health.ts`: llama al health profundo de producción con el bearer de un `api_client` de Greenhouse (scope `studio:health`, secreto en Secret Manager), timeout corto, y proyecta a una señal `platform.marketing_studio.health` (`kind: runtime`, módulo `platform`) con severidad `ok` si todo `ok`/`not_configured`, `warning` si hay `degraded` o frescura fuera de umbral, `error` si un componente está `down` o el ensayo de restauración más reciente falló o tiene más de 45 días; `unknown` si Studio no responde (el uptime check ya alerta eso). Evidencia sin datos sensibles.
 - Registro en `src/lib/reliability/registry.ts` y test focal.
-- Alerta determinista (clase de TASK-1806): endpoint del `ops-worker` + scheduler diario declarado en `services/ops-worker/deploy.sh`, que llama `sendManualTeamsAnnouncement()` con un destino nuevo en `src/config/manual-teams-announcements.ts` apuntando a un canal Teams existente [verificar cuál con el operador]; sólo cuando la señal está en `error`.
+- Alerta determinista (clase de TASK-1806): endpoint del `ops-worker` + scheduler diario declarado en `services/ops-worker/deploy.sh`, que llama `sendManualTeamsAnnouncement()` con un destino nuevo en `src/config/manual-teams-announcements.ts` apuntando al canal **«EO - Teams»** (decisión del operador 2026-09-25). Su `teamId`/`channelId` no aparece con los permisos Graph disponibles (el equipo Efeonce lista sólo «EO - Admin» y la config tiene el chat «EO Team»); resolverlo y confirmarlo con el operador antes del primer envío; sólo cuando la señal está en `error`.
 
 ### Slice 6 — SLOs, costo, rollout y documentación
 
@@ -394,7 +394,7 @@ decide conservarlo. La cifra real queda en la arquitectura de Studio.
 ### Out-of-band coordination required
 
 - Crear el proyecto Sentry y su auth token (acceso de admin de la org Sentry).
-- Confirmar con el operador el email de alertas (Outlook de Efeonce) y el canal Teams de destino.
+- Canal Teams decidido: «EO - Teams» (2026-09-25); falta resolver su id. Confirmar el email de alertas (Outlook de Efeonce).
 - Permisos IAM del service account del job (`cloudsql.client`, acceso al secreto del rol) y rol PG con permiso de crear bases temporales.
 - Ventana horaria del ensayo acordada para no competir con cargas de Greenhouse en la instancia compartida.
 - Release de Greenhouse por el control plane para la señal y la alerta.
@@ -449,6 +449,6 @@ decide conservarlo. La cifra real queda en la arquitectura de Studio.
 
 ## Open Questions
 
-- Canal Teams de destino para las alertas de Studio (¿el de avisos de plataforma existente o uno de Paid Media?).
-- ¿El dump del ensayo se descarta al terminar o se conserva 30 días en un bucket privado como copia lógica adicional?
+- ~~Canal Teams~~ Resuelto 2026-09-25: «EO - Teams» (falta resolver su id).
+- ~~¿El dump del ensayo se descarta o se conserva?~~ Resuelto 2026-09-25: se conserva 30 días en bucket privado (copia independiente de la instancia compartida; KB–MB, un ensayo mensual, costo prácticamente cero).
 - Plan y cuota de la org Sentry: confirmar que un proyecto más no desborda la cuota compartida con Greenhouse.

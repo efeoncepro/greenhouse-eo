@@ -6,6 +6,11 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-25
+
+- Decisiones del operador: el brief es entidad estructurada (objetivo, problema, insight, mensaje, audiencias, presupuesto envolvente, KPIs con metas, canales, ventana, mandatorios, aprobadores — ver TASK-1894 «Brief como entidad»), así que esta UI suma una superficie de edición del brief y la comparación KPI meta vs resultado en el panel de métricas. Escriben `efeonce_admin`, `efeonce_operations`, `efeonce_account` y `designer`. El flujo maestro del programa vive en `docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md`.
+- Hallazgo del flujo maestro: `/library` no es alcanzable a 390 px (la barra inferior no incluye «Piezas» y ⌘K no tiene «Ir a piezas»); esta task lo corrige. La subida firmada la entrega TASK-1894.
+
 ## Status
 
 - Lifecycle: `to-do`

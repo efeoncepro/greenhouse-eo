@@ -8,6 +8,8 @@
 
 ## Delta 2026-09-25
 
+- La URL firmada de subida es de esta task (`requestAssetUpload` + `registerAssetVersion`); TASK-1893 sólo entrega el almacén y la descarga.
+- Decisiones del operador: escriben `efeonce_admin`, `efeonce_operations`, `efeonce_account` y `designer`; el brief es entidad estructurada propia (sección «Brief como entidad»).
 - TASK-1895 (UI consumidora) pide dos cosas a esta task: (1) una proyección de permisos en el reader de campaña — `writable`, `lockReason` (`open_mode` | `missing_capability` | `authority_onedrive`), transiciones permitidas por estado y `revision`; (2) un actor de prueba local y una campaña sandbox en staging para ejercitar escrituras antes del login (TASK-1898). Sin ellas, TASK-1895 se detiene en su Slice 1.
 - TASK-1896 (observabilidad) debe cerrar antes de que estas escrituras lleguen a producción.
 
@@ -115,7 +117,7 @@ Reglas obligatorias:
 
 - `TASK-1890`: manifiesto de tools con guard de paridad, bearer de `api_client`, organización canónica en `campaign.organization_id`, semántica por campo y capability `marketing_studio.campaign.read`.
 - `TASK-1887` (complete): Studio en producción, schema `studio` con 13 tablas y trigger append-only de `audit_event`.
-- `TASK-1893` [verificar alcance al tomarla]: almacén GCS de originales y media worker. Si el upload firmado vive allá, el command `registerAssetVersion` de esta task sólo registra una versión cuyo objeto ya existe en GCS (verifica existencia, `sha256` y `byte_size`); si no, ver Open Questions.
+- `TASK-1893`: almacén GCS de originales (`media_object`, descarga firmada, worker). **Decisión 2026-09-25: la URL firmada de subida y la versión creada desde Studio viven en esta task** (`requestAssetUpload` → PUT directo a GCS → `registerAssetVersion`, que verifica existencia, `sha256` y `byte_size` del objeto), reutilizando el primitive de almacenamiento de TASK-1893.
 
 ### Blocks / Impacts
 
@@ -178,7 +180,7 @@ Reglas obligatorias:
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: `studio.campaign (+source_of_truth, +cutover_at, +cutover_by), studio.campaign_brief [nueva, verificar], studio.concept, studio.asset, studio.asset_version, studio.copy_variant, studio.ad_configuration, studio.media_flight, studio.budget_line, studio.scheduled_post, studio.audit_event, studio.idempotency_record [nueva], studio.api_client (scope studio:write)`
+- Entidades/tablas/views afectadas: `studio.campaign (+source_of_truth, +cutover_at, +cutover_by), studio.campaign_brief [nueva] + studio.campaign_brief_audience + studio.campaign_brief_kpi [nuevas], studio.concept, studio.asset, studio.asset_version, studio.copy_variant, studio.ad_configuration, studio.media_flight, studio.budget_line, studio.scheduled_post, studio.audit_event, studio.idempotency_record [nueva], studio.api_client (scope studio:write)`
 - Invariantes que no se pueden romper:
   - Los tres estados sólo cambian por su command de transición y dentro de su matriz legal; una transición ilegal devuelve `409 invalid_state_transition` y no escribe nada.
   - Ningún command, reader ni export suma `budget_line` de `kind` distinto; un command de presupuesto escribe exactamente un `kind` por llamada. `actual` no se escribe por command de operador ni agente en esta task (sólo por fuente observada).
@@ -256,7 +258,7 @@ Reglas obligatorias:
 
 ### Slice 1 — Fundación de escritura (schema + infraestructura de command)
 
-- Migración Studio aditiva: `studio.idempotency_record`; `revision` + `updated_at` en toda tabla escribible que no los tenga; `campaign.source_of_truth text NOT NULL DEFAULT 'onedrive' CHECK (source_of_truth IN ('onedrive','studio'))` + `cutover_at`, `cutover_by`; `studio.campaign_brief` (contenido literal + revisión) si se confirma en Discovery; bloque `DO` de verificación post-DDL.
+- Migración Studio aditiva: `studio.idempotency_record`; `revision` + `updated_at` en toda tabla escribible que no los tenga; `campaign.source_of_truth text NOT NULL DEFAULT 'onedrive' CHECK (source_of_truth IN ('onedrive','studio'))` + `cutover_at`, `cutover_by`; `studio.campaign_brief` con campos estructurados y revisión (ver «Brief como entidad») + `campaign_brief_audience` y `campaign_brief_kpi`; bloque `DO` de verificación post-DDL.
 - `packages/domain/src/commands/_kernel.ts` [verificar nombre]: ejecutor común que valida actor (bloquea `anonymous_open`), resuelve idempotencia, abre transacción, verifica `revision`, escribe `audit_event` en la misma transacción y devuelve el resultado con la nueva revisión. Ningún command se escribe fuera de este ejecutor.
 - Errores canónicos nuevos en `packages/contracts/src/errors.ts`.
 - `domain-boundary-gate` extendido: sólo `packages/domain/src/commands/**` e `import/**` escriben en `studio.*`.
@@ -297,7 +299,7 @@ Reglas obligatorias:
 
 ### Slice 7 — Greenhouse, rollout y retiro de OneDrive como fuente
 
-- Capability `marketing_studio.campaign.write` en `src/config/entitlements-catalog.ts` + migración seed en `capabilities_registry` + grant a roles internos reales verificados en `src/config/role-codes.ts` (propuesta: `efeonce_admin`, `efeonce_operations`).
+- Capability `marketing_studio.campaign.write` en `src/config/entitlements-catalog.ts` + migración seed en `capabilities_registry` + grant a roles internos reales verificados en `src/config/role-codes.ts` (decisión del operador 2026-09-25: `efeonce_admin`, `efeonce_operations`, `efeonce_account`, `designer`).
 - Manual `docs/mcp/skills/marketing-studio/SKILL.md`: sección de escritura (qué command usar, cómo leer un `412`, por qué nunca sumar presupuestos, que publicar no es una acción de Studio).
 - Corte campaña por campaña de todas las activas; cuando no queda ninguna en `onedrive`, el importador pasa a rechazar el modo `apply` del catálogo (queda sólo lectura de procedencia de archivos) y el runbook lo declara.
 - Arquitectura de Studio (§escritura, §autoridad), Handoff y changelog.
@@ -468,7 +470,7 @@ Exclusiones con razón: `cutover:campaign`, `export:catalog` y `api-client:*` so
 
 ## Open Questions
 
-- ¿El brief se modela como `studio.campaign_brief` con contenido literal, o sigue siendo sólo `brief_ref`? Resolver contra `EFEONCE_CAMPAIGN_REGISTRY_V1.md` antes del Slice 1.
-- ¿El upload firmado de originales vive en `TASK-1893` o aquí? Si `TASK-1893` no lo entrega a tiempo, `registerAssetVersion` queda limitado a objetos GCS ya existentes y el upload firmado se agrega como extensión de esa task, no de esta.
+- ~~¿El brief se modela como tabla?~~ Resuelto 2026-09-25: sí, entidad estructurada propia (ver «Brief como entidad»).
+- ~~¿Dónde vive el upload firmado?~~ Resuelto 2026-09-25: en esta task (ver Dependencies), sobre el almacén de TASK-1893.
 - Matrices de transición: confirmar con el operador y los CDRs las reaperturas permitidas (`approved → in_production`, `authorized → blocked`).
-- Roles que reciben `marketing_studio.campaign.write`: la propuesta es `efeonce_admin` y `efeonce_operations`; confirmar si `efeonce_account` o `designer` deben escribir.
+- ~~Roles con escritura~~ Resuelto 2026-09-25: `efeonce_admin`, `efeonce_operations`, `efeonce_account` y `designer`.

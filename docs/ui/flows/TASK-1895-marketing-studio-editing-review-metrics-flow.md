@@ -1,5 +1,15 @@
 # TASK-1895 — Marketing Studio: edición, revisión y resultados · Flow Contract
 
+## Delta 2026-09-25
+
+- Los nodos `MS-N1…MS-N7` que este contrato declaró ahora son propiedad del master flow del programa:
+  [`EPIC-049-marketing-studio-UI-FLOW.md`](EPIC-049-marketing-studio-UI-FLOW.md). Allí se conservan sus nombres, se
+  descompone `MS-N3` en subnodos (`MS-N3.1…MS-N3.9`) y se agregan `MS-N8…MS-N10`. Este archivo sigue siendo el
+  contrato detallado de `MS-N3`; ante una diferencia de nodos, rutas o actores, gana el master flow.
+- El master flow pide a esta task (§17 de ese documento): la pestaña **Brief** (`MS-N3.2`, `?tab=brief`) con edición
+  por sección y su artboard en `v3 · Edición`; el control de cuenta y el estado «sin acceso» de TASK-1898; y «Ir a
+  piezas» en ⌘K, porque `/library` no es alcanzable en 390 px.
+
 ## Meta
 
 - Status: `draft`

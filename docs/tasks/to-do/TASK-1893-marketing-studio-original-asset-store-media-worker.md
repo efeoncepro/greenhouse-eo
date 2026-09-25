@@ -378,7 +378,7 @@ Los endpoints del worker no forman parte de `/api/v1` ni del OpenAPI; se documen
 - Slice 1 → Slice 2 → Slice 3 (la ingesta necesita bucket, IAM y esquema).
 - Slice 4 después de Slice 3 (no hay qué descargar sin originales en GCS).
 - Slice 5 después de Slice 3; puede correr en paralelo a Slice 4.
-- Slice 6 después de Slice 5 (reutiliza worker, `worker_run` y Scheduler) y sólo si Metricool da acceso de API.
+- Slice 6 después de Slice 5 (reutiliza worker, `worker_run` y Scheduler). El operador confirmó el 2026-09-25 que hay API de Metricool en el plan; se mantiene en esta task.
 - Slice 7 al final. La notificación GCS se activa **después** de desplegar el worker, nunca antes.
 
 ### Risk matrix
@@ -489,6 +489,6 @@ Los endpoints del worker no forman parte de `/api/v1` ni del OpenAPI; se documen
 
 ## Open Questions
 
-- ¿Metricool expone API para la cuenta actual y con qué plan? Define si el Slice 6 queda aquí o sale a una task hija.
+- ~~¿Metricool expone API?~~ Resuelto 2026-09-25: sí, el plan tiene API; el Slice 6 queda en esta task. Falta obtener el token de servidor y guardarlo en `marketing-studio-metricool-api-token`.
 - ¿La infraestructura del bucket y del worker se declara con `gcloud` en un script idempotente o con Terraform? Se decide en Discovery según lo que ya use el repo de Studio.
 - ¿Los recortes automáticos aportan valor frente a las piezas reales por formato que ya existen? Si Discovery muestra que casi todos los conceptos tienen todos sus formatos, el recorte queda sólo como vista previa de colocación.
