@@ -121,22 +121,25 @@ describe('TASK-1888 — productores v2 (ICO)', () => {
 
     // Conclusión = el hecho contra su META (no la comparación de períodos); con un solo space no hay «Lo que significa»
     // porque repetiría la conclusión (hallazgo de 1846 en los PDF reales de Sky y Berel).
-    expect(reading('chart.ico.bullet.otd').conclusion!.text).toBe('Sky Airline no alcanza la meta de entregas a tiempo: 81,9 % (meta 90,0 %).')
+    // Un solo space: el encabezado ya lo nombra, así que la frase no lo repite como sujeto.
+    expect(reading('chart.ico.bullet.otd').conclusion!.text).toBe('No alcanza la meta de entregas a tiempo: 81,9 % (meta 90,0 %).')
     // Sin comparable en este fixture (los meses son hechos independientes), no hay «Lo que significa».
     expect(reading('chart.ico.bullet.otd').meaning).toBeUndefined()
-    expect(reading('chart.ico.bullet.otd').keyFigure!.caption.text).toBe('Entregas a tiempo · Sky Airline.')
+    expect(reading('chart.ico.bullet.otd').keyFigure!.caption.text).toBe('Entregas a tiempo.')
     expect(reading('chart.ico.bullet.otd').keyFigure).toMatchObject({ factId: 'ico.otd.w.sp-1.2026-08', value: '81,9 %' })
-    expect(reading('chart.ico.bullet.otd').nextStep!.text).toBe('Revisar primero Sky Airline: es donde la distancia con la meta es mayor.')
+    // «Revisar primero X» sólo con dos o más spaces: con uno no hay entre qué elegir.
+    expect(reading('chart.ico.bullet.otd').nextStep).toBeNull()
     // FTR 86 sobre la meta de 80 y RpA 1,33 bajo el techo de 1,5: alcanzadas ⇒ sin próximo paso inventado.
     expect(reading('chart.ico.bullet.ftr').nextStep).toBeNull()
     // RpA mejora al bajar: 1,33 bajo el techo de 1,5 CUMPLE la meta.
-    expect(reading('chart.ico.bullet.rpa').conclusion!.text).toBe('Sky Airline cumple la meta de rondas de revisión por pieza: 1,33 (meta 1,50).')
+    expect(reading('chart.ico.bullet.rpa').conclusion!.text).toBe('Cumple la meta de rondas de revisión por pieza: 1,33 (meta 1,50).')
     expect(reading('chart.ico.bullet.rpa').nextStep).toBeNull()
-    expect(reading('chart.ico.line.otd').conclusion!.text).toBe('Sky Airline subió: pasó de 78,4 % en 2026-06 a 81,9 % en 2026-08.')
-    expect(reading('chart.ico.line.rpa').conclusion!.text).toBe('Sky Airline bajó: pasó de 1,50 en 2026-06 a 1,33 en 2026-08.')
+    expect(reading('chart.ico.line.otd').conclusion!.text).toBe('Entregas a tiempo: de 78,4 % en 2026-06 a 81,9 % en 2026-08.')
+    expect(reading('chart.ico.line.rpa').conclusion!.text).toBe('Rondas de revisión por pieza: de 1,50 en 2026-06 a 1,33 en 2026-08.')
     expect(reading('chart.ico.line.otd').meaning).toBeUndefined()
     // Barras sin período anterior: el hallazgo es la cifra más alta de la figura (selección, sin cifras nuevas).
-    expect(reading('chart.ico.percent').conclusion!.text).toBe('La cifra más alta es FTR · Sky Airline · 2026-08: 86,0 %.')
+    // Nombre humano de la métrica; como la ventana tiene tres meses, el mes se dice.
+    expect(reading('chart.ico.percent').conclusion!.text).toBe('La cifra más alta es Primera entrega correcta (2026-08): 86,0 %.')
     expect(reading('chart.ico.percent').meaning).toBeUndefined()
 
     for (const item of chapter.readings!) expect(item.meaning?.text).not.toBe(item.conclusion?.text)
@@ -161,9 +164,9 @@ describe('TASK-1888 — productores v2 (ICO)', () => {
 
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
     // FTR -5,6 pp pesa más que OTD +1,8 pp: el mayor cambio es FTR.
-    expect(reading('chart.ico.percent').conclusion!.text).toBe('El mayor cambio fue en FTR · Sky Airline · 2026-08: 90,9 % (período anterior 96,5 %, variación -5,6 pp).')
-    expect(reading('chart.ico.bullet.ftr').conclusion!.text).toBe('Sky Airline cumple la meta de primera entrega correcta: 90,9 % (meta 80,0 %).')
-    expect(reading('chart.ico.bullet.ftr').meaning!.text).toBe('Contra el período anterior (96,5 %), variación -5,6 pp.')
+    expect(reading('chart.ico.percent').conclusion!.text).toBe('El mayor cambio fue en primera entrega correcta: de 96,5 % a 90,9 % (-5,6 pp).')
+    expect(reading('chart.ico.bullet.ftr').conclusion!.text).toBe('Cumple la meta de primera entrega correcta: 90,9 % (meta 80,0 %).')
+    expect(reading('chart.ico.bullet.ftr').meaning!.text).toBe('Contra el período anterior: de 96,5 % a 90,9 % (-5,6 pp).')
     expect(plan.essentials!.map(item => item.text)[0]).toBe(reading('chart.ico.percent').conclusion!.text)
   })
 
@@ -227,6 +230,48 @@ describe('TASK-1888 — canales y matriz', () => {
     expect(FAMILY_EVIDENCE_MATRIX).toHaveLength(15)
     expect(FAMILY_EVIDENCE_MATRIX.filter(row => row.verdict === 'producer_now').map(row => row.family)).toEqual(['bar', 'bar_grouped', 'line', 'bullet'])
     expect(() => assertChartsAllowed('ico', [{ ...v2(icoSnapshot, ['ico']).chapters[0]!.charts[0]!, family: 'donut' }])).toThrow(/matriz/)
+  })
+})
+
+describe('TASK-1888 — topes, varios spaces y verbos por familia', () => {
+  it('con dos spaces: el sujeto es el space con mayor brecha y hay próximo paso', () => {
+    const second = (metricId: string, value: number) => ({ ...ico(metricId, '2026-08', value, 'percent'), factId: `ico.${metricId}.w.sp-2.2026-08`, label: `${metricId.toUpperCase()} · Sky Cargo · 2026-08`, dimension: { spaceId: 'sp-2', spaceName: 'Sky Cargo', month: '2026-08' } })
+    const snapshot = { facts: [ico('otd', '2026-08', 92, 'percent'), second('otd', 71), target('otd', 90, 'percent', 'higher_is_better')], sources: [], rejections: [] }
+    const reading = v2(snapshot, ['ico']).chapters[0]!.readings!.find(item => item.chartId === 'chart.ico.bullet.otd')!
+
+    expect(reading.conclusion!.text).toBe('Sky Cargo no alcanza la meta de entregas a tiempo: 71,0 % (meta 90,0 %).')
+    expect(reading.meaning!.text).toBe('Sky Airline: 92,0 % (meta 90,0 %); Sky Cargo: 71,0 % (meta 90,0 %).')
+    expect(reading.nextStep!.text).toBe('Revisar primero Sky Cargo: es donde la distancia con la meta es mayor.')
+  })
+
+  it('la presencia por motor se dice con su verbo y su total; una posición varía en posiciones', () => {
+    const plan = v2(aeoSnapshot, ['aeo'])
+
+    expect(plan.chapters[0]!.readings![0]!.conclusion!.text).toBe('ChatGPT es el motor que más menciona la marca: 6 de 10.')
+
+    const position = (factId: string, value: number, comparisonFactId: string | null) => ({ ...aeo('x', value), factId, module: 'seo' as const, metricId: 'position', label: 'Posición media', unit: 'position' as const, numerator: null, denominator: null, dimension: undefined, comparisonFactId })
+    const ctr = (factId: string, value: number, comparisonFactId: string | null) => ({ ...position(factId, value, comparisonFactId), metricId: 'rank', label: 'Posición de marca' })
+    const snapshot = { facts: [position('p.cur', 6.6, 'p.prev'), position('p.prev', 5.8, null), ctr('r.cur', 3.1, 'r.prev'), ctr('r.prev', 3.0, null)], sources: [], rejections: [] }
+    const seo = v2(snapshot, ['seo'])
+
+    expect(seo.chapters[0]!.readings![0]!.conclusion!.text).toBe('El mayor cambio fue en posición media: de #5,8 a #6,6 (+0,8 pos.).')
+    expect(validateEditorialPlan(seo, snapshot)).toEqual([])
+  })
+
+  it('el validador rechaza una conclusión que no cabe en el molde (90)', () => {
+    const plan = v2(icoSnapshot, ['ico'])
+    const long = { ...plan, chapters: plan.chapters.map(chapter => ({ ...chapter, readings: chapter.readings!.map(item => (item.conclusion ? { ...item, conclusion: { ...item.conclusion, text: `${item.conclusion.text} ${'x'.repeat(90)}` } } : item)) })) }
+
+    expect(validateEditorialPlan(long, icoSnapshot).some(violation => violation.rule === 'invalid_field' && violation.detail.startsWith('conclusion mide'))).toBe(true)
+  })
+
+  it('la IA que se pasa del tope en un claim conserva el determinista de ESE claim', async () => {
+    const deterministic = v2(icoSnapshot, ['ico'])
+    const conclusion = deterministic.chapters[0]!.readings!.find(item => item.conclusion)!.conclusion!
+    const generate = vi.fn().mockResolvedValue({ model: 'm', usage: { inputTokens: 1, outputTokens: 1 }, data: { claims: [{ claimId: conclusion.claimId, text: `${conclusion.text} ${'y'.repeat(95)}` }] } })
+    const result = await authorPlanWithBoundedAi(deterministic, icoSnapshot, { generate: generate as never })
+
+    expect(result.plan.chapters[0]!.readings!.find(item => item.conclusion?.claimId === conclusion.claimId)!.conclusion!.text).toBe(conclusion.text)
   })
 })
 

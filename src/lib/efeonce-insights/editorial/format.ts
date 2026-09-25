@@ -53,18 +53,32 @@ export const formatDeltaPercent = (current: number, previous: number, locale: st
  * relativa), que un lector lee como «subió 2,2 puntos» cuando subió 1,8. La variación relativa queda para métricas absolutas (conteos, visitas…).
  */
 export const formatDeltaPoints = (current: number, previous: number, locale: string): string => {
-  const delta = current - previous
-  // Una variación real bajo 0,05 pp se imprimiría «0,0 pp» junto a dos cifras que se ven distintas (Berel, CTR
-  // 1,83 % vs 1,87 %, 2026-09-25): con dos decimales dice lo que pasó («-0,04 pp»). Cero exacto sigue siendo «0,0 pp».
-  const digits = delta !== 0 && Math.abs(delta) < 0.05 ? 2 : 1
-  const text = new Intl.NumberFormat(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits, signDisplay: 'exceptZero' }).format(delta)
+  // La variación se calcula sobre las cifras COMO SE IMPRIMEN (1 decimal): el lector resta lo que ve. Con 1,83 % → 1,88 %
+  // impreso «1,8 %» y «1,9 %», la variación dice «-0,1 pp», no «-0,05 pp» (Berel CTR, 2026-09-25).
+  const round = (value: number) => Math.round(value * 10) / 10
+  const text = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1, signDisplay: 'exceptZero' }).format(round(round(current) - round(previous)))
 
   return `${text} pp`
 }
 
+/**
+ * TASK-1888 — variación de una POSICIÓN en posiciones («+0,8 pos.»), no en %: «+14,0 %» de una posición media no se lee
+ * (Berel, 2026-09-25). Misma regla de redondeo que lo impreso.
+ */
+export const formatDeltaPositions = (current: number, previous: number, locale: string): string => {
+  const round = (value: number) => Math.round(value * 10) / 10
+  const text = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1, signDisplay: 'exceptZero' }).format(round(round(current) - round(previous)))
+
+  return `${text} pos.`
+}
+
 /** Variación que el documento imprime para una unidad: pp si la métrica es porcentaje, relativa si no. */
 export const formatDeltaForUnit = (current: number, previous: number, unit: EvidenceUnit, locale: string): string | null =>
-  unit === 'percent' ? formatDeltaPoints(current, previous, locale) : formatDeltaPercent(current, previous, locale)
+  unit === 'percent'
+    ? formatDeltaPoints(current, previous, locale)
+    : unit === 'position'
+      ? formatDeltaPositions(current, previous, locale)
+      : formatDeltaPercent(current, previous, locale)
 
 /** Cifras que una claim puede contener si referencia estos hechos (valores, num/den y delta). */
 export const allowedNumbersForFacts = (facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, locale: string): Set<string> => {
@@ -89,6 +103,7 @@ export const allowedNumbersForFacts = (facts: EvidenceFactV1[], byId: Map<string
         // Los planes sellados antes de TASK-1888 escribieron la variación relativa también para porcentajes: se sigue
         // admitiendo para que validen igual; los nuevos la escriben en pp.
         if (fact.unit === 'percent') allowed.add(formatDeltaPoints(fact.value, comparison.value, locale))
+        if (fact.unit === 'position') allowed.add(formatDeltaPositions(fact.value, comparison.value, locale))
       }
     }
   }
@@ -103,10 +118,11 @@ export const allowedNumbersForFacts = (facts: EvidenceFactV1[], byId: Map<string
  */
 export const extractNumberTokens = (text: string): string[] => {
   const tokens: string[] = []
-  const pattern = /\d{4}-\d{2}(?:-\d{2})?(?!\d)|(?:US\$ |\$ |#)?[+\-−]?\d[\d.,]*(?: %| pp\b)?/g
+  const pattern = /\d{4}-\d{2}(?:-\d{2})?(?!\d)|(?:US\$ |\$ |#)?[+\-−]?\d[\d.,]*(?: %| pp\b| pos\.)?/g
 
   // Un separador al final del token es puntuación de la frase («1.000,»), no parte de la cifra.
-  for (const match of text.matchAll(pattern)) tokens.push(match[0].replace(/[.,]+$/, ''))
+  // Excepción: el punto de «pos.» es de la abreviatura, no de la frase.
+  for (const match of text.matchAll(pattern)) tokens.push(match[0].endsWith(' pos.') ? match[0] : match[0].replace(/[.,]+$/, ''))
 
   return tokens
 }

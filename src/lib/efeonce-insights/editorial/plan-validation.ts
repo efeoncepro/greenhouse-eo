@@ -7,7 +7,7 @@
 
 import { validateChartSpec } from '../contracts/chart-spec'
 import type { EvidenceSnapshotContentV1 } from '../contracts/evidence'
-import { INSIGHT_COVER_THEMES, PLAN_ESSENTIALS_MAX, type EditorialPlanV1, type PlanActionV1, type PlanClaimV1, type PlanCoverV1 } from '../contracts/plan'
+import { INSIGHT_COVER_THEMES, PLAN_ESSENTIALS_MAX, PLAN_TEXT_LIMITS, type EditorialPlanV1, type PlanActionV1, type PlanClaimV1, type PlanCoverV1 } from '../contracts/plan'
 import { validateChartSpecValues } from './chart-values'
 import { allowedNumbersForFacts, extractNumberTokens, formatFactValue } from './format'
 
@@ -106,6 +106,12 @@ export const validateEditorialPlan = (plan: EditorialPlanV1, snapshot: EvidenceS
   }
 
   const invalid = (where: string, detail: string) => violations.push({ where, rule: 'invalid_field', detail })
+
+  // TASK-1888 — topes físicos de los campos v2 (un texto que no cabe el render lo rechaza, nunca lo recorta).
+  const fits = (where: string, text: string | undefined, limit: number, field: string) => {
+    if (text !== undefined && text.length > limit) invalid(where, `${field} mide ${text.length} caracteres; el molde admite ${limit}`)
+  }
+
   const values = new Map(snapshot.facts.map(fact => [fact.factId, fact.value]))
 
   plan.executiveSummary.forEach(claim => checkClaim('executiveSummary', claim))
@@ -134,6 +140,12 @@ export const validateEditorialPlan = (plan: EditorialPlanV1, snapshot: EvidenceS
       if (!chartIds.has(reading.chartId)) invalid(where, `la lectura apunta a ${reading.chartId}, que no es un gráfico del capítulo`)
       if (readChartIds.has(reading.chartId)) invalid(where, 'una sola lectura por gráfico')
       readChartIds.add(reading.chartId)
+
+      fits(where, reading.conclusion?.text, PLAN_TEXT_LIMITS.conclusion, 'conclusion')
+      fits(where, reading.meaning?.text, PLAN_TEXT_LIMITS.meaning, 'meaning')
+      fits(where, reading.nextStep?.text, PLAN_TEXT_LIMITS.nextStep, 'nextStep')
+      fits(where, reading.keyFigure?.value, PLAN_TEXT_LIMITS.keyFigureValue, 'keyFigure.value')
+      fits(where, reading.keyFigure?.caption.text, PLAN_TEXT_LIMITS.keyFigureCaption, 'keyFigure.caption')
 
       if (reading.keyFigure) {
         const fact = byId.get(reading.keyFigure.factId)
@@ -165,7 +177,14 @@ export const validateEditorialPlan = (plan: EditorialPlanV1, snapshot: EvidenceS
   // TASK-1888 — campos de plan del contrato v2. Todos opcionales: un plan v1 sellado no los trae y valida igual.
   if (plan.essentials) {
     if (plan.essentials.length > PLAN_ESSENTIALS_MAX) invalid('essentials', `«Lo esencial» admite hasta ${PLAN_ESSENTIALS_MAX} hechos; trae ${plan.essentials.length}`)
-    plan.essentials.forEach(claim => checkClaim('essentials', claim))
+    plan.essentials.forEach(claim => {
+      checkClaim('essentials', claim)
+      fits('essentials', claim.text, PLAN_TEXT_LIMITS.essential, 'esencial')
+    })
+
+    // La tesis y la bajada del resumen sólo tienen tope en el diseño v2 (un plan v1 sellado no se re-juzga por largo).
+    fits('executiveSummary', plan.executiveSummary[0]?.text, PLAN_TEXT_LIMITS.summaryThesis, 'tesis del resumen')
+    fits('executiveSummary', plan.executiveSummary[1]?.text, PLAN_TEXT_LIMITS.summaryLead, 'bajada del resumen')
   }
 
   // Las líneas de alcance son copy del catálogo, sin hechos: cualquier cifra en ellas es una discrepancia.
@@ -176,6 +195,8 @@ export const validateEditorialPlan = (plan: EditorialPlanV1, snapshot: EvidenceS
 
     if (claim) checkClaim(key, claim)
   }
+
+  fits('decision', plan.decision?.text, PLAN_TEXT_LIMITS.decision, 'decision')
 
   if (plan.cover) coverViolations(plan.cover).forEach(detail => invalid('cover', detail))
 

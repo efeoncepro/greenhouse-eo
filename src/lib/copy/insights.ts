@@ -147,7 +147,10 @@ export const GH_INSIGHTS = {
     // Una posición más alta es peor: «subió» se leería como mejora. Para posiciones, el verbo neutro.
     changed: 'cambió',
     metricOf: 'de',
-    targetShort: 'meta'
+    targetShort: 'meta',
+    from: 'de',
+    mostMentions: 'es el motor que más menciona la marca',
+    bestDimension: 'La dimensión mejor evaluada es'
   },
 
   /**

@@ -187,7 +187,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       charts,
       tables: facts.length > 0 ? [tableFor(`table.${moduleKey}`, `${MODULE_TITLES[moduleKey]} · resumen`, facts, byId, input.locale)] : [],
       limits: unique(rejections.map(limitFor)),
-      ...(editorialV2 ? { opening: openingFor(moduleKey), readings: readingsFor(charts, byId, input.locale, claims) } : {})
+      ...(editorialV2 ? { opening: openingFor(moduleKey), readings: readingsFor(charts, byId, input.locale) } : {})
     })
   }
 
@@ -207,7 +207,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     // TASK-1888 — campos v2: sólo con el contrato encendido; un plan v1 no los trae.
     ...(editorialV2
       ? {
-          essentials: essentialsFor(chapters, byId),
+          essentials: essentialsFor(chapters, byId, input.locale),
           scopeLines: scopeLinesFor(input.modules),
           ...(input.cover ? { cover: input.cover } : {})
         }

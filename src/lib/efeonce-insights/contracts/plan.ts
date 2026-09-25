@@ -92,6 +92,26 @@ export interface PlanReferenceV1 {
 /** TASK-1888 — máximo de hechos en «Lo esencial del mes». */
 export const PLAN_ESSENTIALS_MAX = 5
 
+/**
+ * TASK-1888 — topes de largo de los campos v2, iguales al molde MÁS ESTRECHO entre el informe A4 y el deck (TASK-1889,
+ * 2026-09-25). Son espacio físico: un texto que no cabe no se recorta, el render lo rechaza. El planner los respeta, el
+ * validador los exige y la autoría IA conserva el texto determinista del claim que se pase.
+ */
+export const PLAN_TEXT_LIMITS = {
+  conclusion: 90,
+  keyFigureValue: 9,
+  keyFigureCaption: 96,
+  meaning: 160,
+  nextStep: 160,
+  summaryThesis: 120,
+  summaryLead: 200,
+  decision: 140,
+  essential: 170
+} as const
+
+/** @deprecated alias de `PLAN_TEXT_LIMITS.conclusion` (acuerdo con TASK-1889). */
+export const PLAN_CONCLUSION_MAX_CHARS = PLAN_TEXT_LIMITS.conclusion
+
 export const INSIGHT_COVER_THEMES = ['dark', 'light'] as const
 export type InsightCoverTheme = (typeof INSIGHT_COVER_THEMES)[number]
 

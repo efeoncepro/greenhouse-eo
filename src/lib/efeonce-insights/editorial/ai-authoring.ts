@@ -13,7 +13,7 @@ import { generateStructuredGemini } from '@/lib/ai/google-genai'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import type { EvidenceSnapshotContentV1 } from '../contracts/evidence'
-import type { EditorialPlanV1, PlanAuthoringProvenanceV1 } from '../contracts/plan'
+import { PLAN_TEXT_LIMITS, type EditorialPlanV1, type PlanAuthoringProvenanceV1 } from '../contracts/plan'
 import { validateEditorialPlan } from './plan-validation'
 
 export const INSIGHTS_AUTHORING_PROMPT_VERSION = 'insights-authoring-v1'
@@ -71,20 +71,26 @@ const buildPrompt = (plan: EditorialPlanV1): string => {
 
 const applyRewrite = (plan: EditorialPlanV1, rewritten: RewrittenClaims): EditorialPlanV1 => {
   const byId = new Map(rewritten.claims.map(claim => [claim.claimId, claim.text.trim()]))
-  const rewrite = <T extends { claimId: string; text: string }>(claim: T): T => ({ ...claim, text: byId.get(claim.claimId) || claim.text })
+
+  const rewrite = <T extends { claimId: string; text: string }>(claim: T, limit = Number.POSITIVE_INFINITY): T => {
+    const text = byId.get(claim.claimId)
+
+    // TASK-1888 — un texto reescrito que no cabe en su molde se descarta SÓLO para ese claim: el determinista ya cabe.
+    return { ...claim, text: text && text.length <= limit ? text : claim.text }
+  }
 
   return {
     ...plan,
     chapters: plan.chapters.map(chapter => ({
       ...chapter,
-      claims: chapter.claims.map(rewrite),
+      claims: chapter.claims.map(claim => rewrite(claim)),
       ...(chapter.readings
         ? {
             readings: chapter.readings.map(reading => ({
               ...reading,
-              ...(reading.conclusion ? { conclusion: rewrite(reading.conclusion) } : {}),
-              ...(reading.meaning ? { meaning: rewrite(reading.meaning) } : {}),
-              nextStep: reading.nextStep ? rewrite(reading.nextStep) : null
+              ...(reading.conclusion ? { conclusion: rewrite(reading.conclusion, PLAN_TEXT_LIMITS.conclusion) } : {}),
+              ...(reading.meaning ? { meaning: rewrite(reading.meaning, PLAN_TEXT_LIMITS.meaning) } : {}),
+              nextStep: reading.nextStep ? rewrite(reading.nextStep, PLAN_TEXT_LIMITS.nextStep) : null
             }))
           }
         : {})
