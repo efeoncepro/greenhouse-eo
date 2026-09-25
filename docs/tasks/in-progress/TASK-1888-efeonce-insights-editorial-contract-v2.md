@@ -116,7 +116,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `src/lib/ico-engine/metric-registry.ts` (`ICO_METRIC_REGISTRY`) — **fuente de los umbrales** que imprime el informe (OTD ≥ 90, FTR ≥ 80, RpA ≤ 1,5; umbral inferior de la zona `optimal`, o superior si la métrica mejora al bajar). `docs/context/06_glosario-metricas.md` (FTR ≥ 70) y `Contrato_Metricas_ICO_v1.md` (FTR ≥ 85) están desalineados con el registro; corregirlos es decisión del dominio ICO y del negocio, fuera de esta task.
+- `src/lib/ico-engine/metric-registry.ts` (`ICO_METRIC_REGISTRY`) — **fuente de los umbrales** que imprime el informe (OTD ≥ 90, FTR ≥ 80, RpA ≤ 1,5; umbral inferior de la zona `optimal`, o superior si la métrica mejora al bajar). El operador lo fijó como fuente única del semáforo el 2026-09-25 y los docs ICO (glosario, `Contrato_Metricas_ICO_v1.md` §7.1 como benchmark externo) quedaron alineados en `f1a41cda0`; los semáforos del portal escritos a mano migran en TASK-1900.
 - `.claude/skills/efeonce-insights/SKILL.md` y `references/*` — memoria operativa del programa (espejo `.codex/`).
 - `docs/tasks/TASK_PROCESS.md`
 - `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`
