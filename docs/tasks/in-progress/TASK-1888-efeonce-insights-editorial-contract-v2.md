@@ -173,7 +173,9 @@ Reglas obligatorias:
 
 - `src/lib/artifact-composer/chart-geometry.ts` — geometría domain-free de 15 familias con tests
   (`__tests__/chart-geometry-extended.test.ts`); `barGeometry`, `lineGeometry`, `sliceGeometry` y `scatterGeometry`
-  se consumen en `src/lib/efeonce-insights/render/figure-pages.ts` y `src/lib/artifact-composer/bar-figure.ts`.
+  se consumían en `render/figure-pages.ts` (retirado por TASK-1889 en `85785e7fc`; hoy el consumer es
+  `src/lib/efeonce-insights/render/figure-slots.ts`, compartido por `report-mapper` e `insights-deck-mapper`, que lee
+  `chapter.readings`, `plan.essentials` y `bandFactId`) y en `src/lib/artifact-composer/bar-figure.ts`.
 - `src/lib/efeonce-insights/contracts/chart-spec.ts` — `ChartSpecV1` con 7 familias, relaciones y validación.
 - `src/lib/efeonce-insights/contracts/plan.ts` — `EditorialPlanV1` (`EDITORIAL_PLAN_VERSION = 'editorial_plan_v1'`).
 - `src/lib/efeonce-insights/editorial/` — planner determinista, autoría IA acotada, validación de cifras y formato.

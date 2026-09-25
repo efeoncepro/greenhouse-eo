@@ -206,7 +206,9 @@ With the flag OFF the adapters return v1 evidence and the planner emits a v1 pla
   `claude`, `perplexity`; `channelForAeoProvider` (`openai→chatgpt`, `anthropic→claude`, `gemini`, `perplexity`,
   `google_ai_overview`); unknown provider ⇒ field ABSENT (not null). On `EvidenceFactV1.channelId`,
   `ChartSeriesV1.channelId`, `ChartSpecV1.dimensionChannelIds` (parallel to `dimensionLabels`, null = not a channel) and
-  the channel fields of bullet/waffle/venn/upset data.
+  the channel fields of bullet/waffle/venn/upset data. Rule (2026-09-25): `dimensionChannelIds` ONLY when the dimensions
+  are distinct channels (AEO presence per engine); when the whole chart measures ONE channel (SEO: clicks, impressions…
+  are all Google) the channel goes on `series[].channelId` and the dimensions carry none.
 - **Reference facts** — `EvidenceFactV1.role?: 'measure' | 'reference'` (absent = measure). ICO targets are
   `role: 'reference'`, metricId `target.{otd|ftr|rpa}`, value from `ICO_METRIC_REGISTRY` (optimal min, or max for
   lower-is-better), `dimension.direction`; plus `band.{otd|ftr|rpa}` = outer edge of the registry's `attention` zone

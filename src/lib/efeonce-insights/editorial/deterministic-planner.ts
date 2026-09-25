@@ -98,8 +98,15 @@ const chartFor = (_module: InsightModule, facts: EvidenceFactV1[], byId: Map<str
     : [{ seriesId: `${chartId}.current`, label: 'Período', factIds: withValue.map(fact => fact.factId), unit }]
 
   const labelled = comparable.length > 0 ? comparable : withValue
-  // TASK-1888 — canal de cada dimensión (presencia por motor, Google): el catálogo lo traduce a su isotipo.
-  const channels = editorialV2 && labelled.some(fact => fact.channelId) ? { dimensionChannelIds: labelled.map(fact => fact.channelId ?? null) } : {}
+  // TASK-1888 — canal. Si las dimensiones SON canales distintos (presencia por motor AEO), cada una lleva el suyo en
+  // `dimensionChannelIds`. Si todo el gráfico mide UN solo canal (SEO: clics, impresiones, CTR… son todas de Google),
+  // la dimensión es una métrica, no un canal: el canal va en la serie. Marcar cada métrica como «google» hacía que un
+  // consumer leyera canales donde no los hay (hallazgo de TASK-1889 con Berel, 2026-09-25).
+  const distinctChannels = new Set(labelled.map(fact => fact.channelId ?? null))
+  const perDimension = editorialV2 && distinctChannels.size > 1
+  const chartChannel = editorialV2 && distinctChannels.size === 1 ? labelled[0]?.channelId : undefined
+  const channels = perDimension ? { dimensionChannelIds: labelled.map(fact => fact.channelId ?? null) } : {}
+  const channelSeries = chartChannel ? series.map(item => ({ ...item, channelId: chartChannel })) : series
 
   return {
     specVersion: 'chart_spec_v1',
@@ -107,7 +114,7 @@ const chartFor = (_module: InsightModule, facts: EvidenceFactV1[], byId: Map<str
     family: series.length > 1 ? 'bar_grouped' : 'bar',
     relation: 'comparison',
     title,
-    series,
+    series: channelSeries,
     dimensionLabels: labelled.map(fact => fact.label),
     ...channels,
     unit,

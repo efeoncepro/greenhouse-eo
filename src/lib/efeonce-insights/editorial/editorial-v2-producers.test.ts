@@ -177,6 +177,16 @@ describe('TASK-1888 — canales y matriz', () => {
     expect(validateEditorialPlan(plan, aeoSnapshot)).toEqual([])
   })
 
+  it('si todo el gráfico mide UN canal (SEO: todo es Google), el canal va en la serie, no en cada dimensión', () => {
+    const seo = (metricId: string, value: number): EvidenceFactV1 => ({ ...aeo(metricId, value), factId: `seo.${metricId}.w`, module: 'seo', metricId, label: metricId, numerator: null, denominator: null, dimension: undefined, channelId: 'google' })
+    const snapshot = { facts: [seo('clicks', 9377), seo('impressions', 512113)], sources: [], rejections: [] }
+    const chart = v2(snapshot, ['seo']).chapters[0]!.charts[0]!
+
+    expect(chart.dimensionChannelIds).toBeUndefined()
+    expect(chart.series.map(series => series.channelId)).toEqual(['google'])
+    expect(validateEditorialPlan(v2(snapshot, ['seo']), snapshot)).toEqual([])
+  })
+
   it('ningún productor emite una familia sin evidencia; la matriz es la autoridad', () => {
     const plans = [v2(icoSnapshot, ['ico']), v2(aeoSnapshot, ['aeo'])]
 
