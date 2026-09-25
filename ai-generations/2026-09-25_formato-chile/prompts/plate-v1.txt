@@ -1,0 +1,18 @@
+Photorealistic editorial photograph inside a contemporary creative design studio at night. Vertical 4:5 frame, camera at eye level, 35mm lens, natural perspective, real photographic depth, subtle film grain. NOT an illustration, NOT a 3D render, NOT flat vector.
+
+SCENE: a large matte wall painted very dark navy blue. Pinned to the wall with small black binder clips hangs a row of four printed poster proofs of the SAME advertising photograph, each in a different aspect ratio, left to right: a portrait 4:5 print, a square 1:1 print, a tall 9:16 print, and a wide 16:9 print. The advertising photograph on every print shows one woman in a bright orange coat standing on a rocky ridge, one arm raised pointing to the sky, against a clear deep blue sky. Each print is RECOMPOSED for its own shape: the woman always keeps normal human proportions; only the framing and the amount of sky and rock change.
+
+THE HERO OBJECT: on the right side of the wall, an extraordinarily tall and extremely thin printed banner of the same photograph hangs from a ceiling rail that is above the top edge of the frame, and runs straight down to the polished concrete floor, where its last part curls gently onto the floor. The banner is about as thin as a hand is wide, many meters tall. On this thin banner the same woman in the orange coat appears SMALL near the bottom part of the banner, full body, with perfectly normal human proportions, NOT stretched, NOT squeezed, and the whole rest of the banner above her is deep blue sky fading to darker blue at the top. It must read clearly as a proof that was recomposed for an absurd format, not distorted.
+
+A DESIGNER stands on the floor near the base of the thin banner, seen from behind in three-quarter view, wearing a plain dark charcoal hoodie with no print, head tilted back looking up along the banner, one hand holding a closed tablet at his side. Natural relaxed posture.
+
+LIGHT: gallery-style ceiling track spotlights with neutral-warm white light create soft pools of light on the four prints and a narrow vertical wash of light along the thin banner. The upper part of the wall falls off into deep shadow. Polished dark grey concrete floor with soft reflections.
+
+STRICT LAYOUT (percent of frame):
+- Top 0% to 34% of the frame height, from the left edge to 70% of the width: ONLY the dark navy wall in deep shadow, completely empty, nothing pinned, no lamps, no objects. This area must be dark enough for large white text.
+- The thin banner is a vertical strip centered at about 80% of the frame width, running from the very top edge of the frame down to the floor at about 88% of the frame height.
+- The four prints sit side by side between 40% and 64% of the frame height, spanning from 5% to 66% of the frame width, with clear gaps between them.
+- The designer occupies roughly 62% to 78% of the frame width and 58% to 100% of the frame height, not covering the banner strip and not covering the prints.
+- The bottom 12% of the frame from the left edge to 45% of the width: dark shadowed concrete floor, empty.
+
+ABSOLUTELY NO text, NO letters, NO numbers, NO logos, NO watermarks, NO labels, NO signage anywhere in the image, including on the prints, the hoodie and the tablet.

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "formato-chile-4x5-v2",
+    "dominante": [
+      "Hasta en",
+      "formato Chile."
+    ],
+    "ratioDominanteEntrada": 4,
+    "contraste": {
+      "entrada": 20.25,
+      "dominante": 19.74,
+      "dominante-acento-0": 6.65,
+      "cierre-frase": 18.8,
+      "logo": 14.25
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 24,
+        "ratioDominante": 0.121
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 32,
+        "ratioDominante": 0.162
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "local"
+        },
+        {
+          "id": "da",
+          "labelBounds": {
+            "left": 863.795,
+            "top": 1786.4,
+            "right": 1220.8,
+            "bottom": 1860.704
+          }
+        }
+      ]
+    }
+  }
+]
