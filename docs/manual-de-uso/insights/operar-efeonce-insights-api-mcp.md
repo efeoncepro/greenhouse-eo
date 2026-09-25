@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1847 cerrada: primer render productivo de A4 y deck con datos reales)
+> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1888: portada preferida por cliente, logo para fondo oscuro, preview del contrato editorial v2)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
@@ -365,6 +365,75 @@ Un destinatario `ambiguous` (o `claimed` hace más de 30 min; señal `insights.d
 - No prender un flag de worker sólo con `gcloud run services update`: el próximo deploy lo borra; declarar en `deploy.sh`.
 - No prometer que revocar recupera lo descargado o un PDF adjunto ya enviado: no es revocable.
 - No crear un cron por cliente para recurrencias: hay un solo tick para todas las organizaciones.
+
+## Portada del informe y contrato editorial v2 (TASK-1888 — construido, flag OFF)
+
+Para qué: fijar si los informes de un cliente llevan portada azul marino o blanca, cargar el logo que se lee sobre fondo
+oscuro, y revisar con datos reales cómo saldría el plan del diseño nuevo antes de prenderlo.
+
+**Antes de empezar.** Fijar la preferencia exige ser administración o cuentas de Efeonce (capability
+`insights.cover_preference.manage`); leerla, poder leer los informes de esa organización. La organización debe tener
+el módulo `insights_v1`. Todo esto funciona con `INSIGHTS_EDITORIAL_V2_ENABLED` apagado: la preferencia se guarda y se
+aplica a las ediciones que se generen después de prender el flag.
+
+**Fijar la preferencia (lane App, sesión interna).**
+
+```bash
+curl -sX POST "$BASE/api/platform/app/insights/cover-preference" -H 'content-type: application/json' \
+  --cookie "$SESSION" -d '{"organizationId":"<org-…>","coverTheme":"light"}'
+```
+
+- `coverTheme`: `auto` (navy sólo si hay logo para fondo oscuro; si no, blanca), `dark` o `light`.
+- Respuesta `200` con `{ preference, changed }`. El mismo valor otra vez responde `changed: false` y no escribe nada.
+- Leerla: `GET …/insights/cover-preference?organizationId=<org-…>`. `isDefault: true` = nunca se fijó (se lee `auto`).
+- Por MCP: `get_insight_cover_preference` / `set_insight_cover_preference` (fijar = binding interno y scope
+  `efeonce.mcp.insights.write`). Las dos tools existen en el gateway sólo después del deploy de efeonce-mcp#18.
+- **Para un solo encargo:** `request.brand.coverTheme` en `create_insight_edition` o en la API. Gana sobre la preferencia.
+
+**Cargar el logo para fondo oscuro.** Igual que el logo normal (sube el asset con el flujo de logos de la organización)
+y adjúntalo con la variante:
+
+```bash
+curl -sX POST "$BASE/api/organizations/<org-…>/brand-assets/logo" -H 'content-type: application/json' \
+  --cookie "$SESSION" -d '{"assetId":"<asset-…>","variant":"on_dark","reason":"logo blanco para portada navy"}'
+```
+
+Sin esa variante, `auto` siempre da portada blanca, y una portada `dark` forzada va **sin** logo del cliente (nunca el
+logo normal sobre azul marino).
+
+**Revisar el plan v2 con datos reales, sin escribir nada.** Con el proxy arriba (`pnpm pg:connect`):
+
+```bash
+GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false \
+  pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/insights/preview-edition.ts \
+  --edition=<insed-…> --org=<org-…> --editorial-v2 --plan-only
+```
+
+Imprime las familias de gráfico, la lectura de cada figura, lo esencial, las líneas de alcance, la portada resuelta y
+las metas usadas. `0 violaciones` es la condición para seguir; una violación es un bug del productor, no un dato.
+
+**Qué significan las señales.**
+- `bullet:chart.ico.bullet.<métrica>` = entrega contra la meta oficial del registro ICO (OTD ≥ 90, FTR ≥ 80, RpA ≤ 1,5).
+- `line:…` sólo con tres meses o más en la ventana.
+- `nextStep` en `null` = el dato alcanzó la meta: no hay un paso que la evidencia sostenga.
+- `cover.source`: `request`, `organization` o `auto`.
+
+**Prender el contrato v2 (sólo junto al release de TASK-1889).** Es multi-runtime: Vercel (`vercel env add
+INSIGHTS_EDITORIAL_V2_ENABLED …` + redeploy) **y** `ops-worker` (`deploy.sh` a `true` + `gcloud run services update`).
+Para probar en staging, prende sólo **Vercel staging**: el `ops-worker` es el mismo para producción. Verifica con una
+edición **interna** (Berel `seo`+`aeo`, Sky `ico`) antes de compartir nada con un cliente. Registra el flip en el ledger.
+
+**Qué no hacer.**
+- No escribas la meta de una métrica ICO a mano en un texto ni en un gráfico: sale del registro.
+- No pongas el logo normal en una portada azul marino ni decidas la portada al renderizar.
+- No prendas el flag en el `ops-worker` para una prueba de staging.
+- No esperes que cambiar la preferencia cambie una edición ya generada: su portada quedó sellada.
+
+**Problemas comunes.**
+- `404` al fijar la preferencia: la organización no tiene el módulo `insights_v1` o no es tuya (anti-oráculo).
+- `403 scope_not_allowed` por el lane ecosystem: el binding es de una organización; sólo un binding interno escribe.
+- `400 invalid_request`: `coverTheme` fuera de `auto|dark|light`.
+- La portada salió blanca con preferencia `auto`: la organización no tiene logo para fondo oscuro.
 
 ## Qué significan los estados
 

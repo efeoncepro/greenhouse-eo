@@ -7,7 +7,7 @@ description: How to operate Efeonce Insights through MCP — build a valid reque
 
 Efeonce Insights turns a client's evidence (SEO, AEO, ICO delivery metrics) into a frozen, versioned
 edition for a period. Greenhouse owns the library, the request, the permissions and the lifecycle.
-This manual teaches you to operate it correctly through its MCP tools (four for editions, four for rendering, three for share links, two for email deliveries and two for schedules). It grants no permission:
+This manual teaches you to operate it correctly through its MCP tools (four for editions, four for rendering, three for share links, two for email deliveries, two for schedules and two for the report cover). It grants no permission:
 everything below is enforced server-side per binding and per organization.
 
 ## What exists today and what does not
@@ -24,6 +24,7 @@ everything below is enforced server-side per binding and per organization.
 | Read recurring schedules and their latest occurrences | `list_insight_schedules`, `get_insight_schedule` — read only |
 | Send an edition by email; cancel, retry or reconcile a delivery | Not through MCP. A person does it in the Greenhouse portal |
 | Create, activate, pause or retire a schedule | Not through MCP. A person does it in the Greenhouse portal |
+| Read or set the organization's preferred report cover (automatic, navy or white) | `get_insight_cover_preference`, `set_insight_cover_preference` — setting is internal bindings only |
 | The in-portal edition page and the web version of an edition | Not yet: they arrive in later units of the program |
 
 `renderableOutputs` in the catalog lists what the render engine can produce today (`deck_pdf`, `report_pdf`). An
@@ -148,6 +149,22 @@ Explain what a schedule will do next:
 2. Report cadence, time zone and the latest occurrences; state that each one lands in review and needs a person to
    issue and send it.
 
+## Report cover
+
+- The cover of an edition is resolved once, when the edition is generated, and sealed with it: the request's
+  `brand.coverTheme` (if not `auto`) wins, then the organization's preference (if not `auto`), then `auto`. `auto` means
+  a navy cover only when the organization has a logo prepared for dark backgrounds, otherwise white. A navy cover
+  never shows the regular logo: without the dark-ready logo it goes without the client's logo.
+- `get_insight_cover_preference { organizationId }` returns `coverTheme` and `isDefault` (`true` = never set, reads as
+  `auto`). `set_insight_cover_preference { organizationId, coverTheme }` writes; the same value again answers
+  `changed: false`. It affects editions generated afterwards; editions already generated keep their sealed cover and
+  nothing is re-rendered.
+- Before setting `dark` for an organization, tell the human that without a dark-ready logo the cover goes without the
+  client's logo, and confirm.
+- The new report design that uses this cover is being switched on gradually; until it is, generated editions keep the
+  current design. If one of these tools is not in your tool list, it is not published in this gateway yet: say so, do
+  not look for another path.
+
 ## The request, field by field
 
 Always call `get_insights_catalog` first and propose the exact request to the human before creating.
@@ -163,6 +180,9 @@ Always call `get_insights_catalog` first and propose the exact request to the hu
 - `audience`: `client` or `internal`. An org-scoped binding can only read `client` editions.
 - `outputs`: one or more of `deck_pdf`, `report_pdf`, `web`. Declares intent. `deck_pdf` and `report_pdf` can be rendered; `web` cannot yet, and requesting its rendering is rejected, never queued for later.
 - `locale` (`es-CL` default, `en-US`), `depth` (`executive`, `standard`, `detailed`).
+- `brand.coverTheme` (optional): `auto`, `dark` (navy) or `light` (white) for THIS request only. Leave it out unless
+  the human asked for a specific cover: then the organization's preference applies. Adding it changes the request, so
+  a replay with the same `idempotencyKey` must repeat it exactly.
 - `idempotencyKey` (8–200 chars): the same key with the same request returns the same edition; the
   same key with a different request is a `409` conflict. Use one key per distinct human request.
 - `policy.allowPartial`: only when the human explicitly accepts visible omissions. Without it, a

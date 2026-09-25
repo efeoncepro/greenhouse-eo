@@ -1,5 +1,23 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-25 · `artifact-composer/pure` is not browser-safe.** Importing the chart geometry into `contracts/` to
+  validate value invariants failed the worker-in-Vercel lint and would have dragged Node crypto (manifest hash) into
+  every browser consumer of the contracts. Rule: `contracts/**` stays structural; anything that needs the geometry
+  lives in `editorial/` (`chart-values.ts`). The boundary test greps the contract SOURCE TEXT for `node:crypto`, so even a
+  comment naming it fails — describe it in words.
+- **2026-09-25 · Generation runs in the `ops-worker` too: watch what the composing phase imports.** Resolving the cover
+  through `organization-brand-assets.ts` pulled storage, Kysely and the assets client into the generation graph (the
+  commands tests broke on a `@/lib/db` mock). Rule: give the worker a light owner reader (`organization-logo-variants-reader.ts`)
+  instead of importing the owner's command module.
+- **2026-09-25 · Rounding hides a tiny pp change.** Berel CTR 1,83 % vs 1,87 % printed «1,8 % … 1,9 %, variación 0,0 pp».
+  No unit test would have found it; the read-only v2 preview over real data did. Rule: preview real editions
+  (`preview-edition.ts --editorial-v2 --plan-only`) before declaring the contract; under 0,05 pp print two decimals.
+- **2026-09-25 · The AEO adapter only reads the LATEST grader run.** The comparison window never has its own score, so
+  a gauge «with the previous period» has no evidence even though the canvas shows one. Rule: the family × evidence
+  matrix decides, not the canvas; enabling it means selecting the run by window in the grader's domain.
+- **2026-09-25 · ICO thresholds disagree across docs.** Registry (runtime) FTR ≥ 80; glossary ≥ 70; ICO contract ≥ 85.
+  Rule: the printed target comes from `ICO_METRIC_REGISTRY` via a reference fact; never copy a number from a doc.
+
 - **2026-09-25 · Un canvas aprobado no es un diseño construido.** TASK-1847 cerró el mismo día en que el operador
   aprobó el rediseño premium en un canvas; producción siguió sirviendo los catálogos v1 y el rediseño quedó en dos
   tasks nuevas (1888 contrato, 1889 catálogos). Decir «los informes se ven así» mirando el canvas habría sido falso.

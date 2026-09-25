@@ -176,10 +176,11 @@ TASK-1846 incorpora únicamente la primitive domain-free, y TASK-1847 conserva l
 Versionar y fijar brand pack, fuentes, catálogo, plan y renderer. Fidelidad semántica/visual es obligatoria;
 igualdad de bytes PDF sólo si el renderer normaliza metadatos y el benchmark la demuestra.
 
-### Delta 2026-09-25 — rediseño premium aprobado (planificado)
+### Delta 2026-09-25 — rediseño premium aprobado (contrato construido, catálogos en curso)
 
-> **Planificado, no construido.** Producción sirve los catálogos v1 de TASK-1847 (§14.7). Nada de este delta existe
-> hoy en código ni en runtime; lo construyen TASK-1888 (contrato, `backend-data`) y TASK-1889 (catálogos, `ui-ux`).
+> **Estado (2026-09-25).** El contrato editorial v2 (TASK-1888) está **construido y apagado** detrás de
+> `INSIGHTS_EDITORIAL_V2_ENABLED` (code complete en `develop`, sin release; estado en §14.8). Las plantillas las
+> construye TASK-1889 (`ui-ux`); producción sirve lo que ya está desplegado (§14.7) hasta ese release.
 > Dirección visual y copia durable del canvas:
 > [`TASK-1889-efeonce-insights-premium-catalogs-direction.md`](../ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md).
 
@@ -191,11 +192,12 @@ igualdad de bytes PDF sólo si el renderer normaliza metadatos y el benchmark la
 - **Una portada con variantes por módulo, nunca una por servicio.** Navy, o blanca (bloque navy arriba y título sobre
   papel) con variante de visibilidad (`seo`/`aeo`: logos de canal como satélites en la órbita) y variante creativa
   (`ico`: sin logos). La variante blanca la elige el catálogo desde los módulos y `channelId`, sin campo nuevo.
-- **Regla de resolución de portada (TASK-1888).** Cambio en el encargo (`brand.coverTheme`, si ≠ `auto`) >
-  preferencia de la organización (si ≠ `auto`) > `auto`; `auto` = navy sólo si la organización tiene un logo apto para
-  fondo oscuro, si no blanca. Hoy cada organización tiene un solo logo y ninguna variante oscura, así que `auto`
-  resolvería blanca. La portada resuelta se **sella** en la edición: re-renderizar da la misma portada; el render
-  nunca la decide con datos vivos. Un encargo sin `coverTheme` conserva el mismo hash.
+- **Regla de resolución de portada (TASK-1888, construida).** `resolveInsightCover` (`contracts/cover.ts`): cambio en
+  el encargo (`brand.coverTheme`, si ≠ `auto`) > preferencia de la organización (`insight_cover_preferences`, si ≠
+  `auto`) > `auto`; `auto` = navy sólo si la organización tiene logo apto para fondo oscuro
+  (`organizations.logo_on_dark_asset_id`), si no blanca. Una portada navy **nunca** lleva el logo por defecto: la
+  variante oscura o ningún logo. Se resuelve una vez al componer y se **sella** en `plan.cover`: re-renderizar da la
+  misma portada; el render nunca la decide con datos vivos. Un encargo sin `coverTheme` conserva el mismo hash.
 - **Roles de color de datos.** Actual = navy `#023c70` en papel / teal `#36c8bf` en navy; anterior o referencia = teal
   profundo `#1f9e94` / periwinkle `#8aa8d8`; oportunidad = coral `#d97757` / `#ff7063`; ausencia = rayado, nunca un
   color. Navy manda en tipografía y estructura. Teal y coral tienen la misma luminosidad: nunca son lo único que separa
@@ -207,21 +209,34 @@ igualdad de bytes PDF sólo si el renderer normaliza metadatos y el benchmark la
   byte). Cada plantilla renderizada con los datos de ejemplo del canvas debe quedar a **≤ 1 % de píxeles distintos**
   (`pixelmatch`, umbral 0,1) y la aprueba el operador página por página. Portada, apertura y contraportada del **deck**
   no están en el canvas: se derivan de A4 con aprobación del operador.
-- **Contrato editorial v2 (TASK-1888), aditivo.** `ChartSpec` de 7 a 15 familias con las invariantes de
-  `chart-geometry.ts`; plan con lectura por figura, cifra principal, entrada de capítulo, hechos esenciales y líneas
-  «Qué mide este informe»; `channelId` en los adapters; lectura de `ftr_pct` en el adapter ICO; preferencia de portada
-  por organización (tabla, command, capability, lanes app/ecosystem y MCP); `brand.coverTheme` opcional en el encargo;
-  variante de logo para fondo oscuro vía el command canónico de account-360; flag `INSIGHTS_EDITORIAL_V2_ENABLED`
-  (default OFF, se prende en producción sólo junto al release de TASK-1889). Planes y specs v1 sellados siguen
-  componiéndose igual.
-- **Matriz familia × evidencia.** Hoy sólo `bar`/`bar_grouped` tienen productor. Hay evidencia para bullet (OTD%, RpA
-  y FTR% de ICO contra los umbrales del registro), línea (tendencia mensual ICO; SEO declara granularidad `day`/`month`),
-  barras de presencia por motor AEO con `channelId` y, posiblemente, medidor y dona. Sin evidencia hoy: métricas por
-  página o keyword de SEO, conjuntos por consulta de IA (Venn/UpSet) y embudo CRM. Una familia sin evidencia no se
-  emite; la matriz la confirma el Slice 1 de TASK-1888.
-- **Observación editorial (render de Sky, 2026-09-25).** La variación de una métrica que ya es un porcentaje se imprime
-  como variación relativa («+2,2 %» para OTD 81,9 % vs 80,1 %); debe imprimirse en puntos porcentuales («+1,8 pp»).
-  Corrección asignada a TASK-1888.
+- **Contrato editorial v2 (TASK-1888), aditivo y construido.** `ChartSpec` de 7 a 15 familias (las 8 nuevas describen
+  sus datos en `data`, tipo discriminado; todo número es un `factId`), con validación estructural en
+  `contracts/chart-spec.ts` y de VALOR en `editorial/chart-values.ts`, que llama a la misma `chart-geometry.ts` que
+  dibuja. Plan con campos opcionales: `chapter.opening`, `chapter.readings[]` (cifra principal, «Lo que significa»,
+  «Próximo paso»), `essentials` (≤ 5), `scopeLines`, `decision`/`measurement`/`ask` (sin productor determinista:
+  inventarlos sería redactar sin evidencia), acciones con `impact`/`effort`/`weeks` y `cover`. Todos pasan la misma
+  regla de cifras. `channelId` en los hechos de canal; FTR y metas ICO como hechos `role: 'reference'`. `planVersion`
+  y `specVersion` no cambian: un plan o spec v1 sellado valida y compone igual.
+- **Matriz familia × evidencia (`family_evidence_matrix_v1`, `editorial/family-evidence-matrix.ts`).** Es la autoridad
+  de qué puede emitir un productor; `assertChartsAllowed` lanza si el planner emite otra cosa. Verificada contra los
+  adapters el 2026-09-25:
+
+  | Familia | Pregunta | Veredicto | Evidencia hoy |
+  |---|---|---|---|
+  | `bar` / `bar_grouped` | comparar / contra el período anterior | productor ahora | hechos por unidad de cada módulo |
+  | `line` | tendencia | productor ahora (seo, ico) | ≥ 3 meses en la ventana: ICO por space y mes; SEO sólo ETV mensual (Search Console entrega totales, sin serie diaria) |
+  | `bullet` | resultado contra la meta | productor ahora (ico) | OTD%, FTR% y RpA por space contra el umbral `optimal` de `ICO_METRIC_REGISTRY` |
+  | `gauge` | nivel 0–100 | sin evidencia | el adapter AEO lee sólo el último run del grader: la ventana anterior nunca tiene puntaje propio |
+  | `pie` / `donut` | parte de un total | sin evidencia | ningún hecho trae sus partes medidas (derivar «el resto» sería calcular) |
+  | `bar_stacked` | composición en el tiempo | sin evidencia | ningún adapter entrega partes por período |
+  | `scatter` | relación entre dos métricas | sin evidencia | sin observaciones pareadas |
+  | `waterfall`, `funnel`, `heatmap`, `waffle`, `venn_two`, `upset` | descomposición, conversión, matriz, conjuntos | sin evidencia | requieren desgloses, CRM o conjuntos por consulta que ningún adapter expone |
+
+  Cambiar un veredicto exige evidencia nueva en el adapter dueño + productor + test + subir la versión de la matriz.
+- **Variación en puntos porcentuales (corregida).** Una métrica que ya es porcentaje varía en pp («+1,8 pp» para OTD
+  81,9 % vs 80,1 %, caso Sky); bajo 0,05 pp se imprimen dos decimales para no escribir «0,0 pp» entre dos cifras
+  distintas (caso Berel, CTR). Aplica con y sin el flag: es una corrección. Los planes sellados con la variación
+  relativa siguen validando.
 - **Primeras ediciones con el diseño nuevo:** Berel (`seo`/`aeo`) y Sky (`ico`), como informe **interno**, sin
   compartir con el cliente hasta la revisión del operador.
 
@@ -762,6 +777,15 @@ greenhouse-eo, dispatch del orquestador, aprobación de gates, env/redeploy en s
   doble finalización que hoy no existe y el fence token es el único candado (`InsightRenderFenceLostError`).
 - **SIEMPRE** que se agregue una tool MCP interna, federarla en `efeonce-mcp` (provider + paridad + política de
   autoridad nativa + scope si escribe) y verificar el gateway construido; registrar una tool aquí no la publica.
+- **NUNCA** emitir una familia de gráfico que la matriz familia × evidencia no autoriza para el módulo
+  (`editorial/family-evidence-matrix.ts`; `assertChartsAllowed` lanza). Los datos del canvas no autorizan nada.
+- **NUNCA** escribir un umbral ICO como literal: la meta es un hecho `role: 'reference'` leído de `ICO_METRIC_REGISTRY`
+  por el adapter. Un hecho de referencia no genera claims ni tablas y no cuenta como evidencia del módulo.
+- **NUNCA** decidir la portada en el render ni poner el logo por defecto sobre navy: la resuelve `resolveInsightCover`
+  al componer y queda sellada en `plan.cover`; la variante oscura del logo se escribe sólo por
+  `attachOrganizationLogoAsset({ variant: 'on_dark' })` (account-360).
+- **NUNCA** importar `@/lib/artifact-composer/pure` desde `contracts/**`: arrastra el módulo crypto de Node y los
+  contratos son browser-safe. Las invariantes de valor que necesitan la geometría viven en `editorial/chart-values.ts`.
 
 ### 14.5 Estado de TASK-1846 — render durable (complete 2026-09-16, en producción)
 
@@ -1033,3 +1057,47 @@ contra PostgreSQL real (transacción revertida), `pnpm worker:runtime-deps-gate`
 - **Sigue abierto:** lector web en Think (TASK-1875, ya desbloqueada: `InsightWebModelV1` y el resolver existen);
   `portal_link` `not_ready` (TASK-1849); in-app/Teams (TASK-690–693 / TASK-1849); recordatorios, preferencias y baja
   no existen en V1; TASK-1876. El encendido en producción espera a TASK-1875.
+
+### 14.8 Estado de TASK-1888 — contrato editorial v2 (code complete 2026-09-25, rollout pendiente)
+
+**Qué existe (en `develop`, sin release).**
+
+| Pieza | Dónde | Estado |
+|---|---|---|
+| 15 familias + datos por familia + validación estructural | `contracts/chart-spec.ts` | construido; `specVersion` sin cambio |
+| Invariantes de valor por la geometría | `editorial/chart-values.ts` | construido (vía `artifact-composer/pure`) |
+| Identidad de canal | `contracts/channels.ts` (`google`, `google_ai_overview`, `chatgpt`, `gemini`, `claude`, `perplexity`) | construido; AEO y SEO la sellan en sus hechos |
+| Matriz familia × evidencia | `editorial/family-evidence-matrix.ts` (`family_evidence_matrix_v1`) | construida; tabla en §6 |
+| Plan v2 (lectura por figura, esenciales, alcance, apertura, portada, acciones) | `contracts/plan.ts`, `editorial/editorial-v2.ts`, `editorial/plan-validation.ts` | construido; campos opcionales |
+| FTR + metas ICO | `adapters/ico-adapter.ts` (`ftr_pct`, `icoOfficialTarget`) | construido; sólo con el flag |
+| Autoría IA v2 | `editorial/ai-authoring.ts` (`insights-authoring-v2`) | construida; también reescribe la lectura por figura |
+| Preferencia de portada | tabla `greenhouse_insights.insight_cover_preferences`, `commands/cover-preference.ts`, `stores/cover-preference-store.ts` | migración **aplicada** 2026-09-25 (instancia compartida, verificada en `information_schema`) |
+| Variante de logo oscuro | `organizations.logo_on_dark_asset_id`, `attachOrganizationLogoAsset({ variant })`, `account-360/organization-logo-variants-reader.ts` | construido; ninguna organización la tiene cargada todavía |
+| Capability | `insights.cover_preference.manage` (Admin + Account); leer = `insights.report.read` | seed en `capabilities_registry` + grant |
+| Evento | `insights.cover_preference.updated` (`insight_cover_preference`) | catálogo actualizado |
+| Lanes | `GET/POST /api/platform/{app,ecosystem}/insights/cover-preference` | construidos (escritura ecosystem sólo binding interno) |
+| MCP | `get_insight_cover_preference`, `set_insight_cover_preference` (manifest 64 tools, hash `a08f649aab8f`) | en Greenhouse; federadas en [`efeonce-mcp#18`](https://github.com/efeoncepro/efeonce-mcp/pull/18) (gateway 1.8.0, superficie 58 → 60; lectura con el scope base y escritura con `efeonce.mcp.insights.write` reusado, sin scope ni Entra nuevos), **sin merge ni deploy**: se despliega después del release de Greenhouse |
+| Flag | `INSIGHTS_EDITORIAL_V2_ENABLED` (Vercel + `ops-worker`, default OFF) | OFF en todo runtime |
+| Preview | `scripts/insights/preview-edition.ts --editorial-v2 --plan-only` | construido |
+
+**Verificado con datos reales (2026-09-25, sólo lectura, flag simulado ON en local).** Sky Airlines `EO-INS-000022`
+(`ico`, agosto): 9 hechos (RpA, OTD, FTR actual y anterior + 3 metas), 0 violaciones; bullets OTD 81,9 % bajo la meta de
+90,0 %, FTR 90,9 % sobre 80,0 %, RpA 1,33 bajo 1,50; «+1,8 pp». Grupo Berel `EO-INS-000019` (`seo`+`aeo`, septiembre):
+24 hechos, 0 violaciones; sin línea (ventana de un mes parcial) y sin medidor (sin run AEO anterior), como dice la
+matriz. Ambas portadas resuelven blanca por `auto`: ninguna tiene logo para fondo oscuro.
+
+**Pendiente de rollout (no es «listo»).** Release de Greenhouse con el flag OFF; ediciones **internas** de Berel y Sky
+en staging con el flag ON sólo en **Vercel staging** (el `ops-worker` es compartido con producción: prenderlo ahí lo
+prende para producción); merge y deploy del PR de `efeonce-mcp` **después** de ese release; prender el flag en
+producción sólo junto al release de TASK-1889; el operador fija la preferencia de Berel y Sky y carga logos aptos
+para fondo oscuro si los hay.
+
+**Metas ICO: el runtime manda y los documentos no coinciden.** La meta impresa sale de `ICO_METRIC_REGISTRY`
+(OTD ≥ 90, FTR ≥ 80, RpA ≤ 1,5), que es lo que calcula el motor. `docs/context/06_glosario-metricas.md` (FTR ≥ 70) y
+`Contrato_Metricas_ICO_v1.md` (FTR ≥ 85) dicen otra cosa: el desalineamiento es del dominio ICO y del negocio, no de
+Insights, y se resuelve fuera de TASK-1888. Si el registro cambia, el informe lo sigue sin tocar este dominio.
+
+**Límites honestos.** `decision`, `measurement` y `ask` no tienen productor determinista; la conclusión de página
+(`reading.conclusion`) tampoco. El medidor necesita que el adapter AEO elija el run por ventana (follow-up en el
+dominio del grader). Métricas por página o keyword de SEO, conjuntos por consulta de IA y embudo CRM siguen fuera.
+

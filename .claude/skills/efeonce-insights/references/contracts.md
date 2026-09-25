@@ -12,7 +12,7 @@
 | `audience` | `client` (default) or `internal`; a client actor cannot request `internal` |
 | `locale`, `depth` | `es-CL` (default) / `en-US`; `executive|standard|detailed` (default `standard`) |
 | `outputs` | non-empty subset of `deck_pdf|report_pdf|web`; `deck_pdf` and `report_pdf` render (production since 2026-09-24), `web` is intent only (render ⇒ `render_rejected`) |
-| `brand` | `efeoncePackVersion` (default `axis-current`), `clientBrandRef` optional 1–200 (validated, resolved by nobody today); `coverTheme` does NOT exist yet (planned, TASK-1888) |
+| `brand` | `efeoncePackVersion` (default `axis-current`), `clientBrandRef` optional 1–200 (validated, resolved by nobody today); `coverTheme` optional `auto|dark|light` (TASK-1888): only enters the request when sent, so a request without it keeps the exact pre-1888 `request_hash` (pinned by a test against the old validator) |
 | `policy.allowPartial` | explicit opt-in to visible omissions; without it a module with no evidence fails the edition at `validating` |
 | `idempotencyKey` | optional, 8–200 chars |
 | `title`, `purpose` | optional 3–200 / 3–500; name the report on first creation, ignored on revise |
@@ -187,38 +187,46 @@ Gateway mapping (`efeonce-mcp` 1.7.0, contract `task-1848-v1`): 503 `sharing_dis
 ⇒ `policy_blocked`; 429 `quota_exceeded` ⇒ `rate_limited`; 404 anti-oracle preserved; `create_insight_share` /
 `revoke_insight_share` need `efeonce.mcp.insights.write` (no client carries it ⇒ 403 challenge), the 5 reads the base scope.
 
-## Planned in TASK-1888 (NOT built — not available in any runtime)
+## Editorial contract v2 (TASK-1888 — code complete 2026-09-25, behind `INSIGHTS_EDITORIAL_V2_ENABLED`, OFF)
 
-Summary of the editorial contract v2 as the task defines it on 2026-09-25. **Nothing below exists in code**: requests,
-plans and specs today are `insight_request_v1` / `editorial_plan_v1` / `chart_spec_v1`, and `CHART_FAMILIES` has 7
-families. Never send these fields to a lane or describe them to a human as available; re-verify against code once the
-task closes and move what shipped into the sections above.
+Verified against code on 2026-09-25. **Additive**: `specVersion` stays `chart_spec_v1` and `planVersion` stays
+`editorial_plan_v1`; the presence of a v2 field is the signal. A sealed v1 plan/spec validates and composes the same.
+With the flag OFF the adapters return v1 evidence and the planner emits a v1 plan (only the pp correction applies).
 
-- **Additive by rule:** a sealed v1 plan/spec keeps composing with the same result; no new field becomes mandatory for
-  sealed plans. Whether the plan stays `editorial_plan_v1` with optional fields or becomes `_v2` is an open question.
-- **Chart families (15):** today's `bar`, `bar_grouped`, `bar_stacked`, `line`, `pie`, `donut`, `scatter` plus
-  `bullet`, `waterfall`, `funnel`, `gauge`, `heatmap`, `waffle`, `venn_two`, `upset`, each with its own data shape and the
-  invariants of `chart-geometry.ts` (bars from zero; pie/donut ≤ 3 non-overlapping parts; Venn of two sets only, real
-  areas; UpSet sorted descending; funnel stages are subsets of the previous; 270° gauge with previous value and target
-  as references; bullet with the target as a mark; heatmap with the value printed; scatter with complete pairs). A
-  family is emitted only when the family × evidence matrix (architecture §6) marks it `productor ahora`.
-- **Plan fields (optional):** per-figure reading `meaning` and `nextStep`, each with `factIds`; hero figure with its
-  subline; chapter entry; essential facts of the summary (max 5); «Qué mide este informe» lines per module from
-  `src/lib/copy/insights.ts` (not written by the LLM). All go through `plan-validation.ts` with the same figure rule.
-- **`channelId`:** stable id on every series or dimension that represents a channel — `google`, `google_ai_overview`,
-  `chatgpt`, `gemini`, `claude`, `perplexity`; AEO provider mapping `openai→chatgpt`, `anthropic→claude`; an unknown
-  provider has no `channelId` and does not break generation.
-- **Cover preference per organization:** `auto|dark|light` (default `auto`; no row ⇒ `auto`) in a new
-  `greenhouse_insights` table; command `setInsightCoverPreference` (upsert by org derived from the authenticated
-  authority, no-op when unchanged, outbox event with actor and previous value) + reader; new capability with a grant;
-  app and ecosystem lanes; MCP tool federated in `efeonce-mcp`.
-- **Request override:** `InsightBrandV1.coverTheme?: 'auto'|'dark'|'light'`; a request without it keeps **exactly the
-  same `request_hash`** as before the task.
-- **Sealed resolution:** `coverTheme(edition)` = request override if present and ≠ `auto` → else the organization's
-  preference if ≠ `auto` → else `dark` (navy) only if the organization has a logo fit for a dark background (variant via
-  the account-360 command) → else `light` (white). The result and the logo asset are sealed in the edition; a re-render of
-  the same edition draws the same cover. The white cover's variant (with or without channel satellites) is chosen by the
-  catalog from `modules` and `channelId` (TASK-1889), with no extra field.
-- **ICO:** the adapter additionally reads `ftr_pct` from the ICO snapshot (owner-computed; Insights computes nothing).
-- **Flag:** `INSIGHTS_EDITORIAL_V2_ENABLED`, default OFF; with OFF the planner emits v1 and the resolver does not apply
-  (the preference can still be saved). Turned on in production only together with the TASK-1889 release.
+- **Chart families (15)** — `contracts/chart-spec.ts`. Series families (`bar`, `bar_grouped`, `bar_stacked`, `line`,
+  `pie`, `donut`, `scatter`) keep `series` + `dimensionLabels`. Data families (`bullet`, `waterfall`, `funnel`, `gauge`,
+  `heatmap`, `waffle`, `venn_two`, `upset`) carry `data` (discriminated by `kind === family`, every number a `factId`)
+  and an empty `series`. New relations: `target`, `decomposition`, `conversion`, `overlap`. Structural validation:
+  `validateChartSpec(spec, knownIds)` (pie/donut ≤ 3 parts = `MAX_COMPOSITION_PARTS`, mirror of the geometry's
+  `MAX_SLICES`; tabular equivalent mandatory; every factId known, references included). Value validation:
+  `validateChartSpecValues(spec, values)` in `editorial/chart-values.ts`, which calls `chart-geometry.ts` (rule codes
+  `geometry_<reason>`, e.g. `geometry_stage_grows`, `geometry_empty_set`). It cannot live in `contracts/`: the
+  composer's `pure` entry pulls Node crypto.
+- **Channels** — `contracts/channels.ts`: `INSIGHT_CHANNEL_IDS` = `google`, `google_ai_overview`, `chatgpt`, `gemini`,
+  `claude`, `perplexity`; `channelForAeoProvider` (`openai→chatgpt`, `anthropic→claude`, `gemini`, `perplexity`,
+  `google_ai_overview`); unknown provider ⇒ field ABSENT (not null). On `EvidenceFactV1.channelId`,
+  `ChartSeriesV1.channelId`, `ChartSpecV1.dimensionChannelIds` (parallel to `dimensionLabels`, null = not a channel) and
+  the channel fields of bullet/waffle/venn/upset data.
+- **Reference facts** — `EvidenceFactV1.role?: 'measure' | 'reference'` (absent = measure). ICO targets are
+  `role: 'reference'`, metricId `target.{otd|ftr|rpa}`, value from `ICO_METRIC_REGISTRY` (optimal min, or max for
+  lower-is-better), `dimension.direction`. They never produce claims, tables or references and never count as module
+  evidence in `validating`.
+- **Plan (all optional)** — `contracts/plan.ts`: `chapter.opening` (claim), `chapter.readings[]` =
+  `{ chartId, keyFigure?: { factId, value (must equal formatFactValue), caption }, conclusion?, meaning, nextStep | null }`;
+  `essentials` (≤ `PLAN_ESSENTIALS_MAX` = 5); `scopeLines` (copy, no numbers allowed); `decision`, `measurement`, `ask`
+  (claims; NO deterministic producer); `cover`; actions gain `impact`/`effort` 1–3 and `weeks` `N` or `N-M` (1–4).
+  Every text is a `PlanClaimV1` checked by the same figure rule (`invalid_field` for shape errors).
+- **Cover** — `contracts/cover.ts`: `resolveInsightCover({ requested, organization, logos })` = request (≠ auto) >
+  organization (≠ auto) > auto (navy only with `logoOnDarkAssetId`). `PlanCoverV1 = { theme: dark|light, source:
+  request|organization|auto, logoAssetId, logoVariant: on_dark|default|null }`; dark never carries the default logo
+  (validator enforces). Sealed at composing, never decided at render.
+- **Cover preference API** — `getInsightCoverPreference` (need `cover_preference_read` = `insights.report.read`) →
+  `{ organizationId, coverTheme, isDefault, updatedAt, updatedByActorKind }`; `setInsightCoverPreference({ coverTheme })`
+  (need `cover_preference_manage` = `insights.cover_preference.manage`, Admin + Account) → `{ preference, changed }`;
+  same value ⇒ `changed: false`, no write, no event; invalid value ⇒ 400 `invalid_request`. Event
+  `insights.cover_preference.updated` `{ version: 1, organizationId, coverTheme, previousCoverTheme, actorKind }`.
+  Lanes: `GET|POST /api/platform/{app,ecosystem}/insights/cover-preference` (ecosystem write = internal binding only).
+  MCP: `get_insight_cover_preference` (base scope), `set_insight_cover_preference` (`efeonce.mcp.insights.write`,
+  reused; gateway PR efeonce-mcp#18, 1.8.0, contract `task-1888-v1`, not deployed).
+- **Percent deltas** — a metric already in percent varies in pp (`formatDeltaPoints`, «+1,8 pp»; two decimals under
+  0,05 pp). Relative deltas stay for absolute metrics. Sealed plans with the old relative text still validate.

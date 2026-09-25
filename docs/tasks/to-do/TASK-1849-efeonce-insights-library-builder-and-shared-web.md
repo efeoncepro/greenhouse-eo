@@ -1,5 +1,15 @@
 # TASK-1849 — Efeonce Insights: biblioteca, creación y experiencia web compartida
 
+## Delta 2026-09-25 (TASK-1888 code complete)
+
+- **Ya existe (flag `INSIGHTS_EDITORIAL_V2_ENABLED` OFF):** command `setInsightCoverPreference` + reader
+  `getInsightCoverPreference` (`src/lib/efeonce-insights/commands/cover-preference.ts`), lanes
+  `GET/POST /api/platform/app/insights/cover-preference` (capability `insights.cover_preference.manage` para fijar,
+  `insights.report.read` para leer) y `brand.coverTheme` opcional en el encargo. El builder sólo los consume: la regla
+  vive en `resolveInsightCover` (`contracts/cover.ts`) y la portada queda sellada en `plan.cover`. La variante de logo
+  para fondo oscuro se carga con `POST /api/organizations/[id]/brand-assets/logo` `{ variant: 'on_dark' }`; no tiene
+  UI todavía. — por trabajo en TASK-1888
+
 ## Delta 2026-09-25
 
 - TASK-1847 cerrada (complete 2026-09-25): catálogos `insights-report` e `insights-deck` en producción desde el

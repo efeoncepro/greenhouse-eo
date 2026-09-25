@@ -28,10 +28,15 @@ Insights templates. This scope preserves existing `deck-axis`/SKY baseline image
 | `INSIGHTS_SCHEDULES_ENABLED` (TASK-1848) | schedule writes (Vercel) + tick (ops-worker) | Vercel + `ops-worker` (default `true`) | 2026-09-18: Vercel staging ON · Production OFF; ops-worker ON |
 | `INSIGHTS_GENERATION_ENABLED` in the worker (TASK-1848) | the schedules tick creates editions | now ALSO `ops-worker` (default `true` in `deploy.sh`) | ops-worker ON; `INSIGHTS_AUTHORING_AI_ENABLED` is NOT declared in the worker |
 
-Planned, NOT declared anywhere yet (2026-09-25): `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888, default OFF; goes ON in
-production only with the TASK-1889 release). When it is born, map every runtime that GENERATES plans before flipping it:
-Vercel (create/revise) and the `ops-worker` schedules tick, which also creates editions (that is why it already reads
-`INSIGHTS_GENERATION_ENABLED`). Add its ledger row in the same PR.
+`INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888, 2026-09-25): read where editions are GENERATED — Vercel (create/revise/
+recover) and the `ops-worker` schedules tick (declared `:-false` in `deploy.sh`, guarded by `deploy-contract.test.ts`).
+The render Job does NOT read it (it composes the frozen plan). OFF everywhere today. Flip in production ONLY with the
+TASK-1889 release, in BOTH runtimes. To test in staging, flip it only in **Vercel staging**: the `ops-worker` is shared
+with production. Before flipping, preview real data read-only:
+`GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/insights/preview-edition.ts --edition=<insed-…> --org=<org-…> --editorial-v2 --plan-only`
+(2026-09-25: Sky `EO-INS-000022` and Berel `EO-INS-000019`, 0 violations). Cover preference: set per org with
+`POST /api/platform/app/insights/cover-preference` `{ organizationId, coverTheme }` (Admin/Account) — works with the
+flag OFF; the dark logo variant is loaded with `POST /api/organizations/<id>/brand-assets/logo` `{ assetId, variant: 'on_dark' }`.
 
 Flip = `vercel env add <FLAG> <env>` (`production` lowercase for the standard env; custom `staging` literal) **+
 `vercel redeploy <url>`**: a deployment built before the env var never sees it. If a worker starts reading a flag,

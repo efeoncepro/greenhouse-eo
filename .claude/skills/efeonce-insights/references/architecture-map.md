@@ -147,18 +147,26 @@ Production still renders with the TASK-1847 v1 catalogs and the v1 contract.
 | Geometry of 15 families | `src/lib/artifact-composer/chart-geometry.ts` (Vercel-safe values via `@/lib/artifact-composer/pure`) |
 | Local preview over real data | `scripts/insights/preview-edition.ts` |
 
-### Planned by TASK-1888 (backend-data) — nothing exists yet
+### Built by TASK-1888 (backend-data) — code complete 2026-09-25, flag OFF
 
-| Piece | Where (per the task's Files owned) | Responsibility |
+| Piece | Where | Responsibility |
 | --- | --- | --- |
-| Contracts | `contracts/chart-spec.ts`, `contracts/plan.ts`, `contracts/request.ts` — planificado (TASK-1888) | 15 families with per-family data; optional plan fields; `InsightBrandV1.coverTheme?` |
-| Channel registry | `contracts/channels.ts` (new) — planificado (TASK-1888) | browser-safe `channelId` registry + provider mapping |
-| Producers | `editorial/{deterministic-planner,ai-authoring,author-plan,plan-validation}.ts` — planificado (TASK-1888) | emit only families the family × evidence matrix allows; validate new fields |
-| Adapters | `adapters/{seo,aeo,ico}-adapter.ts` — planificado (TASK-1888) | `channelId` on channel series; ICO reads `ftr_pct` |
-| Cover preference | `commands/cover-preference.ts` (new) + reader + new table in `greenhouse_insights` (migration `…_task-1888-insights-cover-preference.sql`) — planificado (TASK-1888) | per-org `auto|dark|light`, outbox event, capability + grant, app/ecosystem lanes, federated MCP tool |
-| Dark-background logo | `src/lib/account-360/organization-brand-assets.ts` via its command — planificado (TASK-1888) [owner to verify] | logo variant that decides whether `auto` resolves navy |
-| Flag | `flags.ts` — `INSIGHTS_EDITORIAL_V2_ENABLED` — planificado (TASK-1888) | default OFF; runtime to be mapped when built |
-| Copy | `src/lib/copy/insights.ts` — planificado (TASK-1888) | «Qué mide este informe» lines per module |
+| Chart contract | `contracts/chart-spec.ts` | 15 families, per-family `data`, structural validation, `chartSpecFactIds` |
+| Value invariants | `editorial/chart-values.ts` | `validateChartSpecValues` over `chart-geometry` (via `artifact-composer/pure`) |
+| Channel registry | `contracts/channels.ts` | `INSIGHT_CHANNEL_IDS`, `channelForAeoProvider`, `SEO_SEARCH_CHANNEL` |
+| Family × evidence matrix | `editorial/family-evidence-matrix.ts` | `family_evidence_matrix_v1`, `canProduceFamily` |
+| v2 producers | `editorial/editorial-v2.ts` | bullet ICO, monthly line, readings, opening, essentials, scope lines, `assertChartsAllowed` |
+| Planner / authoring | `editorial/deterministic-planner.ts` (`editorialV2`, `cover`), `editorial/ai-authoring.ts` (`insights-authoring-v2`), `editorial/author-plan.ts` | v2 only with the flag |
+| Validator | `editorial/plan-validation.ts` | same figure rule on every v2 field; masks the cited fact's dimension values |
+| Adapters | `adapters/ico-adapter.ts` (`ftr_pct`, `icoOfficialTarget`, reference facts), `aeo-adapter.ts` / `seo-adapter.ts` (`channelId`) | FTR/targets only with `editorialV2` |
+| Cover | `contracts/cover.ts`, `commands/cover-preference.ts`, `stores/cover-preference-store.ts` | resolver, command + reader, `resolveInsightCoverForEdition` (called in `generation.ts` composing) |
+| Table | `greenhouse_insights.insight_cover_preferences` (migration `20260925183531322_task-1888-insights-cover-preference`, applied) | one row per org, last write wins |
+| Dark logo | `greenhouse_core.organizations.logo_on_dark_asset_id`; `account-360/organization-brand-assets.ts` (`attachOrganizationLogoAsset({ variant })`); `account-360/organization-logo-variants-reader.ts` | write only via account-360; light reader safe for ops-worker |
+| Lanes | `app/api/platform/{app,ecosystem}/insights/cover-preference/route.ts` + `api-platform/resources/{app,ecosystem}-insights(-read).ts` | GET/POST |
+| MCP | `src/mcp/greenhouse/{tool-manifest,tools,http-client,server}.ts` | `get/set_insight_cover_preference`; manifest 64 tools `a08f649aab8f` |
+| Flag | `flags.ts` `isInsightsEditorialV2Enabled`; `services/ops-worker/deploy.sh` (`:-false`) | Vercel + ops-worker |
+| Copy | `src/lib/copy/insights.ts` (`scopeLines`, `chapterOpenings`, `channels`, `targets`, `figures`, `reading`) | TASK-1889 owns `GH_INSIGHTS.catalog` |
+| Preview | `scripts/insights/preview-edition.ts --editorial-v2 --plan-only` | read-only v2 plan over real data |
 
 ### Planned by TASK-1889 (ui-ux) — not built; Slices 1–2 in progress, uncommitted
 

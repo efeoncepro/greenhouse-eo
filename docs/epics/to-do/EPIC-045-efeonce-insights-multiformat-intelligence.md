@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `En ejecución — TASK-1845 (foundation) COMPLETE 2026-09-16: en producción desde 2026-09-15 con generación ON (emisión/IA OFF), rollback ensayado; TASK-1846 (render durable) COMPLETE 2026-09-16: en producción (release 917491fd02e4, render ON en los 3 runtimes, gateway v1.6.0, canary productivo deck_pdf verde); TASK-1848 (compartir/correo/recurrencia) en producción 2026-09-18 con flags OFF (release bda1cf2cd938, gateway 1.7.0), in-progress por in-app/Teams, portal_link, Think e ISSUE-174 → TASK-1876; TASK-1847 COMPLETE 2026-09-25 (render productivo de A4 y deck verificado); en producción desde 2026-09-24 (release ebb9212a32ce, PR #239: report_pdf en insights-report y deck_pdf en insights-deck; canary de contrato productivo verde, canary de render productivo pendiente; staging verificado con Berel/Sky); TASK-1849 y TASK-1875 en diseño (1875 ya desbloqueada)`
+- Status real: `En ejecución — TASK-1845 (foundation) COMPLETE 2026-09-16: en producción desde 2026-09-15 con generación ON (emisión/IA OFF), rollback ensayado; TASK-1846 (render durable) COMPLETE 2026-09-16: en producción (release 917491fd02e4, render ON en los 3 runtimes, gateway v1.6.0, canary productivo deck_pdf verde); TASK-1848 (compartir/correo/recurrencia) en producción 2026-09-18 con flags OFF (release bda1cf2cd938, gateway 1.7.0), in-progress por in-app/Teams, portal_link, Think e ISSUE-174 → TASK-1876; TASK-1847 COMPLETE 2026-09-25 (render productivo de A4 y deck verificado); en producción desde 2026-09-24 (release ebb9212a32ce, PR #239: report_pdf en insights-report y deck_pdf en insights-deck; canary de contrato productivo verde, canary de render productivo pendiente; staging verificado con Berel/Sky); TASK-1849 y TASK-1875 en diseño (1875 ya desbloqueada); TASK-1888 (contrato editorial v2) code complete 2026-09-25 con flag OFF, rollout pendiente; TASK-1889 (catálogos premium) in-progress`
 - Rank: `TBD`
 - Domain: `platform|growth|delivery|ui|cross-domain`
 - Owner: `Platform / Client Experience; Julio Reyes (producto)`
@@ -97,8 +97,8 @@ pequeños. No agregar una task por módulo, gráfico, formato, endpoint ni otra 
 | U04 | [TASK-1848](../../tasks/in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados — **en producción 2026-09-18 con flags OFF** (release `bda1cf2cd938`; staging ON; gateway 1.7.0); in-progress | none |
 | U05 | [TASK-1849](../../tasks/to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md) | biblioteca, creación y experiencia web compartida | TASK-1848 |
 | U06 | [TASK-1875](../../tasks/to-do/TASK-1875-efeonce-insights-shared-web-render-think.md) | vista web compartida por token renderizada en `efeonce-think` (nodo S6; decisión 2026-09-15) | TASK-1848 |
-| U07 | [TASK-1888](../../tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md) | contrato editorial v2: 15 familias de gráfico, lectura por figura, `channelId` y portada por cliente/encargo sellada | none |
-| U08 | [TASK-1889](../../tasks/to-do/TASK-1889-efeonce-insights-premium-catalogs.md) | catálogos premium aprobados (canvas 2026-09-25), verificación con Berel y Sky y release | TASK-1888 |
+| U07 | [TASK-1888](../../tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md) | contrato editorial v2: 15 familias de gráfico, lectura por figura, `channelId` y portada por cliente/encargo sellada — **in-progress: code complete 2026-09-25** (local, sin push; migración aplicada; flag `INSIGHTS_EDITORIAL_V2_ENABLED` OFF; gateway PR efeonce-mcp#18 abierto; rollout pendiente) | none |
+| U08 | [TASK-1889](../../tasks/in-progress/TASK-1889-efeonce-insights-premium-catalogs.md) | catálogos premium aprobados (canvas 2026-09-25), verificación con Berel y Sky y release | TASK-1888 |
 
 TASK-1847 puede preparar catálogos tras TASK-1845; integración/export final requiere TASK-1846.
 

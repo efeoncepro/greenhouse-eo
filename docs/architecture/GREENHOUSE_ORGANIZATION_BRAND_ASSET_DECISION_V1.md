@@ -84,15 +84,22 @@ The logo pop-up gains a third acquisition path next to upload and operator-URL: 
 - **Runtime requirement (Rollout Completion Gate):** the OpenAI key resolves server-side via the canonical secret `greenhouse-openai-api-key`. Each environment must expose `OPENAI_API_KEY_SECRET_REF=greenhouse-openai-api-key` (added to local `.env.local`; Vercel staging/prod must have it for the deployed feature to work).
 - **Observability:** OpenAI failures go through `captureWithDomain(error, 'agency', { tags: { source: 'organization_logo_ai_generate' } })`; the route returns a sanitized 502.
 
-## Delta 2026-09-25 — variante de logo para fondo oscuro (demanda de Efeonce Insights; planificada)
+## Delta 2026-09-25 — dark-background logo variant (TASK-1888, built)
 
-- **Estado:** planificado, no construido. Hoy cada organización tiene un solo logo (`organizations.logo_asset_id`) y
-  ninguna variante para fondo oscuro.
-- **Demanda:** `TASK-1888` (EPIC-045, Efeonce Insights) resuelve la portada de los informes con preferencia `auto` =
-  portada navy **sólo** si la organización tiene un logo apto para fondo oscuro; si no, blanca. Sin esa variante,
-  `auto` siempre resuelve blanca.
-- **Regla:** la variante se agrega y se lee **sólo mediante el command canónico de account-360**, en la misma línea
-  gobernada que `attachOrganizationLogoAsset` (capability `organization.brand_asset`, bloqueo de operating entities,
-  asset privado servido por proxy, sin hotlinks). Insights no escribe assets ni columnas de organización por su cuenta.
-- **Forma exacta** (columna, contexto de asset o candidato revisable) pendiente: se decide en el Discovery de
-  `TASK-1888` y se registra aquí como nuevo delta cuando exista.
+- **Why:** Efeonce Insights resolves its report cover with `auto` = navy cover **only** when the organization has a
+  logo suitable for dark backgrounds, otherwise white (TASK-1888, EPIC-045). A single logo cannot answer that safely:
+  a dark wordmark disappears on navy.
+- **Shape (decided in TASK-1888 Discovery):** a second pointer column, `greenhouse_core.organizations.logo_on_dark_asset_id`
+  (`TEXT NULL`, same contract as `logo_asset_id`: private asset served through the proxy, no hotlinks). Migration
+  `20260925183531322_task-1888-insights-cover-preference` (additive, applied 2026-09-25). No candidate/review table
+  change: a candidate can be accepted as either variant.
+- **Write path (only):** `attachOrganizationLogoAsset({ …, variant: 'on_dark' })` in
+  `src/lib/account-360/organization-brand-assets.ts` — same governed line as the default logo: capability
+  `organization.brand_asset`, operating entities blocked, asset attached as `organization_logo`, the previous asset of
+  the SAME variant marked superseded, outbox `organization.brand_asset.updated` with `variant` and
+  `organization.updated` with `updatedFields: ['logo_on_dark_asset_id']`. `variant` defaults to `default`, so existing
+  callers behave exactly as before. The route `POST /api/organizations/[id]/brand-assets/logo` accepts `variant`.
+- **Read path:** `readOrganizationLogoVariants` in `src/lib/account-360/organization-logo-variants-reader.ts` (read
+  only, PostgreSQL client only, safe for the `ops-worker`). Insights consumes it and never writes organization assets.
+- **Who loads it:** the operator, per organization, when a dark-ready logo exists. As of 2026-09-25 no organization has
+  one, so every `auto` cover resolves white. The UI to upload the variant is not built (the API path exists).

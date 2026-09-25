@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-045`
-- Status real: `Implementacion`
+- Status real: `Code complete; rollout pendiente (release con flag OFF, ediciones internas en staging, deploy efeonce-mcp#18)`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`
@@ -116,7 +116,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/context/06_glosario-metricas.md` — definiciones y umbrales ICO (OTD% ≥ 90 %, RpA ≤ 1,5, FTR% ≥ 70 %).
+- `src/lib/ico-engine/metric-registry.ts` (`ICO_METRIC_REGISTRY`) — **fuente de los umbrales** que imprime el informe (OTD ≥ 90, FTR ≥ 80, RpA ≤ 1,5; umbral inferior de la zona `optimal`, o superior si la métrica mejora al bajar). `docs/context/06_glosario-metricas.md` (FTR ≥ 70) y `Contrato_Metricas_ICO_v1.md` (FTR ≥ 85) están desalineados con el registro; corregirlos es decisión del dominio ICO y del negocio, fuera de esta task.
 - `.claude/skills/efeonce-insights/SKILL.md` y `references/*` — memoria operativa del programa (espejo `.codex/`).
 - `docs/tasks/TASK_PROCESS.md`
 - `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`
@@ -296,23 +296,23 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumers nombrados con paths reales.
-- [ ] Invariantes, frontera tenant e idempotencia explícitas y cubiertas por tests.
-- [ ] La tabla nueva queda en el allowlist de destinos de escritura del dominio (si existe) en el mismo PR.
-- [ ] Postura de migración y rollback explícita y ensayada en staging.
-- [ ] Evidencia runtime/DB listada para cada cambio más allá de docs.
-- [ ] Errores canónicos y sin fuga de datos crudos.
+- [x] Source of truth, contract surface y consumers nombrados con paths reales. — arquitectura §14.8.
+- [x] Invariantes, frontera tenant e idempotencia explícitas y cubiertas por tests. — `cover-preference.test.ts`, `chart-spec.test.ts`, `editorial-v2-*.test.ts`, `adapters.test.ts`.
+- [x] La tabla nueva queda en el allowlist de destinos de escritura del dominio (si existe) en el mismo PR. — `boundary-domain.test.ts`.
+- [ ] Postura de migración y rollback explícita y ensayada en staging. — Aditiva, aplicada y verificada en `information_schema`; el `down` NO se ensayó (la instancia es única para dev/staging/prod y la tabla ya es contrato). Rollback operativo = flag OFF.
+- [x] Evidencia runtime/DB listada para cada cambio más allá de docs. — §14.8 (readback de columnas, CHECKs, FK, grants y capability; preview v2 con datos reales).
+- [x] Errores canónicos y sin fuga de datos crudos. — `InsightsInputError` 400 `invalid_request`, 404 anti-oráculo por `assertInsightsAccess`, payload de evento redactado.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en el primitive: resolución de portada y preferencia viven en `src/lib/efeonce-insights/**`, no en UI.
-- [ ] Preferencia modelada como command + reader, no como handler de pantalla.
-- [ ] Read por reader canónico; write con capability fina, idempotencia, outbox y errores canónicos.
-- [ ] Capability + grant + coverage test en el mismo PR.
-- [ ] Camino programático: lanes `api/platform/app` y `api/platform/ecosystem` + tool MCP federada en `efeonce-mcp`.
-- [ ] Write apto para `propose → confirm → execute`; sin integración Nexa-específica.
-- [ ] Un primitive, muchos consumers; sin lógica duplicada en TASK-1849.
-- [ ] Parity check = SÍ.
+- [x] Lógica en el primitive: resolución de portada y preferencia viven en `src/lib/efeonce-insights/**`, no en UI.
+- [x] Preferencia modelada como command + reader, no como handler de pantalla.
+- [x] Read por reader canónico; write con capability fina, idempotencia, outbox y errores canónicos.
+- [x] Capability + grant + coverage test en el mismo PR. — `insights.cover_preference.manage` (Admin + Account), `capability-grant-coverage.test.ts` verde.
+- [ ] Camino programático: lanes `api/platform/app` y `api/platform/ecosystem` + tool MCP federada en `efeonce-mcp`. — Lanes y tools en Greenhouse construidas; federación en PR efeonce-mcp#18 (sin merge ni deploy hasta el release).
+- [x] Write apto para `propose → confirm → execute`; sin integración Nexa-específica. — un solo write idempotente y reversible (fijar el valor previo).
+- [x] Un primitive, muchos consumers; sin lógica duplicada en TASK-1849. — delta en TASK-1849.
+- [x] Parity check = SÍ.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -481,21 +481,21 @@ eso lo resuelve el catálogo en TASK-1889 desde `modules` y `channelId`, sin cam
 
 ## Acceptance Criteria
 
-- [ ] La matriz familia × evidencia existe en la arquitectura §6 con veredicto por familia.
-- [ ] `ChartSpec` admite las 15 familias; cada invariante de `chart-geometry.ts` tiene su validación y test de rechazo.
-- [ ] Un fixture de plan v1 sellado compone igual antes y después (test).
-- [ ] El plan trae lectura por figura, cifra principal, entrada de capítulo, hechos esenciales y líneas «Qué mide
-  este informe»; el validador rechaza una cifra no citada en cualquiera de ellos.
-- [ ] El planner emite al menos las familias marcadas `productor ahora` y ninguna marcada `sin evidencia`.
-- [ ] Una variación de una métrica en porcentaje se imprime en puntos porcentuales («pp»); test con OTD 80,1 → 81,9
-  que espera «+1,8 pp».
-- [ ] Las series de canal llevan `channelId`; un proveedor desconocido no rompe la generación.
-- [ ] Un encargo sin `coverTheme` conserva su hash (test).
+- [x] La matriz familia × evidencia existe en la arquitectura §6 con veredicto por familia. — `editorial/family-evidence-matrix.ts` (`family_evidence_matrix_v1`) + tabla en §6; producer_now: bar, bar_grouped, line, bullet.
+- [x] `ChartSpec` admite las 15 familias; cada invariante de `chart-geometry.ts` tiene su validación y test de rechazo. — `contracts/chart-spec.test.ts` (16 tests, uno por invariante; los de valor llaman a la geometría vía `editorial/chart-values.ts`).
+- [x] Un fixture de plan v1 sellado compone igual antes y después (test). — `editorial-v2-contract.test.ts` (plan v1 valida igual, incluido el texto «+2,2 %» sellado) + suites `render/report-mapper` y `insights-deck-mapper` verdes con planes v1; `preview-edition.ts --plan-only` sin `--editorial-v2` sobre Berel da el plan v1.
+- [x] El plan trae lectura por figura, cifra principal, entrada de capítulo, hechos esenciales y líneas «Qué mide
+  este informe»; el validador rechaza una cifra no citada en cualquiera de ellos. — `editorial-v2-contract.test.ts` («rechaza una cifra no citada en cada campo nuevo»); `decision`/`measurement`/`ask` existen en el contrato pero sin productor determinista (decisión documentada en §14.8).
+- [x] El planner emite al menos las familias marcadas `productor ahora` y ninguna marcada `sin evidencia`. — `editorial-v2-producers.test.ts` + `assertChartsAllowed`; datos reales: Sky emite bar_grouped + 3 bullets, Berel bar/bar_grouped (sin línea: ventana de un mes).
+- [x] Una variación de una métrica en porcentaje se imprime en puntos porcentuales («pp»); test con OTD 80,1 → 81,9
+  que espera «+1,8 pp». — `editorial-v2-contract.test.ts`; además, bajo 0,05 pp dos decimales (caso real Berel CTR).
+- [x] Las series de canal llevan `channelId`; un proveedor desconocido no rompe la generación. — `adapters.test.ts` (AEO `openai→chatgpt`, proveedor desconocido sin campo; SEO `google`) + `dimensionChannelIds` en el planner.
+- [x] Un encargo sin `coverTheme` conserva su hash (test). — `cover-preference.test.ts`, hash fijado contra el validador de `05fd559c0` (previo a la task).
 - [ ] La preferencia se guarda por command con capability, grant, outbox y errores canónicos, y se lee por reader; lanes
-  app/ecosystem responden y la tool MCP está federada.
-- [ ] `auto` resuelve blanca sin logo apto para fondo oscuro y navy con él; el resultado queda sellado en la edición.
-- [ ] Ediciones internas de Berel y Sky en staging pasan validación con flag ON; ninguna se comparte con el cliente.
-- [ ] Flag en el ledger con runtime declarado.
+  app/ecosystem responden y la tool MCP está federada. — **Parcial:** command/reader/capability/grant/outbox/errores y lanes construidos con tests (`cover-preference.test.ts`, `capability-grant-coverage`); federación en [efeonce-mcp#18](https://github.com/efeoncepro/efeonce-mcp/pull/18) abierta. Falta: lanes respondiendo en un runtime desplegado y el PR mergeado + gateway desplegado (después del release).
+- [x] `auto` resuelve blanca sin logo apto para fondo oscuro y navy con él; el resultado queda sellado en la edición. — `cover-preference.test.ts` + `plan.cover` en el plan congelado (validador impone coherencia tema↔logo); Sky y Berel resuelven blanca por `auto` con datos reales.
+- [ ] Ediciones internas de Berel y Sky en staging pasan validación con flag ON; ninguna se comparte con el cliente. — **Pendiente de rollout** (requiere release a staging). Evidencia previa local, sólo lectura: Sky `EO-INS-000022` 9 hechos / 0 violaciones y Berel `EO-INS-000019` 24 hechos / 0 violaciones con `--editorial-v2`.
+- [x] Flag en el ledger con runtime declarado. — Vercel + `ops-worker` (`deploy.sh` `:-false`); `pnpm flags:audit --strict --no-vercel` en 0.
 
 ## Verification
 

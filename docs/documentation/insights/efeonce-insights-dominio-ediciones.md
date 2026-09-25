@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.9
+> **Version:** 1.10
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1847 cerrada: informe A4 y deck nuevo en producción desde el 2026-09-24 y primer informe real renderizado ahí; rediseño aprobado, planificado en TASK-1888/TASK-1889)
+> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1888: los datos del diseño nuevo quedan construidos y apagados; preferencia de portada por cliente; variación de porcentajes en puntos)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -125,8 +125,9 @@ devuelve el mismo pedido anterior, no produce archivos duplicados.
 
 ## Qué viene: el diseño aprobado para todos los informes (planificado)
 
-> Estado: **aprobado el 2026-09-25, todavía no construido.** Los informes que salen hoy usan el diseño anterior. El
-> nuevo lo construyen TASK-1888 (los datos que el diseño necesita) y TASK-1889 (las plantillas).
+> Estado (2026-09-25): **los datos que el diseño necesita ya están construidos pero apagados** (TASK-1888); las
+> plantillas las construye TASK-1889. Hasta que ambas salgan juntas a producción, los informes usan el diseño vigente.
+> La única mejora que ya aplica siempre es cómo se imprime el cambio de un porcentaje (en puntos, ver abajo).
 
 El operador revisó página por página un diseño nuevo de informe y lo aprobó como el aspecto que debe tener **todo**
 informe de Insights, en A4 y en deck:
@@ -145,21 +146,41 @@ informe de Insights, en A4 y en deck:
 **Portada azul marino o blanca: cómo se decide.** Cada cliente tiene una preferencia, y al pedir una edición se puede
 cambiar sólo para esa edición. Si la preferencia es «automática», la portada va azul marino sólo cuando el cliente
 tiene un logo que se lee bien sobre fondo oscuro; si no, va blanca. Hoy las organizaciones tienen un solo logo, sin
-versión para fondo oscuro, así que «automática» daría portada blanca. La portada elegida queda fija en la edición:
-volver a producir el PDF da la misma portada.
+versión para fondo oscuro, así que «automática» da portada blanca. La portada azul marino **nunca** usa el logo normal
+del cliente (sobre azul marino puede no verse): usa su versión para fondo oscuro o va sin logo. La portada elegida queda
+fija en la edición: volver a producir el PDF da la misma portada, aunque después cambie la preferencia.
 
-**Qué gráficos nuevos llegarán.** Sólo los que tengan datos que los sostengan: por ejemplo, entregas a tiempo, rondas
-por entregable y aprobación al primer intento contra su meta, la tendencia mes a mes, o la presencia de la marca por
-motor de IA. Los que hoy no tienen datos (métricas por página o por palabra clave, coincidencias entre consultas de
-IA, embudo comercial) no aparecerán. También se corregirá cómo se imprime el cambio de un porcentaje: OTD de 80,1 % a
-81,9 % es «+1,8 puntos», no «+2,2 %».
+**Quién fija la preferencia y dónde.** Las personas de Efeonce que operan la cuenta (administración y cuentas) la fijan
+por cliente: «automática», «azul marino» o «blanca». Se puede fijar desde ya, aunque el diseño nuevo siga apagado. La
+versión del logo para fondo oscuro se carga en los logos de la organización, igual que el logo normal. La pantalla para
+hacerlo desde el portal llega con la biblioteca de Insights (TASK-1849); mientras tanto se hace por la API o por un
+asistente conectado al MCP de Efeonce (ver el manual).
+
+**Qué gráficos nuevos traerá.** Sólo los que tienen datos que los sostengan, según una tabla que dice qué tipo de
+gráfico puede salir de qué módulo:
+
+- **Entrega contra la meta** (entregas a tiempo, primera entrega correcta y rondas de revisión por pieza), un espacio
+  por barra, con la meta oficial marcada. La meta sale del registro de métricas de entrega, nunca se escribe a mano.
+- **Tendencia mes a mes** cuando el informe cubre tres meses o más (entrega por espacio; tráfico orgánico estimado).
+- **Presencia de la marca por motor de IA** con el logo de cada motor (ChatGPT, Gemini, Claude, Perplexity, respuestas
+  de Google).
+
+Cada gráfico trae su lectura: la cifra principal, «Lo que significa» (dónde quedó el dato contra la meta o el período
+anterior) y, sólo cuando hay una brecha con la meta, un «Próximo paso». La lectura nunca inventa una causa. Los
+gráficos sin datos que los sostengan no aparecen: métricas por página o por palabra clave, coincidencias entre
+consultas de IA, embudo comercial, y el medidor del puntaje de IA con su período anterior (hoy sólo se lee el último
+análisis).
+
+**Cambio de un porcentaje, en puntos (ya aplica).** Cuando la métrica ya es un porcentaje, el cambio se imprime en
+puntos: OTD de 80,1 % a 81,9 % es «+1,8 pp», no «+2,2 %». Si el cambio es menor a 0,05 puntos, se imprime con dos
+decimales para no escribir «0,0 pp» junto a dos cifras que se ven distintas.
 
 **Cómo se revisa.** Cada plantilla nueva se compara con la página aprobada y no puede diferir en más del 1 % de sus
 puntos. Las primeras ediciones reales con el diseño nuevo serán de Berel (visibilidad) y Sky (entrega), como informes
 internos: no se comparten con el cliente hasta que el operador las revise.
 
 > Detalle técnico: arquitectura §6 (delta 2026-09-25, rediseño premium aprobado);
-> `docs/tasks/to-do/TASK-1888-efeonce-insights-editorial-contract-v2.md`;
+> `docs/tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md` (estado en arquitectura §14.8);
 > `docs/tasks/to-do/TASK-1889-efeonce-insights-premium-catalogs.md`; dirección visual
 > `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`.
 
