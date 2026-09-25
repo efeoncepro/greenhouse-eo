@@ -1,7 +1,7 @@
 # Efeonce Marketing Studio — Gestión de campañas
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
 > **Ultima actualizacion:** 2026-09-25 por Claude
 > **Documentacion tecnica:** [Arquitectura de Marketing Studio](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) · [ADR API-first](../../architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md)
@@ -43,6 +43,21 @@ Tiene modo claro y oscuro: el botón de sol/luna arriba a la derecha lo cambia y
 Por ahora Studio se puede ver sin iniciar sesión y es solo de lectura: nadie puede cambiar datos desde la web.
 Los buscadores no lo indexan. El inicio de sesión con la cuenta Efeonce (`auth.efeonce.org`) llega en una
 etapa posterior del programa (EPIC-049).
+
+## Acceso para agentes e integraciones
+
+Además de la web, Studio se puede leer por su API con un **token de servicio** propio de cada integración. Cada
+token tiene organizaciones permitidas y sólo ve esas campañas; si pide otra, la respuesta es «no encontrado». Los
+tokens se crean y revocan por consola y quedan auditados.
+
+Los agentes de IA autorizados leen Studio por Efeonce MCP (`mcp.efeonce.org`) con 12 herramientas de lectura:
+atención, campañas, detalle de campaña, piezas, detalle y vista de una pieza, copys, anuncios, plan de medios,
+publicaciones, calendario y búsqueda. Cada herramienta explica qué significa cada dato y qué no significa (por
+ejemplo, que un presupuesto propuesto no es gasto), y un manual de uso les enseña a leer los tres estados sin
+confundirlos. Para usarlas, la persona necesita el permiso de lectura de Studio, que hoy tienen los roles de
+administración, cuentas y operaciones.
+
+> Detalle técnico: [arquitectura §4.1](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 
 ## De dónde salen los datos
 

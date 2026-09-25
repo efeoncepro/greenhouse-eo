@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-25 — Marketing Studio listo para agentes (TASK-1890)
+
+Studio publica un registro único de operaciones del que se derivan su OpenAPI (1.1.0) y el manifiesto `studio-tool-manifest.v1` (12 tools de lectura `studio.*` + 5 exclusiones con razón, `manifestHash`, leak test y paridad con los route handlers). La API acepta bearer de `api_client` con organizaciones permitidas (`organizationId` nunca amplía), las campañas usan el id canónico de organización de Greenhouse y hay detalle y preview por pieza. Imágenes por enlace firmado sin consulta a la base (incidente de conexiones del mismo día). En Greenhouse: capability `marketing_studio.campaign.read` y manual MCP `marketing-studio` (manuales con `provider` externo). Toolchain de Studio al día (TypeScript 7, React 19.3, catálogo único de versiones). [Arquitectura §4.1](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md).
+
 ## 2026-09-25 — Efeonce Marketing Studio: fundación en producción
 
 Nuevo producto `studio.efeonce.org` (EPIC-049 / TASK-1887). Repo `efeoncepro/efeonce-marketing-studio`, solo código, con docs en este repo. Next.js en Vercel con `/api/v1` (OpenAPI 3.1, 12 rutas) y dominio sin framework. Bases `marketing_studio` y `marketing_studio_staging` en `greenhouse-pg-dev`, con roles propios. Renditions WebP en buckets privados servidas por la API. UI aprobada en claro y oscuro con tema generado desde `@efeoncepro/axis-tokens`. Import idempotente de CMP-001 a CMP-005 aplicado en prod. Acceso abierto de solo lectura; el login es task aparte y el CNAME del dominio está pendiente. [Arquitectura](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) · [runbook](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).

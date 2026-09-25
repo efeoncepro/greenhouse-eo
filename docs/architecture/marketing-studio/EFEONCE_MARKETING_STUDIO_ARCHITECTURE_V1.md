@@ -1,7 +1,7 @@
 # Efeonce Marketing Studio — Arquitectura V1
 
 > **Tipo:** arquitectura técnica (contrato para agentes y desarrolladores)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
 > **Estado:** Accepted. En vivo en `https://studio.efeonce.org` desde 2026-09-25 (TASK-1887)
 > **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + delta de placement 2026-09-25)
@@ -102,7 +102,7 @@ los nombres de archivo y las UTM.
 
 ## 4. Contrato API v1
 
-- Base: `/api/v1`. Documento: `GET /api/v1/openapi.json` (OpenAPI 3.1 generado desde `packages/contracts`).
+- Base: `/api/v1`. Documento: `GET /api/v1/openapi.json` (OpenAPI 3.1, versión 1.1.0). **Toda operación nace en el registro único `packages/contracts/src/operations.ts`**: de él se derivan el OpenAPI, el manifiesto de tools para agentes (§4.1) y un test de paridad contra los route handlers reales. Las descripciones salen del glosario `semantics.ts`.
 - Formato de error canónico (igual espíritu que Greenhouse): `{ "error": "<es-CL seguro>", "code": "<snake_case estable>", "actionable": <bool> }`. Nunca stack traces, SQL ni rutas.
 - Lecturas de la fundación:
 
@@ -119,10 +119,25 @@ los nombres de archivo y las UTM.
 | `GET /api/v1/attention` | decisiones pendientes derivadas de estados (presupuesto sin aprobar, posts vencidos en «pendiente», pauta bloqueada, campañas sin piezas), próximas publicaciones e inventario |
 | `GET /api/v1/calendar?from&to` | vuelos y publicaciones de todas las campañas en `[from, to)`, con `overdue` y campañas sin fechas |
 | `GET /api/v1/search?q` | campañas, piezas y copys (mínimo 2 caracteres) |
-| `GET /api/v1/renditions/{renditionId}` | imagen WebP desde el bucket privado, tras verificar la visibilidad de su campaña; `Cache-Control: immutable` (el id cambia con la versión) |
+| `GET /api/v1/assets/{assetId}` | detalle de una pieza: versiones con renditions, anuncios que la usan y copys de su concepto |
+| `GET /api/v1/assets/{assetId}/preview?size=thumb\|preview` | imagen vigente de una pieza para clientes de API y agentes |
+| `GET /api/v1/media/{token}` | imagen por enlace firmado (HMAC, vence a la semana): la forma de `thumbUrl`/`previewUrl`; se sirve sin consultar la base |
+| `GET /api/v1/renditions/{renditionId}` | imagen por id de rendition, tras verificar la visibilidad (compatibilidad) |
+| `GET /api/v1/tool-manifest` | artefacto del manifiesto de tools con `manifestHash` |
 
+- Toda lectura acepta `organizationId` (id canónico `org-…`): filtra dentro de lo visible y nunca amplía; una organización no permitida responde 404. `X-Correlation-Id` se acepta y se devuelve.
 - Paginación por cursor opaco en listas que pueden crecer (`assets`, `ads`, `copies`); orden estable por ID.
 - **Escrituras:** la fundación no expone escrituras HTTP. El import corre por CLI con credencial de migrador. Los commands HTTP (crear campaña, versionar asset, revisar copy, aprobar) llegan en tasks hijas con idempotencia (`Idempotency-Key` + digest), `If-Match` por `revision` y auditoría, según el ADR.
+
+## 4.1 Agentes y Efeonce MCP (TASK-1890)
+
+- **Manifiesto de tools** `studio-tool-manifest.v1`, derivado del registro de operaciones: 12 tools de lectura `studio.*` y 5 exclusiones con razón (`renditions` y `media` son transporte de la web; `health`, `openapi.json` y `tool-manifest` son operación y metadato). Cada tool lleva descripción para agentes (cuándo usarla, qué NO significa, qué hacer después), `inputSchema`/`output` autocontenidos (sin `$ref`), las cuatro `annotations`, la capability de Greenhouse (`marketing_studio.campaign.read`) y el scope de API (`studio:read`).
+- Tools: `studio.attention.get`, `studio.campaigns.list`, `studio.campaign.get`, `studio.campaign.assets.list`, `studio.asset.get`, `studio.asset.preview`, `studio.campaign.copies.list`, `studio.campaign.ads.list`, `studio.campaign.media_plan.get`, `studio.campaign.posts.list`, `studio.calendar.get`, `studio.search`.
+- Artefacto `packages/contracts/generated/tool-manifest.json` con `manifestHash = sha256(JSON)`; `pnpm mcp:manifest:generate|check` (el check corre en `pnpm check`). Tests: tool o exclusión por operación, nombres únicos `studio.*`, readOnly, schemas autocontenidos, leak test (mismas prohibiciones que los manuales MCP de Greenhouse), determinismo y paridad con los route handlers. Los tres detectores se vieron fallar antes de confiar en su verde.
+- **Regla del programa:** toda capacidad nueva de Studio nace en el registro con su tool o una exclusión con razón. Todo lo que se puede hacer en la UI se puede hacer por API y por MCP, incluidas las aprobaciones (TASK-1894/1899).
+- **Autoridad:** Greenhouse registra la capability `marketing_studio.campaign.read` (grant: `efeonce_admin`, `efeonce_account`, `efeonce_operations`), que el gateway verifica para la persona; Studio acota por organización con el `api_client` del gateway (secreto `marketing-studio-mcp-gateway-token`).
+- **Manual servido:** `docs/mcp/skills/marketing-studio/SKILL.md` (audiencia `internal`), por `get_greenhouse_skill`. Su entrada del manifiesto de manuales declara `provider: 'marketing-studio'`: Greenhouse valida el espacio de nombres y el gateway, la existencia de cada tool contra el artefacto sincronizado (TASK-1891).
+- La federación en `mcp.efeonce.org` es TASK-1891.
 
 ## 5. Acceso
 
@@ -135,8 +150,15 @@ Riesgo aceptado del modo `open`: cualquiera con la URL ve presupuestos propuesto
 campañas importadas. Se revierte cambiando el modo (redeploy) cuando exista el relying party.
 
 Aun en `open`, el código ya pasa un `Actor` a cada reader (`{ kind: 'anonymous_open' }`), para que activar
-`efeonce_id` sea configuración y no refactor. El `api_client` (token hasheado, scopes, organizaciones) existe
-desde la fundación para agentes y CLI.
+`efeonce_id` sea configuración y no refactor.
+
+**Bearer de servicio (TASK-1890, vigente):** `Authorization: Bearer mst_…` resuelve un `api_client` (se guarda sólo el
+sha256, activo, scope `studio:read`) con sus organizaciones permitidas. Un token inválido, revocado o mal formado
+responde 401 aunque el modo sea `open` (nunca se degrada a anónimo); sin cabecera rige el modo vigente. Alta y
+revocación sólo por CLI de operador (`pnpm api-client:create|revoke`), con `audit_event`; el token se imprime una vez.
+
+**Organización:** `campaign.organization_id` guarda el id canónico de Greenhouse (`org-…`), con `CHECK` de prefijo; el
+público `EO-ORG-####` es sólo presentación y el importador lo rechaza.
 
 ## 6. Persistencia y conexión
 
@@ -158,7 +180,7 @@ desde la fundación para agentes y CLI.
 ## 7.1 Renditions
 
 - CLI `pnpm media:renditions --root <5. Contenidos> --bucket <bucket> [--apply]`: por cada versión vigente genera `thumb` (lado largo 640 px) y `preview` (1600 px) en WebP con `sharp`; los videos usan el cuadro del segundo 1 (ffmpeg). Sube sin sobrescribir (`ifGenerationMatch=0`) a `renditions/<asset_version_id>/<kind>-<sha12>.webp` y hace upsert de la fila. Idempotente.
-- Buckets privados por ambiente (`efeonce-marketing-studio-media` / `-staging`); la web nunca expone URLs de GCS, sólo `/api/v1/renditions/{id}`.
+- Buckets privados por ambiente (`efeonce-marketing-studio-media` / `-staging`); la web nunca expone URLs de GCS. Los readers devuelven enlaces firmados `/api/v1/media/{token}` (HMAC con `STUDIO_MEDIA_URL_SECRET`) que se sirven sin consultar la base: con una consulta por imagen, una grilla de 20+ miniaturas agotaba el tope de 20 conexiones del rol (incidente 2026-09-25).
 - El worker de Cloud Run (task hija) automatiza esto cuando exista el corte de OneDrive.
 - **Corte:** hasta que la UI de Studio permita editar, OneDrive sigue siendo la fuente y Studio una proyección reimportable. El corte a Studio como fuente se declara en un CDR/ADR cuando existan commands de escritura; nunca se escribe en los dos lados.
 

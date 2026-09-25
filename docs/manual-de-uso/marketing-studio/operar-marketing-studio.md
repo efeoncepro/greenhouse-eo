@@ -1,7 +1,7 @@
 # Operar Efeonce Marketing Studio
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
 > **Documentacion tecnica:** [Runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md)
 
@@ -32,6 +32,15 @@ en OneDrive.
 3. Sigue los comandos de import (primero sin `--apply`) y de renditions del [runtime handoff](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md#comandos-desde-efeonce-marketing-studio), primero en staging y después en producción.
 4. Confirma que una segunda corrida de import informe 0 filas insertadas.
 
+## Paso a paso: dar acceso por API a una integración
+
+1. Decide qué organizaciones debe ver la integración (id canónico `org-…`, no el `EO-ORG-####`).
+2. Con el túnel a la base de destino abierto, corre `pnpm api-client:create --label "<quién>" --org org-… --scope studio:read --token-only` y canaliza la salida directo a Secret Manager (`| gcloud secrets versions add <secreto> --data-file=-`). El token se muestra una sola vez.
+3. Verifica con `curl -H "Authorization: Bearer <token>" https://studio.efeonce.org/api/v1/campaigns`: debe responder 200 y sólo campañas de sus organizaciones.
+4. Para cortar el acceso: `pnpm api-client:revoke --id <api_client_id> --reason "<por qué>"`. Desde ese momento el token responde 401.
+
+El gateway de Efeonce MCP usa su propio cliente (secreto `marketing-studio-mcp-gateway-token`); no lo compartas con otra integración.
+
 ## Qué significan los estados
 
 | Estado | Significado |
@@ -50,6 +59,9 @@ en OneDrive.
 - No crees usuarios de base con `gcloud sql users create`, ni pegues el `.npmrc` completo como token en Vercel.
 
 ## Problemas comunes
+
+- **Un token responde 401:** está mal copiado, revocado o tiene saltos de línea. Los tokens empiezan con `mst_` y tienen 47 caracteres.
+- **Una integración recibe 404 en una campaña que existe:** la campaña es de una organización que su token no tiene permitida.
 
 | Síntoma | Qué hacer |
 |---|---|

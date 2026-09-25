@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-049`
-- Status real: `Implementación`
+- Status real: `Code complete en Studio y en producción; en Greenhouse falta el release para servir el manual`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -189,11 +189,11 @@ Reglas obligatorias:
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en readers del dominio, no en handlers.
-- [ ] Reads expuestos como readers canónicos con contrato; el alta de `api_client` como comando de CLI con auditoría.
-- [ ] Capability + grant en el mismo commit (`marketing_studio.campaign.read`).
-- [ ] Camino programático declarado: `/api/v1` + manifiesto para MCP (TASK-1891).
-- [ ] Un primitive, muchos consumers: web, CLI y MCP usan los mismos readers.
+- [x] Lógica en readers del dominio, no en handlers (`getAsset`, `getAssetPreviewLocation`, `api-client.ts` en `packages/domain`).
+- [x] Reads expuestos como readers canónicos con contrato; el alta de `api_client` como comando de CLI con auditoría (`pnpm api-client:create|revoke`, `audit_event` verificado en staging).
+- [x] Capability + grant en el mismo commit (`marketing_studio.campaign.read`, `b29571818`).
+- [x] Camino programático declarado: `/api/v1` + manifiesto para MCP (TASK-1891).
+- [x] Un primitive, muchos consumers: web, CLI y MCP usan los mismos readers.
 
 <!-- ZONE 2 — PLAN MODE: lo llena el agente que toma la task. -->
 
@@ -316,16 +316,16 @@ Nombres de tools propuestos (confirmar con `mcp-craft` al implementar; espacio d
 
 ## Acceptance Criteria
 
-- [ ] Las 5 campañas tienen `organization_id` canónico en staging y producción, y un reimport no lo revierte.
-- [ ] Con bearer válido de un `api_client` de la org Efeonce: `/api/v1/campaigns` 200; con `organizationId` ajeno, 404; con token inválido, 401; sin bearer, la web sigue funcionando en modo `open`.
-- [ ] `GET /api/v1/assets/{assetId}` devuelve pieza, versiones, renditions, anuncios y copys del concepto.
-- [ ] El manifiesto cubre las 13 operaciones de `/api/v1` (tool o exclusión con razón) y el test de paridad falla nombrando la operación cuando se agrega una ruta sin entrada.
-- [ ] `manifestHash` es determinista y `mcp:manifest:check` falla si el artefacto se edita a mano.
-- [ ] Leak test verde sobre todas las descripciones.
-- [ ] `marketing_studio.campaign.read` existe en catálogo TS y `capabilities_registry`, con grant a ≥1 rol real (coverage test verde).
-- [ ] El manual `marketing-studio` se sirve por el lane de skills de Greenhouse en producción.
-- [ ] Secreto del token del gateway creado como scalar crudo.
-- [ ] Arquitectura, runbook, Handoff y changelog actualizados.
+- [x] Las 5 campañas tienen `organization_id` canónico en staging y producción, y un reimport no lo revierte (migración aplicada en ambas bases; dry-run de reimport contra staging: 0 inserciones, el registro semilla y el importador exigen `org-…`).
+- [x] Con bearer válido de un `api_client` de la org Efeonce: `/api/v1/campaigns` 200; con `organizationId` ajeno, 404; con token inválido, 401; sin bearer, la web sigue funcionando en modo `open` (curl contra `studio.efeonce.org` en producción con el token del gateway, 2026-09-25).
+- [x] `GET /api/v1/assets/{assetId}` devuelve pieza, versiones, renditions, anuncios y copys del concepto (CMP001-01-imagen-4x5: 1 versión, 4 anuncios, 12 copys; 200 en producción).
+- [x] El manifiesto cubre todas las operaciones de `/api/v1` (17: 12 tools + 5 exclusiones con razón; la spec decía 13 antes de sumar media, asset, preview y tool-manifest) y el test de paridad falla nombrando la ruta cuando se agrega una sin entrada (visto fallar con `/api/v1/probe`).
+- [x] `manifestHash` es determinista y `mcp:manifest:check` falla si el artefacto se edita a mano (visto fallar renombrando una tool en el artefacto).
+- [x] Leak test verde sobre todas las descripciones (visto fallar con una ruta del repo y un id de task).
+- [x] `marketing_studio.campaign.read` existe en catálogo TS y `capabilities_registry`, con grant a admin, account y operations (tests de entitlements verdes; la paridad live confirma la fila; esa suite falla por un drift previo ajeno: `growth.ga4.connect` e `identity.internal_access.*`).
+- [ ] El manual `marketing-studio` se sirve por el lane de skills de Greenhouse en producción. **Pendiente:** code complete y en el artefacto (`mcp:skills:check` al día, 9 manuales); falta el release de Greenhouse a producción.
+- [x] Secreto del token del gateway creado como scalar crudo (`marketing-studio-mcp-gateway-token` v1, 47 caracteres con forma `mst_…`, sin salto de línea).
+- [x] Arquitectura (§4, §4.1, §5, §7.1), runbook, documento funcional, manual de uso, Handoff y changelog actualizados.
 
 ## Verification
 
@@ -350,4 +350,4 @@ Nombres de tools propuestos (confirmar con `mcp-craft` al implementar; espacio d
 
 ## Open Questions
 
-- Estilo final de nombres de tools (`studio.*` punteado vs `get_studio_*`): resolver con `mcp-craft` y el estilo vigente del gateway antes del Slice 4.
+- ~~Estilo de nombres~~ Resuelto: `studio.*` punteado, el estilo del gateway para proveedores propios (`identity.*`, `hiring.*`, `globe.*`); el snake_case es sólo lo federado desde Greenhouse.

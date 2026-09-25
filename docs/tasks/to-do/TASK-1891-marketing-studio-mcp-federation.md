@@ -4,6 +4,13 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-25
+
+- TASK-1890 dejó listo el lado de Studio: artefacto `studio-tool-manifest.v1` en `GET https://studio.efeonce.org/api/v1/tool-manifest` (12 tools `studio.*` + 5 exclusiones, `manifestHash`, schemas autocontenidos, cuatro `annotations`, `capability` y `apiScope` por tool), bearer `api_client` con scope `studio:read` y organización canónica, y el secreto `marketing-studio-mcp-gateway-token` (token del cliente del gateway en producción, org Efeonce).
+- `studio.asset.preview` apunta a `GET /api/v1/assets/{assetId}/preview?size=thumb|preview` (imagen WebP), no a `/renditions/{id}`.
+- El manual `marketing-studio` declara `provider: 'marketing-studio'` en el manifiesto de manuales de Greenhouse: Greenhouse sólo valida el prefijo `studio.`; **el guard del gateway debe verificar que cada tool de su `appliesTo` exista en el artefacto sincronizado**. Servirlo en producción requiere el release de Greenhouse.
+- Capability `marketing_studio.campaign.read` registrada (grant: `efeonce_admin`, `efeonce_account`, `efeonce_operations`).
+
 ## Status
 
 - Lifecycle: `to-do`

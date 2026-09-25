@@ -28,7 +28,7 @@ Node 24 LTS · pnpm 10 · Next.js 16.3 (Turbopack) · React 19.3 · **TypeScript
 | Instancia Cloud SQL | `efeonce-group:us-east4:greenhouse-pg-dev` (compartida con Greenhouse) |
 | Bases | `marketing_studio` (prod) · `marketing_studio_staging` (preview y development) |
 | Roles PG | `marketing_studio_migrator` (dueño de las bases, DDL) · `marketing_studio_runtime` (NOLOGIN, DML) · `marketing_studio_app` (prod, `CONNECT` sólo a `marketing_studio`) · `marketing_studio_staging_app` (`CONNECT` sólo a staging) |
-| Secretos | `marketing-studio-pg-app-password` · `marketing-studio-pg-staging-app-password` · `marketing-studio-pg-migrator-password` · `axis-packages-read-token` (npmrc; Vercel usa sólo el `_authToken`) |
+| Secretos | `marketing-studio-mcp-gateway-token` (token del `api_client` del gateway MCP en producción, scalar crudo; lo consume TASK-1891) · `marketing-studio-pg-app-password` · `marketing-studio-pg-staging-app-password` · `marketing-studio-pg-migrator-password` · `axis-packages-read-token` (npmrc; Vercel usa sólo el `_authToken`) |
 | Service accounts | `marketing-studio-runtime@` (producción: `cloudsql.client`, secreto prod, lectura del bucket prod) · `marketing-studio-runtime-stg@` (preview/development: equivalentes de staging) |
 | WIF | Pool `vercel`, provider `greenhouse-eo` (issuer del team); bindings por subject `owner:efeonce-7670142f:project:efeonce-marketing-studio:environment:<env>` |
 | Buckets | `efeonce-marketing-studio-media` · `efeonce-marketing-studio-media-staging` (us-east4, privados, acceso uniforme, sin acceso público) |
@@ -78,6 +78,14 @@ STUDIO_PG_HOST=127.0.0.1 STUDIO_PG_PORT=15433 STUDIO_PG_DATABASE=<base> STUDIO_P
 STUDIO_PG_PASSWORD="$(gcloud secrets versions access latest --secret=<secreto app>)" \
 pnpm import:catalog --catalog "<…>/Campaign Manager/CATALOGO-DATOS.json" \
   --readback "CMP-003=<greenhouse-eo>/ai-generations/2026-09-24_cmp003-sky-reel-cover/scheduling/metricool-readback.json" [--apply]
+
+# Clientes de API (token una sola vez; canalizarlo directo a Secret Manager, nunca a pantalla)
+STUDIO_PG_…(base destino) pnpm api-client:create --label "<quién>" --org org-… --scope studio:read --token-only \
+  | gcloud secrets versions add <secreto> --data-file=-
+STUDIO_PG_… pnpm api-client:revoke --id <api_client_id> --reason "<por qué>"
+
+# Manifiesto de tools para agentes (tras cambiar packages/contracts/src/operations.ts)
+pnpm mcp:manifest:generate   # y commitear generated/tool-manifest.json; pnpm check corre mcp:manifest:check
 
 # Renditions (miniatura 640 px + preview 1600 px WebP; ffmpeg para videos). Idempotente.
 pnpm media:renditions --root "<…>/Alineación/5. Contenidos" --bucket <bucket> [--apply]
