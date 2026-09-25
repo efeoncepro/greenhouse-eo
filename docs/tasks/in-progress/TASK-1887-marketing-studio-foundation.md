@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `db`
 - Epic: `EPIC-049`
-- Status real: `En ejecución — Slice 1`
+- Status real: `En producción en Vercel (deploy dpl_7hMKbww8Byoy1CJFZuNyLp3Qr7S2); rollout pendiente: CNAME de studio.efeonce.org en HostGator (operador)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -279,17 +279,17 @@ El modelo, el contrato, el acceso y la conexión están especificados en
 
 ## Acceptance Criteria
 
-- [ ] Repo `efeoncepro/efeonce-marketing-studio` privado existe con `apps/web`, `packages/contracts`, `packages/domain`, `packages/database` y `pnpm check` verde.
-- [ ] `packages/domain` no importa `next`, `react`, `@vercel/*` (gate verde).
-- [ ] Bases `marketing_studio` y `marketing_studio_staging` existen; los roles de Studio no tienen `CONNECT` sobre la base de Greenhouse (verificado).
-- [ ] Las 13 tablas del schema `studio` existen en ambas bases (verificación post-DDL).
-- [ ] Import en producción: 5 campañas, 52 assets, 48 copys, 72 anuncios, 4 audiencias, 1 flight, 3 posts de CMP-001/002 (o conteos del catálogo vigente, registrados en `import_run`).
-- [ ] Reimportar la misma fuente produce 0 inserciones nuevas.
-- [ ] `GET /api/v1/openapi.json` devuelve OpenAPI 3.1 con las 8 rutas.
-- [ ] `GET /api/v1/health` y `/api/v1/campaigns` responden 200 en el deployment de producción.
-- [ ] La respuesta incluye `X-Robots-Tag: noindex`.
-- [ ] Registros DNS de `studio.efeonce.org` entregados al operador; dominio verificado o marcado pendiente de propagación.
-- [ ] Arquitectura, runtime handoff, documentación funcional y manual existen en este repo.
+- [x] Repo `efeoncepro/efeonce-marketing-studio` privado existe con `apps/web`, `packages/contracts`, `packages/domain`, `packages/database` y `pnpm check` verde. — Evidencia: commit `ea32ee6`, `pnpm check` exit 0 y `pnpm build` OK (2026-09-25).
+- [x] `packages/domain` no importa `next`, `react`, `@vercel/*` (gate verde). — `domain-boundary-gate: OK`.
+- [ ] Bases `marketing_studio` y `marketing_studio_staging` existen; los roles de Studio no tienen `CONNECT` sobre la base de Greenhouse (verificado). — **Parcial:** las bases existen y cada app conecta solo a la suya, pero los roles **sí** pueden conectarse a `greenhouse_app` por el `CONNECT` por defecto de PUBLIC. Verificado: 0 tablas legibles y 0 funciones `SECURITY DEFINER` alcanzables. Cerrarlo del todo requiere un cambio en Greenhouse (queda como hija de EPIC-049).
+- [x] Las 13 tablas del schema `studio` existen en ambas bases (verificación post-DDL). — 13 verificadas vía `information_schema` + `asset_rendition` (migración 2), en staging y producción.
+- [x] Import en producción: 5 campañas, 52 assets, 48 copys, 72 anuncios, 4 audiencias, 1 flight, 3 posts de CMP-001/002 (o conteos del catálogo vigente, registrados en `import_run`). — Producción: 5 campañas, 21 conceptos, 54 piezas (52 del catálogo + 2 de CMP-003 del registro), 48 copys, 72 anuncios, 4 audiencias, 1 flight, 7 líneas de presupuesto, 6 posts (3 de CMP-001 + 3 de CMP-003).
+- [x] Reimportar la misma fuente produce 0 inserciones nuevas. — Staging y producción: segunda corrida con `inserted 0`.
+- [x] `GET /api/v1/openapi.json` devuelve OpenAPI 3.1 con las 8 rutas. — OpenAPI 3.1 con 12 rutas: las 8 originales + `attention`, `calendar`, `search`, `renditions/{id}` (test de contrato).
+- [x] `GET /api/v1/health` y `/api/v1/campaigns` responden 200 en el deployment de producción. — `vercel curl` al deployment de producción: health `{"status":"ok","database":"reachable"}`, campaigns con 5 campañas, rendition 200 `image/webp`, attention con las 4 decisiones y home 200.
+- [x] La respuesta incluye `X-Robots-Tag: noindex`. — Verificado en producción.
+- [x] Registros DNS de `studio.efeonce.org` entregados al operador; dominio verificado o marcado pendiente de propagación. — Dominio agregado y verificado en Vercel; falta el `CNAME studio → e33b47bdb5fb489f.vercel-dns-016.com.` en HostGator (runtime handoff).
+- [x] Arquitectura, runtime handoff, documentación funcional y manual existen en este repo.
 
 ## Verification
 

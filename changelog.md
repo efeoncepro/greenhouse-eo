@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-25 — Efeonce Marketing Studio: fundación en producción
+
+Nuevo producto `studio.efeonce.org` (EPIC-049 / TASK-1887). Repo `efeoncepro/efeonce-marketing-studio`, solo código, con docs en este repo. Next.js en Vercel con `/api/v1` (OpenAPI 3.1, 12 rutas) y dominio sin framework. Bases `marketing_studio` y `marketing_studio_staging` en `greenhouse-pg-dev`, con roles propios. Renditions WebP en buckets privados servidas por la API. UI aprobada en claro y oscuro con tema generado desde `@efeoncepro/axis-tokens`. Import idempotente de CMP-001 a CMP-005 aplicado en prod. Acceso abierto de solo lectura; el login es task aparte y el CNAME del dominio está pendiente. [Arquitectura](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) · [runbook](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
+
 ## 2026-09-24 — ANAM: foto oficial de Emma, avatar de chat y cargo comercial
 
 La landing pública sirve `kortex-cms-react/30` con el retrato PNG enviado por María Paz y el cargo `Ejecutivo comercial ANAM`. El avatar derivado con fondo menta se guardó en la identidad de Customer Agent y en el chatflow `96601133`; el widget público mostró la nueva imagen sin enviar mensajes. Se actualizaron el [caso ANAM](docs/architecture/kortex/hubspot-cms/anam-chat-landing.md), la documentación funcional, el manual y las referencias espejo de `hubspot-as-a-service`. La QA completa móvil y conversacional del build #30 no se repitió.

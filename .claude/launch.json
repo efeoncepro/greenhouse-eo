@@ -4,13 +4,25 @@
     {
       "name": "greenhouse-dev",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["dev"],
+      "runtimeArgs": [
+        "dev"
+      ],
       "port": 3000
     },
     {
       "name": "greenhouse-attach",
       "url": "http://localhost:3000",
       "port": 3000
+    },
+    {
+      "name": "marketing-studio-dev",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--dir",
+        "../efeonce-marketing-studio",
+        "dev"
+      ],
+      "port": 3100
     }
   ]
 }

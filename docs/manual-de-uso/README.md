@@ -10,6 +10,8 @@ La diferencia con otras capas de documentacion:
 
 ## Indice por categoria
 
+- [Operar Efeonce Marketing Studio](marketing-studio/operar-marketing-studio.md) — revisar campañas, preview en feed, UTM, y actualizar datos desde OneDrive (import + renditions) en staging y producción.
+
 ### Social y Creative Studio
 
 - [Usar Higgsfield con Creative Studio](creative-studio/higgsfield-provider.md) — preparación, derechos, coste,

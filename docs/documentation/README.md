@@ -268,6 +268,10 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ---
 
+### Marketing Studio
+
+- [Efeonce Marketing Studio — Gestión de campañas](marketing-studio/efeonce-marketing-studio.md) — qué muestra, reglas de estados y acceso abierto de solo lectura (TASK-1887).
+
 ## Documentacion tecnica (arquitectura)
 
 Para detalle tecnico, schemas, contratos y decisiones de diseno, ver `docs/architecture/`:

@@ -93,7 +93,7 @@ Las funciones de Vercel atienden sólo request/response. Imports, derivados de m
 | Instancia | La Cloud SQL existente `greenhouse-pg-dev` (`efeonce-group:us-east4`, Postgres 16). Sin costo de otra instancia. |
 | Base de datos | **Base propia** (`marketing_studio`), **no** un esquema dentro de la base de Greenhouse. Separar prod y staging en bases distintas dentro de la instancia (`marketing_studio` / `marketing_studio_staging`) se resuelve en la task de fundación. |
 | Roles | Propios (`marketing_studio_runtime` DML, `marketing_studio_migrator` DDL, dueño canónico propio). **Cero grants** sobre la base de Greenhouse y viceversa. Límite de conexiones por rol. |
-| Conexión | Cloud SQL Connector con identidad de workload (WIF/OIDC desde Vercel, IAM en Cloud Run); sin IP pública ni secretos de larga vida cuando sea posible. Pool chico en Vercel. |
+| Conexión | Cloud SQL Connector con identidad de workload (WIF/OIDC desde Vercel) para la API de Cloud SQL y Secret Manager; usuario con contraseña guardada en Secret Manager, porque la instancia no tiene IAM DB auth y activarla tocaría la instancia compartida con Greenhouse. Una service account por ambiente. Pool chico en Vercel. |
 | Migraciones | En el repo de Studio, con su propio historial; mismas reglas de oficio que Greenhouse (markers, verificación post-DDL, expand antes del deploy y contract después). |
 | Datos de Greenhouse | Organizaciones, clientes e identidad llegan por API/Efeonce ID, **nunca por SQL**. Postgres no permite joins entre bases, así que la separación queda impuesta por el motor. |
 | Binarios | Bucket GCS propio; metadatos, versiones y checksums en la base. OneDrive es procedencia de migración, no almacenamiento. |

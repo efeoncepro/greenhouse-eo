@@ -1,6 +1,6 @@
 # Handoff activo
 
-**Marketing Studio (25/09):** [TASK-1887](docs/tasks/in-progress/TASK-1887-marketing-studio-foundation.md) in-progress (EPIC-049). Repo nuevo `efeoncepro/efeonce-marketing-studio`, base `marketing_studio` en `greenhouse-pg-dev`, Vercel + `studio.efeonce.org` en modo `open` (sólo lectura). Autorizado por el operador: repo, bases, Vercel y dominio.
+**Marketing Studio (25/09):** [TASK-1887](docs/tasks/in-progress/TASK-1887-marketing-studio-foundation.md) (EPIC-049) en producción en Vercel: prod y staging migradas e importadas (5 campañas, 54 piezas, 72 anuncios), 108 renditions por bucket y UI aprobada en claro y oscuro. **Falta el CNAME** `studio → e33b47bdb5fb489f.vercel-dns-016.com.` en HostGator (operador); luego cerrar la task. Acceso abierto de solo lectura; el login con auth.efeonce.org es task aparte. Runbook: [runtime handoff](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
 
 **ANAM Emma (24/09):** landing pública HubSpot `kortex-cms-react/30` verificada con el PNG entregado por María Paz,
 cargo `Ejecutivo comercial ANAM` y avatar derivado con fondo menta en identidad de Customer Agent y chatflow
