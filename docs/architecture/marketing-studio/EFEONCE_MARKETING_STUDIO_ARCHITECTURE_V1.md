@@ -137,7 +137,7 @@ los nombres de archivo y las UTM.
 - **Regla del programa:** toda capacidad nueva de Studio nace en el registro con su tool o una exclusión con razón. Todo lo que se puede hacer en la UI se puede hacer por API y por MCP, incluidas las aprobaciones (TASK-1894/1899).
 - **Autoridad:** Greenhouse registra la capability `marketing_studio.campaign.read` (grant: `efeonce_admin`, `efeonce_account`, `efeonce_operations`), que el gateway verifica para la persona; Studio acota por organización con el `api_client` del gateway (secreto `marketing-studio-mcp-gateway-token`).
 - **Manual servido:** `docs/mcp/skills/marketing-studio/SKILL.md` (audiencia `internal`), por `get_greenhouse_skill`. Su entrada del manifiesto de manuales declara `provider: 'marketing-studio'`: Greenhouse valida el espacio de nombres y el gateway, la existencia de cada tool contra el artefacto sincronizado (TASK-1891).
-- La federación en `mcp.efeonce.org` es TASK-1891.
+- **Federación en `mcp.efeonce.org` (TASK-1891):** provider `marketing-studio` del gateway. Como Studio no conoce personas, el gateway canjea (RFC 8693) el token Entra de la persona en Greenhouse con el cliente `efeonce-mcp-marketing-studio`, donde se ejecuta `can(persona, 'marketing_studio.campaign.read')`; sólo si se aprueba llama a Studio con su bearer de servicio. El bearer canjeado nunca llega a Studio. Issuer nativo `unsupported` hasta un consentimiento nuevo (D10). Detalle operativo: runbook del gateway §Provider Marketing Studio.
 
 ## 5. Acceso
 

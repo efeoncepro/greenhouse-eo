@@ -65,6 +65,8 @@ The relying-party boundary is fixed by
 
 ## Hard rules
 
+- **Marketing Studio (TASK-1891):** provider `marketing-studio` con 12 tools de lectura `studio.*` registradas desde el manifiesto sincronizado de Studio (`pnpm studio:manifest:sync`, hash verificado al cargar). Studio no conoce personas: cada llamada canjea antes el token Entra de la persona en Greenhouse (cliente `efeonce-mcp-marketing-studio`, `can(persona, 'marketing_studio.campaign.read')`) y sólo entonces consulta Studio con el bearer de servicio del gateway; el bearer canjeado nunca viaja a Studio. Nativo `unsupported` (D10). Un manual servido de un proveedor externo declara `provider` en el manifiesto de manuales de Greenhouse, y el guard del gateway verifica su `appliesTo` contra el manifiesto sincronizado.
+
 - Keep `https://mcp.efeonce.org/mcp` as the single canonical resource. Do not create a second OAuth resource for an alias.
 - Default every provider or capability to disabled, read-only and fail-closed. Enabled internal providers and the
   dedicated synthetic external canary are not customer-access precedents. An absent or degraded provider must

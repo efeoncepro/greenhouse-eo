@@ -722,6 +722,61 @@ manuales e identidad delegada. Para retirar sólo Insights, revertir el PR de fe
 (baja de `1.5.0` con bump de versión y baseline regenerado). En Greenhouse, `INSIGHTS_GENERATION_ENABLED=false`
 convierte la creación en `503 generation_disabled` (`policy_blocked` en el gateway) sin tocar las lecturas.
 
+## Provider Marketing Studio (Efeonce Marketing Studio)
+
+> Task dueña: `TASK-1891` (EPIC-049). Estado 2026-09-25: code complete en la rama `feat/task-1891-marketing-studio-provider`
+> de `efeonce-mcp` (gateway `1.8.0`, 70 tools con el provider habilitado); **sin deploy**. El rollout depende del
+> release de Greenhouse que publica el cliente de canje y el manual.
+
+El provider `marketing-studio` (`src/providers/marketing-studio.ts`) federa las 12 tools de lectura `studio.*` que
+declara el manifiesto de Studio (`studio-tool-manifest.v1`). **Studio no conoce personas**, así que la autoridad de
+la persona se prueba en Greenhouse antes de CADA llamada:
+
+1. Canje RFC 8693 del token Entra de la persona en `/api/integrations/v1/sister-platforms/oauth/token`, cliente
+   confidencial `efeonce-mcp-marketing-studio`, scope `marketing_studio.campaign.read`. Greenhouse ejecuta
+   `can(persona, 'marketing_studio.campaign.read', 'read', 'tenant')` (roles `efeonce_admin`, `efeonce_account`,
+   `efeonce_operations`). Scope de entrada: el base `efeonce.mcp.read` (la barrera de persona es la capability).
+2. Sólo si el canje se aprueba, el gateway llama a `https://studio.efeonce.org/api/v1/**` con su bearer de servicio
+   (`api_client` de Studio con organizaciones permitidas). El bearer canjeado **nunca** viaja a Studio.
+
+- **Tools:** se registran desde `src/providers/marketing-studio-tool-manifest.generated.ts` (nombre, descripción,
+  annotations, inputSchema JSON Schema → zod). `studio.asset.preview` devuelve contenido `image` (miniatura WebP de
+  640 px por defecto; `size=preview` para 1600 px).
+- **Sync:** `pnpm studio:manifest:sync` lee el artefacto del checkout de Studio y el catálogo de manuales de
+  Greenhouse (`STUDIO_REPO`, `GREENHOUSE_REPO`), verifica ambos hashes y escribe el generado. El hash se verifica al
+  cargar: editarlo a mano impide arrancar el gateway.
+- **Guard:** `computeMarketingStudioParity` compara manifiesto ↔ tools registradas en las dos direcciones, rechaza
+  tools de escritura sin clase de scope (TASK-1899) y exige que el `appliesTo` del manual `marketing-studio` exista en
+  el manifiesto (Greenhouse sólo valida el prefijo).
+- **Política:** inventario exacto derivado del manifiesto; issuer Entra. Nativo `unsupported`
+  (`marketing_studio_native_policy_missing`): la autoridad interna v2 sólo delega `growth.seo.observation.read` y
+  sumar Studio exige consentimiento nuevo (D10).
+- **Errores:** persona sin capability ⇒ `authorization_denied`; organización ajena o inexistente ⇒ `not_found`
+  (anti-oráculo); Studio caído o bearer de servicio inválido ⇒ `upstream_unavailable` sin afectar otros providers.
+
+### Configuración
+
+| Variable (GitHub vars de `efeonce-mcp`) | Valor |
+|---|---|
+| `MARKETING_STUDIO_PROVIDER_ENABLED` | `false` hasta el canary; luego `true` |
+| `MARKETING_STUDIO_API_URL` | `https://studio.efeonce.org` |
+| `MARKETING_STUDIO_TOKEN_EXCHANGE_URL` | `https://greenhouse.efeoncepro.com/api/integrations/v1/sister-platforms/oauth/token` |
+| Secreto montado | `MARKETING_STUDIO_API_TOKEN=marketing-studio-mcp-gateway-token:latest` (sólo con el flag ON; la SA `efeonce-mcp-gateway@` necesita `secretAccessor`) |
+
+En Greenhouse: `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` debe incluir `efeonce-mcp-marketing-studio`.
+
+### Canary
+
+`pnpm build && pnpm studio:canary` con `MARKETING_STUDIO_API_URL`, `_TOKEN_EXCHANGE_URL`, `_API_TOKEN` y
+`MCP_STUDIO_CANARY_ACCESS_TOKEN` (token Entra delegado de una persona con la capability; opcional
+`MCP_STUDIO_CANARY_DENY_ACCESS_TOKEN` de una persona sin ella). Casos: allow (atención, campaña, pieza), imagen,
+organización ajena (`not_found`), fault (`upstream_unavailable`) y deny (`forbidden`). No imprime tokens.
+
+### Rollback
+
+`MARKETING_STUDIO_PROVIDER_ENABLED=false` + dispatch del deploy (las tools desaparecen de `tools/list` y el status
+queda `policy-blocked`), o revocar el `api_client` del gateway en Studio (`pnpm api-client:revoke`).
+
 ## Front door and DNS
 
 1. Aplica el módulo front door con `enable_front_door=true` después de existir Cloud Run.

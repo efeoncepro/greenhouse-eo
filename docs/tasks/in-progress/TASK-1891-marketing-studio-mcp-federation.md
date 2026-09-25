@@ -11,9 +11,14 @@
 - El manual `marketing-studio` declara `provider: 'marketing-studio'` en el manifiesto de manuales de Greenhouse: Greenhouse sólo valida el prefijo `studio.`; **el guard del gateway debe verificar que cada tool de su `appliesTo` exista en el artefacto sincronizado**. Servirlo en producción requiere el release de Greenhouse.
 - Capability `marketing_studio.campaign.read` registrada (grant: `efeonce_admin`, `efeonce_account`, `efeonce_operations`).
 
+## Delta 2026-09-25 — diseño de autorización corregido al implementar
+
+- La política `read([...capability])` + membership de la spec no protegía nada: con issuer Entra el gateway autoriza sin revisar capability (delega en el proveedor, y Studio no conoce personas), y con issuer nativo v2 sólo se delega `growth.seo.observation.read` (sumar otra exige consentimiento nuevo, D10). Implementado como Hiring/Client Services: canje RFC 8693 en Greenhouse (cliente `efeonce-mcp-marketing-studio`, `can(persona, 'marketing_studio.campaign.read')`) antes de cada llamada; nativo `unsupported` con razón. Aprobado por el operador.
+- El deploy del gateway es por dispatch manual (runbook §Deploy), no automático al merge.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -26,11 +31,11 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-049`
-- Status real: `Diseno`
+- Status real: `Code complete (gateway 1.8.0 en rama local + canje en Greenhouse); rollout pendiente de autorización y del release de Greenhouse`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `TASK-1890`
-- Branch: `efeonce-mcp main vía PR (auto-deploy de Cloud Run) · Greenhouse develop (docs); sin worktrees`
+- Branch: `efeonce-mcp feat/task-1891-marketing-studio-provider → PR a main (el deploy es dispatch manual, no automático) · Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -266,13 +271,13 @@ Contrato de tools: el que publica el manifiesto de TASK-1890 (tabla en su Detail
 
 ## Acceptance Criteria
 
-- [ ] Todas las tools del manifiesto de Studio están registradas en el gateway, y el guard falla nombrando cualquier tool faltante o sobrante.
+- [x] Todas las tools del manifiesto de Studio están registradas en el gateway, y el guard falla nombrando cualquier tool faltante o sobrante (`marketing-studio-mcp.test.ts` sobre `tools/list` real; `computeMarketingStudioParity` visto fallar con una tool faltante y una sobrante).
 - [ ] Con capability y membership, `studio.attention.get` y `studio.campaign.get` devuelven los datos de producción.
 - [ ] Una organización ajena devuelve `not_found`, y una persona sin capability recibe denegación.
 - [ ] Con Studio inaccesible, sus tools devuelven `upstream_unavailable` y los demás providers siguen sirviendo.
 - [ ] `studio.asset.preview` devuelve una imagen WebP de ≤640 px.
 - [ ] `efeonce.gateway.status` lista `marketing-studio` como `enabled` en la revisión activa.
-- [ ] La versión del gateway subió un minor y `surface-baseline.json` quedó actualizado.
+- [x] La versión del gateway subió un minor y `surface-baseline.json` quedó actualizado (`1.8.0`, 70 tools; el gate se encendió antes del bump). Si PR #18 (TASK-1888, también 1.8.0) se mergea antes, este PR rebasa a 1.9.0.
 - [ ] Runbook, arquitectura, skill (ambos espejos), Handoff y changelog actualizados.
 
 ## Verification
