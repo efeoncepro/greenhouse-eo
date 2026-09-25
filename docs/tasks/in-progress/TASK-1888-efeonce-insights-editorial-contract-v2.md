@@ -515,6 +515,12 @@ compilación 68 s, 23 páginas estáticas); `pnpm typecheck` limpio; `docs:closu
 lectura de Sky y Berel con 0 violaciones. `pnpm local:check` corta en lint por errores de `scripts/foto/**`, trabajo
 ajeno sin commitear.
 
+Re-ejecutado 2026-09-25 tras las correcciones de la revisión de PDFs (último código de 1888: `667b4c12a`), corrida
+única de la sesión TASK-1846 para 1888 y 1889: `pnpm test` completo sobre `067a0d3d8` 1834 archivos / 15 467 tests /
+0 fallos (159 s); `pnpm build` verde sobre `f3bec9669` (mismo código que `067a0d3d8`, sólo docs entre medio;
+compilación 40 s, 23 páginas estáticas). Dos intentos previos fallaron por un tipo generado viejo en `.next/dev/types`
+(ruta de otra sesión creada y borrada), no por código; se borró esa caché y pasó.
+
 ## Closing Protocol
 
 - [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
