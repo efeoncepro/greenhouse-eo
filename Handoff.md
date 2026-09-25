@@ -2,7 +2,7 @@
 
 **Marketing Studio (25/09):** [TASK-1887](docs/tasks/complete/TASK-1887-marketing-studio-foundation.md) completa: en vivo en https://studio.efeonce.org, con acceso abierto de solo lectura y noindex. Siguientes hijas de [EPIC-049](docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md): login con auth.efeonce.org (task dedicada), métricas desde la API ecosystem de Greenhouse, escrituras gobernadas y worker. Runbook: [runtime handoff](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
 
-**Insights (25/09):** TASK-1847 cerrada (A4 y deck en producción con datos reales). [TASK-1888](docs/tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md) **code complete, rollout pendiente**: contrato v2 detrás de `INSIGHTS_EDITORIAL_V2_ENABLED` (OFF en Vercel y `ops-worker`), migración de portada **aplicada** en la instancia compartida, gateway [efeonce-mcp#18](https://github.com/efeoncepro/efeonce-mcp/pull/18) abierto (desplegar sólo después del release de Greenhouse), commits locales sin push. Siguiente: release con flag OFF → ediciones internas Berel/Sky con el flag sólo en Vercel staging → prender junto al release de TASK-1889.
+**Insights (25/09):** [TASK-1888](docs/tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md) code complete, rollout pendiente (flag OFF, migración aplicada, [efeonce-mcp#18](https://github.com/efeoncepro/efeonce-mcp/pull/18) sin deploy; sin push). Plan de rollout: arquitectura §14.8.
 
 **ANAM Emma (24/09):** landing pública HubSpot `kortex-cms-react/30` verificada con el PNG entregado por María Paz,
 cargo `Ejecutivo comercial ANAM` y avatar derivado con fondo menta en identidad de Customer Agent y chatflow
