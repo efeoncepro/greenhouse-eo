@@ -1097,6 +1097,36 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getInsightSchedule(args as { organizationId?: string; scheduleId: string })
   )
 
+  // TASK-1888 — portada preferida por organización. Leer usa el scope base; fijarla exige binding interno.
+  collector.registerTool(
+    'get_insight_cover_preference',
+    {
+      title: 'Get Insight Cover Preference',
+      description:
+        'Read the preferred cover of an organization\'s Efeonce Insights reports: auto, dark (navy) or light (white). isDefault=true means it was never set and reads as auto. auto resolves to navy only when the organization has a logo prepared for dark backgrounds, otherwise white. A single request can still override it with brand.coverTheme. The cover of each edition is sealed when it is generated.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getInsightCoverPreference(args as { organizationId?: string })
+  )
+
+  collector.registerTool(
+    'set_insight_cover_preference',
+    {
+      title: 'Set Insight Cover Preference',
+      description:
+        'Set the preferred cover of an organization\'s Efeonce Insights reports. THIS WRITES. coverTheme is auto, dark (navy) or light (white). Only internal bindings may call it. It affects editions generated afterwards; editions already generated keep the cover sealed in their plan, and nothing is re-rendered. Setting the same value again answers changed=false. Choosing dark for an organization without a logo for dark backgrounds renders a navy cover without the client logo: confirm with the human first.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        coverTheme: z.enum(['auto', 'dark', 'light'])
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.setInsightCoverPreference(args as { organizationId?: string; coverTheme: 'auto' | 'dark' | 'light' })
+  )
+
   // ── El registro: una pasada por el manifiesto, en su orden ────────────────
   const coverage = computeGreenhouseMcpToolCoverage({
     manifest: GREENHOUSE_MCP_TOOL_MANIFEST,

@@ -2448,7 +2448,10 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // TASK-1848 — enviar por correo desde Efeonce: interno y distinto de compartir (no es relay del cliente).
   { key: 'insights.delivery.send', module: 'insights', actions: ['create', 'read', 'update'] as const, defaultScope: 'tenant' },
   // TASK-1848 — recurrencia: genera borradores bajo la autoridad durable de quien la activó (interno).
-  { key: 'insights.schedule.manage', module: 'insights', actions: ['create', 'read', 'update'] as const, defaultScope: 'tenant' }
+  { key: 'insights.schedule.manage', module: 'insights', actions: ['create', 'read', 'update'] as const, defaultScope: 'tenant' },
+  // TASK-1888 — portada preferida de los informes por organización (auto | navy | blanca). Interna; leerla también
+  // la concede insights.report.read.
+  { key: 'insights.cover_preference.manage', module: 'insights', actions: ['read', 'update'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

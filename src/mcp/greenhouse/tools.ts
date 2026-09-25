@@ -228,6 +228,8 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getInsightDelivery'
   | 'listInsightSchedules'
   | 'getInsightSchedule'
+  | 'getInsightCoverPreference'
+  | 'setInsightCoverPreference'
   | 'getMcpSkill'
 >) => ({
   /**
@@ -819,6 +821,27 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         return `Schedule ${input.scheduleId} ${String(data.cadence ?? '')} state=${String(data.state ?? 'unknown')}${data.pauseReason ? ` (paused: ${data.pauseReason})` : ''}; recent=[${occurrences}]. Occurrences end in review; nothing is issued or sent automatically (${result.requestId}).`
       },
       () => client.getInsightSchedule(input)
+    )
+  },
+  // ── TASK-1888 — portada preferida por organización ───────────────────────
+  async getInsightCoverPreference(input: { organizationId?: string }) {
+    return callTool(
+      result => {
+        const data = result.data as { coverTheme?: string; isDefault?: boolean }
+
+        return `Cover preference: ${String(data.coverTheme ?? 'auto')}${data.isDefault ? ' (default, never set)' : ''}. auto means navy only when the organization has a logo for dark backgrounds, white otherwise (${result.requestId}).`
+      },
+      () => client.getInsightCoverPreference(input)
+    )
+  },
+  async setInsightCoverPreference(input: { organizationId?: string; coverTheme: 'auto' | 'dark' | 'light' }) {
+    return callTool(
+      result => {
+        const data = result.data as { changed?: boolean; preference?: { coverTheme?: string } }
+
+        return `Cover preference ${data.changed ? 'set to' : 'already was'} ${String(data.preference?.coverTheme ?? input.coverTheme)}. It applies to editions generated from now on; issued and sealed editions keep their cover (${result.requestId}).`
+      },
+      () => client.setInsightCoverPreference(input)
     )
   },
   async getSeoEntitlement(input: { organizationId?: string }) {

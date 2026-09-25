@@ -84,6 +84,8 @@ describe('manifiesto de tools MCP (TASK-1780)', () => {
         // TASK-1848 — crear/revocar un enlace compartido escribe; listarlos es lectura.
         'create_insight_share',
         'revoke_insight_share',
+        // TASK-1888 — fijar la portada preferida de una organización escribe; leerla es lectura.
+        'set_insight_cover_preference',
         'declare_seo_competitors',
         'discover_seo_keywords',
         'prepare_seo_grounded_queries',

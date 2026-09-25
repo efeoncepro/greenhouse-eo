@@ -893,6 +893,7 @@ Domain: `cost_intelligence`. Canonical source of truth for the commercial state 
 | `insight_delivery_intent` | `insights.delivery.requested` (TASK-1848) | `efeonce-insights/events.ts` (from `requestInsightDelivery`; también al re-encolar fallidos con `retryInsightDelivery`) | `{ version: 1, deliveryIntentId, editionId, organizationId, modality, recipientCount, reason: 'initial' \| 'retry', actorKind }` — sin direcciones de correo | Projection `insights_delivery_dispatch` (lane `ops-reactive-notifications`) → `dispatchInsightDeliveryIntent` |
 | `insight_schedule` | `insights.schedule.changed` (TASK-1848) | `efeonce-insights/events.ts` (commands de recurrencia y pausas del tick) | `{ version: 1, scheduleId, organizationId, state, scheduleVersion, reason?, actorKind }` — `reason` cuando pausa el sistema | Audit |
 | `insight_schedule` | `insights.schedule.occurrence_generated` (TASK-1848) | `efeonce-insights/events.ts` (from `runInsightSchedulesTick`) | `{ version: 1, occurrenceId, scheduleId, organizationId, periodStart, periodEndExclusive, editionId, renderRunId }` | Audit; futura notificación de borrador listo (TASK-1849) |
+| `insight_cover_preference` | `insights.cover_preference.updated` (TASK-1888) | `efeonce-insights/events.ts` (`setInsightCoverPreference`) | `{ version: 1, organizationId, coverTheme, previousCoverTheme, actorKind }` — sólo si el valor cambió | Audit |
 
 Invariants:
 

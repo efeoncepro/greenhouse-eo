@@ -21,6 +21,7 @@ import { readInsightEdition, readInsightEditions, readInsightRenderRun, readInsi
 
 import { readInsightDeliveries, readInsightDelivery } from '@/lib/efeonce-insights/delivery/commands'
 import { readInsightSchedule, readInsightSchedules } from '@/lib/efeonce-insights/schedules/commands'
+import { getInsightCoverPreference } from '@/lib/efeonce-insights/commands/cover-preference'
 
 import { resolveScope } from './app-insights-scope'
 import { withInsightsErrors } from './insights-errors'
@@ -94,3 +95,7 @@ export const listAppInsightSchedules = async ({ context, request }: { context: A
 
 export const getAppInsightSchedule = async ({ context, request, scheduleId }: { context: AppPlatformRequestContext; request: Request; scheduleId: string }) =>
   withInsightsErrors(async () => ({ data: await readInsightSchedule({ ...resolveScope(context, request), scheduleId }) }))
+
+/** TASK-1888 — portada preferida de la organización (`auto` si nunca se fijó). */
+export const getAppInsightCoverPreference = async ({ context, request }: { context: AppPlatformRequestContext; request: Request }) =>
+  withInsightsErrors(async () => ({ data: await getInsightCoverPreference(resolveScope(context, request)) }))

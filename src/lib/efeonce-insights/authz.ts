@@ -36,6 +36,8 @@ export type InsightsAccessNeed =
   | 'delivery_manage'
   | 'schedule_read'
   | 'schedule_manage'
+  | 'cover_preference_read'
+  | 'cover_preference_manage'
 
 type InsightsCapabilityKey =
   | 'insights.report.read'
@@ -45,6 +47,7 @@ type InsightsCapabilityKey =
   | 'insights.share.manage'
   | 'insights.delivery.send'
   | 'insights.schedule.manage'
+  | 'insights.cover_preference.manage'
 
 const NEED_TO_CAPABILITY: Record<InsightsAccessNeed, { capability: InsightsCapabilityKey; action: 'read' | 'create' | 'update' | 'approve' }> = {
   read: { capability: 'insights.report.read', action: 'read' },
@@ -61,7 +64,10 @@ const NEED_TO_CAPABILITY: Record<InsightsAccessNeed, { capability: InsightsCapab
   delivery_manage: { capability: 'insights.delivery.send', action: 'update' },
   // TASK-1848 — la recurrencia también es interna: una autoridad durable que genera en nombre de alguien.
   schedule_read: { capability: 'insights.schedule.manage', action: 'read' },
-  schedule_manage: { capability: 'insights.schedule.manage', action: 'update' }
+  schedule_manage: { capability: 'insights.schedule.manage', action: 'update' },
+  // TASK-1888 — leer la portada preferida es leer el reporte; fijarla es autoridad interna propia.
+  cover_preference_read: { capability: 'insights.report.read', action: 'read' },
+  cover_preference_manage: { capability: 'insights.cover_preference.manage', action: 'update' }
 }
 
 export interface InsightsAccessInput {

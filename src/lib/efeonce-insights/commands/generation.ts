@@ -26,6 +26,7 @@ import { InsightsEvidenceRejectedError, InsightsNotReadyError, isInsightsError }
 import { publishInsightEditionStateTransitioned, publishInsightEvidenceSealed } from '../events'
 import { isInsightsEditorialV2Enabled } from '../flags'
 import { transitionInsightEditionState } from '../stores/edition-store'
+import { resolveInsightCoverForEdition } from './cover-preference'
 import { freezeInsightEditorialPlan, getInsightEditorialPlanByEdition, upsertInsightEditorialPlan } from '../stores/plan-store'
 import type { InsightEditionRecord } from '../stores/records'
 import { getInsightEvidenceSnapshotByEdition, sealInsightEvidenceSnapshot, upsertInsightEvidenceSnapshot } from '../stores/snapshot-store'
@@ -99,11 +100,17 @@ const runComposing = async (edition: InsightEditionRecord): Promise<void> => {
 
   if (!snapshot || !snapshot.sealedAt) throw new InsightsNotReadyError('No hay snapshot sellado para componer el plan', { editionId: edition.editionId })
 
+  const editorialV2 = isInsightsEditorialV2Enabled()
+
+  // TASK-1888 — la portada se resuelve UNA vez, al componer, y queda sellada en el plan congelado.
+  const cover = editorialV2 ? await resolveInsightCoverForEdition({ organizationId: edition.organizationId, requested: edition.request.brand.coverTheme ?? null }) : null
+
   const authored = await authorEditorialPlan({
     snapshot: { facts: snapshot.facts, sources: snapshot.sources, rejections: snapshot.rejections },
     modules: edition.modules as InsightModule[],
     locale: edition.request.locale,
-    editorialV2: isInsightsEditorialV2Enabled()
+    editorialV2,
+    cover
   })
 
   await withGreenhousePostgresTransaction(async client => {

@@ -789,6 +789,18 @@ export class GreenhouseApiPlatformClient {
     return this.request(`/api/platform/ecosystem/insights/schedules/${encodeURIComponent(input.scheduleId)}`, { organizationId: input.organizationId })
   }
 
+  // TASK-1888 — portada preferida por organización
+  async getInsightCoverPreference(input: { organizationId?: string }) {
+    return this.request('/api/platform/ecosystem/insights/cover-preference', { organizationId: input.organizationId })
+  }
+
+  async setInsightCoverPreference(input: { organizationId?: string; coverTheme: 'auto' | 'dark' | 'light' }) {
+    return this.request('/api/platform/ecosystem/insights/cover-preference', {}, {
+      method: 'POST',
+      body: { organizationId: input.organizationId, coverTheme: input.coverTheme }
+    })
+  }
+
   private async request<TData>(
     path: string,
     query: QueryParams = {},

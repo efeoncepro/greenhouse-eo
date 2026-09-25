@@ -43,6 +43,11 @@ export interface InsightBrandV1 {
   efeoncePackVersion: string
   /** Referencia versionada al logo/asset autorizado del cliente; nunca un upload libre. */
   clientBrandRef?: string | null
+  /**
+   * TASK-1888 — cambio de portada EN EL ENCARGO (`auto` | `dark` | `light`). Opcional: ausente = se aplica la
+   * preferencia de la organización. Un encargo sin este campo produce el mismo request hash que antes de TASK-1888.
+   */
+  coverTheme?: 'auto' | 'dark' | 'light'
 }
 
 /** Policy explícita de omisiones visibles: nunca salta gates de seguridad ni validez. */

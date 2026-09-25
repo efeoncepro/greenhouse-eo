@@ -3115,7 +3115,10 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       // TASK-1848 — recurrencia (borradores para revisión; nunca autoemite ni autoenvía).
       { capability: 'insights.schedule.manage', action: 'create' },
       { capability: 'insights.schedule.manage', action: 'read' },
-      { capability: 'insights.schedule.manage', action: 'update' }
+      { capability: 'insights.schedule.manage', action: 'update' },
+      // TASK-1888 — portada preferida por organización (quien opera la cuenta la fija; el encargo puede cambiarla).
+      { capability: 'insights.cover_preference.manage', action: 'read' },
+      { capability: 'insights.cover_preference.manage', action: 'update' }
     ] as const) {
       addEntitlement(entries, {
         module: 'insights',

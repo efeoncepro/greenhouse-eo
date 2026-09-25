@@ -241,3 +241,20 @@ export const publishInsightScheduleOccurrenceGenerated = (client: OutboxClient, 
     { aggregateType: AGGREGATE_TYPES.insightSchedule, aggregateId: payload.scheduleId, eventType: EVENT_TYPES.insightScheduleOccurrenceGenerated, payload },
     client
   )
+
+// ── TASK-1888 — portada preferida por organización ──────────────────────────────────────────
+
+export type InsightCoverPreferenceUpdatedPayload = {
+  version: 1
+  organizationId: string
+  coverTheme: string
+  /** `auto` cuando la organización no tenía fila. */
+  previousCoverTheme: string
+  actorKind: InsightActorKind
+}
+
+export const publishInsightCoverPreferenceUpdated = (client: OutboxClient, payload: InsightCoverPreferenceUpdatedPayload) =>
+  publishOutboxEvent(
+    { aggregateType: AGGREGATE_TYPES.insightCoverPreference, aggregateId: payload.organizationId, eventType: EVENT_TYPES.insightCoverPreferenceUpdated, payload },
+    client
+  )

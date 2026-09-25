@@ -18,7 +18,7 @@ import 'server-only'
  */
 
 import type { AppPlatformRequestContext } from '@/lib/api-platform/core/app-auth'
-import { cancelInsightRender, createInsightEdition, createInsightShare, revokeInsightShare, issueInsightEdition, recoverInsightEdition, requestInsightRender, retryInsightRender, reviseInsightEdition, withdrawInsightEdition } from '@/lib/efeonce-insights/commands'
+import { cancelInsightRender, createInsightEdition, createInsightShare, revokeInsightShare, issueInsightEdition, recoverInsightEdition, requestInsightRender, retryInsightRender, reviseInsightEdition, setInsightCoverPreference, withdrawInsightEdition } from '@/lib/efeonce-insights/commands'
 
 import {
   cancelInsightDelivery,
@@ -144,3 +144,7 @@ export const transitionAppInsightSchedule = async ({
   scheduleId: string
   action: 'activate' | 'pause' | 'retire'
 }) => withInsightsErrors(async () => ({ data: await transitionInsightScheduleCommand({ ...resolveScope(context, request, body), scheduleId, action }), status: 200 }))
+
+/** TASK-1888 — fija la portada preferida de la organización (200 con `changed`; mismo valor = sin efecto). */
+export const setAppInsightCoverPreference = async ({ context, request, body }: { context: AppPlatformRequestContext; request: Request; body: unknown }) =>
+  withInsightsErrors(async () => ({ data: await setInsightCoverPreference({ ...resolveScope(context, request, body), coverTheme: isRecord(body) ? body.coverTheme : undefined }), status: 200 }))

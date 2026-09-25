@@ -139,6 +139,7 @@ export const AGGREGATE_TYPES = {
   insightDeliveryIntent: 'insight_delivery_intent',
   // TASK-1848 — recurrencia de ediciones
   insightSchedule: 'insight_schedule',
+  insightCoverPreference: 'insight_cover_preference',
   quotationLineItem: 'quotation_line_item',
   quotationLineCostOverride: 'quotation_line_cost_override',
   commercialCapacity: 'commercial_capacity',
@@ -628,6 +629,7 @@ export const EVENT_TYPES = {
   // TASK-1848 — recurrencia (payload: ids, estado, versión; nunca plantilla ni autoridad)
   insightScheduleChanged: 'insights.schedule.changed',
   insightScheduleOccurrenceGenerated: 'insights.schedule.occurrence_generated',
+  insightCoverPreferenceUpdated: 'insights.cover_preference.updated',
   quotationDiscountHealthAlert: 'commercial.discount.health_alert',
 
   // Commercial Deals (TASK-453)

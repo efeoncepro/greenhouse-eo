@@ -23,7 +23,7 @@ import 'server-only'
  */
 
 import type { ApiPlatformRequestContext } from '@/lib/api-platform/core/context'
-import { cancelInsightRender, createInsightEdition, createInsightShare, revokeInsightShare, recoverInsightEdition, requestInsightRender, retryInsightRender, reviseInsightEdition } from '@/lib/efeonce-insights/commands'
+import { cancelInsightRender, createInsightEdition, createInsightShare, revokeInsightShare, recoverInsightEdition, requestInsightRender, retryInsightRender, reviseInsightEdition, setInsightCoverPreference } from '@/lib/efeonce-insights/commands'
 
 import { assertWrite, isRecord, resolveScope, type Payload } from './ecosystem-insights-scope'
 import { withInsightsErrors } from './insights-errors'
@@ -120,4 +120,14 @@ export const revokeEcosystemInsightSharePayload = async ({ context, request, bod
     const result = await revokeInsightShare({ ...scope, shareGrantId })
 
     return { data: { share: result.share, idempotent: result.idempotent }, status: 200 }
+  })
+
+/** TASK-1888 — fija la portada preferida; sólo un binding interno escribe (un org-scoped sólo lee). */
+export const setEcosystemInsightCoverPreferencePayload = async ({ context, request, body }: { context: ApiPlatformRequestContext; request: Request; body: unknown }): Payload<unknown> =>
+  withInsightsErrors(async () => {
+    const scope = resolveScope(context, request, body)
+
+    assertWrite(scope)
+
+    return { data: await setInsightCoverPreference({ ...scope, coverTheme: isRecord(body) ? body.coverTheme : undefined }), status: 200 }
   })

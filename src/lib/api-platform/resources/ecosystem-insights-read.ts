@@ -21,6 +21,7 @@ import { readInsightEdition, readInsightEditions, readInsightRenderRun, readInsi
 
 import { readInsightDeliveries, readInsightDelivery } from '@/lib/efeonce-insights/delivery/commands'
 import { readInsightSchedule, readInsightSchedules } from '@/lib/efeonce-insights/schedules/commands'
+import { getInsightCoverPreference } from '@/lib/efeonce-insights/commands/cover-preference'
 
 import { resolveScope, type Payload } from './ecosystem-insights-scope'
 import { withInsightsErrors } from './insights-errors'
@@ -87,3 +88,7 @@ export const listEcosystemInsightSchedulesPayload = async ({ context, request }:
 
 export const getEcosystemInsightSchedulePayload = async ({ context, request, scheduleId }: { context: ApiPlatformRequestContext; request: Request; scheduleId: string }): Payload<unknown> =>
   withInsightsErrors(async () => ({ data: await readInsightSchedule({ ...resolveScope(context, request), scheduleId }) }))
+
+/** TASK-1888 — portada preferida de la organización por el lane ecosystem. */
+export const getEcosystemInsightCoverPreferencePayload = async ({ context, request }: { context: ApiPlatformRequestContext; request: Request }): Payload<unknown> =>
+  withInsightsErrors(async () => ({ data: await getInsightCoverPreference(resolveScope(context, request)) }))
