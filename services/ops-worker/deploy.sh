@@ -287,6 +287,11 @@ ENV_VARS="${ENV_VARS},INSIGHTS_DELIVERY_ENABLED=${INSIGHTS_DELIVERY_ENABLED:-tru
 # La autoría IA (INSIGHTS_AUTHORING_AI_ENABLED) NO se declara: en el worker el plan es determinista.
 ENV_VARS="${ENV_VARS},INSIGHTS_SCHEDULES_ENABLED=${INSIGHTS_SCHEDULES_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},INSIGHTS_GENERATION_ENABLED=${INSIGHTS_GENERATION_ENABLED:-true}"
+# 🚩 TASK-1888 — contrato editorial v2 (familias nuevas, lectura por figura, portada sellada). El tick de schedules
+# genera ediciones, así que lo lee acá además de Vercel. Default **false** A PROPÓSITO (al revés que los de arriba):
+# el ops-worker es único para staging y producción, y el contrato v2 sólo se prende en producción junto al release
+# de TASK-1889 (catálogos premium). Con OFF las ocurrencias salen con el plan v1, que los catálogos v1 componen.
+ENV_VARS="${ENV_VARS},INSIGHTS_EDITORIAL_V2_ENABLED=${INSIGHTS_EDITORIAL_V2_ENABLED:-false}"
 ENV_VARS="${ENV_VARS},REACTIVE_BATCH_SIZE=${REACTIVE_BATCH_SIZE}"
 ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
 ENV_VARS="${ENV_VARS},GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF=${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF}"
