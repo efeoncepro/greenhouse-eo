@@ -55,6 +55,9 @@ Sólo `CDR-###` y `EPIC-CMP-###` tienen numeración propia.
 
 ## Registro de decisiones
 
+- [CDR-010](decisions/CDR-010-cmp004-agencia-creativa-premium.md) · Accepted en alcance creativo: CMP-004, vía creativa premium para mid-market/enterprise. Brief completo y activación propuesta en OneDrive; email incluido; sin pauta/envíos.
+- [CDR-011](decisions/CDR-011-cmp005-agencia-estrategica-premium.md) · Accepted en alcance creativo: CMP-005, vía estratégica premium para mid-market/enterprise. Brief completo y activación propuesta en OneDrive; email incluido; sin pauta/envíos.
+
 - [CDR-009](decisions/CDR-009-cmp003-programacion-organica-octubre-2026.md) · Accepted: CMP-003 SKY programado en Metricool, IG Efeonce 13-oct 16:00, LinkedIn Efeonce 15-oct 11:00 y Julio 16-oct 11:00 (Santiago). V17 + portada V4 + copy por canal; PENDING verificado 24-sep. Registro vigente de activación; no duplicar.
 - [CDR-001](decisions/CDR-001-cmp001-always-on-q4-2026.md) · Accepted: ventana, seasonality y derechos declarados.
 - [CDR-002](decisions/CDR-002-cmp001-set-unico-produccion.md) · Proposed: acuerdo creativo Claude/Codex para pilotos; copy y fichas en OneDrive.
