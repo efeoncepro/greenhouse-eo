@@ -5,9 +5,9 @@
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
 > **Última actualización:** 2026-09-25
 > **Estado:** dirección aprobada por el operador; **candidata a canon**. La canonización formal queda para el ADR, que el operador pidió hacer una vez cerrado todo. Mientras no exista, este documento no reemplaza `DESIGN.md`, AXIS ni `src/config/efeonce-brand.ts`: los complementa.
-> **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (37 láminas, seis capítulos)
+> **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (39 láminas, siete capítulos)
 > **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (axis.efeonce.org/references/graphic-line/, pendiente de publicar). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
-> **Manual en PDF:** [`deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](./deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) (A4, 52 hojas, confidencial · uso interno). Se regenera con `node scripts/documents/render-efeonce-graphic-line.mjs`.
+> **Manual en PDF:** [`deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](./deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) (A4, 54 hojas, confidencial · uso interno). Se regenera con `node scripts/documents/render-efeonce-graphic-line.mjs`.
 > **Fuentes del repo:** `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/` (generador del canvas, texturas, renders, firma de mail, merch generativo y prueba sin logo)
 > **Relacionados:** [Lenguaje fotográfico](../brand-photography/README.md) · [Selección de referencias de marca](../EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md) · `docs/context/09_marca-agencia.md` · `src/config/efeonce-brand.ts`
 
