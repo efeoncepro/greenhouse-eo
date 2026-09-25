@@ -121,7 +121,7 @@ const main = async () => {
       chapters: plan.chapters.map(chapter => ({
         module: chapter.module,
         families: chapter.charts.map(chart => `${chart.family}:${chart.chartId}`),
-        readings: (chapter.readings ?? []).map(reading => ({ chartId: reading.chartId, keyFigure: reading.keyFigure?.value ?? null, meaning: reading.meaning.text, nextStep: reading.nextStep?.text ?? null })),
+        readings: (chapter.readings ?? []).map(reading => ({ chartId: reading.chartId, keyFigure: reading.keyFigure?.value ?? null, meaning: reading.meaning?.text ?? null, nextStep: reading.nextStep?.text ?? null })),
         opening: chapter.opening?.text ?? null
       })),
       essentials: (plan.essentials ?? []).map(claim => claim.text),

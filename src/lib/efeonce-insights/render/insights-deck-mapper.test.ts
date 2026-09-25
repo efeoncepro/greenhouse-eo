@@ -180,7 +180,7 @@ describe('buildInsightsDeckPlanInput', () => {
 
     const targets = input.slides.find(slide => slide.contentType === 'insights-figure-targets')!
 
-    expect(targets.slots.bulletRows).toEqual([expect.objectContaining({ value: '82,0 %', target: '90,0 %', band: '70,0 %', pct: '91 %' })])
+    expect(targets.slots.bulletRows).toEqual([expect.objectContaining({ value: '82,0 %', target: '90,0 %', band: '70,0 %', pct: '8,0 pp' })])
 
     const outDir = await mkdtemp(path.join(os.tmpdir(), 'insights-deck-figures-'))
 

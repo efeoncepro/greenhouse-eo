@@ -149,10 +149,33 @@ const kindOf = (chart: ChartSpecV1): FigureKind => {
   return reject(chart, `la familia ${chart.family} no tiene página de figura en el catálogo (la matriz familia × evidencia no la produce).`)
 }
 
-const closingOf = (reading: PlanFigureReadingV1 | undefined): FigureSlide['closing'] => [
-  ...(reading ? [{ kind: 'measure' as const, label: L.whatItMeans, text: reading.meaning.text }] : []),
+const normalize = (text: string): string => text.toLocaleLowerCase('es').replace(/[\s.,;:()«»"]+/g, ' ').trim()
+
+/**
+ * Cierre de la figura. «Lo que significa» que repite la conclusión impresa no dice nada nuevo: no se dibuja
+ * (caso real Berel/Sky: el planner determinista escribe la misma frase en los dos lugares). Sin lectura, sin panel.
+ */
+const closingOf = (reading: PlanFigureReadingV1 | undefined, conclusion: string): FigureSlide['closing'] => [
+  // `meaning` puede venir ausente (TASK-1888: sólo se emite si dice algo distinto de la conclusión).
+  ...(reading?.meaning && normalize(reading.meaning.text) !== normalize(conclusion)
+    ? [{ kind: 'measure' as const, label: L.whatItMeans, text: reading.meaning.text }]
+    : []),
   ...(reading?.nextStep ? [{ kind: 'action' as const, label: L.nextStep, text: reading.nextStep.text }] : [])
 ]
+
+/**
+ * Fuente de la figura: las fuentes legibles de los hechos que dibuja (por `method.name`, `GH_INSIGHTS.sources`),
+ * sin repetir. El texto genérico queda sólo si ningún hecho declara una fuente conocida.
+ */
+const sourcesOf = (factIds: readonly string[], byId: ReadonlyMap<string, EvidenceFactV1>): string => {
+  const names = [...new Set(factIds.flatMap(id => {
+    const name = GH_INSIGHTS.sources[byId.get(id)?.method?.name ?? '']
+
+    return name ? [name.charAt(0).toUpperCase() + name.slice(1)] : []
+  }))]
+
+  return names.length > 0 ? names.join(' · ') : GH_INSIGHTS.document.evidenceSource
+}
 
 export const buildFigureSlides = (
   chart: ChartSpecV1,
@@ -180,8 +203,13 @@ export const buildFigureSlides = (
   const drawn = new Set<string>()
   const own = (ids: string[]) => claims.filter(claim => claim.factIds.some(id => ids.includes(id))).map(claim => claim.text)
 
+  // Metas: la conclusión es la afirmación que cita la META, no la de comparación con el período anterior.
+  const targetIds = new Set(chart.data?.kind === 'bullet' ? chart.data.items.map(item => item.targetFactId) : [])
+
   const base = (factIds: string[], body: Slots, unitText: string, icon: string | undefined): Omit<FigureSlide, 'kind'> => {
-    const narrated = own(factIds)
+    const cited = own(factIds)
+    const aboutTarget = claims.filter(claim => claim.factIds.some(id => targetIds.has(id))).map(claim => claim.text)
+    const narrated = kind === 'targets' ? [...aboutTarget, ...cited.filter(text => !aboutTarget.includes(text))] : cited
     const conclusion = reading?.conclusion?.text ?? narrated[0] ?? chart.title
     const lead = narrated.find(text => text !== conclusion) ?? null
 
@@ -196,8 +224,8 @@ export const buildFigureSlides = (
       lead,
       figureTitle: chart.title,
       unitText,
-      sourceText: GH_INSIGHTS.document.evidenceSource,
-      closing: closingOf(reading),
+      sourceText: sourcesOf(factIds, byId),
+      closing: closingOf(reading, conclusion),
       body
     }
   }
@@ -307,7 +335,12 @@ export const buildFigureSlides = (
           targetLabel: L.targetRow,
           target: fmt(target, locale),
           ...(band ? { band: fmt(band, locale) } : {}),
-          pct: `${Math.round((value.value! / target.value!) * 100)} %`
+          // Una métrica en % se lee contra la meta en puntos porcentuales («10,9 pp»): «114 %» de un porcentaje se
+          // confunde con una variación. Las cantidades conservan el «% de la meta» del canvas («107 %»).
+          pct:
+            value.unit === 'percent'
+              ? unsigned(formatDeltaForUnit(value.value!, target.value!, 'percent', locale) ?? '0 pp')
+              : `${Math.round((value.value! / target.value!) * 100)} %`
         }
       }]
     })

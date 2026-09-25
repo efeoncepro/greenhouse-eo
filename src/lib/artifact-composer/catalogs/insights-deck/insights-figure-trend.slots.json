@@ -126,8 +126,8 @@
         "text": {
           "type": "string",
           "required": true,
-          "maxCharacters": 36,
-          "maxLines": 1
+          "maxCharacters": 64,
+          "maxLines": 2
         }
       }
     },

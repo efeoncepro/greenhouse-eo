@@ -34,3 +34,57 @@ describe('qué página recibe una figura agrupada', () => {
     expect(slide!.kind).toBe('columns')
   })
 })
+
+describe('texto de la página de figura con datos reales (revisión de TASK-1846 sobre Berel y Sky)', () => {
+  const withMethod = new Map([
+    ['c1', { factId: 'c1', value: 9377, unit: 'count', label: 'Clics', metricId: 'clicks', evidenceRef: 'e', method: { name: 'gsc_window_aggregate' } }],
+    ['p1', { factId: 'p1', value: 10662, unit: 'count', label: 'Clics', metricId: 'clicks', evidenceRef: 'e', method: { name: 'gsc_window_aggregate' } }],
+    ['c2', { factId: 'c2', value: 1, unit: 'count', label: 'Pos', metricId: 'page_one_keywords', evidenceRef: 'e', method: { name: 'dataforseo_serp_rank' } }],
+    ['p2', { factId: 'p2', value: 2, unit: 'count', label: 'Pos', metricId: 'page_one_keywords', evidenceRef: 'e', method: { name: 'dataforseo_serp_rank' } }]
+  ]) as never
+
+  const claim = { claimId: 'k', text: 'Clics orgánicos: 9.377 (período anterior 10.662, variación −12,1 %).', factIds: ['c1', 'p1'] }
+
+  it('la fuente es la de los hechos que la figura dibuja, legible y sin repetir', () => {
+    const [slide] = buildFigureSlides(grouped([null, null]), withMethod, undefined, [claim], 'es-CL', FIGURE_CAPACITY.report)
+
+    expect(slide!.sourceText).toBe('Google Search Console · Mediciones de posiciones en buscadores')
+  })
+
+  it('«Lo que significa» que repite la conclusión no se dibuja', () => {
+    const reading = { chartId: 'c', meaning: { ...claim, claimId: 'm' }, nextStep: null }
+    const [slide] = buildFigureSlides(grouped([null, null]), withMethod, reading as never, [claim], 'es-CL', FIGURE_CAPACITY.report)
+
+    expect(slide!.conclusion).toBe(claim.text)
+    expect(slide!.closing).toEqual([])
+  })
+})
+
+describe('metas', () => {
+  const facts = new Map([
+    ['ftr', { factId: 'ftr', value: 90.9, unit: 'percent', label: 'FTR', metricId: 'ftr', evidenceRef: 'e' }],
+    ['ftr-prev', { factId: 'ftr-prev', value: 96.5, unit: 'percent', label: 'FTR', metricId: 'ftr', evidenceRef: 'e' }],
+    ['ftr-target', { factId: 'ftr-target', value: 80, unit: 'percent', label: 'Meta FTR', metricId: 'target.ftr', evidenceRef: 'e', role: 'reference' }]
+  ]) as never
+
+  const chart = {
+    specVersion: 'chart_spec_v1', chartId: 'b', family: 'bullet', relation: 'target', title: 'FTR', unit: 'percent', series: [], dimensionLabels: ['Sky'],
+    references: [], scale: { kind: 'linear', baseline: 0 }, tabularEquivalent: { columns: [], rows: [] },
+    data: { kind: 'bullet', direction: 'higher_is_better', items: [{ itemId: 'i', label: 'Sky', valueFactId: 'ftr', targetFactId: 'ftr-target' }] }
+  } as never
+
+  const comparison = { claimId: 'cmp', text: 'FTR: 90,9 % (período anterior 96,5 %, variación −5,6 pp).', factIds: ['ftr', 'ftr-prev'] }
+  const againstTarget = { claimId: 'tgt', text: 'Sky: 90,9 %, sobre la meta de 80,0 %.', factIds: ['ftr', 'ftr-target'] }
+
+  it('una métrica en % se lee contra la meta en pp, no como «114 %»', () => {
+    const [slide] = buildFigureSlides(chart, facts, undefined, [], 'es-CL', FIGURE_CAPACITY.report)
+
+    expect((slide!.body.bulletRows as Array<{ pct: string }>)[0]!.pct).toBe('10,9 pp')
+  })
+
+  it('sin lectura, la conclusión es la afirmación que cita la meta, no la comparación de períodos', () => {
+    const [slide] = buildFigureSlides(chart, facts, undefined, [comparison, againstTarget], 'es-CL', FIGURE_CAPACITY.report)
+
+    expect(slide!.conclusion).toBe(againstTarget.text)
+  })
+})

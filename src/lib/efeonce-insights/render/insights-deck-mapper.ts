@@ -134,7 +134,7 @@ const chapterSlides = (
             keyCaption: rejectIfLonger(figure.keyCaption, 96, `${where}.keyCaption`),
             conclusion: rejectIfLonger(figure.conclusion, 90, `${where}.conclusion`),
             figureTitle: rejectIfLonger(figure.figureTitle, 56, `${where}.figureTitle`),
-            source: { label: L.sourceCaption, text: rejectIfLonger(figure.sourceText, 36, `${where}.source`) },
+            source: { label: L.sourceCaption, text: rejectIfLonger(figure.sourceText, 64, `${where}.source`) },
             ...figure.body,
             ...(figure.closing.length > 0
               ? { closing: figure.closing.map(block => ({ ...block, text: rejectIfLonger(block.text, 160, `${where}.closing`) })) }
