@@ -156,3 +156,18 @@ describe('empates (caso Berel: cuatro motores con 2 de 6)', () => {
     expect(slide!.lead).toBeNull()
   })
 })
+
+describe('nombre común de un empate (una sola función para esencial y cifra)', () => {
+  it('usa el nombre de la familia de métrica; sin él, el título de la figura sin su unidad', async () => {
+    const { groupNameOf } = await import('./figure-slots')
+    const fact = (factId: string, metricId: string) => ({ factId, value: 2, unit: 'count', label: factId, metricId, evidenceRef: 'e' }) as never
+
+    const chart = (title: string) => ({ chartId: 'c', title, series: [{ factIds: ['a', 'b'] }] }) as never
+
+    // Caso Berel: la presencia por motor tiene nombre de familia.
+    expect(groupNameOf([fact('a', 'presence.gemini'), fact('b', 'presence.chatgpt')], [chart('Motores de respuesta · Cantidad')])).toBe('Presencia por motor')
+    // Sin nombre de familia: nunca «· Cantidad» ni «(0 a 100)».
+    expect(groupNameOf([fact('a', 'otra.a'), fact('b', 'otra.b')], [chart('Motores de respuesta · Cantidad')])).toBe('Motores de respuesta')
+    expect(groupNameOf([fact('a', 'otra.a'), fact('b', 'otra.b')], [chart('Puntaje de visibilidad (0 a 100)')])).toBe('Puntaje de visibilidad')
+  })
+})

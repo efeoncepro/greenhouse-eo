@@ -442,7 +442,23 @@ export const essentialTitleOf = (
 
   if (measured.length <= 1) return (measured[0] ?? cited[0])?.label ?? item.text
 
-  const ids = new Set(measured.map(fact => fact.factId))
+  return groupNameOf(measured, charts)
+}
+
+/**
+ * Nombre común de varios hechos (un empate): ÚNICA fuente para el título de la esencial y para el rótulo de la cifra
+ * del planner (TASK-1888 `tieSubject`), para que el mismo empate no se nombre de dos maneras.
+ * 1. El nombre de su familia de métrica (`GH_INSIGHTS.tieSubjects`, «Presencia por motor»).
+ * 2. Si no hay, el título de la figura que los dibuja juntos, sin el sufijo de unidad («· Cantidad», «(0 a 100)»).
+ * 3. Si aún lleva cifras, el primer tramo del título sin números; y si no hay figura, el nombre del primer hecho.
+ */
+export const groupNameOf = (facts: readonly EvidenceFactV1[], charts: readonly ChartSpecV1[]): string => {
+  const families = new Set(facts.map(fact => fact.metricId.split('.')[0] ?? ''))
+  const byFamily = families.size === 1 ? GH_INSIGHTS.tieSubjects[[...families][0]!] : undefined
+
+  if (byFamily) return byFamily
+
+  const ids = new Set(facts.map(fact => fact.factId))
 
   const figure = charts.find(chart => {
     const drawn = [...chart.series.flatMap(serie => serie.factIds), ...(chart.data?.kind === 'bullet' ? chart.data.items.map(i => i.valueFactId) : [])]
@@ -450,5 +466,11 @@ export const essentialTitleOf = (
     return drawn.filter(id => ids.has(id)).length >= 2
   })
 
-  return figure?.title ?? measured[0]!.label
+  if (!figure) return facts[0]?.label ?? ''
+
+  const units = new Set(Object.values(GH_INSIGHTS.units))
+  const parts = figure.title.split(' · ')
+  const withoutUnit = (parts.length > 1 && units.has(parts.at(-1)!) ? parts.slice(0, -1).join(' · ') : figure.title).replace(/\s*\([^)]*\)\s*$/, '')
+
+  return /\d/.test(withoutUnit) ? parts[0]!.replace(/\d/g, '').trim() : withoutUnit
 }
