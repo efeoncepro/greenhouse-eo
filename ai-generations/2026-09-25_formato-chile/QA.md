@@ -1,6 +1,6 @@
 # QA — «Formato Chile» v2 (2026-09-25)
 
-Estado: **revisada por el agente** · no aprobada por el operador · no programada.
+Estado: **aprobada por el operador** (2026-09-25) · **programada** (IG 382269976, LI 382269994; ver PROGRAMACION.md) · no publicada aún.
 
 ## Archivos y procedencia
 - Final: `out/formato-chile-4x5-v2.png` (1080×1350 PNG). Vista 390: `out/preview-390/formato-chile-4x5-v2.png`.

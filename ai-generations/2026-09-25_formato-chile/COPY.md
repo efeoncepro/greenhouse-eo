@@ -1,4 +1,4 @@
-# Copy — «Formato Chile» (propuesta, sin aprobar)
+# Copy — «Formato Chile» (aprobado 2026-09-25)
 
 ## Texto en la imagen
 - Entrada: El brief pedía el KV en todos los formatos.
@@ -13,28 +13,39 @@ derecha baja desde el techo un banner larguísimo y angosto con la misma foto: l
 con sus proporciones normales, y arriba todo es cielo. Un diseñador de espaldas lo mira hacia arriba. Texto:
 El brief pedía el KV en todos los formatos. Hasta en formato Chile. No lo estiramos. Lo recompusimos. Logo de Efeonce.
 
-## Instagram
-Chile mide 4.270 km de largo y 177 km de ancho promedio. Un formato 1:24, más o menos. 🇨🇱
+## Instagram (programado, ID 382269976)
+Chile: 4.270 km de largo. 177 de ancho. Formato 1:24. 🇨🇱
 
-Medio internet estiró su producto para que cupiera. Nosotros hicimos lo que se hace con un KV: recomponerlo.
-Mismo concepto, otra proporción, nadie deformado.
+Medio internet estiró su producto para que cupiera.
+Nosotros tomamos el brief en serio.
 
-Mándaselo a quien siempre pide «el KV en todos los formatos».
+No lo estiramos. Lo recompusimos.
+Misma mujer. Más cielo.
 
-## LinkedIn
-Esta semana medio internet estiró su producto para que se viera «chileno»: autos, trenes, lavadoras, buckets de pollo.
+Etiqueta a quien siempre pide «el KV en todos los formatos».
 
-Chile mide 4.270 km de largo y 177 km de ancho promedio. Si fuera un formato, sería 1:24.
+PD: la imprenta todavía no nos contesta.
 
-Nos pusimos en el caso del brief más difícil del año: el KV en 4:5, 1:1, 9:16, 16:9… y formato Chile.
+## LinkedIn (programado, ID 382269994)
+Chile: 4.270 km de largo. 177 de ancho. Formato 1:24.
 
-Estirar es la salida fácil. Recomponer es dirección de arte: decidir qué se queda, qué respira y dónde vive la idea en cada proporción.
+Esta semana medio internet estiró su producto para verse chileno. Autos. Trenes. Lavadoras. Buckets de pollo.
+
+Nosotros aceptamos el brief que todo diseñador teme: el KV en 4:5, 1:1, 9:16, 16:9… y formato Chile.
+
+No lo estiramos. Lo recompusimos.
+Misma mujer. Mismas proporciones. Solo más cielo.
+
+Eso es dirección de arte: que la idea sobreviva a cualquier formato. Incluso a uno de 4.270 km.
 
 ¿Cuál es el formato más imposible que te han pedido?
 
-## Threads
-Nos pidieron el KV en formato Chile (1:24).
-No lo estiramos. Lo recompusimos.
-¿Qué formato imposible te han pedido a ti?
+PD: la imprenta todavía no nos contesta.
+
+## Iteraciones
+1. v1: explicativo («Mismo concepto, otra proporción, nadie deformado»). Operador: «No va mal».
+2. v2: pedido «que conecten los dos» → apertura, línea de oficio y remate compartidos.
+3. v3 (final): «más punch + humor o giro al final» → frases en tres tiempos y la misma PD en ambas redes.
+   PD alternativas no usadas: «el diseñador sigue mirando para arriba» · «¿alguien tiene una pared de 4.270 km?».
 
 Fuente del dato: Wikipedia, «Geografía de Chile» (4.270 km de largo, 177 km de ancho promedio).
