@@ -38,6 +38,9 @@
   La zona de metas sale sólo de `bandFactId` (límite del registro, TASK-1888): se quitó el 0,85 escrito a
   mano, según la revisión de TASK-1846. Queda `chart-figure.ts` del motor sin consumidores (tiene test
   propio): candidato a retiro en un follow-up.
+- **Slice 5 local cerrado (2026-09-25):** `pnpm test` completo verde (1833 archivos, 15 427 tests), `docs:closure-check`
+  exit 0, `ui:quality` PASS, `ui:wireframe-check` y `design-contract:lint` PASS. `local:check` falla sólo por lint de
+  `scripts/foto/*` (WIP ajeno sin commitear). `pnpm build` pendiente de autorización del operador.
 - **Despliegue del worker:** `services/artifact-worker` cambió (consumer Insights, `main.ts`,
   contrato). El Job es único para staging y producción: se despliega sólo por el control plane, junto
   con el flag de TASK-1888.
