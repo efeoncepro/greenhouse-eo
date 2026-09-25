@@ -361,7 +361,8 @@ Las dueñas citadas conservan su scope y epic. No crear tareas por gráfico, cue
      onboarding en Greenhouse; el contractual/facturación 2026-11-01 queda en la descripción y en los términos). El
      propertyChange no llegó en 60 s; se re-upsertó con el mismo helper canónico del webhook (`upsertServiceFromHubSpot`,
      `batchReadServices` directo; el bridge Cloud Run devuelve 404 para `/companies/{id}/services`, bug conocido).
-  2. Términos `7c38b899-ed46-46f0-9960-ed01299bacc8`: committed, effective 2026-09-24, CLP 3.000.000, `bundled_modules=[seo_v2,
+  2. Términos `7c38b899-ed46-46f0-9960-ed01299bacc8`: committed, `effective_from=2026-09-25` (fecha UTC del writer; eran las
+     21:30 del 2026-09-24 en Chile), CLP 3.000.000, `bundled_modules=[seo_v2,
      ai_visibility_v1]` (`declareCommercialTerms`, audit + outbox).
   3. Preview `canApply=true` (fingerprint `4ac57301…`): `enable seo_v2` + `preserve ai_visibility_v1`. Apply
      `EO-APC-9676214B` (`applyServiceEnablement`, actor `user-agent-e2e-001`, clave `task1852-sky-blog-apply-1`): creó
@@ -373,6 +374,10 @@ Las dueñas citadas conservan su scope y epic. No crear tareas por gráfico, cue
   5. Las tres personas Sky ganan `cliente.growth_seo_dashboard` y `cliente.growth_seo_report` (AEO ya lo tenían). Readiness que
      sigue abierta y es humana: `human_login_unverified` (sin login observado), `authenticated_route_unverified`,
      `producer_coverage_unverified` (Search Console del blog + keywords en la transición de octubre).
+  6. **Verificación en el runtime productivo** (sesión técnica superadmin, `greenhouse.efeoncepro.com`, 2026-09-25T00:35Z):
+     `POST …/client-services/enablement/preview` → 200, `canApply=true`, `blockers=[]`, `preserve seo_v2 (cpma-6880e80f…)` +
+     `preserve ai_visibility_v1 (cpma-9525b6ce…)`; `GET …/commercial/services/SVC-HS-591725750952/terms` → 200 con el término
+     `7c38b899…` y `bundledModules=[ai_visibility_v1, seo_v2]`. El resolver del portal cachea 60 s en proceso; no requiere acción.
 - **Rollback:** `rollbackServiceEnablement(EO-APC-9676214B)` pausa el alta propia; `assignAeoTier(trial)` restaura el tier; `UPDATE seo_targets SET status='paused'` retira el target
   (no borrar si ya hay mediciones). Nada de esto envió mensajes ni tocó a las personas cliente.
 
