@@ -78,7 +78,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Slices 1–4 code complete; Slice 5 (dossier, ediciones Berel/Sky, release) pendiente`
+- Status real: `Slices 1–5 code complete en develop (sin push); rollout pendiente: aprobación de PDFs reales, staging, release`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1888` (Slices 3–5 necesitan su contrato; Slices 1–2 ya pueden empezar)
@@ -473,24 +473,32 @@ El operador exige que el informe quede **igual al canvas**. «Igual» se define 
 
 - [x] Se declaró `Execution profile: ui-ux` y `UI impact: layout`; `Wireframe` existe; `UI ready` permanece `no`
   hasta completar mapping, dossier y scorecard.
-- [ ] Las plantillas del wireframe existen en ambos catálogos y componen desde fixtures y desde ediciones reales.
+- [x] Las plantillas del wireframe existen en ambos catálogos y componen desde fixtures y desde ediciones reales.
 - [x] Ninguna plantilla contiene HEX, px de color ni familias tipográficas literales; `deck-axis` recompila
   byte-idéntico.
-- [ ] Los roles de dato existen como tokens y ninguna pareja de series se distingue sólo por color (lectura en gris).
-- [ ] La portada dibujada coincide con el tema sellado en la edición; la blanca muestra canales sólo con `channelId`.
+- [x] Los roles de dato existen como tokens y ninguna pareja de series se distingue sólo por color (lectura en gris).
+- [x] La portada dibujada coincide con el tema sellado en la edición; la blanca muestra canales sólo con `channelId`.
 - [x] La contraportada toma correo, teléfonos y dirección de `src/config/efeonce-brand.ts`.
-- [ ] Cada familia con productor tiene su página A4 y su lámina; ninguna familia sin evidencia aparece.
+- [x] Cada familia con productor tiene su página A4 y su lámina; ninguna familia sin evidencia aparece.
 - [x] Un plan v1 compone sin panel de cierre y sin errores.
 - [x] El folio muestra el total real de páginas.
 - [x] El copy visible reusable vive en `src/lib/copy/insights.ts`.
 - [x] `pnpm composer:visual-gate --catalog=insights` pasa a cero píxeles con los frames nuevos declarados.
-- [ ] Dossier y scorecard con promedio ≥ 4,5 y piso ≥ 4 sobre el render real.
-- [ ] Cada plantilla renderizada con el fixture del canvas queda a ≤ 1 % de píxeles distintos de su página en
+- [x] Dossier y scorecard con promedio ≥ 4,5 y piso ≥ 4 sobre el render real.
+- [x] Cada plantilla renderizada con el fixture del canvas queda a ≤ 1 % de píxeles distintos de su página en
   `paginas/` (tabla por página en el dossier); las excepciones están justificadas y aprobadas por el operador.
-- [ ] El dossier incluye la hoja lado a lado referencia | render de cada página, en color y en gris.
+- [x] El dossier incluye la hoja lado a lado referencia | render de cada página, en color y en gris.
 - [ ] El operador aprobó los PDFs internos de Berel y Sky y la estructura del deck.
 - [ ] En producción, una edición interna real compone con el diseño nuevo antes de compartir con clientes.
 
+> Evidencia 2026-09-25 (Slices 3–5): plantillas componen desde fixtures (`pnpm insights:canvas-fidelity`: 20/21
+> ≤ 1 %, Deck-Agrupadas 2,2 % con excepción aprobada) y desde ediciones reales (Berel EO-INS-000019 y Sky
+> EO-INS-000022, `preview-edition --editorial-v2`); hojas en gris (`--gray`); portada según `plan.cover` (tests de
+> `cover.test.ts` + Berel/Sky con portada blanca y logo); cada familia con productor (bar, bar_grouped, bullet,
+> line) con página A4 y lámina, familia sin página rechazada con causa (tests de mappers con PDF real); dossier
+> `docs/ui/reviews/TASK-1889-.../README.md` y scorecard (`ui:quality` PASS 4,59, piso 4,2). Sin tildar: aprobación
+> del operador de los PDFs reales y de la estructura del deck, y edición interna en producción (rollout).
+>
 > Evidencia 2026-09-25 (Slices 1–2): criterios tildados según `b649080c7` — grep sin HEX/fuentes literales en
 > las plantillas editoriales + `composer:brand-pack --check` (deck-axis byte-idéntico); contraportada y pie
 > desde `EFEONCE_CONTACT` (test del mapper); planes v1 componen sin panel (report/deck-mapper tests con PDF

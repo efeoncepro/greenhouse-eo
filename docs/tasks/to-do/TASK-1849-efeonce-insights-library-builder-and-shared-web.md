@@ -1,5 +1,13 @@
 # TASK-1849 — Efeonce Insights: biblioteca, creación y experiencia web compartida
 
+## Delta 2026-09-25 (TASK-1889 code complete)
+
+- **El render ya compone con el diseño aprobado:** los catálogos `insights-report` e `insights-deck` sólo tienen
+  plantillas v2 (portada navy/blanca con logo, «Lo esencial», páginas de figura por familia vía
+  `src/lib/efeonce-insights/render/figure-slots.ts`); `report-analysis`/`insights-evidence` y
+  `render/figure-pages.ts` se retiraron. Una vista previa del builder debe mostrar estas páginas, no las v1. Para
+  revisar con datos reales: `scripts/insights/preview-edition.ts --editorial-v2`. — por trabajo en TASK-1889
+
 ## Delta 2026-09-25 (TASK-1888 code complete)
 
 - **Ya existe (flag `INSIGHTS_EDITORIAL_V2_ENABLED` OFF):** command `setInsightCoverPreference` + reader
