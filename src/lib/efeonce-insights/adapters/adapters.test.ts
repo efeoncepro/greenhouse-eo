@@ -94,6 +94,20 @@ describe('SEO adapter', () => {
     expect(result.sources.map(source => source.reader)).toEqual(['readSeoOverviewKpisForWindow', 'readRankEvolution', 'readDomainOverviewForTarget', 'readSeoOverviewKpisForWindow', 'readRankEvolution', 'readDomainOverviewForTarget'])
     // TASK-1888 — Search Console, ranking y ETV miden Google: todo hecho SEO lleva el canal.
     expect(new Set(result.facts.map(fact => fact.channelId))).toEqual(new Set(['google']))
+    // Sin v2, ningún hecho lleva dirección (evidencia v1 idéntica).
+    expect(result.facts.some(fact => fact.dimension?.direction !== undefined)).toBe(false)
+  })
+
+  it('SEO con v2: la posición media (y su comparable) lleva lower_is_better; las demás métricas quedan neutras', async () => {
+    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async (_org: string, window: { from: string }) => window.from === '2026-08-01' ? gscWindow(500, 20000, 31, '2026-08-31') : gscWindow(400, 18000, 31, '2026-07-31'))
+    const { seoReportAdapter } = await import('./seo-adapter')
+    const windows = month('2026-08-01', '2026-09-01', 'previous_period')
+    const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [], editorialV2: true })
+    const directions = new Map(result.facts.map(fact => [fact.factId, fact.dimension?.direction]))
+
+    expect(directions.get('seo.position.2026-08-01_2026-09-01')).toBe('lower_is_better')
+    expect(directions.get('seo.position.2026-07-01_2026-08-01')).toBe('lower_is_better')
+    expect(result.facts.filter(fact => fact.metricId !== 'position').every(fact => fact.dimension?.direction === undefined)).toBe(true)
   })
 
   it('ventana no mensual: ETV declara unsupported_window con alternativa mensual; GSC sí sirve', async () => {
@@ -312,6 +326,14 @@ describe('TASK-1888 — evidencia del contrato editorial v2', () => {
       'target.rpa': [thresholds('rpa').optimal.max, 'lower_is_better'],
       'band.rpa': [thresholds('rpa').attention.max, 'lower_is_better']
     })
+
+    // Cada hecho de VALOR lleva la dirección de su métrica desde el mismo registro (el render colorea la variación sin
+    // buscar la meta, cuyo metricId es `target.otd`, no `otd`). Hechos reales de Sky: otd_pct, ftr_pct, rpa.
+    const direction = (id: string) => (ICO_METRIC_REGISTRY.find(metric => metric.id === id)!.higherIsBetter ? 'higher_is_better' : 'lower_is_better')
+    const values = Object.fromEntries(result.facts.filter(fact => fact.role !== 'reference').map(fact => [fact.metricId, fact.dimension?.direction]))
+
+    expect(values).toEqual({ otd: direction('otd_pct'), ftr: direction('ftr_pct'), rpa: direction('rpa') })
+    expect(values.rpa).toBe('lower_is_better')
   })
 
   it('ICO sin v2 entrega exactamente la evidencia v1 (sin FTR ni metas)', async () => {
@@ -322,6 +344,7 @@ describe('TASK-1888 — evidencia del contrato editorial v2', () => {
 
     expect(result.facts.map(fact => fact.metricId).sort()).toEqual(['otd', 'rpa'])
     expect(result.facts.find(fact => fact.metricId === 'otd')!.label).toBe('OTD · Sky · Diseño · 2026-08')
+    expect(result.facts.some(fact => fact.dimension?.direction !== undefined)).toBe(false)
   })
 
   it('ICO con v2 y un snapshot sin FTR lo narra como límite; sin FTR medido no hay meta de FTR', async () => {

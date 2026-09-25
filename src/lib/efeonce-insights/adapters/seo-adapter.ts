@@ -194,6 +194,8 @@ const etvFacts = async (seoTargetId: string, window: ResolvedInsightWindow, comp
   return { facts, rejections, source: { module: 'seo', adapterVersion: SEO_ADAPTER_VERSION, reader: 'readDomainOverviewForTarget', asOf: overview.capturedAt, method, coverage: base.coverage, servedWindow: null } as EvidenceSourceV1 }
 }
 
+const SEO_LOWER_IS_BETTER = new Set(['position'])
+
 const collectForWindow = async (input: AdapterCollectInput, window: ResolvedInsightWindow, seoTargetId: string | null, comparisonIds: Record<string, string | null>) => {
   const gsc = await gscFacts(input.organizationId, window, comparisonIds)
   const rank = seoTargetId ? await rankFacts(seoTargetId, window, comparisonIds) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
@@ -245,8 +247,13 @@ export const seoReportAdapter: ModuleReportAdapterV1 = {
 
     const current = await collectForWindow(input, input.window, seoTargetId, comparisonIds)
 
+    // TASK-1888 — con v2, la dirección de las métricas donde MENOR es mejor (posición media), para que el render no
+    // lea una subida de posición como mejora. El resto queda sin dirección (neutro), como antes.
+    const directed = (facts: EvidenceFactV1[]) =>
+      input.editorialV2 === true ? facts.map(fact => (SEO_LOWER_IS_BETTER.has(fact.metricId) ? { ...fact, dimension: { ...fact.dimension, direction: 'lower_is_better' } } : fact)) : facts
+
     return {
-      facts: [...current.facts, ...(comparison?.facts ?? [])],
+      facts: [...directed(current.facts), ...directed(comparison?.facts ?? [])],
       sources: [...current.sources, ...(comparison?.sources ?? [])],
       rejections: [...rejections, ...current.rejections, ...asComparisonRejections(comparison?.rejections ?? [])]
     }

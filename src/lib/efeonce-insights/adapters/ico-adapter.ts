@@ -67,6 +67,12 @@ export const listOrganizationSpaces = async (organizationId: string): Promise<Sp
     [organizationId]
   )
 
+const withIcoDirection = (fact: EvidenceFactV1): EvidenceFactV1 => {
+  const target = fact.metricId in ICO_SNAPSHOT_METRIC_IDS ? icoOfficialTarget(fact.metricId as keyof typeof ICO_SNAPSHOT_METRIC_IDS) : null
+
+  return target ? { ...fact, dimension: { ...fact.dimension, direction: target.higherIsBetter ? 'higher_is_better' : 'lower_is_better' } } : fact
+}
+
 const collectForWindow = async (spaces: SpaceRow[], window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>, editorialV2 = false) => {
   const facts: EvidenceFactV1[] = []
   const rejections: EvidenceRejectionV1[] = []
@@ -227,8 +233,12 @@ export const icoReportAdapter: ModuleReportAdapterV1 = {
     const current = await collectForWindow(spaces, input.window, input.window.months.length === 1 ? comparisonIds : {}, input.editorialV2 === true)
     const targets = input.editorialV2 === true ? targetFacts(current.facts, input.window) : []
 
+    // TASK-1888 — con v2, cada hecho de VALOR lleva la dirección de su métrica desde el registro dueño
+    // (`ICO_METRIC_REGISTRY.higherIsBetter`): el render colorea la variación sin buscar la meta. Aditivo; sin v2, igual.
+    const directed = (facts: EvidenceFactV1[]) => (input.editorialV2 === true ? facts.map(withIcoDirection) : facts)
+
     return {
-      facts: [...current.facts, ...targets, ...(comparison?.facts ?? [])],
+      facts: [...directed(current.facts), ...targets, ...directed(comparison?.facts ?? [])],
       sources: [current.source, comparison?.source ?? null].filter((source): source is EvidenceSourceV1 => source !== null),
       rejections: [...current.rejections, ...asComparisonRejections(comparison?.rejections ?? [])]
     }
