@@ -506,6 +506,13 @@ eso lo resuelve el catálogo en TASK-1889 desde `modules` y `channelId`, sin cam
 - `scripts/insights/preview-edition.ts --edition=<id> --org=<org>` con Berel y Sky
 - `pnpm task:lint --task TASK-1888`, `pnpm docs:closure-check`, `pnpm flags:audit`
 
+Ejecutado 2026-09-25 (evidencia local): `pnpm test` completo 15 395 passed / 0 failed; `pnpm build` exit 0 sobre
+`4cec0f060` (corrida única coordinada con las sesiones de TASK-1889 y 1846, árbol `src/`+`services/` limpio;
+compilación 68 s, 23 páginas estáticas); `pnpm typecheck` limpio; `docs:closure-check` y `flags:audit --strict` en
+0; cuatro guardas falsificadas (pp, hash, matriz, logo sobre navy) se ponen rojas con el defecto; preview v2 en solo
+lectura de Sky y Berel con 0 violaciones. `pnpm local:check` corta en lint por errores de `scripts/foto/**`, trabajo
+ajeno sin commitear.
+
 ## Closing Protocol
 
 - [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
