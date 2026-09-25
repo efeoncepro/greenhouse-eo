@@ -48,6 +48,8 @@ const chapter = (over: Partial<PlanChapterV1> = {}): PlanChapterV1 =>
     ...over
   }) as PlanChapterV1
 
+const claim0 = (text: string) => ({ claimId: text, text, factIds: [] })
+
 const plan = (over: Partial<EditorialPlanV1> = {}): EditorialPlanV1 =>
   ({
     planVersion: 'editorial_plan_v1',
@@ -101,6 +103,31 @@ describe('buildInsightReportPlanInput', () => {
     expect((opening.slots as { contents: { entries: { title: string; folio: string }[] } }).contents.entries).toEqual([
       { title: 'La visibilidad creció en el período', folio: '04' }
     ])
+  })
+
+  it('la narrada lleva en su columna las páginas que la respaldan, con folio real (TASK-1889)', () => {
+    const rows = [['/a', '10', null]]
+
+    const input = buildInsightReportPlanInput({
+      edition, report, snapshot,
+      plan: plan({
+        executiveSummary: [claim0('Resumen del mes'), claim0('Detalle')],
+        decision: claim0('Aprobar el plan de septiembre.'),
+        chapters: [chapter({ claims: [claim0('Titular'), claim0('Párrafo')], tables: [{ tableId: 't1', title: 'Páginas', columns: ['Página', 'Clics'], rows }] as never })]
+      } as never)
+    })
+
+    const narratives = input.slides.filter(s => s.contentType === 'report-narrative')
+    const summary = narratives.find(s => (s.slots as { runningSection: string }).runningSection === 'Resumen ejecutivo')!
+    const chapterNarrative = narratives.find(s => s !== summary)!
+    const tableFolio = (input.slides.findIndex(s => s.contentType === 'report-table') + 1).toString().padStart(2, '0')
+    const openingFolio = (input.slides.findIndex(s => s.contentType === 'report-chapter') + 1).toString().padStart(2, '0')
+
+    expect(chapterNarrative.slots).toMatchObject({ evidence: { label: 'En este capítulo', items: [{ folio: `p. ${tableFolio}`, text: 'Páginas' }] } })
+    expect(summary.slots).toMatchObject({
+      evidence: { label: 'En este informe', items: [{ folio: `p. ${openingFolio}`, text: 'Visibilidad orgánica' }] },
+      closing: [{ kind: 'action', label: 'Para decidir en la reunión', text: 'Aprobar el plan de septiembre.' }]
+    })
   })
 
   it('contacto, mercados y línea legal de la contraportada salen del SSOT de marca', () => {

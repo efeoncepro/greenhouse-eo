@@ -2,7 +2,7 @@
   "template": "ReportNarrativePage",
   "figmaNodeId": null,
   "version": "0.1",
-  "note": "TASK-1889 — capítulo narrado A4: afirmación, lectura con capitular y columna lateral (frase clave o marca del capítulo). Sin página propia en el canvas.",
+  "note": "TASK-1889 — capítulo narrado A4 con la anatomía de «Nuestra lectura»: capitular, columna lateral útil (frase clave + páginas del capítulo con folio) y cierre navy opcional. Sin página propia en el canvas.",
   "viewport": {
     "width": 794,
     "height": 1123
@@ -106,25 +106,86 @@
         }
       }
     },
-    "chapterMark": {
-      "selector": "[data-slot='chapterMark']",
+    "evidence": {
+      "selector": "[data-slot='evidence']",
       "type": "object",
       "required": false,
       "shape": {
-        "numeral": {
-          "type": "string",
-          "required": true,
-          "maxCharacters": 2,
-          "maxLines": 1
-        },
         "label": {
           "type": "string",
           "required": true,
-          "maxCharacters": 48,
-          "maxLines": 2
+          "maxCharacters": 32,
+          "maxLines": 1
+        },
+        "items": {
+          "type": "array",
+          "required": true,
+          "constraints": {
+            "minItems": 1,
+            "maxItems": 8
+          },
+          "item": {
+            "type": "object",
+            "shape": {
+              "folio": {
+                "type": "string",
+                "required": true,
+                "maxCharacters": 8,
+                "maxLines": 1
+              },
+              "text": {
+                "type": "string",
+                "required": true,
+                "maxCharacters": 48,
+                "maxLines": 2
+              }
+            }
+          }
         }
       },
-      "notes": "Número y nombre del capítulo en la columna lateral."
+      "notes": "Páginas que respaldan la lectura, con folio real (plan de páginas de la misma composición)."
+    },
+    "closing": {
+      "selector": "[data-slot='closing']",
+      "type": "array",
+      "required": false,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 2
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "kind": {
+            "type": "string",
+            "required": true,
+            "resolver": "report-closing-icon",
+            "values": [
+              "measure",
+              "action"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40,
+            "maxLines": 1
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 240,
+            "maxLines": 4
+          },
+          "signature": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 40,
+            "maxLines": 1
+          }
+        }
+      },
+      "notes": "Decisión (resumen) o lectura del plan. Sin ella, la página compone sin panel."
     },
     "footerEdition": {
       "selector": "[data-slot='footerEdition']",

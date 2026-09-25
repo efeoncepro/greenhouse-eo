@@ -64,7 +64,9 @@ const CAPACITY = {
   /** Entradas por página de índice (`entries.maxItems`). */
   indexEntries: 20,
   /** Entradas del índice de una apertura de capítulo (`contents.entries.maxItems`). */
-  chapterContents: 12
+  chapterContents: 12,
+  /** Entradas de la columna «En este capítulo» de la narrada (`evidence.items.maxItems`). */
+  asideItems: 8
 } as const
 
 /** Barras por figura: lo que declara la plantilla analítica (`figureSeries.maxItems`). */
@@ -85,7 +87,8 @@ const BUDGET = {
   reportTitle: 64,
   indexTitle: 72,
   contentsTitle: 56,
-  tableTitle: 80
+  tableTitle: 80,
+  asideTitle: 48
 } as const
 
 export interface BuildInsightReportInput {
@@ -113,7 +116,6 @@ const L = GH_INSIGHTS.catalog
 const chapterBodyPages = (
   chapter: PlanChapterV1,
   running: { runningSection: string; runningPeriod: string },
-  chapterMark: { numeral: string; label: string },
   legacyRunning: { runningChapter: string; runningPeriod: string },
   factsById: ReadonlyMap<string, EvidenceFactV1>,
   locale: string
@@ -169,7 +171,6 @@ const chapterBodyPages = (
           ...running,
           eyebrow: chapter.title,
           assertion: rejectIfLonger(headline!, BUDGET.assertion, `${chapter.chapterId}.assertion`),
-          chapterMark,
           paragraphs: paragraphs.map(p => rejectIfLonger(p, BUDGET.paragraph, `${chapter.chapterId}.paragraph`))
         }
       }
@@ -281,6 +282,18 @@ export const buildInsightReportPlanInput = ({
             ...running,
             eyebrow: GH_INSIGHTS.document.executiveSummary,
             assertion: rejectIfLonger(headline!, BUDGET.assertion, 'executiveSummary.assertion'),
+            ...(frozen.decision
+              ? {
+                  closing: [
+                    {
+                      kind: 'action',
+                      label: L.decideInMeeting,
+                      text: rejectIfLonger(frozen.decision.text, 240, 'decision'),
+                      signature: L.signature
+                    }
+                  ]
+                }
+              : {}),
             paragraphs: paragraphs.map(p => rejectIfLonger(p, BUDGET.paragraph, 'executiveSummary.paragraph'))
           }
         }
@@ -291,8 +304,7 @@ export const buildInsightReportPlanInput = ({
   frozen.chapters.forEach((chapter, index) => {
     const number = pad2(index + 1)
     const running = { runningSection: `${number} · ${chapter.title}`, runningPeriod: periodLabel }
-    const mark = { numeral: number, label: rejectIfLonger(`${L.chapter} ${number} · ${chapter.title}`, 48, `${chapter.chapterId}.mark`) }
-    const body = chapterBodyPages(chapter, running, mark, { runningChapter: chapter.title, runningPeriod: periodLabel }, factsById, frozen.locale)
+    const body = chapterBodyPages(chapter, running, { runningChapter: chapter.title, runningPeriod: periodLabel }, factsById, frozen.locale)
 
     // La apertura abre el capítulo; su índice se completa con folios reales cuando se conoce el plan.
     const opening: BodyPage = {
@@ -406,6 +418,41 @@ export const buildInsightReportPlanInput = ({
     const fits = contentEntries.length > 0 && contentEntries.length <= CAPACITY.chapterContents && contentEntries.every(e => e.title.length <= BUDGET.contentsTitle)
 
     if (fits) (opening.slots as Record<string, unknown>).contents = { label: L.inThisChapter, entries: contentEntries }
+  })
+
+  // Columna «En este capítulo» de cada página narrada: las páginas que respaldan su lectura, con folio
+  // real. En un capítulo, sus figuras y tablas; en el resumen, cada capítulo. Un título que no cabe
+  // en la columna no se recorta: queda fuera de la lista (el índice general lo lleva igual).
+  const asideItem = (title: string, folio: number) =>
+    title.length <= BUDGET.asideTitle ? [{ folio: `${L.evidencePage} ${pad2(folio)}`, text: title }] : []
+
+  sections.forEach((section, i) => {
+    const narratives = section.pages.filter(body => body.page.contentType === 'report-narrative')
+
+    if (narratives.length === 0) return
+
+    const items =
+      section.mark === L.indexMarks.summary
+        ? sections.flatMap((other, j) => (other.pages[0]?.page.contentType === 'report-chapter' ? asideItem(other.title, folioOf[j]!) : []))
+        : (() => {
+            const seen = new Map<string, number>()
+
+            section.pages.forEach((body, offset) => {
+              if (body.page.contentType === 'report-narrative' || body.page.contentType === 'report-chapter') return
+              if (body.contentsTitle && !seen.has(body.contentsTitle)) seen.set(body.contentsTitle, folioOf[i]! + offset)
+            })
+
+            return [...seen].flatMap(([title, folio]) => asideItem(title, folio))
+          })()
+
+    if (items.length === 0) return
+
+    for (const body of narratives) {
+      ;(body.page.slots as Record<string, unknown>).evidence = {
+        label: section.mark === L.indexMarks.summary ? L.inThisReport : L.inThisChapter,
+        items: items.slice(0, CAPACITY.asideItems)
+      }
+    }
   })
 
   const pages = [cover, ...indexPages, ...sections.flatMap(section => section.pages.map(body => body.page)), backCover]

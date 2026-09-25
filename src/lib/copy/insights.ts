@@ -206,6 +206,7 @@ export const GH_INSIGHTS = {
     figuresAsOf: 'Cifras al',
     chapter: 'Capítulo',
     inThisChapter: 'En este capítulo',
+    inThisReport: 'En este informe',
     measuredIn: 'Medimos la marca en',
     indexEyebrow: 'Contenido',
     indexSectionColumn: 'Sección',

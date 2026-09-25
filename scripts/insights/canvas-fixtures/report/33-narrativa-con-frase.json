@@ -26,6 +26,23 @@
     "pullQuote": {
       "text": "Nueve campos son cinco de más para quien ya decidió escribir.",
       "source": "Lectura de Efeonce · p. 20"
+    },
+    "evidence": {
+      "label": "En este capítulo",
+      "items": [
+        {
+          "folio": "p. 20",
+          "text": "Embudo de conversión: del clic a la oportunidad"
+        },
+        {
+          "folio": "p. 21",
+          "text": "Nuestra lectura del mes"
+        },
+        {
+          "folio": "p. 22",
+          "text": "Plan de septiembre: acción 2"
+        }
+      ]
     }
   }
 }

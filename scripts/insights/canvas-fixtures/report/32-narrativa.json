@@ -23,9 +23,35 @@
       "page": "20",
       "total": "24"
     },
-    "chapterMark": {
-      "numeral": "03",
-      "label": "Capítulo 03 · Del clic al negocio"
-    }
+    "evidence": {
+      "label": "En este capítulo",
+      "items": [
+        {
+          "folio": "p. 20",
+          "text": "Embudo de conversión: del clic a la oportunidad"
+        },
+        {
+          "folio": "p. 21",
+          "text": "Nuestra lectura del mes"
+        },
+        {
+          "folio": "p. 22",
+          "text": "Plan de septiembre: acción 2"
+        }
+      ]
+    },
+    "closing": [
+      {
+        "kind": "measure",
+        "label": "Lo que significa",
+        "text": "El sitio ya atrae a quien busca: el freno está en un formulario que pide más de lo necesario."
+      },
+      {
+        "kind": "action",
+        "label": "Próximo paso",
+        "text": "Probar un formulario corto en /servicios y /precios (acción 2 del plan).",
+        "signature": "Recomendación de Efeonce"
+      }
+    ]
   }
 }

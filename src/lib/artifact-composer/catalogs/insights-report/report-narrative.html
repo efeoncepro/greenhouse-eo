@@ -4,12 +4,12 @@
 <meta charset="utf-8" />
 <!--
   ReportNarrativePage — capítulo narrado del informe A4 (TASK-1889). Sin página propia en el canvas:
-  toma la gramática de «Nuestra lectura» aprobada — afirmación, lectura con capitular y columna lateral
-  que respalda — para que una página sin figura tenga el mismo peso que una con figura.
+  sigue la anatomía de «Nuestra lectura» aprobada — afirmación, lectura con capitular y una columna
+  lateral ÚTIL: la frase clave (si el plan la trae) y «En este capítulo», las páginas que respaldan
+  esta lectura con su folio real. Cierra con el panel navy (decisión o lectura del plan) cuando existe.
 
-  Columna lateral: la frase clave (`pullQuote`) si el plan la trae; si no, la marca del capítulo en
-  contorno (número y nombre), que ancla la página en su sección. Sirve al capítulo sin figura (se
-  narra, NUNCA se omite) y a las afirmaciones que ninguna figura tituló.
+  Sirve al resumen ejecutivo, al capítulo sin figura (se narra, NUNCA se omite) y a las afirmaciones
+  que ninguna figura tituló.
 -->
 <link rel="stylesheet" href="report-tokens.css" />
 <link rel="stylesheet" href="report-fonts.css" />
@@ -74,13 +74,7 @@
 
   .narrative-lead:empty { display: none; }
 
-  .narrative-rule { margin-top: 26px; display: flex; align-items: center; }
-
-  .narrative-rule .accent { width: 32px; height: 2px; background: var(--axis-report-role-paperAccent); }
-
-  .narrative-rule .line { flex-grow: 1; height: 1px; background: var(--axis-report-role-rule); }
-
-  .narrative-grid { margin-top: 24px; display: grid; grid-template-columns: minmax(0, 1fr) 196px; gap: 38px; align-items: start; }
+  .narrative-grid { margin-top: 28px; display: grid; grid-template-columns: minmax(0, 1fr) 196px; gap: 38px; align-items: start; }
 
   .narrative-body { display: flex; flex-direction: column; gap: 14px; }
 
@@ -124,29 +118,36 @@
     color: var(--axis-report-role-labelMuted);
   }
 
-  /* Marca del capítulo: el número en contorno de la apertura, a escala de columna. */
-  .mark { padding-top: 14px; border-top: 1px solid var(--axis-report-role-rule); display: flex; flex-direction: column; gap: 6px; }
-
-  .mark:empty { display: none; }
-
-  .mark-numeral {
-    font-family: var(--axis-report-type-display);
-    font-size: 132px;
-    line-height: 0.9;
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    color: transparent;
-    -webkit-text-stroke: 1.5px rgba(var(--axis-report-role-paperAccent-rgb), 0.45);
-  }
-
-  .mark-label {
+  /* «En este capítulo»: las páginas que respaldan esta lectura, con su folio real. */
+  .aside-label {
+    margin-bottom: 4px;
     font-family: var(--axis-report-type-display);
     font-size: 9px;
     font-weight: 600;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--axis-report-role-labelMuted);
+    color: var(--axis-report-role-paperAccent);
   }
+
+  .aside-list { display: flex; flex-direction: column; }
+
+  .aside-list:empty { display: none; }
+
+  .aside-row { display: flex; align-items: flex-start; gap: 9px; padding: 9px 0; border-top: 1px solid var(--axis-report-role-rule); }
+
+  .aside-row .folio-chip { font-size: 9px; }
+
+  .aside-text { font-size: 11.5px; line-height: 1.45; color: var(--axis-report-role-paperAccent); }
+
+  .aside-block { display: flex; flex-direction: column; }
+
+  .aside-block:empty { display: none; }
+
+  .closing-kind { display: contents; }
+
+  .closing--narrative { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+
+  .closing--narrative:empty { display: none; }
 </style>
 </head>
 <body>
@@ -166,15 +167,22 @@
 
     <h1 class="narrative-assertion" data-slot="assertion">La afirmación que ordena este capítulo</h1>
     <p class="narrative-lead" data-slot="lead">Lo que el lector debe entender antes del detalle.</p>
-    <div class="narrative-rule"><span class="accent"></span><span class="line"></span></div>
 
     <div class="narrative-grid">
       <div class="narrative-body" data-slot="paragraphs"><p>Desarrollo del capítulo.</p></div>
       <aside class="narrative-aside">
         <div class="pull" data-slot="pullQuote"><svg class="stroke-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 11h-4a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h3a1 1 0 0 1 1 1v6c0 2.667 -1.333 4.333 -4 5"></path><path d="M19 11h-4a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h3a1 1 0 0 1 1 1v6c0 2.667 -1.333 4.333 -4 5"></path></svg><span class="pull-text" data-slot-field="text">La frase que el lector se lleva.</span><span class="pull-source" data-slot-field="source">Lectura de Efeonce</span></div>
-        <div class="mark" data-slot="chapterMark"><span class="mark-numeral" data-slot-field="numeral">03</span><span class="mark-label" data-slot-field="label">Capítulo 03 · Del clic al negocio</span></div>
+        <div class="aside-block" data-slot="evidence"><span class="aside-label" data-slot-field="label">En este capítulo</span><div class="aside-list" data-slot-field="items"><div class="aside-row"><span class="folio-chip" data-slot-field="folio">p. 06</span><span class="aside-text" data-slot-field="text">Clics, impresiones y CTR</span></div></div></div>
       </aside>
     </div>
+
+    <div class="grow"></div>
+
+    <div class="closing closing--narrative" data-slot="closing"><div class="closing-block">
+        <span class="closing-label"><span class="closing-kind" data-slot-field="kind"><svg class="stroke-icon closing-icon--measure" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7"></path><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3"></path><path d="M9.7 17h4.6"></path></svg><svg class="stroke-icon closing-icon--action" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 18l6 -6"></path><path d="M13 6l6 6"></path></svg></span><span data-slot-field="label">Para decidir en la reunión</span></span>
+        <p class="closing-text" data-slot-field="text">La decisión que el informe propone.</p>
+        <span class="closing-signature" data-slot-field="signature">Recomendación de Efeonce</span>
+      </div></div>
     <footer class="paper-foot">
       <div class="paper-foot-rule"><span class="accent"></span><span class="line"></span></div>
       <div class="paper-foot-row">

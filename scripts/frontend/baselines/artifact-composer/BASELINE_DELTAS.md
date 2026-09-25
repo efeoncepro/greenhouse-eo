@@ -1,5 +1,14 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-25 (f) — TASK-1889: narrada y límites con la misma crítica
+
+La narrada sigue la anatomía de «Nuestra lectura»: se retira el número en contorno decorativo y el filete
+redundante; la columna lateral pasa a ser útil (frase clave + «En este capítulo»/«En este informe» con folio
+real) y cierra con el panel navy cuando el plan trae decisión o lectura. Los límites ganan cuerpo por fila.
+
+- `templates-insights-report/ReportNarrativePage.png` — columna lateral útil + cierre navy opcional
+- `templates-insights-report/ReportLimitsPage.png` — filas con más cuerpo
+
 ## 2026-09-25 (e) — TASK-1889: la tabla vuelve a la anatomía de la evidencia aprobada
 
 Crítica de diseño (operador: «no se ve premium»): la versión anterior cargaba navy arriba (cabecera y
@@ -472,7 +481,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 161a8d1e74acc344218982a459b556503ff2c390c4398a78acb611c1926b1f58 -->
+<!-- manifest-digest: 17d7db258ca983f666fd5b90ab40e4b5dd887d5fd336d5c67e6344dabcc450c5 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.
