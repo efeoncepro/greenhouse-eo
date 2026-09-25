@@ -8,6 +8,7 @@ import {
   weekSpanEffects
 } from '../catalogs/insights-shared/editorial-resolvers'
 import { chapterNumeralX } from '../catalogs/insights-shared/layout-hooks'
+import { tableBarEffects, tableRankEffects } from '../catalogs/insights-report/resolvers'
 
 const ctx = (index: number) => ({ item: {}, index, itemCount: 5, slots: {} })
 
@@ -64,5 +65,23 @@ describe('resolvers editoriales de Insights (TASK-1889)', () => {
     expect(chapterNumeralX('11')).toBe(830)
     expect(chapterNumeralX('02')).toBe(850)
     expect(chapterNumeralX('10')).toBe(850)
+  })
+
+  it('la barra de la tabla sale del dato; la líder es la que alcanza el máximo de la tabla completa', () => {
+    const slots = { barScaleMax: '14.920', tableRows: [{ valueA: '11.305' }, { valueA: '8.410' }] }
+
+    expect(tableBarEffects({ valueA: '7.460' }, slots)).toEqual([{ selector: '.row-bar', styleProp: 'width', styleValue: '50.00%' }])
+    expect(tableBarEffects({ valueA: '14.920' }, slots)).toContainEqual({ selector: ':self', toneClass: 'row--lead', toneGroup: ['row--lead'] })
+    // En la página 2 la líder no está: ninguna fila se vuelve líder por ser la mayor DE LA PÁGINA.
+    expect(tableBarEffects({ valueA: '11.305' }, slots).some(e => e.toneClass === 'row--lead')).toBe(false)
+    expect(tableBarEffects({ valueA: '—' }, slots)).toEqual([{ selector: ':field', remove: true }])
+  })
+
+  it('el ranking de la tabla continúa entre páginas y marca el top 3', () => {
+    expect(tableRankEffects(0, {})).toEqual([
+      { selector: ':field', asText: true, value: '01' },
+      { selector: ':field', toneClass: 'rank--top', toneGroup: ['rank--top'] }
+    ])
+    expect(tableRankEffects(0, { rankOffset: '16' })).toEqual([{ selector: ':field', asText: true, value: '17' }])
   })
 })

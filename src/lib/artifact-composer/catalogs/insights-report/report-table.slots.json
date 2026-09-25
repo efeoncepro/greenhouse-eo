@@ -118,7 +118,7 @@
       "required": true,
       "constraints": {
         "minItems": 1,
-        "maxItems": 20
+        "maxItems": 16
       },
       "item": {
         "type": "object",
@@ -126,7 +126,7 @@
           "rank": {
             "type": "string",
             "required": false,
-            "resolver": "report-ordinal",
+            "resolver": "report-table-rank",
             "consumer": "resolver-only"
           },
           "entity": {
@@ -263,6 +263,18 @@
         }
       },
       "notes": "«NN / total»: ambos del plan de páginas de la misma composición (paginateFlow), nunca un número fijo."
+    },
+    "rankOffset": {
+      "selector": "[data-slot='rankOffset']",
+      "type": "string",
+      "required": false,
+      "consumer": "validation-only",
+      "constraints": {
+        "maxCharacters": 4,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Filas de la tabla ya mostradas en páginas anteriores: el ranking continúa."
     }
   }
 }

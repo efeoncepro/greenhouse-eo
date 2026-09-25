@@ -56,7 +56,7 @@ import { withDedupedLimits } from './plan-limits'
 /** Capacidades declaradas por plantilla (`*.slots.json`). Son del molde, no preferencias. */
 const CAPACITY = {
   /** Filas por página de tabla (`tableRows.maxItems`). */
-  tableRows: 20,
+  tableRows: 16,
   /** Párrafos por página narrativa (`paragraphs.maxItems`). */
   paragraphs: 6,
   /** Límites por página de cierre (`limits.maxItems`). */
@@ -192,7 +192,7 @@ const chapterBodyPages = (
             heroText: L.tableRowsText,
             tableTitle: rejectIfLonger(table.title, BUDGET.tableTitle, `${table.tableId}.title`),
             // La continuación se declara: una tabla que sigue sin decirlo obliga a retroceder.
-            ...(i > 0 ? { continuationLabel: L.tableContinued } : {}),
+            ...(i > 0 ? { continuationLabel: L.tableContinued, rankOffset: String(i * CAPACITY.tableRows) } : {}),
             tableColumns: ['#', ...table.columns.slice(0, 3)].map(label => ({ label })),
             tableRows: rows.map(row => ({
               entity: String(row[0] ?? '—'),

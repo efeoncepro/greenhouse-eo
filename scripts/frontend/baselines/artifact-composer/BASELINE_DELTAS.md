@@ -1,5 +1,13 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-25 (d) — TASK-1889: la tabla de respaldo gana punch
+
+Pedido del operador («la tabla necesita más punch»). Cabecera navy con la cifra contada en teal, tablero de
+barras (cada fila con su barra detrás, desde el dato) y la fila que alcanza el máximo de la tabla completa
+como banda navy. El ranking continúa entre páginas (`rankOffset`), antes volvía a 01.
+
+- `templates-insights-report/ReportTablePage.png` — tablero de barras con cabecera navy y fila líder
+
 ## 2026-09-25 (c) — TASK-1889: narrada, tabla y límites elevadas al nivel del canvas
 
 Pedido del operador («muy sencillas para lo premium del diseño V2»). Las cinco piezas sin página propia en
@@ -454,7 +462,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 9d3a41f406149e80f0bd243a1d66da55a555a9c02a0f4d75f598bc1b2af5efb6 -->
+<!-- manifest-digest: f659c5b36f484774683a13e59be0371a6cd0aadd034446160b80b73318f56731 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

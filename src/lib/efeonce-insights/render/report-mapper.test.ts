@@ -189,7 +189,7 @@ describe('buildInsightReportPlanInput', () => {
       s => s.contentType === 'report-table'
     )
 
-    expect(tablePages.length).toBe(3)
+    expect(tablePages.length).toBe(4) // 16 filas por página (tablero de barras, TASK-1889)
     expect((tablePages[0]!.slots as Record<string, unknown>).continuationLabel).toBeUndefined()
     expect((tablePages[1]!.slots as Record<string, unknown>).continuationLabel).toBeDefined()
   })
@@ -209,6 +209,10 @@ describe('buildInsightReportPlanInput', () => {
       expect(page.slots).toMatchObject({ heroFigure: '30', barScaleMax: '3000', source: { label: 'Fuente' } })
       expect((page.slots as { tableColumns: { label: string }[] }).tableColumns[0]).toEqual({ label: '#' })
     }
+
+    // El ranking continúa en la página siguiente: la segunda página empieza en la fila 17.
+    expect((pages[0]!.slots as { rankOffset?: string }).rankOffset).toBeUndefined()
+    expect((pages[1]!.slots as { rankOffset?: string }).rankOffset).toBe('16')
   })
 
   it('ninguna página de tabla excede la capacidad declarada del molde', () => {
@@ -220,7 +224,7 @@ describe('buildInsightReportPlanInput', () => {
 
     for (const page of buildInsightReportPlanInput({ edition, report, snapshot, plan: withTable }).slides) {
       if (page.contentType !== 'report-table') continue
-      expect((page.slots as { tableRows: unknown[] }).tableRows.length).toBeLessThanOrEqual(26)
+      expect((page.slots as { tableRows: unknown[] }).tableRows.length).toBeLessThanOrEqual(16)
     }
   })
 
