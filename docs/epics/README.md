@@ -22,6 +22,7 @@ Panel operativo de epics del repo.
 ## Bootstrap actual
 
 - `EPIC-048` — **Operational Leadership Performance in ICO and Person 360.** Cartera dinámica de cualquier líder por responsabilidad/vigencia, separada del crédito individual; Daniela y sus cuentas son sólo el piloto. Tres hijas `to-do`: TASK-1879 (fuentes/atribución) → TASK-1880 (ICO/API) → TASK-1881 (Person 360/UI). Sólo planificación; Payroll/bono fuera hasta decisión prospectiva de HR/Finance. [Epic](to-do/EPIC-048-operational-leadership-performance-ico-person-360.md).
+- `EPIC-049` — **Efeonce Marketing Studio.** Campaign Manager local → plataforma API-first en `studio.efeonce.org` (Next.js en Vercel con `/api/v1` en el mismo deployment, base propia `marketing_studio` en la instancia Cloud SQL existente, repo `efeoncepro/efeonce-marketing-studio` sólo código; docs aquí). Fundación: TASK-1887. [Epic](to-do/EPIC-049-efeonce-marketing-studio-platform.md).
 
 - `EPIC-046` — **Servicios del cliente: visibilidad y autogestión.** Primera cohorte: Berel (SEO y marketing de contenidos) y Sky (diseño digital). ADR aceptado para planificación; Insights integrado con EPIC-045 para autogestión cliente y gestión interna; Hito N de email/in-app/Teamsbot y deep links; TASK-1852–1856 registradas y conectadas a TASK-1834; tres tasks existentes por reutilizar, sin ejecutar. [Epic](to-do/EPIC-046-client-services-visibility-and-self-service.md).
 

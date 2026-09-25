@@ -36,7 +36,7 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1878](to-do/TASK-1878-public-landing-entrypaths-human-agent.md) | entradas contextuales desde Home, HubSpot y AEO hacia TASK-1877, sólo tras publicación verificada (EPIC-047, H2) | TASK-1877 |
 | [TASK-1885](to-do/TASK-1885-meeting-booking-campaign-attribution.md) | Atribución de campaña en la reunión agendada (EPIC-023): el contrato server-side ya acepta `utm*`/`referrerHost` y la tabla ya tiene `attribution_json`, pero el renderer sólo envía `placement`+`pagePath` y nadie lee el campo de vuelta — sin esto, pautear hacia `/agenda/` gasta presupuesto sin poder atribuir la reunión. Cierra la pierna Greenhouse/GTM de PDR-009 y decide por escrito la de `context.hutk` | none |
 
-Siguiente ID libre `TASK-1887`. `TASK-1886` (to-do): HubSpot services — un solo read path, command por servicio y traza del intake async (post-mortem Sky Blog). Insights TASK-1845–1849 (+ TASK-1875, vista web compartida en Think) y notificaciones conservan sus dueñas.
+Siguiente ID libre `TASK-1888`. `TASK-1887` (to-do): Efeonce Marketing Studio — fundación (EPIC-049). `TASK-1886` (to-do): HubSpot services — un solo read path, command por servicio y traza del intake async (post-mortem Sky Blog). Insights TASK-1845–1849 (+ TASK-1875, vista web compartida en Think) y notificaciones conservan sus dueñas.
 
 ## Liderazgo operativo: EPIC-048
 
