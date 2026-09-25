@@ -54,18 +54,18 @@
     "heroFigure": {
       "selector": "[data-slot='heroFigure']",
       "type": "string",
-      "required": true,
+      "required": false,
       "constraints": {
         "maxCharacters": 12,
         "maxLines": 1,
         "overflow": "reject"
       },
-      "notes": "Valor de la fila más alta de la tabla completa (lo calcula el mapper del dato)."
+      "notes": "Cifra del hallazgo principal del capítulo (`readings[].keyFigure` de TASK-1888). Sin hallazgo, no hay cifra: nunca «la fila más alta»."
     },
     "heroText": {
       "selector": "[data-slot='heroText']",
       "type": "rich-string",
-      "required": true,
+      "required": false,
       "constraints": {
         "maxCharacters": 110,
         "maxLines": 3,
@@ -74,7 +74,7 @@
           "strong"
         ]
       },
-      "notes": "Qué es la cifra: columna y fila («impresiones en <strong>/precios</strong>, la fila más alta de la tabla»)."
+      "notes": "La conclusión de ese hallazgo."
     },
     "tableTitle": {
       "selector": "[data-slot='tableTitle']",
@@ -119,7 +119,7 @@
     "legend": {
       "selector": "[data-slot='legend']",
       "type": "object",
-      "required": true,
+      "required": false,
       "shape": {
         "label": {
           "type": "string",
@@ -127,7 +127,8 @@
           "maxCharacters": 24,
           "maxLines": 1
         }
-      }
+      },
+      "notes": "Rótulo de la barra. Sin barras (filas de unidades distintas), no hay leyenda."
     },
     "tableColumns": {
       "selector": "[data-slot='tableColumns']",
@@ -184,6 +185,17 @@
             "maxCharacters": 16,
             "maxLines": 1
           },
+          "trend": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-row-trend",
+            "values": [
+              "up",
+              "down",
+              "flat"
+            ],
+            "notes": "Dirección de la variación de la fila. Sin ella, la píldora es neutra."
+          },
           "valueB": {
             "type": "string",
             "required": false,
@@ -204,6 +216,17 @@
         "overflow": "reject"
       },
       "notes": "Máximo de la primera columna de valor en la tabla COMPLETA: la escala de la barra no cambia entre páginas."
+    },
+    "barMode": {
+      "selector": "[data-slot='barMode']",
+      "type": "enum",
+      "required": false,
+      "consumer": "validation-only",
+      "values": [
+        "scale",
+        "none"
+      ],
+      "notes": "`none` cuando las filas no comparten unidad: sin barras (una escala común mentiría) y la segunda columna es la variación."
     },
     "rankOffset": {
       "selector": "[data-slot='rankOffset']",

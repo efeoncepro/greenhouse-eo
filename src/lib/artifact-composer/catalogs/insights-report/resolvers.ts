@@ -22,6 +22,10 @@ export { parsePrintedNumber, roundingToleranceOf } from '../../bar-figure'
 export const tableBarEffects = (item: Record<string, unknown>, slots: Record<string, unknown>): FieldEffect[] => {
   const value = parsePrintedNumber(item.valueA)
   const rows = Array.isArray(slots.tableRows) ? (slots.tableRows as Record<string, unknown>[]) : []
+
+  // Filas en unidades distintas (clics, CTR, posición): una escala común las mentiría; no hay barra.
+  if (slots.barMode === 'none') return [{ selector: ':field', remove: true }]
+
   const declared = parsePrintedNumber(slots.barScaleMax)
   const pageMax = Math.max(0, ...rows.map(row => parsePrintedNumber(row.valueA) ?? 0))
   const max = declared !== null && declared > 0 ? declared : pageMax
@@ -59,6 +63,19 @@ export const insightsReportResolvers: ResolverRegistry = {
   'report-table-rank': {
     known: ['<derivado de rankOffset y la posición>'],
     build: (_value, ctx) => tableRankEffects(ctx.index, ctx.slots)
+  },
+  /** Dirección de la variación de una fila (sin dato ⇒ neutra, sin triángulo). */
+  'report-row-trend': {
+    known: ['up', 'down', 'flat'],
+    build: (value): FieldEffect[] => {
+      const direction = value === 'up' || value === 'down' ? value : 'flat'
+
+      return [
+        { selector: ':field', toneClass: `delta--${direction}`, toneGroup: ['delta--up', 'delta--down', 'delta--flat'] },
+        ...(direction === 'up' ? [] : [{ selector: '.delta-mark-up', remove: true as const }]),
+        ...(direction === 'down' ? [] : [{ selector: '.delta-mark-down', remove: true as const }])
+      ]
+    }
   },
   'report-table-bar': {
     known: ['<derivado de valueA y barScaleMax>'],

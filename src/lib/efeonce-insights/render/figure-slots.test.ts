@@ -171,3 +171,13 @@ describe('nombre común de un empate (una sola función para esencial y cifra)',
     expect(groupNameOf([fact('a', 'otra.a'), fact('b', 'otra.b')], [chart('Puntaje de visibilidad (0 a 100)')])).toBe('Puntaje de visibilidad')
   })
 })
+
+describe('dirección de una posición', () => {
+  it('bajar de número es subir en Google (caso Berel: #5,8 → #6,6 es empeorar)', async () => {
+    const { directionOf } = await import('./figure-slots')
+
+    expect(directionOf(6.6, 5.8, 'position')).toBe('down')
+    expect(directionOf(5.8, 6.6, 'position')).toBe('up')
+    expect(directionOf(9377, 10662, 'count')).toBe('down')
+  })
+})

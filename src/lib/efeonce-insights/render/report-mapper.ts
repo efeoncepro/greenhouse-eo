@@ -48,10 +48,10 @@ import type { ChartSpecV1 } from '../contracts/chart-spec'
 import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { EvidenceSnapshotRecord, InsightEditionRecord, InsightReportRecord } from '../stores/records'
 import { InsightsRenderRejectedError } from '../errors'
-import { formatFactValue } from '../editorial/format'
+import { formatDeltaForUnit, formatFactValue } from '../editorial/format'
 import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
 import { channelNameOf, channelsOf, coverPage } from './cover'
-import { buildFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, readingFor } from './figure-slots'
+import { buildFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, directionOf, readingFor, sourcesOf, unsigned } from './figure-slots'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
 import { withDedupedLimits } from './plan-limits'
 
@@ -146,7 +146,8 @@ const chapterBodyPages = (
   chapter: PlanChapterV1,
   running: { runningSection: string; runningPeriod: string },
   factsById: ReadonlyMap<string, EvidenceFactV1>,
-  locale: string
+  locale: string,
+  periodInline: string
 ): BodyPage[] => {
   const claims = chapter.claims.map(c => c.text)
 
@@ -222,29 +223,56 @@ const chapterBodyPages = (
   })
 
   for (const table of chapter.tables) {
-    // La barra de la primera columna de valor se escala contra la tabla COMPLETA, no contra la página,
-    // y la cifra protagonista es el valor de la fila más alta de esa misma tabla.
+    // Cada fila es un hecho del capítulo: el planner la arma con su nombre y su cifra formateada. Recuperarlo da la
+    // unidad real y el período anterior exactos (no se re-leen cifras impresas).
+    const rowFacts = table.rows.map(row =>
+      [...factsById.values()].find(fact => fact.module === chapter.module && fact.label === row[0] && formatFactValue(fact.value, fact.unit, locale) === row[1])
+    )
+
+    // Unidad de cada fila: la del hecho; sin hecho (tabla v1), la del formato impreso («%», «#», «pos.» o ninguno).
+    const printedUnit = (printed: string | null): string | null =>
+      printed == null || parsePrintedNumber(printed) === null ? null : printed.includes('%') ? 'percent' : printed.startsWith('#') ? 'position' : /pos\.?$/.test(printed) ? 'position' : 'plain'
+
+    const units = new Set(rowFacts.map((fact, i) => fact?.unit ?? printedUnit(table.rows[i]?.[1] ?? null)))
+    const sharedUnit = units.size === 1 && !units.has(null)
+    const withPrevious = table.rows.some(row => row[2] != null && row[2] !== '—')
+
+    // Cifra principal = el hallazgo principal del capítulo (primera lectura con cifra). «La fila más alta» comparaba
+    // impresiones con CTR o porcentajes con RpA: no es un hallazgo. Sin hallazgo, no hay cifra.
+    const finding = chapter.readings?.find(reading => reading.keyFigure)
+
+    const hero = finding?.keyFigure
+      ? {
+          heroFigure: rejectIfLonger(finding.keyFigure.value, 12, `${table.tableId}.heroFigure`),
+          heroText: rejectIfLonger(finding.conclusion?.text ?? finding.keyFigure.caption.text, 110, `${table.tableId}.heroText`)
+        }
+      : {}
+
+    // Barras sólo si toda la tabla comparte unidad; si no, la segunda columna es la variación con su formato canónico.
+    const variationOf = (index: number): { text: string; trend: 'up' | 'down' | 'flat' } | null => {
+      const fact = rowFacts[index]
+      const previous = fact?.comparisonFactId ? factsById.get(fact.comparisonFactId) : undefined
+
+      if (!fact || fact.value === null || !previous || previous.value === null) return null
+
+      if (formatFactValue(fact.value, fact.unit, locale) === formatFactValue(previous.value, previous.unit, locale)) return { text: L.noChange, trend: 'flat' }
+
+      const delta = formatDeltaForUnit(fact.value, previous.value, fact.unit, locale)
+
+      return delta ? { text: unsigned(delta), trend: directionOf(fact.value, previous.value, fact.unit) } : null
+    }
+
     const values = table.rows.map(row => parsePrintedNumber(row[1]))
-    const scale = Math.max(0, ...values.map(v => v ?? 0))
-    const leadIndex = scale > 0 ? values.findIndex(v => v === scale) : -1
-    const leadRow = leadIndex >= 0 ? table.rows[leadIndex]! : null
+    const scale = sharedUnit ? Math.max(0, ...values.map(v => v ?? 0)) : 0
     const entityColumn = table.columns[0] ?? L.tableEyebrow
     const valueColumn = table.columns[1] ?? ''
+    const secondColumn = sharedUnit ? table.columns[2] : L.tableVariation
+    const drawnFacts = rowFacts.flatMap(fact => (fact ? [fact.factId] : []))
 
-    const hero = leadRow
-      ? {
-          heroFigure: rejectIfLonger(String(leadRow[1]), 12, `${table.tableId}.heroFigure`),
-          heroText: rejectIfLonger(
-            `${valueColumn.toLowerCase()} ${L.tableLeadIn} <strong>${String(leadRow[0] ?? '—')}</strong>, ${L.tableLeadSuffix}`,
-            110,
-            `${table.tableId}.heroText`
-          )
-        }
-      : { heroFigure: String(table.rows.length), heroText: L.tableRowsText }
-
-    chunkByCapacity(table.rows, CAPACITY.tableRows, (_r, i) => `${table.tableId}-r${i}`).forEach((rows, i) => {
+    chunkByCapacity(table.rows.map((row, index) => ({ row, index })), CAPACITY.tableRows, (_r, i) => `${table.tableId}-r${i}`).forEach((rows, i) => {
       pages.push({
         contentsTitle: table.title,
+        factIds: drawnFacts,
         page: {
           contentType: 'report-table',
           slots: {
@@ -252,24 +280,33 @@ const chapterBodyPages = (
             eyebrow: L.tableEyebrow,
             ...hero,
             tableTitle: rejectIfLonger(table.title, BUDGET.tableTitle, `${table.tableId}.title`),
-            ...(valueColumn ? { lead: L.tableRowsOrderedBy(table.rows.length, valueColumn) } : {}),
+            lead: L.tableLeadAll(periodInline, withPrevious),
             // La continuación se declara: una tabla que sigue sin decirlo obliga a retroceder.
             ...(i > 0 ? { continuationLabel: L.tableContinued, rankOffset: String(i * CAPACITY.tableRows) } : {}),
             boardTitle: rejectIfLonger(`${L.tableDetailBy} ${entityColumn.toLowerCase()}`, 48, `${table.tableId}.boardTitle`),
-            legend: { label: rejectIfLonger(valueColumn || entityColumn, 24, `${table.tableId}.legend`) },
-            tableColumns: ['#', ...table.columns.slice(0, 3)].map(label => ({ label })),
-            tableRows: rows.map(row => ({
-              entity: String(row[0] ?? '—'),
-              valueA: String(row[1] ?? '—'),
-              ...(row[2] != null ? { valueB: String(row[2]) } : {})
-            })),
+            // La leyenda describe la barra: sin barras no hay leyenda.
+            ...(sharedUnit ? { legend: { label: rejectIfLonger(valueColumn || entityColumn, 24, `${table.tableId}.legend`) } } : {}),
+            tableColumns: ['#', entityColumn, valueColumn, ...(secondColumn ? [secondColumn] : [])].map(label => ({ label })),
+            tableRows: rows.map(({ row, index }) => {
+              const variation = sharedUnit ? null : variationOf(index)
+              const second = sharedUnit ? (row[2] != null ? String(row[2]) : null) : (variation?.text ?? '—')
+
+              return {
+                entity: String(row[0] ?? '—'),
+                valueA: String(row[1] ?? '—'),
+                ...(second !== null ? { valueB: second } : {}),
+                ...(variation ? { trend: variation.trend } : {})
+              }
+            }),
             ...(scale > 0 ? { barScaleMax: String(scale) } : {}),
-            source: { label: GH_INSIGHTS.document.sourceLabel, text: GH_INSIGHTS.document.evidenceSource }
-          }
+            ...(sharedUnit ? {} : { barMode: 'none' }),
+            source: { label: GH_INSIGHTS.document.sourceLabel, text: sourcesOf(drawnFacts, factsById) }
+          } as SlotValues
         }
       })
     })
   }
+
 
   return pages
 }
@@ -388,7 +425,7 @@ export const buildInsightReportPlanInput = ({
   frozen.chapters.forEach((chapter, index) => {
     const number = pad2(index + 1)
     const running = { runningSection: `${number} · ${chapter.title}`, runningPeriod: periodLabel }
-    const body = chapterBodyPages(chapter, running, factsById, frozen.locale)
+    const body = chapterBodyPages(chapter, running, factsById, frozen.locale, periodInline)
 
     // La apertura abre el capítulo; su índice se completa con folios reales cuando se conoce el plan.
     const opening: BodyPage = {

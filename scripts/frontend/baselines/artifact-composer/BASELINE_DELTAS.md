@@ -1,5 +1,15 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-25 (k) — TASK-1889: la tabla de respaldo con datos reales
+
+Revisión del operador sobre Berel y Sky: la tabla comparaba unidades distintas en una sola escala y titulaba con «la
+fila más alta». Ahora la cifra principal es el hallazgo del capítulo (opcional: sin hallazgo, no hay cifra), las
+filas de unidades distintas no llevan barras sino una columna de variación con dirección (triángulo en la píldora;
+en una posición, bajar de número es subir) y la leyenda sólo existe si hay barras. El probe dibuja la píldora de la
+fila sin dirección (neutra).
+
+- `templates-insights-report/ReportTablePage.png` — píldora de variación con triángulo
+
 ## 2026-09-25 (j) — TASK-1889 Slice 5: la capitular de la narrada sólo con cuerpo que la sostenga
 
 Las ediciones reales de Berel y Sky mostraron una capitular suelta («V isibilidad en IA: 0.») en narradas de
@@ -531,7 +541,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: d4f2394c3bc08416bf750b75f83f4671fc036fc40be90c802d751ebaa4ec1e56 -->
+<!-- manifest-digest: 2c7faaec7edb67f0a7c4e333a04eb2ca03967ae1f345c1835750b217e22d6e7f -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

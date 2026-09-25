@@ -149,6 +149,22 @@
 
   .provenance-text { font-size: 10.5px; line-height: 1.5; color: var(--axis-report-role-paperAccent); }
 
+  /* Variación por fila: la dirección con triángulo (no sólo color); neutra si no hay cambio o no es variación. */
+  .row-second { align-items: center; gap: 5px; }
+
+  .row-second svg { display: block; flex-shrink: 0; }
+
+  .row-second.delta--up { background: var(--axis-report-role-paperAccent); color: var(--axis-report-role-navyInk); }
+
+  .row-second.delta--up .delta-mark { fill: var(--axis-report-role-navyAccent); }
+
+  .row-second.delta--down .delta-mark { fill: var(--axis-report-role-paperInk); }
+
+  /* Sin hallazgo del capítulo, la tabla no inventa una cifra principal. */
+  .board-legend:empty,
+  .hero-figure:empty,
+  .hero-figure-text:empty { display: none; }
+
   .closing-kind { display: contents; }
 
   .closing--table { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
@@ -191,7 +207,7 @@
           <span class="row-rank" data-slot-field="rank">01</span>
           <span class="row-entity" data-slot-field="entity">/precios</span>
           <span class="row-measure"><span class="row-lane" data-slot-field="bar"><span class="row-bar"></span></span><span class="row-value" data-slot-field="valueA">14.920</span></span>
-          <span class="row-second-cell"><span class="row-second" data-slot-field="valueB">0,9 %</span></span>
+          <span class="row-second-cell"><span class="row-second" data-slot-field="trend"><svg class="delta-mark-up" width="8" height="7" viewBox="0 0 9 8" aria-hidden="true"><path class="delta-mark" d="M4.5 0.5 L8.5 7.5 H0.5 Z"></path></svg><svg class="delta-mark-down" width="8" height="7" viewBox="0 0 9 8" aria-hidden="true"><path class="delta-mark" d="M4.5 7.5 L8.5 0.5 H0.5 Z"></path></svg><span data-slot-field="valueB">0,9 %</span></span></span>
         </div>
       </div>
     </section>

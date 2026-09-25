@@ -95,11 +95,18 @@ const unitWordOf = (unit: string): string => (GH_INSIGHTS.units[unit] ?? GH_INSI
 
 const fmt = (fact: EvidenceFactV1, locale: string) => formatFactValue(fact.value, fact.unit, locale)
 
-const directionOf = (current: number, previous: number): 'up' | 'down' | 'flat' =>
-  current > previous ? 'up' : current < previous ? 'down' : 'flat'
+/**
+ * Dirección de una variación para el lector. En una POSICIÓN el número menor es mejor: bajar de #6,6 a #5,8 es
+ * «subir» en Google, así que se invierte (caso real Berel: «▲ 0,8 pos.» destacaba un empeoramiento).
+ */
+export const directionOf = (current: number, previous: number, unit?: string): 'up' | 'down' | 'flat' => {
+  const raw = current > previous ? 'up' : current < previous ? 'down' : 'flat'
+
+  return unit === 'position' && raw !== 'flat' ? (raw === 'up' ? 'down' : 'up') : raw
+}
 
 /** La píldora dice la dirección con el triángulo: la cifra va sin signo. */
-const unsigned = (delta: string): string => delta.replace(/^[+\-−]\s*/, '')
+export const unsigned = (delta: string): string => delta.replace(/^[+\-−]\s*/, '')
 
 const monthLabel = (value: string, locale: string): string => {
   const match = /^(\d{4})-(\d{2})$/.exec(value)
@@ -167,7 +174,7 @@ const closingOf = (reading: PlanFigureReadingV1 | undefined, conclusion: string)
  * Fuente de la figura: las fuentes legibles de los hechos que dibuja (por `method.name`, `GH_INSIGHTS.sources`),
  * sin repetir. El texto genérico queda sólo si ningún hecho declara una fuente conocida.
  */
-const sourcesOf = (factIds: readonly string[], byId: ReadonlyMap<string, EvidenceFactV1>): string => {
+export const sourcesOf = (factIds: readonly string[], byId: ReadonlyMap<string, EvidenceFactV1>): string => {
   const names = [...new Set(factIds.flatMap(id => {
     const name = GH_INSIGHTS.sources[byId.get(id)?.method?.name ?? '']
 
@@ -250,7 +257,7 @@ export const buildFigureSlides = (
           unit: unitWordOf(now.unit),
           current: fmt(now, locale),
           prior: fmt(before, locale),
-          direction: delta ? directionOf(now.value!, before.value!) : 'flat',
+          direction: delta ? directionOf(now.value!, before.value!, now.unit) : 'flat',
           delta: delta ? unsigned(delta) : '—'
         }
       }]
@@ -288,7 +295,7 @@ export const buildFigureSlides = (
           label: chart.dimensionLabels[index] ?? now.label,
           current: fmt(now, locale),
           ...(before ? { prior: fmt(before, locale) } : {}),
-          ...(delta && before ? { delta, direction: directionOf(now.value!, before.value!) } : {})
+          ...(delta && before ? { delta, direction: directionOf(now.value!, before.value!, now.unit) } : {})
         }
       }]
     })

@@ -9,6 +9,7 @@ import { composeArtifact } from '@/lib/artifact-composer'
 import { insightsReportCatalog } from '@/lib/artifact-composer/catalogs/insights-report'
 
 import { buildInsightReportPlanInput } from './report-mapper'
+import { formatFactValue } from '../editorial/format'
 import { InsightsRenderRejectedError } from '../errors'
 import type { EditorialPlanV1, PlanChapterV1 } from '../contracts/plan'
 
@@ -221,7 +222,7 @@ describe('buildInsightReportPlanInput', () => {
     expect((tablePages[1]!.slots as Record<string, unknown>).continuationLabel).toBeDefined()
   })
 
-  it('la tabla lleva su cifra contada, la escala de la tabla COMPLETA y su procedencia (TASK-1889)', () => {
+  it('una tabla de una sola unidad lleva barras en la escala de la tabla COMPLETA; sin hallazgo, sin cifra principal', () => {
     const rows = Array.from({ length: 30 }, (_, i) => [`/p${i}`, String((i + 1) * 100), null])
 
     const pages = buildInsightReportPlanInput({
@@ -233,9 +234,10 @@ describe('buildInsightReportPlanInput', () => {
 
     for (const page of pages) {
       // La misma escala en las dos páginas: la barra de /p0 no cambia de tamaño al pasar la hoja.
-      // La cifra protagonista es el valor de la fila más alta de la tabla COMPLETA, con su bajada.
-      expect(page.slots).toMatchObject({ heroFigure: '3000', barScaleMax: '3000', source: { label: 'Fuente' }, legend: { label: 'Clics' } })
-      expect((page.slots as { heroText: string }).heroText).toBe('clics en <strong>/p29</strong>, la fila más alta de la tabla')
+      expect(page.slots).toMatchObject({ barScaleMax: '3000', source: { label: 'Fuente' }, legend: { label: 'Clics' } })
+      // «La fila más alta» no es un hallazgo: sin lectura del capítulo, la tabla no inventa cifra principal.
+      expect(page.slots).not.toHaveProperty('heroFigure')
+      expect(page.slots).not.toHaveProperty('barMode')
       expect((page.slots as { tableColumns: { label: string }[] }).tableColumns[0]).toEqual({ label: '#' })
     }
 
@@ -518,6 +520,49 @@ describe('buildInsightReportPlanInput', () => {
 
     expect(narrativeIndex).toBeGreaterThan(0)
     expect((summary.slots.essentials as Array<{ folio: string }>)[0]!.folio).toBe(`p. ${String(narrativeIndex + 1).padStart(2, '0')}`)
+  })
+
+  it('tabla real con unidades distintas (Berel/Sky): sin barras, columna de variación, cifra del hallazgo y fuente real', () => {
+    const f = (factId: string, label: string, value: number, unit: string, comparisonFactId?: string) =>
+      ({ factId, label, value, unit, module: 'seo', metricId: factId, evidenceRef: 'e', method: { name: 'gsc_window_aggregate' }, ...(comparisonFactId ? { comparisonFactId } : {}) })
+
+    const facts = [
+      f('clicks', 'Clics orgánicos', 9377, 'count', 'clicks-prev'), f('clicks-prev', 'Clics orgánicos', 10662, 'count'),
+      f('imp', 'Impresiones', 512113, 'count', 'imp-prev'), f('imp-prev', 'Impresiones', 566297, 'count'),
+      f('ctr', 'CTR', 1.83, 'percent', 'ctr-prev'), f('ctr-prev', 'CTR', 1.88, 'percent'),
+      f('pos', 'Posición media', 6.6, 'position', 'pos-prev'), f('pos-prev', 'Posición media', 6.6, 'position')
+    ]
+
+    const row = (id: string, prev: string) => {
+      const fact = facts.find(x => x.factId === id)!
+      const before = facts.find(x => x.factId === prev)!
+
+      return [fact.label, formatFactValue(fact.value, fact.unit as never, 'es-CL'), formatFactValue(before.value, before.unit as never, 'es-CL'), '2026-09-20']
+    }
+
+    const reading = { chartId: 'chart.seo.count', keyFigure: { factId: 'clicks', value: '9.377', caption: { claimId: 'k', text: 'Clics orgánicos.', factIds: ['clicks'] } },
+      conclusion: { claimId: 'c', text: 'Los clics bajaron de 10.662 a 9.377 (-12,1 %).', factIds: ['clicks', 'clicks-prev'] }, nextStep: null }
+
+    const [page] = buildInsightReportPlanInput({
+      edition, report,
+      snapshot: { facts, sources: [], rejections: [] } as never,
+      plan: plan({ chapters: [chapter({ module: 'seo', readings: [reading], tables: [{ tableId: 't', title: 'Visibilidad orgánica', columns: ['Métrica', 'Período', 'Período anterior', 'Corte de la fuente'],
+        rows: [row('clicks', 'clicks-prev'), row('imp', 'imp-prev'), row('ctr', 'ctr-prev'), row('pos', 'pos-prev')] }] } as never)] })
+    }).slides.filter(p => p.contentType === 'report-table')
+
+    const slots = page!.slots as Record<string, any>
+
+    expect(slots.heroFigure).toBe('9.377')
+    expect(slots.heroText).toBe(reading.conclusion.text)
+    expect(slots.barMode).toBe('none')
+    expect(slots.barScaleMax).toBeUndefined()
+    expect(slots.tableColumns.map((c: { label: string }) => c.label)).toEqual(['#', 'Métrica', 'Período', 'Variación'])
+    expect(slots.tableRows.map((r: { valueB: string; trend?: string }) => [r.valueB, r.trend])).toEqual([
+      ['12,1 %', 'down'], ['9,6 %', 'down'], ['0,1 pp', 'down'], ['sin cambio', 'flat']
+    ])
+    expect(slots.legend).toBeUndefined()
+    expect(slots.source.text).toBe('Google Search Console')
+    expect(slots.lead).not.toMatch(/orden del plan|la barra compara/)
   })
 
   const periodComparison = (metrics: number) => {

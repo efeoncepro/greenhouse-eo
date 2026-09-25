@@ -290,11 +290,12 @@ export const GH_INSIGHTS = {
     limitsTitleRich: 'Lo que esta edición <em>no</em> puede afirmar',
     methodology: 'Metodología',
     howMeasured: 'Cómo se midió',
-    tableRowsText: 'filas de evidencia respaldan esta tabla',
-    tableLeadIn: 'en',
-    tableLeadSuffix: 'la fila más alta de la tabla',
+    /** Bajada de la tabla para el lector (nunca metainformación del plan ni rótulos de columna). */
+    tableLeadAll: (period: string, withPrevious: boolean) =>
+      withPrevious ? `Todo lo que se midió en el período (${period}), con el anterior para comparar.` : `Todo lo que se midió en el período (${period}).`,
+    tableVariation: 'Variación',
+    noChange: 'sin cambio',
     tableDetailBy: 'Detalle por',
-    tableRowsOrderedBy: (rows: number, column: string) => `${rows} filas, en el orden del plan; la barra compara ${column.toLowerCase()}.`,
     limitsCountText: 'límites que esta edición declara antes de afirmar',
     essentials: 'Lo esencial del mes',
     thesisOfTheMonth: 'La tesis del mes',
