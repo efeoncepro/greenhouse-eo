@@ -8,7 +8,7 @@ import type { ChartSpecV1 } from '../contracts/chart-spec'
 import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSnapshotContentV1, EvidenceSourceV1 } from '../contracts/evidence'
 import type { EditorialPlanV1, PlanChapterV1, PlanClaimV1, PlanTableV1 } from '../contracts/plan'
 import type { InsightModule } from '../contracts/request'
-import { formatDeltaPercent, formatFactValue } from './format'
+import { formatDeltaForUnit, formatFactValue } from './format'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
 const MODULE_TITLES: Record<InsightModule, string> = {
@@ -67,7 +67,8 @@ const claimFor = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, local
 
   if (comparison && fact.value !== null && comparison.value !== null) {
     factIds.push(comparison.factId)
-    const delta = formatDeltaPercent(fact.value, comparison.value, locale)
+    // TASK-1888 — una métrica que ya es porcentaje varía en puntos porcentuales («+1,8 pp»), no en % relativo.
+    const delta = formatDeltaForUnit(fact.value, comparison.value, fact.unit, locale)
     const previous = formatFactValue(comparison.value, comparison.unit, locale)
 
     text = delta

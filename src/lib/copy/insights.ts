@@ -61,8 +61,71 @@ export const GH_INSIGHTS = {
     organic_etv: 'Tráfico orgánico estimado',
     overall_score: 'Puntaje de visibilidad en IA',
     rpa: 'Rondas de revisión por pieza',
-    otd: 'Entregas a tiempo'
+    otd: 'Entregas a tiempo',
+    ftr: 'Primera entrega correcta'
   } as Readonly<Record<string, string>>,
+
+  /**
+   * TASK-1888 — «Qué mide este informe»: una línea por módulo. El plan las sella en `scopeLines` (en el orden de
+   * los módulos del encargo); el LLM nunca las redacta y no llevan cifras (el validador rechazaría cualquiera).
+   */
+  scopeLines: {
+    seo: 'Visibilidad orgánica: cuánto aparece la marca en Google, con sus clics, impresiones, posiciones y tráfico estimado.',
+    aeo: 'Motores de respuesta: si los asistentes de IA y las respuestas de Google mencionan la marca cuando alguien pregunta por su categoría.',
+    ico: 'Entrega: cuánto de lo comprometido llegó a tiempo, cuánto salió bien a la primera y cuántas rondas de revisión necesitó.'
+  } satisfies Record<InsightModule, string>,
+
+  /** TASK-1888 — entrada de cada capítulo: qué pregunta responde. Sin cifras. */
+  chapterOpenings: {
+    seo: 'Cómo encuentra Google a la marca y cuánto tráfico orgánico le trae.',
+    aeo: 'Qué dicen de la marca los motores de respuesta cuando alguien pregunta por su categoría.',
+    ico: 'Cuánto de lo comprometido se entregó a tiempo y con qué calidad al primer intento.'
+  } satisfies Record<InsightModule, string>,
+
+  /** TASK-1888 — nombre visible de cada canal (por `channelId`); el plan lo sella resuelto en la dimensión o la serie. */
+  channels: {
+    google: 'Google',
+    google_ai_overview: 'Respuestas de Google',
+    chatgpt: 'ChatGPT',
+    gemini: 'Gemini',
+    claude: 'Claude',
+    perplexity: 'Perplexity'
+  } as Readonly<Record<string, string>>,
+
+  /**
+   * TASK-1888 — metas oficiales como hechos citables (leídas del registro dueño, nunca literales). La etiqueta del
+   * hecho de meta y el título de su figura.
+   */
+  targets: {
+    otd: 'Meta de entregas a tiempo',
+    ftr: 'Meta de primera entrega correcta',
+    rpa: 'Meta de rondas de revisión por pieza'
+  } as Readonly<Record<string, string>>,
+
+  /** TASK-1888 — títulos de figura por familia (sin cifras: la cifra va en la página, desde su hecho). */
+  figures: {
+    bulletTitle: 'contra la meta',
+    lineTitle: 'evolución mensual',
+    targetLabel: 'Meta',
+    previousLabel: 'Período anterior',
+    currentLabel: 'Período'
+  },
+
+  /**
+   * TASK-1888 — lectura determinista por figura (fallback sin modelo). Afirma sólo lo que el dato muestra: el valor
+   * contra su meta o su período anterior. NUNCA una causa ni una explicación: eso no está en la evidencia.
+   */
+  reading: {
+    aboveTarget: 'sobre la meta de',
+    belowTarget: 'bajo la meta de',
+    atTarget: 'en la meta de',
+    lineFrom: 'pasó de',
+    lineTo: 'a',
+    lineIn: 'en',
+    leadValue: 'es la cifra más alta de la figura',
+    nextStepGap: 'Revisar primero',
+    nextStepGapReason: 'es donde la distancia con la meta es mayor.'
+  },
 
   /**
    * Fuente legible de cada método del snapshot (por `method.name`). El nombre de la función lectora

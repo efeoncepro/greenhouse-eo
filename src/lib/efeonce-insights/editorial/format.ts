@@ -47,6 +47,21 @@ export const formatDeltaPercent = (current: number, previous: number, locale: st
   return `${text} %`
 }
 
+/**
+ * TASK-1888 — variación de una métrica que YA es un porcentaje (OTD%, FTR%, CTR…): se dice en PUNTOS PORCENTUALES
+ * («+1,8 pp»), nunca como variación relativa. Caso Sky 2026-09-25: OTD 80,1 % → 81,9 % salió «+2,2 %» (variación
+ * relativa), que un lector lee como «subió 2,2 puntos» cuando subió 1,8. La variación relativa queda para métricas absolutas (conteos, visitas…).
+ */
+export const formatDeltaPoints = (current: number, previous: number, locale: string): string => {
+  const text = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1, signDisplay: 'exceptZero' }).format(current - previous)
+
+  return `${text} pp`
+}
+
+/** Variación que el documento imprime para una unidad: pp si la métrica es porcentaje, relativa si no. */
+export const formatDeltaForUnit = (current: number, previous: number, unit: EvidenceUnit, locale: string): string | null =>
+  unit === 'percent' ? formatDeltaPoints(current, previous, locale) : formatDeltaPercent(current, previous, locale)
+
 /** Cifras que una claim puede contener si referencia estos hechos (valores, num/den y delta). */
 export const allowedNumbersForFacts = (facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, locale: string): Set<string> => {
   const allowed = new Set<string>()
@@ -67,6 +82,9 @@ export const allowedNumbersForFacts = (facts: EvidenceFactV1[], byId: Map<string
 
         if (delta) allowed.add(delta)
         allowed.add(formatFactValue(fact.value - comparison.value, fact.unit, locale))
+        // Los planes sellados antes de TASK-1888 escribieron la variación relativa también para porcentajes: se sigue
+        // admitiendo para que validen igual; los nuevos la escriben en pp.
+        if (fact.unit === 'percent') allowed.add(formatDeltaPoints(fact.value, comparison.value, locale))
       }
     }
   }
@@ -75,13 +93,13 @@ export const allowedNumbersForFacts = (facts: EvidenceFactV1[], byId: Map<string
 }
 
 /**
- * Extrae tokens numéricos tal como aparecen (con separadores, signo, %, #, US$). Una fecha ISO
+ * Extrae tokens numéricos tal como aparecen (con separadores, signo, %, pp, #, US$). Una fecha ISO
  * (`AAAA-MM` o `AAAA-MM-DD`) es UN token: sin esa alternativa, «2026-08» se partía en «2026» y
  * «-08», y el mes se leía como un número negativo que ningún hecho respalda.
  */
 export const extractNumberTokens = (text: string): string[] => {
   const tokens: string[] = []
-  const pattern = /\d{4}-\d{2}(?:-\d{2})?(?!\d)|(?:US\$ |\$ |#)?[+\-−]?\d[\d.,]*(?: %)?/g
+  const pattern = /\d{4}-\d{2}(?:-\d{2})?(?!\d)|(?:US\$ |\$ |#)?[+\-−]?\d[\d.,]*(?: %| pp\b)?/g
 
   // Un separador al final del token es puntuación de la frase («1.000,»), no parte de la cifra.
   for (const match of text.matchAll(pattern)) tokens.push(match[0].replace(/[.,]+$/, ''))

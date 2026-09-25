@@ -14,7 +14,7 @@
  * Aquí vive la validación ESTRUCTURAL (browser-safe, sin imports del motor). Las invariantes de VALOR (embudo
  * que no crece, Venn con conjuntos no vacíos…) viven en `editorial/chart-values.ts`, que llama a la MISMA
  * geometría que dibuja (`artifact-composer/chart-geometry.ts`): idénticas por construcción. No están acá porque
- * la entrada pública del motor (`artifact-composer/pure`) arrastra `node:crypto`, y este archivo lo consume el
+ * la entrada pública del motor (`artifact-composer/pure`) arrastra el módulo crypto de Node, y este archivo lo consume el
  * navegador.
  */
 
