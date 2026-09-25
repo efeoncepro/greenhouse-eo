@@ -56,6 +56,9 @@ describe('TASK-1888 — variación en puntos porcentuales', () => {
     const rpa = plan.chapters[0]!.claims.find(item => item.claimId === 'claim.ico.rpa.cur')!
 
     expect(formatDeltaPoints(81.9, 80.1, 'es-CL')).toBe('+1,8 pp')
+    // Berel CTR 1,83 % vs 1,87 %: nunca «0,0 pp» entre dos cifras que se ven distintas.
+    expect(formatDeltaPoints(1.83, 1.87, 'es-CL')).toBe('-0,04 pp')
+    expect(formatDeltaPoints(2.5, 2.5, 'es-CL')).toBe('0,0 pp')
     expect(otd.text).toBe('OTD · Sky · 2026-08: 81,9 % (período anterior 80,1 %, variación +1,8 pp).')
     expect(rpa.text).toBe('RpA · Sky · 2026-08: 1,33 (período anterior 1,44, variación -7,6 %).')
     expect(extractNumberTokens('variación +1,8 pp.')).toEqual(['+1,8 pp'])

@@ -53,7 +53,11 @@ export const formatDeltaPercent = (current: number, previous: number, locale: st
  * relativa), que un lector lee como «subió 2,2 puntos» cuando subió 1,8. La variación relativa queda para métricas absolutas (conteos, visitas…).
  */
 export const formatDeltaPoints = (current: number, previous: number, locale: string): string => {
-  const text = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1, signDisplay: 'exceptZero' }).format(current - previous)
+  const delta = current - previous
+  // Una variación real bajo 0,05 pp se imprimiría «0,0 pp» junto a dos cifras que se ven distintas (Berel, CTR
+  // 1,83 % vs 1,87 %, 2026-09-25): con dos decimales dice lo que pasó («-0,04 pp»). Cero exacto sigue siendo «0,0 pp».
+  const digits = delta !== 0 && Math.abs(delta) < 0.05 ? 2 : 1
+  const text = new Intl.NumberFormat(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits, signDisplay: 'exceptZero' }).format(delta)
 
   return `${text} pp`
 }

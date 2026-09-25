@@ -290,7 +290,8 @@ ENV_VARS="${ENV_VARS},INSIGHTS_GENERATION_ENABLED=${INSIGHTS_GENERATION_ENABLED:
 # 🚩 TASK-1888 — contrato editorial v2 (familias nuevas, lectura por figura, portada sellada). El tick de schedules
 # genera ediciones, así que lo lee acá además de Vercel. Default **false** A PROPÓSITO (al revés que los de arriba):
 # el ops-worker es único para staging y producción, y el contrato v2 sólo se prende en producción junto al release
-# de TASK-1889 (catálogos premium). Con OFF las ocurrencias salen con el plan v1, que los catálogos v1 componen.
+# de TASK-1889 (catálogos premium). Con OFF las ocurrencias salen con el plan v1, que las plantillas v2 de
+# TASK-1889 componen igual (sin panel de cierre y con la página de gráfico legacy hasta su Slice 4).
 ENV_VARS="${ENV_VARS},INSIGHTS_EDITORIAL_V2_ENABLED=${INSIGHTS_EDITORIAL_V2_ENABLED:-false}"
 ENV_VARS="${ENV_VARS},REACTIVE_BATCH_SIZE=${REACTIVE_BATCH_SIZE}"
 ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
