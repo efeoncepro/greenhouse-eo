@@ -111,6 +111,13 @@ TASK-1889. Decisiones del operador: portada por cliente con cambio opcional en e
 logo no tiene versión para fondo oscuro), y ninguna edición con el diseño nuevo se comparte con un cliente antes de
 su revisión.
 
+**Delta 2026-09-25 — más familias de gráfico (TASK-1901, TASK-1902).** Los informes reales de Berel y Sky salieron
+con casi un solo tipo de gráfico porque los adapters resumen la evidencia en un total por período, aunque la base
+guarda la serie diaria de Search Console, las posiciones por keyword en el tiempo y el historial del grader. El
+operador pidió abrirlo: [TASK-1901](../../tasks/to-do/TASK-1901-efeonce-insights-richer-evidence-for-chart-families.md)
+(backend-data: evidencia y productores) y [TASK-1902](../../tasks/to-do/TASK-1902-efeonce-insights-gauge-heatmap-pages.md)
+(ui-ux: páginas de medidor y mapa de calor, columnas por tramo), secuenciadas.
+
 **Delta 2026-09-25 — TASK-1889 code complete, rollout pendiente.** Los catálogos `insights-report` (A4) e
 `insights-deck` (16:9) quedan sólo con el diseño v2 del canvas; el legado v1 se retiró. Fidelidad al canvas: 20 de 21
 páginas dentro del 1 %; Deck-Agrupadas da 2,2 % por 3 px del propio canvas y quedó como excepción aprobada por el
