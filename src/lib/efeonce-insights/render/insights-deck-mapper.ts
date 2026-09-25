@@ -35,6 +35,7 @@ import type { EditorialPlanV1, PlanChapterV1 } from '../contracts/plan'
 import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { EvidenceSnapshotRecord, InsightEditionRecord, InsightReportRecord } from '../stores/records'
 import { InsightsRenderRejectedError } from '../errors'
+import { formatFactValue } from '../editorial/format'
 import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
 import { channelNameOf, channelsOf, coverPage } from './cover'
 import { buildFigureSlides, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, readingFor } from './figure-slots'
@@ -78,7 +79,7 @@ const L = GH_INSIGHTS.catalog
 const pad2 = (n: number): string => String(n).padStart(2, '0')
 
 /** Láminas editoriales con pie «NN / total». La de evidencia (legado v1) no lo trae. */
-const FOLIO_TYPES = new Set(['insights-narrative', 'insights-limits', ...Object.values(FIGURE_CONTENT_TYPE.deck)])
+const FOLIO_TYPES = new Set(['insights-summary', 'insights-narrative', 'insights-limits', ...Object.values(FIGURE_CONTENT_TYPE.deck)])
 
 /**
  * Láminas narrativas: el primer texto es el titular y el resto se reparte en puntos, sin recortar. La plantilla exige
@@ -108,8 +109,8 @@ const chapterSlides = (
   tab: Tabbed,
   factsById: ReadonlyMap<string, EvidenceFactV1>,
   locale: string
-): { slide: Slide; contentsTitle?: string }[] => {
-  const slides: { slide: Slide; contentsTitle?: string }[] = []
+): { slide: Slide; contentsTitle?: string; factIds?: readonly string[] }[] => {
+  const slides: { slide: Slide; contentsTitle?: string; factIds?: readonly string[] }[] = []
   const used = new Set<string>()
 
   // Láminas de figura premium (TASK-1889 Slice 4): la misma figura que la página A4, con su cifra
@@ -123,6 +124,7 @@ const chapterSlides = (
 
       slides.push({
         contentsTitle: figure.figureTitle,
+        factIds: figure.factIds,
         slide: {
           contentType: FIGURE_CONTENT_TYPE.deck[figure.kind],
           slots: {
@@ -183,15 +185,47 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
     )
   ]
 
-  slides.push(
-    ...narrativeSlides(
-      { tabNumber: L.tabMarks.summary, section: GH_INSIGHTS.document.executiveSummary, period },
-      GH_INSIGHTS.document.executiveSummary,
-      frozen.executiveSummary.map(claim => claim.text),
-      'summary',
-      GH_INSIGHTS.document.summaryInChapters
+  const summaryTab = { tabNumber: L.tabMarks.summary, section: GH_INSIGHTS.document.executiveSummary, period }
+  const essentials = frozen.essentials ?? []
+  let summaryIndex = -1
+
+  if (essentials.length > 0 && frozen.executiveSummary.length > 0) {
+    // «Lo esencial» (TASK-1888 v2): la lámina de resumen del canvas; lo que no cabe en la tesis se narra.
+    const [headline, lead, ...rest] = frozen.executiveSummary.map(claim => claim.text)
+
+    summaryIndex = slides.length
+    slides.push({
+      contentType: 'insights-summary',
+      slots: {
+        ...summaryTab,
+        eyebrow: GH_INSIGHTS.document.executiveSummary,
+        thesis: rejectIfLonger(headline!, 120, 'executiveSummary.thesis'),
+        ...(lead ? { thesisLead: rejectIfLonger(lead, 200, 'executiveSummary.thesisLead') } : {}),
+        essentialsLabel: L.essentials,
+        essentials: essentials.map(item => {
+          const fact = item.factIds[0] ? factsById.get(item.factIds[0]) : undefined
+
+          if (!fact || fact.value === null) throw new InsightsRenderRejectedError(`«Lo esencial» ${item.claimId}: su hecho principal no tiene valor medido.`)
+
+          return {
+            figure: rejectIfLonger(formatFactValue(fact.value, fact.unit, frozen.locale), 12, `${item.claimId}.figure`),
+            title: rejectIfLonger(fact.label, 60, `${item.claimId}.title`),
+            folio: '—'
+          }
+        }),
+        ...(frozen.decision ? { decision: { label: L.decideShort, text: rejectIfLonger(frozen.decision.text, 140, 'decision') } } : {})
+      }
+    })
+
+    if (rest.length > 0) slides.push(...narrativeSlides(summaryTab, GH_INSIGHTS.document.executiveSummary, [headline!, ...rest], 'summary', GH_INSIGHTS.document.summaryInChapters))
+  } else {
+    slides.push(
+      ...narrativeSlides(summaryTab, GH_INSIGHTS.document.executiveSummary, frozen.executiveSummary.map(claim => claim.text), 'summary', GH_INSIGHTS.document.summaryInChapters)
     )
-  )
+  }
+
+  // Hechos que dibuja cada lámina de figura: con ellos «Lo esencial» apunta a su lámina.
+  const slideFacts = new Map<number, readonly string[]>()
 
   // Aperturas con su índice: los folios se conocen cuando el plan de láminas está completo.
   const openings: { slideIndex: number; entries: { title: string; offset: number }[] }[] = []
@@ -227,7 +261,10 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
       }
     })
 
-    slides.push(...body.map(entry => entry.slide))
+    body.forEach(entry => {
+      if (entry.factIds) slideFacts.set(slides.length, entry.factIds)
+      slides.push(entry.slide)
+    })
   })
 
   const allLimits = limitEntriesOf(frozen.limits)
@@ -282,6 +319,25 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
     if (list.length > 0 && list.length <= CAPACITY.chapterContents && list.every(e => e.title.length <= BUDGET.contentsTitle)) {
       ;(slides[slideIndex]!.slots as Record<string, unknown>).contents = { label: L.inThisChapter, entries: list }
     }
+  }
+
+  // Folio de cada esencial: la primera lámina que dibuja su hecho principal; si ninguna, la apertura del
+  // capítulo que lo afirma.
+  if (summaryIndex >= 0) {
+    const items = (slides[summaryIndex]!.slots as { essentials: Array<Record<string, unknown>> }).essentials
+
+    items.forEach((item, index) => {
+      const source = essentials[index]!
+      const factId = source.factIds[0]
+      const drawn = [...slideFacts].find(([, ids]) => factId !== undefined && ids.includes(factId))?.[0]
+      const chapterIndex = frozen.chapters.findIndex(chapter => chapter.claims.some(c => `essential.${c.claimId}` === source.claimId || c.claimId === source.claimId))
+      const opening = chapterIndex >= 0 ? openings[chapterIndex]?.slideIndex : undefined
+      const at = drawn ?? opening
+
+      if (at === undefined) throw new InsightsRenderRejectedError(`«Lo esencial» ${source.claimId}: no hay lámina que respalde su cifra.`)
+
+      item.folio = `${L.evidencePage} ${pad2(at + 1)}`
+    })
   }
 
   const footerEdition = `${L.product} · ${L.reportOf} ${periodInline}`

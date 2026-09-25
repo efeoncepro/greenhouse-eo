@@ -202,6 +202,27 @@ describe('buildInsightsDeckPlanInput', () => {
     ).toThrow(InsightsRenderRejectedError)
   }, 120_000)
 
+  it('«Lo esencial» (v2) va en la lámina de resumen, con el número de la lámina que lo respalda', () => {
+    const { facts, claims, chart } = seo(2)
+
+    const slides = buildInsightsDeckPlanInput({
+      edition, report,
+      plan: plan({
+        executiveSummary: [claim('s0', 'La visibilidad subió.'), claim('s1', 'Bajada.'), claim('s2', 'Tercera afirmación.')],
+        essentials: [{ ...claims[1]!, claimId: 'essential.k1' }],
+        chapters: [chapter({ claims, charts: [chart] as never })]
+      } as never),
+      snapshot: { facts: facts.map(f => ({ ...f, label: 'Métrica' })) } as never
+    }).slides
+
+    const summary = slides.find(slide => slide.contentType === 'insights-summary')!
+    const figureIndex = slides.findIndex(slide => slide.contentType === 'insights-figure-comparison')
+
+    expect(summary.slots.essentials).toEqual([{ figure: '2.000', title: 'Métrica', folio: `p. ${String(figureIndex + 1).padStart(2, '0')}` }])
+    // Lo que la tesis y su bajada no dicen se narra: la tercera afirmación no se pierde.
+    expect(textOf(slides)).toContain('Tercera afirmación.')
+  })
+
   it('el resumen con una sola afirmación dice dónde está el resto, nunca que no hay más', () => {
     // Caso real (Sky): el resumen toma una afirmación por módulo; el capítulo traía además OTD.
     const slides = buildInsightsDeckPlanInput({ edition, report, plan: plan({ executiveSummary: [claim('s0', 'RpA: 1,33.')] }), snapshot: { facts: [] } as never }).slides

@@ -236,6 +236,8 @@ export const GH_INSIGHTS = {
     essentials: 'Lo esencial del mes',
     thesisOfTheMonth: 'La tesis del mes',
     decideInMeeting: 'Para decidir en la reunión',
+    /** La misma decisión en la lámina (menos espacio). */
+    decideShort: 'Para decidir',
     decide: 'Para decidir',
     ourReading: 'Nuestra lectura',
     inOneSentence: 'En una frase',

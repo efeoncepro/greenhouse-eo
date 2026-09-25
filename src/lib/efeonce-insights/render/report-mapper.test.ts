@@ -405,6 +405,55 @@ describe('buildInsightReportPlanInput', () => {
     ).toThrow(InsightsRenderRejectedError)
   }, 120_000)
 
+  it('«Lo esencial» (v2) va en la página de resumen, con el folio real de la figura que lo respalda', async () => {
+    const facts = [
+      { factId: 'c1', value: 1284, unit: 'count', label: 'Clics', metricId: 'clicks', evidenceRef: 'e1' },
+      { factId: 'p1', value: 1102, unit: 'count', label: 'Clics', metricId: 'clicks', evidenceRef: 'e2' },
+      { factId: 'c2', value: 48310, unit: 'count', label: 'Impresiones', metricId: 'impressions', evidenceRef: 'e3' },
+      { factId: 'p2', value: 51940, unit: 'count', label: 'Impresiones', metricId: 'impressions', evidenceRef: 'e4' }
+    ]
+
+    const chart = {
+      specVersion: 'chart_spec_v1', chartId: 'chart.cmp', family: 'bar_grouped', relation: 'comparison', title: 'Search Console', unit: 'count',
+      dimensionLabels: ['Clics', 'Impresiones'], references: [], scale: { kind: 'linear', baseline: 0 }, tabularEquivalent: { columns: [], rows: [] },
+      series: [
+        { seriesId: 'p', label: 'Período anterior', factIds: ['p1', 'p2'], unit: 'count' },
+        { seriesId: 'c', label: 'Período', factIds: ['c1', 'c2'], unit: 'count' }
+      ]
+    }
+
+    const claims = [{ claimId: 'k1', text: 'Clics: 1.284 (período anterior 1.102).', factIds: ['c1', 'p1'] }]
+
+    const input = buildInsightReportPlanInput({
+      edition, report,
+      snapshot: { facts, sources: [], rejections: [] } as never,
+      plan: plan({
+        executiveSummary: [{ claimId: 's0', text: 'Agosto trajo más clics con menos impresiones.', factIds: [] }],
+        essentials: [{ ...claims[0]!, claimId: 'essential.k1' }],
+        decision: { claimId: 'd', text: 'Aprobar el plan de septiembre.', factIds: [] },
+        chapters: [chapter({ claims, charts: [chart] as never })]
+      } as never)
+    })
+
+    const summary = input.slides.find(slide => slide.contentType === 'report-summary')!
+    const figureIndex = input.slides.findIndex(slide => slide.contentType === 'report-figure-comparison')
+
+    expect(summary.slots.essentials).toEqual([
+      { figure: '1.284', title: 'Clics', detail: 'Clics: 1.284 (período anterior 1.102).', folio: `p. ${String(figureIndex + 1).padStart(2, '0')}` }
+    ])
+    expect(summary.slots.decision).toEqual(expect.objectContaining({ text: 'Aprobar el plan de septiembre.' }))
+
+    const outDir = await mkdtemp(path.join(os.tmpdir(), 'insights-report-essentials-'))
+
+    try {
+      const result = await composeArtifact(insightsReportCatalog, input as never, outDir, { concurrency: 2 })
+
+      expect((await PDFDocument.load(await readFile(result.pdfPath!))).getPageCount()).toBe(input.slides.length)
+    } finally {
+      await rm(outDir, { recursive: true, force: true })
+    }
+  }, 120_000)
+
   const periodComparison = (metrics: number) => {
     const facts = Array.from({ length: metrics }, (_, i) => [
       { factId: `cur${i}`, value: (i + 1) * 1000, unit: 'count', evidenceRef: `ev-c${i}` },

@@ -43,10 +43,11 @@ import {
 import { parsePrintedNumber } from '@/lib/artifact-composer/pure'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
-import type { EditorialPlanV1, PlanChapterV1 } from '../contracts/plan'
+import type { EditorialPlanV1, PlanChapterV1, PlanClaimV1 } from '../contracts/plan'
 import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { EvidenceSnapshotRecord, InsightEditionRecord, InsightReportRecord } from '../stores/records'
 import { InsightsRenderRejectedError } from '../errors'
+import { formatFactValue } from '../editorial/format'
 import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
 import { channelNameOf, channelsOf, coverPage } from './cover'
 import { buildFigureSlides, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, readingFor } from './figure-slots'
@@ -98,9 +99,31 @@ type Page = Omit<CompositionSlideInput, 'slideId'>
 interface BodyPage {
   readonly page: Page
   readonly contentsTitle?: string
+  /** Hechos que la página dibuja: con ellos «Lo esencial» apunta a la página real de su evidencia. */
+  readonly factIds?: readonly string[]
 }
 
 const pad2 = (n: number): string => String(n).padStart(2, '0')
+
+const escapeRich = (text: string): string => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+/**
+ * Un esencial del plan (una afirmación con sus hechos) en la forma del resumen: la cifra es el hecho
+ * principal con el formateador canónico, el título es la métrica y el detalle, la afirmación completa.
+ * El folio se resuelve después, con el plan de páginas completo.
+ */
+const essentialOf = (item: PlanClaimV1, factsById: ReadonlyMap<string, EvidenceFactV1>, locale: string): Record<string, string> => {
+  const fact = item.factIds[0] ? factsById.get(item.factIds[0]) : undefined
+
+  if (!fact || fact.value === null) throw new InsightsRenderRejectedError(`«Lo esencial» ${item.claimId}: su hecho principal no tiene valor medido.`)
+
+  return {
+    figure: rejectIfLonger(formatFactValue(fact.value, fact.unit, locale), 12, `${item.claimId}.figure`),
+    title: rejectIfLonger(fact.label, 60, `${item.claimId}.title`),
+    detail: escapeRich(rejectIfLonger(item.text, 170, `${item.claimId}.detail`)),
+    folio: '—'
+  }
+}
 
 /** «Medimos la marca en»: los canales que miden los gráficos del capítulo (`channelId`, TASK-1888). */
 const measuredChannelsOf = (chapter: PlanChapterV1): SlotValues => {
@@ -112,7 +135,7 @@ const measuredChannelsOf = (chapter: PlanChapterV1): SlotValues => {
 }
 
 /** Páginas en papel: llevan cabecera corrida, pie institucional y folio «NN / total». */
-const PAPER_TYPES = new Set(['report-index', 'report-narrative', 'report-table', 'report-limits', ...Object.values(FIGURE_CONTENT_TYPE.report)])
+const PAPER_TYPES = new Set(['report-index', 'report-summary', 'report-narrative', 'report-table', 'report-limits', ...Object.values(FIGURE_CONTENT_TYPE.report)])
 
 const L = GH_INSIGHTS.catalog
 
@@ -142,6 +165,7 @@ const chapterBodyPages = (
 
       pages.push({
         contentsTitle: figure.figureTitle,
+        factIds: figure.factIds,
         page: {
           contentType: FIGURE_CONTENT_TYPE.report[figure.kind],
           slots: {
@@ -280,7 +304,46 @@ export const buildInsightReportPlanInput = ({
   // Secciones del cuerpo, en orden. Cada una sabe su marca de índice y sus páginas.
   const sections: { mark: string; title: string; pages: BodyPage[] }[] = []
 
-  if (frozen.executiveSummary.length > 0) {
+  // «Lo esencial» (TASK-1888 v2): la página de resumen del canvas, con la tesis, hasta cinco hallazgos
+  // con su cifra y el folio real de su evidencia, y la decisión. Sin esenciales (plan v1), se narra.
+  const essentials = frozen.essentials ?? []
+
+  if (frozen.executiveSummary.length > 0 && essentials.length > 0) {
+    const [headline, lead, ...rest] = frozen.executiveSummary.map(c => c.text)
+    const running = { runningSection: GH_INSIGHTS.document.executiveSummary, runningPeriod: periodLabel }
+
+    const summaryPage: BodyPage = {
+      page: {
+        contentType: 'report-summary',
+        slots: {
+          ...running,
+          eyebrow: GH_INSIGHTS.document.executiveSummary,
+          thesis: rejectIfLonger(headline!, 120, 'executiveSummary.thesis'),
+          ...(lead ? { thesisLead: rejectIfLonger(lead, 320, 'executiveSummary.thesisLead') } : {}),
+          essentialsLabel: L.essentials,
+          essentials: essentials.map(item => essentialOf(item, factsById, frozen.locale)),
+          ...(frozen.decision
+            ? { decision: { label: L.decideInMeeting, text: rejectIfLonger(frozen.decision.text, 240, 'decision'), signature: L.signature } }
+            : {})
+        }
+      }
+    }
+
+    // Lo que la tesis y su bajada no dijeron se sigue narrando: ninguna afirmación del resumen se pierde.
+    const narrated = chunkByCapacity(rest, CAPACITY.paragraphs, (_p, i) => `summary-p${i}`).map(paragraphs => ({
+      page: {
+        contentType: 'report-narrative',
+        slots: {
+          ...running,
+          eyebrow: GH_INSIGHTS.document.executiveSummary,
+          assertion: rejectIfLonger(headline!, BUDGET.assertion, 'executiveSummary.assertion'),
+          paragraphs: paragraphs.map(p => rejectIfLonger(p, BUDGET.paragraph, 'executiveSummary.paragraph'))
+        }
+      }
+    }))
+
+    sections.push({ mark: L.indexMarks.summary, title: GH_INSIGHTS.document.executiveSummary, pages: [summaryPage, ...narrated] })
+  } else if (frozen.executiveSummary.length > 0) {
     const [headline, ...rest] = frozen.executiveSummary.map(c => c.text)
     const running = { runningSection: GH_INSIGHTS.document.executiveSummary, runningPeriod: periodLabel }
 
@@ -472,6 +535,40 @@ export const buildInsightReportPlanInput = ({
       }
     }
   })
+
+  // Folio de cada esencial: la primera página que dibuja su hecho principal; si ninguna figura lo dibuja,
+  // la apertura del capítulo que lo afirma. Se resuelve con el plan de páginas completo (folios físicos).
+  const summaryBody = sections.find(section => section.mark === L.indexMarks.summary)?.pages[0]
+
+  if (summaryBody?.page.contentType === 'report-summary') {
+    const pageOfFact = (factId: string | undefined): number | null => {
+      for (const [i, section] of sections.entries()) {
+        const offset = section.pages.findIndex(body => factId !== undefined && body.factIds?.includes(factId))
+
+        if (offset >= 0) return folioOf[i]! + offset
+      }
+
+      return null
+    }
+
+    const chapterOfClaim = (claimId: string): number | null => {
+      const index = frozen.chapters.findIndex(chapter => chapter.claims.some(item => `essential.${item.claimId}` === claimId || item.claimId === claimId))
+      const section = index >= 0 ? sections.findIndex(sec => sec.title === frozen.chapters[index]!.title) : -1
+
+      return section >= 0 ? folioOf[section]! : null
+    }
+
+    const items = (summaryBody.page.slots as { essentials: Array<Record<string, unknown>> }).essentials
+
+    items.forEach((item, index) => {
+      const source = essentials[index]!
+      const folio = pageOfFact(source.factIds[0]) ?? chapterOfClaim(source.claimId)
+
+      if (folio === null) throw new InsightsRenderRejectedError(`«Lo esencial» ${source.claimId}: no hay página que respalde su cifra.`)
+
+      item.folio = `${L.evidencePage} ${pad2(folio)}`
+    })
+  }
 
   const pages = [cover, ...indexPages, ...sections.flatMap(section => section.pages.map(body => body.page)), backCover]
 
