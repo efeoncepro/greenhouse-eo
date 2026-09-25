@@ -1,5 +1,15 @@
 # TASK-1883 — Severidad, evidencia y recurrencia honestas en los insights ICO
 
+## Delta 2026-09-25
+
+- **Supuesto invalidado: «las bandas autoritativas son las del Contrato de Métricas».** El operador decidió el
+  2026-09-25 que el semáforo de OTD%, FTR% y RpA lo manda `ICO_METRIC_REGISTRY` (OTD 90/70, FTR 80/60, RpA 1,5/2,5).
+  El §7.1 del Contrato quedó marcado como benchmark externo, no semáforo, y el glosario §C se alineó al registro.
+  La severidad por umbral de negocio de esta task debe leer `getThresholdZone` del registro, nunca bandas del
+  Contrato ni literales. El bono conserva umbrales propios en `payroll_bonus_config` y sigue fuera de alcance.
+  Detalle: `ICO_DELIVERY_METRICS_AGENT_INVARIANTS.md` § «Umbrales ICO — una sola fuente por propósito»; los semáforos
+  del portal escritos a mano migran en `TASK-1900` — cerrado por la reconciliación de umbrales (commit `f1a41cda0`).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -100,7 +110,7 @@ Reglas obligatorias:
 - **No se cambia ninguna fórmula de métrica ICO.** Esta task cambia cómo se **clasifica, ordena y presenta** una señal, nunca cómo se calcula `otd_pct`, `ftr_pct` o `rpa_avg`. El insumo del bono no se toca: el cutover de OTD a atraso imputable es exclusivamente `TASK-1170` y está frenado por decisión del CEO.
 - **`ai_signals` y `ai_prediction_log` son append-only.** `TASK-943` lo canonizó. Prohibido `DELETE` sobre esas tablas en BigQuery; los consumers leen la VIEW `*_current`. La única mutación legítima sigue siendo `hydratePredictionActuals`.
 - **La severidad se compone, no se reemplaza.** El z-score se conserva como evidencia; lo que cambia es que deja de ser el único insumo de la severidad presentada. Un cambio que borre el z-score rompe la continuidad de las señales existentes.
-- **Las bandas autoritativas son las del Contrato de Métricas.** `docs/context/06_glosario-metricas.md:116-123` publica umbrales distintos y más laxos; ese documento se declara subordinado al Contrato en su propia línea 3. Si se detecta drift entre ambos, se usa el Contrato y se deja constancia — no se elige el más conveniente.
+- ~~**Las bandas autoritativas son las del Contrato de Métricas.**~~ *(Reemplazado 2026-09-25: manda `ICO_METRIC_REGISTRY`; ver Delta.)* `docs/context/06_glosario-metricas.md:116-123` publica umbrales distintos y más laxos; ese documento se declara subordinado al Contrato en su propia línea 3. Si se detecta drift entre ambos, se usa el Contrato y se deja constancia — no se elige el más conveniente.
 - **Degradación honesta antes que silencio.** `unavailable` / `low_confidence` explícitos, nunca `0` ni `100` inventados (`TASK-156:13`, `Contrato:606`).
 - **Errores canónicos.** Toda respuesta de error usa `canonicalErrorResponse`; nada de prosa en inglés al cliente.
 
