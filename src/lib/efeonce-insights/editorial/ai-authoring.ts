@@ -17,7 +17,15 @@ import type { EditorialPlanV1, PlanAuthoringProvenanceV1 } from '../contracts/pl
 import { validateEditorialPlan } from './plan-validation'
 
 export const INSIGHTS_AUTHORING_PROMPT_VERSION = 'insights-authoring-v1'
+
+/**
+ * TASK-1888 — con el contrato editorial v2 el modelo reescribe además la lectura por figura («Lo que significa» y
+ * «Próximo paso»). Mismas reglas; el prompt sube de versión porque cambia lo que recibe. Presupuesto un poco mayor
+ * porque hay más textos, con el mismo límite de reparaciones y el mismo fallback determinista.
+ */
+export const INSIGHTS_AUTHORING_PROMPT_VERSION_V2 = 'insights-authoring-v2'
 const MAX_OUTPUT_TOKENS = 2048
+const MAX_OUTPUT_TOKENS_V2 = 3072
 const MAX_REPAIRS = 1
 
 interface RewrittenClaims {
@@ -42,20 +50,35 @@ const SYSTEM = [
   'Devuelve exactamente un texto por claimId recibido.'
 ].join(' ')
 
+/** TASK-1888 — mismas reglas + la lectura por figura, que tampoco admite causas ni pasos que el texto no diga. */
+const SYSTEM_V2 = [
+  SYSTEM,
+  'Algunas afirmaciones son la lectura de una figura («Lo que significa» y «Próximo paso»): mantenlas factuales y breves;',
+  'un próximo paso sólo puede nombrar lo que el texto original ya nombra.'
+].join(' ')
+
+const isV2 = (plan: EditorialPlanV1): boolean => plan.chapters.some(chapter => chapter.readings !== undefined)
+
 const buildPrompt = (plan: EditorialPlanV1): string => {
-  const claims = plan.chapters.flatMap(chapter => chapter.claims.map(claim => ({ chapter: chapter.title, claimId: claim.claimId, text: claim.text })))
+  const claims = plan.chapters.flatMap(chapter => [
+    ...chapter.claims.map(claim => ({ chapter: chapter.title, claimId: claim.claimId, text: claim.text })),
+    // TASK-1888 — la lectura por figura también se reescribe; nunca la cifra principal ni las líneas de alcance.
+    ...(chapter.readings ?? []).flatMap(reading => [reading.meaning, ...(reading.nextStep ? [reading.nextStep] : [])].map(claim => ({ chapter: chapter.title, claimId: claim.claimId, text: claim.text })))
+  ])
 
   return JSON.stringify({ locale: plan.locale, claims }, null, 2)
 }
 
 const applyRewrite = (plan: EditorialPlanV1, rewritten: RewrittenClaims): EditorialPlanV1 => {
   const byId = new Map(rewritten.claims.map(claim => [claim.claimId, claim.text.trim()]))
+  const rewrite = <T extends { claimId: string; text: string }>(claim: T): T => ({ ...claim, text: byId.get(claim.claimId) || claim.text })
 
   return {
     ...plan,
     chapters: plan.chapters.map(chapter => ({
       ...chapter,
-      claims: chapter.claims.map(claim => ({ ...claim, text: byId.get(claim.claimId) || claim.text }))
+      claims: chapter.claims.map(rewrite),
+      ...(chapter.readings ? { readings: chapter.readings.map(reading => ({ ...reading, meaning: rewrite(reading.meaning), nextStep: reading.nextStep ? rewrite(reading.nextStep) : null })) } : {})
     }))
   }
 }
@@ -74,6 +97,8 @@ export const authorPlanWithBoundedAi = async (
 ): Promise<AiAuthoringResult> => {
   const generate = options.generate ?? generateStructuredGemini
   const usage = { inputTokens: 0, outputTokens: 0, attempts: 0 }
+  const v2 = isV2(deterministic)
+  const promptVersion = v2 ? INSIGHTS_AUTHORING_PROMPT_VERSION_V2 : INSIGHTS_AUTHORING_PROMPT_VERSION
   let model: string | null = null
   let lastViolations = ''
 
@@ -82,10 +107,10 @@ export const authorPlanWithBoundedAi = async (
 
     try {
       const result = await generate<RewrittenClaims>({
-        system: SYSTEM,
+        system: v2 ? SYSTEM_V2 : SYSTEM,
         prompt: attempt === 0 ? buildPrompt(deterministic) : `${buildPrompt(deterministic)}\n\nLa versión anterior fue rechazada por cambiar cifras: ${lastViolations}. Repite conservando cada cifra literal.`,
         jsonSchema: SCHEMA,
-        maxOutputTokens: MAX_OUTPUT_TOKENS,
+        maxOutputTokens: v2 ? MAX_OUTPUT_TOKENS_V2 : MAX_OUTPUT_TOKENS,
         temperature: 0
       })
 
@@ -99,7 +124,7 @@ export const authorPlanWithBoundedAi = async (
       if (violations.length === 0) {
         return {
           plan: candidate,
-          provenance: { mode: 'ai_bounded', modelId: model, promptVersion: INSIGHTS_AUTHORING_PROMPT_VERSION, usage },
+          provenance: { mode: 'ai_bounded', modelId: model, promptVersion, usage },
           fallbackReason: null
         }
       }

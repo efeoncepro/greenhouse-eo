@@ -5,9 +5,10 @@
  */
 
 import type { ChartSpecV1 } from '../contracts/chart-spec'
-import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSnapshotContentV1, EvidenceSourceV1 } from '../contracts/evidence'
-import type { EditorialPlanV1, PlanChapterV1, PlanClaimV1, PlanTableV1 } from '../contracts/plan'
+import { isReferenceFact, type EvidenceFactV1, type EvidenceRejectionV1, type EvidenceSnapshotContentV1, type EvidenceSourceV1 } from '../contracts/evidence'
+import type { EditorialPlanV1, PlanChapterV1, PlanClaimV1, PlanCoverV1, PlanTableV1 } from '../contracts/plan'
 import type { InsightModule } from '../contracts/request'
+import { assertChartsAllowed, bulletCharts, essentialsFor, lineCharts, openingFor, readingsFor, scopeLinesFor } from './editorial-v2'
 import { formatDeltaForUnit, formatFactValue } from './format'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
@@ -82,7 +83,7 @@ const claimFor = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, local
   return { claimId: `claim.${fact.factId}`, text, factIds }
 }
 
-const chartFor = (_module: InsightModule, facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, unit: string, chartId: string, title: string): ChartSpecV1 | null => {
+const chartFor = (_module: InsightModule, facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, unit: string, chartId: string, title: string, editorialV2 = false): ChartSpecV1 | null => {
   const withValue = facts.filter(fact => fact.value !== null)
 
   if (withValue.length === 0) return null
@@ -97,6 +98,8 @@ const chartFor = (_module: InsightModule, facts: EvidenceFactV1[], byId: Map<str
     : [{ seriesId: `${chartId}.current`, label: 'Período', factIds: withValue.map(fact => fact.factId), unit }]
 
   const labelled = comparable.length > 0 ? comparable : withValue
+  // TASK-1888 — canal de cada dimensión (presencia por motor, Google): el catálogo lo traduce a su isotipo.
+  const channels = editorialV2 && labelled.some(fact => fact.channelId) ? { dimensionChannelIds: labelled.map(fact => fact.channelId ?? null) } : {}
 
   return {
     specVersion: 'chart_spec_v1',
@@ -106,6 +109,7 @@ const chartFor = (_module: InsightModule, facts: EvidenceFactV1[], byId: Map<str
     title,
     series,
     dimensionLabels: labelled.map(fact => fact.label),
+    ...channels,
     unit,
     scale: { kind: 'linear', baseline: 0 },
     references: [],
@@ -127,15 +131,27 @@ const tableFor = (tableId: string, title: string, facts: EvidenceFactV1[], byId:
   })
 })
 
-export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, input: { modules: InsightModule[]; locale: string }): EditorialPlanV1 => {
+export interface DeterministicPlanInput {
+  modules: InsightModule[]
+  locale: string
+  /** TASK-1888 — contrato editorial v2 (`INSIGHTS_EDITORIAL_V2_ENABLED`). Ausente/false ⇒ plan v1. */
+  editorialV2?: boolean
+  /** TASK-1888 — portada ya resuelta (`resolveInsightCover`); se sella tal cual en el plan. Sólo con v2. */
+  cover?: PlanCoverV1 | null
+}
+
+export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, input: DeterministicPlanInput): EditorialPlanV1 => {
   const byId = new Map(snapshot.facts.map(fact => [fact.factId, fact]))
   const comparisonIds = new Set(snapshot.facts.map(fact => fact.comparisonFactId).filter((id): id is string => id !== null))
   const chapters: PlanChapterV1[] = []
   const summary: PlanClaimV1[] = []
+  const editorialV2 = input.editorialV2 === true
 
   for (const moduleKey of input.modules) {
-    // Hechos del período actual (los del período anterior sólo entran como comparación).
-    const facts = snapshot.facts.filter(fact => fact.module === moduleKey && !comparisonIds.has(fact.factId))
+    // Hechos del período actual (los del período anterior sólo entran como comparación). Una meta oficial es un
+    // hecho de REFERENCIA (TASK-1888): se cita en gráficos y lecturas, nunca como hallazgo propio.
+    const facts = snapshot.facts.filter(fact => fact.module === moduleKey && !comparisonIds.has(fact.factId) && !isReferenceFact(fact))
+    const referenceFacts = snapshot.facts.filter(fact => fact.module === moduleKey && isReferenceFact(fact))
     const rejections = snapshot.rejections.filter(rejection => rejection.module === moduleKey)
     const claims = facts.map(fact => claimFor(fact, byId, input.locale))
     const charts: ChartSpecV1[] = []
@@ -144,9 +160,14 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     for (const fact of facts) byUnit.set(fact.unit, [...(byUnit.get(fact.unit) ?? []), fact])
 
     for (const [unit, unitFacts] of byUnit) {
-      const chart = chartFor(moduleKey, unitFacts, byId, unit, `chart.${moduleKey}.${unit}`, GH_INSIGHTS.units[unit] ? `${GH_INSIGHTS.modules[moduleKey].label} · ${GH_INSIGHTS.units[unit]}` : GH_INSIGHTS.modules[moduleKey].label)
+      const chart = chartFor(moduleKey, unitFacts, byId, unit, `chart.${moduleKey}.${unit}`, GH_INSIGHTS.units[unit] ? `${GH_INSIGHTS.modules[moduleKey].label} · ${GH_INSIGHTS.units[unit]}` : GH_INSIGHTS.modules[moduleKey].label, editorialV2)
 
       if (chart) charts.push(chart)
+    }
+
+    if (editorialV2) {
+      charts.push(...bulletCharts(moduleKey, facts, referenceFacts), ...lineCharts(moduleKey, facts))
+      assertChartsAllowed(moduleKey, charts)
     }
 
     if (claims[0]) summary.push({ ...claims[0], claimId: `summary.${claims[0].claimId}` })
@@ -158,12 +179,13 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       claims,
       charts,
       tables: facts.length > 0 ? [tableFor(`table.${moduleKey}`, `${MODULE_TITLES[moduleKey]} · resumen`, facts, byId, input.locale)] : [],
-      limits: unique(rejections.map(limitFor))
+      limits: unique(rejections.map(limitFor)),
+      ...(editorialV2 ? { opening: openingFor(moduleKey), readings: readingsFor(charts, byId, input.locale, claims) } : {})
     })
   }
 
   const references = snapshot.facts
-    .filter(fact => !comparisonIds.has(fact.factId))
+    .filter(fact => !comparisonIds.has(fact.factId) && !isReferenceFact(fact))
     .map(fact => ({ referenceId: `ref.${fact.factId}`, label: `${fact.label} (${windowLabel(fact)})`, evidenceRef: fact.evidenceRef }))
 
   return {
@@ -174,6 +196,14 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     actions: [],
     limits: unique(snapshot.rejections.map(limitFor)),
     methodology: unique(snapshot.sources.map(source => methodologyFor(source, input.locale))),
-    references
+    references,
+    // TASK-1888 — campos v2: sólo con el contrato encendido; un plan v1 no los trae.
+    ...(editorialV2
+      ? {
+          essentials: essentialsFor(chapters, byId),
+          scopeLines: scopeLinesFor(input.modules),
+          ...(input.cover ? { cover: input.cover } : {})
+        }
+      : {})
   }
 }

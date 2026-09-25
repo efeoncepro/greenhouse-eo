@@ -8,12 +8,14 @@ import 'server-only'
  * de OTD por space. Nunca promedia promedios ni porcentajes entre spaces.
  */
 
+import { GH_INSIGHTS } from '@/lib/copy/insights'
+import { getMetricById } from '@/lib/ico-engine/metric-registry'
 import { readSpaceMetrics } from '@/lib/ico-engine/read-metrics'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1 } from '../contracts/evidence'
+import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1, EvidenceUnit } from '../contracts/evidence'
 import type { ResolvedInsightWindow } from '../window'
-import { type AdapterCollectInput, type ModuleReportAdapterV1, asComparisonRejections, factId } from './contract'
+import { type AdapterCollectInput, type ModuleReportAdapterV1, asComparisonRejections, evidenceWindow, factId } from './contract'
 
 export const ICO_ADAPTER_VERSION = 'ico_report_adapter_v1'
 
@@ -28,7 +30,27 @@ interface SpaceRow extends Record<string, unknown> {
  * el del snapshot NO. Se buscó `'otd'` cuando el motor lo llama `'otd_pct'`, y OTD no llegó a ningún
  * informe sin que nada fallara (TASK-1847 canary, 2026-09-22). Un test cruza estos ids con el registro.
  */
-export const ICO_SNAPSHOT_METRIC_IDS = { rpa: 'rpa', otd: 'otd_pct' } as const
+export const ICO_SNAPSHOT_METRIC_IDS = { rpa: 'rpa', otd: 'otd_pct', ftr: 'ftr_pct' } as const
+
+/** TASK-1888 — métricas con meta oficial citable y su unidad en el documento. */
+const TARGET_METRICS: ReadonlyArray<{ metricId: keyof typeof ICO_SNAPSHOT_METRIC_IDS; unit: EvidenceUnit }> = [
+  { metricId: 'otd', unit: 'percent' },
+  { metricId: 'ftr', unit: 'percent' },
+  { metricId: 'rpa', unit: 'ratio' }
+]
+
+/**
+ * TASK-1888 — la meta oficial de una métrica ICO, leída del registro dueño (`ICO_METRIC_REGISTRY`), NUNCA un
+ * literal: el umbral inferior de la zona óptima si la métrica mejora al subir (OTD 90, FTR 80), el superior si
+ * mejora al bajar (RpA 1,5). Es un hecho de REFERENCIA: se puede citar en un gráfico o una frase, no es un hallazgo.
+ */
+export const icoOfficialTarget = (metricId: keyof typeof ICO_SNAPSHOT_METRIC_IDS): { value: number; higherIsBetter: boolean } | null => {
+  const definition = getMetricById(ICO_SNAPSHOT_METRIC_IDS[metricId])
+
+  if (!definition) return null
+
+  return { value: definition.higherIsBetter ? definition.thresholds.optimal.min : definition.thresholds.optimal.max, higherIsBetter: definition.higherIsBetter }
+}
 
 export const listOrganizationSpaces = async (organizationId: string): Promise<SpaceRow[]> =>
   runGreenhousePostgresQuery<SpaceRow>(
@@ -38,7 +60,7 @@ export const listOrganizationSpaces = async (organizationId: string): Promise<Sp
     [organizationId]
   )
 
-const collectForWindow = async (spaces: SpaceRow[], window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>) => {
+const collectForWindow = async (spaces: SpaceRow[], window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>, editorialV2 = false) => {
   const facts: EvidenceFactV1[] = []
   const rejections: EvidenceRejectionV1[] = []
   let source: EvidenceSourceV1 | null = null
@@ -109,12 +131,55 @@ const collectForWindow = async (spaces: SpaceRow[], window: ResolvedInsightWindo
         rejections.push({ module: 'ico', metricId: 'otd', reason: 'no_data', detail: `El snapshot ICO de ${space.space_name} en ${month} no trae OTD` })
       }
 
+      // TASK-1888 — FTR ya lo calcula el motor ICO (`ftr_pct`): el adapter sólo lo lee. Sólo con el contrato v2, para
+      // que la evidencia v1 quede idéntica con el flag apagado.
+      if (editorialV2) {
+        const ftr = snapshot.metrics.find(metric => metric.metricId === ICO_SNAPSHOT_METRIC_IDS.ftr)
+
+        if (ftr && ftr.value !== null) {
+          facts.push({ ...base, factId: factId('ico', 'ftr', window, dimension), metricId: 'ftr', label: `FTR · ${space.space_name} · ${month}`, value: ftr.value, unit: 'percent', numerator: null, denominator: null, coverage: { kind: ftr.qualityGateStatus === 'degraded' ? 'partial' : 'complete', ratio: null, populationSize: ftr.trustEvidence?.sampleSize ?? null }, comparisonFactId: comparisonIds[`ftr.${space.space_id}`] ?? null })
+        } else {
+          rejections.push({ module: 'ico', metricId: 'ftr', reason: ftr ? 'insufficient_data' : 'no_data', detail: ftr ? `FTR sin valor en ${space.space_name} ${month}` : `El snapshot ICO de ${space.space_name} en ${month} no trae FTR` })
+        }
+      }
+
       source = source ?? { module: 'ico', adapterVersion: ICO_ADAPTER_VERSION, reader: 'readSpaceMetrics', asOf, method, coverage: { kind: 'complete', ratio: null, populationSize: spaces.length }, servedWindow: { start: `${window.months[0]}-01`, endExclusive: window.endExclusive, granularity: 'month', partial: window.partial } }
     }
   }
 
   return { facts, rejections, source }
 }
+
+/** Una meta por métrica medida en la ventana actual (misma meta para todo space y mes: la define el registro). */
+const targetFacts = (measured: EvidenceFactV1[], window: ResolvedInsightWindow): EvidenceFactV1[] =>
+  TARGET_METRICS.flatMap(({ metricId, unit }) => {
+    const target = icoOfficialTarget(metricId)
+
+    if (!target || !measured.some(fact => fact.metricId === metricId)) return []
+
+    return [{
+      factVersion: 'evidence_fact_v1' as const,
+      factId: factId('ico', `target.${metricId}`, window),
+      module: 'ico' as const,
+      metricId: `target.${metricId}`,
+      label: GH_INSIGHTS.targets[metricId] ?? metricId,
+      value: target.value,
+      unit,
+      numerator: null,
+      denominator: null,
+      population: 'Meta oficial del registro de métricas de entrega',
+      source: 'ico_engine.ICO_METRIC_REGISTRY',
+      method: { name: 'ico_metric_registry', version: ICO_ADAPTER_VERSION },
+      coverage: { kind: 'complete' as const, ratio: 1, populationSize: null },
+      freshness: { asOf: null },
+      observation: 'observed' as const,
+      window: evidenceWindow(window, 'period'),
+      evidenceRef: `ico_metric_registry:${ICO_SNAPSHOT_METRIC_IDS[metricId]}`,
+      comparisonFactId: null,
+      dimension: { metric: metricId, direction: target.higherIsBetter ? 'higher_is_better' : 'lower_is_better' },
+      role: 'reference' as const
+    }]
+  })
 
 export const icoReportAdapter: ModuleReportAdapterV1 = {
   describe: () => ({ module: 'ico', version: ICO_ADAPTER_VERSION, granularities: ['month'], dimensions: ['spaceId'], suggestedSections: ['entrega_a_tiempo', 'rendimiento_por_asignacion'] }),
@@ -129,7 +194,7 @@ export const icoReportAdapter: ModuleReportAdapterV1 = {
     let comparison: Awaited<ReturnType<typeof collectForWindow>> | null = null
 
     if (input.comparison) {
-      comparison = await collectForWindow(spaces, input.comparison, {})
+      comparison = await collectForWindow(spaces, input.comparison, {}, input.editorialV2 === true)
 
       // Comparable por space cuando el período anterior tiene UN mes (mismo grano); con varios meses
       // la comparación es por serie, no por par de hechos.
@@ -138,10 +203,11 @@ export const icoReportAdapter: ModuleReportAdapterV1 = {
       }
     }
 
-    const current = await collectForWindow(spaces, input.window, input.window.months.length === 1 ? comparisonIds : {})
+    const current = await collectForWindow(spaces, input.window, input.window.months.length === 1 ? comparisonIds : {}, input.editorialV2 === true)
+    const targets = input.editorialV2 === true ? targetFacts(current.facts, input.window) : []
 
     return {
-      facts: [...current.facts, ...(comparison?.facts ?? [])],
+      facts: [...current.facts, ...targets, ...(comparison?.facts ?? [])],
       sources: [current.source, comparison?.source ?? null].filter((source): source is EvidenceSourceV1 => source !== null),
       rejections: [...current.rejections, ...asComparisonRejections(comparison?.rejections ?? [])]
     }

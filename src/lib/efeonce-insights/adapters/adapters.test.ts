@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type * as AiVisibilityContracts from '@/lib/growth/ai-visibility/contracts'
 import type * as MetricRegistry from '@/lib/ico-engine/metric-registry'
 
 import { resolveInsightWindows } from '../window'
@@ -91,6 +92,8 @@ describe('SEO adapter', () => {
     expect(etv).toMatchObject({ value: 1200, unit: 'visits_estimated', observation: 'estimated', method: { version: 'improved_layout_clickstream_v2' }, comparisonFactId: 'seo.organic_etv.2026-07-01_2026-08-01.2026-07' })
     expect(result.rejections).toEqual([])
     expect(result.sources.map(source => source.reader)).toEqual(['readSeoOverviewKpisForWindow', 'readRankEvolution', 'readDomainOverviewForTarget', 'readSeoOverviewKpisForWindow', 'readRankEvolution', 'readDomainOverviewForTarget'])
+    // TASK-1888 — Search Console, ranking y ETV miden Google: todo hecho SEO lleva el canal.
+    expect(new Set(result.facts.map(fact => fact.channelId))).toEqual(new Set(['google']))
   })
 
   it('ventana no mensual: ETV declara unsupported_window con alternativa mensual; GSC sí sirve', async () => {
@@ -264,5 +267,86 @@ describe('ICO adapter', () => {
 
     icoMocks.runGreenhousePostgresQuery.mockResolvedValue([])
     expect((await icoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: month('2026-08-01', '2026-09-01').current, comparison: null, projectIds: [] })).rejections[0]!.reason).toBe('not_connected')
+  })
+})
+
+describe('TASK-1888 — evidencia del contrato editorial v2', () => {
+  const icoSnapshot = (ftr: number | null) => ({
+    spaceId: 'sp-1', clientId: null, clientName: null, periodYear: 2026, periodMonth: 8,
+    metrics: [
+      { metricId: 'rpa', value: 1.12, zone: null, dataStatus: 'valid', suppressionReason: null, evidence: { completedTasks: 10, eligibleTasks: 8, missingTasks: 2, nonPositiveTasks: 0 } },
+      { metricId: 'otd_pct', value: 80, zone: null },
+      ...(ftr === null ? [] : [{ metricId: 'ftr_pct', value: ftr, zone: null, qualityGateStatus: 'healthy', trustEvidence: { sampleBasis: 'x', sampleSize: 9, totalTasks: 12, completedTasks: 10, activeTasks: 2, deliveryClassifiedTasks: 10 } }])
+    ],
+    cscDistribution: null,
+    context: { totalTasks: 12, completedTasks: 10, activeTasks: 2, onTimeTasks: 8, lateDropTasks: 1, overdueTasks: 1, carryOverTasks: 0, overdueCarriedForwardTasks: 0 },
+    computedAt: '2026-09-02T03:00:00.000Z', engineVersion: 'v1.0.0', source: 'materialized'
+  })
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    icoMocks.runGreenhousePostgresQuery.mockResolvedValue([{ space_id: 'sp-1', space_name: 'Sky · Diseño' }])
+  })
+
+  it('ICO con v2: lee ftr_pct del motor y suma las metas del registro como hechos de referencia', async () => {
+    icoMocks.readSpaceMetrics.mockResolvedValue(icoSnapshot(86))
+    const { icoReportAdapter } = await import('./ico-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const result = await icoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
+
+    expect(result.facts.find(fact => fact.metricId === 'ftr')).toMatchObject({ value: 86, unit: 'percent', coverage: { populationSize: 9 } })
+
+    const targets = Object.fromEntries(result.facts.filter(fact => fact.role === 'reference').map(fact => [fact.metricId, [fact.value, fact.dimension?.direction]]))
+    const { ICO_METRIC_REGISTRY } = await vi.importActual<typeof MetricRegistry>('@/lib/ico-engine/metric-registry')
+    const optimal = (id: string) => ICO_METRIC_REGISTRY.find(metric => metric.id === id)!.thresholds.optimal
+
+    // Los valores salen del registro dueño, no de literales: se comparan contra el registro, no contra 90/80/1,5.
+    expect(targets).toEqual({
+      'target.otd': [optimal('otd_pct').min, 'higher_is_better'],
+      'target.ftr': [optimal('ftr_pct').min, 'higher_is_better'],
+      'target.rpa': [optimal('rpa').max, 'lower_is_better']
+    })
+  })
+
+  it('ICO sin v2 entrega exactamente la evidencia v1 (sin FTR ni metas)', async () => {
+    icoMocks.readSpaceMetrics.mockResolvedValue(icoSnapshot(86))
+    const { icoReportAdapter } = await import('./ico-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const result = await icoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
+
+    expect(result.facts.map(fact => fact.metricId).sort()).toEqual(['otd', 'rpa'])
+  })
+
+  it('ICO con v2 y un snapshot sin FTR lo narra como límite; sin FTR medido no hay meta de FTR', async () => {
+    icoMocks.readSpaceMetrics.mockResolvedValue(icoSnapshot(null))
+    const { icoReportAdapter } = await import('./ico-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const result = await icoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
+
+    expect(result.rejections.map(rejection => [rejection.metricId, rejection.reason])).toEqual([['ftr', 'no_data']])
+    expect(result.facts.some(fact => fact.metricId === 'target.ftr')).toBe(false)
+  })
+
+  it('AEO: cada proveedor del grader tiene channelId estable; uno desconocido queda sin channelId', async () => {
+    const { GROWTH_AI_VISIBILITY_PROVIDER_IDS } = await vi.importActual<typeof AiVisibilityContracts>('@/lib/growth/ai-visibility/contracts')
+    const { channelForAeoProvider } = await import('../contracts/channels')
+
+    for (const provider of GROWTH_AI_VISIBILITY_PROVIDER_IDS) expect(channelForAeoProvider(provider), provider).toBeDefined()
+
+    aeoMocks.readClientGraderReport.mockResolvedValue({
+      report: {
+        gate: { status: 'ready', reason: 'r', nextAction: 'n' },
+        overallScore: 61,
+        dimensions: [],
+        providerPresence: [{ provider: 'openai', resolved: 12, present: 5 }, { provider: 'nuevo_motor', resolved: 12, present: 2 }],
+        provenance: { asOfDate: '2026-08-20', promptPackVersion: 'pp-3', scoreVersion: 'score-2', providersSampled: ['openai'], promptCount: 12 }
+      }
+    })
+    const { aeoReportAdapter } = await import('./aeo-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const result = await aeoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
+
+    expect(result.facts.find(fact => fact.metricId === 'presence.openai')!.channelId).toBe('chatgpt')
+    expect(result.facts.find(fact => fact.metricId === 'presence.nuevo_motor')).not.toHaveProperty('channelId')
   })
 })

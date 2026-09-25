@@ -13,6 +13,7 @@ import { readSeoOverviewKpisForWindow } from '@/lib/growth/seo/overview/read-ove
 import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
 import { resolveUnambiguousSeoTarget } from '@/lib/growth/seo/resolve-target'
 
+import { SEO_SEARCH_CHANNEL } from '../contracts/channels'
 import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1 } from '../contracts/evidence'
 import type { ResolvedInsightWindow } from '../window'
 import { type AdapterCollectInput, type ModuleReportAdapterV1, asComparisonRejections, evidenceWindow, factId } from './contract'
@@ -53,7 +54,9 @@ const gscFacts = async (organizationId: string, window: ResolvedInsightWindow, c
     freshness: { asOf },
     observation: 'observed' as const,
     window: evidenceWindow(window, 'period'),
-    evidenceRef: `seo_gsc_daily:${organizationId}:${window.start}_${window.endExclusive}`
+    evidenceRef: `seo_gsc_daily:${organizationId}:${window.start}_${window.endExclusive}`,
+    // TASK-1888 — Search Console, el ranking y el ETV miden Google.
+    channelId: SEO_SEARCH_CHANNEL
   }
 
   facts.push(
@@ -120,7 +123,9 @@ const rankFacts = async (seoTargetId: string, window: ResolvedInsightWindow, com
     freshness: { asOf: lastDate },
     observation: 'observed' as const,
     window: evidenceWindow(window, 'period'),
-    evidenceRef: `seo_target:${seoTargetId}:${window.start}_${window.endExclusive}`
+    evidenceRef: `seo_target:${seoTargetId}:${window.start}_${window.endExclusive}`,
+    // TASK-1888 — Search Console, el ranking y el ETV miden Google.
+    channelId: SEO_SEARCH_CHANNEL
   }
 
   facts.push(
@@ -174,7 +179,9 @@ const etvFacts = async (seoTargetId: string, window: ResolvedInsightWindow, comp
     coverage: { kind: 'complete' as const, ratio: 1, populationSize: window.months.length },
     freshness: { asOf: overview.capturedAt },
     observation: 'estimated' as const,
-    evidenceRef: `seo_target:${seoTargetId}:etv:${overview.etvMethodology.version}`
+    evidenceRef: `seo_target:${seoTargetId}:etv:${overview.etvMethodology.version}`,
+    // TASK-1888 — Search Console, el ranking y el ETV miden Google.
+    channelId: SEO_SEARCH_CHANNEL
   }
 
   window.months.forEach((month, index) => {

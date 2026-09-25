@@ -56,7 +56,8 @@ const YEAR_OR_DATE = /^\d{4}(-\d{2}(-\d{2})?)?$/
 
 /**
  * Las cifras DENTRO del nombre de un hecho referenciado («Keywords en primera página (≤10)»,
- * «RpA · Sky · 2026-08») son identidad del hecho —texto de la evidencia, escrito por el adapter—,
+ * «RpA · Sky · 2026-08») o de sus valores de dimensión (TASK-1888: el nombre del space que una lectura por
+ * figura cita suelto) son identidad del hecho —texto de la evidencia, escrito por el adapter—,
  * no afirmaciones de la claim. Se enmascara sólo la etiqueta LITERAL y sólo la de los hechos que
  * la claim referencia: una cifra fuera de la etiqueta, o la etiqueta de un hecho no referenciado,
  * se sigue validando. Una etiqueta sin letras no se enmascara (borraría esa cifra en todo el texto).
@@ -91,7 +92,10 @@ export const validateEditorialPlan = (plan: EditorialPlanV1, snapshot: EvidenceS
       if (fact.freshness.asOf) dateTokens.add(fact.freshness.asOf)
     }
 
-    for (const token of extractNumberTokens(maskReferencedLabels(claim.text, facts.map(fact => fact.label)))) {
+    // Etiqueta y valores de dimensión del hecho (nombre del space, proveedor) son identidad del hecho, no afirmaciones.
+    const identity = facts.flatMap(fact => [fact.label, ...Object.values(fact.dimension ?? {})])
+
+    for (const token of extractNumberTokens(maskReferencedLabels(claim.text, identity))) {
       const normalized = token.trim()
 
       if (allowed.has(normalized)) continue

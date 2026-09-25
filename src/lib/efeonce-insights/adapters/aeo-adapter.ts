@@ -11,6 +11,7 @@ import { ClientGraderReportError, readClientGraderReport } from '@/lib/growth/ai
 import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
+import { channelForAeoProvider } from '../contracts/channels'
 import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1 } from '../contracts/evidence'
 import type { ResolvedInsightWindow } from '../window'
 import { type AdapterCollectInput, type ModuleReportAdapterV1, asComparisonRejections, evidenceWindow, factId } from './contract'
@@ -79,8 +80,10 @@ const collectForWindow = async (organizationId: string, window: ResolvedInsightW
 
   for (const presence of report.providerPresence) {
     const key = `presence.${presence.provider}`
+    // TASK-1888 — canal estable del motor; un proveedor fuera del registro queda sin channelId (nombre sin isotipo).
+    const channelId = channelForAeoProvider(presence.provider)
 
-    facts.push({ ...base, factId: factId('aeo', key, window), metricId: key, label: `Presencia en ${(GH_GROWTH_AI_VISIBILITY.provider_display_label as Readonly<Record<string, string>>)[presence.provider] ?? presence.provider}`, value: presence.present, unit: 'count', numerator: presence.present, denominator: presence.resolved, comparisonFactId: comparisonIds[key] ?? null, dimension: { provider: presence.provider } })
+    facts.push({ ...base, factId: factId('aeo', key, window), metricId: key, label: `Presencia en ${(GH_GROWTH_AI_VISIBILITY.provider_display_label as Readonly<Record<string, string>>)[presence.provider] ?? presence.provider}`, value: presence.present, unit: 'count', numerator: presence.present, denominator: presence.resolved, comparisonFactId: comparisonIds[key] ?? null, dimension: { provider: presence.provider }, ...(channelId ? { channelId } : {}) })
   }
 
   return { facts, rejections, source: { module: 'aeo', adapterVersion: AEO_ADAPTER_VERSION, reader: 'readClientGraderReport', asOf, method, coverage, servedWindow: { start: asOf, endExclusive: asOf, granularity: 'period', partial: false } } as EvidenceSourceV1 }

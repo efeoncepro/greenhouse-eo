@@ -43,3 +43,12 @@ export const isInsightsDeliveryEnabled = (env: NodeJS.ProcessEnv = process.env):
  * (`ops-worker`, `/insights/schedules/tick`). Dos runtimes. Pausar y retirar funcionan con el flag OFF.
  */
 export const isInsightsSchedulesEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => isOn(env.INSIGHTS_SCHEDULES_ENABLED)
+
+/**
+ * TASK-1888 — contrato editorial v2: el planner emite las familias nuevas (bullet ICO contra la meta, línea mensual),
+ * la lectura por figura, lo esencial, las líneas de alcance y la portada sellada; el adapter ICO agrega FTR y las metas
+ * del registro. OFF ⇒ evidencia y plan v1 (con la variación en pp, que es corrección). La generación corre en DOS
+ * runtimes —Vercel (createEdition/revise/recover) y el `ops-worker` (tick de schedules)—: se declara en ambos
+ * (`services/ops-worker/deploy.sh` es su SoT). Se prende en producción sólo junto al release de TASK-1889.
+ */
+export const isInsightsEditorialV2Enabled = (env: NodeJS.ProcessEnv = process.env): boolean => isOn(env.INSIGHTS_EDITORIAL_V2_ENABLED)

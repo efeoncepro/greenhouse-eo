@@ -7,7 +7,7 @@ import 'server-only'
  */
 
 import type { EvidenceSnapshotContentV1 } from '../contracts/evidence'
-import type { EditorialPlanV1, PlanAuthoringProvenanceV1 } from '../contracts/plan'
+import type { EditorialPlanV1, PlanAuthoringProvenanceV1, PlanCoverV1 } from '../contracts/plan'
 import type { InsightModule } from '../contracts/request'
 import { InsightsEvidenceRejectedError } from '../errors'
 import { isInsightsAuthoringAiEnabled } from '../flags'
@@ -20,6 +20,10 @@ export interface AuthorEditorialPlanInput {
   modules: InsightModule[]
   locale: string
   env?: NodeJS.ProcessEnv
+  /** TASK-1888 — contrato editorial v2; el caller lo lee del flag para decidir también la evidencia. */
+  editorialV2?: boolean
+  /** TASK-1888 — portada resuelta a sellar (sólo con v2). */
+  cover?: PlanCoverV1 | null
 }
 
 export interface AuthoredEditorialPlan {
@@ -28,7 +32,7 @@ export interface AuthoredEditorialPlan {
 }
 
 export const authorEditorialPlan = async (input: AuthorEditorialPlanInput): Promise<AuthoredEditorialPlan> => {
-  const deterministic = buildDeterministicPlan(input.snapshot, { modules: input.modules, locale: input.locale })
+  const deterministic = buildDeterministicPlan(input.snapshot, { modules: input.modules, locale: input.locale, editorialV2: input.editorialV2, cover: input.cover })
   const violations = validateEditorialPlan(deterministic, input.snapshot)
 
   if (violations.length > 0) {

@@ -17,12 +17,14 @@ import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import { collectInsightEvidence } from '../adapters/collect-evidence'
+import { isReferenceFact } from '../contracts/evidence'
 import type { InsightModule } from '../contracts/request'
 import type { InsightActor, InsightFailedPhase } from '../contracts/states'
 import { authorEditorialPlan } from '../editorial/author-plan'
 import { validateEditorialPlan } from '../editorial/plan-validation'
 import { InsightsEvidenceRejectedError, InsightsNotReadyError, isInsightsError } from '../errors'
 import { publishInsightEditionStateTransitioned, publishInsightEvidenceSealed } from '../events'
+import { isInsightsEditorialV2Enabled } from '../flags'
 import { transitionInsightEditionState } from '../stores/edition-store'
 import { freezeInsightEditorialPlan, getInsightEditorialPlanByEdition, upsertInsightEditorialPlan } from '../stores/plan-store'
 import type { InsightEditionRecord } from '../stores/records'
@@ -70,7 +72,9 @@ const runCollecting = async (edition: InsightEditionRecord): Promise<void> => {
     audience: edition.audience,
     modules: edition.modules as InsightModule[],
     windows,
-    projectIds: edition.request.projectIds ?? []
+    projectIds: edition.request.projectIds ?? [],
+    // TASK-1888 — con el contrato v2 el snapshot suma FTR y metas ICO; se sella tal cual.
+    editorialV2: isInsightsEditorialV2Enabled()
   })
 
   await withGreenhousePostgresTransaction(async client => {
@@ -98,7 +102,8 @@ const runComposing = async (edition: InsightEditionRecord): Promise<void> => {
   const authored = await authorEditorialPlan({
     snapshot: { facts: snapshot.facts, sources: snapshot.sources, rejections: snapshot.rejections },
     modules: edition.modules as InsightModule[],
-    locale: edition.request.locale
+    locale: edition.request.locale,
+    editorialV2: isInsightsEditorialV2Enabled()
   })
 
   await withGreenhousePostgresTransaction(async client => {
@@ -124,7 +129,8 @@ const runValidating = async (edition: InsightEditionRecord): Promise<{ reviewOwn
 
   // Un módulo requerido sin ningún hecho bloquea la emisión salvo `allow_partial` EXPLÍCITO
   // (arquitectura §5); aun así la omisión queda visible en `limits` del plan.
-  const modulesWithoutFacts = (edition.modules as InsightModule[]).filter(module => !snapshot.facts.some(fact => fact.module === module))
+  // Una meta oficial (hecho de referencia, TASK-1888) no es evidencia del módulo: sin mediciones, el módulo está vacío.
+  const modulesWithoutFacts = (edition.modules as InsightModule[]).filter(module => !snapshot.facts.some(fact => fact.module === module && !isReferenceFact(fact)))
 
   if (modulesWithoutFacts.length > 0 && edition.request.policy?.allowPartial !== true) {
     throw new InsightsEvidenceRejectedError('Módulos requeridos sin evidencia; la policy no permite omisiones', {
