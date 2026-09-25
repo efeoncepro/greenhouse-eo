@@ -88,6 +88,32 @@
       ]
     },
     {
+      "id": "aeo-creative-composition",
+      "triggers": [
+        "pieza creativa AEO",
+        "recurso creativo AEO",
+        "búsqueda con IA en una pieza",
+        "caja de búsqueda IA",
+        "composer de ChatGPT",
+        "composer de Gemini",
+        "burbuja de ChatGPT",
+        "burbuja de Gemini",
+        "respuesta citada en una pieza",
+        "cita de ChatGPT",
+        "cita de Gemini",
+        "AI Mode en una pieza",
+        "recursos creativos de AXIS"
+      ],
+      "skills": [
+        "efeonce-advertising-creative",
+        "axis-design-system"
+      ],
+      "sources": [
+        "docs/operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md",
+        "docs/manual-de-uso/creative/componer-recursos-aeo-con-axis.md"
+      ]
+    },
+    {
       "id": "axis-collaboration-selection",
       "triggers": [
         "selección colaborativa",

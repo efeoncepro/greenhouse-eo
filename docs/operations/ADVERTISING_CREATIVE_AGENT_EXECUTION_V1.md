@@ -25,6 +25,12 @@ permite explorar funciones, familias, contraste, espaciado y aplicaciones. Las r
 datos siguen viviendo en `../axis-design-system/docs/creative-applications/advertising-social/DESIGN.md` y en
 los paquetes AXIS; la página pública es una superficie didáctica, no un segundo SSOT.
 
+### Recursos AEO componibles para piezas comerciales
+
+Si el brief pide evocar búsqueda con IA, una conversación LLM o citabilidad, consulta el [índice de composición de AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/README.md) y la [galería pública](https://axis.efeonce.org/references/creative-resources/). Los resolvers locales del repo hermano exportan SVG y manifest para caja de búsqueda (`search:compose`), los cuatro SVG originales con texto (`search:compose-original`), composer aislado de ChatGPT/Gemini (`llm-composer:compose`) y conversación o módulo de turno/respuesta/cita (`aeo:compose`). El [manual operativo](../manual-de-uso/creative/componer-recursos-aeo-con-axis.md) explica cómo elegirlos y ensamblarlos.
+
+Esta biblioteca **no** modifica `axisAdvertising` ni implica que los gráficos estén aprobados o publicados como paquete/adapter/MCP. Cada pieza conserva brief, procedencia, verificación de fuentes, revisión visual y gate comercial. Nunca conviertas una muestra editorial en una supuesta respuesta real ni mezcles controles, citas o logos de proveedores. La lupa de Modo IA de Google no lleva aro arcoíris; la selección de búsqueda de ChatGPT no se añade al texto de la burbuja enviada.
+
 ## Activación
 
 Los routers raíz y el manifiesto machine-readable cargan `efeonce-advertising-creative` cuando el pedido menciona

@@ -1,6 +1,6 @@
 ---
 name: efeonce-advertising-creative
-description: Orquesta piezas publicitarias y de social media con texto —posts, stories, reels, covers, banners, key visuals, brochure, OOH y motion— aplicando contratos AXIS de tipografía y selección colaborativa, Bricolage/Poppins/Guttery reales, bounding boxes adaptativos, cursores semánticos, contraste y accesibilidad. Úsala al crear, corregir o auditar una pieza, componer texto o multiplayer sobre imagen o preparar variantes. No sustituye la estrategia de canal ni autoriza publicación.
+description: Orquesta piezas publicitarias y sociales con texto, incluidos recursos AEO de búsqueda con IA, ChatGPT/Gemini, turnos, respuestas y citas; aplica contratos AXIS de tipografía y selección colaborativa, fuentes reales, bounding boxes adaptativos, contraste y accesibilidad. Úsala al crear, corregir o auditar una pieza, componer texto o presencia multiplayer sobre imagen o preparar variantes. No autoriza publicación.
 ---
 
 # Efeonce Advertising Creative
@@ -22,6 +22,8 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
 3. Carga la skill tipográfica activa y sólo las referencias que apliquen:
    - [ink, jerarquía y espaciado](../../../.codex/skills/greenhouse-typography-accessibility/references/campaign-ink-metrics-and-hierarchy.md);
    - [casos reales y reconstrucciones didácticas](../../../.codex/skills/greenhouse-typography-accessibility/references/real-campaign-typography-cases.md).
+   Si la pieza evoca búsqueda con IA, un chat LLM, AEO o citabilidad, carga además `axis-design-system`
+   §«AEO creative graphics» y el [índice de composición del repo hermano](../../../../axis-design-system/docs/agent-composition/README.md).
 4. Para social, compón con `social-media-studio`; para imagen generada, con
    `greenhouse-ai-image-generator` y `greenhouse-ai-creative-rights-governance`; para video/motion, con
    `motion-design-studio`; para copy, con `copywriting`; para marca Efeonce, con `efeonce-brand-studio`.
@@ -48,6 +50,20 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    con sus seis tells como checklist de QA; y **§2.4**, la medición propia de que el motor resuelve toda
    escena imposible en idioma de render. Sus cifras traen fuente, muestra y `as-of`; aun así, reverifica
    fecha y aplicabilidad antes de citarlas.
+
+### Piezas AEO con interfaces componibles
+
+Usa el [manual de composición AXIS](../../../docs/manual-de-uso/creative/componer-recursos-aeo-con-axis.md)
+para elegir campo de búsqueda, SVG original, composer de ChatGPT/Gemini, burbuja, respuesta o cita. Trabaja
+desde `../axis-design-system`: cambia el JSON de intención y exporta SVG editable más `manifest.json` con
+`search:compose`, `search:compose-original`, `llm-composer:compose` o `aeo:compose`; luego incorpora solo los
+módulos que la idea necesita. Conserva el brief y gate creativo de esta skill. Pregunta todavía no enviada,
+turno enviado, respuesta y fuente son momentos distintos. Una muestra `editorial-sample` nunca se presenta
+como respuesta real; una captura `captured-output` requiere referencia, fecha y cotejo de citas/pasajes.
+Respeta la anatomía propia de Google Search, ChatGPT y Gemini: no añadas un aro arcoíris a la lupa de AI Mode,
+ni «Búsqueda web» al texto de la burbuja enviada de ChatGPT. Revisa legibilidad y fidelidad en el master y
+en el tamaño final. La biblioteca está disponible para explorar y componer, pero sus contratos gráficos
+siguen siendo candidatos, sin aprobación de marca o publicación automática.
 
 7. **Al adaptar una pieza a 9:16 o 16:9, o al componer un CTA**, carga
    [safe zones y trampas de formato](references/paid-format-safe-zones-and-craft.md) (`as-of 2026-09-22`,

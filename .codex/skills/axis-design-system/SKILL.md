@@ -1,6 +1,6 @@
 ---
 name: axis-design-system
-description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including portable advertising typography and semantic collaboration-selection intents with adaptive bounding boxes, local cursors and multiplayer presence."
+description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including advertising typography, semantic collaboration selection, and candidate AEO creative graphics for AI search, ChatGPT/Gemini composers, turns, answers and citations."
 ---
 
 # AXIS Design System
@@ -117,22 +117,29 @@ The portable advertising and collaboration contracts are published in the AXIS `
 pins that exact set and its Campaign Layout Compiler implements the first non-Lab adapter for
 `headline|support|hook|lockup`; this evidence does not imply that Globe or another runtime has adopted it.
 
-### AEO conversation graphics for creative agents (local candidate)
+### AEO creative graphics for agents (local candidate)
 
-For a commercial creative piece that evokes a ChatGPT or Gemini conversation, use the sibling AXIS
-[composition contract](../../../../axis-design-system/docs/agent-composition/llm-answer-interfaces.md) and its
-[JSON intent schema](../../../../axis-design-system/docs/agent-composition/aeo-conversation-intent.schema.json).
-Author the question, answer, source IDs, URLs, favicon provenance, provider, state, output modules and format.
-From `../axis-design-system` run:
+For a commercial piece evoking AEO, search with AI, a ChatGPT/Gemini conversation or citability, start at the sibling AXIS
+[agent composition index](../../../../axis-design-system/docs/agent-composition/README.md) and the
+[public Creative Resources Lab](https://axis.efeonce.org/references/creative-resources/). Compose this skill with
+`efeonce-advertising-creative`; the [Greenhouse manual](../../docs/manual-de-uso/creative/componer-recursos-aeo-con-axis.md)
+describes how to place the output in a campaign piece. Select the smallest requested resource:
 
-```bash
-pnpm aeo:compose --input docs/examples/aeo-composition/efeonce-chatgpt.json --out-dir /tmp/pieza-aeo
-```
+| Intent | Command in `../axis-design-system` | Do not infer |
+| --- | --- | --- |
+| Search field, AI action, icon or suggestion | `pnpm search:compose --input docs/examples/ai-search-graphic/efeonce-suggestions.json --out-dir /tmp/axis-search` | Google suggestions or answer from an Efeonce editorial field |
+| Text in one of the four original search SVGs | `pnpm search:compose-original --input docs/examples/original-search-intent.json --out-dir /tmp/axis-original` | Static pointers/checks as live interaction |
+| Standalone ChatGPT or Gemini composer | `pnpm llm-composer:compose --input docs/examples/llm-composer-chatgpt-intent.json --out-dir /tmp/axis-composer` | A submitted turn or response |
+| Full conversation, provider app, user turn, answer, citation or related source | `pnpm aeo:compose --input docs/examples/aeo-composition/efeonce-chatgpt.json --out-dir /tmp/axis-conversation` | Source evidence from a merely plausible URL |
 
-The local command emits editable SVG modules and a manifest with source bindings. For a provider-specific desktop application scene, request `app` for ChatGPT or Gemini; `full` means the conversation module. Gemini `app` uses the observed anonymous dark shell. It uses the Lab renderer;
-review the final pixels and the actual support for every cited claim. Keep `editorial-sample` visible unless
-transcribing one observed interaction with its reference and date. The CLI and schema are candidate, local-only:
-not a published AXIS package contract, a live LLM result, a product adapter or creative approval.
+Edit the JSON intent, not the SVG geometry. The local commands emit editable SVG and `manifest.json`; use
+`modules` and `targets` for an isolated turn, answer or citation. The ChatGPT search tool belongs in the
+composer, not the sent user bubble. The Google AI Mode magnifier has a sparkle and no rainbow ring; the
+Efeonce rainbow field is a separate hypothesis. Keep provider-specific logos, controls and citation anatomy
+separate. Verify each cited passage, favicon host, provenance and final pixels. `editorial-sample` is an
+example; `captured-output` needs a real interaction, reference and date. These tools are local candidate
+resolvers, not published package contracts, a Greenhouse/Globe adapter, an MCP tool, a live model result or
+creative approval.
 
 ### AXIS Lab
 

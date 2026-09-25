@@ -29,6 +29,8 @@ expone estas decisiones como una experiencia interactiva para diseñadores y age
 familia, permite construir una receta por soporte, longitud e intención, y reúne comparaciones DO/DON'T. Es una
 proyección didáctica del contrato `trial`; AXIS conserva el SSOT y cada pieza conserva su revisión propia.
 
+Para piezas comerciales que hablen de **AEO, búsqueda con IA o citabilidad**, AXIS ofrece una [galería de recursos creativos](https://axis.efeonce.org/references/creative-resources/) y un [índice para agentes](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/README.md). Desde JSON de intención, los agentes pueden exportar SVG editables de cajas de búsqueda, las ilustraciones originales con otro texto, composers de ChatGPT/Gemini, turnos, respuestas y citas. Cada salida incluye un manifest de procedencia y relaciones entre citas y fuentes. Son referencias candidatas para componer una pieza; no respuestas verificadas de un modelo, controles de producto integrados ni recursos de marca aprobados. El [manual de composición](../../manual-de-uso/creative/componer-recursos-aeo-con-axis.md) recoge los comandos y límites.
+
 La misma entrada puede orquestar `efeonce.collaboration-selection` cuando el concepto muestra selección activa o
 presencia multiplayer. El agente describe relaciones —qué texto/objeto/grupo está seleccionado, qué cursor actúa
 en qué anclaje y quién sólo se mueve por el canvas— y AXIS las normaliza en un manifest independiente del motor.
