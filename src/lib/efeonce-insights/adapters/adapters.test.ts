@@ -298,13 +298,17 @@ describe('TASK-1888 — evidencia del contrato editorial v2', () => {
 
     const targets = Object.fromEntries(result.facts.filter(fact => fact.role === 'reference').map(fact => [fact.metricId, [fact.value, fact.dimension?.direction]]))
     const { ICO_METRIC_REGISTRY } = await vi.importActual<typeof MetricRegistry>('@/lib/ico-engine/metric-registry')
-    const optimal = (id: string) => ICO_METRIC_REGISTRY.find(metric => metric.id === id)!.thresholds.optimal
+    const thresholds = (id: string) => ICO_METRIC_REGISTRY.find(metric => metric.id === id)!.thresholds
 
     // Los valores salen del registro dueño, no de literales: se comparan contra el registro, no contra 90/80/1,5.
+    // La banda «cerca de la meta» es el borde exterior de la zona `attention` del MISMO registro (nunca meta × 0,85).
     expect(targets).toEqual({
-      'target.otd': [optimal('otd_pct').min, 'higher_is_better'],
-      'target.ftr': [optimal('ftr_pct').min, 'higher_is_better'],
-      'target.rpa': [optimal('rpa').max, 'lower_is_better']
+      'target.otd': [thresholds('otd_pct').optimal.min, 'higher_is_better'],
+      'band.otd': [thresholds('otd_pct').attention.min, 'higher_is_better'],
+      'target.ftr': [thresholds('ftr_pct').optimal.min, 'higher_is_better'],
+      'band.ftr': [thresholds('ftr_pct').attention.min, 'higher_is_better'],
+      'target.rpa': [thresholds('rpa').optimal.max, 'lower_is_better'],
+      'band.rpa': [thresholds('rpa').attention.max, 'lower_is_better']
     })
   })
 
@@ -324,7 +328,7 @@ describe('TASK-1888 — evidencia del contrato editorial v2', () => {
     const result = await icoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
 
     expect(result.rejections.map(rejection => [rejection.metricId, rejection.reason])).toEqual([['ftr', 'no_data']])
-    expect(result.facts.some(fact => fact.metricId === 'target.ftr')).toBe(false)
+    expect(result.facts.some(fact => fact.metricId === 'target.ftr' || fact.metricId === 'band.ftr')).toBe(false)
   })
 
   it('AEO: cada proveedor del grader tiene channelId estable; uno desconocido queda sin channelId', async () => {

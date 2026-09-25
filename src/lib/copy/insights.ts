@@ -102,6 +102,13 @@ export const GH_INSIGHTS = {
     rpa: 'Meta de rondas de revisión por pieza'
   } as Readonly<Record<string, string>>,
 
+  /** TASK-1888 — límite de la zona «cerca de la meta» (borde de la zona de atención del registro ICO), como hecho citable. */
+  bands: {
+    otd: 'Umbral de atención de entregas a tiempo',
+    ftr: 'Umbral de atención de primera entrega correcta',
+    rpa: 'Umbral de atención de rondas de revisión por pieza'
+  } as Readonly<Record<string, string>>,
+
   /** TASK-1888 — títulos de figura por familia (sin cifras: la cifra va en la página, desde su hecho). */
   figures: {
     bulletTitle: 'contra la meta',

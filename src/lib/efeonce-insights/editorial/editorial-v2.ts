@@ -37,8 +37,10 @@ const fmt = (fact: EvidenceFactV1, locale: string): string => formatFactValue(fa
 export const bulletCharts = (moduleKey: InsightModule, facts: EvidenceFactV1[], references: EvidenceFactV1[]): ChartSpecV1[] => {
   if (!canProduceFamily('bullet', moduleKey)) return []
 
-  return references.flatMap(target => {
+  return references.filter(reference => reference.metricId.startsWith('target.')).flatMap(target => {
     const metricId = target.metricId.replace(/^target\./, '')
+    // Banda «cerca de la meta» del mismo registro, si el adapter la entregó (TASK-1888, pedido de TASK-1889).
+    const band = references.find(reference => reference.metricId === `band.${metricId}` && reference.value !== null)
     const measured = facts.filter(fact => fact.metricId === metricId && fact.value !== null)
     const lastMonth = measured.map(monthOf).filter((month): month is string => month !== null).sort().at(-1) ?? null
     const items = lastMonth ? measured.filter(fact => monthOf(fact) === lastMonth) : measured
@@ -65,7 +67,7 @@ export const bulletCharts = (moduleKey: InsightModule, facts: EvidenceFactV1[], 
       data: {
         kind: 'bullet' as const,
         direction: target.dimension?.direction === 'lower_is_better' ? ('lower_is_better' as const) : ('higher_is_better' as const),
-        items: items.map(item => ({ itemId: `${chartId}.${item.factId}`, label: itemLabel(item), valueFactId: item.factId, targetFactId: target.factId }))
+        items: items.map(item => ({ itemId: `${chartId}.${item.factId}`, label: itemLabel(item), valueFactId: item.factId, targetFactId: target.factId, ...(band ? { bandFactId: band.factId } : {}) }))
       }
     }]
   })

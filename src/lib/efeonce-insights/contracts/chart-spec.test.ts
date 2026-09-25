@@ -105,6 +105,18 @@ describe('TASK-1888 — ChartSpec: 15 familias', () => {
     expect(rules(dataSpec({ kind: 'bullet', direction: 'higher_is_better', items: [] }, 'target'))).toContain('bullet_items_required')
   })
 
+  it('bullet: la banda «cerca de la meta» es un hecho positivo del lado donde aún no se alcanza', () => {
+    const bullet = (direction: 'higher_is_better' | 'lower_is_better', targetFactId: string, bandFactId: string) =>
+      dataSpec({ kind: 'bullet', direction, items: [{ itemId: 'i', label: 'OTD', valueFactId: 'v81', targetFactId, bandFactId }] }, 'target')
+
+    expect(rules(bullet('higher_is_better', 't90', 'v80'))).toEqual([])
+    expect(rules(bullet('higher_is_better', 't90', 's120'))).toEqual(['bullet_band_side'])
+    expect(rules(bullet('lower_is_better', 'v80', 't90'))).toEqual([])
+    expect(rules(bullet('lower_is_better', 't90', 'v80'))).toEqual(['bullet_band_side'])
+    expect(rules(bullet('higher_is_better', 't90', 'null'))).toEqual(['bullet_band_side'])
+    expect(rules(bullet('higher_is_better', 't90', 'nope'))).toContain('unknown_fact')
+  })
+
   it('medidor: valor anterior obligatorio y todo dentro de la escala', () => {
     const gauge = (valueFactId: string, previousFactId: string) => dataSpec({ kind: 'gauge', valueFactId, previousFactId, targetFactId: null, min: 0, max: 100 }, 'target')
 

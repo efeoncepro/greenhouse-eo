@@ -78,6 +78,17 @@ const valueViolations = (spec: ChartSpecV1, values: ChartFactValues, push: (rule
         }
 
         guard(() => bulletGeometry(current, target))
+
+        // La banda «cerca de la meta» vive del lado donde todavía no se alcanza: bajo la meta si mayor es mejor, sobre
+        // ella si menor es mejor. Una banda del lado equivocado dibujaría como «casi» un valor que ya la superó.
+        if (item.bandFactId) {
+          const band = value(item.bandFactId)
+          const wrongSide = band !== null && (data.direction === 'higher_is_better' ? band >= target : band <= target)
+
+          if (band === null || band <= 0 || wrongSide) {
+            push('bullet_band_side', `la banda del ítem ${item.itemId} debe ser positiva y quedar ${data.direction === 'higher_is_better' ? 'bajo' : 'sobre'} la meta`)
+          }
+        }
       }
 
       break

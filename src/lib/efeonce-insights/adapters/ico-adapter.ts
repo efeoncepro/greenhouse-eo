@@ -44,12 +44,19 @@ const TARGET_METRICS: ReadonlyArray<{ metricId: keyof typeof ICO_SNAPSHOT_METRIC
  * literal: el umbral inferior de la zona óptima si la métrica mejora al subir (OTD 90, FTR 80), el superior si
  * mejora al bajar (RpA 1,5). Es un hecho de REFERENCIA: se puede citar en un gráfico o una frase, no es un hallazgo.
  */
-export const icoOfficialTarget = (metricId: keyof typeof ICO_SNAPSHOT_METRIC_IDS): { value: number; higherIsBetter: boolean } | null => {
+export const icoOfficialTarget = (metricId: keyof typeof ICO_SNAPSHOT_METRIC_IDS): { value: number; band: number; higherIsBetter: boolean } | null => {
   const definition = getMetricById(ICO_SNAPSHOT_METRIC_IDS[metricId])
 
   if (!definition) return null
 
-  return { value: definition.higherIsBetter ? definition.thresholds.optimal.min : definition.thresholds.optimal.max, higherIsBetter: definition.higherIsBetter }
+  const { optimal, attention } = definition.thresholds
+
+  // Banda «cerca de la meta» = el borde exterior de la zona `attention` del MISMO registro (OTD 70, FTR 60, RpA 2,5).
+  return {
+    value: definition.higherIsBetter ? optimal.min : optimal.max,
+    band: definition.higherIsBetter ? attention.min : attention.max,
+    higherIsBetter: definition.higherIsBetter
+  }
 }
 
 export const listOrganizationSpaces = async (organizationId: string): Promise<SpaceRow[]> =>
@@ -157,13 +164,13 @@ const targetFacts = (measured: EvidenceFactV1[], window: ResolvedInsightWindow):
 
     if (!target || !measured.some(fact => fact.metricId === metricId)) return []
 
-    return [{
+    const reference = (kind: 'target' | 'band', value: number): EvidenceFactV1 => ({
       factVersion: 'evidence_fact_v1' as const,
-      factId: factId('ico', `target.${metricId}`, window),
+      factId: factId('ico', `${kind}.${metricId}`, window),
       module: 'ico' as const,
-      metricId: `target.${metricId}`,
-      label: GH_INSIGHTS.targets[metricId] ?? metricId,
-      value: target.value,
+      metricId: `${kind}.${metricId}`,
+      label: (kind === 'target' ? GH_INSIGHTS.targets : GH_INSIGHTS.bands)[metricId] ?? metricId,
+      value,
       unit,
       numerator: null,
       denominator: null,
@@ -178,7 +185,9 @@ const targetFacts = (measured: EvidenceFactV1[], window: ResolvedInsightWindow):
       comparisonFactId: null,
       dimension: { metric: metricId, direction: target.higherIsBetter ? 'higher_is_better' : 'lower_is_better' },
       role: 'reference' as const
-    }]
+    })
+
+    return [reference('target', target.value), reference('band', target.band)]
   })
 
 export const icoReportAdapter: ModuleReportAdapterV1 = {

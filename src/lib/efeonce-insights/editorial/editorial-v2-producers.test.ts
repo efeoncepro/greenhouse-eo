@@ -103,6 +103,18 @@ describe('TASK-1888 — productores v2 (ICO)', () => {
     expect(chapter.charts.find(chart => chart.chartId === 'chart.ico.bullet.rpa')!.data).toMatchObject({ direction: 'lower_is_better' })
   })
 
+  it('con banda del registro, cada ítem del bullet la cita; sin banda, el bullet sigue válido', () => {
+    const band = { ...target('otd', 70, 'percent', 'higher_is_better'), factId: 'ico.band.otd.w', metricId: 'band.otd', label: 'Umbral otd' }
+    const withBand = { ...icoSnapshot, facts: [...icoSnapshot.facts, band] }
+    const plan = v2(withBand, ['ico'])
+    const otd = plan.chapters[0]!.charts.find(chart => chart.chartId === 'chart.ico.bullet.otd')!
+
+    expect(otd.data).toMatchObject({ items: [{ bandFactId: 'ico.band.otd.w', targetFactId: 'ico.target.otd.w' }] })
+    expect(validateEditorialPlan(plan, withBand)).toEqual([])
+    expect(plan.chapters[0]!.charts.filter(chart => chart.family === 'bullet')).toHaveLength(3)
+    expect((v2(icoSnapshot, ['ico']).chapters[0]!.charts.find(chart => chart.chartId === 'chart.ico.bullet.otd')!.data as { items: object[] }).items[0]).not.toHaveProperty('bandFactId')
+  })
+
   it('la lectura es factual: posición contra la meta y un próximo paso SÓLO si hay brecha', () => {
     const chapter = v2(icoSnapshot, ['ico']).chapters[0]!
     const reading = (chartId: string) => chapter.readings!.find(item => item.chartId === chartId)!

@@ -86,6 +86,12 @@ export interface ChartBulletItemV1 {
   valueFactId: string
   /** La meta es un HECHO (leído del registro dueño, p. ej. ICO), nunca un literal del planner. */
   targetFactId: string
+  /**
+   * Límite de la zona «cerca de la meta», también un HECHO del registro dueño (ICO: `attention.min` si mayor es mejor,
+   * `attention.max` si menor es mejor). Opcional: sin él, el bullet no dibuja banda. NUNCA una fracción de la meta
+   * escrita en el render (el semáforo tiene una sola fuente).
+   */
+  bandFactId?: string
   channelId?: InsightChannelId
 }
 
@@ -211,7 +217,10 @@ export const chartSpecFactIds = (spec: ChartSpecV1): string[] => {
   if (data) {
     switch (data.kind) {
       case 'bullet':
-        data.items.forEach(item => ids.push(item.valueFactId, item.targetFactId))
+        data.items.forEach(item => {
+          ids.push(item.valueFactId, item.targetFactId)
+          if (item.bandFactId) ids.push(item.bandFactId)
+        })
         break
       case 'gauge':
         ids.push(data.valueFactId, data.previousFactId)
