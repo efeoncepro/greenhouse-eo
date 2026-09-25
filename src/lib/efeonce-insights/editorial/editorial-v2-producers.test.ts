@@ -332,6 +332,12 @@ describe('TASK-1888 — superlativos únicos, esenciales sólo de hallazgos y af
 
     expect(conclusionOf(plan, 'chart.aeo.count')?.text).toBe('Todos los motores mencionan la marca en 2 de 6.')
     expect(texts.join(' ')).not.toMatch(/el motor que más/)
+
+    // La bajada de la cifra principal es la figura (el empate no tiene dueño), nunca «Presencia en gemini.».
+    const reading = plan.chapters[0]!.readings!.find(item => item.chartId === 'chart.aeo.count')!
+
+    expect(reading.keyFigure!.caption.text).toBe('Presencia por motor.')
+    expect(reading.keyFigure!.caption.text).not.toMatch(/Presencia en/)
   })
 
   it('un empate parcial nombra a los empatados; un máximo único conserva el superlativo', () => {
@@ -344,11 +350,15 @@ describe('TASK-1888 — superlativos únicos, esenciales sólo de hallazgos y af
 
   it('dos dimensiones en 100 no producen «la mejor evaluada»', () => {
     const dimension = (key: string, label: string, value: number): EvidenceFactV1 => ({ ...aeo(key, value), factId: `aeo.dimension.${key}.w`, metricId: `dimension.${key}`, label, unit: 'score', numerator: null, denominator: null, dimension: { dimension: key } })
-    const plan = v2({ facts: [dimension('entity_clarity', 'Claridad de entidad', 100), dimension('competitive_sov', 'Share of voice competitivo', 100), dimension('ai_visibility', 'Visibilidad en IA', 0)], sources: [], rejections: [] }, ['aeo'])
+    const snapshot = { facts: [dimension('entity_clarity', 'Claridad de entidad', 100), dimension('competitive_sov', 'Share of voice competitivo', 100), dimension('ai_visibility', 'Visibilidad en IA', 0)], sources: [], rejections: [] }
+    const plan = v2(snapshot, ['aeo'])
     const text = conclusionOf(plan, 'chart.aeo.score')?.text ?? ''
 
     expect(text).not.toMatch(/La dimensión mejor evaluada es/)
     expect(text).toBe('Las dimensiones mejor evaluadas son claridad de entidad y share of voice competitivo: 100.')
+    // Bajada del empate sin «(0 a 100)»: cifras que ningún hecho citado respalda (violación vista en Berel real).
+    expect(plan.chapters[0]!.readings!.find(item => item.chartId === 'chart.aeo.score')!.keyFigure!.caption.text).toBe('Dimensiones evaluadas.')
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
   })
 
   it('«Lo esencial» no cita valores sueltos ni variaciones de 0,0 %; las afirmaciones del capítulo usan verbo con concordancia', () => {

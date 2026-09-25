@@ -15,7 +15,7 @@ import type { EvidenceFactV1 } from '../contracts/evidence'
 import type { PlanChapterV1, PlanClaimV1, PlanFigureReadingV1 } from '../contracts/plan'
 import { PLAN_ESSENTIALS_MAX, PLAN_TEXT_LIMITS } from '../contracts/plan'
 import type { InsightModule } from '../contracts/request'
-import { hasFigurePage } from '../render/figure-slots'
+import { essentialTitleOf, hasFigurePage } from '../render/figure-slots'
 import { canProduceFamily } from './family-evidence-matrix'
 import { formatDeltaForUnit, formatFactValue } from './format'
 
@@ -249,6 +249,23 @@ const printedChange = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, 
   return change && fmt(change.previous, locale) !== fmt(fact, locale) ? change : null
 }
 
+/**
+ * Nombre común de hechos empatados: el de su familia de métrica («Presencia por motor»); si no, el título de la figura
+ * (`essentialTitleOf`, la regla con que TASK-1889 titula la esencial) sin su paréntesis de unidad; y si aún lleva cifras
+ * («Puntaje (0 a 100)»), el nombre del módulo. Una bajada validada no puede traer números que ningún hecho respalda.
+ */
+const tieSubject = (factIds: string[], byId: Map<string, EvidenceFactV1>, chart: ChartSpecV1): string => {
+  const families = new Set(factIds.map(id => byId.get(id)?.metricId.split('.')[0] ?? ''))
+  const family = families.size === 1 ? [...families][0]! : ''
+  const byFamily = GH_INSIGHTS.tieSubjects[family]
+
+  if (byFamily) return byFamily
+
+  const title = essentialTitleOf(claim('tie', '', factIds), byId, [chart]).replace(/\s*\([^)]*\)\s*$/, '')
+
+  return /\d/.test(title) ? chart.title.split(' · ')[0]!.replace(/\d/g, '').trim() : title
+}
+
 /** Enumeración humana: «A», «A y B», «A, B y C». */
 const listOf = (names: string[]): string => (names.length <= 1 ? names.join('') : `${names.slice(0, -1).join(', ')} ${R.and} ${names.at(-1)}`)
 
@@ -438,7 +455,13 @@ const barReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, local
 
   return {
     chartId: chart.chartId,
-    keyFigure: { factId: key.factId, value: fmt(key, locale), caption: claim(`${chart.chartId}.key`, `${subjectOf(key, context)}.`, [key.factId]) },
+    // Un empate (la conclusión cita varios hechos medidos) no tiene un dueño: la bajada de la cifra es el título de la
+    // figura, con la MISMA regla que titula su esencial (`essentialTitleOf`, TASK-1889), nunca el primer empatado.
+    keyFigure: {
+      factId: key.factId,
+      value: fmt(key, locale),
+      caption: claim(`${chart.chartId}.key`, `${cited.length > 1 && !biggest ? tieSubject(cited, byId, chart) : subjectOf(key, context)}.`, cited.length > 1 && !biggest ? cited : [key.factId])
+    },
     conclusion: claim(`${chart.chartId}.${finding ? 'conclusion' : 'value'}`, conclusionText, cited),
     nextStep: null
   }

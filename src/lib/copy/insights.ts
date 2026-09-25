@@ -175,6 +175,15 @@ export const GH_INSIGHTS = {
    * TASK-1888 — sujeto con concordancia de cada métrica para las afirmaciones v2 («Las impresiones bajaron de…»). Sin
    * entrada, la forma compacta sin verbo («Presencia en Gemini: 2 de 6.»): nunca un verbo con la concordancia adivinada.
    */
+  /**
+   * TASK-1888 — nombre común de un grupo de hechos empatados (bajada de la cifra principal cuando la conclusión es un
+   * empate), por familia de métrica. Sin cifras: la bajada es una afirmación validada y «(0 a 100)» serían números.
+   */
+  tieSubjects: {
+    presence: 'Presencia por motor',
+    dimension: 'Dimensiones evaluadas'
+  } as Readonly<Record<string, string>>,
+
   metricSubjects: {
     clicks: { subject: 'Los clics orgánicos', plural: true },
     impressions: { subject: 'Las impresiones', plural: true },
