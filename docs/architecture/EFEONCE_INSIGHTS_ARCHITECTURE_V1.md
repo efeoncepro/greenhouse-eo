@@ -1076,7 +1076,7 @@ contra PostgreSQL real (transacción revertida), `pnpm worker:runtime-deps-gate`
 | Capability | `insights.cover_preference.manage` (Admin + Account); leer = `insights.report.read` | seed en `capabilities_registry` + grant |
 | Evento | `insights.cover_preference.updated` (`insight_cover_preference`) | catálogo actualizado |
 | Lanes | `GET/POST /api/platform/{app,ecosystem}/insights/cover-preference` | construidos (escritura ecosystem sólo binding interno) |
-| MCP | `get_insight_cover_preference`, `set_insight_cover_preference` (manifest 64 tools, hash `a08f649aab8f`) | en Greenhouse; federadas en [`efeonce-mcp#18`](https://github.com/efeoncepro/efeonce-mcp/pull/18) (gateway 1.8.0, superficie 58 → 60; lectura con el scope base y escritura con `efeonce.mcp.insights.write` reusado, sin scope ni Entra nuevos), **sin merge ni deploy**: se despliega después del release de Greenhouse |
+| MCP | `get_insight_cover_preference`, `set_insight_cover_preference` (manifest 64 tools, hash `a08f649aab8f`) | en Greenhouse; federadas en [`efeonce-mcp#18`](https://github.com/efeoncepro/efeonce-mcp/pull/18) (gateway 1.9.0 sobre Marketing Studio 1.8.0, superficie 70 → 72; lectura con el scope base y escritura con `efeonce.mcp.insights.write` reusado, sin scope ni Entra nuevos), **sin merge ni deploy**: se despliega después del release de Greenhouse |
 | Flag | `INSIGHTS_EDITORIAL_V2_ENABLED` (Vercel + `ops-worker`, default OFF) | OFF en todo runtime |
 | Preview | `scripts/insights/preview-edition.ts --editorial-v2 --plan-only` | construido |
 

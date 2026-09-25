@@ -330,7 +330,7 @@ Detalle en arquitectura §14.8 y en `contracts.md` § Editorial contract v2.
 | Cloud SQL compartida | `insight_cover_preferences`, `organizations.logo_on_dark_asset_id`, capability | aplicado | `information_schema` + `capabilities_registry` 2026-09-25 |
 | Vercel (staging/prod) | contrato v2, lanes, commands | no desplegado | — |
 | `ops-worker` | lectura del flag (`:-false`) | no desplegado | `deploy-contract.test.ts` |
-| Gateway `efeonce-mcp` | 2 tools federadas (1.8.0) | PR #18 abierto, sin merge ni deploy | `pnpm check` 206/206 |
+| Gateway `efeonce-mcp` | 2 tools federadas (1.9.0, superficie 70 → 72) | PR #18 abierto y mergeable (main integrado en `d288d8e`), sin merge ni deploy | `pnpm check` 219/219 |
 | Local | plan v2 sobre datos reales | verde | Sky 9 hechos/0 violaciones; Berel 24 hechos/0 violaciones |
 
 **Decisiones de Discovery:** plan y spec conservan su versión (campos opcionales); la meta ICO es un hecho `reference`

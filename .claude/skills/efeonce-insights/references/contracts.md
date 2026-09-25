@@ -227,6 +227,6 @@ With the flag OFF the adapters return v1 evidence and the planner emits a v1 pla
   `insights.cover_preference.updated` `{ version: 1, organizationId, coverTheme, previousCoverTheme, actorKind }`.
   Lanes: `GET|POST /api/platform/{app,ecosystem}/insights/cover-preference` (ecosystem write = internal binding only).
   MCP: `get_insight_cover_preference` (base scope), `set_insight_cover_preference` (`efeonce.mcp.insights.write`,
-  reused; gateway PR efeonce-mcp#18, 1.8.0, contract `task-1888-v1`, not deployed).
+  reused; gateway PR efeonce-mcp#18, 1.9.0 on top of Marketing Studio 1.8.0, contract `task-1888-v1`, not deployed).
 - **Percent deltas** — a metric already in percent varies in pp (`formatDeltaPoints`, «+1,8 pp»; two decimals under
   0,05 pp). Relative deltas stay for absolute metrics. Sealed plans with the old relative text still validate.
