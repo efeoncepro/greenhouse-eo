@@ -59,7 +59,7 @@
 - Pendiente de aprobación del operador: portada, apertura y contraportada del deck; índice, tabla,
   límites y narrativa A4; narrativa y límites del deck (sin página en el canvas).
 - Pendiente de cablear (datos ya emitidos por el planner v2 de TASK-1888 bajo su flag): «Lo esencial»
-  en el resumen, `chapter.opening` (ya leído), lecturas por figura y páginas de gráfico (Slice 4).
+  en el resumen. `chapter.opening` y las lecturas por figura ya se leen (Slice 4).
 
 ## Status
 
@@ -76,7 +76,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Slices 1–2 code complete; Slices 3–5 pendientes`
+- Status real: `Slices 1–4 code complete; Slice 5 (dossier, ediciones Berel/Sky, release) pendiente`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1888` (Slices 3–5 necesitan su contrato; Slices 1–2 ya pueden empezar)
