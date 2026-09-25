@@ -6,9 +6,39 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-25
+
+- **Slices 1–2 code complete** (commits `d357e0224`, `b649080c7`, sin push). Fidelidad al canvas con
+  `pnpm insights:canvas-fidelity`: 11 páginas con referencia, máximo 0,048 % (seis en 0 px). Gate visual
+  scoped congelado (20 frames, 0 px).
+- **Decisión del operador: las v2 REEMPLAZAN a las v1** (no conviven). Cada plantilla del canvas tomó el
+  nombre y contentType canónicos de la v1 y la v1 se borró; los mappers componen el plan actual con las
+  v2. Guarda: `src/lib/artifact-composer/__tests__/insights-catalogs-v2-only.test.ts`. Única excepción
+  declarada: `ReportAnalysisPage` e `InsightsEvidenceSlide` (status `legacy`) hasta el Slice 4. Esto
+  reemplaza la regla anterior de «entran con el flag de TASK-1888»: el diseño nuevo aplica a toda
+  edición nueva, con o sin ese flag.
+- **🔴 Condición de release:** develop lleva hoy el diseño a medias (portada, índice, capítulos,
+  narrativa, tabla, límites y contraportada v2 junto a las páginas de gráfico v1; en el deck, la lámina
+  de evidencia sigue a 1920×1080 junto a láminas de 1280×720). **No promover a producción** hasta cerrar
+  el Slice 4 y tener la aprobación del operador de las piezas derivadas, salvo decisión explícita de
+  hacerlo sabiendo que sólo afecta ediciones internas.
+- **Reintentos de salidas selladas antes del cambio:** el worker compone el INPUT sellado al encolar
+  contra el catálogo vigente; un input v1 falla la validación de slots antes de dibujar (nunca sale un
+  PDF mezclado). Desde este cambio se clasifica `semantic_rejected` (no reintentable) en vez de
+  `render_error`: `services/artifact-worker/classify-failure.ts` + test con el caso real. El camino
+  correcto para una edición v1 es pedir un render NUEVO, que vuelve a mapear el plan congelado.
+- Poppins 500 y los roles de dato viven en la extensión `editorial` del pack `axis` (opt-in por
+  catálogo): `deck-axis` pide Poppins 500 y hoy la resuelve a 300; darle la cara cambiaba propuestas
+  entregadas. Coral sobre papel = 2,94:1 (advisory): la serie «oportunidad» nunca se distingue sólo por
+  color.
+- Pendiente de aprobación del operador: portada, apertura y contraportada del deck; índice, tabla,
+  límites y narrativa A4; narrativa y límites del deck (sin página en el canvas).
+- Pendiente de cablear (datos ya emitidos por el planner v2 de TASK-1888 bajo su flag): «Lo esencial»
+  en el resumen, `chapter.opening` (ya leído), lecturas por figura y páginas de gráfico (Slice 4).
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +51,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Diseno`
+- Status real: `Slices 1–2 code complete; Slices 3–5 pendientes`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-1888` (Slices 3–5 necesitan su contrato; Slices 1–2 ya pueden empezar)
@@ -414,25 +444,32 @@ El operador exige que el informe quede **igual al canvas**. «Igual» se define 
 
 ## Acceptance Criteria
 
-- [ ] Se declaró `Execution profile: ui-ux` y `UI impact: layout`; `Wireframe` existe; `UI ready` permanece `no`
+- [x] Se declaró `Execution profile: ui-ux` y `UI impact: layout`; `Wireframe` existe; `UI ready` permanece `no`
   hasta completar mapping, dossier y scorecard.
 - [ ] Las plantillas del wireframe existen en ambos catálogos y componen desde fixtures y desde ediciones reales.
-- [ ] Ninguna plantilla contiene HEX, px de color ni familias tipográficas literales; `deck-axis` recompila
+- [x] Ninguna plantilla contiene HEX, px de color ni familias tipográficas literales; `deck-axis` recompila
   byte-idéntico.
 - [ ] Los roles de dato existen como tokens y ninguna pareja de series se distingue sólo por color (lectura en gris).
 - [ ] La portada dibujada coincide con el tema sellado en la edición; la blanca muestra canales sólo con `channelId`.
-- [ ] La contraportada toma correo, teléfonos y dirección de `src/config/efeonce-brand.ts`.
+- [x] La contraportada toma correo, teléfonos y dirección de `src/config/efeonce-brand.ts`.
 - [ ] Cada familia con productor tiene su página A4 y su lámina; ninguna familia sin evidencia aparece.
-- [ ] Un plan v1 compone sin panel de cierre y sin errores.
-- [ ] El folio muestra el total real de páginas.
-- [ ] El copy visible reusable vive en `src/lib/copy/insights.ts`.
-- [ ] `pnpm composer:visual-gate --catalog=insights` pasa a cero píxeles con los frames nuevos declarados.
+- [x] Un plan v1 compone sin panel de cierre y sin errores.
+- [x] El folio muestra el total real de páginas.
+- [x] El copy visible reusable vive en `src/lib/copy/insights.ts`.
+- [x] `pnpm composer:visual-gate --catalog=insights` pasa a cero píxeles con los frames nuevos declarados.
 - [ ] Dossier y scorecard con promedio ≥ 4,5 y piso ≥ 4 sobre el render real.
 - [ ] Cada plantilla renderizada con el fixture del canvas queda a ≤ 1 % de píxeles distintos de su página en
   `paginas/` (tabla por página en el dossier); las excepciones están justificadas y aprobadas por el operador.
 - [ ] El dossier incluye la hoja lado a lado referencia | render de cada página, en color y en gris.
 - [ ] El operador aprobó los PDFs internos de Berel y Sky y la estructura del deck.
 - [ ] En producción, una edición interna real compone con el diseño nuevo antes de compartir con clientes.
+
+> Evidencia 2026-09-25 (Slices 1–2): criterios tildados según `b649080c7` — grep sin HEX/fuentes literales en
+> las plantillas editoriales + `composer:brand-pack --check` (deck-axis byte-idéntico); contraportada y pie
+> desde `EFEONCE_CONTACT` (test del mapper); planes v1 componen sin panel (report/deck-mapper tests con PDF
+> real); folio «NN / total» desde el plan de páginas; copy en `GH_INSIGHTS.catalog`; gate scoped 20/20 a 0 px.
+> Sin tildar: páginas de gráfico (Slice 4), portada sellada (Slice 3), gris, scorecard, aprobación del
+> operador y release.
 
 ## Verification
 
@@ -446,8 +483,8 @@ El operador exige que el informe quede **igual al canvas**. «Igual» se define 
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible

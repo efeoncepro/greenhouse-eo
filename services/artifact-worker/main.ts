@@ -30,32 +30,14 @@ import { initSentryForService } from '../_shared/sentry-init'
 initSentryForService('artifact-worker')
 
 import { composeArtifact } from '@/lib/artifact-composer'
-import { SlideQualityError } from '@/lib/artifact-composer/quality-gates'
-import { SlideGeometryError, SlotFillError } from '@/lib/artifact-composer/render'
 import { captureWithDomain } from '@/lib/observability/capture'
 
+import { classifyFailure } from './classify-failure'
 import type { RenderConsumer, RenderJobView } from './consumer-contract'
 import { buildRenderConsumers, findConsumer } from './consumers'
 
 const log = (msg: string, extra: Record<string, unknown> = {}) =>
   console.log(JSON.stringify({ svc: 'artifact-worker', msg, ...extra }))
-
-const classifyFailure = (error: unknown): { code: string; detail: string } => {
-  if (error instanceof SlideQualityError) {
-    return { code: error.code, detail: error.message }
-  }
-
-  if (error instanceof SlideGeometryError) {
-    return { code: 'geometry_rejected', detail: error.message }
-  }
-
-  if (error instanceof SlotFillError) {
-    // 1ª bug class (copy del prototipo): el filler aborta — no es reintentable con el mismo plan.
-    return { code: 'semantic_rejected', detail: error.message }
-  }
-
-  return { code: 'render_error', detail: error instanceof Error ? error.message : String(error) }
-}
 
 /**
  * Render de UN job, agnóstico del dominio. Todo lo que era específico de Proposal vive ahora en su
