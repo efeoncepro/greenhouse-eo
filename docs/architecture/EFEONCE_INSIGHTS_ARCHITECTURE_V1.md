@@ -1092,10 +1092,11 @@ prende para producción); merge y deploy del PR de `efeonce-mcp` **después** de
 producción sólo junto al release de TASK-1889; el operador fija la preferencia de Berel y Sky y carga logos aptos
 para fondo oscuro si los hay.
 
-**Metas ICO: el runtime manda y los documentos no coinciden.** La meta impresa sale de `ICO_METRIC_REGISTRY`
-(OTD ≥ 90, FTR ≥ 80, RpA ≤ 1,5), que es lo que calcula el motor. `docs/context/06_glosario-metricas.md` (FTR ≥ 70) y
-`Contrato_Metricas_ICO_v1.md` (FTR ≥ 85) dicen otra cosa: el desalineamiento es del dominio ICO y del negocio, no de
-Insights, y se resuelve fuera de TASK-1888. Si el registro cambia, el informe lo sigue sin tocar este dominio.
+**Metas ICO: el registro manda.** La meta impresa sale de `ICO_METRIC_REGISTRY` (OTD ≥ 90, FTR ≥ 80, RpA ≤ 1,5),
+que es lo que calcula el motor. El 2026-09-25 el operador lo fijó como fuente única del semáforo y la documentación
+ICO se alineó (glosario §C, Delta en las specs V1 y en el contrato, cuyo §7.1 queda como benchmark externo); el bono
+de payroll conserva umbrales propios en `payroll_bonus_config`. Los semáforos del portal aún escritos a mano migran en
+TASK-1900. Si el registro cambia, el informe lo sigue sin tocar este dominio.
 
 **Límites honestos.** `decision`, `measurement` y `ask` no tienen productor determinista; la conclusión de página
 (`reading.conclusion`) tampoco. El medidor necesita que el adapter AEO elija el run por ventana (follow-up en el
