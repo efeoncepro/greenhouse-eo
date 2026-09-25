@@ -590,9 +590,9 @@ de `mcp-craft`; no se depende de ella). Se exige en aprobaciones y destructivas;
 
 ## Open Questions
 
-- Roles con `marketing_studio.campaign.approve`: propuesta `efeonce_admin`, `efeonce_account` y `efeonce_operations`
-  (sin `designer`, que escribe pero no aprueba). ¿La creatividad la puede aprobar `designer`? Si sí, ¿hace falta
-  separar la aprobación creativa de la de presupuesto y medios, o basta con la capability y la matriz de TASK-1894?
+- ~~Roles con `marketing_studio.campaign.approve`~~ Resuelto por el operador 2026-09-25: `efeonce_admin`,
+  `efeonce_account` y `efeonce_operations`. `designer` escribe pero no aprueba; no hace falta separar la aprobación
+  creativa de la de presupuesto y medios.
 - ¿La capability de aprobación la crea TASK-1894 (dueña de los commands) o esta task? Esta task la crea sólo si
   TASK-1894 cierra sin ella.
 - ¿Se acepta también el sujeto Entra (carril legacy) en el exchange durante la transición? Propuesta: no; los writes de

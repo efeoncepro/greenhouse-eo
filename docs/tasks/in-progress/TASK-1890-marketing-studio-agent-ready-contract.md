@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-049`
-- Status real: `Diseno`
+- Status real: `Implementación`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
