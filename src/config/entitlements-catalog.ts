@@ -62,7 +62,10 @@ export const ENTITLEMENT_MODULES = [
   // congeladas (deck/A4/web) por organización y ventana. Distinto de `growth`
   // (produce los hechos SEO/AEO) y `delivery` (ICO): Insights sólo congela y emite.
   // La PUERTA per-ORG es el módulo `insights_v1` (module_assignments).
-  'insights'
+  'insights',
+  // TASK-1890 — namespace de Efeonce Marketing Studio (EPIC-049), plataforma de campañas en su propio
+  // runtime (studio.efeonce.org). Greenhouse sólo registra la autoridad de la persona; los datos viven en Studio.
+  'marketing_studio'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -2451,7 +2454,9 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   { key: 'insights.schedule.manage', module: 'insights', actions: ['create', 'read', 'update'] as const, defaultScope: 'tenant' },
   // TASK-1888 — portada preferida de los informes por organización (auto | navy | blanca). Interna; leerla también
   // la concede insights.report.read.
-  { key: 'insights.cover_preference.manage', module: 'insights', actions: ['read', 'update'] as const, defaultScope: 'tenant' }
+  { key: 'insights.cover_preference.manage', module: 'insights', actions: ['read', 'update'] as const, defaultScope: 'tenant' },
+  // TASK-1890 — leer Marketing Studio por API/MCP. El gateway la verifica para la persona; Studio acota por organización.
+  { key: 'marketing_studio.campaign.read', module: 'marketing_studio', actions: ['read'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

@@ -3146,6 +3146,22 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     }
   }
 
+  // TASK-1890 — Marketing Studio (lectura por API/MCP). Quienes operan campañas y cuentas; la escritura y la
+  // aprobación son capabilities separadas (TASK-1894/1899).
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
+  ) {
+    addEntitlement(entries, {
+      module: 'marketing_studio',
+      capability: 'marketing_studio.campaign.read',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   if (subject.tenantType === 'client') {
     addEntitlement(entries, {
       module: 'insights',
