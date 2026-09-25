@@ -84,6 +84,12 @@
     }
   },
   "knownDifferences": [
-    "El canvas Deck-Agrupadas arranca el contenido en top 97 px; Comparacion, Metas y Lineas en 100 px. La plantilla usa 100 en las cuatro (las láminas no saltan al pasarlas): con 97 la medición da 0,008 %; con 100, 2,2 %, todo por ese corrimiento. Pendiente de decisión del operador."
-  ]
+    "El canvas Deck-Agrupadas arranca el contenido en top 97 px; Comparacion, Metas y Lineas en 100 px. La plantilla usa 100 en las cuatro (las láminas no saltan al pasarlas): con 97 la medición da 0,008 %; con 100, 2,2 %, todo por ese corrimiento."
+  ],
+  "approvedException": {
+    "approvedBy": "operador",
+    "date": "2026-09-25",
+    "reason": "Corrimiento de 3 px del propio canvas; la plantilla queda alineada con las otras tres láminas de figura.",
+    "maxRatio": 0.025
+  }
 }

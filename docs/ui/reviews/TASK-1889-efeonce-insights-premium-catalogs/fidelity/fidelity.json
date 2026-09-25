@@ -7,7 +7,8 @@
       "changed": 20503,
       "total": 921600,
       "ratio": 0.022247178819444446,
-      "pass": false
+      "pass": true,
+      "exception": "operador 2026-09-25: Corrimiento de 3 px del propio canvas; la plantilla queda alineada con las otras tres láminas de figura."
     },
     {
       "reference": "Deck-Comparacion",

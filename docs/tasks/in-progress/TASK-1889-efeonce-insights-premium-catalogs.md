@@ -30,7 +30,8 @@
   deck: comparación, columnas, metas, tendencia) contra el canvas: 20 de 21 páginas dentro del 1 %.
   **Deck-Agrupadas da 2,2 %** porque el canvas corre esa lámina 3 px (top 97 contra 100 en las otras tres; con
   97 daría 0,008 %). La plantilla queda en 100 para que las láminas no salten, y la diferencia está declarada
-  en el fixture: **pendiente de decisión del operador**.
+  en el fixture. **Excepción aprobada por el operador el 2026-09-25**: el fixture la registra con techo 2,5 %
+  y `pnpm insights:canvas-fidelity` la reporta con ⚠ en vez de fallar; si se aleja más, vuelve a fallar.
   Los mappers componen cada gráfico en su página por familia (`render/figure-slots.ts`) con
   `chapter.readings`. Se retiraron ReportAnalysisPage, InsightsEvidenceSlide, los moldes v1 y figure-pages.ts,
   y la guarda v2-only ya no admite legado.
@@ -41,7 +42,8 @@
   contrato). El Job es único para staging y producción: se despliega sólo por el control plane, junto
   con el flag de TASK-1888.
 - **🔴 Condición de release (actualizada con el Slice 4):** las páginas de gráfico ya son v2 en ambos catálogos.
-  Para promover falta la aprobación del operador de las piezas derivadas y de la excepción Deck-Agrupadas.
+  La excepción Deck-Agrupadas está aprobada (2026-09-25). Para promover falta la aprobación del operador de
+  las piezas derivadas.
   Antecedente (antes del Slice 4): develop llevaba el diseño a medias (portada, índice, capítulos,
   narrativa, tabla, límites y contraportada v2 junto a las páginas de gráfico v1; en el deck, la lámina
   de evidencia sigue a 1920×1080 junto a láminas de 1280×720). **No promover a producción** hasta cerrar

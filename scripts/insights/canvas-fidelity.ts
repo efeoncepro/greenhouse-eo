@@ -67,6 +67,11 @@ interface CanvasFixture {
   slots: SlotValues
   /** Diferencias conocidas y aceptadas, con su región (se copian al dossier). */
   knownDifferences?: string[]
+  /**
+   * Excepción al criterio del 1 % aprobada por el operador, con fecha y motivo. Tiene su propio techo
+   * (`maxRatio`): si la página se aleja más de lo aprobado, vuelve a fallar.
+   */
+  approvedException?: { approvedBy: string; date: string; reason: string; maxRatio: number }
 }
 
 interface FidelityRow {
@@ -76,6 +81,8 @@ interface FidelityRow {
   total: number
   ratio: number
   pass: boolean
+  /** La página pasa por una excepción aprobada, no por el criterio general. */
+  exception?: string
 }
 
 const readFixtures = async (only?: string): Promise<{ file: string; fixture: CanvasFixture }[]> => {
@@ -202,12 +209,23 @@ const main = async () => {
 
       if (gray) await sideBySide(reference, render, path.join(REVIEW_DIR, `${fixture.reference}.gris.png`), true)
 
-      const pass = ratio <= MAX_DIFF_RATIO
+      const exception = fixture.approvedException
+      const withinException = exception !== undefined && ratio > MAX_DIFF_RATIO && ratio <= exception.maxRatio
+      const pass = ratio <= MAX_DIFF_RATIO || withinException
 
-      rows.push({ reference: fixture.reference, template: entry.name, changed, total, ratio, pass })
+      rows.push({
+        reference: fixture.reference,
+        template: entry.name,
+        changed,
+        total,
+        ratio,
+        pass,
+        ...(withinException ? { exception: `${exception!.approvedBy} ${exception!.date}: ${exception!.reason}` } : {})
+      })
       console.log(
-        `${pass ? '✓' : '✗'} ${fixture.reference.padEnd(34)} ${entry.name.padEnd(28)} ` +
-          `${String(changed).padStart(7)} px  ${(ratio * 100).toFixed(3)} %`
+        `${withinException ? '⚠' : pass ? '✓' : '✗'} ${fixture.reference.padEnd(34)} ${entry.name.padEnd(28)} ` +
+          `${String(changed).padStart(7)} px  ${(ratio * 100).toFixed(3)} %` +
+          (withinException ? `  (excepción aprobada ${exception!.date}, techo ${(exception!.maxRatio * 100).toFixed(1)} %)` : '')
       )
     }
   } finally {
@@ -236,7 +254,12 @@ const main = async () => {
     process.exit(1)
   }
 
-  console.log(`\n✓ ${rows.length} página(s) dentro del ${MAX_DIFF_RATIO * 100} %.`)
+  const excepted = rows.filter(row => row.exception).length
+
+  console.log(
+    `\n✓ ${rows.length - excepted} página(s) dentro del ${MAX_DIFF_RATIO * 100} %` +
+      (excepted > 0 ? ` y ${excepted} con excepción aprobada.` : '.')
+  )
 }
 
 main().catch(error => {
