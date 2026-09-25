@@ -26,10 +26,23 @@
   7 896 px. **A/B:** con la línea `decode()` desactivada, los mismos 59 frames fallan con la MISMA
   cuenta de píxeles uno por uno (`diff` vacío). La causa es la deriva de entorno `ISSUE-122`, no este
   slice. Nada de deck-axis/SKY se congeló.
+- **Slice 4 code complete** (commits `3fa493efe`, `85785e7fc`, sin push). Ocho plantillas de figura (A4 +
+  deck: comparación, columnas, metas, tendencia) contra el canvas: 20 de 21 páginas dentro del 1 %.
+  **Deck-Agrupadas da 2,2 %** porque el canvas corre esa lámina 3 px (top 97 contra 100 en las otras tres; con
+  97 daría 0,008 %). La plantilla queda en 100 para que las láminas no salten, y la diferencia está declarada
+  en el fixture: **pendiente de decisión del operador**.
+  Los mappers componen cada gráfico en su página por familia (`render/figure-slots.ts`) con
+  `chapter.readings`. Se retiraron ReportAnalysisPage, InsightsEvidenceSlide, los moldes v1 y figure-pages.ts,
+  y la guarda v2-only ya no admite legado.
+  La zona de metas sale sólo de `bandFactId` (límite del registro, TASK-1888): se quitó el 0,85 escrito a
+  mano, según la revisión de TASK-1846. Queda `chart-figure.ts` del motor sin consumidores (tiene test
+  propio): candidato a retiro en un follow-up.
 - **Despliegue del worker:** `services/artifact-worker` cambió (consumer Insights, `main.ts`,
   contrato). El Job es único para staging y producción: se despliega sólo por el control plane, junto
   con el flag de TASK-1888.
-- **🔴 Condición de release:** develop lleva hoy el diseño a medias (portada, índice, capítulos,
+- **🔴 Condición de release (actualizada con el Slice 4):** las páginas de gráfico ya son v2 en ambos catálogos.
+  Para promover falta la aprobación del operador de las piezas derivadas y de la excepción Deck-Agrupadas.
+  Antecedente (antes del Slice 4): develop llevaba el diseño a medias (portada, índice, capítulos,
   narrativa, tabla, límites y contraportada v2 junto a las páginas de gráfico v1; en el deck, la lámina
   de evidencia sigue a 1920×1080 junto a láminas de 1280×720). **No promover a producción** hasta cerrar
   el Slice 4 y tener la aprobación del operador de las piezas derivadas, salvo decisión explícita de
