@@ -121,19 +121,22 @@ describe('TASK-1888 — productores v2 (ICO)', () => {
 
     // Conclusión = el hecho contra su META (no la comparación de períodos); con un solo space no hay «Lo que significa»
     // porque repetiría la conclusión (hallazgo de 1846 en los PDF reales de Sky y Berel).
-    expect(reading('chart.ico.bullet.otd').conclusion!.text).toBe('Sky Airline: 81,9 %, bajo la meta de 90,0 %.')
+    expect(reading('chart.ico.bullet.otd').conclusion!.text).toBe('Sky Airline no alcanza la meta de entregas a tiempo: 81,9 % (meta 90,0 %).')
+    // Sin comparable en este fixture (los meses son hechos independientes), no hay «Lo que significa».
     expect(reading('chart.ico.bullet.otd').meaning).toBeUndefined()
     expect(reading('chart.ico.bullet.otd').keyFigure!.caption.text).toBe('Entregas a tiempo · Sky Airline.')
     expect(reading('chart.ico.bullet.otd').keyFigure).toMatchObject({ factId: 'ico.otd.w.sp-1.2026-08', value: '81,9 %' })
     expect(reading('chart.ico.bullet.otd').nextStep!.text).toBe('Revisar primero Sky Airline: es donde la distancia con la meta es mayor.')
     // FTR 86 sobre la meta de 80 y RpA 1,33 bajo el techo de 1,5: alcanzadas ⇒ sin próximo paso inventado.
     expect(reading('chart.ico.bullet.ftr').nextStep).toBeNull()
-    expect(reading('chart.ico.bullet.rpa').conclusion!.text).toBe('Sky Airline: 1,33, bajo la meta de 1,50.')
+    // RpA mejora al bajar: 1,33 bajo el techo de 1,5 CUMPLE la meta.
+    expect(reading('chart.ico.bullet.rpa').conclusion!.text).toBe('Sky Airline cumple la meta de rondas de revisión por pieza: 1,33 (meta 1,50).')
     expect(reading('chart.ico.bullet.rpa').nextStep).toBeNull()
-    expect(reading('chart.ico.line.otd').conclusion!.text).toBe('Sky Airline: pasó de 78,4 % en 2026-06 a 81,9 % en 2026-08.')
+    expect(reading('chart.ico.line.otd').conclusion!.text).toBe('Sky Airline subió: pasó de 78,4 % en 2026-06 a 81,9 % en 2026-08.')
+    expect(reading('chart.ico.line.rpa').conclusion!.text).toBe('Sky Airline bajó: pasó de 1,50 en 2026-06 a 1,33 en 2026-08.')
     expect(reading('chart.ico.line.otd').meaning).toBeUndefined()
-    // Barras: la conclusión es la afirmación del hecho principal y no hay lectura que la repita.
-    expect(reading('chart.ico.percent').conclusion!.text).toMatch(/^OTD · Sky Airline · 2026-06/)
+    // Barras sin período anterior: el hallazgo es la cifra más alta de la figura (selección, sin cifras nuevas).
+    expect(reading('chart.ico.percent').conclusion!.text).toBe('La cifra más alta es FTR · Sky Airline · 2026-08: 86,0 %.')
     expect(reading('chart.ico.percent').meaning).toBeUndefined()
 
     for (const item of chapter.readings!) expect(item.meaning?.text).not.toBe(item.conclusion?.text)
@@ -147,6 +150,21 @@ describe('TASK-1888 — productores v2 (ICO)', () => {
     expect(chapter.claims.some(claim => claim.factIds.some(id => id.startsWith('ico.target')))).toBe(false)
     expect(chapter.tables[0]!.rows).toHaveLength(9)
     expect(plan.references.some(reference => reference.referenceId.includes('target'))).toBe(false)
+  })
+
+  it('con período anterior: la barra afirma el MAYOR CAMBIO y el bullet sitúa el dato contra el período (caso Sky)', () => {
+    const cur = (metricId: string, value: number, unit: EvidenceFactV1['unit']) => ico(metricId, '2026-08', value, unit, { factId: `ico.${metricId}.cur`, comparisonFactId: `ico.${metricId}.prev` })
+    const prev = (metricId: string, value: number, unit: EvidenceFactV1['unit']) => ico(metricId, '2026-07', value, unit, { factId: `ico.${metricId}.prev` })
+    const snapshot = { facts: [cur('otd', 81.9, 'percent'), prev('otd', 80.1, 'percent'), cur('ftr', 90.9, 'percent'), prev('ftr', 96.5, 'percent'), target('otd', 90, 'percent', 'higher_is_better'), target('ftr', 80, 'percent', 'higher_is_better')], sources: [], rejections: [] }
+    const plan = v2(snapshot, ['ico'])
+    const reading = (chartId: string) => plan.chapters[0]!.readings!.find(item => item.chartId === chartId)!
+
+    expect(validateEditorialPlan(plan, snapshot)).toEqual([])
+    // FTR -5,6 pp pesa más que OTD +1,8 pp: el mayor cambio es FTR.
+    expect(reading('chart.ico.percent').conclusion!.text).toBe('El mayor cambio fue en FTR · Sky Airline · 2026-08: 90,9 % (período anterior 96,5 %, variación -5,6 pp).')
+    expect(reading('chart.ico.bullet.ftr').conclusion!.text).toBe('Sky Airline cumple la meta de primera entrega correcta: 90,9 % (meta 80,0 %).')
+    expect(reading('chart.ico.bullet.ftr').meaning!.text).toBe('Contra el período anterior (96,5 %), variación -5,6 pp.')
+    expect(plan.essentials!.map(item => item.text)[0]).toBe(reading('chart.ico.percent').conclusion!.text)
   })
 
   it('con dos meses no hay línea (la matriz exige ≥ 3 puntos)', () => {

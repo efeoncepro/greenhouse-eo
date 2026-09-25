@@ -16,7 +16,7 @@ import type { PlanChapterV1, PlanClaimV1, PlanFigureReadingV1 } from '../contrac
 import { PLAN_ESSENTIALS_MAX } from '../contracts/plan'
 import type { InsightModule } from '../contracts/request'
 import { canProduceFamily } from './family-evidence-matrix'
-import { formatFactValue } from './format'
+import { formatDeltaForUnit, formatFactValue } from './format'
 
 /** Líneas de tendencia: la matriz exige ≥ 3 meses; el render admite hasta 3 series por figura (gris distinguible). */
 export const LINE_MIN_POINTS = 3
@@ -27,6 +27,12 @@ const monthOf = (fact: EvidenceFactV1): string | null => fact.dimension?.month ?
 const itemLabel = (fact: EvidenceFactV1): string => fact.dimension?.spaceName ?? fact.label
 
 const fmt = (fact: EvidenceFactV1, locale: string): string => formatFactValue(fact.value, fact.unit, locale)
+
+/** Un conteo que es parte de un total se dice con su total («2 de 6»), como la afirmación del planner v1. */
+const valueText = (fact: EvidenceFactV1, locale: string): string =>
+  fact.unit === 'count' && fact.value !== null && fact.numerator === fact.value && fact.denominator !== null && fact.denominator > 0
+    ? `${fmt(fact, locale)} ${GH_INSIGHTS.reading.outOf} ${formatFactValue(fact.denominator, 'count', locale)}`
+    : fmt(fact, locale)
 
 // ─── Familias nuevas ─────────────────────────────────────────────────────────────────────────────
 
@@ -150,6 +156,24 @@ const claim = (claimId: string, text: string, factIds: string[]): PlanClaimV1 =>
 const againstTarget = (value: number, target: number): string =>
   value > target ? GH_INSIGHTS.reading.aboveTarget : value < target ? GH_INSIGHTS.reading.belowTarget : GH_INSIGHTS.reading.atTarget
 
+const R = GH_INSIGHTS.reading
+
+/** Variación de un hecho contra su comparable, en la unidad que imprime el documento (pp o %). Null sin comparable. */
+const changeOf = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, locale: string) => {
+  const previous = fact.comparisonFactId ? byId.get(fact.comparisonFactId) : undefined
+
+  if (!previous || fact.value === null || previous.value === null) return null
+
+  const text = formatDeltaForUnit(fact.value, previous.value, fact.unit, locale)
+
+  if (!text) return null
+
+  // Magnitud comparable entre las dimensiones de UNA figura (misma unidad): pp si es porcentaje, relativa si no.
+  const magnitude = fact.unit === 'percent' ? Math.abs(fact.value - previous.value) : Math.abs((fact.value - previous.value) / previous.value)
+
+  return { previous, text, magnitude }
+}
+
 const bulletReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, locale: string): PlanFigureReadingV1 | null => {
   if (chart.data?.kind !== 'bullet') return null
 
@@ -167,6 +191,10 @@ const bulletReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, lo
   const missing = items.filter(entry => gap(entry) > 0)
 
   const metricId = chart.chartId.split('.').at(-1) ?? ''
+  const leadChange = changeOf(lead.value, byId, locale)
+  const metricName = GH_INSIGHTS.metrics[metricId]
+  // «cumple la meta de entregas a tiempo»; sin nombre registrado, sólo «cumple la meta».
+  const metricPhrase = metricName ? ` ${R.metricOf} ${metricName.charAt(0).toLowerCase()}${metricName.slice(1)}` : ''
   const phrase = (entry: (typeof items)[number]) => `${entry.item.label}: ${fmt(entry.value, locale)}, ${againstTarget(entry.value.value!, entry.target.value!)} ${fmt(entry.target, locale)}`
 
   // Conclusión = el hecho principal CONTRA SU META (nunca la comparación de períodos, que es otra figura). «Lo que
@@ -178,8 +206,15 @@ const bulletReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, lo
       value: fmt(lead.value, locale),
       caption: claim(`${chart.chartId}.key`, `${GH_INSIGHTS.metrics[metricId] ?? chart.title} · ${lead.item.label}.`, [lead.value.factId])
     },
-    conclusion: claim(`${chart.chartId}.conclusion`, `${phrase(lead)}.`, [lead.value.factId, lead.target.factId]),
-    ...(items.length > 1 ? { meaning: claim(`${chart.chartId}.meaning`, `${items.map(phrase).join('; ')}.`, items.flatMap(entry => [entry.value.factId, entry.target.factId])) } : {}),
+    // Hallazgo: cumple o no la meta (el ítem con mayor brecha manda).
+    // Nombra la métrica: la conclusión también se lee fuera de su figura, en «Lo esencial del mes».
+    conclusion: claim(`${chart.chartId}.conclusion`, `${lead.item.label} ${gap(lead) > 0 ? R.missesTarget : R.meetsTarget}${metricPhrase}: ${fmt(lead.value, locale)} (${R.targetShort} ${fmt(lead.target, locale)}).`, [lead.value.factId, lead.target.factId]),
+    // Lo que significa: con varios spaces, cómo queda cada uno; con uno, dónde queda contra el período anterior.
+    ...(items.length > 1
+      ? { meaning: claim(`${chart.chartId}.meaning`, `${items.map(phrase).join('; ')}.`, items.flatMap(entry => [entry.value.factId, entry.target.factId])) }
+      : leadChange
+        ? { meaning: claim(`${chart.chartId}.meaning`, `${R.againstPrevious} (${fmt(leadChange.previous, locale)}), ${R.variation} ${leadChange.text}.`, [lead.value.factId, leadChange.previous.factId]) }
+        : {}),
     nextStep:
       missing.length > 0
         ? claim(`${chart.chartId}.next`, `${GH_INSIGHTS.reading.nextStepGap} ${lead.item.label}: ${GH_INSIGHTS.reading.nextStepGapReason}`, [lead.value.factId])
@@ -197,7 +232,9 @@ const lineReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, loca
 
     if (!first || !last || !firstMonth || !lastMonth) return []
 
-    return [{ series, first, last, text: `${series.label}: ${GH_INSIGHTS.reading.lineFrom} ${fmt(first, locale)} ${GH_INSIGHTS.reading.lineIn} ${firstMonth} ${GH_INSIGHTS.reading.lineTo} ${fmt(last, locale)} ${GH_INSIGHTS.reading.lineIn} ${lastMonth}` }]
+    const direction = first.value === null || last.value === null || last.value === first.value ? R.held : last.value > first.value ? R.rose : R.fell
+
+    return [{ series, first, last, text: `${series.label} ${direction}: ${R.lineFrom} ${fmt(first, locale)} ${R.lineIn} ${firstMonth} ${R.lineTo} ${fmt(last, locale)} ${R.lineIn} ${lastMonth}` }]
   })
 
   const lead = phrases[0]
@@ -220,18 +257,42 @@ const lineReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, loca
  */
 const barReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, locale: string, claims: PlanClaimV1[]): PlanFigureReadingV1 | null => {
   const current = chart.series.at(-1)
-  const lead = current ? byId.get(current.factIds[0] ?? '') : undefined
+  const facts = (current?.factIds ?? []).map(id => byId.get(id)).filter((fact): fact is EvidenceFactV1 => Boolean(fact && fact.value !== null))
+  const first = facts[0]
 
-  if (!lead || lead.value === null) return null
+  if (!first) return null
 
-  const leadClaim = claims.find(item => item.factIds[0] === lead.factId)
+  const changes = facts.map(fact => ({ fact, change: changeOf(fact, byId, locale) })).filter(entry => entry.change !== null)
+  const biggest = [...changes].sort((a, b) => b.change!.magnitude - a.change!.magnitude)[0]
+  const highest = [...facts].sort((a, b) => (b.value as number) - (a.value as number))[0]!
 
-  if (!leadClaim) return null
+  // Hallazgo: con período anterior, el mayor cambio de la figura (selección, sin cifras nuevas); sin él, la cifra más
+  // alta cuando hay varias. Con un solo hecho sin comparable, su propia afirmación.
+  const changeClause = (entry: NonNullable<typeof biggest>) => `${valueText(entry.fact, locale)} (${R.previousPeriod} ${fmt(entry.change!.previous, locale)}, ${R.variation} ${entry.change!.text})`
+
+  const direction = (entry: NonNullable<typeof biggest>) =>
+    entry.fact.value === entry.change!.previous.value ? R.held : entry.fact.unit === 'position' ? R.changed : entry.fact.value! > entry.change!.previous.value! ? R.rose : R.fell
+
+  const conclusion: PlanClaimV1 | null = biggest && changes.length > 1
+    ? claim(`${chart.chartId}.conclusion`, `${R.largestChange} ${biggest.fact.label}: ${changeClause(biggest)}.`, [biggest.fact.factId, biggest.change!.previous.factId])
+    : biggest
+      ? claim(`${chart.chartId}.conclusion`, `${biggest.fact.label} ${direction(biggest)}: ${changeClause(biggest)}.`, [biggest.fact.factId, biggest.change!.previous.factId])
+      : facts.length > 1
+      ? claim(`${chart.chartId}.conclusion`, `${R.highest} ${highest.label}: ${valueText(highest, locale)}.`, [highest.factId])
+      : (() => {
+          const own = claims.find(item => item.factIds[0] === first.factId)
+
+          return own ? { ...own, claimId: `${chart.chartId}.conclusion` } : null
+        })()
+
+  if (!conclusion) return null
+
+  const key = biggest?.fact ?? (facts.length > 1 ? highest : first)
 
   return {
     chartId: chart.chartId,
-    keyFigure: { factId: lead.factId, value: fmt(lead, locale), caption: claim(`${chart.chartId}.key`, `${lead.label}.`, [lead.factId]) },
-    conclusion: { ...leadClaim, claimId: `${chart.chartId}.conclusion` },
+    keyFigure: { factId: key.factId, value: fmt(key, locale), caption: claim(`${chart.chartId}.key`, `${key.label}.`, [key.factId]) },
+    conclusion,
     nextStep: null
   }
 }
@@ -250,18 +311,26 @@ export const openingFor = (moduleKey: InsightModule): PlanClaimV1 => ({ claimId:
 export const scopeLinesFor = (modules: InsightModule[]): string[] => modules.map(moduleKey => GH_INSIGHTS.scopeLines[moduleKey])
 
 /**
- * «Lo esencial del mes»: hasta 5 claims con dato, alternando capítulos (la primera de cada uno, luego la segunda…)
- * para que ningún módulo se coma el resumen. Una claim «sin dato» no es esencial.
+ * «Lo esencial del mes»: hasta 5 hallazgos, alternando capítulos (el primero de cada uno, luego el segundo…) para que
+ * ningún módulo se coma el resumen. Primero las conclusiones de sus figuras (hallazgos: meta cumplida o no, mayor
+ * cambio, tendencia); si no alcanzan, las afirmaciones con dato como respaldo. Sin repetir textos.
  */
 export const essentialsFor = (chapters: PlanChapterV1[], byId: Map<string, EvidenceFactV1>): PlanClaimV1[] => {
-  const withValue = chapters.map(chapter => chapter.claims.filter(item => item.factIds[0] !== undefined && byId.get(item.factIds[0])?.value !== null))
-  const essentials: PlanClaimV1[] = []
+  const candidates = chapters.map(chapter => [
+    ...(chapter.readings ?? []).flatMap(reading => (reading.conclusion ? [reading.conclusion] : [])),
+    ...chapter.claims.filter(item => item.factIds[0] !== undefined && byId.get(item.factIds[0])?.value !== null)
+  ])
 
-  for (let round = 0; essentials.length < PLAN_ESSENTIALS_MAX && withValue.some(list => list.length > round); round += 1) {
-    for (const list of withValue) {
+  const essentials: PlanClaimV1[] = []
+  const seen = new Set<string>()
+
+  for (let round = 0; essentials.length < PLAN_ESSENTIALS_MAX && candidates.some(list => list.length > round); round += 1) {
+    for (const list of candidates) {
       const item = list[round]
 
-      if (item && essentials.length < PLAN_ESSENTIALS_MAX) essentials.push({ ...item, claimId: `essential.${item.claimId}` })
+      if (!item || essentials.length >= PLAN_ESSENTIALS_MAX || seen.has(item.text)) continue
+      seen.add(item.text)
+      essentials.push({ ...item, claimId: `essential.${item.claimId}` })
     }
   }
 

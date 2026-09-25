@@ -131,7 +131,23 @@ export const GH_INSIGHTS = {
     lineIn: 'en',
     leadValue: 'es la cifra más alta de la figura',
     nextStepGap: 'Revisar primero',
-    nextStepGapReason: 'es donde la distancia con la meta es mayor.'
+    nextStepGapReason: 'es donde la distancia con la meta es mayor.',
+    // Hallazgos deterministas: comparaciones y selecciones sobre hechos citados, nunca causas ni cifras nuevas.
+    meetsTarget: 'cumple la meta',
+    missesTarget: 'no alcanza la meta',
+    largestChange: 'El mayor cambio fue en',
+    highest: 'La cifra más alta es',
+    outOf: 'de',
+    previousPeriod: 'período anterior',
+    variation: 'variación',
+    againstPrevious: 'Contra el período anterior',
+    rose: 'subió',
+    fell: 'bajó',
+    held: 'se mantuvo',
+    // Una posición más alta es peor: «subió» se leería como mejora. Para posiciones, el verbo neutro.
+    changed: 'cambió',
+    metricOf: 'de',
+    targetShort: 'meta'
   },
 
   /**
