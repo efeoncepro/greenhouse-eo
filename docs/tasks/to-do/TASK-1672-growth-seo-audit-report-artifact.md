@@ -5,6 +5,13 @@
 - TASK-1847 cerrada (complete 2026-09-25): catálogos `insights-report` e `insights-deck` en producción desde el
   2026-09-24 y render productivo de A4 y deck verificado con datos reales. Se retira de `Blocked by`. El rediseño
   premium aprobado por el operador vive en TASK-1888/TASK-1889. — cerrado por trabajo en TASK-1847
+- **Rediseño Insights (planificado, no construido).** Los catálogos que esta task consume (`insights-report` A4 e
+  `insights-deck`) se rehacen en TASK-1889: plantillas nuevas (portada navy o blanca con variantes por módulo,
+  contraportada, aperturas de capítulo, prosa y páginas de gráfico premium) bajo un contrato de fidelidad de 41 páginas
+  de referencia (≤ 1 % de píxeles distintos). El contrato editorial se amplía de forma aditiva en TASK-1888 (15
+  familias, lectura por figura, cifra principal, `channelId`), que declara esta task en sus impactos. Al ejecutar,
+  confirmar en Discovery qué catálogo está vigente en producción (v1 de TASK-1847 hasta el release de TASK-1889) y
+  mapear contra ese. — por trabajo en TASK-1888/TASK-1889
 
 ## Delta 2026-09-15
 

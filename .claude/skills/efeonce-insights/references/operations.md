@@ -28,6 +28,11 @@ Insights templates. This scope preserves existing `deck-axis`/SKY baseline image
 | `INSIGHTS_SCHEDULES_ENABLED` (TASK-1848) | schedule writes (Vercel) + tick (ops-worker) | Vercel + `ops-worker` (default `true`) | 2026-09-18: Vercel staging ON · Production OFF; ops-worker ON |
 | `INSIGHTS_GENERATION_ENABLED` in the worker (TASK-1848) | the schedules tick creates editions | now ALSO `ops-worker` (default `true` in `deploy.sh`) | ops-worker ON; `INSIGHTS_AUTHORING_AI_ENABLED` is NOT declared in the worker |
 
+Planned, NOT declared anywhere yet (2026-09-25): `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888, default OFF; goes ON in
+production only with the TASK-1889 release). When it is born, map every runtime that GENERATES plans before flipping it:
+Vercel (create/revise) and the `ops-worker` schedules tick, which also creates editions (that is why it already reads
+`INSIGHTS_GENERATION_ENABLED`). Add its ledger row in the same PR.
+
 Flip = `vercel env add <FLAG> <env>` (`production` lowercase for the standard env; custom `staging` literal) **+
 `vercel redeploy <url>`**: a deployment built before the env var never sees it. If a worker starts reading a flag,
 declare it in `services/<worker>/deploy.sh` (destructive `--set-env-vars`) and apply live with `--update-env-vars`.

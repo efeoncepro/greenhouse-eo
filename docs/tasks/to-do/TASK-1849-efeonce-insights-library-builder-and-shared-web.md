@@ -5,6 +5,16 @@
 - TASK-1847 cerrada (complete 2026-09-25): catálogos `insights-report` e `insights-deck` en producción desde el
   2026-09-24 y render productivo de A4 y deck verificado con datos reales. Se retira de `Blocked by`. El rediseño
   premium aprobado por el operador vive en TASK-1888/TASK-1889. — cerrado por trabajo en TASK-1847
+- **Rediseño Insights (planificado, no construido).** El builder (S2) expone el cambio opcional de portada en el
+  encargo — `InsightBrandV1.coverTheme?: 'auto' | 'dark' | 'light'`, dentro del mismo `InsightRequestV1` (sin él, el
+  hash del encargo no cambia) — y muestra la preferencia de portada por cliente; si esta task ofrece editarla, lo hace
+  con el command `setInsightCoverPreference` y su reader (TASK-1888, Slice 5). Es **consumer** del contrato de
+  TASK-1888, sin lógica propia: la regla (`encargo > preferencia del cliente > auto`, con `auto` = navy sólo si el
+  cliente tiene logo apto para fondo oscuro) y el sellado en la edición viven en el dominio; la UI no decide ni
+  recalcula la portada. Si la biblioteca o el detalle dibujan gráficos, respetan los mismos roles de color de datos que
+  los PDF (actual / anterior / oportunidad / ausencia con rayado), según la dirección visual de TASK-1889. Master flow
+  actualizado: `docs/ui/flows/EPIC-045-efeonce-insights-UI-FLOW.md` (delta 2026-09-25). — por trabajo en
+  TASK-1888/TASK-1889
 
 ## Delta 2026-09-18
 

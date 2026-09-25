@@ -1,15 +1,18 @@
 # Estándar de marca y entrega de informes Efeonce
 
-**Estado:** vigente · **Origen:** instrucción del operador, 2026-09-04.
+**Estado:** vigente · **Origen:** instrucción del operador, 2026-09-04 · **Última actualización:** 2026-09-25
+(dirección premium de Efeonce Insights).
 **Alcance:** todos los informes de Efeonce, internos o dirigidos a clientes, cualquiera que sea su disciplina.
 La metodología y las cifras siguen bajo el contrato del dominio; este estándar gobierna su presentación.
 
 ## Identidad y pie de página obligatorios
 
-**Distinción de formato · instrucción del operador, 2026-09-04:** en decks o presentaciones, incluidas las exportadas a PDF A4 horizontal, el pie lleva como máximo la URL bubble oficial. No trasladar dirección, teléfonos, línea divisoria ni folio del informe escrito a las láminas. El pie completo descrito abajo aplica a informes escritos, no a decks.
+**Distinción de formato · instrucción del operador, 2026-09-04:** en decks o presentaciones, incluidas las exportadas a PDF A4 horizontal, el pie lleva como máximo la URL bubble oficial. No trasladar dirección, teléfonos, línea divisoria ni folio del informe escrito a las láminas. El pie completo descrito abajo aplica a informes escritos, no a decks. El deck de Efeonce Insights tiene una excepción aprobada: ver [Delta 2026-09-25](#delta-2026-09-25--dirección-premium-de-efeonce-insights).
 
 - Cada página del informe lleva un pie legible con el **URL bubble oficial de Efeonce**, dirección
-  institucional y teléfono. Incluye la portada, adaptando contraste y espacio sin omitir los datos.
+  institucional y teléfono. Incluye la portada, adaptando contraste y espacio sin omitir los datos
+  (las portadas y aperturas de capítulo de la dirección de Insights tienen una precisión aprobada: ver
+  Delta 2026-09-25).
   Reserva el área del pie antes de paginar: no debe invadir texto, tablas, notas ni numeración.
 - Usa el asset real `src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg` y conserva su
   proporción. Su URL se verifica en `back-cover-full.html`, junto al mismo catálogo. No sustituyas
@@ -87,6 +90,83 @@ resuelve el contacto desde `back-cover-full.slots.json`, pone cabecera en las p�
 calcula el índice desde la página real de cada sección, falla si una página desborda o si fuentes o imágenes no
 cargan, y escribe el PDF de forma atómica. Otro documento puede resolverlo de otra forma mientras cumpla el
 estándar.
+
+## Delta 2026-09-25 — dirección premium de Efeonce Insights
+
+**Origen:** el operador aprobó página por página el diseño de los informes de Efeonce Insights (A4 y deck) y lo
+cerró con «así quiero que se vea un informe». Referencias durables: la
+[dirección visual aprobada](../ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md)
+(tesis, tabla de tokens y anti-patrones), su carpeta `paginas/` con las 41 páginas a tamaño nativo, la prueba en
+escala de grises y el [wireframe](../ui/wireframes/TASK-1889-efeonce-insights-premium-catalogs.md) por región.
+
+**Estado:** diseño aprobado; **implementación en curso**. Producción sigue sirviendo los catálogos v1 de Insights
+(TASK-1847). El contrato editorial lo fija TASK-1888 y los catálogos premium los construye TASK-1889. Esta sección
+no describe lo que hoy emite producción. Las reglas siguientes sirven a cualquier informe Efeonce; lo propio de
+Insights se indica como tal.
+
+### Color de estructura
+
+- En papel manda el navy: el acento es `--axis-ppt-blue-800` (#023c70). El navy de fondo `--axis-deck-navy-920`
+  (#001a33) nunca es acento sobre papel: impreso se lee negro.
+- El teal `--axis-deck-teal-500` (#36c8bf) es acento sólo sobre navy. En papel lo rechazó el operador; además mide
+  ≈1,9:1 sobre el papel interior (#f7f8fa).
+
+### Color de datos por rol
+
+| Rol | En papel | En navy |
+|---|---|---|
+| Actual | navy `--axis-ppt-blue-800` (#023c70) | teal `--axis-deck-teal-500` (#36c8bf) |
+| Anterior o referencia | teal profundo `--axis-deck-teal-650` (#1f9e94) | periwinkle `--axis-deck-blue-310` (#8aa8d8) |
+| Oportunidad | coral `--axis-ppt-orange-500` (#d97757) | coral `--axis-ppt-red-300` (#ff7063) |
+| Ausencia | rayado neutro con nota «sin dato para …» | rayado neutro con nota |
+
+- Cada rol significa lo mismo en todas las figuras del informe y en su deck. La ausencia nunca es un color ni un cero.
+- El color nunca es lo único que separa dos series. En papel, el teal profundo y el coral tienen casi la misma
+  luminancia y se funden en gris: añade trazo continuo/discontinuo, rayado, forma o etiqueta directa.
+- En papel, la serie «oportunidad» no se identifica sólo por el coral: #d97757 mide ≈2,9:1 sobre el papel interior y
+  ≈3,1:1 sobre blanco, en el límite o bajo el 3:1 que WCAG pide a los elementos gráficos (SC 1.4.11). Lleva rayado,
+  etiqueta directa o borde más oscuro, o un coral más oscuro con token propio.
+- Los tokens de la tabla ya existen en `src/lib/artifact-composer/catalogs/insights-report/report-tokens.css`. Los
+  tokens semánticos por rol (actual, anterior, oportunidad y ausencia, en papel y en navy) nacen en TASK-1889; hasta
+  entonces se referencia el token AXIS, nunca el hexadecimal literal en una plantilla.
+- La dirección se aprobó con prueba de impresión en gris: la conclusión de cada gráfico debe sobrevivir sin color.
+
+### Página de evidencia
+
+Orden aprobado en A4: antetítulo con ícono → cifra principal con bajada → título que afirma la conclusión y su
+entrada → gráfico con leyenda y nota → fila Unidad · Fuente · Cobertura → panel navy redondeado «Lo que significa /
+Próximo paso» → pie. En el deck, la cifra y el título van a la izquierda, el gráfico en un panel a la derecha y «Lo que
+significa / Próximo paso» en la franja inferior. Poppins para cifras, títulos, antetítulos y panel de cierre; Geist
+para lectura y datos con cifras tabulares.
+
+### Portadas y logo del cliente
+
+- Una sola portada, navy o blanca; en Insights cambia por módulo, no hay una portada por servicio. La blanca lleva un bloque
+  navy a sangre en el 55 % superior y el título en navy de marca sobre papel.
+- El logo del cliente nunca va en positivo sobre navy. Si el cliente no tiene versión para fondo oscuro, se usa la
+  portada blanca. Sin logo, «Preparado para» muestra el nombre del cliente; sin nombre, el bloque desaparece. Nunca se
+  inventa un nombre ni un logo.
+- **Precisión del pie para esta dirección:** las portadas aprobadas no llevan el pie institucional. Muestran logo,
+  período, «Preparado para», eslogan y la línea «Confidencial · Versión · fecha». El contacto completo va en la
+  contraportada. Las páginas de contenido (resumen, lectura, evidencia y plan) llevan el pie completo: logo, edición,
+  dirección, teléfono, URL bubble y folio «NN / total». Las aperturas de capítulo, en navy, llevan un pie reducido con
+  logo, «Insights» y folio. Los informes que no adoptan esta dirección mantienen la regla general de pie en portada.
+
+### Contraportada institucional
+
+Navy, con logo y eslogan al centro. Su pie reúne URL bubble, seis redes (Spotify, Instagram, LinkedIn, Threads,
+YouTube y TikTok), correo, teléfonos de Chile y Estados Unidos, dirección, mercados (Chile · Estados Unidos ·
+Colombia · México · Perú) y la línea legal con razón social, RUT, confidencialidad y fecha de corte. Ningún valor se
+escribe en la plantilla: salen del SSOT de marca `src/config/efeonce-brand.ts`, que ya contiene URL, razón social,
+RUT, mercados, eslogan y los cuatro perfiles sociales con URL canónica. TASK-1889 está trasladando ahí el correo, los
+teléfonos, la dirección de presentación y los seis canales sociales de documentos. Mientras ese cambio no se integre,
+el dueño vigente del correo, los teléfonos y la dirección sigue siendo `back-cover-full.slots.json`.
+
+### Deck de Insights
+
+El deck aprobado lleva un pie con logo, edición (p. ej. «Insights · Informe de agosto 2026»), URL bubble y folio «NN / total»,
+sin dirección ni teléfonos. Es una excepción aprobada a la regla general de decks, limitada al deck de Insights; los
+demás decks conservan el pie con, como máximo, la URL bubble.
 
 ## Aplicación y propietarios
 

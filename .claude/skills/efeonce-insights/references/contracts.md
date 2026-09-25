@@ -11,8 +11,8 @@
 | `comparison` | `{kind}` in `none|previous_period|previous_year|custom`; default `previous_period`; `custom` has `start`/`endExclusive` and must not overlap |
 | `audience` | `client` (default) or `internal`; a client actor cannot request `internal` |
 | `locale`, `depth` | `es-CL` (default) / `en-US`; `executive|standard|detailed` (default `standard`) |
-| `outputs` | non-empty subset of `deck_pdf|report_pdf|web` (intent only until TASK-1846) |
-| `brand` | `efeoncePackVersion` (default `axis-current`), `clientBrandRef` optional 1–200 |
+| `outputs` | non-empty subset of `deck_pdf|report_pdf|web`; `deck_pdf` and `report_pdf` render (production since 2026-09-24), `web` is intent only (render ⇒ `render_rejected`) |
+| `brand` | `efeoncePackVersion` (default `axis-current`), `clientBrandRef` optional 1–200 (validated, resolved by nobody today); `coverTheme` does NOT exist yet (planned, TASK-1888) |
 | `policy.allowPartial` | explicit opt-in to visible omissions; without it a module with no evidence fails the edition at `validating` |
 | `idempotencyKey` | optional, 8–200 chars |
 | `title`, `purpose` | optional 3–200 / 3–500; name the report on first creation, ignored on revise |
@@ -54,6 +54,13 @@ Internal bindings must pass `organizationId`; org-scoped bindings read their own
   or `200 { …, idempotent:true }` when a live run already covers the targets. Precondition: edition `ready_for_review`
   with sealed snapshot + frozen plan; `outputs` ⊆ edition outputs and ⊆ `INSIGHT_RENDERABLE_OUTPUTS` (`deck_pdf`, `report_pdf` since
   TASK-1847: staging 2026-09-22; production since release `ebb9212a32ce`, 2026-09-24; first productive render verified 2026-09-25). Catalog per output: `deck_pdf` → `insights-deck`, `report_pdf` → `insights-report`.
+- Idempotency per (org, edition, output, audience), verified in `render/commands.ts` 2026-09-25: an output counts as
+  "alive" unless it is `dead_letter` or `cancelled` (so `queued`, `running`, `completed` AND `failed` are alive). If one
+  run's alive outputs cover every requested target ⇒ `200 idempotent:true` with THAT run (a `failed` one is recovered
+  with `retry`, not with a new request). If only part of the targets is alive in another run ⇒ `422 render_rejected`
+  with `details.alive` (never mixes runs). Precondition failure (edition not `ready_for_review`, e.g. already issued) ⇒
+  `not_ready`. `outputs` omitted ⇒ every output the edition declared, so an edition that declared `web` is rejected
+  whole (`details.unsupported`) unless the caller passes the renderable ones; an undeclared output ⇒ `details.outside`.
 - `GET …/insights/editions/{editionId}/render` (paginated runs) · `GET …/insights/render-runs/{renderRunId}` → run DTO
   `{ renderRunId, editionId, audience, requestedOutputs, state, startedAt, finishedAt, cancelledAt, createdAt, outputs[] }`,
   output DTO `{ insightOutputId, output, state, attempts, failureCode, outputAssetId, manifestHash, finishedAt }`.
@@ -179,3 +186,39 @@ cancels, retries or reconciles email, nor creates/activates/pauses/retires sched
 Gateway mapping (`efeonce-mcp` 1.7.0, contract `task-1848-v1`): 503 `sharing_disabled|delivery_disabled|schedules_disabled`
 ⇒ `policy_blocked`; 429 `quota_exceeded` ⇒ `rate_limited`; 404 anti-oracle preserved; `create_insight_share` /
 `revoke_insight_share` need `efeonce.mcp.insights.write` (no client carries it ⇒ 403 challenge), the 5 reads the base scope.
+
+## Planned in TASK-1888 (NOT built — not available in any runtime)
+
+Summary of the editorial contract v2 as the task defines it on 2026-09-25. **Nothing below exists in code**: requests,
+plans and specs today are `insight_request_v1` / `editorial_plan_v1` / `chart_spec_v1`, and `CHART_FAMILIES` has 7
+families. Never send these fields to a lane or describe them to a human as available; re-verify against code once the
+task closes and move what shipped into the sections above.
+
+- **Additive by rule:** a sealed v1 plan/spec keeps composing with the same result; no new field becomes mandatory for
+  sealed plans. Whether the plan stays `editorial_plan_v1` with optional fields or becomes `_v2` is an open question.
+- **Chart families (15):** today's `bar`, `bar_grouped`, `bar_stacked`, `line`, `pie`, `donut`, `scatter` plus
+  `bullet`, `waterfall`, `funnel`, `gauge`, `heatmap`, `waffle`, `venn_two`, `upset`, each with its own data shape and the
+  invariants of `chart-geometry.ts` (bars from zero; pie/donut ≤ 3 non-overlapping parts; Venn of two sets only, real
+  areas; UpSet sorted descending; funnel stages are subsets of the previous; 270° gauge with previous value and target
+  as references; bullet with the target as a mark; heatmap with the value printed; scatter with complete pairs). A
+  family is emitted only when the family × evidence matrix (architecture §6) marks it `productor ahora`.
+- **Plan fields (optional):** per-figure reading `meaning` and `nextStep`, each with `factIds`; hero figure with its
+  subline; chapter entry; essential facts of the summary (max 5); «Qué mide este informe» lines per module from
+  `src/lib/copy/insights.ts` (not written by the LLM). All go through `plan-validation.ts` with the same figure rule.
+- **`channelId`:** stable id on every series or dimension that represents a channel — `google`, `google_ai_overview`,
+  `chatgpt`, `gemini`, `claude`, `perplexity`; AEO provider mapping `openai→chatgpt`, `anthropic→claude`; an unknown
+  provider has no `channelId` and does not break generation.
+- **Cover preference per organization:** `auto|dark|light` (default `auto`; no row ⇒ `auto`) in a new
+  `greenhouse_insights` table; command `setInsightCoverPreference` (upsert by org derived from the authenticated
+  authority, no-op when unchanged, outbox event with actor and previous value) + reader; new capability with a grant;
+  app and ecosystem lanes; MCP tool federated in `efeonce-mcp`.
+- **Request override:** `InsightBrandV1.coverTheme?: 'auto'|'dark'|'light'`; a request without it keeps **exactly the
+  same `request_hash`** as before the task.
+- **Sealed resolution:** `coverTheme(edition)` = request override if present and ≠ `auto` → else the organization's
+  preference if ≠ `auto` → else `dark` (navy) only if the organization has a logo fit for a dark background (variant via
+  the account-360 command) → else `light` (white). The result and the logo asset are sealed in the edition; a re-render of
+  the same edition draws the same cover. The white cover's variant (with or without channel satellites) is chosen by the
+  catalog from `modules` and `channelId` (TASK-1889), with no extra field.
+- **ICO:** the adapter additionally reads `ftr_pct` from the ICO snapshot (owner-computed; Insights computes nothing).
+- **Flag:** `INSIGHTS_EDITORIAL_V2_ENABLED`, default OFF; with OFF the planner emits v1 and the resolver does not apply
+  (the preference can still be saved). Turned on in production only together with the TASK-1889 release.

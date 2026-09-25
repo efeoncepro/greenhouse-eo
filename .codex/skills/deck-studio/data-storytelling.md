@@ -80,6 +80,12 @@ atención consciente. Son tu palanca más fuerte — **y se gastan**.
 > **Gris para el contexto. UN solo acento para el dato que importa.**
 > **Si todo está acentuado, nada lo está.**
 
+**Decks de Efeonce con varias series:** el color va por **rol**, igual en todas las láminas: actual,
+anterior o referencia, oportunidad y ausencia (rayado, nunca un color ni un cero). Dos series nunca se
+separan sólo por el tono: añade trazo, forma o etiqueta directa. Tabla de roles sobre navy y papel:
+`docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md`, sección «Delta 2026-09-25» (dirección
+aprobada de Efeonce Insights; catálogo en implementación, TASK-1889).
+
 ---
 
 ## El eje: cuándo empieza en cero

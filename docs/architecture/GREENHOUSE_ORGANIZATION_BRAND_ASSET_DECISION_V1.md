@@ -83,3 +83,16 @@ The logo pop-up gains a third acquisition path next to upload and operator-URL: 
 - **Prompt decision (explicit operator override):** the prompt instructs the model to **recreate the company's REAL brand logo from its own knowledge** (not invent an original mark). This deliberately overrides the `greenhouse-ai-image-generator` skill default ("never reproduce a real trademark"), per explicit operator decision: an org avatar should show the client's actual brand. The result is an **AI approximation** the operator reviews; for the exact official logo the upload/URL paths remain the gold standard. The UI copy states this.
 - **Runtime requirement (Rollout Completion Gate):** the OpenAI key resolves server-side via the canonical secret `greenhouse-openai-api-key`. Each environment must expose `OPENAI_API_KEY_SECRET_REF=greenhouse-openai-api-key` (added to local `.env.local`; Vercel staging/prod must have it for the deployed feature to work).
 - **Observability:** OpenAI failures go through `captureWithDomain(error, 'agency', { tags: { source: 'organization_logo_ai_generate' } })`; the route returns a sanitized 502.
+
+## Delta 2026-09-25 — variante de logo para fondo oscuro (demanda de Efeonce Insights; planificada)
+
+- **Estado:** planificado, no construido. Hoy cada organización tiene un solo logo (`organizations.logo_asset_id`) y
+  ninguna variante para fondo oscuro.
+- **Demanda:** `TASK-1888` (EPIC-045, Efeonce Insights) resuelve la portada de los informes con preferencia `auto` =
+  portada navy **sólo** si la organización tiene un logo apto para fondo oscuro; si no, blanca. Sin esa variante,
+  `auto` siempre resuelve blanca.
+- **Regla:** la variante se agrega y se lee **sólo mediante el command canónico de account-360**, en la misma línea
+  gobernada que `attachOrganizationLogoAsset` (capability `organization.brand_asset`, bloqueo de operating entities,
+  asset privado servido por proxy, sin hotlinks). Insights no escribe assets ni columnas de organización por su cuenta.
+- **Forma exacta** (columna, contexto de asset o candidato revisable) pendiente: se decide en el Discovery de
+  `TASK-1888` y se registra aquí como nuevo delta cuando exista.

@@ -23,9 +23,17 @@ Resuelve estos paths desde la raíz del repositorio, no desde esta carpeta. Si t
 2. Incorpora el logo de Efeonce en la versión apropiada al fondo. Si el informe es para un cliente, incluye también su logo oficial. Respeta proporción, colores y área libre.
 3. Usa los colores y tipografías reales de marca. No añadas verde, serif u otra familia por asociarlos a sostenibilidad, pintura o una supuesta apariencia premium.
 4. El destino acordado gobierna: PDF A4 para los informes de este flujo salvo solicitud explícita distinta. HTML es un insumo, no reemplaza al archivo final.
-5. Añade gráficos cuando permitan entender una comparación, composición, distribución o evolución. Cada gráfico conserva unidad, universo, período, fuente y limitaciones decisivas. Para una sola serie, usa un tono de marca (azul AXIS `#0375d9` pasó el validador de paleta de la skill dataviz); el gris de marca como serie de datos falla por croma y contraste. Pasa la paleta por el validador antes de exportar.
+5. Añade gráficos cuando permitan entender una comparación, composición, distribución o evolución. Cada gráfico conserva unidad, universo, período, fuente y limitaciones decisivas. Para una sola serie, usa un tono de marca (azul AXIS `#0375d9` pasó el validador de paleta de la skill dataviz); el gris de marca como serie de datos falla por croma y contraste. Pasa la paleta por el validador antes de exportar. Si el informe sigue la dirección premium de Insights (ver abajo), el color de datos va por rol: actual, anterior o referencia, oportunidad y ausencia.
 6. Valida que el conversor haya respetado el asset. Si no interpreta el CSS de un SVG, usa una rasterización fiel con resolución suficiente al tamaño final, conserva la fuente SVG y documenta la decisión. No repintes un logo roto.
 7. El contacto debe ser legible y los enlaces deben abrir destinos reales. Reserva la zona de pie antes de paginar.
+
+## Referencia de informe premium (aprobada 2026-09-25)
+
+El operador aprobó página por página el diseño de los informes de Efeonce Insights (A4 y deck) y lo cerró con «así quiero que se vea un informe». Úsalo como referencia antes de comparar direcciones nuevas:
+
+- Dirección, tokens y anti-patrones: `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`; páginas de referencia a tamaño nativo en su carpeta `paginas/`.
+- Reglas reutilizables (navy manda en papel, teal sólo sobre navy, roles de color de datos, oportunidad nunca sólo por el coral en papel, portadas, logo del cliente, contraportada y pie): estándar de informes, sección «Delta 2026-09-25».
+- Es diseño aprobado, no plantilla construida: producción sirve los catálogos v1 de Insights y los catálogos premium están en implementación (TASK-1889). Fuera del Composer, reprodúcelo con los tokens y assets reales; no copies los datos de ejemplo de las páginas de referencia.
 
 ## Responsabilidad editorial
 

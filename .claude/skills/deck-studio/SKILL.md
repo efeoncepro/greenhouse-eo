@@ -38,6 +38,8 @@ Cuando se solicite la contraportada institucional, reutiliza `BackCoverFull` del
 
 El pie de una lámina lleva como máximo la URL bubble oficial. No hereda dirección, teléfonos, separadores ni folio de un informe escrito, aunque se exporte a PDF A4. Mantén los logos oficiales en la composición. Canon: `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md`.
 
+**Excepción aprobada (2026-09-25): el deck de Efeonce Insights.** Su pie lleva logo, edición, URL bubble y folio «NN / total», sin dirección ni teléfonos; los demás decks conservan la regla anterior. Ese deck es además la referencia aprobada de lámina de evidencia (cifra principal y título a la izquierda, gráfico en panel a la derecha, franja «Lo que significa / Próximo paso») y de color de datos por rol. Detalle en el estándar, sección «Delta 2026-09-25», y en `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`. Es diseño aprobado: el catálogo premium está en implementación (TASK-1889) y producción sirve el v1.
+
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 
 Casi todo el mal deck del mundo nace de saltarse una de estas. **Contéstalas en voz alta.**

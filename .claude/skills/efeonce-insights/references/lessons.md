@@ -1,5 +1,32 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-25 · Un canvas aprobado no es un diseño construido.** TASK-1847 cerró el mismo día en que el operador
+  aprobó el rediseño premium en un canvas; producción siguió sirviendo los catálogos v1 y el rediseño quedó en dos
+  tasks nuevas (1888 contrato, 1889 catálogos). Decir «los informes se ven así» mirando el canvas habría sido falso.
+  Regla: al cerrar una task de catálogos, o al describir el producto, nombrar **qué diseño sirve producción hoy** (qué
+  catálogo, qué release) y dónde vive el aprobado-sin-construir; nunca presentar una dirección aprobada como disponible.
+- **2026-09-25 · La fidelidad a un diseño aprobado se exige con referencias por página y un umbral, no a ojo.** El
+  operador pidió que el informe quede «igual al canvas». Eso se volvió medible: 41 páginas de referencia a tamaño nativo
+  versionadas en el repo, un paquete fuente que las regenera (40 de 41 byte a byte; la restante 0,008 % por
+  antialiasing), un fixture por plantilla con los datos de ejemplo del canvas y `pixelmatch` (umbral 0,1) con techo de
+  1 % de píxeles distintos por página; lo que exceda se corrige o se justifica en el dossier con la región y la
+  aprobación del operador. Regla: antes de construir contra un diseño, dejar referencias durables, reproducibles y un
+  criterio numérico; «se parece» no es un gate. Y el fixture del canvas vive sólo en pruebas: nunca datos de ejemplo en
+  producción.
+- **2026-09-25 · Material de referencia con marcado HTML va empaquetado dentro del repo.** Las fuentes `.dc.html` del
+  canvas se guardaron como `fuente-canvas-2026-09-25.tar.gz` para que el escaneo de Tailwind no lea su marcado (lee
+  cualquier archivo de texto del árbol y materializa sus clases). Regla: HTML de referencia, ejemplos o prototipos que no
+  son código del producto entran comprimidos o fuera del árbol escaneado, con el script que los reproduce al lado.
+- **2026-09-25 · Un diseño aprobado no autoriza familias, y la evidencia se verifica en la fuente, no se supone.** El
+  canvas dibuja 15 familias con datos de ejemplo; varias (embudo, Venn, UpSet, cascada) piden evidencia que ningún
+  adapter produce hoy. Y en sentido contrario, la primera matriz de TASK-1888 subestimó lo que sí existe: Sky tenía 11
+  meses de ICO en BigQuery, el snapshot traía `ftr_pct` que el adapter no leía y SEO ya declaraba granularidad
+  `day`/`month` (corregida en `e845ab562`). Regla: la matriz familia × evidencia decide qué se emite; cada veredicto se
+  verifica contra el adapter y la fuente (BigQuery/PG), nunca contra el diseño ni contra la memoria del planner.
+- **2026-09-25 · Los títulos del planner determinista repiten la etiqueta del hecho.** Hallazgo del cierre de
+  TASK-1847: el título repite la etiqueta en vez de afirmar la conclusión. Es del contrato del plan
+  (TASK-1888), no de un catálogo: arreglarlo en la plantilla escondería el defecto en una sola salida.
+
 - **2026-09-24 · El gate global puede bloquear un catálogo nuevo por drift histórico ajeno.** El baseline de
   `deck-axis`/SKY ya difería en el `develop` limpio. Usa `--catalog=insights` para congelar y comparar sólo los
   frames de Insights, preservando hashes ajenos; valida ambos comandos y mantén ISSUE-122 abierta para el gate global.

@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-22 por Claude (TASK-1847: informe A4 y deck nuevo en staging, probados con datos reales; sin producción)
+> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1847 cerrada: informe A4 y deck nuevo en producción desde el 2026-09-24 y primer informe real renderizado ahí; rediseño aprobado, planificado en TASK-1888/TASK-1889)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -18,10 +18,10 @@ hub que hoy muestra el informe de visibilidad en IA. Greenhouse sigue siendo due
 sólo lo dibuja (decisión del 2026-09-15). La biblioteca para pedir y revisar informes sí queda en el portal.
 
 La primera unidad (TASK-1845) creó el **núcleo**: crear un encargo, recolectar evidencia, redactar el plan y
-dejar la edición lista para revisión. Después se sumaron el deck PDF (TASK-1846) y el enlace compartido, el envío
-por correo y la recurrencia (TASK-1848, en producción pero apagados). **Todavía no existen la vista web ni el
-informe A4.** Como la emisión sigue apagada en producción, **ahí ninguna edición puede emitirse**: llega hasta
-`ready_for_review`.
+dejar la edición lista para revisión. Después se sumaron el deck PDF (TASK-1846), el enlace compartido, el envío
+por correo y la recurrencia (TASK-1848, en producción pero apagados) y el informe A4 junto con el deck nuevo
+(TASK-1847, en producción desde el 2026-09-24). **Todavía no existe la vista web.** Como la emisión sigue apagada en
+producción, **ahí ninguna edición puede emitirse**: llega hasta `ready_for_review`.
 
 ## Cómo se comporta
 
@@ -57,10 +57,11 @@ informe A4.** Como la emisión sigue apagada en producción, **ahí ninguna edic
 | Agente por MCP | Catálogo, listar, leer y (con permiso de escritura) pedir; **nunca emite** | Lo que su vínculo con la organización permita |
 
 Como emitir todavía no es posible, hoy un cliente que pide una edición la verá quedar en `in_review` sin
-cifras visibles: eso es lo esperado hasta que su deck esté renderizado y un interno la emita (el render del deck
-ya corre en staging y producción, pero la emisión sigue apagada en todos los ambientes).
+cifras visibles: eso es lo esperado hasta que sus archivos estén renderizados y un interno la emita (el render del
+deck y del informe A4 ya corre en staging y producción, pero la emisión sigue apagada en producción; sólo staging la
+tiene encendida, para pruebas).
 
-## Los dos formatos y sus gráficos (2026-09-22, en staging)
+## Los dos formatos y sus gráficos (en producción desde el 2026-09-24)
 
 Una edición produce **el mismo contenido en dos formatos**, y la diferencia no es de estilo sino de
 cómo se lee cada uno:
@@ -109,7 +110,64 @@ respuesta) y Sky Airlines (entrega), en ediciones internas y sin emitir. La prue
 datos de ejemplo no mostraban, entre ellos que **la tasa de entregas a tiempo (OTD) nunca llegaba al informe** de
 entrega por un nombre de métrica distinto: ahora aparece (Sky, agosto: 81,9 %).
 
-## Estado de disponibilidad (2026-09-22)
+**Primer informe real en producción (2026-09-25).** Con autorización del operador se generó una edición **interna**
+de Sky Airlines (`EO-INS-000022`, entrega de agosto contra julio de 2026). Salieron el deck (5 láminas) y el informe A4
+(8 páginas) al primer intento, y sus cifras coinciden con las de origen: entregas a tiempo (OTD) 81,9 % contra 80,1 % y
+rondas por entregable (RpA) 1,33 contra 1,44. La edición sigue interna y sin emitir: emitir y compartir siguen
+apagados en producción. Antes se probó la organización de prueba («Greenhouse Demo»), que sirve para ver un deck sin
+datos pero no para un informe de entrega: **no tiene datos ICO**, así que una edición de entrega suya se detiene en
+la validación por falta de evidencia, que es lo correcto. Pedir de nuevo el render de una edición ya renderizada
+devuelve el mismo pedido anterior, no produce archivos duplicados.
+
+> Detalle técnico: arquitectura §14.7 (delta 2026-09-25, cierre de TASK-1847); catálogos
+> `src/lib/artifact-composer/catalogs/insights-report/` e `insights-deck/`; mappers en
+> `src/lib/efeonce-insights/render/`.
+
+## Qué viene: el diseño aprobado para todos los informes (planificado)
+
+> Estado: **aprobado el 2026-09-25, todavía no construido.** Los informes que salen hoy usan el diseño anterior. El
+> nuevo lo construyen TASK-1888 (los datos que el diseño necesita) y TASK-1889 (las plantillas).
+
+El operador revisó página por página un diseño nuevo de informe y lo aprobó como el aspecto que debe tener **todo**
+informe de Insights, en A4 y en deck:
+
+- **Portada:** una sola portada con variantes según los módulos, no una por servicio. Puede ser azul marino o blanca
+  (con un bloque azul marino arriba). La blanca de visibilidad (SEO y respuestas de IA) muestra alrededor los logos de
+  los canales medidos (Google, ChatGPT, Gemini, Claude, Perplexity); la blanca creativa (entrega) va sin logos.
+- **Contraportada** con redes, contacto y datos legales de Efeonce; **aperturas de capítulo**; páginas de **resumen,
+  lectura y plan**.
+- **Páginas de gráfico** que abren con la cifra principal, dicen la conclusión, muestran el gráfico con su fuente y
+  cierran con «Lo que significa / Próximo paso».
+- **El color dice qué es cada dato:** el período actual en azul marino (o turquesa sobre fondo oscuro), el anterior en
+  un turquesa más profundo (o azul lavanda sobre oscuro), una oportunidad en coral, y lo que falta con rayado, nunca con
+  un color.
+
+**Portada azul marino o blanca: cómo se decide.** Cada cliente tiene una preferencia, y al pedir una edición se puede
+cambiar sólo para esa edición. Si la preferencia es «automática», la portada va azul marino sólo cuando el cliente
+tiene un logo que se lee bien sobre fondo oscuro; si no, va blanca. Hoy las organizaciones tienen un solo logo, sin
+versión para fondo oscuro, así que «automática» daría portada blanca. La portada elegida queda fija en la edición:
+volver a producir el PDF da la misma portada.
+
+**Qué gráficos nuevos llegarán.** Sólo los que tengan datos que los sostengan: por ejemplo, entregas a tiempo, rondas
+por entregable y aprobación al primer intento contra su meta, la tendencia mes a mes, o la presencia de la marca por
+motor de IA. Los que hoy no tienen datos (métricas por página o por palabra clave, coincidencias entre consultas de
+IA, embudo comercial) no aparecerán. También se corregirá cómo se imprime el cambio de un porcentaje: OTD de 80,1 % a
+81,9 % es «+1,8 puntos», no «+2,2 %».
+
+**Cómo se revisa.** Cada plantilla nueva se compara con la página aprobada y no puede diferir en más del 1 % de sus
+puntos. Las primeras ediciones reales con el diseño nuevo serán de Berel (visibilidad) y Sky (entrega), como informes
+internos: no se comparten con el cliente hasta que el operador las revise.
+
+> Detalle técnico: arquitectura §6 (delta 2026-09-25, rediseño premium aprobado);
+> `docs/tasks/to-do/TASK-1888-efeonce-insights-editorial-contract-v2.md`;
+> `docs/tasks/to-do/TASK-1889-efeonce-insights-premium-catalogs.md`; dirección visual
+> `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`.
+
+## Estado de disponibilidad (2026-09-25)
+
+> **Delta 2026-09-25 (TASK-1847 cerrada):** el informe A4 y el deck nuevo están **en producción desde el
+> 2026-09-24**, y el 2026-09-25 se renderizó ahí el primer informe con datos reales (edición interna de Sky, ver «Los
+> dos formatos y sus gráficos»). Emitir y compartir siguen apagados en producción.
 
 > **Delta 2026-09-22 (TASK-1847):** el informe A4 y el deck nuevo están **en staging**, probados con datos reales de
 > Berel y Sky. En staging el deck ya usa el formato propio de Insights (antes usaba el de propuestas comerciales, que
@@ -126,7 +184,7 @@ asignado. Lo que está encendido y lo que no:
 | Redacción asistida por IA | Apagada | Flag `INSIGHTS_AUTHORING_AI_ENABLED` OFF; el plan sale del redactor determinista |
 | Pedir el render del **deck PDF** de una edición | **Encendido en staging y producción** (desde 2026-09-16) | Staging: probado con cinco decks reales, un reintento y una cancelación. Producción: probado el 2026-09-16 en la organización de prueba — el deck salió solo, al primer intento, y pedir la vista web fue rechazado como corresponde. Ver «Pedir el deck de una edición» |
 | Enlace compartido, envío por correo y recurrencia | **En producción, pero apagados** (2026-09-18) | El código salió a producción el 2026-09-18 con los tres interruptores apagados a propósito: se encenderán cuando exista la página pública del enlace en Think (TASK-1875). En staging están encendidos y se probaron completos con una organización de prueba; los dos correos de prueba llegaron al buzón autorizado. Ver las tres secciones siguientes |
-| Pedir el **informe A4** de una edición | **En staging** (2026-09-22); no en producción | Probado con datos reales de Berel y Sky; sale junto con el deck si se piden los dos. En producción se rechaza hasta el próximo release (TASK-1847) |
+| Pedir el **informe A4** de una edición | **Encendido en staging y producción** (producción desde 2026-09-24) | Probado con datos reales de Berel y Sky en staging (2026-09-22) y de Sky en producción (2026-09-25, edición interna). Sale junto con el deck si se piden los dos |
 | Pantalla pública del enlace | No existe todavía | TASK-1875 (la página en `think.efeoncepro.com` que muestra el enlace) |
 | Usar Insights desde un agente externo por el gateway MCP (`mcp.efeonce.org`) | Lectura sí; escritura todavía no | Gateway v1.7.0 (2026-09-18). Además de ediciones y render, un agente puede **ver** enlaces, envíos y recurrencias (cinco herramientas de lectura). Crear y revocar enlaces existen, pero exigen un permiso de escritura que ningún cliente tiene aún; lo mismo crear ediciones. **Enviar por correo y programar recurrencias sólo se hacen desde el portal**, no por MCP |
 
@@ -152,7 +210,7 @@ proceso en segundo plano lo produce.
   "no existe" (no encontrado) y no se crea nada.
 - **Registro.** Cada pedido, reintento y cancelación queda a nombre de la persona que lo hizo, también si es un
   usuario cliente (antes todo quedaba como "sistema").
-- **Qué no hace todavía.** En producción sólo existe el deck (en staging también el informe A4). La vista web se rechaza al pedirla. Tener el deck
+- **Qué no hace todavía.** Existen el deck y el informe A4 (en producción desde el 2026-09-24). La vista web se rechaza al pedirla. Tener el deck
   no lo envía ni lo comparte: descargarlo, compartirlo y emitir siguen siendo pasos aparte.
 
 ## Compartir un informe por enlace
@@ -258,9 +316,14 @@ ICO en los meses pedidos, así que el snapshot declara cuatro rechazos "sin dato
 límites. Es decir: se verificó que la ausencia se declara con honestidad, no todavía un informe con cifras
 reales de un cliente.
 
-**Qué falta para cerrar TASK-1845.** Dos evidencias operativas (ensayo de reversión de la migración en la base
-compartida y una sesión MCP con un usuario humano que liste las herramientas publicadas). Hasta entonces la
-task sigue `in-progress`, aunque la capacidad ya esté en producción.
+**Actualización 2026-09-25.** La organización de prueba («Greenhouse Demo») **no tiene datos ICO**: el 2026-09-25 una
+edición de entrega nueva suya se detuvo en la validación por falta de evidencia (`evidence_rejected`), que es lo
+correcto. Por eso el primer informe con cifras reales en producción se hizo con una edición interna de Sky Airlines,
+que tiene 11 meses de datos de entrega (noviembre de 2025 a septiembre de 2026); ver «Los dos formatos y sus
+gráficos».
+
+**Cierre de TASK-1845.** Cerró el 2026-09-16: el ensayo de reversión de la migración en la base compartida se hizo
+ese día, y la sesión MCP con un usuario humano quedó como verificación opcional.
 
 > Detalle técnico: arquitectura §8 (enlace compartido), §9 (correo y recurrencia) y §14 (estado, rollout, límites e invariantes; §14.6 para TASK-1848); dominio `src/lib/efeonce-insights/**`; rutas
 > `src/app/api/platform/{app,ecosystem}/insights/**`; migración

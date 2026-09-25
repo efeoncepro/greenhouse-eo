@@ -11,6 +11,8 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — in production with flags OFF** | Cloud SQL (4 migrations applied); release `bda1cf2cd938` (2026-09-18, Vercel + 6 Cloud Run); staging flags ON (sharing/delivery/schedules/issuance), production OFF until TASK-1875; gateway `efeonce-mcp` 1.7.0 (rev `00055-gk6`, 58 tools); open: in-app/Teams channels, portal route (1849), ISSUE-174 → TASK-1876 | 2026-09-18 |
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
 | TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | to-do (blocked by 1848) | — | — |
+| TASK-1888 | Editorial contract v2: `ChartSpec` 7 → 15 families, per-figure reading and hero figure in the plan, `channelId`, per-org cover preference + sealed cover, flag `INSIGHTS_EDITORIAL_V2_ENABLED` | **to-do — PLANNED, nothing built** (no blockers; recommended owner Codex) | — (production serves the v1 contract) | — |
+| TASK-1889 | Premium catalogs from the approved canvas (A4 + deck), canvas-fidelity gate, internal Berel/Sky editions, release together with the 1888 flag | **to-do — PLANNED** (blocked by 1888 only in Slices 3–5; owner Claude; another session started Slices 1–2 on 2026-09-25, uncommitted in the shared checkout) | — (production serves the TASK-1847 v1 catalogs) | — |
 
 ## TASK-1845 — foundation (complete 2026-09-16)
 
@@ -311,8 +313,100 @@ vestuario, ausencia de Playwright smoke, `split_batch` (3.279 archivos) y autent
 `greenhouse_ops`; migraciones 656/656, GCP WIF y Sentry pasan. El `develop` local está 60 commits y 1.063 archivos
 por delante de `origin/develop`; no es un candidato acotado a esta task. No se dispatchó el orquestador.
 
+## TASK-1888 — contrato editorial v2 (to-do · PLANIFICADA, nada construido)
+
+**Qué es:** la parte de datos del rediseño que el operador aprobó el 2026-09-25. `backend-data`, `Backend impact:
+migration`, sin blockers, asignación recomendada Codex. Creada en `1ae82624d`; matriz corregida en `e845ab562`. Nada de
+esto existe en código ni en ningún runtime: las ediciones siguen saliendo con `chart_spec_v1` / `editorial_plan_v1`.
+
+**Punto de partida verificado en código (2026-09-25):** `CHART_FAMILIES` (`contracts/chart-spec.ts`) tiene 7 familias;
+el planner determinista emite sólo `bar` y `bar_grouped`; el adapter ICO lee `rpa` y `otd_pct`
+(`ICO_SNAPSHOT_METRIC_IDS`) pero no `ftr_pct`, que el snapshot sí trae; Sky tiene 11 meses de ICO en BigQuery
+(2025-11 a 2026-09) y la org sandbox ninguno; `InsightBrandV1.clientBrandRef` se valida y nadie lo resuelve.
+
+**Alcance planificado (Slices 1–6 de la task):**
+- Matriz familia × evidencia versionada en la arquitectura §6: una familia se emite sólo si la evidencia la sostiene
+  (`productor ahora` / `sin evidencia`); los datos de ejemplo del canvas no autorizan ninguna.
+- `ChartSpec` suma `bullet`, `waterfall`, `funnel`, `gauge`, `heatmap`, `waffle`, `venn_two`, `upset` (15 en total) con
+  datos por familia y las mismas invariantes que `artifact-composer/chart-geometry.ts`; tabla equivalente obligatoria.
+- Plan con campos opcionales: lectura por figura (`meaning` / `nextStep`, cada una con `factIds`), cifra principal con
+  bajada, entrada de capítulo, hechos esenciales (≤ 5) y líneas «Qué mide este informe» desde `src/lib/copy/insights.ts`
+  (no las redacta el LLM). `plan-validation.ts` valida todo sin relajarse.
+- Productores: planner + autoría IA acotada emiten sólo las familias `productor ahora`; conjunto mínimo esperado:
+  bullet de OTD%/RpA/FTR% contra umbrales del registro ICO, línea mensual ICO, presencia AEO por motor con `channelId`.
+- `channelId` en `contracts/channels.ts`: `google`, `google_ai_overview`, `chatgpt`, `gemini`, `claude`, `perplexity`;
+  mapeo `openai→chatgpt`, `anthropic→claude`; un proveedor desconocido queda sin `channelId`, no rompe.
+- Portada: tabla nueva de preferencia por organización (`auto|dark|light`, default `auto`) en `greenhouse_insights`,
+  command `setInsightCoverPreference` + reader + evento outbox + capability con grant + lanes app/ecosystem + tool MCP
+  federada (PR en `efeonce-mcp`); `InsightBrandV1.coverTheme?` opcional que NO cambia el hash si falta; variante de logo
+  apta para fondo oscuro sólo por el command de account-360; resolución sellada en la edición:
+  override del encargo > preferencia > `auto` (navy sólo con logo apto para fondo oscuro; si no, blanca).
+- Flag `INSIGHTS_EDITORIAL_V2_ENABLED` (default OFF): con OFF el planner emite v1; se prende en producción **sólo** junto
+  al release de TASK-1889.
+
+**Hallazgos heredados del canary de TASK-1847 (le tocan a esta task, no a un catálogo):** la variación de un porcentaje
+se imprime «+2,2 %» en vez de «+1,8 pp»; los títulos del planner determinista repiten la etiqueta del hecho.
+
+**Fuera de alcance:** plantillas (TASK-1889); UI de preferencia y cambio en el encargo (TASK-1849, consumer); evidencia
+que el canvas usa y hoy no existe (SEO por página o keyword, conjuntos por consulta de IA, embudo CRM); Venn de tres.
+
+**Hand-off planificado:** a TASK-1889, el plan y la edición sellados (familias, lectura, cifra principal, `channelId`,
+tema `dark|light`); a TASK-1875, los campos nuevos como opcionales de `InsightWebModelV1`. Preguntas abiertas: nombre
+de la capability, forma de la variante de logo en account-360, `editorial_plan_v1` con opcionales o `_v2`.
+
+## TASK-1889 — catálogos premium (to-do · PLANIFICADA; Slices 1–2 en curso sin commit)
+
+**Qué es:** llevar a `insights-report` (A4) e `insights-deck` (16:9) el diseño aprobado, verificarlo con ediciones
+internas reales y liberarlo. `ui-ux`, `UI impact: layout`, `UI ready: no`, asignación Claude. Bloqueada por TASK-1888
+sólo en Slices 3–5. El 2026-09-25 otra sesión empezó Slices 1–2 en el checkout compartido: plantillas, assets y
+`scripts/insights/canvas-fidelity.ts` aparecen sin commitear. **No cuenta como construido** hasta que esa sesión lo
+commitee y verifique; producción sigue sirviendo los catálogos v1 de TASK-1847.
+
+**Dirección aprobada (source-led):** `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`
+— canvas «Gráficos de Efeonce Insights» (Artifact privado del operador, versión 36). Alternativas: v1 (en producción),
+recolor de v1 (rechazado: «sólo les estás cambiando el color»), premium editorial (seleccionada). Wireframe:
+`docs/ui/wireframes/TASK-1889-efeonce-insights-premium-catalogs.md`.
+
+**Referencias durables** (`docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs/`): hojas
+`a4-estructura.png`, `a4-graficos.png`, `deck-graficos-y-prosa.png`, `a4-escala-de-grises.png`; `paginas/` con las 41
+páginas aprobadas a tamaño nativo (A4 794×1123, lámina 1280×720); `fuente-canvas-2026-09-25.tar.gz` con los `.dc.html`
+del canvas y `render-referencia.mjs`, que regenera `paginas/` (40 de 41 byte a byte; la restante 0,008 % por
+antialiasing). Commit `568bfa669`.
+
+**Contrato de fidelidad:** por plantilla, un fixture con los datos de ejemplo del canvas (nunca en producción), render a
+tamaño nativo y `pixelmatch` (umbral 0,1) contra `paginas/<Board>.png`: **≤ 1 % de píxeles distintos por página**. Lo
+que excede se corrige o se justifica en el dossier con la región y la aprobación del operador. Evidencia: tabla por
+página + hoja lado a lado en `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/`. No entran en «igual» las
+cifras reales, las familias sin productor ni portada/apertura/contraportada del deck (no diseñadas en el canvas).
+
+**Decisiones del operador (2026-09-25):** una portada con variantes por módulo (no una por servicio); navy o blanca por
+cliente, con cambio opcional en el encargo; las primeras ediciones reales son internas (Berel `seo`/`aeo`, Sky `ico`)
+hasta que el operador las revise. Roles de color de dato:
+
+| Rol | En papel | En navy |
+| --- | --- | --- |
+| actual | navy `#023c70` | teal `#36c8bf` |
+| anterior / referencia | teal profundo `#1f9e94` | periwinkle `#8aa8d8` |
+| oportunidad | coral `#d97757` | `#ff7063` |
+| ausencia | rayado neutro, nunca un color | rayado neutro |
+
+Los valores son tokens AXIS existentes (tabla de la dirección); en las plantillas entran como tokens semánticos del
+brand pack, nunca como HEX.
+
+**Alcance planificado:** Slice 1 tokens de rol + isotipos de canal por `channelId`, redes y contacto (contacto al SSOT
+`src/config/efeonce-brand.ts`; `deck-axis` byte-idéntico) · Slice 2 páginas de estructura y prosa · Slice 3 portada
+blanca por módulo (con o sin canales) desde el tema sellado · Slice 4 páginas de gráfico premium para las familias con
+productor · Slice 5 gate de fidelidad, frames en `composer:visual-gate --catalog=insights`, dossier y scorecard,
+ediciones internas en staging, release por el control plane con el flag de TASK-1888 y una edición interna en
+producción antes de compartir con clientes. Sin flag propio.
+
+**Hand-off planificado:** TASK-1849 y TASK-1875 mantienen en la web los mismos roles de color y la misma lectura.
+
 ## Sessions (append as you go; newest first)
 
+- **2026-09-25 · TASK-1888/1889 · planificación.** Tasks creadas (`1ae82624d`), matriz de 1888 corregida con la
+  evidencia real (`e845ab562`: FTR y tendencias ICO entran al alcance) y contrato de fidelidad de 1889 con las 41 páginas
+  de referencia y su paquete fuente (`568bfa669`). Otra sesión empezó 1889 Slices 1–2 sin commit. Nada desplegado.
 - **2026-09-25 · TASK-1847 · cierre.** Canary de render productivo: deck vacío en la org sandbox (`irun-cc329478…`,
   `insights-deck`, 3 láminas) y, con autorización del operador, A4 + deck con datos reales de Sky (`EO-INS-000022`).
   La sandbox no tiene snapshots ICO: una edición nueva falla en `validating` (`evidence_rejected`). El operador aprobó

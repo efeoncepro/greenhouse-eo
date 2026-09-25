@@ -343,6 +343,9 @@ Reglas obligatorias:
   entrada de capítulo, hechos esenciales del resumen (máximo 5) y líneas «Qué mide este informe» derivadas de los
   módulos desde `src/lib/copy/insights.ts` (no las redacta el LLM).
 - `plan-validation.ts` valida los campos nuevos con la misma regla de cifras.
+- Variación de una métrica expresada en porcentaje (OTD%, FTR%, CTR…) se redacta en **puntos porcentuales**
+  («+1,8 pp»), no como porcentaje relativo («+2,2 %»); la variación relativa queda para métricas absolutas. Caso
+  observado en el render productivo de Sky (TASK-1847, 2026-09-25): OTD 80,1 % → 81,9 % se imprimió «+2,2 %».
 - Planes v1 siguen validando y componiendo.
 
 ### Slice 3 — Productores
@@ -484,6 +487,8 @@ eso lo resuelve el catálogo en TASK-1889 desde `modules` y `channelId`, sin cam
 - [ ] El plan trae lectura por figura, cifra principal, entrada de capítulo, hechos esenciales y líneas «Qué mide
   este informe»; el validador rechaza una cifra no citada en cualquiera de ellos.
 - [ ] El planner emite al menos las familias marcadas `productor ahora` y ninguna marcada `sin evidencia`.
+- [ ] Una variación de una métrica en porcentaje se imprime en puntos porcentuales («pp»); test con OTD 80,1 → 81,9
+  que espera «+1,8 pp».
 - [ ] Las series de canal llevan `channelId`; un proveedor desconocido no rompe la generación.
 - [ ] Un encargo sin `coverTheme` conserva su hash (test).
 - [ ] La preferencia se guarda por command con capability, grant, outbox y errores canónicos, y se lee por reader; lanes

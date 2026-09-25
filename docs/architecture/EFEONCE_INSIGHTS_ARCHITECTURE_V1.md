@@ -2,8 +2,10 @@
 
 > Status: **Foundation implementada y en producción (TASK-1845, 2026-09-15; ver §14)** — generación habilitada en
 > staging y producción, emisión e IA apagadas; render en producción (TASK-1846, §14.5); enlaces compartidos, correo
-> y recurrencia en producción con flags OFF (TASK-1848, release `bda1cf2cd938`, §14.6); A4, UI y vista web en Think siguen pendientes
-> (TASK-1847, TASK-1849, TASK-1875). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
+> y recurrencia en producción con flags OFF (TASK-1848, release `bda1cf2cd938`, §14.6); catálogos v1 A4 (`report_pdf`)
+> y deck (`insights-deck`) en producción desde el 2026-09-24 (TASK-1847, complete 2026-09-25, §14.7); UI y vista web en
+> Think siguen pendientes (TASK-1849, TASK-1875); el rediseño premium aprobado el 2026-09-25 está **planificado, no
+> construido** (TASK-1888, TASK-1889; delta de §6). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
 > rollout verificado, sus límites honestos y las invariantes que un agente debe respetar al tocar el dominio.
 > Owner: Platform + Client Experience.
 > [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
@@ -173,6 +175,55 @@ se resuelve mediante un plan de páginas determinista del catálogo; si un lími
 TASK-1846 incorpora únicamente la primitive domain-free, y TASK-1847 conserva layout y resolvers. No hay fork.
 Versionar y fijar brand pack, fuentes, catálogo, plan y renderer. Fidelidad semántica/visual es obligatoria;
 igualdad de bytes PDF sólo si el renderer normaliza metadatos y el benchmark la demuestra.
+
+### Delta 2026-09-25 — rediseño premium aprobado (planificado)
+
+> **Planificado, no construido.** Producción sirve los catálogos v1 de TASK-1847 (§14.7). Nada de este delta existe
+> hoy en código ni en runtime; lo construyen TASK-1888 (contrato, `backend-data`) y TASK-1889 (catálogos, `ui-ux`).
+> Dirección visual y copia durable del canvas:
+> [`TASK-1889-efeonce-insights-premium-catalogs-direction.md`](../ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md).
+
+- **Aprobación.** El operador aprobó el 2026-09-25, página por página, el canvas «Gráficos de Efeonce Insights»
+  (Artifact privado <https://claude.ai/artifact/M2GiA4NdBfgGkiAvwPjZYb>) como el aspecto de todo informe: portadas,
+  contraportada con redes/contacto/datos legales, aperturas de capítulo, prosa (resumen, lectura, plan), páginas de
+  gráfico premium (cifra principal, conclusión, gráfico, procedencia y panel «Lo que significa / Próximo paso») y logos
+  de canal (Google, ChatGPT, Gemini, Claude, Perplexity). Los datos del canvas son de ejemplo y no autorizan familias.
+- **Una portada con variantes por módulo, nunca una por servicio.** Navy, o blanca (bloque navy arriba y título sobre
+  papel) con variante de visibilidad (`seo`/`aeo`: logos de canal como satélites en la órbita) y variante creativa
+  (`ico`: sin logos). La variante blanca la elige el catálogo desde los módulos y `channelId`, sin campo nuevo.
+- **Regla de resolución de portada (TASK-1888).** Cambio en el encargo (`brand.coverTheme`, si ≠ `auto`) >
+  preferencia de la organización (si ≠ `auto`) > `auto`; `auto` = navy sólo si la organización tiene un logo apto para
+  fondo oscuro, si no blanca. Hoy cada organización tiene un solo logo y ninguna variante oscura, así que `auto`
+  resolvería blanca. La portada resuelta se **sella** en la edición: re-renderizar da la misma portada; el render
+  nunca la decide con datos vivos. Un encargo sin `coverTheme` conserva el mismo hash.
+- **Roles de color de datos.** Actual = navy `#023c70` en papel / teal `#36c8bf` en navy; anterior o referencia = teal
+  profundo `#1f9e94` / periwinkle `#8aa8d8`; oportunidad = coral `#d97757` / `#ff7063`; ausencia = rayado, nunca un
+  color. Navy manda en tipografía y estructura. Teal y coral tienen la misma luminosidad: nunca son lo único que separa
+  dos series. En plantillas estos valores entran como tokens del brand pack (mapeo en la dirección visual), nunca como
+  HEX literal.
+- **Contrato de fidelidad (TASK-1889).** 41 páginas de referencia a tamaño nativo en
+  `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs/paginas/` y las fuentes del canvas
+  empaquetadas (`fuente-canvas-2026-09-25.tar.gz`, con `render-referencia.mjs`, que reproduce 40/41 páginas byte a
+  byte). Cada plantilla renderizada con los datos de ejemplo del canvas debe quedar a **≤ 1 % de píxeles distintos**
+  (`pixelmatch`, umbral 0,1) y la aprueba el operador página por página. Portada, apertura y contraportada del **deck**
+  no están en el canvas: se derivan de A4 con aprobación del operador.
+- **Contrato editorial v2 (TASK-1888), aditivo.** `ChartSpec` de 7 a 15 familias con las invariantes de
+  `chart-geometry.ts`; plan con lectura por figura, cifra principal, entrada de capítulo, hechos esenciales y líneas
+  «Qué mide este informe»; `channelId` en los adapters; lectura de `ftr_pct` en el adapter ICO; preferencia de portada
+  por organización (tabla, command, capability, lanes app/ecosystem y MCP); `brand.coverTheme` opcional en el encargo;
+  variante de logo para fondo oscuro vía el command canónico de account-360; flag `INSIGHTS_EDITORIAL_V2_ENABLED`
+  (default OFF, se prende en producción sólo junto al release de TASK-1889). Planes y specs v1 sellados siguen
+  componiéndose igual.
+- **Matriz familia × evidencia.** Hoy sólo `bar`/`bar_grouped` tienen productor. Hay evidencia para bullet (OTD%, RpA
+  y FTR% de ICO contra los umbrales del registro), línea (tendencia mensual ICO; SEO declara granularidad `day`/`month`),
+  barras de presencia por motor AEO con `channelId` y, posiblemente, medidor y dona. Sin evidencia hoy: métricas por
+  página o keyword de SEO, conjuntos por consulta de IA (Venn/UpSet) y embudo CRM. Una familia sin evidencia no se
+  emite; la matriz la confirma el Slice 1 de TASK-1888.
+- **Observación editorial (render de Sky, 2026-09-25).** La variación de una métrica que ya es un porcentaje se imprime
+  como variación relativa («+2,2 %» para OTD 81,9 % vs 80,1 %); debe imprimirse en puntos porcentuales («+1,8 pp»).
+  Corrección asignada a TASK-1888.
+- **Primeras ediciones con el diseño nuevo:** Berel (`seo`/`aeo`) y Sky (`ico`), como informe **interno**, sin
+  compartir con el cliente hasta la revisión del operador.
 
 ## 7. API, MCP y autorización
 
@@ -473,6 +524,13 @@ fija la de su dominio: access events de enlaces 180 días y rate buckets 1 día,
 | TASK-1849 | Biblioteca/encargo/revisión en el portal Greenhouse y presentación email | TASK-1845/1846/1847/1848 |
 | TASK-1875 | Vista web compartida por token **renderizada en `efeonce-think`** (`/insights/r/<token>`, render tonto de `InsightWebModelV1`, revocación por request, GVC del hub) | TASK-1848 |
 
+> **Nota 2026-09-25 (estado y unidades nuevas).** TASK-1845 y TASK-1846 cerraron el 2026-09-16 y TASK-1847 el
+> 2026-09-25 (catálogos v1 en producción desde el 2026-09-24); TASK-1848 sigue `in-progress`, en producción con flags
+> OFF. El rediseño premium aprobado el 2026-09-25 (§6, delta) suma dos unidades que la tabla de arriba no tenía:
+> **TASK-1888** — contrato editorial v2 y portada por cliente (`backend-data`, `to-do`, sin blockers) — y
+> **TASK-1889** — catálogos premium A4 y deck (`ui-ux`, `to-do`; sus Slices 3–5 dependen del contrato de TASK-1888).
+> TASK-1849, TASK-1875 y TASK-1672 son consumers de ambas.
+
 Cinco nuevas unidades; cada una tiene slices, pruebas y rollout propios. TASK-1672/1673 son dos integraciones
 especializadas ya en backlog: se coordinan, no se cuentan como nuevas ni se borran. No bloquean un informe
 SEO de desempeño sin auditoría técnica; esa sección sólo se habilita cuando sus gates reales estén satisfechos.
@@ -498,6 +556,12 @@ MCP router/gateway; EMAIL_CATALOG; Report Brand Delivery; Executive Report Deck 
 Pendiente de ejecución: límites medidos/costo, retención por clase, DDL exacto, library de charts server-safe
 tras prueba hermética/licencia y mapa final de primitives/rutas. No son preguntas que impidan registrar el
 programa: tienen dueña y gate explícitos. La selección de library no se hace por moda ni impone proveedor nuevo.
+
+> **Nota 2026-09-25.** DDL exacto, retención por clase y mapa de primitives/rutas se resolvieron en TASK-1845 (§14.3).
+> La library de charts se resolvió **sin proveedor nuevo**: geometría propia, domain-free, en
+> `src/lib/artifact-composer/chart-geometry.ts` (TASK-1847, §14.7). Sigue pendiente registrar límites medidos y costo
+> del informe A4 largo: el QA de 30 páginas de TASK-1847 fue una exportación sintética local que verificó formato
+> (A4, fuentes, pie y folio), no tiempos ni costo.
 
 ## 13. Habilitación de agentes: skill operativa y distribución
 
@@ -638,6 +702,16 @@ greenhouse-eo, dispatch del orquestador, aprobación de gates, env/redeploy en s
 
 ### 14.3 Límites honestos y pendientes
 
+> **Nota de vigencia 2026-09-25.** Esta lista registra el estado al 2026-09-15 y varios puntos quedaron superados:
+> TASK-1845 cerró el 2026-09-16 (ensayo `migrate:down` + `up` ejecutado ese día con readbacks; `tools/list` por sesión
+> humana quedó como verificación opcional), así que el «cierre pendiente» de la introducción de §14 ya no aplica.
+> TASK-1846 cerró el 2026-09-16 y TASK-1847 el 2026-09-25: `renderableOutputs` declara `deck_pdf` y `report_pdf`
+> desde el release `ebb9212a32ce` (2026-09-24). El camino con datos reales ya se ejercitó en producción: edición
+> interna de Sky Airlines `EO-INS-000022` (ICO, agosto contra julio 2026), deck y A4 al primer intento con cifras
+> iguales a BigQuery (§14.7). La org sandbox «Greenhouse Demo» sigue sin filas en
+> `ico_engine.metric_snapshots_monthly`: una edición ICO suya falla en `validating` con `evidence_rejected`, por diseño.
+> Sigue sin emitirse ninguna edición: emisión y sharing continúan OFF en producción.
+
 - **La evidencia del canary tiene 0 hechos.** La org sintética no tiene snapshots ICO en 2026-07/08: el snapshot
   sellado trae 4 rechazos `no_data` y el plan congelado declara los límites. Se ejercitó el camino "sin datos
   declarados", no el de un cliente con datos reales.
@@ -680,7 +754,8 @@ greenhouse-eo, dispatch del orquestador, aprobación de gates, env/redeploy en s
   `insights.edition.issue`, `INSIGHTS_ISSUANCE_ENABLED` y outputs validados. El puerto real (TASK-1846) valida
   SÓLO outputs `completed` con asset de la MISMA audiencia de la edición: un output interno jamás valida una
   edición de cliente; faltar uno es `not_ready` con `missing`.
-- **NUNCA** encolar un output que el motor no puede producir (`INSIGHT_RENDERABLE_OUTPUTS`, hoy `deck_pdf`):
+- **NUNCA** encolar un output que el motor no puede producir (`INSIGHT_RENDERABLE_OUTPUTS`: `deck_pdf` y, desde el
+  2026-09-24, `report_pdf`; pedir `web` se rechaza, porque la vista web la dibuja Think desde `InsightWebModelV1`):
   se rechaza `render_rejected`, nunca "queda para después". **NUNCA** truncar una cifra o una afirmación para
   que quepa en un slot del catálogo: el mapper rechaza con causa; sólo un label/título se acorta con elipsis.
 - **NUNCA** separar lease de fencing en el motor de render: el reclamo por lease vencido abre una ventana de
@@ -800,7 +875,11 @@ canary productivo. Los huérfanos en `running` sin lease requieren decisión hum
   ejecuciones del Job aún en curso antes de lanzar otra.
 - **Sigue fuera:** `INSIGHTS_ISSUANCE_ENABLED` OFF (paso de producto); `report_pdf` → TASK-1847; `web` → TASK-1848.
 
-### 14.7 Estado de TASK-1847 — catálogos y gráficos (staging con canary real, 2026-09-22; sin producción)
+### 14.7 Estado de TASK-1847 — catálogos y gráficos (complete 2026-09-25, en producción desde 2026-09-24)
+
+> Los bloques siguientes se escribieron cuando los catálogos estaban sólo en staging (2026-09-22) y se conservan como
+> historia; el estado vigente está en los deltas del 2026-09-24 («en producción») y del 2026-09-25 («cierre») al final
+> de esta sección, que prevalecen sobre las menciones a «no en producción».
 
 **Qué existe y está probado** (424 tests verdes entre `efeonce-insights` y `artifact-composer`,
 typecheck limpio, gates del worker OK):

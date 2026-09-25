@@ -1,5 +1,17 @@
 # TASK-1875 — Efeonce Insights: vista web compartida renderizada en Think (efeonce-think)
 
+## Delta 2026-09-25 (rediseño Insights)
+
+- **Planificado, no construido.** El contrato editorial v2 de TASK-1888 hará que `InsightWebModelV1` reciba campos
+  **opcionales**: lectura por figura («Lo que significa / Próximo paso»), cifra principal con su bajada y `channelId`
+  en las series o dimensiones que representan un canal. Son aditivos: un modelo sin ellos sigue siendo válido y el
+  render debe funcionar igual; su llegada sigue las reglas de `modelVersion` de esta task.
+- El render web respeta los **mismos roles de color de datos** que los PDF de TASK-1889: actual = navy en papel / teal
+  en navy; anterior o referencia = teal profundo / periwinkle; oportunidad = coral; ausencia = rayado, nunca un color.
+  Teal y coral no pueden ser lo único que separa dos series. Referencia:
+  `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md` (valores como tokens, nunca HEX
+  literal). — por trabajo en TASK-1888/TASK-1889
+
 ## Delta 2026-09-18
 
 - **Desbloqueada por TASK-1848** (en producción 2026-09-18, release `bda1cf2cd938`): el resolver público `GET /api/public/insights/shared/[token]` → `InsightWebModelV1` (`modelVersion '1.0'`, proyección client-facing) y el proxy de descarga `GET …/outputs/[output]` (re-chequea revocación) existen en producción, **con `INSIGHTS_SHARING_ENABLED` OFF** (con el flag OFF responde 404). Respuestas: 404 desconocido/expirado/flag OFF/org suspendida/módulo ausente; 410 revocado/retirado; 429 rate limit (IP 300/60 s, grant 60/20); cabeceras `private, no-store`, noindex, no-referrer, CSP. En staging el flag está ON y el canary sintético corrió completo en la org sandbox (`EO-INS-000015`). **El encendido en producción de sharing/delivery/schedules espera a esta task.** No probar límites con ráfagas concurrentes contra el resolver: una ráfaga de 64 requests dejó 86–88 conexiones ociosas en la base compartida (ISSUE-174 → TASK-1876). — por TASK-1848
