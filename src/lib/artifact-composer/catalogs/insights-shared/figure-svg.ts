@@ -87,6 +87,8 @@ export interface ColumnGroupInput {
   /** Variación impresa bajo el grupo («+3», «−2»), con su dirección. */
   delta?: string
   direction?: 'up' | 'down' | 'flat'
+  /** Mejor o peor según la dirección de la métrica; sin él se lee como el canvas (subir = mejor). */
+  tone?: 'better' | 'worse' | 'neutral'
 }
 
 export interface ColumnBandInput {
@@ -270,7 +272,9 @@ export const groupedColumnsSvg = (
     if (group.delta) {
       const mark = group.direction === 'up' ? '▲ ' : group.direction === 'down' ? '▼ ' : ''
 
-      labels.push(`<text class="fig-delta fig-delta--${group.direction ?? 'flat'}" x="${n(c)}" y="${box.deltaY + extra}" font-size="${box.fonts.delta}">${mark}${esc(group.delta)}</text>`)
+      const better = group.tone ? group.tone === 'better' : group.direction === 'up'
+
+      labels.push(`<text class="fig-delta${better ? '' : ' fig-delta--plain'}" x="${n(c)}" y="${box.deltaY + extra}" font-size="${box.fonts.delta}">${mark}${esc(group.delta)}</text>`)
     }
   })
 

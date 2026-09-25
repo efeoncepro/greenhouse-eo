@@ -99,10 +99,40 @@ const fmt = (fact: EvidenceFactV1, locale: string) => formatFactValue(fact.value
  * Dirección de una variación para el lector. En una POSICIÓN el número menor es mejor: bajar de #6,6 a #5,8 es
  * «subir» en Google, así que se invierte (caso real Berel: «▲ 0,8 pos.» destacaba un empeoramiento).
  */
-export const directionOf = (current: number, previous: number, unit?: string): 'up' | 'down' | 'flat' => {
-  const raw = current > previous ? 'up' : current < previous ? 'down' : 'flat'
+export const directionOf = (current: number, previous: number): 'up' | 'down' | 'flat' =>
+  current > previous ? 'up' : current < previous ? 'down' : 'flat'
 
-  return unit === 'position' && raw !== 'flat' ? (raw === 'up' ? 'down' : 'up') : raw
+/**
+ * Si subir es mejor para la métrica del hecho: la posición siempre es «menor es mejor»; si no, la dirección que declara
+ * el hecho de referencia (meta) de la misma métrica. Sin dirección conocida ⇒ null (tono neutro, nunca adivinado).
+ */
+export const higherIsBetterOf = (fact: EvidenceFactV1, facts: Iterable<EvidenceFactV1>): boolean | null => {
+  if (fact.unit === 'position') return false
+
+  for (const other of facts) {
+    const direction = other.dimension?.direction
+
+    if (other.module === fact.module && other.metricId === fact.metricId && direction) return direction === 'higher_is_better'
+  }
+
+  return null
+}
+
+/**
+ * Una sola regla para tablas y figuras: el triángulo sigue al valor (▲ subió, ▼ bajó) y el tono dice si el cambio es
+ * mejor o peor según la dirección de la métrica. Valor `<dirección>:<tono>` (ver `DELTA_VALUES` del catálogo).
+ */
+export const trendOf = (
+  current: number,
+  previous: number,
+  fact: EvidenceFactV1,
+  facts: Iterable<EvidenceFactV1>
+): { direction: 'up' | 'down' | 'flat'; tone: 'better' | 'worse' | 'neutral'; value: string } => {
+  const direction = directionOf(current, previous)
+  const higher = direction === 'flat' ? null : higherIsBetterOf(fact, facts)
+  const tone = higher === null ? 'neutral' : (direction === 'up') === higher ? 'better' : 'worse'
+
+  return { direction, tone, value: `${direction}:${tone}` }
 }
 
 /** La píldora dice la dirección con el triángulo: la cifra va sin signo. */
@@ -257,7 +287,7 @@ export const buildFigureSlides = (
           unit: unitWordOf(now.unit),
           current: fmt(now, locale),
           prior: fmt(before, locale),
-          direction: delta ? directionOf(now.value!, before.value!, now.unit) : 'flat',
+          direction: delta ? trendOf(now.value!, before.value!, now, byId.values()).value : 'flat:neutral',
           delta: delta ? unsigned(delta) : '—'
         }
       }]
@@ -295,7 +325,7 @@ export const buildFigureSlides = (
           label: chart.dimensionLabels[index] ?? now.label,
           current: fmt(now, locale),
           ...(before ? { prior: fmt(before, locale) } : {}),
-          ...(delta && before ? { delta, direction: directionOf(now.value!, before.value!, now.unit) } : {})
+          ...(delta && before ? (({ direction, tone }) => ({ delta, direction, tone }))(trendOf(now.value!, before.value!, now, byId.values())) : {})
         }
       }]
     })

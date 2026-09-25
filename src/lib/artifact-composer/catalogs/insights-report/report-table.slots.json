@@ -192,7 +192,14 @@
             "values": [
               "up",
               "down",
-              "flat"
+              "flat",
+              "up:better",
+              "up:worse",
+              "up:neutral",
+              "down:better",
+              "down:worse",
+              "down:neutral",
+              "flat:neutral"
             ],
             "notes": "Dirección de la variación de la fila. Sin ella, la píldora es neutra."
           },

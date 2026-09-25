@@ -279,14 +279,13 @@ body { background: var(--axis-deck-role-navy); }
 
 .delta-pill svg { display: block; flex-shrink: 0; }
 
-.delta--up { background: rgba(var(--axis-deck-role-navyAccent-rgb), 0.16); color: var(--axis-deck-role-navyAccent); }
+.delta--better { background: rgba(var(--axis-deck-role-navyAccent-rgb), 0.16); color: var(--axis-deck-role-navyAccent); }
 
-.delta--up .delta-mark { fill: var(--axis-deck-role-navyAccent); }
+.delta--better .delta-mark { fill: var(--axis-deck-role-navyAccent); }
 
-.delta--down,
-.delta--flat { background: rgba(var(--axis-deck-role-navyMuted-rgb), 0.12); color: var(--axis-deck-role-navyInk); }
+.delta--plain { background: rgba(var(--axis-deck-role-navyMuted-rgb), 0.12); color: var(--axis-deck-role-navyInk); }
 
-.delta--down .delta-mark { fill: var(--axis-deck-role-navyInk); }
+.delta--plain .delta-mark { fill: var(--axis-deck-role-navyInk); }
 
 /* Cierre en dos columnas sobre el pie: «Lo que significa» y «Próximo paso». */
 .fig-closing {
@@ -357,8 +356,7 @@ body { background: var(--axis-deck-role-navy); }
 
 .fig-delta { font-family: var(--axis-deck-type-display); font-weight: 600; font-variant-numeric: tabular-nums; fill: var(--axis-deck-role-navyAccent); }
 
-.fig-delta--down,
-.fig-delta--flat { fill: var(--axis-deck-role-dataPriorOnNavy); }
+.fig-delta--plain { fill: var(--axis-deck-role-dataPriorOnNavy); }
 
 .fig-swatch--opportunity { width: 13px; box-sizing: border-box; border-radius: 3px; border: 1.3px dashed var(--axis-deck-role-dataOpportunityOnNavy); background: rgba(var(--axis-deck-role-dataOpportunityOnNavy-rgb), 0.14); }
 

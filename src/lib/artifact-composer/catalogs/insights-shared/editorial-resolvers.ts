@@ -92,17 +92,34 @@ export const iconEffects = (value: string): FieldEffect[] | null => {
 }
 
 /**
- * Dirección de una variación: `up`, `down` o `flat`. Es DIRECCIÓN, no juicio (bajar puede ser bueno):
- * el tono sólo distingue si el período subió. El triángulo que no corresponde se quita.
+ * Variación: `<dirección>[:<tono>]`. La DIRECCIÓN (`up`/`down`/`flat`) es la del valor y decide el triángulo; el
+ * TONO (`better`/`worse`/`neutral`) dice si el cambio es bueno según la dirección de la métrica, y decide el color.
+ * Sin tono se lee como el canvas (subir = mejor). Así «▼ 7,6 %» de RpA puede ir en el tono bueno y «▲ 0,8 pos.»
+ * en el tono peor, con una sola regla para tablas y figuras.
  */
+export const DELTA_VALUES = ['up', 'down', 'flat', 'up:better', 'up:worse', 'up:neutral', 'down:better', 'down:worse', 'down:neutral', 'flat:neutral'] as const
+
+export const parseDelta = (value: string): { direction: 'up' | 'down' | 'flat'; better: boolean } | null => {
+  if (!(DELTA_VALUES as readonly string[]).includes(value)) return null
+
+  const [direction, tone] = value.split(':') as ['up' | 'down' | 'flat', string | undefined]
+
+  return { direction, better: tone ? tone === 'better' : direction === 'up' }
+}
+
 export const deltaToneEffects = (value: string): FieldEffect[] | null => {
-  if (value !== 'up' && value !== 'down' && value !== 'flat') return null
+  const parsed = parseDelta(value)
 
-  const tone: FieldEffect = { selector: ':field', toneClass: `delta--${value}`, toneGroup: ['delta--up', 'delta--down', 'delta--flat'] }
+  if (!parsed) return null
 
-  if (value === 'flat') return [tone, { selector: '.delta-mark-up', remove: true }, { selector: '.delta-mark-down', remove: true }]
+  const effects: FieldEffect[] = [
+    { selector: ':field', toneClass: parsed.better ? 'delta--better' : 'delta--plain', toneGroup: ['delta--better', 'delta--plain'] }
+  ]
 
-  return [tone, { selector: value === 'up' ? '.delta-mark-down' : '.delta-mark-up', remove: true }]
+  if (parsed.direction !== 'up') effects.push({ selector: '.delta-mark-up', remove: true })
+  if (parsed.direction !== 'down') effects.push({ selector: '.delta-mark-down', remove: true })
+
+  return effects
 }
 
 /**
@@ -171,7 +188,7 @@ export const bulletRowEffects = (item: Record<string, unknown>, slots: Record<st
     { selector: ':self', styleProp: '--achieved', styleValue: `${((value / scale) * 100).toFixed(1)}%` },
     { selector: ':self', styleProp: '--target', styleValue: `${((target / scale) * 100).toFixed(1)}%` },
     { selector: ':self', styleProp: '--zone', styleValue: band === null ? '0%' : `${((band / scale) * 100).toFixed(1)}%` },
-    { selector: '.delta-pill', toneClass: met ? 'delta--up' : 'delta--down', toneGroup: ['delta--up', 'delta--down'] },
+    { selector: '.delta-pill', toneClass: met ? 'delta--better' : 'delta--plain', toneGroup: ['delta--better', 'delta--plain'] },
     { selector: met ? '.delta-mark-down' : '.delta-mark-up', remove: true }
   ]
 
@@ -232,7 +249,7 @@ export const insightsEditorialResolvers = (prefix: string): ResolverRegistry => 
   },
   /** Dirección de la variación contra el período anterior. */
   [`${prefix}-delta-tone`]: {
-    known: ['up', 'down', 'flat'],
+    known: [...DELTA_VALUES],
     build: value => deltaToneEffects(value)
   },
   /** Barras del período y del anterior, en la escala propia de la métrica. */

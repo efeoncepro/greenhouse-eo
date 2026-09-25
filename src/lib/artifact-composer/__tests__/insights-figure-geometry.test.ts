@@ -134,7 +134,7 @@ describe('resolvers de figura', () => {
 
     expect(rpa).toContainEqual({ selector: ':self', toneClass: 'bullet--lower', toneGroup: ['bullet--lower'] })
     expect(rpa).toContainEqual({ selector: ':self', styleProp: '--zone', styleValue: '90.9%' })
-    expect(rpa).toContainEqual({ selector: '.delta-pill', toneClass: 'delta--up', toneGroup: ['delta--up', 'delta--down'] })
+    expect(rpa).toContainEqual({ selector: '.delta-pill', toneClass: 'delta--better', toneGroup: ['delta--better', 'delta--plain'] })
   })
 
   it('el cuerpo de la cifra del deck sale de su largo', () => {

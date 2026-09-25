@@ -377,14 +377,13 @@ body { background: var(--axis-report-role-navy); }
 
 .delta-pill svg { display: block; flex-shrink: 0; }
 
-.delta--up { background: var(--axis-report-role-paperAccent); color: var(--axis-report-role-navyInk); }
+.delta--better { background: var(--axis-report-role-paperAccent); color: var(--axis-report-role-navyInk); }
 
-.delta--up .delta-mark { fill: var(--axis-report-role-navyAccent); }
+.delta--better .delta-mark { fill: var(--axis-report-role-navyAccent); }
 
-.delta--down,
-.delta--flat { background: var(--axis-report-role-ruleSoft); color: var(--axis-report-role-paperInk); }
+.delta--plain { background: var(--axis-report-role-ruleSoft); color: var(--axis-report-role-paperInk); }
 
-.delta--down .delta-mark { fill: var(--axis-report-role-paperInk); }
+.delta--plain .delta-mark { fill: var(--axis-report-role-paperInk); }
 
 /* Panel de cierre de una figura: una o dos columnas según traiga «Próximo paso». */
 .closing--figure { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
@@ -427,8 +426,7 @@ body { background: var(--axis-report-role-navy); }
 
 .fig-delta { font-family: var(--axis-report-type-display); font-weight: 600; font-variant-numeric: tabular-nums; fill: var(--axis-report-role-paperAccent); }
 
-.fig-delta--down,
-.fig-delta--flat { fill: var(--axis-report-role-labelMuted); }
+.fig-delta--plain { fill: var(--axis-report-role-labelMuted); }
 
 /* Leyenda de columnas: muestra cuadrada y la de oportunidad con su borde discontinuo. */
 .figure-legend--columns .figure-legend-swatch { width: 10px; height: 10px; }

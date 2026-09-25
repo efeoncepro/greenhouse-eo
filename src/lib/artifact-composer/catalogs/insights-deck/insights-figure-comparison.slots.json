@@ -215,7 +215,14 @@
             "values": [
               "up",
               "down",
-              "flat"
+              "flat",
+              "up:better",
+              "up:worse",
+              "up:neutral",
+              "down:better",
+              "down:worse",
+              "down:neutral",
+              "flat:neutral"
             ]
           },
           "delta": {

@@ -51,7 +51,7 @@ import { InsightsRenderRejectedError } from '../errors'
 import { formatDeltaForUnit, formatFactValue } from '../editorial/format'
 import { chunkByCapacity, limitEntriesOf, rejectIfLonger } from './composition-helpers'
 import { channelNameOf, channelsOf, coverPage } from './cover'
-import { buildFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, directionOf, readingFor, sourcesOf, unsigned } from './figure-slots'
+import { buildFigureSlides, essentialTitleOf, FIGURE_CAPACITY, FIGURE_CONTENT_TYPE, readingFor, trendOf, sourcesOf, unsigned } from './figure-slots'
 import { issuedLongLabelOf, periodEndLongLabelOf, periodInlineOf, periodLabelOf } from './labels'
 import { withDedupedLimits } from './plan-limits'
 
@@ -249,17 +249,17 @@ const chapterBodyPages = (
       : {}
 
     // Barras sólo si toda la tabla comparte unidad; si no, la segunda columna es la variación con su formato canónico.
-    const variationOf = (index: number): { text: string; trend: 'up' | 'down' | 'flat' } | null => {
+    const variationOf = (index: number): { text: string; trend: string } | null => {
       const fact = rowFacts[index]
       const previous = fact?.comparisonFactId ? factsById.get(fact.comparisonFactId) : undefined
 
       if (!fact || fact.value === null || !previous || previous.value === null) return null
 
-      if (formatFactValue(fact.value, fact.unit, locale) === formatFactValue(previous.value, previous.unit, locale)) return { text: L.noChange, trend: 'flat' }
+      if (formatFactValue(fact.value, fact.unit, locale) === formatFactValue(previous.value, previous.unit, locale)) return { text: L.noChange, trend: 'flat:neutral' }
 
       const delta = formatDeltaForUnit(fact.value, previous.value, fact.unit, locale)
 
-      return delta ? { text: unsigned(delta), trend: directionOf(fact.value, previous.value, fact.unit) } : null
+      return delta ? { text: unsigned(delta), trend: trendOf(fact.value, previous.value, fact, factsById.values()).value } : null
     }
 
     const values = table.rows.map(row => parsePrintedNumber(row[1]))

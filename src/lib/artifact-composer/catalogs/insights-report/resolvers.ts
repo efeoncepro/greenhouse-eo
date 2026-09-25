@@ -8,7 +8,7 @@
 
 import type { FieldEffect, ResolverRegistry } from '../../resolver-contract'
 import { parsePrintedNumber } from '../../bar-figure'
-import { insightsEditorialResolvers } from '../insights-shared/editorial-resolvers'
+import { DELTA_VALUES, deltaToneEffects, insightsEditorialResolvers } from '../insights-shared/editorial-resolvers'
 
 export { parsePrintedNumber, roundingToleranceOf } from '../../bar-figure'
 
@@ -64,18 +64,10 @@ export const insightsReportResolvers: ResolverRegistry = {
     known: ['<derivado de rankOffset y la posición>'],
     build: (_value, ctx) => tableRankEffects(ctx.index, ctx.slots)
   },
-  /** Dirección de la variación de una fila (sin dato ⇒ neutra, sin triángulo). */
+  /** Variación de una fila: triángulo por la dirección del valor, tono por mejor/peor (sin dato ⇒ neutra). */
   'report-row-trend': {
-    known: ['up', 'down', 'flat'],
-    build: (value): FieldEffect[] => {
-      const direction = value === 'up' || value === 'down' ? value : 'flat'
-
-      return [
-        { selector: ':field', toneClass: `delta--${direction}`, toneGroup: ['delta--up', 'delta--down', 'delta--flat'] },
-        ...(direction === 'up' ? [] : [{ selector: '.delta-mark-up', remove: true as const }]),
-        ...(direction === 'down' ? [] : [{ selector: '.delta-mark-down', remove: true as const }])
-      ]
-    }
+    known: [...DELTA_VALUES],
+    build: (value): FieldEffect[] | null => deltaToneEffects(value === 'undefined' ? 'flat:neutral' : value)
   },
   'report-table-bar': {
     known: ['<derivado de valueA y barScaleMax>'],

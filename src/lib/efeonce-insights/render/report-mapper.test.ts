@@ -558,7 +558,7 @@ describe('buildInsightReportPlanInput', () => {
     expect(slots.barScaleMax).toBeUndefined()
     expect(slots.tableColumns.map((c: { label: string }) => c.label)).toEqual(['#', 'Métrica', 'Período', 'Variación'])
     expect(slots.tableRows.map((r: { valueB: string; trend?: string }) => [r.valueB, r.trend])).toEqual([
-      ['12,1 %', 'down'], ['9,6 %', 'down'], ['0,1 pp', 'down'], ['sin cambio', 'flat']
+      ['12,1 %', 'down:neutral'], ['9,6 %', 'down:neutral'], ['0,1 pp', 'down:neutral'], ['sin cambio', 'flat:neutral']
     ])
     expect(slots.legend).toBeUndefined()
     expect(slots.source.text).toBe('Google Search Console')
@@ -592,8 +592,9 @@ describe('buildInsightReportPlanInput', () => {
     const [figure] = periodComparison(2)
 
     expect(figure!.metrics.map(row => [row.name, row.current, row.prior, row.direction, row.delta])).toEqual([
-      ['Métrica 1', '1.000', '900', 'up', '11,1 %'],
-      ['Métrica 2', '2.000', '1.800', 'up', '11,1 %']
+      // Sin dirección declarada para la métrica, el tono es neutro: el triángulo dice que subió, no que mejoró.
+      ['Métrica 1', '1.000', '900', 'up:neutral', '11,1 %'],
+      ['Métrica 2', '2.000', '1.800', 'up:neutral', '11,1 %']
     ])
   })
 

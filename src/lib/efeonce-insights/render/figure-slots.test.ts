@@ -172,12 +172,29 @@ describe('nombre común de un empate (una sola función para esencial y cifra)',
   })
 })
 
-describe('dirección de una posición', () => {
-  it('bajar de número es subir en Google (caso Berel: #5,8 → #6,6 es empeorar)', async () => {
-    const { directionOf } = await import('./figure-slots')
+describe('una sola regla de variación: triángulo = valor, tono = mejor o peor', () => {
+  const f = (over: Record<string, unknown>) => ({ module: 'ico', metricId: 'm', unit: 'ratio', ...over }) as never
 
-    expect(directionOf(6.6, 5.8, 'position')).toBe('down')
-    expect(directionOf(5.8, 6.6, 'position')).toBe('up')
-    expect(directionOf(9377, 10662, 'count')).toBe('down')
+  it('posición: #5,8 → #6,6 sube el número y es peor (caso Berel)', async () => {
+    const { trendOf } = await import('./figure-slots')
+    const position = f({ module: 'seo', metricId: 'avg_position', unit: 'position' })
+
+    expect(trendOf(6.6, 5.8, position, [])).toMatchObject({ direction: 'up', tone: 'worse', value: 'up:worse' })
+    expect(trendOf(5.8, 6.6, position, []).value).toBe('down:better')
+  })
+
+  it('RpA: 1,44 → 1,33 baja y es mejor porque su meta declara «menor es mejor» (caso Sky)', async () => {
+    const { trendOf } = await import('./figure-slots')
+    const rpa = f({ metricId: 'rpa' })
+    const target = f({ metricId: 'rpa', role: 'reference', dimension: { metric: 'rpa', direction: 'lower_is_better' } })
+
+    expect(trendOf(1.33, 1.44, rpa, [target])).toMatchObject({ direction: 'down', tone: 'better', value: 'down:better' })
+  })
+
+  it('sin dirección declarada, tono neutro (nunca adivinado); sin cambio, plano', async () => {
+    const { trendOf } = await import('./figure-slots')
+
+    expect(trendOf(9377, 10662, f({ metricId: 'clicks', unit: 'count' }), []).value).toBe('down:neutral')
+    expect(trendOf(3, 3, f({}), []).value).toBe('flat:neutral')
   })
 })
