@@ -119,14 +119,24 @@ describe('TASK-1888 — productores v2 (ICO)', () => {
     const chapter = v2(icoSnapshot, ['ico']).chapters[0]!
     const reading = (chartId: string) => chapter.readings!.find(item => item.chartId === chartId)!
 
-    expect(reading('chart.ico.bullet.otd').meaning.text).toBe('Sky Airline: 81,9 %, bajo la meta de 90,0 %.')
+    // Conclusión = el hecho contra su META (no la comparación de períodos); con un solo space no hay «Lo que significa»
+    // porque repetiría la conclusión (hallazgo de 1846 en los PDF reales de Sky y Berel).
+    expect(reading('chart.ico.bullet.otd').conclusion!.text).toBe('Sky Airline: 81,9 %, bajo la meta de 90,0 %.')
+    expect(reading('chart.ico.bullet.otd').meaning).toBeUndefined()
+    expect(reading('chart.ico.bullet.otd').keyFigure!.caption.text).toBe('Entregas a tiempo · Sky Airline.')
     expect(reading('chart.ico.bullet.otd').keyFigure).toMatchObject({ factId: 'ico.otd.w.sp-1.2026-08', value: '81,9 %' })
     expect(reading('chart.ico.bullet.otd').nextStep!.text).toBe('Revisar primero Sky Airline: es donde la distancia con la meta es mayor.')
     // FTR 86 sobre la meta de 80 y RpA 1,33 bajo el techo de 1,5: alcanzadas ⇒ sin próximo paso inventado.
     expect(reading('chart.ico.bullet.ftr').nextStep).toBeNull()
-    expect(reading('chart.ico.bullet.rpa').meaning.text).toBe('Sky Airline: 1,33, bajo la meta de 1,50.')
+    expect(reading('chart.ico.bullet.rpa').conclusion!.text).toBe('Sky Airline: 1,33, bajo la meta de 1,50.')
     expect(reading('chart.ico.bullet.rpa').nextStep).toBeNull()
-    expect(reading('chart.ico.line.otd').meaning.text).toBe('Sky Airline: pasó de 78,4 % en 2026-06 a 81,9 % en 2026-08.')
+    expect(reading('chart.ico.line.otd').conclusion!.text).toBe('Sky Airline: pasó de 78,4 % en 2026-06 a 81,9 % en 2026-08.')
+    expect(reading('chart.ico.line.otd').meaning).toBeUndefined()
+    // Barras: la conclusión es la afirmación del hecho principal y no hay lectura que la repita.
+    expect(reading('chart.ico.percent').conclusion!.text).toMatch(/^OTD · Sky Airline · 2026-06/)
+    expect(reading('chart.ico.percent').meaning).toBeUndefined()
+
+    for (const item of chapter.readings!) expect(item.meaning?.text).not.toBe(item.conclusion?.text)
     expect(chapter.opening!.factIds).toEqual([])
   })
 
@@ -205,13 +215,13 @@ describe('TASK-1888 — canales y matriz', () => {
 describe('TASK-1888 — autoría IA v2', () => {
   it('reescribe la lectura por figura con el prompt v2 y cae al determinista si cambia una cifra', async () => {
     const deterministic = v2(icoSnapshot, ['ico'])
-    const meaning = deterministic.chapters[0]!.readings![0]!.meaning
+    const meaning = deterministic.chapters[0]!.readings!.find(item => item.conclusion)!.conclusion!
 
     const valid = vi.fn().mockResolvedValue({ model: 'gemini-test', usage: { inputTokens: 10, outputTokens: 5 }, data: { claims: [{ claimId: meaning.claimId, text: `En síntesis, ${meaning.text}` }] } })
     const ok = await authorPlanWithBoundedAi(deterministic, icoSnapshot, { generate: valid as never })
 
     expect(ok.provenance).toMatchObject({ mode: 'ai_bounded', promptVersion: INSIGHTS_AUTHORING_PROMPT_VERSION_V2 })
-    expect(ok.plan.chapters[0]!.readings![0]!.meaning.text).toBe(`En síntesis, ${meaning.text}`)
+    expect(ok.plan.chapters[0]!.readings!.find(item => item.conclusion?.claimId === meaning.claimId)!.conclusion!.text).toBe(`En síntesis, ${meaning.text}`)
 
     const invented = vi.fn().mockResolvedValue({ model: 'gemini-test', usage: { inputTokens: 10, outputTokens: 5 }, data: { claims: [{ claimId: meaning.claimId, text: 'Mejoró 40 % gracias al nuevo equipo.' }] } })
     const fallback = await authorPlanWithBoundedAi(deterministic, icoSnapshot, { generate: invented as never })

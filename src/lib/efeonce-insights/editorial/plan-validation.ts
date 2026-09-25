@@ -147,8 +147,13 @@ export const validateEditorialPlan = (plan: EditorialPlanV1, snapshot: EvidenceS
       }
 
       if (reading.conclusion) checkClaim(where, reading.conclusion)
-      checkClaim(where, reading.meaning)
+      if (reading.meaning) checkClaim(where, reading.meaning)
       if (reading.nextStep) checkClaim(where, reading.nextStep)
+
+      // Una lectura que repite la conclusión imprime la misma frase dos veces en la página (Berel, 2026-09-25).
+      if (reading.meaning && reading.conclusion && reading.meaning.text.trim() === reading.conclusion.text.trim()) {
+        invalid(where, 'la lectura repite la conclusión: omítela')
+      }
     }
   }
 

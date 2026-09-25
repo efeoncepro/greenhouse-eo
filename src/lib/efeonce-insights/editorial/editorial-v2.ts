@@ -165,16 +165,21 @@ const bulletReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, lo
   const gap = (entry: (typeof items)[number]) => (lowerIsBetter ? entry.value.value! - entry.target.value! : entry.target.value! - entry.value.value!)
   const lead = [...items].sort((a, b) => gap(b) - gap(a))[0]!
   const missing = items.filter(entry => gap(entry) > 0)
+
+  const metricId = chart.chartId.split('.').at(-1) ?? ''
   const phrase = (entry: (typeof items)[number]) => `${entry.item.label}: ${fmt(entry.value, locale)}, ${againstTarget(entry.value.value!, entry.target.value!)} ${fmt(entry.target, locale)}`
 
+  // Conclusión = el hecho principal CONTRA SU META (nunca la comparación de períodos, que es otra figura). «Lo que
+  // significa» sólo con varios spaces: con uno, repetiría la conclusión (hallazgo de 1846 en el PDF de Sky).
   return {
     chartId: chart.chartId,
     keyFigure: {
       factId: lead.value.factId,
       value: fmt(lead.value, locale),
-      caption: claim(`${chart.chartId}.key`, `${lead.item.label}, ${againstTarget(lead.value.value!, lead.target.value!)} ${fmt(lead.target, locale)}.`, [lead.value.factId, lead.target.factId])
+      caption: claim(`${chart.chartId}.key`, `${GH_INSIGHTS.metrics[metricId] ?? chart.title} · ${lead.item.label}.`, [lead.value.factId])
     },
-    meaning: claim(`${chart.chartId}.meaning`, `${items.map(phrase).join('; ')}.`, items.flatMap(entry => [entry.value.factId, entry.target.factId])),
+    conclusion: claim(`${chart.chartId}.conclusion`, `${phrase(lead)}.`, [lead.value.factId, lead.target.factId]),
+    ...(items.length > 1 ? { meaning: claim(`${chart.chartId}.meaning`, `${items.map(phrase).join('; ')}.`, items.flatMap(entry => [entry.value.factId, entry.target.factId])) } : {}),
     nextStep:
       missing.length > 0
         ? claim(`${chart.chartId}.next`, `${GH_INSIGHTS.reading.nextStepGap} ${lead.item.label}: ${GH_INSIGHTS.reading.nextStepGapReason}`, [lead.value.factId])
@@ -202,12 +207,17 @@ const lineReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, loca
   return {
     chartId: chart.chartId,
     keyFigure: { factId: lead.last.factId, value: fmt(lead.last, locale), caption: claim(`${chart.chartId}.key`, `${lead.series.label} · ${lastMonth}.`, [lead.last.factId]) },
-    meaning: claim(`${chart.chartId}.meaning`, `${phrases.map(phrase => phrase.text).join('; ')}.`, phrases.flatMap(phrase => [phrase.first.factId, phrase.last.factId])),
+    conclusion: claim(`${chart.chartId}.conclusion`, `${lead.text}.`, [lead.first.factId, lead.last.factId]),
+    // Con una sola serie la lectura sería la conclusión otra vez: se omite.
+    ...(phrases.length > 1 ? { meaning: claim(`${chart.chartId}.meaning`, `${phrases.map(phrase => phrase.text).join('; ')}.`, phrases.flatMap(phrase => [phrase.first.factId, phrase.last.factId])) } : {}),
     nextStep: null
   }
 }
 
-/** Barras (v1): la cifra principal es el primer hecho de la figura, dicho por su propia claim. */
+/**
+ * Barras: la conclusión es la afirmación del hecho principal. Sin «Lo que significa»: repetir esa afirmación no es una
+ * lectura (Berel p. 5, 2026-09-25); el panel queda para la redacción IA o humana.
+ */
 const barReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, locale: string, claims: PlanClaimV1[]): PlanFigureReadingV1 | null => {
   const current = chart.series.at(-1)
   const lead = current ? byId.get(current.factIds[0] ?? '') : undefined
@@ -221,7 +231,7 @@ const barReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, local
   return {
     chartId: chart.chartId,
     keyFigure: { factId: lead.factId, value: fmt(lead, locale), caption: claim(`${chart.chartId}.key`, `${lead.label}.`, [lead.factId]) },
-    meaning: { ...leadClaim, claimId: `${chart.chartId}.meaning` },
+    conclusion: { ...leadClaim, claimId: `${chart.chartId}.conclusion` },
     nextStep: null
   }
 }

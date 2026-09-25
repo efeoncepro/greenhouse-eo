@@ -63,7 +63,7 @@ const buildPrompt = (plan: EditorialPlanV1): string => {
   const claims = plan.chapters.flatMap(chapter => [
     ...chapter.claims.map(claim => ({ chapter: chapter.title, claimId: claim.claimId, text: claim.text })),
     // TASK-1888 — la lectura por figura también se reescribe; nunca la cifra principal ni las líneas de alcance.
-    ...(chapter.readings ?? []).flatMap(reading => [reading.meaning, ...(reading.nextStep ? [reading.nextStep] : [])].map(claim => ({ chapter: chapter.title, claimId: claim.claimId, text: claim.text })))
+    ...(chapter.readings ?? []).flatMap(reading => [reading.conclusion, reading.meaning, reading.nextStep].filter((claim): claim is NonNullable<typeof claim> => Boolean(claim)).map(claim => ({ chapter: chapter.title, claimId: claim.claimId, text: claim.text })))
   ])
 
   return JSON.stringify({ locale: plan.locale, claims }, null, 2)
@@ -78,7 +78,16 @@ const applyRewrite = (plan: EditorialPlanV1, rewritten: RewrittenClaims): Editor
     chapters: plan.chapters.map(chapter => ({
       ...chapter,
       claims: chapter.claims.map(rewrite),
-      ...(chapter.readings ? { readings: chapter.readings.map(reading => ({ ...reading, meaning: rewrite(reading.meaning), nextStep: reading.nextStep ? rewrite(reading.nextStep) : null })) } : {})
+      ...(chapter.readings
+        ? {
+            readings: chapter.readings.map(reading => ({
+              ...reading,
+              ...(reading.conclusion ? { conclusion: rewrite(reading.conclusion) } : {}),
+              ...(reading.meaning ? { meaning: rewrite(reading.meaning) } : {}),
+              nextStep: reading.nextStep ? rewrite(reading.nextStep) : null
+            }))
+          }
+        : {})
     }))
   }
 }

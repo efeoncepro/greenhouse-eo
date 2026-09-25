@@ -44,9 +44,13 @@ export interface PlanKeyFigureV1 {
 export interface PlanFigureReadingV1 {
   chartId: string
   keyFigure?: PlanKeyFigureV1
-  /** Conclusión de la página (título afirmativo sobre el gráfico). */
+  /** Conclusión de la página (título afirmativo sobre el gráfico). El planner v2 la emite siempre. */
   conclusion?: PlanClaimV1
-  meaning: PlanClaimV1
+  /**
+   * «Lo que significa». Opcional: sólo existe cuando dice algo que la conclusión no dice (varios spaces o series). Una
+   * lectura que repite la conclusión no es lectura; sin ella el panel no aparece y queda para la redacción IA o humana.
+   */
+  meaning?: PlanClaimV1
   /** Null cuando la evidencia no sostiene un paso concreto: nunca se inventa uno. */
   nextStep: PlanClaimV1 | null
 }

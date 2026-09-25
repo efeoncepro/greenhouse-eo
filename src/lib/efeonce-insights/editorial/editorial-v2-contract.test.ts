@@ -140,7 +140,7 @@ describe('TASK-1888 — campos v2 del plan bajo la misma regla de cifras', () =>
       chapters: plan.chapters.map(chapter => ({
         ...chapter,
         opening: bad('o'),
-        readings: [{ chartId, keyFigure: { factId: 'ico.otd.cur', value: '82 %', caption: bad('k') }, conclusion: bad('c'), meaning: bad('mean'), nextStep: bad('n') }]
+        readings: [{ chartId, keyFigure: { factId: 'ico.otd.cur', value: '82 %', caption: bad('k') }, conclusion: bad('c'), meaning: claim('mean', 'Cayó 13 %.', ['ico.otd.cur']), nextStep: bad('n') }]
       }))
     }
 
@@ -149,6 +149,19 @@ describe('TASK-1888 — campos v2 del plan bajo la misma regla de cifras', () =>
     expect(rulesOf(v2).sort()).toEqual(
       ['essentials:unreferenced_number', 'scopeLines:unreferenced_number', 'decision:unreferenced_number', 'measurement:unreferenced_number', 'ask:unreferenced_number', 'chapter.ico.opening:unreferenced_number', reading, reading, reading, reading, reading].sort()
     )
+  })
+
+  it('rechaza una lectura que repite la conclusión (misma frase dos veces en la página)', () => {
+    const plan = v1Plan()
+    const chartId = plan.chapters[0]!.charts[0]!.chartId
+    const text = 'OTD · Sky · 2026-08: 81,9 %.'
+
+    const v2: EditorialPlanV1 = {
+      ...plan,
+      chapters: plan.chapters.map(chapter => ({ ...chapter, readings: [{ chartId, conclusion: claim('c', text, ['ico.otd.cur']), meaning: claim('m', text, ['ico.otd.cur']), nextStep: null }] }))
+    }
+
+    expect(rulesOf(v2)).toEqual([`chapter.ico.reading.${chartId}:invalid_field`])
   })
 
   it('rechaza formas inválidas: más de 5 esenciales, lectura huérfana, acciones y portada incoherentes', () => {
