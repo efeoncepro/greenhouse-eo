@@ -10,6 +10,7 @@
  */
 
 import type { FieldEffect, ResolverRegistry } from '../../resolver-contract'
+import { parsePrintedNumber } from '../../bar-figure'
 import { channelIsotypeEffects, CHANNEL_ISOTYPES } from './channels'
 
 /**
@@ -75,6 +76,106 @@ export const clientLogoEffects = (value: string): FieldEffect[] | null => {
 }
 
 
+/**
+ * Íconos de trazo de las páginas de figura (TASK-1889 Slice 4), los del canvas aprobado. La plantilla
+ * trae el set completo (`.i-<clave>`) y el resolver deja sólo el pedido. Sin clave, el nodo se quita:
+ * una métrica sin ícono propio no recibe uno ajeno. Una clave desconocida falla cerrado.
+ */
+export const FIGURE_ICON_KEYS = ['bars', 'clicks', 'impressions', 'ctr', 'search', 'target', 'link', 'trend'] as const
+
+export const iconEffects = (value: string): FieldEffect[] | null => {
+  if (isAbsent(value)) return [{ selector: ':field', remove: true }]
+
+  if (!(FIGURE_ICON_KEYS as readonly string[]).includes(value)) return null
+
+  return FIGURE_ICON_KEYS.filter(key => key !== value).map(key => ({ selector: `.i-${key}`, remove: true }))
+}
+
+/**
+ * Dirección de una variación: `up`, `down` o `flat`. Es DIRECCIÓN, no juicio (bajar puede ser bueno):
+ * el tono sólo distingue si el período subió. El triángulo que no corresponde se quita.
+ */
+export const deltaToneEffects = (value: string): FieldEffect[] | null => {
+  if (value !== 'up' && value !== 'down' && value !== 'flat') return null
+
+  const tone: FieldEffect = { selector: ':field', toneClass: `delta--${value}`, toneGroup: ['delta--up', 'delta--down', 'delta--flat'] }
+
+  if (value === 'flat') return [tone, { selector: '.delta-mark-up', remove: true }, { selector: '.delta-mark-down', remove: true }]
+
+  return [tone, { selector: value === 'up' ? '.delta-mark-down' : '.delta-mark-up', remove: true }]
+}
+
+/**
+ * Par de barras de una métrica (período y anterior) en la escala PROPIA de la métrica: el mayor de los
+ * dos ocupa el carril completo. Salen del número impreso de `current`/`prior` —la misma cifra que se
+ * lee al lado—, así barra y etiqueta no pueden decir cosas distintas. Sin anterior, se quita su línea;
+ * un valor negativo o ilegible no dibuja barra (nunca una barra que el dato no sostiene).
+ */
+export const pairBarsEffects = (item: Record<string, unknown>): FieldEffect[] => {
+  const current = parsePrintedNumber(item.current)
+  const prior = item.prior === undefined ? null : parsePrintedNumber(item.prior)
+  const max = Math.max(0, current ?? 0, prior ?? 0)
+  const effects: FieldEffect[] = []
+
+  const bar = (selector: string, value: number | null) => {
+    if (value === null || value < 0 || max <= 0) effects.push({ selector, remove: true })
+    else effects.push({ selector, styleProp: '--fill', styleValue: (value / max).toFixed(4) })
+  }
+
+  bar('.bar-current', current)
+
+  if (item.prior === undefined) effects.push({ selector: '.pair-prior', remove: true })
+  else bar('.bar-prior', prior)
+
+  return effects
+}
+
+/**
+ * Fila de metas (bullet, canvas `Premium-Metas`). Cada fila mide en su PROPIA escala: el mayor entre
+ * lo logrado y la meta ocupa el 91 % del carril (1,1 × máximo, la regla del canvas), la marca vertical
+ * es la meta y la pista se aclara desde el 85 % de la meta (zona «cerca»; con `lower_is_better`, la
+ * zona es la meta misma). La fila «mayor brecha» es la que queda más lejos de su meta en la dirección
+ * que empeora —se decide con TODAS las filas, no por posición— y el tono de la píldora sale de si se
+ * alcanzó. Todo desde las cifras impresas: nada que el dato no sostenga.
+ */
+export const bulletRowEffects = (item: Record<string, unknown>, slots: Record<string, unknown>): FieldEffect[] | null => {
+  const lowerIsBetter = slots.bulletDirection === 'lower_is_better'
+  const value = parsePrintedNumber(item.value)
+  const target = parsePrintedNumber(item.target)
+
+  if (value === null || target === null || value < 0 || target <= 0) return null
+
+  const ratio = (row: Record<string, unknown>): number | null => {
+    const v = parsePrintedNumber(row.value)
+    const t = parsePrintedNumber(row.target)
+
+    if (v === null || t === null || t <= 0) return null
+
+    // Brecha normalizada: > 1 = no alcanzó (en la dirección que empeora).
+    return lowerIsBetter ? v / t : t / Math.max(v, 1e-9)
+  }
+
+  const rows = Array.isArray(slots.bulletRows) ? (slots.bulletRows as Record<string, unknown>[]) : []
+  const gaps = rows.map(ratio).filter((r): r is number => r !== null && r > 1)
+  const own = ratio(item)!
+  const met = own <= 1
+  const worst = gaps.length > 0 ? Math.max(...gaps) : null
+  const scale = Math.max(value, target) * 1.1
+  const zone = lowerIsBetter ? target : target * 0.85
+
+  const effects: FieldEffect[] = [
+    { selector: ':self', styleProp: '--achieved', styleValue: `${((value / scale) * 100).toFixed(1)}%` },
+    { selector: ':self', styleProp: '--target', styleValue: `${((target / scale) * 100).toFixed(1)}%` },
+    { selector: ':self', styleProp: '--zone', styleValue: `${((zone / scale) * 100).toFixed(1)}%` },
+    { selector: '.delta-pill', toneClass: met ? 'delta--up' : 'delta--down', toneGroup: ['delta--up', 'delta--down'] },
+    { selector: met ? '.delta-mark-down' : '.delta-mark-up', remove: true }
+  ]
+
+  if (!met && worst !== null && own === worst) effects.push({ selector: ':self', toneClass: 'bullet--gap', toneGroup: ['bullet--gap'] })
+
+  return effects
+}
+
 export const insightsEditorialResolvers = (prefix: string): ResolverRegistry => ({
   /** `channelId` → isotipo del canal. Un canal desconocido se dibuja sin isotipo (no rompe). */
   [`${prefix}-channel-isotype`]: {
@@ -116,5 +217,33 @@ export const insightsEditorialResolvers = (prefix: string): ResolverRegistry => 
         : value === 'action'
           ? [{ selector: '.closing-icon--measure', remove: true }]
           : null
+  },
+  /** Ícono de trazo de una métrica o de la figura (set del canvas). */
+  [`${prefix}-icon`]: {
+    known: [...FIGURE_ICON_KEYS],
+    build: value => iconEffects(value)
+  },
+  /** Dirección de la variación contra el período anterior. */
+  [`${prefix}-delta-tone`]: {
+    known: ['up', 'down', 'flat'],
+    build: value => deltaToneEffects(value)
+  },
+  /** Barras del período y del anterior, en la escala propia de la métrica. */
+  [`${prefix}-pair-bars`]: {
+    known: ['<derivado de current y prior>'],
+    build: (_value, ctx) => pairBarsEffects(ctx.item)
+  },
+  /** Fila de metas: escala propia, marca de meta, zona y mayor brecha, desde las cifras. */
+  [`${prefix}-bullet-row`]: {
+    known: ['<derivado de value, target, bulletDirection y las demás filas>'],
+    build: (_value, ctx) => bulletRowEffects(ctx.item, ctx.slots)
+  },
+  /** Muestra de línea de la leyenda según el rol de la serie (el mismo trazo que en la figura). */
+  [`${prefix}-line-role`]: {
+    known: ['primary', 'reference', 'detail'],
+    build: value =>
+      ['primary', 'reference', 'detail'].includes(value)
+        ? ['primary', 'reference', 'detail'].filter(role => role !== value).map(role => ({ selector: `.line-swatch--${role}`, remove: true }))
+        : null
   }
 })

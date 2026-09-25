@@ -1,0 +1,202 @@
+{
+  "reference": "Deck-Lineas",
+  "catalog": "deck",
+  "contentType": "insights-figure-trend",
+  "slots": {
+    "tabNumber": "01",
+    "section": "Visibilidad orgánica",
+    "period": "Agosto 2026 · contra julio 2026",
+    "eyebrow": {
+      "icon": "clicks",
+      "label": "Clics día a día"
+    },
+    "keyFigure": "46",
+    "keyCaption": "clics por día al cierre de agosto, media de 7 días <strong>(partió en 37)</strong>",
+    "conclusion": "Los clics subieron durante todo el mes, no en un pico aislado",
+    "figureTitle": "Clics por día en Search Console",
+    "source": {
+      "label": "Fuente",
+      "text": "Google Search Console"
+    },
+    "lineLegend": [
+      {
+        "role": "primary",
+        "label": "Agosto, media de 7 días"
+      },
+      {
+        "role": "detail",
+        "label": "Agosto, diario"
+      },
+      {
+        "role": "reference",
+        "label": "Julio, media de 7 días"
+      }
+    ],
+    "lineSeries": [
+      {
+        "label": "Agosto, media",
+        "role": "primary",
+        "values": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "37,4196",
+          "37,8482",
+          "37,8482",
+          "38,0089",
+          "38,2768",
+          "38,1429",
+          "38,5714",
+          "39,8571",
+          "39,7232",
+          "40,1518",
+          "40,8482",
+          "42,4286",
+          "43,4196",
+          "43,7143",
+          "44,4375",
+          "44,5714",
+          "45,4286",
+          "45,2946",
+          "44,5714",
+          "44,2768",
+          "44,5714",
+          "44,7054",
+          "45,1339",
+          "45,1339",
+          "45,8571"
+        ],
+        "endLabel": "46"
+      },
+      {
+        "label": "Agosto, diario",
+        "role": "detail",
+        "values": [
+          "24,9911",
+          "24,9911",
+          "44,0089",
+          "39,9911",
+          "44,0089",
+          "42,9911",
+          "41,0089",
+          "27,9911",
+          "24,9911",
+          "45,0000",
+          "42,0000",
+          "42,9911",
+          "45,9911",
+          "50,0089",
+          "27,0000",
+          "27,9911",
+          "50,0089",
+          "53,0089",
+          "50,0089",
+          "48,0000",
+          "54,9911",
+          "27,9911",
+          "33,9911",
+          "48,9911",
+          "48,0000",
+          "48,0000",
+          "50,0089",
+          "56,0089",
+          "30,9911",
+          "33,9911",
+          "54,0000"
+        ]
+      },
+      {
+        "label": "Julio, media",
+        "role": "reference",
+        "values": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "33,5625",
+          "33,4286",
+          "33,5625",
+          "34,1518",
+          "34,2857",
+          "34,7143",
+          "34,8482",
+          "34,7143",
+          "35,1429",
+          "35,1429",
+          "35,5714",
+          "36,0000",
+          "35,7054",
+          "36,1339",
+          "36,1339",
+          "36,0000",
+          "36,2946",
+          "35,5714",
+          "35,4375",
+          "35,2768",
+          "35,0089",
+          "35,7054",
+          "36,0000",
+          "36,1339",
+          "36,1339"
+        ],
+        "endLabel": "36"
+      }
+    ],
+    "lineXLabels": [
+      {
+        "index": 0,
+        "label": "1 ago"
+      },
+      {
+        "index": 7,
+        "label": "8"
+      },
+      {
+        "index": 14,
+        "label": "15"
+      },
+      {
+        "index": 21,
+        "label": "22"
+      },
+      {
+        "index": 28,
+        "label": "29"
+      }
+    ],
+    "lineAnnotations": {
+      "band": {
+        "from": 15,
+        "to": 30,
+        "label": "Segunda quincena · 45 clics diarios"
+      },
+      "startLabel": "37",
+      "fillBetween": true
+    },
+    "note": {
+      "text": "Los diez días con menos clics fueron sábados o domingos; ninguno quebró la media."
+    },
+    "closing": [
+      {
+        "kind": "measure",
+        "label": "Lo que significa",
+        "text": "El alza es sostenida: agosto cerró 10 clics diarios por encima de julio (46 contra 36). Septiembre parte de una base más alta."
+      },
+      {
+        "kind": "action",
+        "label": "Próximo paso",
+        "text": "Tomar 46 clics diarios como base de septiembre y avisar si la media de 7 días cae bajo la de agosto."
+      }
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "folio": {
+      "page": "08",
+      "total": "24"
+    }
+  }
+}

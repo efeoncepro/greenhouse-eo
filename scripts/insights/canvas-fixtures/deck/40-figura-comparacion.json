@@ -1,0 +1,75 @@
+{
+  "reference": "Deck-Comparacion",
+  "catalog": "deck",
+  "contentType": "insights-figure-comparison",
+  "slots": {
+    "tabNumber": "01",
+    "section": "Visibilidad orgánica",
+    "period": "Agosto 2026 · contra julio 2026",
+    "eyebrow": {
+      "icon": "bars",
+      "label": "Comparación de períodos"
+    },
+    "keyFigure": "+16,5 %",
+    "keyCaption": "clics desde Google en agosto, contra julio <strong>(1.284 contra 1.102)</strong>",
+    "conclusion": "El sitio convierte mejor lo que muestra: más clics con menos impresiones",
+    "figureTitle": "Search Console · agosto contra julio",
+    "source": {
+      "label": "Fuente",
+      "text": "Google Search Console"
+    },
+    "legend": {
+      "current": "Agosto 2026",
+      "prior": "Julio 2026"
+    },
+    "metrics": [
+      {
+        "icon": "clicks",
+        "name": "Clics",
+        "unit": "cantidad",
+        "current": "1.284",
+        "prior": "1.102",
+        "direction": "up",
+        "delta": "16,5 %"
+      },
+      {
+        "icon": "impressions",
+        "name": "Impresiones",
+        "unit": "cantidad",
+        "current": "48.310",
+        "prior": "51.940",
+        "direction": "down",
+        "delta": "7,0 %"
+      },
+      {
+        "icon": "ctr",
+        "name": "CTR",
+        "unit": "porcentaje",
+        "current": "2,66 %",
+        "prior": "2,12 %",
+        "direction": "up",
+        "delta": "0,54 pp"
+      }
+    ],
+    "note": {
+      "text": "Por cada 100 impresiones, agosto consiguió 2,7 clics; julio, 2,1."
+    },
+    "closing": [
+      {
+        "kind": "measure",
+        "label": "Lo que significa",
+        "text": "El sitio no necesita más visibilidad para crecer: necesita convertir la que ya tiene. Cada punto de CTR vale unos 480 clics al mes."
+      },
+      {
+        "kind": "action",
+        "label": "Próximo paso",
+        "text": "Reescribir títulos y descripciones de /precios, /servicios y /preguntas-frecuentes: mucha visibilidad, CTR bajo la mediana."
+      }
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "folio": {
+      "page": "06",
+      "total": "24"
+    }
+  }
+}

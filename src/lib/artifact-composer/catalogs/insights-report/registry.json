@@ -21,7 +21,11 @@
     "report-plan",
     "report-limits",
     "report-back-cover",
-    "report-cover-light"
+    "report-cover-light",
+    "report-figure-comparison",
+    "report-figure-columns",
+    "report-figure-targets",
+    "report-figure-trend"
   ],
   "templates": [
     {
@@ -180,6 +184,58 @@
       ],
       "prototype": "report-cover-light.html",
       "slotsRef": "report-cover-light.slots.json"
+    },
+    {
+      "name": "ReportFigureComparisonPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-figure-comparison"
+      ],
+      "prototype": "report-figure-comparison.html",
+      "slotsRef": "report-figure-comparison.slots.json"
+    },
+    {
+      "name": "ReportFigureColumnsPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-figure-columns"
+      ],
+      "prototype": "report-figure-columns.html",
+      "slotsRef": "report-figure-columns.slots.json"
+    },
+    {
+      "name": "ReportFigureTargetsPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-figure-targets"
+      ],
+      "prototype": "report-figure-targets.html",
+      "slotsRef": "report-figure-targets.slots.json"
+    },
+    {
+      "name": "ReportFigureTrendPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-figure-trend"
+      ],
+      "prototype": "report-figure-trend.html",
+      "slotsRef": "report-figure-trend.slots.json"
     }
   ],
   "selector": {
@@ -196,14 +252,22 @@
       "report-plan": "ReportPlanPage",
       "report-limits": "ReportLimitsPage",
       "report-back-cover": "ReportBackCoverPage",
-      "report-cover-light": "ReportCoverLightPage"
+      "report-cover-light": "ReportCoverLightPage",
+      "report-figure-comparison": "ReportFigureComparisonPage",
+      "report-figure-columns": "ReportFigureColumnsPage",
+      "report-figure-targets": "ReportFigureTargetsPage",
+      "report-figure-trend": "ReportFigureTrendPage"
     },
     "disambiguation": [
       "el índice real deriva de la primera página de cada sección del plan físico; nunca se calcula desde el título ni se pagina después del render.",
       "capítulo cuya evidencia no alcanzó para una figura, y el resumen ejecutivo => ReportNarrativePage. NUNCA se omite el capítulo: desaparecerlo convierte la falta de datos en silencio.",
       "página analítica: una afirmación con la figura que la prueba => ReportAnalysisPage.",
       "filas comparables que el lector va a auditar => ReportTablePage. Una tabla NO es una figura: no se convierte en gráfico para «verse mejor».",
-      "lo que la edición no puede afirmar, con su causa => ReportLimitsPage. Nunca se omite porque «quedó pobre»."
+      "lo que la edición no puede afirmar, con su causa => ReportLimitsPage. Nunca se omite porque «quedó pobre».",
+      "figura contra el período anterior cuyas dimensiones son MÉTRICAS distintas (clics, impresiones, CTR) => ReportFigureComparisonPage: cada métrica en su escala.",
+      "figura cuyas dimensiones COMPARTEN escala (tramos, canales) => ReportFigureColumnsPage: columnas sobre un mismo eje.",
+      "resultado contra una meta oficial (bullet) => ReportFigureTargetsPage: cada indicador en su escala, con la meta como marca.",
+      "tendencia en el tiempo (line) => ReportFigureTrendPage: hasta tres series distinguibles por rol, sin interpolar huecos."
     ],
     "rules": [
       "Una página = un content-type = una plantilla. Si el contenido mezcla dos intenciones, son dos páginas.",

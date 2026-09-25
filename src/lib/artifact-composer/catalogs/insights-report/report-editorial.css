@@ -264,3 +264,219 @@ body { background: var(--axis-report-role-navy); }
 .paper-folio-page { font-family: var(--axis-report-type-display); font-size: 16px; font-weight: 600; color: var(--axis-report-role-paperInk); }
 
 .paper-folio-total { font-size: 8.5px; letter-spacing: 0.06em; opacity: 0.6; }
+
+/* ─── Páginas de figura (TASK-1889 Slice 4) ─────────────────────────────────────────────────────── */
+
+/* Pestaña de capítulo en el canto derecho: el número del capítulo al que pertenece la figura. */
+.chapter-tab {
+  position: absolute;
+  right: 0;
+  top: 140px;
+  width: 24px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
+  background: var(--axis-report-role-paperAccent);
+  color: var(--axis-report-role-navyInk);
+  font-family: var(--axis-report-type-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+}
+
+/*
+ * Set de íconos de trazo: la plantilla trae todos y el resolver `report-icon` deja sólo el de la
+ * métrica (o quita el nodo si la métrica no tiene ícono). Nunca un ícono inventado por métrica.
+ */
+.icon-set { display: flex; flex-shrink: 0; }
+
+.icon-set .stroke-icon { stroke: var(--axis-report-role-paperAccent); }
+
+/* Cifra principal + conclusión: la gramática de toda página de figura aprobada. */
+.figure-hero { margin-top: 16px; display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 34px; align-items: start; }
+
+.figure-count { display: flex; flex-direction: column; gap: 10px; }
+
+.figure-number {
+  font-family: var(--axis-report-type-display);
+  font-size: 76px;
+  line-height: 0.95;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  color: var(--axis-report-role-paperAccent);
+}
+
+.figure-caption { max-width: 200px; font-size: 12.5px; line-height: 1.45; color: var(--axis-report-role-paperAccent); }
+
+.figure-caption strong { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--axis-report-role-paperInk); }
+
+.figure-heading { display: flex; flex-direction: column; gap: 12px; padding-top: 4px; }
+
+.figure-title {
+  margin: 0;
+  font-family: var(--axis-report-type-display);
+  font-size: 23px;
+  line-height: 1.24;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--axis-report-role-paperInk);
+}
+
+.figure-lead { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--axis-report-role-paperAccent); }
+
+/* Título de la figura + leyenda. */
+.figure-caption-row { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; }
+
+.figure-board-title { font-size: 13px; font-weight: 600; color: var(--axis-report-role-paperInk); }
+
+.figure-legend { display: flex; align-items: center; gap: 16px; font-size: 10.5px; color: var(--axis-report-role-paperAccent); }
+
+.figure-legend-item { display: flex; align-items: center; gap: 6px; }
+
+.figure-legend-swatch { width: 14px; height: 8px; border-radius: 2px; }
+
+.swatch--current { background: var(--axis-report-role-dataCurrentOnPaper); }
+
+.swatch--prior { background: var(--axis-report-role-dataPriorOnPaper); }
+
+/* Nota de lectura bajo la figura (opcional). */
+.figure-note { margin-top: 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-style: italic; color: var(--axis-report-role-paperAccent); }
+
+.figure-note .stroke-icon { stroke: var(--axis-report-role-paperAccent); }
+
+/* Procedencia: unidad, fuente y cobertura. */
+.figure-provenance { margin-top: 24px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; font-size: 11px; line-height: 1.5; color: var(--axis-report-role-paperInk); }
+
+.figure-provenance-item { display: flex; flex-direction: column; gap: 3px; }
+
+.figure-provenance-label {
+  font-family: var(--axis-report-type-display);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--axis-report-role-paperAccent);
+}
+
+/* Variación contra el período anterior: la dirección se dice con forma (triángulo), no sólo color. */
+.delta-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-family: var(--axis-report-type-display);
+  font-size: 12.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.delta-pill svg { display: block; flex-shrink: 0; }
+
+.delta--up { background: var(--axis-report-role-paperAccent); color: var(--axis-report-role-navyInk); }
+
+.delta--up .delta-mark { fill: var(--axis-report-role-navyAccent); }
+
+.delta--down,
+.delta--flat { background: var(--axis-report-role-ruleSoft); color: var(--axis-report-role-paperInk); }
+
+.delta--down .delta-mark { fill: var(--axis-report-role-paperInk); }
+
+/* Panel de cierre de una figura: una o dos columnas según traiga «Próximo paso». */
+.closing--figure { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+
+/* Piezas opcionales ausentes: el nodo queda vacío y no ocupa lugar (nunca copy de ejemplo). */
+.chapter-tab:empty,
+.figure-lead:empty,
+.figure-note:empty,
+.figure-provenance:empty,
+.closing--figure:empty { display: none; }
+
+.figure-legend-item:not(:has([data-slot-field])) { display: none; }
+
+/* Figuras dibujadas por el hook (`figure-svg.ts`): la geometría es compartida, el color es de acá. */
+.fig-columns { display: block; overflow: visible; font-family: var(--axis-report-type-text); }
+
+.fig-band { fill: var(--axis-report-role-paperAccent); fill-opacity: 0.04; }
+
+.fig-band-label { font-family: var(--axis-report-type-display); font-weight: 600; letter-spacing: 1.4px; fill: var(--axis-report-role-paperAccent); }
+
+.fig-grid { stroke: var(--axis-report-role-rule); }
+
+.fig-tick { fill: var(--axis-report-role-paperAccent); }
+
+.fig-opportunity { fill: var(--axis-report-role-dataOpportunityOnPaper); fill-opacity: 0.08; stroke: var(--axis-report-role-dataOpportunityOnPaper); stroke-width: 1.2; stroke-dasharray: 4 3; }
+
+.fig-opportunity-dot { fill: var(--axis-report-role-dataOpportunityOnPaper); }
+
+.fig-current { fill: var(--axis-report-role-dataCurrentOnPaper); }
+
+.fig-prior { fill: var(--axis-report-role-dataPriorOnPaper); fill-opacity: 0.72; }
+
+.fig-baseline { stroke: var(--axis-report-role-paperAccent); stroke-opacity: 0.4; }
+
+.fig-current-value { font-weight: 700; font-variant-numeric: tabular-nums; fill: var(--axis-report-role-paperInk); }
+
+.fig-prior-value { font-variant-numeric: tabular-nums; fill: var(--axis-report-role-paperAccent); }
+
+.fig-dimension { font-weight: 600; font-variant-numeric: tabular-nums; fill: var(--axis-report-role-paperInk); }
+
+.fig-delta { font-family: var(--axis-report-type-display); font-weight: 600; font-variant-numeric: tabular-nums; fill: var(--axis-report-role-paperAccent); }
+
+.fig-delta--down,
+.fig-delta--flat { fill: var(--axis-report-role-labelMuted); }
+
+/* Leyenda de columnas: muestra cuadrada y la de oportunidad con su borde discontinuo. */
+.figure-legend--columns .figure-legend-swatch { width: 10px; height: 10px; }
+
+.figure-legend--columns .swatch--prior { opacity: 0.72; }
+
+.figure-legend--columns .swatch--opportunity { width: 12px; box-sizing: border-box; border-radius: 3px; border: 1.2px dashed var(--axis-report-role-dataOpportunityOnPaper); background: rgba(var(--axis-report-role-dataOpportunityOnPaper-rgb), 0.1); }
+
+.fig-lines { display: block; overflow: visible; font-family: var(--axis-report-type-text); }
+
+.fig-area { fill: var(--axis-report-role-dataPriorOnPaper); fill-opacity: 0.16; }
+
+.fig-line { fill: none; stroke-linejoin: round; }
+
+.fig-line--primary { stroke: var(--axis-report-role-dataCurrentOnPaper); stroke-width: 2.6; stroke-linecap: round; }
+
+.fig-line--reference { stroke: var(--axis-report-role-dataPriorOnPaper); stroke-width: 2.2; stroke-dasharray: 5 3; }
+
+.fig-line--detail { stroke: var(--axis-report-role-dataCurrentOnPaper); stroke-width: 1; stroke-opacity: 0.4; }
+
+.fig-halo { fill: var(--axis-report-role-dataCurrentOnPaper); fill-opacity: 0.14; }
+
+.fig-end-dot { fill: var(--axis-report-role-dataCurrentOnPaper); }
+
+.fig-start-dot { fill: var(--axis-report-role-paper); stroke: var(--axis-report-role-dataCurrentOnPaper); stroke-width: 1.8; }
+
+.fig-labels { font-variant-numeric: tabular-nums; }
+
+.fig-end,
+.fig-end-delta,
+.fig-start { font-family: var(--axis-report-type-display); }
+
+.fig-end--primary { font-weight: 700; fill: var(--axis-report-role-dataCurrentOnPaper); }
+
+.fig-end--reference { font-weight: 600; fill: var(--axis-report-role-dataPriorOnPaper); }
+
+.fig-end-delta,
+.fig-start { font-weight: 600; fill: var(--axis-report-role-paperAccent); }
+
+.fig-xlabels { fill: var(--axis-report-role-paperAccent); }
+
+/* Muestras de línea de la leyenda: el mismo trazo que en la figura. */
+.line-swatch { display: block; flex-shrink: 0; }
+
+.line-swatch line { stroke-linecap: round; }
+
+.line-swatch--primary line { stroke: var(--axis-report-role-dataCurrentOnPaper); stroke-width: 2.6; }
+
+.line-swatch--detail line { stroke: var(--axis-report-role-dataCurrentOnPaper); stroke-width: 1; stroke-opacity: 0.4; stroke-linecap: butt; }
+
+.line-swatch--reference line { stroke: var(--axis-report-role-dataPriorOnPaper); stroke-width: 2.2; stroke-dasharray: 5 3; stroke-linecap: butt; }

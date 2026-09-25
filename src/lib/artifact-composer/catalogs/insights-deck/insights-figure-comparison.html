@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  InsightsFigureComparisonSlide — lámina de figura «comparación de períodos» del deck 16:9 (TASK-1889
+  Slice 4, canvas `Deck-Comparacion`). La misma figura que la página A4 de comparación: cada métrica
+  en su escala, barra del período y del anterior, variación al final. Reemplaza a la lámina de
+  evidencia v1 (1920×1080) para las figuras `bar_grouped` de métricas.
+
+  Las barras salen de la cifra impresa (`deck-pair-bars`); el cuerpo de la cifra principal lo decide
+  el hook por su largo. El cierre «Lo que significa / Próximo paso» viene de la lectura del plan.
+-->
+<link rel="stylesheet" href="deck-tokens.css" />
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="deck-editorial.css" />
+<style>
+  .metric-rows { display: flex; flex-direction: column; }
+
+  .metric-row { display: grid; grid-template-columns: 170px minmax(0, 1fr) 112px; align-items: center; column-gap: 20px; padding: 19px 0; border-top: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14); }
+
+  .metric-row:last-child { border-bottom: 1px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.14); }
+
+  .metric-name-block { display: flex; flex-direction: column; gap: 3px; }
+
+  .metric-name { display: flex; align-items: center; gap: 9px; font-size: 16px; font-weight: 600; }
+
+  .metric-unit { padding-left: 27px; font-size: 11.5px; color: var(--axis-deck-role-dataPriorOnNavy); }
+
+  .metric-name-block:not(:has(.icon-set)) .metric-unit { padding-left: 0; }
+
+  .metric-bars { --lane: 300px; display: flex; flex-direction: column; gap: 7px; }
+
+  .pair-line { display: flex; align-items: center; gap: 12px; }
+
+  .bar-lane { display: contents; }
+
+  .bar-current { width: calc(var(--lane) * var(--fill, 0)); height: 18px; border-radius: 3px; background: var(--axis-deck-role-dataCurrentOnNavy); }
+
+  .bar-prior { width: calc(var(--lane) * var(--fill, 0)); height: 10px; border-radius: 2px; background: var(--axis-deck-role-dataPriorOnNavy); }
+
+  .value-current { font-family: var(--axis-deck-type-display); font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .value-prior { font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--axis-deck-role-navyMuted); }
+
+  .metric-delta { justify-self: end; }
+</style>
+</head>
+<body>
+  <div class="lamina">
+    <svg class="art" width="1280" height="720" viewBox="0 0 1280 720" aria-hidden="true">
+      <defs>
+        <radialGradient id="figureHalo" cx="0.5" cy="0.5" r="0.5">
+          <stop class="halo-stop" offset="0" stop-opacity="0.2"></stop>
+          <stop class="halo-stop" offset="0.55" stop-opacity="0.06"></stop>
+          <stop class="halo-stop" offset="1" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+      <circle cx="230" cy="250" r="380" fill="url(#figureHalo)"></circle>
+      <g class="orbit-rings">
+        <circle cx="1290" cy="740" r="230"></circle>
+        <circle cx="1290" cy="740" r="330"></circle>
+        <circle cx="1290" cy="740" r="430"></circle>
+      </g>
+    </svg>
+
+    <header class="deck-head">
+      <span class="deck-tab">
+        <span class="deck-tab-number" data-slot="tabNumber">00</span>
+        <span class="deck-tab-section" data-slot="section">Resumen ejecutivo</span>
+      </span>
+      <span class="deck-period" data-slot="period">Agosto 2026 · contra julio 2026</span>
+    </header>
+
+    <main class="fig-main">
+      <div class="fig-lead-col">
+        <span class="deck-eyebrow" data-slot="eyebrow"><span class="icon-set" data-slot-field="icon"><svg class="stroke-icon i-bars" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path></svg><svg class="stroke-icon i-clicks" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3"></path><path d="M12 3v3"></path><path d="M7.8 7.8l-2.2 -2.2"></path><path d="M16.2 7.8l2.2 -2.2"></path><path d="M7.8 16.2l-2.2 2.2"></path><path d="M12 12l9 3l-4 2l-2 4l-3 -9"></path></svg><svg class="stroke-icon i-impressions" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg><svg class="stroke-icon i-ctr" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 7a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 18l12 -12"></path></svg><svg class="stroke-icon i-search" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path><path d="M21 21l-6 -6"></path></svg><svg class="stroke-icon i-target" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"></path><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path></svg><svg class="stroke-icon i-link" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 15l6 -6"></path><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"></path><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"></path></svg><svg class="stroke-icon i-trend" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6 -6l4 4l8 -8"></path><path d="M14 7l7 0l0 7"></path></svg></span><span data-slot-field="label">Comparación de períodos</span></span>
+        <span class="fig-number" data-slot="keyFigure">+16,5 %</span>
+        <span class="fig-caption" data-slot="keyCaption">clics desde Google en agosto, contra julio <strong>(1.284 contra 1.102)</strong></span>
+        <span class="deck-rule"></span>
+        <h1 class="fig-conclusion" data-slot="conclusion">El sitio convierte mejor lo que muestra: más clics con menos impresiones</h1>
+      </div>
+      <section class="fig-panel">
+        <div class="fig-panel-head">
+          <span class="fig-panel-title" data-slot="figureTitle">Search Console · agosto contra julio</span>
+          <span class="fig-source" data-slot="source"><span class="fig-source-label" data-slot-field="label">Fuente</span><span data-slot-field="text">Google Search Console</span></span>
+        </div>
+        <div class="fig-legend" data-slot="legend"><span class="fig-legend-item"><span class="fig-swatch fig-swatch--current"></span><span data-slot-field="current">Agosto 2026</span></span><span class="fig-legend-item"><span class="fig-swatch fig-swatch--prior"></span><span data-slot-field="prior">Julio 2026</span></span></div>
+        <div class="metric-rows" data-slot="metrics">
+          <div class="metric-row">
+            <div class="metric-name-block">
+              <span class="metric-name"><span class="icon-set" data-slot-field="icon"><svg class="stroke-icon i-bars" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path></svg><svg class="stroke-icon i-clicks" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3"></path><path d="M12 3v3"></path><path d="M7.8 7.8l-2.2 -2.2"></path><path d="M16.2 7.8l2.2 -2.2"></path><path d="M7.8 16.2l-2.2 2.2"></path><path d="M12 12l9 3l-4 2l-2 4l-3 -9"></path></svg><svg class="stroke-icon i-impressions" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg><svg class="stroke-icon i-ctr" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 7a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 18l12 -12"></path></svg><svg class="stroke-icon i-search" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path><path d="M21 21l-6 -6"></path></svg><svg class="stroke-icon i-target" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"></path><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path></svg><svg class="stroke-icon i-link" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 15l6 -6"></path><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"></path><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"></path></svg><svg class="stroke-icon i-trend" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6 -6l4 4l8 -8"></path><path d="M14 7l7 0l0 7"></path></svg></span><span data-slot-field="name">Clics</span></span>
+              <span class="metric-unit" data-slot-field="unit">cantidad</span>
+            </div>
+            <div class="metric-bars">
+              <span class="bar-lane" data-slot-field="bars"></span>
+              <div class="pair-line"><span class="bar-current"></span><span class="value-current" data-slot-field="current">1.284</span></div>
+              <div class="pair-line pair-prior"><span class="bar-prior"></span><span class="value-prior" data-slot-field="prior">1.102</span></div>
+            </div>
+            <span class="metric-delta"><span class="delta-pill" data-slot-field="direction"><svg class="delta-mark-up" width="10" height="9" viewBox="0 0 10 9" aria-hidden="true"><path class="delta-mark" d="M5 0.5 L9.5 8.5 H0.5 Z"></path></svg><svg class="delta-mark-down" width="10" height="9" viewBox="0 0 10 9" aria-hidden="true"><path class="delta-mark" d="M5 8.5 L9.5 0.5 H0.5 Z"></path></svg><span data-slot-field="delta">16,5 %</span></span></span>
+          </div>
+        </div>
+      <div class="fig-note" data-slot="note"><svg class="stroke-icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10"></path><path d="M7 16v-9h9"></path></svg><span data-slot-field="text">Nota de lectura.</span></div>
+      </section>
+    </main>
+
+    <div class="fig-closing" data-slot="closing"><div class="fig-closing-block"><span class="fig-closing-label"><span class="closing-kind" data-slot-field="kind"><svg class="stroke-icon closing-icon--measure" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7"></path><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3"></path><path d="M9.7 17h4.6"></path></svg><svg class="stroke-icon closing-icon--action" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 18l6 -6"></path><path d="M13 6l6 6"></path></svg></span><span data-slot-field="label">Lo que significa</span></span><p class="fig-closing-text" data-slot-field="text">Lo que la figura muestra.</p></div></div>
+
+    <footer class="deck-foot2">
+      <span class="deck-foot2-id">
+        <img src="assets/brand/logo-negative.svg" alt="Efeonce" />
+        <span class="divider"></span>
+        <span class="deck-foot2-edition" data-slot="footerEdition">Insights · Informe de agosto 2026</span>
+      </span>
+      <span class="deck-foot2-end">
+        <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+        <span class="divider"></span>
+        <span class="deck-folio" data-slot="folio"><span class="deck-folio-page" data-slot-field="page">03</span><span class="deck-folio-total">/ <span data-slot-field="total">24</span></span></span>
+      </span>
+    </footer>
+  </div>
+</body>
+</html>

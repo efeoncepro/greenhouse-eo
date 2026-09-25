@@ -23,6 +23,10 @@ export const synthesizeSlotValue = (slot: SlotContract): unknown => {
   const clamp = (max: number | undefined, text: string) => (max ? text.slice(0, Math.min(text.length, max)) : text)
 
   const fieldValue = (field: Record<string, unknown>, fallback: string): unknown => {
+    // El contrato puede declarar su propio valor de muestra (`example`): una figura cuya geometría sale
+    // de cifras vecinas (TASK-1889) no se ejerce con texto de relleno. Es dato del catálogo, no del motor.
+    if (field.example !== undefined) return field.example
+
     if (field.type === 'array') {
       const constraints = (field.constraints ?? {}) as { minItems?: number }
       const item = field.item as { shape?: Record<string, Record<string, unknown>> } | undefined
@@ -88,6 +92,10 @@ export const synthesizeSlotValue = (slot: SlotContract): unknown => {
 
     return out
   }
+
+  const declared = (slot as unknown as { example?: unknown }).example
+
+  if (declared !== undefined) return declared
 
   switch (slot.type) {
     case 'string':

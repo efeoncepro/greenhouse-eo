@@ -72,6 +72,8 @@ export interface SlotFieldContract {
    * `resolver-only`: es semántica que sólo consume un resolver; tampoco busca un ancla de copy.
    */
   consumer?: 'validation-only' | 'resolver-only'
+  /** Valor de muestra para el probe del gate visual cuando el relleno de texto no ejerce el campo. */
+  example?: unknown
 }
 
 export interface SlotItemContract {
@@ -103,6 +105,8 @@ export interface SlotContract {
    * `QuoteSplit` se escribiera sobre el nodo de la lámina entera y la borrara.
    */
   consumer?: 'validation-only'
+  /** Valor de muestra para el probe del gate visual (figuras cuya geometría sale de cifras). */
+  example?: unknown
   /**
    * Etiquetas de un slot `enum`: el plan declara la CLAVE (`combined`) y la lámina muestra su
    * ETIQUETA (`Propuesta Técnica y Económica`). El autor elige de un conjunto cerrado; el copy

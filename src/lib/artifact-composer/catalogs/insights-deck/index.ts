@@ -20,6 +20,8 @@ import { fileURLToPath } from 'node:url'
 
 import type { ArtifactCatalog } from '../../catalog'
 import { axisPackDir } from '../../brand-packs/axis'
+import { makeColumnsHook, makeLinesHook, withDeckFigureSize } from '../insights-shared/figure-hooks'
+import { DECK_COLUMNS_BOX, DECK_LINES_BOX } from '../insights-shared/figure-svg'
 import { makeChapterNumeralHook } from '../insights-shared/layout-hooks'
 import { insightsDeckResolvers } from './resolvers'
 
@@ -31,7 +33,13 @@ export const insightsDeckCatalog: ArtifactCatalog = {
   templatesDir: insightsDeckCatalogDir,
   outputTarget: 'pdf-merged',
   resolvers: insightsDeckResolvers,
-  layoutHooks: { InsightsChapterSlide: makeChapterNumeralHook(1330) },
+  layoutHooks: {
+    InsightsChapterSlide: makeChapterNumeralHook(1330),
+    InsightsFigureComparisonSlide: withDeckFigureSize(),
+    InsightsFigureColumnsSlide: withDeckFigureSize(makeColumnsHook(DECK_COLUMNS_BOX)),
+    InsightsFigureTargetsSlide: withDeckFigureSize(),
+    InsightsFigureTrendSlide: withDeckFigureSize(makeLinesHook(DECK_LINES_BOX))
+  },
   brand: {
     packName: 'axis',
     compiledFiles: ['deck-tokens.css', 'deck-fonts.css'],

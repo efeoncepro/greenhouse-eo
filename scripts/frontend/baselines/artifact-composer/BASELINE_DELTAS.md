@@ -1,5 +1,23 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-25 (h) — TASK-1889 Slice 4: páginas de figura premium
+
+Nacen las páginas de figura del canvas aprobado, una por familia con productor: comparación de períodos por
+métrica (`Premium-Evidencia` / `Deck-Comparacion`), columnas agrupadas sobre un eje compartido
+(`Premium-Agrupadas` / `Deck-Agrupadas`), metas (bullet, `Premium-Metas` / `Deck-Metas`) y tendencia en
+líneas (`Premium-Lineas` / `Deck-Lineas`). Columnas y líneas las dibuja un hook desde la geometría pura
+compartida (`insights-shared/figure-svg.ts`). El probe las ejerce con el `example` que declara cada contrato
+(regla nueva del sintetizador: una figura cuya geometría sale de cifras no se prueba con texto de relleno).
+
+- `templates-insights-report/ReportFigureComparisonPage.png` — nueva
+- `templates-insights-report/ReportFigureColumnsPage.png` — nueva
+- `templates-insights-report/ReportFigureTargetsPage.png` — nueva
+- `templates-insights-report/ReportFigureTrendPage.png` — nueva
+- `templates-insights-deck/InsightsFigureComparisonSlide.png` — nueva
+- `templates-insights-deck/InsightsFigureColumnsSlide.png` — nueva
+- `templates-insights-deck/InsightsFigureTargetsSlide.png` — nueva
+- `templates-insights-deck/InsightsFigureTrendSlide.png` — nueva
+
 ## 2026-09-25 (g) — TASK-1889 Slice 3: portada blanca y logo del cliente
 
 Nace la portada blanca (`Premium-Portada-Clara` / `-Creativo`: satélites por canal o arco corto, según el
@@ -492,7 +510,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: ddf74e508e9a75932e6d4fcca3131e4c252b8afd995f94def26c3caef4e7e6ab -->
+<!-- manifest-digest: fa9b06157e55b180158bdac6246eda619c7c8184db014a2e38a364581d48aba6 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

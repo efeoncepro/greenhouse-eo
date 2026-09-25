@@ -24,6 +24,8 @@ import { fileURLToPath } from 'node:url'
 
 import type { ArtifactCatalog } from '../../catalog'
 import { axisPackDir } from '../../brand-packs/axis'
+import { makeColumnsHook, makeLinesHook } from '../insights-shared/figure-hooks'
+import { REPORT_COLUMNS_BOX, REPORT_LINES_BOX } from '../insights-shared/figure-svg'
 import { chapterNumeralHook, coverSatellitesHook } from '../insights-shared/layout-hooks'
 import { insightsReportResolvers } from './resolvers'
 
@@ -35,7 +37,12 @@ export const insightsReportCatalog: ArtifactCatalog = {
   templatesDir: insightsReportCatalogDir,
   outputTarget: 'pdf-merged',
   resolvers: insightsReportResolvers,
-  layoutHooks: { ReportChapterPage: chapterNumeralHook, ReportCoverLightPage: coverSatellitesHook },
+  layoutHooks: {
+    ReportChapterPage: chapterNumeralHook,
+    ReportCoverLightPage: coverSatellitesHook,
+    ReportFigureColumnsPage: makeColumnsHook(REPORT_COLUMNS_BOX),
+    ReportFigureTrendPage: makeLinesHook(REPORT_LINES_BOX)
+  },
   brand: {
     packName: 'axis',
     compiledFiles: ['report-tokens.css', 'report-fonts.css'],

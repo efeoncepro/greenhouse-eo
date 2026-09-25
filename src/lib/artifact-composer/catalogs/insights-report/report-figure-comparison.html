@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  ReportFigureComparisonPage — página de figura «comparación de períodos» del informe A4 (TASK-1889
+  Slice 4, canvas `Premium-Evidencia`). Reemplaza a la página analítica v1 para las figuras
+  `bar_grouped` cuyas dimensiones son MÉTRICAS distintas (clics, impresiones, CTR): cada métrica se
+  mide en su propia escala, con la barra del período y la del anterior, y su variación al final.
+
+  Cifra principal, conclusión y lectura («Lo que significa / Próximo paso») vienen de la lectura por
+  figura del plan (TASK-1888). Las barras SALEN DEL DATO (`report-pair-bars`, desde la misma cifra
+  impresa al lado) y la variación la escribe el mapper con el formateador canónico; la plantilla sólo
+  decide su tono por DIRECCIÓN (subir no es un juicio). El navy aparece sólo en el cierre.
+-->
+<link rel="stylesheet" href="report-tokens.css" />
+<link rel="stylesheet" href="report-fonts.css" />
+<link rel="stylesheet" href="report-editorial.css" />
+<style>
+  .figure-eyebrow { margin-top: 38px; }
+
+  .figure-board { margin-top: 40px; display: flex; flex-direction: column; }
+
+  .metric-row { display: grid; grid-template-columns: 150px minmax(0, 1fr) 104px; align-items: center; column-gap: 20px; padding: 20px 0; border-top: 1px solid var(--axis-report-role-rule); }
+
+  .metric-rows .metric-row:last-child { border-bottom: 1px solid var(--axis-report-role-rule); }
+
+  .metric-name-block { display: flex; flex-direction: column; gap: 3px; }
+
+  .metric-name { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--axis-report-role-paperInk); }
+
+  .metric-unit { padding-left: 24px; font-size: 10px; color: var(--axis-report-role-paperAccent); }
+
+  /* Sin ícono, el nombre no deja el hueco del ícono: la unidad se alinea con él. */
+  .metric-name-block:not(:has(.icon-set)) .metric-unit { padding-left: 0; }
+
+  .metric-bars { --lane: 270px; display: flex; flex-direction: column; gap: 6px; }
+
+  .pair-line { display: flex; align-items: center; gap: 10px; }
+
+  .bar-current { width: calc(var(--lane) * var(--fill, 0)); height: 16px; border-radius: 3px; background: var(--axis-report-role-dataCurrentOnPaper); }
+
+  .bar-prior { width: calc(var(--lane) * var(--fill, 0)); height: 9px; border-radius: 2px; background: var(--axis-report-role-dataPriorOnPaper); }
+
+  .value-current { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--axis-report-role-paperInk); }
+
+  .value-prior { font-size: 11px; font-variant-numeric: tabular-nums; color: var(--axis-report-role-paperAccent); }
+
+  .metric-delta { justify-self: end; }
+
+  .bar-lane { display: contents; }
+</style>
+</head>
+<body>
+  <div class="sheet sheet--paper paper-page">
+    <span class="chapter-tab" data-slot="chapterTab">01</span>
+    <header class="running">
+      <span class="running-client"><span class="running-client-name" data-slot="clientName">Nombre del cliente</span></span>
+      <span class="running-meta">
+        <span class="running-section" data-slot="runningSection">01 · Visibilidad orgánica</span>
+        <span class="running-divider"></span>
+        <span data-slot="runningPeriod">Agosto 2026 · contra julio 2026</span>
+      </span>
+    </header>
+
+    <span class="page-eyebrow figure-eyebrow" data-slot="eyebrow">
+      <span class="icon-set" data-slot-field="icon"><svg class="stroke-icon i-bars" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path></svg><svg class="stroke-icon i-clicks" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3"></path><path d="M12 3v3"></path><path d="M7.8 7.8l-2.2 -2.2"></path><path d="M16.2 7.8l2.2 -2.2"></path><path d="M7.8 16.2l-2.2 2.2"></path><path d="M12 12l9 3l-4 2l-2 4l-3 -9"></path></svg><svg class="stroke-icon i-impressions" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg><svg class="stroke-icon i-ctr" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 7a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 18l12 -12"></path></svg><svg class="stroke-icon i-search" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path><path d="M21 21l-6 -6"></path></svg><svg class="stroke-icon i-target" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"></path><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path></svg><svg class="stroke-icon i-link" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 15l6 -6"></path><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"></path><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"></path></svg><svg class="stroke-icon i-trend" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6 -6l4 4l8 -8"></path><path d="M14 7l7 0l0 7"></path></svg></span><span data-slot-field="label">Comparación de períodos</span>
+    </span>
+
+    <div class="figure-hero">
+      <div class="figure-count">
+        <span class="figure-number" data-slot="keyFigure">+16,5 %</span>
+        <span class="figure-caption" data-slot="keyCaption">clics desde Google en agosto, contra julio <strong>(1.284 contra 1.102)</strong></span>
+      </div>
+      <div class="figure-heading">
+        <h1 class="figure-title" data-slot="conclusion">El sitio convierte mejor lo que muestra: más clics con menos impresiones</h1>
+        <p class="figure-lead" data-slot="lead">El CTR pasó de 2,12 % a 2,66 %.</p>
+      </div>
+    </div>
+
+    <section class="figure-board">
+      <div class="figure-caption-row">
+        <span class="figure-board-title" data-slot="figureTitle">Search Console · agosto contra julio</span>
+        <span class="figure-legend" data-slot="legend">
+          <span class="figure-legend-item"><span class="figure-legend-swatch swatch--current"></span><span data-slot-field="current">Agosto 2026</span></span>
+          <span class="figure-legend-item legend-prior"><span class="figure-legend-swatch swatch--prior"></span><span data-slot-field="prior">Julio 2026</span></span>
+        </span>
+      </div>
+      <div class="metric-rows" data-slot="metrics">
+        <div class="metric-row">
+          <div class="metric-name-block">
+            <span class="metric-name"><span class="icon-set" data-slot-field="icon"><svg class="stroke-icon i-bars" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path></svg><svg class="stroke-icon i-clicks" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3"></path><path d="M12 3v3"></path><path d="M7.8 7.8l-2.2 -2.2"></path><path d="M16.2 7.8l2.2 -2.2"></path><path d="M7.8 16.2l-2.2 2.2"></path><path d="M12 12l9 3l-4 2l-2 4l-3 -9"></path></svg><svg class="stroke-icon i-impressions" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg><svg class="stroke-icon i-ctr" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 7a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 18l12 -12"></path></svg><svg class="stroke-icon i-search" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path><path d="M21 21l-6 -6"></path></svg><svg class="stroke-icon i-target" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"></path><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path></svg><svg class="stroke-icon i-link" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 15l6 -6"></path><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"></path><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"></path></svg><svg class="stroke-icon i-trend" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6 -6l4 4l8 -8"></path><path d="M14 7l7 0l0 7"></path></svg></span><span data-slot-field="name">Clics</span></span>
+            <span class="metric-unit" data-slot-field="unit">cantidad</span>
+          </div>
+          <div class="metric-bars">
+            <span class="bar-lane" data-slot-field="bars"></span>
+            <div class="pair-line"><span class="bar-current"></span><span class="value-current" data-slot-field="current">1.284</span></div>
+            <div class="pair-line pair-prior"><span class="bar-prior"></span><span class="value-prior" data-slot-field="prior">1.102</span></div>
+          </div>
+          <span class="metric-delta"><span class="delta-pill" data-slot-field="direction"><svg class="delta-mark-up" width="9" height="8" viewBox="0 0 9 8" aria-hidden="true"><path class="delta-mark" d="M4.5 0.5 L8.5 7.5 H0.5 Z"></path></svg><svg class="delta-mark-down" width="9" height="8" viewBox="0 0 9 8" aria-hidden="true"><path class="delta-mark" d="M4.5 7.5 L8.5 0.5 H0.5 Z"></path></svg><span data-slot-field="delta">16,5 %</span></span></span>
+        </div>
+      </div>
+    <div class="figure-note" data-slot="note"><svg class="stroke-icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10"></path><path d="M7 16v-9h9"></path></svg><span data-slot-field="text">Nota de lectura de la figura.</span></div>
+    </section>
+
+    <div class="figure-provenance" data-slot="provenance">
+      <div class="figure-provenance-item"><span class="figure-provenance-label" data-slot-field="label">Unidad</span><span data-slot-field="text">Unidad de la figura.</span></div>
+    </div>
+
+    <div class="grow"></div>
+
+    <div class="closing closing--figure" data-slot="closing"><div class="closing-block">
+        <span class="closing-label"><span class="closing-kind" data-slot-field="kind"><svg class="stroke-icon closing-icon--measure" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7"></path><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3"></path><path d="M9.7 17h4.6"></path></svg><svg class="stroke-icon closing-icon--action" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 18l6 -6"></path><path d="M13 6l6 6"></path></svg></span><span data-slot-field="label">Lo que significa</span></span>
+        <p class="closing-text" data-slot-field="text">Lo que la tabla muestra.</p>
+        <span class="closing-signature" data-slot-field="signature">Recomendación de Efeonce</span>
+      </div></div>
+
+    <footer class="paper-foot">
+      <div class="paper-foot-rule"><span class="accent"></span><span class="line"></span></div>
+      <div class="paper-foot-row">
+        <div class="paper-foot-id">
+          <div class="paper-foot-lockup">
+            <img src="assets/brand/logo-full.svg" alt="Efeonce" />
+            <span class="divider"></span>
+            <span class="paper-foot-edition" data-slot="footerEdition">Insights · Informe de agosto 2026</span>
+          </div>
+          <div class="paper-foot-contact" data-slot="footerContact"><span data-slot-field="address">Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile</span><span class="dot"></span><span class="num" data-slot-field="phone">+56 9 3732 3064</span></div>
+        </div>
+        <div class="paper-foot-end">
+          <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+          <span class="divider"></span>
+          <span class="paper-folio" data-slot="folio"><span class="paper-folio-page" data-slot-field="page">03</span><span class="paper-folio-total">/ <span data-slot-field="total">24</span></span></span>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

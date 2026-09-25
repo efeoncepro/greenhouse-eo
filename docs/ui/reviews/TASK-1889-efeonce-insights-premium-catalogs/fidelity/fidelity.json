@@ -2,11 +2,43 @@
   "criterion": "≤ 1 % de píxeles distintos (pixelmatch, umbral 0,1)",
   "rows": [
     {
+      "reference": "Deck-Agrupadas",
+      "template": "InsightsFigureColumnsSlide",
+      "changed": 20503,
+      "total": 921600,
+      "ratio": 0.022247178819444446,
+      "pass": false
+    },
+    {
+      "reference": "Deck-Comparacion",
+      "template": "InsightsFigureComparisonSlide",
+      "changed": 58,
+      "total": 921600,
+      "ratio": 0.00006293402777777778,
+      "pass": true
+    },
+    {
       "reference": "Deck-Lectura",
       "template": "InsightsReadingSlide",
       "changed": 0,
       "total": 921600,
       "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Deck-Lineas",
+      "template": "InsightsFigureTrendSlide",
+      "changed": 71,
+      "total": 921600,
+      "ratio": 0.00007703993055555555,
+      "pass": true
+    },
+    {
+      "reference": "Deck-Metas",
+      "template": "InsightsFigureTargetsSlide",
+      "changed": 1485,
+      "total": 921600,
+      "ratio": 0.001611328125,
       "pass": true
     },
     {
@@ -23,6 +55,14 @@
       "changed": 0,
       "total": 921600,
       "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Agrupadas",
+      "template": "ReportFigureColumnsPage",
+      "changed": 254,
+      "total": 891662,
+      "ratio": 0.0002848613039470113,
       "pass": true
     },
     {
@@ -58,11 +98,35 @@
       "pass": true
     },
     {
+      "reference": "Premium-Evidencia",
+      "template": "ReportFigureComparisonPage",
+      "changed": 333,
+      "total": 891662,
+      "ratio": 0.0003734598984817117,
+      "pass": true
+    },
+    {
       "reference": "Premium-Lectura",
       "template": "ReportReadingPage",
       "changed": 243,
       "total": 891662,
       "ratio": 0.0002725247907839518,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Lineas",
+      "template": "ReportFigureTrendPage",
+      "changed": 241,
+      "total": 891662,
+      "ratio": 0.0002702817883906682,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Metas",
+      "template": "ReportFigureTargetsPage",
+      "changed": 1174,
+      "total": 891662,
+      "ratio": 0.001316642404857446,
       "pass": true
     },
     {

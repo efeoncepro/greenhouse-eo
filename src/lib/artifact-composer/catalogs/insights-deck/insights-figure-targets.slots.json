@@ -1,0 +1,338 @@
+{
+  "template": "InsightsFigureTargetsSlide",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "TASK-1889 Slice 4 — resultado contra la meta (bullet, canvas Deck-Metas).",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "slots": {
+    "tabNumber": {
+      "selector": "[data-slot='tabNumber']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 2,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Número de capítulo de la pestaña («00» en el resumen)."
+    },
+    "section": {
+      "selector": "[data-slot='section']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "period": {
+      "selector": "[data-slot='period']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "icon": {
+          "type": "string",
+          "required": false,
+          "resolver": "deck-icon",
+          "values": [
+            "bars",
+            "clicks",
+            "impressions",
+            "ctr",
+            "search",
+            "target",
+            "link",
+            "trend"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32,
+          "maxLines": 1
+        }
+      }
+    },
+    "keyFigure": {
+      "selector": "[data-slot='keyFigure']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 9,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Cifra principal (`readings[].keyFigure.value`). El hook elige su cuerpo por el largo: 132, 112 o 104 px."
+    },
+    "keyCaption": {
+      "selector": "[data-slot='keyCaption']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 96,
+        "maxLines": 3,
+        "overflow": "reject",
+        "allowedTags": [
+          "strong"
+        ]
+      },
+      "notes": "Bajada de la cifra (`keyFigure.caption`)."
+    },
+    "conclusion": {
+      "selector": "[data-slot='conclusion']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 90,
+        "maxLines": 4,
+        "overflow": "reject"
+      }
+    },
+    "figureTitle": {
+      "selector": "[data-slot='figureTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 44,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "source": {
+      "selector": "[data-slot='source']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 36,
+          "maxLines": 1
+        }
+      }
+    },
+    "legend": {
+      "selector": "[data-slot='legend']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "achieved": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 20,
+          "maxLines": 1
+        },
+        "target": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 20,
+          "maxLines": 1
+        },
+        "gap": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 20,
+          "maxLines": 1
+        }
+      }
+    },
+    "bulletDirection": {
+      "selector": "[data-slot='bulletDirection']",
+      "type": "enum",
+      "required": true,
+      "consumer": "validation-only",
+      "values": [
+        "higher_is_better",
+        "lower_is_better"
+      ]
+    },
+    "bulletRows": {
+      "selector": "[data-slot='bulletRows']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 5
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "icon": {
+            "type": "string",
+            "required": false,
+            "resolver": "deck-icon",
+            "values": [
+              "bars",
+              "clicks",
+              "impressions",
+              "ctr",
+              "search",
+              "target",
+              "link",
+              "trend"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 26,
+            "maxLines": 1
+          },
+          "unit": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 18,
+            "maxLines": 1
+          },
+          "bar": {
+            "type": "string",
+            "required": false,
+            "resolver": "deck-bullet-row",
+            "consumer": "resolver-only"
+          },
+          "value": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 12,
+            "maxLines": 1,
+            "example": "9"
+          },
+          "achievedLabel": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 12,
+            "maxLines": 1
+          },
+          "targetLabel": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 12,
+            "maxLines": 1
+          },
+          "target": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 12,
+            "maxLines": 1,
+            "example": "10"
+          },
+          "pct": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 8,
+            "maxLines": 1,
+            "example": "90 %"
+          }
+        }
+      }
+    },
+    "note": {
+      "selector": "[data-slot='note']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 96,
+          "maxLines": 1
+        }
+      },
+      "notes": "Nota de lectura bajo la figura."
+    },
+    "closing": {
+      "selector": "[data-slot='closing']",
+      "type": "array",
+      "required": false,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 2
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "kind": {
+            "type": "string",
+            "required": true,
+            "resolver": "deck-closing-icon",
+            "values": [
+              "measure",
+              "action"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40,
+            "maxLines": 1
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 160,
+            "maxLines": 3
+          }
+        }
+      },
+      "notes": "Lo que significa / Próximo paso (`readings[].meaning` / `nextStep`)."
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
+      },
+      "notes": "«NN / total» del plan de láminas de la misma composición."
+    }
+  }
+}

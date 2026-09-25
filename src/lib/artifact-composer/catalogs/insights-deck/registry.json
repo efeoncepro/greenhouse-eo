@@ -18,7 +18,11 @@
     "insights-reading",
     "insights-plan",
     "insights-limits",
-    "insights-back-cover"
+    "insights-back-cover",
+    "insights-figure-comparison",
+    "insights-figure-columns",
+    "insights-figure-targets",
+    "insights-figure-trend"
   ],
   "templates": [
     {
@@ -138,6 +142,58 @@
       ],
       "prototype": "insights-back-cover.html",
       "slotsRef": "insights-back-cover.slots.json"
+    },
+    {
+      "name": "InsightsFigureComparisonSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-figure-comparison"
+      ],
+      "prototype": "insights-figure-comparison.html",
+      "slotsRef": "insights-figure-comparison.slots.json"
+    },
+    {
+      "name": "InsightsFigureColumnsSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-figure-columns"
+      ],
+      "prototype": "insights-figure-columns.html",
+      "slotsRef": "insights-figure-columns.slots.json"
+    },
+    {
+      "name": "InsightsFigureTargetsSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-figure-targets"
+      ],
+      "prototype": "insights-figure-targets.html",
+      "slotsRef": "insights-figure-targets.slots.json"
+    },
+    {
+      "name": "InsightsFigureTrendSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-figure-trend"
+      ],
+      "prototype": "insights-figure-trend.html",
+      "slotsRef": "insights-figure-trend.slots.json"
     }
   ],
   "selector": {
@@ -151,7 +207,11 @@
       "insights-reading": "InsightsReadingSlide",
       "insights-plan": "InsightsPlanSlide",
       "insights-limits": "InsightsLimitsSlide",
-      "insights-back-cover": "InsightsBackCoverSlide"
+      "insights-back-cover": "InsightsBackCoverSlide",
+      "insights-figure-comparison": "InsightsFigureComparisonSlide",
+      "insights-figure-columns": "InsightsFigureColumnsSlide",
+      "insights-figure-targets": "InsightsFigureTargetsSlide",
+      "insights-figure-trend": "InsightsFigureTrendSlide"
     },
     "disambiguation": [
       "una conclusión con la figura que la prueba => InsightsEvidenceSlide.",

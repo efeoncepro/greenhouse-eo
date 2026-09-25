@@ -1,0 +1,91 @@
+{
+  "reference": "Premium-Evidencia",
+  "catalog": "report",
+  "contentType": "report-figure-comparison",
+  "slots": {
+    "chapterTab": "01",
+    "runningSection": "01 · Visibilidad orgánica",
+    "runningPeriod": "Agosto 2026 · contra julio 2026",
+    "eyebrow": {
+      "icon": "bars",
+      "label": "Comparación de períodos"
+    },
+    "keyFigure": "+16,5 %",
+    "keyCaption": "clics desde Google en agosto, contra julio <strong>(1.284 contra 1.102)</strong>",
+    "conclusion": "El sitio convierte mejor lo que muestra: más clics con menos impresiones",
+    "lead": "El CTR pasó de 2,12 % a 2,66 %. Las impresiones cayeron 7,0 % y aun así llegaron 182 clics más.",
+    "figureTitle": "Search Console · agosto contra julio",
+    "legend": {
+      "current": "Agosto 2026",
+      "prior": "Julio 2026"
+    },
+    "metrics": [
+      {
+        "icon": "clicks",
+        "name": "Clics",
+        "unit": "cantidad",
+        "current": "1.284",
+        "prior": "1.102",
+        "direction": "up",
+        "delta": "16,5 %"
+      },
+      {
+        "icon": "impressions",
+        "name": "Impresiones",
+        "unit": "cantidad",
+        "current": "48.310",
+        "prior": "51.940",
+        "direction": "down",
+        "delta": "7,0 %"
+      },
+      {
+        "icon": "ctr",
+        "name": "CTR",
+        "unit": "porcentaje",
+        "current": "2,66 %",
+        "prior": "2,12 %",
+        "direction": "up",
+        "delta": "0,54 pp"
+      }
+    ],
+    "note": {
+      "text": "Por cada 100 impresiones, agosto consiguió 2,7 clics; julio, 2,1."
+    },
+    "provenance": [
+      {
+        "label": "Unidad",
+        "text": "Clics e impresiones en cantidad; CTR en porcentaje. Cada métrica en su escala."
+      },
+      {
+        "label": "Fuente",
+        "text": "Google Search Console"
+      },
+      {
+        "label": "Cobertura",
+        "text": "31 de 31 días con dato en ambos períodos"
+      }
+    ],
+    "closing": [
+      {
+        "kind": "measure",
+        "label": "Lo que significa",
+        "text": "El sitio no necesita más visibilidad para crecer: necesita convertir la que ya tiene. Hoy, cada punto de CTR equivale a unos 480 clics al mes."
+      },
+      {
+        "kind": "action",
+        "label": "Próximo paso",
+        "text": "Reescribir títulos y descripciones de /precios, /servicios y /preguntas-frecuentes: las páginas con más impresiones y CTR bajo la mediana (p. 13).",
+        "signature": "Recomendación de Efeonce"
+      }
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "footerContact": {
+      "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+      "phone": "+56 9 3732 3064"
+    },
+    "folio": {
+      "page": "06",
+      "total": "24"
+    }
+  }
+}
