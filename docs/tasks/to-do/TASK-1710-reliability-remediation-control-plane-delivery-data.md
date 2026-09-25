@@ -368,6 +368,10 @@ Cada remediación debe producir este paquete mínimo antes de mutar:
 - Crear tasks hijas solamente tras el Slice 0, con ownership y ADR assessment resueltos. Candidatos probables: performance del composer Platform Health, contrato de firma/replay de notifications, remediación fiscal acotada y atribución/guardrail FinOps Cloud Run.
 - Si el error de CI del sitio público o las propuestas Globe sin decidir persisten después del triage, abrir workstream separado: no se mezclan con el control plane, delivery o rematerialización fiscal.
 
+## Delta 2026-09-24
+
+- La fila «`hubspot_services_intake` degradado», listada aquí como sin dueño, pasa a `TASK-1886` (un solo read path de servicios HubSpot, traza del intake async, señal `intake_lag` y backoff corto para `organization_unresolved`). Evidencia: 4 de los últimos 6 batches reintentaron por `organization_unresolved` y convergieron tras ~45 min; post-mortem en `docs/architecture/GREENHOUSE_HUBSPOT_SERVICE_SYNC_READ_PATH_DECISION_V1.md`. Esta umbrella no absorbe ese trabajo.
+
 ## Open Questions
 
 - ¿Qué reader(s) específico(s) consumen el presupuesto de `reliability_control_plane` y cuál es la menor corrección que conserva la semántica del contrato?

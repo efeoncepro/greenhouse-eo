@@ -66,7 +66,7 @@
   (nuevo runbook de trace); `INTEGRATIONS_INFRA_AGENT_INVARIANTS.md` (regla nueva).
 - **Full API Parity:** el command por servicio y el trace nacen con contrato (CLI + tool MCP interna + ruta `app`), no como script.
 
-## 6. Roadmap por slices (una task, `backend-data`)
+## 6. Roadmap por slices — task dueña: [`TASK-1886`](../tasks/to-do/TASK-1886-hubspot-service-sync-single-read-path-and-intake-trace.md) (`backend-data`)
 
 1. **S0 — Higiene:** `env:lint` + des-escape en `load-greenhouse-tool-env.ts` + `new URL()` en `normalizeBaseUrl` (con test que
    reproduce `\r\n` literal). Regenerar `.env.production.local` con `vercel env pull` (Vercel está limpio).

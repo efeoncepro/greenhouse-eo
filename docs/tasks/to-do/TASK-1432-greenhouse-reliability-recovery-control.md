@@ -371,6 +371,10 @@ La umbrella es impact-only: autoriza discovery, clasificación y verificación r
 - Tasks/issues hijas derivadas por Slice 1; no precrear IDs hasta validar causa, ownership y frontera.
 - Promover a `EPIC-###` si la taxonomía confirma un programa de más de tres implementaciones independientes.
 
+## Delta 2026-09-24
+
+- La fila «`hubspot_services_intake` degradado», listada aquí como sin dueño, pasa a `TASK-1886` (un solo read path de servicios HubSpot, traza del intake async, señal `intake_lag` y backoff corto para `organization_unresolved`). Evidencia: 4 de los últimos 6 batches reintentaron por `organization_unresolved` y convergieron tras ~45 min; post-mortem en `docs/architecture/GREENHOUSE_HUBSPOT_SERVICE_SYNC_READ_PATH_DECISION_V1.md`. Esta umbrella no absorbe ese trabajo.
+
 ## Open Questions
 
 - ¿Qué signals representan defectos de sistema versus deuda operativa aceptada con SLA? La decisión se toma por señal con su owner, no por rollup global.
