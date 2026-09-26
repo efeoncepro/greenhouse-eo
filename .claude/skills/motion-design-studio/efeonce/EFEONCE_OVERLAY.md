@@ -36,7 +36,7 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   [manual §10.1](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md). La línea de tiempo
   **es un token**: `efeonceGraphicLine.brandClose` de `@efeoncepro/axis-tokens` (`totalMs` + `steps` con `part`,
   `startMs`, `endMs`: anillo → arco → la esfera asienta → halo → logo → eslogan) y el kind `brand-close` del
-  contrato `efeonce.graphic-line-orbit` 0.2.0. El motion **consume** esos valores; nunca transcribe los tiempos a
+  contrato `efeonce.graphic-line-orbit` 0.3.0. El motion **consume** esos valores; nunca transcribe los tiempos a
   mano (si el token cambia, el cierre cambia con él). `brand-close` no va en canal print; con movimiento reducido,
   cuadro final fijo. Hay versión 16:9 y variante 1:1; referencias renderizadas y generador en
   `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/motion/` (`cierre-16x9.mp4`, `cierre-1x1.mp4`,
@@ -45,9 +45,18 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   `@efeoncepro/axis-brand-assets`, nunca con un modelo de video. El eslogan «Empower your …» sólo cierra: nunca en
   mayúsculas ni con esfera. El foco (§1.4) se anima barriendo la escena hasta posarse sobre el cliente, una sola luz.
   La órbita no reemplaza la composición del plano: se declara donde aporta (cierre, foco), no en cada escena.
-  **Reveal y apertura del logo** (línea → logo y logo → línea, conviven con el cierre): spec, tiempos, oclusión,
-  sonido y entregables en [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md);
-  generador en `scripts/creative/brand-motion/` (render, sonido y codificación).
+  **Animaciones del logo V1.1** (aprobadas 2026-09-26; conviven con el cierre): **reveal** línea → logo 3,6 s,
+  **apertura** logo → línea 2,4 s y **sting** 1,6 s (anticipación, impacto `backOut`, onda de acento, eslogan al 64 %
+  del logotipo). Spec, tiempos, oclusión, sonido, entregables y QA en
+  [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md)
+  (v1.1; los tiempos viven en el script hasta que existan tokens, nunca se transcriben a otro); render en
+  `scripts/creative/brand-motion/{render-orbit-motion,orbit-sound,encode-orbit-motion}.mjs`. **La animación de la
+  órbita sin logo es otra pieza:** sale de `@efeoncepro/axis-graphic-line` (`ORBIT_MOTION_CSS`,
+  `orbitMotionFrameCss`) y se exporta a MP4 con `pnpm orbit:video` en AXIS. Web y fichas en el Lab 4.4.2
+  (`axis.efeonce.org/references/graphic-line/#animaciones`); masters (MP4, ProRes 4444, WebM/HEVC con alfa) en
+  `gs://efeonce-group-axis-public-media/motion/logo/v1.1/<anim>/<formato>/<fondo>/`; MP4, GIF, cuadros y LEEME en
+  OneDrive `13- Branding/Motion Órbita Efeonce/v1.1`; nunca en git. **Una sola cola de render a la vez** (dos en
+  paralelo corrompieron 4 MP4; `run-all.sh` lleva candado).
   Reglas y checklist: [graphic-line-orbit.md](../../efeonce-brand-studio/references/graphic-line-orbit.md).
 - **`DESIGN.md`** es el contrato visual agent-facing; leerlo si la pieza toca UI (pero recuerda: motion de
   UI runtime NO es esta skill).

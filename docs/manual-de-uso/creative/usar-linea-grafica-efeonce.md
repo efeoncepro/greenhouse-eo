@@ -1,7 +1,7 @@
 # Usar la línea gráfica de Efeonce — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-25 por Claude
 > **Ultima actualizacion:** 2026-09-26 por Claude
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
@@ -11,7 +11,8 @@
 ## Para qué sirve
 
 Este manual explica cómo hacer una pieza de Efeonce con la órbita (post, slide, portada, informe, merch, papelería,
-señalética) sin romper sus reglas, y cómo regenerar el manual en PDF cuando cambia su fuente.
+señalética) sin romper sus reglas, cómo usar las animaciones de marca (la órbita y las tres animaciones del logo) y
+cómo regenerar el manual en PDF cuando cambia su fuente.
 
 La órbita es la forma canónica de la marca propia de Efeonce y de su familia (Globe, Wave, Reach). **No se usa** en la
 interfaz de Greenhouse ni en el trabajo de clientes.
@@ -147,10 +148,68 @@ Un agente no dibuja la órbita a mano: declara qué hace en la pieza y AXIS resu
    texto, la firma queda descentrada o bajo 4,5:1, o la órbita cruza el sujeto, sale con error y `qa.json` dice cuál.
 5. **Mira el PNG al 100 %** antes de usarlo: el chequeo del sujeto dentro de la lente es visual.
 
-> Detalle técnico: contrato `efeonce.graphic-line-orbit` 0.2.0 (candidate) en `@efeoncepro/axis-ui-contracts`
-> 0.2.7; archivos oficiales en `@efeoncepro/axis-brand-assets` 0.2.7; capa opcional en `pnpm creative:layout`
-> (`graphic_line` por formato); adapter en `scripts/creative/layout-compiler/graphic-line.mjs`; manual del contrato en AXIS
-> `docs/agent-composition/graphic-line-orbit.md`.
+> Detalle técnico: contrato `efeonce.graphic-line-orbit` 0.3.0 (`stable`) en `@efeoncepro/axis-ui-contracts`
+> 0.3.0; archivos oficiales en `@efeoncepro/axis-brand-assets` 0.3.0 (Greenhouse los fija en `develop`; llegan a
+> producción con el próximo release); capa opcional en `pnpm creative:layout` (`graphic_line` por formato); adapter en
+> `scripts/creative/layout-compiler/graphic-line.mjs`; manual del contrato en AXIS
+> `docs/agent-composition/graphic-line-orbit.md`. Fuera de Greenhouse (por ejemplo en el Lab), la órbita, sus recetas
+> (lente, foco, deck, retrato de la firma de mail) y su movimiento salen del paquete `@efeoncepro/axis-graphic-line`
+> 0.3.1; Greenhouse no depende de él.
+
+## Paso a paso — usar las animaciones de marca
+
+Hay dos tipos de animación. Ninguna se genera con un modelo de video (el logo no se sostiene) y ninguna es para
+clientes ni para la UI de Greenhouse.
+
+| Animación | Qué hace | Dura | Úsala en |
+|---|---|---|---|
+| **Órbita** (sin logo) | anillo → arco → la esfera asienta → halo | 2,0 s + 0,5 s de reposo | fondos de portada, cierres de presentación y piezas que ya tienen su propia firma o texto |
+| **Reveal** | la línea se vuelve logo | 3,6 s | cierre de video, apertura de presentación, intro de evento |
+| **Apertura** | el logo se abre en la línea | 2,4 s | paso del logo al lenguaje de la línea, antes de componer |
+| **Sting** | el golpe corto | 1,6 s | cortinillas, redes y cierres breves |
+
+### Paso 1 · Elige el archivo según dónde lo vas a usar
+
+Cada animación del logo existe por formato (16:9, 16:9 4K, 1:1, 4:5, 9:16) y por fondo (`navy` para fondo oscuro,
+`claro` para fondo claro; la versión «para fondo oscuro» lleva el logo en blanco y la «para fondo claro», en navy).
+
+| Si la vas a usar en… | Toma | Dónde |
+|---|---|---|
+| After Effects, Premiere, Final Cut o DaVinci, sobre tu propio fondo | `…_alpha-para-fondo-{oscuro\|claro}_prores4444.mov` (transparente) | bucket |
+| una página web, con transparencia (Chrome, Firefox) | `…_alpha-para-fondo-{oscuro\|claro}.webm` | bucket |
+| Keynote, Safari o un dispositivo Apple, con transparencia | `…_alpha-para-fondo-{oscuro\|claro}_hevc.mov` | bucket |
+| un video, una presentación o una red social tal cual, con fondo y sonido | `…_60fps.mp4` o `…_30fps.mp4` | OneDrive o bucket |
+| una vista previa en un chat o un correo | `…_960.gif` (sólo 16:9 y 1:1) | OneDrive o bucket |
+| una imagen fija del final | `…_cuadro-final.png` (con fondo o transparente) | OneDrive o bucket |
+
+### Paso 2 · Descárgalo
+
+- **OneDrive (equipo):** `Alineación › 5. Contenidos › 13- Branding › Motion Órbita Efeonce › v1.1`, una carpeta por
+  animación (`reveal`, `apertura`, `sting`) y dentro por formato y fondo. Lee el `LEEME.txt` de la carpeta.
+- **Masters pesados (bucket público de AXIS):**
+  `https://storage.googleapis.com/efeonce-group-axis-public-media/motion/logo/v1.1/<animación>/<formato>/<fondo>/`.
+  Ejemplo: `…/reveal/16x9/navy/efeonce-orbita-reveal_16x9_alpha-para-fondo-oscuro_prores4444.mov`.
+- **Fichas y descargas desde el navegador:** Lab de AXIS, sección 4.4.2 «Animaciones de marca»
+  ([axis.efeonce.org/references/graphic-line/#animaciones](https://axis.efeonce.org/references/graphic-line/#animaciones)),
+  con versiones web livianas para mirarlas antes de bajar el master.
+- **La órbita sin logo** no está en OneDrive: se exporta desde el repo de AXIS con
+  `pnpm orbit:video -- --format 16x9 --surface dark --out <carpeta>` (formatos `16x9`, `1x1`, `4x5`, `9x16`; fondos
+  `dark` y `light`; `--line` elige la línea de servicio). En una página web no hace falta video: el paquete la anima
+  con CSS (`ORBIT_MOTION_CSS`, `<AxisOrbit animate>` o `<axis-orbit animate>`). Se ve en el Lab, sección 4.4.2.
+
+### Paso 3 · Úsala sin romperla
+
+- El sonido viene mezclado en los MP4; en los masters transparentes no hay audio.
+- El halo es parte del cuadro; si necesitas bajarlo o quitarlo, pide las secuencias PNG por capas (`principal`,
+  `halo`, `combinada`), que quedan en el taller `ai-generations/2026-09-26_orbita-motion/` y no se publican.
+- No recolorees, no recortes el logo, no cambies la velocidad ni agregues el eslogan en mayúsculas o con esfera.
+- Si falta una variante (formato o fondo), no la armes a mano: las que faltan se suman a medida que termina el
+  render. Pídela.
+
+> Detalle técnico: [spec de motion](../../operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md) (tiempos,
+> oclusión, entregables y QA) · [manual técnico §10.1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#101-pantalla-y-campaña)
+> · generador en `scripts/creative/brand-motion/` · animación de la órbita en `@efeoncepro/axis-graphic-line`
+> (`ORBIT_MOTION_*`).
 
 ## Paso a paso — fotografiar una aplicación (merch u oficina)
 
@@ -259,5 +318,6 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 - Lenguaje fotográfico: [`docs/operations/brand-photography/README.md`](../../operations/brand-photography/README.md)
 - Banco de la lente: `ai-generations/2026-09-25_banco-lente-orbita/LEEME.md`
 - Canvas de trabajo (privado, 40 láminas): [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii)
-- Contrato y herramientas (AXIS 0.2.7, `creative:orbit:render`, `creative:layout`, `foto:componer:cta` tramo 17): [manual técnico §13](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-contrato-y-herramientas-axis-027)
+- Contrato y herramientas (AXIS 0.3.0 y `axis-graphic-line` 0.3.1, `creative:orbit:render`, `creative:layout`, `foto:componer:cta` tramo 17): [manual técnico §13](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-contrato-y-herramientas-axis-03)
+- Animaciones de marca: [spec de motion](../../operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md) · masters en `gs://efeonce-group-axis-public-media/motion/logo/v1.1/`
 - Compositor de piezas con CTA: [manual de uso](./compositor-piezas-cta.md)

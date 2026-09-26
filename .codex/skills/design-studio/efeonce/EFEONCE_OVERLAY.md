@@ -46,7 +46,7 @@ visual transversal requiere validación en varias portadas.
   composición del lenguaje fotográfico** (no cruza sujeto, reservas, lecho ni firma). **Firma de pieza gráfica:** logo
   de Efeonce centrado abajo; la burbuja URL sólo lo reemplaza si el logo ya está dentro de la imagen, centrada, sola,
   fusionada a opacidad 1 y ≥ 4,5:1 medido. Se compone por intención con `pnpm creative:orbit:resolve|render`
-  (contrato AXIS 0.2.0), `pnpm creative:layout` o `pnpm foto:componer:cta`. **No** se aplica a la UI de Greenhouse
+  (contrato AXIS 0.3.0), `pnpm creative:layout` o `pnpm foto:componer:cta`. **No** se aplica a la UI de Greenhouse
   ni a piezas de clientes Globe. Operación y QA:
   [`graphic-line-orbit.md`](../../efeonce-brand-studio/references/graphic-line-orbit.md) · manual
   [`EFEONCE_GRAPHIC_LINE_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md).

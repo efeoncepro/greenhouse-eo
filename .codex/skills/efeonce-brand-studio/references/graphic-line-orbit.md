@@ -2,8 +2,9 @@
 
 > Canónica desde el 2026-09-25 ([ADR](../../../../docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md), Accepted).
 > Contenido completo en el [manual V1](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
-> (v1.1: §8.5 con el delta de la firma, §10.8 merch en foto, §10.9 oficina en foto). Esta hoja resume para operar;
-> si difiere del manual o de los tokens, mandan ellos.
+> (v1.1: §8.5 con el delta de la firma, §10.8 merch en foto, §10.9 oficina en foto) y el motion en
+> [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md)
+> (v1.1). Esta hoja resume para operar; si difiere del manual o de los tokens, mandan ellos.
 
 ## Qué es
 
@@ -99,25 +100,45 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
     valores de `lens.anatomy` (esfera 7,6 px en 1080, 13,5 px en 1920); el adapter de Greenhouse la pinta así desde
     que adoptó AXIS 0.3.0 (§1.5).
 15. **Un solo anillo alrededor del contenido:** si la órbita rodea algo (palabra, logo, objeto, lente, texto), sin
-    órbitas interiores; éstas sólo en una órbita vacía que las necesita (anatomía, mapa de portafolio) (§1.3).
+    órbitas interiores; éstas sólo en una órbita vacía que las necesita (anatomía, mapa de portafolio) (§1.3). El
+    contrato lo rechaza (`inner-orbits-never-around-content`).
+16. **El foco siempre lleva su anillo**, concéntrico con la luz, con la lámpara (arco y esfera) arriba a la derecha.
+17. **Medidas del canvas, no inventadas** (2026-09-26): el arco genérico va centrado en su posición (`upper-start` →
+    200°–250°); arco y esfera en el extremo bajo de su rango (3,81 / 8,33 px en un lienzo social de 1080); anillo al
+    16 %, al 22 % sólo con órbitas interiores o satélites. Las piezas de formato fijo (lente, foco, deck, retrato)
+    se midieron una por una en `pieces` y `portrait`: la receta las **reproduce**, no las deriva de una escala.
 
 ## De dónde salen los valores y los archivos
 
 - **Valores:** tokens **`efeonceGraphicLine`** (`status: 'canonical'`) de `@efeoncepro/axis-tokens` (repo hermano
   `axis-design-system`, `packages/tokens/src/tokens.ts`), con pruebas de contraste. Grupos: `color`, `family`,
-  `sphere`, `orbit` (medidas por cada `orbit.baseWidthPx` = 794 px de ancho de lienzo), `lens`, `spotlight`,
+  `sphere`, `orbit` (medidas por cada `orbit.baseWidthPx` = 794 px de ancho de lienzo), `trajectory`, `lens`
+  (`anatomy`; `accentSphere*` quedó obsoleto), `portrait` (órbita alrededor de la foto de una persona: firma de
+  correo, tarjetas de equipo), `pieces` (piezas de formato fijo medidas una por una: lente `wall`, `deck-cover`,
+  `post`, `story`, `campaign-post`, `linkedin`; foco `photo`, `event`; deck `cover`, `section`, `content`, `close`),
+  `spotlight`,
   `urlBubble` (+ `source` `#848484`), `type`, `logo`, `isotype` y, desde 0.2.7, `signature` (centrada, anclada abajo
   al centro, margen 0,09 del lado corto, modo por defecto `logo`, la burbuja exige marca en escena, ancho 0,2 del
   lado corto y 0,25 en 16:9, contraste mínimo 4,5), `slogan`, `state` y `brandClose` (animación de cierre de 4 500 ms;
   con movimiento reducido, cuadro final).
-- **Archivos:** `@efeoncepro/axis-brand-assets` 0.2.7: 19 SVG oficiales (logo e isotipo positivo/negativo de Efeonce,
-  Globe, Wave y Reach; `url-bubble-source` gris para fusionar; `url-bubble-baked-light` y `url-bubble-baked-dark`),
-  con SHA-256 sellado y proporción del viewBox. Se piden por id con `findBrandAsset` / `brandAssetUrl`. **Nunca**
+- **Archivos:** `@efeoncepro/axis-brand-assets` 0.3.0: 19 SVG oficiales (logo e isotipo positivo/negativo de Efeonce,
+  Globe, Wave y Reach; `url-bubble-source` gris para fusionar; `url-bubble-baked-light` y `url-bubble-baked-dark`)
+  y 48 órbitas estáticas (6 líneas × 2 fondos × 4 canales, SVG y PNG), con SHA-256 sellado y proporción del viewBox.
+  Se piden por id con `findBrandAsset` / `brandAssetUrl` y `findOrbitAsset`. **Nunca**
   copiar un SVG a mano. Las copias locales que aún leen renderers y catálogos (`public/branding/*`,
   `deliverables/assets/url-lum-{light,dark}.svg`, `url-lum.svg` de los catálogos del Artifact Composer) las vigila la
   guarda `src/config/efeonce-brand-assets.test.ts`: deben llevar el dibujo del paquete. Fuentes y fotos **no** van en
   el paquete. No confundirlo con `efeonce.brand-logos` (procedencia de logos de terceros en UIs).
-- Greenhouse fija `@efeoncepro/axis-*` 0.3.0 y `@efeoncepro/axis-brand-assets` 0.3.0 (en `develop` desde 2026-09-26).
+- **La órbita pintada:** `@efeoncepro/axis-graphic-line` 0.3.1, excepción declarada a «AXIS publica valores, no
+  componentes pintados», sólo para esta forma: `orbitSvg`, `measureSvg`, recetas `lensRecipe`, `spotlightRecipe`,
+  `deckSlideHtml` (4 láminas, con `stats` y nota), `portraitOrbitSvg`, `sphereDividerSvg`, `recipeHtml`,
+  `answerHtml`; motion `ORBIT_MOTION_CSS` + `orbitMotionFrameCss`; `<AxisOrbit>` (React) y `<axis-orbit>` (Web
+  Component). Manual de recetas: `docs/agent-composition/graphic-line-orbit.md` en AXIS.
+- Greenhouse fija `axis-tokens`, `axis-ui-contracts`, `axis-ui-registry` y `axis-brand-assets` 0.3.0 (en `develop`
+  desde 2026-09-26; llega a `main` con el próximo release). **No** usa `axis-graphic-line`: su adapter conserva un
+  pintor propio apto para rasterizar, ya en el contrato 0.3.0 (lente con arco y esfera, deck con un solo anillo).
+  Instalar AXIS en local exige una credencial `read:packages` en un `NPM_CONFIG_USERCONFIG` efímero; nunca se
+  commitea ni se imprime.
 
 **NUNCA transcribir HEX ni px a mano** desde el manual, el PDF o una captura: importar el token. Cambiar un valor
 exige cambiar el token y su prueba, no el documento. Antes de fijar una versión en un consumidor, verificar en qué
@@ -178,6 +199,22 @@ de https://axis.efeonce.org/references/graphic-line.
   aprobadas **no se recertificaron**: como cambió la huella del comando, el gate las muestra en 3 hasta que se
   recompongan. **Ningún workflow de CI corre este gate**: correrlo a mano antes de entregar.
 
+## Motion de la línea
+
+- **Animaciones del logo V1.1** (aprobadas 2026-09-26): **reveal** (línea → logo, 3,6 s), **apertura** (logo → línea,
+  2,4 s) y **sting** (golpe corto, 1,6 s), con anticipación, impacto `backOut`, onda de acento y eslogan al 64 % del
+  logotipo. Spec y QA en
+  [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md);
+  render en `scripts/creative/brand-motion/{render-orbit-motion,orbit-sound,encode-orbit-motion}.mjs`. Nunca con un
+  modelo de video.
+- **Animación de la órbita (sin logo)** es otra cosa: sale del paquete (`ORBIT_MOTION_CSS`) y se exporta a MP4 con
+  `pnpm orbit:video` en AXIS.
+- **Dónde quedan:** versiones web y fichas en el Lab 4.4.2 (`axis.efeonce.org/references/graphic-line/#animaciones`);
+  masters (MP4, ProRes 4444, WebM/HEVC con alfa) en el bucket público
+  `gs://efeonce-group-axis-public-media/motion/logo/v1.1/<anim>/<formato>/<fondo>/`; MP4, GIF, cuadros y LEEME en
+  OneDrive `13- Branding/Motion Órbita Efeonce/v1.1`. Nunca en git.
+- **Una cola de render a la vez:** dos colas en paralelo corrompieron 4 MP4; `run-all.sh` ya lleva candado.
+
 ## Fotografía generada con IA para la línea
 
 **Método (arte plano → foto):** el arte plano, compuesto desde los archivos oficiales, es la **referencia exacta**;
@@ -213,9 +250,11 @@ el pre-push `scripts/ci/large-blob-gate.mjs` bloquea blobs grandes.
 | Funcional | `docs/documentation/creative/linea-grafica-efeonce.md` | qué es, en lenguaje simple |
 | Manual de uso | `docs/manual-de-uso/creative/usar-linea-grafica-efeonce.md` | paso a paso |
 | PDF (A4, 56 hojas, confidencial) | `docs/operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf` | entregable para personas (hoja 12 «La oficina, fotografiada»); regenerar con `node scripts/documents/render-efeonce-graphic-line.mjs` |
-| AXIS (pública, canónica) | https://axis.efeonce.org/references/graphic-line | láminas en HTML nativo; 5.7 «Componer con agentes»; 4.9 «Oficina en foto» (`#oficina-foto`) |
-| Tokens | `efeonceGraphicLine` en `@efeoncepro/axis-tokens` 0.2.7 | valores |
-| Archivos oficiales | `@efeoncepro/axis-brand-assets` 0.2.7 | logos, isotipos y burbujas; el Lab los sincroniza en cada build (`pnpm brand:sync`) |
+| AXIS (pública, canónica) | https://axis.efeonce.org/references/graphic-line | láminas en HTML nativo; 5.7 «Componer con agentes»; 4.9 «Oficina en foto» (`#oficina-foto`); 4.3, 4.6 y 4.7 muestran cada pieza plana junto a su foto IA («plano · foto», rotulada maqueta); 4.4.2 animaciones |
+| Tokens | `efeonceGraphicLine` en `@efeoncepro/axis-tokens` 0.3.0 | valores, `pieces` y `portrait` |
+| Archivos oficiales | `@efeoncepro/axis-brand-assets` 0.3.0 | logos, isotipos, burbujas y 48 órbitas; el Lab los sincroniza en cada build (`pnpm brand:sync`) |
+| Órbita pintada | `@efeoncepro/axis-graphic-line` 0.3.1 | recetas, motion, React y Web Component (Greenhouse no lo usa) |
+| Motion | `docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md` | reveal, apertura y sting V1.1 |
 | Adapter | `scripts/creative/layout-compiler/graphic-line.mjs` | resolver + pintor + medición de firma |
 | Canvas (taller, privado) | https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii | 40 láminas, 7 capítulos (lámina 4.9 «Oficina en foto»); exploración, no fuente |
 
@@ -246,7 +285,7 @@ La página de AXIS es pública: lo que allí aparece queda expuesto.
   no activo distintivo demostrado**. No reportarla como brand equity.
 - Umbral de la burbuja-firma: 4,5:1 o 3:1 (decisión del operador).
 - Elegir firma de mail A o B; aprobar el banco de pares de copy (hoy candidatos).
-- Archivos de impresión y plantillas editables. El contrato sigue en `candidate` hasta que una pieza real salga por
-  un segundo runtime con evidencia.
+- Archivos de impresión y plantillas editables.
+- Pasar los tiempos del motion V1.1 a tokens de AXIS (`brandReveal` / `brandOpen`); hoy viven en el script.
 - Copy en inglés; revisión legal de «Te hacemos visible»; tamaños mínimos del logo con prueba de impresión.
 - Recomponer las piezas aprobadas para que el gate de `foto:componer:cta` las vuelva a certificar.

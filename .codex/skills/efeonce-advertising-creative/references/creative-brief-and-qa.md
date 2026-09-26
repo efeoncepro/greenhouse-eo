@@ -122,7 +122,7 @@ lente, §8.5 URL, §9 foto, §10.1 campaña y grillas). Reglas completas y check
 [referencia operativa](../../efeonce-brand-studio/references/graphic-line-orbit.md). Valores desde los tokens
 `efeonceGraphicLine` de AXIS, nunca transcritos.
 
-Entradas: `pnpm creative:orbit:resolve|render` (contrato AXIS `efeonce.graphic-line-orbit` 0.2.0; `render` sale 1 si
+Entradas: `pnpm creative:orbit:resolve|render` (contrato AXIS `efeonce.graphic-line-orbit` 0.3.0; `render` sale 1 si
 falla un check como texto que cruza el anillo, firma descentrada o bajo 4,5:1, u órbita sobre el sujeto),
 `pnpm creative:layout` (capa opcional `graphic_line: { intent, protect }` por formato y `brand.signature: {
 brand_in_scene }`) y `pnpm foto:componer:cta` (`marcaEnEscena`). La órbita **no sustituye** la composición del
@@ -130,7 +130,7 @@ lenguaje fotográfico: se usa en casos específicos y nunca cruza sujeto, reserv
 
 | Elemento | DO | DON’T |
 |---|---|---|
-| Órbita en campaña | Rodea la lente con aire; esfera arriba a la izquierda, lejos de la cara | Esfera sobre el rostro o suelta, fuera de la punta del arco |
+| Órbita en campaña | Rodea la lente con aire, con anillo, arco corto y esfera en su punta arriba a la izquierda, lejos de la cara; un solo anillo | Esfera sobre el rostro, disco suelto sin arco, u órbitas interiores alrededor de la lente o del texto |
 | Texto | Vive fuera de la órbita (tercio inferior izquierdo) | Titular, CTA o URL cruzando el anillo |
 | Cantidad | Una lente u órbita por pieza | Órbitas repetidas como patrón o textura |
 | Arco de avance | Mide un dato real citable | Arco decorativo o dato inventado |

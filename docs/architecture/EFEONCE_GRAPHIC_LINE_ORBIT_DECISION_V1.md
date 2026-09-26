@@ -3,7 +3,7 @@
 > **Tipo de documento:** ADR (decisión de marca y sistema de diseño)
 > **Estado:** Accepted (2026-09-25) — canonizada en AXIS; atribución sin logo sin medir
 > **Creado:** 2026-09-25 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-26 por Claude (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7)
+> **Última actualización:** 2026-09-26 por Claude (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1)
 > **Manual canónico:** [`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
 > **Entregable:** [`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](../operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf)
 > **Sistema de diseño:** AXIS, página `references/graphic-line` en `axis.efeonce.org` y tokens `efeonceGraphicLine`
@@ -65,6 +65,25 @@ acentos de producto se usan en piezas de Efeonce (recomendación: no). Manual §
 - **La esfera que cierra la respuesta o el titular de marca propia es parte del texto:** guías, marcas de corte,
   selección y cursores la incluyen. Regla de contrato en AXIS (`answer-period-part-of-text`;
   `efeonce.collaboration-selection` 0.3.0 con `target.bounds`). Detalle en el manual §1.2, §1.5 y §6.
+
+### Delta 2026-09-26 (c) — AXIS 0.3.0: la órbita como código y las animaciones del logo
+
+- **Publicado en AXIS** (versionado independiente): `axis-tokens`, `axis-ui-contracts`, `axis-ui-registry` y
+  `axis-brand-assets` en 0.3.0, y el paquete nuevo `@efeoncepro/axis-graphic-line` 0.3.1, que pinta la órbita, sus
+  recetas (lente, foco, deck, retrato de la firma de mail) y su movimiento desde los tokens. El contrato
+  `efeonce.graphic-line-orbit` 0.3.0 pasa a **`stable`** (evidencia: paquete, pruebas de trayectoria, archivos
+  sellados y e2e del Lab). Tokens nuevos: `efeonceGraphicLine.pieces` (piezas de formato fijo medidas una por una del
+  canvas) y `portrait` (retrato de la firma de mail, caja 208 → anillo r 96, foto r 78, arco 200°–250°, esfera r 7).
+  Las recetas reproducen el canvas: el foco siempre con su anillo y un solo anillo alrededor del contenido.
+- **Greenhouse** fija los cuatro primeros en 0.3.0 en `develop` (commit `a98751daa`; llega a producción con el próximo
+  release) y no depende de `axis-graphic-line`: su adapter acepta el contrato 0.3.0, pinta la lente con arco y esfera
+  y el progreso con un solo anillo, y `axis-advertising.mjs` exige la selección 0.3.0. `axis-graphic-line` tiene
+  acceso de lectura desde Actions para los repos consumidores (runbook de paquetes privados de AXIS).
+- **Animaciones del logo V1.1** (aprobadas por el operador): reveal 3,6 s, apertura 2,4 s y sting 1,6 s; conviven con
+  el cierre anterior. Masters en el bucket público de AXIS `gs://efeonce-group-axis-public-media/motion/logo/v1.1/`
+  (creado con autorización del operador), MP4, GIF y cuadros en OneDrive `13- Branding/Motion Órbita Efeonce/v1.1`,
+  fichas y versiones web en el Lab (4.4.2). La animación de la órbita sin logo sale del paquete (`pnpm orbit:video`
+  en AXIS). Spec: `docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md`; manual §10.1, §10.2 y §13.
 
 ## Alternativas descartadas
 

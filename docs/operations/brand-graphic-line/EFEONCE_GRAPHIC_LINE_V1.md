@@ -1,12 +1,12 @@
 # Línea gráfica Efeonce — La órbita · V1
 
 > **Tipo de documento:** Manual de marca (contrato operativo de diseño)
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
-> **Última actualización:** 2026-09-26 por Claude (Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, AXIS 0.2.7, 4.9 · Oficina en foto)
+> **Última actualización:** 2026-09-26 por Claude (Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
 > **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
 > **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (40 láminas, siete capítulos)
-> **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Desde AXIS 0.2.7 los archivos oficiales (logo e isotipo de las cuatro marcas y las tres burbujas URL) viven en el paquete `@efeoncepro/axis-brand-assets` y el contrato de composición es `efeonce.graphic-line-orbit` 0.2.0 (§13). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
+> **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Desde AXIS 0.2.7 los archivos oficiales (logo e isotipo de las cuatro marcas y las tres burbujas URL) viven en el paquete `@efeoncepro/axis-brand-assets`; desde AXIS 0.3.0 el contrato de composición es `efeonce.graphic-line-orbit` 0.3.0 (`stable`) y el paquete `@efeoncepro/axis-graphic-line` 0.3.1 pinta la órbita, sus recetas y su movimiento (§13). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
 > **Manual en PDF:** [`deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](./deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) (A4, 56 hojas, confidencial · uso interno). Se regenera con `node scripts/documents/render-efeonce-graphic-line.mjs`.
 > **Fuentes del repo:** `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/` (generador del canvas, texturas, renders, firma de mail, merch generativo y prueba sin logo)
 > **Relacionados:** [Lenguaje fotográfico](../brand-photography/README.md) · [Selección de referencias de marca](../EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md) · `docs/context/09_marca-agencia.md` · `src/config/efeonce-brand.ts`
@@ -348,7 +348,7 @@ versión toda blanca, se reemplaza.
 >
 > Los usos de la burbuja como **pie** (deck, informe, papelería, stand, firma de mail y pies de página) **no cambian**:
 > siguen como se describe abajo, con las variantes horneadas donde no hay fusión. Contrato: elemento `signature` de
-> `efeonce.graphic-line-orbit` 0.2.0 y tokens `efeonceGraphicLine.signature` (§13).
+> `efeonce.graphic-line-orbit` (desde 0.2.0; hoy 0.3.0) y tokens `efeonceGraphicLine.signature` (§13).
 
 Donde aparezca `efeoncepro.com` va la **burbuja oficial** (`url-lum.svg`, el mismo asset del pie de Insights y del
 deck), nunca la URL como texto: stand, pendón, tarjeta, carnet, hoja membretada, firma de mail y pies de página.
@@ -367,7 +367,8 @@ Desde AXIS 0.2.7 la fuente oficial para código y agentes es el paquete **`@efeo
 (logo e isotipo en positivo y negativo de Efeonce, Globe, Wave y Reach; la burbuja `url-bubble-source` gris para
 fusionar y las horneadas `url-bubble-baked-light` y `url-bubble-baked-dark`), cada uno sellado con su SHA-256 y la
 proporción de su viewBox. No incluye fuentes ni fotos, y no es `efeonce.brand-logos` (la procedencia de logos de
-terceros en interfaces). Las copias locales de Greenhouse se vigilan contra el paquete (§13).
+terceros en interfaces). Las copias locales de Greenhouse se vigilan contra el paquete (§13). Desde 0.3.0 el paquete
+suma además 48 órbitas estáticas (SVG + PNG), generadas desde `@efeoncepro/axis-graphic-line` (§13.1).
 
 ---
 
@@ -415,6 +416,25 @@ foco, y en los estímulos de la prueba sin logo.
 - **Movimiento (cierre de marca 4,5 s):** anillo 0–0,5 s · arco 0,4–1,4 s · la esfera asienta 1,4–1,7 s · halo
   1,2–2,0 s · logo 1,9–2,5 s · eslogan 2,5–3,0 s. Con movimiento reducido, cuadro final fijo. Desde AXIS 0.2.7 estos
   tiempos son el token `efeonceGraphicLine.brandClose` y el elemento `brand-close` del contrato (no va en impresos).
+  Desde AXIS 0.3.0 esa misma animación de la órbita, **sin logo ni eslogan**, sale del paquete
+  `@efeoncepro/axis-graphic-line` (`ORBIT_MOTION_CSS`, `ORBIT_MOTION_TIMELINE`, `orbitMotionFrameCss`, sobre los
+  tiempos de `brandClose`) y se exporta a video con `pnpm orbit:video -- --format 16x9 --surface dark --out <dir>`
+  en el repo de AXIS (formatos 16x9, 1x1, 4x5 y 9x16; fondos oscuro y claro).
+- **Animaciones del logo (V1.1, aprobadas el 2026-09-26):** tres piezas que conviven con el cierre anterior y no lo
+  reemplazan. **Reveal** (la línea se vuelve logo, 3,6 s): cierre de video, apertura de presentación o intro de
+  evento. **Apertura** (el logo se abre en la línea, 2,4 s): paso del logo al lenguaje de la línea. **Sting** (el
+  golpe corto, 1,6 s): cortinillas, redes y cierres breves. Son marca propia de Efeonce: nunca para clientes ni para
+  la UI de Greenhouse, y nunca se generan con un modelo de video. Dónde están:
+  - MP4 con sonido (60 y 30 fps), GIF de vista previa y cuadro final (con fondo y transparente): OneDrive
+    `Alineación › 5. Contenidos › 13- Branding › Motion Órbita Efeonce › v1.1` (con su `LEEME.txt`).
+  - Masters pesados (ProRes 4444 con alfa para After Effects, Premiere, Final Cut o DaVinci; WebM con alfa para web;
+    HEVC con alfa para Safari y Keynote): bucket público de AXIS `gs://efeonce-group-axis-public-media/motion/logo/v1.1/<animación>/<formato>/<fondo>/`
+    (`https://storage.googleapis.com/efeonce-group-axis-public-media/motion/logo/v1.1/…`; creado el 2026-09-26 con
+    autorización del operador). Nunca en git.
+  - Fichas, versiones web livianas y cómo se recrea cada una: Lab de AXIS, sección **4.4.2 «Animaciones de marca»**
+    ([axis.efeonce.org/references/graphic-line/#animaciones](https://axis.efeonce.org/references/graphic-line/#animaciones)).
+  - Spec de producción, tiempos, oclusión y QA: [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](./EFEONCE_ORBIT_REVEAL_MOTION_V1.md)
+    (se produce con `scripts/creative/brand-motion/`).
 - **Grillas:** margen del 9 % del lado corto en redes (96 px sobre 1080) y 140 px en 16:9; en 9:16 se respeta la
   zona que tapa la interfaz de cada red.
 
@@ -424,6 +444,13 @@ HTML con texto vivo y máximo dos imágenes; en Outlook de escritorio fija a 460
 con la órbita alrededor de la foto: **A · clara** (divisor que termina en la esfera) y **B · tarjeta navy**
 (recomendada: se reconoce de lejos y funciona en modo oscuro). **Decisión pendiente: A o B.** Generador:
 `exploracion-v5/firma/`.
+
+**Proporciones del retrato (lámina 4.5, medidas del original, caja de 208 px):** anillo de radio 96, foto recortada en
+círculo de radio 78, arco de 200° a 250° con trazo 4 y la esfera de radio 7 en su punta; anillo de 2 px en navy al
+22 % sobre claro y en halo al 40 % sobre oscuro. Son el token `efeonceGraphicLine.portrait` (fracciones del lado de la
+caja, así escalan a cualquier tamaño) y las pinta `portraitOrbitSvg` de `@efeoncepro/axis-graphic-line` (también para
+tarjetas de equipo y fotos de perfil); el divisor que termina en la esfera es `sphereDividerSvg`. Los clientes de
+correo no muestran SVG: se rasteriza a 2× y se sirve el PNG. La órbita sale del paquete; no se redibuja.
 
 ### 10.3 Oficina
 
@@ -565,7 +592,8 @@ confianza. Kit: `exploracion-v5/prueba-sin-logo/` (protocolo, cuestionario, 24 e
 3. Aprobar el banco de pares de copy.
 4. Umbral de la burbuja-firma: mantener 4,5:1 o bajarlo a 3:1 (objeto gráfico) (§8.5).
 
-**Pendiente (producción):** archivos de impresión y plantillas editables · el contrato de composición `efeonce.graphic-line-orbit` (0.2.0 en AXIS 0.2.7) sigue en `candidate` hasta una pieza real por un segundo runtime · la
+**Pendiente (producción):** archivos de impresión y plantillas editables · las variantes que faltan de las animaciones
+del logo V1.1 (OneDrive y bucket) y sus tiempos como tokens `brandReveal` / `brandOpen` de AXIS (§10.1) · la
 frontera Greenhouse ↔ Efeonce (la línea es de Efeonce, no de Greenhouse) · que la línea no se filtre al trabajo de
 clientes · copy en inglés · revisión legal de «Te hacemos visible» · accesibilidad medida en las piezas reales ·
 tamaños mínimos del logo validados con prueba de impresión.
@@ -579,16 +607,29 @@ operador.
 
 ### 13.1 AXIS
 
-- **Paquetes `0.2.7`:** `@efeoncepro/axis-tokens`, `axis-ui-contracts`, `axis-ui-registry` y el nuevo
-  `@efeoncepro/axis-brand-assets` (§8.6). Greenhouse los tiene fijados en esa versión.
+- **Paquetes (versionado independiente):** `@efeoncepro/axis-tokens`, `axis-ui-contracts`, `axis-ui-registry` y
+  `axis-brand-assets` en **0.3.0**, y el paquete nuevo **`@efeoncepro/axis-graphic-line` 0.3.1** (la órbita como
+  código: `orbitSvg`, recetas `lensRecipe`, `spotlightRecipe`, `deckSlideHtml`, `portraitOrbitSvg` y
+  `sphereDividerSvg`, el movimiento `ORBIT_MOTION_*`, componente React y Web Component `<axis-orbit>`).
+  `axis-brand-assets` 0.3.0 suma 48 órbitas estáticas (SVG + PNG por línea, fondo y canal) generadas desde
+  `axis-graphic-line`. Greenhouse fija los cuatro primeros en 0.3.0 en `develop` (commit `a98751daa`, todavía no en
+  `main`: llega con el próximo release) y **no depende de `axis-graphic-line`**: su adapter pinta con el contrato.
+  `axis-graphic-line` tiene `Manage Actions access → Read` para los repos consumidores desde el 2026-09-26
+  ([runbook de paquetes privados](../AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)).
+- **Bucket público de AXIS** `gs://efeonce-group-axis-public-media` (creado el 2026-09-26 con autorización del
+  operador; lectura pública, CORS para el Lab): masters pesados de motion en `motion/logo/v1.1/` (§10.1). Los
+  archivos pesados viven ahí o en OneDrive, nunca en git.
 - **Tokens `efeonceGraphicLine`** (canónicos): color, familia, esfera, órbita, lente, foco, burbuja URL (con su gris
   fuente), tipo, logo, isotipo y los nuevos `signature` (centrada, anclada abajo al centro, margen 0,09 del lado corto,
   logo por defecto, burbuja sólo con la marca en escena, ancho 0,2 del lado corto y 0,25 en 16:9, contraste mínimo
   4,5), `slogan` («Empower your», bloque o solo, sólo en cierres, sin mayúsculas ni esfera), `state` (anillo libre,
-  esfera ocupado, sin semáforo) y `brandClose` (§10.1).
-- **Contrato `efeonce.graphic-line-orbit` 0.2.0** (candidate; manifest `axis.graphic-line-orbit-composition.v1`).
-  Elementos: `orbit`, `measure`, `progress`, `lens`, `spotlight`, `family-map`, `url-bubble`, `voice`, `logo-inline`
-  y los nuevos `signature`, `slogan`, `state` y `brand-close`. Reglas: un anillo por pieza; una medida exige fuente;
+  esfera ocupado, sin semáforo) y `brandClose` (§10.1). Desde 0.3.0, además, `pieces` (las piezas de formato fijo
+  de las láminas 1.3, 1.4 y 4.2 medidas una por una del canvas: la receta las reproduce, no las deriva; §1.3) y
+  `portrait` (el retrato de la firma de mail; §10.2).
+- **Contrato `efeonce.graphic-line-orbit` 0.3.0** (**`stable`** desde el 2026-09-26, con evidencia de paquete, pruebas
+  de trayectoria, archivos sellados y e2e del Lab; en 0.2.0 era `candidate`; manifest
+  `axis.graphic-line-orbit-composition.v1`). Elementos: `orbit`, `measure`, `progress`, `lens`, `spotlight`,
+  `family-map`, `url-bubble`, `voice`, `logo-inline` y, desde 0.2.0, `signature`, `slogan`, `state` y `brand-close`. Reglas: un anillo por pieza; una medida exige fuente;
   la respuesta tiene hasta tres palabras; en canal social una burbuja suelta se rechaza (se firma con `signature`); una
   sola firma y nunca firma y burbuja a la vez; la burbuja-firma sólo para la marca Efeonce; el eslogan sólo cierra; el
   estado exige etiqueta; `brand-close` no va en impresos. Chequeos nuevos del adapter: `signature-centered`,
@@ -597,6 +638,10 @@ operador.
   «Componer con agentes», donde el post de ejemplo ahora firma con el logo centrado. El banco de tipografía creativa
   (`references/creative-typography`) también firma con el logo centrado por defecto; la burbuja sólo con el logo en la
   imagen. El Lab toma los archivos del paquete de assets en cada build y ya no guarda copias propias.
+  Desde el 2026-09-26 las piezas del Lab salen de `axis-graphic-line`: el deck (4.2), la lente (1.3), el foco (1.4) y
+  la firma de mail (4.5) coinciden con el canvas; las piezas planas de 4.3, 4.6 y 4.7 muestran su foto IA al lado;
+  4.4.1 arma con el paquete las secuencias de movimiento del canvas y 4.4.2 muestra la órbita sin logo y las tres
+  animaciones del logo, cada una con su ficha y la descarga de sus masters desde el bucket.
 - **Delta 2026-09-26 — AXIS 0.3.0 publicado (`axis-graphic-line` 0.3.1) y adoptado por Greenhouse en `develop`:**
   la lente resuelve anillo, arco y esfera desde `lens.anatomy` (§1.5; `accentSphereDiameterRatio` queda obsoleto); la
   esfera que cierra el texto es parte del texto (§1.2, §6) en la línea gráfica y en

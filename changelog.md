@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-26 — Línea gráfica «La órbita»: AXIS 0.3, recetas fieles al canvas y motion V1.1
+
+AXIS publicó 0.3.0 (tokens, contratos, registro y assets) y el paquete nuevo `@efeoncepro/axis-graphic-line` 0.3.1,
+que pinta la órbita y sus recetas. Cada pieza de formato fijo (lente, foco, deck, firma de correo) quedó medida en el
+canvas y la receta la reproduce; la órbita genérica usa las medidas del canvas (arco centrado, 200°–250°). Reglas nuevas
+de contrato: la lente lleva arco y esfera, el foco siempre su anillo, un solo anillo alrededor del contenido y la esfera
+final es parte del texto (también en la selección colaborativa 0.3.0). Greenhouse adoptó 0.3.0 en develop: el
+compositor de campañas pinta la lente y el deck según el contrato nuevo (suite completa en verde). El motion del logo
+V1.1 (reveal 3,6 s, apertura 2,4 s, sting 1,6 s) quedó aprobado y documentado; sus masters se sirven desde el bucket
+público `gs://efeonce-group-axis-public-media` y el Lab muestra versiones web con su ficha, junto a la animación de la
+órbita sola. Rollback: fijar de nuevo los paquetes en 0.2.7.
+
 ## 2026-09-26 — Marketing Studio: originales en GCS, worker de medios y restauración probada (TASK-1893, TASK-1896)
 
 Studio guarda en GCS una copia verificada (sha256 + crc32c, deduplicada) de los finales aprobados: 30 versiones por
@@ -556,16 +568,3 @@ image-to-video sin aspect ratio, expansión de prompt obligatoria en Max), y el 
 encolar. Dos mejoras alcanzan a todos los modelos: el `request_id` se imprime apenas fal acepta el trabajo
 y `--request-id` retoma uno que siguió corriendo tras un timeout, sin volver a cobrarlo. De paso se corrigió
 `--task`, que sólo acepta Seedance 2.5 y hasta ahora se dejaba pasar a la 2.0.
-
-## 2026-09-16 — `pnpm ai:fal`: Seedream 5 con capas editables y Seedance 2.5/2.0 desde la terminal
-
-El cliente fal.ai existía desde julio sin un solo consumidor. Ahora lo usa un CLI hermano de `ai:image`, sobre un
-registro de capacidades model-agnostic (`src/lib/ai/fal-capabilities.ts`) donde cada endpoint declara su slug
-literal, sus campos y sus límites. Seedream 5 quedó completo y verificado —incluido **layerize**, que descompone
-una pieza en hasta 16 capas con alfa real, nombre y bounding box— y los 15 endpoints de Seedance 2.5/2.0 quedan
-operables, con límites validados **antes** de encolar: 2.5 llega a 30 s pero topa en 1080p, y sólo 2.0 base
-entrega 4K (verificado: 3840×2160). Gemini Omni salió del carril: irá directo por Google.
-
-Dos correcciones que venían mal documentadas: el prefijo `fal-ai/` depende del endpoint y no del proveedor
-(Seedream 5 sin él, Seedream 4/4.5 con él), y la subida de archivos es `uploadFalFile`, no un CDN temporal.
-Tres capas documentales y las skills de imagen, video y dirección de arte actualizadas.

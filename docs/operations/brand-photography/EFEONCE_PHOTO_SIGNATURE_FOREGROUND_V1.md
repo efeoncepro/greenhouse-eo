@@ -138,7 +138,7 @@ material** entre piezas consecutivas (hallazgo del revisor adversarial) **[crite
 | Rango logrado | **4,9–20,2:1** **[medido]** en las piezas aprobadas | Salida del script por pieza |
 | Nitidez | Ninguna degradación: el desenfoque es del lecho, la marca se lee | `brand-in-scene.md` |
 | Apariciones | Una por pieza | — |
-| Dibujo del archivo | Las copias locales del logo y de la burbuja son el dibujo del paquete `@efeoncepro/axis-brand-assets` 0.2.7 | Guarda de deriva `src/config/efeonce-brand-assets.test.ts` |
+| Dibujo del archivo | Las copias locales del logo y de la burbuja son el dibujo del paquete `@efeoncepro/axis-brand-assets` (0.3.0 desde el 2026-09-26) | Guarda de deriva `src/config/efeonce-brand-assets.test.ts` |
 
 Uso:
 
@@ -177,7 +177,7 @@ exige un aprobador del registro en el compositor CTA.
 | `pnpm foto:componer:cta` + `pnpm foto:cta:gate` (tramo 17) | Plan con `"marcaEnEscena": true` y `"url": { … }`, **sin** `logo` | En una pieza nueva, la burbuja se fusiona a opacidad 1 y se mide el 1 % peor de su tinta sólida contra el fondo y si cae sobre el sujeto. La juzga la regla exceptuable `firma-burbuja` (burbuja con marca en escena y sin logo al lado; también salta con `marcaEnEscena` y logo sin burbuja), junto a `firma-contraste` (≥ 4,5:1) y `firma-sobre-sujeto` |
 | `pnpm creative:layout` | `brand.signature: { brand_in_scene }` | `false` → logo centrado y **sin** URL; `true` → burbuja centrada sola (exige `brand.url_bubble`), opacidad 1, y el QA falla bajo 4,5:1. Los contratos sin el campo (CMP-00x) quedan exactamente como antes: logo y burbuja a 0,72 |
 | `pnpm creative:orbit:render` | Intent de la órbita con su firma | Firma con logo o con la burbuja fusionada a opacidad 1 y mide el contraste de la firma sobre los píxeles finales |
-| AXIS | Elemento `signature` de `efeonce.graphic-line-orbit` 0.2.0 y token `efeonceGraphicLine.signature` | Centrada al pie, modo por defecto `logo`, burbuja sólo con la marca en escena, contraste mínimo 4,5 (checks `signature-centered` y `signature-min-contrast`) |
+| AXIS | Elemento `signature` de `efeonce.graphic-line-orbit` (0.3.0) y token `efeonceGraphicLine.signature` | Centrada al pie, modo por defecto `logo`, burbuja sólo con la marca en escena, contraste mínimo 4,5 (checks `signature-centered` y `signature-min-contrast`) |
 
 Detalle del compositor en el [contrato CTA §19.6](../EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#196-la-firma-cinco-maneras-de-declararla):
 prueba `P11` y mutantes `gate-t17-burbuja-sin-marca`, `gate-t17-burbuja-con-logo` y `compositor-t17-burbuja-opacidad`

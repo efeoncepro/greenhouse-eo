@@ -106,8 +106,9 @@ nunca como texto. No aplica a UI de Greenhouse ni a clientes.
 - **Firma:** logo de Efeonce **centrado abajo**, sin URL. La burbuja `efeoncepro.com` sólo **reemplaza** al logo si
   el logo ya aparece dentro de la imagen (mockup, objeto, merch): centrada, sola, fusión de luminosidad a opacidad 1 y
   ≥ 4,5:1 medido (sólo pasa sobre lechos muy oscuros). Nunca a un costado ni junto al logo.
-- **Entradas:** `pnpm creative:orbit:resolve|render` (contrato AXIS `efeonce.graphic-line-orbit` 0.2.0; `render`
-  sale 1 si falla un check), `pnpm creative:layout` (capa `graphic_line` + `brand.signature`),
+- **Entradas:** `pnpm creative:orbit:resolve|render` (contrato AXIS `efeonce.graphic-line-orbit` 0.3.0; `render`
+  sale 1 si falla un check; lente siempre con arco y esfera, un solo anillo alrededor del contenido, piezas de
+  formato fijo reproducidas desde `pieces`/`portrait`), `pnpm creative:layout` (capa `graphic_line` + `brand.signature`),
   `pnpm foto:componer:cta` (`marcaEnEscena`, regla `firma-burbuja`). Logos y burbujas desde
   `@efeoncepro/axis-brand-assets`, nunca copias a mano.
 - **Foto de objetos/espacios con la línea (merch, oficina):** el arte plano es la referencia exacta y el modelo sólo

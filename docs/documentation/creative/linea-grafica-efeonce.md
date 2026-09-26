@@ -1,7 +1,7 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-25 por Claude
 > **Ultima actualizacion:** 2026-09-26 por Claude
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
@@ -119,6 +119,23 @@ vectoriales, con prueba de color sobre el material real.
 
 > Detalle técnico: [manual §10.8 Merch en foto y §10.9 Oficina en foto](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#109-oficina-en-foto) · `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/oficina-ia/LEEME.md`
 
+## La línea en movimiento
+
+La órbita también se mueve, y el logo tiene tres animaciones propias, aprobadas el 2026-09-26 (versión 1.1):
+
+| Animación | Qué se ve | Dura | Para qué |
+|---|---|---|---|
+| **Órbita** (sin logo) | aparece el anillo, avanza el arco, la esfera se asienta y sube el halo | 2,0 s y medio segundo de reposo | fondos de portada, cierres de presentación y piezas que ya tienen su propia firma o texto |
+| **Reveal** | la línea se convierte en el logo: el anillo se inclina, la esfera se vuelve planeta y entra la nave | 3,6 s | cierre de video, apertura de presentación, intro de evento |
+| **Apertura** | el recorrido inverso: el logo se abre y deja la línea lista para componer | 2,4 s | pasar del logo al lenguaje de la línea |
+| **Sting** | el golpe corto: la nave encaja y aparece el logotipo | 1,6 s | cortinillas, redes y cierres breves |
+
+Las animaciones del logo se hacen en código a partir de los archivos oficiales, nunca con un modelo de video (el
+logo no se sostiene). Son marca propia de Efeonce: no se usan para clientes ni en el portal. Vienen con fondo y
+sonido (para usarlas tal cual) o transparentes (para montarlas sobre otro fondo en un editor de video).
+
+> Detalle técnico: [spec de motion](../../operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md) · [manual §10.1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#101-pantalla-y-campaña) · [cómo usarlas](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md#paso-a-paso--usar-las-animaciones-de-marca)
+
 ## Dónde está cada cosa
 
 | Qué | Dónde | Para quién |
@@ -129,6 +146,9 @@ vectoriales, con prueba de color sobre el material real.
 | Referencia pública en el sistema de diseño AXIS | [axis.efeonce.org/references/graphic-line](https://axis.efeonce.org/references/graphic-line) | cualquiera que necesite ver los elementos vivos |
 | Valores oficiales (grosores, colores, proporciones, firma) | tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` | quien construye piezas en código |
 | Archivos oficiales (logo e isotipo de las cuatro marcas y burbujas de URL) | paquete `@efeoncepro/axis-brand-assets` | quien construye piezas en código |
+| La órbita lista para usar en código (piezas, retrato de la firma de mail, movimiento) | paquete `@efeoncepro/axis-graphic-line` | quien construye piezas o páginas fuera de Greenhouse |
+| Animaciones del logo para el equipo (MP4, GIF, cuadro final) | OneDrive `13- Branding › Motion Órbita Efeonce › v1.1` | quien edita video o arma presentaciones |
+| Masters de las animaciones (transparentes para editores de video, web y Apple) | bucket público de AXIS `efeonce-group-axis-public-media`, carpeta `motion/logo/v1.1/` | quien monta la animación sobre otro fondo |
 | Canvas de trabajo (taller, privado; 40 láminas) | [Canvas «Línea gráfica Efeonce»](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) | quien explora nuevas aplicaciones |
 | Burbujas de URL listas para visores y correo | `docs/operations/brand-graphic-line/deliverables/assets/url-lum-{light,dark}.svg` | quien arma PDF, correo o referencias para IA |
 | Banco de fotos para la lente | `ai-generations/2026-09-25_banco-lente-orbita/` (fichas y prompts versionados; las imágenes son locales) | quien compone una lente |
@@ -150,9 +170,9 @@ la órbita se reconozca sola.
 | Firma de mail | decisión del operador | elegir entre A (clara) y B (tarjeta navy, la recomendada) e instalarla |
 | Banco de pares de copy | decisión del operador | aprobar los pares pregunta/respuesta candidatos |
 | Archivos de impresión y plantillas editables | producción | no existen todavía |
-| Contrato de composición de la órbita | producción | publicado en AXIS como candidato: un agente describe qué quiere hacer y el sistema pinta la pieza, la firma y mide que cumpla; pasa a estable cuando se use en una pieza real desde una segunda herramienta |
+| Variantes restantes de las animaciones del logo | producción | algunos formatos y fondos siguen en render; se suman a OneDrive y al bucket a medida que terminan |
 | Contraste mínimo de la burbuja como firma | decisión del operador | decidir si se mantiene la exigencia actual (4,5 a 1) o se baja a 3 a 1, porque la burbuja es un elemento gráfico y no texto |
 | Versión en inglés | producción | el copy de la línea está sólo en español |
 | Revisión legal de «Te hacemos visible» | legal | necesaria antes de usar el claim en pauta |
 
-> Detalle técnico: [manual §12](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#12-decisiones-y-validación) · [ADR, pendiente](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md#pendiente) · [manual §13, contrato y herramientas](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-contrato-y-herramientas-axis-027): contrato `efeonce.graphic-line-orbit` 0.2.0 en AXIS 0.2.7, `pnpm creative:orbit:render`, `pnpm creative:layout` y `pnpm foto:componer:cta` (tramo 17)
+> Detalle técnico: [manual §12](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#12-decisiones-y-validación) · [ADR, pendiente](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md#pendiente) · [manual §13, contrato y herramientas](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-contrato-y-herramientas-axis-03): contrato `efeonce.graphic-line-orbit` 0.3.0 (estable desde el 2026-09-26: un agente describe qué quiere hacer y el sistema pinta la pieza, la firma y mide que cumpla) en AXIS 0.3.0, `pnpm creative:orbit:render`, `pnpm creative:layout` y `pnpm foto:componer:cta` (tramo 17)

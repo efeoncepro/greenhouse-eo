@@ -185,7 +185,7 @@ tokens `efeonceGraphicLine` de `@efeoncepro/axis-tokens`; nunca HEX ni px transc
   horneadas `deliverables/assets/url-lum-{light,dark}.svg` donde no hay fusión).
 - **Eslogan «Empower your …»:** sólo cierra (end-card, contraportada, cierre de campaña); nunca en todo post, nunca
   con esfera, nunca en mayúsculas. Estado: anillo = libre, esfera = ocupado, siempre con etiqueta y sin semáforo.
-- **Cómo se produce:** valores del contrato AXIS `efeonce.graphic-line-orbit` 0.2.0 (tokens `signature`, `slogan`,
+- **Cómo se produce:** valores del contrato AXIS `efeonce.graphic-line-orbit` 0.3.0 (tokens `signature`, `slogan`,
   `state`) y archivos oficiales de `@efeoncepro/axis-brand-assets`, nunca copias propias. Pieza suelta con la
   órbita: `pnpm creative:orbit:render` (sale 1 si falla un check); campaña: `pnpm creative:layout` con la capa
   `graphic_line` y `brand.signature: { brand_in_scene }`; foto con CTA: `pnpm foto:componer:cta` con

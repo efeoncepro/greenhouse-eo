@@ -62,7 +62,9 @@ marca de cliente ni a Greenhouse. Contrato: [manual](../../../docs/operations/br
 - Valores desde los tokens `efeonceGraphicLine` (`@efeoncepro/axis-tokens`) y logos/burbujas desde
   `@efeoncepro/axis-brand-assets`, nunca HEX, px ni archivos transcritos. La órbita
   de navegación se compone por intención con `progress` (`sections`, `current`) en `pnpm creative:orbit:render`;
-  ver [graphic-line-orbit.md](../efeonce-brand-studio/references/graphic-line-orbit.md).
+  ver [graphic-line-orbit.md](../efeonce-brand-studio/references/graphic-line-orbit.md). Las cuatro láminas
+  (portada, sección, contenido, cierre) están medidas una por una en `efeonceGraphicLine.pieces.deck` y se
+  reproducen (fuera de Greenhouse, `deckSlideHtml` de `@efeoncepro/axis-graphic-line`): un solo anillo por lámina.
 
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 

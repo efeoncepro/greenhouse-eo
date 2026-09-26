@@ -26,7 +26,8 @@ La diferencia con otras capas de documentacion:
   sha256 del plate y `hasta`, firma externa, decisiones pendientes y problemas comunes (mensaje → causa → solución).
 - [Usar la línea gráfica de Efeonce](creative/usar-linea-grafica-efeonce.md) — hacer una pieza con la órbita
   (qué trabajo hace, color, ubicación del texto, foto de la lente, voz, firma con el logo centrado o burbuja URL sólo
-  con el logo en la imagen), componer con un agente, fotografiar merch u oficina, checklist de revisión, regenerar el
+  con el logo en la imagen), componer con un agente, usar las animaciones de marca (la órbita y las animaciones del
+  logo V1.1: qué archivo para qué editor y dónde bajar los masters), fotografiar merch u oficina, checklist de revisión, regenerar el
   PDF del manual y problemas comunes (burbuja negra en visores, burbuja-firma bajo 4,5:1, texto que cruza la órbita).
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del

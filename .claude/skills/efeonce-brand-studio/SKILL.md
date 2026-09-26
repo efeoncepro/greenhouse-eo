@@ -160,9 +160,15 @@ Kortex y Verk, fuera por ahora. Operar con
   imagen (mockup, objeto, merch), centrada, sola, con fusión de luminosidad a opacidad 1 y ≥ 4,5:1 medido (sólo pasa
   sobre lechos muy oscuros). Nunca a un costado ni junto al logo. Como pie de deck, informe, papelería o mail sigue
   como antes (horneada donde no hay fusión). Umbral 4,5 vs 3:1: pendiente del operador.
-- **Cómo se ejecuta:** contrato AXIS `efeonce.graphic-line-orbit` 0.2.0 (`pnpm creative:orbit:resolve|render`),
+- **Cómo se ejecuta:** contrato AXIS `efeonce.graphic-line-orbit` 0.3.0 estable (`pnpm creative:orbit:resolve|render`),
   capa `graphic_line` y `brand.signature` en `pnpm creative:layout`, `marcaEnEscena` en `pnpm foto:componer:cta`;
-  logos y burbujas sólo desde `@efeoncepro/axis-brand-assets`, nunca copias a mano. Detalle y QA en la referencia.
+  logos, burbujas y órbitas estáticas sólo desde `@efeoncepro/axis-brand-assets`, nunca copias a mano. Las piezas de
+  formato fijo (lente, foco, deck, retrato) se **reproducen** desde los tokens `pieces`/`portrait`; la lente siempre
+  lleva arco y esfera, y un solo anillo rodea el contenido. Fuera de Greenhouse, la órbita pintada sale del paquete
+  `@efeoncepro/axis-graphic-line`. Detalle y QA en la referencia.
+- **Motion:** animaciones del logo V1.1 aprobadas (reveal 3,6 s, apertura 2,4 s, sting 1,6 s;
+  [spec](../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md)); la animación de la órbita
+  sin logo sale del paquete de AXIS. Masters en el bucket público de AXIS, nunca en git (ver referencia).
 - **Estado:** **sistema consistente, NO activo distintivo demostrado**: la prueba de atribución sin logo (600
   personas) no se ha corrido. «Te hacemos visible» no sale a pauta sin revisión legal.
 

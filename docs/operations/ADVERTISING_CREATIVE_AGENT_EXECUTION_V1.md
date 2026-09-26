@@ -159,7 +159,7 @@ sujeto, las reservas de texto, el lecho ni la firma. Una lente u órbita por pie
   QA falla si la órbita cruza el campo de copy o un sujeto protegido.
 - Fuera del compilador: `pnpm creative:orbit:resolve` y `pnpm creative:orbit:render -- --intent <intent.json>
   --bindings <bindings.json> --out-dir <dir>` (adapter `scripts/creative/layout-compiler/graphic-line.mjs`, contrato
-  AXIS `efeonce.graphic-line-orbit` 0.2.0 en estado `candidate`; `bindings.protect` declara sujeto, reserva y lecho).
+  AXIS `efeonce.graphic-line-orbit` 0.3.0 en estado `stable`; `bindings.protect` declara sujeto, reserva y lecho).
   Sale con 1 si falla un check.
 - Los valores vienen de los tokens `efeonceGraphicLine` de AXIS; no se transcriben HEX ni px del manual. Canon:
   [ADR de la línea](../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) y

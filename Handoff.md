@@ -1,6 +1,6 @@
 # Handoff activo
 
-**Línea gráfica «La órbita» (25/09):** canónica y componible por intención (AXIS 0.2.6, `pnpm creative:orbit:render`); [índice](docs/operations/brand-graphic-line/README.md). Pendiente: prueba sin logo y firma A/B.
+**Línea gráfica «La órbita» (26/09):** AXIS 0.3 fiel al canvas (Greenhouse lo fija en develop); motion V1.1 aprobado, masters en bucket público y OneDrive, render en curso; [índice](docs/operations/brand-graphic-line/README.md).
 
 **Marketing Studio (26/09):** [TASK-1893](docs/tasks/complete/TASK-1893-marketing-studio-original-asset-store-media-worker.md) y [TASK-1896](docs/tasks/complete/TASK-1896-marketing-studio-observability-restore.md) complete en producción (release `92002873ced9`, PR #243), junto a 1890/1891; restauración probada (job 49 s) y EPIC-049 con ese exit criterion cumplido. Follow-ups no bloqueantes en cada task (CMP-002 sin sha256, federar `studio.asset.download`, reglas de Sentry por Workflows, Teams real, ensayo programado del 29/09). Gateway en `efeonce-mcp-gateway-00063-l9j`; sigue sin probar en vivo la denegación a una persona sin capability (1891). AXIS: todo paquete nuevo necesita acceso de Actions por consumidor ([runbook](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)).
 

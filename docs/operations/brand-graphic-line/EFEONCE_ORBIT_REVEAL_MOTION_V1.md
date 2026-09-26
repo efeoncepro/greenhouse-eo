@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — Reveal y apertura de la órbita (motion)
 
 > **Tipo de documento:** Especificación de producción de motion
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-09-26 por Claude
-> **Última actualización:** 2026-09-26 por Claude
+> **Última actualización:** 2026-09-26 por Claude (ruta exacta en OneDrive y la animación de la órbita sin logo desde el paquete de AXIS)
 > **Estado:** V1.1 aprobada por el operador (2026-09-26): más punch y sting de 1,6 s; tiempos aún en el script (pendiente pasarlos a tokens `brandReveal` / `brandOpen` de AXIS)
 > **Documentación técnica:** [Manual de la línea gráfica](./EFEONCE_GRAPHIC_LINE_V1.md) · [ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 
@@ -17,6 +17,7 @@ Son dos piezas de marca que conviven con el cierre anterior (anillo, arco y eslo
 | **Apertura** | logo → línea | 2,4 s | Paso del logo al lenguaje de la línea: el logo «se abre» y deja el anillo con su arco listo para componer |
 | **Sting** | el golpe corto | 1,6 s | Cortinillas, redes y cierres breves: el isotipo ya formado, la nave encaja de un golpe y la cámara salta al logotipo |
 | Cierre anterior | anillo + eslogan | — | Sigue vigente (`motion-design-studio`, overlay Efeonce) |
+| Órbita sola | anillo → arco → esfera → halo, sin logo | tiempos de `brandClose` | Sale del paquete `@efeoncepro/axis-graphic-line` (`ORBIT_MOTION_*`); a video con `pnpm orbit:video` en el repo de AXIS |
 
 **Idea.** El anillo fino de la línea gráfica es la órbita del isotipo vista de frente. Al inclinarse hacia el ángulo
 del isotipo, el anillo toma el grosor oficial y la esfera se convierte en el planeta. Luego la nave entra volando por
@@ -138,8 +139,10 @@ Por cada pieza, formato (16:9 1920×1080, 16:9 4K 3840×2160, 1:1 1080, 4:5 1080
 El alfa es directo (no premultiplicado) y sRGB. La versión «para fondo oscuro» lleva el logo en blanco; la «para
 fondo claro», en navy. El halo va como capa aparte para poder bajarlo o quitarlo.
 
-Destino para el equipo: OneDrive `Alineación/5. Contenidos/13- Branding/` (subcarpeta de motion). Los masters se
-archivan en GCS con `pnpm media:archive-ai-generation`. Nunca en git.
+Destino para el equipo: OneDrive `Alineación/5. Contenidos/13- Branding/Motion Órbita Efeonce/v1.1/` (MP4 con sonido
+a 60 y 30 fps, GIF de vista previa y cuadro final con fondo y transparente, por animación, formato y fondo; con un
+`LEEME.txt`). Los masters pesados se sirven desde el bucket público de AXIS (abajo) y se archivan en GCS con
+`pnpm media:archive-ai-generation`. Nunca en git.
 
 **En el Lab de AXIS** (4.4.2 «Animaciones de marca», axis.efeonce.org) van versiones web livianas —MP4 H.264 de
 1280 px a 30 fps con sonido, 100–170 KB, y el cuadro final en WebP como póster— de reveal (16:9 y 1:1), apertura

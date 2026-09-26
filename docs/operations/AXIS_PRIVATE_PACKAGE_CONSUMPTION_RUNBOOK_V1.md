@@ -8,6 +8,10 @@ source control.
 
 ## Current state — 2026-09-14
 
+> **Actualizado 2026-09-26:** hoy hay **cinco** paquetes privados: `axis-tokens`, `axis-ui-contracts`,
+> `axis-ui-registry` y `axis-brand-assets` en `0.3.0`, y `axis-graphic-line` en `0.3.1`. Greenhouse fija los cuatro
+> primeros en `0.3.0` en `develop`. Ver **Delta 2026-09-26 (b)**; la lista de abajo conserva el estado del 14.
+
 - Package repository: `efeoncepro/axis-design-system`.
 - Agent-facing visual guide: [`DESIGN.md`](https://github.com/efeoncepro/axis-design-system/blob/main/DESIGN.md), generated from `packages/tokens` and checked with `pnpm design:check` in the AXIS repository. It is a projection for agents, not a second token source of truth.
 - Lab runtime: `apps/lab` is Astro `7.1.6`, `output: 'static'`, public Vercel delivery, and builds to
@@ -56,6 +60,36 @@ source control.
   La evidencia del piloto pasa de **local** a **CI**.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
+
+## Delta 2026-09-26 (b) — AXIS 0.3.0 y el paquete nuevo `axis-graphic-line`
+
+- **Publicado** (versionado independiente): `@efeoncepro/axis-tokens`, `axis-ui-contracts`, `axis-ui-registry` y
+  `axis-brand-assets` en `0.3.0`, y el paquete nuevo **`@efeoncepro/axis-graphic-line` `0.3.1`** (la órbita de la
+  línea gráfica como código: SVG, recetas, motion, componente React y Web Component, todo desde los tokens).
+- **Greenhouse** fija los cuatro primeros en `0.3.0` en `develop` (commit `a98751daa`, «adopt AXIS 0.3.0»); todavía no
+  está en `main` y llega con el próximo release. Greenhouse **no depende** de `axis-graphic-line`: su adapter de la
+  órbita (`scripts/creative/layout-compiler/graphic-line.mjs`) acepta el contrato `efeonce.graphic-line-orbit` 0.3.0 y
+  pinta por su cuenta; `axis-advertising.mjs` exige `efeonce.collaboration-selection` 0.3.0.
+- **Acceso desde Actions:** aplicando la regla que dejó el delta de abajo, `axis-graphic-line` recibió
+  `Manage Actions access → Read` para los repos consumidores el 2026-09-26, **antes** de que un consumidor lo agregue
+  como dependencia. Así el CI de un consumidor puede instalarlo con su `GITHUB_TOKEN`.
+- **Instalación local con credencial efímera:** para instalar los paquetes privados en un equipo sin dejar el token en
+  el repo, se usa el mismo patrón que el CI: un `.npmrc` temporal **fuera del repo** con el registry `@efeoncepro` y
+  una credencial `read:packages`, pasado por `NPM_CONFIG_USERCONFIG` sólo para ese comando y borrado al terminar.
+
+  ```bash
+  # En un subshell: al salir se borran el archivo y la variable.
+  (
+    npmrc="$(mktemp)"; trap 'rm -f "$npmrc"' EXIT
+    printf '%s\n' '@efeoncepro:registry=https://npm.pkg.github.com' '//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}' > "$npmrc"
+    read -rs NODE_AUTH_TOKEN && export NODE_AUTH_TOKEN   # pega la credencial read:packages; no se muestra ni queda en el historial
+    NPM_CONFIG_USERCONFIG="$npmrc" pnpm install --frozen-lockfile
+  )
+  ```
+
+  El token nunca se escribe en un archivo versionado, no se imprime en la terminal ni en un log y no se pega en un
+  chat. Aplican las reglas duras del Delta 2026-08-29 (nada de sustituirla por una credencial de scope amplio en
+  infraestructura).
 
 ## Delta 2026-09-26 — un paquete AXIS nuevo rompió el CI de develop durante horas
 
@@ -352,8 +386,8 @@ Add:
 - `efeoncepro/greenhouse-eo`
 - `efeoncepro/efeonce-globe`
 
-Repeat for **every** AXIS package — today `axis-tokens`, `axis-ui-contracts`, `axis-ui-registry` and
-`axis-brand-assets` — and for **every new package** the AXIS repo publishes. Access is per package: a new package
+Repeat for **every** AXIS package — today `axis-tokens`, `axis-ui-contracts`, `axis-ui-registry`,
+`axis-brand-assets` and `axis-graphic-line` (granted 2026-09-26) — and for **every new package** the AXIS repo publishes. Access is per package: a new package
 only grants its source repository (`axis-design-system`), and it does not inherit the consumers of the other AXIS
 packages. Do not make the packages public as a shortcut.
 
