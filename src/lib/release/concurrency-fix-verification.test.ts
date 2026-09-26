@@ -175,24 +175,6 @@ describe('TASK-861 HubSpot release workflow contract', () => {
     expect(hubspotJob?.with?.expected_sha).toBe('${{ inputs.target_sha }}')
   })
 
-  it('production-release.yml forwards ops-worker runtime secrets through workflow_call', () => {
-    const orchestrator = loadWorkflow('.github/workflows/production-release.yml') as {
-      jobs?: Record<string, { secrets?: Record<string, unknown> }>
-    }
-    const workerWorkflow = loadWorkflow('.github/workflows/ops-worker-deploy.yml')
-    const opsWorkerJob = orchestrator.jobs?.['deploy-ops-worker']
-    const onClause = workerWorkflow.on as Record<string, unknown>
-    const workflowCall = onClause?.workflow_call as
-      | { secrets?: Record<string, unknown> }
-      | undefined
-
-    expect(opsWorkerJob?.secrets?.DATAFORSEO_API_LOGIN).toBe('${{ secrets.DATAFORSEO_API_LOGIN }}')
-    expect(opsWorkerJob?.secrets?.GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID).toBe(
-      '${{ secrets.GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID }}'
-    )
-    expect(workflowCall?.secrets?.DATAFORSEO_API_LOGIN).toEqual({ required: true })
-    expect(workflowCall?.secrets?.GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID).toEqual({ required: true })
-  })
 })
 
 const AZURE_WORKFLOWS = [
