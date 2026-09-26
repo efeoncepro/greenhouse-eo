@@ -194,6 +194,9 @@ preview 1600 WebP, ffmpeg frame at 1 s for videos; idempotent, no overwrite). St
   dispatch → canary with human Entra token → MCP session).
 - Greenhouse local `develop` holds the exchange client, capability, manual and registry drift fix, **not pushed**
   (remote commit collides with foreign WIP in `scripts/foto`).
+- TASK-1893 (2026-09-26) code complete, rollout pending: original store in GCS, `studio.asset.download` (API 1.2.0,
+  13 tools), rights, media worker `apps/worker`, Metricool readback. **Apply the Studio production migration before
+  pushing `main`**: the readers now select `media_object` and the rights columns.
 - Order: 1890 → 1891 · 1893 · 1896 → 1892 → 1894 → 1895 · 1899 → 1897 → 1898. Details: `references/program-ledger.md`.
 
 ## Routing

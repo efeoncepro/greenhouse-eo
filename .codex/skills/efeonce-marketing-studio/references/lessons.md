@@ -88,3 +88,19 @@
   before an earlier pending one blocks the other agent. Rule: check `public.studio_pgmigrations` first; apply only when
   every earlier file is already applied.
 
+## 2026-09-26 — TASK-1893 (originals and media worker)
+
+- **A raw `pg.Pool` returns DATE as a JS `Date`.** Rights compared `today > usageEndsOn` against a Date and silently
+  returned `active` for an expired window (caught by the integration test). The canonical connection sets
+  `pg.types.setTypeParser(1082, v => v)`; any ad-hoc pool (tests, scripts) must set it too.
+- **Kysely has no nested `transaction()`.** To test commands inside a rolled-back outer transaction, domain commands use
+  `inTransaction(db, …)` (`db.isTransaction` ⇒ reuse). `applyImportPlan` refuses dry-run inside a foreign transaction
+  (its dry-run rolls back its own).
+- **24 of 54 catalog versions have no sha256** (CMP-002 images). The ingest cannot verify them (`unverifiable`); the
+  old importer would have inserted a NEW version when the catalog later brought the hash (lookup by sha first). Rule:
+  the import adopts the hash into the same null-sha version with the same path.
+- **V4 signing by hand is verifiable offline.** Sign with a local RSA key and compare with `@google-cloud/storage`
+  (`getSignedUrl`, same timestamp): identical signature. The unit test pins the string-to-sign.
+- **`gcloud run deploy --set-env-vars` splits on commas**: a value like `3961547,5105024` needs the `^;^` delimiter.
+- **GCS `customTime` only moves forward** (cannot be cleared or set earlier): tiering sits behind its own flag and a
+  reopened campaign is reported (`tiering_reopened`) for a manual class rewrite.

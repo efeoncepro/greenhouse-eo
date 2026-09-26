@@ -40,7 +40,8 @@ pnpm import:catalog --catalog "<…>/Campaign Manager/CATALOGO-DATOS.json" \
 pnpm media:renditions --root "<…>/Alineación/5. Contenidos" --bucket <bucket> [--apply] [--force]
 ```
 
-- Import is idempotent (re-import inserts 0). Renditions: thumb 640 px / preview 1600 px WebP (quality 78/82),
+- Import is idempotent (re-import inserts 0). Since TASK-1893 it never degrades a `gcs` version and adopts a
+  catalog sha256 into the same null-sha version (same path) instead of inserting a new version. Renditions: thumb 640 px / preview 1600 px WebP (quality 78/82),
   videos framed at 1 s with `ffmpeg`, object named by version + sha, upload with `ifGenerationMatch=0`, row upsert.
   Requires ADC with write on the bucket. Order: staging DB/bucket first, then production.
 
@@ -189,3 +190,33 @@ the ops-worker declares it in `deploy.sh`. Alert scheduler `ops-marketing-studio
 it only after the first green production rehearsal. Rollback: DSN empty + redeploy; `pnpm migrate down` (ops_run);
 pause both schedulers; disable the uptime policy.
 
+## Originals, download, rights and media worker (TASK-1893, code complete 2026-09-26)
+
+Full ordered rollout: `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md` §Originales y worker.
+
+```bash
+# Infra (dry-run by default; staging first). Stage 1 before the worker, --wiring after deploying it.
+OPERATOR_PRINCIPAL=user:<email> bash scripts/ops/infra/media-originals.sh --env staging [--apply]
+bash apps/worker/deploy.sh --env staging [--apply] [--skip-build]          # SoT of the worker env vars/flags
+bash scripts/ops/infra/media-originals.sh --env staging --wiring [--apply]  # push + GCS notification + paused Scheduler
+# Worker PG roles: scripts/ops/sql/media-worker-roles.sql (instance admin, passwords piped)
+# Ingest (ADC impersonating marketing-studio-ingest[-stg]@; the CLI refuses a bucket that does not match the DB)
+pnpm media:ingest --root "<…>/Alineación/5. Contenidos" --bucket efeonce-marketing-studio-originals-staging [--campaign CMP-004] [--apply]
+pnpm media:ingest --revert-provider [--campaign …] [--apply]
+pnpm media:rights --asset <assetId> --version <n> --license stock --reference "…" [--from YYYY-MM-DD] [--until YYYY-MM-DD] [--territory CL] [--channel linkedin]
+# Domain integration test against staging (everything rolled back; app role)
+PGPASSWORD="$(gcloud secrets versions access latest --secret=marketing-studio-pg-staging-app-password)" \
+STUDIO_IT_PG_URL="postgres://marketing_studio_staging_app@127.0.0.1:15433/marketing_studio_staging" \
+  pnpm --filter @studio/domain exec vitest run src/media/media.integration.test.ts
+```
+
+- **Production migration BEFORE pushing Studio `main`** (readers select `media_object` and the rights columns).
+- Flags: `STUDIO_ORIGINAL_DOWNLOADS_ENABLED` (Vercel; preview first), worker flags in `apps/worker/deploy.sh` (change,
+  commit, redeploy; never `--update-env-vars` alone). With a flag off the worker answers 2xx and logs `skipped`.
+- Download canary: anonymous 403 `download_disabled` · client with both scopes 200 (`expiresAt` ≤ 10 min) · foreign org
+  404 · non-ingested version 404 `original_not_stored`. The gateway client needs a NEW `api_client` with
+  `--scope studio:read --scope studio:assets:download` (scopes are immutable) → new secret version → revoke the old one.
+- Worker runs: `SELECT kind, status, error_code, counts, started_at FROM studio.worker_run ORDER BY started_at DESC`.
+  DLQ must stay empty: `gcloud pubsub subscriptions pull marketing-studio-originals-finalized[-staging]-dlq-sub --limit 5`.
+- Rollback: flags off + redeploy; pause jobs; delete the bucket notification; `media:ingest --revert-provider --apply`;
+  `migrate down` only with no `gcs` version (the Down aborts otherwise).

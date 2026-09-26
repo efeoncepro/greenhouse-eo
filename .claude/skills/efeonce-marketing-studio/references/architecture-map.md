@@ -32,7 +32,7 @@ only; never write values here.
 | `packages/contracts/src/operations.ts` | **Single operations registry** (tool or exclusion per operation) |
 | `packages/contracts/src/semantics.ts` | Canonical glossary reused by OpenAPI + tool descriptions |
 | `packages/contracts/src/dto.ts` | zod DTOs and filters (→ OpenAPI 3.1) |
-| `packages/contracts/src/openapi.ts` | OpenAPI builder, `API_VERSION = '1.1.0'` |
+| `packages/contracts/src/openapi.ts` | OpenAPI builder, `API_VERSION = '1.2.0'` (TASK-1893) |
 | `packages/contracts/src/tool-manifest.ts` (+ `.test.ts`) | Derives `studio-tool-manifest.v1`, inlines `$ref`, sha256 `manifestHash`; tests: coverage, names, annotations, self-contained schemas, leak, determinism |
 | `packages/contracts/generated/tool-manifest.json` | Committed artifact (never hand-edited) |
 | `packages/contracts/src/errors.ts` | Closed `ERROR_CATALOG` |
@@ -65,6 +65,17 @@ only; never write values here.
 | `scripts/ops/infra/*.sh` | Idempotent infra, dry-run by default: `sentry.sh`, `vercel-env.sh`, `monitoring.sh`, `restore-rehearsal-job.sh`, `greenhouse-health-client.sh` (+ `lib.sh`) |
 | `scripts/ops/sql/restore-role{,-grants}.sql` | Role `marketing_studio_restore` by SQL + grants on `public.studio_pgmigrations` |
 | `infra/restore-rehearsal/` | `Dockerfile` (Node 24 + PG 16 client, filtered install), `Dockerfile.dockerignore`, `cloudbuild.yaml` |
+| `packages/domain/src/media/` (TASK-1893) | `originals.ts` (allowlist, byte sniffing, `originalObjectName`, `downloadFilename`, `pdfPageCount`), `crc32c.ts`, `ports.ts`, `ingest.ts` (`ingestOriginals`, `revertOriginalProvider`), `download.ts` (`issueOriginalDownload`), `derivatives.ts` (`generateDerivatives`, `generateDerivativesForObject`, `reconcileDerivatives`), `tiering.ts`, `worker-run.ts`, `toolkit-node.ts` (sharp + ffmpeg/ffprobe) |
+| `packages/domain/src/rights/rights.ts` | `rightsStatusOf` (America/Santiago), `setAssetVersionRights` (operator CLI + audit) |
+| `packages/domain/src/posts/observation.ts`, `providers/metricool/client.ts` | `recordPostObservation`, `runMetricoolReadback`; Metricool adapter (`X-Mc-Auth`, retry on 429/5xx, `not_configured`) |
+| `packages/domain/src/{worker,media-toolkit}.ts` | Subpaths `@studio/domain/worker` and `@studio/domain/media-toolkit` (never imported by the web — gate) |
+| `packages/domain/src/tx.ts` | `inTransaction` (composes with an outer transaction) |
+| `packages/database/src/storage-write.ts` | `uploadOriginalIfAbsent` (resumable, `ifGenerationMatch=0`, crc32c), `setObjectCustomTime` (never imported by the web — gate) |
+| `packages/database/src/storage.ts` (+ TASK-1893) | `getObjectMetadata`, `iamBlobSigner`, `signReadUrlV4` |
+| `apps/web/src/app/api/v1/assets/[assetId]/versions/[versionNo]/download/route.ts` + `src/server/downloads.ts` | Download route + signer wiring (`STUDIO_ORIGINAL_DOWNLOADS_ENABLED`, `STUDIO_ORIGINALS_BUCKET`) |
+| `apps/worker/` | `src/{config,handlers,server}.ts` (`node:http`), `Dockerfile` (+ ffmpeg), `cloudbuild.yaml`, `deploy.sh` (SoT of env vars) |
+| `scripts/media-ingest.ts`, `scripts/media-rights.ts` | `pnpm media:ingest`, `pnpm media:rights`; `media-renditions.ts` now uses the domain toolkit |
+| `scripts/ops/infra/media-originals.sh`, `scripts/ops/sql/media-worker-roles.sql` | Buckets/SA/IAM/Pub/Sub/Scheduler (`--env`, `--wiring`, dry-run default); worker PG roles |
 
 ## Database (schema `studio`)
 
@@ -91,6 +102,7 @@ Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 c
 | Restore rehearsal (TASK-1896, **to create**) | SA `marketing-studio-restore@`, bucket `efeonce-marketing-studio-restore-dumps` (30-day delete), image `us-east4-docker.pkg.dev/efeonce-group/marketing-studio/restore-rehearsal:<sha>`, Cloud Run Job `marketing-studio-restore-rehearsal` (us-east4), Scheduler same name (Tue 05:30 Santiago, paused until first green) |
 | Monitoring (TASK-1896, **to create**) | Uptime check «Studio — /api/v1/health» (4 regions, 5 min), policy «Studio — health caído en 2+ regiones», email channel «Studio — alertas por email» |
 | Sentry (TASK-1896, **to create**) | Org `efeonce-group-spa`, project `efeonce-marketing-studio`, envs `production`/`preview` |
+| Originals (TASK-1893, **to create**) | Buckets `efeonce-marketing-studio-originals[-staging]`; SAs `marketing-studio-ingest[-stg]@`, `marketing-studio-worker[-stg]@`, `marketing-studio-invoker@`; custom role `marketingStudioOriginalsMetadataWriter`; topics `marketing-studio-originals-finalized[-staging]` (+ `-dlq`, `-worker` push sub, `-dlq-sub`); Cloud Run `marketing-studio-media-worker[-staging]`; Scheduler `marketing-studio-reconcile-derivatives[-staging]`, `marketing-studio-metricool-readback`; PG roles `marketing_studio_worker` / `marketing_studio_staging_worker` (limit 6) |
 
 ## Environment variables (Studio)
 
@@ -110,6 +122,8 @@ Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 c
 | `SENTRY_AUTH_TOKEN` | Source-map upload at build (encrypted); absent ⇒ no upload |
 | `SENTRY_ENVIRONMENT`, `SENTRY_RELEASE`, `SENTRY_ORG`, `SENTRY_PROJECT` | Optional overrides (default env from `VERCEL_ENV`, release from `VERCEL_GIT_COMMIT_SHA`/`K_REVISION`) |
 | `STUDIO_MEDIA_BUCKET` | Bucket probed by the deep health (else deduced from renditions) |
+| `STUDIO_ORIGINAL_DOWNLOADS_ENABLED`, `STUDIO_ORIGINALS_BUCKET`, `STUDIO_DOWNLOAD_SIGNER_EMAIL` | Original download (TASK-1893; off by default; signer defaults to `GCP_SERVICE_ACCOUNT_EMAIL`) |
+| Worker (Cloud Run): `STUDIO_ORIGINALS_BUCKET`, `STUDIO_MEDIA_BUCKET`, `MEDIA_WORKER_{DERIVATIVES,METRICOOL_READBACK,ARCHIVE_TIERING}_ENABLED`, `MEDIA_WORKER_RECONCILE_BATCH`, `METRICOOL_API_TOKEN_SECRET_REF`, `METRICOOL_USER_ID`, `METRICOOL_BLOG_IDS` | SoT `apps/worker/deploy.sh` |
 
 ## Secrets (Secret Manager, project `efeonce-group`)
 
@@ -118,6 +132,8 @@ Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 c
 `secretAccessor` for `efeonce-mcp-gateway@efeonce-group.iam.gserviceaccount.com`), `axis-packages-read-token`
 (a full `.npmrc`). To create (TASK-1896): `marketing-studio-sentry-dsn`, `marketing-studio-sentry-auth-token`,
 `marketing-studio-pg-restore-password`, `greenhouse-marketing-studio-health-token` (Greenhouse reads it; `studio:health`).
+To create (TASK-1893): `marketing-studio-pg-worker-password`, `marketing-studio-pg-staging-worker-password` (generated by
+`media-originals.sh`), `marketing-studio-metricool-api-token` (operator; raw `userToken`).
 
 ## Gateway (`efeonce-mcp`)
 
@@ -141,6 +157,7 @@ Runtime: Cloud Run `efeonce-mcp-gateway` in `southamerica-west1`.
 | Path / object | Responsibility |
 |---|---|
 | Capability `marketing_studio.campaign.read` (module `marketing_studio`) | Grants: `efeonce_admin`, `efeonce_account`, `efeonce_operations` |
+| Capability `marketing_studio.asset.download` (TASK-1893, seed not applied) | Same grants; the exchange client does not request it yet (gateway federation pending) |
 | `src/lib/sister-platforms/mcp-token-exchange.ts` | `resourceFamily: 'marketing_studio'`, `authorizeMarketingStudio` = `can(persona, …, 'read', 'tenant')` |
 | OAuth client `efeonce-mcp-marketing-studio` (migration applied) | Confidential exchange client; allowed via `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` |
 | `src/mcp/greenhouse/skill-manifest.ts` (`'marketing-studio': { toolPrefix: 'studio.' }`) | Served manual entry; Greenhouse validates the prefix, the gateway validates existence |

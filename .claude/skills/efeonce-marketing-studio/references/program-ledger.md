@@ -13,7 +13,7 @@ Insights (EPIC-045), not Studio.
 | TASK-1890 | Agent-ready contract: operations registry + tool manifest, semantics, service bearer, canonical org, capability, served manual | **in-progress — code complete** | Studio prod `d3ab68e`; Greenhouse pieces in local `develop`, not pushed |
 | TASK-1891 | Federation of every manifest tool in Efeonce MCP | **in-progress** | Gateway 1.8.0 deployed, flag **OFF** |
 | TASK-1892 | Marketing metrics from Greenhouse (Search Console, GA4, SEO) via ecosystem lane `/api/platform/ecosystem/growth/*`, never SQL; paid (Meta/LinkedIn) and organic social (Metricool) as Studio adapters | to-do (GA4 not in production yet: TASK-1284) | — |
-| TASK-1893 | Original asset store in GCS (approved finals, sha256, versioning, rights) + Cloud Run media worker (auto renditions, video covers, crops, Metricool readback; Metricool API confirmed) | to-do | — |
+| TASK-1893 | Original asset store in GCS (approved finals, sha256, versioning, rights) + Cloud Run media worker (auto renditions, video covers, crops, Metricool readback; Metricool API confirmed) | **in-progress — code complete, rollout pending** | Studio local `697c97c` (not pushed); migration on staging only; Greenhouse `develop` `f98c63bff` (not pushed) |
 | TASK-1894 | Write commands (idempotency, `If-Match`, audit), brief as entity, authority cutover from OneDrive; signed upload lives here; `.write`/`.approve` capabilities | to-do | — |
 | TASK-1895 | Editing/review/version upload/metrics UI (wireframe + flow), consumer of 1892–1894 | to-do | — |
 | TASK-1896 | Observability (Sentry, request id + JSON logs, deep health, `ops_run`), alerts (uptime + Sentry email; Greenhouse signal + Teams «EO - Admin»), verified logical restore of `marketing_studio` (30-day rehearsal dump); before writes reach production | **in-progress — code complete, rollout pending** | Studio local `7f348b2` (not pushed); `ops_run` on staging; Greenhouse `develop` `e757aaba5` (not pushed) |
@@ -99,7 +99,34 @@ Not done: Sentry project, uptime check, production migration, rehearsals in Clou
 release. Hand-off: run the scripts in the order of the restore runbook; TASK-1893's worker should `initSentry` from
 `@studio/observability/node` and report with `captureWithDomain(…, 'media_worker')`.
 
+## TASK-1893 — original asset store + media worker (in-progress, code complete, rollout pending)
+
+**Studio commits (local `main`, not pushed):** `ef2d253` migration `1790409193629_media-originals` · `4884fb9` domain
+(ingest, download, rights, derivatives, tiering, worker_run, Metricool readback) + contracts (API 1.2.0, tool
+`studio.asset.download`, 13 tools / 5 exclusions, hash `02db316d2d2e…`) + web route + `apps/worker` + CLIs ·
+`0c8b164` infra scripts · `697c97c` AGENTS router. **Greenhouse (`develop`, not pushed):** `f98c63bff` capability
+`marketing_studio.asset.download` (catalog + seed migration `20260926075619118_…` NOT applied + grant admin/account/
+operations).
+
+| Runtime | Component | State | Evidence |
+|---|---|---|---|
+| Studio code | all slices | code complete | `pnpm check` green, `pnpm build` OK; V4 signature identical byte by byte to `@google-cloud/storage` 7 |
+| Staging DB | migration `1790409193629_media-originals` | applied 2026-09-26 | up → down → up; constraints validated; runtime grants |
+| Staging DB | domain end to end | verified (rolled back) | `media.integration.test.ts` with the app role: ingest dry/apply/idempotent, dedup, rejected, drift, download gates + audit, rights `expired`, import guard + sha adoption, derivatives + sweep, readback published |
+| Staging data | `media:ingest` dry-run | run 2026-09-26 | 54 versions: `to_upload` 30, `unverifiable` 24 (CMP-002 images without sha in the catalog), rest 0 |
+| Local | worker boot + `/healthz`; toolkit on real OneDrive files | verified | poster 1080×1350 JPEG, crop 1080×1080, probe duration 15 104 ms |
+| Local `next start` (staging) | download route + DTOs | verified | anonymous 403 `download_disabled`, bad bearer 401, `rights.status` + `storage.available` in `/assets/{id}`, API 1.2.0 |
+| Production DB / GCP / Vercel / gateway / Greenhouse release | — | **pending** | exact commands in the runtime handoff §Originales y worker |
+
+Flags (Studio repo, not in the Greenhouse ledger): `STUDIO_ORIGINAL_DOWNLOADS_ENABLED` (Vercel, off),
+`MEDIA_WORKER_DERIVATIVES_ENABLED` / `_METRICOOL_READBACK_ENABLED` / `_ARCHIVE_TIERING_ENABLED` (SoT `apps/worker/deploy.sh`,
+off). Hand-off: **apply the production migration before pushing Studio `main`** (readers now select `media_object` and
+rights columns); gateway federation of `studio.asset.download` needs its own capability in the exchange and a new
+`api_client` with `studio:assets:download` (scopes are immutable). Metricool: `marketing-studio-metricool-api-token`
+(the `userToken`) + `METRICOOL_USER_ID` in `deploy.sh`; blogs `3961547` (Efeonce Group) and `5105024` (personal).
+
 ## Sessions
 
 - 2026-09-25 — Skill created from the verified facts inventory (Studio `d3ab68e`, gateway `9b93d6a`).
 - 2026-09-26 — TASK-1896 implemented in code (parallel with TASK-1893 in the same checkouts); rollout pending.
+- 2026-09-26 — TASK-1893 implemented in code (Studio `ef2d253`…`697c97c`, Greenhouse `f98c63bff`); rollout pending.

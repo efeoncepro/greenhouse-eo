@@ -65,6 +65,8 @@ Body `{ error: string (es-CL), code, actionable: boolean }`:
 | `invalid_request` | 400 | false |
 | `unauthorized` | 401 | false |
 | `forbidden` | 403 | false |
+| `download_disabled` | 403 | false |
+| `original_not_stored` | 404 | false |
 | `database_unavailable` | 503 | true |
 | `internal_error` | 500 | true |
 
@@ -97,6 +99,28 @@ Health body: `{ status: ok|degraded, database: reachable|unreachable, accessMode
   unchanged ⇒ **manifest hash unchanged** (`96d1f0caf6e5…`), `API_VERSION` still `1.1.0` (not bumped on purpose to
   avoid a gateway resync; bump together with the next operation change).
 - Greenhouse consumer: signal `platform.marketing_studio.health` (see program ledger §TASK-1896).
+
+## Originals, rights and publication evidence (TASK-1893, verified against code 2026-09-26, Studio `4884fb9`, API `1.2.0`)
+
+- **Operation 18** `GET /api/v1/assets/{assetId}/versions/{versionNo}/download` → `getAssetVersionDownload`, tool
+  **`studio.asset.download`** (read, `writes: false`), capability **`marketing_studio.asset.download`**, API scope
+  **`studio:assets:download`** (the bearer also needs `studio:read`: `handle()` resolves every bearer with it). Now 18
+  operations = 13 tools + 5 exclusions; manifest hash `02db316d2d2e2520f7b83d383b755670f3c364ef5584cf21e3381740eb2222a2`.
+- Response `OriginalDownload { url, expiresAt, filename, mimeType, byteSize, sha256, rights }`; URL V4 (10 min) signed by
+  IAM signBlob; `attachment; filename="<assetId>-v<n>.<ext>"`. Gates in order: flag + api_client (else 403
+  `download_disabled`, also for the open-mode anonymous actor) → scope (403 `forbidden`) → organization (404) → version
+  exists (404) → original in this environment's originals bucket (404 `original_not_stored`). Each issue writes
+  `audit_event asset_version.download_issued`.
+- `AssetVersion` adds `mimeType`, `durationMs`, `pageCount` (null = absent/not stored), `storage { available }` and
+  `rights { status: unknown|not_yet_valid|active|expired, licenseKind, usageStartsOn, usageEndsOn (inclusive),
+  territories, channels }` (status computed at read time in America/Santiago; null lists ≠ "all").
+  `AssetVersionDetail` adds `posterUrl` and `placementPreviews[] { aspectRatio, url, automatic: true }`.
+  `storagePath` keeps the working-folder path (for `gcs`, from `provenance.onedrive_path`).
+- `Asset.kind` / `AssetFilters.kind` / search `kind`: `image|video|audio|document` (extensible).
+- `ScheduledPost.observation` adds `publishedAt` and `permalink` (null unless the provider said published).
+- Semantics keys added: `originalStorage`, `mimeType`, `durationMs`, `pageCount`, `rights`, `downloadUrl`, `posterUrl`,
+  `placementPreview`, `publishedAt`, `permalink`.
+- Worker endpoints (`/events/original-finalized`, `/jobs/*`) are NOT `/api/v1` and not in the registry (Cloud Run only).
 
 ## Tool manifest (`studio-tool-manifest.v1`)
 

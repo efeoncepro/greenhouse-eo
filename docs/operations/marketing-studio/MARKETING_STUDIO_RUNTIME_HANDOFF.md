@@ -156,6 +156,117 @@ curl -s -H "Authorization: Bearer $TOKEN" "$BASE/api/v1/campaigns/CMP-004/assets
 No imprimir `$TOKEN`. Si la ráfaga devuelve 500, revisar si los readers cayeron a `/api/v1/renditions/{id}`
 (falta `STUDIO_MEDIA_URL_SECRET`) y los logs por `too many connections for role`.
 
+## Originales y worker de medios (TASK-1893)
+
+Estado: **code complete, rollout pendiente**. Contrato: arquitectura §7.2. Todo lo de abajo está escrito como scripts
+idempotentes con dry-run por defecto; nada se aplicó todavía. Staging tiene la migración `1790409193629_media-originals`
+aplicada; producción no.
+
+### Recursos (por ambiente; staging con sufijo `-staging` / `-stg`)
+
+| Recurso | Producción | Staging |
+|---|---|---|
+| Bucket de originales | `efeonce-marketing-studio-originals` | `efeonce-marketing-studio-originals-staging` |
+| SA de ingesta (el operador la impersona) | `marketing-studio-ingest@` | `marketing-studio-ingest-stg@` |
+| SA del worker | `marketing-studio-worker@` | `marketing-studio-worker-stg@` |
+| SA invocadora (Pub/Sub push + Scheduler, OIDC) | `marketing-studio-invoker@` (compartida) | idem |
+| Rol custom (sólo `customTime`) | `projects/efeonce-group/roles/marketingStudioOriginalsMetadataWriter` | idem |
+| Cloud Run | `marketing-studio-media-worker` | `marketing-studio-media-worker-staging` |
+| Tópico / suscripción push / DLQ | `marketing-studio-originals-finalized` / `…-worker` / `…-dlq` (+ `…-dlq-sub`) | con `-staging` |
+| Scheduler | `marketing-studio-reconcile-derivatives` (`7 * * * *`), `marketing-studio-metricool-readback` (`*/30 * * * *`) | sólo el barrido |
+| Rol PG del worker | `marketing_studio_worker` (límite 6) | `marketing_studio_staging_worker` (límite 6) |
+| Secreto PG del worker | `marketing-studio-pg-worker-password` | `marketing-studio-pg-staging-worker-password` |
+| Token de Metricool | `marketing-studio-metricool-api-token` (el `userToken`, scalar crudo; lo crea el operador) | — |
+
+Matriz IAM (siempre a nivel de bucket/servicio; ninguna SA con `storage.admin` ni `objectAdmin`): runtime de Vercel →
+`objectViewer` en originales + `serviceAccountTokenCreator` sobre sí misma (signBlob); ingesta → `objectCreator` +
+`objectViewer` en originales, `cloudsql.client`, secreto PG de la app de su ambiente; worker → `objectViewer` + rol
+custom en originales, `objectCreator` + `objectViewer` en media, `cloudsql.client`, su secreto PG, Sentry DSN y (sólo
+prod) Metricool; invocadora → `run.invoker` en los dos servicios; agente de Cloud Storage → `pubsub.publisher` en el
+tópico; agente de Pub/Sub → `pubsub.publisher` en la DLQ, `pubsub.subscriber` en la suscripción y
+`serviceAccountTokenCreator` sobre la invocadora.
+
+### Variables
+
+| Dónde | Variable | Valor |
+|---|---|---|
+| Vercel de Studio (production) | `STUDIO_ORIGINALS_BUCKET` | `efeonce-marketing-studio-originals` |
+| Vercel de Studio (preview + development) | `STUDIO_ORIGINALS_BUCKET` | `efeonce-marketing-studio-originals-staging` |
+| Vercel de Studio (todos) | `STUDIO_ORIGINAL_DOWNLOADS_ENABLED` | `false` hasta el canary; luego `true` (primero preview) |
+| Vercel de Studio (opcional) | `STUDIO_DOWNLOAD_SIGNER_EMAIL` | por defecto `GCP_SERVICE_ACCOUNT_EMAIL` |
+| Cloud Run (SoT `apps/worker/deploy.sh`) | `MEDIA_WORKER_DERIVATIVES_ENABLED`, `MEDIA_WORKER_METRICOOL_READBACK_ENABLED`, `MEDIA_WORKER_ARCHIVE_TIERING_ENABLED` | `false` |
+| Cloud Run prod | `METRICOOL_API_TOKEN_SECRET_REF`, `METRICOOL_USER_ID`, `METRICOOL_BLOG_IDS` | ref del secreto · `userId` de la pestaña API (falta) · `3961547,5105024` |
+
+Estos flags viven en el repo de Studio y no se leen en Greenhouse: no entran al ledger de flags de Greenhouse.
+
+### Secuencia de rollout (en orden)
+
+```bash
+# 0. Precondición: sentry.sh de TASK-1896 aplicado (el worker monta marketing-studio-sentry-dsn).
+cd ~/Documents/efeonce-marketing-studio
+# 1. Migración de producción ANTES de empujar main (los readers ya leen media_object y los derechos)
+DATABASE_URL="postgres://marketing_studio_migrator@127.0.0.1:15433/marketing_studio" \
+  PGPASSWORD="$(gcloud secrets versions access latest --secret=marketing-studio-pg-migrator-password)" pnpm migrate up
+# 2. Infra base por ambiente (staging primero)
+OPERATOR_PRINCIPAL=user:jreyes@efeonce.cl bash scripts/ops/infra/media-originals.sh --env staging --apply
+# 3. Roles PG del worker (admin de la instancia; contraseñas por tubería) — ver cabecera del SQL
+psql … -f scripts/ops/sql/media-worker-roles.sql
+# 4. Worker (flags apagados) y cableado (push, notificación, Scheduler en pausa)
+bash apps/worker/deploy.sh --env staging --apply
+bash scripts/ops/infra/media-originals.sh --env staging --wiring --apply
+# 5. Ingesta: dry-run → CMP-004 → completo (ADC impersonando la SA de ingesta del ambiente)
+gcloud auth application-default login --impersonate-service-account marketing-studio-ingest-stg@efeonce-group.iam.gserviceaccount.com
+STUDIO_PG_HOST=127.0.0.1 STUDIO_PG_PORT=15433 STUDIO_PG_DATABASE=marketing_studio_staging STUDIO_PG_USER=marketing_studio_staging_app \
+STUDIO_PG_PASSWORD="$(gcloud secrets versions access latest --secret=marketing-studio-pg-staging-app-password)" \
+  pnpm media:ingest --root "<…>/Alineación/5. Contenidos" --bucket efeonce-marketing-studio-originals-staging [--campaign CMP-004] [--apply]
+# 6. Prender derivados en staging: DERIVATIVES_ENABLED="true" en apps/worker/deploy.sh → commit → deploy → resume del barrido
+gcloud scheduler jobs resume marketing-studio-reconcile-derivatives-staging --location us-east4
+# 7. Descarga en preview: STUDIO_ORIGINALS_BUCKET + STUDIO_ORIGINAL_DOWNLOADS_ENABLED=true en preview → redeploy → canary
+# 8. Repetir 2–7 con --env production / bases y buckets de producción, por campaña.
+```
+
+Canary de descarga (con un `api_client` que tenga `studio:read` y `studio:assets:download`):
+
+```bash
+B=https://studio.efeonce.org; A=CMP001-01-imagen-4x5
+code() { curl -s -o /dev/null -w '%{http_code}\n' "$@"; }
+code "$B/api/v1/assets/$A/versions/1/download"                                      # 403 download_disabled (anónimo)
+code -H "Authorization: Bearer $TOKEN" "$B/api/v1/assets/$A/versions/1/download"     # 200 { url, expiresAt ≤ 10 min, rights }
+code -H "Authorization: Bearer $TOKEN" "$B/api/v1/assets/$A/versions/1/download?organizationId=org-ajena-de-prueba"  # 404
+code -H "Authorization: Bearer $TOKEN" "$B/api/v1/assets/<pieza sin ingestar>/versions/1/download"                 # 404 original_not_stored
+```
+
+El `api_client` del gateway tiene sólo `studio:read`; los scopes de un cliente no se editan: crear uno nuevo con
+`--scope studio:read --scope studio:assets:download`, publicarlo como nueva versión del secreto del gateway y revocar el
+anterior después del redeploy del gateway.
+
+Verificación de datos: `SELECT storage_provider, count(*) FROM studio.asset_version GROUP BY 1;` ·
+`SELECT count(*) FROM studio.media_object;` vs `SELECT count(DISTINCT sha256) FROM studio.asset_version WHERE storage_provider='gcs';` ·
+`SELECT kind, count(*) FROM studio.asset_rendition GROUP BY 1;` ·
+`SELECT kind, status, error_code, started_at FROM studio.worker_run ORDER BY started_at DESC LIMIT 20;`
+
+### Dry-run de la ingesta (2026-09-26, staging)
+
+54 versiones: `to_upload` 30, `unverifiable` 24 (las 24 imágenes de CMP-002 no traen sha256 en el catálogo), `drift` 0,
+`rejected` 0, `missing_local` 0, `dedup` 0. Para ingestarlas: regenerar el catálogo del Campaign Manager con la huella
+de esas piezas y reimportar (el import la adopta en la misma versión), luego volver a correr la ingesta.
+
+### Rollback
+
+| Qué | Cómo |
+|---|---|
+| Descarga | `STUDIO_ORIGINAL_DOWNLOADS_ENABLED=false` + redeploy de Vercel; las URLs emitidas vencen solas en ≤ 10 min |
+| Worker | pausar jobs; borrar la notificación (`gcloud storage buckets notifications list/delete gs://<bucket>`); flags a `false` en `deploy.sh` y redeploy |
+| Ingesta | `pnpm media:ingest --revert-provider [--campaign …] --apply` (vuelve a `onedrive_provenance` desde `provenance.onedrive_path`; los objetos quedan) |
+| Migración | `pnpm migrate down` sólo si ninguna versión quedó en `gcs` (el Down aborta si hay) |
+| Clase de almacenamiento de una campaña reabierta | `gcloud storage objects update gs://<bucket>/<objeto> --storage-class=STANDARD` (GCS no permite retroceder `customTime`) |
+
+### Costo esperado
+
+< USD 10/mes (originales ~50 GB Standard, Cloud Run a escala cero, Pub/Sub y Scheduler mínimos, salida por descargas
+~20 GB/mes). Disparador de revisión: > USD 25/mes en el billing export (en CLP, ÷ ~898). Costo real del primer mes:
+pendiente (se contrasta al mes de la ingesta).
+
 ## DNS (aplicado 2026-09-25)
 
 | Tipo | Nombre | Valor | TTL |

@@ -6,6 +6,26 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 — ejecución (code complete, rollout pendiente)
+
+- **Studio** (`efeonce-marketing-studio`, sin push): `ef2d253` migración `1790409193629_media-originals` (aplicada y
+  verificada en `marketing_studio_staging` up → down → up; producción NO), `4884fb9` dominio + contratos + web + worker +
+  CLIs, `0c8b164` infraestructura como scripts idempotentes, `697c97c` router. **Greenhouse:** `f98c63bff` capability
+  `marketing_studio.asset.download` (catálogo + seed NO aplicado + grant a `efeonce_admin`, `efeonce_account`,
+  `efeonce_operations`).
+- **Decisiones de Discovery:** infraestructura como scripts `gcloud` idempotentes con dry-run por defecto (el repo no usa
+  Terraform; misma convención que TASK-1896: `scripts/ops/infra/media-originals.sh`, `apps/worker/deploy.sh`). Worker en
+  `node:http` (sin dependencia nueva). Recortes: 14 de 16 combinaciones concepto × tipo ya tienen 3–4 formatos reales,
+  así que `crop_*` se genera sólo para proporciones ausentes y se rotula como vista previa de colocación
+  (`automatic: true`). Rol PG propio del worker (límite 6) para no consumir el tope de 20 del rol de la app.
+  `studio.asset.download` es tool de lectura con capability y scope propios (`marketing_studio.asset.download`,
+  `studio:assets:download` además de `studio:read`).
+- **Hallazgo:** 24 de 54 versiones (todas imágenes de CMP-002) no traen sha256 en el catálogo → la ingesta las reporta
+  `unverifiable` y no las sube. El import ahora adopta la huella en la misma versión cuando el catálogo la trae.
+- **Metricool:** adapter y job listos; sin token en Secret Manager ni `userId`, el readback falla cerrado con
+  `not_configured`. El Slice 6 sigue en esta task (no se dividió).
+- Evidencia y pendientes por criterio: ver Acceptance Criteria. Secuencia de rollout: runbook §Originales y worker.
+
 ## Delta 2026-09-25
 
 - Las renditions ya no se sirven por `/api/v1/renditions/{id}` en la web: los readers devuelven enlaces firmados HMAC `/api/v1/media/{token}` (`STUDIO_MEDIA_URL_SECRET`, vida de una a dos semanas) que se sirven desde el bucket **sin consultar Postgres** (incidente `too many connections for role` del 2026-09-25, `packages/domain/src/media-url.ts`). `/renditions/{id}` queda como compatibilidad y exclusión del manifiesto. Esos enlaces NO son el modelo de la descarga de originales de esta task (URL firmada V4 de GCS, vida ≤ 15 min, emitida y auditada por el dominio): no reutilizar `media-url.ts` para originales. Si el worker cambia el nombre de objeto de las renditions, debe conservar el prefijo `renditions/`, que el endpoint exige.
@@ -26,7 +46,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-049`
-- Status real: `Diseno`
+- Status real: `code complete, rollout pendiente — código, tests y dry-runs verdes; staging con la migración; falta toda la infraestructura GCP, la migración de producción, la ingesta real, el release de Greenhouse, el token de Metricool y la federación de la tool en el gateway`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -448,21 +468,21 @@ Los endpoints del worker no forman parte de `/api/v1` ni del OpenAPI; se documen
 
 - [ ] Los buckets `efeonce-marketing-studio-originals` y `-staging` existen en `us-east4` con PAP `enforced`, acceso uniforme, versionado, soft delete de 30 días y las reglas de lifecycle descritas, verificados con `gcloud storage buckets describe`.
 - [ ] Ningún binding de los buckets de originales incluye `allUsers` ni `allAuthenticatedUsers`, y los permisos por SA coinciden con la matriz IAM.
-- [ ] La migración aplica en ambas bases con `-- Up Migration`, bloque `DO … RAISE EXCEPTION` y `-- Down Migration` de sólo undo.
-- [ ] `pnpm media:ingest` sin `--apply` no escribe nada y reporta `to_upload`, `dedup`, `already_gcs`, `drift`, `rejected` y `missing_local`.
-- [ ] Re-ejecutar `media:ingest --apply` sobre el mismo set produce cero subidas y cero cambios de filas.
+- [ ] La migración aplica en ambas bases con `-- Up Migration`, bloque `DO … RAISE EXCEPTION` y `-- Down Migration` de sólo undo. — Staging: aplicada y verificada (up → down → up, `information_schema` + `pg_constraint` validados, grants del runtime) el 2026-09-26. **Falta producción** (va antes de empujar `main`).
+- [x] `pnpm media:ingest` sin `--apply` no escribe nada y reporta `to_upload`, `dedup`, `already_gcs`, `drift`, `rejected` y `missing_local`. — Dry-run real contra staging 2026-09-26: `to_upload` 30, `unverifiable` 24, resto 0; prueba de integración: el dry-run no toca el bucket (+ `unverifiable` para versiones sin huella).
+- [ ] Re-ejecutar `media:ingest --apply` sobre el mismo set produce cero subidas y cero cambios de filas. — Probado en la prueba de integración contra Postgres real de staging (bucket simulado): segunda corrida = `already_gcs` 2, 0 subidas, 0 audit nuevos. Falta la corrida real con bucket.
 - [ ] Las 54 piezas vigentes (o las que existan al cerrar) tienen su versión aprobada en `gcs` en producción, o figuran en el reporte con su causa (`drift` / `missing_local`).
-- [ ] Dos versiones con el mismo sha256 comparten un único objeto y una única fila de `media_object`.
-- [ ] Un archivo PSD o AEP presentado a la ingesta queda en `rejected` y no llega al bucket.
-- [ ] Un reimport con `import:catalog --apply` deja intactas las versiones en `gcs` (test y verificación en staging).
+- [x] Dos versiones con el mismo sha256 comparten un único objeto y una única fila de `media_object`. — Prueba de integración contra staging: 2 versiones enlazadas, 1 subida, 1 fila de `media_object` (objeto por contenido + PK sha256).
+- [x] Un archivo PSD o AEP presentado a la ingesta queda en `rejected` y no llega al bucket. — Unit (`.psd`/`.aep` por extensión; PSD/AEP/ZIP renombrados por firma) + integración: `rejected` 2 y el bucket simulado sin el objeto.
+- [x] Un reimport con `import:catalog --apply` deja intactas las versiones en `gcs` (test y verificación en staging). — Prueba de integración contra la base de staging (transacción revertida): tras `applyImportPlan` la versión sigue `gcs`, mismo objeto, `provenance.onedrive_path` actualizado.
 - [ ] La descarga responde 200 con URL que vence en ≤ 15 min para un `api_client` con scope; 403 `download_disabled` para el actor anónimo; 404 fuera de su organización; 404 `original_not_stored` para una versión sólo en OneDrive.
-- [ ] Cada emisión de descarga deja un `audit_event`.
-- [ ] Toda respuesta de versión y de descarga trae `rights.status`, y una versión con `rights_usage_ends_on` pasado devuelve `expired`.
+- [x] Cada emisión de descarga deja un `audit_event`. — Integración contra staging: +1 `asset_version.download_issued` por emisión (firmante simulado).
+- [x] Toda respuesta de versión y de descarga trae `rights.status`, y una versión con `rights_usage_ends_on` pasado devuelve `expired`. — DTO obligatorio (`Rights` en `AssetVersion`/`OriginalDownload`); unit de borde en hora de Santiago; integración: `expired` en descarga y en `getAsset`; `next start` local contra staging devuelve `rights.status: unknown`.
 - [ ] Una versión nueva en el bucket de staging recibe `thumb`, `preview`, `poster` (video) y los recortes aplicables sin intervención manual, y la DLQ queda en 0.
 - [ ] El barrido horario repara una versión `gcs` a la que se le borraron los derivados.
 - [ ] El readback registra en `post_observation` la publicación real de al menos un post de producción, o el Slice 6 salió a una task hija con evidencia de la falta de acceso a la API.
-- [ ] `studio.asset.download` figura en el manifiesto de tools (o, si TASK-1890 no aterrizó, la task deja la entrada lista y enlazada en TASK-1890).
-- [ ] `marketing_studio.asset.download` existe en el catálogo TS y en `capabilities_registry`, con grant a ≥1 rol real y coverage test verde.
+- [x] `studio.asset.download` figura en el manifiesto de tools (o, si TASK-1890 no aterrizó, la task deja la entrada lista y enlazada en TASK-1890). — Manifiesto 13 tools + 5 exclusiones, hash `02db316d2d2e…`, API 1.2.0 (`pnpm mcp:manifest:check` OK). La federación en el gateway es un paso aparte (pendiente).
+- [ ] `marketing_studio.asset.download` existe en el catálogo TS y en `capabilities_registry`, con grant a ≥1 rol real y coverage test verde. — Catálogo TS + grant + `pnpm test src/lib/entitlements` verde (33 tests) en `f98c63bff`; la migración de seed existe pero **no está aplicada** (va con el release de Greenhouse).
 - [ ] Arquitectura de Studio, runbook, Handoff, changelog y EPIC-049 actualizados, incluidos los recursos, flags y el costo observado.
 
 ## Verification
