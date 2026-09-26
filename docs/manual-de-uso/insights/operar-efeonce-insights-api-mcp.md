@@ -19,8 +19,9 @@ recetas de enlaces compartidos, envío por correo y recurrencia (TASK-1848) est�
 
 1. Flags en el runtime donde vas a operar (ledger `FEATURE_FLAG_STATE_LEDGER.md`; se leen sólo en Vercel):
    `INSIGHTS_GENERATION_ENABLED` para crear/revisar — **ON en staging y producción desde 2026-09-15**, OFF en
-   Preview; `INSIGHTS_ISSUANCE_ENABLED` (emitir) e `INSIGHTS_AUTHORING_AI_ENABLED` (IA) — **OFF en todos los
-   targets**. Sin generación, crear responde `503 service_unavailable` con `details.code = generation_disabled`.
+   Preview; `INSIGHTS_ISSUANCE_ENABLED` (emitir) — **OFF en producción**; `INSIGHTS_AUTHORING_AI_ENABLED` (IA) —
+   **ON en producción desde 2026-09-26** (sólo Vercel; staging OFF; las recurrencias del `ops-worker` salen con plan
+   determinista). Verifícalo en el plan sellado: `authoringMode = ai_bounded`, `modelId`, `promptVersion`. Sin generación, crear responde `503 service_unavailable` con `details.code = generation_disabled`.
    `INSIGHTS_EDITORIAL_V2_ENABLED` (contrato editorial v2) es la excepción a «sólo Vercel»: se lee en Vercel (crear,
    revisar, recuperar) **y** en el `ops-worker` (tick de recurrencias); está **ON en staging y producción desde
    2026-09-26** (ver «Portada del informe y contrato editorial v2»).

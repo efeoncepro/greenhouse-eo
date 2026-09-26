@@ -53,7 +53,7 @@ the v2 content (readings, essentials, cover, bands) only exists in plans generat
 | --- | --- | --- | --- |
 | `INSIGHTS_GENERATION_ENABLED` | create / revise / evidence collection | Vercel only (`flags.ts`) | ON staging + Production; Preview OFF |
 | `INSIGHTS_ISSUANCE_ENABLED` | issue (plus human gate and validated outputs) | Vercel | Production OFF (product decision); staging ON since 2026-09-18, operator-authorized for the TASK-1848 canary |
-| `INSIGHTS_AUTHORING_AI_ENABLED` | Gemini rewrite of the plan | Vercel | OFF everywhere |
+| `INSIGHTS_AUTHORING_AI_ENABLED` | Gemini rewrite of the plan | Vercel only (ops-worker never reads it: scheduled editions stay deterministic) | ON in Production since 2026-09-26 (canary `EO-INS-000029`, `ai_bounded`, gemini-2.5-flash-lite); staging OFF |
 | `INSIGHTS_SHARING_ENABLED` (TASK-1848) | create share links + public reader (OFF ⇒ create 503 `sharing_disabled`, reader 404) | Vercel | 2026-09-18: staging ON · Production OFF until the Think reader (TASK-1875) |
 | `INSIGHTS_DELIVERY_ENABLED` (TASK-1848) | create delivery intent (Vercel, OFF ⇒ 503 `delivery_disabled`) + dispatch (ops-worker) | Vercel + `ops-worker` (default `true` in `deploy.sh`, guarded by `deploy-contract.test.ts`) | 2026-09-18: Vercel staging ON · Production OFF; ops-worker ON (`ops-worker-00695-hrw`, then release `bda1cf2cd938`) |
 | `INSIGHTS_SCHEDULES_ENABLED` (TASK-1848) | schedule writes (Vercel) + tick (ops-worker) | Vercel + `ops-worker` (default `true`) | 2026-09-18: Vercel staging ON · Production OFF; ops-worker ON |
