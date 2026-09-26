@@ -34,7 +34,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1890`
+- Blocked by: `none`
 - Branch: `Greenhouse develop (capability, docs) · efeonce-marketing-studio main (código y migraciones); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -112,7 +112,7 @@ Reglas obligatorias:
 - `.claude/skills/efeonce-mcp-platform/SKILL.md` y la skill `mcp-craft` (nombres, descripciones y anotaciones de tools de escritura).
 - `.claude/skills/greenhouse-backend/` (command semantics, errores canónicos, idempotencia).
 - `AGENTS.md` y `CLAUDE.md` del repo `efeonce-marketing-studio` (comandos vigentes, gates `absolute-path-gate` y `domain-boundary-gate`).
-- `docs/tasks/in-progress/TASK-1890-marketing-studio-agent-ready-contract.md` (manifiesto, bearer, semántica: esta task los extiende, no los redefine).
+- `docs/tasks/complete/TASK-1890-marketing-studio-agent-ready-contract.md` (manifiesto, bearer, semántica: esta task los extiende, no los redefine).
 
 ## Dependencies & Impact
 

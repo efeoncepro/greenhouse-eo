@@ -85,7 +85,7 @@ Revisar y respetar:
 - `docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md` (§trabajo asíncrono en Cloud Run + Scheduler; adapters de proveedor en Studio)
 - `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md` (SA `marketing-studio-runtime@` / `-stg@`, WIF, buckets de media)
 - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` (capability nueva con grant)
-- `docs/tasks/in-progress/TASK-1890-marketing-studio-agent-ready-contract.md` (manifiesto de tools y bearer de servicio)
+- `docs/tasks/complete/TASK-1890-marketing-studio-agent-ready-contract.md` (manifiesto de tools y bearer de servicio)
 
 Reglas obligatorias:
 

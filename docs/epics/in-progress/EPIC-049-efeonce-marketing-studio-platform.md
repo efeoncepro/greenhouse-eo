@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Fundación en vivo (TASK-1887 complete). TASK-1890 code complete en producción de Studio (registro de operaciones, 12 tools + 5 exclusiones, bearer, organización canónica); falta el release de Greenhouse que sirve el manual. TASK-1891: gateway 1.8.0 desplegado con MARKETING_STUDIO_PROVIDER_ENABLED=false; falta release de Greenhouse (canje + manual) → flag ON → canary con token humano. Resto to-do; login al final (TASK-1898)`
+- Status real: `Fundación en vivo (TASK-1887 complete). TASK-1890 complete 2026-09-26 (manual servido en producción tras el release 0e87c7a443a2). TASK-1891: canje en producción y provider encendido en el gateway (efeonce-mcp-gateway-00061-sbc); falta el canary con token humano del cliente MCP.`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Julio Reyes`
@@ -53,8 +53,8 @@ Orden recomendado (2026-09-25): 1890 → 1891 · 1893 en paralelo · 1896 → 18
 **Regla de paridad del programa (operador, 2026-09-25):** todo lo que se puede hacer en la UI se puede hacer por la API y, por consiguiente, por MCP — incluidas las aprobaciones. Las aprobaciones las decide una persona; un agente puede ejecutarlas con la identidad delegada de esa persona y su confirmación explícita. Ninguna capacidad nace sólo en la UI.
 
 - `TASK-1887` — **Complete.** Fundación: repo, bases y roles, modelo de dominio, API v1, import del catálogo, renditions privadas, UI aprobada (claro/oscuro), Vercel + dominio (modo `open`). En vivo en `https://studio.efeonce.org`.
-- `TASK-1890` — **In progress (code complete).** Studio listo para agentes: registro único de operaciones (17: 12 tools + 5 exclusiones), manifiesto con paridad, semántica, bearer de servicio, organización canónica, capability `marketing_studio.campaign.read` y manual. En producción de Studio desde `d08387f`. **Pendiente:** release de Greenhouse a producción para servir el manual `marketing-studio`.
-- `TASK-1891` — **In progress.** Federación en Efeonce MCP de las 12 tools del manifiesto. Canje RFC 8693 en Greenhouse (cliente `efeonce-mcp-marketing-studio`, migrado) y gateway 1.8.0 desplegado (PR `efeonce-mcp#19`, revisión `00057-w8h`) con el flag OFF. **Pendiente:** release de Greenhouse (canje + manual) → `MARKETING_STUDIO_PROVIDER_ENABLED=true` + dispatch → `pnpm studio:canary` con token Entra humano → sesión MCP real. Regla desde aquí: toda capacidad nueva de Studio nace con su tool en el manifiesto o una exclusión con razón.
+- `TASK-1890` — **Complete 2026-09-26** (manual servido en producción tras el release `0e87c7a443a2`). Studio listo para agentes: registro único de operaciones (17: 12 tools + 5 exclusiones), manifiesto con paridad, semántica, bearer de servicio, organización canónica, capability `marketing_studio.campaign.read` y manual. En producción de Studio desde `d08387f`. **Pendiente:** release de Greenhouse a producción para servir el manual `marketing-studio`.
+- `TASK-1891` — **In progress: provider encendido en producción** (`00061-sbc`, 2026-09-26); falta el canary con token humano. Federación en Efeonce MCP de las 12 tools del manifiesto. Canje RFC 8693 en Greenhouse (cliente `efeonce-mcp-marketing-studio`, migrado) y gateway 1.8.0 desplegado (PR `efeonce-mcp#19`, revisión `00057-w8h`) con el flag OFF. **Pendiente:** release de Greenhouse (canje + manual) → `MARKETING_STUDIO_PROVIDER_ENABLED=true` + dispatch → `pnpm studio:canary` con token Entra humano → sesión MCP real. Regla desde aquí: toda capacidad nueva de Studio nace con su tool en el manifiesto o una exclusión con razón.
 - `TASK-1892` — To-do. Métricas de marketing desde Greenhouse (Search Console, GA4, SEO) por el lane ecosystem `/api/platform/ecosystem/growth/*`, nunca por SQL. Pauta (Meta/LinkedIn) y social orgánico (Metricool) quedan en adapters propios de Studio.
 - `TASK-1893` — To-do. Almacén de originales en GCS (finales aprobados, sha256, versionado, derechos) y worker Cloud Run de medios: renditions automáticas, portadas de video, recortes y readback de Metricool.
 - `TASK-1894` — To-do. Commands de escritura con idempotencia, `If-Match` y auditoría; corte de autoridad desde OneDrive.
@@ -76,7 +76,7 @@ Orden recomendado (2026-09-25): 1890 → 1891 · 1893 en paralelo · 1896 → 18
 - [ ] `studio.efeonce.org` sirve Studio con login Efeonce ID y sin modo `open`. Progreso: en vivo en modo `open`; login = TASK-1898.
 - [ ] Las campañas vigentes viven en Studio como fuente, con corte de autoridad declarado. Progreso: CMP-001..005 importadas como proyección reimportable; corte = TASK-1894.
 - [ ] Toda operación de la UI tiene su endpoint `/api/v1` documentado en OpenAPI. Progreso: la UI actual (sólo lectura) ya consume operaciones del registro único con test de paridad handlers ↔ registro; queda abierto hasta que la UI de edición (TASK-1895) nazca igual.
-- [ ] Efeonce MCP federa al menos las lecturas de Studio. Progreso: provider desplegado con flag OFF; se marca con el canary con token humano (TASK-1891).
+- [ ] Efeonce MCP federa al menos las lecturas de Studio. Progreso: provider ENCENDIDO en producción desde 2026-09-26 (`efeonce-mcp-gateway-00061-sbc`); se marca con el canary con token humano (TASK-1891).
 - [ ] Restauración de la base `marketing_studio` probada. Progreso: sin empezar (TASK-1896).
 
 ## Non-goals

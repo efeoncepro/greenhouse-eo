@@ -2,7 +2,7 @@
 
 **Línea gráfica «La órbita» (25/09):** canónica y componible por intención (AXIS 0.2.6, `pnpm creative:orbit:render`); [índice](docs/operations/brand-graphic-line/README.md). Pendiente: prueba sin logo y firma A/B.
 
-**Marketing Studio (25/09):** TASK-1890/1891 code complete; gateway 1.8.0 con `MARKETING_STUDIO_PROVIDER_ENABLED=false`. Falta: release de Greenhouse (canje RFC 8693 + manual) → flag ON + dispatch → `pnpm studio:canary` con token Entra humano. Detalle: [TASK-1891](docs/tasks/in-progress/TASK-1891-marketing-studio-mcp-federation.md) · skill `efeonce-marketing-studio` · [runbook](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
+**Marketing Studio (26/09):** en producción. Release `0e87c7a443a2` (PR #240) llevó el canje RFC 8693 y el manual; [TASK-1890](docs/tasks/complete/TASK-1890-marketing-studio-agent-ready-contract.md) complete. Gateway `958c9de30` (fix efeonce-mcp#20: el secreto de Studio se montaba en el paso equivocado) sirve `00061-sbc` al 100 % con `MARKETING_STUDIO_PROVIDER_ENABLED=true`. Falta el canary de [TASK-1891](docs/tasks/in-progress/TASK-1891-marketing-studio-mcp-federation.md) con token humano del cliente MCP (`pnpm studio:canary`; un token de az CLI da 401 por `azp`, como corresponde). Tras un deploy fallido del gateway, revisar `spec.traffic`: puede quedar en la revisión rota y bloquear los siguientes.
 
 **Insights (25/09):** [TASK-1888](docs/tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md) code complete, rollout pendiente (flag OFF, migración aplicada, [efeonce-mcp#18](https://github.com/efeoncepro/efeonce-mcp/pull/18) sin deploy; sin push). Plan de rollout: arquitectura §14.8.
 

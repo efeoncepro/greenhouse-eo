@@ -39,10 +39,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-049`
-- Status real: `Gateway 1.8.0 desplegado con el flag OFF (PR #19, revisión 00057-w8h); falta el release de Greenhouse (canje + manual) y luego flag ON + canary con token humano`
+- Status real: `Canje y manual en producción (release 0e87c7a443a2, 2026-09-26). Gateway 958c9de30 (1.8.0 + fix de montaje de secreto, efeonce-mcp#20) sirve efeonce-mcp-gateway-00061-sbc al 100 % con MARKETING_STUDIO_PROVIDER_ENABLED=true. Falta el canary con token humano del cliente MCP; un token de az CLI recibe 401 en el canje, como corresponde, porque su azp no es el cliente MCP`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1890`
+- Blocked by: `none`
 - Branch: `efeonce-mcp feat/task-1891-marketing-studio-provider → PR a main (el deploy es dispatch manual, no automático) · Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
