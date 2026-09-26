@@ -266,6 +266,14 @@ Publicar AXIS (tag) si el Slice 3 cambia el paquete; avisar a la sesión que ope
 
 - Barra fotográfica del retrato de perfil (P-7), en el lenguaje fotográfico.
 
+## Delta 2026-09-26
+
+- Insumo de la sesión de piezas OOH (sin aprobación del operador todavía): una ronda nativa 1:1 de cuatro plates en
+  `ai-generations/2026-09-26_ronda-1x1/` pasa `foto:validar` con el lecho al 18 % (tinta blanca 5,5–14,9:1); la banda
+  de texto al 28 % pasa en 3 de 4 (el macro da 0,26). **El modelo entrega 1024 × 1024 aunque la tabla pide 1152**:
+  revisar ese tamaño al tocar `FORMATOS`. El formato `3:1` (2304 × 768, sin validar) sigue local en `build-prompt.mjs`
+  y se reconcilia en el Slice 1.
+
 ## Open Questions
 
 - ¿El anillo dibujado dentro de la escena (P-4) se detecta en `foto:validar` o basta con una regla de ficha?
