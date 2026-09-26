@@ -44,7 +44,9 @@ already cost a day*. It grows with every task (see the maintenance contract).
 6. [`references/lessons.md`](references/lessons.md) — the traps that already bit someone.
 7. Canon docs in `greenhouse-eo` when you need the full contract:
    `docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md` (ADR, delta 2026-09-25),
-   `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` (v1.2),
+   `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md` (ADR 2026-09-26:
+   Studio + GCS as single source of truth; one command, three entry doors),
+   `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` (v1.6),
    `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md` (live runtime),
    `docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md`, the flow
    `docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md`, functional doc
@@ -74,6 +76,33 @@ TASK-1887 and TASK-1890…1899.
 - **`packages/domain` is framework-free** (no `next`, `react`, `@vercel/*`, MCP SDKs — `domain-boundary-gate`);
   every visible web read has its `/api/v1` endpoint and both consume the same domain readers with an `Actor`.
 - **Never SQL against Greenhouse's database**; Greenhouse data arrives by API (e.g. TASK-1892 via the ecosystem lane).
+
+## Source of truth and ingest (ADR accepted 2026-09-26)
+
+Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`.
+
+- **SSOT**: the `marketing_studio` database (schema `studio`) owns campaigns, concepts, pieces, versions, rights,
+  approvals and publication evidence; the private bucket `efeonce-marketing-studio-originals` owns the final bytes
+  (`originals/sha256/<2>/<sha256>`, versioned, 30-day soft delete, never overwritten). OneDrive/SharePoint is the
+  team's **workshop** (editables, drafts, exploration): a final exists for the platform only once it entered Studio.
+- **One command, three doors**: `createAssetVersion` (working name; route under `/api/v1`, tool
+  `studio.asset.version.create`) is the only way a version is born — idempotent by sha256 + `Idempotency-Key`,
+  `If-Match`, the person as actor, `audit_event`, minimal rights (license kind) required, derivatives via the existing
+  worker. Upload is two-step: signed V4 URL scoped to one object (resumable for big video; skipped if the sha256 is
+  already stored) → client uploads straight to GCS → confirm; Studio verifies size, mime and the **recomputed** sha256
+  before creating the version. Doors: CLI `pnpm studio:upload` (TASK-1894), MCP write tools with delegated identity
+  (`studio.asset.upload.request` + `studio.asset.version.create`, TASK-1899), UI (TASK-1895).
+- **Inference**: CLI and agents infer campaign, concept, format and version from the canonical filename
+  (`CMP001-02 - <título> - 4x5.png`) and the catalog, and only ask for what they cannot infer.
+- **Approval stays human**: a new version lands pending review; a person approves (or an agent with that person's
+  delegated identity, `dryRun` → `confirm`) with `marketing_studio.campaign.approve`. Uploading needs
+  `marketing_studio.asset.write` (admin, operations, account, designer).
+- **Cutover per campaign, dated** (new campaigns first). After it, `import:catalog`/`media:ingest` never create finals
+  for that campaign; `media:ingest` stays only as history backfill and is retired afterwards. Signal: «pieza aprobada
+  sin original en Studio». A Microsoft Graph mirror of SharePoint is **not planned** (a Graph read is only for
+  one-off backfill/reconciliation).
+- None of this is in runtime yet: until a campaign's cutover, the TASK-1893 regime holds (OneDrive = source, GCS =
+  verified copy of already registered finals).
 
 ## The operations-registry rule (binding)
 
@@ -113,6 +142,13 @@ TASK-1887 and TASK-1890…1899.
 ## Hard rules
 
 - **NUNCA** confuse Marketing Studio with Efeonce Creative Studio (Globe).
+- **NUNCA** infer that a file is a «final» from its OneDrive/SharePoint folder; a final exists only once it entered
+  Studio through `createAssetVersion` (ADR 2026-09-26). **NUNCA** build a scheduled Graph mirror of SharePoint.
+- **NUNCA** pass binaries inside an MCP call or through a web function: bytes go straight to GCS by signed URL.
+- **NUNCA** create an asset version without a sha256 recomputed over the bytes and matching the declared one.
+- **NUNCA** approve without a person (an agent approves only with the person's delegated identity + explicit confirm),
+  and **NUNCA** record the gateway or an agent as the actor of a write.
+- **SIEMPRE** the same command for CLI, MCP and UI, and **SIEMPRE** minimal rights (license kind) at upload.
 - **NUNCA** create ADRs, runbooks, handoffs or task docs inside `efeonce-marketing-studio`; they live in `greenhouse-eo`.
 - **NUNCA** add a `/api/v1` route without its registry entry (tool or reasoned exclusion), and **NUNCA** hand-edit
   `generated/tool-manifest.json` or the gateway's `marketing-studio-tool-manifest.generated.ts` (hash-verified at
@@ -193,6 +229,7 @@ preview 1600 WebP, ffmpeg frame at 1 s for videos; idempotent, no overwrite). St
 - Open follow-ups: 24 CMP-002 images without sha256 (still only in OneDrive); gateway federation of
   `studio.asset.download`; Sentry custom rules (API moved to Workflows); forced prod error, simulated uptime outage and
   real Teams message not exercised; first scheduled rehearsal on 2026-09-29; first-month costs.
+- Accepted 2026-09-26 (docs only): ADR Studio + GCS as SSOT and ingest by CLI/MCP/UI — implemented by 1894/1899/1895.
 - Next: TASK-1892 → 1894 → 1895 · 1899 → 1897 → 1898. Details: `references/program-ledger.md`.
 
 ## Routing

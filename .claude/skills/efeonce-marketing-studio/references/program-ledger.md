@@ -14,7 +14,7 @@ Insights (EPIC-045), not Studio.
 | TASK-1891 | Federation of every manifest tool in Efeonce MCP | **complete** | Gateway provider **ON** in production |
 | TASK-1892 | Marketing metrics from Greenhouse (Search Console, GA4, SEO) via ecosystem lane `/api/platform/ecosystem/growth/*`, never SQL; paid (Meta/LinkedIn) and organic social (Metricool) as Studio adapters | to-do (GA4 not in production yet: TASK-1284) | — |
 | TASK-1893 | Original asset store in GCS (approved finals, sha256, versioning, rights) + Cloud Run media worker (auto renditions, video covers, crops, Metricool readback; Metricool API confirmed) | **complete 2026-09-26** | Studio prod + staging (worker `00001-sgb` / `00002-svt`); Greenhouse release `92002873ced9` |
-| TASK-1894 | Write commands (idempotency, `If-Match`, audit), brief as entity, authority cutover from OneDrive; signed upload lives here; `.write`/`.approve` capabilities | to-do | — |
+| TASK-1894 | Write commands (idempotency, `If-Match`, audit), brief as entity, dated per-campaign authority cutover from OneDrive; `createAssetVersion` + signed upload + CLI `studio:upload` + rights at upload + signal «pieza aprobada sin original en Studio» (ADR 2026-09-26); `.write`/`.approve` capabilities | to-do | — |
 | TASK-1895 | Editing/review/version upload/metrics UI (wireframe + flow), consumer of 1892–1894 | to-do | — |
 | TASK-1896 | Observability (Sentry, request id + JSON logs, deep health, `ops_run`), alerts (uptime + Sentry email; Greenhouse signal + Teams «EO - Admin»), verified logical restore of `marketing_studio` (30-day rehearsal dump); before writes reach production | **complete 2026-09-26** | Studio prod (Sentry, uptime, rehearsal job + scheduler); Greenhouse release `92002873ced9` (signal + Teams) |
 | TASK-1897 | (Greenhouse) revoke `CONNECT` from PUBLIC on `greenhouse_app` and Studio DBs | to-do | — |
@@ -166,3 +166,6 @@ rights columns); gateway federation of `studio.asset.download` needs its own cap
 - 2026-09-26 — TASK-1896 implemented in code (parallel with TASK-1893 in the same checkouts); rollout pending.
 - 2026-09-26 — TASK-1893 implemented in code (Studio `ef2d253`…`697c97c`, Greenhouse `f98c63bff`); rollout pending.
 - 2026-09-26 — TASK-1893 and TASK-1896 rolled out to production and closed (Greenhouse release `92002873ced9`).
+- 2026-09-26 — ADR accepted by the operator: Studio + GCS as single source of truth, OneDrive as workshop, one command
+  (`createAssetVersion`) with three doors (CLI, MCP, UI), human approval, dated per-campaign cutover; Graph mirror not
+  planned (`docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`). Docs only.
