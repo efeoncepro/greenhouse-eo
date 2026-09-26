@@ -116,7 +116,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `src/lib/ico-engine/metric-registry.ts` (`ICO_METRIC_REGISTRY`) — **fuente de los umbrales** que imprime el informe (OTD ≥ 90, FTR ≥ 80, RpA ≤ 1,5; umbral inferior de la zona `optimal`, o superior si la métrica mejora al bajar). El operador lo fijó como fuente única del semáforo el 2026-09-25 y los docs ICO (glosario, `Contrato_Metricas_ICO_v1.md` §7.1 como benchmark externo) quedaron alineados en `f1a41cda0`; los semáforos del portal escritos a mano migran en TASK-1900.
+- `src/lib/ico-engine/metric-registry.ts` (`ICO_METRIC_REGISTRY`) — **fuente de los umbrales** que imprime el informe (OTD ≥ 90, FTR ≥ 80, RpA ≤ 1,5; umbral inferior de la zona `optimal`, o superior si la métrica mejora al bajar). El operador lo fijó como fuente única del semáforo el 2026-09-25 y los docs ICO (glosario, `Contrato_Metricas_ICO_v1.md` §7.1 como benchmark externo) quedaron alineados en `9172cf5df` (antes `f1a41cda0`); los semáforos del portal escritos a mano migran en TASK-1900.
 - `.claude/skills/efeonce-insights/SKILL.md` y `references/*` — memoria operativa del programa (espejo `.codex/`).
 - `docs/tasks/TASK_PROCESS.md`
 - `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`
@@ -173,7 +173,7 @@ Reglas obligatorias:
 
 - `src/lib/artifact-composer/chart-geometry.ts` — geometría domain-free de 15 familias con tests
   (`__tests__/chart-geometry-extended.test.ts`); `barGeometry`, `lineGeometry`, `sliceGeometry` y `scatterGeometry`
-  se consumían en `render/figure-pages.ts` (retirado por TASK-1889 en `85785e7fc`; hoy el consumer es
+  se consumían en `render/figure-pages.ts` (retirado por TASK-1889 en `30c11aba7` (antes `85785e7fc`); hoy el consumer es
   `src/lib/efeonce-insights/render/figure-slots.ts`, compartido por `report-mapper` e `insights-deck-mapper`, que lee
   `chapter.readings`, `plan.essentials` y `bandFactId`) y en `src/lib/artifact-composer/bar-figure.ts`.
 - `src/lib/efeonce-insights/contracts/chart-spec.ts` — `ChartSpecV1` con 7 familias, relaciones y validación.
@@ -492,11 +492,11 @@ eso lo resuelve el catálogo en TASK-1889 desde `modules` y `channelId`, sin cam
 - [x] Una variación de una métrica en porcentaje se imprime en puntos porcentuales («pp»); test con OTD 80,1 → 81,9
   que espera «+1,8 pp». — `editorial-v2-contract.test.ts`; además, bajo 0,05 pp dos decimales (caso real Berel CTR).
 - [x] Las series de canal llevan `channelId`; un proveedor desconocido no rompe la generación. — `adapters.test.ts` (AEO `openai→chatgpt`, proveedor desconocido sin campo; SEO `google`) + `dimensionChannelIds` en el planner.
-- [x] Un encargo sin `coverTheme` conserva su hash (test). — `cover-preference.test.ts`, hash fijado contra el validador de `05fd559c0` (previo a la task).
+- [x] Un encargo sin `coverTheme` conserva su hash (test). — `cover-preference.test.ts`, hash fijado contra el validador de `b54c3e604` (antes `05fd559c0`) (previo a la task).
 - [ ] La preferencia se guarda por command con capability, grant, outbox y errores canónicos, y se lee por reader; lanes
   app/ecosystem responden y la tool MCP está federada. — **Parcial:** command/reader/capability/grant/outbox/errores y lanes construidos con tests (`cover-preference.test.ts`, `capability-grant-coverage`); federación en [efeonce-mcp#18](https://github.com/efeoncepro/efeonce-mcp/pull/18) abierta. Falta: lanes respondiendo en un runtime desplegado y el PR mergeado + gateway desplegado (después del release).
 - [x] `auto` resuelve blanca sin logo apto para fondo oscuro y navy con él; el resultado queda sellado en la edición. — `cover-preference.test.ts` + `plan.cover` en el plan congelado (validador impone coherencia tema↔logo); Sky y Berel resuelven blanca por `auto` con datos reales.
-- [ ] Ediciones internas de Berel y Sky en staging pasan validación con flag ON; ninguna se comparte con el cliente. — **Pendiente de rollout** (requiere release a staging). Evidencia previa local, sólo lectura: Sky `EO-INS-000022` 12 hechos / 0 violaciones y Berel `EO-INS-000019` 24 hechos / 0 violaciones con `--editorial-v2` sobre `667b4c12a`. Aprobación del operador de los cuatro PDFs locales de Berel y Sky (contrato v2 + autoría IA sobre `667b4c12a`): «Bien, aprobado», 2026-09-25, dada en el chat de la sesión TASK-1846 y registrada en TASK-1889. Esa aprobación es del documento compuesto en local, NO de las ediciones en staging: este criterio sigue abierto hasta el release.
+- [ ] Ediciones internas de Berel y Sky en staging pasan validación con flag ON; ninguna se comparte con el cliente. — **Pendiente de rollout** (requiere release a staging). Evidencia previa local, sólo lectura: Sky `EO-INS-000022` 12 hechos / 0 violaciones y Berel `EO-INS-000019` 24 hechos / 0 violaciones con `--editorial-v2` sobre `be943e009` (antes `667b4c12a`). Aprobación del operador de los cuatro PDFs locales de Berel y Sky (contrato v2 + autoría IA sobre `be943e009` (antes `667b4c12a`)): «Bien, aprobado», 2026-09-25, dada en el chat de la sesión TASK-1846 y registrada en TASK-1889. Esa aprobación es del documento compuesto en local, NO de las ediciones en staging: este criterio sigue abierto hasta el release.
 - [x] Flag en el ledger con runtime declarado. — Vercel + `ops-worker` (`deploy.sh` `:-false`); `pnpm flags:audit --strict --no-vercel` en 0.
 
 ## Verification
@@ -509,15 +509,20 @@ eso lo resuelve el catálogo en TASK-1889 desde `modules` y `channelId`, sin cam
 - `pnpm task:lint --task TASK-1888`, `pnpm docs:closure-check`, `pnpm flags:audit`
 
 Ejecutado 2026-09-25 (evidencia local): `pnpm test` completo 15 395 passed / 0 failed; `pnpm build` exit 0 sobre
-`4cec0f060` (corrida única coordinada con las sesiones de TASK-1889 y 1846, árbol `src/`+`services/` limpio;
+`5d19ead9e` (antes `4cec0f060`) (corrida única coordinada con las sesiones de TASK-1889 y 1846, árbol `src/`+`services/` limpio;
 compilación 68 s, 23 páginas estáticas); `pnpm typecheck` limpio; `docs:closure-check` y `flags:audit --strict` en
 0; cuatro guardas falsificadas (pp, hash, matriz, logo sobre navy) se ponen rojas con el defecto; preview v2 en solo
 lectura de Sky y Berel con 0 violaciones. `pnpm local:check` corta en lint por errores de `scripts/foto/**`, trabajo
 ajeno sin commitear.
 
-Re-ejecutado 2026-09-25 tras las correcciones de la revisión de PDFs (último código de 1888: `667b4c12a`), corrida
-única de la sesión TASK-1846 para 1888 y 1889: `pnpm test` completo sobre `067a0d3d8` 1834 archivos / 15 467 tests /
-0 fallos (159 s); `pnpm build` verde sobre `f3bec9669` (mismo código que `067a0d3d8`, sólo docs entre medio;
+Trazabilidad de SHAs: el 2026-09-25 a las 22:59 otra sesión reescribió la historia de `develop` para sacar blobs de
+`ai-generations/` (archivados en GCS); todos los commits posteriores a esa base cambiaron de SHA con contenido idéntico
+(verificado con `git diff` sobre `src/lib/efeonce-insights`). En este archivo cada SHA lleva el vigente en origin y, entre
+paréntesis, el que se citó antes del rewrite.
+
+Re-ejecutado 2026-09-25 tras las correcciones de la revisión de PDFs (último código de 1888: `be943e009` (antes `667b4c12a`)), corrida
+única de la sesión TASK-1846 para 1888 y 1889: `pnpm test` completo sobre `09f5caa01` (antes `067a0d3d8`) 1834 archivos / 15 467 tests /
+0 fallos (159 s); `pnpm build` verde sobre `21c85623d` (antes `f3bec9669`) (mismo código que `09f5caa01` (antes `067a0d3d8`), sólo docs entre medio;
 compilación 40 s, 23 páginas estáticas). Dos intentos previos fallaron por un tipo generado viejo en `.next/dev/types`
 (ruta de otra sesión creada y borrada), no por código; se borró esa caché y pasó.
 
