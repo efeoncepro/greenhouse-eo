@@ -8,9 +8,36 @@ el contrato completo, las mediciones y los prompts verbatim viven en la document
 > **Estado honesto.** Es un **sistema consistente aprobado**, **no un activo distintivo medido**. Falta la prueba
 > de reconocimiento (n≥100, distractores coherentes, antes/después). NUNCA afirmar que «se reconoce como Efeonce».
 
+## Banco aprobado y guía «El porqué» en AXIS **[operador, 2026-09-26]**
+
+Complemento de esta guía, aprobado por el operador. Es lo primero que se abre antes de producir una foto de marca.
+
+| Qué | Dónde | Para qué |
+|---|---|---|
+| Banco de fotos aprobadas | [axis.efeonce.org/references/photography/](https://axis.efeonce.org/references/photography/) | 125 fotos en 11 secciones (finales, registros, cámaras, palancas, personas, mascotas, identidad de Julio y Nexa, firma). Cada foto abre su receta |
+| Receta de una foto | `https://axis.efeonce.org/media/photography/recipes/<slug>.json` | Prompt verbatim, ficha, comandos, referencias, notas y archivo de origen |
+| Índice para agentes | `https://axis.efeonce.org/media/photography/manifest.json` | Lista las 125 con URL de imagen y de receta (`axis.efeonce-photography-reference.v1`) |
+| Guía «El porqué» | [axis.efeonce.org/references/photography/why/](https://axis.efeonce.org/references/photography/why/) | 57 reglas en 14 capítulos: qué hacer, por qué funciona, cómo se aplica y cómo comprobarlo, más la lista de control «Antes de entregar» |
+| La misma guía, en datos | `https://axis.efeonce.org/references/photography/why.json` | `axis.efeonce-photography-why.v1`: `rule`, `why`, `apply`, `check`, `origin` por regla y `checklist` |
+
+**Cómo se usa.**
+1. Lee el capítulo de «El porqué» que toca a la pieza: registro, color, lecho, formato, personas.
+2. Busca en el banco la foto aprobada más cercana y parte de su receta; no reconstruyas el prompt de memoria.
+3. Escribe la ficha y genera con los comandos canónicos (`foto:prompt`, `foto:generar`, `foto:validar`).
+4. Antes de entregar, recorre las 11 preguntas de la lista de control.
+
+**Jerarquía.** El canon sigue siendo `docs/operations/brand-photography/`; «El porqué» lo explica para el equipo y el
+banco lo muestra aplicado. Si algo difiere, manda el canon y se corrige la guía en el mismo cambio.
+
+**Mantenimiento.** Todo vive en el repo `axis-design-system`: fotos en `apps/lab/public/media/photography/`, datos del
+banco en `apps/lab/src/data/photography.ts`, recetas en `public/media/photography/recipes/` y la guía en
+`apps/lab/src/data/photography-why.ts` (una sola fuente para la página y el JSON). Al aprobar una foto nueva o
+cambiar una regla del canon, actualiza el banco o la guía en el mismo trabajo. Lo que espera aprobación va en una
+rama propia: `main` se despliega solo y otras sesiones empujan la rama compartida.
+
 ## Preflight visual obligatorio antes de generar
 
-**Leer esta guía no sustituye mirar las imágenes que aprobó el operador.** Abre la hoja
+**Leer esta guía no sustituye mirar las imágenes que aprobó el operador.** Empieza por el [banco de AXIS](https://axis.efeonce.org/references/photography/) (sección anterior). Abre la hoja
 `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg` cuando salgan
 Julio o Nexa, la hoja `rondas/curado/set-curado-12.jpg` para la serie de color y al menos dos finales individuales
 comparables a tamaño completo. Antes del prompt, registra los archivos que viste y la comparación concreta:

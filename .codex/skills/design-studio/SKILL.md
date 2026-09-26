@@ -93,6 +93,7 @@ Para fotografía propia Efeonce, cargar
 **preflight visual**: abrir imágenes aprobadas comparables antes de generar, declarar cómo se integra el color en
 la composición sin forzar utilería y comparar los píxeles finales con esas referencias. Haber leído la guía o
 reutilizado un prompt no lo cumple.
+**Antes de producir, abre el banco aprobado y la guía «El porqué» en AXIS** ([banco](https://axis.efeonce.org/references/photography/) · [por qué](https://axis.efeonce.org/references/photography/why/) · agentes: `manifest.json`, `recipes/<slug>.json` y `why.json`): parte de la receta de la foto más cercana y cierra con su lista de control. Detalle en la referencia `design-studio/references/efeonce-photographic-language.md` §«Banco aprobado y guía «El porqué» en AXIS».
 
 > **Skill dueña:** [`efeonce-graphic-line`](../efeonce-graphic-line/SKILL.md) — criterio, paquete, aplicaciones, motion y convergencia con el lenguaje fotográfico (`references/photography-convergence.md`).
 

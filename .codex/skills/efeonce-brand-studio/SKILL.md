@@ -205,6 +205,10 @@ lima = el resultado). Aprobado por el operador el 2026-09-19.
   [índice](../../../docs/operations/brand-photography/README.md) ·
   [manual de uso](../../../docs/manual-de-uso/marketing/fotografia-de-marca-efeonce.md). Referencias en OneDrive
   `5. Contenidos/13- Branding/Lenguaje Fotografico Efeonce/v01/`.
+- **Banco y guía para el equipo [operador, 2026-09-26]:** las fotos aprobadas con su receta viven en
+  [axis.efeonce.org/references/photography/](https://axis.efeonce.org/references/photography/) y el porqué de cada
+  regla, para personas y agentes, en [/references/photography/why/](https://axis.efeonce.org/references/photography/why/)
+  (`why.json` para agentes). Úsalos para explicar y defender las decisiones de marca ante el equipo o el cliente.
 
 ### Isotipo 3D de Efeonce (biblioteca aprobada 2026-09-17)
 

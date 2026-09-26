@@ -1,6 +1,6 @@
 # La foto y la órbita — contrato de convergencia
 
-> Verificado contra: axis-design-system@e26bd85 y greenhouse-eo@051660d73 — 2026-09-26 (decisiones del operador D9 y
+> Verificado contra: axis-design-system@220fc23 y greenhouse-eo@e54a888c3 — 2026-09-26 (capa gráfica sobre la foto aprobada entera; banco y guía «El porqué» en AXIS). Antes: axis-design-system@e26bd85 y greenhouse-eo@051660d73 — 2026-09-26 (decisiones del operador D9 y
 > D10 del 2026-09-26: reglas P1–P12 aprobadas y conflictos P-1 a P-9 resueltos). Ejemplo de §10 re-verificado ese día
 > con `foto:prompt` y `creative:orbit:render`.
 > Canon fotográfico: `docs/operations/brand-photography/` (maestro v1.3, reserva de espacio, firma, colorimetría) y
@@ -22,6 +22,10 @@ aplica (task «foto:prompt y chequeos de la lente», sin ID) · **[cálculo]** =
 la fecha del sello; se recalcula si cambian.
 
 ---
+
+> **Banco y guía [operador, 2026-09-26]:** las fotos aprobadas y el porqué de cada regla fotográfica, incluido el
+> capítulo «La foto y La órbita», viven en [axis.efeonce.org/references/photography/why/](https://axis.efeonce.org/references/photography/why/)
+> (`why.json` para agentes). Allí quedó escrito que cada canon es dueño de lo suyo y que la foto tiene que funcionar sola.
 
 ## 1. Qué es de cada uno, y la idea que comparten
 

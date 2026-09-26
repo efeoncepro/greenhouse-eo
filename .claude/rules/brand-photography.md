@@ -7,6 +7,8 @@ paths:
 
 # Fotografía de marca Efeonce — invariantes (auto-load por path)
 
+**Antes de producir, abre el banco aprobado y la guía «El porqué» en AXIS** ([banco](https://axis.efeonce.org/references/photography/) · [por qué](https://axis.efeonce.org/references/photography/why/) · agentes: `manifest.json`, `recipes/<slug>.json` y `why.json`): parte de la receta de la foto más cercana y cierra con su lista de control. Detalle en la referencia `design-studio/references/efeonce-photographic-language.md` §«Banco aprobado y guía «El porqué» en AXIS».
+
 🔴 **El DEFAULT del bloque compartido gana cuando la escena calla** *(medido 3 veces el 2026-09-22)*:
 
 > **Entre un bloque compartido y la escena, gana el más específico — y el bloque compartido es el default

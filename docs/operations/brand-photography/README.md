@@ -143,6 +143,7 @@ Conserva foto sin scrims, reservas y firma; la superficie del CTA no habilita pa
 
 ## Delta 2026-09-19 (tarde)
 
+- [**Banco aprobado**](https://axis.efeonce.org/references/photography/) y [**guía «El porqué»**](https://axis.efeonce.org/references/photography/why/) en AXIS — **aprobados por el operador (2026-09-26)**: 125 fotos con su receta (`manifest.json`, `recipes/<slug>.json`) y 57 reglas explicadas para el equipo, con lista de control (`why.json` para agentes). Explican el canon; si difieren, manda el canon.
 - [**Reserva de espacio en la toma**](EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) — **aprobado (capa fotográfica)**: las cuatro reservas (texto, objeto para enmarcar, lecho de firma, aire para cursores), tono declarado, límite de cabezas, formato nativo, nunca scrim, medir antes de componer.
 - [Espacio para texto y formatos nativos](EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md) — bitácora de la ronda: zona de titular con tono declarado y límite de cabezas; 4:5, 9:16 y 16:9 nativos. **Sus piezas compuestas fueron rechazadas; valen sus reglas** (ver estado abajo).
 
