@@ -1,10 +1,11 @@
 # Línea gráfica Efeonce — Reveal y apertura de la órbita (motion)
 
 > **Tipo de documento:** Especificación de producción de motion
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-09-26 por Claude
-> **Última actualización:** 2026-09-26 por Claude (ruta exacta en OneDrive y la animación de la órbita sin logo desde el paquete de AXIS)
-> **Estado:** V1.1 aprobada por el operador (2026-09-26): más punch y sting de 1,6 s; tiempos aún en el script (pendiente pasarlos a tokens `brandReveal` / `brandOpen` de AXIS)
+> **Última actualización:** 2026-09-26 por Claude (los tiempos pasan a los tokens `efeonceGraphicLine.motion` de `@efeoncepro/axis-tokens` 0.3.3; enlace a la norma del lenguaje de movimiento)
+> **Estado:** V1.1 aprobada por el operador (2026-09-26): más punch y sting de 1,6 s. Tiempos, sobrepasos, proporciones, desenfoque y sonido en los tokens `efeonceGraphicLine.motion` de `@efeoncepro/axis-tokens` 0.3.3; el render los lee de ahí (commit `0fdd8f492`, en `develop`)
+> **Norma:** [Lenguaje de movimiento de la órbita V1](./EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md) — las siete reglas que cualquier pieza nueva sigue. Este documento es la spec de producción de las tres piezas
 > **Documentación técnica:** [Manual de la línea gráfica](./EFEONCE_GRAPHIC_LINE_V1.md) · [ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 
 ## 1. Qué son y cómo conviven
@@ -59,21 +60,26 @@ nada. Las medidas se calculan en tiempo de ejecución, no se escriben a mano:
 ### Delta V1.1 — más punch (aprobado 2026-09-26)
 
 Las tablas de abajo son la V1 (4,2 s y 2,8 s) y quedan como referencia del recorrido. La versión aprobada es la V1.1,
-con **reveal 3,6 s, apertura 2,4 s y sting 1,6 s**, y su fuente de verdad son `stateReveal`, `stateOpen` y
-`stateSting` de `scripts/creative/brand-motion/orbit-scene.js` (y `DURATION` / `BLUR` de `render-orbit-motion.mjs`)
-hasta que existan los tokens de AXIS. Qué cambió:
+con **reveal 3,6 s, apertura 2,4 s y sting 1,6 s**. **Su fuente de verdad es el token `efeonceGraphicLine.motion`**
+de `@efeoncepro/axis-tokens` 0.3.3 (`pieces.reveal`, `pieces.open` y `pieces.sting` para los tramos; `overshoot`,
+`pulse`, `settle`, `wave`, `letters`, `layout`, `motionBlur` y `sound` para el resto). `orbit-scene.js`,
+`render-orbit-motion.mjs`, `orbit-sound.mjs` y `encode-orbit-motion.mjs` leen cada tiempo y proporción del token; al
+pasarlos del script al token (2026-09-26) se verificó que los 90 cuadros clave de las tres piezas y los tres sonidos
+salen idénticos byte a byte. Las reglas detrás de esos números están en la
+[norma del lenguaje de movimiento](./EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md). Qué cambió:
 
 - **Ritmo lento–rápido–lento:** cada acción arranca después de una pausa corta (anticipación) y se resuelve con un
   golpe; la nave entra rápido, se pasa un poco y vuelve (`backOut`) y el isotipo encaja con un pulso de impacto.
 - **Onda de acento:** al encajar (o lanzarse en la apertura) la órbita en acento se expande y se desvanece.
 - **Sting:** el isotipo ya formado; la nave encaja de un golpe con la onda y la cámara salta al logotipo.
-- **Eslogan al 64 % del logotipo** para que no compita con el logo (decisión del operador).
+- **Eslogan al 64 % del logotipo** para que no compita con el logo (decisión del operador). El logotipo final mide
+  el 50 % del lado corto en 16:9, el 56 % en cuadrado y el 66 % en vertical (`layout.logoOfShortSide`).
 - **Desenfoque de movimiento** en reveal 1250–1900 y 2050–2750 ms, apertura 350–950 y 1150–1550 ms, sting 100–600
-  y 720–1250 ms.
+  y 720–1250 ms (`pieces.*.blurMs`).
 - **Sonido con impactos:** los golpes de llegada acompañan cada encaje; pico −1 dBFS.
 
 Curvas AXIS: `emphasized` (0.2, 0, 0, 1), `standard` (0.4, 0, 0.2, 1) y `emphasizedAccelerate` (0.3, 0, 0.8, 0.15).
-Asentamiento con resorte (amortiguación 0,82, ω 11). El color se mezcla en OKLab y la escala de cámara se interpola
+Asentamiento con resorte (amortiguación 0,82, ω 11; `settle`). El color se mezcla en OKLab y la escala de cámara se interpola
 en espacio logarítmico, para que el acercamiento se sienta constante.
 
 ### Reveal (4,2 s)
@@ -165,7 +171,9 @@ node scripts/creative/brand-motion/encode-orbit-motion.mjs --frames <run>/frames
 ```
 
 Render en Chromium (Playwright) con supermuestreo ×2 (×1 en 4K), dos pasadas por cuadro (principal y halo) con
-transparencia real. Todo sale de los archivos oficiales, los tokens `efeonceGraphicLine` y las curvas `axisMotion.ease`.
+transparencia real. Todo sale de los archivos oficiales, los tokens `efeonceGraphicLine` (los del movimiento en
+`efeonceGraphicLine.motion`) y las curvas `axisMotion.ease`. Para cambiar un tiempo se cambia el token en AXIS, se
+publica `axis-tokens`, se fija en Greenhouse y se compara el storyboard con el anterior antes de producir masters.
 La producción de V1 corrió en `ai-generations/2026-09-26_orbita-motion/`.
 
 ## 8. QA antes de entregar
@@ -180,7 +188,9 @@ La producción de V1 corrió en `ai-generations/2026-09-26_orbita-motion/`.
 ## 9. Qué no hacer
 
 - No generar esta animación con un modelo de video: el logo no se sostiene y la oclusión no es exacta.
-- No transcribir los tiempos a otro script: se leen de aquí hasta que existan los tokens `brandReveal` / `brandOpen`.
+- No escribir tiempos, sobrepasos ni proporciones en un script ni transcribirlos de este documento: se leen del token
+  `efeonceGraphicLine.motion` (ver la [norma](./EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md)). Si falta un valor, se agrega al
+  token con su razón.
 - No usar el reveal para marcas cliente ni para UI de Greenhouse: es marca propia de Efeonce.
 - No poner el eslogan en mayúsculas ni con esfera (manual §5).
 
@@ -189,6 +199,6 @@ La producción de V1 corrió en `ai-generations/2026-09-26_orbita-motion/`.
 - Terminar las 30 variantes de la cola V1.1 (`ai-generations/2026-09-26_orbita-motion/run-all.sh`, con candado de una
   sola instancia desde el 2026-09-26: dos instancias en paralelo corrompieron cuatro MP4, recodificados desde sus
   cuadros), entregarlas en OneDrive y archivarlas en GCS.
-
-- Pasar tiempos y curvas a tokens de AXIS (`efeonceGraphicLine.brandReveal` / `brandOpen`) y una demo viva en el Lab.
+- Una demo viva en el Lab que lea `efeonceGraphicLine.motion`. (Los tiempos ya están en los tokens desde
+  `axis-tokens` 0.3.3, 2026-09-26.)
 - Variantes para Globe, Wave y Reach (acento y palabra del eslogan desde `family`).

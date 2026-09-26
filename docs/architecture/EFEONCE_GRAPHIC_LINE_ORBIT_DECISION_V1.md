@@ -3,7 +3,7 @@
 > **Tipo de documento:** ADR (decisión de marca y sistema de diseño)
 > **Estado:** Accepted (2026-09-25) — canonizada en AXIS; atribución sin logo sin medir
 > **Creado:** 2026-09-25 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-26 por Claude (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1)
+> **Última actualización:** 2026-09-26 por Claude (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1; delta (d): lenguaje de movimiento como norma y `efeonceGraphicLine.motion` en `axis-tokens` 0.3.3)
 > **Manual canónico:** [`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
 > **Entregable:** [`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](../operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf)
 > **Sistema de diseño:** AXIS, página `references/graphic-line` en `axis.efeonce.org` y tokens `efeonceGraphicLine`
@@ -84,6 +84,25 @@ acentos de producto se usan en piezas de Efeonce (recomendación: no). Manual §
   (creado con autorización del operador), MP4, GIF y cuadros en OneDrive `13- Branding/Motion Órbita Efeonce/v1.1`,
   fichas y versiones web en el Lab (4.4.2). La animación de la órbita sin logo sale del paquete (`pnpm orbit:video`
   en AXIS). Spec: `docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md`; manual §10.1, §10.2 y §13.
+
+### Delta 2026-09-26 (d) — El lenguaje de movimiento de la órbita es norma y sus valores son tokens
+
+- **Norma:** [`EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`](../operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md)
+  convierte las animaciones del logo V1.1 aprobadas en siete reglas que cualquier pieza nueva de Efeonce sigue: ritmo
+  lento–rápido–lento con anticipación y un protagonista a la vez; llegar con golpe (sobrepaso por papel, pulso con eco,
+  onda de acento y resorte casi crítico); curvas por papel; la velocidad no salta en los relevos; desenfoque real sólo
+  en los tramos rápidos y color en OKLab; geometría oficial con oclusión coherente y jerarquía del cuadro; y un golpe
+  sonoro por impacto. Una pieza que no las sigue no es el movimiento de Efeonce aunque use el logo.
+- **Valores:** viven en el token `efeonceGraphicLine.motion` de `@efeoncepro/axis-tokens` 0.3.3, con prueba en AXIS
+  (tramos dentro de cada pieza, curvas por papel, resorte ≤ 1,5 %). El render de Greenhouse
+  (`scripts/creative/brand-motion/`) los lee de ahí; al pasarlos del script al token se verificó que los 90 cuadros
+  clave de reveal, apertura y sting y los tres sonidos salen idénticos byte a byte. Con esto se cierra el pendiente de
+  «pasar los tiempos a tokens» (antes nombrado `brandReveal` / `brandOpen`).
+- **Corrección:** el logo final mide el 50 % del lado corto en 16:9, el 56 % en cuadrado y el 66 % en vertical
+  (`layout.logoOfShortSide`); un comentario del script decía «46 % / 58 %» y estaba desactualizado.
+- **Greenhouse** fija `axis-tokens` 0.3.3 en `develop` (commit `0fdd8f492`, todavía no en `main`); el resto de los
+  paquetes sigue en 0.3.0. Cambiar un valor exige cambiar el token y su prueba, publicar, fijar la versión y comparar
+  el storyboard antes de producir masters; si altera una pieza aprobada, lo aprueba el operador.
 
 ## Alternativas descartadas
 

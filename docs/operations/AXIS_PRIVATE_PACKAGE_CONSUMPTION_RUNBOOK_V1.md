@@ -8,9 +8,10 @@ source control.
 
 ## Current state — 2026-09-14
 
-> **Actualizado 2026-09-26:** hoy hay **cinco** paquetes privados: `axis-tokens`, `axis-ui-contracts`,
-> `axis-ui-registry` y `axis-brand-assets` en `0.3.0`, y `axis-graphic-line` en `0.3.1`. Greenhouse fija los cuatro
-> primeros en `0.3.0` en `develop`. Ver **Delta 2026-09-26 (b)**; la lista de abajo conserva el estado del 14.
+> **Actualizado 2026-09-26 (tarde):** hay **cinco** paquetes privados. Publicados: `axis-tokens` `0.3.3`,
+> `axis-ui-contracts` `0.3.2`, `axis-ui-registry` y `axis-brand-assets` `0.3.0`, y `axis-graphic-line` `0.3.1`.
+> Greenhouse fija en `develop` `axis-tokens` `0.3.3` y `axis-ui-contracts`, `axis-ui-registry` y `axis-brand-assets`
+> en `0.3.0`. Ver **Delta 2026-09-26 (c)** y **(b)**; la lista de abajo conserva el estado del 14.
 
 - Package repository: `efeoncepro/axis-design-system`.
 - Agent-facing visual guide: [`DESIGN.md`](https://github.com/efeoncepro/axis-design-system/blob/main/DESIGN.md), generated from `packages/tokens` and checked with `pnpm design:check` in the AXIS repository. It is a projection for agents, not a second token source of truth.
@@ -60,6 +61,20 @@ source control.
   La evidencia del piloto pasa de **local** a **CI**.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
+
+## Delta 2026-09-26 (c) — `axis-tokens` 0.3.3 (movimiento de la órbita) y `axis-ui-contracts` 0.3.2
+
+- **Publicado** (versionado independiente, tags `v0.3.2` y `v0.3.3` del repo AXIS): `axis-tokens` y
+  `axis-ui-contracts` `0.3.2` suman la firma de correo v3.1 (tokens `efeonceGraphicLine.emailSignature` y contrato
+  `efeonce.email-signature` 0.3.0); `axis-tokens` `0.3.3` suma `efeonceGraphicLine.motion`, el lenguaje de movimiento
+  de la órbita (norma en `docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`). `axis-ui-registry`
+  y `axis-brand-assets` siguen en `0.3.0` y `axis-graphic-line` en `0.3.1`.
+- **Greenhouse** fija `@efeoncepro/axis-tokens` en `0.3.3` en `develop` (commit `0fdd8f492`, todavía no en `main`):
+  el render de las animaciones del logo (`scripts/creative/brand-motion/`) lee tiempos y proporciones del token.
+  `axis-ui-contracts`, `axis-ui-registry` y `axis-brand-assets` siguen en `0.3.0`: Greenhouse todavía no usa el
+  contrato `efeonce.email-signature`, así que no subió `axis-ui-contracts` a `0.3.2`.
+- **Acceso:** los paquetes son los mismos cinco, ya con `Manage Actions access → Read` para los repos consumidores;
+  una versión nueva de un paquete existente no necesita otorgar acceso de nuevo.
 
 ## Delta 2026-09-26 (b) — AXIS 0.3.0 y el paquete nuevo `axis-graphic-line`
 

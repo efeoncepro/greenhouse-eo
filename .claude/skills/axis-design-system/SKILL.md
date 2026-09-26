@@ -159,9 +159,9 @@ Efeonce's own-brand graphic line (orbit: thin ring, arc with sphere, halo; lens 
 2026-09-25. Greenhouse is the control plane: the [ADR](../../../docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 and the [manual](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) live there; the
 operating summary is [`graphic-line-orbit.md`](../efeonce-brand-studio/references/graphic-line-orbit.md). Published
-set (versions are independent per package): `axis-tokens` and `axis-ui-contracts` `0.3.2` (they ship
-`emailSignature` and `efeonce.email-signature`); `axis-ui-registry` and `axis-brand-assets` `0.3.0`;
-`axis-graphic-line` `0.3.1`. AXIS holds:
+set (versions are independent per package): `axis-tokens` `0.3.3` (`0.3.2` shipped `emailSignature`, `0.3.3` adds
+`motion`); `axis-ui-contracts` `0.3.2` (ships `efeonce.email-signature`); `axis-ui-registry` and `axis-brand-assets`
+`0.3.0`; `axis-graphic-line` `0.3.1`. AXIS holds:
 
 - **Tokens:** `efeonceGraphicLine` in `packages/tokens/src/tokens.ts` (`@efeoncepro/axis-tokens`, `status:
   'canonical'`, opt-in branch outside the `axisTokens` aggregate). Groups: `color`, per-brand `family`, `sphere`,
@@ -169,7 +169,12 @@ set (versions are independent per package): `axis-tokens` and `axis-ui-contracts
   `accentSphere*` ratios are deprecated), `portrait` (orbit around a person photo: email signature, team cards),
   `pieces` (fixed-format pieces measured one by one: `lens` wall/deck-cover/post/story/campaign-post/linkedin,
   `spotlight` photo/event, `deck` cover/section/content/close), `spotlight`, `urlBubble`, `signature`, `slogan`,
-  `state`, `brandClose` and `emailSignature` (the approved email signature v3.1).
+  `state`, `brandClose`, `emailSignature` (the approved email signature v3.1) and `motion` (since `0.3.3`: the orbit
+  motion language of the approved logo animations V1.1 — `principles`, `curves` by role, `overshoot`, `pulse`,
+  `impactScale`, `settle`, `wave`, `halo`, `letters`, `motionBlur`, `colorMix`, `cameraZoom`, `layout` and `sound`,
+  plus the segment timings of `pieces.reveal|open|sting`; tested in `tokens.test.ts`). The rules behind those numbers
+  are the Greenhouse norm
+  [`EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`](../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md).
 - **Contract:** `efeonce.graphic-line-orbit` `0.3.0` (`stable`), manifest `axis.graphic-line-orbit-composition.v1`.
   An agent declares `orbit`, `measure` (value 0–1 **with a source**), `progress`, `lens`, `spotlight`, `family-map`,
   `url-bubble`, `voice`, `logo-inline`, `signature`, `slogan`, `state` or `brand-close`; the resolver enforces the
@@ -210,7 +215,9 @@ Rules for agents:
   change means changing the token and its test in AXIS, signed through the Greenhouse ADR, not editing a document.
 - Before pinning a consumer, confirm which **published** package version contains the export; do not assume the
   workspace source is released.
-- **Greenhouse consumption:** pins the four `0.3.0` packages on `develop` (reaches `main` with the next release) and
+- **Greenhouse consumption:** pins on `develop` `axis-tokens` `0.3.3` (commit `0fdd8f492`) and `axis-ui-contracts`,
+  `axis-ui-registry` and `axis-brand-assets` `0.3.0` (commit `a98751daa`); neither is in `main` until the next release.
+  It does not use `efeonce.email-signature` yet (so contracts stays on `0.3.0`) and
   does **not** use `axis-graphic-line`: its adapter `scripts/creative/layout-compiler/graphic-line.mjs` keeps its own
   raster-safe painter on contract `0.3.0` (lens with arc + sphere, deck one ring), and `axis-advertising.mjs`
   requires collaboration-selection `0.3.0`. Entry points `pnpm creative:orbit:resolve|render`, the per-format
@@ -227,7 +234,10 @@ Rules for agents:
   `findOrbitAsset`. Consumers read the package, never a hand copy (Greenhouse guards its local copies with
   `src/config/efeonce-brand-assets.test.ts`). Not `efeonce.brand-logos` (third-party logo provenance).
 - **Motion:** the orbit animation (no logo) comes from this package (`ORBIT_MOTION_CSS`, `pnpm orbit:video`); the
-  three logo animations V1.1 (reveal, opening, sting) are rendered in Greenhouse — see `motion-design-studio`.
+  three logo animations V1.1 (reveal, opening, sting) are rendered in Greenhouse (`scripts/creative/brand-motion/`),
+  which reads every timing and ratio from `efeonceGraphicLine.motion` (verified byte-identical: 90 key frames and three
+  sounds). Any new Efeonce motion follows the norm above and takes its numbers from that token; a missing value is
+  added to the token with its reason, never written in a script — see `motion-design-studio`.
 - Scope: Efeonce's own brand and its family. Never Greenhouse product UI and never client work.
 
 ### AXIS Lab

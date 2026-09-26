@@ -1,7 +1,7 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-25 por Claude
 > **Ultima actualizacion:** 2026-09-26 por Claude
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
@@ -134,7 +134,25 @@ Las animaciones del logo se hacen en código a partir de los archivos oficiales,
 logo no se sostiene). Son marca propia de Efeonce: no se usan para clientes ni en el portal. Vienen con fondo y
 sonido (para usarlas tal cual) o transparentes (para montarlas sobre otro fondo en un editor de video).
 
-> Detalle técnico: [spec de motion](../../operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md) · [manual §10.1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#101-pantalla-y-campaña) · [cómo usarlas](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md#paso-a-paso--usar-las-animaciones-de-marca)
+**Cómo se mueve la marca.** Desde el 2026-09-26 esa manera de moverse es una norma, el *lenguaje de movimiento de la
+órbita*, con siete reglas para que cualquier pieza nueva (una cortinilla, un cierre de evento, otra marca de la
+familia) se sienta igual:
+
+1. **Lento, rápido, lento:** una pausa o un pequeño retroceso antes de arrancar, un tramo rápido y un final con golpe;
+   un solo protagonista a la vez.
+2. **Llegar con golpe:** lo que llega se pasa un poco y vuelve; al encajar hay un pulso y una onda en el color de
+   acento. Nada se detiene suavemente ni tiembla.
+3. **Curvas según el papel:** una para lo que llega, otra para lo que cambia y otra para lo que se va.
+4. **Sin frenazos en los relevos:** cuando un movimiento le pasa el turno al siguiente, la velocidad se mantiene.
+5. **Movimiento real:** desenfoque sólo en los tramos rápidos y colores que se mezclan sin pasar por gris.
+6. **La marca manda:** todo sale de los archivos oficiales; el logo final ocupa la mitad del lado corto en horizontal,
+   un poco más en cuadrado y dos tercios en vertical, y el eslogan mide el 64 % del logo.
+7. **El sonido acompaña el golpe:** un golpe sonoro por cada impacto y un cierre con fundido.
+
+Los números (tiempos, cuánto se pasa cada cosa, tamaños) no están en este documento ni en los scripts: viven en los
+tokens de AXIS (`efeonceGraphicLine.motion`), y el generador de las animaciones los lee de ahí.
+
+> Detalle técnico: [norma del lenguaje de movimiento](../../operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md) · [spec de motion](../../operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md) · [manual §10.1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#101-pantalla-y-campaña) · [cómo usarlas](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md#paso-a-paso--usar-las-animaciones-de-marca)
 
 ## La firma de correo
 
@@ -163,7 +181,7 @@ esfera** que abre la zona «Partner oficial de», con los logos de los partners 
 | Decisión (ADR) | [`EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md`](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) | quien necesita saber qué se decidió y qué se descartó |
 | Manual en PDF (A4, 56 hojas, confidencial) | [`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](../../operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) | el equipo (uso interno) |
 | Referencia pública en el sistema de diseño AXIS | [axis.efeonce.org/references/graphic-line](https://axis.efeonce.org/references/graphic-line) | cualquiera que necesite ver los elementos vivos |
-| Valores oficiales (grosores, colores, proporciones, firma) | tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` | quien construye piezas en código |
+| Valores oficiales (grosores, colores, proporciones, firma, movimiento) | tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (el movimiento, en `efeonceGraphicLine.motion`) | quien construye piezas en código |
 | Archivos oficiales (logo e isotipo de las cuatro marcas y burbujas de URL) | paquete `@efeoncepro/axis-brand-assets` | quien construye piezas en código |
 | La órbita lista para usar en código (piezas, retrato de la firma de mail, movimiento) | paquete `@efeoncepro/axis-graphic-line` | quien construye piezas o páginas fuera de Greenhouse |
 | Animaciones del logo para el equipo (MP4, GIF, cuadro final) | OneDrive `13- Branding › Motion Órbita Efeonce › v1.1` | quien edita video o arma presentaciones |

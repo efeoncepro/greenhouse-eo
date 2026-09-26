@@ -1,7 +1,7 @@
 # Usar la línea gráfica de Efeonce — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-25 por Claude
 > **Ultima actualizacion:** 2026-09-26 por Claude
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
@@ -206,9 +206,29 @@ Cada animación del logo existe por formato (16:9, 16:9 4K, 1:1, 4:5, 9:16) y po
 - Si falta una variante (formato o fondo), no la armes a mano: las que faltan se suman a medida que termina el
   render. Pídela.
 
-> Detalle técnico: [spec de motion](../../operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md) (tiempos,
+### Paso 4 · Si vas a animar algo nuevo de la marca, sigue el lenguaje de movimiento
+
+Antes de animar cualquier pieza nueva de Efeonce (una cortinilla, un cierre de evento, una transición, otra marca de
+la familia), lee la [norma del lenguaje de movimiento de la órbita](../../operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md)
+y aplica sus siete reglas:
+
+1. Define el protagonista de cada tramo y ordénalos: nunca dos a la vez.
+2. Pon una pausa o una anticipación antes de cada arranque y un golpe al final (sobrepaso, pulso y, si encaja algo,
+   la onda de acento).
+3. Elige la curva por papel: llega (`emphasized`), se transforma (`standard`) o se va (`emphasizedAccelerate`).
+4. Revisa los relevos: la velocidad no puede saltar.
+5. Agrega desenfoque real sólo donde el movimiento es rápido.
+6. Usa los archivos oficiales y compara el cuadro final con el logo original.
+7. Si lleva sonido, un golpe por impacto y cierre con fundido.
+
+Los números salen del token `efeonceGraphicLine.motion` de `@efeoncepro/axis-tokens` (0.3.3 o superior): no los
+copies de un documento ni de un script. Si tu pieza necesita un valor que no existe, pide que se agregue al token con
+su razón.
+
+> Detalle técnico: [norma del lenguaje de movimiento](../../operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md)
+> · [spec de motion](../../operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md) (tiempos,
 > oclusión, entregables y QA) · [manual técnico §10.1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#101-pantalla-y-campaña)
-> · generador en `scripts/creative/brand-motion/` · animación de la órbita en `@efeoncepro/axis-graphic-line`
+> · generador en `scripts/creative/brand-motion/` (lee los valores de `efeonceGraphicLine.motion`) · animación de la órbita en `@efeoncepro/axis-graphic-line`
 > (`ORBIT_MOTION_*`).
 
 ## Paso a paso — fotografiar una aplicación (merch u oficina)
@@ -313,6 +333,8 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
   Reach.
 - No uses la órbita en la UI de Greenhouse ni en piezas de clientes.
 - No copies HEX ni medidas de una captura o de este manual: tómalos de los tokens.
+- No escribas tiempos, sobrepasos ni proporciones de una animación en un script: salen de
+  `efeonceGraphicLine.motion`.
 - No uses fotos de banco ni pongas un velo navy sobre la foto.
 - No publiques el claim «Te hacemos visible» en pauta: está pendiente de revisión legal.
 
@@ -345,5 +367,5 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 - Banco de la lente: `ai-generations/2026-09-25_banco-lente-orbita/LEEME.md`
 - Canvas de trabajo (privado, 40 láminas): [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii)
 - Contrato y herramientas (AXIS 0.3.0 y `axis-graphic-line` 0.3.1, `creative:orbit:render`, `creative:layout`, `foto:componer:cta` tramo 17): [manual técnico §13](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-contrato-y-herramientas-axis-03)
-- Animaciones de marca: [spec de motion](../../operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md) · masters en `gs://efeonce-group-axis-public-media/motion/logo/v1.1/`
+- Animaciones de marca: [norma del lenguaje de movimiento](../../operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md) · [spec de motion](../../operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md) · valores en `efeonceGraphicLine.motion` (`@efeoncepro/axis-tokens` 0.3.3) · masters en `gs://efeonce-group-axis-public-media/motion/logo/v1.1/`
 - Compositor de piezas con CTA: [manual de uso](./compositor-piezas-cta.md)

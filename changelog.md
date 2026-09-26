@@ -38,7 +38,9 @@ final es parte del texto (también en la selección colaborativa 0.3.0). Greenho
 compositor de campañas pinta la lente y el deck según el contrato nuevo (suite completa en verde). El motion del logo
 V1.1 (reveal 3,6 s, apertura 2,4 s, sting 1,6 s) quedó aprobado y documentado; sus masters se sirven desde el bucket
 público `gs://efeonce-group-axis-public-media` y el Lab muestra versiones web con su ficha, junto a la animación de la
-órbita sola. Rollback: fijar de nuevo los paquetes en 0.2.7.
+órbita sola. El lenguaje de movimiento quedó como norma (`EFEONCE_ORBIT_MOTION_LANGUAGE_V1`) y sus valores en los tokens
+`efeonceGraphicLine.motion` (`axis-tokens` 0.3.3), que el render lee: los 90 cuadros clave y los tres sonidos salen
+idénticos byte a byte. Rollback: fijar de nuevo los paquetes en 0.2.7.
 
 ## 2026-09-26 — Marketing Studio: originales en GCS, worker de medios y restauración probada (TASK-1893, TASK-1896)
 

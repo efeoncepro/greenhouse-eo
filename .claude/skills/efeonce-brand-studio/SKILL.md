@@ -175,7 +175,12 @@ Kortex y Verk, fuera por ahora. Operar con
   `@efeoncepro/axis-graphic-line`. Detalle y QA en la referencia.
 - **Motion:** animaciones del logo V1.1 aprobadas (reveal 3,6 s, apertura 2,4 s, sting 1,6 s;
   [spec](../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md)); la animación de la órbita
-  sin logo sale del paquete de AXIS. Masters en el bucket público de AXIS, nunca en git (ver referencia).
+  sin logo sale del paquete de AXIS. Masters en el bucket público de AXIS, nunca en git (ver referencia). **Antes de
+  animar cualquier pieza de Efeonce, la norma
+  [lenguaje de movimiento de la órbita](../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md)**
+  (siete reglas: lento–rápido–lento, llegar con golpe, curvas por papel, sin saltos en los relevos, movimiento real,
+  geometría oficial, sonido en el golpe); los valores viven en el token `efeonceGraphicLine.motion`
+  (`@efeoncepro/axis-tokens` 0.3.3) y nunca se escriben en un script.
 - **Estado:** **sistema consistente, NO activo distintivo demostrado**: la prueba de atribución sin logo (600
   personas) no se ha corrido. «Te hacemos visible» no sale a pauta sin revisión legal.
 

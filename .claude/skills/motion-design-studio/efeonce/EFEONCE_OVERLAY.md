@@ -49,7 +49,7 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   **apertura** logo → línea 2,4 s y **sting** 1,6 s (anticipación, impacto `backOut`, onda de acento, eslogan al 64 %
   del logotipo). Spec, tiempos, oclusión, sonido, entregables y QA en
   [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md)
-  (v1.1; los tiempos viven en el script hasta que existan tokens, nunca se transcriben a otro); render en
+  (v1.1; tiempos y proporciones en el token `efeonceGraphicLine.motion`, nunca en un script); render en
   `scripts/creative/brand-motion/{render-orbit-motion,orbit-sound,encode-orbit-motion}.mjs`. **La animación de la
   órbita sin logo es otra pieza:** sale de `@efeoncepro/axis-graphic-line` (`ORBIT_MOTION_CSS`,
   `orbitMotionFrameCss`) y se exporta a MP4 con `pnpm orbit:video` en AXIS. Web y fichas en el Lab 4.4.2
@@ -58,6 +58,28 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   OneDrive `13- Branding/Motion Órbita Efeonce/v1.1`; nunca en git. **Una sola cola de render a la vez** (dos en
   paralelo corrompieron 4 MP4; `run-all.sh` lleva candado).
   Reglas y checklist: [graphic-line-orbit.md](../../efeonce-brand-studio/references/graphic-line-orbit.md).
+- **🔴 Antes de animar CUALQUIER pieza de Efeonce (cortinilla, cierre, transición, otra marca de la familia), cargar
+  la norma [`EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md)**
+  (lenguaje de movimiento de la órbita, 2026-09-26). Si una pieza no la sigue, no es el movimiento de Efeonce aunque
+  use el logo. Las siete reglas, en corto:
+  1. **Lento–rápido–lento:** anticipación antes de cada arranque (la nave retrocede un 3,5 % en la apertura) y
+     **un protagonista a la vez** (arco → giro → nave → cámara → letras).
+  2. **Llegar con golpe:** sobrepaso *back-out* por papel (nave 0,9 · esfera al nacer 2 · letras 1,6 · por defecto
+     1,2), pulso de impacto con eco al 55 %, onda de acento sólo en un encaje y resorte casi crítico (≤ 1,5 %, una
+     sola vuelta). Nada se detiene suave.
+  3. **Curvas por papel:** llega `emphasized`, se transforma `standard`, se va `emphasizedAccelerate`
+     (`axisMotion.ease`).
+  4. **La velocidad no salta en los relevos;** la cámara acerca en escala logarítmica.
+  5. **Movimiento real:** desenfoque de verdad (obturador 180°) sólo en los tramos rápidos; color mezclado en OKLab.
+  6. **Geometría oficial:** archivos de `@efeoncepro/axis-brand-assets`, oclusión coherente, la esfera protagonista,
+     letras escalonadas 28 ms; jerarquía: anillo héroe 78/80/84 % y logo final **50/56/66 %** del lado corto
+     (16:9 / cuadrado / vertical), eslogan al 64 % del logo.
+  7. **El sonido acompaña el golpe:** sintetizado, un golpe por impacto, cierre con fundido de 0,45 s.
+
+  **Los números viven en el token `efeonceGraphicLine.motion`** (`@efeoncepro/axis-tokens` ≥ 0.3.3; Greenhouse lo fija
+  en `develop`). Se importan, nunca se escriben en un script ni se copian de la norma; si falta un valor, se agrega al
+  token con su razón. Cambiar un valor: token + prueba en AXIS → publicar → fijar en Greenhouse → comparar storyboard →
+  aprobación del operador si altera una pieza aprobada.
 - **`DESIGN.md`** es el contrato visual agent-facing; leerlo si la pieza toca UI (pero recuerda: motion de
   UI runtime NO es esta skill).
 

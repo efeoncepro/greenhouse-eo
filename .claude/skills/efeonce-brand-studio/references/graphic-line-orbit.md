@@ -4,7 +4,9 @@
 > Contenido completo en el [manual V1](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
 > (v1.1: §8.5 con el delta de la firma, §10.8 merch en foto, §10.9 oficina en foto) y el motion en
 > [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md)
-> (v1.1). Esta hoja resume para operar; si difiere del manual o de los tokens, mandan ellos.
+> (v1.1), con sus reglas en la norma
+> [`EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md).
+> Esta hoja resume para operar; si difiere del manual o de los tokens, mandan ellos.
 
 ## Qué es
 
@@ -225,6 +227,17 @@ de https://axis.efeonce.org/references/graphic-line.
   [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md);
   render en `scripts/creative/brand-motion/{render-orbit-motion,orbit-sound,encode-orbit-motion}.mjs`. Nunca con un
   modelo de video.
+- **Lenguaje de movimiento (norma, 2026-09-26):**
+  [`EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md).
+  Leerla antes de animar cualquier pieza de Efeonce. Siete reglas: lento–rápido–lento con anticipación y un
+  protagonista a la vez; llegar con golpe (sobrepaso por papel: nave 0,9, esfera al nacer 2, letras 1,6, por defecto
+  1,2; pulso con eco al 55 %; onda de acento sólo en un encaje; resorte ≤ 1,5 %); curvas por papel (llega
+  `emphasized`, se transforma `standard`, se va `emphasizedAccelerate`); sin salto de velocidad en los relevos y zoom
+  logarítmico; desenfoque real sólo en tramos rápidos y color en OKLab; geometría oficial (oclusión, esfera
+  protagonista, letras a 28 ms; anillo héroe 78/80/84 % y logo final 50/56/66 % del lado corto, eslogan al 64 % del
+  logo); un golpe sonoro por impacto.
+- **Valores:** token `efeonceGraphicLine.motion` de `@efeoncepro/axis-tokens` 0.3.3 (fijado en Greenhouse en
+  `develop`); el render lo lee y nunca se escriben tiempos ni proporciones en un script.
 - **Animación de la órbita (sin logo)** es otra cosa: sale del paquete (`ORBIT_MOTION_CSS`) y se exporta a MP4 con
   `pnpm orbit:video` en AXIS.
 - **Dónde quedan:** versiones web y fichas en el Lab 4.4.2 (`axis.efeonce.org/references/graphic-line/#animaciones`);
@@ -269,10 +282,10 @@ el pre-push `scripts/ci/large-blob-gate.mjs` bloquea blobs grandes.
 | Manual de uso | `docs/manual-de-uso/creative/usar-linea-grafica-efeonce.md` | paso a paso |
 | PDF (A4, 56 hojas, confidencial) | `docs/operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf` | entregable para personas (hoja 12 «La oficina, fotografiada»); regenerar con `node scripts/documents/render-efeonce-graphic-line.mjs` |
 | AXIS (pública, canónica) | https://axis.efeonce.org/references/graphic-line | láminas en HTML nativo; 5.7 «Componer con agentes»; 4.9 «Oficina en foto» (`#oficina-foto`); 4.3, 4.6 y 4.7 muestran cada pieza plana junto a su foto IA («plano · foto», rotulada maqueta); 4.4.2 animaciones |
-| Tokens | `efeonceGraphicLine` en `@efeoncepro/axis-tokens` 0.3.0 | valores, `pieces` y `portrait` |
+| Tokens | `efeonceGraphicLine` en `@efeoncepro/axis-tokens` 0.3.3 | valores, `pieces`, `portrait`, `emailSignature` y `motion` |
 | Archivos oficiales | `@efeoncepro/axis-brand-assets` 0.3.0 | logos, isotipos, burbujas y 48 órbitas; el Lab los sincroniza en cada build (`pnpm brand:sync`) |
 | Órbita pintada | `@efeoncepro/axis-graphic-line` 0.3.1 | recetas, motion, React y Web Component (Greenhouse no lo usa) |
-| Motion | `docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md` | reveal, apertura y sting V1.1 |
+| Motion | `docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md` · `EFEONCE_ORBIT_REVEAL_MOTION_V1.md` | norma del lenguaje de movimiento · spec de reveal, apertura y sting V1.1 |
 | Adapter | `scripts/creative/layout-compiler/graphic-line.mjs` | resolver + pintor + medición de firma |
 | Canvas (taller, privado) | https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii | 40 láminas, 7 capítulos (lámina 4.9 «Oficina en foto»); exploración, no fuente |
 
@@ -305,6 +318,6 @@ La página de AXIS es pública: lo que allí aparece queda expuesto.
 - Aprobar el banco de pares de copy (hoy candidatos). La firma de correo v3.1 está aprobada y sus imágenes
   publicadas en el bucket público de AXIS (`email-signature/v3.1/`); falta instalarla en Outlook.
 - Archivos de impresión y plantillas editables.
-- Pasar los tiempos del motion V1.1 a tokens de AXIS (`brandReveal` / `brandOpen`); hoy viven en el script.
+- Una demo viva en el Lab que lea `efeonceGraphicLine.motion` (los tiempos ya están en el token desde 0.3.3).
 - Copy en inglés; revisión legal de «Te hacemos visible»; tamaños mínimos del logo con prueba de impresión.
 - Recomponer las piezas aprobadas para que el gate de `foto:componer:cta` las vuelva a certificar.

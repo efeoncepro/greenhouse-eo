@@ -674,7 +674,8 @@
       S.hero = { s: heroW / (2 * S.E.a) }
       S.hero.tx = W / 2 - S.E.cx * S.hero.s
       S.hero.ty = H * L.heroCenterYOfHeight - S.E.cy * S.hero.s
-      // Final: logotipo al 46 % del lado corto (58 % en verticales), centrado un poco sobre el centro para el eslogan.
+      // Final: logotipo al 50 % del lado corto en 16:9, 56 % en cuadrado y 66 % en vertical (layout.logoOfShortSide),
+      // centrado un poco sobre el centro para el eslogan.
       const logoW = short * (W < H ? L.logoOfShortSide.tall : W === H ? L.logoOfShortSide.square : L.logoOfShortSide.wide)
       const ls = logoW / 837.07
 
