@@ -342,3 +342,17 @@
 - **2026-09-26 · Un rewrite de historia cambia todos los SHAs citados.** Tras sacar blobs de `ai-generations/`, los SHAs
   de las tasks dejaron de existir en origin con contenido idéntico. Anotar el vigente con el viejo entre paréntesis y
   verificar despliegues por blobs, nunca por ancestría (el release a main es squash).
+- **2026-09-26 · Ecosystem tiene dos capas de idempotencia.** Repetir con `Idempotency-Key` HTTP reproduce el status/body
+  originales (incluido 202); para comprobar el replay de dominio `200 idempotent:true`, conserva `idempotencyKey` en
+  el body y omite el header de transporte. En la primera canary Production el env Vercel se había guardado como
+  `true` + salto de línea; `isOn` usa igualdad estricta con `true`, así que la generación emitió plan v1. Actualizar
+  el env con `--value true` lo dejó en cuatro caracteres y el nuevo deployment selló v2. La canary SEO+AEO+ICO aún
+  tenía cero facts y nueve rejections (SEO 3, AEO 2, ICO 4), por lo que falló validación; eso es independiente del
+  contrato v2, cuya prueba son las tres `scopeLines` y el cover congelado.
+- **2026-09-26 · Un flag comparado con `=== 'true'` muere con un salto de línea en el valor.** La primera canary de
+  producción selló un plan v1 con la var «en `true»: según Codex el valor tenía `\n` final (una lectura por API no lo
+  mostró). Regla: cargar flags con `printf %s true | vercel env add …` (nunca `echo`) y probar el COMPORTAMIENTO con una
+  canary que selle algo que sólo existe con el flag (aquí `plan.scopeLines`), no el listado de vars.
+- **2026-09-26 · Un script que reescribe docs compartidos debe LEER antes de abrir para escribir.** En Python,
+  `open(p,'w').write(fn(open(p).read()))` trunca el archivo antes de leerlo: vació `docs/tasks/README.md` con WIP ajeno.
+  Se recuperó desde un blob colgante (`git fsck --unreachable` + búsqueda de una línea única del WIP) con hash idéntico.

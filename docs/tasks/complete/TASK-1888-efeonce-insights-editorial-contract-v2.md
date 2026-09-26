@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-045`
-- Status real: `En producción 2026-09-26: código (releases 0e87c7a443a2 + f9257b9c94af, incluye el fix del empate), gateway v1.9.0 y flag ON en Vercel staging, Vercel Production y ops-worker. Pendiente para cerrar: canary de comportamiento en producción (edición sintética con plan v2)`
+- Status real: `Complete 2026-09-26: en producción (releases 0e87c7a443a2 + f9257b9c94af); flag ON en Vercel staging, Vercel Production (greenhouse-8hl5hf54w) y ops-worker (00719-gbm); gateway efeonce-mcp v1.9.0; canary sintético de producción insed-f5768172… con plan v2 sellado`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`
@@ -301,7 +301,7 @@ Reglas obligatorias:
 - [x] Source of truth, contract surface y consumers nombrados con paths reales. — arquitectura §14.8.
 - [x] Invariantes, frontera tenant e idempotencia explícitas y cubiertas por tests. — `cover-preference.test.ts`, `chart-spec.test.ts`, `editorial-v2-*.test.ts`, `adapters.test.ts`.
 - [x] La tabla nueva queda en el allowlist de destinos de escritura del dominio (si existe) en el mismo PR. — `boundary-domain.test.ts`.
-- [ ] Postura de migración y rollback explícita y ensayada en staging. — Aditiva, aplicada y verificada en `information_schema`; el `down` NO se ensayó (la instancia es única para dev/staging/prod y la tabla ya es contrato). Rollback operativo = flag OFF.
+- [ ] Postura de migración y rollback explícita y ensayada en staging. — Aditiva, aplicada y verificada en `information_schema`; el `down` NO se ensayó (la instancia es única para dev/staging/prod y la tabla ya es contrato). Rollback operativo = flag OFF, y ése SÍ se ejercitó en producción el 2026-09-26: tras el release abortado `2add63c61fd6`, Codex quitó la var de Vercel Production y dejó `ops-worker-00716-hwg` en `false`, con verificación (registro en `PRODUCTION_RELEASE_TIMING_LEDGER.md`). Queda sin tildar porque el `down` de la migración no se ensayó.
 - [x] Evidencia runtime/DB listada para cada cambio más allá de docs. — §14.8 (readback de columnas, CHECKs, FK, grants y capability; preview v2 con datos reales).
 - [x] Errores canónicos y sin fuga de datos crudos. — `InsightsInputError` 400 `invalid_request`, 404 anti-oráculo por `assertInsightsAccess`, payload de evento redactado.
 
@@ -493,8 +493,8 @@ eso lo resuelve el catálogo en TASK-1889 desde `modules` y `channelId`, sin cam
   que espera «+1,8 pp». — `editorial-v2-contract.test.ts`; además, bajo 0,05 pp dos decimales (caso real Berel CTR).
 - [x] Las series de canal llevan `channelId`; un proveedor desconocido no rompe la generación. — `adapters.test.ts` (AEO `openai→chatgpt`, proveedor desconocido sin campo; SEO `google`) + `dimensionChannelIds` en el planner.
 - [x] Un encargo sin `coverTheme` conserva su hash (test). — `cover-preference.test.ts`, hash fijado contra el validador de `b54c3e604` (antes `05fd559c0`) (previo a la task).
-- [ ] La preferencia se guarda por command con capability, grant, outbox y errores canónicos, y se lee por reader; lanes
-  app/ecosystem responden y la tool MCP está federada. — **Parcial:** command/reader/capability/grant/outbox/errores y lanes construidos con tests (`cover-preference.test.ts`, `capability-grant-coverage`); federación en [efeonce-mcp#18](https://github.com/efeoncepro/efeonce-mcp/pull/18) abierta. Falta: lanes respondiendo en un runtime desplegado y el PR mergeado + gateway desplegado (después del release).
+- [x] La preferencia se guarda por command con capability, grant, outbox y errores canónicos, y se lee por reader; lanes
+  app/ecosystem responden y la tool MCP está federada. — command/reader/capability/grant/outbox/errores con tests (`cover-preference.test.ts`, `capability-grant-coverage`); lane ecosystem `GET /cover-preference` 200 en producción (canary de la sesión TASK-1846, release `0e87c7a443a2`); federación mergeada (`2cf78af91`) y desplegada (gateway v1.9.0, revisión `00062-ct5`). No ejercitado: `set` en producción (escritura sobre una organización real) ni `tools/list` en vivo con OAuth.
 - [x] `auto` resuelve blanca sin logo apto para fondo oscuro y navy con él; el resultado queda sellado en la edición. — `cover-preference.test.ts` + `plan.cover` en el plan congelado (validador impone coherencia tema↔logo); Sky y Berel resuelven blanca por `auto` con datos reales.
 - [x] Ediciones internas de Berel y Sky en staging pasan validación con flag ON; ninguna se comparte con el cliente. — 2026-09-26: flag ON en Vercel staging + redeploy `greenhouse-9t9fwhrvz`; App lane `POST /api/platform/app/insights/editions` → 202 `ready_for_review` para Berel `insed-56226fa1-0c2b-451d-88cf-158390c4073a` (seo+aeo) y Sky `insed-1e003760-b622-47e1-b5ac-5ec7a2cad396` (ico), `audience: internal`, sin emitir ni compartir; el plan congelado trae portada sellada, lecturas, esenciales, líneas de alcance y tabla «…: todas las cifras»; Sky abre con «Entregas a tiempo es la única meta sin cumplir». Hallazgo: en un empate la cifra principal tomaba el primer hecho (Berel «39» con «Dimensiones evaluadas.»), corregido en `baf0f908b` (aún sin release; la edición de staging lo conserva por inmutable). Antes: Evidencia previa local, sólo lectura: Sky `EO-INS-000022` 12 hechos / 0 violaciones y Berel `EO-INS-000019` 24 hechos / 0 violaciones con `--editorial-v2` sobre `be943e009` (antes `667b4c12a`). Aprobación del operador de los cuatro PDFs locales de Berel y Sky (contrato v2 + autoría IA sobre `be943e009` (antes `667b4c12a`)): «Bien, aprobado», 2026-09-25, dada en el chat de la sesión TASK-1846 y registrada en TASK-1889. Esa aprobación es del documento compuesto en local, NO de las ediciones en staging: este criterio sigue abierto hasta el release.
 - [x] Flag en el ledger con runtime declarado. — Vercel + `ops-worker` (`deploy.sh` `:-false`); `pnpm flags:audit --strict --no-vercel` en 0.
@@ -518,18 +518,30 @@ ajeno sin commitear.
 Release 2026-09-26: orquestador `36222331450` `success` sobre `0e87c7a443a2` (PR #240, squash). Verificado por blobs:
 el código de Insights en `origin/main` es idéntico a `be943e009` (única diferencia: `skill-catalog.generated.json`,
 regenerado por ediciones posteriores de skills). Canary de `GET /api/platform/ecosystem/insights/cover-preference` en
-producción: 200 con el contrato nuevo, corrido por la sesión TASK-1846 (no por esta sesión). `INSIGHTS_EDITORIAL_V2_ENABLED`
-sigue OFF en todos los runtimes. Pendiente: merge y deploy de efeonce-mcp#18 (MERGEABLE, después del gateway 1.8.0 que
-despliega otra sesión); flag ON en Vercel staging + ediciones internas de Berel y Sky; flag ON en producción con 1889.
+producción: 200 con el contrato nuevo, corrida por la sesión TASK-1846 (no por esta sesión).
 
 Rollout de producción 2026-09-26 (ejecutado por Codex con autorización del operador; verificado por esta sesión):
 release `2add63c61fd6` abortado (ops-worker sin `DATAFORSEO_API_LOGIN`, rollback verificado por Codex) → fix #242 →
-release `f9257b9c94af` `released` (run `36236940651`). Verificación propia: `greenhouse.efeoncepro.com` sirve
-`greenhouse-29b4yzhmf` (createdAt 10:24:34Z), creado 8 s después de recrear la var de Production (10:24:26Z, vía
-`vercel api .../env`), así que la incluye; `ops-worker-00718-c4b` Ready/100 % con `INSIGHTS_EDITORIAL_V2_ENABLED=true`;
-el fix del empate (`baf0f908b`) está en `origin/main` (comparado por contenido); issuance/sharing/delivery siguen OFF
-en Vercel Production. No verificado: ninguna edición generada en producción desde el release (DB sin ediciones nuevas);
-el canary sintético por la lane ecosystem quedó bloqueado por el clasificador de permisos de esta sesión.
+release `f9257b9c94af` `released` (run `36236940651`). El readback actual de `ops-worker-00719-gbm` es Ready/100 % con
+`INSIGHTS_EDITORIAL_V2_ENABLED=true`, SHA `3a7d09cb0dae46ad02365dce6cfc73554aac11ca`; el fix del empate (`baf0f908b`) está en `origin/main` (comparado por contenido);
+issuance/sharing/delivery siguen OFF en Vercel Production. La canary inicial mostró que el env Production tenía un
+salto de línea final (`true\n`), incompatible con la comparación estricta del flag. Se actualizó al valor exacto `true`
+y se redeplegó `greenhouse-8hl5hf54w` (`dpl_5sJdifoXZiXhQXfRSmW4zXFtQgGf`, Ready, alias `greenhouse.efeoncepro.com`).
+Canary sintética Production por lane ecosystem: la primera edición `insed-356e948c-02a2-4e53-b449-521d9757a6ce`
+POST 202 / GET 200 selló plan v1. Tras la corrección, `insed-f5768172-5ef3-4105-97b6-b8b0d3135589` POST 202 / GET
+200 selló plan congelado con 3 `scopeLines` y `cover` (`frozenAt` y `planHash` presentes). El snapshot tuvo 0 facts y
+9 rejections (SEO 3, AEO 2, ICO 4), por eso la edición terminó `failed` en `validating`/`evidence_rejected` y no
+produjo readings/essentials. Replay con header HTTP 202 reprodujo la respuesta original; replay de dominio con la misma
+clave del body y sin ese header devolvió 200 `idempotent:true`, `generation:null`. No se emitió, compartió ni solicitó
+render.
+
+Cierre 2026-09-26 (verificación de esta sesión sobre lo ejecutado por Codex): var de Production `'true'` actualizada
+12:00:56Z y deployment `greenhouse-8hl5hf54w` (`dpl_5sJdifoXZiXhQXfRSmW4zXFtQgGf`) creado 12:01:06Z, Ready y aliasado a
+`greenhouse.efeoncepro.com`, commit `f9257b9c94af`; `ops-worker-00719-gbm` Ready/100 % con el flag `true`; en la base, la
+edición sintética `insed-f5768172-5ef3-4105-97b6-b8b0d3135589` (org Greenhouse Demo, `audience: client`, `failed` en
+`validating` por snapshot vacío, `issued_at` nulo, 0 share grants) tiene plan congelado 12:07:19Z con 3 `scopeLines`,
+`cover` sellado y apertura en los 3 capítulos. La causa del primer plan v1 que reporta Codex (`true\n` en el valor) no
+la pude reproducir: mi lectura por API de las 11:5x mostró `'true'`; queda como dato de Codex, no verificado aquí.
 
 Trazabilidad de SHAs: el 2026-09-25 a las 22:59 otra sesión reescribió la historia de `develop` para sacar blobs de
 `ai-generations/` (archivados en GCS); todos los commits posteriores a esa base cambiaron de SHA con contenido idéntico
@@ -544,16 +556,16 @@ compilación 40 s, 23 páginas estáticas). Dos intentos previos fallaron por un
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible — ver nota de cierre abajo
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] Skill `efeonce-insights` actualizada (`program-ledger`, `architecture-map`, `contracts`, `operations`,
+- [x] Skill `efeonce-insights` actualizada (`program-ledger`, `architecture-map`, `contracts`, `operations`,
   `lessons`) y espejada a `.codex/` con `pnpm skills:mirrors` verde.
-- [ ] EPIC-045 actualizado con el estado real de la unidad.
+- [x] EPIC-045 actualizado con el estado real de la unidad.
 
 ## Follow-ups
 

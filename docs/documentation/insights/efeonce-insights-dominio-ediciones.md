@@ -182,7 +182,7 @@ puntos. Las primeras ediciones reales con el diseño nuevo serán de Berel (visi
 internos: no se comparten con el cliente hasta que el operador las revise.
 
 > Detalle técnico: arquitectura §6 (delta 2026-09-25, rediseño premium aprobado);
-> `docs/tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md` (estado en arquitectura §14.8);
+> `docs/tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md` (estado en arquitectura §14.8);
 > `docs/tasks/to-do/TASK-1889-efeonce-insights-premium-catalogs.md`; dirección visual
 > `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`.
 

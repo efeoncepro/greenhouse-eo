@@ -11,7 +11,7 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — in production with flags OFF** | Cloud SQL (4 migrations applied); release `bda1cf2cd938` (2026-09-18, Vercel + 6 Cloud Run); staging flags ON (sharing/delivery/schedules/issuance), production OFF until TASK-1875; gateway `efeonce-mcp` 1.7.0 (rev `00055-gk6`, 58 tools); open: in-app/Teams channels, portal route (1849), ISSUE-174 → TASK-1876 | 2026-09-18 |
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
 | TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | to-do (blocked by 1848) | — | — |
-| TASK-1888 | Editorial contract v2: `ChartSpec` 7 → 15 families, per-figure reading and hero figure in the plan, `channelId`, per-org cover preference + sealed cover, flag `INSIGHTS_EDITORIAL_V2_ENABLED` | **in-progress — live in production 2026-09-26; production behavior canary pending** | code: release `0e87c7a443a2` + fix release `f9257b9c94af`; gateway efeonce-mcp v1.9.0 (rev `00062-ct5`); flag ON in Vercel staging (`greenhouse-9t9fwhrvz`), Vercel Production (`greenhouse-29b4yzhmf`) and ops-worker (`00718-c4b`) | staging internal editions Berel `insed-56226fa1…` / Sky `insed-1e003760…` with sealed v2 plan; production verified structurally (flag in both runtimes, deployment built after the var), no production edition yet |
+| TASK-1888 | Editorial contract v2: `ChartSpec` 7 → 15 families, per-figure reading and hero figure in the plan, `channelId`, per-org cover preference + sealed cover, flag `INSIGHTS_EDITORIAL_V2_ENABLED` | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af`; gateway efeonce-mcp v1.9.0 (rev `00062-ct5`); flag ON in Vercel staging (`greenhouse-9t9fwhrvz`), Vercel Production (`greenhouse-8hl5hf54w`) and ops-worker (`00719-gbm`) | staging internal editions Berel `insed-56226fa1…` / Sky `insed-1e003760…` with sealed v2 plan; Production synthetic canary `insed-f5768172…` sealed 3 scope lines + cover (first canary `insed-356e948c…` sealed v1 before the env value fix) |
 | TASK-1889 | Premium catalogs from the approved canvas (A4 + deck), canvas-fidelity gate, internal Berel/Sky editions, release together with the 1888 flag | **in-progress — code complete 2026-09-25, rollout pending** (local `develop`, not pushed; last commit `2f0776e0f` (antes `9529a1b25`)) | none (production serves the TASK-1847 v1 catalogs until the release) | local real editions Berel `EO-INS-000019` (16 pp / 13 slides) and Sky `EO-INS-000022` (12 / 9); fidelity 20/21 + 1 approved exception; visual gate 27 frames at 0 px |
 
 ## TASK-1845 — foundation (complete 2026-09-16)
@@ -313,7 +313,7 @@ vestuario, ausencia de Playwright smoke, `split_batch` (3.279 archivos) y autent
 `greenhouse_ops`; migraciones 656/656, GCP WIF y Sentry pasan. El `develop` local está 60 commits y 1.063 archivos
 por delante de `origin/develop`; no es un candidato acotado a esta task. No se dispatchó el orquestador.
 
-## TASK-1888 — contrato editorial v2 (in-progress · en producción desde 2026-09-26)
+## TASK-1888 — contrato editorial v2 (complete 2026-09-26 · en producción)
 
 **Rollout 2026-09-26 (dónde corre).** Release `0e87c7a443a2` (código, flag OFF) → gateway efeonce-mcp#18 mergeado
 `2cf78af91` y desplegado v1.9.0 (run `36226550358`, revisión `00062-ct5`, 100 %) → flag ON en Vercel staging
@@ -322,11 +322,19 @@ y Sky (`insed-1e003760-b622-47e1-b5ac-5ec7a2cad396`) → hallazgo en staging (em
 evaluadas.») corregido en `baf0f908b` → Codex (con autorización del operador; el clasificador de esta sesión bloqueó
 redeploy de producción y flag del worker): release `2add63c61fd6` **abortado** (ops-worker sin `DATAFORSEO_API_LOGIN`,
 rollback verificado), fix de secretos del release (#242) y release `f9257b9c94af` `released` (run `36236940651`).
-Estado verificado por esta sesión: `greenhouse.efeoncepro.com` → `greenhouse-29b4yzhmf` (creado 10:24:34Z, 8 s después
-de recrear la var de Production a las 10:24:26Z, así que la incluye); `ops-worker-00718-c4b` Ready/100 % con
-`INSIGHTS_EDITORIAL_V2_ENABLED=true`; el fix del empate está en `origin/main`. Issuance, sharing y delivery siguen OFF
-en Vercel Production. **Falta:** un canary de comportamiento en producción (edición sintética por la lane ecosystem
-que muestre `plan.scopeLines`), bloqueado aquí por el clasificador (lectura del token del gateway).
+Estado verificado por esta sesión: la primera canary sobre `greenhouse-29b4yzhmf` Ready encontró el env Production
+con salto de línea (`true\n`); como `isOn` compara exactamente con `true`, el flag quedó OFF. Se actualizó a `true`
+(4 caracteres) y se redeplegó `greenhouse-8hl5hf54w` (`dpl_5sJdifoXZiXhQXfRSmW4zXFtQgGf`, Ready, alias
+`greenhouse.efeoncepro.com`, SHA `f9257b9c94af`). `ops-worker-00718-c4b` Ready/100 % con
+`INSIGHTS_EDITORIAL_V2_ENABLED=true` en la revisión activa `ops-worker-00719-gbm` (Ready/100 %, SHA
+`3a7d09cb0dae46ad02365dce6cfc73554aac11ca`); el fix del empate (`baf0f908b`) está en `origin/main` (comparado por contenido);
+issuance/sharing/delivery siguen OFF en Vercel Production. **Canary sintética Production por lane ecosystem
+(2026-09-26):** la primera edición `insed-356e948c-02a2-4e53-b449-521d9757a6ce` POST 202 / GET 200 selló plan v1.
+Tras la corrección, `insed-f5768172-5ef3-4105-97b6-b8b0d3135589` POST 202 / GET 200 selló un plan congelado con
+3 `scopeLines` y `cover` (`frozenAt` y `planHash` presentes). Su snapshot tuvo 0 facts y 9 rejections (SEO 3, AEO 2,
+ICO 4), por lo que terminó `failed` en `validating`/`evidence_rejected`; no había datos para readings/essentials.
+Replay con `Idempotency-Key` HTTP devolvió 202 cacheado; replay de dominio con la clave del body y sin ese header
+devolvió 200 `idempotent:true`, `generation:null`. No se emitió, compartió ni solicitó render.
 
 **Qué construyó** (commits en `develop` local, sin push, 2026-09-25): Slice 1 `ChartSpec` 15 familias + `channels.ts`
 + matriz; Slice 2 plan v2 + pp; Slices 3–4 productores (bullet ICO, línea mensual, lectura por figura, esenciales,

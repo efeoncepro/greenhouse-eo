@@ -24,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `insights`
-- Blocked by: `TASK-1888, TASK-1889`
+- Blocked by: `TASK-1889` (el contrato editorial v2 quedó completo y en producción el 2026-09-26)
 - Branch: `Greenhouse develop; sin worktrees ni rama por task`
 - Legacy ID: `none`
 - GitHub Issue: `none`

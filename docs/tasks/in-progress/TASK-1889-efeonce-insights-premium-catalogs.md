@@ -84,7 +84,7 @@
 - Status real: `Slices 1–5 code complete en develop (sin push); rollout pendiente: staging, release (PDFs reales aprobados 2026-09-25)`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-1888` (Slices 3–5 necesitan su contrato; Slices 1–2 ya pueden empezar)
+- Blocked by: `none` (el contrato editorial v2 quedó completo y en producción el 2026-09-26)
 - Branch: `Greenhouse develop; sin worktrees ni rama por task`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -24,7 +24,7 @@
 - Status real: `Diseño`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-1888` (contrato editorial v2 en develop) — puede empezar su Discovery en paralelo
+- Blocked by: `none` (el contrato editorial v2 quedó completo y en producción el 2026-09-26)
 - Branch: `Greenhouse develop; sin worktrees ni rama por task`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -91,7 +91,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md` (contrato v2, lectura por figura, matriz)
+- `docs/tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md` (contrato v2, lectura por figura, matriz)
 - `docs/tasks/in-progress/TASK-1889-efeonce-insights-premium-catalogs.md` (páginas de figura y regla de familia del render)
 - `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md` (qué revelaron las ediciones reales)
 
