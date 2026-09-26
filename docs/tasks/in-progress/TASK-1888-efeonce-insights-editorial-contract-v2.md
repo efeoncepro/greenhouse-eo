@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-045`
-- Status real: `Code complete; rollout pendiente (release con flag OFF, ediciones internas en staging, deploy efeonce-mcp#18)`
+- Status real: `En producción con flag OFF (release 0e87c7a443a2, 2026-09-26); rollout pendiente: deploy efeonce-mcp#18, flag ON en staging + ediciones internas, flag ON en producción con TASK-1889`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`
@@ -514,6 +514,13 @@ compilación 68 s, 23 páginas estáticas); `pnpm typecheck` limpio; `docs:closu
 0; cuatro guardas falsificadas (pp, hash, matriz, logo sobre navy) se ponen rojas con el defecto; preview v2 en solo
 lectura de Sky y Berel con 0 violaciones. `pnpm local:check` corta en lint por errores de `scripts/foto/**`, trabajo
 ajeno sin commitear.
+
+Release 2026-09-26: orquestador `36222331450` `success` sobre `0e87c7a443a2` (PR #240, squash). Verificado por blobs:
+el código de Insights en `origin/main` es idéntico a `be943e009` (única diferencia: `skill-catalog.generated.json`,
+regenerado por ediciones posteriores de skills). Canary de `GET /api/platform/ecosystem/insights/cover-preference` en
+producción: 200 con el contrato nuevo, corrido por la sesión TASK-1846 (no por esta sesión). `INSIGHTS_EDITORIAL_V2_ENABLED`
+sigue OFF en todos los runtimes. Pendiente: merge y deploy de efeonce-mcp#18 (MERGEABLE, después del gateway 1.8.0 que
+despliega otra sesión); flag ON en Vercel staging + ediciones internas de Berel y Sky; flag ON en producción con 1889.
 
 Trazabilidad de SHAs: el 2026-09-25 a las 22:59 otra sesión reescribió la historia de `develop` para sacar blobs de
 `ai-generations/` (archivados en GCS); todos los commits posteriores a esa base cambiaron de SHA con contenido idéntico
