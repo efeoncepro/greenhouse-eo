@@ -74,7 +74,8 @@ Un glifo nuevo se dibuja **ya con el lugar de su esfera previsto**, con su aire 
 - **Fondo:** `#001a33` en **todas** las líneas (D21) o papel `#f7f8f6` (`color.paper`).
 - **Tinta:** blanco sobre oscuro; navy `#023c70` sobre papel.
 - **La línea es de la pieza, no del objeto:** un ícono no tiene línea propia. Toma el acento de la línea de servicio
-  de la pieza donde va (una keynote en un deck de Growth va en teal; en uno de Brand, en naranja). Sin línea clara,
+  de la pieza donde va (una keynote en un deck de Growth va en teal; en uno de Brand, en naranja sobre oscuro y carmesí
+  sobre papel). Sin línea clara,
   la de la marca madre, Growth.
 - **Acento:** **sólo la esfera**, en el acento de la línea de servicio. Sobre oscuro, el acento oscuro de la línea; sobre
   papel, el claro (valores en `efeonceGraphicLine.lines[]`, ver [package-and-tokens.md](package-and-tokens.md)).
@@ -109,7 +110,9 @@ adentro con aire ([criteria.md](criteria.md) §3.1 y §3.7).
 
 ## 7. En una pieza
 
-- **Deck:** íconos de 48–56 px sobre las columnas; en una fila, responde sólo la línea activa, con su propio acento.
+- **Deck:** íconos de 48–56 px sobre las columnas; en una fila responde uno solo (el servicio que se vende), y **todos**
+  llevan el acento de la línea de la pieza, aunque el uso del catálogo diga otra línea. Composición de fila en la guía
+  de AXIS (§«En una fila»).
 - **Post con órbita:** el ícono va dentro de la órbita en reposo y con el tope de trazo (a 220 px, el trazo queda en 4 px,
   a la par del arco de 3,8 px). La respuesta con esfera y la esfera de la órbita ya cierran.
 - Los íconos nunca se repiten como patrón (la misma regla que la esfera y la órbita, [criteria.md](criteria.md) §2.2).
@@ -230,31 +233,25 @@ frente, de 118° a 52°, y esfera de radio 8,3 con anillo de fondo de 12,5, fuer
 alrededor del protagonista; nunca cruza el texto ni mide. Objeto de 320 px o más en 1080. **Opacidad del anillo por
 decidir:** 22 % o 30 % (prueba de teléfono a 390 px en E4).
 
-### 11.3 Método para dibujar un ícono nuevo (probado con nueve objetos el 2026-09-26)
+### 11.3 Método para dibujar un ícono nuevo
 
-1. **Generar la forma, nunca el color:**
-   `pnpm ai:image --image ai-generations/2026-09-26_iconos-planos/r2/inflado.png --prompt-file <prompt> --size 1024x1024`
-   (gpt-image-2). `r2/inflado.png` es **la** referencia de estilo (la hoja E); `plastilina-2/hoja.png` es sólo un
-   resultado. Prompt modelo: `ai-generations/2026-09-26_iconos-planos/plastilina-2/prompt.txt` (copiarlo y cambiar la
-   lista de objetos). Reglas del prompt: rejilla de 3 × 3 con mucho aire entre celdas; **sólo dos colores**, fondo liso
-   y blanco puro, **sin naranja ni puntos** (la esfera se compone después); sin texto, logos, degradé ni sombra. Para
-   **un solo objeto**, pedir nueve variantes del mismo objeto y elegir la mejor.
-2. **Vectorizar** (los valores del set de 2026-09-26):
-   - subir la hoja ×3 con lanczos3;
-   - máscara = píxeles blancos (R, G y B > 150); si quedó algún naranja **dentro** del objeto, se cuenta como parte de
-     la silueta (no deja hueco);
-   - separar por componentes conexos (conectividad 4), nunca por recortes de celda fija: cortan objetos anchos;
-   - descartar componentes de menos de 60 px o con más de la mitad naranja;
-   - trazar cada objeto con `potrace -s --flat -t 40 -a 1.15 -O 0.6`.
-3. **Normalizar** a la grilla de 48 con la fórmula y las reglas de medición de §11.2.
-4. **Componer la esfera aparte, determinística:** en el punto donde está la acción (la gota, la luz, la punta, la boca
-   de la guitarra), radio 3,4 y anillo calado de 4,5 en máscara. La esfera del modelo nunca se conserva.
-5. **Gesto:** sólo si el objeto será protagonista; 2 a 5 trazos de 2,8 **en tinta**, fuera de la silueta (§11.2).
-6. **QA:** render a 160, 64 y 32 px sobre `#001a33` y sobre papel. Revisar que la esfera no choque con el objeto (se
-   corrigieron cámara, rayo, laptop, pincel y cuentagotas), que los calados se lean a 32 px y que el set se lea como
-   familia. Los chequeos están en `qa-checklist.md` §8b; todavía no hay comando: la medición es un script propio.
-7. **Registrar:** con la aprobación del operador, el glifo entra a `PLASTILINA_GLYPHS`
-   (`axis-design-system/packages/graphic-line/src/icons-plastilina-data.ts`) con su prueba, y se publica una versión.
+**El método canónico vive en AXIS** (`docs/agent-composition/iconography.md` §«Un glifo nuevo de Plastilina») y se
+ejecuta con sus comandos; esto es el resumen:
+
+1. **Generar la forma, nunca el color:** desde Greenhouse,
+   `pnpm ai:image --image ../axis-design-system/docs/agent-composition/iconography/plastilina-style-reference.png --prompt-file <prompt> --size 1024x1024 --out <hoja.png>`
+   con el prompt modelo de AXIS (`iconography/plastilina-prompt.txt`, cambia sólo `{{OBJETOS}}`). La referencia es el
+   mismo archivo que `ai-generations/2026-09-26_iconos-planos/r2/inflado.png` (no versionado): se usa el de AXIS. Sólo
+   fondo y blanco, sin naranja; para un objeto, nueve variantes.
+2. **Vectorizar:** `pnpm icons:vectorize` en AXIS (componentes conexos, potrace, normalización por área, calados y
+   esfera propuesta en el calado mayor).
+3. **Elegir la variante:** inclinada, gorda, con calados legibles y peso dentro del set (394–559 u²).
+4. **Esfera** donde está la acción (el centro del calado si la acción es un calado), radio 3,4 con anillo de 4,5.
+5. **Gesto** si será protagonista: 2–5 trazos rectos en tinta, 2,4–5,6 de largo, aire ≥ 0,5, dentro de la grilla.
+6. **Verificar** con `pnpm icons:check` (mide peso, calados y gesto; deja hojas a 160, 64 y 32 px) y revisar a ojo que
+   se lea como familia: el control mide el peso, no el carácter. Caso real: la guitarra de la segunda prueba a ciegas
+   pasó todo lo medible pero se leía más liviana por un mástil fino.
+7. **Alta** con la aprobación del operador: entra a `PLASTILINA_GLYPHS` en AXIS con su prueba.
 
 ### 11.4 Inventario (E3)
 

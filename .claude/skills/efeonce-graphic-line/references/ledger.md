@@ -57,7 +57,8 @@
 - **Firma de correo:** la URL de LinkedIn de la empresa.
 - **Íconos, pendientes tras D22:** la opacidad del anillo de la órbita sesgada (22 % o 30 %); si Voice usa Trazo o
   Plastilina; en piezas con las dos voces, si la esfera va en la respuesta o en el ícono; publicar los paquetes AXIS
-  (tag) y decidir el reemplazo de Tabler en las firmas. **Detectado en la prueba a ciegas (2026-09-26):**
+  (tag `v0.3.6` tras merge del PR efeoncepro/axis-design-system#3) y decidir el reemplazo de Tabler en las firmas;
+  revisar si «Automatización» en respuesta se lee como indicador de carga (hallazgo de la segunda prueba a ciegas). **Detectado en la prueba a ciegas (2026-09-26):**
   a 20 px el trazo sube a 1,75 y el aire de la esfera baja de 0,5 a ~0,375 (la regla D17 se midió con 1,5). Opciones:
   respuesta desde 24 px, o aceptar 0,375 de aire a 20 px. Hasta decidir, la regla sigue siendo «respuesta desde 20 px».
   Diferidos: el motion de los íconos (necesita los
