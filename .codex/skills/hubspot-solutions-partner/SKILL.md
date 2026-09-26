@@ -144,6 +144,9 @@ retainer de Managed CRM Ops.
 **Programa**
 11. **NUNCA** leas la insignia de tier sin leer la **curva de expiración de puntos**. El badge dice
     "Gold válido hasta enero 2027"; el gráfico de puntos antiguos dice que tu piso se disuelve en diciembre.
+    Tampoco la muestres en piezas propias mientras el registro de partnerships tenga el tier sin revalidar: la
+    firma de correo Efeonce v3.1 lleva el **logo oficial de marca** de HubSpot, no la insignia de tier
+    (`docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` §10.2).
 12. **NUNCA** cierres un deal sin **deal registration** (es obligatorio y exclusivo) y sin la firma del cliente
     en el **Proof of Involvement**. Rige **Best Partner Wins**: quien obtiene la firma se lleva el crédito.
     Corta para los dos lados — puedes entrar a cuentas de otros, y otros pueden entrar a las tuyas.

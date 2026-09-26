@@ -106,6 +106,10 @@ nunca como texto. No aplica a UI de Greenhouse ni a clientes.
 - **Firma:** logo de Efeonce **centrado abajo**, sin URL. La burbuja `efeoncepro.com` sólo **reemplaza** al logo si
   el logo ya aparece dentro de la imagen (mockup, objeto, merch): centrada, sola, fusión de luminosidad a opacidad 1 y
   ≥ 4,5:1 medido (sólo pasa sobre lechos muy oscuros). Nunca a un costado ni junto al logo.
+- **Firma de correo ≠ firma de pieza:** la de correo es la v3.1 aprobada (A papel / B navy), con contrato AXIS
+  `efeonce.email-signature` y sus propias reglas (una sola línea con esfera, regla de partners sin esfera, franja de
+  logos oficiales, PNG por URL pública porque el correo no muestra SVG, `data:` ni fusiones). No se recompone a mano:
+  ver la referencia de la línea y el manual §10.2.
 - **Entradas:** `pnpm creative:orbit:resolve|render` (contrato AXIS `efeonce.graphic-line-orbit` 0.3.0; `render`
   sale 1 si falla un check; lente siempre con arco y esfera, un solo anillo alrededor del contenido, piezas de
   formato fijo reproducidas desde `pieces`/`portrait`), `pnpm creative:layout` (capa `graphic_line` + `brand.signature`),

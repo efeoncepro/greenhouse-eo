@@ -72,7 +72,9 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
 ## La firma de correo (v3.1, aprobada 2026-09-26)
 
 - **Dos versiones aprobadas:** A sobre papel y B tarjeta navy. Contrato AXIS `efeonce.email-signature` 0.3.0
-  (`stable`), tokens `efeonceGraphicLine.emailSignature`, lámina 4.5 del Lab, manual §10.2.
+  (`stable`), tokens `efeonceGraphicLine.emailSignature`, lámina 4.5 del Lab, manual §10.2. Viven en los paquetes
+  existentes desde la **0.3.2** (`axis-ui-contracts`, `axis-tokens`), no en un paquete nuevo; CLI
+  `pnpm signature:resolve` en el repo AXIS.
 - **Zonas en orden fijo:** foto con órbita · nombre (Bricolage 800 + punto de acento) y cargo · teléfono y correo
   (Poppins 13, íconos Tabler outline en el acento) · burbuja URL y LinkedIn · **línea que termina en la esfera** ·
   cierre de marca (logo + eslogan) · **regla de sección sin esfera** · «Partner oficial de» + franja. Aire: 18 · 14 ·

@@ -159,8 +159,9 @@ Efeonce's own-brand graphic line (orbit: thin ring, arc with sphere, halo; lens 
 2026-09-25. Greenhouse is the control plane: the [ADR](../../../docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 and the [manual](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) live there; the
 operating summary is [`graphic-line-orbit.md`](../efeonce-brand-studio/references/graphic-line-orbit.md). Published
-set (versions are independent per package): `axis-tokens`, `axis-ui-contracts`, `axis-ui-registry` and
-`axis-brand-assets` `0.3.0`; `axis-graphic-line` `0.3.1`. AXIS holds:
+set (versions are independent per package): `axis-tokens` and `axis-ui-contracts` `0.3.2` (they ship
+`emailSignature` and `efeonce.email-signature`); `axis-ui-registry` and `axis-brand-assets` `0.3.0`;
+`axis-graphic-line` `0.3.1`. AXIS holds:
 
 - **Tokens:** `efeonceGraphicLine` in `packages/tokens/src/tokens.ts` (`@efeoncepro/axis-tokens`, `status:
   'canonical'`, opt-in branch outside the `axisTokens` aggregate). Groups: `color`, per-brand `family`, `sphere`,

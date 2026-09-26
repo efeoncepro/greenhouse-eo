@@ -7,7 +7,7 @@ description: Contexto de negocio, marca, GTM y modelo ASaaS de Efeonce Group (la
 
 > **Ecosistema digital Efeonce — layering canónico** (SSOT: `docs/architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md` + `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`). Efeonce es la marca paraguas; las líneas de negocio/prácticas poseen ofertas; Globe, Wave, Reach, Kortex y Verk son product brands o platform brands; Greenhouse es el control plane. Las superficies front-of-house consumen plataformas/backbones, pero ninguna product brand reemplaza la relación Efeonce ni equivale automáticamente a toda una línea de negocio. Cargar el contrato de portfolio al razonar sobre marca, capas, hosts, ownership o dónde nace una capacidad del ecosistema.
 
-> Para el contrato transversal de adopción y expansión operator-first, cargar [`Efeonce Operator-First Product & Growth Contract V1`](../../docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
+> Para el contrato transversal de adopción y expansión operator-first, cargar [`Efeonce Operator-First Product & Growth Contract V1`](../../../docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
 
 El contrato operator-first es el mecanismo del Why en producto: convertir dolores de agencia en capacidad,
 autonomía, influencia y memoria acumulada. Evaluar cada solución contra la regla **capacidad + memoria, no
@@ -17,11 +17,13 @@ Esta skill es el **router + doctrina destilada** del context pack de negocio de 
 
 La capa de partnerships y providers es transversal al portfolio: Efeonce puede vender licencias cuando los términos lo
 permiten, pero también advisory, implementación, operación, Product Services e IP propia. Para clasificar un partner o
-provider carga [`EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md`](../../docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md);
-para su estado vigente carga [`EFEONCE_PARTNERSHIP_REGISTRY_V1.md`](../../docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
+provider carga [`EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md`](../../../docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md);
+para su estado vigente carga [`EFEONCE_PARTNERSHIP_REGISTRY_V1.md`](../../../docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
 No confundas provider, formulario enviado, partnership aprobado, product brand ni línea de negocio. Una categoría
 `partnership` dentro de un formulario Enterprise sólo prueba la vía solicitada, no reseller, co-selling, tier,
-certificación ni revenue share.
+certificación ni revenue share. En piezas propias, como la franja «Partner oficial de» de la firma de correo v3.1,
+sólo aparecen relaciones que el registro permite declarar, con su logo oficial de marca y nunca una insignia de
+nivel sin readback ([`EFEONCE_GRAPHIC_LINE_V1.md` §10.2](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)).
 
 **Fuente de verdad = `docs/context/` (archivos `00`–`14`).** Esta skill NO los reemplaza: los resume y enruta. Ante cualquier conflicto, mandan los docs `docs/context/*` y, sobre arquitectura/runtime/contratos, manda el contrato técnico verificado (regla del `CLAUDE.md`). Empezar siempre por `docs/context/00_INDEX.md`.
 

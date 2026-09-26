@@ -19,7 +19,8 @@ Lee solo lo que el cambio necesita:
 - `docs/architecture/GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md`, `EPIC-042`, `TASK-1764` y
   [references/footer-presentation.md](references/footer-presentation.md) cuando cambien marca, firma, footer,
   identidad legal, RRSS, preferencias o unsubscribe. El mockup aprobado vive en
-  `/admin/emails/footer-profiles/mockup`; es referencia visual, no runtime productivo.
+  `/admin/emails/footer-profiles/mockup`; es referencia visual, no runtime productivo. La firma de correo
+  personal de Outlook (v3.1) no pertenece a esta skill: ver `EFEONCE_GRAPHIC_LINE_V1.md` §10.2.
 - `resend-email-platform` cuando cambien provider, dominio, tracking, webhook, suppression, retry o entregabilidad.
 - `greenhouse-ai-image-generator` y
   `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md` cuando el correo necesite

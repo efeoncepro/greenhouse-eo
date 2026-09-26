@@ -35,6 +35,11 @@ voluntaria.
 plataforma de Efeonce`. Nunca uses Greenhouse como marca principal del remitente o del footer.
 - La firma pertenece al cuerpo, queda alineada a la izquierda e identifica un equipo institucional o un owner
   runtime verificado. No inventes personas, equipos ni buzones. El footer es un bloque separado y centrado.
+- Esa firma no es la firma de correo personal de Efeonce v3.1 (foto con órbita, franja «Partner oficial de»),
+  que cada persona instala en Outlook y se gobierna en
+  `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` §10.2 y el contrato AXIS
+  `efeonce.email-signature`. No la incrustes en templates React Email ni heredes sus piezas en un footer
+  transaccional.
 - Orden visual vigente: separador → wordmark gris de Efeonce → contexto/ayuda → controles permitidos → RRSS
   opcionales → identidad legal/países/dirección → nota o referencia específica.
 - Conserva 12 px entre el wordmark del footer y el primer texto. El motivo/ayuda usa tinta secundaria; links

@@ -160,6 +160,13 @@ Kortex y Verk, fuera por ahora. Operar con
   imagen (mockup, objeto, merch), centrada, sola, con fusión de luminosidad a opacidad 1 y ≥ 4,5:1 medido (sólo pasa
   sobre lechos muy oscuros). Nunca a un costado ni junto al logo. Como pie de deck, informe, papelería o mail sigue
   como antes (horneada donde no hay fusión). Umbral 4,5 vs 3:1: pendiente del operador.
+- **Firma de correo v3.1** (aprobada por el operador, 2026-09-26): versiones A papel y B tarjeta navy, sin decisión
+  pendiente. Una sola línea con esfera; la regla que abre «Partner oficial de» **nunca** lleva esfera; franja de logos
+  oficiales (no insignias de nivel) en un tono y mismo peso óptico, sólo relaciones que permite el
+  [registro de partnerships](../../../docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md), sin Truora; «Quedo
+  atento» y cualquier cierre van en el cuerpo. Contrato AXIS `efeonce.email-signature`; imágenes PNG publicadas
+  (`email-signature/v3.1/`), falta instalar en Outlook. Detalle en la referencia y en el
+  [manual §10.2](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md).
 - **Cómo se ejecuta:** contrato AXIS `efeonce.graphic-line-orbit` 0.3.0 estable (`pnpm creative:orbit:resolve|render`),
   capa `graphic_line` y `brand.signature` en `pnpm creative:layout`, `marcaEnEscena` en `pnpm foto:componer:cta`;
   logos, burbujas y órbitas estáticas sólo desde `@efeoncepro/axis-brand-assets`, nunca copias a mano. Las piezas de
