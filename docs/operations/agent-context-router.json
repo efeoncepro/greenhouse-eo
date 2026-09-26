@@ -535,7 +535,14 @@
         "agente SEO/AEO de campaña",
         "plan SEO/AEO de campaña",
         "seguimiento SEO de campaña",
-        "agentes de rol de Marketing Studio"
+        "agentes de rol de Marketing Studio",
+        "work item de campaña",
+        "asignar trabajo a un agente",
+        "tarjeta de rol de agente",
+        "despachador de agentes",
+        "corrida de agente",
+        "evals de roles de agente",
+        "operación híbrida con agentes"
       ],
       "skills": [
         "efeonce-marketing-studio",
@@ -547,6 +554,8 @@
       "sources": [
         "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md",
         "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md",
+        "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md",
+        "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md",
         "docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md",
         "docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md",
         "docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md",

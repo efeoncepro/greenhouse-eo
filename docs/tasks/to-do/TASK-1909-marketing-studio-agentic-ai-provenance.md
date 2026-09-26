@@ -428,6 +428,14 @@ Capabilities: T0 `.campaign.read` / `studio:read`; T1 `.campaign.write` / `studi
 - IA dentro del producto sobre los mismos commands: puerto único de proveedor de modelo en Studio, línea base de evaluación por tarea (ADR §11.6), costo por organización con techo gobernado. Se crea como task nueva de EPIC-049 cuando el uso por agentes muestre qué tareas valen.
 - Compartir el informe semanal (publicación `T2`).
 
+## Delta 2026-09-26
+
+- ADR de operación híbrida con agentes aceptado: el trabajo de los agentes se organiza en work items (TASK-1913) y sus
+  entregables son los borradores con procedencia de esta task; la corrida (rol, runtime, modelo, costo) la completa el
+  ledger de TASK-1915. Del follow-up «IA dentro del producto», el puerto de proveedor, el techo de costo por
+  organización y la evaluación por tarea quedan cubiertos para agentes por TASK-1915 (puerto y reserva) y TASK-1916
+  (evals y costo normalizado); la IA con botones en la UI sigue como follow-up y debe reutilizarlos, no duplicarlos.
+
 ## Open Questions
 
 - ¿Nexa opera Studio por el gateway MCP o por un canal propio? (ADR §11.5). Por defecto por el gateway, con las mismas tools y niveles.

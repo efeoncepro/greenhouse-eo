@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Fundación en vivo (TASK-1887). Studio listo para agentes (TASK-1890) y federado en Efeonce MCP con lectura en producción (TASK-1891). Originales en GCS + worker de medios (TASK-1893) y observabilidad + restauración probada (TASK-1896) en producción desde 2026-09-26 (release Greenhouse 92002873ced9). ADR de fuente única e ingesta aceptado el 2026-09-26: Studio + GCS son la fuente; OneDrive es taller; un command y tres puertas (CLI, MCP, UI); sin espejo por Microsoft Graph. Nada de ese ADR está en runtime todavía. Siguen TASK-1892, 1894, 1895, 1897, 1898 y 1899 (métricas, command de ingesta y corte, UI, CONNECT, login y puerta MCP de escritura y aprobación). ADR de capa de estrategia aceptado el 2026-09-26 (canales, ICP, plan, SEO/AEO, IA y paridad total con ejecución por agentes); sus tasks TASK-1905…1912 están en to-do.`
+- Status real: `Fundación en vivo (TASK-1887). Studio listo para agentes (TASK-1890) y federado en Efeonce MCP con lectura en producción (TASK-1891). Originales en GCS + worker de medios (TASK-1893) y observabilidad + restauración probada (TASK-1896) en producción desde 2026-09-26 (release Greenhouse 92002873ced9). ADR de fuente única e ingesta aceptado el 2026-09-26: Studio + GCS son la fuente; OneDrive es taller; un command y tres puertas (CLI, MCP, UI); sin espejo por Microsoft Graph. Nada de ese ADR está en runtime todavía. Siguen TASK-1892, 1894, 1895, 1897, 1898 y 1899 (métricas, command de ingesta y corte, UI, CONNECT, login y puerta MCP de escritura y aprobación). ADR de capa de estrategia aceptado el 2026-09-26 (canales, ICP, plan, SEO/AEO, IA y paridad total con ejecución por agentes); sus tasks TASK-1905…1912 están en to-do. ADR de operación híbrida con agentes aceptado el 2026-09-26 (work items, registro de roles, despachador Claude/OpenAI, evals y costo por rol); sus tasks TASK-1913…1916 están en to-do.`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Julio Reyes`
@@ -47,6 +47,9 @@ identidad (Efeonce ID), UI e integraciones (Metricool, plataformas de pauta, Glo
 - `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md` (ADR `Accepted`
   2026-09-26, capa de estrategia: catálogo de canales, ICP en Greenhouse por organización, plan de campaña, SEO/AEO con
   SV360, IA por agentes con procedencia, medición y aprendizajes; niveles de riesgo `T0`/`T1`/`T2` y paridad total)
+- `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md` (ADR `Accepted`
+  2026-09-26, operación híbrida con agentes: work items, registro de roles de agente, identidad delegada y de servicio,
+  tres modos con un contrato de corrida, despachador con adaptadores Claude/OpenAI, evals, costo y métricas por rol)
 - Skill `.claude/skills/efeonce-campaign-planning/SKILL.md` (planificación de campañas con IA sobre Studio; consumidora de
   las tools de TASK-1905…1911) y skills de rol `efeonce-agent-seo-aeo` y `efeonce-agent-media-planner`
 - `docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md` (ADR, delta 2026-09-25)
@@ -78,6 +81,8 @@ Orden recomendado (actualizado 2026-09-26): 1890 → 1891 · 1893 en paralelo ·
 
 Capa de estrategia (ADR 2026-09-26), después de 1894 y 1899: 1906 (Greenhouse, puede empezar ya) · 1905 → 1907 → 1908 · 1909 · 1910 (en paralelo; 1908 y 1910 además necesitan 1892) → 1911 → 1912 (UI, sección por sección cuando su backend está en staging, tras 1895). 1898 sigue siendo la última del programa.
 
+Operación híbrida con agentes (ADR 2026-09-26), después de 1894 y 1899: 1913 (Slices 1–3, work items con personas) → 1914 (registro de roles y tarjetas) → 1913 Slice 4 (asignación a roles) → 1915 (ledger y modo interactivo primero; despachador y adaptadores después) → 1916 (evals, costo y métricas; compuerta de autonomía). El modo delegado en segundo plano de 1915 queda bloqueado por EPIC-044 (delegación por corrida con claim `act`, sin unidad dueña todavía). La UI de work items, roles, corridas y métricas es follow-up consumidor de 1895/1912.
+
 **Regla de paridad del programa (operador, 2026-09-25):** todo lo que se puede hacer en la UI se puede hacer por la API y, por consiguiente, por MCP — incluidas las aprobaciones. Las aprobaciones las decide una persona; un agente puede ejecutarlas con la identidad delegada de esa persona y su confirmación explícita. Ninguna capacidad nace sólo en la UI.
 
 - `TASK-1887` — **Complete.** Fundación: repo, bases y roles, modelo de dominio, API v1, import del catálogo, renditions privadas, UI aprobada (claro/oscuro), Vercel + dominio (modo `open`). En vivo en `https://studio.efeonce.org`.
@@ -99,6 +104,10 @@ Capa de estrategia (ADR 2026-09-26), después de 1894 y 1899: 1906 (Greenhouse, 
 - `TASK-1910` — To-do. Medición real: cuentas Meta/LinkedIn de sólo lectura conectadas por `T2`, readback como observaciones (líneas `actual` sólo de ahí), atribución bow-tie por lane de Greenhouse, chequeo de destino, progreso de KPIs y mapeo de métricas editable; capability `marketing_studio.integration.manage`. Sólo lectura sobre plataformas. Depende de 1892, 1905, 1907 y 1899.
 - `TASK-1911` — To-do. Experimentos desde hipótesis del plan aprobado, biblioteca de aprendizajes append-only con evidencia y validación `T2`, calendario unificado. Depende de 1907, 1910 y 1899.
 - `TASK-1912` — To-do. UI del espacio de planificación (pestaña Estrategia, aprobación en dos pasos, hueco, procedencia, aprendizajes y programas) sobre la dirección `v4 · Estrategia` a aprobar; `ui-ux`, flow, UI ready no. Depende de 1895 y 1907 (+ backends por sección).
+- `TASK-1913` — To-do. Work items y asignaciones: entidad por campaña con catálogo de tipos versionado, máquina de estados en el command, responsable persona o rol de agente con versión, insumos por referencia, entregable con procedencia, revisión y traspaso como work item nuevo; asignar a un rol es `T1` dentro del techo y `T2` sobre él; `assignmentId` como clave de la corrida lógica. Depende de 1894 y 1899 (asignación a roles: 1914).
+- `TASK-1914` — To-do. Registro de roles de agente: tarjetas versionadas sin sintaxis de proveedor, compilador portable con `cardDigest`, lista blanca de tools aplicada en Studio y en el gateway, modos, kill switch y política por organización; cinco tarjetas iniciales y tres skills de rol nuevas (copywriter, QA creativo y de marca, analista de desempeño); capability `marketing_studio.agent_role.manage`. Depende de 1894, 1899 y 1913.
+- `TASK-1915` — To-do. Despachador en Cloud Run con contrato único de corrida, ledger con idempotencia por corrida lógica y lectura antes de reintentar, reserva de costo, adaptadores `claude-agent-sdk`, `claude-managed-agents`, `openai-agents-sdk` y `openai-responses` detrás de flags, modo interactivo registrado, programas `T2` e identidad de servicio `T0`/`T1`; confirmación `T2` sólo desde token sin `act`. Depende de 1913, 1914 y 1899; segundo plano delegado bloqueado por EPIC-044.
+- `TASK-1916` — To-do. Evals por rol × runtime × modelo con rúbrica objetiva + humana (sin autocalificación), compuerta de autonomía, catálogo de precios y costo normalizado, métricas por rol y señales, runtime por defecto por rol decidido como `T2`; capability `marketing_studio.agent_eval.grade`. Depende de 1914, 1913 y 1915.
 
 ## Existing Related Work
 
@@ -124,6 +133,10 @@ Capa de estrategia (ADR 2026-09-26), después de 1894 y 1899: 1906 (Greenhouse, 
 - [ ] Todo contenido redactado por IA en Studio tiene procedencia y aceptación de una persona (TASK-1909).
 - [ ] Las líneas `actual` nacen sólo de readback observado de Meta/LinkedIn y cada KPI del plan aprobado muestra su progreso o «sin dato» (TASK-1910).
 - [ ] Al menos un aprendizaje validado con evidencia alimenta el contexto de IA de una campaña siguiente (TASK-1911).
+- [ ] El trabajo de campaña se asigna, entrega, revisa y traspasa como work items en Studio, a personas o a roles de agente, con la persona como actor auditado (TASK-1913).
+- [ ] Los cinco roles iniciales tienen tarjeta publicada y su lista blanca se aplica en Studio y en el gateway (TASK-1914).
+- [ ] Toda corrida de agente, interactiva o en segundo plano, queda en el ledger de Studio con costo o «sin dato»; ningún estado duradero vive en el proveedor (TASK-1915).
+- [ ] Ningún rol trabaja en segundo plano sin evaluación aprobada para su combinación rol × runtime × modelo, y sus métricas se leen por API y MCP (TASK-1916).
 
 ## Non-goals
 

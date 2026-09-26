@@ -388,6 +388,13 @@ no se duplica aquí. Reglas de ejecución:
 - UI de catálogo de canales, reglas de voz, conexiones publicitarias y modelo de cliente (Greenhouse).
 - Vista comparada de planes dentro de un programa.
 
+## Delta 2026-09-26
+
+- ADR de operación híbrida con agentes aceptado (TASK-1913…1916, sólo backend). Sus superficies visibles quedan como
+  follow-up consumidor de esta task o de TASK-1895, sin wireframe todavía: work items por campaña y bandeja «mis
+  asignaciones» con revisión (TASK-1913), roles de agente con versiones, modos y kill switch (TASK-1914), corridas y
+  programas con estado, costo y causa de fallo (TASK-1915), y panel de evaluaciones y métricas por rol (TASK-1916).
+
 ## Open Questions
 
 - ¿«Estrategia» debe ser la pestaña por defecto de campañas sin piezas todavía? Por defecto no (Piezas sigue siendo la predeterminada); confirmar con el operador al aprobar `v4 · Estrategia`.
