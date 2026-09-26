@@ -45,6 +45,14 @@ merch, oficina, eventos, redes, decks, correo y producto (Efeonce Insights).
 6. **La línea es de Efeonce, no de Greenhouse.** Greenhouse es el plano de control que la documenta y la consume;
    no la adopta como su identidad de producto ni la aplica al trabajo de clientes.
 
+### Delta 2026-09-26 — Efeonce firma todo; los productos son contexto
+
+Decisión del operador: toda pieza sale con la firma de Efeonce, cualquiera sea la línea de servicio (creativa, web,
+RevOps, medios). La marca que se posiciona es Efeonce. Globe (suite de estudio creativo, en desarrollo), Wave y Reach
+aparecen como contexto: productos de esos servicios, subordinados a Efeonce, que nunca firman ni reemplazan su logo.
+El lockup «Producto by efeonce» queda reservado a la superficie del propio producto. Kortex y Verk quedan fuera de la
+línea gráfica por ahora. Pendiente: si los acentos de producto se usan en piezas de Efeonce (recomendación: no). Manual §7 y §8.1.
+
 ## Alternativas descartadas
 
 | Alternativa | Por qué no |

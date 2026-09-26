@@ -138,8 +138,9 @@ decisiones del operador, ejecución y evidencia; no tratar una aprobación esté
 ### Línea gráfica «La órbita» (canónica 2026-09-25)
 
 La forma propia de Efeonce: anillo fino + arco con esfera + halo, nacida del isotipo. Tres usos: **rodea** (palabra,
-lente, objeto), **mide** (el arco es avance real) y **enfoca** (la lente y el foco «Te hacemos visible»). La familia
-(Efeonce, Globe, Wave, Reach) comparte la órbita y cambia el acento. Operar con
+lente, objeto), **mide** (el arco es avance real) y **enfoca** (la lente y el foco «Te hacemos visible»). **Efeonce firma
+todo:** Globe (suite de estudio creativo, en desarrollo), Wave y Reach aparecen como contexto, nunca como firma;
+Kortex y Verk, fuera por ahora. Operar con
 [la referencia](references/graphic-line-orbit.md); contenido en el
 [manual V1](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) y decisión en el
 [ADR](../../../docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md).

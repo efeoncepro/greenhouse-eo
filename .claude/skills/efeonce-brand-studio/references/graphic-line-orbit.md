@@ -22,8 +22,11 @@ Tres usos, un sistema:
 
 Tres estados de la esfera: punto final (cierra la palabra respuesta), órbita y foco (§1.1).
 
-La familia comparte la forma y cambia el acento. Palabra final del eslogan «Empower your …»: **Growth** (Efeonce),
-**Brand** (Globe), **Engine** (Wave), **Voice** (Reach).
+**Efeonce firma todo** (operador, 2026-09-26): toda pieza, de cualquier línea de servicio, sale con la firma de
+Efeonce. Globe (suite de estudio creativo, en desarrollo), Wave y Reach aparecen como **contexto** —nombre, interfaz
+o isotipo pequeño dentro de su superficie—, nunca como firma; el lockup «by efeonce» sólo vive en la superficie del
+producto. Kortex y Verk, fuera por ahora. Los acentos y palabras de eslogan de producto (**Brand**, **Engine**,
+**Voice**) están en los tokens `family`; su uso en piezas de Efeonce está pendiente del operador (recomendación: no).
 
 ## Cuándo aplica y cuándo no
 

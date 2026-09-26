@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita · V1
 
 > **Tipo de documento:** Manual de marca (contrato operativo de diseño)
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
-> **Última actualización:** 2026-09-26 por Claude (firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, AXIS 0.2.7, 4.9 · Oficina en foto)
+> **Última actualización:** 2026-09-26 por Claude (Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, AXIS 0.2.7, 4.9 · Oficina en foto)
 > **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
 > **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (40 láminas, siete capítulos)
 > **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Desde AXIS 0.2.7 los archivos oficiales (logo e isotipo de las cuatro marcas y las tres burbujas URL) viven en el paquete `@efeoncepro/axis-brand-assets` y el contrato de composición es `efeonce.graphic-line-orbit` 0.2.0 (§13). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
@@ -198,13 +198,27 @@ producción (`@efeoncepro/axis-ui-contracts`), nunca coordenadas decorativas.
 
 ## 7. La familia
 
-Efeonce es la marca principal; Globe (Creative Studio), Wave (búsqueda, web y medición) y Reach (medios y
-distribución) son marcas de producto. **Un lenguaje, cuatro acentos.**
+**Efeonce firma todo** (decisión del operador, 2026-09-26). Toda pieza sale con la firma de Efeonce, sea de servicios
+creativos, web, RevOps, medios o cualquier otra línea: la marca que se posiciona es Efeonce. Globe, Wave y Reach
+aparecen como **contexto**: son los productos con que se prestan esos servicios, subordinados a Efeonce. Nunca firman
+una pieza ni reemplazan el logo de Efeonce.
+
+| Producto | Qué es | Estado |
+|---|---|---|
+| **Globe** | la suite de estudio creativo de Efeonce | en desarrollo |
+| **Wave** | búsqueda, web y medición | vigente |
+| **Reach** | medios y distribución | vigente |
+| Kortex · Verk | — | fuera de la línea gráfica por ahora |
 
 - **Igual en toda la familia:** la esfera y el anillo (forma, 0,20 em, comportamiento) · el oficio a la vista y
   los cursores AXIS · la voz · Bricolage + Poppins · el papel como fondo claro.
-- **Cambia por marca:** el color de la esfera y del anillo · el fondo oscuro (navy para Efeonce, tinta `#091951`
-  para productos) · la firma (el logo de cada producto con «by efeonce»).
+- **Cómo aparece un producto como contexto:** su nombre dentro de la pieza (antetítulo o etiqueta), su interfaz en un
+  mockup o su isotipo pequeño dentro de su propia superficie. El lockup «Producto by efeonce» vive sólo en superficies
+  del propio producto (aplicación, ingreso, página del producto), nunca como firma de una pieza.
+- **Los acentos de producto** (esfera, anillo y fondo `#091951` de Globe, Wave y Reach, y su palabra de eslogan) viven
+  en los tokens `family` de AXIS. Si se usan también en piezas de Efeonce o sólo dentro de la superficie del producto
+  está **pendiente del operador**; recomendación: sólo dentro del producto, y las piezas con la paleta y el eslogan de
+  Efeonce.
 - **Mapa de portafolio:** el arco y el centro son de Efeonce; los productos van como satélites con su isotipo.
 - **Hilo de familia (decidido):** la órbita misma, más la palabra final del eslogan. Descartado: el anillo teal
   en productos.
@@ -220,8 +234,8 @@ distribución) son marcas de producto. **Un lenguaje, cuatro acentos.**
   URL sólo lo reemplaza cuando el logo ya está dentro de la imagen (§8.5).
 - **Isotipo:** avatar, favicon, ícono de app, pin, sticker, credencial, lomo de cuaderno, marca de agua en video.
 - **Nunca los dos en la misma vista.**
-- Productos: su isotipo firma dentro de su propio contexto; Efeonce aparece en el logo completo («by efeonce») o
-  en la pieza madre.
+- Productos: **nunca firman una pieza**; la firma es siempre Efeonce (§7). Su isotipo o su lockup «by efeonce» sólo
+  dentro de su propia superficie (aplicación, ingreso, página del producto).
 
 ### 8.2 Logo — uso correcto
 
