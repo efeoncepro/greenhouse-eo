@@ -21,7 +21,10 @@ const REPO = path.resolve(HERE, '../../..')
 const args = process.argv.slice(2)
 const opt = (name, fallback) => (args.includes(name) ? args[args.indexOf(name) + 1] : fallback)
 
-export const DURATION = { reveal: 3600, open: 2400, sting: 1600 }
+// Tiempos, desenfoque y jerarquía del lenguaje de movimiento: tokens `efeonceGraphicLine.motion` de AXIS (V1.1 aprobada).
+const MOTION = GL.motion
+
+export const DURATION = Object.fromEntries(Object.entries(MOTION.pieces).map(([k, v]) => [k, v.durationMs]))
 export const FORMATS = { '16x9': [1920, 1080], '16x9-4k': [3840, 2160], '1x1': [1080, 1080], '4x5': [1080, 1350], '9x16': [1080, 1920] }
 
 // Paletas por fondo. Oscuro: logo negativo; claro: logo positivo y acento «sobre claro». Todo desde tokens.
@@ -55,6 +58,7 @@ export async function openScene(browser, { format, scheme, ss }) {
     isotypeSvg: readFileSync(brandAssetUrl('efeonce-isotype-negative'), 'utf8'),
     logoSvg: readFileSync(brandAssetUrl('efeonce-logo-negative'), 'utf8'),
     tokens: { orbit: GL.orbit },
+    motion: MOTION,
     colors: SCHEMES[scheme],
     slogan: { parts: [{ text: 'Empower', weight: 800, italic: true }, { text: 'your', weight: 800, italic: false }, { text: member.sloganWord, weight: 900, italic: true, accent: true }] }
   }
@@ -68,9 +72,9 @@ export async function openScene(browser, { format, scheme, ss }) {
 }
 
 // Tramos rápidos: ahí cada cuadro promedia subcuadros (obturador de 180°) para un desenfoque de movimiento real.
-export const BLUR = { reveal: [[1250, 1900], [2050, 2750]], open: [[350, 950], [1150, 1550]], sting: [[100, 600], [720, 1250]] }
+export const BLUR = Object.fromEntries(Object.entries(MOTION.pieces).map(([k, v]) => [k, v.blurMs]))
 // Subcuadros por cuadro en los tramos rápidos (5 en masters; --sub 3 para vistas previas).
-const SUB = Number(opt('--sub', 5))
+const SUB = Number(opt('--sub', MOTION.motionBlur.subframes))
 
 export async function shootBlurred(scene, t, anim, pass, ss, fps) {
   if (!BLUR[anim].some(([a, b]) => t > a && t < b)) return shoot(scene, t, anim, pass, ss)

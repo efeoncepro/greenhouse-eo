@@ -9,13 +9,16 @@
 import { writeFileSync } from 'node:fs'
 import path from 'node:path'
 
+import { efeonceGraphicLine as GL } from '@efeoncepro/axis-tokens'
+
 const args = process.argv.slice(2)
 const opt = (n, f) => (args.includes(n) ? args[args.indexOf(n) + 1] : f)
 const anim = opt('--anim', 'reveal')
 const out = path.resolve(opt('--out', `${anim}.wav`))
 
-const SR = 48000
-const DUR = { reveal: 3.6, open: 2.4, sting: 1.6 }[anim]
+// Frecuencia, duración y pico: tokens `efeonceGraphicLine.motion` (la mezcla sigue en este archivo).
+const SR = GL.motion.sound.sampleRateHz
+const DUR = GL.motion.pieces[anim].durationMs / 1000
 const N = Math.round(SR * (DUR + 0.6)) // cola para que el acorde final decaiga
 const L = new Float64Array(N), R = new Float64Array(N)
 
@@ -135,7 +138,7 @@ if (anim === 'reveal') {
 let peak = 0
 
 for (let i = 0; i < N; i++) peak = Math.max(peak, Math.abs(L[i]), Math.abs(R[i]))
-const g = peak > 0 ? db(-1) / peak : 1
+const g = peak > 0 ? db(GL.motion.sound.peakDbfs) / peak : 1
 const buf = Buffer.alloc(44 + N * 6)
 
 buf.write('RIFF', 0)
