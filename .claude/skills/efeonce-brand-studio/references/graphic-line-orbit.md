@@ -88,6 +88,10 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
   **Truora no va en la firma** (operador).
 - **No va en la firma:** «Quedo atento», «Saludos» (van en el cuerpo). La firma de respuesta es una línea de texto.
 - Todo el texto que no es el nombre va en **Poppins**; Outlook y Gmail muestran Arial y la firma se revisa así.
+- **Firma de equipo** (buzón de un área, aprobada 2026-09-26, `variant: 'team'`): sin foto; la órbita del retrato
+  rodea el ícono del área sobre un disco. Talent (`users-group`, talent@), Finance (`coins`, finance@) y Commercial
+  (`briefcase`, sales@efeoncepro.com). Sólo el correo del área, sin teléfono ni LinkedIn personal. Áreas en
+  `efeonceGraphicLine.emailSignature.team` (AXIS 0.3.4); un área nueva nace ahí.
 
 ## Reglas duras (las más caras de romper)
 

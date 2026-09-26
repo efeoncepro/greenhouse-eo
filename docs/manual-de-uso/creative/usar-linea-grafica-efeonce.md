@@ -269,6 +269,10 @@ que las hace cumplir es `efeonce.email-signature` de AXIS.
    `outlook-respuesta.html` y elígela para respuestas y reenvíos. Envíate un correo de prueba y revísalo en escritorio
    y en el teléfono.
 
+**Firma de un buzón de área (equipo).** Talent, Finance y Commercial tienen firma propia, sin foto: la órbita rodea el
+ícono del área y sólo lleva su correo. Se genera con `AREA=talent` (o `finance`, `commercial`) delante del mismo
+comando, y se instala igual, en la cuenta del buzón. Un área nueva se pide primero en AXIS (tokens de la firma).
+
 **Qué no hacer con la firma:** agregar «Quedo atento.» o «Saludos» (van en el cuerpo del correo) · poner una
 segunda esfera en la línea de los partners · mostrar logos de partners a color o en insignias de nivel sin haberlas
 confirmado en el portal del programa · escribir la URL como texto en vez de usar la burbuja.

@@ -169,6 +169,7 @@ esfera** que abre la zona «Partner oficial de», con los logos de los partners 
 | Sólo aparecen partners que el registro permite declarar | la firma no puede afirmar una relación que no existe |
 | Sin «Quedo atento» ni «Saludos» | eso va en el cuerpo del correo |
 | Para responder y reenviar, una línea de texto | no se repiten imágenes en cada respuesta |
+| Los buzones de área (Talent, Finance, Commercial) firman sin foto: la órbita rodea el ícono del área | un equipo no es una persona; el ícono dice qué área responde |
 
 > Detalle técnico: [manual §10.2](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#102-firma-de-mail) ·
 > contrato `efeonce.email-signature` y tokens `efeonceGraphicLine.emailSignature` en AXIS.

@@ -159,8 +159,9 @@ Efeonce's own-brand graphic line (orbit: thin ring, arc with sphere, halo; lens 
 2026-09-25. Greenhouse is the control plane: the [ADR](../../../docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 and the [manual](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) live there; the
 operating summary is [`graphic-line-orbit.md`](../efeonce-brand-studio/references/graphic-line-orbit.md). Published
-set (versions are independent per package): `axis-tokens` `0.3.3` (`0.3.2` shipped `emailSignature`, `0.3.3` adds
-`motion`); `axis-ui-contracts` `0.3.2` (ships `efeonce.email-signature`); `axis-ui-registry` and `axis-brand-assets`
+set (versions are independent per package): `axis-tokens` `0.3.4` (`0.3.2` shipped `emailSignature`, `0.3.3` adds
+`motion`, `0.3.4` the team signature); `axis-ui-contracts` `0.3.4` (`0.3.2` ships `efeonce.email-signature`, `0.3.4` its
+`team` variant); `axis-ui-registry` and `axis-brand-assets`
 `0.3.0`; `axis-graphic-line` `0.3.1`. AXIS holds:
 
 - **Tokens:** `efeonceGraphicLine` in `packages/tokens/src/tokens.ts` (`@efeoncepro/axis-tokens`, `status:
@@ -185,7 +186,9 @@ set (versions are independent per package): `axis-tokens` `0.3.3` (`0.3.2` shipp
   `axis.email-signature-composition.v1`. Zones in a fixed order; the line that ends in the sphere appears **once**;
   the partner endorsement is its own zone opened by a thin `section-rule` **without a sphere**, and only shows
   partners whose registry status allows the claim (`active`, `accepted`, `declared`). A closing phrase or a second
-  sphere is an error; `reply` is one line of live text. In AXIS `pnpm signature:resolve` (guide
+  sphere is an error; `reply` is one line of live text. Variant `team` (since 0.3.4): a team mailbox signs with
+  `area-mark` (the portrait orbit around the area icon) instead of `portrait`; areas live in
+  `efeonceGraphicLine.emailSignature.team.areas`. In AXIS `pnpm signature:resolve` (guide
   `docs/agent-composition/email-signature.md`, Lab board 4.5). Greenhouse manual §10.2.
 - **Package `@efeoncepro/axis-graphic-line`** (declared exception to "values, not painted components", only for this
   brand form): `orbitSvg`, `measureSvg`, `composeGraphicLine`/`paintGraphicLine`, `runAdapterChecks`, recipes

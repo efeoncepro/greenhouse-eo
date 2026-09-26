@@ -494,6 +494,23 @@ HTML listos para pegar: `outlook-a.html`, `outlook-b.html` y `outlook-respuesta.
 `@efeoncepro/axis-tokens` y `@efeoncepro/axis-ui-contracts` 0.3.2. **Pendiente:** instalar la firma en Outlook (cada
 persona, en su cuenta).
 
+**Firma de equipo** (aprobada el 2026-09-26, `variant: 'team'`): para el buzón de un área. **No lleva foto:** la misma
+órbita del retrato rodea el **ícono del área** (Tabler outline) sobre un disco; el ícono va en el color del nombre y la
+esfera en el acento. El nombre es el área con su punto y la bajada su descripción. Lleva **sólo el correo del área**:
+sin teléfono ni LinkedIn personal. Todo lo demás es igual a la firma personal.
+
+| Área | Bajada | Ícono | Buzón |
+|---|---|---|---|
+| Talent | Personas y talento · Efeonce | `users-group` | `talent@efeoncepro.com` |
+| Finance | Finanzas y facturación · Efeonce | `coins` | `finance@efeoncepro.com` |
+| Commercial | Comercial y alianzas · Efeonce | `briefcase` | `sales@efeoncepro.com` |
+
+Generador: `AREA=<talent|finance|commercial> node build4.mjs` (con `HOST_BASE` escribe `out/equipo/<área>/hosted/` y
+sus `outlook-*.html`); el ícono con órbita se publica en `areas/<área>-<dark|light>.png`. En AXIS: tokens
+`efeonceGraphicLine.emailSignature.team` y contrato con la variante `team`, desde `axis-tokens` y `axis-ui-contracts`
+0.3.4. Un área nueva se agrega primero en esos tokens. Pendiente: confirmar si `people@efeoncepro.com` es un área
+aparte y la URL de LinkedIn de la empresa (hoy la firma de equipo no lleva LinkedIn).
+
 **Proporciones del retrato (lámina 4.5, medidas del original, caja de 208 px):** anillo de radio 96, foto recortada en
 círculo de radio 78, arco de 200° a 250° con trazo 4 y la esfera de radio 7 en su punta; anillo de 2 px en navy al
 22 % sobre claro y en halo al 40 % sobre oscuro. Son el token `efeonceGraphicLine.portrait` (fracciones del lado de la

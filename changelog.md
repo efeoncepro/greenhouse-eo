@@ -25,8 +25,9 @@ abren su propia zona con una regla fina sin esfera, en logos oficiales de un sol
 «Quedo atento» y todo el texto que no es el nombre en Poppins. AXIS `c7717ef`: tokens
 `efeonceGraphicLine.emailSignature`, contrato `efeonce.email-signature` 0.3.0 (`stable`) con `pnpm signature:resolve`,
 guía para agentes y lámina 4.5 del Lab. Greenhouse: manual §10.2, ADR, documentación funcional, manual de uso y las
-skills `efeonce-brand-studio` y `axis-design-system`. Pendiente: subir las imágenes a una URL pública, instalar en
-Outlook y publicar los paquetes AXIS con el contrato.
+skills `efeonce-brand-studio` y `axis-design-system`. Después: paquetes AXIS publicados (0.3.2 y 0.3.4), imágenes en
+el bucket público `email-signature/v3.1/`, HTML listo para Outlook y **firma de equipo** aprobada (Talent, Finance,
+Commercial: sin foto, la órbita rodea el ícono del área; variante `team`). Pendiente: instalar en Outlook.
 
 ## 2026-09-26 — Línea gráfica «La órbita»: AXIS 0.3, recetas fieles al canvas y motion V1.1
 
