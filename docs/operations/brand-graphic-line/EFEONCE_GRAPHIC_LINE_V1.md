@@ -211,8 +211,12 @@ su eslogan y su producto:
 | **Servicios creativos** | Empower your **Brand** | **Globe**, la suite de estudio creativo | Globe en desarrollo |
 | **Web, infraestructura, SEO y medición** (Digital Services & Engineering) | Empower your **Engine** | **Wave** | vigente |
 | **Medios y distribución** | Empower your **Voice** | **Reach** | inferido de «y así sucesivamente»; confirmar |
-| **Efeonce** (marca madre) | Empower your **Growth** | — | vigente |
-| RevOps y CRM · Growth Strategy & Measurement | pendiente del operador | Kortex y Verk fuera por ahora | pendiente |
+| **Efeonce** (marca madre) · Growth Strategy & Measurement | Empower your **Growth** | **Greenhouse**, el producto de Efeonce que controla todo | Greenhouse vigente; la línea Growth Strategy, inferida (confirmar) |
+| RevOps y CRM | pendiente del operador | Kortex fuera por ahora | pendiente |
+
+**Greenhouse** es el producto de Efeonce y la plataforma que controla y orquesta todas las líneas (operador,
+2026-09-26). Aparece como contexto igual que los demás productos —su nombre o su interfaz en un mockup—; su propia
+interfaz sigue gobernada por `DESIGN.md` y AXIS de producto, nunca por esta línea gráfica.
 
 Una pieza de servicios creativos firma con el logo de Efeonce y cierra con «Empower your Brand»; Globe aparece como el
 producto con que se hace. Los pesos del eslogan no cambian (`src/config/efeonce-brand.ts`: *Empower* ExtraBold itálica,

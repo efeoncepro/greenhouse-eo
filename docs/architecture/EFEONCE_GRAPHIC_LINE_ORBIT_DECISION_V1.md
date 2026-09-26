@@ -53,7 +53,8 @@ aparecen como contexto: productos de esos servicios, subordinados a Efeonce, que
 El lockup «Producto by efeonce» queda reservado a la superficie del propio producto. Kortex y Verk quedan fuera de la
 línea gráfica por ahora. La palabra del eslogan pertenece a la **línea de servicio**: servicios creativos → «Empower your
 Brand» (Globe); web, infraestructura, SEO y medición → «Empower your Engine» (Wave); medios y distribución → «Empower
-your Voice» (Reach, por confirmar); Efeonce → «Growth». Pendiente: palabra de RevOps y CRM y de Growth Strategy, y si los
+your Voice» (Reach, por confirmar); Efeonce → «Growth», con **Greenhouse** como su producto, la plataforma que controla
+todas las líneas (su interfaz sigue con `DESIGN.md`). Pendiente: palabra de RevOps y CRM y de Growth Strategy, y si los
 acentos de producto se usan en piezas de Efeonce (recomendación: no). Manual §7 y §8.1.
 
 ## Alternativas descartadas
