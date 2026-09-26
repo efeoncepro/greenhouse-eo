@@ -1,6 +1,7 @@
 # Movimiento de la órbita
 
-> Verificado contra: axis-design-system@e26bd85 y greenhouse-eo@051660d73 — 2026-09-26.
+> Verificado contra: axis-design-system@e26bd85 y greenhouse-eo@051660d73 — 2026-09-26 (decisiones del operador D7 y D8
+> del 2026-09-26 registradas).
 > Norma: `docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`.
 > Producción: `docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md` (v1.3).
 > Valores: tokens `efeonceGraphicLine.motion` en `@efeoncepro/axis-tokens` ≥ 0.3.3 (la 0.3.2 salió sin `motion`).
@@ -23,6 +24,8 @@ nunca para clientes ni para la interfaz de Greenhouse.
    defecto 1,2); pulso de impacto con eco al 55 % (`motion.pulse`); el isotipo crece 4,5 % con el golpe
    (`motion.impactScale`); onda de acento 1,02 → 1,5 al encajar (`motion.wave`); resorte casi crítico, ≤ 1,5 %
    (`motion.settle`).
+   El eco del pulso de impacto es el único uso del **anillo propio de la esfera** (`sphereRing`) en movimiento: está
+   reservado a «en vivo» (D8, 2026-09-26). No se usa como adorno en el cuadro final.
 3. **Curvas por papel** (`motion.curves`): llega = `emphasized`; se transforma = `standard`; se va =
    `emphasizedAccelerate` (valores en `axisMotion.ease`).
 4. **La velocidad no salta en los relevos**; zoom de cámara en escala logarítmica (`motion.cameraZoom: 'log'`).
@@ -33,6 +36,10 @@ nunca para clientes ni para la interfaz de Greenhouse.
    héroe 78/80/84 % del lado corto (16:9 / cuadrado / vertical), logo final 50/56/66 %, eslogan 64 % del logo.
 7. **Sonido en el golpe:** sintetizado y determinístico, un golpe por impacto, paso de la nave paneado, acorde
    final con fundido de 0,45 s; pico −1 dBFS, ~−17,5 LUFS, WAV 48 kHz / 24 bits (`motion.sound`).
+
+**Halo sobre fondo claro:** a media intensidad. El render del motion lee el mismo token que el contrato,
+`efeonceGraphicLine.orbit.haloOnLightScale` (0,5; axis-tokens 0.3.5; D7). Nunca un factor escrito en el
+script.
 
 ## Entregables y dónde están
 

@@ -1,7 +1,7 @@
 # Usar la línea gráfica de Efeonce — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-25 por Claude
 > **Ultima actualizacion:** 2026-09-26 por Claude
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
@@ -57,7 +57,9 @@ la órbita no va por defecto y no reemplaza la composición de la foto. Si la us
 | Papel o blanco (Efeonce) | teal oscuro, **sólo como gráfico**; el texto va en navy |
 | Producto (Globe, Wave o Reach) | el acento de ese producto; nunca el teal |
 
-Un acento por pieza. Los valores exactos están en los tokens y en el §2 del manual técnico.
+Un acento por pieza. **El acento sirve para gráficos y para texto de 24 px o más; nunca para texto más chico**, que va
+en navy sobre claro y en blanco sobre oscuro (decisión del operador, 2026-09-26). Sobre papel, el halo va a la mitad.
+Los valores exactos están en los tokens y en el §2 del manual técnico.
 
 ### Paso 3 · Ubica el texto y la órbita
 
@@ -72,9 +74,14 @@ Un acento por pieza. Los valores exactos están en los tokens y en el §2 del ma
 
 - Usa una toma del banco o produce una nueva con la cadena del lenguaje fotográfico: arma la ficha y corre
   `pnpm foto:generar <ficha.json>` (o `pnpm foto:prompt` + `pnpm foto:validar`). Nunca armes el prompt a mano.
-- La toma debe tener el sujeto dentro de un círculo del 55 % del lado corto, **sin emblemas legibles** (el logo lo pone
-  la pieza, no la ropa) y en registro documental: nadie mira a la cámara.
-- No le pongas velo oscuro encima: fuera del círculo la foto va en navy apagado, dentro va a todo color.
+- La toma debe tener el sujeto dentro de un círculo del 55 % del **círculo visible de la lente** en el formato de la
+  pieza (no del lado corto de la foto), **sin emblemas legibles** (el logo lo pone la pieza, no la ropa) y en registro
+  documental: nadie mira a la cámara. Si el sujeto no cabe, rehaz la toma; no cambies la pieza.
+- No le pongas velo oscuro encima: fuera del círculo la foto va en navy apagado, dentro va a todo color. Ese exterior
+  apagado es el espacio del texto de la lente; en una pieza **sin** lente sigue prohibido oscurecer la foto.
+- Pide el lecho igual, aunque la pieza firme sobre la foto apagada. Si la escena ya trae un anillo dibujado (en una
+  pizarra, por ejemplo), cuenta como órbita: elige otra foto. Con lente manda el encuadre del círculo; las palancas que
+  llenan el cuadro (`variantes`, `manos`) quedan para piezas de sólo foto. (Decisiones del operador, 2026-09-26.)
 - Respeta la composición de la foto: la órbita nunca cruza el sujeto, el espacio reservado para el texto, el lecho
   (la zona oscura donde se apoya el texto) ni la firma.
 
@@ -97,14 +104,16 @@ Un acento por pieza. Los valores exactos están en los tokens y en el §2 del ma
    oscuro; sobre fondos medios o claros no llega (1,6–3,1:1). Si no llega, la pieza no pasa.
 4. Fuera de las piezas gráficas: logo completo si cabe a 96 px o más; si no, el isotipo. **Nunca los dos en la misma
    vista.**
-5. La órbita **nunca rodea el logo**. En objetos, el logo va solo en el dorso.
+5. La órbita **nunca rodea el logo**, salvo en los tres cierres de marca: el final del deck, el final de video y el
+   muro de recepción, con el anillo fuera del área de resguardo del logo (decisión del operador, 2026-09-26). En
+   objetos, en el banner de LinkedIn y en el reverso de la tarjeta, el logo va solo.
 
 - Los pies con la burbuja (deck, informe, papelería, stand, firma de mail) siguen como siempre.
 - Si aparece `efeoncepro.com`, usa la **burbuja oficial**, no la dirección escrita. En web y en herramientas que
   soportan fusión, el SVG gris con fusión de luminosidad; en PDF, correo, visores o referencias para IA, la variante
   horneada (`url-lum-light.svg` sobre blanco o papel, `url-lum-dark.svg` sobre navy).
 - El eslogan «Empower your Growth» sólo va en cierres (último slide, contratapa, firma, final de video) y desde el
-  archivo oficial.
+  archivo oficial. En el cierre del deck, la palabra final va en el acento de la línea, no en blanco.
 
 ### Paso 7 · Revisa antes de entregar
 
@@ -271,7 +280,11 @@ que las hace cumplir es `efeonce.email-signature` de AXIS.
 
 **Firma de un buzón de área (equipo).** Talent, Finance y Commercial tienen firma propia, sin foto: la órbita rodea el
 ícono del área y sólo lleva su correo. Se genera con `AREA=talent` (o `finance`, `commercial`) delante del mismo
-comando, y se instala igual, en la cuenta del buzón. Un área nueva se pide primero en AXIS (tokens de la firma).
+comando, y se instala igual, en la cuenta del buzón. `people@efeoncepro.com` usa la firma de **Talent** (no es un área
+aparte). Un área nueva se pide primero en AXIS (tokens de la firma).
+
+**Quién la instala:** cada persona, en su propia cuenta de Outlook, desde el HTML generado (decisión del operador,
+2026-09-26). La firma de equipo todavía no lleva LinkedIn: falta que el operador confirme la URL de la empresa.
 
 **Qué no hacer con la firma:** agregar «Quedo atento.» o «Saludos» (van en el cuerpo del correo) · poner una
 segunda esfera en la línea de los partners · mostrar logos de partners a color o en insignias de nivel sin haberlas
@@ -307,7 +320,7 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 | **Canónica (2026-09-25)** | la órbita es la forma oficial de la marca propia; cuando una pieza la usa, toma sus valores de los tokens de AXIS. No va por defecto en toda pieza |
 | **Sistema consistente, no activo distintivo demostrado** | no se ha medido si la gente reconoce a Efeonce sin el logo; no afirmes que la órbita se reconoce sola |
 | **Candidato sin aprobar** | pares de copy del banco; sirven de referencia, no de copy final |
-| **Decisión pendiente** | panel de la prueba sin logo; si el contraste mínimo de la burbuja-firma sigue en 4,5:1 o baja a 3:1 |
+| **Decisión pendiente** | proveedor y presupuesto del panel de la prueba sin logo (que debe correr antes de pauta pagada); revisión del banco de pares; URL de LinkedIn de la empresa. El contraste mínimo de la burbuja quedó en 4,5:1 (2026-09-26) |
 | **No certificable** (`foto:cta:gate`) | pieza del canon anterior que firma con la URL; se dibuja igual que antes y no se recertificó |
 | **Maqueta de presentación** | las fotos de merch y de oficina del canvas generadas con IA; la producción sale de los archivos vectoriales y de una muestra física del proveedor |
 | **[propuesta]** en el manual técnico | valor a validar con prueba de impresión (por ejemplo, tamaños mínimos del logo e isotipo impresos) |

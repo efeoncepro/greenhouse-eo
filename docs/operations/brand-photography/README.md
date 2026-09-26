@@ -1,9 +1,9 @@
 # Fotografía de marca Efeonce — índice
 
 > **Tipo de documento:** Índice operativo de carpeta
-> **Versión:** 1.4
+> **Versión:** 1.5
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-26 por Claude (regla de la firma, órbita sobre la foto y marca fotografiada desde el arte plano)
+> **Última actualización:** 2026-09-26 por Claude (convergencia con la línea gráfica: capa gráfica sobre la foto aprobada sólo en los casos de la línea, la lente como reserva del texto, P1–P12 y P-1..P-9; antes: regla de la firma, órbita sobre la foto y marca fotografiada desde el arte plano)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Bitácora del caso](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida de evidencia](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md)
 
 Esta carpeta guarda el **Lenguaje Fotográfico de la marca propia de Efeonce**, aprobado por el operador (Julio
@@ -102,6 +102,20 @@ aprobado «¿Claude o Codex?» llegaba a 0,35). `SELECTION TARGET` sirve **con p
 pegado al objeto falla (1,02:1) porque el objeto trae su propio borde claro, y con 0,04 vuelve a fallar porque la
 caja toca a las personas. Hay punto dulce, no monotonía.
 
+## Delta 2026-09-26 (b) — convergencia con la línea gráfica: decisiones del operador
+
+- 🔴 **Capa gráfica sobre la foto: aprobada sólo en los casos declarados de la línea gráfica** **[decisión del
+  operador, P-5]** —la voz pregunta–respuesta, la lente y la medida con fuente—. Para todo lo demás sigue **no
+  aprobada**, como dice el estado del 2026-09-19 más abajo.
+- **La lente cuenta como reserva del texto** (P-1): su exterior apagado es un tratamiento de la línea, no un velo.
+  **«Nunca un scrim» sigue vigente para toda pieza sin lente.**
+- Aprobadas las reglas de sinergia P1–P12 y resueltos los conflictos P-2..P-9 (lecho pedido igual en piezas con lente,
+  el 55 % es del círculo visible de la lente, un anillo dibujado en la escena cuenta como órbita, 1200 × 627 nativo,
+  el límite de cabezas del 36 % sólo con reserva de texto, la cláusula de encuadre manda en la lente). El **retrato de
+  perfil** (firma de correo, tarjetas de equipo) entra como categoría propia donde se permite mirar a cámara; su barra
+  está por redactar. Lo que necesita código va a la task de `foto:prompt` y chequeos de la lente. Detalle:
+  [maestro §11](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#11-la-línea-gráfica-en-la-foto).
+
 ## Delta 2026-09-26 — firma, órbita y marca fotografiada
 
 - 🔴 **Firma de una pieza gráfica: el logo de Efeonce centrado** **[decisión del operador]**. La burbuja URL
@@ -133,7 +147,8 @@ Conserva foto sin scrims, reservas y firma; la superficie del CTA no habilita pa
 - [Espacio para texto y formatos nativos](EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md) — bitácora de la ronda: zona de titular con tono declarado y límite de cabezas; 4:5, 9:16 y 16:9 nativos. **Su capa de composición no está aprobada** (ver estado abajo).
 
 > **Estado 2026-09-19:** aprobado el **lenguaje fotográfico** (maestro, firma, colorimetría, cámaras, personas,
-> prompts/pipeline). **NO aprobada** la capa de composición gráfica sobre la foto: las pruebas de
+> prompts/pipeline). **NO aprobada** la capa de composición gráfica sobre la foto (salvo, desde el 2026-09-26, en los
+> casos declarados de la línea gráfica: voz pregunta–respuesta, lente y medida con fuente): las pruebas de
 > `EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md` fueron rechazadas por el operador y ese documento vale por sus
 > reglas y prohibiciones, no por sus ejemplos.
 

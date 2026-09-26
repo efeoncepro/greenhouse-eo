@@ -1,9 +1,9 @@
 # Lenguaje Fotográfico Efeonce V1 — «El oficio a la vista»
 
 > **Tipo de documento:** Especificación canónica de marca (documento maestro)
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-26 por Claude — §11 «La línea gráfica en la foto»: cómo se prepara una foto que llevará la órbita y qué puede hacer la órbita sobre ella, con enlace al contrato de convergencia. Antes (mismo día): la órbita de la línea gráfica no sustituye la composición de este lenguaje, y la regla de la firma; ver el [delta 2026-09-26](#delta-2026-09-26--la-órbita-no-sustituye-la-composición). Antes (2026-09-21): el sistema se declara en **dos registros** (documental y puesta en escena); ver el [delta 2026-09-21](#delta-2026-09-21--dos-registros-documental-y-puesta-en-escena)
+> **Última actualización:** 2026-09-26 por Claude — §11: el operador aprueba las reglas de sinergia P1–P12 y resuelve los nueve conflictos P-1..P-9 con la línea gráfica (la lente cuenta como reserva del texto; capa gráfica sobre la foto aprobada sólo en los casos declarados de la línea; retrato de perfil como categoría propia, barra por redactar); §9 ajustado. Antes (mismo día): §11 «La línea gráfica en la foto»: cómo se prepara una foto que llevará la órbita y qué puede hacer la órbita sobre ella, con enlace al contrato de convergencia. Antes (mismo día): la órbita de la línea gráfica no sustituye la composición de este lenguaje, y la regla de la firma; ver el [delta 2026-09-26](#delta-2026-09-26--la-órbita-no-sustituye-la-composición). Antes (2026-09-21): el sistema se declara en **dos registros** (documental y puesta en escena); ver el [delta 2026-09-21](#delta-2026-09-21--dos-registros-documental-y-puesta-en-escena)
 > **Estado:** Aprobado por el operador (Julio Reyes, dueño de Efeonce) el 2026-09-19. Sistema consistente; **no** es todavía un activo distintivo medido.
 > **Documentación relacionada:** [Índice](./README.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Bitácora](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md) · [Marca de agencia](../../context/09_marca-agencia.md) · [Quiénes somos](../../context/01_quienes-somos.md) · [Marca en escena](../../../.claude/skills/social-media-studio/references/brand-in-scene.md)
 
@@ -246,9 +246,9 @@ Recorrido completo ronda por ronda en la [bitácora](../social/2026-09-19-efeonc
 
 | Pendiente | Por qué importa | Condición de cierre |
 |---|---|---|
-| ~~Espacio para texto~~ **cerrado en el plate (2026-09-19)** | Pedido explícito del operador | Reglas de reserva en [`EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md`](EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md). **Ojo:** cerrado del lado de la TOMA; la capa gráfica encima NO está aprobada, y su retícula definitiva puede corregir los porcentajes por formato |
+| ~~Espacio para texto~~ **cerrado en el plate (2026-09-19)** | Pedido explícito del operador | Reglas de reserva en [`EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md`](EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md). **Ojo:** cerrado del lado de la TOMA; la capa gráfica encima NO está aprobada, salvo en los casos declarados de la línea gráfica (voz pregunta–respuesta, lente y medida con fuente; operador, 2026-09-26, §11), y su retícula definitiva puede corregir los porcentajes por formato |
 | ~~Formatos 9:16 y 16:9 nativos~~ **cerrado (2026-09-19)** | Ya NO es cierto que «todo se probó en 4:5»: hay **7 plates nativos 1152×2048 y 8 nativos 2048×1152** (`rondas/texto/S1|S1v2|S2|S2v2|S3|S3v2-*-{916,169}-plate.png`, `rondas/capas/CB-916-plate.png`, `rondas/capas/CC-169-plate.png`) **[medido con sharp]** | Falta sólo **1:1**. Propuesta original del subagente de composición, aún sin validar (propuesta del subagente de composición: lecho 4:5 22–28%; 9:16 18–22% con logo a 85–88%; 16:9 25–30%; 1:1 20–25%) |
-| 🔴 **El canon se contradice sobre la capa gráfica** **[2026-09-21]** | El canon declara que **la capa gráfica sobre la foto NO está aprobada** (2026-09-19, y así lo repiten la fila anterior de esta tabla y `.claude/rules/brand-photography.md`), pero **todas las piezas publicadas del registro B la usan**: titular, cursores, bounding box, chip. Hoy la documentación se contradice consigo misma, y quien llegue nuevo no sabe si una pieza con titular está permitida o prohibida | **Decisión del operador**: o **se aprueba** la capa gráfica —y entonces se retira el «sin aprobar» del canon, de la fila de espacio para texto y de la regla auto-load—, o **se declara que esas piezas viven bajo otro contrato** y el canon nombra cuál. Mientras no se decida, ninguna de las dos lecturas es la vigente |
+| 🔴 **El canon se contradice sobre la capa gráfica** **[2026-09-21]** | El canon declara que **la capa gráfica sobre la foto NO está aprobada** (2026-09-19, y así lo repiten la fila anterior de esta tabla y `.claude/rules/brand-photography.md`), pero **todas las piezas publicadas del registro B la usan**: titular, cursores, bounding box, chip. Hoy la documentación se contradice consigo misma, y quien llegue nuevo no sabe si una pieza con titular está permitida o prohibida | **Decisión del operador**: o **se aprueba** la capa gráfica —y entonces se retira el «sin aprobar» del canon, de la fila de espacio para texto y de la regla auto-load—, o **se declara que esas piezas viven bajo otro contrato** y el canon nombra cuál. Mientras no se decida, ninguna de las dos lecturas es la vigente. **Resuelto en parte el 2026-09-26** (P-5, §11): aprobada sólo la capa de la línea gráfica en sus casos declarados (voz pregunta–respuesta, lente, medida con fuente); para todo lo demás sigue cerrada y esta contradicción sigue abierta |
 | Firma en dron y tomas todo-enfocadas | Sin desenfoque, la franja se ve algo puesta | Decisión del operador sobre la firma alternativa (url-lum). *Desde el 2026-09-26 la burbuja sólo reemplaza al logo cuando la marca ya está en la imagen ([firma §5.1](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26)); lo abierto es cómo sostener el logo centrado sin lecho real* |
 | Promover scripts a comando `pnpm` | Hoy viven en la carpeta de la corrida | Comando canónico con tests |
 | Prueba de reconocimiento | Sin ella no hay «activo distintivo» | n ≥ 100 del público objetivo, distractores coherentes, medición antes y después |
@@ -269,16 +269,18 @@ Recorrido completo ronda por ronda en la [bitácora](../social/2026-09-19-efeonc
 **[decisión del operador, 2026-09-26]** Este lenguaje sigue vigente entero. La línea gráfica
 [«La órbita»](../brand-graphic-line/README.md) converge con él: la foto **muestra el oficio** y la órbita **señala lo que
 importa dentro de él**. Los dos canon comparten la idea al pie de la letra: este documento es «El oficio a la vista» y la
-línea tiene su propio §6 «Oficio a la vista». Esta sección no cambia ninguna regla de arriba; dice cómo se prepara una
-foto que va a llevar la órbita y qué puede hacer la órbita sobre ella.
+línea tiene su propio §6 «Oficio a la vista». Esta sección dice cómo se prepara una foto que va a llevar la órbita y
+qué puede hacer la órbita sobre ella. Desde el 2026-09-26 recoge además las decisiones del operador que ajustan tres
+reglas de este lenguaje sólo para las piezas con lente o con la capa de la línea (nunca un scrim, capa gráfica,
+límite de cabezas) y abre una categoría nueva, el retrato de perfil (ver abajo).
 
 **Cómo se prepara la foto** (con la ficha de `pnpm foto:prompt`, nunca a mano):
 
 | Qué necesita la órbita | Cómo lo trae la foto |
 |---|---|
 | Un solo punto de interés | La escena concentra la obra o la decisión en un lugar; la lente de la línea exige una foto con un punto claro (línea §1.5) |
-| El sujeto dentro del círculo | La escena declara el encuadre de la lente del formato (el banco de 2026-09-25 lo escribe como `LENS FRAMING` en la `escena`); `foto:prompt` no tiene todavía un campo propio |
-| Formato | El nativo de la pieza final; nunca se recorta de otro formato (reserva §2, regla 4) |
+| El sujeto dentro del círculo | La escena declara el encuadre de la lente del formato (el banco de 2026-09-25 lo escribe como `LENS FRAMING` en la `escena`); `foto:prompt` no tiene todavía un campo propio (llega con la task, P9). El sujeto cabe en el 55 % del **círculo visible** de la lente de ese formato; si no cabe, se rehace la toma (P-3) |
+| Formato | El nativo de la pieza final; nunca se recorta de otro formato (reserva §2, regla 4). El 1200 × 627 del banner de LinkedIn entra como formato nativo de `foto:prompt` (P-6, task) |
 | Registro | A, documental: nadie mira al lente (línea §9) |
 | Una sola marca | Sin emblema legible: la pieza firma (firma §6; línea §9) |
 | Color | El azul en un objeto del oficio, nunca un muro de fondo; el acento cálido nace de la acción, una de cada dos fotos |
@@ -292,10 +294,31 @@ sobre la foto; o sustituir la composición, las palancas o las reservas que este
 `pnpm creative:orbit:render` (zonas `protect`: sujeto, reservas y lecho) y en la capa `graphic_line` de
 `pnpm creative:layout`; la revisión al 100 % sigue siendo humana.
 
-Nueve puntos donde las dos reglas parecen chocar (por ejemplo, el texto de la lente sobre la foto apagada frente a
-«nunca un scrim», el círculo del 55 % frente a lo que muestra la lente en el post, o el límite de cabezas del 36 %
-frente al centro de la lente) quedan como **pendientes del operador** en la referencia de convergencia; no se
-resuelven aquí.
+**Reglas de sinergia P1–P12 aprobadas** **[decisión del operador, 2026-09-26]**. Las doce reglas de la referencia de
+convergencia (§6: briefear para el círculo visible, el azul y el acento dentro del círculo, el barrido del foco atado a
+la luz, la luz dura del lado de la lámpara, una sola señal de atención, la foto del foco desde el registro C, el aire
+de la medida en la toma, la revisión al 100 % sobre la pieza compuesta, la cadencia en el feed y el lecho pedido igual
+en piezas con lente, entre otras) dejan de ser propuesta. **P5** (cerrar las brechas del chequeo de la órbita) y **P9**
+(campo `reservas.lente` en `foto:prompt`) necesitan código y van a la task de `foto:prompt` y chequeos de la lente;
+mientras tanto se revisan a mano.
+
+**Conflictos resueltos** **[decisión del operador, 2026-09-26]**. Los nueve puntos donde las dos reglas parecían chocar:
+
+| # | Choque | Resolución |
+|---|---|---|
+| **P-1** | «Nunca un scrim» frente al exterior apagado de la lente con texto encima | El exterior apagado de la lente **cuenta como la reserva del texto**: es un tratamiento de la línea, no un velo. **«Nunca un scrim» sigue vigente para toda pieza sin lente** |
+| **P-2** | La firma siempre necesita su lecho frente a la lente, que firma sobre la foto apagada | En piezas con lente **se pide el lecho igual** (P12) |
+| **P-3** | El círculo del 55 % frente a lo que muestra la lente del `post` (≈ 35 % del lado corto) | El 55 % es del **círculo visible** de la lente; se ajusta la toma, no la pieza |
+| **P-4** | Una sola órbita por pieza frente a un anillo dibujado en la escena | Un anillo dibujado dentro de la escena **cuenta como órbita**: en una pieza con lente se elige otro plate o se rehace la toma |
+| **P-5** | Capa gráfica sobre la foto no aprobada frente a la voz y la lente de la línea | La capa gráfica sobre la foto queda **aprobada sólo en los casos declarados de la línea**: voz pregunta–respuesta, lente y medida con fuente. Para todo lo demás **sigue cerrada** (y la contradicción del registro B de §9 sigue abierta) |
+| **P-6** | Nunca se recorta un formato desde otro frente al banner 1200 × 627 | Se agrega el **1200 × 627 nativo** a `foto:prompt` (task); nunca se recorta desde 16:9 |
+| **P-7** | Retrato con órbita (firma de correo, tarjetas de equipo) sin regla fotográfica | El retrato de perfil entra a este lenguaje como **categoría propia**, donde **mirar a cámara está permitido** (a diferencia del registro A). **Su barra está por redactar** en esa categoría **[pendiente]** |
+| **P-8** | «Cabezas y manos bajo el 36 %» frente al centro de la lente en 4:5 y 9:16 | El límite aplica **sólo cuando la toma tiene reserva de texto**; `foto:prompt` debe emitirlo sólo entonces (task) |
+| **P-9** | Palancas que llenan el cuadro (`variantes`, `manos`) frente al círculo de la lente | En piezas con lente **manda la cláusula de encuadre**; las palancas que llenan el cuadro sólo en piezas de sólo foto |
+
+Las reglas de la [reserva de espacio en la toma](./EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) (nunca un scrim,
+límite de cabezas, formato nativo) siguen escritas allí sin excepción; la excepción de la lente vale desde esta
+sección y la de la línea gráfica (§9.1), y el comando `foto:prompt` la reflejará con la task.
 
 - Paso a paso de producción: [manual de fotografía de marca](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
   y [manual de la línea gráfica](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md).

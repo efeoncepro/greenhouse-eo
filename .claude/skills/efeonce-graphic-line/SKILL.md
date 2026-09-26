@@ -50,17 +50,19 @@ propón agregarlo.
    pieza medida del canvas; las recetas del paquete las pintan tal cual.
 6. **La esfera que cierra el texto es parte del texto**: guías, marcas de corte, selección y cursores la incluyen.
 7. **Efeonce firma todo**: logo centrado abajo; la burbuja `efeoncepro.com` sólo reemplaza al logo si el logo ya
-   aparece en la imagen, y nunca va como texto.
+   aparece en la imagen, y nunca va como texto. **El logo va dentro de la órbita sólo en cierres de marca** (cierre del
+   deck, cierre de video, muro de recepción), con su resguardo X fuera del anillo; en todo lo demás, nunca.
 8. **La línea de servicio decide el acento y la palabra del eslogan** («Empower your Growth | Brand | Engine | Voice |
-   Revenue»). El eslogan sólo cierra, sin esfera ni mayúsculas.
+   Revenue»). El eslogan sólo cierra, sin esfera ni mayúsculas. **El acento mide ≥ 3:1 contra su fondo** en gráfico y en
+   texto ≥ 24 px, y **nunca va en texto de menos de 24 px** (ahí navy sobre claro, blanco sobre oscuro).
 9. **La órbita no sustituye la composición fotográfica**: se declara a propósito y nunca cubre sujeto, reservas, lecho
    ni firma (chequeo `orbit-never-over-subject-or-reserves`).
 10. **Valores sólo desde tokens** (`efeonceGraphicLine`, `axisMotion`): nunca HEX, px, grados o tiempos transcritos
     de un doc, el canvas o un comentario. Archivos de marca sólo desde `@efeoncepro/axis-brand-assets`.
 11. **Movimiento:** la órbita sola sale del paquete; las animaciones del logo (reveal, apertura, sting) siguen el
     lenguaje de movimiento y sus valores de `efeonceGraphicLine.motion`. Nunca se generan con un modelo de video.
-12. **Estado honesto:** la órbita es un sistema consistente, **no** un activo distintivo demostrado (falta la prueba
-    sin logo). «Te hacemos visible» no sale a pauta sin revisión legal.
+12. **Estado honesto:** la órbita es un sistema consistente, **no** un activo distintivo demostrado; la prueba sin
+    logo va antes de cualquier pauta con la órbita. «Te hacemos visible» no sale a pauta sin revisión legal.
 
 ## Cómo se trabaja
 

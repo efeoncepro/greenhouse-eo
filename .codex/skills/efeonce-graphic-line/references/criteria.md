@@ -1,6 +1,7 @@
 # El criterio de la órbita: cuándo, cómo, con qué y por qué
 
-> Verificado contra: axis-design-system@e26bd85 y greenhouse-eo@7cb24df17 — 2026-09-26.
+> Verificado contra: axis-design-system@e26bd85 y greenhouse-eo@7cb24df17 — 2026-09-26 (decisiones del operador D1–D15
+> del 2026-09-26 registradas; ver [ledger.md](ledger.md)).
 > Fuentes: láminas del canvas reconstruidas en AXIS (`apps/lab/src/data/graphic-line-elements.json`, citadas como
 > «lámina X.Y»); página del Lab `apps/lab/src/pages/references/graphic-line.astro` («Lab X.Y»); manual
 > `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` («manual §»); ADR
@@ -44,7 +45,8 @@ Por qué esta forma y no otra:
   como forma, y no medían ni enfocaban (ADR, alternativas descartadas).
 
 **Estado honesto:** hasta correr la prueba sin logo (600 personas, lámina 6.2), la línea es un sistema consistente,
-**no** un activo distintivo demostrado. No la vendas como *brand equity*.
+**no** un activo distintivo demostrado. No la vendas como *brand equity*. La prueba va **antes de cualquier pauta con la
+órbita** (operador, 2026-09-26, D14); proveedor y presupuesto los decide el operador.
 
 ---
 
@@ -171,6 +173,15 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
   y la línea que termina en la esfera; lo que **no** se repite es la línea con esfera. La regla de la zona de partners
   va sin esfera, porque «si la esfera se repite, deja de ser identidad» (manual §10.2).
 
+**Anillo propio de la esfera (`sphereRing`) — «en vivo»** (operador, 2026-09-26, D8):
+
+- **Significa:** que algo está ocurriendo ahora. Es el eco del pulso de impacto cuando la esfera llega en movimiento y
+  el estado activo, «en el aire» (cabina al aire, sala en sesión, «¿Cómo va? En vivo»).
+- **Cuándo:** sólo con la intención declarada: el intent de `orbit` lleva `live: true`. Sin eso, el contrato rechaza
+  `sphereRing: true` (`sphere-ring-only-live`).
+- **Nunca:** como adorno para «dar más marca» a la esfera, en un dato (`measure`), en la esfera que cierra un texto ni
+  en una pieza que no está en vivo.
+
 ### 3.4 Estela — el rastro del recorrido
 
 - **Significa:** que la esfera viene de algún lado. Es lo que distingue **recorrer** de **llenar**.
@@ -191,10 +202,11 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
 - **Cuándo:** en la forma «con halo»: portadas y cierres sobre oscuro (Lab 1.2, formas). En movimiento sube al final,
   cuando la esfera ya asentó (4.4).
 - **Cómo:** degradé radial suave que se apaga hacia el borde y toma el color del acento de la línea (manual §2). Pleno
-  sobre oscuro; sobre papel se reduce (el manual lo fija en navy al 6 %, frente al 13 % del oscuro, §2) o se omite: en
-  impresión, los degradados bajo 5 % hacen bandas en offset (lámina 5.1). *Nota de deriva: el resolver 0.3.0 pinta el
-  halo con las mismas paradas en ambas superficies; si una pieza en papel lo necesita, compáralo con la lámina antes de
-  entregar.*
+  sobre oscuro; **sobre papel, a media intensidad** (operador, 2026-09-26, D7: token `orbit.haloOnLightScale: 0.5`; el
+  resolver del contrato 0.3.1 multiplica la opacidad de cada parada por ese factor en superficie clara y el render del
+  motion lee el mismo token; el manual lo fija en navy al 6 %, frente al 13 % del oscuro, §2) o se omite: en impresión,
+  los degradados bajo 5 % hacen bandas en offset (lámina 5.1). *Con el contrato 0.3.0 (el que tiene Greenhouse hoy) el
+  halo sale igual en ambas superficies: hasta adoptar la 0.3.1, redúcelo a mano con el token.*
 - **Nunca en:** la forma **plana** (sobre fotos, en papel y en tamaños chicos, Lab 1.2), el dato y el avance (el
   resolver no les pone halo), la cerámica, el vinilo y la pizarra (lámina 5.1). Nunca brillo, reflejo ni esfera de
   vidrio.
@@ -253,7 +265,7 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
 - **Lo propio:** el foco de escenario es un recurso conocido; lo que lo hace Efeonce es la esfera en la punta del arco,
   la penumbra navy y una sola luz (lámina 1.4).
 - **Nunca:** un foco sin anillo; dos luces; nombres reales de competidores en el campo en penumbra; pauta sin la
-  revisión legal del claim (pendiente, manual §1.4).
+  revisión legal del claim (regla reafirmada por el operador el 2026-09-26, D15; manual §1.4).
 
 ### 3.10 Marca de estado
 
@@ -263,6 +275,8 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
   tiempo real (estado de sala); sin dato, no hay arco.
 - **Extensiones validadas:** credencial de evento, el rol por la forma (anillo = asistente, órbita = speaker, esfera =
   staff; lámina 4.6 3/3); cabina de llamadas «anillo libre, esfera en el aire»; sobre «cerrado = respondido».
+- **En vivo:** el estado activo, «en el aire», es el único estado que puede sumar el anillo propio de la esfera
+  (`sphereRing` con `live: true`; ver 3.3). Ocupado no es lo mismo que en vivo: una sala reservada lleva la esfera sola.
 - **Nunca:** como semáforo de colores (verde/rojo); sin etiqueta.
 
 ### 3.11 Cierre de marca
@@ -271,9 +285,11 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
 - **Cuándo:** final de video, última lámina, contraportada, pantalla de recepción en loop, sin sonido (láminas 4.1, 4.3
   1/3, 7.2). No va en impresos (contrato).
 - **Cómo:** el anillo aparece, el arco crece, la esfera llega y asienta, sube el halo y, al final, la firma (lámina 4.1;
-  ver 9). En la contraportada y la última lámina, la órbita se completa con la esfera arriba y **el logo va fuera de la
-  órbita** (lámina 7.2). La animación de la órbita **sin logo** sirve para piezas que ya tienen su firma o su texto (Lab
-  4.4.2).
+  ver 9). La animación de la órbita **sin logo** sirve para piezas que ya tienen su firma o su texto (Lab 4.4.2).
+- **El logo dentro de la órbita** (operador, 2026-09-26, D5): **sólo** en tres cierres de marca —el cierre del deck
+  (`deckSlideHtml('close')`), el cierre de video y el muro de recepción—, con el resguardo X del logo respetado: el
+  anillo queda fuera de ese resguardo. En cualquier otro cierre el logo va **fuera** de la órbita, como la contraportada
+  de Insights (lámina 7.2).
 
 ### 3.12 Mapa de familia
 
@@ -328,7 +344,8 @@ decisión, no en la duda. Es la misma gramática del anillo y la esfera, dicha e
 **Sí / no** (lámina 5.6): pregunta chica, respuesta grande de una a tres palabras · **no:** pregunta grande, respuesta
 larga y chica. Bricolage para decir, Poppins para explicar · **no:** Bricolage en párrafos ni monoespaciada.
 
-**Banco de pares (candidatos, sin aprobar;** lámina 2.1**):** ¿Lo medimos? Siempre · ¿Quién decide? Tú, con evidencia ·
+**Banco de pares (candidatos, sin aprobar;** lámina 2.1**; el operador lo revisa y aprobará 2 pares por línea con
+respuestas verificables, D12):** ¿Lo medimos? Siempre · ¿Quién decide? Tú, con evidencia ·
 ¿Y si después lo hago yo? Esa es la idea · ¿Y el reporte del viernes? Ya lo viste · ¿Cuánto rindió? Te mostramos todo ·
 ¿Cómo va? En vivo · ¿Dónde quedó lo aprendido? En tu historial · ¿Otra agencia más? No. Un sistema · ¿Y si lo probamos?
 Hoy. Úsalos como calibración del tono, no como copy aprobado. Verbos de la línea: Hacer, Medir, Crear, Aparecer,
@@ -358,17 +375,21 @@ esfera: el acento va al cierre.
 - **La palabra es de la línea de servicio, no del producto** (operador, 2026-09-26): Growth (Efeonce; su producto
   Greenhouse, la plataforma que controla todo), Brand (servicios creativos; Globe), Engine (web, infraestructura, SEO y
   medición; Wave), Voice (medios y distribución; Reach), **Revenue** (RevOps y CRM). La palabra toma el acento de la
-  línea. *Deriva: el manual §7 aún dice «palabra por decidir» para RevOps; los tokens (`lines[].sloganWord`) y el ledger
-  ya fijan Revenue.*
+  línea **cuando el eslogan mide 24 px o más**; más chico, la palabra va en navy sobre claro o blanco sobre oscuro (regla
+  del acento, sección 8; así lo hace ya la firma de correo, con el eslogan a 12 px). *Deriva: el manual §7 aún dice
+  «palabra por decidir» para RevOps; los tokens (`lines[].sloganWord`) y el ledger ya fijan Revenue.*
 - **RevOps tiene dos acentos:** no tiene plataforma propia y toma el acento de la plataforma en que se opera, HubSpot o
-  Salesforce, **en tonos propios de Efeonce, nunca los colores de la marca del partner** (tokens `lines`; Lab 3.1).
+  Salesforce, **en tonos propios de Efeonce, nunca los colores de la marca del partner** (tokens `lines`; Lab 3.1). El
+  magenta de HubSpot quedó aprobado tal cual (operador, 2026-09-26, D2); el naranja de HubSpot no se usa: choca con
+  Globe y Reach, y es el color del partner.
 - **«Empower your» en gris medido:** sobre claro, un gris que alcanza 5,0:1 (el `#848484` anterior daba 3,5:1 y no
   pasaba; operador, 2026-09-26); sobre oscuro, gris claro (token `slogan.leadColor`). *`05_voz-tono-estilo.md` todavía
   nombra el gris `#848484`: manda el token.*
 - **Pesos del SSOT** (`src/config/efeonce-brand.ts`): *Empower* ExtraBold itálica, *your* ExtraBold, palabra final Black
   itálica. No cambian por línea.
 - **Nunca:** en mayúsculas, con esfera, traducido, con otros pesos o cursivas (láminas 2.2, 5.6; token `slogan`).
-- **Pendiente:** si «Growth» va en blanco (como el canvas) o en el acento de la línea en el cierre del deck.
+- **Cierre del deck:** la palabra final va **en el acento de la línea**, no en blanco (operador, 2026-09-26, D3; 8,5:1
+  sobre `#001a33` en Growth). `deckSlideHtml('close')` la pinta así desde axis-graphic-line 0.3.2.
 
 ---
 
@@ -385,8 +406,8 @@ producto, con «by efeonce»»): el lockup «by efeonce» vive sólo en la super
 - **La burbuja URL sólo reemplaza al logo si el logo ya aparece en la imagen** (un mockup, un objeto, merch). Entonces
   va centrada, sola, con fusión de luminosidad. **Nunca las dos**, y nunca la burbuja a un costado ni junto al logo:
   repetiría la marca (manual §8.5).
-- **Por qué casi nunca alcanza:** la fusión fija la luminosidad del gris, así que la burbuja sólo llega a 4,5:1 sobre un
-  lecho muy oscuro. Si no pasa, se cambia el lecho o la foto, no la burbuja (manual §8.5). Esa es la razón de que sea la
+- **Por qué casi nunca alcanza:** la fusión fija la luminosidad del gris, así que la burbuja sólo llega a 4,5:1 (el
+  umbral decidido el 2026-09-26, D4: token `urlBubble.minContrast`) sobre un lecho muy oscuro. Si no pasa, se cambia el lecho o la foto, no la burbuja (manual §8.5). Esa es la razón de que sea la
   excepción y no la regla.
 - **Nunca la URL como texto.** Donde aparezca `efeoncepro.com` va la burbuja oficial (ADR, regla dura). En pies (deck,
   informe, papelería, stand, firma de correo) la burbuja sigue como pie, fusionada u horneada: eso no es firma.
@@ -397,10 +418,10 @@ producto, con «by efeonce»»): el lockup «by efeonce» vive sólo en la super
 - **Objetos:** frente, la palabra con su punto; dorso, el logo solo, chico y abajo, sin órbita ni texto. La órbita
   alrededor del logo quedó descartada (lámina 4.4). **Sí:** frente palabra · dorso logo solo. **No:** logo y órbita
   juntos al frente (lámina 5.6).
-- *Tensión sin resolver:* la lámina 4.3 (1/3) pone el logo completo «una sola vez, en el muro de recepción, dentro de su
-  órbita», y la tarjeta de presentación lleva atrás «la órbita con el logo y el eslogan» (4.6 3/3), mientras la 5.4 dice
-  «órbita alrededor del logo: nunca». En piezas nuevas sigue la 5.4 (logo fuera de la órbita, como en la contraportada
-  de 7.2) y consulta al operador antes de repetir el caso del muro.
+- **Logo dentro de la órbita, decidido** (operador, 2026-09-26, D5): sólo en los cierres de marca —cierre del deck,
+  cierre de video y muro de recepción (lámina 4.3 1/3)—, con el resguardo X respetado. **Nunca** en el banner de
+  LinkedIn (4.1) ni en el reverso de la tarjeta de presentación (4.6 3/3): ahí el logo va solo, como el dorso de un
+  objeto. En todo lo demás rige la 5.4 y el manual §8.3 n.º 8: la órbita nunca rodea el logo.
 - **Firma de correo:** la línea que termina en la esfera aparece **una vez** y separa a la persona de la marca; la regla
   que abre la zona de partners va **sin esfera**. Sin esa regla, «Partner oficial de» se leía como bajada del logo de
   Efeonce (manual §10.2).
@@ -443,13 +464,16 @@ producto, con «by efeonce»»): el lockup «by efeonce» vive sólo en la super
 - **El teal es sólo de Efeonce** y nunca aparece en una pieza de otra línea (lámina 3.1). Si los acentos de producto se
   usan en piezas de Efeonce está pendiente; la recomendación es que no (ADR, delta del 2026-09-26).
 - **Papeles del color:** en oscuro, navy profundo de fondo, el acento en la gráfica y la luz del halo; en papel, navy
-  para el texto y el acento **oscuro sólo para gráfica** (esfera, arco, anillo): en texto chico no llega a 4,5:1 (lámina
-  1.2, «Color»). Las demás líneas usan una tinta oscura propia como fondo.
-- **La esfera es gráfico; el texto cumple 4,5:1 siempre** (Lab 3). El teal claro como texto sobre blanco (2,1:1) es el no
-  de la lámina 5.6. Mide el contraste sobre los píxeles finales, no sobre la paleta teórica: un color de marca no
-  garantiza legibilidad (Tres voces).
-- *Pendiente:* el contraste de las palabras Engine y Voice sobre sus fondos, que son **texto** y en algunos casos no
-  llegan a 4,5:1; y el magenta de Revenue-HubSpot (ledger).
+  para el texto y el acento oscuro para la gráfica (esfera, arco, anillo) y el texto grande. Las demás líneas usan una
+  tinta oscura propia como fondo.
+- **La regla del acento** (operador, 2026-09-26, D1; token `accentContrast`, chequeo `accent-text-min-size`): el acento
+  mide **≥ 3:1 contra su fondo** en gráfico (arco, esfera, halo) y en texto de **24 px o más**. **Nunca va en texto de
+  menos de 24 px**: ahí el texto es navy `#023c70` sobre claro o blanco sobre oscuro, y cumple 4,5:1. Por qué: el 3:1
+  es el umbral de WCAG para gráfico y texto grande, y todos los acentos lo pasan (los más bajos: Engine sobre
+  `#091951` 3,60, Voice sobre papel 3,53, Growth sobre papel 3,87); el texto chico necesita 4,5:1 y ahí varios acentos
+  no llegan. **Engine y Voice conservan sus colores.**
+- El teal claro como texto sobre blanco (2,1:1) es el no de la lámina 5.6. Mide el contraste sobre los píxeles finales,
+  no sobre la paleta teórica: un color de marca no garantiza legibilidad (Tres voces).
 - **Materiales:** los valores son sRGB; en papel, cerámica, vinilo y tela el color se fija con prueba física del
   proveedor, nunca sin prueba (lámina 5.1).
 - **Nada de semáforo:** el estado se dice con la forma, no con el color (lámina 4.3 2/3).
@@ -498,12 +522,14 @@ Cada uno tiene su fuente. Si ves uno en una pieza, no está terminada.
 | **Texto cruzando la órbita**, o la órbita detrás del texto | ningún texto cruza la órbita | lámina 5.1; ADR |
 | **Órbita sobre la cara**, el sujeto, la reserva, el lecho o la firma | la órbita no sustituye la composición fotográfica | operador 2026-09-26; `orbit-never-over-subject-or-reserves` |
 | **Órbita por defecto** en toda pieza, o un **patrón** de órbitas | se declara a propósito; una por pieza, muro o vidrio | manual §1.3; lámina 4.3 2/3 |
-| **Órbita alrededor del logo**, esfera pegada al logo | la órbita rodea palabras; la esfera es de la palabra | lámina 5.4 |
+| **Órbita alrededor del logo** fuera de un cierre de marca (p. ej. banner de LinkedIn, reverso de la tarjeta), o **esfera pegada al logo** | el logo va en la órbita sólo en el cierre del deck, el cierre de video y el muro de recepción; la esfera es de la palabra | operador 2026-09-26 (D5); lámina 5.4 |
 | **Logo y órbita juntos al frente** de un objeto | frente la palabra, dorso el logo solo | láminas 4.4, 5.6 |
 | **URL como texto**, o **burbuja junto al logo**, o **firma y burbuja a la vez** | la burbuja sólo reemplaza al logo cuando el logo ya está en la imagen | manual §8.5; ADR |
 | **Producto que firma** la pieza (o «by efeonce» como firma) | Efeonce firma todo; el producto es contexto | operador 2026-09-26; manual §7 |
 | **Dos acentos** en una pieza, o **teal en una pieza de otra línea** | una línea, un acento; el teal es de Efeonce | láminas 3.1, 3.2 |
 | **Teal claro como texto sobre blanco** | 2,1:1, no alcanza | láminas 1.1, 5.6 |
+| **El acento en texto de menos de 24 px** (eyebrow, etiqueta, dato chico, palabra del eslogan chico) | el acento es para gráfico y texto grande (≥ 3:1); el texto chico va en navy o blanco | operador 2026-09-26 (D1); `accent-text-min-size` |
+| **Anillo propio de la esfera** (`sphereRing`) en algo que no está en vivo | está reservado al eco del impacto y al estado «en el aire» | operador 2026-09-26 (D8); `sphere-ring-only-live` |
 | **Eslogan en mayúsculas, con esfera, traducido o rearmado**, o en cada post | sólo el bloque oficial, sólo en cierres | láminas 2.2, 5.6 |
 | **Pregunta grande y respuesta larga y chica**, dos preguntas seguidas, pregunta retórica o chiste | la respuesta domina; la pregunta es real | láminas 2.1, 5.6 |
 | **«Te hacemos visible» sin «Y lo medimos.»** ni mecanismo | anti-humo: la visibilidad se mide | lámina 1.4 |
@@ -521,5 +547,7 @@ Cada uno tiene su fuente. Si ves uno en una pieza, no está terminada.
 
 Toda corrección del operador sobre qué significa un elemento, cuándo va o qué error delata entra aquí **en el momento**,
 con fecha, el ejemplo y la razón (Skill Maintenance Contract de `SKILL.md`, punto 0). Las tensiones y derivas marcadas
-en este archivo (halo en papel, logo en la órbita del muro, palabra de RevOps en el manual, gris del eslogan en `05`) se
-resuelven con el operador; cuando se resuelvan, se reescribe la entrada y se registra en [ledger.md](ledger.md).
+en este archivo (palabra de RevOps en el manual, gris del eslogan en `05`) se resuelven con el operador; cuando se
+resuelvan, se reescribe la entrada y se registra en [ledger.md](ledger.md). El halo en papel, el logo dentro de la
+órbita, el contraste del acento, el magenta de HubSpot, el «Growth» del cierre del deck y el anillo propio de la esfera
+quedaron decididos el 2026-09-26.

@@ -1,7 +1,7 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-25 por Claude
 > **Ultima actualizacion:** 2026-09-26 por Claude
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
@@ -196,6 +196,26 @@ cambia, cambia el token y su prueba.
 
 > Detalle técnico: [índice de la carpeta](../../operations/brand-graphic-line/README.md) · [ADR, decisiones 3 y 4](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md#decisión)
 
+## Delta 2026-09-26 — decisiones del operador
+
+El 2026-09-26 el operador cerró varias preguntas abiertas de la línea:
+
+- **Color:** el acento de cada línea se usa en gráficos (arco, esfera, halo) y en textos grandes, de 24 px o más; en
+  texto más chico va navy sobre claro y blanco sobre oscuro. El magenta de RevOps y CRM en HubSpot queda aprobado; el
+  naranjo de HubSpot no se usa. En el cierre del deck, la palabra final del eslogan va en el color de la línea.
+- **La burbuja de la dirección web** exige contraste 4,5 a 1: es texto chico que la gente tiene que leer.
+- **El logo dentro de la órbita** sólo en los cierres de marca: final del deck, final de video y muro de recepción,
+  siempre con aire alrededor del logo. Nunca en el banner de LinkedIn ni en el reverso de la tarjeta, donde el logo va
+  solo.
+- **Un solo anillo** también en el banner de LinkedIn y el fondo de Teams. Sobre papel, el halo va a la mitad. El
+  anillo propio de la esfera queda sólo para lo que está «en vivo» (por ejemplo, una cabina en llamada).
+- **Con la fotografía:** se aprobaron las doce reglas de trabajo conjunto y se resolvieron los nueve choques. La capa
+  gráfica sobre una foto sólo se permite en los casos de la línea (pregunta y respuesta, lente, medida con fuente); en
+  la lente, el exterior apagado sirve de espacio para el texto; y el retrato de perfil pasa a ser una categoría propia
+  de la fotografía, donde se puede mirar a cámara.
+
+> Detalle técnico: [manual §12, tabla D1–D15](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#12-decisiones-y-validación) · [ADR, delta (e)](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) · [lenguaje fotográfico §11](../../operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#11-la-línea-gráfica-en-la-foto)
+
 ## Estado y pendientes
 
 **Estado:** canónica desde el 2026-09-25. Es un **sistema consistente**, pero **todavía no un activo distintivo
@@ -204,13 +224,13 @@ la órbita se reconozca sola.
 
 | Pendiente | Tipo | Qué falta |
 |---|---|---|
-| Prueba de atribución sin logo | decisión del operador | elegir panel y correrla con 600 personas (300 por versión); el kit está listo |
-| Firma de mail | instalación | la v3.1 está aprobada y sus imágenes publicadas; falta que cada persona la instale en su Outlook |
-| Banco de pares de copy | decisión del operador | aprobar los pares pregunta/respuesta candidatos |
-| Archivos de impresión y plantillas editables | producción | no existen todavía |
+| Prueba de atribución sin logo | decisión del operador | elegir panel y presupuesto, y correrla con 600 personas (300 por versión); el kit está listo. Debe correr **antes** de que la órbita entre a pauta pagada |
+| Firma de mail | instalación | la v3.1 está aprobada y sus imágenes publicadas; cada persona la instala en su Outlook desde el HTML generado. `people@` usa la firma del área Talent. Falta la URL de LinkedIn de la empresa |
+| Banco de pares de copy | decisión del operador | revisar los candidatos y aprobar dos pares por línea de servicio, sólo con respuestas que se puedan verificar |
+| Archivos de impresión y plantillas editables | producción | se parte por la tarjeta de presentación y el muro de recepción, en PDF vectorial; espera la especificación técnica de la imprenta |
 | Variantes restantes de las animaciones del logo | producción | algunos formatos y fondos siguen en render; se suman a OneDrive y al bucket a medida que terminan |
-| Contraste mínimo de la burbuja como firma | decisión del operador | decidir si se mantiene la exigencia actual (4,5 a 1) o se baja a 3 a 1, porque la burbuja es un elemento gráfico y no texto |
 | Versión en inglés | producción | el copy de la línea está sólo en español |
-| Revisión legal de «Te hacemos visible» | legal | necesaria antes de usar el claim en pauta |
+| Revisión legal de «Te hacemos visible» | legal | obligatoria antes de cualquier pauta, sin excepción |
+| Ajustes de `foto:prompt` y chequeos de la lente | producción | una task nueva lleva al comando lo decidido para las fotos con lente (formato 1200 × 627, límite de cabezas sólo con reserva de texto, chequeos contra lecho y reservas) |
 
 > Detalle técnico: [manual §12](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#12-decisiones-y-validación) · [ADR, pendiente](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md#pendiente) · [manual §13, contrato y herramientas](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-contrato-y-herramientas-axis-03): contrato `efeonce.graphic-line-orbit` 0.3.0 (estable desde el 2026-09-26: un agente describe qué quiere hacer y el sistema pinta la pieza, la firma y mide que cumpla) en AXIS 0.3.0, `pnpm creative:orbit:render`, `pnpm creative:layout` y `pnpm foto:componer:cta` (tramo 17)

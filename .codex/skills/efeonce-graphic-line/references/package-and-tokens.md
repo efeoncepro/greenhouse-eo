@@ -1,6 +1,10 @@
 # Inventario completo: paquetes, tokens, contratos, funciones, comandos y Lab
 
-> Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26
+> Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 · decisiones del
+> operador D1–D15 del 2026-09-26 registradas y **publicadas** (tag `v0.3.5`, axis@5a87d7a): tokens y contratos 0.3.5,
+> contrato de la órbita 0.3.1, registry y brand-assets 0.3.1, paquete 0.3.2. Nombres y valores verificados contra
+> `tokens.ts` y `graphic-line.ts`. `orbit.sphereRing` lleva `reservedFor: 'live'`; el paquete expone `live` en
+> `OrbitOptions` (`orbitSvg`) y como atributo `live` de `<axis-orbit>` (junto a `sphere-ring`).
 >
 > Todo lo de este archivo se leyó del código (`packages/*/src`, `scripts/`, `apps/lab`) y se ejecutó contra los `dist`
 > de AXIS y contra el adapter de Greenhouse. Si un número de aquí no coincide con el código, **manda el código**:
@@ -26,6 +30,11 @@ separado.
 | `@efeoncepro/axis-graphic-line` | **0.3.1** | `v0.3.1` | **no lo instala** | el pintor: SVG, recetas, React, Web Component, movimiento |
 | `@efeoncepro/axis-brand-assets` | **0.3.0** | `v0.3.0` | **0.3.0** | 19 SVG oficiales + 48 órbitas estáticas (SVG + PNG) |
 | `@efeoncepro/axis-ui-registry` | 0.3.0 | `v0.3.0` | 0.3.0 | no referencia la línea gráfica |
+
+**En publicación (2026-09-26):** `axis-tokens` 0.3.5 (`accentContrast`, `urlBubble.minContrast`,
+`orbit.haloOnLightScale`), `axis-ui-contracts` 0.3.5 con el contrato `efeonce.graphic-line-orbit` **0.3.1** (`live`,
+`sphere-ring-only-live`, el halo a la mitad en claro, el chequeo `accent-text-min-size`) y `axis-graphic-line` 0.3.2
+(`deckSlideHtml('close')` con la palabra del eslogan en el acento). Greenhouse no las fija todavía.
 
 Consecuencias que un agente debe saber:
 
@@ -80,7 +89,7 @@ está expresada **por cada 794 px de ancho** de lienzo (`orbit.baseWidthPx`).
 | `teal` | `#36c8bf` | acento de Efeonce sobre oscuro |
 | `halo` | `#72ded8` | halo y anillo tenue sobre oscuro |
 | `navy` | `#023c70` | texto y anillo sobre papel |
-| `tealDark` | `#0e8c82` | acento de Efeonce sobre claro, **sólo gráfico** |
+| `tealDark` | `#0e8c82` | acento de Efeonce sobre claro: gráfico y texto ≥ 24 px, nunca texto < 24 px (D1, ver §2.4) |
 | `paper` | `#f7f8f6` | fondo claro |
 | `productInk` | `#091951` | fondo oscuro de las líneas que no son Growth |
 
@@ -95,7 +104,8 @@ está expresada **por cada 794 px de ancho** de lienzo (`orbit.baseWidthPx`).
 | `revenue-hubspot` | RevOps y CRM · HubSpot | RevOps & CRM | Revenue | — | `hubspot` | `#091951` | `#e86bd0` | `#8e1b82` |
 | `revenue-salesforce` | RevOps y CRM · Salesforce | RevOps & CRM | Revenue | — | `salesforce` | `#091951` | `#2fb8ff` | `#00739e` |
 
-Los acentos de RevOps son tonos propios de Efeonce, nunca los colores de marca del partner.
+Los acentos de RevOps son tonos propios de Efeonce, nunca los colores de marca del partner. El magenta de HubSpot quedó
+aprobado tal cual (D2, 2026-09-26); el naranja de HubSpot no se usa.
 
 ### 2.3 `family` (productos; compatibilidad y mapa de portafolio)
 
@@ -111,7 +121,7 @@ Los acentos de RevOps son tonos propios de Efeonce, nunca los colores de marca d
 | Par | Ratio | Lectura |
 |---|---|---|
 | acento Growth `#36c8bf` / `#001a33` | 8,51:1 | gráfico ✓ |
-| acento Growth claro `#0e8c82` / papel | 3,87:1 (4,12 sobre blanco) | **sólo gráfico**; nunca texto chico |
+| acento Growth claro `#0e8c82` / papel | 3,87:1 (4,12 sobre blanco) | gráfico y texto ≥ 24 px; **nunca texto < 24 px** |
 | `#36c8bf` sobre blanco | 2,06:1 (1,94 sobre papel) | **prohibido en claro** |
 | Brand `#ff6500`/`#091951` · `#bb1954`/papel | 5,60 · 5,83 | |
 | Engine `#0375db`/`#091951` · /papel | 3,60 · 4,31 | |
@@ -123,9 +133,20 @@ Los acentos de RevOps son tonos propios de Efeonce, nunca los colores de marca d
 | «Empower your» claro `#6b6b6b` / papel · oscuro `#e2e2e2` / `#001a33` | 5,00 · 13,56 | ✓ (el `#848484` viejo daba 3,51) |
 | burbuja horneada clara `#848484` / blanco · oscura `#6f89a2` / `#001a33` | 3,74 · 4,83 | |
 
-La esfera y el arco son gráfico (no se les exige 4,5:1); el texto cumple 4,5:1 siempre. `tokens.test.ts` fija los
-redondeos a un decimal (8,5 · 3,9 · 2,1 · Globe 5,6/5,8 · Wave 3,6/4,3 · Reach 4,4/3,5 · HubSpot 5,9/7,5 · Salesforce
-7,4/5 · lead claro 5).
+`tokens.test.ts` fija los redondeos a un decimal (8,5 · 3,9 · 2,1 · Globe 5,6/5,8 · Wave 3,6/4,3 · Reach 4,4/3,5 ·
+HubSpot 5,9/7,5 · Salesforce 7,4/5 · lead claro 5).
+
+**`accentContrast`** (axis-tokens 0.3.5; decisión D1 del 2026-09-26):
+
+| Clave | Valor | Significa |
+|---|---|---|
+| `graphicMin` | 3 | arco, esfera y halo en el acento: ≥ 3:1 contra su fondo |
+| `largeTextMin` · `largeTextMinPx` | 3 · 24 | texto en el acento sólo desde 24 px, con ≥ 3:1 |
+| `smallTextMin` | 4,5 | texto de menos de 24 px: ≥ 4,5:1 |
+| `accentInSmallText` | `false` | el acento nunca en texto de menos de 24 px (ahí navy `#023c70` sobre claro, blanco sobre oscuro) |
+
+Todos los acentos de la tabla pasan 3:1 contra su fondo (los más bajos: Voice/papel 3,53, Engine/`#091951` 3,60,
+Growth/papel 3,87); Engine y Voice conservan sus colores. Lo verifica el chequeo del adapter `accent-text-min-size`.
 
 ### 2.5 `sphere` (la esfera como punto final)
 
@@ -154,7 +175,8 @@ redondeos a un decimal (8,5 · 3,9 · 2,1 · Globe 5,6/5,8 · Wave 3,6/4,3 · Re
 | `haloRadiusRatio` | 1,86 | radio del halo = 1,86 × radio del anillo |
 | `socialMaxWidthPx` · `socialMultiplier` | 1200 · 1,75 | con `channel: 'social'` y ancho ≤ 1200, `scale ×= 1,75` |
 | `satelliteDiscPx` | 30 | disco blanco del satélite × scale |
-| `sphereRing` | `radiusPx 9` · `opacity 0.4` | anillo propio de la esfera (opcional) |
+| `sphereRing` | `radiusPx 9` · `opacity 0.4` | anillo propio de la esfera, **reservado a «en vivo»** (D8): el eco del pulso de impacto en movimiento y el estado activo / «en el aire». Desde el contrato 0.3.1 exige `live: true` |
+| `haloOnLightScale` | 0,5 (axis-tokens 0.3.5; D7) | en superficie clara, el resolver multiplica la opacidad de cada parada de `halo` por este factor; el render del motion lee el mismo token |
 | `ringAirRatio` | 0,12 | aire entre el objeto rodeado y el anillo (fracción del radio del objeto) |
 
 Valores resultantes típicos: 1080 social → anillo 2,38 · arco 3,81 · esfera 8,33 · scale 2,3804. 1920 screen → anillo
@@ -238,6 +260,7 @@ En la lente, la foto es el anillo / (1 + 0,12).
 | `blendMode` · `source` | `'luminosity'` · `#848484` (gris fuente; W3C SetLum) |
 | `bakedOnLight` · `bakedOnDark` | `#848484` · `#6f89a2` |
 | `assets` | `{ light: 'url-lum-light.svg', dark: 'url-lum-dark.svg' }` — nombres **legados** de Greenhouse; en el paquete se usan los ids `url-bubble-source` / `url-bubble-baked-light` / `url-bubble-baked-dark` |
+| `minContrast` | 4,5 (axis-tokens 0.3.5; D4) — umbral de la burbuja sobre los píxeles finales |
 
 ### 2.14 `slogan`, `state`, `type`, `logo`, `isotype`
 
@@ -318,7 +341,9 @@ palabra final 900 itálica.
 ## 3. Contrato `efeonce.graphic-line-orbit`
 
 Archivo: `packages/contracts/src/graphic-line.ts`. `version '0.3.0'`, `lifecycle 'stable'`, owner
-`efeonce-brand-studio`. Manifest: `axis.graphic-line-orbit-composition.v1`.
+`efeonce-brand-studio`. Manifest: `axis.graphic-line-orbit-composition.v1`. **0.3.1 publicado (contracts 0.3.5)** (en
+`axis-ui-contracts` 0.3.5): `orbit.live`, el código `sphere-ring-only-live`, el halo a `haloOnLightScale` en claro y el
+chequeo `accent-text-min-size`.
 
 API: `validateGraphicLineIntent(intent) → AxisGraphicLineIssue[]` (`{ code, elementId? }`) ·
 `resolveGraphicLineIntent(intent) → manifest` (lanza `AxisGraphicLineValidationError` con `.issues`; mensaje
@@ -352,7 +377,7 @@ Elementos **con anillo** (cuentan para «un anillo por pieza»): `orbit`, `measu
 
 | `kind` | Campos (✱ obligatorio) | Defaults del resolver |
 |---|---|---|
-| `orbit` | `targetId?` + `targetKind?` **o** `region?`; `arc?: { start?, span? }`; `innerOrbits?`; `halo?`; `sphereRing?` | sin target → `region 'center'`; `targetKind 'object'`; `start 'upper-start'`; `span 'accent'`; `innerOrbits false`; halo sí salvo `halo: false`; `sphereRing` no |
+| `orbit` | `targetId?` + `targetKind?` **o** `region?`; `arc?: { start?, span? }`; `innerOrbits?`; `halo?`; `sphereRing?`; `live?` (boolean, desde 0.3.1) | sin target → `region 'center'`; `targetKind 'object'`; `start 'upper-start'`; `span 'accent'`; `innerOrbits false`; halo sí salvo `halo: false`; `sphereRing` no; `sphereRing: true` exige `live: true` (0.3.1) |
 | `measure` | ✱`targetId`, ✱`value` (0–1), ✱`source`, `label?`, `start?` (sólo `'top'`) | origen las 12 |
 | `progress` | ✱`sections` (entero ≥ 1), ✱`current` (0…sections), `region?` o `targetId?` | `region 'upper-end'`; con `targetId`, aire 0 |
 | `lens` | ✱`photoId`, ✱`alt`, `region?`, `subjectRegion?`, `ring?`, `accentSphere?` (posición o `'none'`) | `region 'center'`, `subjectRegion 'center'`, anillo sí salvo `ring: false`, `accentSphere 'upper-start'` |
@@ -400,6 +425,7 @@ Elementos **con anillo** (cuentan para «un anillo por pieza»): `orbit`, `measu
 | `single-voice-pair-per-piece` | más de un `voice` |
 | `single-signature-per-piece` | más de un `signature` |
 | `signature-already-decides-url-bubble` | `signature` y `url-bubble` en la misma pieza |
+| `sphere-ring-only-live` | `orbit` con `sphereRing: true` sin `live: true` (contrato 0.3.1; D8) |
 
 ### 3.5 El manifest
 
@@ -413,7 +439,7 @@ socialMultiplierApplied }, palette: { accent, background, ring, halo }, elements
 
 | `kind` | Campos resueltos |
 |---|---|
-| `orbit` | `placement` (`{ target: { id, kind }, radius: { of: 'target-radius', airRatio: 0.12 } }` o `{ region, radius: { ratio, of } }`), `ring { strokePx, opacity, color, innerOrbits }`, `innerOrbits`, `arc { startDeg, sweepDeg, strokePx, color, linecap, gradient }` o `null`, `trajectory`, `sphere { radiusPx, color, at: 'arc-end', ring }` o `null` (con satélites o `none`), `halo { radiusRatio, stops, color }` o `null` |
+| `orbit` | `placement` (`{ target: { id, kind }, radius: { of: 'target-radius', airRatio: 0.12 } }` o `{ region, radius: { ratio, of } }`), `ring { strokePx, opacity, color, innerOrbits }`, `innerOrbits`, `arc { startDeg, sweepDeg, strokePx, color, linecap, gradient }` o `null`, `trajectory`, `sphere { radiusPx, color, at: 'arc-end', ring }` o `null` (con satélites o `none`), `halo { radiusRatio, stops, color }` o `null` (desde 0.3.1, en superficie clara las opacidades de `stops` salen × `haloOnLightScale`) |
 | `measure` | `placement` (target + aire 0,12), `value`, `source`, `label`, `ring`, `arc` (la **estela**: `startDeg = −90 + valor×360 − min(50, valor×360)`, `sweepDeg = min(50, valor×360)`), `sphere`, `originMark { deg: −90, color }`, `trajectory`, `halo: null` |
 | `progress` | `placement` (región con radio de lienzo, o target con aire 0), `sections`, `current`, `ring`, `arc { startDeg −90, sweepDeg }` (portada 50°, si no `current/sections × 360`), `sphere`, `closed`, `originMark null`, `trajectory`, `halo null` |
 | `lens` | `photo { id, alt, subjectRegion }`, `placement` (región), `subject { circleRatio, airRatio }`, `inside { zoom }`, `outside`, `ring` (anatomía: trazo `max(1, 1,4×w/794)`, opacidad 0,28, `airRatio 0.12`) o `null`, `arc` (50° centrado en `accentSphere`, trazo 2,8×w/794) o `null`, `sphere` (5,6×w/794) o `null` |
@@ -436,7 +462,8 @@ pairsWithNumber (true en measure/progress) }`.
 `text-never-crosses-ring` · `ring-center-on-target-center` · `sphere-on-arc-end` · `lens-subject-inside-circle` ·
 `url-as-bubble-never-text` · `decorative-svg-hidden-from-accessibility-tree` · `signature-centered` ·
 `signature-min-contrast` · `orbit-never-over-subject-or-reserves` · `accent-arc-never-reads-as-data` ·
-`answer-period-part-of-text` · `measure-shows-value-and-source`.
+`answer-period-part-of-text` · `measure-shows-value-and-source` · `accent-text-min-size` (**contrato 0.3.1, en
+publicación**; D1: ningún texto de menos de 24 px en el acento).
 
 ---
 
@@ -601,7 +628,9 @@ círculo; la estela de `measure` lleva la marca de partida (`origin`, opacidad 0
 
 `OrbitOptions`: `width`, `height`, `line?` (default `growth`), `surface?` (`dark`), `channel?` (`screen`), `circle?`,
 `region?` (`center`), `start?` (`upper-start`), `span?` (`accent`), `innerOrbits?` (false), `halo?` (true),
-`sphereRing?` (false), `background?` (false), `idPrefix?`.
+`sphereRing?` (false), `background?` (false), `idPrefix?`. `sphereRing` queda reservado a «en vivo» (D8); si el paquete
+0.3.2 expone `live` en `OrbitOptions` y en el atributo `sphere-ring` del Web Component no está verificado: revisarlo al
+publicar.
 
 `MeasureOptions`: `width`, `height`, `value` (0–1), `source` (obligatoria), `label?`, `circle` (el objeto rodeado;
 el anillo queda en `circle.r` porque la función divide por 1,12 antes de sumar el aire), `line?`, `surface?`,
@@ -664,8 +693,9 @@ words», ««…» crosses the ring», ««…» does not fit the canvas», ««
 `assetBase?`, `idPrefix?`. Portada y cierre en oscuro; sección y contenido en papel. Portada: logo negativo en
 140,110 (230 px) y eyebrow en 400,118; pregunta en 140,640 (40 px); respuesta en 140,715. Sección: número en Bricolage
 300 190 px dentro del anillo y «Sección n de N». Contenido: indicador de 80 px en la esquina; cifras en 140/620/1100 ×
-620; nota en 140,960. Cierre: logo dentro de la órbita completa (220 px centrado en 960,330), pregunta, respuesta y el
-eslogan (Poppins 28: *Empower* 800 itálica, *your* 800, palabra 900 itálica en el acento) centrados. Lanza «a text
+620; nota en 140,960. Cierre: logo dentro de la órbita completa (220 px centrado en 960,330; cierre de marca aprobado,
+D5), pregunta, respuesta y el eslogan (Poppins 28: *Empower* 800 itálica, *your* 800, palabra 900 itálica **en el
+acento**, decisión D3; así lo pinta axis-graphic-line desde 0.3.1) centrados. Lanza «a text
 crosses the orbit» en portada y sección.
 
 ### 7.6 Movimiento (`motion.ts`)

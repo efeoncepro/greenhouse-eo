@@ -1,6 +1,7 @@
 # Aplicaciones de «La órbita» — guía por pieza y por espacio
 
-Verificado contra: greenhouse-eo@7cb24df17 · axis-design-system@a5c21ae — 2026-09-26
+Verificado contra: greenhouse-eo@7cb24df17 · axis-design-system@a5c21ae — 2026-09-26 (decisiones del operador D1–D15
+del 2026-09-26 registradas; ver `ledger.md`)
 
 Esta guía dice, **para cada aplicación**, qué elementos de la línea van (y cuáles nunca), dónde se ubican, cuánto espacio
 ocupan, en qué superficie y color, y cómo se produce. No repite la API (ver `package-and-tokens.md`), el significado de
@@ -33,7 +34,7 @@ Estas reglas no se repiten en cada tarjeta; se asumen siempre.
 3. **Un solo anillo alrededor de lo que rodea** (M §1.3, 2026-09-26): las órbitas interiores sólo van en una órbita
    vacía que las necesita (anatomía, mapa de portafolio). El contrato rechaza `inner-orbits-never-around-content`.
    Varias láminas de aplicaciones (banner de LinkedIn en L 4.1, fondo de Teams en L 4.3 3/3) se dibujaron antes con una
-   órbita interior: **al reproducirlas, un solo anillo**.
+   órbita interior: **al reproducirlas, un solo anillo** (decisión del operador, 2026-09-26, D6).
 4. **El texto nunca cruza la órbita** (M §1.3; en código, `textCrossesRing`). La órbita tampoco cruza el sujeto de una
    foto, la reserva de texto, el lecho ni la firma.
 5. **Posición por defecto** (L 5.1): centro de la órbita fuera del eje, hacia la derecha y arriba; el texto vive en el
@@ -51,12 +52,15 @@ Estas reglas no se repiten en cada tarjeta; se asumen siempre.
 11. **Objetos: frente la palabra con su punto; dorso el logo solo** (M §10.4). La órbita, si va, rodea la palabra.
     **Nunca** la órbita alrededor del logo en un objeto.
 12. **Color:** una marca y un acento por pieza (M §2). Oscuro Efeonce `#001A33` + teal `#36C8BF` + halo `#72DED8`;
-    papel `#F7F8F6`/blanco con navy `#023C70` y teal oscuro `#0E8C82` **sólo como gráfico**. Cada pieza toma el acento
-    de **su línea de servicio**; el logo que firma es siempre Efeonce (M §7). El teal claro nunca es texto sobre claro
-    (2,1:1).
-13. **Soporte físico:** los valores son sRGB; CMYK o Pantone se fijan **con prueba física del proveedor**, nunca sin
+    papel `#F7F8F6`/blanco con navy `#023C70` y teal oscuro `#0E8C82` como gráfico y texto de 24 px o más. Cada pieza
+    toma el acento de **su línea de servicio**; el logo que firma es siempre Efeonce (M §7). **Regla del acento** (D1,
+    2026-09-26): ≥ 3:1 contra su fondo en gráfico y texto ≥ 24 px; **nunca en texto de menos de 24 px** (ahí navy sobre
+    claro, blanco sobre oscuro). El teal claro nunca es texto sobre claro (2,1:1).
+13. **Halo sobre papel a media intensidad** (D7, token `orbit.haloOnLightScale: 0.5`); en impresión con degradados bajo
+    5 % se omite (§0.1).
+14. **Soporte físico:** los valores son sRGB; CMYK o Pantone se fijan **con prueba física del proveedor**, nunca sin
     prueba (L 5.1, M §2). Todo objeto o espacio se valida con muestra antes de producir.
-14. **Maquetas generadas con IA son maquetas**: se rotulan como tales y la producción sale del arte vectorial (L 4.8,
+15. **Maquetas generadas con IA son maquetas**: se rotulan como tales y la producción sale del arte vectorial (L 4.8,
     L 4.9, M §10.8–10.9). Ver §K.
 
 ### 0.1 Medidas de producción por soporte (L 5.1)
@@ -71,16 +75,17 @@ Estas reglas no se repiten en cada tarjeta; se asumen siempre.
 | Pizarra | impreso 2 mm, 30 % | impreso 4 mm | imán Ø 45 mm | sin halo | el imán es la esfera y se mueve |
 | Video | igual que pantalla | crece en 1 s, ease-out | asienta con rebote de 0,3 s | sube en 0,8 s | cierre de 4,5 s; movimiento reducido = cuadro final |
 
-### 0.2 Tensión abierta entre fuentes: ¿el logo dentro de la órbita?
+### 0.2 El logo dentro de la órbita (decidido el 2026-09-26, D5)
 
 M §8.3 n.º 8 prohíbe «órbita alrededor del logo: la órbita rodea palabras, nunca el logo», y L 4.4 / M §10.4 descartan
-la órbita alrededor del logo **en objetos**. Pero varias composiciones de **cierre de marca** ponen el logo dentro de su
-órbita: el muro de recepción («el logo completo va una sola vez, en el muro de recepción, dentro de su órbita», L 4.3
-1/3), el cierre de deck de `deckSlideHtml('close')` (el logo dentro de la órbita completa), el reverso de la tarjeta de
-presentación (L 4.6 3/3) y el banner de LinkedIn (L 4.1). En cambio, la contraportada de Insights lleva «el logo fuera
-de la órbita» (L 7.2). Lectura de trabajo (**inferido**): en objetos, nunca; en cierres de marca aprobados en las
-láminas citadas, se reproduce la lámina tal cual; en cualquier pieza nueva, no pongas el logo dentro de la órbita sin
-confirmarlo con el operador. Registrar la decisión en `ledger.md` cuando llegue.
+la órbita alrededor del logo **en objetos**. El operador decidió la excepción:
+
+- **Sí, sólo en cierres de marca:** el cierre del deck (`deckSlideHtml('close')`), el cierre de video (`brand-close`) y
+  el muro de recepción (L 4.3 1/3). El resguardo X del logo (alto de la nave) se respeta: el anillo queda fuera de él.
+- **Nunca** en el banner de LinkedIn (L 4.1) ni en el reverso de la tarjeta de presentación (L 4.6 3/3): en objetos, el
+  logo va solo en el dorso. Esas láminas no se reproducen tal cual en este punto.
+- **En todo lo demás** rige M §8.3 n.º 8: la contraportada de Insights, por ejemplo, lleva el logo fuera de la órbita
+  (L 7.2).
 
 ---
 
@@ -103,8 +108,10 @@ confirmarlo con el operador. Registrar la decisión en `ledger.md` cuando llegue
 - **Color y superficie:** oscuro de la línea (`#001A33` en Efeonce, `#091951` en productos) con el acento de la línea.
 - **Cómo se produce:** `lensRecipe('post' | 'campaign-post', { photoId, photoSrc, alt, question, answer, line })` +
   `recipeHtml(...)`. La foto sale del banco de la lente (L 5.2) o se genera con `pnpm foto:prompt` →
-  `pnpm foto:generar <ficha>` → `pnpm foto:validar`, cumpliendo las reglas de la toma (sujeto en un círculo del 55 % del
-  lado corto con 15 % de aire).
+  `pnpm foto:generar <ficha>` → `pnpm foto:validar`, cumpliendo las reglas de la toma: el sujeto cabe en el círculo
+  que la lente **muestra de verdad** en ese formato (el 55 % se mide sobre el círculo visible de la lente, no sobre el
+  plate: se ajusta la toma, no la pieza; D10 P-3), un solo punto de interés, y una palanca que concentre, nunca una que
+  llene el cuadro (D10 P-9). Detalle en `photography-convergence.md`.
 - **Errores comunes:** foto sin punto de interés claro («se nota el truco», L 1.3) · esfera suelta sin arco (el token
   `lens.accentSphereDiameterRatio` está retirado: usar `lens.anatomy`) · respuesta de más de tres palabras (la receta
   lanza error).
@@ -156,6 +163,9 @@ confirmarlo con el operador. Registrar la decisión en `ledger.md` cuando llegue
   pregunta 24 px, respuesta 76 px; texto a la izquierda del anillo (`text: start`).
 - **Cómo se produce:** `lensRecipe('linkedin', { …, proof })` (ej. del Lab: «¿Cómo va tu campaña? En vivo. Entra a tu
   operación cuando quieras.»).
+- **La foto:** en formato nativo 1200×627, **nunca recortada de un 16:9** (D10 P-6). `foto:prompt` todavía no genera
+  ese formato: queda en la task «foto:prompt y chequeos de la lente» (sin ID); hasta entonces, esta pieza no tiene
+  camino fotográfico canónico.
 - **Fuente:** L 4.2; R `lensRecipe`.
 
 ### A6. Banner / portada de perfil de LinkedIn 1584 × 396
@@ -164,10 +174,13 @@ confirmarlo con el operador. Registrar la decisión en `ledger.md` cuando llegue
   de LinkedIn»; que sea la portada de perfil es **inferido** por el tamaño).
 - **Va:** respuesta-promesa grande con su esfera («Te hacemos visible.») + una línea de mecanismo en Poppins («Crecimiento
   medido: marca, búsqueda y medios.») a la izquierda · órbita a la derecha con halo.
-- **Nunca:** «visible» sin su mecanismo al lado (L 1.4) · órbita interior (ver §0, punto 3).
-- **Espacio:** en la lámina, texto desde x 80 px; órbita cx 1250, cy 198, r 150 (≈ 38 % del alto). La lámina coloca
-  el logo dentro de la órbita (ver §0.2). La zona que tapa la foto de perfil de LinkedIn (abajo a la izquierda) no está
-  marcada en la lámina: dejarla libre es **inferido**; verificar en la vista real.
+- **Nunca:** «visible» sin su mecanismo al lado (L 1.4) · órbita interior: un solo anillo (D6) · **el logo dentro de la
+  órbita** (D5; la lámina lo pone adentro y eso no se reproduce).
+- **Espacio:** en la lámina, texto desde x 80 px; órbita cx 1250, cy 198, r 150 (≈ 38 % del alto). En el Lab (AXIS
+  0.3.5) la portada quedó **sin logo**: el avatar de la página ya lleva la marca justo debajo. Es una propuesta de
+  implementación, no una decisión del operador: si la portada debe llevar logo, va fuera de la órbita con su
+  resguardo (consultar dónde). La zona que tapa la foto de perfil (abajo a la izquierda) no está marcada en la lámina:
+  dejarla libre es **inferido**; verificar en la vista real.
 - **Cómo se produce:** no hay receta: se compone con `composeGraphicLine` tomando la lámina como referencia.
 - **Fuente:** L 4.1; L 1.4.
 
@@ -214,7 +227,7 @@ confirmarlo con el operador. Registrar la decisión en `ledger.md` cuando llegue
 | **Portada** | oscuro | logo arriba a la izquierda (230 px) con el antetítulo al lado; pregunta y respuesta en la mitad inferior | arco corto de acento a la derecha: anillo cx 1500, cy 380, r 340, 16 %; arco 200°–250° |
 | **Sección** | papel | número de sección grande **dentro** del anillo y «Sección n de N» debajo; pregunta y respuesta a la izquierda | el arco suma su tramo desde las 12: anillo cx 1420, cy 540, r 300 |
 | **Contenido** | papel | antetítulo, pregunta, respuesta; hasta **tres cifras reales** en columnas con su contexto; nota al pie (fuente o «datos de muestra») | **indicador chico de 80 px en la esquina** (cx 1760, cy 130, r 40): sólo marca «3 de 5» |
-| **Cierre** | oscuro | la órbita completa con la esfera arriba y el logo dentro (ver §0.2); pregunta, respuesta y eslogan centrados debajo | anillo cx 960, cy 330, r 200 |
+| **Cierre** | oscuro | la órbita completa con la esfera arriba y el logo dentro, con su resguardo (cierre de marca, §0.2); pregunta, respuesta y eslogan centrados debajo, con **la palabra final en el acento de la línea** (D3; axis-graphic-line 0.3.2) | anillo cx 960, cy 330, r 200 |
 
 - **Nunca:** el arco como decoración (mide la navegación real) · eslogan fuera del cierre · pie con dirección y
   teléfonos: en decks el pie lleva **como máximo la burbuja URL** (excepción aprobada sólo para el deck de Insights,
@@ -276,7 +289,7 @@ confirmarlo con el operador. Registrar la decisión en `ledger.md` cuando llegue
 - **Va:** la órbita **a la derecha** con halo (en la lámina cx 1380, cy 430, r 380) · el logo abajo a la derecha (200
   px).
 - **Espacio:** **la zona izquierda queda libre para la cámara**; nada de texto donde va la persona.
-- **Nunca:** órbita interior (la lámina tiene una, ver §0, punto 3) · eslogan · voz larga.
+- **Nunca:** órbita interior (la lámina tiene una: se reproduce con un solo anillo, D6) · eslogan · voz larga.
 - **Fuente:** L 4.3 3/3; M §10.3.
 
 ---
@@ -307,7 +320,10 @@ confirmarlo con el operador. Registrar la decisión en `ledger.md` cuando llegue
   no es texto va en PNG 2×–3×. Contrato `efeonce.email-signature`.
 - **Errores comunes:** revisarla sólo con fuentes web (Outlook y Gmail muestran **Arial**: revisar también así) · la
   regla de sección como `div` de 1 px (Outlook la ignora: es el borde superior de una celda).
-- **Pendiente:** instalarla en Outlook, persona por persona.
+- **Instalación (D11, 2026-09-26):** cada persona la instala en Outlook desde el HTML generado (`outlook-a.html` /
+  `outlook-b.html` con sus imágenes publicadas).
+- **Eslogan de la firma:** va a 12 px, así que la palabra final va en el color del nombre (navy o blanco), no en el
+  acento: es la regla del acento para texto de menos de 24 px (D1).
 - **Fuente:** L 4.5; M §10.2; T `emailSignature`, `portrait`; R `portraitOrbitSvg`, `sphereDividerSvg`.
 
 ### C2. Firma de equipo (buzón de área, `variant: 'team'`)
@@ -320,7 +336,8 @@ confirmarlo con el operador. Registrar la decisión en `ledger.md` cuando llegue
   nueva se agrega **primero** en los tokens `emailSignature.team.areas`.
 - **Cómo se produce:** `AREA=<talent|finance|commercial> node build4.mjs` (con `HOST_BASE` escribe
   `out/equipo/<área>/hosted/`); el ícono con órbita se publica en `areas/<área>-<dark|light>.png`.
-- **Pendiente:** si `people@` es un área aparte; la URL de LinkedIn de la empresa.
+- **`people@efeoncepro.com`** usa la firma del área **Talent** (D11, 2026-09-26): no es un área aparte.
+- **Pendiente:** la URL de LinkedIn de la empresa.
 - **Fuente:** M §10.2; T `emailSignature.team` (tokens y contratos 0.3.4).
 
 ### C3. Firma de respuesta y reenvío
@@ -343,7 +360,7 @@ completa la oficina. Todo con prueba de color sobre el material real.
 
 | Aplicación | Va | Nunca | Espacio y material |
 |---|---|---|---|
-| **Muro de recepción** (L 4.3 1/3) | la órbita con el **logo completo** dentro y el eslogan centrado debajo; es el único lugar donde va el logo completo en la oficina | repetir el logo en otros muros | en la lámina el anillo (r 300 sobre 1080 de alto) ocupa algo más de la mitad del alto del muro, centrado, con el eslogan en el tercio inferior; vinilo o pintura sobre navy |
+| **Muro de recepción** (L 4.3 1/3) | la órbita con el **logo completo** dentro (cierre de marca aprobado, D5; el anillo fuera del resguardo X) y el eslogan centrado debajo; es el único lugar donde va el logo completo en la oficina | repetir el logo en otros muros | en la lámina el anillo (r 300 sobre 1080 de alto) ocupa algo más de la mitad del alto del muro, centrado, con el eslogan en el tercio inferior; vinilo o pintura sobre navy |
 | **Mural / sala de espera con lente** (L 4.3 1/3, L 4.9) | la lente sobre una foto del oficio con su órbita y una palabra con su punto («Hacer.») | segunda órbita en el mismo muro | receta `lensRecipe('wall')`: anillo cx 1150, cy 420, r 392 en 1920×1080, respuesta 200 px, sin pregunta ni firma |
 | **Pantalla de recepción** | ver B5 | sonido | pantalla |
 | **Directorio de piso** (L 4.3 1/3) | la pregunta «¿A dónde vas?»; cada área con **la esfera en el acento de su marca** | órbitas por fila | papel/claro; esfera como marcador de área |
@@ -359,7 +376,7 @@ completa la oficina. Todo con prueba de color sobre el material real.
 | **Pasillo · muro de trabajo** (L 4.3 2/3) | lente sobre el trabajo en curso con pregunta y respuesta («¿Cuál sale al aire? Esta.») | anotaciones de lámina en el muro (ver §K) | muro navy, una lente |
 | **Pizarra de proyecto** | la pregunta abierta con su anillo («¿Qué aprendimos en este ciclo?», «Escríbelo adentro.»); **el imán es la esfera y avanza por la órbita** | respuesta impresa (la voz queda abierta) | órbita impresa 2 mm al 30 %, arco impreso 4 mm, imán Ø 45 mm |
 | **Muro de voz** | **una** pregunta y su respuesta, pintadas («¿Lo medimos? Siempre.»), del banco de voz | dos pares en un espacio | pintura; una por espacio |
-| **Cabinas de llamada y podcast** | **anillo = libre**, **esfera = en el aire / en llamada**, con su palabra («Libre.», «En el aire.») | rojo/verde | letrero en la puerta |
+| **Cabinas de llamada y podcast** | **anillo = libre**, **esfera = en el aire / en llamada**, con su palabra («Libre.», «En el aire.»); «en el aire» es el estado en vivo y el único que puede sumar el anillo propio de la esfera (`sphereRing` con `live: true`, D8) | rojo/verde | letrero en la puerta |
 
 ### D3. Convivir
 
@@ -373,7 +390,9 @@ completa la oficina. Todo con prueba de color sobre el material real.
 
 - **Cómo se produce (toda la oficina):** hoy no hay receta de paquete salvo la lente de muro. El arte plano de
   referencia es la lámina 4.3 (generador del canvas en `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/`);
-  los archivos de impresión y plantillas editables están **pendientes** (M §12). Para mostrarlo en un espacio real, §K.
+  los archivos de impresión y plantillas editables están **pendientes** (M §12): se empieza por el muro de recepción y
+  la tarjeta de presentación, en PDF vectorial salido de las recetas, **bloqueado** hasta tener la especificación de la
+  imprenta (D13). Para mostrarlo en un espacio real, §K.
 - **Fuente:** L 4.3 (1/3, 2/3, 3/3), L 4.9, L 5.1; M §10.3, §10.9.
 
 ---
@@ -447,7 +466,7 @@ una marca existente. Muestra física del proveedor antes de producir.
 | **Carnet · reverso** | 540 × 860, navy | la voz: «¿Lo encontraste? Devuélvelo.» y dónde (recepción) | — |
 | **Credencial de evento** | 700 × 980 | cabecera navy con nombre del evento, fecha · ciudad y logo; nombre con su punto; **el rol por la forma: anillo = asistente, órbita = speaker, esfera = staff**; **el staff en navy** para encontrarlo rápido | el rol por colores |
 | **Tarjeta de presentación · frente** | 850 × 550, claro | la persona: nombre, cargo, teléfono, correo | la URL como texto (va en su burbuja) |
-| **Tarjeta · reverso** | 850 × 550, navy | la órbita con el logo y el eslogan (ver §0.2) | — |
+| **Tarjeta · reverso** | 850 × 550, navy | **el logo solo**, como el dorso de un objeto (D5, §0.2) | la órbita alrededor del logo (la lámina 4.6 3/3 la pone: no se reproduce) |
 | **Pin** | 500 × 500 | órbita en plata y teal | — |
 | **Lanyard, yoyo y portacarnet** | — | **el actual se mantiene** (kit `13- Branding/Lanyard Efeonce/v01/`); portacarnet de marco rígido | una funda cerrada sobre el arte |
 
@@ -494,7 +513,7 @@ una marca existente. Muestra física del proveedor antes de producir.
 - **Credenciales:** §G.
 - **Cómo se produce:** arte plano de L 4.7 3/3; en pantalla, el foco con `spotlightRecipe('event', { …, proof })`
   (anillo alrededor de una luz cx 960, cy 470, r 380). Validar colores con prueba de impresión en tela.
-- **Pendiente:** revisión legal del claim «Te hacemos visible» antes de pauta.
+- **Regla (reafirmada el 2026-09-26, D15):** revisión legal del claim «Te hacemos visible» antes de cualquier pauta.
 - **Fuente:** L 1.4, L 4.7 3/3, L 4.8 3/3; M §1.4, §10.7; T `pieces.spotlight`.
 
 ---
@@ -527,6 +546,8 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 1. **Plano exacto (arte vectorial).** Es la fuente de verdad: la lámina del canvas y, para producción, el archivo
    vectorial. Las piezas con receta salen del paquete; las demás, de su lámina. Los archivos de impresión y las
    plantillas editables están **pendientes** (M §12): hoy no hay «archivo final de imprenta» de ninguna pieza física.
+   El orden decidido (D13): primero la tarjeta de presentación y el muro de recepción, en PDF vectorial desde las
+   recetas; está **bloqueado** hasta tener la especificación de la imprenta.
 2. **Foto IA como maqueta de dirección** (L 4.8, L 4.9; M §10.8–10.9). El arte plano entra como **referencia exacta**;
    el modelo (GPT Image 2.5 Sunburst) **sólo pone material, espacio y luz**; la gráfica no se redibuja. Prendas y
    credenciales usan además los kits reales (polo, gorra, lanyard) como referencia de forma y tela. Registro documental
@@ -557,14 +578,14 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Story 9:16 | lente con órbita | foto, voz, firma; zonas de interfaz libres | `lensRecipe('story')` |
 | Carrusel | sin regla (inferido: una por lámina) | como post | consultar |
 | LinkedIn 1200×627 | lente a la derecha | voz + prueba a la izquierda | `lensRecipe('linkedin')` |
-| Portada LinkedIn 1584×396 | órbita a la derecha con halo | promesa con esfera + mecanismo | `composeGraphicLine` desde L 4.1 |
+| Portada LinkedIn 1584×396 | órbita a la derecha con halo, un solo anillo, sin el logo adentro | promesa con esfera + mecanismo | `composeGraphicLine` desde L 4.1 |
 | Avatar / favicon | ninguna (el isotipo ya es órbita) | isotipo al 60 % | archivo oficial |
 | Ad con CTA | ninguna por defecto; declarada si trabaja | tres voces + CTA + logo 20–25 % | `pnpm foto:componer:cta` |
 | Deck | progreso: arco por sección; 80 px en contenido; completa al cierre | voz, cifras reales, eslogan sólo al cierre | `deckSlideHtml` |
 | Portada de deck con foto | lente | foto + voz | `lensRecipe('deck-cover')` |
 | Informe A4 | portada con órbita; avance/medida sólo con dato; esfera al final de la serie | voz, figuras, pie con burbuja | catálogo Insights (L 7.x es prueba) |
 | Pantalla de recepción | cierre de marca en loop | órbita, logo, eslogan | `brandClose` |
-| Fondo de Teams | órbita a la derecha | logo abajo-derecha; izquierda libre | desde L 4.3 3/3 |
+| Fondo de Teams | órbita a la derecha, un solo anillo | logo abajo-derecha; izquierda libre | desde L 4.3 3/3 |
 | Firma de correo personal | retrato con órbita + línea que termina en la esfera | nombre con punto, contacto, burbuja, cierre de marca, partners | `build4.mjs`, `portraitOrbitSvg`, `sphereDividerSvg` |
 | Firma de equipo | órbita alrededor del ícono del área | área con punto, correo del área | `AREA=… build4.mjs` |
 | Firma de respuesta | ninguna | una línea de texto | texto vivo |
@@ -586,7 +607,7 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Hoodie | ninguna | uniforme vigente | — |
 | Carnet | retrato con órbita | nombre con punto, logo, voz atrás | `portraitOrbitSvg` + arte L 4.6 |
 | Credencial de evento | anillo / órbita / esfera = rol | cabecera navy, nombre con punto | arte L 4.6 3/3 |
-| Tarjeta de presentación | reverso: órbita con logo | persona adelante; eslogan atrás | arte L 4.6 3/3 |
+| Tarjeta de presentación | ninguna | persona adelante; el logo solo atrás | arte L 4.6 3/3 sin la órbita del reverso |
 | Caja de bienvenida | ninguna | voz en la tapa, logo en el canto | arte L 4.7 |
 | Envío a clientes | un anillo afuera; sello-esfera adentro | logo chico, «Gracias.» | arte L 4.7 |
 | Hoja membretada | órbita recortada en la esquina al 18 % | logo, pie que termina en la esfera | arte L 4.7 2/3 |
@@ -600,7 +621,8 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 
 ## Lo inferido en este archivo (confirmar con el operador)
 
-1. La lectura de la tensión «logo dentro de la órbita» (§0.2).
+1. Dónde va el logo en la portada de LinkedIn, ahora que no va dentro de la órbita (A6). *(La tensión «logo dentro de
+   la órbita» quedó decidida el 2026-09-26, D5: §0.2.)*
 2. La grilla y la existencia del post 1:1 como aplicación de la línea (A2).
 3. Todo el carrusel (A4): no hay regla.
 4. Que el banner 1584 × 396 sea la portada de perfil/página, y dejar libre la zona de la foto de perfil (A6).

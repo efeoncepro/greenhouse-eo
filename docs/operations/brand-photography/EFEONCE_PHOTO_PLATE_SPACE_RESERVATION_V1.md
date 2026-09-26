@@ -264,3 +264,17 @@ sobre el canto de una mesa y queda como decisión del operador.
 > **Regla que queda:** la toma deja el canto del lecho por encima de la banda de la firma. Si el plate no lo cumple, en
 > una pieza nueva se rehace (§2, regla 6); subir el primer plano de un plate ya generado es un arreglo sólo para piezas
 > aprobadas.
+
+## Delta 2026-09-26 — excepciones de la lente de la línea gráfica **[decisión del operador, 2026-09-26]**
+
+El operador resolvió los conflictos entre este documento y la lente de la línea gráfica «La órbita» (detalle en el
+[lenguaje fotográfico §11](EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) y en el manual de la línea §9.1):
+
+- **Regla 5 (nunca un scrim):** sigue vigente para toda pieza **sin lente**. En una pieza con lente, el exterior
+  apagado del círculo es el tratamiento de la línea y **cuenta como la reserva del texto** (P-1).
+- **Regla 2 (cabezas y manos bajo el 36 %):** aplica **sólo cuando la toma tiene reserva de texto**. Una foto para lente
+  sin reserva de texto no la necesita (P-8); `foto:prompt` todavía la emite siempre: el cambio queda en la task de
+  `foto:prompt` y chequeos de la lente.
+- **Regla 4 (nunca se recorta un formato desde otro):** sigue vigente. El formato 1200 × 627 de la imagen de LinkedIn
+  se suma como formato nativo de `foto:prompt` en esa misma task (P-6).
+- **Lecho:** en piezas con lente se pide igual (P-2 / P12).

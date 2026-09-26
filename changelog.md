@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-26 — Línea gráfica: decisiones del operador sobre contraste, halo, logo y fotografía (AXIS 0.3.5)
+
+El operador aprobó las recomendaciones pendientes de la línea «La órbita». El acento pide 3:1 contra su fondo como
+gráfico o en texto de 24 px o más y nunca va en texto menor (Engine y Voice conservan su color); el magenta de
+Revenue-HubSpot queda aprobado; la burbuja URL pide 4,5:1; el halo sobre papel va a la mitad; el anillo propio de la
+esfera significa «en vivo»; el logo va dentro de la órbita sólo en los cierres de marca; «Growth» va en el acento en
+el cierre del deck. AXIS publicó el juego `v0.3.5` (tokens y contracts 0.3.5 con el contrato de la órbita 0.3.1,
+registry y brand-assets 0.3.1, graphic-line 0.3.2) y el Lab reproduce el banner, la story y el fondo de Teams con un
+solo anillo y el reverso de la tarjeta con el logo solo. Se aprobaron las 12 reglas de sinergia con la fotografía y se
+resolvieron sus 9 conflictos; lo que necesita código quedó en TASK-1918. Manual v1.8, ADR delta (e), lenguaje
+fotográfico v1.4 y la skill `efeonce-graphic-line` al día.
+
 ## 2026-09-26 — Skill viva `efeonce-graphic-line` y la órbita junto a la foto
 
 Nace la skill dueña de la línea gráfica «La órbita» (Claude y Codex, espejo byte-idéntico): el criterio de cada elemento
@@ -556,12 +568,3 @@ crecimiento B2B, mid-market y time-to-value; Salesforce-first gana peso con org 
 service a escala, extensibilidad e integración enterprise. La zona de solapamiento sigue incluyendo mid-market
 alto, agentes y coexistencia. El diagnóstico conserva las salidas `HubSpot-first`, `Salesforce-first`, `híbrida` y
 `no-fit`, siempre condicionadas a TCO, datos, adopción, entitlements y contrato.
-
-## 2026-09-16 — Dreamforce: AIforce, Missionforce y marketing agentic
-
-El ledger de Salesforce y sus skills espejo separan los anuncios del 15/09 de las publicaciones del 16/09.
-AIforce queda documentado como capa de interfaz/headless —no SKU— para llevar contexto, workflows, permisos,
-gobierno y acciones a interfaces como Claude y Slack. Missionforce suma capacidades para gobierno y entornos
-regulados con OpenAI/NVIDIA. Marketing Cloud Next incorpora Campaign Agent, Headless Marketing/MCP, Palmata,
-Data Guardian, Budget Optimization y otras capacidades con estados GA/fechas separados. Koa se conserva como
-lanzamiento del 15/09 en pilotos seleccionados. [Ledger](.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md)

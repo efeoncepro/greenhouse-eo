@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita · V1
 
 > **Tipo de documento:** Manual de marca (contrato operativo de diseño)
-> **Versión:** 1.7
+> **Versión:** 1.8
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
-> **Última actualización:** 2026-09-26 por Claude (§9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
+> **Última actualización:** 2026-09-26 por Claude (decisiones del operador D1–D15 del 2026-09-26: contraste del acento y magenta de Revenue-HubSpot, §2; «Growth» en el acento en el cierre del deck, §5 y §10.1; logo dentro de la órbita sólo en cierres de marca, §8.2, §8.3, §10.1, §10.3 y §10.6; un solo anillo en el banner de LinkedIn y el fondo de Teams, §1.3; halo a la mitad sobre papel y anillo de la esfera sólo «en vivo», §1.3; umbral de la burbuja 4,5:1, §8.5; reglas P1–P12 y conflictos P-1..P-9 resueltos, §9 y §9.1; firma de equipo para `people@`, §10.2; impresión, prueba sin logo, banco de pares y revisión legal, §4, §1.4 y §12. Antes, el mismo día: §9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
 > **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
 > **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (40 láminas, siete capítulos)
 > **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Desde AXIS 0.2.7 los archivos oficiales (logo e isotipo de las cuatro marcas y las tres burbujas URL) viven en el paquete `@efeoncepro/axis-brand-assets`; desde AXIS 0.3.0 el contrato de composición es `efeonce.graphic-line-orbit` 0.3.0 (`stable`) y el paquete `@efeoncepro/axis-graphic-line` 0.3.1 pinta la órbita, sus recetas y su movimiento (§13). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
@@ -71,7 +71,8 @@ Tres ideas sostienen todo lo demás:
 ### 1.3 La órbita — anatomía y regla
 
 Anatomía: **anillo** (el recorrido) · **arco** (lo avanzado) · **esfera** en la punta (dónde vamos) ·
-**halo** (el foco) · **órbitas interiores** (máximo 2) · **satélites** (canales o productos).
+**halo** (el foco) · **órbitas interiores** (máximo 2) · **satélites** (canales o productos) · **anillo de la esfera**
+(`sphereRing`, sólo «en vivo»).
 
 Todas las medidas se expresan **por cada 794 px de ancho** del lienzo (la base del informe A4 de Insights):
 
@@ -81,7 +82,8 @@ Todas las medidas se expresan **por cada 794 px de ancho** del lienzo (la base d
 | Arco | 1,6–2 px por cada 794 px, punta redonda, sentido horario. Corto (40–60°) con esfera; largo (hasta 140°) en degradé cuando lleva satélites, y entonces sin esfera |
 | Esfera | radio 3,5–4 px por cada 794 px; siempre en la punta del arco, nunca suelta |
 | Radio de la órbita | 30 % del ancho en retrato; 40 % del alto en horizontal |
-| Halo | radial: 13 % de opacidad en el centro, 3 % al 60 %, 0 al borde |
+| Halo | radial: 13 % de opacidad en el centro, 3 % al 60 %, 0 al borde. **Sobre papel, a la mitad** (paradas × 0,5; token `efeonceGraphicLine.orbit.haloOnLightScale: 0.5`, decisión del operador 2026-09-26; el render de movimiento ya lo hacía) |
+| Anillo de la esfera (`sphereRing`) | **sólo «en vivo»** (decisión del operador, 2026-09-26): el eco del pulso de impacto en movimiento y el estado activo o «en el aire» (por ejemplo, la cabina de llamadas). Nunca en piezas estáticas fuera de ese caso: el contrato rechaza `sphereRing` sin `live: true` (issue `sphere-ring-only-live`) |
 | Arco de avance | **sólo con un dato real**; el arco mide el dato. Sin dato, no hay arco de avance |
 | Satélites | discos de 30 px con el ícono del canal o producto, sobre la órbita exterior |
 | Redes | en lienzos de hasta 1200 px de ancho, grosores ×1,75 (anillo 2,4 px y esfera r 8 px sobre 1080). Verificado a 390 px de ancho |
@@ -99,7 +101,9 @@ fijo (lente, foco, deck, firma) se ajustaron a mano una por una y AXIS las guard
 un objeto, una lente, un texto— queda el anillo que recorre, con su arco y su esfera, y el objeto adentro. Las órbitas
 interiores no van por defecto: sólo en una órbita vacía que las necesita, como el diagrama de anatomía o el mapa de
 portafolio. El cierre de marca, el deck y la lente llevan un solo anillo. El contrato de AXIS rechaza órbitas
-interiores alrededor de un objetivo (`inner-orbits-never-around-content`).
+interiores alrededor de un objetivo (`inner-orbits-never-around-content`). **El banner de LinkedIn (lámina 4.1) y el
+fondo de Teams (lámina 4.3)**, que en el canvas llevaban órbitas interiores, se reproducen con **un solo anillo**:
+gana la regla del anillo único (decisión del operador, 2026-09-26).
 
 **La órbita no sustituye la composición** (regla del operador, 2026-09-26). No reemplaza la composición ni las
 formas del [lenguaje fotográfico](../brand-photography/README.md): se usa en casos específicos (una lente, una medida,
@@ -122,7 +126,8 @@ prueba**: «Te hacemos visible. Y lo medimos.»
 - **Motion:** el foco barre la escena y se posa sobre el cliente.
 - **Cuidar:** «visible» siempre con el mecanismo al lado (buscadores, respuestas de IA, alcance medido). Nunca
   nombres reales de competidores en el campo en penumbra. Una sola luz por pieza.
-- **Pendiente:** revisión legal del claim «Te hacemos visible» antes de pauta.
+- **Revisión legal antes de cualquier pauta, sin excepción** (regla reafirmada por el operador el 2026-09-26): el claim
+  «Te hacemos visible» no entra a medios pagados sin revisión legal.
 
 ### 1.5 La lente
 
@@ -148,6 +153,24 @@ corto de 50° y la esfera en su punta (radio 5,6 px), medidos por 794 px de anch
 
 Contrastes medidos de la esfera: Efeonce 8,5:1 (oscuro) y 3,9:1 (claro) · Globe 5,6:1 y 5,8:1 · Wave 3,6:1 y
 4,3:1 · Reach 4,4:1 y 3,5:1. La esfera es gráfico, no texto; el texto cumple 4,5:1 siempre.
+
+**Regla de contraste del acento** (decisión del operador, 2026-09-26). El acento de la línea debe llegar a **3:1 contra
+su fondo** cuando es gráfico (arco, esfera, halo) o texto de **24 px o más**. **Nunca** se usa para texto de menos de
+24 px: ahí va navy `#023C70` sobre claro y blanco sobre oscuro. Medido sobre los tokens publicados, los que quedan más
+justos pasan 3:1 y no llegan a 4,5:1:
+
+| Acento | Fondo | Contraste |
+|---|---|---|
+| Growth, teal `#0E8C82` | papel | 3,87:1 |
+| Engine `#0375DB` | su oscuro `#091951` | 3,60:1 |
+| Voice `#F83902` | papel | 3,53:1 |
+
+Engine y Voice **conservan su color** (no cambian). Los valores viven en el token `efeonceGraphicLine.accentContrast`
+(nuevo en `@efeoncepro/axis-tokens` 0.3.5).
+
+**Magenta de Revenue-HubSpot, aprobado tal como está** (operador, 2026-09-26): `accentOnDark` `#E86BD0` (5,9:1 sobre
+`#091951`) y `accentOnLight` `#8E1B82` (7,5:1 sobre papel). El naranjo de HubSpot no se usa: choca con Globe y Reach y
+es el color del partner.
 
 **Reglas:** una marca, un acento por pieza · el teal es sólo de Efeonce y nunca aparece en una pieza de producto ·
 el halo toma el color del acento · nunca dos acentos en la misma órbita · los valores son sRGB: la conversión a
@@ -179,7 +202,9 @@ Siempre hay dos voces, y a veces una tercera:
 - **Cuidar:** tuteo neutro, sin voseo ni modismos · nunca dos preguntas ni dos respuestas seguidas · la respuesta
   no promete resultados que no se pueden probar · nada de chistes ni frases motivacionales.
 
-**Banco de pares (candidatos, sin aprobar):** ¿Lo medimos? Siempre. · ¿Quién decide? Tú, con evidencia. · ¿Y si
+**Banco de pares (candidatos, sin aprobar).** Criterio fijado por el operador el 2026-09-26: se aprueban **dos pares
+por línea de servicio** y sólo con respuestas verificables; el operador revisa el banco (pendiente de su revisión).
+Candidatos: ¿Lo medimos? Siempre. · ¿Quién decide? Tú, con evidencia. · ¿Y si
 después lo hago yo? Esa es la idea. · ¿Y el reporte del viernes? Ya lo viste. · ¿Cuánto rindió? Te mostramos
 todo. · ¿Cómo va? En vivo. · ¿Dónde quedó lo aprendido? En tu historial. · ¿Otra agencia más? No. Un sistema. ·
 ¿Y si lo probamos? Hoy.
@@ -198,6 +223,8 @@ solo**, con la palabra final destacada. La palabra final rota por capability y t
 - Se usa desde el archivo oficial; no se rearma.
 - Va en cierres: final de video, última lámina, contratapa, firma de correo, recepción, merch.
 - No va en cada post: ahí la respuesta con esfera ya cierra.
+- **En el cierre del deck, la palabra final va en el acento de la línea, no en blanco** (operador, 2026-09-26):
+  «Growth» en teal sobre `#001A33` da 8,5:1.
 - **Nunca:** pegarle la esfera · traducirlo · cambiarle pesos o cursivas · escribirlo en mayúsculas.
 
 ---
@@ -259,7 +286,7 @@ producto con que se hace. Los pesos del eslogan no cambian (`src/config/efeonce-
   eslogan van en el acento de la línea; el logo que firma sigue siendo el de Efeonce. Los acentos viven en los tokens
   `family` de AXIS (hoy colgados del producto; deuda: pasarlos a la línea). RevOps y CRM toma el color de la plataforma
   en que se opera (HubSpot o Salesforce): los dos acentos viven en los tokens `lines` (`revenue-hubspot`,
-  `revenue-salesforce`); el magenta de HubSpot sigue a revisión del operador.
+  `revenue-salesforce`); el magenta de HubSpot quedó aprobado tal como está el 2026-09-26 (§2).
 - **Mapa de portafolio:** el arco y el centro son de Efeonce; los productos van como satélites con su isotipo.
 - **Hilo de familia (decidido):** la órbita misma, más la palabra final del eslogan. Descartado: el anillo teal
   en productos.
@@ -285,7 +312,7 @@ producto con que se hace. Los pesos del eslogan no cambian (`src/config/efeonce-
 | A color sobre blanco o papel | el navy oficial, desde el archivo |
 | Negativo sobre navy | siempre el archivo negativo, todo blanco |
 | Sobre foto | sólo en una zona calma, con contraste ≥ 4,5:1 medido; nunca con velo encima |
-| Área de resguardo | **X = alto de la nave**, en los cuatro lados. Nada entra en ese margen: ni texto, ni bordes, ni la órbita |
+| Área de resguardo | **X = alto de la nave**, en los cuatro lados. Nada entra en ese margen: ni texto, ni bordes, ni la órbita. En los cierres de marca donde el logo va dentro de la órbita (§8.3 n.º 8), el anillo queda **fuera** de ese margen |
 | Tamaño mínimo | **96 px en pantalla · 25 mm impreso**; recomendado ≥ 160 px. Bajo el mínimo, el isotipo [propuesta, validar con prueba de impresión] |
 | Familia | cada marca con su propio archivo, a color o en negativo (productos sobre `#091951`) |
 | Logo con eslogan | sólo el bloque oficial, en cierres |
@@ -303,7 +330,11 @@ Zona calma o cambia la foto; no se oscurece encima. En objetos, el logo va en el
 5. Sombras, brillos o contornos.
 6. Sin contraste: navy sobre azul oscuro, o sobre textura.
 7. Sobre una foto cargada: el logo compite con la escena.
-8. Órbita alrededor del logo: la órbita rodea palabras, nunca el logo.
+8. Órbita alrededor del logo: la órbita rodea palabras, nunca el logo. **Única excepción, los cierres de marca**
+   (decisión del operador, 2026-09-26): el cierre del deck, el cierre de video (las animaciones del logo aprobadas
+   terminan así) y el muro de recepción, siempre con el anillo fuera del resguardo X. **Nunca** en el banner de
+   LinkedIn (lámina 4.1) ni en el reverso de la tarjeta de presentación (lámina 4.6): en objetos el logo va solo en el
+   dorso y la órbita no entra en su resguardo. Cualquier otro uso del logo sigue esta regla sin excepción.
 9. Agregarle la esfera o un punto: la esfera es de la palabra, no del logo.
 10. Escribirlo con una fuente: se usa el archivo, no se tipea.
 11. Logo e isotipo juntos: uno u otro en cada vista.
@@ -344,8 +375,8 @@ versión toda blanca, se reemplaza.
 > la burbuja se fusiona a **opacidad 1** y un gate mide ≥ 4,5:1 sobre los píxeles finales; si no llega, el chequeo
 > falla y la pieza no pasa.
 >
-> **Pendiente de decisión del operador:** si el umbral de la burbuja-firma sigue en 4,5:1 o baja a 3:1 (tratarla como
-> objeto gráfico).
+> **Umbral decidido: 4,5:1** (operador, 2026-09-26). La burbuja es texto chico que la gente tiene que leer, no un
+> objeto gráfico: no baja a 3:1. Token `efeonceGraphicLine.urlBubble.minContrast: 4.5`.
 >
 > Los usos de la burbuja como **pie** (deck, informe, papelería, stand, firma de mail y pies de página) **no cambian**:
 > siguen como se describe abajo, con las variantes horneadas donde no hay fusión. Contrato: elemento `signature` de
@@ -380,7 +411,9 @@ nunca banco de imágenes. **La órbita no sustituye la composición fotográfica
 composición y la órbita sólo se suma, declarada, cuando hace uno de sus tres trabajos. Se produce con el pipeline canónico del [lenguaje fotográfico](../brand-photography/README.md)
 (`pnpm foto:prompt` para revisar el prompt, `pnpm foto:generar <ficha>` para producir el plate con las referencias que la ficha declara y `pnpm foto:validar` para medirlo), nunca armando prompts a mano.
 
-**Reglas de la toma para la lente:** el sujeto cabe en un círculo del 55 % del lado corto con 15 % de aire · fuera
+**Reglas de la toma para la lente:** el sujeto cabe en un círculo del 55 % con 15 % de aire; ese 55 % es del **círculo
+visible de la lente** en el formato de la pieza, no del lado corto del plate (en `post` la lente muestra ≈ 35 % del lado
+corto), y si no cabe **se ajusta la toma, no la pieza** (operador, 2026-09-26; §9.1) · fuera
 del círculo la foto tolera quedar en navy apagado · **sin emblema legible** (el logo lo pone la pieza, no la ropa) ·
 el azul lo porta un objeto del oficio, nunca un muro de fondo · un acento cálido (naranja o lima) en una de cada dos
 fotos, nacido de la acción · la obra en proceso · registro documental: nadie mira al lente.
@@ -421,9 +454,24 @@ idea al pie de la letra: el [lenguaje fotográfico](../brand-photography/EFEONCE
 - **La órbita lee la foto sin romperla:** las zonas `protect` del adapter (sujeto, reservas y lecho), la firma a la
   altura medida del lecho (`signature.y`), nunca un halo ni un velo sobre la foto fuera del tratamiento propio de la
   lente y del foco.
-- **Lo que queda abierto** —por ejemplo, el texto de la lente sobre la foto apagada frente a «nunca un scrim» del
-  lenguaje fotográfico, o el círculo del 55 % frente a lo que muestra la lente del post— está escrito como pendiente del
-  operador; ninguna de las dos reglas se modificó.
+- **Reglas de sinergia P1–P12 aprobadas** (operador, 2026-09-26): las doce de la referencia de convergencia (§6) dejan
+  de ser propuesta. P5 (cerrar las brechas del chequeo de la órbita contra lecho y reservas, y medir el sujeto contra el
+  círculo visible) y P9 (campo `reservas.lente` en `foto:prompt`) necesitan código y van a una task nueva, la «task de
+  `foto:prompt` y chequeos de la lente»; hasta que se implemente, se aplican a mano en la revisión.
+
+**Conflictos resueltos por el operador (2026-09-26).** Los nueve puntos donde las dos reglas parecían chocar quedan así:
+
+| # | Resolución |
+|---|---|
+| **P-1** | El exterior apagado de la lente **cuenta como la reserva del texto**: es un tratamiento de la línea, no un velo. La regla «nunca un scrim» sigue para toda pieza sin lente |
+| **P-2** | En piezas con lente **se pide el lecho igual** (regla P12) |
+| **P-3** | El 55 % es del **círculo visible** de la lente; se ajusta la toma, no la pieza |
+| **P-4** | Un anillo dibujado dentro de la escena **cuenta como órbita**: en una pieza con lente, se elige otro plate o se rehace la toma |
+| **P-5** | La capa gráfica sobre la foto queda **aprobada sólo en los casos declarados de la línea**: la voz pregunta–respuesta, la lente y la medida con fuente. Para todo lo demás sigue cerrada |
+| **P-6** | El formato nativo **1200 × 627** entra a `foto:prompt` (task); nunca se recorta desde 16:9 |
+| **P-7** | El retrato de perfil (firma de correo, tarjetas de equipo) entra al lenguaje fotográfico como **categoría propia**, donde mirar a cámara está permitido (a diferencia del registro A). Su barra está por redactar en esa categoría |
+| **P-8** | El límite «cabezas y manos bajo el 36 %» aplica **sólo cuando la toma tiene reserva de texto**; `foto:prompt` debe emitirlo sólo entonces (task) |
+| **P-9** | En piezas con lente **manda la cláusula de encuadre**; las palancas que llenan el cuadro (`variantes`, `manos`) sólo para piezas de sólo foto |
 
 Canon fotográfico: [índice](../brand-photography/README.md) y su
 [§11 «La línea gráfica en la foto»](../brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#11-la-línea-gráfica-en-la-foto).
@@ -439,7 +487,11 @@ skill `efeonce-graphic-line`.
 ### 10.1 Pantalla y campaña
 
 - **Deck:** la órbita es la navegación. La portada lleva un arco corto; cada sección suma su tramo; el cierre
-  completa la órbita con la esfera arriba. En el contenido en papel, la órbita baja a 80 px en la esquina.
+  completa la órbita con la esfera arriba. En el contenido en papel, la órbita baja a 80 px en la esquina. **Cierre del
+  deck** (operador, 2026-09-26): es uno de los tres cierres de marca donde el logo va dentro de la órbita, con el anillo
+  fuera del resguardo X (§8.3 n.º 8), y la palabra final del eslogan va en el acento de la línea, no en blanco (§5).
+- **Banner de LinkedIn (lámina 4.1) y fondo de Teams (lámina 4.3):** un solo anillo, sin órbitas interiores (§1.3). En
+  el banner **nunca** va el logo dentro de la órbita (§8.3 n.º 8).
 - **Campaña:** la órbita rodea la lente con aire; la esfera va arriba a la izquierda, lejos de la cara.
 - **Movimiento (cierre de marca 4,5 s):** anillo 0–0,5 s · arco 0,4–1,4 s · la esfera asienta 1,4–1,7 s · halo
   1,2–2,0 s · logo 1,9–2,5 s · eslogan 2,5–3,0 s. Con movimiento reducido, cuadro final fijo. Desde AXIS 0.2.7 estos
@@ -452,7 +504,8 @@ skill `efeonce-graphic-line`.
   reemplazan. **Reveal** (la línea se vuelve logo, 3,6 s): cierre de video, apertura de presentación o intro de
   evento. **Apertura** (el logo se abre en la línea, 2,4 s): paso del logo al lenguaje de la línea. **Sting** (el
   golpe corto, 1,6 s): cortinillas, redes y cierres breves. Son marca propia de Efeonce: nunca para clientes ni para
-  la UI de Greenhouse, y nunca se generan con un modelo de video. Dónde están:
+  la UI de Greenhouse, y nunca se generan con un modelo de video. El cierre de video es un cierre de marca: termina con
+  el logo dentro de la órbita, respetando el resguardo X (§8.3 n.º 8). Dónde están:
   - MP4 con sonido (60 y 30 fps), GIF de vista previa y cuadro final (con fondo y transparente): OneDrive
     `Alineación › 5. Contenidos › 13- Branding › Motion Órbita Efeonce › v1.1` (con su `LEEME.txt`).
   - Masters pesados (ProRes 4444 con alfa para After Effects, Premiere, Final Cut o DaVinci; WebM con alfa para web;
@@ -520,7 +573,8 @@ es el borde superior de una celda (Outlook ignora un bloque de 1 px). **Imágene
 El generador con `HOST_BASE=<esa URL>` escribe `out/v3.1/hosted/` (lo que se sube con `gcloud storage cp -r`) y los
 HTML listos para pegar: `outlook-a.html`, `outlook-b.html` y `outlook-respuesta.html`. Paquetes AXIS con el contrato:
 `@efeoncepro/axis-tokens` y `@efeoncepro/axis-ui-contracts` 0.3.2. **Pendiente:** instalar la firma en Outlook (cada
-persona, en su cuenta).
+persona, en su cuenta): **cada persona la instala en Outlook desde el HTML generado** (decisión del operador,
+2026-09-26).
 
 **Firma de equipo** (aprobada el 2026-09-26, `variant: 'team'`): para el buzón de un área. **No lleva foto:** la misma
 órbita del retrato rodea el **ícono del área** (Tabler outline) sobre un disco; el ícono va en el color del nombre y la
@@ -536,8 +590,9 @@ sin teléfono ni LinkedIn personal. Todo lo demás es igual a la firma personal.
 Generador: `AREA=<talent|finance|commercial> node build4.mjs` (con `HOST_BASE` escribe `out/equipo/<área>/hosted/` y
 sus `outlook-*.html`); el ícono con órbita se publica en `areas/<área>-<dark|light>.png`. En AXIS: tokens
 `efeonceGraphicLine.emailSignature.team` y contrato con la variante `team`, desde `axis-tokens` y `axis-ui-contracts`
-0.3.4. Un área nueva se agrega primero en esos tokens. Pendiente: confirmar si `people@efeoncepro.com` es un área
-aparte y la URL de LinkedIn de la empresa (hoy la firma de equipo no lleva LinkedIn).
+0.3.4. Un área nueva se agrega primero en esos tokens. **`people@efeoncepro.com` usa la firma del área Talent**, no un
+área nueva (operador, 2026-09-26). Pendiente del operador: la URL de LinkedIn de la empresa (hoy la firma de equipo no
+lleva LinkedIn).
 
 **Proporciones del retrato (lámina 4.5, medidas del original, caja de 208 px):** anillo de radio 96, foto recortada en
 círculo de radio 78, arco de 200° a 250° con trazo 4 y la esfera de radio 7 en su punta; anillo de 2 px en navy al
@@ -548,7 +603,8 @@ correo no muestran SVG: se rasteriza a 2× y se sirve el PNG. La órbita sale de
 
 ### 10.3 Oficina
 
-- **Llegar:** el logo completo va una sola vez, en el muro de recepción dentro de su órbita. Salas con verbos
+- **Llegar:** el logo completo va una sola vez, en el muro de recepción dentro de su órbita (uno de los tres cierres de
+  marca, con el anillo fuera del resguardo X; §8.3 n.º 8). Salas con verbos
   (Hacer, Medir, Crear); en el directorio, cada área con la esfera en su acento; la señalética de servicio en
   Poppins, sin esfera ni órbita.
 - **Trabajar:** **anillo = libre o abierto; esfera = ocupado o decidido**, nunca como semáforo de colores (token
@@ -593,7 +649,9 @@ El uniforme actual (polo, hoodie, gorra, chaqueta, lanyard) **sigue vigente**; l
   Devuélvelo.»
 - **Credencial de evento:** el rol por la forma — **anillo = asistente, órbita = speaker, esfera = staff** —, no por
   colores; el staff en navy.
-- **Tarjeta de presentación:** adelante la persona; atrás la órbita con el logo y el eslogan.
+- **Tarjeta de presentación:** adelante la persona; atrás **el logo solo**, y la órbita nunca entra en su resguardo
+  (decisión del operador, 2026-09-26, que corrige la lámina 4.6: la órbita alrededor del logo es sólo de los cierres de
+  marca, §8.3 n.º 8).
 - **Pin esmaltado:** la órbita en plata y teal.
 
 ### 10.7 Bienvenida, papelería y eventos
@@ -650,12 +708,12 @@ material real (vinilo, pintura, cerámica, impresión). Runner, ediciones y prom
 | Firma de pieza gráfica | el logo de Efeonce centrado abajo; la burbuja URL centrada y fusionada sólo si el logo ya está en la imagen | la burbuja por defecto, a un costado o junto al logo; firma y burbuja a la vez |
 | Arco de avance | mide un dato real | decorativo o inventado |
 | Voz | pregunta chica, respuesta grande de 1–3 palabras | pregunta grande, respuesta larga y chica |
-| Color | navy profundo con teal; teal oscuro sólo en gráfico sobre claro | teal claro como texto sobre blanco (2,1:1); dos acentos en una pieza |
+| Color | navy profundo con teal; el acento a ≥ 3:1 en gráfico y en texto de 24 px o más | el acento en texto de menos de 24 px; teal claro como texto sobre blanco (2,1:1); dos acentos en una pieza |
 | Tipografía | Bricolage para decir, Poppins para explicar | Bricolage en párrafos, monoespaciada |
 | Eslogan | bloque oficial, en cierres | traducido, con esfera, en mayúsculas, con otros pesos |
 | Objetos | frente: palabra; dorso: logo solo | logo y órbita juntos al frente |
 | Foto | oficio real, luz con carácter, sin emblema legible | velo navy encima, foto de banco |
-| Logo | archivo oficial, con resguardo X y contraste; en titulares puede ocupar el lugar de la palabra Efeonce | los doce usos incorrectos de §8.3 |
+| Logo | archivo oficial, con resguardo X y contraste; en titulares puede ocupar el lugar de la palabra Efeonce; dentro de la órbita sólo en cierres de marca (deck, video, recepción) | los doce usos incorrectos de §8.3; la órbita alrededor del logo en el banner de LinkedIn o el reverso de la tarjeta |
 | Isotipo | solo, en formatos chicos, ≥ 24 px | con otra órbita, recoloreado, rotado, combinado |
 | Terceros | satélites de canal que muestran dónde medimos | logos de terceros como si fueran alianzas |
 
@@ -674,21 +732,46 @@ material real (vinilo, pintura, cerámica, impresión). Runner, ediciones y prom
 - Retirados del canvas (quedan en el repo como historia): punto gigante, esfera tipográfica, objeto 3D, variantes
   contemporáneas y aplicaciones planas anteriores.
 
+**Decidido por el operador (2026-09-26):**
+
+| # | Decisión | Dónde |
+|---|---|---|
+| D1 | El acento llega a 3:1 contra su fondo en gráfico y texto de 24 px o más; nunca en texto menor (navy o blanco). Engine y Voice conservan su color. Token `efeonceGraphicLine.accentContrast` (`axis-tokens` 0.3.5) | §2 |
+| D2 | Magenta de Revenue-HubSpot aprobado (`#E86BD0` en oscuro, `#8E1B82` en claro); sin naranjo HubSpot | §2, §7 |
+| D3 | En el cierre del deck, «Growth» va en el acento, no en blanco (8,5:1) | §5, §10.1 |
+| D4 | Umbral de la burbuja URL: 4,5:1 (`urlBubble.minContrast: 4.5`) | §8.5 |
+| D5 | Logo dentro de la órbita sólo en cierres de marca (deck, video, recepción), con el anillo fuera del resguardo X; nunca en el banner de LinkedIn ni el reverso de la tarjeta | §8.2, §8.3, §10.1, §10.3, §10.6 |
+| D6 | Banner de LinkedIn y fondo de Teams con un solo anillo | §1.3, §10.1 |
+| D7 | Halo sobre papel a la mitad (`orbit.haloOnLightScale: 0.5`) | §1.3 |
+| D8 | `sphereRing` sólo «en vivo» (issue `sphere-ring-only-live`) | §1.3 |
+| D9 | Reglas de sinergia P1–P12 aprobadas; P5 y P9 van a la task de `foto:prompt` y chequeos de la lente | §9.1 |
+| D10 | Conflictos P-1..P-9 resueltos | §9, §9.1 |
+| D11 | Firma de correo: cada persona la instala en Outlook desde el HTML; `people@` usa la firma de Talent | §10.2 |
+| D12 | Banco de pares: dos por línea de servicio, sólo con respuestas verificables | §4 |
+| D13 | Archivos de impresión: primero la tarjeta y el muro de recepción, PDF vectorial desde las recetas | abajo |
+| D14 | La prueba sin logo corre **antes** de que la órbita entre a medios pagados con presupuesto | abajo |
+| D15 | «Te hacemos visible»: revisión legal antes de cualquier pauta, sin excepción | §1.4 |
+
 **Prueba sin logo (kit listo para campo):** fase de aprendizaje con logo y atribución de piezas nuevas sin logo;
 600 personas (300 por versión), decisores de marketing y comercial en Chile, empresas de 50+ personas. Métrica: %
 que elige «Efeonce» entre Efeonce, 5 competidores y «No sé». Éxito: +10 puntos sobre el distractor con 95 % de
 confianza. Kit: `exploracion-v5/prueba-sin-logo/` (protocolo, cuestionario, 24 estímulos, potencia y análisis).
+**Debe correr antes de que la órbita entre a medios pagados con presupuesto** (operador, 2026-09-26).
 
 **Pendiente (decisión del operador):**
 
-1. Panel de la prueba sin logo (Netquest, Cint o Toluna, a cotizar).
-2. Aprobar el banco de pares de copy.
-3. Umbral de la burbuja-firma: mantener 4,5:1 o bajarlo a 3:1 (objeto gráfico) (§8.5).
+1. Proveedor del panel de la prueba sin logo (Netquest, Cint o Toluna, a cotizar) y su presupuesto.
+2. Revisar el banco de pares de copy y aprobar dos por línea de servicio (§4).
+3. URL de LinkedIn de la empresa para la firma de correo (§10.2).
+4. Barra del retrato de perfil como categoría propia del lenguaje fotográfico (P-7, §9.1): por redactar.
 
-**Pendiente (producción):** instalar la firma de correo v3.1 en Outlook, persona por persona (§10.2) · archivos de impresión y plantillas editables · las variantes que faltan de las animaciones
+**Pendiente (producción):** instalar la firma de correo v3.1 en Outlook, persona por persona, desde el HTML generado
+(§10.2) · archivos de impresión: se parte por la **tarjeta de presentación y el muro de recepción**, en PDF vectorial
+desde las recetas, **bloqueado por la especificación técnica de la imprenta** (operador, 2026-09-26) · plantillas
+editables · task de `foto:prompt` y chequeos de la lente (P5, P9, P-6 y P-8; §9.1) · las variantes que faltan de las animaciones
 del logo V1.1 (OneDrive y bucket) y una demo viva en el Lab que lea `efeonceGraphicLine.motion` (§10.1) · la
 frontera Greenhouse ↔ Efeonce (la línea es de Efeonce, no de Greenhouse) · que la línea no se filtre al trabajo de
-clientes · copy en inglés · revisión legal de «Te hacemos visible» · accesibilidad medida en las piezas reales ·
+clientes · copy en inglés · revisión legal de «Te hacemos visible» antes de cualquier pauta (§1.4) · accesibilidad medida en las piezas reales ·
 tamaños mínimos del logo validados con prueba de impresión.
 
 ---
@@ -758,6 +841,10 @@ operador.
   cuadros clave y los tres sonidos salen idénticos byte a byte. Las reglas detrás de los números quedan en
   [`EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`](./EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md). Greenhouse fija `axis-tokens` 0.3.3
   en `develop` (commit `0fdd8f492`, todavía no en `main`).
+- **Delta 2026-09-26 (noche) — decisiones del operador en AXIS:** `accentContrast` (nuevo en `axis-tokens` 0.3.5; el
+  acento a 3:1 en gráfico y texto ≥ 24 px, nunca en texto menor; §2), `orbit.haloOnLightScale: 0.5` (halo a la mitad
+  sobre papel; §1.3) y `urlBubble.minContrast: 4.5` (§8.5); el contrato rechaza `sphereRing` sin `live: true` (issue
+  `sphere-ring-only-live`; §1.3). Greenhouse sigue fijando `axis-tokens` 0.3.3 hasta adoptar la nueva versión.
 
 ### 13.2 Greenhouse
 

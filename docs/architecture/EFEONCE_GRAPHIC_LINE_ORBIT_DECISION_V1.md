@@ -3,7 +3,7 @@
 > **Tipo de documento:** ADR (decisión de marca y sistema de diseño)
 > **Estado:** Accepted (2026-09-25) — canonizada en AXIS; atribución sin logo sin medir
 > **Creado:** 2026-09-25 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-26 por Claude (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1; delta (d): lenguaje de movimiento como norma y `efeonceGraphicLine.motion` en `axis-tokens` 0.3.3)
+> **Última actualización:** 2026-09-26 por Claude (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1; delta (d): lenguaje de movimiento como norma y `efeonceGraphicLine.motion` en `axis-tokens` 0.3.3; delta (e): decisiones del operador D1–D15 sobre contraste, logo en la órbita, halo, anillo de la esfera, convergencia con la foto y operación)
 > **Manual canónico:** [`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
 > **Entregable:** [`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](../operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf)
 > **Sistema de diseño:** AXIS, página `references/graphic-line` en `axis.efeonce.org` y tokens `efeonceGraphicLine`
@@ -104,6 +104,62 @@ acentos de producto se usan en piezas de Efeonce (recomendación: no). Manual §
   paquetes sigue en 0.3.0. Cambiar un valor exige cambiar el token y su prueba, publicar, fijar la versión y comparar
   el storyboard antes de producir masters; si altera una pieza aprobada, lo aprueba el operador.
 
+### Delta 2026-09-26 (e) — Decisiones del operador D1–D15 (color, logo, órbita, convergencia con la foto, operación)
+
+Aprobadas por el operador (Julio Reyes) el 2026-09-26. Detalle y ubicación en el manual §12.
+
+**Color y contraste**
+
+- **D1.** El acento de la línea llega a **3:1** contra su fondo en gráfico (arco, esfera, halo) y en texto de 24 px o
+  más; **nunca** en texto de menos de 24 px (ahí navy `#023C70` sobre claro y blanco sobre oscuro). Medido: Growth
+  `#0E8C82` sobre papel 3,87:1, Engine `#0375DB` sobre `#091951` 3,60:1, Voice `#F83902` sobre papel 3,53:1; pasan 3:1
+  y no 4,5:1. Engine y Voice conservan su color. Token `efeonceGraphicLine.accentContrast` (`axis-tokens` 0.3.5).
+- **D2.** Magenta de Revenue-HubSpot aprobado tal como está: `#E86BD0` en oscuro (5,9:1 sobre `#091951`) y `#8E1B82`
+  en claro (7,5:1 sobre papel). Sin naranjo HubSpot: choca con Globe y Reach y es el color del partner.
+- **D3.** En el cierre del deck, «Growth» va en el acento de la línea, no en blanco (teal sobre `#001A33` = 8,5:1).
+- **D4.** Umbral de la burbuja URL: **4,5:1** (texto chico que se lee). Token `urlBubble.minContrast: 4.5`. Cierra el
+  pendiente del umbral.
+
+**Logo y órbita**
+
+- **D5.** El logo va dentro de la órbita **sólo en cierres de marca** (cierre del deck, cierre de video, muro de
+  recepción), con el anillo fuera del resguardo X. Nunca en el banner de LinkedIn (4.1) ni en el reverso de la tarjeta
+  (4.6): en objetos, el logo va solo en el dorso y la órbita no entra en su resguardo. Todo otro uso sigue la regla
+  n.º 8 del manual §8.3.
+- **D6.** Las órbitas interiores del banner de LinkedIn (4.1) y del fondo de Teams (4.3) se reproducen con un solo
+  anillo.
+- **D7.** Halo sobre papel a la mitad (paradas × 0,5). Token `efeonceGraphicLine.orbit.haloOnLightScale: 0.5` (el render
+  de movimiento ya lo hacía).
+- **D8.** El anillo propio de la esfera (`sphereRing`) queda reservado a lo «en vivo»: el eco del pulso de impacto en
+  movimiento y el estado activo o «en el aire» (por ejemplo, la cabina de llamadas). El contrato rechaza `sphereRing`
+  sin `live: true` (issue `sphere-ring-only-live`).
+
+**Convergencia con la fotografía**
+
+- **D9.** Reglas de sinergia P1–P12 aprobadas (referencia `photography-convergence.md` §6 de la skill
+  `efeonce-graphic-line`). P5 y P9 necesitan código: van a la task de `foto:prompt` y chequeos de la lente.
+- **D10.** Conflictos P-1..P-9 resueltos: el exterior apagado de la lente cuenta como reserva del texto y «nunca un
+  scrim» sigue para piezas sin lente (P-1); en piezas con lente se pide el lecho igual (P-2); el 55 % es del círculo
+  visible de la lente y se ajusta la toma (P-3); un anillo dibujado en la escena cuenta como órbita y se elige o rehace
+  el plate (P-4); la capa gráfica sobre la foto se aprueba **sólo** en los casos declarados de la línea (voz
+  pregunta–respuesta, lente, medida con fuente) y sigue cerrada para todo lo demás (P-5); formato nativo 1200 × 627 en
+  `foto:prompt`, nunca recortado de 16:9 (P-6, task); el retrato de perfil entra al lenguaje fotográfico como categoría
+  propia donde se permite mirar a cámara, con su barra por redactar (P-7); el límite de cabezas y manos bajo el 36 %
+  aplica sólo con reserva de texto (P-8, task); en piezas con lente manda la cláusula de encuadre y las palancas que
+  llenan el cuadro quedan para piezas de sólo foto (P-9).
+
+**Operación**
+
+- **D11.** Firma de correo: cada persona la instala en Outlook desde el HTML generado; `people@efeoncepro.com` usa la
+  firma del área Talent. Pendiente del operador: la URL de LinkedIn de la empresa.
+- **D12.** Banco de pares pregunta–respuesta: dos por línea de servicio, sólo con respuestas verificables; pendiente de
+  la revisión del operador.
+- **D13.** Archivos de impresión: primero la tarjeta de presentación y el muro de recepción, en PDF vectorial desde las
+  recetas; bloqueado por la especificación técnica de la imprenta.
+- **D14.** La prueba de atribución sin logo corre **antes** de que la órbita entre a medios pagados con presupuesto;
+  proveedor del panel y presupuesto son decisión del operador.
+- **D15.** «Te hacemos visible»: revisión legal antes de cualquier pauta, sin excepción (regla reafirmada).
+
 ## Alternativas descartadas
 
 | Alternativa | Por qué no |
@@ -124,8 +180,10 @@ acentos de producto se usan en piezas de Efeonce (recomendación: no). Manual §
 ## Pendiente
 
 - **Prueba de atribución sin logo:** 600 personas, panel a cotizar. Hasta medirla, la línea es un sistema
-  consistente, no un activo distintivo demostrado.
-- Aprobar el banco de pares de copy. (La firma de mail quedó resuelta el 2026-09-26: ver delta.)
+  consistente, no un activo distintivo demostrado. Desde el 2026-09-26 (D14) debe correr antes de que la órbita entre
+  a medios pagados con presupuesto.
+- Revisar el banco de pares de copy y aprobar dos por línea de servicio (criterio D12). (La firma de mail quedó
+  resuelta el 2026-09-26: ver delta.)
 - Archivos de impresión y plantillas editables. Delta 2026-09-25: la órbita ya tiene contrato de composición por intención en AXIS 0.2.6 (`efeonce.graphic-line-orbit`, candidate; ADR `GRAPHIC_LINE_ORBIT_COMPOSITION_DECISION_V1` en AXIS) con adapters en el Lab y en Greenhouse (`pnpm creative:orbit:render`).
 - Delta 2026-09-26: contrato `0.2.0` (paquetes AXIS `0.2.7`) con `signature` (logo centrado; burbuja URL centrada
   y con fusión sólo si el logo ya está en la imagen), `slogan`, `state` y `brand-close`; la órbita no sustituye la
@@ -135,8 +193,13 @@ acentos de producto se usan en piezas de Efeonce (recomendación: no). Manual §
   `marcaEnEscena` + gate `firma-burbuja`) y `creative:layout` (`brand.signature`); las piezas y contratos anteriores
   se dibujan igual y no se recertifican. En el Lab de AXIS, la sección 5.7 «Componer con agentes» y el banco de
   tipografía creativa firman con el logo centrado, y la sección nueva 4.9 muestra la oficina fotografiada.
-- Decisión del operador: si el umbral de la burbuja-firma sigue en 4,5:1 o baja a 3:1 (objeto gráfico).
-- Copy en inglés, revisión legal de «Te hacemos visible» y tamaños mínimos validados con prueba de impresión.
+- ~~Decisión del operador: si el umbral de la burbuja-firma sigue en 4,5:1 o baja a 3:1 (objeto gráfico).~~ Resuelto
+  el 2026-09-26 (D4): se mantiene 4,5:1.
+- Copy en inglés, revisión legal de «Te hacemos visible» (antes de cualquier pauta, D15) y tamaños mínimos validados
+  con prueba de impresión. Archivos de impresión: primero tarjeta y muro de recepción, bloqueados por la especificación
+  de la imprenta (D13).
+- Task de `foto:prompt` y chequeos de la lente (P5, P9, P-6, P-8; D9–D10), la barra del retrato de perfil (P-7) y la
+  URL de LinkedIn de la empresa (D11).
 - Delta 2026-09-26 (tarde): **firma de correo v3.1 aprobada** en sus dos versiones (A sobre papel, B tarjeta navy).
   La línea que termina en la esfera va una vez; los partners abren su propia zona con una regla fina **sin esfera**.
   Contrato AXIS `efeonce.email-signature` 0.3.0 (`stable`), tokens `efeonceGraphicLine.emailSignature`, lámina 4.5 del

@@ -1,6 +1,8 @@
 # Lista de verificación antes de entregar una pieza con la órbita
 
-> Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26
+> Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 · decisiones del
+> operador D1–D15 del 2026-09-26 registradas (los chequeos marcados «0.3.1» vienen en el contrato publicado con contracts 0.3.5,
+> tag `v0.3.5`).
 >
 > Cada ítem dice **cómo se verifica**. «Automático» = lo hace fallar un comando o una función; «Revisión» = hay que
 > mirar el cuadro real (el adapter de Greenhouse lo marca `manual`). Una pieza no se entrega con un ítem en rojo, y
@@ -32,6 +34,8 @@
 | [ ] | El foco lleva su anillo concéntrico con la luz y la lámpara arriba a la derecha | Automático en la receta; revisión si pintas a mano |
 | [ ] | Formatos chicos: esfera ≥ 4 px de diámetro en pantalla (1,5 mm impresa), arco nunca un pelo | `minSphereRadiusPx` / `minArcStrokePx` en `PaintBindings`; `portraitOrbitSvg` ya aplica pisos |
 | [ ] | Logo ≥ 96 px (25 mm impreso; recomendado ≥ 160 px); isotipo ≥ 24 px (8 mm); resguardo X respetado | Revisión |
+| [ ] | El logo dentro de la órbita **sólo** en el cierre del deck, el cierre de video o el muro de recepción, con el anillo fuera de su resguardo X; nunca en el banner de LinkedIn, el reverso de la tarjeta ni un objeto (D5) | Revisión (el contrato acepta `targetKind: 'logo'` en cualquier pieza) |
+| [ ] | El anillo propio de la esfera (`sphereRing`) sólo en algo **en vivo** (eco del impacto, estado «en el aire»), con `live: true` (D8) | Automático desde 0.3.1: `sphere-ring-only-live`; hoy, revisión |
 
 ## 2. Texto y voz
 
@@ -56,9 +60,11 @@
 |---|---|---|---|
 | [ ] | Un acento por pieza, el de la línea de servicio; nunca dos acentos en una órbita | — | `manifest.palette.accent`; revisión |
 | [ ] | El teal claro `#36c8bf` sólo sobre oscuro | 8,51:1 sobre `#001a33`; 2,06:1 sobre blanco (prohibido) | Revisión |
-| [ ] | Sobre claro, Growth usa `#0e8c82` **sólo en gráfico** | 3,87:1 sobre papel (no alcanza 4,5:1 para texto chico) | Revisión |
-| [ ] | Todo texto ≥ 4,5:1 contra su fondo real | blanco/`#001a33` 17,56 · navy/papel 10,47 · «Empower your» `#6b6b6b`/papel 5,00 · `#e2e2e2`/`#001a33` 13,56 | Medir sobre los píxeles finales |
-| [ ] | La esfera y el arco son gráfico (no se les exige 4,5:1), pero deben leerse | Engine oscuro 3,60 y Voice claro 3,53 son los más bajos | Revisión en el formato más chico |
+| [ ] | El acento (arco, esfera, halo y texto de 24 px o más) mide ≥ 3:1 contra su fondo (D1, token `accentContrast`) | todos pasan; los más bajos: Voice/papel 3,53 · Engine/`#091951` 3,60 · Growth `#0e8c82`/papel 3,87 | Medir sobre los píxeles finales, en el formato más chico |
+| [ ] | **Ningún texto de menos de 24 px en el acento** (eyebrow, etiquetas, cifras chicas, palabra del eslogan chico): va en navy `#023c70` sobre claro o blanco sobre oscuro | `accentInSmallText: false` | Automático desde el contrato 0.3.1: `accent-text-min-size`; hoy, revisión |
+| [ ] | Todo texto de menos de 24 px ≥ 4,5:1 contra su fondo real | blanco/`#001a33` 17,56 · navy/papel 10,47 · «Empower your» `#6b6b6b`/papel 5,00 · `#e2e2e2`/`#001a33` 13,56 | Medir sobre los píxeles finales |
+| [ ] | Halo sobre papel a media intensidad (D7) | `orbit.haloOnLightScale` 0,5 | Automático con el contrato 0.3.1; con 0.3.0 el halo claro sale igual al oscuro: revisar y reducir |
+| [ ] | Cierre del deck: la palabra del eslogan en el acento, no en blanco (D3) | 8,5:1 sobre `#001a33` (Growth) | `deckSlideHtml('close')` desde axis-graphic-line 0.3.2; revisión si se arma a mano |
 | [ ] | Estado por forma (anillo/esfera) en el acento de la línea, nunca rojo/amarillo/verde | — | Automático: `state` resuelve `trafficLightColorsAllowed false`; revisión |
 | [ ] | No usar el gris viejo del eslogan `#848484` sobre claro | 3,51:1 sobre papel (falla) | Revisión (ojo: `src/config/efeonce-brand.ts` y el render de motion aún lo usan) |
 | [ ] | Sobre producción física, color con prueba del proveedor (valores son sRGB) | — | Revisión |
@@ -72,7 +78,7 @@
 | [ ] | Logo negativo sobre oscuro, positivo sobre claro; nunca con velo encima | `assetId` del manifest; revisión |
 | [ ] | La burbuja URL firma **sólo** si el logo de Efeonce ya está en la imagen (`brandInScene: true` / `marcaEnEscena: true` / `brand_in_scene: true`) | Automático: contrato; `pnpm foto:cta:gate` regla `firma-burbuja`; `creative:layout` exige burbuja centrada |
 | [ ] | Nunca burbuja y logo juntos ni burbuja a un costado; en social nunca `url-bubble` suelto | Automático: `signature-already-decides-url-bubble`, `social-signs-with-signature-not-url-bubble`, gate `firma-burbuja` |
-| [ ] | Contraste de la firma ≥ 4,5:1 sobre los píxeles finales (1 % peor de su tinta sólida) | Automático: Greenhouse `renderGraphicLine` → `signature.contrast` + check `signature-min-contrast`; gate `firma-contraste`. La burbuja fusionada sólo pasa sobre lechos muy oscuros (a opacidad 1: 6,17:1 sobre `#001a33` en el píxel máximo; del orden de 4,4–4,9:1 en el 1 % peor; 1,6–3,1:1 sobre fondos medios o claros) |
+| [ ] | Contraste de la firma ≥ 4,5:1 sobre los píxeles finales (1 % peor de su tinta sólida); la burbuja, con su umbral `urlBubble.minContrast` 4,5 (D4) | Automático: Greenhouse `renderGraphicLine` → `signature.contrast` + check `signature-min-contrast`; gate `firma-contraste`. La burbuja fusionada sólo pasa sobre lechos muy oscuros (a opacidad 1: 6,17:1 sobre `#001a33` en el píxel máximo; del orden de 4,4–4,9:1 en el 1 % peor; 1,6–3,1:1 sobre fondos medios o claros) |
 | [ ] | La firma no cae sobre el sujeto ni sobre un canto de luz | Automático: Greenhouse `orbit-never-over-subject-or-reserves` (firma sobre `subject`/`reserve`); gate `firma-sobre-sujeto`, `firma-canto` |
 | [ ] | Burbuja en web con fusión de luminosidad (`url-bubble-source`); en correo, PDF o visores sin fusión, la horneada (`url-bubble-baked-light` / `-dark`) | `assetId` y `blend` del manifest |
 | [ ] | La URL nunca como texto | Automático en Greenhouse: un texto con `efeoncepro.com` falla `url-as-bubble-never-text` |
@@ -83,7 +89,8 @@
 |---|---|---|
 | [ ] | La órbita se declaró a propósito; la foto conserva su composición | Revisión |
 | [ ] | El anillo no cruza el sujeto ni las reservas de texto (ni el lecho ni la firma) | Automático: paquete `runAdapterChecks({ protectedBoxes })` / `ringCrossesBox`; Greenhouse `bindings.protect` (`subject`, `reserve`, `bed`) y `creative:layout` agrega el campo de copy como reserva |
-| [ ] | Lente: el sujeto cabe dentro del círculo (55 % del lado corto, 15 % de aire) y la esfera no toca la cara | Revisión (`lens-subject-inside-circle` queda `manual`) |
+| [ ] | Lente: el sujeto cabe dentro del círculo que la lente **muestra** en ese formato (el 55 % se mide sobre el círculo visible, D10 P-3) y la esfera no toca la cara | Revisión (`lens-subject-inside-circle` queda `manual` hasta la task de P5) |
+| [ ] | Lente: sin otro anillo dibujado dentro de la escena (cuenta como órbita: otro plate, P-4); palanca que concentra, nunca una que llena el cuadro (P-9); azul portador y acento dentro del círculo visible (P2) | Revisión; detalle en `photography-convergence.md` §8 |
 | [ ] | Foto producida con el pipeline fotográfico (`pnpm foto:prompt`, `pnpm foto:generar`, `pnpm foto:validar`), sin emblema legible, sin banco de imágenes, sin velo navy encima | Revisión y el QA del pipeline fotográfico |
 | [ ] | Si la foto la pinta un rasterizador (sharp), el tratamiento de afuera de la lente usa filtros SVG (como el adapter de Greenhouse), no `filter` CSS | Revisión del PNG final |
 

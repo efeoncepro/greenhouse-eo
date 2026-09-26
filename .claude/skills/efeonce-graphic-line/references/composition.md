@@ -1,6 +1,8 @@
 # Cómo componer con la órbita
 
-> Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26
+> Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 · decisiones del
+> operador D1–D15 del 2026-09-26 registradas (ver [ledger.md](ledger.md)); lo que depende de las versiones en
+> publicación (tokens/contratos 0.3.5, contrato de la órbita 0.3.1, paquete 0.3.2) va marcado así.
 >
 > Los resultados «esperados» de los ejemplos se obtuvieron ejecutando las funciones contra los `dist` de AXIS y el
 > comando de Greenhouse ese día. El inventario completo (tokens, códigos, firmas) está en
@@ -45,11 +47,15 @@ clientes ni la interfaz de producto de Greenhouse (esa se rige por `DESIGN.md` y
    │         (siempre con su prueba: proof «Y lo medimos.» o el mecanismo)
    ├─ MOSTRAR la familia (portafolio) → family-map { center, satellites } (arco largo sin esfera, satélites)
    ├─ ESTADO libre/ocupado (salas, agenda, credenciales) → stateMarkerSvg / state con su etiqueta en texto
+   │    └─ ¿está EN VIVO («en el aire», el eco del impacto en movimiento)? → orbit { sphereRing: true, live: true }
+   │         (contrato 0.3.1; sin live, sphere-ring-only-live). Ocupado sin vivo = la esfera sola
    ├─ UNA PERSONA (firma de correo, tarjeta, perfil) → portraitOrbitSvg ; firma completa → efeonce.email-signature
    ├─ UN BUZÓN DE ÁREA → email-signature variant 'team' (área, sin foto)
    ├─ VOZ pregunta + respuesta → voice (texto tuyo) + answerHtml para la respuesta con su esfera
    ├─ LOGO dentro de una frase display → logo-inline (≥ 96 px, línea base y altura x)
    ├─ CERRAR (última lámina, contratapa, final de video) → slogan { form, role: 'close' } de la línea
+   │    └─ ¿el logo dentro de la órbita? SÓLO cierre del deck, cierre de video o muro de recepción, con su resguardo X;
+   │         en cualquier otra pieza, el logo fuera de la órbita (D5)
    ├─ CIERRE DE VIDEO → brand-close (4,5 s) · órbita sola: pnpm orbit:video · logo: reveal/apertura/sting (Greenhouse)
    └─ FIRMAR la pieza
         ├─ ¿El logo de Efeonce YA aparece dentro de la imagen (mockup, objeto, merch)?
@@ -94,6 +100,10 @@ Toda pieza, de cualquier línea, **firma Efeonce** (el `assetId` de la firma es 
 aparece como nombre, interfaz en un mockup o isotipo chico dentro de su propia superficie; el lockup «Producto by
 efeonce» sólo en la superficie del producto. Un acento por pieza; el teal es sólo de Efeonce (Growth).
 
+**Cómo se usa el acento** (D1, 2026-09-26; token `accentContrast`): en gráfico (arco, esfera, halo) y en texto de 24 px o
+más, siempre ≥ 3:1 contra su fondo (todos los acentos de la tabla lo pasan). **Nunca en texto de menos de 24 px**: ahí
+el texto va en navy `#023c70` sobre claro o blanco sobre oscuro. El HubSpot magenta queda tal cual (D2).
+
 ---
 
 ## 2. Reglas duras (qué hace fallar una pieza)
@@ -112,7 +122,7 @@ efeonce» sólo en la superficie del producto. Un acento por pieza; el teal es s
 | 10 | **Arco genérico centrado en su posición**: `upper-start` → 200° a 250°, la esfera en la punta; 40–60° (resuelve 50°) | contrato |
 | 11 | **Formatos fijos reproducen su pieza medida** (`pieces`, `portrait`): no se derivan de una escala | recetas (`applyPiece`) |
 | 12 | **La línea de servicio decide acento y palabra**; Efeonce firma siempre | contrato (`lines`, `assetId`) |
-| 13 | **Firma = logo de Efeonce centrado abajo** (20 % del lado corto, 25 % en 16:9, margen 9 %); la burbuja URL la **reemplaza** sólo si el logo ya está en la imagen, centrada y fusionada; nunca a un costado ni junto al logo; nunca firma y burbuja a la vez | `signature`, `single-signature-per-piece`, `signature-already-decides-url-bubble`, `social-signs-with-signature-not-url-bubble`, checks `signature-centered` y `signature-min-contrast` (≥ 4,5:1) |
+| 13 | **Firma = logo de Efeonce centrado abajo** (20 % del lado corto, 25 % en 16:9, margen 9 %); la burbuja URL la **reemplaza** sólo si el logo ya está en la imagen, centrada y fusionada; nunca a un costado ni junto al logo; nunca firma y burbuja a la vez | `signature`, `single-signature-per-piece`, `signature-already-decides-url-bubble`, `social-signs-with-signature-not-url-bubble`, checks `signature-centered` y `signature-min-contrast` (≥ 4,5:1; la burbuja con su token `urlBubble.minContrast`, D4) |
 | 14 | **La URL nunca como texto**: donde aparezca `efeoncepro.com`, su burbuja oficial | `urlAsTextForbidden`, check `url-as-bubble-never-text` |
 | 15 | **La órbita no sustituye la composición fotográfica**: se declara a propósito y nunca cruza el sujeto, las reservas de texto, el lecho ni la firma | `orbit-never-over-subject-or-reserves` (`ringCrossesBox` / `protect`) |
 | 16 | **Respuesta de 1 a 3 palabras**; un par de voz por pieza | `voice-answer-too-long`, `single-voice-pair-per-piece` |
@@ -121,12 +131,15 @@ efeonce» sólo en la superficie del producto. Un acento por pieza; el teal es s
 | 19 | **El cierre de marca no va en impresos** | `brand-close-needs-motion-channel` |
 | 20 | **El logo** se usa desde el archivo oficial: sin estirar, rotar, recolorear, efectos, sombras, esfera pegada, tipearlo, logo + isotipo juntos; mínimo 96 px / 25 mm (isotipo 24 px / 8 mm); resguardo X = alto de la nave | manual §8; los archivos de `axis-brand-assets` |
 | 21 | **Nada de motion generado por un modelo de video** para el logo o la órbita | norma de movimiento |
+| 22 | **El acento ≥ 3:1 contra su fondo** en gráfico y texto ≥ 24 px; **nunca en texto de menos de 24 px** (navy o blanco) | token `accentContrast`; check `accent-text-min-size` (contrato 0.3.1) |
+| 23 | **El logo dentro de la órbita sólo en cierres de marca**: cierre del deck, cierre de video y muro de recepción, con el resguardo X fuera del anillo. Nunca en el banner de LinkedIn ni en el reverso de la tarjeta; en objetos, el logo solo en el dorso | decisión del operador D5; revisión |
+| 24 | **El anillo propio de la esfera sólo «en vivo»**: `sphereRing: true` exige `live: true` (eco del impacto, estado «en el aire») | `sphere-ring-only-live` (contrato 0.3.1) |
+| 25 | **Halo sobre papel a media intensidad** | token `orbit.haloOnLightScale 0.5`, aplicado por el resolver 0.3.1 (con 0.3.0, a mano) |
 
-> **Tensión a confirmar con el operador:** el manual prohíbe «órbita alrededor del logo» (§8.3 n.º 8, objetos §10.4),
-> pero la lámina de cierre del deck pone el logo **dentro** de la órbita completa (`deckSlideHtml('close')`), el muro de
-> recepción lleva «el logo completo dentro de su órbita» (§10.3), el foco `event` ilumina el logo, y el contrato
-> acepta `targetKind: 'logo'`. Regla práctica: no rodees el logo como adorno ni en objetos; úsalo dentro de la órbita
-> sólo en esas piezas aprobadas.
+> **Logo dentro de la órbita — decidido (operador, 2026-09-26, D5):** sólo en los cierres de marca (cierre del deck con
+> `deckSlideHtml('close')`, cierre de video, muro de recepción), con el resguardo X respetado. Nunca en el banner de
+> LinkedIn ni en el reverso de la tarjeta. En todo lo demás rige el manual §8.3 n.º 8. El contrato sigue aceptando
+> `targetKind: 'logo'` (no distingue la pieza): usarlo sólo en esos tres cierres es responsabilidad de quien compone.
 
 ---
 
@@ -137,7 +150,7 @@ efeonce» sólo en la superficie del producto. Un acento por pieza; el teal es s
 | **Post 1080×1350** | `lensRecipe('post', input)` + `recipeHtml` (o `lensRecipe('campaign-post')` para la lente de campaña, más grande y alta) | lente arriba, pregunta y respuesta debajo, firma de Efeonce automática. Sin lente: `composeGraphicLine` con `orbit` + `voice` + `signature`, `channel: 'social'` |
 | **Story 1080×1920** | `lensRecipe('story', input)` | en 9:16 de pauta la firma al pie puede caer bajo la interfaz de la red: revisa la zona segura |
 | **LinkedIn 1200×627** | `lensRecipe('linkedin', input)` (pregunta, respuesta y `proof` como línea de apoyo) | sin firma en la receta |
-| **Deck 1920×1080** | `deckSlideHtml('cover'|'section'|'content'|'close', { sections, current, question, answer, eyebrow?, stats?, note? })`; portada con foto: `lensRecipe('deck-cover')` | la órbita es la navegación; en contenido, `stats` reales o `note: 'Datos de muestra'` |
+| **Deck 1920×1080** | `deckSlideHtml('cover'|'section'|'content'|'close', { sections, current, question, answer, eyebrow?, stats?, note? })`; portada con foto: `lensRecipe('deck-cover')` | la órbita es la navegación; en contenido, `stats` reales o `note: 'Datos de muestra'`; en el cierre, el logo dentro de la órbita (cierre de marca, D5) y la palabra del eslogan en el acento (D3; axis-graphic-line 0.3.2) |
 | **Muro de recepción** | `lensRecipe('wall', { answer })` (sin pregunta) o `spotlightRecipe('event', …)` | una lente u órbita por muro |
 | **Foto con luz de escenario** | `spotlightRecipe('photo', { …, proof })` | nunca nombres reales de competidores en la penumbra; revisión legal del claim antes de pauta |
 | **Oficina** (salas, directorio, vidrios) | `stateMarkerSvg({ value, line, surface, sizePx })` junto a la etiqueta; órbita por pieza con `orbitSvg` | anillo = libre, esfera = ocupado; el arco del estado de sala mide tiempo real; la señalética de servicio en Poppins sin esfera ni órbita |
@@ -161,8 +174,11 @@ La foto conserva su composición. Declara lo que la foto protege y deja que el c
   `subject` ni `reserve`; la firma no puede caer sobre `subject` ni `reserve` (sí sobre el `bed`, el lecho calmo).
   `creative:layout` agrega el campo de copy como `reserve` automáticamente.
 - La foto de una lente se produce con el pipeline fotográfico (`pnpm foto:prompt`, `pnpm foto:generar <ficha>`,
-  `pnpm foto:validar`): sujeto en un círculo del 55 % del lado corto con 15 % de aire, sin emblema legible, registro
-  documental, sin velo navy encima.
+  `pnpm foto:validar`): el sujeto cabe en el círculo que la lente muestra en ese formato (el 55 % se mide sobre el
+  círculo visible, D10 P-3), palanca que concentre y nunca una que llene el cuadro (P-9), sin emblema legible, registro
+  documental, sin velo navy encima, y sin otro anillo dentro de la escena (P-4: cuenta como órbita; se pide otro plate).
+- En la lente, el oscurecimiento de afuera **es** la reserva del texto (D10 P-1): la pregunta y la respuesta van sobre
+  esa zona apagada. En una pieza sin lente sigue el «nunca scrim» del lenguaje fotográfico.
 
 ### 3.2 Ids del SVG
 
@@ -193,7 +209,8 @@ arco `startDeg −160`, `sweepDeg 50` (200°→250°), trazo 3,81, `#36c8bf`; es
 
 Variante: `orbitSvg({ width: 1920, height: 1080, line: 'brand', surface: 'light', channel: 'screen', region:
 'center-end' })` → círculo `{ cx: 1344, cy: 540, r: 432 }` (40 % del alto), anillo navy `#023c70` 2,42 al 16 %, arco y
-esfera `#bb1954` (3,87 y 8,46).
+esfera `#bb1954` (3,87 y 8,46). *(Medido con el contrato 0.3.0; con el 0.3.1 el halo de esta variante clara sale a la
+mitad: paradas 0,065 → 0,015 → 0, por `haloOnLightScale`.)*
 
 ### E2 · Un dato: 60 % con su fuente
 
