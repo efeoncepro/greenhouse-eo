@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Fundación en vivo (TASK-1887). Studio listo para agentes (TASK-1890) y federado en Efeonce MCP con lectura en producción (TASK-1891). Originales en GCS + worker de medios (TASK-1893) y observabilidad + restauración probada (TASK-1896) en producción desde 2026-09-26 (release Greenhouse 92002873ced9). ADR de fuente única e ingesta aceptado el 2026-09-26: Studio + GCS son la fuente; OneDrive es taller; un command y tres puertas (CLI, MCP, UI); sin espejo por Microsoft Graph. Nada de ese ADR está en runtime todavía. Siguen TASK-1892, 1894, 1895, 1897, 1898 y 1899 (métricas, command de ingesta y corte, UI, CONNECT, login y puerta MCP de escritura y aprobación).`
+- Status real: `Fundación en vivo (TASK-1887). Studio listo para agentes (TASK-1890) y federado en Efeonce MCP con lectura en producción (TASK-1891). Originales en GCS + worker de medios (TASK-1893) y observabilidad + restauración probada (TASK-1896) en producción desde 2026-09-26 (release Greenhouse 92002873ced9). ADR de fuente única e ingesta aceptado el 2026-09-26: Studio + GCS son la fuente; OneDrive es taller; un command y tres puertas (CLI, MCP, UI); sin espejo por Microsoft Graph. Nada de ese ADR está en runtime todavía. Siguen TASK-1892, 1894, 1895, 1897, 1898 y 1899 (métricas, command de ingesta y corte, UI, CONNECT, login y puerta MCP de escritura y aprobación). ADR de capa de estrategia aceptado el 2026-09-26 (canales, ICP, plan, SEO/AEO, IA y paridad total con ejecución por agentes); sus tasks TASK-1905…1912 están en to-do.`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Julio Reyes`
@@ -44,6 +44,11 @@ identidad (Efeonce ID), UI e integraciones (Metricool, plataformas de pauta, Glo
 
 - `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md` (ADR `Accepted`
   2026-09-26, fuente única e ingesta; reemplaza la regla «OneDrive fuente, Studio proyección reimportable»)
+- `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md` (ADR `Accepted`
+  2026-09-26, capa de estrategia: catálogo de canales, ICP en Greenhouse por organización, plan de campaña, SEO/AEO con
+  SV360, IA por agentes con procedencia, medición y aprendizajes; niveles de riesgo `T0`/`T1`/`T2` y paridad total)
+- Skill `.claude/skills/efeonce-campaign-planning/SKILL.md` (planificación de campañas con IA sobre Studio; consumidora de
+  las tools de TASK-1905…1911) y skills de rol `efeonce-agent-seo-aeo` y `efeonce-agent-media-planner`
 - `docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md` (ADR, delta 2026-09-25)
 - `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md`
 - `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`
@@ -71,6 +76,8 @@ identidad (Efeonce ID), UI e integraciones (Metricool, plataformas de pauta, Glo
 
 Orden recomendado (actualizado 2026-09-26): 1890 → 1891 · 1893 en paralelo · 1896 → 1892 → 1894 → 1895 · 1899 (ambas consumen los commands de 1894) → 1897 (cuando convenga) → 1898 al final.
 
+Capa de estrategia (ADR 2026-09-26), después de 1894 y 1899: 1906 (Greenhouse, puede empezar ya) · 1905 → 1907 → 1908 · 1909 · 1910 (en paralelo; 1908 y 1910 además necesitan 1892) → 1911 → 1912 (UI, sección por sección cuando su backend está en staging, tras 1895). 1898 sigue siendo la última del programa.
+
 **Regla de paridad del programa (operador, 2026-09-25):** todo lo que se puede hacer en la UI se puede hacer por la API y, por consiguiente, por MCP — incluidas las aprobaciones. Las aprobaciones las decide una persona; un agente puede ejecutarlas con la identidad delegada de esa persona y su confirmación explícita. Ninguna capacidad nace sólo en la UI.
 
 - `TASK-1887` — **Complete.** Fundación: repo, bases y roles, modelo de dominio, API v1, import del catálogo, renditions privadas, UI aprobada (claro/oscuro), Vercel + dominio (modo `open`). En vivo en `https://studio.efeonce.org`.
@@ -84,6 +91,14 @@ Orden recomendado (actualizado 2026-09-26): 1890 → 1891 · 1893 en paralelo ·
 - `TASK-1897` — To-do. (Greenhouse) Cerrar `CONNECT` de PUBLIC en `greenhouse_app` y en las bases de Studio.
 - `TASK-1899` — To-do. Puerta MCP: federa `studio.asset.upload.request`, `studio.asset.version.create`, las aprobaciones y `studio.asset.download` (Follow-up de TASK-1893) con la clase `efeonce.mcp.marketing_studio.write`, y siembra `marketing_studio.campaign.approve`. El canje de Greenhouse pide la capability exacta de cada tool (un cliente por capability, política con `requireOnPrivilegedAction = true`) y Studio revalida a la persona en `userinfo`: el actor auditado es la persona, nunca el gateway. Aprobaciones con `dryRun` → confirmación con `proposalDigest`. Bloqueada por TASK-1894.
 - `TASK-1898` — To-do. Login con Efeonce ID (`auth.efeonce.org`) y cambio de `STUDIO_ACCESS_MODE` a `efeonce_id`. Última del programa por decisión del operador (2026-09-25).
+- `TASK-1905` — To-do. Catálogo de canales gobernado y versionado (validación al escribir, migración expand → backfill revisado → contract como follow-up), `riskTier` obligatorio en el registro y test de paridad ampliado a escrituras, audiencias como traducción de una referencia ICP (bow-tie ≠ fase creativa); capability `marketing_studio.catalog.manage`. Depende de 1894 y 1899; su slice ICP, de 1906 y del consumer de 1892.
+- `TASK-1906` — To-do. (Greenhouse) Catálogo versionado de modelo de cliente por organización (`greenhouse_commercial.customer_model_*`), lane ecosystem, lane app delegado (borrador `T1`, publicación `T2`), tools MCP con la clase `efeonce.mcp.commercial.write`; versión 1 de Efeonce desde `docs/context/13`. Sin bloqueos.
+- `TASK-1907` — To-do. Plan de campaña versionado: estrategia (objetivo, KPIs con meta y fuente, hipótesis), matriz persona × etapa × canal, casa de mensajes con evidencia, plan de contenidos con hueco calculado, plan de medición y programa; borrador `T1`, aprobación `T2`. Depende de 1894, 1899, 1905 y 1906.
+- `TASK-1908` — To-do. Plan SEO/AEO con Search Visibility 360: referencias + snapshots inmutables (competitivo sólo interno), seguimiento en vivo, propuestas de rastreo en Studio ejecutadas en Greenhouse por `track_seo_keywords` con `proposalRef` y carril delegado (persona como actor). Depende de 1907, 1892 y 1899.
+- `TASK-1909` — To-do. IA por agentes con procedencia inmutable y aceptación por persona, contexto por campaña, validadores de copy y pieza, reglas de voz versionadas, borradores de brief de contenido, QA e informe semanal; IA en el producto como follow-up. Depende de 1905, 1907 y 1899.
+- `TASK-1910` — To-do. Medición real: cuentas Meta/LinkedIn de sólo lectura conectadas por `T2`, readback como observaciones (líneas `actual` sólo de ahí), atribución bow-tie por lane de Greenhouse, chequeo de destino, progreso de KPIs y mapeo de métricas editable; capability `marketing_studio.integration.manage`. Sólo lectura sobre plataformas. Depende de 1892, 1905, 1907 y 1899.
+- `TASK-1911` — To-do. Experimentos desde hipótesis del plan aprobado, biblioteca de aprendizajes append-only con evidencia y validación `T2`, calendario unificado. Depende de 1907, 1910 y 1899.
+- `TASK-1912` — To-do. UI del espacio de planificación (pestaña Estrategia, aprobación en dos pasos, hueco, procedencia, aprendizajes y programas) sobre la dirección `v4 · Estrategia` a aprobar; `ui-ux`, flow, UI ready no. Depende de 1895 y 1907 (+ backends por sección).
 
 ## Existing Related Work
 
@@ -101,6 +116,14 @@ Orden recomendado (actualizado 2026-09-26): 1890 → 1891 · 1893 en paralelo ·
 - [ ] Toda operación de la UI tiene su endpoint `/api/v1` documentado en OpenAPI. Progreso: la UI actual (sólo lectura) ya consume operaciones del registro único con test de paridad handlers ↔ registro; queda abierto hasta que la UI de edición (TASK-1895) nazca igual.
 - [x] Efeonce MCP federa al menos las lecturas de Studio: 12 tools `studio.*` en producción desde 2026-09-26 (`efeonce-mcp-gateway-00061-sbc`), con canary MCP real verde (TASK-1891).
 - [x] Restauración de la base `marketing_studio` probada: ensayo lógico en Cloud Run contra producción `succeeded` el 2026-09-26 (paridad de 18 tablas, restore 2 s, job 49 s, base temporal eliminada), falla forzada probada en staging y ensayo mensual programado (TASK-1896).
+- [ ] Toda operación del registro declara nivel de riesgo (`T0`/`T1`/`T2`) y el test de paridad rompe el build ante una escritura sin contrato (TASK-1905).
+- [ ] Copys, anuncios, audiencias, presupuesto y posts usan `channel_key` del catálogo con la versión con que se validaron, sin canal en texto libre pendiente (TASK-1905; contract como follow-up).
+- [ ] Las campañas referencian el modelo de cliente de Greenhouse por organización, versión e id; ninguna persona local en Studio (TASK-1906, TASK-1905).
+- [ ] Una campaña vigente tiene plan aprobado con metas medibles, casa de mensajes con evidencia y hueco de contenidos visible (TASK-1907, TASK-1912).
+- [ ] El plan SEO/AEO guarda snapshots fechados, el seguimiento se lee en vivo y un rastreo se ejecuta en Greenhouse con la persona como actor (TASK-1908).
+- [ ] Todo contenido redactado por IA en Studio tiene procedencia y aceptación de una persona (TASK-1909).
+- [ ] Las líneas `actual` nacen sólo de readback observado de Meta/LinkedIn y cada KPI del plan aprobado muestra su progreso o «sin dato» (TASK-1910).
+- [ ] Al menos un aprendizaje validado con evidencia alimenta el contexto de IA de una campaña siguiente (TASK-1911).
 
 ## Non-goals
 
