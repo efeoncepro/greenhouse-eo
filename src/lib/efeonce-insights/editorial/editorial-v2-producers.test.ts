@@ -358,6 +358,12 @@ describe('TASK-1888 — superlativos únicos, esenciales sólo de hallazgos y af
     expect(text).toBe('Las dimensiones mejor evaluadas son claridad de entidad y share of voice competitivo: 100.')
     // Bajada del empate sin «(0 a 100)»: cifras que ningún hecho citado respalda (violación vista en Berel real).
     expect(plan.chapters[0]!.readings!.find(item => item.chartId === 'chart.aeo.score')!.keyFigure!.caption.text).toBe('Dimensiones evaluadas.')
+    // La cifra principal es el valor empatado, aunque la figura traiga antes otro hecho (el puntaje global, 39).
+    const withOverall = { ...snapshot, facts: [{ ...dimension('overall', 'Puntaje de visibilidad en IA', 39), factId: 'aeo.overall_score.w', metricId: 'overall_score', dimension: undefined }, ...snapshot.facts] }
+    const key = v2(withOverall, ['aeo']).chapters[0]!.readings!.find(item => item.chartId === 'chart.aeo.score')!.keyFigure!
+
+    expect(key.value).toBe('100')
+    expect(key.caption.text).toBe('Dimensiones evaluadas.')
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
   })
 
