@@ -82,7 +82,7 @@ const bestBalancedBreak = ({ words, size, measureWord, measureSpace }) => {
 export const assertAxisAdvertisingPackages = () => {
   if (AXIS_ADVERTISING_TYPOGRAPHY_CONTRACT.version !== '0.2.1')
     throw new Error(`Unsupported AXIS advertising contract ${AXIS_ADVERTISING_TYPOGRAPHY_CONTRACT.version}`)
-  if (AXIS_COLLABORATION_SELECTION_CONTRACT.version !== '0.2.0')
+  if (AXIS_COLLABORATION_SELECTION_CONTRACT.version !== '0.3.0')
     throw new Error(`Unsupported AXIS collaboration contract ${AXIS_COLLABORATION_SELECTION_CONTRACT.version}`)
   if (axisAdvertising.compositions.supportingTagline.fitStrategy !== 'uniform-scale-to-reference')
     throw new Error('Unsupported AXIS supportingTagline fitting strategy')

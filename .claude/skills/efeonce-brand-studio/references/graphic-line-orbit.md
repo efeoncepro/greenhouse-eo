@@ -96,8 +96,10 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
     **con** la esfera. Nunca una selección que termina en la última letra. En AXIS: `answerHtml` / `answerGroupBox`
     del paquete y el chequeo `answer-period-part-of-text` (§1.2, §6).
 14. **La lente lleva la órbita, nunca un disco suelto:** anillo, arco corto de 50° y la esfera en su punta, con los
-    valores de `lens.anatomy` (esfera 7,6 px en 1080, 13,5 px en 1920). El adapter de Greenhouse fijado en AXIS 0.2.7
-    todavía dibuja el disco: no entregar una lente de `creative:layout` sin revisarla hasta adoptar 0.3.0 (§1.5).
+    valores de `lens.anatomy` (esfera 7,6 px en 1080, 13,5 px en 1920); el adapter de Greenhouse la pinta así desde
+    que adoptó AXIS 0.3.0 (§1.5).
+15. **Un solo anillo alrededor del contenido:** si la órbita rodea algo (palabra, logo, objeto, lente, texto), sin
+    órbitas interiores; éstas sólo en una órbita vacía que las necesita (anatomía, mapa de portafolio) (§1.3).
 
 ## De dónde salen los valores y los archivos
 
@@ -115,16 +117,16 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
   `deliverables/assets/url-lum-{light,dark}.svg`, `url-lum.svg` de los catálogos del Artifact Composer) las vigila la
   guarda `src/config/efeonce-brand-assets.test.ts`: deben llevar el dibujo del paquete. Fuentes y fotos **no** van en
   el paquete. No confundirlo con `efeonce.brand-logos` (procedencia de logos de terceros en UIs).
-- Greenhouse fija `@efeoncepro/axis-*` 0.2.7 y `@efeoncepro/axis-brand-assets` 0.2.7.
+- Greenhouse fija `@efeoncepro/axis-*` 0.3.0 y `@efeoncepro/axis-brand-assets` 0.3.0 (en `develop` desde 2026-09-26).
 
 **NUNCA transcribir HEX ni px a mano** desde el manual, el PDF o una captura: importar el token. Cambiar un valor
 exige cambiar el token y su prueba, no el documento. Antes de fijar una versión en un consumidor, verificar en qué
 versión publicada está el export (no asumirlo).
 
-## Componer con agentes (contrato `efeonce.graphic-line-orbit` 0.2.0)
+## Componer con agentes (contrato `efeonce.graphic-line-orbit` 0.3.0)
 
-Una pieza con la órbita se compone por **intención**, no con coordenadas. Contrato `0.2.0` (`candidate`), manifest
-`axis.graphic-line-orbit-composition.v1`, publicado en los paquetes AXIS 0.2.7. El agente declara qué hace cada
+Una pieza con la órbita se compone por **intención**, no con coordenadas. Contrato `0.3.0` (`stable`), manifest
+`axis.graphic-line-orbit-composition.v1`, publicado en los paquetes AXIS 0.3.0. El agente declara qué hace cada
 elemento y AXIS valida las reglas y resuelve cada valor desde los tokens.
 
 - **Kinds:** `orbit`, `measure`, `progress`, `lens`, `spotlight`, `family-map`, `url-bubble`, `voice`,
@@ -144,7 +146,7 @@ elemento y AXIS valida las reglas y resuelve cada valor desde los tokens.
 | Dónde | Comando | Qué hace |
 |---|---|---|
 | AXIS (repo hermano) | `pnpm orbit:resolve` | valida la intención y emite el manifest |
-| Greenhouse | `pnpm creative:orbit:resolve -- --input intent.json --out manifest.json` | igual, con el pin 0.2.7 |
+| Greenhouse | `pnpm creative:orbit:resolve -- --input intent.json --out manifest.json` | igual, con el pin 0.3.0 |
 | Greenhouse | `pnpm creative:orbit:render -- --intent intent.json --bindings bindings.json --out-dir out/` | pinta, rasteriza, firma (logo, o burbuja fusionada a opacidad 1) y mide la firma sobre los píxeles finales; escribe `manifest.json`, `piece.svg`, `piece.png` y `qa.json`; **sale con 1** si falla un check |
 | Greenhouse, campaña | `pnpm creative:layout` | capa `graphic_line: { intent, protect }` por formato y firma `brand.signature` (abajo) |
 | Greenhouse, foto con CTA | `pnpm foto:componer:cta` + `pnpm foto:cta:gate` | firma de una pieza fotográfica (abajo) |

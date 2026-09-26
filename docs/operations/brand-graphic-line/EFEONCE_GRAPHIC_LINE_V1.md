@@ -89,6 +89,18 @@ Todas las medidas se expresan **por cada 794 px de ancho** del lienzo (la base d
 **Posición:** centro fuera del eje, hacia la derecha y arriba. El texto vive en el tercio inferior izquierdo y
 **nunca cruza la órbita**. Una sola órbita por pieza.
 
+**Medidas del canvas (2026-09-26):** la órbita base usa el mínimo de cada rango —arco 1,6 px, esfera 3,5 px, anillo al
+16 %— y el 22 % sólo con órbitas interiores o satélites (3,81 / 8,33 / 2,38 px en 1080 social). El arco corto va
+**centrado en su posición** con la esfera en la punta: arriba a la izquierda es de 200° a 250°. Las piezas de formato
+fijo (lente, foco, deck, firma) se ajustaron a mano una por una y AXIS las guarda medidas en
+`efeonceGraphicLine.pieces` y `portrait`: las recetas las reproducen, no las derivan.
+
+**Un solo anillo alrededor del contenido** (operador, 2026-09-26). Cuando la órbita rodea algo —una palabra, el logo,
+un objeto, una lente, un texto— queda el anillo que recorre, con su arco y su esfera, y el objeto adentro. Las órbitas
+interiores no van por defecto: sólo en una órbita vacía que las necesita, como el diagrama de anatomía o el mapa de
+portafolio. El cierre de marca, el deck y la lente llevan un solo anillo. El contrato de AXIS rechaza órbitas
+interiores alrededor de un objetivo (`inner-orbits-never-around-content`).
+
 **La órbita no sustituye la composición** (regla del operador, 2026-09-26). No reemplaza la composición ni las
 formas del [lenguaje fotográfico](../brand-photography/README.md): se usa en casos específicos (una lente, una medida,
 un progreso, un foco), **se declara a propósito** y nunca va por defecto en una pieza. Cuando está, nunca cruza el
@@ -560,7 +572,7 @@ tamaños mínimos del logo validados con prueba de impresión.
 
 ---
 
-## 13. Contrato y herramientas (AXIS 0.2.7)
+## 13. Contrato y herramientas (AXIS 0.3)
 
 Nada de esta sección aprueba ni publica una pieza: componer, medir y certificar no reemplazan la autorización del
 operador.
@@ -585,18 +597,20 @@ operador.
   «Componer con agentes», donde el post de ejemplo ahora firma con el logo centrado. El banco de tipografía creativa
   (`references/creative-typography`) también firma con el logo centrado por defecto; la burbuja sólo con el logo en la
   imagen. El Lab toma los archivos del paquete de assets en cada build y ya no guarda copias propias.
-- **Delta 2026-09-26 — en AXIS local, sin publicar (sale con los paquetes 0.3.0 y el contrato 0.3.0):** la lente
-  resuelve anillo, arco y esfera desde `lens.anatomy` (§1.5; `accentSphereDiameterRatio` queda obsoleto); la esfera
-  que cierra el texto es parte del texto (§1.2, §6) en la línea gráfica y en `efeonce.collaboration-selection`
-  0.3.0; el paquete nuevo `@efeoncepro/axis-graphic-line` pinta la órbita, sus recetas y su movimiento. Greenhouse
-  sigue fijado en 0.2.7: su adapter (`scripts/creative/layout-compiler/graphic-line.mjs`) todavía dibuja la lente con
-  el disco suelto y `axis-advertising.mjs` exige la selección 0.2.0; ambos se corrigen al adoptar 0.3.0.
+- **Delta 2026-09-26 — AXIS 0.3.0 publicado (`axis-graphic-line` 0.3.1) y adoptado por Greenhouse en `develop`:**
+  la lente resuelve anillo, arco y esfera desde `lens.anatomy` (§1.5; `accentSphereDiameterRatio` queda obsoleto); la
+  esfera que cierra el texto es parte del texto (§1.2, §6) en la línea gráfica y en
+  `efeonce.collaboration-selection` 0.3.0; las piezas de formato fijo están medidas en `pieces` (§1.3); el paquete
+  nuevo `@efeoncepro/axis-graphic-line` pinta la órbita, sus recetas y su movimiento. Greenhouse fija los cuatro
+  paquetes en 0.3.0: su adapter (`scripts/creative/layout-compiler/graphic-line.mjs`) acepta el contrato 0.3.0, pinta
+  la lente con arco y esfera y el progreso con un solo anillo, y `axis-advertising.mjs` exige la selección 0.3.0.
+  Llega a producción con el próximo release; no se promovió por separado.
 
 ### 13.2 Greenhouse
 
 | Herramienta | Qué hace con la línea |
 |---|---|
-| `pnpm creative:orbit:resolve` · `pnpm creative:orbit:render -- --intent --bindings --out-dir` | Adapter del contrato 0.2.0 (`scripts/creative/layout-compiler/graphic-line.mjs`). Pinta, rasteriza y firma (logo, o burbuja fusionada en luminosidad a opacidad 1) y mide el contraste de la firma sobre los píxeles finales. `bindings.protect` declara sujeto, reservas y lecho para el chequeo de la órbita. Sale con código 1 si falla un chequeo |
+| `pnpm creative:orbit:resolve` · `pnpm creative:orbit:render -- --intent --bindings --out-dir` | Adapter del contrato 0.3.0 (`scripts/creative/layout-compiler/graphic-line.mjs`). Pinta, rasteriza y firma (logo, o burbuja fusionada en luminosidad a opacidad 1) y mide el contraste de la firma sobre los píxeles finales. `bindings.protect` declara sujeto, reservas y lecho para el chequeo de la órbita. Sale con código 1 si falla un chequeo |
 | `pnpm creative:layout` | Capa opcional por formato `graphic_line: { intent, protect }` (sólo elementos con anillo: orbit, measure, progress, lens, spotlight, family-map; el copy y la firma siguen del compilador); falla el QA si cruza el campo de copy o un sujeto. Firma opcional `brand.signature: { brand_in_scene }`: `false` = logo centrado sin URL; `true` = burbuja centrada sola, opacidad 1, falla bajo 4,5:1. Los contratos sin ese campo quedan exactamente como antes |
 | `pnpm foto:componer:cta` + `pnpm foto:cta:gate` (tramo 17) | Campo de plan `marcaEnEscena`. En piezas **nuevas**, la burbuja (`url` + `marcaEnEscena: true`, sin `logo`) se fusiona a opacidad 1, se mide y la juzgan las reglas `firma-burbuja`, `firma-contraste` y `firma-sobre-sujeto`. Las piezas del canon anterior se dibujan igual y siguen «no certificables» con URL; no se recertificaron (el gate las mostrará en 3 hasta recomponerlas) y ningún workflow de CI corre este gate. Detalle: [contrato del compositor §19.6](../EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) |
 | `src/config/efeonce-brand-assets.test.ts` | Guarda de deriva: las copias locales del logo y de la burbuja deben ser el mismo dibujo que el paquete de assets |

@@ -13,7 +13,7 @@ import { AXIS_GRAPHIC_LINE_ORBIT_CONTRACT, resolveGraphicLineIntent } from '@efe
 
 import { compositeLuminosity } from './compiler.mjs'
 
-export const SUPPORTED_CONTRACT_VERSION = '0.2.0'
+export const SUPPORTED_CONTRACT_VERSION = '0.3.0'
 export const SUPPORTED_SCHEMA = 'axis.graphic-line-orbit-composition.v1'
 
 // The URL bubble as a signature blends at full opacity: measured 2026-09-26, at the 0.72 of the campaign footer it never
@@ -134,7 +134,8 @@ export function paintGraphicLine(manifest, bindings = {}) {
       const c = circleFor(manifest, el.placement, bindings)
 
       rings.push({ id: el.id, ...c })
-      layers.push(haloSvg(el.halo, c, width, height), ringSvg(el.ring, c, el.kind === 'orbit' ? el.innerOrbits : el.kind === 'progress'), arcSvg(el.arc, c), sphereSvg(el.sphere, el.arc, c))
+      // Inner orbits only where the element asks for them; a deck's progress is one ring (AXIS 0.3, canvas 4.2).
+      layers.push(haloSvg(el.halo, c, width, height), ringSvg(el.ring, c, el.kind === 'orbit' ? el.innerOrbits : false), arcSvg(el.arc, c), sphereSvg(el.sphere, el.arc, c))
     }
 
     if (el.kind === 'lens') {
@@ -158,14 +159,12 @@ export function paintGraphicLine(manifest, bindings = {}) {
 
       const ringCircle = el.ring ? { ...c, r: c.r * (1 + el.ring.airRatio) } : c
 
+      // The lens carries the orbit (AXIS 0.3, canvas 1.3): its ring, a short arc and the sphere at its tip, never a
+      // loose disc. Arc and sphere ride on the ring, with or without the ring drawn.
+      const orbitCircle = { ...c, r: c.r * (1 + (el.ring?.airRatio ?? 0.12)) }
+
       if (el.ring) layers.push(ringSvg(el.ring, ringCircle, false))
-
-      if (el.accentSphere) {
-        const d = c.r * 2 * el.accentSphere.diameterRatio
-        const [x, y] = at({ ...c, r: c.r + c.r * 2 * el.accentSphere.gapRatio + d / 2 }, el.accentSphere.degrees)
-
-        layers.push(`<circle cx="${f(x)}" cy="${f(y)}" r="${f(d / 2)}" fill="${el.accentSphere.color}"/>`)
-      }
+      layers.push(arcSvg(el.arc, orbitCircle), sphereSvg(el.sphere, el.arc, orbitCircle))
 
       rings.push({ id: el.id, ...ringCircle })
     }

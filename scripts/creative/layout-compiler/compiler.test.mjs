@@ -328,7 +328,7 @@ test('compiles AXIS supporting tagline and semantic collaboration selection with
     const compiled = await compileLayoutCampaign(fixture.contractPath)
 
     assert.equal(compiled.qa.pass, true)
-    assert.equal(compiled.manifest.collaborationSelection.contract.version, '0.2.0')
+    assert.equal(compiled.manifest.collaborationSelection.contract.version, '0.3.0')
 
     for (const result of compiled.manifest.results) {
       assert.equal(result.supportLayout.copy, 'Cómo escalar la creatividad sin automatizar el criterio')

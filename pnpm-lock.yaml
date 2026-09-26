@@ -30,17 +30,17 @@ importers:
         specifier: file:vendor/efeonce-globe/efeonce-globe-sdk-0.1.1.tgz
         version: file:vendor/efeonce-globe/efeonce-globe-sdk-0.1.1.tgz(@efeonce-globe/contracts@file:vendor/efeonce-globe/efeonce-globe-contracts-0.0.1.tgz)
       '@efeoncepro/axis-brand-assets':
-        specifier: 0.2.7
-        version: 0.2.7
+        specifier: 0.3.0
+        version: 0.3.0
       '@efeoncepro/axis-tokens':
-        specifier: 0.2.7
-        version: 0.2.7
+        specifier: 0.3.0
+        version: 0.3.0
       '@efeoncepro/axis-ui-contracts':
-        specifier: 0.2.7
-        version: 0.2.7
+        specifier: 0.3.0
+        version: 0.3.0
       '@efeoncepro/axis-ui-registry':
-        specifier: 0.2.7
-        version: 0.2.7
+        specifier: 0.3.0
+        version: 0.3.0
       '@emoji-mart/data':
         specifier: 1.2.1
         version: 1.2.1
@@ -864,17 +864,17 @@ packages:
     peerDependencies:
       '@efeonce-globe/contracts': 0.0.1
 
-  '@efeoncepro/axis-brand-assets@0.2.7':
-    resolution: {integrity: sha512-6GY752wX8z61wjVGjaV2mAcnrDaJtiuuhDOZmNT71SXAn2LMnXTMWdJxJluWYc4rWDK6C+TmahzYUGCSV8PW9A==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-brand-assets/0.2.7/9423a96cf97b502e08c528f579f7b96a3d8d0f7a}
+  '@efeoncepro/axis-brand-assets@0.3.0':
+    resolution: {integrity: sha512-2Y7PqUgnAXdTI5R8RPZ+x2504SE/cbkMQoMtReRAHm4zPRu5uE30NmeEfOt9XEe9h6MiErToTl3/MsKQ/Yv5MA==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-brand-assets/0.3.0/578d598701293628289f3a49570ebf94ec37f07d}
 
-  '@efeoncepro/axis-tokens@0.2.7':
-    resolution: {integrity: sha512-wkw5LSxpR3mApCkyVROKCL6o74oP2YrlTVxn1vDEucV8O50fumoR1Ld2X+H9VT5u7cHvDistz0oz5Pr0rTd6Nw==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-tokens/0.2.7/e6a71304af3a516af97163cf5623598ad5e6d018}
+  '@efeoncepro/axis-tokens@0.3.0':
+    resolution: {integrity: sha512-/f04p9MstgGqCCi1NJUn/PaNIh+ASg4w+k2BFMqDlvc8eAf5wSw8+12KBDdmkABpa3fYoWTJTRlsdOH7HXBhHg==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-tokens/0.3.0/508d92df387b966cc2149501346d7ce2287363f4}
 
-  '@efeoncepro/axis-ui-contracts@0.2.7':
-    resolution: {integrity: sha512-dI5dSMJ7cbtuU+2hc32RscfaCOPn9GTYAIm7s7SeUsA4yyHbRH0xZpeIPWIKI8S5/PZYroHUPepywgoB5v6INw==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-contracts/0.2.7/892b61d131cec2bd0e59da57cefc30711c5b902c}
+  '@efeoncepro/axis-ui-contracts@0.3.0':
+    resolution: {integrity: sha512-FRbZ0qsVs3BeAxjOVzOpKL5Wi4emlw8Sj5wE778+Ih4AAJo3TKMzRY9wvnnghq9vK4fsLTQga6HHBW/pD19cLw==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-contracts/0.3.0/09b4aca14b6af4743c4593cff893ee4d7a9d6ee9}
 
-  '@efeoncepro/axis-ui-registry@0.2.7':
-    resolution: {integrity: sha512-+hQOqxq3V51/Er/vl+xkdeyKfT+Hzugyc8JI/jo2ACyEB+zryEqneXJMkQPyjFVjdcQHjdordsIv5o9j1bWSKw==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-registry/0.2.7/98c5dd27e613fb872aa5defcf98ede44832ba797}
+  '@efeoncepro/axis-ui-registry@0.3.0':
+    resolution: {integrity: sha512-95lEaXBh+PSdsJI4AlzXyn+HhwtSiJN9Pbz9lq0qQLB/Hj/SaMrPSww+Ut2ah2cnGr4i1bVUnvtXXZSCFbobow==, tarball: https://npm.pkg.github.com/download/@efeoncepro/axis-ui-registry/0.3.0/09af76cf9920dbe4eae2d06e53f87ab6d4c1fa66}
 
   '@emnapi/core@1.9.0':
     resolution: {integrity: sha512-0DQ98G9ZQZOxfUcQn1waV2yS8aWdZ6kJMbYCJB3oUBecjWYO1fqJ+a1DRfPF3O5JEkwqwP1A9QEN/9mYm2Yd0w==}
@@ -11067,17 +11067,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@efeoncepro/axis-brand-assets@0.2.7': {}
+  '@efeoncepro/axis-brand-assets@0.3.0': {}
 
-  '@efeoncepro/axis-tokens@0.2.7': {}
+  '@efeoncepro/axis-tokens@0.3.0': {}
 
-  '@efeoncepro/axis-ui-contracts@0.2.7':
+  '@efeoncepro/axis-ui-contracts@0.3.0':
     dependencies:
-      '@efeoncepro/axis-tokens': 0.2.7
+      '@efeoncepro/axis-tokens': 0.3.0
 
-  '@efeoncepro/axis-ui-registry@0.2.7':
+  '@efeoncepro/axis-ui-registry@0.3.0':
     dependencies:
-      '@efeoncepro/axis-ui-contracts': 0.2.7
+      '@efeoncepro/axis-ui-contracts': 0.3.0
 
   '@emnapi/core@1.9.0':
     dependencies:

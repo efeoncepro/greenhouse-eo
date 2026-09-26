@@ -121,7 +121,7 @@ own-brand display headline), the selection, crop marks and cursors include the s
 never an ornament beside it (operator, 2026-09-26). Source contract `0.3.0` declares
 `target.bounds: 'rendered-group-including-terminal-sphere'`; the graphic line adds the adapter check
 `answer-period-part-of-text`, and `@efeoncepro/axis-graphic-line` exposes `answerHtml` and `answerGroupBox`.
-Greenhouse still pins `0.2.0` of this contract (the `0.2.7` set) until it adopts the new release.
+Greenhouse adopted it on `develop` with the `0.3.0` set (2026-09-26).
 
 The portable advertising and collaboration contracts were first published in the AXIS `0.2.5` package set.
 Greenhouse now pins the `0.2.7` set (which adds the graphic line contract and `@efeoncepro/axis-brand-assets`) and
