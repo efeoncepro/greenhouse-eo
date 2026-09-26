@@ -408,7 +408,9 @@ for (const p of piezas.filter(p => p.cta)) {
   // Tramo 10 (auditorías de arquitectura, hallazgos 5 y 6, y de diseño, hallazgo 5): lo que ninguna guarda mide no sale con
   // 0. Ninguna pieza con CTA del repo los usa.
   if (p.hud) noCertificable.push(`${p.id}: lleva HUD («NIVEL DE BÚSQUEDA», estrellas e íconos), que no entra en la zona segura, el layout, la medición por voz ni el texto alternativo`)
-  if (p.url) noCertificable.push(`${p.id}: lleva la url de la firma, que se dibuja sin medir su contraste y fuera de la guarda del sujeto`)
+  // Tramo 17: en una pieza NUEVA la burbuja URL es una firma medida (contraste y sujeto) y la juzga `firma-burbuja`; en las
+  // del canon anterior se dibuja sin medir, como antes.
+  if (p.url && canonDe(p, plateDe(p)) !== CANON_VIGENTE) noCertificable.push(`${p.id}: lleva la url de la firma, que se dibuja sin medir su contraste y fuera de la guarda del sujeto`)
   if (p.footer) noCertificable.push(`${p.id}: lleva cierre inferior (\`footer\`), que no entra en la jerarquía ni en el orden de lectura`)
 
   const declarada = segmentada || sp === false || (sp && typeof sp.top === 'number' && typeof sp.minClearance === 'number')
@@ -729,7 +731,7 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
 
   if (!p.logo && p.firma?.modo === 'sin-firma' && !salidaAprobada(p, 'pieza SIN firma', p.firma)) fallos++
 
-  if (!p.logo && !p.firma && !externa) {
+  if (!p.logo && !p.firma && !externa && !(nuevo && p.url)) {
     console.error(`✗ ${r.id}: la pieza no declara firma — \`logo\`, o \`firma: { modo: "externa" | "sin-firma", razon }\` si la firma la pone otra herramienta o no lleva.`)
     fallos++
   }
@@ -875,6 +877,22 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
     if (!nuevo) console.warn(`⚠ ${r.id}: ${msg}.`)
     else if (bloquea(p, 'firma-canto', msg, { valor: r.firmaCanto, sentido: 'max' })) fallos++
   } else if (nuevo && (p.logo || p.firma?.modo === 'externa') && typeof r.firmaCanto !== 'number') noCertificable.push(`${r.id}: el QA no trae la pendiente de luz bajo la firma (\`firmaCanto\`): recompón con el comando vigente`)
+
+  // Firma con burbuja URL (tramo 17; regla del operador, 2026-09-26). La firma es el logo de Efeonce centrado; la burbuja
+  // lo reemplaza SÓLO cuando el logo ya está en la imagen (`marcaEnEscena`), centrada y fusionada, y nunca junto al logo.
+  // Sólo piezas nuevas: las aprobadas no se re-juzgan.
+  if (nuevo && p.url) {
+    if (!p.marcaEnEscena && bloquea(p, 'firma-burbuja', 'la burbuja URL firma sólo cuando el logo de Efeonce ya está en la imagen: declara `marcaEnEscena: true` o firma con el logo')) fallos++
+    if (p.logo && bloquea(p, 'firma-burbuja', 'logo y burbuja URL juntos repiten la marca: con el logo en la imagen firma sólo la burbuja')) fallos++
+
+    const u = r.url
+
+    if (!u || typeof u.contraste !== 'number') noCertificable.push(`${r.id}: el QA no trae el contraste de la burbuja URL: recompón con el comando vigente`)
+    else {
+      if (u.contraste < FIRMA_MIN_CONTRASTE && bloquea(p, 'firma-contraste', `la burbuja URL fusionada mide ${u.contraste}:1 contra su fondo (canon: ≥ ${FIRMA_MIN_CONTRASTE}:1). La fusión fija su luminosidad: necesita un lecho muy oscuro`, { valor: u.contraste, sentido: 'min' })) fallos++
+      if (u.sobreSujeto && bloquea(p, 'firma-sobre-sujeto', `la burbuja URL queda sobre el sujeto (${u.sobreSujeto} px de su silueta)`)) fallos++
+    }
+  } else if (nuevo && p.marcaEnEscena && p.logo && bloquea(p, 'firma-burbuja', 'con el logo de Efeonce ya en la imagen, firma la burbuja URL centrada, no otro logo')) fallos++
 
   // Ritmo (tramo 16; octava, diseño N1): «Separación entre bloques conceptuales mayor que entre miembros relacionados del grupo
   // de acción» (Tres voces + acción, jerarquía 2). El grupo de acción es la nota (el beneficio), el CTA y el descriptor, sobre lo

@@ -1647,7 +1647,12 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
 
   let master = await sharp(bare).composite(topLayers).png().toBuffer()
 
-  // Firma web: SVG canónico url-lum con fusión de luminosidad no separable (compositor canónico, opacidad 0.72).
+  // Firma web: SVG canónico url-lum con fusión de luminosidad no separable. En una pieza NUEVA (tramo 17) la burbuja es la
+  // firma —sólo cuando el logo ya está en la imagen— y se fusiona a opacidad plena: a 0,72 no llega a 4,5:1 sobre ningún
+  // fondo (medido 2026-09-26: 3,82 sobre #001a33, 4,00 sobre negro). Se mide el 1 % peor de su tinta sólida contra el fondo
+  // que tapa, y si cae sobre el sujeto. Las piezas aprobadas se dibujan como antes (0,72, sin medir).
+  let urlQa = null
+
   if (s.url) {
     const src = await sharp(repo('src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg'), { density: 600 }).png().toBuffer()
     const uw = Math.round(s.url.width * W)
@@ -1655,11 +1660,35 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
     const uh = Math.round((uh0 * uw) / uw0)
     const left = Math.round(W / 2 - uw / 2)
     const topU = Math.round(s.url.y * H)
-    const res = await compositeLuminosity({ backdropBytes: master, sourceBytes: src, left, top: topU, width: uw, opacity: 0.72 })
+    const opacidad = nuevo ? 1 : 0.72
+    const antes = master
+    const res = await compositeLuminosity({ backdropBytes: master, sourceBytes: src, left, top: topU, width: uw, opacity: opacidad })
 
     master = res.output
     if (!res.evidence || res.evidence.method !== 'non-separable-luminosity') throw new Error('url-lum sin evidencia de fusión')
     checks.push({ id: 'url', box: { left, right: left + uw, top: topU, bottom: topU + uh }, skipContrast: true })
+
+    if (nuevo) {
+      const tinta = await sharp(src).resize({ width: uw }).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+      const region = { left, top: topU, width: Math.min(tinta.info.width, W - left), height: Math.min(tinta.info.height, H - topU) }
+      const [b0, b1] = await Promise.all([antes, master].map(b => sharp(b).extract(region).removeAlpha().raw().toBuffer()))
+      const razones = []
+
+      for (let y = 0; y < region.height; y++)
+        for (let x = 0; x < region.width; x++) {
+          if (tinta.data[(y * tinta.info.width + x) * 4 + 3] < 230) continue
+          const i = (y * region.width + x) * 3
+          const l0 = lum(b0[i], b0[i + 1], b0[i + 2])
+          const l1 = lum(b1[i], b1[i + 1], b1[i + 2])
+
+          razones.push((Math.max(l0, l1) + 0.05) / (Math.min(l0, l1) + 0.05))
+        }
+
+      razones.sort((a, b) => a - b)
+      const sobre = opts.mask ? guardHits(opts.mask, [{ id: 'url', box: { left, right: left + uw, top: topU, bottom: topU + uh } }], W, H, 0) : []
+
+      urlQa = { opacidad, contraste: razones.length ? +razones[Math.floor(razones.length * 0.01)].toFixed(2) : null, anchoLadoCorto: +(uw / Math.min(W, H)).toFixed(3), y: +(topU / H).toFixed(4), ...(sobre.length ? { sobreSujeto: sobre[0].px } : {}) }
+    }
   }
 
   const contraste = {}
@@ -1830,7 +1859,7 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
   const huellas = { pieza: opts.huellaPieza ?? null, plate: opts.plateSha ?? null, compositor: HUELLA_COMANDO, png: sha(pngFinal), layout: sha(layoutJson), alt: sha(`${accesibilidad.altText}\n`) }
   // Pendiente de luz bajo la firma real (tramo 16; octava, F1): el gate la juzga.
   const firmaCanto = firmaReal.length ? +Math.max(...firmaReal.map(f => pendienteBajoCaja(bareRgb, W, H, f.box))).toFixed(2) : null
-  const registro = { id: s.id, canon: opts.canon, firmaCanto, ...(marcoSobreVoz.length ? { marcoSobreVoz } : {}), dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(s.selection?.box && opts.mask ? { seleccionSujeto: fraccionSujeto(opts.mask, s.selection.box) } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
+  const registro = { id: s.id, canon: opts.canon, firmaCanto, ...(urlQa ? { url: urlQa } : {}), ...(s.marcaEnEscena !== undefined ? { marcaEnEscena: s.marcaEnEscena } : {}), ...(marcoSobreVoz.length ? { marcoSobreVoz } : {}), dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(s.selection?.box && opts.mask ? { seleccionSujeto: fraccionSujeto(opts.mask, s.selection.box) } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
 
   for (const [rel, datos] of salidas) escribirAtomico(`${OUT}/${rel}`, datos)
   qa.push(registro)

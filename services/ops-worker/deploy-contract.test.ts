@@ -32,10 +32,10 @@ describe('ops-worker deploy render dispatch contract', () => {
     expect(script).toContain('"/insights/schedules/tick"')
   })
 
-  it('declares the Insights editorial v2 flag default ON (TASK-1888)', () => {
+  it('declares the Insights editorial v2 flag default OFF (TASK-1888)', () => {
     // Señala, no verifica: el verificador real es `gcloud run services describe ops-worker` sobre la revisión activa.
-    // Default true desde el rollout del 2026-09-26.
-    expect(deployScript()).toContain('ENV_VARS="${ENV_VARS},INSIGHTS_EDITORIAL_V2_ENABLED=${INSIGHTS_EDITORIAL_V2_ENABLED:-true}"')
+    // Default false a propósito: el worker es único para staging y producción y el v2 se prende con TASK-1889.
+    expect(deployScript()).toContain('ENV_VARS="${ENV_VARS},INSIGHTS_EDITORIAL_V2_ENABLED=${INSIGHTS_EDITORIAL_V2_ENABLED:-false}"')
   })
 })
 

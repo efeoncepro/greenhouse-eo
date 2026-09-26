@@ -143,7 +143,7 @@ const makeFixture = async (finishStatus, options = {}) => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'campaign-layout-compiler-'))
 
   const plate = await sharp({
-    create: { width: 800, height: 800, channels: 3, background: '#164468' }
+    create: { width: 800, height: 800, channels: 3, background: options.plateBackground ?? '#164468' }
   })
     .composite([
       {
@@ -243,6 +243,16 @@ const makeFixture = async (finishStatus, options = {}) => {
         2
       )}\n`
     )
+  }
+
+  if (options.signature) {
+    contract.brand.signature = options.signature
+    if (options.brandBackground) contract.brand.colors.background = options.brandBackground
+    // The bubble signature is centered; in portrait it signs wider (its thin strokes lose contrast when small).
+    if (options.signature.brand_in_scene) contract.formats[1].layout.url = { ...contract.formats[1].layout.url, x: 60, width: 240 }
+
+    if (options.centerLogo !== false)
+      for (const format of contract.formats) format.layout.logo.left = (format.canvas.width - format.layout.logo.width) / 2
   }
 
   if (options.graphicLine) {
@@ -465,6 +475,69 @@ test('a graphic line intent never signs or writes copy inside a campaign piece',
 
   try {
     await assert.rejects(() => compileLayoutCampaign(fixture.contractPath), /this compiler owns copy and signature/)
+  } finally {
+    await rm(fixture.root, { recursive: true, force: true })
+  }
+})
+
+test('signature rule: a logo-signed piece carries the centered logo and no URL at all', async () => {
+  const fixture = await makeFixture('approved', { signature: { brand_in_scene: false } })
+
+  try {
+    const compiled = await compileLayoutCampaign(fixture.contractPath)
+
+    assert.equal(compiled.qa.pass, true)
+
+    for (const result of compiled.manifest.results) {
+      const editable = await readFile(path.join(fixture.root, result.editableSource), 'utf8')
+
+      assert.equal(result.signature.mode, 'logo')
+      assert.match(editable, /data-layer="brand"/)
+      assert.doesNotMatch(editable, /data-axis-brand-primitive="url-bubble"/)
+    }
+  } finally {
+    await rm(fixture.root, { recursive: true, force: true })
+  }
+})
+
+// Measured on the fixture: on the brand navy bed (#03142D) the blended bubble lands at 4.42–4.58:1, right at the edge;
+// on a near-black bed it reads. The rule is the contrast gate, not the color.
+test('signature rule: with the logo in the image, the centered URL bubble signs alone and must read', async () => {
+  const fixture = await makeFixture('approved', { axisAdvertising: true, signature: { brand_in_scene: true }, centerLogo: false, plateBackground: '#030507', brandBackground: '#020304' })
+
+  try {
+    const compiled = await compileLayoutCampaign(fixture.contractPath)
+
+    assert.equal(compiled.qa.pass, true)
+
+    for (const result of compiled.manifest.results) {
+      const editable = await readFile(path.join(fixture.root, result.editableSource), 'utf8')
+
+      assert.equal(result.signature.mode, 'url-bubble')
+      assert.ok(result.signature.contrast >= 4.5, `bubble ${result.signature.contrast}`)
+      assert.doesNotMatch(editable, /data-layer="brand"/)
+      assert.match(editable, /data-axis-brand-primitive="url-bubble"[^>]*opacity="1"/)
+    }
+  } finally {
+    await rm(fixture.root, { recursive: true, force: true })
+  }
+})
+
+test('signature rule: a URL bubble over a bed that is not dark enough fails QA instead of shipping faint', async () => {
+  const fixture = await makeFixture('approved', { axisAdvertising: true, signature: { brand_in_scene: true }, centerLogo: false, plateBackground: '#6a6a6a' })
+
+  try {
+    await assert.rejects(() => compileLayoutCampaign(fixture.contractPath), /QA failed/)
+  } finally {
+    await rm(fixture.root, { recursive: true, force: true })
+  }
+})
+
+test('signature rule: the contract rejects an off-center signature', async () => {
+  const fixture = await makeFixture('approved', { signature: { brand_in_scene: false }, centerLogo: false })
+
+  try {
+    await assert.rejects(() => buildLayoutPlan(fixture.contractPath), /centered/)
   } finally {
     await rm(fixture.root, { recursive: true, force: true })
   }

@@ -60,7 +60,8 @@ merch, oficina, eventos, redes, decks, correo y producto (Efeonce Insights).
 - Delta 2026-09-26: contrato `0.2.0` (paquetes AXIS `0.2.7`) con `signature` (logo centrado; burbuja URL centrada
   y con fusión sólo si el logo ya está en la imagen), `slogan`, `state` y `brand-close`; la órbita no sustituye la
   composición fotográfica (check `orbit-never-over-subject-or-reserves`); archivos oficiales en el paquete nuevo
-  `@efeoncepro/axis-brand-assets`; la órbita entra como capa opcional en `pnpm creative:layout`. Pendiente: aplicar
-  la regla de la firma en los dos compositores de campaña (`foto:componer:cta` y `creative:layout`), que hoy pueden
-  poner logo y burbuja juntos.
+  `@efeoncepro/axis-brand-assets`; la órbita entra como capa opcional en `pnpm creative:layout`. La regla de la firma
+  se aplica también en los dos compositores de campaña, sólo en piezas nuevas: `foto:componer:cta` (tramo 17,
+  `marcaEnEscena` + gate `firma-burbuja`) y `creative:layout` (`brand.signature`); las piezas y contratos anteriores
+  se dibujan igual y no se recertifican.
 - Copy en inglés, revisión legal de «Te hacemos visible» y tamaños mínimos validados con prueba de impresión.

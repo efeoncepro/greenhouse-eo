@@ -52,7 +52,9 @@ export const REGLAS_EXCEPTUABLES = [
   'cta-columna',
   // Tramo 16 (octava certificación): sólo en las piezas nuevas.
   'firma-canto',
-  'ritmo'
+  'ritmo',
+  // Tramo 17 (regla del operador, 2026-09-26): sólo en las piezas nuevas.
+  'firma-burbuja'
 ]
 
 // Límites de las zonas de sujeto ignoradas: cada una ≤ 10 % del lienzo y todas juntas ≤ 15 %. Una zona del tamaño del
@@ -311,6 +313,9 @@ export const esquemaPieza = z
     footer: z.object({ text: texto, size: positivo, y: fraccion }).strict().optional(),
     card: z.object({ header: texto, body: texto, bottom: fraccion, width: z.number().finite().positive().max(1).optional(), align: z.enum(['left', 'right']).optional(), allowGtaCard: z.boolean().optional() }).strict().optional(),
     url: z.object({ width: z.number().finite().positive().max(1), y: fraccion }).strict().optional(),
+    // El logo de Efeonce YA aparece dentro de la imagen (mockup, objeto, merch). Sólo entonces firma la burbuja URL
+    // (`url`), centrada y con fusión de luminosidad, en lugar del logo (regla del operador, 2026-09-26; tramo 17).
+    marcaEnEscena: z.boolean().optional(),
     // metadatos de otras herramientas (firma externa, validadores de zona segura, trazabilidad editorial)
     altText: z.string().optional(),
     styleReason: z.string().optional(),

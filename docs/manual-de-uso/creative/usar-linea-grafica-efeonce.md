@@ -118,6 +118,8 @@ Un agente no dibuja la órbita a mano: declara qué hace en la pieza y AXIS resu
      fusión de luminosidad. La burbuja sólo pasa el contraste sobre un fondo muy oscuro.
    - **La órbita** se usa en casos puntuales (lente, medida, progreso, foco); no reemplaza la composición de la
      foto. Declara en `protect` el sujeto y las reservas de texto: la órbita no puede cruzarlos.
+   - **En campañas**: `pnpm creative:layout` declara la firma con `brand.signature: { brand_in_scene }` (logo centrado
+     sin URL, o burbuja centrada sin logo) y `pnpm foto:componer:cta` con `marcaEnEscena: true` + `url` y sin `logo`.
 2. **Resuelve**: `pnpm creative:orbit:resolve -- --input intent.json --out manifest.json`. Si la intención rompe
    una regla (dos anillos en la pieza, una medida sin fuente, una respuesta de más de tres palabras), el comando
    falla y dice cuál.

@@ -1867,7 +1867,7 @@ corrige y vuelve a correr, porque el 3 puede aparecer recién después.
 | Mutantes | Todos los mutantes detectados por la razón esperada y los canarios bien clasificados | Alguno sobrevive o falla por otra razón, la corrida base no pasa o el catálogo quedó viejo | — |
 | Reporte de accesibilidad | Escribió el reporte | No existe el QA del plan | 2 si falta el plan |
 
-### 19.6 La firma: cuatro maneras de declararla
+### 19.6 La firma: cinco maneras de declararla
 
 El gate exige que toda pieza declare su firma.
 
@@ -1877,6 +1877,15 @@ El gate exige que toda pieza declare su firma.
 | **Logo en una Y fija** | `"logo": { "width": 0.2, "x": 0.5, "y": 0.84 }` (borde superior, fracción del alto) | Lo dibuja ahí; con `variant: "auto"` (por defecto) elige la tinta midiendo donde va: `negative` (blanca) o `color` (navy) | Lo mismo; en una pieza nueva, también debajo del contenido, en el cuarto inferior y fuera de `protect` (`firma-posicion`) |
 | **Firma externa** | `"firma": { "modo": "externa", "razon": "La firma la pone firmar.mjs después del compositor" }, "signatureY": 0.85` | No la dibuja: reserva su caja (20 % del lado corto, centrada, `signatureY` = centro vertical; 0,935 si no la declaras) para que nada caiga encima, y mide su contraste como la herramienta que firma: el peor píxel de la caja con la mejor de las dos tintas | ≥ 4,5:1, tamaño, sujeto y zona, igual que el logo. En una pieza nueva, además, `aprobadoPor` y `plate`: el PNG que certifica el gate no lleva la firma |
 | **Sin firma** | `"firma": { "modo": "sin-firma", "razon": "…", "aprobadoPor": "julio-reyes" }` | Nada | Un aprobador del registro, que dé la razón; el gate la imprime |
+| **Burbuja URL** (tramo 17, sólo con el logo en la imagen) | `"marcaEnEscena": true, "url": { "width": 0.3, "y": 0.9 }` y **sin** `logo` | La dibuja centrada con fusión de luminosidad no separable; en una pieza nueva, a opacidad plena, y mide el 1 % peor de su tinta sólida contra el fondo y si cae sobre el sujeto (`url` en el QA). En las aprobadas, como antes (0,72, sin medir) | En una pieza nueva: `marcaEnEscena: true`, sin logo al lado (`firma-burbuja`), ≥ 4,5:1 (`firma-contraste`) y fuera del sujeto (`firma-sobre-sujeto`). Con `marcaEnEscena` y logo sin burbuja, también `firma-burbuja`. En una pieza del canon anterior sigue «no certificable» |
+
+**Regla de la firma (operador, 2026-09-26; tramo 17).** Una pieza firma con el logo de Efeonce centrado. La burbuja
+URL lo reemplaza sólo cuando el logo ya aparece dentro de la imagen (mockup, objeto, merch): centrada, fusionada y
+nunca junto al logo. La fusión fija la luminosidad del gris, así que la burbuja sólo pasa 4,5:1 sobre un lecho de verdad
+oscuro (medido en la suite: 4,85:1 sobre `#050608`; a la opacidad antigua de 0,72 no llega sobre ningún fondo). Las
+piezas ya aprobadas no se recomponen: su dibujo no cambia, pero la huella del comando sí, así que el gate las muestra
+como «no certificable» (3) hasta recomponerlas. Ningún workflow de CI corre este gate. Prueba `P11`; mutantes
+`gate-t17-burbuja-sin-marca`, `gate-t17-burbuja-con-logo` y `compositor-t17-burbuja-opacidad`.
 
 `signatureY` sin `firma` también declara una firma externa (la forma que ya usan v05–v07). En la firma sin firma, el
 nombre del aprobador va sólo si el operador aprobó esa salida.

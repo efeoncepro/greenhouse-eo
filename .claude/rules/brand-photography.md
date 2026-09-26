@@ -446,6 +446,10 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 - **Nunca un scrim.** Si el contraste no da, se **regenera** el plate; no se oscurece en post. Desde el 2026-09-23
   (decisión del operador: «todo se genera desde el prompt») el compositor CTA **rechaza** `scrimTop`/`scrimBottom` al
   validar el plan.
+- 🔴 **Firma: logo centrado; la burbuja URL sólo si el logo ya está en la imagen** **[operador, 2026-09-26]**. En un
+  mockup u objeto con el logo de Efeonce visible, firma la burbuja (`marcaEnEscena: true` + `url`, sin `logo`), centrada
+  y con fusión de luminosidad; nunca junto al logo. Sólo pasa 4,5:1 sobre un lecho muy oscuro. Gate `firma-burbuja`
+  (tramo 17; contrato CTA §19.6).
 - **El plate nace sin logo ni texto.** La firma es el SVG oficial compuesto después, **20% del lado corto del lienzo**
   (decisión del operador 2026-09-20), contraste ≥ 4,5:1 medido. En una pieza con CTA, `foto:cta:gate` lo exige —en la
   caja y, si el logo lo dibuja el compositor, también en su trazo; fuera del sujeto y dentro de la zona de AXIS— y la
