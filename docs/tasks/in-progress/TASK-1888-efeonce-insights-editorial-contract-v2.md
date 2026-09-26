@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-045`
-- Status real: `En producción con flag OFF (release 0e87c7a443a2, 2026-09-26); rollout pendiente: deploy efeonce-mcp#18, flag ON en staging + ediciones internas, flag ON en producción con TASK-1889`
+- Status real: `En producción con flag OFF (release 0e87c7a443a2 + gateway efeonce-mcp v1.9.0, revisión 00062-ct5, 2026-09-26); rollout pendiente: flag ON en staging + ediciones internas, flag ON en producción con TASK-1889`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`
@@ -311,7 +311,7 @@ Reglas obligatorias:
 - [x] Preferencia modelada como command + reader, no como handler de pantalla.
 - [x] Read por reader canónico; write con capability fina, idempotencia, outbox y errores canónicos.
 - [x] Capability + grant + coverage test en el mismo PR. — `insights.cover_preference.manage` (Admin + Account), `capability-grant-coverage.test.ts` verde.
-- [ ] Camino programático: lanes `api/platform/app` y `api/platform/ecosystem` + tool MCP federada en `efeonce-mcp`. — Lanes y tools en Greenhouse construidas; federación en PR efeonce-mcp#18 (sin merge ni deploy hasta el release).
+- [x] Camino programático: lanes `api/platform/app` y `api/platform/ecosystem` + tool MCP federada en `efeonce-mcp`. — Lanes en producción desde el release `0e87c7a443a2` (canary de la lane ecosystem 200, corrido por la sesión TASK-1846). Federación: efeonce-mcp#18 mergeado como `2cf78af91` (v1.9.0; el asunto del squash dice «v1.8.0» por error, el `package.json` dice 1.9.0) y desplegado por el run `36226550358` (`success`) como revisión `efeonce-mcp-gateway-00062-ct5`, Ready y al 100 % en `spec.traffic` y `status.traffic`, imagen `sha256:909c53f1…` verificada por el paso «Promote and verify exact revision»; `/health` 200. El merge y el dispatch los ejecutó Codex con autorización del operador; esta sesión verificó el resultado. No ejercitado: un `tools/list` en vivo con token (el MCP responde 401 sin OAuth); la presencia de las dos tools se verificó en el commit desplegado (`src/mcp.ts`, `tool-policy.ts`, manifest generado).
 - [x] Write apto para `propose → confirm → execute`; sin integración Nexa-específica. — un solo write idempotente y reversible (fijar el valor previo).
 - [x] Un primitive, muchos consumers; sin lógica duplicada en TASK-1849. — delta en TASK-1849.
 - [x] Parity check = SÍ.
