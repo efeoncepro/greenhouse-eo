@@ -1,10 +1,10 @@
 # Línea gráfica Efeonce — Reveal y apertura de la órbita (motion)
 
 > **Tipo de documento:** Especificación de producción de motion
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-26 por Claude
 > **Última actualización:** 2026-09-26 por Claude
-> **Estado:** V1 producida; tiempos aún en el script (pendiente pasarlos a tokens `brandReveal` / `brandOpen` de AXIS)
+> **Estado:** V1.1 aprobada por el operador (2026-09-26): más punch y sting de 1,6 s; tiempos aún en el script (pendiente pasarlos a tokens `brandReveal` / `brandOpen` de AXIS)
 > **Documentación técnica:** [Manual de la línea gráfica](./EFEONCE_GRAPHIC_LINE_V1.md) · [ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 
 ## 1. Qué son y cómo conviven
@@ -13,8 +13,9 @@ Son dos piezas de marca que conviven con el cierre anterior (anillo, arco y eslo
 
 | Pieza | Recorrido | Duración | Uso |
 |---|---|---|---|
-| **Reveal** | línea → logo | 4,2 s | Firma de cierre de video, apertura de presentación o intro de evento |
-| **Apertura** | logo → línea | 2,8 s | Paso del logo al lenguaje de la línea: el logo «se abre» y deja el anillo con su arco listo para componer |
+| **Reveal** | línea → logo | 3,6 s | Firma de cierre de video, apertura de presentación o intro de evento |
+| **Apertura** | logo → línea | 2,4 s | Paso del logo al lenguaje de la línea: el logo «se abre» y deja el anillo con su arco listo para componer |
+| **Sting** | el golpe corto | 1,6 s | Cortinillas, redes y cierres breves: el isotipo ya formado, la nave encaja de un golpe y la cámara salta al logotipo |
 | Cierre anterior | anillo + eslogan | — | Sigue vigente (`motion-design-studio`, overlay Efeonce) |
 
 **Idea.** El anillo fino de la línea gráfica es la órbita del isotipo vista de frente. Al inclinarse hacia el ángulo
@@ -53,6 +54,22 @@ nada. Las medidas se calculan en tiempo de ejecución, no se escriben a mano:
   la nave en ángulo recto y encuadra las ventanas.
 
 ## 4. Tiempos
+
+### Delta V1.1 — más punch (aprobado 2026-09-26)
+
+Las tablas de abajo son la V1 (4,2 s y 2,8 s) y quedan como referencia del recorrido. La versión aprobada es la V1.1,
+con **reveal 3,6 s, apertura 2,4 s y sting 1,6 s**, y su fuente de verdad son `stateReveal`, `stateOpen` y
+`stateSting` de `scripts/creative/brand-motion/orbit-scene.js` (y `DURATION` / `BLUR` de `render-orbit-motion.mjs`)
+hasta que existan los tokens de AXIS. Qué cambió:
+
+- **Ritmo lento–rápido–lento:** cada acción arranca después de una pausa corta (anticipación) y se resuelve con un
+  golpe; la nave entra rápido, se pasa un poco y vuelve (`backOut`) y el isotipo encaja con un pulso de impacto.
+- **Onda de acento:** al encajar (o lanzarse en la apertura) la órbita en acento se expande y se desvanece.
+- **Sting:** el isotipo ya formado; la nave encaja de un golpe con la onda y la cámara salta al logotipo.
+- **Eslogan al 64 % del logotipo** para que no compita con el logo (decisión del operador).
+- **Desenfoque de movimiento** en reveal 1250–1900 y 2050–2750 ms, apertura 350–950 y 1150–1550 ms, sting 100–600
+  y 720–1250 ms.
+- **Sonido con impactos:** los golpes de llegada acompañan cada encaje; pico −1 dBFS.
 
 Curvas AXIS: `emphasized` (0.2, 0, 0, 1), `standard` (0.4, 0, 0.2, 1) y `emphasizedAccelerate` (0.3, 0, 0.8, 0.15).
 Asentamiento con resorte (amortiguación 0,82, ω 11). El color se mezcla en OKLab y la escala de cámara se interpola
@@ -124,6 +141,12 @@ fondo claro», en navy. El halo va como capa aparte para poder bajarlo o quitarl
 Destino para el equipo: OneDrive `Alineación/5. Contenidos/13- Branding/` (subcarpeta de motion). Los masters se
 archivan en GCS con `pnpm media:archive-ai-generation`. Nunca en git.
 
+**En el Lab de AXIS** (4.4.2 «Animaciones de marca», axis.efeonce.org) van versiones web livianas —MP4 H.264 de
+1280 px a 30 fps con sonido, 100–170 KB, y el cuadro final en WebP como póster— de reveal (16:9 y 1:1), apertura
+(16:9 navy y claro) y sting (16:9 y 4:5 claro), con una ficha por animación. Para servir los masters descargables se
+propuso un bucket público de AXIS en GCP (`efeonce-group-axis-public-media`); crearlo requiere autorización del
+operador.
+
 ## 7. Cómo se produce
 
 ```bash
@@ -158,6 +181,10 @@ La producción de V1 corrió en `ai-generations/2026-09-26_orbita-motion/`.
 - No poner el eslogan en mayúsculas ni con esfera (manual §5).
 
 ## 10. Pendiente
+
+- Terminar las 30 variantes de la cola V1.1 (`ai-generations/2026-09-26_orbita-motion/run-all.sh`, con candado de una
+  sola instancia desde el 2026-09-26: dos instancias en paralelo corrompieron cuatro MP4, recodificados desde sus
+  cuadros), entregarlas en OneDrive y archivarlas en GCS.
 
 - Pasar tiempos y curvas a tokens de AXIS (`efeonceGraphicLine.brandReveal` / `brandOpen`) y una demo viva en el Lab.
 - Variantes para Globe, Wave y Reach (acento y palabra del eslogan desde `family`).

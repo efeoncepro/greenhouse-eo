@@ -7,7 +7,7 @@
 // Todo sale de los archivos oficiales (`@efeoncepro/axis-brand-assets`), de los tokens `efeonceGraphicLine` y de las
 // curvas `axisMotion.ease`. Dos pasadas por cuadro, con transparencia real: `main` (anillo, nave, letras, eslogan) y
 // `halo`. Las versiones con fondo se componen después (fondo + halo + main). `--storyboard` rinde sólo cuadros clave.
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -109,7 +109,17 @@ export async function shootBlurred(scene, t, anim, pass, ss, fps) {
 
 export async function shoot(scene, t, anim, pass, ss) {
   await scene.page.evaluate(({ t, anim, pass }) => window.orbitScene.render(t, anim, pass), { t, anim, pass })
-  const png = await scene.page.screenshot({ omitBackground: true, type: 'png' })
+  let png
+
+  // Con varios renders en paralelo, un cuadro pesado puede tardar más que el límite por defecto: plazo amplio y reintento.
+  for (let attempt = 1; ; attempt++) {
+    try {
+      png = await scene.page.screenshot({ omitBackground: true, type: 'png', timeout: 180000 })
+      break
+    } catch (err) {
+      if (attempt >= 3) throw err
+    }
+  }
 
   return ss === 1 ? png : sharp(png).resize(scene.W, scene.H, { kernel: 'lanczos3' }).png().toBuffer()
 }
@@ -145,6 +155,9 @@ async function main() {
 
           for (const [i, t] of times.entries()) {
             const name = storyboard ? `t${String(Math.round(t)).padStart(4, '0')}.png` : `${String(i).padStart(4, '0')}.png`
+
+            // Reanudable: si el cuadro ya existe en las tres capas, se salta.
+            if (!storyboard && ['main', 'halo', 'bg'].every(l => existsSync(path.join(dir, l, name)))) continue
             const tt = Math.min(t, DURATION[anim])
             const main = storyboard ? await shoot(scene, tt, anim, 'main', ss) : await shootBlurred(scene, tt, anim, 'main', ss, fps)
             const halo = await shoot(scene, tt, anim, 'halo', ss)
