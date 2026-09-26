@@ -149,22 +149,24 @@ Revenue termina en 17,5 / 11,5 y la esfera de Medios va en x 20,35.
   este set reemplaza a los Tabler outline de la firma de correo y de la firma de equipo (`emailSignature.icons`,
   `team.areaMark`). Mientras no se decida, la firma sigue con Tabler.
 
-## 11. Iconografía plana (exploración, no usar)
+## 11. Plastilina, la voz blanda (dirección aprobada, especificación en exploración)
 
-El operador pidió un estilo **complementario**: íconos planos (rellenos) **con personalidad creativa**, con objetos del
-oficio: rayo, paleta de colores, pincel, cuentagotas, bombillo, tablet, laptop, Mac de escritorio y teléfono. Estado al
-2026-09-26, página «Plano · exploración» del canvas:
+El operador pidió un estilo **complementario** con punch y personalidad para el oficio creativo. Tras descartar los
+tratamientos dibujados a mano y dos rondas generadas, eligió la dirección E y la llamó **Plastilina** (D19). Vive en la
+sección 2 del canvas «Íconos de La órbita» (anatomía E1, post E2, set E3 e ícono maestro vectorial `IconoE.dc.html`).
 
-- **Descartado:** tres tratamientos dibujados a mano en SVG (capas planas, registro corrido, contorno). El operador los
-  rechazó: «no hablan el lenguaje de Efeonce». Causas: clip-art rígido de coordenadas a mano, tintes pastel que no
-  existen en la paleta y objetos genéricos.
-- **Color (operador, 2026-09-26):** el set es **consistente dentro de cada línea de servicio** (fondo, tinta y el
-  acento de la línea) y **cambia de acento según la línea**. Nada de colores por objeto ni tintes inventados. La
-  librería 3D del equipo (OneDrive › Iconos 3D) no sirve de base justamente porque no conserva consistencia de color.
-- **Método en curso:** la forma se explora con generación de imagen en dos tintas y el acento (hojas en
-  `ai-generations/2026-09-26_iconos-planos/`: oficio a la vista, calado, construidos con la órbita); la dirección
-  elegida se redibuja en vector y el color se aplica desde los tokens de cada línea, para que no pueda derivar.
-
-Lo que se mantiene en cualquier forma: plano, sin volumen, brillo ni degradé; la esfera en el acento tiene un papel en
-el objeto; los equipos evocan la forma, **nunca el logo** de Apple ni de otra marca. Cuando el operador decida, esta
-sección se reescribe como estilo aprobado.
+- **Dos voces, una familia (propuesta):** Trazo para lo que se mide (Growth, Engine, Revenue; decks, informes,
+  listas); Plastilina para lo que se crea (Brand/Globe). Comparten la paleta, la esfera (reposo o respuesta), la grilla
+  (24 y 48) y los remates redondos. En una pieza con las dos, manda una (Plastilina grande, Trazo chico de apoyo), una
+  sola esfera responde y nunca se mezclan en un mismo grupo.
+- **Anatomía (E1):** silueta blanda con contorno a mano · proporciones con carácter · actitud (giro) · calados
+  redondos · la esfera es la acción (la gota, la luz, la pintura, el punto que cierra la respuesta), un solo tamaño y
+  con su aire · gesto en el protagonista (rayos, velocidad, vibración) · tres colores.
+- **Color (D18):** consistente dentro de cada línea de servicio y cambia de acento según la línea.
+- **Órbita sesgada (D20):** la firma de Plastilina. Elipse inclinada (en el canvas, −16° y un alto de un tercio del
+  ancho) que pasa por detrás y por delante del objeto protagonista, con un calado del color del fondo; anillo tenue,
+  arco en el acento por el frente y la esfera al final, fuera del objeto. Una por pieza, nunca cruza el texto y nunca
+  mide. Lo que mide, enfoca o cierra la marca sigue siendo circular.
+- **Origen de la geometría:** la silueta se trazó en vector (potrace) desde la hoja generada E y la esfera se compone
+  aparte; los glifos nuevos necesitan un método propio (pendiente).
+- **Pendientes:** ver [ledger.md](ledger.md), «Íconos, pendientes de Plastilina».
