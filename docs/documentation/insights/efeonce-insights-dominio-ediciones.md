@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.11
+> **Version:** 1.12
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1889: cómo se ve un informe y un deck con el diseño aprobado y qué pasa cuando falta un dato; antes, TASK-1888: datos del diseño nuevo, portada por cliente y variación en puntos)
+> **Ultima actualizacion:** 2026-09-26 por Claude (cierre de TASK-1888: el contrato editorial v2 está encendido en producción; qué trae hoy un informe y las reglas de redacción; antes, TASK-1889: cómo se ve un informe y un deck con el diseño aprobado)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -20,7 +20,8 @@ sólo lo dibuja (decisión del 2026-09-15). La biblioteca para pedir y revisar i
 La primera unidad (TASK-1845) creó el **núcleo**: crear un encargo, recolectar evidencia, redactar el plan y
 dejar la edición lista para revisión. Después se sumaron el deck PDF (TASK-1846), el enlace compartido, el envío
 por correo y la recurrencia (TASK-1848, en producción pero apagados) y el informe A4 junto con el deck nuevo
-(TASK-1847, en producción desde el 2026-09-24). **Todavía no existe la vista web.** Como la emisión sigue apagada en
+(TASK-1847, en producción desde el 2026-09-24), y el contrato editorial v2 que ordena qué dice cada informe
+(TASK-1888, encendido en producción desde el 2026-09-26). **Todavía no existe la vista web.** Como la emisión sigue apagada en
 producción, **ahí ninguna edición puede emitirse**: llega hasta `ready_for_review`.
 
 ## Cómo se comporta
@@ -79,8 +80,9 @@ gráfico cuya barra no corresponde a su etiqueta no se publica: se rechaza con l
 
 **Qué puede graficar hoy:** barras simples, agrupadas y apiladas, líneas, circular y dona,
 dispersión, embudo, cascada, medidor, mapa de calor, waffle, bullet, Venn de dos conjuntos y UpSet.
-**De todas ellas, el sistema hoy produce automáticamente sólo barras**: el resto está construido y
-probado, pero todavía no hay quien genere esos datos. No están ofrecidas como disponibles.
+**De todas ellas, el sistema hoy produce automáticamente sólo cuatro**: barras simples, barras agrupadas y líneas
+(visibilidad y entrega) y bullet (entrega contra su meta). El resto está construido y probado, pero todavía no hay
+quien genere esos datos. No están ofrecidas como disponibles.
 
 **Tres cosas que el sistema se niega a hacer**, porque harían mentir al informe:
 
@@ -123,13 +125,14 @@ devuelve el mismo pedido anterior, no produce archivos duplicados.
 > `src/lib/artifact-composer/catalogs/insights-report/` e `insights-deck/`; mappers en
 > `src/lib/efeonce-insights/render/`.
 
-## Qué viene: el diseño aprobado para todos los informes (planificado)
+## El diseño aprobado para todos los informes y el contrato editorial v2
 
-> Estado (2026-09-25): **los datos que el diseño necesita ya están construidos pero apagados** (TASK-1888) y **las
-> plantillas ya están construidas** (TASK-1889, lista en el código y probada en local con datos reales de Berel y Sky;
-> ver la sección siguiente). Ninguna de las dos está todavía en producción: hasta que salgan juntas, los informes de
-> producción usan el diseño vigente. La única mejora que ya aplica siempre es cómo se imprime el cambio de un
-> porcentaje (en puntos, ver abajo).
+> Estado (2026-09-26): **el contrato editorial v2 está encendido en staging y producción** (TASK-1888, cerrada el
+> 2026-09-26). Toda edición nueva sale con el plan v2: lectura por figura, «Lo esencial», líneas de alcance y portada
+> sellada (ver «Qué trae hoy un informe»). El código de las plantillas nuevas (TASK-1889) salió a producción en el
+> mismo release; su cierre formal lo lleva su propia task. Las ediciones ya creadas no cambian: son inmutables, y las
+> reglas nuevas aplican a las ediciones nuevas. Emitir, compartir y enviar siguen apagados en producción, así que
+> ninguna edición llega a un cliente sin revisión humana.
 
 El operador revisó página por página un diseño nuevo de informe y lo aprobó como el aspecto que debe tener **todo**
 informe de Insights, en A4 y en deck:
@@ -146,14 +149,15 @@ informe de Insights, en A4 y en deck:
   un color.
 
 **Portada azul marino o blanca: cómo se decide.** Cada cliente tiene una preferencia, y al pedir una edición se puede
-cambiar sólo para esa edición. Si la preferencia es «automática», la portada va azul marino sólo cuando el cliente
-tiene un logo que se lee bien sobre fondo oscuro; si no, va blanca. Hoy las organizaciones tienen un solo logo, sin
-versión para fondo oscuro, así que «automática» da portada blanca. La portada azul marino **nunca** usa el logo normal
+cambiar sólo para esa edición: manda lo pedido en la edición, después la preferencia del cliente y, si no hay
+ninguna, «automática». Con «automática», la portada va azul marino sólo cuando el cliente tiene un logo que se lee
+bien sobre fondo oscuro; si no, va blanca. Mientras una organización no tenga cargada su versión del logo para fondo
+oscuro, «automática» da portada blanca. La portada azul marino **nunca** usa el logo normal
 del cliente (sobre azul marino puede no verse): usa su versión para fondo oscuro o va sin logo. La portada elegida queda
 fija en la edición: volver a producir el PDF da la misma portada, aunque después cambie la preferencia.
 
 **Quién fija la preferencia y dónde.** Las personas de Efeonce que operan la cuenta (administración y cuentas) la fijan
-por cliente: «automática», «azul marino» o «blanca». Se puede fijar desde ya, aunque el diseño nuevo siga apagado. La
+por cliente: «automática», «azul marino» o «blanca». La
 versión del logo para fondo oscuro se carga en los logos de la organización, igual que el logo normal. La pantalla para
 hacerlo desde el portal llega con la biblioteca de Insights (TASK-1849); mientras tanto se hace por la API o por un
 asistente conectado al MCP de Efeonce (ver el manual).
@@ -178,21 +182,58 @@ puntos: OTD de 80,1 % a 81,9 % es «+1,8 pp», no «+2,2 %». Si el cambio es me
 decimales para no escribir «0,0 pp» junto a dos cifras que se ven distintas.
 
 **Cómo se revisa.** Cada plantilla nueva se compara con la página aprobada y no puede diferir en más del 1 % de sus
-puntos. Las primeras ediciones reales con el diseño nuevo serán de Berel (visibilidad) y Sky (entrega), como informes
-internos: no se comparten con el cliente hasta que el operador las revise.
+puntos. Las primeras ediciones reales con el contrato v2 son de Berel (visibilidad orgánica y en IA) y Sky (entrega),
+en staging, como informes internos listos para revisión: no se emiten ni se comparten con el cliente hasta que el
+operador las revise.
+
+### Qué trae hoy un informe (contrato v2)
+
+El plan de cada edición nueva trae, además de las cifras:
+
+| Parte | Qué es |
+|---|---|
+| **Lectura por figura** | Cada gráfico lleva su cifra principal con una bajada, la conclusión en una frase, «Lo que significa» cuando hay algo que decir y el próximo paso cuando la evidencia lo sostiene |
+| **Apertura de capítulo** | Una afirmación que abre cada módulo; la primera lectura del capítulo es siempre su hallazgo principal |
+| **«Lo esencial»** | Hasta cinco hallazgos del período, nunca más |
+| **Alcance** | Unas líneas breves que declaran qué cubre la edición y qué no |
+| **Portada** | Azul marino o blanca, decidida al crear la edición y sellada en ella |
+| **Tabla de respaldo** | «<módulo>: todas las cifras», con cada dato del capítulo |
+| **Acciones** | Cada acción del plan con su impacto, su esfuerzo y cuántas semanas toma |
+
+Cada texto tiene un largo máximo; si no cabe, la edición se rechaza con la causa en vez de recortarse.
+
+**Reglas de redacción.** El plan las cumple siempre; si una no se cumple, no sale:
+
+- **Un superlativo exige un máximo único.** «El canal con más presencia» sólo se escribe si ese canal está solo en el
+  primer lugar de lo que se imprime. Si hay empate, se dice el empate: la bajada nombra lo que tienen en común y la
+  cifra principal es el valor empatado.
+- **«Lo esencial» y la tesis sólo citan hallazgos**: una meta alcanzada o no, un cambio que se imprime, un máximo único
+  o un empate. Nunca un valor suelto sin comparación, ni una variación de 0,0 %.
+- **Sujeto y verbo concuerdan** en cada afirmación de capítulo.
+
+**Referencias de entrega y dirección de cada métrica.** En entrega, el plan suma la primera entrega correcta (FTR) y
+las metas y bandas del registro oficial de métricas de entrega como datos de referencia, no como resultados. Cada
+métrica sabe si «más es mejor» o «menos es mejor» (en visibilidad, la posición media es «menos es mejor»), y cada canal
+de IA o buscador tiene un identificador estable (Google, respuestas de IA de Google, ChatGPT, Gemini, Claude,
+Perplexity).
+
+**Cómo se apaga.** El contrato v2 depende de un interruptor que se lee en dos lugares (el portal, para crear, revisar y
+recuperar ediciones, y el proceso que corre las recurrencias). Apagarlo en ambos vuelve las ediciones nuevas al plan
+anterior; las ya creadas no cambian (ver el manual).
 
 > Detalle técnico: arquitectura §6 (delta 2026-09-25, rediseño premium aprobado);
-> `docs/tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md` (estado en arquitectura §14.8);
+> `docs/tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md` (estado en arquitectura §14.8; flag
+> `INSIGHTS_EDITORIAL_V2_ENABLED` en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`);
 > `docs/tasks/to-do/TASK-1889-efeonce-insights-premium-catalogs.md`; dirección visual
 > `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`.
 
-## Cómo se ve un informe y un deck con el diseño aprobado (construido, todavía no en producción)
+## Cómo se ve un informe y un deck con el diseño aprobado
 
-> Estado (2026-09-25): las plantillas del informe A4 y del deck ya tienen **sólo** el diseño aprobado por el operador;
-> el diseño anterior se retiró del código. Está listo en el código de desarrollo y se revisó en local con ediciones
-> reales de Berel (visibilidad orgánica y en IA) y Sky (entrega). **Todavía no está en producción**: falta probarlo en
-> staging, publicarlo con el proceso de release y que el operador apruebe los PDF reales. Nada se comparte con un
-> cliente hasta que una edición interna en producción haya pasado por su revisión.
+> Estado (2026-09-26): las plantillas del informe A4 y del deck tienen **sólo** el diseño aprobado por el operador;
+> el diseño anterior se retiró del código. Se revisó en local con ediciones reales de Berel (visibilidad orgánica y en
+> IA) y Sky (entrega), y **su código salió a producción en el release del 2026-09-26**, junto con el contrato editorial
+> v2. El cierre formal (incluida la aprobación de los PDF reales por el operador) lo lleva TASK-1889. Nada se comparte
+> con un cliente hasta que una edición interna en producción haya pasado por su revisión.
 
 El informe A4 y el deck dicen lo mismo, en el mismo orden; cambia cuánto cabe en cada página.
 
@@ -245,7 +286,7 @@ Sky, revisadas en local, destaparon cinco defectos que los datos de ejemplo no m
 > `insights-deck/`; página por forma de gráfico en `src/lib/efeonce-insights/render/figure-slots.ts`;
 > task `docs/tasks/in-progress/TASK-1889-efeonce-insights-premium-catalogs.md`.
 
-## Estado de disponibilidad (2026-09-25)
+## Estado de disponibilidad (2026-09-26)
 
 > **Delta 2026-09-25 (TASK-1847 cerrada):** el informe A4 y el deck nuevo están **en producción desde el
 > 2026-09-24**, y el 2026-09-25 se renderizó ahí el primer informe con datos reales (edición interna de Sky, ver «Los
@@ -263,12 +304,13 @@ asignado. Lo que está encendido y lo que no:
 | --- | --- | --- |
 | Pedir una edición y generarla hasta `ready_for_review` | **Encendida** en staging y producción | Flag `INSIGHTS_GENERATION_ENABLED=true` en Vercel (staging y producción); en Preview sigue apagada |
 | Emitir una edición | Apagada en producción | Flag `INSIGHTS_ISSUANCE_ENABLED` OFF en producción (encendido sólo en staging desde 2026-09-18 para las pruebas de TASK-1848); además exige que todos los outputs pedidos estén renderizados y validados |
+| Contrato editorial v2 (lectura por figura, «Lo esencial», alcance, portada sellada) | **Encendido en staging y producción** (desde 2026-09-26) | Flag `INSIGHTS_EDITORIAL_V2_ENABLED=true` en Vercel (staging y producción) y en el ops-worker (recurrencias). Aplica a ediciones nuevas; las ya creadas no cambian |
 | Redacción asistida por IA | Apagada | Flag `INSIGHTS_AUTHORING_AI_ENABLED` OFF; el plan sale del redactor determinista |
 | Pedir el render del **deck PDF** de una edición | **Encendido en staging y producción** (desde 2026-09-16) | Staging: probado con cinco decks reales, un reintento y una cancelación. Producción: probado el 2026-09-16 en la organización de prueba — el deck salió solo, al primer intento, y pedir la vista web fue rechazado como corresponde. Ver «Pedir el deck de una edición» |
 | Enlace compartido, envío por correo y recurrencia | **En producción, pero apagados** (2026-09-18) | El código salió a producción el 2026-09-18 con los tres interruptores apagados a propósito: se encenderán cuando exista la página pública del enlace en Think (TASK-1875). En staging están encendidos y se probaron completos con una organización de prueba; los dos correos de prueba llegaron al buzón autorizado. Ver las tres secciones siguientes |
 | Pedir el **informe A4** de una edición | **Encendido en staging y producción** (producción desde 2026-09-24) | Probado con datos reales de Berel y Sky en staging (2026-09-22) y de Sky en producción (2026-09-25, edición interna). Sale junto con el deck si se piden los dos |
 | Pantalla pública del enlace | No existe todavía | TASK-1875 (la página en `think.efeoncepro.com` que muestra el enlace) |
-| Usar Insights desde un agente externo por el gateway MCP (`mcp.efeonce.org`) | Lectura sí; escritura todavía no | Gateway v1.7.0 (2026-09-18). Además de ediciones y render, un agente puede **ver** enlaces, envíos y recurrencias (cinco herramientas de lectura). Crear y revocar enlaces existen, pero exigen un permiso de escritura que ningún cliente tiene aún; lo mismo crear ediciones. **Enviar por correo y programar recurrencias sólo se hacen desde el portal**, no por MCP |
+| Usar Insights desde un agente externo por el gateway MCP (`mcp.efeonce.org`) | Lectura sí; escritura todavía no | Gateway v1.9.0 (2026-09-26). Además de ediciones y render, un agente puede **ver** enlaces, envíos y recurrencias (cinco herramientas de lectura) y la preferencia de portada de un cliente; fijar esa preferencia sólo lo pueden hacer vínculos internos de Efeonce. Crear y revocar enlaces existen, pero exigen un permiso de escritura que ningún cliente tiene aún; lo mismo crear ediciones. **Enviar por correo y programar recurrencias sólo se hacen desde el portal**, no por MCP |
 
 **Pedir el deck de una edición (render).** Cuando una edición está `ready_for_review`, quien tenga permiso sobre
 esa organización puede pedir su deck PDF. El pedido no devuelve el archivo al instante: queda **en cola** y un

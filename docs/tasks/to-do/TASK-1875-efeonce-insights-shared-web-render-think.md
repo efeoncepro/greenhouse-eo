@@ -1,8 +1,13 @@
 # TASK-1875 — Efeonce Insights: vista web compartida renderizada en Think (efeonce-think)
 
+## Delta 2026-09-26
+
+- TASK-1888 complete y en producción con `INSIGHTS_EDITORIAL_V2_ENABLED` ON: las ediciones nuevas ya sellan planes v2,
+  así que tratar sus campos como opcionales al proyectarlos a `InsightWebModelV1` deja de ser hipotético. — por trabajo en TASK-1888
+
 ## Delta 2026-09-25 (TASK-1888 code complete)
 
-- **Construido, flag OFF:** los campos v2 existen en `EditorialPlanV1` como opcionales (`essentials`, `scopeLines`,
+- **Construido (flag ON desde 2026-09-26, ver delta de arriba):** los campos v2 existen en `EditorialPlanV1` como opcionales (`essentials`, `scopeLines`,
   `cover`, `chapter.opening`, `chapter.readings[]` con `keyFigure`/`meaning`/`nextStep`), los gráficos `bullet`
   (`data`) y `line`, y `channelId` en series/dimensiones. Un plan sin ellos es v1. `InsightWebModelV1` todavía no los
   proyecta: al hacerlo, trátalos como opcionales. Contrato en arquitectura §6 y §14.8. — por trabajo en TASK-1888

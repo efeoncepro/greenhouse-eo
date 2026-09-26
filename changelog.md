@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-26 — Efeonce Insights: contrato editorial v2 encendido en producción (TASK-1888)
+
+Los informes nuevos de Insights salen con el contrato v2: lectura por figura (cifra principal, conclusión, próximo
+paso), «Lo esencial» sólo con hallazgos, líneas de alcance, tabla «<módulo>: todas las cifras» y portada sellada por
+organización (`auto`/navy/blanca; navy sólo con logo apto para fondo oscuro). Superlativos sólo con máximo único (con
+empate se dice el empate). Código en los releases `0e87c7a443a2` y `f9257b9c94af`; gateway efeonce-mcp v1.9.0 con
+`get/set_insight_cover_preference`; `INSIGHTS_EDITORIAL_V2_ENABLED` ON en Vercel staging/Production y en el
+`ops-worker`. Verificado con un canary sintético en producción que sella el plan v2. Emisión, sharing y correo siguen
+OFF en producción. Rollback: flag OFF en los dos runtimes.
+
 ## 2026-09-26 — La órbita 0.2.0: firma por regla, assets oficiales y la oficina en foto
 
 Regla del operador: una pieza gráfica firma con el logo de Efeonce centrado; la burbuja URL lo reemplaza sólo si el
@@ -555,17 +565,3 @@ Las skills espejo de CRM, Marketing Cloud Next y Marketing Cloud Engagement inco
 Claudeforce, Slackforce, Koa, Agentforce long-horizon y las integraciones AWS/Google/NVIDIA/Siemens. Cada claim
 conserva su estado `GA`, beta, piloto, preview o roadmap; la actualización no cambia entitlements, contratos,
 orgs ni rollout.
-
-## 2026-09-16 — El CLI de imágenes gana inpainting por máscara y reporta `usage`
-
-`pnpm ai:image` ya puede editar **solo una zona** de una imagen: `--mask` conecta el soporte de máscara que
-el cliente canónico ya tenía y nadie podía usar, con su validación de formato y dimensiones y un guardarraíl
-que aborta si se pasa una máscara sin imagen base. El CLI además imprime ahora el `usage` de cada corrida:
-para la familia 2.5 esa es la **única** fuente documentada de costo, y el instrumento que gasta no lo mostraba.
-
-Medido en el mismo movimiento, contra la intuición: **editar no abarata**. El modelo devuelve la imagen
-completa aunque la máscara acote qué cambia, así que el output se cobra idéntico a una generación (196 tokens
-en `low`) y encima la imagen base entra como 1 024 tokens de input — editar costó 2,3× generar en `low`, y el
-sobrecosto se diluye al subir calidad. **La máscara es gratis**: con y sin ella el `usage` fue idéntico.
-Corolario: para recortar el fondo de una imagen existente, `pnpm ai:image:rmbg` (local, sin costo de
-proveedor) en vez de un edit. Evidencia: `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`.

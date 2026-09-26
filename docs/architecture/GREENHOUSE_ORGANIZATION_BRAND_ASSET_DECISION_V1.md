@@ -84,7 +84,11 @@ The logo pop-up gains a third acquisition path next to upload and operator-URL: 
 - **Runtime requirement (Rollout Completion Gate):** the OpenAI key resolves server-side via the canonical secret `greenhouse-openai-api-key`. Each environment must expose `OPENAI_API_KEY_SECRET_REF=greenhouse-openai-api-key` (added to local `.env.local`; Vercel staging/prod must have it for the deployed feature to work).
 - **Observability:** OpenAI failures go through `captureWithDomain(error, 'agency', { tags: { source: 'organization_logo_ai_generate' } })`; the route returns a sanitized 502.
 
-## Delta 2026-09-25 — dark-background logo variant (TASK-1888, built)
+## Delta 2026-09-25 — dark-background logo variant (TASK-1888, in production)
+
+- **Runtime status (2026-09-26):** in production since release `0e87c7a443a2` (2026-09-26). The column, write path
+  and reader below ship with that release; TASK-1888 is complete. The Insights editorial v2 contract that consumes
+  the variant is ON (`INSIGHTS_EDITORIAL_V2_ENABLED`) in Vercel staging, Vercel Production and the `ops-worker`.
 
 - **Why:** Efeonce Insights resolves its report cover with `auto` = navy cover **only** when the organization has a
   logo suitable for dark backgrounds, otherwise white (TASK-1888, EPIC-045). A single logo cannot answer that safely:

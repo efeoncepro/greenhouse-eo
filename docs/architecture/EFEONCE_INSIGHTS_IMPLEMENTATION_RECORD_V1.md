@@ -1,9 +1,9 @@
 # Efeonce Insights — Registro de implementación y despliegue (TASK-1845)
 
 > **Tipo de documento:** Registro de implementación y despliegue
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-15 por Claude
-> **Ultima actualizacion:** 2026-09-25 por Claude (§8.z y fila de §10: TASK-1889)
+> **Ultima actualizacion:** 2026-09-26 por Claude (§6.3, §8.aa y fila de §10: TASK-1888 en producción)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · ADR [EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md)
 > **Task:** [TASK-1845](../tasks/in-progress/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) (EPIC-045)
 
@@ -455,8 +455,11 @@ nunca emite porque el actor no es persona y el lane no expone `issue`/`withdraw`
 | `INSIGHTS_GENERATION_ENABLED` | `createInsightEdition` / `reviseInsightEdition` (primera línea del command) | 503 `generation_disabled` | **Vercel** únicamente (`grep` en `src/` y `services/`: sólo `flags.ts`; task línea 297) | ON staging + Production; OFF Preview |
 | `INSIGHTS_ISSUANCE_ENABLED` | `issueInsightEdition` | 503 `issuance_disabled` | Vercel | OFF en todos |
 | `INSIGHTS_AUTHORING_AI_ENABLED` | `authorEditorialPlan` → IA acotada | plan determinista | Vercel | OFF en todos |
+| `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888) | contrato editorial v2 al sellar el plan (§8.aa) | plan v1 | **Vercel** (crear/revisar/recuperar) **y `ops-worker`** (tick de schedules); el Job de render no lo lee | **Estado 2026-09-26:** ON en Vercel staging, Vercel Production y `ops-worker` |
 
-Los tres son independientes; el default es OFF (`=== 'true'`). Los workers Cloud Run no leen ninguno.
+Los tres primeros son independientes y los workers Cloud Run no leen ninguno; el default es OFF (`=== 'true'`: un
+valor con salto de línea final, `true\n`, cuenta como OFF). `INSIGHTS_EDITORIAL_V2_ENABLED` es el único de esta tabla
+que también lee un worker.
 
 ---
 
@@ -654,6 +657,43 @@ dossier [`docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md`
 aprobada (2026-09-25). `pnpm composer:visual-gate --catalog=insights`: 27 frames a 0 px. `ui:quality` PASS 4,59.
 Ediciones reales locales: Berel `EO-INS-000019` (16 páginas / 13 láminas) y Sky `EO-INS-000022` (12 / 9).
 
+### 8.aa Contrato editorial v2 — TASK-1888 (complete 2026-09-26, en producción con el flag ON)
+
+Fuente: [TASK-1888](../tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md) y arquitectura §14.8.
+
+**Qué entró.** `chart_spec_v1` y `editorial_plan_v1` conservan su versión; los campos opcionales señalan v2.
+
+| Pieza | Qué es |
+|---|---|
+| `ChartSpec` | 7 → 15 familias (se suman bullet, waterfall, funnel, gauge, heatmap, waffle, venn_two, upset). Matriz `family_evidence_matrix_v1`: con productor hoy sólo bar, bar_grouped, line (SEO, ICO) y bullet (ICO); el resto espera evidencia (TASK-1901/1902) |
+| Plan v2 | `readings[]` por figura (cifra principal + bajada, conclusión, «lo que significa» opcional, próximo paso), apertura de capítulo, `essentials` (máx. 5, sólo hallazgos), `scopeLines`, portada sellada `plan.cover`, tabla de respaldo «<módulo>: todas las cifras», acciones con impacto/esfuerzo/semanas; topes en `PLAN_TEXT_LIMITS` (incluye `tableTitle` 80) |
+| Reglas editoriales | superlativo sólo con máximo ÚNICO en lo impreso (con empate se dice el empate: bajada = nombre común, cifra principal = valor empatado); esenciales y tesis sólo citan hallazgos, nunca valor suelto ni variación 0,0 %; afirmaciones con sujeto y verbo concordados; la primera lectura de cada capítulo es su hallazgo principal |
+| Evidencia v2 | ICO suma FTR y metas/bandas de `ICO_METRIC_REGISTRY` como hechos `role:'reference'`; cada hecho de valor ICO lleva `dimension.direction` del registro; SEO marca la posición media `lower_is_better`; `channelId` estable (google, google_ai_overview, chatgpt, gemini, claude, perplexity) |
+| Preferencia de portada | tabla `greenhouse_insights.insight_cover_preferences` (migración `20260925183531322_task-1888-insights-cover-preference`, aplicada), command `setInsightCoverPreference` + reader, capability `insights.cover_preference.manage` (Admin + Account), evento `insights.cover_preference.updated`, lanes `/api/platform/{app,ecosystem}/insights/cover-preference`, variante de logo `on_dark` en account-360. Resolución: request > organización > `auto` (navy sólo con logo apto para fondo oscuro) |
+| MCP federado | gateway `efeonce-mcp` v1.9.0 con `get_insight_cover_preference` y `set_insight_cover_preference` (set sólo con bindings internos) |
+
+**Dónde corre.**
+
+| Runtime | Estado | Evidencia |
+|---|---|---|
+| Vercel Production (código) | release `0e87c7a443a2` (2026-09-26, PR #240, run `36222331450`), que incluye también el código de TASK-1889; canary de la lane ecosystem `cover-preference` 200 | release manifest |
+| Vercel Production (flag) | `INSIGHTS_EDITORIAL_V2_ENABLED=true` exacto; deployment `greenhouse-8hl5hf54w` sirve `greenhouse.efeoncepro.com` | Vercel API |
+| Vercel staging (flag) | ON desde 2026-09-26 (redeploy `greenhouse-9t9fwhrvz`) | Vercel API |
+| Cloud Run `ops-worker` | revisión `ops-worker-00719-gbm` al 100 % con `true`; `services/ops-worker/deploy.sh` con default `:-true`, fijado por `deploy-contract.test.ts` | Cloud Run |
+| Cloud Run `efeonce-mcp-gateway` | v1.9.0 (PR #18 `2cf78af91`, deploy `36226550358`, revisión `00062-ct5` al 100 %) | GitHub + Cloud Run |
+| Release posterior | `f9257b9c94af` `released` (run `36236940651`): fix de secretos del `ops-worker` (PR #242) y fix del empate. El release intermedio `2add63c61fd6` (PR #241) abortó por `DATAFORSEO_API_LOGIN` ausente en el `ops-worker`, con rollback verificado | release manifests |
+| Sigue OFF en Production | emisión, enlaces compartidos y envío: ninguna edición llega a un cliente sin gate humano | Vercel API |
+
+**Canary de producción.** La primera (`insed-356e948c…`) selló plan v1: según el diagnóstico de Codex, la variable valía `true\n`. Corregida a
+`true` exacto y redesplegada, `insed-f5768172…` (org sintética Greenhouse Demo) selló plan v2: 3 `scopeLines`,
+`cover` y apertura en los 3 capítulos; terminó `failed` en `validating` por snapshot sin hechos, lo esperado.
+En staging quedan ediciones internas v2 de Berel (`seo`+`aeo`) y Sky (`ico`) en `ready_for_review`, sin emitir ni
+compartir; la de Berel conserva el defecto del empate porque las ediciones son inmutables (el fix aplica a las nuevas).
+
+**Rollback.** Flag OFF en los dos runtimes: `vercel env rm` + redeploy en Vercel; en el `ops-worker`,
+`--update-env-vars INSIGHTS_EDITORIAL_V2_ENABLED=false` y `:-false` en `deploy.sh` (si sólo se hace lo primero, el
+próximo deploy lo vuelve a prender).
+
 ## 9. Verificación realizada
 
 | Capa | Evidencia | Fuente |
@@ -697,6 +737,7 @@ en 2026-07/08); se ejercitó el camino «sin datos declarados», no el de un cli
 | Vercel `Production` (TASK-1848) | release `bda1cf2cd938` (PR #238, orquestador `35349506106`, `released` 13:41Z) | Código vivo, **flags OFF** (sharing/delivery/schedules/emisión) hasta TASK-1875; canary: crear enlace ⇒ 503 `sharing_disabled`, token inexistente ⇒ 404, sin token ⇒ 401 | TASK-1848 Delta 2026-09-18 |
 | Cloud Run `efeonce-mcp-gateway` (TASK-1848) | v1.7.0, 58 tools | Rev `00055-gk6` al 100 %; canary del provider contra producción verde | TASK-1848 Delta 2026-09-18 |
 | `develop` local (TASK-1889, 2026-09-25) | catálogos premium v2 (`insights-report`, `insights-deck`), regla de familia, portada con logo del cliente | **Sin push**: ni staging, ni Job `artifact-worker`, ni producción. Rollout: staging con `INSIGHTS_EDITORIAL_V2_ENABLED` → release (Job único staging/prod) → aprobación de PDFs reales → edición interna en producción | §8.z; arquitectura §14.9 |
+| Vercel staging + Production + `ops-worker` (TASK-1888, 2026-09-26) | contrato editorial v2 (release `0e87c7a443a2`, luego `f9257b9c94af`) + `INSIGHTS_EDITORIAL_V2_ENABLED=true` en los dos runtimes lectores; gateway `efeonce-mcp` v1.9.0 | **En producción, flag ON**; canary de producción selló plan v2 (`insed-f5768172…`); emisión, enlaces y envío siguen OFF | §8.aa |
 | Ledgers | `FEATURE_FLAG_STATE_LEDGER.md` (3 filas + snapshot), `PRODUCTION_RELEASE_TIMING_LEDGER.md` (fila del release) | Al día | líneas 249–251, 383–385; línea 78 |
 
 ---

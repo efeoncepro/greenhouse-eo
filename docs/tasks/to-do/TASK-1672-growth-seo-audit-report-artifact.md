@@ -1,8 +1,13 @@
 # TASK-1672 — Growth SEO: artefacto de la auditoría técnica (web + print)
 
+## Delta 2026-09-26
+
+- TASK-1888 complete y en producción con `INSIGHTS_EDITORIAL_V2_ENABLED` ON; el código de TASK-1889 salió en el release
+  `0e87c7a443a2`. En Discovery, confirmar contra producción qué catálogo y contrato usa esta task. — por trabajo en TASK-1888
+
 ## Delta 2026-09-25 (TASK-1888 code complete)
 
-- **Construido, flag OFF:** `ChartSpecV1` admite 15 familias (datos propios en `data`), con validación estructural en
+- **Construido (flag ON desde 2026-09-26, ver delta de arriba):** `ChartSpecV1` admite 15 familias (datos propios en `data`), con validación estructural en
   `src/lib/efeonce-insights/contracts/chart-spec.ts` y de valor en `editorial/chart-values.ts` sobre la misma
   `chart-geometry.ts`. Qué familia puede emitir cada módulo lo decide `editorial/family-evidence-matrix.ts`; las
   métricas SEO por página o keyword siguen sin evidencia en el adapter. — por trabajo en TASK-1888

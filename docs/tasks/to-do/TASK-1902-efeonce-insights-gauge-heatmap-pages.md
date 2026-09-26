@@ -1,5 +1,10 @@
 # TASK-1902 — Efeonce Insights: páginas de medidor y mapa de calor
 
+## Delta 2026-09-26
+
+- TASK-1888 complete con `INSIGHTS_EDITORIAL_V2_ENABLED` ON en staging y Production: sin flag propio, las páginas nuevas
+  aparecen en ediciones nuevas de producción en cuanto salgan con TASK-1901; la revisión interna antes de compartir sigue siendo el gate. — por trabajo en TASK-1888
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -291,7 +296,7 @@ referencia y la fuente editable están en `docs/ui/visual-directions/TASK-1889-e
 
 ### Feature flags / cutover
 
-- Sin flag propio: las familias nuevas sólo aparecen en ediciones con `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888) y la evidencia de TASK-1901.
+- Sin flag propio: las familias nuevas sólo aparecen en ediciones con `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888, ON en staging y Production desde 2026-09-26) y la evidencia de TASK-1901.
 
 ### Rollback plan per slice
 

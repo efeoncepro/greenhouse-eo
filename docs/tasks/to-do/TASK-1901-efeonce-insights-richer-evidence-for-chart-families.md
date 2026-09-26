@@ -1,5 +1,10 @@
 # TASK-1901 — Efeonce Insights: evidencia más rica para más familias de gráfico
 
+## Delta 2026-09-26
+
+- TASK-1888 complete con `INSIGHTS_EDITORIAL_V2_ENABLED` ON en Vercel staging/Production y `ops-worker`: como esta task no
+  tiene flag propio, lo que agregue llega a ediciones nuevas de producción con su release; el rollback es revert o flag OFF en ambos runtimes. — por trabajo en TASK-1888
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -99,8 +104,8 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1888`: contrato v2 (`ChartSpecV1` con `data`, `dimensionChannelIds`, `readings`, `essentials`), en develop.
-- `TASK-1889`: render por familia (`src/lib/efeonce-insights/render/figure-slots.ts`, `hasFigurePage`), en develop.
+- `TASK-1888`: contrato v2 (`ChartSpecV1` con `data`, `dimensionChannelIds`, `readings`, `essentials`), en producción desde 2026-09-26.
+- `TASK-1889`: render por familia (`src/lib/efeonce-insights/render/figure-slots.ts`, `hasFigurePage`), código en producción desde el release `0e87c7a443a2`.
 - Tablas `greenhouse_growth.seo_gsc_daily`, `greenhouse_growth.seo_rank_snapshots` (vía `seo_targets`) y
   `greenhouse_growth.grader_runs`, verificadas con datos de Berel el 2026-09-25.
 
@@ -293,7 +298,7 @@ Tramos por defecto: 1–3, 4–10, 11–20, 21–50; «primera página» = 1–1
 
 ### Feature flags / cutover
 
-- Sin flag propio: todo va detrás de `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888, OFF). Con OFF, el contrato v1 no cambia.
+- Sin flag propio: todo va detrás de `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888, ON en staging y Production desde 2026-09-26). Con OFF, el contrato v1 no cambia.
 
 ### Rollback plan per slice
 
@@ -307,7 +312,7 @@ Tramos por defecto: 1–3, 4–10, 11–20, 21–50; «primera página» = 1–1
 
 1. Local: `preview-edition --editorial-v2 --plan-only` y composición completa de Berel y Sky.
 2. Staging: edición interna con el flag de TASK-1888 ON; revisión del operador.
-3. Producción por el control plane junto con TASK-1888/1889; edición interna revisada antes de compartir con clientes.
+3. Producción por el control plane (TASK-1888 y el código de TASK-1889 ya están en producción); edición interna revisada antes de compartir con clientes.
 
 ### Out-of-band coordination required
 

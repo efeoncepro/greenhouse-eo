@@ -99,8 +99,8 @@ por token, sin navegación privada, sin login, `noindex`. El token nunca cruza a
 | Emitir / retirar / recuperar | `issueInsightEdition` / `withdrawInsightEdition` / `recoverInsightEdition` | app (persona autenticada); nunca MCP para emitir |
 | Compartir / enviar / programar | TASK-1848 (`createShare`, `requestDelivery`, `createSchedule`, …) | app · ecosystem por definir |
 | Leer compartido / descargar | TASK-1848 (`resolveSharedEdition`, `downloadSharedOutput`) | público por token (S6) |
-| Cambiar la portada de un encargo *(planificado, TASK-1888)* | `createInsightEdition` con `brand.coverTheme` opcional (sin él, el hash del encargo no cambia) | mismas lanes que crear encargo |
-| Ver / fijar la preferencia de portada del cliente *(planificado, TASK-1888)* | `setInsightCoverPreference` + su reader | app · ecosystem · MCP (tool federada en `efeonce-mcp`) |
+| Cambiar la portada de un encargo *(en producción, TASK-1888)* | `createInsightEdition` con `brand.coverTheme` opcional (sin él, el hash del encargo no cambia) | mismas lanes que crear encargo |
+| Ver / fijar la preferencia de portada del cliente *(en producción, TASK-1888)* | `setInsightCoverPreference` + su reader | app · ecosystem · MCP (tool federada en `efeonce-mcp`) |
 
 ## 7. Consent / PII boundaries
 
@@ -139,8 +139,8 @@ Estado al 2026-09-15 (se conserva como historia; el vigente está en el delta de
 | TASK-1846 | render durable (Job `artifact-worker`) | complete (2026-09-16), en producción |
 | TASK-1847 | catálogos v1 `report_pdf` + `deck_pdf` (alimentan S3 y S6 descargas) | complete (2026-09-25), en producción desde 2026-09-24 |
 | TASK-1848 | S5 backend, S6 contrato, S7 backend | in-progress; en producción con flags OFF |
-| TASK-1888 | contrato de portada y editorial v2 (alimenta S2 y los PDF; sin UI) | to-do, sin blockers |
-| TASK-1889 | catálogos premium (los PDF de S3 y S6) | to-do; Slices 3–5 dependen de TASK-1888 |
+| TASK-1888 | contrato de portada y editorial v2 (alimenta S2 y los PDF; sin UI) | complete (2026-09-26), en producción con `INSIGHTS_EDITORIAL_V2_ENABLED` ON |
+| TASK-1889 | catálogos premium (los PDF de S3 y S6) | in-progress; ya no bloqueada por TASK-1888 |
 | TASK-1849 | S1–S5, S7 (+ portada en S2 como consumer de TASK-1888) | to-do |
 | TASK-1875 | S6 (+ mismos roles de color que los PDF) | to-do (desbloqueada por TASK-1848 el 2026-09-18) |
 | TASK-1854 | S8 | to-do (EPIC-046; bloqueada por TASK-1852 y TASK-1853) |

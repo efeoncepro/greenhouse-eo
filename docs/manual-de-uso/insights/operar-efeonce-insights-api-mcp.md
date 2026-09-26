@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.10
+> **Version:** 1.11
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1889: revisar el diseño aprobado antes de compartir; antes, TASK-1888: portada preferida por cliente, logo para fondo oscuro, preview del contrato editorial v2)
+> **Ultima actualizacion:** 2026-09-26 por Claude (cierre de TASK-1888: contrato editorial v2 encendido en producción, cómo verificar una edición v2, rollback y el problema del salto de línea en el valor del flag; antes, TASK-1889: revisar el diseño aprobado antes de compartir)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
@@ -21,6 +21,9 @@ recetas de enlaces compartidos, envío por correo y recurrencia (TASK-1848) est�
    `INSIGHTS_GENERATION_ENABLED` para crear/revisar — **ON en staging y producción desde 2026-09-15**, OFF en
    Preview; `INSIGHTS_ISSUANCE_ENABLED` (emitir) e `INSIGHTS_AUTHORING_AI_ENABLED` (IA) — **OFF en todos los
    targets**. Sin generación, crear responde `503 service_unavailable` con `details.code = generation_disabled`.
+   `INSIGHTS_EDITORIAL_V2_ENABLED` (contrato editorial v2) es la excepción a «sólo Vercel»: se lee en Vercel (crear,
+   revisar, recuperar) **y** en el `ops-worker` (tick de recurrencias); está **ON en staging y producción desde
+   2026-09-26** (ver «Portada del informe y contrato editorial v2»).
    Trampa de Vercel: un env var nuevo no lo ve una deployment construida antes; tras `vercel env add` hace falta
    `vercel redeploy` del target (pasó en staging y en producción).
 2. La organización debe tener el módulo `insights_v1` asignado. Se asigna con el script canónico (pasa por
@@ -104,7 +107,8 @@ Think resuelve el token contra Greenhouse en cada visita, así que revocar el en
 
 MCP: `get_insights_catalog` → `create_insight_edition` → `get_insight_edition` (con `includeEvidence`),
 con el manual servido `efeonce-insights` (`get_greenhouse_skill`). Las cuatro tools **ya están federadas** en el
-gateway `efeonce-mcp` (federadas en la versión 1.5.0 del 2026-09-15; hoy el gateway está en **1.7.0, 58 tools**, 2026-09-18): las tres de
+gateway `efeonce-mcp` (federadas en la versión 1.5.0 del 2026-09-15; hoy el gateway está en **1.9.0**, 2026-09-26, que
+además federa `get_insight_cover_preference` y `set_insight_cover_preference`): las tres de
 lectura con el scope base `efeonce.mcp.read`; `create_insight_edition` exige la clase
 `efeonce.mcp.insights.write`, que ya existe en Entra pero **ningún cliente porta todavía** → responde
 `insufficient_scope` hasta un consentimiento/grant gobernado. Canary de lectura del gateway:
@@ -366,15 +370,21 @@ Un destinatario `ambiguous` (o `claimed` hace más de 30 min; señal `insights.d
 - No prometer que revocar recupera lo descargado o un PDF adjunto ya enviado: no es revocable.
 - No crear un cron por cliente para recurrencias: hay un solo tick para todas las organizaciones.
 
-## Portada del informe y contrato editorial v2 (TASK-1888 — construido, flag OFF)
+## Portada del informe y contrato editorial v2 (TASK-1888 — en producción, flag ON desde 2026-09-26)
 
 Para qué: fijar si los informes de un cliente llevan portada azul marino o blanca, cargar el logo que se lee sobre fondo
-oscuro, y revisar con datos reales cómo saldría el plan del diseño nuevo antes de prenderlo.
+oscuro, revisar con datos reales el plan del diseño nuevo, comprobar que una edición salió con el contrato v2 y, si
+hace falta, apagarlo.
+
+**Estado.** `INSIGHTS_EDITORIAL_V2_ENABLED` está ON en Vercel staging, Vercel Production y el `ops-worker` (default
+`:-true` en `services/ops-worker/deploy.sh`). Toda edición **nueva** sale con el plan v2 (lectura por figura,
+apertura de capítulo, «Lo esencial», `scopeLines`, `cover` sellada, tabla de respaldo, acciones con
+impacto/esfuerzo/semanas). Las ediciones ya creadas no cambian: son inmutables. Emisión, sharing y delivery siguen
+OFF en Production.
 
 **Antes de empezar.** Fijar la preferencia exige ser administración o cuentas de Efeonce (capability
 `insights.cover_preference.manage`); leerla, poder leer los informes de esa organización. La organización debe tener
-el módulo `insights_v1`. Todo esto funciona con `INSIGHTS_EDITORIAL_V2_ENABLED` apagado: la preferencia se guarda y se
-aplica a las ediciones que se generen después de prender el flag.
+el módulo `insights_v1`. La preferencia se aplica a las ediciones que se generen después de fijarla.
 
 **Fijar la preferencia (lane App, sesión interna).**
 
@@ -387,8 +397,10 @@ curl -sX POST "$BASE/api/platform/app/insights/cover-preference" -H 'content-typ
 - Respuesta `200` con `{ preference, changed }`. El mismo valor otra vez responde `changed: false` y no escribe nada.
 - Leerla: `GET …/insights/cover-preference?organizationId=<org-…>`. `isDefault: true` = nunca se fijó (se lee `auto`).
 - Por MCP: `get_insight_cover_preference` / `set_insight_cover_preference` (fijar = binding interno y scope
-  `efeonce.mcp.insights.write`). Las dos tools existen en el gateway sólo después del deploy de efeonce-mcp#18.
+  `efeonce.mcp.insights.write`). Federadas desde el gateway v1.9.0 (2026-09-26).
 - **Para un solo encargo:** `request.brand.coverTheme` en `create_insight_edition` o en la API. Gana sobre la preferencia.
+- Orden de resolución: encargo (`request`) > preferencia de la organización > `auto`. La portada queda sellada en la
+  edición al crearla: volver a renderizar da la misma, aunque después cambie la preferencia.
 
 **Cargar el logo para fondo oscuro.** Igual que el logo normal (sube el asset con el flujo de logos de la organización)
 y adjúntalo con la variante:
@@ -401,7 +413,7 @@ curl -sX POST "$BASE/api/organizations/<org-…>/brand-assets/logo" -H 'content-
 Sin esa variante, `auto` siempre da portada blanca, y una portada `dark` forzada va **sin** logo del cliente (nunca el
 logo normal sobre azul marino).
 
-**Revisar el plan v2 con datos reales, sin escribir nada.** Con el proxy arriba (`pnpm pg:connect`):
+**Revisar el plan v2 de una edición existente con datos reales, sin escribir nada.** Con el proxy arriba (`pnpm pg:connect`):
 
 ```bash
 GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false \
@@ -418,30 +430,61 @@ las metas usadas. `0 violaciones` es la condición para seguir; una violación e
 - `nextStep` en `null` = el dato alcanzó la meta: no hay un paso que la evidencia sostenga.
 - `cover.source`: `request`, `organization` o `auto`.
 
-**Prender el contrato v2 (sólo junto al release de TASK-1889).** Es multi-runtime: Vercel (`vercel env add
-INSIGHTS_EDITORIAL_V2_ENABLED …` + redeploy) **y** `ops-worker` (`deploy.sh` a `true` + `gcloud run services update`).
-Para probar en staging, prende sólo **Vercel staging**: el `ops-worker` es el mismo para producción. Verifica con una
-edición **interna** (Berel `seo`+`aeo`, Sky `ico`) antes de compartir nada con un cliente. Registra el flip en el ledger.
+**Verificar que una edición salió con el contrato v2.** Lee la edición como interno:
+`GET …/insights/editions/<insed-…>?include=evidence&organizationId=<org-…>` (o `get_insight_edition` con
+`includeEvidence` por MCP) y mira el plan congelado:
+
+- `plan.scopeLines` es un arreglo con líneas de alcance y `plan.cover` trae la portada sellada (con `cover.source`):
+  la edición es **v2**. Así selló la canary sintética de producción del 2026-09-26: 3 `scopeLines`, `cover` y apertura
+  en los 3 capítulos.
+- Ni `scopeLines` ni `cover` en el plan: la edición se selló con el plan **v1** (ver «Problemas comunes»).
+- Una canary sobre la org sintética Greenhouse Demo termina `failed` en `validating` (`evidence_rejected`, snapshot sin
+  hechos) **después** de sellar el plan: es lo esperado; lo que se verifica es la forma del plan.
+
+**Rollback (apagar el contrato v2).** Es multi-runtime: hay que apagarlo en los **dos** lugares donde se lee, y
+registrar el cambio en el ledger.
+
+1. Vercel: `vercel env rm INSIGHTS_EDITORIAL_V2_ENABLED production` (y el entorno de staging si corresponde) y
+   `vercel redeploy` del target: una deployment ya construida no ve el cambio.
+2. `ops-worker`: `gcloud run services update ops-worker --update-env-vars INSIGHTS_EDITORIAL_V2_ENABLED=false` para
+   efecto inmediato **y** default `:-false` en `services/ops-worker/deploy.sh` (el `--set-env-vars` del próximo deploy
+   borra lo agregado a mano). Ajustar `deploy-contract.test.ts`, que hoy fija `:-true`.
+3. Verificar en la revisión activa del `ops-worker` y con una edición interna nueva: el plan vuelve a v1. Las
+   ediciones ya selladas con v2 no cambian.
+
+Para volver a prenderlo, el mismo camino al revés, cargando el valor exacto (ver «Problemas comunes»):
+`printf %s true | vercel env add INSIGHTS_EDITORIAL_V2_ENABLED production` + redeploy, y `true` en el `ops-worker`
+(`deploy.sh` + `--update-env-vars`).
 
 **Qué no hacer.**
 - No escribas la meta de una métrica ICO a mano en un texto ni en un gráfico: sale del registro.
 - No pongas el logo normal en una portada azul marino ni decidas la portada al renderizar.
-- No prendas el flag en el `ops-worker` para una prueba de staging.
-- No esperes que cambiar la preferencia cambie una edición ya generada: su portada quedó sellada.
+- No apagues el flag sólo en Vercel o sólo en el `ops-worker`: las ediciones de recurrencias y las pedidas a mano
+  saldrían con contratos distintos.
+- No cargues el valor del flag con `echo` ni pegándolo en un prompt interactivo con Enter: el salto de línea final
+  apaga el flag en silencio.
+- No esperes que cambiar la preferencia o el flag cambie una edición ya generada: su plan y su portada quedaron
+  sellados.
 
 **Problemas comunes.**
 - `404` al fijar la preferencia: la organización no tiene el módulo `insights_v1` o no es tuya (anti-oráculo).
 - `403 scope_not_allowed` por el lane ecosystem: el binding es de una organización; sólo un binding interno escribe.
 - `400 invalid_request`: `coverTheme` fuera de `auto|dark|light`.
 - La portada salió blanca con preferencia `auto`: la organización no tiene logo para fondo oscuro.
+- **El flag está en `true` pero la edición sale v1** (sin `plan.scopeLines` ni `plan.cover`): el valor guardado en
+  Vercel trae un salto de línea final (`true\n`) y el flag compara exactamente con `'true'`. Pasó en la primera canary
+  de producción del 2026-09-26. Corrige cargando el valor con `printf %s true | vercel env add
+  INSIGHTS_EDITORIAL_V2_ENABLED production` (tras `vercel env rm`), haz `vercel redeploy` y repite la verificación
+  con una edición interna nueva. En el `ops-worker`, confirma el valor exacto en la revisión activa.
 
-## Revisar el diseño antes de compartir (TASK-1889 — code complete, rollout pendiente)
+## Revisar el diseño antes de compartir (TASK-1889 — en producción, cierre pendiente)
 
 Para qué: ver cómo sale un informe A4 o un deck con el diseño aprobado (portada, índice, «Lo esencial», páginas de
 gráfico, límites, contraportada) usando datos reales, y comprobar que las plantillas siguen fieles al canvas aprobado.
-Nada de esto comparte ni emite: es revisión local. Estado al 2026-09-25: los catálogos `insights-report` e
-`insights-deck` están sólo en v2 en develop (sin push); falta staging con el flag de TASK-1888, release por el control
-plane y la aprobación del operador de las piezas derivadas y los PDF reales.
+Nada de esto comparte ni emite: es revisión local. Estado al 2026-09-26: los catálogos `insights-report` e
+`insights-deck` (sólo v2) salieron a producción en el release del 2026-09-26, junto con el contrato v2 de TASK-1888
+(flag ON). El cierre formal de TASK-1889, incluida la aprobación del operador de las piezas derivadas y los PDF
+reales, lo lleva su propia task.
 
 **Antes de empezar.**
 

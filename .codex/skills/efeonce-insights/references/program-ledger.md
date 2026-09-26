@@ -12,7 +12,7 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
 | TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | to-do (blocked by 1848) | — | — |
 | TASK-1888 | Editorial contract v2: `ChartSpec` 7 → 15 families, per-figure reading and hero figure in the plan, `channelId`, per-org cover preference + sealed cover, flag `INSIGHTS_EDITORIAL_V2_ENABLED` | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af`; gateway efeonce-mcp v1.9.0 (rev `00062-ct5`); flag ON in Vercel staging (`greenhouse-9t9fwhrvz`), Vercel Production (`greenhouse-8hl5hf54w`) and ops-worker (`00719-gbm`) | staging internal editions Berel `insed-56226fa1…` / Sky `insed-1e003760…` with sealed v2 plan; Production synthetic canary `insed-f5768172…` sealed 3 scope lines + cover (first canary `insed-356e948c…` sealed v1 before the env value fix) |
-| TASK-1889 | Premium catalogs from the approved canvas (A4 + deck), canvas-fidelity gate, internal Berel/Sky editions, release together with the 1888 flag | **in-progress — code complete 2026-09-25, rollout pending** (local `develop`, not pushed; last commit `2f0776e0f` (antes `9529a1b25`)) | none (production serves the TASK-1847 v1 catalogs until the release) | local real editions Berel `EO-INS-000019` (16 pp / 13 slides) and Sky `EO-INS-000022` (12 / 9); fidelity 20/21 + 1 approved exception; visual gate 27 frames at 0 px |
+| TASK-1889 | Premium catalogs from the approved canvas (A4 + deck), canvas-fidelity gate, internal Berel/Sky editions, release together with the 1888 flag | **in-progress — code shipped in release `0e87c7a443a2` (2026-09-26)**; owned by another session, which records runtime verification and closure | code in the release `0e87c7a443a2`; runtime state recorded by the TASK-1889 session | local real editions Berel `EO-INS-000019` (16 pp / 13 slides) and Sky `EO-INS-000022` (12 / 9); fidelity 20/21 + 1 approved exception; visual gate 27 frames at 0 px |
 
 ## TASK-1845 — foundation (complete 2026-09-16)
 
@@ -349,9 +349,10 @@ Detalle en arquitectura §14.8 y en `contracts.md` § Editorial contract v2.
 | Runtime | Componente | Estado | Evidencia |
 |---|---|---|---|
 | Cloud SQL compartida | `insight_cover_preferences`, `organizations.logo_on_dark_asset_id`, capability | aplicado | `information_schema` + `capabilities_registry` 2026-09-25 |
-| Vercel (staging/prod) | contrato v2, lanes, commands | no desplegado | — |
-| `ops-worker` | lectura del flag (`:-false`) | no desplegado | `deploy-contract.test.ts` |
-| Gateway `efeonce-mcp` | 2 tools federadas (1.9.0, superficie 70 → 72) | PR #18 abierto y mergeable (main integrado en `d288d8e`), sin merge ni deploy | `pnpm check` 219/219 |
+| Vercel staging | contrato v2, lanes, commands; flag ON | desplegado | redeploy `greenhouse-9t9fwhrvz`; ediciones internas Berel/Sky `ready_for_review` |
+| Vercel Production | contrato v2, lanes, commands; flag ON (`true` exacto) | desplegado | releases `0e87c7a443a2` + `f9257b9c94af`; deployment `greenhouse-8hl5hf54w`; canary sintética `insed-f5768172…` |
+| `ops-worker` | lectura del flag (`deploy.sh` `:-true`) | ON | revisión `ops-worker-00719-gbm` al 100 %; `deploy-contract.test.ts` |
+| Gateway `efeonce-mcp` | 2 tools federadas (v1.9.0) | desplegado | PR #18 mergeado `2cf78af91`, run `36226550358`, revisión `00062-ct5` al 100 % |
 | Local | plan v2 sobre datos reales | verde | Sky 9 hechos/0 violaciones; Berel 24 hechos/0 violaciones |
 
 **Decisiones de Discovery:** plan y spec conservan su versión (campos opcionales); la meta ICO es un hecho `reference`
@@ -390,7 +391,8 @@ implementación §8.z.
 - «Lo esencial» del plan v2 en `report-summary` / `insights-summary` con folio real.
 - Motor compartido: `render.ts` espera `img.decode()`; `synthesize.ts` honra `example` del contrato.
 
-**Dónde corre:** en ningún runtime todavía. Producción y staging siguen sirviendo los catálogos v1 de TASK-1847.
+**Dónde corre:** el código salió en el release `0e87c7a443a2` (2026-09-26). La verificación de runtime y el cierre los
+registra la sesión dueña de TASK-1889.
 
 **Verificación:** `pnpm insights:canvas-fidelity` 20/21 ≤ 1 % + `Deck-Agrupadas` 2,2 % con excepción aprobada por el
 operador (techo 2,5 %); `pnpm composer:visual-gate --catalog=insights` 27 frames a 0 px (deltas g–j); `ui:quality`

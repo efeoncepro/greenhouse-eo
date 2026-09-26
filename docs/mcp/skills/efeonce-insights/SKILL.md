@@ -161,9 +161,10 @@ Explain what a schedule will do next:
   nothing is re-rendered.
 - Before setting `dark` for an organization, tell the human that without a dark-ready logo the cover goes without the
   client's logo, and confirm.
-- The new report design that uses this cover is being switched on gradually; until it is, generated editions keep the
-  current design. If one of these tools is not in your tool list, it is not published in this gateway yet: say so, do
-  not look for another path.
+- New editions carry the sealed cover in their frozen plan (`plan.cover`, with `cover.source` = `request`,
+  `organization` or `auto`). Editions generated before the current editorial contract have no `cover` in their plan;
+  they are immutable and keep the design they were sealed with. If one of these tools is not in your tool list, it is
+  not published in this gateway yet: say so, do not look for another path.
 
 ## The request, field by field
 
@@ -250,6 +251,35 @@ frozen and hashed; both are immutable. Every figure in the plan references a fac
   across spaces.
 - The plan's `limits` and `methodology` already say what was omitted and how each figure was produced.
   Reproduce them; do not invent causes, forecasts or promises.
+- ICO targets and bands (for example the official on-time delivery target) travel as **reference** facts
+  (`role: 'reference'`), not as results: use them to say where a result stands against its target, never report them as
+  the period's performance. Each value fact carries `dimension.direction` (`higher_is_better` or `lower_is_better`; the
+  average search position is `lower_is_better`): read "better" or "worse" from it, never from the sign of the change.
+- Channels (Google, Google AI Overviews, ChatGPT, Gemini, Claude, Perplexity) carry a stable `channelId`; group by it,
+  not by display names.
+
+## What a frozen plan carries
+
+Every new edition is sealed with the current editorial contract. Its frozen plan carries, besides the figures:
+
+- **A reading per figure** (`readings[]`): the headline figure with a short caption, the conclusion in one sentence,
+  an optional "what it means" and a next step only when the evidence supports one (a result that already met its
+  target has none — do not add one).
+- **A chapter opening** per module; the first reading of each chapter is its main finding.
+- **Essentials** (`essentials`): at most five, and only findings.
+- **Scope lines** (`scopeLines`) stating what the edition covers, and the sealed **cover** (`cover`).
+- **A backing table** per module ("<module>: all figures") and **actions** with impact, effort and weeks.
+
+When you summarise a plan for a human, follow the same editorial rules the plan follows:
+
+- A superlative ("the highest", "the channel with most presence") requires a **unique** maximum among the printed
+  values. With a tie, say it is a tie and give the tied value; never pick one of the tied items as "the top".
+- Essentials and the thesis cite only findings: a target met or missed, a printed change, a unique maximum or a tie.
+  Never a bare value without comparison, and never a 0.0 % change as a finding.
+- Quote readings, limits and methodology as written; they are validated against the facts. Do not rewrite a number.
+
+A plan without `scopeLines` and `cover` was sealed with the previous editorial contract. That is not an error and it
+does not change: plans are immutable. Describe it as it is.
 
 ## Scope, permissions and negatives
 

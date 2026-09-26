@@ -187,9 +187,10 @@ Gateway mapping (`efeonce-mcp` 1.7.0, contract `task-1848-v1`): 503 `sharing_dis
 ⇒ `policy_blocked`; 429 `quota_exceeded` ⇒ `rate_limited`; 404 anti-oracle preserved; `create_insight_share` /
 `revoke_insight_share` need `efeonce.mcp.insights.write` (no client carries it ⇒ 403 challenge), the 5 reads the base scope.
 
-## Editorial contract v2 (TASK-1888 — code complete 2026-09-25, behind `INSIGHTS_EDITORIAL_V2_ENABLED`, OFF)
+## Editorial contract v2 (TASK-1888 — complete 2026-09-26, in production, `INSIGHTS_EDITORIAL_V2_ENABLED` ON)
 
-Verified against code on 2026-09-25. **Additive**: `specVersion` stays `chart_spec_v1` and `planVersion` stays
+Verified against 2026-09-26 (code + Production canary). The flag is ON in Vercel staging, Vercel Production and the
+`ops-worker`; editions generated since then seal v2 plans. **Additive**: `specVersion` stays `chart_spec_v1` and `planVersion` stays
 `editorial_plan_v1`; the presence of a v2 field is the signal. A sealed v1 plan/spec validates and composes the same.
 With the flag OFF the adapters return v1 evidence and the planner emits a v1 plan (only the pp correction applies).
 
@@ -215,6 +216,9 @@ With the flag OFF the adapters return v1 evidence and the planner emits a v1 pla
   (attention.min, or max for lower-is-better), cited by each bullet item as optional `bandFactId` (validated: exists,
   positive, on the not-yet-reached side of the target). They never produce claims, tables or references and never count
   as module evidence in `validating`. The render draws the band only from that fact — never `target × 0.85`.
+- **Direction per fact** — every ICO value fact carries `dimension.direction` taken from `ICO_METRIC_REGISTRY`; SEO
+  marks the average position `lower_is_better`. «Better/worse» and target sides are read from that field, never
+  inferred from the metric name.
 - **Plan (all optional)** — `contracts/plan.ts`: `chapter.opening` (claim), `chapter.readings[]` =
   `{ chartId, keyFigure?: { factId, value (must equal formatFactValue), caption }, conclusion?, meaning?, nextStep | null }`
   — the v2 planner ALWAYS emits `conclusion` as a deterministic FINDING (bullet: meets/misses the target of <metric>;
@@ -224,7 +228,18 @@ With the flag OFF the adapters return v1 evidence and the planner emits a v1 pla
   for a bullet); `meaning === conclusion` is rejected (`invalid_field`);
   `essentials` (≤ `PLAN_ESSENTIALS_MAX` = 5); `scopeLines` (copy, no numbers allowed); `decision`, `measurement`, `ask`
   (claims; NO deterministic producer); `cover`; actions gain `impact`/`effort` 1–3 and `weeks` `N` or `N-M` (1–4).
-  Every text is a `PlanClaimV1` checked by the same figure rule (`invalid_field` for shape errors).
+  Every text is a `PlanClaimV1` checked by the same figure rule (`invalid_field` for shape errors). Text caps live in
+  `PLAN_TEXT_LIMITS` (`contracts/plan.ts`): `conclusion` 90, `keyFigureValue` 9, `keyFigureCaption` 96, `meaning` 160,
+  `nextStep` 160, `summaryThesis` 120, `summaryLead` 200, `decision` 140, `essential` 170, `tableTitle` 80 (the A4
+  backing table «<module>: todas las cifras»; the deck draws no tables). `PLAN_CONCLUSION_MAX_CHARS` is a deprecated
+  alias of `conclusion`.
+- **Findings rules (`editorial/editorial-v2.ts`)** — a superlative («the highest», «the largest change», «first»)
+  requires a UNIQUE maximum in the PRINTED values (two facts that format the same are a tie). With a tie the plan says
+  the tie: the key figure is the tied value and its caption is the common name — never the first tied fact.
+  Essentials and the thesis cite only findings (target met/missed, a change that prints, a unique superlative or a
+  tie), never a bare value nor a 0,0 % variation. Chapter claims keep subject–verb agreement. The first reading of
+  every chapter is its main finding (ordering only; figure pages keep their order). Sealed editions are immutable: an
+  edition sealed before a fix keeps its text (e.g. the internal Berel staging edition with the pre-fix tie caption).
 - **Cover** — `contracts/cover.ts`: `resolveInsightCover({ requested, organization, logos })` = request (≠ auto) >
   organization (≠ auto) > auto (navy only with `logoOnDarkAssetId`). `PlanCoverV1 = { theme: dark|light, source:
   request|organization|auto, logoAssetId, logoVariant: on_dark|default|null }`; dark never carries the default logo
@@ -236,11 +251,12 @@ With the flag OFF the adapters return v1 evidence and the planner emits a v1 pla
   `insights.cover_preference.updated` `{ version: 1, organizationId, coverTheme, previousCoverTheme, actorKind }`.
   Lanes: `GET|POST /api/platform/{app,ecosystem}/insights/cover-preference` (ecosystem write = internal binding only).
   MCP: `get_insight_cover_preference` (base scope), `set_insight_cover_preference` (`efeonce.mcp.insights.write`,
-  reused; gateway PR efeonce-mcp#18, 1.9.0 on top of Marketing Studio 1.8.0, contract `task-1888-v1`, not deployed).
+  reused; set works only for internal bindings). Gateway `efeonce-mcp` v1.9.0 (PR #18, merged `2cf78af91`, revision
+  `efeonce-mcp-gateway-00062-ct5` at 100 %, contract `task-1888-v1`).
 - **Percent deltas** — a metric already in percent varies in pp (`formatDeltaPoints`, «+1,8 pp»; two decimals under
   0,05 pp). Relative deltas stay for absolute metrics. Sealed plans with the old relative text still validate.
 
-## Render contract of the premium catalogs (TASK-1889 — code complete 2026-09-25, not pushed)
+## Render contract of the premium catalogs (TASK-1889 — code shipped in release `0e87c7a443a2`; task still open)
 
 Verified against code on 2026-09-25. Detail: architecture §14.9.
 

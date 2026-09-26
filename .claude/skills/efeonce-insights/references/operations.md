@@ -16,9 +16,10 @@ The Composer's historical global visual set also drifts on clean, unrelated fram
 `pnpm composer:visual-gate --catalog=insights --selftest`, then the declared scoped freeze and scoped gate for
 Insights templates. This scope preserves existing `deck-axis`/SKY baseline images and hashes.
 
-## TASK-1889 premium catalogs — how to operate (code complete 2026-09-25, not pushed)
+## TASK-1889 premium catalogs — how to operate (code shipped in release `0e87c7a443a2`; task still open)
 
-Nothing is deployed: staging and production keep rendering the TASK-1847 v1 catalogs until the release. No own flag;
+Its code went out in release `0e87c7a443a2` (2026-09-26); the task is owned by another session, which records the
+runtime verification and closure — do not describe the redesign as live from this skill. No own flag;
 the v2 content (readings, essentials, cover, bands) only exists in plans generated with `INSIGHTS_EDITORIAL_V2_ENABLED`
 (TASK-1888). A v1 plan composes on the v2 templates with the documented fallbacks.
 
@@ -53,9 +54,10 @@ the v2 content (readings, essentials, cover, bands) only exists in plans generat
 | `INSIGHTS_DELIVERY_ENABLED` (TASK-1848) | create delivery intent (Vercel, OFF ⇒ 503 `delivery_disabled`) + dispatch (ops-worker) | Vercel + `ops-worker` (default `true` in `deploy.sh`, guarded by `deploy-contract.test.ts`) | 2026-09-18: Vercel staging ON · Production OFF; ops-worker ON (`ops-worker-00695-hrw`, then release `bda1cf2cd938`) |
 | `INSIGHTS_SCHEDULES_ENABLED` (TASK-1848) | schedule writes (Vercel) + tick (ops-worker) | Vercel + `ops-worker` (default `true`) | 2026-09-18: Vercel staging ON · Production OFF; ops-worker ON |
 | `INSIGHTS_GENERATION_ENABLED` in the worker (TASK-1848) | the schedules tick creates editions | now ALSO `ops-worker` (default `true` in `deploy.sh`) | ops-worker ON; `INSIGHTS_AUTHORING_AI_ENABLED` is NOT declared in the worker |
+| `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888) | v2 evidence + v2 plan when an edition is generated (create/revise/recover; schedules tick) | Vercel + `ops-worker` (default `:-true` in `deploy.sh`, pinned by `deploy-contract.test.ts`); the render Job does NOT read it | 2026-09-26: Vercel staging ON (`greenhouse-9t9fwhrvz`) · Vercel Production ON (exact `true`, deployment `greenhouse-8hl5hf54w`) · ops-worker ON (`ops-worker-00719-gbm`) |
 
 `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888, 2026-09-25): read where editions are GENERATED — Vercel (create/revise/
-recover) and the `ops-worker` schedules tick. Since the 2026-09-26 rollout, staging and `ops-worker` are ON. The
+recover) and the `ops-worker` schedules tick. Since the 2026-09-26 rollout, Vercel staging, Vercel Production and the `ops-worker` are ON. The
 first Production canary revealed a trailing newline in Vercel's encrypted Production value: the reader compares
 exactly to `true`, so `true\n` left the flag OFF. Corrected it to the exact four-character value and redeployed
 `greenhouse-8hl5hf54w` (`dpl_5sJdifoXZiXhQXfRSmW4zXFtQgGf`, Ready, alias `greenhouse.efeoncepro.com`). A second
@@ -69,9 +71,28 @@ real data read-only:
 `POST /api/platform/app/insights/cover-preference` `{ organizationId, coverTheme }` (Admin/Account) — works with the
 flag OFF; the dark logo variant is loaded with `POST /api/organizations/<id>/brand-assets/logo` `{ assetId, variant: 'on_dark' }`.
 
-Flip = `vercel env add <FLAG> <env>` (`production` lowercase for the standard env; custom `staging` literal) **+
-`vercel redeploy <url>`**: a deployment built before the env var never sees it. If a worker starts reading a flag,
-declare it in `services/<worker>/deploy.sh` (destructive `--set-env-vars`) and apply live with `--update-env-vars`.
+Flip = `printf %s true | vercel env add <FLAG> <env>` (`production` lowercase for the standard env; custom `staging`
+literal; NEVER `echo`, whose trailing newline stores `true\n` and leaves a strict `=== 'true'` reader OFF) **+ a new
+deployment created AFTER the variable** (`vercel redeploy <url>`): a deployment built before the env var never sees it.
+Verify the flip by BEHAVIOR (a canary), never by the env listing — an API read did not show the newline. If a worker
+starts reading a flag, declare it in `services/<worker>/deploy.sh` (destructive `--set-env-vars`) and apply live with
+`--update-env-vars`.
+
+### Editorial v2 — Production canary recipe (EXECUTED 2026-09-26)
+
+Ecosystem lane with the gateway consumer token (recipe in § Canaries), synthetic org "Greenhouse Demo" only.
+`POST …/insights/editions` → 202, then `GET` the detail with `?include=evidence`. Proof of v2 = the frozen plan
+carries `plan.scopeLines` (3) and `plan.cover` (with `frozenAt` + `planHash`); a plan without them was generated with
+the flag OFF (first canary `insed-356e948c…`, value `true\n`). The sandbox snapshot has no facts, so the edition ends
+`failed` in `validating`/`evidence_rejected` — expected; readings/essentials need an organization with data. Do not
+issue, share nor request a render. Passing canary: `insed-f5768172…` on `greenhouse-8hl5hf54w`.
+
+### Editorial v2 — rollback
+
+Flag OFF in BOTH runtimes: `vercel env rm INSIGHTS_EDITORIAL_V2_ENABLED production` (and staging) **+ redeploy**; in
+the `ops-worker`, apply `--update-env-vars INSIGHTS_EDITORIAL_V2_ENABLED=false` on the live service **and**
+change the `deploy.sh` default to `:-false` (otherwise the next deploy turns it back ON). New editions seal v1 plans;
+sealed v2 editions keep composing (render reads the frozen plan). Update the flag ledger.
 
 ## Assigning the module
 

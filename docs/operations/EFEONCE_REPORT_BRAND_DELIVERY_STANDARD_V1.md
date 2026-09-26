@@ -1,7 +1,8 @@
 # Estándar de marca y entrega de informes Efeonce
 
-**Estado:** vigente · **Origen:** instrucción del operador, 2026-09-04 · **Última actualización:** 2026-09-25
-(dirección premium de Efeonce Insights; dueño del contacto por tipo de documento tras TASK-1889).
+**Estado:** vigente · **Origen:** instrucción del operador, 2026-09-04 · **Última actualización:** 2026-09-26
+(estado de la dirección premium de Insights tras el cierre de TASK-1888; antes, dueño del contacto por tipo de
+documento tras TASK-1889).
 **Alcance:** todos los informes de Efeonce, internos o dirigidos a clientes, cualquiera que sea su disciplina.
 La metodología y las cifras siguen bajo el contrato del dominio; este estándar gobierna su presentación.
 
@@ -110,9 +111,11 @@ cerró con «así quiero que se vea un informe». Referencias durables: la
 (tesis, tabla de tokens y anti-patrones), su carpeta `paginas/` con las 41 páginas a tamaño nativo, la prueba en
 escala de grises y el [wireframe](../ui/wireframes/TASK-1889-efeonce-insights-premium-catalogs.md) por región.
 
-**Estado:** diseño aprobado; **implementación en curso**. Producción sigue sirviendo los catálogos v1 de Insights
-(TASK-1847). El contrato editorial lo fija TASK-1888 y los catálogos premium los construye TASK-1889. Esta sección
-no describe lo que hoy emite producción. Las reglas siguientes sirven a cualquier informe Efeonce; lo propio de
+**Estado (2026-09-26):** diseño aprobado. El contrato editorial v2 (TASK-1888) está **encendido en producción**
+desde el 2026-09-26: toda edición nueva de Insights sella lectura por figura, «Lo esencial», líneas de alcance y
+portada. El código de los catálogos premium (TASK-1889) salió a producción en el mismo release; su cierre formal
+(aprobación de los PDF reales por el operador) lo lleva su propia task. Las ediciones anteriores son inmutables y
+conservan el diseño con que se sellaron. Las reglas siguientes sirven a cualquier informe Efeonce; lo propio de
 Insights se indica como tal.
 
 ### Color de estructura
@@ -154,8 +157,9 @@ para lectura y datos con cifras tabulares.
 
 - Una sola portada, navy o blanca; en Insights cambia por módulo, no hay una portada por servicio. La blanca lleva un bloque
   navy a sangre en el 55 % superior y el título en navy de marca sobre papel.
-- El logo del cliente nunca va en positivo sobre navy. Si el cliente no tiene versión para fondo oscuro, se usa la
-  portada blanca. Sin logo, «Preparado para» muestra el nombre del cliente; sin nombre, el bloque desaparece. Nunca se
+- El logo del cliente nunca va en positivo sobre navy. Si el cliente no tiene versión para fondo oscuro, la portada
+  automática es la blanca; una portada navy pedida expresamente va sin logo del cliente. En Insights la portada se
+  resuelve al crear la edición (encargo > preferencia de la organización > automática) y queda sellada en ella. Sin logo, «Preparado para» muestra el nombre del cliente; sin nombre, el bloque desaparece. Nunca se
   inventa un nombre ni un logo.
 - **Precisión del pie para esta dirección:** las portadas aprobadas no llevan el pie institucional. Muestran logo,
   período, «Preparado para», eslogan y la línea «Confidencial · Versión · fecha». El contacto completo va en la

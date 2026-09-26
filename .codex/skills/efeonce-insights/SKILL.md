@@ -1,6 +1,6 @@
 ---
 name: efeonce-insights
-description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 code complete 2026-09-25, not pushed, rollout pending), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
+description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 shipped in release `0e87c7a443a2`, its runtime state owned by TASK-1889), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
 ---
 
 # Efeonce Insights (living skill)
@@ -65,6 +65,17 @@ it without repeating what already cost a day*. It grows with every task: see the
   `ops-worker` also reads `INSIGHTS_GENERATION_ENABLED`, `INSIGHTS_DELIVERY_ENABLED` and `INSIGHTS_SCHEDULES_ENABLED`
   (declared in its `deploy.sh`); a worker that reads one must declare it in its `deploy.sh`. A Vercel deployment created
   before `vercel env add` does not see the variable: redeploy.
+- **`INSIGHTS_EDITORIAL_V2_ENABLED` is read in TWO runtimes** — Vercel (create/revise/recover) and the `ops-worker`
+  (schedules tick; `deploy.sh` default `:-true`, pinned by `deploy-contract.test.ts`). The render Job does NOT read it:
+  it composes the frozen plan. ON in Vercel staging, Vercel Production and the `ops-worker` since 2026-09-26. The
+  reader compares `=== 'true'`: load the value with `printf %s true | vercel env add …` (a trailing newline leaves it
+  OFF), create the deployment AFTER the variable, and prove the flip with a canary that seals `plan.scopeLines` /
+  `plan.cover`, never with the env listing. Rollback = OFF in BOTH runtimes (see `references/operations.md`).
+- **Editorial v2 claims are findings, never loose values** (`editorial/editorial-v2.ts`): a superlative needs a
+  UNIQUE maximum in the printed values — with a tie the plan says the tie (the key figure is the tied value and its
+  caption the common name, never the first tied fact); essentials and the thesis cite only findings (target met or
+  missed, a change that prints, a unique superlative or a tie), never a bare value nor a 0,0 % change; the first
+  reading of every chapter is its main finding. Sealed editions are immutable, so a fix applies to new editions only.
 - **Share links (TASK-1848): the bearer is never persisted** — not even encrypted; only its sha256 digest. It is
   returned once on create and lives only in memory during an email send. A lost link is revoked and replaced, never
   recovered. Only ISSUED client editions; TTL 1–90 days (default 30); max 20 active links per edition (429
@@ -100,16 +111,18 @@ it without repeating what already cost a day*. It grows with every task: see the
 ## Routing
 
 - Rendering, PDF/deck, Artifact Worker → `references/program-ledger.md` § TASK-1846 + `artifact-composer` docs; Proposal stays a compatible consumer adapter (behaviour untouched).
-- Charts/catalogs → `dataviz-design` + `deck-studio` + TASK-1847 (v1 catalogs, what production serves today).
-  Contract changes (15 chart families, per-figure reading, `channelId`, sealed cover) → TASK-1888 (code deployed
-  since 2026-09-26; staging and ops-worker flag ON; Production v2 plan verified by synthetic canary after correcting
-  the exact Vercel flag value; see `references/contracts.md` § Editorial contract v2 and `references/program-ledger.md`).
-  Premium A4/deck templates → TASK-1889 (code complete 2026-09-25 in local `develop`, not pushed; see
+- Charts/catalogs → `dataviz-design` + `deck-studio` + TASK-1847 (v1 catalogs).
+  Contract changes (15 chart families, per-figure reading, `channelId`, sealed cover) → TASK-1888 (**complete
+  2026-09-26, in production**: releases `0e87c7a443a2` + `f9257b9c94af`, flag ON in Vercel staging, Vercel Production
+  and the `ops-worker`, gateway `efeonce-mcp` v1.9.0; issuance/sharing/delivery stay OFF in Production; see
+  `references/contracts.md` § Editorial contract v2 and `references/program-ledger.md`).
+  Premium A4/deck templates → TASK-1889 (its code shipped in release `0e87c7a443a2`; the task is still open and owned
+  by another session, which records its runtime state; see
   `references/contracts.md` § Render contract of the premium catalogs and `references/operations.md` § TASK-1889) with the approved direction
   `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`, its wireframe and its fidelity
   contract (41 reference pages in `…/TASK-1889-efeonce-insights-premium-catalogs/paginas/`, `pixelmatch` 0.1, ≤ 1 % of
-  differing pixels per page). **The approved canvas is built but not deployed:** until TASK-1889 releases with
-  `INSIGHTS_EDITORIAL_V2_ENABLED`, every report comes out with the v1 design — never describe the redesign as live.
+  differing pixels per page). Never describe the redesign as live until the TASK-1889 session closes it with runtime
+  evidence (real PDFs approved by the operator).
 - Brand graphic line «La órbita» (canonical for the Efeonce brand since 2026-09-25; manual
   `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md`, operational reference
   [`graphic-line-orbit.md`](../efeonce-brand-studio/references/graphic-line-orbit.md)): the orbit was born in the

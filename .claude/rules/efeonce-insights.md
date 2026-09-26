@@ -39,8 +39,12 @@ Invoca la skill `efeonce-insights` (+ `efeonce-mcp-platform` si vas a federar un
   toda cola sin drenar (hallazgo 2026-09-16). Render ON en los tres runtimes en staging y producción desde 2026-09-16
   (release `917491fd02e4`); con el Job en frío el dispatcher puede lanzar dos ejecuciones para un output (una finaliza). Los demás sólo en Vercel: `INSIGHTS_GENERATION_ENABLED` (crear/revisar; ON en
   Production y staging desde 2026-09-15), `INSIGHTS_ISSUANCE_ENABLED`, `INSIGHTS_AUTHORING_AI_ENABLED` (Gemini acotada
-  con validación de cifras y fallback determinista). Sin generación ⇒ `503 generation_disabled`. Registrar todo flip en
-  `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+  con validación de cifras y fallback determinista). Sin generación ⇒ `503 generation_disabled`.
+  `INSIGHTS_EDITORIAL_V2_ENABLED` (contrato editorial v2) se lee en DOS runtimes — Vercel (crear/revisar/recuperar) y el
+  `ops-worker` (tick de schedules; default `:-true` en `deploy.sh`); el Job de render NO lo lee. ON en staging y
+  producción desde 2026-09-26. Compara `=== 'true'`: cargarlo con `printf %s true`, redeploy DESPUÉS de la var y
+  verificar con una canary (plan con `scopeLines`/`cover`), no con el listado de vars. Rollback = OFF en los dos
+  runtimes. Registrar todo flip en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 - **Sharing / correo / recurrencia (TASK-1848, `sharing/`, `delivery/`, `schedules/`)**: del token `isg_` sólo se
   persiste su sha256 — **NUNCA** el bearer (ni cifrado); un reintento de correo revoca el grant y emite otro. El reader
   público (`/api/public/insights/shared/**`) responde 404 desconocido/expirado, 410 revocado/retirado, 429 y SIEMPRE

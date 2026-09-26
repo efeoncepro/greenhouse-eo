@@ -1,5 +1,11 @@
 # TASK-1849 — Efeonce Insights: biblioteca, creación y experiencia web compartida
 
+## Delta 2026-09-26
+
+- TASK-1888 complete y en producción con `INSIGHTS_EDITORIAL_V2_ENABLED` ON (Vercel staging/Production y `ops-worker`): la
+  preferencia de portada (command, reader, lanes app/ecosystem y tools MCP `get_/set_insight_cover_preference`) ya es
+  consumible por el builder, y las ediciones nuevas sellan `plan.cover`. — por trabajo en TASK-1888
+
 ## Delta 2026-09-25 (TASK-1889 code complete)
 
 - **El render ya compone con el diseño aprobado:** los catálogos `insights-report` e `insights-deck` sólo tienen
@@ -10,7 +16,7 @@
 
 ## Delta 2026-09-25 (TASK-1888 code complete)
 
-- **Ya existe (flag `INSIGHTS_EDITORIAL_V2_ENABLED` OFF):** command `setInsightCoverPreference` + reader
+- **Ya existe (flag `INSIGHTS_EDITORIAL_V2_ENABLED` ON desde 2026-09-26, ver delta de arriba):** command `setInsightCoverPreference` + reader
   `getInsightCoverPreference` (`src/lib/efeonce-insights/commands/cover-preference.ts`), lanes
   `GET/POST /api/platform/app/insights/cover-preference` (capability `insights.cover_preference.manage` para fijar,
   `insights.report.read` para leer) y `brand.coverTheme` opcional en el encargo. El builder sólo los consume: la regla

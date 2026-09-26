@@ -648,6 +648,12 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
     token de consumer del gateway vive en el runbook §4.3 — el assert debe ser algo que sólo el
     contrato nuevo puede producir.
 
+18. **Dos delta del 2026-09-26 (TASK-1888).** (a) El release `2add63c61fd6` se **abortó** porque el deploy del
+    `ops-worker` no recibía `DATAFORSEO_API_LOGIN`; se corrigió reenviando los secretos runtime del `ops-worker` en el
+    release (PR #242) y el siguiente (`f9257b9c94af`) cerró `released`. (b) Prender un flag por redeploy exige crear el
+    deployment **DESPUÉS** de la var y verificar el **comportamiento** con una canary, no el listado de vars: un valor
+    `true\n` (cargado sin `printf %s`) dejó OFF un lector `=== 'true'` y la primera canary selló el contrato viejo.
+
 ### Credencial de paquete privado vencida — el bloqueador que no está en el código
 
 **Antes de diagnosticar un deploy de worker rojo, mirar el HISTORIAL del workflow, no el diff.**

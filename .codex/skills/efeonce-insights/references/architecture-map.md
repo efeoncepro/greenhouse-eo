@@ -147,7 +147,7 @@ Production still renders with the TASK-1847 v1 catalogs and the v1 contract unti
 | Geometry of 15 families | `src/lib/artifact-composer/chart-geometry.ts` (Vercel-safe values via `@/lib/artifact-composer/pure`) |
 | Local preview over real data | `scripts/insights/preview-edition.ts` |
 
-### Built by TASK-1888 (backend-data) — code complete 2026-09-25, flag OFF
+### Built by TASK-1888 (backend-data) — complete 2026-09-26, in production, flag ON
 
 | Piece | Where | Responsibility |
 | --- | --- | --- |
@@ -164,11 +164,11 @@ Production still renders with the TASK-1847 v1 catalogs and the v1 contract unti
 | Dark logo | `greenhouse_core.organizations.logo_on_dark_asset_id`; `account-360/organization-brand-assets.ts` (`attachOrganizationLogoAsset({ variant })`); `account-360/organization-logo-variants-reader.ts` | write only via account-360; light reader safe for ops-worker |
 | Lanes | `app/api/platform/{app,ecosystem}/insights/cover-preference/route.ts` + `api-platform/resources/{app,ecosystem}-insights(-read).ts` | GET/POST |
 | MCP | `src/mcp/greenhouse/{tool-manifest,tools,http-client,server}.ts` | `get/set_insight_cover_preference`; manifest 64 tools `a08f649aab8f` |
-| Flag | `flags.ts` `isInsightsEditorialV2Enabled`; `services/ops-worker/deploy.sh` (`:-false`) | Vercel + ops-worker |
+| Flag | `flags.ts` `isInsightsEditorialV2Enabled` (`=== 'true'`); `services/ops-worker/deploy.sh` (`:-true`) | Vercel + ops-worker; ON in staging, Production and ops-worker since 2026-09-26 (render Job does not read it) |
 | Copy | `src/lib/copy/insights.ts` (`scopeLines`, `chapterOpenings`, `channels`, `targets`, `figures`, `reading`) | TASK-1889 owns `GH_INSIGHTS.catalog` |
 | Preview | `scripts/insights/preview-edition.ts --editorial-v2 --plan-only` | read-only v2 plan over real data |
 
-### Built by TASK-1889 (ui-ux) — code complete 2026-09-25, not pushed (rollout pending)
+### Built by TASK-1889 (ui-ux) — code shipped in release `0e87c7a443a2` (runtime state owned by TASK-1889)
 
 Detail: architecture §14.9, implementation record §8.z.
 
@@ -189,4 +189,4 @@ Detail: architecture §14.9, implementation record §8.z.
 | Visual baseline | Insights frames of `pnpm composer:visual-gate --catalog=insights` | 27 frames at 0 px; deltas g–j in `BASELINE_DELTAS.md` |
 
 Removed: `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css`, `render/figure-pages.ts`, v1
-bar/family/path resolvers. `artifact-composer/chart-figure.ts` has no consumers left (own test kept; follow-up to retire).
+bar/family/path resolvers. `artifact-composer/chart-figure.ts` and its test were retired on 2026-09-26 (no consumers).

@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `En ejecución — TASK-1845 (foundation) COMPLETE 2026-09-16: en producción desde 2026-09-15 con generación ON (emisión/IA OFF), rollback ensayado; TASK-1846 (render durable) COMPLETE 2026-09-16: en producción (release 917491fd02e4, render ON en los 3 runtimes, gateway v1.6.0, canary productivo deck_pdf verde); TASK-1848 (compartir/correo/recurrencia) en producción 2026-09-18 con flags OFF (release bda1cf2cd938, gateway 1.7.0), in-progress por in-app/Teams, portal_link, Think e ISSUE-174 → TASK-1876; TASK-1847 COMPLETE 2026-09-25 (render productivo de A4 y deck verificado); en producción desde 2026-09-24 (release ebb9212a32ce, PR #239: report_pdf en insights-report y deck_pdf en insights-deck; canary de contrato productivo verde, canary de render productivo pendiente; staging verificado con Berel/Sky); TASK-1849 y TASK-1875 en diseño (1875 ya desbloqueada); TASK-1888 (contrato editorial v2) code complete 2026-09-25 con flag OFF, rollout pendiente; TASK-1889 (catálogos premium) code complete 2026-09-25 en develop (sin push; A4 y deck sólo v2, 20 de 21 páginas ≤1 % del canvas + excepción aprobada, Berel y Sky revisados localmente), rollout pendiente: staging con el flag de TASK-1888, release por control plane y aprobación del operador de piezas derivadas y PDFs reales`
+- Status real: `En ejecución — TASK-1845 (foundation) COMPLETE 2026-09-16: en producción desde 2026-09-15 con generación ON (emisión/IA OFF), rollback ensayado; TASK-1846 (render durable) COMPLETE 2026-09-16: en producción (release 917491fd02e4, render ON en los 3 runtimes, gateway v1.6.0, canary productivo deck_pdf verde); TASK-1848 (compartir/correo/recurrencia) en producción 2026-09-18 con flags OFF (release bda1cf2cd938, gateway 1.7.0), in-progress por in-app/Teams, portal_link, Think e ISSUE-174 → TASK-1876; TASK-1847 COMPLETE 2026-09-25 (render productivo de A4 y deck verificado); en producción desde 2026-09-24 (release ebb9212a32ce, PR #239: report_pdf en insights-report y deck_pdf en insights-deck; canary de contrato productivo verde, canary de render productivo pendiente; staging verificado con Berel/Sky); TASK-1849 y TASK-1875 en diseño (1875 ya desbloqueada); TASK-1888 (contrato editorial v2) COMPLETE 2026-09-26: en producción (releases 0e87c7a443a2 + f9257b9c94af, `INSIGHTS_EDITORIAL_V2_ENABLED` ON en Vercel staging/Production y ops-worker, gateway efeonce-mcp v1.9.0, canary sintético de producción con plan v2 sellado; emisión, compartir y entrega siguen OFF); TASK-1889 (catálogos premium) code complete 2026-09-25 en develop (sin push; A4 y deck sólo v2, 20 de 21 páginas ≤1 % del canvas + excepción aprobada, Berel y Sky revisados localmente), rollout pendiente: staging con el flag de TASK-1888, release por control plane y aprobación del operador de piezas derivadas y PDFs reales`
 - Rank: `TBD`
 - Domain: `platform|growth|delivery|ui|cross-domain`
 - Owner: `Platform / Client Experience; Julio Reyes (producto)`
@@ -127,6 +127,10 @@ ya corregidos. Falta el rollout: staging con el flag de TASK-1888, release por e
 `artifact-worker` es único para staging y producción) y la aprobación del operador de las piezas derivadas y de los
 PDFs reales. Nada se comparte con clientes hasta una edición interna en producción revisada por el operador.
 TASK-1849 es consumer UI, backend none; si encuentra un gap de command vuelve a la dueña backend.
+
+**Delta 2026-09-26 — TASK-1888 complete, en producción.** El flag `INSIGHTS_EDITORIAL_V2_ENABLED` que el rollout de
+TASK-1889 esperaba ya está ON en Vercel staging/Production y en el `ops-worker`: las ediciones nuevas sellan plan v2.
+Emisión, compartir y entrega siguen OFF en producción; ninguna edición llega a un cliente sin gate humano.
 
 ## Existing Related Work
 
