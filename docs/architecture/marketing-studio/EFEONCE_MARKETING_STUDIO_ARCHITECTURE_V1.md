@@ -1,11 +1,11 @@
 # Efeonce Marketing Studio — Arquitectura V1
 
 > **Tipo:** arquitectura técnica (contrato para agentes y desarrolladores)
-> **Versión:** 1.7
+> **Versión:** 1.8
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-09-26 por Claude (ADR aceptado: capa de estrategia — canales, ICP, plan, SEO/AEO, IA — con paridad total y niveles de riesgo; antes, el mismo día: Studio + GCS como fuente única e ingesta por CLI, MCP y UI)
+> **Última actualización:** 2026-09-26 por Claude (ADR aceptado: operación híbrida con agentes — work items, registro de roles, despachador Claude/OpenAI, §4.2; antes, el mismo día: ADR capa de estrategia — canales, ICP, plan, SEO/AEO, IA — con paridad total y niveles de riesgo; antes, el mismo día: Studio + GCS como fuente única e ingesta por CLI, MCP y UI)
 > **Estado:** Accepted. En vivo en `https://studio.efeonce.org` desde 2026-09-25 (TASK-1887)
-> **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + deltas de placement y de agentes 2026-09-25) · fuente única e ingesta: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md) (Accepted 2026-09-26) · capa de estrategia: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) (Accepted 2026-09-26)
+> **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + deltas de placement y de agentes 2026-09-25) · fuente única e ingesta: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md) (Accepted 2026-09-26) · capa de estrategia: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) (Accepted 2026-09-26) · operación híbrida con agentes: [`EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) (Accepted 2026-09-26)
 > **Programa:** [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
 > **Operación:** [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md)
 
@@ -252,6 +252,44 @@ Errores del provider hacia el agente: `forbidden`, `not_found` (anti-oráculo), 
 **Manual servido.** `docs/mcp/skills/marketing-studio/SKILL.md` (audiencia `internal`), por `get_greenhouse_skill`. Su
 entrada en `src/mcp/greenhouse/skill-manifest.ts` declara `provider: 'marketing-studio'`: Greenhouse valida el prefijo
 `studio.` y el gateway verifica que cada tool exista en el artefacto sincronizado.
+
+## 4.2 Operación híbrida con agentes
+
+Decisión gobernante: [`EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md)
+(Accepted 2026-09-26). **Nada de esta sección está en runtime todavía**; la implementan tasks del EPIC-049. Lo vigente
+como contrato:
+
+- **Work items**: unidad de trabajo por campaña (tipo, responsable = persona **o** rol de agente, quién lo pidió,
+  estado, insumos por referencia versionada, entregable como borrador con procedencia, revisión y traspaso al rol
+  siguiente). Máquina de estados en el command; paridad total (command, `/api/v1`, registro con nivel, tool MCP).
+  Asignar a un agente es `T1` dentro del techo de costo; excederlo es `T2`. El traspaso entre roles es un work item
+  nuevo, nunca un handoff del proveedor.
+- **MCP es la única vía**: los agentes tocan Studio, Greenhouse y Search Visibility 360 sólo por tools de
+  `mcp.efeonce.org`, con lista blanca por rol aplicada en el runtime y en Studio/gateway. Nunca bearer de servicio,
+  SQL ni API interna directa.
+- **Registro de roles** (dato versionado, portable Claude ↔ OpenAI): misión, skills con versión, tools con nivel
+  (`T0`/`T1` directo; `T2` sólo como propuesta), límites de costo y turnos, runtime y modelo preferidos, set de
+  evaluación, modos habilitados y kill switch. Roles iniciales: planificador de medios, SEO/AEO, copywriter, QA
+  creativo y de marca, analista de desempeño.
+- **Identidad**: corrida delegada = persona que asignó ∩ lista del rol (auditoría «persona X, ejecutado por agente
+  `<rol>`»); delegación para segundo plano emitida sólo por Efeonce ID (claim `act`, corta, revocable; pendiente de
+  diseño en su dueño); corrida programada = identidad de servicio por rol limitada a `T0`/`T1` y a borradores nuevos;
+  `T2` siempre con confirmación de una persona desde un token sin `act`.
+- **Tres modos, un contrato** `{rol@versión, work_item, insumos, runtime, modelo, identidad, techo}`: interactivo
+  (persona + skill de rol + Efeonce MCP en Claude Code, claude.ai, Codex o ChatGPT; disponible en lectura hoy),
+  delegado en segundo plano y programado, ambos por un **despachador en Studio** (runtime asíncrono en Cloud Run) con
+  adaptadores `claude-agent-sdk`, `claude-managed-agents`, `openai-agents-sdk` y `openai-responses` detrás de flags.
+  El estado duradero vive en Studio; la sesión del proveedor es efímera. Una clave de idempotencia por corrida lógica
+  y recuperación por lectura antes de reintentar.
+- **Reuso**: el despachador no reusa el runtime de Globe (frontera de plataforma hermana; sus adaptadores son de
+  generación de medios) ni el de Nexa (turno de chat en Greenhouse); reusa sus patrones. Nexa opera Studio como
+  cliente del gateway con las mismas tools y niveles. El puerto nace sin tipos de Studio para promoverse a plataforma
+  cuando aparezca un segundo consumidor.
+- **Gobierno**: evals por rol × runtime × modelo antes de segundo plano; escalera interactivo → segundo plano con
+  revisión → programado; techos por corrida, rol y organización con reserva previa; métricas por rol (aceptación,
+  retrabajo, costo por entregable aceptado, intentos fuera de lista); secretos fuera del contexto; contenido externo
+  como dato; runtimes sin ZDR sólo con autorización de la organización; nada sobre Agent Builder (retiro anunciado
+  para 2026-11-30).
 
 ## 5. Acceso
 
@@ -519,6 +557,7 @@ Orden: 1890 → 1891 · 1893 · 1896 → 1892 → 1894 → 1895 · 1899 → 1897
 - ADR: [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md)
 - ADR fuente única e ingesta: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md)
 - ADR capa de estrategia: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md)
+- ADR operación híbrida con agentes: [`EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md)
 - Runtime handoff: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md)
 - Gateway: [`EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Marketing Studio
 - Invariantes de superficie MCP: [`MCP_TOOL_SURFACE_INVARIANTS.md`](../agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md)

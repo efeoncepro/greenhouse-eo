@@ -128,6 +128,29 @@ Nothing of it is in runtime yet; EPIC-049 tasks implement it by theme.
 - **AI agent-first**; AI proposes, a person confirms, the command executes; every AI draft carries immutable
   provenance (model, instruction/skill version, sources, who accepted and when).
 
+## Hybrid operation with agents (ADR accepted 2026-09-26)
+
+Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md` (architecture §4.2).
+Nothing of it is in runtime yet; interactive mode (person + role skill + Efeonce MCP) already works for reads.
+
+- **Work items** are the unit of hybrid work per campaign: assignee = person **or** agent role@version, requester,
+  state machine, versioned inputs by reference, deliverable = draft with provenance (TASK-1909), review, handoff =
+  a **new work item** (never a provider handoff). Assigning to an agent is `T1` within the cost cap, `T2` above it.
+- **MCP is the only action path** for agents (`mcp.efeonce.org`); per-role tool allowlist enforced in the runtime
+  and again in Studio/gateway. Never the `mst_` bearer, SQL or internal APIs.
+- **Agent role registry** (versioned data, portable Claude ↔ OpenAI): mission, skills@version, tools with tier
+  (`T0`/`T1` direct, `T2` proposal only), cost/turn caps, preferred runtime/model, eval set, enabled modes, kill switch.
+  Interactive role skills: `efeonce-agent-media-planner`, `efeonce-agent-seo-aeo` (+ `efeonce-campaign-planning`).
+- **Identity**: delegated run = assigning person ∩ role allowlist; background delegation minted only by Efeonce ID
+  (`act` claim, short, revocable — design pending); scheduled run = per-role service identity, `T0`/`T1` drafts only;
+  a `T2` confirmation is valid only from a token **without** `act`.
+- **Three modes, one run contract**; durable state only in Studio; a thin **dispatcher in Studio** (Cloud Run) with
+  adapters `claude-agent-sdk`, `claude-managed-agents`, `openai-agents-sdk`, `openai-responses` behind flags; one
+  idempotency key per logical run, read-back before retry. It reuses Globe/Nexa **patterns**, never their runtime;
+  Nexa is a gateway client. Never build on OpenAI Agent Builder (shutdown 2026-11-30).
+- **Autonomy gate**: evals per role × runtime × model before background/scheduled; cost caps per run, role and org;
+  no-ZDR runtimes (Managed Agents) only with the organization's authorization.
+
 ## The operations-registry rule (binding)
 
 - **Every Studio capability is born in `packages/contracts/src/operations.ts`**, the single registry. From it derive:
