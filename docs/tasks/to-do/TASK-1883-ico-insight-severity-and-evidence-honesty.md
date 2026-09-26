@@ -8,7 +8,7 @@
   La severidad por umbral de negocio de esta task debe leer `getThresholdZone` del registro, nunca bandas del
   Contrato ni literales. El bono conserva umbrales propios en `payroll_bonus_config` y sigue fuera de alcance.
   Detalle: `ICO_DELIVERY_METRICS_AGENT_INVARIANTS.md` § «Umbrales ICO — una sola fuente por propósito»; los semáforos
-  del portal escritos a mano migran en `TASK-1900` — cerrado por la reconciliación de umbrales (commit `f1a41cda0`).
+  del portal escritos a mano migran en `TASK-1900` — cerrado por la reconciliación de umbrales (commit `9172cf5df`; antes del rewrite de historia del 2026-09-25, `f1a41cda0`).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
