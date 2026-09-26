@@ -6,18 +6,31 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
-## Delta 2026-09-26
+## Delta 2026-09-26 — reescrita sobre el ADR de fuente única e ingesta
 
-- TASK-1896 complete: la condición «cerrada antes del flag ON en producción» está cumplida. La tool de lectura
-  `studio.asset.download` (TASK-1893) está en el manifiesto pero sin federar en el gateway (Follow-up de TASK-1893);
-  quien toque el provider primero hace el sync.
-
-## Delta 2026-09-25
-
-- El patrón de provider ya existe (TASK-1891, gateway 1.8.0 con flag OFF): `src/providers/marketing-studio.ts`, sync `pnpm studio:manifest:sync` → `marketing-studio-tool-manifest.generated.ts` con hash verificado al cargar, y guard `marketing-studio-tool-parity.ts`, que ya rechaza tools de escritura sin clase de scope. Extenderlo; no crear otro provider.
-- El gate de versión del gateway mide la superficie **construida** con providers máximos: `src/surface.ts` registra las tools de Studio desde `MARKETING_STUDIO_TOOL_MANIFEST.tools`. Si el carril de escritura registra tools por otra vía, declararlas en `src/surface.ts` y en el test de cobertura de políticas, o quedan fuera de la cuenta y del bump.
-- El campo `Branch` dice «auto-deploy de Cloud Run»: no es así. El deploy del gateway es dispatch manual de `deploy.yml` (exposure `public-oauth`), nunca automático al merge.
-- Precedente de lectura: la autoridad de la persona hoy se prueba con un canje RFC 8693 en **Greenhouse** (`/api/integrations/v1/sister-platforms/oauth/token`, cliente `efeonce-mcp-marketing-studio`) y Studio recibe sólo el bearer de servicio. El diseño de esta task (token delegado de `auth.efeonce.org` con audiencia Studio) es distinto a propósito, porque la escritura debe auditar a la persona en Studio; declarar en el ADR cómo conviven ambos carriles.
+- ADR gobernante: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md)
+  (`Accepted` 2026-09-26, commit `a8f43a01f`). La base de Studio + el bucket privado
+  `efeonce-marketing-studio-originals` son la fuente única; OneDrive/SharePoint es taller; un final existe sólo cuando
+  entró a Studio. **No hay espejo por Microsoft Graph.** Un command (`createAssetVersion`, tool
+  `studio.asset.version.create`) y tres puertas (CLI, MCP, UI). §9 del ADR asigna a esta task: tools MCP de subida y
+  aprobación, clase de scope de escritura, identidad delegada de la persona y el protocolo `dryRun` → confirmación.
+- **Reemplaza el diseño anterior de esta task** (token delegado emitido por `auth.efeonce.org` con audiencia Studio y
+  dos clases de scope `write`/`approve`). El diseño vigente reutiliza el canje RFC 8693 de Greenhouse que ya sirve las
+  lecturas en producción (TASK-1891), ahora **pidiendo la capability exacta de cada tool**, y hace viajar a Studio la
+  identidad de la persona como el token canjeado, que Studio revalida en Greenhouse. Razones: una sola ancla de
+  autoridad ya en producción, revocación evaluada en el momento del uso, cero cambios en el emisor nativo compartido
+  por staging y producción, y el ADR fija una sola clase de escritura. El emisor nativo sigue `unsupported` para Studio.
+- Reparto con TASK-1894 (su tabla «Operaciones y tools»): 1894 entrega los commands, las tools en el manifiesto, los
+  scopes de API y las capabilities `marketing_studio.asset.write` y `marketing_studio.campaign.write`; **esta task
+  siembra `marketing_studio.campaign.approve`**, implementa el actor delegado en el puerto de autoridad de Studio y el
+  `proposalDigest`, y federa todo por MCP.
+- Se incorpora a esta task la federación de `studio.asset.download` (Follow-up de TASK-1893): la tool existe en el
+  manifiesto de Studio (API 1.2.0) y el gateway aún sincroniza el manifiesto 1.1.0 (12 tools).
+- Lecciones del 2026-09-26 que esta task aplica: la política de un cliente de canje se valida con
+  `sisterPlatformOAuthPolicyV1Schema` y exige `revocation.requireOnPrivilegedAction = true` (con `false` el canje
+  responde 503 y el gateway lo muestra como `upstream_unavailable`; forward fix `20260926071321910`); un secreto
+  condicional se monta en el mismo paso que corre `gcloud run deploy` (`efeonce-mcp#20`); tras una promoción fallida,
+  `spec.traffic` puede quedar fijado en la revisión rota (`efeonce-mcp#21`).
 
 ## Status
 
@@ -34,52 +47,48 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-049`
-- Status real: `Diseno. Regla del operador (2026-09-25): «todo lo que se pueda hacer por la UI debe poderse hacer por API, y por consiguiente por MCP», incluidas las aprobaciones, que decide siempre una persona.`
+- Status real: `Diseno. Contrato cerrado por el ADR de fuente única (2026-09-26) y la regla de paridad del operador (2026-09-25): todo lo de la UI se puede por API y por MCP, incluidas las aprobaciones, que decide siempre una persona.`
 - Rank: `TBD`
 - Domain: `platform|identity`
-- Blocked by: `TASK-1894 (commands de escritura, tools de clase write en el manifiesto y capability marketing_studio.campaign.write). Depende además de que el emisor nativo auth.efeonce.org porte la identidad de la persona hasta Studio (Slices 2–3 de esta task). NO depende de TASK-1898: la identidad MCP llega desde Efeonce ID vía el gateway, no desde la sesión web de Studio.`
-- Branch: `Greenhouse develop (emisor nativo, scopes, capability, readers, docs) · efeonce-mcp main vía PR (deploy por dispatch manual de deploy.yml, nunca automático al merge) · efeonce-marketing-studio main (actor delegado y guardas); sin worktrees`
+- Blocked by: `TASK-1894 (commands de escritura y aprobación con dryRun, requestAssetVersionUpload + createAssetVersion, tools de clase write/approve en el manifiesto con método, cabeceras y requiresPerson, scopes de API studio:assets:write y studio:write, puerto de autoridad de Studio que niega por defecto, capabilities marketing_studio.asset.write y marketing_studio.campaign.write sembradas con grant). Las dependencias de federación de lecturas y de almacén de originales ya están cerradas (ver Dependencies & Impact). NO depende de TASK-1898: la identidad llega por el canje de Greenhouse, no por la sesión web de Studio.`
+- Branch: `Greenhouse develop (canje, clientes OAuth, paridad de scopes, userinfo, manual servido, docs) · efeonce-mcp rama + PR a main (deploy por dispatch manual de deploy.yml, nunca automático al merge) · efeonce-marketing-studio main (actor delegado, digest de confirmación; push a main = deploy de producción); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Federa en el provider `marketing-studio` de `efeonce-mcp` todas las tools de clase `write` del manifiesto de Studio
-(crear y editar campaña, brief, conceptos, piezas y versiones con su intención de subida, copys, anuncios, líneas del
-plan de medios, posts del calendario, transiciones de estado y aprobaciones), con dos scopes de clase nuevos
-(`efeonce.mcp.marketing_studio.write` y `efeonce.mcp.marketing_studio.approve`). La persona viaja hasta Studio como
-un token delegado RFC 8693 que emite `auth.efeonce.org` con audiencia Studio; Studio verifica ese token, relee
-capability y membership en Greenhouse y audita a la persona con `via=mcp:<cliente>`. Toda escritura admite `dryRun`,
-y toda aprobación exige una confirmación que repite el digest de la propuesta. Un guard bidireccional impide que
-exista una escritura de la UI sin API ni tool.
+Federa en el provider `marketing-studio` de `efeonce-mcp` todas las tools de escritura del manifiesto de Studio
+(subida de finales en dos pasos, creación de versión y aprobaciones) y la lectura `studio.asset.download`, con una
+clase de scope nueva, `efeonce.mcp.marketing_studio.write`. En cada llamada el gateway canjea el token Entra de la
+persona en Greenhouse pidiendo **la capability exacta de la tool** y reenvía el token canjeado a Studio en la cabecera
+`Efeonce-Delegated-Token`; Studio lo revalida en el `userinfo` de Greenhouse y audita a la persona, nunca al gateway.
+Los bytes van del agente directo a GCS por URL firmada; toda aprobación exige `dryRun` → confirmación explícita con el
+digest de la propuesta.
 
 ## Why This Task Exists
 
-- TASK-1891 federa sólo lecturas y TASK-1894 publica las tools de escritura en el manifiesto sin federarlas: hoy un
-  agente puede leer Studio pero no operarlo. Eso incumple Full API Parity y la regla del operador.
-- El operador quiere que un agente, actuando por una persona autorizada, pueda también **aprobar** (presupuesto
-  `approved`, Creatividad `→ approved`, Autorización de medios `→ authorized`, aprobación del brief). La aprobación la
-  decide la persona; el agente la ejecuta en su nombre.
-- En el lane ecosystem el actor es la máquina `mcp:<consumer>`: no hay chequeo de capability por persona y el scope
-  OAuth es la única compuerta que depende de quién es la persona. Si el gateway llamara a Studio sólo con su
-  `api_client`, Studio auditaría al gateway, no a la persona, y cualquiera con el scope escribiría con la autoridad de
-  la máquina. La autoridad por persona tiene que viajar de forma **explícita y verificable**, no inferida.
-- Studio no puede aceptar el access token MCP de la persona: su audiencia es `https://mcp.efeonce.org/mcp` y el ADR de
-  relying parties exige rechazar un token MCP en un RP por audiencia antes de la lógica de dominio. Hace falta un token
-  nuevo, emitido para Studio, que conserve la identidad de la persona y declare quién actúa en su nombre.
-- El emisor nativo hoy sólo admite `authorization_code` y `refresh_token`, y el contexto interno v2 delega sólo
-  `growth.seo.observation.read` (D9). Incorporar las clases de Studio exige autorización nueva (D10), no un flag.
+- El ADR declara a Studio + GCS fuente única y abre tres puertas al mismo command. La puerta MCP no existe: el gateway
+  federa sólo 12 lecturas y su guard marca toda tool `writes: true` como `write_tool_without_scope_class`, así que
+  ninguna escritura se federa hoy.
+- Hoy el provider pide **siempre** `marketing_studio.campaign.read` (`MARKETING_STUDIO_GREENHOUSE_SCOPE` en
+  `src/providers/marketing-studio.ts`) y el cliente `efeonce-mcp-marketing-studio` sólo admite ese scope
+  (`assertFederatedClient` exige exactamente uno). Con eso, una persona que puede leer podría escribir o aprobar: la
+  autoridad tiene que evaluarse por tool.
+- Studio no conoce personas: con el bearer de servicio del gateway, cualquier escritura quedaría auditada al
+  `api_client` del gateway, lo que el ADR §8 prohíbe («NUNCA registrar al gateway o a un agente como actor»).
+- `studio.asset.download` quedó sin federar al cerrar TASK-1893.
 
 ## Goal
 
-- Todas las operaciones de escritura del OpenAPI de Studio tienen tool federada en el gateway o exclusión con razón;
-  el guard falla nombrando la operación, la tool o la exclusión que sobra o falta.
-- Una persona con capability y membership escribe y aprueba en Studio desde un agente MCP, y el `audit_event` de Studio
-  la registra a ella (no al gateway ni al modelo) con `via=mcp:<clientId>`.
-- Un `api_client` de máquina sin persona no puede aprobar (`approval_requires_person`, 403), y una persona sin
-  capability recibe denegación antes de escribir.
-- Toda escritura soporta `dryRun`; una aprobación sin confirmación que repita el digest de su propuesta no se ejecuta.
-- Canary en producción sobre una campaña sandbox: allow, deny, fault, reintento idempotente y conflicto 412.
+- Un agente MCP, actuando por una persona con `marketing_studio.asset.write`, sube un final (URL firmada → GCS) y crea
+  su versión pendiente de revisión, y el `audit_event` de Studio registra a la persona.
+- Una persona con `marketing_studio.campaign.approve` aprueba desde un agente sólo tras `dryRun` y confirmación con el
+  `proposalDigest`; sin la capability, o sin confirmación, no se escribe nada.
+- `studio.asset.download` responde por MCP con la capability `marketing_studio.asset.download` de la persona.
+- Toda tool `writes: true` del manifiesto sincronizado está federada con su contrato de canje, o el guard falla
+  nombrándola.
+- Canary de sesión MCP real en producción sobre una campaña sandbox: allow, deny, confirmación ausente y alterada,
+  reintento idempotente y conflicto de revisión.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -92,125 +101,137 @@ exista una escritura de la UI sin API ni tool.
 
 Revisar y respetar:
 
+- `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md` (ADR gobernante:
+  §4.2 un command, tres puertas; §4.3 inferencia; §4.4 aprobación humana; §8 invariantes; §9 mapa)
+- `docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md` (paridad UI → API → MCP; registro único de operaciones)
+- `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` (§Agentes, §7 originales)
 - `docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` (§«El scope de escritura NO se cablea al cliente
-  público compartido»; Deltas 2026-09-10 TASK-1852 y 2026-09-15 TASK-1845)
+  público compartido»; Delta 2026-09-10 TASK-1852: escritura con autoridad humana delegada por canje)
 - `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` (§0 manifiesto, §5 federar es parte de listo,
-  §9 versión y superficie, §11 status; «Autoridad nativa antes de dispatch»; «Escritura con autoridad humana delegada
-  por exchange»)
-- `docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md` (D8 actor ≠ objetivo, D9 v2 base-only, D10
-  consentimiento fresco, D11 revocación ≤ 60 s y sin caché positiva)
-- `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` (sesiones y audiencias aisladas;
-  cross-audience rechazado antes del dominio)
-- `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` (endpoints, grants soportados, step-up de writes)
-- `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`
-- `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md`
-- `docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md` [verificar ruta]
+  §9 versión y superficie, §11 status en el mismo PR; «Escritura con autoridad humana delegada por exchange»)
+- `docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md` (D9 v2 base-only, D10: sumar Studio al emisor
+  nativo exige consentimiento nuevo; por eso Studio sigue `unsupported` para el emisor nativo)
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
-- `docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md` §5 (mapa de commands) y §5.3 (agentes: `propose → confirm`,
-  aprobar por MCP)
+- `docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md` §5.3 (agentes: `propose → confirm`, nodo `MS-N7`)
 
 Reglas obligatorias:
 
-- **Un scope por clase de radio de daño, nunca por capability.** Esta task agrega exactamente dos clases (ver Detailed
-  Spec §Decisión 1). Federar la escritura N+1 de Studio no crea scope nuevo.
-- **Ningún scope de escritura o aprobación se cablea al cliente PKCE público compartido**, ni se anuncia en el PRM, ni
-  se agrega a `scopes_supported`, ni se publica como mínimo del emisor. Llega sólo por el `403 insufficient_scope` de la
-  tool y por consentimiento explícito con step-up.
-- **La autoridad por persona viaja explícita**: token RFC 8693 firmado por el emisor, audiencia Studio, `sub` de la
-  persona y `act` del actor. Nunca un header libre con el id de la persona, nunca el access token MCP reenviado, nunca
-  una aserción firmada por el gateway.
-- **Los argumentos nunca eligen autoridad.** El scope y la política se deciden por el nombre de la tool; por eso toda
-  aprobación es una tool propia (no un valor de un enum dentro de una tool genérica).
-- `organizationId` explícito en cada llamada; el objetivo se resuelve por el reader canónico de v2 sin caché positiva, y
-  Studio vuelve a comprobarlo.
-- El gateway sólo transporta: sin lógica de campañas, sin SQL, sin decidir transiciones. Studio decide datos y reglas;
-  Greenhouse decide capability y membership; el emisor decide identidad y delegación.
-- Default OFF y fail-closed en los tres runtimes; un Studio o un emisor degradado no rompe el discovery de otros
+- **Una sola clase de scope nueva**, `efeonce.mcp.marketing_studio.write`, para toda escritura y aprobación de Studio
+  (una por radio de daño, nunca por capability). La diferencia entre subir y aprobar la decide la **capability de la
+  persona** en Greenhouse, no el scope. Studio no publica ni lanza pauta: aprobar registra una decisión, no mueve
+  dinero ni gasta proveedor.
+- **La clase nunca se cablea al cliente PKCE público compartido** (`32617b87-e7ef-493a-838f-1ff3f0213b93`): no entra
+  en su `requiredResourceAccess`, ni en el PRM, ni en `scopes_supported`, ni en `PUBLISHED_SCOPES_SUPPORTED`. Se
+  descubre sólo por el `403 insufficient_scope` de la tool y llega por consentimiento dinámico de la persona.
+- **La capability la elige la tool, nunca los argumentos.** El canje pide `tool.capability` del manifiesto; un argumento
+  no puede cambiar la autoridad. Toda aprobación es una tool propia con `requiresPerson: true`.
+- **Un cliente confidencial de canje por capability.** `assertFederatedClient` sigue exigiendo exactamente un scope por
+  cliente; no se relaja esa guarda.
+- **El actor auditado es la persona.** Studio acepta el token canjeado sólo desde el `api_client` del gateway, lo
+  revalida en `userinfo` de Greenhouse en cada llamada (sin caché positiva) y escribe `actor = user`.
+- **Ningún binario viaja por MCP ni por Vercel.** La tool entrega una URL firmada V4 de un solo objeto
+  `originals/sha256/<2 primeros hex>/<sha256>`; el agente sube con su propio HTTP/CLI.
+- El gateway sólo transporta: sin lógica de campañas, sin parsear nombres de archivo, sin decidir transiciones, sin
+  generar `Idempotency-Key`, sin reintentar escrituras por su cuenta.
+- Default OFF y fail-closed en Studio y en el gateway; un Studio o un canje degradado no rompe el discovery de otros
   providers.
 - Bump minor del gateway + `pnpm surface:baseline` después de decidir el bump; `efeonce.gateway.status` reporta el
-  estado del carril de escritura en el mismo PR, probado por la puerta HTTP.
+  carril de escritura en el mismo PR, probado por la puerta HTTP.
 
 ## Normative Docs
 
-- `.claude/skills/efeonce-mcp-platform/SKILL.md` + `references/native-authority.md` + `references/capability-intake.md` +
-  `references/verification-matrix.md` [verificar nombres de references]
-- Skill `mcp-craft` (descripciones de tools de escritura, anotaciones `destructiveHint`/`idempotentHint`, diseño de
-  errores, radar de protocolo antes de apoyarse en elicitation)
-- Skill `arch-architect` (decisión de delegación y deltas de ADR)
-- Skill `greenhouse-backend` (command semantics, errores canónicos) y `greenhouse-secret-hygiene` (secreto del cliente
-  confidencial de exchange)
-- `docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`, `docs/operations/runbooks/auth-server.md`,
-  `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`
+- Skills: `efeonce-marketing-studio` (contrato de mantenimiento obligatorio al cerrar), `efeonce-mcp-platform`,
+  `mcp-craft` (anotaciones, descripciones de tools de escritura, errores), `greenhouse-backend`, `greenhouse-postgres`
+  (migraciones de clientes OAuth), `greenhouse-secret-hygiene` (secreto del `api_client` rotado),
+  `greenhouse-production-release` (release de Greenhouse), `greenhouse-qa-release-auditor`,
+  `greenhouse-documentation-governor`.
+- `.claude/skills/efeonce-marketing-studio/references/{program-ledger,architecture-map,contracts,operations,lessons}.md`
+- `docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md` §Provider Marketing Studio
+- `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md`
+- `docs/operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md` (receta del canary de escritura con token humano)
+- `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`
 
 ## Dependencies & Impact
 
 ### Depends on
 
-- `TASK-1891`: provider `marketing-studio`, sync del manifiesto con `manifestHash`, guard bidireccional de lecturas,
-  bearer de servicio y secreto `marketing-studio-mcp-gateway-token`.
-- `TASK-1894`: commands de escritura en `packages/domain/src/commands/**` con `Idempotency-Key`, `If-Match`, `dryRun`,
-  auditoría append-only; tools de clase `write` con `requiresPerson` en el manifiesto; capability
-  `marketing_studio.campaign.write`; error `approval_requires_person`; campaña sandbox (Delta de TASK-1894 para
-  TASK-1895).
-- Emisor nativo `auth.efeonce.org` (EPIC-044, TASK-1828/1829/1830/1836/1844) con contexto interno v2 y ledger de `jti`.
-- Reader de acceso a producto de Greenhouse (TASK-1898 Slice 2). Es un primitive compartido: si esta task llega
-  antes, lo construye con el mismo contrato y TASK-1898 lo consume; el resto de TASK-1898 (login web, sesión de
-  Studio, cierre del modo `open`) **no** es requisito.
+- `TASK-1894` (bloqueante): el manifiesto sincronizable de Studio trae las tools de su tabla «Operaciones y tools»
+  con `writes: true`, `class` (`write` | `approve`), `requiresPerson`, `destructive`, `capability`, `apiScope`,
+  método y cabeceras (`Idempotency-Key`, `If-Match`) — entre ellas `studio.asset.upload.request`,
+  `studio.asset.version.create` (command `createAssetVersion`), `studio.asset.version.approve`,
+  `studio.campaign.creative.approve`, `studio.campaign.media.authorize`, `studio.campaign.brief.approve` y
+  `studio.media_plan.budget_line.approve`. Además: `dryRun` que devuelve diff y `revision` base sin escribir;
+  `audit_event`; `API_SCOPES` con `studio:assets:write` y `studio:write`; el puerto de autoridad de personas que niega
+  por defecto; capabilities `marketing_studio.asset.write` (grant: `efeonce_admin`, `efeonce_account`,
+  `efeonce_operations`, `designer`) y `marketing_studio.campaign.write` sembradas con grant.
+- `TASK-1891` (complete): provider `marketing-studio`, sync `pnpm studio:manifest:sync` con hash verificado al cargar,
+  guard `marketing-studio-tool-parity.ts`, canje RFC 8693 y cliente `efeonce-mcp-marketing-studio`.
+- `TASK-1893` (complete): bucket `efeonce-marketing-studio-originals`, `studio.media_object`, worker de derivados por
+  `OBJECT_FINALIZE`, descarga firmada `issueOriginalDownload` y capability `marketing_studio.asset.download`.
+- `TASK-1896` (complete): observabilidad y restauración; precondición de escrituras en producción cumplida.
 
 ### Blocks / Impacts
 
-- `MS-N7` del flujo maestro deja de ser sólo lectura cuando esta task cierra.
-- `TASK-1894`: pide dos deltas (ver Detailed Spec §Deltas a otras tasks): tools de aprobación propias y exigencia del
-  digest de confirmación en el kernel de commands para toda vía.
-- `TASK-1895` (UI de edición): el diálogo de confirmación de aprobaciones consume `dryRun` y envía el digest.
-- `TASK-1898`: reutiliza el reader de acceso a producto y el verificador JWKS del emisor.
-- `TASK-1896` (observabilidad): debe cerrar antes del flag ON en producción.
-- Futuras escrituras delegadas de otros productos: el grant RFC 8693 del emisor queda como primitive reutilizable con
-  allowlist de audiencias.
+- `MS-N7` del flujo maestro deja de ser sólo lectura.
+- `TASK-1895`: el diálogo de aprobación de la UI usa el mismo `dryRun` + `proposalDigest` que esta task pone en el
+  kernel de Studio.
+- `TASK-1898`: el actor `user` de sesión y el delegado comparten la forma `Actor` que esta task extiende con
+  `authority`.
+- Futuras escrituras de Studio (otras capabilities): se federan con la misma receta (cliente de canje por capability).
 
 ### Files owned
 
-- Repo `efeonce-mcp`: `src/providers/marketing-studio.ts` (carril de escritura), `src/providers/marketing-studio-tool-manifest.generated.ts`, `src/providers/marketing-studio-tool-parity.ts`, `src/auth/marketing-studio-delegation.ts` [nuevo], `src/auth/tool-policy.ts`, `src/config.ts`, `src/mcp.ts`, herramienta de status [verificar ruta], `.github/workflows/deploy.yml`, `scripts/marketing-studio-write-canary.mjs` [nuevo], `surface-baseline.json`, `package.json`, tests asociados.
-- Greenhouse: `src/lib/auth-server/oauth/scopes.ts` + `scopes.test.ts`, `src/lib/auth-server/oauth/token.ts`, `src/lib/auth-server/oauth/token-exchange.ts` [nuevo], `src/lib/auth-server/oauth/metadata.ts`, `src/lib/auth-server/oauth/audit.ts`, `src/lib/auth-server/oauth/clients.ts`, `src/lib/auth-server/internal/consent-context.ts` [verificar], `src/lib/identity/internal-access/target-authority.ts`, reader de acceso a producto `src/lib/identity/product-access/**` [verificar ruta; compartido con TASK-1898], `src/config/entitlements-catalog.ts`, `src/lib/entitlements/runtime.ts`, `migrations/*marketing-studio-approve-capability*`, `migrations/*mcp-marketing-studio-exchange-client*`, `services/auth-server/deploy.sh`, `docs/mcp/skills/marketing-studio/SKILL.md`, `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`, `docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md`, `docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md`, `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md`, `docs/architecture/marketing-studio/**`, `docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`, `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`, skill `efeonce-mcp-platform` (ambos espejos).
-- Repo `efeonce-marketing-studio`: `apps/web/src/server/auth/delegated-actor.ts` [nuevo], `packages/domain/src/actor.ts`, `packages/domain/src/commands/_kernel.ts` [verificar nombre], `packages/domain/src/confirmation-digest.ts` [nuevo], `packages/contracts/src/tool-manifest.ts`, `packages/contracts/src/errors.ts`, `apps/web/test/ui-write-parity.test.ts` [nuevo], `scripts/` de campaña sandbox [verificar].
+- Repo `efeonce-mcp`: `src/providers/marketing-studio.ts`, `src/providers/marketing-studio-tool-manifest.generated.ts` (sólo por sync), `src/providers/marketing-studio-tool-parity.ts`, `src/providers/marketing-studio-exchange-contracts.ts` [nuevo], `scripts/sync-marketing-studio-tool-manifest.mjs`, `src/auth/tool-policy.ts`, `src/app.ts` (challenge de scope por tool), `src/config.ts` (`MARKETING_STUDIO_WRITE_SCOPE`, flag de escrituras), `src/mcp.ts` (registro, mensajes de error y status), `src/surface.ts` [verificar si requiere cambio], `.github/workflows/deploy.yml`, `scripts/marketing-studio-canary.mjs`, `scripts/marketing-studio-write-session-canary.mjs` [nuevo], `surface-baseline.json`, `package.json` (`version`), `test/marketing-studio.test.ts`, `test/marketing-studio-mcp.test.ts`, `test/authorized-tools.test.ts`, `test/version.test.ts`.
+- Greenhouse: `src/lib/sister-platforms/mcp-token-exchange.ts` + `mcp-token-exchange.test.ts`, `src/lib/sister-platforms/oauth-broker.ts` (revalidación de capability en `userinfo` para la familia `marketing_studio`) + su test, `src/lib/auth-server/oauth/scopes.ts` + `scopes.test.ts`, `src/config/entitlements-catalog.ts` + `src/lib/entitlements/runtime.ts` (capability `marketing_studio.campaign.approve` y su grant), `migrations/*task-1899-marketing-studio-campaign-approve-capability*` [nuevo], `migrations/*task-1899-mcp-marketing-studio-exchange-clients*` [nuevo], `docs/mcp/skills/marketing-studio/SKILL.md`, `docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` (Delta), `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md`, `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` (§Agentes), `docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`, `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md`, `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`, skills `efeonce-marketing-studio` y `efeonce-mcp-platform` (ambos espejos).
+- Repo `efeonce-marketing-studio`: `apps/web/src/server/delegated-actor.ts` [nuevo], `apps/web/src/server/runtime.ts` (`resolveRequestActor`), `apps/web/src/server/api.ts` (`handle()`), `packages/domain/src/actor.ts`, el adaptador delegado del puerto de autoridad de personas que deja TASK-1894 [verificar ruta en `packages/domain`], `packages/domain/src/commands/confirmation.ts` [nuevo; junto al kernel `runCommand` de TASK-1894], `packages/contracts/src/errors.ts`, tests asociados.
 
 ## Current Repo State
 
 ### Already exists
 
-- Gateway `efeonce-mcp` multi-issuer con policy por tool (`allowedIssuers`, `nativeUnsupportedReason`,
-  `requiredCapabilities`, `organizationPolicy`), ocho clases de scope y el patrón de escritura con autoridad humana
-  delegada por exchange (TASK-1852, provider `greenhouse-client-services`).
-- Intercambio RFC 8693 en Greenhouse (`src/lib/sister-platforms/mcp-token-exchange.ts`): verifica la identidad de
-  workload del gateway (Google ID token) y el token Entra de la persona, y emite un token opaco `gh_mcp_*` con
-  audiencia Greenhouse (TTL 300 s). Sólo sirve a Greenhouse: Studio no puede verificarlo sin introspección.
-- Emisor nativo con JWT firmados por KMS, JWKS público, ledger de `jti`, `introspect` (RFC 7662) para clientes
-  confidenciales, consentimiento por scope y step-up para scopes de escritura; `grant_types_supported` =
-  `authorization_code`, `refresh_token`.
-- `src/lib/auth-server/oauth/scopes.ts` con `EFEONCE_MCP_WRITE_SCOPES` (cinco clases) y test de paridad contra el
-  gateway.
-- Reader de objetivo v2 `src/lib/identity/internal-access/target-authority.ts` (hoy sólo `growth.seo.observation.read`).
-- En Studio: `Actor` con `anonymous_open | api_client | user | operator_cli` (`packages/domain/src/actor.ts`); tras
-  TASK-1894, commands con `dryRun`, idempotencia, revisión y auditoría.
+- Gateway `efeonce-mcp` `1.9.0` (verificar la vigente al tomar la task): provider `marketing-studio` con 12 tools de
+  lectura del manifiesto `1.1.0`; flag `MARKETING_STUDIO_PROVIDER_ENABLED=true` en producción; secreto
+  `marketing-studio-mcp-gateway-token` montado en el paso de deploy; policy `unsupported(BASE_READ_SCOPE,
+  [tool.capability], 'marketing_studio_native_policy_missing')` por tool, derivada del manifiesto.
+- `authorizePerson` del provider canjea con `scope=marketing_studio.campaign.read` fijo y descarta el token canjeado;
+  `buildStudioUrl` sólo arma `GET` con query; `MarketingStudioManifestTool.method` es el literal `'GET'`.
+- Guard `computeMarketingStudioParity`: bidireccional, con `write_tool_without_scope_class` para toda tool `writes`.
+- Greenhouse `exchangeMcpGatewayToken`: verifica la identidad de workload del gateway (Google ID token de la SA),
+  el token Entra de la persona (`tid`, `azp`, `scp` con el input scope), resuelve el usuario interno y ejecuta
+  `can(persona, 'marketing_studio.campaign.read', 'read', 'tenant')`; emite un token opaco `gh_mcp_*` de 300 s en
+  `greenhouse_core.sister_platform_oauth_access_tokens`. El `userinfo`
+  (`/api/integrations/v1/sister-platforms/oauth/userinfo`) acepta ese token y devuelve `sub`
+  (`greenhouse:user:<id>`), `identityProfileId`, `email`, `capabilities`; revalida estado y tipo de tenant, **no**
+  vuelve a ejecutar `can()`.
+- Cliente `efeonce-mcp-marketing-studio` (`allowed_scopes = [marketing_studio.campaign.read]`, política con
+  `requireOnPrivilegedAction = true` tras el forward fix `20260926071321910`).
+- `src/lib/auth-server/oauth/scopes.ts`: `EFEONCE_MCP_WRITE_SCOPES` con cinco clases y test de paridad con el gateway.
+- Studio API `1.2.0`: 13 tools (incluye `studio.asset.download`, capability `marketing_studio.asset.download`,
+  `apiScope` `studio:assets:download`) + 5 exclusiones; `API_SCOPES = ['studio:read', 'studio:health',
+  'studio:assets:download']`; `Actor` con `anonymous_open | api_client | user | operator_cli`; `pnpm api-client:create`
+  admite varios `--scope`; `pnpm api-client:revoke`.
 
 ### Gap
 
-- Ninguna tool de escritura de Studio federada; ningún scope de clase para Studio.
-- El emisor no tiene grant `urn:ietf:params:oauth:grant-type:token-exchange` ni audiencias fuera del MCP.
-- El contexto v2 no delega capabilities de Studio; su consentimiento no describe clases de Studio.
-- Studio no conoce un actor `user` delegado por MCP ni verifica tokens del emisor.
-- No existe capability de aprobación separada de la de escritura [verificar tras TASK-1894].
-- No hay digest de confirmación ni guard que impida escrituras sólo-UI.
+- Ninguna tool de escritura federada; `studio.asset.download` sin federar.
+- El canje no sabe pedir otra capability que `campaign.read`; no hay clientes de canje para `asset.download`,
+  `asset.write` ni `campaign.approve`.
+- `userinfo` no revalida la capability: una revocación de rol entre el canje y el uso no se detecta.
+- Studio no conoce un actor delegado, no verifica el token canjeado ni exige confirmación con digest; su puerto de
+  autoridad de personas (TASK-1894) niega por defecto.
+- `marketing_studio.campaign.approve` no existe en Greenhouse (TASK-1894 siembra sólo `asset.write` y `campaign.write`).
+- El `api_client` del gateway no tiene `studio:assets:download`, `studio:assets:write` ni `studio:write`.
+- La clase `efeonce.mcp.marketing_studio.write` no existe en el gateway, en `scopes.ts` ni en el recurso Entra.
 
 ## Modular Placement Contract
 
 - Topology impact: `cross-runtime`
-- Current home: `repo efeonce-mcp (Cloud Run efeonce-mcp-gateway) + greenhouse-eo (services/auth-server y src/lib/auth-server, readers de identidad, capability) + repo efeonce-marketing-studio (apps/web server y packages/domain)`
+- Current home: `repo efeonce-mcp (Cloud Run efeonce-mcp-gateway, southamerica-west1) + greenhouse-eo (src/lib/sister-platforms, route handlers del broker OAuth en Vercel, migraciones de greenhouse_core) + repo efeonce-marketing-studio (apps/web server y packages/domain, Vercel)`
 - Future candidate home: `api`
-- Boundary: `el emisor autentica y emite la delegación (grant RFC 8693 con allowlist de actores y audiencias); Greenhouse autoriza (target-authority v2 y reader de acceso a producto); el gateway transporta y aplica scope y policy por nombre de tool; Studio verifica la delegación, relee autoridad y ejecuta sólo por sus commands`
-- Server/browser split: `sólo server-side; ningún token delegado, digest ni secreto llega al navegador`
-- Build impact: `none sobre el bundle del portal; en Studio, una dependencia JOSE server-only (la misma que elija TASK-1898, una sola)`
-- Extraction blocker: `none — cada pieza vive en su runtime; el emisor ya es un servicio propio`
+- Boundary: `Greenhouse autoriza (canje RFC 8693 por capability exacta y userinfo con revalidación); el gateway transporta y aplica scope y policy por nombre de tool; Studio verifica la delegación, relee la autoridad en userinfo y ejecuta sólo por sus commands; GCS recibe los bytes directo del agente`
+- Server/browser split: `sólo server-side; ningún token canjeado, digest de confirmación ni secreto llega a un navegador`
+- Build impact: `none en el bundle del portal; en Studio, sin dependencias nuevas (fetch a userinfo)`
+- Extraction blocker: `none — cada pieza vive en su runtime`
 
 ## Backend/Data Contract
 
@@ -218,58 +239,60 @@ Reglas obligatorias:
 
 - Backend rigor: `backend-critical`
 - Impacto principal: `integration`
-- Source of truth afectado: `superficie pública del gateway MCP; catálogo de scopes y grants del emisor auth.efeonce.org; capabilities marketing_studio.* en Greenhouse; studio.audit_event (autor real de cada escritura)`
-- Consumidores afectados: `Claude, Codex, ChatGPT y agentes internos conectados a mcp.efeonce.org; UI de Studio (TASK-1895) vía el digest de confirmación; futuros productos con delegación`
-- Runtime target: `production (Cloud Run efeonce-mcp-gateway, Cloud Run efeonce-auth-server compartido staging/producción, Vercel de studio.efeonce.org, Vercel de Greenhouse)`
+- Source of truth afectado: `superficie pública del gateway MCP; greenhouse_core.sister_platform_oauth_clients (clientes de canje) y sister_platform_oauth_access_tokens; capabilities marketing_studio.* en Greenhouse; studio.audit_event (autor real de cada escritura); bucket efeonce-marketing-studio-originals (bytes)`
+- Consumidores afectados: `Claude, Codex, ChatGPT y agentes internos conectados a mcp.efeonce.org; UI de Studio (TASK-1895) por el digest de confirmación; CLI studio:upload (TASK-1894) por el mismo command`
+- Runtime target: `production (Cloud Run efeonce-mcp-gateway, Vercel de Greenhouse, Vercel de studio.efeonce.org, Entra «Efeonce MCP Resource»)`
 
 ### Contract surface
 
-- Contrato existente a respetar: `manifiesto de Studio (TASK-1890/1894) y su guard; OpenAPI v1 de Studio; errores { error, code, actionable }; policy por tool del gateway; contrato OAuth del emisor; D8–D11; ADR de relying parties`
-- Contrato nuevo o modificado: `tools de clase write/approve de Studio en el gateway; scopes efeonce.mcp.marketing_studio.write y efeonce.mcp.marketing_studio.approve; grant token-exchange en POST /oauth/token (audiencia allowlisted https://studio.efeonce.org); token delegado typ delegated+jwt; header Efeonce-Delegated-Token hacia Studio; campo confirmation.proposalDigest en aprobaciones y destructivas; capability marketing_studio.campaign.approve`
-- Backward compatibility: `compatible (minor en el gateway: agrega tools; el emisor agrega un grant detrás de flag y no cambia los existentes)`
-- Full API parity: `UI, API, CLI y MCP invocan el mismo command de Studio; el guard ui-write-parity impide una mutación de la UI sin operación OpenAPI, y el guard del gateway impide una operación de escritura sin tool ni exclusión`
+- Contrato existente a respetar: `manifiesto studio-tool-manifest de Studio y su hash; OpenAPI v1; errores { error, code, actionable } de Studio; policy por tool del gateway; contrato del canje RFC 8693 de Greenhouse (grant, input scope por clase, cliente confidencial); userinfo del broker; ADR de fuente única`
+- Contrato nuevo o modificado: `clase efeonce.mcp.marketing_studio.write; canje con scope = capability de la tool y cuatro clientes nuevos; capability marketing_studio.campaign.approve; userinfo con revalidación de capability para la familia marketing_studio; cabecera Efeonce-Delegated-Token hacia Studio; actor user delegado con authority; campo confirmation.proposalDigest en tools requiresPerson; errores Studio delegation_required, delegation_invalid, delegation_insufficient, delegation_unavailable, confirmation_required, confirmation_mismatch; errores gateway conflict, confirmation_required, upstream_timeout_unknown_outcome`
+- Backward compatibility: `compatible — minor del gateway (agrega tools); las lecturas campaign.read conservan su camino (sin reenvío de token); userinfo agrega una revalidación sólo para clientes marketing_studio`
+- Full API parity: `CLI, MCP y UI invocan createAssetVersion y los commands de aprobación de Studio; la tool no agrega lógica; el guard del gateway impide una tool writes sin contrato de canje`
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: `greenhouse_auth (clients, audit y ledger de tokens del emisor) [verificar schema]; greenhouse_core.capabilities_registry (+marketing_studio.campaign.approve); studio.audit_event (actor user delegado); studio.idempotency_record (sin cambios de forma)`
+- Entidades/tablas/views afectadas: `greenhouse_core.sister_platform_oauth_clients (4 filas nuevas); greenhouse_core.capabilities_registry (+marketing_studio.campaign.approve); greenhouse_core.sister_platform_oauth_access_tokens (sin cambio de forma); studio.audit_event (actor user delegado; columnas según TASK-1894 [verificar nombres]); studio.api_client (cliente del gateway rotado); sin tablas nuevas`
 - Invariantes que no se pueden romper:
-  - Cada operación de escritura del OpenAPI de Studio tiene exactamente una tool federada o una exclusión con razón; cada tool federada existe en el manifiesto; el guard falla nombrando la diferencia.
-  - Ninguna mutación de la UI de Studio usa una ruta u operación ausente del OpenAPI ni una server action que escriba; el test `ui-write-parity` falla nombrando el archivo.
-  - Toda aprobación es una tool propia con `requiresPerson: true` y scope `...approve`; ninguna tool genérica de transición o de presupuesto acepta un destino de aprobación.
-  - Studio acepta una escritura delegada sólo si el token delegado es válido (firma JWKS del emisor, `iss`, `aud`, `typ`, `exp` ≤ 300 s, `jti` no repetido) **y** el bearer de servicio pertenece al `api_client` del gateway **y** `act.sub` coincide con el actor registrado para ese `api_client`.
-  - El token delegado nunca crea sesión en Studio ni sirve para otra audiencia; el token MCP de la persona nunca llega a Studio.
-  - Studio relee capability (`marketing_studio.campaign.write` o `.approve`) y membership de la persona sobre la organización de la campaña en cada llamada, sin caché positiva; `organizationId` del input debe coincidir con `campaign.organization_id` o responde `404` anti-oráculo.
-  - Un `api_client` sin token delegado nunca aprueba: `403 approval_requires_person` antes de abrir transacción.
-  - `dryRun` no escribe ninguna fila (ni entidad, ni `idempotency_record`, ni `audit_event`) y devuelve el diff, la `revision` base y el `proposalDigest`.
-  - Una aprobación o una escritura destructiva sin `confirmation.proposalDigest` responde `428 confirmation_required`; con un digest que no coincide con el recalculado sobre el estado vigente, `409 confirmation_mismatch`; en ambos casos sin escribir.
-  - El `audit_event` de toda escritura delegada registra `actor = user:<subject>`, `via = mcp:<clientId>`, `authority.kind = delegated_oauth`, `accessTokenId` (el `jti` del token delegado) y `correlationId`; nunca el token, el digest como credencial ni claims crudos.
-  - El gateway nunca genera la `Idempotency-Key`: la recibe del agente y la reenvía; ante timeout responde `upstream_timeout_unknown_outcome` y no reintenta por su cuenta.
-- Write-target allowlist: `N/A — ni el gateway ni el emisor escriben en tablas de dominio; Studio mantiene su domain-boundary-gate (sólo packages/domain/src/commands e import escriben en studio.*)`
-- Tenant/space boundary: `persona (token nativo v2) → organizationId explícito → target-authority v2 en el gateway antes del dispatch → token delegado con sub de la persona → Studio relee el reader de acceso a producto y compara con campaign.organization_id`
-- Idempotency/concurrency: `Idempotency-Key obligatorio en ejecuciones (input idempotencyKey de la tool, reutilizado en reintentos y entre dryRun y ejecución); If-Match desde el input expectedRevision; 412 obliga a releer y volver a proponer; jti del token delegado de un solo uso en Studio (replay → 401); el exchange no se cachea entre llamadas`
-- Audit/outbox/history: `studio.audit_event append-only con autor real; audit del emisor por cada exchange (token_exchange_granted | token_exchange_denied con razón cerrada); logs del gateway con correlationId y sujeto hasheado; sin outbox`
+  - Cada tool `writes: true` del manifiesto sincronizado está registrada en el gateway, exige la clase `efeonce.mcp.marketing_studio.write` y su `capability` tiene contrato de canje; si falta cualquiera de las tres cosas, el guard falla nombrando la tool.
+  - El canje pide exactamente `tool.capability`; la respuesta se acepta sólo si su `scope` es idéntico. Una tool nunca canjea con la capability de otra.
+  - Cada cliente de canje admite exactamente un scope (`allowed_scopes`, `requiredScopes` y `capabilityScopes` de un elemento) y su política valida con `sisterPlatformOAuthPolicyV1Schema` con `revocation.requireOnPrivilegedAction = true`.
+  - `userinfo` de un token de la familia `marketing_studio` vuelve a ejecutar `can(persona, capability, acción, 'tenant')` y responde 403 si ya no la tiene.
+  - Studio acepta `Efeonce-Delegated-Token` sólo si el bearer de servicio es un `api_client` listado en `STUDIO_DELEGATION_TRUSTED_API_CLIENT_IDS`; la capability requerida por la operación está en `capabilities` del `userinfo`; y el `userinfo` respondió 200 en esa misma llamada.
+  - Un `api_client` confiable sin `Efeonce-Delegated-Token` en una operación de escritura recibe `403 delegation_required` antes de abrir transacción: el gateway nunca queda como actor.
+  - Con `userinfo` inaccesible o con timeout, Studio responde `503 delegation_unavailable` sin escribir (fail-closed, sin caché).
+  - El token canjeado nunca se registra en logs, `audit_event`, respuestas ni errores; el `audit_event` guarda `actor = user:<sub>`, `authority.kind = delegated_oauth`, `via = mcp`, la capability y el `correlationId` del canje.
+  - Las lecturas `marketing_studio.campaign.read` no reenvían el token (camino de TASK-1891 intacto); `studio.asset.download` y toda escritura sí.
+  - Una tool `requiresPerson` o `destructive` sin `confirmation.proposalDigest` responde `428 confirmation_required`; con un digest distinto del recalculado sobre el estado vigente, `409 confirmation_mismatch`; ambas sin escribir. Vale para toda puerta (CLI, UI, MCP).
+  - `dryRun` no escribe filas (ni entidad, ni `idempotency_record`, ni `audit_event`) y devuelve `diff`, `baseRevision` y `proposalDigest`.
+  - El gateway nunca genera `Idempotency-Key` ni reintenta una escritura; ante timeout responde `upstream_timeout_unknown_outcome`.
+  - La URL firmada de subida es de vida corta y apunta a un solo objeto que define TASK-1894 conforme al ADR (`originals/sha256/<2 primeros hex>/<sha256>` con `ifGenerationMatch=0`); el gateway no la interpreta ni la modifica y sólo aparece en la respuesta de la tool, nunca en logs.
+- Write-target allowlist: `N/A — el gateway no escribe en tablas; Greenhouse sólo inserta filas de clientes OAuth por migración; Studio conserva su domain-boundary-gate (sólo commands e import escriben en studio.*)`
+- Tenant/space boundary: `persona Entra interna (tenantType efeonce_internal) → canje con la capability de la tool → Studio revalida en userinfo → Studio intersecta con organization_ids del api_client del gateway y con campaign.organization_id; organización ajena = 404 anti-oráculo`
+- Idempotency/concurrency: `Idempotency-Key obligatorio en ejecuciones (input idempotencyKey que el agente reutiliza en reintentos); If-Match desde expectedRevision; createAssetVersion además idempotente por sha256; 412 obliga a releer y volver a proponer; el canje no se cachea entre llamadas`
+- Audit/outbox/history: `studio.audit_event append-only con la persona; audit del broker en Greenhouse (token_success del canje + userinfo_success/userinfo_reject de Studio) enlazado por correlationId; logs del gateway con correlationId y sujeto hasheado; sin outbox`
 
 ### Migration, backfill and rollout
 
-- Migration posture: `additive — seed de capability marketing_studio.campaign.approve con grant a roles reales; alta del cliente confidencial efeonce-mcp-marketing-studio en el emisor por command gobernado o migración seed [verificar mecanismo vigente]; sin DROP`
-- Default state: `MARKETING_STUDIO_MCP_WRITES_ENABLED=false en el gateway; AUTH_SERVER_TOKEN_EXCHANGE_ENABLED=false en el emisor; STUDIO_DELEGATED_ACTOR_ENABLED=false en Studio; ningún cliente porta las clases nuevas`
-- Backfill plan: `sin backfill de datos; la delegación de las clases de Studio en v2 exige consentimiento fresco por cliente (D10), nunca se promueve un consentimiento previo`
-- Rollback path: `flag del gateway a false + redeploy (las tools responden policy_blocked); flag del emisor a false (deja de emitir delegaciones; las vigentes vencen en ≤ 300 s); flag de Studio a false (rechaza delegados); revocar el consentimiento de la clase por cliente; revert de PR en cada repo`
-- External coordination: `secreto del cliente confidencial de exchange en Secret Manager (scalar crudo) con secretAccessor sólo para la SA del gateway; deploy.sh del emisor y deploy.yml del gateway declaran todas sus variables (--set-env-vars destructivo); release de Greenhouse con scopes, capability y reader antes del deploy del gateway; una sesión humana para el consentimiento con step-up y el canary`
+- Migration posture: `additive — dos migraciones de Greenhouse: capability marketing_studio.campaign.approve (INSERT … ON CONFLICT + bloque DO) y cuatro clientes de canje (INSERT … ON CONFLICT DO NOTHING + bloque DO que valida el contrato exacto); sin DROP; ninguna migración en Studio`
+- Default state: `MARKETING_STUDIO_MCP_WRITES_ENABLED=false (gateway) y STUDIO_DELEGATED_ACTOR_ENABLED=false (Studio); los clientes nuevos inertes hasta que GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS los liste; ningún token de persona porta la clase hasta que la persona la consienta`
+- Backfill plan: `N/A — sin datos que migrar`
+- Rollback path: `gateway: MARKETING_STUDIO_MCP_WRITES_ENABLED=false + dispatch (tools de escritura responden policy_blocked sin canje); Studio: STUDIO_DELEGATED_ACTOR_ENABLED=false (rechaza el token delegado); Greenhouse: quitar los cuatro clientes de GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS + redeploy (el canje responde invalid_client); revert de PR en cada repo`
+- External coordination: `release de Greenhouse por el control plane; env de Vercel Production de Greenhouse (allowlist) + redeploy; scope nuevo en la app Entra «Efeonce MCP Resource» con round-trip verificado; nuevo api_client del gateway en Studio y nueva versión del secreto marketing-studio-mcp-gateway-token; variables de GitHub de efeonce-mcp; una persona para el consentimiento y el canary`
 
 ### Security and access
 
-- Auth/access gate: `gateway: issuer nativo (contexto interno v2) + scope de clase exacto + requiredCapabilities + organizationPolicy membership con target-authority; emisor: subject token nativo vigente con la clase, actor allowlisted (identidad de workload de la SA del gateway + cliente confidencial), audiencia allowlisted; Studio: bearer del api_client del gateway + token delegado + capability y membership releídas`
-- Sensitive data posture: `presupuestos propuestos y aprobados, copys, configuración de anuncios, URLs firmadas de subida (credencial efímera de un objeto); sin PII personal; tokens, secretos y URLs firmadas nunca en logs`
-- Error contract: `Studio: approval_requires_person 403, confirmation_required 428, confirmation_mismatch 409, delegation_invalid 401, más los de TASK-1894; gateway: insufficient_scope (403 con challenge), policy_blocked (writes_disabled, native_delegation_unavailable), not_found anti-oráculo, conflict (412 con instrucción de releer), invalid_request, upstream_unavailable, upstream_timeout_unknown_outcome; emisor: invalid_grant, invalid_target, unauthorized_client, códigos cerrados sin detalle JOSE`
-- Abuse/rate-limit posture: `rate limit del gateway por persona y tool (aprobaciones con cupo menor que ediciones); rate limit del grant de exchange por actor; jti de un solo uso; TTL corto; sin caché positiva de autoridad`
+- Auth/access gate: `gateway: issuer Entra + scope base + clase efeonce.mcp.marketing_studio.write (403 insufficient_scope con challenge que la nombra) + flag; Greenhouse: identidad de workload de la SA del gateway + cliente confidencial por capability + can(persona, capability) en el canje y en userinfo; Studio: api_client confiable + token delegado revalidado + organización`
+- Sensitive data posture: `copys, presupuestos, estados de aprobación, URLs firmadas de subida y descarga (credenciales efímeras de un objeto); email de la persona en userinfo (no se persiste en Studio más allá del actor); tokens y URLs firmadas nunca en logs`
+- Error contract: `ver Detailed Spec §Mapa de errores`
+- Abuse/rate-limit posture: `canje por llamada sin caché; token canjeado de 300 s; URLs firmadas de vida corta y de un solo objeto; límites de tamaño y mime los aplica createAssetVersion (TASK-1894); el gateway no reintenta escrituras`
 
 ### Runtime evidence
 
-- Local checks: `pnpm check en efeonce-mcp (guard bidireccional, policy, delegación, versión, surface); pnpm check en Studio (verificación de token delegado con JWKS de prueba, requiresPerson, digest, ui-write-parity); pnpm local:check + pnpm test src/lib/auth-server src/lib/identity src/lib/entitlements en Greenhouse`
-- DB/runtime checks: `capability y grant presentes en capabilities_registry; cliente confidencial registrado y activo en el emisor; audit del emisor con token_exchange_granted por cada ejecución del canary; studio.audit_event con actor user delegado y via mcp`
-- Integration checks: `canary de escritura contra producción sobre campaña sandbox: allow, deny (sin capability; máquina sin persona aprobando; organización ajena), fault (Studio caído; emisor sin exchange), reintento idempotente, 412, confirmación ausente y alterada`
-- Reliability signals/logs: `efeonce.gateway.status reporta el carril de escritura de marketing-studio; logs del emisor token_exchange_*; logs de Studio con correlationId; señales de TASK-1896`
+- Local checks: `efeonce-mcp: pnpm check (guard, policy, canje por capability, transporte, errores, versión, surface); efeonce-marketing-studio: pnpm check (actor delegado con userinfo simulado, delegation_required, digest, errores); Greenhouse: pnpm local:check + pnpm test src/lib/sister-platforms src/lib/auth-server src/lib/entitlements`
+- DB/runtime checks: `capability marketing_studio.campaign.approve en capabilities_registry; cuatro clientes activos con el contrato exacto (SELECT de verificación en la migración y readback por pg:connect); studio.audit_event del canary con actor user y authority delegated_oauth (proxy de Studio en 15433); audit del broker con token_success y userinfo_success por cada escritura del canary`
+- Integration checks: `sesión MCP real contra https://mcp.efeonce.org/mcp con token humano (PKCE): tools/list, subida completa, dryRun + confirmación de aprobación, descarga, casos negativos; ver Verification`
+- Reliability signals/logs: `efeonce.gateway.status con el carril de escritura; logs del broker (token_success, userinfo_success/userinfo_reject); logs de Studio con correlationId; señales de TASK-1896`
 - Production verification sequence: `ver Rollout Plan`
 
 ### Acceptance criteria additions
@@ -283,12 +306,11 @@ Reglas obligatorias:
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] La regla de negocio vive en los commands de Studio; el gateway y el emisor no deciden nada de campañas.
-- [ ] Toda escritura y aprobación es un command con authorization fina por persona, idempotencia, auditoría y errores canónicos.
-- [ ] Capability `marketing_studio.campaign.approve` (si no existe) + grant a ≥1 rol real + coverage test en el mismo PR.
-- [ ] Camino programático completo: UI → `/api/v1` → tool MCP, verificado por los dos guards.
-- [ ] Writes aptos para `propose → confirm → execute` (`dryRun` + digest + confirmación humana).
-- [ ] Un primitive, muchos consumers: UI, CLI, API y MCP invocan el mismo command.
+- [ ] La regla de negocio vive en los commands de Studio; el gateway y Greenhouse no deciden nada de campañas.
+- [ ] Toda escritura y aprobación federada es un command con autorización por persona, idempotencia, auditoría y errores canónicos.
+- [ ] `marketing_studio.campaign.approve` sembrada por esta task en catálogo TS + `capabilities_registry` + grant en `runtime.ts` a `efeonce_admin`, `efeonce_account` y `efeonce_operations`, con `capability-grant-coverage.test.ts` verde en el mismo PR; las demás (`asset.write`, `campaign.write` de TASK-1894 y `asset.download` de TASK-1893) verificadas.
+- [ ] Camino programático completo: CLI → `/api/v1` → tool MCP sobre el mismo command.
+- [ ] Aprobaciones aptas para `propose → confirm → execute` (`dryRun` + `proposalDigest` + confirmación humana).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -305,243 +327,335 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Decisión y contratos
+### Slice 1 — Greenhouse: canje por capability, clientes, userinfo, paridad de scope y manual
 
-- Delta en `EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md`: clases `marketing_studio.write` y `marketing_studio.approve`,
-  delegación por token RFC 8693 con audiencia de producto y el porqué frente a las alternativas descartadas.
-- Delta en `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md`: incorporación de las clases de Studio al contexto v2 con
-  consentimiento fresco (D10), sin tocar lo ya consentido.
-- Delta en `EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`: grant `token-exchange`, claims del token delegado, allowlists,
-  TTL, auditoría y errores.
-- Delta en `MCP_TOOL_SURFACE_INVARIANTS.md`: «aprobación = tool propia», digest de confirmación, `requiresPerson`.
-- Deltas pedidos a TASK-1894 y TASK-1895 registrados en esas tasks (tools de aprobación propias; digest en el kernel).
+- `src/lib/sister-platforms/mcp-token-exchange.ts`:
+  - Constantes nuevas: `MCP_MARKETING_STUDIO_WRITE_INPUT_SCOPE = 'efeonce.mcp.marketing_studio.write'` y los cuatro
+    client ids de la tabla de Detailed Spec §Contratos de canje.
+  - `resolveScopeContract` agrega cuatro contratos (`asset.download`, `asset.write`, `campaign.write`,
+    `campaign.approve`) con `resourceFamily: 'marketing_studio'`, `requireWorkspaceBinding: false`, su input scope y su
+    client id; el tipo `McpTokenExchangeResult['scope']` suma las cuatro capabilities.
+  - `authorizeMarketingStudio(tenant, capability, action)` reemplaza la versión fija: ejecuta
+    `can(persona, capability, action, 'tenant')` con la acción de la tabla (misma forma del sujeto que hoy).
+  - `assertFederatedClient` **no cambia** (sigue exigiendo un scope por cliente).
+- `src/lib/sister-platforms/oauth-broker.ts`: en `resolveSisterPlatformOAuthUserinfo`, si el cliente tiene
+  `metadata.resourceFamily = 'marketing_studio'`, volver a ejecutar `can()` con la capability del token y su acción;
+  si ya no la tiene, `403 user_not_eligible` y `userinfo_reject` en el audit. Los demás clientes no cambian.
+- Capability `marketing_studio.campaign.approve`: `pnpm migrate:create task-1899-marketing-studio-campaign-approve-capability`
+  (INSERT en `greenhouse_core.capabilities_registry`, módulo `marketing_studio`, acción de aprobación, scopes
+  `organization`/`tenant`, descripción es-CL que diga que aprobar registra una decisión y no publica; bloque DO; Down =
+  `deprecated_at`), entrada en `src/config/entitlements-catalog.ts` y grant en `src/lib/entitlements/runtime.ts` a
+  `efeonce_admin`, `efeonce_account` y `efeonce_operations` (nunca `designer`), con `capability-grant-coverage.test.ts`
+  verde. Patrón: `20260926075619118_task-1893-marketing-studio-asset-download-capability.sql`.
+- Migración `pnpm migrate:create task-1899-mcp-marketing-studio-exchange-clients`: cuatro filas en
+  `greenhouse_core.sister_platform_oauth_clients` copiadas de la forma de `efeonce-mcp-marketing-studio`
+  (consumer `spc-efeonce-mcp-gateway`, `confidential`, `require_human_session = FALSE`, TTL 300 s,
+  `redirect_uris = ['https://mcp.efeonce.org/mcp']`), cada una con un solo scope, política con
+  `revocation = {mode: userinfo_revalidation, revalidateAfterSeconds: 60, requireOnPrivilegedAction: true}` y
+  `metadata_json.resourceFamily = 'marketing_studio'`, `taskId = 'TASK-1899'`. Bloque DO que aborta si alguna fila no
+  quedó con el contrato exacto. Down: `DELETE` de las cuatro filas.
+- Test nuevo que carga las filas sembradas (o sus literales) y las parsea con `sisterPlatformOAuthPolicyV1Schema`.
+- `src/lib/auth-server/oauth/scopes.ts`: agregar `efeonce.mcp.marketing_studio.write` a `EFEONCE_MCP_WRITE_SCOPES`
+  con su comentario de clase; `scopes.test.ts` verifica que no aparece en `PUBLISHED_SCOPES_SUPPORTED`.
+- Manual servido `docs/mcp/skills/marketing-studio/SKILL.md`: flujo de subida en dos pasos con ejemplo de `curl`,
+  inferencia por nombre canónico (`CMP001-02 - <título> - 4x5.png`) y preguntar sólo lo que falte, tipo de licencia
+  obligatorio, estado `verifying` (esperar `retryAfterSeconds` y repetir con la misma `idempotencyKey`, o consultar
+  `studio.asset.get`; nunca volver a subir ni cambiar la llave),
+  protocolo `dryRun` → confirmación, qué hacer ante 412/428/409/`upstream_timeout_unknown_outcome`, que aprobar es de la
+  persona, `appliesTo` con las tools nuevas. `pnpm mcp:skills:generate` + `pnpm mcp:skills:check` (leak test: sin ids,
+  rutas, org ids ni secretos).
+- Tests: `mcp-token-exchange.test.ts` (cada capability con su cliente e input scope; capability de otra tool rechazada;
+  persona sin capability 403; cliente con dos scopes rechazado), test de `userinfo` (revocación entre canje y uso ⇒ 403).
+- Release de Greenhouse por el control plane (`greenhouse-production-release`) y, después, agregar
+  `efeonce-mcp-marketing-studio-asset-download,efeonce-mcp-marketing-studio-asset-write,efeonce-mcp-marketing-studio-campaign-write,efeonce-mcp-marketing-studio-campaign-approve` a
+  `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` en Vercel Production (y staging), conservando los valores
+  actuales, + redeploy. Verificar con `vercel env ls` y un canje de prueba.
 
-### Slice 2 — Greenhouse: scopes, capability y autoridad
+### Slice 2 — Entra: exponer la clase en el recurso
 
-- `scopes.ts`: agregar `efeonce.mcp.marketing_studio.write` y `efeonce.mcp.marketing_studio.approve` a
-  `EFEONCE_MCP_WRITE_SCOPES` con su comentario de clase; `scopes.test.ts` en paridad con el gateway; ninguno se publica
-  como mínimo.
-- Capability `marketing_studio.campaign.approve` en `entitlements-catalog.ts` + seed en `capabilities_registry` + grant
-  en `runtime.ts` a roles reales de `src/config/role-codes.ts` (ver Open Questions) + `capability-grant-coverage.test.ts`
-  verde. Si TASK-1894 ya la creó, sólo se verifica.
-- `target-authority.ts`: el contexto v2 resuelve `marketing_studio.campaign.write` y `.approve` sobre el objetivo exacto,
-  con la misma precedencia de permisos y sin caché positiva.
-- Consentimiento del contexto v2: descripción de las dos clases (copy es-CL validado con `greenhouse-ux-writing`),
-  step-up obligatorio, versión de contexto nueva.
-- Reader de acceso a producto (primitive compartido con TASK-1898): «¿este sujeto tiene capability X de
-  `marketing_studio` sobre la organización Y?», lane ecosystem con credencial de consumer de Studio.
+- Agregar el scope delegado `efeonce.mcp.marketing_studio.write` (consentimiento de administrador, descripción es-CL) a
+  la app Entra «Efeonce MCP Resource». `az ad app update` **reemplaza** el arreglo completo: leer el arreglo vigente,
+  agregar uno, escribir, releer y comprobar que están todos los anteriores más el nuevo (conteo antes → después).
+- **No** tocar el `requiredResourceAccess` del cliente público `32617b87-e7ef-493a-838f-1ff3f0213b93` ni de ningún
+  otro cliente.
+- Si el recurso Entra no admite el cambio sin afectar otros scopes, detener y escalar al operador.
 
-### Slice 3 — Emisor: grant RFC 8693 con audiencia de producto
+### Slice 3 — Studio: actor delegado y confirmación
 
-- `token-exchange.ts` + rama en `token.ts`: `grant_type=urn:ietf:params:oauth:grant-type:token-exchange`,
-  `subject_token` = access token nativo de la persona (se verifica firma, `jti` en el ledger, revocación, contexto v2 y
-  que porte la clase pedida), `actor_token` = ID token de workload de la SA del gateway, autenticación del cliente
-  confidencial `efeonce-mcp-marketing-studio`, `audience` en allowlist (`https://studio.efeonce.org`).
-- Mapeo cerrado clase → scope de producto: `efeonce.mcp.marketing_studio.write` → `studio:write`,
-  `efeonce.mcp.marketing_studio.approve` → `studio:approve`. Nada más se puede pedir.
-- Token emitido: JWT `typ=delegated+jwt`, `iss`, `aud` Studio, `sub` de la persona, `act.sub` del cliente de exchange,
-  `azp` = cliente MCP original, `scope`, `jti`, `exp` ≤ 300 s, sin refresh token.
-- Flag `AUTH_SERVER_TOKEN_EXCHANGE_ENABLED` (default `false`) + allowlists en `services/auth-server/deploy.sh`;
-  `grant_types_supported` lo anuncia sólo con el flag ON. Auditoría `token_exchange_granted|denied`.
-- Tests: replay, subject revocado, subject sin la clase, audiencia fuera de allowlist, actor no allowlisted, token MCP
-  presentado como delegado, TTL, rate limit.
+- `apps/web/src/server/delegated-actor.ts` + adaptador delegado del puerto de autoridad de personas de TASK-1894 (que
+  hoy niega por defecto): con `STUDIO_DELEGATED_ACTOR_ENABLED=true` y un bearer `api_client` cuyo id
+  está en `STUDIO_DELEGATION_TRUSTED_API_CLIENT_IDS`, si llega `Efeonce-Delegated-Token`:
+  1. `GET STUDIO_GREENHOUSE_USERINFO_URL` con `Authorization: Bearer <token>` (timeout 5 s; en staging, cabecera
+     `x-vercel-protection-bypass` sólo hacia esa URL exacta).
+  2. 200 ⇒ `Actor { kind: 'user', subject: <sub>, identityProfileId, organizationIds: <del api_client>, authority:
+     { kind: 'delegated_oauth', via: 'mcp', capabilities, correlationId: <x-correlation-id de userinfo> } }`.
+     401 ⇒ `401 delegation_invalid`; 403 ⇒ `403 delegation_insufficient`; 5xx, red o timeout ⇒
+     `503 delegation_unavailable`. Nunca caché.
+  3. La operación exige que su `capability` (la del registro de operaciones) esté en `authority.capabilities`; si no,
+     `403 delegation_insufficient`.
+- Sin cabecera, un `api_client` confiable que llama una operación de escritura recibe `403 delegation_required`; sus
+  lecturas siguen como hoy. Con el flag OFF, la cabecera se rechaza con `401 delegation_invalid`.
+- `packages/domain/src/actor.ts`: `user` suma `authority` opcional; `audit_event` registra la persona y
+  `authority.kind`, sin el token.
+- Confirmación (dueña esta task, ADR §9 y TASK-1894 §Out of Scope): función de dominio que calcula `proposalDigest` =
+  SHA-256 hex del JSON canónico (claves ordenadas) de `{ operationId, entityId, baseRevision, payload normalizado,
+  actor.subject }`; `dryRun` de toda operación `requiresPerson` o `destructive` lo devuelve; la ejecución lo exige
+  (428/409). Aplica a toda puerta (CLI, UI, MCP).
+- Errores nuevos en `packages/contracts/src/errors.ts` con copy es-CL y `actionable`: `delegation_required`,
+  `delegation_invalid`, `delegation_insufficient`, `delegation_unavailable`, `confirmation_required`,
+  `confirmation_mismatch`.
+- Nuevo `api_client` del gateway: `pnpm api-client:create --label "Efeonce MCP gateway" --org
+  org-2df565fb-98aa-42f7-b324-ea9a2209017f --scope studio:read --scope studio:assets:download --scope studio:assets:write
+  --scope studio:write --token-only | gcloud secrets versions add marketing-studio-mcp-gateway-token
+  --data-file=-` contra la base de producción (proxy 15433). Anotar el id (no el token) en
+  `STUDIO_DELEGATION_TRUSTED_API_CLIENT_IDS`. El cliente anterior se revoca en Slice 5, paso 8.
+- Env en Vercel de Studio (Production y Preview): `STUDIO_DELEGATED_ACTOR_ENABLED=false`,
+  `STUDIO_DELEGATION_TRUSTED_API_CLIENT_IDS`, `STUDIO_GREENHOUSE_USERINFO_URL`; push a `main`.
+- Tests: `userinfo` simulado (200, 401, 403, 5xx, timeout), cliente no confiable con cabecera, capability ausente,
+  `delegation_required`, digest (ausente, alterado, revisión movida), `dryRun` sin filas, redacción del token.
 
-### Slice 4 — Studio: actor delegado, guardas de aprobación y digest
+### Slice 4 — Gateway: carril de escritura del provider
 
-- `delegated-actor.ts`: con `STUDIO_DELEGATED_ACTOR_ENABLED=true`, una llamada con bearer del `api_client` del gateway
-  y header `Efeonce-Delegated-Token` construye `Actor { kind: 'user', subject, via: 'mcp:<azp>', authority:
-  'delegated_oauth', accessTokenId }`. Verificación JWKS del emisor, `typ`, `aud`, `act.sub` ligado al `api_client`,
-  `jti` de un solo uso. Sin el header, el actor sigue siendo el `api_client`.
-- Autorización por persona en cada llamada con el reader de acceso a producto (Slice 2) y comparación con
-  `campaign.organization_id`.
-- Kernel de commands: `requiresPerson` ⇒ `approval_requires_person` para actores sin persona; `confirmation-digest.ts`
-  (SHA-256 sobre JSON canónico de operación, entidad, `revision` base, payload normalizado, diff y sujeto) devuelto por
-  `dryRun` y exigido en aprobaciones y destructivas para **toda** vía, UI incluida.
-- Manifiesto: tools de aprobación propias (ver Detailed Spec) con `requiresPerson: true` y clase `write`; las
-  transiciones genéricas rechazan destinos de aprobación.
-- `ui-write-parity.test.ts`: recorre `apps/web/src/**` y falla ante una mutación (`fetch` con método distinto de `GET`,
-  server action que escriba) cuyo destino no sea una operación del OpenAPI con tool o exclusión.
+- `pnpm studio:manifest:sync` con el manifiesto que dejó TASK-1894; el script y el tipo
+  `MarketingStudioManifestTool` aceptan `method: 'GET' | 'POST' | 'PATCH'`, `requiresPerson` y el bloque `transport`.
+- `src/providers/marketing-studio-exchange-contracts.ts`: tabla cerrada `capability → { clientId, inputScope, forwardDelegatedToken }`
+  (Detailed Spec §Contratos de canje). El guard suma `capability_without_exchange_contract` y
+  `write_tool_without_transport`, y reemplaza `write_tool_without_scope_class` por la comprobación real: toda tool
+  `writes` exige `MARKETING_STUDIO_WRITE_SCOPE`.
+- `src/providers/marketing-studio.ts`:
+  - `authorizePerson` canjea con `scope = tool.capability` y `client_id` del contrato, y devuelve el token canjeado
+    sólo si `forwardDelegatedToken`; valida `scope` idéntico en la respuesta.
+  - Construcción de la petición desde `transport`: parámetros de ruta, `idempotencyKey` → `Idempotency-Key`,
+    `expectedRevision` → `If-Match`, `dryRun` a la query, resto al cuerpo JSON; `Efeonce-Delegated-Token` cuando
+    corresponde; `x-correlation-id` siempre.
+  - `202` de `studio.asset.version.create` (`status: 'verifying'`) se devuelve como resultado, no como error, con
+    `uploadId` y `retryAfterSeconds` tomado de `Retry-After`.
+  - Escrituras con timeout ⇒ `upstream_timeout_unknown_outcome` (sin reintento). Mapa de errores de §Mapa de errores.
+  - Nunca registrar cuerpo de respuesta, token ni URL firmada.
+- `src/config.ts`: `MARKETING_STUDIO_WRITE_SCOPE`, `MARKETING_STUDIO_MCP_WRITES_ENABLED`. Con el flag OFF, las tools
+  `writes` se registran y responden `policy_blocked: writes_disabled` sin canje (visibles para descubrir, inertes).
+- `src/auth/tool-policy.ts`: tools `writes` ⇒ `unsupported(MARKETING_STUDIO_WRITE_SCOPE, [tool.capability],
+  'marketing_studio_native_policy_missing')`; lecturas sin cambio.
+- `src/app.ts`: el challenge `403 insufficient_scope` nombra `efeonce.mcp.marketing_studio.write` para toda tool
+  `writes` (conjunto derivado del manifiesto).
+- `src/mcp.ts`: mensajes de error por código (sin prosa que diga «read capability» a una escritura); `annotations` del
+  manifiesto emitidas tal cual; `efeonce.gateway.status` reporta `marketing-studio` con `writes: enabled|disabled`.
+- `.github/workflows/deploy.yml`: `MARKETING_STUDIO_MCP_WRITES_ENABLED` desde variable de GitHub, en el **mismo paso**
+  que arma `env_vars` y corre `gcloud run deploy`, con default `false`.
+- `scripts/marketing-studio-write-session-canary.mjs` [nuevo]: lee el token humano de `MCP_CANARY_TOKEN_FILE`
+  (permisos `0600`, nunca lo imprime), habla JSON-RPC con `https://mcp.efeonce.org/mcp` y ejecuta los casos de
+  Verification sobre la campaña sandbox.
+- Tests: guard (tool `writes` sin contrato/transporte/scope ⇒ hallazgo nombrado), canje por capability, reenvío sólo
+  cuando corresponde, transporte, errores, flag OFF, status por la puerta HTTP, `authorized-tools`.
+- `pnpm surface:baseline` tras decidir bump minor; `version` minor sobre la vigente; PR con CI verde.
 
-### Slice 5 — Gateway: carril de escritura del provider
+### Slice 5 — Rollout en producción
 
-- Sync del manifiesto con las tools `write` y `requiresPerson`; guard bidireccional extendido: operaciones de escritura
-  del OpenAPI ↔ manifiesto ↔ tools registradas ↔ exclusiones con razón.
-- `marketing-studio-delegation.ts`: exchange por llamada contra el emisor (sin caché), con la identidad de workload de
-  la SA y el secreto del cliente confidencial; reenvío a Studio con bearer de servicio + `Efeonce-Delegated-Token`,
-  `Idempotency-Key`, `If-Match`, `correlationId`.
-- Policy por tool: `allowedIssuers: ['native']` con contexto interno v2; Entra `unsupported`
-  (`studio_native_delegation_only`); `requiredScopes` exacto por clase; `requiredCapabilities` según la tool;
-  `organizationPolicy: 'membership'`; aprobaciones rechazan tokens sin persona antes del exchange.
-- Inputs comunes de escritura: `organizationId`, `idempotencyKey`, `expectedRevision` (mutaciones), `dryRun`,
-  `confirmation.proposalDigest` (aprobaciones y destructivas). Descripciones con el protocolo `propose → confirm`.
-- `studio.asset.upload.request` devuelve la URL firmada de subida sólo en la respuesta de la tool, nunca en logs.
-- Mapeo de errores de Studio y del emisor; flag `MARKETING_STUDIO_MCP_WRITES_ENABLED` en `config.ts` y `deploy.yml`
-  (OFF ⇒ `policy_blocked: writes_disabled` sin exchange); `efeonce.gateway.status` reporta el carril.
-- Bump minor + `pnpm surface:baseline`; PR con CI verde.
+1. Release de Greenhouse (Slice 1) aplicado y allowlist en Vercel con redeploy; canje de prueba de cada cliente
+   desde el gateway (o su log) sin errores de política.
+2. Scope en Entra (Slice 2) con readback.
+3. Studio desplegado con `STUDIO_DELEGATED_ACTOR_ENABLED=false`; nuevo `api_client` activo y secreto con versión nueva.
+4. Merge del PR del gateway + dispatch de `deploy.yml` (`exposure=public-oauth`) con `MARKETING_STUDIO_MCP_WRITES_ENABLED=false`.
+   Verificar: revisión nueva `Ready` al 100 % (`gcloud run services describe efeonce-mcp-gateway --region
+   southamerica-west1 --format='value(status.traffic)'`); si `spec.traffic` quedó fijado en otra revisión, aplicar la
+   receta de `efeonce-mcp#21`; lecturas `studio.*` verdes; una tool de escritura responde `policy_blocked`;
+   `studio.asset.download` responde con la capability de descarga.
+5. `STUDIO_DELEGATED_ACTOR_ENABLED=true` en Studio Production + redeploy.
+6. `MARKETING_STUDIO_MCP_WRITES_ENABLED=true` + dispatch; readback de la revisión activa (env y secretos presentes).
+7. Canary de sesión real (Verification) sobre la campaña sandbox de producción, creada antes con la CLI de operador de
+   TASK-1894 (nunca por SQL) y rotulada como sandbox.
+8. Revocar el `api_client` anterior del gateway (`pnpm api-client:revoke --id … --reason "rotado por TASK-1899"`) y
+   verificar que lecturas y escrituras siguen verdes.
 
-### Slice 6 — Deploy, consentimiento y canary
+### Slice 6 — Documentación y cierre
 
-- Orden: release de Greenhouse (scopes, capability, reader, emisor con flag OFF) → deploy de Studio (flag OFF) →
-  deploy del gateway (flag OFF) → flags ON en emisor, Studio y gateway, en ese orden.
-- Consentimiento humano de la clase con step-up desde un cliente real (Claude Code o Codex).
-- `scripts/marketing-studio-write-canary.mjs` contra producción sobre la campaña sandbox: los casos de Verification.
-  Flag ON definitivo sólo con canary verde; si falla, los tres flags vuelven a OFF.
-
-### Slice 7 — Documentación
-
-- Runbook del gateway (carril de escritura del provider, receta del canary), runbook del emisor (grant de exchange),
-  arquitectura de Studio (§Agentes), manual servido `docs/mcp/skills/marketing-studio/SKILL.md` (cómo proponer, cómo
-  confirmar, qué hacer ante 412/428/409, que aprobar es de la persona), skill `efeonce-mcp-platform` (ambos espejos),
-  `FEATURE_FLAG_STATE_LEDGER.md` (tres flags con su runtime), Handoff, changelog y EPIC-049.
+- Delta en `EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` (novena clase y por qué una sola) y en
+  `MCP_TOOL_SURFACE_INVARIANTS.md` (canje por capability de la tool, reenvío del token canjeado sólo a Studio,
+  aprobación = tool propia con digest).
+- Arquitectura de Studio §Agentes; runbook del gateway §Provider Marketing Studio (carril de escritura, rotación del
+  `api_client`, receta del canary); `MARKETING_STUDIO_RUNTIME_HANDOFF.md`; `FEATURE_FLAG_STATE_LEDGER.md` (los dos
+  flags con su runtime y estado real).
+- Contrato de mantenimiento de `efeonce-marketing-studio` (ledger, architecture-map, contracts, operations, lessons) y
+  skill `efeonce-mcp-platform`; espejos `.codex/` + `pnpm skills:mirrors`.
+- Handoff, changelog, EPIC-049 y `MS-N7` del flujo maestro.
 
 ## Out of Scope
 
-- Los commands de escritura, su semántica y sus matrices de estado (TASK-1894).
-- Login web de Studio, su sesión y el cierre del modo `open` (TASK-1898).
-- Acceso de personas externas o de clientes: requiere grant en `external_capability_grants`, consentimiento, piloto y
-  firma propia; las tools quedan `unsupported` para poblaciones externas.
-- Ampliar el cliente PKCE público compartido o el contexto v2 fuera de las dos clases de Studio.
-- Operaciones sólo de operador por CLI (`cutover:campaign`, `export:catalog`, `api-client:*`, `media:ingest`): son
-  exclusiones con razón.
-- Publicar posts o lanzar anuncios en proveedores: Studio no publica.
-- UI de consentimiento nueva: se reutiliza la del emisor; sólo se agregan las descripciones de clase.
+- Los commands de escritura, su semántica, límites de tamaño/mime, dónde se recalcula el sha256, el corte por campaña,
+  la CLI `studio:upload` y la señal «pieza aprobada sin original en Studio» (TASK-1894).
+- UI de subida, revisión y aprobación (TASK-1895); login web y cierre del modo `open` (TASK-1898).
+- Emisor nativo `auth.efeonce.org`: las tools de Studio siguen `unsupported` para él (D10); no se agrega grant de
+  token exchange al emisor.
+- Personas externas o clientes: requieren grant en `external_capability_grants`, consentimiento y piloto propios.
+- Espejo o lectura programada de SharePoint/OneDrive por Microsoft Graph (ADR §4.6).
+- Publicar posts o lanzar pauta en proveedores (Studio no publica).
+- Operaciones sólo de operador (`import:catalog`, `media:ingest`, `api-client:*`, cortes): siguen como exclusiones.
 
 ## Detailed Spec
 
-### Decisión 1 — Dos clases de scope, no una
+### Contratos de canje (Greenhouse ↔ gateway)
 
-| Clase | Qué autoriza | Tools |
-|---|---|---|
-| `efeonce.mcp.marketing_studio.write` | crear y editar el material de trabajo de una campaña (borradores, propuestas, versiones, calendario) | todas las `write` sin `requiresPerson` |
-| `efeonce.mcp.marketing_studio.approve` | registrar decisiones que comprometen a la organización: aprobar el brief, la creatividad, el presupuesto y autorizar medios | sólo las tools de aprobación |
+| Capability de la tool | Cliente de canje | Input scope en el token Entra | Acción en `can()` | Reenvía token a Studio |
+|---|---|---|---|---|
+| `marketing_studio.campaign.read` | `efeonce-mcp-marketing-studio` (existe) | `efeonce.mcp.read` | `read` | no |
+| `marketing_studio.asset.download` | `efeonce-mcp-marketing-studio-asset-download` | `efeonce.mcp.read` | `read` | sí |
+| `marketing_studio.asset.write` | `efeonce-mcp-marketing-studio-asset-write` | `efeonce.mcp.marketing_studio.write` | la de `allowed_actions` que siembre TASK-1894 [verificar] | sí |
+| `marketing_studio.campaign.write` | `efeonce-mcp-marketing-studio-campaign-write` | `efeonce.mcp.marketing_studio.write` | la de `allowed_actions` que siembre TASK-1894 [verificar] | sí |
+| `marketing_studio.campaign.approve` | `efeonce-mcp-marketing-studio-campaign-approve` | `efeonce.mcp.marketing_studio.write` | la que siembre esta task (Slice 1) | sí |
 
-Por qué dos: el radio de daño es distinto. Editar un borrador es reversible y no compromete dinero; aprobar un
-presupuesto o autorizar medios compromete gasto, igual que la clase `globe.credits.funding.ensure`, que tiene scope
-propio porque mueve dinero. Además la persona puede consentir por cliente: dejar que un agente edite sin dejarlo
-aprobar. Una sola clase obligaría a elegir entre no delegar nada o delegar también la aprobación. Tres o más clases
-(una por estado) ya sería un scope por capability, que la regla prohíbe.
+La tabla vive en dos lugares con paridad por test: `resolveScopeContract` (Greenhouse) y
+`marketing-studio-exchange-contracts.ts` (gateway). Si el manifiesto sincronizado trae una tool `writes` con una
+capability fuera de la tabla, esta task le agrega su fila, su cliente y su contrato con la misma receta; el guard
+falla hasta que exista.
 
-### Decisión 2 — Identidad delegada: RFC 8693 en el emisor nativo
+Por qué un cliente por capability: `assertFederatedClient` exige hoy un scope por cliente y esa guarda es la que
+impide que un token canjeado para una capability sirva para otra; se revoca y se audita por cliente. Precedente:
+`efeonce-mcp-hiring` y `efeonce-mcp-hiring-review`.
 
-| Opción | Veredicto | Razón |
-|---|---|---|
-| Reenviar el token MCP de la persona a Studio | descartada | audiencia MCP; el ADR de relying parties exige rechazarlo antes del dominio |
-| Aserción firmada por el gateway (JWKS del gateway) | descartada | convierte al gateway en emisor de identidad (el gateway no es authorization server); un compromiso del gateway fabricaría a cualquier persona; nueva llave y rotación |
-| Exchange en el broker de Greenhouse (`gh_mcp_*`) | descartada | token opaco con audiencia Greenhouse; Studio necesitaría introspección nueva; el broker sólo acepta sujetos Entra |
-| **Exchange RFC 8693 en `auth.efeonce.org` con audiencia Studio** | **elegida** | el emisor re-verifica de forma independiente el token de la persona (el gateway no puede delegar a alguien que no le presentó un token vigente); una sola ancla de confianza para Studio (el mismo JWKS que usará TASK-1898); audiencia aislada; revocación coherente con D11; reutilizable por otros productos |
+### Flujo de una escritura
 
-Hacia Studio viajan dos credenciales con papeles distintos: `Authorization: Bearer <api_client del gateway>`
-(canal de confianza registrado) y `Efeonce-Delegated-Token: <JWT delegado>` (quién actúa). Studio exige ambas y su
-vínculo (`act.sub` registrado para ese `api_client`). No es un header libre: su contenido es un token firmado y
-verificable.
+1. El cliente MCP llama la tool; la capa HTTP del gateway exige la clase (`403 insufficient_scope` con challenge).
+2. Policy: issuer Entra; flag de escrituras ON; si no, `policy_blocked`.
+3. Canje en Greenhouse con la identidad de workload de la SA del gateway, el token Entra de la persona,
+   `scope = tool.capability` y el cliente de la tabla. Greenhouse ejecuta `can()` y emite `gh_mcp_*` (300 s).
+4. Petición a Studio: `Authorization: Bearer <api_client del gateway>`, `Efeonce-Delegated-Token: <gh_mcp_*>`,
+   `Idempotency-Key`, `If-Match`, `x-correlation-id`, cuerpo JSON.
+5. Studio revalida en `userinfo` (Greenhouse vuelve a ejecutar `can()`), construye el actor persona y ejecuta el command.
+6. El gateway devuelve el cuerpo de Studio tal cual (sin transformar), o el error mapeado.
 
-### Decisión 3 — Toda aprobación es una tool propia
+### Subida de un final (ADR §4.2)
 
-El gateway decide scope y policy por el nombre de la tool; los argumentos nunca eligen autoridad. Por eso
-`studio.media_plan.budget_line.set` queda sólo para `kind=proposed` y las transiciones genéricas rechazan destinos de
-aprobación. Tools de aprobación (nombres a confirmar con `mcp-craft` y el manifiesto de TASK-1894):
+1. `studio.asset.upload.request` (`POST /api/v1/campaigns/{campaignId}/uploads`) con `campaignId`, `filename`,
+   `sha256`, `byteSize`, `mimeType` (el schema exacto lo declara el manifiesto). Respuesta: `alreadyStored` o
+   `upload { method, url, headers, expiresAt, resumable }` hacia un solo objeto que define TASK-1894 conforme al ADR
+   (`originals/sha256/<2 primeros hex>/<sha256>`, `ifGenerationMatch=0`), más lo inferido del nombre canónico y lo que
+   falta preguntar.
+2. El agente sube los bytes directo a GCS (`curl -X PUT --upload-file … -H` con las cabeceras devueltas; sesión
+   reanudable para video grande). Nunca por MCP.
+3. `studio.asset.version.create` (`POST /api/v1/campaigns/{campaignId}/asset-versions`) con la referencia de la
+   subida, metadata inferida o confirmada, el tipo de licencia (obligatorio), `idempotencyKey` y `expectedRevision`.
+   Resultados: `created` (versión **pendiente de revisión**), `duplicate` (el sha256 ya es una versión de esa pieza; sin
+   fila nueva) o `verifying` (`202`: el worker aún recalcula el sha256). Con `verifying`, el agente informa el estado,
+   espera `retryAfterSeconds` y repite **la misma llamada con la misma `idempotencyKey`**, o consulta
+   `studio.asset.get`; nunca vuelve a subir ni cambia la llave. `upload_rejected` (sha256, tamaño o tipo no
+   coinciden) y `upload_expired` exigen pedir una subida nueva.
+4. Si `alreadyStored`, se salta el paso 2.
 
-| Aprobación | Tool | Capability | Scope |
-|---|---|---|---|
-| Aprobar el brief | `studio.campaign.brief.approve` | `marketing_studio.campaign.approve` | `...approve` |
-| Creatividad `final_available → approved` | `studio.campaign.creative.approve` | `marketing_studio.campaign.approve` | `...approve` |
-| Autorización de medios `pending → authorized` | `studio.campaign.media_authorization.authorize` | `marketing_studio.campaign.approve` | `...approve` |
-| Presupuesto `kind=approved` con referencia | `studio.media_plan.budget_line.approve` | `marketing_studio.campaign.approve` | `...approve` |
+### Aprobación (ADR §4.4)
 
-Las demás tools de clase `write` del manifiesto (campaña, brief, concepto, pieza, versión e intención de subida, copy,
-anuncio, flight y línea propuesta, post del calendario, transiciones no aprobatorias) usan `...write` y
-`marketing_studio.campaign.write`.
-
-### Decisión 4 — Protocolo del agente y digest de confirmación
-
-1. El agente llama la tool con `dryRun=true`; Studio devuelve `diff`, `baseRevision` y `proposalDigest` sin escribir.
-2. El agente muestra el diff a la persona y pide aceptación explícita en la conversación.
-3. Con la aceptación, repite la llamada sin `dryRun`, con la misma `idempotencyKey`, el mismo `expectedRevision` y
+1. La tool de aprobación con `dryRun=true` devuelve `diff`, `baseRevision` y `proposalDigest` sin escribir.
+2. El agente muestra el diff y pide aceptación explícita de la persona en la conversación.
+3. Con la aceptación, repite sin `dryRun`, con la misma `idempotencyKey`, el mismo `expectedRevision` y
    `confirmation.proposalDigest`.
 4. `412` ⇒ releer y volver al paso 1; nunca reintentar con la revisión nueva sin mostrar el diff otra vez.
 
-El digest prueba que lo ejecutado es exactamente lo propuesto sobre esa revisión y para ese sujeto; **no prueba que la
-persona lo haya visto**. Esa parte la sostienen el consentimiento por clase y por cliente, las descripciones de las
-tools, la auditoría con `via` y, cuando el cliente la soporte, una confirmación por elicitation (verificar en el radar
-de `mcp-craft`; no se depende de ella). Se exige en aprobaciones y destructivas; en ediciones reversibles basta
-`If-Match`.
+El digest prueba que lo ejecutado es lo propuesto sobre esa revisión y para esa persona; no prueba que la persona lo
+haya visto. Esa parte la sostienen el consentimiento de la clase, las descripciones de las tools, la capability de
+aprobación y la auditoría. La confirmación por elicitation no se usa (ver `mcp-craft/protocol-radar.md`).
+
+Tools de aprobación (tabla de TASK-1894; manda el manifiesto sincronizado y el gateway las deriva de
+`requiresPerson: true`, nunca de una lista a mano): `studio.asset.version.approve`, `studio.campaign.creative.approve`,
+`studio.campaign.media.authorize`, `studio.campaign.brief.approve` y `studio.media_plan.budget_line.approve`. Las
+destructivas (`studio.media_plan.budget_line.remove`, `studio.calendar.post.cancel`) exigen el mismo `dryRun` + digest
+aunque no requieran la capability de aprobación.
+
+### Mapa de errores
+
+| Origen | Respuesta | Código del gateway | Qué hace el agente |
+|---|---|---|---|
+| Canje | 400 `invalid_grant`, 403 `user_not_eligible`/`scope_not_allowed` | `forbidden` | Informar que la persona no tiene esa autoridad |
+| Canje | 401 `invalid_client`, 404 `exchange_disabled`, 5xx | `upstream_unavailable` | No reintentar; avisar |
+| Studio | 400/422 (incluye `upload_rejected`), 410 `upload_expired` | `invalid_request` | Corregir según el schema; con `upload_*` pedir una subida nueva |
+| Studio | 202 `verifying` de `createAssetVersion` | resultado, no error | Esperar `retryAfterSeconds` y repetir con la misma llave |
+| Studio | 401 (bearer de servicio o `delegation_invalid`), 403 `delegation_required`, 503 `delegation_unavailable` | `upstream_unavailable` | No reintentar; avisar |
+| Studio | 403 `delegation_insufficient`, `approval_requires_person`, `forbidden` | `forbidden` | Informar |
+| Studio | 404 | `not_found` | Verificar ids y organización |
+| Studio | 409 `confirmation_mismatch` u otro conflicto, 412 `revision_conflict` | `conflict` | Releer y volver a proponer |
+| Studio | 428 `confirmation_required`/`precondition_required` | `confirmation_required` | Hacer `dryRun` y pedir confirmación |
+| Studio | 429 | `rate_limited` | Esperar |
+| Red/timeout en escritura | — | `upstream_timeout_unknown_outcome` | Reintentar con la **misma** `idempotencyKey` |
+
+El `upstreamCode` de Studio se conserva en logs saneados, nunca el cuerpo.
 
 ### Deltas a otras tasks
 
-- TASK-1894: tools de aprobación propias con `requiresPerson: true`; transiciones genéricas sin destinos
-  aprobatorios; digest exigido por el kernel para toda vía; capability `marketing_studio.campaign.approve` si se decide
-  crearla allí.
-- TASK-1895: el diálogo de aprobación llama `dryRun`, muestra el resumen y envía el digest.
-- TASK-1898: consume el reader de acceso a producto y el verificador JWKS; el actor `user` de sesión y el delegado
-  comparten el mismo `Actor`.
+- **TASK-1894** (registrar allí al tomar esta task si no está): (1) el manifiesto generado exporta, por tool de
+  escritura, `method`, `class`, `requiresPerson`, `destructive` y el transporte (`pathParams`, cabeceras
+  `Idempotency-Key`/`If-Match` desde `idempotencyKey`/`expectedRevision`, `dryRun` en query, resto en cuerpo); (2)
+  `dryRun` de las operaciones `requiresPerson` o `destructive` deja un punto de extensión para el `proposalDigest` que
+  implementa esta task; (3) la respuesta de `studio.asset.upload.request` expone lo inferido del nombre canónico y lo
+  que falta preguntar. `marketing_studio.campaign.approve` la siembra esta task, no TASK-1894.
+- **TASK-1895**: el diálogo de aprobación llama `dryRun`, muestra el diff y envía `confirmation.proposalDigest`.
+- **TASK-1898**: el actor `user` de sesión reutiliza `authority` con `kind: 'session'`.
 
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-- TASK-1891 y TASK-1894 cerradas en producción → Slice 1 → Slice 2 → Slice 3 → Slice 4 → Slice 5 → Slice 6 → Slice 7.
-- El release de Greenhouse (Slices 2–3) sale **antes** que el gateway: sin scopes, capability y grant, las tools
-  responderían `insufficient_scope` o `upstream_unavailable` contra producción.
-- Los tres flags se prenden en orden emisor → Studio → gateway, y se apagan en orden inverso.
-- TASK-1896 cerrada antes de prender el flag del gateway en producción.
+- TASK-1894 complete en producción → Slice 1 → Slice 2 → Slice 3 → Slice 4 → Slice 5 → Slice 6.
+- El release de Greenhouse (Slice 1) y la allowlist salen **antes** del deploy del gateway: sin clientes ni canje por
+  capability, las tools responderían `upstream_unavailable` contra producción.
+- Los flags se prenden Studio → gateway y se apagan gateway → Studio.
+- El `api_client` anterior del gateway se revoca sólo después de verificar la revisión nueva con el secreto nuevo.
 
 ### Risk matrix
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| El scope de escritura o aprobación llega a un cliente público compartido | identity | low | regla dura + test de paridad que falla si aparece en `scopes_supported` o en el mínimo del emisor | test rojo; PRM con más de un scope |
-| Studio audita al gateway en vez de a la persona | Studio | medium | actor delegado obligatorio en tools `write`; test que exige `actor=user:*` y `via=mcp:*` | canary: `audit_event` sin persona |
-| Un agente aprueba sin que la persona lo vea | MCP | medium | clase `approve` separada con consentimiento y step-up; digest; descripciones; auditoría | canary de confirmación ausente/alterada |
-| Replay del token delegado | Studio | low | `jti` de un solo uso, TTL ≤ 300 s, audiencia única | log `delegation_invalid` |
-| El emisor emite delegaciones para otra audiencia | auth-server | low | allowlist cerrada de audiencias y actores; tests negativos | audit `token_exchange_denied` |
-| Deploy borra env o secretos (`--set-*` destructivo) | Cloud Run | medium | declarar todo en `deploy.sh`/`deploy.yml`; readback de la revisión activa | status tool / readyz |
-| Cambio del emisor afecta staging y producción a la vez (servicio compartido) | auth-server | medium | grant detrás de flag OFF; tests de no-regresión de `authorization_code` y `refresh_token` | canary de login y refresh |
-| Timeout deja una escritura en estado incierto | MCP | medium | `upstream_timeout_unknown_outcome` + reintento con la misma llave (idempotente) | canary de reintento |
-| UI gana una mutación sin API ni tool | Studio | medium | `ui-write-parity` + guard del gateway en CI | CI rojo |
-| Deriva manifiesto ↔ gateway o superficie sin bump | MCP | medium | guard bidireccional + `surface.ts` + `test/version.test.ts` | CI rojo |
+| La clase de escritura llega al cliente público compartido | identity | low | regla dura; `scopes.test.ts` falla si aparece en `PUBLISHED_SCOPES_SUPPORTED`; Slice 2 no toca clientes | PRM con más de un scope; `requiredResourceAccess` del cliente cambiado |
+| Una persona que sólo lee escribe o aprueba | MCP / Greenhouse | medium | canje con `tool.capability` + validación del `scope` devuelto + `userinfo` con `can()` + capability por operación en Studio | canary deny; `userinfo_reject` |
+| Studio audita al gateway en vez de a la persona | Studio | medium | `delegation_required` para escrituras del cliente confiable sin token; test de actor | `audit_event` con actor `api_client` en una escritura |
+| Política de un cliente nuevo inválida (503 del canje) | Greenhouse | medium | `requireOnPrivilegedAction: true` + test con `sisterPlatformOAuthPolicyV1Schema` + bloque DO | `upstream_unavailable` en todas las escrituras |
+| Secreto o variable borrados por `--set-*` destructivo | Cloud Run | medium | flag y secreto en el mismo paso de `gcloud run deploy`; readback de la revisión | status sin carril de escritura; `readyz` |
+| `spec.traffic` fijado en una revisión rota | Cloud Run | medium | receta de `efeonce-mcp#21`; verificar tráfico tras cada dispatch | deploy siguiente falla |
+| Rotación del `api_client` corta las lecturas | Studio / MCP | low | el nuevo cliente es superconjunto; revocar el viejo al final | lecturas `upstream_unavailable` |
+| Timeout deja una escritura incierta | MCP | medium | `upstream_timeout_unknown_outcome` + idempotencia | canary de reintento |
+| Agente reintenta a ciegas una versión en verificación | MCP | medium | manual servido + descripción de la tool + idempotencia por sha256 | versiones duplicadas (debe ser cero) |
+| Cambio en `az ad app update` borra scopes vigentes | Entra | low | round-trip leído-escrito-releído con conteo | tools de otros providers con `insufficient_scope` |
+| Deriva manifiesto ↔ gateway o superficie sin bump | MCP | medium | guard + `surface.ts` + `test/version.test.ts` | CI rojo |
 
 ### Feature flags / cutover
 
-- Gateway `MARKETING_STUDIO_MCP_WRITES_ENABLED` (default `false`): OFF ⇒ tools registradas que responden
-  `policy_blocked: writes_disabled` sin intentar exchange.
-- Emisor `AUTH_SERVER_TOKEN_EXCHANGE_ENABLED` (default `false`) + allowlists de audiencias y actores en
-  `services/auth-server/deploy.sh`: OFF ⇒ `unsupported_grant_type`.
-- Studio `STUDIO_DELEGATED_ACTOR_ENABLED` (default `false`): OFF ⇒ `Efeonce-Delegated-Token` se rechaza con
-  `delegation_invalid`.
-- Los tres se registran en `FEATURE_FLAG_STATE_LEDGER.md` con su runtime. Revertir = OFF en orden gateway → Studio →
-  emisor + redeploy donde el runtime no toma env en caliente.
+- Gateway `MARKETING_STUDIO_MCP_WRITES_ENABLED` (variable de GitHub → `deploy.yml`, default `false`): OFF ⇒ tools de
+  escritura registradas que responden `policy_blocked: writes_disabled` sin canje. Runtime: Cloud Run
+  `efeonce-mcp-gateway`.
+- Studio `STUDIO_DELEGATED_ACTOR_ENABLED` (Vercel de Studio, default `false`): OFF ⇒ `Efeonce-Delegated-Token` se
+  rechaza con `401 delegation_invalid` y las escrituras del gateway no pueden ejecutarse.
+- Allowlist `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` (Vercel de Greenhouse): corte inmediato del canje.
+- Los dos flags van a `FEATURE_FLAG_STATE_LEDGER.md` con runtime y estado real.
 
 ### Rollback plan per slice
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
-| Slice 1 | revert de docs | minutos | sí |
-| Slice 2 | revert del PR; la capability queda sin grant y los scopes sin cliente | < 30 min con release | sí |
-| Slice 3 | flag del emisor OFF + redeploy; delegaciones vigentes vencen en ≤ 300 s | < 10 min | sí |
-| Slice 4 | flag de Studio OFF; revert del deploy de Vercel | < 5 min | sí |
-| Slice 5 | flag del gateway OFF + redeploy, o volver a la revisión anterior al 100 % | < 10 min | sí |
-| Slice 6 | los tres flags OFF; revocar el consentimiento de la clase del cliente del canary | < 15 min | sí; las escrituras del canary quedan en la campaña sandbox, auditadas y sin retorno automático |
-| Slice 7 | revert de docs | minutos | sí |
+| Slice 1 | quitar los cuatro clientes de la allowlist + redeploy; revert del PR (la migración queda inerte) | < 15 min | sí |
+| Slice 2 | quitar el scope del recurso con round-trip | < 15 min | sí |
+| Slice 3 | `STUDIO_DELEGATED_ACTOR_ENABLED=false` o rollback del deploy de Vercel | < 5 min | sí |
+| Slice 4 | flag OFF + dispatch, o tráfico a la revisión anterior al 100 % | < 10 min | sí |
+| Slice 5 | los dos flags OFF; si se revocó el `api_client` viejo, las lecturas siguen con el nuevo | < 15 min | sí; lo escrito en la campaña sandbox queda auditado |
+| Slice 6 | revert de docs | minutos | sí |
 
 ### Production verification sequence
 
-1. Release de Greenhouse con emisor en flag OFF; verificar que `authorization_code` y `refresh_token` siguen verdes y
-   que el PRM anuncia sólo el scope base.
-2. Deploy de Studio y del gateway con flags OFF; `efeonce.gateway.status` muestra el carril de escritura `disabled` y
-   una tool de escritura responde `policy_blocked`.
-3. Flag del emisor ON; un exchange de prueba con un sujeto sin la clase responde `invalid_grant`.
-4. Flag de Studio ON; una llamada con token delegado de otra audiencia responde `delegation_invalid`.
-5. Consentimiento humano de las dos clases con step-up; flag del gateway ON.
-6. Canary completo sobre la campaña sandbox; readback de `studio.audit_event` (persona + `via`) y del audit del emisor.
-7. Readback de las tres revisiones activas: env y secretos presentes.
+1. Greenhouse en producción: la capability de aprobación y los cuatro clientes con el contrato exacto; `vercel env ls` muestra la allowlist.
+2. Entra: scope nuevo presente y los anteriores intactos (conteo).
+3. Gateway con flag OFF: lecturas verdes, `studio.asset.download` verde, escritura `policy_blocked`, status con
+   `writes: disabled`, tráfico al 100 % en la revisión nueva.
+4. Studio flag ON; gateway flag ON; status `writes: enabled`.
+5. Canary de sesión (Verification) y readback de `studio.audit_event` y del audit del broker por `correlationId`.
+6. Revocación del `api_client` anterior y repetición de una lectura y una descarga.
 
 ### Out-of-band coordination required
 
-- Una persona interna con la capability de aprobación para el consentimiento con step-up y el canary (PKCE
-  interactivo; nunca desatendido).
-- Una segunda identidad interna sin capability para el caso deny [verificar disponibilidad; si no existe, usar una
-  identidad sintética sandbox anunciada antes a los peers].
-- Aviso previo a los peers antes de tocar el emisor compartido staging/producción.
+- Una persona interna con `marketing_studio.asset.write` y `marketing_studio.campaign.approve` (rol `efeonce_admin`,
+  `efeonce_account` o `efeonce_operations`) para consentir la clase
+  (PKCE interactivo con el cliente público, callback `http://localhost:8765/callback`, scopes
+  `https://mcp.efeonce.org/mcp/efeonce.mcp.read` y `https://mcp.efeonce.org/mcp/efeonce.mcp.marketing_studio.write`)
+  y ejecutar el canary. El token vive en un archivo `0600`, nunca en el chat, y se borra al terminar.
+- Una segunda persona interna **con** `marketing_studio.asset.write` y **sin** `marketing_studio.campaign.approve` (rol
+  `designer`) para el deny de aprobación en vivo. Requisito de cierre: el operador la designa.
+- Autorización explícita del operador para: release de Greenhouse, cambio en Entra, variables de Vercel y de GitHub,
+  dispatch del gateway y rotación del `api_client`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -552,36 +666,41 @@ de `mcp-craft`; no se depende de ella). Se exige en aprobaciones y destructivas;
 
 ## Acceptance Criteria
 
-- [ ] Cada operación de escritura del OpenAPI de Studio tiene una tool federada o una exclusión con razón, y el guard del gateway falla nombrando la operación, tool o exclusión que sobra o falta.
-- [ ] `ui-write-parity` falla en CI ante una mutación de la UI de Studio sin operación OpenAPI con tool o exclusión (verificado agregando una mutación de prueba).
-- [ ] `efeonce.mcp.marketing_studio.write` y `efeonce.mcp.marketing_studio.approve` existen en la policy del gateway y en `src/lib/auth-server/oauth/scopes.ts` con test de paridad verde, y ninguno aparece en el PRM, en `scopes_supported` ni en el cliente PKCE compartido.
-- [ ] Toda aprobación es una tool propia con `requiresPerson: true`, y la tool genérica de transición o de presupuesto rechaza un destino aprobatorio.
-- [ ] `marketing_studio.campaign.approve` existe en catálogo y registry con grant a ≥1 rol real y `capability-grant-coverage.test.ts` verde.
-- [ ] El emisor emite un token `typ=delegated+jwt` con `aud` Studio, `sub` de la persona, `act`, `jti` y `exp` ≤ 300 s, y rechaza subject revocado, subject sin la clase, audiencia o actor fuera de allowlist y token MCP presentado como delegado.
-- [ ] Con capability y membership, una persona aprueba la creatividad de la campaña sandbox desde un cliente MCP real, y `studio.audit_event` registra `actor=user:<subject>`, `via=mcp:<clientId>` y `authority.kind=delegated_oauth`.
-- [ ] Una persona sin capability recibe denegación sin escritura, y un `api_client` sin token delegado que intenta aprobar recibe `403 approval_requires_person`.
-- [ ] Una organización que no es la de la campaña responde `not_found` sin escritura.
-- [ ] `dryRun` devuelve `diff`, `baseRevision` y `proposalDigest` y no escribe filas (verificado contando `audit_event` e `idempotency_record` antes y después).
-- [ ] Una aprobación sin `confirmation.proposalDigest` responde `428 confirmation_required`, y con un digest alterado responde `409 confirmation_mismatch`, ambas sin escribir.
-- [ ] Repetir la misma ejecución con la misma `idempotencyKey` devuelve la misma respuesta y un solo `audit_event`.
-- [ ] Una ejecución con `expectedRevision` vieja devuelve `412` mapeado a `conflict` con instrucción de releer, sin escribir.
-- [ ] Con Studio inaccesible, las tools de Studio responden `upstream_unavailable` y los demás providers siguen sirviendo; con el emisor sin exchange, responden `policy_blocked` sin llamar a Studio.
-- [ ] Con `MARKETING_STUDIO_MCP_WRITES_ENABLED=false`, toda tool de escritura responde `policy_blocked: writes_disabled` sin exchange.
-- [ ] `efeonce.gateway.status` reporta el carril de escritura de `marketing-studio` en la revisión activa.
+- [ ] El guard del gateway falla nombrando la tool cuando una tool `writes` del manifiesto no tiene contrato de canje, transporte o clase de scope (verificado agregando una de prueba).
+- [ ] `efeonce.mcp.marketing_studio.write` existe en la policy del gateway, en `EFEONCE_MCP_WRITE_SCOPES` con test de paridad verde y en el recurso Entra, y no aparece en el PRM, en `PUBLISHED_SCOPES_SUPPORTED` ni en el `requiredResourceAccess` del cliente público compartido.
+- [ ] `marketing_studio.campaign.approve` existe en catálogo, registry y grant (tres roles, sin `designer`) con `capability-grant-coverage.test.ts` verde.
+- [ ] Los cuatro clientes de canje existen activos, con un solo scope cada uno y política que valida con `sisterPlatformOAuthPolicyV1Schema` (`requireOnPrivilegedAction = true`).
+- [ ] El canje de cada tool pide su `capability` y el gateway rechaza una respuesta con otro `scope`.
+- [ ] `userinfo` de un token `marketing_studio` responde 403 cuando la persona perdió la capability después del canje (test).
+- [ ] Una tool de escritura sin la clase en el token responde `403 insufficient_scope` con challenge que nombra `efeonce.mcp.marketing_studio.write`.
+- [ ] Con `MARKETING_STUDIO_MCP_WRITES_ENABLED=false`, toda tool de escritura responde `policy_blocked: writes_disabled` sin canje.
+- [ ] En producción, una persona con `marketing_studio.asset.write` sube un archivo de prueba por la URL firmada al objeto `originals/sha256/<2>/<sha256>` y `studio.asset.version.create` devuelve `created` con la versión pendiente de revisión (si antes devolvió `verifying`, la misma llamada con la misma llave termina en `created` sin fila duplicada).
+- [ ] El `audit_event` de esa versión registra a la persona (`actor = user`, `authority.kind = delegated_oauth`) y no al `api_client` del gateway.
+- [ ] Un `api_client` confiable sin `Efeonce-Delegated-Token` que intenta escribir recibe `403 delegation_required` sin escribir.
+- [ ] Una aprobación sin `confirmation.proposalDigest` responde `confirmation_required` y con digest alterado `conflict` (`409 confirmation_mismatch` en Studio), ambas sin escribir.
+- [ ] Con `dryRun` + digest correcto, la persona aprueba la versión de prueba desde la sesión MCP.
+- [ ] La persona `designer` recibe `forbidden` al aprobar, sin escritura.
+- [ ] Una organización ajena responde `not_found` sin escritura.
+- [ ] Repetir una ejecución con la misma `idempotencyKey` devuelve la misma respuesta y un solo `audit_event`.
+- [ ] Una ejecución con `expectedRevision` vieja devuelve `conflict` sin escribir.
+- [ ] `studio.asset.download` devuelve una URL de descarga de la versión aprobada con la capability `marketing_studio.asset.download`, y la emisión queda auditada a la persona.
+- [ ] Las 12 lecturas previas siguen verdes tras la rotación del `api_client` y la revocación del anterior.
+- [ ] `efeonce.gateway.status` reporta `marketing-studio` con `writes: enabled` en la revisión activa, y el tráfico está al 100 % en ella.
 - [ ] La versión del gateway subió un minor y `surface-baseline.json` quedó actualizado.
-- [ ] Los tres flags figuran en `FEATURE_FLAG_STATE_LEDGER.md` con su runtime y su estado real.
-- [ ] Deltas de ADR (gateway, autoridad nativa, contrato OAuth), invariantes MCP, runbooks, manual servido, skill (ambos espejos), Handoff, changelog y EPIC-049 actualizados.
+- [ ] Ningún log del gateway, de Studio ni de Greenhouse contiene el token canjeado, el bearer de servicio ni una URL firmada (búsqueda en los logs del canary).
+- [ ] Manual servido, ADR del gateway (Delta), invariantes MCP, runbooks, handoff de runtime, ledger de flags, skills (ambos espejos), Handoff, changelog y EPIC-049 actualizados.
 
 ## Verification
 
-- `pnpm check` en `efeonce-mcp` (guard, policy, delegación, versión, surface)
-- `pnpm check` en `efeonce-marketing-studio` (actor delegado, digest, `requiresPerson`, `ui-write-parity`)
-- `pnpm local:check` y `pnpm test src/lib/auth-server src/lib/identity src/lib/entitlements` en Greenhouse
-- `node scripts/marketing-studio-write-canary.mjs` contra producción: allow (aprobar creatividad en campaña sandbox),
-  deny (sin capability; máquina sin persona aprobando; organización ajena), fault (Studio caído; emisor sin exchange),
-  reintento idempotente, 412, confirmación ausente y alterada
-- Sesión MCP humana: `tools/list` con las tools de escritura y una aprobación real en la campaña sandbox
-- `pnpm docs:closure-check` y `pnpm flags:audit --strict --no-vercel`
+- `pnpm check` en `efeonce-mcp`; `pnpm check` en `efeonce-marketing-studio`.
+- `pnpm local:check` y `pnpm test src/lib/sister-platforms src/lib/auth-server src/lib/entitlements` en Greenhouse;
+  `pnpm mcp:skills:check`.
+- Readback SQL de la capability y de los cuatro clientes (`pnpm pg:connect:shell`).
+- `MCP_CANARY_TOKEN_FILE=… node scripts/marketing-studio-write-session-canary.mjs` contra producción: `tools/list`
+  con las tools nuevas; subida completa; `dryRun` + aprobación; aprobación sin digest y con digest alterado; reintento
+  idempotente; revisión vieja; organización ajena; descarga. Deny de aprobación con el token de la persona `designer`.
+- Readback de `studio.audit_event` por `correlationId` (proxy 15433) y del audit del broker en Greenhouse.
+- `pnpm docs:closure-check`, `pnpm flags:audit --strict --no-vercel`, `pnpm skills:mirrors`.
 
 ## Closing Protocol
 
@@ -592,25 +711,20 @@ de `mcp-craft`; no se depende de ella). Se exige en aprobaciones y destructivas;
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
+- [ ] Contrato de mantenimiento de la skill `efeonce-marketing-studio` cumplido en el mismo commit del cierre
 - [ ] EPIC-049 actualizado y `MS-N7` del flujo maestro marcado con escritura
 - [ ] Deltas registrados en TASK-1894, TASK-1895 y TASK-1898
 
 ## Follow-ups
 
-- Escrituras de Studio para personas externas (grant en `external_capability_grants`, consentimiento, piloto).
-- Reutilizar el grant RFC 8693 del emisor para otros productos first-party con escrituras delegadas.
+- Federar al emisor nativo `auth.efeonce.org` cuando exista la policy nativa de Studio (D10, consentimiento nuevo).
+- Escrituras de Studio para personas externas (grant, consentimiento, piloto).
 - Confirmación por elicitation cuando los clientes certificados la soporten.
+- Si el volumen crece, medir la latencia agregada por `userinfo` y evaluar un verificador de tokens sin ida y vuelta,
+  sin caché positiva de autoridad.
 
 ## Open Questions
 
-- ~~Roles con `marketing_studio.campaign.approve`~~ Resuelto por el operador 2026-09-25: `efeonce_admin`,
-  `efeonce_account` y `efeonce_operations`. `designer` escribe pero no aprueba; no hace falta separar la aprobación
-  creativa de la de presupuesto y medios.
-- ¿La capability de aprobación la crea TASK-1894 (dueña de los commands) o esta task? Esta task la crea sólo si
-  TASK-1894 cierra sin ella.
-- ¿Se acepta también el sujeto Entra (carril legacy) en el exchange durante la transición? Propuesta: no; los writes de
-  Studio sólo por Efeonce ID nativo.
-- `studio.asset.upload.request` devuelve una URL firmada al contexto del agente: ¿se acepta así (TTL corto, un objeto,
-  tipo y tamaño fijados) o se agrega una subida inline acotada para archivos pequeños?
-- ¿El grant RFC 8693 del emisor merece su propia task (es un primitive reutilizable del emisor) en vez de un slice de
-  esta? Decidir en Discovery según tamaño.
+- Acción de `can()` para `marketing_studio.asset.write` y `marketing_studio.campaign.write`: se toma de
+  `allowed_actions` que siembre TASK-1894; confirmar en Discovery y fijarla en ambas tablas de contratos (la de
+  `campaign.approve` la decide esta task al sembrarla).
