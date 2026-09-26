@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-045`
-- Status real: `Código en producción (release 0e87c7a443a2 + gateway v1.9.0); flag ON en Vercel staging (verificado). Pendiente: redeploy de Vercel Production (var ya creada), ops-worker a true (deploy.sh + gcloud) y release del fix baf0f908b`
+- Status real: `En producción 2026-09-26: código (releases 0e87c7a443a2 + f9257b9c94af, incluye el fix del empate), gateway v1.9.0 y flag ON en Vercel staging, Vercel Production y ops-worker. Pendiente para cerrar: canary de comportamiento en producción (edición sintética con plan v2)`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`
@@ -521,6 +521,15 @@ regenerado por ediciones posteriores de skills). Canary de `GET /api/platform/ec
 producción: 200 con el contrato nuevo, corrido por la sesión TASK-1846 (no por esta sesión). `INSIGHTS_EDITORIAL_V2_ENABLED`
 sigue OFF en todos los runtimes. Pendiente: merge y deploy de efeonce-mcp#18 (MERGEABLE, después del gateway 1.8.0 que
 despliega otra sesión); flag ON en Vercel staging + ediciones internas de Berel y Sky; flag ON en producción con 1889.
+
+Rollout de producción 2026-09-26 (ejecutado por Codex con autorización del operador; verificado por esta sesión):
+release `2add63c61fd6` abortado (ops-worker sin `DATAFORSEO_API_LOGIN`, rollback verificado por Codex) → fix #242 →
+release `f9257b9c94af` `released` (run `36236940651`). Verificación propia: `greenhouse.efeoncepro.com` sirve
+`greenhouse-29b4yzhmf` (createdAt 10:24:34Z), creado 8 s después de recrear la var de Production (10:24:26Z, vía
+`vercel api .../env`), así que la incluye; `ops-worker-00718-c4b` Ready/100 % con `INSIGHTS_EDITORIAL_V2_ENABLED=true`;
+el fix del empate (`baf0f908b`) está en `origin/main` (comparado por contenido); issuance/sharing/delivery siguen OFF
+en Vercel Production. No verificado: ninguna edición generada en producción desde el release (DB sin ediciones nuevas);
+el canary sintético por la lane ecosystem quedó bloqueado por el clasificador de permisos de esta sesión.
 
 Trazabilidad de SHAs: el 2026-09-25 a las 22:59 otra sesión reescribió la historia de `develop` para sacar blobs de
 `ai-generations/` (archivados en GCS); todos los commits posteriores a esa base cambiaron de SHA con contenido idéntico
