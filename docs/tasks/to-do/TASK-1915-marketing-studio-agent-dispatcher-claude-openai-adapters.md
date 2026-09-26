@@ -6,6 +6,20 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 — decisiones del operador
+
+Decisiones de Julio Reyes (operador) del 2026-09-26 aplicadas en esta task:
+
+- **Delegación por corrida con `act` (pregunta 1 del ADR):** se crea la unidad nueva **U22 de EPIC-044**, poseída por
+  [`TASK-1917`](TASK-1917-efeonce-id-agent-run-delegation-act.md). Efeonce ID emite tokens cortos y revocables por
+  corrida, con la persona como sujeto y el rol de agente versionado como actor (`act`), scopes ⊆ lista blanca del rol,
+  atados al work item y a la corrida, y la autoridad efectiva sigue pasando por el canje RFC 8693 de Greenhouse que ya
+  usa Studio. El Slice 5 queda bloqueado por TASK-1917 (y por la evaluación de TASK-1916), no por una unidad sin dueño.
+- **Datos competitivos `internal` (pregunta 8 del ADR):** los agentes en segundo plano y los programados **nunca** leen
+  datos competitivos `internal`; sólo el modo interactivo, con la persona presente, puede. Una excepción futura exige
+  una decisión nueva y explícita por organización (opt-in); no existe un interruptor `T2` en `agent_org_policy`.
+- **Asignación sobre el techo de costo:** la confirma una persona con `marketing_studio.campaign.approve` (TASK-1913).
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -24,7 +38,7 @@
 - Status real: `Diseno — creada 2026-09-26 desde el ADR de operación híbrida con agentes (§3.3 D, §4.4, §4.5, §4.6, §4.7, §12); ningún slice empezado. Plan de respaldo: modo interactivo primero (Slices 1–3), independiente de EPIC-044`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1913 (work items y evento de asignación) · TASK-1914 (tarjetas, compilador portable, lista blanca, kill switch, política por organización) · TASK-1899 (escritura MCP delegada). El modo delegado en segundo plano (Slice 5) está BLOQUEADO por EPIC-044: Efeonce ID aún no emite delegación por corrida con claim act (pregunta abierta 1 del ADR; no existe unidad en EPIC-044 que la posea). El modo programado (Slice 6) necesita la identidad de servicio por rol. Habilitar segundo plano o programado exige además evaluación aprobada (TASK-1916)`
+- Blocked by: `TASK-1913 (work items y evento de asignación) · TASK-1914 (tarjetas, compilador portable, lista blanca, kill switch, política por organización) · TASK-1899 (escritura MCP delegada). El modo delegado en segundo plano (Slice 5) está BLOQUEADO por TASK-1917 (EPIC-044 U22, decisión del operador 2026-09-26): Efeonce ID aún no emite delegación por corrida con claim act. El modo programado (Slice 6) necesita la identidad de servicio por rol. Habilitar segundo plano o programado exige además evaluación aprobada (TASK-1916)`
 - Branch: `efeonce-marketing-studio main (ledger de corridas, despachador, adaptadores, infra) · Greenhouse develop (docs, manual servido) · efeonce-mcp rama + PR (verificación de tokens de corrida) · Efeonce ID vía EPIC-044; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -105,6 +119,8 @@ Reglas obligatorias:
   el servidor; nunca la sesión personal de claude.ai o ChatGPT de nadie.
 - **Contenido externo es dato, no instrucción**; herramientas web del runtime restringidas a los dominios de la
   tarjeta.
+- **Datos competitivos `internal` sólo con la persona presente** (modo interactivo); segundo plano y programado
+  nunca los leen (decisión del operador 2026-09-26).
 - **Runtimes sin ZDR** (hoy Claude Managed Agents) sólo con datos de organizaciones que lo autorizaron (TASK-1914).
 - **Nunca OpenAI Agent Builder** (retiro anunciado para el 2026-11-30, ADR §12).
 - **Superficies en beta se reverifican al implementar cada adaptador** (ADR §12); un hecho de proveedor sin verificar
@@ -133,7 +149,8 @@ Reglas obligatorias:
 - **EPIC-044 (bloqueante del Slice 5):** token de delegación por corrida emitido por Efeonce ID (sujeto = persona,
   actor = agente vía claim `act` RFC 8693, audiencia `mcp.efeonce.org`, scopes ⊆ lista del rol, atado a work item y
   corrida, corto, revocable, sin refresh de larga vida a terceros) y soporte del emisor nativo para las tools de
-  Studio (hoy `unsupported`, `marketing_studio_native_policy_missing`). **No existe unidad de EPIC-044 que lo posea.**
+  Studio (hoy `unsupported`, `marketing_studio_native_policy_missing`). **Lo posee `TASK-1917` (EPIC-044 U22),
+  creada por decisión del operador el 2026-09-26.**
 
 ### Blocks / Impacts
 
@@ -211,6 +228,7 @@ Reglas obligatorias:
   - confirmación `T2` con token con `act` o identidad de servicio ⇒ `403 confirmation_requires_direct_person`
   - kill switch encendido ⇒ ninguna corrida nueva; las en curso se cancelan en su siguiente llamada
   - runtime sin ZDR sólo si `agent_org_policy` de la organización lo admite
+  - corridas en segundo plano y programadas nunca leen datos competitivos `internal` (sin interruptor por organización; una excepción exige decisión nueva)
   - `agent_run_event` append-only; `provider_ref` nunca se usa como fuente del entregable
 - Write-target allowlist: N/A (Studio; declarado)
 - Tenant/space boundary: cada corrida hereda `organization_id` del work item; la identidad delegada no puede leer otra organización (lo aplica el canje en cada llamada)
@@ -223,7 +241,7 @@ Reglas obligatorias:
 - Default state: `STUDIO_AGENT_DISPATCHER_ENABLED=false` y los cuatro flags de adaptador en `false`; `STUDIO_AGENT_INTERACTIVE_RUNS_ENABLED=false`; kill switch global encendido (TASK-1914)
 - Backfill plan: ninguno
 - Rollback path: flags OFF (los work items asignados a agentes quedan en `assigned`, visibles para reasignar a una persona); kill switch global; revocación de delegaciones en Efeonce ID; revert PR; ADR §9
-- External coordination: claves de API de Anthropic y OpenAI de Efeonce en Secret Manager; SA propia del despachador; cola Cloud Tasks; Scheduler de programas; release del gateway; unidad nueva en EPIC-044
+- External coordination: claves de API de Anthropic y OpenAI de Efeonce en Secret Manager; SA propia del despachador; cola Cloud Tasks; Scheduler de programas; release del gateway; TASK-1917 (EPIC-044 U22)
 
 ### Security and access
 
@@ -315,7 +333,7 @@ Reglas obligatorias:
   requeridas por defecto se responden sólo para tools `T0`/`T1` de la lista.
 - Test común de conformidad del puerto que los cuatro pasan con fakes, y corrida real por adaptador en staging.
 
-### Slice 5 — Modo delegado en segundo plano (bloqueado por EPIC-044)
+### Slice 5 — Modo delegado en segundo plano (bloqueado por TASK-1917, EPIC-044 U22)
 
 - Al asignar a un rol en modo `background`, el command de TASK-1913 obtiene el consentimiento de la persona; el
   despachador pide a Efeonce ID un token de corrida (persona como sujeto, agente como `act`, audiencia
@@ -325,7 +343,7 @@ Reglas obligatorias:
   llamada falla cerrada).
 - Studio: auditoría «persona X, ejecutado por agente `<rol>@<versión>` (corrida R, runtime, modelo)»; guarda
   `confirmation_requires_direct_person` en el kernel.
-- No se habilita mientras EPIC-044 no entregue la delegación (ver Open Questions).
+- No se habilita mientras TASK-1917 no entregue la delegación en producción.
 
 ### Slice 6 — Modo programado
 
@@ -333,12 +351,13 @@ Reglas obligatorias:
   `T2`; Cloud Scheduler dispara; `run_key` = programa + ventana.
 - Identidad de servicio por rol (emisor y forma en Discovery con EPIC-044; nunca un bearer `mst_` entregado al agente),
   limitada a `T0`/`T1` de creación de borrador nuevo; auditoría «servicio `<rol>`, programa P de la persona X».
-- Por defecto el servicio programado **no** lee datos competitivos `internal` (pregunta abierta 8); habilitarlo por
-  organización es `T2` en `agent_org_policy`.
+- El servicio programado **nunca** lee datos competitivos `internal` (decisión del operador 2026-09-26, pregunta 8
+  del ADR); tampoco el modo delegado en segundo plano. Sólo el modo interactivo, con la persona presente, puede. No hay
+  interruptor en `agent_org_policy`: una excepción futura exige una decisión nueva y explícita por organización.
 
 ## Out of Scope
 
-- Diseñar e implementar la delegación con `act` dentro de Efeonce ID: la posee EPIC-044 (unidad a crear).
+- Diseñar e implementar la delegación con `act` dentro de Efeonce ID: la posee `TASK-1917` (EPIC-044 U22).
 - Evals, normalización de precios, métricas y elección de runtime por defecto: TASK-1916.
 - Roles, tarjetas y lista blanca: TASK-1914. Work items: TASK-1913.
 - UI de corridas y programas: follow-up consumidor en TASK-1895/1912.
@@ -391,7 +410,7 @@ El despachador en sí no expone tools: sus transiciones son commands internos de
 
 ### Slice ordering hard rule
 
-- TASK-1913 y TASK-1914 en staging → Slice 1 → Slice 2 (interactivo; se puede habilitar en production sin EPIC-044) → Slice 3 → Slice 4 (un adaptador a la vez, empezando por uno auto-hospedado: `claude-agent-sdk` u `openai-agents-sdk`) → TASK-1916 con evaluación aprobada → Slice 5 sólo cuando EPIC-044 entregue la delegación → Slice 6.
+- TASK-1913 y TASK-1914 en staging → Slice 1 → Slice 2 (interactivo; se puede habilitar en production sin EPIC-044) → Slice 3 → Slice 4 (un adaptador a la vez, empezando por uno auto-hospedado: `claude-agent-sdk` u `openai-agents-sdk`) → TASK-1916 con evaluación aprobada → Slice 5 sólo cuando TASK-1917 entregue la delegación → Slice 6.
 - Ningún adaptador se prende en production sin su corrida real en staging, ni `claude-managed-agents` sin una organización que haya admitido runtimes sin ZDR.
 
 ### Risk matrix
@@ -405,7 +424,7 @@ El despachador en sí no expone tools: sus transiciones son commands internos de
 | Datos de cliente en proveedor sin ZDR | privacidad | low | runtime admitido por organización; borrado de sesión | corridas `claude-managed-agents` en orgs sin autorización = 0 |
 | Cambio o retiro de superficie de proveedor (beta) | disponibilidad | high | adaptador detrás de flag, estado en Studio, reverificación al implementar, nada sobre Agent Builder | fallos `provider_error` por adaptador |
 | Secretos en prompts o logs | seguridad | low | tokens en cabecera/vault, claves en Secret Manager, `logEvent` sin cuerpos | revisión de logs en canary |
-| EPIC-044 no entrega la delegación | cronograma | high | modo interactivo primero; Slice 5 no se habilita sin ella | unidad de EPIC-044 sin crear |
+| TASK-1917 (EPIC-044 U22) no entrega la delegación | cronograma | high | modo interactivo primero; Slice 5 no se habilita sin ella | TASK-1917 sin cerrar |
 
 ### Feature flags / cutover
 
@@ -432,7 +451,7 @@ El despachador en sí no expone tools: sus transiciones son commands internos de
 
 ### Out-of-band coordination required
 
-- Operador: crear la unidad de EPIC-044 para la delegación por corrida con `act` (o confirmar a qué task existente se agrega).
+- Coordinación con `TASK-1917` (EPIC-044 U22, creada 2026-09-26 por decisión del operador) para la delegación por corrida con `act`.
 - Operador: claves de API de Anthropic y OpenAI de Efeonce y su presupuesto; autorización explícita por organización para runtimes sin ZDR.
 - Dueño de TASK-1899: hook de la guarda `confirmation_requires_direct_person` en su camino de confirmación.
 
@@ -455,7 +474,8 @@ El despachador en sí no expone tools: sus transiciones son commands internos de
 - [ ] Una identidad de servicio que intenta una operación que no crea borrador nuevo responde `403 service_identity_not_allowed`.
 - [ ] Kill switch encendido impide corridas nuevas y cancela las en curso en su siguiente llamada.
 - [ ] Ninguna dependencia, import o configuración usa OpenAI Agent Builder.
-- [ ] El modo delegado en segundo plano queda deshabilitado en production hasta que EPIC-044 entregue la delegación, y así consta en el ledger de flags.
+- [ ] El modo delegado en segundo plano queda deshabilitado en production hasta que TASK-1917 entregue la delegación, y así consta en el ledger de flags.
+- [ ] Una corrida en segundo plano o programada nunca recibe datos competitivos `internal`: las tools competitivas quedan fuera de su lista efectiva (`403 agent_tool_not_allowed`) y el reader de TASK-1908 filtra `internal_competitive` para tokens con `act` e identidades de servicio (test).
 
 ## Verification
 
@@ -478,15 +498,13 @@ El despachador en sí no expone tools: sus transiciones son commands internos de
 
 ## Follow-ups
 
-- Unidad de EPIC-044: delegación por corrida con `act` y soporte del emisor nativo para las tools de Studio.
+- Soporte del emisor nativo para las tools de Studio en modo interactivo (autorización nueva D10; la delegación por corrida la posee `TASK-1917`).
 - UI de corridas y programas (estado, costo, causa de fallo, cancelar): consumidora en TASK-1895/1912; no se crea wireframe aquí.
 - Promoción del puerto y los adaptadores a servicio de plataforma cuando un segundo producto lo necesite (ADR §8).
 - Nexa como runtime del despachador cuando hable MCP contra el gateway con la delegación de ADR §4.4 (pregunta abierta 5).
 
 ## Open Questions
 
-- **Pregunta 1 del ADR (dueño: EPIC-044).** Mecánica de la delegación para segundo plano: consentimiento de la persona al asignar, TTL, atadura a work item y corrida, verificación en el gateway y relación con el canje RFC 8693 de TASK-1899. **No hay unidad de EPIC-044 que la posea: el operador decide si se crea una nueva (U22) o se agrega a una existente.** Mientras tanto rige el plan de respaldo (modo interactivo).
 - **Pregunta 2 del ADR.** Cómo inyectar la credencial en runtimes alojados sin dejar un refresh token en el proveedor. Propuesta: token corto por corrida en vault `static_bearer` de Managed Agents rotado por el despachador, sin `mcp_oauth` con refresh; si no alcanza, `claude-managed-agents` queda sólo para datos internos de Efeonce.
 - **Pregunta 5 del ADR.** Nexa como runtime del despachador: fuera de alcance; Nexa sigue como cliente del gateway.
-- **Pregunta 8 del ADR.** ¿El servicio programado puede leer datos competitivos `internal` para campañas de clientes? Por defecto no; habilitable por organización como `T2`. Confirmar con el operador.
 - ¿El despachador es un servicio Cloud Run propio (`apps/agent-dispatcher`, SA separada) o una ruta nueva del worker de medios? Propuesta: servicio propio (secretos distintos, timeouts y concurrencia distintos, mínimo privilegio); Discovery lo confirma.

@@ -6,6 +6,12 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 — decisiones del operador
+
+- **Asignar a un agente sobre el techo de costo se confirma con `marketing_studio.campaign.approve`** (decisión de Julio
+  Reyes, operador, 2026-09-26). No nace una capability nueva: el `T2` de asignación reutiliza la capability y el cliente
+  de canje de aprobación que siembra TASK-1899. Se revisa sólo si otra persona distinta debe ser dueña del gasto en IA.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -200,7 +206,7 @@ Reglas obligatorias:
 
 ### Security and access
 
-- Auth/access gate: lecturas `marketing_studio.campaign.read` / `studio:read`; escrituras `marketing_studio.campaign.write` / `studio:write`; aceptar y pedir cambios con `requiresPerson`; confirmar una asignación sobre el techo con `marketing_studio.campaign.approve` (ver Open Questions)
+- Auth/access gate: lecturas `marketing_studio.campaign.read` / `studio:read`; escrituras `marketing_studio.campaign.write` / `studio:write`; aceptar y pedir cambios con `requiresPerson`; confirmar una asignación sobre el techo con `marketing_studio.campaign.approve` (decisión del operador 2026-09-26; sin capability nueva)
 - Sensitive data posture: sin PII más allá del `subject` de personas; las notas de revisión son texto de trabajo, no se loggean
 - Error contract: `work_item_invalid_transition`, `work_item_role_not_eligible`, `work_item_role_disabled`, `approval_requires_person`, `confirmation_required`, `confirmation_mismatch`, `revision_conflict`, `provenance_required`, `feature_disabled` (todos en `ERROR_CATALOG`, prosa es-CL)
 - Abuse/rate-limit posture: tope de 200 work items abiertos por campaña y de 20 asignaciones a agentes por persona y día (`STUDIO_AGENT_ASSIGNMENTS_DAILY_LIMIT_PER_PERSON`), ajustables por env
@@ -281,7 +287,8 @@ Reglas obligatorias:
 - Regla de techo (ADR §4.1): el command pide al puerto de presupuesto de TASK-1914/1915
   (`evaluateAgentAssignmentBudget`) el margen del rol y de la organización para el costo estimado de la corrida; con
   margen ⇒ `T1`; sin margen ⇒ `409 confirmation_required` con `proposalDigest`, y la confirmación la da una persona
-  con token sin `act` (regla de TASK-1915). Mientras TASK-1915 no registre corridas, el margen es el techo completo y
+  con `marketing_studio.campaign.approve` y token sin `act` (regla de TASK-1915; capability decidida por el operador
+  el 2026-09-26). Mientras TASK-1915 no registre corridas, el margen es el techo completo y
   el modo sólo puede ser interactivo (el costo lo absorbe el cliente de la persona).
 - Genera `assignment_id` estable; reasignar o pedir cambios crea uno nuevo; el evento `assigned` a rol lleva
   `{assignmentId, roleKey, roleVersion, mode}` para el despachador.
@@ -423,7 +430,7 @@ asignar a un rol puede devolver `confirmation_required` y que el agente debe mos
 - [ ] Las cinco tablas existen en staging y production; `work_item_event` rechaza `UPDATE` y `DELETE`.
 - [ ] Toda transición fuera de la matriz responde `409 work_item_invalid_transition`; toda transición válida escribe `work_item_event` y `audit_event` en la misma transacción.
 - [ ] Aceptar y pedir cambios con un `api_client` responden `403 approval_requires_person`; una persona aceptando su propio trabajo recibe `409 work_item_self_review`.
-- [ ] Asignar a un rol publicado dentro del techo es `T1`; sobre el techo responde `confirmation_required` y sólo ejecuta con la confirmación de una persona.
+- [ ] Asignar a un rol publicado dentro del techo es `T1`; sobre el techo responde `confirmation_required` y sólo ejecuta con la confirmación de una persona con `marketing_studio.campaign.approve` (sin ella, `forbidden`).
 - [ ] Aceptar con traspaso crea un work item nuevo con `parent_work_item_id` y deja el original en `handed_off`.
 - [ ] Cada asignación genera un `assignment_id` estable presente en el evento `assigned`.
 - [ ] Las 15 operaciones están en `operations.ts` con `riskTier`, ruta y tool; test de paridad y leak test verdes.
@@ -456,6 +463,5 @@ asignar a un rol puede devolver `confirmation_required` y que el agente debe mos
 
 ## Open Questions
 
-- ¿Qué capability confirma una asignación sobre el techo? Propuesta: `marketing_studio.campaign.approve` (es aprobar gasto preautorizado, como una línea de presupuesto). Alternativa: capability propia `marketing_studio.agent_budget.approve` con su cliente de canje. Decide el operador.
 - ¿Cómo se eligen personas asignables sin directorio en Studio? Propuesta: reader del lane ecosystem de Greenhouse filtrado por capability `marketing_studio.campaign.write` (follow-up); mientras tanto, `subject` explícito.
 - ¿Tope de 200 work items abiertos por campaña y 20 asignaciones a agentes por persona y día son los correctos? Ajustables por env.

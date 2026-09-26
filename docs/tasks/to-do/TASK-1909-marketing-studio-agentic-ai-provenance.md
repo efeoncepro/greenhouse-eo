@@ -6,6 +6,14 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 — decisiones del operador
+
+- **`studio.voice_rules.publish` es `T2`**, no `T1` (decisión de Julio Reyes, operador, 2026-09-26): publicar una
+  versión de reglas de voz exige `dryRun` → digest de propuesta → confirmación explícita de una persona (token sin
+  `act`), con la capability restringida `marketing_studio.catalog.manage`. Editar el borrador
+  (`studio.voice_rules.draft.upsert`) sigue siendo `T1` restringido. Esta decisión no cambia el nivel de la
+  publicación del catálogo de canales (TASK-1905).
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -192,7 +200,7 @@ Reglas obligatorias:
 
 ### Security and access
 
-- Auth/access gate: lecturas `.campaign.read`; borradores `.campaign.write` / `studio:write`; aceptar/rechazar `.campaign.write` con `requiresPerson`; reglas de voz `.catalog.manage`
+- Auth/access gate: lecturas `.campaign.read`; borradores `.campaign.write` / `studio:write`; aceptar/rechazar `.campaign.write` con `requiresPerson`; reglas de voz `.catalog.manage` (publicar es `T2` con `dryRun` → digest → confirmación de una persona)
 - Sensitive data posture: el contexto no incluye PII ni datos competitivos (`internal_competitive` filtrado por el reader de TASK-1908 según actor)
 - Error contract: `provenance_required`, `provenance_invalid`, `ai_draft_not_accepted`, `accepted_copy_requires_new_variant`, `ai_draft_quota_exceeded` (429)
 - Abuse/rate-limit posture: cuotas `STUDIO_AI_DRAFT_DAILY_LIMIT_PER_PERSON` (default 200 escrituras `ai_agent` por persona y día) y 50 borradores abiertos por campaña
@@ -218,7 +226,7 @@ Reglas obligatorias:
 
 - [ ] Procedencia, validadores y contexto en `packages/domain`.
 - [ ] Entidades de borrador como recursos con commands.
-- [ ] `riskTier` en todas las operaciones; ninguna `T2` nueva (aprobar sigue en las dueñas).
+- [ ] `riskTier` en todas las operaciones; la única `T2` nueva es `publishVoiceRules` (decisión del operador 2026-09-26); aprobar sigue en las dueñas.
 - [ ] Sin capability nueva (usa `.campaign.read`, `.campaign.write`, `.catalog.manage`).
 - [ ] Camino programático: `/api/v1` + tools federadas.
 - [ ] Un primitive, muchos consumers: agentes hoy, IA en producto después, sobre los mismos commands.
@@ -274,8 +282,10 @@ Reglas obligatorias:
 
 ### Slice 5 — Reglas de voz versionadas
 
-- `voice_rule_set` por organización con versiones (`draft|published|superseded`), commands `upsertVoiceRulesDraft` y
-  `publishVoiceRules` (`T1`, capability restringida `.catalog.manage`, mismo criterio que el catálogo de canales).
+- `voice_rule_set` por organización con versiones (`draft|published|superseded`), commands `upsertVoiceRulesDraft`
+  (`T1`, capability restringida `.catalog.manage`) y `publishVoiceRules` (`T2`: `dryRun` → digest → confirmación de una
+  persona sin `act`, misma capability; decisión del operador 2026-09-26). A diferencia de la publicación del catálogo
+  de canales, que sigue `T1` restringida en TASK-1905.
 - Semilla Efeonce desde `docs/context/05_voz-tono-estilo.md` (revisada por una persona antes del `--apply`).
 
 ### Slice 6 — Entidades de borrador: brief de contenido, QA e informe semanal
@@ -327,7 +337,8 @@ Reglas obligatorias:
 | `getProvenance` | `GET /api/v1/provenance?entityType=&entityId=` | `studio.provenance.get` | T0 |
 | `acceptAiDraft` · `rejectAiDraft` | `POST /api/v1/ai-drafts/{entityType}/{entityId}/accept` · `…/reject` | `studio.ai_draft.accept` · `studio.ai_draft.reject` | T1 (persona) |
 | `getVoiceRules` | `GET /api/v1/voice-rules?organizationId=` | `studio.voice_rules.get` | T0 |
-| `upsertVoiceRulesDraft` · `publishVoiceRules` | `PUT /api/v1/voice-rules/drafts/{versionNo}` · `POST …/publish` | `studio.voice_rules.draft.upsert` · `studio.voice_rules.publish` | T1 (restringida) |
+| `upsertVoiceRulesDraft` | `PUT /api/v1/voice-rules/drafts/{versionNo}` | `studio.voice_rules.draft.upsert` | T1 (restringida) |
+| `publishVoiceRules` | `POST /api/v1/voice-rules/drafts/{versionNo}/publish` | `studio.voice_rules.publish` | T2 (`dryRun` → digest → confirmación de persona) |
 | `listContentBriefs` · `getContentBrief` · `upsertContentBrief` | `GET/GET/PUT /api/v1/campaigns/{campaignId}/content-briefs[/{briefId}]` | `studio.content_briefs.list` · `studio.content_brief.get` · `studio.content_brief.upsert` | T0 · T0 · T1 |
 | `listQaReports` · `createQaReport` | `GET/POST /api/v1/campaigns/{campaignId}/qa-reports` | `studio.qa_reports.list` · `studio.qa_report.create` | T0 · T1 |
 | `listReadouts` · `getReadout` · `upsertReadout` | `GET/GET/PUT /api/v1/readouts[/{readoutId}]` | `studio.readouts.list` · `studio.readout.get` · `studio.readout.upsert` | T0 · T0 · T1 |
@@ -400,7 +411,8 @@ Capabilities: T0 `.campaign.read` / `studio:read`; T1 `.campaign.write` / `studi
 - [ ] Una propuesta de IA sobre un copy aceptado crea variante nueva; editar en su lugar responde `409`.
 - [ ] El contexto por campaña devuelve `contextDigest` estable y secciones `not_available` cuando falta la fuente.
 - [ ] `studio.copy.validate` y `studio.creative.check` no escriben y reportan límites, voz, formato y derechos.
-- [ ] Reglas de voz de Efeonce publicadas en production desde la guía documental.
+- [ ] Reglas de voz de Efeonce publicadas en production desde la guía documental, por `studio.voice_rules.publish` como `T2` confirmado por una persona.
+- [ ] Publicar reglas de voz sin digest responde `confirmation_required`; con token con `act` responde `403 confirmation_requires_direct_person`.
 - [ ] Brief de contenido, QA e informe semanal existen con borrador y aceptación, por API y MCP.
 - [ ] Sesión MCP real de punta a punta verde en staging y production.
 - [ ] Manual servido y skill de planificación usan las tools reales; leak test verde.

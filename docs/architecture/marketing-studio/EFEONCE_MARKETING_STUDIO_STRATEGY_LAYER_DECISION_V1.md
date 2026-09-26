@@ -340,13 +340,23 @@ Las tasks por tema las crea el EPIC-049; este ADR no fija sus IDs.
 
 ## 11. Preguntas abiertas (deliberadamente no decididas aquí)
 
+> Resoluciones del operador (Julio Reyes) del 2026-09-26 marcadas en cada punto; el cuerpo del ADR no cambia.
+> Decisiones del mismo día que precisan tasks sin ser preguntas de esta sección: `studio.voice_rules.publish` es `T2`
+> (TASK-1909); el canje de `marketing_studio.integration.manage` verifica la acción única `update`, y conectar y revocar
+> son `T2` (TASK-1910, TASK-1899).
+
 1. **Forma y dueño exacto del catálogo de modelo de cliente en Greenhouse** (dominio comercial o growth, tablas,
    quién publica versiones y con qué capability).
+   **Resuelto en parte (2026-09-26):** se crea la clase de scope `efeonce.mcp.commercial.write`; publica el modelo de
+   una organización cliente `efeonce_account` y el de la organización propia de Efeonce `efeonce_admin` (TASK-1906).
+   Dominio y tablas los fija TASK-1906.
 2. **Qué binding usa Studio** para planificar campañas de Efeonce con lanes competitivos (`internal`) versus campañas de
    clientes (binding por organización), y cómo la UI separa ambas superficies.
 3. **Cómo la UI de Studio dispara un `T2` en Greenhouse** (p. ej. rastrear palabras clave) con la identidad de la
    persona: vía la tool de Greenhouse directamente o vía el lane app con token delegado.
 4. **Límites de copy duros vs recomendados por plataforma** y quién mantiene el catálogo al día.
+   **Resuelto quién lo mantiene (2026-09-26):** `efeonce_operations`, con `efeonce_admin`; son los únicos grants de
+   `marketing_studio.catalog.manage` (TASK-1905). Límites duros vs recomendados y cadencia siguen abiertos.
 5. **Nexa como cliente:** si opera Studio a través del gateway MCP o de un canal propio; en ambos casos, con las mismas
    tools y niveles.
 6. **Modelo de proveedor para la IA en producto** y línea base de evaluación por tarea.

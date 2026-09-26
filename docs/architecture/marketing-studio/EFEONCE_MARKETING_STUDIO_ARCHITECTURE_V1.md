@@ -272,9 +272,11 @@ como contrato:
   evaluación, modos habilitados y kill switch. Roles iniciales: planificador de medios, SEO/AEO, copywriter, QA
   creativo y de marca, analista de desempeño.
 - **Identidad**: corrida delegada = persona que asignó ∩ lista del rol (auditoría «persona X, ejecutado por agente
-  `<rol>`»); delegación para segundo plano emitida sólo por Efeonce ID (claim `act`, corta, revocable; pendiente de
-  diseño en su dueño); corrida programada = identidad de servicio por rol limitada a `T0`/`T1` y a borradores nuevos;
+  `<rol>`»); delegación para segundo plano emitida sólo por Efeonce ID (claim `act`, corta, revocable; dueña
+  TASK-1917 = EPIC-044 U22, decisión del operador 2026-09-26); corrida programada = identidad de servicio por rol limitada a `T0`/`T1` y a borradores nuevos;
   `T2` siempre con confirmación de una persona desde un token sin `act`.
+  Los modos en segundo plano y programado nunca leen datos competitivos `internal`; sólo el interactivo, con la
+  persona presente (decisión del operador 2026-09-26).
 - **Tres modos, un contrato** `{rol@versión, work_item, insumos, runtime, modelo, identidad, techo}`: interactivo
   (persona + skill de rol + Efeonce MCP en Claude Code, claude.ai, Codex o ChatGPT; disponible en lectura hoy),
   delegado en segundo plano y programado, ambos por un **despachador en Studio** (runtime asíncrono en Cloud Run) con

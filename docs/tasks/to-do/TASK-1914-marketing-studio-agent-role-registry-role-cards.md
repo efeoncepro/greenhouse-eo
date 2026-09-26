@@ -6,6 +6,12 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 — decisiones del operador
+
+- **Grants de `marketing_studio.agent_role.manage`:** `efeonce_admin` y `efeonce_operations` (decisión de Julio Reyes,
+  operador, 2026-09-26; roles verificados en `src/config/role-codes.ts`). Relajar un rol sigue siendo `T2` (`dryRun` →
+  digest → confirmación) aunque la persona tenga la capability.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -215,7 +221,7 @@ Reglas obligatorias:
 
 ### Security and access
 
-- Auth/access gate: lecturas `marketing_studio.campaign.read`; gestión de roles, modos, kill switch y política con capability nueva `marketing_studio.agent_role.manage` (grants propuestos: `efeonce_admin`, `efeonce_operations`); encender un kill switch lo puede hacer cualquier persona con `.agent_role.manage` sin digest
+- Auth/access gate: lecturas `marketing_studio.campaign.read`; gestión de roles, modos, kill switch y política con capability nueva `marketing_studio.agent_role.manage` (grants `efeonce_admin`, `efeonce_operations`, decididos por el operador el 2026-09-26; relajar sigue siendo `T2`); encender un kill switch lo puede hacer cualquier persona con `.agent_role.manage` sin digest
 - Sensitive data posture: las tarjetas no contienen secretos ni PII; las instrucciones no incluyen credenciales; `agent_tool_denial` guarda nombre de tool y corrida, nunca argumentos
 - Error contract: `agent_role_unknown_tool`, `agent_role_provider_syntax`, `agent_role_version_immutable`, `agent_role_not_published`, `agent_role_disabled`, `agent_mode_disabled`, `eval_required`, `agent_tool_not_allowed`, `agent_kill_switch_on`, `runtime_not_admitted`, `confirmation_required`
 - Abuse/rate-limit posture: gestión de roles es de baja frecuencia; `agent_tool_denial` con tope de escritura por corrida para no amplificar un bucle
@@ -316,8 +322,8 @@ Reglas obligatorias:
 
 ### Slice 6 — Capability, canje y gateway
 
-- Greenhouse: capability `marketing_studio.agent_role.manage` (registry + catálogo + grants + cliente de canje
-  `efeonce-mcp-marketing-studio-agent-role-manage`, receta TASK-1899), release.
+- Greenhouse: capability `marketing_studio.agent_role.manage` (registry + catálogo + grants a `efeonce_admin` y
+  `efeonce_operations` + cliente de canje `efeonce-mcp-marketing-studio-agent-role-manage`, receta TASK-1899), release.
 - Gateway: sync del manifiesto, guarda del Slice 4, bump de versión, dispatch, canary.
 
 ## Out of Scope
@@ -414,7 +420,7 @@ Reglas obligatorias:
 ### Out-of-band coordination required
 
 - Operador revisa y aprueba las cinco tarjetas v1 y las tres skills nuevas.
-- Grants de `marketing_studio.agent_role.manage` confirmados por el operador.
+- Grants de `marketing_studio.agent_role.manage` decididos por el operador el 2026-09-26 (`efeonce_admin`, `efeonce_operations`); sin coordinación pendiente.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -433,7 +439,7 @@ Reglas obligatorias:
 - [ ] Kill switch encendido rechaza corridas nuevas y llamadas de corridas en curso de ese rol.
 - [ ] Habilitar `background` o `scheduled` sin evaluación aprobada responde `409 eval_required`.
 - [ ] Cinco tarjetas v1 publicadas; cinco skills de rol existen, espejadas en `.codex`, con test de deriva verde contra su tarjeta.
-- [ ] Capability `marketing_studio.agent_role.manage` con grant y cliente de canje en producción; coverage test verde.
+- [ ] Capability `marketing_studio.agent_role.manage` con grant a `efeonce_admin` y `efeonce_operations` y cliente de canje en producción; coverage test verde.
 - [ ] Manual servido con la sección «Roles de agente»; leak test verde.
 
 ## Verification
@@ -463,5 +469,4 @@ Reglas obligatorias:
 ## Open Questions
 
 - ¿Cómo carga el despachador las skills referenciadas por la tarjeta? Propuesta: publicarlas como manuales servidos del catálogo de Greenhouse y leerlas por `get_greenhouse_skill` al iniciar la corrida (MCP como única vía; digest de la versión en la tarjeta). Exige que las skills de rol pasen el leak test de manuales servidos. Alternativa: paquete generado dentro de la imagen del despachador. Decide el operador con TASK-1915.
-- ¿Grants de `marketing_studio.agent_role.manage`? Propuesta: `efeonce_admin` y `efeonce_operations`.
 - ¿La versión de una skill es su digest de contenido o un semver en el frontmatter? Propuesta: digest (no depende de disciplina humana).

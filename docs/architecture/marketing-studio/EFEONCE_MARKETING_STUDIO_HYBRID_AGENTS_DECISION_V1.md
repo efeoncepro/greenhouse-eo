@@ -401,13 +401,27 @@ plataforma con su propio ADR. Hasta entonces vive en Studio.
 
 ## 11. Preguntas abiertas (deliberadamente no decididas aquí)
 
+> Resoluciones del operador (Julio Reyes) del 2026-09-26 marcadas en cada punto; el cuerpo del ADR no cambia.
+> Decisiones del mismo día que precisan tasks sin ser preguntas de esta sección: grants de
+> `marketing_studio.agent_role.manage` = `efeonce_admin` y `efeonce_operations` (relajar sigue `T2`, TASK-1914); asignar
+> a un agente sobre el techo de costo se confirma con `marketing_studio.campaign.approve`, sin capability nueva (TASK-1913).
+
 1. **Mecánica exacta de la delegación para segundo plano** en Efeonce ID: forma del consentimiento de la persona al
    asignar, TTL, atadura a work item y corrida, cómo el gateway la verifica y cómo se relaciona con el canje RFC 8693
    actual de TASK-1899 (hoy el emisor nativo está `unsupported` para las tools de Studio).
+   **Resuelta en dueño y principios (2026-09-26):** unidad nueva **U22 de EPIC-044**, poseída por
+   [`TASK-1917`](../../tasks/to-do/TASK-1917-efeonce-id-agent-run-delegation-act.md). Efeonce ID emite tokens cortos y
+   revocables por corrida, con `act` (la persona delega en un rol de agente versionado), scopes ⊆ lista del rol, atados
+   al work item y a la corrida, y reutiliza el canje RFC 8693 de Greenhouse que ya usa Studio; consumidor: modo delegado
+   de TASK-1915. Vida máxima, forma del consentimiento y autenticación del despachador quedan en TASK-1917.
 2. **Cómo se inyecta la credencial en cada runtime alojado** sin dejar un refresh token en el proveedor (p. ej. token
    corto por corrida en un vault de Managed Agents con rotación, vs sólo runtimes auto-hospedados para clientes).
 3. **Dónde vive el set de evaluación y quién califica los criterios humanos** (Studio vs repo de skills; rotación de
    revisores).
+   **Resuelto quién califica (2026-09-26):** `marketing_studio.agent_eval.grade` para `efeonce_admin`,
+   `efeonce_operations` y `efeonce_account`, pero califican sólo personas nominales, una por disciplina (medios,
+   SEO/AEO, creativo), designadas por el operador; sin rotación. Los nombres son un insumo pendiente del operador. Dónde
+   vive el set sigue abierto (TASK-1916).
 4. **Runtime por defecto por rol** (se decide por evals; ninguna preferencia fijada aquí).
 5. **Nexa como runtime del despachador** (no sólo cliente): posible si Nexa llega a hablar MCP contra el gateway con
    la delegación de §4.4; hoy no.
@@ -416,6 +430,9 @@ plataforma con su propio ADR. Hasta entonces vive en Studio.
    para comparar roles.
 8. **Si el agente de servicio programado puede leer data competitiva** (`internal`) para campañas de clientes; hoy
    se asume que no.
+   **Resuelta (2026-09-26):** los agentes programados **nunca** leen data competitiva `internal`, y tampoco los delegados
+   en segundo plano; sólo el modo interactivo con la persona presente puede. Una excepción futura exige una decisión
+   nueva y explícita por organización (opt-in), no un interruptor de política (TASK-1915, TASK-1908).
 
 ## 12. Hechos verificados de proveedores (verificado 2026-09-26)
 

@@ -6,6 +6,23 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 — decisiones del operador
+
+Decisiones de Julio Reyes (operador) del 2026-09-26 que tocan la mecánica de esta task:
+
+- **`marketing_studio.integration.manage`: el canje verifica la acción única `update`.** Conectar, revalidar y revocar
+  cuentas publicitarias son `T2` y se canjean con esa misma acción; TASK-1910 la siembra así. Se retira la marca
+  «verificar en TASK-1910» de la tabla de contratos de canje.
+- **`studio.voice_rules.publish` es `T2`** (digest + confirmación de persona); `studio.voice_rules.draft.upsert` sigue
+  `T1` restringido (TASK-1909).
+- **Asignar un work item a un agente sobre el techo de costo** (TASK-1913) se confirma con
+  `marketing_studio.campaign.approve`; no nace capability nueva, así que reutiliza el cliente de canje de aprobación de
+  esta task.
+- **Delegación por corrida con `act`:** la emite Efeonce ID en la unidad U22 de EPIC-044
+  ([`TASK-1917`](TASK-1917-efeonce-id-agent-run-delegation-act.md)) y la autoridad sigue pasando por el canje de esta
+  task en cada llamada; la guarda `confirmation_requires_direct_person` del hook de abajo es la que ejercitan esos tokens.
+- **Clase `efeonce.mcp.commercial.write`:** creada por decisión del operador; la posee TASK-1906 (no es fila de esta tabla).
+
 ## Delta 2026-09-26 (capa de estrategia)
 
 - **Decisión nueva:**
@@ -572,7 +589,7 @@ Reglas obligatorias:
 | `marketing_studio.campaign.write` | `efeonce-mcp-marketing-studio-campaign-write` | `efeonce.mcp.marketing_studio.write` | la de `allowed_actions` que siembre TASK-1894 [verificar] | sí |
 | `marketing_studio.campaign.approve` | `efeonce-mcp-marketing-studio-campaign-approve` | `efeonce.mcp.marketing_studio.write` | la que siembre esta task (Slice 1) | sí |
 | `marketing_studio.catalog.manage` (fila y cliente de **TASK-1905** Slices 7–8) | `efeonce-mcp-marketing-studio-catalog-manage` | `efeonce.mcp.marketing_studio.write` | `update` (TASK-1905 Slice 7) | sí |
-| `marketing_studio.integration.manage` (fila y cliente de **TASK-1910** Slice 8) | `efeonce-mcp-marketing-studio-integration-manage` | `efeonce.mcp.marketing_studio.write` | `update` por la convención de TASK-1894 (`create` y `update` se conceden juntas) [verificar en TASK-1910] | sí |
+| `marketing_studio.integration.manage` (fila y cliente de **TASK-1910** Slice 8) | `efeonce-mcp-marketing-studio-integration-manage` | `efeonce.mcp.marketing_studio.write` | `update` (decisión del operador 2026-09-26; conectar, revalidar y revocar son `T2`) | sí |
 
 La tabla vive en dos lugares con paridad por test: `resolveScopeContract` (Greenhouse) y
 `marketing-studio-exchange-contracts.ts` (gateway). Si el manifiesto sincronizado trae una tool `writes` con una
@@ -606,7 +623,8 @@ nuevo en el provider.
 | TASK-1908 | `studio.campaign.strategy_plan.seo.set`, `studio.campaign.seo_snapshots.capture`, `studio.campaign.seo_tracking.propose`, `studio.campaign.seo_tracking.withdraw` | `.campaign.write` | `T1` |
 | TASK-1908 | `studio.campaign.seo_snapshot.declare_competitive` | `.campaign.write` (sólo persona interna, sin scope de bearer) | `T1` |
 | TASK-1909 | `studio.ai_draft.accept`, `studio.ai_draft.reject` (persona), `studio.content_brief.upsert`, `studio.qa_report.create`, `studio.readout.upsert` | `.campaign.write` | `T1` |
-| TASK-1909 | `studio.voice_rules.draft.upsert`, `studio.voice_rules.publish` | `.catalog.manage` | `T1` (restringida) |
+| TASK-1909 | `studio.voice_rules.draft.upsert` | `.catalog.manage` | `T1` (restringida) |
+| TASK-1909 | `studio.voice_rules.publish` (persona) | `.catalog.manage` | `T2` (decisión del operador 2026-09-26) |
 | TASK-1910 | `studio.ad_connection.connect`, `studio.ad_connection.revalidate`, `studio.ad_connection.revoke` (persona) | `.integration.manage` | `T2` |
 | TASK-1910 | `studio.ad.provider_link.set`, `studio.campaign.paid_performance.readback`, `studio.campaign.landing_check.run`, `studio.campaign.metrics_mapping.set` | `.campaign.write` | `T1` |
 | TASK-1911 | `studio.experiment.design.upsert`, `studio.experiment.start`, `studio.experiment.result.capture`, `studio.learning.propose` | `.campaign.write` | `T1` |
@@ -838,7 +856,6 @@ El `upstreamCode` de Studio se conserva en logs saneados, nunca el cuerpo.
 
 ## Open Questions
 
-- Acción de `can()` para `marketing_studio.integration.manage` (TASK-1910): esta task propone `update` por la misma convención; la fija TASK-1910 al sembrarla.
 - Acción de `can()` para `marketing_studio.asset.write` y `marketing_studio.campaign.write`: se toma de
   `allowed_actions` que siembre TASK-1894; confirmar en Discovery y fijarla en ambas tablas de contratos (la de
   `campaign.approve` la decide esta task al sembrarla).

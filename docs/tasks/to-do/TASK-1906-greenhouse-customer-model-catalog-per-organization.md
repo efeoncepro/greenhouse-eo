@@ -6,6 +6,18 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 — decisiones del operador
+
+Decisiones de Julio Reyes (operador) del 2026-09-26:
+
+- **Se crea la clase de scope `efeonce.mcp.commercial.write`** (Slice 4). Nombre genérico por radio de impacto
+  comercial; la capability `commercial.customer_model.manage` acota lo que permite hoy. Sumar otra escritura comercial
+  a esta clase se evalúa en la task de esa escritura, contra la regla «una clase por radio de impacto».
+- **Quién publica el modelo de cliente:** para una organización **cliente**, `efeonce_account`; para la organización
+  **propia de Efeonce** (`org-2df565fb-98aa-42f7-b324-ea9a2209017f`), `efeonce_admin`. El grant de
+  `commercial.customer_model.manage` sigue en `efeonce_admin` y `efeonce_account`; la regla por tipo de organización la
+  aplica el command de publicación (`forbidden` si no corresponde).
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -294,7 +306,9 @@ Reglas obligatorias:
 - `commercial.customer_model.read` (`actions: ['read']`) y `commercial.customer_model.manage`
   (`actions: ['create','update','approve']`) en catálogo + seed en `capabilities_registry` + grants: read a
   `efeonce_admin`, `efeonce_account`, `efeonce_operations`; manage (las tres acciones) a `efeonce_admin` y
-  `efeonce_account`. Coverage test verde.
+  `efeonce_account`. Coverage test verde. Publicar (`approve`) además exige, por decisión del operador del 2026-09-26:
+  `efeonce_account` para organizaciones cliente y `efeonce_admin` para la organización propia de Efeonce; el command de
+  publicación lo verifica con el tipo de organización y responde `forbidden` si no corresponde.
 - Clase MCP `efeonce.mcp.commercial.write` en `src/lib/auth-server/oauth/scopes.ts` (`EFEONCE_MCP_WRITE_SCOPES`, test
   de paridad) y en el recurso Entra «Efeonce MCP Resource» (scope Admin, round-trip verificado leyendo el arreglo antes y
   después; `az ad app update` reemplaza el arreglo completo). **Nunca** en el cliente PKCE público compartido.
@@ -426,13 +440,13 @@ interface CustomerModelV1 {
 3. Lane ecosystem con binding org-scoped de otra organización ⇒ `404`; `internal` sin `organizationId` ⇒ `400`.
 4. Release de Greenhouse; Entra; allowlist; gateway con flags OFF → ON; canary del provider (lectura, deny, borrador,
    publicación con digest, persona sin capability `forbidden`).
-5. Production: semilla v1 de Efeonce publicada por una persona; Studio (TASK-1905) lee la versión en staging.
+5. Production: semilla v1 de Efeonce publicada por una persona con `efeonce_admin` (organización propia); Studio (TASK-1905) lee la versión en staging.
 
 ### Out-of-band coordination required
 
 - Scope Admin nuevo en el recurso Entra «Efeonce MCP Resource» (operador con `az`, round-trip).
 - Allowlist del cliente de canje en Vercel de Greenhouse production + redeploy.
-- Revisión humana de la semilla v1 (dueño comercial) y confirmación de la publicación.
+- Revisión humana de la semilla v1 (dueño comercial) y confirmación de la publicación por una persona con `efeonce_admin` (organización propia de Efeonce).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -449,6 +463,7 @@ interface CustomerModelV1 {
 - [ ] Publicar sin evidencia en un segmento o persona activo responde `422 customer_model_evidence_missing`.
 - [ ] Un id retirado no puede reutilizarse con otro significado (test).
 - [ ] `commercial.customer_model.read` y `.manage` sembradas con grants y coverage test verde.
+- [ ] Publicar el modelo de una organización cliente sólo lo logra `efeonce_account`, y el de la organización propia de Efeonce sólo `efeonce_admin`; el resto recibe `forbidden` (test).
 - [ ] La clase `efeonce.mcp.commercial.write` existe en Entra y en `scopes.ts` con test de paridad, y no está en el cliente público compartido.
 - [ ] Cinco tools en el manifiesto de Greenhouse y federadas; `efeonce.gateway.status` lista el provider.
 - [ ] Sesión MCP real: lectura, borrador y publicación con la persona como actor; persona sin capability `forbidden`.
@@ -483,5 +498,4 @@ interface CustomerModelV1 {
 
 ## Open Questions
 
-- ¿El dueño comercial que publica versiones es `efeonce_account` además de `efeonce_admin`? Por defecto sí (Slice 4); confirmar con el operador.
-- ¿La clase `efeonce.mcp.commercial.write` se reutiliza para futuras escrituras comerciales (propuestas, cotizaciones) o se limita al modelo de cliente? Regla del gateway: una clase por radio de impacto; por defecto se nombra genérica y la capability acota.
+- ¿`efeonce_admin` puede además publicar el modelo de una organización cliente? La decisión del 2026-09-26 asigna la publicación de organizaciones cliente a `efeonce_account` y no lo dice; hasta confirmarlo, el command sólo lo permite a `efeonce_account`.

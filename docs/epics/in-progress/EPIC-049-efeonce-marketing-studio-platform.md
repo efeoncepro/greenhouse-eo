@@ -81,7 +81,7 @@ Orden recomendado (actualizado 2026-09-26): 1890 → 1891 · 1893 en paralelo ·
 
 Capa de estrategia (ADR 2026-09-26), después de 1894 y 1899: 1906 (Greenhouse, puede empezar ya) · 1905 → 1907 → 1908 · 1909 · 1910 (en paralelo; 1908 y 1910 además necesitan 1892) → 1911 → 1912 (UI, sección por sección cuando su backend está en staging, tras 1895). 1898 sigue siendo la última del programa.
 
-Operación híbrida con agentes (ADR 2026-09-26), después de 1894 y 1899: 1913 (Slices 1–3, work items con personas) → 1914 (registro de roles y tarjetas) → 1913 Slice 4 (asignación a roles) → 1915 (ledger y modo interactivo primero; despachador y adaptadores después) → 1916 (evals, costo y métricas; compuerta de autonomía). El modo delegado en segundo plano de 1915 queda bloqueado por EPIC-044 (delegación por corrida con claim `act`, sin unidad dueña todavía). La UI de work items, roles, corridas y métricas es follow-up consumidor de 1895/1912.
+Operación híbrida con agentes (ADR 2026-09-26), después de 1894 y 1899: 1913 (Slices 1–3, work items con personas) → 1914 (registro de roles y tarjetas) → 1913 Slice 4 (asignación a roles) → 1915 (ledger y modo interactivo primero; despachador y adaptadores después) → 1916 (evals, costo y métricas; compuerta de autonomía). El modo delegado en segundo plano de 1915 queda bloqueado por TASK-1917 (EPIC-044 U22: delegación por corrida con claim `act`, creada por decisión del operador el 2026-09-26). La UI de work items, roles, corridas y métricas es follow-up consumidor de 1895/1912.
 
 **Regla de paridad del programa (operador, 2026-09-25):** todo lo que se puede hacer en la UI se puede hacer por la API y, por consiguiente, por MCP — incluidas las aprobaciones. Las aprobaciones las decide una persona; un agente puede ejecutarlas con la identidad delegada de esa persona y su confirmación explícita. Ninguna capacidad nace sólo en la UI.
 
@@ -106,8 +106,30 @@ Operación híbrida con agentes (ADR 2026-09-26), después de 1894 y 1899: 1913 
 - `TASK-1912` — To-do. UI del espacio de planificación (pestaña Estrategia, aprobación en dos pasos, hueco, procedencia, aprendizajes y programas) sobre la dirección `v4 · Estrategia` a aprobar; `ui-ux`, flow, UI ready no. Depende de 1895 y 1907 (+ backends por sección).
 - `TASK-1913` — To-do. Work items y asignaciones: entidad por campaña con catálogo de tipos versionado, máquina de estados en el command, responsable persona o rol de agente con versión, insumos por referencia, entregable con procedencia, revisión y traspaso como work item nuevo; asignar a un rol es `T1` dentro del techo y `T2` sobre él; `assignmentId` como clave de la corrida lógica. Depende de 1894 y 1899 (asignación a roles: 1914).
 - `TASK-1914` — To-do. Registro de roles de agente: tarjetas versionadas sin sintaxis de proveedor, compilador portable con `cardDigest`, lista blanca de tools aplicada en Studio y en el gateway, modos, kill switch y política por organización; cinco tarjetas iniciales y tres skills de rol nuevas (copywriter, QA creativo y de marca, analista de desempeño); capability `marketing_studio.agent_role.manage`. Depende de 1894, 1899 y 1913.
-- `TASK-1915` — To-do. Despachador en Cloud Run con contrato único de corrida, ledger con idempotencia por corrida lógica y lectura antes de reintentar, reserva de costo, adaptadores `claude-agent-sdk`, `claude-managed-agents`, `openai-agents-sdk` y `openai-responses` detrás de flags, modo interactivo registrado, programas `T2` e identidad de servicio `T0`/`T1`; confirmación `T2` sólo desde token sin `act`. Depende de 1913, 1914 y 1899; segundo plano delegado bloqueado por EPIC-044.
+- `TASK-1915` — To-do. Despachador en Cloud Run con contrato único de corrida, ledger con idempotencia por corrida lógica y lectura antes de reintentar, reserva de costo, adaptadores `claude-agent-sdk`, `claude-managed-agents`, `openai-agents-sdk` y `openai-responses` detrás de flags, modo interactivo registrado, programas `T2` e identidad de servicio `T0`/`T1`; confirmación `T2` sólo desde token sin `act`. Depende de 1913, 1914 y 1899; segundo plano delegado bloqueado por TASK-1917 (EPIC-044 U22).
 - `TASK-1916` — To-do. Evals por rol × runtime × modelo con rúbrica objetiva + humana (sin autocalificación), compuerta de autonomía, catálogo de precios y costo normalizado, métricas por rol y señales, runtime por defecto por rol decidido como `T2`; capability `marketing_studio.agent_eval.grade`. Depende de 1914, 1913 y 1915.
+
+## Delta 2026-09-26 — decisiones del operador sobre la capa de estrategia y la operación con agentes
+
+Decisiones de Julio Reyes (operador) del 2026-09-26, registradas en las tasks dueñas y en §11 de ambos ADR:
+
+1. **Delegación por corrida con `act`:** unidad nueva **U22 de EPIC-044**, poseída por `TASK-1917` (Efeonce ID emite
+   tokens cortos y revocables por corrida; persona como sujeto, rol de agente versionado como actor; scopes ⊆ lista del
+   rol; atados a work item y corrida; reutiliza el canje RFC 8693 de Greenhouse). Consumidor: TASK-1915.
+2. **Grants:** `marketing_studio.agent_role.manage` → `efeonce_admin`, `efeonce_operations` (relajar sigue `T2`,
+   TASK-1914). `marketing_studio.agent_eval.grade` → `efeonce_admin`, `efeonce_operations`, `efeonce_account`, pero
+   califican sólo personas nominales, una por disciplina (medios, SEO/AEO, creativo); nombres pendientes del operador
+   (TASK-1916).
+3. **Asignar un agente sobre el techo de costo** se confirma con `marketing_studio.campaign.approve`, sin capability nueva
+   (TASK-1913).
+4. **`studio.voice_rules.publish` es `T2`** (TASK-1909, TASK-1899).
+5. **El canje de `marketing_studio.integration.manage` verifica `update`**; conectar y revocar son `T2` (TASK-1910,
+   TASK-1899).
+6. **Clase de scope `efeonce.mcp.commercial.write`** creada (TASK-1906); catálogo de canales mantenido por
+   `efeonce_operations` con `efeonce_admin` (TASK-1905); publicar el modelo de cliente: `efeonce_account` para
+   organizaciones cliente, `efeonce_admin` para la organización propia de Efeonce (TASK-1906).
+7. **Agentes programados (y en segundo plano) nunca leen datos competitivos `internal`**; sólo el modo interactivo con la
+   persona presente. Una excepción futura exige una decisión nueva por organización (TASK-1915, TASK-1908).
 
 ## Existing Related Work
 

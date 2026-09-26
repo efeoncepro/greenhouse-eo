@@ -6,6 +6,14 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 — decisiones del operador
+
+- **Quién mantiene el catálogo de canales:** `efeonce_operations` (con `efeonce_admin`), decisión de Julio Reyes,
+  operador, 2026-09-26. Son los únicos grants de `marketing_studio.catalog.manage`; `efeonce_account` **no** gobierna el
+  catálogo. La misma capability gobierna las reglas de voz de TASK-1909, cuya publicación es `T2` por decisión del mismo
+  día (la publicación del catálogo de canales conserva su nivel).
+- **Relacionado:** la delegación por corrida de agentes con `act` la posee `TASK-1917` (EPIC-044 U22).
+
 ## Delta 2026-09-26 (reparto con TASK-1894)
 
 - **El campo `riskTier` y su enforcement en el kernel pasan a TASK-1894 Slice 1** (commit `0f225551f`): 1905 depende de
@@ -384,7 +392,9 @@ Reglas obligatorias:
 - Capability `marketing_studio.catalog.manage` en `src/config/entitlements-catalog.ts` (`module: 'marketing_studio'`,
   `actions: ['create','update']`, `defaultScope: 'tenant'`) + migración seed en `capabilities_registry` (patrón de
   `20260926075619118_task-1893-marketing-studio-asset-download-capability.sql`) + grant de ambas acciones a
-  `efeonce_admin` y `efeonce_operations` en `src/lib/entitlements/runtime.ts`; `capability-grant-coverage.test.ts` verde.
+  `efeonce_admin` y `efeonce_operations` en `src/lib/entitlements/runtime.ts` (decisión del operador 2026-09-26:
+  `efeonce_operations` mantiene el catálogo, con `efeonce_admin`; `efeonce_account` no lo gobierna);
+  `capability-grant-coverage.test.ts` verde.
 - Cliente de canje `efeonce-mcp-marketing-studio-catalog-manage` (input scope `efeonce.mcp.marketing_studio.write`,
   capability `marketing_studio.catalog.manage`, acción `update`) por migración (patrón del cliente
   `efeonce-mcp-client-services`, `requireOnPrivilegedAction = true`), fila en `resolveScopeContract` y allowlist
@@ -573,7 +583,7 @@ Nombres finales se confirman con `mcp-craft` en el Slice 5; cualquier cambio se 
 - [ ] Publicar una versión nueva marca `validatedWithPreviousSpec` en los registros previos sin cambiar su versión.
 - [ ] `channel_unmapped = 0` en production al cerrar, o cada alias pendiente tiene dueño declarado en el Handoff.
 - [ ] Una audiencia guarda organización, versión e id de segmento/persona y `bowtie_stage` separado de `funnel_phase`; Studio no guarda nombres de ICP.
-- [ ] `marketing_studio.catalog.manage` existe en catálogo, `capabilities_registry` y grants, con coverage test verde.
+- [ ] `marketing_studio.catalog.manage` existe en catálogo, `capabilities_registry` y grants (sólo `efeonce_admin` y `efeonce_operations`), con coverage test verde.
 - [ ] Sesión MCP real verde: persona con capability ejecuta T0 y T1; persona sin capability recibe `forbidden`; el actor auditado es la persona.
 - [ ] Gateway desplegado con bump minor y `surface-baseline.json` actualizado.
 
@@ -605,5 +615,4 @@ Nombres finales se confirman con `mcp-craft` en el Slice 5; cualquier cambio se 
 
 ## Open Questions
 
-- ¿Quién mantiene al día las especificaciones de plataforma y con qué cadencia? (ADR §11.4). Propuesta: `efeonce_operations` revisa trimestralmente y cada vez que una plataforma anuncia un cambio; confirmar con el operador.
-- ¿`efeonce_account` debe gobernar el catálogo además de `efeonce_admin` y `efeonce_operations`? Por defecto no.
+- Cadencia de revisión de las especificaciones de plataforma (ADR §11.4; quién la mantiene quedó decidido el 2026-09-26: `efeonce_operations` con `efeonce_admin`). Propuesta: trimestral y cada vez que una plataforma anuncia un cambio.

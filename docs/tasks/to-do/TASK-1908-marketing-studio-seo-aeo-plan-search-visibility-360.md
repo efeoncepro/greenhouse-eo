@@ -6,6 +6,15 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 — decisiones del operador
+
+- **Agentes en segundo plano y programados nunca leen datos competitivos `internal`** (decisión de Julio Reyes,
+  operador, 2026-09-26; pregunta 8 del ADR de operación híbrida). Sólo el modo interactivo, con la persona presente,
+  puede. El filtro de clasificación de esta task se extiende: además de actores no internos, `internal_competitive`
+  nunca llega a un token con claim `act` (corrida delegada, TASK-1917/TASK-1915) ni a una identidad de servicio de
+  agente (modo programado). No hay interruptor por organización: una excepción futura exige decisión nueva y explícita
+  por organización.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -91,7 +100,8 @@ Reglas obligatorias:
   se muestra tal cual la devuelve el lane, con su `dataThrough` y su metodología.
 - **Snapshot ≠ dato actual:** todo DTO distingue `planningSnapshot` (con `takenAt`) de `current` (con `dataThrough`).
 - **Competitivo sólo interno:** un snapshot `internal_competitive` nunca aparece en un DTO servido a un actor que no sea
-  interno; el filtro vive en el reader y tiene test.
+  interno, ni a un agente en segundo plano (token con `act`) o programado (identidad de servicio); el filtro vive en el
+  reader y tiene test (decisión del operador 2026-09-26).
 - **Studio no gasta:** ningún command de Studio llama a un lane o tool que gaste (rastrear, descubrir, declarar
   competidores, diagnóstico); la ejecución es del command dueño en Greenhouse con persona y confirmación.
 - **Ausencia ≠ cero:** sin snapshot es «sin dato»; `found=false` de un lane es «sin captura», nunca 0.
@@ -176,7 +186,7 @@ Reglas obligatorias:
 - Entidades/tablas/views afectadas: Studio `plan_seo_target`, `plan_aeo_question`, `seo_snapshot`, `seo_tracking_proposal` (nuevas); Greenhouse: columna/propiedad `proposal_ref` en la membresía de keywords rastreadas [verificar tabla en Discovery]
 - Invariantes que no se pueden romper:
   - snapshot inmutable y append-only; nunca se reescribe con datos nuevos
-  - `internal_competitive` nunca en un DTO para actor no interno
+  - `internal_competitive` nunca en un DTO para actor no interno, token con `act` o identidad de servicio de agente
   - Studio no invoca lanes o tools que gasten
   - rastrear exige persona + confirmación (digest) en Greenhouse; `intent` declarado, nunca por defecto
   - metodología distinta ⇒ `not_comparable`, sin delta
@@ -276,8 +286,8 @@ Reglas obligatorias:
   visibilidad por URL, desempeño con ventana fija del vuelo, lente dual para AEO) con `dataThrough`; `comparison`
   = `improved | declined | unchanged | not_comparable | no_data` calculado sobre los valores tal cual (sin recalcular
   métricas); `not_comparable` si difiere `methodology` (p. ej. `etvMethodology`).
-- Filtro de clasificación aplicado en este reader y en `getStrategyPlan` (test: actor no interno nunca recibe
-  `internal_competitive`).
+- Filtro de clasificación aplicado en este reader y en `getStrategyPlan` (test: actor no interno, token con `act` e
+  identidad de servicio de agente nunca reciben `internal_competitive`).
 
 ### Slice 5 — Propuestas de rastreo (Studio)
 
@@ -432,6 +442,7 @@ Reglas obligatorias:
 - [ ] Studio captura snapshots desde lanes org-visibles con su consumer y los guarda tal cual, con `data_through` y metodología.
 - [ ] Un snapshot no se puede modificar ni borrar (trigger).
 - [ ] Un actor no interno nunca recibe un snapshot `internal_competitive` (test en ambos readers).
+- [ ] Un agente en segundo plano (token con `act`) o programado (identidad de servicio) nunca recibe un snapshot `internal_competitive` ni puede declararlo (test en ambos readers y en el command).
 - [ ] Un `api_client` no puede declarar un snapshot competitivo.
 - [ ] El seguimiento distingue snapshot de dato actual y marca `not_comparable` ante metodología distinta.
 - [ ] El bloque SEO/AEO participa en `readiness` de la aprobación del plan.

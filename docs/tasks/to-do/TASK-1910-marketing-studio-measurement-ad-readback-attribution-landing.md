@@ -6,6 +6,13 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 — decisiones del operador
+
+- **El canje de `marketing_studio.integration.manage` verifica la acción única `update`** (decisión de Julio Reyes,
+  operador, 2026-09-26). Conectar, revalidar y revocar una cuenta publicitaria son `T2` y se canjean con `update`; el
+  cliente `efeonce-mcp-marketing-studio-integration-manage` se siembra con esa acción y la fila de TASK-1899 queda
+  sin marca de verificación.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -313,8 +320,10 @@ Reglas obligatorias:
 
 ### Slice 8 — Capability, gateway, canary y docs
 
-- `marketing_studio.integration.manage` (`actions: ['create','update']`, grant `efeonce_admin`, `efeonce_operations`) +
-  seed + coverage; cliente de canje `efeonce-mcp-marketing-studio-integration-manage` + allowlist + redeploy.
+- `marketing_studio.integration.manage` (`actions: ['create','update']`, concedidas juntas; grant `efeonce_admin`,
+  `efeonce_operations`) + seed + coverage; cliente de canje `efeonce-mcp-marketing-studio-integration-manage` sembrado
+  con la acción única `update` para conectar, revalidar y revocar (todas `T2`; decisión del operador 2026-09-26) +
+  allowlist + redeploy.
 - Registro con `riskTier`, manifiestos, sync del gateway, bump minor, `surface:baseline`, dispatch.
 - Docs: arquitectura de Studio (medición), runbook (conectar cuentas, rotación de tokens, readback manual), manual
   servido, ledger de flags (runtimes: worker de Studio en Cloud Run, Vercel de Studio, Vercel de Greenhouse), skills.
@@ -427,7 +436,7 @@ Reglas obligatorias:
 - [ ] El chequeo de destino detecta UTM perdida por redirección y lo muestra en atención y `checksPending`, sin tocar `launch_state`.
 - [ ] El progreso de KPIs usa sólo la fuente declarada de cada KPI y dice `no_data` cuando falta.
 - [ ] El mapeo de métricas se edita por API y MCP.
-- [ ] `marketing_studio.integration.manage` sembrada con grant, coverage y cliente de canje; sesión MCP real verde.
+- [ ] `marketing_studio.integration.manage` sembrada con grant, coverage y cliente de canje que verifica la acción `update`; sesión MCP real verde.
 - [ ] Frescuras `ad_readback` y `landing_check` en el health profundo, calculadas desde `worker_run`.
 
 ## Verification
