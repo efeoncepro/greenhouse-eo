@@ -4,8 +4,8 @@
 > staging y producción, emisión e IA apagadas; render en producción (TASK-1846, §14.5); enlaces compartidos, correo
 > y recurrencia en producción con flags OFF (TASK-1848, release `bda1cf2cd938`, §14.6); catálogos v1 A4 (`report_pdf`)
 > y deck (`insights-deck`) en producción desde el 2026-09-24 (TASK-1847, complete 2026-09-25, §14.7); UI y vista web en
-> Think siguen pendientes (TASK-1849, TASK-1875); el rediseño premium aprobado el 2026-09-25 está **code complete,
-> rollout pendiente** (TASK-1888 §14.8, TASK-1889 §14.9; delta de §6). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
+> Think siguen pendientes (TASK-1849, TASK-1875); del rediseño premium aprobado el 2026-09-25, el contrato editorial v2 está **en producción y encendido desde el
+> 2026-09-26** (TASK-1888 §14.8) y los catálogos premium se registran en TASK-1889 §14.9 (delta de §6). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
 > rollout verificado, sus límites honestos y las invariantes que un agente debe respetar al tocar el dominio.
 > Owner: Platform + Client Experience.
 > [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
@@ -176,10 +176,10 @@ TASK-1846 incorpora únicamente la primitive domain-free, y TASK-1847 conserva l
 Versionar y fijar brand pack, fuentes, catálogo, plan y renderer. Fidelidad semántica/visual es obligatoria;
 igualdad de bytes PDF sólo si el renderer normaliza metadatos y el benchmark la demuestra.
 
-### Delta 2026-09-25 — rediseño premium aprobado (contrato y catálogos construidos; rollout pendiente, §14.9)
+### Delta 2026-09-25 — rediseño premium aprobado (contrato en producción, §14.8; catálogos, §14.9)
 
-> **Estado (2026-09-25).** El contrato editorial v2 (TASK-1888) está **construido y apagado** detrás de
-> `INSIGHTS_EDITORIAL_V2_ENABLED` (code complete en `develop`, sin release; estado en §14.8). Las plantillas las
+> **Estado (2026-09-26).** El contrato editorial v2 (TASK-1888) está **en producción y encendido**:
+> `INSIGHTS_EDITORIAL_V2_ENABLED` ON en Vercel staging/Production y en el `ops-worker` (estado en §14.8). Las plantillas las
 > construye TASK-1889 (`ui-ux`); producción sirve lo que ya está desplegado (§14.7) hasta ese release.
 > Dirección visual y copia durable del canvas:
 > [`TASK-1889-efeonce-insights-premium-catalogs-direction.md`](../ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md).
@@ -192,7 +192,7 @@ igualdad de bytes PDF sólo si el renderer normaliza metadatos y el benchmark la
 - **Una portada con variantes por módulo, nunca una por servicio.** Navy, o blanca (bloque navy arriba y título sobre
   papel) con variante de visibilidad (`seo`/`aeo`: logos de canal como satélites en la órbita) y variante creativa
   (`ico`: sin logos). La variante blanca la elige el catálogo desde los módulos y `channelId`, sin campo nuevo.
-- **Regla de resolución de portada (TASK-1888, construida).** `resolveInsightCover` (`contracts/cover.ts`): cambio en
+- **Regla de resolución de portada (TASK-1888, en producción).** `resolveInsightCover` (`contracts/cover.ts`): cambio en
   el encargo (`brand.coverTheme`, si ≠ `auto`) > preferencia de la organización (`insight_cover_preferences`, si ≠
   `auto`) > `auto`; `auto` = navy sólo si la organización tiene logo apto para fondo oscuro
   (`organizations.logo_on_dark_asset_id`), si no blanca. Una portada navy **nunca** lleva el logo por defecto: la
@@ -209,7 +209,7 @@ igualdad de bytes PDF sólo si el renderer normaliza metadatos y el benchmark la
   byte). Cada plantilla renderizada con los datos de ejemplo del canvas debe quedar a **≤ 1 % de píxeles distintos**
   (`pixelmatch`, umbral 0,1) y la aprueba el operador página por página. Portada, apertura y contraportada del **deck**
   no están en el canvas: se derivan de A4 con aprobación del operador.
-- **Contrato editorial v2 (TASK-1888), aditivo y construido.** `ChartSpec` de 7 a 15 familias (las 8 nuevas describen
+- **Contrato editorial v2 (TASK-1888), aditivo y en producción.** `ChartSpec` de 7 a 15 familias (las 8 nuevas describen
   sus datos en `data`, tipo discriminado; todo número es un `factId`), con validación estructural en
   `contracts/chart-spec.ts` y de VALOR en `editorial/chart-values.ts`, que llama a la misma `chart-geometry.ts` que
   dibuja. Plan con campos opcionales: `chapter.opening`, `chapter.readings[]` (cifra principal, «Lo que significa»,
@@ -1058,9 +1058,9 @@ contra PostgreSQL real (transacción revertida), `pnpm worker:runtime-deps-gate`
   `portal_link` `not_ready` (TASK-1849); in-app/Teams (TASK-690–693 / TASK-1849); recordatorios, preferencias y baja
   no existen en V1; TASK-1876. El encendido en producción espera a TASK-1875.
 
-### 14.8 Estado de TASK-1888 — contrato editorial v2 (code complete 2026-09-25, rollout pendiente)
+### 14.8 Estado de TASK-1888 — contrato editorial v2 (complete 2026-09-26, en producción y encendido)
 
-**Qué existe (en `develop`, sin release).**
+**Qué existe (en producción desde el release `0e87c7a443a2`, 2026-09-26).**
 
 | Pieza | Dónde | Estado |
 |---|---|---|
@@ -1076,8 +1076,8 @@ contra PostgreSQL real (transacción revertida), `pnpm worker:runtime-deps-gate`
 | Capability | `insights.cover_preference.manage` (Admin + Account); leer = `insights.report.read` | seed en `capabilities_registry` + grant |
 | Evento | `insights.cover_preference.updated` (`insight_cover_preference`) | catálogo actualizado |
 | Lanes | `GET/POST /api/platform/{app,ecosystem}/insights/cover-preference` | construidos (escritura ecosystem sólo binding interno) |
-| MCP | `get_insight_cover_preference`, `set_insight_cover_preference` (manifest 64 tools, hash `a08f649aab8f`) | en Greenhouse; federadas en [`efeonce-mcp#18`](https://github.com/efeoncepro/efeonce-mcp/pull/18) (gateway 1.9.0 sobre Marketing Studio 1.8.0, superficie 70 → 72; lectura con el scope base y escritura con `efeonce.mcp.insights.write` reusado, sin scope ni Entra nuevos), **sin merge ni deploy**: se despliega después del release de Greenhouse |
-| Flag | `INSIGHTS_EDITORIAL_V2_ENABLED` (Vercel + `ops-worker`, default OFF) | OFF en todo runtime |
+| MCP | `get_insight_cover_preference`, `set_insight_cover_preference` (manifest 64 tools, hash `a08f649aab8f`) | en Greenhouse; federadas por [`efeonce-mcp#18`](https://github.com/efeoncepro/efeonce-mcp/pull/18) (gateway 1.9.0 sobre Marketing Studio 1.8.0, superficie 70 → 72; lectura con el scope base y escritura con `efeonce.mcp.insights.write` reusado, sin scope ni Entra nuevos): mergeado `2cf78af91`, desplegado 2026-09-26 (run `36226550358`, revisión `efeonce-mcp-gateway-00062-ct5` al 100 %) |
+| Flag | `INSIGHTS_EDITORIAL_V2_ENABLED` (Vercel + `ops-worker`; el Job de render no lo lee) | **ON** desde 2026-09-26: Vercel staging, Vercel Production (`greenhouse-8hl5hf54w`) y `ops-worker-00719-gbm` (`deploy.sh` default `:-true`) |
 | Preview | `scripts/insights/preview-edition.ts --editorial-v2 --plan-only` | construido |
 
 **Verificado con datos reales (2026-09-25, sólo lectura, flag simulado ON en local).** Sky Airlines `EO-INS-000022`
@@ -1086,11 +1086,18 @@ contra PostgreSQL real (transacción revertida), `pnpm worker:runtime-deps-gate`
 24 hechos, 0 violaciones; sin línea (ventana de un mes parcial) y sin medidor (sin run AEO anterior), como dice la
 matriz. Ambas portadas resuelven blanca por `auto`: ninguna tiene logo para fondo oscuro.
 
-**Pendiente de rollout (no es «listo»).** Release de Greenhouse con el flag OFF; ediciones **internas** de Berel y Sky
-en staging con el flag ON sólo en **Vercel staging** (el `ops-worker` es compartido con producción: prenderlo ahí lo
-prende para producción); merge y deploy del PR de `efeonce-mcp` **después** de ese release; prender el flag en
-producción sólo junto al release de TASK-1889; el operador fija la preferencia de Berel y Sky y carga logos aptos
-para fondo oscuro si los hay.
+**Rollout 2026-09-26 (verificado).** Release `0e87c7a443a2` (código, flag OFF; canary de la lane ecosystem
+`cover-preference` 200) → gateway v1.9.0 → flag ON en Vercel staging, con ediciones internas v2 de Berel (`seo`+`aeo`) y
+Sky (`ico`) en `ready_for_review` sin emitir → fix del empate (la cifra principal de un empate es el valor empatado) →
+release `2add63c61fd6` **abortado** (al deploy del `ops-worker` le faltaba `DATAFORSEO_API_LOGIN`; rollback del flag
+verificado) → secretos del `ops-worker` reenviados por el release → release `f9257b9c94af` `released` → flag ON en
+Vercel Production y `ops-worker`. La primera canary de producción selló un plan v1: el valor de la var tenía, según
+Codex, un salto de línea final (el flag compara `=== 'true'`); corregido a `true` exacto y con redeploy, la canary
+sintética selló el plan v2 (3 `scopeLines`, `cover`, apertura en los 3 capítulos; `failed` en `validating` por snapshot
+vacío, como corresponde). Emisión, sharing y correo siguen OFF en Vercel Production. **Rollback:** flag OFF en los dos
+runtimes (`vercel env rm` + redeploy; `--update-env-vars INSIGHTS_EDITORIAL_V2_ENABLED=false` + `:-false` en
+`deploy.sh`). La preferencia de portada de Berel y Sky y los logos aptos para fondo oscuro los fija el operador cuando
+quiera; sin ellos, `auto` resuelve blanca.
 
 **Metas ICO: el registro manda.** La meta impresa sale de `ICO_METRIC_REGISTRY` (OTD ≥ 90, FTR ≥ 80, RpA ≤ 1,5),
 que es lo que calcula el motor. El 2026-09-25 el operador lo fijó como fuente única del semáforo y la documentación
@@ -1112,7 +1119,7 @@ ediciones reales `198ce883a` (antes `b88fd447c`); dossier + scorecard `2f0776e0f
 | Pieza | Dónde | Estado |
 |---|---|---|
 | Catálogos editoriales v2 | `artifact-composer/catalogs/insights-report` (A4 794×1123) e `insights-deck` (1280×720) | construidos; **sólo** diseño editorial v2 — la guarda `__tests__/insights-catalogs-v2-only.test.ts` no admite legado |
-| Legado retirado | `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css`, `efeonce-insights/render/figure-pages.ts` y los resolvers v1 de barra/familia/path | borrado. `artifact-composer/chart-figure.ts` quedó sin consumidores (conserva su test); candidato a retiro en follow-up |
+| Legado retirado | `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css`, `efeonce-insights/render/figure-pages.ts` y los resolvers v1 de barra/familia/path | borrado. `artifact-composer/chart-figure.ts` y su test, retirados el 2026-09-26 (sin consumidores) |
 | Páginas de figura (A4) | `report-figure-{comparison,columns,targets,trend}` → `ReportFigure{Comparison,Columns,Targets,Trend}Page` | construidas |
 | Láminas de figura (deck) | `insights-figure-{comparison,columns,targets,trend}` → `InsightsFigure{Comparison,Columns,Targets,Trend}Slide` | construidas |
 | Regla de familia (compartida por `report-mapper` e `insights-deck-mapper`) | `efeonce-insights/render/figure-slots.ts` | construida (ver abajo) |
