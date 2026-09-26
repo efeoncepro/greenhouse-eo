@@ -3160,6 +3160,16 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: 'role'
     })
+
+    // TASK-1893 — descarga auditada del original de una versión aprobada (URL firmada de vida corta). Mismos roles
+    // que la lectura; la subida y la escritura nacen con el corte de autoridad (TASK-1894).
+    addEntitlement(entries, {
+      module: 'marketing_studio',
+      capability: 'marketing_studio.asset.download',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
   }
 
   if (subject.tenantType === 'client') {
