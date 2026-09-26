@@ -1,11 +1,11 @@
 # Efeonce Marketing Studio — Arquitectura V1
 
 > **Tipo:** arquitectura técnica (contrato para agentes y desarrolladores)
-> **Versión:** 1.6
+> **Versión:** 1.7
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-09-26 por Claude (ADR aceptado: Studio + GCS como fuente única e ingesta por CLI, MCP y UI)
+> **Última actualización:** 2026-09-26 por Claude (ADR aceptado: capa de estrategia — canales, ICP, plan, SEO/AEO, IA — con paridad total y niveles de riesgo; antes, el mismo día: Studio + GCS como fuente única e ingesta por CLI, MCP y UI)
 > **Estado:** Accepted. En vivo en `https://studio.efeonce.org` desde 2026-09-25 (TASK-1887)
-> **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + deltas de placement y de agentes 2026-09-25) · fuente única e ingesta: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md) (Accepted 2026-09-26)
+> **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + deltas de placement y de agentes 2026-09-25) · fuente única e ingesta: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md) (Accepted 2026-09-26) · capa de estrategia: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) (Accepted 2026-09-26)
 > **Programa:** [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
 > **Operación:** [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md)
 
@@ -146,6 +146,42 @@ org-2df565fb-98aa-42f7-b324-ea9a2209017f` (Efeonce).
 10. **Un original nunca se sobrescribe ni es público.** Objeto nombrado por su sha256, subida con `ifGenerationMatch=0`, bucket con PAP `enforced` y UBLA; la descarga es una URL firmada de ≤ 15 min emitida y auditada por el dominio.
 11. **Derechos siempre explícitos.** Toda versión y toda descarga traen `rights.status` (`unknown` \| `not_yet_valid` \| `active` \| `expired`), calculado al leer en `America/Santiago`; `unknown` = sin licencia registrada.
 12. **Un recorte automático no es una pieza.** `crop_*` es un derivado rotulado `automatic: true`; nunca crea `asset_version` ni cuenta como aprobado.
+
+## 3.1 Capa de estrategia
+
+Decisión gobernante: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md)
+(Accepted 2026-09-26). **Nada de esta sección está en runtime todavía**; la implementan tasks del EPIC-049. Lo vigente
+como contrato:
+
+- **Paridad total con ejecución por agentes.** Toda capacidad, de lectura y de escritura, nace con command o reader de
+  dominio, ruta `/api/v1`, entrada en `operations.ts` (tool o exclusión razonada) y tool MCP federada. La UI escribe
+  sólo por esos commands. Claude, Codex y Nexa pueden ejecutar toda acción de la UI con la identidad delegada de la
+  persona (mecánica de TASK-1899). El test de paridad se amplía a escrituras, nivel declarado y mutaciones de la UI.
+- **Niveles de riesgo por operación**, declarados en el registro y aplicados por el command: `T0` lectura (directa);
+  `T1` borrador o edición reversible (directa, idempotente, `If-Match`, auditada, actor = persona); `T2` aprobación,
+  publicación, gasto, credenciales externas o destructivo (`dryRun` → digest → confirmación explícita de una persona).
+- **Catálogo de canales** gobernado y versionado en Studio (`channel_key`: tipo paid/organic/owned, plataforma,
+  placements, formatos, límites de copy, objetivos válidos, fuente y fecha por especificación). Valida copys, piezas y
+  anuncios al escribir; reemplaza el `channel` libre por expand → backfill revisado → contract. El mercado no se
+  codifica en el canal.
+- **ICP en Greenhouse**, catálogo versionado **por organización** (segmentos, personas, JTBD, roles del buying group,
+  etapas del bow-tie) expuesto por lane ecosystem + MCP. Studio lo referencia por organización, versión e id; nunca
+  crea personas locales. Cada audiencia de canal es la traducción a plataforma de una referencia ICP. Etapa del bow-tie
+  y fase creativa del embudo son dimensiones separadas.
+- **Plan de campaña**: estrategia (objetivo, KPIs con meta y fuente, hipótesis), matriz persona × etapa × canal, casa
+  de mensajes (pruebas con evidencia), plan de contenidos con el hueco visible hasta que la pieza real entra, plan
+  SEO/AEO y plan de medición; nivel de programa opcional. Borrador `T1`, aprobación `T2`. Brief ≠ plan.
+- **SEO/AEO con Search Visibility 360**: referencias al sujeto de SV360 + snapshot fechado de lo que justificó la
+  decisión; seguimiento en vivo por lanes (ranking, visibilidad por URL, citas en IA); sólo lanes o MCP, nunca SQL;
+  lanes competitivos sólo `internal`. Rastrear palabras clave es `T2` y lo ejecuta el command dueño en Greenhouse, no
+  Studio con su identidad de servicio.
+- **IA agentes primero**; en el producto después, sobre los mismos commands. La IA propone, una persona confirma y el
+  command ejecuta; nunca aprueba, publica ni gasta sola. Todo borrador de IA guarda procedencia inmutable (modelo,
+  instrucción, fuentes, quién aceptó y cuándo). Un copy aceptado no se reescribe en su lugar.
+- **Medición y aprendizajes**: readback de Meta Ads y LinkedIn Ads como observaciones (las líneas `actual` nacen sólo
+  de readback); GA4/GSC por TASK-1892; atribución HubSpot por el lane de Greenhouse; experimentos; biblioteca de
+  aprendizajes append-only con evidencia; chequeo de destino antes de lanzar; calendario unificado. Escribir en
+  plataformas publicitarias queda fuera (ADR nuevo, scope propio).
 
 ## 4. Contrato API v1
 
@@ -482,6 +518,7 @@ Orden: 1890 → 1891 · 1893 · 1896 → 1892 → 1894 → 1895 · 1899 → 1897
 
 - ADR: [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md)
 - ADR fuente única e ingesta: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md)
+- ADR capa de estrategia: [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md)
 - Runtime handoff: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md)
 - Gateway: [`EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Marketing Studio
 - Invariantes de superficie MCP: [`MCP_TOOL_SURFACE_INVARIANTS.md`](../agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md)

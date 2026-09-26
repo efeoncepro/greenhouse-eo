@@ -104,6 +104,30 @@ Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_ING
 - None of this is in runtime yet: until a campaign's cutover, the TASK-1893 regime holds (OneDrive = source, GCS =
   verified copy of already registered finals).
 
+## Strategy layer (ADR accepted 2026-09-26)
+
+Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md` (architecture §3.1).
+Nothing of it is in runtime yet; EPIC-049 tasks implement it by theme.
+
+- **Full parity with agent execution**: every capability, read AND write, is born with command, `/api/v1` route,
+  registry entry and federated MCP tool; agents (Claude, Codex, Nexa) execute every UI action with the person's
+  delegated identity (TASK-1899 mechanics). Each operation declares its risk tier in the registry: **T0** read
+  (direct) · **T1** reversible draft/edit (direct, idempotent, `If-Match`, audited, actor = person) · **T2** approve,
+  publish, spend, external credentials or destructive (`dryRun` → proposal digest → explicit human confirm).
+- **Channel catalog** (Studio, versioned `channel_key`: type, platform, placements, formats, copy limits, objectives,
+  source + verified date per spec) validates copies/pieces/ads at write time and replaces free-text `channel`
+  (expand → human-reviewed backfill → contract). Market is never encoded in the channel key.
+- **ICP lives in Greenhouse** as a versioned catalog **per organization** (segments, personas, JTBD, buying-group roles,
+  bow-tie stages) exposed by ecosystem lane + MCP; Studio references `(org, version, id)`. Bow-tie stage ≠ creative
+  funnel phase.
+- **Campaign plan**: strategy (objective, KPIs with target and source, hypotheses), persona × stage × channel matrix,
+  message house (proof points need evidence), content plan with visible gap, SEO/AEO plan, measurement plan.
+- **SEO/AEO**: references to the Search Visibility 360 subject + dated snapshot of what justified the decision; follow-up
+  read live via lanes; competitive lanes are `internal`-only; tracking keywords is T2 executed by Greenhouse's owning
+  command, never by Studio's service identity.
+- **AI agent-first**; AI proposes, a person confirms, the command executes; every AI draft carries immutable
+  provenance (model, instruction/skill version, sources, who accepted and when).
+
 ## The operations-registry rule (binding)
 
 - **Every Studio capability is born in `packages/contracts/src/operations.ts`**, the single registry. From it derive:
@@ -170,6 +194,13 @@ Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_ING
   + manual, and never call a gateway deploy "done" without the canary with a real human Entra token.
 - **NUNCA** federate a write tool without its own scope class, delegated person identity and `dryRun` → confirm loop.
 - **SIEMPRE** write copy in neutral Spanish (no voseo) and keep null ≠ 0 in every reader, tool description and report.
+- **NUNCA** a Studio capability only in the UI, and **NUNCA** a read-only tool when the UI writes that capability; every
+  operation declares its risk tier (T0/T1/T2) in the registry and no caller can downgrade it.
+- **NUNCA** a parallel ICP in Studio (local segments/personas/JTBD): reference Greenhouse's catalog by org, version and id.
+- **NUNCA** read Search Visibility 360 by SQL, present a planning snapshot as current data, or spend provider budget
+  (track keywords, declare competitors) with Studio's service identity.
+- **NUNCA** AI that approves, publishes or spends alone; **SIEMPRE** provenance on every AI draft and a catalog
+  `channel_key` on every copy, piece, ad, audience and budget line.
 - **NUNCA** restore, clone or PITR the shared Cloud SQL instance to recover Studio (it rolls Greenhouse back). Recovery
   is logical per database (`pnpm ops:restore-rehearsal`, restore runbook); PITR only into a NEW temporary instance.
 - **NUNCA** call `Sentry.captureException` directly or log tokens/cookies/bodies: use `captureWithDomain` and `logEvent`
