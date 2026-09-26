@@ -6,6 +6,24 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26
+
+- **Código en producción.** Salió en el release `0e87c7a443a2` y quedó completo con `f9257b9c94af` (run
+  `36236940651` success; el Job `artifact-worker` se desplegó). El código de Insights en `origin/main` es idéntico al de
+  `develop`, verificado comparando blobs: los releases son squash y la ancestría de commits no sirve para esto. El
+  contrato editorial v2 de TASK-1888 está ON en producción; «Blocked by» pasó a `none`.
+- **Falta el criterio de producción.** No hay renders posteriores al release: el último output es del 2026-09-25
+  15:59Z, con los catálogos v1. Receta para cerrarlo: crear por el lane ecosystem una edición `internal` de Berel
+  (SEO+AEO, 2026-09-01 → 2026-09-21) y otra de Sky (ICO, agosto de 2026), con el mismo `request` de las ediciones
+  aprobadas y títulos de cliente (no «Canary…»); `POST …/editions/<id>/render`, esperar al dispatcher y revisar los
+  PDFs. Emitir y compartir siguen OFF en producción, así que el cliente no ve nada. El clasificador de permisos
+  bloqueó el POST: necesita la autorización explícita del operador para escribir en producción.
+- **Tono de las variaciones** (`373e56485` (antes `26937733b`), `5ee201c0c` (antes `d8354471b`)): el triángulo sigue al
+  valor y el tono dice mejor o peor según la dirección de la métrica. Posición = menor es mejor; si no, la dirección del
+  propio hecho o la de su meta ICO (`dimension.metric`); si no hay dirección, tono neutro. Verificado con la evidencia
+  real de Sky: RpA ▼ mejor, OTD ▲ mejor, FTR ▼ peor.
+- **Retiro:** `artifact-composer/chart-figure.ts` y su test (`8f16401b3`), sin consumidores.
+
 ## Delta 2026-09-25
 
 - **Slices 1–2 code complete** (commits `61d1ef690` (antes `d357e0224`), `4a4c77748` (antes `b649080c7`), sin push). Fidelidad al canvas con
@@ -81,7 +99,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Slices 1–5 code complete en develop (sin push); rollout pendiente: staging, release (PDFs reales aprobados 2026-09-25)`
+- Status real: `Código en producción (releases 0e87c7a443a2 + f9257b9c94af, 2026-09-26); PDFs reales aprobados 2026-09-25; falta el primer render real en producción (edición interna), que requiere autorización del operador para escribir en producción`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none` (el contrato editorial v2 quedó completo y en producción el 2026-09-26)

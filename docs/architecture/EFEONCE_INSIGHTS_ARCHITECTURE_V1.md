@@ -1109,9 +1109,18 @@ TASK-1900. Si el registro cambia, el informe lo sigue sin tocar este dominio.
 (`reading.conclusion`) tampoco. El medidor necesita que el adapter AEO elija el run por ventana (follow-up en el
 dominio del grader). Métricas por página o keyword de SEO, conjuntos por consulta de IA y embudo CRM siguen fuera.
 
-### 14.9 Estado de TASK-1889 — catálogos premium del canvas (code complete 2026-09-25, rollout pendiente)
+### 14.9 Estado de TASK-1889 — catálogos premium del canvas (código en producción 2026-09-26; falta el primer render real)
 
-**Qué existe (en `develop`, sin push ni release).** Commits: Slices 1–2 `61d1ef690` (antes `d357e0224`), `4a4c77748` (antes `b649080c7`); Slice 3
+> **Estado verificado 2026-09-26.** El código salió en el release `0e87c7a443a2` y quedó completo en producción con
+> `f9257b9c94af` (run `36236940651`, success, con el Job `artifact-worker` desplegado). El código de Insights en
+> `origin/main` es idéntico al de `develop` (blobs comparados; los releases son squash, así que la ancestría no sirve).
+> El operador aprobó el 2026-09-25 los PDFs internos de Berel y Sky y la estructura del deck. **Falta:** que una
+> edición interna real se renderice en producción con el diseño nuevo. Al 2026-09-26 no hay ningún render posterior
+> al release (el último output es del 2026-09-25 15:59Z, con los catálogos v1). Crear esa edición requiere
+> autorización explícita del operador para escribir en producción (el lane ecosystem crea ediciones reales).
+> `artifact-composer/chart-figure.ts` quedó retirado.
+
+**Qué se construyó (commits en `develop`).** Commits: Slices 1–2 `61d1ef690` (antes `d357e0224`), `4a4c77748` (antes `b649080c7`); Slice 3
 `5c2bcb5a1` (antes `4ff72fe3a`) (+ evidencia `8075a2930` (antes `2410e5156`)); Slice 4 `f0b0d78cc` (antes `3fa493efe`) (plantillas de figura) y `30c11aba7` (antes `85785e7fc`) (mappers + retiro del
 legado), docs `29a54885e` (antes `1120e86e4`)/`3709d9424` (antes `5968e35e8`); excepción aprobada `7ab466c88` (antes `289b6eca4`); «Lo esencial» `ae2c34b59` (antes `738ceb748`); correcciones por
 ediciones reales `198ce883a` (antes `b88fd447c`); dossier + scorecard `2f0776e0f` (antes `9529a1b25`).
