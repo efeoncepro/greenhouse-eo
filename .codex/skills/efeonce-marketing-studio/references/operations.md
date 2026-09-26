@@ -108,7 +108,7 @@ Preconditions for turning the provider ON: Greenhouse release in production that
 includes the client in that deployment; secret `marketing-studio-mcp-gateway-token` readable by
 `efeonce-mcp-gateway@efeonce-group.iam.gserviceaccount.com`.
 
-GitHub repo variables (production environment): `MARKETING_STUDIO_PROVIDER_ENABLED` (currently `false`),
+GitHub repo variables (production environment): `MARKETING_STUDIO_PROVIDER_ENABLED` (`true` since 2026-09-26, revision `00061-sbc`),
 `MARKETING_STUDIO_API_URL=https://studio.efeonce.org`,
 `MARKETING_STUDIO_TOKEN_EXCHANGE_URL=https://greenhouse.efeoncepro.com/api/integrations/v1/sister-platforms/oauth/token`.
 The token secret is mounted only when the flag is `true` (the workflow checks the secret exists first).
@@ -131,8 +131,16 @@ MCP_STUDIO_CANARY_ACCESS_TOKEN=<short-lived Entra delegated token, efeonce.mcp.r
 [MCP_STUDIO_CANARY_DENY_ACCESS_TOKEN=<token of a person WITHOUT it>] pnpm studio:canary
 ```
 Cases: allow (attention + campaign detail + asset detail), preview image, foreign org ⇒ `not_found`, person without
-capability ⇒ `forbidden`, unreachable Studio ⇒ `upstream_unavailable`. No token is printed. Then open a real MCP session
-and call `studio.attention.get`.
+capability ⇒ `forbidden`, unreachable Studio ⇒ `upstream_unavailable`. No token is printed.
+
+⚠️ **The local canary only works if the Google ID token it mints comes from the gateway service account.** From a laptop,
+ADC is the operator, and the exchange rejects that actor. An `az account get-access-token` token is also rejected: its
+`azp` is Azure CLI, not the MCP client (`GREENHOUSE_MCP_ENTRA_AZP`). **The canonical live canary is a real MCP session:**
+1. Run PKCE with the public client `32617b87-e7ef-493a-838f-1ff3f0213b93` (callback `http://localhost:8765/callback`, scope
+   `https://mcp.efeonce.org/mcp/efeonce.mcp.read`).
+2. Keep the token in a `0600` file.
+3. Call `initialize` → `tools/list` → `tools/call` on `https://mcp.efeonce.org/mcp`.
+4. Delete the file.
 
 Rollback: set `MARKETING_STUDIO_PROVIDER_ENABLED=false` + dispatch (provider `policy-blocked`, tools not registered);
 or `gcloud run services update-traffic efeonce-mcp-gateway --project efeonce-group --region southamerica-west1 --to-revisions <prev>=100` (standard Cloud Run rollback, not yet exercised for this provider; the gateway runbook §Rollback is the canonical procedure).

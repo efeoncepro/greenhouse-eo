@@ -31,7 +31,7 @@
 - Status real: `Diseno. Regla del operador (2026-09-25): «todo lo que se pueda hacer por la UI debe poderse hacer por API, y por consiguiente por MCP», incluidas las aprobaciones, que decide siempre una persona.`
 - Rank: `TBD`
 - Domain: `platform|identity`
-- Blocked by: `TASK-1891 (provider marketing-studio de lectura en el gateway), TASK-1894 (commands de escritura, tools de clase write en el manifiesto y capability marketing_studio.campaign.write). Depende además de que el emisor nativo auth.efeonce.org porte la identidad de la persona hasta Studio (Slices 2–3 de esta task). NO depende de TASK-1898: la identidad MCP llega desde Efeonce ID vía el gateway, no desde la sesión web de Studio.`
+- Blocked by: `TASK-1894 (commands de escritura, tools de clase write en el manifiesto y capability marketing_studio.campaign.write). Depende además de que el emisor nativo auth.efeonce.org porte la identidad de la persona hasta Studio (Slices 2–3 de esta task). NO depende de TASK-1898: la identidad MCP llega desde Efeonce ID vía el gateway, no desde la sesión web de Studio.`
 - Branch: `Greenhouse develop (emisor nativo, scopes, capability, readers, docs) · efeonce-mcp main vía PR (deploy por dispatch manual de deploy.yml, nunca automático al merge) · efeonce-marketing-studio main (actor delegado y guardas); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

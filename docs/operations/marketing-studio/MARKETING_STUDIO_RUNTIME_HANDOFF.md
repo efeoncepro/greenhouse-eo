@@ -21,7 +21,7 @@ Este documento dice **cómo operar** Studio. El porqué y los contratos viven en
 | Renditions | 108 por bucket (miniatura + preview de 54 piezas) |
 | Acceso | `STUDIO_ACCESS_MODE=open` (lectura sin login, noindex). `efeonce_id` falla cerrado hasta TASK-1898 |
 | Bearer de servicio | Cliente del gateway en producción (secreto `marketing-studio-mcp-gateway-token`, organización Efeonce) |
-| Provider MCP | Gateway 1.8.0 desplegado con `MARKETING_STUDIO_PROVIDER_ENABLED=false` (TASK-1891) |
+| Provider MCP | Encendido en producción desde 2026-09-26: gateway `958c9de30` (`00061-sbc`), `MARKETING_STUDIO_PROVIDER_ENABLED=true`, canary MCP real verde (TASK-1891) |
 | Greenhouse | Capability `marketing_studio.campaign.read` y cliente de canje `efeonce-mcp-marketing-studio` migrados; el manual y el canje llegan a producción con el próximo release de Greenhouse |
 
 ## Recursos

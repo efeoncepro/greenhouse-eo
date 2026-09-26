@@ -724,9 +724,12 @@ convierte la creación en `503 generation_disabled` (`policy_blocked` en el gate
 
 ## Provider Marketing Studio (Efeonce Marketing Studio)
 
-> Task dueña: `TASK-1891` (EPIC-049). Estado 2026-09-25: gateway `1.8.0` desplegado (PR #19 `9b93d6a`, run
-> `36183601792`, revisión `efeonce-mcp-gateway-00057-w8h` al 100 %) con `MARKETING_STUDIO_PROVIDER_ENABLED=false`.
-> Prender el flag espera el release de Greenhouse (cliente de canje + manual) y el canary con token humano.
+> Task dueña: `TASK-1891` (EPIC-049). Estado 2026-09-26: **encendido en producción**. Gateway `958c9de30` (1.8.0 + fix #20)
+> en la revisión `efeonce-mcp-gateway-00061-sbc` al 100 % con `MARKETING_STUDIO_PROVIDER_ENABLED=true`; canary por sesión MCP
+> real en verde. Tres lecciones del encendido:
+> - Un secreto condicional se monta en el paso que ejecuta `gcloud run deploy`, porque cada paso es otro shell. El test es `test/deploy-secret-mounts.test.ts`.
+> - Si la promoción falla, revisar `spec.traffic`: puede quedar en la revisión rota y bloquear todos los deploys siguientes. Se sale con `update-traffic` a la revisión que sirve y un re-dispatch.
+> - Un `upstream_unavailable` del provider puede venir de un 503 del canje en Greenhouse, no de Studio. Hay que mirar los runtime logs de Vercel de `/api/integrations/v1/sister-platforms/oauth/token`.
 
 El provider `marketing-studio` (`src/providers/marketing-studio.ts`) federa las 12 tools de lectura `studio.*` que
 declara el manifiesto de Studio (`studio-tool-manifest.v1`). **Studio no conoce personas**, así que la autoridad de

@@ -203,12 +203,7 @@ Errores del provider hacia el agente: `forbidden`, `not_found` (anti-oráculo), 
 `unsupported` para este provider (`marketing_studio_native_policy_missing`): el contexto interno v2 sólo delega
 `growth.seo.observation.read` y sumar Studio exige consentimiento nuevo (D10).
 
-**Estado del provider (2026-09-25).** Gateway **1.8.0** desplegado (PR `efeoncepro/efeonce-mcp#19`, revisión
-`efeonce-mcp-gateway-00057-w8h`) con `MARKETING_STUDIO_PROVIDER_ENABLED=false`. El manifiesto se sincroniza con
-`pnpm studio:manifest:sync` (genera `src/providers/marketing-studio-tool-manifest.generated.ts`, hash verificado al
-cargar) y el guard `marketing-studio-tool-parity.ts` compara de forma bidireccional el manifiesto, el `appliesTo` del
-manual y las escrituras sin clase. Falta: release de Greenhouse (publica el canje y el manual) → flag ON + dispatch →
-`pnpm studio:canary` con token Entra humano → sesión MCP real.
+**Estado del provider (2026-09-26).** En producción. El gateway `958c9de30` (1.8.0 más el fix `efeoncepro/efeonce-mcp#20`) sirve `efeonce-mcp-gateway-00061-sbc` al 100 % con `MARKETING_STUDIO_PROVIDER_ENABLED=true`, tras el release de Greenhouse `0e87c7a443a2`, que publicó el canje y el manual. Hubo una migración correctiva (`20260926071321910`): la política del cliente de canje traía `requireOnPrivilegedAction=false` y el esquema V1 exige `true`, así que el canje respondía 503. Una sesión MCP real con un token del cliente público devolvió datos de producción en `attention`, `campaigns` (5), `campaign` y `asset`, un preview WebP de 640×360, `not_found` para una organización ajena y el provider `enabled` en `efeonce.gateway.status`. El manifiesto se sincroniza con `pnpm studio:manifest:sync` (genera `src/providers/marketing-studio-tool-manifest.generated.ts`, con hash verificado al cargar), y el guard `marketing-studio-tool-parity.ts` compara de forma bidireccional el manifiesto, el `appliesTo` del manual y las escrituras sin clase.
 
 **Manual servido.** `docs/mcp/skills/marketing-studio/SKILL.md` (audiencia `internal`), por `get_greenhouse_skill`. Su
 entrada en `src/mcp/greenhouse/skill-manifest.ts` declara `provider: 'marketing-studio'`: Greenhouse valida el prefijo

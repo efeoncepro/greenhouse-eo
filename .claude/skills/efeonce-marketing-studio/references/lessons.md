@@ -51,3 +51,17 @@
 - **2026-09-25 · Pushing Greenhouse `develop` was blocked by foreign WIP.** A remote commit collides with another
   session's work in `scripts/foto`. Rule: in the shared checkout, never sweep foreign WIP into a Studio commit; stage
   and commit in one call with explicit paths.
+
+## 2026-09-26 — Turning on the provider in production
+
+- **A sister-platform OAuth client policy is validated by `sisterPlatformOAuthPolicyV1Schema`, not by the migration's DO
+  guard.** `revocation.requireOnPrivilegedAction` must be literally `true`. With `false`, the exchange answers 503
+  ("OAuth client policy is unavailable"), and the gateway surfaces it as `upstream_unavailable`, which looks like Studio
+  is down. Fixed forward by `20260926071321910`. When seeding a client, copy a working one (client-services) and parse
+  the policy with the real schema.
+- **A conditional secret belongs in the step that runs `gcloud run deploy`.** Revision `00058-9jq` started without
+  `MARKETING_STUDIO_API_TOKEN`; the verified promotion kept `00057` serving.
+- **After a failed promotion, check `spec.traffic`.** It stayed pinned to the broken revision and every later deploy
+  failed. Fix: `update-traffic` to the serving revision, then re-dispatch.
+- **Diagnose by hop.** Studio with the service bearer (curl) → Greenhouse exchange (Vercel runtime logs of
+  `/api/integrations/v1/sister-platforms/oauth/token`) → gateway (sanitized logs).

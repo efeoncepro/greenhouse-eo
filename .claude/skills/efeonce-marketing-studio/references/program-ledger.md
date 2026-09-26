@@ -68,8 +68,12 @@ manifest · `d3ab68e` (TASK-1891) preview default thumb 640 px. Production = `d3
 - Gateway: PR efeoncepro/efeonce-mcp#19 merged (`9b93d6a`), version **1.8.0**, deploy run `36183601792`, revision
   `efeonce-mcp-gateway-00057-w8h` (southamerica-west1) at 100 %, `MARKETING_STUDIO_PROVIDER_ENABLED=false`.
   Surface 70 tools at 1.8.0 (the Insights PR #18 of TASK-1888 moves to 1.9.0).
-- **Pending:** Greenhouse release → flag ON + dispatch → `pnpm studio:canary` with a human Entra token → real MCP
-  session → evidence here → close 1890 and 1891.
+- **Live 2026-09-26:** Greenhouse release `0e87c7a443a2` (PR #240) published the exchange client and the manual (TASK-1890
+  complete). Forward-fix migration `20260926071321910`: the client policy had `requireOnPrivilegedAction=false`; the V1
+  schema requires `true`, so the exchange answered 503. Gateway fix PR #20 (`958c9de30`, secret mounted in the deploy step)
+  now serves `efeonce-mcp-gateway-00061-sbc` at 100 % with the flag ON. A real MCP session (public client PKCE token)
+  returned: attention, 5 campaigns, CMP-001 detail, asset detail, WebP preview 640×360, and `not_found` for a foreign org.
+  Not exercised live: denial for a person without the capability (needs a second login; covered by tests).
 
 ## Sessions
 

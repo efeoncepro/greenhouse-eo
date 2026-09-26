@@ -9,7 +9,7 @@
 
 ## 2026-09-26 — Marketing Studio por MCP en producción (release 0e87c7a443a2)
 
-Release develop→main PR #240 (run `36222331450`, released): canje RFC 8693 `efeonce-mcp-marketing-studio`, capability `marketing_studio.campaign.read`, manual MCP `marketing-studio` servido por el lane de skills (canary 200) y contrato editorial v2 de Insights con flag OFF (canary `cover-preference` 200). Gateway `efeonce-mcp` `958c9de30` con el provider `marketing-studio` encendido (`00061-sbc`). TASK-1890 complete; TASK-1891 espera el canary con token humano. [Ledger de tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md).
+Release develop→main PR #240 (run `36222331450`, released): canje RFC 8693 `efeonce-mcp-marketing-studio`, capability `marketing_studio.campaign.read`, manual MCP `marketing-studio` servido por el lane de skills (canary 200) y contrato editorial v2 de Insights con flag OFF (canary `cover-preference` 200). Gateway `efeonce-mcp` `958c9de30` con el provider `marketing-studio` encendido (`00061-sbc`). TASK-1890 y TASK-1891 complete: una sesión MCP real devolvió datos de producción, tras la migración correctiva `20260926071321910` (política del cliente de canje) y el fix `efeonce-mcp#20` (montaje del secreto). [Ledger de tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md).
 
 ## 2026-09-25 — La órbita se compone por intención (AXIS 0.2.6)
 
