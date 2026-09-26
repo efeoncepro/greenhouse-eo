@@ -134,6 +134,11 @@ TASK-1887 and TASK-1890…1899.
   + manual, and never call a gateway deploy "done" without the canary with a real human Entra token.
 - **NUNCA** federate a write tool without its own scope class, delegated person identity and `dryRun` → confirm loop.
 - **SIEMPRE** write copy in neutral Spanish (no voseo) and keep null ≠ 0 in every reader, tool description and report.
+- **NUNCA** restore, clone or PITR the shared Cloud SQL instance to recover Studio (it rolls Greenhouse back). Recovery
+  is logical per database (`pnpm ops:restore-rehearsal`, restore runbook); PITR only into a NEW temporary instance.
+- **NUNCA** call `Sentry.captureException` directly or log tokens/cookies/bodies: use `captureWithDomain` and `logEvent`
+  from `@studio/observability`; every operational process records its run (`ops_run`/`worker_run`) and freshness is
+  computed from the run, never from the latest datum.
 
 ## Workflows
 
@@ -183,6 +188,8 @@ preview 1600 WebP, ffmpeg frame at 1 s for videos; idempotent, no overwrite). St
 
 - Studio in production at `d3ab68e`; API 1.1.0; 12 tools + 5 exclusions; manifest hash `96d1f0caf6e5…`.
 - TASK-1887 complete. TASK-1890 in-progress (code complete; pending: Greenhouse release that serves the manual).
+- TASK-1896 in-progress: code complete in Studio + Greenhouse (not pushed), `ops_run` on staging; rollout pending
+  (Sentry, Vercel env, uptime, restore role/job/scheduler, production migration, Greenhouse release). See ledger.
   TASK-1891 in-progress (gateway 1.8.0 deployed with provider flag **OFF**; pending: Greenhouse release → flag ON +
   dispatch → canary with human Entra token → MCP session).
 - Greenhouse local `develop` holds the exchange client, capability, manual and registry drift fix, **not pushed**

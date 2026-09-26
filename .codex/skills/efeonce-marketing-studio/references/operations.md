@@ -149,3 +149,43 @@ Revoking the Studio `api_client` cuts the gateway immediately (gateway maps Stud
 Manifest change in the gateway: `STUDIO_REPO=… GREENHOUSE_REPO=… pnpm studio:manifest:sync` → tests
 (`test/marketing-studio*.test.ts`, `test/authorized-tools.test.ts`, version gate) → `pnpm surface:baseline` →
 bump `version` in `package.json` → PR → merge → dispatch. A description change is a breaking surface change (bump).
+
+## Observability and restore (TASK-1896, verified 2026-09-26)
+
+All infra is idempotent shell in the Studio repo, **dry-run by default** (`--apply` executes; secrets always piped):
+
+```bash
+SENTRY_ADMIN_TOKEN=… SENTRY_TEAM=… SENTRY_ALERT_MEMBER_ID=… bash scripts/ops/infra/sentry.sh [--apply]
+bash scripts/ops/infra/vercel-env.sh [--apply]                 # then redeploy production + preview
+ALERT_EMAIL=<Efeonce work email> bash scripts/ops/infra/monitoring.sh [--apply]   # rejects @gmail.com
+bash scripts/ops/infra/restore-rehearsal-job.sh [--apply] [--activate]            # scheduler born paused
+bash scripts/ops/infra/greenhouse-health-client.sh [--apply]   # studio:health client → Greenhouse secret
+```
+
+Restore rehearsal (details: `docs/operations/marketing-studio/MARKETING_STUDIO_RESTORE_RUNBOOK.md`):
+
+```bash
+STUDIO_PG_HOST=127.0.0.1 STUDIO_PG_PORT=15433 STUDIO_PG_USER=marketing_studio_restore \
+STUDIO_PG_PASSWORD="$(gcloud secrets versions access latest --secret=marketing-studio-pg-restore-password)" \
+  pnpm ops:restore-rehearsal --source marketing_studio_staging [--apply] [--simulate-parity-failure] [--skip-if-recent-days 28] [--dump-bucket <b>]
+# exit 0 ok/skipped · 1 failed · 2 guard (source/role) · 3 locked
+gcloud run jobs execute marketing-studio-restore-rehearsal --region us-east4 --wait --args=--source,marketing_studio_staging,--apply
+```
+
+Order: role by SQL (`scripts/ops/sql/restore-role.sql` as instance admin + `restore-role-grants.sql` as migrator per
+DB) → job `--apply` → staging rehearsal → forced failure → production rehearsal (record times in the runbook) →
+`--activate`. Local testing of the rehearsal works against a throwaway cluster (see lessons: socket path limit).
+
+Deep health (with a `studio:health` token, never `studio:read`):
+
+```bash
+T="$(gcloud secrets versions access latest --secret=greenhouse-marketing-studio-health-token)"
+curl -s -H "Authorization: Bearer $T" "https://studio.efeonce.org/api/v1/health?deep=1" | jq '.status, .components, .freshness'
+unset T
+```
+
+Greenhouse side: Vercel production needs `MARKETING_STUDIO_HEALTH_TOKEN_SECRET_REF=greenhouse-marketing-studio-health-token`;
+the ops-worker declares it in `deploy.sh`. Alert scheduler `ops-marketing-studio-health-watch` is born paused; resume
+it only after the first green production rehearsal. Rollback: DSN empty + redeploy; `pnpm migrate down` (ops_run);
+pause both schedulers; disable the uptime policy.
+

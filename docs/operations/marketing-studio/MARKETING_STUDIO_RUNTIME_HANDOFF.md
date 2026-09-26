@@ -1,9 +1,9 @@
 # Efeonce Marketing Studio — Runtime handoff
 
 > **Tipo:** runbook operativo
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-09-25 por Claude (TASK-1890, TASK-1891)
+> **Última actualización:** 2026-09-26 por Claude (TASK-1896: observabilidad y restauración)
 > **Arquitectura:** [EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md)
 > **Gateway MCP:** [EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md](../EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Marketing Studio
 > **Repo de código:** `efeoncepro/efeonce-marketing-studio` (privado, rama `main`, local en `~/Documents/efeonce-marketing-studio`)
@@ -46,6 +46,10 @@ Este documento dice **cómo operar** Studio. El porqué y los contratos viven en
 | `marketing-studio-pg-migrator-password` | contraseña del migrador (CLI del operador) | operador |
 | `marketing-studio-mcp-gateway-token` | token `mst_…` del `api_client` del gateway en producción (v1, scalar crudo, organización Efeonce) | `efeonce-mcp-gateway@efeonce-group.iam.gserviceaccount.com` (`roles/secretmanager.secretAccessor`); se monta en el gateway sólo con el flag ON |
 | `axis-packages-read-token` | `.npmrc` completo con token de lectura del registro AXIS | operador; a Vercel va sólo el `_authToken` |
+| `marketing-studio-sentry-dsn` | DSN del proyecto Sentry `efeonce-marketing-studio` (TASK-1896, **pendiente de crear**) | Vercel (`SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`) y `marketing-studio-restore@` |
+| `marketing-studio-sentry-auth-token` | token de org para subir source maps (TASK-1896, pendiente) | Vercel (`SENTRY_AUTH_TOKEN`, encrypted) |
+| `marketing-studio-pg-restore-password` | contraseña del rol `marketing_studio_restore` (TASK-1896, pendiente; generada, nunca impresa) | `marketing-studio-restore@` |
+| `greenhouse-marketing-studio-health-token` | token `mst_…` con scope `studio:health` para la señal de Greenhouse (TASK-1896, pendiente) | `greenhouse-portal@` (Vercel de Greenhouse y ops-worker) |
 
 Publicar siempre como scalar crudo: `printf %s "$VALOR" | gcloud secrets versions add <secreto> --data-file=-`.
 
@@ -63,6 +67,9 @@ Publicar siempre como scalar crudo: `printf %s "$VALOR" | gcloud secrets version
 | `STUDIO_PUBLIC_URL` | `https://studio.efeonce.org` | — |
 | `STUDIO_MEDIA_URL_SECRET` | secreto HMAC de los enlaces de imagen (sensitive, ≥ 32 caracteres) | **uno distinto** por ambiente |
 | `NODE_AUTH_TOKEN` | `_authToken` del registro AXIS (encrypted) | igual |
+| `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | DSN del proyecto Sentry (TASK-1896, pendiente) | igual (environment `preview` se deriva de `VERCEL_ENV`) |
+| `SENTRY_AUTH_TOKEN` | token de source maps (encrypted; sin él el build no sube nada) | igual |
+| `STUDIO_MEDIA_BUCKET` | `efeonce-marketing-studio-media` (sonda del health profundo; si falta se deduce de las renditions) | `efeonce-marketing-studio-media-staging` |
 
 Opcional: `STUDIO_PG_MAX_CONNECTIONS` (pool por instancia; por defecto 3 en Vercel, 5 fuera). Cambiar una variable
 exige redeploy.
@@ -170,6 +177,44 @@ El CNAME en `studio` no afecta el correo (MX, `autodiscover` y SPF de Outlook vi
 | Acceso del gateway a Studio | `pnpm api-client:revoke --id <id> --reason …` en la base de producción |
 | Provider MCP | `MARKETING_STUDIO_PROVIDER_ENABLED=false` + dispatch del deploy del gateway |
 | Dominio | Quitar el CNAME o el dominio del proyecto |
+
+## Observabilidad y restauración (TASK-1896)
+
+Estado: **code complete, rollout pendiente**. Contrato en la arquitectura §9; restauración en
+[`MARKETING_STUDIO_RESTORE_RUNBOOK.md`](MARKETING_STUDIO_RESTORE_RUNBOOK.md). Toda la infraestructura vive como scripts
+idempotentes del repo Studio, **dry-run por defecto** (`--apply` ejecuta):
+
+```bash
+SENTRY_ADMIN_TOKEN=… SENTRY_TEAM=… SENTRY_ALERT_MEMBER_ID=… bash scripts/ops/infra/sentry.sh [--apply]
+bash scripts/ops/infra/vercel-env.sh [--apply]                     # luego redeploy de production y preview
+ALERT_EMAIL=<correo laboral> bash scripts/ops/infra/monitoring.sh [--apply]
+bash scripts/ops/infra/restore-rehearsal-job.sh [--apply] [--activate]
+bash scripts/ops/infra/greenhouse-health-client.sh [--apply]
+```
+
+En Greenhouse (Vercel production y el ops-worker) la señal lee el secreto por nombre:
+`MARKETING_STUDIO_HEALTH_TOKEN_SECRET_REF=greenhouse-marketing-studio-health-token` (el ops-worker ya lo declara en
+`services/ops-worker/deploy.sh`; en Vercel hay que agregarlo). Sin él la señal queda `unknown` y no alerta.
+
+Verificación en producción:
+
+```bash
+B=https://studio.efeonce.org
+curl -s -D - -o /dev/null $B/api/v1/campaigns | grep -i x-correlation-id        # id de request en la respuesta
+# El mismo id aparece en la línea JSON "studio_request" de los logs de Vercel (vercel logs --scope efeonce-7670142f).
+T="$(gcloud secrets versions access latest --secret=greenhouse-marketing-studio-health-token)"
+curl -s -H "Authorization: Bearer $T" "$B/api/v1/health?deep=1" | jq '.status, [.components[] | {name, state}], [.freshness[] | {name, state, code}]'
+curl -s -o /dev/null -w '%{http_code}\n' -H "Authorization: Bearer $T" $B/api/v1/campaigns   # 403 (studio:health no lee campañas)
+unset T
+curl -s "$B/api/v1/health?deep=1"      # sin bearer: health superficial
+```
+
+Error de prueba en Sentry (preview primero): pedir una ruta con un bearer bien formado pero revocado no genera evento
+(es 401 controlado); para forzar un 500 usar un deployment de preview con `STUDIO_PG_PASSWORD_SECRET_REF` inválido y
+confirmar en Sentry `domain=api`, `request_id`, environment y release, sin `Authorization` ni cookies.
+
+Rollback: DSN vacío en Vercel + redeploy (Sentry); `pnpm migrate down` de `ops_run`; pausar
+`marketing-studio-restore-rehearsal` y `ops-marketing-studio-health-watch`; desactivar la política de uptime.
 
 ## Trampas conocidas
 

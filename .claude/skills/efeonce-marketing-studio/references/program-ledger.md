@@ -16,7 +16,7 @@ Insights (EPIC-045), not Studio.
 | TASK-1893 | Original asset store in GCS (approved finals, sha256, versioning, rights) + Cloud Run media worker (auto renditions, video covers, crops, Metricool readback; Metricool API confirmed) | to-do | — |
 | TASK-1894 | Write commands (idempotency, `If-Match`, audit), brief as entity, authority cutover from OneDrive; signed upload lives here; `.write`/`.approve` capabilities | to-do | — |
 | TASK-1895 | Editing/review/version upload/metrics UI (wireframe + flow), consumer of 1892–1894 | to-do | — |
-| TASK-1896 | Observability, alerts to Teams «EO - Teams», verified restore of `marketing_studio` (30-day rehearsal dump); before writes reach production | to-do | — |
+| TASK-1896 | Observability (Sentry, request id + JSON logs, deep health, `ops_run`), alerts (uptime + Sentry email; Greenhouse signal + Teams «EO - Admin»), verified logical restore of `marketing_studio` (30-day rehearsal dump); before writes reach production | **in-progress — code complete, rollout pending** | Studio local `7f348b2` (not pushed); `ops_run` on staging; Greenhouse `develop` `e757aaba5` (not pushed) |
 | TASK-1897 | (Greenhouse) revoke `CONNECT` from PUBLIC on `greenhouse_app` and Studio DBs | to-do | — |
 | TASK-1898 | Login with Efeonce ID (`auth.efeonce.org`), `STUDIO_ACCESS_MODE=efeonce_id`; last; also depends on TASK-1834 | to-do | — |
 | TASK-1899 | MCP writes and approvals: write-class tools with own scopes (`.write`/`.approve`), delegated person identity (RFC 8693, Studio audience), `dryRun` → explicit confirm, `proposalDigest`; blocked by 1891 + 1894 | to-do | — |
@@ -75,6 +75,31 @@ manifest · `d3ab68e` (TASK-1891) preview default thumb 640 px. Production = `d3
   returned: attention, 5 campaigns, CMP-001 detail, asset detail, WebP preview 640×360, and `not_found` for a foreign org.
   Not exercised live: denial for a person without the capability (needs a second login; covered by tests).
 
+## TASK-1896 — observability, alerts and verified restore (in-progress, code complete, rollout pending)
+
+**Studio commits (local `main`, not pushed):** `3d9a497` `@studio/observability` + Sentry 11 catalog · `978c414`
+`studio.ops_run` · `cf109e6` web Sentry, request id + JSON logs, deep health, `studio:health`, run registry in
+import/renditions · `ae40780` `withSentryConfig` import · `fc69c5e` restore rehearsal · `923762f` infra scripts ·
+`a4cdc75` AGENTS rules · `7f348b2` warm DB latency. **Greenhouse (`develop`, not pushed):** `0498c7964` signal +
+Teams alert + ops-worker endpoint · `e757aaba5` paused scheduler + secret ref in `deploy.sh`.
+
+| Runtime | Component | State | Evidence |
+|---|---|---|---|
+| Studio code | observability, deep health, ops_run, rehearsal | code complete | `pnpm check` exit 0 + `pnpm build` OK in an isolated copy of HEAD (other agent's partial `asset.kind` type neutralized only in the copy) |
+| Staging DB | `studio.ops_run` | applied 2026-09-26 | table, 3 indexes, trigger, runtime grants (INSERT/SELECT/UPDATE) verified |
+| Staging DB | deep health reader | exercised read-only | `overdue_unverified_posts=3`, `metricool_readback=never_ran`, `restore_rehearsal=never_ran`, worker/metrics `not_configured` |
+| Local throwaway PG | rehearsal | verified | success (18 tables parity), forced failure exit 1, lock exit 3, temp DB dropped, down/up of ops_run |
+| Local `next start` | request id + deep health | verified | `X-Correlation-Id` = `requestId` of `studio_request`; deep 200 with `studio:health`; 401 bad token; 403 on `/campaigns` |
+| Production DB | `studio.ops_run` | **pending** | `pnpm migrate up` with the migrator against `marketing_studio` |
+| Sentry / Vercel / Monitoring / Job / Scheduler / secrets | — | **pending** | scripts in `scripts/ops/infra/` (dry-run printed OK) |
+| Greenhouse | signal + alert | code complete | focal tests (`src/lib/reliability` 675 passed; alert + contract tests), `pnpm typecheck` exit 0; needs release + Vercel env + secret |
+
+Flags: none new. Teams destination `marketing-studio-reliability-alerts` («EO - Admin», operator decision 2026-09-26).
+Not done: Sentry project, uptime check, production migration, rehearsals in Cloud SQL, scheduler activation, Greenhouse
+release. Hand-off: run the scripts in the order of the restore runbook; TASK-1893's worker should `initSentry` from
+`@studio/observability/node` and report with `captureWithDomain(…, 'media_worker')`.
+
 ## Sessions
 
 - 2026-09-25 — Skill created from the verified facts inventory (Studio `d3ab68e`, gateway `9b93d6a`).
+- 2026-09-26 — TASK-1896 implemented in code (parallel with TASK-1893 in the same checkouts); rollout pending.

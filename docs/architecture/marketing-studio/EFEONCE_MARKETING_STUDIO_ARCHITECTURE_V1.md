@@ -1,9 +1,9 @@
 # Efeonce Marketing Studio — Arquitectura V1
 
 > **Tipo:** arquitectura técnica (contrato para agentes y desarrolladores)
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-09-25 por Claude (TASK-1890, TASK-1891)
+> **Última actualización:** 2026-09-26 por Claude (TASK-1896: observabilidad, health profundo, restauración)
 > **Estado:** Accepted. En vivo en `https://studio.efeonce.org` desde 2026-09-25 (TASK-1887)
 > **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + deltas de placement y de agentes 2026-09-25)
 > **Programa:** [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
@@ -111,15 +111,18 @@ los nombres de archivo y las UTM.
 |---|---|---|---|
 | Campaña | `studio.campaign` | `campaign_id` (`CMP-###`) | `organization_id` canónico (`org-…`), nombre, servicio, fase, audiencia resumida, destino, referencia de brief, `revision` |
 | Concepto | `studio.concept` | `concept_id` | pertenece a una campaña; título; orden |
-| Asset | `studio.asset` | `asset_id` | tipo `image`/`video`, ratio, concepto |
-| Versión de asset | `studio.asset_version` | uuid | nº de versión, `storage_provider` (`onedrive_provenance` \| `gcs`), ruta, bytes, sha256, dimensiones, procedencia jsonb. Única por `(asset_id, sha256)` |
-| Rendition | `studio.asset_rendition` | uuid | derivado liviano de una versión: `thumb` (640 px) o `preview` (1600 px) WebP en bucket privado; único por `(asset_version_id, kind)` |
+| Asset | `studio.asset` | `asset_id` | tipo `image`/`video`/`audio`/`document` (PDF final; lista extensible), ratio, concepto |
+| Versión de asset | `studio.asset_version` | uuid | nº de versión, `storage_provider` (`onedrive_provenance` \| `gcs`), ruta, bytes, sha256, dimensiones, procedencia jsonb. Única por `(asset_id, sha256)`. TASK-1893: `media_object_sha256` (FK; `gcs` ⇔ no nulo, `CHECK`) y derechos `rights_license_kind`, `rights_reference`, `rights_usage_starts_on/ends_on`, `rights_territories[]`, `rights_channels[]`, `rights_recorded_at` |
+| Objeto de medios | `studio.media_object` | `sha256` | TASK-1893: bytes de un original por contenido en el bucket de originales del ambiente: objeto `originals/sha256/<2>/<sha256>`, `generation`, `crc32c`, tamaño, mime (allowlist), dimensiones, `duration_ms`, `page_count`, `custom_time`. Un sha256 = un objeto aunque lo usen varias versiones |
+| Rendition | `studio.asset_rendition` | uuid | derivado de una versión en bucket privado, único por `(asset_version_id, kind)`: `thumb` (640 px) y `preview` (1600 px) WebP, `poster` (JPEG a resolución completa, videos) y `crop_1x1`/`crop_4x5`/`crop_9x16`/`crop_16x9` (recortes automáticos = vistas previas de colocación, nunca piezas aprobadas) |
 | Copy | `studio.copy_variant` | `copy_id` | canal, variante, texto literal, headline, descripción, CTA nativo, nota editorial, estado |
 | Audiencia | `studio.audience` | `(campaign_id, audience_key)` | canal, temperatura, definición jsonb (cargos, tamaños, geos, exclusiones) |
 | Configuración de anuncio | `studio.ad_configuration` | `ad_id` | asset × copy × canal × placement × audiencia × objetivo × destino + UTM; `status`, `checks_pending[]` |
 | Flight / plan de medios | `studio.media_flight` | uuid | modelo (always-on, burst), fechas, mercados, moneda, alcance del presupuesto, estacionalidad |
 | Línea de presupuesto | `studio.budget_line` | uuid | `flight_id`, período `YYYY-MM`, canal (nullable = reserva), monto, **`kind` = `proposed` \| `approved` \| `actual`** |
-| Post programado | `studio.scheduled_post` | uuid | proveedor (`metricool`), IDs del proveedor, red, fecha/zona, texto literal, media, **estado observado + `observed_at`** |
+| Post programado | `studio.scheduled_post` | uuid | proveedor (`metricool`), IDs del proveedor, red, fecha/zona, texto literal, media, **estado observado + `observed_at`**; `published_at` y `permalink` sólo desde una observación publicada (TASK-1893) |
+| Observación de post | `studio.post_observation` | uuid | TASK-1893: evidencia de publicación append-only (trigger): estado del proveedor, `published`, `published_at`, `permalink`, error sanitizado, `payload_digest`; única por `(post_id, payload_digest)` |
+| Corrida del worker | `studio.worker_run` | uuid | TASK-1893: `process` (`media-worker`), `kind` (`original_finalized` \| `reconcile_derivatives` \| `metricool_readback`), `trigger` (`pubsub` \| `scheduler` \| `manual`), `status` (`running` \| `succeeded` \| `partial` \| `failed` \| `skipped`), `started_at`, `finished_at`, `counts` jsonb, `error_code`, `error_summary` (≤ 500, sanitizado), `correlation_id`. La lee la salud profunda (TASK-1896) |
 | Auditoría | `studio.audit_event` | bigserial | append-only |
 | Corrida de import | `studio.import_run` | uuid | fuente, digest, modo, conteos, resultado |
 | Cliente API | `studio.api_client` | uuid | sha256 del token, scopes, organizaciones permitidas, revocación |
@@ -138,10 +141,14 @@ org-2df565fb-98aa-42f7-b324-ea9a2209017f` (Efeonce).
 6. **Import idempotente.** Reimportar la misma fuente inserta 0 filas: upsert por ID de negocio; versión de asset nueva sólo si cambia el sha256.
 7. **Orden estable por bytes.** Las listas ordenan con `COLLATE "C"`, para que paginación y comparación en JavaScript coincidan.
 8. **Paid y orgánico conservan destinos distintos** (los posts orgánicos no heredan la UTM del plan paid).
+9. **Almacenar ≠ ser la autoridad** (TASK-1893). Hasta TASK-1894, OneDrive es la fuente y GCS una copia verificada de finales ya registrados: la ingesta nunca crea versiones ni escribe en OneDrive, y `import:catalog` nunca devuelve una versión `gcs` a `onedrive_provenance`.
+10. **Un original nunca se sobrescribe ni es público.** Objeto nombrado por su sha256, subida con `ifGenerationMatch=0`, bucket con PAP `enforced` y UBLA; la descarga es una URL firmada de ≤ 15 min emitida y auditada por el dominio.
+11. **Derechos siempre explícitos.** Toda versión y toda descarga traen `rights.status` (`unknown` \| `not_yet_valid` \| `active` \| `expired`), calculado al leer en `America/Santiago`; `unknown` = sin licencia registrada.
+12. **Un recorte automático no es una pieza.** `crop_*` es un derivado rotulado `automatic: true`; nunca crea `asset_version` ni cuenta como aprobado.
 
 ## 4. Contrato API v1
 
-- Base `/api/v1`. Documento `GET /api/v1/openapi.json` (OpenAPI 3.1, versión **1.1.0**).
+- Base `/api/v1`. Documento `GET /api/v1/openapi.json` (OpenAPI 3.1, versión **1.2.0** desde TASK-1893: descarga de originales, derechos y evidencia de publicación).
 - **Registro único:** toda operación nace en `packages/contracts/src/operations.ts` con `exposure` = `tool` (se federa a agentes) o `exclusion` (con razón). De ese registro se derivan el OpenAPI y el manifiesto de tools (§4.1), y un test de paridad lo compara con los route handlers reales: una ruta sin entrada, o una entrada sin ruta, rompe `pnpm check`. Las descripciones salen del glosario `semantics.ts`. La paridad queda así garantizada por construcción, no por revisión.
 - Formato de error canónico (mismo espíritu que Greenhouse): `{ "error": "<es-CL seguro>", "code": "<snake_case estable>", "actionable": <bool> }`. Nunca stack traces, SQL ni rutas.
 - `X-Correlation-Id` se acepta y se devuelve.
@@ -241,6 +248,7 @@ prefijo; el público `EO-ORG-####` es sólo presentación y el importador lo rec
 | `marketing_studio_runtime` | NOLOGIN, DML; sin `UPDATE/DELETE` sobre la auditoría | — |
 | `marketing_studio_app` | runtime de producción, `CONNECT` sólo a `marketing_studio` | **20** |
 | `marketing_studio_staging_app` | runtime de preview/development, `CONNECT` sólo a staging | 10 |
+| `marketing_studio_worker` / `marketing_studio_staging_worker` | worker de medios en Cloud Run (TASK-1893), miembro de `marketing_studio_runtime`, `CONNECT` sólo a su base (`scripts/ops/sql/media-worker-roles.sql`) | 6 |
 
 - `PUBLIC` sin `CONNECT` sobre las bases de Studio. **Riesgo residual verificado:** `greenhouse_app` conserva el `CONNECT` de PUBLIC, así que los roles de Studio pueden abrir sesión allí, pero no leen ninguna tabla ni alcanzan funciones `SECURITY DEFINER`. Cerrarlo es TASK-1897.
 - Runtime en Vercel: `@google-cloud/cloud-sql-connector` con **usuario y contraseña** (la instancia no tiene `cloudsql.iam_authentication`; activarlo tocaría la instancia compartida con Greenhouse). La contraseña se resuelve server-side desde Secret Manager con credenciales WIF (`@vercel/oidc` → pool `vercel`, provider `greenhouse-eo`, subject `owner:efeonce-7670142f:project:efeonce-marketing-studio:environment:<env>`). Producción impersona `marketing-studio-runtime@`; preview y development, `marketing-studio-runtime-stg@`, que no puede leer el secreto ni el bucket de producción. Sin claves JSON.
@@ -252,7 +260,7 @@ prefijo; el público `EO-ORG-####` es sólo presentación y el importador lo rec
 
 - Fuentes: `Campaign Manager/CATALOGO-DATOS.json` (proyección que consolida manifiestos, copys, anuncios, audiencias, flight y posts) + registro semilla del repo + readback de Metricool por campaña.
 - CLI `pnpm import:catalog --catalog <CATALOGO-DATOS.json> [--registry scripts/seeds/campaign-registry.json] [--readback CMP-###=<ruta>] [--apply]`: dry-run por defecto con conteos por entidad; `--apply` en una transacción; registra `import_run` con digest de la fuente.
-- Los originales **no se suben**: `asset_version.storage_provider = 'onedrive_provenance'` con ruta relativa a `Alineación/5. Contenidos` + sha256.
+- El import registra cada versión como `onedrive_provenance` con ruta relativa a `Alineación/5. Contenidos` + sha256. La copia verificada del original en GCS la hace después `pnpm media:ingest` (§7.2); un reimport respeta las versiones ya en `gcs` y, si el catálogo trae la huella de un archivo que antes venía sin ella (misma ruta), la adopta en la misma versión en vez de crear una nueva.
 - El registro semilla (`scripts/seeds/campaign-registry.json`) fija por campaña los tres estados, `organization_id`, CDR y, cuando la campaña no tiene manifiesto, sus conceptos y piezas: CMP-003 (video V17 y portada V4, CDR-009), CMP-004 (C01–C04, CDR-010), CMP-005 (S01–S03, CDR-011).
 - **Corte:** hasta que existan commands de escritura (TASK-1894), OneDrive sigue siendo la fuente y Studio una proyección reimportable. El corte se declara por campaña; nunca se escribe en los dos lados.
 
@@ -262,7 +270,61 @@ prefijo; el público `EO-ORG-####` es sólo presentación y el importador lo rec
 - Buckets privados por ambiente (`efeonce-marketing-studio-media` / `-staging`, us-east4). La web nunca expone URLs de GCS.
 - **Enlaces firmados sin base.** Los readers devuelven `thumbUrl`/`previewUrl` como `/api/v1/media/{token}`: payload `{bucket, objeto, mime, expiración}` firmado con HMAC-SHA256 (`STUDIO_MEDIA_URL_SECRET`, ≥ 32 caracteres, distinto por ambiente). La expiración se redondea a la semana (el enlace vive entre una y dos semanas) para que la caché del navegador sirva. El endpoint verifica firma, vencimiento, mime y prefijo `renditions/` y sirve el objeto **sin consultar Postgres**: el reader ya autorizó la campaña al armar la respuesta. Sin secreto, los readers caen a `/api/v1/renditions/{id}`, que sí consulta la base. Rotar el secreto invalida los enlaces vigentes; la página los regenera al recargar.
 - **Incidente 2026-09-25 (origen del diseño):** con una consulta Postgres por miniatura, una grilla de 20+ agotaba el tope de 20 conexiones de `marketing_studio_app` (`too many connections for role`); reproducido: 18 de 40 pedidos simultáneos devolvían 500. Con enlaces firmados: 108 de 108 pedidos simultáneos OK en producción. `MediaImage` reintenta una vez y, si vuelve a fallar, muestra «Vista previa no disponible» en el mismo espacio.
-- El worker de Cloud Run (TASK-1893) automatiza las renditions cuando exista el almacén de originales.
+- Para versiones con original en GCS, las renditions las genera el worker de medios (§7.2); `media:renditions` queda para versiones que siguen sólo en OneDrive y usa el mismo toolkit del dominio.
+
+## 7.2 Almacén de originales y worker de medios (TASK-1893)
+
+Estado: **code complete, rollout pendiente** (buckets, SA, Pub/Sub, Cloud Run, Scheduler, migración de producción,
+ingesta y release de Greenhouse). Runbook: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) §Originales y worker.
+
+- **Buckets** `efeonce-marketing-studio-originals` / `-staging` (us-east4, Standard, UBLA, PAP `enforced`, versionado,
+  soft delete 30 días, labels `app`/`env`). Lifecycle: no vigentes se borran a los 30 días; `daysSinceCustomTime > 30`
+  → Nearline y `> 365` → Coldline. Sólo finales: allowlist `image/png|jpeg|webp`, `video/mp4|quicktime`,
+  `audio/mpeg|wav|aac`, `application/pdf`; formatos de trabajo (PSD, AEP, AI, INDD, PRPROJ, comprimidos) rechazados por
+  extensión **y** por firma de bytes.
+- **Ingesta** (`pnpm media:ingest`, primitive `ingestOriginals`): sólo versiones de `studio.asset_version`; sha256 local
+  = sha256 del catálogo (si no, `drift`); crc32c local = el que devuelve GCS; subida reanudable con
+  `ifGenerationMatch=0` y metadata `sha256`; en una transacción: `media_object` (upsert), versión a `gcs` con guarda de
+  estado previo, ruta de OneDrive a `provenance.onedrive_path`, `audit_event asset_version.original_ingested`. Conteos
+  `to_upload`, `dedup`, `already_gcs`, `drift`, `rejected`, `missing_local`, `unverifiable` (el catálogo no trae huella).
+  Dry-run por defecto; reversible con `--revert-provider` (los objetos quedan). La CLI exige que el bucket corresponda
+  a la base (`marketing_studio` ↔ originales de producción).
+- **Descarga** `GET /api/v1/assets/{assetId}/versions/{versionNo}/download` (tool `studio.asset.download`, capability
+  `marketing_studio.asset.download`, scope `studio:assets:download` además de `studio:read`): JSON `{ url, expiresAt,
+  filename, mimeType, byteSize, sha256, rights }`. URL V4 de 10 min firmada por IAM `signBlob` con la SA del runtime
+  (sin claves JSON), `response-content-disposition: attachment; filename="<assetId>-v<n>.<ext>"`. Compuertas: flag
+  `STUDIO_ORIGINAL_DOWNLOADS_ENABLED` y actor `api_client` (el anónimo del modo open recibe 403 `download_disabled`),
+  scope (403 `forbidden`), organización (404), versión en el bucket del ambiente (404 `original_not_stored`). Cada
+  emisión deja `audit_event asset_version.download_issued`. Firma verificada byte a byte contra `@google-cloud/storage`.
+- **Derechos** por versión: command `setAssetVersionRights` (CLI `pnpm media:rights`, con `audit_event` que guarda el
+  estado anterior); la API de escritura nace con TASK-1894. DTO de versión: `mimeType`, `durationMs`, `pageCount`,
+  `storage.available`, `rights`; el detalle agrega `posterUrl` y `placementPreviews[] { aspectRatio, url, automatic }`.
+  `storagePath` sigue siendo la ruta de trabajo (en `gcs` se lee de `provenance.onedrive_path`); el nombre del objeto
+  nunca sale del servidor.
+- **Worker** `apps/worker` (Node 24, `node:http`, ffmpeg + sharp) en Cloud Run `marketing-studio-media-worker[-staging]`:
+  privado (`run.invoker` sólo para `marketing-studio-invoker@`), 0–3 instancias, concurrencia 1, 2 vCPU / 2 GiB, 900 s,
+  pool PG de 2 con su propio rol. `apps/worker/deploy.sh` es la fuente de verdad de sus variables.
+  - `POST /events/original-finalized`: push de Pub/Sub (`OBJECT_FINALIZE` del bucket de originales, prefijo
+    `originals/`; ack 600 s, backoff 10–600 s, DLQ `…-dlq` tras 5 intentos). Si la fila `media_object` aún no existe
+    responde 503 (reintento); eventos que nunca podrán procesarse se confirman con 204 y quedan `skipped`.
+  - `POST /jobs/reconcile-derivatives` (Scheduler, cada hora): repara versiones `gcs` sin derivados o desactualizados
+    en lotes de 20 y, con `MEDIA_WORKER_ARCHIVE_TIERING_ENABLED`, fija `customTime` de objetos cuyas campañas cerraron
+    todas (archivada o lanzamiento `ended`). GCS no permite retroceder `customTime`: una campaña reabierta sale como
+    `tiering_reopened` y se reescribe a Standard a mano (runbook).
+  - `POST /jobs/metricool-readback` (Scheduler, cada 30 min, sólo producción): posts con fecha en las últimas 72 h o sin
+    estado terminal; lee el estado real por marca y agrega `post_observation`; actualiza `provider_status`,
+    `observed_at`, `observation_source = 'metricool_api'` y, sólo si el proveedor dice publicado, `published_at` y
+    `permalink`. Sin token o `userId`, falla cerrado con `not_configured`.
+  - Derivados: `thumb`/`preview` WebP, `poster` JPEG del segundo 1 y `crop_*` **sólo** para proporciones que el
+    concepto no tiene como pieza real. Decisión de Discovery (2026-09-26): 14 de 16 combinaciones concepto × tipo ya
+    tienen 3–4 formatos reales; el recorte queda como vista previa de colocación rotulada, no como pieza.
+  - Flags `MEDIA_WORKER_DERIVATIVES_ENABLED`, `MEDIA_WORKER_METRICOOL_READBACK_ENABLED`,
+    `MEDIA_WORKER_ARCHIVE_TIERING_ENABLED` (default `false`): apagados, el worker responde 2xx y registra `skipped`.
+- **Frontera:** la web nunca importa `@studio/database/storage-write`, `@studio/domain/worker`,
+  `@studio/domain/media-toolkit` ni `sharp` (`domain-boundary-gate`); el dominio usa puertos y no los adapters de escritura.
+- **Infraestructura como código:** scripts `gcloud` idempotentes con dry-run por defecto (misma convención que
+  TASK-1896): `scripts/ops/infra/media-originals.sh --env <env> [--wiring] [--apply]` y `apps/worker/deploy.sh`.
+  No se adoptó Terraform: el repo no lo usa.
 
 ## 8. Interfaz
 
@@ -274,11 +336,102 @@ prefijo; el público `EO-ORG-####` es sólo presentación y el importador lo rec
 - Logos oficiales (`public/brand/`) copiados de `greenhouse-eo/public/branding/`.
 - Flujo maestro y huecos conocidos (p. ej. `/library` no alcanzable a 390 px): `docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md`; la UI de edición es TASK-1895.
 
-## 9. Observabilidad y operación
+## 9. Observabilidad y operación (TASK-1896)
 
-- `GET /api/v1/health` para smoke (503 si la base no responde).
-- Logs estructurados sin PII ni secretos; errores al cliente sólo por el contrato canónico.
-- Sentry, alertas (Teams «EO - Teams»), señal de saturación de conexiones y restauración ensayada llegan con TASK-1896; la fundación no los finge.
+Estado: **code complete, rollout pendiente** (proyecto Sentry, variables de Vercel, uptime check, rol y job del
+ensayo, secreto del cliente de Greenhouse y release de Greenhouse). Runbooks:
+[`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) y
+[`MARKETING_STUDIO_RESTORE_RUNBOOK.md`](../../operations/marketing-studio/MARKETING_STUDIO_RESTORE_RUNBOOK.md).
+
+### 9.1 Errores y logs
+
+- Paquete `packages/observability`: `scrubEvent`/`scrubValue` (fuera `Authorization`, `Cookie`, `Set-Cookie`, cuerpos,
+  cookies, variables de entorno; tokens `mst_`, bearers, JWT, enlaces firmados `/api/v1/media/{token}` y credenciales en
+  URLs tapados en cualquier string), `captureWithDomain(error, domain)` sobre `@sentry/core` (misma forma que el de
+  Greenhouse, sin importarlo), `initSentry(service)` para job y worker, `logEvent` (una línea JSON).
+- Web: `@sentry/nextjs` 11 (`src/instrumentation.ts`, `instrumentation-client.ts`, `sentry.{server,edge}.config.ts`),
+  `sendDefaultPii: false`, trazas al 5 %. Sin `SENTRY_DSN` no inicializa. Source maps sólo con `SENTRY_AUTH_TOKEN`.
+  Proyecto `efeonce-marketing-studio` en la org `efeonce-group-spa`, environments `production` y `preview`.
+- Un test de extremo a extremo arma un evento con cabeceras, cookies, cuerpo y tokens, lo pasa por el SDK real con las
+  opciones de Studio e inspecciona el sobre que saldría: falla si algo sensible sale (corre en `pnpm check`).
+- Regla: nada de `Sentry.captureException` suelto en `packages/domain` ni en rutas; siempre `captureWithDomain`.
+- **Id de request:** `X-Correlation-Id` del cliente (el gateway MCP lo manda), si no `x-vercel-id`, si no uno nuevo. Toda
+  respuesta dinámica de `/api/v1` lo devuelve y deja una línea JSON `studio_request` con `requestId`, `route`, `method`,
+  `status`, `durationMs`, `domain` y `code`. Los 5xx de `/api/v1/media` y `/api/v1/renditions` quedan contables por
+  esas líneas (`route` + `status`) y en Sentry. `openapi.json` y `tool-manifest` son estáticas (sin id).
+
+### 9.2 Health
+
+- `GET /api/v1/health` (público, uptime check): `SELECT 1`; 200 o 503. Sin cambios de contrato.
+- `GET /api/v1/health?deep=1` con `Authorization: Bearer` de un `api_client` con scope **`studio:health`** (nuevo en
+  `API_SCOPES`; no da lectura de campañas): `HealthDeep { status, version, accessMode, observedAt, components[],
+  freshness[] }` (`packages/contracts/src/health.ts`, schema estricto). Sin cabecera `Authorization` responde el
+  superficial; token inválido 401; sin el scope 403; 503 sólo si la base no responde.
+- Componentes: `database` (latencia; > 800 ms degraded), `database_connections` (conexiones abiertas del rol de la app
+  contra su tope: ≥ 70 % degraded, ≥ 90 % down — el modo de falla del incidente del 2026-09-25), `media_bucket` (listar
+  un objeto con el SA del ambiente), `greenhouse_metrics` (TASK-1892) y `media_worker` (última fila de
+  `studio.worker_run`, TASK-1893). Lo que aún no existe es `not_configured`, detectado en runtime (`to_regclass`,
+  columnas en `information_schema`): no degrada ni cuenta como sano.
+- Frescura, siempre desde la corrida registrada y nunca desde el dato: `catalog_import` (`import_run`/`ops_run`, 7 días),
+  `pending_renditions` (versiones de imagen/video con más de 1 h sin miniatura o preview), `overdue_unverified_posts`
+  (`PENDING` con más de 2 h de vencido), `metricool_readback` (48 h, sólo con campañas activas; lee `ops_run` y
+  `worker_run.kind = 'metricool_readback'`), `restore_rehearsal` (45 días; fallido o vencido = `down`; nunca corrido =
+  `degraded`), `rights_expiring` (versiones cuyo uso vence en 14 días; `not_configured` sin la columna de derechos).
+- Umbrales en un solo módulo: `packages/domain/src/health/thresholds.ts`. Estado global: `down` si la base no
+  responde; `degraded` si algo más está degradado o caído; si no, `ok`.
+
+### 9.3 Registro de corridas
+
+`studio.ops_run` (migración `1790409464603_ops-run`): `process`, `mode`, `status running|succeeded|failed|partial|
+cancelled`, `actor`, `started_at`, `finished_at`, `counts`, `error_code`, `correlation_id`. Índice único parcial
+`(process) WHERE status = 'running'` = una corrida a la vez; trigger: sólo `running → terminal`, sin borrados.
+`recordOpsRun` envuelve `import:catalog` (y `metricool_readback` cuando trae `--readback`) y `media:renditions` sin
+romperlos si el registro falla. El worker de TASK-1893 registra en su propia `studio.worker_run`.
+
+### 9.4 Restauración verificada
+
+- La instancia es compartida con Greenhouse: **nunca** se restaura, clona ni hace PITR sobre ella para recuperar Studio.
+  La recuperación es lógica y por base; el camino de punto exacto usa PITR a una instancia **nueva** y extrae sólo
+  `marketing_studio`.
+- Postura verificada 2026-09-26 (sólo lectura): backups automáticos 7 retenidos a las 07:00 UTC, PITR con 7 días de logs.
+- Ensayo `pnpm ops:restore-rehearsal`: conteo y `pg_dump --snapshot` sobre el mismo snapshot `REPEATABLE READ`, base
+  temporal `marketing_studio_restore_<16 hex>`, paridad por tabla del schema `studio`, `DROP` siempre y verificado,
+  `ops_run` + `audit_event`. Rol dedicado `marketing_studio_restore` (por SQL, `CREATEDB`, sin `CREATEROLE`, tope 3).
+  Cloud Run Job `marketing-studio-restore-rehearsal` + Scheduler pausado hasta el primer ensayo verde; dump conservado
+  30 días en `efeonce-marketing-studio-restore-dumps`.
+
+### 9.5 Alertas
+
+- **Por su cuenta (no depende de Greenhouse):** uptime check de Cloud Monitoring sobre el health superficial cada
+  5 min desde 4 regiones, alerta si falla en ≥ 2 regiones durante 10 min, email al operador (correo laboral); Sentry:
+  issue nuevo en `production`, regresión y más de 10 eventos en 5 min, al mismo email.
+- **En Greenhouse:** una señal agregada `platform.marketing_studio.health` (`kind: runtime`, módulo `platform`) que lee
+  el health profundo por HTTP con el secreto `greenhouse-marketing-studio-health-token` (nunca SQL a la base de Studio):
+  `error` si un componente o el ensayo está `down`, `warning` con cualquier degradación, `ok` con `not_configured`,
+  `unknown` sin credencial o sin respuesta. Aviso diario a Teams **«EO - Admin»** (destino
+  `marketing-studio-reliability-alerts`, decisión del operador 2026-09-26) sólo en `error`, desde el ops-worker
+  (`POST /marketing-studio/health-watch`, scheduler `ops-marketing-studio-health-watch`, nace pausado). Studio nunca
+  recibe credenciales del bot de Teams.
+
+### 9.6 SLOs (producto interno, sin error budget formal ni guardia fuera de horario)
+
+| SLO | Objetivo | Medición |
+|---|---|---|
+| Disponibilidad de `/api/v1/health` | 99,5 % mensual | uptime check de Cloud Monitoring |
+| Errores 5xx en `/api/v1` | < 1 % de requests por semana | Sentry + líneas `studio_request` de Vercel |
+| Latencia de lecturas de colección | p95 < 800 ms | trazas muestreadas de Sentry + `durationMs` |
+| Frescura del readback de Metricool | ≤ 48 h con campañas activas | health profundo |
+| Restauración verificada | 1 ensayo exitoso cada ≤ 45 días; RTO medido | `studio.ops_run` |
+
+### 9.7 Costo mensual estimado (a verificar tras el primer mes)
+
+| Pieza | Estimación |
+|---|---|
+| Sentry | dentro del plan de la org `efeonce-group-spa` si la cuota compartida lo permite (trazas al 5 %) — **pendiente confirmar plan y cuota** |
+| Uptime check (4 regiones × cada 5 min ≈ 35 k ejecuciones/mes) + 1 política | dentro del tramo gratuito de Cloud Monitoring |
+| Cloud Run Job mensual (1 vCPU, 1 GiB, minutos) + Scheduler | céntimos de USD |
+| Bucket de dumps (KB–MB, retención 30 días) | prácticamente cero |
+| Artifact Registry (una imagen) + Cloud Build (un build por cambio) | céntimos de USD |
 
 ## 10. Programa pendiente (EPIC-049)
 
@@ -288,7 +441,7 @@ prefijo; el público `EO-ORG-####` es sólo presentación y el importador lo rec
 | TASK-1890 | Registro de operaciones, manifiesto, semántica, bearer, organización canónica, capability, manual | Code complete; falta servir el manual en producción (release de Greenhouse) |
 | TASK-1891 | Provider `marketing-studio` en el gateway | Gateway 1.8.0 desplegado con flag OFF; falta release de Greenhouse → flag ON → canary |
 | TASK-1893 | Originales en GCS + worker de medios | To-do |
-| TASK-1896 | Observabilidad, alertas y restauración | To-do |
+| TASK-1896 | Observabilidad, alertas y restauración | In-progress: code complete (Studio + Greenhouse), rollout pendiente |
 | TASK-1892 | Métricas desde Greenhouse (GA4 aún no en producción: TASK-1284) | To-do |
 | TASK-1894 | Commands de escritura, brief como entidad, corte de autoridad, subida firmada | To-do |
 | TASK-1895 | UI de edición, revisión y métricas | To-do |

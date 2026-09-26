@@ -65,3 +65,26 @@
   failed. Fix: `update-traffic` to the serving revision, then re-dispatch.
 - **Diagnose by hop.** Studio with the service bearer (curl) → Greenhouse exchange (Vercel runtime logs of
   `/api/integrations/v1/sister-platforms/oauth/token`) → gateway (sanitized logs).
+
+## 2026-09-26 — TASK-1896 (observability and restore)
+
+- **Sentry 11 moved `withSentryConfig` to `@sentry/nextjs/config`.** Importing it from `@sentry/nextjs` typechecks in
+  `src` but `next build` fails loading `next.config.ts` (`withSentryConfig is not a function`). Rule: import from
+  `@sentry/nextjs/config`; the build (not the typecheck) is the proof.
+- **`marketing_studio_migrator` has no `CREATEDB`.** The restore rehearsal needs to create a temp DB; never grant it to
+  the migrator. Rule: dedicated role `marketing_studio_restore` created by SQL under `SET ROLE cloudsqlsuperuser`
+  (the creator keeps ADMIN on it, so the script is re-runnable).
+- **`pg_dump` as a runtime-member role fails on `public.studio_pgmigrations_id_seq`.** The migrations table and its
+  sequence belong to the migrator and are outside `studio`. Rule: grant SELECT on both to the restore role
+  (`restore-role-grants.sql`), per database.
+- **The first `SELECT 1` includes opening the connection** (770 ms against staging via proxy, at the edge of the 800 ms
+  "slow" threshold). Rule: the deep health measures latency on the second query.
+- **Local throwaway Postgres in the scratchpad fails with "Unix-domain socket path is too long (max 103 bytes)".** Rule:
+  start it with `-c unix_socket_directories='' -c listen_addresses=127.0.0.1` and `LC_ALL=C`.
+- **Shared-checkout commits:** other agents stage files in the same index. Rule: `git commit -m … -- <paths>` (only
+  those paths) and, for a shared file with foreign hunks, build a blob of HEAD + your hunks and `git update-index
+  --cacheinfo` it; never `git add -A`. Wait if the other session has the same file staged.
+- **Two agents, one migration order.** node-pg-migrate runs with `--check-order`: applying a later-timestamped migration
+  before an earlier pending one blocks the other agent. Rule: check `public.studio_pgmigrations` first; apply only when
+  every earlier file is already applied.
+

@@ -1,6 +1,7 @@
 # Efeonce Marketing Studio — architecture map
 
-Verified against code on 2026-09-25 (Studio `d3ab68e`, gateway `efeonce-mcp` `9b93d6a` / v1.8.0). Secret **names**
+Verified against code on 2026-09-25 (Studio `d3ab68e`, gateway `efeonce-mcp` `9b93d6a` / v1.8.0); TASK-1896 rows
+verified 2026-09-26 (Studio `7f348b2`, Greenhouse `e757aaba5`). Secret **names**
 only; never write values here.
 
 ## Repositories
@@ -52,11 +53,25 @@ only; never write values here.
 | `scripts/tool-manifest.ts` | `pnpm mcp:manifest:generate|check` |
 | `scripts/seeds/campaign-registry.json` | Campaign registry for the import |
 | `scripts/gates/*.mjs` | `absolute-path-gate`, `domain-boundary-gate`, `dependency-catalog-gate` (+ `gates.test.mjs`) |
+| `packages/observability` (TASK-1896) | `scrub.ts` (event/value/URL scrubbing), `capture.ts` (`captureWithDomain` on `@sentry/core`), `node.ts` (`initSentry(service)`, `flushSentry`), `log.ts` (`logEvent` JSON), `sentry-options.ts` (shared options, traces 5 %); `sentry-e2e.test.ts` inspects the real SDK envelope |
+| `apps/web/src/instrumentation.ts`, `instrumentation-client.ts`, `sentry.{server,edge}.config.ts` | Sentry for Next (no DSN ⇒ no init); `next.config.ts` wraps with `withSentryConfig` from `@sentry/nextjs/config` |
+| `apps/web/src/server/observe.ts` | `requestIdOf`, `logRequest`, `reportRouteError`, `withObservability(route, domain, handler)` for routes outside `handle()` |
+| `apps/web/src/server/health-probes.ts` | Bucket probe (list 1 object with the env SA) for the deep health |
+| `packages/contracts/src/health.ts` | `HealthDeep`, `HealthComponent`, `HealthFreshness`, `HealthFilters` |
+| `packages/domain/src/health/{thresholds,health-deep}.ts` | Thresholds (single place) + `collectHealthInputs` / pure `evaluateHealth` / `getHealthDeep` |
+| `packages/domain/src/ops/ops-run.ts` | `startOpsRun` (stale-lock release 6 h), `finishOpsRun`, `recordOpsRun` (never breaks the process), `opsErrorCode` |
+| `packages/domain/src/ops/restore-rehearsal.ts` | Pure guards (`assertRehearsalSource`, `tempDatabaseName`, `assertRehearsalTarget`) + `compareParity` |
+| `scripts/ops/restore-rehearsal.ts` | `pnpm ops:restore-rehearsal` (exit 0/1/2/3) |
+| `scripts/ops/infra/*.sh` | Idempotent infra, dry-run by default: `sentry.sh`, `vercel-env.sh`, `monitoring.sh`, `restore-rehearsal-job.sh`, `greenhouse-health-client.sh` (+ `lib.sh`) |
+| `scripts/ops/sql/restore-role{,-grants}.sql` | Role `marketing_studio_restore` by SQL + grants on `public.studio_pgmigrations` |
+| `infra/restore-rehearsal/` | `Dockerfile` (Node 24 + PG 16 client, filtered install), `Dockerfile.dockerignore`, `cloudbuild.yaml` |
 
 ## Database (schema `studio`)
 
 Tables: `campaign`, `concept`, `asset`, `asset_version`, `asset_rendition`, `copy_variant`, `audience`,
-`ad_configuration`, `media_flight`, `budget_line`, `scheduled_post`, `import_run`, `audit_event`, `api_client`.
+`ad_configuration`, `media_flight`, `budget_line`, `scheduled_post`, `import_run`, `audit_event`, `api_client`;
+`media_object`, `worker_run`, `post_observation` (TASK-1893); `ops_run` (TASK-1896, migration `1790409464603_ops-run`,
+staging applied 2026-09-26, production pending).
 Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 copies, 72 ads, 4 audiences,
 1 flight, 7 budget lines, 6 posts, 108 renditions; all `organization_id = org-2df565fb-98aa-42f7-b324-ea9a2209017f`.
 
@@ -72,6 +87,10 @@ Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 c
 | WIF | pool `vercel`, provider `greenhouse-eo`; subject `owner:efeonce-7670142f:project:efeonce-marketing-studio:environment:<env>` |
 | Buckets | `efeonce-marketing-studio-media`, `efeonce-marketing-studio-media-staging` (us-east4, private, uniform access) |
 | Local tunnel | `cloud-sql-proxy efeonce-group:us-east4:greenhouse-pg-dev --port 15433` (own port, not Greenhouse's) |
+| PG role (TASK-1896, **to create by SQL**) | `marketing_studio_restore` (LOGIN CREATEDB NOCREATEROLE INHERIT, conn limit 3, member of `marketing_studio_runtime`). The migrator has NO `CREATEDB` (verified 2026-09-26) |
+| Restore rehearsal (TASK-1896, **to create**) | SA `marketing-studio-restore@`, bucket `efeonce-marketing-studio-restore-dumps` (30-day delete), image `us-east4-docker.pkg.dev/efeonce-group/marketing-studio/restore-rehearsal:<sha>`, Cloud Run Job `marketing-studio-restore-rehearsal` (us-east4), Scheduler same name (Tue 05:30 Santiago, paused until first green) |
+| Monitoring (TASK-1896, **to create**) | Uptime check «Studio — /api/v1/health» (4 regions, 5 min), policy «Studio — health caído en 2+ regiones», email channel «Studio — alertas por email» |
+| Sentry (TASK-1896, **to create**) | Org `efeonce-group-spa`, project `efeonce-marketing-studio`, envs `production`/`preview` |
 
 ## Environment variables (Studio)
 
@@ -87,13 +106,18 @@ Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 c
 | `STUDIO_PUBLIC_URL` | `https://studio.efeonce.org` (prod; OpenAPI `servers`) |
 | `STUDIO_MEDIA_URL_SECRET` | HMAC secret for media links (≥ 32 chars, sensitive, different per environment); absent ⇒ fallback `/renditions/{id}` |
 | `NODE_AUTH_TOKEN` | Read token for the AXIS package registry (only the `_authToken`) |
+| `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | Sentry DSN (server / browser); absent ⇒ Sentry off (TASK-1896) |
+| `SENTRY_AUTH_TOKEN` | Source-map upload at build (encrypted); absent ⇒ no upload |
+| `SENTRY_ENVIRONMENT`, `SENTRY_RELEASE`, `SENTRY_ORG`, `SENTRY_PROJECT` | Optional overrides (default env from `VERCEL_ENV`, release from `VERCEL_GIT_COMMIT_SHA`/`K_REVISION`) |
+| `STUDIO_MEDIA_BUCKET` | Bucket probed by the deep health (else deduced from renditions) |
 
 ## Secrets (Secret Manager, project `efeonce-group`)
 
 `marketing-studio-pg-app-password`, `marketing-studio-pg-staging-app-password`,
 `marketing-studio-pg-migrator-password`, `marketing-studio-mcp-gateway-token` (v1, raw `mst_` scalar, org Efeonce;
 `secretAccessor` for `efeonce-mcp-gateway@efeonce-group.iam.gserviceaccount.com`), `axis-packages-read-token`
-(a full `.npmrc`).
+(a full `.npmrc`). To create (TASK-1896): `marketing-studio-sentry-dsn`, `marketing-studio-sentry-auth-token`,
+`marketing-studio-pg-restore-password`, `greenhouse-marketing-studio-health-token` (Greenhouse reads it; `studio:health`).
 
 ## Gateway (`efeonce-mcp`)
 
@@ -121,3 +145,7 @@ Runtime: Cloud Run `efeonce-mcp-gateway` in `southamerica-west1`.
 | OAuth client `efeonce-mcp-marketing-studio` (migration applied) | Confidential exchange client; allowed via `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` |
 | `src/mcp/greenhouse/skill-manifest.ts` (`'marketing-studio': { toolPrefix: 'studio.' }`) | Served manual entry; Greenhouse validates the prefix, the gateway validates existence |
 | `docs/mcp/skills/marketing-studio/SKILL.md` | MCP-served manual (internal audience, English) |
+| `src/lib/reliability/queries/marketing-studio-health.ts` (TASK-1896) | Signal `platform.marketing_studio.health` (HTTP deep health, env `MARKETING_STUDIO_HEALTH_TOKEN_SECRET_REF`, optional `MARKETING_STUDIO_HEALTH_URL`) |
+| `src/lib/marketing-studio/health-alert.ts` | `checkAndAlertMarketingStudioHealth` → Teams destination `marketing-studio-reliability-alerts` («EO - Admin») only on `error` |
+| ops-worker `POST /marketing-studio/health-watch` + scheduler `ops-marketing-studio-health-watch` | Daily 12:20, born paused (`services/ops-worker/deploy.sh`) |
+| `docs/operations/marketing-studio/MARKETING_STUDIO_RESTORE_RUNBOOK.md` | Restore + rehearsal runbook (RPO/RTO, paths A/B) |

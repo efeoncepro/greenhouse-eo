@@ -6,6 +6,27 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 — code complete, rollout pendiente
+
+- **Studio** (`efeonce-marketing-studio`, sin push): `3d9a497` paquete `@studio/observability` + Sentry 11 en el
+  catálogo · `978c414` migración `studio.ops_run` · `cf109e6` Sentry en la web, request id + logs JSON, health
+  profundo, `studio:health`, registro de corridas en import/renditions · `ae40780` import de `withSentryConfig` ·
+  `fc69c5e` ensayo de restauración · `923762f` infraestructura como scripts dry-run · `a4cdc75` reglas en AGENTS.md ·
+  `7f348b2` latencia de la base con conexión abierta.
+- **Greenhouse** (`develop`, sin push): `0498c7964` señal `platform.marketing_studio.health` + alerta Teams +
+  endpoint del ops-worker · `e757aaba5` scheduler pausado + secreto por referencia en `deploy.sh`.
+- `studio.ops_run` aplicada en **staging** (`marketing_studio_staging`), verificada (tabla, índices, trigger, grants).
+  Producción pendiente. Health profundo ejercitado contra staging (sólo lectura): `overdue_unverified_posts=3`,
+  `metricool_readback=never_ran`, `restore_rehearsal=never_ran`, worker/métricas `not_configured`.
+- Ensayo verificado en un clúster Postgres local desechable (éxito, falla forzada exit 1, lock exit 3, `DROP`
+  verificado). **No** se ensayó en Cloud SQL: `marketing_studio_migrator` no tiene `CREATEDB` y no se le dio; se crea
+  el rol dedicado `marketing_studio_restore` por SQL (`scripts/ops/sql/restore-role.sql`).
+- Canal Teams: el operador decidió **«EO - Admin»** (2026-09-26), no «EO - Teams». Destino nuevo
+  `marketing-studio-reliability-alerts` con channelCode `marketing-studio-reliability-watch`.
+- Todas las mutaciones externas (Sentry, Vercel, uptime/alertas, job/scheduler/IAM/secretos, migración de
+  producción, release de Greenhouse) están escritas como scripts idempotentes en `scripts/ops/infra/` del repo Studio;
+  ninguna se ejecutó.
+
 ## Delta 2026-09-25
 
 - Incidente 2026-09-25: con una consulta Postgres por miniatura, una grilla de 20+ agotó el tope de 20 conexiones de `marketing_studio_app` (`too many connections for role`; 18 de 40 pedidos simultáneos = 500). Se corrigió con enlaces firmados sin base (`/api/v1/media/{token}`). Esta task debe sumar una señal/alerta de saturación de conexiones por rol de Studio (`marketing_studio_app` 20, `marketing_studio_staging_app` 10, `marketing_studio_migrator` 5) y el conteo de 5xx de `/api/v1/media` y `/api/v1/renditions`; es el modo de falla ya observado.
@@ -26,7 +47,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-049`
-- Status real: `Diseno`
+- Status real: `Avanzada`
 - Rank: `TBD`
 - Domain: `ops`
 - Blocked by: `none`
@@ -266,7 +287,7 @@ N/A — no capability de negocio: la task agrega observabilidad y recuperación 
 
 - Reader `src/lib/reliability/queries/marketing-studio-health.ts`: llama al health profundo de producción con el bearer de un `api_client` de Greenhouse (scope `studio:health`, secreto en Secret Manager), timeout corto, y proyecta a una señal `platform.marketing_studio.health` (`kind: runtime`, módulo `platform`) con severidad `ok` si todo `ok`/`not_configured`, `warning` si hay `degraded` o frescura fuera de umbral, `error` si un componente está `down` o el ensayo de restauración más reciente falló o tiene más de 45 días; `unknown` si Studio no responde (el uptime check ya alerta eso). Evidencia sin datos sensibles.
 - Registro en `src/lib/reliability/registry.ts` y test focal.
-- Alerta determinista (clase de TASK-1806): endpoint del `ops-worker` + scheduler diario declarado en `services/ops-worker/deploy.sh`, que llama `sendManualTeamsAnnouncement()` con un destino nuevo en `src/config/manual-teams-announcements.ts` apuntando al canal **«EO - Teams»** (decisión del operador 2026-09-25). Su `teamId`/`channelId` no aparece con los permisos Graph disponibles (el equipo Efeonce lista sólo «EO - Admin» y la config tiene el chat «EO Team»); resolverlo y confirmarlo con el operador antes del primer envío; sólo cuando la señal está en `error`.
+- Alerta determinista (clase de TASK-1806): endpoint del `ops-worker` + scheduler diario declarado en `services/ops-worker/deploy.sh`, que llama `sendManualTeamsAnnouncement()` con un destino nuevo en `src/config/manual-teams-announcements.ts` apuntando al canal **«EO - Admin»** del Equipo Efeonce (decisión del operador 2026-09-26, reemplaza «EO - Teams» del 2026-09-25): destino `marketing-studio-reliability-alerts`, channelCode `marketing-studio-reliability-watch`, mismos `teamId`/`channelId` que `growth-seo-reliability-alerts`; sólo cuando la señal está en `error`.
 
 ### Slice 6 — SLOs, costo, rollout y documentación
 
@@ -399,7 +420,7 @@ decide conservarlo. La cifra real queda en la arquitectura de Studio.
 ### Out-of-band coordination required
 
 - Crear el proyecto Sentry y su auth token (acceso de admin de la org Sentry).
-- Canal Teams decidido: «EO - Teams» (2026-09-25); falta resolver su id. Confirmar el email de alertas (Outlook de Efeonce).
+- Canal Teams decidido: «EO - Admin» (2026-09-26, ids ya en la config). Confirmar el email de alertas (Outlook de Efeonce).
 - Permisos IAM del service account del job (`cloudsql.client`, acceso al secreto del rol) y rol PG con permiso de crear bases temporales.
 - Ventana horaria del ensayo acordada para no competir con cargas de Greenhouse en la instancia compartida.
 - Release de Greenhouse por el control plane para la señal y la alerta.
@@ -414,18 +435,18 @@ decide conservarlo. La cifra real queda en la arquitectura de Studio.
 ## Acceptance Criteria
 
 - [ ] Un error forzado en una ruta `/api/v1` de producción aparece en el proyecto Sentry de Studio con `requestId`, environment y release, y sin `Authorization`, cookies ni cuerpo.
-- [ ] El test de scrubbing de `packages/observability` falla si un evento sale con un header sensible, y corre en `pnpm check`.
-- [ ] Cada respuesta de `/api/v1` devuelve un id de request que coincide con la línea JSON del log de Vercel.
-- [ ] `studio.ops_run` existe en staging y producción; import, renditions y readback de Metricool registran su corrida.
-- [ ] `/api/v1/health?deep=1` con bearer `studio:health` devuelve componentes y frescura; sin bearer devuelve el health superficial; un test de fuga verifica que no aparecen hosts, bases, secretos ni proyectos.
-- [ ] Los componentes de TASK-1892 y TASK-1893 aparecen como `not_configured` mientras no existan, sin degradar el estado global.
+- [x] El test de scrubbing de `packages/observability` falla si un evento sale con un header sensible, y corre en `pnpm check`. — Evidencia: `packages/observability/src/sentry-e2e.test.ts` usa el SDK real y lee el sobre; con `beforeSend` anulado el test falla (verificado 2026-09-26); `pnpm check` exit 0 en copia aislada de HEAD.
+- [ ] Cada respuesta de `/api/v1` devuelve un id de request que coincide con la línea JSON del log de Vercel. — Verificado con `next start` local (header `X-Correlation-Id` = `requestId` de la línea `studio_request`); falta en Vercel tras el deploy.
+- [ ] `studio.ops_run` existe en staging y producción; import, renditions y readback de Metricool registran su corrida. — Staging aplicado y verificado 2026-09-26; producción pendiente. Import/renditions/readback por CLI registran (código + clúster local); el readback del worker registra en `worker_run` (TASK-1893).
+- [x] `/api/v1/health?deep=1` con bearer `studio:health` devuelve componentes y frescura; sin bearer devuelve el health superficial; un test de fuga verifica que no aparecen hosts, bases, secretos ni proyectos. — Evidencia: build de producción servido local con token `studio:health` (profundo 200, sin bearer superficial, token inválido 401, el token de salud recibe 403 en `/campaigns`); `health-deep.test.ts` (fuga + schema estricto). El curl en producción queda en Verification.
+- [x] Los componentes de TASK-1892 y TASK-1893 aparecen como `not_configured` mientras no existan, sin degradar el estado global. — Evidencia: test «todo sano: ok, y lo no configurado no degrada» + lectura real contra staging (`greenhouse_metrics` y `media_worker` `not_configured`).
 - [ ] El uptime check sobre `studio.efeonce.org` está activo y una caída simulada en staging dispara el email al operador.
 - [ ] Un ensayo de restauración contra producción terminó `succeeded` con paridad de filas por tabla del schema `studio`, la base temporal no existe al terminar y su duración quedó en el runbook.
-- [ ] Un ensayo con paridad forzada a fallar termina `failed` y sale con código distinto de 0.
+- [x] Un ensayo con paridad forzada a fallar termina `failed` y sale con código distinto de 0. — Evidencia: `--simulate-parity-failure` en clúster Postgres local → `ops_run.status=failed`, `error_code=parity_mismatch`, exit 1, base temporal eliminada (2026-09-26). Repetir en el Cloud Run Job contra staging.
 - [ ] El Cloud Scheduler del ensayo está activo y su primera corrida programada quedó registrada.
 - [ ] La señal `platform.marketing_studio.health` aparece en el Reliability Control Plane de producción y pasa a `error` cuando el último ensayo falló o tiene más de 45 días.
 - [ ] El aviso por Teams llega al canal acordado cuando la señal está en `error`, y no se envía en `ok` ni `warning`.
-- [ ] SLOs, costo mensual y postura de backup de la instancia están escritos en la arquitectura de Studio, con la regla de no restaurar la instancia compartida.
+- [x] SLOs, costo mensual y postura de backup de la instancia están escritos en la arquitectura de Studio, con la regla de no restaurar la instancia compartida. — Arquitectura §9.4–9.7 (postura leída con `gcloud sql instances describe`, sólo lectura); el costo real se verifica tras el primer mes.
 - [ ] EPIC-049 marca como cumplido el exit criterion de restauración probada, y TASK-1894 tiene su `## Delta` con esta dependencia.
 
 ## Verification
@@ -454,6 +475,6 @@ decide conservarlo. La cifra real queda en la arquitectura de Studio.
 
 ## Open Questions
 
-- ~~Canal Teams~~ Resuelto 2026-09-25: «EO - Teams» (falta resolver su id).
+- ~~Canal Teams~~ Resuelto 2026-09-26: «EO - Admin» (reemplaza «EO - Teams» del 2026-09-25); ids en `manual-teams-announcements.ts`.
 - ~~¿El dump del ensayo se descarta o se conserva?~~ Resuelto 2026-09-25: se conserva 30 días en bucket privado (copia independiente de la instancia compartida; KB–MB, un ensayo mensual, costo prácticamente cero).
 - Plan y cuota de la org Sentry: confirmar que un proyecto más no desborda la cuota compartida con Greenhouse.
