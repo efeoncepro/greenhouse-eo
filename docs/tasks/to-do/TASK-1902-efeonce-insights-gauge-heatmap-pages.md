@@ -2,6 +2,8 @@
 
 ## Delta 2026-09-26
 
+- Filas del mapa de calor: sólo keywords del set monitoreado con intención `target` (prioritarias acordadas con el cliente), posición semanal desde la captura diaria de ranking; con menos de 3, la página no se produce. Decisión del operador 2026-09-26 — registrada en TASK-1901.
+
 - TASK-1888 complete con `INSIGHTS_EDITORIAL_V2_ENABLED` ON en staging y Production: sin flag propio, las páginas nuevas
   aparecen en ediciones nuevas de producción en cuanto salgan con TASK-1901; la revisión interna antes de compartir sigue siendo el gate. — por trabajo en TASK-1888
 - TASK-1889 complete y en producción: la píldora de cambio (`delta-pill`) usa la regla única de variación — el

@@ -91,6 +91,7 @@ más arriba», «Subió», «Bajó»), «Cambio». Los nombres de zona salen del
 | Celda sin dato | celda vacía con borde, sin cifra |
 | Keyword sin cambio | píldora neutra «= 0» |
 | Más filas que la capacidad | continuación en la página siguiente |
+| Menos de 3 keywords objetivo | el mapa de calor no se produce (sólo keywords del set con intención `target`, decisión del operador 2026-09-26) |
 
 ## Accessibility Contract
 
