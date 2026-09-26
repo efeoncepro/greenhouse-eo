@@ -377,7 +377,7 @@ preferencia de Berel y Sky y carga logos oscuros si los hay.
 internas reales y liberarlo. `ui-ux`, `UI impact: layout`, asignación Claude. Detalle: arquitectura §14.9 y registro de
 implementación §8.z.
 
-**Qué construyó (en `develop`, sin push).** Commits `61d1ef690` (antes `d357e0224`), `4a4c77748` (antes `b649080c7`) (Slices 1–2), `5c2bcb5a1` (antes `4ff72fe3a`) + `8075a2930` (antes `2410e5156`)
+**Qué construyó (en `develop`; en producción desde los releases de 2026-09-26, ver «Dónde corre»).** Commits `61d1ef690` (antes `d357e0224`), `4a4c77748` (antes `b649080c7`) (Slices 1–2), `5c2bcb5a1` (antes `4ff72fe3a`) + `8075a2930` (antes `2410e5156`)
 (Slice 3), `f0b0d78cc` (antes `3fa493efe`), `30c11aba7` (antes `85785e7fc`) (Slice 4), `29a54885e` (antes `1120e86e4`)/`3709d9424` (antes `5968e35e8`) (docs), `7ab466c88` (antes `289b6eca4`) (excepción aprobada),
 `ae2c34b59` (antes `738ceb748`) («Lo esencial»), `198ce883a` (antes `b88fd447c`) (fixes por ediciones reales), `2f0776e0f` (antes `9529a1b25`) (dossier + scorecard).
 
@@ -400,15 +400,15 @@ Después del cierre: `373e56485`/`5ee201c0c` (tono mejor/peor por dirección de 
 `chart-figure.ts`).
 
 **Verificación:** `pnpm insights:canvas-fidelity` 20/21 ≤ 1 % + `Deck-Agrupadas` 2,2 % con excepción aprobada por el
-operador (techo 2,5 %); `pnpm composer:visual-gate --catalog=insights` 27 frames a 0 px (deltas g–j); `ui:quality`
+operador (techo 2,5 %); `pnpm composer:visual-gate --catalog=insights` 27 frames a 0 px (deltas g–k); `ui:quality`
 PASS 4,59; ediciones reales locales Berel `EO-INS-000019` y Sky `EO-INS-000022`.
 
-**Pendiente de rollout:** push; staging con `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888); release por el control plane
+**Rollout (cumplido 2026-09-26; se conserva como historial):** push; staging con `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888); release por el control plane
 (Job `artifact-worker` único para staging y producción); aprobación del operador de piezas derivadas y PDFs reales;
 edición interna en producción antes de compartir.
 
-**Hand-off:** TASK-1849 y TASK-1875 mantienen en la web los mismos roles de color y la misma lectura; follow-up para
-retirar `chart-figure.ts`.
+**Hand-off:** TASK-1849 y TASK-1875 mantienen en la web los mismos roles de color y la misma lectura; `chart-figure.ts` ya se retiró el
+2026-09-26 (sin consumidores).
 
 > Lo que sigue es el plan original de la task (2026-09-25); se conserva como historia de la decisión.
 

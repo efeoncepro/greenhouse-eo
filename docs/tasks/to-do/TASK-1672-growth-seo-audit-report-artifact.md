@@ -4,6 +4,10 @@
 
 - TASK-1888 complete y en producción con `INSIGHTS_EDITORIAL_V2_ENABLED` ON; el código de TASK-1889 salió en el release
   `0e87c7a443a2`. En Discovery, confirmar contra producción qué catálogo y contrato usa esta task. — por trabajo en TASK-1888
+- TASK-1889 complete y en producción (releases `0e87c7a443a2` y `f9257b9c94af`): `insights-report` e `insights-deck`
+  quedan sólo con el diseño v2 del canvas y el legado v1 de TASK-1847 se retiró (`ReportAnalysisPage`,
+  `InsightsEvidenceSlide`, moldes v1, `render/figure-pages.ts`). El delta de abajo que habla de «v1 hasta el release de
+  TASK-1889» ya no aplica: mapear contra v2. — cerrado por trabajo en TASK-1889
 
 ## Delta 2026-09-25 (TASK-1888 code complete)
 

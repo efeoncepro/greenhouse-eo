@@ -4,6 +4,10 @@
 
 - TASK-1888 complete con `INSIGHTS_EDITORIAL_V2_ENABLED` ON en staging y Production: sin flag propio, las páginas nuevas
   aparecen en ediciones nuevas de producción en cuanto salgan con TASK-1901; la revisión interna antes de compartir sigue siendo el gate. — por trabajo en TASK-1888
+- TASK-1889 complete y en producción: la píldora de cambio (`delta-pill`) usa la regla única de variación — el
+  triángulo sigue al valor y el tono dice si el cambio es mejor o peor para la métrica (`trendOf` en
+  `render/figure-slots.ts`; clases `delta--better` / `delta--plain`, ya no `delta--up/down/flat`); sin dirección
+  conocida, tono neutro. Las páginas nuevas deben usar esa misma regla. — cerrado por trabajo en TASK-1889
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE

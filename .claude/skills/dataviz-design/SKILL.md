@@ -35,7 +35,7 @@ const RevenueChart = dynamic(() => import('./RevenueChart'), {
 NEVER bare hex in chart configs. Use:
 
 - `theme.palette.primary.main` (#7367F0) — primary series
-- `theme.palette.customColors.success` (#6ec207 lime) — positive deltas
+- `theme.palette.customColors.success` (#6ec207 lime) — improving deltas (better for the metric, not merely "up"; see §4)
 - `theme.palette.customColors.warning` (#ff6500) — warning
 - `theme.palette.customColors.error` (#bb1954) — negative
 - `theme.palette.customColors.info` (#00BAD1) — neutral / informational
@@ -50,6 +50,7 @@ Greenhouse has `src/components/greenhouse/KpiCard/` primitive. Use it. Anatomy:
 - Value (`h3` + `tabular-nums`) — NEVER monospace
 - Currency suffix (`caption`, neutral)
 - Delta chip (icon + color + text, NEVER color alone)
+  - **Variation rule (tables and figures):** the triangle follows the VALUE (▲ went up, ▼ went down); the TONE says whether the change is better or worse FOR THAT METRIC. A rank position that goes ▲ is worse; a lower-is-better ratio that goes ▼ is better. Metric direction comes from data, in order: the direction the fact itself declares; positions are always lower-is-better; the direction of a reference fact (target/band) for the same metric. Unknown direction ⇒ neutral tone, never guessed (never "up = green"). Reference implementation: `trendOf` / `higherIsBetterOf` in `src/lib/efeonce-insights/render/figure-slots.ts`.
 - Comparison period (`caption`, "vs mes anterior")
 - Optional sparkline (small ECharts line, no axis)
 

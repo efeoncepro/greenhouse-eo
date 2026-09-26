@@ -73,7 +73,7 @@ Documento de lectura, sin acciones. El orden de lectura es cifra → conclusión
 | Pista del arco | `gaugeTrack` | |
 | Brecha a la meta | `dataOpportunityOnPaper` | con rótulo «faltan N»; nunca sólo color |
 | Rampa del mapa de calor | escala de `dataCurrentOnPaper` por opacidad | la cifra se imprime siempre; contraste AA medido en cada escalón |
-| Píldora de cambio | `delta-pill` de TASK-1889 | dirección con triángulo |
+| Píldora de cambio | `delta-pill` de TASK-1889 (`delta--better` / `delta--plain`) | el triángulo sigue al valor; el tono dice si el cambio es mejor o peor para la métrica (`trendOf` de `render/figure-slots.ts`); sin dirección conocida, tono neutro |
 
 ## Copy Ledger
 

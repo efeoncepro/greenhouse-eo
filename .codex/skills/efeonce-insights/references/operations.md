@@ -31,7 +31,7 @@ the v2 content (readings, essentials, cover, bands) only exists in plans generat
   Criterion ≤ 1 % differing pixels per page against `docs/ui/visual-directions/TASK-1889-…/paginas/`. State: 20/21
   inside; `Deck-Agrupadas` 2,2 % is an operator-APPROVED exception (2026-09-25, `approvedException` in its fixture,
   ceiling 2,5 %, reported with ⚠). A new exception needs the operator's approval, never a silent threshold bump.
-- **Visual gate**: `pnpm composer:visual-gate --catalog=insights` (27 frames at 0 px; deltas g–j). A figure contract
+- **Visual gate**: `pnpm composer:visual-gate --catalog=insights` (27 frames at 0 px; deltas g–k). A figure contract
   may declare `example` so the probe exercises real geometry — changing it moves the frame (declare + scoped freeze;
   runbook `docs/operations/runbooks/composer-visual-gate.md`).
 - **Real-data preview (local, before any release)**: `preview-edition.ts --edition=<insed-…> --org=<org-…>

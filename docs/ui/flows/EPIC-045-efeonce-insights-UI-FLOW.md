@@ -32,7 +32,7 @@ apto para fondo oscuro, si no blanca. Queda sellada en la edición, así que re-
 superficie la decide. Los PDFs (`report_pdf`, `deck_pdf`) la dibujan con una sola portada y variantes por módulo
 (visibilidad `seo`/`aeo` con logos de canal; creativa `ico` sin logos), además de los roles de color de datos
 (actual/anterior/oportunidad/ausencia) que TASK-1889 fija; la vista web (`InsightWebModelV1`) respeta los mismos roles.
-Hasta el release de TASK-1889, producción sirve los catálogos v1 de TASK-1847.
+Desde el 2026-09-26 producción sirve sólo los catálogos v2 de TASK-1889 (releases `0e87c7a443a2` y `f9257b9c94af`); los v1 de TASK-1847 se retiraron.
 
 ## 2. Actores y resolución de superficie por autoridad
 
@@ -140,7 +140,7 @@ Estado al 2026-09-15 (se conserva como historia; el vigente está en el delta de
 | TASK-1847 | catálogos v1 `report_pdf` + `deck_pdf` (alimentan S3 y S6 descargas) | complete (2026-09-25), en producción desde 2026-09-24 |
 | TASK-1848 | S5 backend, S6 contrato, S7 backend | in-progress; en producción con flags OFF |
 | TASK-1888 | contrato de portada y editorial v2 (alimenta S2 y los PDF; sin UI) | complete (2026-09-26), en producción con `INSIGHTS_EDITORIAL_V2_ENABLED` ON |
-| TASK-1889 | catálogos premium (los PDF de S3 y S6) | in-progress; ya no bloqueada por TASK-1888 |
+| TASK-1889 | catálogos premium (los PDF de S3 y S6) | complete (2026-09-26), en producción; emitir y compartir siguen OFF |
 | TASK-1849 | S1–S5, S7 (+ portada en S2 como consumer de TASK-1888) | to-do |
 | TASK-1875 | S6 (+ mismos roles de color que los PDF) | to-do (desbloqueada por TASK-1848 el 2026-09-18) |
 | TASK-1854 | S8 | to-do (EPIC-046; bloqueada por TASK-1852 y TASK-1853) |

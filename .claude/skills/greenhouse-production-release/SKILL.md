@@ -654,6 +654,13 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
     deployment **DESPUÉS** de la var y verificar el **comportamiento** con una canary, no el listado de vars: un valor
     `true\n` (cargado sin `printf %s`) dejó OFF un lector `=== 'true'` y la primera canary selló el contrato viejo.
 
+19. **"¿Este commit de `develop` ya está en producción?" NO se responde por ancestría (2026-09-26, TASK-1889).**
+    Los releases son squash: ningún commit de `develop` es ancestro de `main`, así que `git merge-base --is-ancestor`
+    y los conteos de commits dicen "no desplegado" aunque el código ya esté servido. Se verifica por **contenido**:
+    comparar blobs de las rutas del cambio (`git rev-parse origin/main:<path>` vs `origin/develop:<path>`, o vs el
+    commit en cuestión) y confirmar que el `headSha` del run del orquestador / `target_sha` del manifest `released`
+    es ese `main`. Blobs idénticos + release `released` sobre ese SHA = desplegado.
+
 ### Credencial de paquete privado vencida — el bloqueador que no está en el código
 
 **Antes de diagnosticar un deploy de worker rojo, mirar el HISTORIAL del workflow, no el diff.**

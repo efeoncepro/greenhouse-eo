@@ -84,7 +84,11 @@ atención consciente. Son tu palanca más fuerte — **y se gastan**.
 anterior o referencia, oportunidad y ausencia (rayado, nunca un color ni un cero). Dos series nunca se
 separan sólo por el tono: añade trazo, forma o etiqueta directa. Tabla de roles sobre navy y papel:
 `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md`, sección «Delta 2026-09-25» (dirección
-aprobada de Efeonce Insights; catálogo en implementación, TASK-1889).
+aprobada de Efeonce Insights; implementada en el catálogo `insights-deck`).
+
+**Variaciones (▲/▼):** el triángulo sigue al valor; el **tono** dice si el cambio es mejor o peor para
+esa métrica (una posición que sube empeora; una tasa donde menor es mejor que baja mejora). La
+dirección sale del dato, nunca se adivina: sin dirección conocida, tono neutro — nunca «subir = verde».
 
 ---
 

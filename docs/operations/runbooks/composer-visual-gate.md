@@ -62,6 +62,14 @@ ser atómicos. El gate scoped valida el manifest completo y diffea a cero píxel
 Insights. El gate global sigue siendo la verificación para cambios en `deck-axis` o en SKY; este scope
 no limpia ni oculta sus diferencias históricas.
 
+Estado al cierre de TASK-1889 (2026-09-26): el scope Insights tiene **27 frames a 0 px**, sólo con el
+diseño editorial v2 (el legado v1 se retiró); los últimos deltas declarados son los (g)–(k) del
+2026-09-25 en `BASELINE_DELTAS.md`. Este gate compara contra el baseline propio; la fidelidad al canvas
+aprobado se mide aparte con `pnpm insights:canvas-fidelity [--only=<nombre>] [--gray]` (≤ 1 % de píxeles
+distintos por página contra `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs/paginas/`;
+`Deck-Agrupadas` es la única excepción aprobada por el operador, con techo 2,5 %; una excepción nueva
+exige su aprobación). Dossier: `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md`.
+
 ## 4. 🩸 El gotcha que TIENES que conocer: las fotos raster no son deterministas (ISSUE-122)
 
 Las láminas con **fotos** (`TeamGalleryFull` / la lámina del equipo) **driftean unos píxeles entre

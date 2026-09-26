@@ -59,7 +59,7 @@ runbook `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, EPIC-0
 | Domain | `render/store.ts` | claim (lease+fence+reclaim+org quota), transitions (+events), retry, cancel, inserts, readers by edition/run |
 | Domain | `render/commands.ts` · `render/readers.ts` | `requestInsightRender`, `retryInsightRender`, `cancelInsightRender`; `readInsightRenderRun(s)` |
 | Domain | `render/outputs-port.ts` | real `InsightOutputsPort` + `wireInsightOutputsPort()` (called from `commands/index.ts`) |
-| Domain | `render/insights-deck-mapper.ts` · `render/report-mapper.ts` · `render/figure-pages.ts` · `render/composition-helpers.ts` · `render/labels.ts` · `render/plan-limits.ts` | frozen plan → `insights-deck` slides (deck_pdf, since 2026-09-22; the deck-axis mapper was retired) and `insights-report` pages (report_pdf); also line/pie/donut/scatter and a paginated A4 index; in production since release `ebb9212a32ce` (2026-09-24), first productive A4 + deck render 2026-09-25 |
+| Domain | `render/insights-deck-mapper.ts` · `render/report-mapper.ts` · `render/figure-slots.ts` (replaced `figure-pages.ts`, TASK-1889) · `render/composition-helpers.ts` · `render/labels.ts` · `render/plan-limits.ts` | frozen plan → `insights-deck` slides (deck_pdf, since 2026-09-22; the deck-axis mapper was retired) and `insights-report` pages (report_pdf); also line/pie/donut/scatter and a paginated A4 index; in production since release `ebb9212a32ce` (2026-09-24), first productive A4 + deck render 2026-09-25 |
 | Composer | `src/lib/artifact-composer/manifest-hash.ts` | `hashResolvedManifest` domain-free (re-exported by Proposal `render-jobs.ts`) |
 | Worker | `services/artifact-worker/consumer-contract.ts`, `consumers/{proposal,insights,index}.ts`, `main.ts` | registry dispatch; `INSIGHTS_RENDER_ENABLED` in `deploy.sh` (+ `deploy-contract.test.ts`) |
 | Lanes | `src/lib/api-platform/resources/{app,ecosystem}-insights.ts` + routes `…/insights/editions/[editionId]/render`, `…/insights/render-runs/[renderRunId]{,/retry,/cancel}` | request/list/get/retry/cancel |
@@ -138,7 +138,7 @@ Production renders with these catalogs and the v2 contract since the 2026-09-26 
 | Wireframe | `docs/ui/wireframes/TASK-1889-efeonce-insights-premium-catalogs.md` | region-by-region spec of every A4 page and slide, with data, states and rules |
 | Editable source | canvas «Gráficos de Efeonce Insights» (private Artifact of the operator, version 36) | editable origin; the repo copies above are the durable contract |
 
-### Pieces the redesign built on (TASK-1847; v1 templates replaced by TASK-1889 in `develop`)
+### Pieces the redesign built on (TASK-1847; v1 templates replaced by TASK-1889, in production since 2026-09-26)
 
 | Piece | Where |
 | --- | --- |
@@ -186,7 +186,7 @@ Detail: architecture §14.9, implementation record §8.z.
 | Shared engine | `artifact-composer/render.ts` (`img.decode()` before capture), `contracts.ts` + `synthesize.ts` (`example?`) | probe uses the contract's sample value |
 | Fidelity gate | `pnpm insights:canvas-fidelity [--gray]` → `scripts/insights/canvas-fidelity.ts` + `canvas-fixtures/{report,deck}` | ≤ 1 % per page; `approvedException` only with operator approval |
 | Review dossier | `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/` | fidelity table, gray sheets, scorecard (`ui:quality` 4,59) |
-| Visual baseline | Insights frames of `pnpm composer:visual-gate --catalog=insights` | 27 frames at 0 px; deltas g–j in `BASELINE_DELTAS.md` |
+| Visual baseline | Insights frames of `pnpm composer:visual-gate --catalog=insights` | 27 frames at 0 px; deltas g–k in `BASELINE_DELTAS.md` |
 
 Removed: `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css`, `render/figure-pages.ts`, v1
 bar/family/path resolvers. `artifact-composer/chart-figure.ts` and its test were retired on 2026-09-26 (no consumers).

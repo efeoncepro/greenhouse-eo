@@ -113,8 +113,9 @@ escala de grises y el [wireframe](../ui/wireframes/TASK-1889-efeonce-insights-pr
 
 **Estado (2026-09-26):** diseño aprobado. El contrato editorial v2 (TASK-1888) está **encendido en producción**
 desde el 2026-09-26: toda edición nueva de Insights sella lectura por figura, «Lo esencial», líneas de alcance y
-portada. El código de los catálogos premium (TASK-1889) salió a producción en el mismo release; su cierre formal
-(aprobación de los PDF reales por el operador) lo lleva su propia task. Las ediciones anteriores son inmutables y
+portada. Los catálogos premium (TASK-1889, complete 2026-09-26) están en producción (releases `0e87c7a443a2` y
+`f9257b9c94af`): el operador aprobó los PDF internos de Berel y Sky y la estructura del deck, y las primeras ediciones
+internas con el diseño nuevo se renderizaron en producción; emitir y compartir siguen apagados. Las ediciones anteriores son inmutables y
 conservan el diseño con que se sellaron. Las reglas siguientes sirven a cualquier informe Efeonce; lo propio de
 Insights se indica como tal.
 
@@ -173,7 +174,7 @@ Navy, con logo y eslogan al centro. Su pie reúne URL bubble, seis redes (Spotif
 YouTube y TikTok), correo, teléfonos de Chile y Estados Unidos, dirección, mercados (Chile · Estados Unidos ·
 Colombia · México · Perú) y la línea legal con razón social, RUT, confidencialidad y fecha de corte. Ningún valor se
 escribe en la plantilla: salen del SSOT de marca `src/config/efeonce-brand.ts`, que ya contiene URL, razón social,
-RUT, mercados, eslogan y los cuatro perfiles sociales con URL canónica. Desde TASK-1889 (code complete 2026-09-25)
+RUT, mercados, eslogan y los cuatro perfiles sociales con URL canónica. Desde TASK-1889 (en producción desde 2026-09-26)
 contiene además el contacto (`EFEONCE_CONTACT`: correo, teléfonos de Chile y Estados Unidos y dirección de
 presentación) y los seis canales sociales de documentos (`EFEONCE_DOCUMENT_SOCIAL_CHANNELS`). Para los catálogos de
 Insights ese es el único dueño del contacto: los mappers lo inyectan, y

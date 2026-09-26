@@ -33,7 +33,8 @@ El operador aprobó página por página el diseño de los informes de Efeonce In
 
 - Dirección, tokens y anti-patrones: `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`; páginas de referencia a tamaño nativo en su carpeta `paginas/`.
 - Reglas reutilizables (navy manda en papel, teal sólo sobre navy, roles de color de datos, oportunidad nunca sólo por el coral en papel, portadas, logo del cliente, contraportada y pie): estándar de informes, sección «Delta 2026-09-25».
-- Es diseño aprobado, no plantilla construida: producción sirve los catálogos v1 de Insights y los catálogos premium están en implementación (TASK-1889). Fuera del Composer, reprodúcelo con los tokens y assets reales; no copies los datos de ejemplo de las páginas de referencia.
+- Ya es plantilla construida: los catálogos `insights-report` (A4) e `insights-deck` (16:9) del Artifact Composer lo implementan en producción desde 2026-09-26, sólo en su versión aprobada (el legado se retiró). Dentro del Composer, la fidelidad se mide página por página contra las referencias (≤ 1 % de píxeles distintos; una excepción exige aprobación del operador). Fuera del Composer, reprodúcelo con los tokens y assets reales; no copies los datos de ejemplo de las páginas de referencia.
+- Variaciones en tablas y figuras: el triángulo sigue al valor (▲ subió, ▼ bajó) y el tono dice si el cambio es mejor o peor para esa métrica (una posición que sube empeora; una tasa donde menor es mejor que baja mejora). La dirección de la métrica sale del dato, nunca se adivina: sin dirección conocida, tono neutro.
 
 ## Línea gráfica «La órbita» y la burbuja de URL (canónica desde 2026-09-25)
 

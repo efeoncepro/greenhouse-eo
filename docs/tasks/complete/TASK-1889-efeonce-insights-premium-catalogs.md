@@ -70,7 +70,7 @@
   con el flag de TASK-1888.
 - **🔴 Condición de release (actualizada con el Slice 4):** las páginas de gráfico ya son v2 en ambos catálogos.
   La excepción Deck-Agrupadas está aprobada (2026-09-25). Para promover falta la aprobación del operador de
-  las piezas derivadas.
+  las piezas derivadas. *(Resuelto: aprobadas el 2026-09-25; en producción desde el 2026-09-26.)*
   Antecedente (antes del Slice 4): develop llevaba el diseño a medias (portada, índice, capítulos,
   narrativa, tabla, límites y contraportada v2 junto a las páginas de gráfico v1; en el deck, la lámina
   de evidencia sigue a 1920×1080 junto a láminas de 1280×720). **No promover a producción** hasta cerrar
@@ -88,7 +88,8 @@
 - Aprobadas por el operador (2026-09-25, sobre los PDFs reales de Berel y Sky): portada, apertura y contraportada
   del deck; índice, tabla, límites y narrativa A4; narrativa y límites del deck (sin página en el canvas).
 - Pendiente de cablear (datos ya emitidos por el planner v2 de TASK-1888 bajo su flag): «Lo esencial»
-  en el resumen. `chapter.opening` y las lecturas por figura ya se leen (Slice 4).
+  en el resumen. `chapter.opening` y las lecturas por figura ya se leen (Slice 4). *(Resuelto: el resumen con
+  «Lo esencial» está en producción desde el 2026-09-26.)*
 
 ## Status
 

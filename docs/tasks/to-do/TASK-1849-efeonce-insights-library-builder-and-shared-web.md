@@ -5,6 +5,11 @@
 - TASK-1888 complete y en producción con `INSIGHTS_EDITORIAL_V2_ENABLED` ON (Vercel staging/Production y `ops-worker`): la
   preferencia de portada (command, reader, lanes app/ecosystem y tools MCP `get_/set_insight_cover_preference`) ya es
   consumible por el builder, y las ediciones nuevas sellan `plan.cover`. — por trabajo en TASK-1888
+- TASK-1889 complete y en producción (releases `0e87c7a443a2` y `f9257b9c94af`): el delta «code complete» de abajo ya
+  describe el render de producción. Las primeras ediciones internas con el diseño nuevo (Berel y Sky) se renderizaron
+  en producción; emitir y compartir siguen OFF. En tablas y figuras el triángulo sigue al valor y el tono dice si el
+  cambio es mejor o peor (`trendOf` en `render/figure-slots.ts`, clases `delta--better` / `delta--plain`); una vista
+  previa del builder debe mostrar esa misma regla. — cerrado por trabajo en TASK-1889
 
 ## Delta 2026-09-25 (TASK-1889 code complete)
 
