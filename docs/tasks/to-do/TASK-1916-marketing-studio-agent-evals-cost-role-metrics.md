@@ -11,10 +11,13 @@
 - **Grants de `marketing_studio.agent_eval.grade`:** `efeonce_admin`, `efeonce_operations` y `efeonce_account` (decisión
   de Julio Reyes, operador, 2026-09-26; roles verificados en `src/config/role-codes.ts`).
 - **Calificadores nominales, uno por disciplina:** la capability es condición necesaria, no suficiente. Califica los
-  criterios humanos sólo la persona designada por el operador para la disciplina del rol: **medios**, **SEO/AEO** y
-  **creativo**. Reemplaza la rotación que proponía esta task. **Insumo pendiente del operador** (no es una pregunta de
-  diseño): los nombres de las tres personas y, si hace falta, a qué disciplina pertenece cada rol cuya disciplina no
-  sea evidente.
+  criterios humanos sólo la persona designada por el operador para la disciplina del rol. **Disciplinas calificadoras
+  (operador, 2026-09-26, «de momento»): Medios, SEO/AEO, CRO, Copywriter, Designer y Creativo.** Asignación de roles
+  iniciales: planificador de medios → Medios; SEO/AEO → SEO/AEO; copywriter → Copywriter; QA creativo y de marca →
+  Creativo (concepto y marca) y Designer (ejecución visual); analista de desempeño → CRO (con Medios para la pauta).
+  Reemplaza la rotación que proponía esta task. **Insumo pendiente del operador:** el nombre de la persona de cada
+  disciplina. **`efeonce_admin` puede calificar cualquier disciplina sin designación** (rol de máximo privilegio,
+  decisión del operador 2026-09-26); la designación nominal restringe a `efeonce_operations` y `efeonce_account`.
 
 ## Status
 
@@ -44,7 +47,7 @@
 Pone **evidencia antes de autonomía**. Cada rol de agente tiene un **set de evaluación versionado** de work items de
 referencia con rúbrica que separa **chequeos objetivos automáticos** (formato, límites del catálogo de canales, citas
 con fuente, «sin dato» en vez de cero, cero `T2` ejecutados, cero tools fuera de lista) de **criterios humanos** que
-califica la persona designada para la disciplina del rol (medios, SEO/AEO o creativo) y **nunca se autocalifican**. Se evalúa por combinación **rol × runtime × modelo** (más
+califica la persona designada para la disciplina del rol (Medios, SEO/AEO, CRO, Copywriter, Designer o Creativo) y **nunca se autocalifican**. Se evalúa por combinación **rol × runtime × modelo** (más
 versión de tarjeta y digest de skills): cambiar cualquiera invalida la aprobación vigente. La aprobación de una
 evaluación es `T2` y es la compuerta que TASK-1914 consulta para habilitar los modos en segundo plano y programado.
 Suma un **catálogo versionado de precios por proveedor** que normaliza a USD el costo de tokens, sesiones alojadas y
@@ -207,7 +210,7 @@ Reglas obligatorias:
 - Default state: `STUDIO_AGENT_EVALS_ENABLED=false`; con OFF la compuerta responde «sin evaluar» (los modos autónomos siguen bloqueados)
 - Backfill plan: semilla de precios v1 con fuente y fecha (dry-run → revisión humana → `--apply`); sets v1 importados desde `evals/sets/**` (dry-run → `--apply`)
 - Rollback path: flag OFF (la compuerta vuelve a bloquear); revert PR; tablas quedan
-- External coordination: release de Greenhouse (capability de calificador y grants), sync y dispatch del gateway, tres personas calificadoras nominales (medios, SEO/AEO, creativo) designadas por el operador
+- External coordination: release de Greenhouse (capability de calificador y grants), sync y dispatch del gateway, una persona calificadora nominal por disciplina (Medios, SEO/AEO, CRO, Copywriter, Designer, Creativo) designada por el operador
 
 ### Security and access
 
@@ -282,7 +285,8 @@ Reglas obligatorias:
   de prueba acotada a la organización de prueba) o registra una corrida interactiva usando el harness de TASK-1864;
   resultados por caso en `agent_eval_result`.
 - `gradeAgentEvalCase` (persona con `.agent_eval.grade` **y** designada por el operador como calificadora de la
-  disciplina del rol —medios, SEO/AEO o creativo—; nunca el autor de la tarjeta). La designación nominal por disciplina
+  disciplina del rol —Medios, SEO/AEO, CRO, Copywriter, Designer o Creativo—, o persona con `efeonce_admin`, que califica cualquier disciplina; nunca
+  el autor de la tarjeta). La designación nominal por disciplina
   queda registrada en Studio como dato auditado (quién, disciplina, desde cuándo, quién designó); forma exacta en
   Discovery.
 - `approveAgentEvalRun` (`T2`): exige chequeos objetivos en verde, criterios humanos calificados y umbral de la
@@ -393,7 +397,7 @@ igual que el import de catálogo.
 
 ### Out-of-band coordination required
 
-- Operador designa por nombre a las tres personas calificadoras (medios, SEO/AEO, creativo). Insumo pendiente; los grants ya están decididos (2026-09-26).
+- Operador designa por nombre a la persona calificadora de cada disciplina (Medios, SEO/AEO, CRO, Copywriter, Designer, Creativo). Disciplinas y grants decididos el 2026-09-26; nombres pendientes.
 - Operador revisa los sets v1 y el catálogo de precios v1.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -407,7 +411,7 @@ igual que el import de catálogo.
 
 - [ ] Existen sets v1 publicados para los cinco roles, con casos adversariales, importados desde `evals/sets/**` con su digest.
 - [ ] Un criterio humano calificado por el agente evaluado o por un juez LLM responde `403 grader_not_allowed`.
-- [ ] Una persona con `.agent_eval.grade` que no es la calificadora designada para la disciplina del rol recibe `403 grader_not_allowed`.
+- [ ] Una persona con `.agent_eval.grade` que no es la calificadora designada para la disciplina del rol recibe `403 grader_not_allowed`, salvo `efeonce_admin`, que califica cualquier disciplina (test de ambos casos).
 - [ ] Aprobar una evaluación exige chequeos objetivos en verde y criterios humanos completos, y lo hace una persona distinta del autor de la tarjeta.
 - [ ] Cambiar tarjeta, skills, runtime, modelo o versión del set deja la aprobación en `stale` y la compuerta vuelve a responder «sin evaluar».
 - [ ] `normalizeRunCost` devuelve `null` sin uso o sin precio con fuente; nunca 0.

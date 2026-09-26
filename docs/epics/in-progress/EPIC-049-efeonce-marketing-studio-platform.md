@@ -118,7 +118,7 @@ Decisiones de Julio Reyes (operador) del 2026-09-26, registradas en las tasks du
    rol; atados a work item y corrida; reutiliza el canje RFC 8693 de Greenhouse). Consumidor: TASK-1915.
 2. **Grants:** `marketing_studio.agent_role.manage` → `efeonce_admin`, `efeonce_operations` (relajar sigue `T2`,
    TASK-1914). `marketing_studio.agent_eval.grade` → `efeonce_admin`, `efeonce_operations`, `efeonce_account`, pero
-   califican sólo personas nominales, una por disciplina (medios, SEO/AEO, creativo); nombres pendientes del operador
+   califican sólo personas nominales, una por disciplina (Medios, SEO/AEO, CRO, Copywriter, Designer, Creativo), y `efeonce_admin` califica cualquiera; nombres pendientes del operador
    (TASK-1916).
 3. **Asignar un agente sobre el techo de costo** se confirma con `marketing_studio.campaign.approve`, sin capability nueva
    (TASK-1913).

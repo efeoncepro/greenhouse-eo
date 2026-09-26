@@ -419,8 +419,9 @@ plataforma con su propio ADR. Hasta entonces vive en Studio.
 3. **Dónde vive el set de evaluación y quién califica los criterios humanos** (Studio vs repo de skills; rotación de
    revisores).
    **Resuelto quién califica (2026-09-26):** `marketing_studio.agent_eval.grade` para `efeonce_admin`,
-   `efeonce_operations` y `efeonce_account`, pero califican sólo personas nominales, una por disciplina (medios,
-   SEO/AEO, creativo), designadas por el operador; sin rotación. Los nombres son un insumo pendiente del operador. Dónde
+   `efeonce_operations` y `efeonce_account`, pero califican sólo personas nominales, una por disciplina (Medios,
+   SEO/AEO, CRO, Copywriter, Designer y Creativo), designadas por el operador; sin rotación; `efeonce_admin` califica
+   cualquier disciplina. Los nombres son un insumo pendiente del operador. Dónde
    vive el set sigue abierto (TASK-1916).
 4. **Runtime por defecto por rol** (se decide por evals; ninguna preferencia fijada aquí).
 5. **Nexa como runtime del despachador** (no sólo cliente): posible si Nexa llega a hablar MCP contra el gateway con
