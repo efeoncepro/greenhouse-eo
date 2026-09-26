@@ -1,13 +1,14 @@
 # Iconografía de la línea: íconos de trazo (reposo y respuesta)
 
-> Verificado contra: canvas «Íconos de La órbita» (claude.ai/artifact/Y9mx42L72zYc6iLg4j3Maj, página «Trazo · aprobado»,
-> ícono maestro `project/Icono.dc.html`) — 2026-09-26 · greenhouse-eo@1981f4ac4 · decisiones del operador D16 y D17
+> Verificado contra: canvas «Íconos de La órbita» (claude.ai/artifact/Y9mx42L72zYc6iLg4j3Maj, versión 20; maestros
+> `project/Icono.dc.html` e `IconoE.dc.html`) — 2026-09-26 · greenhouse-eo@33c570afb · decisiones del operador D16–D21
 > ([ledger.md](ledger.md)).
 >
 > **Estado:** estilo **aprobado por el operador el 2026-09-26**. Todavía **no** vive en AXIS: no hay tokens
 > `efeonceGraphicLine.icons` ni archivos en `@efeoncepro/axis-brand-assets`. Hasta que existan, la geometría canónica es la
 > de este documento (sección 9), copiada del ícono maestro del canvas. La iconografía **plana** (rellena) está en
-> exploración y no se usa (sección 11).
+> complementaria **Plastilina** tiene nombre, dirección y órbita sesgada aprobados; su receta, el método para glifos
+> nuevos, el inventario, los «no hacer» y los formatos están **en revisión del operador** (sección 11).
 
 ## 1. La idea
 
@@ -123,6 +124,8 @@ COIN   = M2.5 12a9.5 9.5 0 1 0 19 0a9.5 9.5 0 1 0 -19 0
 S2     = M14.55 9.5a1.75 1.75 0 0 0 -1.55 -1h-2a1.75 1.75 0 1 0 0 3.5h2a1.75 1.75 0 1 1 0 3.5h-2a1.75 1.75 0 0 1 -1.55 -1
 HEAD   = M6 7a3 3 0 1 0 6 0a3 3 0 1 0 -6 0
 BODY   = M3 20v-1a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v1
+CARD   = M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2z
+DOC    = M6 3h8l4 4v14h-12z
 ```
 
 | Glifo | Uso | Reposo | Respuesta (trazos) | Esfera (cx, cy) | Modo |
@@ -135,8 +138,13 @@ BODY   = M3 20v-1a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v1
 | Web | Engine · web | `WIN` · `M4 10h16` · `M7.25 7h.01` · `M10.5 7h.01` | `WIN` · `M4 10h16` · `M10.5 7h.01` | 7.25, 7 | reemplaza |
 | Talent | área | `HEAD` · `BODY` · `M16 4.13a3 3 0 0 1 0 5.75` · `M21 20v-1a4 4 0 0 0 -3 -3.85` | `HEAD` · `BODY` · `M21 20v-1a4 4 0 0 0 -3 -3.85` | 17, 7 | reemplaza |
 | Finance | área | `COIN` · `S2` · `M12 6.5v2m0 7v2` | `COIN` · `S2` · `M12 15.5v2` | 12, 5.5 | reemplaza |
+| Embudo | Revenue · funnel | `M4 4.5h16l-6 8v6l-4 2.5v-8.5z` | igual al reposo | 12, 8 | completa |
+| CRM | Revenue · CRM | `CARD` · `M6.5 10a2 2 0 1 0 4 0a2 2 0 1 0 -4 0` · `M6 16.5a2.5 2.5 0 0 1 5 0` · `M13 9.5h5` · `M13 13h5` | `CARD` · cabeza · cuerpo · `M13 9.5h5` · `M13 13h1.5` | 17.5, 13 | reemplaza |
+| Automatización | Revenue · RevOps | `M19 12a7 7 0 1 1 -2.05 -4.95` · `M17 3.5v3.6h-3.6` | `M19 12a7 7 0 1 1 -2.95 -5.71` | 18.06, 8.5 | reemplaza |
+| Informe | Growth · reportes | `DOC` · `M14 3v4h4` · `M9 17v-3` · `M12 17v-5.5` · `M15 17v-2` | `DOC` · `M14 3v4h4` · `M9 17v-3` · `M12 17v-2.5` · `M15 17v-2` | 12, 10.5 | reemplaza |
 
-Aire verificado a mano el 2026-09-26 (≥ 0,5 en todos). Revenue y Medios se corrigieron para cumplirlo: la línea de
+Aire verificado a mano el 2026-09-26 (≥ 0,5 en todos; Embudo, CRM, Automatización e Informe entraron ese día, en
+revisión del operador). Revenue y Medios se corrigieron para cumplirlo: la línea de
 Revenue termina en 17,5 / 11,5 y la esfera de Medios va en x 20,35.
 
 ## 10. Implementación y pendientes
@@ -149,24 +157,85 @@ Revenue termina en 17,5 / 11,5 y la esfera de Medios va en x 20,35.
   este set reemplaza a los Tabler outline de la firma de correo y de la firma de equipo (`emailSignature.icons`,
   `team.areaMark`). Mientras no se decida, la firma sigue con Tabler.
 
-## 11. Plastilina, la voz blanda (dirección aprobada, especificación en exploración)
+## 11. Plastilina, la voz blanda
 
 El operador pidió un estilo **complementario** con punch y personalidad para el oficio creativo. Tras descartar los
-tratamientos dibujados a mano y dos rondas generadas, eligió la dirección E y la llamó **Plastilina** (D19). Vive en la
-sección 2 del canvas «Íconos de La órbita» (anatomía E1, post E2, set E3 e ícono maestro vectorial `IconoE.dc.html`).
+tratamientos dibujados a mano y dos rondas generadas, eligió la dirección E y la llamó **Plastilina** (D19); la
+**órbita sesgada** quedó como su firma (D20) y el **fondo Efeonce `#001a33`** va en todas las líneas (D21). Vive en la
+sección 2 del canvas «Íconos de La órbita»: anatomía E1, post E2, set E3, receta E4, no hacer E5, story E6, LinkedIn E7,
+stickers E8 e ícono maestro vectorial `IconoE.dc.html`.
 
-- **Dos voces, una familia (propuesta):** Trazo para lo que se mide (Growth, Engine, Revenue; decks, informes,
-  listas); Plastilina para lo que se crea (Brand/Globe). Comparten la paleta, la esfera (reposo o respuesta), la grilla
-  (24 y 48) y los remates redondos. En una pieza con las dos, manda una (Plastilina grande, Trazo chico de apoyo), una
-  sola esfera responde y nunca se mezclan en un mismo grupo.
-- **Anatomía (E1):** silueta blanda con contorno a mano · proporciones con carácter · actitud (giro) · calados
-  redondos · la esfera es la acción (la gota, la luz, la pintura, el punto que cierra la respuesta), un solo tamaño y
-  con su aire · gesto en el protagonista (rayos, velocidad, vibración) · tres colores.
-- **Color (D18):** consistente dentro de cada línea de servicio y cambia de acento según la línea.
-- **Órbita sesgada (D20):** la firma de Plastilina. Elipse inclinada (en el canvas, −16° y un alto de un tercio del
-  ancho) que pasa por detrás y por delante del objeto protagonista, con un calado del color del fondo; anillo tenue,
-  arco en el acento por el frente y la esfera al final, fuera del objeto. Una por pieza, nunca cruza el texto y nunca
-  mide. Lo que mide, enfoca o cierra la marca sigue siendo circular.
-- **Origen de la geometría:** la silueta se trazó en vector (potrace) desde la hoja generada E y la esfera se compone
-  aparte; los glifos nuevos necesitan un método propio (pendiente).
-- **Pendientes:** ver [ledger.md](ledger.md), «Íconos, pendientes de Plastilina».
+> **Estado de cada parte:** nombre, dirección, color por línea, órbita sesgada y fondo, **aprobados**. Receta, método,
+> los nueve íconos nuevos, los «no hacer» y los formatos, **en revisión del operador**: se usan para explorar, no en
+> piezas publicadas, hasta que el ledger los marque vigentes.
+
+### 11.1 Dos voces, una familia (propuesta)
+
+Trazo para lo que se mide (Growth, Engine, Revenue; decks, informes, listas); Plastilina para lo que se crea
+(Brand/Globe). Voice está por decidir. Comparten la paleta, la esfera (reposo o respuesta), las grillas 24 y 48 y los
+remates redondos. En una pieza con las dos manda una (Plastilina grande, Trazo chico de apoyo), una sola esfera responde
+y nunca se mezclan en un mismo grupo.
+
+### 11.2 Receta (E4, en revisión)
+
+| Parte | Valor |
+|---|---|
+| Grilla | 48 × 48, con margen de 2 |
+| Tamaño óptico | Se iguala por **área**, no por caja: la silueta ocupa unos 560 u² (24 % de la grilla), con radio máximo 22,5. Escala `k = min(√(560 / área), 22,5 / radio)` |
+| Silueta | Masa plana y gorda; el contorno conserva la mano, nunca una esquina viva |
+| Giro | El objeto va inclinado, tomado en uso; nunca de frente y quieto |
+| Calados | Recortes redondos contra el fondo, con las curvas de la silueta |
+| Esfera | Radio 3,4 en la grilla de 48 (el mismo tamaño relativo que el Trazo), con 1,1 de aire calado (anillo de 4,5 en máscara) |
+| Gesto | Trazo de 2,8 con remate redondo, sólo en el protagonista (hoy: bombillo, rayo, teléfono) |
+| Contenido de pantallas | Barras redondeadas de 2,6 |
+| Tamaños | Desde 32 px; más chico, se usa el Trazo |
+| Color | Fondo `#001a33`, tinta blanca (navy `#023c70` sobre papel), el acento de la línea sólo en la esfera y el gesto |
+
+**Órbita sesgada:** elipse inclinada −16°, alta un tercio de su ancho; pasa detrás del objeto arriba y delante abajo,
+con un calado de 12 px del color del fondo; anillo blanco tenue de 2,4 px (en 1080); arco de 3,8 px en el acento por el
+frente, de 118° a 52°, y esfera de radio 8,3 con anillo de fondo de 12,5, fuera del objeto. Una por pieza, sólo
+alrededor del protagonista; nunca cruza el texto ni mide. Objeto de 320 px o más en 1080. **Opacidad del anillo por
+decidir:** 22 % o 30 % (prueba de teléfono a 390 px en E4).
+
+### 11.3 Método para dibujar un ícono nuevo (probado con nueve objetos el 2026-09-26)
+
+1. **Generar la forma, nunca el color:** `pnpm ai:image --image <hoja E aprobada> --prompt-file … --size 1024x1024`
+   (gpt-image-2), con la hoja como referencia de estilo, dos colores planos (blanco sobre fondo liso y un solo naranja
+   para la esfera) y una rejilla de 3 × 3 objetos. La hoja de origen es
+   `ai-generations/2026-09-26_iconos-planos/r2/inflado.png`; la segunda tanda, `plastilina-2/hoja.png`.
+2. **Vectorizar:** separar cada objeto por componentes conexos (nunca recortes de celda fija: cortan objetos anchos),
+   descartar los componentes sólo naranja y trazar con potrace.
+3. **Normalizar por área** a la grilla de 48 con la fórmula de §11.2.
+4. **Componer la esfera aparte, determinística:** posición elegida donde está la acción (la gota, la luz, la punta),
+   radio 3,4 y anillo calado de 4,5. La esfera del modelo nunca se conserva.
+5. **Gesto:** sólo si el objeto será protagonista; trazos de 2,8 en el acento.
+6. **QA:** render a 160, 64 y 32 px sobre `#001a33` y sobre papel; revisar que la esfera no choque con el objeto (se
+   corrigieron cámara, rayo, laptop, pincel y cuentagotas) y que el set se lea como familia.
+
+### 11.4 Inventario (E3)
+
+Dieciocho glifos en `IconoE.dc.html`: rayo, paleta, pincel, cuentagotas, bombillo, tablet, laptop, escritorio,
+teléfono (primera tanda) y cámara, claqueta, micrófono, pluma, cursor, tijeras, megáfono, audífonos, corazón (segunda
+tanda, en revisión). La geometría vive en el `DATA` del maestro: transformación de normalización + potrace, trazado y
+esfera `(cx, cy)` en la grilla de 48.
+
+### 11.5 No hacer (E5, en revisión)
+
+- Las dos voces en un mismo grupo o fila.
+- La órbita sesgada midiendo un dato: la sesgada es gesto; lo que mide va en la circular.
+- Todos los íconos con gesto y con esfera: responde uno solo, el protagonista.
+- Un objeto sin carácter: de frente, simétrico, con esquinas vivas y quieto (se lee como stock).
+- Volumen, brillo, sombras o degradés.
+- La órbita cruzando el texto: rodea sólo al objeto; la voz vive fuera, en el tercio inferior.
+
+### 11.6 Formatos (en revisión)
+
+| Formato | Canvas | Composición |
+|---|---|---|
+| Post 4:5 | E2 · 1080 × 1350 | Objeto arriba con la órbita sesgada; voz en el tercio inferior (pregunta 38 / respuesta 140), logo centrado al 20 % del lado corto |
+| Story 9:16 | E6 · 1080 × 1920 | Objeto de 640 en (220, 330), órbita centrada en (540, 707); voz desde 1270 (42 / 160); logo desde 1600 |
+| LinkedIn 1,91:1 | E7 · 1200 × 627 | Objeto de 360 a la derecha, órbita en (950, 302); voz a la izquierda (24 / 76); sin firma |
+| Stickers | E8 · 1080 × 1080 | Círculos navy de 300 px con borde blanco de 10 px, el objeto girado en respuesta y con gesto; sin órbita |
+
+La voz sigue siempre el canon de la línea (pregunta Poppins 300 con aro, respuesta Bricolage 760 con esfera de cierre;
+ver `criteria.md`).

@@ -146,6 +146,11 @@ Detalle y geometría en [iconography.md](iconography.md).
 | [ ] | En listas, tablas, contacto, satélites y dentro de una órbita, reposo; bajo 20 px, reposo | Revisión |
 | [ ] | Tinta blanca sobre oscuro y navy sobre papel; el acento ≥ 3:1 contra su fondo; nunca `#36c8bf` sobre papel | Medir sobre los píxeles finales |
 | [ ] | Sin volumen, brillo, degradé ni patrón; nunca mezclado con otra familia de íconos (salvo Tabler en la firma, mientras dure) | Revisión |
+| [ ] | Fondo `#001a33` en todas las líneas (D21) | Revisión |
+| [ ] | Plastilina: el glifo sale del maestro (`IconoE`), grilla 48, tamaño óptico por área, desde 32 px (más chico, Trazo) | Revisión contra `iconography.md` §11 |
+| [ ] | Plastilina: esfera de radio 3,4 con su anillo calado; gesto sólo en el protagonista; una sola esfera responde por pieza | Revisión |
+| [ ] | Nunca Trazo y Plastilina en un mismo grupo; en una pieza con las dos, Plastilina manda y el Trazo apoya en chico | Revisión |
+| [ ] | Órbita sesgada: sólo alrededor del protagonista de Plastilina, pasa detrás y delante con su calado, nunca cruza el texto ni mide | Revisión sobre los píxeles finales |
 
 ## 9. Comandos y pruebas de referencia
 
