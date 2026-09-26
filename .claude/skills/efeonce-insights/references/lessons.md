@@ -42,7 +42,7 @@
   matrix decides, not the canvas; enabling it means selecting the run by window in the grader's domain.
 - **2026-09-25 · ICO thresholds lived in several docs with different numbers.** Registry (runtime) FTR ≥ 80; glossary
   said ≥ 70; ICO contract ≥ 85. The operator made `ICO_METRIC_REGISTRY` the single source the same day (docs aligned in
-  `f1a41cda0`; hand-written portal semaphores → TASK-1900). Rule: the printed target comes from the registry via a
+  `9172cf5df`, formerly `f1a41cda0` before the 2026-09-25 history rewrite; hand-written portal semaphores → TASK-1900). Rule: the printed target comes from the registry via a
   reference fact; never copy a number from a doc.
 
 - **2026-09-25 · Un canvas aprobado no es un diseño construido.** TASK-1847 cerró el mismo día en que el operador
