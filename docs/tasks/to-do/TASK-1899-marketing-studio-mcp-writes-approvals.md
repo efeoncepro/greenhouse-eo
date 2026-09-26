@@ -42,6 +42,11 @@
   usa la clase existente `efeonce.mcp.seo.write` y el cliente `efeonce-mcp-growth-seo-write` para que
   `track_seo_keywords` (`T2`) lo ejecute Greenhouse con la persona. Ninguna de las dos pasa por el provider
   `marketing-studio`; ambas respetan la misma regla: la clase nunca va al cliente público compartido.
+- **Hook para la operación híbrida con agentes (TASK-1913–1916):** el camino de confirmación `T2` de esta task debe
+  exponer el chequeo `confirmation_requires_direct_person`: una confirmación sólo vale si el token de quien confirma
+  no trae claim `act` (ADR
+  [`EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md`](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md)
+  §4.4 y §7). Un agente en segundo plano o programado (TASK-1915) puede proponer un `T2`, nunca confirmarlo.
 - **Fuera de esta task, con su propia clase cuando exista:** cualquier escritura que mueva dinero en una plataforma
   publicitaria (lanzar, pausar, presupuesto) exige ADR nuevo y una clase por radio de impacto (ADR §5).
 

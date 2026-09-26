@@ -106,7 +106,7 @@ Así una regla de edición, conflicto o permiso se diseña una vez, en `MS-N3`, 
 | Sistema | Superficie vigente | Contrato |
 |---|---|---|
 | Global | `Rail` de 76 px (Hoy · Campañas · Calendario · Piezas · Medios); `BottomNav` bajo 860 px | máximo 5 destinos; `aria-current="page"` siempre visible; el espacio de campaña activa «Campañas» |
-| Local | pestañas del espacio de campaña (`nav.tabs`, `?tab=`) | 7 pestañas tras este programa (§4); scroll interno contenido en 390 px |
+| Local | pestañas del espacio de campaña (`nav.tabs`, `?tab=`) | 8 pestañas tras este programa (Brief · Estrategia · Piezas · Copys · Anuncios · Medios · Calendario · Resultados; §4 y Delta 2026-09-26; «Estrategia» = TASK-1912); scroll interno contenido en 390 px |
 | Contextual | tarjetas de Hoy, eventos del Calendario, filas de Medios, tiles de Piezas, pista de tres estados | cada una lleva a pestaña + elemento (`?tab=`, `?piece=`, `#copyId`, `?review=`) |
 | Suplementario | ⌘K (`CommandPalette`: campañas, piezas, copys + atajos «Ir a») | busca por `GET /api/v1/search`; la hoja abierta tiene prioridad sobre ⌘K |
 

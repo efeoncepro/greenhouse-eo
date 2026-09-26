@@ -6,6 +6,18 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 (reparto con TASK-1894)
+
+- **El campo `riskTier` y su enforcement en el kernel pasan a TASK-1894 Slice 1** (commit `0f225551f`): 1905 depende de
+  los commands y del kernel de 1894, así que dejar aquí la introducción del campo creaba un ciclo. 1894 declara
+  `riskTier` explícito en cada entrada del registro con el contrato de este Slice 1 (T0/T1/T2, leído del registro, nunca
+  del request) y deja un puerto `ChannelValidator` con adaptador neutro que el Slice 3 de esta task reemplaza por el real.
+- **Esta task conserva del Slice 1:** los detectores ampliados (c)–(e) del test de paridad y la lectura del `riskTier`
+  por el gateway desde el artefacto sincronizado. Donde el Slice 1 dice «introduce `riskTier`», léase «verifica y
+  consume el `riskTier` que ya declaró TASK-1894».
+- **Relacionado:** TASK-1913–1916 (operación híbrida con agentes) usan este `riskTier` para decidir cuándo una
+  asignación o corrida de agente exige confirmación humana.
+
 ## Status
 
 - Lifecycle: `to-do`
