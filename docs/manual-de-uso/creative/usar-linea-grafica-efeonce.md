@@ -110,9 +110,14 @@ Publicar, imprimir o mandar a producir requiere la autorización del operador; e
 Un agente no dibuja la órbita a mano: declara qué hace en la pieza y AXIS resuelve el resto.
 
 1. **Escribe la intención** (`intent.json`): el lienzo (`width`, `height`, `brand`, `surface`, `channel`) y los
-   elementos. Por ejemplo, una lente con su foto del banco, el par pregunta y respuesta, y la burbuja de URL.
-   Elementos posibles: `orbit`, `measure`, `progress`, `lens`, `spotlight`, `family-map`, `url-bubble`, `voice` y
-   `logo-inline`.
+   elementos. Por ejemplo, una lente con su foto del banco, el par pregunta y respuesta, y la firma.
+   Elementos posibles: `orbit`, `measure`, `progress`, `lens`, `spotlight`, `family-map`, `url-bubble`, `voice`,
+   `logo-inline`, `signature`, `slogan`, `state` y `brand-close`.
+   - **La firma** (`signature`): por defecto el logo de Efeonce, centrado abajo. Si el logo de Efeonce ya aparece
+     en la imagen (mockup, objeto, merch), declara `"brandInScene": true` y firma la burbuja URL, centrada y con
+     fusión de luminosidad. La burbuja sólo pasa el contraste sobre un fondo muy oscuro.
+   - **La órbita** se usa en casos puntuales (lente, medida, progreso, foco); no reemplaza la composición de la
+     foto. Declara en `protect` el sujeto y las reservas de texto: la órbita no puede cruzarlos.
 2. **Resuelve**: `pnpm creative:orbit:resolve -- --input intent.json --out manifest.json`. Si la intención rompe
    una regla (dos anillos en la pieza, una medida sin fuente, una respuesta de más de tres palabras), el comando
    falla y dice cuál.
@@ -120,12 +125,13 @@ Un agente no dibuja la órbita a mano: declara qué hace en la pieza y AXIS resu
    lugar de la burbuja, cajas de texto). La respuesta lleva además `fontSize`, `baseline` y `lastChar` para
    cerrar con su esfera.
 4. **Pinta y revisa**: `pnpm creative:orbit:render -- --intent intent.json --bindings bindings.json --out-dir out/`.
-   Deja `piece.svg`, `piece.png`, `manifest.json` y `qa.json`. Si un texto cruza el anillo o la URL aparece como
-   texto, sale con error y `qa.json` dice cuál.
+   Deja `piece.svg`, `piece.png`, `manifest.json` y `qa.json`. Si un texto cruza el anillo, la URL aparece como
+   texto, la firma queda descentrada o bajo 4,5:1, o la órbita cruza el sujeto, sale con error y `qa.json` dice cuál.
 5. **Mira el PNG al 100 %** antes de usarlo: el chequeo del sujeto dentro de la lente es visual.
 
-> Detalle técnico: contrato `efeonce.graphic-line-orbit` 0.1.0 (candidate) en `@efeoncepro/axis-ui-contracts`
-> 0.2.6; adapter en `scripts/creative/layout-compiler/graphic-line.mjs`; manual del contrato en AXIS
+> Detalle técnico: contrato `efeonce.graphic-line-orbit` 0.2.0 (candidate) en `@efeoncepro/axis-ui-contracts`
+> 0.2.7; archivos oficiales en `@efeoncepro/axis-brand-assets` 0.2.7; capa opcional en `pnpm creative:layout`
+> (`graphic_line` por formato); adapter en `scripts/creative/layout-compiler/graphic-line.mjs`; manual del contrato en AXIS
 > `docs/agent-composition/graphic-line-orbit.md`.
 
 ## Paso a paso — regenerar el PDF del manual

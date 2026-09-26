@@ -162,17 +162,25 @@ Rules for agents:
   changing the token and its test in AXIS, signed through the Greenhouse ADR, not editing a document.
 - Before pinning a consumer, confirm which **published** package version contains the export; do not assume the
   workspace source is released.
-- **Compose by intent, never by coordinates.** AXIS `0.2.6` publishes the candidate contract
-  `efeonce.graphic-line-orbit` `0.1.0` and manifest `axis.graphic-line-orbit-composition.v1`: an agent declares
+- **Compose by intent, never by coordinates.** AXIS `0.2.7` publishes the candidate contract
+  `efeonce.graphic-line-orbit` `0.2.0` and manifest `axis.graphic-line-orbit-composition.v1`: an agent declares
   `orbit`, `measure` (value 0–1 **with a source**, or no arc), `progress`, `lens`, `spotlight`, `family-map`,
-  `url-bubble`, `voice` or `logo-inline`; the resolver enforces the line's rules (one ring per piece, answer ≤ 3
+  `url-bubble`, `voice`, `logo-inline`, `signature`, `slogan`, `state` or `brand-close`; the resolver enforces the line's rules (one ring per piece, answer ≤ 3
   words, URL never as text) and resolves every value from `efeonceGraphicLine`. In AXIS: `pnpm orbit:resolve`
   (manual `docs/agent-composition/graphic-line-orbit.md`, ADR `GRAPHIC_LINE_ORBIT_COMPOSITION_DECISION_V1.md`).
   In Greenhouse: `pnpm creative:orbit:resolve` (manifest) and `pnpm creative:orbit:render --intent --bindings
   --out-dir` (SVG, PNG and `qa.json`; exits 1 when an adapter check such as text crossing the ring fails). The
-  bindings carry measured geometry (targets, photos, URL-bubble slot, text boxes); never copy the Lab painter.
-- Scope: Efeonce's own brand and its family. Never Greenhouse product UI and never client work. The URL bubble
-  (`url-lum`) baked variants live as SVG assets in Greenhouse, not as tokens.
+  bindings carry measured geometry (targets, photos, text boxes, `protect` zones); never copy the Lab painter.
+- **Signature rule (operator, 2026-09-26):** a piece signs with the Efeonce logo, centered. The URL bubble signs
+  instead ONLY when the Efeonce logo already appears in the image (`signature.brandInScene: true`), also centered and
+  luminosity-blended on the real pixels; a bare `url-bubble` is rejected in `social`. The blend fixes the gray's
+  lightness, so the bubble passes 4.5:1 only on a truly dark bed.
+- **The orbit never replaces the photographic composition:** it is declared on purpose, never by default, and never
+  crosses the subject or the text reserves (`orbit-never-over-subject-or-reserves`).
+- **Official files:** `@efeoncepro/axis-brand-assets` (logos, isotypes and URL bubbles of the four brands, SHA-256
+  sealed, aspect ratio from the viewBox). Contracts resolve ids; consumers read the file from the package. It is
+  not `efeonce.brand-logos` (third-party logo provenance in UIs).
+- Scope: Efeonce's own brand and its family. Never Greenhouse product UI and never client work.
 
 ### AXIS Lab
 

@@ -6,15 +6,28 @@
 // with sharp and runs the contract's `adapterChecks`. It never copies the AXIS Lab painter.
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 
+import sharp from 'sharp'
+import { brandAssetUrl, findBrandAsset } from '@efeoncepro/axis-brand-assets'
 import { AXIS_GRAPHIC_LINE_ORBIT_CONTRACT, resolveGraphicLineIntent } from '@efeoncepro/axis-ui-contracts'
 
-export const SUPPORTED_CONTRACT_VERSION = '0.1.0'
+import { compositeLuminosity } from './compiler.mjs'
+
+export const SUPPORTED_CONTRACT_VERSION = '0.2.0'
 export const SUPPORTED_SCHEMA = 'axis.graphic-line-orbit-composition.v1'
 
-const REPO = fileURLToPath(new URL('../../../', import.meta.url))
-const URL_BUBBLE_DIR = path.join(REPO, 'docs/operations/brand-graphic-line/deliverables/assets')
+// The URL bubble as a signature blends at full opacity: measured 2026-09-26, at the 0.72 of the campaign footer it never
+// reaches 4.5:1 (3.82 on #001a33, 4.00 on near black); at 1 it gives 6.17 and 6.78 on dark beds and fails on mid or
+// light ones — the luminosity blend fixes the lightness of the gray. The contrast gate below decides, not this value.
+export const SIGNATURE_BUBBLE_OPACITY = 1
+
+const assetFile = id => {
+  const asset = findBrandAsset(id)
+
+  if (!asset) throw new Error(`graphic-line adapter: brand asset «${id}» is not in @efeoncepro/axis-brand-assets`)
+
+  return { asset, file: new URL(brandAssetUrl(id)).pathname }
+}
 
 // Greenhouse grid for semantic regions: thirds pulled toward the center, the same reading the canvas used.
 const REGION_X = { start: 0.3, center: 0.5, end: 0.7 }
@@ -103,7 +116,10 @@ const haloSvg = (halo, c, width, height) => {
 
 /**
  * bindings: { targets: { [id]: { cx, cy, r } }, photos: { [photoId]: path }, urlBubble: { x, y, height },
- *             texts: [{ id, x, y, w, h, svg? }] } — text boxes are measured by the caller; `svg` paints them.
+ *             texts: [{ id, x, y, w, h, svg? }], signature: { y? },
+ *             protect: [{ id, kind: 'subject' | 'reserve' | 'bed', x, y, w, h }] }
+ * Text boxes are measured by the caller; `svg` paints them. `protect` is what the photographic language owns: the
+ * orbit never crosses a subject or a reserve, and the signature never lands on either (it may sit on the bed).
  */
 export function paintGraphicLine(manifest, bindings = {}) {
   if (manifest.schema !== SUPPORTED_SCHEMA) throw new Error(`Unsupported manifest ${manifest.schema}`)
@@ -155,13 +171,12 @@ export function paintGraphicLine(manifest, bindings = {}) {
     }
 
     if (el.kind === 'url-bubble' && bindings.urlBubble) {
-      // Raster output never blends: the baked variant already carries the luminosity result.
-      const svg = readFileSync(path.join(URL_BUBBLE_DIR, el.asset), 'utf8')
-      const [, vw, vh] = svg.match(/viewBox="[\d.]+ [\d.]+ ([\d.]+) ([\d.]+)"/) ?? []
+      // A footer bubble (deck, report, stationery). Raster output never blends: the baked variant carries the result.
+      const baked = el.assetId === 'url-bubble-source' ? 'url-bubble-baked-light' : el.assetId
+      const { asset, file } = assetFile(baked)
       const h = bindings.urlBubble.height
-      const w = vw && vh ? (h * Number(vw)) / Number(vh) : h * 5
 
-      layers.push(`<image href="${dataUri(path.join(URL_BUBBLE_DIR, el.asset))}" x="${f(bindings.urlBubble.x)}" y="${f(bindings.urlBubble.y)}" width="${f(w)}" height="${f(h)}"/>`)
+      layers.push(`<image href="${dataUri(file)}" x="${f(bindings.urlBubble.x)}" y="${f(bindings.urlBubble.y)}" width="${f(h / asset.aspectRatio)}" height="${f(h)}"/>`)
     }
   }
 
@@ -180,9 +195,82 @@ export function paintGraphicLine(manifest, bindings = {}) {
     layers.push(`<circle cx="${f(answer.x + answer.w + gapEm * answer.fontSize + d / 2)}" cy="${f(answer.baseline - d / 2)}" r="${f(d / 2)}" fill="${manifest.palette.accent}"/>`)
   }
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" aria-hidden="true"><rect width="${width}" height="${height}" fill="${manifest.palette.background}"/>${layers.join('')}</svg>`
+  // `transparent`: a layer over a plate another compiler owns (Campaign Layout Compiler) — no background of its own.
+  const background = bindings.transparent ? '' : `<rect width="${width}" height="${height}" fill="${manifest.palette.background}"/>`
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" aria-hidden="true">${background}${layers.join('')}</svg>`
 
-  return { svg, rings }
+  return { svg, rings, signature: signatureBox(manifest, bindings) }
+}
+
+/** Where the signature goes: centered, anchored at the foot by the resolved margin; `bindings.signature.y` (a photo
+ * adapter that measured the bed) may move it vertically, never horizontally. */
+export const signatureBox = (manifest, bindings = {}) => {
+  const el = manifest.elements.find(element => element.kind === 'signature')
+
+  if (!el) return null
+
+  const { width, height } = manifest.canvas
+  const { asset, file } = assetFile(el.assetId)
+  const short = Math.min(width, height)
+  const w = Math.round(short * el.widthOfShortSide)
+  const h = Math.round(w * asset.aspectRatio)
+  const x = Math.round((width - w) / 2)
+  const y = bindings.signature?.y !== undefined ? Math.round(bindings.signature.y) : Math.round(height - short * el.marginOfShortSide - h)
+
+  return { id: el.id, mode: el.mode, assetId: el.assetId, file, blend: el.blend, minContrast: el.minContrast, x, y, w, h }
+}
+
+const relLum = (r, g, b) => {
+  const c = v => {
+    const s = v / 255
+
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
+  }
+
+  return 0.2126 * c(r) + 0.7152 * c(g) + 0.0722 * c(b)
+}
+
+// Contrast of the signature as painted: every solid ink pixel (alpha ≥ 0.9; antialiased edges excluded) against the
+// backdrop it covers, the 1 % worst.
+const inkContrast = (before, after, alpha, channels) => {
+  const ratios = []
+
+  for (let i = 0, a = 0; a < alpha.length; i += channels, a += 1) {
+    if (alpha[a] < 230) continue
+    const l1 = relLum(after[i], after[i + 1], after[i + 2])
+    const l0 = relLum(before[i], before[i + 1], before[i + 2])
+
+    ratios.push((Math.max(l1, l0) + 0.05) / (Math.min(l1, l0) + 0.05))
+  }
+
+  if (!ratios.length) return null
+  ratios.sort((a, b) => a - b)
+
+  return Number(ratios[Math.floor(ratios.length * 0.01)].toFixed(2))
+}
+
+/** Paints, rasterizes and signs. The URL bubble blends on the real pixels (non-separable luminosity), not in CSS. */
+export async function renderGraphicLine(manifest, bindings = {}) {
+  const { svg, rings, signature } = paintGraphicLine(manifest, bindings)
+  let png = await sharp(Buffer.from(svg)).png().toBuffer()
+
+  if (signature) {
+    const source = await sharp(signature.file, { density: 600 }).resize({ width: signature.w }).png().toBuffer()
+    const { data: alpha } = await sharp(source).ensureAlpha().extractChannel(3).raw().toBuffer({ resolveWithObject: true })
+    const region = { left: signature.x, top: signature.y, width: signature.w, height: (await sharp(source).metadata()).height }
+    const before = await sharp(png).extract(region).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+
+    png = signature.blend
+      ? (await compositeLuminosity({ backdropBytes: png, sourceBytes: source, left: signature.x, top: signature.y, width: signature.w, opacity: SIGNATURE_BUBBLE_OPACITY })).output
+      : await sharp(png).composite([{ input: source, left: signature.x, top: signature.y }]).png().toBuffer()
+
+    const after = await sharp(png).extract(region).removeAlpha().raw().toBuffer()
+
+    signature.contrast = inkContrast(before.data, after, alpha, 3)
+    signature.h = region.height
+  }
+
+  return { svg, png, rings, signature }
 }
 
 /** `text-never-crosses-ring`: a text box sits fully inside or fully outside every ring. */
@@ -195,7 +283,10 @@ export const textCrossesRing = (box, c) => {
   return Math.hypot(nx - c.cx, ny - c.cy) < c.r && !inside
 }
 
-export function runAdapterChecks(manifest, bindings, rings) {
+// Lens and spotlight surround their subject by design; the rule is for the orbit drawn over a photo.
+const orbitKinds = new Set(['orbit', 'measure', 'progress', 'family-map'])
+
+export function runAdapterChecks(manifest, bindings, rings, signature = null) {
   const results = []
 
   for (const check of manifest.adapterChecks) {
@@ -209,6 +300,24 @@ export function runAdapterChecks(manifest, bindings, rings) {
       results.push({ check, status: asText.length ? 'fail' : 'pass', detail: asText.map(text => text.id) })
     } else if (check === 'decorative-svg-hidden-from-accessibility-tree') {
       results.push({ check, status: 'pass', detail: ['svg aria-hidden="true"'] })
+    } else if (check === 'signature-centered') {
+      const sig = signature ?? null
+      const off = sig ? Math.abs(sig.x + sig.w / 2 - manifest.canvas.width / 2) : 0
+
+      results.push({ check, status: !sig ? 'pass' : off <= 1 ? 'pass' : 'fail', detail: sig ? [`${sig.mode} ${Math.round(off)} px off center`] : ['no signature declared'] })
+    } else if (check === 'signature-min-contrast') {
+      const sig = signature ?? null
+      const ok = !sig || (sig.contrast != null && sig.contrast >= sig.minContrast)
+
+      results.push({ check, status: ok ? 'pass' : 'fail', detail: sig ? [`${sig.mode} ${sig.contrast ?? 'unmeasured'}:1 (min ${sig.minContrast})`] : ['no signature declared'] })
+    } else if (check === 'orbit-never-over-subject-or-reserves') {
+      const guarded = (bindings.protect ?? []).filter(zone => zone.kind === 'subject' || zone.kind === 'reserve')
+      const orbitRings = rings.filter(ring => orbitKinds.has(manifest.elements.find(el => el.id === ring.id)?.kind))
+      const crossings = guarded.flatMap(zone => orbitRings.filter(ring => textCrossesRing(zone, ring)).map(ring => `${ring.id}×${zone.id}`))
+      const sig = signature ?? null
+      const sigOver = sig ? guarded.filter(zone => zone.x < sig.x + sig.w && zone.x + zone.w > sig.x && zone.y < sig.y + sig.h && zone.y + zone.h > sig.y).map(zone => `signature×${zone.id}`) : []
+
+      results.push({ check, status: crossings.length || sigOver.length ? 'fail' : 'pass', detail: [...crossings, ...sigOver] })
     } else if (check === 'sphere-on-arc-end' || check === 'ring-center-on-target-center') {
       results.push({ check, status: 'pass', detail: ['painted from the resolved arc and the bound target center'] })
     } else {

@@ -9,6 +9,7 @@ import { axisAdvertising } from '@efeoncepro/axis-tokens'
 
 import { loadLayoutContract, resolveRunPath, resolveRunRoot } from './contract.mjs'
 import { renderCollaborationSelection, resolveSupportingTagline, supportingTaglineCopy } from './axis-advertising.mjs'
+import { paintGraphicLine, resolveGraphicLine, runAdapterChecks } from './graphic-line.mjs'
 
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex')
 
@@ -732,6 +733,33 @@ export const compositeLuminosity = async ({ backdropBytes, sourceBytes, left, to
   }
 }
 
+// Kinds a campaign piece may take from the graphic line: the ring-bearing ones. Voice, signature and URL bubble stay with
+// this compiler (its type system, its logo and its URL), so a graphic line intent never signs or writes copy twice.
+const GRAPHIC_LINE_LAYER_KINDS = new Set(['orbit', 'measure', 'progress', 'lens', 'spotlight', 'family-map'])
+
+const renderGraphicLineLayer = async ({ contract, contractPath, format, finishedPlatePath }) => {
+  if (!format.graphic_line) return null
+
+  const { width, height } = format.canvas
+  const intent = JSON.parse(await readFile(resolveRunPath(contractPath, contract, format.graphic_line.intent), 'utf8'))
+
+  if (intent.canvas?.width !== width || intent.canvas?.height !== height)
+    throw new Error(`${format.id}: graphic_line intent canvas ${intent.canvas?.width}×${intent.canvas?.height} ≠ format ${width}×${height}`)
+
+  const foreign = (intent.elements ?? []).filter(element => !GRAPHIC_LINE_LAYER_KINDS.has(element.kind)).map(element => element.kind)
+
+  if (foreign.length) throw new Error(`${format.id}: graphic_line carries ${[...new Set(foreign)].join(', ')}; this compiler owns copy and signature`)
+
+  const manifest = resolveGraphicLine(intent)
+  // Lens and spotlight work on the piece's own finished plate.
+  const photos = Object.fromEntries(manifest.elements.filter(el => el.photo).map(el => [el.photo.id, finishedPlatePath]))
+  const protect = format.graphic_line.protect.map(zone => ({ id: zone.id, kind: zone.kind, x: zone.box.x * width, y: zone.box.y * height, w: zone.box.width * width, h: zone.box.height * height }))
+  const bindings = { photos, protect, transparent: true }
+  const { svg, rings } = paintGraphicLine(manifest, bindings)
+
+  return { manifest, svg, rings, bindings }
+}
+
 const renderFormat = async ({
   contract,
   contractPath,
@@ -755,11 +783,17 @@ const renderFormat = async ({
   const sourcePlateBytes = await readFile(sourcePlatePath)
   const finishedPlateBytes = await readFile(finishedPlatePath)
 
-  const plateBytes = await sharp(finishedPlateBytes)
+  const bareplateBytes = await sharp(finishedPlateBytes)
     .resize(width, height, { fit: 'fill' })
     .toColourspace('srgb')
     .png()
     .toBuffer()
+
+  const graphicLine = await renderGraphicLineLayer({ contract, contractPath, format, finishedPlatePath })
+
+  const plateBytes = graphicLine
+    ? await sharp(bareplateBytes).composite([{ input: Buffer.from(graphicLine.svg), left: 0, top: 0 }]).png().toBuffer()
+    : bareplateBytes
 
   const hookSelectionTarget =
     contract.collaboration_selection?.target_binding === 'hook' ? (collaborationManifest?.target.id ?? null) : null
@@ -784,6 +818,7 @@ const renderFormat = async ({
     height,
     `
     <g data-layer="clean_plate"><image href="${escapeXml(relativePlatePath)}" width="${width}" height="${height}" preserveAspectRatio="none"/></g>
+    ${graphicLine ? `<g data-layer="graphic_line">${graphicLine.svg.replace(/^<svg[^>]*>|<\/svg>$/g, '')}</g>` : ''}
     ${underlayBody}
     ${vectorMarkup}
     <g data-layer="brand"><image href="${logoDataUri}" x="${format.layout.logo.left}" y="${format.layout.logo.top}" width="${format.layout.logo.width}"/></g>
@@ -879,6 +914,21 @@ const renderFormat = async ({
 
   if (urlBubbleBytes) assertions.urlBubbleVisible = urlBubbleComposite.evidence.visible
 
+  // The orbit layer passes its contract checks against the real copy field and the laid-out text.
+  if (graphicLine) {
+    const box = b => ({ x: b.left, y: b.top, w: b.right - b.left, h: b.bottom - b.top })
+    const copy = format.copy_field
+
+    const bindings = {
+      ...graphicLine.bindings,
+      texts: [{ id: 'copy', ...box(contentBounds) }],
+      protect: [...graphicLine.bindings.protect, { id: 'copy-field', kind: 'reserve', x: copy.x * width, y: copy.y * height, w: copy.width * width, h: copy.height * height }]
+    }
+
+    graphicLine.checks = runAdapterChecks(graphicLine.manifest, bindings, graphicLine.rings)
+    assertions.graphicLine = graphicLine.checks.every(check => check.status !== 'fail')
+  }
+
   if (format.baseline) {
     assertions.baselineWithinTolerance = baselineComparison.normalizedMae <= format.baseline.max_normalized_mae
   }
@@ -909,6 +959,9 @@ const renderFormat = async ({
     logoSha256,
     urlBubbleSha256,
     urlBubbleRasterEvidence: urlBubbleComposite?.evidence ?? null,
+    graphicLine: graphicLine
+      ? { intent: format.graphic_line.intent, contract: graphicLine.manifest.contract, rings: graphicLine.rings, checks: graphicLine.checks }
+      : null,
     exactCopy: contract.message,
     supportLayout,
     collaborationSelection: collaborationEvidence,

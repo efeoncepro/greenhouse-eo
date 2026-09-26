@@ -245,6 +245,16 @@ const makeFixture = async (finishStatus, options = {}) => {
     )
   }
 
+  if (options.graphicLine) {
+    const format = contract.formats[0]
+
+    await writeFile(
+      path.join(root, 'graphic-line-intent.json'),
+      JSON.stringify({ canvas: { ...format.canvas, channel: 'social' }, elements: options.graphicLine })
+    )
+    format.graphic_line = { intent: 'graphic-line-intent.json', protect: [] }
+  }
+
   if (options.baselineThreshold !== undefined) {
     const baseline = await sharp({
       create: { width: 640, height: 360, channels: 3, background: '#000000' }
@@ -435,6 +445,26 @@ test('check detects a master modified after compilation', async () => {
       .jpeg()
       .toFile(outputPath)
     await assert.rejects(() => verifyCompiledCampaign(fixture.contractPath), /QA failed/)
+  } finally {
+    await rm(fixture.root, { recursive: true, force: true })
+  }
+})
+
+test('the graphic line layer never crosses the copy field: the photographic composition wins', async () => {
+  const fixture = await makeFixture('approved', { graphicLine: [{ kind: 'orbit', id: 'orbit', region: 'center-end' }] })
+
+  try {
+    await assert.rejects(() => compileLayoutCampaign(fixture.contractPath), /QA failed/)
+  } finally {
+    await rm(fixture.root, { recursive: true, force: true })
+  }
+})
+
+test('a graphic line intent never signs or writes copy inside a campaign piece', async () => {
+  const fixture = await makeFixture('approved', { graphicLine: [{ kind: 'signature', id: 'firma' }] })
+
+  try {
+    await assert.rejects(() => compileLayoutCampaign(fixture.contractPath), /this compiler owns copy and signature/)
   } finally {
     await rm(fixture.root, { recursive: true, force: true })
   }

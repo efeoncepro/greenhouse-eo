@@ -154,6 +154,16 @@ const contractSchema = z
             delta: z.string().min(1),
             input_policy: z.string().min(1)
           }),
+          // Optional graphic line layer (AXIS `efeonce.graphic-line-orbit`): an intent file with ring elements only. The
+          // orbit is declared on purpose, never a default; it never crosses the copy field or a protected subject.
+          graphic_line: z
+            .object({
+              intent: z.string().min(1),
+              protect: z
+                .array(z.object({ id: z.string().min(1), kind: z.enum(['subject', 'reserve', 'bed']), box: normalizedBox }))
+                .default([])
+            })
+            .optional(),
           layout: z.object({
             copy_fade_mid: z.number().min(0).max(1),
             copy_fade_end: z.number().min(0).max(1),

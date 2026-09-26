@@ -268,6 +268,14 @@ versión toda blanca, se reemplaza.
 
 ### 8.5 La URL: siempre en su burbuja
 
+> **Delta 2026-09-26 — firma de piezas gráficas (regla del operador).** En una pieza (post, anuncio, portada con foto)
+> la firma es **el logo de Efeonce centrado**. La burbuja URL **no** se agrega por defecto: sólo reemplaza al logo
+> cuando el logo de Efeonce ya aparece dentro de la imagen (mockup, objeto, merch), y entonces va **centrada y con
+> fusión de luminosidad**. Nunca a un costado ni junto al logo. La fusión fija la luminosidad del gris: la burbuja
+> sólo llega a 4,5:1 sobre un lecho de verdad oscuro (medido: 6,2 sobre `#001A33`, 6,8 sobre negro; 1,6–3,1 sobre
+> fondos medios o claros). Contrato: elemento `signature` de `efeonce.graphic-line-orbit` 0.2.0. Los usos de la
+> burbuja en pies de deck, informe, papelería, stand y firma de mail siguen como abajo.
+
 Donde aparezca `efeoncepro.com` va la **burbuja oficial** (`url-lum.svg`, el mismo asset del pie de Insights y del
 deck), nunca la URL como texto: stand, pendón, tarjeta, carnet, hoja membretada, firma de mail y pies de página.
 El SVG se mantiene gris y se aplica con **`mix-blend-mode: luminosity`**, que lo adapta al fondo; no se recolorea

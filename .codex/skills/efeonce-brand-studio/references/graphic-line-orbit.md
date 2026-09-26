@@ -95,8 +95,20 @@ La página de AXIS es pública: lo que allí aparece queda expuesto.
 ## Componer con agentes (contrato `efeonce.graphic-line-orbit`)
 
 Una pieza con la órbita se compone por **intención**, no con coordenadas: el agente declara qué hace la órbita
-(`orbit`, `measure`, `progress`, `lens`, `spotlight`, `family-map`, `url-bubble`, `voice`, `logo-inline`) y AXIS
-valida las reglas de la línea y resuelve cada valor desde los tokens.
+(`orbit`, `measure`, `progress`, `lens`, `spotlight`, `family-map`, `url-bubble`, `voice`, `logo-inline`,
+`signature`, `slogan`, `state`, `brand-close`) y AXIS valida las reglas de la línea y resuelve cada valor desde los
+tokens. Contrato `0.2.0` en los paquetes AXIS `0.2.7`; los archivos oficiales (logos, isotipos y burbujas de las
+cuatro marcas) salen de `@efeoncepro/axis-brand-assets` por id.
+
+**La órbita no reemplaza la composición fotográfica.** Se declara a propósito en casos concretos (lente, medida,
+progreso, foco), nunca por defecto, y nunca cruza el sujeto ni las reservas de texto (check
+`orbit-never-over-subject-or-reserves`; en `bindings.protect`).
+
+**Firma de la pieza (regla del operador, 2026-09-26):** por defecto, el logo de Efeonce centrado abajo. La burbuja
+URL lo reemplaza **sólo** si el logo de Efeonce ya aparece dentro de la imagen (mockup, objeto, merch): centrada y
+con fusión de luminosidad calculada sobre los píxeles reales. Nunca la burbuja a un costado ni junto al logo. La
+fusión fija la luminosidad del gris, así que la burbuja sólo alcanza 4,5:1 sobre un lecho de verdad oscuro (medido:
+6,2 sobre navy y 6,8 sobre negro a opacidad plena; menos de 3,1 sobre fondos medios o claros).
 
 ```bash
 pnpm creative:orbit:resolve -- --input intent.json --out manifest.json
@@ -104,7 +116,10 @@ pnpm creative:orbit:render -- --intent intent.json --bindings bindings.json --ou
 ```
 
 `render` escribe `manifest.json`, `piece.svg`, `piece.png` y `qa.json`, y **sale con 1** si falla un chequeo del
-adapter (texto que cruza el anillo, URL como texto). Los bindings llevan la geometría medida: objetos, fotos,
+adapter (texto que cruza el anillo, URL como texto, firma descentrada o bajo 4,5:1, órbita sobre el sujeto).
+En una campaña, `pnpm creative:layout` acepta la órbita como capa opcional por formato (`graphic_line: { intent,
+protect }`, sólo elementos con anillo): la tipografía y la firma siguen siendo del compilador, y la capa no puede
+cruzar el campo de copy. Los bindings llevan la geometría medida: objetos, fotos,
 lugar de la burbuja y cajas de texto; la respuesta con `fontSize`, `baseline` y `lastChar` para cerrar con su
 esfera. Rechazos típicos del resolver: dos anillos en una pieza, `measure` sin `source`, respuesta de más de tres
 palabras. Contrato y manual en AXIS: `docs/agent-composition/graphic-line-orbit.md`; ejemplos pintados en la
