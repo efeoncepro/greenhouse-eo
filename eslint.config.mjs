@@ -22,11 +22,19 @@ import prettierConfig from 'eslint-config-prettier'
 import importPlugin from 'eslint-plugin-import'
 
 import greenhousePlugin from './eslint-plugins/greenhouse/index.mjs'
+import { gitignoreIgnores } from './eslint-plugins/greenhouse/gitignore-ignores.mjs'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 export default [
+  /*
+    Lo que git no versiona, ESLint no lo juzga. Cierra la clase «un WIP o un artefacto ignorado de
+    otra sesión bloquea el pre-push de todos» (cinco veces; la última, una copia mutante del arnés
+    de CTA que `.gitignore` ya excluía). Ver `eslint-plugins/greenhouse/gitignore-ignores.mjs`.
+  */
+  gitignoreIgnores(resolve(__dirname, '.gitignore')),
+
   /*
     Ignore patterns. Equivalente flat-config del antiguo `ignorePatterns`
     en `.eslintrc.js` + ignores adicionales que en eslint 8 absorbia
