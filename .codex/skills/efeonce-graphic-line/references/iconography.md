@@ -152,12 +152,19 @@ Revenue termina en 17,5 / 11,5 y la esfera de Medios va en x 20,35.
 ## 11. Iconografía plana (exploración, no usar)
 
 El operador pidió un estilo **complementario**: íconos planos (rellenos) **con personalidad creativa**, con objetos del
-oficio: rayo, paleta de colores, pincel, cuentagotas, bombillo, tablet, laptop, Mac de escritorio y teléfono. Se explora
-en la página «Plano · exploración» del canvas (grilla 48, ícono maestro `project/IconoPlano.dc.html`) en tres
-tratamientos: **P1 capas planas** (tinte del acento, navy y luz, sin contorno), **P2 registro corrido** (el color
-desplazado del contorno, como impresión a mano) y **P3 contorno** (tinte plano con contorno en tinta).
+oficio: rayo, paleta de colores, pincel, cuentagotas, bombillo, tablet, laptop, Mac de escritorio y teléfono. Estado al
+2026-09-26, página «Plano · exploración» del canvas:
 
-Lo que se mantiene en cualquier tratamiento: plano, sin volumen, brillo ni degradé; la esfera en el acento tiene un papel
-en el objeto (la gota del cuentagotas, la luz del bombillo, el pozo de color de la paleta, el punto que cierra la frase
-en la pantalla); los equipos evocan la forma, **nunca el logo** de Apple ni de otra marca. Cuando el operador decida,
-esta sección se reescribe como estilo aprobado.
+- **Descartado:** tres tratamientos dibujados a mano en SVG (capas planas, registro corrido, contorno). El operador los
+  rechazó: «no hablan el lenguaje de Efeonce». Causas: clip-art rígido de coordenadas a mano, tintes pastel que no
+  existen en la paleta y objetos genéricos.
+- **Color (operador, 2026-09-26):** el set es **consistente dentro de cada línea de servicio** (fondo, tinta y el
+  acento de la línea) y **cambia de acento según la línea**. Nada de colores por objeto ni tintes inventados. La
+  librería 3D del equipo (OneDrive › Iconos 3D) no sirve de base justamente porque no conserva consistencia de color.
+- **Método en curso:** la forma se explora con generación de imagen en dos tintas y el acento (hojas en
+  `ai-generations/2026-09-26_iconos-planos/`: oficio a la vista, calado, construidos con la órbita); la dirección
+  elegida se redibuja en vector y el color se aplica desde los tokens de cada línea, para que no pueda derivar.
+
+Lo que se mantiene en cualquier forma: plano, sin volumen, brillo ni degradé; la esfera en el acento tiene un papel en
+el objeto; los equipos evocan la forma, **nunca el logo** de Apple ni de otra marca. Cuando el operador decida, esta
+sección se reescribe como estilo aprobado.
