@@ -24,6 +24,11 @@
   propio hecho o la de su meta ICO (`dimension.metric`); si no hay dirección, tono neutro. Verificado con la evidencia
   real de Sky: RpA ▼ mejor, OTD ▲ mejor, FTR ▼ peor.
 - **Retiro:** `artifact-composer/chart-figure.ts` y su test (`8f16401b3`), sin consumidores.
+- **Gate de cierre.** `pnpm test` completo: 15 457 tests pasan y 41 fallan en 16 archivos de otros dominios (finanzas,
+  HR, navegación, SEO). Los fallos venían de la carga en paralelo de la máquina: esos 16 archivos pasan al volver a
+  correrlos con `--maxWorkers=2` (76/76). Los de Insights (`classify-failure`, `insights-read-boundary`) pasan
+  aislados. `pnpm build` verde de la sesión TASK-1846 sobre el mismo código de Insights; desde entonces sólo se retiró
+  `chart-figure.ts`, que no tenía consumidores (tsc 0 errores).
 
 ## Delta 2026-09-25
 
