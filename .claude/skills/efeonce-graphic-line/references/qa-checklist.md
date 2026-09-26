@@ -148,7 +148,9 @@ Detalle y geometría en [iconography.md](iconography.md).
 | [ ] | Sin volumen, brillo, degradé ni patrón; nunca mezclado con otra familia de íconos (salvo Tabler en la firma, mientras dure) | Revisión |
 | [ ] | Fondo `#001a33` en todas las líneas (D21) | Revisión |
 | [ ] | Plastilina: el glifo sale del maestro (`IconoE`), grilla 48, tamaño óptico por área, desde 32 px (más chico, Trazo) | Revisión contra `iconography.md` §11 |
-| [ ] | Plastilina: esfera de radio 3,4 con su anillo calado; gesto sólo en el protagonista; una sola esfera responde por pieza | Revisión |
+| [ ] | Plastilina: esfera de radio 3,4 con su anillo calado; gesto en tinta, sólo en el protagonista; una sola esfera responde por pieza | Revisión |
+| [ ] | Plastilina: los calados se leen a 32 px; si se empastan, se simplifica el objeto | Render a 32 px |
+| [ ] | Trazo, glifo nuevo: control a 64, 32, 24 y 20 px sobre `#001a33` y papel; aire ≥ 0,5 con trazo 1,5 | Render + medición |
 | [ ] | Nunca Trazo y Plastilina en un mismo grupo; en una pieza con las dos, Plastilina manda y el Trazo apoya en chico | Revisión |
 | [ ] | Órbita sesgada: sólo alrededor del protagonista de Plastilina, pasa detrás y delante con su calado, nunca cruza el texto ni mide | Revisión sobre los píxeles finales |
 

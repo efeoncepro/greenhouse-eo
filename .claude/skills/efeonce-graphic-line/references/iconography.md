@@ -57,7 +57,11 @@ Un glifo nuevo se dibuja **ya con el lugar de su esfera previsto**, con su aire 
 
 ## 4. Color
 
-- **Tinta:** blanco sobre oscuro (`#001a33` en Growth, `#091951` en las demás líneas); navy `#023c70` sobre papel.
+- **Fondo:** `#001a33` en **todas** las líneas (D21) o papel `#f7f8f6` (`color.paper`).
+- **Tinta:** blanco sobre oscuro; navy `#023c70` sobre papel.
+- **La línea es de la pieza, no del objeto:** un ícono no tiene línea propia. Toma el acento de la línea de servicio
+  de la pieza donde va (una keynote en un deck de Growth va en teal; en uno de Brand, en naranja). Sin línea clara,
+  la de la marca madre, Growth.
 - **Acento:** **sólo la esfera**, en el acento de la línea de servicio. Sobre oscuro, el acento oscuro de la línea; sobre
   papel, el claro (valores en `efeonceGraphicLine.lines[]`, ver [package-and-tokens.md](package-and-tokens.md)).
 - El acento mide **≥ 3:1** contra su fondo (D1). El teal claro `#36c8bf` nunca sobre papel (1,94:1).
@@ -73,7 +77,7 @@ Un glifo nuevo se dibuja **ya con el lugar de su esfera previsto**, con su aire 
 | Dentro de una órbita (firma de equipo, post con órbita) | **reposo** | la órbita ya responde |
 | Satélites del mapa de canales o de familia | **reposo** | los satélites no llevan esfera |
 | Listas, tablas, contacto, navegación | **reposo** | la esfera nunca es viñeta |
-| 20 px o menos | **reposo** | la esfera no se lee |
+| Menos de 20 px | **reposo** | la esfera no se lee |
 
 Regla corta: **responde el que importa, y sólo si nadie más está respondiendo.**
 
@@ -147,6 +151,18 @@ Aire verificado a mano el 2026-09-26 (≥ 0,5 en todos; Embudo, CRM, Automatizac
 revisión del operador). Revenue y Medios se corrigieron para cumplirlo: la línea de
 Revenue termina en 17,5 / 11,5 y la esfera de Medios va en x 20,35.
 
+### 9.1 Cómo entra un glifo nuevo de trazo
+
+Un glifo nuevo se dibuja una vez, entra al set y recién después se usa en piezas (§8).
+
+1. **Dibujar en la grilla 24** con margen 2 y remates redondos. Llena la guía que corresponde a su forma: círculo de
+   radio 10 (objetos redondos), cuadrado de 18 (compactos) o rectángulo de 20 × 16 (apaisados: pantallas, láminas).
+2. **Prever la esfera desde el dibujo:** elegir el modo (reemplaza o completa, §3) y dejarle su lugar.
+3. **Medir el aire** de la esfera contra todos los trazos, con el trazo incluido: ≥ 0,5 con trazo 1,5.
+4. **Renderizar el control** a 64, 32, 24 y 20 px (y 160 si será héroe), sobre `#001a33` y sobre papel.
+5. **Registrar:** una fila en la tabla de §9 y el glifo en el maestro `Icono.dc.html` del canvas. Queda **en revisión**
+   hasta que el operador lo apruebe; antes, no sale en piezas.
+
 ## 10. Implementación y pendientes
 
 - **Hoy:** el ícono maestro del canvas es la referencia visual; este documento, la geometría.
@@ -180,16 +196,17 @@ y nunca se mezclan en un mismo grupo.
 
 | Parte | Valor |
 |---|---|
-| Grilla | 48 × 48, con margen de 2 |
-| Tamaño óptico | Se iguala por **área**, no por caja: la silueta ocupa unos 560 u² (24 % de la grilla), con radio máximo 22,5. Escala `k = min(√(560 / área), 22,5 / radio)` |
+| Grilla | 48 × 48. La silueta cabe en un **círculo de radio 22,5** centrado en (24, 24); en diagonal puede pasar el margen de 2 del cuadrado, en los ejes no |
+| Tamaño óptico | Se iguala por **área**, no por caja: la silueta ocupa unos 560 u² (24 % de la grilla), con radio máximo 22,5. Escala `k = min(√(560 / área), 22,5 / radio)`. El área es la de la silueta **sin** calados; el radio se mide desde el **centro de la caja** del objeto hasta su punto más lejano, y la silueta se centra con ese centro en (24, 24). Un objeto alargado (guitarra, pincel) queda bajo 560 porque manda el radio: es correcto |
 | Silueta | Masa plana y gorda; el contorno conserva la mano, nunca una esquina viva |
 | Giro | El objeto va inclinado, tomado en uso; nunca de frente y quieto |
 | Calados | Recortes redondos contra el fondo, con las curvas de la silueta |
 | Esfera | Radio 3,4 en la grilla de 48 (el mismo tamaño relativo que el Trazo), con 1,1 de aire calado (anillo de 4,5 en máscara) |
-| Gesto | Trazo de 2,8 con remate redondo, sólo en el protagonista (hoy: bombillo, rayo, teléfono) |
-| Contenido de pantallas | Barras redondeadas de 2,6 |
-| Tamaños | Desde 32 px; más chico, se usa el Trazo |
-| Color | Fondo `#001a33`, tinta blanca (navy `#023c70` sobre papel), el acento de la línea sólo en la esfera y el gesto |
+| Reposo | Sin esfera y **sin** el anillo calado: el objeto queda entero, con sus calados propios |
+| Gesto | Trazo de 2,8 con remate redondo, **en tinta**, sólo en el protagonista y con la respuesta. Son 2 a 5 trazos cortos (2,5 a 5,6 de largo), fuera de la silueta, que dicen qué hace el objeto: rayos que irradian (bombillo), líneas de velocidad paralelas (rayo), marcas de vibración a los lados (teléfono). Hoy: bombillo, rayo y teléfono |
+| Contenido de pantallas | Barras redondeadas de 2,6, en tinta |
+| Tamaños | Desde 32 px; más chico, se usa el Trazo. Si un calado se empasta a 32 px, se simplifica el objeto (se funden o se quitan los calados finos), nunca se agranda la esfera |
+| Color | Fondo `#001a33` en todas las líneas, tinta blanca (navy `#023c70` sobre papel `#f7f8f6`). El acento de la línea va **sólo en la esfera**: el oscuro sobre `#001a33` y el claro sobre papel (§4). Gesto y barras, en tinta |
 
 **Órbita sesgada:** elipse inclinada −16°, alta un tercio de su ancho; pasa detrás del objeto arriba y delante abajo,
 con un calado de 12 px del color del fondo; anillo blanco tenue de 2,4 px (en 1080); arco de 3,8 px en el acento por el
@@ -199,25 +216,47 @@ decidir:** 22 % o 30 % (prueba de teléfono a 390 px en E4).
 
 ### 11.3 Método para dibujar un ícono nuevo (probado con nueve objetos el 2026-09-26)
 
-1. **Generar la forma, nunca el color:** `pnpm ai:image --image <hoja E aprobada> --prompt-file … --size 1024x1024`
-   (gpt-image-2), con la hoja como referencia de estilo, dos colores planos (blanco sobre fondo liso y un solo naranja
-   para la esfera) y una rejilla de 3 × 3 objetos. La hoja de origen es
-   `ai-generations/2026-09-26_iconos-planos/r2/inflado.png`; la segunda tanda, `plastilina-2/hoja.png`.
-2. **Vectorizar:** separar cada objeto por componentes conexos (nunca recortes de celda fija: cortan objetos anchos),
-   descartar los componentes sólo naranja y trazar con potrace.
-3. **Normalizar por área** a la grilla de 48 con la fórmula de §11.2.
-4. **Componer la esfera aparte, determinística:** posición elegida donde está la acción (la gota, la luz, la punta),
-   radio 3,4 y anillo calado de 4,5. La esfera del modelo nunca se conserva.
-5. **Gesto:** sólo si el objeto será protagonista; trazos de 2,8 en el acento.
-6. **QA:** render a 160, 64 y 32 px sobre `#001a33` y sobre papel; revisar que la esfera no choque con el objeto (se
-   corrigieron cámara, rayo, laptop, pincel y cuentagotas) y que el set se lea como familia.
+1. **Generar la forma, nunca el color:**
+   `pnpm ai:image --image ai-generations/2026-09-26_iconos-planos/r2/inflado.png --prompt-file <prompt> --size 1024x1024`
+   (gpt-image-2). `r2/inflado.png` es **la** referencia de estilo (la hoja E); `plastilina-2/hoja.png` es sólo un
+   resultado. Prompt modelo: `ai-generations/2026-09-26_iconos-planos/plastilina-2/prompt.txt` (copiarlo y cambiar la
+   lista de objetos). Reglas del prompt: rejilla de 3 × 3 con mucho aire entre celdas; **sólo dos colores**, fondo liso
+   y blanco puro, **sin naranja ni puntos** (la esfera se compone después); sin texto, logos, degradé ni sombra. Para
+   **un solo objeto**, pedir nueve variantes del mismo objeto y elegir la mejor.
+2. **Vectorizar** (los valores del set de 2026-09-26):
+   - subir la hoja ×3 con lanczos3;
+   - máscara = píxeles blancos (R, G y B > 150); si quedó algún naranja **dentro** del objeto, se cuenta como parte de
+     la silueta (no deja hueco);
+   - separar por componentes conexos (conectividad 4), nunca por recortes de celda fija: cortan objetos anchos;
+   - descartar componentes de menos de 60 px o con más de la mitad naranja;
+   - trazar cada objeto con `potrace -s --flat -t 40 -a 1.15 -O 0.6`.
+3. **Normalizar** a la grilla de 48 con la fórmula y las reglas de medición de §11.2.
+4. **Componer la esfera aparte, determinística:** en el punto donde está la acción (la gota, la luz, la punta, la boca
+   de la guitarra), radio 3,4 y anillo calado de 4,5 en máscara. La esfera del modelo nunca se conserva.
+5. **Gesto:** sólo si el objeto será protagonista; 2 a 5 trazos de 2,8 **en tinta**, fuera de la silueta (§11.2).
+6. **QA:** render a 160, 64 y 32 px sobre `#001a33` y sobre papel. Revisar que la esfera no choque con el objeto (se
+   corrigieron cámara, rayo, laptop, pincel y cuentagotas), que los calados se lean a 32 px y que el set se lea como
+   familia. Los chequeos están en `qa-checklist.md` §8b; todavía no hay comando: la medición es un script propio.
+7. **Registrar:** agregar el glifo a `plastilina-glyphs.json` y al maestro del canvas. Queda **en revisión** hasta que
+   el operador lo apruebe.
 
 ### 11.4 Inventario (E3)
 
 Dieciocho glifos en `IconoE.dc.html`: rayo, paleta, pincel, cuentagotas, bombillo, tablet, laptop, escritorio,
 teléfono (primera tanda) y cámara, claqueta, micrófono, pluma, cursor, tijeras, megáfono, audífonos, corazón (segunda
-tanda, en revisión). La geometría vive en el `DATA` del maestro: transformación de normalización + potrace, trazado y
-esfera `(cx, cy)` en la grilla de 48.
+tanda, en revisión). La geometría canónica está en el repo, en
+[plastilina-glyphs.json](plastilina-glyphs.json) (exportada del maestro `IconoE.dc.html`). Cada glifo tiene `t`
+(transformación: normalización + potrace), `d` (trazado), `dot` (centro de la esfera), `over` (barras de contenido) y
+`gesto` (marcas de acción). Se pinta así, en `viewBox="0 0 48 48"`:
+
+```svg
+<mask id="m"><rect x="-8" y="-8" width="64" height="64" fill="#fff"/>
+  <circle cx="DOT_X" cy="DOT_Y" r="4.5" fill="#000"/></mask>   <!-- sólo en respuesta -->
+<g mask="url(#m)"><path d="D" transform="T" fill="TINTA"/></g>
+<path d="OVER" stroke="TINTA" stroke-width="2.6" stroke-linecap="round"/>   <!-- por cada barra -->
+<path d="GESTO" stroke="TINTA" stroke-width="2.8" stroke-linecap="round"/>  <!-- sólo protagonista -->
+<circle cx="DOT_X" cy="DOT_Y" r="3.4" fill="ACENTO"/>                       <!-- sólo en respuesta -->
+```
 
 ### 11.5 No hacer (E5, en revisión)
 

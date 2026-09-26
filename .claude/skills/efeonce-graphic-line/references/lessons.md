@@ -38,6 +38,12 @@
   desde el Lab o desde una URL, no desde un HTML local.
 - **La e2e «creative typography reference» cae por tiempo con render en paralelo.** No es regresión: correrla sola.
 
+- **Documentar el método leyendo el maestro, no de memoria (íconos, 2026-09-26).** Síntoma: un agente sin contexto
+  siguió la receta de Plastilina y pintó el gesto en el acento. Causa: la receta decía «acento en la esfera y el gesto»,
+  pero el maestro `IconoE` lo pinta en tinta; y la geometría vivía sólo en el canvas. Regla: toda receta se contrasta
+  contra el código del maestro antes de publicarse, la geometría canónica vive en el repo (`plastilina-glyphs.json`), y
+  un método nuevo se prueba con un subagente sin contexto antes de darlo por documentado.
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos

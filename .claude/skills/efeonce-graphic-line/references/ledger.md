@@ -58,7 +58,10 @@
   método; aprobar los nueve íconos nuevos (cámara, claqueta, micrófono, pluma, cursor, tijeras, megáfono, audífonos,
   corazón) y los cuatro de trazo (embudo, CRM, automatización, informe); la opacidad del anillo de la órbita sesgada
   (22 % o 30 %); los «no hacer»; los formatos story, LinkedIn y stickers; si Voice usa Trazo o Plastilina; y en piezas
-  con las dos voces, si la esfera va en la respuesta o en el ícono. Diferidos: el motion de los íconos (necesita los
+  con las dos voces, si la esfera va en la respuesta o en el ícono. **Detectado en la prueba a ciegas (2026-09-26):**
+  a 20 px el trazo sube a 1,75 y el aire de la esfera baja de 0,5 a ~0,375 (la regla D17 se midió con 1,5). Opciones:
+  respuesta desde 24 px, o aceptar 0,375 de aire a 20 px. Hasta decidir, la regla sigue siendo «respuesta desde 20 px».
+  Diferidos: el motion de los íconos (necesita los
   tokens `axisMotion` y `motion-design-studio`) y la llegada a AXIS (tokens y SVG, cuando la especificación esté
   aprobada).
 - **Íconos:** el inventario del set (qué íconos necesita la marca) y si reemplaza a los Tabler outline de la firma de
