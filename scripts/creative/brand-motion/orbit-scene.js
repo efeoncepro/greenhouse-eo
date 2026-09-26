@@ -240,6 +240,8 @@
       white(pmk)
       S.planetHoleP = el('circle', { fill: '#000', r: 0 }, pmk)
       S.ringParam = el('path', { 'fill-rule': 'evenodd', mask: 'url(#paramMask)' }, S.cam)
+      // Copia de la forma (sin máscara ni opacidad) para cortar el casco con el mismo anillo que se ve.
+      S.ringParamShape = el('path', { id: 'ringParamShape', 'fill-rule': 'evenodd' }, defs)
 
       // Anillo oficial SIN huecos: unión de las tres piezas oficiales con cierre morfológico (radio > medio corte). Es el
       // anillo oficial en todo su recorrido salvo los puentes donde estaban los cortes; los cortes vuelven a nacer de
@@ -302,7 +304,8 @@
       const cutNX = el('g', { mask: 'url(#notCross)' }, cut)
       const cutIn = el('g', { mask: 'url(#frontSector)' }, cutNX)
 
-      el('use', { href: '#ringClosed', color: '#000' }, cutIn)
+      S.cutClosed = el('use', { href: '#ringClosed', color: '#000' }, cutIn)
+      S.cutParam = el('use', { href: '#ringParamShape' }, cutIn)
       S.shipOuter = el('g', {}, S.cam)
       S.shipInner = el('g', {}, S.shipOuter)
       S.hullWrap = el('g', { mask: 'url(#shipMask)' }, S.shipOuter)
@@ -321,6 +324,12 @@
 
       S.shipHoleFront = el('g', { filter: 'url(#dilateGap)' }, xg)
       clone(S.src.ship, S.shipHoleFront, { fill: '#000' })
+      // El anillo del giro también se abre alrededor de la nave: en su sector trasero y en las zonas de cruce.
+      S.shipHoleP = el('g', { filter: 'url(#dilateGap)' }, el('g', { mask: 'url(#backSector)' }, pmk))
+      clone(S.src.ship, S.shipHoleP, { fill: '#000' })
+      clone(S.src.front, S.shipHoleP, { fill: '#000', mask: 'url(#finOnly)' })
+      S.shipHolePF = el('g', { filter: 'url(#dilateGap)' }, el('g', { 'clip-path': 'url(#crossZones)' }, pmk))
+      clone(S.src.ship, S.shipHolePF, { fill: '#000' })
       S.frontOuter = el('g', { mask: 'url(#frontCut)' }, S.cam)
       S.frontG = el('g', { mask: 'url(#frontSector)' }, S.frontOuter)
       S.frontUse = el('use', { href: '#ringClosed' }, S.frontG)
@@ -696,8 +705,9 @@
         planet: e.standard(seg(1450, 1850)),
         planetSettle: settle(seg(1700, 2100)),
         gapsPlanet: e.emphasized(seg(1500, 1850)),
-        ringSwap: seg(1820, 1900),
-        patch: 1 - e.standard(seg(2080, 2250)),
+        // La nave vuela sobre el anillo del giro (continuo); el anillo oficial, con sus cruces, entra de golpe recién
+        // cuando la nave está en su lugar y los tapa.
+        ringSwap: t >= 2250 ? 1 : 0,
         ship: e.emphasized(seg(1550, 2250)),
         swap: seg(2300, 2400),
         isoSettle: settle(seg(2250, 2450)),
@@ -727,11 +737,12 @@
         planet: back(e.standard(seg(1400, 1800))),
         planetSettle: 1,
         gapsPlanet: back(e.emphasizedAccelerate(seg(1400, 1700))),
-        ringSwap: back(seg(1650, 1730)),
-        patch: e.standard(seg(1100, 1300)),
+        // Oficial → anillo cerrado (1000–1080) → anillo continuo del giro (1085), todo antes de que la nave arranque.
+        ringSwap: t < 1085 ? 1 : 0,
         ship: back(e.emphasizedAccelerate(seg(1100, 1700))),
         shipExit: true,
-        swap: back(seg(1250, 1350)),
+        // El isotipo oficial cede a la construcción ANTES de que la nave arranque.
+        swap: back(seg(1000, 1080)),
         isoSettle: 1,
         cam: back(e.standard(seg(600, 1300))),
         letters: t,
@@ -782,6 +793,9 @@
       const toOfficial = st.ringSwap ?? 0 // 0 = anillo del giro · 1 = piezas oficiales
 
       set(S.ringParam, { d: ringD, fill: ringColor, 'fill-opacity': ringOp * (1 - toOfficial) })
+      S.ringParamShape.setAttribute('d', ringD)
+      S.cutClosed.setAttribute('visibility', toOfficial >= 0.5 ? 'visible' : 'hidden')
+      S.cutParam.setAttribute('visibility', toOfficial >= 0.5 ? 'hidden' : 'visible')
       S.backG.setAttribute('opacity', toOfficial)
       S.frontOuter.setAttribute('opacity', toOfficial)
       set(S.planetHoleP, { cx: 363.7, cy: 61.83, r: st.gapsPlanet > 0 ? (61.83 + S.gapPlanet) * st.gapsPlanet : 0 })
@@ -796,9 +810,15 @@
       S.hullInner.setAttribute('transform', `translate(${dx},0)`)
       S.shipHole.setAttribute('transform', `translate(${dx},0)`)
       S.shipHoleFront.setAttribute('transform', `translate(${dx},0)`)
+
+      for (const n of [S.shipHoleP, S.shipHolePF]) {
+        n.setAttribute('transform', `translate(${dx},0)`)
+        n.setAttribute('visibility', shipOn ? 'visible' : 'hidden')
+      }
+
       S.shipHoleFront.setAttribute('visibility', shipOn ? 'visible' : 'hidden')
       S.shipHole.setAttribute('visibility', shipOn ? 'visible' : 'hidden')
-      S.shipOuter.setAttribute('visibility', shipOn && toOfficial > 0 ? 'visible' : 'hidden')
+      S.shipOuter.setAttribute('visibility', shipOn ? 'visible' : 'hidden')
       for (const n of [S.offShip, S.offFin]) n.setAttribute('fill', col.logo)
       S.backUse.setAttribute('color', col.logo)
       S.frontUse.setAttribute('color', col.logo)

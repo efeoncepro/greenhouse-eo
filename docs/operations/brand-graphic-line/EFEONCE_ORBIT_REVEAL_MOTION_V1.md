@@ -43,8 +43,14 @@ nada. Las medidas se calculan en tiempo de ejecución, no se escriben a mano:
 - El **anillo trasero** se abre alrededor del planeta y de la silueta de la nave (dilatada por el aire oficial), en movimiento.
 - El **casco** se corta con el anillo delantero dilatado por el aire, salvo en las zonas de cruce, donde manda la nave.
 - La **aleta de cola** viaja con la nave y no se corta.
-- Al llegar, la construcción se reemplaza por el **isotipo oficial completo** (2300–2400 ms). La diferencia medida
+- **La nave vuela siempre sobre el anillo continuo del giro**, que también se abre a su alrededor (sector trasero y
+  zonas de cruce). El anillo oficial cerrado trae los escalones de sus cruces (la pieza delantera es más baja y gruesa
+  que la trasera), y esos escalones sólo quedan ocultos con la nave en su lugar: por eso entra **de golpe** a los
+  2250 ms, cuando la nave ya los tapa. Un fundido entre dos anillos casi iguales deja un contorno fantasma.
+- Luego la construcción se reemplaza por el **isotipo oficial completo** (2300–2400 ms). La diferencia medida
   entre ambos es de 183 px sobre el cuadro completo: invisible y resuelta por el cruce.
+- **No** se usa apertura morfológica para limpiar el casco: `feMorphology` tiene núcleo cuadrado y corta la punta de
+  la nave en ángulo recto y encuadra las ventanas.
 
 ## 4. Tiempos
 
@@ -64,7 +70,8 @@ en espacio logarítmico, para que el acercamiento se sienta constante.
 | Color de línea → color del logo | 1050–1750 | standard |
 | La esfera se vuelve planeta (asienta 1700–2100) | 1450–1850 | standard + resorte |
 | Se abre el aire del planeta | 1500–1850 | emphasized |
-| Nave entra por la izquierda | 1550–2250 | emphasized |
+| Nave entra por la izquierda (sobre el anillo del giro) | 1550–2250 | emphasized |
+| Relevo al anillo oficial cerrado | 2250 | instantáneo |
 | Isotipo asienta | 2250–2450 | resorte |
 | Cambio a isotipo oficial | 2300–2400 | lineal |
 | Cámara a la «o» + halo baja | 2450–3250 | standard |
@@ -77,9 +84,9 @@ en espacio logarítmico, para que el acercamiento se sienta constante.
 | Tramo | ms | Curva |
 |---|---|---|
 | Letras se recogen | 300–800 | emphasized |
+| Isotipo oficial → anillo cerrado → anillo continuo | 1000–1080 · 1085 | lineal · instantáneo |
 | Cámara vuelve al isotipo héroe + halo | 600–1300 | standard |
 | Nave sale por la derecha, acelerando | 1100–1700 | emphasizedAccelerate |
-| Cambio de isotipo oficial a construcción | 1250–1350 | lineal |
 | Se cierra el aire del planeta | 1400–1700 | emphasizedAccelerate |
 | El anillo se endereza, afina y toma el color de línea | 1400–2200 | standard |
 | El arco se abre y el anillo respira a 1,18 | 2000–2800 | emphasized |
