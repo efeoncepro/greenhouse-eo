@@ -389,6 +389,12 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   la ropa de las referencias. El comando avisa.
 - **Editar conserva, generar reconstruye.** Para un ángulo nuevo de una persona, **edita su foto aprobada**;
   generar desde cero redondea el rostro (cuatro iteraciones lo probaron).
+- 🔴 **Para poner a Julio (o Nexa) en una escena ajena, REGENERA la escena con `foto:generar`; NUNCA injertes la
+  cara** **[operador, 2026-09-26]**. Tres métodos de injerto fueron rechazados (cara que crece, mirada perdida, «como un
+  mandril»); la escena completa con identidad por ficha fue aprobada. Cabeza casi frontal y giran los ojos (el tres cuartos
+  marcado se lee «de lado como un mono»); con dos personas, la mirada va al otro o al mismo objeto. Editar por zona sólo
+  sirve para corregir a la segunda persona sobre una foto ya aprobada. Receta: `EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`
+  §Delta 2026-09-26.
 - **Retrato: 85 mm f/2, nunca 35 mm de cerca** **[del brief aprobado]**. El gran angular a distancia de retrato
   **ensancha y distorsiona el rostro**: parte de lo que se lee como «no es ella» es el lente, no deriva de identidad.
   La pieza aprobada es *chest-up medium close-up, 85 mm f/2*.

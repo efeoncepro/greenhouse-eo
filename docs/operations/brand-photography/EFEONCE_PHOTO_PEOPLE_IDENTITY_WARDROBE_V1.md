@@ -731,3 +731,45 @@ selección existente; no altera los assets ni el orden del manifiesto.
 
 Bitácora con las seis piezas, sus palancas y los errores de proceso:
 `ai-generations/2026-09-21_nexa-uniforme-terreno/LEEME.md`.
+
+## Delta 2026-09-26 — poner a Julio en una escena: regenerar la escena, nunca injertar la cara **[operador · medido]**
+
+Caso: las fotos del banco del 19-09 (J2, JN1–JN4, M1, M3, M4) se hicieron con el set de identidad retirado. Al
+corregirles el rostro se probaron cuatro métodos el mismo día; el operador aprobó sólo los que regeneran la escena.
+
+| Método | Resultado | Veredicto del operador |
+|---|---|---|
+| Injerto de cara con 2 refs sobre la escena completa | La cara crece, se alarga; retoca a la otra persona en cuadro | «parece que mi cara hubiese crecido» |
+| Injerto con las 11 refs sobre la escena completa | La mirada se va a cámara (las refs son frontales) | «mirada perdida, típico de IA» |
+| Recorte de la cabeza + ángulo + pegado con borde difuso | Escena intacta, pero la cara se fuerza al sonreír o de lado | «como un mandril», «muy forzado» |
+| **Escena completa con `pnpm foto:generar` (Sunburst)** | Identidad, pose y mirada coherentes | **aprobada** (J2 v8, JN4 v7, M1 v7) |
+
+**Receta que funcionó** (fichas en `ai-generations/2026-09-26_julio-m1-rostro/v7/`):
+
+1. **Describir la escena original como ficha** (`formato`, `identidad`, `objetos`, `escena`, `lecho`) y generar con
+   `pnpm foto:prompt` → `pnpm foto:generar`. El modelo construye a Julio en la pose; no le pega una cara encima.
+2. **La cabeza casi no gira: giran los ojos.** Un tres cuartos marcado empuja boca y mandíbula hacia adelante y se lee
+   «de lado como un mono» (J2 v7, rechazada). Pedir la cabeza casi frontal con los marcadores del casi-frontal y
+   mover sólo los iris hacia el objetivo (J2 v8, aprobada). Evitar tres cuartos marcados y perfiles de Julio en escena.
+3. **La mirada necesita un destino físico en cuadro.** Con dos personas, o se miran entre sí (líneas de mirada que se
+   encuentran) o miran el MISMO objeto (atención compartida: JN4 v7). Miradas a lados distintos delatan la IA.
+4. **Sonrisa con la boca cerrada y nada apoyado en la cara.** La mano en la mejilla y la risa abierta deforman el
+   rostro en edición y en generación.
+5. **Uniforme y utilería desde el kit**, no desde la descripción: `objetos: ["polo-efeonce"]` trae el piqué navy con su
+   isotipo (verificar con `pnpm foto:emblema`); la utilería se declara con precisión de oficio (tablet actual, cámara de
+   cine de gran formato con matte box, follow focus, óptica cine, V-mount, monitor) y sin marcas legibles.
+6. **Luz con carácter, si la escena salió plana, se agrega reiluminando la misma foto** (edición con la foto aprobada
+   como imagen 1 y dos refs de identidad sólo para sostener la cara): un haz duro y estrecho, contraluz baja que
+   recorta pelo y hombro, sala en oscuros ricos. La primera pasada tiende a quedar tímida; se pide «visible a simple
+   vista» y un lado del rostro en sombra abierta (M1 v7 + luz, aprobada).
+
+**Dónde sí sirve editar por zona:** corregir a la SEGUNDA persona cuando la primera ya está aprobada (Nexa en M3 v5,
+aprobada): recorte de su cabeza, edición sutil con sus anclas canónicas y la vista del set que coincide con su giro,
+y pegado con borde difuso sobre la foto aprobada. Con dos personas, el modelo nunca respeta del todo a la que no se
+edita, así que no se le pide «no toques a la otra»: se compone por zona.
+
+«Editar conserva, generar reconstruye» sigue valiendo para **derivar vistas o vestuario de una foto aprobada de la
+misma persona**; no para cambiar la identidad de alguien dentro de una escena ajena.
+
+El perfil derecho del set (`julio-perfil-der.png`) se reemplazó el 26-09 por una v2 regenerada desde el perfil izquierdo
+aprobado; el anterior deformaba el perfil. Lock de assets resellado.
