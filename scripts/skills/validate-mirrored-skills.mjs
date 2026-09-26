@@ -136,6 +136,15 @@ const mirroredSkills = [
     claude: '.claude/skills/efeonce-marketing-studio',
   },
   {
+    // EPIC-049 — planificar campañas con IA sobre Studio, ICP y Search Visibility 360. Codex y Claude deben
+    // aplicar las mismas reglas de fuente/fecha, canales canónicos y niveles de gobierno (T0/T1/T2): un drift aquí
+    // produce dos planes con criterios distintos sobre qué puede escribir, aprobar o gastar un agente.
+    id: 'efeonce-campaign-planning',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-campaign-planning',
+    claude: '.claude/skills/efeonce-campaign-planning',
+  },
+  {
     // La operación de imágenes comparte código, modelos y restricciones de formato. Una divergencia
     // entre agentes puede convertir una capacidad preview del proveedor en un fallback deprecated.
     id: 'greenhouse-ai-image-generator',

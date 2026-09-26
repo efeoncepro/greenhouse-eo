@@ -520,10 +520,17 @@
         "renditions de piezas",
         "EPIC-049",
         "TASK-1890",
-        "TASK-1891"
+        "TASK-1891",
+        "planificar campaña",
+        "plan de campaña",
+        "estrategia de campaña",
+        "message house",
+        "matriz de audiencias",
+        "plan de contenidos de campaña"
       ],
       "skills": [
         "efeonce-marketing-studio",
+        "efeonce-campaign-planning",
         "efeonce-mcp-platform"
       ],
       "sources": [
@@ -531,7 +538,8 @@
         "docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md",
         "docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md",
         "docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md",
-        "docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md"
+        "docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md",
+        "docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md"
       ]
     },
     {
