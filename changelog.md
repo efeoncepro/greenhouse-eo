@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-26 — Marketing Studio: capa de estrategia y operación híbrida con agentes (ADR aceptados)
+
+Quedaron aceptadas tres decisiones de EPIC-049. Studio + un bucket GCP son la fuente única de los archivos de campaña, con
+ingesta por CLI, MCP y agentes sobre un solo command. La capa de estrategia suma catálogo de canales, referencia al ICP
+de la organización, plan de campaña, plan SEO/AEO sobre Search Visibility 360, IA con procedencia y medición de solo
+lectura, todo operable por agentes con niveles de riesgo (T0 lectura, T1 borradores reversibles, T2 aprobar/publicar/
+gastar con confirmación humana). La operación híbrida reparte cada campaña en work items asignables a personas o a roles
+de agente (planificador de medios, SEO/AEO, copywriter, QA creativo, analista), con un despachador en Studio y
+adaptadores Claude y OpenAI detrás de flags. Tasks TASK-1905–1916 en to-do; sin cambios de runtime todavía.
+
 ## 2026-09-26 — Firma de correo v3.1 aprobada: zona de partners y contrato `efeonce.email-signature`
 
 El operador aprobó la firma de correo en sus dos versiones (A sobre papel, B tarjeta navy). La línea que termina en la
@@ -550,17 +560,3 @@ Agent Hub, Agent Builder, Breeze y Scheduled Prompts, además de Developer Platf
 Se documentan requisitos de portal, plan, créditos, permisos, consentimiento, Audit Log y la separación entre
 capacidad anunciada, elegibilidad y runtime. También queda registrada la deprecación de APIs y apps legacy, con
 enforcement previsto para septiembre de 2027. [Detalle](docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md)
-
-## 2026-09-16 — Flux 3 entra a `pnpm ai:fal`, y Seedance ya sabe hacer video a video sin sorpresas
-
-Flux 3 llegó al CLI completo y con sus 12 endpoints probados en real. En fal no es un modelo de imagen sino
-de video: texto, imagen, primer y último cuadro, y keyframes a video; edición y extensión de un clip
-existente; y un flujo de borrador que cuesta USD 0,03 por segundo y después se sube a calidad final sin volver
-a generar la toma. Las pruebas destaparon dos trampas de la extensión: el clip de origen tiene que traer pista
-de audio (sin ella fal acepta el trabajo y lo rechaza después) y lo que devuelve es sólo la continuación, no el
-clip completo. El CLI ahora revisa el audio antes de subir.
-
-Al revisar cómo hace video a video Seedance, apareció que no tiene un endpoint propio: la 2.5 edita y extiende
-dentro de reference-to-video con `--task`, y la 2.0 sólo usa el video como guía. El registro tenía mal la
-duración mínima (4 s, no 1) y no declaraba cuántas referencias acepta cada versión; ambas cosas quedaron
-corregidas y validadas antes de encolar. La edición y extensión con Seedance 2.5 siguen sin probarse en real.
