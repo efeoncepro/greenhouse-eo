@@ -4,7 +4,7 @@
 
 **Marketing Studio (26/09):** [TASK-1893](docs/tasks/complete/TASK-1893-marketing-studio-original-asset-store-media-worker.md) y [TASK-1896](docs/tasks/complete/TASK-1896-marketing-studio-observability-restore.md) complete en producción (release `92002873ced9`, PR #243), junto a 1890/1891; restauración probada (job 49 s) y EPIC-049 con ese exit criterion cumplido. Follow-ups no bloqueantes en cada task. Gateway en `efeonce-mcp-gateway-00063-l9j`; sigue sin probar en vivo la denegación a una persona sin capability (1891).
 
-**Marketing Studio — estrategia y agentes (26/09):** ADR de [estrategia](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) y [agentes híbridos](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) `Accepted`; TASK-1905–1916 to-do. Bloqueo: delegación `act` sin unidad en EPIC-044.
+**Marketing Studio — estrategia y agentes (26/09):** ADR de [estrategia](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) y [agentes híbridos](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) `Accepted`; TASK-1905–1916 to-do. Delegación `act`: [TASK-1917](docs/tasks/to-do/TASK-1917-efeonce-id-agent-run-delegation-act.md).
 
 **Insights (26/09):** [TASK-1888](docs/tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md) **complete**: contrato editorial v2 en producción (flag ON en Vercel staging/Production y `ops-worker-00719-gbm`, gateway v1.9.0, canary sintético `insed-f5768172…` con plan v2). Rollback = flag OFF en los dos runtimes (`FEATURE_FLAG_STATE_LEDGER.md`). Siguen TASK-1889 (catálogos) y TASK-1903 (agente redactor).
 
