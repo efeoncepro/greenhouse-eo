@@ -3,7 +3,7 @@
 > **Tipo de documento:** Índice operativo de carpeta
 > **Versión:** 1.5
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-26 por Claude (convergencia con la línea gráfica: capa gráfica sobre la foto aprobada sólo en los casos de la línea, la lente como reserva del texto, P1–P12 y P-1..P-9; antes: regla de la firma, órbita sobre la foto y marca fotografiada desde el arte plano)
+> **Última actualización:** 2026-09-26 por Claude (la capa gráfica sobre la foto queda aprobada; guía «El porqué» en AXIS; antes, el mismo día: convergencia con la línea gráfica, la lente como reserva del texto, P1–P12 y P-1..P-9; antes: regla de la firma, órbita sobre la foto y marca fotografiada desde el arte plano)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Bitácora del caso](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida de evidencia](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md)
 
 Esta carpeta guarda el **Lenguaje Fotográfico de la marca propia de Efeonce**, aprobado por el operador (Julio
@@ -104,9 +104,9 @@ caja toca a las personas. Hay punto dulce, no monotonía.
 
 ## Delta 2026-09-26 (b) — convergencia con la línea gráfica: decisiones del operador
 
-- 🔴 **Capa gráfica sobre la foto: aprobada sólo en los casos declarados de la línea gráfica** **[decisión del
-  operador, P-5]** —la voz pregunta–respuesta, la lente y la medida con fuente—. Para todo lo demás sigue **no
-  aprobada**, como dice el estado del 2026-09-19 más abajo.
+- 🔴 **Capa gráfica sobre la foto: aprobada** **[decisión del operador, 2026-09-26]**. Primero se aprobó sólo para
+  los casos de la línea gráfica (P-5: voz pregunta–respuesta, lente y medida con fuente); el mismo día el operador
+  la aprobó entera. Se compone sobre las reservas de la toma, con los compositores canónicos y sin scrim.
 - **La lente cuenta como reserva del texto** (P-1): su exterior apagado es un tratamiento de la línea, no un velo.
   **«Nunca un scrim» sigue vigente para toda pieza sin lente.**
 - Aprobadas las reglas de sinergia P1–P12 y resueltos los conflictos P-2..P-9 (lecho pedido igual en piezas con lente,
@@ -144,13 +144,12 @@ Conserva foto sin scrims, reservas y firma; la superficie del CTA no habilita pa
 ## Delta 2026-09-19 (tarde)
 
 - [**Reserva de espacio en la toma**](EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) — **aprobado (capa fotográfica)**: las cuatro reservas (texto, objeto para enmarcar, lecho de firma, aire para cursores), tono declarado, límite de cabezas, formato nativo, nunca scrim, medir antes de componer.
-- [Espacio para texto y formatos nativos](EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md) — bitácora de la ronda: zona de titular con tono declarado y límite de cabezas; 4:5, 9:16 y 16:9 nativos. **Su capa de composición no está aprobada** (ver estado abajo).
+- [Espacio para texto y formatos nativos](EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md) — bitácora de la ronda: zona de titular con tono declarado y límite de cabezas; 4:5, 9:16 y 16:9 nativos. **Sus piezas compuestas fueron rechazadas; valen sus reglas** (ver estado abajo).
 
-> **Estado 2026-09-19:** aprobado el **lenguaje fotográfico** (maestro, firma, colorimetría, cámaras, personas,
-> prompts/pipeline). **NO aprobada** la capa de composición gráfica sobre la foto (salvo, desde el 2026-09-26, en los
-> casos declarados de la línea gráfica: voz pregunta–respuesta, lente y medida con fuente): las pruebas de
-> `EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md` fueron rechazadas por el operador y ese documento vale por sus
-> reglas y prohibiciones, no por sus ejemplos.
+> **Estado:** aprobado el **lenguaje fotográfico** (maestro, firma, colorimetría, cámaras, personas,
+> prompts/pipeline) el 2026-09-19, y **la capa gráfica sobre la foto** el 2026-09-26 (decisión del operador). Las
+> pruebas compuestas de `EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md` fueron rechazadas por el operador: ese documento
+> vale por sus reglas y prohibiciones, no por sus ejemplos.
 
 
 ## 🔴 Componer lo sensible, y que el modelo sólo TERMINE **[operador, 2026-09-21]**

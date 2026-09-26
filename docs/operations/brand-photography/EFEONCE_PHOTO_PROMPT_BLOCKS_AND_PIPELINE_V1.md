@@ -1,9 +1,9 @@
 # Bloques de prompt y pipeline de producción — fotografía de marca Efeonce V1
 
 > **Tipo de documento:** Especificación técnica de producción (prompts, comandos, scripts, QA)
-> **Versión:** 1.0
+> **Versión:** 1.3
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-20
+> **Última actualización:** 2026-09-26 por Claude — conteo de palancas de encuadre alineado con el código (24), cinco descartadas, columna de texto del 16:9 en 0,42 como `foto:prompt` y `foto:validar`. Antes: 2026-09-22 (lecho de finales verticales) y 2026-09-21 (editar con otro aspect ratio reencuadra)
 > **Documentación relacionada:** [Índice](./README.md) · [Lenguaje fotográfico (maestro)](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma: primer plano y logo](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras, lentes y ángulos](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Personas, identidad y vestuario](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Manual de uso](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
 
 Este documento es el **cómo se produce**: los bloques de texto que incorpora `pnpm foto:prompt` en cada prompt, la ficha de
@@ -390,13 +390,13 @@ el error que la guarda ahora nombra.
 
 ### 3.10 Palancas de encuadre y punto de vista — `palanca` **[aprobadas 2026-09-20]**
 
-**Veintitrés** palancas, probadas en seis rondas del 2026-09-20 (`palancas-nuevas/`, `palancas-disruptivas/`,
+**Veinticuatro** palancas, probadas en las rondas del 2026-09-20 y del 2026-09-21 (`palancas-nuevas/`, `palancas-disruptivas/`,
 `palancas-ronda3/`, `palancas-con-color/`, `palancas-podcast/`, `palancas-oficio-digital/`). Se declaran con el campo `palanca` y **UNA sola por pieza**.
 
 > **El dueño del catálogo es [`EFEONCE_PHOTO_LEVERS_CATALOG_V1.md`](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md)**: ahí
-> están las 23 con su ficha completa —qué es, cómo se logran, marcadores verbatim, evidencia, qué no hacer—, las
+> están las 24 con su ficha completa —qué es, cómo se logran, marcadores verbatim, evidencia, qué no hacer—, las
 > otras tres familias de palancas (5 siempre activas · 4 atmósferas · acción suspendida), las 20 tomas de cámara
-> y las cuatro descartadas. Esta tabla conserva **las cinco primeras**, que son las que nacieron en esta spec.
+> y las cinco descartadas. Esta tabla conserva **las cinco primeras**, que son las que nacieron en esta spec.
 
 | `palanca` | Qué hace | Marcadores que emite | Exige |
 |---|---|---|---|
@@ -806,7 +806,7 @@ azules, pintura) **[criterio]**.
 
 | Reserva | Umbral | Origen |
 |---|---|---|
-| 1 · zona de texto | contraste ≥ 4,5:1 con alguna tinta **y calma L\* < 0,5**; banda ≥ 0,28 del alto (vertical) o ≥ 0,45 del ancho (16:9) | **[medido]** ronda `texto` |
+| 1 · zona de texto | contraste ≥ 4,5:1 con alguna tinta **y calma L\* < 0,5**; banda ≥ 0,28 del alto (vertical) o ≥ 0,42 del ancho (16:9) | **[medido]** ronda `texto` |
 | 2 · objeto para enmarcar | trazo `#a6cdf5` ≥ 3:1 en los **cuatro** lados del perímetro de la caja | **[medido]** capa gráfica |
 | 3 · lecho de la firma | mejor tinta ≥ 4,5:1 **y** nitidez < 0,004 — **señal débil, ver §5.1** | **[frágil]** |
 | 4 · aire para cursores | calma L* < 1,0 en ambos costados | **[criterio]** |

@@ -120,9 +120,10 @@ haz de la contra visible cruzando la sala; el haz, su resplandor y **cada mancha
 mitad del cuadro**) · **tres planos** (primer plano desenfocado · sujeto nítido · al fondo, fuera de foco, un
 segundo brazo con pop filter tomando el rim).
 
-**Contradicción documental abierta [pendiente]:** el canon declara que **la capa gráfica sobre la foto NO está
-aprobada** (2026-09-19) y **todas las piezas publicadas del registro B la usan** (titular, cursores, bounding box,
-chip). O se aprueba, o se declara que esas piezas viven bajo otro contrato.
+**Capa gráfica aprobada [operador, 2026-09-26]:** se cerró la contradicción entre el canon del 2026-09-19 y las
+piezas publicadas del registro B. La capa gráfica sobre la foto (titular, cursores, bounding box, chip, CTA y la voz
+de la línea gráfica) **está aprobada**. Se compone sobre las reservas de la toma con los compositores canónicos,
+sin scrim; los ejemplos rechazados del 2026-09-19 siguen sin valer como referencia.
 
 **El podcast, medido:** las dos piezas previas fallaron —`rondas/paleta/P2-podcast` **rechazada** por lámparas
 prácticas encendidas (**b\* de altas luces +20,1**, look de podcast de stock) y `rondas/personas/JN2-podcast`
@@ -215,7 +216,7 @@ en `bottom-end`** — en `top-end` su etiqueta cae sobre la entrada y se come el
 | Para qué | **Descanso visual**: relaja el feed | Dice algo concreto |
 | Reserva | No necesita | **Obligatoria, declarada en la toma** |
 | Cómo | `foto:prompt` → `foto:validar` | `foto:prompt` con `reservas` → `foto:validar --zona-texto` → `foto:componer` (con CTA: `foto:componer:cta` → `foto:cta:gate`) |
-| Estado | **aprobada** | **capa SIN aprobar** (2026-09-19); el CTA funcional sí está aprobado ([Tres voces + acción](../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md), 2026-09-22) |
+| Estado | **aprobada** | **aprobada** (operador, 2026-09-26); el CTA funcional sigue su contrato ([Tres voces + acción](../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md), 2026-09-22) |
 
 **NUNCA escribas un compositor nuevo.** `foto:componer` es el de «Nivel de búsqueda» con su gramática de voces
 intacta; escribir otro ya se intentó y el operador rechazó las piezas enteras. Con CTA, el canónico es

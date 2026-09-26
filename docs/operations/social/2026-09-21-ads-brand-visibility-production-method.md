@@ -116,6 +116,6 @@ aportaba al riesgo, ocupando la línea más cara de la pieza.
 
 - **El emblema del pecho varía entre piezas.** Las frontales usan la vista puesta oficial y aun así el
   bordado chico deriva. El canon prohíbe publicar el emblema como sale del generador.
-- **La capa gráfica sigue formalmente sin aprobar** (canon 2026-09-19), y estas piezas la usan.
+- ~~La capa gráfica sigue formalmente sin aprobar~~ **Resuelto el 2026-09-26: el operador aprobó la capa gráfica sobre la foto.**
 - **Nada de esto está pauteado ni medido**: faltan variantes por ángulo, carrusel, video, message match
   contra la landing, eventos en GTM y plan de medios.
