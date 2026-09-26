@@ -44,9 +44,29 @@ naturales y hasta dos énfasis semánticos. El agente puede sustituir todo el co
 `intervention` a otros fragmentos sin copiar el HTML/CSS del Lab. Cada adapter conserva la medición y el QA de
 su propio motor.
 
-La firma web usa el asset fijo de Artifact Composer `assets/url-lum.svg`, no una placa textual. Greenhouse lo
-compone contra el fondo final con el blend no separable `luminosity` y opacidad `0.72`; su QA comprueba hash,
-geometría vectorial y diferencia raster visible. Por eso un SVG declarado pero invisible no cuenta como entrega.
+**La firma de una pieza gráfica es el logo de Efeonce centrado** (regla del operador, 2026-09-26). La burbuja URL
+(`efeoncepro.com`) no se agrega por defecto: sólo reemplaza al logo cuando el logo de Efeonce ya aparece dentro de la
+imagen —un mockup, un objeto, merch—, y entonces va sola, centrada y fusionada con el fondo, nunca a un costado ni
+junto al logo. Esa fusión deja a la burbuja legible sólo sobre un fondo muy oscuro, así que como firma se dibuja a
+opacidad plena y una medición exige un contraste de al menos 4,5:1. Los pies de deck, informe, papelería y firma de
+mail siguen llevando la burbuja como antes.
+
+Cuando se usa, la burbuja es el asset fijo de Artifact Composer `assets/url-lum.svg`, no una placa textual. Greenhouse
+la compone contra el fondo final con el blend no separable `luminosity`: a opacidad 1 en las piezas nuevas que firman
+con ella, y a `0.72` en los contratos y piezas anteriores a la regla, que no cambian. Su QA comprueba hash, geometría
+vectorial y diferencia raster visible, y en la firma nueva también el contraste. Por eso un SVG declarado pero
+invisible no cuenta como entrega.
+
+> Detalle técnico: [firma fotográfica §5.1](../../operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26)
+> (números medidos) · [compositor CTA §19.6](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#196-la-firma-cinco-maneras-de-declararla)
+> (tramo 17, `marcaEnEscena`) · `brand.signature` en `pnpm creative:layout`.
+
+La **línea gráfica «La órbita»** —anillo fino, arco con esfera y halo— es la forma de la marca propia de Efeonce y su
+familia. Un agente puede sumarla a una pieza sólo en casos específicos (una lente, una medida con dato real, un
+progreso, un foco) y declarándola a propósito: **no reemplaza la composición ni las formas del lenguaje
+fotográfico**, nunca va por defecto y nunca cruza a la persona o el objeto principal, el espacio del texto, el lecho
+ni la firma. No se usa en piezas de clientes ni en la interfaz de Greenhouse. Qué es y cuándo usarla:
+[línea gráfica de Efeonce](linea-grafica-efeonce.md).
 
 ## Tres voces + acción
 
@@ -69,6 +89,8 @@ La aprobación de estos estilos no aprueba las piezas completas ni demuestra con
 - cursores decorativos separados de su identidad o que no señalan semánticamente al objeto seleccionado;
 - bounding boxes fijos que cambian el aire al variar el copy o el formato.
 - taglines partidos en fragmentos independientes, con palabras pegadas o huecos creados para llenar el ancho;
+- la burbuja URL agregada por defecto a una pieza, o junto al logo;
+- la órbita puesta por defecto o cruzando la foto, el texto o la firma.
 
 ## Relación con MCP
 

@@ -2456,7 +2456,10 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // la concede insights.report.read.
   { key: 'insights.cover_preference.manage', module: 'insights', actions: ['read', 'update'] as const, defaultScope: 'tenant' },
   // TASK-1890 — leer Marketing Studio por API/MCP. El gateway la verifica para la persona; Studio acota por organización.
-  { key: 'marketing_studio.campaign.read', module: 'marketing_studio', actions: ['read'] as const, defaultScope: 'tenant' }
+  { key: 'marketing_studio.campaign.read', module: 'marketing_studio', actions: ['read'] as const, defaultScope: 'tenant' },
+  // TASK-1893 — obtener el enlace de descarga (vida corta, auditado) del original de una versión aprobada. Separada de
+  // la lectura: ver una campaña no autoriza a llevarse el archivo final.
+  { key: 'marketing_studio.asset.download', module: 'marketing_studio', actions: ['read'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

@@ -980,7 +980,7 @@ incluye catálogo y PNGs.
 (sobre `main`, PR #239 → `ebb9212a3`); manifest `ebb9212a32ce-388b8af7-e133-4ea3-9441-2bbf00a157b7` en `released`.
 Producción rinde `report_pdf` con `insights-report` y `deck_pdf` con `insights-deck`; el canary de contrato del lane
 ecosystem devolvió `renderableOutputs` = `["deck_pdf","report_pdf"]`. El primer render productivo de esos catálogos
-todavía no se ejercitó. `develop` recibió el código del release en `e15d71648`.
+todavía no se ejercitó. `develop` recibió el código del release en `6d78817bb` (antes `e15d71648`).
 
 **Límite honesto de las familias:** el planner determinista emite `bar` y `bar_grouped`. Las otras
 13 tienen geometría probada con fixtures y **ningún productor**; no se ofrecen como disponibles.
@@ -1104,10 +1104,10 @@ dominio del grader). Métricas por página o keyword de SEO, conjuntos por consu
 
 ### 14.9 Estado de TASK-1889 — catálogos premium del canvas (code complete 2026-09-25, rollout pendiente)
 
-**Qué existe (en `develop`, sin push ni release).** Commits: Slices 1–2 `d357e0224`, `b649080c7`; Slice 3
-`4ff72fe3a` (+ evidencia `2410e5156`); Slice 4 `3fa493efe` (plantillas de figura) y `85785e7fc` (mappers + retiro del
-legado), docs `1120e86e4`/`5968e35e8`; excepción aprobada `289b6eca4`; «Lo esencial» `738ceb748`; correcciones por
-ediciones reales `b88fd447c`; dossier + scorecard `9529a1b25`.
+**Qué existe (en `develop`, sin push ni release).** Commits: Slices 1–2 `61d1ef690` (antes `d357e0224`), `4a4c77748` (antes `b649080c7`); Slice 3
+`5c2bcb5a1` (antes `4ff72fe3a`) (+ evidencia `8075a2930` (antes `2410e5156`)); Slice 4 `f0b0d78cc` (antes `3fa493efe`) (plantillas de figura) y `30c11aba7` (antes `85785e7fc`) (mappers + retiro del
+legado), docs `29a54885e` (antes `1120e86e4`)/`3709d9424` (antes `5968e35e8`); excepción aprobada `7ab466c88` (antes `289b6eca4`); «Lo esencial» `ae2c34b59` (antes `738ceb748`); correcciones por
+ediciones reales `198ce883a` (antes `b88fd447c`); dossier + scorecard `2f0776e0f` (antes `9529a1b25`).
 
 | Pieza | Dónde | Estado |
 |---|---|---|
@@ -1141,7 +1141,7 @@ figura crece. `withDeckFigureSize` elige 132/112/104 px según el largo de la ci
 
 **Metas (`bullet`).** Escala propia por fila (1,1 × máximo), marca de meta y «mayor brecha» decidida con todas las
 filas y la dirección. La zona de atención se dibuja **sólo** desde `band` = `bandFactId` (límite del registro ICO,
-emitido por TASK-1888, `80952ed7f`); sin banda, pista única. Nunca un umbral a mano: se quitó un `0,85 × meta` tras
+emitido por TASK-1888, `1a1d70cf2` (antes `80952ed7f`)); sin banda, pista única. Nunca un umbral a mano: se quitó un `0,85 × meta` tras
 la revisión de la sesión de TASK-1846. `lower_is_better` usa la clase `bullet--lower`, que invierte el lado oscuro.
 
 **«Lo esencial» (`plan.essentials` v2).** `report-summary` / `insights-summary` con tesis, bajada y hasta 5
@@ -1164,7 +1164,7 @@ ISSUE-122). `ui:quality` PASS 4,59 (piso 4,2 en densidad: una figura ICO de una 
 
 **Verificado con ediciones reales (local).** `scripts/insights/preview-edition.ts --editorial-v2` entrega el logo con
 el mismo lector del worker (su única escritura es el access log): Berel SEO+AEO `EO-INS-000019` (16 páginas / 13
-láminas) y Sky ICO `EO-INS-000022` (12 / 9). Revelaron y quedó corregido en `b88fd447c`: métricas SEO con el mismo
+láminas) y Sky ICO `EO-INS-000022` (12 / 9). Revelaron y quedó corregido en `198ce883a` (antes `b88fd447c`): métricas SEO con el mismo
 canal `google` iban a un eje común (ahora comparación); la capitular quedaba suelta en párrafos cortos (ahora
 `narrativeDropCapHook`, sólo con ≥ 3 líneas); presupuestos de texto — `runningSection` A4 44, sección del deck 44,
 `figureTitle` del deck 56, nombre de métrica en 2 líneas, etiqueta de columna hasta 3 líneas.

@@ -66,6 +66,10 @@ const contractSchema = z
     brand: z.object({
       logo: z.string().min(1),
       url_bubble: z.string().min(1).optional(),
+      // Graphic line signature rule (operator, 2026-09-26): the piece signs with the Efeonce logo, centered; the URL
+      // bubble signs instead only when the Efeonce logo already appears in the image, also centered and blended.
+      // Contracts written before the rule omit it and keep their layout (flagged in QA, never re-rendered).
+      signature: z.object({ brand_in_scene: z.boolean() }).strict().optional(),
       fonts: z.object({
         regular: z.string().min(1).optional(),
         medium: z.string().min(1),
@@ -154,6 +158,16 @@ const contractSchema = z
             delta: z.string().min(1),
             input_policy: z.string().min(1)
           }),
+          // Optional graphic line layer (AXIS `efeonce.graphic-line-orbit`): an intent file with ring elements only. The
+          // orbit is declared on purpose, never a default; it never crosses the copy field or a protected subject.
+          graphic_line: z
+            .object({
+              intent: z.string().min(1),
+              protect: z
+                .array(z.object({ id: z.string().min(1), kind: z.enum(['subject', 'reserve', 'bed']), box: normalizedBox }))
+                .default([])
+            })
+            .optional(),
           layout: z.object({
             copy_fade_mid: z.number().min(0).max(1),
             copy_fade_end: z.number().min(0).max(1),
@@ -219,6 +233,27 @@ const contractSchema = z
           message: 'supportingTagline accepts at most two semantic emphasis segments'
         })
       }
+    }
+
+    if (contract.brand.signature) {
+      const bubble = contract.brand.signature.brand_in_scene
+      const centered = (left, width, canvas) => Math.abs(left + width / 2 - canvas / 2) <= 1
+
+      if (bubble && !contract.brand.url_bubble) {
+        context.addIssue({ code: 'custom', path: ['brand', 'url_bubble'], message: 'brand_in_scene signs with the URL bubble: brand.url_bubble is required' })
+      }
+
+      contract.formats.forEach((format, index) => {
+        const { logo, url } = format.layout
+
+        if (!bubble && !centered(logo.left, logo.width, format.canvas.width)) {
+          context.addIssue({ code: 'custom', path: ['formats', index, 'layout', 'logo'], message: 'The signature logo is centered on the canvas width' })
+        }
+
+        if (bubble && (url.width === undefined || !centered(url.x, url.width, format.canvas.width))) {
+          context.addIssue({ code: 'custom', path: ['formats', index, 'layout', 'url'], message: 'The URL bubble signature is centered on the canvas width' })
+        }
+      })
     }
 
     if (contract.brand.url_bubble && contract.message.url !== 'efeoncepro.com') {

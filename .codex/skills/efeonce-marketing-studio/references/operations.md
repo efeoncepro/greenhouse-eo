@@ -40,7 +40,8 @@ pnpm import:catalog --catalog "<…>/Campaign Manager/CATALOGO-DATOS.json" \
 pnpm media:renditions --root "<…>/Alineación/5. Contenidos" --bucket <bucket> [--apply] [--force]
 ```
 
-- Import is idempotent (re-import inserts 0). Renditions: thumb 640 px / preview 1600 px WebP (quality 78/82),
+- Import is idempotent (re-import inserts 0). Since TASK-1893 it never degrades a `gcs` version and adopts a
+  catalog sha256 into the same null-sha version (same path) instead of inserting a new version. Renditions: thumb 640 px / preview 1600 px WebP (quality 78/82),
   videos framed at 1 s with `ffmpeg`, object named by version + sha, upload with `ifGenerationMatch=0`, row upsert.
   Requires ADC with write on the bucket. Order: staging DB/bucket first, then production.
 
@@ -108,7 +109,7 @@ Preconditions for turning the provider ON: Greenhouse release in production that
 includes the client in that deployment; secret `marketing-studio-mcp-gateway-token` readable by
 `efeonce-mcp-gateway@efeonce-group.iam.gserviceaccount.com`.
 
-GitHub repo variables (production environment): `MARKETING_STUDIO_PROVIDER_ENABLED` (currently `false`),
+GitHub repo variables (production environment): `MARKETING_STUDIO_PROVIDER_ENABLED` (`true` since 2026-09-26, revision `00061-sbc`),
 `MARKETING_STUDIO_API_URL=https://studio.efeonce.org`,
 `MARKETING_STUDIO_TOKEN_EXCHANGE_URL=https://greenhouse.efeoncepro.com/api/integrations/v1/sister-platforms/oauth/token`.
 The token secret is mounted only when the flag is `true` (the workflow checks the secret exists first).
@@ -131,8 +132,16 @@ MCP_STUDIO_CANARY_ACCESS_TOKEN=<short-lived Entra delegated token, efeonce.mcp.r
 [MCP_STUDIO_CANARY_DENY_ACCESS_TOKEN=<token of a person WITHOUT it>] pnpm studio:canary
 ```
 Cases: allow (attention + campaign detail + asset detail), preview image, foreign org ⇒ `not_found`, person without
-capability ⇒ `forbidden`, unreachable Studio ⇒ `upstream_unavailable`. No token is printed. Then open a real MCP session
-and call `studio.attention.get`.
+capability ⇒ `forbidden`, unreachable Studio ⇒ `upstream_unavailable`. No token is printed.
+
+⚠️ **The local canary only works if the Google ID token it mints comes from the gateway service account.** From a laptop,
+ADC is the operator, and the exchange rejects that actor. An `az account get-access-token` token is also rejected: its
+`azp` is Azure CLI, not the MCP client (`GREENHOUSE_MCP_ENTRA_AZP`). **The canonical live canary is a real MCP session:**
+1. Run PKCE with the public client `32617b87-e7ef-493a-838f-1ff3f0213b93` (callback `http://localhost:8765/callback`, scope
+   `https://mcp.efeonce.org/mcp/efeonce.mcp.read`).
+2. Keep the token in a `0600` file.
+3. Call `initialize` → `tools/list` → `tools/call` on `https://mcp.efeonce.org/mcp`.
+4. Delete the file.
 
 Rollback: set `MARKETING_STUDIO_PROVIDER_ENABLED=false` + dispatch (provider `policy-blocked`, tools not registered);
 or `gcloud run services update-traffic efeonce-mcp-gateway --project efeonce-group --region southamerica-west1 --to-revisions <prev>=100` (standard Cloud Run rollback, not yet exercised for this provider; the gateway runbook §Rollback is the canonical procedure).
@@ -141,3 +150,73 @@ Revoking the Studio `api_client` cuts the gateway immediately (gateway maps Stud
 Manifest change in the gateway: `STUDIO_REPO=… GREENHOUSE_REPO=… pnpm studio:manifest:sync` → tests
 (`test/marketing-studio*.test.ts`, `test/authorized-tools.test.ts`, version gate) → `pnpm surface:baseline` →
 bump `version` in `package.json` → PR → merge → dispatch. A description change is a breaking surface change (bump).
+
+## Observability and restore (TASK-1896, verified 2026-09-26)
+
+All infra is idempotent shell in the Studio repo, **dry-run by default** (`--apply` executes; secrets always piped):
+
+```bash
+SENTRY_ADMIN_TOKEN=… SENTRY_TEAM=… SENTRY_ALERT_MEMBER_ID=… bash scripts/ops/infra/sentry.sh [--apply]
+bash scripts/ops/infra/vercel-env.sh [--apply]                 # then redeploy production + preview
+ALERT_EMAIL=<Efeonce work email> bash scripts/ops/infra/monitoring.sh [--apply]   # rejects @gmail.com
+bash scripts/ops/infra/restore-rehearsal-job.sh [--apply] [--activate]            # scheduler born paused
+bash scripts/ops/infra/greenhouse-health-client.sh [--apply]   # studio:health client → Greenhouse secret
+```
+
+Restore rehearsal (details: `docs/operations/marketing-studio/MARKETING_STUDIO_RESTORE_RUNBOOK.md`):
+
+```bash
+STUDIO_PG_HOST=127.0.0.1 STUDIO_PG_PORT=15433 STUDIO_PG_USER=marketing_studio_restore \
+STUDIO_PG_PASSWORD="$(gcloud secrets versions access latest --secret=marketing-studio-pg-restore-password)" \
+  pnpm ops:restore-rehearsal --source marketing_studio_staging [--apply] [--simulate-parity-failure] [--skip-if-recent-days 28] [--dump-bucket <b>]
+# exit 0 ok/skipped · 1 failed · 2 guard (source/role) · 3 locked
+gcloud run jobs execute marketing-studio-restore-rehearsal --region us-east4 --wait --args=--source,marketing_studio_staging,--apply
+```
+
+Order: role by SQL (`scripts/ops/sql/restore-role.sql` as instance admin + `restore-role-grants.sql` as migrator per
+DB) → job `--apply` → staging rehearsal → forced failure → production rehearsal (record times in the runbook) →
+`--activate`. Local testing of the rehearsal works against a throwaway cluster (see lessons: socket path limit).
+
+Deep health (with a `studio:health` token, never `studio:read`):
+
+```bash
+T="$(gcloud secrets versions access latest --secret=greenhouse-marketing-studio-health-token)"
+curl -s -H "Authorization: Bearer $T" "https://studio.efeonce.org/api/v1/health?deep=1" | jq '.status, .components, .freshness'
+unset T
+```
+
+Greenhouse side: Vercel production needs `MARKETING_STUDIO_HEALTH_TOKEN_SECRET_REF=greenhouse-marketing-studio-health-token`;
+the ops-worker declares it in `deploy.sh`. Alert scheduler `ops-marketing-studio-health-watch` is born paused; resume
+it only after the first green production rehearsal. Rollback: DSN empty + redeploy; `pnpm migrate down` (ops_run);
+pause both schedulers; disable the uptime policy.
+
+## Originals, download, rights and media worker (TASK-1893, code complete 2026-09-26)
+
+Full ordered rollout: `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md` §Originales y worker.
+
+```bash
+# Infra (dry-run by default; staging first). Stage 1 before the worker, --wiring after deploying it.
+OPERATOR_PRINCIPAL=user:<email> bash scripts/ops/infra/media-originals.sh --env staging [--apply]
+bash apps/worker/deploy.sh --env staging [--apply] [--skip-build]          # SoT of the worker env vars/flags
+bash scripts/ops/infra/media-originals.sh --env staging --wiring [--apply]  # push + GCS notification + paused Scheduler
+# Worker PG roles: scripts/ops/sql/media-worker-roles.sql (instance admin, passwords piped)
+# Ingest (ADC impersonating marketing-studio-ingest[-stg]@; the CLI refuses a bucket that does not match the DB)
+pnpm media:ingest --root "<…>/Alineación/5. Contenidos" --bucket efeonce-marketing-studio-originals-staging [--campaign CMP-004] [--apply]
+pnpm media:ingest --revert-provider [--campaign …] [--apply]
+pnpm media:rights --asset <assetId> --version <n> --license stock --reference "…" [--from YYYY-MM-DD] [--until YYYY-MM-DD] [--territory CL] [--channel linkedin]
+# Domain integration test against staging (everything rolled back; app role)
+PGPASSWORD="$(gcloud secrets versions access latest --secret=marketing-studio-pg-staging-app-password)" \
+STUDIO_IT_PG_URL="postgres://marketing_studio_staging_app@127.0.0.1:15433/marketing_studio_staging" \
+  pnpm --filter @studio/domain exec vitest run src/media/media.integration.test.ts
+```
+
+- **Production migration BEFORE pushing Studio `main`** (readers select `media_object` and the rights columns).
+- Flags: `STUDIO_ORIGINAL_DOWNLOADS_ENABLED` (Vercel; preview first), worker flags in `apps/worker/deploy.sh` (change,
+  commit, redeploy; never `--update-env-vars` alone). With a flag off the worker answers 2xx and logs `skipped`.
+- Download canary: anonymous 403 `download_disabled` · client with both scopes 200 (`expiresAt` ≤ 10 min) · foreign org
+  404 · non-ingested version 404 `original_not_stored`. The gateway client needs a NEW `api_client` with
+  `--scope studio:read --scope studio:assets:download` (scopes are immutable) → new secret version → revoke the old one.
+- Worker runs: `SELECT kind, status, error_code, counts, started_at FROM studio.worker_run ORDER BY started_at DESC`.
+  DLQ must stay empty: `gcloud pubsub subscriptions pull marketing-studio-originals-finalized[-staging]-dlq-sub --limit 5`.
+- Rollback: flags off + redeploy; pause jobs; delete the bucket notification; `media:ingest --revert-provider --apply`;
+  `migrate down` only with no `gcs` version (the Down aborts otherwise).

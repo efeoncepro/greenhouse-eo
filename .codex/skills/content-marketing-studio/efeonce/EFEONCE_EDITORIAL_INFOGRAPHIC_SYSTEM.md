@@ -102,7 +102,14 @@ mientras no exista, su firma sigue siendo wordmark + sello en el footer derecho 
 decoración. Si una pieza derivada (hero, OG, social, deck) usa la órbita, aplica la
 [referencia operativa](../../efeonce-brand-studio/references/graphic-line-orbit.md): ningún texto la cruza, una sola
 por pieza y el arco sólo mide un dato real — el mismo principio que prohíbe «órbitas decorativas sin encoding» en
-la tabla de arquetipos.
+la tabla de arquetipos. La órbita nunca reemplaza la composición fotográfica de esas piezas ni cruza el sujeto.
+
+**Sello de footer ≠ firma de pieza gráfica (regla del operador, 2026-09-26):** el sello URL del footer de la
+infografía de cuerpo sigue como está. Una pieza derivada gráfica de la marca Efeonce (social, anuncio, OG o
+portada con foto) firma en cambio con **el logo de Efeonce centrado abajo**; la burbuja URL sólo reemplaza al logo
+cuando el logo ya aparece dentro de la imagen, centrada, fusionada a opacidad 1 y sobre lecho muy oscuro (≥ 4,5:1).
+Los archivos oficiales (logo, `url-bubble-source` y variantes horneadas) son el dibujo de
+`@efeoncepro/axis-brand-assets`; las copias del repo están vigiladas por `src/config/efeonce-brand-assets.test.ts`.
 
 Wordmarks públicos oficiales: `public/branding/logo-full.svg` en light y
 `public/branding/logo-negative.svg` en dark. `AxisWordmark` es interno y no se usa en piezas públicas.

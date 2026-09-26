@@ -11,8 +11,8 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — in production with flags OFF** | Cloud SQL (4 migrations applied); release `bda1cf2cd938` (2026-09-18, Vercel + 6 Cloud Run); staging flags ON (sharing/delivery/schedules/issuance), production OFF until TASK-1875; gateway `efeonce-mcp` 1.7.0 (rev `00055-gk6`, 58 tools); open: in-app/Teams channels, portal route (1849), ISSUE-174 → TASK-1876 | 2026-09-18 |
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
 | TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | to-do (blocked by 1848) | — | — |
-| TASK-1888 | Editorial contract v2: `ChartSpec` 7 → 15 families, per-figure reading and hero figure in the plan, `channelId`, per-org cover preference + sealed cover, flag `INSIGHTS_EDITORIAL_V2_ENABLED` | **in-progress — code complete 2026-09-25, rollout pending** (local `develop`, not pushed; migration applied; gateway PR efeonce-mcp#18 open) | none in production (flag OFF everywhere; v1 contract still served) | read-only v2 preview over Sky `EO-INS-000022` and Berel `EO-INS-000019`, 0 violations |
-| TASK-1889 | Premium catalogs from the approved canvas (A4 + deck), canvas-fidelity gate, internal Berel/Sky editions, release together with the 1888 flag | **in-progress — code complete 2026-09-25, rollout pending** (local `develop`, not pushed; last commit `9529a1b25`) | none (production serves the TASK-1847 v1 catalogs until the release) | local real editions Berel `EO-INS-000019` (16 pp / 13 slides) and Sky `EO-INS-000022` (12 / 9); fidelity 20/21 + 1 approved exception; visual gate 27 frames at 0 px |
+| TASK-1888 | Editorial contract v2: `ChartSpec` 7 → 15 families, per-figure reading and hero figure in the plan, `channelId`, per-org cover preference + sealed cover, flag `INSIGHTS_EDITORIAL_V2_ENABLED` | **in-progress — live in production 2026-09-26; production behavior canary pending** | code: release `0e87c7a443a2` + fix release `f9257b9c94af`; gateway efeonce-mcp v1.9.0 (rev `00062-ct5`); flag ON in Vercel staging (`greenhouse-9t9fwhrvz`), Vercel Production (`greenhouse-29b4yzhmf`) and ops-worker (`00718-c4b`) | staging internal editions Berel `insed-56226fa1…` / Sky `insed-1e003760…` with sealed v2 plan; production verified structurally (flag in both runtimes, deployment built after the var), no production edition yet |
+| TASK-1889 | Premium catalogs from the approved canvas (A4 + deck), canvas-fidelity gate, internal Berel/Sky editions, release together with the 1888 flag | **in-progress — code complete 2026-09-25, rollout pending** (local `develop`, not pushed; last commit `2f0776e0f` (antes `9529a1b25`)) | none (production serves the TASK-1847 v1 catalogs until the release) | local real editions Berel `EO-INS-000019` (16 pp / 13 slides) and Sky `EO-INS-000022` (12 / 9); fidelity 20/21 + 1 approved exception; visual gate 27 frames at 0 px |
 
 ## TASK-1845 — foundation (complete 2026-09-16)
 
@@ -162,7 +162,7 @@ pre-existing visual defect (glued/wrapped) visible in delivered tender decks: se
 **Cierre (2026-09-25):** primer render productivo de los dos catálogos con datos reales — edición interna de Sky
 Airlines `EO-INS-000022` (ICO, agosto vs julio 2026), run `irun-166f4ed0-f3b9-4d31-8837-26035ec46db5`: `deck_pdf`
 5 láminas (`insights-deck`) y `report_pdf` 8 páginas A4 (`insights-report`), primer intento, cifras = BigQuery.
-Gate de cierre: `pnpm test` completo (1821 archivos, 15 303 tests) y `pnpm build` verdes sobre `35f208553`. La
+Gate de cierre: `pnpm test` completo (1821 archivos, 15 303 tests) y `pnpm build` verdes sobre `e22ccf17e` (antes `35f208553`). La
 edición queda interna y sin emitir. **Hand-off:** el rediseño premium aprobado por el operador vive en TASK-1888
 (contrato v2: 15 familias, lectura por figura, `channelId`, portada sellada) y TASK-1889 (catálogos premium +
 verificación Berel/Sky + release); el gap «13 de 15 familias sin productor» pasa a TASK-1888.
@@ -313,7 +313,20 @@ vestuario, ausencia de Playwright smoke, `split_batch` (3.279 archivos) y autent
 `greenhouse_ops`; migraciones 656/656, GCP WIF y Sentry pasan. El `develop` local está 60 commits y 1.063 archivos
 por delante de `origin/develop`; no es un candidato acotado a esta task. No se dispatchó el orquestador.
 
-## TASK-1888 — contrato editorial v2 (in-progress · code complete 2026-09-25, rollout pendiente)
+## TASK-1888 — contrato editorial v2 (in-progress · en producción desde 2026-09-26)
+
+**Rollout 2026-09-26 (dónde corre).** Release `0e87c7a443a2` (código, flag OFF) → gateway efeonce-mcp#18 mergeado
+`2cf78af91` y desplegado v1.9.0 (run `36226550358`, revisión `00062-ct5`, 100 %) → flag ON en Vercel staging
+(`greenhouse-9t9fwhrvz`) verificado con ediciones internas v2 de Berel (`insed-56226fa1-0c2b-451d-88cf-158390c4073a`)
+y Sky (`insed-1e003760-b622-47e1-b5ac-5ec7a2cad396`) → hallazgo en staging (empate: cifra principal «39» con «Dimensiones
+evaluadas.») corregido en `baf0f908b` → Codex (con autorización del operador; el clasificador de esta sesión bloqueó
+redeploy de producción y flag del worker): release `2add63c61fd6` **abortado** (ops-worker sin `DATAFORSEO_API_LOGIN`,
+rollback verificado), fix de secretos del release (#242) y release `f9257b9c94af` `released` (run `36236940651`).
+Estado verificado por esta sesión: `greenhouse.efeoncepro.com` → `greenhouse-29b4yzhmf` (creado 10:24:34Z, 8 s después
+de recrear la var de Production a las 10:24:26Z, así que la incluye); `ops-worker-00718-c4b` Ready/100 % con
+`INSIGHTS_EDITORIAL_V2_ENABLED=true`; el fix del empate está en `origin/main`. Issuance, sharing y delivery siguen OFF
+en Vercel Production. **Falta:** un canary de comportamiento en producción (edición sintética por la lane ecosystem
+que muestre `plan.scopeLines`), bloqueado aquí por el clasificador (lectura del token del gateway).
 
 **Qué construyó** (commits en `develop` local, sin push, 2026-09-25): Slice 1 `ChartSpec` 15 familias + `channels.ts`
 + matriz; Slice 2 plan v2 + pp; Slices 3–4 productores (bullet ICO, línea mensual, lectura por figura, esenciales,
@@ -355,9 +368,9 @@ preferencia de Berel y Sky y carga logos oscuros si los hay.
 internas reales y liberarlo. `ui-ux`, `UI impact: layout`, asignación Claude. Detalle: arquitectura §14.9 y registro de
 implementación §8.z.
 
-**Qué construyó (en `develop`, sin push).** Commits `d357e0224`, `b649080c7` (Slices 1–2), `4ff72fe3a` + `2410e5156`
-(Slice 3), `3fa493efe`, `85785e7fc` (Slice 4), `1120e86e4`/`5968e35e8` (docs), `289b6eca4` (excepción aprobada),
-`738ceb748` («Lo esencial»), `b88fd447c` (fixes por ediciones reales), `9529a1b25` (dossier + scorecard).
+**Qué construyó (en `develop`, sin push).** Commits `61d1ef690` (antes `d357e0224`), `4a4c77748` (antes `b649080c7`) (Slices 1–2), `5c2bcb5a1` (antes `4ff72fe3a`) + `8075a2930` (antes `2410e5156`)
+(Slice 3), `f0b0d78cc` (antes `3fa493efe`), `30c11aba7` (antes `85785e7fc`) (Slice 4), `29a54885e` (antes `1120e86e4`)/`3709d9424` (antes `5968e35e8`) (docs), `7ab466c88` (antes `289b6eca4`) (excepción aprobada),
+`ae2c34b59` (antes `738ceb748`) («Lo esencial»), `198ce883a` (antes `b88fd447c`) (fixes por ediciones reales), `2f0776e0f` (antes `9529a1b25`) (dossier + scorecard).
 
 - Catálogos **sólo v2** (A4 794×1123, deck 1280×720); la guarda `insights-catalogs-v2-only.test.ts` no admite legado.
   Retirados `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css`, `render/figure-pages.ts`
@@ -393,7 +406,7 @@ recolor de v1 (rechazado: «sólo les estás cambiando el color»), premium edit
 `a4-estructura.png`, `a4-graficos.png`, `deck-graficos-y-prosa.png`, `a4-escala-de-grises.png`; `paginas/` con las 41
 páginas aprobadas a tamaño nativo (A4 794×1123, lámina 1280×720); `fuente-canvas-2026-09-25.tar.gz` con los `.dc.html`
 del canvas y `render-referencia.mjs`, que regenera `paginas/` (40 de 41 byte a byte; la restante 0,008 % por
-antialiasing). Commit `568bfa669`.
+antialiasing). Commit `07eb90170` (antes `568bfa669`).
 
 **Contrato de fidelidad:** por plantilla, un fixture con los datos de ejemplo del canvas (nunca en producción), render a
 tamaño nativo y `pixelmatch` (umbral 0,1) contra `paginas/<Board>.png`: **≤ 1 % de píxeles distintos por página**. Lo
@@ -427,15 +440,15 @@ producción antes de compartir con clientes. Sin flag propio.
 ## Sessions (append as you go; newest first)
 
 - **2026-09-25 · TASK-1889 · implementación.** Slices 1–4 + «Lo esencial» + fixes por ediciones reales en
-  `develop` local (sin push, último commit `9529a1b25`). Fidelidad 20/21 + excepción aprobada `Deck-Agrupadas`;
+  `develop` local (sin push, último commit `2f0776e0f` (antes `9529a1b25`)). Fidelidad 20/21 + excepción aprobada `Deck-Agrupadas`;
   visual gate Insights 27 frames a 0 px; ediciones reales Berel/Sky revelaron 5 defectos que el canvas no mostraba,
   todos corregidos. Nada desplegado; rollout pendiente junto al flag de TASK-1888.
 - **2026-09-25 · TASK-1888 · implementación.** Slices 1–6 en `develop` local (sin push), migración aplicada, gateway
   PR efeonce-mcp#18 abierto; preview v2 con datos reales de Sky y Berel en 0 violaciones. Coordinado con la sesión de
   TASK-1889 (copy `GH_INSIGHTS.catalog` de ella; campos del plan acordados por mensaje).
-- **2026-09-25 · TASK-1888/1889 · planificación.** Tasks creadas (`1ae82624d`), matriz de 1888 corregida con la
-  evidencia real (`e845ab562`: FTR y tendencias ICO entran al alcance) y contrato de fidelidad de 1889 con las 41 páginas
-  de referencia y su paquete fuente (`568bfa669`). Otra sesión empezó 1889 Slices 1–2 sin commit. Nada desplegado.
+- **2026-09-25 · TASK-1888/1889 · planificación.** Tasks creadas (`8b35925fb` (antes `1ae82624d`)), matriz de 1888 corregida con la
+  evidencia real (`d1f041f4e` (antes `e845ab562`): FTR y tendencias ICO entran al alcance) y contrato de fidelidad de 1889 con las 41 páginas
+  de referencia y su paquete fuente (`07eb90170` (antes `568bfa669`)). Otra sesión empezó 1889 Slices 1–2 sin commit. Nada desplegado.
 - **2026-09-25 · TASK-1847 · cierre.** Canary de render productivo: deck vacío en la org sandbox (`irun-cc329478…`,
   `insights-deck`, 3 láminas) y, con autorización del operador, A4 + deck con datos reales de Sky (`EO-INS-000022`).
   La sandbox no tiene snapshots ICO: una edición nueva falla en `validating` (`evidence_rejected`). El operador aprobó
@@ -444,7 +457,7 @@ producción antes de compartir con clientes. Sin flag propio.
   despachó; tras ~4 h el operador lo detuvo y Claude tomó la coordinación sólo para verificar y cerrar. Manifest
   `ebb9212a32ce-388b8af7-e133-4ea3-9441-2bbf00a157b7` `released`; 6 runtimes en el SHA, Vercel READY, watchdog `ok`;
   canary de contrato productivo con `renderableOutputs` deck_pdf+report_pdf. Pendiente: primer render productivo.
-  El código del release vivía sin commitear en `develop`: `e15d71648` lo trae byte a byte.
+  El código del release vivía sin commitear en `develop`: `6d78817bb` (antes `e15d71648`) lo trae byte a byte.
 - **2026-09-24 · TASK-1847 · render A4/deck y auditoría de release.** Índice local con folios reales; PDFs de prueba
   de 30 páginas y 25 láminas; cuatro familias nuevas en ambos formatos; fix de paths SVG vacíos; contraste de acentos
   A4 ajustado con token AXIS teal-750. El freeze visual rechazó veinte frames `deck-axis` ajenos y no escribió el
@@ -493,3 +506,7 @@ producción antes de compartir con clientes. Sin flag propio.
   production release, flag flip, doc sweep (5 agents), rollback rehearsal, closure. Codex executed the mutations
   the permission classifier blocked until the operator added allow rules.
 - 2026-09-16 · Claude (greenhouse-eo-0d) · TASK-1846 discovery started; verified the rollback aftermath against the DB.
+- 2026-09-26 · Claude (TASK-1888) · revisión de PDFs con TASK-1846/1889 (superlativos únicos, esenciales sólo de
+  hallazgos, afirmaciones con verbo, empate, tabla, orden de lecturas, dirección por hecho), gateway v1.9.0, flag en
+  staging + ediciones internas, fix del empate. Codex ejecutó merge del gateway, redeploy de producción, flag del
+  ops-worker y los dos releases que el clasificador bloqueó.

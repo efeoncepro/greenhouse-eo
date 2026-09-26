@@ -329,3 +329,16 @@
   «+2,2 %»; the reader expects «+1,8 pp». Owned by TASK-1888 (plan contract), not a catalog fix.
 - **2026-09-25 · `cmd; echo EXIT=$?; tail log` reports tail's exit code.** A background gate must end with
   `exit $rc` of the gated command, or its green notification proves nothing.
+
+- **2026-09-26 · Un empate no tiene dueño: la cifra principal es el valor empatado.** Síntoma: en staging, Berel
+  mostraba «39» (puntaje global, primer hecho de la figura) con la bajada «Dimensiones evaluadas.», mientras el empate
+  era en 100. Regla: todo superlativo exige máximo ÚNICO en lo impreso (se dice el empate); la bajada de un empate es
+  el nombre común; y la cifra es la EMPATADA. Sólo apareció al generar una edición real en staging: el plan-only local
+  no lo mostraba porque nadie leyó `keyFigure.value` contra su bajada.
+- **2026-09-26 · Recrear una var de Vercel exige un deployment POSTERIOR.** Tras un rollback, la var de Production se
+  borró y se volvió a crear (10:24:26Z); el deployment que la ve empezó a las 10:24:34Z. Verificar con
+  `vercel api /v9/projects/<id>/env` (createdAt exacto) contra `vercel inspect --json` (createdAt del deployment):
+  «1h ago» en `vercel env ls` no alcanza para decidir.
+- **2026-09-26 · Un rewrite de historia cambia todos los SHAs citados.** Tras sacar blobs de `ai-generations/`, los SHAs
+  de las tasks dejaron de existir en origin con contenido idéntico. Anotar el vigente con el viejo entre paréntesis y
+  verificar despliegues por blobs, nunca por ancestría (el release a main es squash).

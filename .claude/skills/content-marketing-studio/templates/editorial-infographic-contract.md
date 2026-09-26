@@ -31,7 +31,8 @@
 - firma:
 - wordmark light: `public/branding/logo-full.svg`
 - wordmark dark: `public/branding/logo-negative.svg`
-- sello URL: `src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg`
+- sello URL: `src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg` (sólo footer de la infografía;
+  una derivada gráfica Efeonce —social/OG con foto— firma con logo centrado, burbuja sólo con el logo ya en la imagen)
 - fuente/nota:
 - footer: `source/as-of left | official wordmark + efeoncepro.com right`
 - brand placement: `footer_only | surface_specific`

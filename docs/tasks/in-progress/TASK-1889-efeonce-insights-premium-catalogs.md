@@ -8,7 +8,7 @@
 
 ## Delta 2026-09-25
 
-- **Slices 1–2 code complete** (commits `d357e0224`, `b649080c7`, sin push). Fidelidad al canvas con
+- **Slices 1–2 code complete** (commits `61d1ef690` (antes `d357e0224`), `4a4c77748` (antes `b649080c7`), sin push). Fidelidad al canvas con
   `pnpm insights:canvas-fidelity`: 11 páginas con referencia, máximo 0,048 % (seis en 0 px). Gate visual
   scoped congelado (20 frames, 0 px).
 - **Decisión del operador: las v2 REEMPLAZAN a las v1** (no conviven). Cada plantilla del canvas tomó el
@@ -17,7 +17,7 @@
   declarada: `ReportAnalysisPage` e `InsightsEvidenceSlide` (status `legacy`) hasta el Slice 4. Esto
   reemplaza la regla anterior de «entran con el flag de TASK-1888»: el diseño nuevo aplica a toda
   edición nueva, con o sin ese flag.
-- **Slice 3 code complete** (commit `4ff72fe3a`, sin push). Portada blanca 0,052 % / 0,186 % contra el
+- **Slice 3 code complete** (commit `5c2bcb5a1` (antes `4ff72fe3a`), sin push). Portada blanca 0,052 % / 0,186 % contra el
   canvas; logo privado por `asset-ref:org-logo:<id>` + `externalAssets` (falla cerrado sin bytes). Gate
   scoped `--catalog=insights` 21/21 a 0 px. **Verificación del núcleo compartido** (pedido de la sesión
   de TASK-1846, porque `renderSlide` ahora espera `img.decode()` para todo catálogo):
@@ -26,7 +26,7 @@
   7 896 px. **A/B:** con la línea `decode()` desactivada, los mismos 59 frames fallan con la MISMA
   cuenta de píxeles uno por uno (`diff` vacío). La causa es la deriva de entorno `ISSUE-122`, no este
   slice. Nada de deck-axis/SKY se congeló.
-- **Slice 4 code complete** (commits `3fa493efe`, `85785e7fc`, sin push). Ocho plantillas de figura (A4 +
+- **Slice 4 code complete** (commits `f0b0d78cc` (antes `3fa493efe`), `30c11aba7` (antes `85785e7fc`), sin push). Ocho plantillas de figura (A4 +
   deck: comparación, columnas, metas, tendencia) contra el canvas: 20 de 21 páginas dentro del 1 %.
   **Deck-Agrupadas da 2,2 %** porque el canvas corre esa lámina 3 px (top 97 contra 100 en las otras tres; con
   97 daría 0,008 %). La plantilla queda en 100 para que las láminas no salten, y la diferencia está declarada
@@ -497,8 +497,8 @@ El operador exige que el informe quede **igual al canvas**. «Igual» se define 
 > Evidencia 2026-09-25 (aprobación): el operador aprobó los cuatro PDFs con «Bien, aprobado» en el chat de la
 > sesión TASK-1846 (procedencia: esa sesión lo informó a ésta, no se dijo en este hilo). Aprobado: Berel EO-INS-000019
 > (`insed-8fdb55a9-…`), informe 16 páginas + deck 15 láminas; Sky EO-INS-000022 (`insed-0729ee9e-…`), informe 12 + deck
-> 10. Generados con `preview-edition --editorial-v2 --ai-authoring` sobre HEAD `667b4c12a` (incluye `26937733b` y
-> `d8354471b`: triángulo = valor, tono = mejor/peor según la métrica); autoría gemini-2.5-flash-lite, un intento, sin
+> 10. Generados con `preview-edition --editorial-v2 --ai-authoring` sobre HEAD `be943e009` (antes `667b4c12a`) (incluye `373e56485` (antes `26937733b`) y
+> `5ee201c0c` (antes `d8354471b`): triángulo = valor, tono = mejor/peor según la métrica); autoría gemini-2.5-flash-lite, un intento, sin
 > fallback; vista previa local, nada compartido con clientes. Cubre la estructura del deck (portada, aperturas y
 > contraportada derivadas de A4) y la excepción Deck-Agrupadas. Sigue abierto: edición interna en producción; el paso
 > a producción va sólo por el release control plane y requiere decisión aparte del operador.
@@ -511,7 +511,7 @@ El operador exige que el informe quede **igual al canvas**. «Igual» se define 
 > `docs/ui/reviews/TASK-1889-.../README.md` y scorecard (`ui:quality` PASS 4,59, piso 4,2). Sin tildar: aprobación
 > del operador de los PDFs reales y de la estructura del deck, y edición interna en producción (rollout).
 >
-> Evidencia 2026-09-25 (Slices 1–2): criterios tildados según `b649080c7` — grep sin HEX/fuentes literales en
+> Evidencia 2026-09-25 (Slices 1–2): criterios tildados según `4a4c77748` (antes `b649080c7`) — grep sin HEX/fuentes literales en
 > las plantillas editoriales + `composer:brand-pack --check` (deck-axis byte-idéntico); contraportada y pie
 > desde `EFEONCE_CONTACT` (test del mapper); planes v1 componen sin panel (report/deck-mapper tests con PDF
 > real); folio «NN / total» desde el plan de páginas; copy en `GH_INSIGHTS.catalog`; gate scoped 20/20 a 0 px.

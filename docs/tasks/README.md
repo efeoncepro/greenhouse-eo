@@ -1726,6 +1726,8 @@ Reglas de lectura:
 
 ## Complete
 
+- `TASK-1891` ✅ — **Marketing Studio federado en Efeonce MCP.** Provider `marketing-studio` con 12 tools de lectura, canje RFC 8693 en Greenhouse y bearer de servicio de Studio. En producción desde 2026-09-26 (`efeonce-mcp-gateway-00061-sbc`, gateway `958c9de30`); canary MCP real verde, con un fix de la política del cliente de canje (migración `20260926071321910`).
+- `TASK-1890` ✅ — **Marketing Studio listo para agentes.** Registro de operaciones con paridad (12 tools + 5 exclusiones), manifiesto con hash, bearer de servicio, organización canónica y capability `marketing_studio.campaign.read` (admin, account, operations). Manual `marketing-studio` servido por el lane de skills de producción desde el release `0e87c7a443a2` (2026-09-26).
 - `TASK-1846` ✅ — **Efeonce Insights: render durable y Artifact Worker multiconsumidor.** En producción 2026-09-16: release `917491fd02e4` (manifest `released` en un intento, Job `artifact-worker` desplegado por el control plane, change-gated), `INSIGHTS_RENDER_ENABLED` ON en Vercel, Job y `ops-worker` (staging y producción), gateway `efeonce-mcp` v1.6.0 desplegado (51 tools) y canary productivo en la org sandbox (`deck_pdf` completed al 1er intento; `web` → `422 render_rejected`; canary del provider MCP verde). `report_pdf` → TASK-1847, `web` → TASK-1848; `INSIGHTS_ISSUANCE_ENABLED` sigue OFF. `EPIC-045`.
 
 - `TASK-1352` ✅ — **Landing HubSpot (Pillar del hub)** (`/servicios-contratar-hubspot/`, page `244079`). Cerrada 2026-09-11 por decisión del operador: publicada e indexable. No se hizo la migración a `/servicios/hubspot/` (hoy `301` a un post antiguo) y los 27 criterios quedan sin certificar; la URL padre del hub es decisión pendiente en `EPIC-047`.

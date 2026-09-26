@@ -472,12 +472,16 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'GCP Workload Identity Federation (subjects ref + environment)',
       'Azure App Registration federated credentials',
       'Vercel Production deployments + alias',
-      'Cloud Run worker revisions (ops-worker, commercial-cost-worker, ico-batch)'
+      'Cloud Run worker revisions (ops-worker, commercial-cost-worker, ico-batch)',
+      // TASK-1896 — sistema par: health profundo por HTTP (bearer studio:health), nunca SQL a su base.
+      'Efeonce Marketing Studio deep health (studio.efeonce.org/api/v1/health?deep=1)'
     ],
     smokeTests: [],
     filesOwned: [
       'src/lib/release/**',
       'src/lib/reliability/queries/release-*.ts',
+      'src/lib/reliability/queries/marketing-studio-health.ts',
+      'src/lib/marketing-studio/**',
       'scripts/release/**',
       '.github/workflows/production-release.yml',
       '.github/workflows/ops-worker-deploy.yml',

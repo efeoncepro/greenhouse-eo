@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-045`
-- Status real: `Code complete; rollout pendiente (release con flag OFF, ediciones internas en staging, deploy efeonce-mcp#18)`
+- Status real: `En producción 2026-09-26: código (releases 0e87c7a443a2 + f9257b9c94af, incluye el fix del empate), gateway v1.9.0 y flag ON en Vercel staging, Vercel Production y ops-worker. Pendiente para cerrar: canary de comportamiento en producción (edición sintética con plan v2)`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`
@@ -311,7 +311,7 @@ Reglas obligatorias:
 - [x] Preferencia modelada como command + reader, no como handler de pantalla.
 - [x] Read por reader canónico; write con capability fina, idempotencia, outbox y errores canónicos.
 - [x] Capability + grant + coverage test en el mismo PR. — `insights.cover_preference.manage` (Admin + Account), `capability-grant-coverage.test.ts` verde.
-- [ ] Camino programático: lanes `api/platform/app` y `api/platform/ecosystem` + tool MCP federada en `efeonce-mcp`. — Lanes y tools en Greenhouse construidas; federación en PR efeonce-mcp#18 (sin merge ni deploy hasta el release).
+- [x] Camino programático: lanes `api/platform/app` y `api/platform/ecosystem` + tool MCP federada en `efeonce-mcp`. — Lanes en producción desde el release `0e87c7a443a2` (canary de la lane ecosystem 200, corrido por la sesión TASK-1846). Federación: efeonce-mcp#18 mergeado como `2cf78af91` (v1.9.0; el asunto del squash dice «v1.8.0» por error, el `package.json` dice 1.9.0) y desplegado por el run `36226550358` (`success`) como revisión `efeonce-mcp-gateway-00062-ct5`, Ready y al 100 % en `spec.traffic` y `status.traffic`, imagen `sha256:909c53f1…` verificada por el paso «Promote and verify exact revision»; `/health` 200. El merge y el dispatch los ejecutó Codex con autorización del operador; esta sesión verificó el resultado. No ejercitado: un `tools/list` en vivo con token (el MCP responde 401 sin OAuth); la presencia de las dos tools se verificó en el commit desplegado (`src/mcp.ts`, `tool-policy.ts`, manifest generado).
 - [x] Write apto para `propose → confirm → execute`; sin integración Nexa-específica. — un solo write idempotente y reversible (fijar el valor previo).
 - [x] Un primitive, muchos consumers; sin lógica duplicada en TASK-1849. — delta en TASK-1849.
 - [x] Parity check = SÍ.
@@ -496,7 +496,7 @@ eso lo resuelve el catálogo en TASK-1889 desde `modules` y `channelId`, sin cam
 - [ ] La preferencia se guarda por command con capability, grant, outbox y errores canónicos, y se lee por reader; lanes
   app/ecosystem responden y la tool MCP está federada. — **Parcial:** command/reader/capability/grant/outbox/errores y lanes construidos con tests (`cover-preference.test.ts`, `capability-grant-coverage`); federación en [efeonce-mcp#18](https://github.com/efeoncepro/efeonce-mcp/pull/18) abierta. Falta: lanes respondiendo en un runtime desplegado y el PR mergeado + gateway desplegado (después del release).
 - [x] `auto` resuelve blanca sin logo apto para fondo oscuro y navy con él; el resultado queda sellado en la edición. — `cover-preference.test.ts` + `plan.cover` en el plan congelado (validador impone coherencia tema↔logo); Sky y Berel resuelven blanca por `auto` con datos reales.
-- [ ] Ediciones internas de Berel y Sky en staging pasan validación con flag ON; ninguna se comparte con el cliente. — **Pendiente de rollout** (requiere release a staging). Evidencia previa local, sólo lectura: Sky `EO-INS-000022` 12 hechos / 0 violaciones y Berel `EO-INS-000019` 24 hechos / 0 violaciones con `--editorial-v2` sobre `be943e009` (antes `667b4c12a`). Aprobación del operador de los cuatro PDFs locales de Berel y Sky (contrato v2 + autoría IA sobre `be943e009` (antes `667b4c12a`)): «Bien, aprobado», 2026-09-25, dada en el chat de la sesión TASK-1846 y registrada en TASK-1889. Esa aprobación es del documento compuesto en local, NO de las ediciones en staging: este criterio sigue abierto hasta el release.
+- [x] Ediciones internas de Berel y Sky en staging pasan validación con flag ON; ninguna se comparte con el cliente. — 2026-09-26: flag ON en Vercel staging + redeploy `greenhouse-9t9fwhrvz`; App lane `POST /api/platform/app/insights/editions` → 202 `ready_for_review` para Berel `insed-56226fa1-0c2b-451d-88cf-158390c4073a` (seo+aeo) y Sky `insed-1e003760-b622-47e1-b5ac-5ec7a2cad396` (ico), `audience: internal`, sin emitir ni compartir; el plan congelado trae portada sellada, lecturas, esenciales, líneas de alcance y tabla «…: todas las cifras»; Sky abre con «Entregas a tiempo es la única meta sin cumplir». Hallazgo: en un empate la cifra principal tomaba el primer hecho (Berel «39» con «Dimensiones evaluadas.»), corregido en `baf0f908b` (aún sin release; la edición de staging lo conserva por inmutable). Antes: Evidencia previa local, sólo lectura: Sky `EO-INS-000022` 12 hechos / 0 violaciones y Berel `EO-INS-000019` 24 hechos / 0 violaciones con `--editorial-v2` sobre `be943e009` (antes `667b4c12a`). Aprobación del operador de los cuatro PDFs locales de Berel y Sky (contrato v2 + autoría IA sobre `be943e009` (antes `667b4c12a`)): «Bien, aprobado», 2026-09-25, dada en el chat de la sesión TASK-1846 y registrada en TASK-1889. Esa aprobación es del documento compuesto en local, NO de las ediciones en staging: este criterio sigue abierto hasta el release.
 - [x] Flag en el ledger con runtime declarado. — Vercel + `ops-worker` (`deploy.sh` `:-false`); `pnpm flags:audit --strict --no-vercel` en 0.
 
 ## Verification
@@ -514,6 +514,22 @@ compilación 68 s, 23 páginas estáticas); `pnpm typecheck` limpio; `docs:closu
 0; cuatro guardas falsificadas (pp, hash, matriz, logo sobre navy) se ponen rojas con el defecto; preview v2 en solo
 lectura de Sky y Berel con 0 violaciones. `pnpm local:check` corta en lint por errores de `scripts/foto/**`, trabajo
 ajeno sin commitear.
+
+Release 2026-09-26: orquestador `36222331450` `success` sobre `0e87c7a443a2` (PR #240, squash). Verificado por blobs:
+el código de Insights en `origin/main` es idéntico a `be943e009` (única diferencia: `skill-catalog.generated.json`,
+regenerado por ediciones posteriores de skills). Canary de `GET /api/platform/ecosystem/insights/cover-preference` en
+producción: 200 con el contrato nuevo, corrido por la sesión TASK-1846 (no por esta sesión). `INSIGHTS_EDITORIAL_V2_ENABLED`
+sigue OFF en todos los runtimes. Pendiente: merge y deploy de efeonce-mcp#18 (MERGEABLE, después del gateway 1.8.0 que
+despliega otra sesión); flag ON en Vercel staging + ediciones internas de Berel y Sky; flag ON en producción con 1889.
+
+Rollout de producción 2026-09-26 (ejecutado por Codex con autorización del operador; verificado por esta sesión):
+release `2add63c61fd6` abortado (ops-worker sin `DATAFORSEO_API_LOGIN`, rollback verificado por Codex) → fix #242 →
+release `f9257b9c94af` `released` (run `36236940651`). Verificación propia: `greenhouse.efeoncepro.com` sirve
+`greenhouse-29b4yzhmf` (createdAt 10:24:34Z), creado 8 s después de recrear la var de Production (10:24:26Z, vía
+`vercel api .../env`), así que la incluye; `ops-worker-00718-c4b` Ready/100 % con `INSIGHTS_EDITORIAL_V2_ENABLED=true`;
+el fix del empate (`baf0f908b`) está en `origin/main` (comparado por contenido); issuance/sharing/delivery siguen OFF
+en Vercel Production. No verificado: ninguna edición generada en producción desde el release (DB sin ediciones nuevas);
+el canary sintético por la lane ecosystem quedó bloqueado por el clasificador de permisos de esta sesión.
 
 Trazabilidad de SHAs: el 2026-09-25 a las 22:59 otra sesión reescribió la historia de `develop` para sacar blobs de
 `ai-generations/` (archivados en GCS); todos los commits posteriores a esa base cambiaron de SHA con contenido idéntico

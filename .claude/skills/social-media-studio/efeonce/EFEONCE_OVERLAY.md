@@ -170,12 +170,28 @@ tokens `efeonceGraphicLine` de `@efeoncepro/axis-tokens`; nunca HEX ni px transc
   `docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md`, §Zonas seguras).
 - **Ningún texto cruza la órbita.** Una órbita o una lente por pieza, nunca como patrón. El arco de avance mide un
   dato real; sin dato, no hay arco.
-- **Campaña con foto:** la órbita rodea la lente con aire y la esfera va arriba a la izquierda, lejos de la cara.
+- **Campaña con foto y lente declarada:** la órbita rodea la lente con aire y la esfera va arriba a la izquierda, lejos de la cara.
   La foto sale del banco propio `ai-generations/2026-09-25_banco-lente-orbita/` (8 tomas, una por palanca, fichas
   en `fichas/`) o del pipeline `foto:*`; sin velo navy, sin emblema legible, sujeto dentro de un círculo del 55 %
   del lado corto.
-- **URL:** `efeoncepro.com` va siempre en la burbuja oficial `url-lum`, nunca como texto suelto; si el render no
-  garantiza la fusión de luminosidad, usa la variante horneada (`deliverables/assets/url-lum-{light,dark}.svg`).
+- **La órbita no reemplaza la composición fotográfica.** Se declara a propósito en casos concretos (lente,
+  medida, progreso, foco), nunca por defecto ni en todo post, y nunca cruza el sujeto, las reservas de texto, el
+  lecho ni la firma.
+- **Firma de la pieza (regla del operador, 2026-09-26):** un post, anuncio o portada con foto firma con **el logo
+  de Efeonce centrado abajo**. La burbuja URL **no** se agrega por defecto: sólo **reemplaza** al logo cuando el logo
+  ya aparece dentro de la imagen (mockup, objeto, merch), y entonces va centrada, con fusión de luminosidad a
+  opacidad 1 y sobre un lecho muy oscuro (el gate exige ≥ 4,5:1). Nunca a un costado ni junto al logo. `efeoncepro.com`
+  nunca como texto suelto. Los pies con burbuja de decks, informes y papelería siguen su propia regla (variantes
+  horneadas `deliverables/assets/url-lum-{light,dark}.svg` donde no hay fusión).
+- **Eslogan «Empower your …»:** sólo cierra (end-card, contraportada, cierre de campaña); nunca en todo post, nunca
+  con esfera, nunca en mayúsculas. Estado: anillo = libre, esfera = ocupado, siempre con etiqueta y sin semáforo.
+- **Cómo se produce:** valores del contrato AXIS `efeonce.graphic-line-orbit` 0.2.0 (tokens `signature`, `slogan`,
+  `state`) y archivos oficiales de `@efeoncepro/axis-brand-assets`, nunca copias propias. Pieza suelta con la
+  órbita: `pnpm creative:orbit:render` (sale 1 si falla un check); campaña: `pnpm creative:layout` con la capa
+  `graphic_line` y `brand.signature: { brand_in_scene }`; foto con CTA: `pnpm foto:componer:cta` con
+  `marcaEnEscena` (gate `firma-burbuja`). Detalle en la
+  [referencia operativa](../../efeonce-brand-studio/references/graphic-line-orbit.md) §La firma de una pieza
+  gráfica y §Componer con agentes.
 - **«Te hacemos visible»** siempre con su prueba y sin pauta mientras falte la revisión legal (§1.4). La prueba de
   atribución sin logo sigue sin medir: no afirmes que la órbita ya se reconoce sola.
 

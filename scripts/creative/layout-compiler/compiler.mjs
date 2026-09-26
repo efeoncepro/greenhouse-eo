@@ -9,6 +9,7 @@ import { axisAdvertising } from '@efeoncepro/axis-tokens'
 
 import { loadLayoutContract, resolveRunPath, resolveRunRoot } from './contract.mjs'
 import { renderCollaborationSelection, resolveSupportingTagline, supportingTaglineCopy } from './axis-advertising.mjs'
+import { paintGraphicLine, resolveGraphicLine, runAdapterChecks } from './graphic-line.mjs'
 
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex')
 
@@ -281,7 +282,7 @@ const unionBounds = (...boundsList) => ({
   bottom: Math.max(...boundsList.map(bounds => bounds.bottom))
 })
 
-const inlineCanonicalUrlBubble = (bytes, layout) => {
+const inlineCanonicalUrlBubble = (bytes, layout, opacity = LEGACY_URL_BUBBLE_OPACITY) => {
   const source = bytes.toString('utf8').replace(/^<\?xml[^>]*>\s*/u, '')
   const openingEnd = source.indexOf('>')
   const closingStart = source.lastIndexOf('</svg>')
@@ -298,8 +299,18 @@ const inlineCanonicalUrlBubble = (bytes, layout) => {
   const height = width * (242.53 / 1232.25)
   const body = source.slice(openingEnd + 1, closingStart)
 
-  return `<svg data-axis-brand-primitive="url-bubble" data-copy="efeoncepro.com" x="${layout.url.x}" y="${layout.url.y}" width="${width}" height="${height}" viewBox="${viewBox}" opacity="0.72" style="mix-blend-mode:luminosity">${body}</svg>`
+  return `<svg data-axis-brand-primitive="url-bubble" data-copy="efeoncepro.com" x="${layout.url.x}" y="${layout.url.y}" width="${width}" height="${height}" viewBox="${viewBox}" opacity="${opacity}" style="mix-blend-mode:luminosity">${body}</svg>`
 }
+
+// Footer bubble of contracts written before the signature rule (kept as it was). As a signature the bubble blends at
+// full opacity: measured 2026-09-26, at 0.72 it never reaches 4.5:1 (3.82 on #001a33, 4.00 on near black).
+const LEGACY_URL_BUBBLE_OPACITY = 0.72
+const SIGNATURE_URL_BUBBLE_OPACITY = 1
+
+// Which signature the piece carries: `logo` or `url-bubble` under the graphic line rule, `legacy` for contracts
+// written before it (logo plus URL, kept as they were).
+export const signatureMode = contract =>
+  !contract.brand.signature ? 'legacy' : contract.brand.signature.brand_in_scene ? 'url-bubble' : 'logo'
 
 const buildVectorLayers = (fonts, contract, format, collaborationManifest = null, urlBubbleMarkup = null) => {
   const colors = contract.brand.colors
@@ -481,8 +492,12 @@ const buildVectorLayers = (fonts, contract, format, collaborationManifest = null
   const urlBubbleWidth = layout.url.width ?? 0
   const urlBubbleHeight = urlBubbleWidth * (242.53 / 1232.25)
 
-  const urlMarkup =
-    urlBubbleMarkup === null
+  // Under the signature rule a logo-signed piece carries no URL at all (never as text, never next to the logo).
+  const withUrl = signatureMode(contract) !== 'logo'
+
+  const urlMarkup = !withUrl
+    ? ''
+    : urlBubbleMarkup === null
       ? glyphPaths(fonts, {
           value: message.url,
           x: layout.url.x,
@@ -494,19 +509,22 @@ const buildVectorLayers = (fonts, contract, format, collaborationManifest = null
         })
       : urlBubbleMarkup
 
+  // A bubble-signed piece draws no logo: its box leaves the content bounds.
+  const withLogo = signatureMode(contract) !== 'url-bubble'
+
   const contentBounds = {
     left: Math.min(
-      layout.logo.left,
+      withLogo ? layout.logo.left : Number.POSITIVE_INFINITY,
       layout.hook.x,
       layout.kicker.x,
       layout.headline.x,
       layout.support.x,
-      layout.url.x,
+      withUrl ? layout.url.x : Number.POSITIVE_INFINITY,
       layout.rule.visible ? layout.rule.x : Number.POSITIVE_INFINITY
     ),
-    top: Math.min(layout.logo.top, layout.kicker.y - layout.kicker.size, layout.headline.y - layout.headline.size),
+    top: Math.min(withLogo ? layout.logo.top : Number.POSITIVE_INFINITY, layout.kicker.y - layout.kicker.size, layout.headline.y - layout.headline.size),
     right: Math.max(
-      layout.logo.left + layout.logo.width,
+      withLogo ? layout.logo.left + layout.logo.width : Number.NEGATIVE_INFINITY,
       layout.kicker.x +
         measureText(fonts, {
           value: message.kicker,
@@ -516,7 +534,9 @@ const buildVectorLayers = (fonts, contract, format, collaborationManifest = null
         }),
       headlineBounds.right,
       supportBounds.right,
-      urlBubbleMarkup
+      !withUrl
+        ? Number.NEGATIVE_INFINITY
+        : urlBubbleMarkup
         ? layout.url.x + urlBubbleWidth
         : layout.url.x +
             measureText(fonts, {
@@ -528,7 +548,7 @@ const buildVectorLayers = (fonts, contract, format, collaborationManifest = null
       layout.rule.visible ? layout.rule.x + layout.rule.width : Number.NEGATIVE_INFINITY
     ),
     bottom: Math.max(
-      urlBubbleMarkup ? layout.url.y + urlBubbleHeight : layout.url.y,
+      !withUrl ? Number.NEGATIVE_INFINITY : urlBubbleMarkup ? layout.url.y + urlBubbleHeight : layout.url.y,
       layout.rule.visible ? layout.rule.y + layout.rule.height : Number.NEGATIVE_INFINITY,
       supportBounds.bottom
     )
@@ -668,6 +688,29 @@ const setPixelLuminosity = (color, targetLuminosity) => {
  * Parámetros: `left`/`top` en px del backdrop, `width` al que se reescala la fuente y `opacity` (url-lum usa 0.72).
  * Devuelve `{ output, evidence }`: `output` es el nuevo master y `evidence.method` vale 'non-separable-luminosity'.
  */
+// Contrast of a blended bubble as painted: solid ink pixels (alpha ≥ 0.9) of the source against the backdrop they
+// cover, the 1 % worst.
+const measureBubbleContrast = async ({ before, after, source, left, top, width }) => {
+  const ink = await sharp(source).resize({ width }).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+  const region = { left, top, width: ink.info.width, height: ink.info.height }
+  const read = async bytes => (await sharp(bytes).extract(region).removeAlpha().raw().toBuffer())
+  const [b0, b1] = await Promise.all([read(before), read(after)])
+  const ratios = []
+
+  for (let i = 0, p = 0; p < ink.info.width * ink.info.height; i += 3, p += 1) {
+    if (ink.data[p * 4 + 3] < 230) continue
+    const l0 = relativeLuminance(b0[i], b0[i + 1], b0[i + 2])
+    const l1 = relativeLuminance(b1[i], b1[i + 1], b1[i + 2])
+
+    ratios.push((Math.max(l0, l1) + 0.05) / (Math.min(l0, l1) + 0.05))
+  }
+
+  if (!ratios.length) return null
+  ratios.sort((a, b) => a - b)
+
+  return Number(ratios[Math.floor(ratios.length * 0.01)].toFixed(2))
+}
+
 export const compositeLuminosity = async ({ backdropBytes, sourceBytes, left, top, width, opacity }) => {
   const { data: backdrop, info } = await sharp(backdropBytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
 
@@ -732,6 +775,33 @@ export const compositeLuminosity = async ({ backdropBytes, sourceBytes, left, to
   }
 }
 
+// Kinds a campaign piece may take from the graphic line: the ring-bearing ones. Voice, signature and URL bubble stay with
+// this compiler (its type system, its logo and its URL), so a graphic line intent never signs or writes copy twice.
+const GRAPHIC_LINE_LAYER_KINDS = new Set(['orbit', 'measure', 'progress', 'lens', 'spotlight', 'family-map'])
+
+const renderGraphicLineLayer = async ({ contract, contractPath, format, finishedPlatePath }) => {
+  if (!format.graphic_line) return null
+
+  const { width, height } = format.canvas
+  const intent = JSON.parse(await readFile(resolveRunPath(contractPath, contract, format.graphic_line.intent), 'utf8'))
+
+  if (intent.canvas?.width !== width || intent.canvas?.height !== height)
+    throw new Error(`${format.id}: graphic_line intent canvas ${intent.canvas?.width}×${intent.canvas?.height} ≠ format ${width}×${height}`)
+
+  const foreign = (intent.elements ?? []).filter(element => !GRAPHIC_LINE_LAYER_KINDS.has(element.kind)).map(element => element.kind)
+
+  if (foreign.length) throw new Error(`${format.id}: graphic_line carries ${[...new Set(foreign)].join(', ')}; this compiler owns copy and signature`)
+
+  const manifest = resolveGraphicLine(intent)
+  // Lens and spotlight work on the piece's own finished plate.
+  const photos = Object.fromEntries(manifest.elements.filter(el => el.photo).map(el => [el.photo.id, finishedPlatePath]))
+  const protect = format.graphic_line.protect.map(zone => ({ id: zone.id, kind: zone.kind, x: zone.box.x * width, y: zone.box.y * height, w: zone.box.width * width, h: zone.box.height * height }))
+  const bindings = { photos, protect, transparent: true }
+  const { svg, rings } = paintGraphicLine(manifest, bindings)
+
+  return { manifest, svg, rings, bindings }
+}
+
 const renderFormat = async ({
   contract,
   contractPath,
@@ -755,18 +825,28 @@ const renderFormat = async ({
   const sourcePlateBytes = await readFile(sourcePlatePath)
   const finishedPlateBytes = await readFile(finishedPlatePath)
 
-  const plateBytes = await sharp(finishedPlateBytes)
+  const bareplateBytes = await sharp(finishedPlateBytes)
     .resize(width, height, { fit: 'fill' })
     .toColourspace('srgb')
     .png()
     .toBuffer()
+
+  const graphicLine = await renderGraphicLineLayer({ contract, contractPath, format, finishedPlatePath })
+
+  const plateBytes = graphicLine
+    ? await sharp(bareplateBytes).composite([{ input: Buffer.from(graphicLine.svg), left: 0, top: 0 }]).png().toBuffer()
+    : bareplateBytes
 
   const hookSelectionTarget =
     contract.collaboration_selection?.target_binding === 'hook' ? (collaborationManifest?.target.id ?? null) : null
 
   const underlayBody = underlayMarkup(contract, format, hookSelectionTarget)
   const underlaySvg = svgDocument(width, height, underlayBody)
-  const urlBubbleMarkup = urlBubbleBytes ? inlineCanonicalUrlBubble(urlBubbleBytes, format.layout) : null
+  const signature = signatureMode(contract)
+  const urlBubbleOpacity = signature === 'url-bubble' ? SIGNATURE_URL_BUBBLE_OPACITY : LEGACY_URL_BUBBLE_OPACITY
+  const drawsLogo = signature !== 'url-bubble'
+  const drawsUrlBubble = Boolean(urlBubbleBytes) && signature !== 'logo'
+  const urlBubbleMarkup = drawsUrlBubble ? inlineCanonicalUrlBubble(urlBubbleBytes, format.layout, urlBubbleOpacity) : null
 
   const {
     markup: vectorMarkup,
@@ -784,9 +864,10 @@ const renderFormat = async ({
     height,
     `
     <g data-layer="clean_plate"><image href="${escapeXml(relativePlatePath)}" width="${width}" height="${height}" preserveAspectRatio="none"/></g>
+    ${graphicLine ? `<g data-layer="graphic_line">${graphicLine.svg.replace(/^<svg[^>]*>|<\/svg>$/g, '')}</g>` : ''}
     ${underlayBody}
     ${vectorMarkup}
-    <g data-layer="brand"><image href="${logoDataUri}" x="${format.layout.logo.left}" y="${format.layout.logo.top}" width="${format.layout.logo.width}"/></g>
+    ${drawsLogo ? `<g data-layer="brand"><image href="${logoDataUri}" x="${format.layout.logo.left}" y="${format.layout.logo.top}" width="${format.layout.logo.width}"/></g>` : ''}
   `
   )
 
@@ -808,30 +889,43 @@ const renderFormat = async ({
 
   const logoRaster = await sharp(logoBytes).resize({ width: format.layout.logo.width }).png().toBuffer()
 
-  const rasterVectorMarkup = urlBubbleBytes
+  const rasterVectorMarkup = drawsUrlBubble
     ? buildVectorLayers(fonts, contract, format, collaborationManifest, '').markup
     : vectorMarkup
 
   const composedWithoutUrlBubble = await sharp(underlayBytes)
     .composite([
       { input: svgDocument(width, height, rasterVectorMarkup), left: 0, top: 0 },
-      { input: logoRaster, left: format.layout.logo.left, top: format.layout.logo.top }
+      ...(drawsLogo ? [{ input: logoRaster, left: format.layout.logo.left, top: format.layout.logo.top }] : [])
     ])
     .flatten({ background: contract.brand.colors.background })
     .toColourspace('srgb')
     .png()
     .toBuffer()
 
-  const urlBubbleComposite = urlBubbleBytes
+  const urlBubbleComposite = drawsUrlBubble
     ? await compositeLuminosity({
         backdropBytes: composedWithoutUrlBubble,
         sourceBytes: urlBubbleBytes,
         left: Math.round(format.layout.url.x),
         top: Math.round(format.layout.url.y),
         width: Math.round(format.layout.url.width),
-        opacity: 0.72
+        opacity: urlBubbleOpacity
       })
     : null
+
+  // Under the rule, the URL bubble signature must read: its solid ink against the backdrop it covers, ≥ 4.5:1.
+  const signatureContrast =
+    signature === 'url-bubble' && urlBubbleComposite
+      ? await measureBubbleContrast({
+          before: composedWithoutUrlBubble,
+          after: urlBubbleComposite.output,
+          source: urlBubbleBytes,
+          left: Math.round(format.layout.url.x),
+          top: Math.round(format.layout.url.y),
+          width: Math.round(format.layout.url.width)
+        })
+      : null
 
   const composedBytes = urlBubbleComposite?.output ?? composedWithoutUrlBubble
   let pipeline = sharp(composedBytes).toColourspace('srgb').withMetadata({ density: 72 })
@@ -877,7 +971,25 @@ const renderFormat = async ({
     accentContrastP95: contrastEvidence.accentP95 >= 3
   }
 
-  if (urlBubbleBytes) assertions.urlBubbleVisible = urlBubbleComposite.evidence.visible
+  if (drawsUrlBubble) assertions.urlBubbleVisible = urlBubbleComposite.evidence.visible
+  if (signature === 'url-bubble') assertions.signatureContrast = signatureContrast !== null && signatureContrast >= 4.5
+  if (signature === 'legacy' && urlBubbleBytes)
+    console.warn(`  ⚠ ${format.id}: contract without brand.signature — logo and URL bubble together (pre-2026-09-26 layout, kept as is).`)
+
+  // The orbit layer passes its contract checks against the real copy field and the laid-out text.
+  if (graphicLine) {
+    const box = b => ({ x: b.left, y: b.top, w: b.right - b.left, h: b.bottom - b.top })
+    const copy = format.copy_field
+
+    const bindings = {
+      ...graphicLine.bindings,
+      texts: [{ id: 'copy', ...box(contentBounds) }],
+      protect: [...graphicLine.bindings.protect, { id: 'copy-field', kind: 'reserve', x: copy.x * width, y: copy.y * height, w: copy.width * width, h: copy.height * height }]
+    }
+
+    graphicLine.checks = runAdapterChecks(graphicLine.manifest, bindings, graphicLine.rings)
+    assertions.graphicLine = graphicLine.checks.every(check => check.status !== 'fail')
+  }
 
   if (format.baseline) {
     assertions.baselineWithinTolerance = baselineComparison.normalizedMae <= format.baseline.max_normalized_mae
@@ -909,6 +1021,10 @@ const renderFormat = async ({
     logoSha256,
     urlBubbleSha256,
     urlBubbleRasterEvidence: urlBubbleComposite?.evidence ?? null,
+    signature: { mode: signature, ...(signatureContrast !== null ? { contrast: signatureContrast } : {}) },
+    graphicLine: graphicLine
+      ? { intent: format.graphic_line.intent, contract: graphicLine.manifest.contract, rings: graphicLine.rings, checks: graphicLine.checks }
+      : null,
     exactCopy: contract.message,
     supportLayout,
     collaborationSelection: collaborationEvidence,
@@ -1100,8 +1216,11 @@ export const verifyCompiledCampaign = async (contractPathInput, compiled) => {
     const overlayPath = resolveRunPath(contractPath, contract, result.vectorOverlay)
     const overlay = await readFile(overlayPath, 'utf8')
 
+    const mode = signatureMode(contract)
+
+    // A logo-signed piece carries no URL at all.
     const copyPresent =
-      [contract.message.kicker, ...contract.message.headline, contract.message.url].every(value =>
+      [contract.message.kicker, ...contract.message.headline, ...(mode === 'logo' ? [] : [contract.message.url])].every(value =>
         overlay.includes(`data-copy="${escapeXml(value)}"`)
       ) && overlay.includes(`data-full-copy="${escapeXml(supportingTaglineCopy(contract.message.support))}"`)
 
@@ -1115,12 +1234,13 @@ export const verifyCompiledCampaign = async (contractPathInput, compiled) => {
       logoHash: result.logoSha256 === manifest.logoSha256,
       urlBubbleAsset:
         !contract.brand.url_bubble ||
+        mode === 'logo' ||
         (result.urlBubbleSha256 === manifest.urlBubbleSha256 &&
           result.urlBubbleRasterEvidence?.method === 'non-separable-luminosity' &&
           result.urlBubbleRasterEvidence?.visible === true &&
           overlay.includes('data-axis-brand-primitive="url-bubble"') &&
           overlay.includes('style="mix-blend-mode:luminosity"') &&
-          overlay.includes('opacity="0.72"')),
+          overlay.includes(`opacity="${mode === 'url-bubble' ? SIGNATURE_URL_BUBBLE_OPACITY : LEGACY_URL_BUBBLE_OPACITY}"`)),
       editableSourcePresent: await exists(resolveRunPath(contractPath, contract, result.editableSource)),
       collaborationSelectionResolved:
         !contract.collaboration_selection ||

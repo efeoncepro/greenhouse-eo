@@ -6,6 +6,14 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26
+
+- TASK-1896 quedó code complete (rollout pendiente): los commands de escritura heredan `captureWithDomain` y
+  `logEvent` de `@studio/observability` (nunca `Sentry.captureException` suelto), el id de request de `handle()`
+  (`X-Correlation-Id`, útil como `correlation_id` de `audit_event`) y el health profundo. La precondición sigue en
+  pie: las escrituras no se habilitan en producción hasta que TASK-1896 cierre con el ensayo de restauración verde
+  contra `marketing_studio` y el scheduler activo.
+
 ## Delta 2026-09-25
 
 - TASK-1899 pide: cada aprobación como command y tool propios con `requiresPerson` (`brief.approve`, `creative.approve`, `media_authorization.authorize`, `budget_line.approve`); las tools genéricas rechazan destinos aprobatorios; `dryRun` devuelve `proposalDigest` y las aprobaciones y acciones destructivas exigen repetirlo (sin él 428, alterado 409) por cualquier vía, UI incluida. Capability `marketing_studio.campaign.approve` separada de `write`, con grant a `efeonce_admin`, `efeonce_account` y `efeonce_operations` (decisión del operador 2026-09-25; `designer` escribe pero no aprueba).
@@ -34,7 +42,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1890`
+- Blocked by: `none`
 - Branch: `Greenhouse develop (capability, docs) · efeonce-marketing-studio main (código y migraciones); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -112,7 +120,7 @@ Reglas obligatorias:
 - `.claude/skills/efeonce-mcp-platform/SKILL.md` y la skill `mcp-craft` (nombres, descripciones y anotaciones de tools de escritura).
 - `.claude/skills/greenhouse-backend/` (command semantics, errores canónicos, idempotencia).
 - `AGENTS.md` y `CLAUDE.md` del repo `efeonce-marketing-studio` (comandos vigentes, gates `absolute-path-gate` y `domain-boundary-gate`).
-- `docs/tasks/in-progress/TASK-1890-marketing-studio-agent-ready-contract.md` (manifiesto, bearer, semántica: esta task los extiende, no los redefine).
+- `docs/tasks/complete/TASK-1890-marketing-studio-agent-ready-contract.md` (manifiesto, bearer, semántica: esta task los extiende, no los redefine).
 
 ## Dependencies & Impact
 

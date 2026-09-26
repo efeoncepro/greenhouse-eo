@@ -26,7 +26,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -39,10 +39,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-049`
-- Status real: `Gateway 1.8.0 desplegado con el flag OFF (PR #19, revisión 00057-w8h); falta el release de Greenhouse (canje + manual) y luego flag ON + canary con token humano`
+- Status real: `Encendido y verificado en producción 2026-09-26 (00061-sbc, canary MCP real verde). Sin verificar en vivo: la denegación a una persona sin capability (requiere un segundo login; cubierta por tests)`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1890`
+- Blocked by: `none`
 - Branch: `efeonce-mcp feat/task-1891-marketing-studio-provider → PR a main (el deploy es dispatch manual, no automático) · Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -280,13 +280,14 @@ Contrato de tools: el que publica el manifiesto de TASK-1890 (tabla en su Detail
 ## Acceptance Criteria
 
 - [x] Todas las tools del manifiesto de Studio están registradas en el gateway, y el guard falla nombrando cualquier tool faltante o sobrante (`marketing-studio-mcp.test.ts` sobre `tools/list` real; `computeMarketingStudioParity` visto fallar con una tool faltante y una sobrante).
-- [ ] Con capability y membership, `studio.attention.get` y `studio.campaign.get` devuelven los datos de producción.
-- [ ] Una organización ajena devuelve `not_found`, y una persona sin capability recibe denegación.
-- [ ] Con Studio inaccesible, sus tools devuelven `upstream_unavailable` y los demás providers siguen sirviendo.
-- [ ] `studio.asset.preview` devuelve una imagen WebP de ≤640 px.
-- [ ] `efeonce.gateway.status` lista `marketing-studio` como `enabled` en la revisión activa.
+- [x] Con capability y membership, `studio.attention.get` y `studio.campaign.get` devuelven los datos de producción (sesión MCP real contra `https://mcp.efeonce.org/mcp` el 2026-09-26, token PKCE del cliente público con la persona operadora `efeonce_admin`: `attention` con `items/upcoming/inventory`, `campaigns.list` con 5 campañas, `campaign.get CMP-001` con los tres estados y la organización canónica, `asset.get` con 1 versión).
+- [x] Una organización ajena devuelve `not_found` (en vivo: `campaign.get` con un `organizationId` ajeno respondió `not_found` anti-oráculo).
+- [ ] Una persona sin capability recibe denegación **en vivo**. No se ejercitó: requiere el login de una segunda persona sin `marketing_studio.campaign.read`. Cubierto por tests: `test/marketing-studio.test.ts` («persona sin la capability: forbidden y Studio nunca recibe la llamada») y `mcp-token-exchange.test.ts` (`authorizeMarketingStudio → false` ⇒ `user_not_eligible`).
+- [x] Con Studio inaccesible, sus tools devuelven `upstream_unavailable` y los demás providers siguen sirviendo. Evidencia en vivo del mismo camino: mientras el canje de Greenhouse respondía 503 (2026-09-26 07:09Z), las tools `studio.*` devolvieron `upstream_unavailable`, y `efeonce.gateway.status`, `tools/list` y los demás providers siguieron respondiendo. El caso de Studio caído está cubierto por `test/marketing-studio.test.ts`.
+- [x] `studio.asset.preview` devuelve una imagen WebP de ≤640 px (en vivo: `CMP001-01-imagen-16x9`, `image/webp`, 12 196 bytes, 640×360).
+- [x] `efeonce.gateway.status` lista `marketing-studio` como `enabled` en la revisión activa (`efeonce-mcp-gateway-00061-sbc`, `contractVersion task-1891-studio-tool-manifest.v1`, servidor `efeonce-mcp 1.8.0+958c9de`).
 - [x] La versión del gateway subió un minor y `surface-baseline.json` quedó actualizado (`1.8.0`, 70 tools; el gate se encendió antes del bump). Si PR #18 (TASK-1888, también 1.8.0) se mergea antes, este PR rebasa a 1.9.0.
-- [ ] Runbook, arquitectura, skill (ambos espejos), Handoff y changelog actualizados.
+- [x] Runbook, arquitectura, skill (ambos espejos), Handoff y changelog actualizados (2026-09-26, con las tres lecciones del encendido).
 
 ## Verification
 
@@ -296,13 +297,13 @@ Contrato de tools: el que publica el manifiesto de TASK-1890 (tabla en su Detail
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] EPIC-049 actualizado
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] EPIC-049 actualizado
 
 ## Follow-ups
 

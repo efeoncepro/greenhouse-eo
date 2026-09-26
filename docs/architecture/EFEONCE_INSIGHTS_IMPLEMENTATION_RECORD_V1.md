@@ -616,16 +616,16 @@ dossier [`docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md`
 
 | # | Hito | Commit | Qué entró |
 |---|---|---|---|
-| 1 | Slices 1–2 — catálogos editoriales del canvas aprobado | `d357e0224` | Gate `insights:canvas-fidelity` (`scripts/insights/canvas-fidelity.ts` + `canvas-fixtures/`), roles editoriales y Poppins 500 en el brand pack `axis`, assets de canal/marca/contacto, resolvers editoriales + test |
-| 2 | Las plantillas editoriales reemplazan a las v1 | `b649080c7` | Portada, índice, capítulo, narrativa, tabla, límites y contraportada v2; retiro de `report-contents`, `report-dense-table`, `report-limits-v2` y portadas navy separadas; guarda `insights-catalogs-v2-only.test.ts` |
-| 3 | Slice 3 — portada blanca por módulo y logo del cliente | `4ff72fe3a` (+ evidencia `2410e5156`) | `ReportCoverLightPage`, `render/cover.ts`, `readOrganizationLogoForRender`, `ComposeOptions.externalAssets`, consumer del worker y `classify-failure.ts`; `render.ts` espera `img.decode()` |
-| 4 | Slice 4 — plantillas de figura | `3fa493efe` | 4 páginas A4 + 4 láminas de figura, `figure-svg.ts`, `figure-hooks.ts`, resolvers `report-`/`deck-`, `example?` en `contracts.ts` + `synthesize.ts`, fixtures 40–43 |
-| 5 | Slice 4 — mappers y retiro del legado | `85785e7fc` | `render/figure-slots.ts` (nuevo, compartido) reemplaza a `render/figure-pages.ts` (borrado); fuera `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css` y resolvers v1 |
-| 6 | Docs del Slice 4 | `1120e86e4`, `5968e35e8` | Estado real en la task |
-| 7 | Excepción aprobada de `Deck-Agrupadas` | `289b6eca4` | `approvedException` (techo 2,5 %) en el fixture y en `canvas-fidelity.ts` |
-| 8 | «Lo esencial» del plan v2 | `738ceb748` | Resumen A4 y deck desde `plan.essentials`, folio real |
-| 9 | Correcciones por ediciones reales | `b88fd447c` | Canales distintos para agrupar en un eje, `narrativeDropCapHook`, presupuestos de texto, `preview-edition.ts` con el lector del worker |
-| 10 | Dossier + scorecard | `9529a1b25` | Hojas en gris, `ui:quality` PASS 4,59 |
+| 1 | Slices 1–2 — catálogos editoriales del canvas aprobado | `61d1ef690` (antes `d357e0224`) | Gate `insights:canvas-fidelity` (`scripts/insights/canvas-fidelity.ts` + `canvas-fixtures/`), roles editoriales y Poppins 500 en el brand pack `axis`, assets de canal/marca/contacto, resolvers editoriales + test |
+| 2 | Las plantillas editoriales reemplazan a las v1 | `4a4c77748` (antes `b649080c7`) | Portada, índice, capítulo, narrativa, tabla, límites y contraportada v2; retiro de `report-contents`, `report-dense-table`, `report-limits-v2` y portadas navy separadas; guarda `insights-catalogs-v2-only.test.ts` |
+| 3 | Slice 3 — portada blanca por módulo y logo del cliente | `5c2bcb5a1` (antes `4ff72fe3a`) (+ evidencia `8075a2930` (antes `2410e5156`)) | `ReportCoverLightPage`, `render/cover.ts`, `readOrganizationLogoForRender`, `ComposeOptions.externalAssets`, consumer del worker y `classify-failure.ts`; `render.ts` espera `img.decode()` |
+| 4 | Slice 4 — plantillas de figura | `f0b0d78cc` (antes `3fa493efe`) | 4 páginas A4 + 4 láminas de figura, `figure-svg.ts`, `figure-hooks.ts`, resolvers `report-`/`deck-`, `example?` en `contracts.ts` + `synthesize.ts`, fixtures 40–43 |
+| 5 | Slice 4 — mappers y retiro del legado | `30c11aba7` (antes `85785e7fc`) | `render/figure-slots.ts` (nuevo, compartido) reemplaza a `render/figure-pages.ts` (borrado); fuera `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css` y resolvers v1 |
+| 6 | Docs del Slice 4 | `29a54885e` (antes `1120e86e4`), `3709d9424` (antes `5968e35e8`) | Estado real en la task |
+| 7 | Excepción aprobada de `Deck-Agrupadas` | `7ab466c88` (antes `289b6eca4`) | `approvedException` (techo 2,5 %) en el fixture y en `canvas-fidelity.ts` |
+| 8 | «Lo esencial» del plan v2 | `ae2c34b59` (antes `738ceb748`) | Resumen A4 y deck desde `plan.essentials`, folio real |
+| 9 | Correcciones por ediciones reales | `198ce883a` (antes `b88fd447c`) | Canales distintos para agrupar en un eje, `narrativeDropCapHook`, presupuestos de texto, `preview-edition.ts` con el lector del worker |
+| 10 | Dossier + scorecard | `2f0776e0f` (antes `9529a1b25`) | Hojas en gris, `ui:quality` PASS 4,59 |
 
 **Archivo por archivo.**
 

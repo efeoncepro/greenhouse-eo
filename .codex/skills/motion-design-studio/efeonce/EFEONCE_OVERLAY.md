@@ -33,12 +33,21 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   (mograph/HTML `<img src>`); el logo se compone en post, nunca lo renderiza un modelo de video.
 - **Cierre de marca 4,5 s — línea gráfica «La órbita» (canónica desde 2026-09-25):** el end-card de la marca propia
   Efeonce y su familia (nunca de un cliente) sigue el
-  [manual §10.1](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md): anillo 0–0,5 s · arco
-  0,4–1,4 s · la esfera asienta 1,4–1,7 s · halo 1,2–2,0 s · logo 1,9–2,5 s · eslogan 2,5–3,0 s. Con movimiento
-  reducido, cuadro final fijo. Hay versión 16:9 y variante 1:1; referencias renderizadas y generador en
+  [manual §10.1](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md). La línea de tiempo
+  **es un token**: `efeonceGraphicLine.brandClose` de `@efeoncepro/axis-tokens` (`totalMs` + `steps` con `part`,
+  `startMs`, `endMs`: anillo → arco → la esfera asienta → halo → logo → eslogan) y el kind `brand-close` del
+  contrato `efeonce.graphic-line-orbit` 0.2.0. El motion **consume** esos valores; nunca transcribe los tiempos a
+  mano (si el token cambia, el cierre cambia con él). `brand-close` no va en canal print; con movimiento reducido,
+  cuadro final fijo. Hay versión 16:9 y variante 1:1; referencias renderizadas y generador en
   `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/motion/` (`cierre-16x9.mp4`, `cierre-1x1.mp4`,
-  `orbita-motion.mjs`). Se construye en mograph desde tokens `efeonceGraphicLine` y el logo real, nunca con un
-  modelo de video. El foco (§1.4) se anima barriendo la escena hasta posarse sobre el cliente, una sola luz.
+  `orbita-motion.mjs`; ese generador de exploración trae los tiempos escritos a mano: es referencia visual, no
+  fuente de valores). Se construye en mograph desde tokens `efeonceGraphicLine` y el logo real de
+  `@efeoncepro/axis-brand-assets`, nunca con un modelo de video. El eslogan «Empower your …» sólo cierra: nunca en
+  mayúsculas ni con esfera. El foco (§1.4) se anima barriendo la escena hasta posarse sobre el cliente, una sola luz.
+  La órbita no reemplaza la composición del plano: se declara donde aporta (cierre, foco), no en cada escena.
+  **Reveal y apertura del logo** (línea → logo y logo → línea, conviven con el cierre): spec, tiempos, oclusión,
+  sonido y entregables en [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md);
+  generador en `scripts/creative/brand-motion/` (render, sonido y codificación).
   Reglas y checklist: [graphic-line-orbit.md](../../efeonce-brand-studio/references/graphic-line-orbit.md).
 - **`DESIGN.md`** es el contrato visual agent-facing; leerlo si la pieza toca UI (pero recuerda: motion de
   UI runtime NO es esta skill).

@@ -105,7 +105,7 @@ Leer solo lo necesario:
 - `references/metrics-and-scorecards.md` para métricas y scorecards.
 - `references/branding-as-a-service.md` para ofertas, delivery, pricing logic y handoff.
 - `references/research-sources-2026.md` para evidencia fechada, confianza y fuentes de investigación.
-- `references/graphic-line-orbit.md` para la línea gráfica «La órbita» de Efeonce: usos, reglas duras, tokens, artefactos y QA.
+- `references/graphic-line-orbit.md` para la línea gráfica «La órbita» de Efeonce: usos, regla de la firma, reglas duras, tokens y archivos oficiales, contrato y comandos, fotografía generada, artefactos y QA.
 
 Usar las plantillas de `templates/` cuando el usuario necesite un artefacto formal. Ejecutar `scripts/validate-brand-artifact.py` antes de cerrar entregables estructurados.
 
@@ -149,8 +149,19 @@ lente, objeto), **mide** (el arco es avance real) y **enfoca** (la lente y el fo
   **Qué decide `design-studio`:** composición, lente, foto y QA de píxeles; los valores salen de los tokens
   `efeonceGraphicLine` de AXIS, **nunca** HEX/px transcritos.
 - **Reglas duras:** ningún texto cruza la órbita · una lente u órbita por pieza, muro o vidrio, nunca patrón · sin
-  dato real no hay arco · `efeoncepro.com` siempre en la burbuja oficial `url-lum`, nunca como texto · el logo en una
+  dato real con fuente no hay arco · `efeoncepro.com` siempre en la burbuja oficial, nunca como texto · el logo en una
   frase de display sólo alineado a línea base y altura de x · sin velo navy sobre fotos de banco.
+- **La órbita no sustituye el lenguaje fotográfico** (operador, 2026-09-26): se declara a propósito en casos
+  específicos (lente, medida, progreso, foco, cierre), nunca por defecto, y nunca cruza sujeto, reservas de texto,
+  lecho ni firma. La composición de una foto sigue siendo del lenguaje fotográfico.
+- **Firma de una pieza gráfica** (operador, 2026-09-26): **logo de Efeonce centrado abajo**, sin URL. La burbuja
+  `efeoncepro.com` **no se agrega por defecto**: sólo **reemplaza** al logo cuando el logo ya aparece dentro de la
+  imagen (mockup, objeto, merch), centrada, sola, con fusión de luminosidad a opacidad 1 y ≥ 4,5:1 medido (sólo pasa
+  sobre lechos muy oscuros). Nunca a un costado ni junto al logo. Como pie de deck, informe, papelería o mail sigue
+  como antes (horneada donde no hay fusión). Umbral 4,5 vs 3:1: pendiente del operador.
+- **Cómo se ejecuta:** contrato AXIS `efeonce.graphic-line-orbit` 0.2.0 (`pnpm creative:orbit:resolve|render`),
+  capa `graphic_line` y `brand.signature` en `pnpm creative:layout`, `marcaEnEscena` en `pnpm foto:componer:cta`;
+  logos y burbujas sólo desde `@efeoncepro/axis-brand-assets`, nunca copias a mano. Detalle y QA en la referencia.
 - **Estado:** **sistema consistente, NO activo distintivo demostrado**: la prueba de atribución sin logo (600
   personas) no se ha corrido. «Te hacemos visible» no sale a pauta sin revisión legal.
 

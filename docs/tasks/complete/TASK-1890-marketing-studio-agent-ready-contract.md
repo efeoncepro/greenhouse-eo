@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-049`
-- Status real: `Code complete en Studio y en producción; en Greenhouse falta el release para servir el manual`
+- Status real: `Complete 2026-09-26: en producción en Studio y en Greenhouse (release 0e87c7a443a2, PR #240); manual servido por el lane de skills de producción`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -323,7 +323,7 @@ Nombres de tools propuestos (confirmar con `mcp-craft` al implementar; espacio d
 - [x] `manifestHash` es determinista y `mcp:manifest:check` falla si el artefacto se edita a mano (visto fallar renombrando una tool en el artefacto).
 - [x] Leak test verde sobre todas las descripciones (visto fallar con una ruta del repo y un id de task).
 - [x] `marketing_studio.campaign.read` existe en catálogo TS y `capabilities_registry`, con grant a admin, account y operations (tests de entitlements verdes; la paridad live confirma la fila; esa suite falla por un drift previo ajeno: `growth.ga4.connect` e `identity.internal_access.*`).
-- [ ] El manual `marketing-studio` se sirve por el lane de skills de Greenhouse en producción. **Pendiente:** code complete y en el artefacto (`mcp:skills:check` al día, 9 manuales); falta el release de Greenhouse a producción.
+- [x] El manual `marketing-studio` se sirve por el lane de skills de Greenhouse en producción. Canary del 2026-09-26 tras el release `0e87c7a443a2` (run `36222331450`): `GET /api/platform/ecosystem/mcp/skills` 200 con `marketing-studio` en el catálogo, y `/skills/marketing-studio` 200 con el manual completo (8,9 KB, incluye `studio.attention.get`).
 - [x] Secreto del token del gateway creado como scalar crudo (`marketing-studio-mcp-gateway-token` v1, 47 caracteres con forma `mst_…`, sin salto de línea).
 - [x] Arquitectura (§4, §4.1, §5, §7.1), runbook, documento funcional, manual de uso, Handoff y changelog actualizados.
 
@@ -335,13 +335,13 @@ Nombres de tools propuestos (confirmar con `mcp-craft` al implementar; espacio d
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] EPIC-049 actualizado; TASK-1891 desbloqueada
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (TASK-1891 actualizada; TASK-1892/1894/1899 no cambian de supuestos)
+- [x] EPIC-049 actualizado; TASK-1891 desbloqueada
 
 ## Follow-ups
 

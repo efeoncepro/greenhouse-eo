@@ -1,6 +1,6 @@
 # Guía de uso de los kits de marca de Efeonce en imagen y video
 
-> **Tipo de documento:** Guía operativa para agentes · **Versión:** 1.1 · **Creado:** 2026-09-17 por Claude · **Actualizado:** 2026-09-17
+> **Tipo de documento:** Guía operativa para agentes · **Versión:** 1.2 · **Creado:** 2026-09-17 por Claude · **Actualizado:** 2026-09-26 por Claude
 > **Método de producción de los kits:** [kits de prenda y merch](2026-09-17-hoodie-efeonce-garment-reference-kit.md) ·
 > [kit 3D del logo](2026-09-17-efeonce-logo-3d-reference-kit-production-method.md) ·
 > [bibliotecas 3D y vestuario](PARTNER_MASCOT_POSE_LIBRARIES.md)
@@ -211,3 +211,26 @@ frente, la palabra en Bricolage con su punto (la órbita, opcional, alrededor de
 este mismo método (arte plano exacto + kit de prenda como referencia; el modelo sólo pone material y luz) y son
 maquetas de presentación. Reglas y medidas en el
 [manual §10.4–§10.8](../brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#104-objetos--la-regla).
+
+## Delta 2026-09-26 — oficina y merch en foto, y cómo firma una foto con la marca dentro
+
+**Método [medido en las láminas 4.8 y 4.9 de la línea gráfica].** Para fotografiar merch (17 fotos) o la oficina
+(9 fotos: recepción, sala, pasillo, pizarra, estado de sala, muro de voz, cocina, puesto de bienvenida, cabinas) el
+arte plano de la línea es la **referencia exacta** y GPT Image 2.5 Sunburst (`xhigh`) sólo pone el espacio, el
+material y la luz, en registro documental y sin que nadie mire al lente. Lo que enseñó la corrida de la oficina:
+
+1. **El modelo imprime todo lo que ve en el arte, incluidas las notas de la lámina.** Dos fotos salieron con la
+   anotación pintada en el muro. El arte que se pasa como referencia va **sin leyendas**.
+2. **El logo chico se reinventa.** Se repuso editando la foto con el logo oficial como segunda referencia; revisarlo
+   siempre al 100 %.
+3. **La puntuación se revisa letra por letra** (salió un espacio antes del punto final).
+4. **Se corrige editando la foto generada** (editar conserva), no regenerando la escena.
+
+Son maquetas de dirección: la producción sale de los archivos vectoriales con prueba de color sobre el material
+real. Detalle en el [manual §10.9](../brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#109-oficina-en-foto).
+
+**Firma [decisión del operador, 2026-09-26].** Una pieza gráfica firma con el **logo de Efeonce centrado**. Cuando la
+foto ya muestra el logo de Efeonce —en una prenda, un objeto o el merch— no se compone otro logo: si la pieza firma, lo
+hace con la **burbuja URL sola, centrada y fusionada**, que sólo llega a 4,5:1 sobre un lecho muy oscuro. Nunca la
+burbuja junto al logo ni a un costado. Números y cómo se declara:
+[firma §5.1](../brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26).

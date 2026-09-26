@@ -1,9 +1,9 @@
 # Lenguaje Fotográfico Efeonce V1 — «El oficio a la vista»
 
 > **Tipo de documento:** Especificación canónica de marca (documento maestro)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-21 — el sistema se declara en **dos registros** (documental y puesta en escena); ver el [delta 2026-09-21](#delta-2026-09-21--dos-registros-documental-y-puesta-en-escena)
+> **Última actualización:** 2026-09-26 por Claude — la órbita de la línea gráfica no sustituye la composición de este lenguaje, y la regla de la firma; ver el [delta 2026-09-26](#delta-2026-09-26--la-órbita-no-sustituye-la-composición). Antes (2026-09-21): el sistema se declara en **dos registros** (documental y puesta en escena); ver el [delta 2026-09-21](#delta-2026-09-21--dos-registros-documental-y-puesta-en-escena)
 > **Estado:** Aprobado por el operador (Julio Reyes, dueño de Efeonce) el 2026-09-19. Sistema consistente; **no** es todavía un activo distintivo medido.
 > **Documentación relacionada:** [Índice](./README.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Bitácora](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md) · [Marca de agencia](../../context/09_marca-agencia.md) · [Quiénes somos](../../context/01_quienes-somos.md) · [Marca en escena](../../../.claude/skills/social-media-studio/references/brand-in-scene.md)
 
@@ -184,7 +184,7 @@ compara la misma toma en `high` y `xhigh`; `xhigh` cuesta 1,8× y mejora poco el
 
 | Sistema | Regla central | Documento |
 |---|---|---|
-| Firma | Un primer plano desenfocado **planeado desde la toma** (herramienta o superficie del oficio) sirve de lecho al logo centrado, ancho 20% del lado corto, contraste ≥ 4,5:1. Lecho p99 ≤ ~20, tono declarado en el prompt | [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) |
+| Firma | Un primer plano desenfocado **planeado desde la toma** (herramienta o superficie del oficio) sirve de lecho al logo centrado, ancho 20% del lado corto, contraste ≥ 4,5:1. Lecho p99 ≤ ~20, tono declarado en el prompt. La burbuja URL sólo reemplaza al logo cuando la marca ya está en la imagen, sobre lecho muy oscuro (2026-09-26) | [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) |
 | Colorimetría | Sin grade; color natural; blancos ~5200 K neutro-cálido; sombras nunca azules. Azul activo `#0375DB` = la casa, integrado naturalmente en la composición; naranja `#F55D01` = la idea; lima `#6EC207` = el resultado; un solo acento además del azul, sin objeto obligatorio | [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) |
 | Cámaras | Lente, ángulo y lecho se eligen juntos; el modelo respeta la sensación del lente, no la física exacta | [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) |
 | Prompts y pipeline | `foto:prompt` incorpora realismo, impacto/color, escena y FOREGROUND. Generar → validar plate → curar pantallas si aplica → componer firma → métricas → QA al zoom | [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) |
@@ -249,7 +249,7 @@ Recorrido completo ronda por ronda en la [bitácora](../social/2026-09-19-efeonc
 | ~~Espacio para texto~~ **cerrado en el plate (2026-09-19)** | Pedido explícito del operador | Reglas de reserva en [`EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md`](EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md). **Ojo:** cerrado del lado de la TOMA; la capa gráfica encima NO está aprobada, y su retícula definitiva puede corregir los porcentajes por formato |
 | ~~Formatos 9:16 y 16:9 nativos~~ **cerrado (2026-09-19)** | Ya NO es cierto que «todo se probó en 4:5»: hay **7 plates nativos 1152×2048 y 8 nativos 2048×1152** (`rondas/texto/S1|S1v2|S2|S2v2|S3|S3v2-*-{916,169}-plate.png`, `rondas/capas/CB-916-plate.png`, `rondas/capas/CC-169-plate.png`) **[medido con sharp]** | Falta sólo **1:1**. Propuesta original del subagente de composición, aún sin validar (propuesta del subagente de composición: lecho 4:5 22–28%; 9:16 18–22% con logo a 85–88%; 16:9 25–30%; 1:1 20–25%) |
 | 🔴 **El canon se contradice sobre la capa gráfica** **[2026-09-21]** | El canon declara que **la capa gráfica sobre la foto NO está aprobada** (2026-09-19, y así lo repiten la fila anterior de esta tabla y `.claude/rules/brand-photography.md`), pero **todas las piezas publicadas del registro B la usan**: titular, cursores, bounding box, chip. Hoy la documentación se contradice consigo misma, y quien llegue nuevo no sabe si una pieza con titular está permitida o prohibida | **Decisión del operador**: o **se aprueba** la capa gráfica —y entonces se retira el «sin aprobar» del canon, de la fila de espacio para texto y de la regla auto-load—, o **se declara que esas piezas viven bajo otro contrato** y el canon nombra cuál. Mientras no se decida, ninguna de las dos lecturas es la vigente |
-| Firma en dron y tomas todo-enfocadas | Sin desenfoque, la franja se ve algo puesta | Decisión del operador sobre la firma alternativa (url-lum) |
+| Firma en dron y tomas todo-enfocadas | Sin desenfoque, la franja se ve algo puesta | Decisión del operador sobre la firma alternativa (url-lum). *Desde el 2026-09-26 la burbuja sólo reemplaza al logo cuando la marca ya está en la imagen ([firma §5.1](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26)); lo abierto es cómo sostener el logo centrado sin lecho real* |
 | Promover scripts a comando `pnpm` | Hoy viven en la carpeta de la corrida | Comando canónico con tests |
 | Prueba de reconocimiento | Sin ella no hay «activo distintivo» | n ≥ 100 del público objetivo, distractores coherentes, medición antes y después |
 | Masters `xhigh` y limpieza | Inscripción diminuta en la cámara; emblemas por revisar letra por letra | Master limpio con QA al zoom |
@@ -507,3 +507,24 @@ no hay partnership declarado. Sirve en orgánico como referencia nominativa; **n
 
 **El vehículo más seguro del registro es propio: Nexa.** Tiene Character Bible, ocho expresiones y cinco
 vestuarios, y *es* la tesis de la narrativa del período —la IA que sí conoce tu negocio—.
+
+## Delta 2026-09-26 — la órbita no sustituye la composición
+
+**[decisión del operador, 2026-09-26]** La línea gráfica de Efeonce, [«La órbita»](../brand-graphic-line/README.md),
+**no sustituye la composición ni las formas de este lenguaje fotográfico**. Se usa en casos específicos —una lente, una
+medida, un progreso, un foco—, se declara a propósito y **nunca va por defecto** en una pieza. Cuando está, **nunca
+cruza el sujeto, las reservas de texto, el lecho ni la firma**. La foto conserva la composición que le da este
+documento: registro, palancas, lecho y reservas se deciden igual con o sin órbita.
+
+| Tema | Regla |
+|---|---|
+| Cuándo | Sólo si la órbita hace uno de sus trabajos: **rodea** (la lente, un objeto), **mide** (el arco es avance real y exige un dato con fuente) o **enfoca** (la lente: la foto en navy apagado y a color dentro del círculo; el foco: penumbra afuera) |
+| Cuántas | Una lente u órbita por pieza, nunca patrón. Ningún texto cruza la órbita |
+| Dónde se mide | `pnpm creative:orbit:render` (sale 1 si falla un check) y la capa `graphic_line` de `pnpm creative:layout`, con las zonas `protect` (sujeto, reserva, lecho) y el check `orbit-never-over-subject-or-reserves`. La revisión al 100 % sigue siendo humana |
+| La lente pide foto con foco | Exige un punto de interés claro; con una foto débil se nota el truco. El banco propio de la lente (8 tomas documentales) está en [`ai-generations/2026-09-25_banco-lente-orbita/`](../../../ai-generations/2026-09-25_banco-lente-orbita/LEEME.md) |
+| Alcance | Marca propia de Efeonce y su familia. Nunca UI de producto Greenhouse ni trabajo de clientes |
+
+La firma de la pieza sigue su propia regla: logo centrado; la burbuja URL sólo con el logo ya en la imagen
+([firma §5.1](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26)).
+Canon de la órbita: [línea gráfica §1.3](../brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-la-órbita--anatomía-y-regla)
+y [ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md).

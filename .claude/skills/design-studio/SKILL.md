@@ -98,8 +98,22 @@ Para piezas de la marca propia Efeonce o su familia (Globe, Wave, Reach) con la 
 (canónica 2026-09-25: anillo, arco con esfera, halo; lente y foco), cargar
 [`../efeonce-brand-studio/references/graphic-line-orbit.md`](../efeonce-brand-studio/references/graphic-line-orbit.md)
 y el [manual V1](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md). Valores desde los tokens
-AXIS `efeonceGraphicLine`, nunca HEX/px a mano; ningún texto cruza la órbita; una órbita o lente por pieza; URL en
-burbuja `url-lum`. No aplica a UI de Greenhouse ni a clientes.
+AXIS `efeonceGraphicLine`, nunca HEX/px a mano; ningún texto cruza la órbita; una órbita o lente por pieza; URL
+nunca como texto. No aplica a UI de Greenhouse ni a clientes.
+
+- **La órbita no reemplaza la composición fotográfica:** se declara a propósito (lente, medida con fuente, progreso,
+  foco), nunca por defecto, y nunca cruza sujeto, reservas de texto, lecho ni firma. La foto conserva su composición.
+- **Firma:** logo de Efeonce **centrado abajo**, sin URL. La burbuja `efeoncepro.com` sólo **reemplaza** al logo si
+  el logo ya aparece dentro de la imagen (mockup, objeto, merch): centrada, sola, fusión de luminosidad a opacidad 1 y
+  ≥ 4,5:1 medido (sólo pasa sobre lechos muy oscuros). Nunca a un costado ni junto al logo.
+- **Entradas:** `pnpm creative:orbit:resolve|render` (contrato AXIS `efeonce.graphic-line-orbit` 0.2.0; `render`
+  sale 1 si falla un check), `pnpm creative:layout` (capa `graphic_line` + `brand.signature`),
+  `pnpm foto:componer:cta` (`marcaEnEscena`, regla `firma-burbuja`). Logos y burbujas desde
+  `@efeoncepro/axis-brand-assets`, nunca copias a mano.
+- **Foto de objetos/espacios con la línea (merch, oficina):** el arte plano es la referencia exacta y el modelo sólo
+  pone espacio, material y luz. Lecciones medidas: la referencia va sin leyendas (el modelo las imprime), el logo chico
+  se reinventa y se repone **editando** con el logo oficial como segunda referencia, la puntuación se revisa letra por
+  letra y se corrige editando, no regenerando. Detalle en la referencia de la línea.
 
 Cuando aparezca Julio, usar su identidad fotorrealista aprobada: `refs-aprobadas/` (11 referencias; `julio-ap-04`
 primera opción de rostro y `julio-ap-11` de cuerpo) más `set-identidad/angulos/` (seis ángulos), ambos bajo

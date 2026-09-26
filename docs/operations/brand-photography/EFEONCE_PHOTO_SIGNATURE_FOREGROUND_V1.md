@@ -1,13 +1,18 @@
 # Firma fotográfica Efeonce V1 — primer plano planeado y logo
 
 > **Tipo de documento:** Especificación técnica y funcional de marca
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-20
+> **Última actualización:** 2026-09-26 por Claude — regla de la firma de piezas gráficas: logo centrado; burbuja URL sólo con el logo ya en la imagen ([§5.1](#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26))
 > **Estado:** Aprobado por el operador el 2026-09-19 (con pendientes en §8)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Marca en escena (regla previa)](../../../.claude/skills/social-media-studio/references/brand-in-scene.md) · [Bitácora](../social/2026-09-19-efeonce-photographic-language-production-method.md) · Scripts `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/{medir.mjs,componer.mjs}`
 
 Convenciones: **[medido]** · **[decisión del operador]** · **[criterio]** · **[pendiente]**.
+
+> 🔴 **Regla de la firma (operador, 2026-09-26).** Una pieza gráfica firma con **el logo de Efeonce centrado**. La
+> burbuja URL (`efeoncepro.com`) **no se agrega por defecto**: sólo **reemplaza** al logo cuando el logo de Efeonce ya
+> aparece dentro de la imagen (mockup, objeto, merch), y entonces va sola, centrada y con fusión de luminosidad, sobre
+> un lecho muy oscuro. Detalle, números y cómo se declara en §5.1.
 
 ## 1. Principio
 
@@ -133,6 +138,7 @@ material** entre piezas consecutivas (hallazgo del revisor adversarial) **[crite
 | Rango logrado | **4,9–20,2:1** **[medido]** en las piezas aprobadas | Salida del script por pieza |
 | Nitidez | Ninguna degradación: el desenfoque es del lecho, la marca se lee | `brand-in-scene.md` |
 | Apariciones | Una por pieza | — |
+| Dibujo del archivo | Las copias locales del logo y de la burbuja son el dibujo del paquete `@efeoncepro/axis-brand-assets` 0.2.7 | Guarda de deriva `src/config/efeonce-brand-assets.test.ts` |
 
 Uso:
 
@@ -140,6 +146,53 @@ Uso:
 LOGO=0.20 node ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/componer.mjs <plate.png> <final.png>
 # salida: <final.png> logo blanco|navy <contraste>:1
 ```
+
+### 5.1 La burbuja URL como firma — regla del operador 2026-09-26
+
+**[decisión del operador, 2026-09-26]** Una pieza gráfica (post, anuncio, portada con foto) firma con **el logo de
+Efeonce centrado**, abajo al centro, con todo lo de §5. La **burbuja URL** (`efeoncepro.com`, asset `url-lum`) **no se
+agrega por defecto**. Sólo **reemplaza** al logo cuando el logo de Efeonce **ya aparece dentro de la imagen** (mockup,
+objeto, merch o similar). Entonces va **sola, centrada y con fusión de luminosidad**. Nunca a un costado y nunca junto
+al logo: repetiría la marca.
+
+**Por qué sólo sobre un lecho muy oscuro [medido 2026-09-26].** La fusión de luminosidad fija la luminosidad del gris
+de origen (`#848484`): el color lo pone el fondo, pero el contraste no se puede subir desde la burbuja.
+
+| Condición | Contraste de la burbuja |
+|---|---|
+| Opacidad 0,72 (la de las piezas del canon anterior) | **No llega a 4,5:1 en ningún fondo**: 3,82:1 sobre `#001A33`, 4,00:1 sobre negro |
+| Opacidad plena, píxel máximo | 6,17:1 sobre `#001A33` y 6,78:1 sobre negro |
+| Opacidad plena, 1 % peor de su tinta sólida, sobre lechos casi negros | ~4,4–4,9:1 |
+| Fondos medios o claros | 1,6–3,1:1 |
+
+Por eso, como firma, la burbuja se fusiona **a opacidad 1** y un gate mide **≥ 4,5:1** sobre los píxeles finales. En la
+práctica sólo la sostiene un lecho de §2 de tono `DARK near black`; los lechos muy claros (mesa de luz, concreto,
+plinto) no la sostienen. Si no pasa, se regenera el plate con un lecho oscuro, nunca un scrim; la salida sin firma
+exige un aprobador del registro en el compositor CTA.
+
+**Cómo se declara.**
+
+| Herramienta | Declaración | Qué verifica |
+|---|---|---|
+| `pnpm foto:componer:cta` + `pnpm foto:cta:gate` (tramo 17) | Plan con `"marcaEnEscena": true` y `"url": { … }`, **sin** `logo` | En una pieza nueva, la burbuja se fusiona a opacidad 1 y se mide el 1 % peor de su tinta sólida contra el fondo y si cae sobre el sujeto. La juzga la regla exceptuable `firma-burbuja` (burbuja con marca en escena y sin logo al lado; también salta con `marcaEnEscena` y logo sin burbuja), junto a `firma-contraste` (≥ 4,5:1) y `firma-sobre-sujeto` |
+| `pnpm creative:layout` | `brand.signature: { brand_in_scene }` | `false` → logo centrado y **sin** URL; `true` → burbuja centrada sola (exige `brand.url_bubble`), opacidad 1, y el QA falla bajo 4,5:1. Los contratos sin el campo (CMP-00x) quedan exactamente como antes: logo y burbuja a 0,72 |
+| `pnpm creative:orbit:render` | Intent de la órbita con su firma | Firma con logo o con la burbuja fusionada a opacidad 1 y mide el contraste de la firma sobre los píxeles finales |
+| AXIS | Elemento `signature` de `efeonce.graphic-line-orbit` 0.2.0 y token `efeonceGraphicLine.signature` | Centrada al pie, modo por defecto `logo`, burbuja sólo con la marca en escena, contraste mínimo 4,5 (checks `signature-centered` y `signature-min-contrast`) |
+
+Detalle del compositor en el [contrato CTA §19.6](../EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#196-la-firma-cinco-maneras-de-declararla):
+prueba `P11` y mutantes `gate-t17-burbuja-sin-marca`, `gate-t17-burbuja-con-logo` y `compositor-t17-burbuja-opacidad`
+(3 de 3 detectados). **Las piezas ya aprobadas no se recertificaron:** su dibujo no cambia (siguen a 0,72 y «no
+certificables» con url), pero la huella del comando sí, así que el gate las muestra con 3 hasta recomponerlas. Ningún
+workflow de CI corre este gate.
+
+**Lo que no cambia.** Los usos de la burbuja como **pie** —deck, informe, papelería, stand, firma de mail y pies de
+página— siguen como antes, con sus variantes horneadas donde no hay fusión
+([estándar de informes](../EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md);
+[línea gráfica §8.5](../brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#85-la-url-siempre-en-su-burbuja)). La regla es
+para la **firma** de piezas gráficas.
+
+**[pendiente]** Decisión del operador: si el umbral de la burbuja como firma sigue en 4,5:1 o baja a 3:1 (objeto
+gráfico).
 
 ## 6. Cuándo NO firmar
 
@@ -149,6 +202,10 @@ LOGO=0.20 node ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/co
 | Un 3D de marca es protagonista (nave o logo 3D) | La marca ya es el sujeto | Sin firma (grilla V2, pieza de la nave) |
 | Otra marca es protagonista | Una sola marca protagonista | No firmar o no producir |
 | Toma todo enfocada (dron) | No hay lecho real | Excepción abierta **[pendiente]** |
+
+**Delta 2026-09-26.** Las dos primeras filas son casos con la marca de Efeonce ya dentro de la imagen: el logo
+compuesto sigue sin ir. Si la pieza firma, la única firma posible es la burbuja URL sola, centrada y fusionada
+(§5.1), que exige un lecho muy oscuro.
 
 ## 7. Selección colaborativa AXIS
 
@@ -182,7 +239,9 @@ azul; esa ronda es anterior a la asignación de colores por rol, que es la vigen
 
 ## 8. Pendientes
 
-- Firma en dron y tomas todo-enfocadas: decidir si se usa una firma alternativa (url-lum) **[pendiente]**.
+- Firma en dron y tomas todo-enfocadas: decidir si se usa una firma alternativa (url-lum) **[pendiente]**. *Desde el
+  2026-09-26 la burbuja no es una firma alternativa: sólo reemplaza al logo cuando la marca ya está en la imagen (§5.1).
+  Lo abierto es cómo sostener el logo centrado sin lecho real.*
 - Ajuste de la posición del logo en 9:16 y 16:9 sobre piezas finales, y validación de 1:1 **[pendiente]**. Las
   propuestas históricas de lecho anteriores a `foto:prompt` no sustituyen los valores medidos: 18%, 22% y 16%.
 - Convivencia con el espacio para texto que pidió el operador **[pendiente]**.

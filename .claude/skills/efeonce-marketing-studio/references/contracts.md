@@ -34,7 +34,8 @@ Routes added by TASK-1890: `/assets/{assetId}`, `/assets/{assetId}/preview`, `/t
 
 - `organizationId` (optional, canonical `org-…`): intersects, never widens. Non-canonical ⇒ 400 `invalid_request`;
   outside an `api_client`'s allowed list ⇒ 404; open/operator mode ⇒ restricts to that org.
-- `X-Correlation-Id`: echoed if it matches `^[A-Za-z0-9._:-]{8,128}$`, else a new UUID. The gateway sends it.
+- `X-Correlation-Id`: echoed if it matches `^[A-Za-z0-9._:-]{8,128}$`, else `x-vercel-id`, else a new UUID (TASK-1896:
+  every dynamic `/api/v1` response carries it and it equals the `requestId` of the JSON log line `studio_request`).
 - JSON responses `Cache-Control: no-store`; preview images `private, max-age=300`.
 - Pagination: `{ items, nextCursor }`; the cursor is opaque (never built by hand).
 - Auth: no header ⇒ mode actor; `Authorization: Bearer mst_…` ⇒ `api_client` requiring `studio:read`; malformed,
@@ -64,14 +65,62 @@ Body `{ error: string (es-CL), code, actionable: boolean }`:
 | `invalid_request` | 400 | false |
 | `unauthorized` | 401 | false |
 | `forbidden` | 403 | false |
+| `download_disabled` | 403 | false |
+| `original_not_stored` | 404 | false |
 | `database_unavailable` | 503 | true |
 | `internal_error` | 500 | true |
 
 `handle()` classifies: domain error → its code; `ZodError` → `invalid_request`; pg/network codes (`ECONNREFUSED`,
 `ETIMEDOUT`, `ENOTFOUND`, `57P01`, `57P03`, `53300`, `08006`, `08001`) or connect/timeout/secret/credential/`STUDIO_PG_`
-messages → `database_unavailable`; else `internal_error`. Logs only code, error name, pg code and correlation id.
+messages → `database_unavailable`; else `internal_error`. Since TASK-1896 it logs one JSON line per request
+(`studio_request`: requestId, route, method, status, durationMs, domain, code, apiClientId) and sends
+`internal_error`/`database_unavailable` to Sentry via `captureWithDomain(error, 'api')` with tags route/code/request_id.
 
 Health body: `{ status: ok|degraded, database: reachable|unreachable, accessMode: open|efeonce_id, … }`.
+
+## Deep health (TASK-1896, verified against code 2026-09-26, Studio `7f348b2`)
+
+- `GET /api/v1/health?deep=1` + `Authorization: Bearer` of an `api_client` with scope **`studio:health`** (new in
+  `API_SCOPES = ['studio:read', 'studio:health']`; it does NOT grant campaign reads — `/campaigns` answers 403). No
+  `Authorization` header ⇒ shallow body; bad token ⇒ 401; missing scope ⇒ 403; 503 only if the DB is down.
+- `HealthDeep` (`packages/contracts/src/health.ts`, `.strict()`): `{ status: ok|degraded|down, version, accessMode,
+  observedAt, components[], freshness[] }`; each item `{ name, state: ok|degraded|down|not_configured, latencyMs?,
+  used?, limit?, ageSeconds?, thresholdSeconds?, count?, code? }` — never hosts, DB/bucket names, secrets, projects.
+- Components: `database`, `database_connections` (role conns vs limit: ≥70 % degraded, ≥90 % down), `media_bucket`,
+  `greenhouse_metrics` (TASK-1892, `not_configured`), `media_worker` (latest `studio.worker_run`, TASK-1893).
+- Freshness: `catalog_import` (7 d), `pending_renditions` (>1 h), `overdue_unverified_posts` (PENDING >2 h),
+  `metricool_readback` (48 h, only with active campaigns; `ops_run` + `worker_run.kind='metricool_readback'`),
+  `restore_rehearsal` (45 d; failed or stale = `down`; never = `degraded`), `rights_expiring` (14 d window).
+- Codes: `unreachable`, `timeout`, `slow_response`, `connections_high`, `connections_saturated`, `check_failed`,
+  `last_run_failed`, `last_run_partial`, `no_recent_runs`, `never_ran`, `import_stale`, `renditions_pending`,
+  `posts_pending_verification`, `no_active_campaigns`, `readback_stale`, `last_rehearsal_failed`, `rehearsal_stale`,
+  `registry_missing`, `rights_expiring_soon`, `partial_response`.
+- Registry: `getHealth` input is now `HealthFilters` (`deep`), response `Health | HealthDeep`; exclusion reason
+  unchanged ⇒ **manifest hash unchanged** (`96d1f0caf6e5…`), `API_VERSION` still `1.1.0` (not bumped on purpose to
+  avoid a gateway resync; bump together with the next operation change).
+- Greenhouse consumer: signal `platform.marketing_studio.health` (see program ledger §TASK-1896).
+
+## Originals, rights and publication evidence (TASK-1893, verified against code 2026-09-26, Studio `4884fb9`, API `1.2.0`)
+
+- **Operation 18** `GET /api/v1/assets/{assetId}/versions/{versionNo}/download` → `getAssetVersionDownload`, tool
+  **`studio.asset.download`** (read, `writes: false`), capability **`marketing_studio.asset.download`**, API scope
+  **`studio:assets:download`** (the bearer also needs `studio:read`: `handle()` resolves every bearer with it). Now 18
+  operations = 13 tools + 5 exclusions; manifest hash `02db316d2d2e2520f7b83d383b755670f3c364ef5584cf21e3381740eb2222a2`.
+- Response `OriginalDownload { url, expiresAt, filename, mimeType, byteSize, sha256, rights }`; URL V4 (10 min) signed by
+  IAM signBlob; `attachment; filename="<assetId>-v<n>.<ext>"`. Gates in order: flag + api_client (else 403
+  `download_disabled`, also for the open-mode anonymous actor) → scope (403 `forbidden`) → organization (404) → version
+  exists (404) → original in this environment's originals bucket (404 `original_not_stored`). Each issue writes
+  `audit_event asset_version.download_issued`.
+- `AssetVersion` adds `mimeType`, `durationMs`, `pageCount` (null = absent/not stored), `storage { available }` and
+  `rights { status: unknown|not_yet_valid|active|expired, licenseKind, usageStartsOn, usageEndsOn (inclusive),
+  territories, channels }` (status computed at read time in America/Santiago; null lists ≠ "all").
+  `AssetVersionDetail` adds `posterUrl` and `placementPreviews[] { aspectRatio, url, automatic: true }`.
+  `storagePath` keeps the working-folder path (for `gcs`, from `provenance.onedrive_path`).
+- `Asset.kind` / `AssetFilters.kind` / search `kind`: `image|video|audio|document` (extensible).
+- `ScheduledPost.observation` adds `publishedAt` and `permalink` (null unless the provider said published).
+- Semantics keys added: `originalStorage`, `mimeType`, `durationMs`, `pageCount`, `rights`, `downloadUrl`, `posterUrl`,
+  `placementPreview`, `publishedAt`, `permalink`.
+- Worker endpoints (`/events/original-finalized`, `/jobs/*`) are NOT `/api/v1` and not in the registry (Cloud Run only).
 
 ## Tool manifest (`studio-tool-manifest.v1`)
 

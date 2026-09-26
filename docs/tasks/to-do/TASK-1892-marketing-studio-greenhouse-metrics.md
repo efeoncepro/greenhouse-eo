@@ -24,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-1890`
+- Blocked by: `none`
 - Branch: `Greenhouse develop (lecturas ecosystem, consumer, docs) · efeonce-marketing-studio main (adapter, mapeo, reader, API, manifiesto); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -100,7 +100,7 @@ Reglas obligatorias:
 
 - `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md` (runtime, Vercel `prj_dztLezZkYxAJikDuPSdT9QROEJRS`, base `marketing_studio`)
 - `docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md`
-- `docs/tasks/in-progress/TASK-1890-marketing-studio-agent-ready-contract.md` (manifiesto, semántica, bearer de servicio, organización canónica)
+- `docs/tasks/complete/TASK-1890-marketing-studio-agent-ready-contract.md` (manifiesto, semántica, bearer de servicio, organización canónica)
 - `docs/tasks/to-do/TASK-1284-growth-ga4-multitenant-connection-signal.md` (dueña de la conexión GA4 y de `readGa4Analytics`)
 - `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` (filas `GROWTH_GA4_ENABLED`, `GROWTH_SEO_ENABLED`, `GROWTH_SEARCH_CONSOLE_ENABLED`)
 - Skill `mcp-craft` para la descripción de la tool; `greenhouse-secret-hygiene` para el token del consumer.

@@ -1878,6 +1878,47 @@ const PRUEBAS = [
 
       return { ok: Object.values(r).every(Boolean), detalle: Object.entries(r).map(([k, v]) => `${k} ${v ? '✓' : '✗'}`).join(' · ') }
     }
+  },
+  {
+    id: 'P11', nombre: 'Firma con burbuja URL (tramo 17): sólo con el logo en la imagen, sola, centrada, fusionada y medida',
+    async correr() {
+      // Un lecho oscuro parejo: la fusión fija la luminosidad del gris y la burbuja sólo alcanza 4,5:1 sobre algo así.
+      const base = canon('b2_916')
+      const { width: ancho, height: alto } = await sharp(base.plate).metadata()
+      const plateOscuro = path.join(TMP, 'P11-plates', 'oscuro.png')
+
+      fs.mkdirSync(path.dirname(plateOscuro), { recursive: true })
+      await sharp({ create: { width: ancho, height: alto, channels: 3, background: '#050608' } }).png().toFile(plateOscuro)
+
+      const conBurbuja = extra => {
+        const p = canon('b2_916')
+
+        p.plate = plateOscuro
+        delete p.logo
+        p.url = { width: 0.3, y: 0.9 }
+        // El plate de la prueba no tiene sujeto: la máscara vacía se exceptúa para llegar a juzgar la firma.
+        p.excepciones = [{ regla: 'mascara-vacia', razon: 'prueba: lecho oscuro sin sujeto para medir la burbuja', aprobadoPor: 'suite-pruebas', plate: sha(fs.readFileSync(plateOscuro)) }]
+
+        return Object.assign(p, extra)
+      }
+
+      const sinMarca = conBurbuja({})
+      const doble = Object.assign(conBurbuja({ marcaEnEscena: true }), { logo: { width: 0.2, x: 0.5, y: 0.8 } })
+      const bien = conBurbuja({ marcaEnEscena: true })
+      const [rSin, rDoble, rBien] = await Promise.all([['P11-sin-marca', sinMarca], ['P11-doble', doble], ['P11-bien', bien]].map(([n, pz]) => componer(n, [pz])))
+      const [gSin, gDoble, gBien] = await Promise.all([rSin, rDoble, rBien].map(x => (x.ok ? gate(x.planPath) : { code: -1, salida: x.error })))
+      const u = rBien.ok ? rBien.qa[0].url : null
+
+      const r = {
+        'rechaza la burbuja sin el logo en la imagen (canon nuevo)': gSin.code === 1 && /firma sólo cuando el logo de Efeonce ya está en la imagen/.test(gSin.salida),
+        'rechaza logo y burbuja juntos (canon nuevo)': gDoble.code === 1 && /repiten la marca/.test(gDoble.salida),
+        'la burbuja se fusiona a opacidad plena y se mide': Boolean(u) && u.opacidad === 1 && typeof u.contraste === 'number',
+        'la burbuja medida no cae en «no certificable» por la url': !/lleva la url de la firma/.test(gBien.salida),
+        'la burbuja va centrada': rBien.ok && Math.abs(rBien.qa[0].url.anchoLadoCorto - 0.3 * ancho / Math.min(ancho, alto)) < 0.01
+      }
+
+      return { ok: Object.values(r).every(Boolean), detalle: Object.entries(r).map(([k, v]) => `${k} ${v ? '✓' : '✗'}`).join(' · ') + (u ? ` · contraste medido ${u.contraste}:1` : ` · ${rBien.error ?? ''}`) }
+    }
   }
 ]
 

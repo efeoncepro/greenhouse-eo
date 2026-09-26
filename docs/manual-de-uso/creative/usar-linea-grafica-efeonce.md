@@ -1,9 +1,9 @@
 # Usar la línea gráfica de Efeonce — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-25 por Claude
+> **Ultima actualizacion:** 2026-09-26 por Claude
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — es un sistema de marca; los valores viven en AXIS y el PDF se regenera con un comando local
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Manual técnico-operativo V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) · [Producir una foto de marca](../marketing/fotografia-de-marca-efeonce.md)
@@ -29,7 +29,8 @@ interfaz de Greenhouse ni en el trabajo de clientes.
   nunca transcribas HEX o px a mano.
 - **Ten los archivos oficiales:** logo e isotipo desde `public/branding/` (o la carpeta de Branding en OneDrive) y la
   burbuja de URL (`url-lum.svg`, o sus variantes horneadas `url-lum-light.svg` y `url-lum-dark.svg` en
-  `docs/operations/brand-graphic-line/deliverables/assets/`).
+  `docs/operations/brand-graphic-line/deliverables/assets/`). En código, la fuente es el paquete
+  `@efeoncepro/axis-brand-assets` (logo e isotipo de las cuatro marcas y las tres burbujas).
 - **Si la pieza lleva foto en la lente**, parte del banco de ocho tomas en `ai-generations/2026-09-25_banco-lente-orbita/`
   o produce una nueva con el lenguaje fotográfico (ver paso 4).
 
@@ -44,7 +45,8 @@ interfaz de Greenhouse ni en el trabajo de clientes.
 | muestra un avance medido | el **arco de avance** | sólo si tienes el dato real; sin dato, no hay arco |
 | destaca dónde está la decisión en una foto | la **lente** | exige una foto con un punto de interés claro |
 
-Una sola órbita o una sola lente por pieza.
+Una sola órbita o una sola lente por pieza. **Si la pieza no necesita ninguno de estos trabajos, no lleves órbita**:
+la órbita no va por defecto y no reemplaza la composición de la foto. Si la usas, decláralo a propósito.
 
 ### Paso 2 · Elige el contexto de color
 
@@ -72,6 +74,8 @@ Un acento por pieza. Los valores exactos están en los tokens y en el §2 del ma
 - La toma debe tener el sujeto dentro de un círculo del 55 % del lado corto, **sin emblemas legibles** (el logo lo pone
   la pieza, no la ropa) y en registro documental: nadie mira a la cámara.
 - No le pongas velo oscuro encima: fuera del círculo la foto va en navy apagado, dentro va a todo color.
+- Respeta la composición de la foto: la órbita nunca cruza el sujeto, el espacio reservado para el texto, el lecho
+  (la zona oscura donde se apoya el texto) ni la firma.
 
 ### Paso 5 · Escribe la voz
 
@@ -84,8 +88,17 @@ Un acento por pieza. Los valores exactos están en los tokens y en el §2 del ma
 
 ### Paso 6 · Firma la pieza
 
-- Logo completo si cabe a 96 px o más; si no, el isotipo. **Nunca los dos en la misma vista.**
-- La órbita **nunca rodea el logo**. En objetos, el logo va solo en el dorso.
+1. **Pieza gráfica (post, anuncio, portada con foto):** firma con el **logo de Efeonce centrado abajo**. No agregues la
+   burbuja de URL.
+2. **¿El logo de Efeonce ya aparece dentro de la imagen** (una maqueta, un objeto, una prenda)? Entonces no repitas el
+   logo: firma con la **burbuja URL, centrada y con fusión de luminosidad**, sola. Nunca a un costado ni junto al logo.
+3. Mide el contraste de la burbuja-firma: debe llegar a **4,5:1**. En la práctica sólo lo logra sobre un fondo muy
+   oscuro; sobre fondos medios o claros no llega (1,6–3,1:1). Si no llega, la pieza no pasa.
+4. Fuera de las piezas gráficas: logo completo si cabe a 96 px o más; si no, el isotipo. **Nunca los dos en la misma
+   vista.**
+5. La órbita **nunca rodea el logo**. En objetos, el logo va solo en el dorso.
+
+- Los pies con la burbuja (deck, informe, papelería, stand, firma de mail) siguen como siempre.
 - Si aparece `efeoncepro.com`, usa la **burbuja oficial**, no la dirección escrita. En web y en herramientas que
   soportan fusión, el SVG gris con fusión de luminosidad; en PDF, correo, visores o referencias para IA, la variante
   horneada (`url-lum-light.svg` sobre blanco o papel, `url-lum-dark.svg` sobre navy).
@@ -94,7 +107,10 @@ Un acento por pieza. Los valores exactos están en los tokens y en el §2 del ma
 
 ### Paso 7 · Revisa antes de entregar
 
-- [ ] Una sola órbita o lente en la pieza.
+- [ ] Una sola órbita o lente en la pieza, y sólo si hace un trabajo (rodear, medir, enfocar); nunca sobre el sujeto,
+  las reservas de texto, el lecho ni la firma.
+- [ ] La pieza gráfica firma con el logo centrado; la burbuja URL sólo si el logo ya está en la imagen, centrada, sola
+  y con ≥ 4,5:1 medido.
 - [ ] Ningún texto cruza la órbita.
 - [ ] Si hay arco de avance, mide un dato real.
 - [ ] Un solo acento; el teal no aparece en una pieza de producto.
@@ -110,9 +126,16 @@ Publicar, imprimir o mandar a producir requiere la autorización del operador; e
 Un agente no dibuja la órbita a mano: declara qué hace en la pieza y AXIS resuelve el resto.
 
 1. **Escribe la intención** (`intent.json`): el lienzo (`width`, `height`, `brand`, `surface`, `channel`) y los
-   elementos. Por ejemplo, una lente con su foto del banco, el par pregunta y respuesta, y la burbuja de URL.
-   Elementos posibles: `orbit`, `measure`, `progress`, `lens`, `spotlight`, `family-map`, `url-bubble`, `voice` y
-   `logo-inline`.
+   elementos. Por ejemplo, una lente con su foto del banco, el par pregunta y respuesta, y la firma.
+   Elementos posibles: `orbit`, `measure`, `progress`, `lens`, `spotlight`, `family-map`, `url-bubble`, `voice`,
+   `logo-inline`, `signature`, `slogan`, `state` y `brand-close`.
+   - **La firma** (`signature`): por defecto el logo de Efeonce, centrado abajo. Si el logo de Efeonce ya aparece
+     en la imagen (mockup, objeto, merch), declara `"brandInScene": true` y firma la burbuja URL, centrada y con
+     fusión de luminosidad. La burbuja sólo pasa el contraste sobre un fondo muy oscuro.
+   - **La órbita** se usa en casos puntuales (lente, medida, progreso, foco); no reemplaza la composición de la
+     foto. Declara en `protect` el sujeto y las reservas de texto: la órbita no puede cruzarlos.
+   - **En campañas**: `pnpm creative:layout` declara la firma con `brand.signature: { brand_in_scene }` (logo centrado
+     sin URL, o burbuja centrada sin logo) y `pnpm foto:componer:cta` con `marcaEnEscena: true` + `url` y sin `logo`.
 2. **Resuelve**: `pnpm creative:orbit:resolve -- --input intent.json --out manifest.json`. Si la intención rompe
    una regla (dos anillos en la pieza, una medida sin fuente, una respuesta de más de tres palabras), el comando
    falla y dice cuál.
@@ -120,13 +143,30 @@ Un agente no dibuja la órbita a mano: declara qué hace en la pieza y AXIS resu
    lugar de la burbuja, cajas de texto). La respuesta lleva además `fontSize`, `baseline` y `lastChar` para
    cerrar con su esfera.
 4. **Pinta y revisa**: `pnpm creative:orbit:render -- --intent intent.json --bindings bindings.json --out-dir out/`.
-   Deja `piece.svg`, `piece.png`, `manifest.json` y `qa.json`. Si un texto cruza el anillo o la URL aparece como
-   texto, sale con error y `qa.json` dice cuál.
+   Deja `piece.svg`, `piece.png`, `manifest.json` y `qa.json`. Si un texto cruza el anillo, la URL aparece como
+   texto, la firma queda descentrada o bajo 4,5:1, o la órbita cruza el sujeto, sale con error y `qa.json` dice cuál.
 5. **Mira el PNG al 100 %** antes de usarlo: el chequeo del sujeto dentro de la lente es visual.
 
-> Detalle técnico: contrato `efeonce.graphic-line-orbit` 0.1.0 (candidate) en `@efeoncepro/axis-ui-contracts`
-> 0.2.6; adapter en `scripts/creative/layout-compiler/graphic-line.mjs`; manual del contrato en AXIS
+> Detalle técnico: contrato `efeonce.graphic-line-orbit` 0.2.0 (candidate) en `@efeoncepro/axis-ui-contracts`
+> 0.2.7; archivos oficiales en `@efeoncepro/axis-brand-assets` 0.2.7; capa opcional en `pnpm creative:layout`
+> (`graphic_line` por formato); adapter en `scripts/creative/layout-compiler/graphic-line.mjs`; manual del contrato en AXIS
 > `docs/agent-composition/graphic-line-orbit.md`.
+
+## Paso a paso — fotografiar una aplicación (merch u oficina)
+
+Las láminas 4.8 (merch) y 4.9 (oficina) del canvas muestran las aplicaciones fotografiadas con IA. Si necesitas una
+foto nueva de ese tipo:
+
+1. Parte del **arte plano exacto** de la pieza y **quítale las leyendas y notas de lámina**: el modelo imprime todo lo
+   que ve en la referencia.
+2. Genera con el mismo método (GPT Image 2.5 Sunburst, `xhigh`): la IA sólo pone espacio, material y luz, en registro
+   documental y sin nadie mirando a la cámara. Usa los scripts del taller (`exploracion-v5/oficina-ia/items.mjs` o
+   `exploracion-v5/merch-ia/`).
+3. Revisa la foto **al 100 %**: el logo chico suele salir deformado y la puntuación se revisa letra por letra.
+4. Corrige **editando la foto que salió** (`exploracion-v5/oficina-ia/edits.mjs`), no regenerando la escena. Para el
+   logo, pasa el logo oficial como segunda referencia.
+5. Trátala como **maqueta de dirección**: la producción sale de los archivos vectoriales, con prueba de color sobre el
+   material real.
 
 ## Paso a paso — regenerar el PDF del manual
 
@@ -155,10 +195,11 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 
 | Estado | Qué significa |
 |---|---|
-| **Canónica (2026-09-25)** | la órbita es la forma oficial de la marca propia; toda pieza nueva de Efeonce la usa desde los tokens de AXIS |
+| **Canónica (2026-09-25)** | la órbita es la forma oficial de la marca propia; cuando una pieza la usa, toma sus valores de los tokens de AXIS. No va por defecto en toda pieza |
 | **Sistema consistente, no activo distintivo demostrado** | no se ha medido si la gente reconoce a Efeonce sin el logo; no afirmes que la órbita se reconoce sola |
 | **Candidato sin aprobar** | pares de copy del banco; sirven de referencia, no de copy final |
-| **Decisión pendiente** | firma de mail A o B; panel de la prueba sin logo |
+| **Decisión pendiente** | firma de mail A o B; panel de la prueba sin logo; si el contraste mínimo de la burbuja-firma sigue en 4,5:1 o baja a 3:1 |
+| **No certificable** (`foto:cta:gate`) | pieza del canon anterior que firma con la URL; se dibuja igual que antes y no se recertificó |
 | **Maqueta de presentación** | las fotos de merch y de oficina del canvas generadas con IA; la producción sale de los archivos vectoriales y de una muestra física del proveedor |
 | **[propuesta]** en el manual técnico | valor a validar con prueba de impresión (por ejemplo, tamaños mínimos del logo e isotipo impresos) |
 
@@ -179,6 +220,9 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 - No dibujes un arco de avance sin un dato que lo respalde.
 - No rodees el logo con la órbita ni le agregues la esfera o un punto.
 - No escribas `efeoncepro.com` como texto: va en su burbuja.
+- No agregues la burbuja URL como firma por defecto, a un costado ni junto al logo: sólo reemplaza al logo cuando
+  el logo ya está en la imagen.
+- No uses la órbita por defecto ni la pongas sobre el sujeto, las reservas de texto, el lecho o la firma.
 - No recolorees ni redibujes la burbuja de URL, el logo o el isotipo.
 - No uses el teal claro como texto sobre blanco (no llega al contraste mínimo) ni el teal en piezas de Globe, Wave o
   Reach.
@@ -201,6 +245,10 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 | El PDF no se regenera y dice «imágenes rotas» | una imagen referida en la fuente HTML no cargó | revisa las rutas de imagen de `linea-grafica-efeonce.src.html` y de los assets del renderer |
 | El PDF sale con «Desborde» | algún bloque de la fuente HTML no cabe en su hoja | acorta o divide el bloque en `linea-grafica-efeonce.src.html` y vuelve a correr |
 
+| La burbuja-firma **no llega a 4,5:1** | la fusión de luminosidad fija el gris de la burbuja; sobre fondos medios o claros queda entre 1,6 y 3,1:1 | ubícala sobre un lecho muy oscuro; si la pieza no tiene el logo de Efeonce en la imagen, firma con el logo centrado. El umbral está pendiente de decisión del operador |
+| El gate de `foto:cta:gate` sale con código **3** («no certificable») en piezas ya aprobadas | el tramo 17 cambió la huella del comando y esas piezas no se recertificaron | se resuelve al recomponerlas; ningún workflow de CI corre este gate, así que no rompe CI |
+| Una foto de merch u oficina trae **las notas de la lámina** pintadas | el arte de referencia llevaba leyendas | corrige editando la foto; en adelante pasa el arte sin leyendas |
+
 ## Referencias técnicas
 
 - Manual técnico-operativo (fuente de verdad): [`docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md`](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
@@ -210,4 +258,6 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 - Renderer del PDF: [`scripts/documents/render-efeonce-graphic-line.mjs`](../../../scripts/documents/render-efeonce-graphic-line.mjs)
 - Lenguaje fotográfico: [`docs/operations/brand-photography/README.md`](../../operations/brand-photography/README.md)
 - Banco de la lente: `ai-generations/2026-09-25_banco-lente-orbita/LEEME.md`
-- Canvas de trabajo (privado): [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii)
+- Canvas de trabajo (privado, 40 láminas): [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii)
+- Contrato y herramientas (AXIS 0.2.7, `creative:orbit:render`, `creative:layout`, `foto:componer:cta` tramo 17): [manual técnico §13](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-contrato-y-herramientas-axis-027)
+- Compositor de piezas con CTA: [manual de uso](./compositor-piezas-cta.md)

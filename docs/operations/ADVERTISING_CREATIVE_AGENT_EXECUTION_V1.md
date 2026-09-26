@@ -119,6 +119,51 @@ contrato de abajo (el plate se genera antes). El detalle vive en el
 - **Firma por formato en una pieza nueva:** mínimo 25 % del lado corto en horizontales y 20 % en verticales o
   cuadrados; máximo 35 % en todos. El gate lo exige desde el canon del 2026-09-23. Las piezas aprobadas bajo el
   canon anterior no se regeneran por esta decisión; una recomposición se evalúa con el canon vigente.
+- **Burbuja URL como firma (tramo 17, 2026-09-26):** sólo con el logo de Efeonce ya en la imagen. El plan declara
+  `marcaEnEscena: true` y `url`, **sin** `logo`; en una pieza nueva se fusiona a opacidad 1 y la juzgan
+  `firma-burbuja`, `firma-contraste` (≥ 4,5:1) y `firma-sobre-sujeto`. Ver la sección siguiente.
+
+## Firma y línea gráfica — 2026-09-26
+
+**Firma de una pieza gráfica (regla del operador).** Un post, un anuncio o una portada con foto firman con **el logo
+de Efeonce centrado**, abajo al centro. La **burbuja URL** (`efeoncepro.com`, asset `url-lum`) **no se agrega por
+defecto**: sólo reemplaza al logo cuando el logo de Efeonce **ya aparece dentro de la imagen** (mockup, objeto, merch o
+similar), y entonces va **sola, centrada y con fusión de luminosidad**, nunca a un costado ni junto al logo. La fusión
+fija la luminosidad del gris de origen, así que la burbuja sólo llega a 4,5:1 sobre un lecho **muy oscuro**: a opacidad
+0,72 no llega en ningún fondo (3,82:1 sobre `#001A33`, 4,00:1 sobre negro); a opacidad plena, ~4,4–4,9:1 midiendo el
+1 % peor de su tinta sólida sobre lechos casi negros, y 1,6–3,1:1 sobre fondos medios o claros. Por eso, como firma, se
+fusiona a opacidad 1 y un gate mide ≥ 4,5:1. Tabla completa en la
+[firma fotográfica §5.1](brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26).
+
+| Herramienta | Cómo se declara la firma |
+|---|---|
+| `pnpm foto:componer:cta` + `pnpm foto:cta:gate` | Tramo 17: `marcaEnEscena: true` + `url`, sin `logo`. En una pieza nueva, opacidad 1, medición del 1 % peor de la tinta sólida y de si cae sobre el sujeto; reglas `firma-burbuja` (exceptuable), `firma-contraste` y `firma-sobre-sujeto`. Prueba `P11` y tres mutantes, 3 de 3 detectados. Contrato: [§19.6 del compositor CTA](EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#196-la-firma-cinco-maneras-de-declararla) |
+| `pnpm creative:layout` | `brand.signature: { brand_in_scene }`: `false` → logo centrado y sin URL; `true` → burbuja centrada sola (exige `brand.url_bubble`), opacidad 1, QA falla bajo 4,5:1. Los contratos sin el campo (CMP-00x) quedan exactamente como antes |
+| `pnpm creative:orbit:render` | Firma con logo o con la burbuja fusionada a opacidad 1 y mide su contraste sobre los píxeles finales |
+
+**Piezas ya aprobadas.** No se recertificaron: su dibujo no cambia (0,72; con url siguen «no certificables»), pero la
+huella del comando sí, así que `foto:cta:gate` las muestra con 3 hasta recomponerlas. Ningún workflow de CI corre ese
+gate, así que no rompe CI; un 3 sigue sin informarse como verde.
+
+**Lo que no cambia.** La burbuja como pie de deck, informe, papelería, stand, firma de mail y pies de página sigue como
+antes ([estándar de informes](EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md)). Pendiente del operador: si el umbral de
+la burbuja como firma sigue en 4,5:1 o baja a 3:1.
+
+**La órbita (línea gráfica «La órbita»).** Es la forma canónica de la marca propia de Efeonce y su familia, nunca de
+clientes ni de UI de producto Greenhouse. **No sustituye la composición ni las formas del lenguaje fotográfico**: se usa
+en casos específicos (lente, medida, progreso, foco), se declara a propósito y nunca va por defecto; nunca cruza el
+sujeto, las reservas de texto, el lecho ni la firma. Una lente u órbita por pieza, y ningún texto la cruza.
+
+- En el Campaign Layout Compiler, capa opcional por formato `graphic_line: { intent, protect }`: sólo elementos con
+  anillo (orbit, measure, progress, lens, spotlight, family-map); el copy y la firma siguen siendo del compilador. El
+  QA falla si la órbita cruza el campo de copy o un sujeto protegido.
+- Fuera del compilador: `pnpm creative:orbit:resolve` y `pnpm creative:orbit:render -- --intent <intent.json>
+  --bindings <bindings.json> --out-dir <dir>` (adapter `scripts/creative/layout-compiler/graphic-line.mjs`, contrato
+  AXIS `efeonce.graphic-line-orbit` 0.2.0 en estado `candidate`; `bindings.protect` declara sujeto, reserva y lecho).
+  Sale con 1 si falla un check.
+- Los valores vienen de los tokens `efeonceGraphicLine` de AXIS; no se transcriben HEX ni px del manual. Canon:
+  [ADR de la línea](../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) y
+  [manual](brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md). Nada de esto aprueba ni publica una pieza.
 
 ## Contrato de ejecución
 
@@ -218,7 +263,8 @@ Contrato que se suma al de ejecución:
    `scripts/creative/layout-compiler/compiler.mjs` quedó exportada (antes privada; el cambio fue sólo la palabra
    `export`, sin tocar su lógica). Un compositor de corrida la importa en vez de duplicar la fusión de luminosidad no
    separable, y exige `evidence.method === 'non-separable-luminosity'`. Si el logo 3D es héroe de la escena, la firma
-   es url-lum y no se agrega un segundo logo plano.
+   es url-lum y no se agrega un segundo logo plano. *(Desde el 2026-09-26 esa es la única forma de firma con burbuja: sólo
+   con la marca ya en la imagen, centrada, a opacidad 1 y sobre lecho muy oscuro; ver «Firma y línea gráfica».)*
 5. **QA por nivel.** Contraste p98 por voz y por acento, revisión visual a 390 px registrada cuando se aprueba bajo el
    umbral, tarjeta HUD con vidrio esmerilado real y oscurecimientos graduales declarados por lámina. Gate en
    [brief y QA](../../.claude/skills/efeonce-advertising-creative/references/creative-brief-and-qa.md).
@@ -242,6 +288,9 @@ real. Esa receta histórica queda congelada; para nuevos ads con CTA usar `foto:
 - Ninguna guía, caja de selección, label técnico o nota interna queda dentro del export público.
 - Cuando la selección colaborativa es parte deliberada del concepto final, bounding box, cursores, nombres y
   URL Bubble sí son capas editoriales; las marcas de revisión del Lab y sus comentarios siguen siendo internas.
+- La firma de una pieza es el logo de Efeonce centrado; la burbuja URL no va por defecto y sólo lo reemplaza con el
+  logo ya en la imagen. Nunca los dos juntos.
+- La órbita no sustituye la composición ni cruza sujeto, reservas de texto, lecho ni firma.
 - Un ejemplo aprobado informa, pero no se convierte en preset universal.
 - Producido, revisado, aprobado, programado, publicado y medido son estados distintos.
 

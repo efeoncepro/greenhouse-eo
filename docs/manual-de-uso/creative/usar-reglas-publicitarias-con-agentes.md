@@ -92,6 +92,10 @@ Selección colaborativa sobre el dominante: SEO y Contenido editando, Paid movi�
 Firma con url-lum. Toma como referencia ai-generations/2026-09-19_nivel-de-busqueda/componer-v2.mjs.
 ```
 
+> **Desde el 2026-09-26** ese «Firma con url-lum» vale sólo si el logo de Efeonce ya está en la escena (en el caso de
+> referencia, el logo 3D). En cualquier otra pieza pide «firma con el logo de Efeonce centrado». Ver
+> [Firma y órbita](#firma-y-órbita-qué-pedir-y-qué-revisar).
+
 **Qué revisar en la entrega.**
 
 - La **hoja de revisión** con todas las láminas en el orden de publicación (una pieza suelta debe venir aparte).
@@ -100,8 +104,9 @@ Firma con url-lum. Toma como referencia ai-generations/2026-09-19_nivel-de-busqu
 - El **acento naranja legible**: sobre horizonte encendido debe haberse cambiado a peso blanco. Pide el contraste
   por nivel (incluidos los acentos) y, si alguno quedó bajo el umbral, la nota de revisión visual a 390 px.
 - Las placas de los cursores dentro del lienzo, con nombres cortos, y sin tapar la frase ni el HUD.
-- La firma `efeoncepro.com` visible en el PNG final; si el logo 3D ya protagoniza la escena, no debe haber otro
-  logo plano.
+- La firma: el **logo de Efeonce centrado**. Si el logo ya está en la escena (logo 3D, merch, objeto), la firma es la
+  burbuja `efeoncepro.com` sola, centrada, fusionada y visible en el PNG final, con su contraste medido (≥ 4,5:1); nunca
+  junto a otro logo plano.
 
 **Qué no hacer.**
 
@@ -113,6 +118,30 @@ Firma con url-lum. Toma como referencia ai-generations/2026-09-19_nivel-de-busqu
   omite.
 - No trates los pesos o colores del caso como plantilla fija: se revalidan con cada fondo y copy.
 - Producir la pieza no autoriza programarla ni publicarla.
+
+## Firma y órbita: qué pedir y qué revisar
+
+Regla del operador del 2026-09-26. Detalle y números en la
+[firma fotográfica §5.1](../../operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26).
+
+**La firma.**
+
+- Por defecto pide **«firma con el logo de Efeonce centrado»**. No pidas la burbuja `efeoncepro.com` en una pieza
+  gráfica salvo que el logo de Efeonce ya aparezca dentro de la imagen (mockup, objeto, merch).
+- En ese caso la burbuja va **sola, centrada y fusionada**, nunca a un costado ni junto al logo. Sólo se lee sobre un
+  lecho muy oscuro: si la foto es clara en el pie, pide regenerar el plate con un lecho oscuro, no un scrim.
+- En una pieza con CTA, el plan lleva `"marcaEnEscena": true` y `url`, sin `logo`; `pnpm foto:cta:gate` la juzga con
+  `firma-burbuja`, `firma-contraste` y `firma-sobre-sujeto` ([contrato CTA §19.6](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#196-la-firma-cinco-maneras-de-declararla)).
+- Si una pieza ya aprobada aparece ahora con salida 3 en el gate, es esperado: no se recertificó tras el cambio del
+  comando y se muestra así hasta recomponerla. No la informes como verde ni como falla.
+- La burbuja en pies de deck, informe, papelería y firma de mail sigue como siempre.
+
+**La órbita.** Pídela sólo si hace un trabajo concreto —una lente sobre la foto, una medida con dato y fuente, un
+progreso o un foco— y nómbralo en el pedido. No reemplaza la composición del lenguaje fotográfico, no va por defecto y
+no puede cruzar a la persona u objeto principal, el texto, el lecho ni la firma. Una sola por pieza. Revisa que el
+agente haya corrido `pnpm creative:orbit:render` (o la capa `graphic_line` de `pnpm creative:layout`) con las zonas
+protegidas declaradas y que sus checks salgan en verde. Qué es la línea y cuándo usarla:
+[usar la línea gráfica de Efeonce](usar-linea-grafica-efeonce.md).
 
 ## Probar el harness en una sesión nueva
 
@@ -136,7 +165,10 @@ pnpm creative:layout -- --contract <campaign-run>/brief/layout-contract.yaml --m
 
 `plan` y el resolver no llaman a un modelo. `compile` usa los assets tipográficos versionados, conserva el copy
 literal, ajusta el supporting tagline, pinta la selección semántica e incrusta el URL Bubble canónico si el contrato
-declara `brand.url_bubble`. No reemplaces ese asset por texto ni por un rectángulo: usa
+declara `brand.url_bubble`. En un contrato nuevo declara también la firma con `brand.signature: { brand_in_scene }`:
+`false` firma con el logo centrado y sin URL; `true` (sólo si el logo de Efeonce ya está en la foto) firma con la
+burbuja sola, centrada, a opacidad 1, y el QA falla si no llega a 4,5:1. Los contratos sin ese campo (CMP-00x)
+siguen exactamente como antes. No reemplaces ese asset por texto ni por un rectángulo: usa
 `src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg`, conserva la firma fija `efeoncepro.com` y revisa
 que aparezca en el PNG final. `human_release: pending` impide confundir un master técnico con una pieza aprobada o
 publicada.

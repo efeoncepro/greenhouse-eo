@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-26 — La órbita 0.2.0: firma por regla, assets oficiales y la oficina en foto
+
+Regla del operador: una pieza gráfica firma con el logo de Efeonce centrado; la burbuja URL lo reemplaza sólo si el
+logo ya está en la imagen (centrada, fusión de luminosidad, lecho muy oscuro). La órbita se usa en casos puntuales y no
+sustituye la composición fotográfica. AXIS 0.2.7: contrato `efeonce.graphic-line-orbit` 0.2.0 (`signature`, `slogan`,
+`state`, `brand-close`; checks de firma y de sujeto), tokens nuevos y paquete `@efeoncepro/axis-brand-assets` (19 SVG
+sellados); el Lab sincroniza los archivos, suma la sección 4.9 «Oficina en foto» y el banco de tipografía firma con el
+logo. Greenhouse pinnea 0.2.7: `creative:orbit:render` pinta y mide la firma; `creative:layout` acepta la capa
+`graphic_line` y `brand.signature`; `foto:componer:cta` tramo 17 (`marcaEnEscena`, gate `firma-burbuja`, P11, 3
+mutantes) sólo en piezas nuevas, sin recertificar las aprobadas (el gate las muestra 3 hasta recomponer; ningún CI lo
+corre). La oficina de 4.3 se fotografió con IA (9 fotos, 4 corregidas por edición); canvas 40 láminas, PDF 56 hojas.
+Pendiente: umbral de contraste de la burbuja (4,5:1 hoy, al límite) y la atribución sin logo.
+
+## 2026-09-26 — Marketing Studio por MCP en producción (release 0e87c7a443a2)
+
+Release develop→main PR #240 (run `36222331450`, released): canje RFC 8693 `efeonce-mcp-marketing-studio`, capability `marketing_studio.campaign.read`, manual MCP `marketing-studio` servido por el lane de skills (canary 200) y contrato editorial v2 de Insights con flag OFF (canary `cover-preference` 200). Gateway `efeonce-mcp` `958c9de30` con el provider `marketing-studio` encendido (`00061-sbc`). TASK-1890 y TASK-1891 complete: una sesión MCP real devolvió datos de producción, tras la migración correctiva `20260926071321910` (política del cliente de canje) y el fix `efeonce-mcp#20` (montaje del secreto). [Ledger de tiempos](docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md).
+
 ## 2026-09-25 — La órbita se compone por intención (AXIS 0.2.6)
 
 Contrato candidate `efeonce.graphic-line-orbit` 0.1.0 en `@efeoncepro/axis-ui-contracts` 0.2.6: un agente declara órbita, medida (con fuente o sin arco), progreso de deck, lente, foco, mapa de familia, burbuja de URL, voz o logo en frase, y AXIS valida las reglas y resuelve cada valor desde los tokens. Adapter de Greenhouse: `pnpm creative:orbit:resolve` y `pnpm creative:orbit:render` (SVG, PNG y `qa.json`; falla si un texto cruza el anillo). Pines AXIS a 0.2.6. [Manual](docs/manual-de-uso/creative/usar-linea-grafica-efeonce.md) · [skill](.claude/skills/efeonce-brand-studio/references/graphic-line-orbit.md).
@@ -552,29 +569,3 @@ en `low`) y encima la imagen base entra como 1 024 tokens de input — editar co
 sobrecosto se diluye al subir calidad. **La máscara es gratis**: con y sin ella el `usage` fue idéntico.
 Corolario: para recortar el fondo de una imagen existente, `pnpm ai:image:rmbg` (local, sin costo de
 proveedor) en vez de un edit. Evidencia: `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`.
-
-## 2026-09-16 — GPT Image 2.5 transportado, y el carril Google migrado porque su modelo estaba apagado
-
-`src/lib/ai/` ya reconoce `gpt-image-2.5-flare` y `gpt-image-2.5-sunburst` con su contrato correcto
-(`xhigh`/`max`, grilla de tamaños moderna, sin `input_fidelity`). El contrato se decide por **capacidad
-declarada** y no por literales de modelo, así que agregar uno nuevo sin declarar sus capacidades ya no
-compila — la degradación silenciosa deja de ser posible por olvido. Cinco puertas que antes elegían otro
-motor sin avisar ahora fallan ruidoso, incluida la ruta interna, que respondía con el default cuando recibía
-un campo inválido: pedir `quality: "max"` devolvía `medium`.
-
-El carril `google-imagen` no estaba bloqueado sino **apagado**: un probe propio devolvió `404 NOT_FOUND` para
-`imagen-4.0-generate-001`, retirado por Google, y era el **default** del helper. Se migró de provider —no de
-string— a `gemini-3.1-flash-image` sobre `generateContent`, y el default pasó a `openai-image`.
-
-Queda además la primera medición propia del costo de 2.5, que OpenAI no publica y declara no estimable:
-el consumo es **idéntico entre Flare y Sunburst** (196/1756/7024 tokens en `low`/`high`/`max`), así que el
-costo lo fija `quality × size` y no el modelo; lo que los separa es la latencia (`max`: 46,0 s vs 80,6 s).
-Evidencia fechada, no tarifa: `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`.
-
-## 2026-09-16 — Skill viva `efeonce-insights` para Claude y Codex, con contrato de mantenimiento
-
-La skill pasa de un resumen a una memoria operativa del programa: `references/program-ledger.md` (qué construyó
-cada task y dónde corre), `architecture-map.md`, `contracts.md`, `operations.md` y `lessons.md`, espejada en
-`.codex/` con su `agents/openai.yaml`. Contrato obligatorio: cada task de EPIC-045 la actualiza al cerrar
-(registrado en CLAUDE.md, AGENTS.md, la regla auto-load, EPIC-045 y los closing protocols de 1847–1849/1875;
-TASK-1846 lo asume por coordinación entre sesiones).

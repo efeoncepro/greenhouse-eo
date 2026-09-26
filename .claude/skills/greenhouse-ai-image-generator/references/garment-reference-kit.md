@@ -343,6 +343,26 @@ producto generadas con `gpt-image-2.5-sunburst` bajo este mismo método:
 - **Sólo marca propia Efeonce y su familia**, nunca merch de un cliente.
 - Prompts, artes y runner: `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/merch-ia/`
   (`items.mjs`, `arte/`, `prompts/`, `out/`).
+- **Firma de la foto:** si el logo de Efeonce ya se ve en el objeto, la pieza no repite el logo como firma; la
+  burbuja URL lo reemplaza centrada, sola y fusionada (≥ 4,5:1 medido), nunca junto al logo
+  ([regla de la firma](../../efeonce-brand-studio/references/graphic-line-orbit.md)).
+
+### Oficina en foto (lámina 4.9, 2026-09-26) — lecciones medidas
+
+Nueve espacios (recepción, sala, pasillo, pizarra, estado de sala, muro de voz, cocina, puesto de bienvenida,
+cabinas) con el mismo método: arte plano como referencia exacta, GPT Image 2.5 Sunburst `xhigh` sólo pone espacio,
+material y luz. Scripts: `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/oficina-ia/` (`items.mjs`,
+`edits.mjs`). Lo que costó y aplica a cualquier arte de marca dentro de una foto generada:
+
+1. **El modelo imprime todo lo que ve en el arte**, incluidas las notas y leyendas de la lámina. El arte de
+   referencia va **sin leyendas** ni anotaciones.
+2. **El logo chico se reinventa.** A tamaño pequeño en la escena el modelo dibuja otro logotipo. Se repone
+   **editando la foto** con el logo oficial (de `@efeoncepro/axis-brand-assets`) como segunda referencia, y se revisa
+   al 100 %.
+3. **La puntuación se revisa letra por letra** (salió un espacio antes del punto).
+4. **Se corrige editando la foto generada, no regenerando:** editar conserva lo que ya estaba bien.
+
+Son maquetas de dirección: la producción sale de los vectoriales con prueba de color sobre el material real.
 
 ### Vistas que cierran reinterpretación
 

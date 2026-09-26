@@ -1,12 +1,12 @@
 # Línea gráfica Efeonce — La órbita · V1
 
 > **Tipo de documento:** Manual de marca (contrato operativo de diseño)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
-> **Última actualización:** 2026-09-26 (4.9 · Oficina en foto)
+> **Última actualización:** 2026-09-26 por Claude (firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, AXIS 0.2.7, 4.9 · Oficina en foto)
 > **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
 > **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (40 láminas, siete capítulos)
-> **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
+> **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Desde AXIS 0.2.7 los archivos oficiales (logo e isotipo de las cuatro marcas y las tres burbujas URL) viven en el paquete `@efeoncepro/axis-brand-assets` y el contrato de composición es `efeonce.graphic-line-orbit` 0.2.0 (§13). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
 > **Manual en PDF:** [`deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](./deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) (A4, 56 hojas, confidencial · uso interno). Se regenera con `node scripts/documents/render-efeonce-graphic-line.mjs`.
 > **Fuentes del repo:** `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/` (generador del canvas, texturas, renders, firma de mail, merch generativo y prueba sin logo)
 > **Relacionados:** [Lenguaje fotográfico](../brand-photography/README.md) · [Selección de referencias de marca](../EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md) · `docs/context/09_marca-agencia.md` · `src/config/efeonce-brand.ts`
@@ -84,6 +84,12 @@ Todas las medidas se expresan **por cada 794 px de ancho** del lienzo (la base d
 
 **Posición:** centro fuera del eje, hacia la derecha y arriba. El texto vive en el tercio inferior izquierdo y
 **nunca cruza la órbita**. Una sola órbita por pieza.
+
+**La órbita no sustituye la composición** (regla del operador, 2026-09-26). No reemplaza la composición ni las
+formas del [lenguaje fotográfico](../brand-photography/README.md): se usa en casos específicos (una lente, una medida,
+un progreso, un foco), **se declara a propósito** y nunca va por defecto en una pieza. Cuando está, nunca cruza el
+sujeto de la foto, las reservas de texto, el lecho ni la firma. Una pieza con foto conserva la composición que le da el
+lenguaje fotográfico; la órbita se suma sólo si hace uno de sus tres trabajos.
 
 **Origen verificado en producción:** `src/lib/artifact-composer/catalogs/insights-report/report-cover.html`,
 `report-cover-light.html` y `report-back-cover.html`.
@@ -210,6 +216,8 @@ distribución) son marcas de producto. **Un lenguaje, cuatro acentos.**
 ### 8.1 Cuándo usar cada uno
 
 - **Logo completo:** post, slide, portada, email, reverso de taza, muro, stand; siempre que quepa a 96 px o más.
+- **Firma de una pieza gráfica** (post, anuncio, portada con foto): el logo de Efeonce **centrado abajo**; la burbuja
+  URL sólo lo reemplaza cuando el logo ya está dentro de la imagen (§8.5).
 - **Isotipo:** avatar, favicon, ícono de app, pin, sticker, credencial, lomo de cuaderno, marca de agua en video.
 - **Nunca los dos en la misma vista.**
 - Productos: su isotipo firma dentro de su propio contexto; Efeonce aparece en el logo completo («by efeonce») o
@@ -268,6 +276,26 @@ versión toda blanca, se reemplaza.
 
 ### 8.5 La URL: siempre en su burbuja
 
+> **Delta 2026-09-26 — firma de piezas gráficas (regla del operador).** En una pieza gráfica (post, anuncio, portada
+> con foto) la firma es **el logo de Efeonce centrado**, abajo al centro. La burbuja URL (`efeoncepro.com`, asset
+> `url-lum`) **no se agrega por defecto**: sólo **reemplaza** al logo cuando el logo de Efeonce ya aparece dentro de la
+> imagen (mockup, objeto, merch o similar), y entonces va **centrada y con fusión de luminosidad**. Nunca a un costado
+> ni junto al logo: repetiría la marca.
+>
+> **La realidad del contraste.** La fusión fija la luminosidad del gris `#848484`, así que la burbuja sólo llega a
+> 4,5:1 sobre un lecho **muy oscuro**. Medido el 2026-09-26: a opacidad 0,72 no llega en ningún fondo (3,82:1 sobre
+> `#001A33`, 4,00:1 sobre negro); a opacidad plena, 6,17:1 sobre `#001A33` y 6,78:1 sobre negro en el píxel máximo y del orden de 4,4–4,9:1 midiendo
+> el 1 % peor de su tinta sólida sobre lechos casi negros; sobre fondos medios o claros, 1,6–3,1:1. Por eso, como firma,
+> la burbuja se fusiona a **opacidad 1** y un gate mide ≥ 4,5:1 sobre los píxeles finales; si no llega, el chequeo
+> falla y la pieza no pasa.
+>
+> **Pendiente de decisión del operador:** si el umbral de la burbuja-firma sigue en 4,5:1 o baja a 3:1 (tratarla como
+> objeto gráfico).
+>
+> Los usos de la burbuja como **pie** (deck, informe, papelería, stand, firma de mail y pies de página) **no cambian**:
+> siguen como se describe abajo, con las variantes horneadas donde no hay fusión. Contrato: elemento `signature` de
+> `efeonce.graphic-line-orbit` 0.2.0 y tokens `efeonceGraphicLine.signature` (§13).
+
 Donde aparezca `efeoncepro.com` va la **burbuja oficial** (`url-lum.svg`, el mismo asset del pie de Insights y del
 deck), nunca la URL como texto: stand, pendón, tarjeta, carnet, hoja membretada, firma de mail y pies de página.
 El SVG se mantiene gris y se aplica con **`mix-blend-mode: luminosity`**, que lo adapta al fondo; no se recolorea
@@ -281,12 +309,19 @@ trazo queda negro). Archivos: `docs/operations/brand-graphic-line/deliverables/a
 `public/branding/` y `public/branding/SVG/` en el repo; `OneDrive › Alineación › 5. Contenidos › 13- Branding ›
 SVG`. Nunca se redibujan ni se exportan desde una captura.
 
+Desde AXIS 0.2.7 la fuente oficial para código y agentes es el paquete **`@efeoncepro/axis-brand-assets`**: 19 SVG
+(logo e isotipo en positivo y negativo de Efeonce, Globe, Wave y Reach; la burbuja `url-bubble-source` gris para
+fusionar y las horneadas `url-bubble-baked-light` y `url-bubble-baked-dark`), cada uno sellado con su SHA-256 y la
+proporción de su viewBox. No incluye fuentes ni fotos, y no es `efeonce.brand-logos` (la procedencia de logos de
+terceros en interfaces). Las copias locales de Greenhouse se vigilan contra el paquete (§13).
+
 ---
 
 ## 9. Fotografía
 
 La foto va en la lente o en el foco, con su luz y **sin velo**. Personas reales del equipo o escenas del oficio;
-nunca banco de imágenes. Se produce con el pipeline canónico del [lenguaje fotográfico](../brand-photography/README.md)
+nunca banco de imágenes. **La órbita no sustituye la composición fotográfica** (§1.3): la foto conserva su
+composición y la órbita sólo se suma, declarada, cuando hace uno de sus tres trabajos. Se produce con el pipeline canónico del [lenguaje fotográfico](../brand-photography/README.md)
 (`pnpm foto:prompt` para revisar el prompt, `pnpm foto:generar <ficha>` para producir el plate con las referencias que la ficha declara y `pnpm foto:validar` para medirlo), nunca armando prompts a mano.
 
 **Reglas de la toma para la lente:** el sujeto cabe en un círculo del 55 % del lado corto con 15 % de aire · fuera
@@ -324,7 +359,8 @@ foco, y en los estímulos de la prueba sin logo.
   completa la órbita con la esfera arriba. En el contenido en papel, la órbita baja a 80 px en la esquina.
 - **Campaña:** la órbita rodea la lente con aire; la esfera va arriba a la izquierda, lejos de la cara.
 - **Movimiento (cierre de marca 4,5 s):** anillo 0–0,5 s · arco 0,4–1,4 s · la esfera asienta 1,4–1,7 s · halo
-  1,2–2,0 s · logo 1,9–2,5 s · eslogan 2,5–3,0 s. Con movimiento reducido, cuadro final fijo.
+  1,2–2,0 s · logo 1,9–2,5 s · eslogan 2,5–3,0 s. Con movimiento reducido, cuadro final fijo. Desde AXIS 0.2.7 estos
+  tiempos son el token `efeonceGraphicLine.brandClose` y el elemento `brand-close` del contrato (no va en impresos).
 - **Grillas:** margen del 9 % del lado corto en redes (96 px sobre 1080) y 140 px en 16:9; en 9:16 se respeta la
   zona que tapa la interfaz de cada red.
 
@@ -340,7 +376,8 @@ con la órbita alrededor de la foto: **A · clara** (divisor que termina en la e
 - **Llegar:** el logo completo va una sola vez, en el muro de recepción dentro de su órbita. Salas con verbos
   (Hacer, Medir, Crear); en el directorio, cada área con la esfera en su acento; la señalética de servicio en
   Poppins, sin esfera ni órbita.
-- **Trabajar:** **anillo = libre o abierto; esfera = ocupado o decidido**, nunca como semáforo de colores. El arco
+- **Trabajar:** **anillo = libre o abierto; esfera = ocupado o decidido**, nunca como semáforo de colores (token
+  `efeonceGraphicLine.state` y elemento `state`, que siempre lleva su etiqueta). El arco
   del estado de sala mide tiempo real. Una lente o una órbita por muro o vidrio; nada de patrones. Muro de voz: una
   pregunta y su respuesta por espacio.
 - **Convivir:** tazas, cuaderno, credencial, stickers, fondos de pantalla (la órbita a la derecha, la zona izquierda
@@ -400,7 +437,7 @@ El uniforme actual (polo, hoodie, gorra, chaqueta, lanyard) **sigue vigente**; l
 
 ### 10.8 Merch en foto
 
-El canvas incluye 17 fotos de producto generadas con IA (GPT Image 2.5 Sunburst) a partir del **arte plano exacto**
+La lámina 4.8 del canvas incluye 17 fotos de producto generadas con IA (GPT Image 2.5 Sunburst) a partir del **arte plano exacto**
 de cada pieza como referencia, y de los kits reales de prenda (polo, gorra, lanyard) como referencia de forma y
 tela. El modelo sólo pone material y luz. **Son maquetas de presentación**: la producción sale de los archivos
 vectoriales y de una muestra física del proveedor. Prompts y runner: `exploracion-v5/merch-ia/`.
@@ -434,7 +471,8 @@ material real (vinilo, pintura, cerámica, impresión). Runner, ediciones y prom
 | Elemento | Sí | No |
 |---|---|---|
 | Esfera | al final de la respuesta, 0,2 em, en el acento; una por pieza | en preguntas, como viñeta, repetida, con volumen o brillo |
-| Órbita | anillo fino al 16–22 %, arco y esfera, al costado del texto | anillos gruesos o muchos, detrás del texto, alrededor del logo |
+| Órbita | anillo fino al 16–22 %, arco y esfera, al costado del texto; declarada a propósito, en casos específicos | anillos gruesos o muchos, detrás del texto, alrededor del logo, por defecto en toda pieza, sobre el sujeto, las reservas, el lecho o la firma |
+| Firma de pieza gráfica | el logo de Efeonce centrado abajo; la burbuja URL centrada y fusionada sólo si el logo ya está en la imagen | la burbuja por defecto, a un costado o junto al logo; firma y burbuja a la vez |
 | Arco de avance | mide un dato real | decorativo o inventado |
 | Voz | pregunta chica, respuesta grande de 1–3 palabras | pregunta grande, respuesta larga y chica |
 | Color | navy profundo con teal; teal oscuro sólo en gráfico sobre claro | teal claro como texto sobre blanco (2,1:1); dos acentos en una pieza |
@@ -471,8 +509,47 @@ confianza. Kit: `exploracion-v5/prueba-sin-logo/` (protocolo, cuestionario, 24 e
 1. Panel de la prueba sin logo (Netquest, Cint o Toluna, a cotizar).
 2. Firma de mail A o B, e instalarla.
 3. Aprobar el banco de pares de copy.
+4. Umbral de la burbuja-firma: mantener 4,5:1 o bajarlo a 3:1 (objeto gráfico) (§8.5).
 
-**Pendiente (producción):** archivos de impresión y plantillas editables · el contrato de composición `efeonce.graphic-line-orbit` (AXIS 0.2.6) sigue en `candidate` hasta una pieza real por un segundo runtime · la
+**Pendiente (producción):** archivos de impresión y plantillas editables · el contrato de composición `efeonce.graphic-line-orbit` (0.2.0 en AXIS 0.2.7) sigue en `candidate` hasta una pieza real por un segundo runtime · la
 frontera Greenhouse ↔ Efeonce (la línea es de Efeonce, no de Greenhouse) · que la línea no se filtre al trabajo de
 clientes · copy en inglés · revisión legal de «Te hacemos visible» · accesibilidad medida en las piezas reales ·
 tamaños mínimos del logo validados con prueba de impresión.
+
+---
+
+## 13. Contrato y herramientas (AXIS 0.2.7)
+
+Nada de esta sección aprueba ni publica una pieza: componer, medir y certificar no reemplazan la autorización del
+operador.
+
+### 13.1 AXIS
+
+- **Paquetes `0.2.7`:** `@efeoncepro/axis-tokens`, `axis-ui-contracts`, `axis-ui-registry` y el nuevo
+  `@efeoncepro/axis-brand-assets` (§8.6). Greenhouse los tiene fijados en esa versión.
+- **Tokens `efeonceGraphicLine`** (canónicos): color, familia, esfera, órbita, lente, foco, burbuja URL (con su gris
+  fuente), tipo, logo, isotipo y los nuevos `signature` (centrada, anclada abajo al centro, margen 0,09 del lado corto,
+  logo por defecto, burbuja sólo con la marca en escena, ancho 0,2 del lado corto y 0,25 en 16:9, contraste mínimo
+  4,5), `slogan` («Empower your», bloque o solo, sólo en cierres, sin mayúsculas ni esfera), `state` (anillo libre,
+  esfera ocupado, sin semáforo) y `brandClose` (§10.1).
+- **Contrato `efeonce.graphic-line-orbit` 0.2.0** (candidate; manifest `axis.graphic-line-orbit-composition.v1`).
+  Elementos: `orbit`, `measure`, `progress`, `lens`, `spotlight`, `family-map`, `url-bubble`, `voice`, `logo-inline`
+  y los nuevos `signature`, `slogan`, `state` y `brand-close`. Reglas: un anillo por pieza; una medida exige fuente;
+  la respuesta tiene hasta tres palabras; en canal social una burbuja suelta se rechaza (se firma con `signature`); una
+  sola firma y nunca firma y burbuja a la vez; la burbuja-firma sólo para la marca Efeonce; el eslogan sólo cierra; el
+  estado exige etiqueta; `brand-close` no va en impresos. Chequeos nuevos del adapter: `signature-centered`,
+  `signature-min-contrast` y `orbit-never-over-subject-or-reserves`.
+- **Lab** (axis.efeonce.org): la página `references/graphic-line` suma la sección **4.9 «Oficina en foto»** y la 5.7
+  «Componer con agentes», donde el post de ejemplo ahora firma con el logo centrado. El banco de tipografía creativa
+  (`references/creative-typography`) también firma con el logo centrado por defecto; la burbuja sólo con el logo en la
+  imagen. El Lab toma los archivos del paquete de assets en cada build y ya no guarda copias propias.
+
+### 13.2 Greenhouse
+
+| Herramienta | Qué hace con la línea |
+|---|---|
+| `pnpm creative:orbit:resolve` · `pnpm creative:orbit:render -- --intent --bindings --out-dir` | Adapter del contrato 0.2.0 (`scripts/creative/layout-compiler/graphic-line.mjs`). Pinta, rasteriza y firma (logo, o burbuja fusionada en luminosidad a opacidad 1) y mide el contraste de la firma sobre los píxeles finales. `bindings.protect` declara sujeto, reservas y lecho para el chequeo de la órbita. Sale con código 1 si falla un chequeo |
+| `pnpm creative:layout` | Capa opcional por formato `graphic_line: { intent, protect }` (sólo elementos con anillo: orbit, measure, progress, lens, spotlight, family-map; el copy y la firma siguen del compilador); falla el QA si cruza el campo de copy o un sujeto. Firma opcional `brand.signature: { brand_in_scene }`: `false` = logo centrado sin URL; `true` = burbuja centrada sola, opacidad 1, falla bajo 4,5:1. Los contratos sin ese campo quedan exactamente como antes |
+| `pnpm foto:componer:cta` + `pnpm foto:cta:gate` (tramo 17) | Campo de plan `marcaEnEscena`. En piezas **nuevas**, la burbuja (`url` + `marcaEnEscena: true`, sin `logo`) se fusiona a opacidad 1, se mide y la juzgan las reglas `firma-burbuja`, `firma-contraste` y `firma-sobre-sujeto`. Las piezas del canon anterior se dibujan igual y siguen «no certificables» con URL; no se recertificaron (el gate las mostrará en 3 hasta recomponerlas) y ningún workflow de CI corre este gate. Detalle: [contrato del compositor §19.6](../EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) |
+| `src/config/efeonce-brand-assets.test.ts` | Guarda de deriva: las copias locales del logo y de la burbuja deben ser el mismo dibujo que el paquete de assets |
+

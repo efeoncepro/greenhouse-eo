@@ -2,7 +2,7 @@
 
 **Línea gráfica «La órbita» (25/09):** canónica y componible por intención (AXIS 0.2.6, `pnpm creative:orbit:render`); [índice](docs/operations/brand-graphic-line/README.md). Pendiente: prueba sin logo y firma A/B.
 
-**Marketing Studio (25/09):** TASK-1890/1891 code complete; gateway 1.8.0 con `MARKETING_STUDIO_PROVIDER_ENABLED=false`. Falta: release de Greenhouse (canje RFC 8693 + manual) → flag ON + dispatch → `pnpm studio:canary` con token Entra humano. Detalle: [TASK-1891](docs/tasks/in-progress/TASK-1891-marketing-studio-mcp-federation.md) · skill `efeonce-marketing-studio` · [runbook](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
+**Marketing Studio (26/09):** lectura por MCP en producción y verificada. Release `0e87c7a443a2` (PR #240), [TASK-1890](docs/tasks/complete/TASK-1890-marketing-studio-agent-ready-contract.md) y [TASK-1891](docs/tasks/complete/TASK-1891-marketing-studio-mcp-federation.md) complete. Gateway `958c9de30` (fix #20) sirve `00061-sbc` con el provider encendido; migración correctiva `20260926071321910` (política del cliente de canje). La migración ya está aplicada, pero su archivo sólo está en develop: sale a main con el próximo release. Sin probar en vivo: la denegación a una persona sin capability (requiere un segundo login). Tras un deploy fallido del gateway, revisar `spec.traffic`.
 
 **Insights (25/09):** [TASK-1888](docs/tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md) code complete, rollout pendiente (flag OFF, migración aplicada, [efeonce-mcp#18](https://github.com/efeoncepro/efeonce-mcp/pull/18) sin deploy; sin push). Plan de rollout: arquitectura §14.8.
 

@@ -1,6 +1,6 @@
 ---
 name: efeonce-insights
-description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 code complete behind a flag that is OFF, premium catalogs TASK-1889 code complete 2026-09-25, not pushed, rollout pending), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
+description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 live in production since 2026-09-26 with `INSIGHTS_EDITORIAL_V2_ENABLED` ON in Vercel and the ops-worker, premium catalogs TASK-1889 code complete 2026-09-25, not pushed, rollout pending), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
 ---
 
 # Efeonce Insights (living skill)
@@ -101,8 +101,8 @@ it without repeating what already cost a day*. It grows with every task: see the
 
 - Rendering, PDF/deck, Artifact Worker → `references/program-ledger.md` § TASK-1846 + `artifact-composer` docs; Proposal stays a compatible consumer adapter (behaviour untouched).
 - Charts/catalogs → `dataviz-design` + `deck-studio` + TASK-1847 (v1 catalogs, what production serves today).
-  Contract changes (15 chart families, per-figure reading, `channelId`, sealed cover) → TASK-1888 (code complete
-  2026-09-25 behind `INSIGHTS_EDITORIAL_V2_ENABLED`, OFF; see `references/contracts.md` § Editorial contract v2). Premium A4/deck templates → TASK-1889 (code complete 2026-09-25 in local `develop`, not pushed; see
+  Contract changes (15 chart families, per-figure reading, `channelId`, sealed cover) → TASK-1888 (live
+  since 2026-09-26, `INSIGHTS_EDITORIAL_V2_ENABLED` ON in Vercel staging/Production and the ops-worker; see `references/contracts.md` § Editorial contract v2). Premium A4/deck templates → TASK-1889 (code complete 2026-09-25 in local `develop`, not pushed; see
   `references/contracts.md` § Render contract of the premium catalogs and `references/operations.md` § TASK-1889) with the approved direction
   `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`, its wireframe and its fidelity
   contract (41 reference pages in `…/TASK-1889-efeonce-insights-premium-catalogs/paginas/`, `pixelmatch` 0.1, ≤ 1 % of
@@ -114,7 +114,11 @@ it without repeating what already cost a day*. It grows with every task: see the
   Insights covers (`insights-report/report-cover*.html`, `report-back-cover.html`), and the brand canvas tested it
   over Insights as boards **P-01 (A4 report)** and **P-02 (plan/deck)**. That is a **canvas proposal, not adopted**:
   it is not implemented in the runtime catalogs (those are governed by TASK-1889). Never describe P-01/P-02 as the
-  Insights design, and never add the orbit to a catalog outside that task.
+  Insights design, and never add the orbit to a catalog outside that task. The URL bubble in the Insights report and
+  deck **footers** stays as it is: the operator's 2026-09-26 signature rule (centered Efeonce logo; the bubble only
+  when the logo is already inside the image) governs graphic pieces such as social posts and ads, not report footers.
+  The catalogs' `assets/url-lum.svg` copies are the `url-bubble-source` drawing of `@efeoncepro/axis-brand-assets`,
+  guarded by `src/config/efeonce-brand-assets.test.ts` — never edit them by hand.
 - Sharing/email/schedules → `resend-email-platform`, `greenhouse-email` + TASK-1848.
 - Portal UI → `greenhouse-ux` + `greenhouse-ai-design-studio` + TASK-1849 (Composition Shell, GVC).
 - Shared web render → `efeonce-think` repo + `astro` skill + TASK-1875 (headless model, token server-side).
