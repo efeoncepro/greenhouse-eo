@@ -179,9 +179,11 @@ describe('TASK-861 HubSpot release workflow contract', () => {
     const orchestrator = loadWorkflow('.github/workflows/production-release.yml') as {
       jobs?: Record<string, { secrets?: Record<string, unknown> }>
     }
+
     const workerWorkflow = loadWorkflow('.github/workflows/ops-worker-deploy.yml')
     const opsWorkerJob = orchestrator.jobs?.['deploy-ops-worker']
     const onClause = workerWorkflow.on as Record<string, unknown>
+
     const workflowCall = onClause?.workflow_call as
       | { secrets?: Record<string, unknown> }
       | undefined
