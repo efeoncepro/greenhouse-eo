@@ -212,7 +212,7 @@ su eslogan y su producto:
 | **Web, infraestructura, SEO y medición** (Digital Services & Engineering) | Empower your **Engine** | **Wave** | vigente |
 | **Medios y distribución** | Empower your **Voice** | **Reach** | inferido de «y así sucesivamente»; confirmar |
 | **Efeonce** (marca madre) · Growth Strategy & Measurement | Empower your **Growth** | **Greenhouse**, el producto de Efeonce que controla todo | Greenhouse vigente; la línea Growth Strategy, inferida (confirmar) |
-| RevOps y CRM | pendiente del operador | Kortex fuera por ahora | pendiente |
+| **RevOps y CRM** (sublínea de Efeonce) | palabra por decidir | sin plataforma propia: se opera en **HubSpot** y **Salesforce** | color según la plataforma; pendiente |
 
 **Greenhouse** es el producto de Efeonce y la plataforma que controla y orquesta todas las líneas (operador,
 2026-09-26). Aparece como contexto igual que los demás productos —su nombre o su interfaz en un mockup—; su propia
@@ -227,10 +227,10 @@ producto con que se hace. Los pesos del eslogan no cambian (`src/config/efeonce-
 - **Cómo aparece un producto como contexto:** su nombre dentro de la pieza (antetítulo o etiqueta), su interfaz en un
   mockup o su isotipo pequeño dentro de su propia superficie. El lockup «Producto by efeonce» vive sólo en superficies
   del propio producto (aplicación, ingreso, página del producto), nunca como firma de una pieza.
-- **Los acentos de producto** (esfera, anillo y fondo `#091951` de Globe, Wave y Reach, y su palabra de eslogan) viven
-  en los tokens `family` de AXIS. Si se usan también en piezas de Efeonce o sólo dentro de la superficie del producto
-  está **pendiente del operador**; recomendación: sólo dentro del producto, y las piezas con la paleta y el eslogan de
-  Efeonce.
+- **Cada pieza toma el color de su línea** (operador, 2026-09-26): la esfera, el anillo y la palabra final del
+  eslogan van en el acento de la línea; el logo que firma sigue siendo el de Efeonce. Los acentos viven en los tokens
+  `family` de AXIS (hoy colgados del producto; deuda: pasarlos a la línea). RevOps y CRM toma el color de la plataforma
+  en que se opera (HubSpot o Salesforce); los valores están por decidir.
 - **Mapa de portafolio:** el arco y el centro son de Efeonce; los productos van como satélites con su isotipo.
 - **Hilo de familia (decidido):** la órbita misma, más la palabra final del eslogan. Descartado: el anillo teal
   en productos.
