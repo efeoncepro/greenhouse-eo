@@ -882,8 +882,8 @@ La línea tiene su propia iconografía, canónica desde el 2026-09-26 (D16–D22
 **Dónde vive:** AXIS es la fuente de verdad — tokens `efeonceGraphicLine.icons`, el paquete
 `@efeoncepro/axis-graphic-line/icons` (`resolveIcon`, `auditIconGroup`, `skewedOrbitHeroSvg`), los comandos
 `pnpm icons:export|check|vectorize`, la página [axis.efeonce.org/references/iconography](https://axis.efeonce.org/references/iconography/)
-y la guía `docs/agent-composition/iconography.md` del repositorio de AXIS. Estado: implementado en la rama
-`feat/iconography`, **sin publicar** (tokens 0.3.6, `axis-graphic-line` 0.4.0). La firma de correo y la de equipo siguen
+y la guía `docs/agent-composition/iconography.md` del repositorio de AXIS. Estado: publicado el 2026-09-26 con el
+tag `v0.3.6` (tokens 0.3.6, `axis-graphic-line` 0.4.0). La firma de correo y la de equipo siguen
 con íconos Tabler hasta que el operador decida el reemplazo. Criterio e historia: skill `efeonce-graphic-line`,
 `references/iconography.md`.
 

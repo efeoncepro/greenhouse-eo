@@ -169,7 +169,7 @@ blanda en grilla 48, esfera 3,4 con anillo calado, gesto en tinta del protagonis
 sesgada** como firma de Plastilina (D20: nunca mide; lo que mide sigue siendo circular). Voz por línea: Trazo para
 Growth, Engine y Revenue; Plastilina para Brand; Voice por decidir.
 
-Se implementó en AXIS (rama `feat/iconography`, commit `b5a621f`, **sin publicar**): tokens `efeonceGraphicLine.icons`
+Se implementó en AXIS (PR efeoncepro/axis-design-system#3, publicado el 2026-09-26 con el tag `v0.3.6`): tokens `efeonceGraphicLine.icons`
 (`axis-tokens` 0.3.6), `@efeoncepro/axis-graphic-line/icons` (0.4.0) con los 30 glifos aprobados y la API para agentes
 (`resolveIcon`, `auditIconGroup`, `skewedOrbitHeroSvg`), los comandos `pnpm icons:export|check|vectorize` para dar de
 alta glifos nuevos, la página `/references/iconography/` y la guía `docs/agent-composition/iconography.md` (ADR de AXIS

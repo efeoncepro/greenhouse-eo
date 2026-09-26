@@ -851,8 +851,8 @@ de la página es `orbitSvg` con `circle` y `channel: 'social'`.
 
 ## Iconografía (`efeonceGraphicLine.icons` y `@efeoncepro/axis-graphic-line/icons`)
 
-> AXIS `feat/iconography@b5a621f`, 2026-09-26: `axis-tokens` **0.3.6** y `axis-graphic-line` **0.4.0** en el código,
-> **sin publicar**. Guía: `axis-design-system/docs/agent-composition/iconography.md`.
+> AXIS `main@5b8ab20`, 2026-09-26: `axis-tokens` **0.3.6** y `axis-graphic-line` **0.4.0**, publicados con el tag
+> `v0.3.6`. Guía: `axis-design-system/docs/agent-composition/iconography.md`.
 
 | Token | Qué guarda |
 | --- | --- |

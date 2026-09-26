@@ -1,7 +1,7 @@
 # Iconografía de la línea: Trazo y Plastilina
 
-> Verificado contra: AXIS `feat/iconography@b5a621f` (tokens `0.3.6`, `@efeoncepro/axis-graphic-line` `0.4.0`, **sin
-> publicar**) y el canvas «Íconos de La órbita» (claude.ai/artifact/Y9mx42L72zYc6iLg4j3Maj, versión 20) — 2026-09-26 ·
+> Verificado contra: AXIS `main@5b8ab20` (tokens `0.3.6`, `@efeoncepro/axis-graphic-line` `0.4.0`, publicados con el
+> tag `v0.3.6`) y el canvas «Íconos de La órbita» (claude.ai/artifact/Y9mx42L72zYc6iLg4j3Maj, versión 20) — 2026-09-26 ·
 > decisiones del operador D16–D22 ([ledger.md](ledger.md)).
 >
 > **Estado: canónica** (el operador la canonizó el 2026-09-26, D22). **La fuente de verdad es AXIS**, no este documento:
@@ -21,8 +21,8 @@
 4. Reposo por defecto; responde uno solo y sólo si la pieza no tiene otra esfera. Antes de entregar,
    `auditIconGroup(items, { pieceHasSphere })`.
 5. Plastilina protagonista: `skewedOrbitHeroSvg` (el objeto en reposo, la órbita pone la esfera).
-6. Los paquetes aún no están publicados: en Greenhouse se usan desde el repo hermano (`../axis-design-system`) o se
-   exportan con `pnpm icons:export`. Greenhouse todavía no consume `/icons`.
+6. Paquetes publicados (tag `v0.3.6`): un consumidor fija `@efeoncepro/axis-graphic-line` `0.4.0` y `axis-tokens`
+   `0.3.6`. Greenhouse todavía no consume `/icons`: para una pieza, `pnpm icons:export` en AXIS o el paquete.
 
 ## 1. La idea
 
@@ -184,10 +184,10 @@ Un glifo nuevo se dibuja una vez, entra al set y recién después se usa en piez
 
 ## 10. Implementación y pendientes
 
-- **Hecho (2026-09-26, AXIS `b5a621f`, sin publicar):** tokens `efeonceGraphicLine.icons` (`axis-tokens` 0.3.6) y el
+- **Hecho y publicado el 2026-09-26 con el tag `v0.3.6` (AXIS `main@5b8ab20`):** tokens `efeonceGraphicLine.icons` (`axis-tokens` 0.3.6) y el
   subpath `@efeoncepro/axis-graphic-line/icons` (0.4.0) con la geometría de este §9, la API y los comandos
   `icons:export|check|vectorize`; página `/references/iconography/`.
-- **Pendiente:** publicar los paquetes con el próximo tag (visto bueno del operador) y que un consumidor los fije.
+- **Pendiente:** que un consumidor los fije (versiones exactas `axis-tokens` 0.3.6 y `axis-graphic-line` 0.4.0).
 - **Pendiente (operador):** el inventario del set (qué íconos necesita la marca: líneas, canales, áreas, contacto) y si
   este set reemplaza a los Tabler outline de la firma de correo y de la firma de equipo (`emailSignature.icons`,
   `team.areaMark`). Mientras no se decida, la firma sigue con Tabler.
