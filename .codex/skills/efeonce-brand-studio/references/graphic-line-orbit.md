@@ -300,8 +300,8 @@ La página de AXIS es pública: lo que allí aparece queda expuesto.
 - **Prueba de atribución sin logo** (600 personas, panel a cotizar) sin medir: hoy la línea es **sistema consistente,
   no activo distintivo demostrado**. No reportarla como brand equity.
 - Umbral de la burbuja-firma: 4,5:1 o 3:1 (decisión del operador).
-- Aprobar el banco de pares de copy (hoy candidatos). La firma de correo v3.1 está aprobada; falta subir sus
-  imágenes a una URL pública e instalarla en Outlook.
+- Aprobar el banco de pares de copy (hoy candidatos). La firma de correo v3.1 está aprobada y sus imágenes
+  publicadas en el bucket público de AXIS (`email-signature/v3.1/`); falta instalarla en Outlook.
 - Archivos de impresión y plantillas editables.
 - Pasar los tiempos del motion V1.1 a tokens de AXIS (`brandReveal` / `brandOpen`); hoy viven en el script.
 - Copy en inglés; revisión legal de «Te hacemos visible»; tamaños mínimos del logo con prueba de impresión.

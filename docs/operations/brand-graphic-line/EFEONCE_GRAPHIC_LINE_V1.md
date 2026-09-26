@@ -477,8 +477,12 @@ la **firma de respuestas y reenvíos** es una línea de texto vivo (nombre, carg
 
 **Correo real:** Outlook y Gmail no cargan fuentes web y muestran Arial (se revisa también así); no muestran SVG ni
 fusiones, así que foto, íconos, logo, burbuja y franja van en PNG servidos desde una URL pública; la regla de sección
-es el borde superior de una celda (Outlook ignora un bloque de 1 px). **Pendiente:** subir las imágenes a una URL
-pública e instalar la firma en Outlook.
+es el borde superior de una celda (Outlook ignora un bloque de 1 px). **Imágenes publicadas** en
+`https://storage.googleapis.com/efeonce-group-axis-public-media/email-signature/v3.1/` (`shared/<dark|light>/` para íconos, logo, burbuja y franja; `people/<persona>-<dark|light>.png` para la foto).
+El generador con `HOST_BASE=<esa URL>` escribe `out/v3.1/hosted/` (lo que se sube con `gcloud storage cp -r`) y los
+HTML listos para pegar: `outlook-a.html`, `outlook-b.html` y `outlook-respuesta.html`. Paquetes AXIS con el contrato:
+`@efeoncepro/axis-tokens` y `@efeoncepro/axis-ui-contracts` 0.3.2. **Pendiente:** instalar la firma en Outlook (cada
+persona, en su cuenta).
 
 **Proporciones del retrato (lámina 4.5, medidas del original, caja de 208 px):** anillo de radio 96, foto recortada en
 círculo de radio 78, arco de 200° a 250° con trazo 4 y la esfera de radio 7 en su punta; anillo de 2 px en navy al
@@ -626,7 +630,7 @@ confianza. Kit: `exploracion-v5/prueba-sin-logo/` (protocolo, cuestionario, 24 e
 2. Aprobar el banco de pares de copy.
 3. Umbral de la burbuja-firma: mantener 4,5:1 o bajarlo a 3:1 (objeto gráfico) (§8.5).
 
-**Pendiente (producción):** subir las imágenes de la firma de correo v3.1 a una URL pública e instalarla en Outlook (§10.2) · archivos de impresión y plantillas editables · las variantes que faltan de las animaciones
+**Pendiente (producción):** instalar la firma de correo v3.1 en Outlook, persona por persona (§10.2) · archivos de impresión y plantillas editables · las variantes que faltan de las animaciones
 del logo V1.1 (OneDrive y bucket) y sus tiempos como tokens `brandReveal` / `brandOpen` de AXIS (§10.1) · la
 frontera Greenhouse ↔ Efeonce (la línea es de Efeonce, no de Greenhouse) · que la línea no se filtre al trabajo de
 clientes · copy en inglés · revisión legal de «Te hacemos visible» · accesibilidad medida en las piezas reales ·

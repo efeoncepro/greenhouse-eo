@@ -240,9 +240,14 @@ que las hace cumplir es `efeonce.email-signature` de AXIS.
 3. **Revisa las tres vistas.** La versión sin fuentes web es la que ven Outlook y Gmail: debe leerse bien en Arial.
 4. **Revisa los partners** contra el [registro de partnerships](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
    Sólo entran relaciones activas, aceptadas o declaradas por el operador. Truora no va en la firma.
-5. **Instálala en Outlook:** la firma completa para correos nuevos y la de una línea para respuestas y reenvíos. Las
-   imágenes tienen que estar servidas desde una URL pública; con imágenes incrustadas, muchos clientes las muestran
-   como adjuntos.
+5. **Publica las imágenes** (sólo si cambió algo o es otra persona): corre el generador con
+   `HOST_BASE=https://storage.googleapis.com/efeonce-group-axis-public-media/email-signature/v3.1` y `PERSON=<nombre-apellido>`, y sube la carpeta `out/v3.1/hosted/` con
+   `gcloud storage cp -r out/v3.1/hosted/* gs://efeonce-group-axis-public-media/email-signature/v3.1/`. Nunca uses la
+   versión con imágenes incrustadas: Outlook y Gmail las bloquean o las muestran como adjuntos.
+6. **Instálala en Outlook:** abre `out/v3.1/outlook-b.html` (o `outlook-a.html`) en el navegador, selecciona todo,
+   copia y pega en Configuración → Cuentas → Firmas como firma para mensajes nuevos. Crea una segunda firma con
+   `outlook-respuesta.html` y elígela para respuestas y reenvíos. Envíate un correo de prueba y revísalo en escritorio
+   y en el teléfono.
 
 **Qué no hacer con la firma:** agregar «Quedo atento.» o «Saludos» (van en el cuerpo del correo) · poner una
 segunda esfera en la línea de los partners · mostrar logos de partners a color o en insignias de nivel sin haberlas

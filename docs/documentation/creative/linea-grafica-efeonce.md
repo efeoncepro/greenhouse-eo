@@ -186,7 +186,7 @@ la órbita se reconozca sola.
 | Pendiente | Tipo | Qué falta |
 |---|---|---|
 | Prueba de atribución sin logo | decisión del operador | elegir panel y correrla con 600 personas (300 por versión); el kit está listo |
-| Firma de mail | producción | la v3.1 está aprobada (A sobre papel y B tarjeta navy, con la zona de partners); falta subir sus imágenes a una URL pública e instalarla en Outlook |
+| Firma de mail | instalación | la v3.1 está aprobada y sus imágenes publicadas; falta que cada persona la instale en su Outlook |
 | Banco de pares de copy | decisión del operador | aprobar los pares pregunta/respuesta candidatos |
 | Archivos de impresión y plantillas editables | producción | no existen todavía |
 | Variantes restantes de las animaciones del logo | producción | algunos formatos y fondos siguen en render; se suman a OneDrive y al bucket a medida que terminan |
