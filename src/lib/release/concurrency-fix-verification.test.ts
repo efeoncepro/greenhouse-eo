@@ -174,7 +174,6 @@ describe('TASK-861 HubSpot release workflow contract', () => {
     expect(hubspotJob?.with?.environment).toBe('production')
     expect(hubspotJob?.with?.expected_sha).toBe('${{ inputs.target_sha }}')
   })
-
 })
 
 const AZURE_WORKFLOWS = [
