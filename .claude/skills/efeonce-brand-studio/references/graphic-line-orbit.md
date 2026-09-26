@@ -25,8 +25,11 @@ Tres estados de la esfera: punto final (cierra la palabra respuesta), órbita y 
 **Efeonce firma todo** (operador, 2026-09-26): toda pieza, de cualquier línea de servicio, sale con la firma de
 Efeonce. Globe (suite de estudio creativo, en desarrollo), Wave y Reach aparecen como **contexto** —nombre, interfaz
 o isotipo pequeño dentro de su superficie—, nunca como firma; el lockup «by efeonce» sólo vive en la superficie del
-producto. Kortex y Verk, fuera por ahora. Los acentos y palabras de eslogan de producto (**Brand**, **Engine**,
-**Voice**) están en los tokens `family`; su uso en piezas de Efeonce está pendiente del operador (recomendación: no).
+producto. Kortex y Verk, fuera por ahora. **La palabra del eslogan es de la línea de servicio** (operador, 2026-09-26):
+servicios creativos → «Empower your **Brand**» (producto Globe); web, infraestructura, SEO y medición → «Empower your
+**Engine**» (Wave); medios y distribución → «**Voice**» (Reach, por confirmar); Efeonce → «**Growth**». RevOps y CRM y
+Growth Strategy: pendientes. Los tokens `family` de AXIS aún cuelgan la palabra del producto (deuda). Uso de acentos de
+producto en piezas de Efeonce: pendiente (recomendación: no).
 
 ## Cuándo aplica y cuándo no
 

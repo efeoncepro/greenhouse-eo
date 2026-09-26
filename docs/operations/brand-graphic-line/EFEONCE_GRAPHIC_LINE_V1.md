@@ -203,12 +203,20 @@ creativos, web, RevOps, medios o cualquier otra línea: la marca que se posicion
 aparecen como **contexto**: son los productos con que se prestan esos servicios, subordinados a Efeonce. Nunca firman
 una pieza ni reemplazan el logo de Efeonce.
 
-| Producto | Qué es | Estado |
-|---|---|---|
-| **Globe** | la suite de estudio creativo de Efeonce | en desarrollo |
-| **Wave** | búsqueda, web y medición | vigente |
-| **Reach** | medios y distribución | vigente |
-| Kortex · Verk | — | fuera de la línea gráfica por ahora |
+**La palabra del eslogan es de la línea de servicio, no del producto** (operador, 2026-09-26). Cada macroservicio tiene
+su eslogan y su producto:
+
+| Línea de servicio | Eslogan | Producto (contexto) | Estado |
+|---|---|---|---|
+| **Servicios creativos** | Empower your **Brand** | **Globe**, la suite de estudio creativo | Globe en desarrollo |
+| **Web, infraestructura, SEO y medición** (Digital Services & Engineering) | Empower your **Engine** | **Wave** | vigente |
+| **Medios y distribución** | Empower your **Voice** | **Reach** | inferido de «y así sucesivamente»; confirmar |
+| **Efeonce** (marca madre) | Empower your **Growth** | — | vigente |
+| RevOps y CRM · Growth Strategy & Measurement | pendiente del operador | Kortex y Verk fuera por ahora | pendiente |
+
+Una pieza de servicios creativos firma con el logo de Efeonce y cierra con «Empower your Brand»; Globe aparece como el
+producto con que se hace. Los pesos del eslogan no cambian (`src/config/efeonce-brand.ts`: *Empower* ExtraBold itálica,
+*your* ExtraBold, palabra final Black itálica).
 
 - **Igual en toda la familia:** la esfera y el anillo (forma, 0,20 em, comportamiento) · el oficio a la vista y
   los cursores AXIS · la voz · Bricolage + Poppins · el papel como fondo claro.
