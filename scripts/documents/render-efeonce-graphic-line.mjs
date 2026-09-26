@@ -85,7 +85,9 @@ for (const [i, f] of canvas.order.entries()) {
 const assets = {
   LOGO_FULL: svgUri('public/branding/logo-full.svg'),
   LOGO_NEG: svgUri('public/branding/logo-negative.svg'),
-  URL_BUBBLE: svgUri('src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg'),
+  // Burbuja con la fusión de luminosidad horneada (fórmula W3C): clara #848484 y sobre navy #6F89A2.
+  URL_BUBBLE: svgUri('docs/operations/brand-graphic-line/deliverables/assets/url-lum-light.svg'),
+  URL_BUBBLE_DARK: svgUri('docs/operations/brand-graphic-line/deliverables/assets/url-lum-dark.svg'),
   LOCK_NEG: `data:image/png;base64,${b64(path.join(expl, 'assets/lockup-claim-neg.png'))}`,
   FIG_FAMILIA: await fig('O-03-orbita-familia.jpg', 250, 1100),
   FIG_ISOTIPO: await fig('D-05-isotipo.jpg', 280, 880),
@@ -143,7 +145,7 @@ try {
         ftr.className = 'ftr'
         ftr.innerHTML =
           `<span class="rule"></span>` +
-          `<a class="bubble" href="https://efeoncepro.com"><img src="${assets.URL_BUBBLE}" alt="efeoncepro.com"></a>` +
+          `<a class="bubble" href="https://efeoncepro.com"><img src="${isCover || isBack ? assets.URL_BUBBLE_DARK : assets.URL_BUBBLE}" alt="efeoncepro.com"></a>` +
           `<span>${contact.address}</span>` +
           `<a href="${phoneHref}">${contact.chilePhone}</a>` +
           `<span class="pn">${isCover || isBack ? '' : `Página ${i + 1} de ${total}`}</span>`

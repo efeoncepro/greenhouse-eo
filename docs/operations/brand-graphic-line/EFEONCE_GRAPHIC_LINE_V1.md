@@ -271,7 +271,10 @@ versión toda blanca, se reemplaza.
 Donde aparezca `efeoncepro.com` va la **burbuja oficial** (`url-lum.svg`, el mismo asset del pie de Insights y del
 deck), nunca la URL como texto: stand, pendón, tarjeta, carnet, hoja membretada, firma de mail y pies de página.
 El SVG se mantiene gris y se aplica con **`mix-blend-mode: luminosity`**, que lo adapta al fondo; no se recolorea
-ni se redibuja. En correo, donde la fusión no está soportada, va el mismo archivo sin fusión y enlazado.
+ni se redibuja. Donde la fusión no está garantizada (visores, correo, PDF, referencias para IA) se usa el resultado
+**horneado** con la fórmula W3C: variante clara `#848484` sobre blanco o papel y variante sobre navy `#6F89A2` sobre
+`#001A33`, ambas con el color como atributo del trazo (sin bloque de estilos: hay visores que lo descartan y el
+trazo queda negro). Archivos: `docs/operations/brand-graphic-line/deliverables/assets/url-lum-{light,dark}.svg`.
 
 ### 8.6 Archivos
 
