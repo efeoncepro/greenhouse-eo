@@ -1,6 +1,6 @@
 {
   "_comentario": "Huellas de los assets que el catálogo de foto:prompt declara. Los binarios viven fuera de git (640 MB); esto los verifica sin descargarlos. Regenerar con `pnpm foto:assets:lock` y commitear.",
-  "sellado": "2026-09-24",
+  "sellado": "2026-09-26",
   "assets": {
     "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-04.png": {
       "rol": "persona:julio",
@@ -28,7 +28,7 @@
     },
     "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-perfil-der.png": {
       "rol": "persona:julio/perfil-der",
-      "sha256": "c1ae6fb69c2dbb59f48e7da7a71496dcf1574fcb7ee158533137b5bc962e629c"
+      "sha256": "90ef70ed0500f7b30db698ecfe4a95d3a78abf3a9d5df76b60326c3362edea93"
     },
     "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-135-trasero.png": {
       "rol": "persona:julio/trasero",
