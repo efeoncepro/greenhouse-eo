@@ -1,27 +1,67 @@
 # Handoff activo
 
-**16–17/09:** Higgsfield API con créditos. Previa 18: verificar · readback KV 21/09 y 23/09.
+**Línea gráfica «La órbita» (25/09):** canónica y componible por intención (AXIS 0.2.6, `pnpm creative:orbit:render`); [índice](docs/operations/brand-graphic-line/README.md). Pendiente: prueba sin logo y firma A/B.
 
-**Posicionamiento CRM actualizado (2026-09-16, documental):** HubSpot y Salesforce se mantienen como proveedores
-con una zona de solapamiento —mid-market alto, agentes e integraciones— pero con centros de gravedad distintos.
-HubSpot-first parte para crecimiento B2B, mid-market y time-to-value; Salesforce-first para org instalada compleja,
-gobierno, service a escala, extensibilidad e integración enterprise. La práctica usa `HubSpot-first`,
-`Salesforce-first`, `híbrida` o `no-fit`; no es una decisión automática ni una afirmación de segmentación exclusiva.
+**Marketing Studio (25/09):** TASK-1890/1891 code complete; gateway 1.8.0 con `MARKETING_STUDIO_PROVIDER_ENABLED=false`. Falta: release de Greenhouse (canje RFC 8693 + manual) → flag ON + dispatch → `pnpm studio:canary` con token Entra humano. Detalle: [TASK-1891](docs/tasks/in-progress/TASK-1891-marketing-studio-mcp-federation.md) · skill `efeonce-marketing-studio` · [runbook](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
 
-**Dreamforce 2026 — delta 16/09 (documental):** el ledger y las skills Salesforce quedaron actualizados con AIforce
-como capa de interfaz/headless gobernada; Missionforce con OpenAI/NVIDIA para government y entornos regulados; y
-las novedades de Marketing Cloud Next (Campaign Agent, Headless Marketing/MCP, Palmata, Data Guardian, Budget
-Optimization, Adaptive Web, Personalized Paths y otras) con disponibilidad separada por capacidad. Koa pertenece
-al anuncio del 15/09 y sigue en pilotos seleccionados. No se cambió ninguna org, entitlement ni contrato. Detalle:
-[`Dreamforce 2026`](.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md).
+**Insights (25/09):** [TASK-1888](docs/tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md) code complete, rollout pendiente (flag OFF, migración aplicada, [efeonce-mcp#18](https://github.com/efeoncepro/efeonce-mcp/pull/18) sin deploy; sin push). Plan de rollout: arquitectura §14.8.
 
-**HubSpot Fall Spotlight / UNBOUND 2026 (2026-09-16, documental):** las skills espejo de HubSpot as a Service,
-Solutions Partner y HubSpot-Greenhouse bridge, junto con el catálogo de oferta, incorporan ChatGPT Ads beta,
-MCP/Claude con writes gobernados, Agent Hub/Builder/Breeze, Developer Platform 2026.09 y la deprecación de APIs/apps
-legacy para septiembre de 2027. El detalle y la matriz de disponibilidad están en
-[`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md).
-No se activó ningún beta, permiso, campaña, conexión ni write de portal; falta verificar elegibilidad por cliente antes
-de vender o implementar.
+**Insights diseño (25/09):** [TASK-1889](docs/tasks/in-progress/TASK-1889-efeonce-insights-premium-catalogs.md) Slices 1–5 code complete en develop (sin push): catálogos A4 y deck del canvas aprobado, páginas de figura por familia, «Lo esencial», portada con logo privado; legado v1 retirado. Canvas 20/21 ≤ 1 % + excepción Deck-Agrupadas aprobada; gate insights 27/27 a 0 px; `ui:quality` PASS. Ediciones reales Berel/Sky compuestas en local (PDFs en `.captures/insights-preview/`, no versionados). **Falta:** aprobación del operador de esos PDFs y de las piezas derivadas, push, staging con `INSIGHTS_EDITORIAL_V2_ENABLED` (TASK-1888) y release por el control plane (el Job `artifact-worker` es compartido). [Dossier](docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md).
+
+**ANAM Emma (24/09):** landing pública HubSpot `kortex-cms-react/30` verificada con el PNG entregado por María Paz,
+cargo `Ejecutivo comercial ANAM` y avatar derivado con fondo menta en identidad de Customer Agent y chatflow
+`96601133`. Canon técnico, funcional, manual y skill `hubspot-as-a-service` actualizados en
+[caso ANAM](docs/architecture/kortex/hubspot-cms/anam-chat-landing.md). La verificación abrió el widget sin enviar
+mensajes; no se repitió la regresión móvil ni conversacional del build anterior. Fuente CMS en
+`../dev/kortex/hubspot-cms-react-project`, commit local `2229965` (sin push).
+
+SKY: CDR-009.
+
+**SKY Blog SEO/AEO (24/09):** HECHO end-to-end: `SVC-HS-591725750952`, términos `7c38b899…`, apply `EO-APC-9676214B`; SEO+AEO `contracted` ([delta TASK-1852](docs/tasks/in-progress/TASK-1852-berel-sky-service-access-and-channel-enablement.md#delta-2026-09-24--sky-blog-seoaeo-segundo-servicio-de-la-misma-organización)). Falta humano: login Sky, Search Console y keywords del blog (octubre).
+
+SKY V17: companions Motion/Audio.
+
+**Ads:** [CMP-001](docs/operations/social/2026-09-22-cmp-001-campaign-brief-handoff.md): 28 exports, 3 posts PENDING, sin pauta.
+
+**Paid visual:** [playbook](.codex/skills/efeonce-advertising-creative/references/paid-visual-attention-playbook.md); sin resultados paid.
+
+**Fotografía:** [canon](docs/operations/brand-photography/README.md) aprobado; reserva 2 abierta.
+
+**CTA:** [corte](docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#1910-regresión-y-mutantes-cómo-leerlos): tramo 16 local; novena sin informe, mutantes 81/175 parciales y P10 intermitente. No más rondas.
+
+[EPIC-048](docs/epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md): revisión adversarial aplicada; ADR Proposed, tasks to-do; sin runtime/bono.
+
+**DataForSEO:** ISSUE-175 y TASK-1341 cerrados (guard en `ops-worker-deploy`, revisión 00699, smoke AIO PASS).
+
+**Humano-agente (19/09):** [oferta aprobada](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md),
+con ruta CMO sin CRM obligatorio; TASK-1877/1878 sólo planificadas. [Demanda CL/es + GSC](docs/audits/public-site/2026-09-19-efeonce-human-agent-landing-demand.md):
+rango 03 comercial, no volumen orgánico probado. Faltan prueba, CTA y QA; sin publicación ni paid.
+
+**Berel campaña 2027 (19/09):** Color del Año, hub Colores de Temporada 2027 y Raíces de la piel con V2 en revisión
+(publican juntos el 29/09; gate PASS). Pendientes: enviar mensaje a Berel (material de marca, menú, «2026»), rehacer arte
+social (tareas 744–755) y gráficos 739/740 antes del 25/09. Septiembre: 12 artículos vs 8, 90 gráficas vs 50
+([conteo](docs/audits/seo/BEREL_CONTEO_PIEZAS_SEPTIEMBRE_2026-09-19.md)); skill `berel-content-production`.
+
+**Berel Frame.io (19/09):** [feedback visual de octubre](.codex/skills/berel-content-production/modules/20_REVISION_VISUAL_FRAMEIO.md)
+clasificado en la skill y Notion. Sin masters: artes intactos, sin publicación. «Berel Squad» no visible en la cuenta de Julio;
+cobertura limitada al share.
+
+**16–17/09:** Higgsfield API con créditos. Previa 18: verificar · readback KV 21/09 y 23/09 · 24/09 `higgsfield-provider`.
+
+**GTA VI:** posts 22 y 25/09 ([bitácora](docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md)).
+
+**Posicionamiento CRM (18/09, documental):** solapamiento HubSpot/Salesforce en mid-market alto, agentes e
+integraciones. `HubSpot-first`: crecimiento B2B, mid-market y time-to-value. `Salesforce-first`: org compleja,
+gobierno, service a escala, extensibilidad e integración enterprise. También `híbrida` o `no-fit`; selección
+no automática ni exclusiva.
+
+**Dreamforce 2026 (corte 18/09, documental):** estados por producto en el
+[`ledger`](.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md); sin cambios de org, entitlement
+ni contrato.
+
+**UNBOUND 2026 (corte 19/09, documental):** estados por capacidad en la
+[`matriz`](docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md); sin activar
+beta, permiso, campaña, conexión ni write. Verificar elegibilidad por cliente antes de vender o implementar.
 
 **Contacto:** TASK-1801 cerrada; [alcance y evidencia](.codex/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
 
@@ -33,24 +73,18 @@ blend raster `luminosity` `0.72` verificado. Templates: `efeonce-advertising-cre
 y [Pódcast](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md) están programados/PENDING,
 no publicados; el video del Pódcast sigue suspendido. MCP sigue sin tool creativa federada.
 
-**Efeonce Insights:** 1845/1846 en producción (emisión/IA OFF); TASK-1848 verificada en staging, pendiente gateway y prod.
+**Efeonce Insights:** 1845/1846/1848 en producción (emisión/IA OFF; flags 1848 OFF), gateway 1.7.0; 1849/1875/1876 abiertas. **TASK-1847:** en producción 24/09 (`ebb9212a32ce`); falta canary de render; [evidencia](docs/tasks/in-progress/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md).
 Estado vivo: arquitectura §14 y la skill `efeonce-insights`.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
 TASK-1403 reenfocada a landing del servicio de agentes (detalle en su Delta y en EPIC-047). **Pendiente con
 autorización:** el artículo publicado del caso (post `251432`) aún dice «no operativo».
 
-**Hiring: incidente P1 resuelto y en producción (2026-09-12; `ISSUE-171`/`172` resolved, `ISSUE-173` open; release
-`586a8627568a`):** el tablero no re-leía el snapshot al cambiar de vacante (`ISSUE-171`) y `lpad` recortaba el
-`public_id` del Banco de Talento pasado 99 999 (`ISSUE-172`, P1): colisión que rompía el cron y abrió el circuito
-del consumer de postulaciones. Recuperado por vías gobernadas sin borrar nada (migración, replay, revive de correos):
-**281 submissions / 0 sin postulación, 164 acuses enviados**, circuito `closed`, handler `healthy`. Release PR #234 →
-`released` 14:44:56Z, watchdog 5/5. Docs y skills barridas ese día: ATS §Delta 2026-09-12, `.claude/rules/hiring.md`,
-invariantes SQL/Ops, playbook reactivo, skills talento/resend/email/release (+ espejos `.codex/`), desk/careers/emails.
-Follow-ups formales: `TASK-1872` (fix de `ISSUE-173`: Phase A del consumer deja huérfano al handler que el breaker
-saltó; mitigación `reactive:backfill --handler=`), `TASK-1873`+`TASK-1874` (enlace descartado: warnings de intake +
-aviso en Application 360). Sin task: valor live de `GROWTH_FORMS_SERVER_VALIDATION_ENABLED`, 6 CV en cuarentena de
-`EO-OPN-0675`, reader canónico submissions↔postulaciones (hoy ad hoc). Resend en Pro. Siguiente ID libre: `TASK-1877`.
+**Hiring (12/09):** `ISSUE-171`/`172` resueltos en producción (release `586a8627568a`); recuperación:
+281 submissions / 0 sin postulación, 164 acuses, circuito `closed`, handler `healthy`. Evidencia y causa en los
+issues y el [contrato ATS](docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md). Abiertos:
+`ISSUE-173`/`TASK-1872` (consumer Phase A), `TASK-1873`/`1874` (intake y Application 360), seis CV en cuarentena
+de `EO-OPN-0675`, readback del flag `GROWTH_FORMS_SERVER_VALIDATION_ENABLED` y reader submissions↔postulaciones.
 
 **Revisión competitiva «AI Skills» de DataForSEO (2026-09-11, documental):** seis skills del proveedor analizadas;
 **no se instala ninguna**. El delta entró a `dataforseo-operator/references/**` y a
@@ -140,15 +174,15 @@ verificado por API/reader. [Evidencia](docs/audits/hiring/2026-09-13-seo-assignm
 D4 desplegado en producción con release `cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9`, canary sin efectos.
 Recorrido sintético y automatización pendientes; sin asignaciones/correos; Arte intacto.
 
-**TASK-1832 (revisión read-only 2026-09-14T14:12Z): operativamente bloqueada para retiro, no para uso MCP.**
-La correlación por sujeto atribuyó los `458 refresh_reuse/7d` del CIMD compartido de Codex a un perfil interno
-`real`, no a los dos perfiles canary. La conexión posterior a TASK-1832 funciona por el conector hospedado de
-Claude: grant vigente, familia refresh activa y access token emitido a `13:55:32Z`, con vigencia hasta
-`14:10:32Z`. Para los sujetos canary hubo `14` eventos desde el alta, todos contenidos en negativos/DCR
-run-owned; el último fue
-`2026-09-11T01:33:34.325Z`, sin actividad posterior. La primera fecha conservadora de siete días es
-`2026-09-18T01:33:34.325Z`. El apply sigue prohibido por `oauth_client_not_run_owned`: el helper borra por
-`client_id` y debe pasar a planner/delete/readback sujeto-específicos que preserven el CIMD y sus hijos ajenos.
+**TASK-1832 (2026-09-18): corrida canary retirada; gates OFF con readback servido. Sigue `in-progress`.**
+Authority revocada; cleanup sujeto-específico (`74638aed0`, perfil `ops`) con readback cero y CIMD compartido
+preservado. Apagados:
+GitHub repo var `EXTERNAL_IDENTITY_CANARY_ENABLED=false` (sin overrides) → auth-server `00076-t2t` sirve `false`
+(mismo SHA `bda1cf2cd938`); Vercel Production `false` + redeploy `dpl_CWnDKTVm…`; `efeonce-mcp` environment
+`production` `MCP_NATIVE_EXTERNAL_CANARY_ENABLED=false` → gateway `00056-kgs` sirve `false`. Flags generales
+intactos. Para cerrar faltan la muestra steady por sujeto 2026-09-14→retiro y `pnpm test` + `pnpm build`.
+No volver a correr revoke/cleanup.
+Lecciones: runbook §Diseño de la corrida.
 [Evidencia y alcance](docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md).
 
 **Sistema de contenidos Notion (2026-09-10, mapeado / sin mutaciones):**
@@ -330,12 +364,8 @@ sólo estos commits: la revisión anterior `00035-bhd` estaba construida desde `
 impacto visible: ningún cliente Claude renderiza `icons` todavía. Razones:
 [ADR](docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md) §Delta 2026-09-05.
 
-**Berel, 2026-09-04:** Playbook Producción y feedback nuevo de septiembre leídos completos y promovidos a
-`berel-content-production` en los espejos Claude/Codex. La skill ahora distingue ficha técnica de página
-pública, elimina lenguaje interno del cuerpo, agrega la rama de awareness con render oficial, normaliza
-Kelvin/tablas/CTA y registra catálogo y pendientes técnicos. Se preservaron las reglas posteriores que
-superan líneas antiguas del Playbook. Alcance local documental: no se tocaron artículos, assets, Drupal ni
-el estado de publicación. Ver `SOURCES.md` de la skill para IDs, timestamps y drift.
+**Berel, 2026-09-04:** Playbook y feedback de septiembre incorporados a la skill espejo, sin tocar
+artículos, assets ni Drupal. Fuentes, decisiones y drift: `berel-content-production/SOURCES.md`.
 
 **SEO/AEO y Berel, 2026-09-04:** método de informes documentado en
 [modelo operativo](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) y skills espejo.
@@ -359,17 +389,7 @@ Platform debe promoverla y medir ahorro. Reactivación/evidencia:
 
 **TASK-1829 (EPIC-044 U02) — `code complete, rollout pendiente`** (greenhouse-eo-45; commits `263ee3a74` · `19d1658de` · `d31e6e913`). Superficie OAuth del emisor detrás de `AUTH_SERVER_OAUTH_ENABLED=false` (ya en producción por el release de arriba): metadata, CIMD primario + DCR compat, authorize/token/revoke/introspect/consent, JWT ES256 con `gv`, 7 tablas `greenhouse_auth` y 2 capabilities aplicadas, 3 señales `auth.oauth.*`; contrato `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. Decisión del operador: `localhost` como loopback sólo para clientes públicos. Próximo paso: flag ON en staging (environment `efeonce-auth` a `active`, metadata validada, clientes CIMD/DCR de prueba); persona real exige TASK-1830 (`SubjectSessionPort`). `pnpm build` de producción no se corrió localmente (CI/Vercel lo construyeron). No se corrió el canary de Globe OAuth (hibernado).
 
-**EPIC-044 (2026-09-03) — authorization server PROPIO, decidido por el operador; WorkOS descartado.** ADR aceptado
-`docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`; epic `in-progress` con TASK-1626/1631/1813 y las
-nuevas TASK-1828…1834 (runtime · OAuth/CIMD/tokens · personas sin contraseña · gateway multi-issuer · canaries · pentest ·
-convergencia login). Emisor como segundo host del front door del gateway (≈ USD 15/mes medidos). DNS `auth.efeonce.org` →
-`34.111.78.237` creado y verificado. Excepción EPIC-027 para `services/auth-server` **APROBADA** por el operador (Build Unit
-ADR Delta 2026-09-03, fila Accepted en DECISIONS_INDEX); **TASK-1828 EN EJECUCIÓN (sesión Claude greenhouse-eo-a3, `/implement-task 1828`, 2026-09-03/04)**: Slice 0 (KMS HSM `auth-server-es256` v1 + SA) y Slice 1 (schema `greenhouse_auth`, `src/lib/auth-server/keys`, `services/auth-server`, workflow, gates; commit `765ff0ca7`) HECHOS; token real firmado por HSM y verificado con el JWKS de PG. Slice 2 HECHO: `https://auth.efeonce.org` vivo (cert ACTIVE; rev `auth-server-00002-gfh`, `AUTH_SERVER_ENABLED=true`): `/readyz` 200 (postgres/kms/activeKey ok), JWKS publicado; rotación ejercitada (KMS v2 activa, v1 `retiring` — retiro pendiente tras 1 h: `pnpm auth-server:rotate-key --retire VjbDUgwc5bd1zj5olC8VndMXKk_G60tLF8xRw945nI8` + `gcloud kms keys versions disable 1`); `tofu apply` en `efeonce-mcp` `6a144a5` (pusheado), allowlist + orquestador + señales `auth.*` + runbook. CI `Auth Server Deploy` verde en develop (rev `auth-server-00003-jtf`, GIT_SHA `02dc5d987`; el deployer necesitó `cloudkms.viewer` sobre la llave). Barrido documental hecho (ADR nativo §Delta 2026-09-04, `GREENHOUSE_IDENTITY_ACCESS_V2`, invariantes identity/ops, `cloud-infrastructure/CLOUD_RUN.md`, control plane de reliability, runbook MCP, doc funcional + manual del autorizador, rule `.claude/rules/auth-server.md`, skills, EPIC-044 y tasks 1829–1833). **Retiro de la llave v1 pendiente** (`pnpm auth-server:rotate-key --retire VjbDUgwc…nI8` + disable KMS v1); `AUTH_SERVER_JWKS_URL` en Vercel pendiente de autorización. Producción del emisor = `code complete, rollout pendiente` (release control plane). Otra sesión tiene WIP sin commit de TASK-1631 (`src/lib/identity/external-access/`, `reliability/registry.ts`, `event-catalog.ts`, entitlements): no acoplar; señales del emisor se agregan después de que ese WIP se commitee. Task ui-ux de login sin ID hasta
-tener wireframe/flow reales. Siguiente ID libre `TASK-1835` / `EPIC-045`.
-**TASK-1631 (U04) Slice 1, 2026-09-04 — code complete, rollout pendiente.** Binding aplicado en PG, dominio
-`src/lib/identity/external-access/**`, rutas admin, reader del gateway `GET /api/platform/ecosystem/identity/binding` y 4
-señales; smoke `pnpm identity:external-access:smoke`. **Staging verificado 2026-09-04** (develop `02dc5d987` pusheado coordinado con TASK-1828): 4 señales en `/api/admin/reliability`, rutas admin 200, lane ecosystem 401 sin consumer. **En producción** desde el release 2026-09-04 (run 33893120972; canary del lane 400/200 `environment_inactive`/401; emisor `efeonce-auth` en `draft`). **Próximo paso:** operador lee las 4 señales en `/admin/operations` prod con sesión humana; TASK-1829 emite tokens y pasa el environment a `active`; TASK-1831 consume el reader.
-Paridad registry↔catálogo roja por 11 capabilities ajenas sin seed (task aparte).
+**EPIC-044 (2026-09-03) — authorization server propio** (ADR `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`; WorkOS descartado). Estado por task en `docs/tasks/**/TASK-1828*`…`TASK-1834*`. **TASK-1631 (U04)** en producción desde el release 2026-09-04 (run 33893120972); próximo paso: el operador lee las 4 señales en `/admin/operations` prod; TASK-1829 emite tokens y activa el environment; TASK-1831 consume el reader. Paridad registry↔catálogo: 4 capabilities sembradas el 2026-09-25; el resto sigue como task aparte.
 
 Release SEO/D4 (2026-09-13): PR #235, run `34754161855`, manifiesto `released`; [auditoría](docs/audits/hiring/2026-09-13-seo-assignment-readiness.md).
 
@@ -394,19 +414,7 @@ draft 07-29, decisión manual de HR), executed_member_still_active **0**, deprov
 trataba como salida decidida (`identity_only` ejecutado → `full_period`). Compensaciones cerradas por command,
 `hasDecidedExitFact` ya excluye `identity_only`, el live test limpia al terminar; fix en PR #220 (`main`).
 
-**Valentina Hoyos — restauración gobernada APLICADA por Codex a las 18:38:48Z:** member activo/status activo,
-asignable y sin corte antiguo; asignación existente activa sin fecha final. Se verificaron alias Production hacia
-`a824d073` y 100% del tráfico `ops-worker-00641-dl2` hacia el árbol corregido antes de aplicar. Las siete categorías
-protegidas (relaciones, engagements, envíos, payables, usuario, obligación y orden) siguen idénticas; SSO elegible con
-correo nuevo y rol collaborator. Clave `valentina-lifecycle-reentry-restore-2026-09-03`; no repetir ni usar el SQL retirado.
-Eventos publicados 18:40:03Z y People completado 18:42:05Z; employee cerrado y datos protegidos idénticos.
-**Release cerrado:** `33795564223` success, manifest `a824d073a5fb-c2cf99e9-1ba1-40b3-9d85-76ad0a8e8372`
-released 19:30:49Z, health success y watchdog ok/4 de 4 workers. Dos intentos anteriores fueron abortados por
-cancelaciones concurrentes; Claude se retiró y Codex cerró bajo un solo operador. La auditoría conserva el incidente
-independiente de matching SHA/run ID. Readback final: recuperación y siete categorías protegidas intactas.
-[Auditoría](docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md) ·
-[runbook](docs/operations/runbooks/workforce-reentry-recovery.md).
-Finance de Felipe (obligación junio + SII) sigue como dependencia sin command de anulación. UI: TASK-1814.
+**Valentina Hoyos (2026-09-03) — cerrado:** restauración gobernada aplicada (clave `valentina-lifecycle-reentry-restore-2026-09-03`, no repetir ni usar el SQL retirado); release `33795564223` released. Detalle: [auditoría](docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md) · [runbook](docs/operations/runbooks/workforce-reentry-recovery.md). Pendiente: Finance de Felipe (obligación junio + SII) sin command de anulación; UI TASK-1814.
 
 **Delta Claude 19:40Z — PR #220 CERRADO por Codex** (run `33795564223`, manifest released 19:30:49Z; ver arriba).
 Attempts 1 y 2 `aborted` por cancelaciones cruzadas: el webhook empareja por `target_sha` antes que por

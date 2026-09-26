@@ -17,11 +17,11 @@
 | **Idear / dirigir** | esta skill (`../modules/`) + `templates/` | concepto, storyboard, animatic, shotlist |
 | **Keyframes / stills** | `greenhouse-ai-image-generator` / `design-studio` | frames de inicio/fin para image-to-video |
 | **Producir video IA** | **Higgsfield** (MCP) + `higgsfield-*` skills; Runway/Seedance/Veo/Kling/Omni | generar/animar tomas con control de cámara + personaje |
-| **Producir craft humano** | After Effects (mograph), Blender/C4D (3D), Houdini (FX) | tipo kinética, 3D, VFX de precisión — handoff con spec |
+| **Producir craft humano** | After Effects (mograph), Blender/C4D (3D), Houdini (FX) | tipo kinética, 3D, VFX de precisión — handoff con spec. Blender también se opera desde el agente vía el puente MCP local `higgsfield-use-blender` (2026-09-24); After Effects/Premiere/Resolve no están instalados → handoff humano. Estado en `higgsfield-provider` |
 | **VFX / compositing** | Nuke / Fusion (Resolve) / After Effects; **Mocha** (tracking); **Wonder/Flow Studio** (mocap); **Runway** / **Beeble** (AI-VFX) | keying, roto, matchmove, integración CGI, cleanup (`../modules/11`) |
-| **Editar / montar** | DaVinci Resolve / Premiere | corte, montaje, ritmo (`../modules/06`) |
-| **Sonido** | DAW + LipSync (ElevenLabs vía Higgsfield) | sound design, música, VO, mezcla (`../modules/07`) |
-| **Color / finish** | DaVinci Resolve + **Magnific** (upscale) | grade, LUT, upscale frame-consistent (`../modules/08`) |
+| **Editar / montar** | DaVinci Resolve / Premiere; FFmpeg/Python para conform y rescate local | corte, montaje, ritmo (`../modules/06`) |
+| **Sonido** | Audio Studio; DAW, ElevenLabs directo/UI o conectores verificados, FFmpeg/Python | música y SFX separados sobre eventos reales; VO sólo si el brief la pide (`../modules/07`) |
+| **Color / finish** | DaVinci Resolve, FFmpeg; Magnific o Topaz vía ElevenLabs según ruta verificada | grade, color, restauración sólo tras piloto A/B (`../modules/08`) |
 | **Formato por red** | `social-media-studio` | adapta el master a cada red (duración/safe-zone) |
 
 ## Higgsfield (MCP conectado) — la mano IA principal
@@ -47,17 +47,35 @@
 - **Generative upscaling 2x–16x** ("generative hallucination": sueña detalle, no interpola).
 - **Video Sequence Enhancement**: upscaling **frame-consistent** (analiza movimiento/textura/sujeto entre
   frames, no cada frame aislado) — clave para no romper la continuidad del video.
-- **Video Upscaler Precision API**: diffusion, recupera detalle **sin agregar** contenido IA (fiel).
+- **Video Upscaler Precision API**: ruta orientada a fidelidad; no garantiza ausencia de detalle inventado. Revisar contornos, letras, identidad y flicker en un piloto antes del metraje completo.
 - Reference Image (composición + textura), sliders Creativity/Resemblance, 8K, API Python/Node, plugin Photoshop.
 - **Rol:** paso de **finish** — subir resolución/detalle de frames e imagen y de **secuencias de video**.
   Tenemos **MCP y API**.
+
+## Gemini Omni 1.1 Flash — CLI local Cloud (2026-09-24)
+
+`pnpm ai:omni --help` opera en `efeonce-group` la identidad Cloud exacta
+`gemini-omni-1.1-flash-preview` por Interactions `v1beta1` en `global`, con ADC y salida en GCS privado.
+`gemini-omni-1.1-flash` es la identidad distinta de Developer API; no hay fallback entre ellas. La CLI
+ofrece `--task text|image|frames|reference|edit|extend`: usa `--estimate` para validar/cotizar sólo el video
+output nominal sin enviar, y `--yes` para cada POST. Los archivos locales necesitan `--staging-uri`; la
+salida exige `--gcs-output`. Tras un timeout, recupera con `--status` o `--wait` y el interaction ID;
+no reenvíes a ciegas. Contrato, flags y recetas:
+`docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`.
+
+**Evidencia acotada:** los seis modos completaron corridas técnicas 2026-09-24 a 360p, 16:9 y 3 s;
+`extend` produjo 6 s acumulados. Se verificaron MP4 H.264/AAC de 640×360 a 24 fps. No están probados
+4K ni edición stateful con `previous_interaction_id`. SKY sí añadió pilotos de edición 1080×1920/24 fps: uno de 9,5 s rechazado por continuidad y otro de 6,5 s integrado con empalmes revisados; ver `../companions/video-postproduction-and-delivery.md`. Siguen sin acreditarse de forma general continuidad temporal fina,
+escucha de audio, C2PA ni factura real. `edit` usa un MP4 fuente y puede llevar imágenes de referencia;
+`extend` usa un MP4 fuente. Ninguna corrida habilita Globe ni aprueba un entregable comercial.
 
 ## Vertex (efeonce-group) — Gemini Omni video-gen (VERIFICADO en vivo 2026-07-05)
 
 > **⛔ HISTÓRICO, NO EJECUTABLE (actualizado 2026-08-27).** El bloque hasta “UI-heavy motion” conserva la
 > evidencia del spot de julio, pero su endpoint `:generateContent`, payload `responseModalities`, auth y techo
-> 720p ya no son el contrato vigente. Omni migró a Interactions el 2026-07-20. Para ejecutar, usa
-> `GEMINI_OMNI_VERTEX.md`; para Globe, route card + reader live. Gemini Omni 1.1 Flash usa IDs distintos por
+> 720p ya no son el contrato vigente. Omni migró a Interactions el 2026-07-20. Para ejecutar 1.1 local,
+> usa la sección anterior y su manual; `GEMINI_OMNI_VERTEX.md` conserva el detalle histórico.
+> Para Globe, route card + reader live. Gemini Omni 1.1 Flash usa IDs distintos por
 > superficie (`gemini-omni-1.1-flash` Developer API; `gemini-omni-1.1-flash-preview` Cloud), añade
 > 360p/first-last/video references/edit/extend/1080p/4K-upscaled y permanece `gated` hasta `TASK-1781`. El modelo
 > anterior tiene shutdown anunciado para el 2026-09-30. No heredes canary, rate, rights ni promotion.
@@ -82,25 +100,21 @@ Gemini Omni + Veo corren en **Vertex del proyecto `efeonce-group`**. Receta **pr
 
 - **Referencias / image-to-video VERIFICADO (2026-07-05):** Omni **acepta imagen de referencia** en
   `contents[].parts[].inlineData` (`mimeType image/png` + el `text`). Probado pasando el frame de una toma
-  previa → devolvió una toma **casi idéntica** (mismo mundo/luz/composición). **Esta es la cura de la
-  "desconexión":** encadena las tomas → cada toma usa el **último frame de la anterior como referencia** +
+  previa → devolvió una toma **casi idéntica** (mismo mundo/luz/composición). **Condicionamiento observado en ese caso, no garantía de continuidad:** encadena las tomas → cada toma usa el **último frame de la anterior como referencia** +
   el prompt del beat siguiente. Sin eso, tomas text-to-video independientes se ven como escenas sueltas.
 
 > **Fortaleza vs límite:** Omni entrega tomas cinematográficas de 10s; la **consistencia entre tomas** se
-> logra con **reference-chaining** (frame anterior como `inlineData`), no sólo con prompt. El **logo/UI/texto
-> NUNCA se generan con IA** (los deforma) → van en post como **overlay de asset real** (mograph). Diseña el
+> puede mejorar con **reference-chaining** (frame anterior como referencia), pero exige QA temporal. Cuando se requiere exactitud, el logo/UI/texto se compone con assets reales; respeta cualquier alcance generativo explícitamente aceptado. Diseña el
 > corte para no necesitar composite in-frame: beats de UI a **pantalla completa**, mundo/humano en **cortes
 > separados**, hilados por transición (pull-back/match-cut).
 
 ## UI-heavy motion SIN After Effects (HTML + Playwright) — receta producible
 
-Cuando el motion es **UI/producto** (prompt box, chat, citas, cursor, gauge, dashboards, tipografía legible),
-NO uses video IA (deforma texto/logos). Producible por el agente, legible y on-brand:
+Cuando el contrato exige exactitud de UI/producto y autoriza composición local, esta receta es una opción. Si el operador pide interfaz generativa (caso SKY), conserva ese alcance y verifica sus textos/cámaras. No conviertas toda la película a código por tener microtexto:
 
-1. **Construye un mockup HTML/CSS/JS animado** (timeline con `setTimeout`/CSS): typing, cursor que se mueve y
+1. **Construye un mockup HTML/CSS/JS animado** con reloj explícito y seek reproducible: typing, cursor que se mueve y
    "clickea", burbujas, citas, unfold de ventana, etc. Embebe el **logo real** (`<img src>` a `public/branding/*`).
-2. **Captura con Playwright** (`recordVideo`, viewport 1280×720): correr el `.mjs` **desde la raíz del repo**
-   (el scratchpad NO resuelve `node_modules` → `ERR_MODULE_NOT_FOUND`; copia el script a la raíz, corre, bórralo).
+2. **Renderiza con Playwright** a tiempos `frame/fps`, dimensiones y fuentes fijadas. Espera fuentes/assets antes de capturar; secuencia sin pérdidas para composición. `recordVideo`/`setTimeout` sirve para una preview, no garantiza timing de entrega. Resuelve dependencias desde el repo; no borres fuentes de reproducción.
 3. **Empaquetado web** con `pnpm media:web-video` cuando el resultado vaya a
    un sitio/landing: genera WebM + MP4 fallback + poster. Runbook:
    `docs/operations/web-media-delivery-tooling.md`.
@@ -134,21 +148,22 @@ Ahí la pantalla la renderiza el modelo con pantallas video-safe como referencia
 - **RRSS desde un paquete de stills ficticios, sin copy/practical exacto** → Gemini Omni image-to-video (ver `workflows/living-social-wall-clips.md`); no confundir el canal con la regla de motor.
 - **Dispositivo con UI legible dentro de la toma** → Seedance 2.5 (Higgsfield MCP) con pantallas video-safe como
   `image_references`; nunca pantalla verde + reemplazo por tracking. Titular y logo de la pieza, en overlay.
-- **Broadcast** → Veo 3.1. **Edición conversacional o microescena flexible** → Gemini Omni. Selección completa: `workflows/engine-selection-by-fidelity-contract.md`.
-- **Tipo kinética / mograph de precisión / 3D** → craft humano (AE/Blender/Houdini), handoff con spec.
+- **Broadcast** → Veo 3.1. **Microescena flexible o edición de MP4 con instrucción** → Gemini Omni 1.1 por
+  `pnpm ai:omni`; la cadena conversacional stateful aún no está probada. Selección completa:
+  `workflows/engine-selection-by-fidelity-contract.md`.
+- **Tipo kinética / mograph de precisión / 3D** → AE/Blender/Houdini o animador local HTML/Playwright/Sharp/FFmpeg con reloj por cuadro y alcance aprobado. SKY probó cartelas alpha y URL Luminosidad; ver companion de posproducción.
 - **VFX / compositing** (keying, roto, tracking/matchmove, integración CGI, simulaciones, cleanup) → craft
   humano (Nuke/Fusion/AE + Mocha) + AI-VFX (Runway roto, Wonder/Flow mocap, Beeble relight); ver `../modules/11`.
-- **Subir resolución del entregable final** → Magnific (Video Sequence Enhancement).
+- **Restaurar detalle** → Magnific o Topaz en la superficie disponible. SKY verificó Topaz vía ElevenLabs con piloto 4 s y metraje 26 s; no es 4K nativo ni garantía para otra fuente. Recomponer textos/vectores después.
 - **Keyframes** → `greenhouse-ai-image-generator` / `design-studio`. **Formato por red** → `social-media-studio`.
 
 ## Regla dura: gasto gobernado + confirmación humana
 
 Sólo una operación generativa gobernada **cuesta credits**. Antes de volumen: descompón capability,
 segundos, tier, controls y attempts; emite estimate/rate version; reserva y obtén approval humano. Valida el
-ritmo en el animatic determinístico (`0 credits`), genera en **chunks 5–8s** y escala calidad/upscale sólo de
-lo elegido. Después del review, settlement consume lo elegible, release libera remanente y refund corrige
+ritmo en una previs (`0 credits` si es local); audita sus defectos antes de usarla como referencia. Elige generación completa o ventanas por continuidad y autorización, no por una cuota fija de segundos. Escala calidad/restauración sólo de lo elegido. Un estimate/flag local no impone un techo a la factura externa. Después del review, settlement consume lo elegible, release libera remanente y refund corrige
 fallas técnicas sin borrar historia. Cambio creativo aprobado = branch/estimate nuevo.
 
 El costo/saldo del provider es evidencia interna, no conversión comercial. No cobres por pieza, hora,
 render/export o retry técnico. Voz, likeness, música, stock, sync/master, territorio, plazo y buyout viven
-fuera de credits. **Entregar/publicar pasa SIEMPRE por confirmación humana.**
+fuera de credits. Entregar a revisión usa la autorización existente. Aprobación creativa y publicación son actos separados; no publicar por el hecho de exportar. Monitorear por ID sin reenvío, registrar todos los intentos/variantes y reconciliar costo por solicitud. Ver el método operativo y companions desde `SKILL.md`.

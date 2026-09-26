@@ -1,0 +1,115 @@
+{
+  "persona": "Julio Reyes",
+  "version": "v1 · 2026-09-20",
+  "estado": "Set canónico de referencia de identidad, aprobado por el operador el 2026-09-20 sobre hoja de contacto.",
+  "consentimiento": "Imágenes entregadas por él mismo. No usar la imagen de otra persona real sin su consentimiento.",
+  "que_es": "Estas once imágenes son la fuente de identidad de Julio para cualquier generación. Reemplazan al set anterior de `2026-09-17_equipo-vestuario/refs/` como ancla de aspecto: aquel idealizaba el rostro (más estrecho y afilado) y llevaba a deriva.",
+  "como_usarlas": "Pasar SIEMPRE al menos una de rostro y una de cuerpo entero. Con dos personas en cuadro, dos de cada una. Declarar el vestuario en la escena: el modelo copia la ropa de las referencias aunque el prompt diga 'ignore their clothing'.",
+  "limite_conocido": "Cubren frontal, tres cuartos suave y cuerpo entero. NO cubren perfil, tres cuartos marcado ni espalda. Generar esos ángulos desde cero reconstruye el rostro y lo redondea: medido en cuatro iteraciones el 2026-09-20 (v1 a v4), ninguna alcanzó la proporción de estas referencias.",
+  "distribucion": "Las imágenes están gitignoreadas: viven en esta máquina y en OneDrive. La copia compartible es la de OneDrive.",
+  "referencias": [
+    {
+      "archivo": "julio-ap-04.png",
+      "tipo": "rostro",
+      "angulo": "frontal",
+      "nota": "Fondo gris oscuro. La más nítida para detalle de montura y canas. PRIMERA opción de rostro."
+    },
+    {
+      "archivo": "julio-ap-08.png",
+      "tipo": "rostro",
+      "angulo": "frontal",
+      "nota": "Sala de directorio. SEGUNDA opción de rostro; buena base para edición."
+    },
+    {
+      "archivo": "julio-ap-06.png",
+      "tipo": "rostro",
+      "angulo": "frontal",
+      "nota": "Oficina con skyline."
+    },
+    {
+      "archivo": "julio-ap-05.png",
+      "tipo": "rostro",
+      "angulo": "frontal",
+      "nota": "Lobby cálido."
+    },
+    {
+      "archivo": "julio-ap-07.png",
+      "tipo": "rostro",
+      "angulo": "frontal",
+      "nota": "Sala de directorio, variante."
+    },
+    {
+      "archivo": "julio-ap-01.png",
+      "tipo": "torso",
+      "angulo": "frontal",
+      "nota": "Chaqueta softshell navy con lanyard y credencial. Es la de cara MÁS ANCHA del set: no usarla como única referencia de rostro."
+    },
+    {
+      "archivo": "julio-ap-03.png",
+      "tipo": "cuerpo entero",
+      "angulo": "tres cuartos suave",
+      "nota": "Chaqueta navy, oficina."
+    },
+    {
+      "archivo": "julio-ap-11.png",
+      "tipo": "cuerpo entero",
+      "angulo": "frontal",
+      "nota": "Traje cruzado, estudio. La de proporción facial más fina del set. PRIMERA opción de cuerpo."
+    },
+    {
+      "archivo": "julio-ap-09.png",
+      "tipo": "cuerpo entero",
+      "angulo": "frontal",
+      "nota": "Traje navy, sala de juntas al atardecer."
+    },
+    {
+      "archivo": "julio-ap-10.png",
+      "tipo": "cuerpo entero",
+      "angulo": "frontal",
+      "nota": "Traje navy, terraza de noche."
+    },
+    {
+      "archivo": "julio-ap-12.png",
+      "tipo": "cuerpo entero",
+      "angulo": "frontal",
+      "nota": "Traje negro, lobby."
+    }
+  ],
+  "excluidas": [
+    {
+      "archivo": "_no-referencia/julio-ap-02.png",
+      "porque": "Es una pieza publicitaria compuesta (titular, cursores AXIS, logo), no un retrato limpio. Sirve como salida aprobada, nunca como referencia de identidad."
+    }
+  ],
+  "angulos_derivados": {
+    "que_son": "Ángulos que las 11 referencias no cubren. NO se generaron desde cero: se obtuvieron EDITANDO julio-ap-08.png, que parte de sus píxeles. Generar desde cero reconstruye el rostro y lo redondea — medido en cuatro iteraciones el 2026-09-20; editar lo conserva a la primera.",
+    "carpeta": "../set-identidad/angulos/",
+    "archivos": [
+      {
+        "archivo": "julio-45-izq.png",
+        "vista": "tres cuartos izquierda"
+      },
+      {
+        "archivo": "julio-45-der.png",
+        "vista": "tres cuartos derecha"
+      },
+      {
+        "archivo": "julio-perfil-izq.png",
+        "vista": "perfil izquierdo"
+      },
+      {
+        "archivo": "julio-perfil-der.png",
+        "vista": "perfil derecho"
+      },
+      {
+        "archivo": "julio-135-trasero.png",
+        "vista": "tres cuartos trasero"
+      },
+      {
+        "archivo": "julio-espalda.png",
+        "vista": "espalda"
+      }
+    ],
+    "leccion": "Al modelo se le dan MARCADORES VERIFICABLES, no magnitudes. 'Gira 45 grados' produjo una cabeza apenas inclinada que se leía ancha; 'el puente de la nariz corta el contorno de la mejilla lejana, la oreja lejana no se ve, el ojo lejano queda escorzado' produjo el tres cuartos real. Lo mismo valió para el perfil y para la proporción del rostro."
+  }
+}

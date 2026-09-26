@@ -1,17 +1,26 @@
 # HubSpot as a Service — arquitectura de oferta V2
 
 > **Estado:** vigente
-> **Fecha de verificación:** 2026-09-16
+> **Fecha de verificación:** 2026-09-19
 > **Owner:** RevOps & CRM / práctica HubSpot
 > **Evidencia de mercado:**
 > [`HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md`](../../audits/commercial/HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md)
 > **Regla de producto:** toda disponibilidad, tier, seat, crédito, beta y limitación se vuelve a verificar contra
 > fuente primaria al cotizar y antes de publicar.
 
-> **Delta Fall 2026 / UNBOUND 2026:** ChatGPT Ads en HubSpot se incorpora como beta pública; Agent Hub, MCP/Claude,
-> Breeze y Scheduled Prompts quedan sujetos a la matriz de estado, gates y fuentes oficiales de
+> **Delta Fall 2026 / UNBOUND 2026:** ChatGPT Ads en HubSpot se incorpora como beta pública; Smart CRM self-updating,
+> Growth Context, Context Home, Marketing Studio y las nuevas superficies de agentes quedan sujetos a la matriz de
+> estado, gates y fuentes oficiales de
 > [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md). No se
 > incorporan pricing ni disponibilidad territorial por inferencia.
+
+> **Transformación humano-agente:** el método provider-neutral para pasar de readiness a equipos operativos vive en
+> [`Hybrid Human-Agent Transformation V1`](../revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md).
+> Agent Hub & Agentic Operations es su carril HubSpot, no un sinónimo de activar agentes aislados.
+
+> **Outcomes Era (UNBOUND 2026):** HubSpot enmarca el paso de funciones/herramientas a resultados mediante
+> contexto y acción de personas y agentes. Es narrativa del proveedor, no nombre de una oferta Efeonce ni promesa
+> de ROI. Ver [marco y fuentes](HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md#marco-de-posicionamiento-outcomes-era).
 
 ## 1. Decisión
 
@@ -37,6 +46,10 @@ cruzan esos productos. Por eso no se publican como una séptima lista equivalent
 | **Data, Integration & CRM Intelligence** | Unificar datos confiables y convertirlos en contexto, automatización y decisión. | Smart CRM, Data Hub, Data Studio, sync, datasets, calidad, scoring, reporting, Data Agent, APIs, webhooks, custom workflow actions, UI extensions, MCP e integraciones. |
 | **Agent Hub & Agentic Operations** | Diseñar, desplegar y gobernar agentes y workflows agentic con resultados, costo y escalamiento observables. | Agent Hub, agentes preconstruidos, agentes custom, Agent Builder, agentic workflows, Breeze Assistant, Scheduled Prompts beta, MCP, knowledge/context, herramientas, permisos, créditos, evaluación, observabilidad y human handoff. |
 
+En esta última familia, el entregable puede ser un **equipo híbrido en producción**: mapa de trabajo, roles humanos
+y de agentes, autonomía por acción, capacidad de supervisión, adopción, evaluación y operación continua. Su diseño
+organizacional y economics no los resuelve una configuración de portal; se gobiernan desde el servicio transversal.
+
 ### Reglas de clasificación
 
 - **Customer Agent no es una familia comercial.** Es un componente de Service/Customer Success y, en algunos
@@ -60,6 +73,11 @@ cruzan esos productos. Por eso no se publican como una séptima lista equivalent
 | **Sprint de optimización** | Para resolver un cuello de botella o deuda acotada. | Baseline, change set, prueba, medición y backlog residual. |
 | **Managed HubSpot Operations** | Cuando existe backlog recurrente, owner, cadencia y costo de servir sostenible. | Operación continua, releases, calidad, adopción, reporting, QBR y expansión gobernada. |
 | **Managed Agentic Operations** | Cuando agentes o workflows agentic requieren evaluación y mejora continua. | Catálogo de agentes, autonomía/handoff, knowledge/context, tests, consumo, observabilidad, incidentes y optimización. |
+
+Para cuentas con transformación del trabajo como prioridad, la secuencia comprable es `Hybrid Workforce Blueprint
+→ First Hybrid Team → expansión por workflows/equipos → Managed Agentic Operations`. El blueprint es pagado sólo
+cuando deja un artefacto independiente; el primer despliegue debe probar a la vez runtime, colaboración humana,
+capacidad de revisión y costo por outcome válido. La elegibilidad de Agent Hub/Builder beta se comprueba por portal.
 
 La evaluación sin costo es el default de adquisición y cotización. No debe disfrazar consultoría extensa gratuita.
 La auditoría pagada existe solo cuando su salida es un producto intelectual autónomo.

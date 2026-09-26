@@ -25,6 +25,12 @@ la oportunidad, justificar participación, definir mecanismo creativo y papel de
 Para Efeonce, aplicar [SEASONAL_CONTENT](../social-media-studio/efeonce/SEASONAL_CONTENT.md): el oficio debe
 ser demostrable y la atribución reconocible. No forzar un objeto corporativo para cumplir branding. Color,
 marco o tipografía oficiales no equivalen a activos distintivos reconocidos sin evidencia.
+🔴 **Estudiar la estética del trend con fuentes antes de promptear, nunca de memoria.** En «Nivel de búsqueda»
+(GTA VI, 2026-09-19) la v1 salió en synthwave ochentero (el Vice City de 2002) y el operador la rechazó («no está
+mal, pero no está bien»): GTA VI es Florida hiperreal de 2026 en key art de realismo ilustrado pintado. Un estudio
+con URL y etiquetas verificado/observado/no verificado (`ai-generations/2026-09-19_nivel-de-busqueda/brief/gta6-visual-study.md`)
+fijó paleta, luz, trazo, HUD y la lista de IP que no se toca, y de ahí salió el bloque STYLE de la serie
+(§[Serie con estética de trend](#serie-con-estética-de-trend-bloque-style-batch-layout-y-moderación)).
 
 Separar dos rutas: **firma editorial**, con zona reservada y activo exacto compuesto después del modelo;
 **marca física**, con soporte pertinente, geometría y acabado definidos, usando arte oficial como referencia
@@ -90,16 +96,18 @@ ranking fechado · **[decisión]** del operador · **sin dato** = no existe evid
 |---|---|---|
 | OpenAI directo | `pnpm ai:image` (out-of-band) · runtime `generateImage` provider `openai-image` (default del producto) | GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare |
 | Google directo (Vertex, `global`) | **sólo** runtime `generateImage` provider `google-gemini-image`; **no hay CLI** | Nano Banana 2 (`gemini-3.1-flash-image`, default); Nano Banana Pro (`gemini-3-pro-image`) disponible pero **sin superficie** |
-| Higgsfield CLI (out-of-band) | `higgsfield` | Recraft V4.1, **vectores SVG reales**. Estado 2026-09-16: `Not authenticated` → sin vía hasta que una persona corra `higgsfield auth login` |
+| Google Cloud directo (Interactions, `global`) | `pnpm ai:omni` (tooling local, fuera de Globe) | Gemini Omni 1.1 Flash `gemini-omni-1.1-flash-preview`: texto, imagen, cuadros inicial/final, referencias, edición y extensión de video |
+| Higgsfield CLI (out-of-band) | `higgsfield` | Recraft V4.1, **vectores SVG reales**. Estado 2026-09-24: CLI 1.1.26 con sesión y workspace fijado (`higgsfield auth login` + `workspace set`); la generación de un SVG real sigue **sin corrida**. Carril independiente del MCP remoto y de `pnpm ai:fal --capability hf-*`; estado y trampas en `higgsfield-provider` §Estado local verificado |
 | fal.ai (out-of-band, NUNCA runtime) | `pnpm ai:fal` | Seedream 5 Pro/Lite/edit/layerize (imagen); Seedance, Minimax H3, Flux 3, Wan 3.0 (video) |
 | Higgsfield API (out-of-band, NUNCA runtime) | `pnpm ai:fal --capability hf-*` | SOUL 2/Cinema, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image Turbo, Grok Image 2.0, Recraft 4.1 (SVG **sin confirmar**: `model_type: vector` de la app, sin probar por API); video Kling/PixVerse/LTX/Happy Horse y otra vía para Seedance/Wan/H3. `--estimate` cotiza exacto sin cobrar. Estado 2026-09-16: 44/44 cotizan, **0 generaciones reales** (cuenta de API sin créditos). Guía §5.8 |
 
-Nano Banana Pro y Gemini Omni Flash van **siempre directo por Google, nunca por fal** [decisión]. Recraft por fal
+Nano Banana Pro y Gemini Omni van **siempre directo por Google, nunca por fal** [decisión]. La CLI de video 1.1
+usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiable. Recraft por fal
 (23 endpoints) no está conectado.
 
 ### Árbol de decisión — imagen
 
-1. **¿Necesitas vector real (SVG)?** → Recraft V4.1 vía Higgsfield. GPT Image y Seedream son **raster siempre**.
+1. **¿Necesitas vector real (SVG)?** → Recraft V4.1 vía Higgsfield (CLI con sesión desde 2026-09-24, SVG real aún sin corrida) o `/Vectorize` en Illustrator vía el puente MCP local `higgsfield-use-illustrator` (`ai_get_skill illustrator-vector-art`; estado en `higgsfield-provider`). GPT Image y Seedream son **raster siempre**.
 2. **¿La pieza lleva copy, logo, CTA, precio o legal finales?** → el modelo entrega **sólo el clean plate**;
    texto y marca se componen de forma determinística. Esto no cambia con ningún modelo.
 3. **¿Edición donde la precisión manda, zona protegida con máscara o entregable final?** →
@@ -171,6 +179,15 @@ Flare #1/#2 en texto a imagen y en edición (Sunburst gana edición), Seedream 5
 Toda elección de video se hace con `motion-design-studio` → `workflows/engine-selection-by-fidelity-contract.md`
 (contrato de fidelidad por toma). Lo mínimo que debes saber desde esta skill:
 
+**Gemini Omni 1.1 Flash:** `pnpm ai:omni --help` y
+`docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md` son la entrada operativa para Cloud directo.
+Los seis modos CLI `text|image|frames|reference|edit|extend` completaron una corrida técnica real en
+`efeonce-group` el 2026-09-24 a 360p, 16:9 y 3 s; `extend` devolvió 6 s acumulados. `edit` recibe video
+fuente e imagen opcional; **no** se ha probado la cadena `previous_interaction_id`/edición stateful en 1.1.
+720p/1080p/4K, 9:16, continuidad fina, C2PA y factura real siguen sin verificar. La CLI sólo produce
+salidas en GCS privado, con descarga local opcional; no activa ni cambia rutas de Globe. Usa `--estimate` sin gasto antes de `--yes`, conserva el
+interaction ID y retoma con `--status`/`--wait` sin enviar otro POST.
+
 | Necesidad | Motor (`pnpm ai:fal --capability …`) |
 |---|---|
 | Explorar barato y rápido | `h3turbo-t2v/i2v` 480P · `flux3-*-draft` → `flux3-enhance` sólo del elegido · `seedance20-mini-*` 480p |
@@ -206,6 +223,10 @@ rechaza marcas y personas reales **después de cobrar**.
   3.0/Prime, `seedance25-r2v`); más de 10 `--image` en Seedream edit se rechaza; LoRA con
   `--lora <path>[@escala][#weight_name]`; entrenadores con `--frames` (22–124, `% 17 == 5`) y `--split-threshold`
   (1–60), validados también por `--input`.
+- **`--batch` + `--out` (corregido 2026-09-19):** antes `--out` se ignoraba en silencio en modo lote y todo caía en
+  `public/images/generated` (dentro del repo). Ahora `--out <dir>` sin extensión es el directorio del lote; con
+  extensión de imagen, o junto a `--concept` o a un `--out-dir` distinto, aborta antes de gastar
+  (`scripts/ai/resolve-output-dir.ts`, con 7 tests).
 - **Sigue abierto:** `ai:image` ignora `--input-fidelity` con 2.5 o 2 en silencio, no hay `--moderation` y la salida
   por defecto es `public/images/generated` (usa `--out` hacia `ai-generations/` o scratchpad). `ai:fal`: `--size`/
   `--count` de imagen sin validar; número de capas de layerize y si la base se cobra: sin dato; la API de pricing
@@ -371,6 +392,60 @@ pnpm ai:image --batch concepts.json         # [{ "filename": "a.png", "prompt": 
   keeps the asset reusable across layouts.
 - Keep exploratory concepts out of commits (gitignored dir, e.g. `.captures/concepts/`).
 
+### Serie con estética de trend: bloque STYLE, batch, layout y moderación
+
+Medido en «Nivel de búsqueda» (2026-09-19, `ai-generations/2026-09-19_nivel-de-busqueda/`, bitácora
+[`2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md`](../../../docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md)):
+10 plates `gpt-image-2.5-flare` (escenas sin marca) y `gpt-image-2.5-sunburst` + `--image` (escenas con activos de
+marca), 1152×1440, `high`, ≈ USD 2–2,5 en total.
+
+- **Un bloque STYLE reutilizable por serie, escrito una vez y antepuesto a cada escena** (`brief/style.txt`):
+  técnica y acabado («digital painted key-art illustration in illustrated realism», contornos, sombras magenta,
+  reflejos turquesa, cielo cobalto→magenta→naranja, grano offset), época y lugar, las **anti-direcciones** que
+  corrigen el error de la v1 («NOT 1980s synthwave, NOT photoreal render, NOT flat vector») y los límites de IP
+  («no text, no letters…, no real brand logos, no characters from any existing video game»). Cada ítem del batch
+  = `STYLE: … SCENE: …`; el SCENE sólo describe la escena y su layout. Así la serie no deriva de lámina en lámina.
+- 🔴 **Construir el JSON de `--batch` con `json.dump` (Python) o `JSON.stringify` (Node), nunca con heredoc +
+  interpolación.** Las comillas dobles del estilo («"illustrated realism"») rompieron el JSON y el batch murió
+  con exit 1 **sin output visible** porque el `grep` del comando filtraba el error. Correcto:
+  `json.dump([{"filename": f, "prompt": style + " SCENE: " + scene} …], open("brief/plates.json","w"), ensure_ascii=False)`.
+  Ejemplos vigentes: `brief/plates-v2.json`, `brief/plates-v2b.json`. No filtrar la salida del CLI con `grep` en
+  la primera corrida de un batch.
+- **Pedir el espacio para texto con porcentajes en el prompt**, no con «leave space for text»: «the upper 45% of
+  the vertical frame is a deep dark twilight sky, darkest indigo-cobalt at the very top (dark enough for white
+  text), with the sunset glow only low near the horizon; keep that upper area free of buildings, palms and bright
+  objects». Con la versión vaga («upper 40% is open burning sunset sky») el cielo salió naranja brillante bajo el
+  titular y midió **1,4:1** (s5/s6/s8 v1). Con un objeto de marca, fijar su borde: «STRICT LAYOUT: the top edge of
+  the logo letters is at 55% of the frame height; above it ONLY … sky» (caso completo en
+  [`logo-3d-reference-kit.md`](references/logo-3d-reference-kit.md#evidencia-2026-09-19--monumental-como-cartel-de-azotea-en-estilo-ilustrado-pintado)).
+  Reservar también la banda de firma («the bottom 12% is dark matte, reserved for small text»).
+- **Falso positivo de moderación:** «a dense crowd … ALL holding their smartphones up high and pointing them
+  straight at the camera» devolvió `safety_violations=[sexual]` (`moderation_blocked`, `brief/plates-v2.log`) sin
+  nada sexual en el pedido. Pasó reescrito como escena de contexto explícito y vestuario declarado: «street
+  festival … fully clothed tourists and locals in t-shirts, caps and sundresses». Ante un bloqueo, reescribir
+  contexto y ropa; no insistir con la misma redacción ni forzar otro proveedor para saltarse el filtro.
+- 🔴 **Nexa: sus accesorios y su equipo son parte de la identidad, no atrezzo.** Los cuatro signature
+  elements viajan solos en el bloque `accesorios` de `foto:prompt` —anillo geométrico plata mate en el
+  índice derecho, **SMARTWATCH** en la muñeca izquierda (nunca analógico), aretes de plata, uñas de un
+  color— y los **gadgets de escena** se declaran en la `escena`: Apple Watch, iPhone, iPad con Pencil,
+  MacBook, AirPods, **DJI Osmo Pocket/Action**, **DJI Mic 3** o lavalier **Rode**, **Shure** en podcast,
+  cuerpo **Sony α** o **Canon EOS R**. Siempre la generación vigente, nunca un modelo descontinuado;
+  encendidos y en uso; ningún logotipo de tercero legible. Canon:
+  [props tecnológicos](../../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md).
+- 🔴 **El DEDO del anillo se gana editando, no generando** [medido 2026-09-21]. Pedirlo por prompt en una
+  generación desde cero da metal y forma correctos pero el dedo equivocado; editar una foto existente con
+  instrucción posicional sí lo coloca. Es «editar conserva, generar reconstruye» aplicado a dos centímetros.
+- 🔴 **Editar con un `--size` de distinto aspect ratio REENCUADRA al sujeto** [medido 2026-09-21]. No
+  recorta ni rellena: cambia la escala de la persona dentro del cuadro y la cabeza sale desproporcionada. El
+  canon es 4:5 y el modelo entrega 1:1, 2:3 y 3:2, así que **hay que padear, editar y recortar**. Receta en
+  [bloques y pipeline](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
+- **Nexa en estilo pintado: pedir el navy explícito.** Con la referencia de cuerpo completo
+  (hoy `ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png`; en esa corrida era
+  `2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png`) + la vista frontal transparente
+  del kit hoodie (`ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-01-frente-…-transparente.png`), la
+  v1 salió con hoodie **azul rey**. Corrigió «deep navy (#023c70), not royal blue». La identidad de Nexa se conservó
+  en el estilo pintado; aun así el hoodie quedó algo más brillante que `#023c70`: revisar el color al 100 %.
+
 ## Reference edit + character consistency (`--image`)
 
 Canonical path to make **consistent variants** of an existing character/asset (new pose, expression, scene) while preserving its identity, style, and logo — the model edits the reference, it does not re-imagine it.
@@ -497,6 +572,14 @@ verificar **delta máximo 0** en la zona protegida. Receta y trampa de canales a
   imagen 1 del edit con «cada píxel = pila de 1×2 cubos» y material declarado; verificar silueta, ojos y extremidades
   contra el sprite antes de usarlo. Biblioteca completa (8 ángulos + 8 accesorios, recorte, QA, entrega y cómo
   aplicarlo a Nexa): [`references/mascot-3d-pose-library.md`](references/mascot-3d-pose-library.md).
+- **Si la mascota no está en el binario ni en el bundle de la app, no es de producto: es de campaña**, y la fuente
+  correcta es **el estudio que la diseñó**, no imágenes sueltas. Buscar «<personaje> portfolio / case study». Caso
+  Gigi (Google Gemini, 2026-09-21), la **tercera** mascota de partner con biblioteca 3D después de Clawd y Codex:
+  `/Applications/Gemini.app` no la trae —`GelIdle.mp4` es el degradado aurora del asistente, verificado mirando los
+  cuadros— y los assets de producción, incluida la **hoja de modelo oficial** con 15 siluetas canónicas, los publica
+  [Gasta](https://www.gasta.org/portfolio/gemini-free/), el estudio que la creó para el back-to-school de Gemini.
+  Sus tres reglas duras de utilería (tono hueso, prop que toca al personaje, nada translúcido sobre la cara) están en
+  la misma biblioteca.
 - **Cambiar el fondo detrás de una persona o mascota: regenerar, no recortar.** Repintar un muro alrededor de un
   sujeto con matte + máscara deja bordes «mordidos» en pelo y deforma partes finas o sueltas (el «?» de Clawd).
   Acabado profesional = plate nativo con el set nuevo, guiado por un **boceto de composición** de formas planas
@@ -552,6 +635,58 @@ verificar **delta máximo 0** en la zona protegida. Receta y trampa de canales a
   contrato de referencias, QA al 100 % y las tres reglas propias del video (primer cuadro aprobado, la marca no se mueve
   dentro del plano generado, planos cortos).
 
+## Fotografía de marca propia Efeonce
+
+Lenguaje aprobado el 2026-09-19. **Dirección** (idea, barra, firma, color, tomas, QA) en
+[`design-studio` → lenguaje fotográfico](../design-studio/references/efeonce-photographic-language.md); contrato completo en
+[el maestro](../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) y receta paso a paso en
+[bloques y pipeline](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md). Aquí sólo
+lo que toca a la mano:
+
+**El prompt NO se arma a mano.** Tres comandos, con 27 tests en `scripts/foto/build-prompt.test.ts`:
+
+- `pnpm foto:doctor` — ¿esta máquina puede generar? Seis chequeos que **ejercitan la cadena**: bloques presentes y sin
+  contaminar · sharp · ADC de gcloud (pide un token real) · referencia al secreto · el secreto resolviendo · la clave
+  aceptada por OpenAI vía `/v1/models`, **sin costo**. La clave nunca se imprime y sale 1 si algo bloquea. Verificado en
+  los dos sentidos: con ADC vencida señaló el comando exacto, tras renovarla pasaron los seis, y quitando un bloque sale 1.
+- `pnpm foto:prompt <ficha.json> [--batch <out>]` — arma el prompt desde una ficha de toma: **el formato, el % del lecho
+  y el límite de sujetos salen de UNA tabla**. `--ficha-ejemplo` imprime la plantilla; la salida trae el `ai:image` exacto
+  con su `--size`. Los bloques viven en **`scripts/foto/bloques/`**, no en una carpeta de corrida fechada. Guardas
+  probadas: bloque compartido con un valor de formato adentro · reserva pedida en una toma que no la admite · batch que
+  mezcla formatos · falta el lecho o la escena · **materia de la superficie ausente o genérica** («a wall», «the surface»).
+- `pnpm foto:validar <plate.png> [--zona-texto] [--objeto x0,y0,x1,y1] [--padding-x/-y]` — valida las **seis** reservas
+  sobre el plate limpio y sale 1 si una reserva **evaluada** falla. `--zona-texto` y `--objeto` son **opt-in**; las
+  coordenadas van en **fracciones** (0–1), nunca píxeles.
+
+**NUNCA armar un prompt de foto de marca concatenando bloques a mano.** Es la vía por la que «Vertical 4:5.» vivió
+dentro del bloque de realismo compartido y «bottom 18%» dentro de la plantilla del lecho, sin que nadie los viera.
+
+`foto:prompt` y `foto:validar` **no necesitan credencial**: se puede preparar y validar una tanda entera sin acceso. Lo
+único que no viaja con el repo es `.env.local` con `OPENAI_API_KEY_SECRET_REF="greenhouse-openai-api-key"` (el **nombre**
+del secreto, nunca la clave cruda) + ADC de gcloud vigentes (`pnpm gcloud:auth:playwright -- --force`); `foto:doctor` lo
+diagnostica sin costo.
+
+- **Modelo:** `gpt-image-2.5-flare` `high` 1152×1440 para explorar; `gpt-image-2.5-sunburst` cuando hay **identidad**
+  (Julio, Nexa) o **edición**; `xhigh` **sólo masters** (≈1,8× costo, mejora modesta de detalle fino). Observado:
+  ≈ USD 0,05 por imagen high, ≈ 0,09 xhigh; los edits suman entrada.
+- **Prompt = bloques** en este orden: realismo (`prompts/bloque-realismo-v2.txt`) + impacto (`bloque-impacto-v1.txt`) +
+  color/WB + escena + **`FOREGROUND` con el tono del lecho declarado** («DARK near black» / «VERY LIGHT almost white»).
+  Ese orden lo emite `pnpm foto:prompt`; los bloques vigentes viven en `scripts/foto/bloques/`.
+- **Medir y regenerar, no parchar:** nitidez p99 Sobel dentro del lecho (`scripts/medir.mjs` de la corrida) ≤ ~20; si
+  pasa, o si el lecho sale de tono medio, **se regenera**. Sin grade: la corrección técnica es la excepción. Las **seis**
+  reservas del plate se miden con `pnpm foto:validar`; el lecho sigue medido en luminancia y es **señal débil [frágil]**
+  (medir desenfoque bien queda **[pendiente]**).
+- **Firma:** SVG oficial compuesto con `scripts/componer.mjs` (`LOGO=0.15`), nunca generado.
+- **Pantallas por curación generativa:** plate con pantalla en chroma `#00FF00` → UI de referencia → edit con
+  `--image plate --image ui --mask <máscara>` → restaurar fuera de la pantalla desde el plate. La máscara se arma
+  detectando chroma (g>120, g>1,4r, g>1,4b), dilatando (blur 2 + threshold 20) y con **`.extractChannel(0)`**: sin eso
+  sharp devuelve 3 canales y la máscara se desalinea (2 intentos fallidos). Alfa 0 = editable, 255 = protegido. Una
+  máscara rectangular que incluye a una persona delante de la pantalla deja un **fantasma**.
+- **Gotchas de zsh:** una variable con varios `--image` se expande con **`${=R}`** (sin eso fallaron 8 llamadas, sin
+  costo); `setopt nullglob` antes de copiar con globs (un glob sin match aborta el comando entero).
+- **Lotes:** JSON con `json.dump` (§Serie con estética de trend) y `--batch <json> --out <dir>` ya respeta el
+  directorio (corregido 2026-09-19, §Brechas conocidas).
+
 ## Provider Choice
 
 - Use `openai-image` for higher prompt fidelity, complex composition, reference-guided edits, UI assets, icon sets, and transparent PNG batches.
@@ -578,8 +713,9 @@ verificar **delta máximo 0** en la zona protegida. Receta y trampa de canales a
   en location `global`, 2026-09-16: `gemini-3-pro-image` y `gemini-3-pro-image-preview` OK, `gemini-3.1-flash-image`
   OK, `gemini-3.1-pro-image` 404), pero **ninguna superficie lo usa**. No cambies la env global para probarlo:
   cambiaría todo el carril `google-gemini-image` del producto; lo correcto sería exponerlo como modelo elegible por
-  pedido (no hecho, decisión del operador). Nano Banana Pro y Gemini Omni Flash van **directo por Google, nunca por
-  fal** (decisión del operador), aunque fal ofrezca Omni Flash (`google/gemini-omni-flash/*`). Referencia externa: OpenArt Arena imagen (2026-09-16) ubica a Nano Banana Pro #3 y
+  pedido (no hecho, decisión del operador). Nano Banana Pro y Gemini Omni van **directo por Google, nunca por
+  fal** (decisión del operador). La CLI Omni 1.1 Cloud es `pnpm ai:omni`; el slug fal del modelo anterior
+  (`google/gemini-omni-flash/*`) no es su transporte. Referencia externa: OpenArt Arena imagen (2026-09-16) ubica a Nano Banana Pro #3 y
   Nano Banana 2 #5.
 - **Grok Imagine imagen v2.0 (xAI): evaluado, no conectado.** `xai/grok-imagine-image/v2.0/{text-to-image,edit}`
   en fal: `quality` low|medium, 1k/2k, 1–4 imágenes, aspectos amplios (incluye 19.5:9 y 20:9), devuelve
@@ -590,7 +726,7 @@ verificar **delta máximo 0** en la zona protegida. Receta y trampa de canales a
   (built on `src/lib/ai/fal.ts`), never a parallel fal client, ad-hoc script or product runtime wiring.
 - For campaign systems, do not choose one provider globally. Load
   `references/seedream-5-gpt-image-2-hybrid-production.md` and route each operation through an
-  explicit anchor/handoff contract. If the system adds Gemini Omni motion or offline outputs, also load
+  explicit anchor/handoff contract. Si la campaña incluye Gemini Omni motion u outputs offline, carga también
   `docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md`; keep clean plates separate from the
   deterministic brand/channel layer.
 - Campaign derivation uses a governed **star topology**: the approved `anchor_id`/`anchor_revision` is the
@@ -680,7 +816,7 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   Para video a video con personas, Flux 3 o Wan 3.0. Costo: la fórmula de tokens de fal
   (`alto × ancho × segundos × 24 / 1024`) calzó con lo medido dentro de ~5 %; lo que subestimaba ~2× era la
   equivalencia de OpenArt (corregido 2026-09-16).
-- **Pendientes:** LoRA de H3 (postergada por decisión del operador) y Recraft sin vía operativa (Higgsfield CLI sin sesión).
+- **Pendientes:** LoRA de H3 (postergada por decisión del operador) y Recraft V4.1 vía Higgsfield CLI: sesión resuelta el 2026-09-24 (CLI 1.1.26), la generación de un SVG real sigue sin corrida.
 - **Retome (request_id):** el CLI imprime el `request_id` apenas fal encola. Si el polling local vence (HTTP 408)
   el trabajo **sigue corriendo y cobrando** en fal: no relances; usa el comando de retome que imprime el CLI
   (verificado: mismo archivo byte a byte; alcance de la verificación: el retome se probó en real con `h3turbo-t2v` y con un Seedance 2.5 r2v que superó la espera anterior; Seedream y Flux 3 usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.) La cola se direcciona por APP (dos primeros segmentos del slug), no por
@@ -855,3 +991,21 @@ Conservar input oficial, plate, resultado del pase físico, detalle comparativo 
 revisiones identificables. Reportar por separado idea/pertinencia, identidad, geometría, material, lectura móvil
 y checks técnicos. V5 de la silla fue rechazada pese a checks verdes; V6 no implica aprobación humana ni
 resultados de audiencia. No publicar, reutilizar como aprobado ni promover a release por completar una generación.
+
+## Ediciones de campaña Efeonce y procedencia
+
+Para la foto de un ad propio, cargar el [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) junto al lenguaje fotográfico: ficha por ratio, prompt íntegro compilado, referencias exactas con hash, motor realmente usado y cadena de correcciones. Una corrección de tablet/manos/lecho edita el plate aprobado; no reconstruye identidad de memoria. Texto, CTA y firma editorial se componen después. Una nueva altura de firma exige revisar la extensión física del primer plano: no conservar un lecho gigante por inercia. Registrar descartes y límites de QA, sin elevarlos al catálogo aprobado.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+Para una imagen de campaña, consumir ficha, prompt compilado y referencias canónicas del brief vigente.
+Guardar prompt íntegro, motor real, referencias/hashes, intentos y cadena de ediciones en canal; no confundir
+prompt preparado con ejecución. Texto, firma y CTA editables se componen según canon, con QA de export.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+El motor consume prompt resuelto y referencias verificadas; guardar receta/motor en Recursos. El manifiesto identifica el export final por ID/ruta/hash. Catálogo y copy exterior no habilitan regenerar un arte aprobado ni tratar un placeholder como archivo descargado.

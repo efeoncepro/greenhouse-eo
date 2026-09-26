@@ -3,61 +3,115 @@
 <head>
 <meta charset="utf-8" />
 <!--
-  ReportIndexPage — navegación editorial derivada del plan físico de páginas.
-  Los folios vienen del mapper; esta plantilla no estima ni recalcula páginas.
+  ReportIndexPage — índice del informe A4 con el estilo editorial; reemplaza al índice v1 (TASK-1889). El canvas no
+  diseñó el índice: hereda el molde en papel aprobado (cabecera, antetítulo, pie) y la gramática de la
+  lista «En este capítulo» de la apertura. Cada entrada apunta a la primera página REAL de su sección.
 -->
 <link rel="stylesheet" href="report-tokens.css" />
 <link rel="stylesheet" href="report-fonts.css" />
-<link rel="stylesheet" href="report-mold.css" />
+<link rel="stylesheet" href="report-editorial.css" />
 <style>
-  .index-title { margin: 34px 0 24px; font-family: var(--axis-report-type-display); font-size: 30px; line-height: 1.2; }
+  .v2-eyebrow { margin-top: 38px; }
 
-  .index-head { display: flex; justify-content: space-between; padding: 0 0 9px; border-bottom: 1.5px solid var(--axis-report-role-accent); color: var(--axis-report-role-fieldMid); font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .v2-title {
+    margin: 16px 0 0;
+    max-width: 620px;
+    font-family: var(--axis-report-type-display);
+    font-size: 30px;
+    line-height: 1.16;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
 
-  .index-entries { display: flex; flex-direction: column; margin-top: 8px; }
+  .v2-title em { font-style: normal; color: var(--axis-report-role-paperAccent); }
 
-  .index-row { display: grid; grid-template-columns: minmax(0, 1fr) 32px; align-items: baseline; gap: 16px; min-height: 26px; padding: 5px 0; border-bottom: 1px solid var(--axis-report-role-surfaceEdge); font-size: 12px; line-height: 1.35; }
+  .contents { margin-top: 28px; display: flex; flex-direction: column; }
 
-  .index-section { overflow-wrap: anywhere; }
+  .contents-head {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    font-family: var(--axis-report-type-display);
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--axis-report-role-labelMuted);
+  }
 
-  .index-page { text-align: right; color: var(--axis-deck-teal-750); font-variant-numeric: tabular-nums; font-weight: 700; }
+  .contents-entry {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 40px;
+    column-gap: 12px;
+    align-items: baseline;
+    padding: 10px 0;
+    border-top: 1px solid var(--axis-report-role-rule);
+    font-size: 13.5px;
+    color: var(--axis-report-role-paperInk);
+  }
+
+  .contents-entry:last-child { border-bottom: 1px solid var(--axis-report-role-rule); }
+
+  .contents-mark {
+    font-family: var(--axis-report-type-display);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-report-role-labelMuted);
+  }
+
+  .contents-title { font-weight: 500; }
+
+  .contents-folio {
+    justify-self: end;
+    font-family: var(--axis-report-type-display);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-report-role-paperAccent);
+  }
 </style>
 </head>
 <body>
-  <div class="page">
+  <div class="sheet sheet--paper paper-page">
     <header class="running">
-      <span class="chapter" data-slot="runningChapter">ÍNDICE</span>
-      <span data-slot="runningPeriod">Agosto 2026</span>
+      <span class="running-client"><span class="running-client-name" data-slot="clientName">Nombre del cliente</span></span>
+      <span class="running-meta">
+        <span class="running-section" data-slot="runningSection">Índice</span>
+        <span class="running-divider"></span>
+        <span data-slot="runningPeriod">Agosto 2026 · contra julio 2026</span>
+      </span>
     </header>
 
-    <h1 class="index-title" data-slot="indexTitle">Índice</h1>
+    <span class="page-eyebrow v2-eyebrow">
+      <svg class="stroke-icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l11 0"></path><path d="M9 12l11 0"></path><path d="M9 18l11 0"></path><path d="M5 6l0 .01"></path><path d="M5 12l0 .01"></path><path d="M5 18l0 .01"></path></svg><span data-slot="eyebrow">Índice</span>
+    </span>
 
-    <div class="index-head">
-      <span>Sección</span>
-      <span data-slot="indexPageColumn">Pág.</span>
-    </div>
-    <div class="index-entries" data-slot="indexEntries">
-      <div class="index-row">
-        <span class="index-section" data-slot-field="title">Resumen ejecutivo</span>
-        <span class="index-page" data-slot-field="pageNumber">3</span>
+    <h1 class="v2-title" data-slot="title">Índice</h1>
+
+    <div class="contents">
+      <div class="contents-head"><span data-slot="titleColumn">Sección</span><span data-slot="pageColumn">Pág.</span></div>
+      <div class="contents-list" data-slot="entries">
+        <div class="contents-entry"><span class="contents-mark" data-slot-field="mark">01</span><span class="contents-title" data-slot-field="title">Visibilidad orgánica</span><span class="contents-folio" data-slot-field="folio">05</span></div>
       </div>
     </div>
-
-    <footer class="foot">
-      <div class="foot-contact" data-slot="contactDetails">
-        <span class="foot-line">
-          <img src="assets/contact/map-point-bold.svg" alt="" />
-          <span>Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile</span>
-        </span>
-        <span class="foot-line">
-          <img src="assets/contact/phone-calling-bold.svg" alt="" />
-          <span>+56 9 3732 3064</span>
-        </span>
+    <footer class="paper-foot">
+      <div class="paper-foot-rule"><span class="accent"></span><span class="line"></span></div>
+      <div class="paper-foot-row">
+        <div class="paper-foot-id">
+          <div class="paper-foot-lockup">
+            <img src="assets/brand/logo-full.svg" alt="Efeonce" />
+            <span class="divider"></span>
+            <span class="paper-foot-edition" data-slot="footerEdition">Insights · Informe de agosto 2026</span>
+          </div>
+          <div class="paper-foot-contact" data-slot="footerContact"><span data-slot-field="address">Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile</span><span class="dot"></span><span class="num" data-slot-field="phone">+56 9 3732 3064</span></div>
+        </div>
+        <div class="paper-foot-end">
+          <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+          <span class="divider"></span>
+          <span class="paper-folio" data-slot="folio"><span class="paper-folio-page" data-slot-field="page">03</span><span class="paper-folio-total">/ <span data-slot-field="total">24</span></span></span>
+        </div>
       </div>
-      <span class="foot-bubble" data-slot="urlBubble">
-        <img src="assets/url-lum.svg" alt="efeoncepro.com" />
-      </span>
-      <span class="folio" data-slot="pageFolio">2</span>
     </footer>
   </div>
 </body>

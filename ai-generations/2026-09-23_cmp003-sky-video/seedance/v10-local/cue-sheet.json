@@ -1,0 +1,79 @@
+[
+  {
+    "id": "yearTop-land",
+    "type": "soft",
+    "time": 16,
+    "localTime": 0.27,
+    "frame": 384
+  },
+  {
+    "id": "yearBottom-land",
+    "type": "soft",
+    "time": 16.333333333333332,
+    "localTime": 0.6,
+    "frame": 392
+  },
+  {
+    "id": "plus-land",
+    "type": "accent",
+    "time": 18.541666666666668,
+    "localTime": 2.78,
+    "frame": 445
+  },
+  {
+    "id": "number-land",
+    "type": "soft",
+    "time": 18.875,
+    "localTime": 3.12,
+    "frame": 453
+  },
+  {
+    "id": "pieces-land",
+    "type": "soft",
+    "time": 19.166666666666668,
+    "localTime": 3.4,
+    "frame": 460
+  },
+  {
+    "id": "intro-land",
+    "type": "soft",
+    "time": 21.041666666666668,
+    "localTime": 5.28,
+    "frame": 505
+  },
+  {
+    "id": "agency-land",
+    "type": "soft",
+    "time": 21.25,
+    "localTime": 5.51,
+    "frame": 510
+  },
+  {
+    "id": "seo-land",
+    "type": "accent",
+    "time": 21.708333333333332,
+    "localTime": 5.97,
+    "frame": 521
+  },
+  {
+    "id": "thanksText-land",
+    "type": "soft",
+    "time": 24.375,
+    "localTime": 8.61,
+    "frame": 585
+  },
+  {
+    "id": "lockup-land",
+    "type": "soft",
+    "time": 26.166666666666668,
+    "localTime": 10.43,
+    "frame": 628
+  },
+  {
+    "id": "urlBubble-land",
+    "type": "soft",
+    "time": 26.25,
+    "localTime": 10.5,
+    "frame": 630
+  }
+]

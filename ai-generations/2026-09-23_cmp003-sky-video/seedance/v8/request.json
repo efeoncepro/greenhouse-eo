@@ -1,0 +1,139 @@
+{
+  "params": {
+    "model": "seedance_2_5",
+    "mode": "omni_reference",
+    "duration": 30,
+    "resolution": "720p",
+    "aspect_ratio": "9:16",
+    "generate_audio": true,
+    "bitrate_mode": "high",
+    "count": 1,
+    "prompt": "Generate ONE complete 30-second vertical SKY x Efeonce cinematic film. Photoreal aviation, dimensional motion graphics, three-camera choreography. All written words are VISUAL ARTWORK ONLY, never speech.\n\nREFERENCE ROLES:\n@Image1 sky/light. @Image2 empty search, @Image3 typed search, @Image4 results, @Image5 user turn, @Image6 answer/citation, @Image7 citation glow: successive states, never simultaneous panels.\n@Image8 front three-quarter aircraft, @Image9 underside pass, @Image10 rear departure. @Image11 @Image12 @Image13 @Image14 lock geometry/livery: ALL are the SAME SKY A320neo, never different aircraft. Full airline scale, metal in real sunlight.\n@Image15 @Image16 @Image17 @Image18: successive title layouts; @Image21 @Image22 @Image23 @Image24 @Image25 their typography assets, not extra scenes. @Image19 blue closing, @Image20 purple closing; @Image26 @Image27 logos. @Image28 lateral UI, @Image29 elevated UI, @Image30 oblique title camera.\n@Audio1: approved instrumental music/SFX. Follow its musical identity, dynamic arc and accents; never add speech.\n\nCAMERAS across UI, flight and titles: A frontal hero/readability; B close lateral tracking/depth; C elevated oblique crane/drone. Moves settle for reading. Camera motion and subject motion are independent. Real clouds, golden light, atmospheric distance; white dimensional type, SKY purple/lime.\n\nSTORY: follow this order, never return to an earlier state:\n[0-2s] Camera B glides laterally past the rounded white search field toward A, referencing @Image28 and @Image2-3. The field remains readable. VISUAL text types: ¿A dónde viajar en Sudamérica? First 0.2s silence, then dry keyboard SFX only. At completion around 1s, Enter visibly confirms; a crisp click starts the uplifting musical pulse. No music before Enter.\n[2-3.75s] Camera C reveals the three result options from @Image4, with @Image29 perspective and restrained parallax. Options appear in sequence: Camboriú, Mendoza, Puerto Fuy. Each has one precise soft digital tick.\n[3.75-4.85s] The search field becomes the right-aligned user chat bubble from @Image5. Results leave permanently. Show the user question ALONE first. The bubble moves upward to make room, while camera A gently descends.\n[4.85-8s] The assistant answer unfolds downward in three meaningful phrase groups on one clean modern surface, referencing @Image6. VISUAL copy: Tres ideas: Camboriú, por sus playas; Mendoza, por sus bodegas; y Puerto Fuy, por sus lagos y volcanes. A small purple SKY Airline citation chip appears attached BELOW the answer after its text. Finish reveal by 6.1s; hold to 7.8s. At 7.8s the chip visibly presses/focuses with a tactile click and sparkle. No search results here, no detached CTA.\n[8-9.5s] A forceful smooth push INTO that citation; light originates inside the purple chip as in @Image7. Bloom fills the image and reveals real sky. Musical dip then bright lift; distant jet grows. No portal rings.\n[9.5-12s] A, front three-quarter aerial view based on @Image8. One full-size SKY A320neo already flies forward fast; cloud parallax and changing scale establish travel immediately. Camera retreats more slowly than the approaching aircraft, so it grows naturally. Reference shape/livery, metal reflections, two engines, gear up. Majestic mass, not hovering.\n[12-13s] B cuts on forward motion below its path, @Image9: one powerful overhead passage, fuselage and wings crossing above the lens. Brief physical motion blur, jet peak with Doppler. Maintain aircraft identity, direction and speed.\n[13-15.5s] C rear three-quarter aerial camera, @Image10: same plane continues away toward the horizon. Camera stays behind and offset, moving slower than the plane; it never overtakes. No braking, reversal, turn-around, toy look, wing smoke or slow-motion reset. The aircraft's exit guides the eye into the first title.\n[15.5-18s] VISUAL title @Image15/@Image21: Un año creando con SKY. Camera B makes a short dimensional reveal then settles at A. White sculpted type arrives with weight, fully readable by 16s; hold.\n[18-20.5s] VISUAL title @Image16/@Image22: +2.000 piezas. The lime PLUS travels independently from foreground into its place LEFT of 2.000, makes a short axial turn, lands on a musical accent and settles. Its landing reveals 2.000, then piezas. Complete entrance by 18.6s and hold. The eye follows PLUS then NUMBER then NOUN. No counting or repeated bouncing.\n[20.5-23s] VISUAL title @Image17/@Image23-24: Y ahora nos eligió como su agencia SEO/AEO. Camera C approaches obliquely as @Image30, settling frontal. Reveal the introductory phrase, then su agencia, then SEO/AEO; all readable by 21.2s. Accent SEO/AEO, then hold.\n[23-25s] VISUAL title @Image18/@Image25: ¡Gracias, SKY! Broad confident arrival, slight camera pullback, warm musical resolution; readable hold before blue closing.\n[25-27s] Locked A camera. Exact white Efeonce | SKY logos from @Image26-27 and efeoncepro.com URL bubble on BLUE as @Image19.\n[27-30s] Only the background changes smoothly BLUE to SKY PURPLE by 28.2s, matching @Image20. Logos and URL remain fixed and readable through the end. Music resolves cleanly.\n\nAUDIO ONLY: use @Audio1 instrumental identity and cinematic action sounds. Bright triumphant electronic/orchestral energy, rhythmic percussion, strings/brass synths; no mystery. Sync keys, Enter, results ticks, chat reveal, citation press/glow, jet approach/pass/departure, PLUS landing and title accents to the pictured actions. Every title remains acoustically unspoken: instruments and SFX continue under it. No narration, no dialogue, no reading/reciting/translating screen text, no announcements, no singing, no choir, no humming, no whispering, no human or synthetic vocal samples. No extra captions.\n",
+    "medias": [
+      {
+        "role": "image",
+        "value": "067250ac-511d-4ab9-aa6d-adf422e4978b"
+      },
+      {
+        "role": "image",
+        "value": "1095976d-a205-4458-80d4-e798c207b681"
+      },
+      {
+        "role": "image",
+        "value": "bfcae795-f1cf-42e6-9824-426e9cf5ff5f"
+      },
+      {
+        "role": "image",
+        "value": "cfe48c79-e48b-4e8f-8954-e27cfec5969a"
+      },
+      {
+        "role": "image",
+        "value": "fe7c6472-bd22-4405-9a6b-d44b91f8d18f"
+      },
+      {
+        "role": "image",
+        "value": "1e1e5779-5380-4d22-9786-0dd2f8f38572"
+      },
+      {
+        "role": "image",
+        "value": "440a6508-0dbb-4b21-9bfe-f21f1d54a9b9"
+      },
+      {
+        "role": "image",
+        "value": "a2a389bb-8af8-4a15-adb9-f6ee9c728bd4"
+      },
+      {
+        "role": "image",
+        "value": "787b9dcd-0cd7-46c0-9568-81cc09a8d5b2"
+      },
+      {
+        "role": "image",
+        "value": "d3918504-0ce8-47d0-b2c1-1fda083ae5c7"
+      },
+      {
+        "role": "image",
+        "value": "9901d95d-645e-443d-a688-bd91dfc97025"
+      },
+      {
+        "role": "image",
+        "value": "cb683a8e-76e4-4ab4-a227-3d4253ecbbc0"
+      },
+      {
+        "role": "image",
+        "value": "36b5870b-edf7-4ad4-85d7-0f1a3e869e00"
+      },
+      {
+        "role": "image",
+        "value": "6ec10edc-cf89-4c1d-9347-5287203c5db2"
+      },
+      {
+        "role": "image",
+        "value": "f7d5a12c-005a-426b-b2bb-4921077a72dc"
+      },
+      {
+        "role": "image",
+        "value": "7f444147-05f2-427b-b010-7060c0fe9d2e"
+      },
+      {
+        "role": "image",
+        "value": "37485393-4121-46e7-b7c8-94bef4f7d155"
+      },
+      {
+        "role": "image",
+        "value": "a0456be3-6cbf-47a4-b71e-b90adef8753e"
+      },
+      {
+        "role": "image",
+        "value": "b19d12d0-cd2d-46f2-b000-5d4df72a1bb1"
+      },
+      {
+        "role": "image",
+        "value": "456fb450-ed6d-4669-86a0-5a7c2f52e16b"
+      },
+      {
+        "role": "image",
+        "value": "1f76ce65-fbb8-4774-87ac-1fe7fc427e30"
+      },
+      {
+        "role": "image",
+        "value": "52e731e7-fd4f-4a87-9f5f-cd8f0a60ffac"
+      },
+      {
+        "role": "image",
+        "value": "f840028f-f4cb-4de3-8577-743079fe0839"
+      },
+      {
+        "role": "image",
+        "value": "f3d216e6-7769-4f4d-8b06-1ab054b17f5a"
+      },
+      {
+        "role": "image",
+        "value": "a2ea67ec-4db4-4498-9bcb-128affd912ce"
+      },
+      {
+        "role": "image",
+        "value": "30565f80-e58c-4eeb-bf41-62c2297b6ad9"
+      },
+      {
+        "role": "image",
+        "value": "c180c3f1-0ca4-4323-8912-932c59628413"
+      },
+      {
+        "role": "image",
+        "value": "f5da8faa-c3f3-4a8d-95fc-1491190ba4c2"
+      },
+      {
+        "role": "image",
+        "value": "41b2f301-7980-450d-85cf-73ae00db3a81"
+      },
+      {
+        "role": "image",
+        "value": "82e492ba-1cdd-42f5-bb16-818c65e622ed"
+      },
+      {
+        "role": "audio",
+        "value": "5bf0428e-fa7f-4117-822c-9272349684d1"
+      }
+    ]
+  }
+}

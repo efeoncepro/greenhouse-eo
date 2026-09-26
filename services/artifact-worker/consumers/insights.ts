@@ -21,7 +21,7 @@ import {
 } from '@/lib/efeonce-insights/render/store'
 import type { InsightOutputRecord, InsightRenderFailureCode } from '@/lib/efeonce-insights/render/contracts'
 import { hashResolvedManifest } from '@/lib/artifact-composer/manifest-hash'
-import { storeSystemGeneratedPrivateAsset } from '@/lib/storage/greenhouse-assets'
+import { readOrganizationLogoForRender, storeSystemGeneratedPrivateAsset } from '@/lib/storage/greenhouse-assets'
 
 import { insightsDeckCatalog } from '@/lib/artifact-composer/catalogs/insights-deck'
 import { insightsReportCatalog } from '@/lib/artifact-composer/catalogs/insights-report'
@@ -29,6 +29,24 @@ import { insightsReportCatalog } from '@/lib/artifact-composer/catalogs/insights
 import type { RenderConsumer, RenderJobView, RenderedArtifact } from '../consumer-contract'
 
 const WORKER_ACTOR_USER = null
+
+/** Referencia sellada al logo de la organización cliente (la emite el mapper de portada, TASK-1889). */
+const ORG_LOGO_REF = /^asset-ref:(org-logo:([A-Za-z0-9_-]+))$/
+
+/** Todas las referencias `asset-ref:org-logo:<id>` del input sellado, sin repetir. */
+export const collectOrgLogoRefs = (value: unknown, found = new Map<string, string>()): Map<string, string> => {
+  if (typeof value === 'string') {
+    const match = ORG_LOGO_REF.exec(value)
+
+    if (match) found.set(match[1]!, match[2]!)
+  } else if (Array.isArray(value)) {
+    for (const item of value) collectOrgLogoRefs(item, found)
+  } else if (value && typeof value === 'object') {
+    for (const item of Object.values(value)) collectOrgLogoRefs(item, found)
+  }
+
+  return found
+}
 
 // Los catálogos que el worker tiene EMPAQUETADOS. Un output encolado con un catálogo ausente de
 // este mapa falla como manifest_drift, que es la respuesta honesta: el worker no improvisa un
@@ -91,6 +109,25 @@ export const createInsightsConsumer = (): RenderConsumer => {
       if (emittedInputHash === view.manifestHash) return null
 
       return `El input compuesto (${emittedInputHash.slice(0, 12)}…) difiere del sellado al encolar (${view.manifestHash.slice(0, 12)}…): el artefacto no corresponde al plan congelado.`
+    },
+
+    // El logo del cliente vive como asset privado de SU organización. Sólo se lee el de la organización
+    // dueña de la salida (`readOrganizationLogoForRender` falla cerrado ante cualquier otro), y los
+    // bytes no entran al manifest: el input sellado conserva la referencia.
+    resolveExternalAssets: async (view, input) => {
+      const assets: Record<string, string> = {}
+
+      for (const [key, assetId] of collectOrgLogoRefs(input)) {
+        const logo = await readOrganizationLogoForRender({
+          organizationId: view.ownerOrgId,
+          assetId,
+          accessMetadata: { insightOutputId: view.jobId, artifactId: view.artifactId }
+        })
+
+        assets[key] = logo.dataUri
+      }
+
+      return assets
     },
 
     storeOutputs: async (view, rendered: RenderedArtifact) => {

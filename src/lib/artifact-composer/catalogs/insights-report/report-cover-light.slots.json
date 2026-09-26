@@ -1,0 +1,132 @@
+{
+  "template": "ReportCoverLightPage",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "TASK-1889 — portada blanca del canvas aprobado (`Premium-Portada-Clara` con canales, `-Creativo` sin canales). La elige la portada sellada (`plan.cover.theme = light`).",
+  "viewport": {
+    "width": 794,
+    "height": 1123
+  },
+  "slots": {
+    "editionLabel": {
+      "selector": "[data-slot='editionLabel']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "scopeLabel": {
+      "selector": "[data-slot='scopeLabel']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "scopeLines": {
+      "selector": "[data-slot='scopeLines']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 3,
+        "maxCharactersPerItem": 150
+      },
+      "item": {
+        "type": "string"
+      },
+      "notes": "«Qué mide este informe»: una línea por módulo, selladas por el plan (`plan.scopeLines`, TASK-1888)."
+    },
+    "channels": {
+      "selector": "[data-slot='channels']",
+      "type": "array",
+      "required": false,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 6
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "channelId": {
+            "type": "string",
+            "required": true,
+            "resolver": "report-channel-isotype"
+          }
+        }
+      },
+      "notes": "Un satélite por canal medido (channelId de TASK-1888). Sin canales, la órbita va sin satélites (variante creativa)."
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "reportTitle": {
+      "selector": "[data-slot='reportTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 64,
+        "maxLines": 2,
+        "overflow": "reject"
+      },
+      "notes": "Título en dos líneas como máximo, a la medida del canvas."
+    },
+    "reportSubtitle": {
+      "selector": "[data-slot='reportSubtitle']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 110,
+        "maxLines": 2,
+        "overflow": "reject"
+      }
+    },
+    "preparedFor": {
+      "selector": "[data-slot='preparedFor']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        },
+        "logo": {
+          "type": "asset",
+          "required": false,
+          "resolver": "report-client-logo"
+        },
+        "clientName": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 48,
+          "maxLines": 1
+        }
+      },
+      "notes": "Logo del cliente en positivo (`asset-ref:org-logo:<id>`, variante default sellada por TASK-1888) o su nombre. Sin ninguno, el bloque desaparece."
+    },
+    "confidentialityLine": {
+      "selector": "[data-slot='confidentialityLine']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 72,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    }
+  }
+}

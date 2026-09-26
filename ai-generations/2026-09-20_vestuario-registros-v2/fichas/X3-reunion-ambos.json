@@ -1,0 +1,11 @@
+{
+  "id": "X3-reunion-ambos",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "entre-dos",
+  "identidad": ["julio", "nexa"],
+  "objetos": ["chaqueta-bomber-efeonce"],
+  "reservas": { "margen": { "superficie": "the unlit plaster wall of the meeting room, its trowel marks still visible", "tinta": "blanca" } },
+  "escena": "SCENE (working through a problem, meeting room in Santiago, evening): both wear the Efeonce team bomber jacket — navy, its ribbed collar and cuffs clearly legible, the register of an important instance. THE EMBROIDERED EMBLEM IS NOT VISIBLE ON EITHER OF THEM — verify it by these landmarks: both are seen from BEHIND THE SHOULDER and slightly from the back, so only the backs and the sides of the jackets face the lens, and the chest of each is entirely out of view; no part of either garment carries a readable mark. The camera sits IN THE SPACE BETWEEN them: he is at the RIGHT edge of the frame and she further right, both cut by the frame, and NEITHER looks at the camera — they look ACROSS it at each other. The reserved plaster wall runs down the LEFT side, unbroken and in its own shadow, nothing crossing it. An AZURE-BLUE wall screen behind them edges both figures. Caught AT THE INSTANT he stops speaking and she draws breath. 35mm at f/2.8.",
+  "lecho": { "objeto": "the out-of-focus edge of the table right against the lens, unlit", "tono": "DARK walnut in shadow, matte" }
+}

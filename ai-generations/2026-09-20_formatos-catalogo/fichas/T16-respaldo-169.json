@@ -1,0 +1,20 @@
+{
+  "id": "T16-respaldo-169-piloto",
+  "formato": "16:9",
+  "impacto": true,
+  "escena": "SCENE (Creative, Santiago, 5 pm): presentation wall. A hard, low slice of late afternoon sun comes through a half-open blind on the right and rakes DIAGONALLY across the dark felt board and across the creative director, throwing crisp graphic shadow bars over the pinned frames and over his rolled-up sleeves; everything it does not touch falls into deep shadow that still keeps the texture of the felt. THREE DEPTH PLANES: the out-of-focus chair backrest in the foreground, the director and the board sharp in the middle, and behind them the studio continuing into soft shade with a window edge. DECISIVE MOMENT: at the exact instant he presses a pin into a new frame, the sheet still swinging a little from his hand, he has already turned his head to answer a client executive who is leaning forward, hand half-raised, in the moment of getting it. Two client executives seated at the table, seen from behind in three-quarter, nobody looking at camera. Story accent: one single printed frame in the pinned grid is a field of azure blue (#0375DB); one small orange (#F55D01) grease pencil resting on the table. 85mm lens at f/1.8, from behind the empty seat reserved for the viewer, at seated shoulder height, focus on the director's hand and face. Neutral-warm white balance around 5200 K, shadows strictly neutral and NEVER blue, exposed for the highlights so the sunlit felt and the window edge keep full detail.",
+  "lecho": {
+    "objeto": "the top of the backrest of the empty chair in front of the camera, warm-grey felt upholstery, a soft gentle curve",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the bare dark felt of the presentation board on the left where nothing is pinned yet",
+      "tinta": "blanca"
+    },
+    "margen": {
+      "superficie": "the bare dark felt of the presentation board on the left where nothing is pinned yet",
+      "tinta": "blanca"
+    }
+  }
+}

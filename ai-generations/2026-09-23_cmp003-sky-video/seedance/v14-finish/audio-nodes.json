@@ -1,0 +1,312 @@
+{
+  "flow_id": "SVt3llC8SDhciCoZjoQF",
+  "specs": [
+    {
+      "key": "music",
+      "node_type": "music",
+      "model_id": "eleven_music_v2",
+      "model_parameters": {
+        "duration_seconds": 30,
+        "lyrics_type": "instrumental",
+        "instrumental": true
+      },
+      "prompt": "One complete 30-second instrumental cinematic brand-film score, with a continuous musical arc and a deliberate composed ending. Heroic uplifting orchestral-electronic hybrid, 120 BPM: soaring real strings, warm bold French horns and brass, deep controlled orchestral percussion, confident rhythmic drive and broad harmonic lift. Quiet anticipatory opening 0-1 seconds; confident pulse builds 1-8; exhilarating harmonic opening at 9.5 seconds; largest orchestral lift and powerful forward drive 10-15; sustain epic momentum with space for typography 15-24; warm victorious resolution begins 24 and lands the final brand chord at 26, with a natural resonant tail through 30. Musical accents near18.54 and21.71 should feel part of the phrase, never stop the bed. Elegant premium cinema, not ominous suspense or a generic corporate jingle. Music only: absolutely no speech, vocals, choir, humming, chanting, lyrics, aircraft/engine sounds, typing, whooshes or environmental sound effects. No abrupt cut, no repeated loop, no silence gaps after the beginning."
+    },
+    {
+      "key": "keyboard",
+      "node_type": "sfx",
+      "model_id": "eleven_text_to_sound_v2",
+      "model_parameters": {
+        "duration_seconds": 2,
+        "prompt_influence": 0.6,
+        "loop": false
+      },
+      "prompt": "Isolated close-miked premium laptop keyboard foley: a short natural irregular burst of light fingertip typing, dry rounded tactile key presses with subtle variation, finishing with one slightly deeper Enter key. Intimate, crisp and restrained, no room echo, no music, no voices, no electronic beeps, no cinematic impacts."
+    },
+    {
+      "key": "ui-slide",
+      "node_type": "sfx",
+      "model_id": "eleven_text_to_sound_v2",
+      "model_parameters": {
+        "duration_seconds": 0.7,
+        "prompt_influence": 0.65,
+        "loop": false
+      },
+      "prompt": "One single refined interface card sliding quickly into place: a delicate short airy swish with a tiny soft tactile landing. Smooth clean modern glass interface, subtle and dry, not sci-fi laser, not a beep, no repeated events, no music, no voices."
+    },
+    {
+      "key": "portal",
+      "node_type": "sfx",
+      "model_id": "eleven_text_to_sound_v2",
+      "model_parameters": {
+        "duration_seconds": 1.2,
+        "prompt_influence": 0.65,
+        "loop": false
+      },
+      "prompt": "One cinematic luminous portal opening: a brief tightly focused airy rising shimmer blooms into a warm deep clean impact and a short spatial tail. Powerful but elegant, synchronized sense of forward acceleration. No electrical buzzing, no laser shots, no repeated pulses, no engine, no music, no voice."
+    },
+    {
+      "key": "jet",
+      "node_type": "sfx",
+      "model_id": "eleven_text_to_sound_v2",
+      "model_parameters": {
+        "duration_seconds": 5,
+        "prompt_influence": 0.7,
+        "loop": false
+      },
+      "prompt": "One single photoreal large commercial twin-turbofan passenger jet flyby in open air. Smooth approach from distance, one powerful close pass near the middle, natural Doppler pitch fall and continuous receding tail to silence. Weighty turbine roar and aerodynamic air rush, realistic scale. Exactly one aircraft and one pass. No second approach, no looping engine cycles, no stutter, no explosions, no music, no voice."
+    },
+    {
+      "key": "title-impact",
+      "node_type": "sfx",
+      "model_id": "eleven_text_to_sound_v2",
+      "model_parameters": {
+        "duration_seconds": 0.8,
+        "prompt_influence": 0.65,
+        "loop": false
+      },
+      "prompt": "A single premium motion-graphics typography landing accent: short deep rounded cinematic thump with a crisp light woody transient and a very brief airy tail. Elegant, controlled weight, not a huge trailer explosion, not a metallic robot, not an aircraft or engine, no repetitions, no music, no voices."
+    }
+  ],
+  "nodes": [
+    {
+      "key": "music",
+      "flow_id": "SVt3llC8SDhciCoZjoQF",
+      "flow_created": false,
+      "url": "https://elevenlabs.io/app/flows/SVt3llC8SDhciCoZjoQF",
+      "flow_url": "https://elevenlabs.io/app/flows/SVt3llC8SDhciCoZjoQF",
+      "success": true,
+      "node_ids": [
+        "1RkdJeAaA5FJf8VJ3Gxd"
+      ],
+      "created_nodes": [
+        {
+          "id": "1RkdJeAaA5FJf8VJ3Gxd",
+          "label": "New music node",
+          "template_id": "SVt3llC8SDhciCoZjoQF",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "modified_by": "udqJejWdiOPpyOKvtVnZ6OgEqCC2",
+          "modified_at_utc": "2026-09-24T10:41:42.187532Z",
+          "type": "generation",
+          "model_id": "eleven_music_v2",
+          "prompt": "One complete 30-second instrumental cinematic brand-film score, with a continuous musical arc and a deliberate composed ending. Heroic uplifting orchestral-electronic hybrid, 120 BPM: soaring real strings, warm bold French horns and brass, deep controlled orchestral percussion, confident rhythmic drive and broad harmonic lift. Quiet anticipatory opening 0-1 seconds; confident pulse builds 1-8; exhilarating harmonic opening at 9.5 seconds; largest orchestral lift and powerful forward drive 10-15; sustain epic momentum with space for typography 15-24; warm victorious resolution begins 24 and lands the final brand chord at 26, with a natural resonant tail through 30. Musical accents near18.54 and21.71 should feel part of the phrase, never stop the bed. Elegant premium cinema, not ominous suspense or a generic corporate jingle. Music only: absolutely no speech, vocals, choir, humming, chanting, lyrics, aircraft/engine sounds, typing, whooshes or environmental sound effects. No abrupt cut, no repeated loop, no silence gaps after the beginning.",
+          "model_parameters": {
+            "duration_seconds": 30,
+            "instrumental": true,
+            "lyrics_type": "instrumental"
+          }
+        }
+      ],
+      "canvas_summary": {
+        "total_nodes": 1,
+        "total_edges": 0,
+        "node_types": {
+          "music": 1
+        }
+      }
+    },
+    {
+      "key": "keyboard",
+      "flow_id": "SVt3llC8SDhciCoZjoQF",
+      "flow_created": false,
+      "url": "https://elevenlabs.io/app/flows/SVt3llC8SDhciCoZjoQF",
+      "flow_url": "https://elevenlabs.io/app/flows/SVt3llC8SDhciCoZjoQF",
+      "success": true,
+      "node_ids": [
+        "Tj5VzlOBjcAyGMqCcDjb"
+      ],
+      "created_nodes": [
+        {
+          "id": "Tj5VzlOBjcAyGMqCcDjb",
+          "label": "New sfx node",
+          "template_id": "SVt3llC8SDhciCoZjoQF",
+          "position": {
+            "x": 0,
+            "y": 700
+          },
+          "modified_by": "udqJejWdiOPpyOKvtVnZ6OgEqCC2",
+          "modified_at_utc": "2026-09-24T10:41:43.148093Z",
+          "type": "generation",
+          "model_id": "eleven_text_to_sound_v2",
+          "prompt": "Isolated close-miked premium laptop keyboard foley: a short natural irregular burst of light fingertip typing, dry rounded tactile key presses with subtle variation, finishing with one slightly deeper Enter key. Intimate, crisp and restrained, no room echo, no music, no voices, no electronic beeps, no cinematic impacts.",
+          "model_parameters": {
+            "duration_seconds": 2,
+            "prompt_influence": 0.6,
+            "loop": false
+          }
+        }
+      ],
+      "canvas_summary": {
+        "total_nodes": 2,
+        "total_edges": 0,
+        "node_types": {
+          "music": 1,
+          "sfx": 1
+        }
+      }
+    },
+    {
+      "key": "ui-slide",
+      "flow_id": "SVt3llC8SDhciCoZjoQF",
+      "flow_created": false,
+      "url": "https://elevenlabs.io/app/flows/SVt3llC8SDhciCoZjoQF",
+      "flow_url": "https://elevenlabs.io/app/flows/SVt3llC8SDhciCoZjoQF",
+      "success": true,
+      "node_ids": [
+        "XxFuyqXo2phy7YJOzOyN"
+      ],
+      "created_nodes": [
+        {
+          "id": "XxFuyqXo2phy7YJOzOyN",
+          "label": "New sfx node",
+          "template_id": "SVt3llC8SDhciCoZjoQF",
+          "position": {
+            "x": 0,
+            "y": 1400
+          },
+          "modified_by": "udqJejWdiOPpyOKvtVnZ6OgEqCC2",
+          "modified_at_utc": "2026-09-24T10:41:43.977209Z",
+          "type": "generation",
+          "model_id": "eleven_text_to_sound_v2",
+          "prompt": "One single refined interface card sliding quickly into place: a delicate short airy swish with a tiny soft tactile landing. Smooth clean modern glass interface, subtle and dry, not sci-fi laser, not a beep, no repeated events, no music, no voices.",
+          "model_parameters": {
+            "duration_seconds": 0.7,
+            "prompt_influence": 0.65,
+            "loop": false
+          }
+        }
+      ],
+      "canvas_summary": {
+        "total_nodes": 3,
+        "total_edges": 0,
+        "node_types": {
+          "music": 1,
+          "sfx": 2
+        }
+      }
+    },
+    {
+      "key": "portal",
+      "flow_id": "SVt3llC8SDhciCoZjoQF",
+      "flow_created": false,
+      "url": "https://elevenlabs.io/app/flows/SVt3llC8SDhciCoZjoQF",
+      "flow_url": "https://elevenlabs.io/app/flows/SVt3llC8SDhciCoZjoQF",
+      "success": true,
+      "node_ids": [
+        "vnNkMkC2eYMKsTG9E0kM"
+      ],
+      "created_nodes": [
+        {
+          "id": "vnNkMkC2eYMKsTG9E0kM",
+          "label": "New sfx node",
+          "template_id": "SVt3llC8SDhciCoZjoQF",
+          "position": {
+            "x": 0,
+            "y": 2100
+          },
+          "modified_by": "udqJejWdiOPpyOKvtVnZ6OgEqCC2",
+          "modified_at_utc": "2026-09-24T10:41:44.868245Z",
+          "type": "generation",
+          "model_id": "eleven_text_to_sound_v2",
+          "prompt": "One cinematic luminous portal opening: a brief tightly focused airy rising shimmer blooms into a warm deep clean impact and a short spatial tail. Powerful but elegant, synchronized sense of forward acceleration. No electrical buzzing, no laser shots, no repeated pulses, no engine, no music, no voice.",
+          "model_parameters": {
+            "duration_seconds": 1.2,
+            "prompt_influence": 0.65,
+            "loop": false
+          }
+        }
+      ],
+      "canvas_summary": {
+        "total_nodes": 4,
+        "total_edges": 0,
+        "node_types": {
+          "music": 1,
+          "sfx": 3
+        }
+      }
+    },
+    {
+      "key": "jet",
+      "flow_id": "SVt3llC8SDhciCoZjoQF",
+      "flow_created": false,
+      "url": "https://elevenlabs.io/app/flows/SVt3llC8SDhciCoZjoQF",
+      "flow_url": "https://elevenlabs.io/app/flows/SVt3llC8SDhciCoZjoQF",
+      "success": true,
+      "node_ids": [
+        "EH1lIkLfH0mC2dVhi3OR"
+      ],
+      "created_nodes": [
+        {
+          "id": "EH1lIkLfH0mC2dVhi3OR",
+          "label": "New sfx node",
+          "template_id": "SVt3llC8SDhciCoZjoQF",
+          "position": {
+            "x": 0,
+            "y": 2800
+          },
+          "modified_by": "udqJejWdiOPpyOKvtVnZ6OgEqCC2",
+          "modified_at_utc": "2026-09-24T10:41:45.767702Z",
+          "type": "generation",
+          "model_id": "eleven_text_to_sound_v2",
+          "prompt": "One single photoreal large commercial twin-turbofan passenger jet flyby in open air. Smooth approach from distance, one powerful close pass near the middle, natural Doppler pitch fall and continuous receding tail to silence. Weighty turbine roar and aerodynamic air rush, realistic scale. Exactly one aircraft and one pass. No second approach, no looping engine cycles, no stutter, no explosions, no music, no voice.",
+          "model_parameters": {
+            "duration_seconds": 5,
+            "prompt_influence": 0.7,
+            "loop": false
+          }
+        }
+      ],
+      "canvas_summary": {
+        "total_nodes": 5,
+        "total_edges": 0,
+        "node_types": {
+          "music": 1,
+          "sfx": 4
+        }
+      }
+    },
+    {
+      "key": "title-impact",
+      "flow_id": "SVt3llC8SDhciCoZjoQF",
+      "flow_created": false,
+      "url": "https://elevenlabs.io/app/flows/SVt3llC8SDhciCoZjoQF",
+      "flow_url": "https://elevenlabs.io/app/flows/SVt3llC8SDhciCoZjoQF",
+      "success": true,
+      "node_ids": [
+        "ILkOSJ3IoFFdIRdQp0Sm"
+      ],
+      "created_nodes": [
+        {
+          "id": "ILkOSJ3IoFFdIRdQp0Sm",
+          "label": "New sfx node",
+          "template_id": "SVt3llC8SDhciCoZjoQF",
+          "position": {
+            "x": 0,
+            "y": 3500
+          },
+          "modified_by": "udqJejWdiOPpyOKvtVnZ6OgEqCC2",
+          "modified_at_utc": "2026-09-24T10:41:46.994847Z",
+          "type": "generation",
+          "model_id": "eleven_text_to_sound_v2",
+          "prompt": "A single premium motion-graphics typography landing accent: short deep rounded cinematic thump with a crisp light woody transient and a very brief airy tail. Elegant, controlled weight, not a huge trailer explosion, not a metallic robot, not an aircraft or engine, no repetitions, no music, no voices.",
+          "model_parameters": {
+            "duration_seconds": 0.8,
+            "prompt_influence": 0.65,
+            "loop": false
+          }
+        }
+      ],
+      "canvas_summary": {
+        "total_nodes": 6,
+        "total_edges": 0,
+        "node_types": {
+          "music": 1,
+          "sfx": 5
+        }
+      }
+    }
+  ]
+}

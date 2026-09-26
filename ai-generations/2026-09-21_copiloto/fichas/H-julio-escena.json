@@ -1,0 +1,19 @@
+{
+  "id": "H-julio-escena",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["julio"],
+  "objetos": ["chaqueta-softshell-efeonce"],
+  "atmosfera": "polvo",
+  "escena": "SCENE (a staged portrait for a campaign piece, in the agency's production room): this is a PUT-TOGETHER picture, not a documentary moment. Julio stands, half sitting back against the edge of a dark worktable, arms folded across his chest, shoulders squared to the camera, and he LOOKS STRAIGHT INTO THE LENS. His expression is NOT a smile: chin level, jaw relaxed, mouth closed and steady, eyebrows level, the calm and slightly challenging look of someone who already knows the answer and is waiting for the question. His head stays FRONTAL to the camera: both eyes and both eyebrows fully visible, both cheeks visible, the bridge of his nose does not cut across either cheek. He wears the Efeonce softshell jacket, open, over a plain dark tee. CRITICAL ON LIGHT, this is where the picture gets its character, and every practical lamp in the room is SWITCHED OFF: the KEY is a single hard white source low and far to the LEFT, raking across him at a steep angle so one side of his face is bright and the other falls into open shadow, with the shadow of his nose short and readable on the cheek — modelled, never flat. A second hard source sits BEHIND him on the right and LOW, aimed back towards the camera, cutting a clean RIM along his shoulder, the collar of the jacket and the side of his head, separating him from the wall. That back light throws a visible SHAFT across the room through the floating dust, and the shaft, its glow and every pool it makes stay BELOW THE MIDDLE OF THE FRAME. Both sources are white: the highlights on his skin and on the jacket stay NEUTRAL, never yellow or amber, and nothing in the picture glows warm. The fall-off is steep and the far corners of the room sink to black. THREE PLANES, all readable: the out-of-focus body of a cinema camera on a tripod at the very front; Julio sharp in the middle; and behind him, far out of focus and small, a C-stand and a folded reflector catching the rim light, so the room has depth instead of being a flat wall. The wall behind him is bare dark concrete — there is NO blue panel, NO bookshelf, NO plant and NO domestic decor. He sits LOW in the frame: the very top of his head is at or BELOW 38% of the frame height, and the whole TOP THIRD of the picture is that bare dark wall, completely unbroken — no lamp, no stand, no cable, no shaft and no light patch may enter that band, and no glow may wash up into it. Everything is completely unbranded except his jacket. Chest-up medium close-up on an 85mm lens at f/2.8, focus on his eyes — never a wide lens, which would widen and distort his face.",
+  "lecho": {
+    "objeto": "the black body of the cinema camera on its tripod standing right at the lens, its matte box and rig crossing the ENTIRE bottom of the frame from left edge to right edge, a hand's width from the camera and dissolved completely out of focus. It sits OUTSIDE every light: neither the key nor the rim reaches it",
+    "tono": "NEAR-BLACK, the darkest thing in the picture and even across its whole width — NOTHING else appears in that bottom strip: no hands, no table edge, no cable, no highlight, no reflection, no lettering"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the bare dark concrete wall filling the top third behind him",
+      "tinta": "blanca"
+    }
+  }
+}

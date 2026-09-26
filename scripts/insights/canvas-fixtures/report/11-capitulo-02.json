@@ -1,0 +1,55 @@
+{
+  "reference": "Premium-Capitulo-02",
+  "catalog": "report",
+  "contentType": "report-chapter",
+  "slots": {
+    "chapterLabel": "Capítulo 02",
+    "chapterNumeral": "02",
+    "runningLabel": "Informe de agosto 2026",
+    "chapterTitle": "Motores de respuesta",
+    "chapterLead": "La IA ya conoce la marca: aparece en la mayoría de las respuestas. Lo que falta es que la cite como fuente, con enlace al sitio.",
+    "measuredChannels": {
+      "label": "Medimos la marca en",
+      "channels": [
+        {
+          "name": "Google",
+          "channelId": "google"
+        },
+        {
+          "name": "ChatGPT",
+          "channelId": "chatgpt"
+        },
+        {
+          "name": "Gemini",
+          "channelId": "gemini"
+        },
+        {
+          "name": "Claude",
+          "channelId": "claude"
+        },
+        {
+          "name": "Perplexity",
+          "channelId": "perplexity"
+        }
+      ]
+    },
+    "contents": {
+      "label": "En este capítulo",
+      "entries": [
+        {
+          "title": "Presencia de la marca en respuestas de IA",
+          "folio": "16"
+        },
+        {
+          "title": "Google y la IA: dónde coinciden",
+          "folio": "17"
+        },
+        {
+          "title": "Presencia por canal de IA",
+          "folio": "18"
+        }
+      ]
+    },
+    "pageFolio": "15"
+  }
+}

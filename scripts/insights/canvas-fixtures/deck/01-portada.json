@@ -1,0 +1,17 @@
+{
+  "reference": null,
+  "catalog": "deck",
+  "contentType": "insights-cover",
+  "slots": {
+    "editionLabel": "Informe mensual · Agosto 2026",
+    "eyebrow": "Lectura de Efeonce",
+    "reportTitle": "Visibilidad, respuestas de IA y entrega",
+    "reportSubtitle": "Qué cambió en agosto, por qué cambió y qué haremos en septiembre.",
+    "confidentialityLine": "Confidencial · Versión 1 · 2 de septiembre de 2026",
+    "preparedFor": {
+      "label": "Preparado para",
+      "clientName": "Nombre del cliente"
+    }
+  },
+  "name": "deck-portada"
+}

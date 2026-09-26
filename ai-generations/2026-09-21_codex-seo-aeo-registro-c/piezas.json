@@ -1,0 +1,137 @@
+[
+  {
+    "id": "01-presencia",
+    "plate": "plates/01-presencia-v2.png",
+    "align": "left",
+    "top": 0.067,
+    "textWidth": 0.84,
+    "label": "SEO + AEO",
+    "labelSize": 23,
+    "labelGap": 0.15,
+    "lead": "Tu próximo cliente ya está buscando.",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 31,
+    "leadGap": 0.17,
+    "dominant": "¿Sales tú?",
+    "dominantSize": 151,
+    "dominantMax": 0.79,
+    "after": "Trabaja tu visibilidad en buscadores e IA.|**Solicita un diagnóstico SEO/AEO.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 29,
+    "afterGap": 0.17,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "final": [
+      1080,
+      1350
+    ],
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.25,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    }
+  },
+  {
+    "id": "02-relevancia",
+    "plate": "plates/02-relevancia-v4.png",
+    "align": "left",
+    "top": 0.067,
+    "textWidth": 0.84,
+    "label": "SEO + AEO",
+    "labelSize": 23,
+    "labelGap": 0.15,
+    "lead": "Tener una web es el comienzo.",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 31,
+    "leadGap": 0.17,
+    "dominant": "Sé relevante.",
+    "dominantSize": 151,
+    "dominantMax": 0.79,
+    "after": "Conecta tu contenido con preguntas reales.|**Solicita un diagnóstico SEO/AEO.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 29,
+    "afterGap": 0.17,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "final": [
+      1080,
+      1350
+    ],
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.25,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    }
+  },
+  {
+    "id": "03-diagnostico",
+    "plate": "plates/03-diagnostico-v4.png",
+    "align": "left",
+    "top": 0.067,
+    "textWidth": 0.84,
+    "label": "SEO + AEO",
+    "labelSize": 23,
+    "labelGap": 0.15,
+    "lead": "¿Tu marca aparece en las respuestas?",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 31,
+    "leadGap": 0.17,
+    "dominant": "Mídelo.",
+    "dominantSize": 151,
+    "dominantMax": 0.79,
+    "after": "Detecta dónde estás y qué falta trabajar.|**Solicita un diagnóstico SEO/AEO.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 29,
+    "afterGap": 0.17,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "final": [
+      1080,
+      1350
+    ],
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.25,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    }
+  }
+]

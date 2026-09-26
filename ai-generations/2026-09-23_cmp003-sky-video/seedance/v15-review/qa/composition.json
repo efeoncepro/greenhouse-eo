@@ -1,0 +1,91 @@
+{
+  "sourceSha256": "e2732a2f5d22fa515ec77ff912d2ec91468fea4a7b42a593e1e778e187f6eaeb",
+  "outputSha256": "f93bc526c2b9b2948d4619d490351b0153a9c176ff9b869953e9b6e4ee16df49",
+  "frames": 720,
+  "titleOffset": 15.75,
+  "urlOffset": 26,
+  "urlWidth": 320,
+  "urlMode": "non-separable-luminosity",
+  "opacity": "1 on approved alpha containing original .72 and fade",
+  "audio": false,
+  "approvedSourceHashesVerified": true,
+  "samples": [
+    {
+      "frame": 624,
+      "method": "non-separable-luminosity",
+      "backdrop": "composed-master-before-url-bubble",
+      "opacity": 1,
+      "region": {
+        "left": 380,
+        "top": 1245,
+        "width": 320,
+        "height": 83
+      },
+      "changedChannels": 0,
+      "maxChannelDelta": 0,
+      "visible": false
+    },
+    {
+      "frame": 630,
+      "method": "non-separable-luminosity",
+      "backdrop": "composed-master-before-url-bubble",
+      "opacity": 1,
+      "region": {
+        "left": 380,
+        "top": 1245,
+        "width": 320,
+        "height": 83
+      },
+      "changedChannels": 18393,
+      "maxChannelDelta": 80,
+      "visible": true
+    },
+    {
+      "frame": 648,
+      "method": "non-separable-luminosity",
+      "backdrop": "composed-master-before-url-bubble",
+      "opacity": 1,
+      "region": {
+        "left": 380,
+        "top": 1245,
+        "width": 320,
+        "height": 83
+      },
+      "changedChannels": 18393,
+      "maxChannelDelta": 80,
+      "visible": true
+    },
+    {
+      "frame": 684,
+      "method": "non-separable-luminosity",
+      "backdrop": "composed-master-before-url-bubble",
+      "opacity": 1,
+      "region": {
+        "left": 380,
+        "top": 1245,
+        "width": 320,
+        "height": 83
+      },
+      "changedChannels": 18387,
+      "maxChannelDelta": 79,
+      "visible": true
+    },
+    {
+      "frame": 719,
+      "method": "non-separable-luminosity",
+      "backdrop": "composed-master-before-url-bubble",
+      "opacity": 1,
+      "region": {
+        "left": 380,
+        "top": 1245,
+        "width": 320,
+        "height": 83
+      },
+      "changedChannels": 18387,
+      "maxChannelDelta": 79,
+      "visible": true
+    }
+  ],
+  "review": "candidate; music replacement pending",
+  "closingCorrection": "thanks exit softened 25.35-26; cloud-shaped blue reveal; logos and URL timing retained"
+}

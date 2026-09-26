@@ -1,0 +1,34 @@
+{
+  "flow_id": "c1xwy5PjHyOFVHtKgBAy",
+  "flow_created": false,
+  "url": "https://elevenlabs.io/app/flows/c1xwy5PjHyOFVHtKgBAy?vs=viewstate_01m3938e4aerjb82t1fyxhehx3",
+  "flow_url": "https://elevenlabs.io/app/flows/c1xwy5PjHyOFVHtKgBAy",
+  "results": [
+    {
+      "success": true,
+      "node_id": "aqBNAAlqiCXfqnkWmhVR",
+      "session_id": "jypVUqjiLJI6lUmnddtm"
+    }
+  ],
+  "summary": {
+    "nodes_run": 1,
+    "generations_started": 1,
+    "failed": 0,
+    "generations_by_node": {
+      "aqBNAAlqiCXfqnkWmhVR": 1
+    }
+  },
+  "session_ids": [
+    "jypVUqjiLJI6lUmnddtm"
+  ],
+  "pending": [
+    {
+      "generation_id": "c8IaAqnXH7PZxePohmw4",
+      "kind": "video",
+      "generation_url": "https://elevenlabs.io/app/image-video/history?modality=video&generationId=c8IaAqnXH7PZxePohmw4"
+    }
+  ],
+  "poll_after_seconds": 15,
+  "notes": "Not finished yet. If a generation view is shown it tracks progress and polls by itself, so there is nothing to do here. Only call creative_get_flow_run_status yourself if no view appeared: wait poll_after_seconds, then call it with this flow_id and session_ids, repeating until all_completed or has_failures is true.",
+  "view_state_id": "viewstate_01m3938e4aerjb82t1fyxhehx3"
+}

@@ -34,6 +34,15 @@ export const MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE = 'hiring.candidate.review.re
 export const MCP_CLIENT_SERVICES_OAUTH_CLIENT_ID = 'efeonce-mcp-client-services'
 export const MCP_CLIENT_SERVICES_INPUT_SCOPE = 'efeonce.mcp.client_services.write'
 export const MCP_CLIENT_SERVICES_GREENHOUSE_SCOPE = 'client_services.enablement.write'
+/**
+ * TASK-1891 — lectura de Efeonce Marketing Studio por MCP. Studio no conoce personas: el gateway canjea el token
+ * de la persona aquí, donde se ejecuta `can(persona, 'marketing_studio.campaign.read')` en cada llamada, y sólo si
+ * aprueba llama a Studio con su bearer de servicio. Scope de entrada = el base de lectura: la barrera de persona es
+ * la capability, no el scope (las escrituras de Studio tendrán su propia clase, TASK-1899).
+ */
+export const MCP_MARKETING_STUDIO_OAUTH_CLIENT_ID = 'efeonce-mcp-marketing-studio'
+export const MCP_MARKETING_STUDIO_INPUT_SCOPE = 'efeonce.mcp.read'
+export const MCP_MARKETING_STUDIO_GREENHOUSE_SCOPE = 'marketing_studio.campaign.read'
 export const RFC8693_TOKEN_EXCHANGE_GRANT = 'urn:ietf:params:oauth:grant-type:token-exchange'
 export const RFC8693_ACCESS_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:access_token'
 export const MCP_EXCHANGED_TOKEN_TTL_SECONDS = 300
@@ -74,6 +83,7 @@ type McpTokenExchangeDependencies = Readonly<{
   authorizeTalentPool?: (tenant: TenantAccessRecord) => boolean
   authorizeCandidateReview?: (tenant: TenantAccessRecord) => boolean
   authorizeClientServices?: (tenant: TenantAccessRecord) => boolean
+  authorizeMarketingStudio?: (tenant: TenantAccessRecord) => boolean
   issueToken?: (input: IssueTokenInput) => Promise<IssuedToken>
   now?: () => Date
 }>
@@ -117,13 +127,14 @@ export type McpTokenExchangeResult = Readonly<{
     | typeof MCP_TALENT_POOL_GREENHOUSE_SCOPE
     | typeof MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE
     | typeof MCP_CLIENT_SERVICES_GREENHOUSE_SCOPE
+    | typeof MCP_MARKETING_STUDIO_GREENHOUSE_SCOPE
 }>
 
 type ExchangeScopeContract = Readonly<{
   inputScope: string
   greenhouseScope: McpTokenExchangeResult['scope']
   clientId: string
-  resourceFamily: 'globe' | 'hiring' | 'client_services'
+  resourceFamily: 'globe' | 'hiring' | 'client_services' | 'marketing_studio'
   requireWorkspaceBinding: boolean
 }>
 
@@ -204,7 +215,9 @@ export async function exchangeMcpGatewayToken(
       ? (dependencies.authorizeFunding ?? authorizeFunding)(tenant)
       : scopeContract.resourceFamily === 'client_services'
         ? (dependencies.authorizeClientServices ?? authorizeClientServices)(tenant)
-        : scopeContract.greenhouseScope === MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE
+        : scopeContract.resourceFamily === 'marketing_studio'
+          ? (dependencies.authorizeMarketingStudio ?? authorizeMarketingStudio)(tenant)
+          : scopeContract.greenhouseScope === MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE
           ? (dependencies.authorizeCandidateReview ?? authorizeCandidateReview)(tenant)
           : (dependencies.authorizeTalentPool ?? authorizeTalentPool)(tenant)
 
@@ -291,6 +304,16 @@ function resolveScopeContract(requestedScope: string): ExchangeScopeContract {
       greenhouseScope: MCP_CLIENT_SERVICES_GREENHOUSE_SCOPE,
       clientId: MCP_CLIENT_SERVICES_OAUTH_CLIENT_ID,
       resourceFamily: 'client_services',
+      requireWorkspaceBinding: false
+    }
+  }
+
+  if (requestedScope === MCP_MARKETING_STUDIO_GREENHOUSE_SCOPE) {
+    return {
+      inputScope: MCP_MARKETING_STUDIO_INPUT_SCOPE,
+      greenhouseScope: MCP_MARKETING_STUDIO_GREENHOUSE_SCOPE,
+      clientId: MCP_MARKETING_STUDIO_OAUTH_CLIENT_ID,
+      resourceFamily: 'marketing_studio',
       requireWorkspaceBinding: false
     }
   }
@@ -549,6 +572,28 @@ function authorizeClientServices(tenant: TenantAccessRecord) {
       'create',
       'tenant'
     )
+  )
+}
+
+function authorizeMarketingStudio(tenant: TenantAccessRecord) {
+  return can(
+    {
+      userId: tenant.userId,
+      tenantType: tenant.tenantType,
+      roleCodes: tenant.roleCodes,
+      primaryRoleCode: tenant.primaryRoleCode,
+      routeGroups: tenant.routeGroups,
+      authorizedViews: tenant.authorizedViews,
+      projectScopes: tenant.projectScopes,
+      campaignScopes: tenant.campaignScopes,
+      businessLines: tenant.businessLines,
+      serviceModules: tenant.serviceModules,
+      portalHomePath: tenant.portalHomePath,
+      ...(tenant.memberId ? { memberId: tenant.memberId } : {})
+    },
+    MCP_MARKETING_STUDIO_GREENHOUSE_SCOPE,
+    'read',
+    'tenant'
   )
 }
 

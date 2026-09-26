@@ -1,5 +1,39 @@
 # Licitación SKY — Servicio de Producción de Contenido Blog (Wherex, 2026)
 
+> # ✅ Estado vigente 2026-09-23 — ADJUDICADA
+>
+> **SKY adjudicó a Efeonce el servicio el 2026-09-23** (correo de Nashira Año Meza, Analista de Compras).
+> Efeonce fue finalista entre ~15 propuestas. Todo lo que sigue más abajo sobre "qué falta para entregar",
+> plazos de entrega o cifras de la oferta original es **registro histórico de la licitación**.
+>
+> | | Vigente |
+> |---|---|
+> | **Condiciones finales** | **CLP 3.000.000 netos/mes + IVA** (CLP 3.570.000 con IVA) · **24 meses, vigente hasta 2028** (inicio 2026-11-01) → TCV **CLP 72.000.000 neto**. Capacidad gobernada para 45–50 contenidos/mes (nuevos + refreshes), newsletter mensual incluida (hasta 10 contenidos), Notion/Content Hub como hub editorial, WordPress como superficie de publicación, addons aparte, **sin precio unitario por artículo**. |
+> | **Formalización** | **Adenda al contrato vigente con Marketing** (no contrato nuevo). Coordinador en SKY: **Slauko Davor Balaic Guerrero**. |
+> | **Comprador en SKY** | **Equipo de Marca.** Contraparte principal: **Natalia Ortiz Cáceres** (Coordinadora de Comunicación al Pasajero) y su equipo. Gerente de Marketing: Nicolá Lamiaux. Es un equipo comprador distinto del de Performance, que compra la Agencia Creativa. |
+> | **Transición** | Durante **octubre 2026** (Natalia comparte antecedentes). **Kickoff de transición: lunes 2026-09-28, 11:00.** |
+> | **Inicio del servicio** | **2026-11-01** |
+> | **Equipo operativo** | **Valentina Hoyos — Redactora SEO**; el operador va a contratar más equipo. El mapeo de squad del deck (Julio 12% · María Fernanda SEO Copywriter · Daniela · Melkin · Andrés como "SEO Specialist") era el de la **propuesta** y es **histórico**: no es el equipo operativo confirmado. |
+> | **HubSpot** | Deal `62535094842` "SKY Airline — Licitación Blog SEO/AEO (Wherex)" → **Cierre ganado**, closedate 2026-09-23, monto CLP 72.000.000; nota de adjudicación `117311269190`. |
+> | **Greenhouse (2026-09-24)** | **SEO y AEO asignados a Sky (tier `contracted`)** por el camino gobernado: SERVICE HubSpot `591725750952` → `SVC-HS-591725750952` → términos `7c38b899…` (`bundledModules=[seo_v2, ai_visibility_v1]`, CLP 3.000.000) → apply `EO-APC-9676214B` (TASK-1852). Target SEO `skyairline.com` creado. Scripts: `scripts/growth/provision-sky-blog-seo.ts`, `scripts/client-portal/enable-sky-blog-seo-aeo.ts`. Falta operativo: Search Console del blog, keywords/competidores y primer login de las personas Sky en la transición de octubre. |
+> | **Práctica dueña** | `seo-aeo-practice` (NO `creative-practice`). No mezclar alcance ni márgenes con la Agencia Creativa de SKY. |
+>
+> **Por qué ganamos:** (1) relación y confianza — cuenta ancla desde 2023, el comité lo reconoció como
+> ventaja; (2) propuesta como **operación de canal, no fábrica de artículos** sobre un blog con tracción
+> (~13.000 keywords, ~40.000 visitas orgánicas/mes); (3) **evidencia verificable** — AI Visibility Grader
+> publicado, Radiografía AEO con artículo real y benchmark AEO competitivo (LATAM, JetSMART, Avianca, Gol);
+> (4) **ajuste económico por alcance, no por descuento** — presupuesto declarado ~USD 3.000/mes → Core
+> 3,0M con capacidad gobernada; (5) squad real, SLA y penalidades aceptadas, y el caso comparable de
+> Grupo Berel (también vía Wherex).
+>
+> 🏆 **Hito 2026-09-23 — primera licitación GANADA con el flujo agéntico de licitaciones.** La propuesta SKY Blog (Wherex) se construyó con el método de la skill `greenhouse-public-private-tenders` (bases → admisibilidad → diagnóstico → oferta) y se compuso con el **Artifact Composer**: deck desde catálogo, oferta técnica y económica y Excel generados desde fuente versionada, y evidencia viva (AI Visibility Grader y Radiografía AEO). La operó el operador junto a un agente. La adjudicación **no se atribuye sólo al flujo**: pesaron la relación existente con SKY, las reuniones de ronda 2, la negociación humana y el ajuste económico por alcance. Pero es la **primera validación en el mercado** de lo construido: una oferta producida con este flujo compitió contra ~15 propuestas y ganó, y lo hizo en una **cuenta de talla enterprise** (SKY Airline, aerolínea), no en un piloto menor.
+
+> 📘 **Análisis completo (qué hicimos bien, qué mejorar, riesgos y qué replicar):** [`ANALISIS-ADJUDICACION-Y-PATRON-DE-CUENTA-INTERNO.md`](ANALISIS-ADJUDICACION-Y-PATRON-DE-CUENTA-INTERNO.md) — interno, nunca va a SKY.
+>
+> **Superseded:** las cifras de la oferta original (CLP 5,2M/mes, 8 artículos, TCV 124,8M, BAFO 4,3M,
+> piso 5,0M) **no son las condiciones vigentes**.
+
+
 > # ⚠️ Dónde vive qué (corregido 2026-07-12)
 >
 > **La licitación SE TRABAJA EN EL REPO.** Antes este README decía que los entregables vivían en OneDrive
@@ -56,6 +90,9 @@ por separado, una arquitectura interna de capacidad/margen. La salida está comp
 enviarla o registrarla como versión productiva se debe reconciliar el envelope de capacidad con el mix real,
 el cost-to-serve y el margen aprobado.
 
+> **2026-09-23:** la configuración económica V2 (Core CLP 3.000.000 netos/mes) es la que SKY **adjudicó**; su
+> margen y cost-to-serve quedaron **validados internamente por el operador**. La advertencia de arriba queda cerrada.
+
 ---
 
 ## 🚀 ¿Sesión nueva? Empieza acá
@@ -67,18 +104,18 @@ enlaces no clickeables, el discurso de la §3) y **lo que ya aprendimos y no hay
 
 ---
 
-## ⚠️ Lo primero que tienes que saber
+## ⚠️ Lo primero que tienes que saber *(histórico — etapa de licitación)*
 
 | | |
 |---|---|
 | **Entrega** | **15/07/2026.** ✅ **RESUELTO por el operador (2026-07-12): el proceso SIGUE ABIERTO y cierra el 15.** La contradicción de las bases (§2.2 dice 15/07, §2.8 dice *"apertura de ofertas 10 de julio 16:00"*) **queda zanjada: manda el 15.** No volver a levantarla. |
 | **Plataforma** | Wherex (las comisiones del adjudicado las absorbe Efeonce) |
 | **Excluyente único** | No tener demandas contra SKY → ✅ **confirmado 2026-07-11** |
-| **Deal HubSpot** | `62535094842` · Company `Sky Airlines` (`30825221458`) · TCV **CLP 124.800.000** (2 años) |
+| **Deal HubSpot** | `62535094842` · Company `Sky Airlines` (`30825221458`) · ~~TCV CLP 124.800.000 (2 años)~~ *(histórico, oferta original)* → **Cierre ganado 2026-09-23, CLP 72.000.000** |
 
 ---
 
-## Qué falta para poder entregar
+## Qué falta para poder entregar *(histórico — la oferta ya se entregó y fue adjudicada el 2026-09-23)*
 
 | # | Entregable | Estado |
 |---|---|---|
@@ -141,7 +178,10 @@ enlaces no clickeables, el discurso de la §3) y **lo que ya aprendimos y no hay
 
 ## Las cifras reales (para el deck y el Excel — NUNCA inventar)
 
-**Económica (CLP, neto sin IVA, sin reajuste):**
+> ⚠️ **Histórico / superseded.** La tabla económica de abajo es la **oferta original**. Las condiciones
+> vigentes son las del bloque *Estado vigente 2026-09-23* al inicio de este README (CLP 3,0M netos/mes × 24).
+
+**Económica original (CLP, neto sin IVA, sin reajuste) — superseded:**
 
 | Plan | Alcance mensual | Valor mensual |
 |---|---|---|
@@ -162,7 +202,7 @@ Pago 30 días desde aceptación conforme de la factura · facturación mensual �
 **Semrush (el blog ya tiene tracción):** ~13.000 keywords · ~40.000 visitas orgánicas/mes.
 Páginas a un paso del top 3: Antofagasta (~110.000 vol, pos. **12**) · Terminal sur Santiago (~33.000, pos. **9**) · Camboriú (~22.000, pos. **6**) · Puerto Fuy (~22.000, pos. **6**).
 
-**Squad:** ≈ **2,2 FTE**, 9 roles con dedicación declarada (ver §10 de la técnica). **Fotos REALES** —
+**Squad (de la propuesta, histórico):** ≈ **2,2 FTE**, 9 roles con dedicación declarada (ver §10 de la técnica). El equipo operativo vigente está en el bloque *Estado vigente*. **Fotos REALES** —
 una cara generada con IA es **tergiversación**, no un tema estético.
 
 ---

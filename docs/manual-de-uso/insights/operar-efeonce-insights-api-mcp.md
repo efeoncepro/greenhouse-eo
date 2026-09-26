@@ -1,18 +1,19 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.5
+> **Version:** 1.10
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-18 por Claude (TASK-1848 code complete: enlaces, correo y recurrencia; sin deploy)
+> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1889: revisar el diseño aprobado antes de compartir; antes, TASK-1888: portada preferida por cliente, logo para fondo oscuro, preview del contrato editorial v2)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
 
 Crear y seguir ediciones de Efeonce Insights sin pantalla (la UI llega en TASK-1849): desde el
 portal autenticado (lane `app`), desde un consumer del ecosistema (lane `ecosystem`) o desde un
-agente por MCP. Hoy el flujo llega hasta `ready_for_review` y, en staging, hasta el deck PDF renderizado;
-emitir sigue apagado en todos los ambientes. Las recetas de enlaces compartidos, envío por correo y
-recurrencia (TASK-1848) están en su sección: el código existe, pero **no está desplegado** (2026-09-18).
+agente por MCP. Hoy el flujo llega hasta `ready_for_review` y, en staging y producción, hasta el deck PDF renderizado;
+emitir sigue apagado en producción (encendido en staging desde 2026-09-18 para el canary de TASK-1848). Las
+recetas de enlaces compartidos, envío por correo y recurrencia (TASK-1848) están en su sección: el código está
+**en producción con los flags OFF** (release `bda1cf2cd938`, 2026-09-18) y encendido en staging.
 
 ## Antes de empezar
 
@@ -98,12 +99,12 @@ del gateway (binding interno del provider SEO/Insights, scope `internal`), nunca
 Evidencia del 2026-09-15: `EO-INS-000012` (app, staging), `EO-INS-000013` (ecosystem, staging),
 `EO-INS-000014` (ecosystem, producción); las tres `ready_for_review` sobre la org sintética Greenhouse Demo.
 
-Vista web compartida: cuando exista (TASK-1848/1849), el enlace apuntará a `think.efeoncepro.com/insights/r/<token>`;
+Vista web compartida: el resolver por token ya existe (TASK-1848); cuando exista la página de Think (TASK-1875), el enlace apuntará a `think.efeoncepro.com/insights/r/<token>`;
 Think resuelve el token contra Greenhouse en cada visita, así que revocar el enlace corta el acceso de inmediato.
 
 MCP: `get_insights_catalog` → `create_insight_edition` → `get_insight_edition` (con `includeEvidence`),
 con el manual servido `efeonce-insights` (`get_greenhouse_skill`). Las cuatro tools **ya están federadas** en el
-gateway `efeonce-mcp` (versión 1.5.0, 47 tools, 8 clases de scope, desplegado el 2026-09-15): las tres de
+gateway `efeonce-mcp` (federadas en la versión 1.5.0 del 2026-09-15; hoy el gateway está en **1.7.0, 58 tools**, 2026-09-18): las tres de
 lectura con el scope base `efeonce.mcp.read`; `create_insight_edition` exige la clase
 `efeonce.mcp.insights.write`, que ya existe en Entra pero **ningún cliente porta todavía** → responde
 `insufficient_scope` hasta un consentimiento/grant gobernado. Canary de lectura del gateway:
@@ -113,8 +114,14 @@ lectura con el scope base `efeonce.mcp.read`; `create_insight_edition` exige la 
 
 Cuando una edición está en `ready_for_review`, se puede encargar su **deck PDF**. El encargo es
 asíncrono: la respuesta es un `run` con un `output` por target en cola; el archivo lo produce el
-worker de render y se consulta después. Hoy sólo `deck_pdf` es renderizable; pedir `report_pdf` o
-`web` responde `422 render_rejected` y no encola nada.
+worker de render y se consulta después. Son renderizables `deck_pdf` (catálogo `insights-deck`) y `report_pdf`
+(informe A4, catálogo `insights-report`): en staging desde 2026-09-22 y en producción desde el 2026-09-24 (release
+`ebb9212a32ce`). `web` responde siempre `422 render_rejected` y no encola nada.
+
+El `report_pdf` de staging se verificó con canaries internos Berel y Sky (15/7 páginas, respectivamente). Una
+exportación sintética local de 30 páginas confirmó tamaño A4, fuentes incrustadas y pie/folio en todas las páginas;
+esa prueba no acredita el runtime. En producción, el catálogo de Insights anuncia `deck_pdf` y `report_pdf` desde el
+release del 2026-09-24; el primer render productivo de `report_pdf` todavía no se ha ejercitado.
 
 1. `POST /api/platform/app/insights/editions/{editionId}/render` con `{ "organizationId": "…" }`
    (interno) y opcionalmente `"outputs": ["deck_pdf"]`. Respuesta `202` con `run`, `outputs` e
@@ -191,6 +198,24 @@ credenciales que «Canary por lane ecosystem»):
 5. Gateway: en el repo `efeonce-mcp`, `scripts/greenhouse-insights-canary.mjs --render-run` → catalog (renderable=1),
    list, render run `completed` y deny `404` verdes.
 
+### Canary de render en producción con datos reales (receta usada el 2026-09-25)
+
+La org sintética «Greenhouse Demo» sirve para probar el deck vacío, pero **no para un informe con datos**: sus
+espacios no tienen snapshots ICO y el encargo falla en validación con `evidence_rejected`, que es lo correcto.
+Para probar A4 y deck con datos reales:
+
+1. Pedir autorización explícita al operador: es una escritura en producción bajo la organización de un cliente.
+2. Confirmar en `GET …/catalog?organizationId=<org>` que el módulo está disponible y que `renderableOutputs`
+   incluye `deck_pdf` y `report_pdf`.
+3. Crear la edición con `audience: "internal"` y una `Idempotency-Key` fija. Con emisión y sharing apagados en
+   producción, el cliente no la ve ni recibe nada.
+4. `POST …/editions/<editionId>/render` con `{}` (las dos salidas) → `202`. Si responde `200 idempotent:true`, esa
+   edición ya tenía una salida viva: el render no se repite; usar otra edición.
+5. Esperar al dispatcher: una salida por tick de 2 min. Bajar los PDF del asset (`greenhouse_core.assets`) y
+   revisar páginas, fuentes (`pdffonts`) y que las cifras (`pdftotext`) sean las del snapshot.
+
+El 2026-09-25 se usó Sky Airlines (`EO-INS-000022`): deck 5 láminas y A4 8 páginas al primer intento.
+
 ### Canary de render en staging (receta usada el 2026-09-16)
 
 Con la org sintética «Greenhouse Demo» y la persona cliente:
@@ -207,11 +232,25 @@ Con la org sintética «Greenhouse Demo» y la persona cliente:
    persona cliente → `404`, sin outputs.
 5. Contra PostgreSQL real: `pnpm test:live src/lib/efeonce-insights/render` (4/4 el 2026-09-16).
 
-## Enlaces, correo y recurrencia (TASK-1848 — code complete 2026-09-18, sin deploy)
+## Enlaces, correo y recurrencia (TASK-1848 — en producción con flags OFF desde 2026-09-18)
 
-> **Estado:** commits locales en `develop`, sin push ni deploy; migraciones aplicadas en la base compartida;
-> flags de Vercel OFF; tipos de correo pausados. Hasta el rollout, estas recetas sólo corren en local o en live tests.
+> **Estado (2026-09-18):** código en producción (release `bda1cf2cd938`) con `INSIGHTS_SHARING/DELIVERY/SCHEDULES_ENABLED`
+> y la emisión **OFF en producción** hasta que exista el lector de Think (TASK-1875). En **staging** los cuatro flags
+> están ON y el canary sintético corrió completo en la org sandbox (`EO-INS-000015`); los dos correos llegaron al buzón
+> autorizado del operador (evidencia humana: Resend no reporta `delivered`, ISSUE-160). Canary de contrato en
+> producción: crear enlace ⇒ `503 sharing_disabled`; lector público con token inexistente ⇒ `404`; sin token ⇒ `401`.
 > Todo requiere una edición `issued` con audiencia `client`.
+>
+> **Por MCP (`mcp.efeonce.org`, gateway 1.7.0):** cinco lecturas con el scope base (`list_insight_shares`,
+> `list_insight_deliveries`, `get_insight_delivery`, `list_insight_schedules`, `get_insight_schedule`) y dos
+> escrituras de enlace (`create_insight_share`, `revoke_insight_share`) que exigen `efeonce.mcp.insights.write`
+> — ningún cliente la porta, así que hoy responden `insufficient_scope`. **Enviar por correo y programar recurrencias
+> no existen por MCP**: sólo lane App (persona interna; UI en el portal cuando llegue TASK-1849). En el gateway,
+> `*_disabled` (503) llega como `policy_blocked` y `quota_exceeded` (429) como `rate_limited`.
+>
+> ⚠️ **Nunca pruebes límites (rate limit, cuota) con ráfagas concurrentes** contra la base compartida: una ráfaga de
+> 64 requests al lector público dejó 86–88 conexiones ociosas en Cloud SQL durante 5 min (ISSUE-174; TASK-1876).
+> Secuencia las requests.
 
 ### Flags y dónde se leen
 
@@ -236,7 +275,7 @@ Prender un flag del worker es multi-runtime: `deploy.sh` + revisión activa (led
 2. Listar: `GET …/editions/<editionId>/shares` (sin token ni digest).
 3. Revocar: `POST /api/platform/app/insights/shares/<shareGrantId>/revoke`. Idempotente; nunca reactiva.
 - Ecosystem: mismas rutas bajo `/api/platform/ecosystem/insights/**`; crear y revocar exigen binding `internal`.
-- MCP: `create_insight_share`, `list_insight_shares`, `revoke_insight_share` (el gateway aún no las federa).
+- MCP: `create_insight_share`, `list_insight_shares`, `revoke_insight_share` (federadas en el gateway 1.7.0; crear y revocar exigen `efeonce.mcp.insights.write`, que ningún cliente porta).
 - Límite: 20 activos por edición → `429 quota_exceeded`. Permiso: `insights.share.manage` (Admin/Account; cliente executive sobre su org).
 
 ### Leer el reader público
@@ -327,6 +366,164 @@ Un destinatario `ambiguous` (o `claimed` hace más de 30 min; señal `insights.d
 - No prometer que revocar recupera lo descargado o un PDF adjunto ya enviado: no es revocable.
 - No crear un cron por cliente para recurrencias: hay un solo tick para todas las organizaciones.
 
+## Portada del informe y contrato editorial v2 (TASK-1888 — construido, flag OFF)
+
+Para qué: fijar si los informes de un cliente llevan portada azul marino o blanca, cargar el logo que se lee sobre fondo
+oscuro, y revisar con datos reales cómo saldría el plan del diseño nuevo antes de prenderlo.
+
+**Antes de empezar.** Fijar la preferencia exige ser administración o cuentas de Efeonce (capability
+`insights.cover_preference.manage`); leerla, poder leer los informes de esa organización. La organización debe tener
+el módulo `insights_v1`. Todo esto funciona con `INSIGHTS_EDITORIAL_V2_ENABLED` apagado: la preferencia se guarda y se
+aplica a las ediciones que se generen después de prender el flag.
+
+**Fijar la preferencia (lane App, sesión interna).**
+
+```bash
+curl -sX POST "$BASE/api/platform/app/insights/cover-preference" -H 'content-type: application/json' \
+  --cookie "$SESSION" -d '{"organizationId":"<org-…>","coverTheme":"light"}'
+```
+
+- `coverTheme`: `auto` (navy sólo si hay logo para fondo oscuro; si no, blanca), `dark` o `light`.
+- Respuesta `200` con `{ preference, changed }`. El mismo valor otra vez responde `changed: false` y no escribe nada.
+- Leerla: `GET …/insights/cover-preference?organizationId=<org-…>`. `isDefault: true` = nunca se fijó (se lee `auto`).
+- Por MCP: `get_insight_cover_preference` / `set_insight_cover_preference` (fijar = binding interno y scope
+  `efeonce.mcp.insights.write`). Las dos tools existen en el gateway sólo después del deploy de efeonce-mcp#18.
+- **Para un solo encargo:** `request.brand.coverTheme` en `create_insight_edition` o en la API. Gana sobre la preferencia.
+
+**Cargar el logo para fondo oscuro.** Igual que el logo normal (sube el asset con el flujo de logos de la organización)
+y adjúntalo con la variante:
+
+```bash
+curl -sX POST "$BASE/api/organizations/<org-…>/brand-assets/logo" -H 'content-type: application/json' \
+  --cookie "$SESSION" -d '{"assetId":"<asset-…>","variant":"on_dark","reason":"logo blanco para portada navy"}'
+```
+
+Sin esa variante, `auto` siempre da portada blanca, y una portada `dark` forzada va **sin** logo del cliente (nunca el
+logo normal sobre azul marino).
+
+**Revisar el plan v2 con datos reales, sin escribir nada.** Con el proxy arriba (`pnpm pg:connect`):
+
+```bash
+GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false \
+  pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/insights/preview-edition.ts \
+  --edition=<insed-…> --org=<org-…> --editorial-v2 --plan-only
+```
+
+Imprime las familias de gráfico, la lectura de cada figura, lo esencial, las líneas de alcance, la portada resuelta y
+las metas usadas. `0 violaciones` es la condición para seguir; una violación es un bug del productor, no un dato.
+
+**Qué significan las señales.**
+- `bullet:chart.ico.bullet.<métrica>` = entrega contra la meta oficial del registro ICO (OTD ≥ 90, FTR ≥ 80, RpA ≤ 1,5).
+- `line:…` sólo con tres meses o más en la ventana.
+- `nextStep` en `null` = el dato alcanzó la meta: no hay un paso que la evidencia sostenga.
+- `cover.source`: `request`, `organization` o `auto`.
+
+**Prender el contrato v2 (sólo junto al release de TASK-1889).** Es multi-runtime: Vercel (`vercel env add
+INSIGHTS_EDITORIAL_V2_ENABLED …` + redeploy) **y** `ops-worker` (`deploy.sh` a `true` + `gcloud run services update`).
+Para probar en staging, prende sólo **Vercel staging**: el `ops-worker` es el mismo para producción. Verifica con una
+edición **interna** (Berel `seo`+`aeo`, Sky `ico`) antes de compartir nada con un cliente. Registra el flip en el ledger.
+
+**Qué no hacer.**
+- No escribas la meta de una métrica ICO a mano en un texto ni en un gráfico: sale del registro.
+- No pongas el logo normal en una portada azul marino ni decidas la portada al renderizar.
+- No prendas el flag en el `ops-worker` para una prueba de staging.
+- No esperes que cambiar la preferencia cambie una edición ya generada: su portada quedó sellada.
+
+**Problemas comunes.**
+- `404` al fijar la preferencia: la organización no tiene el módulo `insights_v1` o no es tuya (anti-oráculo).
+- `403 scope_not_allowed` por el lane ecosystem: el binding es de una organización; sólo un binding interno escribe.
+- `400 invalid_request`: `coverTheme` fuera de `auto|dark|light`.
+- La portada salió blanca con preferencia `auto`: la organización no tiene logo para fondo oscuro.
+
+## Revisar el diseño antes de compartir (TASK-1889 — code complete, rollout pendiente)
+
+Para qué: ver cómo sale un informe A4 o un deck con el diseño aprobado (portada, índice, «Lo esencial», páginas de
+gráfico, límites, contraportada) usando datos reales, y comprobar que las plantillas siguen fieles al canvas aprobado.
+Nada de esto comparte ni emite: es revisión local. Estado al 2026-09-25: los catálogos `insights-report` e
+`insights-deck` están sólo en v2 en develop (sin push); falta staging con el flag de TASK-1888, release por el control
+plane y la aprobación del operador de las piezas derivadas y los PDF reales.
+
+**Antes de empezar.**
+
+1. Proxy de Cloud SQL arriba: `pnpm pg:connect`.
+2. El id de una edición existente (`insed-…`) y su organización (`org-…`). Para la revisión se usan ediciones
+   **internas** de Berel (`seo`+`aeo`) y Sky (`ico`).
+3. Un árbol de trabajo con el código que quieres revisar: el script compone con tu árbol, no con lo desplegado.
+
+**Paso a paso.**
+
+1. **Vista previa con datos reales.**
+
+   ```bash
+   GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false \
+     pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/insights/preview-edition.ts \
+     --edition=<insed-…> --org=<org-…> --editorial-v2 [--output=report_pdf|deck_pdf|both] [--plan-only]
+   ```
+
+   - `--editorial-v2` recorre el contrato del diseño nuevo (familias, lecturas, lo esencial, portada resuelta).
+   - `--plan-only` imprime el plan sin componer PDF: úsalo primero; `0 violaciones` es la condición para seguir.
+   - Los PDF quedan en `.captures/insights-preview/<código>-<salida>/`. **Nunca los copies al repo**: son datos de
+     cliente. `.captures/` es taller local y no acredita que la salida exista en producción.
+   - No escribe en la base ni encola nada. La **única** escritura es el registro de acceso al logo privado del
+     cliente en la bitácora de assets (auditoría), cuando la portada lleva logo.
+
+2. **Mira cada página, a tamaño físico y en gris.** Cada página de gráfico debe abrir con la cifra, decir la
+   conclusión, mostrar la figura con su procedencia (unidad y fuente) y cerrar con «Lo que significa / Próximo paso».
+   «Lo esencial» debe citar el folio real donde está su evidencia.
+
+3. **Fidelidad al canvas.**
+
+   ```bash
+   pnpm insights:canvas-fidelity          # plantillas contra las páginas aprobadas
+   pnpm insights:canvas-fidelity --gray   # además, la comparación en escala de grises
+   ```
+
+   Criterio: ≤ 1 % de píxeles distintos por página (`✓`). Una excepción aprobada por el operador sale con `⚠`, su
+   fecha y su techo; si la diferencia supera el techo, vuelve a fallar (`✗`). Hoy hay una sola: Deck-Agrupadas,
+   2,2 % por 3 px del propio canvas, aprobada el 2026-09-25 con techo 2,5 %. Estado: 20 de 21 páginas ≤ 1 %.
+
+4. **Gate visual del catálogo.**
+
+   ```bash
+   pnpm composer:visual-gate --catalog=insights
+   ```
+
+   Debe dar 0 píxeles contra la línea base. Rebaselinear sólo se hace declarado en `BASELINE_DELTAS.md`.
+
+**Qué significan los rechazos.** Son información, no fallas del script:
+
+| Rechazo | Significa | Qué hacer |
+| --- | --- | --- |
+| `El campo "<campo>" mide N caracteres y el molde admite M` | Un texto no cabe: el render falla cerrado, nunca recorta | Corregir el texto en el plan o el mapper, no el molde a ojo |
+| `La figura <id> no tiene página: la familia <familia> no tiene página de figura…` | Una familia de gráfico sin plantilla propia | Se rechaza por diseño; nunca se dibuja en una plantilla ajena |
+| Output `semantic_rejected` «El logo sellado en la portada no es un logo incrustable…» | El logo de la portada no se pudo incrustar | Cargar un logo válido de la organización y pedir un render nuevo (no reintentar) |
+| Una figura que no aparece, con su falta en la tabla y en límites | No había hechos suficientes para dibujarla | Esperado: el capítulo se narra; nunca se inventa el hueco |
+
+**Qué no hacer.**
+
+- No subas los PDF de `.captures/insights-preview/` al repo ni los compartas: son datos de cliente.
+- No compartas con un cliente ninguna edición con el diseño nuevo antes de una edición interna en producción
+  revisada por el operador.
+- No recortes un texto ni cambies un molde para que un rechazo desaparezca.
+- No rebaselinees el gate visual ni ensanches una excepción de fidelidad sin aprobación del operador.
+
+**Problemas comunes.**
+
+- **La portada con logo falla sin PDF:** el logo no tiene bytes o no es incrustable; la portada falla cerrada en
+  vez de salir con un hueco. Revisa los logos de la organización.
+- **Métricas que parecen mal agrupadas:** la regla es que van en columnas sobre un eje sólo canales distintos de una
+  misma métrica; métricas distintas (clics, impresiones, CTR) van en comparación, cada una en su escala. Si ves
+  métricas distintas en columnas, es un bug del mapper (`render/figure-slots.ts`), no del dato.
+- **La vista previa no coincide con una edición ya renderizada:** el script recolecta la evidencia de nuevo; muestra
+  lo que produciría una edición nueva o revisada, no el plan sellado.
+- **Portada blanca con preferencia `auto`:** la organización no tiene logo para fondo oscuro (ver la sección de
+  portada).
+
+**Referencias.** Arquitectura §14.9 (estado de TASK-1889) y §6; `scripts/insights/preview-edition.ts`;
+`scripts/insights/canvas-fidelity.ts` y `scripts/insights/canvas-fixtures/`; catálogos
+`src/lib/artifact-composer/catalogs/insights-report/` e `insights-deck/`;
+`services/artifact-worker/classify-failure.ts`.
+
 ## Qué significan los estados
 
 | Estado (interno) | Cliente ve | Significa |
@@ -365,7 +562,9 @@ Códigos de rechazo de evidencia: `unsupported_window` (grano no servible; suele
 | Output `queued` que no arranca pasado varios ticks | Cola larga (1 output por tick de 2 min; Proposal gana el tick) **o** el `ops-worker` sin el flag (logs del dispatcher con `insightsQueued=0` y outputs en cola) | Calcular ≈ 2·N min por posición en la cola; si excede, revisar el flag en la revisión activa del `ops-worker` |
 | `retry` sobre un run `cancelled` responde `200` y no pasa nada | Cancelado es terminal | Pedir un render nuevo |
 | Output falla de nuevo tras `retry` con `render_error` | Causa de contenido (p. ej. validación de slots) que reintentar no arregla; `attempts` sube hasta 3 y termina en `dead_letter` | Corregir la edición (`revise`) y pedir el render de la nueva versión |
-| `422 render_rejected` al pedir el render | Output no renderizable todavía (`report_pdf`/`web`), o el plan excede un presupuesto del catálogo | Pedir sólo `deck_pdf`; si es presupuesto, la causa viene en `details` — no se trunca copy en silencio |
+| `422 render_rejected` al pedir el render | Output no renderizable en ese ambiente (`web` siempre), o el plan excede un presupuesto del catálogo | Pedir sólo lo renderizable; si es presupuesto, la causa viene en `details` — no se trunca copy en silencio |
+| El output queda `failed` con `render_error` y un detalle que empieza con `report-bar-geometry`/`insights-bar-geometry` | La etiqueta de una barra no representa su valor (más allá del redondeo impreso) | Es un bug de datos o de formato, no de layout: reproducirlo con la vista previa local (abajo) y corregir en el plan o el mapper |
+| En un informe falta una métrica que el módulo debería traer | El adapter no la encontró en su fuente | Desde 2026-09-22 la falta aparece como límite («Entregas a tiempo: sin datos»); si no aparece ni como cifra ni como límite, es un bug del adapter (así se descubrió que OTD nunca llegaba) |
 | Run en `partial_failed` | Un output salió y otro falló | Leer cada output; `retry` re-encola sólo los fallidos |
 | Output `running` que no avanza | Worker caído o flag OFF en su revisión activa (señal `insights.render.orphaned_output`) | Verificar el Job y el flag en Cloud Run; los reclamos por lease vencido son automáticos si el worker corre. Un `running` **sin lease** no se reclama solo: decisión humana |
 | `failed` en `validating` con `evidence_rejected` | Un módulo requerido no aportó hechos | Revisar rechazos; pedir meses completos o `policy.allowPartial=true` explícito |
@@ -378,3 +577,52 @@ Códigos de rechazo de evidencia: `unsupported_window` (grano no servible; suele
 - Estado, rollout, límites e invariantes: arquitectura §14.
 - Señales: `src/lib/reliability/queries/insights-edition-signals.ts`. Eventos: `insights.*` en `GREENHOUSE_EVENT_CATALOG_V1.md`.
 - Tests: `pnpm vitest run --project unit src/lib/efeonce-insights` · `pnpm test:live src/lib/efeonce-insights`.
+
+## Revisar un informe o un deck antes de que exista en producción (2026-09-21, ampliado 2026-09-22)
+
+Los catálogos de Insights componen en local sin depender de nada desplegado. Sirve para revisar el
+documento **antes** de encargarlo de verdad.
+
+**Con datos reales de una edición (recomendado).** El script recorre la misma cadena que producción —adapters (sólo
+lectura) → planner → validador de cifras → mapper → composer— con el código de tu árbol de trabajo, y deja los PDF en
+`.captures/insights-preview/`. No escribe en la base ni encola nada. Recolecta la evidencia de nuevo, así que muestra
+lo que produciría una edición **nueva o revisada** con esa ventana, no el plan ya sellado:
+
+```bash
+pnpm pg:connect
+GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false \
+  pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/insights/preview-edition.ts \
+  --edition=insed-... --org=org-... --output=both
+```
+
+Si el validador encuentra una cifra sin respaldo, el script lo informa y no compone, igual que producción. Todos los
+defectos del canary del 2026-09-22 aparecieron así, con datos reales; la edición de demostración, sin datos, no mostró
+ninguno.
+
+**Sólo la marca y los colores** (sin datos):
+
+1. Compila la marca de los tres catálogos y verifica que ninguno quedó desincronizado:
+
+   ```bash
+   pnpm composer:brand-pack --check
+   ```
+
+2. Comprueba que no se coló ningún color literal en una plantilla:
+
+   ```bash
+   pnpm composer:color-ledger
+   ```
+
+3. Los PDF y PNG quedan bajo `.captures/`, que **no es un entregable**: es taller local. Un archivo
+   ahí no acredita que la salida exista en producción.
+
+**Qué mirar, y por qué no basta con que los tests estén verdes.** Los defectos que aparecieron en
+este trabajo no los vio ninguna suite: un riel de barra que se leía como si fuera el dato, un valor
+impreso sin su unidad, y una verificación de coherencia que no podía fallar nunca. Todos salieron de
+abrir el archivo y mirarlo. Revisa **todas** las páginas exportadas, a tamaño físico, y también en
+escala de grises: el informe se imprime.
+
+**Si el render se rechaza, léelo como información, no como falla.** El sistema se detiene cuando una
+afirmación excede el molde, cuando una etiqueta no representa el valor que dibuja su barra, o cuando
+una figura no tiene hechos medibles. En los tres casos el mensaje dice la causa, y la corrección va
+en el plan o en el catálogo — nunca en recortar el texto.

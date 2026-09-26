@@ -1,7 +1,7 @@
 # Template — Propuesta-tipo de SEO/AEO
 
 > 🔴 **Hoy NO existe una propuesta-tipo: cada una se arma de cero.** Esta es.
-> **Estructura derivada del deck de la licitación SKY** *(el único artefacto real que teníamos)* —
+> **Estructura derivada del deck de la licitación SKY** *(el único artefacto real que teníamos — y ganó: adjudicada a Efeonce el 2026-09-23)* —
 > que ya hacía lo correcto: **usar el Grader corrido sobre el cliente como diagnóstico y linkear el informe
 > público live.**
 >

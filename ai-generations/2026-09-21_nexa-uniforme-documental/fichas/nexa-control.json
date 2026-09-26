@@ -1,0 +1,20 @@
+{
+  "id": "nexa-uniforme-documental",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    {
+      "objeto": "polo-efeonce",
+      "color": "navy"
+    }
+  ],
+  "palanca": "quien-sostiene",
+  "escena": "SCENE (small recording studio, mid-morning): she stands at the control desk in three-quarter view, her left hand on a fader of the mixing console and her right resting flat on the desk beside a marked-up running order, watching the level meters and the waveform crawling across the screen. She wears the NAVY EFEONCE PIQUÉ POLO, sleeves as they are, with a lanyard tucked behind the desk edge; no jacket and no other blue garment. She is working: she looks at the meters, never at the camera, and her weight is on the hand that is not moving. Behind her and well out of focus, two people sit at a table with boom microphones, seen from behind and small in frame, no feature of them legible. 50mm at f/2.8, focus on her hand and the console.",
+  "lecho": {
+    "objeto": "the near edge of a matte black flight case standing between the camera and the desk",
+    "tono": "DARK charcoal in shadow"
+  }
+}

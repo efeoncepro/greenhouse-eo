@@ -35,7 +35,13 @@ posicionamiento**. Canon: [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](.
 priorizar mensajes, planificar campañas o revisar el arco trimestral.
 - Capítulos: 1 lo que tu IA no sabe · 2 lo que tu IA cree que es cierto (datos, pilar de apoyo) · 3 lo que la IA dice
   de ti · 4 un equipo, no una herramienta · 5 campañas en días, con tu marca · capa de resultados.
+- Capítulo 4: el servicio de [transformación humano-agente](../../../../docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md)
+  está comercialmente aprobado y probado por confirmación del operador. Se vende el proceso y su supervisión,
+  no una cantidad de bots ni un proveedor; conversación de fit → Blueprint pagado o primer equipo si ya existe
+  diseño → operación continua. Prueba publicable, precio, ROI y disponibilidad por tenant se verifican aparte.
+  Distribución y gates en el [brief Q4](../../../../docs/commercial/campaigns/2026-q4-tu-ia-no-conoce-tu-negocio/README.md).
 - Se comunica **a través** de los beachheads existentes; no crea beachheads nuevos ni un segundo catálogo.
+- Para CMO, conectar capítulo 3 (visibilidad AEO pública) → 5 (contexto de marca/campaña) → 4 (equipo humano-agente de marketing). La entrada AEO o de campaña puede ser independiente; no exigir CRM/RevOps ni vender una SKU nueva. Contexto público y datos privados/autorizados tienen permisos distintos. Owner de delivery según alcance: Marketing/Content & AEO, Creative, Media y plataforma/RevOps cuando aplique; RACI del cliente para publicar, enviar y gastar.
 - Cambios de tesis, capítulos o arco se hacen en el canon (versión nueva), nunca en este overlay.
 
 ## Reglas duras del overlay

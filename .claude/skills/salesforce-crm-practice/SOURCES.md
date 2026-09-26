@@ -1,13 +1,15 @@
 # Fuentes oficiales
 
-Última revisión de esta lista: `2026-09-16`. La fecha indica cuándo se revisó el índice, no garantiza que una capacidad o condición siga vigente.
+Última revisión de esta lista: `2026-09-18`. La fecha indica cuándo se revisó el índice, no garantiza que una capacidad o condición siga vigente.
 
 ## Producto y arquitectura
 
-- [Dreamforce 2026 — ledger de lanzamientos](references/dreamforce-2026.md): AIforce, Koa, Agentforce, interoperabilidad y estados de disponibilidad verificados el 2026-09-16.
+- [Dreamforce 2026 — ledger de lanzamientos](references/dreamforce-2026.md): AIforce, Koa, Agentforce, interoperabilidad y estados de disponibilidad verificados al corte ampliado del 2026-09-18.
 - [AIforce regional](https://www.salesforce.com/ap/news/press-releases/2026/09/16/sg-salesforce-unveils-aiforce-bringing-the-full-power-of-its-platform-to-any-interface/): anuncio publicado el 2026-09-16; la fecha de la newsroom USA puede aparecer como 2026-09-15.
 - [Missionforce, NVIDIA y OpenAI](https://www.salesforce.com/news/stories/missionsforce-expansion-agents-nvidia-openai-partnerships/): anuncio del 2026-09-16 para gobierno y entornos regulados.
 - [Novedades de Marketing Cloud desde Dreamforce](https://www.salesforce.com/marketing/whats-new/): Campaign Agent, Headless Marketing, Data Guardian, Budget Optimization y fechas anunciadas.
+- [Dreamforce 2026 — media resources](https://www.salesforce.com/news/dreamforce-26-media-resources/): lineup oficial de anuncios y casos del 15–16/09; consultado el 2026-09-18.
+- [Dreamforce 2026 — session catalog](https://reg.salesforce.com/flow/plus/df26/sessioncatalog/page/catalog): sesiones y distribución pública por día; consultado el 2026-09-18.
 
 - [What Is Salesforce?](https://help.salesforce.com/s/articleView?id=sf.overview.htm&language=en_US): límites generales de la plataforma y dependencia de edición.
 - [What is Sales Cloud?](https://help.salesforce.com/s/articleView?id=000372249&language=en_US&type=3): definición de Sales Cloud.

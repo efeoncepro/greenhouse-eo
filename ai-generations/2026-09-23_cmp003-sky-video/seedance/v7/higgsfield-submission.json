@@ -1,0 +1,207 @@
+{
+  "results": [
+    {
+      "id": "6a04807f-9fac-4f69-8a85-64848be5bd25",
+      "type": "video",
+      "status": "pending",
+      "model": "seedance_2_5",
+      "params": {
+        "prompt": "Edit the supplied COMPLETE approved 30-second SKY x Efeonce film. Return ONE complete vertical film with native synchronized instrumental music and SFX. The VIDEO is the primary authority for sequence, scene durations, layouts, exact text, aircraft and final logos. All still references are identity/design anchors only. Preserve the existing camera changes: no added cuts, repeated scenes, new story, slideshow or extra outro. Improve only audio synchronization, modern chat reveal, purposeful typography and smooth camera momentum.\n\nAUDIO: ONLY instrumental music and sound effects. Absolutely no narration, dialogue, announcements, singing, humming, chanting, choir, whispers or processed vocal samples. NEVER read on-screen text. Original uplifting epic electronic/orchestral score near 120 BPM, bright triumphant harmony, forward pulse, precise percussion, wide strings and brass synths. Positive aviation scale and accomplishment; no mystery, ominous drones or suspense. Grow layers after Enter and reach heroic expansion with the airplane. Match sounds to visible actions, not arbitrary periodic effects.\n\n0.00-0.20 silence; then soft dry keyboard taps synchronized with visible typing, NO MUSIC. Search text remains “¿A dónde viajar en Sudamérica?”. At typing completion about 0.8-1.0s add a tiny visible Enter acknowledgement, crisp confirm click and low musical impact. ONLY THEN begin the musical pulse. Preserve the lateral macro camera sweep with smooth inertia and parallax.\n2.00-3.75: preserve the three search results and exact source wording. Distinct soft digital ticks, slightly ascending pitch, match each result appearance/focus. No additional results screens.\n3.75-4.85: search becomes the right-aligned user chat turn. Show user turn ALONE first. It gently rises to make space. Camera descends smoothly to follow the response. Restrained airy slide SFX.\n4.85-6.10: assistant response unfolds downward in 2-3 meaningful phrase groups, subtle vertical expansion with crisp readable type. Exact text: “Tres ideas: Camboriú, por sus playas; Mendoza, por sus bodegas; y Puerto Fuy, por sus lagos y volcanes”. Preserve source layout. Purple “SKY Airline” citation chip appears attached to the answer after its phrases. It is a source citation, not a detached CTA. Tiny reveal ticks.\n6.10-8.00: hold the completed answer readable, camera settles. At 7.8-8.0 the citation subtly presses/focuses with a precise tactile click and small ringing sparkle.\n8.00-9.50: preserve camera push into citation and luminous transition. Bloom originates from the chip. Brief 120-180ms musical dip before bloom releases, then bright rising musical lift. Distant approaching jet anticipates the airplane. No added portal rings.\n9.50-15.50: preserve the same realistic full-size SKY A320neo in its existing three views: approach to 12.125, underside pass to 13.125, rear departure to 15.50. Refine momentum: stable approach with cloud parallax, fast overhead passage, uninterrupted departure at consistent forward speed. Rear camera does NOT chase/overtake the aircraft. No hovering, braking, reversal, turnaround or slow-motion reset. Exact reference white/purple/lime livery, two CFM engines, correct wings/tail, gear up, real metal/light/cloud scale. No toy/plastic look, wing smoke, contrails or sparks. Jet audio approaches, peaks at overhead pass near 12.6, then drops in pitch/level as it recedes. Music reaches heroic full arrangement and ducks slightly for jet impact.\n15.50-18.00: exact “Un año creando con SKY.”. Flight direction guides the camera into the title. Brief depth-based arrival with weight and one confident musical accent; settle within 0.5s and hold readable.\n18.00-20.50: exact “+2.000 piezas.”. Animate lime PLUS independently as leading graphic actor: it arrives from foreground along existing motion direction, makes a short controlled axial turn, lands LEFT of number with damped settle. Always recognizable PLUS, not multiplication sign. Its landing unveils “2.000”, then “piezas.” 0.15s later. Satisfying short impact on PLUS landing; softer number/noun accents. Complete entrance within 0.55s, then hold full phrase readable. No counting, extra symbols, continuous bouncing or broken letters.\n20.50-23.00: exact “Y ahora nos eligió como su agencia SEO/AEO.”. Eye follows introductory phrase, then “su agencia”, then “SEO/AEO”, using a short stagger and subtle oblique-to-frontal camera motion. Fully settled by 21.15. Music accent on SEO/AEO, then hold.\n23.00-25.00: exact “¡Gracias, SKY!”. Broad confident arrival, gentle camera settle, generous musical resolution. Preserve transition to blue closing background.\n25.00-27.00: preserve exact official white Efeonce | SKY logos and “efeoncepro.com” URL bubble on BLUE, identical geometry/position to source. Stable and legible.\n27.00-28.20: ONLY background transitions blue to SKY purple. Logos and URL stay fixed. Soft resolving shimmer.\n28.20-30.00: hold purple closing; music decays cleanly to end.\n\nThree-camera language applies across UI, chat, airplane and typography. Keep photographic sky, safe margins and source continuity. Depth/timing/sound guide attention, never extra cuts. Preserve exact text and logo geometry. The complete edit must include newly generated Seedance instrumental music and synchronized SFX with ZERO VOICE.",
+        "reference_images": [
+          "3380fb23-f1c4-4ff9-9e00-f2f5a2ee2816",
+          "067250ac-511d-4ab9-aa6d-adf422e4978b",
+          "1095976d-a205-4458-80d4-e798c207b681",
+          "bfcae795-f1cf-42e6-9824-426e9cf5ff5f",
+          "cfe48c79-e48b-4e8f-8954-e27cfec5969a",
+          "fe7c6472-bd22-4405-9a6b-d44b91f8d18f",
+          "1e1e5779-5380-4d22-9786-0dd2f8f38572",
+          "440a6508-0dbb-4b21-9bfe-f21f1d54a9b9",
+          "a2a389bb-8af8-4a15-adb9-f6ee9c728bd4",
+          "787b9dcd-0cd7-46c0-9568-81cc09a8d5b2",
+          "d3918504-0ce8-47d0-b2c1-1fda083ae5c7",
+          "9901d95d-645e-443d-a688-bd91dfc97025",
+          "cb683a8e-76e4-4ab4-a227-3d4253ecbbc0",
+          "36b5870b-edf7-4ad4-85d7-0f1a3e869e00",
+          "6ec10edc-cf89-4c1d-9347-5287203c5db2",
+          "f7d5a12c-005a-426b-b2bb-4921077a72dc",
+          "7f444147-05f2-427b-b010-7060c0fe9d2e",
+          "37485393-4121-46e7-b7c8-94bef4f7d155",
+          "a0456be3-6cbf-47a4-b71e-b90adef8753e",
+          "b19d12d0-cd2d-46f2-b000-5d4df72a1bb1",
+          "456fb450-ed6d-4669-86a0-5a7c2f52e16b",
+          "1f76ce65-fbb8-4774-87ac-1fe7fc427e30",
+          "52e731e7-fd4f-4a87-9f5f-cd8f0a60ffac",
+          "f840028f-f4cb-4de3-8577-743079fe0839",
+          "f3d216e6-7769-4f4d-8b06-1ab054b17f5a",
+          "a2ea67ec-4db4-4498-9bcb-128affd912ce",
+          "30565f80-e58c-4eeb-bf41-62c2297b6ad9",
+          "c180c3f1-0ca4-4323-8912-932c59628413",
+          "f5da8faa-c3f3-4a8d-95fc-1491190ba4c2",
+          "41b2f301-7980-450d-85cf-73ae00db3a81",
+          "82e492ba-1cdd-42f5-bb16-818c65e622ed"
+        ],
+        "mode": "video_edit",
+        "resolution": "720p",
+        "generate_audio": true,
+        "bitrate_mode": "high"
+      }
+    }
+  ],
+  "adjustments": {
+    "medias[0].role": {
+      "requested": "video",
+      "used": "video_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[1].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[2].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[3].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[4].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[5].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[6].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[7].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[8].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[9].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[10].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[11].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[12].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[13].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[14].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[15].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[16].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[17].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[18].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[19].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[20].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[21].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[22].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[23].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[24].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[25].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[26].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[27].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[28].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[29].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[30].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    }
+  }
+}

@@ -2,68 +2,90 @@
   "template": "InsightsCoverSlide",
   "figmaNodeId": null,
   "version": "0.1",
+  "note": "TASK-1889 — portada navy del deck. DERIVADA de la A4 aprobada: el canvas no la diseñó; la aprueba el operador antes de congelar baseline.",
   "viewport": {
-    "width": 1920,
-    "height": 1080
+    "width": 1280,
+    "height": 720
   },
   "slots": {
-    "editionId": {
-      "selector": "[data-slot='editionId']",
+    "editionLabel": {
+      "selector": "[data-slot='editionLabel']",
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 24,
+        "maxCharacters": 48,
         "maxLines": 1,
-        "transform": "uppercase",
         "overflow": "reject"
-      }
+      },
+      "notes": "«Informe mensual · <período>». El período sale de `render/labels.ts`; la etiqueta, de `src/lib/copy/insights.ts`."
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Lectura de Efeonce», desde el copy."
     },
     "reportTitle": {
       "selector": "[data-slot='reportTitle']",
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 70,
+        "maxCharacters": 64,
         "maxLines": 3,
         "overflow": "reject"
-      }
+      },
+      "notes": "Título en tres líneas como máximo: la medida de 430 px es la del canvas."
     },
     "reportSubtitle": {
       "selector": "[data-slot='reportSubtitle']",
       "type": "string",
       "required": false,
       "constraints": {
-        "maxCharacters": 150,
+        "maxCharacters": 110,
         "maxLines": 3,
         "overflow": "reject"
       }
     },
-    "periodLabel": {
-      "selector": "[data-slot='periodLabel']",
+    "preparedFor": {
+      "selector": "[data-slot='preparedFor']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        },
+        "clientName": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 48,
+          "maxLines": 1
+        },
+        "logo": {
+          "type": "asset",
+          "required": false,
+          "resolver": "deck-client-logo"
+        }
+      },
+      "notes": "Logo del cliente en negativo (`asset-ref:org-logo:<id>`, variante on_dark sellada por TASK-1888) o su nombre. Sin ninguno, el bloque desaparece; nunca un nombre inventado."
+    },
+    "confidentialityLine": {
+      "selector": "[data-slot='confidentialityLine']",
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 28,
+        "maxCharacters": 72,
         "maxLines": 1,
         "overflow": "reject"
-      }
-    },
-    "versionLabel": {
-      "selector": "[data-slot='versionLabel']",
-      "type": "string",
-      "required": true,
-      "constraints": {
-        "maxCharacters": 10,
-        "maxLines": 1,
-        "overflow": "reject"
-      }
-    },
-    "fixed-urlBubble": {
-      "selector": "[data-slot='urlBubble']",
-      "type": "fixed-asset",
-      "required": true,
-      "agentMayOverride": false,
-      "note": "template-owned. El pie de una lámina lleva COMO MÁXIMO la URL bubble: dirección, teléfonos y folio son del informe escrito."
+      },
+      "notes": "«Confidencial · Versión N · <fecha de emisión>». Sin emitir, dice «Sin emitir»."
     }
   }
 }

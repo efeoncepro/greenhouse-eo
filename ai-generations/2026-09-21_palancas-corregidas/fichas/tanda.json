@@ -1,0 +1,48 @@
+[
+  {
+    "id": "A-ausencia-corregida",
+    "formato": "4:5",
+    "impacto": true,
+    "atmosfera": "polvo",
+    "palanca": "ausencia",
+    "escena": "SCENE (five minutes after the review ended, design studio in Santiago, late afternoon): a hard low sun beam comes through the window and rakes across the worktop, dust still drifting in it. The chair is pushed back at a hard angle and half turned away from the table, exactly where someone shoved it standing up. The work is left mid-decision: printed sheets fanned out where they were dropped, two of them pulled apart from the rest, a marker lying uncapped across them with its cap a hand's width away, a glass half drunk. The monitor is still awake and its azure-blue interface is the only cool light in the room, throwing blue across the near edge of the sheets. One desk lamp is still on. 35mm at f/2.8, focus on the pushed-back chair. Small printed text exists on the sheets but sits at a sharp angle and far outside the focal plane, so no word can be read. Everything is completely unbranded.",
+    "lecho": {
+      "objeto": "the near edge of the pale oak worktop on the camera side",
+      "tono": "VERY LIGHT bleached pale oak lit by the low sun, almost white, the brightest surface in the lower frame"
+    }
+  },
+  {
+    "id": "B-variantes-eje-unico",
+    "formato": "4:5",
+    "impacto": true,
+    "palanca": "variantes",
+    "eje": "the weight of the headline type, from light to bold, and nothing else",
+    "escena": "SCENE (choosing the final weight, design studio in Bogota, morning, NO faces): twelve printed sheets of one poster are pinned in a strict four-by-three grid on a pale studio wall, lit by a single hard window light from the left that rakes across the paper so each sheet throws its own small shadow. One sheet, second row, is unpinned and held forward into the light by a hand entering from the right edge, the rest of the arm out of frame. A large azure-blue calibration monitor stands at the far left of the frame, switched on and facing away, its light spilling cool across the wall. 50mm at f/4, focus on the held sheet. The headline text on the sheets is real but small and thrown out of focus by the shallow plane, unreadable at any size. Everything is completely unbranded.",
+    "lecho": {
+      "objeto": "the matte-black top of the studio camera on its tripod that we shoot past",
+      "tono": "DARK near black, matte"
+    }
+  },
+  {
+    "id": "C-marcado-primera-corrida",
+    "formato": "4:5",
+    "impacto": true,
+    "palanca": "marcado",
+    "escena": "SCENE (the art director's correction pass, studio in Lima, evening): a large printed layout fills the frame at a steep raking angle on the table, its coated paper catching a hard low light from the left so the fibre and the ink surface read sharp. Across it run the marks of the pass in ORANGE grease pencil, pressed hard enough to leave a physical ridge: a circle around one element, an arrow dragging it down and across, a firm double crossing-out, a bracket in the margin. Caught at the exact instant the last stroke ends: the wax of that final bracket still sits raised and wet-bright on the paper, and the hand that drew it is already leaving as a blurred fragment at the far top edge, never the subject. At the far edge, out of focus, a monitor glows azure blue with the same layout open. 50mm at f/4, focus on the orange marks. The type on the layout is real but tiny and lies outside the focal plane, unreadable. Everything is completely unbranded.",
+    "lecho": {
+      "objeto": "the pale polished concrete floor rising into the bottom of the frame right at the lens",
+      "tono": "VERY LIGHT almost white polished concrete"
+    }
+  },
+  {
+    "id": "D-descarte-primera-corrida",
+    "formato": "4:5",
+    "impacto": true,
+    "palanca": "descarte",
+    "escena": "SCENE (what did not make it, studio in Mexico City, night): a low hard raking light from the right crosses a deep untidy pile of rejected prints that fills the centre and the lower half of the frame, so every single edge throws its own shadow and the real depth of the stack reads. Behind and above the pile, on the wall, a single empty pin and a clean rectangle of unfaded paint mark where the chosen one hung. A wall-mounted screen at the left edge is on standby, its azure-blue power light the only cool source, glancing off the topmost sheets. 35mm at f/4, focus on the near face of the pile. Printed type exists across the sheets but is creased, angled and mostly face-down, so nothing can be read. Everything is completely unbranded.",
+    "lecho": {
+      "objeto": "the nearest creased proof sheet lying right against the lens",
+      "tono": "DARK near black in shadow, matte"
+    }
+  }
+]

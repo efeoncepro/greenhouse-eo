@@ -1,0 +1,231 @@
+{
+  "template": "InsightsPlanSlide",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "TASK-1889 — plan de acción del deck (lámina `Deck-Plan`, 1280×720).",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "slots": {
+    "tabNumber": {
+      "selector": "[data-slot='tabNumber']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 2,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Número de capítulo de la pestaña («00» en el resumen)."
+    },
+    "section": {
+      "selector": "[data-slot='section']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 44,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "period": {
+      "selector": "[data-slot='period']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "heroFigure": {
+      "selector": "[data-slot='heroFigure']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 3,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "heroText": {
+      "selector": "[data-slot='heroText']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 64,
+        "maxLines": 3,
+        "overflow": "reject"
+      }
+    },
+    "title": {
+      "selector": "[data-slot='title']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 80,
+        "maxLines": 3,
+        "overflow": "reject"
+      }
+    },
+    "columns": {
+      "selector": "[data-slot='columns']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "number": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 2,
+          "maxLines": 1
+        },
+        "action": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "maxLines": 1
+        },
+        "metric": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        },
+        "weeks": {
+          "type": "array",
+          "required": true,
+          "constraints": {
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "item": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "actions": {
+      "selector": "[data-slot='actions']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 5
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "number": {
+            "type": "string",
+            "required": false,
+            "resolver": "deck-number",
+            "consumer": "resolver-only"
+          },
+          "title": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 60,
+            "maxLines": 2
+          },
+          "metric": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 36,
+            "maxLines": 1
+          },
+          "metricNote": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 32,
+            "maxLines": 1
+          },
+          "weeks": {
+            "type": "string",
+            "required": false,
+            "resolver": "deck-week-span",
+            "values": [
+              "1-2",
+              "1",
+              "1-3",
+              "1-4",
+              "2",
+              "2-3",
+              "2-4",
+              "3",
+              "3-4",
+              "4"
+            ]
+          }
+        }
+      }
+    },
+    "ask": {
+      "selector": "[data-slot='ask']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 140,
+          "maxLines": 2
+        }
+      }
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
+      },
+      "notes": "«NN / total» del plan de láminas de la misma composición."
+    }
+  }
+}

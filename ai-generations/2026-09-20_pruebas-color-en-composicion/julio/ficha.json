@@ -1,0 +1,25 @@
+{
+  "id": "julio-ensayo-proyeccion-espacial",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["julio"],
+  "servicio": "Creative Services: ensayo de una experiencia audiovisual espacial sin cliente identificado",
+  "industria": "evento cultural independiente hipotetico, sin marca cliente",
+  "mercado": "Santiago",
+  "preflightVisual": {
+    "vistos": [
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/set-curado-12.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/J1-retrato-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/J2-rodaje-polo-final.png"
+    ],
+    "comparacion": "J1 fija el rostro, la montura plateada, los rizos y la barba entrecana; J2 muestra gesto decisivo de direccion y lecho oscuro de equipo. En la hoja curada, el azul puede ser un campo espacial de la obra; no exige una taza, botella ni ropa. Esta escena lleva el azul a la luz proyectada que cruza muro y piso, y el naranja al borde solar de un muro de ladrillo existente. La maleta de proyeccion junto a la lente, oscura y opticamente desenfocada, reserva la firma. Es ensayo real de luz en espacio, no retrato de oficina ni rodaje de producto."
+  },
+  "azul": "haz azul activo reflejado por una proyeccion de prueba sobre muro blanco y piso, integrado a la arquitectura y al trabajo, no objeto azul",
+  "acento": "naranja del sol bajo sobre el muro de ladrillo existente y su reflejo estrecho en el piso, no utileria",
+  "lecho": {
+    "objeto": "the near edge of the real black padded projector transport case lying in front of the camera",
+    "tono": "DARK charcoal near black in even shadow, subtle real fabric texture"
+  },
+  "escena": "SCENE (live spatial projection rehearsal in a clean converted industrial hall in Santiago, late afternoon): Julio, the SAME real man from the identity references, is the only person. He wears an unbranded light stone linen overshirt and charcoal trousers, no navy clothing. Seen from a low candid 35mm f/2.8 angle past working projection equipment, his face, silver glasses, curly salt-and-pepper hair and full greying beard are visible and natural. At the decisive moment he crouches to adjust the focus and angle of an unbranded video projector, watching how its abstract azure-blue test light falls onto the far white plaster wall. This is a real working light study for a spatial experience: the azure-blue light is a broad but bounded luminous plane on the wall and a softer physically plausible reflection across the polished concrete floor, creating graphic rhythm between depth planes without any blue-colored prop, panel, bottle, book, or clothing. A narrow true-orange warm rim of low afternoon sunlight entering through an existing high side window catches one section of the hall's original terracotta brick wall and makes a small reflected streak beside the blue floor reflection; no orange object or added decorative prop. Keep the orange limited and subordinate to Julio and the working blue projection; the rest is warm-neutral natural material. Julio's face stays in neutral daylight, not blue-tinted. Light has character: clear hard side sunlight on his hand and the real brick, deep but detailed neutral shadows elsewhere. Show three distinct depth planes, a coherent optical blur, no other people, no artificial neon, no cinematic teal-orange grade, no generic meeting, no posed smile. No text, letters, numbers, logos, marks, client identity or pseudo-interface anywhere."
+}

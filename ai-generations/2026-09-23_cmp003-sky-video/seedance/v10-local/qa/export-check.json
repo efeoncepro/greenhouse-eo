@@ -1,0 +1,56 @@
+{
+  "version": "v3",
+  "exports": [
+    {
+      "file": "titulos-y-firma-alpha.mov",
+      "sha256": "950d8648b04161354971e5910871a227d112bb1754a4ee2ff4d20b28fa61b485",
+      "streams": [
+        {
+          "codec_name": "prores",
+          "codec_type": "video",
+          "width": 1080,
+          "height": 1920,
+          "pix_fmt": "yuva444p12le",
+          "r_frame_rate": "24/1",
+          "duration": "14.250000",
+          "nb_frames": "342"
+        }
+      ]
+    },
+    {
+      "file": "url-bubble-luminosidad-alpha.mov",
+      "sha256": "a21246124aa6bfdb9e03b38a37a2804c2afc5cadffc359b1d9b2699135ddbcee",
+      "streams": [
+        {
+          "codec_name": "prores",
+          "codec_type": "video",
+          "width": 1080,
+          "height": 1920,
+          "pix_fmt": "yuva444p12le",
+          "r_frame_rate": "24/1",
+          "duration": "4.000000",
+          "nb_frames": "96"
+        }
+      ]
+    },
+    {
+      "file": "prueba-cartelas-punch-v3.mp4",
+      "sha256": "71daf664907d768ababdac883cf217fa55543f6e2a454cd5ff5ca706bf03f6dc",
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 1080,
+          "height": 1920,
+          "pix_fmt": "yuvj420p",
+          "r_frame_rate": "24/1",
+          "duration": "14.250000",
+          "nb_frames": "342",
+          "side_data_list": [
+            {}
+          ]
+        }
+      ]
+    }
+  ]
+}

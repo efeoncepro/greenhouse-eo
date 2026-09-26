@@ -29,6 +29,9 @@ traducir en cada ciclo, y la traducción se pierde el primer mes de carga alta.
   «cero resultados» se lee como «no hay entregables» cuando el hecho es «no buscaste
   por ese eje». **Barre por carpeta y por extensión**, no por patrón de nombre; y para
   concluir ausencia, **nombra dónde no miraste** (`ANTIPATTERNS.md`).
+- 🔴 **Abre las subcarpetas del gestor de revisión** (Frame.io anida carpetas «Social Media»)
+  antes de concluir que un derivado no existe. Un agente que no ve un archivo no prueba su
+  ausencia: en un caso real se canceló por ese motivo una tarea entregada y hubo que revertirla.
 - ✅ Barre **el ciclo completo** (varios meses), no el mes vigente: la convención se ve
   en la serie, no en un corte.
 
@@ -61,6 +64,12 @@ amarre, diseño inventa — y lo que inventa es exactamente lo que nadie verific
 Si un H2 de la pieza pilar está bloqueado esperando una ficha técnica, el carrusel que
 sale de ese H2 **está bloqueado también**: no se produce «con lo que haya» ni se
 rellena con lógica de oficio. Hereda el bloqueo, el dueño y la fecha.
+
+📏 **El átomo sigue la base visual vigente de la pieza madre.** Si esa base cambia después
+de producir los derivados (p. ej. el cliente decide que el gráfico ancla será su propio
+material de marca), los derivados que usan la base anterior quedaron desalineados: se abren
+**tareas v2 nuevas** contra la base vigente y las originales se conservan con una nota. No se
+sobrescriben ni se cancelan en silencio, porque el conteo contra contrato necesita las dos.
 
 ## El mapa de átomos (artefacto obligatorio por pillar)
 

@@ -5,6 +5,8 @@ Configuración live verificada en el portal `19893546` el `2026-09-01`. Este arc
 ## Identidad
 
 - Nombre visible y conversacional: `Emma`.
+- Avatar visible: retrato de Emma entregado por ANAM, derivado con fondo menta claro para perfil y chatflow `96601133` (verificado en widget público el 2026-09-24).
+- Cargo en la landing: `Ejecutivo comercial ANAM`; es copy visible de la página, no una modificación de las directrices del agente.
 - Personalidad: `Amigable`.
 - Idioma: detección automática desde el primer mensaje del visitante.
 
@@ -130,6 +132,11 @@ El 2026-09-01 se cambió sólo la identidad de `Agente de clientes de ANAM` / `A
 publicar las directrices, el readback mostró `Borrador (0)` y el saludo exacto con `Soy Emma`. Personalidad,
 idioma, conocimiento, permisos, acciones, handoff, routing y canales no cambiaron durante ese slice de identidad.
 No se abrió ni se envió una conversación real.
+
+El 2026-09-24 se actualizó únicamente la imagen de la identidad y, por separado, el avatar del chatflow. HubSpot
+confirmó el guardado de ambos y el widget público mostró la nueva foto; se abrió para comprobarla sin enviar un
+mensaje. La foto de la landing y el cargo `Ejecutivo comercial ANAM` se verificaron en el build público #30.
+No se modificaron personalidad, idioma, conocimiento, permisos, acciones, saludo, routing ni handoff en este cambio.
 
 El preflight de HubSpot mantuvo dos advertencias preexistentes sobre `Registraré tu consulta`: una promesa no
 respaldada y una contradicción con la regla de no afirmar registro antes de una acción real. La publicación de

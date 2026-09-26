@@ -1,19 +1,27 @@
 {
   "$schema": "../deck-axis/registry.schema.json",
-  "version": "0.1",
+  "version": "0.2",
   "status": "draft",
-  "note": "Registry del catálogo `insights-deck` — deck ejecutivo 16:9 de Efeonce Insights (TASK-1847). Catálogo propio y no extensión de `deck-axis`: aquel imprime vocabulario de propuesta comercial en su portada y sus presupuestos de slot están dimensionados para copy de licitación. Comparte brand pack, compilación de marca y geometría de gráficos; no comparte molde, porque una lámina que se proyecta y una hoja que se lee no tienen la misma densidad.",
+  "note": "Registry del catálogo `insights-deck` — deck ejecutivo 16:9 de Efeonce Insights (TASK-1847). Catálogo propio y no extensión de `deck-axis`: aquel imprime vocabulario de propuesta comercial en su portada y sus presupuestos de slot están dimensionados para copy de licitación. Comparte brand pack, compilación de marca y geometría de gráficos; no comparte molde, porque una lámina que se proyecta y una hoja que se lee no tienen la misma densidad. TASK-1889 (2026-09-25): el catálogo es el del canvas editorial aprobado, a 1280×720; las láminas v1 (1920×1080) se REEMPLAZARON bajo los mismos contentTypes. Las páginas de gráfico v1 se retiraron en el Slice 4 de TASK-1889: cada familia con productor tiene su página de figura premium.",
   "canvas": {
-    "w": 1920,
-    "h": 1080,
+    "w": 1280,
+    "h": 720,
     "aspect": "16:9"
   },
   "figmaFileKey": null,
   "contentTypeTaxonomy": [
     "insights-cover",
-    "insights-evidence",
+    "insights-summary",
+    "insights-chapter",
     "insights-narrative",
-    "insights-limits"
+    "insights-reading",
+    "insights-plan",
+    "insights-limits",
+    "insights-back-cover",
+    "insights-figure-comparison",
+    "insights-figure-columns",
+    "insights-figure-targets",
+    "insights-figure-trend"
   ],
   "templates": [
     {
@@ -30,17 +38,30 @@
       "slotsRef": "insights-cover.slots.json"
     },
     {
-      "name": "InsightsEvidenceSlide",
+      "name": "InsightsSummarySlide",
       "kind": "full-bleed",
       "source": "design",
       "figmaNode": null,
       "owner": "claude",
       "status": "built",
       "contentTypes": [
-        "insights-evidence"
+        "insights-summary"
       ],
-      "prototype": "insights-evidence.html",
-      "slotsRef": "insights-evidence.slots.json"
+      "prototype": "insights-summary.html",
+      "slotsRef": "insights-summary.slots.json"
+    },
+    {
+      "name": "InsightsChapterSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-chapter"
+      ],
+      "prototype": "insights-chapter.html",
+      "slotsRef": "insights-chapter.slots.json"
     },
     {
       "name": "InsightsNarrativeSlide",
@@ -56,6 +77,32 @@
       "slotsRef": "insights-narrative.slots.json"
     },
     {
+      "name": "InsightsReadingSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-reading"
+      ],
+      "prototype": "insights-reading.html",
+      "slotsRef": "insights-reading.slots.json"
+    },
+    {
+      "name": "InsightsPlanSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-plan"
+      ],
+      "prototype": "insights-plan.html",
+      "slotsRef": "insights-plan.slots.json"
+    },
+    {
       "name": "InsightsLimitsSlide",
       "kind": "full-bleed",
       "source": "design",
@@ -67,18 +114,90 @@
       ],
       "prototype": "insights-limits.html",
       "slotsRef": "insights-limits.slots.json"
+    },
+    {
+      "name": "InsightsBackCoverSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-back-cover"
+      ],
+      "prototype": "insights-back-cover.html",
+      "slotsRef": "insights-back-cover.slots.json"
+    },
+    {
+      "name": "InsightsFigureComparisonSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-figure-comparison"
+      ],
+      "prototype": "insights-figure-comparison.html",
+      "slotsRef": "insights-figure-comparison.slots.json"
+    },
+    {
+      "name": "InsightsFigureColumnsSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-figure-columns"
+      ],
+      "prototype": "insights-figure-columns.html",
+      "slotsRef": "insights-figure-columns.slots.json"
+    },
+    {
+      "name": "InsightsFigureTargetsSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-figure-targets"
+      ],
+      "prototype": "insights-figure-targets.html",
+      "slotsRef": "insights-figure-targets.slots.json"
+    },
+    {
+      "name": "InsightsFigureTrendSlide",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "insights-figure-trend"
+      ],
+      "prototype": "insights-figure-trend.html",
+      "slotsRef": "insights-figure-trend.slots.json"
     }
   ],
   "selector": {
     "model": "El autor declara intención (`contentType` + slots); el selector resuelve la plantilla. Un autor NUNCA elige plantilla.",
     "map": {
       "insights-cover": "InsightsCoverSlide",
-      "insights-evidence": "InsightsEvidenceSlide",
+      "insights-summary": "InsightsSummarySlide",
+      "insights-chapter": "InsightsChapterSlide",
       "insights-narrative": "InsightsNarrativeSlide",
-      "insights-limits": "InsightsLimitsSlide"
+      "insights-reading": "InsightsReadingSlide",
+      "insights-plan": "InsightsPlanSlide",
+      "insights-limits": "InsightsLimitsSlide",
+      "insights-back-cover": "InsightsBackCoverSlide",
+      "insights-figure-comparison": "InsightsFigureComparisonSlide",
+      "insights-figure-columns": "InsightsFigureColumnsSlide",
+      "insights-figure-targets": "InsightsFigureTargetsSlide",
+      "insights-figure-trend": "InsightsFigureTrendSlide"
     },
     "disambiguation": [
-      "una conclusión con la figura que la prueba => InsightsEvidenceSlide.",
       "un capítulo cuya evidencia no alcanzó para una figura => InsightsNarrativeSlide. NUNCA se omite el capítulo.",
       "lo que la edición no puede afirmar => InsightsLimitsSlide, y siempre cierra el deck."
     ],

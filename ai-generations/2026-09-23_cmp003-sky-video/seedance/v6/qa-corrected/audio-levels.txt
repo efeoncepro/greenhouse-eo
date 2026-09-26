@@ -1,0 +1,24 @@
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/sky-v6-corrected-silent.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+  Duration: 00:00:30.04, start: 0.000000, bitrate: 7968 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 720x1280 [SAR 1:1 DAR 9:16], 7966 kb/s, 24 fps, 24 tbr, 12288 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> wrapped_avframe (native))
+Press [q] to stop, [?] for help
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf62.12.101
+  Stream #0:0(und): Video: wrapped_avframe, yuv420p(progressive), 720x1280 [SAR 1:1 DAR 9:16], q=2-31, 200 kb/s, 24 fps, 24 tbn (default)
+    Metadata:
+      encoder         : Lavc62.28.101 wrapped_avframe
+      handler_name    : VideoHandler
+[out#0/null @ 0x778cc40180] video:299KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  721 fps=0.0 q=-0.0 Lsize=N/A time=00:00:30.04 bitrate=N/A speed=66.9x elapsed=0:00:00.44    

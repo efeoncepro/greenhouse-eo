@@ -1,0 +1,31 @@
+{
+  "reference": "ElevenLabs native Use as reference: Heroic Ascent",
+  "source": "music-v2.5-intro-repaired.wav",
+  "sourceRange": [
+    0,
+    30
+  ],
+  "purpose": "style reference only; no splice in final music",
+  "requestedModel": "Music v3",
+  "verifiedAvailableModel": "Music v2.5",
+  "uiModels": [
+    "Music v1",
+    "Music v2",
+    "Music v2.5"
+  ],
+  "durationSeconds": 30,
+  "variations": 1,
+  "instrumental": true,
+  "quoteCredits": 795,
+  "status": "completed and downloaded",
+  "referenceSongId": "idrq0CycPCeXW50njc3Y",
+  "referenceProjectId": "gyvTaCwHahnhAWn0aB0k",
+  "referenceInfluence": 1,
+  "localExcerptUploaded": false,
+  "termsApproval": "User explicitly authorized accept and continue",
+  "projectId": "riVXVCCDac1uJmLXZvTI",
+  "songId": "7DG5i9CQXNDR2GTlUqwZ",
+  "generatedTitle": "Heroic Ascent Finale",
+  "output": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v14-finish/audio/music-v2.5-heroic-reference.wav",
+  "sha256": "030b4e96394c08c81022ed08ecf327b5d890cf3d9e7ac406183ee8b66765e20d"
+}

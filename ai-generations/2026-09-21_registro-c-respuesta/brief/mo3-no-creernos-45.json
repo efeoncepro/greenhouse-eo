@@ -1,0 +1,17 @@
+{
+  "id": "mo3-no-creernos-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "objetos": [
+    { "objeto": "clawd", "vista": "frente" }
+  ],
+  "escena": "SCENE (a museum-grade vitrine in a dark empty gallery, seen straight on at case height): a single display case of clear low-iron tempered glass sits on a low plinth of brushed anodised aluminium — five frameless panes, hairline silicone joints, contemporary and precise, no wood, no brass, no velvet. A thin LED strip recessed along the inside base of the case glows clean blue-white, the ONLY real light source in the frame, lighting the case from within so the glass reads unmistakably TRANSPARENT: the far wall of the gallery is visible straight through it, and the near pane throws a sharp hard-edged reflection. Inside the case, standing on the lit base, the small Clawd figure from the reference faces front, fully visible, nothing covering or cropping it, no pedestal under it and no cloth around it — the whole object open to view from every side. The gallery around it falls to black: no visitors, no other cases, no labels, no wall text, no paper, no printed matter of any kind, no plants. COLOUR: the environment is cool and contemporary — deep ink-blue blacks, the LED a clean blue-white, the metal neutral grey; the figure's own warm colour is the ONLY warm thing in the frame and it does not spread. The gallery light, the glass and the metal stay strictly cool: no tungsten, no amber cast, no golden spill, no retro glow anywhere in the room. The case sits low in the frame; its light, its spill and every reflection it throws stay BELOW the middle of the image, while the upper third is an unbroken field of ink-blue darkness. Fine dust hangs in the light. 50mm lens at f/2.8, camera at case height.",
+  "reservas": {
+    "texto": { "muro": "the empty dark gallery above the vitrine, unbroken and unlit", "tinta": "blanca" }
+  },
+  "lecho": {
+    "objeto": "the top rail of a low museum barrier in the immediate foreground, running unbroken across the whole width of the frame below the case",
+    "tono": "dark matte powder-coated steel rail in full shadow, outside the case light"
+  }
+}

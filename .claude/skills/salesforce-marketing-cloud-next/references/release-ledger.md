@@ -1,6 +1,6 @@
 # Release y claim ledger
 
-Actualiza este ledger desde release notes y contrato antes de usarlo. Snapshot de investigación: **2026-09-16**.
+Actualiza este ledger desde release notes y contrato antes de usarlo. Snapshot de investigación: **2026-09-18**.
 
 | Afirmación | Estado | Evidencia / regla |
 |---|---|---|
@@ -21,5 +21,8 @@ Actualiza este ledger desde release notes y contrato antes de usarlo. Snapshot d
 | Headless Marketing/MCP está disponible universalmente | Falso | GA anunciada para octubre de 2026; verifica conector, producto, región y entitlement |
 | Data Guardian y Budget Optimization están incluidos por defecto | Falso | GA anunciada para octubre de 2026 y sujeta a edición, permisos y consumo |
 | La lista de novedades de Marketing Cloud es un solo lanzamiento GA | Falso | Mezcla RCS GA ahora con capacidades anunciadas para octubre y noviembre de 2026 |
+| Marketing Cloud Next incluye automáticamente AIforce, Claudeforce, Slackforce o Agentforce Coworker | Falso | AIforce es una capa/superficie transversal; confirma producto consumidor, edición, permisos, región y contrato |
+| Palmata prueba que una marca ya ganó visibilidad en respuestas de IA | Falso | Es una superficie de discoverability/AEO; no prueba posicionamiento, tráfico ni outcome |
+| Un anuncio de Dreamforce del 15–16/09 prueba disponibilidad en Chile | Falso | Fecha de evento y disponibilidad regional/contractual son dimensiones distintas |
 
 Para un claim nuevo registra: `claim`, `producto/edición`, `release`, `estado GA/preview`, `región`, `entitlement`, `fuente primaria`, `as-of`, `owner` y `uso permitido`.

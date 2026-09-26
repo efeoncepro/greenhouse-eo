@@ -1,0 +1,158 @@
+[
+  {
+    "id": "cerrado",
+    "dominante": [
+      "No fuiste tú."
+    ],
+    "ratioDominanteEntrada": 4.7,
+    "contraste": {
+      "entrada": 19.88,
+      "dominante": 18.37,
+      "cierre-frase": 19.79,
+      "nota": 19.85,
+      "cta": 10.88,
+      "descriptor": 19.76,
+      "logo": 20.34
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 25,
+        "ratioDominante": 0.149
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 25,
+        "ratioDominante": 0.149
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "ia",
+          "labelBounds": {
+            "left": 729.495,
+            "top": 296.92,
+            "right": 767.699,
+            "bottom": 328.128
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "equilibrado",
+    "dominante": [
+      "No fuiste tú."
+    ],
+    "ratioDominanteEntrada": 4.7,
+    "contraste": {
+      "entrada": 19.88,
+      "dominante": 18.37,
+      "cierre-frase": 19.79,
+      "nota": 19.85,
+      "cta": 10.88,
+      "descriptor": 19.76,
+      "logo": 20.34
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 25,
+        "ratioDominante": 0.149
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 25,
+        "ratioDominante": 0.149
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "ia",
+          "labelBounds": {
+            "left": 796.695,
+            "top": 296.92,
+            "right": 834.899,
+            "bottom": 328.128
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "abierto",
+    "dominante": [
+      "No fuiste tú."
+    ],
+    "ratioDominanteEntrada": 4.7,
+    "contraste": {
+      "entrada": 19.88,
+      "dominante": 18.37,
+      "cierre-frase": 19.79,
+      "nota": 19.85,
+      "cta": 10.88,
+      "descriptor": 19.76,
+      "logo": 20.34
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 25,
+        "ratioDominante": 0.149
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 25,
+        "ratioDominante": 0.149
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "ia",
+          "labelBounds": {
+            "left": 890.775,
+            "top": 296.92,
+            "right": 928.979,
+            "bottom": 328.128
+          }
+        }
+      ]
+    }
+  }
+]

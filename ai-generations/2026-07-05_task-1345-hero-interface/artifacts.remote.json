@@ -1,0 +1,41 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:26:17.704Z",
+  "run": "ai-generations/2026-07-05_task-1345-hero-interface",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-05_task-1345-hero-interface",
+  "totalBytes": 8133812,
+  "fileCount": 5,
+  "files": [
+    {
+      "path": "UI-1-site-layers.png",
+      "sizeBytes": 1170774,
+      "sha256": "f7cb49f47d5baafce310bd5147b5e4885a465ac26342abd779f1dd69ba99af65",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-interface/UI-1-site-layers.png"
+    },
+    {
+      "path": "UI-2-working-interface.png",
+      "sizeBytes": 1146904,
+      "sha256": "8ef919038246f4a7f97ac490582cd988330b980609b5d61b6e91a54130db3c60",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-interface/UI-2-working-interface.png"
+    },
+    {
+      "path": "_verify/desktop-1440.png",
+      "sizeBytes": 2514978,
+      "sha256": "ab24905fb9572df7488f1ccc62c89e5a31e5662c9ef766e5641f05221c7dcb99",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-interface/_verify/desktop-1440.png"
+    },
+    {
+      "path": "_verify/desktop-reduced.png",
+      "sizeBytes": 2491463,
+      "sha256": "effb802042b0b5057a6b221192f897fddfbd038d49bf22f71541ed533bec4bd0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-interface/_verify/desktop-reduced.png"
+    },
+    {
+      "path": "_verify/mobile-390.png",
+      "sizeBytes": 809693,
+      "sha256": "b2521d89dbb0d1bf412d5f856e97c7929b7a77ea3859b569b048fd88aac8114f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-interface/_verify/mobile-390.png"
+    }
+  ]
+}

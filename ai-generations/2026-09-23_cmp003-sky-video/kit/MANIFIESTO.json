@@ -1,0 +1,102 @@
+{
+  "generado": "2026-09-24T00:06:29.889Z",
+  "escala": 2,
+  "piezas": {
+    "T01a-caja-vacia-cursor": {
+      "file": "out/piezas/T01a-caja-vacia-cursor.png",
+      "sha256": "310913e3215c7bc241494bf6589c7a5dc812949cb766aab8a9af6dde32cbb4f1"
+    },
+    "T01b-caja-pregunta": {
+      "file": "out/piezas/T01b-caja-pregunta.png",
+      "sha256": "a8d71619af2b65be711f5941b9b3dfefd3d3a930e4ecaaea399c7d2f08dba77b"
+    },
+    "T01c-caja-pregunta-ia": {
+      "file": "out/piezas/T01c-caja-pregunta-ia.png",
+      "sha256": "bc5971cda16ab823484e4baebffec1453132e0c9df2a3bcbb2f279a3a0e9c4c7"
+    },
+    "T02-pregunta-texto": {
+      "file": "out/piezas/T02-pregunta-texto.png",
+      "sha256": "1f78ede268e508c5cb840fe4162b1bfef23483f82f531e515b5509ea0cee51eb"
+    },
+    "T03a-resultado-camboriu": {
+      "file": "out/piezas/T03a-resultado-camboriu.png",
+      "sha256": "68c35c86830faba054aca162be4b8abd14fab1b3263a454809b70434b2d9537f"
+    },
+    "T03b-resultado-mendoza": {
+      "file": "out/piezas/T03b-resultado-mendoza.png",
+      "sha256": "7dfda6f48dc4b3a3be9caa201c6c1c00409fbcde7efc7770339b009306fdf6b1"
+    },
+    "T03c-resultado-puerto-fuy": {
+      "file": "out/piezas/T03c-resultado-puerto-fuy.png",
+      "sha256": "46652a21f6a35b190b068a48964eb2f8eabba4995a4f980284d22ec66bd306e7"
+    },
+    "T03-resultados-lista": {
+      "file": "out/piezas/T03-resultados-lista.png",
+      "sha256": "b25016e5c5ab2b1ab04c263a8dad1701b23bab3a6529b7f742b544c6763b2dcd"
+    },
+    "T04-burbuja-pregunta": {
+      "file": "out/piezas/T04-burbuja-pregunta.png",
+      "sha256": "7d4fd9787b8ebc4501a00046e963793c337393c8d396fec027f9db25badd0f44"
+    },
+    "T05a-respuesta-tres-chips": {
+      "file": "out/piezas/T05a-respuesta-tres-chips.png",
+      "sha256": "781b673ec6779d9f9594639655f811a34b51bb967a279de4791a34f605f7101c"
+    },
+    "T05b-respuesta-un-chip": {
+      "file": "out/piezas/T05b-respuesta-un-chip.png",
+      "sha256": "88c9920ff98aa907f75faa3c10ce0d641289ba7ba208146f766192b9ea661d87"
+    },
+    "T05c-respuesta-chip-encendido": {
+      "file": "out/piezas/T05c-respuesta-chip-encendido.png",
+      "sha256": "7d64954ef9e9ce9c099d6dfede3a4907eb6681519639dd9999cd8007e9183f5c"
+    },
+    "T06a-chip-reposo": {
+      "file": "out/piezas/T06a-chip-reposo.png",
+      "sha256": "e6a24affda69a127fbf2e4dda4abc9fd2766892ee0d9572af0c0ea4544d606d1"
+    },
+    "T06b-chip-encendido": {
+      "file": "out/piezas/T06b-chip-encendido.png",
+      "sha256": "b1a4beb5ef6346d1d792c2bf2a4f78af7bc4c9a2f4f2953cad0baf3436ebe14a"
+    },
+    "T06c-chip-destellos": {
+      "file": "out/piezas/T06c-chip-destellos.png",
+      "sha256": "50a25ed6cc2b37404f20c104b4036a580b765c90ca5e0e7b4ecc8bbac9e5e26a"
+    },
+    "T08-un-ano-creando-con-sky": {
+      "file": "out/piezas/T08-un-ano-creando-con-sky.png",
+      "sha256": "6b4189b09abe6d8106224aeaf9595a5ec2f0d1973b5495352da9e5c653f0829b"
+    },
+    "T09-mas-2000-piezas": {
+      "file": "out/piezas/T09-mas-2000-piezas.png",
+      "sha256": "cf4c6b7d826ff1dc64f7cf7f97ef9f92e0d6f34655d775b46f88b73e22de15b0"
+    },
+    "T10a-y-ahora-nos-eligio-como": {
+      "file": "out/piezas/T10a-y-ahora-nos-eligio-como.png",
+      "sha256": "86d5efe19579fc5b75e89713b7364a9dd54ae61bb3e3b31eb11dbddce1f54b88"
+    },
+    "T10b-su-agencia-seo-aeo": {
+      "file": "out/piezas/T10b-su-agencia-seo-aeo.png",
+      "sha256": "9128d03843674c49d77b6d2aa9730507295baea0705b270dfb44f14c87d257dc"
+    },
+    "T11-gracias-sky": {
+      "file": "out/piezas/T11-gracias-sky.png",
+      "sha256": "88fc4322b5e9945c2e995879289e4d9fdfb759d9f1c775431ba6d81c1b457ea6"
+    },
+    "L01-logo-efeonce-negativo": {
+      "file": "out/piezas/L01-logo-efeonce-negativo.png",
+      "sha256": "5b53f35ee1de01a4b7044d1614aa79e5ec43b1e75613949003519e7252c303e1"
+    },
+    "L02-logo-sky-blanco": {
+      "file": "out/piezas/L02-logo-sky-blanco.png",
+      "sha256": "30f9b91a1e01f4a359d72d22adbdd2e918dfac0c6fb86e2de12fa507909ebaa0"
+    },
+    "L03-separador": {
+      "file": "out/piezas/L03-separador.png",
+      "sha256": "e7f1e7bf33436b0ae4097942733dbf6ffc2e07a7f8542abef2302a5fbcb2efb8"
+    },
+    "L05-favicon-sky": {
+      "file": "out/piezas/L05-favicon-sky.png",
+      "sha256": "e3775e85efcb5f7c31bd1f3bbc96e80ac20508f008aa266d0af819bdfe813b9c"
+    }
+  }
+}

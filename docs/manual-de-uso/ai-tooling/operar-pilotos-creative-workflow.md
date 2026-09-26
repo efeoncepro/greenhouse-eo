@@ -4,6 +4,11 @@
 >
 > Estado: Aplicable a pilotos manuales versionados. No describe una pantalla de producto ni autoriza publicación automática.
 
+> **Ruta vigente para Gemini Omni 1.1 Cloud (2026-09-24):** usar `pnpm ai:omni` y el
+> [manual del CLI](gemini-omni-1-1-cli.md) para texto, imagen, primer/último cuadro, referencias, edición y
+> extensión. Los ejemplos del piloto de 2026-07-18 y sus respuestas `promptFeedback`/`candidates` pertenecen
+> a la integración anterior; el CLI 1.1 usa Cloud Interactions, `global`, MP4 fuente para editar y GET por ID.
+
 ## Para qué sirve
 
 Este manual permite a un operador o agente ejecutar un piloto creativo de imagen o video de forma reproducible, con gasto controlado y evidencia suficiente para distinguir una falla de capacidad de un bloqueo de entrada. No presupone que un solo motor gobierne toda la pieza: la selección depende de la operación, del contrato de fidelidad de la referencia y de las invariantes aprobadas.
@@ -55,7 +60,7 @@ el segundo prueba familia de campaña, format wall, mezcla y release creativo si
 3. Mantener el key visual original como fuente canónica. No sobrescribirlo ni usar el storyboard multipanel como input.
 4. Validar dirección, duración, formato, acción, audio y límite de gasto antes de llamar al modelo.
 5. Elegir la mano mediante el gate `el master ya contiene la toma/física` vs `falta una toma, ángulo o continuidad física`; no decidir por canal ni precio aislado. Ver [Selección de motor por contrato de fidelidad](../../../.codex/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md).
-6. Si se usará Omni/Vertex, autenticar ambos caminos de Google Cloud: gcloud auth login y gcloud auth application-default login. Si se usará Fal, comprobar saldo y credencial en Secret Manager sin exponerla.
+6. Si se usará Omni 1.1 Cloud, ejecutar el [preflight GCP del CLI](gemini-omni-1-1-cli.md#3-preflight-gcp), incluidos gcloud auth login y gcloud auth application-default login. Si se usará Fal, comprobar saldo y credencial en Secret Manager sin exponerla.
 7. Ejecutar primero el modo plan. Ningún plan debe llamar al proveedor.
 
 ### Preflight enterprise del provider
@@ -132,7 +137,7 @@ El detalle de capacidad, fuentes, prompt de intención y restricciones internas 
 2. No cambiar el brief ni lanzar una batería paralela.
 3. Si el límite persiste después de los reintentos definidos, detener la corrida y registrar capacidad pendiente.
 
-## Si aparece HTTP 200 sin candidatos en Omni / Vertex
+## Si aparece HTTP 200 sin candidatos en el piloto Omni anterior
 
 Un HTTP 200 no equivale a una generación. Si promptFeedback está presente y candidates está vacío, la entrada fue bloqueada antes de producir video.
 
@@ -173,9 +178,10 @@ No se debe intentar desactivar filtros, ocultar contenido sensible ni presentar 
 
 ### Cómo elegir entre editar con Omni y editar el clip existente
 
-1. **Cambio localizado que necesita píxeles y tolera reinterpretación:** usar una interacción Omni persistente,
-   una instrucción acotada y guardar su ID. No incluir `aspect_ratio` en una tarea `edit` si el proveedor ya
-   preserva el formato del input.
+1. **Cambio localizado que necesita píxeles y tolera reinterpretación:** usar `pnpm ai:omni --task edit`
+   con el MP4 fuente, una instrucción acotada y guardar el ID de interacción. No incluir `aspect_ratio` en
+   `edit`: Cloud 1.1 conserva el formato del input. `previous_interaction_id` stateful no está probado para
+   este modelo en Cloud; el ID sirve para recuperar y auditar el trabajo.
 2. **Falta una toma, ángulo o continuidad física completa:** usar Seedance 2.0 como fallback con la referencia
    aprobada. No simular una actuación ausente mediante retime.
 3. **Sólo cambia el montaje:** para repetir un gesto ya correcto, cambiar pausas, reordenar beats, construir la

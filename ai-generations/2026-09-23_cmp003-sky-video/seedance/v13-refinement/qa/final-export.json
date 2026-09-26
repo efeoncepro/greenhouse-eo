@@ -1,0 +1,24 @@
+{
+  "sha256": "f9ce3955cfe8c0781b4c9b9f9a3e27be03d76db2cad0ce4f0d8f702202de70c9",
+  "frames": 720,
+  "duration": 30,
+  "resolution": [
+    1080,
+    1920
+  ],
+  "fps": 24,
+  "costUsd": 0,
+  "visualReview": "overview full30s,180 frames8.5-16s, native closing",
+  "audioListening": "pending; unavailable to agent",
+  "approvedByUser": false,
+  "changes": {
+    "urlWidth": [
+      620,
+      320
+    ],
+    "purpleTarget": "#50015C",
+    "purpleSource": "archived kit/refs/home.html, fallback header color; not claimed current brand manual",
+    "transition": "continuous V11 source9.75-25s from output9s",
+    "music": "V7 recovered, excludes source15.1-24.4s"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "reference": null,
+  "catalog": "deck",
+  "contentType": "insights-chapter",
+  "slots": {
+    "chapterLabel": "Capítulo 01",
+    "chapterNumeral": "01",
+    "runningLabel": "Informe de agosto 2026",
+    "chapterTitle": "Visibilidad orgánica",
+    "chapterLead": "El sitio convierte mejor lo que muestra: agosto trajo más clics con menos impresiones, y el alza se sostuvo todo el mes.",
+    "contents": {
+      "label": "En este capítulo",
+      "entries": [
+        {
+          "title": "Clics, impresiones y CTR",
+          "folio": "06"
+        },
+        {
+          "title": "Posiciones en Google",
+          "folio": "07"
+        },
+        {
+          "title": "Clics día a día",
+          "folio": "08"
+        },
+        {
+          "title": "Qué explica el alza",
+          "folio": "09"
+        },
+        {
+          "title": "De dónde vienen los clics",
+          "folio": "10"
+        },
+        {
+          "title": "Posiciones semana a semana",
+          "folio": "11"
+        },
+        {
+          "title": "Cobertura de keywords",
+          "folio": "12"
+        },
+        {
+          "title": "Páginas con más impresiones y CTR bajo",
+          "folio": "13"
+        },
+        {
+          "title": "Salud técnica del sitio",
+          "folio": "14"
+        }
+      ]
+    },
+    "pageFolio": "05"
+  },
+  "name": "deck-capitulo-01"
+}

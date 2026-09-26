@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  InsightsReadingSlide — «Nuestra lectura» del deck (TASK-1889, canvas aprobado 2026-09-25, lámina
+  `Deck-Lectura`, 1280×720).
+
+  Tesis en grande (la segunda mitad resaltada con <em>), tres bloques numerados con sus folios de
+  evidencia y la franja «En una frase». El bloque que carga el argumento lleva `tone: focus`
+  (filete teal); el ordinal sale de la posición.
+-->
+<link rel="stylesheet" href="deck-tokens.css" />
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="deck-editorial.css" />
+<style>
+  .reading-main { position: absolute; left: 72px; right: 72px; top: 104px; display: flex; flex-direction: column; }
+
+  .reading-thesis {
+    margin: 22px 0 0;
+    max-width: 1000px;
+    font-family: var(--axis-deck-type-display);
+    font-size: 46px;
+    line-height: 1.08;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .reading-thesis em { font-style: normal; color: var(--axis-deck-role-navyAccent); }
+
+  .reading-blocks { margin-top: 56px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 44px; }
+
+  .reading-block {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 18px;
+    border-top: 2px solid rgba(var(--axis-deck-role-navyMuted-rgb), 0.3);
+  }
+
+  .reading-block.block--focus { border-top-color: var(--axis-deck-role-navyAccent); }
+
+
+  .block-ordinal {
+    font-family: var(--axis-deck-type-display);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--axis-deck-role-dataPriorOnNavy);
+  }
+
+  .block-heading { font-family: var(--axis-deck-type-display); font-size: 19px; font-weight: 700; line-height: 1.25; }
+
+  .block-text { margin: 0; font-size: 15px; line-height: 1.55; color: var(--axis-deck-role-navyLead); }
+
+  .block-folios { display: flex; gap: 8px; }
+
+  .deck-band-text em { font-style: italic; font-weight: 700; }
+</style>
+</head>
+<body>
+  <div class="lamina">
+    <svg class="art" width="1280" height="720" viewBox="0 0 1280 720" aria-hidden="true">
+      <defs>
+        <radialGradient id="readingHalo" cx="0.5" cy="0.5" r="0.5">
+          <stop class="halo-stop" offset="0" stop-opacity="0.2"></stop>
+          <stop class="halo-stop" offset="0.55" stop-opacity="0.06"></stop>
+          <stop class="halo-stop" offset="1" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+      <circle cx="230" cy="250" r="380" fill="url(#readingHalo)"></circle>
+      <g class="orbit-rings">
+        <circle cx="1290" cy="740" r="230"></circle>
+        <circle cx="1290" cy="740" r="330"></circle>
+        <circle cx="1290" cy="740" r="430"></circle>
+      </g>
+    </svg>
+
+    <header class="deck-head">
+      <span class="deck-tab">
+        <span class="deck-tab-number" data-slot="tabNumber">C</span>
+        <span class="deck-tab-section" data-slot="section">Conclusiones</span>
+      </span>
+      <span class="deck-period" data-slot="period">Agosto 2026</span>
+    </header>
+
+    <main class="reading-main">
+      <span class="deck-eyebrow"><svg class="stroke-icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 11h-4a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h3a1 1 0 0 1 1 1v6c0 2.667 -1.333 4.333 -4 5"></path><path d="M19 11h-4a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h3a1 1 0 0 1 1 1v6c0 2.667 -1.333 4.333 -4 5"></path></svg><span data-slot="eyebrow">Nuestra lectura</span></span>
+      <h1 class="reading-thesis" data-slot="thesis">El sitio ya no tiene un problema de visibilidad: <em>tiene uno de conversión.</em></h1>
+      <div class="reading-blocks" data-slot="blocks">
+        <div class="reading-block">
+          <span class="block-ordinal" data-slot-field="ordinal">01</span>
+          <span class="block-heading" data-slot-field="heading">Lo que muestran los datos</span>
+          <p class="block-text" data-slot-field="text">El alza es sostenida.</p>
+          <span class="block-folios" data-slot-field="folios"><span class="deck-chip">p. 08</span></span>
+        </div>
+      </div>
+    </main>
+
+    <div class="deck-band" data-slot="oneLiner"><span class="deck-band-label"><svg class="stroke-icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 11h-4a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h3a1 1 0 0 1 1 1v6c0 2.667 -1.333 4.333 -4 5"></path><path d="M19 11h-4a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h3a1 1 0 0 1 1 1v6c0 2.667 -1.333 4.333 -4 5"></path></svg><span data-slot-field="label">En una frase</span></span><span class="deck-band-text" data-slot-field="text"><em>Cada punto de CTR vale unos 480 clics al mes:</em> el crecimiento está en convertir.</span></div>
+
+    <footer class="deck-foot2">
+      <span class="deck-foot2-id">
+        <img src="assets/brand/logo-negative.svg" alt="Efeonce" />
+        <span class="divider"></span>
+        <span class="deck-foot2-edition" data-slot="footerEdition">Insights · Informe de agosto 2026</span>
+      </span>
+      <span class="deck-foot2-end">
+        <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+        <span class="divider"></span>
+        <span class="deck-folio" data-slot="folio"><span class="deck-folio-page" data-slot-field="page">03</span><span class="deck-folio-total">/ <span data-slot-field="total">24</span></span></span>
+      </span>
+    </footer>
+  </div>
+</body>
+</html>

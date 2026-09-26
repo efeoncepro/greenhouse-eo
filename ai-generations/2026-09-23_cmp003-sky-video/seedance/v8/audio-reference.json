@@ -1,0 +1,7 @@
+{
+  "media_id": "5bf0428e-fa7f-4117-822c-9272349684d1",
+  "source_file": "../v7/audio-clean.wav",
+  "source_asset": "cwnYhvQjwEI73SELqQFj",
+  "transfer": "ElevenLabs preview MP3 remuxed without re-encoding, uploaded and confirmed in Higgsfield",
+  "speech_check": "../v7/clean-audio-speech-check.json"
+}

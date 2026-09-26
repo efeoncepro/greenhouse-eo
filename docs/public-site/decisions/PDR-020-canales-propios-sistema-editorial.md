@@ -137,6 +137,17 @@ El sistema distingue dos cosas:
   original, el satélite no se hace.
 - Trendjacking **no se despieza**: su valor es la ventana temporal, y un canal lento la pierde.
 
+**Subserie del capítulo humano-agente (2026-09-19):** «Así trabaja un equipo humano-agente» no agrega una
+franquicia ni una taxonomía social. En LinkedIn Página usa `Educativo` para explicar un job, ficha de rol,
+excepción o medición; en Instagram sólo entra en `Behind the Build` si hay proceso real filmable; LinkedIn Julio
+conserva POV personal y un caso completo sigue siendo `Casos de Éxito` con permiso del cliente. El mismo tema
+puede tener cortes distintos, pero un asset idéntico no cambia de trabajo por reescribirle el caption. La variante
+CMO une evidencia AEO, brief de marca/campaña y revisión humano-agente bajo las mismas franquicias; no convierte la
+serie en «CRM para marketing» ni agrega otro territorio. Los datos públicos sobre la marca y el contexto privado
+autorizado del equipo requieren fuentes y permisos distintos. Canon:
+[`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md)
+y [brief Q4](../../commercial/campaigns/2026-q4-tu-ia-no-conoce-tu-negocio/README.md).
+
 **El formato transversal — talking head** (*face-to-camera*, en B2B *executive-led video*): es la única
 producción que rinde corte en cuatro canales desde una sola grabación (Instagram, LinkedIn, YouTube Shorts,
 y gancho en Threads). Es la expresión del diferenciador de PDR-005 §1.1 y ya tiene capability de producción:
@@ -321,6 +332,9 @@ de Contenidos** — mapeadas en `docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_M
 - **La estrategia de LinkedIn queda huérfana de fuente.** Los *Thought Territories T1–T5* citados en
   `docs/context/09_marca-agencia.md` remiten a un doc de marca ausente del repo. Hasta reponerlo o reemplazarlo,
   los territorios de LinkedIn son los de PDR-019, no los T1–T5.
+- **El job humano-agente no está representado con claridad en los siete Pilares JTBD documentados.** Es candidato
+  a un pilar nuevo o a una revisión de alcance de uno existente, decisión que se toma contra Notion vigente y
+  buyer/jobs reales. No se promueve «Agentes» a categoría raíz del blog ni se crea un pilar por defecto.
 - **Medición:** analítica nativa por red vía Metricool MCP resolviendo `brandId` con `getBrandSettings` antes
   de cualquier operación; programar y publicar siguen la doctrina `propose → confirm → execute` con
   confirmación humana explícita.

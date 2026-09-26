@@ -1,0 +1,49 @@
+A 15-second seamless loop for a 1:1 SQUARE social ad. THIS PIECE IS EFFECTIVELY SILENT: there is no dialogue and no score. The only sounds are the faint tone of an empty room and a few small physical noises made by things that move on screen.
+
+Image 1 is the EXACT target look of the finished frame — its typography, its text hierarchy, its corner brackets and its cursor are the reference to reproduce faithfully. Image 2 is the clean set. Image 3 is a close crop of the same woman in this set: keep her identity, hair, clothing and build exactly as shown there. Image 4 is her approved profile portrait and is a reference for her FACE AND HAIR ONLY — ignore the grey top she wears in it: in this video she wears the navy polo of images 1 and 3, never grey.
+
+THE SET (from image 2, locked): a woman with long dark wavy hair in a navy polo stands in a warm-lit modern office, holding a tablet that shows a contemporary glass office tower. Beside her, a large wall display shows an answer screen with a photo of an old, run-down warehouse. She stays in the same place in frame; only her head, eyes, arms and the tablet move. Her navy polo is only ever seen from the side or back: no emblem, badge or lettering on her clothing ever becomes visible or legible. The camera is LOCKED OFF for the whole shot: no pan, no tilt, no zoom, no dolly.
+
+THE PERFORMANCE — her movements are small, natural and unhurried — a person quietly noticing a mismatch. Her face stays mostly turned away from the camera, as in image 1; we see her in three-quarter profile, never a frontal close-up:
+- 0.0–1.0s   She looks down at the tablet in her hands.
+- 1.0–3.0s   She lifts her eyes from the tablet to the wall display and pauses.
+- 3.0–5.0s   She raises the tablet slightly and turns it toward the wall display, so the glass tower on the tablet and the old warehouse on the display are seen together in the same frame.
+- 5.0–6.0s   Her head tilts very slightly: the smallest beat of doubt.
+- 6.0–13.0s  She holds still, comparing the two images; only a slow breath and a single slow blink show she is alive.
+- 13.0–15.0s She lowers the tablet back to the exact position of the first frame and looks down at it again.
+The images on the tablet and on the display never change, never morph and never swap: the tower stays a tower, the warehouse stays a warehouse. The text-like lines on the display are blurred light shapes, never readable letters.
+
+THE TWO PICTURES NEVER MATCH: her real building on the tablet and the old warehouse on the display stay exactly as they are for all fifteen seconds. That mismatch is the point of the piece.
+
+THE GRAPHIC LAYER — reproduce the typography, weights, sizes, colours and positions exactly as in image 1. The shape of this sequence matters more than any single timing: the elements arrive at a steady pace, then the FULLY COMPOSED frame is HELD FOR A LONG TIME so it can be read as a whole, and only then does it fade out SLOWLY. Once an element appears it never moves or leaves until the final fade.
+1. 1.0s   The small white line "La IA describe tu negocio." fades in, centred at the top.
+2. 2.0s   The huge bold headline "¿Te reconoces?" SLAMS in hard — a fast punch-in scale from 104% to 100% with no bounce — white, with only the word "reconoces" in vivid orange.
+3. 3.5s   A solid orange rounded button reading "Pide el diagnóstico" in dark text fades in, with the small white line "SEO + AEO" under it, and four thin white corner brackets draw themselves around the pair.
+4. 5.0s   A white arrow cursor glides in from the right, stops at the button's right edge and clicks: the button brightens once.
+5. 7.5–13.0s  🔴 THE LONG HOLD. The complete composition — every line of text, the button, the corner brackets and the cursor — stays FULLY VISIBLE and PERFECTLY STILL for five and a half seconds. Nothing appears, nothing moves, nothing changes in the graphic layer. This is the reading window and it is the most important part of the sequence: do not shorten it, do not animate anything in the graphic layer during it.
+6. 13.0–14.3s  A SLOW, GENTLE fade out: over more than a full second every graphic element dissolves together and gradually — never a cut, never a fast wipe.
+7. 14.3–15.0s The frame is COMPLETELY CLEAN and identical to the very first frame. Do NOT leave any text on screen at the end.
+
+TEXT SIZE AND LAYOUT — match image 1 exactly, do not shrink it:
+- The whole text block is CENTRED in the upper 25% of the square, starting about 4% down from the top, with the same proportions as in image 1.
+- The headline is by far the largest element in the picture — several times taller than the line above it. Do NOT render it small.
+- Only the highlighted word of the headline is orange; everything else in it is white.
+- The four corner brackets hug the button and its descriptor; the white arrow cursor sits just outside their right edge.
+Text is crisp, perfectly legible, correctly spelled Spanish with its accents, never warped and never handwritten.
+
+THE LOWER BAND — the strip across the bottom of the frame stays exactly as in image 1: dark, calm and EMPTY. Do not draw any wordmark, emblem, signature, watermark or lettering there, at any moment. A brand signature is added later in editing and needs that space clear.
+
+SOUNDTRACK — there is no score in this video at all: no fanfare, no orchestra, no brass, no strings, no melody, no instrumental bed of any kind. And there is NO dialogue track: no voice, no gibberish, no babbling, no crowd, no whispering — not one syllable in any language is uttered at any point by anyone.
+
+Under everything, a barely audible room tone — the faint air of a quiet room — so the silence sounds like a real room and never like a broken audio file.
+
+On top of that room tone, ONLY these discrete sounds, each landing exactly on its action and each surrounded by silence:
+- a faint fabric rustle at ~1.0s as she lifts her eyes;
+- a soft handling sound of the tablet at ~3.0s as she raises it;
+- a soft handling sound at ~13.0s as she lowers it;
+- a delicate high tick each time a line of text appears;
+- a crisp mouse click when the cursor presses the button.
+
+The physical actions are the most present sounds in the mix; the interface ticks are noticeably quieter. During the long hold (7.5–13.0s) there is NO sound at all beyond the room tone. All sounds are crisp, short, dry and light: no reverb tails, no comedy honks, no slide whistles, no boings, no slapstick. The loop is continuous: the room tone carries seamlessly from the last frame back into the first, with no gap, no fade and no ending sting.
+
+Photographic and documentary: a real person in a real workplace, natural skin texture, subtle sensor grain, true depth of field, warm practical light. Hands and fingers anatomically correct (five fingers, natural proportions). Her face never distorts and never changes identity; her lips stay closed the whole time. Not a cartoon, not a 3D render, not glossy stock.

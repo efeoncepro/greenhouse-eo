@@ -1,0 +1,32 @@
+{
+  "id": "julio-1-experiencia-autoservicio-v2",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    "julio"
+  ],
+  "servicio": "Product Design 360: observación y prueba de recorrido de autoservicio",
+  "industria": "espacio cultural hipotético y sin cliente real",
+  "mercado": "Santiago",
+  "preflightVisual": {
+    "vistos": [
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/set-curado-12.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/J1-retrato-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/J3-escenario-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas2/J5-respaldo-final.png",
+      "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-04.png",
+      "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-08.png",
+      "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-11.png"
+    ],
+    "comparacion": "J1 y J3 fijan montura plateada, pelo corto rizado con canas, barba entrecana y cara legible. J5 muestra el gesto activo junto a una obra visible y un lecho oscuro. Esta escena prueba un recorrido digital en el lugar: la pantalla real lleva el azul y una señal de resultado lima, pero el trabajo de Julio, la distancia del brazo y la relación con el visitante gobiernan la imagen. El vidrio y la piedra clara del sitio forman un lecho luminoso; no se añade utilería de marca. La primera salida conservó obra e identidad pero el lecho claro falló contraste para ambas tintas (1.15:1 blanco, 1.53:1 navy); se corrige la materia del primer plano sin alterar la acción.",
+    "azul": "contenido abstracto azul activo dentro de la pantalla de autoservicio encendida, visible como parte del dispositivo que se está probando; leve reflejo congruente en el vidrio lateral",
+    "acento": "una pequeña luz de estado lima dentro de la interfaz funcional después de la interacción de prueba, sin texto ni icono de check",
+    "lecho": "borde inferior del mismo kiosco, metal mate carbón, pegado al lente: oscuro y reconocible como parte del dispositivo en los extremos, disuelto en el centro"
+  },
+  "escena": "SCENE (on-site test of a self-service journey for an unnamed, hypothetical cultural venue in Santiago, late morning): Julio Reyes is the ONLY person in frame, working rather than posing. He wears an unbranded warm-grey cotton overshirt, a pale cream tee and charcoal trousers, with NO navy suit or blue garment; the outfit is practical and understated. A documentary 50mm f/2.8 eye-level camera angle from beside the visitor's place catches the decisive moment as he stands in three-quarter view and tests the reach and sightline of a real, slim touchscreen kiosk: one hand hovering a few centimeters from the glass, the other loosely holding a folded blank prototype card at his side. His face and silver rectangular glasses remain large enough to read, in sharp focus, as he looks at the touch target and not at the camera. The kiosk is fully unbranded, with a photographed active screen showing only a simple abstract azure blue #0375DB field and a small lime-green #6EC207 illuminated status region that appears after the touch; absolutely no letters, digits, icons, checks, logos, or invented UI copy. The blue of the operating display produces a faint natural reflection in an adjacent glass edge, while the lime is a restrained sign of completed interaction. This is a real UX reach-and-sightline test, with a visible mechanism and a clear moment, not a meeting. Warm-neutral daylight from a large side window gives his face sculpted texture and leaves open neutral shadows; cream stone and natural wood stay true to life. Three depth planes, imperfect candid framing, hands anatomically plausible, no client attribution, no artificial color grading, no other colored props. The face follows the Julio identity references, not their formal navy clothing.",
+  "lecho": {
+    "objeto": "the real matte dark-charcoal lower service base of this same kiosk, diagonally crossing the bottom foreground immediately in front of the lens, identifiable as the kiosk housing at the side yet becoming featureless blur in the center",
+    "tono": "DARK near-black matte charcoal in even shade, without highlights or letters"
+  }
+}

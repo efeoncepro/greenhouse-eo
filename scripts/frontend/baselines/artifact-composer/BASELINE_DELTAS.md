@@ -1,5 +1,164 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-25 (k) — TASK-1889: la tabla de respaldo con datos reales
+
+Revisión del operador sobre Berel y Sky: la tabla comparaba unidades distintas en una sola escala y titulaba con «la
+fila más alta». Ahora la cifra principal es el hallazgo del capítulo (opcional: sin hallazgo, no hay cifra), las
+filas de unidades distintas no llevan barras sino una columna de variación con dirección (triángulo en la píldora;
+en una posición, bajar de número es subir) y la leyenda sólo existe si hay barras. El probe dibuja la píldora de la
+fila sin dirección (neutra).
+
+- `templates-insights-report/ReportTablePage.png` — píldora de variación con triángulo
+
+## 2026-09-25 (j) — TASK-1889 Slice 5: la capitular de la narrada sólo con cuerpo que la sostenga
+
+Las ediciones reales de Berel y Sky mostraron una capitular suelta («V isibilidad en IA: 0.») en narradas de
+afirmaciones cortas. La capitular ahora la enciende un hook sólo cuando el primer párrafo compuesto ocupa tres
+líneas o más; el probe (texto corto) queda sin capitular. La fidelidad de las narradas del canvas no cambia.
+
+- `templates-insights-report/ReportNarrativePage.png` — sin capitular con texto corto
+
+## 2026-09-25 (i) — TASK-1889 Slice 4: se retiran las páginas de gráfico v1; la zona de metas sale del dato
+
+Los mappers ya componen cada gráfico del plan en su página de figura premium, y salen del catálogo la página
+analítica v1 y la lámina de evidencia v1 (1920×1080), con sus moldes v1. La zona de atención de las metas deja
+de ser un umbral escrito a mano (0,85 × meta): se dibuja sólo desde `band`, el límite de atención del
+registro dueño (hecho de referencia de TASK-1888); sin banda, la pista es una sola. Con «menos es mejor», lo
+oscuro queda sobre el límite. El probe ejerce la banda con su `example`.
+
+- `templates-insights-report/ReportAnalysisPage.png` — retirada
+- `templates-insights-deck/InsightsEvidenceSlide.png` — retirada
+- `templates-insights-report/ReportFigureTargetsPage.png` — zona desde `band`
+- `templates-insights-deck/InsightsFigureTargetsSlide.png` — zona desde `band`
+
+## 2026-09-25 (h) — TASK-1889 Slice 4: páginas de figura premium
+
+Nacen las páginas de figura del canvas aprobado, una por familia con productor: comparación de períodos por
+métrica (`Premium-Evidencia` / `Deck-Comparacion`), columnas agrupadas sobre un eje compartido
+(`Premium-Agrupadas` / `Deck-Agrupadas`), metas (bullet, `Premium-Metas` / `Deck-Metas`) y tendencia en
+líneas (`Premium-Lineas` / `Deck-Lineas`). Columnas y líneas las dibuja un hook desde la geometría pura
+compartida (`insights-shared/figure-svg.ts`). El probe las ejerce con el `example` que declara cada contrato
+(regla nueva del sintetizador: una figura cuya geometría sale de cifras no se prueba con texto de relleno).
+
+- `templates-insights-report/ReportFigureComparisonPage.png` — nueva
+- `templates-insights-report/ReportFigureColumnsPage.png` — nueva
+- `templates-insights-report/ReportFigureTargetsPage.png` — nueva
+- `templates-insights-report/ReportFigureTrendPage.png` — nueva
+- `templates-insights-deck/InsightsFigureComparisonSlide.png` — nueva
+- `templates-insights-deck/InsightsFigureColumnsSlide.png` — nueva
+- `templates-insights-deck/InsightsFigureTargetsSlide.png` — nueva
+- `templates-insights-deck/InsightsFigureTrendSlide.png` — nueva
+
+## 2026-09-25 (g) — TASK-1889 Slice 3: portada blanca y logo del cliente
+
+Nace la portada blanca (`Premium-Portada-Clara` / `-Creativo`: satélites por canal o arco corto, según el
+dato). Las portadas navy ganan el logo del cliente (variante `on_dark`), que el plan sella como
+`asset-ref:org-logo:<id>` y el worker entrega autorizado (`ComposeOptions.externalAssets`). El probe dibuja
+el asset del catálogo en ese campo (regla nueva del sintetizador para campos `asset`).
+
+- `templates-insights-report/ReportCoverLightPage.png` — nueva
+- `templates-insights-report/ReportCoverPage.png` — «Preparado para» con logo
+- `templates-insights-deck/InsightsCoverSlide.png` — «Preparado para» con logo
+
+## 2026-09-25 (f) — TASK-1889: narrada y límites con la misma crítica
+
+La narrada sigue la anatomía de «Nuestra lectura»: se retira el número en contorno decorativo y el filete
+redundante; la columna lateral pasa a ser útil (frase clave + «En este capítulo»/«En este informe» con folio
+real) y cierra con el panel navy cuando el plan trae decisión o lectura. Los límites ganan cuerpo por fila.
+
+- `templates-insights-report/ReportNarrativePage.png` — columna lateral útil + cierre navy opcional
+- `templates-insights-report/ReportLimitsPage.png` — filas con más cuerpo
+
+## 2026-09-25 (e) — TASK-1889: la tabla vuelve a la anatomía de la evidencia aprobada
+
+Crítica de diseño (operador: «no se ve premium»): la versión anterior cargaba navy arriba (cabecera y
+fila líder) y dejaba vacío el último tercio; las barras pálidas detrás del texto leían como interfaz. Se
+rehace con la anatomía de `Premium-Evidencia`: cifra de la fila más alta y tesis sobre papel, barras finas
+con el valor al final, segunda columna en pastilla, procedencia y panel navy de cierre (si el plan trae la
+lectura). El navy aparece sólo en el cierre.
+
+- `templates-insights-report/ReportTablePage.png` — anatomía de evidencia
+
+## 2026-09-25 (d) — TASK-1889: la tabla de respaldo gana punch
+
+Pedido del operador («la tabla necesita más punch»). Cabecera navy con la cifra contada en teal, tablero de
+barras (cada fila con su barra detrás, desde el dato) y la fila que alcanza el máximo de la tabla completa
+como banda navy. El ranking continúa entre páginas (`rankOffset`), antes volvía a 01.
+
+- `templates-insights-report/ReportTablePage.png` — tablero de barras con cabecera navy y fila líder
+
+## 2026-09-25 (c) — TASK-1889: narrada, tabla y límites elevadas al nivel del canvas
+
+Pedido del operador («muy sencillas para lo premium del diseño V2»). Las cinco piezas sin página propia en
+el canvas pasan a la gramática aprobada: momento dominante (capitular o cifra protagonista contada del dato),
+columna lateral o lista numerada, y cierre (panel navy o franja). La barra de la tabla sale del dato
+(`report-table-bar`, escala de la tabla completa).
+
+- `templates-insights-report/ReportNarrativePage.png` — capitular + columna lateral (frase clave o marca del capítulo)
+- `templates-insights-report/ReportTablePage.png` — cifra contada, ranking, barra desde el dato, procedencia
+- `templates-insights-report/ReportLimitsPage.png` — cifra contada, límites numerados, metodología en panel navy
+- `templates-insights-deck/InsightsNarrativeSlide.png` — gramática de «Lectura» del deck + franja «En una frase»
+- `templates-insights-deck/InsightsLimitsSlide.png` — cifra de 132 px, lista numerada, franja «Cómo se midió»
+
+## 2026-09-25 (b) — TASK-1889: las plantillas editoriales REEMPLAZAN a las v1
+
+Decisión del operador: las v2 no conviven con las v1; ningún agente debe poder componer con una v1
+cuando existe su v2. Cada v2 toma el nombre y el contentType canónicos de la v1 que reemplaza, y la
+v1 se borra del catálogo. Los mappers componen desde el plan actual con las plantillas nuevas. Única
+excepción declarada: las páginas de gráfico (`ReportAnalysisPage`, `InsightsEvidenceSlide`, status
+`legacy` con `replacedBy`) hasta el Slice 4. Guarda: `__tests__/insights-catalogs-v2-only.test.ts`.
+
+**Frames que cambian (v1 → diseño editorial):**
+
+- `templates-insights-report/ReportCoverPage.png` — ahora la portada navy (antes `ReportCoverNavyPage`)
+- `templates-insights-report/ReportIndexPage.png` — índice editorial (antes `ReportContentsPage`)
+- `templates-insights-report/ReportTablePage.png` — tabla densa editorial (antes `ReportDenseTablePage`)
+- `templates-insights-report/ReportLimitsPage.png` — límites editoriales (antes `ReportLimitsV2Page`)
+- `templates-insights-report/ReportNarrativePage.png` — narrativa editorial nueva (sin página en el canvas)
+- `templates-insights-deck/InsightsCoverSlide.png` — portada navy 1280×720 (antes `InsightsCoverNavySlide`)
+- `templates-insights-deck/InsightsNarrativeSlide.png` — narrativa editorial 1280×720 (sin página en el canvas)
+- `templates-insights-deck/InsightsLimitsSlide.png` — límites editoriales 1280×720 (sin página en el canvas)
+
+**Frames retirados (nombres de transición, vivieron sólo en el commit anterior):**
+`templates-insights-report/ReportCoverNavyPage.png`, `templates-insights-report/ReportContentsPage.png`,
+`templates-insights-report/ReportDenseTablePage.png`, `templates-insights-report/ReportLimitsV2Page.png`,
+`templates-insights-deck/InsightsCoverNavySlide.png`.
+
+La narrativa (A4 y deck) y los límites del deck son piezas derivadas, en revisión del operador.
+
+## 2026-09-25 — TASK-1889: plantillas editoriales de Insights (canvas aprobado)
+
+Nacen las plantillas del diseño premium aprobado por el operador el 2026-09-25. **Todas son
+plantillas NUEVAS con contentType propio.** Las v1 de TASK-1847 siguen intactas porque las ediciones
+v1 (flag de TASK-1888 apagado) componen con ellas: sus 10 frames se verificaron **byte-idénticos** al
+baseline después del cambio de pack (Poppins 500 y extensión editorial, opt-in de los catálogos
+Insights; `deck-axis` no los recibe y su CSS compilado queda byte-idéntico).
+
+La fidelidad al canvas se mide aparte (`pnpm insights:canvas-fidelity`): 11 páginas con referencia,
+todas ≤ 0,05 % de píxeles distintos (seis en 0 px). Estos frames son el probe sintético de siempre, el
+guard de regresión del molde y los slots, no la prueba de fidelidad.
+
+**Frames declarados para promoción (15 nuevos):**
+
+- `templates-insights-report/ReportCoverNavyPage.png` — portada navy (`Premium-Portada`)
+- `templates-insights-report/ReportBackCoverPage.png` — contraportada (`Premium-Contraportada`)
+- `templates-insights-report/ReportChapterPage.png` — apertura de capítulo (`Premium-Capitulo*`)
+- `templates-insights-report/ReportSummaryPage.png` — resumen ejecutivo (`Premium-Resumen`)
+- `templates-insights-report/ReportReadingPage.png` — nuestra lectura (`Premium-Lectura`)
+- `templates-insights-report/ReportPlanPage.png` — plan de acción (`Premium-Plan`)
+- `templates-insights-report/ReportContentsPage.png` — índice editorial (sin página en el canvas)
+- `templates-insights-report/ReportDenseTablePage.png` — tabla densa editorial (sin página en el canvas)
+- `templates-insights-report/ReportLimitsV2Page.png` — límites editoriales (sin página en el canvas)
+- `templates-insights-deck/InsightsSummarySlide.png` — resumen (`Deck-Resumen`, 1280×720)
+- `templates-insights-deck/InsightsReadingSlide.png` — lectura (`Deck-Lectura`)
+- `templates-insights-deck/InsightsPlanSlide.png` — plan (`Deck-Plan`)
+- `templates-insights-deck/InsightsCoverNavySlide.png` — portada del deck, derivada de la A4
+- `templates-insights-deck/InsightsChapterSlide.png` — apertura del deck, derivada de la A4
+- `templates-insights-deck/InsightsBackCoverSlide.png` — contraportada del deck, derivada de la A4
+
+⚠️ Las tres últimas no tienen diseño en el canvas y están **en revisión del operador**. Si cambian,
+se re-declaran aquí y se re-promueven; no se edita el PNG a mano.
+
 ## 2026-09-24 — Declaración del set de Insights con el índice A4
 
 La ampliación de TASK-1847 agrega `ReportIndexPage.png` al set visual. El índice se deriva del plan
@@ -382,7 +541,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: e959a6f6f779a2149617cbbc50621e30d2fe8fdd62ca7c23c250ca272a17121a -->
+<!-- manifest-digest: 2c7faaec7edb67f0a7c4e333a04eb2ca03967ae1f345c1835750b217e22d6e7f -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

@@ -1,13 +1,17 @@
 # Tender Deck Composer — Cómo se arma el deck de una propuesta
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-07-12 por Claude (con Julio Reyes)
-> **Ultima actualizacion:** 2026-07-12 por Claude — Delta: el motor se extrajo a `artifact-composer` y el render gobernado ya existe (ver aviso abajo)
+> **Ultima actualizacion:** 2026-09-23 por Claude — Delta: primera licitación ganada con este flujo (SKY Blog)
 > **Documentacion tecnica:** [GREENHOUSE_TENDER_DECK_COMPOSER_V1.md](../../architecture/GREENHOUSE_TENDER_DECK_COMPOSER_V1.md) · ADR: [GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md §5-ter](../../architecture/GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md)
 > **Manual de uso:** [comercial/componer-deck-de-licitacion.md](../../manual-de-uso/comercial/componer-deck-de-licitacion.md)
 
 ---
+
+## Delta 2026-09-23 — primera licitación ganada con este flujo
+
+🏆 **Hito 2026-09-23 — primera licitación GANADA con el flujo agéntico de licitaciones.** La propuesta SKY Blog (Wherex) se construyó con el método de la skill `greenhouse-public-private-tenders` (bases → admisibilidad → diagnóstico → oferta) y se compuso con el **Artifact Composer**: deck desde catálogo, oferta técnica y económica y Excel generados desde fuente versionada, y evidencia viva (AI Visibility Grader y Radiografía AEO). La operó el operador junto a un agente. La adjudicación **no se atribuye sólo al flujo**: pesaron la relación existente con SKY, las reuniones de ronda 2, la negociación humana y el ajuste económico por alcance. Pero es la **primera validación en el mercado** de lo construido: una oferta producida con este flujo compitió contra ~15 propuestas y ganó, y lo hizo en una **cuenta de talla enterprise** (SKY Airline, aerolínea), no en un piloto menor.
 
 ## ⚠️ Delta 2026-07-12 — este documento quedó parcialmente desactualizado
 

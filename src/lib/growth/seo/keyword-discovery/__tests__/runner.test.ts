@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { DataForSeoConfigurationError } from '@/lib/ai/dataforseo-errors'
+
 /**
  * TASK-1664 — Runner async.
  *
@@ -111,7 +113,13 @@ const claimedRun = (overrides: Record<string, unknown> = {}) => ({
 
 const providerItem = (keyword: string) => ({
   keyword,
-  keyword_info: { search_volume: 700, cpc: 0.2, competition: 0.3, competition_level: 'LOW', last_updated_time: '2026-07-15 00:00:00 +00:00' },
+  keyword_info: {
+    search_volume: 700,
+    cpc: 0.2,
+    competition: 0.3,
+    competition_level: 'LOW',
+    last_updated_time: '2026-07-15 00:00:00 +00:00'
+  },
   keyword_properties: { keyword_difficulty: 12, core_keyword: keyword },
   search_intent_info: { main_intent: 'commercial', probability: 0.7 }
 })
@@ -141,6 +149,60 @@ beforeEach(() => {
 })
 
 describe('runKeywordDiscovery — claim y gates', () => {
+  it('configuration failure during enrichment preserves expansion and stops without another provider call', async () => {
+    state.claim = claimedRun({
+      seed_inputs_json: { seeds: [{ keyword: 'pintura', normalizedKeyword: 'pintura', origin: 'manual' }] }
+    })
+    providerMock
+      .mockResolvedValueOnce(providerOk([{ keyword: 'pintura' }]))
+      .mockRejectedValue(new DataForSeoConfigurationError('DATAFORSEO_API_PASSWORD'))
+
+    const result = await runKeywordDiscovery('seokdr-1')
+
+    expect(result).toMatchObject({
+      status: 'partial',
+      errorCode: 'provider_configuration_missing',
+      providerCalls: 1,
+      actualCostUsd: 0.014,
+      candidateCount: 1
+    })
+    expect(providerMock).toHaveBeenCalledTimes(2)
+    expect(providerMock.mock.calls[1][0].endpoint).toContain('keyword_overview')
+  })
+
+  it('stops an unconfigured runtime without counting provider calls or claiming provider failure', async () => {
+    providerMock.mockRejectedValue(new DataForSeoConfigurationError('DATAFORSEO_API_LOGIN'))
+
+    const result = await runKeywordDiscovery('seokdr-1')
+
+    expect(result).toMatchObject({
+      status: 'failed',
+      errorCode: 'provider_configuration_missing',
+      providerCalls: 0,
+      actualCostUsd: 0,
+      candidateCount: 0
+    })
+    expect(providerMock).toHaveBeenCalledTimes(1)
+    expect(outboxMock).toHaveBeenCalled()
+  })
+
+  it('preserves paid candidates when configuration fails after a successful call', async () => {
+    providerMock
+      .mockResolvedValueOnce(providerOk([providerItem('pintura')]))
+      .mockRejectedValue(new DataForSeoConfigurationError('DATAFORSEO_API_PASSWORD'))
+
+    const result = await runKeywordDiscovery('seokdr-1')
+
+    expect(result).toMatchObject({
+      status: 'partial',
+      errorCode: 'provider_configuration_missing',
+      providerCalls: 1,
+      actualCostUsd: 0.014,
+      candidateCount: 1
+    })
+    expect(providerMock).toHaveBeenCalledTimes(2)
+  })
+
   it('con el flag OFF no reclama ni llama al proveedor', async () => {
     flags.discovery = false
 
@@ -184,10 +246,7 @@ describe('runKeywordDiscovery — ejecución', () => {
     providerMock.mockResolvedValue(providerOk([providerItem('pintura para piso'), providerItem('pintura exterior')]))
     // Las keywords de los items quedan frescas tras la primera persistencia inline: el
     // top-up no debería comprar nada.
-    state.freshKeywords = [
-      { normalized_keyword: 'pintura para piso' },
-      { normalized_keyword: 'pintura exterior' }
-    ]
+    state.freshKeywords = [{ normalized_keyword: 'pintura para piso' }, { normalized_keyword: 'pintura exterior' }]
 
     const result = await runKeywordDiscovery('seokdr-1')
 

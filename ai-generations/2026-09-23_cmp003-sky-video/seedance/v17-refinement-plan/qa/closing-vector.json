@@ -1,0 +1,26 @@
+{
+  "sky": {
+    "x": 1388,
+    "y": 1754.40625,
+    "width": 500,
+    "height": 191.15625
+  },
+  "efeonce": {
+    "x": 270,
+    "y": 1739.5625,
+    "width": 940,
+    "height": 220.84375
+  },
+  "divider": {
+    "x": 1294,
+    "y": 1710,
+    "width": 10,
+    "height": 280
+  },
+  "renderResolution": [
+    2160,
+    3840
+  ],
+  "frames": 96,
+  "allWhite": true
+}

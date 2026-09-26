@@ -1,0 +1,18 @@
+{
+  "id": "KV-02-preguntan-otra-cosa",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "escucha",
+  "escena": "SCENE (customer support desk, Santiago, afternoon): a Latin American woman in her thirties in a plain piqué polo sits at her desk RECEIVING — her mouth closed, her eyes looking off-frame at something she is reading, her headset resting on the desk beside her, present and unused. Her hands are still. The key light is a hard, low source from the far left, raking, leaving one side of her face in open shadow with the shadow of her nose legible on her cheek; a second low source behind her cuts a rim along her hair and shoulder, separating her from the wall. All that light and every patch it throws stays BELOW the middle of the frame. A monitor at her side is a glowing cool blue panel carrying a long conversation thread, deliberately out of focus. On the desk behind her, well out of focus, sits a small solid orange desktop sculpture. 135mm lens at f/2, focus on her eyes. Everything except that sculpture is completely unbranded; her polo carries no readable emblem. No readable text anywhere: any lettering is small, angled or out of focus.",
+  "objetos": [{ "objeto": "sprocket-hubspot", "vista": "frente" }],
+  "lecho": {
+    "objeto": "the boom arm of a second headset crossing the very bottom of the frame, right against the lens",
+    "tono": "DARK charcoal, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "a plain, evenly lit, VERY LIGHT warm-white plaster wall with its texture visible",
+      "tinta": "oscura"
+    }
+  }
+}

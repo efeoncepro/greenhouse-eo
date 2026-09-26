@@ -10,14 +10,26 @@ La diferencia con otras capas de documentacion:
 
 ## Indice por categoria
 
+- [Operar Efeonce Marketing Studio](marketing-studio/operar-marketing-studio.md) — revisar campañas (preview por formato, UTM, estados y presupuestos), actualizar datos desde OneDrive (import), generar imágenes (renditions), dar y revocar acceso por API, leer Studio con un agente por MCP y resolver problemas comunes.
+
 ### Social y Creative Studio
 
 - [Usar Higgsfield con Creative Studio](creative-studio/higgsfield-provider.md) — preparación, derechos, coste,
-  ejecución, readback, governance y límites del MCP local After Effects/Blender.
+  ejecución, readback, governance, puentes MCP locales (Blender, Illustrator y Photoshop instalados y conectados
+  desde el 2026-09-24; After Effects requiere la app) y CLI `higgsfield` con sesión.
 
 - [Usar reglas publicitarias con Codex y Claude](creative/usar-reglas-publicitarias-con-agentes.md) — prompts,
   entregables, ficha tipográfica y revisión para crear/corregir publicidad y social con texto sin confundir
   producción, aprobación y publicación.
+- [Compositor de piezas con CTA — manual de uso](creative/compositor-piezas-cta.md) — plan mínimo con lo que exige
+  el gate, componer, certificar (también con `--reproducir`), reporte de accesibilidad, códigos 0/1/2/3, excepciones con
+  sha256 del plate y `hasta`, firma externa, decisiones pendientes y problemas comunes (mensaje → causa → solución).
+- [Usar la línea gráfica de Efeonce](creative/usar-linea-grafica-efeonce.md) — hacer una pieza con la órbita
+  (qué trabajo hace, color, ubicación del texto, foto de la lente, voz, firma y burbuja de URL), checklist de revisión,
+  regenerar el PDF del manual y problemas comunes (burbuja negra en visores, texto que cruza la órbita).
+- [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
+  prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
+  lenguaje fotográfico aprobado el 2026-09-19.
 - [Manual: producir un post visual de reporte](social/visual-report-social-production.md) — brief, dirección,
   crop, logo, QA y gates contra capturas ilegibles o composiciones genéricas.
 - [Manual: operar Creator Influence & Content](media-distribution/operar-creator-influence-content.md) — intake,
@@ -199,6 +211,7 @@ La diferencia con otras capas de documentacion:
 
 - [Operar AI Tooling, Content y Assets](ai-tooling/operar-ai-tooling-content-assets.md) — administrar catalogo de herramientas IA, licencias, wallets, credit ledger y generacion interna de imagenes/animaciones sin confundirlo con facturacion ni publicacion del Public Site.
 - [Editar solo una zona de una imagen](ai-tooling/editar-una-zona-de-una-imagen.md) — inpainting con mascara desde `pnpm ai:image`: como crear la mascara, como leer el `usage` que imprime el comando y por que editar NO sale mas barato que generar de nuevo. Desde v1.1: como elegir entre GPT Image 2, 2.5 Sunburst y 2.5 Flare (con enlace a la guia canonica de seleccion), costo de 2.5 estimable antes de gastar y brechas conocidas del comando.
+- [Operar Gemini Omni 1.1 desde la CLI de video](ai-tooling/gemini-omni-1-1-cli.md) — `pnpm ai:omni`: generación desde texto, imagen, cuadros o referencias; edición y extensión desde video; autenticación ADC, staging GCS privado, costos nominales, consulta de estado, recuperación y evidencia de seis modos probados a 360p/16:9.
 - [Operar el CLI de fal: Seedream 5, Seedance 2.5/2.0, Minimax H3, Flux 3 y Wan 3.0](ai-tooling/operar-cli-fal-seedream-seedance.md) — `pnpm ai:fal`: imagenes y edicion con Seedream 5, separacion de una pieza plana en capas con alfa + `layers.json`, video Seedance y Minimax H3 (Turbo barato, control de camara, LoRAs y entrenamiento), video Flux 3 (borrador → mejora, primer/ultimo cuadro, keyframes, editar y extender un clip) y video a video con Seedance 2.5 (`--task editing|extension`, verificado; su filtro rechaza marcas y personas reales y cobra el intento), video Wan 3.0 y Prime (largo `auto`, referencias, basado en una web o un documento con `--thinking`, `--seed`, default 1080p), con limites validados antes de cobrar; dos cuentas de fal con cambio automatico ante bloqueo por saldo y `--balance`; encolar sin esperar con `--detach` y consultar con `--status`; como retomar un trabajo vencido con `--request-id` sin volver a pagar, que esta verificado (47 de 55), por que no informa costo y por que Gemini Omni y Nano Banana Pro no pasan por fal. Desde v1.7: paso previo para elegir el modelo con la guia canonica de seleccion, costos por escalon de resolucion (Wan 3.0 sale en 1080p y H3 base en 2K por defecto; Wan 3.0 Prime cuesta mas; Flux 3 publicado al doble; formula de tokens de Seedance), minimo de 100 pasos al entrenar LoRA y brechas conocidas del comando.
 - [Operar pilotos de Creative Workflow](ai-tooling/operar-pilotos-creative-workflow.md) — seleccionar motor por contrato de fidelidad, ejecutar una prueba controlada y revisar evidencia; incluye la condición para probar previs 3D exportada como referencia de video, sin tratarla como un render 3D.
 - [Producir un set con Layout Design & Finishing](ai-tooling/producir-layout-design-y-finishing.md) — diseñar

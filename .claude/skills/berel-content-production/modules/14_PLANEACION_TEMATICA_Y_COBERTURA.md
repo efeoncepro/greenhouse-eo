@@ -28,6 +28,9 @@ precedencia de pedidos del cliente ni autoriza publicación.
 
 10. Antes de producción social, completar la matriz del [módulo 15](15_DISTRIBUCION_SELECTIVA.md):
     no asumir cuatro derivados. Repartir capacidad mensual por utilidad y encaje, sin alterar formatos.
+    Para enero, febrero y marzo de 2027, planear con el cupo reducido mientras Berel no diga otra cosa: 6 / 7 / 7
+    artículos y 35 gráficas por mes, sin videos en el cupo. Estimado pendiente de aceptación y de confirmar al cierre
+    de diciembre; ver el balance en el módulo 15.
 
 El baseline fechado y las 49 asignaciones están en
 [la auditoría](../../../../docs/audits/seo/BEREL_EDITORIAL_COVERAGE_2026-09-02.md); refrescar antes de producir.

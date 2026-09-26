@@ -2,32 +2,33 @@
   "template": "ReportCoverPage",
   "figmaNodeId": null,
   "version": "0.1",
+  "note": "TASK-1889 — portada navy del canvas aprobado (página `Premium-Portada`). La portada del canvas no lleva pie institucional ni folio: el operador la aprobó así, con eslogan y línea de confidencialidad. El identificador de la edición viaja en la línea de confidencialidad (versión) y en el pie de las páginas interiores.",
   "viewport": {
     "width": 794,
     "height": 1123
   },
   "slots": {
-    "editionId": {
-      "selector": "[data-slot='editionId']",
+    "editionLabel": {
+      "selector": "[data-slot='editionLabel']",
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 20,
+        "maxCharacters": 48,
         "maxLines": 1,
         "overflow": "reject"
       },
-      "notes": "Identificador público de la edición. Sin él el informe no se puede citar."
+      "notes": "«Informe mensual · <período>». El período sale de `render/labels.ts`; la etiqueta, de `src/lib/copy/insights.ts`."
     },
-    "clientName": {
-      "selector": "[data-slot='clientName']",
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
       "type": "string",
-      "required": false,
+      "required": true,
       "constraints": {
-        "maxCharacters": 48,
-        "maxLines": 2,
+        "maxCharacters": 32,
+        "maxLines": 1,
         "overflow": "reject"
       },
-      "notes": "Opcional: la edición no lo trae hoy. Un informe sin nombre de cliente es correcto; uno con un nombre inventado, no."
+      "notes": "«Lectura de Efeonce», desde el copy."
     },
     "reportTitle": {
       "selector": "[data-slot='reportTitle']",
@@ -37,76 +38,54 @@
         "maxCharacters": 64,
         "maxLines": 3,
         "overflow": "reject"
-      }
+      },
+      "notes": "Título en tres líneas como máximo: la medida de 430 px es la del canvas."
     },
     "reportSubtitle": {
       "selector": "[data-slot='reportSubtitle']",
       "type": "string",
       "required": false,
       "constraints": {
-        "maxCharacters": 150,
+        "maxCharacters": 110,
         "maxLines": 3,
         "overflow": "reject"
       }
     },
-    "periodLabel": {
-      "selector": "[data-slot='periodLabel']",
-      "type": "string",
-      "required": true,
-      "constraints": {
-        "maxCharacters": 28,
-        "maxLines": 1,
-        "overflow": "reject"
-      }
-    },
-    "versionLabel": {
-      "selector": "[data-slot='versionLabel']",
-      "type": "string",
-      "required": true,
-      "constraints": {
-        "maxCharacters": 10,
-        "maxLines": 1,
-        "overflow": "reject"
-      }
-    },
-    "issuedLabel": {
-      "selector": "[data-slot='issuedLabel']",
-      "type": "string",
-      "required": true,
-      "constraints": {
-        "maxCharacters": 16,
-        "maxLines": 1,
-        "overflow": "reject"
-      }
-    },
-    "fixed-urlBubble": {
-      "selector": "[data-slot='urlBubble']",
-      "type": "fixed-asset",
-      "required": true,
-      "agentMayOverride": false,
-      "note": "template-owned: el HTML ya lo trae."
-    },
-    "fixed-contactDetails": {
-      "selector": "[data-slot='contactDetails']",
-      "type": "fixed-contact-set",
-      "required": true,
-      "agentMayOverride": false,
-      "value": {
-        "chilePhone": "+56 9 3732 3064",
-        "address": "Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile"
+    "preparedFor": {
+      "selector": "[data-slot='preparedFor']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        },
+        "clientName": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 48,
+          "maxLines": 1
+        },
+        "logo": {
+          "type": "asset",
+          "required": false,
+          "resolver": "report-client-logo"
+        }
       },
-      "note": "Dueño del valor: back-cover-full.slots.json de deck-axis. Pie completo en CADA página, incluida la portada."
+      "notes": "Logo del cliente en negativo (`asset-ref:org-logo:<id>`, variante on_dark sellada por TASK-1888) o su nombre. Sin ninguno, el bloque desaparece; nunca un nombre inventado."
     },
-    "pageFolio": {
-      "selector": "[data-slot='pageFolio']",
+    "confidentialityLine": {
+      "selector": "[data-slot='confidentialityLine']",
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 8,
+        "maxCharacters": 72,
         "maxLines": 1,
         "overflow": "reject"
       },
-      "notes": "Asignado por el plan de páginas ANTES de imprimir."
+      "notes": "«Confidencial · Versión N · <fecha de emisión>». Sin emitir, dice «Sin emitir»."
     }
   }
 }

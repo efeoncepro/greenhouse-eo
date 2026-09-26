@@ -1,0 +1,94 @@
+{
+  "reference": "Deck-Metas",
+  "catalog": "deck",
+  "contentType": "insights-figure-targets",
+  "slots": {
+    "tabNumber": "00",
+    "section": "Resumen ejecutivo",
+    "period": "Agosto 2026 · contra la meta",
+    "eyebrow": {
+      "icon": "target",
+      "label": "Metas del mes"
+    },
+    "keyFigure": "107 %",
+    "keyCaption": "de la meta de clics; las otras tres metas quedaron entre 76 % y 89 %",
+    "conclusion": "Se cumplió la meta de clics; la brecha más grande está en las citas de IA",
+    "figureTitle": "Resultado contra la meta",
+    "source": {
+      "label": "Fuente",
+      "text": "Search Console y motores de IA"
+    },
+    "legend": {
+      "achieved": "Logrado",
+      "target": "Meta",
+      "gap": "Mayor brecha"
+    },
+    "bulletDirection": "higher_is_better",
+    "bulletRows": [
+      {
+        "icon": "clicks",
+        "name": "Clics desde Google",
+        "unit": "cantidad",
+        "value": "1.284",
+        "achievedLabel": "logrado",
+        "targetLabel": "meta",
+        "target": "1.200",
+        "pct": "107 %",
+        "band": "1.020"
+      },
+      {
+        "icon": "search",
+        "name": "Keywords en primera página",
+        "unit": "cantidad",
+        "value": "26",
+        "achievedLabel": "logrado",
+        "targetLabel": "meta",
+        "target": "30",
+        "pct": "87 %",
+        "band": "25,5"
+      },
+      {
+        "icon": "ctr",
+        "name": "CTR",
+        "unit": "porcentaje",
+        "value": "2,66 %",
+        "achievedLabel": "logrado",
+        "targetLabel": "meta",
+        "target": "3,00 %",
+        "pct": "89 %",
+        "band": "2,55 %"
+      },
+      {
+        "icon": "link",
+        "name": "Citas de IA con enlace",
+        "unit": "cantidad",
+        "value": "19",
+        "achievedLabel": "logrado",
+        "targetLabel": "meta",
+        "target": "25",
+        "pct": "76 %",
+        "band": "21,25"
+      }
+    ],
+    "note": {
+      "text": "Cada fila usa su propia escala: la marca vertical es la meta y la barra, lo logrado."
+    },
+    "closing": [
+      {
+        "kind": "measure",
+        "label": "Lo que significa",
+        "text": "El sitio ya atrae más tráfico del previsto; falta que ese alcance se convierta en citas y primeras posiciones."
+      },
+      {
+        "kind": "action",
+        "label": "Próximo paso",
+        "text": "Priorizar contenido citable y reforzar las keywords en posiciones 11 a 20."
+      }
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "folio": {
+      "page": "04",
+      "total": "24"
+    }
+  }
+}

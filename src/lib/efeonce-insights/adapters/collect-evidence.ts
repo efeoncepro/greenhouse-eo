@@ -21,6 +21,8 @@ export interface CollectEvidenceInput {
   modules: InsightModule[]
   windows: ResolvedInsightWindows
   projectIds: string[]
+  /** TASK-1888 — evidencia del contrato editorial v2; lo decide el caller desde el flag. */
+  editorialV2?: boolean
 }
 
 export const collectInsightEvidence = async (input: CollectEvidenceInput): Promise<EvidenceSnapshotContentV1> => {
@@ -31,7 +33,8 @@ export const collectInsightEvidence = async (input: CollectEvidenceInput): Promi
     audience: input.audience,
     window: input.windows.current,
     comparison: input.windows.comparison,
-    projectIds: input.projectIds
+    projectIds: input.projectIds,
+    editorialV2: input.editorialV2 === true
   }
 
   for (const moduleKey of input.modules) {

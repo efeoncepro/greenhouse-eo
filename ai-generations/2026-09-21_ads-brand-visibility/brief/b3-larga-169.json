@@ -1,0 +1,21 @@
+{
+  "id": "b3-larga-169",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "larga-exposicion",
+  "objetos": [
+    "polo-efeonce",
+    "chaqueta-bomber-efeonce"
+  ],
+  "escena": "SCENE (Efeonce studio at dusk, Santiago): on the right side of the room a man stands at a standing desk and looks STRAIGHT INTO THE LENS, perfectly still and razor sharp — the one element that holds. He is wearing the Efeonce bomber jacket over the Efeonce navy piqué polo, both exactly as in the references, with the jacket's embroidered chest mark clearly in frame. Behind and beside him the studio keeps moving: people crossing and a monitor arm being lifted and swung dissolve into long translucent streaks, and a cool blue glow draws continuous light trails low through that side of the room. The left side of the room is a bare board-formed concrete wall in deep shadow, one continuous surface with nothing on it and no light reaching it. 85mm lens at f/8 on a tripod.",
+  "reservas": {
+    "texto": {
+      "muro": "the bare board-formed concrete wall on the left of the room",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "a dark equipment road case standing in the immediate foreground, its top edge running unbroken all the way across the frame from the left edge to the right edge",
+    "tono": "DARK charcoal road-case panel in deep shadow, matte, its texture still faintly visible, far outside the light"
+  }
+}

@@ -1,0 +1,88 @@
+[
+  {
+    "id": "a-texto-cursor",
+    "dominante": [
+      "No te leyó."
+    ],
+    "ratioDominanteEntrada": 4.3,
+    "contraste": {
+      "entrada": 18.28,
+      "dominante": 18.04,
+      "cierre-frase": 17.9,
+      "nota": 17.86,
+      "cta": 9.76,
+      "descriptor": 12.3,
+      "logo": 16.84
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 23,
+        "ratioDominante": 0.147
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 23,
+        "ratioDominante": 0.147
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "b-contorno-redondeado",
+    "dominante": [
+      "No te leyó."
+    ],
+    "ratioDominanteEntrada": 4.3,
+    "contraste": {
+      "entrada": 18.28,
+      "dominante": 18.04,
+      "cierre-frase": 17.9,
+      "nota": 17.86,
+      "cta": 9.76,
+      "descriptor": 12.3,
+      "logo": 16.84
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 23,
+        "ratioDominante": 0.147
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 23,
+        "ratioDominante": 0.147
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "c-boton-lima",
+    "dominante": [
+      "No te leyó."
+    ],
+    "ratioDominanteEntrada": 4.3,
+    "contraste": {
+      "entrada": 18.28,
+      "dominante": 18.04,
+      "cierre-frase": 17.9,
+      "nota": 17.86,
+      "descriptor": 12.3,
+      "logo": 16.84
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 23,
+        "ratioDominante": 0.147
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 23,
+        "ratioDominante": 0.147
+      }
+    ],
+    "seleccion": null
+  }
+]

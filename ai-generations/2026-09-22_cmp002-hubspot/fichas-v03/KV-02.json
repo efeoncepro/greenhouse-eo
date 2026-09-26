@@ -1,0 +1,16 @@
+{
+  "id": "KV-02-faq-v03",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "fragmento",
+  "corta": "the key panel runs off all four edges of the frame — no desk, no room, no whole device is ever visible, only the keys themselves filling the picture edge to edge",
+  "objetos": [{ "objeto": "sprocket-hubspot", "vista": "cenital" }],
+  "escena": "SCENE (support desk, extreme macro, night): a dense grid of small square response keys fills the ENTIRE frame, cropped hard on every side. Every key carries its own worn label and a faint glowing cool blue backlight: they are the ready-made answers, used thousands of times, their edges polished smooth by years of thumbs. Dead centre, ONE key is BLANK — no label, no wear, its backlight dark. It is the only unlit, unmarked key in the whole grid and it sits exactly where the eye lands. A single fingertip hovers just above that blank key, not pressing it, the only piece of a person in frame and cut by the edge. A hard low raking light from the left throws sharp graphic shadows down the side of every key, very high contrast, the far side of the grid falling to near black. A small orange sculpture rests at the top right corner of the grid, cropped by the edge, catching the raking light. 100mm macro lens at f/4, focus on the blank key. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. Everything except the sculpture is completely unbranded, and no text anywhere is readable: the key labels are worn, angled and shallow-focused — legible as marks, never as words.",
+  "lecho": {
+    "objeto": "the out-of-focus near row of keys running along the very bottom, right against the lens and outside the raking light",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": { "muro": "the dark unlit upper rows of the same key grid, evenly toned and free of backlight, their matte plastic texture visible", "tinta": "blanca" }
+  }
+}

@@ -1,0 +1,19 @@
+  $ costo estimado ≈ USD 0.301 (6 × 1669 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-09-19_nivel-de-busqueda/plates-v2/s2-todos-te-buscan.png …
+  ✗ ./ai-generations/2026-09-19_nivel-de-busqueda/plates-v2/s2-todos-te-buscan.png FAILED: OpenAI image generation failed: Your request was rejected by the safety system. If you believe this is an error, contact us at help.openai.com and include the request ID req_90eb27e06c9646a58b87e8dffefa3c38. safety_violations=[sexual]. (image_generation_user_error/moderation_blocked).
+→ ./ai-generations/2026-09-19_nivel-de-busqueda/plates-v2/s4-respuesta.png …
+  ✓ 2260KB · gpt-image-2.5-flare · 1152x1440 · high
+    usage: in 283 (img 0 · txt 283) · out 1669 · total 1952
+→ ./ai-generations/2026-09-19_nivel-de-busqueda/plates-v2/s5-datos-propios.png …
+  ✓ 2966KB · gpt-image-2.5-flare · 1152x1440 · high
+    usage: in 290 (img 0 · txt 290) · out 1669 · total 1959
+→ ./ai-generations/2026-09-19_nivel-de-busqueda/plates-v2/s6-hablan-de-ti.png …
+  ✓ 2898KB · gpt-image-2.5-flare · 1152x1440 · high
+    usage: in 285 (img 0 · txt 285) · out 1669 · total 1954
+→ ./ai-generations/2026-09-19_nivel-de-busqueda/plates-v2/s7-dejalos-entrar.png …
+  ✓ 2802KB · gpt-image-2.5-flare · 1152x1440 · high
+    usage: in 287 (img 0 · txt 287) · out 1669 · total 1956
+→ ./ai-generations/2026-09-19_nivel-de-busqueda/plates-v2/hero-nadie.png …
+  ✓ 2763KB · gpt-image-2.5-flare · 1152x1440 · high
+    usage: in 273 (img 0 · txt 273) · out 1669 · total 1942
+done

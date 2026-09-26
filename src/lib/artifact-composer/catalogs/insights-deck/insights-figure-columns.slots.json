@@ -1,0 +1,362 @@
+{
+  "template": "InsightsFigureColumnsSlide",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "TASK-1889 Slice 4 — columnas agrupadas sobre un eje compartido (canvas Deck-Agrupadas).",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "slots": {
+    "tabNumber": {
+      "selector": "[data-slot='tabNumber']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 2,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Número de capítulo de la pestaña («00» en el resumen)."
+    },
+    "section": {
+      "selector": "[data-slot='section']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 44,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "period": {
+      "selector": "[data-slot='period']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "icon": {
+          "type": "string",
+          "required": false,
+          "resolver": "deck-icon",
+          "values": [
+            "bars",
+            "clicks",
+            "impressions",
+            "ctr",
+            "search",
+            "target",
+            "link",
+            "trend"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32,
+          "maxLines": 1
+        }
+      }
+    },
+    "keyFigure": {
+      "selector": "[data-slot='keyFigure']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 9,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Cifra principal (`readings[].keyFigure.value`). El hook elige su cuerpo por el largo: 132, 112 o 104 px."
+    },
+    "keyCaption": {
+      "selector": "[data-slot='keyCaption']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 96,
+        "maxLines": 3,
+        "overflow": "reject",
+        "allowedTags": [
+          "strong"
+        ]
+      },
+      "notes": "Bajada de la cifra (`keyFigure.caption`)."
+    },
+    "conclusion": {
+      "selector": "[data-slot='conclusion']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 90,
+        "maxLines": 4,
+        "overflow": "reject"
+      }
+    },
+    "figureTitle": {
+      "selector": "[data-slot='figureTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 56,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "source": {
+      "selector": "[data-slot='source']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 64,
+          "maxLines": 2
+        }
+      }
+    },
+    "legend": {
+      "selector": "[data-slot='legend']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "current": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 20,
+          "maxLines": 1
+        },
+        "prior": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 20,
+          "maxLines": 1
+        },
+        "opportunity": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 20,
+          "maxLines": 1
+        }
+      }
+    },
+    "columnGroups": {
+      "selector": "[data-slot='columnGroups']",
+      "type": "array",
+      "required": true,
+      "consumer": "validation-only",
+      "constraints": {
+        "minItems": 2,
+        "maxItems": 4
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40,
+            "maxLines": 3
+          },
+          "current": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 10,
+            "maxLines": 1
+          },
+          "prior": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 10,
+            "maxLines": 1
+          },
+          "delta": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 8,
+            "maxLines": 1
+          },
+          "direction": {
+            "type": "enum",
+            "required": false,
+            "values": [
+              "up",
+              "down",
+              "flat"
+            ]
+          }
+        }
+      },
+      "example": [
+        {
+          "label": "A",
+          "current": "9",
+          "prior": "6",
+          "delta": "+3",
+          "direction": "up"
+        },
+        {
+          "label": "B",
+          "current": "17",
+          "prior": "15",
+          "delta": "+2",
+          "direction": "up"
+        }
+      ],
+      "notes": "Grupos de la lámina (los dibuja el hook). Hasta cuatro: proyectada, cada columna necesita ancho para su etiqueta en dos líneas; más grupos se reparten en láminas equilibradas."
+    },
+    "columnBand": {
+      "selector": "[data-slot='columnBand']",
+      "type": "object",
+      "required": false,
+      "consumer": "validation-only",
+      "shape": {
+        "from": {
+          "type": "number",
+          "required": true
+        },
+        "to": {
+          "type": "number",
+          "required": true
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32,
+          "maxLines": 1
+        }
+      },
+      "example": {
+        "from": 0,
+        "to": 0,
+        "label": "Franja"
+      }
+    },
+    "columnOpportunity": {
+      "selector": "[data-slot='columnOpportunity']",
+      "type": "object",
+      "required": false,
+      "consumer": "validation-only",
+      "shape": {
+        "group": {
+          "type": "number",
+          "required": true
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 20,
+          "maxLines": 1
+        }
+      },
+      "example": {
+        "group": 1,
+        "label": "A un paso"
+      }
+    },
+    "note": {
+      "selector": "[data-slot='note']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 96,
+          "maxLines": 1
+        }
+      },
+      "notes": "Nota de lectura bajo la figura."
+    },
+    "closing": {
+      "selector": "[data-slot='closing']",
+      "type": "array",
+      "required": false,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 2
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "kind": {
+            "type": "string",
+            "required": true,
+            "resolver": "deck-closing-icon",
+            "values": [
+              "measure",
+              "action"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40,
+            "maxLines": 1
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 160,
+            "maxLines": 3
+          }
+        }
+      },
+      "notes": "Lo que significa / Próximo paso (`readings[].meaning` / `nextStep`)."
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
+      },
+      "notes": "«NN / total» del plan de láminas de la misma composición."
+    }
+  }
+}

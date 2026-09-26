@@ -11,7 +11,8 @@
 - No acredita: aprobación de Berel, carga en Drupal, publicación, indexación ni producción de banners.
 - Documentos hermanos: [Color del Año 2027](BEREL_COLOR_DEL_ANO_2027_2026-08-25.md) ·
   [Arquitectura de autoridad](BEREL_ARQUITECTURA_AUTORIDAD_2026-08-25.md) ·
-  [Cobertura editorial](BEREL_EDITORIAL_COVERAGE_2026-09-02.md).
+  [Cobertura editorial](BEREL_EDITORIAL_COVERAGE_2026-09-02.md) ·
+  [Conteo de piezas de septiembre contra contrato](BEREL_CONTEO_PIEZAS_SEPTIEMBRE_2026-09-19.md).
 - Convención de evidencia: **MEDIDO** (Search Console), **ESTIMADO** (Semrush), **OBSERVADO** (HTML en vivo,
   Notion, Canva), **INFERIDO** (deducción declarada). Caduca: revalidar antes de reutilizar cifras.
 
@@ -169,3 +170,65 @@ registrado como corrección para Drupal fuera de este alcance.
   fuente original.
 - Pendiente fuera de Notion (no visible al cliente): tareas visuales N1–N4 con ficha completa (N2 y N3 con ficha
   de infografía), matriz de distribución del módulo 15, activación de enlaces al publicar y QA en vivo.
+
+## Delta 2026-09-19 — V2 de las tres piezas de campaña tras los comentarios de Berel
+
+- **Alcance autorizado por el operador:** V2 de Color del Año 2027 (`3a639c2fefe7807d847cc099a0b99966`),
+  Colores de Temporada 2027 (`3dd39c2fefe781bf8ff1f1f943011491`) y Raíces de la piel
+  (`3d539c2fefe78131abe4fe1f0a1b6500`); respuesta a todos los hilos de Berel; enlaces entre piezas armados porque
+  las tres se publican el mismo día.
+- **Forma:** la V1 de cada página quedó como `🗄️ Histórico · Artículo V1` con todos sus hilos anclados; la V2 va
+  debajo como `✍️ Versión vigente para revisión · V2`; las notas internas salieron del artículo a
+  `🗒️ Notas internas de producción`. Ningún hilo desapareció ni fue marcado como resuelto.
+- **Criterio de Berel aplicado (17–18 sep):** entrada informativa sin escena; sin tiempo ni orden de paletas; sin
+  «ciclo» ni «colección 2027»; nombre del Color del Año enlazado una vez por página; fuera las tablas redundantes;
+  masters oficiales en el hub; sección ladrillo/adobe/terracota retirada del Color del Año (queda FAQ corta que
+  enlaza a Calidez Vibrante). Registro: módulo 09 de la skill («Campaña 2027», ⚠️ Choque 3).
+- **Enlaces:** rutas relativas (pestaña nueva en el sitio). Colores a su página de familia; `verdes`, `amarillos`,
+  `azules` y `morados` no cargan colores ni title, así que esos colores enlazan a `/colores`. Los 35 enlaces a
+  `/search?q=` del hub V1 salieron.
+- **Reparto de intenciones:** la diferencia Color del Año/paleta vive solo en el hub; los roles por color solo en
+  la página de cada paleta (como sugerencia, sin dato oficial); Bien y de Buenas se desarrolla solo en su artículo.
+- **Readback 2026-09-19 (OBSERVADO):** gate `client-visible-copy-gate` PASS en las tres páginas; cuerpos de
+  1.285 (Color del Año), 1.713 (hub) y 1.169 palabras (Raíces); hub y Raíces pasaron a `En revisión`, Color del
+  Año ya lo estaba.
+- **Pendiente de decisión:** tareas de diseño N2/N3 inexistentes en hub y Color del Año; Banner N1/N4 del Color
+  del Año congelados (en producción) con HEX y posición a conciliar; arte social del Color del Año (Facebook con
+  la tabla 60-30-10 de colores 2026, Reel con «luz de norte/sur») a conciliar con diseño; tareas de Reel marcadas
+  «No aplica» que contienen copy de Pin; excepción de extensión contractual y material oficial por pedir a Berel;
+  actualización del menú principal el día de publicación.
+- **Hallazgos del sitio (OBSERVADO):** el menú enlaza `/colores-de-temporada` y `/articulos/colores-de-temporada-2025`,
+  que cargan la página vacía.
+
+### Delta 2026-09-19 (ronda 2 y revisión adversarial)
+
+- **Decisiones del operador:** publicación conjunta el 29-sep-2026; sin infografías de Efeonce (Berel entrega el
+  material de marca: banner principal del Color del Año y masters de las paletas); para el Color del Año, Efeonce
+  desarrolla solo los gráficos de luces y de acabados (María Fernanda, Teams 2026-09-17); el excedente de artículos
+  de septiembre se descuenta de los meses siguientes (conteo verificado: 12 artículos contra 8; ver delta siguiente).
+- **Fichas técnicas incorporadas (OBSERVADO):** `FT_BERELEX GREEN.pdf` R1-02/24 e `HT-INSIGNIA.pdf` R1-07/19, p. 1;
+  tabla comparativa con filas comunes; exclusivos en texto; certificado MAS Certified Green (vencido jun-2025) fuera.
+- **Revisión adversarial (3 lentes: Berel, SEO/AEO, verificación de datos):** sin datos de producto mal publicados;
+  corregidos familia de Bien y de Buenas (rojos con fondo café, unificado), garantía de Insignia con su condición,
+  «uso preferente» sin fuente, recomendaciones de mate/satinado sin ficha, «verdes» en Raíces, «muestras físicas»,
+  «la más expresiva», repetición del nombre del Color del Año (27 → 12), H1/meta del hub parecidos a 2026, sección de
+  Raíces duplicada en el hub, tabla de luz de Raíces sin fuente, tres respuestas nuestras que la V2 desmentía.
+- **Derivados sociales (OBSERVADO en Frame.io):** 18 archivos entregados el 16–17 sep (2 banners + post, story, reel
+  y pin por pieza); cada uno con su tarea (nuevas 741, 742, 743); ninguna cancelación. El arte social entregado son
+  renders de ambientes y no usa la base vigente (luces N2 en el Color del Año; masters en hub y Raíces): requiere
+  rehacerse o validarse. Se revirtió una cancelación errónea del Reel N61 (tarea 734).
+- **Readback final:** gate PASS en las tres páginas; cuerpos de ~1.310 (Color del Año), ~1.430 (hub) y ~1.120
+  palabras (Raíces); hilos íntegros y abiertos; comentario de página con el estado final en cada una.
+
+### Delta 2026-09-19 (ronda 3: adaptación a México, autoría, tareas v2 y conteo del mes)
+
+- **Adaptación a México (queja de Berel: «no suena natural»):** pasada de localización en las tres V2 y revisión de un
+  lector mexicano; aplicados: «nosotros» = la marca, una lista de tres por sección, fórmulas de apertura distintas por
+  página (solo el Color del Año abre con «En Berel presentamos»), sin jerga traducida, menos posesivos. Gate PASS.
+- **Autoría:** Berel no quiere firma de persona; las piezas se publican a nombre de Pinturas Berel (`Organization` en
+  `author` y `publisher`, `url` `/somos-berel`), lo que además corrige el `Person` «Equipo Editorial Berel» del sitio.
+- **Tareas v2:** 744–755 para rehacer el arte social de las tres piezas (vencen 25-sep); originales conservadas.
+- **Conteo de septiembre (OBSERVADO en Notion, SharePoint y Frame.io):** proyecto «Produccion Creativa - Septiembre 26»,
+  118 tareas. Artículos **12 vs 8 (+4)**. Gráficas, unidad archivo: entregables al cliente **90 (+40)**; producidas 101
+  (+51); en uso hoy 79 (+29); mínimo con archivo encontrado 61 (+11). Videos **10 vs 3 (+7)**. El rollup de Notion (102)
+  no es fiable por etiquetas faltantes o erróneas (tareas 438, 445, 461, 620, 428, 429, 431, 432, 413, 415, 417, 420, 733).

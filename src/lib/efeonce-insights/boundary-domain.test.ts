@@ -55,6 +55,10 @@ const ALLOWED_WRITE_TARGETS = new Set([
   // TASK-1848 — recurrencia: definición versionada y ocurrencias únicas por período.
   'greenhouse_insights.insight_schedules',
   'greenhouse_insights.insight_schedule_occurrences',
+  // TASK-1888 — portada preferida por organización (una fila por org, última escritura gana). La variante del logo
+  // para fondo oscuro vive en `greenhouse_core.organizations` y se escribe SÓLO por el command de account-360
+  // (`attachOrganizationLogoAsset`, variant on_dark): Insights la lee por su reader y jamás la escribe.
+  'greenhouse_insights.insight_cover_preferences',
   // Outbox canónico (vía publishOutboxEvent; el literal no aparece aquí, se lista por completitud).
   'greenhouse_sync.outbox_events'
 ])

@@ -1,0 +1,52 @@
+{
+  "file": "sky-v15-rock-1080p.mp4",
+  "sha256": "b0e97b44457197434f25dd36358ca7c9284ac8a71f46e874d8244f740ff1f92d",
+  "duration": "30.000000",
+  "video": {
+    "width": 1080,
+    "height": 1920,
+    "nb_frames": "720",
+    "r_frame_rate": "24/1",
+    "color_space": "bt709",
+    "color_transfer": "bt709",
+    "color_primaries": "bt709",
+    "color_range": "tv",
+    "bit_rate": "8348786"
+  },
+  "audio": {
+    "codec_name": "aac",
+    "sample_rate": "48000",
+    "channels": 2
+  },
+  "decode": "pass",
+  "videoUnchangedDuringMux": true,
+  "decodedClosingColors": [
+    {
+      "second": 26.8,
+      "decodedMeanRgb": [
+        0.0,
+        40.0,
+        76.0
+      ],
+      "targetRgb": [
+        2,
+        42,
+        78
+      ]
+    },
+    {
+      "second": 29.5,
+      "decodedMeanRgb": [
+        77.0,
+        0.0,
+        90.0
+      ],
+      "targetRgb": [
+        80,
+        1,
+        92
+      ]
+    }
+  ],
+  "approval": "pending operator audiovisual review"
+}

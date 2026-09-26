@@ -5,7 +5,8 @@ export type DeleteExternalCanaryAuthArtifactsInput = {
   subjects: string[]
   runId: string
   bindingIds: string[]
-  oauthClientIds: string[]
+  ownedOauthClientIds: string[]
+  sharedOauthClientIds: string[]
 }
 
 /**
@@ -19,32 +20,37 @@ export const deleteExternalCanaryAuthArtifacts = async (
   client: PoolClient,
   input: DeleteExternalCanaryAuthArtifactsInput
 ) => {
-  if (input.oauthClientIds.length > 0) {
-    await client.query(`DELETE FROM greenhouse_auth.access_tokens WHERE client_id=ANY($1::text[])`, [
-      input.oauthClientIds
-    ])
-    await client.query(`DELETE FROM greenhouse_auth.refresh_tokens WHERE client_id=ANY($1::text[])`, [
-      input.oauthClientIds
-    ])
-    await client.query(`DELETE FROM greenhouse_auth.authorization_codes WHERE client_id=ANY($1::text[])`, [
-      input.oauthClientIds
-    ])
-    await client.query(`DELETE FROM greenhouse_auth.client_consents WHERE client_id=ANY($1::text[])`, [
-      input.oauthClientIds
-    ])
+  const hasOwnedClients = input.ownedOauthClientIds.length > 0
+  const hasSharedSubjectArtifacts = input.sharedOauthClientIds.length > 0 && input.subjects.length > 0
+
+  if (hasOwnedClients || hasSharedSubjectArtifacts) {
+    const deleteOauthChildren = async (relation: string) =>
+      client.query(
+        `DELETE FROM greenhouse_auth.${relation}
+          WHERE client_id=ANY($1::text[])
+             OR (client_id=ANY($2::text[]) AND environment_id=$3 AND subject=ANY($4::text[]))`,
+        [input.ownedOauthClientIds, input.sharedOauthClientIds, input.environmentId, input.subjects]
+      )
+
+    await deleteOauthChildren('access_tokens')
+    await deleteOauthChildren('refresh_tokens')
+    await deleteOauthChildren('authorization_codes')
+    await deleteOauthChildren('client_consents')
   }
 
-  if (input.oauthClientIds.length > 0 || input.bindingIds.length > 0) {
+  if (hasOwnedClients || hasSharedSubjectArtifacts || input.bindingIds.length > 0) {
     await client.query(
       `DELETE FROM greenhouse_auth.authorization_contexts
-        WHERE client_id=ANY($1::text[]) OR binding_id=ANY($2::text[])`,
-      [input.oauthClientIds, input.bindingIds]
+        WHERE client_id=ANY($1::text[])
+           OR binding_id=ANY($2::text[])
+           OR (client_id=ANY($3::text[]) AND environment_id=$4 AND subject=ANY($5::text[]))`,
+      [input.ownedOauthClientIds, input.bindingIds, input.sharedOauthClientIds, input.environmentId, input.subjects]
     )
   }
 
-  if (input.oauthClientIds.length > 0) {
+  if (hasOwnedClients) {
     await client.query(`DELETE FROM greenhouse_auth.oauth_clients WHERE client_id=ANY($1::text[])`, [
-      input.oauthClientIds
+      input.ownedOauthClientIds
     ])
   }
 

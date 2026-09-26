@@ -1,5 +1,6 @@
 import { runAppCommandRoute, runAppReadRoute } from '@/lib/api-platform/core/app-auth'
-import { createAppInsightShare, listAppInsightShares } from '@/lib/api-platform/resources/app-insights'
+import { createAppInsightShare } from '@/lib/api-platform/resources/app-insights'
+import { listAppInsightShares } from '@/lib/api-platform/resources/app-insights-read'
 
 export const dynamic = 'force-dynamic'
 

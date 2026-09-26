@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.11
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-18 por Claude (TASK-1848 code complete: compartir por enlace, envío por correo y recurrencia; sin deploy)
+> **Ultima actualizacion:** 2026-09-25 por Claude (TASK-1889: cómo se ve un informe y un deck con el diseño aprobado y qué pasa cuando falta un dato; antes, TASK-1888: datos del diseño nuevo, portada por cliente y variación en puntos)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -17,10 +17,11 @@ La vista web que se comparte por enlace no vivirá en el portal: se mostrará en
 hub que hoy muestra el informe de visibilidad en IA. Greenhouse sigue siendo dueño del dato y del enlace; Think
 sólo lo dibuja (decisión del 2026-09-15). La biblioteca para pedir y revisar informes sí queda en el portal.
 
-Hoy (TASK-1845) existe el **núcleo**: crear un encargo, recolectar evidencia, redactar el plan y dejar
-la edición lista para revisión. **Todavía no se renderiza ningún PDF ni vista web, no se comparte por
-enlace ni se envía por correo** (unidades posteriores del programa). Y como emitir exige salidas
-validadas, **hoy ninguna edición puede emitirse**: llega hasta `ready_for_review`.
+La primera unidad (TASK-1845) creó el **núcleo**: crear un encargo, recolectar evidencia, redactar el plan y
+dejar la edición lista para revisión. Después se sumaron el deck PDF (TASK-1846), el enlace compartido, el envío
+por correo y la recurrencia (TASK-1848, en producción pero apagados) y el informe A4 junto con el deck nuevo
+(TASK-1847, en producción desde el 2026-09-24). **Todavía no existe la vista web.** Como la emisión sigue apagada en
+producción, **ahí ninguna edición puede emitirse**: llega hasta `ready_for_review`.
 
 ## Cómo se comporta
 
@@ -56,10 +57,204 @@ validadas, **hoy ninguna edición puede emitirse**: llega hasta `ready_for_revie
 | Agente por MCP | Catálogo, listar, leer y (con permiso de escritura) pedir; **nunca emite** | Lo que su vínculo con la organización permita |
 
 Como emitir todavía no es posible, hoy un cliente que pide una edición la verá quedar en `in_review` sin
-cifras visibles: eso es lo esperado hasta que su deck esté renderizado y un interno la emita (el render del deck
-ya corre en staging y producción, pero la emisión sigue apagada en todos los ambientes).
+cifras visibles: eso es lo esperado hasta que sus archivos estén renderizados y un interno la emita (el render del
+deck y del informe A4 ya corre en staging y producción, pero la emisión sigue apagada en producción; sólo staging la
+tiene encendida, para pruebas).
 
-## Estado de disponibilidad (2026-09-16)
+## Los dos formatos y sus gráficos (en producción desde el 2026-09-24)
+
+Una edición produce **el mismo contenido en dos formatos**, y la diferencia no es de estilo sino de
+cómo se lee cada uno:
+
+| | **Deck** | **Informe A4** |
+|---|---|---|
+| Para qué | proyectarse y hojearse | leerse sentado, sin quien lo presente |
+| Densidad | una conclusión por lámina | capítulos continuos, con notas al margen |
+| Pie | sólo la dirección web | dirección, teléfono y folio en **cada** página |
+| Largo | acotado | hasta decenas de páginas, con índice |
+
+**Los gráficos salen del dato, nunca se dibujan a mano.** El sistema calcula cada barra desde el
+número que la acompaña y **se detiene si el texto impreso no coincide con lo que dibuja**. Un
+gráfico cuya barra no corresponde a su etiqueta no se publica: se rechaza con la causa.
+
+**Qué puede graficar hoy:** barras simples, agrupadas y apiladas, líneas, circular y dona,
+dispersión, embudo, cascada, medidor, mapa de calor, waffle, bullet, Venn de dos conjuntos y UpSet.
+**De todas ellas, el sistema hoy produce automáticamente sólo barras**: el resto está construido y
+probado, pero todavía no hay quien genere esos datos. No están ofrecidas como disponibles.
+
+**Tres cosas que el sistema se niega a hacer**, porque harían mentir al informe:
+
+- **Circular con más de tres porciones.** Pasadas unas pocas, nadie compara ángulos: adivina. Se
+  ofrece una barra en su lugar.
+- **Rellenar un hueco.** Si falta un dato, la línea se corta y la ausencia viaja a la página de
+  límites. No se une el trazo ni se dibuja un cero.
+- **Recortar para que quepa.** Si una afirmación o una tabla exceden el espacio, el informe se
+  rechaza con la causa. Nunca sale un texto amputado.
+
+**Un capítulo sin datos no desaparece**: se cuenta en palabras y su falta queda declarada en la
+página de cierre, «Lo que esta edición no puede afirmar». Desaparecerlo convertiría la falta de
+datos en silencio.
+
+**Cómo se lee una figura que compara períodos.** Cada métrica aparece como un par: la barra de color es el
+período del informe y la gris, el período anterior. Cada par se mide en su propia escala, porque comparar el largo de
+«clics» contra el de «impresiones» no dice nada (son magnitudes de cientos de veces de diferencia). Si una figura
+no cabe en una página, sigue en la siguiente con «(continuación)»: nunca se descartan barras.
+
+**Qué dicen el período, los límites y la metodología.** El período es la ventana que la edición midió: una edición
+del 1 al 20 de septiembre dice «1–20 de septiembre de 2026», no «Septiembre». Los límites y la metodología nombran
+las métricas y las fuentes en palabras («Posiciones en buscadores», «Google Search Console, corte al 19 de septiembre
+de 2026»), nunca con códigos internos.
+
+**Probado con datos reales (2026-09-22, staging).** Con Grupo Berel (visibilidad orgánica y en motores de
+respuesta) y Sky Airlines (entrega), en ediciones internas y sin emitir. La prueba encontró y corrigió errores que los
+datos de ejemplo no mostraban, entre ellos que **la tasa de entregas a tiempo (OTD) nunca llegaba al informe** de
+entrega por un nombre de métrica distinto: ahora aparece (Sky, agosto: 81,9 %).
+
+**Primer informe real en producción (2026-09-25).** Con autorización del operador se generó una edición **interna**
+de Sky Airlines (`EO-INS-000022`, entrega de agosto contra julio de 2026). Salieron el deck (5 láminas) y el informe A4
+(8 páginas) al primer intento, y sus cifras coinciden con las de origen: entregas a tiempo (OTD) 81,9 % contra 80,1 % y
+rondas por entregable (RpA) 1,33 contra 1,44. La edición sigue interna y sin emitir: emitir y compartir siguen
+apagados en producción. Antes se probó la organización de prueba («Greenhouse Demo»), que sirve para ver un deck sin
+datos pero no para un informe de entrega: **no tiene datos ICO**, así que una edición de entrega suya se detiene en
+la validación por falta de evidencia, que es lo correcto. Pedir de nuevo el render de una edición ya renderizada
+devuelve el mismo pedido anterior, no produce archivos duplicados.
+
+> Detalle técnico: arquitectura §14.7 (delta 2026-09-25, cierre de TASK-1847); catálogos
+> `src/lib/artifact-composer/catalogs/insights-report/` e `insights-deck/`; mappers en
+> `src/lib/efeonce-insights/render/`.
+
+## Qué viene: el diseño aprobado para todos los informes (planificado)
+
+> Estado (2026-09-25): **los datos que el diseño necesita ya están construidos pero apagados** (TASK-1888) y **las
+> plantillas ya están construidas** (TASK-1889, lista en el código y probada en local con datos reales de Berel y Sky;
+> ver la sección siguiente). Ninguna de las dos está todavía en producción: hasta que salgan juntas, los informes de
+> producción usan el diseño vigente. La única mejora que ya aplica siempre es cómo se imprime el cambio de un
+> porcentaje (en puntos, ver abajo).
+
+El operador revisó página por página un diseño nuevo de informe y lo aprobó como el aspecto que debe tener **todo**
+informe de Insights, en A4 y en deck:
+
+- **Portada:** una sola portada con variantes según los módulos, no una por servicio. Puede ser azul marino o blanca
+  (con un bloque azul marino arriba). La blanca de visibilidad (SEO y respuestas de IA) muestra alrededor los logos de
+  los canales medidos (Google, ChatGPT, Gemini, Claude, Perplexity); la blanca creativa (entrega) va sin logos.
+- **Contraportada** con redes, contacto y datos legales de Efeonce; **aperturas de capítulo**; páginas de **resumen,
+  lectura y plan**.
+- **Páginas de gráfico** que abren con la cifra principal, dicen la conclusión, muestran el gráfico con su fuente y
+  cierran con «Lo que significa / Próximo paso».
+- **El color dice qué es cada dato:** el período actual en azul marino (o turquesa sobre fondo oscuro), el anterior en
+  un turquesa más profundo (o azul lavanda sobre oscuro), una oportunidad en coral, y lo que falta con rayado, nunca con
+  un color.
+
+**Portada azul marino o blanca: cómo se decide.** Cada cliente tiene una preferencia, y al pedir una edición se puede
+cambiar sólo para esa edición. Si la preferencia es «automática», la portada va azul marino sólo cuando el cliente
+tiene un logo que se lee bien sobre fondo oscuro; si no, va blanca. Hoy las organizaciones tienen un solo logo, sin
+versión para fondo oscuro, así que «automática» da portada blanca. La portada azul marino **nunca** usa el logo normal
+del cliente (sobre azul marino puede no verse): usa su versión para fondo oscuro o va sin logo. La portada elegida queda
+fija en la edición: volver a producir el PDF da la misma portada, aunque después cambie la preferencia.
+
+**Quién fija la preferencia y dónde.** Las personas de Efeonce que operan la cuenta (administración y cuentas) la fijan
+por cliente: «automática», «azul marino» o «blanca». Se puede fijar desde ya, aunque el diseño nuevo siga apagado. La
+versión del logo para fondo oscuro se carga en los logos de la organización, igual que el logo normal. La pantalla para
+hacerlo desde el portal llega con la biblioteca de Insights (TASK-1849); mientras tanto se hace por la API o por un
+asistente conectado al MCP de Efeonce (ver el manual).
+
+**Qué gráficos nuevos traerá.** Sólo los que tienen datos que los sostengan, según una tabla que dice qué tipo de
+gráfico puede salir de qué módulo:
+
+- **Entrega contra la meta** (entregas a tiempo, primera entrega correcta y rondas de revisión por pieza), un espacio
+  por barra, con la meta oficial marcada. La meta sale del registro de métricas de entrega, nunca se escribe a mano.
+- **Tendencia mes a mes** cuando el informe cubre tres meses o más (entrega por espacio; tráfico orgánico estimado).
+- **Presencia de la marca por motor de IA** con el logo de cada motor (ChatGPT, Gemini, Claude, Perplexity, respuestas
+  de Google).
+
+Cada gráfico trae su lectura: la cifra principal, «Lo que significa» (dónde quedó el dato contra la meta o el período
+anterior) y, sólo cuando hay una brecha con la meta, un «Próximo paso». La lectura nunca inventa una causa. Los
+gráficos sin datos que los sostengan no aparecen: métricas por página o por palabra clave, coincidencias entre
+consultas de IA, embudo comercial, y el medidor del puntaje de IA con su período anterior (hoy sólo se lee el último
+análisis).
+
+**Cambio de un porcentaje, en puntos (ya aplica).** Cuando la métrica ya es un porcentaje, el cambio se imprime en
+puntos: OTD de 80,1 % a 81,9 % es «+1,8 pp», no «+2,2 %». Si el cambio es menor a 0,05 puntos, se imprime con dos
+decimales para no escribir «0,0 pp» junto a dos cifras que se ven distintas.
+
+**Cómo se revisa.** Cada plantilla nueva se compara con la página aprobada y no puede diferir en más del 1 % de sus
+puntos. Las primeras ediciones reales con el diseño nuevo serán de Berel (visibilidad) y Sky (entrega), como informes
+internos: no se comparten con el cliente hasta que el operador las revise.
+
+> Detalle técnico: arquitectura §6 (delta 2026-09-25, rediseño premium aprobado);
+> `docs/tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md` (estado en arquitectura §14.8);
+> `docs/tasks/to-do/TASK-1889-efeonce-insights-premium-catalogs.md`; dirección visual
+> `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`.
+
+## Cómo se ve un informe y un deck con el diseño aprobado (construido, todavía no en producción)
+
+> Estado (2026-09-25): las plantillas del informe A4 y del deck ya tienen **sólo** el diseño aprobado por el operador;
+> el diseño anterior se retiró del código. Está listo en el código de desarrollo y se revisó en local con ediciones
+> reales de Berel (visibilidad orgánica y en IA) y Sky (entrega). **Todavía no está en producción**: falta probarlo en
+> staging, publicarlo con el proceso de release y que el operador apruebe los PDF reales. Nada se comparte con un
+> cliente hasta que una edición interna en producción haya pasado por su revisión.
+
+El informe A4 y el deck dicen lo mismo, en el mismo orden; cambia cuánto cabe en cada página.
+
+| Parte | Qué muestra |
+|---|---|
+| **Portada** | Azul marino o blanca (con un bloque azul marino arriba), con el logo del cliente, el período y «Preparado para». La blanca de visibilidad lleva alrededor los logos de los canales medidos. Sobre azul marino sólo va la versión del logo para fondo oscuro; si no existe, la portada va sin logo del cliente |
+| **Índice** | Los capítulos con el número de página real donde empieza cada uno |
+| **Resumen y «Lo esencial»** | La tesis del período en una afirmación y hasta cinco hallazgos, cada uno con su cifra y el número real de la página donde está su evidencia |
+| **Aperturas de capítulo** | Una página azul marino que anuncia cada módulo (visibilidad, respuestas de IA, entrega) |
+| **Páginas de gráfico** | Una por gráfico, con la forma que corresponde a su pregunta (ver abajo) |
+| **Tabla** | Las cifras en detalle, en filas ordenadas; si no caben, siguen en la página siguiente con la misma escala |
+| **Límites** | «Lo que esta edición no puede afirmar»: cada dato faltante, con su motivo |
+| **Contraportada** | Logo, eslogan, redes, correo, teléfonos, dirección, mercados y la línea legal de Efeonce |
+
+**Cada página de gráfico se lee igual.** Abre con la cifra principal, dice la conclusión en una frase, muestra el
+gráfico, indica de dónde sale el dato (unidad y fuente) y cierra con «Lo que significa» y «Próximo paso». Ese cierre
+sale de la lectura del plan: no se escribe a mano y nunca inventa una causa. Si el dato ya alcanzó la meta, no hay
+«Próximo paso» que la evidencia sostenga, y no se escribe.
+
+**Cuatro formas de gráfico, según la pregunta:**
+
+| Forma | Cuándo se usa | Cómo se lee |
+|---|---|---|
+| **Comparación de períodos** | Métricas distintas entre sí (clics, impresiones, CTR) | Cada métrica en su propia escala, período actual contra anterior. La variación lleva un triángulo que indica si subió o bajó: dice la dirección, no si es bueno o malo |
+| **Columnas** | Canales comparables entre sí (por ejemplo, motores de IA) sobre un mismo eje | Una columna por canal. La franja de referencia y la marca de oportunidad aparecen sólo cuando el plan las declara |
+| **Metas** | Entrega contra su meta oficial (entregas a tiempo, primera entrega correcta, rondas por pieza) | Lo logrado contra la meta, marcando la «mayor brecha». La zona de atención aparece sólo si el registro de métricas de entrega trae su límite; nunca se escribe a mano. En métricas donde «menos es mejor» (como las rondas), la lectura se invierte |
+| **Tendencia** | Ventanas de tres meses o más | Hasta tres líneas, distinguibles también en gris. Si falta un mes, la línea se corta: nunca se une el trazo ni se inventa el valor |
+
+**Una regla para no mezclar peras con manzanas:** van en columnas sobre un mismo eje sólo canales distintos de una
+misma métrica. Métricas distintas van siempre en comparación, cada una en su escala.
+
+**Qué pasa cuando falta un dato.**
+
+- **La figura no se dibuja.** Si un gráfico no tiene hechos suficientes, no sale: el capítulo lo cuenta en palabras,
+  y la falta aparece en la tabla y en «Lo que esta edición no puede afirmar».
+- **Nunca se recorta.** Si un texto no cabe en su espacio, el informe no sale y el rechazo dice qué campo es y cuánto
+  mide. La corrección va en el plan, no en amputar la frase.
+- **Nunca se inventa.** Ni un cero donde no hay dato, ni un valor interpolado en una línea, ni un gráfico en una forma
+  que no le corresponde: un tipo de gráfico que no tiene página propia se rechaza con su causa.
+- **Portada sin logo utilizable.** Si el logo elegido no se puede incrustar, el informe se detiene en vez de salir con
+  un hueco en la portada.
+
+**Cómo se verificó.** Cada plantilla se compara con la página aprobada del diseño: 20 de 21 páginas difieren en 1 % o
+menos. La restante (la lámina de columnas agrupadas del deck) difiere 2,2 % porque el propio diseño la corrió 3
+píxeles; el operador aprobó la diferencia el 2026-09-25 y queda vigilada con un techo. Las ediciones reales de Berel y
+Sky, revisadas en local, destaparon cinco defectos que los datos de ejemplo no mostraban; los cinco se corrigieron.
+
+> Detalle técnico: [arquitectura §14.9](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) (estado de
+> TASK-1889) y §6 (dirección premium); catálogos `src/lib/artifact-composer/catalogs/insights-report/` e
+> `insights-deck/`; página por forma de gráfico en `src/lib/efeonce-insights/render/figure-slots.ts`;
+> task `docs/tasks/in-progress/TASK-1889-efeonce-insights-premium-catalogs.md`.
+
+## Estado de disponibilidad (2026-09-25)
+
+> **Delta 2026-09-25 (TASK-1847 cerrada):** el informe A4 y el deck nuevo están **en producción desde el
+> 2026-09-24**, y el 2026-09-25 se renderizó ahí el primer informe con datos reales (edición interna de Sky, ver «Los
+> dos formatos y sus gráficos»). Emitir y compartir siguen apagados en producción.
+
+> **Delta 2026-09-22 (TASK-1847):** el informe A4 y el deck nuevo están **en staging**, probados con datos reales de
+> Berel y Sky. En staging el deck ya usa el formato propio de Insights (antes usaba el de propuestas comerciales, que
+> recortaba textos y omitía métricas). **En producción todavía no**: ahí el informe A4 se rechaza al pedirlo y el deck
+> sale con el formato anterior, hasta el próximo release.
 
 **Disponible en producción** desde el 2026-09-15 para las organizaciones que tengan el módulo `insights_v1`
 asignado. Lo que está encendido y lo que no:
@@ -67,12 +262,13 @@ asignado. Lo que está encendido y lo que no:
 | Capacidad | Estado | Nota |
 | --- | --- | --- |
 | Pedir una edición y generarla hasta `ready_for_review` | **Encendida** en staging y producción | Flag `INSIGHTS_GENERATION_ENABLED=true` en Vercel (staging y producción); en Preview sigue apagada |
-| Emitir una edición | Apagada y bloqueada | Flag `INSIGHTS_ISSUANCE_ENABLED` OFF en todos los ambientes; además exige que todos los outputs pedidos estén renderizados y validados |
+| Emitir una edición | Apagada en producción | Flag `INSIGHTS_ISSUANCE_ENABLED` OFF en producción (encendido sólo en staging desde 2026-09-18 para las pruebas de TASK-1848); además exige que todos los outputs pedidos estén renderizados y validados |
 | Redacción asistida por IA | Apagada | Flag `INSIGHTS_AUTHORING_AI_ENABLED` OFF; el plan sale del redactor determinista |
 | Pedir el render del **deck PDF** de una edición | **Encendido en staging y producción** (desde 2026-09-16) | Staging: probado con cinco decks reales, un reintento y una cancelación. Producción: probado el 2026-09-16 en la organización de prueba — el deck salió solo, al primer intento, y pedir la vista web fue rechazado como corresponde. Ver «Pedir el deck de una edición» |
-| Enlace compartido, envío por correo y recurrencia | **Construidos, todavía no disponibles** (2026-09-18) | Código listo y tablas creadas, pero nada está desplegado y los tres interruptores siguen apagados. Ver las tres secciones siguientes |
-| Informe A4 y pantalla pública del enlace | No existen todavía | TASK-1847 (A4) y TASK-1875 (la página en `think.efeoncepro.com` que muestra el enlace) |
-| Pedir una edición desde un agente externo por el gateway MCP | Lectura sí; escritura todavía no | Las herramientas de ediciones y de render están publicadas (gateway v1.6.0, 2026-09-16); crear exige un permiso de escritura que ningún cliente tiene aún (`insufficient_scope`) |
+| Enlace compartido, envío por correo y recurrencia | **En producción, pero apagados** (2026-09-18) | El código salió a producción el 2026-09-18 con los tres interruptores apagados a propósito: se encenderán cuando exista la página pública del enlace en Think (TASK-1875). En staging están encendidos y se probaron completos con una organización de prueba; los dos correos de prueba llegaron al buzón autorizado. Ver las tres secciones siguientes |
+| Pedir el **informe A4** de una edición | **Encendido en staging y producción** (producción desde 2026-09-24) | Probado con datos reales de Berel y Sky en staging (2026-09-22) y de Sky en producción (2026-09-25, edición interna). Sale junto con el deck si se piden los dos |
+| Pantalla pública del enlace | No existe todavía | TASK-1875 (la página en `think.efeoncepro.com` que muestra el enlace) |
+| Usar Insights desde un agente externo por el gateway MCP (`mcp.efeonce.org`) | Lectura sí; escritura todavía no | Gateway v1.7.0 (2026-09-18). Además de ediciones y render, un agente puede **ver** enlaces, envíos y recurrencias (cinco herramientas de lectura). Crear y revocar enlaces existen, pero exigen un permiso de escritura que ningún cliente tiene aún; lo mismo crear ediciones. **Enviar por correo y programar recurrencias sólo se hacen desde el portal**, no por MCP |
 
 **Pedir el deck de una edición (render).** Cuando una edición está `ready_for_review`, quien tenga permiso sobre
 esa organización puede pedir su deck PDF. El pedido no devuelve el archivo al instante: queda **en cola** y un
@@ -96,13 +292,14 @@ proceso en segundo plano lo produce.
   "no existe" (no encontrado) y no se crea nada.
 - **Registro.** Cada pedido, reintento y cancelación queda a nombre de la persona que lo hizo, también si es un
   usuario cliente (antes todo quedaba como "sistema").
-- **Qué no hace todavía.** Sólo existe el deck. El informe A4 y la vista web se rechazan al pedirlos. Tener el deck
+- **Qué no hace todavía.** Existen el deck y el informe A4 (en producción desde el 2026-09-24). La vista web se rechaza al pedirla. Tener el deck
   no lo envía ni lo comparte: descargarlo, compartirlo y emitir siguen siendo pasos aparte.
 
 ## Compartir un informe por enlace
 
-> Estado: construido el 2026-09-18, **todavía no disponible** (sin deploy, interruptor apagado). La página pública que
-> muestra el enlace en `think.efeoncepro.com` es otra unidad (TASK-1875).
+> Estado: en producción desde el 2026-09-18, **todavía no disponible** (interruptor apagado en producción; encendido y
+> probado en staging). La página pública que muestra el enlace en `think.efeoncepro.com` es otra unidad (TASK-1875) y
+> no existe todavía; el interruptor se enciende cuando exista.
 
 **Qué hace.** Genera un enlace secreto para que alguien sin cuenta en el portal lea una edición **ya emitida** y, si
 se permite, descargue sus archivos. El enlace sólo abre esa edición: no da acceso a la biblioteca, no permite pedir
@@ -134,7 +331,8 @@ momento, no borra copias. Los registros de acceso guardan si hubo una visita (si
 
 ## Enviar un informe por correo
 
-> Estado: construido el 2026-09-18, **todavía no disponible** (sin deploy, interruptores apagados, tipos de correo pausados).
+> Estado: en producción desde el 2026-09-18, **todavía no disponible** (interruptor apagado en producción; encendido y
+> probado en staging, donde los dos correos de prueba llegaron).
 
 **Qué hace.** Envía una edición emitida por correo, desde Efeonce, a personas elegidas de la lista de usuarios
 activos de la organización (o a internos). Cada persona tiene su propio resultado.
@@ -163,7 +361,8 @@ correo llegará con TASK-1849.
 
 ## Programar informes recurrentes
 
-> Estado: construido el 2026-09-18, **todavía no disponible** (sin deploy, interruptor apagado).
+> Estado: en producción desde el 2026-09-18, **todavía no disponible** (interruptor apagado en producción; encendido y
+> probado en staging).
 
 **Qué hace.** Prepara automáticamente una edición por cada período que se cierra (semanal o mensual), con el mismo
 encargo cada vez, en la zona horaria de la cuenta. **No emite ni envía nada solo:** cada edición queda lista para
@@ -199,9 +398,14 @@ ICO en los meses pedidos, así que el snapshot declara cuatro rechazos "sin dato
 límites. Es decir: se verificó que la ausencia se declara con honestidad, no todavía un informe con cifras
 reales de un cliente.
 
-**Qué falta para cerrar TASK-1845.** Dos evidencias operativas (ensayo de reversión de la migración en la base
-compartida y una sesión MCP con un usuario humano que liste las herramientas publicadas). Hasta entonces la
-task sigue `in-progress`, aunque la capacidad ya esté en producción.
+**Actualización 2026-09-25.** La organización de prueba («Greenhouse Demo») **no tiene datos ICO**: el 2026-09-25 una
+edición de entrega nueva suya se detuvo en la validación por falta de evidencia (`evidence_rejected`), que es lo
+correcto. Por eso el primer informe con cifras reales en producción se hizo con una edición interna de Sky Airlines,
+que tiene 11 meses de datos de entrega (noviembre de 2025 a septiembre de 2026); ver «Los dos formatos y sus
+gráficos».
+
+**Cierre de TASK-1845.** Cerró el 2026-09-16: el ensayo de reversión de la migración en la base compartida se hizo
+ese día, y la sesión MCP con un usuario humano quedó como verificación opcional.
 
 > Detalle técnico: arquitectura §8 (enlace compartido), §9 (correo y recurrencia) y §14 (estado, rollout, límites e invariantes; §14.6 para TASK-1848); dominio `src/lib/efeonce-insights/**`; rutas
 > `src/app/api/platform/{app,ecosystem}/insights/**`; migración

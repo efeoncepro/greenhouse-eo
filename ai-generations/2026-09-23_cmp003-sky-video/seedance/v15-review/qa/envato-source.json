@@ -1,0 +1,32 @@
+{
+  "providedBy": "operator ZIP attachment",
+  "archiveSha256": "a083499a55bd5c633444e16c62818271e287b9e697973c8a2620cccdf4ccb33f",
+  "licenseCertificateInArchive": false,
+  "publication": false,
+  "files": [
+    {
+      "file": "331music_rock_short-03.wav",
+      "duration": "17.785692",
+      "sample_rate": "44100",
+      "sha256": "c9961bd0b7ae39ff012affeab4c3e71400e6255b4f2be3d2fb2210b781cd5761"
+    },
+    {
+      "file": "331music_rock_main-01_full.wav",
+      "duration": "114.000000",
+      "sample_rate": "44100",
+      "sha256": "7c1d872ba49350c2b3967481df1c3008ffe2d08fad7bbf7c9b9e18a70bf355ed"
+    },
+    {
+      "file": "331music_rock_short-01.wav",
+      "duration": "86.500000",
+      "sample_rate": "44100",
+      "sha256": "466546fe8468b12edf768f8ff7fe8203c6f803ed6a40245a3a4d52d6acd26325"
+    },
+    {
+      "file": "331music_rock_short-02.wav",
+      "duration": "32.000000",
+      "sample_rate": "44100",
+      "sha256": "168184e358c4cd1e25db609f03d0681c1129b210a4ef666c05e39a58a89c1bab"
+    }
+  ]
+}

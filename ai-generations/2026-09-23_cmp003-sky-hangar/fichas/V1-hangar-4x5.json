@@ -1,0 +1,17 @@
+{
+  "id": "CMP003-V1-hangar",
+  "formato": "4:5",
+  "impacto": true,
+  "atmosfera": "bruma",
+  "escena": "SCENE (a real narrow-body maintenance hangar at night, NOBODY IN FRAME): a SKY Airline Airbus A320neo parked on the ground, landing gear down with chocks, filling most of the frame in three-quarter front view, facing camera-right, nose near the right edge, tail cut by the left edge; the aircraft at its TRUE SIZE (fuselage about 4 m diameter, tail about 12 m), the hangar sized for it: the tail comes within a few meters of the roof trusses. Livery exactly as in the reference images: white fuselage, PURPLE tail (#701C74, never navy) with a large lime-green chevron, lime-green sharklets; the forward fuselage wordmark area is plain white paint (the wordmark will be applied later) with the cabin windows running along it. LIGHT: the hangar's overhead high-bays are OFF, so the roof structure falls into deep darkness. The aircraft is lit by two portable LED work floodlights on tripods, standing low on the floor at the left edge of the frame, their hard beams raking across the fuselage from the left at about waist height, sculpting the nose and the engine with graphic highlights and deep shadows; the beams are visible as solid columns in a thin clean haze, all below the middle of the frame. A narrow spotlight lights one single row of a split-flap departures board mounted on the rear wall behind the aircraft (about 7 m wide and 3 m tall, individual matte black flaps with hinges, ALL flaps BLANK). THE MOMENT: the lit row of the board is caught in the middle of flipping — several flaps are frozen mid-rotation with slight motion blur, as if the board were about to write something. BLUE CARRIER: the airport ground equipment near the nose is painted in a dusty matte cobalt blue industrial paint (#0375DB), low sheen — an aircraft tow tractor and a ground power unit with its black cable — catching the floodlight on their edges; two orange safety cones on the floor near the nose gear. Polished grey epoxy floor with painted lines catching soft reflections. 50mm lens at f/4, camera about 1.2 m high, focus on the aircraft nose. No readable text or logos anywhere.",
+  "lecho": {
+    "objeto": "a black rubber aircraft wheel chock lying on the floor right against the lens at the bottom of the frame, completely out of focus and outside the floodlight beams",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the unlit hangar roof structure and trusses in deep shadow above the aircraft",
+      "tinta": "blanca"
+    }
+  }
+}

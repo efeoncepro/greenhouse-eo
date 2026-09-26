@@ -102,6 +102,18 @@
     },
     {
       "family": "Poppins",
+      "weight": 500,
+      "style": "normal",
+      "file": "fonts/poppins-500.ttf",
+      "sha256": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016",
+      "bytes": 152860,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "extension": "editorial",
+      "source": "Google Fonts css2 (TTF completo), 2026-09-25 — TASK-1889: el informe aprobado usa Poppins 500 en antetítulos y etiquetas; sin ella el navegador caía a 300. Es de la extensión editorial: deck-axis pide 500 en MaturityLadderFull y hoy lo resuelve a 300; darle la cara cambiaría las propuestas ya aprobadas."
+    },
+    {
+      "family": "Poppins",
       "weight": 600,
       "style": "normal",
       "file": "fonts/poppins-600.ttf",

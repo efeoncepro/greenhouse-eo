@@ -108,7 +108,37 @@ describe('attachOrganizationLogoAsset', () => {
       organizationId: 'org-client',
       previousLogoAssetId: 'asset-old',
       logoAssetId: 'asset-new',
-      logoUrl: '/api/assets/private/asset-new?inline=1'
+      logoUrl: '/api/assets/private/asset-new?inline=1',
+      variant: 'default'
     })
+    expect(mockClientQuery).toHaveBeenCalledWith(expect.stringContaining('SET logo_asset_id = $2'), ['org-client', 'asset-new'])
+  })
+
+  it('TASK-1888 — la variante on_dark escribe logo_on_dark_asset_id y deja intacto el logo por defecto', async () => {
+    mockClientQuery
+      .mockResolvedValueOnce({
+        rows: [{
+          organization_id: 'org-client',
+          public_id: 'EO-ORG-0002',
+          organization_name: 'Cliente Demo',
+          is_operating_entity: false,
+          logo_asset_id: 'asset-default',
+          logo_on_dark_asset_id: 'asset-dark-old'
+        }]
+      })
+      .mockResolvedValue({ rows: [] })
+
+    mockGetAssetById.mockResolvedValue({ assetId: 'asset-dark', status: 'pending', ownerAggregateType: 'organization_logo_draft', ownerClientId: null, ownerSpaceId: null, ownerMemberId: null })
+    mockAttachAssetToAggregate.mockResolvedValue({ assetId: 'asset-dark', ownerClientId: null, ownerSpaceId: null, ownerMemberId: null })
+
+    const result = await attachOrganizationLogoAsset({ organizationId: 'org-client', assetId: 'asset-dark', actorUserId: 'user-1', variant: 'on_dark' })
+
+    expect(result).toMatchObject({ previousLogoAssetId: 'asset-dark-old', logoAssetId: 'asset-dark', variant: 'on_dark' })
+    expect(mockClientQuery).toHaveBeenCalledWith(expect.stringContaining('SET logo_on_dark_asset_id = $2'), ['org-client', 'asset-dark'])
+    expect(mockClientQuery).not.toHaveBeenCalledWith(expect.stringContaining('SET logo_asset_id'), expect.anything())
+    // El asset anterior que se marca reemplazado es el de la MISMA variante, nunca el logo por defecto.
+    expect(mockClientQuery).toHaveBeenCalledWith(expect.stringContaining('UPDATE greenhouse_core.assets'), expect.arrayContaining(['asset-dark-old']))
+    expect(mockPublishOutboxEvent).toHaveBeenCalledWith(expect.objectContaining({ eventType: 'organization.brand_asset.updated', payload: expect.objectContaining({ variant: 'on_dark' }) }), expect.anything())
+    expect(mockPublishOutboxEvent).toHaveBeenCalledWith(expect.objectContaining({ payload: { organizationId: 'org-client', updatedFields: ['logo_on_dark_asset_id'] } }), expect.anything())
   })
 })

@@ -1,0 +1,213 @@
+{
+  "width": 1080,
+  "height": 1920,
+  "fps": 24,
+  "duration": 14.25,
+  "insertAt": 15.75,
+  "scope": "Only post-aircraft titles and closing graphics. No background, camera, UI or aircraft generation.",
+  "scenes": [
+    {
+      "id": "year",
+      "start": 0,
+      "end": 2.58,
+      "elements": [
+        {
+          "id": "yearTop",
+          "text": "Un año creando",
+          "start": 0.02,
+          "duration": 0.45,
+          "land": 0.27,
+          "preset": "sweep",
+          "from": {
+            "x": -780,
+            "y": 40,
+            "ry": -25,
+            "rz": -8,
+            "scale": 1.1
+          }
+        },
+        {
+          "id": "yearBottom",
+          "text": "con SKY.",
+          "start": 0.22,
+          "duration": 0.5,
+          "land": 0.6,
+          "preset": "rise",
+          "from": {
+            "y": 140,
+            "z": 70,
+            "rx": -18,
+            "scale": 1.03
+          }
+        }
+      ],
+      "exit": {
+        "start": 2.22,
+        "duration": 0.36,
+        "x": -1150,
+        "y": -35,
+        "rz": -3,
+        "blur": 8
+      }
+    },
+    {
+      "id": "proof",
+      "start": 2.3,
+      "end": 5.12,
+      "elements": [
+        {
+          "id": "plus",
+          "asset": "plus",
+          "start": 2.3,
+          "duration": 0.68,
+          "land": 2.78,
+          "preset": "arc",
+          "from": {
+            "x": 1020,
+            "y": -150,
+            "z": 80,
+            "rz": 135
+          }
+        },
+        {
+          "id": "number",
+          "text": "2.000",
+          "start": 2.78,
+          "duration": 0.46,
+          "land": 3.12,
+          "preset": "unfold",
+          "from": {
+            "x": -110,
+            "y": 0,
+            "ry": -12,
+            "scale": 0.96
+          }
+        },
+        {
+          "id": "pieces",
+          "text": "piezas.",
+          "start": 3.08,
+          "duration": 0.42,
+          "land": 3.4,
+          "preset": "rise",
+          "from": {
+            "y": -65,
+            "rx": 9
+          }
+        }
+      ],
+      "exit": {
+        "start": 4.72,
+        "duration": 0.4,
+        "y": -920,
+        "rx": 8,
+        "blur": 7
+      }
+    },
+    {
+      "id": "news",
+      "start": 4.92,
+      "end": 8.25,
+      "elements": [
+        {
+          "id": "intro",
+          "text": "Y ahora nos eligió como",
+          "start": 4.94,
+          "duration": 0.42,
+          "land": 5.28,
+          "preset": "rise",
+          "from": {
+            "y": 320,
+            "rx": -8
+          }
+        },
+        {
+          "id": "agency",
+          "text": "su agencia",
+          "start": 5.17,
+          "duration": 0.42,
+          "land": 5.51,
+          "preset": "rise",
+          "from": {
+            "y": 260,
+            "rx": -10
+          }
+        },
+        {
+          "id": "seo",
+          "text": "SEO/AEO.",
+          "start": 5.67,
+          "duration": 0.5,
+          "land": 5.97,
+          "preset": "slam",
+          "from": {
+            "y": -180,
+            "z": 240,
+            "rx": -24,
+            "scale": 2.25
+          }
+        }
+      ],
+      "exit": {
+        "start": 7.93,
+        "duration": 0.3,
+        "y": -48,
+        "z": -120,
+        "scale": 0.95,
+        "blur": 1.5
+      }
+    },
+    {
+      "id": "thanks",
+      "start": 8.19,
+      "end": 10.25,
+      "elements": [
+        {
+          "id": "thanksText",
+          "text": "¡Gracias, SKY!",
+          "start": 8.19,
+          "duration": 0.42,
+          "land": 8.61,
+          "preset": "emotive",
+          "from": {
+            "y": 60,
+            "z": -50,
+            "scale": 0.96
+          }
+        }
+      ],
+      "exit": {
+        "start": 10.03,
+        "duration": 0.22,
+        "y": -12,
+        "scale": 1,
+        "blur": 0
+      }
+    },
+    {
+      "id": "closing",
+      "start": 10.25,
+      "end": 14.25,
+      "elements": [
+        {
+          "id": "lockup",
+          "asset": "official-svg-lockup",
+          "start": 10.25,
+          "duration": 0.18,
+          "land": 10.43,
+          "preset": "fade",
+          "from": {}
+        },
+        {
+          "id": "urlBubble",
+          "asset": "canonical-url-lum.svg",
+          "start": 10.3,
+          "duration": 0.2,
+          "land": 10.5,
+          "preset": "fade",
+          "from": {}
+        }
+      ]
+    }
+  ]
+}

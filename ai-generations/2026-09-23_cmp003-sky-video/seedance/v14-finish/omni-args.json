@@ -1,0 +1,22 @@
+[
+  "pnpm",
+  "ai:omni",
+  "--task",
+  "edit",
+  "--project",
+  "efeonce-group",
+  "--video",
+  "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v14-plan/window-a-input-silent.mp4",
+  "--resolution",
+  "1080p",
+  "--prompt-file",
+  "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v14-plan/window-a.prompt.txt",
+  "--staging-uri",
+  "gs://efeonce-group-greenhouse-private-assets-dev/ai-tooling/cmp003-sky/v14-window-a/inputs/",
+  "--gcs-output",
+  "gs://efeonce-group-greenhouse-private-assets-dev/ai-tooling/cmp003-sky/v14-window-a/output/",
+  "--state-file",
+  "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v14-finish/omni-state.json",
+  "--max-usd",
+  "1.53"
+]

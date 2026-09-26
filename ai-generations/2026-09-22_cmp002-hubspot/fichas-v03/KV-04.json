@@ -1,0 +1,19 @@
+{
+  "id": "KV-04-criterio-v03",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "larga-exposicion",
+  "identidad": [{ "persona": "nexa", "vista": "busto" }],
+  "objetos": [
+    { "objeto": "polo-efeonce", "puesta": "frente-cuerpo-b" },
+    { "objeto": "sprocket-hubspot", "vista": "lateral" }
+  ],
+  "escena": "SCENE (revenue operations floor at night, Santiago): a LONG EXPOSURE on a tripod. Everything that moves by itself has dissolved into soft translucent streaks: colleagues crossing behind her are smeared ribbons, the glowing cool blue records on the display wall have pulled into continuous horizontal light trails, a chair has swung through and left only a blur. Nexa is the ONE thing perfectly sharp in the frame — seated, still, almost frontal to the lens in a navy piqué polo, hands quiet on the desk, eyes down-right on one record she has not let go. Her stillness against all that motion is the entire picture. A single hard low light from the left holds her edge crisp with very high contrast while the streaks glow around her. A small orange sculpture sits on the desk at the right, sharp because it never moved. Her head and hands stay BELOW 36% of the frame height. 85mm lens at f/2 on a tripod, several seconds of exposure, focus on her eyes. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. The sculpture's ring-and-nodes symbol belongs ONLY to the sculpture: it never appears on her clothing, and no symbol of it is printed, embroidered or reflected on the polo. Everything except the sculpture is completely unbranded and no text anywhere is readable: the trails read as movement, never as words.",
+  "lecho": {
+    "objeto": "the near edge of the operations desk crossing the very bottom against the lens, outside every light",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": { "muro": "the dark painted ceiling soffit above the display wall, unlit and even, its matte paint texture visible", "tinta": "blanca" }
+  }
+}

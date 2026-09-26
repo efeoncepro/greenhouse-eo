@@ -1,0 +1,1001 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:42:02.569Z",
+  "run": "ai-generations/2026-07-18_web-agentica-pillar",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-18_web-agentica-pillar",
+  "totalBytes": 82019255,
+  "fileCount": 165,
+  "files": [
+    {
+      "path": "cover-creation-of-adam-v1/candidates/WAG-V01-C01-mediating-window.png",
+      "sizeBytes": 1746059,
+      "sha256": "fe637d0faf8163902f4f68648aa767507f26d1cbc7a1cf34981f15d71fcf6937",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/candidates/WAG-V01-C01-mediating-window.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/candidates/WAG-V01-C02-contract-in-gap.png",
+      "sizeBytes": 1744136,
+      "sha256": "c8054b1e9583eb6a76a8bdc114f1cb3297ff9d734e6cccef40eba3760a7e354b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/candidates/WAG-V01-C02-contract-in-gap.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/candidates/WAG-V01-C03-interface-between-hands.png",
+      "sizeBytes": 1442259,
+      "sha256": "fa763e3b9e487fdead99ec11fab0b416bcb38fdf355cf97e98164a343fc82c42",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/candidates/WAG-V01-C03-interface-between-hands.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/candidates/WAG-V01-C04-blue-sculptural-agent.png",
+      "sizeBytes": 1898866,
+      "sha256": "0a95393e1f5bacbc1f228647847a9277c4199943bbb69754f890fbc0ada3aedc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/candidates/WAG-V01-C04-blue-sculptural-agent.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/candidates/WAG-V01-C05-refined-interface-between-hands.png",
+      "sizeBytes": 1273613,
+      "sha256": "cfb2675702535fb0a5aefee85ca62db337e93af726ebe7a6321d7f1e4c54a20a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/candidates/WAG-V01-C05-refined-interface-between-hands.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/candidates/WAG-V01-C06-diagonal-web-contract.png",
+      "sizeBytes": 2097656,
+      "sha256": "56ac0a421ab78755e0e08ee83679a826cfd8cac0c19788356eb32c1c9d4a4a55",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/candidates/WAG-V01-C06-diagonal-web-contract.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/candidates/WAG-V01-C07-blue-agent-premium.png",
+      "sizeBytes": 2001423,
+      "sha256": "31decd8386f0e5dfb28866899c237dbba46c5c3ce747f6d5b72618d8fe676b64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/candidates/WAG-V01-C07-blue-agent-premium.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/candidates/WAG-V01-C08-gradient-rich-interface.png",
+      "sizeBytes": 2238455,
+      "sha256": "2cbe060a02cc025906716a4320108a1ef5c8495bd4fa0c6831726b05670ecec1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/candidates/WAG-V01-C08-gradient-rich-interface.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/candidates/WAG-V01-C09-layered-interface.png",
+      "sizeBytes": 2301600,
+      "sha256": "19508f846351fa8cb21a227b56a25e89d512e2b71b75eddd2956ab1fb1911b85",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/candidates/WAG-V01-C09-layered-interface.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/candidates/WAG-V01-C10-blue-hinge-punch.png",
+      "sizeBytes": 2108248,
+      "sha256": "a86b5e97853669336e9e0f38cfcb91bcd2a7ec2404afae8afac4a25a4c9c4085",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/candidates/WAG-V01-C10-blue-hinge-punch.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/candidates/WAG-V01-C11-gpt-image-2-punch-v1.png",
+      "sizeBytes": 3265915,
+      "sha256": "ab1b83f04718fbcb6488ca2a1f828b3cc5cdf6bd256c890091ef21ca6e168a29",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/candidates/WAG-V01-C11-gpt-image-2-punch-v1.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/candidates/WAG-V01-C12-gpt-image-2-punch-v2.png",
+      "sizeBytes": 3269684,
+      "sha256": "f9fb06c756255c77d3d77f134d222fa950249ad3feaa6a47ff2b7d3eb9b0e8bc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/candidates/WAG-V01-C12-gpt-image-2-punch-v2.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/candidates/WAG-V01-C13-gpt-image-2-index-safe.png",
+      "sizeBytes": 3126766,
+      "sha256": "18002d862277142ef10050afff28cf741864f23502b1fd6d3cd313258598c436",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/candidates/WAG-V01-C13-gpt-image-2-index-safe.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/candidates/WAG-V01-C14-gpt-image-2-anatomy-anchored.png",
+      "sizeBytes": 3140731,
+      "sha256": "a3d3bef8d16ad77f3b7792ef20431c03860d6433e8f62ef907ccdef7491392a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/candidates/WAG-V01-C14-gpt-image-2-anatomy-anchored.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/candidates/WAG-V01-C15-gpt-image-2-continuous-gradient.png",
+      "sizeBytes": 3089624,
+      "sha256": "c9f7d6114a3c22666a3fe436fa0774965b669977d5d8aae91a578413f65d71d5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/candidates/WAG-V01-C15-gpt-image-2-continuous-gradient.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/exports/web-agentica-cover-card-square-1152-v2.webp",
+      "sizeBytes": 108658,
+      "sha256": "8328d01ad75c64e49432893e6e22b0c8eab8fcd8267e246fb44a8a08c0676370",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-card-square-1152-v2.webp"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/exports/web-agentica-cover-card-square-1152-v3.webp",
+      "sizeBytes": 91916,
+      "sha256": "e8e805f6e30682edc93073196abdc2aaf442b08b9d69e986c89f2876aab0c56f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-card-square-1152-v3.webp"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/exports/web-agentica-cover-card-square-941-v1.webp",
+      "sizeBytes": 38160,
+      "sha256": "7e27848cc2ba642065e9946b71c42fdcf0c09009b42cf5686812958f1de367c0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-card-square-941-v1.webp"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/exports/web-agentica-cover-featured-1600x900-v1.webp",
+      "sizeBytes": 63296,
+      "sha256": "c64e71b01a0abe9520d0f6161ac209f19b479e85afd90446ee251e6d55019830",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-featured-1600x900-v1.webp"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/exports/web-agentica-cover-featured-1600x900-v2.webp",
+      "sizeBytes": 122170,
+      "sha256": "3fd9a2b08307212a4f7ef26da660ef57c5d3ea3eaa63806d3a6492b2e7b9bbe1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-featured-1600x900-v2.webp"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/exports/web-agentica-cover-featured-1600x900-v3.webp",
+      "sizeBytes": 100170,
+      "sha256": "a6256cf1c8ec116ffefc5219575285bb8df06f4e6e7d594b6cfc61265aaa9ff1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-featured-1600x900-v3.webp"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/exports/web-agentica-cover-featured-source-v1.png",
+      "sizeBytes": 1889863,
+      "sha256": "bd04092eb3c3eb36b7d419a560a3828efeec282062cd792874e3c504a5421ebc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-featured-source-v1.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/exports/web-agentica-cover-featured-source-v2.png",
+      "sizeBytes": 1966659,
+      "sha256": "7701dcc73b6229131a9f13032d5c224c8d0e26c80f74291832dd838f197ed650",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-featured-source-v2.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/exports/web-agentica-cover-featured-source-v3.png",
+      "sizeBytes": 1912373,
+      "sha256": "b2efab43692a7896a653fbc70e4a52cf288b6d2683429ac246d75361dc1e8b83",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-featured-source-v3.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/exports/web-agentica-cover-human-agent-interface-master-v1.png",
+      "sizeBytes": 2001423,
+      "sha256": "31decd8386f0e5dfb28866899c237dbba46c5c3ce747f6d5b72618d8fe676b64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-human-agent-interface-master-v1.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/exports/web-agentica-cover-human-agent-interface-master-v2.png",
+      "sizeBytes": 3140731,
+      "sha256": "a3d3bef8d16ad77f3b7792ef20431c03860d6433e8f62ef907ccdef7491392a0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-human-agent-interface-master-v2.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/exports/web-agentica-cover-human-agent-interface-master-v3.png",
+      "sizeBytes": 3089624,
+      "sha256": "c9f7d6114a3c22666a3fe436fa0774965b669977d5d8aae91a578413f65d71d5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-human-agent-interface-master-v3.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/exports/web-agentica-cover-og-1440x756-v1.jpg",
+      "sizeBytes": 203311,
+      "sha256": "f5b4d1d6e03604f66db208d03a6113328d20471c821260c87d3092ef198d7ce4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-og-1440x756-v1.jpg"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/exports/web-agentica-cover-og-1440x756-v2.jpg",
+      "sizeBytes": 266502,
+      "sha256": "0ac5a8cf6fb65708a54059eb79db38ecd2685868f9c720cb54d002b9b6a4d295",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-og-1440x756-v2.jpg"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/exports/web-agentica-cover-og-1440x756-v3.jpg",
+      "sizeBytes": 242430,
+      "sha256": "d0a956f4c0d800000871b89ff5fa32b56fb5b50489f9945931640d66b9e6ae29",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/exports/web-agentica-cover-og-1440x756-v3.jpg"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/proofs/WAG-V01-C07-og-proof.png",
+      "sizeBytes": 1416831,
+      "sha256": "c2a03a6521658b275eb297397b5e253d9583a0034f19a11e7280cd8f1773390d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/proofs/WAG-V01-C07-og-proof.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/proofs/WAG-V01-C07-square-proof.png",
+      "sizeBytes": 1100354,
+      "sha256": "f042654faf28866597f1730e74e2c9daf43d2734924711075a70c7d270cb4d2a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/proofs/WAG-V01-C07-square-proof.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/proofs/WAG-V01-C13-og-proof.png",
+      "sizeBytes": 1460295,
+      "sha256": "0e6a3367635fe6c71382f15595bd3bd44103935f8dca4813201e5db6814e525c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/proofs/WAG-V01-C13-og-proof.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/proofs/WAG-V01-C13-square-proof.png",
+      "sizeBytes": 1825436,
+      "sha256": "611df960fd1c49b2909a311d4c8d9d306ea0dca67939cc640d0c386ae837f04d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/proofs/WAG-V01-C13-square-proof.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/proofs/WAG-V01-C13-thumbnail-160.png",
+      "sizeBytes": 26361,
+      "sha256": "24497ab19a87bcfd6ebed55d927a206c44f93c94b56e03dc19a4d0fb9fd26987",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/proofs/WAG-V01-C13-thumbnail-160.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/proofs/WAG-V01-C14-og-proof.png",
+      "sizeBytes": 1473967,
+      "sha256": "2aaf82e0720f2725cc568e9b45b1324e899abe77172816ffe75966bbd8032e30",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/proofs/WAG-V01-C14-og-proof.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/proofs/WAG-V01-C14-square-proof.png",
+      "sizeBytes": 1841662,
+      "sha256": "52c7efaed6fd5b40bce7242ecf5f0580088e5d92615772627cbcec4417cdb606",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/proofs/WAG-V01-C14-square-proof.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/proofs/WAG-V01-C14-thumbnail-160.png",
+      "sizeBytes": 26625,
+      "sha256": "5c0620f23381efd05a35afcc9f6fef8674102f927c20abb3146c1a1b6d6f4cf0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/proofs/WAG-V01-C14-thumbnail-160.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/proofs/WAG-V01-C15-og-proof.png",
+      "sizeBytes": 1429528,
+      "sha256": "406d156b70d70b9e4eec6baa6378f9e74a2bc83891ec4bcccc3e75d8c3d349a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/proofs/WAG-V01-C15-og-proof.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/proofs/WAG-V01-C15-square-proof.png",
+      "sizeBytes": 1772402,
+      "sha256": "24a87330c5c6adfdd9727c11b3db7f44453015b2fa61cf30cdd2d28b0a26010a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/proofs/WAG-V01-C15-square-proof.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/proofs/WAG-V01-C15-thumbnail-160.png",
+      "sizeBytes": 23916,
+      "sha256": "b4229811c51db7bfa0c5f59b782d4fdd0b5e2d94c33ff5d13fc7f0db8c57b019",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/proofs/WAG-V01-C15-thumbnail-160.png"
+    },
+    {
+      "path": "cover-creation-of-adam-v1/proofs/anatomy-reference-index-pointing-source.png",
+      "sizeBytes": 780415,
+      "sha256": "fad256a2c8b3ed81615fceafb274717633c1205a0198e273318f086326cdebdb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-creation-of-adam-v1/proofs/anatomy-reference-index-pointing-source.png"
+    },
+    {
+      "path": "cover-iterations-v1/wag-cover-a-shared-threshold.png",
+      "sizeBytes": 1964557,
+      "sha256": "685665a3cbc82c7d2cb25109b486983b5f6efb3059726b10a00400cf85063efd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-iterations-v1/wag-cover-a-shared-threshold.png"
+    },
+    {
+      "path": "cover-iterations-v1/wag-cover-b-dual-surface.png",
+      "sizeBytes": 1959257,
+      "sha256": "e51e3d974cf15133ef2acc76f80f0866826d185c0c8c55d2b75678a489ff0eb1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-iterations-v1/wag-cover-b-dual-surface.png"
+    },
+    {
+      "path": "cover-iterations-v1/wag-cover-c-second-visitor.png",
+      "sizeBytes": 2204992,
+      "sha256": "55cdccd629644e39d469deefcadf8b467895fe0c83ef8f1dd470359ec7a85539",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/cover-iterations-v1/wag-cover-c-second-visitor.png"
+    },
+    {
+      "path": "delivery/web-agentica-v02-frontera-operativa-desktop-dark-web-v2.webp",
+      "sizeBytes": 106560,
+      "sha256": "489b9d7a38649c20ae5bc1294d52b833f783e2dbb93d537fb92ee26e7eabdf07",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v02-frontera-operativa-desktop-dark-web-v2.webp"
+    },
+    {
+      "path": "delivery/web-agentica-v02-frontera-operativa-desktop-light-web-v2.webp",
+      "sizeBytes": 121748,
+      "sha256": "4e078a44bf136e9509356cb1ee5639a89178af58dfe06a6779f4e00ed2de2faf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v02-frontera-operativa-desktop-light-web-v2.webp"
+    },
+    {
+      "path": "delivery/web-agentica-v02-frontera-operativa-mobile-dark-web-v2.webp",
+      "sizeBytes": 95568,
+      "sha256": "d5331af4730cfeda0f1ff3c2c71ae581e2447c1fabaa199259406ffe642db5b4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v02-frontera-operativa-mobile-dark-web-v2.webp"
+    },
+    {
+      "path": "delivery/web-agentica-v02-frontera-operativa-mobile-light-web-v2.webp",
+      "sizeBytes": 109770,
+      "sha256": "db0f1117eb781968fec3afd3c355244e1b0f71def1ff372f064f6d74283b30dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v02-frontera-operativa-mobile-light-web-v2.webp"
+    },
+    {
+      "path": "delivery/web-agentica-v03-arquitectura-compartida-desktop-dark-web-v2.webp",
+      "sizeBytes": 96258,
+      "sha256": "71bc67c252d88658c330fd09f171be60686f90ae77eff78b637ff9d108b77354",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v03-arquitectura-compartida-desktop-dark-web-v2.webp"
+    },
+    {
+      "path": "delivery/web-agentica-v03-arquitectura-compartida-desktop-light-web-v2.webp",
+      "sizeBytes": 109904,
+      "sha256": "bc96bc70e5a2875a08357601b083d4440d5b7604e5206998823cf3effb81059b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v03-arquitectura-compartida-desktop-light-web-v2.webp"
+    },
+    {
+      "path": "delivery/web-agentica-v03-arquitectura-compartida-mobile-dark-web-v2.webp",
+      "sizeBytes": 90128,
+      "sha256": "18e893bf0b2407a6877606c1e0f1ca9dd216415f02e4107f2c44e7d6d3d045a9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v03-arquitectura-compartida-mobile-dark-web-v2.webp"
+    },
+    {
+      "path": "delivery/web-agentica-v03-arquitectura-compartida-mobile-light-web-v2.webp",
+      "sizeBytes": 103134,
+      "sha256": "0e5e5f783834bc2e4577324bc1baed7ac2ed4a56ce3b6e207f685dd8a468bd98",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v03-arquitectura-compartida-mobile-light-web-v2.webp"
+    },
+    {
+      "path": "delivery/web-agentica-v04-cadena-autoridad-desktop-dark-web-v2.webp",
+      "sizeBytes": 108206,
+      "sha256": "b6a5b1091f7d98631c0048d64490f2789062e40dbb8b8847f9ad97b7e75bd42e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v04-cadena-autoridad-desktop-dark-web-v2.webp"
+    },
+    {
+      "path": "delivery/web-agentica-v04-cadena-autoridad-desktop-light-web-v2.webp",
+      "sizeBytes": 119824,
+      "sha256": "940c61a65a4fdbc63af9832e44c50b1e3d70a9562b434a3275bf2d197ad2958b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v04-cadena-autoridad-desktop-light-web-v2.webp"
+    },
+    {
+      "path": "delivery/web-agentica-v04-cadena-autoridad-mobile-dark-web-v2.webp",
+      "sizeBytes": 87036,
+      "sha256": "cfbab79d79df2bbc525f8f91e45bd0cd126007632068800b5b278004a52d7a45",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v04-cadena-autoridad-mobile-dark-web-v2.webp"
+    },
+    {
+      "path": "delivery/web-agentica-v04-cadena-autoridad-mobile-light-web-v2.webp",
+      "sizeBytes": 97268,
+      "sha256": "7d2b00ee5f4f4de7efae7838d1224fd795054d81eec6891e8bf07639e7235177",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/delivery/web-agentica-v04-cadena-autoridad-mobile-light-web-v2.webp"
+    },
+    {
+      "path": "masters/web-agentica-v02-frontera-operativa-desktop-dark-master-v2.png",
+      "sizeBytes": 173983,
+      "sha256": "0a74f35573346094eccfd76502a7d16e3693931c2bf330e91bc29356fc62eed1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v02-frontera-operativa-desktop-dark-master-v2.png"
+    },
+    {
+      "path": "masters/web-agentica-v02-frontera-operativa-desktop-light-master-v2.png",
+      "sizeBytes": 171044,
+      "sha256": "a81cc0af3f67b839605cd3188eaf0ee85a6979720543870d73e765cfa1b28aa8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v02-frontera-operativa-desktop-light-master-v2.png"
+    },
+    {
+      "path": "masters/web-agentica-v02-frontera-operativa-mobile-dark-master-v2.png",
+      "sizeBytes": 163931,
+      "sha256": "5b3f62805e43b0cc57def74686867fd8531bd5a45d76d12c66cdab8599fc12b3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v02-frontera-operativa-mobile-dark-master-v2.png"
+    },
+    {
+      "path": "masters/web-agentica-v02-frontera-operativa-mobile-light-master-v2.png",
+      "sizeBytes": 163061,
+      "sha256": "84fb5866e83f43d392d0d622657764b35e426302d42b5a8940373b3d17f68df6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v02-frontera-operativa-mobile-light-master-v2.png"
+    },
+    {
+      "path": "masters/web-agentica-v03-arquitectura-compartida-desktop-dark-master-v2.png",
+      "sizeBytes": 158954,
+      "sha256": "2e8f8260d9ce62739bfbbf09d0cb37f3aca4c3ead9de3b8b98720fa09049e88c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v03-arquitectura-compartida-desktop-dark-master-v2.png"
+    },
+    {
+      "path": "masters/web-agentica-v03-arquitectura-compartida-desktop-light-master-v2.png",
+      "sizeBytes": 157609,
+      "sha256": "eb8bc2ce9644b9ba99308467e38382d173c5ca72881359d19120787364c8fc25",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v03-arquitectura-compartida-desktop-light-master-v2.png"
+    },
+    {
+      "path": "masters/web-agentica-v03-arquitectura-compartida-mobile-dark-master-v2.png",
+      "sizeBytes": 157498,
+      "sha256": "2baf8897c0227bf3878ca3bd9fa08c98a79ba5e28a137617abfc8a8b4c40e6a3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v03-arquitectura-compartida-mobile-dark-master-v2.png"
+    },
+    {
+      "path": "masters/web-agentica-v03-arquitectura-compartida-mobile-light-master-v2.png",
+      "sizeBytes": 155373,
+      "sha256": "fd2a674b07169d8a18a2b105a15753bf080a63ff1ca7db0eef512032bdb1f296",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v03-arquitectura-compartida-mobile-light-master-v2.png"
+    },
+    {
+      "path": "masters/web-agentica-v04-cadena-autoridad-desktop-dark-master-v2.png",
+      "sizeBytes": 158260,
+      "sha256": "6185d38e3c490732aca478f3120b2ac6adf8d65624b49be406fab77722daba79",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v04-cadena-autoridad-desktop-dark-master-v2.png"
+    },
+    {
+      "path": "masters/web-agentica-v04-cadena-autoridad-desktop-light-master-v2.png",
+      "sizeBytes": 156839,
+      "sha256": "62d70b5c0a23a4583d52596f60bdf41c70c43fb0b000243223207a75b9aadeae",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v04-cadena-autoridad-desktop-light-master-v2.png"
+    },
+    {
+      "path": "masters/web-agentica-v04-cadena-autoridad-mobile-dark-master-v2.png",
+      "sizeBytes": 141416,
+      "sha256": "784acf40b90889b9131897b30370b57506b761f6bab2a472cfb5f8aa7b36b18c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v04-cadena-autoridad-mobile-dark-master-v2.png"
+    },
+    {
+      "path": "masters/web-agentica-v04-cadena-autoridad-mobile-light-master-v2.png",
+      "sizeBytes": 140494,
+      "sha256": "f59b535afc7b64f80cb93bd0cf3ab868c5937bf5eea8ce9fce6aa386e5960470",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/masters/web-agentica-v04-cadena-autoridad-mobile-light-master-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v02-frontera-operativa-desktop-dark-context-proof-v2.png",
+      "sizeBytes": 255334,
+      "sha256": "494678e7b9bac021726e36cc5b32af3e23ee6cfc289c179689dede7774e6beec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-desktop-dark-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v02-frontera-operativa-desktop-light-context-proof-v2.png",
+      "sizeBytes": 311272,
+      "sha256": "32dde5e856326472883741f33af485f12013d9549adae22d37eb768f2afa9236",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-desktop-light-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v02-frontera-operativa-mobile-dark-context-proof-v2.png",
+      "sizeBytes": 60543,
+      "sha256": "7d23860054fa5b92d188fb545edc548e21c1faa72544d875b838e1fbcf9e62d6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-mobile-dark-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v02-frontera-operativa-mobile-light-context-proof-v2.png",
+      "sizeBytes": 71981,
+      "sha256": "1b65edfd9efeca7d9bf8c835ed2116454860fa29601b38a8eb098c9dbb8db80b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v02-frontera-operativa-mobile-light-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v03-arquitectura-compartida-desktop-dark-context-proof-v2.png",
+      "sizeBytes": 235492,
+      "sha256": "25feafff5b086b6a7f6654a56ee90ec80b9c6b7bcebf569492409fa293426f76",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-desktop-dark-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v03-arquitectura-compartida-desktop-light-context-proof-v2.png",
+      "sizeBytes": 286793,
+      "sha256": "242aa9bc8fc735d2623ad4d5729ce09e538a29bc1f75903b99131c4a7e9500f7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-desktop-light-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v03-arquitectura-compartida-mobile-dark-context-proof-v2.png",
+      "sizeBytes": 59967,
+      "sha256": "108dfbeaff5b2c388853290ada6da1811e41edc57ef2ac0de8bee6eb74e87345",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-mobile-dark-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v03-arquitectura-compartida-mobile-light-context-proof-v2.png",
+      "sizeBytes": 70353,
+      "sha256": "51f5b44a692d98192c5779b1975d69f3e2532e2ebaad33742dd160147a4e4ad8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v03-arquitectura-compartida-mobile-light-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v04-cadena-autoridad-desktop-dark-context-proof-v2.png",
+      "sizeBytes": 260272,
+      "sha256": "705b025064cb951beed4146067d47434a683fcc54d14c9c30e6d9b0d0ad32533",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-desktop-dark-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v04-cadena-autoridad-desktop-light-context-proof-v2.png",
+      "sizeBytes": 300307,
+      "sha256": "4c23d4dee2e240e4571b3ce0d7f57f4c8573a5033340ba8a307538942c5a2fa2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-desktop-light-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v04-cadena-autoridad-mobile-dark-context-proof-v2.png",
+      "sizeBytes": 59163,
+      "sha256": "8a5954e3836d76823a5cc1e42ef98e704c5f4a0956c92cd736146896d4d7c867",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-mobile-dark-context-proof-v2.png"
+    },
+    {
+      "path": "review/web-agentica-v04-cadena-autoridad-mobile-light-context-proof-v2.png",
+      "sizeBytes": 65897,
+      "sha256": "b273b6bb8e19e4f6ba2fb12de12b61b7faa3c514adc83031d6dd49e03a8b1339",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review/web-agentica-v04-cadena-autoridad-mobile-light-context-proof-v2.png"
+    },
+    {
+      "path": "review-v3/web-agentica-arquitectura-compartida-desktop-dark-v6.png",
+      "sizeBytes": 122747,
+      "sha256": "46d39f892d53a72472bcd83041627d07d8506691f57e8857cf07155337c9d18f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-arquitectura-compartida-desktop-dark-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-arquitectura-compartida-desktop-dark-v7.png",
+      "sizeBytes": 125680,
+      "sha256": "fb9b0e3b79d5fdbba64f00f483b07d436b3fc00576d9ec4eb5b6bf42f2c8466f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-arquitectura-compartida-desktop-dark-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-arquitectura-compartida-desktop-light-v6.png",
+      "sizeBytes": 119930,
+      "sha256": "ae00749ce72b79da7e30f4347e63379451913d0ce1b1a18f721b0bf4248ec0a2",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-arquitectura-compartida-desktop-light-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-arquitectura-compartida-desktop-light-v7.png",
+      "sizeBytes": 123048,
+      "sha256": "4387c17c4c7891823aa6586a8fc1c75d6948858ac1f325d8fbdfe2cb8e8c387d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-arquitectura-compartida-desktop-light-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-arquitectura-compartida-mobile-dark-v6.png",
+      "sizeBytes": 118468,
+      "sha256": "7fee562b30cf4764a46319fa0dd8bda158e3560392c2f891fea1d301710667fd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-arquitectura-compartida-mobile-dark-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-arquitectura-compartida-mobile-dark-v7.png",
+      "sizeBytes": 121371,
+      "sha256": "48cb44b08dd4eb758b78185ef272cc3af90f45198badea0fc92c41b67827c562",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-arquitectura-compartida-mobile-dark-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-arquitectura-compartida-mobile-light-v6.png",
+      "sizeBytes": 115078,
+      "sha256": "575cb83a35637953340e7e2911ee80f97ca82b276176774f405d29d8bab76add",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-arquitectura-compartida-mobile-light-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-arquitectura-compartida-mobile-light-v7.png",
+      "sizeBytes": 118133,
+      "sha256": "3020e4eca6151ae763a89e34e2e11f904afa7fbbc8eba0bcea54eb6b4325afa7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-arquitectura-compartida-mobile-light-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-cadena-autoridad-desktop-dark-v6.png",
+      "sizeBytes": 113074,
+      "sha256": "b33f25029715dc86f150d5ca80ae1c6b0714172e3b29530bb2931ca6ea27fd35",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-cadena-autoridad-desktop-dark-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-cadena-autoridad-desktop-dark-v7.png",
+      "sizeBytes": 116092,
+      "sha256": "abfc7a93a16dd4d2595aa751fafacb211dfd1f2677e4aed3099d3f21ba6b0bb7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-cadena-autoridad-desktop-dark-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-cadena-autoridad-desktop-light-v6.png",
+      "sizeBytes": 110998,
+      "sha256": "864579ea05cb15618ec692783bb9f90d5c85cf357b672313ff3023661ab5d059",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-cadena-autoridad-desktop-light-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-cadena-autoridad-desktop-light-v7.png",
+      "sizeBytes": 114180,
+      "sha256": "c42818ec5b93db26616c755563f137fc19ec4a9c4098238d55ce8911d0733bbc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-cadena-autoridad-desktop-light-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-cadena-autoridad-mobile-dark-v6.png",
+      "sizeBytes": 116404,
+      "sha256": "01e61d324c1da08c434cf92ab9da5dcd49fb9c58c82da21f2a7d8222b994b659",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-cadena-autoridad-mobile-dark-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-cadena-autoridad-mobile-dark-v7.png",
+      "sizeBytes": 119268,
+      "sha256": "3cf41b712b99885d16f7e8d61f58a5b65be82157a14f2f1df34f9f7491c0325d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-cadena-autoridad-mobile-dark-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-cadena-autoridad-mobile-light-v6.png",
+      "sizeBytes": 114079,
+      "sha256": "eb8ced6aac3a47ed6e6e056033e94d6bafa215d0ecff1abf162db804aa7dc8d4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-cadena-autoridad-mobile-light-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-cadena-autoridad-mobile-light-v7.png",
+      "sizeBytes": 117078,
+      "sha256": "88a0e9ac1df8570e5ff4b9a5aed4f05313bfa92d2154f56f7477c89aee3dd454",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-cadena-autoridad-mobile-light-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-circuito-evaluacion-desktop-dark-v6.png",
+      "sizeBytes": 134672,
+      "sha256": "34c714aefa34eac28e526c81acd2fc1cfd320b7769b4ff0296493846d446d91c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-circuito-evaluacion-desktop-dark-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-circuito-evaluacion-desktop-dark-v7.png",
+      "sizeBytes": 137870,
+      "sha256": "36f920af48f330b64cf2155d87569c6c6a799adfe475c51e596f162e148ae3e6",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-circuito-evaluacion-desktop-dark-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-circuito-evaluacion-desktop-light-v6.png",
+      "sizeBytes": 128270,
+      "sha256": "5d39642c249e7228b10a75de892bd73cb4211941dd75664f06666b7e6ab9cd64",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-circuito-evaluacion-desktop-light-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-circuito-evaluacion-desktop-light-v7.png",
+      "sizeBytes": 131455,
+      "sha256": "23f52d1e25f13e17450d65bd49200a6cc0c0221169bac491676104a93f2e03d7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-circuito-evaluacion-desktop-light-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-circuito-evaluacion-mobile-dark-v6.png",
+      "sizeBytes": 121582,
+      "sha256": "9e1710052121ccc4187d605ab5c1836384b86ea8df0f560453ebc5767671a536",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-circuito-evaluacion-mobile-dark-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-circuito-evaluacion-mobile-dark-v7.png",
+      "sizeBytes": 124362,
+      "sha256": "c34fb94e526377ce3f19b2689f95fc6dc931c266d472476bd7ce2f64818bd1c0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-circuito-evaluacion-mobile-dark-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-circuito-evaluacion-mobile-light-v6.png",
+      "sizeBytes": 118564,
+      "sha256": "e51f7d4210a29764bb3774e410603bc94b1da447fadb671764e15e70720481ba",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-circuito-evaluacion-mobile-light-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-circuito-evaluacion-mobile-light-v7.png",
+      "sizeBytes": 121473,
+      "sha256": "a0da8d22ea96b95a20907c5bab0ce1f3cf05f03b8ca563e3bb2f7d9ed8caaf00",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-circuito-evaluacion-mobile-light-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-frontera-operativa-desktop-dark-v6.png",
+      "sizeBytes": 132755,
+      "sha256": "98c08e7d00c435e974ec863f92cdd4a6d72f2c76e549518e7424f208f3dc0a84",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-frontera-operativa-desktop-dark-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-frontera-operativa-desktop-dark-v7.png",
+      "sizeBytes": 135814,
+      "sha256": "1ce4a86c0131578a1c292a19661512aa50ff6045016423c336b01fbff02d6c91",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-frontera-operativa-desktop-dark-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-frontera-operativa-desktop-light-v6.png",
+      "sizeBytes": 130428,
+      "sha256": "35416de671f92f69048424ae1b7794fc27110f58a1487093471ab8de229a2c0e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-frontera-operativa-desktop-light-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-frontera-operativa-desktop-light-v7.png",
+      "sizeBytes": 133358,
+      "sha256": "cfdf81f70da4109ae9eb4b6013b9c4ce7faa661827cbc8531a2686ab42cbf0bf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-frontera-operativa-desktop-light-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-frontera-operativa-mobile-dark-v6.png",
+      "sizeBytes": 130482,
+      "sha256": "76aca035656198256a94396ae3feec0099e9e816ccbe40bae912d906a778c538",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-frontera-operativa-mobile-dark-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-frontera-operativa-mobile-dark-v7.png",
+      "sizeBytes": 133348,
+      "sha256": "bfed2c166a280215de1b9f110f5e9aa29789a484b5d35228f6c3aea95488b78c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-frontera-operativa-mobile-dark-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-frontera-operativa-mobile-light-v6.png",
+      "sizeBytes": 126981,
+      "sha256": "e0ab9ee52fb77c2629c02f81de32c5571f1d036aa5eb7820a4f6395d02ccdc1d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-frontera-operativa-mobile-light-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-frontera-operativa-mobile-light-v7.png",
+      "sizeBytes": 130042,
+      "sha256": "b7619ff237e242b8545a9c9f7008afccf99fdee49f23c9ac2571feb147485f33",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-frontera-operativa-mobile-light-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-madurez-agentica-desktop-dark-v6.png",
+      "sizeBytes": 116454,
+      "sha256": "f45ab4ad21bd33707dd3556304d537e1946c7e30eba890eee940a2269b84286e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-madurez-agentica-desktop-dark-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-madurez-agentica-desktop-dark-v7.png",
+      "sizeBytes": 119472,
+      "sha256": "b982dc5359a865712f87f39b346d0baee08e7b5544546c853bba574b76dd6d8b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-madurez-agentica-desktop-dark-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-madurez-agentica-desktop-light-v6.png",
+      "sizeBytes": 114493,
+      "sha256": "3baea5fd7a790c460dc41cdd0fca1c99a286071faf5f34ed005a88dff2459dc8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-madurez-agentica-desktop-light-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-madurez-agentica-desktop-light-v7.png",
+      "sizeBytes": 117680,
+      "sha256": "37048993d5b96a16af3d1e7a5a81f120ec78240d7fca0575cb6358b5e326fafc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-madurez-agentica-desktop-light-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-madurez-agentica-mobile-dark-v6.png",
+      "sizeBytes": 136713,
+      "sha256": "7f50a30720fb307169cfb6767ad2242d2df2000cbfabcdf8412d858ecbc32860",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-madurez-agentica-mobile-dark-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-madurez-agentica-mobile-dark-v7.png",
+      "sizeBytes": 139523,
+      "sha256": "8e39686c2241af09b9065d8fe76b60ca24ede85628b25119d08218d9375859ab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-madurez-agentica-mobile-dark-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-madurez-agentica-mobile-light-v6.png",
+      "sizeBytes": 133478,
+      "sha256": "f1ac91c8a87e26a1686e2c11da85ca7537d543b08a150291edecc1e2c5c5a06e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-madurez-agentica-mobile-light-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-madurez-agentica-mobile-light-v7.png",
+      "sizeBytes": 136461,
+      "sha256": "ad2b255c7279b23a5c612b9059e5445875e633869f9fbd3b516a7a9029afdb2a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-madurez-agentica-mobile-light-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-mapa-ecosistema-desktop-dark-v6.png",
+      "sizeBytes": 135003,
+      "sha256": "43875cb9465909a93ee83949bebc926321f6f37a8cd9716b9f7f1dbcbbbabf41",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-mapa-ecosistema-desktop-dark-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-mapa-ecosistema-desktop-dark-v7.png",
+      "sizeBytes": 138137,
+      "sha256": "6bdcafa5dfd5407206ee03dd08fdd0bdcdcea25acd9bfdd36989a165e1bd7915",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-mapa-ecosistema-desktop-dark-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-mapa-ecosistema-desktop-light-v6.png",
+      "sizeBytes": 133025,
+      "sha256": "63f3117a51c416347e7ceaf505318bd65e5f5faf62c415057e8c7ea050ae8abc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-mapa-ecosistema-desktop-light-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-mapa-ecosistema-desktop-light-v7.png",
+      "sizeBytes": 136259,
+      "sha256": "fee9d3cfe20b555fd6cfd2fe5a0e554add38795ec0ed2295b3bd77a7ab01dbce",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-mapa-ecosistema-desktop-light-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-mapa-ecosistema-mobile-dark-v6.png",
+      "sizeBytes": 128570,
+      "sha256": "4eff54b6c9761076ce19e53df372bedbbe1470a3b77087422dcce71a4a0cb49f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-mapa-ecosistema-mobile-dark-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-mapa-ecosistema-mobile-dark-v7.png",
+      "sizeBytes": 131576,
+      "sha256": "3a99084fa5b18bf99b7106862c39d5029a6bdbe25e552eb9686f294aae8fa89d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-mapa-ecosistema-mobile-dark-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-mapa-ecosistema-mobile-light-v6.png",
+      "sizeBytes": 126192,
+      "sha256": "508c0aa50e23159e8e23e451943fd5d333e76fd60fd748075fd9d6ed86693e2b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-mapa-ecosistema-mobile-light-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-mapa-ecosistema-mobile-light-v7.png",
+      "sizeBytes": 129298,
+      "sha256": "7a6ca3dc57b6079f0c7fbcd117a8b7f8c5143b8a741c6be3c01d22fe5bb882f5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-mapa-ecosistema-mobile-light-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-readiness-12-pruebas-desktop-dark-v6.png",
+      "sizeBytes": 112858,
+      "sha256": "3e19ddb1cca340ac2388fb5e8480d64343967876c8c9fd0eb8b5dc461b40e574",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-readiness-12-pruebas-desktop-dark-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-readiness-12-pruebas-desktop-dark-v7.png",
+      "sizeBytes": 115899,
+      "sha256": "ab26354dd80db039f93b9c1be2306d32bbbb84023e5af42246ad70ee7aa5cea7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-readiness-12-pruebas-desktop-dark-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-readiness-12-pruebas-desktop-light-v6.png",
+      "sizeBytes": 110140,
+      "sha256": "fafecdc88590ee65b7a75344bc6429430a73d36230a9e09a90dd64d0943feae8",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-readiness-12-pruebas-desktop-light-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-readiness-12-pruebas-desktop-light-v7.png",
+      "sizeBytes": 113343,
+      "sha256": "d8230f47f88d293b6cd6a5a9053079ffa0a557455c05459b2b3f7d3f862bd204",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-readiness-12-pruebas-desktop-light-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-readiness-12-pruebas-mobile-dark-v6.png",
+      "sizeBytes": 112098,
+      "sha256": "937b3ae02a9977377bea339eb866b3936fbc86361633179bd35f4d634cf1985d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-readiness-12-pruebas-mobile-dark-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-readiness-12-pruebas-mobile-dark-v7.png",
+      "sizeBytes": 114860,
+      "sha256": "034519f4f13b9c013ba4bcc4038cbb50991ed2870c42e5608f1b702450963216",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-readiness-12-pruebas-mobile-dark-v7.png"
+    },
+    {
+      "path": "review-v3/web-agentica-readiness-12-pruebas-mobile-light-v6.png",
+      "sizeBytes": 109609,
+      "sha256": "c8adb48eb61ca2f2d203d5ad966246493820caf151126012e1b1943ef1206e4b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-readiness-12-pruebas-mobile-light-v6.png"
+    },
+    {
+      "path": "review-v3/web-agentica-readiness-12-pruebas-mobile-light-v7.png",
+      "sizeBytes": 112568,
+      "sha256": "24d785ed404a1d5e0ebea5cd422bb59be4a23c697b94af5c646f32777421a130",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/review-v3/web-agentica-readiness-12-pruebas-mobile-light-v7.png"
+    },
+    {
+      "path": "social-v3/web-agentica-arquitectura-compartida-mobile-dark-v6-social.png",
+      "sizeBytes": 21504,
+      "sha256": "773b0234c32ae3dfc7cbf00e1ba61bc421ae96b231ac1ad5ef15a1ee90c76442",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-arquitectura-compartida-mobile-dark-v6-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-arquitectura-compartida-mobile-dark-v7-social.png",
+      "sizeBytes": 23837,
+      "sha256": "244d7fee5fd80eb0b9f71ede31b5d6b8d77116ea10c7bd46353d2355959f4b74",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-arquitectura-compartida-mobile-dark-v7-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-arquitectura-compartida-mobile-light-v6-social.png",
+      "sizeBytes": 19982,
+      "sha256": "4bdb8e32f04edc9b8e1da35c37050663b179da5401409eb8bbb3e3925458dd1a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-arquitectura-compartida-mobile-light-v6-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-arquitectura-compartida-mobile-light-v7-social.png",
+      "sizeBytes": 22537,
+      "sha256": "fd8f9157d0a414d4b255e166a077c076126352578e5c9b6856016e4f8d351398",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-arquitectura-compartida-mobile-light-v7-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-cadena-autoridad-mobile-dark-v6-social.png",
+      "sizeBytes": 21626,
+      "sha256": "41592100cfa2f55fd2bcd80bb90003eb57d12c6e2cbfb548ca7142b28b358d82",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-cadena-autoridad-mobile-dark-v6-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-cadena-autoridad-mobile-dark-v7-social.png",
+      "sizeBytes": 23975,
+      "sha256": "44f66e2919bd3c2da5d2c59a2ca838e70f1b494b1e0fc7eb13571275da44841b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-cadena-autoridad-mobile-dark-v7-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-cadena-autoridad-mobile-light-v6-social.png",
+      "sizeBytes": 20521,
+      "sha256": "8f3e0f36a9093f4c5e935dd6539f1a3e89e30e93ec6786361ea866e0eb9bb94d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-cadena-autoridad-mobile-light-v6-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-cadena-autoridad-mobile-light-v7-social.png",
+      "sizeBytes": 23075,
+      "sha256": "b396f82c6048f65b2db531dbdcbc5fdbfc9942518f3aeb4ac081f0d983a7ebbd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-cadena-autoridad-mobile-light-v7-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-circuito-evaluacion-mobile-dark-v6-social.png",
+      "sizeBytes": 24808,
+      "sha256": "5e3af7afd857972ed161cbfc9b2a057612c34068695e98972bcaecba75196c53",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-circuito-evaluacion-mobile-dark-v6-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-circuito-evaluacion-mobile-dark-v7-social.png",
+      "sizeBytes": 27212,
+      "sha256": "0ec85e7b8b5fe89a0f54d4d59046b9a1d275f7347085b82723561cfe8127b1e5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-circuito-evaluacion-mobile-dark-v7-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-circuito-evaluacion-mobile-light-v6-social.png",
+      "sizeBytes": 23783,
+      "sha256": "4af5c4b5a37991769db31bed9b3fb58a36607139db5f08fae7580ba619499742",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-circuito-evaluacion-mobile-light-v6-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-circuito-evaluacion-mobile-light-v7-social.png",
+      "sizeBytes": 26391,
+      "sha256": "20c537100e9ba2b26c90656d87f90795e3a453589f404f03df8cd697b989c4d0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-circuito-evaluacion-mobile-light-v7-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-frontera-operativa-mobile-dark-v6-social.png",
+      "sizeBytes": 21269,
+      "sha256": "65339eea8e31b554c224d8c62a02469e0c2ef859782df037671ee3c4f31c9389",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-frontera-operativa-mobile-dark-v6-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-frontera-operativa-mobile-dark-v7-social.png",
+      "sizeBytes": 23616,
+      "sha256": "bed58eb37cffd64632957232dfb427c5ab3e791a47272c51dd40559d760a02ed",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-frontera-operativa-mobile-dark-v7-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-frontera-operativa-mobile-light-v6-social.png",
+      "sizeBytes": 20417,
+      "sha256": "bf4acf46d690fb4afd8a01a8519ec4dc4cb20bc5201df8c73722ec3cd517ea0a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-frontera-operativa-mobile-light-v6-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-frontera-operativa-mobile-light-v7-social.png",
+      "sizeBytes": 22959,
+      "sha256": "125b109284c31698c00817400ac9f6d8f1a8f42df8c2934c5174f421104022dd",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-frontera-operativa-mobile-light-v7-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-madurez-agentica-mobile-dark-v6-social.png",
+      "sizeBytes": 26793,
+      "sha256": "20d5b49122ab41aef90df5c20ab282b0f01496a9517679f7a99765e5088d3e6a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-madurez-agentica-mobile-dark-v6-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-madurez-agentica-mobile-dark-v7-social.png",
+      "sizeBytes": 29278,
+      "sha256": "7d842c181b6527b2c61a7df5bdef51bf84df4d0d959803df12617bb985c8300e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-madurez-agentica-mobile-dark-v7-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-madurez-agentica-mobile-light-v6-social.png",
+      "sizeBytes": 25483,
+      "sha256": "ed7c79c9cc3f3b666de83feb8ce17b9da521f527191c7d8854c8b68cc042170f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-madurez-agentica-mobile-light-v6-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-madurez-agentica-mobile-light-v7-social.png",
+      "sizeBytes": 28130,
+      "sha256": "7f89ce6a64d5abe836e7097f2e2b87f4781ac4d7b0d467d2edbf9f4b1cab3a18",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-madurez-agentica-mobile-light-v7-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-mapa-ecosistema-mobile-dark-v6-social.png",
+      "sizeBytes": 21512,
+      "sha256": "8b5941e0a1681ae59f809c676384ae4ae7ac087001f353d21100d64c94db6c3a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-mapa-ecosistema-mobile-dark-v6-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-mapa-ecosistema-mobile-dark-v7-social.png",
+      "sizeBytes": 23864,
+      "sha256": "631668c0b2f39fe1b1efd24823adf729afc05a9203dc3081a40530744aeadded",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-mapa-ecosistema-mobile-dark-v7-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-mapa-ecosistema-mobile-light-v6-social.png",
+      "sizeBytes": 20587,
+      "sha256": "8dd0f344a123ef8829003d5c6942b576fe099db58054248e41bd22ffe638ab10",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-mapa-ecosistema-mobile-light-v6-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-mapa-ecosistema-mobile-light-v7-social.png",
+      "sizeBytes": 23121,
+      "sha256": "cfc3a62c35387e50b072b62e8b3d90a28036dd06a1d5e7f44df814468ec49c6d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-mapa-ecosistema-mobile-light-v7-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-readiness-12-pruebas-mobile-dark-v6-social.png",
+      "sizeBytes": 11886,
+      "sha256": "85315cb1846f2f75b19f0e0a9d21b053c9f3b7cc452c1498749645276879c528",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-readiness-12-pruebas-mobile-dark-v6-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-readiness-12-pruebas-mobile-dark-v7-social.png",
+      "sizeBytes": 14455,
+      "sha256": "543e204d54d82b4429415130e464c585a9d9471eac757b8392372058cf26cc8b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-readiness-12-pruebas-mobile-dark-v7-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-readiness-12-pruebas-mobile-light-v6-social.png",
+      "sizeBytes": 11458,
+      "sha256": "24822b406d2c90dc47b0edbb58de92de0690cc76412c97a5f5d6027494702290",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-readiness-12-pruebas-mobile-light-v6-social.png"
+    },
+    {
+      "path": "social-v3/web-agentica-readiness-12-pruebas-mobile-light-v7-social.png",
+      "sizeBytes": 14224,
+      "sha256": "0a8db616db996fb8c65019832e9eaed10c482a1bee6ff60f1b77f9933c34c2ef",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_web-agentica-pillar/social-v3/web-agentica-readiness-12-pruebas-mobile-light-v7-social.png"
+    }
+  ]
+}

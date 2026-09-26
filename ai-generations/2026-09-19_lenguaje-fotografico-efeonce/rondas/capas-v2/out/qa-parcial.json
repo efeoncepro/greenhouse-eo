@@ -1,0 +1,34 @@
+[
+  {
+    "id": "a-oficio-45",
+    "dominante": [
+      "donde"
+    ],
+    "contraste": {
+      "etiqueta": 6.54,
+      "entrada": 6.54,
+      "dominante": 6.48,
+      "cierre-frase": 4.71,
+      "gesto": 10.16,
+      "logo": 20.38
+    },
+    "gapsTinta": [
+      {
+        "entre": "etiqueta→entrada",
+        "px": 19,
+        "ratioDominante": 0.1
+      },
+      {
+        "entre": "entrada→dominante",
+        "px": 17,
+        "ratioDominante": 0.089
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 17,
+        "ratioDominante": 0.089
+      }
+    ],
+    "seleccion": null
+  }
+]

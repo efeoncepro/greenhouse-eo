@@ -7,7 +7,7 @@
 > **Project ID:** `103589049`
 > **Theme component UID:** `kortex-anam-cms-react-theme`
 > **Plataforma:** HubSpot Developer Projects / CMS React `2026.03`
-> **Estado:** live en build `#28`
+> **Estado:** live en build `#30` (verificado 2026-09-24)
 
 ## Resumen
 
@@ -36,6 +36,10 @@ src/theme/kortex-anam-theme/styles/kortex-landing-hero.module.css
 src/theme/kortex-anam-theme/templates/layouts/base.hubl.html
 src/theme/kortex-anam-theme/assets/anam-virtual-executive.png
 src/theme/kortex-anam-theme/assets/anam-virtual-executive-v2.png
+src/theme/kortex-anam-theme/assets/emma-anam-portrait-2026-09-23.png
+src/theme/kortex-anam-theme/assets/emma-anam-full-2026-09-23.png
+src/theme/kortex-anam-theme/assets/emma-anam-chat-avatar-2026-09-24.png
+src/theme/kortex-anam-theme/assets/emma-anam-chat-avatar-256-2026-09-24.jpg
 src/theme/kortex-anam-theme/assets/anam-logo-horizontal.svg
 ```
 
@@ -83,6 +87,8 @@ Builds relevantes:
 #26  Corrección del feedback del selector para preservar íntegros los tres ítems al cambiar la intención.
 #27  Logo horizontal ANAM del catálogo canónico, mayor presencia de marca y cierre del espacio inferior.
 #28  Bordado de Emma corregido mediante edición generativa a `ANÁLISIS AMBIENTALES S.A.`.
+#29  Foto PNG de Emma enviada por María Paz aplicada a la landing; avatar con fondo claro aplicado a la identidad del agente y al chatflow de HubSpot.
+#30  Cargo visible actualizado a `Ejecutivo comercial ANAM` por indicación del operador.
 ```
 
 Estado final verificado:
@@ -92,7 +98,7 @@ Estado final verificado:
   "projectName": "kortex-cms-react",
   "platformVersion": "2026.03",
   "projectId": 103589049,
-  "deployedBuildId": 28,
+  "deployedBuildId": 30,
   "autoDeployEnabled": true,
   "components": [
     {
@@ -106,7 +112,7 @@ Estado final verificado:
 La URL publica fue verificada sirviendo assets:
 
 ```text
-kortex-cms-react/28
+kortex-cms-react/30
 ```
 
 ## Direccion de producto y UX
@@ -124,16 +130,17 @@ Decision de experiencia:
   - `Gestionar calidad`;
 - evitar lenguaje de implementacion como `widget`, `HubSpot`, `boton flotante` o explicaciones tecnicas.
 
-Copy final clave:
+Copy visible vigente en el build #30:
 
 ```text
 Canal seguro y asistido
-Tu asistente virtual ANAM
+Tu ejecutivo comercial ANAM
 Hola, soy Emma. ¿En qué puedo ayudarte?
 Te ayudo a cotizar, revisar el avance de un servicio o canalizar un requerimiento de calidad con el equipo indicado.
 ¿Qué quieres resolver hoy?
 Conversar con Emma
 Emma está disponible
+Ejecutivo comercial ANAM
 Orientación con contexto
 Datos protegidos
 Derivación humana
@@ -160,7 +167,7 @@ Sistema visual final:
 - logo renderizado en `199x54` desktop y `166x45` mobile;
 - panel navy integrado con Emma, identidad, disponibilidad y tres señales de confianza.
 
-Asset generado:
+Assets históricos generados (builds #23-#28):
 
 ```text
 src/theme/kortex-anam-theme/assets/anam-virtual-executive.png
@@ -174,9 +181,11 @@ Origen local de la generacion nativa Codex:
 /Users/jreye/.codex/generated_images/01a05f48-1615-7590-befa-b814f5abafe8/exec-07e833ac-d048-4ced-9e56-e216efe33c31.png
 ```
 
-El reemplazo de build #23 fue solicitado explicitamente para alinear el personaje con el nombre Emma. Conservar torso superior, presentacion femenina adulta, expresion amable, headset, fondo claro y logo ANAM visible en camisa. No regenerar el avatar sin un nuevo pedido explicito.
+El reemplazo de build #23 fue solicitado explicitamente para alinear el personaje con el nombre Emma. Ese diseño histórico conservaba torso superior, headset, fondo claro y logo ANAM visible en camisa. No regenerar la identidad visual vigente sin un nuevo pedido explícito de ANAM.
 
-El build #28 usa `anam-virtual-executive-v2.png`. La corrección se hizo con edición generativa, no con un parche tipográfico plano: el bordado inferior dice exactamente `ANÁLISIS AMBIENTALES S.A.` y el asset anterior queda disponible para rollback. Éste es también el contrato para futuras correcciones integradas en el personaje o su ropa: generar una nueva versión, revisar el resultado completo y evitar overlays deterministas.
+El build #28 usaba `anam-virtual-executive-v2.png`. La corrección del bordado `ANÁLISIS AMBIENTALES S.A.` mediante edición generativa fue propia de esa ilustración histórica, que permanece disponible para rollback; no es un requisito de la foto entregada por ANAM.
+
+El 2026-09-24 se recibió por Outlook `EMMA.png` (cuerpo completo) y `EMMA 2.png` (retrato con auricular) de María Paz. La landing usa `emma-anam-portrait-2026-09-23.png`, copia intacta del retrato PNG transparente enviado por ANAM; el archivo de cuerpo completo se conserva como fuente, sin mostrarlo en la landing. Para el avatar circular del chat se editó el retrato con el motor de imágenes, agregando un fondo menta claro, y se exportó `emma-anam-chat-avatar-256-2026-09-24.jpg` (256 px). Ese JPEG se guardó tanto en la identidad de Customer Agent como en el chatflow activo `96601133`. La URL pública sirvió el build #30 y mostró la nueva foto, el avatar en el widget abierto y el cargo `Ejecutivo comercial ANAM`. La comprobación visual abrió el widget, pero no envió un mensaje ni volvió a probar el routing conversacional. Los assets anteriores permanecen disponibles para rollback.
 
 ## Interaccion del chat
 
@@ -309,7 +318,7 @@ Conclusion:
 
 ## Estado de cierre
 
-Estado final al cierre de la sesion:
+Estado histórico al cierre de la sesión del build #28:
 
 ```text
 URL publica: https://anam-2.hubspotpagebuilder.com/agente-anam
@@ -319,10 +328,13 @@ Estado: live
 Pendiente: configurar chatflow target rules/branches en HubSpot para `anam_intent`.
 ```
 
+Estado actual verificado el 2026-09-24: build público y desplegado `#30`, con imagen y cargo nuevos. El pendiente de `anam_intent` requiere una verificación separada; este cambio visual no modificó esas reglas.
+
 ## Evidencia incluida en la entrega al cliente
 
 La captura final seleccionada para el correo de cierre está versionada en
 [`../hubspot-as-a-service/reports/assets/ANAM_Emma_Landing_2026-09-02.png`](../hubspot-as-a-service/reports/assets/ANAM_Emma_Landing_2026-09-02.png).
 Muestra el wordmark horizontal, la presentación `Hola, soy Emma`, el personaje femenino, el bordado correcto
 `ANÁLISIS AMBIENTALES S.A.`, el selector único y el CTA `Conversar con Emma`. La captura comunica la experiencia;
-la evidencia runtime continúa siendo el readback público de build `#28` descrito arriba.
+esa captura es histórica y corresponde al build #28. La evidencia de la versión vigente es el readback público
+del build #30 descrito en este documento.

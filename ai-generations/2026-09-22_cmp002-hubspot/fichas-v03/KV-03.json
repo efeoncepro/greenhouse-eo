@@ -1,0 +1,15 @@
+{
+  "id": "KV-03-cuando-no-v03",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "sombra",
+  "objetos": [{ "objeto": "sprocket-hubspot", "vista": "lateral" }],
+  "escena": "SCENE (equipment bench at night, extreme close-up, NOBODY IN FRAME except one hand): THE SHADOW IS THE SUBJECT. A hard low light from the left throws a LONG, SHARP, GRAPHIC shadow across a brushed dark metal bench, and that shadow is the most detailed thing in the picture: it is the silhouette of a connector held just above the surface. Beside the shadow, on the bench itself, sits the socket it is being offered to — and the shadow and the socket DO NOT MATCH: the silhouette is unmistakably a different shape, wider and with the wrong keying. The two forms lie side by side so the mismatch reads instantly, without a word. A hand enters from the right holding the connector, cut by the frame edge, stopped mid-air: it has not been forced in. A glowing cool blue status light on the equipment throws a soft secondary glow. A small orange sculpture sits further back on the bench, out of focus. 100mm macro lens at f/4, focus on the shadow. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. Everything except the sculpture is completely unbranded and no text anywhere is readable: any markings on the equipment are tiny, angled and out of focus.",
+  "lecho": {
+    "objeto": "the near edge of the metal bench crossing the very bottom against the lens, outside the raking light",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": { "muro": "the dark unlit back panel of the equipment rising behind the bench, evenly toned, its brushed metal texture visible", "tinta": "blanca" }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "KV-01-permisos-v04",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "proyeccion",
+  "atmosfera": "bruma",
+  "identidad": [{ "persona": "nexa", "vista": "45-izq" }],
+  "objetos": [
+    { "objeto": "polo-efeonce", "puesta": "frente-cuerpo-b" },
+    { "objeto": "sprocket-hubspot", "vista": "tres-cuartos-izq" }
+  ],
+  "escena": "SCENE (server room at night, Santiago): a work chart is PROJECTED onto her and onto the rough concrete wall — the concrete grain reads straight through the projected image and the chart's rows bend across her shoulder and chest. She stands inside the beam in a navy piqué polo, almost frontal, only her eyes turned down-left to where the projection falls on her — she has just stepped into the beam and stopped, mid-step, the sheet in her hand still half-raised; one column of that chart is empty and it is the empty column that lands on her chest. The projector sits LOW, at knee height, so its beam and the whole projected chart stay in the LOWER HALF of the frame. A glowing cool blue display on a rack beside her adds a second, softer light, also low. Very high contrast: her lit side burns, the other falls to near black. Her head stays BELOW 55% of the frame height. 85mm lens at f/2, focus on her eyes. CRITICAL FRAMING: the ENTIRE UPPER HALF of the frame — everything above 50% of the frame height — is one single dark, evenly toned surface with NOTHING in it: no object, no screen, no lamp, no window, no light beam, no bright spot, no shadow edge. All action, all light and every bright patch stay strictly BELOW the middle of the frame. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. Everything except the sculpture is completely unbranded and no text is readable: the projected rows read as structure, never as words. A small orange sculpture sits on a low shelf at the right, inside the beam.",
+  "lecho": { "objeto": "the near edge of a server rack crossing the very bottom against the lens, outside the projector beam", "tono": "DARK near black, matte" },
+  "reservas": { "texto": { "muro": "the same rough concrete wall continuing up above the projection, in deep unlit shadow, its grain visible", "tinta": "blanca" } }
+}

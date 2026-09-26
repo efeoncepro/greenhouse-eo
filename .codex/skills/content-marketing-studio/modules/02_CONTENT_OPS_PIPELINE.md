@@ -74,6 +74,12 @@ Un checklist de review protege la marca y la barra de originalidad:
 - **Aprobaciones** proporcionales al riesgo: un post evergreen no necesita el mismo gate que un statement sensible.
 - **IA con gobernanza** (`07`): fidelidad de voz + revisión humana obligatoria; nunca output crudo publicado.
 - **Cliente/confidencialidad:** separar contenido público de material bajo NDA; en contenido para clientes, respetar su brand safety.
+- **Rondas de comentarios del cliente en un documento compartido** (Notion, Docs): una revisión amplia no se
+  escribe encima de los bloques comentados. La versión nueva va **debajo**; la anterior se renombra como
+  histórico y conserva todos sus hilos anclados. Al cerrar la ronda, un comentario de página con el **estado
+  final** reemplaza los resúmenes anteriores, y si una respuesta nuestra quedó desmentida por la versión nueva,
+  se corrige en el mismo hilo. Nunca marcar como resueltos los hilos del cliente. Antes de entregar un conjunto
+  de piezas, revisión adversarial por lentes (`seo-aeo/references/agentic-editorial-eeat.md` §10).
 
 ## SLAs y cadencia de producción
 
@@ -81,6 +87,11 @@ Un checklist de review protege la marca y la barra de originalidad:
 - **Newsletter = compromiso de fecha fijo** (la audiencia la espera; fallar la cadencia erosiona confianza).
 - **Backlog + WIP limit:** limita piezas en curso simultáneas para no ahogar el gate de calidad. Mejor terminar y distribuir que acumular drafts.
 - **Buffer editorial:** mantén 2–4 semanas de contenido listo para no publicar apurado (la prisa mata la calidad y la distribución).
+- **Conteo contra contrato:** declarar la **unidad** (archivo o tarea: una secuencia de 4 fotos es 1 tarea y 4
+  archivos) y el **criterio** (producidas, entregables al cliente, en uso, verificadas con archivo), porque cada uno
+  da otra cifra. El rollup de la herramienta no basta si hay etiquetas faltantes o erróneas: se reconstruye desde
+  las propiedades y se contrasta con los archivos. Una ausencia en un listado no prueba que el archivo no exista
+  (los gestores de revisión anidan carpetas). Caso: `docs/audits/seo/BEREL_CONTEO_PIEZAS_SEPTIEMBRE_2026-09-19.md`.
 
 ## Herramientas de content ops
 

@@ -2,7 +2,7 @@
 
 - **Agentforce:** familia de capacidades para agentes. No implica que todo proceso CRM deba automatizarse ni autoriza acciones autónomas.
 - **AIforce:** capa de interfaz de Salesforce para exponer contexto, lógica, permisos y acciones a distintas interfaces de IA; no es por sí sola un SKU ni prueba disponibilidad contractual.
-- **Koa:** modelo de razonamiento CRM de Salesforce/NVIDIA para Agentforce; al 2026-09-16 está en pilotos seleccionados.
+- **Koa:** modelo de razonamiento CRM de Salesforce/NVIDIA para Agentforce; al corte del 2026-09-18 sigue en pilotos seleccionados, con GA anunciado para más adelante en 2026 en regiones concretas de EE. UU.
 - **Headless 360:** arquitectura para exponer capacidades Salesforce fuera de Lightning mediante APIs/MCP; AIforce la empaqueta en superficies listas para usar.
 - **Long-horizon runtime:** ejecución de Agentforce que conserva contexto y progreso para perseguir objetivos durante días o semanas; su presencia no autoriza autonomía sin guardrails.
 - **Agentforce Service:** nombre vigente que Salesforce usa para Service Cloud; conserva `Service Cloud` cuando sea el nombre contractual o histórico verificable.

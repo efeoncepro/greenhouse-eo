@@ -1,0 +1,20 @@
+{
+  "id": "01-fuera-916",
+  "formato": "9:16",
+  "impacto": true,
+  "palanca": "ausencia",
+  "objetos": [
+    "codex"
+  ],
+  "reservas": {
+    "texto": {
+      "muro": "the fine-grained graphite plaster of the real studio wall, naturally in deep even shadow",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the soft curved graphite upholstered back of the viewer chair close to the lens, crossing only the bottom 20 percent of the photograph",
+    "tono": "deep charcoal in real physical shadow, very soft optical defocus, smooth gradual transition"
+  },
+  "escena": "EDIT THE ATTACHED NATIVE 9:16 PHOTOGRAPH. Correct its excessive foreground. Currently the blurred foreground begins near the middle and hides almost half the picture. The new image must show the actual scene much larger and extending farther downward. Reduce the near foreground obstruction to ONLY THE LOWEST FIFTH (bottom 20–22%). Its upper edge is now near y=79–80%, NOT near the middle. Reveal and re-stage the real desk, character body, and equipment behind it to fill the previously hidden middle/lower scene. Keep the upper y=0–32% real dark wall empty for later typography; the top of the character's head or monitor does not enter that space. Main narrative scene occupies y=34–79%, much taller and larger than before. The physical foreground crosses the bottom edge only, leaving a calm central region at y=82–85% for a later official signature. This is NOT a black rectangle, a gradient, a scrim, an added canvas band or an enlarged blur. Restore realistic physical scene content, natural perspective and the SAME character identity, clothing, light, materials and screen content. Keep the exact same native 9:16 ratio. No headline, no text labels, no CTA, no watermark, no editorial logo. Codex, same blue cloud silhouette and face, stands on the real desk at left. The large monitor at right shows the same two blue source cards and empty third slot. Enlarge the desk/monitor/Codex ensemble downward; the foreground chair only grazes the bottom fifth."
+}

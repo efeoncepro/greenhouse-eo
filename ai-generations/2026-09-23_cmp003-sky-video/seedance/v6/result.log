@@ -1,0 +1,16 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 ai:fal /Users/jreye/Documents/greenhouse-eo
+> tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/fal-image.ts --capability seedance25-r2v --request-id 01a0d110-aa66-7542-b5c0-c257696cf221 --fal-account FAL_API_KEY_B --out ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/sky-v6-silent-30s-916.mp4 --json
+
+↻ retomando bytedance/seedance-2.5/reference-to-video · request 01a0d110-aa66-7542-b5c0-c257696cf221
+{
+  "video": {
+    "url": "https://v3b.fal.media/files/b/0aaba694/8B2vHa8UryeWh-ZNwn_C1_video.mp4",
+    "content_type": "video/mp4",
+    "file_name": "video.mp4",
+    "file_size": 22769436
+  },
+  "seed": 378633743
+}
+  ✓ 22236KB · ./ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/sky-v6-silent-30s-916.mp4
+done · 678225 ms · 1 asset(s) · request_id 01a0d110-aa66-7542-b5c0-c257696cf221 · cuenta FAL_API_KEY_B

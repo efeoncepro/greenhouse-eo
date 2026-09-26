@@ -1,0 +1,65 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:30:27.481Z",
+  "run": "ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-v2",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-v2",
+  "totalBytes": 9068813,
+  "fileCount": 9,
+  "files": [
+    {
+      "path": "masters/art-macaws-agency-promo-16x9-v2-omni-master.mp4",
+      "sizeBytes": 2947440,
+      "sha256": "a5465a2fda84b351d3e64408e05ca09330ba449a5e02ce6304b3977dc99a671c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-v2/masters/art-macaws-agency-promo-16x9-v2-omni-master.mp4"
+    },
+    {
+      "path": "review/original-temporal/segment-0.png",
+      "sizeBytes": 785905,
+      "sha256": "ab1120a89709103e4095927ab070146aec16ada4b5e8dfcc748b388105581549",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-v2/review/original-temporal/segment-0.png"
+    },
+    {
+      "path": "review/original-temporal/segment-2_5.png",
+      "sizeBytes": 762895,
+      "sha256": "74d9b27d9575595a92da08ca0640c2e52c1546f40ed1a27e17967ac1d8f2ca0c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-v2/review/original-temporal/segment-2_5.png"
+    },
+    {
+      "path": "review/original-temporal/segment-5.png",
+      "sizeBytes": 737332,
+      "sha256": "31c8607172a86b8a67bd5f8964ef030de31cda0d83e299adead8bd4e9afca2ab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-v2/review/original-temporal/segment-5.png"
+    },
+    {
+      "path": "review/original-temporal/segment-7_5.png",
+      "sizeBytes": 757495,
+      "sha256": "e596cd6dd24b92d76fdfcef5145f750398872233da1318712e382fc29deead50",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-v2/review/original-temporal/segment-7_5.png"
+    },
+    {
+      "path": "review/temporal/segment-0.png",
+      "sizeBytes": 854207,
+      "sha256": "f8fe5d091f19e7b742a2aef3e90f068e78bdadb157410c63f36d0f58b89bcbd5",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-v2/review/temporal/segment-0.png"
+    },
+    {
+      "path": "review/temporal/segment-2_5.png",
+      "sizeBytes": 776776,
+      "sha256": "3182a0e8545ea46976e18e18f96d062cc71e0f95d5835e8fef43e7c1a8e30650",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-v2/review/temporal/segment-2_5.png"
+    },
+    {
+      "path": "review/temporal/segment-5.png",
+      "sizeBytes": 758116,
+      "sha256": "3c1078b1e2c0ee0c3cdc7249f254ac10f5bc2add7fcf47a3df2884d8afc6ebb3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-v2/review/temporal/segment-5.png"
+    },
+    {
+      "path": "review/temporal/segment-7_5.png",
+      "sizeBytes": 688647,
+      "sha256": "628e2b58c7fb9f03fe8735fc2e58c8c688bed1be4c3e1f5ae7a7cfd172cf0ec9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-22_mural-guacamayas-agency-promo-16x9-v2/review/temporal/segment-7_5.png"
+    }
+  ]
+}

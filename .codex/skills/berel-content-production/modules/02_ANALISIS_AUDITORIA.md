@@ -35,7 +35,10 @@ En la página del artículo del Content Hub, crear y conservar un toggle hermano
 - **Enlazado** interno (artículos propios) y externo; oportunidades de interlinking.
 - **Imágenes:** ALT descriptivo, formato `.webp`, peso, `loading="lazy"` (excepto el hero, que es
   LCP).
-- **E-E-A-T**, datos verificables y comparación con la competencia.
+- **E-E-A-T**, datos verificables y comparación con la competencia. La autoría de Berel es la organización
+  «Pinturas Berel», no una persona (decisión del 2026-09-19, módulo 03): no recomendar un autor persona; evaluar
+  las señales de experiencia disponibles (expertos por disciplina, datos de fichas técnicas) y el `author` del
+  schema vivo.
 - Cierre con **recomendaciones priorizadas** (accionables, ordenadas por impacto).
 
 ### Verificación obligatoria en la URL publicada

@@ -32,6 +32,7 @@ import {
   SearchConsoleConnectionPanel,
   type SearchConsoleConnectionPanelConnection
 } from '@/views/greenhouse/agency/clients/SearchConsoleConnectionPanel'
+import { Ga4ConnectionPanel, type Ga4ConnectionPanelData } from '@/views/greenhouse/agency/clients/Ga4ConnectionPanel'
 import { isAutoDerivableItem } from '@/lib/client-lifecycle/evidence/evidence-types'
 import { GH_CLIENT_ONBOARDING as T } from '@/lib/copy/client-onboarding'
 import type {
@@ -168,6 +169,9 @@ interface Props {
   searchConsoleConnection?: SearchConsoleConnectionPanelConnection | null
   searchConsoleEnabled?: boolean
   canManageSearchConsole?: boolean
+  ga4Connection?: Ga4ConnectionPanelData | null
+  ga4Enabled?: boolean
+  canManageGa4?: boolean
 }
 
 const LifecycleTimeline = ({
@@ -182,7 +186,10 @@ const LifecycleTimeline = ({
   teamsAnchor,
   searchConsoleConnection,
   searchConsoleEnabled = false,
-  canManageSearchConsole = false
+  canManageSearchConsole = false,
+  ga4Connection,
+  ga4Enabled = false,
+  canManageGa4 = false
 }: Props) => {
   const theme = useTheme()
   const evidence = useOnboardingEvidence(caseId)
@@ -199,14 +206,20 @@ const LifecycleTimeline = ({
   )
 
   const SearchConsoleBlock = (
-    <Box sx={{ mb: 6, minWidth: 0 }} data-capture='search-console-connect-section'>
+    <Stack spacing={4} sx={{ mb: 6, minWidth: 0 }} data-capture='measurement-connections-section'>
       <SearchConsoleConnectionPanel
         organizationId={organizationId}
         connection={searchConsoleConnection ?? null}
         enabled={searchConsoleEnabled}
         canConnect={canManageSearchConsole}
       />
-    </Box>
+      <Ga4ConnectionPanel
+        organizationId={organizationId}
+        connection={ga4Connection ?? null}
+        enabled={ga4Enabled}
+        canConnect={canManageGa4}
+      />
+    </Stack>
   )
 
   if (degraded) {

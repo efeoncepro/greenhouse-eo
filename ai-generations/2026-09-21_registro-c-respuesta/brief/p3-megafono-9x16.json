@@ -1,0 +1,23 @@
+{
+  "id": "p3-megafono-9x16",
+  "formato": "9:16",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "objetos": [
+    {
+      "objeto": "gigi",
+      "vista": "megafono"
+    }
+  ],
+  "escena": "SCENE (a desk in a dark empty office at night, seen straight on at desk height): standing ON TOP of a full-size mechanical keyboard, the small Gigi figure from the reference holds its megaphone raised and turned AWAY from the camera towards the empty dark room, mid-announcement. The keyboard runs across the frame and its individual keycaps are clearly LARGER than the figure's feet, so it reads unmistakably as a physical figurine about 25 cm tall standing on a normal keyboard. To the right, angled towards it, a monitor shows one single rounded ANSWER CARD glowing on a dark field — a plain empty rounded rectangle with a short bright underline beneath it and nothing else: no letters, no numbers, no words, no icons, no interface chrome. That monitor is the ONLY light source: it rakes hard across the keycaps picking out their edges, lights one side of the figure and leaves the other side falling to black. The room it is announcing into is completely empty and unlit — no people, no chairs, no other screens, no windows, nothing listening. Fine dust hangs in the light. The figure is the ONLY colour in the frame; everything else is deep navy and near-black. 50mm lens at f/2.8, camera at keyboard height. FRAMING FOR THIS FORMAT: the keyboard runs across the LOWER third of the frame and the figure stands on it near the bottom; the empty dark room rises tall and unbroken above for most of the frame height, and the megaphone is raised UPWARD into that emptiness.",
+  "reservas": {
+    "texto": {
+      "muro": "the empty dark office wall above the desk, unbroken and unlit",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the near edge of the desk in the immediate foreground, running unbroken across the whole width of the frame",
+    "tono": "DARK near-black oak in deep shadow, matte, its grain still faintly visible, outside the light"
+  }
+}

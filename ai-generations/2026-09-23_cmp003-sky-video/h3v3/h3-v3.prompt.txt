@@ -1,0 +1,19 @@
+A 15-second vertical cinematic commercial, multi-shot, filmed with THREE cameras and edited with hard cuts on the music beats. The whole film lives in a REAL dawn sky above a sea of clouds exactly like the reference photographs: low sun behind a cumulus tower, crepuscular rays through haze, warm rim light, deep cobalt sky above, mist drifting. Real photographic realism, natural film look, dense atmosphere, depth in three planes (cloud wisps passing close to the lens, subject in the middle, sun and clouds far behind). Every camera always moves.
+
+The product elements are giant glossy white glass panels physically floating IN the sky, like monumental objects: they catch the real sunlight (warm rim on their edges, reflections of the clouds on their surface, sun flare glinting off their corners, soft shadows on the mist). Reproduce every text, card, chip, logo and the aircraft EXACTLY as in the references — same words, spelling, typography and colors. Text must stay crisp and fully readable; when a camera shows text, it faces the camera. Never add any other text.
+
+SHOT LIST (cameras: A = wide drone, B = close macro, C = low angle orbit):
+1. 0.0–1.8 s, CAM A: drone push-in through thin mist toward the giant search box floating above the clouds with the sun behind it; the question "¿A dónde viajar en Sudamérica?" is already being typed from the first frame (Image 1).
+2. 1.8–2.6 s, CAM B: macro close-up sliding along the glass box as the last letters appear and the cursor blinks; sun flare crossing the glass edge.
+3. 2.6–4.0 s, CAM C: low-angle orbit below the box: a pulse of light like pressing Enter, then the three result cards drop in one by one, each landing with a soft purple-and-lime glow (Image 1).
+4. 4.0–6.0 s, CAM A: the camera glides forward as the box becomes the question bubble and the answer card types in, ending in the small "SKY Airline" chip (Image 2).
+5. 6.0–7.0 s, CAM B: fast push-in on the "SKY Airline" chip drifting in front of the low sun; it lights up with a glowing border and sparkles in SKY purple and lime and a soft AI rainbow shimmer (Image 3).
+6. 7.0–8.0 s, CAM A (long telephoto, heat shimmer): the chip and the sun flare into one blinding burst; out of the light the SKY Airline Airbus A320neo emerges head-on, growing fast (Image 4).
+7. 8.0–8.8 s, CAM C: extreme low angle as the aircraft roars overhead just above the lens, belly and engines filling the frame, violent camera shake, motion blur, cloud wisp torn apart.
+8. 8.8–10.2 s, CAM B (air-to-air tracking beside the aircraft): the plane banks gently past the sun, the SKY livery and wordmark gleaming exactly as Image 9, a contrail forming.
+9. 10.2–11.6 s, CAM A: wide on the clean sky and the fading contrail; "Un año creando con SKY." appears, then "+2.000 piezas." slams in with the lime plus popping (Image 5).
+10. 11.6–12.9 s, CAM C: slow orbit on the sky; "Y ahora nos eligió como" then "su agencia SEO/AEO." slams in (Image 6).
+11. 12.9–13.9 s, CAM A: tilt up into the deep cobalt upper sky that deepens to navy and blends into SKY purple in a soft modern gradient; "¡Gracias, SKY!" appears (Image 7).
+12. 13.9–15.0 s: locked final frame exactly as Image 8 — solid SKY purple, white Efeonce logo, thin bar, white SKY logo, efeoncepro.com. Hold.
+
+AUDIO: music and sound effects ONLY. NO voice, NO narration, NO voice-over, NO speech, NO singing, NO lyrics, NO spoken words of any kind. Modern cinematic electronic track that builds, with cuts landing on beats: crisp key clicks under the typing, a whoosh on each camera cut, a bright chime and shimmer when the chip lights, a massive jet roar at the flyover (the peak), punchy hits on "+2.000 piezas." and "su agencia SEO/AEO.", and a warm resolved final chord on the logos.

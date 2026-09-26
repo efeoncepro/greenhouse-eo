@@ -2,8 +2,8 @@
   "$comment": "GENERADO por pnpm mcp:manifest:generate (TASK-1780). NO editar a mano: el hash y el gate de Greenhouse lo detectan. Greenhouse declara que EXISTE; el gateway decide que CRUZA.",
   "source": "greenhouse-eo/src/mcp/greenhouse/tool-manifest.ts",
   "generator": "pnpm mcp:manifest:generate",
-  "manifestHash": "9fc46c8d90d32ff586b1365af169b41e2805c9d0e801873d57dbd84068016cac",
-  "toolCount": 62,
+  "manifestHash": "a08f649aab8fbc2ab27bc55e9048cea753e28f143dda43571cba52a00d4bfd44",
+  "toolCount": 64,
   "tools": [
     {
       "name": "preview_client_service_enablement",
@@ -884,6 +884,31 @@
       ],
       "description": "Read one recurring Efeonce Insights schedule with its request template, review policy (always draft_for_review), catch-up limit and recent occurrences (pending, generating, generated, render_requested, failed, skipped) with the edition each one produced. A paused schedule with reason authority_revoked or module_unavailable stopped itself: report it, do not work around it.",
       "descriptionHash": "b5ec42afe22bbe8dde0c825dc553bdb43a4db6292f580b6ddd1f8a47bf33a5b6"
+    },
+    {
+      "name": "get_insight_cover_preference",
+      "domain": "insights",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Portada preferida de los informes de una organización (automática, navy o blanca); auto si nunca se fijó.",
+      "inputKeys": [
+        "organizationId"
+      ],
+      "description": "Read the preferred cover of an organization's Efeonce Insights reports: auto, dark (navy) or light (white). isDefault=true means it was never set and reads as auto. auto resolves to navy only when the organization has a logo prepared for dark backgrounds, otherwise white. A single request can still override it with brand.coverTheme. The cover of each edition is sealed when it is generated.",
+      "descriptionHash": "a6c86bba906cbbaa99168733c2b7fb3509a848ff696b25a7dc7ad043d36097ed"
+    },
+    {
+      "name": "set_insight_cover_preference",
+      "domain": "insights",
+      "writes": true,
+      "spendsProviderBudget": false,
+      "purpose": "Fija la portada preferida de los informes de una organización; aplica a las ediciones que se generen después.",
+      "inputKeys": [
+        "coverTheme",
+        "organizationId"
+      ],
+      "description": "Set the preferred cover of an organization's Efeonce Insights reports. THIS WRITES. coverTheme is auto, dark (navy) or light (white). Only internal bindings may call it. It affects editions generated afterwards; editions already generated keep the cover sealed in their plan, and nothing is re-rendered. Setting the same value again answers changed=false. Choosing dark for an organization without a logo for dark backgrounds renders a navy cover without the client logo: confirm with the human first.",
+      "descriptionHash": "1736a87406d2911600d586bf4f846f4bb3204a7b8d2577555f9f353f02dd5d7f"
     }
   ]
 }

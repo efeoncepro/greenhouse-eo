@@ -49,6 +49,18 @@ SERVICE_NAME="ops-worker"
 SERVICE_ACCOUNT="greenhouse-portal@${PROJECT_ID}.iam.gserviceaccount.com"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# TASK-1341 / ISSUE-175 — validate before any cloud mutation or paid build.
+# These defaults are shared by staging/production because ops-worker is shared.
+GROWTH_SEO_ENABLED="${GROWTH_SEO_ENABLED:-true}"
+GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED="${GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED:-true}"
+DATAFORSEO_API_PASSWORD_SECRET_REF="${DATAFORSEO_API_PASSWORD_SECRET_REF-greenhouse-dataforseo-api-password}"
+DATAFORSEO_API_LOGIN="${DATAFORSEO_API_LOGIN:-}"
+GROWTH_SEO_ENABLED="${GROWTH_SEO_ENABLED}" \
+GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED="${GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED}" \
+DATAFORSEO_API_PASSWORD_SECRET_REF="${DATAFORSEO_API_PASSWORD_SECRET_REF}" \
+DATAFORSEO_API_LOGIN="${DATAFORSEO_API_LOGIN}" \
+  node "${SCRIPT_DIR}/dataforseo-config.mjs" --preflight
+
 # TASK-1836: one durable flag controls both worker execution and scheduler state.
 AUTH_SERVER_GC_ENABLED="${AUTH_SERVER_GC_ENABLED:-false}"
 case "${AUTH_SERVER_GC_ENABLED}" in
@@ -275,6 +287,12 @@ ENV_VARS="${ENV_VARS},INSIGHTS_DELIVERY_ENABLED=${INSIGHTS_DELIVERY_ENABLED:-tru
 # La autoría IA (INSIGHTS_AUTHORING_AI_ENABLED) NO se declara: en el worker el plan es determinista.
 ENV_VARS="${ENV_VARS},INSIGHTS_SCHEDULES_ENABLED=${INSIGHTS_SCHEDULES_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},INSIGHTS_GENERATION_ENABLED=${INSIGHTS_GENERATION_ENABLED:-true}"
+# 🚩 TASK-1888 — contrato editorial v2 (familias nuevas, lectura por figura, portada sellada). El tick de schedules
+# genera ediciones, así que lo lee acá además de Vercel. Default **false** A PROPÓSITO (al revés que los de arriba):
+# el ops-worker es único para staging y producción, y el contrato v2 sólo se prende en producción junto al release
+# de TASK-1889 (catálogos premium). Con OFF las ocurrencias salen con el plan v1, que las plantillas v2 de
+# TASK-1889 componen igual (sin panel de cierre y con la página de gráfico legacy hasta su Slice 4).
+ENV_VARS="${ENV_VARS},INSIGHTS_EDITORIAL_V2_ENABLED=${INSIGHTS_EDITORIAL_V2_ENABLED:-false}"
 ENV_VARS="${ENV_VARS},REACTIVE_BATCH_SIZE=${REACTIVE_BATCH_SIZE}"
 ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
 ENV_VARS="${ENV_VARS},GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF=${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF}"
@@ -606,9 +624,7 @@ if [ "${ENV}" = "staging" ]; then
   # TASK-1265 — Google AI Overviews / AI Mode provider (DataForSEO). El run async del grader
   # ejecuta en este worker, así que el flag + creds DataForSEO deben vivir acá (no sólo en
   # Vercel) para que los 3 endpoints (public/client-portal/operator) midan AI Overviews.
-  # Staging ON (operador 2026-06-28, smoke real verde). Prod OFF (gated por EPIC-020 +
-  # sign-off + rotación del password DataForSEO expuesto en provisión).
-  DEFAULT_GROWTH_GOOGLE_AIO_ENABLED="true"
+  # Config y default de Google AIO se resuelven arriba, antes del build (TASK-1341).
   # TASK-1266 — Site Readiness Probe Layer: el probe gatherer corre dentro de
   # executeClaimedGraderRun → en el path async ejecuta en ESTE worker, así que el flag
   # debe vivir acá (no sólo en Vercel). Staging ON (rollout 2026-06-28). Prod OFF
@@ -659,7 +675,6 @@ else
   DEFAULT_GROWTH_LEAD_HANDOFF_ENABLED="true"
   DEFAULT_GROWTH_REPORT_EMAIL_ENABLED="true"
   DEFAULT_GROWTH_OPERATOR_SEND_ENABLED="true"
-  DEFAULT_GROWTH_GOOGLE_AIO_ENABLED="true"
   DEFAULT_GROWTH_PROBES_ENABLED="true"
   DEFAULT_GROWTH_AGENTIC_READINESS_ENABLED="true"
   DEFAULT_GROWTH_ENTITY_PROBES_ENABLED="true"
@@ -686,7 +701,6 @@ GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED="${GROWTH_AI_VISIBILITY_LLM_EXTRACTI
 GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED="${GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED:-${DEFAULT_GROWTH_LEAD_HANDOFF_ENABLED}}"
 GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED="${GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED:-${DEFAULT_GROWTH_REPORT_EMAIL_ENABLED}}"
 GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED="${GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED:-${DEFAULT_GROWTH_OPERATOR_SEND_ENABLED}}"
-GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED="${GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED:-${DEFAULT_GROWTH_GOOGLE_AIO_ENABLED}}"
 GROWTH_AI_VISIBILITY_PROBES_ENABLED="${GROWTH_AI_VISIBILITY_PROBES_ENABLED:-${DEFAULT_GROWTH_PROBES_ENABLED}}"
 GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED="${GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED:-${DEFAULT_GROWTH_AGENTIC_READINESS_ENABLED}}"
 GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED="${GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED:-${DEFAULT_GROWTH_ENTITY_PROBES_ENABLED}}"
@@ -738,13 +752,8 @@ ANTHROPIC_API_KEY_SECRET_REF="${ANTHROPIC_API_KEY_SECRET_REF:-greenhouse-anthrop
 # quedaba con 1 solo provider → informe `insufficient_data`). El secret existe en Secret Manager;
 # acá lo declaramos + appendeamos + bindeamos igual que OpenAI/Anthropic (el flag gatea el uso).
 PERPLEXITY_API_KEY_SECRET_REF="${PERPLEXITY_API_KEY_SECRET_REF:-greenhouse-perplexity-api-key}"
-# TASK-1265 — DataForSEO (fuente SERP/AI Mode del provider google_ai_overview). El password
-# se resuelve server-side via secret ref; el login es config no-secreta que el CI inyecta
-# desde la GH Actions variable DATAFORSEO_API_LOGIN (ops-worker-deploy.yml). Sin login, el
-# adapter degrada limpio (missing_secret) — por eso sólo se appendea cuando viene poblado
-# (evita que un --set-env-vars destructivo deje DATAFORSEO_API_LOGIN="" en el worker).
-DATAFORSEO_API_PASSWORD_SECRET_REF="${DATAFORSEO_API_PASSWORD_SECRET_REF:-greenhouse-dataforseo-api-password}"
-DATAFORSEO_API_LOGIN="${DATAFORSEO_API_LOGIN:-}"
+# DataForSEO config was validated before the build. CI supplies the login through
+# secrets.DATAFORSEO_API_LOGIN; local deploys must supply it explicitly too.
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_GRADER_ENABLED=${GROWTH_AI_VISIBILITY_GRADER_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_OPENAI_ENABLED=${GROWTH_AI_VISIBILITY_OPENAI_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED=${GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED}"
@@ -775,11 +784,13 @@ if [ -n "${GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF}" ]; then
   ENV_VARS="${ENV_VARS},GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF=${GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF}"
   ensure_secret_accessor_binding "${GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF}"
 fi
-ENV_VARS="${ENV_VARS},DATAFORSEO_API_PASSWORD_SECRET_REF=${DATAFORSEO_API_PASSWORD_SECRET_REF}"
+if [ -n "${DATAFORSEO_API_PASSWORD_SECRET_REF}" ]; then
+  ENV_VARS="${ENV_VARS},DATAFORSEO_API_PASSWORD_SECRET_REF=${DATAFORSEO_API_PASSWORD_SECRET_REF}"
+  ensure_secret_accessor_binding "${DATAFORSEO_API_PASSWORD_SECRET_REF}:latest"
+fi
 if [ -n "${DATAFORSEO_API_LOGIN}" ]; then
   ENV_VARS="${ENV_VARS},DATAFORSEO_API_LOGIN=${DATAFORSEO_API_LOGIN}"
 fi
-ensure_secret_accessor_binding "${DATAFORSEO_API_PASSWORD_SECRET_REF}:latest"
 # TASK-1229/1230 — Motor Growth Forms: dispatcher + adapter HubSpot Forms secure-submit.
 # Staging ON (forms en vivo en develop); prod OFF (gated por TASK-1232 primer form real +
 # sign-off). Gate prod-safe: con OFF el handler/adapter no-opean (cero queries/writes).
@@ -822,7 +833,6 @@ ensure_secret_accessor_binding "${GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_SECRET_SECR
 # datos gratuitos de Google (cero costo de proveedor) y escribe en `seo_gsc_daily`, tabla que
 # hoy no consume ningún cliente (TASK-1306/1308 aún no existen). Degrada honesto por org.
 # Rollback (<5 min): `GROWTH_SEO_ENABLED=false` acá + redeploy, o pausar el scheduler.
-GROWTH_SEO_ENABLED="${GROWTH_SEO_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_ENABLED=${GROWTH_SEO_ENABLED}"
 
 # TASK-1661 — Captura de datos de mercado por keyword (DataForSEO Labs `keyword_overview`).
@@ -1208,6 +1218,10 @@ print('')
 
   echo "✓ GIT_SHA verified: revision ${REVISION_NAME} expone GIT_SHA=${EXPECTED_SHA}"
 fi
+
+# Verify every revision receiving traffic, not just the service template.
+node "${SCRIPT_DIR}/dataforseo-config.mjs" \
+  --service "${SERVICE_NAME}" --project "${PROJECT_ID}" --region "${REGION}"
 
 # ─── IAM: Grant Invoker role to SA (idempotent) ─────────────────────────────
 

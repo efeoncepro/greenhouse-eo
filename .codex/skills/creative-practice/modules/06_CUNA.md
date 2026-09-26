@@ -219,6 +219,6 @@ producción gratis** — y la producción es **exactamente el recurso escaso que
 
 ## → Siguiente
 
-**El diagnóstico abrió la puerta. Ahora hay que sostener la credibilidad sin casos citables — y sin mentir.**
-→ **`modules/07_PRUEBA.md`** *(el método y la telemetría cargan el peso de la prueba mientras no tengamos casos)*
+**El diagnóstico abrió la puerta. Ahora hay que sostener la credibilidad con la prueba que sí existe — y sin mentir.**
+→ **`modules/07_PRUEBA.md`** *(Actualización 2026-09-23: el caso creativo SKY está publicado con métricas de entrega; el método y la telemetría siguen cargando el peso de la prueba de **negocio**, que aún no tenemos)*
 **Y si el cliente insiste con ver ideas antes de firmar:** → **`modules/10_PITCH.md` § 4.**

@@ -13,6 +13,22 @@ const CALLOUT_END = /^\s*<\/callout>\s*$/i
 const NESTED_TABLE_START = /^\t+<table\b[^>]*>\s*$/i
 const TABLE_END = /^\s*<\/table>\s*$/i
 
+// Berel pide los enlaces internos como ruta relativa (`/articulos/...`) para que abran en pestaña nueva.
+// Notion renderiza esa ruta contra su propio dominio (`https://app.notion.com/articulos/...`); eso es una
+// ruta pública de berel.com, no una página de Notion. Una página de Notion lleva `/p/` o un id de 32 hex.
+const NOTION_URL = /https?:\/\/(?:www\.)?(?:app\.)?notion\.(?:com|so)\/([^\s)\]"'<>]*)/giu
+const BEREL_PUBLIC_ROUTE =
+  /^(?:articulos|colores|productos|tutoriales|inspiracion|ubica-tienda|contacto|preguntas-frecuentes|consejos-para-pintar|promociones|somos-berel)(?:[/?#]|$)/iu
+const NOTION_PAGE_ID = /(?:^|[/-])[0-9a-f]{32}(?:[/?#&]|$)/iu
+
+function exposesNotionLink(line) {
+  for (const [, path] of line.matchAll(NOTION_URL)) {
+    const isRenderedRelativeRoute = BEREL_PUBLIC_ROUTE.test(path) && !NOTION_PAGE_ID.test(path)
+    if (!isRenderedRelativeRoute) return true
+  }
+  return false
+}
+
 const INTERNAL_MARKERS = [
   ['procedencia interna', /\b(?:callout de )?procedencia\b|esta versi[oó]n sale de/i],
   ['ubicación operativa', /\bd[oó]nde vive\b/i],
@@ -45,12 +61,14 @@ const INTERNAL_MARKERS = [
     'campo operativo dentro de la narrativa',
     /^\s*(?:[-*]\s*)?(?:\*\*)?(?:Autor|Conteo de palabras|Word count|Fuentes|Referencias|CMS|Schema|Ruta(?: (?:CMS|Drupal))?|Nodo Drupal|Estado de QA|QA(?: status)?|Fecha de carga|Fecha de publicación)(?::\*\*|\*\*:|:)\s*/i
   ],
-  ['enlace interno de Notion expuesto al lector', /https?:\/\/(?:www\.)?(?:app\.)?notion\.(?:com|so)\//i],
+  ['enlace interno de Notion expuesto al lector', { test: line => exposesNotionLink(line) }],
   [
     'razonamiento o instrucción del agente',
     /\b(?:nota interna|razonamiento del agente|como agente|opté por|decidimos (?:mantener|cambiar|ajustar)|se decidió (?:mantener|cambiar|ajustar)|comentario del cliente|feedback del cliente|solicitud del cliente|el cliente (?:pidió|solicitó|indicó|aprobó|rechazó)|para revisión del cliente|este párrafo (?:se|lo)|hay que (?:corregir|ajustar|validar) este texto)\b/i
   ],
-  ['pendiente editorial interno', /\b(?:TODO|FIXME)\b|\bpendiente de (?:validar|revisar|corregir|reescribir)\b/i],
+  // TODO/FIXME solo en mayúsculas: en español «sobre todo» o «todo el muro» son copy legítimo.
+  ['marcador TODO/FIXME', /\b(?:TODO|FIXME)\b/u],
+  ['pendiente editorial interno', /\bpendiente de (?:validar|revisar|corregir|reescribir)\b/i],
   ['placeholder de callout', /\[callout\b/i],
   [
     'campo técnico fuera de una ficha visual contextual',
@@ -301,6 +319,8 @@ function selfTest() {
   const wrapped = `<page>\n<content>\n${clean}\n</content>\n</page>`
   const leaked = `${clean}\n\tMontaje CMS: cargar el tutorial en cuatro pasos.`
   const notionLink = `${clean}\n\tConsulta la [fuente](https://app.notion.com/p/efeonce/documento-interno) para más información.`
+  const relativeRouteRenderedByNotion = `${clean}\n\tConoce los [Colores de Temporada Berel 2027](https://app.notion.com/articulos/colores-de-temporada-2027) y la [familia de los cafés](https://app.notion.com/colores/cafes).`
+  const notionPageById = `${clean}\n\tRevisa [Coyotito 301N](https://app.notion.com/37639c2fefe781b99658d1629e001d08) antes de pintar.`
   const notionLinkInVisualSpec = clean.replace(
     '\t\t**Posición:** después de la sección correspondiente.',
     '\t\t**Posición:** después de la [referencia interna](https://app.notion.com/p/efeonce/spec-interna).'
@@ -357,6 +377,18 @@ function selfTest() {
   }
   if (!inspect(notionLink).some(error => error.includes('enlace interno de Notion'))) {
     throw new Error('El caso con enlace interno de Notion no falló.')
+  }
+  if (inspect(`${clean}\n\tElegirlo fue, sobre todo, una decisión sobre todo el espacio.`).length !== 0) {
+    throw new Error('«sobre todo» en minúsculas se confundió con un marcador TODO.')
+  }
+  if (!inspect(`${clean}\n\tTODO: revisar esta frase.`).some(error => error.includes('marcador TODO/FIXME'))) {
+    throw new Error('El marcador TODO en mayúsculas no falló.')
+  }
+  if (inspect(relativeRouteRenderedByNotion).length !== 0) {
+    throw new Error('La ruta relativa de berel.com renderizada por Notion se confundió con un enlace de Notion.')
+  }
+  if (!inspect(notionPageById).some(error => error.includes('enlace interno de Notion'))) {
+    throw new Error('El enlace a una página de Notion por id no falló.')
   }
   if (!inspect(notionLinkInVisualSpec).some(error => error.includes('enlace interno de Notion'))) {
     throw new Error('El enlace interno de Notion dentro de una ficha visual no falló.')

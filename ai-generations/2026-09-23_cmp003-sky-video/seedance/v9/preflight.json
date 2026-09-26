@@ -1,0 +1,20 @@
+{
+  "date": "2026-09-24T08:01:58.674Z",
+  "balances": [
+    {
+      "account": "FAL_API_KEY",
+      "balance": -3.86
+    },
+    {
+      "account": "FAL_API_KEY_B",
+      "balance": 46.73737994
+    }
+  ],
+  "apiPrice": {
+    "unitPrice": 0.0214,
+    "unit": "1000 tokens"
+  },
+  "estimatedUsd": 40.94064,
+  "basis": "1080*1920*(30 input + 30 output)*24/1024 tokens * $0.0234/1000 * 0.6 video reference discount",
+  "pricingSource": "https://fal.ai/models/bytedance/seedance-2.5/reference-to-video"
+}

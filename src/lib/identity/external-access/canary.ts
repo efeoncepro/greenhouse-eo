@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import type { PoolClient } from 'pg'
 
 import { deleteExternalCanaryAuthArtifacts } from '@/lib/auth-server/maintenance/external-canary-cleanup'
@@ -469,6 +471,11 @@ export type ExternalCanaryCleanupPlan = {
   profileIds: string[]
   sourceLinkIds: string[]
   oauthClientIds: string[]
+  runOwnedOAuthClientIds: string[]
+  confirmedRunOwnedOAuthClientIds: string[]
+  unconfirmedOAuthClientIds: string[]
+  sharedOAuthClientIds: string[]
+  preservedSharedAuthArtifacts: SharedOAuthPreservationReadback
   subjectCount: number
   registrationRevoked: boolean
   activeAuthorityCount: number
@@ -517,6 +524,67 @@ const EMPTY_AUTH_ARTIFACTS = {
   authorizationContexts: 0,
   oauthClients: 0
 } as const
+
+type PreservationReceipt = { count: number; digest: string }
+type SharedOAuthPreservationReadback = Record<
+  'oauthClients' | 'authorizationCodes' | 'refreshTokens' | 'accessTokens' | 'clientConsents' | 'authorizationContexts',
+  PreservationReceipt
+>
+
+const SHARED_OAUTH_PRESERVATION_TARGETS = [
+  { key: 'oauthClients', relation: 'oauth_clients', primaryKey: 'client_id', kind: 'client' },
+  { key: 'authorizationCodes', relation: 'authorization_codes', primaryKey: 'code_hash', kind: 'subject' },
+  { key: 'refreshTokens', relation: 'refresh_tokens', primaryKey: 'token_hash', kind: 'subject' },
+  { key: 'accessTokens', relation: 'access_tokens', primaryKey: 'jti', kind: 'subject' },
+  { key: 'clientConsents', relation: 'client_consents', primaryKey: 'consent_id', kind: 'subject' },
+  {
+    key: 'authorizationContexts',
+    relation: 'authorization_contexts',
+    primaryKey: 'context_id',
+    kind: 'context'
+  }
+] as const
+
+const readSharedOAuthPreservation = async (
+  client: PoolClient,
+  input: { clientIds: string[]; environmentId: string; subjects: string[]; bindingIds: string[] }
+): Promise<SharedOAuthPreservationReadback> => {
+  const receipts = {} as SharedOAuthPreservationReadback
+
+  for (const target of SHARED_OAUTH_PRESERVATION_TARGETS) {
+    const subjectExclusion =
+      target.kind === 'client'
+        ? ''
+        : ` AND NOT (environment_id=$2 AND subject=ANY($3::text[]))${
+            target.kind === 'context' ? ' AND NOT (binding_id=ANY($4::text[]))' : ''
+          }`
+
+    const params =
+      target.kind === 'client'
+        ? [input.clientIds]
+        : target.kind === 'context'
+          ? [input.clientIds, input.environmentId, input.subjects, input.bindingIds]
+          : [input.clientIds, input.environmentId, input.subjects]
+
+    const rows = await client.query<{ preservation_key: string }>(
+      `SELECT ${target.primaryKey}::text AS preservation_key
+         FROM greenhouse_auth.${target.relation}
+        WHERE client_id=ANY($1::text[])${subjectExclusion}
+        ORDER BY ${target.primaryKey}::text
+        FOR SHARE`,
+      params
+    )
+
+    const keys = rows.rows.map(row => row.preservation_key)
+
+    receipts[target.key] = {
+      count: keys.length,
+      digest: createHash('sha256').update(keys.join('\n')).digest('hex')
+    }
+  }
+
+  return receipts
+}
 
 const censusForeignKeys = async (
   client: PoolClient,
@@ -583,7 +651,8 @@ const censusForeignKeys = async (
 
 const buildCleanupPlan = async (
   client: PoolClient,
-  canaryRegistrationId: string
+  canaryRegistrationId: string,
+  confirmedRunOwnedOAuthClientIds: string[] = []
 ): Promise<ExternalCanaryCleanupPlan> => {
   const registration = await client.query<
     CanaryRegistrationRow & {
@@ -713,16 +782,17 @@ const buildCleanupPlan = async (
 
   if (activeAuthorityCount > 0) logicalBlockers.push('active_authority')
 
-  // A DCR creado por el canary se marca con `software_id=run_id`. La unión con los artefactos del
-  // sujeto detecta un cliente que hubiera omitido esa marca; en ese caso el plan se niega a asumir
-  // ownership y `oauth_client_not_run_owned` bloquea el borrado. Un DCR correctamente marcado sigue
-  // siendo run-owned aunque una ceremonia diagnóstica haya usado por error otro sujeto: el cleanup
-  // elimina sólo sus hijos client-scoped, nunca la sesión ni la identidad de ese otro sujeto.
-  const oauthClients = await client.query<{ client_id: string }>(
-    `SELECT DISTINCT owned.client_id
+  // Un DCR creado por el canary se marca con `software_id=run_id` y `created_by=dcr`. Los demás
+  // clientes observados por el sujeto son compartidos: el cleanup borra sólo su slice exacto por
+  // environment+sujeto y conserva tanto el cliente como los hijos de otros sujetos.
+  const oauthClients = await client.query<{ client_id: string; run_owned: boolean; dcr_eligible: boolean }>(
+    `SELECT DISTINCT observed.client_id,
+            (c.registration_kind='dcr' AND c.created_by='dcr'
+             AND c.metadata_json #>> '{dcr,software_id}'=$1) AS run_owned,
+            (c.registration_kind='dcr' AND c.created_by='dcr') AS dcr_eligible
        FROM (
          SELECT client_id FROM greenhouse_auth.oauth_clients
-          WHERE registration_kind='dcr' AND metadata_json #>> '{dcr,software_id}'=$1
+          WHERE registration_kind='dcr' AND created_by='dcr' AND metadata_json #>> '{dcr,software_id}'=$1
          UNION ALL
          SELECT client_id FROM greenhouse_auth.authorization_codes WHERE environment_id=$2 AND subject=ANY($3::text[])
          UNION ALL
@@ -733,12 +803,44 @@ const buildCleanupPlan = async (
          SELECT client_id FROM greenhouse_auth.client_consents WHERE environment_id=$2 AND subject=ANY($3::text[])
          UNION ALL
          SELECT client_id FROM greenhouse_auth.authorization_contexts WHERE environment_id=$2 AND subject=ANY($3::text[])
-       ) owned
-      ORDER BY owned.client_id`,
+       ) observed
+       JOIN greenhouse_auth.oauth_clients c ON c.client_id=observed.client_id
+      ORDER BY observed.client_id`,
     [row.run_id, row.environment_id, subjectIds]
   )
 
   const oauthClientIds = oauthClients.rows.map(item => item.client_id)
+  const confirmedSet = new Set(confirmedRunOwnedOAuthClientIds)
+
+  const invalidConfirmedOAuthClientIds = confirmedRunOwnedOAuthClientIds.filter(clientId => {
+    const clientRow = oauthClients.rows.find(item => item.client_id === clientId)
+
+    return !clientRow?.dcr_eligible
+  })
+
+  if (invalidConfirmedOAuthClientIds.length > 0) {
+    throw new ExternalAccessError('invalid_request', 'confirmed OAuth client is not an observed DCR', {
+      invalidConfirmedOAuthClientCount: invalidConfirmedOAuthClientIds.length
+    })
+  }
+
+  const runOwnedOAuthClientIds = oauthClients.rows
+    .filter(item => item.run_owned || confirmedSet.has(item.client_id))
+    .map(item => item.client_id)
+
+  const confirmedRunOwned = oauthClients.rows
+    .filter(item => !item.run_owned && confirmedSet.has(item.client_id))
+    .map(item => item.client_id)
+
+  const unconfirmedOAuthClientIds = oauthClients.rows
+    .filter(item => item.dcr_eligible && !item.run_owned && !confirmedSet.has(item.client_id))
+    .map(item => item.client_id)
+
+  const sharedOAuthClientIds = oauthClients.rows
+    .filter(item => !item.run_owned && !confirmedSet.has(item.client_id))
+    .map(item => item.client_id)
+
+  if (unconfirmedOAuthClientIds.length > 0) logicalBlockers.push('oauth_dcr_ownership_unconfirmed')
 
   type AuthInventoryRow = {
     sessions: string
@@ -753,7 +855,6 @@ const buildCleanupPlan = async (
     authorization_contexts: string
     oauth_clients: string
     active_auth: string
-    unsafe_oauth_clients: string
   }
 
   const authInventory = await client.query<AuthInventoryRow>(
@@ -763,28 +864,40 @@ const buildCleanupPlan = async (
       (SELECT count(*)::text FROM greenhouse_auth.passkey_credentials WHERE environment_id=$1 AND subject=ANY($2::text[])) AS passkey_credentials,
       (SELECT count(*)::text FROM greenhouse_auth.passkey_challenges WHERE environment_id=$1 AND (subject=ANY($2::text[]) OR correlation_id=$3)) AS passkey_challenges,
       (SELECT count(*)::text FROM greenhouse_auth.totp_enrollments WHERE environment_id=$1 AND subject=ANY($2::text[])) AS totp_enrollments,
-      (SELECT count(*)::text FROM greenhouse_auth.authorization_codes WHERE client_id=ANY($4::text[])) AS authorization_codes,
-      (SELECT count(*)::text FROM greenhouse_auth.refresh_tokens WHERE client_id=ANY($4::text[])) AS refresh_tokens,
-      (SELECT count(*)::text FROM greenhouse_auth.access_tokens WHERE client_id=ANY($4::text[])) AS access_tokens,
-      (SELECT count(*)::text FROM greenhouse_auth.client_consents WHERE client_id=ANY($4::text[])) AS client_consents,
-      (SELECT count(*)::text FROM greenhouse_auth.authorization_contexts WHERE client_id=ANY($4::text[]) OR binding_id=ANY($5::text[])) AS authorization_contexts,
+      (SELECT count(*)::text FROM greenhouse_auth.authorization_codes
+        WHERE client_id=ANY($4::text[]) OR (client_id=ANY($5::text[]) AND environment_id=$1 AND subject=ANY($2::text[]))) AS authorization_codes,
+      (SELECT count(*)::text FROM greenhouse_auth.refresh_tokens
+        WHERE client_id=ANY($4::text[]) OR (client_id=ANY($5::text[]) AND environment_id=$1 AND subject=ANY($2::text[]))) AS refresh_tokens,
+      (SELECT count(*)::text FROM greenhouse_auth.access_tokens
+        WHERE client_id=ANY($4::text[]) OR (client_id=ANY($5::text[]) AND environment_id=$1 AND subject=ANY($2::text[]))) AS access_tokens,
+      (SELECT count(*)::text FROM greenhouse_auth.client_consents
+        WHERE client_id=ANY($4::text[]) OR (client_id=ANY($5::text[]) AND environment_id=$1 AND subject=ANY($2::text[]))) AS client_consents,
+      (SELECT count(*)::text FROM greenhouse_auth.authorization_contexts
+        WHERE client_id=ANY($4::text[]) OR binding_id=ANY($6::text[])
+           OR (client_id=ANY($5::text[]) AND environment_id=$1 AND subject=ANY($2::text[]))) AS authorization_contexts,
       (SELECT count(*)::text FROM greenhouse_auth.oauth_clients WHERE client_id=ANY($4::text[])) AS oauth_clients,
       ((SELECT count(*) FROM greenhouse_auth.sessions WHERE environment_id=$1 AND subject=ANY($2::text[]) AND revoked_at IS NULL AND expires_at>NOW()) +
        (SELECT count(*) FROM greenhouse_auth.magic_link_tokens WHERE environment_id=$1 AND subject=ANY($2::text[]) AND consumed_at IS NULL AND expires_at>NOW()) +
        (SELECT count(*) FROM greenhouse_auth.passkey_credentials WHERE environment_id=$1 AND subject=ANY($2::text[]) AND revoked_at IS NULL) +
        (SELECT count(*) FROM greenhouse_auth.passkey_challenges WHERE environment_id=$1 AND (subject=ANY($2::text[]) OR correlation_id=$3) AND consumed_at IS NULL AND expires_at>NOW()) +
        (SELECT count(*) FROM greenhouse_auth.totp_enrollments WHERE environment_id=$1 AND subject=ANY($2::text[]) AND status<>'revoked') +
-       (SELECT count(*) FROM greenhouse_auth.authorization_codes WHERE client_id=ANY($4::text[]) AND consumed_at IS NULL AND expires_at>NOW()) +
-       (SELECT count(*) FROM greenhouse_auth.refresh_tokens WHERE client_id=ANY($4::text[]) AND status='active' AND expires_at>NOW()) +
-       (SELECT count(*) FROM greenhouse_auth.access_tokens WHERE client_id=ANY($4::text[]) AND revoked_at IS NULL AND expires_at>NOW()) +
-       (SELECT count(*) FROM greenhouse_auth.client_consents WHERE client_id=ANY($4::text[]) AND status='active') +
-       (SELECT count(*) FROM greenhouse_auth.authorization_contexts WHERE (client_id=ANY($4::text[]) OR binding_id=ANY($5::text[])) AND revoked_at IS NULL AND expires_at>NOW()) +
-       (SELECT count(*) FROM greenhouse_auth.oauth_clients WHERE client_id=ANY($4::text[]) AND status='active'))::text AS active_auth,
-      (SELECT count(*)::text FROM greenhouse_auth.oauth_clients
-        WHERE client_id=ANY($4::text[]) AND NOT (
-          registration_kind='dcr' AND created_by='dcr' AND metadata_json #>> '{dcr,software_id}'=$3
-        )) AS unsafe_oauth_clients`,
-    [row.environment_id, subjectIds, row.run_id, oauthClientIds, bindingIds]
+       (SELECT count(*) FROM greenhouse_auth.authorization_codes
+         WHERE (client_id=ANY($4::text[]) OR (client_id=ANY($5::text[]) AND environment_id=$1 AND subject=ANY($2::text[])))
+           AND consumed_at IS NULL AND expires_at>NOW()) +
+       (SELECT count(*) FROM greenhouse_auth.refresh_tokens
+         WHERE (client_id=ANY($4::text[]) OR (client_id=ANY($5::text[]) AND environment_id=$1 AND subject=ANY($2::text[])))
+           AND status='active' AND expires_at>NOW()) +
+       (SELECT count(*) FROM greenhouse_auth.access_tokens
+         WHERE (client_id=ANY($4::text[]) OR (client_id=ANY($5::text[]) AND environment_id=$1 AND subject=ANY($2::text[])))
+           AND revoked_at IS NULL AND expires_at>NOW()) +
+       (SELECT count(*) FROM greenhouse_auth.client_consents
+         WHERE (client_id=ANY($4::text[]) OR (client_id=ANY($5::text[]) AND environment_id=$1 AND subject=ANY($2::text[])))
+           AND status='active') +
+       (SELECT count(*) FROM greenhouse_auth.authorization_contexts
+         WHERE (client_id=ANY($4::text[]) OR binding_id=ANY($6::text[])
+           OR (client_id=ANY($5::text[]) AND environment_id=$1 AND subject=ANY($2::text[])))
+           AND revoked_at IS NULL AND expires_at>NOW()))::text AS active_auth`,
+    [row.environment_id, subjectIds, row.run_id, runOwnedOAuthClientIds, sharedOAuthClientIds, bindingIds]
   )
 
   const inventory = authInventory.rows[0]
@@ -806,10 +919,15 @@ const buildCleanupPlan = async (
     : { ...EMPTY_AUTH_ARTIFACTS }
 
   const activeAuthCount = Number(inventory?.active_auth ?? 0)
-  const unsafeOAuthClientCount = Number(inventory?.unsafe_oauth_clients ?? 0)
 
   if (activeAuthCount > 0) logicalBlockers.push('active_auth')
-  if (unsafeOAuthClientCount > 0) logicalBlockers.push('oauth_client_not_run_owned')
+
+  const preservedSharedAuthArtifacts = await readSharedOAuthPreservation(client, {
+    clientIds: sharedOAuthClientIds,
+    environmentId: row.environment_id,
+    subjects: subjectIds,
+    bindingIds
+  })
 
   const shared = await client.query<{ total: string }>(
     `SELECT (
@@ -848,7 +966,7 @@ const buildCleanupPlan = async (
     ['source_link', 'greenhouse_core.identity_profile_source_links', 'link_id', sourceLinkIds],
     ['registration', 'greenhouse_core.external_canary_registrations', 'canary_registration_id', [canaryRegistrationId]],
     ['session', 'greenhouse_auth.sessions', 'session_hash', sessionHashes],
-    ['oauth_client', 'greenhouse_auth.oauth_clients', 'client_id', oauthClientIds]
+    ['oauth_client', 'greenhouse_auth.oauth_clients', 'client_id', runOwnedOAuthClientIds]
   ]
 
   for (const [target, relation, targetColumn, values] of censusTargets) {
@@ -868,6 +986,11 @@ const buildCleanupPlan = async (
     profileIds,
     sourceLinkIds,
     oauthClientIds,
+    runOwnedOAuthClientIds,
+    confirmedRunOwnedOAuthClientIds: confirmedRunOwned,
+    unconfirmedOAuthClientIds,
+    sharedOAuthClientIds,
+    preservedSharedAuthArtifacts,
     subjectCount: subjectIds.length,
     registrationRevoked: row.status === 'revoked',
     activeAuthorityCount,
@@ -881,7 +1004,8 @@ const buildCleanupPlan = async (
 }
 
 export const inspectExternalCanaryCleanup = async (
-  canaryRegistrationIdInput: string
+  canaryRegistrationIdInput: string,
+  options: { confirmedRunOwnedOAuthClientIds?: string[] } = {}
 ): Promise<ExternalCanaryCleanupPlan> => {
   const canaryRegistrationId = requireIdShape(
     canaryRegistrationIdInput,
@@ -889,13 +1013,24 @@ export const inspectExternalCanaryCleanup = async (
     REGISTRATION_ID_PATTERN
   )
 
-  return withTransaction(client => buildCleanupPlan(client, canaryRegistrationId))
+  return withTransaction(client =>
+    buildCleanupPlan(client, canaryRegistrationId, options.confirmedRunOwnedOAuthClientIds ?? [])
+  )
 }
 
 export const cleanupExternalCanaryFixture = async (
-  input: { canaryRegistrationId: string; apply?: boolean; reason: string },
+  input: {
+    canaryRegistrationId: string
+    apply?: boolean
+    reason: string
+    confirmedRunOwnedOAuthClientIds?: string[]
+  },
   actor: ExternalAccessActor
-): Promise<{ applied: boolean; plan: ExternalCanaryCleanupPlan; readback?: Record<string, number> }> => {
+): Promise<{
+  applied: boolean
+  plan: ExternalCanaryCleanupPlan
+  readback?: { deletedGraph: Record<string, number>; preservedShared: SharedOAuthPreservationReadback }
+}> => {
   const canaryRegistrationId = requireIdShape(
     input.canaryRegistrationId,
     'canaryRegistrationId',
@@ -906,7 +1041,7 @@ export const cleanupExternalCanaryFixture = async (
   const performedBy = actorId(actor)
 
   return withTransaction(async client => {
-    const plan = await buildCleanupPlan(client, canaryRegistrationId)
+    const plan = await buildCleanupPlan(client, canaryRegistrationId, input.confirmedRunOwnedOAuthClientIds ?? [])
 
     if (!input.apply) return { applied: false, plan }
 
@@ -980,7 +1115,8 @@ export const cleanupExternalCanaryFixture = async (
       subjects: ownedSubjects,
       runId: plan.runId,
       bindingIds: plan.bindingIds,
-      oauthClientIds: plan.oauthClientIds
+      ownedOauthClientIds: plan.runOwnedOAuthClientIds,
+      sharedOauthClientIds: plan.sharedOAuthClientIds
     })
 
     if (plan.bindingIds.length > 0) {
@@ -1049,11 +1185,17 @@ export const cleanupExternalCanaryFixture = async (
         (SELECT count(*)::text FROM greenhouse_auth.passkey_credentials WHERE environment_id=$6 AND subject=ANY($7::text[])) AS passkey_credentials,
         (SELECT count(*)::text FROM greenhouse_auth.passkey_challenges WHERE environment_id=$6 AND (subject=ANY($7::text[]) OR correlation_id=$8)) AS passkey_challenges,
         (SELECT count(*)::text FROM greenhouse_auth.totp_enrollments WHERE environment_id=$6 AND subject=ANY($7::text[])) AS totp_enrollments,
-        (SELECT count(*)::text FROM greenhouse_auth.authorization_codes WHERE client_id=ANY($9::text[])) AS authorization_codes,
-        (SELECT count(*)::text FROM greenhouse_auth.refresh_tokens WHERE client_id=ANY($9::text[])) AS refresh_tokens,
-        (SELECT count(*)::text FROM greenhouse_auth.access_tokens WHERE client_id=ANY($9::text[])) AS access_tokens,
-        (SELECT count(*)::text FROM greenhouse_auth.client_consents WHERE client_id=ANY($9::text[])) AS client_consents,
-        (SELECT count(*)::text FROM greenhouse_auth.authorization_contexts WHERE client_id=ANY($9::text[]) OR binding_id=ANY($3::text[])) AS authorization_contexts,
+        (SELECT count(*)::text FROM greenhouse_auth.authorization_codes
+          WHERE client_id=ANY($9::text[]) OR (client_id=ANY($10::text[]) AND environment_id=$6 AND subject=ANY($7::text[]))) AS authorization_codes,
+        (SELECT count(*)::text FROM greenhouse_auth.refresh_tokens
+          WHERE client_id=ANY($9::text[]) OR (client_id=ANY($10::text[]) AND environment_id=$6 AND subject=ANY($7::text[]))) AS refresh_tokens,
+        (SELECT count(*)::text FROM greenhouse_auth.access_tokens
+          WHERE client_id=ANY($9::text[]) OR (client_id=ANY($10::text[]) AND environment_id=$6 AND subject=ANY($7::text[]))) AS access_tokens,
+        (SELECT count(*)::text FROM greenhouse_auth.client_consents
+          WHERE client_id=ANY($9::text[]) OR (client_id=ANY($10::text[]) AND environment_id=$6 AND subject=ANY($7::text[]))) AS client_consents,
+        (SELECT count(*)::text FROM greenhouse_auth.authorization_contexts
+          WHERE client_id=ANY($9::text[]) OR binding_id=ANY($3::text[])
+             OR (client_id=ANY($10::text[]) AND environment_id=$6 AND subject=ANY($7::text[]))) AS authorization_contexts,
         (SELECT count(*)::text FROM greenhouse_auth.oauth_clients WHERE client_id=ANY($9::text[])) AS oauth_clients`,
       [
         plan.organizationId,
@@ -1064,19 +1206,33 @@ export const cleanupExternalCanaryFixture = async (
         plan.environmentId,
         ownedSubjects,
         plan.runId,
-        plan.oauthClientIds
+        plan.runOwnedOAuthClientIds,
+        plan.sharedOAuthClientIds
       ]
     )
 
     const raw = readbackRows.rows[0]!
-    const readback = Object.fromEntries(Object.entries(raw).map(([key, value]) => [key, Number(value)]))
+    const deletedGraph = Object.fromEntries(Object.entries(raw).map(([key, value]) => [key, Number(value)]))
 
-    if (Object.values(readback).some(value => value !== 0)) {
+    if (Object.values(deletedGraph).some(value => value !== 0)) {
       throw new ExternalAccessError('canary_cleanup_blocked', 'canary cleanup readback is not zero', {
         canaryRegistrationId
       })
     }
 
-    return { applied: true, plan, readback }
+    const preservedShared = await readSharedOAuthPreservation(client, {
+      clientIds: plan.sharedOAuthClientIds,
+      environmentId: plan.environmentId,
+      subjects: ownedSubjects,
+      bindingIds: plan.bindingIds
+    })
+
+    if (JSON.stringify(preservedShared) !== JSON.stringify(plan.preservedSharedAuthArtifacts)) {
+      throw new ExternalAccessError('canary_cleanup_blocked', 'shared OAuth preservation readback changed', {
+        canaryRegistrationId
+      })
+    }
+
+    return { applied: true, plan, readback: { deletedGraph, preservedShared } }
   })
 }

@@ -1,0 +1,186 @@
+[
+  {
+    "id": "01-fuera-916",
+    "plate": "plates/01-fuera-916.png",
+    "plateSHA256": "e321a6c2b0f3ec325a37dbb3eab28b17fd395dd68f43593f14a8d77ec2658702",
+    "engine": "image_gen integrado",
+    "prompt": "brief/01-fuera-916.prompt.txt",
+    "reference": "origen-v06/plates/01-fuera-916.png",
+    "referenceSHA256": "2976aa8d60740a7b802979c61fb4489e7e1e260fd92a2a703edd2a747236e833",
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": true
+  },
+  {
+    "id": "01-fuera-169",
+    "plate": "plates/01-fuera-169.png",
+    "plateSHA256": "1013917024780dbcd30e75ce9299639bbe1bf62cbd4383e2f4eb59e15cef8315",
+    "engine": "conservado de v06",
+    "prompt": null,
+    "reference": null,
+    "referenceSHA256": null,
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": false
+  },
+  {
+    "id": "02-reconoces-916",
+    "plate": "plates/02-reconoces-916.png",
+    "plateSHA256": "3eca7df3ef7214a9c326f1a42a848a72d4023eeac271a9086bb64d0f90b7005f",
+    "engine": "image_gen integrado",
+    "prompt": "brief/02-reconoces-916.prompt.txt",
+    "reference": "origen-v06/plates/02-reconoces-916.png",
+    "referenceSHA256": "c759b7fe980c4978381e722c19ee2ac016795f3f81afb3649a8800ac65a14e88",
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": true
+  },
+  {
+    "id": "02-reconoces-169",
+    "plate": "plates/02-reconoces-169.png",
+    "plateSHA256": "2659e296a69e3172167e3aa039063dc5f0e102c900bf9fdc56afbb97ec8345d5",
+    "engine": "conservado de v06",
+    "prompt": null,
+    "reference": null,
+    "referenceSHA256": null,
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": false
+  },
+  {
+    "id": "03-referencia-916",
+    "plate": "plates/03-referencia-916.png",
+    "plateSHA256": "d190fe79a40925d60ff755216ebdfc432ebb6cd57eb802e2d5077a6702868872",
+    "engine": "image_gen integrado",
+    "prompt": "brief/03-referencia-916.prompt.txt",
+    "reference": "origen-v06/plates/03-referencia-916.png",
+    "referenceSHA256": "4c55cbeeca432d9f8252fefe45085c34b323a8308dda84411ccacacfb49926a4",
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": true
+  },
+  {
+    "id": "03-referencia-169",
+    "plate": "plates/03-referencia-169.png",
+    "plateSHA256": "5acbef7d4e6843676f00528d397a38328f96dc76b12245f9e0bac6e33220f040",
+    "engine": "conservado de v06",
+    "prompt": null,
+    "reference": null,
+    "referenceSHA256": null,
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": false
+  },
+  {
+    "id": "04-elegida-916",
+    "plate": "plates/04-elegida-916-lecho.png",
+    "plateSHA256": "e49c32ecd6505ea67328fe4f015050c58dce7b9e82b7d2dce268c97b5b74330c",
+    "engine": "image_gen integrado",
+    "prompt": "brief/04-elegida-916.prompt.txt",
+    "reference": "origen-v06/plates/04-elegida-916.png",
+    "referenceSHA256": "ae8324fe3518c5dbf95c82e68cb00e09319d17c8d41d95cc4fa302351346c44e",
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": true,
+    "derivedFrom": {
+      "plate": "plates/04-elegida-916.png",
+      "plateSHA256": "af747aa7a04d052fa8df3dcc3a72f30cee3c6d6d4b6778f1e5534994c501f7be",
+      "fecha": "2026-09-23",
+      "metodo": "Primer plano (lecho y apoyabrazos) subido 60 px del plate (69 px en la pieza) como una capa rígida, como con la cámara un poco más baja; el corte sigue el borde del propio objeto, con 10 px de fundido. Sin IA y sin deformar su forma.",
+      "script": "../2026-09-23_v07-lecho-04-elegida/subir-primer-plano-v4.cjs",
+      "aprobadoPor": "operador"
+    }
+  },
+  {
+    "id": "04-elegida-169",
+    "plate": "plates/04-elegida-169.png",
+    "plateSHA256": "fe174c066b9b91b804b55e8e7afd6be9716680c8235e08ad238d1c6101e6f4cc",
+    "engine": "conservado de v06",
+    "prompt": null,
+    "reference": null,
+    "referenceSHA256": null,
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": false
+  },
+  {
+    "id": "01-fuera-45",
+    "plate": "plates/01-fuera-45.png",
+    "plateSHA256": "856999869c69681684ac57bb1b6fca0c0e5fe97a3c23599f0030a6d26a4d949c",
+    "engine": "conservado de v06",
+    "prompt": null,
+    "reference": null,
+    "referenceSHA256": null,
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": false
+  },
+  {
+    "id": "01-fuera-11",
+    "plate": "plates/01-fuera-11.png",
+    "plateSHA256": "256357f5185bc25b8045da5ead15174f17c9e54616718602684196670f8444b4",
+    "engine": "conservado de v06",
+    "prompt": null,
+    "reference": null,
+    "referenceSHA256": null,
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": false
+  },
+  {
+    "id": "02-reconoces-45",
+    "plate": "plates/02-reconoces-45.png",
+    "plateSHA256": "092972e5ca0738be37eb9951dbfb8d52b388bcead251b1d68048861a3de2cd70",
+    "engine": "conservado de v06",
+    "prompt": null,
+    "reference": null,
+    "referenceSHA256": null,
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": false
+  },
+  {
+    "id": "02-reconoces-11",
+    "plate": "plates/02-reconoces-11.png",
+    "plateSHA256": "c722be4695789a669d90fdc4b9c0ad324fa6be46cfefde968d50e4675feb6397",
+    "engine": "conservado de v06",
+    "prompt": null,
+    "reference": null,
+    "referenceSHA256": null,
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": false
+  },
+  {
+    "id": "03-referencia-45",
+    "plate": "plates/03-referencia-45.png",
+    "plateSHA256": "a8b426e6282a69669eb01a6186b5c350481effcd1dda6d0c1f5866b585268d68",
+    "engine": "conservado de v06",
+    "prompt": null,
+    "reference": null,
+    "referenceSHA256": null,
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": false
+  },
+  {
+    "id": "03-referencia-11",
+    "plate": "plates/03-referencia-11.png",
+    "plateSHA256": "f17db172416e820cad0ca584a49d8d8d30835a69d09753479ac3e5a745a39573",
+    "engine": "conservado de v06",
+    "prompt": null,
+    "reference": null,
+    "referenceSHA256": null,
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": false
+  },
+  {
+    "id": "04-elegida-45",
+    "plate": "plates/04-elegida-45.png",
+    "plateSHA256": "e04b514589a2b56045e52b84fdcd2eac3f79d33978d2af1231bb5d00b8dccb6b",
+    "engine": "conservado de v06",
+    "prompt": null,
+    "reference": null,
+    "referenceSHA256": null,
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": false
+  },
+  {
+    "id": "04-elegida-11",
+    "plate": "plates/04-elegida-11.png",
+    "plateSHA256": "b2df1437c9727c8d266588b98d5ea2d3a77eab2efe504da60ee646556916af74",
+    "engine": "conservado de v06",
+    "prompt": null,
+    "reference": null,
+    "referenceSHA256": null,
+    "parentProvenance": "origen-v06/PROVENANCE.json",
+    "newGeneration": false
+  }
+]

@@ -1,9 +1,9 @@
 # Efeonce Insights — Registro de implementación y despliegue (TASK-1845)
 
 > **Tipo de documento:** Registro de implementación y despliegue
-> **Version:** 1.0
+> **Version:** 1.2
 > **Creado:** 2026-09-15 por Claude
-> **Ultima actualizacion:** 2026-09-15 por Claude
+> **Ultima actualizacion:** 2026-09-25 por Claude (§8.z y fila de §10: TASK-1889)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · ADR [EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md)
 > **Task:** [TASK-1845](../tasks/in-progress/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) (EPIC-045)
 
@@ -328,7 +328,8 @@ Fuente: `contracts/request.ts`, `commands/validate-request.ts`, `window.ts`.
 `{ data: { report, edition, idempotent, generation }, status }` donde `generation` es
 `{ outcome: 'ready_for_review' | 'failed', failedPhase, failureCode } | null` (`null` en replay
 idempotente o `deferGeneration`). `status` es `202` para una edición nueva y `200` cuando
-`idempotent: true` (`resources/app-insights.ts` línea 140, `ecosystem-insights.ts` línea 283); ambos
+`idempotent: true` (`createAppInsightEdition` en `resources/app-insights.ts` y su par en `ecosystem-insights.ts`; se
+citan por nombre porque la separación lectura/comandos de ISSUE-177 movió las líneas); ambos
 runners honran `result.status` (`core/app-auth.ts` línea 344, `core/commands.ts` línea 55).
 
 > Verificado 2026-09-15 23:30Z contra staging: un replay resuelto por la idempotencia de dominio (misma
@@ -591,6 +592,68 @@ client_services.write, insights.write).
 | Dominio | `src/lib/efeonce-insights/render/{contracts,store,commands,readers,outputs-port,deck-mapper,plan-limits}.ts` | store compone con `InsightsDbClient` (testeable en rollback) |
 | Worker | `services/artifact-worker/{consumer-contract.ts,consumers/*}` + `main.ts` por registry | Proposal = adapter compatible; `INSIGHTS_RENDER_ENABLED` en `deploy.sh` (default `false` al escribirse; **delta 2026-09-16: default `true`** en el `deploy.sh` del Job y del `ops-worker`, ambos únicos para staging y producción) |
 
+### 8.y Superficies agregadas por TASK-1848 (2026-09-18)
+
+Fuente: [TASK-1848](../tasks/in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) y arquitectura §14.6.
+
+| Superficie | Ruta / tool | Notas |
+|---|---|---|
+| Enlaces compartidos | tabla `insight_share_grants` (`ishr-`), token `isg_` + 32 bytes base64url, en DB sólo `token_digest` sha256 | sólo ediciones emitidas; TTL 1–90 días (default 30); máx 20 enlaces activos por edición (429 `quota_exceeded`); revocación única (410); retirar la edición revoca sus enlaces; access log append-only `insight_share_access_events`; capability `insights.share.manage` |
+| Lector público (Think) | `GET /api/public/insights/shared/[token]` → `InsightWebModelV1` (`modelVersion '1.0'`) · `GET …/outputs/[output]` | 404 desconocido/expirado/flag OFF/org suspendida/módulo ausente; 410 revocado/retirado; 429 rate limit (IP 300/60 s, grant 60/20); `private, no-store`, noindex, no-referrer, CSP. El render en `efeonce-think` es TASK-1875 |
+| Envío por correo | intents/recipients/events (`idlv-`, `idlr-`); EmailTypes `insights_edition_delivery` y `insights_edition_delivery_attachment` (sembrados apagados); projection `insights_delivery_dispatch` en `ops-worker` | aceptado ≠ entregado; `ambiguous` = señal de reliability; `portal_link` ⇒ `not_ready` hasta TASK-1849; capability `insights.delivery.send` (interna) |
+| Recurrencia | schedules + ocurrencias; Cloud Scheduler `ops-insights-schedules-tick` (`20 * * * *`) → `ops-worker` `/insights/schedules/tick` | V1 = borrador + render y se detiene en revisión humana (`draft_for_review`); pausa automática por `authority_revoked`/`module_unavailable`; capability `insights.schedule.manage` (interna) |
+| Lanes | App `/api/platform/app/insights/**` (shares, deliveries con cancel/retry/reconcile, schedules con activate/pause/retire); Ecosystem (shares crear/listar/revocar; deliveries y schedules sólo lectura) | errores 503 `sharing_disabled\|delivery_disabled\|schedules_disabled`, 429 `quota_exceeded`, 409 `not_ready` |
+| MCP interno | `create_insight_share`, `list_insight_shares`, `revoke_insight_share`, `list_insight_deliveries`, `get_insight_delivery`, `list_insight_schedules`, `get_insight_schedule` | manifiesto 62 tools, hash `9fc46c8d90d3` |
+| Gateway `efeonce-mcp` | v1.7.0 (PR #16 `4c9d7c44`, deploy `35351850324`, revisión `00055-gk6` al 100 %) | provider `greenhouse-insights` contrato `task-1848-v1`; 51 → 58 tools; crear/revocar enlace exigen `efeonce.mcp.insights.write` (fail-closed); envío y recurrencia no existen por MCP |
+| Migraciones | 4 (share grants, delivery intents, skip reason edition, schedules) | aplicadas en la instancia única |
+
+### 8.z Catálogos premium del canvas — TASK-1889 (2026-09-25, code complete, sin push)
+
+Fuente: [TASK-1889](../tasks/in-progress/TASK-1889-efeonce-insights-premium-catalogs.md), arquitectura §14.9 y el
+dossier [`docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md`](../ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md).
+
+**Commits (en `develop`, sin push).**
+
+| # | Hito | Commit | Qué entró |
+|---|---|---|---|
+| 1 | Slices 1–2 — catálogos editoriales del canvas aprobado | `d357e0224` | Gate `insights:canvas-fidelity` (`scripts/insights/canvas-fidelity.ts` + `canvas-fixtures/`), roles editoriales y Poppins 500 en el brand pack `axis`, assets de canal/marca/contacto, resolvers editoriales + test |
+| 2 | Las plantillas editoriales reemplazan a las v1 | `b649080c7` | Portada, índice, capítulo, narrativa, tabla, límites y contraportada v2; retiro de `report-contents`, `report-dense-table`, `report-limits-v2` y portadas navy separadas; guarda `insights-catalogs-v2-only.test.ts` |
+| 3 | Slice 3 — portada blanca por módulo y logo del cliente | `4ff72fe3a` (+ evidencia `2410e5156`) | `ReportCoverLightPage`, `render/cover.ts`, `readOrganizationLogoForRender`, `ComposeOptions.externalAssets`, consumer del worker y `classify-failure.ts`; `render.ts` espera `img.decode()` |
+| 4 | Slice 4 — plantillas de figura | `3fa493efe` | 4 páginas A4 + 4 láminas de figura, `figure-svg.ts`, `figure-hooks.ts`, resolvers `report-`/`deck-`, `example?` en `contracts.ts` + `synthesize.ts`, fixtures 40–43 |
+| 5 | Slice 4 — mappers y retiro del legado | `85785e7fc` | `render/figure-slots.ts` (nuevo, compartido) reemplaza a `render/figure-pages.ts` (borrado); fuera `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css` y resolvers v1 |
+| 6 | Docs del Slice 4 | `1120e86e4`, `5968e35e8` | Estado real en la task |
+| 7 | Excepción aprobada de `Deck-Agrupadas` | `289b6eca4` | `approvedException` (techo 2,5 %) en el fixture y en `canvas-fidelity.ts` |
+| 8 | «Lo esencial» del plan v2 | `738ceb748` | Resumen A4 y deck desde `plan.essentials`, folio real |
+| 9 | Correcciones por ediciones reales | `b88fd447c` | Canales distintos para agrupar en un eje, `narrativeDropCapHook`, presupuestos de texto, `preview-edition.ts` con el lector del worker |
+| 10 | Dossier + scorecard | `9529a1b25` | Hojas en gris, `ui:quality` PASS 4,59 |
+
+**Archivo por archivo.**
+
+| Archivo | Responsabilidad | Invariantes |
+|---|---|---|
+| `src/lib/artifact-composer/catalogs/insights-report/` (A4 794×1123) | Catálogo `report_pdf`: portada navy y blanca, índice, capítulo, narrativa, resumen, lectura, plan, tabla, límites, 4 páginas de figura, contraportada; `registry.json`, `index.ts` (hooks), `report-editorial.css` | Sólo v2; color por clases, cero HEX en código |
+| `src/lib/artifact-composer/catalogs/insights-deck/` (1280×720) | Catálogo `deck_pdf`: portada (siempre navy), capítulo, resumen, lectura, plan, narrativa, límites, 4 láminas de figura, contraportada; `deck-editorial.css` | Ídem |
+| `src/lib/artifact-composer/__tests__/insights-catalogs-v2-only.test.ts` | Guarda | Falla si reaparece una plantilla legado |
+| `src/lib/artifact-composer/catalogs/insights-shared/figure-svg.ts` | Geometría pura: `niceAxis`, `groupedColumnsSvg`, `lineChartSvg`, `wrapLabel` (hasta 3 líneas; la figura crece), cajas `REPORT_/DECK_COLUMNS_BOX`, `REPORT_/DECK_LINES_BOX`, `FigureDataError` | Sin DOM ni navegador; test `insights-figure-geometry.test.ts` |
+| `src/lib/artifact-composer/catalogs/insights-shared/figure-hooks.ts` | `makeColumnsHook`, `makeLinesHook`, `withDeckFigureSize` (132/112/104 px por largo de la cifra) | El hook dibuja; la plantilla no calcula |
+| `src/lib/artifact-composer/catalogs/insights-shared/layout-hooks.ts` | `chapterNumeralHook`, `coverSatellitesHook`, `narrativeDropCapHook` | Capitular sólo con párrafo de ≥ 3 líneas |
+| `src/lib/artifact-composer/catalogs/insights-shared/editorial-resolvers.ts` | Resolvers `report-`/`deck-`: `icon`, `delta-tone`, `pair-bars`, `bullet-row`, `line-role` | `delta-tone` = dirección, no juicio; zona de atención sólo desde `band` |
+| `src/lib/efeonce-insights/render/figure-slots.ts` | Regla de familia, `FIGURE_CAPACITY`, `FIGURE_CONTENT_TYPE`, `balancedPages`, `buildFigureSlides`, `readingFor` | Familia sin página → `InsightsRenderRejectedError`; sin hechos suficientes, no se emite |
+| `src/lib/efeonce-insights/render/report-mapper.ts`, `insights-deck-mapper.ts` | Consumen `figure-slots.ts`; resumen «Lo esencial»; portada según `plan.cover` | Lectura desde `chapter.readings`; sin lectura, primer hecho + afirmación |
+| `src/lib/efeonce-insights/render/cover.ts` | `orgLogoRef` (`asset-ref:org-logo:<id>`), `coverPage`, canales de la portada | El logo viaja como referencia sellada, nunca como bytes en el plan |
+| `src/lib/storage/greenhouse-assets.ts` | `readOrganizationLogoForRender` | Sólo el logo adjunto de esa org, imagen, ≤ 2 MB, con access log |
+| `services/artifact-worker/consumers/insights.ts`, `consumer-contract.ts`, `main.ts`, `classify-failure.ts` | Entrega de bytes vía `externalAssets`; logo no incrustable = `semantic_rejected` | Sin bytes, falla cerrado |
+| `src/lib/artifact-composer/render.ts` | Espera `img.decode()` antes de capturar | A/B: no mueve `deck-axis` ni SKY |
+| `src/lib/artifact-composer/contracts.ts`, `synthesize.ts` | `example?` en slot y campo; el probe lo usa tal cual | Dato del catálogo, no del motor (runbook `composer-visual-gate.md` §4bis) |
+| `src/lib/copy/insights.ts` | Copy de figuras, resumen y portada | SSOT del copy del dominio |
+| `scripts/insights/canvas-fidelity.ts` + `canvas-fixtures/{report,deck}` | Gate de fidelidad al canvas (`--gray`), criterio ≤ 1 %, `approvedException` | Excepción sólo con aprobación del operador |
+| `scripts/insights/preview-edition.ts` | Preview local `--editorial-v2` con el lector del worker | Única escritura: access log |
+| `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` | Deltas g, h, i, j | 27 frames Insights a 0 px |
+
+**Verificación.** `pnpm insights:canvas-fidelity`: 20/21 dentro de ≤ 1 %, `Deck-Agrupadas` 2,2 % con excepción
+aprobada (2026-09-25). `pnpm composer:visual-gate --catalog=insights`: 27 frames a 0 px. `ui:quality` PASS 4,59.
+Ediciones reales locales: Berel `EO-INS-000019` (16 páginas / 13 láminas) y Sky `EO-INS-000022` (12 / 9).
+
 ## 9. Verificación realizada
 
 | Capa | Evidencia | Fuente |
@@ -630,6 +693,10 @@ en 2026-07/08); se ejercitó el camino «sin datos declarados», no el de un cli
 | Cloud Run `efeonce-mcp-gateway` | v1.5.0, provider `greenhouse-insights`, 47 tools | Rev `00053-dsk` al 100 % | `efeonce-mcp/README.md`; facts file |
 | Entra (tenant Efeonce) | scope `efeonce.mcp.insights.write` en «Efeonce MCP Resource» | Creado; sin clientes que lo porten | facts file |
 | Greenhouse manifest/skills MCP | 51 tools + skill `efeonce-insights` | En `develop` y `main` | artefactos generados |
+| Vercel `staging` + `ops-worker` (TASK-1848, 2026-09-18) | `INSIGHTS_SHARING/DELIVERY/SCHEDULES/ISSUANCE_ENABLED=true` en staging; `ops-worker` con DELIVERY/SCHEDULES/GENERATION | Canary sintético completo (`EO-INS-000015`); el operador confirmó la llegada de los dos correos | TASK-1848 Delta 2026-09-18 |
+| Vercel `Production` (TASK-1848) | release `bda1cf2cd938` (PR #238, orquestador `35349506106`, `released` 13:41Z) | Código vivo, **flags OFF** (sharing/delivery/schedules/emisión) hasta TASK-1875; canary: crear enlace ⇒ 503 `sharing_disabled`, token inexistente ⇒ 404, sin token ⇒ 401 | TASK-1848 Delta 2026-09-18 |
+| Cloud Run `efeonce-mcp-gateway` (TASK-1848) | v1.7.0, 58 tools | Rev `00055-gk6` al 100 %; canary del provider contra producción verde | TASK-1848 Delta 2026-09-18 |
+| `develop` local (TASK-1889, 2026-09-25) | catálogos premium v2 (`insights-report`, `insights-deck`), regla de familia, portada con logo del cliente | **Sin push**: ni staging, ni Job `artifact-worker`, ni producción. Rollout: staging con `INSIGHTS_EDITORIAL_V2_ENABLED` → release (Job único staging/prod) → aprobación de PDFs reales → edición interna en producción | §8.z; arquitectura §14.9 |
 | Ledgers | `FEATURE_FLAG_STATE_LEDGER.md` (3 filas + snapshot), `PRODUCTION_RELEASE_TIMING_LEDGER.md` (fila del release) | Al día | líneas 249–251, 383–385; línea 78 |
 
 ---
@@ -642,8 +709,8 @@ en 2026-07/08); se ejercitó el camino «sin datos declarados», no el de un cli
 | Emisión | `INSIGHTS_ISSUANCE_ENABLED` OFF; el puerto (real desde 2026-09-16) responde `not_ready` mientras falte un output `completed` de la misma audiencia; `insights.edition.issued` nunca se ha publicado | rollout de TASK-1846 + policy EPIC-046 P01 |
 | IA de autoría | `INSIGHTS_AUTHORING_AI_ENABLED` OFF; todos los planes existentes son `deterministic` | medir costo/tokens en staging antes |
 | UI del portal (biblioteca, encargo, revisión) | no existe; sólo API/MCP | TASK-1849 |
-| Vista web compartida | resolver `InsightWebModelV1` + proxy (TASK-1848) y render en Think (TASK-1849/1875) sin código | EPIC-045 |
-| Share/delivery/schedules | `insightSharePort = { implemented: false }` | TASK-1848 |
+| Vista web compartida | resolver `InsightWebModelV1` + proxy **existen desde TASK-1848 (en producción con flag OFF, 2026-09-18)**; el render en Think no tiene código | TASK-1875 |
+| Share/delivery/schedules | **Actualizado 2026-09-18:** construidos y en producción con flags OFF (release `bda1cf2cd938`, §8.y); faltan in-app/Teams, `portal_link`, recordatorios/preferencias/baja y ISSUE-174 → TASK-1876 | TASK-1849, TASK-1875, TASK-1876, TASK-690–693 |
 | Grant del scope `insights.write` a clientes MCP | `create_insight_edition` por el gateway ⇒ `insufficient_scope` | consentimiento/grant gobernado |
 | Ensayo de `migrate:down` | ejecutado 2026-09-16 00:24–00:25Z con el Down definitivo (down OK, readback, up OK, readback; canaries posteriores `EO-INS-000002` staging / `EO-INS-000003` producción) | cerrado (§4.8) |
 | Sesión MCP con token humano | `tools/list` desde un cliente real (evidencia de 47 tools + skill) no obtenida | pendiente para `complete` |

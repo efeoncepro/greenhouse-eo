@@ -1,0 +1,60 @@
+[
+  {
+    "id": "b2-primero-el-numero-916",
+    "dominante": [
+      "Cerrarlo es otra cosa."
+    ],
+    "ratioDominanteEntrada": 3.5,
+    "contraste": {
+      "entrada": 19.88,
+      "dominante": 19.98,
+      "cierre-frase": 20.09,
+      "nota": 20.18,
+      "cta": 11.12,
+      "descriptor": 20.39,
+      "logo": 2.44
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 17,
+        "ratioDominante": 0.135
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 15,
+        "ratioDominante": 0.119
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "b2-primero-el-numero-169",
+    "dominante": [
+      "Cerrarlo es otra cosa."
+    ],
+    "ratioDominanteEntrada": 3.5,
+    "contraste": {
+      "entrada": 19.16,
+      "dominante": 19.16,
+      "cierre-frase": 19.31,
+      "nota": 19.44,
+      "cta": 10.74,
+      "descriptor": 19.71,
+      "logo": 19.35
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 15,
+        "ratioDominante": 0.116
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 15,
+        "ratioDominante": 0.116
+      }
+    ],
+    "seleccion": null
+  }
+]

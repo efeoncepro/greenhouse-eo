@@ -150,3 +150,26 @@ tiene pero no recupera sin que se la pidan.** De ahí sale la regla editorial vi
 - **Qué pasó después:** abierto. La próxima pregunta es si el diferencial ciego debería ser el gate
   de nacimiento de cualquier skill nueva de la casa, no solo de ésta.
 
+### [2026-09-19] · Lenguaje fotográfico de marca propia · Efeonce interno
+
+- **Sujeto:** Efeonce cliente interno.
+- **Brief:** que una foto de Efeonce, por su escena y su colorimetría, se sienta de la agencia y la muestre premium,
+  como se vende.
+- **Tensión:** agencia creativa y sistema de crecimiento a la vez; ni consultora de post-its ni dashboard sin idea.
+- **Territorio elegido:** «El oficio a la vista»: la obra y el oficio de cada servicio, el sistema o dato y personas
+  decidiendo; firma con primer plano planeado y logo al 15%; azul = la casa, naranja = la idea, lima = el resultado.
+- **Territorios descartados:** grade «Navy Shadow» (el operador prefirió color natural); V2 de salas tonales con gente
+  en mesas («muy muy genérico»); anti-IA con desorden y manchas («tanto desorden y suciedad tampoco se ve bien»);
+  UI determinística pegada (sólo sirve como referencia para curar); serie cargada de pintura (se leía como un cliente
+  real); logo al 20% (se leía como sello).
+- **Intocables declarados:** SVG oficial compuesto, tono del lecho declarado, un solo acento por pieza, sin grade.
+- **Peldaño Ladder:** sin evaluar formalmente.
+- **Veredicto de efectividad:** no medido; falta la prueba de reconocimiento.
+- **Veredicto de craft:** aprobado por el operador («todas me gustaron»), con dos ángulos de Nexa destacados.
+- **Decisión:** va — decidió Julio Reyes.
+- **Divergencia:** ninguna registrada.
+- **Qué aprendimos:** el impacto vino de la luz y la composición, no del modelo; la firma sólo se ve natural si el
+  primer plano se planea desde la toma y su tono se declara; y una serie de marca propia se contamina rápido con la
+  categoría de un cliente si nadie vigila la variedad de industrias.
+- **Qué pasó después:** abierto. Pendientes: espacio para texto, 9:16 y 16:9, prueba de reconocimiento. Fuente:
+  [lenguaje fotográfico V1](../../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md).

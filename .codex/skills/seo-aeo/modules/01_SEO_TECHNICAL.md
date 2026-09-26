@@ -4,7 +4,7 @@
 > sitemaps, canonicalización, datos estructurados (JSON-LD), arquitectura de
 > sitio, y **gestión de crawlers de IA** (robots para GPTBot/ClaudeBot/etc.).
 > Sello base: as-of 2026-06; delta GSC/API verificado 2026-07-18; cambio de
-> extracción JSON-LD de Google verificado 2026-08-21; FAQ y Home metadata 2026-08-30. Reverifica umbrales CWV,
+> extracción JSON-LD de Google verificado 2026-08-21; FAQ y Home metadata 2026-08-30; Search Console Web multimodal 2026-09-24. Reverifica umbrales CWV,
 > lista de bots, parsers y features de Search Console con WebSearch.
 
 ## Mapa mental: la técnica habilita las 3 capas
@@ -69,6 +69,14 @@ ALT, contexto/caption, dimensiones, GET/MIME y crawlability. El texto convertido
 indexable. Mantener un raster representativo separado para featured, Open Graph, Twitter y schema de Article.
 Para infografías complejas, usar ALT breve + descripción larga equivalente. Carga
 `../references/editorial-image-seo.md` para el contrato completo.
+
+**Medición visual en Search Console (delta 2026-09-24):** usa el filtro
+`Web: multimodal` para aislar resultados web donde la búsqueda incluyó una
+imagen (Lens, Circle to Search, subida a Search o “Search this image” en Chrome).
+Está en despliegue global y puede no mostrar datos todavía. Este filtro describe
+el modo de búsqueda, no un diagnóstico de indexación ni una atribución de causa;
+el proceso de comparación y las limitaciones de API están en
+`07_MEASUREMENT.md`.
 
 ## 3. Rendering (JavaScript SEO)
 

@@ -170,6 +170,11 @@ de varias pantallas o un paquete de variantes. No dividir la tarea canónica del
 fórmulas para simular cantidades. Si se necesitan archivos individuales, acordar primero la unidad
 de conteo y un campo de cantidad con su agregación; es un cambio de esquema distinto del etiquetado.
 
+🔴 **El rollup no es el conteo del cupo.** En septiembre de 2026 la reconstrucción del rollup daba 102 piezas, y el
+conteo por archivo daba otra cifra según cada criterio: tareas sin tipo/canal, archivadas que seguían etiquetadas
+y canales mal puestos lo desvían en los dos sentidos. El operador cuenta por **archivo**. Método, criterios y
+errores de etiquetado típicos: [módulo 15](15_DISTRIBUCION_SELECTIVA.md#conteo-del-cupo-mensual--método-verificado-2026-09-19).
+
 ### Obligatorio al crear tareas — confirmación del operador 2026-09-03
 
 Cada tarea de banner, secuencia de fotos o derivado social nace con `Tipo de pieza` y
@@ -268,7 +273,7 @@ sensible vive en Efeonce con acceso privado comprobado.
   pierde el texto que va después**. Por eso los titles del tipo `Tema` + separador + `Marca` van en
   viñetas, no en tabla.
 - Evitar los símbolos `<`, `≤` y `~` sueltos en el cuerpo: escribirlos en palabras — "menos de
-  50 g/L", "hasta 200 KB", "más de 60.000 ciclos".
+  50 g/L", "hasta 200 KB", "más de 60,000 ciclos" (en México el punto es decimal y la coma separa miles).
 - **Cuando el símbolo sí va** —datos de ficha técnica, donde la prosa estorba— **escápalo a mano**:
   `\>` y `\<`. Así se escriben `\> 60,000 ciclos` y `\< 50 g/L`.
 - **`\#Berel` lleva su barra a propósito.** Sin ella Notion lee el hashtag como **encabezado** y te
@@ -280,6 +285,9 @@ sensible vive en Efeonce con acceso privado comprobado.
   también a los **hijos de un `<callout>`**. Nadie te va a avisar: la única defensa es releer el
   markdown guardado y el render, y confirmar que el contenido sigue dentro del toggle. En reemplazos
   anclados, la línea nueva debe conservar explícitamente el tabulador de la línea reemplazada.
+- 🔴 **En una inserción de varias líneas, cada línea lleva su propio tabulador.** En `update_content`, todo lo que
+  sigue a un `\n` dentro de `new_str` empieza con los `\t` de su nivel (`\n\t- …`). Una sola línea sin tabulador sale
+  del toggle aunque la API responda `success`; pasó en vivo el 2026-09-19 (módulo 18).
 - **Notion canoniza parte del formato al guardar** (tablas, autolinks, escapes, negritas pegadas a
   código o a enlaces — inventario abajo). Son cosméticos **para el lector, NO para el editor**:
   🔴 **el texto guardado ≠ el texto que enviaste.** **Antes de cualquier edición
@@ -319,6 +327,12 @@ reemplazos pequeños el bloque vigente que el cliente está revisando, sin borra
 
 El contrato completo y el criterio `atendido ≠ resolved` viven en
 [`18_REVISION_COMENTARIOS_CLIENTE.md`](18_REVISION_COMENTARIOS_CLIENTE.md).
+
+**Revisión amplia (2026-09-19):** si la ronda cambia el criterio de toda la pieza, no se reescribe la V1. Se renombra
+su encabezado a `🗄️ Histórico · Artículo V1` —sus bloques y sus hilos no se tocan— y se crea debajo
+`✍️ Versión vigente para revisión · V2`. El orden de primer nivel queda: evidencia (research/plan) →
+`🗄️ Histórico · Artículo V1` → `✍️ Versión vigente para revisión · V2` → `🗒️ Notas internas de producción`.
+Procedimiento, comentario de estado final y lentes adversariales: módulo 18.
 
 ### Los artefactos de serialización, uno por uno
 

@@ -228,6 +228,12 @@ Definir `P` principales editoriales (artículos + tutoriales), `B` tareas de ban
 - Subítems sociales activos/reservados: **`S`**, con pares verificados `S/S`.
 - Cancelados/archivados históricos se conservan y reportan aparte; las filas físicas pueden ser más.
 - Son tareas/paquetes, no archivos entregados ni una modificación de fórmulas Notion.
+- El cupo contractual se cuenta **por archivo**, con cuatro criterios, sin material de marca de Berel y sin fiarse
+  del rollup; el excedente se descuenta de los meses siguientes → [módulo 15](15_DISTRIBUCION_SELECTIVA.md#conteo-del-cupo-mensual--método-verificado-2026-09-19).
+- **Enero, febrero y marzo de 2027 se planean con cupo reducido** mientras Berel no diga otra cosa: artículos
+  6 / 7 / 7 y 35 gráficas por mes, **sin videos en el cupo** (cortesía terminada en diciembre de 2026). Es el descuento
+  estimado del excedente septiembre–diciembre, pendiente de aceptación de Berel y de confirmar al cierre de diciembre:
+  antes de abrir cada proyecto, releer el balance vigente en el módulo 15 (§Balance septiembre–diciembre 2026).
 
 ## 11 · Fase 9 — Íconos
 

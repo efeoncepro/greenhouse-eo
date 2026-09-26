@@ -60,14 +60,19 @@ export const runSelftest = async (): Promise<void> => {
   const packDir = path.resolve(deckAxisCatalogDir, '../../brand-packs/axis')
 
   const fontsManifest = JSON.parse(await fs.readFile(path.join(packDir, 'fonts.json'), 'utf8')) as {
-    fonts: Array<{ family: string; weight: number; style: string; file: string; sha256: string }>
+    fonts: Array<{ family: string; weight: number; style: string; file: string; sha256: string; extension?: string }>
   }
 
-  if ((seal.fonts?.length ?? 0) !== fontsManifest.fonts.length) {
-    fail('font seal', `el seal declara ${seal.fonts?.length ?? 0} fuentes y fonts.json ${fontsManifest.fonts.length}`)
+  // deck-axis adopta sólo las fuentes BASE del pack. Las de extensión (hoy `editorial`, Poppins 500, TASK-1889)
+  // llegan únicamente a los catálogos que las piden (`packExtensions` en compile-catalog-tokens.ts): comparar el
+  // seal de deck-axis contra el pack completo rompió el deploy del worker (13 ≠ 14) sin que faltara nada.
+  const deckAxisFonts = fontsManifest.fonts.filter(font => !font.extension)
+
+  if ((seal.fonts?.length ?? 0) !== deckAxisFonts.length) {
+    fail('font seal', `el seal declara ${seal.fonts?.length ?? 0} fuentes y fonts.json ${deckAxisFonts.length} fuentes base`)
   }
 
-  for (const font of fontsManifest.fonts) {
+  for (const font of deckAxisFonts) {
     // Las fuentes viven duplicadas pack+catálogo (sync por composer:brand-pack); el render las
     // carga del CATÁLOGO — se verifica esa copia, que es la que Chromium usa.
     const fontPath = path.join(deckAxisCatalogDir, 'fonts', path.basename(font.file))
@@ -86,7 +91,7 @@ export const runSelftest = async (): Promise<void> => {
     }
   }
 
-  ok('font pack íntegro', `${fontsManifest.fonts.length} fuentes verificadas por checksum (catálogo)`)
+  ok('font pack íntegro', `${deckAxisFonts.length} fuentes base verificadas por checksum (catálogo)`)
 
   // 4 · Chromium + render real de una lámina probe (mismo camino que el gate visual: fillSlide
   //     + screenshot, sin assert de fit — el probe no es contenido real).

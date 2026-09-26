@@ -1,0 +1,9 @@
+{
+  "id": "design-context-v3-02-ingredientes",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "cenital",
+  "escena": "SCENE (Efeonce creative studio, Santiago, late afternoon): a true overhead 90-degree photograph of a working creative workbench, at the exact moment a real hand places one campaign proof beside a deep brushed-steel mixing bowl slightly right of centre. Four physical design ingredients are arranged as separate, readable objects around it: a folded handwritten brief turned away so its words cannot be read; a small set of official-looking but unbranded paper identity and product references; a contact sheet of real campaign photography; and three paper format frames in distinct proportions (portrait, square, vertical story) laid flat. A small azure-blue color chip is a real design asset near the bowl; one orange paper sample sits beside it. The upper 18% of the tabletop is a broad, uncluttered warm-neutral paper surface reserved for a short comic narrator caption in dark ink. Ordered and intentional, not scattered like confetti, no face, no screen UI, no legible text, no logos. Warm-neutral daylight from the upper left, real paper grain and metal texture, hard-edged but natural shadows, a calm cream and ink work surface with three depth planes. The objects must be large enough to crop into separate close comic panels. This is a photographed real set, not a drawn infographic or an illustration. No fantasy magic, no smoke, no glow, no cartoon props, no lettering or graphic effects added to the plate.",
+  "lecho": { "objeto": "the dark near edge of the ink workbench along the lower foreground", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "uncluttered warm-neutral paper surface across the upper edge of the overhead table", "tinta": "oscura" } }
+}

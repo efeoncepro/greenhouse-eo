@@ -1,0 +1,30 @@
+{
+  "decision": "pass_for_single_full_restoration",
+  "reviewed": {
+    "pairedFrames": 16,
+    "intervalSeconds": 0.25,
+    "rangeGlobalSeconds": [
+      8.25,
+      12.0
+    ],
+    "fullSize": [
+      "ui",
+      "aircraft-close"
+    ]
+  },
+  "findings": [
+    "Sharper SKY chip contour and lettering than native source",
+    "Aircraft cockpit, windows, fuselage and wing geometry preserved in inspected images",
+    "Cloud contours gain definition",
+    "Motion blur remains; no claim of recovering original native detail",
+    "Mild enhanced texture is visible on interface surface; no observed changed letter or layout in inspected images"
+  ],
+  "output": {
+    "width": 2160,
+    "height": 3840,
+    "fps": 24,
+    "frames": 96,
+    "seconds": 4
+  },
+  "limitation": "Sampled visual comparison; full restored film still requires review."
+}

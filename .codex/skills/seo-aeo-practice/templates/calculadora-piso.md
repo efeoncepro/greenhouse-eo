@@ -16,7 +16,7 @@
 | Otros | | % | | |
 | **TOTAL** | | **__% ≈ __ FTE** | | **$ ______** |
 
-**Referencia real (SKY, 2026-07):** 2,2 FTE → **CLP 2.260.000/mes** ≈ **CLP 1.027.000 / USD 1.105 por FTE-mes.**
+**Referencia real (SKY, oferta original 2026-07; la configuración adjudicada el 2026-09-23 es otra):** 2,2 FTE → **CLP 2.260.000/mes** ≈ **CLP 1.027.000 / USD 1.105 por FTE-mes.**
 
 ## 2. El piso
 

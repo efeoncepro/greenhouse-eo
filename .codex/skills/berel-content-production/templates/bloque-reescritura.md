@@ -3,6 +3,9 @@
 > Crear un único desplegable `✍️ Versión vigente para revisión`, **debajo** de lo que ya exista y
 > sin borrar historia. Renombrar las versiones anteriores como `🗂️ Histórico — ...` cuando haga falta
 > distinguirlas. Norma: `../modules/03_REDACCION_ARTICULO.md`.
+> Tras una revisión amplia por comentarios: la nueva zona se titula `✍️ Versión vigente para revisión · V2`, va
+> debajo de la V1 y la V1 solo cambia su encabezado a `🗄️ Histórico · Artículo V1` (`../modules/18_REVISION_COMENTARIOS_CLIENTE.md`).
+> En una inserción de varias líneas, cada línea lleva su propio tabulador.
 > 🔴 La zona editorial vigente contiene metadatos aprobables, copy público final y las specs visuales
 > contextuales obligatorias. Los toggles hermanos de evidencia permanecen fuera de este bloque.
 
@@ -49,7 +52,9 @@ con notas internas ni agruparlas en un anexo.** Antes de pasar a revisión, sust
 ## Antes de cerrar
 
 - [ ] Cada enlace **navegado y verificado**; ninguno 404 ni solo búsqueda
-- [ ] Productos a página pública; colores a paleta/artículo o familia; **nunca** a la búsqueda del sitio
+- [ ] Productos a página pública; colores a paleta/artículo o familia (familias rotas → `/colores`); **nunca** a la búsqueda del sitio
+- [ ] Enlaces internos como ruta relativa (`/articulos/...`); piezas que salen el mismo día, enlazadas como vivas
+- [ ] Español mexicano estándar: sin jerga traducida, un «nuestro» por bloque, fórmulas no repetidas entre piezas (módulo `04`)
 - [ ] Anchors descriptivos, **nunca la URL cruda** como texto visible
 - [ ] Ningún RGB/HEX y ninguna serie de producto en el cuerpo
 - [ ] Temperatura de luz con la fórmula **adjetivo + Kelvin** en **todas** las menciones

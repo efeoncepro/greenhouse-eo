@@ -109,6 +109,30 @@ bio consistente, `sameAs` del autor, presencia en su campo (charlas, papers,
 prensa), schema `Person` con `jobTitle`/`knowsAbout`/`alumniOf`. Un autor
 reconocido eleva el E-E-A-T de todo lo que firma.
 
+### Cuando el cliente no quiere que firme una persona: autoría institucional
+
+> As-of 2026-09-19. Caso fuente: campaña anual de un fabricante mexicano de pintura; el cliente pidió que
+> ninguna persona firmara las piezas (registro:
+> `docs/audits/seo/BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md`, delta de la ronda 3).
+
+Recomendar un autor con nombre sigue siendo lo mejor para E-E-A-T, pero es **decisión del cliente**. Si la
+rechaza, no se insiste pieza por pieza ni se inventa una persona. Se publica como **autoría institucional
+real**:
+
+- **Schema:** `author` y `publisher` son la misma `Organization` (mismo `@id`), con el nombre legal o comercial
+  de la marca y `url` a su página «quiénes somos». El byline visible dice el mismo nombre.
+- 🔴 **Un nombre colectivo tipado como `Person` es un error, no una solución.** «Equipo Editorial <Marca>» como
+  `Person` declara una persona que no existe. Si el sitio ya lo hace, la decisión institucional se aprovecha para
+  corregir ese nodo en el origen (plantilla o perfil global), no solo en la pieza nueva.
+- **La experiencia se demuestra en el cuerpo, no en la firma.** Expertos invitados identificados por su
+  disciplina (y por nombre solo si el cliente lo autoriza); datos de fichas técnicas con su versión o revisión;
+  método visible (cómo se armó la pieza, qué fuentes se usaron); página «quiénes somos» y estándares editoriales
+  sólidos. Un experto sin nombre no se modela como `Person` en el schema.
+- **Consistencia de entidad:** la misma autoría en todas las piezas del conjunto. Mezclar `Person` en unas y
+  `Organization` en otras parte la entidad.
+- **Registrar la decisión** en el brief o el Content Hub, con fecha y fuente, para que nadie la «corrija»
+  después de vuelta a una persona.
+
 ## YMYL — el listón alto (finanzas, salud, legal, seguridad)
 
 **YMYL** = *Your Money or Your Life*: contenido que puede impactar salud,
@@ -136,7 +160,9 @@ es YMYL. El listón:
 2. Pregunta a ChatGPT/Perplexity/Gemini "¿qué es {marca}?": ¿responden? ¿es
    correcto? ¿qué fuentes citan? (esto es oro: te dice qué "sabe" la IA de ti).
 3. Revisa `sameAs` y consistencia de perfiles.
-4. Revisa autoría: ¿hay byline real con credenciales? ¿schema `Person`?
+4. Revisa autoría: ¿hay byline real con credenciales? ¿schema `Person`? Si la
+   autoría es institucional, ¿es una `Organization` real y no un colectivo tipado
+   como `Person`?
 5. Revisa reputación off-site (reseñas, prensa, menciones).
 6. ¿Wikidata existe y es correcta?
 

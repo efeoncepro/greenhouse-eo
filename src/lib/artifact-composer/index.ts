@@ -7,12 +7,23 @@
  * ADR: `docs/architecture/GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md`.
  *
  * Reglas del paquete (nace package-shaped, extraction-ready para EPIC-027):
- *   - Los consumers importan SOLO desde este barrel (o desde el barrel de un catálogo bajo
- *     `catalogs/<nombre>`) — cero deep-imports a los internals del motor.
+ *   - El paquete tiene DOS entradas públicas (ISSUE-177, 2026-09-22), como dos subpath exports de un
+ *     `package.json`:
+ *       · este barrel — el motor COMPLETO (render en Chromium, pdf-lib, catálogos, quality gates). Lo
+ *         importan con valores sólo el worker (`services/artifact-worker`), los scripts y los tests.
+ *         Desde `src/` (código que puede terminar en una función de Vercel) sólo se importan TIPOS.
+ *       · `./pure` — el subconjunto liviano (paginación, geometría, figura de barras, hash del
+ *         manifest y tipos) para encolar, mapear y sellar desde Vercel sin arrastrar el motor.
+ *     Un valor de este barrel en código de Vercel llevó una función a 441 MB (límite 250 MB).
+ *   - Cero deep-imports a los internals del motor desde consumers: se importa desde una de las dos
+ *     entradas (o desde el barrel de un catálogo bajo `catalogs/<nombre>`, que sólo cargan el worker,
+ *     los scripts y los tests). En `src/**` lo hace cumplir la regla eslint
+ *     `greenhouse/no-worker-only-module-in-vercel-code`, que rechaza todo deep-import —incluso de tipos—
+ *     y todo valor de este barrel.
  *   - El motor NUNCA importa de un dominio (`commercial/`, `growth/`, …) ni trae Next-isms
  *     (`server-only`). Frontera mecánica: eslint `no-restricted-imports` + el boundary test
  *     `__tests__/package-boundary.test.ts` rompen el build ante una violación.
- *   - Dependencias declaradas del motor: `playwright`, `pdf-lib` y `node:*`. Nada más.
+ *   - Dependencias declaradas del motor: `playwright`, `pdf-lib`, `pngjs` y `node:*`. Nada más.
  */
 
 // El contrato de catálogo (dato, no código del motor) + resolución del plan autorable → manifest
@@ -35,6 +46,7 @@ export {
 
 // El pipeline (valida TODO antes de renderizar NADA + emite según el outputTarget del catálogo)
 export { composeArtifact, TemplateAuthorityError, type ComposeOptions, type ComposeResult } from './compose'
+export { EXTERNAL_ASSET_PREFIX } from './contracts'
 
 // Contratos de plantilla/plan (browser-safe)
 export type {

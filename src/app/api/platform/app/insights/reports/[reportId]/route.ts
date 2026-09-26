@@ -1,5 +1,5 @@
 import { runAppReadRoute } from '@/lib/api-platform/core/app-auth'
-import { getAppInsightReport } from '@/lib/api-platform/resources/app-insights'
+import { getAppInsightReport } from '@/lib/api-platform/resources/app-insights-read'
 
 export const dynamic = 'force-dynamic'
 

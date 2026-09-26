@@ -36,6 +36,7 @@ import { loadGreenhouseMcpSkillCatalogFromFilesystem, observeGreenhouseMcpSkillF
 import {
   buildGreenhouseMcpSkillUri,
   computeGreenhouseMcpSkillCoverage,
+  GREENHOUSE_MCP_SKILL_EXTERNAL_PROVIDERS,
   GREENHOUSE_MCP_SKILL_MANIFEST,
   GREENHOUSE_MCP_SKILLS_ROOT,
   type GreenhouseMcpSkillManifestEntry
@@ -69,12 +70,28 @@ describe('manifiesto de manuales MCP — el repo real (TASK-1804)', () => {
     }
   })
 
-  it('toda tool gobernada existe en el manifiesto de tools', () => {
+  it('toda tool gobernada existe en el manifiesto de tools de su proveedor', () => {
     for (const entry of GREENHOUSE_MCP_SKILL_MANIFEST) {
       for (const tool of entry.appliesTo) {
-        expect(GREENHOUSE_MCP_TOOL_MANIFEST_BY_NAME.has(tool), `${entry.name} gobierna ${tool}`).toBe(true)
+        if (entry.provider) {
+          // Proveedor externo (TASK-1890): su manifiesto vive en su repo; aquí sólo el espacio de nombres. El gateway
+          // verifica la existencia contra el artefacto sincronizado (TASK-1891).
+          expect(tool.startsWith(GREENHOUSE_MCP_SKILL_EXTERNAL_PROVIDERS[entry.provider].toolPrefix), `${entry.name} gobierna ${tool}`).toBe(true)
+        } else {
+          expect(GREENHOUSE_MCP_TOOL_MANIFEST_BY_NAME.has(tool), `${entry.name} gobierna ${tool}`).toBe(true)
+        }
       }
     }
+  })
+
+  it('un manual de proveedor externo con una tool fuera de su espacio de nombres falla la cobertura', () => {
+    const findings = computeGreenhouseMcpSkillCoverage({
+      manifest: [{ name: 'x-provider', audience: 'internal', sourcePath: 'docs/mcp/skills/x-provider/SKILL.md', provider: 'marketing-studio', appliesTo: ['get_seo_keyword_gap'] }],
+      files: [{ sourcePath: 'docs/mcp/skills/x-provider/SKILL.md', frontmatterName: 'x-provider', frontmatterDescription: 'd' }],
+      tools: []
+    })
+
+    expect(findings.map(f => f.code)).toContain('applies_to_unknown_tool')
   })
 
   it('toda tool que compromete presupuesto está gobernada por seo-spend-discipline', () => {

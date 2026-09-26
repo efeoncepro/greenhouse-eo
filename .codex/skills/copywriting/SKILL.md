@@ -227,6 +227,8 @@ capacidad y derechos no se esconden dentro de ella. Fuentes:
 - **Idioma:** por defecto **es-CL neutro, tuteo** (puedes/quieres/dime), **sin voseo**
   (nunca podés/querés). Todo ejemplo de craft nace en es-CL salvo pedido en inglés. Para
   clientes Globe internacionales, transcreación es-CL/en-US (no traducción literal) → `06`.
+  Para un cliente de otro mercado hispano (p. ej. México), variedad estándar de ese país, sin
+  coloquialismos → `efeonce/BILINGUAL_CRAFT.md`.
 - **Entrega:** el copy + una nota de *por qué* (qué framework, qué nivel de consciencia,
   qué se editó). No entregues palabras sin el pensamiento detrás.
 - **Router de voz:** copy institucional, producto, UI, propuestas y piezas sin byline personal
@@ -284,3 +286,70 @@ para el mensaje y para la marca por separado. No presentar una heurística como 
 Para continuidad entre planos, saludo de cierre, emisor y caption por red, cargar
 [seasonal storytelling and caption](references/seasonal-storytelling-and-caption.md). Separar texto
 intra-pieza, portada y cuerpo de publicación; verificar el copy literal al programar.
+
+## Campañas — el brief manda
+
+🔴 **Si la pieza pertenece a una campaña, lee su `BRIEF.md` ANTES de producir.** Vive en OneDrive
+`Alineación/2. Campañas/CMP-###_…`. Gobierna **la promesa, lo que NO se promete, la audiencia y su job, el
+vocabulario permitido, los destinos, la medición y los límites de uso** — y lo hace **igual para todos los
+canales**, porque una campaña la ejecutan varios agentes en varias sesiones y sin fuente única **diverge sin
+que nadie lo note**.
+
+- **Los assets van a la carpeta de su canal**, nunca a la de campaña; la campaña los referencia por ruta en
+  su `ASSETS.md`, donde hay que **registrar la fila** al sumar una pieza.
+- Si tu pieza necesita una promesa que el brief no tiene, **el brief se actualiza primero** (con el operador).
+- Un brief **crece con aportes de varios agentes**: léelo de nuevo antes de producir, **no de memoria**.
+
+Canon: `docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md`.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+Conservar copy literal por imagen y plataforma, headline, botón nativo, CTA y descriptor en ficha editable.
+Mantener promesa, exclusiones y vocabulario del brief; adaptar expresión al canal sin inventar resultados.
+Identificar qué hook es propuesta, aprobado o descartado; no usar copy de archivo FINAL contra una decisión más nueva.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+Entregar primary_text, titular, descripción opcional, CTA nativo y destino por canal en copy_profiles. Preservar copy literal, conteos y variantes; el texto externo complementa el arte. No editar manualmente HTML/CSV/MD ni incorporar claims o VOC inventados.
+
+
+## Lanzamiento del grader y programación aprobada
+
+Al programar copy aprobado, conservar voz de cada speaker y texto literal; sólo modificar menciones/destino cuando el operador lo autorice. Sintaxis por red y readback: [entrega Metricool](../social-media-studio/references/video-delivery-metricool.md). Las formulaciones BeX se apoyan en SEO/AEO; percepción y operabilidad son ejes distintos, y preferencia es aspiración, no garantía.
+
+## Craft del dominante en un ad (medido en CMP-001, 2026-09-22)
+
+Canon: [CDR-005 · el embudo se ordena por momento y por acción encadenada](../../../docs/campaigns/decisions/CDR-005-cmp001-embudo-momento-y-accion.md).
+Cuatro reglas del titular publicitario que la teoría de headlines no cubre.
+
+🔴 **Un dato sin referente no es un dato.** «−68%», «+91%», «+35%» sueltos no informan: el lector no sabe si
+es tráfico, ventas o presupuesto. La forma es **magnitud + DE QUÉ** en el dominante **+ EN QUÉ CONDICIÓN** en
+el puente — «−68% en tus clics pagados» / «Cuando Google pone su respuesta arriba, antes de tus anuncios».
+Cada pieza de una serie necesita **su propio referente**: mismo referente con signo opuesto (clics pagados
+−68% / +91%) se lee como contradicción, y eso sólo aparece leyendo la serie junta.
+
+🔴 **Un ad CREA INTERÉS; no maneja objeciones** (§5b — el mismo error de forma medido dos veces). Una práctica
+de venta tiene respuestas honestas a objeciones que construyen confianza **en una conversación**, cuando el
+prospecto ya tiene interés y pregunta si le inflas el caso. Convertidas en titular **minimizan la categoría y
+regalan la venta**: «Te decimos que no.» se lee en un feed como «no te vamos a atender»; «1% del tráfico viene
+de la IA» —verdadero y verificado— le dice al prospecto que el problema que le vendes no importa. **En el ad va
+el dato que abre los ojos; en la reunión va el que matiza:** un ad tiene un segundo y ninguna pregunta previa,
+nadie objetó todavía, así que no hay nada que desactivar. ✅ Prueba antes de aprobar un dominante: *¿este número
+le da MÁS urgencia al lector, o se la quita?* Si se la quita, por verdadero que sea, no va.
+
+🔴 **El tamaño del momento manda sobre su urgencia** (§6). No construyas un ad sobre un momento que le ocurre a
+poca gente, por urgente que sea para quien lo vive: «Migras en enero» paga impresiones a una audiencia que casi
+no existe. ✅ Prueba: *¿cuánta gente de mi segmento está en este momento HOY?* Si el ángulo exige una condición
+agendada (migración, rebrand, lanzamiento), sirve para outbound o nurture, **no para paid**.
+
+🔴 **Audita la serie, no sólo la pieza.** Siete dominantes seguidos salieron todos como negación («No fuiste
+tú», «No te leyó», «Sin tu nombre», «No te citan»): cada uno correcto, juntos el mismo golpe repetido. El tic de
+construcción no se ve pieza por pieza — se ve leyendo la tanda completa de corrido.
+
+**Continuidad** (§1–2): el embudo es una cadena donde la acción de cada etapa **usa** lo que entregó la
+anterior; si pide algo que no necesita el resultado previo, no está en el embudo. Y «mismo mundo, otro ángulo»
+**no es «misma escena»**: repetir la escena es refrito.

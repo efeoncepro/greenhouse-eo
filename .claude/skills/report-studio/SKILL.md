@@ -54,7 +54,7 @@ El resumen debe contestar qué cambió, por qué importa, qué sabemos y qué ha
 
 ### 4. Elegir la dirección visual
 
-Parte de marca, assets y fuentes reales. Compara 2–3 direcciones sólo cuando no exista una dirección aprobada. En una mejora acotada, conserva la composición y corrige el defecto observado. Define tamaño físico, retícula, márgenes del pie, jerarquía y densidad antes de maquetar todo.
+Parte de marca, assets y fuentes reales. Compara 2–3 direcciones sólo cuando no exista una dirección aprobada. En Efeonce existe una referencia de informe premium aprobada el 2026-09-25 (ver el [overlay](references/efeonce-overlay.md)). En una mejora acotada, conserva la composición y corrige el defecto observado. Define tamaño físico, retícula, márgenes del pie, jerarquía y densidad antes de maquetar todo.
 
 Prueba primero una apertura, una página densa y una ficha de acción. Los gráficos deben responder una pregunta; las imágenes deben explicar o aportar evidencia. No generes fotografía ni iconografía decorativa para llenar espacio. Usa una familia real de iconos y registra su procedencia.
 

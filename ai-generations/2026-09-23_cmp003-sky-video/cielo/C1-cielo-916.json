@@ -1,0 +1,17 @@
+{
+  "id": "CMP003-C1-cielo",
+  "formato": "9:16",
+  "impacto": true,
+  "atmosfera": "bruma",
+  "escena": "SCENE (a real photograph taken from high altitude at dawn, above a vast sea of clouds, NOBODY IN FRAME, NO AIRCRAFT): the camera floats at cruising altitude looking slightly toward the rising sun, which sits low on the horizon at the lower-middle of the frame, partly hidden behind a tall bank of cumulus. LIGHT: hard low sunlight rakes across the cloud tops from behind, carving every cloud edge with a bright warm rim and leaving the cloud faces toward camera in cool shadow; visible crepuscular rays fan out from behind the cumulus through a thin haze, all below the middle of the frame. Distant cloud layers recede in aerial perspective to a hazy horizon. BLUE CARRIER: the upper sky deepens from a clean pale blue near the horizon into a deep cobalt blue at the zenith, smooth and calm. THE MOMENT: a thin veil of mist drifts across the middle distance, caught in the rays. 35mm lens at f/8, true photographic perspective, fine natural grain, no lens flare streaks, no rainbow artifacts. No readable text, logos, birds or aircraft anywhere.",
+  "lecho": {
+    "objeto": "the dark underside of a near cloud bank filling the very bottom of the frame, soft and out of focus, in deep shadow away from the sun",
+    "tono": "DARK blue-grey, near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm deep cobalt blue upper sky at the top third of the frame",
+      "tinta": "blanca"
+    }
+  }
+}

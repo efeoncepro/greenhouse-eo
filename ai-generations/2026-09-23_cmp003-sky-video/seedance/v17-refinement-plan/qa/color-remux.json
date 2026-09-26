@@ -1,0 +1,26 @@
+[
+  {
+    "file": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v17-refinement-plan/sky-v17-restored-4k.mp4",
+    "before": {
+      "v": "SHA256=a38e4037d0fcdc92c0f23acf700f9e2902593973f9a3ca7cb410e0c635cd6edd",
+      "a": "SHA256=659c367c4e9484136ce2eb14141ecffc023340f07ac7d5b73f900dc352f543fe"
+    },
+    "after": {
+      "v": "SHA256=a38e4037d0fcdc92c0f23acf700f9e2902593973f9a3ca7cb410e0c635cd6edd",
+      "a": "SHA256=659c367c4e9484136ce2eb14141ecffc023340f07ac7d5b73f900dc352f543fe"
+    },
+    "reencoded": false
+  },
+  {
+    "file": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v17-refinement-plan/sky-v17-restored-1080p.mp4",
+    "before": {
+      "v": "SHA256=487970d39f0c9a957d5c8049151db08e1ffbbb226025fab68a3ce68670d13985",
+      "a": "SHA256=659c367c4e9484136ce2eb14141ecffc023340f07ac7d5b73f900dc352f543fe"
+    },
+    "after": {
+      "v": "SHA256=487970d39f0c9a957d5c8049151db08e1ffbbb226025fab68a3ce68670d13985",
+      "a": "SHA256=659c367c4e9484136ce2eb14141ecffc023340f07ac7d5b73f900dc352f543fe"
+    },
+    "reencoded": false
+  }
+]

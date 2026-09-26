@@ -126,20 +126,29 @@ tenemos — y está sin tocar.** → `modules/13_PROSPECCION.md` §5.
 >
 > | | Qué es | ¿De quién es? |
 > |---|---|---|
-> | 🎯 **SKY — Agencia Creativa** | ✅ **CLIENTE CREATIVO VIGENTE.** Service modules **`agencia_creativa` + `globe`** activos. Squad: **Daniela Ferreira** *(Creative Operations Lead / directora de arte)* + **Melkin Hernández** y **Andrés Carlosama** *(Senior Visual Designers)*. Proyecto ago-2025 → jul-2026 | 🎯 **ESTA práctica** |
-> | **SKY — Blog (Wherex)** | 🔴 **Licitación de SEO/CONTENIDO.** Oferta en curso, no adjudicada. CLP 5,2M/mes · piso 4,6M · loaded 2,26M | 🔴 **`seo-aeo-practice` — NO es de acá** |
+> | 🎯 **SKY — Agencia Creativa** | ✅ **CLIENTE CREATIVO VIGENTE.** Service modules **`agencia_creativa` + `globe`** activos. Squad: **Daniela Ferreira** *(Creative Operations Lead / directora de arte)* + **Melkin Hernández** y **Andrés Carlosama** *(Senior Visual Designers)*. Atiende al **equipo de Performance** de SKY. Proyecto iniciado ago-2025; primer año cumplido y **contrato renovado por un año más** | 🎯 **ESTA práctica** |
+> | **SKY — Blog SEO/AEO (Wherex)** | 🔴 **Servicio de SEO/CONTENIDO.** **Adjudicado 2026-09-23** para el **equipo de Marca** de SKY *(otro comprador)*: CLP 3,0M neto/mes · 24 meses · inicio 2026-11-01. *(Oferta original 5,2M · piso 4,6M · loaded 2,26M = histórica / superseded.)* | 🔴 **`seo-aeo-practice` — NO es de acá** |
 >
 > 🔴 **Los CLP 5,2M, el loaded de 2,26M, el piso de 4,6M y los bugs de precio (ad-hoc, plan dominado,
 > precio unitario) son de la LICITACIÓN DE SEO.** Su dueño es **`seo-aeo-practice/modules/04_PRICING.md`**
 > — así lo declara el propio squad blueprint. **NO son el caso económico de la práctica creativa.**
 >
-> *(El squad del blog incluye roles creativos —diseñador, audiovisual, social— porque un servicio de
-> contenido necesita imágenes y video. **Eso no lo convierte en un servicio creativo.**)*
+> *(El squad de la **propuesta** del blog incluía roles creativos —diseñador, audiovisual, social— porque un
+> servicio de contenido necesita imágenes y video. **Eso no lo convierte en un servicio creativo.**)*
+>
+> **Actualización 2026-09-23:** el blog se **ganó** — es un **segundo servicio para otro equipo de SKY**
+> *(Marca; la Agencia Creativa atiende a Performance)*. El equipo operativo del blog es **Valentina Hoyos**
+> *(Redactora SEO)* más contratación en curso; el mapeo de squad del deck era de la propuesta. 🔴 **No
+> afirmes que el squad creativo atiende el blog** *(no confirmado)* **y no mezcles márgenes ni alcance entre
+> los dos servicios.** 🎯 La historia de expansión *(relación ancla → retainer creativo → segundo servicio
+> comprado por otro equipo)* es prueba de cuenta, no prueba creativa.
 >
 > **Wrapper de experiencia vivo:** `https://experiencia.efeoncepro.com` es el primer **Efeonce Wrapper**
 > anual para un cliente, creado para SKY por su primer año con Efeonce. Sirve como memoria/retención y
-> prueba de dirección para `"Tu año con Efeonce"`; NO convierte automáticamente a SKY en caso público
-> citable sin autorización escrita.
+> prueba de dirección para `"Tu año con Efeonce"`. **Actualización 2026-09-23: ahí está PUBLICADO el caso
+> creativo de SKY** con métricas de entrega *(+2.000 piezas · 39 campañas · 88% on-time · 0,12 ajustes/pieza ·
+> 5 mercados · −25% tiempo de producción)*. Son métricas de **delivery, no de negocio**, sin baseline del día 0;
+> citarlo **fuera del wrapper** exige autorización escrita que aún no está verificada.
 
 ### 🎯 EL CASO ECONÓMICO DE REFERENCIA DE LA PRÁCTICA — SKY Agencia Creativa
 
@@ -171,6 +180,9 @@ tenemos — y está sin tocar.** → `modules/13_PROSPECCION.md` §5.
 
 1. **La dedicación REAL de cada uno.** *(Si no están al 100% en SKY, el costo baja y el margen mejora.
    Si están al 100% y además cubren otras cuentas, hay sobre-asignación.)* → `greenhouse-ico` / capacity.
+   **Actualización 2026-09-23 (cualitativa):** SKY es la **cuenta principal** del squad; también atiende
+   otras cuentas *(p. ej. Grupo Berel)* con **dedicación mucho menor**. Falta el porcentaje medido —
+   **no se estima**.
 2. 🩸 **Qué incluye `loaded_monthly_cost_usd`** en `sellable-roles-store`: **¿bruto o costo empresa?**
    ¿Incluye herramientas? ¿Descuenta la utilización real? → **`greenhouse-finance-accounting-operator`.**
 
@@ -213,10 +225,11 @@ validación es **2026-03-10**, anterior a **RpA v2 (TASK-916)**.
 
 1. 🩸 **Documentar la economía del engagement creativo de SKY** *(→ `greenhouse-finance-accounting-operator`)*.
    **Es el bug real de esta práctica** *(`ANTIPATTERNS.md` I)*.
-2. 🎯 **Formalizar a SKY como el primer caso creativo citable** — un año de relación, squad nombrado, **telemetría
-   real** y autorización declarada para nombrarlo como caso de éxito. Falta armar el paquete de caso con alcance de
-   claims, métricas, assets, screenshots, nombres, URLs y pricing. El wrapper `experiencia.efeoncepro.com` ayuda a
-   contar la memoria del año, pero no sustituye los gates de evidencia específicos. → `templates/caso-estudio.md`.
+2. 🎯 **Llevar el caso SKY del wrapper a la venta** — *(Actualización 2026-09-23: el caso creativo ya está
+   publicado en `experiencia.efeoncepro.com` con métricas de entrega.)* Falta: verificar la autorización escrita
+   para citarlo fuera del wrapper, fijar el alcance de claims/assets/screenshots/URLs/pricing y sumar, si existe,
+   evidencia de negocio del cliente *(no hay baseline del día 0)*. → `templates/caso-estudio.md`.
+   Caso de referencia detallado: caso documentado **Travel Sale · Sky Airline** (Notion `MET-1530`, aprobado; marzo 2026): 4 mercados + Brasil, 178 piezas (66 de Efeonce), −21–25% de tiempo total de campaña (producción −24–26%, adaptación −30–40%) y cambios de precio en 27 piezas —incluidos 9 videos— en 10 minutos; tiene PDF/one-pager, blog y video de YouTube asociados.
 3. 🎯 **Empezar a usar el RpA en la venta.** Está medido, es bueno, y nadie más lo tiene.
 
 ---
@@ -227,7 +240,7 @@ validación es **2026-03-10**, anterior a **RpA v2 (TASK-916)**.
 |---|---|---|
 | **1** | 🩸 **Confirmar el loaded cost con finance** | **Sin esto, no sabemos si podemos descontar.** Todo lo demás depende de este número |
 | **2** | 🩸 **Arreglar la estructura de precios** *(ad-hoc, plan dominado, precio unitario)* | Es un error visible que **destruye credibilidad** con cualquier analista de compras |
-| **3** | 🩸 **Empezar a construir casos** *(el día 1, con autorización en el contrato)* | **Cero casos creativos citables.** Cada engagement que cierra sin caso es munición perdida para siempre |
+| **3** | 🩸 **Empezar a construir casos** *(el día 1, con autorización en el contrato)* | **Un solo caso creativo publicado (SKY, de delivery, 2026-09-23) y ninguno de negocio.** Cada engagement que cierra sin caso es munición perdida para siempre |
 | **4** | 🎯 **Construir la cuña creativa** *(el diagnóstico de operación creativa)* | El Grader abre puertas de **visibilidad**, no de **creatividad**. → `modules/06_CUNA.md` |
 | **5** | 🩸 **Medir nuestro baseline de OTD/FTR/RpA** | **Sin baseline, cualquier SLA que firmemos es una apuesta** |
 | **6** | 🎯 **Activar el cross-sell creativo a las cuentas vivas** | El pipeline más caliente que tenemos, sin tocar |

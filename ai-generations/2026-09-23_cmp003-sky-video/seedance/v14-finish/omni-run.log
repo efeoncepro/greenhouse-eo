@@ -1,0 +1,50 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 ai:omni /Users/jreye/Documents/greenhouse-eo
+> tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/gemini-omni.ts --task edit --project efeonce-group --video /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v14-plan/window-a-input-silent.mp4 --resolution 1080p --prompt-file /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v14-plan/window-a.prompt.txt --staging-uri gs://efeonce-group-greenhouse-private-assets-dev/ai-tooling/cmp003-sky/v14-window-a/inputs/ --gcs-output gs://efeonce-group-greenhouse-private-assets-dev/ai-tooling/cmp003-sky/v14-window-a/output/ --state-file /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v14-finish/omni-state.json --max-usd 1.53 --yes --out /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v14-finish/omni-window-a-native.mp4
+
+Omni 1.1 Cloud · edit · 1080p · cota de video output para hasta 10s ≈ USD 1.520 + input/texto/impuestos.
+{
+  "project": "efeonce-group",
+  "model": "gemini-omni-1.1-flash-preview",
+  "id": "ChBkMGM0NmQwOTNhYTE0OGUxEAgaATAqBG1haW4",
+  "status": "in_progress",
+  "videos": [],
+  "inlineVideoCount": 0
+}
+Estado local: /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v14-finish/omni-state.json
+{
+  "project": "efeonce-group",
+  "model": "gemini-omni-1.1-flash-preview",
+  "id": "ChBkMGM0NmQwOTNhYTE0OGUxEAgaATAqBG1haW4",
+  "status": "completed",
+  "videos": [
+    {
+      "uri": "gs://efeonce-group-greenhouse-private-assets-dev/ai-tooling/cmp003-sky/v14-window-a/output/16236973390806031404.mp4",
+      "mimeType": "video/mp4"
+    }
+  ],
+  "inlineVideoCount": 0,
+  "usage": {
+    "total_tokens": 93523,
+    "total_input_tokens": 36680,
+    "input_tokens_by_modality": [
+      {
+        "modality": "video",
+        "tokens": 36342
+      },
+      {
+        "modality": "text",
+        "tokens": 338
+      }
+    ],
+    "total_output_tokens": 56472,
+    "output_tokens_by_modality": [
+      {
+        "modality": "video",
+        "tokens": 56472
+      }
+    ],
+    "total_thought_tokens": 371
+  }
+}
+MP4: /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v14-finish/omni-window-a-native.mp4 (6339608 bytes)

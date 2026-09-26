@@ -3654,6 +3654,10 @@ export interface GreenhouseCoreOrganizations {
    * TASK-999 — canonical organization logo asset pointer. For non-operating organizations this is the commercial/brand logo used by Organization 360 UI. For operating entities it remains the legal/institutional document logo and is NOT mutated by the TASK-999 enrichment flow.
    */
   logo_asset_id: string | null;
+  /**
+   * TASK-1888 — variante del logo de la organización apta para fondo oscuro (portada navy de Efeonce Insights). Nullable: sin variante, una portada auto resuelve blanca. Se escribe sólo por el command canónico de account-360 (attachOrganizationLogoAsset, variant on_dark).
+   */
+  logo_on_dark_asset_id: string | null;
   notes: string | null;
   organization_id: string;
   organization_name: string;
@@ -10117,6 +10121,15 @@ export interface GreenhouseHrWorkRelationshipOnboardingCases {
   user_id: string | null;
 }
 
+export interface GreenhouseInsightsInsightCoverPreferences {
+  cover_theme: Generated<string>;
+  created_at: Generated<Timestamp>;
+  organization_id: string;
+  updated_at: Generated<Timestamp>;
+  updated_by_actor_kind: string;
+  updated_by_user_id: string | null;
+}
+
 export interface GreenhouseInsightsInsightDeliveryEvents {
   actor_kind: string;
   created_at: Generated<Timestamp>;
@@ -14073,6 +14086,7 @@ export interface DB {
   "greenhouse_hr.workforce_contracting_case_events": GreenhouseHrWorkforceContractingCaseEvents;
   "greenhouse_hr.workforce_contracting_cases": GreenhouseHrWorkforceContractingCases;
   "greenhouse_hr.workforce_contracting_drafts": GreenhouseHrWorkforceContractingDrafts;
+  "greenhouse_insights.insight_cover_preferences": GreenhouseInsightsInsightCoverPreferences;
   "greenhouse_insights.insight_delivery_events": GreenhouseInsightsInsightDeliveryEvents;
   "greenhouse_insights.insight_delivery_intents": GreenhouseInsightsInsightDeliveryIntents;
   "greenhouse_insights.insight_delivery_recipients": GreenhouseInsightsInsightDeliveryRecipients;

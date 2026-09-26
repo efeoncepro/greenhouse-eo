@@ -1,0 +1,20 @@
+{
+  "id": "J-pov-julio",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "pov",
+  "identidad": ["julio"],
+  "objetos": ["chaqueta-softshell-efeonce"],
+  "atmosfera": "polvo",
+  "escena": "SCENE (a staged piece for a campaign, shot in the agency's meeting room): the camera sits in the CLIENT'S CHAIR, at seated eye level across a dark table, and Julio is on the other side, mid-explanation, addressing the camera as if it were the person he is talking to. He LOOKS STRAIGHT INTO THE LENS, leaning slightly forward with his forearms on the table and one hand open mid-gesture, as if he had just laid an argument on the table and were waiting for the answer. His expression is warm but serious: mouth open mid-word, eyebrows slightly raised, engaged — never a posed smile. His head stays FRONTAL: both eyes and both eyebrows fully visible, both cheeks visible, the bridge of his nose does not cut across either cheek. He wears the Efeonce softshell jacket over a plain dark tee. CRITICAL ON LIGHT, and every practical lamp in the room is SWITCHED OFF: the KEY is a single hard white source low and far to the LEFT, raking across him so one side of his face is bright and the other falls into open shadow, the shadow of his nose short and readable on the cheek. A second hard source sits BEHIND him on the right and LOW, cutting a clean RIM along his shoulder and the collar of the jacket, separating him from the wall. That back light throws a visible SHAFT across the room through the floating dust, and the shaft, its glow and every pool it makes stay BELOW THE MIDDLE OF THE FRAME. Both sources are white: the highlights on his skin and on the jacket stay NEUTRAL, never yellow or amber, and nothing glows warm. THREE PLANES: the out-of-focus edge of the client's own laptop at the very front, seen from behind as the person sitting here would see it; Julio sharp in the middle; and behind him, far out of focus and small, a whiteboard rail with a folded print catching the rim light. The wall behind him is bare dark concrete — NO blue panel, NO bookshelf, NO plant, NO domestic decor. He sits LOW: the very top of his head is at or BELOW 38% of the frame height, and the whole TOP THIRD of the picture is that bare dark wall, completely unbroken — no lamp, no stand, no cable, no shaft and no light patch may enter that band. Everything is unbranded except his jacket. Seated eye level, 50mm at f/2.8, focus on his eyes.",
+  "lecho": {
+    "objeto": "the black lid of the client's own laptop, half closed and seen from behind, crossing the ENTIRE bottom of the frame from left edge to right edge a hand's width from the lens and dissolved completely out of focus. It sits OUTSIDE every light: neither the key nor the rim reaches it",
+    "tono": "NEAR-BLACK, the darkest thing in the picture and even across its whole width — NOTHING else appears in that bottom strip: no hands, no table edge, no cable, no highlight, no reflection, no lettering"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the bare dark concrete wall filling the top third behind him",
+      "tinta": "blanca"
+    }
+  }
+}

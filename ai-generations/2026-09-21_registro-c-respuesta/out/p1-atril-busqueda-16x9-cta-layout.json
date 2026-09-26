@@ -1,0 +1,98 @@
+{
+  "canvas": {
+    "width": 2048,
+    "height": 1152
+  },
+  "subjectProtection": {
+    "top": 950,
+    "minClearance": 24
+  },
+  "elements": [
+    {
+      "id": "entrada",
+      "box": {
+        "left": 143,
+        "right": 910.245235111111,
+        "top": 115.2,
+        "bottom": 152.60999999999999
+      }
+    },
+    {
+      "id": "dominante",
+      "box": {
+        "left": 143,
+        "right": 828.3922787301585,
+        "top": 178.61,
+        "bottom": 302.997
+      }
+    },
+    {
+      "id": "cierre-frase",
+      "box": {
+        "left": 143,
+        "right": 539.3570000000001,
+        "top": 323.997,
+        "bottom": 365.298
+      }
+    },
+    {
+      "id": "nota",
+      "box": {
+        "left": 143.36,
+        "right": 764.864,
+        "top": 421.298,
+        "bottom": 461.936
+      }
+    },
+    {
+      "id": "cta",
+      "box": {
+        "left": 171.36,
+        "right": 613.052,
+        "top": 503.936,
+        "bottom": 554.9499999999999
+      }
+    },
+    {
+      "id": "descriptor",
+      "box": {
+        "left": 143.36,
+        "right": 490.15700000000004,
+        "top": 605.286,
+        "bottom": 638.1149999999999
+      }
+    }
+  ],
+  "typography": {
+    "lead": 43,
+    "dominant": 173,
+    "closure": 39,
+    "benefit": 39,
+    "cta": 46,
+    "descriptor": 31
+  },
+  "selection": {
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "paddingRatio": {
+        "inline": 0.012,
+        "block": 0.01
+      },
+      "overlay": "subtle",
+      "overlayOpacity": 0.1,
+      "overlayBlendMode": "luminosity"
+    },
+    "cursores": [
+      {
+        "id": "ia",
+        "labelBounds": {
+          "left": 917.48,
+          "top": 387.989,
+          "right": 985.399,
+          "bottom": 443.469
+        }
+      }
+    ]
+  }
+}

@@ -4,7 +4,7 @@
 
 ## La tesis
 
-De **$6.9M a $15–25M CLP/mes** en revenue recurrente (base actual: retainer Sky Airlines). La estrategia se construye sobre una verdad que los datos de HubSpot confirman: **Efeonce gana cuando profundiza, no cuando dispersa.** Win rate 50% en cuentas existentes vs. 2–3% en licitaciones frías. Los 151 deals perdidos no son fracaso — son evidencia de que el modelo real es expansión de cuenta, no volumen de propuestas.
+De **$5.8M netos a $15–25M CLP/mes** en revenue recurrente neto (base actual: retainer Agencia Creativa Sky Airlines, CLP 5.800.000 + IVA; desde 2026-11-01 se suma el Blog SEO/AEO, CLP 3.000.000 + IVA → CLP 8.800.000 netos/mes en Sky). Los montos de revenue son siempre netos: el IVA no es ingreso. La estrategia se construye sobre una verdad que los datos de HubSpot confirman: **Efeonce gana cuando profundiza, no cuando dispersa.** Win rate 50% en cuentas existentes vs. 2–3% en licitaciones frías. Los 151 deals perdidos no son fracaso — son evidencia de que el modelo real es expansión de cuenta, no volumen de propuestas.
 
 > *Concentrar energía en pocas cuentas de alto valor, profundizar con múltiples servicios, y filtrar agresivamente el new business para que cada propuesta tenga probabilidad real de cierre.*
 
@@ -71,7 +71,9 @@ El demo ya no es genérico. Se elige la plataforma según el decisor:
 
 Profundizar cuentas donde ya se demostró valor. Cada mes acumula historial en las tres plataformas. Cuentas ancla y sus playbooks (cada fase tiene un **Hito Producto**):
 
-**Sky Airlines** — retainer $6.9M/mes (ganado por licitación, 125 días). +127% tráfico orgánico vs. LATAM. Oportunidad inmediata: Content Lead ($18M) + Social Care ($21.6M) → llevaría Sky a $46.5M/mes. Hitos producto: demo Greenhouse en vivo → login activo + Content Calendar en Verk → Feedback Review desde Greenhouse → "Tu año con Efeonce" generado desde datos de Greenhouse + Verk + analytics.
+**Sky Airlines** — retainer Agencia Creativa CLP 5.800.000/mes + IVA (ganado por licitación, 125 días). +127% tráfico orgánico vs. LATAM. Oportunidad inmediata: Content Lead ($18M) + Social Care ($21.6M) → llevaría Sky a $45.4M/mes (base neta). Hitos producto: demo Greenhouse en vivo → login activo + Content Calendar en Verk → Feedback Review desde Greenhouse → "Tu año con Efeonce" generado desde datos de Greenhouse + Verk + analytics.
+
+> **Actualización 2026-09-23:** Sky sumó una segunda línea: el **Blog SEO/AEO** (licitación privada vía Wherex, adjudicada el 2026-09-23; CLP 3.000.000 netos/mes + IVA × 24 meses; inicio 2026-11-01, vigente hasta 2028), comprado por el **equipo de Marca**, distinto del equipo de Performance que compra la Agencia Creativa. Análisis del patrón de cuenta, riesgos (concentración, capacidad, squad compartido) y qué replicar: [`sky-blog-2026/ANALISIS-ADJUDICACION-Y-PATRON-DE-CUENTA-INTERNO.md`](../commercial/tenders/sky-blog-2026/ANALISIS-ADJUDICACION-Y-PATRON-DE-CUENTA-INTERNO.md).
 
 **Grupo Réditos** (Medellín, holding multisectorial, 10.000+ empleados) — deal CRM $115.3M perdido (5 mar), relación viva con Tibisay. Ruta: consultoría + branding → CRM a filial Gana → expansión a Credintegral, Loticolombia. Hitos: demo Kortex como diferenciador → login Greenhouse + Kortex desplegó schema → multi-tenant (cada filial con espacio en Greenhouse + portal Kortex).
 

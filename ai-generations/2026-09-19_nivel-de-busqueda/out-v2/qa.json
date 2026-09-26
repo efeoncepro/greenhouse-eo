@@ -1,0 +1,476 @@
+[
+  {
+    "id": "c01-portada",
+    "dominante": [
+      "antes"
+    ],
+    "contraste": {
+      "etiqueta": 14.34,
+      "entrada": 13.1,
+      "dominante": 6.93,
+      "cierre-acento-0": 1.69,
+      "cierre-frase": 4.99,
+      "gesto": 7.86,
+      "logo": 9.21
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "nexa",
+          "labelBounds": {
+            "left": 601.435,
+            "top": 245.831,
+            "right": 706.815,
+            "bottom": 299.33
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c02-todos-te-buscan",
+    "dominante": [
+      "todos te",
+      "buscan."
+    ],
+    "contraste": {
+      "etiqueta": 15.15,
+      "entrada": 12.18,
+      "dominante": 3.26,
+      "dominante-acento-0": 2.21,
+      "tarjeta": 13.35
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "seo",
+          "labelBounds": {
+            "left": 679.337,
+            "top": 234.277,
+            "right": 767.473,
+            "bottom": 287.776
+          }
+        },
+        {
+          "id": "contenido",
+          "labelBounds": {
+            "left": 679.337,
+            "top": 754.632,
+            "right": 853.021,
+            "bottom": 808.131
+          }
+        },
+        {
+          "id": "paid",
+          "labelBounds": {
+            "left": 1006.848,
+            "top": 782.208,
+            "right": 1103.32,
+            "bottom": 835.707
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c03-quien-eres",
+    "dominante": [
+      "quién eres."
+    ],
+    "contraste": {
+      "etiqueta": 14.87,
+      "entrada": 14.33,
+      "dominante": 9.61,
+      "dominante-acento-0": 3.13,
+      "tarjeta": 10.9
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "seo",
+          "labelBounds": {
+            "left": 854.487,
+            "top": 254.921,
+            "right": 942.624,
+            "bottom": 308.42
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c04-primero-la-respuesta",
+    "dominante": [
+      "la respuesta."
+    ],
+    "contraste": {
+      "etiqueta": 17.83,
+      "entrada": 16.81,
+      "dominante": 9,
+      "dominante-acento-0": 2.47,
+      "tarjeta": 9.73
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "contenido",
+          "labelBounds": {
+            "left": 860.295,
+            "top": 254.081,
+            "right": 1033.98,
+            "bottom": 307.58
+          }
+        },
+        {
+          "id": "nexa",
+          "labelBounds": {
+            "left": 860.295,
+            "top": 595.956,
+            "right": 965.675,
+            "bottom": 649.455
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c05-datos-propios",
+    "dominante": [
+      "datos",
+      "propios."
+    ],
+    "contraste": {
+      "etiqueta": 18.96,
+      "entrada": 18.59,
+      "dominante": 7.77,
+      "dominante-acento-0": 1.8,
+      "gesto": 18.3,
+      "tarjeta": 8.32
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "data",
+          "labelBounds": {
+            "left": 665.233,
+            "top": 247.291,
+            "right": 767.03,
+            "bottom": 300.79
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c06-hablan-de-ti",
+    "dominante": [
+      "hable de ti."
+    ],
+    "contraste": {
+      "etiqueta": 14.35,
+      "entrada": 13.74,
+      "dominante": 10.38,
+      "dominante-acento-0": 3.8,
+      "dominante-acento-1": 3.6,
+      "tarjeta": 15.78
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "pr",
+          "labelBounds": {
+            "left": 848.161,
+            "top": 254.616,
+            "right": 919.725,
+            "bottom": 308.115
+          }
+        },
+        {
+          "id": "social",
+          "labelBounds": {
+            "left": 848.161,
+            "top": 599.371,
+            "right": 965.759,
+            "bottom": 652.869
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c07-dejalos-entrar",
+    "dominante": [
+      "a los bots."
+    ],
+    "contraste": {
+      "etiqueta": 16.27,
+      "entrada": 15.64,
+      "dominante": 10.94,
+      "dominante-acento-0": 3.61,
+      "tarjeta": 12.73
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "dev",
+          "labelBounds": {
+            "left": 808.062,
+            "top": 254.921,
+            "right": 896.87,
+            "bottom": 308.42
+          }
+        },
+        {
+          "id": "yo"
+        },
+        {
+          "id": "nexa",
+          "labelBounds": {
+            "left": 1006.848,
+            "top": 782.208,
+            "right": 1112.228,
+            "bottom": 835.707
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "c08-mision-cumplida",
+    "dominante": [
+      "Misión",
+      "cumplida."
+    ],
+    "contraste": {
+      "etiqueta": 18.19,
+      "dominante": 7.69,
+      "dominante-acento-0": 2.33,
+      "cierre-frase": 3.99,
+      "gesto": 16.88,
+      "logo": 5.1
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "nexa",
+          "labelBounds": {
+            "left": 141.148,
+            "top": 222.469,
+            "right": 246.528,
+            "bottom": 275.968
+          }
+        },
+        {
+          "id": "equipo",
+          "labelBounds": {
+            "left": 905.472,
+            "top": 222.469,
+            "right": 1046.037,
+            "bottom": 275.968
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c09-refuerzos",
+    "dominante": [
+      "Pide refuerzos."
+    ],
+    "contraste": {
+      "etiqueta": 17.5,
+      "entrada": 16.36,
+      "dominante": 12.71,
+      "dominante-acento-0": 4.27,
+      "gesto": 3.06,
+      "cierre-inferior": 10.75
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "clawd",
+          "labelBounds": {
+            "left": 881.976,
+            "top": 267.137,
+            "right": 1003.431,
+            "bottom": 320.636
+          }
+        },
+        {
+          "id": "codex",
+          "labelBounds": {
+            "left": 881.976,
+            "top": 578.003,
+            "right": 1003.456,
+            "bottom": 631.502
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "post-nadie-te-busca",
+    "dominante": [
+      "Nadie"
+    ],
+    "contraste": {
+      "etiqueta": 7.25,
+      "dominante": 5.26,
+      "dominante-acento-0": 1.78,
+      "cierre-frase": 4.29,
+      "gesto": 5.32,
+      "logo": 3.7,
+      "tarjeta": 10.43
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "yo"
+        },
+        {
+          "id": "ia",
+          "labelBounds": {
+            "left": 1006.848,
+            "top": 782.208,
+            "right": 1072.341,
+            "bottom": 835.707
+          }
+        }
+      ]
+    }
+  }
+]

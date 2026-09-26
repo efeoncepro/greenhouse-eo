@@ -468,3 +468,11 @@ El bucket OTD freeze-aware (M2, `task_attributable_lateness_shadow.bucket_attrib
 Labels del select = verbatim del legacy `Indicador de Performance` (🟢 On-Time / 🟡 Late Drop / 🔴 Overdue / 🔵 Carry-Over / —) para comparación lado a lado. Fuente = el M2 shadow **PG** (`bucket_attributable`), recomputado por `computeAttributableLatenessForTask` antes de escribir (NO `gh_otd_bucket` BQ, que es M1 crudo sin freeze). Solo se escribe `data_status='valid'` (degradación honesta). Idempotencia skip-if-unchanged + throttle in-process ~2.5 req/s (Cloud Tasks = growth-path) + echo-loop safe (escribe select, no status). **Gate duro**: el signal `delivery.attributable_lateness.shadow_terminal_open` (TASK-1174) debe estar en steady=0 — si hay tareas terminales con bucket abierto, el batch NO escribe (escribiría "atrasada" sobre tareas entregadas, visible al cliente). 2 signals nuevos (`notion.metrics.otd_writeback_dead_letter` + `otd_writeback_lag`).
 
 **Estado**: `code complete, rollout pendiente`. Flag `NOTION_OTD_WRITEBACK_ENABLED` (+ per-cliente `_EFEONCE`/`_SKY`) default OFF. Activación gateada al operador (client-facing): (1) crear la propiedad `[GH] OTD` select read-only en Notion Efeonce + Sky, (2) redeploy del ops-worker (registra el Cloud Scheduler job + endpoint), (3) flip del flag per-cliente con el gate `shadow_terminal_open` en verde. Helper: `src/lib/notion-metrics/otd-writeback-batch.ts`. Tabla: `greenhouse_delivery.task_otd_writeback_snapshots`. Spec: TASK-927.
+
+## Delta 2026-09-25 — umbral del bono vigente 94 % y semáforo = registro (decisión del operador)
+
+- **Bono:** la tabla de §13 describe el default del código (100 % desde 89 %). La configuración vigente en
+  `greenhouse_payroll.payroll_bonus_config` desde **2026-04-01** paga el 100 % desde **94 %** (prorrateo lineal
+  70–94 %, $0 bajo 70 %). El operador confirmó que 94 % es el valor correcto. El cálculo lee la fila vigente por
+  fecha; el default 89 del código sólo aplica si no hay fila. No se cambió ningún cálculo.
+- **Semáforo:** §8 ya coincide con `ICO_METRIC_REGISTRY` (óptimo ≥90 %, atención 70–90 %, crítico <70 %); sin cambio.

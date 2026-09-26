@@ -23,6 +23,10 @@ export const synthesizeSlotValue = (slot: SlotContract): unknown => {
   const clamp = (max: number | undefined, text: string) => (max ? text.slice(0, Math.min(text.length, max)) : text)
 
   const fieldValue = (field: Record<string, unknown>, fallback: string): unknown => {
+    // El contrato puede declarar su propio valor de muestra (`example`): una figura cuya geometría sale
+    // de cifras vecinas (TASK-1889) no se ejerce con texto de relleno. Es dato del catálogo, no del motor.
+    if (field.example !== undefined) return field.example
+
     if (field.type === 'array') {
       const constraints = (field.constraints ?? {}) as { minItems?: number }
       const item = field.item as { shape?: Record<string, Record<string, unknown>> } | undefined
@@ -69,6 +73,10 @@ export const synthesizeSlotValue = (slot: SlotContract): unknown => {
     // cada catálogo no prueba que el motor sea reutilizable: prueba que el primero sigue igual.
     if (field.type === 'number') return '1'
 
+    // Un campo `asset` de un objeto recibe el mismo asset del catálogo que un slot `asset` (la burbuja
+    // de URL): el probe no puede darle texto de relleno a un `src` (TASK-1889, logo del cliente).
+    if (field.type === 'asset' || field.type === 'asset-ref') return 'assets/url-lum.svg'
+
     // Un resolver de geometría deriva de los campos VECINOS del item (`beforeValue`/`afterValue`, el
     // eje del timeline). Si el probe les diera texto, el resolver no podría calcular y abortaría —
     // correctamente: una barra sin dato es una barra que miente. El probe tiene que darle números.
@@ -84,6 +92,10 @@ export const synthesizeSlotValue = (slot: SlotContract): unknown => {
 
     return out
   }
+
+  const declared = (slot as unknown as { example?: unknown }).example
+
+  if (declared !== undefined) return declared
 
   switch (slot.type) {
     case 'string':

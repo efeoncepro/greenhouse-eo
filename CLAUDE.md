@@ -11,6 +11,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Dominio / disparador | Skill a invocar | Invariantes (cargar al tocar) |
 |---|---|---|
 | Publicidad/social con texto o selección colaborativa: posts, stories, reels, covers, banners, brochure, OOH, Bricolage/Poppins/Guttery, bounding box y cursores multiplayer | `efeonce-advertising-creative` + `axis-design-system` + skill de formato | [`ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md`](docs/operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md): AXIS posee valores/contratos; probar tipografía/contraste o resolver intent semántico + adapter sin coordenadas decorativas. No autoriza publicación. |
+| Pieza creativa AEO con caja de búsqueda IA, composer, burbuja, respuesta o cita de ChatGPT/Gemini | `efeonce-advertising-creative` + `axis-design-system` | [Manual de recursos AEO](docs/manual-de-uso/creative/componer-recursos-aeo-con-axis.md) + [índice AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/README.md): SVG y manifest editables desde JSON; biblioteca candidata, con procedencia y fuentes verificadas. |
 | Seasonality, trendjacking, memes, piezas sociales y marca sobre objetos | `social-media-studio` + `efeonce-advertising-creative` si contiene texto + `design-studio`; `copywriting`/`efeonce-brand-studio` según decisión | [Protocolo de ejecución social](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md): clasificación, investigación, idea, papel de marca, producción por defecto y QA; módulos/overlays espejo son el canon de oficio. |
 | Contractor engagements/payables/honorarios | `greenhouse-finance-accounting-operator` (+payroll) | `architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` |
 | Hiring/ATS: docs candidato · scan/quarantine · procedencia | `greenhouse-talent-people-operator` | `architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (§Candidate document capture · §Delta 2026-08-18 `data_origin` ⊥ `source`, NUNCA en su CHECK; `real`=default=VISIBLE; NUNCA publicar vacante no-real ni sintética a quien tenga vida laboral; retención/comms ciegas) |
@@ -36,11 +37,14 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Ops/Reliability/Platform (Teams Bot/ops-worker/Vercel cron/reliability/platform-health) | `greenhouse-cron-sync-ops` `teams-bot-platform` | `architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md` |
 | EPIC-027 / trabajo nuevo durante desacople build-runtime · cualquier decisión de arquitectura (dominio/schema/agentes/frontera) | `arch-architect` (skill canónica de arquitectura; overlay greenhouse-pinned) | `architecture/GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md` + `operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md` |
 | Efeonce Globe / Creative Studio (repo `efeonce-globe`) · EPIC-028 · capability/command/reader/provider adapter · trusted context/dispatch/SDK · boundary Globe↔Greenhouse | `greenhouse-globe` + `greenhouse-globe-model-fleet` para rutas de modelos/proveedores (+ `arch-architect` para forma/decisiones) | **Globe es un PRODUCTO COMERCIAL de Efeonce (ADR-010: *"now a commercial product, not an internal lab"*), NUNCA un lab/piloto interno; su ESTADIO DE ROLLOUT hoy es internal-only + runtime `internal_smoke` + externos gated por TASK-1480 — estadio ≠ naturaleza, y NUNCA dimensiones infra/UX/calidad "porque es interno".** · `architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_{DECISION,ARCHITECTURE}_V1.md` + `epics/in-progress/EPIC-028-*.md` + `architecture/creative-studio/` (índice; la doc gobernante de Globe vive en Greenhouse, NUNCA en `efeonce-globe/docs/**`) + `architecture/creative-studio/EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md` (**ADR-016 `Accepted` 2026-07-27, motor YA implementado: el payload cliente usa Tailwind v4 con `tokens.ts` como theme; NUNCA un valor de diseño literal en `className` — `text-[#hex]`/`p-[13px]` — todo sale del theme, que sale del SSOT; lo único arbitrario permitido es una REFERENCIA a token, `duration-(--duration-short)`. **NUNCA aliasear el theme con `@theme inline { --text-xs: var(--text-xs) }`: cuando el nombre coincide a ambos lados es una referencia circular que rinde `text-xs` a 16px y `rounded-sm` a 0 CON EL BUILD VERDE** — el theme se GENERA desde el SSOT (`pnpm theme:generate`). **NUNCA documentar un anti-patrón dentro del árbol que Tailwind escanea**: lee los `.ts` como texto plano y materializa el ejemplo como clase real. Dueño `TASK-1485`**) + `docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md` + `architecture/creative-studio/GLOBE_CLIENT_MOTION_CONTRACT_V1.md` (SSOT del motion cliente; `TASK-1523`) + `operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md` (ledger de la flota; leer PRIMERO) |
+| Efeonce Marketing Studio (`studio.efeonce.org`, repo `efeonce-marketing-studio`, EPIC-049, tools `studio.*`) | `efeonce-marketing-studio` (+ `efeonce-mcp-platform` para gateway) | `architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md`: docs sólo en greenhouse-eo; toda capability nace en el registro de operaciones con tool o exclusión; autoridad de persona por canje RFC 8693 en Greenhouse, NUNCA `organizationId` del cliente; ≠ Creative Studio/Globe |
 | MCP · tools y consentimiento | `efeonce-mcp-platform` | `agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` + `GREENHOUSE_MCP_ARCHITECTURE_V1.md` §22 + `EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` + `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md` D8–D11. TASK-1844: v2 por target, nuevas organizaciones elegibles sin reconectar. Gate: `pnpm mcp:manifest:check`. |
 | Task nueva en un EPIC grande (>20 hijas), en especial `EPIC-028` | `greenhouse-task-planner` | **Barrer el registry por DOMINIO y SUPERFICIE antes de reservar un ID, NUNCA por el título del trabajo** — dos tasks de la misma superficie con nombres distintos no se cruzan por nombre; caso fuente: 5 duplicadas en una sesión (`docs/tasks/TASK_PROCESS.md` §Barrido por dominio) |
 | Entitlements governance + capability grants + ROLE_CODES | — | `architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` · `architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` |
 | Typography + Efeonce brand | `typography-design` | `architecture/agent-invariants/DESIGN_TOKENS_BRAND_AGENT_INVARIANTS.md` |
-| AI image/video + LLM providers · **qué modelo elegir** (`pnpm ai:image`, `pnpm ai:fal`) | `greenhouse-ai-image-generator` (imagen) + `motion-design-studio` (video) | `architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md` (elegir modelo, cuándo y cómo) + `architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` |
+| **Fotografía de marca propia Efeonce** (nosotros, equipo, oficina, Nexa/mascotas, logo 3D en escena) — **con cualquier motor** | `design-studio` (+ `efeonce-brand-studio`; + `efeonce-advertising-creative` si lleva texto) | `docs/operations/brand-photography/README.md`. **Comandos: `pnpm foto:doctor`, `pnpm foto:prompt` y `pnpm foto:validar`; NUNCA armar el prompt concatenando bloques a mano** (campos de la ficha y guardas en `.claude/rules/brand-photography.md`, auto-load) (así vivió «Vertical 4:5.» dentro del bloque compartido). 🔴 **Todo asset de marca en una pieza generada —ropa, lanyard, merch, logo 3D, isotipo, nave, mascotas— se rige por [`EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md`](docs/operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md): 279 archivos en 10 kits, y el problema es ELEGIR el correcto. Arte plano → producir vistas · pieza aislada → construir · **pieza en uso → USAR en escena**; lo sensible se COMPONE y el modelo sólo pone material y luz (un modelo no sostiene una marca: 4 pasadas = 4 logotipos distintos); las proporciones se calculan del objeto real. Comando: `pnpm foto:lanyard`.** El plate nace **sin logo ni texto**: la firma es el SVG oficial compuesto después, **20% del lado corto** y contraste ≥ 4,5:1 medido. Toma que después llevará texto o selección → `EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md`. **La capa gráfica sobre la foto NO está aprobada (2026-09-19)** |
+| **Qué modelo usar / qué puede cada modelo** (imagen, video, audio, 3D, LLM) · costo antes de gastar | **`ai-model-selection`** (domain-free, dueña del método y del mantenimiento) → delega el oficio a `greenhouse-ai-image-generator` (imagen) / `motion-design-studio` (video) / `audio-studio` | `architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md` (catálogo canónico: árboles, matrices, fichas, costos) + `architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`. Gate: `pnpm models:freshness` |
+| Gemini Omni 1.1 en CLI local (`pnpm ai:omni`) | `motion-design-studio` + `greenhouse-secret-hygiene`; `greenhouse-gcloud-auth-playwright` para renovar ADC | `architecture/GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md` + `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`; no es una ruta de Globe |
 | Growth AI Visibility Grader (`src/lib/growth/ai-visibility/**`) | `greenhouse-ai-image-generator` (providers LLM) | `architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` (§Delta 2026-06-24) |
 | Workforce Contracting Studio | — | `architecture/GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` |
 | PostgreSQL (conexión/migraciones/SQL readers) | `greenhouse-postgres` | inline (PostgreSQL Access + Migration markers + SQL gate) |
@@ -390,7 +394,7 @@ Los invariantes de admin center entitlement governance, deprecated capabilities 
 
 ### AI image generation + LLM providers — invariantes
 
-**Antes de generar imagen o video con IA, elegir el modelo con `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`** (qué modelo, cuándo, cómo, costo por resolución y estado de verificación de todo `pnpm ai:image` y `pnpm ai:fal`). Los invariantes de generación de assets visuales con IA (CLI `pnpm ai:image`, `generateImage()`, OpenAI GPT Image (familia 2.5 incluida) / Gemini Image / Higgsfield-Recraft vectores, secret `greenhouse-openai-api-key`) y de los providers de texto/LLM (Gemini/Vertex, Anthropic, OpenAI — `src/lib/ai/`) viven en **`docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` → §`Invariantes operativos para agentes — AI image + LLM providers`**. **Skill `greenhouse-ai-image-generator` para dirección de arte.** **NUNCA** crear un cliente/SDK LLM paralelo dentro de un módulo de dominio (extender el cliente canónico de `src/lib/ai/`); **NUNCA** hardcodear `sk-*`/`sk-ant-*` (resolver server-side via `*_SECRET_REF`); **NUNCA** crear scripts de generación ad-hoc (usar `pnpm ai:image`).
+**Antes de generar imagen o video con IA, elegir el modelo con `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`** (qué modelo, cuándo, cómo, costo por resolución y estado de verificación de `pnpm ai:image`, `pnpm ai:fal` y `pnpm ai:omni`). Los invariantes de generación de assets visuales con IA (CLI `pnpm ai:image`, `generateImage()`, OpenAI GPT Image (familia 2.5 incluida) / Gemini Image / Higgsfield-Recraft vectores, secret `greenhouse-openai-api-key`) y de los providers de texto/LLM (Gemini/Vertex, Anthropic, OpenAI — `src/lib/ai/`) viven en **`docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` → §`Invariantes operativos para agentes — AI image + LLM providers`**. Gemini Omni 1.1 usa su CLI e Interactions API propias, según el ADR y manual enlazados arriba. **Skill `greenhouse-ai-image-generator` para dirección de arte.** **NUNCA** crear un cliente/SDK LLM paralelo dentro de un módulo de dominio (extender el cliente canónico de `src/lib/ai/`); **NUNCA** hardcodear `sk-*`/`sk-ant-*` (resolver server-side via `*_SECRET_REF`); **NUNCA** crear scripts de generación ad-hoc (usar la CLI canónica del motor elegido).
 
 ### Workforce Contracting Studio — invariantes (TASK-1019)
 
@@ -778,64 +782,11 @@ Toda respuesta de error API que cruce al cliente **debe** usar el helper canóni
 
 ### Agent Auth (acceso headless para agentes y E2E)
 
-Permite que agentes AI y tests E2E obtengan una sesión NextAuth válida sin login interactivo.
-
-**Personas agente operativas:**
-
-Usar siempre la persona agente de menor privilegio que represente el caso. `agent@greenhouse.efeonce.org` queda reservado para diagnóstico transversal, admin, permisos y smoke amplio; no debe ser el default para validar experiencias collaborator/client si existe una persona dedicada más limitada.
-
-| Persona       | Email                                             | `user_id`                       | `tenant_type`      | Roles                                                 | Uso canónico                                                                 |
-| ------------- | ------------------------------------------------- | ------------------------------- | ------------------ | ----------------------------------------------------- | ---------------------------------------------------------------------------- |
-| Superadmin    | `agent@greenhouse.efeonce.org`                    | `user-agent-e2e-001`            | `efeonce_internal` | `efeonce_admin` + `collaborator`                      | Admin, permisos, diagnóstico transversal, smoke amplio                       |
-| Collaborator  | `agent-collaborator@greenhouse.efeonce.org`       | `user-agent-collaborator-001`   | `efeonce_internal` | `collaborator`                                       | `/my`, self-service, experiencia personal y validación sin privilegios admin |
-| Client        | `agent-client@greenhouse.efeonce.org`             | `user-agent-client-001`         | `client`           | `client_executive` + `client_manager` + `client_specialist` | Portal cliente general, rutas `client`, dashboards y reporting client-facing |
-
-Todas usan password `Gh-Agent-2026!` en modo credentials y están provisionadas por migraciones PostgreSQL:
-
-- `20260405151705425_provision-agent-e2e-user.sql` — superadmin.
-- `20260531020000000_task-954-agent-role-personas.sql` — collaborator y client.
-
-La persona `agent-client@...` es compuesta para cobertura cliente general. No sirve para probar límites finos entre `client_executive`, `client_manager` y `client_specialist`; si una task requiere esos límites, crear personas separadas por rol antes de cerrar la validación.
-
-**Flujo rápido:**
-
-```bash
-# 1. Con dev server corriendo en localhost:3000
-curl -s -X POST http://localhost:3000/api/auth/agent-session \
-  -H 'Content-Type: application/json' \
-  -d '{"secret": "<AGENT_AUTH_SECRET>", "email": "agent@greenhouse.efeonce.org"}'
-# → { ok, cookieName, cookieValue, userId, portalHomePath }
-
-# 2. Playwright (genera .auth/storageState.json)
-AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
-
-# 3. Usar una persona limitada cuando el rol importe
-AGENT_AUTH_EMAIL=agent-collaborator@greenhouse.efeonce.org AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
-AGENT_AUTH_EMAIL=agent-client@greenhouse.efeonce.org AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
-```
-
-**Variables de entorno:**
-
-| Variable                      | Propósito                                                   | Requerida        |
-| ----------------------------- | ----------------------------------------------------------- | ---------------- |
-| `AGENT_AUTH_SECRET`           | Shared secret (`openssl rand -hex 32`)                      | Sí               |
-| `AGENT_AUTH_EMAIL`            | Email del usuario (default: `agent@greenhouse.efeonce.org`) | Sí               |
-| `AGENT_AUTH_PASSWORD`         | Password (`Gh-Agent-2026!`) — solo modo credentials         | Solo credentials |
-| `AGENT_AUTH_ALLOW_PRODUCTION` | `true` para habilitar en prod (no recomendado)              | No               |
-
-**Seguridad:**
-
-- Sin `AGENT_AUTH_SECRET` → endpoint devuelve 404 (invisible)
-- En production → 403 por defecto
-- Comparación timing-safe con `crypto.timingSafeEqual`
-- No crea usuarios — solo autentica emails que ya existen en PG
-
-**Archivos clave:**
-
-- Endpoint: `src/app/api/auth/agent-session/route.ts`
-- Lookup PG-first: `getTenantAccessRecordForAgent()` en `src/lib/tenant/access.ts`
-- Setup Playwright: `scripts/playwright-auth-setup.mjs`
-- Spec técnica: `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` (sección Agent Auth)
+Sesión NextAuth sin login interactivo para agentes y Playwright. **Tres personas** (superadmin, collaborator,
+client): usar siempre la de **menor privilegio** que represente el caso. Endpoint `POST /api/auth/agent-session`,
+setup `node scripts/playwright-auth-setup.mjs`. Sin `AGENT_AUTH_SECRET` el endpoint responde 404; en production,
+403. Personas, `user_id`, roles, variables y flujo completo:
+[`GREENHOUSE_IDENTITY_ACCESS_V2.md` §Agent Auth](docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md).
 
 ### Playwright smoke navigation contract
 
@@ -1078,7 +1029,7 @@ Estos CLIs están autenticados localmente. Cuando una task toca su dominio, **ú
 
 **Regla operativa**: cuando un agente diagnostica un incidente y la causa raíz vive en una de estas plataformas, debe **ejecutar el fix con el CLI** (con guardrails y verificación), no documentar pasos manuales. Si el fix es destructivo (eliminar app registration, drop database, force-push) sí confirma con el usuario primero.
 
-**MCP creativos (solo sesiones Claude):** conectores `claude.ai` de edición/diseño de assets (Adobe, Figma, Higgsfield, Magnific…), session-scoped y solo-Claude, **out-of-band** (NUNCA a runtime; imágenes runtime = `src/lib/ai/image-generator.ts`). Inventario + reglas: **AGENTS.md → §0**.
+**MCP creativos (solo sesiones Claude):** conectores `claude.ai` de edición/diseño de assets (Adobe, Figma, Higgsfield, Magnific…), session-scoped y solo-Claude, **out-of-band** (NUNCA a runtime; imágenes runtime = `src/lib/ai/image-generator.ts`). Inventario + reglas: fila «Higgsfield» del router de dominios en **AGENTS.md** + skill `higgsfield-provider` §«Estado local verificado» (puentes MCP locales Blender/Illustrator/Photoshop conectados 2026-09-24; los slash del bundle viven en `get_preset_instructions`, no en `get_workflow_instructions`).
 
 ### Auth resilience — invariantes (TASK-742)
 

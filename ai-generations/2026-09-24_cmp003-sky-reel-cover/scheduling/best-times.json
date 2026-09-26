@@ -1,0 +1,172 @@
+{
+  "timezone": "America/Santiago",
+  "window": [
+    "2026-10-12",
+    "2026-10-18"
+  ],
+  "ranking": {
+    "igBest": [
+      {
+        "dayOfWeek": 2,
+        "hourOfDay": 16,
+        "value": 311
+      },
+      {
+        "dayOfWeek": 3,
+        "hourOfDay": 14,
+        "value": 306
+      },
+      {
+        "dayOfWeek": 2,
+        "hourOfDay": 21,
+        "value": 304
+      },
+      {
+        "dayOfWeek": 3,
+        "hourOfDay": 20,
+        "value": 304
+      },
+      {
+        "dayOfWeek": 2,
+        "hourOfDay": 13,
+        "value": 303
+      },
+      {
+        "dayOfWeek": 4,
+        "hourOfDay": 9,
+        "value": 302
+      },
+      {
+        "dayOfWeek": 2,
+        "hourOfDay": 15,
+        "value": 297
+      },
+      {
+        "dayOfWeek": 2,
+        "hourOfDay": 17,
+        "value": 296
+      },
+      {
+        "dayOfWeek": 2,
+        "hourOfDay": 20,
+        "value": 293
+      },
+      {
+        "dayOfWeek": 3,
+        "hourOfDay": 10,
+        "value": 293
+      }
+    ],
+    "liBest": [
+      {
+        "dayOfWeek": 5,
+        "hourOfDay": 11,
+        "value": 2914
+      },
+      {
+        "dayOfWeek": 4,
+        "hourOfDay": 11,
+        "value": 2790
+      },
+      {
+        "dayOfWeek": 3,
+        "hourOfDay": 11,
+        "value": 2445
+      },
+      {
+        "dayOfWeek": 2,
+        "hourOfDay": 11,
+        "value": 2026
+      },
+      {
+        "dayOfWeek": 4,
+        "hourOfDay": 10,
+        "value": 1518
+      },
+      {
+        "dayOfWeek": 5,
+        "hourOfDay": 10,
+        "value": 1427
+      },
+      {
+        "dayOfWeek": 5,
+        "hourOfDay": 13,
+        "value": 1375
+      },
+      {
+        "dayOfWeek": 4,
+        "hourOfDay": 13,
+        "value": 1355
+      },
+      {
+        "dayOfWeek": 2,
+        "hourOfDay": 10,
+        "value": 1328
+      },
+      {
+        "dayOfWeek": 4,
+        "hourOfDay": 12,
+        "value": 1323
+      }
+    ],
+    "julioBest": [
+      {
+        "dayOfWeek": 5,
+        "hourOfDay": 11,
+        "value": 2914
+      },
+      {
+        "dayOfWeek": 4,
+        "hourOfDay": 11,
+        "value": 2790
+      },
+      {
+        "dayOfWeek": 3,
+        "hourOfDay": 11,
+        "value": 2445
+      },
+      {
+        "dayOfWeek": 2,
+        "hourOfDay": 11,
+        "value": 2026
+      },
+      {
+        "dayOfWeek": 4,
+        "hourOfDay": 10,
+        "value": 1518
+      },
+      {
+        "dayOfWeek": 5,
+        "hourOfDay": 10,
+        "value": 1427
+      },
+      {
+        "dayOfWeek": 5,
+        "hourOfDay": 13,
+        "value": 1375
+      },
+      {
+        "dayOfWeek": 4,
+        "hourOfDay": 13,
+        "value": 1355
+      },
+      {
+        "dayOfWeek": 2,
+        "hourOfDay": 10,
+        "value": 1328
+      },
+      {
+        "dayOfWeek": 4,
+        "hourOfDay": 12,
+        "value": 1323
+      }
+    ]
+  },
+  "conflict": {
+    "brandId": "3961547",
+    "network": "linkedin",
+    "dateTime": "2026-10-16T11:00:00",
+    "existingPostId": 381375024,
+    "decision": "Use Thursday 15 11:00, next highest available weekday peak; preserve existing post."
+  }
+}

@@ -1,0 +1,478 @@
+<!doctype html><html lang="en" class="notranslate" translate="no"><head><script>(function (w, d, s, l, i) {
+          w[l] = w[l] || [];
+          w[l].push({
+            'gtm.start': new Date().getTime(),
+            event: 'gtm.js'
+          });
+          var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s),
+            dl = l != 'dataLayer' ? '&l=' + l : '';
+          j.async = true;
+          j.src =
+            'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+          f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-KTT6XGSS');</script><script>// Shared configuration for Microfrontends
+          window.__APP_CONFIG__ = window.__APP_CONFIG__ || {};
+          window.__APP_CONFIG__.APP_RECAPTCHA_ACTION_LOGIN = 'LOGIN';
+          window.__APP_CONFIG__.APP_RECAPTCHA_KEY = '6Lc5eIkqAAAAAMZaDwRLo9N98YEbbXWd0IY2noxV';</script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="ie=edge"><title>Sky</title><link rel="icon" type="image/x-icon" href="https://cdn.buttercms.com/Jbze6MD6RT2rZPYBb8Fi"><link rel="preconnect" href="https://cdn.buttercms.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="preload" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&display=optional" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&display=optional"></noscript><meta name="importmap-type" content="systemjs-importmap"/><link rel="preload" href="https://cdn.jsdelivr.net/npm/single-spa@5.9.0/lib/system/single-spa.min.js" as="script" crossorigin><link rel="preload" href="https://cdn.jsdelivr.net/npm/regenerator-runtime@0.13.7/runtime.min.js" as="script" crossorigin><link rel="preload" href="https://cdn.jsdelivr.net/npm/systemjs@6.8.3/dist/system.min.js" as="script" crossorigin><link rel="preload" href="https://cdn.jsdelivr.net/npm/systemjs@6.8.3/dist/extras/amd.min.js" as="script" crossorigin><link rel="preload" href="https://cdn.jsdelivr.net/npm/vue@3.3.8/dist/vue.global.prod.js" as="script" crossorigin><link rel="preload" href="https://cdn.jsdelivr.net/npm/vue-router@4.2.2/dist/vue-router.global.prod.min.js" as="script" crossorigin><link rel="preload" href="https://cdn.jsdelivr.net/npm/pinia@2.1.6/dist/pinia.iife.prod.js" as="script" crossorigin><link rel="preload" href="/sky-root-config.js" as="script"><link rel="preconnect" href="https://dev.visualwebsiteoptimizer.com"/><script id="vwoCode">window._vwo_code || (function () {
+            var account_id = 781810,
+              version = 2.1,
+              settings_tolerance = 300,
+              hide_element = '.notification,.scrollmenu,.sky-search-box-base,.screenModal,.modal-paga',
+              hide_element_style = 'opacity:0 !important;filter:alpha(opacity=0) !important;background:none !important',
+              /* DO NOT EDIT BELOW THIS LINE */
+              f = false,
+              w = window,
+              d = document,
+              v = d.querySelector('#vwoCode'),
+              cK = '_vwo_' + account_id + '_settings',
+              cc = {};
+            try {
+              var c = JSON.parse(localStorage.getItem('_vwo_' + account_id + '_config'));
+              cc = c && typeof c === 'object' ? c : {}
+            } catch (e) { }
+            var stT = cc.stT === 'session' ? w.sessionStorage : w.localStorage;
+            code = {
+              use_existing_jquery: function () {
+                return typeof use_existing_jquery !== 'undefined' ? use_existing_jquery : undefined
+              },
+              library_tolerance: function () {
+                return typeof library_tolerance !== 'undefined' ? library_tolerance : undefined
+              },
+              settings_tolerance: function () {
+                return cc.sT || settings_tolerance
+              },
+              hide_element_style: function () {
+                return '{' + (cc.hES || hide_element_style) + '}'
+              },
+              hide_element: function () {
+                if (performance.getEntriesByName('first-contentful-paint')[0]) {
+                  return ''
+                }
+                return typeof cc.hE === 'string' ? cc.hE : hide_element
+              },
+              getVersion: function () {
+                return version
+              },
+              finish: function (e) {
+                if (!f) {
+                  f = true;
+                  var t = d.getElementById('_vis_opt_path_hides');
+                  if (t) t.parentNode.removeChild(t);
+                  if (e) (new Image).src = 'https://dev.visualwebsiteoptimizer.com/ee.gif?a=' + account_id + e
+                }
+              },
+              finished: function () {
+                return f
+              },
+              addScript: function (e) {
+                var t = d.createElement('script');
+                t.type = 'text/javascript';
+                if (e.src) {
+                  t.src = e.src
+                } else {
+                  t.text = e.text
+                }
+                d.getElementsByTagName('head')[0].appendChild(t)
+              },
+              load: function (e, t) {
+                var i = this.getSettings(),
+                  n = d.createElement('script'),
+                  r = this;
+                t = t || {};
+                if (i) {
+                  n.textContent = i;
+                  d.getElementsByTagName('head')[0].appendChild(n);
+                  if (!w.VWO || VWO.caE) {
+                    stT.removeItem(cK);
+                    r.load(e)
+                  }
+                } else {
+                  var o = new XMLHttpRequest;
+                  o.open('GET', e, true);
+                  o.withCredentials = !t.dSC;
+                  o.responseType = t.responseType || 'text';
+                  o.onload = function () {
+                    if (t.onloadCb) {
+                      return t.onloadCb(o, e)
+                    }
+                    if (o.status === 200) {
+                      _vwo_code.addScript({
+                        text: o.responseText
+                      })
+                    } else {
+                      _vwo_code.finish('&e=loading_failure:' + e)
+                    }
+                  };
+                  o.onerror = function () {
+                    if (t.onerrorCb) {
+                      return t.onerrorCb(e)
+                    }
+                    _vwo_code.finish('&e=loading_failure:' + e)
+                  };
+                  o.send()
+                }
+              },
+              getSettings: function () {
+                try {
+                  var e = stT.getItem(cK);
+                  if (!e) {
+                    return
+                  }
+                  e = JSON.parse(e);
+                  if (Date.now() > e.e) {
+                    stT.removeItem(cK);
+                    return
+                  }
+                  return e.s
+                } catch (e) {
+                  return
+                }
+              },
+              init: function () {
+                if (d.URL.indexOf('__vwo_disable__') > -1) return;
+                var e = this.settings_tolerance();
+                w._vwo_settings_timer = setTimeout(function () {
+                  _vwo_code.finish();
+                  stT.removeItem(cK)
+                }, e);
+                var t;
+                if (this.hide_element() !== 'body') {
+                  t = d.createElement('style');
+                  var i = this.hide_element(),
+                    n = i ? i + this.hide_element_style() : '',
+                    r = d.getElementsByTagName('head')[0];
+                  t.setAttribute('id', '_vis_opt_path_hides');
+                  v && t.setAttribute('nonce', v.nonce);
+                  t.setAttribute('type', 'text/css');
+                  if (t.styleSheet) t.styleSheet.cssText = n;
+                  else t.appendChild(d.createTextNode(n));
+                  r.appendChild(t)
+                } else {
+                  t = d.getElementsByTagName('head')[0];
+                  var n = d.createElement('div');
+                  n.style.cssText =
+                    'z-index: 2147483647 !important;position: fixed !important;left: 0 !important;top: 0 !important;width: 100% !important;height: 100% !important;background: white !important;';
+                  n.setAttribute('id', '_vis_opt_path_hides');
+                  n.classList.add('_vis_hide_layer');
+                  t.parentNode.insertBefore(n, t.nextSibling)
+                }
+                var o = 'https://dev.visualwebsiteoptimizer.com/j.php?a=' + account_id + '&u=' + encodeURIComponent(d
+                  .URL) + '&vn=' + version;
+                if (w.location.search.indexOf('_vwo_xhr') !== -1) {
+                  this.addScript({
+                    src: o
+                  })
+                } else {
+                  this.load(o + '&x=true')
+                }
+              }
+            };
+            w._vwo_code = code;
+            code.init();
+          })();</script><script>// Defer reCAPTCHA to avoid main-thread contention during single-spa bootstrap.
+          // Guard prevents double injection on SPA navigation.
+          {
+            const load = () => {
+              if (document.getElementById('recaptcha-enterprise')) return;
+              const s = document.createElement('script');
+              s.id = 'recaptcha-enterprise';
+              s.src = 'https://www.google.com/recaptcha/enterprise.js?render=6Lc5eIkqAAAAAMZaDwRLo9N98YEbbXWd0IY2noxV';
+              s.async = true;
+              document.head.appendChild(s);
+            };
+            window.requestIdleCallback
+              ? requestIdleCallback(load, { timeout: 10000 })
+              : setTimeout(load, 10000);
+          }</script><meta name="apple-mobile-web-app-capable" content="no"><meta name="google" value="notranslate"><style>body {
+                      overflow-y: scroll;
+                      overflow-x: hidden;
+                    }
+
+                    /* Posicionar reCAPTCHA por encima del icono de chat */
+                    .grecaptcha-badge {
+                      visibility: hidden;
+                    }
+
+                    /* Header slot: reserva espacio antes de que monte el header MFE para evitar CLS */
+                    .header_top-fixed {
+                      min-height: 56px;
+                    }
+
+                    @media (min-width: 769px) {
+                      .header_top-fixed {
+                        min-height: 58px;
+                      }
+                    }
+
+                    /* Footer wrapper: reserva espacio antes del primer render para evitar CLS */
+                    .footer-wrapper {
+                      min-height: 1210px;
+                    }
+
+                    @media (min-width: 769px) {
+                      .footer-wrapper {
+                        min-height: 590px;
+                      }
+                    }
+
+                    @media (min-width: 1280px) {
+                      .footer-wrapper {
+                        min-height: 727px;
+                      }
+                    }
+
+                    /* ─── Shell header placeholder ──────────────────────────────────── */
+                    /* Pure-HTML purple bar + logo, visible at t=0 before the header
+                       MFE loads. Drops to z-index:-1 via two independent mechanisms:
+                       1) sky:header-ready event (after real header paints)
+                       2) CSS :has(#header-desktop, #header-mobile) fallback
+                       pointer-events:none → user interaction passes through. */
+                    #sky-shell-header {
+                      position: fixed;
+                      top: 0;
+                      left: 0;
+                      right: 0;
+                      z-index: 110;
+                      height: 56px;
+                      background: #50015C; /* fallback; overridden by inline style when SKY_SHELL_HEADER_COLOR is set */
+                      padding: 0 16px;
+                      display: flex;
+                      align-items: center;
+                      pointer-events: none;
+                    }
+
+                    @media (min-width: 1279px) {
+                      #sky-shell-header { height: 58px; padding: 0 64px; }
+                    }
+
+                    /* At ≤1278px the real header centers its logo.
+                       justify-content:center replicates that without changing padding. */
+                    @media (max-width: 1278px) {
+                      #sky-shell-header { justify-content: center; }
+                    }
+
+                    /* Layer 1 (event): sky:header-ready dispatched from Header.vue */
+                    html.sky-header-ready #sky-shell-header { z-index: -1; }
+
+                    /* Layer 2 (CSS): #header-desktop/#header-mobile only exist when
+                       v-if="store.getIsDataReady" is true → real content in DOM */
+                    body:has(#header-desktop, #header-mobile) #sky-shell-header {
+                      z-index: -1;
+                    }
+
+                    /* ─── Server pre-render ───────────────────────────────── */
+                    /* Contains huincha (optional) + hero, stacked vertically.
+                       top:56px/58px → below the fixed header height.
+                       z-index:1 → above page background, below shell header (110).
+                       Drops to z-index:-1 via two independent mechanisms:
+                       1) sky:home-ready event (after RetailHome.vue paints)
+                       2) CSS :has(... #app) fallback */
+                    #sky-worker-render {
+                      position: fixed;
+                      top: 56px;
+                      left: 0;
+                      right: 0;
+                      z-index: 1;
+                      pointer-events: none;
+                    }
+
+                    @media (min-width: 1279px) {
+                      #sky-worker-render { top: 58px; }
+                    }
+
+                    /* Matches .rh-carousel-header-wrapper */
+                    #skw-huincha {
+                      background: #efefef;
+                    }
+
+                    /* Mirrors .sky-main-container-primary. DS CSS variables
+                       (--sky-main-container-primary: 1312px) are unavailable during the
+                       skeleton phase (design system loads later), so we hardcode.
+                       Padding breakpoints confirmed via DevTools on QA:
+                         744–1279px → 24px  |  1280–1439px → 32px */
+                    #skw-huincha .skw-container {
+                      width: 100%;
+                      max-width: 1312px;
+                      margin-left: auto;
+                      margin-right: auto;
+                      box-sizing: border-box;
+                    }
+
+                    @media (max-width: 1279px) and (min-width: 744px) {
+                      #skw-huincha .skw-container { padding-left: 24px; padding-right: 24px; }
+                    }
+
+                    @media (max-width: 1439px) and (min-width: 1280px) {
+                      #skw-huincha .skw-container { padding-left: 32px; padding-right: 32px; }
+                    }
+
+                     /* Matches .rh-carousel-header (scoped — won't apply to skeleton).
+                        No fixed height — grows with content so placeholder matches the
+                        real component height at every viewport (avoids CLS on swap). */
+                     #skw-huincha .rh-carousel-header {
+                       padding: 12px 0;
+                       box-sizing: border-box;
+                       display: flex;
+                       overflow: hidden;
+                       justify-content: space-between;
+                     }
+
+                     /* Matches .arrow-huicha (scoped).
+                        No fixed width — arrows size to their content (SVG 1em) so the
+                        available text width matches the real component exactly.
+                        font-size:14px!important pins the 1em SVG chevron to 14×14px. */
+                     #skw-huincha .arrow-huicha {
+                       display: flex;
+                       align-items: center;
+                       justify-content: center;
+                       font-size: 14px !important;
+                     }
+
+                    /* Anticon sizing before antd CSS loads */
+                    #skw-huincha .anticon {
+                      display: inline-flex;
+                      align-items: center;
+                      line-height: 0;
+                    }
+
+                    /* Slides container — takes remaining space */
+                    #skw-huincha .skw-slides {
+                      flex: 1;
+                      min-width: 0;
+                      overflow: hidden;
+                      display: flex;
+                    }
+
+                    /* Single visible slide (matches #huicha_slides > div, scoped).
+                       font-size:16px!important = final rendered value. The real component
+                       ends up at 16px via body a{font-size:16px!important} (design system).
+                       Setting it here prevents a flash from 14px → 16px when DS loads. */
+                    #skw-huincha .skw-slide {
+                      flex-shrink: 0;
+                      width: 100%;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 16px !important;
+                    }
+
+                    /* !important on font-weight and font-family beats the global
+                       body a { font-weight:400 !important; font-family:Assistant !important }
+                       rule — our selector (ID+2 classes+el) has higher specificity. */
+                    #skw-huincha .skw-slide > a {
+                      color: #3c3c3c;
+                      text-align: center;
+                      font-size: 16px !important;
+                      line-height: 1.5 !important;
+                      font-weight: 700 !important;
+                      font-family: Assistant, sans-serif !important;
+                      text-decoration: none;
+                      display: inline-flex;
+                      align-items: center;
+                    }
+
+                     /* Mobile slides hidden by default; shown at ≤850px.
+                        Mirrors the MFE's window.innerWidth > 850 breakpoint exactly.
+                        display:none removes hidden slides from the flex flow so they
+                        don't contribute to container height — only visible slides do. */
+                     #skw-huincha .skw-slide.skw-mobile { display: none; }
+
+                     @media (max-width: 850px) {
+                       #skw-huincha .skw-slide.skw-desktop { display: none; }
+                       #skw-huincha .skw-slide.skw-mobile  { display: flex; align-items: center; justify-content: center; }
+                     }
+
+                     /* Matches @media ≤650px for .rh-carousel-header. */
+                     @media (max-width: 650px) {
+                       #skw-huincha .rh-carousel-header { padding: 12px 16px; }
+                     }
+
+                    /* Hero heights match the real .rh-banner-header rendered size at each
+                       breakpoint. The real component uses min-height:400px but the
+                       flight-box MFE inside it pushes the height on mobile/tablet.
+                       Fixed heights here (no flight-box in the skeleton) replicate
+                       the measured values. */
+                    #skw-hero {
+                      overflow: hidden;
+                      height: 400px;           /* > 1000px (desktop) */
+                    }
+
+                    @media (max-width: 1000px) {
+                      #skw-hero { height: 597px; }
+                    }
+
+                    @media (max-width: 767px) {
+                      #skw-hero { height: 575px; }
+                    }
+
+                    /* sky:home-ready dispatched by RetailHome.vue (double-rAF after
+                       onMounted). Scroll listener and 6s timeout below are fallbacks.
+                       CSS :has() Layer-2 removed: Chrome evaluates :has() synchronously
+                       on DOM mutation, hiding the placeholder before the hero background
+                       image painted and causing a Chrome-only flash. Firefox batches
+                       style recalc and was unaffected. Confirmed via DevTools stack trace
+                       (sky-home-ready path = double-rAF only, no scroll trigger). */
+                    html.sky-home-ready #sky-worker-render { z-index: -1; }</style></head><body><script>(function() {
+      function dismiss(flags) {
+        if (flags.header) document.documentElement.classList.add('sky-header-ready');
+        if (flags.home)   document.documentElement.classList.add('sky-home-ready');
+      }
+      window.addEventListener('sky:header-ready', function() {
+        dismiss({ header: true });
+      }, { once: true });
+      window.addEventListener('sky:home-ready', function() {
+        dismiss({ home: true });
+        if (window.VWO) window.VWO.push(['activate', { SPA: true }]);
+      }, { once: true });
+      window.addEventListener('scroll', function() {
+        dismiss({ header: true, home: true });
+      }, { once: true, passive: true });
+      setTimeout(function() {
+        dismiss({ header: true, home: true });
+      }, 6000);
+    })();</script><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KTT6XGSS" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript><div id="sky-shell-header" aria-hidden="true" style="background:#fefeff"><img src="https://cdn.buttercms.com/cache=expiry:31506000/WeSY7XAyRiq6Q9NKMGXN" width="66" height="24" alt="sky-logo"></div><noscript>You need to enable JavaScript to run this app.</noscript><script type="systemjs-importmap" src="https://storage.googleapis.com/importmap-retail/PROD/importmap.json"></script><script type="systemjs-importmap">{
+          "imports": {
+            "@skyairline/root-config": "/sky-root-config.js",
+            "pinia": "https://cdn.jsdelivr.net/npm/pinia@2.1.6/dist/pinia.iife.prod.js"
+          }
+        }</script><script src="https://cdn.jsdelivr.net/npm/regenerator-runtime@0.13.7/runtime.min.js" crossorigin></script><script src="https://cdn.jsdelivr.net/npm/systemjs@6.8.3/dist/system.min.js" crossorigin></script><script src="https://cdn.jsdelivr.net/npm/systemjs@6.8.3/dist/extras/amd.min.js" crossorigin></script><script>// vue must resolve before vue-router: vue-router.global is an IIFE that
+          // references window.Vue at evaluation time. Loading both in Promise.all
+          // creates a race condition — vue-router can win and fail with
+          // "Vue is not defined". Fix: load vue first, then vue-router + pinia
+          // in parallel (they are independent of each other).
+          System.import('https://cdn.jsdelivr.net/npm/vue@3.3.8/dist/vue.global.prod.js')
+            .then(() => {
+              System.set(System.resolve('vue'), window.Vue);
+              // pinia IIFE requires window.VueDemi (vue-demi ≈ Vue 3 APIs in a Vue-3-only context)
+              window.VueDemi = window.Vue;
+              return Promise.all([
+                System.import('https://cdn.jsdelivr.net/npm/vue-router@4.2.2/dist/vue-router.global.prod.min.js'),
+                System.import('https://cdn.jsdelivr.net/npm/pinia@2.1.6/dist/pinia.iife.prod.js'),
+              ]);
+            })
+            .then(() => {
+              System.set(System.resolve('vue-router'), window.VueRouter);
+              System.set(System.resolve('pinia'), window.Pinia);
+
+              // Preload key MFE bundles as soon as importmap is ready.
+              // Starts fetching MFE JS in parallel with root-config init, saving one
+              // full waterfall hop on the critical path (~200–400 ms on mobile).
+              // Fire-and-forget: intentionally not returned — root-config must not
+              // wait on preloads. .catch() silences potential unhandled rejections.
+              // crossOrigin='anonymous' must match SystemJS's own <script crossorigin>
+              // so the browser reuses the preload cache instead of re-fetching.
+              System.prepareImport().then(function () {
+                ['@skyairline/flight-box', '@sky/app-retail-home', '@sky/app-retail-header'].forEach(function (key) {
+                  try {
+                    var l = document.createElement('link');
+                    l.rel = 'preload'; l.as = 'script';
+                    l.crossOrigin = 'anonymous';
+                    l.href = System.resolve(key);
+                    document.head.appendChild(l);
+                  } catch (e) { /* System.resolve throws if key absent from importmap */ }
+                });
+              }).catch(function () { /* fire-and-forget — errors must not surface */ });
+
+              System.import('@skyairline/root-config');
+            });</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3fd7740c814bae7',t:'MTc5MDIwNzU3NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body></html>

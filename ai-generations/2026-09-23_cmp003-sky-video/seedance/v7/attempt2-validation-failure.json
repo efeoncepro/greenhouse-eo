@@ -1,0 +1,28 @@
+{
+  "flow_id": "c1xwy5PjHyOFVHtKgBAy",
+  "flow_created": false,
+  "url": "https://elevenlabs.io/app/flows/c1xwy5PjHyOFVHtKgBAy",
+  "flow_url": "https://elevenlabs.io/app/flows/c1xwy5PjHyOFVHtKgBAy",
+  "session_id": "7HXEQEiUvsSuP6Du5w1R",
+  "generations": [
+    {
+      "id": "w1wGSvka1hUWUJW9NQr5",
+      "status": "failed",
+      "model_id": "bytedance-seedance-v2.5-edit",
+      "modality": "video",
+      "prompt": "Edit the supplied COMPLETE approved 30-second SKY x Efeonce film. Return ONE complete vertical film with native synchronized instrumental music and SFX. The VIDEO is the primary authority for sequence",
+      "error_message": "Aspect ratio must be between 0.4 and 2.5. Please adjust your input and try again.",
+      "created_at_unix_ms": 1790233112490,
+      "price": {
+        "credits": 100833.552,
+        "price_cents": 2218.338144,
+        "cost_fiat_currency": "usd"
+      }
+    }
+  ],
+  "all_completed": false,
+  "has_failures": true,
+  "session_ids": [
+    "7HXEQEiUvsSuP6Du5w1R"
+  ]
+}

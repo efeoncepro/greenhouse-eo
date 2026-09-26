@@ -31,6 +31,11 @@ segmentación exclusiva del proveedor. El diagnóstico debe poder concluir `HubS
 La arquitectura vigente se define en
 [`HUBSPOT_OFFER_ARCHITECTURE_V2.md`](HUBSPOT_OFFER_ARCHITECTURE_V2.md). Separa tres ejes que no deben colapsarse:
 
+Si el problema del cliente es **cómo trabajar con agentes y personas como un solo equipo**, la oferta transversal
+es [Transformación de equipos humano-agente](../revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md).
+HubSpot es un carril de implementación posible; activar Agent Hub no sustituye el diseño de trabajo, supervisión
+y adopción.
+
 1. **Familia de solución:** Marketing, Content & AEO; Sales & AI Pipeline; Revenue Lifecycle; Service, Customer
    Success & Delivery; Data, Integration & CRM Intelligence; Agent Hub & Agentic Operations.
 2. **Modo de entrega:** evaluación inicial sin costo; blueprint/auditoría pagada opcional; implementación o
@@ -103,7 +108,7 @@ artefacto versionado usa `orange` por su contraste con la portada clara.
 ## Fuentes transversales
 
 - [Arquitectura de oferta V2](HUBSPOT_OFFER_ARCHITECTURE_V2.md)
-- [Lanzamientos Fall 2026 / UNBOUND 2026 — corte 2026-09-16](HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md)
+- [Lanzamientos Fall 2026 / UNBOUND 2026 — cierre revisado 2026-09-19](HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md)
 - [Benchmark de mercado 2026-08-30](../../audits/commercial/HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md)
 - [Canon técnico HubSpot as a Service](../../architecture/kortex/hubspot-as-a-service/README.md)
 - [Documentación funcional ANAM](../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)

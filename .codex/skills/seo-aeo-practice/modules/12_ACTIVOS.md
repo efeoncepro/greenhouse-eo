@@ -217,7 +217,7 @@ Aguas Andinas · BeFUN · Gobierno de Santiago · Universidad de Temuco.**
 
 | | Estado |
 |---|---|
-| **Licitación SKY** *(`docs/commercial/tenders/sky-blog-2026/`)* | ✅ **El único artefacto real.** Oferta técnica + económica + `deck-plan.json` + benchmark competitivo + squad blueprint |
+| **Licitación SKY** *(`docs/commercial/tenders/sky-blog-2026/`)* | ✅ **El único artefacto real — y GANÓ (adjudicada 2026-09-23).** Oferta técnica + económica + `deck-plan.json` + benchmark competitivo + squad blueprint. ⚠️ Los precios y el squad del expediente son de la oferta original; las condiciones vigentes están en `efeonce/ESTADO_ACTUAL.md` § 1 |
 | 🔴 **Propuesta-tipo de SEO/AEO** | 🔴 **NO EXISTE.** Cada propuesta se arma de cero |
 | 🔴 **Catálogo del Artifact Composer para SEO/AEO** | 🔴 **NO EXISTE** *(solo `deck-axis`)* |
 
@@ -306,5 +306,5 @@ SI NO CIERRA        Ebooks + Glitch    → nurturing                        [a c
 | **1** | 🔴🔴 **Prender la entrega del form SEO a HubSpot** | **Una línea de config. Los leads están cayendo al vacío** |
 | **2** | 🎯 **Prender los Fix-It Artifacts en producción** | **Es el arma de venta más fuerte que tenemos y está apagada** |
 | **3** | 🎯 **Actualizar el copy de la landing AEO** *(−58% CTR · −68% paid · +35%/+91%)* | **Estamos infravendiendo con datos viejos** |
-| **4** | 🎯 **Verificar los casos de Sky y Bresler** *(no "conseguir" — VERIFICAR)* | **Ya tenemos los números. Falta el rigor** |
+| **4** | 🎯 **Verificar los casos de Sky y Bresler** *(no "conseguir" — VERIFICAR)* | **Ya tenemos los números. Falta el rigor.** *(SKY blog adjudicado 2026-09-23 prueba cómo se gana, no resultados: el servicio arranca el 2026-11-01)* |
 | **5** | ⚠️ **Corregir el drift de Otterly** | **Declaramos la herramienta de un competidor como nuestra fuente de verdad** |

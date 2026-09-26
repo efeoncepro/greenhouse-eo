@@ -1,0 +1,27 @@
+{
+  "source": "transformation.mp3",
+  "sourceDuration": 3.0,
+  "sourceCrest": 0.634875,
+  "placementStart": 8.948458333333335,
+  "crestInFilm": 9.583333333333334,
+  "end": 11.948458333333335,
+  "brandMidrangeDbRms": -19.598549577703004,
+  "musicMidrangeDbRms": -27.03517261869869,
+  "brandLeadDbIn300to6000Hz": 7.436623040995688,
+  "musicMaxAttenuationDb": 2.5,
+  "priorBrandBusRemoved": true,
+  "bandwidth": "full; no160Hz low-pass",
+  "audioReadback": {
+    "input_i": "-16.03",
+    "input_tp": "-1.38",
+    "input_lra": "6.80",
+    "input_thresh": "-26.93",
+    "output_i": "-16.09",
+    "output_tp": "-1.61",
+    "output_lra": "3.00",
+    "output_thresh": "-26.65",
+    "normalization_type": "dynamic",
+    "target_offset": "0.09"
+  },
+  "perceptualReview": "pending, audio perception unavailable to agent"
+}

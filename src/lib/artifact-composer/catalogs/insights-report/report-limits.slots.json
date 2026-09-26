@@ -2,24 +2,47 @@
   "template": "ReportLimitsPage",
   "figmaNodeId": null,
   "version": "0.1",
+  "note": "TASK-1889 — límites y metodología A4: cifra protagonista, límites numerados y metodología en panel navy. Sin página propia en el canvas.",
   "viewport": {
     "width": 794,
     "height": 1123
   },
   "slots": {
-    "runningChapter": {
-      "selector": "[data-slot='runningChapter']",
+    "clientName": {
+      "selector": "[data-slot='clientName']",
       "type": "string",
-      "required": true,
+      "required": false,
       "constraints": {
         "maxCharacters": 40,
         "maxLines": 1,
-        "transform": "uppercase",
         "overflow": "reject"
-      }
+      },
+      "notes": "Nombre del cliente en la cabecera. Sin cliente, la caja queda vacía y la página no se mueve; nunca un nombre inventado. El logo llega con la portada sellada de TASK-1888."
+    },
+    "runningSection": {
+      "selector": "[data-slot='runningSection']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 44,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Sección de la página («Resumen ejecutivo»)."
     },
     "runningPeriod": {
       "selector": "[data-slot='runningPeriod']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Período y comparación («Agosto 2026 · contra julio 2026»)."
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
       "type": "string",
       "required": true,
       "constraints": {
@@ -28,16 +51,47 @@
         "overflow": "reject"
       }
     },
+    "heroFigure": {
+      "selector": "[data-slot='heroFigure']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 3,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Cuántos límites declara la edición (se cuenta)."
+    },
+    "heroText": {
+      "selector": "[data-slot='heroText']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 64,
+        "maxLines": 3,
+        "overflow": "reject"
+      }
+    },
     "assertion": {
       "selector": "[data-slot='assertion']",
       "type": "rich-string",
       "required": true,
       "constraints": {
-        "maxCharacters": 90,
-        "maxLines": 2,
+        "maxCharacters": 80,
+        "maxLines": 3,
+        "overflow": "reject",
         "allowedTags": [
           "em"
-        ],
+        ]
+      }
+    },
+    "lead": {
+      "selector": "[data-slot='lead']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 140,
+        "maxLines": 2,
         "overflow": "reject"
       }
     },
@@ -47,12 +101,17 @@
       "required": true,
       "constraints": {
         "minItems": 1,
-        "maxItems": 14,
-        "overflow": "reject"
+        "maxItems": 9
       },
       "item": {
         "type": "object",
         "shape": {
+          "ordinal": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-ordinal",
+            "consumer": "resolver-only"
+          },
           "subject": {
             "type": "string",
             "required": true,
@@ -62,12 +121,21 @@
           "cause": {
             "type": "string",
             "required": true,
-            "maxCharacters": 110,
+            "maxCharacters": 140,
             "maxLines": 3
           }
         }
-      },
-      "notes": "Cada límite lleva su CAUSA: «sin datos» a secas no le sirve a nadie para decidir qué conectar."
+      }
+    },
+    "methodologyLabel": {
+      "selector": "[data-slot='methodologyLabel']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 24,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
     },
     "methodology": {
       "selector": "[data-slot='methodology']",
@@ -76,12 +144,42 @@
       "constraints": {
         "minItems": 1,
         "maxItems": 8,
-        "maxCharactersPerItem": 180,
-        "overflow": "reject"
+        "maxCharactersPerItem": 200
       },
       "item": {
         "type": "string"
       }
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "footerContact": {
+      "selector": "[data-slot='footerContact']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "address": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 72,
+          "maxLines": 1
+        },
+        "phone": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        }
+      },
+      "notes": "Desde EFEONCE_CONTACT (dirección de presentación y teléfono de Chile)."
     },
     "fixed-urlBubble": {
       "selector": "[data-slot='urlBubble']",
@@ -90,27 +188,25 @@
       "agentMayOverride": false,
       "note": "template-owned: el HTML ya lo trae."
     },
-    "fixed-contactDetails": {
-      "selector": "[data-slot='contactDetails']",
-      "type": "fixed-contact-set",
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
       "required": true,
-      "agentMayOverride": false,
-      "value": {
-        "chilePhone": "+56 9 3732 3064",
-        "address": "Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile"
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
       },
-      "note": "Dueño del valor: back-cover-full.slots.json de deck-axis. Pie completo en CADA página, incluida la portada."
-    },
-    "pageFolio": {
-      "selector": "[data-slot='pageFolio']",
-      "type": "string",
-      "required": true,
-      "constraints": {
-        "maxCharacters": 8,
-        "maxLines": 1,
-        "overflow": "reject"
-      },
-      "notes": "Asignado por el plan de páginas ANTES de imprimir."
+      "notes": "«NN / total»: ambos del plan de páginas de la misma composición (paginateFlow), nunca un número fijo."
     }
   }
 }

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "01-fuera-11",
+    "exitCode": 1,
+    "report": "01-fuera-11.png  1254×1254  · formato 1:1\n\n  reserva                                 medido                                              pasa\n  1 · zona de texto (banda)               blanca 0.14 · oscura 0.00 del alto                  ✗\n  2 · objeto para enmarcar                no declarado (--objeto x0,y0,x1,y1)                 —\n  3 · lecho de la firma (18% · señal débil)blanco 18.91 · navy 1.78 · nitidez 0.0002 (frágil)  ✓\n  color · sombras no azules               b* del cuartil oscuro -0.1 (negativo = azul; ojo si hay un objeto azul grande)✓\n  4 · aire para cursores                  costados calma 3.02 / 0.39                          ✗\n  5 · campo profundo al margen            banda continua hasta 0.00 (tinta —)                 ✗\n\n  2/5 reservas cumplidas\n",
+    "stderr": ""
+  },
+  {
+    "id": "01-fuera-45",
+    "exitCode": 1,
+    "report": "01-fuera-45.png  1122×1402  · formato 4:5\n\n  reserva                                 medido                                              pasa\n  1 · zona de texto (banda)               blanca 0.02 · oscura 0.00 del alto                  ✗\n  2 · objeto para enmarcar                no declarado (--objeto x0,y0,x1,y1)                 —\n  3 · lecho de la firma (18% · señal débil)blanco 17.26 · navy 1.79 · nitidez 0.0002 (frágil)  ✓\n  color · sombras no azules               b* del cuartil oscuro -0.0 (negativo = azul; ojo si hay un objeto azul grande)✓\n  4 · aire para cursores                  costados calma 2.39 / 0.70                          ✗\n  5 · campo profundo al margen            banda continua hasta 0.00 (tinta —)                 ✗\n\n  2/5 reservas cumplidas\n",
+    "stderr": ""
+  },
+  {
+    "id": "02-reconoces-11",
+    "exitCode": 1,
+    "report": "02-reconoces-11.png  1254×1254  · formato 1:1\n\n  reserva                                 medido                                              pasa\n  1 · zona de texto (banda)               blanca 0.34 · oscura 0.00 del alto                  ✓\n  2 · objeto para enmarcar                no declarado (--objeto x0,y0,x1,y1)                 —\n  3 · lecho de la firma (18% · señal débil)blanco 7.99 · navy 1.78 · nitidez 0.0005 (frágil)   ✓\n  color · sombras no azules               b* del cuartil oscuro -0.9 (negativo = azul; ojo si hay un objeto azul grande)✓\n  4 · aire para cursores                  costados calma 0.84 / 0.50                          ✓\n  5 · campo profundo al margen            banda continua hasta 0.30 (tinta blanca)            ✗\n\n  4/5 reservas cumplidas\n",
+    "stderr": ""
+  },
+  {
+    "id": "02-reconoces-45",
+    "exitCode": 1,
+    "report": "02-reconoces-45.png  1122×1402  · formato 4:5\n\n  reserva                                 medido                                              pasa\n  1 · zona de texto (banda)               blanca 0.26 · oscura 0.00 del alto                  ✗\n  2 · objeto para enmarcar                no declarado (--objeto x0,y0,x1,y1)                 —\n  3 · lecho de la firma (18% · señal débil)blanco 7.23 · navy 1.74 · nitidez 0.0007 (frágil)   ✓\n  color · sombras no azules               b* del cuartil oscuro -1.1 (negativo = azul; ojo si hay un objeto azul grande)✓\n  4 · aire para cursores                  costados calma 0.74 / 0.82                          ✓\n  5 · campo profundo al margen            banda continua hasta 0.25 (tinta blanca)            ✗\n\n  3/5 reservas cumplidas\n",
+    "stderr": ""
+  },
+  {
+    "id": "03-referencia-11",
+    "exitCode": 1,
+    "report": "03-referencia-11.png  1254×1254  · formato 1:1\n\n  reserva                                 medido                                              pasa\n  1 · zona de texto (banda)               blanca 0.26 · oscura 0.00 del alto                  ✗\n  2 · objeto para enmarcar                no declarado (--objeto x0,y0,x1,y1)                 —\n  3 · lecho de la firma (18% · señal débil)blanco 1.27 · navy 1.25 · nitidez 0.0040 (frágil)   ✗\n  color · sombras no azules               b* del cuartil oscuro 4.3 (negativo = azul; ojo si hay un objeto azul grande)✓\n  4 · aire para cursores                  costados calma 0.81 / 2.94                          ✗\n  5 · campo profundo al margen            banda continua hasta 0.33 (tinta blanca)            ✗\n\n  1/5 reservas cumplidas\n",
+    "stderr": ""
+  },
+  {
+    "id": "03-referencia-45",
+    "exitCode": 1,
+    "report": "03-referencia-45.png  1122×1402  · formato 4:5\n\n  reserva                                 medido                                              pasa\n  1 · zona de texto (banda)               blanca 0.26 · oscura 0.00 del alto                  ✗\n  2 · objeto para enmarcar                no declarado (--objeto x0,y0,x1,y1)                 —\n  3 · lecho de la firma (18% · señal débil)blanco 1.39 · navy 1.2 · nitidez 0.0033 (frágil)    ✗\n  color · sombras no azules               b* del cuartil oscuro 4.6 (negativo = azul; ojo si hay un objeto azul grande)✓\n  4 · aire para cursores                  costados calma 0.53 / 3.06                          ✗\n  5 · campo profundo al margen            banda continua hasta 0.35 (tinta blanca)            ✗\n\n  1/5 reservas cumplidas\n",
+    "stderr": ""
+  },
+  {
+    "id": "04-elegida-11",
+    "exitCode": 1,
+    "report": "04-elegida-11.png  1254×1254  · formato 1:1\n\n  reserva                                 medido                                              pasa\n  1 · zona de texto (banda)               blanca 0.24 · oscura 0.00 del alto                  ✗\n  2 · objeto para enmarcar                no declarado (--objeto x0,y0,x1,y1)                 —\n  3 · lecho de la firma (18% · señal débil)blanco 12.33 · navy 1.75 · nitidez 0.0004 (frágil)  ✓\n  color · sombras no azules               b* del cuartil oscuro -0.4 (negativo = azul; ojo si hay un objeto azul grande)✓\n  4 · aire para cursores                  costados calma 1.34 / 1.02                          ✗\n  5 · campo profundo al margen            banda continua hasta 0.00 (tinta —)                 ✗\n\n  2/5 reservas cumplidas\n",
+    "stderr": ""
+  },
+  {
+    "id": "04-elegida-45",
+    "exitCode": 1,
+    "report": "04-elegida-45.png  1122×1402  · formato 4:5\n\n  reserva                                 medido                                              pasa\n  1 · zona de texto (banda)               blanca 0.30 · oscura 0.00 del alto                  ✓\n  2 · objeto para enmarcar                no declarado (--objeto x0,y0,x1,y1)                 —\n  3 · lecho de la firma (18% · señal débil)blanco 13.77 · navy 1.75 · nitidez 0.0004 (frágil)  ✓\n  color · sombras no azules               b* del cuartil oscuro -0.1 (negativo = azul; ojo si hay un objeto azul grande)✓\n  4 · aire para cursores                  costados calma 1.37 / 0.80                          ✗\n  5 · campo profundo al margen            banda continua hasta 0.00 (tinta —)                 ✗\n\n  3/5 reservas cumplidas\n",
+    "stderr": ""
+  }
+]

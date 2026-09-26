@@ -1,8 +1,9 @@
 # El estado real de la práctica SEO/AEO — sin adornos
 
-> **As-of 2026-09-11.** Base **2026-07-13**, con **corrección estructural del 2026-08-15** *(ver bloque
-> siguiente)*, **delta del 2026-08-25 sobre el estado de la cuenta Berel** *(§ 3b)* y **delta del 2026-09-11:
-> el Grader se usó en un panel competitivo real para SKY** *(§ 3c)*.
+> **As-of 2026-09-23.** Base **2026-07-13**, con **corrección estructural del 2026-08-15** *(ver bloque
+> siguiente)*, **delta del 2026-08-25 sobre el estado de la cuenta Berel** *(§ 3b)*, **delta del 2026-09-11:
+> el Grader se usó en un panel competitivo real para SKY** *(§ 3c)* y **delta del 2026-09-23: SKY adjudicó el
+> servicio de blog a Efeonce** *(§ 3d)*.
 > Fuente: **expediente de licitación** + repo + facturación real + benchmark de mercado verificado +
 > **research SEO/AEO de Berel con su propio Search Console**.
 > 🔴 **Este documento existe para que ningún agente venda con una realidad que no tenemos.**
@@ -61,18 +62,29 @@ Crecimiento completo *(AEO avanzado, Digital PR, monitoreo mensual, KPI de citat
 
 ---
 
-## 1. La cartera: dos clientes, y ninguno con método
+## 1. La cartera: dos clientes
 
-| | **Berel** (MX) | **SKY** (CL) |
+> **Actualización 2026-09-23:** la columna SKY describía la **oferta original** (5,2M · 8 artículos · TCV 124,8M,
+> luego BAFO 4,3M y piso 5,0M). **Todo eso es historia de la negociación, superseded.** Las condiciones vigentes
+> son las adjudicadas *(§ 3d)*. Los datos internos de la oferta original se conservan tachados abajo sólo como
+> registro.
+
+| | **Berel** (MX) | **SKY — Blog "SKY Visibility Core"** (CL) |
 |---|---|---|
-| Estado | **Cliente activo, facturando** | 🔴 **Licitación EN CURSO** (Wherex) |
-| Precio | ✅ **MXN 52.000/mes** — **lista 60.000 − 13,3% de descuento** *(operador, 2026-08-15)*. 🔴 **Alcance Crecimiento COMPLETO al 87% del precio de lista** | **CLP 5.200.000/mes** *(plan base)* |
-| **USD equivalente** | **≈ 2.965** *(FX 17,54 — reverificar)* | **≈ 5.591** |
-| Alcance **real** *(expediente, no memoria)* | ✅ **Escenario Crecimiento: SEO + AEO + producción de contenido editorial y visual.** 12 art/mes · AEO completo · Entity SEO · Digital PR · monitoreo mensual de AI citations · reporting quincenal | 8 artículos + SEO/AEO + multimedia + reportería + portal |
-| **Loaded cost** | 🔴 **DESCONOCIDO** | CLP **2.260.000** (2,2 FTE) |
-| **Piso** | 🔴 **NO EXISTE** | 🔴 **3.900.000 declarado → NO PASA la regla del 45%.** El piso real es **≈ CLP 4.602.000** *(45% + buffer 12% de penalidades/Wherex)* |
-| **Margen** | 🔴 **NO SABEMOS** | **56%** (lista) · **42%** (piso) |
-| Contrato | **Fee fijo MXN · mínimo 6 meses · notice 30 días · herramientas incluidas.** 🔴 **Sin reajuste ni cláusula FX** | **2 años, CLP, SIN reajuste** ⚠️ |
+| Estado | **Cliente activo, facturando** | ✅ **ADJUDICADA a Efeonce el 2026-09-23** (Wherex). Transición en oct-2026 · **inicio del servicio 2026-11-01** |
+| Precio | ✅ **MXN 52.000/mes** — **lista 60.000 − 13,3% de descuento** *(operador, 2026-08-15)*. 🔴 **Alcance Crecimiento COMPLETO al 87% del precio de lista** | ✅ **CLP 3.000.000 netos/mes + IVA** · 24 meses, vigente hasta 2028 · **TCV CLP 72.000.000 neto**. ~~5.200.000/mes plan base~~ *(oferta original, superseded)* |
+| **USD equivalente** | **≈ 2.965** *(FX 17,54 — reverificar)* | Ajustado al presupuesto que declaró SKY *(~USD 3.000/mes)*. ~~≈ 5.591~~ *(era la oferta original)* |
+| Alcance **real** *(expediente, no memoria)* | ✅ **Escenario Crecimiento: SEO + AEO + producción de contenido editorial y visual.** 12 art/mes · AEO completo · Entity SEO · Digital PR · monitoreo mensual de AI citations · reporting quincenal | ✅ **Capacidad gobernada: 45–50 contenidos/mes** (nuevos + refreshes) · newsletter mensual incluida (hasta 10 contenidos) · Notion/Content Hub como hub editorial · WordPress como superficie · addons aparte · **sin precio unitario por artículo**. ~~8 artículos~~ *(oferta original)* |
+| **Loaded cost** | 🔴 **DESCONOCIDO** | ~~CLP 2.260.000 (2,2 FTE)~~ *(pod de la propuesta original)*. Cost-to-serve de la configuración adjudicada: **validado internamente por el operador (2026-09-23)** |
+| **Piso** | 🔴 **NO EXISTE** | ~~3.900.000 declarado / ≈ 4.602.000 real~~ *(cálculo sobre la oferta original; superseded)* |
+| **Margen** | 🔴 **NO SABEMOS** | ~~56% (lista) · 42% (piso)~~ *(oferta original)*. Configuración adjudicada: **validada por el operador**; el detalle vive en el expediente, no acá |
+| Contrato | **Fee fijo MXN · mínimo 6 meses · notice 30 días · herramientas incluidas.** 🔴 **Sin reajuste ni cláusula FX** | **Adenda al contrato vigente con Marketing** (no contrato nuevo) · 24 meses · CLP. ⚠️ Reajuste: confirmarlo en la adenda |
+| Equipo | — | **Valentina Hoyos — Redactora SEO**; el operador **contratará más equipo**. 🔴 El squad del deck de la licitación era el de la PROPUESTA, no el operativo |
+
+> 🔴 **SKY son DOS servicios distintos, con dos compradores distintos.** Este documento sólo gobierna el **blog**
+> (equipo de **Marca** de SKY; contraparte Natalia Ortiz Cáceres). La **agencia creativa** (equipo de
+> **Performance** de SKY; squad Daniela Ferreira · Andrés Carlosama · Melkin Hernández) es de `creative-practice`.
+> **Nunca mezclar márgenes, alcance ni squad entre ambos**, y no afirmar que el squad creativo atiende el blog.
 
 ### ✅ El fee de Berel: RESUELTO — lista → descuento → final
 
@@ -149,8 +161,11 @@ serias nos dejan entrar — y en una categoría con déficit de confianza, eso v
 
 - 🔴 **No podemos vender con prueba social.** Vendemos con **el Grader** (diagnóstico) y **el método**.
 - 🔴 **Por eso el precio y el Grader tienen que estar impecables:** están haciendo el trabajo que debería hacer
-  un caso. **Un error de aritmética en una oferta** *(y tenemos uno vivo en SKY)* **nos cuesta más de lo normal,
-  porque no hay un caso que lo compense.**
+  un caso. **Un error de aritmética en una oferta** *(lo tuvimos en la oferta original de SKY; la adjudicada ya
+  no lo tiene — § 3d)* **nos cuesta más de lo normal, porque no hay un caso que lo compense.**
+- 🎯 **SKY blog (adjudicado 2026-09-23) es un caso de VENTA, no de resultado:** prueba cómo se gana *(evidencia
+  primero, precio por alcance)*, pero **no** tiene todavía métrica de resultado ni autorización. No se cita como
+  caso de resultados.
 - 🎯 **La acción de mayor ROI de la práctica es conseguir el primer caso citable.** Berel es candidato natural:
   es cliente activo, hay data, y solo falta **medir, verificar y pedir autorización.**
 
@@ -328,6 +343,32 @@ cambia el estado de Berel:** el panel no corrió a Berel.
 
 ---
 
+## 3d. ✅ Delta 2026-09-23 — SKY adjudicó el blog a Efeonce
+
+> **Qué pasó:** la licitación privada de Wherex *"Servicio de Producción de Contenido Blog"* se **adjudicó a
+> Efeonce el 2026-09-23** *(finalista entre ~15 propuestas)*. Condiciones vigentes en § 1. HubSpot: deal
+> `62535094842` → **Cierre ganado**, CLP 72.000.000. Formalización por **adenda al contrato vigente con
+> Marketing**; kickoff de transición 2026-09-28; **inicio del servicio 2026-11-01**. Contraparte: **Natalia Ortiz
+> Cáceres** (equipo de Marca); **Nicolá Lamiaux** *(sin «s»)* es el gerente de Marketing.
+>
+> 🏆 **Hito 2026-09-23:** SKY Blog (Wherex) es la **primera licitación ganada** con el flujo agéntico de licitaciones —método de `greenhouse-public-private-tenders` + Artifact Composer, operado por el operador con un agente— y en una **cuenta de talla enterprise** (SKY Airline). No todo el mérito es del flujo (pesaron la relación, la ronda 2 y la negociación humana), pero es la primera validación en el mercado de lo construido. Para esta práctica, además, es la prueba de que el Grader y la Radiografía AEO venden dentro de una oferta formal.
+
+**Por qué ganamos — y es el patrón que la práctica repite:**
+
+1. **Relación y confianza:** SKY es cuenta ancla desde 2023; el comité lo reconoció como ventaja.
+2. **Operación de canal, no fábrica de artículos:** el blog ya tenía tracción (~13.000 keywords, ~40.000 visitas
+   orgánicas/mes) y se propuso operarlo, no llenarlo.
+3. 🎯 **Evidencia antes que promesa:** Grader publicado, Radiografía AEO con un artículo real y el panel
+   competitivo AEO (LATAM, JetSMART, Avianca, Gol — § 3c).
+4. 🎯 **Ajuste por alcance, no por descuento:** con un presupuesto declarado de ~USD 3.000/mes, se rediseñó el
+   Core a CLP 3,0M con capacidad gobernada y **sin precio unitario por artículo** — no se bajó el precio de la
+   misma caja.
+5. **Squad real, SLA y penalidades aceptadas**, y un comparable vivo (Grupo Berel, también vía Wherex).
+
+🔴 **Sigue sin ser caso citable de resultados** *(§ 2)*: el servicio arranca el 2026-11-01.
+
+---
+
 ## 4. 🔴🔴 LA HEMORRAGIA — el bug más caro, y es de una línea
 
 > **La landing de SEO (`/servicios/posicionamiento-seo`, live) tiene su form `efeonce-seo-diagnostic` con
@@ -342,10 +383,12 @@ cambia el estado de Berel:** el panel no corrió a Berel.
 
 ## 4b. 🔴 Los otros bugs vivos
 
-1. **La oferta de SKY tiene un plan dominado.** El "ampliado" (12 art · 6,9M) **cuesta CLP 660.000 MÁS** que
+1. ~~**La oferta de SKY tiene un plan dominado.**~~ El "ampliado" (12 art · 6,9M) **costaba CLP 660.000 MÁS** que
    comprar base + 4 ad-hoc (6,24M). **Un analista de compras lo ve en 30 segundos.**
-2. **El ad-hoc está invertido.** CLP 260.000 vs un marginal de plan de 425.000. **Premiamos salirse del plan** —
+2. ~~**El ad-hoc está invertido.**~~ CLP 260.000 vs un marginal de plan de 425.000. **Premiábamos salirse del plan** —
    y le entregamos al cliente **la calculadora para comoditizarnos.**
+   *(**Actualización 2026-09-23:** 1 y 2 quedaron superados — la oferta adjudicada es un Core de capacidad
+   gobernada, sin precio unitario por artículo y con addons aparte. Quedan como lección, en `ANTIPATTERNS.md`.)*
 3. 🔴 **~~Regalamos el AEO~~ → CORREGIDO 2026-08-15: el AEO de Berel está PAGADO, y le estamos quedando cortos.**
    El presupuesto compromete **monitoreo mensual de presencia en ChatGPT/Perplexity/AI Overviews/Gemini** y un KPI
    de **15-25 AI citations/mes**. 🔴 **El grader lleva dormido desde el 2026-07-17.** *(Nota 2026-09-11: volvió
@@ -362,8 +405,8 @@ cambia el estado de Berel:** el panel no corrió a Berel.
 |---|---|---|
 | Retainer SEO promedio | **USD 3.209/mes** | — |
 | **Mid-market** | **USD 5.000-10.000** | 🔴 **Berel: 2.965** *(y su propia lista, 60.000 MXN, son 3.421 — **también abajo del tramo**)* |
-| **Enterprise** | **USD 10.000-50.000+** | 🔴 **SKY: 5.591** |
-| Margen bruto sano | **50%+** *(bajo 40% = delivery roto; neto promedio ~13%)* | SKY 56% ✅ · **Berel: ?** 🔴 |
+| **Enterprise** | **USD 10.000-50.000+** | 🔴 **SKY: ~~5.591~~ (oferta original) → adjudicado a CLP 3,0M/mes, ajustado al presupuesto declarado de ~USD 3.000** |
+| Margen bruto sano | **50%+** *(bajo 40% = delivery roto; neto promedio ~13%)* | SKY: ~~56%~~ (oferta original); configuración adjudicada validada por el operador · **Berel: ?** 🔴 |
 | Agencias **de nicho** | **40-75% bruto** — *la especialización compra el margen* | Estamos en la parte baja **sin razón** |
 
 > 🔴 **Delta 2026-08-15 — la cifra de Berel se sostiene, y el cuadro es PEOR de lo que decía esta tabla.**
@@ -372,7 +415,9 @@ cambia el estado de Berel:** el panel no corrió a Berel.
 > propio precio de lista.** 🎯 **No es que Berel esté barato para lo que creíamos entregar: está barato para
 > mucho más de lo que creíamos entregar.**
 
-> 🎯 **No estamos baratos porque seamos de LATAM. Estamos baratos porque nunca miramos.** *(Vigente para SKY.)*
+> 🎯 **No estamos baratos porque seamos de LATAM. Estamos baratos porque nunca miramos.** *(En SKY el precio
+> adjudicado se ajustó por ALCANCE al presupuesto del cliente y se validó el cost-to-serve antes de aceptar — ese
+> es el camino correcto, no bajar la misma caja.)*
 > **Berel es un grupo industrial mexicano. SKY es una aerolínea. No son PyMEs sensibles al precio.**
 
 ---
@@ -384,9 +429,9 @@ cambia el estado de Berel:** el panel no corrió a Berel.
 | **0** | 🔴🔴 **Despertar el grader para Berel — es entrega contratada, no mejora.** KPI comprometido: **15-25 AI citations/mes** con **monitoreo mensual**; dormido desde el **2026-07-17** *(el 2026-09-11 corrió para el panel de SKY; eso no cubre a Berel — § 3c)* | Delivery + Ingeniería | 🔴 **Under-delivery contra contrato. Es lo primero** |
 | **1** | 🔴🔴 **Squad blueprint de Berel — ahora es PRERREQUISITO, no tarea.** Alcance Crecimiento completo *(12 art/mes + PR + quincenal)* **al 87% del precio de lista** | Finance + Delivery | **Podría estar al 18%, y con 13% menos de colchón** |
 | **2** | ✅ **Fee RESUELTO: MXN 52.000** *(lista 60.000 − 13,3%)*. Sólo queda pasar el pago inicial de 89.960 como **línea de conciliación contable** | Finance | Cerrado — ya no bloquea |
-| **3** | 🔴 **Arreglar la oferta de SKY** *(plan dominado + ad-hoc invertido)* — **está viva** | Comercial | Reputacional en una licitación |
+| **3** | ✅ ~~Arreglar la oferta de SKY~~ — **cerrada 2026-09-23:** la oferta adjudicada no tiene plan dominado ni precio unitario | Comercial | — |
 | **4** | ✅ **Piso del 45% APROBADO (2026-07-13)** → **sembrarlo en el motor** | Dueño ✅ / Ingeniería | Convierte la política en gate automático |
-| **4b** | 🔴 **URGENTE — corregir el piso de SKY: 3,9M → 4,6M** | Comercial | **A 3,9M cerramos al 35%. La negociación real es de CLP 598.000, no de 1,3M** |
+| **4b** | ✅ ~~Corregir el piso de SKY: 3,9M → 4,6M~~ — **superseded 2026-09-23:** se adjudicó otra configuración (Core 3,0M, alcance rediseñado) con cost-to-serve validado por el operador | Comercial | — |
 | **5** | ⚠️ **Instrumento comercial de Berel — retirar el descuento en la renovación, NO desagregar el AEO** *(ver abajo)* | Comercial | **Depende del blueprint (#1). No se mueve antes** |
 | **6** | 🎯 **Conseguir el primer caso citable** *(Berel es el candidato)* | Delivery + Cliente | **Desbloquea vender con prueba** |
 
@@ -430,6 +475,9 @@ pública, ni tope de modificación, ni impugnación de terceros.
 🔴 **La restricción reputacional es la que manda en el timing.** No es que no se pueda repricear: es que **no
 conviene abrir esa conversación mientras SKY está evaluando**, salvo que el blueprint muestre que estamos
 perdiendo plata.
+*(**Actualización 2026-09-23:** SKY ya adjudicó — la ventana de evaluación se cerró. Berel sigue siendo
+referencia comparable ante SKY, así que la conversación de precio con Berel se lleva con el mismo cuidado, pero
+ya no está bloqueada por el timing de la licitación.)*
 
 ---
 

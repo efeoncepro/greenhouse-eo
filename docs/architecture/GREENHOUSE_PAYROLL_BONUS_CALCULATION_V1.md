@@ -398,3 +398,13 @@ Sin pasos 1-7 cubiertos, **NO agregar bonus nuevo inline en código** — viola 
 - **Lista explícita de 12 métricas NO-input bonus** con razones — previene drift "agregar bonus inline ad-hoc".
 - **Bug class TASK-877 follow-up documentado** (sección 9) — captura el impacto operacional para reference futura.
 - **Pre-existente**: helpers `calculateOtdBonus` + `calculateRpaBonus` operan en producción desde TASK-758 era. Config `payroll_bonus_config` BQ table existe. Defaults canonical estables.
+
+## Delta 2026-09-25 — umbrales vigentes del bono (verificados en base) y separación del semáforo
+
+- Donde este documento dice «default 89 %», ese es el respaldo del código (`DEFAULT_BONUS_PRORATION_CONFIG`). El
+  cálculo lee la fila vigente de `greenhouse_payroll.payroll_bonus_config` por `effective_from`. Filas verificadas el
+  2026-09-25: 2026-01-01 (OTD 70/89, RpA 1,7/2,0/corte 2,0), 2026-03-01 (OTD 70/89, RpA corte 3,0) y **2026-04-01
+  (OTD 70/94, RpA 1,7/2,0/corte 3,0)**. El operador confirmó que 94 % es el umbral vigente.
+- Los umbrales del bono son **distintos a propósito** del semáforo de ICO (`ICO_METRIC_REGISTRY`): el semáforo lee
+  desempeño; el bono define pago. Alinear semáforos o documentación nunca debe tocar esta tabla ni los helpers
+  `calculateOtdBonus` / `calculateRpaBonus`.

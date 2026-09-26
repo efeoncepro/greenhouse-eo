@@ -1,0 +1,20 @@
+{
+  "id": "M-led-marca",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "identidad": ["nexa"],
+  "objetos": ["polo-efeonce"],
+  "atmosfera": "bruma",
+  "escena": "SCENE (a staged piece for a campaign, shot on the agency's own lighting floor): the room is lit by REAL LED FIXTURES that are visible in the frame as equipment — slim vertical LED tubes on stands, the kind used to light a studio, not decorative lamps. TWO of those tubes stand BEHIND her, one at each side of the frame and BOTH BELOW THE MIDDLE OF THE PICTURE, and they are burning a deep, saturated ACTIVE BLUE, the colour of the brand: rgb(3,117,219). Their blue washes the concrete wall behind her in two soft vertical gradients, catches the haze in the air, and lays a clear BLUE RIM along the edge of her hair, the top of her shoulder and the side of her arm — the blue belongs to the room, it is not a filter over the photograph. Nexa stands between them and LOOKS STRAIGHT INTO THE LENS, weight settled, hands quiet, chin level, lips closed with a faint lift at one corner: composed, direct, the owner of the room. Her head stays FRONTAL: both eyes and both eyebrows fully visible, both cheeks visible, the bridge of her nose does not cut across either cheek. Her irises are VERY DARK BROWN, almost black, so dark that the iris barely separates from the pupil — never hazel, amber or honey, and no golden ring. She wears the navy blue Efeonce piqué polo. 🔴 CRITICAL — HER SKIN STAYS NEUTRAL: the KEY on her face and body is a single WHITE LED panel low and to the LEFT, off camera, and it is stronger on her than the blue tubes are, so her face, her arms and the front of the polo read in TRUE, NEUTRAL SKIN AND FABRIC COLOUR, never tinted blue, never cyan, never cold-cast. The blue only touches the wall, the haze and the edges of her silhouette — it must NEVER wash over the front of her face. The key also gives the short readable shadow of her nose on the cheek, so she is modelled and not flat. The ONE warm accent in the picture is a small ORANGE rgb(245,93,1) tally light glowing on a camera body at the right, far out of focus and tiny — the only warm thing in the room, and nothing else glows warm. THREE PLANES: the out-of-focus black corner of a lighting case at the very front; Nexa sharp in the middle; the two blue tubes and the hazy wall behind. The wall is bare dark concrete — NO blue painted panel, NO backdrop, NO bookshelf, NO plant, NO domestic decor: the blue in this picture is LIGHT, never paint and never a printed surface. She stands LOW: the very top of her head is at or BELOW 38% of the frame height, and the whole TOP THIRD of the picture is bare dark concrete with NO blue on it at all — no tube, no glow, no gradient and no light patch may enter that band. Everything is unbranded except her polo. 85mm at f/2.8, focus on her eyes.",
+  "lecho": {
+    "objeto": "the black corner of a lighting case standing right at the lens, its metal edge and latch crossing the ENTIRE bottom of the frame from left edge to right edge, a hand's width from the camera and dissolved completely out of focus. It sits OUTSIDE every light: neither the white key nor the blue tubes reach it",
+    "tono": "NEAR-BLACK and NEUTRAL, the darkest thing in the picture and even across its whole width, with NO blue cast on it — NOTHING else appears in that bottom strip: no hands, no cable, no highlight, no reflection, no lettering"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the bare dark concrete wall filling the top third, above the reach of the blue tubes",
+      "tinta": "blanca"
+    }
+  }
+}

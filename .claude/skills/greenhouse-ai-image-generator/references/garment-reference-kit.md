@@ -103,6 +103,53 @@ La prenda base fija la prenda, pero **no fija la orientación del emblema**: se 
 - **Tono sobre tono sólo si la marca se lee por relieve.** En el polo no se leía y el operador lo descartó: «el logo
   se pierde». Para uso corporativo, hilo de contraste: blanco sobre navy, navy sobre blanco.
 
+### La aplicación de marca la decide LA TELA, no la costumbre del kit
+
+**Delta 2026-09-21 [decisión del operador].** El operador vio una pieza con la espalda de la chaqueta softshell y
+la corrigió de inmediato: **«esa tela se borda no se estampa»**. Se verificó y era cierto **[medido]**: las vistas
+`efeonce-chaqueta-softshell-02-espalda`, `10-plano-espalda`, `15-puesto-espalda` y `17-puesto-espalda-mujer`
+mostraban el logotipo y el eslogan en **tinta plana**, sin relieve ni puntada, y el propio manifiesto del kit lo
+declaraba así —«lleva la **estampa** canónica»—. El kit estaba además inconsistente consigo mismo: el polo recibió
+ese mismo día su arte de espalda **bordado**, mientras chaqueta y hoodie seguían declarando estampa.
+
+La regla, por tela:
+
+| Tela | Aplicación | Por qué |
+|---|---|---|
+| **Softshell y chaquetas técnicas** | **BORDADO** | la serigrafía sobre tela técnica **se agrieta y se despega**; no es un capricho estético |
+| **Piqué (polo)** | **bordado** | ya era así; es la prenda más formal frente a cliente |
+| **Algodón afelpado (hoodie)** | la **serigrafía es legítima**; el bordado grande en espalda también se hace, más caro | **decisión abierta del operador** — no darla por resuelta en ninguna dirección |
+
+🔴 **Antes de generar cualquier vista de una prenda, verificar en el manifiesto qué técnica declara. Si la técnica
+declarada contradice la tela, se corrige el manifiesto ANTES de generar** — generar sobre un manifiesto equivocado
+propaga el error a todas las vistas, y el error queda con aspecto de decisión.
+
+#### La formulación que produjo un bordado convincente
+
+Pieza de evidencia: `ai-generations/2026-09-21_espalda-bordada/out/softshell-02-espalda-bordada-v01.png`, prompt
+verbatim en `prompts/softshell-02-espalda.txt`. Los marcadores que funcionaron conviene listarlos porque son
+**verificables a ojo**:
+
+- cada letra y cada forma **rellena de puntada satinada densa**, con la **dirección** de la puntada visible y
+  cambiando de un trazo de letra al siguiente, atrapando la luz distinto en cada trazo;
+- el bordado **levemente elevado** sobre la tela, con sombra en el borde inferior de cada forma y brillo en el
+  superior, para que tenga espesor real;
+- el **borde festoneado** que deja el satén, nunca un canto vectorial perfectamente liso;
+- el **brillo sutil del hilo de rayón**, más luminoso que la tela mate de alrededor;
+- la tela **levemente fruncida y tensada** por la puntada, como tira el bordado real;
+- y la **negación explícita**: sin tinta, sin vinilo, sin transfer, sin serigrafía, **sin ninguna zona de color
+  plano liso** en toda la prenda.
+
+**El texto nunca se le pide al modelo**, tampoco acá. El arte de espalda —logotipo + «Empower your Growth»— entra
+como **imagen 2** desde el archivo determinístico
+`ai-generations/2026-09-17_chaqueta-efeonce/ref/estampa-espalda.png`, con la instrucción de reproducirlo exacto
+(§3). Lo que cambia entre estampado y bordado es **cómo se aplica**, no de dónde sale el arte.
+
+⚠️ **Deuda declarada.** De las vistas de espalda de las **dos chaquetas** (softshell y bomber), en cada una
+producto, plano cenital, puesta en hombre y puesta en mujer, sólo está corregida la `02-espalda` de la softshell,
+como `v02`. **Las demás siguen estampadas** y hay que rehacerlas con esta formulación antes de usarlas en una pieza
+donde la espalda se lea.
+
 ## 4. Proporciones declaradas (el modelo las mueve si no se fijan)
 
 - **Emblema del pecho:** mismo tamaño y posición que el asset oficial. **Nunca se reduce** — corrección expresa del
@@ -187,7 +234,7 @@ Cuando **no existe** asset oficial de la prenda, el kit tiene un paso 0 que el h
    al operador**. Ésta es la única aprobación que bloquea: todo lo demás se copia de aquí.
 3. **Congelar la aprobada como imagen 1** de toda la serie y escribir su bloque base verbatim.
 4. **Preparar las referencias del emblema:** el isotipo oficial rasterizado si va bordado, y la estampa compuesta con
-   el script determinístico si la prenda lleva texto (§3). El polo no lleva estampa: espalda limpia.
+   el script determinístico si la prenda lleva texto (§3). Desde el 2026-09-21 el polo TAMBIÉN lleva arte de espalda, bordado (ver delta al final).
 5. **Recién entonces generar las vistas** (§2), todas con el mismo bloque base + el delta de cada una.
 6. **QA (§6), recorte selectivo (§7), manifiesto y entrega (§9).**
 
@@ -233,7 +280,7 @@ descarte, y más si la prenda lleva emblema bordado: ahí los descartes son por 
 
 ## Delta 2026-09-17 — dónde va la estampa de espalda
 
-La estampa canónica (logo completo + eslogan al 38 % del ancho de la espalda) va en el **hoodie** y en las **chaquetas (softshell y bomber) sí la llevan**, por decisión del operador. La única prenda con **espalda limpia** es el **polo**, la más formal frente a cliente. Si una serie ya se produjo con la regla anterior, se rehacen sólo las vistas de espalda (prenda sola, plano cenital y puesta) con la estampa como imagen 2.
+El arte canónico de espalda (logo completo + eslogan al 38 % del ancho de la espalda) va en el **hoodie** y en las **chaquetas (softshell y bomber)**, por decisión del operador. **Revertido el 2026-09-21: el polo también lo lleva, BORDADO** (ver delta al final). **Qué técnica se usa lo decide la tela, no el kit** — softshell y chaquetas técnicas van bordadas: ver §3, «La aplicación de marca la decide LA TELA». Si una serie ya se produjo con la regla anterior, se rehacen sólo las vistas de espalda (prenda sola, plano cenital y puesta) con la estampa como imagen 2.
 
 ## Delta 2026-09-17 — elegir la vista por cómo se usa la prenda
 
@@ -277,6 +324,25 @@ desde los archivos oficiales y entran como referencia; el texto exacto nunca se 
 calcula desde el ancho real de cada pieza** más un espacio: fijarlo a mano solapa el logo con el eslogan.
 **Lo plano no se genera:** el carnet, la tarjeta o la etiqueta en plano **son** el arte compuesto, no una
 generación.
+
+### Merch de la línea gráfica «La órbita» (2026-09-25)
+
+La línea gráfica canónica de Efeonce ([manual](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
+§10.4–§10.8; [referencia operativa](../../efeonce-brand-studio/references/graphic-line-orbit.md)) trae 17 fotos de
+producto generadas con `gpt-image-2.5-sunburst` bajo este mismo método:
+
+- **Referencia = el arte plano exacto de cada pieza** (lapiceros, pulseras, polo, polera, gorra, carnet, pin, llavero, paraguas, caja de bienvenida, stand…), compuesto desde
+  los archivos oficiales, más los **kits reales** de polo, gorra y lanyard como referencia de forma y tela. El
+  modelo sólo pone material y luz; la órbita, la palabra con su punto y el logo nunca se describen para que el
+  modelo los dibuje.
+- **Se conservan las versiones planas.** La foto es una maqueta de presentación; la producción sale de los
+  vectoriales y de una muestra física del proveedor.
+- **La regla del objeto viaja al prompt:** frente con la palabra en Bricolage y su punto (órbita opcional,
+  alrededor de la palabra); dorso con el logo solo, chico y abajo. La órbita alrededor del logo está descartada.
+  Declarar lo que la pieza NO lleva, igual que en el caso de la gorra.
+- **Sólo marca propia Efeonce y su familia**, nunca merch de un cliente.
+- Prompts, artes y runner: `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/merch-ia/`
+  (`items.mjs`, `arte/`, `prompts/`, `out/`).
 
 ### Vistas que cierran reinterpretación
 
@@ -323,3 +389,131 @@ Si la prenda o el merch ya tiene una foto real (por ejemplo la gorra del héroe 
 ## Delta 2026-09-17 — el calce se declara, no se asume
 
 Al vestir a alguien con una pieza cuya referencia es una **foto de producto** (gorra, mochila, accesorio), el modelo tiende a escalarla de más: la gorra sale oversized y domina la cara. Describir el **ajuste**, no el objeto: talla adulta normal, calce ceñido y perfil bajo; de la ceja a lo alto de la copa ≈ un tercio de la altura de la cabeza; banda sobre las cejas y laterales sin hueco; visera corta y curva del ancho de la frente. Vale para cualquier accesorio que se lleve puesto. Caso: `ai-generations/2026-09-17_gorra-efeonce/LEEME.md`.
+
+## Delta 2026-09-20 — el kit ya trae la respuesta: ábrelo antes de teorizar
+
+Tres intentos fallidos de vestir a una persona con la gorra, y las tres respuestas estaban en el propio kit,
+a un `cat` de distancia. **Antes de escribir un prompt con una prenda, se abren su `LEEME.md` y su
+manifiesto.** No es una recomendación de prolijidad: es el paso que evita reconstruir mal lo que ya está
+resuelto.
+
+**Lo que estaba escrito y no se leyó** (`ai-generations/2026-09-17_gorra-efeonce/`):
+
+| Estaba en el kit | Lo que pasó por no leerlo |
+|---|---|
+| **Cinco variantes con su rol**, y el manifiesto con `cuando_usarla` por vista | Se usó la de continuidad con el sitio para una escena de **terreno**, cuyo rol declarado corresponde a la **trucker navy** |
+| El rol distingue **logotipo completo** e **isotipo solo** | Se declaró el tipo de marca a nivel de **kit** en vez de por **variante**, así que pedir una heredaba la descripción de la otra y el modelo construía una marca a mitad de camino |
+| «El logotipo se lee pequeño en los paneles, sin estirarse» y la corrección del operador **«muy grandes las gorras»**, con cinco marcadores de calce | No se declaró ninguno |
+| **Pruebas en persona ya resueltas** (`out/prueba-nexa.png`, `out/prueba-julio.png`), donde «el logotipo se mantiene legible y el emblema conserva su orientación» | Se intentó resolver desde cero lo que ya tenía solución y evidencia |
+| «La trasera se declara **sin bordado**; si no, el modelo tiende a repetir el logotipo detrás» | — |
+
+**La regla que sale de esto, y vale para cualquier kit:**
+
+1. **Abrir `LEEME.md` y el manifiesto del kit ANTES del prompt.** El manifiesto dice `cuando_usarla` por vista:
+   la variante se elige por el **rol de la escena**, no por la que esté primero en la lista.
+2. **El tipo de marca va por VARIANTE, no por kit.** Una misma prenda puede existir con logotipo completo y con
+   isotipo, y una vista puede no llevar marca (trasera, cenital). Declararlo arriba hace que el modelo mezcle.
+3. **Si el kit trae pruebas en persona, esas son el punto de partida**, no un extra: ya resolvieron calce,
+   orientación y legibilidad.
+4. **El calce se declara con marcadores, no con el nombre del objeto.** La referencia es una foto de producto y el
+   modelo la escala de más: ceñida, perfil bajo, un tercio de la altura de la cabeza de ceja a copa, banda sobre
+   las cejas, visera corta y curva.
+
+> **Lo que el modelo no sostiene, medido el 2026-09-20.** Con la variante correcta, la referencia correcta y la
+> posición y escala declaradas, la **posición y el tamaño se corrigen**, pero **la forma del emblema sigue
+> espejándose**: la nave sale apuntando al lado contrario. Coincide con lo que ya registraba §«El emblema bordado
+> también lleva su propia referencia» —6 de 21 vistas del polo volvieron invertidas— y no se resuelve con más
+> descripción. Para una pieza donde la marca deba leerse fiel: edición con máscara, o un ángulo donde la marca no
+> cargue el peso.
+
+### Delta 2026-09-21 — la variante de COLOR también se elige, y por defecto va la principal
+
+Misma clase que la variante de gorra, un día después y en otro kit: `polo-efeonce` tenía el patrón **fijo** en
+la variante **blanca**, que es la segunda (6 vistas), cuando la principal es la **navy** (15 vistas) y es la
+declarada como referencia del uniforme. Como **la referencia gana sobre la escena**, una escena que pedía «deep
+navy Efeonce pique polo» devolvió el plate con polo **blanco** — medido por la sesión peer en
+`ai-generations/2026-09-21_palancas-corregidas/`.
+
+**La regla completa, para cualquier prenda que exista en más de una versión:** lo que se elige por ficha es la
+**vista** (ángulo), el **color** y, cuando aplica, la **variante de marca**. Nada de eso puede quedar fijo en el
+kit: lo que quede fijo se impone sobre lo que pida la escena, en silencio y sin aviso.
+
+`pnpm foto:prompt` resuelve hoy los tres: `{ objeto, vista, color }`, con la principal por defecto, y **rechaza
+un color que no existe** en vez de caer a otro. El **ancla de tamaño del emblema** —«no más ancho que un tercio
+del panel del pecho, apenas más ancho que el carnet que cuelga en la misma toma»— viaja ahora dentro del bloque
+que emite el comando y no sólo en esta doc: el emblema sobredimensionado es el fallo más repetido del kit, y un
+marcador que vive sólo en la documentación no llega al prompt.
+
+### Delta 2026-09-21 — dos trampas de la EDICIÓN, medidas
+
+Valen para cualquier edición con `--image`, no sólo para prendas.
+
+1. **`--mask` no preserva píxeles.** Editando sólo la zona del lanyard, el delta medio **en el rostro** dio
+   **88 de 255**: la edición recompone el encuadre entero, no parchea la zona. La identidad se sostiene, pero es
+   una pasada nueva. **Después de editar una prenda con máscara, vuelve a mirar la cara** contra la referencia.
+2. **La edición perdía la relación de aspecto en silencio.** Sin `--size`, `pnpm ai:image` aplicaba su default
+   horizontal (`1536x1024`) también al editar, así que un plate 4:5 volvía apaisado sin aviso. **Corregido**: al
+   editar sin `--size` explícito, el tamaño se **hereda de la imagen base** y el comando lo dice; si la base mide
+   algo que el modelo no acepta, avisa que la relación **va a cambiar** en vez de hacerlo callado.
+
+Medidas por la sesión peer durante la corrección del lanyard.
+
+
+## Delta 2026-09-21 — componer lo sensible, y que el modelo sólo termine
+
+**El modelo no sostiene una marca, ni con el arte delante.** Medido sobre el lanyard en cuatro
+pasadas: descrito en palabras dio un borrón con forma de flecha; con el arte plano quedó ilegible; y
+con la foto del producto delante la nave de la «o» seguía cambiando.
+
+**La salida es no pedírselo.** Se arma la pieza **determinísticamente** —cada elemento sensible
+compuesto desde su archivo oficial, lo neutro en SVG plano— y al modelo se le pasa ese armado para que
+ponga **sólo material y luz**: tejido, relieve de serigrafía, plástico, níquel, acrílico y sombras de
+contacto. Comando: **`pnpm foto:lanyard`**; caso completo en
+`ai-generations/2026-09-21_lanyard-deterministico/LEEME.md`.
+
+### Arte plano ≠ prenda aislada ≠ prenda puesta
+
+Los tres son assets legítimos del kit y **sirven para cosas distintas**:
+
+| Asset | Para qué |
+|---|---|
+| **Arte plano** (`ref/arte-*.png`) | **PRODUCIR** las vistas del kit |
+| **Prenda o pieza aislada** (transparente) | **CONSTRUIR** el armado |
+| **Prenda o pieza PUESTA / producto terminado** | **USAR** en una escena: vestir a alguien, bodegón |
+
+Dárselos al revés es lo que hace que el modelo reinvente la marca. En el lanyard costó tres pasadas;
+en la gorra, el asset que resolvía el problema —`out/prueba-julio.png`, con el logotipo legible y el
+emblema bien orientado— llevaba días en el kit sin usarse.
+
+### Las proporciones se CALCULAN del objeto real
+
+Dos correcciones del operador el mismo día, las dos cazadas a la primera: la unidad del patrón de la
+cinta mide **7,05 veces** su ancho (a ojo en 3,4 el logotipo salía alargado y el eslogan achatado) y
+el yoyo **1,6 veces** ese ancho —32 mm contra 20 mm reales— cuando estaba en 2,5. Rima con los cinco
+marcadores de calce de la gorra: **la medida sale del objeto, no del ojo**.
+
+
+🔴 **ANTES de generar una pieza con un asset de marca —ropa corporativa, lanyard, merch, logo 3D,
+isotipo, nave o mascotas— carga el [contrato de selección de referencias](../../../../docs/operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md).** Hay **279 archivos en
+10 kits**: el problema nunca es que falte la vista, es **elegir la correcta**. Resume tres reglas:
+
+1. **Tres clases de asset, no intercambiables.** Arte plano → **producir** vistas del kit · pieza
+   aislada → **construir** · **pieza en uso / producto terminado → USAR en una escena**. Darlos al
+   revés hace que el modelo **reinvente la marca**.
+2. **Lo sensible se compone; el modelo sólo termina.** Toda marca, texto exacto o arte oficial se arma
+   determinístico y al modelo se le pide **sólo material y luz**. Un modelo no sostiene una marca:
+   cuatro pasadas sobre la misma pieza dieron cuatro logotipos distintos.
+3. **Las proporciones se calculan del objeto real**, nunca a ojo.
+
+Y **abre el `LEEME.md` y el manifiesto del kit antes del prompt**: su `cuando_usarla` dice qué vista
+corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida.
+
+
+> 🔴 **Delta 2026-09-21 — el polo YA NO lleva la espalda limpia.** El operador **revirtió** su decisión
+> del 2026-09-17: desde hoy el polo lleva en la espalda el **logo completo + «Empower your Growth»**,
+> igual que el hoodie y las chaquetas, pero **BORDADO** en puntada satinada con relieve —no
+> serigrafiado—, porque es la prenda más formal frente a cliente y su emblema de pecho ya es bordado.
+> Motivo: de espaldas, un polo sin marca no se reconoce como Efeonce. El arte se compone con
+> `ai-generations/2026-09-17_polo-efeonce/estampa-espalda.mjs` (hilo blanco sobre el navy, hilo navy
+> sobre el blanco) y las cinco vistas de espalda están rehechas como `-v02-`; **las `-v01-` de espalda
+> quedan obsoletas**.

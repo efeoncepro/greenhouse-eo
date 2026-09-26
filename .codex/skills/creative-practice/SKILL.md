@@ -208,8 +208,8 @@ Esta es **la verdad que más plata nos cuesta ignorar.** ✅ *verificado 2026-07
 | | 🎯 **1 art director in-house US: USD 7.500 – 13.300/mes** *(loaded)* |
 | | 🎯 **Retainer de diseño/marca: USD 3.000 – 15.000/mes** |
 
-**El squad SKY completo — 9 roles, 2,2 FTE — se vende a CLP 5,2M/mes.** Eso es **menos de lo que le cuesta a
-un cliente enterprise UN SOLO director de arte interno**.
+**El squad SKY completo — 9 roles, 2,2 FTE — se ofertó a CLP 5,2M/mes.** Eso es **menos de lo que le cuesta a
+un cliente enterprise UN SOLO director de arte interno**. *(Cifra de la **oferta original** del blog — superseded: el blog se adjudicó el 2026-09-23 a CLP 3,0M neto/mes con otra configuración. Úsala sólo como ilustración de la aritmética, no como precio vigente.)*
 
 > 🔴 **Corrección 2026-09-10.** Esta sección decía que estábamos "en el mismo rango que Superside" con un
 > comparable de ~USD 5.000/mes tomado de un blog de tercero. **Falso:** su propia página fija un **mínimo de
@@ -263,8 +263,8 @@ Dos cosas que el SEO no tiene y el creativo sí, y que **ninguna** de nuestras s
 2. 🔴 **NUNCA vendas la hora.** Ni "bolsa de horas", ni "tarifa hora diseñador". Verdad (a).
    **La hora es la unidad que la IA está deflacionando y que el procurement sabe atacar.**
 3. 🔴 **NUNCA publiques un precio unitario por pieza.** *(Ni "por post", ni "por artículo", ni "por spot".)*
-   🎯 **Es entregarle al cliente la calculadora para comoditizarte.** *(Ya lo hicimos en SKY: "artículo
-   adicional CLP 260.000" — y ahora SKY puede dividir cualquier propuesta futura por ese número.)*
+   🎯 **Es entregarle al cliente la calculadora para comoditizarte.** *(Ya lo hicimos en la oferta original del blog de SKY:
+   "artículo adicional CLP 260.000". Lo adjudicado el 2026-09-23 ya va sin precio unitario, pero la cifra se vio.)*
 4. 🔴 **NUNCA el ad-hoc más barato que el marginal del plan.** Rompe la planificación y consume coordinación:
    **tiene que costar MÁS.** *(Hoy hacemos lo contrario.)* → `ANTIPATTERNS.md` 🩸
 5. 🔴 **NUNCA cierres bajo el 45% de margen bruto.** **Piso aprobado por el dueño (2026-07-13).**

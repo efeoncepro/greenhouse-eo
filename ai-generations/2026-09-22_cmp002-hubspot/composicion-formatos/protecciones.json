@@ -1,0 +1,74 @@
+{
+  "KV-01-169": {
+    "top": 960,
+    "minClearance": 24
+  },
+  "KV-02-169": {
+    "top": 960,
+    "minClearance": 24
+  },
+  "KV-04-169": {
+    "top": 960,
+    "minClearance": 24
+  },
+  "KV-05-169": {
+    "top": 960,
+    "minClearance": 24
+  },
+  "KV-06-169": {
+    "top": 960,
+    "minClearance": 24
+  },
+  "KV-07-169": {
+    "top": 960,
+    "minClearance": 24
+  },
+  "KV-04-916": {
+    "top": 730,
+    "minClearance": 24
+  },
+  "KV-05-916": {
+    "top": 870,
+    "minClearance": 24
+  },
+  "KV-07-916": {
+    "top": 645,
+    "minClearance": 24
+  },
+  "KV-05-11": {
+    "top": 460,
+    "minClearance": 24
+  },
+  "KV-01-11": {
+    "top": 415,
+    "minClearance": 24
+  },
+  "KV-02-11": {
+    "top": 425,
+    "minClearance": 24
+  },
+  "KV-06-11": {
+    "top": 455,
+    "minClearance": 24
+  },
+  "KV-07-11": {
+    "top": 395,
+    "minClearance": 24
+  },
+  "KV-01-916": {
+    "top": 770,
+    "minClearance": 24
+  },
+  "KV-02-916": {
+    "top": 640,
+    "minClearance": 24
+  },
+  "KV-06-916": {
+    "top": 725,
+    "minClearance": 24
+  },
+  "KV-04-11": {
+    "top": 440,
+    "minClearance": 24
+  }
+}

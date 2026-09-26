@@ -1,0 +1,12 @@
+A 15-second vertical social video, one continuous premium motion-graphics piece over a real cinematic sky at dawn above the clouds. Use the eight reference images as the exact design source: reproduce every text, user-interface card, logo and the aircraft EXACTLY as they appear in the references — same typography, same spelling, same colors, same layout. Never invent or add any other text, word, label or logo.
+
+0–2.5 s (Image 1): a large white search box floats over the sky; the text "¿A dónde viajar en Sudamérica?" is typed letter by letter from the very first frame, with a blinking cursor. On enter, the three white result cards from Image 1 drop in below it, one after another, each with a soft purple-and-lime glow.
+2.5–5 s (Image 2): in one continuous camera move the search box morphs into a chat: the same question rises into the grey bubble, the three result cards fold into the answer card, and the answer text types in, ending in the small purple "SKY Airline" chip.
+5–6 s (Image 3): the camera pushes into the "SKY Airline" chip; it lights up with a glowing border and bright sparkles in SKY purple and lime plus a soft AI rainbow gradient.
+6–8 s (Image 4): the chip's light bursts open into real sky and clouds, and the SKY Airline Airbus A320neo from Image 4 flies out of that light straight toward camera, huge, and sweeps past the lens — realistic aircraft, real sunlight reflections, livery and logo exactly as in Image 4.
+8–10 s (Image 5): in the sky the plane left behind, the text from Image 5 appears: "Un año creando con SKY." then big "+2.000 piezas." with the lime plus sign popping in.
+10–12 s (Image 6): "Y ahora nos eligió como" then big "su agencia SEO/AEO." exactly as Image 6.
+12–13.5 s (Image 7): the sky dissolves into a deep navy field that smoothly turns to SKY purple with a modern soft gradient fade; "¡Gracias, SKY!" appears exactly as Image 7.
+13.5–15 s (Image 8): final solid SKY purple frame with the white Efeonce logo, a thin white vertical bar and the white SKY logo side by side exactly as Image 8. Hold still.
+
+Style: clean, modern, premium, smooth easing, subtle depth and parallax, crisp readable type, no film grain, no lens flares on the text. Music: an original uplifting modern electronic track with a soft pulse, light typing clicks at the start, a shimmering chime when the chip lights up, a deep jet whoosh as the plane passes, and a warm resolved final chord on the logos. No voice, no lyrics.

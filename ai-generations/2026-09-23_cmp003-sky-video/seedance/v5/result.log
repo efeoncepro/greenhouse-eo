@@ -1,0 +1,16 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 ai:fal /Users/jreye/Documents/greenhouse-eo
+> tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/fal-image.ts --capability seedance25-r2v --request-id 01a0d0fd-b1f6-73b3-b78b-37b5e2adbc30 --fal-account FAL_API_KEY_B --out ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/sky-v5-three-cameras-30s-916-720p.mp4 --json
+
+↻ retomando bytedance/seedance-2.5/reference-to-video · request 01a0d0fd-b1f6-73b3-b78b-37b5e2adbc30
+{
+  "video": {
+    "url": "https://v3b.fal.media/files/b/0aaba60a/KqaG07iB-UWh4V_WXct5v_video.mp4",
+    "content_type": "video/mp4",
+    "file_name": "video.mp4",
+    "file_size": 22069201
+  },
+  "seed": 1175484435
+}
+  ✓ 21552KB · ./ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/sky-v5-three-cameras-30s-916-720p.mp4
+done · 446008 ms · 1 asset(s) · request_id 01a0d0fd-b1f6-73b3-b78b-37b5e2adbc30 · cuenta FAL_API_KEY_B

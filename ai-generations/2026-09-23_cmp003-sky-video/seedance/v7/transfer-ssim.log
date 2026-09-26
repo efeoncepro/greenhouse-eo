@@ -1,0 +1,39 @@
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/sky-v6-finished-silent.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf62.12.101
+  Duration: 00:00:30.00, start: 0.000000, bitrate: 2425 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 720x1280 [SAR 1:1 DAR 9:16], 2422 kb/s, 24 fps, 24 tbr, 12288 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      encoder         : Lavc62.28.101 libx264
+Input #1, mov,mp4,m4a,3gp,3g2,mj2, from 'ai-generations/2026-09-23_cmp003-sky-video/seedance/v7/transfer-master.mp4':
+  Metadata:
+    major_brand     : iso5
+    minor_version   : 512
+    compatible_brands: iso5iso6mp41
+    encoder         : Lavf61.9.107
+  Duration: 00:00:30.00, start: 0.083333, bitrate: 2429 kb/s
+  Stream #1:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 720x1280 [SAR 1:1 DAR 9:16], 2422 kb/s, 24 fps, 24 tbr, 12288 tbn, start 0.083333 (default)
+    Metadata:
+      handler_name    : VideoHandler
+      encoder         : Lavc62.28.101 libx264
+Stream mapping:
+  Stream #0:0 (h264) -> fps:default
+  Stream #1:0 (h264) -> fps:default
+  ssim:default -> Stream #0:0 (wrapped_avframe)
+Press [q] to stop, [?] for help
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf62.12.101
+  Stream #0:0: Video: wrapped_avframe, yuv420p(progressive), 360x640 [SAR 1:1 DAR 9:16], q=2-31, 200 kb/s, 24 fps, 24 tbn
+    Metadata:
+      encoder         : Lavc62.28.101 wrapped_avframe
+frame=  670 fps=0.0 q=-0.0 size=N/A time=00:00:27.91 bitrate=N/A speed=55.3x elapsed=0:00:00.50    [Parsed_ssim_6 @ 0x7b9b02b9c0] SSIM Y:1.000000 (inf) U:1.000000 (inf) V:1.000000 (inf) All:1.000000 (inf)
+[out#0/null @ 0x7b9b028600] video:298KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  720 fps=0.0 q=-0.0 Lsize=N/A time=00:00:30.00 bitrate=N/A speed=57.2x elapsed=0:00:00.52    

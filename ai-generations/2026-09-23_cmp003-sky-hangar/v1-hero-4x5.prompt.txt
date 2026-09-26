@@ -1,0 +1,23 @@
+Create a single photorealistic night photograph, vertical 4:5, that looks like a real editorial photo shot on location — not CGI, not a 3D render.
+
+AIRCRAFT — use the reference images as the exact source of truth for the aircraft:
+- The aircraft is an Airbus A320neo-family jet of SKY Airline, parked on the ground with its landing gear DOWN (nose gear and main gear visible, tires on the floor, wheel chocks in front of the main wheels). Take the ground stance, gear, engine nacelles and proportions from the real photograph of the aircraft parked next to a hangar (image 1); take the painted wordmark placement from the real close-up photograph (image 3); take the exact letter shapes from the flat official logo (image 4).
+- Livery exactly as in the references, unchanged: all-white fuselage; purple vertical tail with a large lime-green chevron; lime-green sharklet wingtips; white engine nacelles.
+- The "SKY" wordmark on the forward fuselage must match the flat official logo reference EXACTLY, letter by letter: (1) a bold purple "S"; (2) the "K" is built from TWO separate shapes — first a lime-green chevron pointing RIGHT (like the ">" sign), immediately followed by a solid purple VERTICAL bar; there is NO diagonal crossing and it must never look like an "X"; (3) a bold purple "Y". Letters are upright, heavy geometric sans-serif, painted large over the window line; the cabin windows stay visible as dark ovals passing through the painted letters, exactly like the real aircraft photo reference.
+- Do not add any other text, number, registration or logo anywhere on the aircraft, landing gear doors or equipment.
+- Clean, well-maintained aircraft, realistic panel lines, rivets, small service decals kept illegible, subtle real-world dust on the lower fuselage.
+
+SCALE — this is critical: the aircraft must feel BIG and dominant, at its true size (fuselage about 4 m in diameter, tail about 12 m tall, main tires about 1.2 m, nose tires about 0.75 m). The aircraft fills most of the frame width.
+VIEW AND CAMERA: three-quarter front view, the aircraft facing camera-right, nose near the right edge, the "SKY" wordmark readable on the forward fuselage, the tail cut by the left edge. The camera is close to the aircraft, about 1.4 m above the floor, 50 mm lens on a full-frame camera, f/5.6, 1/60 s, ISO 3200, so the background is compressed and the aircraft dominates. Natural slight sensor grain, true perspective, no fisheye, no HDR look.
+
+SCENE: the inside of a real narrow-body maintenance hangar at night, sized for this aircraft: the top of the tail comes within a few meters of the roof trusses, the side walls and the big hangar doors are close, there is no vast empty space around the aircraft. Steel roof trusses and rows of LED high-bay lights (5600 K) overhead, a light haze in the air catching the beams. Polished grey epoxy concrete floor with painted yellow safety lines and a faint mirror reflection of the aircraft. Realistic hangar details that give true scale: a yellow maintenance stair platform next to the forward door, a ground power unit with its cable, two orange safety cones, a tow bar near the nose gear. No people.
+
+BACK WALL: mounted on the hangar's rear wall behind the aircraft, a large mechanical split-flap departures board (Solari style) of believable size: about 7 m wide and 3 m tall, its top well below the roof trusses and visibly smaller than the aircraft's tail height; 6 rows of individual matte black flaps with hinges and thin metal gaps, each flap roughly the size of a hand, mostly in shadow. One single horizontal row near the middle of the board is lit by a narrow overhead spotlight. EVERY flap is completely BLANK: no letters, no numbers, no symbols, no logos anywhere on the board.
+
+LIGHT: low-key, cinematic but real. The main light is a strong top-down beam from the high-bays that rims the fuselage and tail; the rest of the hangar falls into deep shadow. Physically correct reflections on the fuselage and floor.
+
+COMPOSITION RESERVES (keep clean, no objects, no text):
+- The top 20% of the frame is dark roof structure and trusses in shadow, with the high-bay lamps small and not glaring — a calm dark zone.
+- The bottom 15% of the frame is dark polished floor with only a soft reflection — a calm dark zone.
+
+AVOID: CGI or render look, plastic surfaces, oversaturated purple, glowing outlines, lens flares, bokeh balls, fake film grain overlays, any text or letters other than the aircraft's own "SKY" wordmark, extra logos, warped wings, extra engines, wrong number of wheels.

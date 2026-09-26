@@ -62,6 +62,19 @@ argument-hint: "[área de growth/CRO o pregunta específica — ej: 'auditar con
 
 ## 0. Cómo se usa esta skill (orden obligatorio)
 
+Para **medir creatividades paid, thumb-stop, hook rate o hold rate**, carga
+[el diccionario y diseño de experimentos](../efeonce-advertising-creative/references/paid-visual-attention-playbook.md#5-diccionario-de-medición-sin-falsas-equivalencias).
+Exige numerador/denominador, población, periodo, placement, duración y KPI primario. TikTok 6-second views
+puede incluir interacción; estáticos no tienen hook temporal de video; CTR no mide atención.
+No declarar ganador sin calidad de resultado y muestra comparable.
+
+
+
+Para **CTA dentro de una imagen publicitaria**, cargar [Tres voces + acción](../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md) y
+`efeonce-advertising-creative`: estilos texto/contorno/relleno, una acción y coherencia con destino. Separar aprobación
+visual de eficacia CRO; comparar estilos con copy/oferta/medios constantes y medir resultado calificado. No
+trasladar este tratamiento de anuncio a botones de producto ni atribuir conversiones al color por sí solo.
+
 `diagnose → model → prioritize → experiment → measure`
 
 1. **Diagnostica primero.** Nunca prescribas una lista genérica de "10 growth
@@ -304,3 +317,32 @@ referrals, IDs de campaña o evidencia CRM cuando exista. Alcance correlacionado
 8. **Cero dark patterns.** Scarcity falsa, opt-out engañoso, roach motels: castigados
    por confianza, por regulación (FTC/Ley 21.719) y por deliverability. El growth de
    Efeonce es honesto por diseño (`ANTIPATTERNS.md`).
+
+## Paid Media: zonas seguras y handoff completo
+
+Cargar `docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md`, §Zonas seguras, al adaptar o
+cerrar anuncios. Declarar placement además de ratio; proteger texto, CTA y cursor de la UI.
+La firma cierra al pie sobre lecho físico: no elevarla al centro para aprobar un gate. Medirla por separado,
+declarar cualquier solapamiento posible y revisar el placement; nunca resolverlo con scrim.
+Entregar concepto, audiencia, fase del embudo, hipótesis, progreso, CTA/destino y KPI junto con prompts,
+referencias, editables, comandos/dependencias y QA. Promover a Finales según autorización del operador;
+conservar pilotos y separar final creativo de tráfico/publicación y de resultados medidos.
+
+## Creatividad, etapa y continuidad Paid Media
+
+El [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) registra audiencia/estado de entrada, progreso, fase principal/secundaria y KPI por concepto. Ser fuente preferida es objetivo deseado, no garantía. Ausencia/representación abren problema; referencia/elección trabajan consideración. No inferir eficacia por estética, color o fase. Conservar CTA–destino, solicitudes calificadas, costo y métricas diagnósticas; hook temporal N/A en estáticos. Usar la matriz y el paquete compartido para que otro agente pueda modificar una variable sin perder el control.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+El plan de campaña distingue clicks, consultas recibidas, diagnóstico entregado, reserva confirmada, reunión
+realizada, encaje y oportunidad. Cada KPI declara denominador/fuente/ventana; utm_content en URL no prueba
+persistencia en booking. Verificar el recorrido y sus dependencias antes de gasto; sin causalidad automática
+entre citación IA e ingresos. Hipótesis de experimento no es resultado.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+Conservar denominadores, conversiones reales, deduplicación y atribución hasta CRM; hipótesis A/B no es resultado. No inferir conversión del click, audiencia construida de una definición ni gasto aprobado de un presupuesto sugerido. Ejecución MCP y lectura del estado viven separadas del plan.

@@ -51,9 +51,23 @@ export interface GreenhouseMcpSkillManifestEntry {
   audience: GreenhouseMcpSkillAudience
   /** Ruta del cuerpo relativa a la raíz del repo. Siempre bajo `docs/mcp/skills/`. */
   sourcePath: string
-  /** Tools que este manual gobierna. Cada una DEBE existir en el manifiesto de tools. */
+  /** Tools que este manual gobierna. Cada una DEBE existir en el manifiesto de tools de su proveedor. */
   appliesTo: readonly string[]
+  /**
+   * Proveedor dueño de las tools de `appliesTo`. Ausente = Greenhouse (se validan contra su manifiesto). Para otro
+   * proveedor federado en el gateway (p. ej. Marketing Studio, TASK-1890) Greenhouse sólo valida el espacio de
+   * nombres: su manifiesto vive en el repo del proveedor y el gateway, que tiene ambos, verifica que cada tool
+   * exista (TASK-1891). Nunca se copia a mano la lista de tools de otro proveedor aquí.
+   */
+  provider?: GreenhouseMcpSkillExternalProvider
 }
+
+/** Proveedores externos cuyos manuales sirve Greenhouse, con el prefijo obligatorio de sus tools. */
+export const GREENHOUSE_MCP_SKILL_EXTERNAL_PROVIDERS = {
+  'marketing-studio': { toolPrefix: 'studio.' }
+} as const
+
+export type GreenhouseMcpSkillExternalProvider = keyof typeof GREENHOUSE_MCP_SKILL_EXTERNAL_PROVIDERS
 
 /** Directorio raíz de los manuales publicables, relativo a la raíz del repo. */
 export const GREENHOUSE_MCP_SKILLS_ROOT = 'docs/mcp/skills'
@@ -153,6 +167,28 @@ export const GREENHOUSE_MCP_SKILL_MANIFEST: readonly GreenhouseMcpSkillManifestE
     audience: 'internal',
     sourcePath: `${GREENHOUSE_MCP_SKILLS_ROOT}/efeonce-insights/SKILL.md`,
     appliesTo: ['get_insights_catalog', 'list_insight_editions', 'get_insight_edition', 'create_insight_edition']
+  },
+  {
+    // TASK-1890 — Efeonce Marketing Studio: leer campañas, piezas, copys, anuncios, plan y calendario por MCP sin
+    // malinterpretar estados ni presupuestos. Tools del proveedor `marketing-studio` (manifiesto en su propio repo).
+    name: 'marketing-studio',
+    audience: 'internal',
+    sourcePath: `${GREENHOUSE_MCP_SKILLS_ROOT}/marketing-studio/SKILL.md`,
+    provider: 'marketing-studio',
+    appliesTo: [
+      'studio.attention.get',
+      'studio.campaigns.list',
+      'studio.campaign.get',
+      'studio.campaign.assets.list',
+      'studio.asset.get',
+      'studio.asset.preview',
+      'studio.campaign.copies.list',
+      'studio.campaign.ads.list',
+      'studio.campaign.media_plan.get',
+      'studio.campaign.posts.list',
+      'studio.calendar.get',
+      'studio.search'
+    ]
   }
 ] as const
 
@@ -239,8 +275,10 @@ export const computeGreenhouseMcpSkillCoverage = (input: {
       })
     }
 
+    const external = entry.provider ? GREENHOUSE_MCP_SKILL_EXTERNAL_PROVIDERS[entry.provider] : null
+
     for (const tool of entry.appliesTo) {
-      if (!toolNames.has(tool)) {
+      if (external ? !/^[a-z][a-z0-9_.]*$/.test(tool) || !tool.startsWith(external.toolPrefix) : !toolNames.has(tool)) {
         findings.push({
           code: 'applies_to_unknown_tool',
           skill: entry.name,

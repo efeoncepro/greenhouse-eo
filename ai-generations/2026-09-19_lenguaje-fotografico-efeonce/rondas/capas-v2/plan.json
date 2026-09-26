@@ -1,0 +1,120 @@
+[
+ {
+  "id": "a-oficio-45",
+  "plate": "p1.png",
+  "align": "left",
+  "top": 0.045,
+  "label": "CREATIVE · RUN & GUN",
+  "lead": "Grabamos el oficio",
+  "leadSize": 50,
+  "textWidth": 0.66,
+  "dominant": "donde",
+  "dominantSize": 190,
+  "dominantMax": 0.46,
+  "after": "pasa: en la|**panadería.**",
+  "afterSize": 46,
+  "afterFill": "#ffffff",
+  "gesture": {
+   "text": "¡ahí está!",
+   "size": 58,
+   "x": 0.58,
+   "y": 0.45,
+   "rotate": -6,
+   "color": "#ffffff"
+  },
+  "logo": {
+   "width": 0.17,
+   "variant": "auto"
+  },
+  "final": [
+   1080,
+   1350
+  ],
+  "labelSize": 30
+ },
+ {
+  "id": "b-cocreacion-45",
+  "plate": "p2.png",
+  "align": "left",
+  "top": 0.055,
+  "label": "CO-CREACIÓN",
+  "lead": "No te entregamos crecimiento:",
+  "leadSize": 44,
+  "textWidth": 0.7,
+  "dominant": "lo construimos",
+  "dominantSize": 150,
+  "dominantMax": 0.84,
+  "after": "**contigo.**",
+  "afterSize": 44,
+  "afterFill": "#ffffff",
+  "selection": {
+   "box": [
+    0.29,
+    0.695,
+    0.87,
+    0.795
+   ],
+   "targetKind": "object",
+   "variant": "open-brackets",
+   "scale": 1.2,
+   "cursors": [
+    {
+     "id": "cliente",
+     "label": "Cliente",
+     "anchor": "bottom-start",
+     "color": "#6ec207"
+    },
+    {
+     "id": "efeonce",
+     "label": "Efeonce",
+     "anchor": "bottom-end",
+     "color": "#0375db"
+    },
+    {
+     "id": "yo",
+     "kind": "local",
+     "anchor": "end-center"
+    }
+   ]
+  },
+  "logo": {
+   "width": 0.17,
+   "variant": "auto"
+  },
+  "final": [
+   1080,
+   1350
+  ],
+  "labelSize": 30
+ },
+ {
+  "id": "c-pipeline-169",
+  "plate": "p3.png",
+  "align": "left",
+  "top": 0.16,
+  "label": "REVOPS · PIPELINE",
+  "lead": "Tu operación,",
+  "leadSize": 48,
+  "textWidth": 0.42,
+  "dominant": "en vivo.",
+  "dominantSize": 190,
+  "dominantMax": 0.36,
+  "logo": {
+   "width": 0.12,
+   "variant": "auto",
+   "x": 0.22
+  },
+  "final": [
+   1920,
+   1080
+  ],
+  "ink": "dark",
+  "labelSize": 34,
+  "note": {
+   "text": "Ganados este mes **+18**|RpA 2,1 a **1,4**",
+   "y": 0.62,
+   "width": 0.34,
+   "size": 46
+  }
+ }
+]

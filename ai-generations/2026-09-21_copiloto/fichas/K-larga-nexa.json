@@ -1,0 +1,19 @@
+{
+  "id": "K-larga-nexa",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "larga-exposicion",
+  "identidad": ["nexa"],
+  "objetos": ["polo-efeonce"],
+  "escena": "SCENE (a staged piece for a campaign, shot in the agency's production floor during a busy afternoon): Nexa is the ONE thing that does not move. She stands still in the middle of the frame, weight settled, hands quiet at her sides, and she LOOKS STRAIGHT INTO THE LENS with calm, unhurried attention — perfectly sharp, every strand of hair and the weave of the polo readable. Her head stays FRONTAL: both eyes and both eyebrows fully visible, both cheeks visible, the bridge of her nose does not cut across either cheek. Her expression is composed and direct, lips closed, a faint lift at one corner of the mouth: the stillness of someone who knows where things are going. Her irises are VERY DARK BROWN, almost black, so dark that the iris barely separates from the pupil — never hazel, amber or honey, and no golden ring inside the iris. She wears the navy blue Efeonce piqué polo. AROUND HER, EVERYTHING ELSE IS MOTION: two or three colleagues crossing behind her dissolve into soft translucent streaks with no readable faces, a hand pushing a rolling case draws a continuous blur, and a small work lamp carried across the room leaves a thin continuous light trail. The motion reads as accumulated time, never as camera shake: SHE is not blurred at all. CRITICAL ON LIGHT, and every practical lamp is SWITCHED OFF except the ones being carried: the KEY is a single hard white source low and far to the LEFT, raking across her with the shadow of her nose short and readable; a second hard source BEHIND her on the right and LOW cuts a clean RIM along her hair and shoulder, separating her from the wall. The light trails and every pool of light stay BELOW THE MIDDLE OF THE FRAME. Both sources are white: highlights on skin and polo stay NEUTRAL, never yellow or amber, and nothing glows warm. THREE PLANES: the out-of-focus corner of a road case at the very front; Nexa sharp in the middle; the streaked colleagues far behind. The wall behind her is bare dark concrete — NO blue panel, NO bookshelf, NO plant, NO domestic decor. She stands LOW in the frame: the very top of her head is at or BELOW 38% of the frame height, and the whole TOP THIRD is that bare dark wall, completely unbroken — no lamp, no trail, no streak and no light patch may enter that band. Everything is unbranded except her polo. Tripod, 85mm at f/8, half a second, focus on her eyes.",
+  "lecho": {
+    "objeto": "the black corner of a road case standing right at the lens, its metal edge and latch crossing the ENTIRE bottom of the frame from left edge to right edge, a hand's width from the camera and dissolved completely out of focus. It sits OUTSIDE every light and no light trail passes over it",
+    "tono": "NEAR-BLACK, the darkest thing in the picture and even across its whole width — NOTHING else appears in that bottom strip: no hands, no streak, no cable, no highlight, no reflection, no lettering"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the bare dark concrete wall filling the top third behind her",
+      "tinta": "blanca"
+    }
+  }
+}

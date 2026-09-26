@@ -1,0 +1,61 @@
+
+> @efeoncepro/axis-design-system-workspace@0.1.0 aeo:compose /Users/jreye/Documents/axis-design-system
+> pnpm --dir apps/lab build && node apps/lab/scripts/compose-aeo.mjs --input /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/kit/src/aeo-intent-9x16.json --out-dir /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/kit/out/aeo-9x16
+
+
+> @efeonce/axis-design-system-lab@0.1.0 build /Users/jreye/Documents/axis-design-system/apps/lab
+> astro build
+
+20:53:53 [content] Syncing content
+20:53:53 [content] Synced content
+20:53:53 [types] Generated 508ms
+20:53:53 [build] output: "static"
+20:53:53 [build] mode: "static"
+20:53:53 [build] directory: /Users/jreye/Documents/axis-design-system/apps/lab/dist/
+20:53:53 [build] Collecting build info...
+20:53:53 [build] ✓ Completed in 549ms.
+20:53:53 [build] Building static entrypoints...
+20:53:54 [vite] ✓ built in 428ms
+20:53:54 [vite] ✓ built in 64ms
+20:53:54 [build] Rearranging server assets...
+
+ generating static routes 
+20:53:54   ├─ /docs/index.html (+11ms) 
+20:53:54   ├─ /patterns/efeonce.activity-timeline/index.html (+3ms) 
+20:53:54   ├─ /patterns/efeonce.advertising-typography/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.ai-search-composition/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.border-beam/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.brand-logos/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.brand-motion/index.html (+2ms) 
+20:53:54   ├─ /patterns/efeonce.breadcrumbs/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.button/index.html (+2ms) 
+20:53:54   ├─ /patterns/efeonce.card-density/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.charts/index.html (+6ms) 
+20:53:54   ├─ /patterns/efeonce.chip/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.collaboration-selection/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.composition-shell/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.disclosure/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.floating-surface/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.gradients/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.leaderboard/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.loaders/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.motion/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.progress/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.roadmap-timeline/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.status/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.surface-recipes/index.html (+1ms) 
+20:53:54   ├─ /patterns/efeonce.team-avatar-group/index.html (+1ms) 
+20:53:54   ├─ /references/colors/index.html (+2ms) 
+20:53:54   ├─ /references/creative-resources/index.html (+4ms) 
+20:53:54   ├─ /references/creative-typography/index.html (+3ms) 
+20:53:54   ├─ /references/elevation/index.html (+1ms) 
+20:53:54   ├─ /references/geometry/index.html (+1ms) 
+20:53:54   ├─ /references/typography/index.html (+1ms) 
+20:53:54   ├─ /index.html (+1ms) 
+20:53:54 ✓ Completed in 76ms.
+
+20:53:54 [build] ✓ Completed in 592ms.
+20:53:54 [@astrojs/sitemap] `sitemap-index.xml` created at `dist`
+20:53:54 [build] 32 page(s) built in 1.16s
+20:53:54 [build] Complete!
+{"status":"composed","directory":"/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/kit/out/aeo-9x16","manifest":"/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/kit/out/aeo-9x16/manifest.json","outputs":["chatgpt-app-9x16.svg","chatgpt-user-9x16.svg","chatgpt-answer-9x16.svg","chatgpt-citation-9x16.svg","chatgpt-composer-9x16.svg"]}

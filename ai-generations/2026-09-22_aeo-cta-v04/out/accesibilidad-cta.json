@@ -1,0 +1,586 @@
+{
+  "method": "WCAG relative luminance; conservative minimum across full text bounding boxes on native photograph (not p98); solid text versus surface; boundary band versus photograph; opaque light cursor/selection core pixels versus photograph. Antialiased edges excluded for controls, not text boxes.",
+  "thresholds": {
+    "text": 4.5,
+    "boundary": 3,
+    "controls": 3
+  },
+  "results": [
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 15.84298830149146,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 14.725938379299853,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 5.394290733809997,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "01-fuera-916",
+      "style": "outline",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#ff6500"
+      },
+      "ctaTextMin": 4.988,
+      "descriptorMin": 14.785,
+      "boundaryMin": 4.918,
+      "cursorAndControlsMin": 9.231,
+      "controlCorePixels": 284,
+      "overlayBounds": {
+        "right": 693,
+        "bottom": 427
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 13.184272926557812,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 11.398502847917952,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 5.059171115621053,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "01-fuera-169",
+      "style": "outline",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#ff6500"
+      },
+      "ctaTextMin": 5.196,
+      "descriptorMin": 14.38,
+      "boundaryMin": 5.186,
+      "cursorAndControlsMin": 9.023,
+      "controlCorePixels": 816,
+      "overlayBounds": {
+        "right": 581,
+        "bottom": 447
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 14.543389447062395,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 14.07167683673959,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 4.817301317335044,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "02-reconoces-916",
+      "style": "solid",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#00284d"
+      },
+      "ctaTextMin": 5.043,
+      "descriptorMin": 14.987,
+      "boundaryMin": 4.975,
+      "cursorAndControlsMin": 8.551,
+      "controlCorePixels": 282,
+      "overlayBounds": {
+        "right": 781,
+        "bottom": 387
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 13.238115154150984,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 11.700416653513493,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 4.163769345752681,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "02-reconoces-169",
+      "style": "solid",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#00284d"
+      },
+      "ctaTextMin": 5.043,
+      "descriptorMin": 14.312,
+      "boundaryMin": 4.475,
+      "cursorAndControlsMin": 8.298,
+      "controlCorePixels": 811,
+      "overlayBounds": {
+        "right": 565,
+        "bottom": 485
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 14.52004859897198,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 10.255689544393467,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 3.473979146766435,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "03-referencia-916",
+      "style": "text",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#ffffff"
+      },
+      "ctaTextMin": 12.066,
+      "descriptorMin": 11.649,
+      "boundaryMin": null,
+      "cursorAndControlsMin": 7.646,
+      "controlCorePixels": 288,
+      "overlayBounds": {
+        "right": 835,
+        "bottom": 382
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 14.424001185400812,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 13.30552075604123,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 4.6639863646274495,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "03-referencia-169",
+      "style": "text",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#ffffff"
+      },
+      "ctaTextMin": 12.847,
+      "descriptorMin": 13.531,
+      "boundaryMin": null,
+      "cursorAndControlsMin": 8.783,
+      "controlCorePixels": 824,
+      "overlayBounds": {
+        "right": 627,
+        "bottom": 526
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 12.253580614344413,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 12.22205631110538,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 4.338376065871721,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "04-elegida-916",
+      "style": "solid",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#00284d"
+      },
+      "ctaTextMin": 5.043,
+      "descriptorMin": 13.744,
+      "boundaryMin": 4.387,
+      "cursorAndControlsMin": 8.175,
+      "controlCorePixels": 274,
+      "overlayBounds": {
+        "right": 757,
+        "bottom": 402
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 7.956477687551244,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 9.454488766713679,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 3.2025829834968254,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "04-elegida-169",
+      "style": "solid",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#00284d"
+      },
+      "ctaTextMin": 5.043,
+      "descriptorMin": 12.368,
+      "boundaryMin": 4.502,
+      "cursorAndControlsMin": 9.021,
+      "controlCorePixels": 822,
+      "overlayBounds": {
+        "right": 531,
+        "bottom": 588
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 14.812896474554478,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 14.254259952147962,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 5.104082731191037,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "01-fuera-45",
+      "style": "outline",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#ff6500"
+      },
+      "ctaTextMin": 4.779,
+      "descriptorMin": 14.29,
+      "boundaryMin": 4.828,
+      "cursorAndControlsMin": 8.85,
+      "controlCorePixels": 321,
+      "overlayBounds": {
+        "right": 787,
+        "bottom": 312
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 15.333547048931326,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 14.885339701380307,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 5.576398439184281,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "01-fuera-11",
+      "style": "outline",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#ff6500"
+      },
+      "ctaTextMin": 4.832,
+      "descriptorMin": 14.714,
+      "boundaryMin": 4.832,
+      "cursorAndControlsMin": 8.865,
+      "controlCorePixels": 395,
+      "overlayBounds": {
+        "right": 857,
+        "bottom": 298
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 14.759866301619688,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 14.027507516747152,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 4.751632582416577,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "02-reconoces-45",
+      "style": "solid",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#00284d"
+      },
+      "ctaTextMin": 5.043,
+      "descriptorMin": 15.103,
+      "boundaryMin": 5.034,
+      "cursorAndControlsMin": 8.519,
+      "controlCorePixels": 335,
+      "overlayBounds": {
+        "right": 820,
+        "bottom": 311
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 15.924727449687596,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 15.834460040133314,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 5.390046767217753,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "02-reconoces-11",
+      "style": "solid",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#00284d"
+      },
+      "ctaTextMin": 5.043,
+      "descriptorMin": 16.162,
+      "boundaryMin": 5.398,
+      "cursorAndControlsMin": 8.914,
+      "controlCorePixels": 411,
+      "overlayBounds": {
+        "right": 886,
+        "bottom": 298
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 14.970522241933546,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 13.759445896542383,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 4.660830255122176,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "03-referencia-45",
+      "style": "text",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#ffffff"
+      },
+      "ctaTextMin": 13.413,
+      "descriptorMin": 13.068,
+      "boundaryMin": null,
+      "cursorAndControlsMin": 7.486,
+      "controlCorePixels": 321,
+      "overlayBounds": {
+        "right": 840,
+        "bottom": 300
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 15.62468407296714,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 13.484258747622802,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 4.567614249248894,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "03-referencia-11",
+      "style": "text",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#ffffff"
+      },
+      "ctaTextMin": 13.744,
+      "descriptorMin": 13.698,
+      "boundaryMin": null,
+      "cursorAndControlsMin": 8.527,
+      "controlCorePixels": 410,
+      "overlayBounds": {
+        "right": 906,
+        "bottom": 287
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 13.373714706019426,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 13.564708547168504,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 4.594865554465723,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "04-elegida-45",
+      "style": "solid",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#00284d"
+      },
+      "ctaTextMin": 5.043,
+      "descriptorMin": 13.664,
+      "boundaryMin": 4.591,
+      "cursorAndControlsMin": 7.997,
+      "controlCorePixels": 322,
+      "overlayBounds": {
+        "right": 787,
+        "bottom": 315
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 12.349024890436144,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 12.718109207642426,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 4.308091229009699,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "04-elegida-11",
+      "style": "solid",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#00284d"
+      },
+      "ctaTextMin": 5.043,
+      "descriptorMin": 14.001,
+      "boundaryMin": 4.583,
+      "cursorAndControlsMin": 8.062,
+      "controlCorePixels": 412,
+      "overlayBounds": {
+        "right": 857,
+        "bottom": 302
+      },
+      "contrastPass": true
+    }
+  ]
+}

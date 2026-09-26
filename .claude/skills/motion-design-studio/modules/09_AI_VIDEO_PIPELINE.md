@@ -30,12 +30,12 @@ No hay "el mejor modelo" — hay **el mejor modelo para ESTA toma**. Elige por l
 | **Higgsfield Soul ID** | **Consistencia de personaje** | Subir 3–5 fotos, entrenar ~5–10 min, reusar el mismo rostro en todas las tools. EL diferenciador |
 | **Runway Gen-4.5** | **Cine dirigido** | Entiende beats y coreografía de cámara (pan/truck/handheld). Fuerte para narrativa dirigida |
 | **Seedance 2.0** | Briefs detallados + refs multimodales | Reference-to-video con hasta 9 imágenes + 3 videos + 3 audios; 4–15 s; native audio. Puede usar previs 3D como **video exportado**; no recibe `.blend`. |
-| **Seedance 2.5 vía Fal** | T2V, I2V y R2V; briefs largos, audio nativo y muchas refs | OpenAPI (releído 2026-09-16): 480p/720p/1080p, sin 4K, 4–30 s; I2V acepta `image_url` y `end_image_url`; R2V admite hasta 30 imágenes, 10 videos, 10 audios y 50 archivos totales, con audio condicionado a imagen/video. No declara 4K, máscara, storyboard, shots ni precio fijo; el costo publicado es una fórmula de Fal y debe refrescarse. Verificado en real 2026-09-16 (t2v, i2v y r2v en `reference`/`editing`/`extension`); costo estimable con la fórmula de fal `alto × ancho × segundos × 24 / 1024` tokens (calzó con lo medido; la equivalencia de OpenArt subestima ~2×); precio publicado 480p ≈0,22 · 720p ≈0,47 USD/s; 1080p sin verificar; el filtro de ByteDance rechaza marcas y personas reales **tras encolar y cobra**. |
+| **Seedance 2.5 vía Fal** | T2V, I2V y R2V; briefs largos, audio nativo y muchas refs | OpenAPI (releído 2026-09-16): 480p/720p/1080p, sin 4K, 4–30 s; I2V acepta `image_url` y `end_image_url`; R2V admite hasta 30 imágenes, 10 videos, 10 audios y 50 archivos totales, con audio condicionado a imagen/video. No declara 4K, máscara, storyboard, shots ni precio fijo; el costo publicado es una fórmula de Fal y debe refrescarse. Verificado en real 2026-09-16 (t2v, i2v y r2v en `reference`/`editing`/`extension`); La fórmula local coincidió en pruebas cortas, pero subestimó SKY V11 (USD 23,88204 estimados frente a 34,162558 facturados). Incluir entrada/salida y tarifa vigente: el flag local no es cap del proveedor. SKY V11 verificó salida1080×1920, no detalle nativo. Se observaron rechazos cobrados de marcas/personas en ciertas rutas; no universalizar esa observación. |
 | **Seedance 2.5 vía Higgsfield MCP** (`seedance_2_5`) | UI legible en la pantalla de un dispositivo, producto y refs indexadas; el operador lo indicó como el más potente para esto | `generate_video` con `mode: omni_reference` y roles `start_image`, `end_image`, `image_references`, `video_references`, `audio_references`; 4–30 s; 480p/720p/1080p; `bitrate_mode` standard/high; `generate_audio`. Medido 2026-09-11: **72 créditos Higgsfield por 8 s a 1080p**, ~4–5 min por render. Mecánica del MCP en `efeonce/STUDIO_TOOLING.md`; receta de pantallas en §7. |
 | **Kling 3.0** (vía Higgsfield; Kling 3 vía fal = evaluado, no conectado) | **Storyboarding multi-shot + Voice Binding** | Voz consistente en 6 cortes / 5 idiomas. Económico |
 | **Wan 3.0 / Prime vía Fal** (`pnpm ai:fal`, conectado 2026-09-16) | Tomas de hasta 30 s con **duración inteligente** (`auto`); video basado en una **web o documento** | 2–30 s, hasta 1080p (default del proveedor 1080p; sin `--resolution` el CLI envía 480p y lo avisa: pide 720p/1080p explícito para la toma final), audio apagable, 30 fps; USD/s por resolución 480p 0,05 · 720p 0,10 · 1080p 0,20 (Prime 0,068 · 0,14 · 0,28); R2V con 10 imágenes / 5 videos / 5 audios citados por posición (`Image 1`); `--web-url`/`--file` exigen `--thinking`. Los 6 endpoints verificados en real 2026-09-16. Sin edición en fal. #2 video / #1 Video Editing en OpenArt Arena (2026-09-16, ranking externo) |
 | **Veo 3.1** | **Broadcast** | Frame rate de cine, sync audio-visual nativo. ~$0.10/s |
-| **Gemini Omni** | **Edición conversacional multi-turn** | Multimodal, consistencia entre turnos. Vertex (proyecto efeonce-group). **Directo por Google, nunca por fal** aunque fal lo ofrezca |
+| **Gemini Omni 1.1 Flash** | Texto, imagen, cuadros, referencias, edit y extend desde MP4 | `pnpm ai:omni` Cloud directo (nunca fal). Seis modos probados técnicamente a360p/16:9/3 s; `extend` entregó6 s acumulados. SKY añadió edición1080×1920/24fps: piloto9,5s rechazado y ventana6,5s integrada tras QA. Cadena stateful,4K y continuidad universal no acreditados; manual `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md` |
 | **Sora 2** | Consistencia temporal/física (líder) | ⚠️ **API deprecada 2026-03-24, shutdown 2026-09-24** → **NO basar nada nuevo**. Sigue accesible vía agregadores (Higgsfield) |
 | **Magnific** (MCP + API) | **Upscale / enhance / finish** | Video Sequence Enhancement (frame-consistent), Precision API (detalle fiel), 2x–16x/8K. Paso de finishing, no de generación. Detalle en `modules/08 §8` |
 
@@ -162,9 +162,9 @@ ilusión.** Es el error #1 que separa el video IA amateur del pro. Herramientas 
 | Modo de fallo | Síntoma | Workaround canónico |
 |---|---|---|
 | **Handheld / shaky** | Movimiento de cámara "a mano" sale tembloroso, con warping o grano raro | Genera **estático/suave** y agrega el *shake* en post (AE/Resolve), o suma grano en post. No pidas handheld al modelo |
-| **Tomas > ~10s** | Deriva, morphing, pérdida de coherencia en clips largos | Genera en **chunks de 5–8s** y **monta** (`modules/06`). El master largo se arma editando, no generando de una |
-| **Through-object moves** | Cámara que atraviesa un objeto (a través de una ventana, un anillo) se rompe | **Plates estáticos** + el *move* en post (compositing/3D camera en AE). No lo resuelve el modelo hoy |
-| **Manos / texto / detalle fino** | Manos deformes, texto ilegible, logos derretidos | Evita primeros planos de manos/texto generado; pon el **texto real en post** (mograph, `modules/05`); logo compositeado, no generado. Excepción: la UI **dentro de la pantalla de un dispositivo** la renderiza el modelo (ver abajo) |
+| **Tomas largas** | Riesgo de deriva, morphing o pérdida de coherencia, según motor/escena | Elige película completa o ventanas por contrato de continuidad y capacidad verificada; un job completo puede contener cortes. No dividir por defecto en 5–8 s. Si usas ventanas, planifica handles y valida entrada/centro/salida. Ver [preproducción](../companions/video-preproduction-and-production.md) |
+| **Through-object moves** | Cámara que atraviesa un objeto (a través de una ventana, un anillo) se rompe | Evaluar piloto con entrada/salida observables; si falla, plates + movimiento3D local sólo si está autorizado. No inferir incapacidad universal de un fallo puntual |
+| **Manos / texto / detalle fino** | Manos deformes, texto ilegible, logos derretidos | Revisa manos/texto/logo en secuencia. Cuando se exige exactitud, usa assets locales; si el operador conserva UI generativa, registra su tolerancia y no amplíes la composición por inferencia. Ver contrato por elemento en el companion de preproducción |
 | **Texto chico en pantalla redibujado** | El modelo reescribe la UI desde el primer frame («B2S» por B2B) | Pantallas **video-safe** como `image_references` + frases exactas en el prompt (ver abajo) |
 | **Reencuadre pese al `start_image`** | El sujeto crece o se desplaza durante el clip e invade el espacio del overlay | Mide el bounding box por frame y diagrama el overlay en las bandas libres (ver abajo) |
 | **Edit `completed` con deriva temporal** | La edición cambia artefactos, cámara o anatomía fuera de la zona pedida | `completed` = candidato. Revisar 1×/0.5× + contact sheet; si sólo faltan timing/orden/repetición y las poses existen, retimar el mismo master en post (`workflows/omni-in-place-edit-and-deterministic-finish.md`) |
@@ -242,9 +242,8 @@ dirigir (shot list + prompt sheet)
   + upscales. Confirma con `pnpm ai:fal --balance` antes y después de la primera toma. Una
   pieza de 30s a ~$0.10/s con 4 variantes por toma escala rápido.
 - **Prueba en una toma**, valida calidad/consistencia, **recién ahí** genera el volumen.
-- **Chunks, no clips largos** (§7) — también controla el gasto de re-tiradas.
-- **Confirmación humana antes de volumen y antes de entregar** (boundary del SKILL §4/§5). El estudio
-  dirige; no dispara créditos ni publica sin aprobación. Créditos/balance y ejecución:
+- **Generación completa o ventanas:** decidir por continuidad, capacidad y alcance (§7); ventanas requieren empalmes verificables y no son una regla de ahorro universal.
+- **Autorización compatible antes de gasto**: reutiliza la ya concedida; entregar a revisión no exige otra confirmación rutinaria. Publicar requiere su autorización separada. Créditos/balance y ejecución:
   `efeonce/STUDIO_TOOLING.md`.
 
 ---
@@ -257,7 +256,7 @@ dirigir (shot list + prompt sheet)
 | Spot broadcast con audio sincronizado | Veo 3.1 | Frame rate de cine + sync nativo |
 | Producto que debe verse idéntico en 6 tomas | Seedance 2.5 R2V (50 archivos totales) | Muchas refs orientan producto, movimiento y audio; validar continuidad antes del release |
 | Diálogo de personaje multi-idioma | Kling (Voice Binding) + LipSync | Voz consistente 5 idiomas |
-| Iteración conversacional de una escena | Gemini Omni | Edición multi-turn con consistencia |
+| Edición instruida sobre MP4 | Gemini Omni en la ruta verificada | Puede reinterpretar; CLI local stateful sin probar, continuidad se revisa en el resultado |
 | Plate / fondo / partículas | text-to-video (modelo barato del agregador) | Encuadre exacto no importa |
 | Transición precisa inicio→fin | i2v con start+end frame | Control del arco de movimiento |
 | Subir a 4K/8K + limpiar | Magnific (Sequence Enhancement / Precision) | Finish frame-consistent, después del grade |

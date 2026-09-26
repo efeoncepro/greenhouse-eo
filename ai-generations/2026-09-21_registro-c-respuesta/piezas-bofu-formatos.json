@@ -1,0 +1,113 @@
+[
+  {
+    "align": "left",
+    "top": 0.165,
+    "textWidth": 0.84,
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 36,
+    "leadGap": 0.12,
+    "dominantSize": 140,
+    "dominantMax": 0.76,
+    "dominantTracking": -0.02,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 34,
+    "afterGap": 0.12,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": 0.82
+    },
+    "id": "b2-primero-el-numero-916",
+    "plate": "plates/b2-primero-el-numero-916-v2-plate.png",
+    "lead": "El tablero ya te mostró el problema.",
+    "dominant": "Cerrarlo es otra cosa.",
+    "after": "Eso es lo que **operamos**.",
+    "subjectProtection": {
+      "top": 920,
+      "minClearance": 24
+    },
+    "cta": {
+      "variant": "outline",
+      "radius": 10,
+      "text": "Agenda tu discovery",
+      "descriptor": "AEO para LatAm · 30 minutos",
+      "surfaceToken": "growthOnDark",
+      "inkToken": "growthOnDark",
+      "x": 0.07,
+      "gapAfterNote": 18,
+      "paddingX": 24,
+      "paddingY": 14,
+      "fontSize": 40,
+      "descriptorSize": 28,
+      "descriptorGap": 16,
+      "cursorScale": 1.1
+    },
+    "note": {
+      "text": "Método, no improvisación: los seis motores, cada mes.",
+      "size": 34,
+      "x": 0.07,
+      "width": 0.8,
+      "gapAfterClosure": 30
+    }
+  },
+  {
+    "align": "left",
+    "top": 0.1,
+    "textWidth": 0.44,
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 32,
+    "leadGap": 0.12,
+    "dominantSize": 112,
+    "dominantMax": 0.44,
+    "dominantTracking": -0.02,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 30,
+    "afterGap": 0.12,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "logo": {
+      "width": 0.14,
+      "x": 0.5
+    },
+    "id": "b2-primero-el-numero-169",
+    "plate": "plates/b2-primero-el-numero-169-plate.png",
+    "lead": "El tablero ya te mostró el problema.",
+    "dominant": "Cerrarlo es otra cosa.",
+    "after": "Eso es lo que **operamos**.",
+    "subjectProtection": {
+      "top": 904,
+      "minClearance": 24
+    },
+    "cta": {
+      "variant": "outline",
+      "radius": 10,
+      "text": "Agenda tu discovery",
+      "descriptor": "AEO para LatAm · 30 minutos",
+      "surfaceToken": "growthOnDark",
+      "inkToken": "growthOnDark",
+      "x": 0.07,
+      "gapAfterNote": 18,
+      "paddingX": 24,
+      "paddingY": 14,
+      "fontSize": 34,
+      "descriptorSize": 24,
+      "descriptorGap": 16,
+      "cursorScale": 1.1
+    },
+    "note": {
+      "text": "Método, no improvisación: los seis motores, cada mes.",
+      "size": 30,
+      "x": 0.07,
+      "width": 0.42,
+      "gapAfterClosure": 30
+    }
+  }
+]

@@ -1,0 +1,49 @@
+{
+  "reference": "Deck-Lectura",
+  "catalog": "deck",
+  "contentType": "insights-reading",
+  "slots": {
+    "tabNumber": "C",
+    "section": "Conclusiones",
+    "period": "Agosto 2026",
+    "eyebrow": "Nuestra lectura",
+    "thesis": "El sitio ya no tiene un problema de visibilidad: <em>tiene uno de conversión.</em>",
+    "blocks": [
+      {
+        "tone": "default",
+        "heading": "Lo que muestran los datos",
+        "text": "El alza es sostenida: la media diaria subió de 37 a 46 clics, y seis de cada diez llegaron sin buscar la marca.",
+        "folios": [
+          "p. 08",
+          "p. 10"
+        ]
+      },
+      {
+        "tone": "focus",
+        "heading": "Dónde está la brecha",
+        "text": "De 690 visitas salieron 41 formularios (5,9 %). Y en 14 consultas donde rankeamos, ningún motor de IA nos cita.",
+        "folios": [
+          "p. 17",
+          "p. 20"
+        ]
+      },
+      {
+        "tone": "default",
+        "heading": "Qué cambia en septiembre",
+        "text": "Convertir lo que ya llega: páginas que respondan mejor, un formulario más corto y contenido que la IA pueda citar.",
+        "folios": [
+          "p. 22"
+        ]
+      }
+    ],
+    "oneLiner": {
+      "label": "En una frase",
+      "text": "<em>Cada punto de CTR vale unos 480 clics al mes:</em> el crecimiento está en convertir, no en aparecer más."
+    },
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "folio": {
+      "page": "21",
+      "total": "24"
+    }
+  }
+}

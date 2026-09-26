@@ -1,0 +1,168 @@
+{
+  "costUsd": 0,
+  "musicSource": "V7 native, locally separated; instrumental bridge from pre-speech material",
+  "excludedSourceSeconds": [
+    15.1,
+    24.4
+  ],
+  "bridgeSourceSeconds": [
+    10.6,
+    15.1
+  ],
+  "speed": 1,
+  "cues": [
+    {
+      "name": "dry-key-0",
+      "start": 0.041666666666666664,
+      "duration": 0.035,
+      "level": 0.075,
+      "frame": 1
+    },
+    {
+      "name": "dry-key-1",
+      "start": 0.125,
+      "duration": 0.035,
+      "level": 0.075,
+      "frame": 3
+    },
+    {
+      "name": "dry-key-2",
+      "start": 0.20833333333333334,
+      "duration": 0.035,
+      "level": 0.075,
+      "frame": 5
+    },
+    {
+      "name": "dry-key-3",
+      "start": 0.2916666666666667,
+      "duration": 0.035,
+      "level": 0.075,
+      "frame": 7
+    },
+    {
+      "name": "dry-key-4",
+      "start": 0.4166666666666667,
+      "duration": 0.035,
+      "level": 0.075,
+      "frame": 10
+    },
+    {
+      "name": "dry-key-5",
+      "start": 0.5,
+      "duration": 0.035,
+      "level": 0.075,
+      "frame": 12
+    },
+    {
+      "name": "dry-key-6",
+      "start": 0.625,
+      "duration": 0.035,
+      "level": 0.075,
+      "frame": 15
+    },
+    {
+      "name": "dry-key-7",
+      "start": 0.75,
+      "duration": 0.035,
+      "level": 0.075,
+      "frame": 18
+    },
+    {
+      "name": "dry-key-8",
+      "start": 0.8333333333333334,
+      "duration": 0.035,
+      "level": 0.075,
+      "frame": 20
+    },
+    {
+      "name": "enter",
+      "start": 1,
+      "duration": 0.05,
+      "level": 0.13,
+      "frame": 24
+    },
+    {
+      "name": "result-slide-0",
+      "start": 1.9716666666666665,
+      "duration": 0.13,
+      "level": 0.065,
+      "frame": 47
+    },
+    {
+      "name": "result-slide-1",
+      "start": 2.2633333333333336,
+      "duration": 0.13,
+      "level": 0.065,
+      "frame": 54
+    },
+    {
+      "name": "result-slide-2",
+      "start": 2.5133333333333336,
+      "duration": 0.13,
+      "level": 0.065,
+      "frame": 60
+    },
+    {
+      "name": "chat-turn",
+      "start": 3.93,
+      "duration": 0.14,
+      "level": 0.055,
+      "frame": 94
+    },
+    {
+      "name": "answer-expansion",
+      "start": 4.3,
+      "duration": 0.5,
+      "level": 0.045,
+      "frame": 103
+    },
+    {
+      "name": "citation-attach",
+      "start": 5.75,
+      "duration": 0.075,
+      "level": 0.09,
+      "frame": 138
+    },
+    {
+      "name": "portal-air",
+      "start": 9.08,
+      "duration": 0.65,
+      "level": 0.15,
+      "frame": 218
+    },
+    {
+      "name": "jet-continuous-pass",
+      "start": 10.1,
+      "duration": 4.4,
+      "level": 0.24,
+      "frame": 242
+    },
+    {
+      "name": "plus-land",
+      "start": 18.541666666666668,
+      "duration": 0.4,
+      "level": 0.12,
+      "frame": 445
+    },
+    {
+      "name": "seo-land",
+      "start": 21.708333333333332,
+      "duration": 0.55,
+      "level": 0.17,
+      "frame": 521
+    }
+  ],
+  "aacReadback": {
+    "input_i": "-16.12",
+    "input_tp": "-1.53",
+    "input_lra": "13.00",
+    "input_thresh": "-27.07",
+    "output_i": "-16.14",
+    "output_tp": "-1.50",
+    "output_lra": "8.60",
+    "output_thresh": "-26.78",
+    "normalization_type": "dynamic",
+    "target_offset": "0.14"
+  },
+  "listening": "Unavailable to agent. Perceptual approval pending; ASR is support only."
+}

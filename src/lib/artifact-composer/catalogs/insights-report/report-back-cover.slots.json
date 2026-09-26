@@ -1,0 +1,71 @@
+{
+  "template": "ReportBackCoverPage",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "TASK-1889 — contraportada institucional del canvas aprobado (página `Premium-Contraportada`). Contacto, mercados y línea legal los escribe el mapper desde `src/config/efeonce-brand.ts`; el catálogo no guarda un teléfono.",
+  "viewport": {
+    "width": 794,
+    "height": 1123
+  },
+  "slots": {
+    "editionLabel": {
+      "selector": "[data-slot='editionLabel']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Efeonce Insights · <período>»."
+    },
+    "contact": {
+      "selector": "[data-slot='contact']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "email": { "type": "string", "required": true, "maxCharacters": 40, "maxLines": 1 },
+        "phonePrimary": { "type": "string", "required": true, "maxCharacters": 24, "maxLines": 1 },
+        "phoneSecondary": { "type": "string", "required": false, "maxCharacters": 24, "maxLines": 1 },
+        "address": { "type": "string", "required": true, "maxCharacters": 72, "maxLines": 1 }
+      },
+      "notes": "Desde EFEONCE_CONTACT."
+    },
+    "marketsLine": {
+      "selector": "[data-slot='marketsLine']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 64,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "EFEONCE_OPERATING_MARKETS unidos con « · »."
+    },
+    "legalLine": {
+      "selector": "[data-slot='legalLine']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 150,
+        "maxLines": 2,
+        "overflow": "reject"
+      },
+      "notes": "Razón social · RUT · confidencialidad · fecha de corte de las cifras."
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "fixed-socialSet": {
+      "selector": "[data-slot='socialSet']",
+      "type": "fixed-social-set",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned; orden y canales = EFEONCE_DOCUMENT_SOCIAL_CHANNELS (test de sincronía)."
+    }
+  }
+}

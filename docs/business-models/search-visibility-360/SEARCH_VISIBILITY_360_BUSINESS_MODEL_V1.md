@@ -1,7 +1,16 @@
 # Search Visibility 360 Business Model V1
 
-> **Estado:** `Draft` — capability en construcción; no declarar producto, ARR, adopción o margen separado
-> sin runtime y evidencia aprobada.
+> **Estado:** `Accepted` — confirmado por el operador el 2026-09-21. El estatus ya estaba declarado en dos
+> ADRs y en el catálogo de servicios, y este documento se había quedado atrás: el `Draft` era **drift**, no el
+> estado real. Fuentes: [ADR del módulo](../../architecture/GREENHOUSE_SEO_SEARCH_VISIBILITY_360_DECISION_V1.md)
+> (`Accepted` · 2026-07-01) · [ADR de portfolio boundaries](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md)
+> (`Accepted direction` · 2026-07-25) · [catálogo de servicios Wave](../../services/wave/README.md) (familia «Aceptada»).
+>
+> 🔴 **Lo que la aprobación NO cambia, y sigue vigente:** el estatus del portfolio no autoriza claims económicos
+> ni comerciales por sí solo. **No declarar ARR, adopción ni margen separado sin runtime y evidencia aprobada**;
+> el pricing sigue gobernado por su Pricing Integrity Pack; y la práctica mantiene **cero casos citables** de
+> SEO/AEO (`seo-aeo-practice/efeonce/ESTADO_ACTUAL.md`). Las preguntas de §`Model questions` que sigan marcadas
+> como hipótesis conservan su propio ciclo de validación.
 > **Owner:** Wave + Strategy + SEO/AEO + Product + Finance
 > **Pricing Integrity Pack:** [`SEARCH_VISIBILITY_360_PRICING_INTEGRITY_PACK_V1.md`](SEARCH_VISIBILITY_360_PRICING_INTEGRITY_PACK_V1.md)
 > **Business Model Integrity Pack:** [`SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md`](SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md)

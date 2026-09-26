@@ -29,6 +29,8 @@ expone estas decisiones como una experiencia interactiva para diseñadores y age
 familia, permite construir una receta por soporte, longitud e intención, y reúne comparaciones DO/DON'T. Es una
 proyección didáctica del contrato `trial`; AXIS conserva el SSOT y cada pieza conserva su revisión propia.
 
+Para piezas comerciales que hablen de **AEO, búsqueda con IA o citabilidad**, AXIS ofrece una [galería de recursos creativos](https://axis.efeonce.org/references/creative-resources/) y un [índice para agentes](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/README.md). Desde JSON de intención, los agentes pueden exportar SVG editables de cajas de búsqueda, las ilustraciones originales con otro texto, composers de ChatGPT/Gemini, turnos, respuestas y citas. Cada salida incluye un manifest de procedencia y relaciones entre citas y fuentes. Son referencias candidatas para componer una pieza; no respuestas verificadas de un modelo, controles de producto integrados ni recursos de marca aprobados. El [manual de composición](../../manual-de-uso/creative/componer-recursos-aeo-con-axis.md) recoge los comandos y límites.
+
 La misma entrada puede orquestar `efeonce.collaboration-selection` cuando el concepto muestra selección activa o
 presencia multiplayer. El agente describe relaciones —qué texto/objeto/grupo está seleccionado, qué cursor actúa
 en qué anclaje y quién sólo se mueve por el canvas— y AXIS las normaliza en un manifest independiente del motor.
@@ -45,6 +47,14 @@ su propio motor.
 La firma web usa el asset fijo de Artifact Composer `assets/url-lum.svg`, no una placa textual. Greenhouse lo
 compone contra el fondo final con el blend no separable `luminosity` y opacidad `0.72`; su QA comprueba hash,
 geometría vectorial y diferencia raster visible. Por eso un SVG declarado pero invisible no cuenta como entrega.
+
+## Tres voces + acción
+
+Los ads con CTA usan [Tres voces + acción](../../operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md),
+aprobado el 2026-09-22: Bricolage idea, Poppins estructura/acción y Guttery gesto opcional. Texto, contorno y relleno
+son tres estilos disponibles según la composición; no hace falta elegir uno para toda la campaña. La acción
+no suma una cuarta familia ni otro titular. Se protege personaje/firma y se entregan textos/espaciados editables.
+La aprobación de estos estilos no aprueba las piezas completas ni demuestra conversión.
 
 ## Qué evita
 
@@ -68,3 +78,15 @@ de Codex/Claude funciona sin MCP y no depende de un estado de conexión.
 
 Contrato operativo: [Advertising Creative Agent Execution V1](../../operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md).
 Manual: [usar reglas publicitarias con agentes](../../manual-de-uso/creative/usar-reglas-publicitarias-con-agentes.md).
+
+## Entrega Paid Media en cuatro ratios
+
+Por defecto, preparar cada key visual en **4:5, 1:1, 9:16 y 16:9**. Cuatro conceptos son dieciséis exports; si el brief excluye alguno, dejarlo explícito. Recomponer foto y tipografía por formato y revisar CTA, puntero, personaje, lecho/firma y contraste mínimo en cada export. Entregar la matriz concepto×ratio con editables, prompts y QA en Pilotos. Es cobertura interna; antes de pautar se verifican specs y safe areas de cada placement.
+
+## Safe areas y paquete final
+
+Aplicar el canon Tres voces + acción, §Zonas seguras: placement y medio explícitos; texto/CTA/cursor protegidos; firma al pie con límites de UI declarados, sin inflar el lecho. Export limpio más máscara QA separada. Entregar concepto, audiencia, fase de embudo, hipótesis, CTA/destino, KPI, prompts/referencias, editables, comandos/dependencias y hashes. El operador autorizó promover la campaña SEO/AEO ajustada a Finales; conservar Pilotos. Final creativo no equivale a publicación ni a validación live del placement.
+
+## Método completo y compatibilidad verificada
+
+Consultar el [método SEO/AEO](../../operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) para dirección, registro, referencias, prompts, composición, lecho proporcionado, formatos, embudo y archivo local. El [compositor CTA](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) es la ruta de trabajo nuevo; revisar §7 antes de migrar una corrida. Los runners históricos conservan reproducción exacta, no sustituyen el canon. QA vacío o sólo p98 no certifican contraste ni cobertura.

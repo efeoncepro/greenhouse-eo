@@ -34,9 +34,10 @@ y un único CTA `Conversar con Emma`. Elegir una intención sólo prepara el con
 persona activa el CTA. La pantalla incluye señales breves de orientación, protección de datos y derivación humana,
 y mantiene el lenguaje de implementación fuera del copy visible.
 
-La experiencia premium quedó publicada en el build `#28` del proyecto CMS React `kortex-cms-react`. El header usa
-el wordmark horizontal ANAM sin el círculo superior y la imagen final de Emma lleva el nombre corporativo exacto
-`ANÁLISIS AMBIENTALES S.A.` integrado en la camisa mediante edición generativa. No se usó texto superpuesto. El
+La experiencia premium sirve el build `#30` del proyecto CMS React `kortex-cms-react`. El header usa
+el wordmark horizontal ANAM sin el círculo superior. La foto de Emma es el retrato PNG transparente enviado por
+María Paz; la landing la presenta como `Ejecutivo comercial ANAM`. La ilustración con el nombre corporativo
+integrado en la camisa corresponde al build histórico #28 y se conserva como rollback. El
 contrato técnico y el readback público viven en
 [`../../architecture/kortex/hubspot-cms/anam-chat-landing.md`](../../architecture/kortex/hubspot-cms/anam-chat-landing.md),
 y la dirección visual en
@@ -48,9 +49,9 @@ El source pack independiente y reconciliado versiona las 23 fuentes en uso, las 
 de 356 registros y el contrato de identidad/directrices/handoff/canales.
 
 La identidad live del Customer Agent también es `Emma`: el nombre del perfil, el saludo guionizado y el preview
-convergen en el mismo nombre. La actualización fue publicada el 2026-09-01 sin cambiar la personalidad
-`Amigable`, idioma, fuentes de conocimiento, permisos, acciones, routing, handoff ni canales. La landing y el
-agente ya no presentan identidades distintas.
+convergen en el mismo nombre. La actualización de nombre fue publicada el 2026-09-01. El 2026-09-24 se cambió
+además su avatar y el del chatflow activo a un derivado del retrato de ANAM con fondo menta claro; el widget
+público mostró la nueva imagen. Este cambio visual no volvió a probar conocimiento, acciones ni handoff.
 
 El readback del 24 de julio confirmó que Customer Agent volvió a operar, con live chat activo y cobertura de todas
 las horas. El bloqueo administrativo observado el 17 de julio queda como antecedente histórico, no como estado
@@ -99,7 +100,7 @@ consolidada. Esa comunicación es un compromiso futuro y no debe marcarse como c
 
 | Fase | Estado | Resultado vigente |
 |---|---|---|
-| Customer Agent y landing | Operativo; rediseño build `#28` y routing `1876744588` activos | Emma, selector de tres intenciones, CTA único, 23 fuentes y canal activo. QA pública desktop/mobile y E2E de cotización, seguimiento/fallback y Calidad aprobadas. |
+| Customer Agent y landing | Operativo; landing build `#30` y routing `1876744588` previamente activo | Emma, foto y avatar entregados por ANAM, cargo `Ejecutivo comercial ANAM`, selector de tres intenciones, CTA único, 23 fuentes y canal activo. QA desktop/mobile y E2E de cotización, seguimiento/fallback y Calidad corresponden al build anterior; en #30 se verificaron imagen, cargo y widget público, sin repetir la regresión completa. |
 | Growth y calidad | Cerrada | Data Quality `21144697`, Growth `19708354`, siete assets y outcome exacto. |
 | Catálogo | Suficiente | 505/506 líneas tienen Product; 220/220 líneas ganadas resuelven a Product. |
 | Service y contrato | Piloto live | Grupo, diez propiedades, asociaciones, cinco Services y workflow `1852406585`. |

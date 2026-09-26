@@ -92,6 +92,8 @@ src/assets/iconify-icons/generated-icons.css
 # Keep manifests, prompts, scripts and docs in git; publish approved web assets
 # to the runtime/CDN or external artifact storage.
 /ai-generations/**/*.png
+# Temporales de la suite del compositor de CTA (prueba del origen heredado, tramo 15): se borran al terminar.
+/ai-generations/.cta-prueba-*/
 /ai-generations/**/*.jpg
 /ai-generations/**/*.jpeg
 /ai-generations/**/*.webp
@@ -100,6 +102,18 @@ src/assets/iconify-icons/generated-icons.css
 /ai-generations/**/*.webm
 /ai-generations/**/*.mov
 /ai-generations/**/*.m4v
+# Audio, video sin comprimir y comprimidos (2026-09-25): se archivan con `pnpm media:archive-ai-generation`.
+/ai-generations/**/*.mkv
+/ai-generations/**/*.avi
+/ai-generations/**/*.wav
+/ai-generations/**/*.aif
+/ai-generations/**/*.aiff
+/ai-generations/**/*.flac
+/ai-generations/**/*.mp3
+/ai-generations/**/*.m4a
+/ai-generations/**/*.aac
+/ai-generations/**/*.ogg
+/ai-generations/**/*.zip
 # Legacy AI skill artifacts (not the src/lib/ai/ module which is tracked)
 
 
@@ -143,3 +157,9 @@ public/growth-cta/BUILDINFO.json
 
 # Bank statements and loan contracts are sensitive source files (TASK finance recon 2026-09): never versioned
 data/bank/
+
+# Compositor de referencia extraído de git por `pnpm foto:componer:cta:regresion` (temporal)
+scripts/foto/.componer-cta@*.regresion.mjs
+# Referencia HERMÉTICA de la regresión y mutantes de `pnpm foto:componer:cta:mutantes` (temporales)
+scripts/foto/.ref-*
+scripts/creative/layout-compiler/.ref-*

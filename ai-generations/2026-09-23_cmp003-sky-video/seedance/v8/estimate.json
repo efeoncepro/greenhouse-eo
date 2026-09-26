@@ -1,0 +1,163 @@
+{
+  "cost": {
+    "credits": 210,
+    "credits_exact": 210
+  },
+  "adjustments": {
+    "medias[0].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[1].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[2].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[3].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[4].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[5].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[6].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[7].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[8].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[9].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[10].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[11].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[12].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[13].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[14].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[15].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[16].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[17].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[18].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[19].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[20].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[21].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[22].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[23].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[24].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[25].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[26].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[27].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[28].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[29].role": {
+      "requested": "image",
+      "used": "image_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    },
+    "medias[30].role": {
+      "requested": "audio",
+      "used": "audio_references",
+      "reason": "Seedance 2.5 backend expects schema-key media roles"
+    }
+  }
+}

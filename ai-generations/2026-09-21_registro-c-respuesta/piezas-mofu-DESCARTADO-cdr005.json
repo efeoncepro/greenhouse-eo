@@ -1,0 +1,164 @@
+[
+  {
+    "align": "left",
+    "top": 0.05,
+    "textWidth": 0.84,
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 36,
+    "leadGap": 0.15,
+    "dominantSize": 168,
+    "dominantMax": 0.62,
+    "dominantTracking": -0.02,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 34,
+    "afterGap": 0.15,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "id": "m1-no-te-eligen",
+    "plate": "plates/m1-no-te-eligen-45-plate.png",
+    "lead": "Apareces en las respuestas.",
+    "dominant": "No te eligen.",
+    "after": "Salir en la lista dejó de ser el **logro**.",
+    "note": {
+      "text": "Medimos por qué eligen al otro — y qué lo cambia.",
+      "size": 34,
+      "x": 0.07,
+      "width": 0.78,
+      "gapAfterClosure": 36
+    },
+    "cta": {
+      "variant": "outline",
+      "radius": 10,
+      "text": "Compárate con ellos",
+      "descriptor": "Panel competitivo · SEO + AEO",
+      "x": 0.07,
+      "gapAfterNote": 20,
+      "paddingX": 24,
+      "paddingY": 14,
+      "fontSize": 40,
+      "descriptorSize": 28,
+      "descriptorGap": 16,
+      "cursorScale": 1.1
+    },
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.05,
+      "cursors": [
+        {
+          "id": "ia",
+          "label": "IA",
+          "who": "role",
+          "anchor": "bottom-end",
+          "color": "#12afa2"
+        }
+      ]
+    }
+  },
+  {
+    "align": "left",
+    "top": 0.05,
+    "textWidth": 0.84,
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 36,
+    "leadGap": 0.15,
+    "dominantSize": 168,
+    "dominantMax": 0.62,
+    "dominantTracking": -0.02,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 34,
+    "afterGap": 0.15,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "id": "m2-ya-no-puedes",
+    "plate": "plates/m2-ya-no-puedes-45-plate.png",
+    "lead": "Te googleabas y sabías.",
+    "dominant": "Eso se acabó.",
+    "after": "Seis motores, seis respuestas, **ninguna igual mañana**.",
+    "note": {
+      "text": "Te devolvemos el instrumento: los seis, todos los meses.",
+      "size": 34,
+      "x": 0.07,
+      "width": 0.78,
+      "gapAfterClosure": 36
+    },
+    "cta": {
+      "variant": "text",
+      "radius": 0,
+      "text": "Recupera el control",
+      "descriptor": "Medición continua · SEO + AEO",
+      "x": 0.07,
+      "gapAfterNote": 20,
+      "paddingX": 24,
+      "paddingY": 14,
+      "fontSize": 40,
+      "descriptorSize": 28,
+      "descriptorGap": 16,
+      "cursorScale": 1.1
+    }
+  },
+  {
+    "align": "left",
+    "top": 0.05,
+    "textWidth": 0.84,
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 36,
+    "leadGap": 0.15,
+    "dominantSize": 168,
+    "dominantMax": 0.62,
+    "dominantTracking": -0.02,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 34,
+    "afterGap": 0.15,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "id": "m3-que-rompiste",
+    "plate": "plates/m3-que-rompiste-45-plate.png",
+    "lead": "Migras en enero.",
+    "dominant": "No sabrás qué rompiste.",
+    "after": "Salvo que midas **antes**.",
+    "note": {
+      "text": "Tomamos la línea base en diciembre. Es la única ventana.",
+      "size": 34,
+      "x": 0.07,
+      "width": 0.78,
+      "gapAfterClosure": 36
+    },
+    "cta": {
+      "variant": "solid",
+      "radius": 10,
+      "text": "Toma la línea base",
+      "descriptor": "Diagnóstico pre-migración · SEO + AEO",
+      "x": 0.07,
+      "gapAfterNote": 20,
+      "paddingX": 24,
+      "paddingY": 14,
+      "fontSize": 40,
+      "descriptorSize": 28,
+      "descriptorGap": 16,
+      "cursorScale": 1.1
+    }
+  }
+]

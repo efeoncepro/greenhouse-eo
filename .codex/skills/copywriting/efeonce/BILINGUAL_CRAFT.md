@@ -21,6 +21,36 @@
 - Español neutro latinoamericano, natural para el mercado chileno e internacional hispanohablante.
 - Voz Efeonce: directa, con filo, cada frase con un trabajo (`EFEONCE_VOICE_SYSTEM.md`).
 
+## Clientes de otro mercado hispano (p. ej. México): localizar, no neutralizar
+
+> As-of 2026-09-19. Caso fuente: tres piezas de campaña de un fabricante mexicano de pintura que el cliente
+> devolvió porque «no suena natural» ni «adaptado a México». Canon del cliente: skill
+> `berel-content-production`, módulo 04 (§Adaptación a México).
+
+El default es-CL neutro es para Efeonce. El copy de un cliente de otro mercado se escribe en la **variedad
+estándar de ese país**: la que publicaría una marca nacional seria, sin coloquialismos ni jerga regional. Para
+México, español mexicano estándar. Que el cliente diga «no suena natural» es un hallazgo de craft, no de
+gusto: se corrige con una pasada de localización y una lectura con ojos del mercado.
+
+Patrones que delatan un texto no localizado:
+
+- **El «nosotros» es la marca**, no la nacionalidad. Nada de «los mexicanos» como sujeto colectivo.
+- **No explicarle su país al lector.** Un mexicano no necesita que le cuenten qué hay en una casa mexicana.
+  Mostrar objetos y escenas; variarlos entre piezas en lugar de repetir la misma postal.
+- **Nada de jerga traducida ni de registro de agencia:** «profundidad», «acento», «contraste fresco»,
+  «sumar una mirada» y similares se cambian por lo que la persona haría o vería.
+- **Una sola lista de tres por sección.** La tríada como muletilla delata texto generado.
+- **Cada fórmula vive en una sola pieza del conjunto.** Si una pieza abre con «En <Marca> presentamos», las
+  demás abren distinto.
+- **Menos posesivos** («nuestro», «nuestra»): cansan y suenan a folleto.
+- **Convenciones del país:** decimal con punto en México; léxico local cuando lo hay (recámara, no dormitorio).
+- **El léxico del cliente manda.** Si la marca usa un anglicismo en sus propios materiales («premium»), se usa;
+  la preferencia del redactor no lo corrige.
+
+Verificación: antes de entregar, una lectura desde el mercado (el lente «lector del mercado» de
+`../../seo-aeo/references/agentic-editorial-eeat.md` §10). Si se usa un agente para simularla, sus hallazgos se
+verifican antes de aplicarlos.
+
 ## en-US
 
 - Natural y directo, no "spanglish" ni calco del español. Los idioms y el ritmo son propios del
@@ -44,5 +74,7 @@
 
 - **NUNCA** traducir literal un headline/tagline/hook: transcrear.
 - **NUNCA** voseo ni modismos argentinos en es-CL.
+- **NUNCA** entregar copy de un cliente de otro mercado hispano en es-CL neutro: se localiza a la variedad
+  estándar de su país, sin coloquialismos.
 - **NUNCA** spanglish/calco en en-US.
 - **SIEMPRE** verificar el efecto (voz alta) en cada idioma; ubicar en el locale correcto de `src/lib/copy/`.

@@ -1,0 +1,20 @@
+{
+  "id": "KV-02-faq-v03b",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "variantes",
+  "eje": "how each conversation arrives: ordered and closable, or not",
+  "identidad": [{ "persona": "nexa", "vista": "cuerpo-tresquartos" }],
+  "objetos": [
+    { "objeto": "polo-efeonce", "puesta": "frente-cuerpo-b" },
+    { "objeto": "sprocket-hubspot", "vista": "frente" }
+  ],
+  "escena": "SCENE (support floor at night, Santiago, wide view): a long row of identical attention stations recedes across the lower half of the frame. Every station's glowing cool blue screen shows the SAME calm, orderly pattern — short even blocks, evenly spaced, each one closable. They are indistinguishable from one another. ONE station, just left of centre, is the exception: its screen carries a single thread that has outgrown the pattern — one long unbroken block that runs past the bottom of its own screen, brighter and denser than every other, the only thing in the row that does not repeat. Nexa stands in front of exactly that one, SMALL in the frame, three-quarters turned away from the lens in a navy piqué polo, stopped mid-step with one hand still on the back of the chair: she has just arrived at it and has not sat down. A hard low light from the left rakes along the row and dies before it reaches the upper wall. The ENTIRE top third of the frame is bare dark wall: no station, no screen, no lamp, no beam, no bright spot — the room is tall and empty above the row. Very high contrast: the screens burn, the floor between them falls to near black. A small orange sculpture sits on the desk of that one exceptional station. All heads and hands stay BELOW 36% of the frame height. 35mm lens at f/4, focus on the exceptional screen. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. The sculpture's ring-and-nodes symbol belongs ONLY to the sculpture: it never appears on her clothing. Everything except the sculpture is completely unbranded and no text anywhere is readable: the blocks on every screen read as structure, never as words.",
+  "lecho": {
+    "objeto": "the out-of-focus back of the nearest chair crossing the very bottom against the lens, outside the raking light",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": { "muro": "the bare dark painted wall rising above the whole row of stations, unlit and evenly toned, its matte texture visible", "tinta": "blanca" }
+  }
+}

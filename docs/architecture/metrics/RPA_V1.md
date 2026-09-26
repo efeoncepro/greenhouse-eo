@@ -414,3 +414,10 @@ RpA agregado per-cliente per-período aparece en reportes ejecutivos al cliente 
 ### 13.4 Iteration Velocity (Revenue Enabled palanca 2) — relación NO directa
 
 RpA **NO es input directo** de Iteration Velocity. Iteration Velocity discrimina iteración útil (frame_versions ≥ 2 sin client_change_round) vs corrective rework — RpA cuenta solo el rework client-side. Métricas hermanas pero distintas semánticas. Ver `ITERATION_VELOCITY_V1.md` §6.1.
+
+## Delta 2026-09-25 — umbral operativo = registro ICO (decisión del operador)
+
+- El semáforo operativo de RpA es el de `ICO_METRIC_REGISTRY`: **óptimo ≤1,5, atención >1,5–2,5, crítico >2,5**.
+  La tabla de §8 (2,0 / 3,5) queda como referencia de benchmark, no como semáforo.
+- Las bandas del **bono** (§13) no cambian y no dependen del semáforo: 100 % hasta 1,7, banda suave hasta 2,0 (80 %),
+  $0 desde 3,0, leídas de `greenhouse_payroll.payroll_bonus_config` (corte 3,0 vigente desde 2026-03-01; antes 2,0).

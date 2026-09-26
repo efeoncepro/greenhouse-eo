@@ -1,0 +1,26 @@
+{
+  "id": "nexa-mapeo-espacial-luz-lima",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "preflightVisual": {
+    "abiertas": [
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/set-curado-12.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/N1-ojo-pez-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/N2-reflejo-final.png",
+      "ai-generations/2026-09-20_pruebas-julio-nexa-codex/nexa/final-v3.png"
+    ],
+    "comparacion": "N1 muestra a Nexa decidiendo sobre una obra física, con profundidad y cara reconocible; N2 muestra luz que atraviesa el vidrio, pero el check lima es un objeto aislado. La toma previa de Nexa convirtió azul en panel y naranja en pinza y saco, que el operador sintió demasiado literal. Esta prueba hace del color parte de la proyección espacial que ella ajusta, sin accesorios cromáticos añadidos.",
+    "oficio": "Dirección creativa y ajuste de una experiencia espacial interactiva sin cliente atribuido; la obra son bandas de luz proyectadas sobre dos planos arquitectónicos reales, el mecanismo es su alineación en la esquina durante el ensayo.",
+    "azul": "La banda azul activo #0375DB es luz de la pieza proyectada sobre el muro y su continuidad, no un panel ni un prop; deja el resto de la pared y la piel neutros cálidos.",
+    "acento": "Una misma banda proyectada vira brevemente a lima #6EC207 justo cuando llega al plano final del recorrido; el lima es el resultado visible del sistema y ocupa poco espacio, sin tarjeta, check, sticker ni ropa de color.",
+    "lecho": "Borde oscuro mate de una consola de control que Nexa usa para alinear la proyección, muy cerca del lente, fuera de foco óptico.",
+    "vestuario": "Camisa de algodón crudo y pantalón sastre arena, sin blazer ni prendas navy; conservar pelo ondulado oscuro y rasgos de referencias."
+  },
+  "escena": "SCENE (creative direction during a rehearsal of an unbranded interactive spatial experience in a clean concrete gallery in Bogotá, late afternoon): Nexa is the ONLY person in frame. This is a candid documentary photograph of her adjusting the alignment of a real projection-mapped visual journey at the exact instant its clean azure blue (#0375DB) ribbon crosses the corner between two architectural wall planes and its narrow end turns luminous lime green (#6EC207) on the final plane. The blue and lime are continuous parts of ONE actual work-in-progress projected experience, light on real warm-grey concrete; they are NOT separate objects, props, signage, colored cards, stickers, checks, product packaging, or post-production graphic overlays. The projection grazes the wall and floor with believable falloff and subtle concrete texture still visible. Nexa stands near the junction in three-quarter profile, one hand on the real adjustment wheel of a compact projection control console and the other just raised to sight the seam; her focused eyes follow the misalignment at the corner, never the camera. The decisive moment is her fine adjustment as the line lands exactly across the corner. She wears a plain natural ecru cotton shirt with sleeves rolled up and warm sand tailored trousers, absolutely no blazer, navy, blue or lime clothing. Her long dark wavy hair, defined brows, facial structure and warm skin stay recognizable from the references. A single hard warm-neutral white shaft of late-afternoon sunlight from a high side window sculpts her face and casts a crisp diagonal shadow BEHIND her, away from the projected artwork; blue projection light may touch only the architecture, never turn her skin or shadows cyan. Three depth planes: an optically blurred real matte-dark control console edge in the lower foreground, Nexa sharply focused, the receding gallery and projected wall softly resolved behind. 35mm lens f/2.8 from a low viewpoint beside the console, asymmetrical editorial composition with the work and Nexa equally legible. No other saturated accent colors. No text, letters, numbers, logos, readable UI, clients, labels or watermarks anywhere.",
+  "lecho": {
+    "objeto": "the top edge of the real matte dark charcoal projection control console that Nexa is operating, physically between the low camera and her hand, so close to the lens it becomes optical blur",
+    "tono": "DARK near black, genuine matte charcoal equipment material with faint physical texture in shadow, not a featureless flat panel"
+  }
+}

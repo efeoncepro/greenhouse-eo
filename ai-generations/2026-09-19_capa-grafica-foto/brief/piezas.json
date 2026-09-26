@@ -1,0 +1,217 @@
+{
+  "preset": {
+    "nombre": "foto-titular-centrado",
+    "fuente": "Medido sobre ai-generations/2026-09-17_claude-o-codex/componer.mjs — pieza que el operador señala como bien resuelta y que además es sobre fotografía, en el mismo formato nativo 1152×1440.",
+    "medido": {
+      "tituloAnchoDeTinta": 0.58,
+      "tituloAnchoDeTinta_16x9": 0.36,
+      "tituloTopDeTinta": 0.135,
+      "tituloTopDeTinta_16x9": 0.09,
+      "tituloTamañoResultante": "98 px = 0.068 del alto con «¿Claude o Codex?» (16 caracteres)",
+      "citaTamaño": "0.34 × el titular",
+      "citaMargenIzquierdo": 0.055,
+      "citaGap": "1.05 × el tamaño del titular, fuera del eje del titular",
+      "logoAncho": 0.26,
+      "citaTinta": "color.softOnDark — el caso de referencia separa la cita del titular también por TINTA, no sólo por familia, peso y escala (gate: vecinos distintos en >= 2 ejes)."
+    },
+    "decidido": {
+      "tituloBandaDeTamaño": "0.06–0.10 del alto — el ajuste al ancho fija el px, la banda impide que un copy largo lo hunda o uno corto lo dispare. El caso de referencia cae en 0.068. DECISIÓN A VALIDAR, no una ley medida.",
+      "logoAncho": "0.15 del ancho, por el contrato fotográfico aprobado (EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1 §5). «Claude o Codex» usó 0.26: divergencia registrada, no resuelta por mí.",
+      "aireAbajo": "La cita exige 3x el alto de su tinta de campo libre por debajo. En «Claude o Codex» ese campo existe (panel oscuro hasta ~0.55) y por eso el aparte respira. DECISIÓN DERIVADA del caso, no medida en el archivo."
+    }
+  },
+  "variantes": [
+    {
+      "id": "A-con-cita",
+      "omitir": []
+    },
+    {
+      "id": "B-sin-cita",
+      "omitir": [
+        "cita"
+      ]
+    }
+  ],
+  "piezas": [
+    {
+      "id": "P1-oficio",
+      "plate": "../2026-09-19_lenguaje-fotografico-efeonce/rondas/texto/S1-panaderia-45-plate.png",
+      "campo": "oscuro",
+      "capas": [
+        {
+          "id": "titular",
+          "tipo": "texto",
+          "receta": "ideaImpact",
+          "texto": "El oficio manda.",
+          "ajuste": {
+            "modo": "ancho",
+            "objetivo": 0.58,
+            "minAlto": 0.06,
+            "maxAlto": 0.1
+          },
+          "x": "eje",
+          "y": {
+            "frac": 0.135
+          },
+          "tinta": "fuerte",
+          "piso": 4.5
+        },
+        {
+          "id": "cita",
+          "tipo": "texto",
+          "familia": "poppins",
+          "peso": 500,
+          "receta": "structureTagline",
+          "texto": "“Nadie lo apura”",
+          "ajuste": {
+            "modo": "relativo",
+            "a": "titular",
+            "factor": 0.34
+          },
+          "x": {
+            "frac": 0.055
+          },
+          "y": {
+            "ref": "titular",
+            "borde": "bottom",
+            "gapDe": "titular",
+            "gapFactor": 1.05
+          },
+          "tinta": "suave",
+          "piso": 4.5,
+          "aireAbajo": 3
+        },
+        {
+          "id": "firma",
+          "tipo": "firma",
+          "ancho": 0.15,
+          "x": "eje",
+          "y": {
+            "frac": 0.935
+          },
+          "piso": 4.5
+        }
+      ]
+    },
+    {
+      "id": "P2-pipeline",
+      "plate": "../2026-09-19_lenguaje-fotografico-efeonce/rondas/texto/S2v2-45-plate.png",
+      "campo": "claro",
+      "capas": [
+        {
+          "id": "titular",
+          "tipo": "texto",
+          "receta": "ideaImpact",
+          "texto": "Pipeline en vivo.",
+          "ajuste": {
+            "modo": "ancho",
+            "objetivo": 0.58,
+            "minAlto": 0.06,
+            "maxAlto": 0.1
+          },
+          "x": "eje",
+          "y": {
+            "frac": 0.135
+          },
+          "tinta": "fuerte",
+          "piso": 4.5
+        },
+        {
+          "id": "cita",
+          "tipo": "texto",
+          "familia": "poppins",
+          "peso": 500,
+          "receta": "structureTagline",
+          "texto": "“Ya no pregunto”",
+          "ajuste": {
+            "modo": "relativo",
+            "a": "titular",
+            "factor": 0.34
+          },
+          "x": {
+            "frac": 0.055
+          },
+          "y": {
+            "ref": "titular",
+            "borde": "bottom",
+            "gapDe": "titular",
+            "gapFactor": 1.05
+          },
+          "tinta": "suave",
+          "piso": 4.5,
+          "aireAbajo": 3
+        },
+        {
+          "id": "firma",
+          "tipo": "firma",
+          "ancho": 0.15,
+          "x": "eje",
+          "y": {
+            "frac": 0.935
+          },
+          "piso": 4.5
+        }
+      ]
+    },
+    {
+      "id": "P3-equipo",
+      "plate": "../2026-09-19_lenguaje-fotografico-efeonce/rondas/texto/S3v2-julio-nexa-45-plate.png",
+      "campo": "oscuro",
+      "capas": [
+        {
+          "id": "titular",
+          "tipo": "texto",
+          "receta": "ideaImpact",
+          "texto": "Lo hacemos contigo.",
+          "ajuste": {
+            "modo": "ancho",
+            "objetivo": 0.58,
+            "minAlto": 0.06,
+            "maxAlto": 0.1
+          },
+          "x": "eje",
+          "y": {
+            "frac": 0.135
+          },
+          "tinta": "fuerte",
+          "piso": 4.5
+        },
+        {
+          "id": "cita",
+          "tipo": "texto",
+          "familia": "poppins",
+          "peso": 500,
+          "receta": "structureTagline",
+          "texto": "“Ese es el punto”",
+          "ajuste": {
+            "modo": "relativo",
+            "a": "titular",
+            "factor": 0.34
+          },
+          "x": {
+            "frac": 0.055
+          },
+          "y": {
+            "ref": "titular",
+            "borde": "bottom",
+            "gapDe": "titular",
+            "gapFactor": 1.05
+          },
+          "tinta": "suave",
+          "piso": 4.5,
+          "aireAbajo": 3
+        },
+        {
+          "id": "firma",
+          "tipo": "firma",
+          "ancho": 0.15,
+          "x": "eje",
+          "y": {
+            "frac": 0.935
+          },
+          "piso": 4.5
+        }
+      ]
+    }
+  ]
+}

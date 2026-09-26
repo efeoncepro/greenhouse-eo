@@ -1,0 +1,52 @@
+{
+  "duration": 29.5,
+  "musicInternalEdits": 0,
+  "newAudioGenerations": 0,
+  "stems": {
+    "music": {
+      "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v16-brand-repair/audio/stem-music.wav",
+      "sha256": "0d53c7fa778eef839c65279d76ac18394cbeb5e8991548ab5e30d5545f530ba8",
+      "shiftSeconds": -0.5,
+      "unalteredSamples": true
+    },
+    "brand": {
+      "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v16-brand-repair/audio/stem-brand.wav",
+      "sha256": "2c67a6a03e5b3838f199babe8f3d8a510f7fb3618ccbee924c2ce11937cc80e9",
+      "shiftSeconds": -0.5,
+      "unalteredSamples": true
+    },
+    "ui": {
+      "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v16-brand-repair/audio/stem-ui.wav",
+      "sha256": "816b3a731c3667a1fd5bf28180f12d913df08dcce2c01c7153f76a3a4e3c02b0",
+      "shiftSeconds": 0,
+      "unalteredSamples": true
+    },
+    "jet": {
+      "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v16-brand-repair/audio/stem-jet.wav",
+      "sha256": "e473f25af9b055d5c177d408ae0f8d1c5ae8e3ecbcea9dd8b84772b77f8e0688",
+      "shiftSeconds": -0.5,
+      "unalteredSamples": true
+    },
+    "closing": {
+      "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v16-brand-repair/audio/stem-closing.wav",
+      "sha256": "5b8e5e70a6560d940056371337625fdcaa3993a02b1ed9bf957a4211bf0398a3",
+      "shiftSeconds": -0.5,
+      "unalteredSamples": true
+    }
+  },
+  "measurement": {
+    "input_i": "-15.99",
+    "input_tp": "-1.50",
+    "input_lra": "8.90",
+    "input_thresh": "-26.87",
+    "output_i": "-16.15",
+    "output_tp": "-1.50",
+    "output_lra": "2.10",
+    "output_thresh": "-26.69",
+    "normalization_type": "dynamic",
+    "target_offset": "0.15"
+  },
+  "brandCrest": 9.083333333333334,
+  "musicStart": 1.11,
+  "perceptualListening": "not performed; no audio perception available"
+}

@@ -1,6 +1,6 @@
 # Ejecución de creatividad social para Codex y Claude
 
-Estado: vigente para trabajo local autorizado. Owner: Social Media Studio. Actualizado: 2026-09-17.
+Estado: vigente para trabajo local autorizado. Owner: Social Media Studio. Actualizado: 2026-09-19.
 Alcance: solicitudes de seasonality, trendjacking, memes de marca, creatividad social y correcciones de
 identidad/product placement. Es un protocolo de entrada y cierre; las skills enlazadas contienen el oficio.
 No habilita publicación, presupuestos externos nuevos ni cambios de runtime.
@@ -183,5 +183,58 @@ mascota), el riesgo de lectura sobre el partner, el recorrido v01→v05 con las 
 el sprite oficial, el plate nativo guiado por boceto que reemplazó un repintado con recorte mordido, la opción
 `presentation` del adapter AXIS y la programación en Metricool. Detalle en su
 [`LEEME.md`](../../ai-generations/2026-09-17_kv-tu-ia-no-conoce/LEEME.md).
-Las poses 3D reutilizables de Clawd y Codex (fuente oficial, ángulos, accesorios y reglas de uso) están inventariadas en
+Las poses 3D reutilizables de Clawd, Codex y Gigi (fuente oficial, ángulos, accesorios y reglas de uso) están inventariadas en
 [bibliotecas de mascotas de partners](social/PARTNER_MASCOT_POSE_LIBRARIES.md).
+
+## Delta 2026-09-19 — trendjacking de franquicia en carrusel («Nivel de búsqueda», GTA VI)
+
+La [bitácora del caso](social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md) y la carpeta
+`ai-generations/2026-09-19_nivel-de-busqueda/` conservan el recorrido v1→v2, el estudio visual y la programación.
+Reglas nuevas, con el oficio en el [módulo 11](../../.codex/skills/social-media-studio/modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md)
+(espejo Claude):
+
+- **Estudiar la estética del trend con fuentes antes de dirigir.** Nunca de memoria: la v1 (synthwave de Vice City
+  2002) fue rechazada porque GTA VI es Florida hiperreal de 2026. Estudio con URL y etiquetas `[V]/[O]/[NV]`,
+  activos de IP que no se usan y regla orgánico OK / pauta con `legal-privacy-ip-operator`.
+- **Carrusel de trendjacking con el código del juego:** portada-gancho con el meme vigente → reencuadre → N misiones
+  = mecanismo real del servicio → cierre → contraportada con CTA, refuerzos y marca como héroe. El layout del texto se
+  declara en el prompt del plate (porcentajes de alto, cielo oscuro reservado), no con velos.
+- **Readback por firma de imagen:** tras programar, además del texto idéntico a `COPY.md`, comprobar el orden de la
+  secuencia comparando la firma de la media re-alojada por Metricool contra los PNG locales (primera = portada,
+  última = contraportada). Receta en [entrega Metricool](../../.codex/skills/social-media-studio/references/video-delivery-metricool.md) §3.
+- **Pieza suelta separada de la secuencia:** nombre, hoja de revisión y programación propios; la hoja del carrusel
+  va en orden de publicación, no alfabético.
+
+El meme «We got X before GTA 6» caduca el 19-nov-2026; no reutilizar el gancho después. Regresiones en
+[casos de revisión](../../.codex/skills/social-media-studio/references/creative-review-cases.md); fuentes fechadas en
+[trend-production-sources](../../.codex/skills/social-media-studio/references/trend-production-sources.md).
+
+## Delta 2026-09-21 — tercera mascota de partner con biblioteca 3D (Gigi, Google Gemini)
+
+**Gigi** —mascota oficial de Google Gemini, nombre y grafía elegidos por votación de fans en ago-2025 para la
+campaña *back-to-school*— es la **tercera** mascota de partner con biblioteca 3D, después de Clawd (Anthropic) y
+Codex (OpenAI); el sprocket de HubSpot es un logo, no una mascota. Ficha comparada en
+[bibliotecas de mascotas de partners](social/PARTNER_MASCOT_POSE_LIBRARIES.md); producción y medidas en
+[`ai-generations/2026-09-21_gigi-poses-3d/LEEME.md`](../../ai-generations/2026-09-21_gigi-poses-3d/LEEME.md).
+
+- **Papel distinto en la narrativa.** Gigi **no es quien hace marketing: es la máquina que responde.** Por eso es
+  la única con una **familia propia de búsqueda y AEO** (8 vistas) además de los 8 ángulos y los 8 accesorios de
+  servicio; `aeo-03-no-te-conoce` —una tarjeta de respuesta completamente vacía— es el key visual del pitch «Tu IA
+  no conoce tu negocio». Ni una letra ni un número en ninguna utilería.
+- **La fuente de una mascota de campaña es el estudio, no la app.** Gigi **no está en el producto**
+  (`/Applications/Gemini.app` no la trae; su `GelIdle.mp4` es el degradado aurora del asistente). La fuente
+  correcta es **Gasta**, el estudio que la creó para Google, con sus assets de producción y la hoja de modelo de
+  15 siluetas. Buscar «<personaje> portfolio / case study», no imágenes sueltas.
+- 🔴 **Utilería clara sobre fondo de estudio claro no se recorta** y ninguna tolerancia lo arregla (Δ 4 por canal
+  contra tolerancia 18: gorro, lente, audífonos y birrete volvieron como agujeros). Se corrige **en la
+  generación**, pidiendo la utilería en **hueso cálido `#D3C8B4`**, que sigue leyéndose «blanca».
+- 🔴 **Todo prop debe tocar al personaje** —un objeto suelto se lo come el matting— y **nunca un prop translúcido
+  delante de la cara**: la lupa v01 magnificó un arco del ojo y Gigi parecía tener tres ojos, invisible en hoja de
+  contacto. El QA de la cara se mira **al 100 %, pose por pose**.
+- 🔴 **Gigi se queda con el sistema de color de la pieza:** es el espectro completo de Google (rojo `#D93B2B` →
+  azul `#3B7DF5` en dos tercios → verde-lima `#9ED957`), así que debe ser el **único acento de color** y Efeonce
+  vive en el navy y la estructura. Con ropa Efeonce en la misma pieza, prohibir el degradado arcoíris y la punta
+  enroscada sobre la prenda **sin describir nuestro emblema**: manda la referencia del kit.
+- **Gobernanza:** Gigi es propiedad de Google. Interpretación 3D de una mascota de terceros, de **uso interno y
+  orgánico**; orgánico aprobado ≠ pauta, y antes de pautar hay que validar la guía de marca de Google. Sigue
+  vigente **una sola mascota de partner por imagen** por defecto; juntas sólo con pedido explícito del operador.

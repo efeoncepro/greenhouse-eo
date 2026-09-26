@@ -4,6 +4,57 @@
   "fallbackSnapshot": "docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md",
   "domains": [
     {
+      "id": "efeonce-brand-photography",
+      "triggers": [
+        "fotografía de marca",
+        "foto de marca Efeonce",
+        "lenguaje fotográfico",
+        "colorimetría de la foto",
+        "imagen de Efeonce",
+        "foto del equipo",
+        "foto de la oficina",
+        "Julio en una foto",
+        "Nexa en una foto",
+        "mascotas en escena",
+        "logo 3D en escena",
+        "primer plano desenfocado",
+        "lecho de la firma",
+        "logo centrado sobre la foto",
+        "ángulo de cámara",
+        "lente",
+        "ojo de pez",
+        "tilt-shift",
+        "reserva de espacio para texto",
+        "zona de titular en la foto",
+        "foto:prompt",
+        "foto:validar",
+        "ficha de toma",
+        "generar un plate",
+        "validar un plate",
+        "foto:doctor"
+      ],
+      "skills": [
+        "design-studio",
+        "efeonce-brand-studio",
+        "efeonce-advertising-creative"
+      ],
+      "sources": [
+        "docs/operations/brand-photography/README.md",
+        "docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md",
+        "docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md",
+        "docs/operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md",
+        "docs/operations/brand-photography/EFEONCE_PHOTO_COLORIMETRY_V1.md",
+        "docs/operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md",
+        "docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md",
+        "docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md",
+        ".codex/skills/design-studio/references/efeonce-photographic-language.md",
+        "scripts/foto/build-prompt.mjs",
+        "scripts/foto/validar-reservas.mjs",
+        "docs/manual-de-uso/marketing/fotografia-de-marca-efeonce.md",
+        "scripts/foto/doctor.ts"
+      ]
+    },
+    {
       "id": "advertising-creative-production",
       "triggers": [
         "pieza publicitaria",
@@ -34,6 +85,32 @@
         "docs/architecture/EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md",
         ".codex/skills/greenhouse-typography-accessibility/references/campaign-ink-metrics-and-hierarchy.md",
         ".codex/skills/greenhouse-typography-accessibility/references/real-campaign-typography-cases.md"
+      ]
+    },
+    {
+      "id": "aeo-creative-composition",
+      "triggers": [
+        "pieza creativa AEO",
+        "recurso creativo AEO",
+        "búsqueda con IA en una pieza",
+        "caja de búsqueda IA",
+        "composer de ChatGPT",
+        "composer de Gemini",
+        "burbuja de ChatGPT",
+        "burbuja de Gemini",
+        "respuesta citada en una pieza",
+        "cita de ChatGPT",
+        "cita de Gemini",
+        "AI Mode en una pieza",
+        "recursos creativos de AXIS"
+      ],
+      "skills": [
+        "efeonce-advertising-creative",
+        "axis-design-system"
+      ],
+      "sources": [
+        "docs/operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md",
+        "docs/manual-de-uso/creative/componer-recursos-aeo-con-axis.md"
       ]
     },
     {
@@ -187,6 +264,29 @@
       "sources": [
         "docs/manual-de-uso/operations/gcloud-auth-playwright.md",
         "scripts/gcloud-auth-preflight.sh"
+      ]
+    },
+    {
+      "id": "gemini-omni-video-cli",
+      "triggers": [
+        "Gemini Omni 1.1",
+        "gemini-omni-1.1-flash-preview",
+        "pnpm ai:omni",
+        "Omni video CLI",
+        "Omni edit video",
+        "Omni extend video"
+      ],
+      "skills": [
+        "motion-design-studio",
+        "greenhouse-secret-hygiene",
+        "greenhouse-gcloud-auth-playwright"
+      ],
+      "sources": [
+        "docs/architecture/GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md",
+        "docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md",
+        "docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md",
+        "scripts/ai/gemini-omni.ts",
+        "src/lib/ai/gemini-omni-cli.ts"
       ]
     },
     {
@@ -401,6 +501,37 @@
         "docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md",
         "docs/tasks/to-do/TASK-1642-globe-flux3-video-fleet-producer-integration.md",
         "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md"
+      ]
+    },
+    {
+      "id": "efeonce-marketing-studio",
+      "triggers": [
+        "Marketing Studio",
+        "studio.efeonce.org",
+        "efeonce-marketing-studio",
+        "Campaign Manager",
+        "campañas CMP",
+        "CMP-001",
+        "plan de medios de campaña",
+        "studio.* MCP tools",
+        "api_client de Studio",
+        "token mst_",
+        "importar catálogo de campañas",
+        "renditions de piezas",
+        "EPIC-049",
+        "TASK-1890",
+        "TASK-1891"
+      ],
+      "skills": [
+        "efeonce-marketing-studio",
+        "efeonce-mcp-platform"
+      ],
+      "sources": [
+        "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md",
+        "docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md",
+        "docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md",
+        "docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md",
+        "docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md"
       ]
     },
     {

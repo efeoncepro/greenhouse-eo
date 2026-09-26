@@ -56,15 +56,28 @@ export class Ga4AdminClient {
   constructor(private readonly tokens: GoogleApiTokenProvider) {}
 
   async listAccountSummaries(): Promise<Ga4AccountSummary[]> {
-    const body = await request<{
-      accountSummaries?: Array<{
-        account?: string
-        displayName?: string
-        propertySummaries?: Array<{ property?: string; displayName?: string; parent?: string }>
-      }>
-    }>(GA4_ADMIN_API_BASE, this.tokens, 'accountSummaries')
+    type AccountRow = {
+      account?: string
+      displayName?: string
+      propertySummaries?: Array<{ property?: string; displayName?: string; parent?: string }>
+    }
 
-    return (body.accountSummaries ?? [])
+    const accounts: AccountRow[] = []
+    const seenTokens = new Set<string>()
+    let pageToken: string | undefined
+
+    do {
+      const path = `accountSummaries?pageSize=200${pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : ''}`
+      const body = await request<{ accountSummaries?: AccountRow[]; nextPageToken?: string }>(GA4_ADMIN_API_BASE, this.tokens, path)
+
+      accounts.push(...(body.accountSummaries ?? []))
+      pageToken = body.nextPageToken?.trim() || undefined
+
+      if (pageToken && seenTokens.has(pageToken)) throw new Error('GA4 account summaries pagination loop')
+      if (pageToken) seenTokens.add(pageToken)
+    } while (pageToken)
+
+    return accounts
       .filter(
         (a): a is { account: string; displayName?: string; propertySummaries?: Array<{ property?: string; displayName?: string; parent?: string }> } =>
           typeof a.account === 'string'
@@ -85,9 +98,29 @@ export class Ga4AdminClient {
   }
 }
 
-/** Data API — reporting. Requiere que el SA esté en la propiedad (Viewer). */
+/** Data API — reporting con token de usuario OAuth o service account autorizado en la propiedad. */
 export class Ga4DataClient {
   constructor(private readonly tokens: GoogleApiTokenProvider) {}
+
+  /** Informe histórico agregado. El caller controla dimensiones y filtros gobernados. */
+  async runReport(propertyId: string, body: {
+    dateRanges: Array<{ startDate: string; endDate: string }>
+    dimensions: Array<{ name: string }>
+    metrics: Array<{ name: string }>
+    dimensionFilter?: Record<string, unknown>
+    limit?: string
+    offset?: string
+  }): Promise<{
+    dimensionHeaders?: Array<{ name: string }>
+    metricHeaders?: Array<{ name: string }>
+    rows?: Array<{ dimensionValues?: Array<{ value?: string }>; metricValues?: Array<{ value?: string }> }>
+    rowCount?: number
+  }> {
+    return request(GA4_DATA_API_BASE, this.tokens, `properties/${propertyId}:runReport`, {
+      method: 'POST',
+      body: JSON.stringify(body)
+    })
+  }
 
   /**
    * Conteo de eventos EN TIEMPO REAL por nombre (últimos ~30 min). El uso canónico para

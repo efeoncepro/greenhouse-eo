@@ -2,24 +2,25 @@
 
 ## Estado vigente para agentes
 
+CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
+
 ## Actualización documental reciente
 
-El 2026-09-16 se actualizaron las skills CRM: Dreamforce 2026 (ledger Salesforce, estados por capacidad) y HubSpot
-Fall Spotlight/UNBOUND (`docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`). El
-provider-fit usa `HubSpot-first`, `Salesforce-first`, `híbrida` o `no-fit`; el detalle vive en esas referencias.
+Ledgers CRM Dreamforce/UNBOUND al 2026-09-19; el provider-fit admite
+`HubSpot-first | Salesforce-first | híbrida | no-fit`. La [transformación humano-agente de RevOps & CRM](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md)
+está aprobado y probado comercialmente por confirmación del operador; pruebas publicables, pricing y elegibilidad
+de cada capacidad siguen sujetos a verificación.
 
 Greenhouse: plataforma operativa Efeonce Group (Next.js 16/MUI 7/Vuexy/TS). Estado: `Handoff.md`. Historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
 
 Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
 
-TeamBot usa `pnpm teams:announce` para grupos: menciones explícitas, no `@todos` ni DMs. Un 1:1 manual aprobado exige dispatcher/audit canónicos, Entra revalidada e idempotencia; lo recurrente converge a Notification Hub. En Performance Reports, volumen no prueba sobrecarga y el mensaje publicado verifica la mención. Contrato: `docs/operations/manual-teams-announcements.md`.
+TeamBot: `pnpm teams:announce` sólo para grupos con menciones explícitas; 1:1 manual requiere dispatcher/audit, Entra e idempotencia. Performance Reports verifica mención publicada, no infiere sobrecarga por volumen. [Manual](docs/operations/manual-teams-announcements.md).
 
-AXIS: consumo privado cerrado para interno/producción — secreto activo en `efeonce-group`, secreto legacy de
-`efeonce-globe` eliminado, PAT legacy revocado. El PAT temporal aprobado sigue activo hasta reemplazarlo por una
-identidad de máquina antes del rollout externo. Release productivo `30502476429` y rollback ejercitado:
-`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`. Selección colaborativa: contrato `0.2.0`
-`candidate` y manifest agent-facing sólo en source; Lab es el primer adapter y otros runtimes quedan `pending`.
+AXIS: consumo privado interno/productivo; PAT temporal hasta identidad de máquina para rollout externo. Release
+`30502476429` y rollback: [runbook](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md). Selección
+colaborativa `0.2.0` sigue `candidate`; Lab es el primer adapter, otros runtimes `pending`.
 
 Globe (`../efeonce-globe`): Tailwind v4 activo, vanilla fallback hasta TASK-1560.
 Hibernación reversible: `draining` obligatorio al apagar/encender; discovery estático permitido, nunca despertar
@@ -68,8 +69,7 @@ canary y readback. Desde 2026-09-08 existe `gpt-image-2.5` (Sunburst/Flare): pro
 sin ruta Globe, sin Batch y **sin calculadora de costo por imagen**; `gpt-image-2` no quedó deprecado y el
 helper local no transporta 2.5. Matriz canónica:
 `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`.
-`TASK-1781` gobierna Omni 1.1: Developer `gemini-omni-1.1-flash` y Cloud
-`gemini-omni-1.1-flash-preview` no se colapsan; gated hasta canary/readback y el modelo anterior cierra el 2026-09-30.
+Omni 1.1 CLI: [ADR](docs/architecture/GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md). Globe: `TASK-1781` gated; modelo anterior cierra 30/09.
 Seedream T2I, GPT Image 2 y Nano Banana 2/Pro están disponibles
 según el reader live; Seedream Edit queda `gated` por binding deshabilitado. Seedream Lite, edición de OpenAI/Nano
 Banana y video-to-image de Nano Banana son superficies no públicas hasta tener ruta, binding, canary y readback
@@ -109,7 +109,7 @@ append-only, `greenhouse_growth.seo_work_queue_*` (TASK-1700): ningún consumer 
 medida `priority_score` queda NULL. La curva CTR declara usabilidad y distingue cero de ausencia de muestra
 (TASK-1792); discovery identifica keywords normalizadas, no filas del proveedor. El módulo vive en producción
 y federado en `mcp.efeonce.org`, fail-closed por organización. `GROWTH_SEO_ENABLED` gobierna Vercel y
-`ops-worker`; el worker Cloud Run compartido materializa `seo_gsc_daily`, sin flip aislado de staging. Canon:
+`ops-worker`: Cloud Run compartido, `seo_gsc_daily`, sin flip aislado. Verificar credenciales en runtime. Canon:
 `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` e
 `docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`.
 
@@ -120,6 +120,9 @@ ETV DataForSEO: producción sirve `improved_layout_clickstream_v2` desde 2026-09
 Efeonce Insights (EPIC-045): [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14 = estado real.
 
 Informes: skill `report-studio` (evidencia, diseño, QA PDF).
+Fotografía Efeonce: [Design Studio](.codex/skills/design-studio/references/efeonce-photographic-language.md)
+Paid: `efeonce-advertising-creative/references/paid-visual-attention-playbook.md`.
+Ads: [producción y QA](docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md).
 Seasonalities: `social-media-studio/efeonce/SEASONAL_CONTENT.md` + `notion-platform`; estado en Notion.
 [Referente Metricool](.codex/skills/social-media-studio/references/seasonality-reference-calendar.md): inspiración para Efeonce/clientes; separado del calendario editorial y del scheduler.
 Producción seasonality/trendjacking: [protocolo de agentes](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md); canon en skills espejo `social-media-studio` (idea, marca, dirección, producción y QA).
@@ -127,8 +130,8 @@ Ejecución audiovisual por formato, tipografía exacta, audio aprobado y program
 [manual de seasonalities](docs/manual-de-uso/social/producir-y-programar-seasonalities.md), con referencias de oficio Codex/Claude.
 Berel: `berel-content-production` · [plan](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) ·
 [informes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) ·
-[colaboración](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md). Preservar análisis, N1–N4 y
-arte producido; la cadencia mensual requiere aceptación del cliente.
+[colaboración](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md) ·
+[QA Frame.io](.codex/skills/berel-content-production/modules/20_REVISION_VISUAL_FRAMEIO.md).
 
 WordPress/Ohio: skill `efeonce-public-site-wordpress`; contratos [Home](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md),
 [HubSpot](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) y [misceláneas](docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md).
@@ -149,7 +152,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 - Este repo es el `starter-kit` Greenhouse; `full-version` es referencia visual/funcional, no source of truth ni producto activo. Greenhouse es plataforma/subproducto de Efeonce; `EO` es abreviación del repo, no nomenclatura visible.
 - El gateway MCP federado vive en `efeonce-mcp` y sirve `https://mcp.efeonce.org/mcp` desde Cloud Run. Cada provider conserva policy y contratos; los manifiestos Greenhouse de tools/skills son SSOT (TASK-1780/1804).
 - Greenhouse, `auth.efeonce.org` y MCP aíslan cookies, sesiones y audiencias, pero resuelven un `identity_profile` y Account 360 con bindings auditados. Cada producto entra en su contexto: un first-party puede reutilizar sesión con assurance; MCP y terceros conservan consentimiento por cliente/scope y step-up. No nace otra identidad.
-- EPIC-044: emisor propio `auth.efeonce.org`, OAuth/sesiones y gateway multi-issuer; SSO no concede MCP. Grants, `gv` y tokens se revalidan antes del dispatch. `TASK-1813` cerró Efeonce ID/base-only y la matriz post-cutover; `TASK-1844` aporta v2 interna y altas elegibles sin reconectar ([manual](docs/manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md)). `TASK-1832` conserva el canary sintético certificado: mide sujetos exactos, no el agregado CIMD, y su retiro exige ventana hasta `2026-09-18T01:33:34.325Z`, cleanup sujeto-específico y readback cero. `TASK-1841` separa el piloto real. [`ADR nativo`](docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) · [`entrada/consentimiento`](docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md) · [`autoridad interna`](docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) · [`runbook`](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+- EPIC-044: emisor propio `auth.efeonce.org`, OAuth/sesiones y gateway multi-issuer; SSO no concede MCP. Grants, `gv` y tokens se revalidan antes del dispatch. `TASK-1813` cerró Efeonce ID/base-only y la matriz post-cutover; `TASK-1844` aporta v2 interna y altas elegibles sin reconectar ([manual](docs/manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md)). `TASK-1832` certificó clientes con un canary sintético, retirado el 2026-09-18 (readback cero, gates `false`); una corrida nueva sigue el runbook canary. `TASK-1841` separa el piloto real. [`ADR nativo`](docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) · [`entrada/consentimiento`](docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md) · [`autoridad interna`](docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) · [`runbook`](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
 - La operación MCP se enruta por las skills espejo `efeonce-mcp-platform`, que componen la de cada provider. Una superficie hospedada puede compartir DCR/familia; la observación es read-only y atribuye negativos por timestamp + DCR run-owned + familia revocada. Arquitectura debe cargar ese router antes de cambiar OAuth.
 - Hiring/ATS separa **etapa** (¿dónde está?) de **desenlace** (¿cómo terminó?), ejes ortogonales atados por el `CHECK` `(stage='closed') = (decision IS NOT NULL)`. `TASK-1754` dejó el vocabulario de etapas en **seis** (`sourced`, `screening`, `shortlisted`, `interview`, `decision_pending`, `closed`) y `TASK-1765` el de desenlaces en seis; `HIRING_PIPELINE_STAGES` (cinco) es el subconjunto escribible por un cambio de etapa —`closed` no está: cerrar exige declarar el desenlace— y `TERMINAL_APPLICATION_STAGES` es la fuente única de lo terminal. **Un contract de enum se aplica DESPUÉS del release que retira sus escritores, nunca antes**, y la alcanzabilidad de un valor se deriva del contrato de la superficie desplegada, jamás del conteo de filas (`ISSUE-161`). El contract de etapas está escrito y **pendiente de aplicar** al 2026-08-23.
 - Hiring/ATS declara la **procedencia del dato en su nacimiento** (`data_origin`, `TASK-1739`, en producción desde 2026-08-19): dos raíces —persona y demanda— con copia derivada por trigger en la postulación, default `real` porque omitir debe dejar el dato visible, nunca ocultarlo. Una vacante no real no se publica; el gold set excluye sintéticos sin flag; retención y compliance son ciegos a la procedencia y ésta nunca gatea comunicaciones. El primitive canónico es `src/lib/hiring/data-origin/`; ningún reader escribe su propio predicado. `TASK-1748` cerró esa deuda **en `develop`** (readers y projection del Banco de Talento ya filtran por procedencia); en producción todavía no: `code complete, rollout pendiente`.
@@ -195,6 +198,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo crear o auditar publicidad/social con texto o selección colaborativa | `docs/operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md` + [Creative Typography Workbench público](https://axis.efeonce.org/references/creative-typography/) + skill espejo `efeonce-advertising-creative`; AXIS `0.2.5` posee `axisAdvertising`/`efeonce.advertising-typography` (`trial`) y `efeonce.collaboration-selection` (`candidate`) + manifest agent-facing. Greenhouse fija esa versión y `pnpm creative:layout` adapta supporting tagline, targets `headline|support|hook|lockup` y el URL Bubble canónico con blend raster `luminosity`; otro motor sin adapter reporta `pending adapter`. Para social compone con `social-media-studio`; producir/revisar no autoriza publicar. MCP no sirve este manual mientras no exista una tool creativa federada real. |
 | Qué tipografías y firma de marca usan las seasonalities Efeonce | UI: `DESIGN.md` + `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`; guía de publicidad/social: `../axis-design-system/docs/creative-applications/advertising-social/DESIGN.md`; casos auditados y límites de peso/interlineado: `.codex/skills/greenhouse-typography-accessibility/references/real-campaign-typography-cases.md`; seasonalities: Bricolage display + Poppins apoyo, con Guttery sólo como gesto breve y con atribución oficial o activo distintivo validado; assets y skills: `src/assets/fonts/BricolageGrotesque-Variable.ttf` + `BricolageGrotesque-SOURCE.md` + `efeonce-advertising-creative`/`social-media-studio`/`design-studio`/`greenhouse-ai-image-generator` |
 | Cómo producir posts sociales visuales con reportes, dashboards o evidencia de producto | `docs/operations/GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md` + capas funcional/manual + skills `design-studio` y `social-media-studio` |
+| Video | Motion/Audio: companions; CDR-008 |
 | Cómo crear o modificar templates, footers y hero images de email | skill espejo `greenhouse-email` + `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`; delivery/provider se opera aparte con `resend-email-platform` y visuales GPT Image 2 con `greenhouse-ai-image-generator` |
 | Cómo diseñar, auditar o mejorar dashboards en Google Data Studio (antes Looker Studio) | `.codex/skills/google-data-studio/SKILL.md` + `.claude/skills/google-data-studio/SKILL.md`; usar `inspect` por defecto; validar modelado, filtros, browser, permisos y sharing en sus references |
 | Cómo modelar Efeonce Group, Media & Distribution, Growth Platform, AEO y Search Visibility 360 | `docs/business-models/README.md` + `.codex/skills/efeonce-business-model-operator/SKILL.md` + modelos vigentes |

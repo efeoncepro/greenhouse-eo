@@ -7,12 +7,13 @@
 
 ## Meta
 
-- Status: `draft` (2026-09-15)
+- Status: `draft` (2026-09-15; delta 2026-09-25 por el rediseño premium aprobado)
 - Epic: `EPIC-045` (+ integración `EPIC-046` P01/P02/P04/P09)
 - Skills de product design aplicadas: `info-architecture` (líder), `state-design`, `greenhouse-ux-writing`,
   `modern-ui`, `dataviz-design`.
 - Tasks conectadas: 1845 (motor, hecho), 1846 (render), 1847 (catálogos), 1848 (share/delivery/schedules),
-  1849 (portal + email), 1875 (web compartida en Think).
+  1849 (portal + email), 1875 (web compartida en Think), 1888 (contrato editorial v2 + portada por cliente,
+  sin UI) y 1889 (catálogos premium A4 y deck, sin ruta de portal).
 - Flow files por task: `TASK-1849-…-flow.md`, `TASK-1875-…-flow.md`.
 
 ## 1. La espina dorsal: un motor, un modelo, tres renders
@@ -21,6 +22,17 @@
 salen tres renders con las mismas cifras: `deck_pdf` y `report_pdf` (Composer/Artifact Worker, TASK-1846/1847) y
 `web` (proyección `InsightWebModelV1`, TASK-1848 → render en Think, TASK-1875). El portal (TASK-1849) muestra el
 mismo plan desde los readers autenticados. Cambiar una cifra = nueva versión, nunca mutación.
+
+**Delta 2026-09-25 — portada sellada y rediseño (planificado, no construido).** El operador aprobó un diseño premium
+para todo informe (dirección visual:
+`docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`). Para la espina dorsal esto
+agrega una decisión más que se congela con la edición: la **portada** (navy o blanca). La resuelve el dominio
+(TASK-1888): cambio en el encargo > preferencia del cliente > `auto`, donde `auto` = navy sólo si el cliente tiene logo
+apto para fondo oscuro, si no blanca. Queda sellada en la edición, así que re-renderizar da la misma portada y ninguna
+superficie la decide. Los PDFs (`report_pdf`, `deck_pdf`) la dibujan con una sola portada y variantes por módulo
+(visibilidad `seo`/`aeo` con logos de canal; creativa `ico` sin logos), además de los roles de color de datos
+(actual/anterior/oportunidad/ausencia) que TASK-1889 fija; la vista web (`InsightWebModelV1`) respeta los mismos roles.
+Hasta el release de TASK-1889, producción sirve los catálogos v1 de TASK-1847.
 
 ## 2. Actores y resolución de superficie por autoridad
 
@@ -43,6 +55,17 @@ mismo plan desde los readers autenticados. Cambiar una cifra = nueva versión, n
 | S6 | Vista web compartida por token en `think.efeoncepro.com/insights/r/<token>` | TASK-1875 sobre 1848 | diseño |
 | S7 | Correo de entrega (resumen útil + deep link autenticado o ShareGrant) | TASK-1849 (presentación) sobre 1848 | diseño |
 | S8 | Accesos contextuales desde Inicio/Mis servicios (EPIC-046 P04) | TASK-1854 | diseño |
+
+**Delta 2026-09-25 (planificado) — qué suman S2 y las descargas.**
+
+- **S2 (encargo):** muestra la preferencia de portada del cliente y permite cambiarla sólo para ese encargo
+  (`brand.coverTheme`: `auto` | `dark` | `light`, opcional, dentro del mismo `InsightRequestV1`). Si TASK-1849 ofrece
+  editar la preferencia del cliente, lo hace con el command `setInsightCoverPreference` y su reader (TASK-1888, Slice
+  5); la superficie exacta se decide en su Discovery. En ambos casos es **consumer** del contrato de TASK-1888, sin
+  lógica propia: no replica la regla `auto` ni ninguna otra resolución; la portada efectiva es la que el dominio sella
+  en la edición.
+- **S3 y S6 (descargas):** los PDF traerán la portada navy o blanca sellada por edición y sus variantes por módulo
+  (TASK-1889). Ninguna superficie elige ni recalcula la portada al descargar.
 
 ## 4. Las journeys cross-surface
 
@@ -76,6 +99,8 @@ por token, sin navegación privada, sin login, `noindex`. El token nunca cruza a
 | Emitir / retirar / recuperar | `issueInsightEdition` / `withdrawInsightEdition` / `recoverInsightEdition` | app (persona autenticada); nunca MCP para emitir |
 | Compartir / enviar / programar | TASK-1848 (`createShare`, `requestDelivery`, `createSchedule`, …) | app · ecosystem por definir |
 | Leer compartido / descargar | TASK-1848 (`resolveSharedEdition`, `downloadSharedOutput`) | público por token (S6) |
+| Cambiar la portada de un encargo *(planificado, TASK-1888)* | `createInsightEdition` con `brand.coverTheme` opcional (sin él, el hash del encargo no cambia) | mismas lanes que crear encargo |
+| Ver / fijar la preferencia de portada del cliente *(planificado, TASK-1888)* | `setInsightCoverPreference` + su reader | app · ecosystem · MCP (tool federada en `efeonce-mcp`) |
 
 ## 7. Consent / PII boundaries
 
@@ -95,6 +120,8 @@ fixtures sintéticos de dos organizaciones; ningún cliente real como tester.
 
 ## 10. Mapa task → nodo (estado)
 
+Estado al 2026-09-15 (se conserva como historia; el vigente está en el delta de abajo):
+
 | Task | Nodos | Estado |
 |---|---|---|
 | TASK-1845 | motor (sin UI) | code complete, rollout pendiente |
@@ -104,9 +131,25 @@ fixtures sintéticos de dos organizaciones; ningún cliente real como tester.
 | TASK-1875 | S6 | to-do (bloqueada por 1848) |
 | TASK-1854 | S8 | to-do (EPIC-046) |
 
+**Delta 2026-09-25 — estado vigente del mapa** (lifecycle leído de cada task):
+
+| Task | Nodos | Estado |
+|---|---|---|
+| TASK-1845 | motor (sin UI) | complete (2026-09-16) |
+| TASK-1846 | render durable (Job `artifact-worker`) | complete (2026-09-16), en producción |
+| TASK-1847 | catálogos v1 `report_pdf` + `deck_pdf` (alimentan S3 y S6 descargas) | complete (2026-09-25), en producción desde 2026-09-24 |
+| TASK-1848 | S5 backend, S6 contrato, S7 backend | in-progress; en producción con flags OFF |
+| TASK-1888 | contrato de portada y editorial v2 (alimenta S2 y los PDF; sin UI) | to-do, sin blockers |
+| TASK-1889 | catálogos premium (los PDF de S3 y S6) | to-do; Slices 3–5 dependen de TASK-1888 |
+| TASK-1849 | S1–S5, S7 (+ portada en S2 como consumer de TASK-1888) | to-do |
+| TASK-1875 | S6 (+ mismos roles de color que los PDF) | to-do (desbloqueada por TASK-1848 el 2026-09-18) |
+| TASK-1854 | S8 | to-do (EPIC-046; bloqueada por TASK-1852 y TASK-1853) |
+
 ## Acceptance Checklist (del programa)
 
 - [ ] Mismo `EO-INS-…` + versión + cifras en S3, S6, S7 y PDF para una edición emitida.
 - [ ] Un cliente nunca ve un draft interno ni evidencia de una edición no emitida; un tercero con token nunca ve la biblioteca.
 - [ ] Revocar un grant corta S6 en la siguiente lectura; retirar una edición corta S6 y descargas.
 - [ ] Emitir sólo desde una persona autenticada con `insights.edition.issue`; nunca desde MCP.
+- [ ] (desde 2026-09-25, con TASK-1888/1889) La portada de una edición es la sellada por el dominio: S2 sólo la
+  pide o la muestra, re-renderizar la edición da la misma portada y ninguna superficie la recalcula.

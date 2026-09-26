@@ -1,5 +1,5 @@
 import { runEcosystemReadRoute } from '@/lib/api-platform/core/ecosystem-auth'
-import { getEcosystemInsightSchedulePayload } from '@/lib/api-platform/resources/ecosystem-insights'
+import { getEcosystemInsightSchedulePayload } from '@/lib/api-platform/resources/ecosystem-insights-read'
 
 export const dynamic = 'force-dynamic'
 

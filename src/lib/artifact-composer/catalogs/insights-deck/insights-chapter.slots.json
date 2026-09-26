@@ -1,0 +1,154 @@
+{
+  "template": "InsightsChapterSlide",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "TASK-1889 — apertura de capítulo del deck. DERIVADA de la A4 aprobada: el canvas no la diseñó; la aprueba el operador antes de congelar baseline.",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "slots": {
+    "chapterLabel": {
+      "selector": "[data-slot='chapterLabel']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 20,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Capítulo NN»."
+    },
+    "chapterNumeral": {
+      "selector": ".chapter-numeral",
+      "type": "string",
+      "required": true,
+      "consumer": "validation-only",
+      "constraints": {
+        "maxCharacters": 2,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "El número en contorno. No se pinta como slot: lo escribe el layout hook (sangra fuera del lienzo a propósito)."
+    },
+    "runningLabel": {
+      "selector": "[data-slot='runningLabel']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 40,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Informe de <período>»."
+    },
+    "chapterTitle": {
+      "selector": "[data-slot='chapterTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 44,
+        "maxLines": 2,
+        "overflow": "reject"
+      }
+    },
+    "chapterLead": {
+      "selector": "[data-slot='chapterLead']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 150,
+        "maxLines": 4,
+        "overflow": "reject"
+      },
+      "notes": "Entrada del capítulo (TASK-1888). Un plan v1 no la trae: la apertura compone sin ella."
+    },
+    "measuredChannels": {
+      "selector": "[data-slot='measuredChannels']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32,
+          "maxLines": 1
+        },
+        "channels": {
+          "type": "array",
+          "required": true,
+          "constraints": {
+            "minItems": 1,
+            "maxItems": 8
+          },
+          "item": {
+            "type": "object",
+            "shape": {
+              "name": {
+                "type": "string",
+                "required": true,
+                "maxCharacters": 24,
+                "maxLines": 1
+              },
+              "channelId": {
+                "type": "string",
+                "required": false,
+                "resolver": "deck-channel-isotype"
+              }
+            }
+          }
+        }
+      },
+      "notes": "«Medimos la marca en» + un disco por canal medido. Canal sin isotipo conocido: sólo el nombre."
+    },
+    "contents": {
+      "selector": "[data-slot='contents']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32,
+          "maxLines": 1
+        },
+        "entries": {
+          "type": "array",
+          "required": true,
+          "constraints": {
+            "minItems": 1,
+            "maxItems": 9
+          },
+          "item": {
+            "type": "object",
+            "shape": {
+              "title": {
+                "type": "string",
+                "required": true,
+                "maxCharacters": 56,
+                "maxLines": 1
+              },
+              "folio": {
+                "type": "string",
+                "required": true,
+                "maxCharacters": 3,
+                "maxLines": 1
+              }
+            }
+          }
+        }
+      },
+      "notes": "Índice del capítulo con el folio real de cada página (plan de páginas de la misma composición)."
+    },
+    "pageFolio": {
+      "selector": "[data-slot='pageFolio']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 3,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    }
+  }
+}

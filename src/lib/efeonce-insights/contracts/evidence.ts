@@ -7,6 +7,7 @@
  * de histórico (arquitectura Insights §5).
  */
 
+import type { InsightChannelId } from './channels'
 import type { InsightModule } from './request'
 
 export const EVIDENCE_FACT_VERSION = 'evidence_fact_v1' as const
@@ -32,6 +33,15 @@ export type EvidenceCoverageKind = (typeof EVIDENCE_COVERAGE_KINDS)[number]
 
 export const EVIDENCE_OBSERVATION_KINDS = ['observed', 'estimated'] as const
 export type EvidenceObservationKind = (typeof EVIDENCE_OBSERVATION_KINDS)[number]
+
+/**
+ * TASK-1888 — `measure` (default, ausente en snapshots anteriores) es una medición del período. `reference` es un
+ * valor de referencia del dueño de la métrica —p. ej. la meta oficial de OTD leída de `ICO_METRIC_REGISTRY`— que un
+ * gráfico o una frase puede citar, pero que NO es un hallazgo: no genera claims, no entra a tablas y no cuenta como
+ * evidencia del módulo al validar la edición.
+ */
+export const EVIDENCE_FACT_ROLES = ['measure', 'reference'] as const
+export type EvidenceFactRole = (typeof EVIDENCE_FACT_ROLES)[number]
 
 /** Razones canónicas de ausencia/incomparabilidad; el adapter las declara, el plan las muestra. */
 export const EVIDENCE_REJECTION_REASONS = [
@@ -98,7 +108,14 @@ export interface EvidenceFactV1 {
   /** factId del hecho comparable (misma metodología/grano) cuando existe. */
   comparisonFactId: string | null
   dimension?: Record<string, string>
+  /** TASK-1888 — canal que el hecho representa (motor de respuesta, buscador). Ausente = no es un canal o no se conoce. */
+  channelId?: InsightChannelId
+  /** TASK-1888 — ausente = `measure`. */
+  role?: EvidenceFactRole
 }
+
+/** TASK-1888 — un hecho de referencia (meta oficial) no es una medición del período. */
+export const isReferenceFact = (fact: Pick<EvidenceFactV1, 'role'>): boolean => fact.role === 'reference'
 
 export interface EvidenceRejectionV1 {
   module: InsightModule

@@ -1,0 +1,23 @@
+{
+  "formato": "4:5",
+  "impacto": true,
+  "objetos": [],
+  "reservas": {
+    "texto": {
+      "muro": "the smooth graphite plaster wall of the actual photography studio behind the workbench",
+      "tinta": "blanca"
+    },
+    "margen": {
+      "superficie": "the actual finely finished graphite plaster studio wall, smooth matte painted plaster in even shadow with only nearly invisible texture",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the out-of-focus back of a navy upholstered studio chair very close to camera",
+    "tono": "deep navy nearly black cloth in natural shadow, continuous soft defocus without a hard edge"
+  },
+  "id": "02-relevancia-v3",
+  "palanca": "luz-motivada",
+  "escena": "PRECISE EDIT. Image 1 is the edit target. Image 2 is ONLY a reference for the flat calm dark neutral background wall; do not copy its scene or props. Preserve the character and all tabletop objects from Image 1 exactly. Replace only the visible back wall with a smooth matte charcoal painted plaster wall, optically out of focus, with flat uniform illumination across the entire upper 43 percent. NO grain in that background, NO plaster ridges, NO sweeping diagonal shadows, NO spots, NO texture, NO gradient within the upper-left quarter. This is real wall material, not an overlay. The wall should read as calm charcoal paint rather than rough stone. Keep existing hard directional sunlight on the foreground objects only. Keep framing, figure scale, orange detail, blue metal, tablet, glass, foreground cloth and their sharpness unchanged. No text or logo.",
+  "fuente": "the cool illuminated glass slots in the low aluminium tablet reader on the tabletop"
+}

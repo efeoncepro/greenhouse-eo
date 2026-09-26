@@ -1,0 +1,205 @@
+{
+  "flow_id": "SVt3llC8SDhciCoZjoQF",
+  "flow_created": false,
+  "url": "[ephemeral media URL removed]",
+  "flow_url": "[ephemeral media URL removed]",
+  "session_id": "0K1witFylFsn7Hiuw5b4",
+  "generations": [
+    {
+      "id": "LV27G9HyeTZg58qgaTsO",
+      "status": "completed",
+      "model_id": "eleven_text_to_sound_v2",
+      "modality": "audio",
+      "prompt": "Dry close-miked laptop keyboard, a brief natural irregular burst of light tactile keypresses finishing with one deeper Enter key, no voices or music.",
+      "duration_secs": 2,
+      "created_at_unix_ms": 1790246893258,
+      "price": {
+        "credits": 19.999999999999996,
+        "price_cents": 0.43999999999999995,
+        "cost_fiat_currency": "usd"
+      }
+    },
+    {
+      "id": "NH48hHEqULK31PP8TJxW",
+      "status": "completed",
+      "model_id": "eleven_text_to_sound_v2",
+      "modality": "audio",
+      "prompt": "One short delicate airy swish with a tiny soft tactile landing, clean dry interface slide, no beep, no voices or music.",
+      "duration_secs": 0.6802494331065759,
+      "created_at_unix_ms": 1790246893258,
+      "price": {
+        "credits": 6.999999999999998,
+        "price_cents": 0.15399999999999997,
+        "cost_fiat_currency": "usd"
+      }
+    },
+    {
+      "id": "wTpKgsXrx199AFiKzoi0",
+      "status": "completed",
+      "model_id": "eleven_text_to_sound_v2",
+      "modality": "audio",
+      "prompt": "A single short airy rising shimmer blooming into one warm deep impact with a brief spatial tail, no engine, voices or music.",
+      "duration_secs": 1.2,
+      "created_at_unix_ms": 1790246893260,
+      "price": {
+        "credits": 12,
+        "price_cents": 0.264,
+        "cost_fiat_currency": "usd"
+      }
+    },
+    {
+      "id": "jc9U2ZV7nsA7wiAXWwvz",
+      "status": "completed",
+      "model_id": "eleven_text_to_sound_v2",
+      "modality": "audio",
+      "prompt": "One realistic large passenger turbofan jet approaching, passing close once at the middle and receding with a smooth Doppler fall and natural air rush, no repetitions, voices or music.",
+      "duration_secs": 5,
+      "created_at_unix_ms": 1790246893262,
+      "price": {
+        "credits": 49.99999999999999,
+        "price_cents": 1.0999999999999999,
+        "cost_fiat_currency": "usd"
+      }
+    },
+    {
+      "id": "pGEG73iaImQ7hGFsHTy3",
+      "status": "completed",
+      "model_id": "eleven_text_to_sound_v2",
+      "modality": "audio",
+      "prompt": "One short deep rounded thump with a crisp light woody transient and very brief airy tail, no engine, repetition, voice or music.",
+      "duration_secs": 0.8,
+      "created_at_unix_ms": 1790246893262,
+      "price": {
+        "credits": 7.999999999999999,
+        "price_cents": 0.176,
+        "cost_fiat_currency": "usd"
+      }
+    }
+  ],
+  "all_completed": true,
+  "has_failures": false,
+  "session_ids": [
+    "0K1witFylFsn7Hiuw5b4",
+    "Fx1mLtTRZMlKZNXDMYsq",
+    "Lej4gEDETs0Eefir5tG6",
+    "XqgU3IZcUXhP9e4xkrt7",
+    "56BUUKK7j7QovBUWPjDb"
+  ],
+  "media": [
+    {
+      "generation_id": "LV27G9HyeTZg58qgaTsO",
+      "kind": "audio",
+      "url": "[ephemeral media URL removed]",
+      "prompt": "Dry close-miked laptop keyboard, a brief natural irregular burst of light tactile keypresses finishing with one deeper Enter key, no voices or music.",
+      "duration_secs": 2,
+      "master_url": "[ephemeral media URL removed]",
+      "model_id": "eleven_text_to_sound_v2",
+      "settings": [
+        {
+          "label": "Duration seconds",
+          "value": "2.0"
+        },
+        {
+          "label": "Prompt influence",
+          "value": "0.6"
+        },
+        {
+          "label": "Loop",
+          "value": "False"
+        }
+      ]
+    },
+    {
+      "generation_id": "NH48hHEqULK31PP8TJxW",
+      "kind": "audio",
+      "url": "[ephemeral media URL removed]",
+      "prompt": "One short delicate airy swish with a tiny soft tactile landing, clean dry interface slide, no beep, no voices or music.",
+      "duration_secs": 0.68,
+      "master_url": "[ephemeral media URL removed]",
+      "model_id": "eleven_text_to_sound_v2",
+      "settings": [
+        {
+          "label": "Duration seconds",
+          "value": "0.7"
+        },
+        {
+          "label": "Prompt influence",
+          "value": "0.65"
+        },
+        {
+          "label": "Loop",
+          "value": "False"
+        }
+      ]
+    },
+    {
+      "generation_id": "wTpKgsXrx199AFiKzoi0",
+      "kind": "audio",
+      "url": "[ephemeral media URL removed]",
+      "prompt": "A single short airy rising shimmer blooming into one warm deep impact with a brief spatial tail, no engine, voices or music.",
+      "duration_secs": 1.2,
+      "master_url": "[ephemeral media URL removed]",
+      "model_id": "eleven_text_to_sound_v2",
+      "settings": [
+        {
+          "label": "Duration seconds",
+          "value": "1.2"
+        },
+        {
+          "label": "Prompt influence",
+          "value": "0.65"
+        },
+        {
+          "label": "Loop",
+          "value": "False"
+        }
+      ]
+    },
+    {
+      "generation_id": "jc9U2ZV7nsA7wiAXWwvz",
+      "kind": "audio",
+      "url": "[ephemeral media URL removed]",
+      "prompt": "One realistic large passenger turbofan jet approaching, passing close once at the middle and receding with a smooth Doppler fall and natural air rush, no repetitions, voices or music.",
+      "duration_secs": 5,
+      "master_url": "[ephemeral media URL removed]",
+      "model_id": "eleven_text_to_sound_v2",
+      "settings": [
+        {
+          "label": "Duration seconds",
+          "value": "5.0"
+        },
+        {
+          "label": "Prompt influence",
+          "value": "0.7"
+        },
+        {
+          "label": "Loop",
+          "value": "False"
+        }
+      ]
+    },
+    {
+      "generation_id": "pGEG73iaImQ7hGFsHTy3",
+      "kind": "audio",
+      "url": "[ephemeral media URL removed]",
+      "prompt": "One short deep rounded thump with a crisp light woody transient and very brief airy tail, no engine, repetition, voice or music.",
+      "duration_secs": 0.8,
+      "master_url": "[ephemeral media URL removed]",
+      "model_id": "eleven_text_to_sound_v2",
+      "settings": [
+        {
+          "label": "Duration seconds",
+          "value": "0.8"
+        },
+        {
+          "label": "Prompt influence",
+          "value": "0.65"
+        },
+        {
+          "label": "Loop",
+          "value": "False"
+        }
+      ]
+    }
+  ]
+}

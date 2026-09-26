@@ -1,0 +1,15 @@
+{
+  "id": "U5-julio-uniforme-boston",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["julio"],
+  "objetos": [
+    { "objeto": "chaqueta-softshell-efeonce", "vista": "frente" },
+    { "objeto": "lanyard-efeonce", "vista": "colgado" }
+  ],
+  "escena": "SCENE (partner hall of a large technology conference in Boston, late afternoon): a single shaft of low sun through the tall convention-centre glass falls ONTO THE MAN from his left, edging his shoulder and jaw and throwing a long shadow across the polished floor behind him; he stands at the edge of the hall with one hand in his pocket, turning mid-conversation towards someone out of frame as he starts to answer. He wears the softshell jacket from the object reference, open over a plain dark charcoal t-shirt, with the lanyard from the object reference hanging at his chest. He looks off camera, never at the lens. Deep behind him the hall recedes into soft focus with cool azure-blue light from the session signage. 85mm lens at f/2. Everything else is completely unbranded, with no readable text and no other logos anywhere.",
+  "lecho": {
+    "objeto": "the near edge of a matte black exhibition counter standing between the camera and the man",
+    "tono": "DARK near black, matte, with subtle texture"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "id": "KV-04-criterio-v04",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "larga-exposicion",
+  "identidad": [{ "persona": "nexa", "vista": "busto" }],
+  "objetos": [
+    { "objeto": "polo-efeonce", "puesta": "frente-cuerpo-b" },
+    { "objeto": "sprocket-hubspot", "vista": "lateral" }
+  ],
+  "escena": "SCENE (revenue operations floor at night, Santiago): a LONG EXPOSURE on a tripod. Everything that moves by itself has dissolved into soft translucent streaks — colleagues crossing behind her are smeared ribbons, the glowing cool blue records on the low display wall have pulled into continuous horizontal light trails. Nexa is the ONE thing perfectly sharp: seated, still, almost frontal in a navy piqué polo, hands quiet on the desk, eyes down-right on one record she has not let go. Her stillness against all that motion is the picture. CRITICAL: the display wall is LOW — its top edge and every light trail stay BELOW 55% of the frame height — and the ceiling above it is bare dark painted soffit. A single hard low light from the left holds her edge crisp, very high contrast. A small orange sculpture sits sharp on the desk at the right, because it never moved. Her head stays BELOW 55% of the frame height. 85mm lens at f/2 on a tripod, several seconds of exposure, focus on her eyes. CRITICAL FRAMING: the ENTIRE UPPER HALF of the frame — everything above 50% of the frame height — is one single dark, evenly toned surface with NOTHING in it: no object, no screen, no lamp, no window, no light beam, no bright spot. All action, all light and every bright patch stay strictly BELOW the middle of the frame. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. Everything except the sculpture is completely unbranded and no text is readable: the trails read as movement, never as words.",
+  "lecho": { "objeto": "the near edge of the operations desk crossing the very bottom against the lens, outside every light", "tono": "DARK near black, matte" },
+  "reservas": { "texto": { "muro": "the bare dark painted ceiling soffit filling the whole upper half above the display wall, unlit and evenly toned, its matte texture visible", "tinta": "blanca" } }
+}

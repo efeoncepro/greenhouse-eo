@@ -1,0 +1,27 @@
+[
+  {
+    "role": "source-timing-camera-and-composition-authority",
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v10-local/planning/omni-pilot-source-6_50-16_00.mp4",
+    "sha256": "7b63ab1f79881b5b9aeb01bf0ced6683146b619cb424fa343dbaff1842ea6f36"
+  },
+  {
+    "role": "aircraft-front-material",
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/cam-A-frontal-photo.png",
+    "sha256": "178b838e4dc2d0792bb1e33406d67363366b5d495755d9b5a231b678d5298869"
+  },
+  {
+    "role": "aircraft-side-material",
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/cam-B-tracking-photo.png",
+    "sha256": "8da2a6d21d5c64a1b0ce6d1405cebeeb65cc23ef2b2ccceabae08e7118b016f3"
+  },
+  {
+    "role": "aircraft-rear-material",
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/refs/cam-B-rear-departure.png",
+    "sha256": "d8b5823fb7943f7eb992a319482a8f0494a8e3f0608972ef4ed46e3f31231809"
+  },
+  {
+    "role": "ui-copy-only-not-layout",
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/05-answer-citation.png",
+    "sha256": "28363fb381518a902bc8457da720d77d68f40b5aaa08a966ac28f60d653e9530"
+  }
+]

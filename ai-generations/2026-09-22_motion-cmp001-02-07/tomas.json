@@ -1,0 +1,380 @@
+[
+  {
+    "take": "CMP001-02-9x16",
+    "piece": "02",
+    "title": "Sin tu nombre",
+    "ratio": "9x16",
+    "aspect": "9:16",
+    "prompt": "prompts/CMP001-02-9x16.prompt.txt",
+    "images": [
+      "refs/02/ref-sin-logo-9x16.png",
+      "refs/02/plate-9x16.png",
+      "refs/02/pose-gesto.png",
+      "refs/02/pose-reposo.png"
+    ],
+    "sha256": {
+      "refs/02/ref-sin-logo-9x16.png": "00321852c0139aad4b1bbd2b382b35112f3c8af733c96f0fbbd9023a8e6b80c6",
+      "refs/02/plate-9x16.png": "88b35f03f08d85eb00a0c251f55b5ec12068c309ca66e5cb7e43af924cd740e8",
+      "refs/02/pose-gesto.png": "861cd64363587dc325f8252916fb29bf24fac0302c880345a2d4fb90c6e579c6",
+      "refs/02/pose-reposo.png": "fecce7908d47ce51eb592342e19416fc8386e1a0bfd98740863a2188c66daa4e"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-02-3x4",
+    "piece": "02",
+    "title": "Sin tu nombre",
+    "ratio": "3x4",
+    "aspect": "3:4",
+    "prompt": "prompts/CMP001-02-3x4.prompt.txt",
+    "images": [
+      "refs/02/ref-sin-logo-4x5.png",
+      "refs/02/plate-4x5.png",
+      "refs/02/pose-gesto.png",
+      "refs/02/pose-reposo.png"
+    ],
+    "sha256": {
+      "refs/02/ref-sin-logo-4x5.png": "437c98e879a9283117668bdb0e90a91b21a9c134a823b7535efb420abc993d97",
+      "refs/02/plate-4x5.png": "dd42905580156f3f50e2c1b594880a45a8bff303f4da515f66164a12f0f2b67c",
+      "refs/02/pose-gesto.png": "861cd64363587dc325f8252916fb29bf24fac0302c880345a2d4fb90c6e579c6",
+      "refs/02/pose-reposo.png": "fecce7908d47ce51eb592342e19416fc8386e1a0bfd98740863a2188c66daa4e"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-02-1x1",
+    "piece": "02",
+    "title": "Sin tu nombre",
+    "ratio": "1x1",
+    "aspect": "1:1",
+    "prompt": "prompts/CMP001-02-1x1.prompt.txt",
+    "images": [
+      "refs/02/ref-sin-logo-4x5.png",
+      "refs/02/plate-4x5.png",
+      "refs/02/pose-gesto.png",
+      "refs/02/pose-reposo.png"
+    ],
+    "sha256": {
+      "refs/02/ref-sin-logo-4x5.png": "437c98e879a9283117668bdb0e90a91b21a9c134a823b7535efb420abc993d97",
+      "refs/02/plate-4x5.png": "dd42905580156f3f50e2c1b594880a45a8bff303f4da515f66164a12f0f2b67c",
+      "refs/02/pose-gesto.png": "861cd64363587dc325f8252916fb29bf24fac0302c880345a2d4fb90c6e579c6",
+      "refs/02/pose-reposo.png": "fecce7908d47ce51eb592342e19416fc8386e1a0bfd98740863a2188c66daa4e"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-03-9x16",
+    "piece": "03",
+    "title": "No te leyó",
+    "ratio": "9x16",
+    "aspect": "9:16",
+    "prompt": "prompts/CMP001-03-9x16.prompt.txt",
+    "images": [
+      "refs/03/ref-sin-logo-9x16.png",
+      "refs/03/plate-9x16.png",
+      "refs/03/pose-gesto.png",
+      "refs/03/pose-reposo.png"
+    ],
+    "sha256": {
+      "refs/03/ref-sin-logo-9x16.png": "054888b7d7a37d898282418c67850ca6c6f67d998e3d2e8f55586057663c67dd",
+      "refs/03/plate-9x16.png": "a3517abfd9e25436b76fb58c2954873132fd25a5378f4649ea1b6af56639e417",
+      "refs/03/pose-gesto.png": "2068b7fffb8a609958ae7d2c57f9d687447d59d0d5d5c3231f7ba85627fb9a42",
+      "refs/03/pose-reposo.png": "4eb29b21b6b5d186086739e458c1a032f20ca907c839e0f119aff5eeb8b9ea51"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-03-3x4",
+    "piece": "03",
+    "title": "No te leyó",
+    "ratio": "3x4",
+    "aspect": "3:4",
+    "prompt": "prompts/CMP001-03-3x4.prompt.txt",
+    "images": [
+      "refs/03/ref-sin-logo-4x5.png",
+      "refs/03/plate-4x5.png",
+      "refs/03/pose-gesto.png",
+      "refs/03/pose-reposo.png"
+    ],
+    "sha256": {
+      "refs/03/ref-sin-logo-4x5.png": "c704977c30b02b829783636e1cdb7a4f47376416f8a9c9fca1ba68d9ca60362f",
+      "refs/03/plate-4x5.png": "daa7f797345a6f61d50e19de7ed67a6ffbc8e572c6227b1e9784c4ca0ccbc1c7",
+      "refs/03/pose-gesto.png": "2068b7fffb8a609958ae7d2c57f9d687447d59d0d5d5c3231f7ba85627fb9a42",
+      "refs/03/pose-reposo.png": "4eb29b21b6b5d186086739e458c1a032f20ca907c839e0f119aff5eeb8b9ea51"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-03-1x1",
+    "piece": "03",
+    "title": "No te leyó",
+    "ratio": "1x1",
+    "aspect": "1:1",
+    "prompt": "prompts/CMP001-03-1x1.prompt.txt",
+    "images": [
+      "refs/03/ref-sin-logo-4x5.png",
+      "refs/03/plate-4x5.png",
+      "refs/03/pose-gesto.png",
+      "refs/03/pose-reposo.png"
+    ],
+    "sha256": {
+      "refs/03/ref-sin-logo-4x5.png": "c704977c30b02b829783636e1cdb7a4f47376416f8a9c9fca1ba68d9ca60362f",
+      "refs/03/plate-4x5.png": "daa7f797345a6f61d50e19de7ed67a6ffbc8e572c6227b1e9784c4ca0ccbc1c7",
+      "refs/03/pose-gesto.png": "2068b7fffb8a609958ae7d2c57f9d687447d59d0d5d5c3231f7ba85627fb9a42",
+      "refs/03/pose-reposo.png": "4eb29b21b6b5d186086739e458c1a032f20ca907c839e0f119aff5eeb8b9ea51"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-04-9x16",
+    "piece": "04",
+    "title": "¿Sales tú?",
+    "ratio": "9x16",
+    "aspect": "9:16",
+    "prompt": "prompts/CMP001-04-9x16.prompt.txt",
+    "images": [
+      "refs/04/ref-sin-logo-9x16.png",
+      "refs/04/plate-9x16.png",
+      "refs/04/pose-gesto.png",
+      "refs/04/pose-reposo.png"
+    ],
+    "sha256": {
+      "refs/04/ref-sin-logo-9x16.png": "3faa1700f5619b1f31c8b5723bd3dd5fd7106d74b3f99630081e3cc3e11953d5",
+      "refs/04/plate-9x16.png": "e321a6c2b0f3ec325a37dbb3eab28b17fd395dd68f43593f14a8d77ec2658702",
+      "refs/04/pose-gesto.png": "71a7839c5ee83b6147ba936c4fb1bab1aaded91a7c950c64ecddda4ff267bcb3",
+      "refs/04/pose-reposo.png": "ac3bb959b863fd78b114aa5ea515c0ab03d2cf712bbfc8655ebbb67a0c42e5b8"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-04-3x4",
+    "piece": "04",
+    "title": "¿Sales tú?",
+    "ratio": "3x4",
+    "aspect": "3:4",
+    "prompt": "prompts/CMP001-04-3x4.prompt.txt",
+    "images": [
+      "refs/04/ref-sin-logo-4x5.png",
+      "refs/04/plate-4x5.png",
+      "refs/04/pose-gesto.png",
+      "refs/04/pose-reposo.png"
+    ],
+    "sha256": {
+      "refs/04/ref-sin-logo-4x5.png": "efd7a4b363ffebf2874de14004ba1fa4977ef18289d4ece4c2732acbeffd4ea1",
+      "refs/04/plate-4x5.png": "856999869c69681684ac57bb1b6fca0c0e5fe97a3c23599f0030a6d26a4d949c",
+      "refs/04/pose-gesto.png": "71a7839c5ee83b6147ba936c4fb1bab1aaded91a7c950c64ecddda4ff267bcb3",
+      "refs/04/pose-reposo.png": "ac3bb959b863fd78b114aa5ea515c0ab03d2cf712bbfc8655ebbb67a0c42e5b8"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-04-1x1",
+    "piece": "04",
+    "title": "¿Sales tú?",
+    "ratio": "1x1",
+    "aspect": "1:1",
+    "prompt": "prompts/CMP001-04-1x1.prompt.txt",
+    "images": [
+      "refs/04/ref-sin-logo-1x1.png",
+      "refs/04/plate-1x1.png",
+      "refs/04/pose-gesto.png",
+      "refs/04/pose-reposo.png"
+    ],
+    "sha256": {
+      "refs/04/ref-sin-logo-1x1.png": "50836e09f892c1b6a147b38753fcd90582b140955e27a6151c7b2cc770a1f251",
+      "refs/04/plate-1x1.png": "256357f5185bc25b8045da5ead15174f17c9e54616718602684196670f8444b4",
+      "refs/04/pose-gesto.png": "71a7839c5ee83b6147ba936c4fb1bab1aaded91a7c950c64ecddda4ff267bcb3",
+      "refs/04/pose-reposo.png": "ac3bb959b863fd78b114aa5ea515c0ab03d2cf712bbfc8655ebbb67a0c42e5b8"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-05-9x16",
+    "piece": "05",
+    "title": "¿Te reconoces?",
+    "ratio": "9x16",
+    "aspect": "9:16",
+    "prompt": "prompts/CMP001-05-9x16.prompt.txt",
+    "images": [
+      "refs/05/ref-sin-logo-9x16.png",
+      "refs/05/plate-9x16.png",
+      "refs/05/identidad-persona.png",
+      "refs/05/nexa-perfil.png"
+    ],
+    "sha256": {
+      "refs/05/ref-sin-logo-9x16.png": "63a00e0fc218dd1b14aa78229b931b8ce3c6b98d0317179e440690579cc209e2",
+      "refs/05/plate-9x16.png": "3eca7df3ef7214a9c326f1a42a848a72d4023eeac271a9086bb64d0f90b7005f",
+      "refs/05/identidad-persona.png": "301d667dc88cad838c55c66b68c5e6ce6ecee03fb00178046e64b66240a22b55",
+      "refs/05/nexa-perfil.png": "0f44e931ee5a32fa9d03df110fa4a2afbe292140c18ab8d894bc31d1205b147d"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-05-3x4",
+    "piece": "05",
+    "title": "¿Te reconoces?",
+    "ratio": "3x4",
+    "aspect": "3:4",
+    "prompt": "prompts/CMP001-05-3x4.prompt.txt",
+    "images": [
+      "refs/05/ref-sin-logo-4x5.png",
+      "refs/05/plate-4x5.png",
+      "refs/05/identidad-persona.png",
+      "refs/05/nexa-perfil.png"
+    ],
+    "sha256": {
+      "refs/05/ref-sin-logo-4x5.png": "457cd18d794894970b2256cf02544875d85eb3b4c38cf2089fb49b0cfbf8a2c3",
+      "refs/05/plate-4x5.png": "092972e5ca0738be37eb9951dbfb8d52b388bcead251b1d68048861a3de2cd70",
+      "refs/05/identidad-persona.png": "301d667dc88cad838c55c66b68c5e6ce6ecee03fb00178046e64b66240a22b55",
+      "refs/05/nexa-perfil.png": "0f44e931ee5a32fa9d03df110fa4a2afbe292140c18ab8d894bc31d1205b147d"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-05-1x1",
+    "piece": "05",
+    "title": "¿Te reconoces?",
+    "ratio": "1x1",
+    "aspect": "1:1",
+    "prompt": "prompts/CMP001-05-1x1.prompt.txt",
+    "images": [
+      "refs/05/ref-sin-logo-1x1.png",
+      "refs/05/plate-1x1.png",
+      "refs/05/identidad-persona.png",
+      "refs/05/nexa-perfil.png"
+    ],
+    "sha256": {
+      "refs/05/ref-sin-logo-1x1.png": "e63c751093f174f6f61e5dfdafbeef96852a0b1104f19595e2b6ec56578a1760",
+      "refs/05/plate-1x1.png": "c722be4695789a669d90fdc4b9c0ad324fa6be46cfefde968d50e4675feb6397",
+      "refs/05/identidad-persona.png": "301d667dc88cad838c55c66b68c5e6ce6ecee03fb00178046e64b66240a22b55",
+      "refs/05/nexa-perfil.png": "0f44e931ee5a32fa9d03df110fa4a2afbe292140c18ab8d894bc31d1205b147d"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-06-9x16",
+    "piece": "06",
+    "title": "Sé la referencia",
+    "ratio": "9x16",
+    "aspect": "9:16",
+    "prompt": "prompts/CMP001-06-9x16.prompt.txt",
+    "images": [
+      "refs/06/ref-sin-logo-9x16.png",
+      "refs/06/plate-9x16.png",
+      "refs/06/identidad-persona.png",
+      "refs/06/nexa-perfil.png"
+    ],
+    "sha256": {
+      "refs/06/ref-sin-logo-9x16.png": "5c0bf67658f086ea9ace747f4ec42485ba59c524dfa9c915fece91755f503c40",
+      "refs/06/plate-9x16.png": "d190fe79a40925d60ff755216ebdfc432ebb6cd57eb802e2d5077a6702868872",
+      "refs/06/identidad-persona.png": "5d7c249d6db7af88c19fb7590b1176f3d2dae351de05d9235a3fd5dc45298fd1",
+      "refs/06/nexa-perfil.png": "0f44e931ee5a32fa9d03df110fa4a2afbe292140c18ab8d894bc31d1205b147d"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-06-3x4",
+    "piece": "06",
+    "title": "Sé la referencia",
+    "ratio": "3x4",
+    "aspect": "3:4",
+    "prompt": "prompts/CMP001-06-3x4.prompt.txt",
+    "images": [
+      "refs/06/ref-sin-logo-4x5.png",
+      "refs/06/plate-4x5.png",
+      "refs/06/identidad-persona.png",
+      "refs/06/nexa-perfil.png"
+    ],
+    "sha256": {
+      "refs/06/ref-sin-logo-4x5.png": "b808f511be6f471302ccaa1bf27cdb57985b266c113e5638c504803c69e1db73",
+      "refs/06/plate-4x5.png": "a8b426e6282a69669eb01a6186b5c350481effcd1dda6d0c1f5866b585268d68",
+      "refs/06/identidad-persona.png": "5d7c249d6db7af88c19fb7590b1176f3d2dae351de05d9235a3fd5dc45298fd1",
+      "refs/06/nexa-perfil.png": "0f44e931ee5a32fa9d03df110fa4a2afbe292140c18ab8d894bc31d1205b147d"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-06-1x1",
+    "piece": "06",
+    "title": "Sé la referencia",
+    "ratio": "1x1",
+    "aspect": "1:1",
+    "prompt": "prompts/CMP001-06-1x1.prompt.txt",
+    "images": [
+      "refs/06/ref-sin-logo-1x1.png",
+      "refs/06/plate-1x1.png",
+      "refs/06/identidad-persona.png",
+      "refs/06/nexa-perfil.png"
+    ],
+    "sha256": {
+      "refs/06/ref-sin-logo-1x1.png": "6b8d4452a8f5f19db97f7c521ddb4f1c363a47520fb9c792aa5ef5c23e04b996",
+      "refs/06/plate-1x1.png": "f17db172416e820cad0ca584a49d8d8d30835a69d09753479ac3e5a745a39573",
+      "refs/06/identidad-persona.png": "5d7c249d6db7af88c19fb7590b1176f3d2dae351de05d9235a3fd5dc45298fd1",
+      "refs/06/nexa-perfil.png": "0f44e931ee5a32fa9d03df110fa4a2afbe292140c18ab8d894bc31d1205b147d"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-07-9x16",
+    "piece": "07",
+    "title": "Que te elijan",
+    "ratio": "9x16",
+    "aspect": "9:16",
+    "prompt": "prompts/CMP001-07-9x16.prompt.txt",
+    "images": [
+      "refs/07/ref-sin-logo-9x16.png",
+      "refs/07/plate-9x16.png",
+      "refs/07/pose-gesto.png",
+      "refs/07/pose-reposo.png"
+    ],
+    "sha256": {
+      "refs/07/ref-sin-logo-9x16.png": "6b714f2126fc462cc7b110cb4d82e0849c1809ebff3b3137b20acc2221d6fcbf",
+      "refs/07/plate-9x16.png": "af747aa7a04d052fa8df3dcc3a72f30cee3c6d6d4b6778f1e5534994c501f7be",
+      "refs/07/pose-gesto.png": "69939ba513a1b8e45648aa69ce017b696abd73c74d4775d210497fb6b17438a7",
+      "refs/07/pose-reposo.png": "ac3bb959b863fd78b114aa5ea515c0ab03d2cf712bbfc8655ebbb67a0c42e5b8"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-07-3x4",
+    "piece": "07",
+    "title": "Que te elijan",
+    "ratio": "3x4",
+    "aspect": "3:4",
+    "prompt": "prompts/CMP001-07-3x4.prompt.txt",
+    "images": [
+      "refs/07/ref-sin-logo-4x5.png",
+      "refs/07/plate-4x5.png",
+      "refs/07/pose-gesto.png",
+      "refs/07/pose-reposo.png"
+    ],
+    "sha256": {
+      "refs/07/ref-sin-logo-4x5.png": "7120de6f007525262d761ca1c8287a2c74203c30699df1ecfeea45be14f6517b",
+      "refs/07/plate-4x5.png": "e04b514589a2b56045e52b84fdcd2eac3f79d33978d2af1231bb5d00b8dccb6b",
+      "refs/07/pose-gesto.png": "69939ba513a1b8e45648aa69ce017b696abd73c74d4775d210497fb6b17438a7",
+      "refs/07/pose-reposo.png": "ac3bb959b863fd78b114aa5ea515c0ab03d2cf712bbfc8655ebbb67a0c42e5b8"
+    },
+    "lint": "ok"
+  },
+  {
+    "take": "CMP001-07-1x1",
+    "piece": "07",
+    "title": "Que te elijan",
+    "ratio": "1x1",
+    "aspect": "1:1",
+    "prompt": "prompts/CMP001-07-1x1.prompt.txt",
+    "images": [
+      "refs/07/ref-sin-logo-1x1.png",
+      "refs/07/plate-1x1.png",
+      "refs/07/pose-gesto.png",
+      "refs/07/pose-reposo.png"
+    ],
+    "sha256": {
+      "refs/07/ref-sin-logo-1x1.png": "35ac2a5a2a1a96135a7e61653311bc9ed759e61fc67316b63560352f2e951174",
+      "refs/07/plate-1x1.png": "b2df1437c9727c8d266588b98d5ea2d3a77eab2efe504da60ee646556916af74",
+      "refs/07/pose-gesto.png": "69939ba513a1b8e45648aa69ce017b696abd73c74d4775d210497fb6b17438a7",
+      "refs/07/pose-reposo.png": "ac3bb959b863fd78b114aa5ea515c0ab03d2cf712bbfc8655ebbb67a0c42e5b8"
+    },
+    "lint": "ok"
+  }
+]

@@ -21,10 +21,12 @@ demás.
 - El cleanup borra el DCR run-owned y todos sus hijos por `client_id`, incluso si una prueba errónea usó otro
   sujeto. Para un cliente shared conserva el cliente y los hijos ajenos; sólo puede borrar artefactos con
   environment/sujeto canary exactos, y contextos ligados al binding exacto.
-- Al 2026-09-10 la implementación aún no separa esos conjuntos. `oauth_client_not_run_owned` bloquea el apply
-  porque retirarlo dejaría al helper borrar hijos de otros sujetos por `client_id`. No lo allowlistees ni marques
-  el CIMD como run-owned: primero parte planner/delete/readback, añade una comprobación de preservación del
-  cliente/hijos ajenos y prueba ambos caminos. Hasta entonces, no hay cleanup seguro aunque venza la ventana.
+- Desde `74638aed0` (2026-09-18) planner, delete y readback separan ambos conjuntos: el DCR run-owned se borra
+  por `client_id` y el cliente shared sólo por environment + sujeto canary (más `binding_id` en contexts). El
+  readback compara un recibo de preservación del cliente shared y de sus hijos ajenos antes/después; si difiere,
+  hace rollback. Nunca allowlistees `oauth_client_not_run_owned` ni marques un CIMD como run-owned.
+- El apply corre con el perfil DB `ops` (`greenhouse_ops`, miembro de `greenhouse_migrator`, que es lo que exige
+  el guard). `migrator` a secas no tiene acceso DML transversal a todos los schemas del censo fail-closed.
 - Una señal de `refresh_reuse` agregada por `client_id` compartido no demuestra actividad canary. Antes de usarla
   como blocker de steady, correlaciona `subject_hash`, `grant_id`, familia y `profile.data_origin` con los sujetos
   exactos de la corrida. Conserva y atiende la actividad de otros sujetos como señal operacional separada, pero
@@ -133,11 +135,29 @@ conserva PKCE, callbacks, anti-SSRF, auth method y allowlist de scopes. Canon: c
   adelanta el retiro. Una excepción expresa debe nombrar el asset/conexión y conservar el resto de la ventana;
   no se convierte en autorización para borrar el registro completo o los clientes compartidos.
 
+## Diseño de una corrida nueva
+
+Lecciones de TASK-1832 (la certificación pasó; el retiro quedó bloqueado una semana por diseño):
+
+- Clasifica cada cliente OAuth de la matriz como `run_owned` o `shared` antes del primer write. Los hospedados
+  por CIMD (ChatGPT/Codex) son shared; prueba el cleanup por sujeto en dry-run sobre uno de ellos antes de
+  invitar, no el día del retiro.
+- Toda señal se lee por sujeto (`subject_hash`/`grant_id`), nunca por `client_id`, y las muestras por sujeto
+  cubren sin huecos todo el período hasta la revocación. Una ventana steady con un tramo sin muestra no es
+  evidencia.
+- El dry-run corre con el mismo perfil DB que el apply (`ops`).
+- Los gates y sus carriles de apagado se inventarían en el manifiesto al abrir; se leen en el runtime servido
+  al abrir y al cerrar.
+
 ## Cierre
 
 Para el canary externo, después de `delete_after`: corta authority, mide deny con token vigente, revoca
 familias/consents/sesiones, exige `unexpectedRefs=0` y `deletionReady=true`, aplica con el registration ID
 exacto, relee cero y apaga sus gates. Audit/outbox y assets compartidos de marca/correo se conservan.
+Apagar = GitHub repo var `EXTERNAL_IDENTITY_CANARY_ENABLED=false` + redeploy del auth-server (el workflow compara
+config y redeploya el mismo SHA), Vercel Production `false` + redeploy, y la variable del environment `production`
+de `efeonce-mcp` `MCP_NATIVE_EXTERNAL_CANARY_ENABLED=false` + `deploy.yml`. Readback en la revisión servida; la
+corrida `task-1832-canary-20260906-a` quedó así el 2026-09-18.
 
 Para fixtures internos, sigue el command de la task: verifica ownership, retira sólo overrides/relaciones
 propias, conserva historia y relee targets denegados y ausentes de discovery. No revoques conexiones

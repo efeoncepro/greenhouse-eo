@@ -157,21 +157,64 @@ Dos ejes ortogonales — **superficies** front-of-house (por audiencia/etapa) qu
 - Ilustraciones/personajes propietarios (`characters/greenhouse-*.png`, Nexa) = obra del equipo
   creativo, NO stock. Úsalas con criterio de marca; producción visual nueva → generadores (§tooling).
 
+### Línea gráfica «La órbita» en redes (canónica desde 2026-09-25)
+
+Rige toda pieza social de la marca propia Efeonce y su familia (Globe, Wave, Reach cambian sólo el acento).
+**No** aplica a clientes ni a Greenhouse. Contrato: [manual](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
+(§1.3 órbita, §1.5 lente, §8.5 URL, §9 foto, §10.1 grillas y campaña). Referencia operativa y checklist de QA:
+[graphic-line-orbit.md](../../efeonce-brand-studio/references/graphic-line-orbit.md). Los valores salen de los
+tokens `efeonceGraphicLine` de `@efeoncepro/axis-tokens`; nunca HEX ni px transcritos a mano.
+
+- **Lo que cambia en redes:** grosores ×1,75 en lienzos de hasta 1200 px; margen del 9 % del lado corto; en 9:16,
+  la órbita y el texto respetan la zona que tapa la interfaz de cada red (medidas en
+  `docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md`, §Zonas seguras).
+- **Ningún texto cruza la órbita.** Una órbita o una lente por pieza, nunca como patrón. El arco de avance mide un
+  dato real; sin dato, no hay arco.
+- **Campaña con foto:** la órbita rodea la lente con aire y la esfera va arriba a la izquierda, lejos de la cara.
+  La foto sale del banco propio `ai-generations/2026-09-25_banco-lente-orbita/` (8 tomas, una por palanca, fichas
+  en `fichas/`) o del pipeline `foto:*`; sin velo navy, sin emblema legible, sujeto dentro de un círculo del 55 %
+  del lado corto.
+- **URL:** `efeoncepro.com` va siempre en la burbuja oficial `url-lum`, nunca como texto suelto; si el render no
+  garantiza la fusión de luminosidad, usa la variante horneada (`deliverables/assets/url-lum-{light,dark}.svg`).
+- **«Te hacemos visible»** siempre con su prueba y sin pauta mientras falte la revisión legal (§1.4). La prueba de
+  atribución sin logo sigue sin medir: no afirmes que la órbita ya se reconoce sola.
+
 ## Narrativa del período (Q4 2026 – Q3 2027)
 
 Las piezas sociales de marca de Efeonce que no son seasonality se anclan a un capítulo de **«Tu IA no conoce tu
 negocio»**. Canon: [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../../../docs/strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md).
-- Instagram: tensión y demostración (mismo prompt con y sin marca, negocios cerrados por WhatsApp, organigrama
-  humano-agente). LinkedIn: el argumento profesional del capítulo (PDR-020 manda por canal).
+- El capítulo 4 prioriza la serie **«Así trabaja un equipo humano-agente»**: job, ficha de rol, handoff,
+  excepción, supervisor y resultado válido. Es una serie temática, no territorio social ni octava franquicia.
+  [Brief Q4](../../../../docs/commercial/campaigns/2026-q4-tu-ia-no-conoce-tu-negocio/README.md).
+- La variante para CMO de esa misma serie conecta AEO (qué se dice de la marca), contexto aprobado de campaña y handoff humano-agente. Mostrar brief, revisión de claims/segmento y decisión de publicación o gasto, no un bot genérico ni volumen de campañas como resultado. Respetar canal-hogar y permisos distintos entre contexto público y datos privados.
+- Instagram: proceso real con tropiezo/decisión bajo `Behind the Build`, nunca organigrama ficticio o caso de éxito
+  no autorizado. LinkedIn Página: método educativo y documento útil; LinkedIn Julio: POV personal con su voz.
+  El blog conserva casos completos autorizados. PDR-020 manda el catálogo y cada satélite aporta trabajo propio.
+- El CRM que se actualiza solo desplaza la pregunta de «¿quién escribe el dato?» a «¿quién autoriza la acción,
+  revisa la interpretación y corrige el error?». Evitar el absoluto «el CRM nunca se enteró» sin prueba.
+- En piezas del servicio usar artefactos auténticos anonimizados (work chart, ficha, registro de excepción),
+  escenas/entrevistas reales y baseline. Un mockup se rotula ilustrativo; métricas, nombres y logos de cliente
+  exigen permiso específico. No usar robots/cerebros genéricos como sustituto de prueba.
 - Salesforce sólo se nombra en orgánico de liderazgo de opinión, con respeto; nunca en pauta.
 - La cuenta regresiva a la Ley 21.719 (1 dic 2026) es orientación, no asesoría legal.
 - Seasonalities conservan su línea propia; no se les fuerza un capítulo.
+- La oferta humano-agente está comercialmente aprobada y probada por confirmación del operador; esto no autoriza
+  publicar ROI, precio, caso ni claim de disponibilidad de un tenant sin su propia evidencia. Antes de convertir
+  en paid, verificar landing neutral, CTA, formulario/agenda y atribución. No programar por este overlay.
 - KV paraguas: Nexa (humana, hoodie Efeonce) es central; el hombro lleva **una sola** mascota de partner por imagen
   (Clawd/Claude hoy, Codex Pet/Codex después), que cambia junto con nombre y color del cursor colaborador e insignia.
   Nunca dos mascotas de terceros juntas.
 - Riesgo de partner: la mascota confundida puede leerse «Claude no sirve». Mitigar en caption (el problema es el
   contexto, no la capacidad) y validar con la guía de marca del partner antes de pautar. Caso:
   [`LEEME.md`](../../../../ai-generations/2026-09-17_kv-tu-ia-no-conoce/LEEME.md).
+- **Gigi (Google Gemini) es la tercera mascota de partner** con biblioteca 3D, y entra con un papel distinto:
+  no es quien hace marketing, es **la máquina que responde**. Por eso tiene una familia propia de 8 poses de
+  búsqueda y AEO que Clawd y Codex no tienen —la pregunta, la respuesta con citas, el podio, el diagnóstico— y
+  `no-te-conoce` (una tarjeta completamente vacía) es el KV del capítulo. Sigue valiendo una sola mascota de
+  partner por imagen. 🔴 **Gigi se queda con el sistema de color de la pieza:** no «porta un color», es el
+  espectro completo de Google, así que con ella en cuadro es el **único acento de color** y Efeonce vive en el
+  navy y la estructura; buscar otro portador para el azul de Efeonce es competir con un degradado de tres colores
+  y perder. Es propiedad de Google: interpretación 3D de uso interno y orgánico, y orgánico aprobado no es pauta.
 
 ## Coherencia con las skills hermanas del repo
 

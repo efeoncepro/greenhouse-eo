@@ -1,0 +1,349 @@
+[
+  {
+    "id": "01-fuera-916",
+    "dominante": [
+      "¿Sales tú?"
+    ],
+    "ratioDominanteEntrada": 4,
+    "contraste": {
+      "entrada": 13.89,
+      "dominante": 13.74,
+      "dominante-acento-0": 4.86,
+      "cta": 13.5,
+      "descriptor": 14.2
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 17,
+        "ratioDominante": 0.179
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "01-fuera-169",
+    "dominante": [
+      "¿Sales tú?"
+    ],
+    "ratioDominanteEntrada": 4.5,
+    "contraste": {
+      "entrada": 15.71,
+      "dominante": 15.88,
+      "dominante-acento-0": 5.38,
+      "cta": 5.57,
+      "descriptor": 15.98
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 64,
+        "ratioDominante": 0.448
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "02-reconoces-916",
+    "dominante": [
+      "¿Te reconoces?"
+    ],
+    "ratioDominanteEntrada": 3.5,
+    "contraste": {
+      "entrada": 15.66,
+      "dominante": 15.21,
+      "dominante-acento-0": 5.4,
+      "descriptor": 15.52
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 10,
+        "ratioDominante": 0.118
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "02-reconoces-169",
+    "dominante": [
+      "¿Te",
+      "reconoces?"
+    ],
+    "ratioDominanteEntrada": 3.7,
+    "contraste": {
+      "entrada": 14.88,
+      "dominante": 14.84,
+      "dominante-acento-0": 5.08,
+      "descriptor": 15.3
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 33,
+        "ratioDominante": 0.279
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "03-referencia-916",
+    "dominante": [
+      "Sé la referencia."
+    ],
+    "ratioDominanteEntrada": 3,
+    "contraste": {
+      "entrada": 15.81,
+      "dominante": 14.96,
+      "dominante-acento-0": 5.05,
+      "cta": 15.14,
+      "descriptor": 15.67
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 17,
+        "ratioDominante": 0.236
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "03-referencia-169",
+    "dominante": [
+      "sé la",
+      "referencia."
+    ],
+    "ratioDominanteEntrada": 4.5,
+    "contraste": {
+      "entrada": 16.26,
+      "dominante": 16.08,
+      "dominante-acento-0": 5.49,
+      "cta": 16.07,
+      "descriptor": 15.84
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 33,
+        "ratioDominante": 0.231
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "04-elegida-916",
+    "dominante": [
+      "Que te elijan."
+    ],
+    "ratioDominanteEntrada": 4,
+    "contraste": {
+      "entrada": 14.42,
+      "dominante": 14.3,
+      "dominante-acento-0": 4.84,
+      "descriptor": 14.87
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 17,
+        "ratioDominante": 0.179
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "04-elegida-169",
+    "dominante": [
+      "que te",
+      "elijan."
+    ],
+    "ratioDominanteEntrada": 4.5,
+    "contraste": {
+      "entrada": 12.16,
+      "dominante": 13.17,
+      "dominante-acento-0": 4.64,
+      "descriptor": 15.47
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 33,
+        "ratioDominante": 0.231
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "01-fuera-45",
+    "dominante": [
+      "¿Sales tú?"
+    ],
+    "ratioDominanteEntrada": 3.3,
+    "contraste": {
+      "entrada": 15.13,
+      "dominante": 14.77,
+      "dominante-acento-0": 5.23,
+      "cta": 4.92,
+      "descriptor": 14.65
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 21,
+        "ratioDominante": 0.2
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "01-fuera-11",
+    "dominante": [
+      "¿Sales tú?"
+    ],
+    "ratioDominanteEntrada": 3.3,
+    "contraste": {
+      "entrada": 16.21,
+      "dominante": 15.9,
+      "dominante-acento-0": 5.66,
+      "cta": 5.19,
+      "descriptor": 15.48
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 21,
+        "ratioDominante": 0.2
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "02-reconoces-45",
+    "dominante": [
+      "¿Te reconoces?"
+    ],
+    "ratioDominanteEntrada": 3.3,
+    "contraste": {
+      "entrada": 15.28,
+      "dominante": 15.06,
+      "dominante-acento-0": 5.12,
+      "descriptor": 15.31
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 21,
+        "ratioDominante": 0.2
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "02-reconoces-11",
+    "dominante": [
+      "¿Te reconoces?"
+    ],
+    "ratioDominanteEntrada": 3.3,
+    "contraste": {
+      "entrada": 16.31,
+      "dominante": 16.26,
+      "dominante-acento-0": 5.51,
+      "descriptor": 16.32
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 21,
+        "ratioDominante": 0.2
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "03-referencia-45",
+    "dominante": [
+      "Sé la referencia."
+    ],
+    "ratioDominanteEntrada": 3.3,
+    "contraste": {
+      "entrada": 16.32,
+      "dominante": 15.41,
+      "dominante-acento-0": 5.21,
+      "cta": 15.18,
+      "descriptor": 14.81
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 21,
+        "ratioDominante": 0.2
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "03-referencia-11",
+    "dominante": [
+      "Sé la referencia."
+    ],
+    "ratioDominanteEntrada": 3.3,
+    "contraste": {
+      "entrada": 16.56,
+      "dominante": 15.94,
+      "dominante-acento-0": 5.37,
+      "cta": 15.44,
+      "descriptor": 14.91
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 21,
+        "ratioDominante": 0.2
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "04-elegida-45",
+    "dominante": [
+      "Que te elijan."
+    ],
+    "ratioDominanteEntrada": 3.3,
+    "contraste": {
+      "entrada": 14.32,
+      "dominante": 14.52,
+      "dominante-acento-0": 4.87,
+      "descriptor": 14.63
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 21,
+        "ratioDominante": 0.2
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "04-elegida-11",
+    "dominante": [
+      "Que te elijan."
+    ],
+    "ratioDominanteEntrada": 3.3,
+    "contraste": {
+      "entrada": 14.01,
+      "dominante": 14.29,
+      "dominante-acento-0": 4.73,
+      "descriptor": 14.68
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 21,
+        "ratioDominante": 0.2
+      }
+    ],
+    "seleccion": null
+  }
+]

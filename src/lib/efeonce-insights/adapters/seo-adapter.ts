@@ -13,6 +13,7 @@ import { readSeoOverviewKpisForWindow } from '@/lib/growth/seo/overview/read-ove
 import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
 import { resolveUnambiguousSeoTarget } from '@/lib/growth/seo/resolve-target'
 
+import { SEO_SEARCH_CHANNEL } from '../contracts/channels'
 import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1 } from '../contracts/evidence'
 import type { ResolvedInsightWindow } from '../window'
 import { type AdapterCollectInput, type ModuleReportAdapterV1, asComparisonRejections, evidenceWindow, factId } from './contract'
@@ -53,7 +54,9 @@ const gscFacts = async (organizationId: string, window: ResolvedInsightWindow, c
     freshness: { asOf },
     observation: 'observed' as const,
     window: evidenceWindow(window, 'period'),
-    evidenceRef: `seo_gsc_daily:${organizationId}:${window.start}_${window.endExclusive}`
+    evidenceRef: `seo_gsc_daily:${organizationId}:${window.start}_${window.endExclusive}`,
+    // TASK-1888 — Search Console, el ranking y el ETV miden Google.
+    channelId: SEO_SEARCH_CHANNEL
   }
 
   facts.push(
@@ -120,7 +123,9 @@ const rankFacts = async (seoTargetId: string, window: ResolvedInsightWindow, com
     freshness: { asOf: lastDate },
     observation: 'observed' as const,
     window: evidenceWindow(window, 'period'),
-    evidenceRef: `seo_target:${seoTargetId}:${window.start}_${window.endExclusive}`
+    evidenceRef: `seo_target:${seoTargetId}:${window.start}_${window.endExclusive}`,
+    // TASK-1888 — Search Console, el ranking y el ETV miden Google.
+    channelId: SEO_SEARCH_CHANNEL
   }
 
   facts.push(
@@ -174,7 +179,9 @@ const etvFacts = async (seoTargetId: string, window: ResolvedInsightWindow, comp
     coverage: { kind: 'complete' as const, ratio: 1, populationSize: window.months.length },
     freshness: { asOf: overview.capturedAt },
     observation: 'estimated' as const,
-    evidenceRef: `seo_target:${seoTargetId}:etv:${overview.etvMethodology.version}`
+    evidenceRef: `seo_target:${seoTargetId}:etv:${overview.etvMethodology.version}`,
+    // TASK-1888 — Search Console, el ranking y el ETV miden Google.
+    channelId: SEO_SEARCH_CHANNEL
   }
 
   window.months.forEach((month, index) => {
@@ -186,6 +193,8 @@ const etvFacts = async (seoTargetId: string, window: ResolvedInsightWindow, comp
 
   return { facts, rejections, source: { module: 'seo', adapterVersion: SEO_ADAPTER_VERSION, reader: 'readDomainOverviewForTarget', asOf: overview.capturedAt, method, coverage: base.coverage, servedWindow: null } as EvidenceSourceV1 }
 }
+
+const SEO_LOWER_IS_BETTER = new Set(['position'])
 
 const collectForWindow = async (input: AdapterCollectInput, window: ResolvedInsightWindow, seoTargetId: string | null, comparisonIds: Record<string, string | null>) => {
   const gsc = await gscFacts(input.organizationId, window, comparisonIds)
@@ -238,8 +247,13 @@ export const seoReportAdapter: ModuleReportAdapterV1 = {
 
     const current = await collectForWindow(input, input.window, seoTargetId, comparisonIds)
 
+    // TASK-1888 — con v2, la dirección de las métricas donde MENOR es mejor (posición media), para que el render no
+    // lea una subida de posición como mejora. El resto queda sin dirección (neutro), como antes.
+    const directed = (facts: EvidenceFactV1[]) =>
+      input.editorialV2 === true ? facts.map(fact => (SEO_LOWER_IS_BETTER.has(fact.metricId) ? { ...fact, dimension: { ...fact.dimension, direction: 'lower_is_better' } } : fact)) : facts
+
     return {
-      facts: [...current.facts, ...(comparison?.facts ?? [])],
+      facts: [...directed(current.facts), ...directed(comparison?.facts ?? [])],
       sources: [...current.sources, ...(comparison?.sources ?? [])],
       rejections: [...rejections, ...current.rejections, ...asComparisonRejections(comparison?.rejections ?? [])]
     }

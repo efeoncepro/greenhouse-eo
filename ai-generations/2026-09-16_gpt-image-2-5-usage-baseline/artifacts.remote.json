@@ -1,0 +1,17 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:30:20.112Z",
+  "run": "ai-generations/2026-09-16_gpt-image-2-5-usage-baseline",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-16_gpt-image-2-5-usage-baseline",
+  "totalBytes": 976966,
+  "fileCount": 1,
+  "files": [
+    {
+      "path": "flare-transparent.png",
+      "sizeBytes": 976966,
+      "sha256": "123f157768ce2abe70369ea4b4e9e3230be61ad11cde560b65458a7e063ae2ab",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/flare-transparent.png"
+    }
+  ]
+}

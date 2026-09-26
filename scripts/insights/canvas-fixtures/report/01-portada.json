@@ -1,0 +1,15 @@
+{
+  "reference": "Premium-Portada",
+  "catalog": "report",
+  "contentType": "report-cover",
+  "slots": {
+    "editionLabel": "Informe mensual · Agosto 2026",
+    "eyebrow": "Lectura de Efeonce",
+    "reportTitle": "Visibilidad, respuestas de IA y entrega",
+    "reportSubtitle": "Qué cambió en agosto, por qué cambió y qué haremos en septiembre.",
+    "confidentialityLine": "Confidencial · Versión 1 · 2 de septiembre de 2026"
+  },
+  "knownDifferences": [
+    "«Preparado para» + recuadro punteado «Logo del cliente» (x 68–184, y 1003–1067): el canvas muestra un marcador de posición; el informe real dibuja el nombre o el logo del cliente, y sin cliente el bloque desaparece."
+  ]
+}

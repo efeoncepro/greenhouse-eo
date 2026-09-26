@@ -1,0 +1,35 @@
+{
+  "$comment": "ISSUE-177 — Módulos alcanzables desde funciones de Vercel que arman una ruta con process.cwd()/__dirname/import.meta.url más un segmento variable. Turbopack traza el directorio completo. Cada entrada está MEDIDA contra un build real (.next-local/build-20260919232629-17169) y queda bajo el límite; es deuda con dueño, no una excepción permanente. Ratchet: una entrada nueva exige medir el tamaño trazado (pnpm vercel:function-size-gate); una entrada obsoleta se borra.",
+  "fsDynamicPath": [
+    {
+      "file": "src/components/growth/ai-visibility/report-artifact/pdf/AiVisibilityReportPdf.tsx",
+      "reason": "resolve(process.cwd(), 'public', file) para los PNG de motores del PDF: traza public/** completo (562 archivos, 22,6 MB por función). Llega a 31 entradas vía la proyección reactiva de envío del grader (admin, cloud-integrations, ops-health…). Retiro: mapa estático de rutas literales por motor.",
+      "owner": "growth / AI Visibility (TASK-1273)",
+      "since": "2026-09-22"
+    },
+    {
+      "file": "src/lib/finance/pdf/sections/shared.tsx",
+      "reason": "publicAssetPath(relativePath) = resolve(process.cwd(), 'public', relativePath) para logos de react-pdf: traza public/** completo (562 archivos, 22,6 MB en /api/finance/quotes/[id]/pdf). Retiro: rutas literales por asset de marca.",
+      "owner": "finance / PDF de cotizaciones",
+      "since": "2026-09-22"
+    },
+    {
+      "file": "src/lib/ai/image-generator.ts",
+      "reason": "join(IMAGES_OUTPUT_DIR|ANIMATIONS_OUTPUT_DIR, filename) al escribir assets generados: traza public/images/generated (3 archivos, 1,6 MB). Sólo lo alcanzan las rutas internas generate-image y generate-animation.",
+      "owner": "AI tooling (TASK-1851)",
+      "since": "2026-09-22"
+    },
+    {
+      "file": "src/lib/legal-signatures/index.ts",
+      "reason": "resolve(process.cwd(), LEGAL_SIGNATURE_BASE_DIR, relativePath) + existsSync para la firma del representante legal: traza src/assets/signatures (3 archivos, 0,1 MB). Acotado a un directorio pequeño; la lectura en runtime lo necesita.",
+      "owner": "payroll / legal-signatures (TASK-863)",
+      "since": "2026-09-22"
+    },
+    {
+      "file": "src/lib/reliability/queries/client-portal-assigned-view-without-route.ts",
+      "reason": "existsSync(join(process.cwd(), 'src', 'app', '(dashboard)', clean, `page.${ext}`)): traza el código fuente de src/app (282 archivos, 0,3 MB en /admin). La señal depende de esos archivos en runtime. Retiro: comparar contra un manifest de rutas generado en build.",
+      "owner": "reliability (TASK-824 / TASK-1679)",
+      "since": "2026-09-22"
+    }
+  ]
+}

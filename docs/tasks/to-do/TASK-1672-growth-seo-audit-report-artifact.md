@@ -1,5 +1,25 @@
 # TASK-1672 — Growth SEO: artefacto de la auditoría técnica (web + print)
 
+## Delta 2026-09-25 (TASK-1888 code complete)
+
+- **Construido, flag OFF:** `ChartSpecV1` admite 15 familias (datos propios en `data`), con validación estructural en
+  `src/lib/efeonce-insights/contracts/chart-spec.ts` y de valor en `editorial/chart-values.ts` sobre la misma
+  `chart-geometry.ts`. Qué familia puede emitir cada módulo lo decide `editorial/family-evidence-matrix.ts`; las
+  métricas SEO por página o keyword siguen sin evidencia en el adapter. — por trabajo en TASK-1888
+
+## Delta 2026-09-25
+
+- TASK-1847 cerrada (complete 2026-09-25): catálogos `insights-report` e `insights-deck` en producción desde el
+  2026-09-24 y render productivo de A4 y deck verificado con datos reales. Se retira de `Blocked by`. El rediseño
+  premium aprobado por el operador vive en TASK-1888/TASK-1889. — cerrado por trabajo en TASK-1847
+- **Rediseño Insights (planificado, no construido).** Los catálogos que esta task consume (`insights-report` A4 e
+  `insights-deck`) se rehacen en TASK-1889: plantillas nuevas (portada navy o blanca con variantes por módulo,
+  contraportada, aperturas de capítulo, prosa y páginas de gráfico premium) bajo un contrato de fidelidad de 41 páginas
+  de referencia (≤ 1 % de píxeles distintos). El contrato editorial se amplía de forma aditiva en TASK-1888 (15
+  familias, lectura por figura, cifra principal, `channelId`), que declara esta task en sus impactos. Al ejecutar,
+  confirmar en Discovery qué catálogo está vigente en producción (v1 de TASK-1847 hasta el release de TASK-1889) y
+  mapear contra ese. — por trabajo en TASK-1888/TASK-1889
+
 ## Delta 2026-09-15
 
 - Desbloqueada de TASK-1845 (2026-09-15): la foundation de Efeonce Insights está en producción (release `9c094688309d`, generación ON en Vercel, gateway v1.5.0 federado, scope en Entra); TASK-1845 sigue `in-progress` sólo por dos evidencias de cierre (ensayo `migrate:down` y sesión MCP con token humano) que no condicionan este trabajo. — cerrado por rollout de TASK-1845
@@ -128,7 +148,7 @@ Grupo Berel**, no es supuesto.
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ui`
-- Blocked by: `TASK-1847` en tasks — **pero el gate NO se levantó**: el artefacto no se publica hasta que `GROWTH_SEO_SITE_FINDINGS_ENABLED` esté en `ON` en producción con una corrida real verificada. Ver Delta 2026-09-01 (2)
+- Blocked by: `none` en tasks — **pero el gate NO se levantó**: el artefacto no se publica hasta que `GROWTH_SEO_SITE_FINDINGS_ENABLED` esté en `ON` en producción con una corrida real verificada. Ver Delta 2026-09-01 (2)
 - Branch: `Greenhouse develop; local-first, sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

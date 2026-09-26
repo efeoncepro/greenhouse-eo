@@ -1384,6 +1384,63 @@ export const downloadPrivateAsset = async ({
   }
 }
 
+/** Formatos de logo que la portada de un informe puede incrustar. */
+const RENDERABLE_LOGO_MIME_TYPES = new Set(['image/svg+xml', 'image/png', 'image/jpeg', 'image/webp'])
+
+/** Tope de un logo incrustado en una portada: un logo no pesa más que esto; si pesa, no es un logo. */
+const RENDERABLE_LOGO_MAX_BYTES = 2 * 1024 * 1024
+
+/**
+ * TASK-1889 — lector de SISTEMA del logo de una organización para incrustarlo en la portada de un
+ * informe de Efeonce Insights (lo usa el `artifact-worker`). Es deliberadamente más estrecho que
+ * `downloadPrivateAsset`: sólo un asset `organization_logo` ADJUNTO de ESA organización, en un
+ * formato de imagen y bajo el tope; cualquier otro asset falla cerrado, aunque su id venga en un plan
+ * sellado. No suma al contador humano de descargas; deja su propio registro de acceso.
+ */
+export const readOrganizationLogoForRender = async ({
+  organizationId,
+  assetId,
+  accessMetadata
+}: {
+  organizationId: string
+  assetId: string
+  accessMetadata?: Record<string, unknown>
+}) => {
+  const asset = await getAssetById(assetId)
+
+  if (
+    !asset ||
+    asset.status !== 'attached' ||
+    asset.ownerAggregateType !== 'organization_logo' ||
+    asset.ownerAggregateId !== organizationId ||
+    !RENDERABLE_LOGO_MIME_TYPES.has(asset.mimeType) ||
+    asset.sizeBytes > RENDERABLE_LOGO_MAX_BYTES
+  ) {
+    throw new Error('organization_logo_not_renderable')
+  }
+
+  const file = await downloadGreenhouseStorageObject({
+    bucketName: asset.bucketName,
+    objectName: asset.objectPath
+  })
+
+  if (file.arrayBuffer.byteLength > RENDERABLE_LOGO_MAX_BYTES) {
+    throw new Error('organization_logo_not_renderable')
+  }
+
+  await writeAssetAccessLog({
+    assetId,
+    action: 'download',
+    actorUserId: null,
+    metadata: { ...accessMetadata, purpose: 'insights_render_cover', ownerAggregateType: asset.ownerAggregateType, ownerAggregateId: organizationId }
+  })
+
+  return {
+    mimeType: asset.mimeType,
+    dataUri: `data:${asset.mimeType};base64,${Buffer.from(file.arrayBuffer).toString('base64')}`
+  }
+}
+
 /**
  * System-only byte reader for derived projections.
  *

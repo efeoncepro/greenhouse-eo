@@ -1,8 +1,8 @@
 {
   "$schema": "../deck-axis/registry.schema.json",
-  "version": "0.1",
+  "version": "0.2",
   "status": "draft",
-  "note": "Registry del catálogo `insights-report` — informe editorial A4 vertical de Efeonce Insights (TASK-1847). Canvas A4 retrato: 794×1123 px a 96 dpi = 210,06 × 297,04 mm. El motor imprime `${viewport}px`, así que el canvas se declara en píxeles enteros; esa es la aproximación más cercana a A4 exacto y queda dentro de la tolerancia de ±0,5 mm. Cada página es una lámina autocontenida: el pie institucional y el folio son slots de la plantilla, nunca post-proceso sobre el PDF. El reparto de contenido entre páginas lo resuelve `paginateFlow()` antes de imprimir — decisión en GREENHOUSE_ARTIFACT_VERTICAL_PAGINATION_DECISION_V1.md.",
+  "note": "Registry del catálogo `insights-report` — informe editorial A4 vertical de Efeonce Insights (TASK-1847). Canvas A4 retrato: 794×1123 px a 96 dpi = 210,06 × 297,04 mm. El motor imprime `${viewport}px`, así que el canvas se declara en píxeles enteros; esa es la aproximación más cercana a A4 exacto y queda dentro de la tolerancia de ±0,5 mm. Cada página es una lámina autocontenida: el pie institucional y el folio son slots de la plantilla, nunca post-proceso sobre el PDF. El reparto de contenido entre páginas lo resuelve `paginateFlow()` antes de imprimir — decisión en GREENHOUSE_ARTIFACT_VERTICAL_PAGINATION_DECISION_V1.md. TASK-1889 (2026-09-25): el catálogo es el del canvas editorial aprobado; las plantillas v1 de TASK-1847 se REEMPLAZARON bajo los mismos contentTypes (no conviven). Las páginas de gráfico v1 se retiraron en el Slice 4 de TASK-1889: cada familia con productor tiene su página de figura premium.",
   "canvas": {
     "w": 794,
     "h": 1123,
@@ -12,12 +12,34 @@
   "contentTypeTaxonomy": [
     "report-cover",
     "report-index",
+    "report-summary",
+    "report-chapter",
     "report-narrative",
-    "report-analysis",
     "report-table",
-    "report-limits"
+    "report-reading",
+    "report-plan",
+    "report-limits",
+    "report-back-cover",
+    "report-cover-light",
+    "report-figure-comparison",
+    "report-figure-columns",
+    "report-figure-targets",
+    "report-figure-trend"
   ],
   "templates": [
+    {
+      "name": "ReportCoverPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-cover"
+      ],
+      "prototype": "report-cover.html",
+      "slotsRef": "report-cover.slots.json"
+    },
     {
       "name": "ReportIndexPage",
       "kind": "full-bleed",
@@ -32,30 +54,43 @@
       "slotsRef": "report-index.slots.json"
     },
     {
-      "name": "ReportAnalysisPage",
+      "name": "ReportSummaryPage",
       "kind": "full-bleed",
       "source": "design",
       "figmaNode": null,
       "owner": "claude",
       "status": "built",
       "contentTypes": [
-        "report-analysis"
+        "report-summary"
       ],
-      "prototype": "report-analysis.html",
-      "slotsRef": "report-analysis.slots.json"
+      "prototype": "report-summary.html",
+      "slotsRef": "report-summary.slots.json"
     },
     {
-      "name": "ReportCoverPage",
+      "name": "ReportChapterPage",
       "kind": "full-bleed",
       "source": "design",
       "figmaNode": null,
       "owner": "claude",
       "status": "built",
       "contentTypes": [
-        "report-cover"
+        "report-chapter"
       ],
-      "prototype": "report-cover.html",
-      "slotsRef": "report-cover.slots.json"
+      "prototype": "report-chapter.html",
+      "slotsRef": "report-chapter.slots.json"
+    },
+    {
+      "name": "ReportNarrativePage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-narrative"
+      ],
+      "prototype": "report-narrative.html",
+      "slotsRef": "report-narrative.slots.json"
     },
     {
       "name": "ReportTablePage",
@@ -71,6 +106,32 @@
       "slotsRef": "report-table.slots.json"
     },
     {
+      "name": "ReportReadingPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-reading"
+      ],
+      "prototype": "report-reading.html",
+      "slotsRef": "report-reading.slots.json"
+    },
+    {
+      "name": "ReportPlanPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-plan"
+      ],
+      "prototype": "report-plan.html",
+      "slotsRef": "report-plan.slots.json"
+    },
+    {
       "name": "ReportLimitsPage",
       "kind": "full-bleed",
       "source": "design",
@@ -84,17 +145,82 @@
       "slotsRef": "report-limits.slots.json"
     },
     {
-      "name": "ReportNarrativePage",
+      "name": "ReportBackCoverPage",
       "kind": "full-bleed",
       "source": "design",
       "figmaNode": null,
       "owner": "claude",
       "status": "built",
       "contentTypes": [
-        "report-narrative"
+        "report-back-cover"
       ],
-      "prototype": "report-narrative.html",
-      "slotsRef": "report-narrative.slots.json"
+      "prototype": "report-back-cover.html",
+      "slotsRef": "report-back-cover.slots.json"
+    },
+    {
+      "name": "ReportCoverLightPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-cover-light"
+      ],
+      "prototype": "report-cover-light.html",
+      "slotsRef": "report-cover-light.slots.json"
+    },
+    {
+      "name": "ReportFigureComparisonPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-figure-comparison"
+      ],
+      "prototype": "report-figure-comparison.html",
+      "slotsRef": "report-figure-comparison.slots.json"
+    },
+    {
+      "name": "ReportFigureColumnsPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-figure-columns"
+      ],
+      "prototype": "report-figure-columns.html",
+      "slotsRef": "report-figure-columns.slots.json"
+    },
+    {
+      "name": "ReportFigureTargetsPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-figure-targets"
+      ],
+      "prototype": "report-figure-targets.html",
+      "slotsRef": "report-figure-targets.slots.json"
+    },
+    {
+      "name": "ReportFigureTrendPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-figure-trend"
+      ],
+      "prototype": "report-figure-trend.html",
+      "slotsRef": "report-figure-trend.slots.json"
     }
   ],
   "selector": {
@@ -102,17 +228,29 @@
     "map": {
       "report-cover": "ReportCoverPage",
       "report-index": "ReportIndexPage",
-      "report-analysis": "ReportAnalysisPage",
+      "report-summary": "ReportSummaryPage",
+      "report-chapter": "ReportChapterPage",
+      "report-narrative": "ReportNarrativePage",
       "report-table": "ReportTablePage",
+      "report-reading": "ReportReadingPage",
+      "report-plan": "ReportPlanPage",
       "report-limits": "ReportLimitsPage",
-      "report-narrative": "ReportNarrativePage"
+      "report-back-cover": "ReportBackCoverPage",
+      "report-cover-light": "ReportCoverLightPage",
+      "report-figure-comparison": "ReportFigureComparisonPage",
+      "report-figure-columns": "ReportFigureColumnsPage",
+      "report-figure-targets": "ReportFigureTargetsPage",
+      "report-figure-trend": "ReportFigureTrendPage"
     },
     "disambiguation": [
       "el índice real deriva de la primera página de cada sección del plan físico; nunca se calcula desde el título ni se pagina después del render.",
       "capítulo cuya evidencia no alcanzó para una figura, y el resumen ejecutivo => ReportNarrativePage. NUNCA se omite el capítulo: desaparecerlo convierte la falta de datos en silencio.",
-      "página analítica: una afirmación con la figura que la prueba => ReportAnalysisPage.",
       "filas comparables que el lector va a auditar => ReportTablePage. Una tabla NO es una figura: no se convierte en gráfico para «verse mejor».",
-      "lo que la edición no puede afirmar, con su causa => ReportLimitsPage. Nunca se omite porque «quedó pobre»."
+      "lo que la edición no puede afirmar, con su causa => ReportLimitsPage. Nunca se omite porque «quedó pobre».",
+      "figura contra el período anterior cuyas dimensiones son MÉTRICAS distintas (clics, impresiones, CTR) => ReportFigureComparisonPage: cada métrica en su escala.",
+      "figura cuyas dimensiones COMPARTEN escala (tramos, canales) => ReportFigureColumnsPage: columnas sobre un mismo eje.",
+      "resultado contra una meta oficial (bullet) => ReportFigureTargetsPage: cada indicador en su escala, con la meta como marca.",
+      "tendencia en el tiempo (line) => ReportFigureTrendPage: hasta tres series distinguibles por rol, sin interpolar huecos."
     ],
     "rules": [
       "Una página = un content-type = una plantilla. Si el contenido mezcla dos intenciones, son dos páginas.",

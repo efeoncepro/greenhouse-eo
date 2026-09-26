@@ -21,6 +21,26 @@ revela el cierre antes del gesto. La firma Efeonce identifica al autor, no al de
 un bloque que se lea “Felices Fiestas Patrias, Efeonce”. En este caso el logo oficial inferior centrado
 resultó suficiente; no añadir “Un saludo de”, slogan, URL o CTA para llenar el aire.
 
+## Jerarquía del texto dentro de la pieza
+
+Cuando una lámina lleva más de una frase, el copy se escribe **por voces** y se entrega al diseño con el nivel de
+cada una; si dos voces pesan igual, la lámina se lee plana. En «Nivel de búsqueda» (2026-09-19) el operador pidió
+«que no haya jerarquías planas» y la versión aprobada separó cinco voces, cada una con su trabajo:
+
+| Voz | Trabajo del copy | Ejemplo (c01 / c09) |
+|---|---|---|
+| Etiqueta | Ubica: contexto o paso de la serie, 2–4 palabras en mayúsculas | «13 AÑOS DE ESPERA» · «¿SIN ESTRELLAS?» |
+| Entrada | Prepara la frase dominante; puede ser pregunta | «¿Tu marca no sale en ChatGPT, Perplexity ni Gemini?» |
+| Dominante | La idea en la menor cantidad de palabras; **una** palabra clave para el acento | «Pide refuerzos.» |
+| Cierre / remate | Completa o voltea la dominante | «Te ayudamos a subir tu nivel de búsqueda.» |
+| Tarjeta | Aporta el dato o el giro que la lámina no dice arriba, en tono de notificación | c02: en la IA pasa lo mismo, pero aquí no quieres escapar |
+
+Además, un solo gesto manuscrito por pieza, de tres palabras o menos («¿apostamos?», «¡por fin!»). Marcar en el
+copy entregado qué palabra recibe el acento y cuáles van con peso: el diseño decide tipografía y color (contrato
+en `efeonce-advertising-creative`), pero la jerarquía de sentido la define el copy. Si el acento de color no se lee
+sobre la imagen, la palabra conserva el énfasis por peso; la frase no se reescribe. Registro:
+`ai-generations/2026-09-19_nivel-de-busqueda/LEEME.md` §«Pasada de jerarquía».
+
 ## El oficio de agencia como mecanismo
 
 El concepto funciona cuando la escena y la acción prueban las palabras. Un cursor que considera
@@ -54,6 +74,7 @@ anula flags nativos ni requisitos vigentes de la plataforma. Caso:
 
 1. Leer la frase en orden real de aparición, con las pausas y la retirada del gesto.
 2. Revisar sintaxis, tildes, signos, continuidad y qué palabra recibe el mayor peso visual.
+   Un claim de proporción sin estudio que lo respalde baja a cuantificador honesto: «muchas marcas», no «la mayoría».
 3. Leer el cierre con la firma: emisor/destinatario inequívocos.
 4. Quitar apoyos redundantes sin alterar un literal aprobado.
 5. Verificar el caption por red contra el archivo de entrega y el readback de programación.

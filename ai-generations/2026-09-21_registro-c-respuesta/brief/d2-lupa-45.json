@@ -1,0 +1,26 @@
+{
+  "id": "d2-lupa-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "instrumento",
+  "instrumento": "a modern anodised-aluminium inspection loupe on a slim machined stand, held upright over the table by the woman",
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    "polo-efeonce",
+    "chaqueta-bomber-efeonce",
+    "codex"
+  ],
+  "escena": "SCENE (Efeonce studio, Santiago, late afternoon): the camera sits DOWN AT TABLE HEIGHT, level with the objects on it, never looking down on them. Beyond the glass and sharp inside it, the small Codex figure from the reference stands upright on the table and leans in towards the loupe, its visor filling the circle of glass and throwing a small blue glow onto the aluminium rim, magnified far beyond its real size. The woman holds the loupe from the near side, her forearm and shoulder entering the frame in soft blur, her face turned down to the table and never to the lens, caught at the instant she tilts the glass for the figure. She is wearing the Efeonce navy bomber jacket over the Efeonce navy piqué polo, copied from the garment reference images exactly as they are, including their embroidered chest emblem, which is never redrawn nor replaced by any other symbol; the creature's cloud body and bracket symbol belong ONLY to the creature and never appear on her clothing. The table is a working surface of this decade: a dark tablet lying face up and asleep, a low-profile mechanical keyboard, a braided charging cable coiled beside it, a matte aluminium portable drive. A single strip of ORANGE marking tape runs along the near edge of the table where the figure stands. Hard low afternoon sun from a window on the left rakes across the table and the machined aluminium, and stays BELOW the middle of the frame: it never reaches the wall above. She sits LOW in the frame, her head well down from the top edge, and the loupe, both figures and every object stay entirely in the LOWER TWO THIRDS of the picture, so the upper third is wall and nothing else. Above them the plaster wall is one smooth unbroken surface in deep shadow, with nothing on it and no window, no lamp and no bright spot anywhere in it. 100mm macro lens at f/4.",
+  "reservas": {
+    "texto": {
+      "muro": "the smooth plaster studio wall above the table",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the matte-black back of a monitor standing in the immediate foreground, its dark body running unbroken across the whole width of the frame and reaching no higher than the table top",
+    "tono": "DARK matte-black monitor shell in deep shadow, its fine texture still faintly visible, completely outside the raking light"
+  }
+}

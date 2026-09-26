@@ -50,7 +50,8 @@ encabezado; una costura ausente hace que el bloque siga sintiéndose insertado a
 No es plantilla rígida: es la columna vertebral que hace que una pieza "se sienta Berel".
 
 1. **Gancho con micro-escena.** Abre con una situación reconocible y sensorial, **no con una
-   definición**. *La duda frente al muestrario; la mancha que asoma en la esquina; papá moviendo las
+   definición**. Excepción: en las piezas de campaña ancladas al menú, entrada informativa sin escena
+   (⚠️ Choque 3 en el módulo 09). *La duda frente al muestrario; la mancha que asoma en la esquina; papá moviendo las
    brasas.* El hook nombra el miedo o el deseo concreto del lector **una sola vez**: ahí se permite
    la tensión o el dato negativo, **el resto del artículo se mantiene en positivo**.
 2. **Respuesta directa (TL;DR).** Justo después del gancho, **40-55 palabras** extractables que
@@ -114,7 +115,7 @@ Esta es la precisión que el Playbook de Producción no alcanza a dar y que camb
 | | Cómo se enlaza | Por qué |
 |---|---|---|
 | **Producto** | A su **página pública** (`berel.com/productos/...`) o a la categoría `berel.com/productos`. **Nunca al Home ni a `/search?q=`** | Los productos pueden tener una página pública distinta de su ficha técnica |
-| **Color** | **1.º** la página de **paleta o artículo** que sí rankea (hub & spoke) · **2.º** `berel.com/colores/<familia>` · 🔴 **NUNCA la búsqueda del sitio** | **Berel no tiene página pública por tono**, pero **sí por familia**. Verificado en `sitemap-colores.xml` el 2026-08-25: existen exactamente **nueve** — `amarillos` · `azules` · `cafes` · `grises` · `morados` · `naranjas` · `pasteles` · `rojos` · `verdes`. Ninguna otra |
+| **Color** | **1.º** la página de **paleta o artículo** que sí rankea (hub & spoke) · **2.º** `berel.com/colores/<familia>` · **3.º** `/colores` si la familia está rota · 🔴 **NUNCA la búsqueda del sitio** | **Berel no tiene página pública por tono**, pero **sí por familia**. Verificado en `sitemap-colores.xml` el 2026-08-25: existen exactamente **nueve** — `amarillos` · `azules` · `cafes` · `grises` · `morados` · `naranjas` · `pasteles` · `rojos` · `verdes`. Ninguna otra |
 
 Siempre con **anchor descriptivo** —nunca la URL cruda como texto del enlace— y CTA que lleve
 exactamente a donde promete.
@@ -122,11 +123,11 @@ exactamente a donde promete.
 🔴 **En auditoría, un color enlazado a la búsqueda no es un enlace débil: es un DEFECTO que se
 reporta.** El destino está bloqueado por `robots.txt` → [`02_ANALISIS_AUDITORIA.md`](02_ANALISIS_AUDITORIA.md).
 
-⚠️ **Cuatro de las nueve familias tienen la canónica rota.** Verificado el 2026-08-25: `amarillos`,
-`azules`, `morados` y `verdes` renderizan **sin `<title>`** y con `canonical` literal
-`https://berel.comundefined`. Están en el sitemap y se autoanulan. **Se pueden seguir enlazando
-—son el destino correcto— pero hay que levantarlo como pendiente técnico**, porque hoy esa autoridad
-no vuelve.
+⚠️ **Cuatro de las nueve familias están rotas.** El 2026-08-25, `amarillos`, `azules`, `morados` y `verdes`
+renderizaban **sin `<title>`** y con `canonical` literal `https://berel.comundefined`. **Revalidado el
+2026-09-19: tampoco cargan colores.** Desde esa fecha, los colores de esas cuatro familias se enlazan a
+**`/colores`**, no a su familia, y el defecto sigue como pendiente técnico hacia Berel (módulo 09). Si una familia
+se repara, volver a enlazarla después de comprobar `title`, canonical y colores en vivo.
 
 **Por qué es la peor opción, documentado por el cliente** (`38739c2fefe780b3aa6bde8f422fc748`): las
 páginas de búsqueda interna **no se indexan** (Google recomienda bloquearlas), **desperdician link
@@ -142,7 +143,9 @@ intuición. 🔴 **No intercambies beneficios entre líneas.** Ejemplos que el e
 
 - **Berelex Green** *purifica el aire* — **no** es para humedad ni baños.
 - Para **playa y climas de alta humedad** va la **Serie 3500**.
-- La **garantía de por vida** es de la línea **Insignia**, no de Green.
+- La **garantía de por vida** la declaran las hojas técnicas de **Berelex Green** (R1-02/24) y de **Insignia**
+  (R1-07/19), pero no en los mismos términos: en Insignia está condicionada a aplicar sellador acrílico sobre
+  cemento, yeso o mortero. Citar cada una con su condición (módulo 12 §7).
 
 Cita los nombres completos tal como aparecen en catálogo y ficha técnica.
 
@@ -169,6 +172,53 @@ arriba, el comal, los muros de block, el aplanado—, **nunca por la etiqueta**.
 
 > **Única excepción: las fichas de banner.** Ahí sí conviene escribir "azotea mexicana", porque es
 > **una instrucción para quien diseña, no texto publicable**.
+
+## Adaptación a México: español mexicano estándar
+
+> Queja de Berel en la campaña 2027 (septiembre de 2026): la redacción «no suena natural» y «no está adaptada a
+> México». Corrección aplicada el 2026-09-19 con la lente de lector mexicano (módulo 18).
+
+La meta es el español que usaría una marca mexicana grande al hablarle a quien va a pintar su casa: **mexicano
+estándar, sin coloquialismos** («chido», «padre», «neta», diminutivos afectivos, albures) y sin calcos de
+traducción. Prueba práctica: si un asesor de una Tienda de Pintura Berel en Monterrey, CDMX o Guadalajara no lo
+diría así, se reescribe.
+
+1. **El «nosotros» es la marca, no «los mexicanos».** «Algo que hacemos muy bien en casa: recibir» convierte a
+   Berel en vocero del país. Lo cotidiano va en tú o impersonal: «lo que contestas cuando te preguntan cómo estás».
+2. **No explicarle México a un mexicano.** No definir expresiones que el lector ya usa ni repetir «la diversidad
+   cultural de México»: se nombra una vez, donde es el tema.
+3. **Una sola lista de tres por sección.** Tríadas encadenadas («recibimos, acompañamos y compartimos… honestos,
+   cálidos y humanos») suenan a manifiesto. Ninguna promesa sin dato («llenan de energía cualquier espacio»).
+4. **Cada fórmula vive en una sola página.** Si varias piezas salen juntas, no abren igual: solo el Color del Año
+   abre con «En Berel presentamos»; el hub, con «Estos son nuestros Colores de Temporada 2027»; la paleta, con
+   «Raíces de la piel es una de las cuatro paletas…». Vale también para fórmulas internas: «Suma la mirada de
+   expertos…» aparecía seis veces entre dos páginas.
+5. **Variar los objetos mexicanos.** Madera, barro y plantas se repetían en las tres piezas (madera, 11 veces).
+   Alternar con loseta, talavera, herrería, petate, el patio o la sobremesa.
+6. **Nada de jerga traducida:** «profundidad» (*deep*), «acento» o «muro de acento» (*accent*), «contraste
+   fresco», «sumar una mirada», «funciona en», «punto focal», «calma visual», «base Deep». Un asesor dice
+   «oscuro», «el muro que quieres destacar», «se ve bien en», «el centro de atención», «la base para tonos intensos».
+7. **Menos posesivos.** La V1 del Color del Año llevaba 27 «nuestr-» en unas 1.400 palabras. Un «nuestro» por
+   bloque; después, «el catálogo», «la paleta».
+8. **Números como en México:** punto decimal (2.5 m) y coma para los miles (60,000 ciclos). Las temperaturas de
+   luz conservan su fórmula (regla 48).
+9. **«Premium» sí**, cuando Berel lo usa para la línea (Insignia); nunca para la formulación (regla 46).
+10. **Sintaxis natural:** oraciones cortas, voz activa y verbos concretos, sin sustantivos abstractos encadenados
+    (atmósfera, calidez, conjunto, esencia).
+
+Léxico de casa en México, además del de abajo: recámara, sala, comedor, cuarto, departamento, foco, contacto,
+cubeta, plafón, azulejo, clóset, patio, fachada, barda. Evitar formas de España o del Cono Sur: piso (por
+departamento), ordenador, vale, «living», «estar», «enduido», habitación como opción por defecto.
+
+Barrido rápido (localiza candidatas; decide el criterio):
+
+```bash
+grep -niE "profundidad|de acento|contraste fresco|(suma|sumar) (la |una )?mirada|punto focal|calma visual|base deep|atm[oó]sfera|et[eé]re[oa]s?|evoca|funciona (en|como)" "$ARCHIVO"
+grep -oiE "nuestr[oa]s?" "$ARCHIVO" | wc -l    # posesivos: más de uno por bloque suele sobrar
+grep -nE "[0-9],[0-9]{1,2}\b" "$ARCHIVO"        # posible decimal con coma
+```
+
+Ejemplos reales antes → después: [`../ANTIPATTERNS.md`](../ANTIPATTERNS.md#adaptación-a-méxico--campaña-2027-2026-09-19).
 
 ## Léxico
 
@@ -356,6 +406,7 @@ rg -ni --pcre2 '\b([\p{L}]{4,})\s+\1\b|\b([\p{L}]{4,})\2\b' "$ARCHIVO"
 - [ ] Producto integrado como solución, nombrado con mesura
 - [ ] Mexicanidad auténtica que sostiene el artículo
 - [ ] Léxico mexicano correcto (brochazo, deja, variedad de colores…)
+- [ ] Español mexicano estándar: sin jerga traducida, «nosotros» solo de marca, fórmulas no repetidas entre piezas, un «nuestro» por bloque y decimal con punto
 - [ ] Nombres oficiales exactos (eslogan sin coma, App Color Berel, Serie 3500…)
 - [ ] Claims y beneficios tomados de la ficha técnica, sin intercambiar entre productos
 - [ ] Cierre que cierra el círculo + CTA triple (no solo slogan)

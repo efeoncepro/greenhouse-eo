@@ -1,5 +1,10 @@
 # Berel — clasificación de tareas y conteo de piezas
 
+> **Delta 2026-09-19:** el primer conteo mensual contra contrato por archivo (pendiente 4 de este documento)
+> está en [`BEREL_CONTEO_PIEZAS_SEPTIEMBRE_2026-09-19.md`](BEREL_CONTEO_PIEZAS_SEPTIEMBRE_2026-09-19.md). Usa la
+> unidad archivo, que es la que aplicó el operador en la asignación de noviembre, y el cupo 8/50/3 del módulo 15
+> de la skill. El operador decidió que el excedente se descuenta de los meses siguientes.
+
 Fecha: 2026-09-03. Alcance autorizado: revisar campos de formato/canal y clasificar las piezas
 trabajadas en esta sesión. No hay autorización para modificar fórmulas, unidad comercial ni todo el histórico.
 

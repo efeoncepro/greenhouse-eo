@@ -126,6 +126,16 @@ escala: 12% hasta USD 30 mil · 9% sobre el tramo 30–100 mil · 6% sobre el ex
 - **Partner: Real Audiences** (seleccionado 2026-09-10; fees desconocidos). En modo managed, su fee de servicio es
   pass-through declarado. En modo autogestionado no hay fee de servicio del partner: el trabajo del trader certificado de
   Efeonce va dentro del nivel y el cliente paga plataforma y medios. Antes de cotizar se necesitan sus fees por escrito.
+  **2026-09-19:** Real Audiences declaró por escrito que no tiene mínimos, que factura desde su LLC en EE.UU. y que a las
+  agencias partner les ofrece **rebates o comisiones según inversión** (sin porcentaje todavía). CPM estimados de su deck:
+  display 0,20–0,25, video 0,33–0,38, push 0,15–0,20, audio 3–4 USD; pDOOH sin precio. Detalle y alertas en la
+  [ficha](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md#lo-que-real-audiences-declaró-por-escrito--2026-09-19).
+- **Rebates de partners (decisión pendiente de CEO + Finance).** Un rebate sobre la inversión del cliente nunca se
+  retiene en silencio: o se traspasa al cliente como descuento, o se declara en propuesta y contrato como ingreso de
+  Efeonce. No reemplaza al fee de Efeonce ni convierte el modelo en porcentaje de inversión. Si el partner paga desde
+  EE.UU., Finance define el tratamiento tributario antes de la primera liquidación.
+- **Partner en evaluación: Basis** (contacto 2026-09-17, reunión por agendar). Se compara con la misma lista que Real
+  Audiences; gana el costo total declarado y la cláusula de transparencia, no el rebate más alto.
 - **Gate para pasar a autogestionado:** dos campañas managed auditadas, trader certificado con backup y checklist de
   brand safety y reporte. **Seat en otro DSP:** sólo si Real Audiences no cubre CTV o ABM B2B y la inversión en ese
   frente supera USD 50 mil/mes sostenida dos trimestres.

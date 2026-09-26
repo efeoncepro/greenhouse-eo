@@ -1,0 +1,47 @@
+{
+  "canvas": {
+    "width": 1152,
+    "height": 1440
+  },
+  "subjectProtection": {
+    "top": 676,
+    "minClearance": 24
+  },
+  "elements": [
+    {
+      "id": "dominante",
+      "box": {
+        "left": 81,
+        "right": 809.2574998363089,
+        "top": 115.19999999999999,
+        "bottom": 213.26832777786535
+      }
+    },
+    {
+      "id": "cta",
+      "box": {
+        "left": 104.64000000000001,
+        "right": 591.88,
+        "top": 253.26832777786538,
+        "bottom": 295.94832777786536
+      }
+    },
+    {
+      "id": "descriptor",
+      "box": {
+        "left": 80.64000000000001,
+        "right": 425.656,
+        "top": 335.01199999999994,
+        "bottom": 363.01199999999994
+      }
+    }
+  ],
+  "typography": {
+    "lead": 36,
+    "dominant": 116.74800925936353,
+    "closure": 34,
+    "cta": 40,
+    "descriptor": 28
+  },
+  "selection": null
+}

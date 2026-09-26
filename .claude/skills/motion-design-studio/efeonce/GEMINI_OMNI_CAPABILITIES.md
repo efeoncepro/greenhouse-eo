@@ -1,5 +1,12 @@
 # Gemini Omni Flash — catálogo de capacidades + mapa de sinergia con el estudio
 
+> **Corte vigente 2026-09-24:** este catálogo conserva capacidades y experimentos del modelo anterior
+> `gemini-omni-flash-preview`. Para operar **Omni 1.1 Cloud** usa `pnpm ai:omni` y
+> `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`. Los seis modos CLI completaron pruebas técnicas
+> a 360p/16:9/3 s (extend 6 s acumulados); una edición desde MP4 fuente no prueba cadena conversacional
+> stateful. 720p/1080p/4K, 9:16, fidelidad temporal, C2PA y factura real siguen sin verificar. No
+> extrapolar los checks ✅ históricos a 1.1 ni a Globe.
+
 > **Tipo de documento:** Catálogo de capacidades + mapa de sinergia (agent-facing).
 > **Hermano de:** `GEMINI_OMNI_VERTEX.md` (contrato operativo: endpoint, auth, pricing, gotchas). **Este doc NO repite el contrato** — si necesitas invocarlo, lee ese. Acá está TODO lo que Omni *puede hacer* y **cómo combinarlo** con las skills de la familia "studio" para exprimirlo.
 > **Verificado as-of:** migración a **Interactions API** live-verificada **2026-07-20** (`efeonce-globe`: generación t2v keyless por Vertex + edición stateful por Gemini-key, ambas `200 completed`); runtime histórico `generateContent` 2026-07-05 + edición persistida Glitch 2026-07-11 (`efeonce-group`, Vertex `global`), **ya no vigente como método de invocación**; docs oficiales Google reverificadas 2026-07-20.

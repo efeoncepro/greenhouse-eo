@@ -1,0 +1,23 @@
+{
+  "id": "m2-ya-no-puedes-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "objetos": [
+    {
+      "objeto": "codex",
+      "vista": "saludo"
+    }
+  ],
+  "escena": "SCENE (a bare desk in a dark modern office, straight on at desk height): TWO identical bezel-less panels stand side by side, same size, same height, same brightness. Each shows the SAME search bar at the top — a long horizontal SEARCH BAR — a rounded rectangular slot glowing softly from within, completely EMPTY except for one thin vertical text cursor at its left end. No letters, no numbers, no words, no icons — so it reads unmistakably as the SAME QUERY asked twice. Below each bar, the results differ visibly: the LEFT panel shows FOUR stacked glowing horizontal bars of different lengths, the RIGHT panel shows only ONE. Everything else about the two panels is deliberately identical. Between them on the desk stands the small Codex figure from the reference, in three-quarter view, head turned towards the left panel as if comparing. CRITICAL: reproduce the figure's face EXACTLY as in the reference — a single wide dark rectangular visor screen, not two separate eyes. The two panels are the ONLY light. Everything else falls to deep navy black. 50mm at f/2.8. NOTHING may read as old or analogue: NO books, NO paper, NO plants, NO mugs, NO clutter anywhere, including out of focus. Current-generation hardware only: anodised aluminium, matte glass, seamless edges, bezel-less screens. Bare desk. Empty architectural darkness behind.",
+  "reservas": {
+    "texto": {
+      "muro": "the empty dark office wall above the panels, unbroken and unlit",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the near edge of the desk in the immediate foreground, running unbroken across the whole width",
+    "tono": "DARK near-black anodised aluminium in deep shadow, outside the light"
+  }
+}

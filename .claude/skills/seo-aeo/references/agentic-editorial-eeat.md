@@ -255,7 +255,7 @@ nodo global, porque un perfil incorrecto contamina todas las piezas.
 
 | Propiedad | Regla |
 |---|---|
-| `@type` | `Person` para una persona; `Organization` solo para autoria institucional real |
+| `@type` | `Person` para una persona; `Organization` solo para autoria institucional real, incluida la decision del cliente de no firmar con persona (`../modules/03_EEAT_ENTITY.md`). Nunca un nombre colectivo (`Equipo Editorial X`) tipado como `Person` |
 | `name` | Solo el nombre, sin cargo, prefijos editoriales ni publisher |
 | `url` | Perfil canonico del autor o pagina que lo identifica |
 | `sameAs` | Perfiles publicos reales y verificados; eliminar URLs rotas, ajenas u obsoletas |
@@ -275,7 +275,8 @@ Usar el tipo que corresponda al contenido visible e incluir, cuando apliquen:
 - `description` fiel a la pieza;
 - `mainEntityOfPage` y URL canonical;
 - `author` enlazado a `Person` u `Organization` real;
-- `publisher` como `Organization` separada del autor;
+- `publisher` como `Organization` separada del autor; si la autoria es
+  institucional, `author` y `publisher` apuntan al mismo `@id`;
 - `datePublished` y `dateModified` ISO 8601 reales;
 - imagen representativa accesible (`image`, `primaryImageOfPage` o equivalente);
 - `articleSection`, `inLanguage` y breadcrumb coherentes con la UI;
@@ -430,7 +431,10 @@ Todo item bloqueante debe estar resuelto o tener excepcion humana documentada.
 - [ ] Caso cliente tiene permiso, caveats y datos no sensibles.
 - [ ] Who, How, Why y disclosure de IA son honestos y visibles.
 - [ ] Autor/fecha visibles y nodo `Person` verificado (`sameAs`, `jobTitle`,
-      `worksFor`, `knowsAbout`).
+      `worksFor`, `knowsAbout`), o autoria institucional `Organization` decidida
+      por el cliente y registrada.
+- [ ] Si la pieza es parte de un conjunto o vuelve con comentarios del cliente:
+      revision adversarial por lentes aplicada (abajo).
 - [ ] `Article`/`BlogPosting`, breadcrumb y fechas coinciden con el contenido.
 - [ ] OG/Twitter e imagen social pasan readback.
 - [ ] Enlaces revisados sin etiquetar `403` anti-bot o timeout como rotos sin
@@ -440,6 +444,31 @@ Todo item bloqueante debe estar resuelto o tener excepcion humana documentada.
 - [ ] Tras publicar: anonimo `200`, `index, follow`, self-canonical y render
       desktop/mobile verificados live.
 - [ ] Estado se reporta como `index eligible` hasta confirmar indexacion real.
+
+### Revision adversarial por lentes (conjuntos y rondas de cliente)
+
+Cuando varias piezas se publican juntas (campana, ciclo anual, hub y
+satelites) o una pieza vuelve con comentarios del cliente, la relectura de
+quien la escribio no basta. Se corren lentes separados, cada uno con una sola
+pregunta, y los hallazgos se aplican por pieza:
+
+| Lente | Pregunta | Que suele encontrar |
+|---|---|---|
+| Lector-cliente | Que marcaria el cliente con sus propias reglas y comentarios previos? | vetos que reaparecen, terminos prohibidos, la entidad principal repetida de mas, formatos ya rechazados |
+| SEO/AEO y canibalizacion | Cada intencion vive en una sola URL del conjunto y no choca con la edicion anterior? | H1 o meta casi iguales entre piezas o contra el ano previo, secciones duplicadas entre hub y satelite, la misma entidad desarrollada en dos lugares |
+| Verificacion contra fuentes | Cada dato de producto, cifra o nombre tiene fuente primaria vigente? | garantias sin su condicion, atributos sin ficha tecnica, certificados vencidos, categorias mal asignadas |
+| Lector del mercado | Suena escrito en ese pais? | calcos y jerga traducida, formulas repetidas entre piezas, explicarle su propia cultura al lector (craft: skill `copywriting`) |
+
+- Un hallazgo se verifica antes de aplicarlo: un lente puede equivocarse,
+  sobre todo cuando concluye ausencia.
+- Revisar tambien las respuestas ya dadas en los hilos de comentarios: si la
+  version nueva las desmiente, se corrigen en el mismo hilo.
+- Caso fuente (2026-09, tres piezas de campana anual de un cliente de
+  pintura): la entidad del ano repetida 27 veces en una pagina, una garantia
+  publicada sin su condicion, H1 y meta del hub parecidos a la edicion anterior,
+  una seccion duplicada entre hub y satelite y tres respuestas en hilos que la
+  version nueva desmentia. Registro:
+  `docs/audits/seo/BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md`.
 
 ## 11. Plantilla de auditoria
 

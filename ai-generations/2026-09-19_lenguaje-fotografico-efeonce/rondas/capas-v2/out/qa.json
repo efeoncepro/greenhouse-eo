@@ -1,0 +1,126 @@
+[
+  {
+    "id": "a-oficio-45",
+    "dominante": [
+      "donde"
+    ],
+    "contraste": {
+      "etiqueta": 6.54,
+      "entrada": 6.54,
+      "dominante": 6.48,
+      "cierre-frase": 4.71,
+      "gesto": 10.16,
+      "logo": 20.38
+    },
+    "gapsTinta": [
+      {
+        "entre": "etiqueta→entrada",
+        "px": 19,
+        "ratioDominante": 0.1
+      },
+      {
+        "entre": "entrada→dominante",
+        "px": 17,
+        "ratioDominante": 0.089
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 17,
+        "ratioDominante": 0.089
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "b-cocreacion-45",
+    "dominante": [
+      "lo construimos"
+    ],
+    "contraste": {
+      "etiqueta": 10.54,
+      "entrada": 10.36,
+      "dominante": 10.11,
+      "cierre-frase": 9.28,
+      "logo": 13.01
+    },
+    "gapsTinta": [
+      {
+        "entre": "etiqueta→entrada",
+        "px": 15,
+        "ratioDominante": 0.1
+      },
+      {
+        "entre": "entrada→dominante",
+        "px": 14,
+        "ratioDominante": 0.093
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 14,
+        "ratioDominante": 0.093
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "open-brackets",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "cliente",
+          "labelBounds": {
+            "left": 191.461,
+            "top": 1197.792,
+            "right": 278.784,
+            "bottom": 1233.458
+          }
+        },
+        {
+          "id": "efeonce",
+          "labelBounds": {
+            "left": 1057.536,
+            "top": 1197.792,
+            "right": 1151.246,
+            "bottom": 1233.458
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c-pipeline-169",
+    "dominante": [
+      "en vivo."
+    ],
+    "contraste": {
+      "etiqueta": 12.77,
+      "entrada": 12.87,
+      "dominante": 12.86,
+      "nota": 12.43,
+      "logo": 7.66
+    },
+    "gapsTinta": [
+      {
+        "entre": "etiqueta→entrada",
+        "px": 19,
+        "ratioDominante": 0.1
+      },
+      {
+        "entre": "entrada→dominante",
+        "px": 17,
+        "ratioDominante": 0.089
+      }
+    ],
+    "seleccion": null
+  }
+]

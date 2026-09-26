@@ -3,7 +3,9 @@ import { NextResponse } from 'next/server'
 import {
   attachOrganizationLogoAsset,
   canUpdateOrganizationBrandAsset,
-  OrganizationBrandAssetError
+  ORGANIZATION_LOGO_VARIANTS,
+  OrganizationBrandAssetError,
+  type OrganizationLogoVariant
 } from '@/lib/account-360/organization-brand-assets'
 import { requireTenantContext } from '@/lib/tenant/authorization'
 
@@ -52,6 +54,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const candidateId = typeof body.candidateId === 'string' ? body.candidateId.trim() : null
   const reason = typeof body.reason === 'string' ? body.reason.trim() : null
 
+  // TASK-1888 — `variant: 'on_dark'` fija la versión del logo apta para fondo oscuro; ausente = el logo de siempre.
+  const variant: OrganizationLogoVariant = body.variant === undefined ? 'default' : body.variant
+
+  if (!(ORGANIZATION_LOGO_VARIANTS as readonly unknown[]).includes(variant)) {
+    return NextResponse.json({ error: 'La variante del logo debe ser default u on_dark.' }, { status: 400 })
+  }
+
   if (!assetId) {
     return NextResponse.json({ error: 'assetId is required.' }, { status: 400 })
   }
@@ -62,7 +71,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       assetId,
       candidateId,
       reason,
-      actorUserId: tenant.userId
+      actorUserId: tenant.userId,
+      variant
     })
 
     return NextResponse.json(result)

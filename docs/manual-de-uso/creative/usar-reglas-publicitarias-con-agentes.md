@@ -52,6 +52,18 @@ intenciones `growth` o `intervention`. El agente debe conservar el orden y los e
 la frase contra el ancho del lockup y mostrar el resultado en el formato final. La receta funciona con cualquier
 copy; no depende de las palabras “escalar” o “automatizar”.
 
+## Pedir un ad con Tres voces + acción
+
+```text
+Usa Tres voces + acción para este anuncio. CTA en texto, contorno o relleno según la composición;
+explica la elección. Conserva la tesis dominante, una acción y aire respecto del personaje y firma.
+Entrega cada formato nativo revisado, copy y espaciados editables, compositor y contraste medido.
+```
+
+[Regla vigente](../../operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md). Revisar el cursor completo,
+no sólo el botón. El CTA usa Poppins; Guttery no es obligatoria. Las tres variantes pertenecen al
+sistema aprobado. Los valores de los pilotos 4:5 no se copian a 9:16/16:9 sin recomposición y revisión.
+
 ## Cómo revisar la respuesta
 
 - La tesis debe leerse primero al tamaño real y en miniatura.
@@ -64,6 +76,43 @@ copy; no depende de las palabras “escalar” o “automatizar”.
 
 La guía pública ayuda a entender y discutir las decisiones, pero no aprueba una pieza ni convierte una receta
 en preset universal. El estado `trial` del contrato exige conservar ficha, evidencia y gate por cada composición.
+
+## Pedir un carrusel con jerarquía de 5 voces y selección colaborativa
+
+Caso de referencia: carrusel «Nivel de búsqueda» (2026-09-19). Método completo en la
+[bitácora del caso](../../operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md).
+
+**Cómo pedirlo.** Entrega el copy por lámina separado en voces y marca los énfasis:
+
+```text
+Usa $efeonce-advertising-creative y $social-media-studio. Carrusel 1080×1350, 9 láminas.
+Por lámina: etiqueta, entrada, dominante (1–3 palabras), cierre de frase, tarjeta y gesto opcional.
+Marca **negrita** para subir peso y [[acento]] para la palabra clave en naranja.
+Selección colaborativa sobre el dominante: SEO y Contenido editando, Paid moviéndose por el canvas.
+Firma con url-lum. Toma como referencia ai-generations/2026-09-19_nivel-de-busqueda/componer-v2.mjs.
+```
+
+**Qué revisar en la entrega.**
+
+- La **hoja de revisión** con todas las láminas en el orden de publicación (una pieza suelta debe venir aparte).
+- La **vista a 390 px**: la etiqueta, el dominante y la tarjeta se leen sin ampliar; ninguna voz se funde con la
+  vecina (si entrada y dominante tienen el mismo peso y color, pide corrección).
+- El **acento naranja legible**: sobre horizonte encendido debe haberse cambiado a peso blanco. Pide el contraste
+  por nivel (incluidos los acentos) y, si alguno quedó bajo el umbral, la nota de revisión visual a 390 px.
+- Las placas de los cursores dentro del lienzo, con nombres cortos, y sin tapar la frase ni el HUD.
+- La firma `efeoncepro.com` visible en el PNG final; si el logo 3D ya protagoniza la escena, no debe haber otro
+  logo plano.
+
+**Qué no hacer.**
+
+- No pidas «un cursor solo sin caja»: el cursor que pasea sin seleccionar es un colaborador en movimiento, y la
+  pieza siempre conserva un objeto seleccionado.
+- En foto, no aceptes tarjetas de contenido ni scrims. La superficie funcional acotada del CTA contorno/relleno
+  de **Tres voces + acción** sí está autorizada. El vidrio HUD sigue limitado a ilustración de género.
+- No pidas Guttery en más de un gesto por pieza ni en frases largas; si la máquina no tiene la fuente, esa capa se
+  omite.
+- No trates los pesos o colores del caso como plantilla fija: se revalidan con cada fondo y copy.
+- Producir la pieza no autoriza programarla ni publicarla.
 
 ## Probar el harness en una sesión nueva
 
@@ -101,3 +150,15 @@ como una capability de runtime que todavía no existe.
 
 Descripción funcional: [reglas publicitarias para agentes](../../documentation/creative/reglas-publicitarias-para-agentes.md).
 Contrato: [Advertising Creative Agent Execution V1](../../operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md).
+
+## Entrega Paid Media en cuatro ratios
+
+Por defecto, preparar cada key visual en **4:5, 1:1, 9:16 y 16:9**. Cuatro conceptos son dieciséis exports; si el brief excluye alguno, dejarlo explícito. Recomponer foto y tipografía por formato y revisar CTA, puntero, personaje, lecho/firma y contraste mínimo en cada export. Entregar la matriz concepto×ratio con editables, prompts y QA en Pilotos. Es cobertura interna; antes de pautar se verifican specs y safe areas de cada placement.
+
+## Safe areas y paquete final
+
+Aplicar el canon Tres voces + acción, §Zonas seguras: placement y medio explícitos; texto/CTA/cursor protegidos; firma al pie con límites de UI declarados, sin inflar el lecho. Export limpio más máscara QA separada. Entregar concepto, audiencia, fase de embudo, hipótesis, CTA/destino, KPI, prompts/referencias, editables, comandos/dependencias y hashes. El operador autorizó promover la campaña SEO/AEO ajustada a Finales; conservar Pilotos. Final creativo no equivale a publicación ni a validación live del placement.
+
+## Método completo y compatibilidad verificada
+
+Consultar el [método SEO/AEO](../../operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) para dirección, registro, referencias, prompts, composición, lecho proporcionado, formatos, embudo y archivo local. El [compositor CTA](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) es la ruta de trabajo nuevo; revisar §7 antes de migrar una corrida. Los runners históricos conservan reproducción exacta, no sustituyen el canon. QA vacío o sólo p98 no certifican contraste ni cobertura.

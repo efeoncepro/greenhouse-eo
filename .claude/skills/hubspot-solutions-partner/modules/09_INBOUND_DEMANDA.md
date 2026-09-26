@@ -1,6 +1,6 @@
 # 09 · Inbound, directorio y partner matching
 
-> **Refresh Fall Spotlight/UNBOUND 2026 — 2026-09-16.** El enablement del vendor es una entrada de canal,
+> **Refresh Fall Spotlight/UNBOUND 2026 — 2026-09-18.** El enablement del vendor es una entrada de canal,
 > no evidencia de elegibilidad individual ni autorización para publicar.
 
 > **Antes de invertir un peso en inbound, corre la Lente 1 de `modules/06`.**

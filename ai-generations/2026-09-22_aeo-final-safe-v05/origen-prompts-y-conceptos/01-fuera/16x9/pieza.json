@@ -1,0 +1,25 @@
+{
+  "id": "01-fuera-169",
+  "status": "PILOTO_PENDIENTE_APROBACION",
+  "creator": "Codex",
+  "engine": "image_gen.imagegen (model/version/seed not exposed)",
+  "concept": "¿Sales tú?",
+  "territory": "Exclusión de la respuesta",
+  "mechanism": "Codex junto a una respuesta con dos fuentes y un espacio ausente. La pregunta del titular convierte el vacío en relevancia personal.",
+  "photographic_lever": "ausencia",
+  "current_plate_version": 1,
+  "history": [
+    {
+      "version": "v01",
+      "operation": "generate",
+      "prompt": "prompts/v01-prompt-exacto.txt",
+      "references_in_order": [
+        "../../../../../01. Recursos/2026-09-22_SEO-AEO_kit-referencias/referencias/efeonce-codex-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png"
+      ],
+      "output": "historial/v01-plate.png",
+      "selected_for_current_pilot": true
+    }
+  ],
+  "feedback_and_limits": "Conservar escena valorada; evaluar si el vacío se entiende a tamaño móvil.",
+  "approval": null
+}

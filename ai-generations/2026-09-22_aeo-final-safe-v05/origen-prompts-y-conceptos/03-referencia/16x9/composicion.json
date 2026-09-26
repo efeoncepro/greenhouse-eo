@@ -1,0 +1,32 @@
+{
+  "id": "03-referencia-169",
+  "plate": "plate-actual.png",
+  "align": "left",
+  "top": 0.15,
+  "textWidth": 0.3,
+  "label": "SEO + AEO",
+  "labelSize": 27,
+  "labelGap": 0.13,
+  "lead": "En la respuesta de la IA,",
+  "leadFamily": "poppins",
+  "leadFill": "#ffffff",
+  "leadSize": 32,
+  "leadGap": 0.15,
+  "dominant": "sé la|referencia.",
+  "dominantSize": 138,
+  "dominantMax": 0.32,
+  "after": "**Trabajemos tu SEO + AEO.**",
+  "afterFamily": "poppins",
+  "afterFill": "#ffffff",
+  "afterSize": 29,
+  "afterGap": 0.2,
+  "logo": {
+    "width": 0.2,
+    "x": 0.5
+  },
+  "final": [
+    1920,
+    1080
+  ],
+  "signature_note": "Compose text without logo, then canonical documented signature compositor at 93.5% height, width20% shortest side."
+}

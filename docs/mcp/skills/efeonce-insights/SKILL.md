@@ -1,13 +1,13 @@
 ---
 name: efeonce-insights
-description: How to operate Efeonce Insights through MCP — build a valid request from the catalog, create an edition, follow its phases, read sealed evidence and the frozen plan honestly, request and follow the rendering of its deck, manage read-only share links of issued editions, read email deliveries and recurring schedules honestly, and know what a machine cannot do (issue, send email, manage schedules). Load it before creating, rendering, sharing or describing an Insights edition.
+description: How to operate Efeonce Insights through MCP — build a valid request from the catalog, create an edition, follow its phases, read sealed evidence and the frozen plan honestly, request and follow the rendering of its deck and A4 report, manage read-only share links of issued editions, read email deliveries and recurring schedules honestly, and know what a machine cannot do (issue, send email, manage schedules). Load it before creating, rendering, sharing or describing an Insights edition.
 ---
 
 # Operating Efeonce Insights
 
 Efeonce Insights turns a client's evidence (SEO, AEO, ICO delivery metrics) into a frozen, versioned
 edition for a period. Greenhouse owns the library, the request, the permissions and the lifecycle.
-This manual teaches you to operate it correctly through its MCP tools (four for editions, four for rendering, three for share links, two for email deliveries and two for schedules). It grants no permission:
+This manual teaches you to operate it correctly through its MCP tools (four for editions, four for rendering, three for share links, two for email deliveries, two for schedules and two for the report cover). It grants no permission:
 everything below is enforced server-side per binding and per organization.
 
 ## What exists today and what does not
@@ -18,15 +18,16 @@ everything below is enforced server-side per binding and per organization.
 | List editions / read one edition with evidence and plan | `list_insight_editions`, `get_insight_edition` |
 | Create an edition and run its generation up to `ready_for_review` | `create_insight_edition` — internal bindings only |
 | Issue, withdraw, recover a failed edition | Not through MCP. Issuing is a human decision with its own capability |
-| Request the rendering of an edition's deck and follow it | `request_insight_render`, `get_insight_render_run`, `retry_insight_render`, `cancel_insight_render` — writes are internal bindings only; today only `deck_pdf` renders |
+| Request the rendering of an edition's deck and A4 report and follow it | `request_insight_render`, `get_insight_render_run`, `retry_insight_render`, `cancel_insight_render` — writes are internal bindings only; `deck_pdf` (16:9 deck) and `report_pdf` (A4 report) render, `web` does not |
 | Create, list and revoke read-only share links of an issued edition | `create_insight_share`, `list_insight_shares`, `revoke_insight_share` — create and revoke are internal bindings only |
 | Read email deliveries of an edition and their per-recipient outcome | `list_insight_deliveries`, `get_insight_delivery` — read only |
 | Read recurring schedules and their latest occurrences | `list_insight_schedules`, `get_insight_schedule` — read only |
 | Send an edition by email; cancel, retry or reconcile a delivery | Not through MCP. A person does it in the Greenhouse portal |
 | Create, activate, pause or retire a schedule | Not through MCP. A person does it in the Greenhouse portal |
-| A4 report and the in-portal edition page | Not yet: they arrive in later units of the program |
+| Read or set the organization's preferred report cover (automatic, navy or white) | `get_insight_cover_preference`, `set_insight_cover_preference` — setting is internal bindings only |
+| The in-portal edition page and the web version of an edition | Not yet: they arrive in later units of the program |
 
-`renderableOutputs` in the catalog lists what the render engine can produce today (`deck_pdf`). An
+`renderableOutputs` in the catalog lists what the render engine can produce today (`deck_pdf`, `report_pdf`). An
 edition can be created, generated and reviewed, but **it cannot be issued** until every requested
 output has been rendered and validated. Rendering is asynchronous and runs in a worker: request it,
 then poll the run. If the request answers `service_unavailable` with code `render_disabled`, rendering
@@ -35,20 +36,32 @@ is switched off in this runtime — report it and stop. Never tell a human that 
 ## Rendering: timing and semantics
 
 - **It is a queue, not a call.** The engine starts one render roughly every two minutes and produces one
-  output per turn. A single deck is typically ready three to four minutes after the request (longer on a
-  cold start); a batch of N outputs takes about 2·N minutes. Drawing the deck itself takes seconds — the
+  output per turn. A single output (deck or A4 report) is typically ready three to four minutes after the
+  request (longer on a cold start); a batch of N outputs takes about 2·N minutes, so asking for both the deck
+  and the A4 report of one edition takes about two turns. Drawing the document itself takes seconds — the
   wait is the queue. Other document types may be served first. Poll `get_insight_render_run` every 30–60
   seconds; do not poll in a tight loop and do not promise the human a delivery in seconds.
 - **States.** Outputs go `queued` → `running` → `completed` | `failed` | `dead_letter` | `cancelled`. A run
   summarises them (`partial_failed` = one succeeded, another failed). A `completed` output carries
-  `outputAssetId`; that id is not a download link and the deck is not shared or sent.
+  `outputAssetId`; that id is not a download link and the document is not shared or sent.
 - **Retry** (`retry_insight_render`) re-queues only failed outputs; completed ones are never touched. A
   failure caused by the content (for example text that does not fit a slide) fails again with the same
   cause and, after its attempts are exhausted, becomes `dead_letter`. Report the cause; the fix is a
   corrected edition, not more retries.
 - **Cancel** (`cancel_insight_render`) stops what has not started; what is already rendering finishes and
   the answer says so (`stillRunning`). A cancelled run is **terminal**: retrying it answers successfully
-  but re-queues nothing. To get the deck after cancelling, request a new render.
+  but re-queues nothing. To get the document after cancelling, request a new render.
+- **Asking twice does not draw twice.** If the outputs you ask for already have a live render in one run
+  (`queued`, `running`, `completed` or `failed`), `request_insight_render` answers with that same run and
+  `idempotent: true`; nothing new is queued. A failed output is recovered with `retry_insight_render`; a new
+  render is possible only after `dead_letter` or a cancel. If only some of the requested outputs are live in
+  another run, the request is rejected with `render_rejected` naming them: follow that run, or ask for the
+  missing output alone.
+- **Only an edition in review renders.** The edition must be in `ready_for_review`; any other state (for
+  example an issued one) answers `not_ready`.
+- **Name the outputs.** `outputs` must be outputs the edition declared. If you omit it, every declared output
+  is requested — and if the edition also declared `web`, the whole request is rejected with `render_rejected`.
+  Pass the renderable ones explicitly.
 - **Audience.** Asking to render or read the render of an edition you cannot see answers `not_found`, and
   nothing is created. Do not infer that the edition exists.
 - Every request, retry and cancel is recorded under the identity that made it.
@@ -75,7 +88,12 @@ If a tool below is not listed by your client, it is not available in that enviro
   link is never reactivated; revoking twice answers `idempotent: true`. Files already downloaded cannot be revoked —
   say so when you report. Withdrawing an edition revokes all of its links automatically.
 - A visit to a link is never evidence that a person read the report. Do not claim it.
-- `service_unavailable` with code `sharing_disabled` means sharing is off in this runtime: report it and stop.
+- `service_unavailable` (or `policy_blocked` through the gateway) with code `sharing_disabled` means sharing is off in
+  this runtime: report it and stop. Any `*_disabled` code means the same for its lane. Lists can still answer while a
+  lane is off; that does not mean the lane is on.
+- Creating and revoking links need a write scope that most MCP clients do not carry: `insufficient_scope` there is
+  expected, reads are unaffected. Do not retry with another token; ask a human for a governed grant.
+- **Revoking is irreversible.** Confirm with the human which link (by label) before calling `revoke_insight_share`.
 
 ### Email deliveries (read only)
 
@@ -131,6 +149,22 @@ Explain what a schedule will do next:
 2. Report cadence, time zone and the latest occurrences; state that each one lands in review and needs a person to
    issue and send it.
 
+## Report cover
+
+- The cover of an edition is resolved once, when the edition is generated, and sealed with it: the request's
+  `brand.coverTheme` (if not `auto`) wins, then the organization's preference (if not `auto`), then `auto`. `auto` means
+  a navy cover only when the organization has a logo prepared for dark backgrounds, otherwise white. A navy cover
+  never shows the regular logo: without the dark-ready logo it goes without the client's logo.
+- `get_insight_cover_preference { organizationId }` returns `coverTheme` and `isDefault` (`true` = never set, reads as
+  `auto`). `set_insight_cover_preference { organizationId, coverTheme }` writes; the same value again answers
+  `changed: false`. It affects editions generated afterwards; editions already generated keep their sealed cover and
+  nothing is re-rendered.
+- Before setting `dark` for an organization, tell the human that without a dark-ready logo the cover goes without the
+  client's logo, and confirm.
+- The new report design that uses this cover is being switched on gradually; until it is, generated editions keep the
+  current design. If one of these tools is not in your tool list, it is not published in this gateway yet: say so, do
+  not look for another path.
+
 ## The request, field by field
 
 Always call `get_insights_catalog` first and propose the exact request to the human before creating.
@@ -144,8 +178,11 @@ Always call `get_insights_catalog` first and propose the exact request to the hu
   months, the same number of months before), `previous_year` (same civil dates one year earlier, Feb 29
   becomes Feb 28) or `custom` with its own `start`/`endExclusive` that must not overlap.
 - `audience`: `client` or `internal`. An org-scoped binding can only read `client` editions.
-- `outputs`: one or more of `deck_pdf`, `report_pdf`, `web`. Declares intent. Only `deck_pdf` can be rendered today; requesting the rendering of another target is rejected, never queued for later.
+- `outputs`: one or more of `deck_pdf`, `report_pdf`, `web`. Declares intent. `deck_pdf` and `report_pdf` can be rendered; `web` cannot yet, and requesting its rendering is rejected, never queued for later.
 - `locale` (`es-CL` default, `en-US`), `depth` (`executive`, `standard`, `detailed`).
+- `brand.coverTheme` (optional): `auto`, `dark` (navy) or `light` (white) for THIS request only. Leave it out unless
+  the human asked for a specific cover: then the organization's preference applies. Adding it changes the request, so
+  a replay with the same `idempotencyKey` must repeat it exactly.
 - `idempotencyKey` (8–200 chars): the same key with the same request returns the same edition; the
   same key with a different request is a `409` conflict. Use one key per distinct human request.
 - `policy.allowPartial`: only when the human explicitly accepts visible omissions. Without it, a
@@ -176,6 +213,12 @@ Always call `get_insights_catalog` first and propose the exact request to the hu
   `evidence_rejected` (a required module had no usable evidence), `unsupported_window`,
   `insufficient_data`, `method_mismatch`. A failed edition is recoverable from that phase by an
   authorized human; do not create a duplicate edition to "retry".
+
+A module marked `available` in the catalog means the organization may request it, not that the window has
+data. A demonstration or test organization, for example, can have delivery (ICO) enabled and no monthly
+delivery snapshots at all: without `allowPartial`, an edition there fails at `validating` with
+`evidence_rejected`. That is the correct outcome, not an outage. Report it, do not create more editions to
+"retry", and ask the human for an organization and window that actually have evidence.
 
 States you will see: `draft → collecting → composing → validating → ready_for_review → issued`, plus
 `failed` (recoverable by phase) and `withdrawn` (terminal). Org-scoped bindings see a redacted
@@ -230,12 +273,20 @@ frozen and hashed; both are immutable. Every figure in the plan references a fac
 | `not_found` for an organization you believe exists | Either it does not exist for your binding or it has no Insights module | Do not infer anything else; report it as not available |
 | `evidence` and `plan` come back `null` for a client-audience read | The edition is not issued yet; clients only see evidence and plan of issued editions | Say the edition is in review and figures are not yet visible for the client |
 | Issuing answers `not_ready` | At least one requested output is not rendered and validated yet (the details name it) | Request or finish the rendering first; do not work around it |
-| `request_insight_render` answers `render_rejected` | You asked for an output that cannot be rendered yet, or the frozen plan exceeds a slot budget of the catalog | Request only `deck_pdf`; nothing is truncated silently — report the cause |
+| `request_insight_render` answers `render_rejected` | You asked for an output that cannot be rendered yet (`web`, also when you omitted `outputs` and the edition declared it) or that the edition did not declare, part of the outputs is already live in another run (the details name them), or the frozen plan exceeds a slot budget of the catalog | Request only outputs listed in `renderableOutputs`; follow the named run or ask for the missing output alone; nothing is truncated silently — report the cause |
+| `request_insight_render` answers `idempotent: true` | The requested outputs already have a live render; you got that earlier run | Follow that run; do not request again — use `retry_insight_render` if one output failed |
+| `request_insight_render` answers `not_ready` | The edition is not in `ready_for_review` (for example it is already issued) | Do not retry; report the edition's state |
+| A new edition fails at `validating` with `evidence_rejected` | A requested module had no usable evidence for that organization and window (common in demonstration organizations) | Report it; do not re-create; choose an organization and window with evidence, or use `allowPartial` only if the human accepts visible omissions |
 | A render run is `partial_failed` | One output succeeded and another failed | Report both states; `retry_insight_render` re-queues only the failed ones |
 | An output is `dead_letter` | Attempts exhausted or a non-retryable failure (for example the catalog changed since queuing) | Do not retry from MCP; a human decides |
 | An output stays `queued` for several minutes | Normal queue wait: one output per turn of about two minutes | Estimate about 2·N minutes by position; report it as queued, not as failed |
 | `retry_insight_render` on a cancelled run answers successfully but nothing changes | Cancelled is terminal | Request a new render with `request_insight_render` |
 | `not_found` when rendering an edition | The edition is not visible to your binding (for example an internal edition read by a client binding) | Do not retry; report it as not available |
+| `policy_blocked` / `service_unavailable` with `sharing_disabled`, `delivery_disabled` or `schedules_disabled` | That distribution lane is switched off in this runtime | Report it and stop; do not retry or look for another path |
+| `insufficient_scope` on `create_insight_share` or `revoke_insight_share` | Your client does not carry the write scope; list tools still work | Do not retry with another token; ask a human for a governed grant |
+| `rate_limited` / `quota_exceeded` when creating a link | The edition already has 20 active links | Review `list_insight_shares`; a human decides which link to revoke before creating another |
+| `not_ready` when creating a link | The edition is not issued or is not client-audience | Share only issued client editions; issuing is a human decision |
+| A delivery recipient in `ambiguous` | The send outcome is unknown and nothing is resent until a person reconciles it | Report it as unresolved, never as sent or failed |
 
 ## Recipes
 
@@ -249,10 +300,11 @@ Monthly SEO + ICO edition for a client, previous month comparison:
 4. `get_insight_edition { editionId, includeEvidence: true }` → summarize facts with units and as-of,
    list rejections as limits, and state that issuing is pending human review.
 
-Rendering the deck of an edition in review:
+Rendering the deck and the A4 report of an edition in review:
 
-1. `request_insight_render { organizationId, editionId, outputs: ["deck_pdf"] }` → note `renderRunId`.
-2. Tell the human the deck is queued and will take a few minutes.
+1. `request_insight_render { organizationId, editionId, outputs: ["deck_pdf", "report_pdf"] }` (only outputs the
+   edition declared) → note `renderRunId`. If the answer says `idempotent: true`, follow that existing run instead.
+2. Tell the human both documents are queued and will take a few minutes (about two minutes per output).
 3. `get_insight_render_run { organizationId, renderRunId }` every 30–60 s until the output is `completed` (report
    `outputAssetId`) or `failed`/`dead_letter` (report `failureCode`).
 4. If `failed` with a transient cause, `retry_insight_render { organizationId, renderRunId }` once; if the same cause

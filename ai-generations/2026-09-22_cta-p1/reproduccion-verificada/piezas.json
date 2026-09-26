@@ -1,0 +1,167 @@
+[
+  {
+    "id": "a-texto-cursor",
+    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/02. Pilotos/2026-09-22_p1-cta-comparativa-Codex/v01/plates/p1.png",
+    "align": "left",
+    "top": 0.06,
+    "textWidth": 0.84,
+    "lead": "Hoy alguien habló en nombre de tu empresa.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 41,
+    "leadGap": 0.15,
+    "dominant": "No fuiste tú.",
+    "dominantSize": 176,
+    "dominantMax": 0.62,
+    "after": "Ni te preguntó **nada**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 37,
+    "afterGap": 0.12,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.35,
+      "cursors": [
+        {
+          "id": "ia",
+          "label": "IA",
+          "who": "role",
+          "anchor": "bottom-end",
+          "color": "#12afa2"
+        }
+      ]
+    },
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "note": {
+      "text": "Descubre qué dice de tu marca.",
+      "size": 34,
+      "x": 0.09,
+      "y": 0.295,
+      "width": 0.78
+    },
+    "cta": {
+      "variant": "text",
+      "radius": 0,
+      "text": "Pide el diagnóstico",
+      "descriptor": "Diagnóstico SEO + AEO"
+    }
+  },
+  {
+    "id": "b-contorno-redondeado",
+    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/02. Pilotos/2026-09-22_p1-cta-comparativa-Codex/v01/plates/p1.png",
+    "align": "left",
+    "top": 0.06,
+    "textWidth": 0.84,
+    "lead": "Hoy alguien habló en nombre de tu empresa.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 41,
+    "leadGap": 0.15,
+    "dominant": "No fuiste tú.",
+    "dominantSize": 176,
+    "dominantMax": 0.62,
+    "after": "Ni te preguntó **nada**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 37,
+    "afterGap": 0.12,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.35,
+      "cursors": [
+        {
+          "id": "ia",
+          "label": "IA",
+          "who": "role",
+          "anchor": "bottom-end",
+          "color": "#12afa2"
+        }
+      ]
+    },
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "note": {
+      "text": "Descubre qué dice de tu marca.",
+      "size": 34,
+      "x": 0.09,
+      "y": 0.295,
+      "width": 0.78
+    },
+    "cta": {
+      "variant": "outline",
+      "radius": 16,
+      "text": "Pide el diagnóstico",
+      "descriptor": "Diagnóstico SEO + AEO"
+    }
+  },
+  {
+    "id": "c-boton-lima",
+    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/02. Pilotos/2026-09-22_p1-cta-comparativa-Codex/v01/plates/p1.png",
+    "align": "left",
+    "top": 0.06,
+    "textWidth": 0.84,
+    "lead": "Hoy alguien habló en nombre de tu empresa.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 41,
+    "leadGap": 0.15,
+    "dominant": "No fuiste tú.",
+    "dominantSize": 176,
+    "dominantMax": 0.62,
+    "after": "Ni te preguntó **nada**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 37,
+    "afterGap": 0.12,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.35,
+      "cursors": [
+        {
+          "id": "ia",
+          "label": "IA",
+          "who": "role",
+          "anchor": "bottom-end",
+          "color": "#12afa2"
+        }
+      ]
+    },
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "note": {
+      "text": "Descubre qué dice de tu marca.",
+      "size": 34,
+      "x": 0.09,
+      "y": 0.295,
+      "width": 0.78
+    },
+    "cta": {
+      "variant": "solid",
+      "radius": 16,
+      "text": "Pide el diagnóstico",
+      "descriptor": "Diagnóstico SEO + AEO"
+    }
+  }
+]

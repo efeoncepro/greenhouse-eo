@@ -1,0 +1,47 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:29:00.745Z",
+  "run": "ai-generations/2026-07-17_anam-revops-cover-v6-product-story",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-17_anam-revops-cover-v6-product-story",
+  "totalBytes": 523759,
+  "fileCount": 6,
+  "files": [
+    {
+      "path": "delivery/anam-revops-product-story-og-1440x757-v6.jpg",
+      "sizeBytes": 51770,
+      "sha256": "51027f07b57bfc92193cebcfb2630dd8ebc68aa38f55a36855df675fc401e468",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v6-product-story/delivery/anam-revops-product-story-og-1440x757-v6.jpg"
+    },
+    {
+      "path": "delivery/anam-revops-product-story-web-1600-v6.webp",
+      "sizeBytes": 39852,
+      "sha256": "7cbf478784c10032a1b67a8cca87e9f340ff0b11f9dffe5ccf80209d6c3e1baf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v6-product-story/delivery/anam-revops-product-story-web-1600-v6.webp"
+    },
+    {
+      "path": "refs/operator-reference-brand-visibility.png",
+      "sizeBytes": 71043,
+      "sha256": "a3af05af053bf777df2e2399938fdca612e525928a57a25ce050e0105ab59f03",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v6-product-story/refs/operator-reference-brand-visibility.png"
+    },
+    {
+      "path": "refs/operator-reference-citations.png",
+      "sizeBytes": 64202,
+      "sha256": "afc2c76ddb7b95f06959e89e57daf039fa9ed43969a3624e7ad5b7de029362db",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v6-product-story/refs/operator-reference-citations.png"
+    },
+    {
+      "path": "review/anam-revops-product-story-square-v6.png",
+      "sizeBytes": 121417,
+      "sha256": "e618ce268946bd9600128811e2add20e0aaf982bc36eeb5d4b7701644793ca1c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v6-product-story/review/anam-revops-product-story-square-v6.png"
+    },
+    {
+      "path": "source/anam-revops-product-story-master-v6.png",
+      "sizeBytes": 175475,
+      "sha256": "ee2574cba8bf7442c963883ac37b69a6328d5cc48ec3858d54fcb3d1d77f61ec",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-17_anam-revops-cover-v6-product-story/source/anam-revops-product-story-master-v6.png"
+    }
+  ]
+}

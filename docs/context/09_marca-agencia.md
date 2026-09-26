@@ -270,6 +270,18 @@ ICO y el ecosistema de producto no son solo operaciones — son **experiencia de
 *Última verificación de drift contra runtime: 2026-07-23 — doctrina de autoría Creative Studio reconciliada con
 el business model V1.1; sin claims de runtime hardcodeados.*
 
+## Línea gráfica: «La órbita»
+
+Desde el 2026-09-25 la marca propia de Efeonce tiene una forma canónica además del logo: **la órbita** (anillo fino,
+arco con esfera en la punta y halo), extraída del propio isotipo. Rodea, **mide** (el arco es avance real: sin dato no
+hay arco) y enfoca (la lente sobre una foto del lenguaje fotográfico). Es la misma forma para Efeonce, Globe, Wave y
+Reach —cambia sólo el acento— y aplica a redes, decks, informes, oficina, merch, eventos, papelería y firma de mail;
+**no** a la UI de Greenhouse ni al trabajo de clientes. Reglas duras: ningún texto cruza la órbita, la URL va en su
+burbuja oficial y una sola órbita o lente por pieza. Hasta correr la prueba de atribución sin logo es un sistema
+consistente, no un activo distintivo demostrado. Manual y valores:
+[`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · tokens
+`efeonceGraphicLine` de AXIS · [índice de la carpeta](../operations/brand-graphic-line/README.md).
+
 ## Identidad en informes
 
 Todos los informes de Efeonce aplican el [estándar de marca y entrega](../operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md): pie institucional, URL bubble oficial, contacto, logos de Efeonce y del cliente cuando corresponda, tipografías de marca y gráficos con evidencia. Los valores se resuelven desde sus fuentes canónicas, sin duplicarlos en este contexto.

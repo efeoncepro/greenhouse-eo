@@ -1,6 +1,6 @@
 ---
 name: efeonce-insights
-description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
+description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 code complete behind a flag that is OFF, premium catalogs TASK-1889 code complete 2026-09-25, not pushed, rollout pending), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
 ---
 
 # Efeonce Insights (living skill)
@@ -46,7 +46,9 @@ it without repeating what already cost a day*. It grows with every task: see the
   `commands/index.ts` loads) validates only outputs `completed` with an asset for the SAME audience as the
   edition; a missing one is `not_ready` with `missing`. Ecosystem/MCP actors never issue nor withdraw.
 - **Durable rendering is asynchronous and fail-closed** (`render/**`): only `INSIGHT_RENDERABLE_OUTPUTS`
-  (today `deck_pdf`) can be queued; another target is `render_rejected`, never "for later". The mapper NEVER
+  (`deck_pdf` → catalog `insights-deck`, `report_pdf` → `insights-report`, per `INSIGHT_RENDER_CATALOG_BY_OUTPUT`; both in
+  production since release `ebb9212a32ce`, 2026-09-24) can be queued; another target (`web`) is `render_rejected`, never
+  "for later". A render request whose outputs already exist answers `200 idempotent:true` with the previous run. The mapper NEVER
   truncates a figure or a claim to fit a slot (it rejects with the cause). Lease and fencing ship together:
   finalization presents the `fence_token` or writes nothing. `INSIGHTS_RENDER_ENABLED` is read in THREE runtimes
   (Vercel to queue, the `ops-worker` dispatcher that launches the Job, the `artifact-worker` Job to claim) and must
@@ -65,16 +67,26 @@ it without repeating what already cost a day*. It grows with every task: see the
   before `vercel env add` does not see the variable: redeploy.
 - **Share links (TASK-1848): the bearer is never persisted** — not even encrypted; only its sha256 digest. It is
   returned once on create and lives only in memory during an email send. A lost link is revoked and replaced, never
-  recovered. Revoking works with the flag OFF and never reactivates; withdrawing an edition revokes its live grants.
+  recovered. Only ISSUED client editions; TTL 1–90 days (default 30); max 20 active links per edition (429
+  `quota_exceeded`). Revoking works with the flag OFF and never reactivates; withdrawing an edition revokes its live
+  grants (`edition_withdrawn`). The access log is not proof of reading.
 - **The public reader is anti-oracle and uncacheable**: `404` for unknown/malformed/expired/flag OFF/suspended org/
   retired module (indistinguishable), `410` revoked or withdrawn, `429` rate limit that FAILS CLOSED, and always
   `Cache-Control: private, no-store` + `noindex`. Never copy the Grader's link (token in clear, `public, max-age=300`).
+  Think consumes it server-side as `InsightWebModelV1` (`modelVersion '1.0'`, client-facing projection only). NEVER
+  probe its limits with concurrent bursts: the DB-backed limiter spends a connection before rejecting (ISSUE-174).
 - **Email delivery and schedule writes are App lane only, human internal actor** (capabilities without `own`: a
   client never sends). Ecosystem lane and MCP only read deliveries and schedules; MCP never sends email.
 - **Schedules never issue nor send**: `review_policy = 'draft_for_review'` (DB CHECK); each occurrence creates the
   edition and requests its render, then stops at `ready_for_review`. A revoked authority or missing module pauses it.
 - **An `ambiguous` delivery is reconciled against the email ledger, never resent blindly**; a definitive failure
   revokes its grant and a retry issues a new one with a per-attempt correlation (`…:aN`). Accepted ≠ delivered ≠ read.
+  The link email uses the token-sensitive EmailType: its grant is issued in the same transaction that claims the
+  `email_deliveries` row. EmailTypes are seeded OFF (the config table fails open without a row).
+- **TASK-1848 state (2026-09-18):** in production since release `bda1cf2cd938` with sharing/delivery/schedules flags
+  OFF there (ON in staging) until the Think reader (TASK-1875) exists. Gateway `efeonce-mcp` 1.7.0 federates the 7 tools
+  (58 total): share create/revoke require `efeonce.mcp.insights.write` (no client carries it ⇒ fail-closed), the 5
+  reads use the base scope; sending email and scheduling do not exist over MCP.
 - **Figures are never invented, never "0" when absent.** `no_data`, `unsupported_window`,
   `insufficient_data` are rejections recorded in the snapshot and shown as limits in the plan. The AI
   author only rewrites validated text; if a figure changes, the deterministic plan wins.
@@ -88,7 +100,21 @@ it without repeating what already cost a day*. It grows with every task: see the
 ## Routing
 
 - Rendering, PDF/deck, Artifact Worker → `references/program-ledger.md` § TASK-1846 + `artifact-composer` docs; Proposal stays a compatible consumer adapter (behaviour untouched).
-- Charts/catalogs → `dataviz-design` + `deck-studio` + TASK-1847.
+- Charts/catalogs → `dataviz-design` + `deck-studio` + TASK-1847 (v1 catalogs, what production serves today).
+  Contract changes (15 chart families, per-figure reading, `channelId`, sealed cover) → TASK-1888 (code complete
+  2026-09-25 behind `INSIGHTS_EDITORIAL_V2_ENABLED`, OFF; see `references/contracts.md` § Editorial contract v2). Premium A4/deck templates → TASK-1889 (code complete 2026-09-25 in local `develop`, not pushed; see
+  `references/contracts.md` § Render contract of the premium catalogs and `references/operations.md` § TASK-1889) with the approved direction
+  `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`, its wireframe and its fidelity
+  contract (41 reference pages in `…/TASK-1889-efeonce-insights-premium-catalogs/paginas/`, `pixelmatch` 0.1, ≤ 1 % of
+  differing pixels per page). **The approved canvas is built but not deployed:** until TASK-1889 releases with
+  `INSIGHTS_EDITORIAL_V2_ENABLED`, every report comes out with the v1 design — never describe the redesign as live.
+- Brand graphic line «La órbita» (canonical for the Efeonce brand since 2026-09-25; manual
+  `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md`, operational reference
+  [`graphic-line-orbit.md`](../efeonce-brand-studio/references/graphic-line-orbit.md)): the orbit was born in the
+  Insights covers (`insights-report/report-cover*.html`, `report-back-cover.html`), and the brand canvas tested it
+  over Insights as boards **P-01 (A4 report)** and **P-02 (plan/deck)**. That is a **canvas proposal, not adopted**:
+  it is not implemented in the runtime catalogs (those are governed by TASK-1889). Never describe P-01/P-02 as the
+  Insights design, and never add the orbit to a catalog outside that task.
 - Sharing/email/schedules → `resend-email-platform`, `greenhouse-email` + TASK-1848.
 - Portal UI → `greenhouse-ux` + `greenhouse-ai-design-studio` + TASK-1849 (Composition Shell, GVC).
 - Shared web render → `efeonce-think` repo + `astro` skill + TASK-1875 (headless model, token server-side).
@@ -98,7 +124,7 @@ it without repeating what already cost a day*. It grows with every task: see the
 
 ## Skill Maintenance Contract (binding for every EPIC-045 task and every session that builds Insights)
 
-A task of EPIC-045 (TASK-1846, 1847, 1848, 1849, 1875 and any future child) is **not closable** until
+A task of EPIC-045 (TASK-1846, 1847, 1848, 1849, 1875, 1888, 1889 and any future child) is **not closable** until
 this skill reflects what it built. At closure, in the same commit as the task's lifecycle change:
 
 1. `references/program-ledger.md`: fill your task's row and section — what exists, commits/SHAs,
@@ -132,4 +158,6 @@ own this contract; the `.codex/` mirror is the same file, so edit `.claude/` and
 - Live: `pnpm test:live` for `stores.live.test.ts` (org isolation, triggers, code sequence).
 - Runtime: the canaries in `references/operations.md` against staging and production, per lane, with
   the synthetic organization; a deny (404) on an organization without the module is part of every canary.
+- Catalogs: `pnpm composer:visual-gate --catalog=insights` (scoped; never re-freeze `deck-axis`/SKY frames) and a real
+  PDF opened page by page — a render canary needs an organization with data, not the sandbox (see `operations.md`).
 - Docs: `pnpm task:lint`, `pnpm docs:context-check:strict`, `pnpm skills:mirrors`, `pnpm mcp:skills:check`.

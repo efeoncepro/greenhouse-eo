@@ -1,0 +1,56 @@
+[
+  {
+    "key": "instagram-efeonce",
+    "kind": "video",
+    "http": 200,
+    "mime": "video/mp4",
+    "bytes": 38589225,
+    "sha256": "2800c93815414fe9d7b22d037726cc8eae2474925835a07d5d81db8015c59136",
+    "identicalToApprovedFile": true
+  },
+  {
+    "key": "instagram-efeonce",
+    "kind": "cover",
+    "http": 200,
+    "mime": "image/png",
+    "bytes": 2739216,
+    "sha256": "0c6231629a20c719a09dd847fbe1624fb64913dd5b78aadbea97f14269ea69c4",
+    "identicalToApprovedFile": true
+  },
+  {
+    "key": "linkedin-efeonce",
+    "kind": "video",
+    "http": 200,
+    "mime": "video/mp4",
+    "bytes": 38589225,
+    "sha256": "2800c93815414fe9d7b22d037726cc8eae2474925835a07d5d81db8015c59136",
+    "identicalToApprovedFile": true
+  },
+  {
+    "key": "linkedin-efeonce",
+    "kind": "cover",
+    "http": 200,
+    "mime": "image/png",
+    "bytes": 2739216,
+    "sha256": "0c6231629a20c719a09dd847fbe1624fb64913dd5b78aadbea97f14269ea69c4",
+    "identicalToApprovedFile": true
+  },
+  {
+    "key": "linkedin-julio",
+    "kind": "video",
+    "http": 200,
+    "mime": "video/mp4",
+    "bytes": 38589225,
+    "sha256": "2800c93815414fe9d7b22d037726cc8eae2474925835a07d5d81db8015c59136",
+    "identicalToApprovedFile": true
+  },
+  {
+    "key": "linkedin-julio",
+    "kind": "cover",
+    "http": 200,
+    "mime": "image/png",
+    "bytes": 2739216,
+    "sha256": "0c6231629a20c719a09dd847fbe1624fb64913dd5b78aadbea97f14269ea69c4",
+    "identicalToApprovedFile": true
+  }
+]

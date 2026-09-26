@@ -44,11 +44,29 @@ Cuando el pedido sea para vender, diseñar o entregar el servicio de Efeonce, es
 
 La narrativa de venta es el sistema de autoridad y demanda; Trendjacking, reels, community, Social Search y Run & Gun son capacidades dentro de ese sistema, no sustitutos del posicionamiento.
 
+- 🔴 **Los gadgets de Nexa son identidad, no atrezzo** [operador, 2026-09-21]. Su reloj es un **SMARTWATCH**,
+  nunca analógico, y su equipo es siempre tecnología premium de la **generación vigente**: iPhone, iPad con
+  Pencil, MacBook, AirPods · **DJI Osmo Pocket/Action** y **DJI Mic 3** o lavalier **Rode** para grabar ·
+  **Shure** en podcast · cuerpo **Sony α** o **Canon EOS R**. Encendidos y en uso, **ningún logotipo de
+  tercero legible**, un objeto manda por escena. Canon:
+  [props tecnológicos](../../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md).
+
 ## 1. Cómo se usa esta skill (router)
+
+Para continuar **CMP-003 SKY**, leer primero [CDR-009](../../../docs/campaigns/decisions/CDR-009-cmp003-programacion-organica-octubre-2026.md): video/portada/copies ya programados en IG Efeonce y ambos LinkedIn para el 13, 15 y 16 de octubre de 2026. Fechas, cuentas, IDs y readback en ese registro; no duplicar desde planes de producción históricos.
 
 Para fotohistorias, globos y PDF social, cargar
 [dialogue-carousel-and-document-delivery.md](references/dialogue-carousel-and-document-delivery.md).
-Para Nexa, cargar el inventario enlazado en efeonce/ONEDRIVE_DELIVERY.md antes de generar.
+Para Nexa, cargar el inventario enlazado en efeonce/ONEDRIVE_DELIVERY.md antes de generar. La identidad humana
+fotorrealista aprobada el 2026-09-24 es la familia Avatar A con continuidad de polera gris; sus ocho vistas
+están en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/` y se resuelven por `foto:prompt`.
+Las poses de OneDrive son guías de actuación/cuerpo, no anclas faciales. No reutilizar el set sintético anterior
+como rostro de Nexa.
+Cuando Julio aparezca como vocero o personaje de una pieza, aplicar el mismo preflight de identidad: usar las 11
+referencias aprobadas y los seis ángulos de `ai-generations/2026-09-20_identidad-julio-nexa/`, revisar su
+`refs-aprobadas/MANIFIESTO.json` y seleccionar por `foto:prompt`. No usar el archivo excluido `julio-ap-02.png`
+ni fotos fuente/descartes como anclas. Canon:
+[`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
 
 1. **Clasifica la intención** con el árbol de §2. ¿Es realmente social de ejecución
    profunda, o pertenece a una skill hermana? Si pertenece a otra, carga la skill dueña (§5). Para encargos sociales integrales,
@@ -57,6 +75,9 @@ Para Nexa, cargar el inventario enlazado en efeonce/ONEDRIVE_DELIVERY.md antes d
    Para trendjacking, seasonalities o una pieza social que necesita idea y dirección visual, cargar
    `modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md`. Mantener ownership del resultado hasta mostrar
    la pieza revisada; componer skills y herramientas no equivale a terminar entregando sólo un prompt.
+   Trend de franquicia/lanzamiento: estudio visual con fuentes, IP de terceros y patrón de carrusel con el código
+   del juego en módulo 11 §1–§2 (caso GTA VI 2026-09-19); programación con readback por firma en
+   `references/video-delivery-metricool.md` §3.
 3. **Chequea frescura**: si vas a afirmar algo de la tabla `volátil`/`trimestral` de
    `SOURCES.md`, reverifica primero.
 4. **Si hay que ejecutar** (producir/programar/medir), abre `efeonce/STUDIO_TOOLING.md`
@@ -68,6 +89,7 @@ Para Nexa, cargar el inventario enlazado en efeonce/ONEDRIVE_DELIVERY.md antes d
    `greenhouse-talent-people-operator`.
 5. **Aterriza a Efeonce** si el trabajo es de canales propios o de un cliente internacional:
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`. Globe es un adaptador futuro gated, no una dependencia.
+   Pieza de marca propia Efeonce o de su familia (nunca cliente): aplica la línea gráfica «La órbita» ([referencia operativa](../efeonce-brand-studio/references/graphic-line-orbit.md); reglas de redes en `efeonce/EFEONCE_OVERLAY.md` §Marca).
 6. **Cierra con el resultado solicitado**: artefacto de `templates/` en ejecución, pieza si se encargó producción,
    o explicación si sólo se pidió comprender/evaluar. No inventar un entregable para una pregunta.
    Para seasonalities, metáforas visuales y planificación anticipada de canales propios,
@@ -304,3 +326,80 @@ Para elegir **video o estático** en una seasonality, aplicar
 `efeonce/SEASONAL_CONTENT.md` → «Elegir video o estático por el mecanismo creativo»: transformación temporal
 frente a asociación inmediata, funciones complementarias y evaluación comparable sin promesas de rendimiento.
 El criterio de formato es transferible; el ejemplo y los activos Efeonce no se trasladan a otras marcas.
+
+## Paid Media: zonas seguras y handoff completo
+
+Cargar `docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md`, §Zonas seguras, al adaptar o
+cerrar anuncios. Declarar placement además de ratio; proteger texto, CTA y cursor de la UI.
+La firma cierra al pie sobre lecho físico: no elevarla al centro para aprobar un gate. Medirla por separado,
+declarar cualquier solapamiento posible y revisar el placement; nunca resolverlo con scrim.
+Entregar concepto, audiencia, fase del embudo, hipótesis, progreso, CTA/destino y KPI junto con prompts,
+referencias, editables, comandos/dependencias y QA. Promover a Finales según autorización del operador;
+conservar pilotos y separar final creativo de tráfico/publicación y de resultados medidos.
+
+## Paid Media: ratio, placement y entrega reproducible
+
+Aplicar el [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md): cuatro ratios por KV salvo exclusión, foto y copy recompuestos, archivo local en Recursos/Pilotos/Finales y matriz por versión. Distinguir foto/reserva, safe zone de UI y criterio editorial de firma. No certificar Reels por una máscara local; registrar la excepción de firma al pie y verificar el placement real. No convertir PNG 9:16 en Video Ad por nombre. El lecho físico no debe crecer para reemplazar una zona de interfaz. Prompts, referencias, edición, embudo y comandos acompañan cada export.
+
+## Dominante de un ad: crea interés, no maneja objeciones
+
+Canon: [CDR-005 · el embudo se ordena por momento y por acción encadenada](../../../docs/campaigns/decisions/CDR-005-cmp001-embudo-momento-y-accion.md);
+el craft verbal completo lo tiene `copywriting` → «Craft del dominante en un ad».
+
+🔴 **Un ad crea interés; no maneja objeciones** (§5b, el mismo error medido dos veces en CMP-001). Las
+respuestas honestas que construyen confianza **en una conversación de venta** —cuando el prospecto ya tiene
+interés y pregunta si le inflas el caso— puestas como titular en un feed **minimizan la categoría y regalan la
+venta**. En el ad va el dato que abre los ojos; en la reunión, el que matiza. ✅ Prueba antes de aprobar un
+dominante: *¿este número le da más urgencia al lector, o se la quita?* Si se la quita, por verdadero que sea,
+no va.
+
+🔴 **Un dato sin referente no es un dato.** Un porcentaje suelto no dice si es tráfico, ventas o presupuesto:
+magnitud + **de qué** en el dominante, **en qué condición** en el puente. En una tanda, cada pieza necesita su
+propio referente — mismo referente con signo opuesto se lee como contradicción.
+
+🔴 **El tamaño del momento manda sobre su urgencia** (§6). Un momento que le ocurre a poca gente paga
+impresiones a una audiencia que casi no existe, por urgente que sea para quien lo vive. ✅ Prueba: *¿cuánta
+gente del segmento está en ese momento hoy?* Si exige una condición agendada, sirve para outbound o nurture,
+no para paid.
+
+**Revisar la tanda, no sólo la pieza:** un tic de construcción —siete dominantes seguidos escritos como
+negación— sólo se ve leyendo la serie completa de corrido, nunca pieza por pieza. Y en continuidad, «mismo
+mundo, otro ángulo» **no es «misma escena»**: repetir la escena es refrito (§1–2).
+
+## Campañas — el brief manda
+
+🔴 **Si la pieza pertenece a una campaña, lee su `BRIEF.md` ANTES de producir.** Vive en OneDrive
+`Alineación/2. Campañas/CMP-###_…`. Gobierna **la promesa, lo que NO se promete, la audiencia y su job, el
+vocabulario permitido, los destinos, la medición y los límites de uso** — y lo hace **igual para todos los
+canales**, porque una campaña la ejecutan varios agentes en varias sesiones y sin fuente única **diverge sin
+que nadie lo note**.
+
+- **Los assets van a la carpeta de su canal**, nunca a la de campaña; la campaña los referencia por ruta en
+  su `ASSETS.md`, donde hay que **registrar la fila** al sumar una pieza.
+- Si tu pieza necesita una promesa que el brief no tiene, **el brief se actualiza primero** (con el operador).
+- Un brief **crece con aportes de varios agentes**: léelo de nuevo antes de producir, **no de memoria**.
+
+Canon: `docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md`.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+Derivar piezas desde el brief vigente sin trasladar permisos entre orgánico y paid. Medio/placement/ratio se
+verifican por plataforma; cada archivo vive en canal y se indexa con versión y fecha. Programado/publicado se
+reportan con evidencia propia, no por existir en Finales. No crear hook rate temporal para estáticos.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+Distinguir programación orgánica de paid: descubrir capacidad real del MCP antes de operar. El ad usa su copy_id/canal/placement y URL con UTM; no convertir copy pagado en post orgánico, ni duplicar anuncios al reintentar sin lectura de estado.
+
+
+## Lanzamiento del grader y programación aprobada
+
+Para programar lanzamientos con menciones y videos reutilizados de paid, aplicar [video-delivery-metricool](references/video-delivery-metricool.md). Conservar texto aprobado, identidad por red, destino y readback por ID; PENDING no significa publicado.
+
+### Programación activa CMP-001 + CMP-002 · 24/09/2026
+
+Antes de modificar, duplicar o reportar como publicados los posts orgánicos AEO/HubSpot del set 4:5, consulta el [registro de programación en Metricool](../../../docs/operations/social/2026-09-24-cmp001-cmp002-organic-programming.md) y verifica el estado actual por ID. El registro confirma 28 posts programados para LinkedIn e Instagram de Efeonce y LinkedIn personal de Julio Reyes, con publicaciones entre el 28/09 y el 18/11/2026. `PENDING` significa programado, no publicado; el registro no autoriza pauta.

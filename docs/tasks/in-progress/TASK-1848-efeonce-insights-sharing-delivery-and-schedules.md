@@ -1,5 +1,11 @@
 # TASK-1848 — Efeonce Insights: acceso compartido, correo y recurrencia gobernados
 
+## Delta 2026-09-18 — producción
+
+- **Release `bda1cf2cd938`** (PR #238 squash, orquestador `35349506106`, manifest `released` 13:41Z, sin retry; `bypass_preflight_reason` por `db_migrations` ya aplicadas + marker `[release-coupled]` auth_access/cloud_release). Vercel READY, 6 workers Cloud Run en `bda1cf2cd938`, Azure `no_infra_diff`, post-release health verde.
+- **Flags en producción OFF** (`INSIGHTS_SHARING/DELIVERY/SCHEDULES_ENABLED`; emisión OFF): el lector de Think (TASK-1875) no existe. Canary de contrato secuencial en producción: crear enlace ⇒ `503 sharing_disabled` (sólo el código nuevo produce ese código), listas de shares/deliveries/schedules ⇒ 200 con las filas sintéticas del canary de staging (instancia única), lector público con token inexistente ⇒ 404, sin token ⇒ 401.
+- **Gateway `efeonce-mcp` 1.7.0** (PR #16 `4c9d7c44`, deploy `35351850324`, revisión `00055-gk6` al 100 %, front door 200/200/401).
+
 ## Delta 2026-09-15
 
 - **Decisión del operador (ADR delta 2026-09-15):** la vista web compartida se renderiza en `efeonce-think` (`think.efeoncepro.com/insights/r/<token>`, patrón headless del Grader). Esta task expone el resolver público por token (`GET /api/public/insights/shared/[token]` → `InsightWebModelV1`, proyección client-facing versionada del plan + snapshot) y el proxy de descarga con chequeo de revocación; Think resuelve por request, sin pre-render ni cache. Arquitectura §8. El render es **TASK-1875** (bloqueada por esta task): el correo con ShareGrant enlaza a `think.efeoncepro.com/insights/r/<token>`; el contrato de respuesta esperado por 1875 está en su `## Detailed Spec` (200/404/410/429 + `downloads[]` con `available|unavailable`).
@@ -28,7 +34,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-045`
-- Status real: `Staging verificado (canary sintético completo); pendiente gateway efeonce-mcp y producción`
+- Status real: `En producción 2026-09-18 con flags OFF (release bda1cf2cd938) + gateway efeonce-mcp 1.7.0 federado; abierto por criterios de canales in-app/Teams, ruta de portal (TASK-1849), lector público en Think (TASK-1875) y ISSUE-174 (TASK-1876)`
 - Rank: `TBD`
 - Domain: `platform|identity|ops|data`
 - Blocked by: `none`
@@ -222,8 +228,9 @@ concurrentes agotó casi las conexiones de la instancia compartida por 5 min ⇒
 `pnpm hiring:email-type` y apagados al terminar): `share_link` y `attachment` → ambos `accepted` al primer intento, fila
 `sent` con `resend_id`, asunto del enlace redactado, sin bearer persistido, grant `source=delivery` (7 días). Retiro de la
 edición: enlace B 200 → 410 y grants vivos (manual + delivery) revocados `edition_withdrawn`. `provider_status`
-(entregado) no se pudo leer: el ciclo de vida de Resend no opera (`ISSUE-160`); la entrega la confirma el operador en su
-bandeja. **Pendiente fuera de la frontera acordada:** federación en `efeonce-mcp`, producción (flags + release).
+(entregado) no se pudo leer: el ciclo de vida de Resend no opera (`ISSUE-160`); **el operador confirmó 2026-09-18 que los
+dos correos (enlace `idlv-5be5306b…` y adjunto `idlv-0ee709e7…`) llegaron a su bandeja** — evidencia humana, no de
+ledger. Federación en `efeonce-mcp` y release a producción: cerrados el mismo día (ver Delta 2026-09-18).
 
 **Slices:** 1 grants + reader público + web model + redacción + proxy · 2 intents/recipients + EmailTypes + projection
 + reconciliación + in-app · 3 schedules + tick `ops-worker` + período relativo · 4 conformance, docs, skill, staging.
@@ -333,7 +340,7 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - [x] Email usa sendEmail, email_deliveries, type/config y context resolver canónicos; accepted/delivered/bounced/failed son distintos y apertura no identifica persona. — Verificado: `claimTokenSensitiveEmailIntent` + `sendEmail`, EmailTypes sembrados apagados, `transportStatus` desde `email_deliveries` (aceptado ≠ entregado, sin «leído»).
 - [x] Dedupe, timeout ambiguo, reintento y webhook duplicado no provocan otro correo sin reconciliación; retiro pausa intents pendientes. — Verificado: dedupe por índice parcial (live), ambiguo sin reenvío + reconciliación por intento exacto, retiro cancela pendientes (`delivery.test.ts`, `commands.test.ts`).
 - [x] Schedule resuelve período cerrado/zona/consolidación, doble tick produce una ocurrencia, catch-up acotado y revoke de autoridad lo pausa. — Verificado: `resolveClosedInsightPeriods` (DST/bisiesto/semana ISO), ocurrencia única ante doble tick y claim único (`schedules.live.test.ts`), catch-up acotado y pausa por autoridad revocada (`schedules.test.ts`).
-- [ ] API/MCP ejercitan mismos permisos y errores; write scopes por consentimiento preciso, sin ampliar cliente base-only. — **Abierto:** lanes con la misma tabla de errores; las tools no están federadas en el gateway (fuera de la sesión).
+- [x] API/MCP ejercitan mismos permisos y errores; write scopes por consentimiento preciso, sin ampliar cliente base-only. — Verificado 2026-09-18: gateway `efeonce-mcp` 1.7.0 (PR #16, revisión `efeonce-mcp-gateway-00055-gk6`, 58 tools) federa las 7 tools con la misma tabla de errores (503 `*_disabled` ⇒ `policy_blocked`, 429 `quota_exceeded` ⇒ `rate_limited`, 404 anti-oráculo); crear/revocar enlace exigen `efeonce.mcp.insights.write`, que ningún cliente porta (403 challenge; el cliente base-only no se amplió); canary del provider contra producción verde (schedules 1, shares 3, deliveries 3).
 - [x] Retención/cleanup y rate limits verificados; rollout por sharing/delivery/schedules con gates OFF, inbox sintético autorizado y rollback ejercitado; integración SEO especializada sigue en TASK-1673. — Verificado en staging 2026-09-18: tick real con `retention` ejecutada, rate limit 60/min por grant con 429 + `Retry-After`, flags por lane (Vercel staging) con default OFF en producción, buzón autorizado por el operador, rollback ejercitado en el kill switch del EmailType (on→off) y en schedules (pause/retire); el rollback por flag de Vercel está documentado pero no se ejercitó.
 
 ## Verification

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  ReportCoverLightPage — portada blanca del informe A4 (TASK-1889, canvas aprobado 2026-09-25, páginas
+  `Premium-Portada-Clara` y `Premium-Portada-Clara-Creativo`).
+
+  Bloque navy a sangre en el 55 % superior (lockup, período, órbita cortada por el borde y «Qué mide
+  este informe»); en papel, «Lectura de Efeonce», título en navy de marca, bajada, «Preparado para» con
+  el logo del cliente en positivo y el pie.
+
+  Una plantilla, dos variantes decididas por el DATO: con canales medidos (`channels`, cada uno con su
+  `channelId`) la órbita lleva un satélite por canal y el arco en degradé; sin canales (p. ej. sólo
+  ICO), arco corto con punto. Los satélites los ubica el layout hook del catálogo sobre el anillo.
+  La portada la elige la portada sellada por TASK-1888 (`plan.cover.theme = light`); el catálogo nunca.
+-->
+<link rel="stylesheet" href="report-tokens.css" />
+<link rel="stylesheet" href="report-fonts.css" />
+<link rel="stylesheet" href="report-editorial.css" />
+<style>
+  .light-cover { background: var(--axis-report-role-navyInk); color: var(--axis-report-role-paperInk); }
+
+  .block { position: absolute; left: 0; top: 0; width: 794px; height: 600px; background: var(--axis-report-role-navy); overflow: hidden; }
+
+  .block .halo-stop { stop-color: var(--axis-report-role-navyAccent); }
+
+  .ring { fill: none; stroke: var(--axis-report-role-halo); stroke-width: 1; }
+
+  .arc-stop { stop-color: var(--axis-report-role-navyAccent); }
+
+  .arc { fill: none; stroke-width: 2; stroke-linecap: round; }
+
+  .arc--channels { stroke: url(#lightCoverArc); }
+
+  .arc--plain { stroke: var(--axis-report-role-navyAccent); }
+
+  .dot { fill: var(--axis-report-role-navyAccent); }
+
+  .dot-ring { fill: none; stroke: var(--axis-report-role-navyAccent); stroke-opacity: 0.4; }
+
+  /* Variante por dato: con satélites, arco largo en degradé; sin ellos, arco corto con punto. */
+  .orbit--plain { display: none; }
+
+  .light-cover:not(:has(.satellite .channel-disc)) .orbit--channels { display: none; }
+
+  .light-cover:not(:has(.satellite .channel-disc)) .orbit--plain { display: inline; }
+
+  .satellites:empty { display: none; }
+
+  .satellite { position: absolute; width: 30px; height: 30px; }
+
+  .satellite .channel-disc {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--axis-report-role-navyInk);
+    box-shadow: 0 0 0 4px rgba(var(--axis-report-role-navyAccent-rgb), 0.16), 0 6px 18px rgba(var(--axis-report-role-shadowNavy-rgb), 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .satellite img { width: 18px; height: 18px; display: block; object-fit: contain; }
+
+  .block-body { position: relative; height: 600px; padding: 60px 68px 50px; display: flex; flex-direction: column; color: var(--axis-report-role-navyInk); }
+
+  .block-head { display: flex; justify-content: space-between; align-items: center; }
+
+  .scope-label {
+    font-family: var(--axis-report-type-display);
+    font-size: 8.5px;
+    font-weight: 500;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--axis-report-role-navyAccent);
+  }
+
+  .scope-lines { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+
+  /* 230 px: el texto nunca cruza el arco ni el primer satélite (x ≥ 307). */
+  .scope-line { max-width: 230px; font-size: 12px; line-height: 1.5; color: var(--axis-report-role-navyMuted); text-wrap: balance; }
+
+  .paper-half { position: absolute; left: 0; top: 600px; width: 794px; height: 523px; padding: 50px 68px 56px; display: flex; flex-direction: column; }
+
+  .light-title {
+    margin: 18px 0 0;
+    font-family: var(--axis-report-type-display);
+    font-size: 58px;
+    line-height: 1.05;
+    font-weight: 600;
+    letter-spacing: -0.026em;
+    color: var(--axis-report-role-paperAccent);
+  }
+
+  .light-subtitle { margin: 20px 0 0; font-size: 15px; line-height: 1.62; color: rgba(var(--axis-report-role-paperAccent-rgb), 0.82); }
+
+  /* «Preparado para»: la caja del logo existe siempre (la página no se mueve con o sin cliente). */
+  .prepared-row { min-height: 56px; display: flex; align-items: center; gap: 22px; }
+
+  .prepared-row:empty { visibility: hidden; }
+
+  .prepared-label {
+    font-family: var(--axis-report-type-display);
+    font-size: 8.5px;
+    font-weight: 500;
+    letter-spacing: 0.26em;
+    line-height: 1.75;
+    text-transform: uppercase;
+    color: var(--axis-report-role-labelMuted);
+    max-width: 70px;
+  }
+
+  .prepared-divider { width: 1px; height: 48px; background: var(--axis-report-role-rule); }
+
+  .client-mark { width: 200px; height: 56px; display: flex; align-items: center; }
+
+  .client-mark img { max-width: 200px; max-height: 56px; display: block; object-fit: contain; }
+
+  .client-mark:has(img) .client-name { display: none; }
+
+  .client-name { font-family: var(--axis-report-type-display); font-size: 15px; font-weight: 600; color: var(--axis-report-role-paperInk); }
+
+  .light-foot { margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--axis-report-role-rule); display: flex; justify-content: space-between; align-items: center; }
+
+  .light-foot .confidential { font-size: 9.5px; letter-spacing: 0.05em; font-variant-numeric: tabular-nums; color: var(--axis-report-role-labelMuted); }
+
+  .light-foot .slogan { font-size: 15px; letter-spacing: -0.005em; color: var(--axis-report-role-paperAccent); }
+</style>
+</head>
+<body>
+  <div class="sheet light-cover">
+    <div class="block">
+      <svg class="art" width="794" height="600" viewBox="0 0 794 600" aria-hidden="true">
+        <defs>
+          <radialGradient id="lightCoverHalo" cx="572" cy="404" r="420" gradientUnits="userSpaceOnUse">
+            <stop class="halo-stop" offset="0" stop-opacity="0.24"></stop>
+            <stop class="halo-stop" offset="0.55" stop-opacity="0.06"></stop>
+            <stop class="halo-stop" offset="1" stop-opacity="0"></stop>
+          </radialGradient>
+          <linearGradient id="lightCoverArc" x1="322.8" y1="470.8" x2="720.0" y2="192.7" gradientUnits="userSpaceOnUse">
+            <stop class="arc-stop" offset="0" stop-opacity="0.15"></stop>
+            <stop class="arc-stop" offset="1" stop-opacity="1"></stop>
+          </linearGradient>
+        </defs>
+        <rect width="794" height="600" fill="url(#lightCoverHalo)"></rect>
+        <circle class="ring" cx="572" cy="404" r="258" stroke-opacity="0.22"></circle>
+        <circle class="ring" cx="572" cy="404" r="186" stroke-opacity="0.11"></circle>
+        <circle class="ring" cx="572" cy="404" r="114" stroke-opacity="0.06"></circle>
+        <g class="orbit--channels"><path class="arc arc--channels" d="M 322.8 470.8 A 258 258 0 0 1 720.0 192.7"></path></g>
+        <g class="orbit--plain">
+          <path class="arc arc--plain" d="M 326.6 324.3 A 258 258 0 0 1 467.1 168.3"></path>
+          <circle class="dot" cx="467.1" cy="168.3" r="4"></circle>
+          <circle class="dot-ring" cx="467.1" cy="168.3" r="9"></circle>
+        </g>
+      </svg>
+      <div class="satellites" data-slot="channels" role="list" aria-label="Canales medidos"><span class="satellite" role="listitem"><span class="channel-disc"><img data-slot-field="channelId" src="assets/channels/google.svg" alt="" /></span></span></div>
+      <div class="block-body">
+        <div class="block-head">
+          <div class="brand-lockup">
+            <img class="brand-logo" src="assets/brand/logo-negative.svg" alt="Efeonce" />
+            <span class="brand-divider"></span>
+            <span class="brand-product">Insights</span>
+          </div>
+          <span class="kicker kicker--navy" data-slot="editionLabel">Informe mensual · Agosto 2026</span>
+        </div>
+        <div class="grow"></div>
+        <span class="scope-label" data-slot="scopeLabel">Qué mide este informe</span>
+        <div class="scope-lines" data-slot="scopeLines"><span class="scope-line">Visibilidad en Google, ChatGPT, Gemini, Claude y Perplexity</span></div>
+      </div>
+    </div>
+
+    <div class="paper-half">
+      <span class="eyebrow eyebrow--paper"><span class="eyebrow-rule"></span><span data-slot="eyebrow">Lectura de Efeonce</span></span>
+      <h1 class="light-title" data-slot="reportTitle">Visibilidad, respuestas de IA y entrega</h1>
+      <p class="light-subtitle" data-slot="reportSubtitle">Qué cambió en agosto, por qué cambió y qué haremos en septiembre.</p>
+      <div class="grow"></div>
+      <div class="prepared-row" data-slot="preparedFor">
+        <span class="prepared-label" data-slot-field="label">Preparado para</span>
+        <span class="prepared-divider"></span>
+        <span class="client-mark"><img data-slot-field="logo" src="assets/url-lum.svg" alt="" /><span class="client-name" data-slot-field="clientName">Nombre del cliente</span></span>
+      </div>
+      <div class="light-foot">
+        <span class="confidential" data-slot="confidentialityLine">Confidencial · Versión 1 · 2 de septiembre de 2026</span>
+        <span class="slogan" data-brand="slogan"><span class="slogan-empower">Empower</span> <span class="slogan-your">your</span> <span class="slogan-growth">Growth</span></span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

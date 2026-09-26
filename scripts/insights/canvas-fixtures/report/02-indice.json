@@ -1,0 +1,60 @@
+{
+  "reference": null,
+  "name": "indice",
+  "catalog": "report",
+  "contentType": "report-index",
+  "slots": {
+    "runningSection": "Índice",
+    "runningPeriod": "Agosto 2026",
+    "eyebrow": "Contenido",
+    "title": "Índice",
+    "titleColumn": "Sección",
+    "pageColumn": "Pág.",
+    "entries": [
+      {
+        "mark": "R",
+        "title": "Resumen ejecutivo",
+        "folio": "03"
+      },
+      {
+        "mark": "01",
+        "title": "Visibilidad orgánica",
+        "folio": "05"
+      },
+      {
+        "mark": "02",
+        "title": "Motores de respuesta",
+        "folio": "15"
+      },
+      {
+        "mark": "03",
+        "title": "Del clic al negocio",
+        "folio": "19"
+      },
+      {
+        "mark": "C",
+        "title": "Nuestra lectura",
+        "folio": "21"
+      },
+      {
+        "mark": "P",
+        "title": "Plan de septiembre",
+        "folio": "22"
+      },
+      {
+        "mark": "L",
+        "title": "Límites y metodología",
+        "folio": "23"
+      }
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "footerContact": {
+      "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+      "phone": "+56 9 3732 3064"
+    },
+    "folio": {
+      "page": "02",
+      "total": "24"
+    }
+  }
+}

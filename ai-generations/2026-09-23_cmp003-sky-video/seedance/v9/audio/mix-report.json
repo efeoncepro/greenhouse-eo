@@ -1,0 +1,44 @@
+{
+  "status": "Conformed to full native fal render after 361-sample review at 12 fps; timing tolerance one sampled interval (83 ms).",
+  "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v7/audio-clean.wav",
+  "source_sha256": "304d7a9bf1f233a8b8c23a735efd06f08a3a25e37203ef0bdfda1c8f32e737b8",
+  "source_is_separated_v7_music_and_sfx": true,
+  "new_sfx": "Deterministic non-vocal impulses, oscillators and filtered noise",
+  "time_source": [
+    1.65,
+    8.65,
+    9.5,
+    12.65,
+    15.5,
+    18.1,
+    21.0,
+    23.8,
+    25.1,
+    29.708667
+  ],
+  "time_destination": [
+    1.8,
+    8.7,
+    10.0833,
+    13.0417,
+    15.8333,
+    18.5417,
+    21.5,
+    24.3333,
+    26.0,
+    30.0
+  ],
+  "premix_loudness": {
+    "input_i": "-24.16",
+    "input_tp": "-5.19",
+    "input_lra": "14.60",
+    "input_thresh": "-35.37",
+    "output_i": "-18.16",
+    "output_tp": "-1.50",
+    "output_lra": "9.70",
+    "output_thresh": "-28.79",
+    "normalization_type": "dynamic",
+    "target_offset": "2.16"
+  },
+  "silence_first_seconds": 0.2
+}

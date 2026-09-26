@@ -1,5 +1,12 @@
 # Gemini Omni Flash — referencia operativa (Interactions API)
 
+> **Ruta CLI vigente para 1.1 (2026-09-24):** `pnpm ai:omni --help` y
+> `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md`. Este documento conserva evidencia y recetas del
+> `gemini-omni-flash-preview` anterior; sus IDs, límites, superficies de edición y cuerpos de request no son
+> el contrato de 1.1. La CLI Cloud usa `gemini-omni-1.1-flash-preview` y tiene seis modos técnicos probados
+> a 360p, 16:9, 3 s (extensión: 6 s acumulados). La cadena stateful `previous_interaction_id` sigue sin
+> probarse en 1.1. No inferir disponibilidad de Globe de esta CLI.
+
 > **Tipo de documento:** Referencia técnica agent-facing (para operar Gemini Omni sin volver a investigar).
 > **Verificado as-of:** migración a Interactions API **2026-07-20** (`efeonce-globe`, Vertex keyless `global` + Gemini API con key) + edit cross-model / multi-referencia combinada **2026-07-20** (TASK-1490, live-verificado por el seam en ambas superficies); runtime histórico `generateContent` 2026-07-05 + edición persistida Glitch 2026-07-11 (`efeonce-group`, `global`), **ya no vigente**.
 > **Idioma:** es-CL neutro (tuteo).

@@ -79,7 +79,8 @@ Las fichas N1–N4 se intercalan en este recorrido junto a la sección que repre
 1:1 del Paso a Paso y no se mueven a un anexo.
 
 La tarea privada de implementación conserva el schema recomendado: `Article`, `FAQPage`,
-`BreadcrumbList` y `HowTo` cuando el Paso a Paso cumple la estructura visible.
+`BreadcrumbList` y `HowTo` cuando el Paso a Paso cumple la estructura visible. `author` y `publisher` =
+`Organization` «Pinturas Berel» (módulo 03, «Autoría y datos estructurados»).
 
 El corte de 4 pasos es el canónico del template actual. Solo se cambia si el cliente/template lo
 pide explícitamente. Son **macropasos de presentación, no sólo cuatro operaciones**. No eliminar

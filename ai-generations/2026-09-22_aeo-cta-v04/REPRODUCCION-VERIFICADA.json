@@ -1,0 +1,69 @@
+{
+  "results": [
+    {
+      "id": "01-fuera-916",
+      "byteIdentical": true
+    },
+    {
+      "id": "01-fuera-169",
+      "byteIdentical": true
+    },
+    {
+      "id": "02-reconoces-916",
+      "byteIdentical": true
+    },
+    {
+      "id": "02-reconoces-169",
+      "byteIdentical": true
+    },
+    {
+      "id": "03-referencia-916",
+      "byteIdentical": true
+    },
+    {
+      "id": "03-referencia-169",
+      "byteIdentical": true
+    },
+    {
+      "id": "04-elegida-916",
+      "byteIdentical": true
+    },
+    {
+      "id": "04-elegida-169",
+      "byteIdentical": true
+    },
+    {
+      "id": "01-fuera-45",
+      "byteIdentical": true
+    },
+    {
+      "id": "01-fuera-11",
+      "byteIdentical": true
+    },
+    {
+      "id": "02-reconoces-45",
+      "byteIdentical": true
+    },
+    {
+      "id": "02-reconoces-11",
+      "byteIdentical": true
+    },
+    {
+      "id": "03-referencia-45",
+      "byteIdentical": true
+    },
+    {
+      "id": "03-referencia-11",
+      "byteIdentical": true
+    },
+    {
+      "id": "04-elegida-45",
+      "byteIdentical": true
+    },
+    {
+      "id": "04-elegida-11",
+      "byteIdentical": true
+    }
+  ],
+  "passed": 16
+}

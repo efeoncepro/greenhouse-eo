@@ -1,0 +1,14 @@
+{
+  "id": "e5-ausencia-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "ausencia",
+  "escena": "SCENE (Efeonce studio, Santiago, late afternoon, minutes after the working session ended): what remains is the whole method left out in the open — a long dark worktop where printed sheets are laid out in a deliberate ordered row, each one annotated in the margin, left exactly where they were set down; a chair pushed back at an angle; a marker with its cap off. At the far end of the table a monitor sits awake but idle, showing only a still panel of INK-BLUE bars, small in the frame and casting a soft blue light on the wood. Hard low afternoon sun from the left rakes along the row of sheets so the order of them is legible, and stays BELOW the middle of the frame: it never reaches the wall above. NOBODY is in the picture. Above the worktop the plaster wall is one smooth unbroken surface in deep shadow, with nothing on it and no window, no lamp and no bright spot anywhere in it. 35mm lens at f/2.8.",
+  "reservas": {
+    "texto": { "muro": "the smooth plaster studio wall above the worktop", "tinta": "blanca" }
+  },
+  "lecho": {
+    "objeto": "the matte-black back of a monitor standing in the immediate foreground, its dark body running unbroken across the whole width of the frame",
+    "tono": "DARK matte-black monitor shell in deep shadow, its fine texture still faintly visible, completely outside the light"
+  }
+}

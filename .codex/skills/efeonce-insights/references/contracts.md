@@ -11,8 +11,8 @@
 | `comparison` | `{kind}` in `none|previous_period|previous_year|custom`; default `previous_period`; `custom` has `start`/`endExclusive` and must not overlap |
 | `audience` | `client` (default) or `internal`; a client actor cannot request `internal` |
 | `locale`, `depth` | `es-CL` (default) / `en-US`; `executive|standard|detailed` (default `standard`) |
-| `outputs` | non-empty subset of `deck_pdf|report_pdf|web` (intent only until TASK-1846) |
-| `brand` | `efeoncePackVersion` (default `axis-current`), `clientBrandRef` optional 1–200 |
+| `outputs` | non-empty subset of `deck_pdf|report_pdf|web`; `deck_pdf` and `report_pdf` render (production since 2026-09-24), `web` is intent only (render ⇒ `render_rejected`) |
+| `brand` | `efeoncePackVersion` (default `axis-current`), `clientBrandRef` optional 1–200 (validated, resolved by nobody today); `coverTheme` optional `auto|dark|light` (TASK-1888): only enters the request when sent, so a request without it keeps the exact pre-1888 `request_hash` (pinned by a test against the old validator) |
 | `policy.allowPartial` | explicit opt-in to visible omissions; without it a module with no evidence fails the edition at `validating` |
 | `idempotencyKey` | optional, 8–200 chars |
 | `title`, `purpose` | optional 3–200 / 3–500; name the report on first creation, ignored on revise |
@@ -52,7 +52,15 @@ Internal bindings must pass `organizationId`; org-scoped bindings read their own
 
 - `POST …/insights/editions/{editionId}/render` body `{ organizationId?, outputs?: InsightOutput[] }` → `202 { run, outputs, idempotent:false }`
   or `200 { …, idempotent:true }` when a live run already covers the targets. Precondition: edition `ready_for_review`
-  with sealed snapshot + frozen plan; `outputs` ⊆ edition outputs and ⊆ `INSIGHT_RENDERABLE_OUTPUTS` (`deck_pdf`).
+  with sealed snapshot + frozen plan; `outputs` ⊆ edition outputs and ⊆ `INSIGHT_RENDERABLE_OUTPUTS` (`deck_pdf`, `report_pdf` since
+  TASK-1847: staging 2026-09-22; production since release `ebb9212a32ce`, 2026-09-24; first productive render verified 2026-09-25). Catalog per output: `deck_pdf` → `insights-deck`, `report_pdf` → `insights-report`.
+- Idempotency per (org, edition, output, audience), verified in `render/commands.ts` 2026-09-25: an output counts as
+  "alive" unless it is `dead_letter` or `cancelled` (so `queued`, `running`, `completed` AND `failed` are alive). If one
+  run's alive outputs cover every requested target ⇒ `200 idempotent:true` with THAT run (a `failed` one is recovered
+  with `retry`, not with a new request). If only part of the targets is alive in another run ⇒ `422 render_rejected`
+  with `details.alive` (never mixes runs). Precondition failure (edition not `ready_for_review`, e.g. already issued) ⇒
+  `not_ready`. `outputs` omitted ⇒ every output the edition declared, so an edition that declared `web` is rejected
+  whole (`details.unsupported`) unless the caller passes the renderable ones; an undeclared output ⇒ `details.outside`.
 - `GET …/insights/editions/{editionId}/render` (paginated runs) · `GET …/insights/render-runs/{renderRunId}` → run DTO
   `{ renderRunId, editionId, audience, requestedOutputs, state, startedAt, finishedAt, cancelledAt, createdAt, outputs[] }`,
   output DTO `{ insightOutputId, output, state, attempts, failureCode, outputAssetId, manifestHash, finishedAt }`.
@@ -72,9 +80,19 @@ Internal bindings must pass `organizationId`; org-scoped bindings read their own
 - Events: `insights.render.requested`, `insights.render.output_completed`, `insights.render.output_failed` (aggregate `insight_render_run`).
 - Port: `assertOutputsValidated(edition)` requires every `edition.outputs` `completed` with asset, same audience → `{ outputs: [{ output, assetId, manifestHash }] }`.
 
+## Evidence rejections — `scope` (TASK-1847, 2026-09-22)
+
+- `EvidenceRejectionV1.scope?: 'current' | 'comparison'` (optional, additive). Absent = the current window (every snapshot
+  sealed before 2026-09-22). Adapters mark what they collected for the comparison window with `asComparisonRejections`;
+  the planner writes it as «<métrica>: en el período anterior, <causa>». Never read a comparison rejection as a gap of the
+  current window.
+- Plan text (limits, methodology, chart titles, units) never carries `metricId`, `method.name`, reader names or the
+  adapter `detail`: it comes from `GH_INSIGHTS` (`metrics`, `sources`, `units`).
+
 ## Sharing, delivery, schedules (TASK-1848) — verified against code 2026-09-18
 
-Code complete, not deployed. Shapes below are the ones in `sharing/`, `delivery/`, `schedules/` and the lanes.
+In production since release `bda1cf2cd938` (2026-09-18) with the lane flags OFF there (ON in staging). Shapes below are
+the ones in `sharing/`, `delivery/`, `schedules/` and the lanes.
 
 ### Share links
 
@@ -133,6 +151,11 @@ Code complete, not deployed. Shapes below are the ones in `sharing/`, `delivery/
   failed without dispatch_unknown ⇒ failed (grant revoked, retryable); pending/dispatch_unknown ⇒ unresolved unless
   `operatorDecision` + `reason`.
 - Email correlation per attempt: `source_event_id` = `idlr-<uuid>` (attempt 1) / `idlr-<uuid>:aN` (N=2..5).
+- `share_link` sends through the token-sensitive EmailType: the ShareGrant (`source=delivery`) is issued in the SAME
+  transaction that claims the `email_deliveries` row (`claimTokenSensitiveEmailIntent`); the bearer lives only in memory
+  for that send. A definitive failure revokes that grant; a retry issues a new one. The attachment EmailType is a separate,
+  non-sensitive type and never carries a ShareGrant in the same email.
+- `accepted` (provider took it) ≠ `delivered` ≠ read; `ambiguous` = outcome unknown, stays unresolved until reconciled.
 
 ### Schedules (App lane only for writes)
 
@@ -159,3 +182,91 @@ Code complete, not deployed. Shapes below are the ones in `sharing/`, `delivery/
 `list_insight_deliveries {organizationId?, editionId}`, `get_insight_delivery {organizationId?, deliveryIntentId}`,
 `list_insight_schedules {organizationId?}`, `get_insight_schedule {organizationId?, scheduleId}`. No MCP tool sends,
 cancels, retries or reconciles email, nor creates/activates/pauses/retires schedules.
+
+Gateway mapping (`efeonce-mcp` 1.7.0, contract `task-1848-v1`): 503 `sharing_disabled|delivery_disabled|schedules_disabled`
+⇒ `policy_blocked`; 429 `quota_exceeded` ⇒ `rate_limited`; 404 anti-oracle preserved; `create_insight_share` /
+`revoke_insight_share` need `efeonce.mcp.insights.write` (no client carries it ⇒ 403 challenge), the 5 reads the base scope.
+
+## Editorial contract v2 (TASK-1888 — code complete 2026-09-25, behind `INSIGHTS_EDITORIAL_V2_ENABLED`, OFF)
+
+Verified against code on 2026-09-25. **Additive**: `specVersion` stays `chart_spec_v1` and `planVersion` stays
+`editorial_plan_v1`; the presence of a v2 field is the signal. A sealed v1 plan/spec validates and composes the same.
+With the flag OFF the adapters return v1 evidence and the planner emits a v1 plan (only the pp correction applies).
+
+- **Chart families (15)** — `contracts/chart-spec.ts`. Series families (`bar`, `bar_grouped`, `bar_stacked`, `line`,
+  `pie`, `donut`, `scatter`) keep `series` + `dimensionLabels`. Data families (`bullet`, `waterfall`, `funnel`, `gauge`,
+  `heatmap`, `waffle`, `venn_two`, `upset`) carry `data` (discriminated by `kind === family`, every number a `factId`)
+  and an empty `series`. New relations: `target`, `decomposition`, `conversion`, `overlap`. Structural validation:
+  `validateChartSpec(spec, knownIds)` (pie/donut ≤ 3 parts = `MAX_COMPOSITION_PARTS`, mirror of the geometry's
+  `MAX_SLICES`; tabular equivalent mandatory; every factId known, references included). Value validation:
+  `validateChartSpecValues(spec, values)` in `editorial/chart-values.ts`, which calls `chart-geometry.ts` (rule codes
+  `geometry_<reason>`, e.g. `geometry_stage_grows`, `geometry_empty_set`). It cannot live in `contracts/`: the
+  composer's `pure` entry pulls Node crypto.
+- **Channels** — `contracts/channels.ts`: `INSIGHT_CHANNEL_IDS` = `google`, `google_ai_overview`, `chatgpt`, `gemini`,
+  `claude`, `perplexity`; `channelForAeoProvider` (`openai→chatgpt`, `anthropic→claude`, `gemini`, `perplexity`,
+  `google_ai_overview`); unknown provider ⇒ field ABSENT (not null). On `EvidenceFactV1.channelId`,
+  `ChartSeriesV1.channelId`, `ChartSpecV1.dimensionChannelIds` (parallel to `dimensionLabels`, null = not a channel) and
+  the channel fields of bullet/waffle/venn/upset data. Rule (2026-09-25): `dimensionChannelIds` ONLY when the dimensions
+  are distinct channels (AEO presence per engine); when the whole chart measures ONE channel (SEO: clicks, impressions…
+  are all Google) the channel goes on `series[].channelId` and the dimensions carry none.
+- **Reference facts** — `EvidenceFactV1.role?: 'measure' | 'reference'` (absent = measure). ICO targets are
+  `role: 'reference'`, metricId `target.{otd|ftr|rpa}`, value from `ICO_METRIC_REGISTRY` (optimal min, or max for
+  lower-is-better), `dimension.direction`; plus `band.{otd|ftr|rpa}` = outer edge of the registry's `attention` zone
+  (attention.min, or max for lower-is-better), cited by each bullet item as optional `bandFactId` (validated: exists,
+  positive, on the not-yet-reached side of the target). They never produce claims, tables or references and never count
+  as module evidence in `validating`. The render draws the band only from that fact — never `target × 0.85`.
+- **Plan (all optional)** — `contracts/plan.ts`: `chapter.opening` (claim), `chapter.readings[]` =
+  `{ chartId, keyFigure?: { factId, value (must equal formatFactValue), caption }, conclusion?, meaning?, nextStep | null }`
+  — the v2 planner ALWAYS emits `conclusion` as a deterministic FINDING (bullet: meets/misses the target of <metric>;
+  bars: the largest change among ≥ 2 comparables, the direction of a single fact, or the highest value; line: the
+  direction from/to), using only numbers the validator already admits (value, target, previous, delta — never
+  «by how much» vs the target). `meaning` only when it adds something (other spaces/series, or the previous period
+  for a bullet); `meaning === conclusion` is rejected (`invalid_field`);
+  `essentials` (≤ `PLAN_ESSENTIALS_MAX` = 5); `scopeLines` (copy, no numbers allowed); `decision`, `measurement`, `ask`
+  (claims; NO deterministic producer); `cover`; actions gain `impact`/`effort` 1–3 and `weeks` `N` or `N-M` (1–4).
+  Every text is a `PlanClaimV1` checked by the same figure rule (`invalid_field` for shape errors).
+- **Cover** — `contracts/cover.ts`: `resolveInsightCover({ requested, organization, logos })` = request (≠ auto) >
+  organization (≠ auto) > auto (navy only with `logoOnDarkAssetId`). `PlanCoverV1 = { theme: dark|light, source:
+  request|organization|auto, logoAssetId, logoVariant: on_dark|default|null }`; dark never carries the default logo
+  (validator enforces). Sealed at composing, never decided at render.
+- **Cover preference API** — `getInsightCoverPreference` (need `cover_preference_read` = `insights.report.read`) →
+  `{ organizationId, coverTheme, isDefault, updatedAt, updatedByActorKind }`; `setInsightCoverPreference({ coverTheme })`
+  (need `cover_preference_manage` = `insights.cover_preference.manage`, Admin + Account) → `{ preference, changed }`;
+  same value ⇒ `changed: false`, no write, no event; invalid value ⇒ 400 `invalid_request`. Event
+  `insights.cover_preference.updated` `{ version: 1, organizationId, coverTheme, previousCoverTheme, actorKind }`.
+  Lanes: `GET|POST /api/platform/{app,ecosystem}/insights/cover-preference` (ecosystem write = internal binding only).
+  MCP: `get_insight_cover_preference` (base scope), `set_insight_cover_preference` (`efeonce.mcp.insights.write`,
+  reused; gateway PR efeonce-mcp#18, 1.9.0 on top of Marketing Studio 1.8.0, contract `task-1888-v1`, not deployed).
+- **Percent deltas** — a metric already in percent varies in pp (`formatDeltaPoints`, «+1,8 pp»; two decimals under
+  0,05 pp). Relative deltas stay for absolute metrics. Sealed plans with the old relative text still validate.
+
+## Render contract of the premium catalogs (TASK-1889 — code complete 2026-09-25, not pushed)
+
+Verified against code on 2026-09-25. Detail: architecture §14.9.
+
+- **Catalogs v2 only** — `insights-report` (A4 794×1123) and `insights-deck` (1280×720). No legacy template may exist
+  (`__tests__/insights-catalogs-v2-only.test.ts`). A v1 plan still composes on the v2 templates.
+- **Family → page** (`render/figure-slots.ts`, shared by both mappers). `bar_grouped` whose dimensions are METRICS →
+  comparison (each metric on its own scale); `bar`, or `bar_grouped` whose dimensions are DISTINCT CHANNELS
+  (`dimensionChannelIds` all non-null and distinct) → columns on one axis; `bullet` → targets; `line` → trend (≤ 3 series
+  by role `primary`/`reference`/`detail`). contentType → template: `report-figure-{comparison,columns,targets,trend}` →
+  `ReportFigure*Page`; `insights-figure-{…}` → `InsightsFigure*Slide`. A family without a page ⇒
+  `InsightsRenderRejectedError` with its cause; a figure without enough facts is NOT emitted (the chapter narrates it).
+- **Capacities** (`FIGURE_CAPACITY`): A4 `metrics 5, groups 6, bulletRows 6`; deck `metrics 4, groups 4, bulletRows 5`;
+  overflow splits with `balancedPages` (7 groups → 4+3).
+- **Figure content** — key figure, conclusion and «Lo que significa / Próximo paso» from `chapter.readings` (TASK-1888);
+  without a reading (v1 plan): first fact + the claim that cites the figure. Only derived number: percent of target
+  (achieved ÷ target, integer).
+- **Targets (`bullet`)** — own scale per row (1.1 × max), target mark, «mayor brecha» decided over all rows and the
+  direction. Attention zone ONLY from `band` = `bandFactId`; without it, a single track. Never a hand-written threshold.
+  `lower_is_better` ⇒ class `bullet--lower` (inverts the dark side).
+- **«Lo esencial»** (`plan.essentials`) — `report-summary` / `insights-summary`: thesis, lede, ≤ 5 essentials (figure =
+  primary fact formatted, title = metric, A4 detail = claim), real folio = first page drawing the fact, else the
+  chapter opening; decision «Para decidir en la reunión» (A4) / «Para decidir» (deck). No essentials ⇒ narrated summary.
+- **Cover** — white (`ReportCoverLightPage`) or navy per `plan.cover`; deck always navy. Client logo travels as the sealed
+  ref `asset-ref:org-logo:<id>` (`render/cover.ts` `orgLogoRef`); bytes arrive through `ComposeOptions.externalAssets`.
+  The worker reads them with `readOrganizationLogoForRender` (only the attached logo of THAT org, image, ≤ 2 MB, access
+  log). No bytes ⇒ fail closed; non-embeddable logo ⇒ `semantic_rejected` (`services/artifact-worker/classify-failure.ts`).
+- **Color** — only `fig-*` classes painted by each catalog; zero HEX in code. `delta-tone` = direction, not judgment.
+- **Composer contract** — `SlotContract.example?` / `SlotFieldContract.example?` (`artifact-composer/contracts.ts`): the
+  visual-gate probe (`synthesize.ts`) uses it verbatim; catalog data, not engine data (runbook `composer-visual-gate.md`).

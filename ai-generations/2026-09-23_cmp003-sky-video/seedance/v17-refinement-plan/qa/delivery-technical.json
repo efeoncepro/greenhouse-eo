@@ -1,0 +1,46 @@
+{
+  "outputs": [
+    {
+      "file": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v17-refinement-plan/sky-v17-restored-4k.mp4",
+      "sha256": "36fa8a86f3b128831b9d9f539d1b26035722ee68d2449c4d5c67c3056db778c9",
+      "width": 2160,
+      "height": 3840,
+      "frames": 708,
+      "fps": 24,
+      "seconds": 29.5,
+      "rec709": true,
+      "videoBitrate": "30188812",
+      "audioBitrate": "311511",
+      "audioHash": "SHA256=659c367c4e9484136ce2eb14141ecffc023340f07ac7d5b73f900dc352f543fe",
+      "decode": "pass"
+    },
+    {
+      "file": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v17-refinement-plan/sky-v17-restored-1080p.mp4",
+      "sha256": "2800c93815414fe9d7b22d037726cc8eae2474925835a07d5d81db8015c59136",
+      "width": 1080,
+      "height": 1920,
+      "frames": 708,
+      "fps": 24,
+      "seconds": 29.5,
+      "rec709": true,
+      "videoBitrate": "10147289",
+      "audioBitrate": "311511",
+      "audioHash": "SHA256=659c367c4e9484136ce2eb14141ecffc023340f07ac7d5b73f900dc352f543fe",
+      "decode": "pass"
+    }
+  ],
+  "audio": {
+    "input_i": "-16.03",
+    "input_tp": "-1.50",
+    "input_lra": "8.80",
+    "input_thresh": "-26.91",
+    "output_i": "-16.15",
+    "output_tp": "-1.50",
+    "output_lra": "2.10",
+    "output_thresh": "-26.70",
+    "normalization_type": "dynamic",
+    "target_offset": "0.15"
+  },
+  "native4K": false,
+  "perceptualAudioReview": "not performed; no audio perception available"
+}

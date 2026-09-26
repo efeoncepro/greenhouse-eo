@@ -15,6 +15,10 @@ platform/provider**. Use the service catalog in `docs/services/hubspot-as-a-serv
 default commercial entry is a limited evaluation without cost; use a paid blueprint only when it produces an
 independent technical artifact. Customer Agent is a component of Service/Customer Success and Agentic Operations,
 not the root of the AI offer.
+For human-agent team transformation, load
+`docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md`: portal configuration is only one
+part of workflow redesign, named human accountability, autonomy, handoffs, adoption, quality and cost. A first
+production team requires operator training and supervision capacity, not only an active agent toggle.
 Treat brochures as historical commercial input only; the review and quarantine rules live in
 `docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`. Do not import brochure claims, pricing, bundles or
 feature availability without current primary-source verification and an `as-of` date.
@@ -45,7 +49,7 @@ explicit source of truth, lifecycle, consent, attribution, deduplication and syn
    - Offer/sector qualification: `docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md`
 4. When the work derives from a sold implementation, read `../hubspot-solutions-partner/modules/12_IMPLEMENTACION.md`; for agents, also read `../hubspot-solutions-partner/modules/13_AGENTES.md`. Product claims and prices remain owned by that skill's `hubspot-solutions-partner` → `SOURCES.md`.
 
-For Fall 2026 / UNBOUND 2026 product changes, read [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](../../../docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md) before qualifying ChatGPT Ads, MCP/Claude, Agent Hub, Breeze or Scheduled Prompts. It is a dated evidence register, not proof of portal eligibility, regional availability, pricing or runtime.
+For Fall 2026 / UNBOUND 2026 product changes, read [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](../../../docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md) before qualifying ChatGPT Ads/Lead Gen Ads, MCP/Claude, Agent Hub, Breeze, Scheduled Prompts, Customer Agent Voice, HubSpot Work, Agent CLI or Smart CRM Universal Record Page. The register is cut at 2026-09-19; it is evidence of vendor documentation/demo, not proof of portal eligibility, regional availability, pricing or runtime.
 
 ## Boundary router
 

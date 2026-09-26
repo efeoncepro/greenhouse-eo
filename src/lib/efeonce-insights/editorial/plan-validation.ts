@@ -7,20 +7,57 @@
 
 import { validateChartSpec } from '../contracts/chart-spec'
 import type { EvidenceSnapshotContentV1 } from '../contracts/evidence'
-import type { EditorialPlanV1, PlanClaimV1 } from '../contracts/plan'
-import { allowedNumbersForFacts, extractNumberTokens } from './format'
+import { INSIGHT_COVER_THEMES, PLAN_ESSENTIALS_MAX, PLAN_TEXT_LIMITS, type EditorialPlanV1, type PlanActionV1, type PlanClaimV1, type PlanCoverV1 } from '../contracts/plan'
+import { validateChartSpecValues } from './chart-values'
+import { allowedNumbersForFacts, extractNumberTokens, formatFactValue } from './format'
 
 export interface PlanViolation {
   where: string
-  rule: 'unknown_fact' | 'unreferenced_number' | 'chart' | 'empty_claim'
+  /** `invalid_field`: un campo del contrato editorial v2 (TASK-1888) con forma inválida. */
+  rule: 'unknown_fact' | 'unreferenced_number' | 'chart' | 'empty_claim' | 'invalid_field'
   detail: string
+}
+
+const WEEKS_PATTERN = /^([1-4])(?:-([1-4]))?$/
+
+const actionFieldViolations = (action: PlanActionV1): string[] => {
+  const problems: string[] = []
+
+  for (const key of ['impact', 'effort'] as const) {
+    const value = action[key]
+
+    if (value !== undefined && ![1, 2, 3].includes(value)) problems.push(`${action.actionId}: ${key} debe ser 1, 2 o 3`)
+  }
+
+  if (action.weeks !== undefined) {
+    const match = WEEKS_PATTERN.exec(action.weeks)
+
+    if (!match || (match[2] !== undefined && Number(match[2]) < Number(match[1]))) {
+      problems.push(`${action.actionId}: weeks debe ser «N» o «N-M» dentro de las 4 semanas`)
+    }
+  }
+
+  return problems
+}
+
+/** Una portada navy nunca lleva el logo por defecto: sólo la variante apta para fondo oscuro, o ningún logo. */
+const coverViolations = (cover: PlanCoverV1): string[] => {
+  const problems: string[] = []
+
+  if (!(INSIGHT_COVER_THEMES as readonly string[]).includes(cover.theme)) problems.push(`tema de portada inválido: ${String(cover.theme)}`)
+  if ((cover.logoAssetId === null) !== (cover.logoVariant === null)) problems.push('logoAssetId y logoVariant van juntos')
+  if (cover.theme === 'dark' && cover.logoVariant === 'default') problems.push('una portada navy no lleva el logo por defecto')
+  if (cover.theme === 'light' && cover.logoVariant === 'on_dark') problems.push('una portada blanca no lleva la variante para fondo oscuro')
+
+  return problems
 }
 
 const YEAR_OR_DATE = /^\d{4}(-\d{2}(-\d{2})?)?$/
 
 /**
  * Las cifras DENTRO del nombre de un hecho referenciado («Keywords en primera página (≤10)»,
- * «RpA · Sky · 2026-08») son identidad del hecho —texto de la evidencia, escrito por el adapter—,
+ * «RpA · Sky · 2026-08») o de sus valores de dimensión (TASK-1888: el nombre del space que una lectura por
+ * figura cita suelto) son identidad del hecho —texto de la evidencia, escrito por el adapter—,
  * no afirmaciones de la claim. Se enmascara sólo la etiqueta LITERAL y sólo la de los hechos que
  * la claim referencia: una cifra fuera de la etiqueta, o la etiqueta de un hecho no referenciado,
  * se sigue validando. Una etiqueta sin letras no se enmascara (borraría esa cifra en todo el texto).
@@ -55,7 +92,10 @@ export const validateEditorialPlan = (plan: EditorialPlanV1, snapshot: EvidenceS
       if (fact.freshness.asOf) dateTokens.add(fact.freshness.asOf)
     }
 
-    for (const token of extractNumberTokens(maskReferencedLabels(claim.text, facts.map(fact => fact.label)))) {
+    // Etiqueta y valores de dimensión del hecho (nombre del space, proveedor) son identidad del hecho, no afirmaciones.
+    const identity = facts.flatMap(fact => [fact.label, ...Object.values(fact.dimension ?? {})])
+
+    for (const token of extractNumberTokens(maskReferencedLabels(claim.text, identity))) {
       const normalized = token.trim()
 
       if (allowed.has(normalized)) continue
@@ -65,21 +105,102 @@ export const validateEditorialPlan = (plan: EditorialPlanV1, snapshot: EvidenceS
     }
   }
 
+  const invalid = (where: string, detail: string) => violations.push({ where, rule: 'invalid_field', detail })
+
+  // TASK-1888 — topes físicos de los campos v2 (un texto que no cabe el render lo rechaza, nunca lo recorta).
+  const fits = (where: string, text: string | undefined, limit: number, field: string) => {
+    if (text !== undefined && text.length > limit) invalid(where, `${field} mide ${text.length} caracteres; el molde admite ${limit}`)
+  }
+
+  const values = new Map(snapshot.facts.map(fact => [fact.factId, fact.value]))
+
   plan.executiveSummary.forEach(claim => checkClaim('executiveSummary', claim))
 
   for (const chapter of plan.chapters) {
     chapter.claims.forEach(claim => checkClaim(chapter.chapterId, claim))
 
     for (const chart of chapter.charts) {
-      for (const violation of validateChartSpec(chart, knownIds)) {
+      // Estructura primero; los valores sólo se juzgan sobre un spec bien formado (TASK-1888).
+      const structural = validateChartSpec(chart, knownIds)
+
+      for (const violation of structural.length > 0 ? structural : validateChartSpecValues(chart, values)) {
         violations.push({ where: chapter.chapterId, rule: 'chart', detail: `${violation.chartId}: ${violation.rule} — ${violation.detail}` })
+      }
+    }
+
+    for (const table of chapter.tables) fits(`${chapter.chapterId}.${table.tableId}`, table.title, PLAN_TEXT_LIMITS.tableTitle, 'title')
+
+    // TASK-1888 — entrada de capítulo y lectura por figura: mismas reglas de cifras que cualquier claim.
+    if (chapter.opening) checkClaim(`${chapter.chapterId}.opening`, chapter.opening)
+
+    const chartIds = new Set(chapter.charts.map(chart => chart.chartId))
+    const readChartIds = new Set<string>()
+
+    for (const reading of chapter.readings ?? []) {
+      const where = `${chapter.chapterId}.reading.${reading.chartId}`
+
+      if (!chartIds.has(reading.chartId)) invalid(where, `la lectura apunta a ${reading.chartId}, que no es un gráfico del capítulo`)
+      if (readChartIds.has(reading.chartId)) invalid(where, 'una sola lectura por gráfico')
+      readChartIds.add(reading.chartId)
+
+      fits(where, reading.conclusion?.text, PLAN_TEXT_LIMITS.conclusion, 'conclusion')
+      fits(where, reading.meaning?.text, PLAN_TEXT_LIMITS.meaning, 'meaning')
+      fits(where, reading.nextStep?.text, PLAN_TEXT_LIMITS.nextStep, 'nextStep')
+      fits(where, reading.keyFigure?.value, PLAN_TEXT_LIMITS.keyFigureValue, 'keyFigure.value')
+      fits(where, reading.keyFigure?.caption.text, PLAN_TEXT_LIMITS.keyFigureCaption, 'keyFigure.caption')
+
+      if (reading.keyFigure) {
+        const fact = byId.get(reading.keyFigure.factId)
+
+        if (!fact) violations.push({ where, rule: 'unknown_fact', detail: `cifra principal referencia ${reading.keyFigure.factId}` })
+        else if (reading.keyFigure.value !== formatFactValue(fact.value, fact.unit, plan.locale)) {
+          violations.push({ where, rule: 'unreferenced_number', detail: `cifra principal "${reading.keyFigure.value}" no es el valor del hecho ${fact.factId}` })
+        }
+
+        checkClaim(where, reading.keyFigure.caption)
+      }
+
+      if (reading.conclusion) checkClaim(where, reading.conclusion)
+      if (reading.meaning) checkClaim(where, reading.meaning)
+      if (reading.nextStep) checkClaim(where, reading.nextStep)
+
+      // Una lectura que repite la conclusión imprime la misma frase dos veces en la página (Berel, 2026-09-25).
+      if (reading.meaning && reading.conclusion && reading.meaning.text.trim() === reading.conclusion.text.trim()) {
+        invalid(where, 'la lectura repite la conclusión: omítela')
       }
     }
   }
 
   for (const action of plan.actions) {
     checkClaim('actions', { claimId: action.actionId, text: action.text, factIds: action.factIds })
+    actionFieldViolations(action).forEach(detail => invalid('actions', detail))
   }
+
+  // TASK-1888 — campos de plan del contrato v2. Todos opcionales: un plan v1 sellado no los trae y valida igual.
+  if (plan.essentials) {
+    if (plan.essentials.length > PLAN_ESSENTIALS_MAX) invalid('essentials', `«Lo esencial» admite hasta ${PLAN_ESSENTIALS_MAX} hechos; trae ${plan.essentials.length}`)
+    plan.essentials.forEach(claim => {
+      checkClaim('essentials', claim)
+      fits('essentials', claim.text, PLAN_TEXT_LIMITS.essential, 'esencial')
+    })
+
+    // La tesis y la bajada del resumen sólo tienen tope en el diseño v2 (un plan v1 sellado no se re-juzga por largo).
+    fits('executiveSummary', plan.executiveSummary[0]?.text, PLAN_TEXT_LIMITS.summaryThesis, 'tesis del resumen')
+    fits('executiveSummary', plan.executiveSummary[1]?.text, PLAN_TEXT_LIMITS.summaryLead, 'bajada del resumen')
+  }
+
+  // Las líneas de alcance son copy del catálogo, sin hechos: cualquier cifra en ellas es una discrepancia.
+  plan.scopeLines?.forEach((line, index) => checkClaim('scopeLines', { claimId: `scope.${index}`, text: line, factIds: [] }))
+
+  for (const key of ['decision', 'measurement', 'ask'] as const) {
+    const claim = plan[key]
+
+    if (claim) checkClaim(key, claim)
+  }
+
+  fits('decision', plan.decision?.text, PLAN_TEXT_LIMITS.decision, 'decision')
+
+  if (plan.cover) coverViolations(plan.cover).forEach(detail => invalid('cover', detail))
 
   return violations
 }

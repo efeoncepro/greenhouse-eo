@@ -2,40 +2,167 @@
 <html lang="es">
 <head>
 <meta charset="utf-8" />
-<!-- InsightsCoverSlide — portada del deck. Reemplaza a CoverFull, que imprime vocabulario de propuesta comercial. -->
+<!--
+  InsightsCoverSlide — portada navy del deck (TASK-1889). DERIVADA de la portada A4 aprobada
+  (`Premium-Portada`): el canvas no diseñó la portada del deck. La aprueba el operador antes de
+  congelar su baseline. Misma órbita (arco de 200° a 250°), mismo lockup y misma gramática.
+-->
 <link rel="stylesheet" href="deck-tokens.css" />
 <link rel="stylesheet" href="deck-fonts.css" />
-<link rel="stylesheet" href="deck-mold.css" />
+<link rel="stylesheet" href="deck-editorial.css" />
 <style>
-  .cover-meta {
-    margin-top: auto;
-    display: flex;
-    gap: 72px;
-    padding-top: 36px;
-    border-top: 2px solid var(--axis-deck-role-accent);
-  }
+  .slogan { font-family: var(--axis-deck-type-display); line-height: 1; }
 
-  .cover-meta dt {
-    font-size: 16px;
-    font-weight: 700;
+  .slogan-empower { font-weight: 800; font-style: italic; }
+
+  .slogan-your { font-weight: 800; }
+
+  .slogan-growth { font-weight: 900; font-style: italic; }
+
+  .orbit .ring { fill: none; stroke: var(--axis-deck-role-halo); stroke-width: 1; }
+
+  .orbit .arc { fill: none; stroke: var(--axis-deck-role-navyAccent); stroke-width: 1.6; stroke-linecap: round; }
+
+  .orbit .dot { fill: var(--axis-deck-role-navyAccent); }
+
+  .lockup { display: flex; align-items: center; gap: 16px; }
+
+  .lockup img { height: 30px; width: auto; display: block; }
+
+  .lockup .divider { width: 1px; height: 22px; background: rgba(var(--axis-deck-role-navyInk-rgb), 0.26); }
+
+  .lockup .product {
+    font-family: var(--axis-deck-type-display);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.34em;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--axis-deck-role-accent);
+    color: var(--axis-deck-role-navyAccent);
   }
 
-  .cover-meta dd { margin: 8px 0 0; font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .kicker {
+    font-family: var(--axis-deck-type-display);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(var(--axis-deck-role-navyMuted-rgb), 0.85);
+  }
+
+  .cover { position: absolute; inset: 0; padding: 44px 72px 40px; display: flex; flex-direction: column; }
+
+  .cover-head { display: flex; justify-content: space-between; align-items: center; }
+
+  .grow { flex-grow: 1; }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--axis-deck-type-display);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--axis-deck-role-navyAccent);
+  }
+
+  .eyebrow-rule { width: 24px; height: 1.5px; background: var(--axis-deck-role-navyAccent); }
+
+  .cover-title {
+    margin: 20px 0 0;
+    max-width: 640px;
+    font-family: var(--axis-deck-type-display);
+    font-size: 56px;
+    line-height: 1.07;
+    font-weight: 600;
+    letter-spacing: -0.024em;
+  }
+
+  .cover-subtitle { margin: 22px 0 0; max-width: 520px; font-size: 17px; line-height: 1.55; color: var(--axis-deck-role-navyMuted); }
+
+  .cover-foot {
+    min-height: 73px;
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(var(--axis-deck-role-navyInk-rgb), 0.12);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .prepared { display: flex; flex-direction: column; gap: 10px; }
+
+  .prepared-label {
+    font-family: var(--axis-deck-type-display);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: rgba(var(--axis-deck-role-navyMuted-rgb), 0.75);
+  }
+
+  /* Logo del cliente en negativo (variante on_dark sellada por TASK-1888) o, sin él, su nombre. */
+  .prepared-mark { display: flex; align-items: center; min-height: 30px; }
+
+  .prepared-logo { max-width: 160px; max-height: 30px; display: block; object-fit: contain; }
+
+  .prepared-mark:has(.prepared-logo) .prepared-name { display: none; }
+
+  .prepared-name { font-family: var(--axis-deck-type-display); font-size: 15px; font-weight: 600; }
+
+  .cover-sign { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+
+  .cover-sign .slogan { font-size: 17px; letter-spacing: -0.005em; }
+
+  .confidential { font-size: 10.5px; letter-spacing: 0.05em; font-variant-numeric: tabular-nums; color: rgba(var(--axis-deck-role-navyMuted-rgb), 0.8); }
 </style>
 </head>
 <body>
-  <div class="slide">
-    <span class="eyebrow" data-slot="editionId">EO-INS-000014</span>
-    <h1 class="headline" data-slot="reportTitle">Informe de visibilidad y entrega</h1>
-    <p class="deck-lead" data-slot="reportSubtitle">Evidencia sellada de la ventana declarada, con sus límites explícitos.</p>
-    <dl class="cover-meta">
-      <div><dt>Período</dt><dd data-slot="periodLabel">Agosto 2026</dd></div>
-      <div><dt>Versión</dt><dd data-slot="versionLabel">v1</dd></div>
-    </dl>
-    <footer class="deck-foot"><span data-slot="urlBubble"><img src="assets/url-lum.svg" alt="efeoncepro.com" /></span></footer>
+  <div class="lamina">
+    <svg class="orbit art" width="1280" height="720" viewBox="0 0 1280 720" aria-hidden="true">
+      <defs>
+        <radialGradient id="coverHalo" cx="900" cy="300" r="520" gradientUnits="userSpaceOnUse">
+          <stop class="halo-stop" offset="0" stop-opacity="0.13"></stop>
+          <stop class="halo-stop" offset="0.6" stop-opacity="0.03"></stop>
+          <stop class="halo-stop" offset="1" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+      <rect width="1280" height="720" fill="url(#coverHalo)"></rect>
+      <circle class="ring" cx="900" cy="300" r="230" stroke-opacity="0.16"></circle>
+      <path class="arc" d="M 683.9 221.3 A 230 230 0 0 1 821.3 83.9"></path>
+      <circle class="dot" cx="821.3" cy="83.9" r="3.5"></circle>
+    </svg>
+
+    <div class="cover">
+      <header class="cover-head">
+        <div class="lockup">
+          <img src="assets/brand/logo-negative.svg" alt="Efeonce" />
+          <span class="divider"></span>
+          <span class="product">Insights</span>
+        </div>
+        <span class="kicker" data-slot="editionLabel">Informe mensual · Agosto 2026</span>
+      </header>
+
+      <div class="grow"></div>
+
+      <div>
+        <span class="eyebrow"><span class="eyebrow-rule"></span><span data-slot="eyebrow">Lectura de Efeonce</span></span>
+        <h1 class="cover-title" data-slot="reportTitle">Visibilidad, respuestas de IA y entrega</h1>
+        <p class="cover-subtitle" data-slot="reportSubtitle">Qué cambió en agosto, por qué cambió y qué haremos en septiembre.</p>
+      </div>
+
+      <footer class="cover-foot">
+        <div class="prepared" data-slot="preparedFor">
+          <span class="prepared-label" data-slot-field="label">Preparado para</span>
+          <span class="prepared-mark"><img class="prepared-logo" data-slot-field="logo" src="assets/url-lum.svg" alt="" /><span class="prepared-name" data-slot-field="clientName">Nombre del cliente</span></span>
+        </div>
+        <div class="cover-sign">
+          <span class="slogan" data-brand="slogan"><span class="slogan-empower">Empower</span> <span class="slogan-your">your</span> <span class="slogan-growth">Growth</span></span>
+          <span class="confidential" data-slot="confidentialityLine">Confidencial · Versión 1 · 2 de septiembre de 2026</span>
+        </div>
+      </footer>
+    </div>
   </div>
 </body>
 </html>

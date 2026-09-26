@@ -1,0 +1,49 @@
+{
+  "costUsd": 0,
+  "frames": 720,
+  "fps": 24,
+  "titleOffset": 15.75,
+  "picture": "sky-v12-picture-base.mp4",
+  "editDecisionList": [
+    {
+      "out": [
+        0,
+        52
+      ],
+      "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v12-recovery/segments/01-search.mp4",
+      "note": "Generated V7 lateral search"
+    },
+    {
+      "out": [
+        52,
+        236
+      ],
+      "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v12-recovery/segments/02-chat.mp4",
+      "note": "V9 search results, isolated user, progressive answer, citation"
+    },
+    {
+      "out": [
+        236,
+        244
+      ],
+      "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v12-recovery/segments/03-bloom.mp4",
+      "note": "V7 generated luminous bloom"
+    },
+    {
+      "out": [
+        244,
+        624
+      ],
+      "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v12-recovery/segments/04-flight-sky.mp4",
+      "note": "V11 continuous plane flight and its moving sky; editorial downward crop clears aircraft by15.65; no object removal or sky replacement"
+    },
+    {
+      "out": [
+        624,
+        720
+      ],
+      "source": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v12-recovery/segments/05-closing.mp4",
+      "note": "Canonical blue/purple closing, approved deterministic scope"
+    }
+  ]
+}

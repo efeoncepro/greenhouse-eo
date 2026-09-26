@@ -23,7 +23,7 @@
 | **Growth Specialist (GS)** | El rep de HubSpot que gestiona una cuenta existente. Con él se coordina el *shared deal* de un cross-sell |
 | **Membership** | **USD 400/mes** desde el 2026-07-15. **Se exonera si tu suscripción neta post-discount supera USD 400/mes** |
 
-## Producto HubSpot (as-of 2026-09-16)
+## Producto HubSpot (as-of 2026-09-18)
 
 | Término | Qué es |
 |---|---|
@@ -50,7 +50,16 @@
 | **HubSpot Credits** | La moneda de Breeze. **USD 0,010/crédito.** 🔴 **NO se suman entre hubs** (manda el tier más alto) y **no hay rollover** |
 | **Outcome-based pricing** | Desde el **2026-04-14**: Customer Agent cobra **USD 0,50 por conversación RESUELTA**; Prospecting Agent **USD 1,00 por lead recomendado**. Las que no resuelven no cuestan |
 | **Loop Marketing** | La metodología con que HubSpot **enterró el funnel lineal** (INBOUND 2025). Cuatro etapas: **Express → Tailor → Amplify → Evolve**. Es el idioma que hay que hablar |
-| **Growth Context** | La tesis del Spring 2026 Spotlight. *"If data is what happened, context is why."* |
+| **Growth Context** | Fundación de Fall Spotlight: contexto de negocio, equipo, clientes y procesos que alimenta resultados y agentes; no es un SKU ni prueba de calidad del portal |
+| **Context Home** | Superficie para revisar qué contexto usa HubSpot, detectar vacíos y corregir información que alimenta a Breeze y agentes |
+| **Self-updating Smart CRM** | Dirección/producto de Fall Spotlight para capturar llamadas, emails y reuniones y mantener registros actualizados; validar cobertura, permisos y plan |
+| **Marketing Studio** | Espacio unificado para insights, campañas, contenido, automatización y rendimiento; no confundir con Campaigns ni asumir GA universal |
+| **Campaign Agent** | Agente de marketing mostrado junto a Marketing Studio para construir campañas con contexto; validar estado, edición, créditos, canales y consentimiento |
+| **Customer Agent Voice** | First look de UNBOUND 2026 para soporte de voz; no tratar una demo como GA o runtime |
+| **HubSpot Work** | First look de UNBOUND 2026 para gestión de trabajo con contexto CRM y agentes; no equivale automáticamente a PSA/ERP |
+| **Agent CLI** | Superficie developer/CLI para convertir instrucciones y datos CRM en trabajo repetible; el demo del 18/09 mostró flujo read-only con revisión humana |
+| **Smart CRM Universal Record Page** | Private beta mostrada en UNBOUND el 18/09: record universal, layout de dos columnas, timeline rediseñada, next best actions y personalización en página; validar opt-in y rendimiento |
+| **Conversations API 2026.09** | API GA para Inbox/Help Desk: hilos, mensajes, asignaciones, estados y webhooks; requiere scopes, tier, permisos y readback |
 | **UNBOUND** | ⚠️ **Ex-INBOUND.** El evento anual. **16-18 sep 2026, Boston** |
 | **Core Seat** | Seat pagado con acceso completo (USD 45-USD 75). También hay **Sales**, **Service** y **Revenue** seats. **View-only y Partner seats: USD 0** |
 | **Marketing contact** | El contacto al que efectivamente le comercializas. Es lo que HubSpot cobra — **a diferencia de Marketo, que cobra por el tamaño total de la base** |

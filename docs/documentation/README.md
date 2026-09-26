@@ -17,11 +17,19 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 ### Social y Creative Studio
 
 - [Proveedor Higgsfield en Creative Studio](creative-studio/HIGGSFIELD_PROVIDER.md) — superficies de API, SDK,
-  CLI, skills y MCP local; estados de adopción y evidencia exigida antes de entregar una salida.
+  CLI, skills, MCP remoto y puentes MCP locales (Blender, Illustrator, Photoshop); estados de adopción y evidencia
+  exigida antes de entregar una salida.
 
 - [Reglas publicitarias para agentes](creative/reglas-publicitarias-para-agentes.md) — activación común de
   Codex/Claude para posts, stories, reels, covers, banners, brochure y motion con contrato AXIS, tipografía real,
   contraste, gate DO/DON'T y estados separados de publicación.
+- [Compositor de piezas con CTA](creative/compositor-piezas-cta.md) — qué compone y qué certifica
+  `pnpm foto:componer:cta` + `pnpm foto:cta:gate`: veredictos certificado/falla/no certificable, huellas, guarda de
+  sujeto por segmentación, zona segura AXIS, firma, WCAG 2.2 AA sobre el trazo a 390 px, APCA y daltonismo en el CTA,
+  excepciones con aprobador, texto alternativo y cómo se prueba el propio comando.
+- [Línea gráfica Efeonce — La órbita](creative/linea-grafica-efeonce.md) — la forma canónica de la marca propia de
+  Efeonce y su familia (Globe, Wave, Reach) desde 2026-09-25: qué es, sus tres trabajos (rodea, mide, enfoca), a qué
+  piezas aplica (y que no aplica a la UI de Greenhouse ni a clientes), reglas clave, dónde vive cada cosa y pendientes.
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
 - [Creator Influence & Content](media-distribution/creator-influence-content.md) — reglas funcionales para separar
@@ -262,6 +270,10 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 - [Benchmark competitivo](creative-studio/efeonce-globe-competitive-benchmark.md) — qué aprender de Higgsfield y Magnific, con la comparación autenticada del 2026-08-05.
 
 ---
+
+### Marketing Studio
+
+- [Efeonce Marketing Studio — Gestión de campañas](marketing-studio/efeonce-marketing-studio.md) — qué muestra cada pantalla, vista previa por formato, los tres estados, presupuestos sin sumar, acceso abierto de solo lectura, API y agentes por Efeonce MCP (12 herramientas de lectura, hoy apagadas) y lo que viene (TASK-1887 · TASK-1890 · TASK-1891).
 
 ## Documentacion tecnica (arquitectura)
 

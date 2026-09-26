@@ -1,0 +1,18 @@
+{
+  "frames": 720,
+  "intermediate": "FFV1 RGB lossless",
+  "jpegIntermediates": false,
+  "paidCalls": 0,
+  "nativeSources": [
+    "v7",
+    "v9",
+    "v11",
+    "omni-window-a-native"
+  ],
+  "cropRetained": "up to 1.95x; cannot recover missing source detail",
+  "closingVeil": [
+    25.35,
+    26.0
+  ],
+  "status": "pending visual review"
+}

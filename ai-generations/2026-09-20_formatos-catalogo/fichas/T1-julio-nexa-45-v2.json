@@ -1,0 +1,16 @@
+{
+  "id": "T1-julio-nexa-45-piloto-v2",
+  "formato": "4:5",
+  "impacto": true,
+  "escena": "SCENE (Creative, Santiago studio, 6 pm): taken from the client's own empty seat at a long bleached pale oak table. A HARD, low slice of golden late-afternoon sun comes through a window frame on the left and rakes ACROSS the table and across both of them, throwing the CRISP graphic shadow of the window bars onto the plaster wall behind them and a hard-edged shadow line across the table, lighting the edges of the printed storyboard frames and catching fine dust in the air; the far side of the room falls into deep warm shadow that still keeps the texture of the plaster. THREE DEPTH PLANES: the near edge of the table dissolved in the foreground, the two of them and the printed frames sharp in the middle, and behind them the studio wall in soft warm shade. DECISIVE MOMENT: Nexa has just landed her finger on one storyboard frame and is laughing at what she found, mid-laugh, her hair still moving; the man leans in across the table in the same instant, pen already lifted to answer her, both looking at the frame and never at the camera. They work over large printed storyboard frames for a specialty coffee brand. Story accent: one single azure-blue (#0375DB) marker lying on the table where the sun hits it. 50mm lens at f/2, seated eye level but framed LOW in the picture: both of them sit in the LOWER TWO THIRDS and the TOP 30% of the frame is nothing but the plain plaster wall, with no heads, hands, plants, shelves or objects in it, focus on her hand on the frame and on both faces. Neutral-warm white balance around 5200 K, shadows strictly neutral and NEVER blue, exposed for the highlights so the sunlit oak and the paper keep full detail.",
+  "lecho": {
+    "objeto": "the near edge of the long table, bleached pale oak lit directly by the low daylight, almost white",
+    "tono": "VERY LIGHT almost white"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the plain plaster studio wall behind them that the low sun does not reach, in deep warm shadow",
+      "tinta": "blanca"
+    }
+  }
+}

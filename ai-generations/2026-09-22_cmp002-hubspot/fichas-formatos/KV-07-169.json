@@ -1,0 +1,33 @@
+{
+  "id": "KV-07-169",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "sombra",
+  "identidad": [
+    {
+      "persona": "nexa",
+      "vista": "cuerpo-perfil-der"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "polo-efeonce",
+      "puesta": "frente-cuerpo-b"
+    },
+    {
+      "objeto": "sprocket-hubspot",
+      "vista": "tres-cuartos-izq"
+    }
+  ],
+  "escena": "SCENE (open workspace at night, Santiago): THE SHADOWS ARE THE SUBJECT. On a bare concrete wall, FOUR separate hard-edged shadows of Nexa are thrown by four separate low lights, each falling across a different workstation, each caught in a different working posture on its own desk with its own glowing cool blue screen: one typing, one reviewing a page, one on a call, one pointing at a screen. Nexa herself stands in the near foreground at the left edge of the action area, seen in clean PROFILE facing right towards the wall — her face, profile and the front of her navy piqué polo visible, NOT her back — one hand resting on the nearest desk, watching the four shadows work. She is one person; the wall is doing four jobs with her. The four lights are rigged LOW, at desk height, so the shadows are short and wide and stay inside the action area; the rest of the wall is bare, unlit and in deep even shadow. Very high contrast. The orange sculpture sits on the nearest desk, clearly visible. 35mm lens at f/4, focus on the shadows, her profile slightly soft. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. The sculpture's ring-and-nodes symbol belongs ONLY to the sculpture: it never appears on her clothing. Everything except the sculpture and the polo is completely unbranded and no text is readable. CRITICAL FRAMING (horizontal 16:9): the ACTION AREA is the RIGHT 55% of the frame. The LEFT 45% of the frame, top to bottom, is one single dark, evenly toned surface with NOTHING in it: no person, no object, no screen, no lamp, no window, no light beam, no bright spot, no shadow edge. Every person, every object, all the action, all the light and every bright patch stay inside the right 55%.",
+  "lecho": {
+    "objeto": "the near edge of the first desk crossing the very bottom against the lens, outside every beam",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the bare concrete wall, unlit and evenly toned in deep shadow, its texture visible",
+      "tinta": "blanca"
+    }
+  }
+}

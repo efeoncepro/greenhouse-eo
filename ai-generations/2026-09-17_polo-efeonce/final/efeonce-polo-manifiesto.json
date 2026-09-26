@@ -260,6 +260,60 @@
         1200,
         1600
       ]
+    },
+    {
+      "id": "navy-16-puesto-espalda-mujer",
+      "descripcion": "El polo navy puesto, vista de espalda, en cuerpo femenino, sin rostro. La espalda va LIMPIA.",
+      "cuando_usarla": "Cuando la pieza muestre a una MUJER de espaldas con el polo. La vista 14 es la misma toma en cuerpo masculino.",
+      "archivo_fondo": "final/efeonce-polo-navy-16-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png",
+      "resolucion": "1024x1536",
+      "brief": "brief/polo-navy-puesto-espalda-mujer.prompt.txt",
+      "nota": "Generada SIN referencia de arte: el polo es la única prenda de espalda limpia, y pasarle la estampa empuja al modelo a imprimirla igual."
+    },
+    {
+      "id": "navy-02-espalda-v02",
+      "descripcion": "La prenda sola, espalda, con el logo y eslogan BORDADOS.",
+      "cuando_usarla": "La referencia de construcción de la espalda desde el 2026-09-21.",
+      "archivo_fondo": "final/efeonce-polo-navy-02-espalda-1024x1024-v02-fondo-estudio.png",
+      "resolucion": "1024x1024",
+      "brief": "brief/navy-02-espalda.prompt.txt",
+      "archivo_transparente": "final/efeonce-polo-navy-02-espalda-1024x1024-v02-transparente.png"
+    },
+    {
+      "id": "navy-09-plano-espalda-v02",
+      "descripcion": "Plano cenital de la espalda con el bordado.",
+      "cuando_usarla": "Mockups y composiciones planas.",
+      "archivo_fondo": "final/efeonce-polo-navy-09-plano-espalda-1024x1024-v02-fondo-estudio.png",
+      "resolucion": "1024x1024",
+      "brief": "brief/navy-09-plano-espalda.prompt.txt",
+      "archivo_transparente": "final/efeonce-polo-navy-09-plano-espalda-1024x1024-v02-transparente.png"
+    },
+    {
+      "id": "navy-14-puesto-espalda-v02",
+      "descripcion": "Puesta de espalda en cuerpo masculino, sin rostro.",
+      "cuando_usarla": "Asset de USO: alguien de espaldas con el polo.",
+      "archivo_fondo": "final/efeonce-polo-navy-14-puesto-espalda-1024x1536-v02-fondo-estudio.png",
+      "resolucion": "1024x1536",
+      "brief": "brief/navy-14-puesto-espalda.prompt.txt"
+    },
+    {
+      "id": "navy-16-puesto-espalda-mujer-v02",
+      "descripcion": "Puesta de espalda en cuerpo femenino, sin rostro.",
+      "cuando_usarla": "Asset de USO con una mujer de espaldas.",
+      "archivo_fondo": "final/efeonce-polo-navy-16-puesto-espalda-mujer-1024x1536-v02-fondo-estudio.png",
+      "resolucion": "1024x1536",
+      "brief": "brief/navy-16-puesto-espalda-mujer.prompt.txt"
+    },
+    {
+      "id": "blanco-02-espalda-v02",
+      "descripcion": "El polo BLANCO, espalda, con el bordado en hilo navy.",
+      "cuando_usarla": "La variante clara; el hilo invierte a navy.",
+      "archivo_fondo": "final/efeonce-polo-blanco-02-espalda-1024x1024-v02-fondo-estudio.png",
+      "resolucion": "1024x1024",
+      "brief": "brief/blanco-02-espalda.prompt.txt",
+      "archivo_transparente": "final/efeonce-polo-blanco-02-espalda-1024x1024-v02-transparente.png"
     }
-  ]
+  ],
+  "delta_2026_09_21": "Se agrega la espalda puesta en cuerpo femenino. El kit sólo la tenía en cuerpo masculino.",
+  "delta_2026_09_21_espalda_bordada": "🔴 CAMBIO DE PRODUCTO. El operador REVIRTIÓ su decisión del 2026-09-17 («la única prenda con espalda limpia es el polo»): desde el 2026-09-21 el polo lleva en la espalda el logo y el eslogan, BORDADOS. Motivo: de espaldas, un polo sin marca no se reconoce como Efeonce, y ése era el hueco que no se podía tapar de otra forma. Diferencia con el hoodie y las chaquetas: ahí la espalda es SERIGRAFÍA plastisol; en el polo es BORDADO de puntada satinada con relieve, porque es la prenda más formal frente a cliente y su emblema de pecho ya es bordado. El arte se compone determinísticamente con `estampa-espalda.mjs` (dos versiones: hilo blanco para el polo navy, hilo navy para el blanco) y al modelo sólo se le pide la puntada. Las vistas de espalda v01 quedan OBSOLETAS: documentan el producto anterior y no deben usarse."
 }

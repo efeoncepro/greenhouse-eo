@@ -18,7 +18,7 @@
 | **1** | 🎯 **Outbound con el Grader ya corrido** | Baja | Medio | 🎯 **Altísima** | **El motor** |
 | **2** | 🎯 **Cross-sell a la cartera actual** | 🎯 **Mínima** | Bajo | **Altísima** | **La fruta al alcance** |
 | **3** | 🎯 **PAID al Grader** *(LinkedIn + retargeting Meta + Google al DOLOR)* | Baja | 🎯 **Alto** | Media-alta | 🎯 **La aritmética es abrumadora — y no lo estamos usando** *(§ 5)* |
-| **4** | **Licitaciones** *(Wherex / Mercado Público)* | Media | Medio | Alta | ✅ **Ya lo hacemos (SKY, Berel)** |
+| **4** | **Licitaciones** *(Wherex / Mercado Público)* | Media | Medio | Alta | ✅ **Ya lo hacemos — y ganamos (Berel; SKY blog adjudicado 2026-09-23)** |
 | **5** | **Inbound propio** *(nuestro SEO/AEO)* | Alta *(tarda)* | Medio | Alta | 🔴 **Obligatorio — es la prueba** |
 | **6** | **Referidos y partners** | Baja | Bajo | Alta | Subutilizado |
 | **7** | **LinkedIn orgánico / autoridad** | Media | Medio | Media | Sostiene a los demás |
@@ -70,7 +70,7 @@ vendemos** *(→ `05_CUNA_GRADER` regla 3)*.
 
 ## 2. 🎯 Cross-sell — la fruta que está en el suelo
 
-**Tenemos clientes que YA nos pagan por otra cosa.** *(Berel, SKY performance, Bresler…)*
+**Tenemos clientes que YA nos pagan por otra cosa.** *(Berel, SKY performance/creativo, Bresler…)* 🎯 *SKY es la prueba: cliente creativo (equipo de Performance) que terminó comprando el blog SEO/AEO (equipo de Marca) por licitación, 2026-09-23.*
 **Y no les hemos corrido el Grader.**
 
 | Movimiento | Fricción | Por qué funciona |
@@ -86,7 +86,7 @@ vendemos** *(→ `05_CUNA_GRADER` regla 3)*.
 
 ## 3. Licitaciones — el canal que ya opera
 
-✅ **Ya lo hacemos** (SKY, vía Wherex). **Es un canal real y ordenado.**
+✅ **Ya lo hacemos** (SKY, vía Wherex — **adjudicado a Efeonce el 2026-09-23**, finalista entre ~15 propuestas). **Es un canal real y ordenado.**
 
 | A favor | En contra |
 |---|---|

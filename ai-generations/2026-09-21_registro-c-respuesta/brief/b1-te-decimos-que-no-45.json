@@ -1,0 +1,14 @@
+{
+  "id": "b1-te-decimos-que-no-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "manos",
+  "escena": "SCENE (a working desk in a dark studio, seen at a low three-quarter angle from just above the surface): only HANDS and forearms are in frame — no face anywhere, not even blurred in the background, no shoulders, no body. Two hands work over a current-generation low-profile wireless keyboard and a modern tablet lying flat beside it; the tablet screen shows a dense comparison panel of rows and small bars, lit from within, its content too small and too steeply angled to read. The RIGHT hand has stopped mid-gesture: palm open and turned slightly up in a small, unposed halt, hovering just above the tablet — the hand of someone saying not this one. The LEFT hand keeps a finger resting on one row of the panel, holding the place. Sleeves pushed up mid-forearm on a plain dark long-sleeve; skin is real with visible pores, knuckle creases and fine hair, warm and healthy, no rings, no watch, no jewellery. The desk is bare brushed matte black: no paper, no printed matter of any kind, no notebooks, no mugs, no plants, no cables in shot. Behind the desk everything falls to unlit black — no window, no monitor, no second screen. The tablet is the ONLY light source in the frame, throwing a tight pool across the hands and the keyboard and dying within a hand's width of them; it sits low in the image and its light, spill and every reflection stay BELOW the middle of the frame, while the upper third is an unbroken field of ink-blue darkness. COLOUR: cool and contemporary — ink-blue blacks, the screen a clean blue-white, the desk near black and matte, the skin the only warm thing in the frame; no tungsten, no amber, no golden spill, no retro glow. Fine dust hangs in the light. 50mm lens at f/2.8.",
+  "reservas": {
+    "texto": { "muro": "the empty unlit darkness above the desk, unbroken", "tinta": "blanca" }
+  },
+  "lecho": {
+    "objeto": "the near edge of the matte black desk in the immediate foreground, so close to the lens it dissolves into a soft abstract blur, running unbroken across the whole width of the frame",
+    "tono": "brushed matte black desk surface in complete shadow, receiving no light from the tablet, near black with only a faint matte grain"
+  }
+}

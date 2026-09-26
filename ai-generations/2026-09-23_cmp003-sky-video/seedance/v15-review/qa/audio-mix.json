@@ -1,0 +1,199 @@
+{
+  "music": "Envato operator attachment: 331music_rock_short-02.wav",
+  "sourceDuration": 32,
+  "tempoFactor": 1.14,
+  "pitchPreserved": true,
+  "musicInteriorSplices": 0,
+  "musicStart": 1.6100000000000003,
+  "sourceBrandBeatAfterTempo": 7.973333333333334,
+  "brandBeatInFilm": 9.583333333333334,
+  "closingBeatInFilm": 26.127333333333333,
+  "sourceEndInFilm": 29.65983333333333,
+  "paidCalls": 0,
+  "cues": [
+    {
+      "bus": "ui",
+      "name": "key-1",
+      "start": 0.03766666666666667,
+      "duration": 0.057,
+      "source": "keyboard",
+      "anchor": 0.041666666666666664,
+      "peak": 0.032
+    },
+    {
+      "bus": "ui",
+      "name": "key-2",
+      "start": 0.121,
+      "duration": 0.057,
+      "source": "keyboard",
+      "anchor": 0.125,
+      "peak": 0.036000000000000004
+    },
+    {
+      "bus": "ui",
+      "name": "key-3",
+      "start": 0.20433333333333334,
+      "duration": 0.057,
+      "source": "keyboard",
+      "anchor": 0.20833333333333334,
+      "peak": 0.04
+    },
+    {
+      "bus": "ui",
+      "name": "key-4",
+      "start": 0.2876666666666667,
+      "duration": 0.057,
+      "source": "keyboard",
+      "anchor": 0.2916666666666667,
+      "peak": 0.032
+    },
+    {
+      "bus": "ui",
+      "name": "key-5",
+      "start": 0.4126666666666667,
+      "duration": 0.057,
+      "source": "keyboard",
+      "anchor": 0.4166666666666667,
+      "peak": 0.036000000000000004
+    },
+    {
+      "bus": "ui",
+      "name": "key-6",
+      "start": 0.496,
+      "duration": 0.057,
+      "source": "keyboard",
+      "anchor": 0.5,
+      "peak": 0.04
+    },
+    {
+      "bus": "ui",
+      "name": "key-7",
+      "start": 0.621,
+      "duration": 0.057,
+      "source": "keyboard",
+      "anchor": 0.625,
+      "peak": 0.032
+    },
+    {
+      "bus": "ui",
+      "name": "key-8",
+      "start": 0.746,
+      "duration": 0.057,
+      "source": "keyboard",
+      "anchor": 0.75,
+      "peak": 0.036000000000000004
+    },
+    {
+      "bus": "ui",
+      "name": "key-9",
+      "start": 0.8293333333333334,
+      "duration": 0.057,
+      "source": "keyboard",
+      "anchor": 0.8333333333333334,
+      "peak": 0.04
+    },
+    {
+      "bus": "ui",
+      "name": "enter",
+      "start": 0.996,
+      "duration": 0.075,
+      "source": "keyboard",
+      "anchor": 1,
+      "peak": 0.062
+    },
+    {
+      "bus": "ui",
+      "name": "result-1",
+      "start": 1.7116666666666664,
+      "duration": 0.68025,
+      "source": "ui-slide",
+      "anchor": 2.0416666666666665,
+      "peak": 0.025
+    },
+    {
+      "bus": "ui",
+      "name": "result-2",
+      "start": 2.0033333333333334,
+      "duration": 0.68025,
+      "source": "ui-slide",
+      "anchor": 2.3333333333333335,
+      "peak": 0.025
+    },
+    {
+      "bus": "ui",
+      "name": "result-3",
+      "start": 2.2533333333333334,
+      "duration": 0.68025,
+      "source": "ui-slide",
+      "anchor": 2.5833333333333335,
+      "peak": 0.025
+    },
+    {
+      "bus": "ui",
+      "name": "user-turn",
+      "start": 3.67,
+      "duration": 0.68025,
+      "source": "ui-slide",
+      "anchor": 4,
+      "peak": 0.018
+    },
+    {
+      "bus": "ui",
+      "name": "answer",
+      "start": 4.32,
+      "duration": 0.68025,
+      "source": "ui-slide",
+      "anchor": 4.65,
+      "peak": 0.018
+    },
+    {
+      "bus": "brand",
+      "name": "guitar-energy-transformation",
+      "start": 9.083333333333334,
+      "duration": 0.5,
+      "source": "current rock, reversed bandpassed texture",
+      "anchor": 9.583333333333334,
+      "peak": 0.28
+    },
+    {
+      "bus": "brand",
+      "name": "transformation-weight",
+      "start": 9.571333333333333,
+      "duration": 1.2,
+      "source": "existing portal, low frequencies only",
+      "anchor": 9.583333333333334,
+      "peak": 0.17
+    },
+    {
+      "bus": "jet",
+      "name": "single-flyby",
+      "start": 10.300125,
+      "duration": 5.0,
+      "source": "existing jet",
+      "anchor": 12.5,
+      "peak": 0.15
+    },
+    {
+      "bus": "closing",
+      "name": "guitar-close-anticipation",
+      "start": 25.677333333333333,
+      "duration": 0.45,
+      "source": "current rock ending, reversed guitar texture",
+      "anchor": 26.127333333333333,
+      "peak": 0.11
+    }
+  ],
+  "aacReadback": {
+    "input_i": "-16.03",
+    "input_tp": "-1.55",
+    "input_lra": "6.20",
+    "input_thresh": "-26.92",
+    "output_i": "-15.86",
+    "output_tp": "-1.50",
+    "output_lra": "2.60",
+    "output_thresh": "-26.43",
+    "normalization_type": "dynamic",
+    "target_offset": "-0.14"
+  },
+  "listening": "Not available in this session; operator perceptual review required"
+}

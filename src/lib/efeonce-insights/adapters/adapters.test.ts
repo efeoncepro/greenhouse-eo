@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type * as AiVisibilityContracts from '@/lib/growth/ai-visibility/contracts'
 import type * as MetricRegistry from '@/lib/ico-engine/metric-registry'
 
 import { resolveInsightWindows } from '../window'
@@ -91,6 +92,22 @@ describe('SEO adapter', () => {
     expect(etv).toMatchObject({ value: 1200, unit: 'visits_estimated', observation: 'estimated', method: { version: 'improved_layout_clickstream_v2' }, comparisonFactId: 'seo.organic_etv.2026-07-01_2026-08-01.2026-07' })
     expect(result.rejections).toEqual([])
     expect(result.sources.map(source => source.reader)).toEqual(['readSeoOverviewKpisForWindow', 'readRankEvolution', 'readDomainOverviewForTarget', 'readSeoOverviewKpisForWindow', 'readRankEvolution', 'readDomainOverviewForTarget'])
+    // TASK-1888 — Search Console, ranking y ETV miden Google: todo hecho SEO lleva el canal.
+    expect(new Set(result.facts.map(fact => fact.channelId))).toEqual(new Set(['google']))
+    // Sin v2, ningún hecho lleva dirección (evidencia v1 idéntica).
+    expect(result.facts.some(fact => fact.dimension?.direction !== undefined)).toBe(false)
+  })
+
+  it('SEO con v2: la posición media (y su comparable) lleva lower_is_better; las demás métricas quedan neutras', async () => {
+    seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async (_org: string, window: { from: string }) => window.from === '2026-08-01' ? gscWindow(500, 20000, 31, '2026-08-31') : gscWindow(400, 18000, 31, '2026-07-31'))
+    const { seoReportAdapter } = await import('./seo-adapter')
+    const windows = month('2026-08-01', '2026-09-01', 'previous_period')
+    const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [], editorialV2: true })
+    const directions = new Map(result.facts.map(fact => [fact.factId, fact.dimension?.direction]))
+
+    expect(directions.get('seo.position.2026-08-01_2026-09-01')).toBe('lower_is_better')
+    expect(directions.get('seo.position.2026-07-01_2026-08-01')).toBe('lower_is_better')
+    expect(result.facts.filter(fact => fact.metricId !== 'position').every(fact => fact.dimension?.direction === undefined)).toBe(true)
   })
 
   it('ventana no mensual: ETV declara unsupported_window con alternativa mensual; GSC sí sirve', async () => {
@@ -264,5 +281,102 @@ describe('ICO adapter', () => {
 
     icoMocks.runGreenhousePostgresQuery.mockResolvedValue([])
     expect((await icoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: month('2026-08-01', '2026-09-01').current, comparison: null, projectIds: [] })).rejections[0]!.reason).toBe('not_connected')
+  })
+})
+
+describe('TASK-1888 — evidencia del contrato editorial v2', () => {
+  const icoSnapshot = (ftr: number | null) => ({
+    spaceId: 'sp-1', clientId: null, clientName: null, periodYear: 2026, periodMonth: 8,
+    metrics: [
+      { metricId: 'rpa', value: 1.12, zone: null, dataStatus: 'valid', suppressionReason: null, evidence: { completedTasks: 10, eligibleTasks: 8, missingTasks: 2, nonPositiveTasks: 0 } },
+      { metricId: 'otd_pct', value: 80, zone: null },
+      ...(ftr === null ? [] : [{ metricId: 'ftr_pct', value: ftr, zone: null, qualityGateStatus: 'healthy', trustEvidence: { sampleBasis: 'x', sampleSize: 9, totalTasks: 12, completedTasks: 10, activeTasks: 2, deliveryClassifiedTasks: 10 } }])
+    ],
+    cscDistribution: null,
+    context: { totalTasks: 12, completedTasks: 10, activeTasks: 2, onTimeTasks: 8, lateDropTasks: 1, overdueTasks: 1, carryOverTasks: 0, overdueCarriedForwardTasks: 0 },
+    computedAt: '2026-09-02T03:00:00.000Z', engineVersion: 'v1.0.0', source: 'materialized'
+  })
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    icoMocks.runGreenhousePostgresQuery.mockResolvedValue([{ space_id: 'sp-1', space_name: 'Sky · Diseño' }])
+  })
+
+  it('ICO con v2: lee ftr_pct del motor y suma las metas del registro como hechos de referencia', async () => {
+    icoMocks.readSpaceMetrics.mockResolvedValue(icoSnapshot(86))
+    const { icoReportAdapter } = await import('./ico-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const result = await icoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
+
+    expect(result.facts.find(fact => fact.metricId === 'ftr')).toMatchObject({ value: 86, unit: 'percent', coverage: { populationSize: 9 } })
+    // Un space y un mes: la etiqueta es el nombre humano, sin «OTD · Sky · Diseño · 2026-08» (revisión de 1846).
+    expect(result.facts.find(fact => fact.metricId === 'otd')!.label).toBe('Entregas a tiempo')
+
+    const targets = Object.fromEntries(result.facts.filter(fact => fact.role === 'reference').map(fact => [fact.metricId, [fact.value, fact.dimension?.direction]]))
+    const { ICO_METRIC_REGISTRY } = await vi.importActual<typeof MetricRegistry>('@/lib/ico-engine/metric-registry')
+    const thresholds = (id: string) => ICO_METRIC_REGISTRY.find(metric => metric.id === id)!.thresholds
+
+    // Los valores salen del registro dueño, no de literales: se comparan contra el registro, no contra 90/80/1,5.
+    // La banda «cerca de la meta» es el borde exterior de la zona `attention` del MISMO registro (nunca meta × 0,85).
+    expect(targets).toEqual({
+      'target.otd': [thresholds('otd_pct').optimal.min, 'higher_is_better'],
+      'band.otd': [thresholds('otd_pct').attention.min, 'higher_is_better'],
+      'target.ftr': [thresholds('ftr_pct').optimal.min, 'higher_is_better'],
+      'band.ftr': [thresholds('ftr_pct').attention.min, 'higher_is_better'],
+      'target.rpa': [thresholds('rpa').optimal.max, 'lower_is_better'],
+      'band.rpa': [thresholds('rpa').attention.max, 'lower_is_better']
+    })
+
+    // Cada hecho de VALOR lleva la dirección de su métrica desde el mismo registro (el render colorea la variación sin
+    // buscar la meta, cuyo metricId es `target.otd`, no `otd`). Hechos reales de Sky: otd_pct, ftr_pct, rpa.
+    const direction = (id: string) => (ICO_METRIC_REGISTRY.find(metric => metric.id === id)!.higherIsBetter ? 'higher_is_better' : 'lower_is_better')
+    const values = Object.fromEntries(result.facts.filter(fact => fact.role !== 'reference').map(fact => [fact.metricId, fact.dimension?.direction]))
+
+    expect(values).toEqual({ otd: direction('otd_pct'), ftr: direction('ftr_pct'), rpa: direction('rpa') })
+    expect(values.rpa).toBe('lower_is_better')
+  })
+
+  it('ICO sin v2 entrega exactamente la evidencia v1 (sin FTR ni metas)', async () => {
+    icoMocks.readSpaceMetrics.mockResolvedValue(icoSnapshot(86))
+    const { icoReportAdapter } = await import('./ico-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const result = await icoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
+
+    expect(result.facts.map(fact => fact.metricId).sort()).toEqual(['otd', 'rpa'])
+    expect(result.facts.find(fact => fact.metricId === 'otd')!.label).toBe('OTD · Sky · Diseño · 2026-08')
+    expect(result.facts.some(fact => fact.dimension?.direction !== undefined)).toBe(false)
+  })
+
+  it('ICO con v2 y un snapshot sin FTR lo narra como límite; sin FTR medido no hay meta de FTR', async () => {
+    icoMocks.readSpaceMetrics.mockResolvedValue(icoSnapshot(null))
+    const { icoReportAdapter } = await import('./ico-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const result = await icoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [], editorialV2: true })
+
+    expect(result.rejections.map(rejection => [rejection.metricId, rejection.reason])).toEqual([['ftr', 'no_data']])
+    expect(result.facts.some(fact => fact.metricId === 'target.ftr' || fact.metricId === 'band.ftr')).toBe(false)
+  })
+
+  it('AEO: cada proveedor del grader tiene channelId estable; uno desconocido queda sin channelId', async () => {
+    const { GROWTH_AI_VISIBILITY_PROVIDER_IDS } = await vi.importActual<typeof AiVisibilityContracts>('@/lib/growth/ai-visibility/contracts')
+    const { channelForAeoProvider } = await import('../contracts/channels')
+
+    for (const provider of GROWTH_AI_VISIBILITY_PROVIDER_IDS) expect(channelForAeoProvider(provider), provider).toBeDefined()
+
+    aeoMocks.readClientGraderReport.mockResolvedValue({
+      report: {
+        gate: { status: 'ready', reason: 'r', nextAction: 'n' },
+        overallScore: 61,
+        dimensions: [],
+        providerPresence: [{ provider: 'openai', resolved: 12, present: 5 }, { provider: 'nuevo_motor', resolved: 12, present: 2 }],
+        provenance: { asOfDate: '2026-08-20', promptPackVersion: 'pp-3', scoreVersion: 'score-2', providersSampled: ['openai'], promptCount: 12 }
+      }
+    })
+    const { aeoReportAdapter } = await import('./aeo-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const result = await aeoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
+
+    expect(result.facts.find(fact => fact.metricId === 'presence.openai')!.channelId).toBe('chatgpt')
+    expect(result.facts.find(fact => fact.metricId === 'presence.nuevo_motor')).not.toHaveProperty('channelId')
   })
 })

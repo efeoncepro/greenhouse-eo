@@ -26,6 +26,11 @@ export interface AdapterCollectInput {
   window: ResolvedInsightWindow
   comparison: ResolvedInsightWindow | null
   projectIds: string[]
+  /**
+   * TASK-1888 — contrato editorial v2 (`INSIGHTS_EDITORIAL_V2_ENABLED`). Con `false`/ausente un adapter entrega
+   * exactamente la evidencia v1; con `true` agrega lo que el contrato v2 necesita (p. ej. FTR y metas ICO).
+   */
+  editorialV2?: boolean
 }
 
 export type AdapterCollectResult = EvidenceSnapshotContentV1

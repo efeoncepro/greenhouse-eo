@@ -7,6 +7,39 @@
 
 ---
 
+> # ✅ Estado vigente 2026-09-23 — ADJUDICADA
+>
+> **SKY adjudicó a Efeonce el servicio el 2026-09-23** (correo de Nashira Año Meza, Analista de Compras).
+> Efeonce fue finalista entre ~15 propuestas. Todo lo que sigue más abajo sobre "qué falta para entregar",
+> plazos de entrega o cifras de la oferta original es **registro histórico de la licitación**.
+>
+> | | Vigente |
+> |---|---|
+> | **Condiciones finales** | **CLP 3.000.000 netos/mes + IVA** (CLP 3.570.000 con IVA) · **24 meses** → TCV **CLP 72.000.000 neto**. Capacidad gobernada para 45–50 contenidos/mes (nuevos + refreshes), newsletter mensual incluida (hasta 10 contenidos), Notion/Content Hub como hub editorial, WordPress como superficie de publicación, addons aparte, **sin precio unitario por artículo**. |
+> | **Formalización** | **Adenda al contrato vigente con Marketing** (no contrato nuevo). Coordinador en SKY: **Slauko Davor Balaic Guerrero**. |
+> | **Comprador en SKY** | **Equipo de Marca.** Contraparte principal: **Natalia Ortiz Cáceres** (Coordinadora de Comunicación al Pasajero) y su equipo. Gerente de Marketing: Nicolá Lamiaux. Es un equipo comprador distinto del de Performance, que compra la Agencia Creativa. |
+> | **Transición** | Durante **octubre 2026** (Natalia comparte antecedentes). **Kickoff de transición: lunes 2026-09-28, 11:00.** |
+> | **Inicio del servicio** | **2026-11-01** |
+> | **Equipo operativo** | **Valentina Hoyos — Redactora SEO**; el operador va a contratar más equipo. El mapeo de squad del deck (Julio 12% · María Fernanda SEO Copywriter · Daniela · Melkin · Andrés como "SEO Specialist") era el de la **propuesta** y es **histórico**: no es el equipo operativo confirmado. |
+> | **HubSpot** | Deal `62535094842` "SKY Airline — Licitación Blog SEO/AEO (Wherex)" → **Cierre ganado**, closedate 2026-09-23, monto CLP 72.000.000; nota de adjudicación `117311269190`. |
+> | **Práctica dueña** | `seo-aeo-practice` (NO `creative-practice`). No mezclar alcance ni márgenes con la Agencia Creativa de SKY. |
+>
+> **Por qué ganamos:** (1) relación y confianza — cuenta ancla desde 2023, el comité lo reconoció como
+> ventaja; (2) propuesta como **operación de canal, no fábrica de artículos** sobre un blog con tracción
+> (~13.000 keywords, ~40.000 visitas orgánicas/mes); (3) **evidencia verificable** — AI Visibility Grader
+> publicado, Radiografía AEO con artículo real y benchmark AEO competitivo (LATAM, JetSMART, Avianca, Gol);
+> (4) **ajuste económico por alcance, no por descuento** — presupuesto declarado ~USD 3.000/mes → Core
+> 3,0M con capacidad gobernada; (5) squad real, SLA y penalidades aceptadas, y el caso comparable de
+> Grupo Berel (también vía Wherex).
+>
+> **Superseded:** las cifras de la oferta original (CLP 5,2M/mes, 8 artículos, TCV 124,8M, BAFO 4,3M,
+> piso 5,0M) **no son las condiciones vigentes**.
+
+> **La iteración de la oferta terminó:** este brief queda como registro histórico del trabajo de licitación.
+> Una sesión nueva sobre SKY Blog ya no itera la oferta: opera la transición y el arranque del servicio.
+
+---
+
 ## DELTA 2026-08-03 — V2 técnica y económica alineadas con Notion; cierre canónico pendiente
 
 Se creó una nueva versión técnica sin reemplazar la anterior:
@@ -145,10 +178,10 @@ vende el servicio) · `commercial-expert` · `copywriting`.
 
 ---
 
-## 1. El contexto en una frase
+## 1. El contexto en una frase *(histórico — etapa de licitación)*
 
 Licitación de **producción de contenido para el blog de SKY Airline** (Wherex, cierra **15/07/2026**,
-TCV CLP 124.800.000 a 2 años). La propuesta se entrega como **deck**, más oferta técnica y económica.
+TCV CLP 124.800.000 a 2 años — cifra de la oferta original, superseded; vigente: CLP 72.000.000 neto). La propuesta se entrega como **deck**, más oferta técnica y económica.
 **El agente prepara; el humano sube y firma.**
 
 🔴 **Regla dura de esta licitación:** todo lo client-facing va en **registro formal de usted** (o

@@ -68,7 +68,7 @@ GANCHO ──► TENSIÓN/DESARROLLO ──► GIRO/CLÍMAX ──► RESOLUCIÓ
 - **Beats.** Divide el cuerpo en 3-6 *beats* (unidades de sentido). Cada beat mueve la historia un
   paso. Un beat = una idea = típicamente 1-3 planos. Si un beat no mueve nada, córtalo.
 - **Giro/clímax.** El momento de mayor carga: la revelación, el producto en su mejor luz, el dato que
-  duele. Colócalo ~70-80% del recorrido, no al final muerto.
+  duele. Su posición depende del arco: una transformación de marca puede ser el primer gran giro y dejar espacio a prueba/mensaje/cierre. No imponer un porcentaje fijo.
 - **Resolución + CTA.** Cierra la tensión y da la acción. El CTA cinematográfico se *gana* con el arco;
   no se pega como cartel.
 
@@ -113,9 +113,10 @@ Acción: la cámara empuja 10% mientras el foco sube de intensidad.
 Audio: swell de cuerdas + subgrave; corta duro a negro al final.
 ```
 
-**Densidad correcta:** entre 8 y 30 planos para un spot de 15-30s. Menos = estás saltando decisiones;
-más = estás sobre-especificando toma que se decidirán en el edit. Un plano por *idea de encuadre*, no
-por segundo.
+**Densidad de planos:** define la cantidad por ideas, lectura y continuidad. Un spot de 15–30 s puede
+funcionar con una toma o varios planos; no existe una cuota 8–30. Distingue rigs de cámara, planos y
+solicitudes al modelo. Justifica cada cambio y el tiempo de lectura; usa la matriz del
+[companion de preproducción](../companions/video-preproduction-and-production.md).
 
 **Notas de cámara y acción** — vocabulario mínimo para que cualquiera lo lea: `push-in / pull-out`
 (dolly), `pan / tilt` (giro sobre eje), `truck / pedestal` (traslación lateral/vertical), `whip`
@@ -189,7 +190,7 @@ Cierra en `templates/animatic-shotlist.md`.
 
 **Aplica a las dos manos:** para IA, cada fila es un `shot-prompt-sheet.md` (módulo 09) esperando
 llenarse; para humano, es la especde handoff a After Effects/Blender. El storyboard es el jefe común:
-si la toma IA no calza con su celda de storyboard, se regenera — no se acepta "porque salió linda".
+si la toma no cumple, se diagnostica y se evalúa rescate/edición dentro del alcance antes de una nueva generación autorizada. La belleza aislada no compensa incumplir el relato.
 
 ---
 

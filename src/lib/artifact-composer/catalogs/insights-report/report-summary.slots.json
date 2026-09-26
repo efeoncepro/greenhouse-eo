@@ -1,0 +1,218 @@
+{
+  "template": "ReportSummaryPage",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "note": "TASK-1889 — resumen ejecutivo del canvas aprobado (página `Premium-Resumen`).",
+  "viewport": {
+    "width": 794,
+    "height": 1123
+  },
+  "slots": {
+    "clientName": {
+      "selector": "[data-slot='clientName']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 40,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Nombre del cliente en la cabecera. Sin cliente, la caja queda vacía y la página no se mueve; nunca un nombre inventado. El logo llega con la portada sellada de TASK-1888."
+    },
+    "runningSection": {
+      "selector": "[data-slot='runningSection']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 44,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Sección de la página («Resumen ejecutivo»)."
+    },
+    "runningPeriod": {
+      "selector": "[data-slot='runningPeriod']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Período y comparación («Agosto 2026 · contra julio 2026»)."
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "thesis": {
+      "selector": "[data-slot='thesis']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 120,
+        "maxLines": 3,
+        "overflow": "reject"
+      },
+      "notes": "Tesis del mes: una afirmación, no un tema."
+    },
+    "thesisLead": {
+      "selector": "[data-slot='thesisLead']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 320,
+        "maxLines": 4,
+        "overflow": "reject"
+      }
+    },
+    "essentialsLabel": {
+      "selector": "[data-slot='essentialsLabel']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "essentials": {
+      "selector": "[data-slot='essentials']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 5
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "ordinal": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-ordinal",
+            "consumer": "resolver-only"
+          },
+          "figure": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 12,
+            "maxLines": 1
+          },
+          "title": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 60,
+            "maxLines": 2
+          },
+          "detail": {
+            "type": "rich-string",
+            "required": true,
+            "maxCharacters": 170,
+            "maxLines": 3,
+            "allowedTags": [
+              "strong"
+            ]
+          },
+          "folio": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 8,
+            "maxLines": 1
+          }
+        }
+      },
+      "notes": "Hechos esenciales (TASK-1888): hasta 5, cada uno con su cifra y el folio de la página que lo prueba."
+    },
+    "decision": {
+      "selector": "[data-slot='decision']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 40,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 240,
+          "maxLines": 3
+        },
+        "signature": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 40,
+          "maxLines": 1
+        }
+      },
+      "notes": "Panel «Para decidir». Un plan sin decisión compone sin panel."
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "footerContact": {
+      "selector": "[data-slot='footerContact']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "address": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 72,
+          "maxLines": 1
+        },
+        "phone": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        }
+      },
+      "notes": "Desde EFEONCE_CONTACT (dirección de presentación y teléfono de Chile)."
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
+      },
+      "notes": "«NN / total»: ambos del plan de páginas de la misma composición (paginateFlow), nunca un número fijo."
+    }
+  }
+}

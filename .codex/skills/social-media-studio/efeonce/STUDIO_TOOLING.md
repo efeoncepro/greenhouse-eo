@@ -124,7 +124,9 @@ Descubrir herramientas actuales; `models_recommend` → `models_get` → estimat
 confirmado → generación → `jobs_wait` → resultado visible. No asumir que `models_explore` o
 `media_upload_widget` siguen expuestos ni que todos los modelos tienen los mismos ratios.
 
-La sesión de CLI y MCP son independientes; verificar la ruta elegida. Un predictor, si está disponible,
+La sesión de CLI y MCP son independientes; verificar la ruta elegida. Los puentes MCP locales
+(`higgsfield-use-photoshop` / `-illustrator` / `-blender`, instalados 2026-09-24) y la CLI `higgsfield` (con sesión
+desde 2026-09-24) son carriles distintos del MCP remoto; estado en `higgsfield-provider` §Estado local verificado. Un predictor, si está disponible,
 es una hipótesis y nunca evidencia de performance. Cargar la skill específica de producto/UGC/preset
 cuando el encargo la requiera.
 

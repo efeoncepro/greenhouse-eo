@@ -5,7 +5,7 @@
     "softshell": "softshell de tres capas, cierre completo con tapeta interior y protector de mentón, cuello alto, dos bolsillos con cierre oculto, puños ajustables, cordón en el ruedo, sin capucha",
     "bomber": "sarga técnica mate, cierre completo, cuello, puños y ruedo de punto acanalado navy, dos bolsillos ribeteados con cierre oculto, mangas raglán",
     "emblema": "isotipo BORDADO en hilo blanco en el pecho izquierdo, ~7 cm, geometría del isotipo oficial (nave a la derecha, aletas abajo a la izquierda, órbita elipse ancha, planeta arriba)",
-    "espalda": "lleva la estampa canónica (logo completo + «Empower your Growth» centrado y más chico) al 38 % del ancho de la espalda, igual que el hoodie — decisión del operador 2026-09-17; el polo mantiene la espalda limpia",
+    "espalda": "lleva la marca canónica (logo completo + «Empower your Growth» centrado y más chico) al 38 % del ancho de la espalda, BORDADA en puntada satinada, NUNCA estampada: la softshell es tela técnica y la serigrafía se agrieta y se despega — corrección del operador 2026-09-21 («esa tela se borda no se estampa»). El arte con texto se pasa como IMAGEN desde `ref/estampa-espalda.png`, nunca se le pide el texto al modelo. El polo mantiene la espalda limpia",
     "color": "navy de marca #023c70"
   },
   "como_usarla": "Elegir la vista por el ángulo de la toma y pasarla junto con las referencias de rostro y cuerpo. La chaqueta va sobre el polo navy en piezas frente a cliente.",
@@ -273,6 +273,40 @@
         1200,
         1600
       ]
+    },
+    {
+      "id": "softshell-17-puesto-espalda-mujer",
+      "descripcion": "La softshell puesta, vista de espalda, en cuerpo femenino, sin rostro.",
+      "cuando_usarla": "Cuando la pieza muestre a una MUJER de espaldas con la chaqueta de reunión. La vista 15 es la misma toma en cuerpo masculino.",
+      "archivo_fondo": "final/efeonce-chaqueta-softshell-17-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png",
+      "resolucion": "1024x1536",
+      "brief": "brief/softshell-puesto-espalda-mujer.prompt.txt"
+    },
+    {
+      "id": "bomber-15-puesto-espalda-mujer",
+      "descripcion": "La bomber puesta, vista de espalda, en cuerpo femenino, sin rostro. PRIMERA vista de espalda puesta de la bomber: el kit no tenía ninguna.",
+      "cuando_usarla": "Cuando la pieza muestre a alguien de espaldas con la bomber. Sigue faltando la equivalente en cuerpo masculino.",
+      "archivo_fondo": "final/efeonce-chaqueta-bomber-15-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png",
+      "resolucion": "1024x1536",
+      "brief": "brief/bomber-puesto-espalda-mujer.prompt.txt"
+    },
+    {
+      "id": "bomber-16-puesto-espalda",
+      "descripcion": "La bomber puesta, vista de espalda, en cuerpo masculino, sin rostro.",
+      "cuando_usarla": "Alguien de espaldas con la bomber, cuerpo masculino. La 15 es la misma toma en cuerpo femenino.",
+      "archivo_fondo": "final/efeonce-chaqueta-bomber-16-puesto-espalda-1024x1536-v01-fondo-estudio.png",
+      "resolucion": "1024x1536",
+      "brief": "brief/bomber-puesto-espalda.prompt.txt"
+    },
+    {
+      "id": "bomber-17-puesto-frente-cuerpo-b",
+      "descripcion": "La bomber puesta de frente en un segundo cuerpo, de complexión más llena y tono de piel más oscuro, sin rostro.",
+      "cuando_usarla": "Para ver cómo cae la bomber en otra contextura; equivalente a la 16 de la softshell.",
+      "archivo_fondo": "final/efeonce-chaqueta-bomber-17-puesto-frente-cuerpo-b-1024x1536-v01-fondo-estudio.png",
+      "resolucion": "1024x1536",
+      "brief": "brief/bomber-puesto-frente-cuerpo-b.prompt.txt"
     }
-  ]
+  ],
+  "delta_2026_09_21": "Se agregan las vistas PUESTAS DE ESPALDA EN CUERPO FEMENINO. El kit sólo tenía la espalda puesta en cuerpo masculino, así que para una pieza con una mujer había que elegir entre una vista del ángulo correcto pero del cuerpo equivocado, o ninguna. Generadas con el método del kit: mismo bloque base, mismo contrato de realismo, mismo cierre de estudio, y la estampa canónica como imagen 2 — el texto nunca se le pide al modelo. Detectado por el operador el 2026-09-21.",
+  "delta_2026_09_21_bordado": "El kit declaraba la espalda como ESTAMPA y las cuatro vistas de espalda salieron en tinta plana. El operador lo detectó al verla en una pieza. La técnica la decide la TELA: softshell y bomber van BORDADAS. Corregida por ahora sólo `02-espalda` como v02 (`efeonce-chaqueta-softshell-02-espalda-1024x1024-v02-fondo-estudio.png`); PENDIENTES de rehacer: softshell 10-plano-espalda, 15-puesto-espalda y 17-puesto-espalda-mujer, y las equivalentes de la bomber. El hoodie queda como decisión abierta del operador: en algodón afelpado la serigrafía es legítima."
 }

@@ -43,6 +43,25 @@ sus cambios se mezclan en el render y cualquier `--freeze` co-mingla el trabajo 
 6. git add <tu deck-plan> <las plantillas> scripts/frontend/baselines/artifact-composer + COMMIT (atómico).
 ```
 
+### Scope de catálogos Insights
+
+El gate global también contiene `deck-axis` y el deck SKY. Mientras `ISSUE-122` mantenga diferencias
+históricas en frames que esta task no toca, un freeze global obliga a rebaselinar trabajo ajeno. Para
+promover o verificar únicamente los dos catálogos Insights usa:
+
+```bash
+pnpm composer:visual-gate --catalog=insights --selftest
+pnpm composer:visual-gate --catalog=insights --freeze
+pnpm composer:visual-gate --catalog=insights
+```
+
+El freeze scoped agrega o actualiza sólo `templates-insights-deck/**` y
+`templates-insights-report/**`, conserva los demás PNG y hashes del manifest y vuelve a sellar su
+digest. Igual requiere declarar cada frame cambiado en `BASELINE_DELTAS.md`; el freeze y commit deben
+ser atómicos. El gate scoped valida el manifest completo y diffea a cero píxeles sólo los frames de
+Insights. El gate global sigue siendo la verificación para cambios en `deck-axis` o en SKY; este scope
+no limpia ni oculta sus diferencias históricas.
+
 ## 4. 🩸 El gotcha que TIENES que conocer: las fotos raster no son deterministas (ISSUE-122)
 
 Las láminas con **fotos** (`TeamGalleryFull` / la lámina del equipo) **driftean unos píxeles entre
@@ -85,6 +104,26 @@ trabajo.
   ledger de deltas, no un archivo duplicado que después driftea.
 
 Caso fuente: `partnerBadge` en `BackCoverFull` (credencial HubSpot Solutions Partner, 2026-08-13).
+
+### Valor de muestra declarado por el contrato (`example`, TASK-1889)
+
+El relleno sintético (texto recortado al `maxLength`, números mínimos) no ejerce una **figura cuya
+geometría sale de cifras**: una barra, una columna o una marca de meta calculadas desde `"a"` o `0`
+dibujan una figura vacía o degenerada, y el frame congelado no prueba nada. Por eso un contrato puede
+declarar su propio valor de muestra con `example`:
+
+- **En el slot** (`SlotContract.example`) o **en un campo** de objeto/item (`SlotFieldContract.example`),
+  ambos en `src/lib/artifact-composer/contracts.ts`.
+- `synthesizeSlotValue` (`synthesize.ts`) lo usa **tal cual** antes de sintetizar nada; si no hay
+  `example`, el comportamiento es el de siempre.
+- Es **dato del catálogo, no del motor**: vive en el `*.slots.json` de la plantilla (ej. los
+  `"example": "9"` / `"10"` de `report-figure-targets.slots.json`). Sólo lo lee el probe del gate; un
+  render real usa los valores del plan.
+- Agregar o cambiar un `example` **mueve el frame** de esa lámina igual que un slot nuevo: declararlo en
+  `BASELINE_DELTAS.md` y `--freeze` (§2).
+
+Caso fuente: las páginas y láminas de figura de Insights (`ReportFigure{Comparison,Columns,Targets,Trend}Page`
+e `InsightsFigure{Comparison,Columns,Targets,Trend}Slide`), TASK-1889, 2026-09-25.
 
 ## 4ter. Atribuir un drift que no es tuyo: mira si la plantilla está commiteada y limpia
 

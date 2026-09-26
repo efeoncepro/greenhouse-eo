@@ -20,6 +20,7 @@ import {
   type InsightOutput,
   type InsightRequestV1
 } from '../contracts/request'
+import { INSIGHT_COVER_PREFERENCES } from '../contracts/cover'
 import { InsightsInputError } from '../errors'
 import { type ResolvedInsightWindows, resolveInsightWindows } from '../window'
 
@@ -110,6 +111,9 @@ export const validateInsightRequest = (
   const efeoncePackVersion = assertString(brand.efeoncePackVersion ?? 'axis-current', 'brand.efeoncePackVersion', { min: 1, max: 64 })
   const clientBrandRef = brand.clientBrandRef === undefined || brand.clientBrandRef === null ? null : assertString(brand.clientBrandRef, 'brand.clientBrandRef', { min: 1, max: 200 })
 
+  // TASK-1888 — sólo entra al encargo si viene: su ausencia deja el request (y su hash) idéntico al de antes.
+  const coverTheme = brand.coverTheme === undefined || brand.coverTheme === null ? undefined : assertEnum(brand.coverTheme, 'brand.coverTheme', INSIGHT_COVER_PREFERENCES)
+
   const projectIds = raw.projectIds === undefined ? [] : Array.isArray(raw.projectIds) ? raw.projectIds.map(item => assertString(item, 'projectIds[]', { min: 1, max: 200 })) : null
 
   if (projectIds === null) throw new InsightsInputError('projectIds debe ser una lista', { field: 'projectIds' })
@@ -131,7 +135,7 @@ export const validateInsightRequest = (
       locale,
       depth,
       outputs,
-      brand: { efeoncePackVersion, clientBrandRef },
+      brand: { efeoncePackVersion, clientBrandRef, ...(coverTheme ? { coverTheme } : {}) },
       policy,
       idempotencyKey,
       title,

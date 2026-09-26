@@ -1,34 +1,6 @@
 ---
 name: audio-studio
-description: >-
-  Skill experta de PRODUCCIÓN DE AUDIO de nivel enterprise al estado del arte 2026 — el
-  "estudio" que dirige y produce voz, música, SFX y audio-narrativa con IA y/o humanos, y
-  lo entrega como pieza de audio propia (podcast, voice over, jingle, track, audiolibro,
-  sonic branding). Dos manos: (1) conocimiento profundo del craft (fundamentos de audio —
-  señal/gain staging/espectro/dinámica, dirección de voz + performance, creación musical
-  + composición, jingles + sonic branding, diseño de SFX + foley, producción de podcast,
-  audio-narrativa, mezcla + mastering + loudness), y (2) capacidad de ejecución (dirige el
-  pipeline IA — ElevenLabs voz/música/dubbing vía MCP + Higgsfield audio + Seed Audio 1.0
-  + Suno/Udio + Adobe enhance —, integra craft humano y hace handoff), cerrando el loop
-  idear→guion/brief→producir→editar→mezclar→masterizar→entregar. Es "humano + IA": el craft
-  (módulos 01-02, 04-09) aplica lo produzca quien lo produzca; el pipeline IA (03, 10) suma
-  la mano moderna. COMPLEMENTARIA pero DISTINTA de motion-design-studio: ese hace sonido
-  SINCRONIZADO A IMAGEN (mezcla a video, hit points, LipSync); audio-studio produce AUDIO
-  COMO PIEZA PROPIA y es a quien ese módulo de sonido le delega el craft de voz/música/SFX.
-  Delega a motion-design-studio (sonido sincronizado a picture), a social-media-studio
-  (formato/norma de audio por red), a design-studio (identidad visual que el sonic branding
-  acompaña), a digital-marketing (estrategia de medios/campaña de audio), a
-  greenhouse-nexa-conversational (integración de Nexa en producto — audio-studio produce el
-  ASSET de voz de Nexa), a copywriting (craft del guion/VO script) y a efeonce-agency
-  (doctrina de marca). Incluye overlay Efeonce (sonic identity, voz de Nexa, podcast de
-  Glitch) y capa de delivery para clientes Globe. Triggers: "audio", "sonido", "voz", "voice
-  over", "voiceover", "VO", "locución", "narración", "podcast", "música", "music", "jingle",
-  "banda sonora", "score", "sonic branding", "identidad sonora", "audio logo", "SFX", "efecto
-  de sonido", "foley", "diseño sonoro", "audiolibro", "radiodrama", "voz IA", "AI voice",
-  "text-to-speech", "TTS", "voice cloning", "clonar voz", "clonación de voz", "dubbing",
-  "doblaje", "ElevenLabs", "Suno", "Udio", "Seed Audio", "Seedaudio", "mezcla", "mixing",
-  "mastering", "masterización", "loudness", "LUFS", "EQ", "compresión de audio", "enhance de
-  voz", "restauración de audio".
+description: Produce y dirige audio enterprise con IA y humanos para voz, VO, TTS, clonación autorizada, música, SFX, podcast, sonic branding, mezcla y mastering. Use for audio como pieza propia, Studio Credits de audio y rights; delega sincronización audiovisual a motion-design-studio.
 ---
 
 # Audio Studio — Producción de audio (voz · música · SFX · podcast) 2026
@@ -68,7 +40,8 @@ description: >-
 3. **Chequea frescura + licencia**: si vas a nombrar un modelo de audio IA o usar música/voz IA en
    algo comercial/cliente, reverifica el modelo **y su licencia** (`SOURCES.md`).
 4. **Si hay que ejecutar** (producir/editar/mezclar), abre `efeonce/STUDIO_TOOLING.md` y usa el
-   pipeline con las herramientas conectadas + confirmación humana antes de producir/entregar.
+   pipeline con las herramientas conectadas y el alcance ya autorizado. Preparar y entregar una revisión
+   solicitada no exige otra aprobación; una operación pagada fuera del alcance o una publicación conserva su gate.
 5. **Aterriza a Efeonce** si es marca/canales propios o un cliente Globe:
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`.
 6. **Cierra con un artefacto** de `templates/` (brief, guion+dirección, casting de voz, brief de
@@ -115,7 +88,8 @@ Cierra el loop **idear → guion/brief → producir → editar → mezclar → m
 - **Producir voz**: **ElevenLabs** (v3 audio tags, IVC/PVC cloning, dubbing multi-idioma, voice design;
   Flash v2.5 para real-time), **Seed Audio 1.0** (diálogo multi-personaje + música + SFX en una pasada),
   **Higgsfield** (`create_voice`, `dubbing`, `voice_change`) — todo vía MCP.
-- **Producir música**: **ElevenLabs Music** (licencia comercial día 1 = cliente), **Suno/Udio** (calidad).
+- **Producir música**: **ElevenLabs Music**, **Suno/Udio** según controles reales, dirección y licencia verificada
+  para la cuenta, pista y uso; una marca de proveedor no acredita derechos comerciales por sí sola.
 - **Producir SFX**: generación de SFX (ElevenLabs) + foley/librerías.
 - **Restaurar/enhance**: **Adobe** `media_enhance_speech`, Higgsfield `enhanceSpeechPoll`.
 - **Craft humano**: grabación, edición, mezcla, mastering (DAW) — handoff con spec cuando aplique.
@@ -124,8 +98,10 @@ Cierra el loop **idear → guion/brief → producir → editar → mezclar → m
 > **(a)** las operaciones generativas consumen credits por duración/tier/attempt; edición, mix/master y
 > export determinísticos consumen `0 credits` aunque sí capacidad; todo spend sigue estimate, reservation,
 > approval y settlement/release/refund; **(b)** todo audio comercial/cliente
-> exige **licencia verificada** (música IA: ElevenLabs Music es lo seguro); **(c)** clonar una voz exige
-> **consentimiento explícito** del dueño; **(d)** entregar/publicar pasa **SIEMPRE por confirmación humana**.
+> exige **licencia verificada para el activo y el uso**, separada del saldo; **(c)** clonar una voz exige
+> **consentimiento explícito** del dueño; **(d)** distinguir exportación, entrega para revisión, aprobación
+> creativa y publicación. Entregar una revisión pedida está dentro del encargo; publicar necesita autorización
+> correspondiente. La aprobación existente y los límites del operador prevalecen sobre un gate genérico.
 
 ## 5. Boundaries duros (lo que esta skill NO hace)
 
@@ -137,7 +113,9 @@ Cierra el loop **idear → guion/brief → producir → editar → mezclar → m
   reverifica (§Frescura). El licenciamiento es lo más volátil y lo más caro de equivocar.
 - **NUNCA** clones una voz sin **consentimiento explícito**, ni uses música IA de licencia dudosa en un
   entregable comercial/cliente.
-- **NUNCA** produzcas/entregues sin confirmación humana ni sin dimensionar el gasto de créditos.
+- **NUNCA** ejecutes gasto fuera del alcance autorizado ni publiques por inferencia de una aprobación musical.
+  Dimensiona el gasto y conserva su evidencia; las ediciones locales y entregas para revisión ya solicitadas
+  continúan sin pedir una aprobación redundante.
 - **NUNCA** cotices credits por pieza/hora/caracteres, conviertas costo vendor en credits, cobres un retry
   técnico o escondas licencia/consentimiento/sync/master/buyout en el saldo. Usa `modules/11`.
 - **NUNCA** transcribas mal la marca: Efeonce ≠ Greenhouse. Ver `efeonce/EFEONCE_OVERLAY.md`.
@@ -150,8 +128,9 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
    audio. Dirección, mezcla y mastering deciden si suena pro.
 2. **Voz IA es tier producción**, no juguete: ElevenLabs v3 con audio tags (`[whispers]/[laughs]`),
    multi-speaker, 70+ idiomas; cloning IVC/PVC; dubbing que preserva la voz cross-idioma.
-3. **Música IA reemplaza librerías stock** para la mayoría de usos — pero **la licencia decide la
-   herramienta**: ElevenLabs Music (comercial día 1) para cliente; Suno/Udio para calidad/interno.
+3. **Elegir fuente por adecuación y derechos.** Música original, librería o generación IA son alternativas.
+   Una pista existente bien dirigida puede resolver mejor que otra generación; verificar licencia, controles
+   reales y calidad percibida por activo. El proveedor o su popularidad no garantizan uso comercial.
 4. **Audio unificado (Seed Audio 1.0):** diálogo + música + SFX + ambiente en una sola pasada — cambia el
    pipeline para prototipado rápido y prev de audio.
 5. **Consentimiento y licencia no son opcionales.** Clonar voz sin permiso o música IA sin licencia clara =
@@ -180,3 +159,24 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
 Al adaptar un video cuya música ya fue aceptada, cargar
 `efeonce/APPROVED_MUSIC_CONTINUITY.md`: conservar la aprobación, procedencia y licencia; copiar el
 stream cuando procede y verificar audio/sincronía. La adaptación visual no exige regenerar música.
+
+## Música y efectos sin narración
+
+Cuando una mezcla contiene voz no permitida o debe acompañar cartelas sin leerlas, cargar
+`efeonce/NO_VOICE_MUSIC_SFX.md`: controles instrumentales por proveedor, fuentes limpias,
+SFX por evento, continuidad de tempo y escucha perceptual identificada. Un ASR vacío no certifica ausencia
+de voz; si la sesión no admite escuchar, registrar ese límite al entregar para revisión.
+
+## Posproducción audiovisual y cambios después del picture lock
+
+Motion coordina el [companion de posproducción y entrega](../motion-design-studio/companions/video-postproduction-and-delivery.md).
+Audio recibe el montaje real y sus cues, produce o recupera fuentes limpias y separa stems por causa visible.
+Generar la mezcla final después de fijar imagen; una referencia temporal de previs no aprueba timings del
+resultado. Reservar el mayor gesto sonoro para el evento principal de marca y conservar continuidad musical.
+
+Para recortes o retiming posteriores, usar `efeonce/APPROVED_MUSIC_CONTINUITY.md`: clasificar qué se conserva,
+se mueve o cambia; verificar márgenes inicial/final y no desplazar el foley intacto. Revisión por bandas/mono,
+LUFS, true peak, ASR y hashes son evidencia técnica específica, nunca sustitutos de naturalidad o impacto.
+El template compartido de Motion es `templates/video-postproduction-review.md` en esa skill.
+
+Descripción extendida de oficio y términos de búsqueda conservados en `efeonce/EXTENDED_DESCRIPTION.md`.

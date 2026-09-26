@@ -115,6 +115,32 @@ videos devolvió `[null]`, por lo que no afirmar que se publicó alt text en el 
   el post, leer ese estado antes de suponer fallo: puede ser demora del feed.
 - Caso: [Viva México y previa 18](../../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md).
 
+### Receta verificada: carrusel IG + documento LinkedIn con readback por firma (2026-09-19)
+
+Caso «Nivel de búsqueda» (9 láminas PNG 1080×1350): Instagram `378566667` mar 22-sep 16:00 y LinkedIn página
+`378566757` vie 25-sep 11:00, marca `3961547`, zona `America/Santiago`. Registro:
+`ai-generations/2026-09-19_nivel-de-busqueda/PROGRAMACION.md`; bitácora
+`docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md`.
+
+1. **Media.** Subir los PNG finales a `gs://efeonce-group-greenhouse-public-media-prod/campaigns/<campaña>/` con
+   nombre de orden (`c01…c09`) y verificar **HTTP 200** de cada URL (y `content-type` correcto, §3) antes de crear el post. Si `gcloud`
+   responde `Reauthentication failed`, correr `pnpm gcloud:auth:playwright -- --force` sin preguntar y seguir.
+2. **Horario.** `getBestTimeToPostByNetwork` por red sobre la semana (en el caso: IG mar 16 h, índice 311 = máximo
+   semanal; LinkedIn vie 11 h, índice 2914 = máximo) **cruzado con `getScheduledPosts`** de la misma marca para no
+   chocar con piezas ya programadas (lun 21 y mié 23). El índice es intensidad relativa, no pronóstico.
+3. **Instagram.** `media` = URLs en orden de lectura, `mediaAltText` = un texto por lámina en el mismo orden,
+   `instagramData:{type:"POST", isAiGenerated:true}` cuando el arte es generado.
+4. **LinkedIn.** Las mismas URLs + `linkedinData:{"publishImagesAsPDF":true,"documentTitle":"…"}`; Metricool arma
+   el documento. El alt text queda **vacío** (no lo expone para documentos): no afirmarlo. El PDF local
+   (`out-v2/linkedin-nivel-de-busqueda.pdf`, pdf-lib, 25 MB bajo el límite de 100 MB) es respaldo, no transporte.
+5. **Readback de texto.** Releer por ID y comparar el texto completo contra `COPY.md` (idéntico, no «parecido»).
+6. **Readback de orden por firma de imagen.** Metricool re-aloja la media en `static.metricool.com`, así que la URL
+   no prueba el orden. Descargar las URLs re-alojadas y comparar su firma de imagen (p. ej. miniatura reducida
+   y diferencia de píxeles; no el hash, porque el re-alojamiento puede recodificar) contra los PNG locales: primera = portada y última = contraportada con diferencia 0 en
+   ambas redes. Un error de orden en un carrusel narrativo rompe la pieza aunque todos los archivos estén.
+7. Registrar en `PROGRAMACION.md` IDs, horarios con su justificación, URLs de media, resultado del readback y lo
+   **no** programado (la pieza suelta de Threads quedó fuera, declarada).
+
 ## 4. Readback, evidencia y cierre
 
 La respuesta de creación no cierra la tarea. Leer nuevamente `getScheduledPosts` y comprobar por ID:
@@ -139,3 +165,36 @@ Evidencia del 2026-09-13 (no estado vivo):
 
 Las dos campañas conservan activos, copy y manifiestos separados. Día de Muertos verifica reutilización
 del método y aceptación de PNG; no cambia la dirección creativa ni los entregables de Fiestas Patrias.
+
+
+## Menciones y reutilización de videos paid en orgánico
+
+Caso: [CMP-001, lanzamiento del grader](../../../../docs/operations/social/2026-09-22-cmp-001-campaign-brief-handoff.md).
+El mismo MP4 puede usarse en orgánico y paid, pero sus permisos, destino, copy y estados son independientes.
+Conservar el ratio pedido; REEL con un MP4 4:5 no se documenta como un master 9:16.
+
+- LinkedIn: resolver primero el URN de organización y nombre exacto. La sintaxis documentada por Metricool es
+  `@[urn:li:organization:ID|Nombre]`; Efeonce se verificó como `@[urn:li:organization:20503593|Efeonce]`.
+- Instagram: la mención usa el handle, `@efeoncepro`, no el nombre de presentación.
+- Fuente oficial, revisada 22/09/2026: https://help.metricool.com/mention-and-tag-other-accounts-9jqzi.
+  La sintaxis documentada y preservada en readback no acredita por sí sola el enlace en el post publicado.
+- Copy aprobado: preservar literalmente salvo cambios pedidos; registrar URL exacta, no añadir UTMs en silencio.
+  Un URL en caption no prueba un enlace clicable en Instagram ni autoriza cambiar la bio.
+- Mantener registro único con IDs y UUID, cuenta, horario local/UTC, copy, media, portada y estado. Un borrador
+  previo en el navegador no debe publicarse además del post ya programado. No copiar correos, tokens ni cookies.
+- Si expira GCP para el transporte canónico, usar el runner de `greenhouse-gcloud-auth-playwright`, verificar
+  CLI + ADC y luego HTTP/MIME del archivo. No modificar IAM ni reemplazar por credenciales de otra identidad.
+
+## Caso CMP-003 SKY · corte de programación 2026-09-24
+
+Registro de campaña: [CDR-009](../../../../docs/campaigns/decisions/CDR-009-cmp003-programacion-organica-octubre-2026.md).
+**Ya programado; no recrear:** IG Efeonce 13-oct-2026 16:00; LinkedIn Efeonce 15-oct 11:00;
+LinkedIn Julio 16-oct 11:00, America/Santiago. IDs/UUID, cuentas y evidencia pertenecen al CDR.
+Video V17 de 29,5 s/1080×1920 + portada V4 PNG con flecha SKY verde + copy específico por canal.
+Readback del 24-sep: tres PENDING, autoPublish=true, draft=false; MP4/PNG re-alojados con SHA-256
+idénticos a las entregas aprobadas. El jueves corporativo evita una colisión real del viernes;
+no se movió la publicación ajena. PENDING no equivale a publicado; releer antes de actuar.
+
+Al retomar una campaña ya aprobada, partir del registro de programación y su paquete exacto,
+no de una preview ni de un plan antiguo. En SKY, la corrección de voz programada es «mi equipo
+Efeonce» para Julio y primera persona plural para los canales institucionales.

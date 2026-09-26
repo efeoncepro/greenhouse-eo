@@ -1,0 +1,18 @@
+Edit image 1, the blue-purple Efeonce/SKY cover. Image 2 is the OFFICIAL WHITE SKY LOGO to use literally, including the separated arrow chevron K and adjacent vertical stem. The user requests a NEW CLEARER TYPOGRAPHIC HIERARCHY. Keep the sophisticated blue/purple lighting, but reorganize the composition:
+
+1. Replace the giant plain typed "SKY" at the top with the OFFICIAL SKY LOGO supplied in image 2. It must be a faithful proportional placement of that exact white logo artwork, not Bricolage letters, not a font approximation, no geometry changes. It is the sole SKY logo anywhere on the poster.
+2. Below it put "nos eligió" (no period here) in the original campaign Bricolage font, but notably smaller and lighter weight than before. This line is a bridge, not a competing headline.
+3. Below that put "de nuevo." in the reference's real green handwritten Guttery lettering, enlarged and more expressive as the main emotional graphic payoff. A confident slightly angled handwritten gesture and short luminous underline. Retain the exact lettering and spelling. Three obviously different visual levels: official brand / quieter sentence / expressive handwritten reveal. Avoid equal-size lines and flat hierarchy.
+4. At the bottom, only the official white Efeonce spacecraft logotype already present in image 1, centered. Remove the separator bar and the lower SKY logo completely. Under Efeonce retain the smaller, subtle efeoncepro.com URL speech bubble with its tiny tail and low-contrast luminosity appearance. No rounded rectangle substitute, no new text.
+
+Exact remaining text: official SKY logo, "nos eligió", "de nuevo.", official efeonce logo, "efeoncepro.com". No SEO or AEO sentence. Do not add text.
+
+Canvas 9:16. Crop-safe composition in 1080x1920 equivalent coordinates:
+- official SKY logo approximately x200..800, y460..690, preserve its original 68:26 proportions
+- nos eligió centered around y750..850, about 95px text size, restrained compared with logo
+- handwritten de nuevo. approximately x160..900 y890..1120, around 230px nominal size, largest expressive phrase, green #46DC28; underline below
+- Efeonce centered approximately x350..730, y1240..1335, original logo proportions intact
+- URL bubble centered x390..690, y1390..1450.
+Keep all critical artwork inside x110..920 y440..1470; all outer space is atmospheric blue-purple only. Never show guides.
+
+Maintain deep Efeonce blue blending to rich SKY purple, controlled diagonal blue-violet light, no pink drift, no extra symbols, no aircraft, no stars/confetti. Logos flat white, no extrusion, no distortion. Crisp typography. Elegant premium campaign finish with bold hierarchy. Deliver a single portrait static cover 1080x1920 or 2160x3840 if possible.

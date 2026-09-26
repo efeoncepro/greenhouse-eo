@@ -1,0 +1,10 @@
+const fs=require('fs'),path=require('path'),os=require('os'),crypto=require('crypto'),cp=require('child_process'),{pathToFileURL}=require('url');
+const args=process.argv.slice(2),arg=n=>args[args.indexOf(n)+1];
+if(!args.includes('--out'))throw Error('Uso: node recomponer.cjs --out <directorio nuevo> [--repo <repo>]');
+const repo=path.resolve(args.includes('--repo')?arg('--repo'):'/Users/jreye/Documents/greenhouse-eo'),out=path.resolve(arg('--out'));
+if(fs.existsSync(out))throw Error('La salida ya existe; usa una nueva.');
+for(const f of JSON.parse(fs.readFileSync(path.join(__dirname,'dependencias.json')))){const actual=crypto.createHash('sha256').update(fs.readFileSync(path.join(repo,f.path))).digest('hex');if(actual!==f.sha256)throw Error('Dependencia cambió: '+f.path);}
+fs.mkdirSync(out,{recursive:true});
+const plan=JSON.parse(fs.readFileSync(path.join(__dirname,'piezas.json')));for(const p of plan)p.plate=path.resolve(__dirname,p.plate);fs.writeFileSync(path.join(out,'piezas.json'),JSON.stringify(plan,null,2));
+const temp=fs.mkdtempSync(path.join(repo,'ai-generations','.cta-render-'));
+try{let code=fs.readFileSync(path.join(__dirname,'componer-cta.mjs'),'utf8');code=code.replaceAll("'../../scripts/creative/layout-compiler/axis-advertising.mjs'",JSON.stringify(pathToFileURL(path.join(repo,'scripts/creative/layout-compiler/axis-advertising.mjs')).href)).replaceAll("'../../scripts/creative/layout-compiler/compiler.mjs'",JSON.stringify(pathToFileURL(path.join(repo,'scripts/creative/layout-compiler/compiler.mjs')).href));const script=path.join(temp,'render.mjs');fs.writeFileSync(script,code);cp.execFileSync(process.execPath,[script,path.join(out,'piezas.json')],{cwd:repo,stdio:'inherit'});for(const name of ['firmar.mjs','validar.mjs']){const helper=path.join(temp,name);fs.copyFileSync(path.join(__dirname,name),helper);cp.execFileSync(process.execPath,[helper,path.join(out,'piezas.json')],{cwd:repo,stdio:'inherit'});}}finally{fs.rmSync(temp,{recursive:true,force:true});}

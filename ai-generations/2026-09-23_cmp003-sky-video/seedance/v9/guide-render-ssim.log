@@ -1,0 +1,42 @@
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/sky-v9-guide-silent.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf62.12.101
+  Duration: 00:00:30.00, start: 0.000000, bitrate: 1872 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuvj420p(pc, bt470bg/unknown/unknown, progressive), 720x1280 [SAR 1:1 DAR 9:16], 1869 kb/s, 24 fps, 24 tbr, 12288 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      encoder         : Lavc62.28.101 libx264
+    Side data:
+      ICC Profile: (456 bytes)
+Input #1, mov,mp4,m4a,3gp,3g2,mj2, from 'ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/sky-v9-fal-native.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+  Duration: 00:00:30.04, start: 0.000000, bitrate: 4961 kb/s
+  Stream #1:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1080x1920 [SAR 1:1 DAR 9:16], 4958 kb/s, 24 fps, 24 tbr, 12288 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+Stream mapping:
+  Stream #0:0 (h264) -> scale:default
+  Stream #1:0 (h264) -> scale:default
+  ssim:default -> Stream #0:0 (wrapped_avframe)
+Press [q] to stop, [?] for help
+[swscaler @ 0x75457e8000] deprecated pixel format used, make sure you did set range correctly
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf62.12.101
+  Stream #0:0: Video: wrapped_avframe, yuvj420p(pc, bt470bg/unknown/unknown, progressive), 720x1280 [SAR 1:1 DAR 9:16], q=2-31, 200 kb/s, 24 fps, 24 tbn
+    Metadata:
+      encoder         : Lavc62.28.101 wrapped_avframe
+    Side data:
+      ICC Profile: (456 bytes)
+frame=  269 fps=0.0 q=-0.0 size=N/A time=00:00:11.20 bitrate=N/A speed=22.2x elapsed=0:00:00.50    frame=  543 fps=538 q=-0.0 size=N/A time=00:00:22.62 bitrate=N/A speed=22.4x elapsed=0:00:01.00    [Parsed_ssim_4 @ 0x7542c1b6c0] SSIM Y:0.779933 (6.574454) U:0.872524 (8.945722) V:0.882565 (9.302013) All:0.812470 (7.269298)
+[out#0/null @ 0x7542c18540] video:299KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  721 fps=553 q=-0.0 Lsize=N/A time=00:00:30.04 bitrate=N/A speed=  23x elapsed=0:00:01.30    

@@ -1,0 +1,18 @@
+{
+  "id": "KV-03-cuando-no-conviene",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "descarte",
+  "escena": "SCENE (Efeonce studio, morning, NOBODY IN FRAME): seen from about 50 degrees above a matt ink-blue worktop. The subject is the pile of what was NOT chosen: a tall, slightly untidy stack of printed assessment sheets set aside, the biggest thing in the picture, its edges casting hard graphic shadows. The single light source is a hard low sun beam coming through a side window at the left, raking straight across the worktop. The stack still leans where it was just set down a moment ago. What was approved is not here and no person appears. Cyan ink marks run down the margin of the top sheet. A small solid orange sculpture sits at the far corner of the worktop, small in frame and slightly out of focus. 50mm lens at f/2.8, focus on the top edge of the stack. Everything except that sculpture is completely unbranded. No readable text anywhere: the printed lines are small, angled and out of focus.",
+  "objetos": [{ "objeto": "sprocket-hubspot", "vista": "cenital" }],
+  "lecho": {
+    "objeto": "the near edge of the ink-blue worktop against the lens",
+    "tono": "VERY LIGHT warm grey, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the matt ink-blue worktop itself, evenly lit and empty, its weave visible",
+      "tinta": "blanca"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+[
+  {
+    "id": "a-texto-cursor",
+    "lastGraphicInkRow": 519,
+    "crownReserveY": 585,
+    "clearancePx": 66,
+    "clearanceAt390": 22.34375,
+    "gaps": {
+      "closureToBenefit": 36,
+      "benefitToSurface": 20,
+      "surfaceToDescriptor": 16
+    },
+    "nativeImageUnchanged": true
+  },
+  {
+    "id": "b-contorno-redondeado",
+    "lastGraphicInkRow": 519,
+    "crownReserveY": 585,
+    "clearancePx": 66,
+    "clearanceAt390": 22.34375,
+    "gaps": {
+      "closureToBenefit": 36,
+      "benefitToSurface": 20,
+      "surfaceToDescriptor": 16
+    },
+    "nativeImageUnchanged": true
+  },
+  {
+    "id": "c-boton-lima",
+    "lastGraphicInkRow": 519,
+    "crownReserveY": 585,
+    "clearancePx": 66,
+    "clearanceAt390": 22.34375,
+    "gaps": {
+      "closureToBenefit": 36,
+      "benefitToSurface": 20,
+      "surfaceToDescriptor": 16
+    },
+    "nativeImageUnchanged": true
+  }
+]

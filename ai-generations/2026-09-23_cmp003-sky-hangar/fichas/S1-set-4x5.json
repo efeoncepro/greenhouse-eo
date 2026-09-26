@@ -1,0 +1,17 @@
+{
+  "id": "CMP003-S1-set",
+  "formato": "4:5",
+  "impacto": true,
+  "atmosfera": "bruma",
+  "escena": "SCENE (a real narrow-body aircraft maintenance hangar at night, EMPTY OF AIRCRAFT, NOBODY IN FRAME): the aircraft parking position is empty and waiting — a wide clear area of polished grey epoxy floor in the center and lower-middle of the frame, with painted yellow lead-in lines and two pairs of black wheel chocks lying ready where the main gear will stop. The hangar is sized for an Airbus A320: roof trusses about 16 m high, side walls and the big folding hangar doors close. LIGHT: the overhead high-bays are OFF, so the roof structure falls into deep darkness. Two portable LED work floodlights on tripods stand low on the floor at the left edge of the frame, their hard beams raking toward the empty parking position at about waist height; the beams are visible as solid columns in a thin clean haze, all below the middle of the frame. On the rear wall hangs a mechanical split-flap departures board (Solari style, about 7 m wide and 3 m tall, its top well below the roof trusses), individual matte black flaps with hinges and thin metal gaps; a narrow spotlight lights one single row. THE MOMENT: that lit row is caught in the middle of flipping — several flaps are frozen mid-rotation with slight motion blur; ALL flaps are BLANK, no characters. BLUE CARRIER: at the right edge, airport ground equipment painted in a dusty matte cobalt blue industrial paint (#0375DB), low sheen — an aircraft tow tractor and a ground power unit with its black cable coiled on the floor — catching the floodlight on their edges. Two orange safety cones near the empty nose-gear position. A yellow maintenance stair platform stands near the right, waiting. 50mm lens at f/4, camera about 1.2 m high, focus on the empty parking position. No readable text or logos anywhere.",
+  "lecho": {
+    "objeto": "a black rubber wheel chock lying on the floor right against the lens at the bottom of the frame, completely out of focus and outside the floodlight beams",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the unlit hangar roof structure and trusses in deep shadow at the top of the frame",
+      "tinta": "blanca"
+    }
+  }
+}

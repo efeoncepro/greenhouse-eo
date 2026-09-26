@@ -73,6 +73,14 @@ export interface RenderConsumer {
   verifyEmittedManifest(job: RenderJobView, emittedManifest: Record<string, unknown>): string | null
 
   /**
+   * TASK-1889 — assets EXTERNOS al catálogo que el input sellado referencia como `asset-ref:<clave>`
+   * (hoy: el logo privado de la organización cliente). El consumer los lee con SU autorización —sólo
+   * lo que pertenece al dueño del job— y los entrega como data URI. Opcional: un dominio sin assets
+   * externos no lo implementa y cualquier referencia falla el render (fail-closed del motor).
+   */
+  resolveExternalAssets?(job: RenderJobView, input: Record<string, unknown>): Promise<Record<string, string>>
+
+  /**
    * Persiste los bytes producidos como assets privados del dominio y los vincula
    * semánticamente. Devuelve el id del asset principal (null si el target no produce PDF).
    */

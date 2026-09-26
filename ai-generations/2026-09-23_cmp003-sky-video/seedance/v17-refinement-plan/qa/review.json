@@ -1,0 +1,22 @@
+{
+  "status": "visual and technical review passed; operator review pending",
+  "reviewedAt": "2026-09-24T13:19:53.878715+00:00",
+  "generalSamples": 59,
+  "denseHoldAndTransformationFrames": 96,
+  "closingEntrySamples": 18,
+  "nativeLogoInspected": [
+    "1080p",
+    "4k"
+  ],
+  "observations": [
+    "The UI remains readable; retimed interval contains only pre-activation hold.",
+    "Activation and aircraft source frames remain consecutive and at original speed after the 12-frame reduction.",
+    "Arrow-to-stem separation visible in native 1080p and 4K crops.",
+    "Title choreography, cloud movement, thanks exit, URL hierarchy and blue-to-purple close retained."
+  ],
+  "qualityEvidence": "612 corresponding frames before closing: RGB mean difference 0.1189/255 at 108x192 against V16; supports correspondence, not a full-resolution perceptual metric.",
+  "color": "Rec709 metadata remuxed without changes to compressed video/audio payloads; visual evidence remains applicable.",
+  "audio": "Stems shifted as planned with no internal music edits; AAC -16.03 LUFS-I / -1.50 dBTP. No perceptual listening performed.",
+  "paidCalls": 0,
+  "costUSD": 0
+}

@@ -20,7 +20,7 @@ Todos viven en OneDrive `5. Contenidos/`:
 | Credencial | `13- Branding/Lanyard Efeonce/v01/` | Lanyard, yoyo, portacarnet y carnet |
 | Hoja maestra | `13- Branding/efeonce-kit-marca-fisica-v01-A4.png` | Vista general y reglas |
 | Personas del equipo | `13- Branding/Equipo/<Nombre>/v01/` | Identidad de una persona real |
-| Mascotas de partners | `14. Mascotas de partners/` | Clawd, Codex, sprocket |
+| Mascotas de partners | `14. Mascotas de partners/` | Clawd, Codex, Gigi, sprocket |
 | Nexa | `10. Nexa (Influencer IA)/` | Identidad y poses de Nexa |
 
 Cada kit trae un **manifiesto** que dice qué es cada vista y **cuándo usarla**. Leerlo antes de elegir.
@@ -113,7 +113,7 @@ estampa de espalda. Esos elementos se componen.
 - La **forma** de marca —logo, isotipo, estampa, carnet— nunca se le deja inventar al modelo.
 - El **texto exacto** se compone, no se genera.
 - En prendas formales el emblema va **bordado** y sin eslogan; la estampa de espalda va en hoodie y chaquetas, y el
-  polo mantiene la espalda limpia.
+  polo también la lleva desde el 2026-09-21, bordada (ver delta al final).
 - Sobre navy impreso, el prefijo del eslogan va en **gris claro `#C8CEDA`**; el gris de marca no resuelve impreso. Es
   excepción de sustrato, no un cambio de color de marca.
 - Si la pieza **ya existe** (una foto real), esa foto es la fuente de construcción y las variantes se piden sobre ella.
@@ -126,3 +126,88 @@ estampa de espalda. Esos elementos se componen.
 Antes de dar una pieza por lista: QA al 100 %, nombre y ubicación en la carpeta que corresponde, manifiesto
 actualizado si la pieza entra a un kit, y registro en la bitácora de la corrida. Publicar o programar requiere
 autorización explícita del operador.
+
+
+## Delta 2026-09-21 — qué asset del kit se usa para qué
+
+**Un kit tiene tres clases de asset y no son intercambiables.** Confundirlos es lo que hace que el
+modelo **reinvente la marca**:
+
+| Asset | Para qué sirve | Ejemplo |
+|---|---|---|
+| **Arte plano** | **PRODUCIR** las vistas del kit | `ref/arte-cinta.png`, `ref/arte-carnet-*.png` |
+| **Pieza aislada** (transparente) | **CONSTRUIR** un armado nuevo | `…-01-frente-…-transparente.png` |
+| **Pieza PUESTA / producto terminado** | **USAR** la pieza en una escena | `…-04-puesto-…`, `out/prueba-julio.png`, `…-14-conjunto-deterministico-…` |
+
+**Medido el 2026-09-21.** Para vestir a alguien con el lanyard se le pasó primero una descripción del
+logotipo (borrón con forma de flecha), después el arte plano (ilegible) y sólo funcionó con la **foto
+del producto terminado**. En la gorra pasó lo mismo: el asset que resolvía el problema —la prueba en
+persona, con el logotipo legible y el emblema bien orientado— llevaba días en el kit sin usarse.
+
+### Y si la pieza lleva marca, se compone: no se genera
+
+Para una pieza con marca, arte exacto o texto, el camino es **armarla determinísticamente** y pedirle
+al modelo **sólo el acabado** —material y luz—, nunca el dibujo. Comando: **`pnpm foto:lanyard`**.
+Método completo y medido: `ai-generations/2026-09-21_lanyard-deterministico/LEEME.md`.
+
+**Las proporciones se calculan del objeto real, no se estiman:** la unidad del patrón de la cinta mide
+7,05 veces su ancho y el yoyo 1,6 veces ese ancho (32 mm contra 20 mm reales). Puestas a ojo, el
+operador detectó las dos a la primera.
+
+
+🔴 **ANTES de generar una pieza con un asset de marca —ropa corporativa, lanyard, merch, logo 3D,
+isotipo, nave o mascotas— carga el [contrato de selección de referencias](../EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md).** Hay **279 archivos en
+10 kits**: el problema nunca es que falte la vista, es **elegir la correcta**. Resume tres reglas:
+
+1. **Tres clases de asset, no intercambiables.** Arte plano → **producir** vistas del kit · pieza
+   aislada → **construir** · **pieza en uso / producto terminado → USAR en una escena**. Darlos al
+   revés hace que el modelo **reinvente la marca**.
+2. **Lo sensible se compone; el modelo sólo termina.** Toda marca, texto exacto o arte oficial se arma
+   determinístico y al modelo se le pide **sólo material y luz**. Un modelo no sostiene una marca:
+   cuatro pasadas sobre la misma pieza dieron cuatro logotipos distintos.
+3. **Las proporciones se calculan del objeto real**, nunca a ojo.
+
+Y **abre el `LEEME.md` y el manifiesto del kit antes del prompt**: su `cuando_usarla` dice qué vista
+corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida.
+
+
+> 🔴 **Delta 2026-09-21 — el polo YA NO lleva la espalda limpia.** El operador **revirtió** su decisión
+> del 2026-09-17: desde hoy el polo lleva en la espalda el **logo completo + «Empower your Growth»**,
+> igual que el hoodie y las chaquetas, pero **BORDADO** en puntada satinada con relieve —no
+> serigrafiado—, porque es la prenda más formal frente a cliente y su emblema de pecho ya es bordado.
+> Motivo: de espaldas, un polo sin marca no se reconoce como Efeonce. El arte se compone con
+> `ai-generations/2026-09-17_polo-efeonce/estampa-espalda.mjs` (hilo blanco sobre el navy, hilo navy
+> sobre el blanco) y las cinco vistas de espalda están rehechas como `-v02-`; **las `-v01-` de espalda
+> quedan obsoletas**.
+
+
+## Delta 2026-09-21 — Gigi (Google Gemini), tercera mascota de partner
+
+En `14. Mascotas de partners/Gigi (Google Gemini)/` hay **24 vistas × fondo de estudio y transparente**: los mismos
+8 ángulos y 8 accesorios de servicio de Clawd y Codex, más una familia propia, `Poses 3D busqueda y AEO/v01/`, que
+ninguna otra mascota tiene —porque **Gigi no es quien hace marketing: es la máquina que responde**—. Nombre:
+`efeonce-gigi-3d-<vista>-1x1-1600x1600-v01-{fondo-estudio|transparente}.png`, con `aeo-` en la vista para esa
+familia. Ficha comparada en [bibliotecas de mascotas de partners](PARTNER_MASCOT_POSE_LIBRARIES.md).
+
+- 🔴 **Gigi es el único acento de color de la pieza.** No «porta un color»: **es el espectro completo de Google**
+  (rojo `#D93B2B` → azul `#3B7DF5` en dos tercios → verde-lima `#9ED957`, con el contorno de tinta negro `#1E2021`
+  como firma). Con ella en cuadro, Efeonce vive en el **navy y la estructura**; si hay ropa Efeonce en la misma
+  pieza, prohibir el degradado arcoíris y la punta enroscada sobre la prenda **sin describir nuestro emblema**
+  —describirlo lo tergiversa—: manda la referencia del kit.
+- 🔴 **Utilería clara sobre fondo claro no se recorta** (Δ 4 por canal contra tolerancia 18) y no hay tolerancia
+  que lo arregle: se pide en **hueso cálido `#D3C8B4`**, que sigue leyéndose «blanca». **Todo prop debe tocar al
+  personaje** y **nunca va un prop translúcido delante de la cara** (la lupa magnificó un arco del ojo y pareció un
+  tercer ojo, invisible en hoja de contacto). QA de la cara **al 100 %, pose por pose**.
+- **Gobernanza:** es propiedad de Google, como Clawd de Anthropic y Codex de OpenAI. Uso **interno y orgánico**;
+  orgánico aprobado ≠ pauta, y antes de pautar se valida la guía de marca de Google. **Una sola mascota de partner
+  por imagen** por defecto.
+
+## Delta 2026-09-25 — línea gráfica «La órbita»
+
+La marca propia ya tiene forma canónica: [«La órbita»](../brand-graphic-line/README.md). Los kits siguen fijando la
+**forma** de la prenda o del objeto; la línea fija **qué va encima** en ediciones nuevas de merch y vestuario: al
+frente, la palabra en Bricolage con su punto (la órbita, opcional, alrededor de la palabra); al dorso, el logo solo.
+**La órbita nunca rodea el logo** y el uniforme actual sigue vigente. Las fotos de merch de la línea se hicieron con
+este mismo método (arte plano exacto + kit de prenda como referencia; el modelo sólo pone material y luz) y son
+maquetas de presentación. Reglas y medidas en el
+[manual §10.4–§10.8](../brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#104-objetos--la-regla).

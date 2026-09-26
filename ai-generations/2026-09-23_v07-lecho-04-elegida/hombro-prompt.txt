@@ -1,0 +1,5 @@
+Inpainting edit of a real photograph. Only the small transparent oval may change.
+
+The oval sits where the rounded top of a very close, extremely out-of-focus deep charcoal cushion meets a blurred chrome chair armrest on the right. Continue the cushion's soft rounded top and its faint sheen smoothly toward the right until it meets the armrest, as one continuous object: no dark notch, no pocket, no gap, no hard edge. Keep the chrome armrest's shape and highlights exactly as they are where they cross the oval's border.
+
+Match the existing blur, grain, color and light exactly so the edit is invisible. No new objects, no text, no logo.

@@ -1,0 +1,41 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:26:19.991Z",
+  "run": "ai-generations/2026-07-05_task-1345-hero-right",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-05_task-1345-hero-right",
+  "totalBytes": 6203191,
+  "fileCount": 5,
+  "files": [
+    {
+      "path": "task-1345-hero-right_v1-scan-beam.png",
+      "sizeBytes": 1199106,
+      "sha256": "d514ad1cdd8048b6be532c7c11c8b58d75ffc735f143be1c72ef4f8cf87455e0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-right/task-1345-hero-right_v1-scan-beam.png"
+    },
+    {
+      "path": "task-1345-hero-right_v2-edge-dissolve.png",
+      "sizeBytes": 1206519,
+      "sha256": "6d60ef508ab003ae58d1c1f62c33d8e47afaa50419c05bb9d34e15d193870f77",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-right/task-1345-hero-right_v2-edge-dissolve.png"
+    },
+    {
+      "path": "task-1345-hero-right_v2-motion-poster.jpg",
+      "sizeBytes": 162311,
+      "sha256": "ed74740f3345816652f02890482469994e28fc1393c103687960988b646efeb1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-right/task-1345-hero-right_v2-motion-poster.jpg"
+    },
+    {
+      "path": "task-1345-hero-right_v2-motion-seedance-5s-1080p.mp4",
+      "sizeBytes": 3578225,
+      "sha256": "e5f6be581fa86d6d0aaee2f85eef0ee6a7ebeb540ebd548b77579fe61c181112",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-right/task-1345-hero-right_v2-motion-seedance-5s-1080p.mp4"
+    },
+    {
+      "path": "task-1345-hero-right_v2-motion-seedance-contact-sheet.jpg",
+      "sizeBytes": 57030,
+      "sha256": "f52472b9b7b12dfab4eadd8f90f8e719aef41f3095e9a44579f533f5dfb1e6a1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-05_task-1345-hero-right/task-1345-hero-right_v2-motion-seedance-contact-sheet.jpg"
+    }
+  ]
+}

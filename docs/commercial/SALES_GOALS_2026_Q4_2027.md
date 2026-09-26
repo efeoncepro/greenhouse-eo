@@ -31,13 +31,18 @@ Valores de gestión provisionales; requieren reconciliación periódica con cont
 
 | Fuente           | Contrato/condición                                                     | MRR USD aproximado |
 | ---------------- | ---------------------------------------------------------------------- | -----------------: |
-| SKY              | CLP 6.902.000 mensuales con IVA; neto CLP 5.800.000                    |              6.078 |
+| SKY              | Agencia Creativa: CLP 6.902.000 mensuales con IVA; neto CLP 5.800.000  |              6.078 |
 | Berel            | MXN 57.000 mensuales; exportación sin IVA                              |              3.302 |
 | Motogas          | CLP 1.417.000 mensuales; tratamiento fiscal pendiente de formalización |              1.584 |
 | Comisión HubSpot | USD 882 trimestrales                                                   |                294 |
 | **Baseline MRR** |                                                                        |         **11.258** |
 
 El valor recurrente anualizado provisional es USD 135.100. No equivale a ARR SaaS ni a revenue reconocido.
+
+> **Actualización 2026-09-23 (fuera del corte 2026-08-29):** SKY adjudicó el Blog SEO/AEO (Deal `62535094842`,
+> Cierre ganado): CLP 3.000.000 netos/mes + IVA × 24 meses, con inicio el 2026-11-01. Es un segundo servicio
+> SKY, comprado por el equipo de Marca, que se suma al baseline recién desde noviembre 2026. Esta tabla no se
+> reescribe; el baseline se recalcula en la próxima reconciliación.
 
 ## 3. Evidencia On-Demand
 
@@ -104,6 +109,11 @@ se reportan aparte.
   de CLP 3.000.000 netos mensuales.
 - Hasta verificar cuál versión recibió/evalúa el comprador y poblar term/MRR de forma consistente, no se atribuye MRR
   exacto al forecast.
+
+> **Resuelto 2026-09-23:** SKY adjudicó la versión de **CLP 3.000.000 netos/mes + IVA × 24 meses** (TCV CLP
+> 72.000.000 neto), formalizada como adenda al contrato vigente con Marketing. El Deal `62535094842` pasó a
+> **Cierre ganado** (closedate 2026-09-23; nota `117311269190`). Las versiones de CLP 5.200.000/mes y CLP
+> 124.800.000 quedan como históricas. El forecast de arriba se conserva como snapshot del corte 2026-08-29.
 
 ## 6. Contexto de probabilidad
 

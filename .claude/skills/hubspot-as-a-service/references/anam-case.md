@@ -116,7 +116,7 @@ When resuming ANAM from a handoff or deciding whether to advance a phase, first 
 
 ## Landing and agent seam
 
-As of 2026-09-01, the public landing `https://anam-2.hubspotpagebuilder.com/agente-anam` serves build `#28` of
+As of 2026-09-24, the public landing `https://anam-2.hubspotpagebuilder.com/agente-anam` serves build `#30` of
 HubSpot Developer Project `kortex-cms-react` (`103589049`) in portal `19893546`. Its source lives at
 `/Users/jreye/Documents/dev/kortex/hubspot-cms-react-project`; the Greenhouse canon is
 `docs/architecture/kortex/hubspot-cms/anam-chat-landing.md`.
@@ -134,11 +134,18 @@ selection is controlled in `base.hubl.html`. The public deploy is not verified u
 Brand and asset contract:
 
 - use the horizontal ANAM wordmark from the repository without the circle above it;
-- Emma is a female assistant and her shirt must read exactly `ANÁLISIS AMBIENTALES S.A.`;
-- correct text integrated into the character or garment through a generative edit, save a versioned asset and
-  keep the previous version for rollback; do not add a deterministic text overlay;
-- verify desktop and 390 px, overflow, keyboard/click selection, `aria-pressed`, CTA context and console/page/
-  network errors without opening or submitting a real conversation.
+- use the unaltered transparent `EMMA 2.png` portrait supplied by María Paz/ANAM for the landing
+  (`emma-anam-portrait-2026-09-23.png`); retain `EMMA.png` as the separate full-body source;
+- show `Tu ejecutivo comercial ANAM` above the hero and `Ejecutivo comercial ANAM` on Emma's identity plate;
+- use a derivative of the client portrait with a pale mint background for the circular chat avatar. Customer Agent
+  identity and chatflow `96601133` are separate image settings: save both, then inspect the public widget header
+  and message avatar. The 256 px JPEG is `emma-anam-chat-avatar-256-2026-09-24.jpg`;
+- the `ANÁLISIS AMBIENTALES S.A.` shirt embroidery belonged to the generated build #28 illustration, which remains
+  available for rollback; do not impose that former-asset requirement on the client-provided photograph;
+- verify public build ID and visible copy/image; run desktop and 390 px, overflow, keyboard/click selection,
+  `aria-pressed`, CTA context and console/page/network checks for a full regression. Opening the widget to inspect
+  its avatar does not require sending a real conversation. Build #30 received visual public readback, not a full
+  mobile or conversational regression.
 
 `Deployment > Workflows and bots` is the governed seam for routing only selected ANAM conversations to the Customer Agent. A candidate design is a short rule-based pre-flow that identifies one of the three landing intents, captures the minimum identifying/service context and then sends documented, repeatable needs to the agent while preserving explicit-person requests, commercial commitments, investigations, complaints/appeals and sensitive actions for human handling. This is a design pattern, not evidence of a live deployment: inventory the authenticated portal before proposing it, publish only with separate approval and verify positive, excluded, human-fallback and unavailable paths after activation.
 

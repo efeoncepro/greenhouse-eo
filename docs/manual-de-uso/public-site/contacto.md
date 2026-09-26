@@ -49,8 +49,9 @@ El readback público confirma 250 países y el navegador confirma el combo `ghf-
 
 El override page-scoped `ghf-country-icon-ohio-override-v1` se probó y se revirtió el 2026-09-16: no atraviesa el
 Shadow DOM del renderer y dejaba `globe` junto al SVG. Se restauró el snapshot `_gh_contacto_before_country_icon_override`;
-no queda parche live. El hotfix correcto del renderer es `d15bb9256` (sobre `e5d4a0fb2`), preparado para el próximo
-release. No se debe crear otra versión del formulario; la v3 ya está activa.
+no queda parche live para ese problema. Después del release se detectó una duplicación distinta entre el pin azul
+del host y el globo SVG del renderer; se corrigió sin release con CSS page-scoped `ghf-country-icon-dedup-v1`,
+ocultando solo el globo en `/contacto/`. El hotfix del renderer es `d15bb9256` (sobre `e5d4a0fb2`); la v3 sigue activa.
 
 Para una futura modificación, repite el precheck de renderer/banderas, toma snapshot, ejecuta el comando gobernado
 con `--apply`, verifica el readback y revisa desktop/390 px, teclado, giro del chevron y ausencia de overflow.

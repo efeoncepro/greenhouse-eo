@@ -108,6 +108,8 @@ idear → storyboard → animatic → producir → editar → finalizar → entr
 | **Magnific (MCP + API)** | Upscale / enhance / finish frame-consistent | Paso final, después del grade (`modules/08 §8`) |
 | **greenhouse-ai-image-generator / design-studio** | Keyframes / stills / Key Visual para i2v | Upstream del pipeline (boundary) |
 
+> Estado local (2026-09-24): Blender se opera desde el agente vía el puente MCP local `higgsfield-use-blender`; After Effects, Premiere, Resolve y TouchDesigner no están instalados en la Mac del operador, así que sus workflows del bundle siguen siendo handoff humano. Detalle en `higgsfield-provider` §Estado local verificado.
+
 ---
 
 ## 4. Regla dura — gasto gobernado + confirmación humana

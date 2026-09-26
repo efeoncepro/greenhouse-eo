@@ -59,3 +59,12 @@ Cuando una oferta depende de un partner/provider, cargar también la sección ca
 providers en la oferta`. El estado del programa del tercero no prueba demanda del cliente, readiness de delivery ni
 calificación comercial: exigir evidencia de JTBD, procurement/seguridad, ownership, economics, continuidad y
 sustitución.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+El brief CMP registra JTBD situado y roles operador/sponsor/validadores; mid-market/enterprise son contextos,
+no equivalencias rígidas entre cargo, autoridad o conversión. Etiquetar inferencias y validar con compradores;
+una skill o una recepción positiva del concepto no certifica demanda. Conservar alternativas y frenos de compra.

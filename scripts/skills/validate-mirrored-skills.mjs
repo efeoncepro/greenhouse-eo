@@ -19,6 +19,19 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    // El método de video debe conservar producción, post y evidencia entre ambos agentes.
+    id: 'motion-design-studio',
+    mode: 'byte-identical',
+    codex: '.codex/skills/motion-design-studio',
+    claude: '.claude/skills/motion-design-studio',
+  },
+  {
+    id: 'audio-studio',
+    mode: 'byte-identical',
+    codex: '.codex/skills/audio-studio',
+    claude: '.claude/skills/audio-studio',
+  },
+  {
     // La barra creativa no puede depender de qué agente atienda. Si Codex y Claude sostienen criterios
     // distintos para juzgar una idea, el cliente recibe dos estándares con la misma firma — y el drift
     // es invisible porque nadie compara dos juicios subjetivos. Va byte-identical desde su nacimiento.
@@ -113,6 +126,14 @@ const mirroredSkills = [
     mode: 'byte-identical',
     codex: '.codex/skills/efeonce-insights',
     claude: '.claude/skills/efeonce-insights',
+  },
+  {
+    // TASK-1890/1891 — Efeonce Marketing Studio (EPIC-049): los dos harness deben enseñar el mismo registro de
+    // operaciones, la misma autoridad de persona (canje RFC 8693) y las mismas reglas de rollout del provider.
+    id: 'efeonce-marketing-studio',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-marketing-studio',
+    claude: '.claude/skills/efeonce-marketing-studio',
   },
   {
     // La operación de imágenes comparte código, modelos y restricciones de formato. Una divergencia

@@ -37,7 +37,7 @@ no sobrescribir silenciosamente. Agrupar tres archivos en una misma versión cua
 
 ## Trabajo con assets existentes
 
-**Marketing con Manzanitas:** los nueve SVG de logos y símbolos están en `13- Branding/SVG`. La nave (isotipo) en 3D, navy y blanco, con ángulos, transparentes y escenas, está en `13- Branding/Nave Efeonce 3D/`. El hoodie de Efeonce está en `13- Branding/Hoodie Efeonce/v01/` y el polo piqué corporativo en `13- Branding/Polo Efeonce/v01/` la chaqueta (softshell y bomber) en `13- Branding/Chaqueta Efeonce/v01/` el lanyard con yoyo en `13- Branding/Lanyard Efeonce/v01/` la gorra en `13- Branding/Gorra Efeonce/v01/` y la hoja maestra del kit en `13- Branding/efeonce-kit-marca-fisica-v01-A4.png`, cada uno con sus vistas y manifiesto. El logo completo en 3D está en `13- Branding/Logo Efeonce 3D/` (navy/blanco × monumental/grande/mediana/pequeña, transparente + fondo estudio + manifiesto).
+**Marketing con Manzanitas:** los nueve SVG de logos y símbolos están en `13- Branding/SVG`. La nave (isotipo) en 3D, navy y blanco, con ángulos, transparentes y escenas, está en `13- Branding/Nave Efeonce 3D/`. El hoodie de Efeonce está en `13- Branding/Hoodie Efeonce/v01/` y el polo piqué corporativo en `13- Branding/Polo Efeonce/v01/` la chaqueta (softshell y bomber) en `13- Branding/Chaqueta Efeonce/v01/` el lanyard con yoyo en `13- Branding/Lanyard Efeonce/v01/` la gorra en `13- Branding/Gorra Efeonce/v01/` y la hoja maestra del kit en `13- Branding/efeonce-kit-marca-fisica-v01-A4.png`, cada uno con sus vistas y manifiesto. El logo completo en 3D está en `13- Branding/Logo Efeonce 3D/` (navy/blanco × monumental/grande/mediana/pequeña, transparente + fondo estudio + manifiesto). Las referencias aprobadas del lenguaje fotográfico de la marca (set curado, rondas y documentos) están en `13- Branding/Lenguaje Fotografico Efeonce/v01/`; su contrato vive en [lenguaje fotográfico V1](../../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md).
 Cargar el [inventario de identidad](../../../../docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md)
 para elegir la variante exacta, colores y relación con efeonce. En estos archivos dark es blanco
 para fondo oscuro; light es navy para fondo claro. No inferirlo al revés.
@@ -45,13 +45,21 @@ para fondo oscuro; light es navy para fondo claro. No inferirlo al revés.
 **Nexa:** poses, vestuario, avatar, fondos, voz y contenidos viven en
 `10. Nexa (Influencer IA)` bajo esta raíz. Cargar el
 [inventario y contrato de selección](../../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md)
-antes de reutilizarla; incluye rutas y particularidades Unicode verificadas.
+antes de reutilizarla; incluye rutas y particularidades Unicode verificadas. Identidad vigente confirmada
+2026-09-24: rostro humano fotorrealista Avatar A, con set de ocho vistas de polera gris en
+`ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/`, resuelto con `foto:prompt`. El banco
+OneDrive de poses guía actuación/cuerpo, no identidad facial.
 
 **Mascotas de partners:** `14. Mascotas de partners/<Mascota (Partner)>/` (incluye `Sprocket (HubSpot)`, logo de uso interno hasta aprobación) con subcarpetas por familia y versión
-(p. ej. `Clawd (Claude)/` y `Codex (OpenAI)/`, cada una con `Fuente oficial/`, `Poses 3D/v01/` y
+(p. ej. `Clawd (Claude)/`, `Codex (OpenAI)/` y `Gigi (Google Gemini)/`, cada una con `Fuente oficial/`, `Poses 3D/v01/` y
 `Poses 3D con accesorios/v01/`, cada pose en fondo de estudio y transparente). Método reutilizable:
 [`mascot-3d-pose-library.md`](../../greenhouse-ai-image-generator/references/mascot-3d-pose-library.md); evidencia en
-`ai-generations/2026-09-17_clawd-poses-3d/LEEME.md` y `ai-generations/2026-09-17_codex-poses-3d/LEEME.md`. Para Nexa
+`ai-generations/2026-09-17_clawd-poses-3d/LEEME.md`, `ai-generations/2026-09-17_codex-poses-3d/LEEME.md` y
+`ai-generations/2026-09-21_gigi-poses-3d/LEEME.md`. Gigi suma una familia que las otras dos no tienen,
+`Poses 3D busqueda y AEO/v01/`. Nombre:
+`efeonce-gigi-3d-<vista>-1x1-1600x1600-v01-{fondo-estudio|transparente}.png`, y la familia AEO lleva `aeo-` en la
+vista (`efeonce-gigi-3d-aeo-03-no-te-conoce-…`). Como mascota de Gemini, Gigi no es quien
+hace marketing sino la máquina que responde, su papel en «Tu IA no conoce tu negocio». Para Nexa
 (marca propia) el destino es `10. Nexa (Influencer IA)`, no esta carpeta.
 
 Ante una solicitud de buscar, adaptar, editar, reutilizar u organizar assets, comenzar en esta raíz y explorar
@@ -93,6 +101,15 @@ audio y documentos, sin convertir toda la biblioteca a PNG.
 `Seasonalities/Día de Muertos/2026/Hay ausencias que se sientan/v08/`: Feed 1080×1350, Historia 1080×1920,
 portada de video YouTube 1920×1080. PNG v8; revisión del operador pendiente. No incluir el copy de publicaciones
 como aprobado: la conversación todavía no cerró su selección. La portada no es banner de canal.
+
+## Caso inicial de Trendjacking
+
+`Trendjacking/` existe desde el 2026-09-19 en la raíz, con un `LEEME.md` que explica la convención y un índice de casos.
+Primer caso: `Trendjacking/2026/2026-09-16-Lanzamiento GTA VI/Nivel de búsqueda/v04/`, que contiene
+`Carrusel Instagram y LinkedIn/` (láminas 01–09 en orden de publicación + PDF de LinkedIn) y `Pieza suelta/` (aparte,
+no programada), junto con `LEEME.md` (idea y guía visual), `COPY.md`, `PROGRAMACION.md` y `manifiesto.json` (SHA-256
+igual al origen y a lo programado). El PNG es RGBA con alfa 255 en todos los píxeles: se entregó idéntico byte a byte
+a lo subido a Metricool, no re-aplanado. Al sumar un trendjacking nuevo, agregar su fila al índice del `LEEME.md` raíz.
 
 ## Videos dentro de una campaña
 

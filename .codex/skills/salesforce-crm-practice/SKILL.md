@@ -26,6 +26,12 @@ candidate for growth-oriented B2B, mid-market teams, and faster time-to-value. T
 not a rigid vendor market boundary: discovery must be able to conclude `Salesforce-first`, `HubSpot-first`,
 `híbrida` or `no-fit`, with TCO, adoption, data, governance and contract evidence.
 
+For a human-agent workforce transformation, load
+[`Hybrid Human-Agent Transformation V1`](../../../docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md)
+before proposing Agentforce. Sell the workflow and human-agent operating model: process owner, operator,
+supervisor, agent role cards, autonomy, handoff, adoption, cost and evidence. Use the Salesforce lane in the
+offer architecture for `Blueprint → First Hybrid Team → cross-team transformation → managed operations`.
+
 ## Reglas obligatorias
 
 1. No presentes a Efeonce como Consulting Partner vigente, reseller, especialista certificado ni poseedor de una credencial sin readback primario actual. Lee [references/partner-and-claims.md](references/partner-and-claims.md).
@@ -47,7 +53,8 @@ Lee [references/sell.md](references/sell.md) y usa [templates/discovery-guide.md
 
 ## Actualización Dreamforce 2026
 
-Para lanzamientos de septiembre de 2026, estados de disponibilidad, integraciones y límites de claim, lee
+Para lanzamientos de septiembre de 2026, estados de disponibilidad, integraciones y límites de claim, lee el ledger
+con corte 2026-09-18 y
 [references/dreamforce-2026.md](references/dreamforce-2026.md). AIforce, Claudeforce, Slackforce, Koa,
 Missionforce y las alianzas AWS/Google/NVIDIA/OpenAI son superficies con estados y fechas distintos; no las trates
 como una sola licencia ni como GA universal. Koa corresponde al 15/09; AIforce y Missionforce tienen publicaciones

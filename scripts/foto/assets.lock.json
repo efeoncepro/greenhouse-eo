@@ -1,0 +1,602 @@
+{
+  "_comentario": "Huellas de los assets que el catálogo de foto:prompt declara. Los binarios viven fuera de git (640 MB); esto los verifica sin descargarlos. Regenerar con `pnpm foto:assets:lock` y commitear.",
+  "sellado": "2026-09-24",
+  "assets": {
+    "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-04.png": {
+      "rol": "persona:julio",
+      "sha256": "fc241e2489f15a224de23c5e5c63755450b7fb504b7ccd5f3b25e75bb7e65722"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-08.png": {
+      "rol": "persona:julio",
+      "sha256": "ef836ea26aa5f347a16413675d8aed835dc643e4e68369a4d5f907bfaedfb80a"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-11.png": {
+      "rol": "persona:julio/cuerpo",
+      "sha256": "687e7e650443e6425d6b273b1c0cc2f9f3a8198ce89f6afabe5b8ffbfe5dd65a"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-45-izq.png": {
+      "rol": "persona:julio/45-izq",
+      "sha256": "f8b827f3e586eb8758ed088138403f80ccdbcccdc706fe4dc26e6a741a5373d0"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-45-der.png": {
+      "rol": "persona:julio/45-der",
+      "sha256": "2811ad49f1a03bc90c6e146ec30a1ceeb155a228e7601fa4938934d4d77dc58f"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-perfil-izq.png": {
+      "rol": "persona:julio/perfil-izq",
+      "sha256": "e932197bedf7494ea6f1b6ea212e3460b6acb9d1acc787808d9ba00ea7ab8022"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-perfil-der.png": {
+      "rol": "persona:julio/perfil-der",
+      "sha256": "c1ae6fb69c2dbb59f48e7da7a71496dcf1574fcb7ee158533137b5bc962e629c"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-135-trasero.png": {
+      "rol": "persona:julio/trasero",
+      "sha256": "0a1ed3329548d21b4643920e137a6c864500a4659b8682325668aaa864787290"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-espalda.png": {
+      "rol": "persona:julio/espalda",
+      "sha256": "640f278f70d13bb816b9889c0d8060623880f70ace639d4fa70b40894abd8c07"
+    },
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-2-rostro-tresquartos.png": {
+      "rol": "persona:nexa",
+      "sha256": "a0d4864f6ae1829de110af860a973e8b41a51b03fb3c58728e9c8a0c12ae4a6d"
+    },
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png": {
+      "rol": "persona:nexa/cuerpo",
+      "sha256": "c152b98b86e58ad50556bc00cebce9cce5cd98a6f4333389a50e6dd077c905f1"
+    },
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png": {
+      "rol": "persona:nexa",
+      "sha256": "0903de95472ed4eb4c1029da00ec05dcd976628910d8f062961c17db7a29f219"
+    },
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-4-busto-tresquartos.png": {
+      "rol": "persona:nexa/busto",
+      "sha256": "9222178fba792b103f185f809037e62bbc85876a45d5170112ec7fb0ec8a23ee"
+    },
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-6-cuerpo-tresquartos.png": {
+      "rol": "persona:nexa/cuerpo-tresquartos",
+      "sha256": "0a354d1f974188246925dc130cc60616d3bc66b63de0fe08f6b620debd9eef12"
+    },
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-7-cuerpo-perfil.png": {
+      "rol": "persona:nexa/cuerpo-perfil-der",
+      "sha256": "71b7cb619741a6bc7ddadbe89e3a1e9147f02e02f9b4bebfb1bf224c2dbfca85"
+    },
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-8-manos.png": {
+      "rol": "persona:nexa/manos",
+      "sha256": "6211aed68c243821ad4a441e3678395f5843700c3efb8aa10508430996f495a5"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-45-izq.png": {
+      "rol": "persona:nexa/45-izq",
+      "sha256": "505ec26df0c3755c498517c36764983321a2f6bdfeaf6bc48b491bf1c9b4dcbd"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-45-der.png": {
+      "rol": "persona:nexa/45-der",
+      "sha256": "f9f53cfd6d3ab08671039c122778a08c4659dccae8c6a8b85a55a59ad3c038b3"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-perfil-izq.png": {
+      "rol": "persona:nexa/perfil-izq",
+      "sha256": "7159cc484e9beb6b7ed555708a812e34a37cad8ef4fef25d5bc0a70f2d93576d"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-perfil-der.png": {
+      "rol": "persona:nexa/perfil-der",
+      "sha256": "06148f4a74cc5264a3151c5987f7559a3c75f094417a5a0ffb6d809806718878"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-135-trasero.png": {
+      "rol": "persona:nexa/trasero",
+      "sha256": "9bdff6dde641a10abfcd2e2e66228fac82a05e9d9a1379625f0a34116b12d530"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-espalda.png": {
+      "rol": "persona:nexa/espalda",
+      "sha256": "01f1fd94e7470fd3b306b7b4b1409b0da47df89b7adbcc18f3395ca5798bb1df"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-cuerpo-perfil-izq.png": {
+      "rol": "persona:nexa/cuerpo-perfil-izq",
+      "sha256": "d499480d4dafab2ee5605527ffb422fbac0e1bb59d6955449b29b6f3c3d3e7af"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-cuerpo-espalda.png": {
+      "rol": "persona:nexa/cuerpo-espalda",
+      "sha256": "70e643fb200fba5b497d1ff038d02c281af174cf64f603ccc77616393ba12693"
+    },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-the-spark.png": {
+      "rol": "persona:nexa/the-spark",
+      "sha256": "64c2af69b180abdd043d4ef7cc423fdbeeb38288dbdf32c5d4725422d6a0a5e9"
+    },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-the-breakdown.png": {
+      "rol": "persona:nexa/the-breakdown",
+      "sha256": "52c6d4de265bc056a70c268927a01af48422a329934d43f6b5b417a63da7d686"
+    },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-the-read.png": {
+      "rol": "persona:nexa/the-read",
+      "sha256": "00d7140cfed4d82453c5723f6c0c9b16b9ae5c46cbb8dea96b30254d980aea4e"
+    },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-deep-work.png": {
+      "rol": "persona:nexa/deep-work",
+      "sha256": "76b3826aba48abdaca02e5b9c462c5f0ec58c2d8faf3dfcb5b7dda712700932e"
+    },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-the-point.png": {
+      "rol": "persona:nexa/the-point",
+      "sha256": "b5d5cac47d72893d22b57cdd6a265ef09725d3a8475c2782d2397d291731abce"
+    },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-got-it.png": {
+      "rol": "persona:nexa/got-it",
+      "sha256": "2a415d34051bea57daed7357611fabce6451da53014612d8720ff5fe0b764742"
+    },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-the-listen.png": {
+      "rol": "persona:nexa/the-listen",
+      "sha256": "44ad8456ceea26da3ce0e5d047db0862cce0d967bb5d8247e53b94bb566db631"
+    },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-mic-drop.png": {
+      "rol": "persona:nexa/mic-drop",
+      "sha256": "1e05a848669405bd073522e703786802dbbbf6fd92c5fc4532471804f3b89df9"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-prof-1.png": {
+      "rol": "persona:nexa/prof-1",
+      "sha256": "6476e0bd0ca71f6e4664b8859c2f240ee2ccfa71511d963c6137c8c024478732"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-prof-2.png": {
+      "rol": "persona:nexa/prof-2",
+      "sha256": "a23909ec18f0f12a4d8c0f7bb773eb85a5e2d5d8653895d80ec0b6938f53bd2d"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-prof-3.png": {
+      "rol": "persona:nexa/prof-3",
+      "sha256": "47327227a6056a62e97c14722a6b998b6c7eed9c2c7f39739b1dc1cf2d0034f2"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-1.png": {
+      "rol": "persona:nexa/casual-1",
+      "sha256": "aa4f7c78da570f34653859c2737c72c4ecd5565016a2b7008b60682cc9a039ea"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-2.png": {
+      "rol": "persona:nexa/casual-2",
+      "sha256": "522cac46052fd208694eb45ddf5bc271a7b07ad144d870df976897f9c5f915ca"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-3.png": {
+      "rol": "persona:nexa/casual-3",
+      "sha256": "2e96c153d66c02e8af7b576f5430dbc509ffdeea045b40b808283723c2058ed3"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-4.png": {
+      "rol": "persona:nexa/casual-4",
+      "sha256": "2bf5a1a053e6aec3098ab8e46e3f8bc29539214ae4bea33014bfc67f8ae8a0c9"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-5.png": {
+      "rol": "persona:nexa/casual-5",
+      "sha256": "002e5da11163ecfae2d6f3962adb9d8de37e03858a1d0757172de0938699ecf0"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-6.png": {
+      "rol": "persona:nexa/casual-6",
+      "sha256": "4a792ac154d8d69a137a2637c8292d5b4a1a4ce840194255b73db7affb5e4d0b"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-1.png": {
+      "rol": "persona:nexa/home-1",
+      "sha256": "3a698cb019cb7dd10516af3768002b7b6fe2c49b250da349986e18d32c0a960b"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-2.png": {
+      "rol": "persona:nexa/home-2",
+      "sha256": "5a069980a6d2b8dd25473e3ba365d578091326c2485d929690349c55936ce1cd"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-3.png": {
+      "rol": "persona:nexa/home-3",
+      "sha256": "f6644a9a89d527456be2fb029d34efa0f43a82769562ddefea72b8cb05b96907"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-4.png": {
+      "rol": "persona:nexa/home-4",
+      "sha256": "9821761f9732815049a7d99ae1de43615993930301df6d25572579aaab5c0f3c"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-5.png": {
+      "rol": "persona:nexa/home-5",
+      "sha256": "c177b4f2ab074d9b60a0153683f5961f825e0a984120876cb223265e25149bf1"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-speaker-1.png": {
+      "rol": "persona:nexa/speaker-1",
+      "sha256": "4c0fa3c3ec4083aa9edf24e7d863fb97ff31fb44188427f8167c8f7a9de49934"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-speaker-2.png": {
+      "rol": "persona:nexa/speaker-2",
+      "sha256": "89464fcc7638acbcad1f0aa02de2413c09be789c9fb8faffc16512620ffd7450"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-speaker-3.png": {
+      "rol": "persona:nexa/speaker-3",
+      "sha256": "e3c454458cd3e9918a1e49f99258bb83b04b6f47466f9404f73cba740ac40d42"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-1.png": {
+      "rol": "persona:nexa/lifestyle-1",
+      "sha256": "c865217aea19489a485eed835a36e07a4e316e7f7dbca7018b10ea6090babdb8"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-2.png": {
+      "rol": "persona:nexa/lifestyle-2",
+      "sha256": "dc91577fde2c59e2edd81ad00c5bd0088319652355fc530c5a3f2e1b25b324c5"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-3.png": {
+      "rol": "persona:nexa/lifestyle-3",
+      "sha256": "3d5065db6799234b534d8578b083ac0670904691a8886b26a4718df480cf4ba6"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-4.png": {
+      "rol": "persona:nexa/lifestyle-4",
+      "sha256": "336317422a32b20e680ed478daf9ed451f08be5c163ce67ea4084d5844a40203"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/frente",
+      "sha256": "4bb97bc7fb7382b898fbdd76c4b97073dbe27e5e401c8c9a612ccf6a3026caf3"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-02-tres-cuartos-izquierda-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/tres-cuartos-izq",
+      "sha256": "171a68997a247cfa2a353835911663c2c49e97ddeb0c7dda20538aa9ecff2195"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-03-lateral-pronunciado-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/lateral",
+      "sha256": "5cb19ae1f9957406d24af205d5a95ef349f85caa25a4ad5dd4157b163d4355f8"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-04-contrapicado-monumental-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/contrapicado",
+      "sha256": "c2d68584fa6dd23b0ab2592fa9fb451200f6cfe17af8c17ba9c111e1d14de0b7"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-05-cenital-plano-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/cenital",
+      "sha256": "ef53a022da1acceab72005c2bf0d33468db85bf3c9a663c380027598b9d57fc9"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-06-flotando-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/flotando",
+      "sha256": "0d928ef313e3a2abd4508c6025e7ee0e610092484083948624fb6b24d96e0803"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-07-rodando-sobre-canto-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/rodando",
+      "sha256": "888da0020d183d76c4f2603ef2dd24578567316a1eb24819ba866b54b8927e53"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-08-tres-cuartos-trasero-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/tres-cuartos-trasero",
+      "sha256": "d0ea5ce54a6742f7bcf30efcf74a3a01fd903e75f3df374adc0ba3a6bcc01ad8"
+    },
+    "ai-generations/2026-09-17_efeonce-ship-3d/final/efeonce-nave-3d-blanco-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:nave-efeonce/frente",
+      "sha256": "c12e6678db2dcb59fe11a38bc9e7806a957ba6f36ad9c58631d10fe6650384c2"
+    },
+    "ai-generations/2026-09-17_efeonce-ship-3d/final/efeonce-nave-3d-blanco-02-tres-cuartos-izquierda-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:nave-efeonce/tres-cuartos-izq",
+      "sha256": "5ad2bf58febf7b3accfc62305997b2262b7078f1334a2580162dcc73f5a433df"
+    },
+    "ai-generations/2026-09-17_efeonce-ship-3d/final/efeonce-nave-3d-blanco-03-perfil-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:nave-efeonce/perfil",
+      "sha256": "49a210d22337d2bec973f1f6f8ca81162177559e734e32e8ee6728e0fd4c1a9a"
+    },
+    "ai-generations/2026-09-17_clawd-poses-3d/final/efeonce-clawd-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:clawd/frente",
+      "sha256": "f93da26cbbc4595e381fda24c0ea88350af976157a09272927618c447d8af792"
+    },
+    "ai-generations/2026-09-17_clawd-poses-3d/final/efeonce-clawd-3d-02-saludo-tres-cuartos-izquierda-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:clawd/saludo",
+      "sha256": "198dc209adcb8ec7d99682368b1c32e4af693df35ec00d65f75afffdc63bd8dd"
+    },
+    "ai-generations/2026-09-17_clawd-poses-3d/final/efeonce-clawd-3d-03-perfil-caminando-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:clawd/perfil",
+      "sha256": "e64bef6e5c683e0409f55892c0a720dea5c5be51ff11ff893b64798d057b352c"
+    },
+    "ai-generations/2026-09-17_codex-poses-3d/final/efeonce-codex-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:codex/frente",
+      "sha256": "a34a295de62b3d27210a5bac0c43d27e36e52616aa0b5d1836aad7d75dc0aef3"
+    },
+    "ai-generations/2026-09-17_codex-poses-3d/final/efeonce-codex-3d-02-saludo-tres-cuartos-izquierda-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:codex/saludo",
+      "sha256": "37828c82d4032174c75453e6514a751e4d93660e7c9678335da6e7f033af4abe"
+    },
+    "ai-generations/2026-09-17_codex-poses-3d/final/efeonce-codex-3d-03-perfil-caminando-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:codex/perfil",
+      "sha256": "b287cc1134999871384abfc205cf62aac67d206af6194cc85a5bafbd85dde39a"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/frente",
+      "sha256": "38e7028de382eafe4409b89826eac83e57ebd898bb5639be229eb32078c1feea"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-02-saludo-tres-cuartos-izquierda-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/saludo",
+      "sha256": "0b726ed80a47b683a18a4385658a1c197835b505a577a1b77e8fceee21d6378c"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-03-perfil-caminando-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/perfil",
+      "sha256": "7df294a7c81ab17f235b526f6c5ac3df94602fca613933794a4d0da2eba23159"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-04-contrapicado-celebrando-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/celebrando",
+      "sha256": "8dd00e818b96941c248aebd71d5f035f5fcb71e34b28562e4a6c4c8075f4007f"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-05-cenital-mirando-arriba-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/cenital",
+      "sha256": "9293303e83fce694ca7cfdf380c4f23997c3567da8bcc99c832d073bac09e842"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-06-espalda-tres-cuartos-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/espalda",
+      "sha256": "3eddaab8e356e8dce5b391902ad6aa0b54ceb15f231ce5831435cc1821282160"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-07-salto-en-el-aire-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/salto",
+      "sha256": "011b2e8ddc9755d03e5dc46282f1bd7a7bed07178bc6f2928d0cbf3658d7790b"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-08-idea-tres-cuartos-derecha-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/idea",
+      "sha256": "9bbadddbd1251bf5cf50ed959e55847b3ab59b8d21ae0ba903778e50f2ad3ae9"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-01-detective-lupa-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/detective",
+      "sha256": "047cde5b40258f61d5be4aa54669b3ed8e3be85110e4752466ed526cffaee6c0"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-02-artista-boina-pincel-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/artista",
+      "sha256": "7ab688e1aeed6eb2c71f199951cecb9e10290a52d50eeea8ea41d3d1ffff2270"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-03-megafono-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/megafono",
+      "sha256": "368f348aa005fe6e76d1845fe58689128fc6c9ae351518e82233021eb112f64b"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-04-casco-llave-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/casco",
+      "sha256": "e79ad5a4cd270e077130d14cbcf825b6999da8f0d0b74369cc8a18ecd7376667"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-05-audifonos-microfono-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/podcast",
+      "sha256": "5474cdb0e57255a5817692145df2ebcaa4ade81f225c59eb879b2495df8a6ce7"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-06-claqueta-cine-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/claqueta",
+      "sha256": "c7851d16cca201c5614d3b03872df601e7fbc190259491fab1fe91a628d1d211"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-07-carpetas-ordenadas-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/carpetas",
+      "sha256": "b744ddd57a15d6828a1ea5efd36ffbdbe1cec6ca5c355b0ab1d035ba311701a0"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-08-birrete-libro-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/birrete",
+      "sha256": "ed8d82acaeb2369dbcd254ee4fcae9aee78c5c0eb042118d7b8f878f60621708"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-01-la-pregunta-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/pregunta",
+      "sha256": "aa14494ac1523f6ccb900239a7071c581068c4b51d7ae061965b41797a9caef7"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-02-la-respuesta-con-citas-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/citas",
+      "sha256": "3d298bb8c4aca95524d7e2ef0efdd30964db4b07f4bc6049a099eb0a78e1692d"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-03-no-te-conoce-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/no-te-conoce",
+      "sha256": "b3f8f9aa323eac6c5f8e7864f164688976ee690c45e56e1cd8df76e7e44d96ef"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-04-el-podio-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/podio",
+      "sha256": "a13a5bfb938fad12360a4070be541ecdd4f8520976990ff3900d7c302382d6a9"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-05-leyendo-tu-sitio-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/lee-tu-sitio",
+      "sha256": "6f497f9a0a1b25944fe829b593f0ad1f94dd68db9ce9efff8e8066176d5cabd3"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-06-datos-estructurados-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/schema",
+      "sha256": "cbc919b9d060744c599e0784120b74e66dbb19b426dcd96a3168f96e73f3c2d5"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-07-la-entidad-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/entidad",
+      "sha256": "9ece4e95da48b800f6e418e960820c8c6838aa42cd340405879bb9877e95d0f7"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-08-el-diagnostico-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/diagnostico",
+      "sha256": "d58fab31cbeb2d256c6a63894893b20dbb195e5d4d0a9754e9526b51ce264491"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-01-frente-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-softshell-efeonce/frente",
+      "sha256": "05aa5938e6fdbeecd6ae478eeede1d1a3d95676ca4ae1dffa8840131498c356c"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-02-espalda-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-softshell-efeonce/espalda",
+      "sha256": "80617479db7c7fdc1f8a2dbadf99aeda14429d8b8577cd5c15a0b79a9cfbe30d"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-softshell-efeonce/tres-cuartos-izq",
+      "sha256": "a348c7c2e14dd5aa5a9551212765237ada44aeb2f107ecc55c770d454a1545c0"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-04-tres-cuartos-derecha-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-softshell-efeonce/tres-cuartos-der",
+      "sha256": "09d66f71d5e7ae6332c7cb7dc66b06b1c73e9b491c73569667aa0199025e22f0"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-05-lateral-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-softshell-efeonce/lateral",
+      "sha256": "ac1eceeb85217ad68df2f06a03036c9f8ed2c701dc327b8826e1ca7a1e6b0131"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-06-cierre-abierto-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-softshell-efeonce/abierta",
+      "sha256": "6687b27d43aee92acc3b3b095dead475babee8cb86802016d0f648d5c2f45c62"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-02-espalda-1024x1024-v02-fondo-estudio.png": {
+      "rol": "kit:chaqueta-softshell-efeonce/espalda",
+      "sha256": "0e4b4634162b39a8fadf976865627f418ee6c19966911711a972d1845a9d30f8"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-14-puesto-frente-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-softshell-efeonce/defecto",
+      "sha256": "a10cb56bae90155270d4ffd6fa0703a6ee0e62c22672e1bc1be43b488daccede"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-15-puesto-espalda-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-softshell-efeonce/usoPorVista:espalda",
+      "sha256": "96f2cd79715af1c4646a207dd23e6ea94a20071ab1eb377287da63b000537a9a"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-17-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-softshell-efeonce/usoPorVista:espalda-mujer",
+      "sha256": "01b09794863326773ebbeb8f92e426fc076d0062211a46cec15f80a3fa0d086b"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-16-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-softshell-efeonce/usoPorVista:frente-cuerpo-b",
+      "sha256": "0e1323b343d549e7290b29b129702ca5d29a63565607d3395901d63382f613d0"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-11-macro-bordado-1600x1600-v01-fondo-estudio.png": {
+      "rol": "macro:chaqueta-softshell-efeonce",
+      "sha256": "aa3f2ce8a9ea87e9d7620156bcce3025ed7c3484b657f7d3c5af056bf5fda928"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-01-frente-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-bomber-efeonce/frente",
+      "sha256": "768de3537fb362456ce9c20595a958551bfe89883446cc6455d5e6d70b8a44ff"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-02-espalda-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-bomber-efeonce/espalda",
+      "sha256": "d1cd6755c31b24b23dc0aacf2f69cd5e9206f3a530ae78b05505515e29d71500"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-bomber-efeonce/tres-cuartos-izq",
+      "sha256": "b3f4269bb674804fd9b61d5247c6d9c41b7efc0750091a405240e6ecb609a47b"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-14-puesto-frente-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-bomber-efeonce/defecto",
+      "sha256": "b25ae2c2db7c2f5344db9fc246f21d278dc7a63c5e3087735432544f7ededdb6"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-16-puesto-espalda-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-bomber-efeonce/usoPorVista:espalda",
+      "sha256": "28cdce55b7b3e29ab653945d7342503f3db36f39be35fe027e97d0c1c64d5f9e"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-15-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-bomber-efeonce/usoPorVista:espalda-mujer",
+      "sha256": "dbd4e61b5335c15629fb0715d563dc8cb615ce876b302bf5e12474357c947488"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-17-puesto-frente-cuerpo-b-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-bomber-efeonce/usoPorVista:frente-cuerpo-b",
+      "sha256": "da6a724c899c3a669b20b5c740fd70d4d7df62abdcbe1b3404bff2c08583a7ff"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-11-macro-bordado-1600x1600-v01-fondo-estudio.png": {
+      "rol": "macro:chaqueta-bomber-efeonce",
+      "sha256": "f6fc75d7c4080593cb4be2f9a7aa27eb508ccfeb7edd2fc7929b715c00ef9513"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v2-01-frente-1600x1600-v01-transparente.png": {
+      "rol": "kit:gorra-efeonce/frente",
+      "sha256": "7b11063a107bc0dcbeb7ea39096c7bb3e0aedb2b9b5ef7af47b0f91caa944000"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v2-02-lateral-1600x1600-v01-transparente.png": {
+      "rol": "kit:gorra-efeonce/lateral",
+      "sha256": "76b1547bbc5b80e1b1d3c1456d75b4e8c48c0bdf91e1b46e77ff4d95cde4c656"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v2-03-trasera-1600x1600-v01-transparente.png": {
+      "rol": "kit:gorra-efeonce/trasera",
+      "sha256": "e8e11130a18f734e2011fd9911abbed4958092d0d1eea374e8c145ea1037c434"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v2-05-cenital-1600x1600-v01-transparente.png": {
+      "rol": "kit:gorra-efeonce/cenital",
+      "sha256": "bd9b7cd005ad3afc2450ef06f57d373b10f5ce7ccd46b7105ddbe17e4ae53d21"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v2-navy-logotipo-1600x1600-v01-transparente.png": {
+      "rol": "kit:gorra-efeonce/navy-logotipo",
+      "sha256": "f5834bff6f464309a564a1f2c8334b02cc8eeb3b835525a6de81214a1b3b3fe0"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v3-navy-isotipo-1600x1600-v01-transparente.png": {
+      "rol": "kit:gorra-efeonce/navy-isotipo",
+      "sha256": "f082b243a1fb12fd1725565e8de539481e1c57a69aa99657de108b78a8823b75"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v5-trucker-navy-1600x1600-v01-transparente.png": {
+      "rol": "kit:gorra-efeonce/trucker-navy",
+      "sha256": "c6f2aa8c617838ca59955115baa570ec74b55168104e097439a817243ea19213"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/out/prueba-julio.png": {
+      "rol": "uso:gorra-efeonce/usoPorPersona:julio",
+      "sha256": "051cdbfc7660a6fac1d4c4d6c06fe6735ad43bd4986f71f3f61c6101ceb5b14b"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/out/prueba-nexa.png": {
+      "rol": "uso:gorra-efeonce/usoPorPersona:nexa",
+      "sha256": "6a9761c1fe023698fedc1160ba6e5f5b1ed8ad6bfc401e1f5f4d810ba47a9db8"
+    },
+    "ai-generations/2026-09-17_lanyard-efeonce/final/efeonce-lanyard-01-conjunto-1200x1600-v01-transparente.png": {
+      "rol": "kit:lanyard-efeonce/conjunto",
+      "sha256": "db2c460171134eac45581d29f81a924e293efafdd3e93a648ebcc2bbf550f232"
+    },
+    "ai-generations/2026-09-17_lanyard-efeonce/final/efeonce-lanyard-12-conjunto-colgado-1200x1600-v01-transparente.png": {
+      "rol": "kit:lanyard-efeonce/colgado",
+      "sha256": "30cbcd292b19c340baa4f7ffa71f9a84c18352f991255fe6722b0bc5989a31e6"
+    },
+    "ai-generations/2026-09-17_lanyard-efeonce/final/efeonce-lanyard-10-portacarnet-vacio-1200x1600-v01-transparente.png": {
+      "rol": "kit:lanyard-efeonce/portacarnet-vacio",
+      "sha256": "b3fbafdd8519d95b4f8a6cdd1c2be2a21e3a030862463a4ccf9884e31760a838"
+    },
+    "ai-generations/2026-09-17_lanyard-efeonce/final/efeonce-lanyard-15-conjunto-deterministico-nexa-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:lanyard-efeonce/usoPorPersona:nexa",
+      "sha256": "adc49569110943463c1f0840df41d1544ccfadf8f8287c32b2e6c983a78ebd28"
+    },
+    "ai-generations/2026-09-17_lanyard-efeonce/final/efeonce-lanyard-14-conjunto-deterministico-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:lanyard-efeonce/usoPorPersona:generico",
+      "sha256": "62edf6a5a6776af55cff037a050986dd66a7a9ae727070f80f671b6671a55d66"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-01-frente-1600x1600-v01-transparente.png": {
+      "rol": "kit:polo-efeonce/navy/frente",
+      "sha256": "16c4a977d0283f0b8f1e4b0ad7fc0341173f303c9269124e6909d6ff46952263"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-02-espalda-1600x1600-v01-transparente.png": {
+      "rol": "kit:polo-efeonce/navy/espalda",
+      "sha256": "66d232d457e44c21e872e14101a6b48e0d85ecddff1100b46030af3a3cf7ba5e"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
+      "rol": "kit:polo-efeonce/navy/tres-cuartos-izq",
+      "sha256": "a623a14b4ab8c08c076509ae355dd782b95da992ade018c6aac527ebcb6b35f0"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-01-frente-1600x1600-v01-transparente.png": {
+      "rol": "kit:polo-efeonce/blanco/frente",
+      "sha256": "dbcf1f1ca14e354c21873d521f93b929f18591992a709979cc6f40e020d6ba3a"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-02-espalda-1600x1600-v01-transparente.png": {
+      "rol": "kit:polo-efeonce/blanco/espalda",
+      "sha256": "a6b2294ab026548e32e4e9c9ea11afeb4085c50fa3cc08aab840aa2bbac4543c"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
+      "rol": "kit:polo-efeonce/blanco/tres-cuartos-izq",
+      "sha256": "49321dc2ea66b8dc119377140c10d665f89e9f211353e6f0ad966cc2abab5057"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-13-puesto-frente-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:polo-efeonce/usoPorColor:navy",
+      "sha256": "4c9ae41f72fbe82500cc6f0d603515f58a3b1c607163b8880fcaa47e91dc7d4d"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-13-puesto-frente-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:polo-efeonce/usoPorColor:blanco",
+      "sha256": "5788d3c98db35d240db6f41a91c7de2bbef3fd10c9aaa02e78ea23d79d94a422"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-14-puesto-espalda-1024x1536-v02-fondo-estudio.png": {
+      "rol": "uso:polo-efeonce/usoPorVista:espalda",
+      "sha256": "2afb6445ed3daf026236b1ee177eb503c5c93e33901345993eca7d62bed5546d"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-16-puesto-espalda-mujer-1024x1536-v02-fondo-estudio.png": {
+      "rol": "uso:polo-efeonce/usoPorVista:espalda-mujer",
+      "sha256": "d7bfd495c507c50296db00b9ae9e704627a18a72e349249c9e2174b5b44bd46f"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-15-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:polo-efeonce/usoPorVista:frente-cuerpo-b",
+      "sha256": "3ad2b06f809ff66e2482a2e6edfde00909704f06819e872256bb7e1501905adc"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-10-detalle-bordado-1600x1600-v01-fondo-estudio.png": {
+      "rol": "macro:polo-efeonce/navy",
+      "sha256": "48c566eb57bbc69b8416b69386bcddfaf125f57a96ac3f97e750ba31050eddff"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-10-detalle-bordado-1600x1600-v01-fondo-estudio.png": {
+      "rol": "macro:polo-efeonce/blanco",
+      "sha256": "02461ec89f8c759cb20a12b2851377a865079539067c5ffbbe54aa4ea59df117"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-01-frente-1600x1600-v01-transparente.png": {
+      "rol": "kit:hoodie-efeonce/frente",
+      "sha256": "fb65b41f0fe2f5d91221304411916dc04c4a38cf1685290850d581b516225be4"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-02-espalda-1600x1600-v01-transparente.png": {
+      "rol": "kit:hoodie-efeonce/espalda",
+      "sha256": "1769edcf2d9039abc852cdad886c8a49f4775afead29ce2d632eb7f86c835c43"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
+      "rol": "kit:hoodie-efeonce/tres-cuartos-izq",
+      "sha256": "d505b3b621969df5704499ff28866138b5436646105f5da5026efd11734ec717"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-15-puesto-frente-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:hoodie-efeonce/defecto",
+      "sha256": "4586cbb398d0f7387b808c89ae33f36ce9b9e72d66fbd5cad737b5350172c744"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-16-puesto-espalda-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:hoodie-efeonce/usoPorVista:espalda",
+      "sha256": "a4ac8e4d6d3f21ab516c96a4c0ae2f026016461b4cccfd487b84b29c965e24b1"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-22-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:hoodie-efeonce/usoPorVista:espalda-mujer",
+      "sha256": "2111878d4fd3cf4d1fb8eef5d9e33443013d4ff770995ca169bfa33e10060334"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-17-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:hoodie-efeonce/usoPorVista:frente-cuerpo-b",
+      "sha256": "a208765f8265ef13d7078f3e5eed622a576382ea8c69bd526355e57c6909f62b"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-09-detalle-pecho-1600x1600-v01-fondo-estudio.png": {
+      "rol": "macro:hoodie-efeonce",
+      "sha256": "05adae8b6b020bd3d4395c6f640d39cd3607336e10ca5d5c8db5c0f0363535f6"
+    }
+  }
+}

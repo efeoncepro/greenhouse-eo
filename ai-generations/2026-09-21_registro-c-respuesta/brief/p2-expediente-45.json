@@ -1,0 +1,20 @@
+{
+  "id": "p2-expediente-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "objetos": [
+    "clawd"
+  ],
+  "escena": "SCENE (a desk in a dark office, seen straight on at desk height): a thick corporate dossier lies CLOSED and flat on the desk, its cover matte and grey, a soft even layer of DUST settled across it and undisturbed — nobody has opened it. Standing ON TOP of the closed dossier, the small Clawd figure from the reference is turned three-quarters AWAY from it, facing out to the right, mid-gesture as if explaining something to someone off-frame. It never looks down at the dossier under its feet. To the right, angled towards the figure, a screen shows one single rounded ANSWER CARD glowing on a dark field — a plain empty rounded rectangle with a short bright underline beneath it and nothing else: no letters, no numbers, no words, no icons, no interface chrome. That screen is the ONLY light source: it rakes hard across the dusty cover, picking out every dust particle on it, lights one side of the figure and leaves the other side in darkness. The rest of the office falls to deep navy black — no lamps, no windows, no other screens. 50mm lens at f/2.8, camera at desk height.",
+  "reservas": {
+    "texto": {
+      "muro": "the empty dark office wall above the desk, unbroken and unlit",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the near edge of the desk in the immediate foreground, running unbroken across the whole width of the frame",
+    "tono": "DARK near-black oak in deep shadow, matte, its grain still faintly visible, outside the light"
+  }
+}

@@ -115,8 +115,9 @@ mueve, y este es el orden"* sí.
    (`src/lib/finance/pricing/pricing-engine-v2.ts`, cost-plus, Full API Parity). **Un precio sin loaded cost
    detrás no es un precio: es una corazonada con decimales.**
 2. 🔴 **NUNCA publiques un precio unitario por artículo.** 🎯 **Es entregarle al cliente la calculadora para
-   comoditizarte.** *(Ya lo hicimos: la oferta de SKY dice "artículo adicional CLP 260.000" — y ahora SKY puede
-   dividir cualquier propuesta futura por ese número.)*
+   comoditizarte.** *(Ya lo hicimos: la oferta original de SKY decía "artículo adicional CLP 260.000" — y SKY
+   puede dividir cualquier propuesta futura por ese número. **Actualización 2026-09-23:** la oferta que se
+   adjudicó ya corrige esto — Core de capacidad gobernada, **sin precio unitario por artículo**.)*
 3. 🔴 **NUNCA el ad-hoc más barato que el marginal del plan.** Rompe la planificación y consume coordinación:
    **tiene que costar MÁS, no menos.** *(Hoy hacemos lo contrario y premiamos salirse del plan.)*
 4. 🔴 **NUNCA descuentes la línea de plataforma.** Costo marginal ≈ 0 **y es lo único que un freelancer no
@@ -199,7 +200,7 @@ mueve, y este es el orden"* sí.
 | **La conversación** — discovery *(las 9 preguntas)*, propuesta, negociación, QBR | **`modules/10_CONVERSACION.md`** |
 | **El retainer que sobrevive** — por qué la mayoría muere al mes 9 | **`modules/11_RETENCION.md`** |
 | 🎯 **El arsenal Y CÓMO SE USA CADA ACTIVO** — la cadena Semrush → Grader → Fix-It → reporte → portal *(auditado contra el repo)* | **`modules/12_ACTIVOS.md`** |
-| 🔴 **El estado real de la práctica** — Berel, SKY, el Grader, **cero casos citables** | **`efeonce/ESTADO_ACTUAL.md`** |
+| 🔴 **El estado real de la práctica** — Berel, SKY *(blog adjudicado 2026-09-23, § 3d)*, el Grader, **cero casos citables de resultado** | **`efeonce/ESTADO_ACTUAL.md`** |
 | **Qué se puede afirmar y con qué evidencia** *(+ § Datos que NO se citan)* | **`SOURCES.md`** |
 | 🔴 **BENCHMARK de la competencia** *(set de 4 archivos; entra siempre por el principal, que es el índice)* — lo que **NO** podemos decir (**F-01…F-14**), lo que **SÍ** (**S-01…S-11**), **lo que descubrió sobre nosotros** (N-01…N-06) y los **errores que circulan**. **Cárgalo ANTES de escribir cualquier diferenciador técnico, de citar cobertura LATAM, precio de competencia o robustez de medición.** `as-of 2026-08-15`, **caduca 2026-11-15** | **`references/BENCHMARK_SUITES_AEO_2026-08.md`** → hermanos: `BENCHMARK_METODOS_TRANSPARENCIA_2026-08.md` · `BENCHMARK_VENDORS_PUREPLAYS_2026-08.md` · `BENCHMARK_VENDORS_INCUMBENTES_2026-08.md` · `BENCHMARK_PRECIOS_LATAM_2026-08.md` |
 
@@ -227,7 +228,7 @@ panorama, límites y reunión)*
 | **`gtm-architect`** | **El motion.** | Si la práctica necesita cambiar de motion (PLG, partner-led, ABM). |
 | **`content-marketing-studio`** + **`digital-marketing`** | **El canal y el contenido.** | Los assets de captura y la distribución. |
 | **`research-benchmark-operator`** + `/deep-research` | **La evidencia.** | Todo refresh de `SOURCES.md`. **Esta skill no guarda hechos de memoria.** |
-| **`greenhouse-public-private-tenders`** | **Si entra por licitación.** | El caso SKY vive ahí (`docs/commercial/tenders/sky-blog-2026/`). |
+| **`greenhouse-public-private-tenders`** | **Si entra por licitación.** | El caso SKY vive ahí (`docs/commercial/tenders/sky-blog-2026/`) — **ganado el 2026-09-23**. |
 | **`deck-studio`** | **El deck.** | La propuesta se compone ahí. Esta skill es *consumer*. |
 | **`greenhouse-ico`** | **La prueba operativa.** | El portal + ICO son **la línea de plataforma**, y son **transparencia como producto**. |
 | **`efeonce-mcp-platform`** | **La superficie agéntica.** | Las tools SEO/AEO por MCP y sus **manuales de uso servidos por el protocolo** (`docs/mcp/skills/**`, manifiesto `src/mcp/greenhouse/skill-manifest.ts`; TASK-1804). Toda task que toque una tool actualiza el manual que la gobierna; un agente carga `seo-spend-discipline` antes de cualquier tool que gaste. |
@@ -334,6 +335,43 @@ Canon (no repetir acá): ADR `docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD
 
 ---
 
+## 4e. 🔴 Nuestras propias landings de conversión — se auditan con navegador, no con `curl`
+
+Las páginas con las que se vende esta práctica (`/aeo-2/`, `/servicios/aeo/`, `/servicios/posicionamiento-seo/`)
+**montan sus formularios y su agendamiento por JavaScript**: el HTML inicial no los contiene. Auditadas con `curl`
+el 2026-09-22, la conclusión fue **falsa en dos frentes** —*«no hay formularios HubSpot»* y *«no hay acción de
+mayor compromiso»*—; con navegador aparecieron el **Growth Form** de cada una y el enlace a **HubSpot Meetings**.
+
+🔴 **Auditar una landing de conversión exige un navegador real.** Es la misma familia que la regla dura 10: una
+conclusión que se ve verificada, que nadie observó, y que el cliente va a repetir con tu nombre encima.
+
+🎯 **Y el dato que sólo apareció así: las dos líneas NO convierten con lo mismo.**
+
+| Línea | Qué pide su formulario | Qué es realmente |
+|---|---|---|
+| **AEO** | marca, sitio, **competidor principal** | alimenta un **diagnóstico** — es oferta de TOFU |
+| **SEO** | **contexto, rol y consentimiento** | un **lead comercial** |
+
+Tres reglas al mandar tráfico —pagado u orgánico— a una landing de la práctica:
+
+1. 🔴 **Verifica el `canonical` del destino ANTES de pautar.** `/servicios/aeo/` declaraba `canonical → /aeo-2/`:
+   pautar ahí manda tráfico pagado a una página que **le dice a Google que la buena es otra**. No rompe la
+   conversión, pero contradice la señal y **parte el reporting del propio servicio que estamos vendiendo.**
+   🎯 Es un hallazgo de SEO en la página con la que vendemos SEO.
+2. 🔴 **Cada etapa del embudo pide MÁS compromiso que la anterior.** Una landing puede ofrecer **dos**
+   conversiones de etapas distintas —diagnóstico gratis (TOFU) y agenda discovery (BOFU)— y **cerrar la página
+   con la de TOFU**. Un anuncio de etapa baja que aterriza sin dirigir cae en la oferta que el usuario **ya
+   pasó**. ✅ No siempre falta la acción: a veces **falta dirigir a ella**, y se resuelve nombrándola en el CTA
+   del anuncio *(`Agenda tu discovery`)* **sin tocar la página**.
+3. 🔴 **La promesa del ad y la de la landing tienen que ser la misma**, o la conversión cae por **incoherencia de
+   mensaje**, no por creatividad. El copy se escribe **después** de saber qué acción ofrece la página. ✅ Lo que
+   funcionó: **tomar el mensaje de una sección de la propia landing.**
+
+**Canon:** `docs/campaigns/decisions/CDR-007-cmp001-bofu-conversion-a-landing.md` (destinos verificados en vivo,
+bloqueos B1/B2 y su delta) · `docs/campaigns/CMP-001-MEDIA-PLAN-Q4-2026.md` (estructura de campañas y medición).
+
+---
+
 ## 5. Antes de responder cualquier cosa
 
 1. ¿Vas a decir un precio? → **cotizador primero.** `modules/04_PRICING.md`.
@@ -345,3 +383,16 @@ Canon (no repetir acá): ADR `docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD
 5. ¿Es una decisión de método de venta genérica? → **es de `commercial-expert`**, no de acá.
 6. ¿Vas a citar tráfico estimado? → **versión de fórmula + as-of + aviso del corte 2026-11-01** (§4d). Con
    `truncated=true`, es un piso.
+7. ¿Vas a mandar tráfico —pagado u orgánico— a una landing de la práctica? → **§4e**: navegador real (no
+   `curl`), `canonical` propio, y **la acción que ofrece la página define el CTA del anuncio**.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+La prueba comercial distingue intervención controlable de aparición/citación/elección observada. No garantizar
+inclusión en motores ni recuperación/ahorro en paid por una correlación; no presumir caída de tráfico o mala
+experiencia previa para todo prospecto. Medir conversiones de referencia cuando existan datos no prueba el efecto
+causal de una cita. Estas precisiones prevalecen para copy sobre formulaciones absolutas de módulos históricos.
+No reiniciar el Grader por defecto en MOFU/BOFU: evidencia, muestra autorizada y alcance según avance real.

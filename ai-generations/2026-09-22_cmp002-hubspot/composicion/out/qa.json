@@ -1,0 +1,174 @@
+[
+  {
+    "id": "KV-01",
+    "dominante": [
+      "sin exponer",
+      "tus datos."
+    ],
+    "ratioDominanteEntrada": 3.5,
+    "contraste": {
+      "entrada": 18.45,
+      "dominante": 18.34,
+      "cierre-frase": 17.46,
+      "cta": 6.02,
+      "descriptor": 17.91,
+      "logo": 19.63
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 14,
+        "ratioDominante": 0.124
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 10,
+        "ratioDominante": 0.088
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "KV-02",
+    "dominante": [
+      "Tu agente ya la llamó."
+    ],
+    "ratioDominanteEntrada": 4.1,
+    "contraste": {
+      "entrada": 18.87,
+      "dominante": 18.74,
+      "cierre-frase": 18.75,
+      "cta": 6.4,
+      "descriptor": 19.01,
+      "logo": 18.85
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 16,
+        "ratioDominante": 0.121
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 11,
+        "ratioDominante": 0.083
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "KV-04",
+    "dominante": [
+      "¿cuánto de tu pipeline",
+      "ya no va a cerrar?"
+    ],
+    "ratioDominanteEntrada": 3.6,
+    "contraste": {
+      "entrada": 16.81,
+      "dominante": 17.1,
+      "cierre-frase": 18.11,
+      "cta": 6.29,
+      "descriptor": 15.52,
+      "logo": 19.26
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 14,
+        "ratioDominante": 0.121
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 10,
+        "ratioDominante": 0.086
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "KV-05",
+    "dominante": [
+      "todo lo que",
+      "ya pagaste."
+    ],
+    "ratioDominanteEntrada": 5.5,
+    "contraste": {
+      "entrada": 16.01,
+      "dominante": 16.95,
+      "cierre-frase": 17.95,
+      "cta": 6.15,
+      "descriptor": 18.47,
+      "logo": 18.91
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 21,
+        "ratioDominante": 0.12
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 16,
+        "ratioDominante": 0.091
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "KV-06",
+    "dominante": [
+      "la IA es",
+      "un gasto."
+    ],
+    "ratioDominanteEntrada": 3.6,
+    "contraste": {
+      "entrada": 15.86,
+      "dominante": 16.36,
+      "cierre-frase": 14.5,
+      "cta": 12.61,
+      "descriptor": 13.39,
+      "logo": 16.07
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 14,
+        "ratioDominante": 0.121
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 10,
+        "ratioDominante": 0.086
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "KV-07",
+    "dominante": [
+      "tu equipo, multiplicado."
+    ],
+    "ratioDominanteEntrada": 3.8,
+    "contraste": {
+      "entrada": 16.47,
+      "dominante": 16.11,
+      "cierre-frase": 15.55,
+      "cta": 5.52,
+      "descriptor": 15.22,
+      "logo": 19.65
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 15,
+        "ratioDominante": 0.123
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 11,
+        "ratioDominante": 0.09
+      }
+    ],
+    "seleccion": null
+  }
+]

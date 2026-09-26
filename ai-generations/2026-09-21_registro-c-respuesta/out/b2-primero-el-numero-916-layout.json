@@ -1,0 +1,75 @@
+{
+  "canvas": {
+    "width": 1152,
+    "height": 2048
+  },
+  "subjectProtection": {
+    "top": 920,
+    "minClearance": 24
+  },
+  "elements": [
+    {
+      "id": "entrada",
+      "box": {
+        "left": 81,
+        "right": 588.144528,
+        "top": 337.92,
+        "bottom": 369.168
+      }
+    },
+    {
+      "id": "dominante",
+      "box": {
+        "left": 81,
+        "right": 971.6169133401146,
+        "top": 386.168,
+        "bottom": 473.8074945963406
+      }
+    },
+    {
+      "id": "cierre-frase",
+      "box": {
+        "left": 81,
+        "right": 492.02600000000007,
+        "top": 488.8074945963405,
+        "bottom": 523.0114945963405
+      }
+    },
+    {
+      "id": "nota",
+      "box": {
+        "left": 80.64000000000001,
+        "right": 909.662,
+        "top": 553.0114945963405,
+        "bottom": 631.1434945963406
+      }
+    },
+    {
+      "id": "cta",
+      "box": {
+        "left": 104.64000000000001,
+        "right": 529.76,
+        "top": 663.1434945963406,
+        "bottom": 706.1834945963406
+      }
+    },
+    {
+      "id": "descriptor",
+      "box": {
+        "left": 80.64000000000001,
+        "right": 481.37600000000003,
+        "top": 745.247,
+        "bottom": 773.8349999999999
+      }
+    }
+  ],
+  "typography": {
+    "lead": 36,
+    "dominant": 125.7381558053667,
+    "closure": 34,
+    "benefit": 34,
+    "cta": 40,
+    "descriptor": 28
+  },
+  "selection": null
+}

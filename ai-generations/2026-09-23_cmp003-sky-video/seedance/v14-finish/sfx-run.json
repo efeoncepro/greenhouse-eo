@@ -1,0 +1,77 @@
+{
+  "flow_id": "SVt3llC8SDhciCoZjoQF",
+  "flow_created": false,
+  "url": "https://elevenlabs.io/app/flows/SVt3llC8SDhciCoZjoQF?vs=viewstate_01m39gfdq9e1csb7b5xxhe601e",
+  "flow_url": "https://elevenlabs.io/app/flows/SVt3llC8SDhciCoZjoQF",
+  "results": [
+    {
+      "success": true,
+      "node_id": "Tj5VzlOBjcAyGMqCcDjb",
+      "session_id": "0K1witFylFsn7Hiuw5b4"
+    },
+    {
+      "success": true,
+      "node_id": "XxFuyqXo2phy7YJOzOyN",
+      "session_id": "Fx1mLtTRZMlKZNXDMYsq"
+    },
+    {
+      "success": true,
+      "node_id": "vnNkMkC2eYMKsTG9E0kM",
+      "session_id": "Lej4gEDETs0Eefir5tG6"
+    },
+    {
+      "success": true,
+      "node_id": "EH1lIkLfH0mC2dVhi3OR",
+      "session_id": "XqgU3IZcUXhP9e4xkrt7"
+    },
+    {
+      "success": true,
+      "node_id": "ILkOSJ3IoFFdIRdQp0Sm",
+      "session_id": "56BUUKK7j7QovBUWPjDb"
+    }
+  ],
+  "summary": {
+    "nodes_run": 5,
+    "generations_started": 5,
+    "failed": 0,
+    "generations_by_node": {
+      "Tj5VzlOBjcAyGMqCcDjb": 1,
+      "XxFuyqXo2phy7YJOzOyN": 1,
+      "vnNkMkC2eYMKsTG9E0kM": 1,
+      "EH1lIkLfH0mC2dVhi3OR": 1,
+      "ILkOSJ3IoFFdIRdQp0Sm": 1
+    }
+  },
+  "session_ids": [
+    "0K1witFylFsn7Hiuw5b4",
+    "Fx1mLtTRZMlKZNXDMYsq",
+    "Lej4gEDETs0Eefir5tG6",
+    "XqgU3IZcUXhP9e4xkrt7",
+    "56BUUKK7j7QovBUWPjDb"
+  ],
+  "pending": [
+    {
+      "generation_id": "LV27G9HyeTZg58qgaTsO",
+      "kind": "audio"
+    },
+    {
+      "generation_id": "NH48hHEqULK31PP8TJxW",
+      "kind": "audio"
+    },
+    {
+      "generation_id": "wTpKgsXrx199AFiKzoi0",
+      "kind": "audio"
+    },
+    {
+      "generation_id": "jc9U2ZV7nsA7wiAXWwvz",
+      "kind": "audio"
+    },
+    {
+      "generation_id": "pGEG73iaImQ7hGFsHTy3",
+      "kind": "audio"
+    }
+  ],
+  "poll_after_seconds": 3,
+  "notes": "Not finished yet. If a generation view is shown it tracks progress and polls by itself, so there is nothing to do here. Only call creative_get_flow_run_status yourself if no view appeared: wait poll_after_seconds, then call it with this flow_id and session_ids, repeating until all_completed or has_failures is true.",
+  "view_state_id": "viewstate_01m39gfdq9e1csb7b5xxhe601e"
+}

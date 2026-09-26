@@ -1,0 +1,9 @@
+{
+  "id": "F2-suelo-oblicuo-color",
+  "formato": "4:5",
+  "impacto": true,
+  "atmosfera": "polvo",
+  "palanca": "suelo-oblicuo",
+  "escena": "SCENE (Run and Gun set, warehouse in Lima, late afternoon, NO recognisable faces): a hard low sun beam cuts across the concrete. Deep in the frame, a large azure-blue lighting panel is switched on and throws its cool blue across the far wall and the trusses — it is the blue of the house, present as a real working light. On the floor right at the lens, a strip of ORANGE gaffer tape marks a camera position, small but unmistakable against the grey concrete. A crew member steps over the lens at that instant. 16mm at f/4, camera on the ground. Everything is completely unbranded, no readable text anywhere.",
+  "lecho": { "objeto": "the concrete floor itself, right at the lens, filling the bottom of the frame", "tono": "DARK grey concrete in shadow, matte" }
+}

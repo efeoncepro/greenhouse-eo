@@ -28,6 +28,7 @@ const PACK_DIR = path.dirname(fileURLToPath(import.meta.url))
 const SNAPSHOT_PATH = path.join(PACK_DIR, 'axis-ppt-snapshot.json')
 const ROLES_PATH = path.join(PACK_DIR, 'roles.json')
 const LEDGER_PATH = path.resolve(PACK_DIR, '../../catalogs/deck-axis/brand/color-ledger.json')
+const EDITORIAL_PATH = path.join(PACK_DIR, 'editorial-roles.json')
 
 /** Home del pack (fonts.json + fonts/ + snapshot + roles). */
 export const axisPackDir = PACK_DIR
@@ -53,10 +54,23 @@ interface RolesFile {
   contrastPairs: Array<{ fg: string; bg: string; min: number; context: string }>
 }
 
+interface EditorialRolesFile extends RolesFile {
+  colors: Record<string, string>
+}
+
+export interface AxisBrandPackOptions {
+  /**
+   * Suma la extensión editorial (`editorial-roles.json`, TASK-1889): los grises de estructura y los
+   * ROLES de dato del informe de Insights. Es opt-in por catálogo: `deck-axis` no la pide y su CSS
+   * compilado queda byte-idéntico, así una propuesta comercial no cambia por un informe.
+   */
+  readonly editorial?: boolean
+}
+
 /** `blue/800` (nombre Figma) → `--axis-ppt-blue-800` (custom property). */
 export const pptCssVar = (figmaName: string): string => `--axis-ppt-${figmaName.replace(/\//g, '-')}`
 
-export const buildAxisBrandPack = (): BrandPack => {
+export const buildAxisBrandPack = (options: AxisBrandPackOptions = {}): BrandPack => {
   const snapshot = JSON.parse(fs.readFileSync(SNAPSHOT_PATH, 'utf8')) as SnapshotFile
   const ledger = JSON.parse(fs.readFileSync(LEDGER_PATH, 'utf8')) as LedgerFile
   const rolesFile = JSON.parse(fs.readFileSync(ROLES_PATH, 'utf8')) as RolesFile
@@ -93,12 +107,36 @@ export const buildAxisBrandPack = (): BrandPack => {
     })
   }
 
+  const roles = Object.entries(rolesFile.roles).map(([name, colorVar]) => ({ name, colorVar }))
+  const contrastPairs = [...rolesFile.contrastPairs]
+
+  // 3 · Extensión editorial — sólo para los catálogos que la declaran. Un color que ya exista en el
+  // pack no se redefine acá: la extensión suma, nunca pisa (el compilador falla ante un duplicado).
+  if (options.editorial) {
+    const editorial = JSON.parse(fs.readFileSync(EDITORIAL_PATH, 'utf8')) as EditorialRolesFile
+
+    for (const [cssVar, hex] of Object.entries(editorial.colors)) {
+      if (colors.has(cssVar)) {
+        throw new Error(`editorial-roles.json redefine ${cssVar}, que ya existe en el pack: la extensión sólo suma.`)
+      }
+
+      colors.set(cssVar, {
+        cssVar,
+        hex: hex.toLowerCase(),
+        source: { collection: 'Deck (extensión editorial Insights)', nodeId: null, status: 'proposed' }
+      })
+    }
+
+    roles.push(...Object.entries(editorial.roles).map(([name, colorVar]) => ({ name, colorVar })))
+    contrastPairs.push(...editorial.contrastPairs)
+  }
+
   return {
     name: 'axis',
     version: '1.0.0',
     contrastEnforcement: 'advisory',
     colors: [...colors.values()],
-    roles: Object.entries(rolesFile.roles).map(([name, colorVar]) => ({ name, colorVar })),
-    contrastPairs: rolesFile.contrastPairs
+    roles,
+    contrastPairs
   }
 }

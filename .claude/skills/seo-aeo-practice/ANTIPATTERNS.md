@@ -10,10 +10,10 @@
 | # | Antipatrón | Por qué mata | Qué hacer |
 |---|---|---|---|
 | **A1** | 🩸 **Cotizar sin loaded cost** | **Un precio sin costo detrás no es un precio: es una corazonada con decimales.** *(Berel: 52.000 MXN, sin blueprint, sin piso, sin margen conocido)* | **Cotizador siempre.** `templates/calculadora-piso.md` |
-| **A2** | 🩸 **Publicar un precio unitario por artículo** | 🎯 **Le entregas al cliente la calculadora para comoditizarte.** *(SKY ya sabe que un artículo nuestro vale 260k)* | **Capacidad declarada**, no precio unitario |
-| **A3** | 🩸 **Ad-hoc más barato que el marginal del plan** | **Premias salirse del plan.** *(SKY: ad-hoc 260k vs marginal 425k)* | **Ad-hoc SIEMPRE más caro** |
-| **A4** | 🩸 **Un plan dominado por otro** | 🔴 **Un analista de compras lo ve en 30 segundos.** Parece descuido o mala fe *(SKY: ampliado 6,9M > base+4 ad-hoc 6,24M)* | **Haz la aritmética del comprador antes de mandar** |
-| **A5** | **Bajar el precio para cerrar** | 🎯 **Eso no es un descuento: es una donación.** Y le enseñas que tu precio era mentira | 🔴 **Baja el ALCANCE, nunca el precio** |
+| **A2** | 🩸 **Publicar un precio unitario por artículo** | 🎯 **Le entregas al cliente la calculadora para comoditizarte.** *(SKY ya sabe que un artículo nuestro vale 260k — oferta original; la adjudicada 2026-09-23 ya no tiene precio unitario)* | **Capacidad declarada**, no precio unitario |
+| **A3** | 🩸 **Ad-hoc más barato que el marginal del plan** | **Premias salirse del plan.** *(SKY, oferta original: ad-hoc 260k vs marginal 425k)* | **Ad-hoc SIEMPRE más caro** |
+| **A4** | 🩸 **Un plan dominado por otro** | 🔴 **Un analista de compras lo ve en 30 segundos.** Parece descuido o mala fe *(SKY, oferta original: ampliado 6,9M > base+4 ad-hoc 6,24M)* | **Haz la aritmética del comprador antes de mandar** |
+| **A5** | **Bajar el precio para cerrar** | 🎯 **Eso no es un descuento: es una donación.** Y le enseñas que tu precio era mentira | 🔴 **Baja el ALCANCE, nunca el precio** *(✅ SKY blog, adjudicado 2026-09-23: se ganó rediseñando el Core al presupuesto del cliente, no descontando la misma caja)* |
 | **A6** | 🩸 **Descontar la plataforma** | Margen puro **+ devalúas tu único diferenciador** | **Descuenta horas. Nunca la plataforma** |
 | **A7** | **Cerrar bajo 45% de margen** | 🔴 **Viola la política aprobada (2026-07-13).** El mercado: bajo 40% el delivery está roto | **No se cotiza. Punto** |
 | **A8** | 🩸 **"Todo incluido… etc"** | El "etc" no tiene borde. **Las expectativas se expanden, el margen se evapora — y churnean igual** | **Lista cerrada** |
@@ -82,8 +82,9 @@
 ## F. Los tres que más nos cuestan HOY 🩸
 
 1. 🩸 **A1 — Berel sin loaded cost.** Puede estar al **18% de margen** y nadie lo ha medido.
-2. 🩸 **A2+A3+A4 — la oferta de SKY.** Precio unitario publicado, ad-hoc invertido y un plan dominado.
-   **En una licitación viva.**
+2. 🩸 **A2+A3+A4 — la oferta original de SKY.** Precio unitario publicado, ad-hoc invertido y un plan dominado.
+   *(**Actualización 2026-09-23:** corregido en la oferta adjudicada — Core de capacidad gobernada, sin precio
+   unitario por artículo. El 260k ya quedó a la vista del cliente: esa parte de A2 no se deshace.)*
 3. 🩸 **E1 — cero baselines congelados.** Por eso tenemos **cero casos citables** — y por eso el precio y el
    Grader están haciendo el trabajo que debería hacer un caso.
 

@@ -2,8 +2,10 @@
 
 > Status: **Foundation implementada y en producción (TASK-1845, 2026-09-15; ver §14)** — generación habilitada en
 > staging y producción, emisión e IA apagadas; render en producción (TASK-1846, §14.5); enlaces compartidos, correo
-> y recurrencia code complete sin deploy (TASK-1848, §14.6); A4, UI y vista web en Think siguen pendientes
-> (TASK-1847, TASK-1849, TASK-1875). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
+> y recurrencia en producción con flags OFF (TASK-1848, release `bda1cf2cd938`, §14.6); catálogos v1 A4 (`report_pdf`)
+> y deck (`insights-deck`) en producción desde el 2026-09-24 (TASK-1847, complete 2026-09-25, §14.7); UI y vista web en
+> Think siguen pendientes (TASK-1849, TASK-1875); el rediseño premium aprobado el 2026-09-25 está **code complete,
+> rollout pendiente** (TASK-1888 §14.8, TASK-1889 §14.9; delta de §6). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
 > rollout verificado, sus límites honestos y las invariantes que un agente debe respetar al tocar el dominio.
 > Owner: Platform + Client Experience.
 > [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
@@ -174,6 +176,70 @@ TASK-1846 incorpora únicamente la primitive domain-free, y TASK-1847 conserva l
 Versionar y fijar brand pack, fuentes, catálogo, plan y renderer. Fidelidad semántica/visual es obligatoria;
 igualdad de bytes PDF sólo si el renderer normaliza metadatos y el benchmark la demuestra.
 
+### Delta 2026-09-25 — rediseño premium aprobado (contrato y catálogos construidos; rollout pendiente, §14.9)
+
+> **Estado (2026-09-25).** El contrato editorial v2 (TASK-1888) está **construido y apagado** detrás de
+> `INSIGHTS_EDITORIAL_V2_ENABLED` (code complete en `develop`, sin release; estado en §14.8). Las plantillas las
+> construye TASK-1889 (`ui-ux`); producción sirve lo que ya está desplegado (§14.7) hasta ese release.
+> Dirección visual y copia durable del canvas:
+> [`TASK-1889-efeonce-insights-premium-catalogs-direction.md`](../ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md).
+
+- **Aprobación.** El operador aprobó el 2026-09-25, página por página, el canvas «Gráficos de Efeonce Insights»
+  (Artifact privado <https://claude.ai/artifact/M2GiA4NdBfgGkiAvwPjZYb>) como el aspecto de todo informe: portadas,
+  contraportada con redes/contacto/datos legales, aperturas de capítulo, prosa (resumen, lectura, plan), páginas de
+  gráfico premium (cifra principal, conclusión, gráfico, procedencia y panel «Lo que significa / Próximo paso») y logos
+  de canal (Google, ChatGPT, Gemini, Claude, Perplexity). Los datos del canvas son de ejemplo y no autorizan familias.
+- **Una portada con variantes por módulo, nunca una por servicio.** Navy, o blanca (bloque navy arriba y título sobre
+  papel) con variante de visibilidad (`seo`/`aeo`: logos de canal como satélites en la órbita) y variante creativa
+  (`ico`: sin logos). La variante blanca la elige el catálogo desde los módulos y `channelId`, sin campo nuevo.
+- **Regla de resolución de portada (TASK-1888, construida).** `resolveInsightCover` (`contracts/cover.ts`): cambio en
+  el encargo (`brand.coverTheme`, si ≠ `auto`) > preferencia de la organización (`insight_cover_preferences`, si ≠
+  `auto`) > `auto`; `auto` = navy sólo si la organización tiene logo apto para fondo oscuro
+  (`organizations.logo_on_dark_asset_id`), si no blanca. Una portada navy **nunca** lleva el logo por defecto: la
+  variante oscura o ningún logo. Se resuelve una vez al componer y se **sella** en `plan.cover`: re-renderizar da la
+  misma portada; el render nunca la decide con datos vivos. Un encargo sin `coverTheme` conserva el mismo hash.
+- **Roles de color de datos.** Actual = navy `#023c70` en papel / teal `#36c8bf` en navy; anterior o referencia = teal
+  profundo `#1f9e94` / periwinkle `#8aa8d8`; oportunidad = coral `#d97757` / `#ff7063`; ausencia = rayado, nunca un
+  color. Navy manda en tipografía y estructura. Teal y coral tienen la misma luminosidad: nunca son lo único que separa
+  dos series. En plantillas estos valores entran como tokens del brand pack (mapeo en la dirección visual), nunca como
+  HEX literal.
+- **Contrato de fidelidad (TASK-1889).** 41 páginas de referencia a tamaño nativo en
+  `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs/paginas/` y las fuentes del canvas
+  empaquetadas (`fuente-canvas-2026-09-25.tar.gz`, con `render-referencia.mjs`, que reproduce 40/41 páginas byte a
+  byte). Cada plantilla renderizada con los datos de ejemplo del canvas debe quedar a **≤ 1 % de píxeles distintos**
+  (`pixelmatch`, umbral 0,1) y la aprueba el operador página por página. Portada, apertura y contraportada del **deck**
+  no están en el canvas: se derivan de A4 con aprobación del operador.
+- **Contrato editorial v2 (TASK-1888), aditivo y construido.** `ChartSpec` de 7 a 15 familias (las 8 nuevas describen
+  sus datos en `data`, tipo discriminado; todo número es un `factId`), con validación estructural en
+  `contracts/chart-spec.ts` y de VALOR en `editorial/chart-values.ts`, que llama a la misma `chart-geometry.ts` que
+  dibuja. Plan con campos opcionales: `chapter.opening`, `chapter.readings[]` (cifra principal, «Lo que significa»,
+  «Próximo paso»), `essentials` (≤ 5), `scopeLines`, `decision`/`measurement`/`ask` (sin productor determinista:
+  inventarlos sería redactar sin evidencia), acciones con `impact`/`effort`/`weeks` y `cover`. Todos pasan la misma
+  regla de cifras. `channelId` en los hechos de canal; FTR y metas ICO como hechos `role: 'reference'`. `planVersion`
+  y `specVersion` no cambian: un plan o spec v1 sellado valida y compone igual.
+- **Matriz familia × evidencia (`family_evidence_matrix_v1`, `editorial/family-evidence-matrix.ts`).** Es la autoridad
+  de qué puede emitir un productor; `assertChartsAllowed` lanza si el planner emite otra cosa. Verificada contra los
+  adapters el 2026-09-25:
+
+  | Familia | Pregunta | Veredicto | Evidencia hoy |
+  |---|---|---|---|
+  | `bar` / `bar_grouped` | comparar / contra el período anterior | productor ahora | hechos por unidad de cada módulo |
+  | `line` | tendencia | productor ahora (seo, ico) | ≥ 3 meses en la ventana: ICO por space y mes; SEO sólo ETV mensual (Search Console entrega totales, sin serie diaria) |
+  | `bullet` | resultado contra la meta | productor ahora (ico) | OTD%, FTR% y RpA por space contra el umbral `optimal` de `ICO_METRIC_REGISTRY`; banda «cerca de la meta» (`bandFactId`) = borde de la zona `attention` del mismo registro (OTD 70, FTR 60, RpA 2,5), nunca una fracción de la meta en el render |
+  | `gauge` | nivel 0–100 | sin evidencia | el adapter AEO lee sólo el último run del grader: la ventana anterior nunca tiene puntaje propio |
+  | `pie` / `donut` | parte de un total | sin evidencia | ningún hecho trae sus partes medidas (derivar «el resto» sería calcular) |
+  | `bar_stacked` | composición en el tiempo | sin evidencia | ningún adapter entrega partes por período |
+  | `scatter` | relación entre dos métricas | sin evidencia | sin observaciones pareadas |
+  | `waterfall`, `funnel`, `heatmap`, `waffle`, `venn_two`, `upset` | descomposición, conversión, matriz, conjuntos | sin evidencia | requieren desgloses, CRM o conjuntos por consulta que ningún adapter expone |
+
+  Cambiar un veredicto exige evidencia nueva en el adapter dueño + productor + test + subir la versión de la matriz.
+- **Variación en puntos porcentuales (corregida).** Una métrica que ya es porcentaje varía en pp («+1,8 pp» para OTD
+  81,9 % vs 80,1 %, caso Sky); bajo 0,05 pp se imprimen dos decimales para no escribir «0,0 pp» entre dos cifras
+  distintas (caso Berel, CTR). Aplica con y sin el flag: es una corrección. Los planes sellados con la variación
+  relativa siguen validando.
+- **Primeras ediciones con el diseño nuevo:** Berel (`seo`/`aeo`) y Sky (`ico`), como informe **interno**, sin
+  compartir con el cliente hasta la revisión del operador.
+
 ## 7. API, MCP y autorización
 
 Superficie **propuesta**, naming final de rutas/capabilities se registra durante implementación:
@@ -182,8 +248,8 @@ Superficie **propuesta**, naming final de rutas/capabilities se registra durante
 |---|---|---|
 | list/get/catalog/validateRequest/createEdition/revise/issue | Thin adapters App/Ecosystem; listado paginado y estados compactos | TASK-1845 |
 | requestOutputs/getRun/retryOutput/cancelRun | Requests asíncronos, sin esperar Chromium. **Registrado 2026-09-16:** `POST/GET …/insights/editions/{editionId}/render`, `GET …/insights/render-runs/{renderRunId}`, `POST …/render-runs/{renderRunId}/retry`, `POST …/render-runs/{renderRunId}/cancel` en los lanes app y ecosystem; tools MCP `request_insight_render`, `get_insight_render_run`, `retry_insight_render`, `cancel_insight_render`. Errores nuevos `render_disabled` (503) y `render_rejected` (422). | TASK-1846 |
-| createShare/revokeShare/getShare/withdrawEdition | Writes gobernados; token sólo al emitir enlace autorizado. **Registrado 2026-09-18 (code complete, sin deploy):** `POST/GET …/insights/editions/{editionId}/shares`, `POST …/insights/shares/{shareId}/revoke` en los lanes app y ecosystem (en ecosystem crear/revocar exige binding interno); tools MCP `create_insight_share`, `list_insight_shares`, `revoke_insight_share` (clase write: create/revoke). Capability `insights.share.manage`. Error `sharing_disabled` (503) | TASK-1848 |
-| requestDelivery/getDelivery/createSchedule/pauseSchedule | Autorización exacta por destinatario, modalidad y recurrencia. **Registrado 2026-09-18 (code complete, sin deploy).** Envío — app: `POST/GET …/editions/{editionId}/deliveries`, `GET …/deliveries/{deliveryId}`, `POST …/deliveries/{deliveryId}/cancel\|retry`, `POST …/delivery-recipients/{recipientId}/reconcile`; ecosystem: sólo los dos `GET`; MCP `list_insight_deliveries`, `get_insight_delivery`. Recurrencia — app: `POST/GET …/insights/schedules`, `GET …/schedules/{scheduleId}`, `POST …/schedules/{scheduleId}/activate\|pause\|retire`; ecosystem: sólo `GET`; MCP `list_insight_schedules`, `get_insight_schedule`. **Envío, cancelación, reintento, reconciliación y escrituras de recurrencia son sólo lane App (persona interna); ecosystem y MCP son de lectura.** La modalidad `portal_link` responde `not_ready` hasta que TASK-1849 construya la ruta de la edición en el portal. Capabilities `insights.delivery.send` e `insights.schedule.manage`. Errores `delivery_disabled` y `schedules_disabled` (503); `quota_exceeded` (429) | TASK-1848 |
+| createShare/revokeShare/getShare/withdrawEdition | Writes gobernados; token sólo al emitir enlace autorizado. **Registrado 2026-09-18 (en producción con `INSIGHTS_SHARING_ENABLED` OFF, release `bda1cf2cd938`):** `POST/GET …/insights/editions/{editionId}/shares`, `POST …/insights/shares/{shareId}/revoke` en los lanes app y ecosystem (en ecosystem crear/revocar exige binding interno); tools MCP `create_insight_share`, `list_insight_shares`, `revoke_insight_share` (clase write: create/revoke). Capability `insights.share.manage`. Error `sharing_disabled` (503) | TASK-1848 |
+| requestDelivery/getDelivery/createSchedule/pauseSchedule | Autorización exacta por destinatario, modalidad y recurrencia. **Registrado 2026-09-18 (en producción con flags OFF, release `bda1cf2cd938`).** Envío — app: `POST/GET …/editions/{editionId}/deliveries`, `GET …/deliveries/{deliveryId}`, `POST …/deliveries/{deliveryId}/cancel\|retry`, `POST …/delivery-recipients/{recipientId}/reconcile`; ecosystem: sólo los dos `GET`; MCP `list_insight_deliveries`, `get_insight_delivery`. Recurrencia — app: `POST/GET …/insights/schedules`, `GET …/schedules/{scheduleId}`, `POST …/schedules/{scheduleId}/activate\|pause\|retire`; ecosystem: sólo `GET`; MCP `list_insight_schedules`, `get_insight_schedule`. **Envío, cancelación, reintento, reconciliación y escrituras de recurrencia son sólo lane App (persona interna); ecosystem y MCP son de lectura.** La modalidad `portal_link` responde `not_ready` hasta que TASK-1849 construya la ruta de la edición en el portal. Capabilities `insights.delivery.send` e `insights.schedule.manage`. Errores `delivery_disabled` y `schedules_disabled` (503); `quota_exceeded` (429) | TASK-1848 |
 | resolveSharedEdition/downloadSharedOutput | Token de lectura limitado, sin OAuth ni discovery de módulos. **Registrado 2026-09-18:** `GET /api/public/insights/shared/[token]` y `GET /api/public/insights/shared/[token]/outputs/[output]` (§8) | TASK-1848 |
 
 API responde `202` con `reportId/editionId/runId` para trabajo asíncrono. Repetir la misma idempotency key y
@@ -246,7 +312,7 @@ ni cifrado** (decisión del operador 2026-09-18): en el envío por correo vive s
 revoca el grant y el reintento emite uno nuevo. No se copia en outbox, logs, analytics ni errores. Resolver asset
 y auth en servidor.
 
-**Contrato materializado (TASK-1848, code complete 2026-09-18, sin deploy).**
+**Contrato materializado (TASK-1848, code complete 2026-09-18; en producción con flag OFF desde el release `bda1cf2cd938`, §14.6).**
 
 - **Token:** `isg_` + 32 bytes aleatorios base64url (256 bits), `src/lib/efeonce-insights/sharing/token.ts`; se
   guarda sólo el digest sha256 (`token_digest` UNIQUE). URL: `${INSIGHTS_SHARE_PUBLIC_BASE_URL ??
@@ -324,7 +390,7 @@ scheduleVersion + período; dos ticks no duplican. Caída se recupera por polít
 (una ocurrencia pendiente por defecto), no tormenta histórica. Revocar autoridad pausa el schedule. Default:
 genera borrador para revisión; autoemisión/envío exige autorización previa explícita, acotada y revocable.
 
-**Materializado por TASK-1848 (code complete 2026-09-18, sin deploy).**
+**Materializado por TASK-1848 (code complete 2026-09-18; en producción con flags OFF desde el release `bda1cf2cd938`, §14.6).**
 
 - **Modalidades vivas V1:** `share_link` y `attachment`. `portal_link` se rechaza `not_ready` hasta que TASK-1849
   construya la ruta de la edición en el portal (`INSIGHT_PORTAL_EDITION_ROUTE_AVAILABLE = false` en
@@ -473,6 +539,13 @@ fija la de su dominio: access events de enlaces 180 días y rate buckets 1 día,
 | TASK-1849 | Biblioteca/encargo/revisión en el portal Greenhouse y presentación email | TASK-1845/1846/1847/1848 |
 | TASK-1875 | Vista web compartida por token **renderizada en `efeonce-think`** (`/insights/r/<token>`, render tonto de `InsightWebModelV1`, revocación por request, GVC del hub) | TASK-1848 |
 
+> **Nota 2026-09-25 (estado y unidades nuevas).** TASK-1845 y TASK-1846 cerraron el 2026-09-16 y TASK-1847 el
+> 2026-09-25 (catálogos v1 en producción desde el 2026-09-24); TASK-1848 sigue `in-progress`, en producción con flags
+> OFF. El rediseño premium aprobado el 2026-09-25 (§6, delta) suma dos unidades que la tabla de arriba no tenía:
+> **TASK-1888** — contrato editorial v2 y portada por cliente (`backend-data`, `to-do`, sin blockers) — y
+> **TASK-1889** — catálogos premium A4 y deck (`ui-ux`, `to-do`; sus Slices 3–5 dependen del contrato de TASK-1888).
+> TASK-1849, TASK-1875 y TASK-1672 son consumers de ambas.
+
 Cinco nuevas unidades; cada una tiene slices, pruebas y rollout propios. TASK-1672/1673 son dos integraciones
 especializadas ya en backlog: se coordinan, no se cuentan como nuevas ni se borran. No bloquean un informe
 SEO de desempeño sin auditoría técnica; esa sección sólo se habilita cuando sus gates reales estén satisfechos.
@@ -498,6 +571,12 @@ MCP router/gateway; EMAIL_CATALOG; Report Brand Delivery; Executive Report Deck 
 Pendiente de ejecución: límites medidos/costo, retención por clase, DDL exacto, library de charts server-safe
 tras prueba hermética/licencia y mapa final de primitives/rutas. No son preguntas que impidan registrar el
 programa: tienen dueña y gate explícitos. La selección de library no se hace por moda ni impone proveedor nuevo.
+
+> **Nota 2026-09-25.** DDL exacto, retención por clase y mapa de primitives/rutas se resolvieron en TASK-1845 (§14.3).
+> La library de charts se resolvió **sin proveedor nuevo**: geometría propia, domain-free, en
+> `src/lib/artifact-composer/chart-geometry.ts` (TASK-1847, §14.7). Sigue pendiente registrar límites medidos y costo
+> del informe A4 largo: el QA de 30 páginas de TASK-1847 fue una exportación sintética local que verificó formato
+> (A4, fuentes, pie y folio), no tiempos ni costo.
 
 ## 13. Habilitación de agentes: skill operativa y distribución
 
@@ -584,7 +663,9 @@ Puertos `InsightOutputsPort` (TASK-1846) e `InsightSharePort` (TASK-1848) declar
 falla cerrado (`not_ready`) hasta que el render valide outputs**.
 
 **Superficies:** lanes `app` y `ecosystem` con la misma tabla de errores
-(`src/lib/api-platform/resources/{app-insights,ecosystem-insights,insights-errors}.ts`). Rutas
+(`src/lib/api-platform/resources/{app-insights,ecosystem-insights,insights-errors}.ts`; desde ISSUE-177 cada lane separa
+lectura —`*-insights-read.ts`, que nunca carga commands ni render— de comandos —`*-insights.ts`, que importa el barrel
+de commands y así conecta el puerto de outputs— con helpers en `*-insights-scope.ts`). Rutas
 `platform/app/insights/{catalog, reports, reports/[id], editions, editions/[id], editions/[id]/{issue,revise,withdraw,recover}}`
 y `platform/ecosystem/insights/{catalog, reports, reports/[id], editions, editions/[id], editions/[id]/{revise,recover}}`
 (ecosystem NO emite ni retira; exige `externalScopeType`/`externalScopeId` + `organizationId` para bindings
@@ -636,6 +717,16 @@ greenhouse-eo, dispatch del orquestador, aprobación de gates, env/redeploy en s
 
 ### 14.3 Límites honestos y pendientes
 
+> **Nota de vigencia 2026-09-25.** Esta lista registra el estado al 2026-09-15 y varios puntos quedaron superados:
+> TASK-1845 cerró el 2026-09-16 (ensayo `migrate:down` + `up` ejecutado ese día con readbacks; `tools/list` por sesión
+> humana quedó como verificación opcional), así que el «cierre pendiente» de la introducción de §14 ya no aplica.
+> TASK-1846 cerró el 2026-09-16 y TASK-1847 el 2026-09-25: `renderableOutputs` declara `deck_pdf` y `report_pdf`
+> desde el release `ebb9212a32ce` (2026-09-24). El camino con datos reales ya se ejercitó en producción: edición
+> interna de Sky Airlines `EO-INS-000022` (ICO, agosto contra julio 2026), deck y A4 al primer intento con cifras
+> iguales a BigQuery (§14.7). La org sandbox «Greenhouse Demo» sigue sin filas en
+> `ico_engine.metric_snapshots_monthly`: una edición ICO suya falla en `validating` con `evidence_rejected`, por diseño.
+> Sigue sin emitirse ninguna edición: emisión y sharing continúan OFF en producción.
+
 - **La evidencia del canary tiene 0 hechos.** La org sintética no tiene snapshots ICO en 2026-07/08: el snapshot
   sellado trae 4 rechazos `no_data` y el plan congelado declara los límites. Se ejercitó el camino "sin datos
   declarados", no el de un cliente con datos reales.
@@ -678,13 +769,23 @@ greenhouse-eo, dispatch del orquestador, aprobación de gates, env/redeploy en s
   `insights.edition.issue`, `INSIGHTS_ISSUANCE_ENABLED` y outputs validados. El puerto real (TASK-1846) valida
   SÓLO outputs `completed` con asset de la MISMA audiencia de la edición: un output interno jamás valida una
   edición de cliente; faltar uno es `not_ready` con `missing`.
-- **NUNCA** encolar un output que el motor no puede producir (`INSIGHT_RENDERABLE_OUTPUTS`, hoy `deck_pdf`):
+- **NUNCA** encolar un output que el motor no puede producir (`INSIGHT_RENDERABLE_OUTPUTS`: `deck_pdf` y, desde el
+  2026-09-24, `report_pdf`; pedir `web` se rechaza, porque la vista web la dibuja Think desde `InsightWebModelV1`):
   se rechaza `render_rejected`, nunca "queda para después". **NUNCA** truncar una cifra o una afirmación para
   que quepa en un slot del catálogo: el mapper rechaza con causa; sólo un label/título se acorta con elipsis.
 - **NUNCA** separar lease de fencing en el motor de render: el reclamo por lease vencido abre una ventana de
   doble finalización que hoy no existe y el fence token es el único candado (`InsightRenderFenceLostError`).
 - **SIEMPRE** que se agregue una tool MCP interna, federarla en `efeonce-mcp` (provider + paridad + política de
   autoridad nativa + scope si escribe) y verificar el gateway construido; registrar una tool aquí no la publica.
+- **NUNCA** emitir una familia de gráfico que la matriz familia × evidencia no autoriza para el módulo
+  (`editorial/family-evidence-matrix.ts`; `assertChartsAllowed` lanza). Los datos del canvas no autorizan nada.
+- **NUNCA** escribir un umbral ICO como literal: la meta es un hecho `role: 'reference'` leído de `ICO_METRIC_REGISTRY`
+  por el adapter. Un hecho de referencia no genera claims ni tablas y no cuenta como evidencia del módulo.
+- **NUNCA** decidir la portada en el render ni poner el logo por defecto sobre navy: la resuelve `resolveInsightCover`
+  al componer y queda sellada en `plan.cover`; la variante oscura del logo se escribe sólo por
+  `attachOrganizationLogoAsset({ variant: 'on_dark' })` (account-360).
+- **NUNCA** importar `@/lib/artifact-composer/pure` desde `contracts/**`: arrastra el módulo crypto de Node y los
+  contratos son browser-safe. Las invariantes de valor que necesitan la geometría viven en `editorial/chart-values.ts`.
 
 ### 14.5 Estado de TASK-1846 — render durable (complete 2026-09-16, en producción)
 
@@ -798,9 +899,106 @@ canary productivo. Los huérfanos en `running` sin lease requieren decisión hum
   ejecuciones del Job aún en curso antes de lanzar otra.
 - **Sigue fuera:** `INSIGHTS_ISSUANCE_ENABLED` OFF (paso de producto); `report_pdf` → TASK-1847; `web` → TASK-1848.
 
-### 14.6 Estado de TASK-1848 — sharing, correo y recurrencia (code complete 2026-09-18, rollout pendiente)
+### 14.7 Estado de TASK-1847 — catálogos y gráficos (complete 2026-09-25, en producción desde 2026-09-24)
 
-**Construido (commits locales en `develop`, sin push ni deploy):**
+> Los bloques siguientes se escribieron cuando los catálogos estaban sólo en staging (2026-09-22) y se conservan como
+> historia; el estado vigente está en los deltas del 2026-09-24 («en producción») y del 2026-09-25 («cierre») al final
+> de esta sección, que prevalecen sobre las menciones a «no en producción».
+
+**Qué existe y está probado** (424 tests verdes entre `efeonce-insights` y `artifact-composer`,
+typecheck limpio, gates del worker OK):
+
+- **Decisión de paginación:** `GREENHOUSE_ARTIFACT_VERTICAL_PAGINATION_DECISION_V1.md` (`Accepted`).
+  El motor no pagina pero ya sabía medir: `measureSlideFit()` expone esa medición como consulta y
+  `assertSlideFitsCanvas` pasa a consumirla. `paginateFlow()` es **puro** —recibe capacidades, no
+  toca el navegador— y vive domain-free en el composer para que un segundo informe vertical
+  (TASK-1672) pueda usarlo sin copiarlo.
+- **Geometría de 15 familias** en `artifact-composer/chart-geometry.ts`, domain-free: barras
+  (simple/agrupada/apilada), línea, circular/dona con techo de 3 porciones, dispersión, bullet,
+  embudo, cascada, medidor, heatmap, waffle, Venn de dos conjuntos con áreas proporcionales reales
+  y UpSet. Venn de tres NO se implementa: con tres conjuntos las áreas proporcionales exactas en
+  general no existen, y uno que las aparente miente.
+- **Marca:** `compile-catalog-tokens.ts` compila una vez para N catálogos. `deck-axis` recompila
+  byte-idéntico.
+- **Catálogos nuevos:** `insights-report` (A4 794×1123, 5 plantillas + molde compartido) e
+  `insights-deck` (16:9, 4 composiciones + molde). Ambos con brand pack `axis`, sin HEX literal y
+  con contraste WCAG AA verificado.
+- **Copy:** `src/lib/copy/insights.ts` es SSOT y cierra un drift real — el planner y el mapper
+  tenían títulos de módulo **distintos**, de modo que el plan sellado y su render se contradecían.
+- **`report_pdf` admitido:** el catálogo se resuelve **por output** (era una constante única, y eso
+  era lo que impedía una segunda salida), cada salida sella su propio manifest, el evento del run
+  sella el hash del conjunto, y el worker registra los dos catálogos nuevos.
+
+**Rollout a staging y canary con datos reales (2026-09-22).** Desplegado en `develop` (staging + Job
+`artifact-worker`); **no en producción**. Canary interno y sin emitir sobre Berel (SEO+AEO) y Sky (ICO), con
+`insights_v1` asignado a ambas orgs. Lo que encontró y quedó cerrado:
+
+- **Validador de cifras** (`editorial/plan-validation.ts`, `format.ts`): una fecha ISO es un solo token, y la
+  etiqueta LITERAL de un hecho referenciado se enmascara antes de leer cifras (sus números son identidad del hecho,
+  no afirmación). La guarda no se relajó: una cifra fuera de la etiqueta, o la etiqueta de un hecho no referenciado,
+  sigue rechazándose.
+- **Texto del plan sin identificadores internos:** límites, metodología, títulos de gráfico y unidades salen de
+  `GH_INSIGHTS` (`metrics`, `sources`, `units`); el `detail` del adapter y el reader quedan en el snapshot. AEO usa el
+  copy es-CL del grader (`GH_GROWTH_AI_VISIBILITY`). Un conteo parte de un total se escribe «21 de 31».
+- **ICO:** el adapter leía `otd` y el registro dueño lo llama `otd_pct` — OTD nunca llegó a un informe. Los ids leídos
+  viven en `ICO_SNAPSHOT_METRIC_IDS`, cruzados por test con `ICO_METRIC_REGISTRY`; una métrica esperada ausente se
+  narra como límite.
+- **Figuras compartidas** (`render/figure-pages.ts` + `artifact-composer/bar-figure.ts`): formato canónico, barra
+  nombrada por su métrica, comparación de períodos en pares con escala propia (`scaleGroup`), paginación sin partir
+  pares ni recortar, guarda barra↔etiqueta con tolerancia de redondeo (media unidad del último decimal impreso) y
+  tono con espacio de nombres propio (`tone-lead`/`tone-rest`: `lead` chocaba con el `.lead` tipográfico del molde y
+  la barra destacada quedaba invisible).
+- **Cutover de `deck_pdf` a `insights-deck`** (`render/insights-deck-mapper.ts`): `deck-axis` recortaba con «…»,
+  duplicaba filas y callaba métricas. Toda afirmación del plan aparece en alguna lámina; nada se recorta. Lo ya
+  encolado con `deck-axis` compone con su input sellado. Proposal sigue en `deck-axis`, intacto.
+- **Rótulo de período** (`render/labels.ts`): desde la ventana civil medida («1–20 de septiembre de 2026»), no desde
+  el mes de inicio, dentro del presupuesto de 28.
+
+- **Alcance del rechazo** (`EvidenceRejectionV1.scope?: 'current' | 'comparison'`, opcional y aditivo; ausente = ventana
+  actual): los adapters marcan lo recolectado para la comparación (`asComparisonRejections`) y el planner lo redacta
+  «en el período anterior, …». Antes, un rechazo de la comparación se leía como falta de la ventana actual.
+
+Verificado en el runtime de staging: las revisiones v2 de Berel (deck `insights-deck` 13 láminas + A4 15 páginas) y Sky
+(deck 5 + A4 7, con OTD) completaron al primer intento, idénticas a la vista previa local
+(`scripts/insights/preview-edition.ts`). **Falta:** baseline visual (ISSUE-122) y promoción a producción.
+
+**Delta 2026-09-24 — QA A4 y estado del release.** La paginación/índice A4 ya está implementada y se verificó con una
+exportación sintética local de 30 páginas: `pdfinfo` reporta A4 (595.92 × 842.88 pt), `pdffonts` encuentra 120/120
+recursos embebidos, `pdftotext` confirma pie y folio en 30/30 páginas y el renderer carga fuentes locales y aborta
+solicitudes HTTP(S). La hoja de contacto de las 30 páginas en gris quedó en el dossier de TASK-1847; esto es evidencia
+local sintética, no de disponibilidad productiva. Las suites focales de ChartSpec/geometría/render (83 pruebas) y
+API/tenant/errores (31) pasan; `task:lint`, `epic:lint`, `design-contract:lint`, `ui:quality`, `composer:brand-pack
+--check`, `skills:mirrors` y `docs:context-check:strict` también pasan.
+
+El baseline visual de los catálogos Insights se promueve y verifica con `pnpm composer:visual-gate
+--catalog=insights`; su freeze preserva el resto del manifest. En el snapshot del candidato `ef1a5c8`, los diez
+frames pasan determinismo y comparación a cero píxeles. El gate global continúa mostrando drift previo en `deck-axis`
+y SKY, registrado en ISSUE-122; esta task no rebaselina esos frames. El baseline scoped queda ligado al commit que
+incluye catálogo y PNGs.
+
+**Delta 2026-09-24 — en producción.** El release salió acotado a TASK-1847 desde `release/task-1847-insights-catalogs`
+(sobre `main`, PR #239 → `ebb9212a3`); manifest `ebb9212a32ce-388b8af7-e133-4ea3-9441-2bbf00a157b7` en `released`.
+Producción rinde `report_pdf` con `insights-report` y `deck_pdf` con `insights-deck`; el canary de contrato del lane
+ecosystem devolvió `renderableOutputs` = `["deck_pdf","report_pdf"]`. El primer render productivo de esos catálogos
+todavía no se ejercitó. `develop` recibió el código del release en `e15d71648`.
+
+**Límite honesto de las familias:** el planner determinista emite `bar` y `bar_grouped`. Las otras
+13 tienen geometría probada con fixtures y **ningún productor**; no se ofrecen como disponibles.
+
+**Delta 2026-09-25 — cierre de TASK-1847.** Primer render productivo de los dos catálogos: edición interna de
+Sky Airlines `EO-INS-000022` (ICO, agosto contra julio 2026) → `deck_pdf` 5 láminas con `insights-deck` y
+`report_pdf` 8 páginas A4 con `insights-report`, primer intento, cifras iguales al snapshot ICO de BigQuery. La org
+sandbox «Greenhouse Demo» no sirve para este canary: sus espacios no tienen filas en
+`ico_engine.metric_snapshots_monthly`, y una edición sin hechos falla en `validating` con `evidence_rejected`
+(correcto). El render es idempotente por salida viva: una edición ya renderizada devuelve su run anterior.
+El rediseño premium aprobado por el operador sigue en TASK-1888 (contrato) y TASK-1889 (catálogos).
+
+### 14.6 Estado de TASK-1848 — sharing, correo y recurrencia (en producción con flags OFF, 2026-09-18)
+
+> Los bloques «Construido» y «Pendiente» de abajo registran el estado al cerrar el código (commits locales, sin
+> deploy). **Superados** por el delta de producción al final de esta sección; se conservan como historia.
+
+**Construido (al escribir: commits locales en `develop`, sin push ni deploy):**
 - Slice 1 — ShareGrant + reader público: token `isg_` con sólo digest, commands `createInsightShare` /
   `revokeInsightShare` / `readInsightShares`, retirada de edición que revoca grants y cancela envíos pendientes,
   `InsightWebModelV1`, `GET /api/public/insights/shared/[token]` (+ `/outputs/[output]`), cabeceras y rate limit
@@ -831,10 +1029,147 @@ Revocar, cancelar, pausar y retirar funcionan con el flag OFF. Kill switch adici
 **Verificado:** suites focales (último barrido 1147 tests), live tests `sharing`, `delivery` y `schedules` 3/3
 contra PostgreSQL real (transacción revertida), `pnpm worker:runtime-deps-gate` y `pnpm mcp:manifest:check`.
 
-**Pendiente (bloquea declarar operativo):**
+**Pendiente al escribir este bloque (ver delta de producción):**
 - `pnpm test` completo y `pnpm build` de producción sobre el último commit.
 - Push a `develop`, flags en Vercel staging, deploy del `ops-worker` y del Cloud Scheduler, canary sintético.
 - Federación de las tools en el gateway `efeonce-mcp` (fuera de esta sesión).
 - TASK-1875 (Think): consumidor de `/insights/r/<token>`; sin él el enlace compartido no tiene pantalla pública.
 - Producción y release quedan fuera de la frontera de esta sesión.
 - Gaps de producto: `portal_link` (TASK-1849), in-app/Teams (TASK-690–693 / TASK-1849), presentación final del correo.
+
+#### Delta 2026-09-18 — staging, producción y gateway
+
+- **Staging:** `INSIGHTS_SHARING/DELIVERY/SCHEDULES/ISSUANCE_ENABLED=true` en Vercel staging; `ops-worker` con
+  DELIVERY/SCHEDULES/GENERATION. Canary sintético completo en la org sandbox (`EO-INS-000015`); los dos correos
+  reales llegaron al buzón autorizado del operador (evidencia humana: Resend no reporta `delivered`, ISSUE-160).
+- **Producción:** release `bda1cf2cd938` (PR #238, orquestador `35349506106`, `released` 13:41Z, sin retry).
+  **Flags OFF en producción** (sharing, delivery, schedules; emisión también OFF) hasta que exista el lector de Think
+  (TASK-1875). Canary de contrato secuencial: crear enlace ⇒ `503 sharing_disabled`; lector público con token
+  inexistente ⇒ 404; sin token ⇒ 401.
+- **Gateway `efeonce-mcp` 1.7.0** (PR #16 `4c9d7c44`, deploy `35351850324`, revisión
+  `efeonce-mcp-gateway-00055-gk6` al 100 %, front door 200/200/401): provider `greenhouse-insights` contrato
+  `task-1848-v1`, superficie 51 → 58 tools. Crear/revocar enlace exigen `efeonce.mcp.insights.write` (ningún cliente
+  la porta ⇒ fail-closed); las 5 lecturas van con el scope base. Enviar correo y programar no existen por MCP.
+  Canary del provider contra producción verde (schedules 1, shares 3, deliveries 3).
+- **Incidente durante el canary — ISSUE-174:** una ráfaga concurrente de 64 requests al lector público dejó 86–88
+  conexiones ociosas en la instancia Cloud SQL compartida durante 5 min. Corrección: TASK-1876 (P1, to-do). Regla:
+  nunca probar límites con ráfagas concurrentes contra la base compartida.
+- **Sigue abierto:** lector web en Think (TASK-1875, ya desbloqueada: `InsightWebModelV1` y el resolver existen);
+  `portal_link` `not_ready` (TASK-1849); in-app/Teams (TASK-690–693 / TASK-1849); recordatorios, preferencias y baja
+  no existen en V1; TASK-1876. El encendido en producción espera a TASK-1875.
+
+### 14.8 Estado de TASK-1888 — contrato editorial v2 (code complete 2026-09-25, rollout pendiente)
+
+**Qué existe (en `develop`, sin release).**
+
+| Pieza | Dónde | Estado |
+|---|---|---|
+| 15 familias + datos por familia + validación estructural | `contracts/chart-spec.ts` | construido; `specVersion` sin cambio |
+| Invariantes de valor por la geometría | `editorial/chart-values.ts` | construido (vía `artifact-composer/pure`) |
+| Identidad de canal | `contracts/channels.ts` (`google`, `google_ai_overview`, `chatgpt`, `gemini`, `claude`, `perplexity`) | construido; AEO y SEO la sellan en sus hechos |
+| Matriz familia × evidencia | `editorial/family-evidence-matrix.ts` (`family_evidence_matrix_v1`) | construida; tabla en §6 |
+| Plan v2 (lectura por figura, esenciales, alcance, apertura, portada, acciones) | `contracts/plan.ts`, `editorial/editorial-v2.ts`, `editorial/plan-validation.ts` | construido; campos opcionales |
+| FTR + metas ICO | `adapters/ico-adapter.ts` (`ftr_pct`, `icoOfficialTarget`) | construido; sólo con el flag |
+| Autoría IA v2 | `editorial/ai-authoring.ts` (`insights-authoring-v2`) | construida; también reescribe la lectura por figura |
+| Preferencia de portada | tabla `greenhouse_insights.insight_cover_preferences`, `commands/cover-preference.ts`, `stores/cover-preference-store.ts` | migración **aplicada** 2026-09-25 (instancia compartida, verificada en `information_schema`) |
+| Variante de logo oscuro | `organizations.logo_on_dark_asset_id`, `attachOrganizationLogoAsset({ variant })`, `account-360/organization-logo-variants-reader.ts` | construido; ninguna organización la tiene cargada todavía |
+| Capability | `insights.cover_preference.manage` (Admin + Account); leer = `insights.report.read` | seed en `capabilities_registry` + grant |
+| Evento | `insights.cover_preference.updated` (`insight_cover_preference`) | catálogo actualizado |
+| Lanes | `GET/POST /api/platform/{app,ecosystem}/insights/cover-preference` | construidos (escritura ecosystem sólo binding interno) |
+| MCP | `get_insight_cover_preference`, `set_insight_cover_preference` (manifest 64 tools, hash `a08f649aab8f`) | en Greenhouse; federadas en [`efeonce-mcp#18`](https://github.com/efeoncepro/efeonce-mcp/pull/18) (gateway 1.9.0 sobre Marketing Studio 1.8.0, superficie 70 → 72; lectura con el scope base y escritura con `efeonce.mcp.insights.write` reusado, sin scope ni Entra nuevos), **sin merge ni deploy**: se despliega después del release de Greenhouse |
+| Flag | `INSIGHTS_EDITORIAL_V2_ENABLED` (Vercel + `ops-worker`, default OFF) | OFF en todo runtime |
+| Preview | `scripts/insights/preview-edition.ts --editorial-v2 --plan-only` | construido |
+
+**Verificado con datos reales (2026-09-25, sólo lectura, flag simulado ON en local).** Sky Airlines `EO-INS-000022`
+(`ico`, agosto): 9 hechos (RpA, OTD, FTR actual y anterior + 3 metas), 0 violaciones; bullets OTD 81,9 % bajo la meta de
+90,0 %, FTR 90,9 % sobre 80,0 %, RpA 1,33 bajo 1,50; «+1,8 pp». Grupo Berel `EO-INS-000019` (`seo`+`aeo`, septiembre):
+24 hechos, 0 violaciones; sin línea (ventana de un mes parcial) y sin medidor (sin run AEO anterior), como dice la
+matriz. Ambas portadas resuelven blanca por `auto`: ninguna tiene logo para fondo oscuro.
+
+**Pendiente de rollout (no es «listo»).** Release de Greenhouse con el flag OFF; ediciones **internas** de Berel y Sky
+en staging con el flag ON sólo en **Vercel staging** (el `ops-worker` es compartido con producción: prenderlo ahí lo
+prende para producción); merge y deploy del PR de `efeonce-mcp` **después** de ese release; prender el flag en
+producción sólo junto al release de TASK-1889; el operador fija la preferencia de Berel y Sky y carga logos aptos
+para fondo oscuro si los hay.
+
+**Metas ICO: el registro manda.** La meta impresa sale de `ICO_METRIC_REGISTRY` (OTD ≥ 90, FTR ≥ 80, RpA ≤ 1,5),
+que es lo que calcula el motor. El 2026-09-25 el operador lo fijó como fuente única del semáforo y la documentación
+ICO se alineó (glosario §C, Delta en las specs V1 y en el contrato, cuyo §7.1 queda como benchmark externo); el bono
+de payroll conserva umbrales propios en `payroll_bonus_config`. Los semáforos del portal aún escritos a mano migran en
+TASK-1900. Si el registro cambia, el informe lo sigue sin tocar este dominio.
+
+**Límites honestos.** `decision`, `measurement` y `ask` no tienen productor determinista; la conclusión de página
+(`reading.conclusion`) tampoco. El medidor necesita que el adapter AEO elija el run por ventana (follow-up en el
+dominio del grader). Métricas por página o keyword de SEO, conjuntos por consulta de IA y embudo CRM siguen fuera.
+
+### 14.9 Estado de TASK-1889 — catálogos premium del canvas (code complete 2026-09-25, rollout pendiente)
+
+**Qué existe (en `develop`, sin push ni release).** Commits: Slices 1–2 `d357e0224`, `b649080c7`; Slice 3
+`4ff72fe3a` (+ evidencia `2410e5156`); Slice 4 `3fa493efe` (plantillas de figura) y `85785e7fc` (mappers + retiro del
+legado), docs `1120e86e4`/`5968e35e8`; excepción aprobada `289b6eca4`; «Lo esencial» `738ceb748`; correcciones por
+ediciones reales `b88fd447c`; dossier + scorecard `9529a1b25`.
+
+| Pieza | Dónde | Estado |
+|---|---|---|
+| Catálogos editoriales v2 | `artifact-composer/catalogs/insights-report` (A4 794×1123) e `insights-deck` (1280×720) | construidos; **sólo** diseño editorial v2 — la guarda `__tests__/insights-catalogs-v2-only.test.ts` no admite legado |
+| Legado retirado | `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css`, `efeonce-insights/render/figure-pages.ts` y los resolvers v1 de barra/familia/path | borrado. `artifact-composer/chart-figure.ts` quedó sin consumidores (conserva su test); candidato a retiro en follow-up |
+| Páginas de figura (A4) | `report-figure-{comparison,columns,targets,trend}` → `ReportFigure{Comparison,Columns,Targets,Trend}Page` | construidas |
+| Láminas de figura (deck) | `insights-figure-{comparison,columns,targets,trend}` → `InsightsFigure{Comparison,Columns,Targets,Trend}Slide` | construidas |
+| Regla de familia (compartida por `report-mapper` e `insights-deck-mapper`) | `efeonce-insights/render/figure-slots.ts` | construida (ver abajo) |
+| Geometría pura | `catalogs/insights-shared/figure-svg.ts` (`niceAxis`, `groupedColumnsSvg`, `lineChartSvg`, `wrapLabel`; cajas `REPORT_/DECK_COLUMNS_BOX`, `REPORT_/DECK_LINES_BOX`) | construida |
+| Hooks que dibujan | `catalogs/insights-shared/figure-hooks.ts` (`makeColumnsHook`, `makeLinesHook`, `withDeckFigureSize`) y `layout-hooks.ts` (`narrativeDropCapHook`) | construidos |
+| Resolvers editoriales | `catalogs/insights-shared/editorial-resolvers.ts` con prefijo `report-`/`deck-`: `icon`, `delta-tone`, `pair-bars`, `bullet-row`, `line-role` | construidos |
+| Portada blanca/navy + logo del cliente | `efeonce-insights/render/cover.ts`, `ReportCoverLightPage`, `storage/greenhouse-assets.ts` (`readOrganizationLogoForRender`), `services/artifact-worker/consumers/insights.ts`, `classify-failure.ts` | construido; el deck es siempre navy |
+| «Lo esencial» del plan v2 | `report-summary` / `insights-summary` vía `report-mapper.ts` e `insights-deck-mapper.ts` | construido |
+| Motor compartido | `artifact-composer/render.ts` (espera `img.decode()` antes de capturar), `synthesize.ts` + `contracts.ts` (`example?` del contrato) | construido |
+| Gate de fidelidad al canvas | `pnpm insights:canvas-fidelity [--gray]` (`scripts/insights/canvas-fidelity.ts`, fixtures `scripts/insights/canvas-fixtures/{report,deck}`) | 20/21 dentro de ≤1 %; ver excepción |
+
+**Regla de familia.** `bar_grouped` cuyas dimensiones son **métricas** → comparación (cada métrica en su escala);
+`bar`, o `bar_grouped` cuyas dimensiones son **canales distintos** (`dimensionChannelIds` todos no nulos y distintos)
+→ columnas sobre un eje; `bullet` → metas; `line` → tendencia (hasta 3 series por rol `primary`/`reference`/`detail`).
+Una familia sin página lanza `InsightsRenderRejectedError` con causa; una figura sin hechos suficientes no se emite
+(el capítulo la narra). Reparto equilibrado entre páginas (`balancedPages`: 7 grupos → 4+3). Capacidades
+(`FIGURE_CAPACITY`): A4 `metrics 5, groups 6, bulletRows 6`; deck `metrics 4, groups 4, bulletRows 5`.
+
+**Contenido de la figura.** Cifra principal, conclusión y cierre «Lo que significa / Próximo paso» salen de
+`chapter.readings` (TASK-1888); sin lectura (plan v1), el primer hecho y la afirmación que cita la figura. La única
+cifra derivada es el porcentaje de la meta (logrado ÷ meta, entero).
+
+**Geometría y color.** El SVG es puro y lo dibujan los hooks; `wrapLabel` parte etiquetas en hasta 3 líneas y la
+figura crece. `withDeckFigureSize` elige 132/112/104 px según el largo de la cifra. El color sale sólo de clases
+`fig-*` que pinta cada catálogo: cero HEX en código. `delta-tone` expresa dirección, no juicio.
+
+**Metas (`bullet`).** Escala propia por fila (1,1 × máximo), marca de meta y «mayor brecha» decidida con todas las
+filas y la dirección. La zona de atención se dibuja **sólo** desde `band` = `bandFactId` (límite del registro ICO,
+emitido por TASK-1888, `80952ed7f`); sin banda, pista única. Nunca un umbral a mano: se quitó un `0,85 × meta` tras
+la revisión de la sesión de TASK-1846. `lower_is_better` usa la clase `bullet--lower`, que invierte el lado oscuro.
+
+**«Lo esencial» (`plan.essentials` v2).** `report-summary` / `insights-summary` con tesis, bajada y hasta 5
+esenciales (cifra = hecho principal formateado, título = métrica, detalle A4 = afirmación); el folio es real: la
+primera página que dibuja el hecho o la apertura del capítulo. Decisión «Para decidir en la reunión» (A4) / «Para
+decidir» (deck). Sin esenciales, el resumen narrado de antes.
+
+**Portada y logo (Slice 3).** Blanca (`ReportCoverLightPage`) o navy según `plan.cover`. El logo privado viaja como
+`asset-ref:org-logo:<id>` sellado; los bytes entran por `ComposeOptions.externalAssets`. El `artifact-worker` los lee
+con `readOrganizationLogoForRender` (sólo el logo adjunto de **esa** organización, imagen, ≤ 2 MB, con access log);
+sin bytes, falla cerrado; logo no incrustable = `semantic_rejected` (`services/artifact-worker/classify-failure.ts`).
+
+**Gates y fidelidad.** `pnpm insights:canvas-fidelity`: 20/21 dentro de ≤ 1 %; `Deck-Agrupadas` da 2,2 % por un
+corrimiento de 3 px del propio canvas — excepción **aprobada por el operador el 2026-09-25** (fixture con
+`approvedException`, techo 2,5 %; el gate la reporta con ⚠). `pnpm composer:visual-gate --catalog=insights`: 27
+frames a 0 px (deltas g, h, i, j en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`). El
+`img.decode()` de `render.ts` se probó con A/B: no mueve `deck-axis` ni SKY (la deriva global de 59 frames es
+ISSUE-122). `ui:quality` PASS 4,59 (piso 4,2 en densidad: una figura ICO de una fila deja espacio). Dossier:
+`docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md`.
+
+**Verificado con ediciones reales (local).** `scripts/insights/preview-edition.ts --editorial-v2` entrega el logo con
+el mismo lector del worker (su única escritura es el access log): Berel SEO+AEO `EO-INS-000019` (16 páginas / 13
+láminas) y Sky ICO `EO-INS-000022` (12 / 9). Revelaron y quedó corregido en `b88fd447c`: métricas SEO con el mismo
+canal `google` iban a un eje común (ahora comparación); la capitular quedaba suelta en párrafos cortos (ahora
+`narrativeDropCapHook`, sólo con ≥ 3 líneas); presupuestos de texto — `runningSection` A4 44, sección del deck 44,
+`figureTitle` del deck 56, nombre de métrica en 2 líneas, etiqueta de columna hasta 3 líneas.
+
+**Pendiente de rollout (no es «listo»).** Push; staging con `INSIGHTS_EDITORIAL_V2_ENABLED` de TASK-1888; release por
+el control plane (el Job `artifact-worker` es único para staging y producción, así que el render nuevo llega a ambos
+con el release); aprobación del operador de las piezas derivadas y de los PDFs reales; una edición interna en
+producción antes de compartir con un cliente.

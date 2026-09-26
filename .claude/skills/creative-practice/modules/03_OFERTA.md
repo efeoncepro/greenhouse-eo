@@ -179,6 +179,9 @@ Si lo presentas como una lista de CVs, el comprador lo lee como una lista de pre
 
 ### El caso real: **SKY — 9 roles, ≈ 2,2 FTE**
 
+*(Squad de la **propuesta** del blog SKY. Actualización 2026-09-23: el blog se adjudicó con otra configuración y
+el equipo operativo confirmado es distinto — este blueprint ilustra la estructura, no el equipo vigente.)*
+
 | Lane | Rol | % dedicación |
 |---|---|---|
 | **Cuenta** | Responsable de Cuenta *(interlocutor único, accountable global)* | 12% |
@@ -285,7 +288,8 @@ El detalle operativo: **`modules/05_SCOPE_SOW.md`.**
 
 ## 5. 🩸 Lo que HOY está mal empaquetado — y hay que arreglar
 
-**Todos estos son bugs vivos, verificados en nuestra propia oferta económica de SKY.**
+**Todos estos fueron bugs verificados en nuestra propia oferta económica original del blog de SKY.** *(Actualización
+2026-09-23: lo adjudicado ya va con capacidad gobernada y sin precio unitario; la tabla queda como lección.)*
 
 | Hoy | 🔴 El problema | ✅ El fix |
 |---|---|---|

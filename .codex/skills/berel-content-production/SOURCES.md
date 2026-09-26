@@ -1,10 +1,44 @@
 # Fuentes — de dónde salió cada regla
 
-> **Última actualización:** **2026-09-08** por aclaración expresa del operador; última sincronización
-> integral contra la Wiki viva de Berel en Notion: **2026-09-07**.
+> **Última actualización:** **2026-09-19**, balance del cupo septiembre–diciembre y cierre de la campaña 2027 (dos
+> secciones siguientes); última sincronización integral contra la Wiki viva de Berel en Notion: **2026-09-07**.
 > Notion sigue siendo la fuente de verdad viva; el repo es una copia operativa. Cuando una petición
 > fechada del cliente o una spec específica contradice una regla más vieja, manda la fuente más
 > reciente/específica y se registra el drift.
+
+## Cupo septiembre–diciembre 2026 y descuento en 2027 — 2026-09-19 (tarde)
+
+Conteo de solo lectura de octubre, noviembre y diciembre con el método de septiembre; no se editó nada.
+
+| Fuente | Qué respalda | Dónde quedó |
+|---|---|---|
+| [Auditoría del cupo septiembre–diciembre 2026 y descuento en 2027](../../../docs/audits/seo/BEREL_CONTEO_CUPO_SEP_DIC_2026_DESCUENTO_2027_2026-09-19.md) (2026-09-19): proyectos `Produccion Creativa - Octubre 26` (74 tareas), `- Noviembre 26` (79) y `- Diciembre 26` (73), shares de Frame.io «Mes Octubre», «Mes Noviembre» y «Mes Diciembre», correos de envío del 10 y 14 de septiembre, Teams | octubre 8/66/8, noviembre 8/43/3, diciembre 8/46/3; neto con septiembre +4 artículos, +45 gráficas y +12 videos; sensibilidades; Stories de 1 pantalla, reels de 11–14 s y audio a cambiar | módulos 01, 14, 15; SKILL regla 41 |
+| Decisiones del operador, 2026-09-19 (tarde) | videos absorbidos como cortesía y cupo 0 desde enero de 2027; descuento parejo enero–marzo de 2027 (6/7/7 artículos, 35 gráficas por mes); estimado a confirmar al cierre de diciembre | módulos 01, 14, 15; SKILL regla 41 |
+
+Límites: Berel no ha aceptado el descuento; ninguna pieza de octubre a diciembre tiene aprobación formal observada.
+Queda por confirmar con el operador si la cortesía de videos alcanzaba a diciembre (Teams, 17-sep).
+
+## Campaña 2027: V2, adaptación a México, autoría, material de marca y conteo — 2026-09-19
+
+Trabajo con readback en Notion, Frame.io, berel.com y el repo. No es una resincronización integral de la Wiki.
+
+| Fuente | Qué respalda | Dónde quedó |
+|---|---|---|
+| Hilos de Fernanda Vega y Anel Garza en las tres páginas del Content Hub (17–18 sep): Color del Año `3a639c2fefe7807d847cc099a0b99966`, Colores de Temporada 2027 `3dd39c2fefe781bf8ff1f1f943011491`, Raíces de la piel `3d539c2fefe78131abe4fe1f0a1b6500` | criterios de campaña; queja «no suena natural / no adaptado a México» | módulos 09, 04, 18 |
+| Teams Berel–Efeonce, María Fernanda, 2026-09-17 | el banner principal lo entrega Berel; Efeonce hace solo los gráficos de luces y acabados | módulos 05, 09 |
+| Decisiones del operador, 2026-09-19 | método V2; autoría como organización; publicación conjunta el 29 de septiembre; excedente descontado de meses siguientes | módulos 03, 07, 09, 15, 18 |
+| Correcciones posteriores sobre la V2 del Color del Año (2026-09-19), contrastadas con Wiki › «Reglas del cliente — Correcciones de Berel (septiembre 2026)» y el módulo 09 | Insignia con uso preferente en exteriores; Berelex Green purifica el aire en interiores: la regla del cliente gana y se contrasta en los dos sentidos | módulos 09, 12, 18, ANTIPATTERNS |
+| Hojas técnicas en OneDrive (`02_Recursos › 03_Producto PNG › 01. Arquitectura › Vinil-Acrilicas`): `FT_BERELEX GREEN.pdf` R1-02/24, `HT-INSIGNIA.pdf` R1-07/19, `MAS CERTIFIED GREEN.pdf` | datos técnicos publicados, exclusiones y certificado vencido | módulo 12 §7 |
+| Frame.io (16–17 sep, «Aprobación interna»): N28 `https://f.io/r6p_WB-8`, N60 `https://f.io/4pzeKPE6`, N61 `https://f.io/efRQ0F39` | arte producido, congelamiento, tareas v2 744–755 y 741–743, caso del Reel 734 | módulos 05, 06 |
+| [Frame.io «Mes Octubre»](https://f.io/R70K6BBw), lectura 19-sep de comentarios de Fernanda en N35–N42 | nombres/códigos, render oficial, legibilidad, composición y valor por canal; `ok` separado de corrección; solo exports, sin masters editables | módulo 20 |
+| [Frame.io noviembre N43](https://next.frame.io/project/a77a1b36-ac3e-48db-be38-9dca618d9a96/view/482fbace-fef9-4e9d-9dcf-8b57104b2587), [N48](https://next.frame.io/project/a77a1b36-ac3e-48db-be38-9dca618d9a96/view/b7ff0ddf-2e40-4da9-bad1-d5daf752df3a) y [diciembre N56](https://next.frame.io/project/a77a1b36-ac3e-48db-be38-9dca618d9a96/view/d719c296-0bf9-4dc6-850b-49eee24031ea), QA de Efeonce 19-sep | foto debe mostrar acción; recalcular litros; subtítulo/cierre deben describir función. Comentarios preventivos, no feedback del cliente ni artes corregidos | módulo 20; baseline de feedback |
+| [Frame.io noviembre N51](https://next.frame.io/project/a77a1b36-ac3e-48db-be38-9dca618d9a96/view/4c61d465-3b25-459b-949a-5874908c8312), QA de Efeonce 19-sep | una «base de pintura» requiere aplicación visible o rotular la escena como referencial; la infografía 2 del mismo artículo sí muestra un muro pintado | módulo 20; baseline de feedback |
+| HTML vivo de berel.com y Catálogo RGB (`collection://3cb94025-0447-476b-8780-e60d3026b8ff`) | familias rotas → `/colores`; soft-404 de menú y pie; rutas relativas | módulos 03, 04, 09 |
+| Conteo de septiembre (solo lectura): 118 tareas del proyecto `Produccion Creativa - Septiembre 26`, SharePoint `04_Entregables`, Frame.io y Teams | unidad por archivo, cuatro criterios, errores de rollup; 12 artículos (el «9» anterior era incorrecto) | módulos 01, 07, 15 |
+| Revisión adversarial en cuatro lentes sobre las tres V2 | tipos de defecto y ejemplos reales de adaptación a México | módulos 04, 18, ANTIPATTERNS |
+
+Límites: las V2 quedaron `En revisión`, con gate PASS e hilos íntegros; nada de esto prueba aprobación de Berel,
+carga en Drupal ni publicación. La excepción de extensión para piezas de campaña está planteada, no aceptada.
 
 ## Colores de Temporada 2027 — 2026-09-16
 
@@ -337,8 +371,10 @@ Cada vez que cambie el Playbook Producción, revisar como mínimo:
 - `07_SISTEMA_NOTION.md`
 - `08_PUBLICACION_CMS_DRUPAL.md`
 - `09_RECOMENDACIONES_DEL_CLIENTE.md`
+- `12_DATOS_VERIFICADOS_DEL_CATALOGO.md`
 - `13_FORMATO_TUTORIAL_HIBRIDO.md`
 - `14_PLANEACION_TEMATICA_Y_COBERTURA.md`
+- `15_DISTRIBUCION_SELECTIVA.md`
 - `18_REVISION_COMENTARIOS_CLIENTE.md`
 - `ANTIPATTERNS.md`
 - `GLOSSARY.md`

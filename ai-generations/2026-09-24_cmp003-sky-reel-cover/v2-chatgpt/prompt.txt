@@ -1,0 +1,19 @@
+Edit the attached existing Efeonce × SKY Instagram Reel cover. This image is the EDIT TARGET and exact reference for brand artwork, Spanish copy, letter shapes and hierarchy. Deliver one polished static portrait cover, exact 9:16 aspect ratio, ideally 2160 × 3840 pixels.
+
+OBJECTIVE: premium agency campaign finishing with visibly stronger visual punch, sophisticated cinematic light and depth. It must still unmistakably be this Efeonce design, not a redesign. Keep the clean powerful typography, blue-to-purple brand gradient, green handwritten second reading, white logos and subtle URL speech bubble.
+
+IMMUTABLE BRAND/TEXT:
+REMOVE the supporting sentence “Ahora, también para SEO y AEO.” as explicitly requested by the user. Preserve the actual contours, typography, punctuation and accents of every REMAINING word. Do not rewrite, replace fonts, hallucinate, melt, distort, extrude, duplicate, add letters or misspell. EXACT TEXT:
+“SKY”
+“nos eligió.”
+“de nuevo.”
+“efeoncepro.com”
+Preserve the Efeonce spacecraft logotype and the white SKY logo in the bottom lockup exactly as supplied, including the separated arrow-shaped K geometry. Keep logos sharp, flat white, proportionally correct. Do not treat the SKY heading as a logo: retain its original Bricolage heading glyphs. No fake recreated logos. Preserve original URL speech bubble outline with its little tail, same proportions and low-contrast luminosity-blended appearance, not a rounded rectangle. Keep all marks legible and subordinate to the headline.
+
+FINISH:
+Deep Efeonce navy/blue blending into rich SKY purple, no pink color drift. Introduce one beautifully controlled diagonal sweep of volumetric blue-violet light through the background with smooth dimensional falloff, subtle high-end satin-like gradients and very fine almost imperceptible grain. Give the green handwritten “de nuevo.” underline a concentrated luminous energy trail and a tiny bright tip; green itself stays SKY green (#46DC28), solid and crisp. Background light should support the visual connection from headline to handwritten gesture, never cross and wash out the letters. Subtle atmospheric depth only; no confetti, stars, decorative UI, aircraft, extra icons, extra text, borders or mockup devices. No cheesy neon outlines on every letter, no 3D text, no beveling logos. The impact should come from contrast, expressive light and excellent finish with ample breathing room.
+
+CROP SAFETY:
+Use proportions equivalent to a 1080×1920 canvas. Keep critical artwork between x=105 and x=900, y=430 and y=1480 so it survives centered 3:4 (y240..1680), 4:5 (y285..1635), and conservative square (y420..1500) tests. Adjust only group placement/minor uniform scaling without deforming. Preserve relative reading order. Start the large SKY headline around y430. Remove the entire supporting sentence “Ahora, también para SEO y AEO.” completely. Leave no remnants and add no replacement copy. Use the freed space as confident breathing room. Move the white bottom logo lockup up to approximately y1320..1400 and the small URL bubble to y1440..1480. No important elements in top/bottom outer margins or right-side interface region. Do NOT draw safe-zone guides. Full-bleed blue/purple background.
+
+Quality: professional campaign finish, immaculate edges, original typography and official brand artwork fidelity are higher priority than effects. Return only the finished single cover.

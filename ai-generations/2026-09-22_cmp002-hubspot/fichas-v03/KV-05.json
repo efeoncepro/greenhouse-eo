@@ -1,0 +1,16 @@
+{
+  "id": "KV-05-operas-starter-v03",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "oclusion",
+  "ocluye": "a wall of dark, dead, unlit modules in the immediate foreground, out of focus, covering roughly two thirds of the frame and hiding most of the lit module behind them",
+  "objetos": [{ "objeto": "sprocket-hubspot", "vista": "frente" }],
+  "escena": "SCENE (operations room at night, NOBODY IN FRAME): the camera looks from BEHIND a dense wall of dark equipment modules. They fill the foreground out of focus, identical, switched off, their rows disappearing off both edges — paid for and never turned on. Through ONE narrow gap between them, far back and pin sharp, a SINGLE module is alive and working right now — its status row pulsing through a cycle, a cooling fan still spinning behind its grille — a glowing cool blue face, the only light in the entire picture, and the dark dead modules crowd in from every side and hide most of it. The eye lands on that one lit face first, and only then reads how much dark hardware is standing in front of it. Very high contrast: the lit face burns, everything else falls to near black with only a rim of blue spill defining the dead modules' edges. A small orange sculpture sits on a ledge inside that same gap, catching the blue spill. 85mm lens at f/2, focus on the lit module far back, foreground modules dissolved. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. The sculpture's ring-and-nodes symbol belongs ONLY to the sculpture: it never appears on any garment. Everything except the sculpture is completely unbranded and no text anywhere is readable: module markings are tiny, angled and out of focus.",
+  "lecho": {
+    "objeto": "the out-of-focus top edge of the nearest dead module running along the very bottom against the lens",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": { "muro": "the dark unlit flank of the module wall continuing up, evenly toned and free of any spill, its brushed metal texture visible", "tinta": "blanca" }
+  }
+}

@@ -5,6 +5,7 @@ Snapshot documental independiente del conocimiento y del contrato conversacional
 - Agente: `Emma` (nombre anterior: `Agente de clientes de ANAM`)
 - Fecha de verificación live: `2026-09-01`
 - Última publicación de directrices observada: `2026-09-01`
+- Avatar de perfil y chatflow actualizado el `2026-09-24` con la foto entregada por ANAM; no modifica las fuentes ni las directrices.
 - Alcance de fuentes en uso: `23` (`6` archivos privados + `17` respuestas cortas)
 - Landing pages en uso: `0`
 - URL importadas en uso: `0`
@@ -18,6 +19,12 @@ confirmó el agente operativo, con 23 fuentes, live chat activo y 33.000 crédit
 guardó y publicó la identidad `Emma`: la vista de identidad mostró `Agente de clientes, Emma`, el preview respondió
 `Hola, soy Emma.` y la pantalla de directrices quedó en `Borrador (0)` con el saludo publicado
 `¡Hola! 👋 Soy Emma, de ANAM. ¿En qué te puedo orientar?`.
+
+El 2026-09-24 se guardó un avatar derivado del retrato `EMMA 2.png` enviado por María Paz, con fondo menta claro,
+en la identidad de Customer Agent y por separado en el chatflow `96601133`. El widget público mostró el nuevo
+avatar en la cabecera y junto al mensaje inicial. La landing sirve la foto PNG original y presenta a Emma como
+`Ejecutivo comercial ANAM`. Esta verificación visual no envió un mensaje ni prueba de nuevo las respuestas o el
+handoff; esos contratos conservan su evidencia anterior.
 
 La edición de identidad no modificó personalidad (`Amigable`), idioma, conocimiento, permisos ni acciones. Más
 tarde el mismo 1 de septiembre, la matriz de handoff autorizada se publicó por separado mediante el workflow de

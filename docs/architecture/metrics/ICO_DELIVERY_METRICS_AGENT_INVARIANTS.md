@@ -760,3 +760,15 @@ La inclusión de un cliente en ICO (cálculo + reportes + activación + verifica
 **Capabilities**: `delivery.ico.sync.enable` (update, grant EFEONCE_ADMIN ∪ EFEONCE_OPERATIONS ∪ EFEONCE_ACCOUNT) · `delivery.ico.sync.read` (read, grant route_group internal ∪ EFEONCE_ADMIN). **Outbox event**: `space_notion_source.ico_sync_enabled` (aggregate `space_notion_source`).
 
 **Spec canónica**: `docs/tasks/in-progress/TASK-1171-ico-client-inclusion-systemic-full-api-parity.md` + `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`. Migrations: `20260619122238123` (enable cap), `20260619133753393` (read cap). Patrón fuente: outbox→reactive (TASK-773), data-driven SSOT, capability⇒grant+coverage (TASK-873/935).
+
+## Umbrales ICO — una sola fuente por propósito (decisión del operador 2026-09-25)
+
+- **Semáforo / meta de lectura** de OTD%, FTR% y RpA: `ICO_METRIC_REGISTRY` (`src/lib/ico-engine/metric-registry.ts`,
+  `thresholds.optimal|attention|critical`). Lo consumen dashboards, Nexa y Efeonce Insights (meta impresa).
+- **Bono**: `greenhouse_payroll.payroll_bonus_config` (vigencia por fecha) vía `calculateOtdBonus` /
+  `calculateRpaBonus`. Distinto a propósito del semáforo.
+- **NUNCA** escribir un umbral de OTD/FTR/RpA a mano en UI, copy o helpers: leer del registro (semáforo) o de la
+  configuración del bono (pago). Al 2026-09-25 quedan literales pendientes de migrar (tarea formal registrada).
+- **NUNCA** alinear semáforos o documentación tocando la configuración o los helpers del bono.
+- Glosario, contrato y specs V1 tenían umbrales distintos entre sí; ahora declaran que manda el registro. Si vuelven a
+  divergir, manda el registro y se corrige el documento.

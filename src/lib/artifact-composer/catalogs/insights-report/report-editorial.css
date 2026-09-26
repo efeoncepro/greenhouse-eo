@@ -1,0 +1,480 @@
+/**
+ * Molde editorial del informe A4 (TASK-1889) — el chrome compartido por las páginas del canvas
+ * aprobado el 2026-09-25 («Gráficos de Efeonce Insights»).
+ *
+ * Es el ÚNICO molde del catálogo: el v1 (`report-mold.css`) se retiró con las páginas de gráfico v1
+ * en el Slice 4 de TASK-1889.
+ *
+ * Reglas: ningún HEX ni familia literal (todo sale de `report-tokens.css`: roles del pack y de la
+ * extensión editorial); la geometría es la del canvas, porque la fidelidad se mide en píxeles contra
+ * sus páginas aprobadas.
+ *
+ * GENERADO NO — este archivo se edita a mano.
+ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body { background: var(--axis-report-role-navy); }
+
+.sheet {
+  position: relative;
+  width: 794px;
+  height: 1123px;
+  overflow: hidden;
+  font-family: var(--axis-report-type-text);
+}
+
+.sheet--navy { background: var(--axis-report-role-navy); color: var(--axis-report-role-navyInk); }
+
+.sheet--paper { background: var(--axis-report-role-paper); color: var(--axis-report-role-paperInk); }
+
+/* Arte a sangre (órbitas, halos, números en contorno): debajo del contenido, sin interceptar nada. */
+.art { position: absolute; left: 0; top: 0; display: block; }
+
+.grow { flex-grow: 1; }
+
+/* Lockup de marca: logo + filete + «Insights». */
+.brand-lockup { display: flex; align-items: center; gap: 16px; }
+
+.brand-logo { height: 32px; width: auto; display: block; }
+
+.brand-divider { width: 1px; height: 24px; background: rgba(var(--axis-report-role-navyInk-rgb), 0.26); }
+
+.brand-product {
+  font-family: var(--axis-report-type-display);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--axis-report-role-navyAccent);
+}
+
+/* Rótulo corrido en versalitas (período, edición). */
+.kicker {
+  font-family: var(--axis-report-type-display);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.kicker--navy { color: rgba(var(--axis-report-role-navyMuted-rgb), 0.85); }
+
+/* Antetítulo con filete: «Lectura de Efeonce». */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--axis-report-type-display);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.eyebrow-rule { width: 24px; height: 1.5px; }
+
+.eyebrow--navy { color: var(--axis-report-role-navyAccent); }
+
+.eyebrow--navy .eyebrow-rule { background: var(--axis-report-role-navyAccent); }
+
+.eyebrow--paper { color: var(--axis-report-role-paperAccent); }
+
+.eyebrow--paper .eyebrow-rule { background: var(--axis-report-role-paperAccent); }
+
+/* Eslogan «Empower your Growth» con los pesos del SSOT de marca (EFEONCE_SLOGAN_PARTS). */
+.slogan { font-family: var(--axis-report-type-display); line-height: 1; }
+
+.slogan-empower { font-weight: 800; font-style: italic; }
+
+.slogan-your { font-weight: 800; }
+
+.slogan-growth { font-weight: 900; font-style: italic; }
+
+.num { font-variant-numeric: tabular-nums; }
+
+/* ─── Páginas en papel (resumen, lectura, plan, gráficos) ──────────────────────────────────── */
+
+/* Lienzo: 48/68 arriba y a los lados; 112 abajo, la banda que el pie reserva ANTES de componer. */
+.paper-page { padding: 48px 68px 112px; display: flex; flex-direction: column; }
+
+/* Cabecera corrida: cliente a la izquierda; sección y período a la derecha. */
+.running {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--axis-report-role-ruleSoft);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--axis-report-role-paperAccent);
+}
+
+/* La marca del cliente ocupa siempre su caja: con o sin cliente, la página no se mueve. */
+.running-client { height: 30px; display: flex; align-items: center; }
+
+.running-client-name {
+  font-family: var(--axis-report-type-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--axis-report-role-paperInk);
+}
+
+.running-meta { display: flex; align-items: center; gap: 10px; font-family: var(--axis-report-type-display); font-weight: 500; }
+
+.running-section { font-weight: 600; text-transform: uppercase; }
+
+.running-divider { width: 1px; height: 10px; background: var(--axis-report-role-separator); }
+
+/* Antetítulo de página con ícono de la métrica o de la sección. */
+.page-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--axis-report-type-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--axis-report-role-paperAccent);
+}
+
+.stroke-icon { display: block; flex-shrink: 0; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.page-eyebrow .stroke-icon { stroke: var(--axis-report-role-paperAccent); }
+
+/* Rótulo de sección con filete corto: «Lo esencial del mes». */
+.rule-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--axis-report-type-display);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--axis-report-role-paperAccent);
+}
+
+.rule-label-bar { width: 24px; height: 2px; background: var(--axis-report-role-paperAccent); }
+
+/* Chip de folio de evidencia: «p. 06». */
+.folio-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--axis-report-role-ruleSoft);
+  font-family: var(--axis-report-type-display);
+  font-size: 9.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--axis-report-role-paperAccent);
+  white-space: nowrap;
+}
+
+/* Panel de cierre navy: «Para decidir», «Lo que significa / Próximo paso», «Cómo lo mediremos». */
+.closing {
+  background: var(--axis-report-role-paperAccent);
+  color: var(--axis-report-role-navyInk);
+  border-radius: 12px;
+  padding: 24px 26px;
+  display: grid;
+  gap: 30px;
+}
+
+.closing-block { display: flex; flex-direction: column; gap: 9px; }
+
+.closing-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--axis-report-type-display);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--axis-report-role-navyAccent);
+}
+
+.closing-label .stroke-icon { stroke: var(--axis-report-role-navyAccent); }
+
+.closing-text {
+  margin: 0;
+  font-family: var(--axis-report-type-display);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--axis-report-role-navyInk);
+}
+
+.closing-signature { font-family: var(--axis-report-type-display); font-size: 9.5px; font-weight: 500; color: var(--axis-report-role-navyMuted); }
+
+/* Pie institucional de las páginas en papel. Slots de la plantilla, nunca post-proceso del PDF. */
+.paper-foot {
+  position: absolute;
+  left: 68px;
+  right: 68px;
+  bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  color: var(--axis-report-role-paperAccent);
+}
+
+.paper-foot-rule { display: flex; align-items: center; }
+
+.paper-foot-rule .accent { width: 32px; height: 2px; background: var(--axis-report-role-paperAccent); }
+
+.paper-foot-rule .line { flex-grow: 1; height: 1px; background: var(--axis-report-role-rule); }
+
+.paper-foot-row { display: flex; justify-content: space-between; align-items: center; }
+
+.paper-foot-id { display: flex; flex-direction: column; gap: 5px; }
+
+.paper-foot-lockup { display: flex; align-items: center; gap: 10px; }
+
+.paper-foot-lockup img { height: 11px; width: auto; display: block; }
+
+.paper-foot-lockup .divider { width: 1px; height: 10px; background: var(--axis-report-role-separator); }
+
+.paper-foot-edition {
+  font-family: var(--axis-report-type-display);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.paper-foot-contact { display: flex; align-items: center; gap: 9px; font-size: 8px; letter-spacing: 0.03em; line-height: 1.4; opacity: 0.72; }
+
+.paper-foot-contact .dot { width: 2px; height: 2px; border-radius: 1px; background: var(--axis-report-role-paperAccent); }
+
+.paper-foot-end { display: flex; align-items: center; gap: 16px; }
+
+.paper-foot-end .url-bubble { height: 16px; width: auto; display: block; mix-blend-mode: luminosity; }
+
+.paper-foot-end .divider { width: 1px; height: 22px; background: var(--axis-report-role-separator); }
+
+.paper-folio { display: flex; align-items: baseline; gap: 5px; font-variant-numeric: tabular-nums; }
+
+.paper-folio-page { font-family: var(--axis-report-type-display); font-size: 16px; font-weight: 600; color: var(--axis-report-role-paperInk); }
+
+.paper-folio-total { font-size: 8.5px; letter-spacing: 0.06em; opacity: 0.6; }
+
+/* ─── Páginas de figura (TASK-1889 Slice 4) ─────────────────────────────────────────────────────── */
+
+/* Pestaña de capítulo en el canto derecho: el número del capítulo al que pertenece la figura. */
+.chapter-tab {
+  position: absolute;
+  right: 0;
+  top: 140px;
+  width: 24px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
+  background: var(--axis-report-role-paperAccent);
+  color: var(--axis-report-role-navyInk);
+  font-family: var(--axis-report-type-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+}
+
+/*
+ * Set de íconos de trazo: la plantilla trae todos y el resolver `report-icon` deja sólo el de la
+ * métrica (o quita el nodo si la métrica no tiene ícono). Nunca un ícono inventado por métrica.
+ */
+.icon-set { display: flex; flex-shrink: 0; }
+
+.icon-set .stroke-icon { stroke: var(--axis-report-role-paperAccent); }
+
+/* Cifra principal + conclusión: la gramática de toda página de figura aprobada. */
+.figure-hero { margin-top: 16px; display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 34px; align-items: start; }
+
+.figure-count { display: flex; flex-direction: column; gap: 10px; }
+
+.figure-number {
+  font-family: var(--axis-report-type-display);
+  font-size: 76px;
+  line-height: 0.95;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  color: var(--axis-report-role-paperAccent);
+}
+
+.figure-caption { max-width: 200px; font-size: 12.5px; line-height: 1.45; color: var(--axis-report-role-paperAccent); }
+
+.figure-caption strong { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--axis-report-role-paperInk); }
+
+.figure-heading { display: flex; flex-direction: column; gap: 12px; padding-top: 4px; }
+
+.figure-title {
+  margin: 0;
+  font-family: var(--axis-report-type-display);
+  font-size: 23px;
+  line-height: 1.24;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--axis-report-role-paperInk);
+}
+
+.figure-lead { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--axis-report-role-paperAccent); }
+
+/* Título de la figura + leyenda. */
+.figure-caption-row { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; }
+
+.figure-board-title { font-size: 13px; font-weight: 600; color: var(--axis-report-role-paperInk); }
+
+.figure-legend { display: flex; align-items: center; gap: 16px; font-size: 10.5px; color: var(--axis-report-role-paperAccent); }
+
+.figure-legend-item { display: flex; align-items: center; gap: 6px; }
+
+.figure-legend-swatch { width: 14px; height: 8px; border-radius: 2px; }
+
+.swatch--current { background: var(--axis-report-role-dataCurrentOnPaper); }
+
+.swatch--prior { background: var(--axis-report-role-dataPriorOnPaper); }
+
+/* Nota de lectura bajo la figura (opcional). */
+.figure-note { margin-top: 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-style: italic; color: var(--axis-report-role-paperAccent); }
+
+.figure-note .stroke-icon { stroke: var(--axis-report-role-paperAccent); }
+
+/* Procedencia: unidad, fuente y cobertura. */
+.figure-provenance { margin-top: 24px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; font-size: 11px; line-height: 1.5; color: var(--axis-report-role-paperInk); }
+
+.figure-provenance-item { display: flex; flex-direction: column; gap: 3px; }
+
+.figure-provenance-label {
+  font-family: var(--axis-report-type-display);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--axis-report-role-paperAccent);
+}
+
+/* Variación contra el período anterior: la dirección se dice con forma (triángulo), no sólo color. */
+.delta-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-family: var(--axis-report-type-display);
+  font-size: 12.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.delta-pill svg { display: block; flex-shrink: 0; }
+
+.delta--better { background: var(--axis-report-role-paperAccent); color: var(--axis-report-role-navyInk); }
+
+.delta--better .delta-mark { fill: var(--axis-report-role-navyAccent); }
+
+.delta--plain { background: var(--axis-report-role-ruleSoft); color: var(--axis-report-role-paperInk); }
+
+.delta--plain .delta-mark { fill: var(--axis-report-role-paperInk); }
+
+/* Panel de cierre de una figura: una o dos columnas según traiga «Próximo paso». */
+.closing--figure { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+
+/* Piezas opcionales ausentes: el nodo queda vacío y no ocupa lugar (nunca copy de ejemplo). */
+.chapter-tab:empty,
+.figure-lead:empty,
+.figure-note:empty,
+.figure-provenance:empty,
+.closing--figure:empty { display: none; }
+
+.figure-legend-item:not(:has([data-slot-field])) { display: none; }
+
+/* Figuras dibujadas por el hook (`figure-svg.ts`): la geometría es compartida, el color es de acá. */
+.fig-columns { display: block; overflow: visible; font-family: var(--axis-report-type-text); }
+
+.fig-band { fill: var(--axis-report-role-paperAccent); fill-opacity: 0.04; }
+
+.fig-band-label { font-family: var(--axis-report-type-display); font-weight: 600; letter-spacing: 1.4px; fill: var(--axis-report-role-paperAccent); }
+
+.fig-grid { stroke: var(--axis-report-role-rule); }
+
+.fig-tick { fill: var(--axis-report-role-paperAccent); }
+
+.fig-opportunity { fill: var(--axis-report-role-dataOpportunityOnPaper); fill-opacity: 0.08; stroke: var(--axis-report-role-dataOpportunityOnPaper); stroke-width: 1.2; stroke-dasharray: 4 3; }
+
+.fig-opportunity-dot { fill: var(--axis-report-role-dataOpportunityOnPaper); }
+
+.fig-current { fill: var(--axis-report-role-dataCurrentOnPaper); }
+
+.fig-prior { fill: var(--axis-report-role-dataPriorOnPaper); fill-opacity: 0.72; }
+
+.fig-baseline { stroke: var(--axis-report-role-paperAccent); stroke-opacity: 0.4; }
+
+.fig-current-value { font-weight: 700; font-variant-numeric: tabular-nums; fill: var(--axis-report-role-paperInk); }
+
+.fig-prior-value { font-variant-numeric: tabular-nums; fill: var(--axis-report-role-paperAccent); }
+
+.fig-dimension { font-weight: 600; font-variant-numeric: tabular-nums; fill: var(--axis-report-role-paperInk); }
+
+.fig-delta { font-family: var(--axis-report-type-display); font-weight: 600; font-variant-numeric: tabular-nums; fill: var(--axis-report-role-paperAccent); }
+
+.fig-delta--plain { fill: var(--axis-report-role-labelMuted); }
+
+/* Leyenda de columnas: muestra cuadrada y la de oportunidad con su borde discontinuo. */
+.figure-legend--columns .figure-legend-swatch { width: 10px; height: 10px; }
+
+.figure-legend--columns .swatch--prior { opacity: 0.72; }
+
+.figure-legend--columns .swatch--opportunity { width: 12px; box-sizing: border-box; border-radius: 3px; border: 1.2px dashed var(--axis-report-role-dataOpportunityOnPaper); background: rgba(var(--axis-report-role-dataOpportunityOnPaper-rgb), 0.1); }
+
+.fig-lines { display: block; overflow: visible; font-family: var(--axis-report-type-text); }
+
+.fig-area { fill: var(--axis-report-role-dataPriorOnPaper); fill-opacity: 0.16; }
+
+.fig-line { fill: none; stroke-linejoin: round; }
+
+.fig-line--primary { stroke: var(--axis-report-role-dataCurrentOnPaper); stroke-width: 2.6; stroke-linecap: round; }
+
+.fig-line--reference { stroke: var(--axis-report-role-dataPriorOnPaper); stroke-width: 2.2; stroke-dasharray: 5 3; }
+
+.fig-line--detail { stroke: var(--axis-report-role-dataCurrentOnPaper); stroke-width: 1; stroke-opacity: 0.4; }
+
+.fig-halo { fill: var(--axis-report-role-dataCurrentOnPaper); fill-opacity: 0.14; }
+
+.fig-end-dot { fill: var(--axis-report-role-dataCurrentOnPaper); }
+
+.fig-start-dot { fill: var(--axis-report-role-paper); stroke: var(--axis-report-role-dataCurrentOnPaper); stroke-width: 1.8; }
+
+.fig-labels { font-variant-numeric: tabular-nums; }
+
+.fig-end,
+.fig-end-delta,
+.fig-start { font-family: var(--axis-report-type-display); }
+
+.fig-end--primary { font-weight: 700; fill: var(--axis-report-role-dataCurrentOnPaper); }
+
+.fig-end--reference { font-weight: 600; fill: var(--axis-report-role-dataPriorOnPaper); }
+
+.fig-end-delta,
+.fig-start { font-weight: 600; fill: var(--axis-report-role-paperAccent); }
+
+.fig-xlabels { fill: var(--axis-report-role-paperAccent); }
+
+/* Muestras de línea de la leyenda: el mismo trazo que en la figura. */
+.line-swatch { display: block; flex-shrink: 0; }
+
+.line-swatch line { stroke-linecap: round; }
+
+.line-swatch--primary line { stroke: var(--axis-report-role-dataCurrentOnPaper); stroke-width: 2.6; }
+
+.line-swatch--detail line { stroke: var(--axis-report-role-dataCurrentOnPaper); stroke-width: 1; stroke-opacity: 0.4; stroke-linecap: butt; }
+
+.line-swatch--reference line { stroke: var(--axis-report-role-dataPriorOnPaper); stroke-width: 2.2; stroke-dasharray: 5 3; stroke-linecap: butt; }

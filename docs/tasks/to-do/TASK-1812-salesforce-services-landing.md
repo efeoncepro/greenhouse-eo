@@ -22,7 +22,7 @@
 - Backend impact: `none`
 - Epic: `EPIC-047`
 - Status real: `Oferta canónica, dirección, wireframe, flow y motion listos; discovery, copy final, implementación y publicación no iniciados`
-- Rank: `EPIC-047-05`
+- Rank: `EPIC-047-06`
 - Domain: `public-site|crm|content|growth|ui|seo`
 - Blocked by: `none para iniciar Discovery; publicar exige rights/partnership readback, first-fold approval, CTA binding y QA`
 - Branch: `Greenhouse develop; sin worktrees`
@@ -461,3 +461,14 @@ equivale a publicación ni readback.
 - ¿Qué casos, artefactos, logos o badges tienen autorización pública verificable?
 - ¿El siguiente paso comercial será diagnóstico, assessment acotado o reunión consultiva?
 - ¿Qué estado contractual Salesforce puede afirmarse públicamente en la fecha de publicación?
+
+## Delta 2026-09-19 — puente humano-agente y marketing
+
+- TASK-1877 posee la transformación transversal y su CTA de primer proceso. Esta landing conserva la intención
+  Salesforce: plataforma, nubes, integración y Agentforce/Marketing Cloud donde correspondan.
+- Incluir una ruta para marketing (audiencia, contenido/campañas, medición y control humano) junto a revenue y
+  servicio, sin convertir toda necesidad en RevOps ni presentar Marketing Cloud Next como migración automática de
+  Engagement. AEO público puede iniciar la conversación, pero no otorga acceso a datos privados.
+- Enlazar la landing transversal sólo después de verificar su publicación, canonical y CTA; ninguna ruta de
+  producto promete agentes disponibles en un tenant sin entitlement, región, estado de release y prueba.
+- [ ] La ruta marketing y el puente transversal son legibles sin JS y se verifican en navegación pública fresca.

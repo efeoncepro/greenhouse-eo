@@ -1,0 +1,25 @@
+{
+  "id": "julio-ensayo-proyeccion-espacial-v2",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["julio"],
+  "servicio": "Creative Services: ensayo de una experiencia audiovisual espacial sin cliente identificado",
+  "industria": "evento cultural independiente hipotetico, sin marca cliente",
+  "mercado": "Santiago",
+  "preflightVisual": {
+    "vistos": [
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/set-curado-12.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/J1-retrato-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/J2-rodaje-polo-final.png"
+    ],
+    "comparacion": "J1 fija rostro, montura plateada, rizos y barba entrecana; J2 da gesto de dirección y lecho oscuro de equipo. En la hoja curada, el azul puede ser campo espacial de la obra. El primer plate de esta prueba mostró azul 17% en muro/piso y naranja demasiado ámbar; el segundo usa la misma proyección en operación para que un borde naranja de la secuencia audiovisual haga visible la idea sin utilería de color."
+  },
+  "azul": "luz azul activo de la proyección espacial sobre muro y piso, sin objeto azul",
+  "acento": "borde naranja pequeño de la misma proyección audiovisual en operación, proyectado sobre arquitectura real, no utilería",
+  "lecho": {
+    "objeto": "the near edge of the real black padded projector transport case lying in front of the camera",
+    "tono": "DARK charcoal near black in even shadow, subtle real fabric texture"
+  },
+  "escena": "SCENE (live spatial projection rehearsal in a clean converted industrial hall in Santiago, late afternoon): Julio, the SAME real man from the identity references, is the only person. He wears an unbranded light stone linen overshirt and charcoal trousers, no navy clothing. Seen from a low candid 35mm f/2.8 angle past working projection equipment, his face, thin rectangular silver glasses, curly salt-and-pepper hair and full greying beard are clearly visible and natural. At the decisive moment he crouches to adjust the focus and angle of an unbranded video projector, watching how its abstract light study lands on the far white plaster wall. The projection itself is the creative work: a large luminous active azure-blue field with a SMALL distinct saturated true-orange edge of moving light, a believable single projected composition on the wall (not separate colored objects or decorative props); a physically plausible trace of that projected blue and orange reflects softly on the polished concrete floor. The orange occupies only a narrow portion of the projected light and expresses the transition he is tuning; all other materials are warm-neutral. The projector is the visible mechanism; no props have been added just to carry brand colors. Neutral late-afternoon daylight sculpts Julio's face and hand; his skin is never blue-tinted. Light has character and shadows stay neutral with texture; show three distinct depth planes and coherent optical blur. No other people, no artificial neon, no cinematic teal-orange grade, no generic meeting, no posed smile. No text, letters, numbers, logos, marks, client identity or pseudo-interface anywhere."
+}

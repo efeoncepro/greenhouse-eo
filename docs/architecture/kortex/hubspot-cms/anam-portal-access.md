@@ -56,7 +56,7 @@ Invoice properties: 145
 ## CMS / Content scopes relevantes
 
 El estado vivo, build y verificación pública de la landing de Emma no se duplican aquí: su canon es
-[`anam-chat-landing.md`](anam-chat-landing.md). Al 2026-09-01 ese documento registra el build `#28`; esta ficha
+[`anam-chat-landing.md`](anam-chat-landing.md). Al 2026-09-24 ese documento registra el build `#30`; esta ficha
 continúa siendo dueña solamente del acceso y los scopes del portal.
 
 Scopes observados:

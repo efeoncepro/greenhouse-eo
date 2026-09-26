@@ -1,13 +1,13 @@
 # Runbook técnico — certificación MCP con canary externo eliminable
 
-> TASK-1832 · owner: Identity + MCP Platform · estado al 2026-09-14: **rollout productivo con retiro
-> operativamente bloqueado**.
-> Corrida activa `task-1832-canary-20260906-a`; helper, Playwright, Codex, ChatGPT hospedado, Claude Code
+> TASK-1832 · owner: Identity + MCP Platform · estado al 2026-09-18: **corrida retirada; gates canary OFF
+> con readback servido** (ver §Estado final de la corrida 2026-09-18).
+> Corrida `task-1832-canary-20260906-a`; helper, Playwright, Codex, ChatGPT hospedado, Claude Code
 > `2.1.263`, Claude.ai y Claude Desktop `1.46388.4` están verdes. Code y web renovaron post-TTL sin widening;
 > Desktop ejecutó desde la app nativa sobre el conector remoto. La matriz y el manifiesto acreditan el runtime;
 > este runbook define el procedimiento. La señal agregada del CIMD compartido fue atribuida a un perfil interno,
-> no a la canary; el retiro sigue bloqueado por su ventana específica y porque el cleanup actual no puede retirar
-> sus hijos canary sin poner en riesgo otros sujetos.
+> no a la canary. El cleanup sujeto-específico (`74638aed0`) retiró el grafo run-owned preservando el CIMD
+> compartido y sus sujetos ajenos.
 
 ## Objetivo y frontera
 
@@ -84,7 +84,8 @@ no se permite SQL manual.
 | inspección de cleanup     | `POST /api/admin/identity/external-access/canaries/{id}/cleanup` con `apply:false` | `identity.external_canary.revoke`   |
 
 El endpoint de cleanup no puede aplicar hard delete bajo el rol runtime. El apply se ejecuta sólo con el wrapper
-local y el perfil DB `greenhouse_migrator`:
+local y el perfil DB `ops` (`greenhouse_ops`, miembro de `greenhouse_migrator`; el guard exige esa membresía y
+`migrator` a secas no tiene DML transversal sobre todos los schemas que el censo inspecciona):
 
 ```bash
 pnpm identity:external-canary:cleanup -- \
@@ -236,9 +237,10 @@ mínima: el apply también exige siete días estables, precondiciones de retiro 
    Si un sujeto canary usó además un cliente compartido, el planner, el delete y el readback deben llevar dos
    conjuntos separados. El DCR run-owned conserva el borrado client-scoped; el cliente shared permanece y sólo
    se eliminan sus filas con `environment_id` y `subject` canary exactos, más `binding_id` en contexts. El
-   readback debe confirmar que el cliente y los hijos de otros sujetos siguen presentes. La implementación
-   vigente al 2026-09-10 aún no hace esta partición: `oauth_client_not_run_owned` bloquea de forma segura y no
-   se debe retirar, allowlistear ni eludir antes de implementar y probar el contrato completo.
+   readback debe confirmar que el cliente y los hijos de otros sujetos siguen presentes. Desde `74638aed0`
+   (2026-09-18) la partición existe: el planner emite un recibo de preservación del cliente shared y el apply
+   hace rollback si el recibo posterior difiere. `oauth_client_not_run_owned` sigue siendo un blocker válido
+   para un cliente no inventariado; nunca se allowlistea.
 6. El mismo transaction relee organización, registro, bindings, perfiles, links y todos los artefactos
    auth/OAuth anteriores; cualquier conteo distinto de `0` hace rollback.
 7. Releer aparte superficies 360 y actualizar el manifiesto a `deleted` sólo cuando todo el inventario run-owned
@@ -256,11 +258,11 @@ El apply se niega sin mutar cuando aparece cualquiera de estos estados:
 - perfil no `smoke_test`, source link de otro environment o asset compartido;
 - cliente OAuth observado por el canary que no sea DCR o no tenga `software_id=run_id`;
 - FK nueva/no inventariada con conteo positivo;
-- rol DB distinto de migrator;
+- rol DB sin membresía `greenhouse_migrator` (usar el perfil `ops`);
 - readback final distinto de cero.
 
-Para la corrida activa, `oauth_client_not_run_owned` corresponde al CIMD compartido de Codex. No se resuelve
-marcándolo run-owned: requiere cleanup sujeto-específico y una prueba que preserve el mismo cliente y sus otros
+Para la corrida `task-1832-canary-20260906-a`, `oauth_client_not_run_owned` correspondía al CIMD compartido de
+Codex. No se resolvió marcándolo run-owned, sino con el cleanup sujeto-específico y una prueba que preserve el mismo cliente y sus otros
 sujetos. La revisión del 2026-09-14 atribuyó la señal agregada reciente a un perfil interno `real`; por eso no
 rompe el steady canary. Los eventos de los dos sujetos exactos sí cuentan: su último reintento contenido fue el
 `2026-09-11T01:33:34.325Z`, por lo que la ventana conservadora no termina antes del
@@ -284,3 +286,46 @@ Una corrida deja:
 Hasta completar esos siete puntos, TASK-1832 permanece `rollout productivo en observación`; nunca se presenta
 como piloto ni adopción de cliente. Para la corrida activa, `delete_after=2026-09-13T19:43:30Z`: antes de esa
 fecha el dry-run debe negarse por authority/auth activas y `--apply` no se ejecuta.
+
+## Diseño de la corrida — lecciones de TASK-1832
+
+La corrida `task-1832-canary-20260906-a` certificó bien la matriz y encontró defectos reales (probe vacío `500`
+en el gateway, scopes de Claude Code `2.1.186`, sesión interna colada en la ceremonia, drift de la flag en
+staging). Lo que falló fue el diseño de su salida: el retiro quedó bloqueado una semana. Para la próxima:
+
+1. **Asume clientes OAuth compartidos desde el día 0.** Los clientes hospedados (ChatGPT/Codex por CIMD) no son
+   de la corrida. Antes del primer write, clasifica cada cliente de la matriz como `run_owned` (DCR con
+   `software_id=run_id`) o `shared`, y regístralo en el manifiesto. El cleanup por sujeto ya existe
+   (`74638aed0`); pruébalo en dry-run con un sujeto sintético sobre un cliente shared **antes** de invitar,
+   no al retirar.
+2. **Lee las señales por sujeto, nunca por `client_id`.** Una señal agregada de un cliente compartido mezcla
+   personas reales. Define desde el inicio la consulta por `subject_hash`/`grant_id` de los sujetos exactos y
+   úsala en cada muestra diaria.
+3. **Muestra por sujeto hasta el retiro, sin huecos.** La ventana steady sólo vale si hay muestras por sujeto
+   que cubran todo el período hasta la revocación. En TASK-1832 faltó el tramo 2026-09-14 → retiro.
+4. **Verifica el perfil DB del apply en el preflight.** El dry-run debe ejecutarse con el mismo perfil que el
+   apply (`ops`), para que un permiso faltante aparezca antes de la ventana y no el día del retiro.
+5. **Lee las flags en cada runtime al abrir y al cerrar.** Config de Vercel (`env pull`), revisión servida de
+   Cloud Run y variables GitHub (repo y environment). El ledger no es la verdad live.
+6. **Planifica el apagado como parte del retiro.** Cada gate tiene su carril (repo var + workflow del
+   auth-server, Vercel + redeploy, environment `production` + `deploy.yml` del gateway); inclúyelos en el
+   manifiesto desde el principio.
+
+## Estado final de la corrida 2026-09-18
+
+- Revocación de authority a `2026-09-18T12:46:01Z`: `activeAuthorityCount=0`, `activeAuthCount=0`.
+- Cleanup apply con perfil `ops`: `deletionReady=true`, `unexpectedRefs=0`, cero blockers; grafo run-owned en
+  cero. El CIMD compartido de ChatGPT/Codex y los artefactos de otros sujetos quedaron con recibos de
+  preservación idénticos antes/después. Audit, outbox, deliveries y el wordmark compartido (HTTP 200) se
+  conservaron.
+- Readback agregado `2026-09-18T14:09:17Z`: `registrations=0`, `canary_bindings=0`, drift `0/0`,
+  `smoke_in_person_360=0`.
+- Gates OFF con readback servido (`2026-09-18T14:0xZ`):
+  - GitHub repo var `EXTERNAL_IDENTITY_CANARY_ENABLED=false`, sin overrides en `Production|Preview|staging|copilot`;
+  - auth-server `auth-server-00076-t2t`, 100 %, `GIT_SHA=bda1cf2cd938` (sin cambio de código; run
+    `35353431957`, break-glass auditado de producción por drift de config);
+  - Vercel Production `false` + redeploy `dpl_CWnDKTVmLkrQY2xUtLHnxEL64ZG9` (mismo SHA), alias
+    `greenhouse.efeoncepro.com`; staging sigue `false`;
+  - gateway `efeonce-mcp-gateway-00056-kgs`, 100 %, `GATEWAY_BUILD_SHA=4c9d7c44cf0e`, variable del environment
+    `production` en `false`, run `35353391431`.
+- Flags nativos generales (`AUTH_SERVER_*`, `MCP_NATIVE_AUTH_*`, multi-org interno) intactos.

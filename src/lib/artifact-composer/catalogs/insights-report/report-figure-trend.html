@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  ReportFigureTrendPage — página de figura «tendencia» del informe A4 (TASK-1889 Slice 4, canvas
+  `Premium-Lineas`, familia `line`). Hasta tres series distinguibles en gris por ROL: principal
+  (trazo grueso con punto final), referencia (discontinua) y detalle (fino translúcido).
+
+  El SVG lo dibuja el hook del catálogo (`makeLinesHook`) desde `lineSeries`, `lineXLabels` y
+  `lineAnnotations` (validation-only). Cada punto sale de la cifra del plan; un hueco corta la línea
+  (nunca se interpola ni se dibuja como cero). Franja, rótulo inicial, diferencia final y área entre
+  líneas son opcionales y sólo aparecen si el plan los declara.
+-->
+<link rel="stylesheet" href="report-tokens.css" />
+<link rel="stylesheet" href="report-fonts.css" />
+<link rel="stylesheet" href="report-editorial.css" />
+<style>
+  .figure-eyebrow { margin-top: 38px; }
+
+  .figure-board { margin-top: 40px; display: flex; flex-direction: column; }
+
+  .figure-board .figure-caption-row { padding-bottom: 14px; }
+
+  .figure-board .figure-legend { gap: 14px; }
+
+  .figure-board .figure-note { margin-top: 14px; }
+
+  .fig-lines-host { display: block; }
+</style>
+</head>
+<body>
+  <div class="sheet sheet--paper paper-page">
+    <span class="chapter-tab" data-slot="chapterTab">01</span>
+    <header class="running">
+      <span class="running-client"><span class="running-client-name" data-slot="clientName">Nombre del cliente</span></span>
+      <span class="running-meta">
+        <span class="running-section" data-slot="runningSection">01 · Visibilidad orgánica</span>
+        <span class="running-divider"></span>
+        <span data-slot="runningPeriod">Agosto 2026 · contra julio 2026</span>
+      </span>
+    </header>
+
+    <span class="page-eyebrow figure-eyebrow" data-slot="eyebrow">
+      <span class="icon-set" data-slot-field="icon"><svg class="stroke-icon i-bars" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path><path d="M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path></svg><svg class="stroke-icon i-clicks" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3"></path><path d="M12 3v3"></path><path d="M7.8 7.8l-2.2 -2.2"></path><path d="M16.2 7.8l2.2 -2.2"></path><path d="M7.8 16.2l-2.2 2.2"></path><path d="M12 12l9 3l-4 2l-2 4l-3 -9"></path></svg><svg class="stroke-icon i-impressions" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg><svg class="stroke-icon i-ctr" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 17a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 7a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M6 18l12 -12"></path></svg><svg class="stroke-icon i-search" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path><path d="M21 21l-6 -6"></path></svg><svg class="stroke-icon i-target" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"></path><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path></svg><svg class="stroke-icon i-link" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 15l6 -6"></path><path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"></path><path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"></path></svg><svg class="stroke-icon i-trend" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6 -6l4 4l8 -8"></path><path d="M14 7l7 0l0 7"></path></svg></span><span data-slot-field="label">Clics día a día</span>
+    </span>
+
+    <div class="figure-hero">
+      <div class="figure-count">
+        <span class="figure-number" data-slot="keyFigure">46</span>
+        <span class="figure-caption" data-slot="keyCaption">clics por día al cierre de agosto, media de 7 días <strong>(partió en 37)</strong></span>
+      </div>
+      <div class="figure-heading">
+        <h1 class="figure-title" data-slot="conclusion">Los clics subieron durante todo el mes, no en un pico aislado</h1>
+        <p class="figure-lead" data-slot="lead">Julio se mantuvo plano.</p>
+      </div>
+    </div>
+
+    <section class="figure-board">
+      <div class="figure-caption-row">
+        <span class="figure-board-title" data-slot="figureTitle">Clics por día en Search Console</span>
+        <span class="figure-legend" data-slot="lineLegend">
+          <span class="figure-legend-item"><span class="line-swatches" data-slot-field="role"><svg class="line-swatch line-swatch--primary" width="18" height="6" aria-hidden="true"><line x1="0" x2="18" y1="3" y2="3"></line></svg><svg class="line-swatch line-swatch--reference" width="18" height="6" aria-hidden="true"><line x1="0" x2="18" y1="3" y2="3"></line></svg><svg class="line-swatch line-swatch--detail" width="18" height="6" aria-hidden="true"><line x1="0" x2="18" y1="3" y2="3"></line></svg></span><span data-slot-field="label">Agosto, media</span></span>
+        </span>
+      </div>
+      <div class="fig-lines-host"></div>
+    <div class="figure-note" data-slot="note"><svg class="stroke-icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10"></path><path d="M7 16v-9h9"></path></svg><span data-slot-field="text">Nota de lectura de la figura.</span></div>
+    </section>
+
+    <div class="figure-provenance" data-slot="provenance">
+      <div class="figure-provenance-item"><span class="figure-provenance-label" data-slot-field="label">Unidad</span><span data-slot-field="text">Unidad de la figura.</span></div>
+    </div>
+
+    <div class="grow"></div>
+
+    <div class="closing closing--figure" data-slot="closing"><div class="closing-block">
+        <span class="closing-label"><span class="closing-kind" data-slot-field="kind"><svg class="stroke-icon closing-icon--measure" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7"></path><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3"></path><path d="M9.7 17h4.6"></path></svg><svg class="stroke-icon closing-icon--action" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 18l6 -6"></path><path d="M13 6l6 6"></path></svg></span><span data-slot-field="label">Lo que significa</span></span>
+        <p class="closing-text" data-slot-field="text">Lo que la tabla muestra.</p>
+        <span class="closing-signature" data-slot-field="signature">Recomendación de Efeonce</span>
+      </div></div>
+
+    <footer class="paper-foot">
+      <div class="paper-foot-rule"><span class="accent"></span><span class="line"></span></div>
+      <div class="paper-foot-row">
+        <div class="paper-foot-id">
+          <div class="paper-foot-lockup">
+            <img src="assets/brand/logo-full.svg" alt="Efeonce" />
+            <span class="divider"></span>
+            <span class="paper-foot-edition" data-slot="footerEdition">Insights · Informe de agosto 2026</span>
+          </div>
+          <div class="paper-foot-contact" data-slot="footerContact"><span data-slot-field="address">Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile</span><span class="dot"></span><span class="num" data-slot-field="phone">+56 9 3732 3064</span></div>
+        </div>
+        <div class="paper-foot-end">
+          <img class="url-bubble" data-slot="urlBubble" src="assets/url-lum.svg" alt="efeoncepro.com" />
+          <span class="divider"></span>
+          <span class="paper-folio" data-slot="folio"><span class="paper-folio-page" data-slot-field="page">03</span><span class="paper-folio-total">/ <span data-slot-field="total">24</span></span></span>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

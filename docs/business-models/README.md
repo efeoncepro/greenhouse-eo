@@ -241,6 +241,7 @@ Todo business model debe separar al menos estas dimensiones:
 - [Studio Credits](creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md) — política económica V1,
   todavía sin precio público ni venta self-serve.
 - [Efeonce Partner & Provider Layer V1](EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md) — `Approved for validation`; modelo transversal para relaciones comerciales y tecnológicas, sin declarar por sí solo partnerships aprobados ni pricing.
+- [Transformación de equipos humano-agente — business model V1](revops-crm/HYBRID_WORKFORCE_TRANSFORMATION_BUSINESS_MODEL_V1.md) — `Approved for validation`; fee por blueprint/ola y retainer gobernado, sin tarifario o margen aprobado.
 - [Creative Studio Skill Adoption Matrix](creative-studio/EFEONCE_CREATIVE_STUDIO_SKILL_ADOPTION_V1.md) —
   cobertura de skills, fronteras de ownership, validación y dominios auditados sin cambio.
 - [Higgsfield Partnership & Vertical Expansion Research 2026-07-29](../audits/commercial/HIGGSFIELD_PARTNERSHIP_AND_VERTICAL_EXPANSION_RESEARCH_2026-07-29.md) —

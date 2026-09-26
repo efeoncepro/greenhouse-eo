@@ -1,12 +1,13 @@
 # 14 · Narrativa agéntica y motion comercial 2026
 
-> **Verificado al 2026-09-16.** Cargar este módulo cuando la pregunta sea cómo posicionar, prospectar,
+> **Verificado al 2026-09-19, después del cierre de UNBOUND.** Cargar este módulo cuando la pregunta sea cómo posicionar, prospectar,
 > demostrar o empaquetar HubSpot en la etapa Agentic Customer Platform. Para implementación y gobierno
 > técnico de agentes, cargar además `13_AGENTES.md`. Para cualquier cifra o vigencia, abrir `../SOURCES.md`.
 
 ## 0. La conclusión
 
-HubSpot ya no se vende principalmente como **un CRM con varios Hubs**. La narrativa oficial convergente es:
+HubSpot ya no se vende principalmente como **un CRM con varios Hubs**. Después del Fall Spotlight/UNBOUND, la
+narrativa oficial convergente es:
 
 > **Una plataforma de clientes agéntica que concentra el contexto del negocio, entrega espacios de trabajo
 > especializados y permite que humanos y agentes ejecuten juntos el GTM.**
@@ -14,6 +15,12 @@ HubSpot ya no se vende principalmente como **un CRM con varios Hubs**. La narrat
 El orden comercial es **dolor → contexto → trabajo → outcome → plataforma**. No abrir con un inventario de
 Hubs, agentes o features. La IA es el mecanismo; el comprador paga por más demanda, pipeline, cierres,
 resolución, retención o capacidad operativa.
+
+Cuando el buyer busca cambiar la operación completa, avanzar de este pitch a la
+[transformación de equipos humano-agente](../../../../docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md):
+`Hybrid Workforce Blueprint → First Hybrid Team → transformación por áreas → Managed Agentic Operations`.
+El organigrama híbrido debe asignar dueño humano, operador, supervisor, agente, autoridad, handoffs y capacidad
+de revisión. La herramienta coordina tareas; Efeonce y el cliente diseñan el trabajo y el accountability.
 
 ## 1. Quién está diciendo qué
 
@@ -35,6 +42,11 @@ Angela son señales ejecutivas directas, pero LinkedIn no reemplaza políticas, 
 | **Acción** | Hubs, workspaces, Breeze Assistant y Breeze Agents | ¿Qué trabajo repetitivo, lento o frágil debe mejorar primero? | Configuración, implementación, training y activación de un caso medible |
 | **Coordinación** | Agent management, permisos, handoffs, sistemas conectados, auditoría | ¿Qué puede ejecutar un agente y qué exige aprobación humana? | Gobierno, `propose → confirmación humana → execute`, observabilidad y mejora continua |
 | **Acceso abierto** | APIs, remote MCP, conectores y Agent CLI | ¿El trabajo es conversacional o masivo/programado? | MCP para humano-en-el-loop; CLI/API para background, bulk y scheduled con dry-run y control |
+
+El corte final del 17–18/09 añade cuatro señales de producto que deben tratarse con disponibilidad escalonada:
+Customer Agent Voice, HubSpot Work, Agent CLI y Smart CRM Universal Record Page. Los tres primeros son superficies
+agénticas o de trabajo mostradas en demos; la cuarta es una private beta de la experiencia de registro. Las sesiones
+son first look/demo; no son prueba de GA, pricing, SLA o runtime.
 
 **No reducir “contexto” a campos del CRM.** HubSpot lo define como datos de cliente + conocimiento del
 negocio + forma real de trabajar + procesos + patrones aprendidos. Limpiar properties ayuda, pero no captura

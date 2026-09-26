@@ -223,6 +223,31 @@ objeto que sale desenfocado… justo en el desenfoque se pone el logo». Caso fu
 > La primera versión de esta regla mandaba añadir un objeto delante de la cámara. Esa premisa quedó **falsada** en
 > el mismo caso: el desenfoque de primer plano ya estaba en la foto. Se medía después; ahora se mide **antes**.
 
+### Delta 2026-09-19 — en fotografía de marca propia Efeonce, el lecho se planifica desde la toma
+
+Con el [lenguaje fotográfico de Efeonce](../../design-studio/references/efeonce-photographic-language.md) aprobado,
+la firma dejó de ser un hallazgo posterior: el primer plano es una **herramienta o superficie del oficio** entre la
+cámara y el sujeto, **escrita en el prompt como `FOREGROUND`** antes de generar. No contradice la lección de abajo: lo
+que sigue prohibido es **añadir** un soporte después; lo que ahora se exige es **planearlo** como parte de la escena.
+
+- **Lechos probados:** borde de mesa a ras del lente · respaldo de silla del espectador · escritorio del visitante ·
+  matte box o rig · consola de corrección de color · borde de mesa de luz · fila de latas o botellas («casi tocando el
+  lente, f/1.4, sin bordes», o sale nítida) · marco de vidrio · maleta de equipo · techo de auto · cabezas del
+  público · cámara de estudio · mostrador · desenfoque óptico del tilt-shift · borde curvo de mesa en ojo de pez.
+- **Tono del lecho declarado SIEMPRE** («DARK near black» / «VERY LIGHT almost white»): la madera de tono medio hizo
+  fallar el contraste 6+ veces. Lecho p99 ≤ ~20 y transición gradual; si falla, **se regenera**.
+- **Logo al 15% del ancho**, centrado, SVG oficial compuesto (20% se leía como sello). Contraste ≥ 4,5:1 medido.
+- **Delta 2026-09-20 — el lecho ya tiene % por formato [medido]:** 4:5 **18%** · 9:16 **22%** · 16:9 **16%** ·
+  1:1 **18%** (*sin validar*). No se escribe a mano: `pnpm foto:prompt <ficha.json>` lo emite junto al `--size` del
+  `ai:image` desde una sola tabla —y rechaza un lecho cuya **materia** esté ausente o sea genérica («a wall», «the
+  surface»)—, y `pnpm foto:validar <plate.png>` lo mide sobre el plate limpio junto a las otras cinco reservas
+  ([canon](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md)).
+- Contrato completo: [firma y primer plano](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md).
+
+Los **cinco soportes rechazados** de esta sección siguen prohibidos como añadidos: un objeto que existe sólo para
+sostener la marca se lee puesto, lo planees o no. La medición del Paso 1 sigue vigente para piezas que no nacen
+de este lenguaje (trendjacking, seasonality, plates ajenos).
+
 ### Paso 1 — medir el plate limpio antes de añadir nada
 
 Sobre el plate sin marca ni objetos añadidos, medir el **gradiente máximo** de luminancia en cada plano: el rostro
@@ -298,3 +323,25 @@ cumplía todas las reglas de forma y aun así se leyó forzado. Cumplir la forma
    primer plano tan nítido como la cara. Medir sólo dentro del lecho.
 
 **Límites.** Una sola aparición por pieza. Nunca sobre la cara ni cruzando la mirada.
+
+
+## 🔴 Elegir la referencia correcta — contrato canónico
+
+**Antes de usar este kit, carga el [contrato de selección de referencias](../../../../docs/operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md).** Vale para el logo 3D,
+el isotipo, la nave y las mascotas igual que para la ropa: los kits 3D traen **ocho poses o ángulos
+cada uno**, con fondo de estudio y transparente, y el logo está resuelto además por **escala**
+(pequeña, mediana, grande, monumental) **y color** (blanco, navy). **Ninguna vista hay que inventarla:
+hay que elegir la que corresponde.**
+
+Las tres reglas que gobiernan la elección:
+
+1. **Arte plano → producir vistas del kit · pieza aislada → construir · pieza en uso → USAR en una
+   escena.** Darlos al revés hace que el modelo reinvente la marca.
+2. **Lo sensible se compone; el modelo sólo pone material y luz.** Un modelo no sostiene una marca:
+   medido, cuatro pasadas sobre la misma pieza dieron cuatro logotipos distintos, y en prendas tres
+   dieron tres emblemas y ninguno era el de Efeonce.
+3. **Las proporciones se calculan del objeto real** —y para el 3D, la **escala** y la **luminancia**
+   deciden qué variante entra: blanca para materiales claros, navy para oscuros.
+
+**Y el QA de una marca es letra por letra** —«e», «f», nave, órbita con sus cortes, tres ventanas—:
+una letra distinta obliga a regenerar, nunca a publicar.

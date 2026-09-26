@@ -120,7 +120,7 @@ Validado por datos del CRM: win rate ~50% en cuentas existentes vs. 2–3% en ne
 | **Strategic Bets** (licitaciones, menor control) | ~0% | Upside, no forecast |
 | **Opportunistic** (pequeñas, administrativas) | ~0% | No pipeline |
 
-> *Efeonce no necesita más deals. Necesita más deals con derecho estructural a ganar.* El flywheel documentado: **licitación privada ganada → cuenta ancla → expansión por trato directo** (modelo Sky Airlines).
+> *Efeonce no necesita más deals. Necesita más deals con derecho estructural a ganar.* El flywheel documentado: **licitación privada ganada → cuenta ancla → expansión por trato directo** (modelo Sky Airlines). *(2026-09-23: la primera expansión de Sky —el Blog SEO/AEO, comprado por otra área, el equipo de Marca— llegó por una segunda licitación privada vía Wherex, no por trato directo; la cuenta ancla fue la ventaja que el comité reconoció.)*
 
 ---
 

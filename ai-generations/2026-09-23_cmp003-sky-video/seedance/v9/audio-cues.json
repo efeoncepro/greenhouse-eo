@@ -1,0 +1,45 @@
+{
+  "status": "Conformed to full native fal render after 361-sample review at 12 fps; timing tolerance one sampled interval (83 ms).",
+  "duration": 30,
+  "typing_start": 0.2,
+  "typing_end": 1.65,
+  "enter": 1.8,
+  "results": [
+    2.0833,
+    2.3333,
+    2.5833
+  ],
+  "chat": 3.8,
+  "answer": [
+    4.5,
+    4.9167,
+    5.3333
+  ],
+  "citation": 8.7,
+  "flight_start": 10.0833,
+  "pass": 13.0417,
+  "year": 15.8333,
+  "plus": 18.5417,
+  "number": 18.625,
+  "pieces": 18.875,
+  "agency": [
+    20.8333,
+    21.1667,
+    21.5
+  ],
+  "thanks": 24.3333,
+  "closing": 26.0,
+  "purple": 28.0,
+  "approved_source_anchors": [
+    1.65,
+    8.65,
+    9.5,
+    12.65,
+    15.5,
+    18.1,
+    21.0,
+    23.8,
+    25.1,
+    29.708667
+  ]
+}

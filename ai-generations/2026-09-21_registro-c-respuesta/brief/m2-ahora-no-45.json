@@ -1,0 +1,23 @@
+{
+  "id": "m2-ahora-no-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "objetos": [
+    {
+      "objeto": "codex",
+      "vista": "saludo"
+    }
+  ],
+  "escena": "SCENE (a bare desk in a dark modern office, seen straight on at desk height): TWO bezel-less display panels stand side by side, IDENTICAL in size, shape, height and brightness, at exactly the same distance from the camera, perfectly level with each other. Each shows a rounded ANSWER CARD glowing on a dark field — a plain empty rounded rectangle with short bright underlines beneath it and nothing else: no letters, no numbers, no words, no icons, no interface chrome — but they are NOT the same: the left panel's card has FOUR bright underlines beneath it and the right panel's card has only ONE. Everything about the two panels is deliberately symmetrical EXCEPT that difference. Standing between them on the desk, small, the Codex figure from the reference is turned in three-quarter view towards the left panel, mid-motion as if looking from one to the other. The two panels are the ONLY light source and they light the figure equally from both sides. Everything else falls to deep navy black. 50mm at f/2.8, camera at desk height. NOTHING IN THIS SCENE MAY READ AS OLD OR ANALOGUE. Absolutely NO books, NO paper, NO plants, NO mugs, NO pencil cups, NO clutter anywhere in frame, including out of focus in the background. Every object is current-generation hardware with clean machined surfaces: anodised aluminium, matte glass, seamless edges. Screens are bezel-less, edge to edge. The desk is bare except for what the scene names. The room behind is empty architectural darkness, not a cosy study.",
+  "reservas": {
+    "texto": {
+      "muro": "the empty dark office wall above the panels, unbroken and unlit",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the near edge of the desk in the immediate foreground, running unbroken across the whole width of the frame",
+    "tono": "DARK near-black anodised aluminium in deep shadow, matte, outside the light"
+  }
+}

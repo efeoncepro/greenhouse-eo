@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "httpStatus": 202,
+  "model": "bytedance/seedance-2.5/reference-to-video",
+  "requestId": "01a0d2c8-444a-7fd0-b606-5a2987148e87",
+  "output": null,
+  "errorDetail": null,
+  "latencyMs": 461,
+  "secretSource": "secret_manager",
+  "account": "FAL_API_KEY_B"
+}

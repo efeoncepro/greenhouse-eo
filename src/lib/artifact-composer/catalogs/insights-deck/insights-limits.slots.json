@@ -2,22 +2,84 @@
   "template": "InsightsLimitsSlide",
   "figmaNodeId": null,
   "version": "0.1",
+  "note": "TASK-1889 — límites del deck con la gramática del plan del deck (sin lámina propia en el canvas).",
   "viewport": {
-    "width": 1920,
-    "height": 1080
+    "width": 1280,
+    "height": 720
   },
   "slots": {
+    "tabNumber": {
+      "selector": "[data-slot='tabNumber']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 2,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Número de capítulo de la pestaña («00» en el resumen)."
+    },
+    "section": {
+      "selector": "[data-slot='section']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 44,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "period": {
+      "selector": "[data-slot='period']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "heroFigure": {
+      "selector": "[data-slot='heroFigure']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 3,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "heroText": {
+      "selector": "[data-slot='heroText']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 64,
+        "maxLines": 3,
+        "overflow": "reject"
+      }
+    },
     "assertion": {
       "selector": "[data-slot='assertion']",
       "type": "rich-string",
       "required": true,
       "constraints": {
-        "maxCharacters": 90,
-        "maxLines": 2,
+        "maxCharacters": 80,
+        "maxLines": 3,
+        "overflow": "reject",
         "allowedTags": [
           "em"
-        ],
-        "overflow": "reject"
+        ]
       }
     },
     "limits": {
@@ -26,12 +88,17 @@
       "required": true,
       "constraints": {
         "minItems": 1,
-        "maxItems": 6,
-        "overflow": "reject"
+        "maxItems": 6
       },
       "item": {
         "type": "object",
         "shape": {
+          "ordinal": {
+            "type": "string",
+            "required": false,
+            "resolver": "deck-ordinal",
+            "consumer": "resolver-only"
+          },
           "subject": {
             "type": "string",
             "required": true,
@@ -41,19 +108,68 @@
           "cause": {
             "type": "string",
             "required": true,
-            "maxCharacters": 96,
-            "maxLines": 2
+            "maxCharacters": 110,
+            "maxLines": 3
           }
         }
+      }
+    },
+    "method": {
+      "selector": "[data-slot='method']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 150,
+          "maxLines": 2
+        }
+      }
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
       },
-      "notes": "Máximo 6 en lámina; el informe A4 admite 14. Cada límite lleva su causa."
+      "notes": "«Insights · Informe de <período>»."
     },
     "fixed-urlBubble": {
       "selector": "[data-slot='urlBubble']",
       "type": "fixed-asset",
       "required": true,
       "agentMayOverride": false,
-      "note": "template-owned. El pie de una lámina lleva COMO MÁXIMO la URL bubble: dirección, teléfonos y folio son del informe escrito."
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
+      },
+      "notes": "«NN / total» del plan de láminas de la misma composición."
     }
   }
 }

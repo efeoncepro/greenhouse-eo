@@ -1,0 +1,356 @@
+[
+  {
+    "id": "p1-atril-busqueda-9x16-cta",
+    "plate": "plates/p1-atril-busqueda-9x16-v3-plate.png",
+    "align": "left",
+    "top": 0.165,
+    "textWidth": 0.84,
+    "lead": "Hoy alguien habló en nombre de tu empresa.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 36,
+    "leadGap": 0.15,
+    "dominant": "No fuiste tú.",
+    "dominantSize": 168,
+    "dominantMax": 0.62,
+    "after": "Ni te preguntó **nada**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 34,
+    "afterGap": 0.12,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": 0.82,
+      "variant": "negative"
+    },
+    "dominantTracking": -0.02,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "note": {
+      "text": "Descubre qué dice de tu marca.",
+      "size": 34,
+      "x": 0.07,
+      "width": 0.78,
+      "gapAfterClosure": 36
+    },
+    "cta": {
+      "variant": "outline",
+      "radius": 10,
+      "text": "Pide el diagnóstico",
+      "descriptor": "Diagnóstico SEO + AEO",
+      "x": 0.07,
+      "gapAfterNote": 20,
+      "paddingX": 24,
+      "paddingY": 14,
+      "fontSize": 40,
+      "descriptorSize": 28,
+      "descriptorGap": 16,
+      "cursorScale": 1.1
+    },
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.05,
+      "cursors": [
+        {
+          "id": "ia",
+          "label": "IA",
+          "who": "role",
+          "anchor": "bottom-end",
+          "color": "#12afa2"
+        }
+      ]
+    },
+    "subjectProtection": {
+      "top": 1015,
+      "minClearance": 24
+    }
+  },
+  {
+    "id": "p1-atril-busqueda-16x9-cta",
+    "plate": "plates/p1-atril-busqueda-16x9-plate.png",
+    "align": "left",
+    "top": 0.1,
+    "textWidth": 0.4,
+    "lead": "Hoy alguien habló en nombre de tu empresa.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 28,
+    "leadGap": 0.15,
+    "dominant": "No fuiste tú.",
+    "dominantSize": 112,
+    "dominantMax": 0.38,
+    "after": "Ni te preguntó **nada**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 25,
+    "afterGap": 0.12,
+    "logo": {
+      "width": 0.13,
+      "x": 0.5
+    },
+    "dominantTracking": -0.02,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "note": {
+      "text": "Descubre qué dice de tu marca.",
+      "size": 25,
+      "x": 0.07,
+      "width": 0.38,
+      "gapAfterClosure": 36
+    },
+    "cta": {
+      "variant": "outline",
+      "radius": 10,
+      "text": "Pide el diagnóstico",
+      "descriptor": "Diagnóstico SEO + AEO",
+      "x": 0.07,
+      "gapAfterNote": 16,
+      "paddingX": 18,
+      "paddingY": 11,
+      "fontSize": 30,
+      "descriptorSize": 20,
+      "descriptorGap": 12,
+      "cursorScale": 0.85
+    },
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.05,
+      "cursors": [
+        {
+          "id": "ia",
+          "label": "IA",
+          "who": "role",
+          "anchor": "bottom-end",
+          "color": "#12afa2"
+        }
+      ]
+    },
+    "subjectProtection": {
+      "top": 950,
+      "minClearance": 24
+    }
+  },
+  {
+    "id": "p2-expediente-9x16-cta",
+    "plate": "plates/p2-expediente-9x16-v3-plate.png",
+    "align": "left",
+    "top": 0.165,
+    "textWidth": 0.84,
+    "lead": "Te describe con seguridad.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 36,
+    "leadGap": 0.15,
+    "dominant": "No te leyó.",
+    "dominantSize": 168,
+    "dominantMax": 0.62,
+    "after": "Y responde igual **todos los días**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 34,
+    "afterGap": 0.12,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": 0.82,
+      "variant": "negative"
+    },
+    "dominantTracking": -0.02,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "note": {
+      "text": "Mira con qué te describe.",
+      "size": 34,
+      "x": 0.07,
+      "width": 0.78,
+      "gapAfterClosure": 36
+    },
+    "cta": {
+      "variant": "solid",
+      "radius": 10,
+      "text": "Pide el diagnóstico",
+      "descriptor": "Diagnóstico SEO + AEO",
+      "x": 0.07,
+      "gapAfterNote": 20,
+      "paddingX": 24,
+      "paddingY": 14,
+      "fontSize": 40,
+      "descriptorSize": 28,
+      "descriptorGap": 16,
+      "cursorScale": 1.1
+    },
+    "subjectProtection": {
+      "top": 997,
+      "minClearance": 24
+    }
+  },
+  {
+    "id": "p2-expediente-16x9-cta",
+    "plate": "plates/p2-expediente-16x9-v2-plate.png",
+    "align": "left",
+    "top": 0.1,
+    "textWidth": 0.4,
+    "lead": "Te describe con seguridad.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 28,
+    "leadGap": 0.15,
+    "dominant": "No te leyó.",
+    "dominantSize": 112,
+    "dominantMax": 0.38,
+    "after": "Y responde igual **todos los días**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 25,
+    "afterGap": 0.12,
+    "logo": {
+      "width": 0.13,
+      "x": 0.5
+    },
+    "dominantTracking": -0.02,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "note": {
+      "text": "Mira con qué te describe.",
+      "size": 25,
+      "x": 0.07,
+      "width": 0.38,
+      "gapAfterClosure": 36
+    },
+    "cta": {
+      "variant": "solid",
+      "radius": 10,
+      "text": "Pide el diagnóstico",
+      "descriptor": "Diagnóstico SEO + AEO",
+      "x": 0.07,
+      "gapAfterNote": 16,
+      "paddingX": 18,
+      "paddingY": 11,
+      "fontSize": 30,
+      "descriptorSize": 20,
+      "descriptorGap": 12,
+      "cursorScale": 0.85
+    },
+    "subjectProtection": {
+      "top": 728,
+      "minClearance": 24
+    }
+  },
+  {
+    "id": "p3-megafono-9x16-cta",
+    "plate": "plates/p3-megafono-9x16-v3-plate.png",
+    "align": "left",
+    "top": 0.165,
+    "textWidth": 0.84,
+    "lead": "Anuncia tu categoría todos los días.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 36,
+    "leadGap": 0.15,
+    "dominant": "Sin tu nombre.",
+    "dominantSize": 168,
+    "dominantMax": 0.62,
+    "after": "Y nadie lo **corrige**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 34,
+    "afterGap": 0.12,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": 0.82,
+      "variant": "negative"
+    },
+    "dominantTracking": -0.02,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "note": {
+      "text": "Mira qué responde por tu categoría.",
+      "size": 34,
+      "x": 0.07,
+      "width": 0.78,
+      "gapAfterClosure": 36
+    },
+    "cta": {
+      "variant": "text",
+      "radius": 0,
+      "text": "Pide el diagnóstico",
+      "descriptor": "Diagnóstico SEO + AEO",
+      "x": 0.07,
+      "gapAfterNote": 20,
+      "paddingX": 24,
+      "paddingY": 14,
+      "fontSize": 40,
+      "descriptorSize": 28,
+      "descriptorGap": 16,
+      "cursorScale": 1.1
+    },
+    "subjectProtection": {
+      "top": 893,
+      "minClearance": 24
+    }
+  },
+  {
+    "id": "p3-megafono-16x9-cta",
+    "plate": "plates/p3-megafono-16x9-v2-plate.png",
+    "align": "left",
+    "top": 0.1,
+    "textWidth": 0.4,
+    "lead": "Anuncia tu categoría todos los días.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 28,
+    "leadGap": 0.15,
+    "dominant": "Sin tu nombre.",
+    "dominantSize": 112,
+    "dominantMax": 0.38,
+    "after": "Y nadie lo **corrige**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 25,
+    "afterGap": 0.12,
+    "logo": {
+      "width": 0.13,
+      "x": 0.5
+    },
+    "dominantTracking": -0.02,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "note": {
+      "text": "Mira qué responde por tu categoría.",
+      "size": 25,
+      "x": 0.07,
+      "width": 0.38,
+      "gapAfterClosure": 36
+    },
+    "cta": {
+      "variant": "text",
+      "radius": 0,
+      "text": "Pide el diagnóstico",
+      "descriptor": "Diagnóstico SEO + AEO",
+      "x": 0.07,
+      "gapAfterNote": 16,
+      "paddingX": 18,
+      "paddingY": 11,
+      "fontSize": 30,
+      "descriptorSize": 20,
+      "descriptorGap": 12,
+      "cursorScale": 0.85
+    },
+    "subjectProtection": {
+      "top": 786,
+      "minClearance": 24
+    }
+  }
+]

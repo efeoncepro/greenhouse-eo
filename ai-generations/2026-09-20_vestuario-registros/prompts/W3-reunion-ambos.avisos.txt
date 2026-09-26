@@ -1,0 +1,1 @@
+  ⚠ W3-reunion-ambos: "lanyard-efeonce": el carnet se genera determinísticamente con `node ai-generations/2026-09-17_lanyard-efeonce/arte-carnet.mjs <foto.png> "<Nombre>" "<Cargo>" <salida.png>` y se compone después; al modelo nunca se le pide escribir el nombre ni el cargo

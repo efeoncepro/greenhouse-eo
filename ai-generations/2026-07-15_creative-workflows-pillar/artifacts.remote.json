@@ -1,0 +1,221 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:29:44.039Z",
+  "run": "ai-generations/2026-07-15_creative-workflows-pillar",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-15_creative-workflows-pillar",
+  "totalBytes": 18752549,
+  "fileCount": 35,
+  "files": [
+    {
+      "path": "exports/creative-workflows-autonomy-ladder-web-1440-v1.webp",
+      "sizeBytes": 65802,
+      "sha256": "b5b028982cc2f5e3442b436d4bd671611f2805b6a0a9b5bf943c2013d7bca641",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/exports/creative-workflows-autonomy-ladder-web-1440-v1.webp"
+    },
+    {
+      "path": "exports/creative-workflows-autonomy-ladder-web-1440-v2.webp",
+      "sizeBytes": 65792,
+      "sha256": "81cdcc879345dae6fe29990b34d9f01b75ed2e5292725f38728e23228669086f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/exports/creative-workflows-autonomy-ladder-web-1440-v2.webp"
+    },
+    {
+      "path": "exports/creative-workflows-autonomy-ladder-web-1440-v3.webp",
+      "sizeBytes": 68120,
+      "sha256": "4c944fd0d7915b76bdaa67cf78de02ea40cc609965adec461a3b438d186fa1c4",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/exports/creative-workflows-autonomy-ladder-web-1440-v3.webp"
+    },
+    {
+      "path": "exports/creative-workflows-decision-boundary-web-1440-v1.webp",
+      "sizeBytes": 85788,
+      "sha256": "32865e084a14d48ad8e9a20552da4cf2e61c84d570430a0db425bd1693f5e3d3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/exports/creative-workflows-decision-boundary-web-1440-v1.webp"
+    },
+    {
+      "path": "exports/creative-workflows-decision-boundary-web-1440-v2.webp",
+      "sizeBytes": 80570,
+      "sha256": "cb3d92e71cf8bd9bef1d7a5874ec35dcff289767c18d25e1c94a3c48f37243d7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/exports/creative-workflows-decision-boundary-web-1440-v2.webp"
+    },
+    {
+      "path": "exports/creative-workflows-decision-boundary-web-1440-v3.webp",
+      "sizeBytes": 75474,
+      "sha256": "1db4a810dbdba75229086974531d5d9dc965116fd3e83cebcd82a0151148af31",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/exports/creative-workflows-decision-boundary-web-1440-v3.webp"
+    },
+    {
+      "path": "exports/creative-workflows-hero-featured-1440-v1.jpg",
+      "sizeBytes": 185911,
+      "sha256": "99f7fd5943c76818171aa891a0d609eac79bd181933be5c23707b8d17aa12a8e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/exports/creative-workflows-hero-featured-1440-v1.jpg"
+    },
+    {
+      "path": "exports/creative-workflows-hero-featured-1440-v1.webp",
+      "sizeBytes": 104662,
+      "sha256": "0aca7db7fd3e991407d071828e20ebb3571683a144737275c3eecc20bf9ff55d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/exports/creative-workflows-hero-featured-1440-v1.webp"
+    },
+    {
+      "path": "exports/creative-workflows-hero-og-1200x630-v1.webp",
+      "sizeBytes": 82216,
+      "sha256": "483e2ebfe0ed05b21236fc389abd68383c5ace3c199eb4159b5b614b5216086b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/exports/creative-workflows-hero-og-1200x630-v1.webp"
+    },
+    {
+      "path": "exports/creative-workflows-interface-web-1440-v1.webp",
+      "sizeBytes": 167700,
+      "sha256": "ad62cfbf5032ea0cb2e85f385873265cb3d478442aa930ba9a5ae3d322668331",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/exports/creative-workflows-interface-web-1440-v1.webp"
+    },
+    {
+      "path": "exports/creative-workflows-six-moments-web-1440-v1.webp",
+      "sizeBytes": 164628,
+      "sha256": "e61b544aa9bf47ae2624045a46b65596eb33262378d723592187adfaaa159c41",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/exports/creative-workflows-six-moments-web-1440-v1.webp"
+    },
+    {
+      "path": "exports/creative-workflows-two-speeds-web-1440-v1.webp",
+      "sizeBytes": 81336,
+      "sha256": "135e39ee96789c0a4d62ffdeee5988ba9520d1233073dd741bc6c5d62113fb9f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/exports/creative-workflows-two-speeds-web-1440-v1.webp"
+    },
+    {
+      "path": "masters/creative-workflows-autonomy-ladder-master-v1.png",
+      "sizeBytes": 159283,
+      "sha256": "66ce74cf179cf675de297c099ecf1283bd89df00237c3df7a04feebec4fb0733",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/masters/creative-workflows-autonomy-ladder-master-v1.png"
+    },
+    {
+      "path": "masters/creative-workflows-autonomy-ladder-master-v2.png",
+      "sizeBytes": 160147,
+      "sha256": "8d4f3c2f5fb9a95f87d3e4ea7423ed5e6e2b8f15f9c7a0bab1d198005a485d1d",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/masters/creative-workflows-autonomy-ladder-master-v2.png"
+    },
+    {
+      "path": "masters/creative-workflows-autonomy-ladder-master-v3.png",
+      "sizeBytes": 155042,
+      "sha256": "177b46e7184f2cc7be178bde9631fb800506981fdc37128ec02dbd3f5bdd795f",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/masters/creative-workflows-autonomy-ladder-master-v3.png"
+    },
+    {
+      "path": "masters/creative-workflows-decision-boundary-master-v1.png",
+      "sizeBytes": 217600,
+      "sha256": "7d7bf2e1ccad078877de320aea6315a2a126edaefa8ddee4c5b38e83f85df600",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/masters/creative-workflows-decision-boundary-master-v1.png"
+    },
+    {
+      "path": "masters/creative-workflows-decision-boundary-master-v2.png",
+      "sizeBytes": 209226,
+      "sha256": "c5df4322bc6963fb5aa2da8febe0f1921c0efafd1c528e221ab08048a0af417a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/masters/creative-workflows-decision-boundary-master-v2.png"
+    },
+    {
+      "path": "masters/creative-workflows-decision-boundary-master-v3.png",
+      "sizeBytes": 145666,
+      "sha256": "9fc7db9f7a5570f7823600112b3b7e4251be45cc2b6fc9c010fb0837c1801c7c",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/masters/creative-workflows-decision-boundary-master-v3.png"
+    },
+    {
+      "path": "masters/creative-workflows-hero-master-v1.png",
+      "sizeBytes": 2182514,
+      "sha256": "79c50a6c14a93ce6753c98f8ba57da8bb3459c910597d147756cd2838cca6195",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/masters/creative-workflows-hero-master-v1.png"
+    },
+    {
+      "path": "masters/creative-workflows-interface-master-v1.png",
+      "sizeBytes": 2834757,
+      "sha256": "c6adda98fa1036b58cf06239aa4fcc9fa72285c1a51952105a333ed8c1975a0a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/masters/creative-workflows-interface-master-v1.png"
+    },
+    {
+      "path": "masters/creative-workflows-six-moments-master-v1.png",
+      "sizeBytes": 2827416,
+      "sha256": "405f1917a9efb59dab2006a46202d465cfbbeaef459fe25cf66b19f3bc125612",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/masters/creative-workflows-six-moments-master-v1.png"
+    },
+    {
+      "path": "masters/creative-workflows-two-speeds-master-v1.png",
+      "sizeBytes": 2486775,
+      "sha256": "2d86227ede410d73993affa166bf0b3b831c0211ada9c200f81b96200882566b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/masters/creative-workflows-two-speeds-master-v1.png"
+    },
+    {
+      "path": "review/live-desktop-1440x1000.png",
+      "sizeBytes": 3304674,
+      "sha256": "e0c79e9b2fd2dfe26e3816e987fbbf30838749837eff0111ecb26f01fc499ef9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/live-desktop-1440x1000.png"
+    },
+    {
+      "path": "review/v5/desktop-autonomy-ladder.png",
+      "sizeBytes": 404829,
+      "sha256": "70719eb38816d9729d41b7024ee9f59978ef40b09c0f2d89431a847fe75ad670",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/desktop-autonomy-ladder.png"
+    },
+    {
+      "path": "review/v5/desktop-decision-boundary.png",
+      "sizeBytes": 444529,
+      "sha256": "5b5a7cd56e228fb86ddb08367be9687c79dad158672c4fa52d8971f33d589504",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/desktop-decision-boundary.png"
+    },
+    {
+      "path": "review/v5/desktop-measurement-table.png",
+      "sizeBytes": 307211,
+      "sha256": "90d42d2de032cf61f044e4b51c7482b1605c54788e48770ede381219261b9c6a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/desktop-measurement-table.png"
+    },
+    {
+      "path": "review/v5/mobile-autonomy-ladder.png",
+      "sizeBytes": 125067,
+      "sha256": "e64553b82fabdee5b4659530f3468cb36086779b320d0d2989a4a2122c52b609",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/mobile-autonomy-ladder.png"
+    },
+    {
+      "path": "review/v5/mobile-decision-boundary.png",
+      "sizeBytes": 121646,
+      "sha256": "d705dada3a20730694ed918fa9b38ac57f80b70c7c79c7590c2bd5aa26128fa9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/mobile-decision-boundary.png"
+    },
+    {
+      "path": "review/v5/mobile-measurement-table.png",
+      "sizeBytes": 83257,
+      "sha256": "e190190b4462ae1f0c2705852eca47ef45cb9c0c86a4c8397c188e17bca5dbbf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5/mobile-measurement-table.png"
+    },
+    {
+      "path": "review/v5-diagrams-v3/desktop-autonomy-ladder.png",
+      "sizeBytes": 367783,
+      "sha256": "0c5729483138d8ffaf87aed3aa519cbe08d38bced9e7af60edc5338ee16c6845",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5-diagrams-v3/desktop-autonomy-ladder.png"
+    },
+    {
+      "path": "review/v5-diagrams-v3/desktop-decision-boundary.png",
+      "sizeBytes": 366447,
+      "sha256": "46715d549b607f40eb678b415574477b1bacb892f4ecb3316b8b4fe9e71c2ab7",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5-diagrams-v3/desktop-decision-boundary.png"
+    },
+    {
+      "path": "review/v5-diagrams-v3/desktop-measurement-table.png",
+      "sizeBytes": 307211,
+      "sha256": "90d42d2de032cf61f044e4b51c7482b1605c54788e48770ede381219261b9c6a",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5-diagrams-v3/desktop-measurement-table.png"
+    },
+    {
+      "path": "review/v5-diagrams-v3/mobile-autonomy-ladder.png",
+      "sizeBytes": 120484,
+      "sha256": "537d417057d60ea623fa03d59b2548c2094f3d604c8861cca89e54d5308ff197",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5-diagrams-v3/mobile-autonomy-ladder.png"
+    },
+    {
+      "path": "review/v5-diagrams-v3/mobile-decision-boundary.png",
+      "sizeBytes": 109729,
+      "sha256": "c63737eef1f1e508d195c02e60cae9f9316d22b8007dd48d40e2bb78cdd39472",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5-diagrams-v3/mobile-decision-boundary.png"
+    },
+    {
+      "path": "review/v5-diagrams-v3/mobile-measurement-table.png",
+      "sizeBytes": 83257,
+      "sha256": "e190190b4462ae1f0c2705852eca47ef45cb9c0c86a4c8397c188e17bca5dbbf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-15_creative-workflows-pillar/review/v5-diagrams-v3/mobile-measurement-table.png"
+    }
+  ]
+}

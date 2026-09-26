@@ -42,7 +42,7 @@ Además de ElevenLabs MCP, Greenhouse tiene un **path API a Fal.ai** — agregad
 | Minimax H3 (base, Max, Max Turbo, camera) | Sí, **siempre** (estéreo 48 kHz: voz, efectos y música) | **No** | — (no hay toggle) | Reemplazar en post si hay diseño sonoro [oficial MiniMax; verificado 9 corridas] |
 | Flux 3 (finales, drafts, extend) | Sí, por defecto (diálogo con lip sync, efectos, ambiente) | Sí | `--no-audio` | `extend` exige audio en el origen y lo usa como contexto; `edit`: si conserva el audio, sin dato. Idiomas: BFL lista español, fal dice "inglés principal" → probar español antes de prometer diálogo [oficial] |
 | Wan 3.0 / Prime | Sí, por defecto (diálogo, BGM, efectos) | Sí | `--no-audio` (campo `audio`) | 30 fps; Alibaba reconoce que la textura del audio aún no está donde la quieren [oficial] |
-| Gemini Omni Flash | Sí (reference/video edit + audio) | — | Directo por Google, sin CLI | — |
+| Gemini Omni 1.1 Flash (`pnpm ai:omni`) | Sí: MP4 H.264/AAC observado en seis corridas 360p/16:9/3 s (extend 6 s acumulados) del 2026-09-24 | Sin toggle en la CLI | Cloud directo; `--task text|image|frames|reference|edit|extend` | Escucha, continuidad de audio y factura sin verificar; manual `docs/manual-de-uso/ai-tooling/gemini-omni-1-1-cli.md` |
 
 Regla: en toda pieza con mezcla, voz, música licenciada o loudness de entrega, el audio generado es **provisional**.
 Si no lo vas a usar, apágalo en los motores que lo permiten (no ahorra por sí mismo un costo documentado: sin dato)

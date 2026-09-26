@@ -1,0 +1,20 @@
+{
+  "id": "p2-expediente-9x16-v3",
+  "formato": "9:16",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "objetos": [
+    "clawd"
+  ],
+  "escena": "SCENE (a bare desk in a dark modern office, seen straight on at desk height): an ultra-thin aluminium laptop lies CLOSED and flat on the bare desk, its lid a single seamless matte surface, and a soft even layer of DUST has settled across that closed lid, undisturbed — nobody has opened it. Standing ON TOP of the closed laptop, the small Clawd figure from the reference is turned three-quarters AWAY from it, facing out to the right, mid-gesture as if explaining something to someone off-frame. It never looks down at the laptop under its feet. To the right, angled towards the figure, a bezel-less display shows one single rounded ANSWER CARD glowing on a dark field — a plain empty rounded rectangle with a short bright underline beneath it and nothing else: no letters, no numbers, no words, no icons, no interface chrome. That display is the ONLY light source: it rakes hard across the dusty aluminium lid, picking out every dust particle on it, lights one side of the figure and leaves the other side in darkness. 50mm lens at f/2.8, camera at desk height. NOTHING IN THIS SCENE MAY READ AS OLD OR ANALOGUE. Absolutely NO books, NO bound volumes, NO paper, NO plants, NO mugs, NO pencil cups, NO clutter of any kind anywhere in frame, including out of focus in the background. Every object is current-generation hardware with clean machined surfaces: anodised aluminium, matte glass, seamless edges. Screens are bezel-less, edge to edge. The desk is bare except for what the scene names. The room behind is empty architectural darkness, not a cosy study. FRAMING FOR THIS FORMAT: the desk runs across the LOWER third of the frame; the bare dark wall rises tall and unbroken above it for most of the frame height. The bezel-less display stands at the right, its card glowing at desk level. SIGNATURE BAND (essential): a horizontal band running the FULL width of the frame between 54% and 66% of the frame height is completely EMPTY, unlit and evenly dark — no object, no edge, no highlight, no light beam and no part of the subject enters it, and no bright surface sits behind it. It keeps faint material texture and is never a flat pure-black panel. Everything in the scene sits either ABOVE or BELOW that band.",
+  "reservas": {
+    "texto": {
+      "muro": "the empty dark office wall above the desk, unbroken and unlit",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the near edge of the desk in the immediate foreground, running unbroken across the whole width of the frame",
+    "tono": "DARK near-black oak in deep shadow, matte, its grain still faintly visible, outside the light"
+  }
+}

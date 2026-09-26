@@ -303,6 +303,41 @@ export const GH_SEARCH_CONSOLE = {
   }
 } as const
 
+export const GH_GA4_CONNECTION = {
+  title: 'Google Analytics 4',
+  ariaPanel: 'Estado de conexión de Google Analytics 4',
+  subtitle: 'Sesiones, canales y comportamiento del sitio de esta marca.',
+  connected: 'Conectado',
+  notConnected: 'No conectado',
+  pendingStatus: 'Pendiente',
+  revokedStatus: 'Acceso revocado',
+  pending: 'Elige una propiedad para terminar la conexión.',
+  disconnected: 'Aún no hay una propiedad GA4 vinculada a esta organización.',
+  unavailable: 'La conexión GA4 aún no está habilitada en este ambiente.',
+  denied: 'Necesitas permiso de operación para conectar esta fuente.',
+  revoked: 'El acceso dejó de funcionar. Reconecta tu cuenta de Google.',
+  property: 'Propiedad vinculada',
+  chooseProperty: 'Elige la propiedad GA4',
+  chooseHelper: 'Solo aparecen las propiedades que tu cuenta de Google puede leer.',
+  noProperties: 'Tu cuenta no muestra propiedades GA4 disponibles.',
+  loadError: 'No pudimos cargar las propiedades. Intenta de nuevo.',
+  saveError: 'No pudimos vincular esa propiedad. Verifica tu acceso e intenta de nuevo.',
+  connectError: 'No pudimos completar la conexión con Google.',
+  disconnectError: 'No pudimos desconectar GA4. Intenta de nuevo.',
+  connect: 'Conectar Google Analytics',
+  reconnect: 'Reconectar',
+  disconnect: 'Desconectar',
+  cancel: 'Cancelar',
+  confirmDisconnect: 'Desconectar fuente',
+  disconnectTitle: '¿Desconectar Google Analytics 4?',
+  disconnectBody: 'Greenhouse dejará de leer las métricas de esta propiedad hasta que la vuelvas a conectar.',
+  retry: 'Reintentar',
+  loading: 'Cargando propiedades…',
+  connectedFeedback: 'Cuenta autorizada. Elige la propiedad GA4.',
+  propertyFeedback: 'Propiedad GA4 conectada.',
+  disconnectedFeedback: 'GA4 quedó desconectado.'
+} as const
+
 /**
  * TASK-1252 — AI Visibility Report Artifact · copy reusable del informe completo.
  *

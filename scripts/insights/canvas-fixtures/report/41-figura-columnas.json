@@ -1,0 +1,102 @@
+{
+  "reference": "Premium-Agrupadas",
+  "catalog": "report",
+  "contentType": "report-figure-columns",
+  "slots": {
+    "chapterTab": "01",
+    "runningSection": "01 · Visibilidad orgánica",
+    "runningPeriod": "Agosto 2026 · contra julio 2026",
+    "eyebrow": {
+      "icon": "search",
+      "label": "Posiciones en Google"
+    },
+    "keyFigure": "+3",
+    "keyCaption": "keywords nuevas entre las tres primeras posiciones <strong>(9 contra 6)</strong>",
+    "conclusion": "Tres keywords más llegaron al top 3 y el conjunto medido no cambió",
+    "lead": "Las diez primeras posiciones pasaron de 21 a 26 keywords. Las posiciones 11 a 50 bajaron de 53 a 48 en el mismo período.",
+    "figureTitle": "Keywords por tramo de posición · agosto contra julio",
+    "legend": {
+      "current": "Agosto 2026",
+      "prior": "Julio 2026",
+      "opportunity": "Oportunidad"
+    },
+    "columnGroups": [
+      {
+        "label": "Posiciones 1–3",
+        "current": "9",
+        "prior": "6",
+        "delta": "+3",
+        "direction": "up"
+      },
+      {
+        "label": "4–10",
+        "current": "17",
+        "prior": "15",
+        "delta": "+2",
+        "direction": "up"
+      },
+      {
+        "label": "11–20",
+        "current": "21",
+        "prior": "24",
+        "delta": "−3",
+        "direction": "down"
+      },
+      {
+        "label": "21–50",
+        "current": "27",
+        "prior": "29",
+        "delta": "−2",
+        "direction": "down"
+      }
+    ],
+    "columnBand": {
+      "from": 0,
+      "to": 1,
+      "label": "Primera página de Google"
+    },
+    "columnOpportunity": {
+      "group": 2,
+      "label": "A un paso"
+    },
+    "note": {
+      "text": "Las 74 keywords son las mismas en los dos meses: cambió su posición, no el conjunto medido."
+    },
+    "provenance": [
+      {
+        "label": "Unidad",
+        "text": "Cantidad de keywords; bajo cada tramo, la variación contra julio."
+      },
+      {
+        "label": "Fuente",
+        "text": "Mediciones de posiciones en buscadores"
+      },
+      {
+        "label": "Cobertura",
+        "text": "74 keywords medidas en ambos períodos"
+      }
+    ],
+    "closing": [
+      {
+        "kind": "measure",
+        "label": "Lo que significa",
+        "text": "Cinco keywords más quedaron en la primera página de Google, que es donde se reciben los clics. El avance viene de las mismas palabras subiendo, no de medir otras."
+      },
+      {
+        "kind": "action",
+        "label": "Próximo paso",
+        "text": "Reforzar con enlaces internos las 21 keywords en posiciones 11 a 20: son las que están más cerca de entrar a la primera página.",
+        "signature": "Recomendación de Efeonce"
+      }
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "footerContact": {
+      "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+      "phone": "+56 9 3732 3064"
+    },
+    "folio": {
+      "page": "07",
+      "total": "24"
+    }
+  }
+}

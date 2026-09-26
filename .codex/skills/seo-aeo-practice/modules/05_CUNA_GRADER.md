@@ -186,6 +186,10 @@ ni precio. **5 runs** en modo `full`, mercado Chile: **12 preguntas × 5 motores
 **Entregables:** 5 informes web tokenizados *(link corto `think.efeoncepro.com/s/<code>`)* + 5 PDF + el correo,
 ✅ **enviado**. Cómo repetirlo en venta: `docs/manual-de-uso/comercial/panel-competitivo-aeo-en-venta.md`.
 
+*(**Actualización 2026-09-23:** SKY adjudicó el blog a Efeonce. El benchmark AEO competitivo figura entre los motivos del cierre
+— junto al Grader publicado y la Radiografía AEO con un artículo real. La cuña funcionó como
+evidencia, no como promesa. Detalle: `efeonce/ESTADO_ACTUAL.md` § 3d.)*
+
 ---
 
 ## 4. 🔴 Lo que el Grader NO puede hacer

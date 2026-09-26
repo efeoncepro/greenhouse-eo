@@ -1,0 +1,20 @@
+{
+  "id": "U4-sprocket-hall-boston",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    "julio",
+    "nexa"
+  ],
+  "escena": "SCENE (partner hall of a large technology conference in Boston, late afternoon): a single shaft of low sun comes through the tall convention-centre glass and falls ONTO THE TWO PEOPLE, edging their shoulders and throwing a long graphic shadow across the polished floor; they stand beside a low matte-black pedestal, and she is mid-sentence with one hand open towards the object on it while he leans in to look closely at it, caught at the moment he notices a detail. He is wearing a faded olive linen shirt with the sleeves rolled; she is wearing a fine light heather-grey knit sweater; no jackets, no blazers, no navy or blue clothing. Neither looks at the camera. On the pedestal stands the sculpture from the object reference, about 30 cm tall, lit cleanly. Far behind them the hall recedes into soft focus with cool azure-blue light. 35mm lens at f/2.8. Everything else is completely unbranded, no brand names, no readable text and no other logos anywhere.",
+  "lecho": {
+    "objeto": "the near edge of the matte black pedestal top, right against the lens",
+    "tono": "DARK near black, matte, with subtle texture"
+  },
+  "objetos": [
+    {
+      "objeto": "sprocket-hubspot",
+      "vista": "tres-cuartos-izq"
+    }
+  ]
+}

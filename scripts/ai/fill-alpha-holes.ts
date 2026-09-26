@@ -11,6 +11,14 @@
  * mediana del borde del original) o ese mismo gris neutro en sombra (caso: el piso visto por el aro del sprocket
  * apoyado en cenital). Así se conservan los huecos reales de fondo (el espacio dentro del
  * arco de unos audífonos) y se reparan los huecos falsos del sujeto.
+ *
+ * LÍMITE de esta regla, medido el 2026-09-21 con la biblioteca de Gigi: cuando el objeto interno es de verdad
+ * del color del fondo, la heurística NO puede distinguirlo y no hay tolerancia que lo arregle. La utilería
+ * blanca de los accesorios salió del render en (222,221,223) contra un fondo de estudio de (218,217,220):
+ * Δ 4 por canal contra `backgroundTolerance = 18`. Gorro, lente, audífonos y birrete quedaron como agujeros.
+ * Subir la tolerancia sólo empieza a comerse huecos de fondo reales. La corrección va AGUAS ARRIBA, en la
+ * generación: pedir la utilería en un tono que se separe del fondo (ahí se usó hueso cálido #D3C8B4, Δ ≈ 40,
+ * que sigue leyéndose «blanco»). Si llegas acá porque un prop claro volvió transparente, no toques este número.
  */
 
 export interface AlphaHoleFillResult {

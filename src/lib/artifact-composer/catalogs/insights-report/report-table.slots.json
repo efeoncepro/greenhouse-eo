@@ -2,24 +2,47 @@
   "template": "ReportTablePage",
   "figmaNodeId": null,
   "version": "0.1",
+  "note": "TASK-1889 — tabla de respaldo A4: cifra protagonista, ranking, barra desde el dato y procedencia. Sin página propia en el canvas.",
   "viewport": {
     "width": 794,
     "height": 1123
   },
   "slots": {
-    "runningChapter": {
-      "selector": "[data-slot='runningChapter']",
+    "clientName": {
+      "selector": "[data-slot='clientName']",
       "type": "string",
-      "required": true,
+      "required": false,
       "constraints": {
         "maxCharacters": 40,
         "maxLines": 1,
-        "transform": "uppercase",
         "overflow": "reject"
-      }
+      },
+      "notes": "Nombre del cliente en la cabecera. Sin cliente, la caja queda vacía y la página no se mueve; nunca un nombre inventado. El logo llega con la portada sellada de TASK-1888."
+    },
+    "runningSection": {
+      "selector": "[data-slot='runningSection']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 44,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Sección de la página («Resumen ejecutivo»)."
     },
     "runningPeriod": {
       "selector": "[data-slot='runningPeriod']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Período y comparación («Agosto 2026 · contra julio 2026»)."
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
       "type": "string",
       "required": true,
       "constraints": {
@@ -28,12 +51,47 @@
         "overflow": "reject"
       }
     },
+    "heroFigure": {
+      "selector": "[data-slot='heroFigure']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 12,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Cifra del hallazgo principal del capítulo (`readings[].keyFigure` de TASK-1888). Sin hallazgo, no hay cifra: nunca «la fila más alta»."
+    },
+    "heroText": {
+      "selector": "[data-slot='heroText']",
+      "type": "rich-string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 110,
+        "maxLines": 3,
+        "overflow": "reject",
+        "allowedTags": [
+          "strong"
+        ]
+      },
+      "notes": "La conclusión de ese hallazgo."
+    },
     "tableTitle": {
       "selector": "[data-slot='tableTitle']",
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 60,
+        "maxCharacters": 80,
+        "maxLines": 3,
+        "overflow": "reject"
+      }
+    },
+    "lead": {
+      "selector": "[data-slot='lead']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 140,
         "maxLines": 2,
         "overflow": "reject"
       }
@@ -43,20 +101,42 @@
       "type": "string",
       "required": false,
       "constraints": {
-        "maxCharacters": 34,
+        "maxCharacters": 48,
         "maxLines": 1,
         "overflow": "reject"
+      }
+    },
+    "boardTitle": {
+      "selector": "[data-slot='boardTitle']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "legend": {
+      "selector": "[data-slot='legend']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        }
       },
-      "notes": "Sólo en páginas que continúan una tabla. Una tabla que sigue sin decirlo obliga a retroceder."
+      "notes": "Rótulo de la barra. Sin barras (filas de unidades distintas), no hay leyenda."
     },
     "tableColumns": {
       "selector": "[data-slot='tableColumns']",
       "type": "array",
       "required": true,
       "constraints": {
-        "minItems": 2,
-        "maxItems": 3,
-        "overflow": "reject"
+        "minItems": 3,
+        "maxItems": 4
       },
       "item": {
         "type": "object",
@@ -64,12 +144,11 @@
           "label": {
             "type": "string",
             "required": true,
-            "maxCharacters": 22,
-            "maxLines": 2
+            "maxCharacters": 24,
+            "maxLines": 1
           }
         }
-      },
-      "notes": "Entre 2 y 3 columnas. Un catálogo cerrado no estira una plantilla para cualquier ancho: si hace falta otra forma de tabla, es un gap del catálogo y se diseña su plantilla."
+      }
     },
     "tableRows": {
       "selector": "[data-slot='tableRows']",
@@ -77,43 +156,207 @@
       "required": true,
       "constraints": {
         "minItems": 1,
-        "maxItems": 26,
-        "overflow": "reject"
+        "maxItems": 16
       },
       "item": {
         "type": "object",
         "shape": {
+          "rank": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-table-rank",
+            "consumer": "resolver-only"
+          },
           "entity": {
             "type": "string",
             "required": true,
-            "maxCharacters": 44,
-            "maxLines": 2
+            "maxCharacters": 48,
+            "maxLines": 1
+          },
+          "bar": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-table-bar",
+            "consumer": "resolver-only"
           },
           "valueA": {
             "type": "string",
             "required": true,
-            "maxCharacters": 14,
+            "maxCharacters": 16,
             "maxLines": 1
+          },
+          "trend": {
+            "type": "string",
+            "required": false,
+            "resolver": "report-row-trend",
+            "values": [
+              "up",
+              "down",
+              "flat",
+              "up:better",
+              "up:worse",
+              "up:neutral",
+              "down:better",
+              "down:worse",
+              "down:neutral",
+              "flat:neutral"
+            ],
+            "notes": "Dirección de la variación de la fila. Sin ella, la píldora es neutra."
           },
           "valueB": {
             "type": "string",
             "required": false,
-            "maxCharacters": 14,
+            "maxCharacters": 16,
+            "maxLines": 1
+          }
+        }
+      }
+    },
+    "barScaleMax": {
+      "selector": "[data-slot='barScaleMax']",
+      "type": "string",
+      "required": false,
+      "consumer": "validation-only",
+      "constraints": {
+        "maxCharacters": 24,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Máximo de la primera columna de valor en la tabla COMPLETA: la escala de la barra no cambia entre páginas."
+    },
+    "barMode": {
+      "selector": "[data-slot='barMode']",
+      "type": "enum",
+      "required": false,
+      "consumer": "validation-only",
+      "values": [
+        "scale",
+        "none"
+      ],
+      "notes": "`none` cuando las filas no comparten unidad: sin barras (una escala común mentiría) y la segunda columna es la variación."
+    },
+    "rankOffset": {
+      "selector": "[data-slot='rankOffset']",
+      "type": "string",
+      "required": false,
+      "consumer": "validation-only",
+      "constraints": {
+        "maxCharacters": 4,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Filas de la tabla ya mostradas en páginas anteriores: el ranking continúa."
+    },
+    "source": {
+      "selector": "[data-slot='source']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 90,
+          "maxLines": 2
+        }
+      }
+    },
+    "coverage": {
+      "selector": "[data-slot='coverage']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 90,
+          "maxLines": 2
+        }
+      }
+    },
+    "closing": {
+      "selector": "[data-slot='closing']",
+      "type": "array",
+      "required": false,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 2
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "kind": {
+            "type": "string",
+            "required": true,
+            "resolver": "report-closing-icon",
+            "values": [
+              "measure",
+              "action"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 40,
+            "maxLines": 1
+          },
+          "text": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 220,
+            "maxLines": 4
+          },
+          "signature": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 40,
             "maxLines": 1
           }
         }
       },
-      "notes": "El TECHO DE FILAS es del molde, no una preferencia: más de 26 no caben en el alto útil, y el reparto entre páginas lo hace paginateFlow() antes de imprimir. Una celda sin dato se escribe «—», nunca 0."
+      "notes": "Lo que significa / Próximo paso de la tabla, cuando el plan trae la lectura. Sin ella, la página compone sin panel."
     },
-    "tableSource": {
-      "selector": "[data-slot='tableSource']",
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 110,
-        "maxLines": 2,
+        "maxCharacters": 48,
+        "maxLines": 1,
         "overflow": "reject"
-      }
+      },
+      "notes": "«Insights · Informe de <período>»."
+    },
+    "footerContact": {
+      "selector": "[data-slot='footerContact']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "address": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 72,
+          "maxLines": 1
+        },
+        "phone": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        }
+      },
+      "notes": "Desde EFEONCE_CONTACT (dirección de presentación y teléfono de Chile)."
     },
     "fixed-urlBubble": {
       "selector": "[data-slot='urlBubble']",
@@ -122,27 +365,25 @@
       "agentMayOverride": false,
       "note": "template-owned: el HTML ya lo trae."
     },
-    "fixed-contactDetails": {
-      "selector": "[data-slot='contactDetails']",
-      "type": "fixed-contact-set",
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
       "required": true,
-      "agentMayOverride": false,
-      "value": {
-        "chilePhone": "+56 9 3732 3064",
-        "address": "Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile"
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
       },
-      "note": "Dueño del valor: back-cover-full.slots.json de deck-axis. Pie completo en CADA página, incluida la portada."
-    },
-    "pageFolio": {
-      "selector": "[data-slot='pageFolio']",
-      "type": "string",
-      "required": true,
-      "constraints": {
-        "maxCharacters": 8,
-        "maxLines": 1,
-        "overflow": "reject"
-      },
-      "notes": "Asignado por el plan de páginas ANTES de imprimir."
+      "notes": "«NN / total»: ambos del plan de páginas de la misma composición (paginateFlow), nunca un número fijo."
     }
   }
 }

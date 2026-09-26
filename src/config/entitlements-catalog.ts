@@ -62,7 +62,10 @@ export const ENTITLEMENT_MODULES = [
   // congeladas (deck/A4/web) por organización y ventana. Distinto de `growth`
   // (produce los hechos SEO/AEO) y `delivery` (ICO): Insights sólo congela y emite.
   // La PUERTA per-ORG es el módulo `insights_v1` (module_assignments).
-  'insights'
+  'insights',
+  // TASK-1890 — namespace de Efeonce Marketing Studio (EPIC-049), plataforma de campañas en su propio
+  // runtime (studio.efeonce.org). Greenhouse sólo registra la autoridad de la persona; los datos viven en Studio.
+  'marketing_studio'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -2314,6 +2317,7 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // nunca conecta directo). Grant set operador (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT
   // ∪ EFEONCE_OPERATIONS ∪ AI_TOOLING_ADMIN) en runtime.ts mismo PR.
   { key: 'growth.search_console.connect', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.ga4.connect', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
   // TASK-1301 — Growth SEO (dominio growth.seo, EPIC-022 "Search Visibility 360"). 5 capabilities
   // gobernadas (Full API Parity + MCP-first: mismas caps para UI/Nexa/lane app/lane ecosystem —
   // NUNCA un gate paralelo por consumer). El ACCESO efectivo es per-org vía module_assignments
@@ -2447,7 +2451,12 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // TASK-1848 — enviar por correo desde Efeonce: interno y distinto de compartir (no es relay del cliente).
   { key: 'insights.delivery.send', module: 'insights', actions: ['create', 'read', 'update'] as const, defaultScope: 'tenant' },
   // TASK-1848 — recurrencia: genera borradores bajo la autoridad durable de quien la activó (interno).
-  { key: 'insights.schedule.manage', module: 'insights', actions: ['create', 'read', 'update'] as const, defaultScope: 'tenant' }
+  { key: 'insights.schedule.manage', module: 'insights', actions: ['create', 'read', 'update'] as const, defaultScope: 'tenant' },
+  // TASK-1888 — portada preferida de los informes por organización (auto | navy | blanca). Interna; leerla también
+  // la concede insights.report.read.
+  { key: 'insights.cover_preference.manage', module: 'insights', actions: ['read', 'update'] as const, defaultScope: 'tenant' },
+  // TASK-1890 — leer Marketing Studio por API/MCP. El gateway la verifica para la persona; Studio acota por organización.
+  { key: 'marketing_studio.campaign.read', module: 'marketing_studio', actions: ['read'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

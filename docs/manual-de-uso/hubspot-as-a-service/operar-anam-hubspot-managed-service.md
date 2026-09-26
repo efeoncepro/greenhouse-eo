@@ -152,10 +152,12 @@ Antes de subir:
 2. Ejecuta `hs project validate --profile anam`.
 3. Confirma que el selector conserva tres opciones con `aria-pressed` y que sólo `Conversar con Emma` tiene
    `data-chat-intent`.
-4. Verifica que el header use `anam-logo-horizontal.svg`, sin el círculo superior, y que la camisa de Emma diga
-   exactamente `ANÁLISIS AMBIENTALES S.A.`.
-5. Si se corrige texto integrado en el personaje o la ropa, usa edición generativa, guarda un asset versionado y
-   conserva el anterior como rollback. No superpongas texto determinista: el operador descartó ese tratamiento.
+4. Verifica que el header use `anam-logo-horizontal.svg`, sin el círculo superior, que la landing cargue
+   `emma-anam-portrait-2026-09-23.png` y que el cargo visible diga `Ejecutivo comercial ANAM`.
+5. Usa el PNG original entregado por ANAM para la landing. El avatar del chat es un derivado con fondo menta:
+   actualízalo por separado en la identidad de Customer Agent y en el chatflow `96601133`, guarda ambos cambios
+   y abre el widget público para comprobar las dos apariciones del avatar. Conserva fuentes y versiones previas.
+   El bordado `ANÁLISIS AMBIENTALES S.A.` era propio de la ilustración anterior, no de la foto actual.
 
 Para desplegar y leer de vuelta:
 
@@ -165,12 +167,14 @@ hs project info --account 19893546 --json
 curl -s -L https://anam-2.hubspotpagebuilder.com/agente-anam | rg -o "kortex-cms-react/[0-9]+" | sort -u
 ```
 
-No declares la publicación por el estado del build: espera a que la URL pública sirva el mismo número de asset.
+No declares la publicación por el estado del build: después del deploy abre el editor de la página, pulsa
+`Actualizar` y espera a que la URL pública sirva el mismo número de asset. HubSpot puede tardar unos instantes.
 Después valida 1440 x 1100 y 390 x 1000, `scrollWidth === clientWidth`, margen exterior en cero, selección por
-clic y teclado, transferencia del intent al CTA y ausencia de errores de consola, página y red. El smoke no debe
-abrir ni enviar una conversación real.
+clic y teclado, transferencia del intent al CTA y ausencia de errores de consola, página y red. Para cambios de
+avatar, abre el widget sin enviar una conversación real. No atribuyas al build #30 una regresión móvil o
+conversacional que no se ejecutó.
 
-El cierre 2026-09-01 corresponde al build `#28`; su evidencia está en
+El cierre 2026-09-01 corresponde al build histórico `#28`; su evidencia está en
 `.captures/anam-emma-corporate-name-build28-2026-09-01/`. Consulta el contrato técnico completo en
 [`../../architecture/kortex/hubspot-cms/anam-chat-landing.md`](../../architecture/kortex/hubspot-cms/anam-chat-landing.md)
 y el runbook de CMS en

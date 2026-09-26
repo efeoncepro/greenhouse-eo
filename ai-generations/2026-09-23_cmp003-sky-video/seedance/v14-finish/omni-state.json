@@ -1,0 +1,11 @@
+{
+  "provider": "google-cloud",
+  "project": "efeonce-group",
+  "location": "global",
+  "model": "gemini-omni-1.1-flash-preview",
+  "task": "edit",
+  "interactionId": "ChBkMGM0NmQwOTNhYTE0OGUxEAgaATAqBG1haW4",
+  "status": "in_progress",
+  "gcsOutput": "gs://efeonce-group-greenhouse-private-assets-dev/ai-tooling/cmp003-sky/v14-window-a/output/",
+  "submittedAt": "2026-09-24T10:41:16.564Z"
+}

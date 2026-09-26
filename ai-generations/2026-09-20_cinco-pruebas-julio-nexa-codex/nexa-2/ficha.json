@@ -1,0 +1,27 @@
+{
+  "id": "nexa-edicion-pelicula-marca",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "preflightVisual": {
+    "abiertas": [
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/set-curado-12.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/N1-ojo-pez-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/N2-reflejo-final.png",
+      "ai-generations/2026-09-20_pruebas-julio-nexa-codex/nexa/final-v3.png",
+      "ai-generations/2026-09-20_pruebas-color-en-composicion/nexa/final.png"
+    ],
+    "comparacion": "N1 y N2 validan cara y gesto natural; el curado muestra que un material de oficio real puede sostener la firma. Esta escena conserva a Nexa trabajando, pero pasa de gran angular y proyección espacial a un encuadre íntimo de edición. Azul en el material audiovisual visto en reproducción real; un único lima minúsculo indica un estado real del control.",
+    "oficio": "Creative Services: revisión de un corte de película editorial propia en una sala de edición, con obra audiovisual visible y ajuste físico preciso.",
+    "azul": "Dentro de la reproducción de pantalla completa hay una estructura arquitectónica azul activo, parte del metraje que Nexa compara; el reflejo se mantiene tenue y no tiñe piel ni sombras.",
+    "acento": "Una fila corta de tres teclas de transporte de la consola emite luz lima de confirmación de reproducción, junto a la mano de Nexa. Es una señal funcional, visible a 390 px, sin decoración; no naranja.",
+    "lecho": "El borde real y oscuro de la consola de corrección de color, con perillas fuera de foco óptico, sostiene la firma sin superponer una franja.",
+    "identidadVestuario": "Rostro, cejas y cabello ondulado de Nexa según las tres referencias canónicas. Blusa verde grisáceo muy apagado y pantalón grafito, sin navy, azul, lima brillante ni logos."
+  },
+  "escena": "SCENE (Efeonce's own unbranded city-and-people editorial film in a small premium editing suite in Bogotá, daytime): Nexa is the ONLY person in frame, caught in the decisive instant of checking a difficult match cut. Her right hand is turning ONE physical color-control trackball on a real matte charcoal grading console; her eyes study a large calibrated monitor beyond it while her other hand rests naturally on the console. The monitor is in CLEAN FULL-SCREEN FILM PLAYBACK with absolutely no editing UI or text: a documentary frame of a pedestrian passing a simple AZURE BLUE (#0375DB) architectural bridge element in warm neutral daylight, a natural strong color field that belongs to the footage she is editing. Its light gives the room a small blue reflection on the metal monitor edge, never cyan skin or blue shadows. Immediately beside her active hand on the REAL physical grading console is a short row of THREE lime-green (#6EC207) backlit transport keys showing that playback is running. The lime key lights form one subtle but VISIBLE functional status signal even at a small 390-pixel display size, roughly one percent of the image; they must NOT disappear into tiny pinpricks. This is the ONLY small story accent: no orange, no colored cups or decorative props. Nexa wears a muted sage-grey blouse and graphite trousers, no blue, navy or lime clothing. Keep her long dark wavy hair, fair olive skin, dark eyes and defined brows exactly as in the three identity references. Camera from the monitor side at a low three-quarter angle, 85mm f/2, focus jointly on her eyes and the hand turning the trackball, with the film frame still clearly legible behind her. A hard, warm-neutral shaft of daylight from a narrow side window shapes her cheek and hand; shadows are deep with detail, not black or blue. THREE distinct depth planes: the real charcoal grading-console edge almost touching the lens in soft optical blur at the bottom, Nexa sharp and intent, full-screen film monitor and quiet acoustic room behind. This is active postproduction, not a generic desk portrait or stock photo. Clean premium room with believable physical equipment, no graphic overlays, no client brands, no readable text, letters, numbers, logos, UI, labels or watermarks anywhere.",
+  "lecho": {
+    "objeto": "the near edge of the actual matte-charcoal color grading control console Nexa operates, with real rounded equipment contours just in front of the camera",
+    "tono": "DARK near black, tactile textured charcoal equipment in shade, never a uniform invented slab"
+  }
+}

@@ -1,7 +1,8 @@
 # Greenhouse — Fal.ai Model & Capability Catalog V1
 
-> **Tipo:** Referencia técnica agent-facing · **Version:** 1.9 · **Creado:** 2026-07-06 por Claude
-> **Ultima actualizacion:** 2026-09-16 por Claude — (1.9) brechas del CLI corregidas en el commit `17196ead1`:
+> **Tipo:** Referencia técnica agent-facing · **Version:** 1.10 · **Creado:** 2026-07-06 por Claude
+> **Ultima actualizacion:** 2026-09-24 por Claude — (1.10) Recraft: la CLI `higgsfield` volvió a tener sesión (1.1.26,
+> workspace fijado) y el SVG real sigue sin corrida (§Recraft). Antes (1.9) brechas del CLI corregidas en el commit `17196ead1`:
 > estimación de costo antes de encolar con confirmación `--yes` sobre el tope, resolución más barata por defecto en
 > video, formato real de salida, `--seed` sólo donde el OpenAPI lo declara, tope de 10 `--image` en Seedream edit,
 > `--lora …#weight_name`, `--frames` y `--split-threshold` (§Estimación de costo y validaciones del CLI). Antes (1.8): correcciones de precio y contrato con la investigación del
@@ -889,7 +890,10 @@ Edición, restyle, restauración, lipsync, upscale, reframe sobre video existent
 - **Código:** ninguna integración directa (sin SDK, secreto ni registro en `ai:fal`).
 - **Carril documentado:** Higgsfield CLI (`~/.local/bin/higgsfield`, cuenta `mkt@efeoncepro.com`) con Recraft V4.1 para
   vectores. El 2026-09-16 la CLI responde `Not authenticated`: hay que correr `higgsfield auth login` (lo hace una persona
-  en el navegador).
+  en el navegador). **Actualización 2026-09-24:** la CLI se actualizó a 1.1.26 (la 0.2.1 mostraba «Update your app to
+  sign in»), quedó con sesión y con el workspace `Private` fijado (`higgsfield workspace set <id>` es obligatorio tras el
+  login); la generación de un SVG real con Recraft V4.1 sigue **sin corrida**. Operación: runbook Higgsfield §«CLI
+  `higgsfield`».
 - **Por fal (no conectado):** 23 endpoints, por ejemplo `fal-ai/recraft/v4.1/text-to-vector` (USD 0,08), `…/pro/text-to-vector`
   (0,30), `fal-ai/recraft/vectorize` (0,01), `fal-ai/recraft/upscale/crisp` (0,004) y `recraft/v4/style/*` con estilos propios
   (`recraft/v4/create-style`, 0,005).

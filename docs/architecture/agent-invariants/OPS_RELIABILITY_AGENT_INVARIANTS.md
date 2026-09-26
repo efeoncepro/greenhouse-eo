@@ -87,6 +87,51 @@
   - **Release:** `.github/workflows/auth-server-deploy.yml` (`workflow_call`, drift check por rutas, verificación de `GIT_SHA`); registrado en `RELEASE_DEPLOY_WORKFLOWS` (`Auth Server Deploy`, `cloudRunService: auth-server`, `us-east4`) y como job `deploy-auth-server` de `production-release.yml`. Staging se despliega en push a `develop`; producción **sólo** vía release. Los tres gates (`worker:build-contract-gate`, `worker:runtime-deps-gate`, `worker:deploy-path-gate`) lo cubren; su imagen **no** copia branding ni fuentes.
   - **Señales nuevas** (reader `src/lib/reliability/queries/auth-server-signals.ts`, módulo `identity`): `auth.issuer.jwks_unreachable` (`runtime`; steady `ok`; `not_configured` mientras Vercel no declare `AUTH_SERVER_JWKS_URL`; `error` si el JWKS no responde 200 o sus `kid` difieren del registry `greenhouse_auth.signing_keys`) y `auth.signing_keys.lifecycle` (`data_quality`; steady `ok`; `error` sin llave `active` o con más de una; `warning` con una `retiring` de más de 7 días). Los fallos de firma KMS **no** tienen contador propio: se leen como incidentes Sentry con tag `component=auth-server` / `check=kms`. TASK-1829 (2026-09-04) suma al mismo reader tres señales `incident` de la superficie OAuth, ventana 24 h sobre `greenhouse_auth.oauth_audit_events`, steady 0: `auth.oauth.code_reuse_detected` (`error`), `auth.oauth.refresh_reuse_detected` (`error`), `auth.oauth.cimd_rejected` (`warning`); con `AUTH_SERVER_OAUTH_ENABLED=false` (default) no hay eventos y quedan en steady — eso significa «no emite», no «sano». **NUNCA** infieras la salud del emisor desde el gateway MCP: hasta TASK-1831 el gateway no verifica este issuer.
 
+### Tamaño de las funciones de Vercel — frontera worker-only (ISSUE-177, desde 2026-09-22)
+
+Vercel rechaza toda función de más de **250 MB sin comprimir**, y lo descubre recién en su build remoto: `local:check`,
+el pre-push y `pnpm build` local pasan en verde. En `develop` Vercel es el único build. Ocurrió tres veces en tres
+semanas: `api/mcp/greenhouse` 397 MB (2026-09-02, `node:fs` con ruta armada desde `process.cwd()`) y
+`api/platform/app/insights/catalog` 434 MB (2026-09-16) y 441 MB (2026-09-22) por un **valor** importado del barrel
+del Artifact Composer, que reexporta `render.ts` (Playwright + pdf-lib) y `catalog.ts` (lecturas de `fs` con rutas de
+runtime). El render de PDF corre SÓLO en el Job `artifact-worker` (Cloud Run); Vercel encola.
+
+Defensa en capas (cada una atrapa lo que la otra no ve):
+
+1. **ESLint `greenhouse/no-worker-only-module-in-vercel-code`** (`error`, `src/**` salvo el motor y los tests):
+   del barrel `@/lib/artifact-composer` sólo `import type`; valores sólo desde la entrada liviana
+   `@/lib/artifact-composer/pure` (paginate, chart-geometry, bar-figure, manifest-hash); cualquier otra ruta interna
+   del motor es error; `playwright`, `pdf-lib`, `puppeteer`, `@sparticuz/chromium` como valor son error. Un test de
+   frontera (`artifact-composer/__tests__/pure-entry-boundary.test.ts`) prueba que `pure` no alcanza nada pesado.
+2. **`pnpm vercel:reachability-gate`** (en `local:check` → pre-push, y en `ci.yml` en todos los eventos; ~2 s, sin
+   build): esbuild recorre el grafo de imports desde cada entrada del App Router (`route`/`page`/`layout`/…,
+   `src/proxy.ts`, `src/instrumentation.ts`) y falla si alcanza la denylist (paquetes de browser/PDF, internos
+   pesados del composer, `skill-catalog-fs.ts`, `services/**`, `scripts/**`) o un módulo NUEVO que arma una ruta de
+   runtime con `process.cwd()`/`__dirname`/`import.meta.url` más un segmento variable. Los casos conocidos viven en
+   `scripts/ci/vercel-function-reachability-allowlist.json` con su causa y tamaño medido (ratchet: se informan, no
+   fallan; una entrada que ya no aplica se avisa para retirarla).
+3. **`pnpm vercel:function-size-gate`** (en `ci.yml` tras el `Build`, PR/`main`/manual): suma las trazas `*.nft.json`
+   de cada función (más el servidor mínimo compartido) y falla sobre 200 MB, avisa sobre 150 MB. Cubre lo que el
+   grafo no ve (un paquete pesado que llega por otro paquete, un directorio trazado por un `readdir` de ruta fija). Es
+   una cota inferior: Vercel agrupa rutas en una función.
+4. **Diseño:** las rutas de lectura de Insights importan `app-insights-read.ts` / `ecosystem-insights-read.ts`, que
+   nunca cargan commands ni render; los módulos de comandos sí importan el barrel de commands (conecta el puerto de
+   outputs que usa `issue`). Lo guarda `resources/insights-read-boundary.test.ts`.
+
+**Reglas duras:**
+
+- **NUNCA** importar un VALOR del barrel del composer, ni `playwright`/`pdf-lib`, desde código de `src/` que corra en
+  Vercel. **SIEMPRE** `import type` o `@/lib/artifact-composer/pure`; la composición se queda en
+  `services/artifact-worker`.
+- **NUNCA** leer disco con una ruta de runtime variable desde un módulo alcanzable por una ruta: mover la lectura a
+  un script y servir un artefacto generado (forma canónica de `skill-catalog.ts`, MCP §8).
+- **NUNCA** "arreglar" un tamaño con `VERCEL_SUPPORT_LARGE_FUNCTIONS=1` (lo sugiere el log de Vercel): sube el límite y
+  esconde la causa; la próxima regresión ya no la ve nadie.
+- **NUNCA** agregar una entrada a la allowlist del gate sin causa, archivo, tamaño medido y fecha; **NUNCA** relajar la
+  denylist para que un cambio pase. Si el gate falla, la corrección va en el import.
+- **SIEMPRE** que un módulo worker-only nuevo viva en `src/lib/**` e importe algo pesado, sumarlo a la denylist del gate
+  en el mismo cambio.
+
 ### Vercel cron classification + migration platform (TASK-775)
 
 Toda decisión "dónde vive un cron" pasa por las **3 categorías canónicas** de `docs/architecture/GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md`:

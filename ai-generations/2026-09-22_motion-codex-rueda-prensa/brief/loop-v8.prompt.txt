@@ -1,0 +1,51 @@
+A 15-second seamless loop for a vertical social ad. Image 1 is the EXACT target look of the finished frame — its typography, its text hierarchy, its selection box and its cursors are the reference to reproduce faithfully. Image 2 is the clean set. Images 3, 4 and 5 are the same blue cloud character in the exact poses it must hit.
+
+THE SET (from image 2, locked): a small blue cloud-shaped vinyl character stands behind a dark lectern at a press conference, four foam microphones angled toward it, a glowing horizontal search bar across the lectern, black empty background. The camera is LOCKED OFF for the whole shot: no pan, no tilt, no zoom, no dolly. The character never changes size or position in frame; only its arms, its slight lean and its screen-face move.
+
+THE PERFORMANCE — the character is an official spokesperson reading a routine statement about someone else. It is NOT celebrating, NOT happy, NOT triumphant: it is professional, detached and slightly bored, the way a press officer delivers an announcement they have given a hundred times. It NEVER looks at the camera — it addresses a press room that is somewhere off to the side, never us:
+- 0.0–1.8s   At rest behind the lectern, facing slightly off-camera, arms down, screen-face showing the neutral prompt glyphs (pose of image 4).
+- 1.8–5.0s   It leans toward the microphones and makes a small, matter-of-fact "point one" gesture with ONE short arm — the flat, routine hand of someone listing items, not the arm of someone cheering (pose of image 3, restrained). Its screen-face glyphs flicker rapidly.
+- 5.0–8.0s   It makes a second brief administrative gesture — a short dismissive wave, like "that concludes it" — and its arms come back down. Its screen-face stays NEUTRAL throughout: the prompt glyphs never turn into smiling or arched happy eyes at any point.
+- 8.0–11.5s  It stops and holds completely still, facing slightly away, as if the statement is over and NO questions will be taken. Nobody asks anything. This long stillness is the emotional centre of the piece: the indifference of not being consulted.
+- 11.5–15.0s It settles back into the exact rest pose of the first frame, unchanged and unbothered.
+The gestures are small, contained and bureaucratic — readable in silhouette but never exuberant. Its body stays planted behind the lectern the whole time.
+
+THE SEARCH BAR stays COMPLETELY EMPTY for all fifteen seconds: its small text cursor blinks slowly and no words, letters or query ever appear inside it. This emptiness is the point of the piece.
+
+THE GRAPHIC LAYER — reproduce the typography, weights, sizes, colours and positions exactly as in image 1, animating them IN THIS ORDER. This is a piece meant to be READ: every line must stay alone on screen long enough to be read calmly before the next one arrives, and once a line appears it STAYS until the final fade. Never rush the sequence.
+1. 1.5s   The thin white line "Hoy alguien habló en nombre de tu empresa." fades in at the top, and holds alone.
+2. 3.0s   The huge bold white headline "No fuiste tú." SLAMS in hard — a fast punch-in scale from 104% to 100% with no bounce. It is by far the largest, heaviest text in the frame, and it HOLDS untouched while everything else arrives.
+3. 4.5s   A small teal arrow cursor labelled "IA" glides in from the right and a thin dashed selection rectangle with eight small square handles draws itself around "No fuiste tú.", then stays.
+4. 6.0s   The line "Ni te preguntó nada." fades in below the headline.
+5. 8.0s   The light blue line "Descubre qué dice de tu marca." fades in.
+6. 10.0s  A lime-green rounded outline button reading "Pide el diagnóstico" fades in, with the small line "Diagnóstico SEO + AEO" under it.
+7. 11.5s  A white arrow cursor glides to that button and clicks: the button's lime outline pulses once, brightly. Everything stays on screen after the click so the offer can be read.
+8. 13.0–14.0s  EVERYTHING fades out together — all text, both cursors, the selection rectangle and the button. By 14.0s the frame is COMPLETELY CLEAN and identical to the very first frame: only the character, the microphones and the empty glowing bar. That clean frame holds for the last second so the loop is seamless. Do NOT leave any text on screen at the end.
+TEXT SIZE AND LAYOUT — match image 1 exactly, do not shrink it:
+- The whole text block occupies the upper 45% of the frame and is LEFT-ALIGNED, starting at 7% in from the left edge and 5% down from the top.
+- The headline "No fuiste tú." is HUGE: its line spans about 62% of the frame width. It is by far the largest element in the picture — several times taller than any other line. Do NOT render it small or centred.
+- The thin line above it is roughly one fifth of the headline's height; the lines below it about one fifth as well.
+- The selection rectangle hugs the headline tightly with its eight handles on the corners and edge midpoints, and the teal "IA" label sits just outside its lower-right corner.
+- The lime button is about 40% of the frame width, with its descriptor line directly beneath it.
+Text is crisp, perfectly legible, correctly spelled Spanish, never warped and never handwritten.
+
+AUDIO — there is NO VOICE anywhere in this video. This is absolute:
+
+The character NEVER speaks. It has no mouth — it is a terminal with a screen for a face. There is no voice, no voice actor, no speech, no gibberish, no babbling, no singing, no chanting, no whispering, no crowd and no vocal performance of any kind. Nobody talks. Not one syllable in any language is uttered at any point. Its silence is the joke: it delivers a statement about someone else without saying anything at all.
+
+Instead the soundtrack is built from TWO layers only:
+
+1. SOUND EFFECTS SYNCED TO ITS MOVEMENT, in the classic cartoon scoring tradition where every gesture gets its own sound:
+   - a soft microphone thump at the very start;
+   - a light whoosh as it leans toward the microphones;
+   - a short bright accent — a xylophone or woodblock note — on the beat when its arm goes up to list a point;
+   - a small descending swipe as it makes the dismissive "that concludes it" gesture and its arms come down;
+   - a tiny soft mechanical click when the white cursor clicks the lime button;
+   - COMPLETE SILENCE, except the music, during the long still hold at the end. Nothing rattles, nothing beeps, nothing moves.
+   These are crisp, short and light. No comedy honks, no slide whistles, no boings, no cartoon slapstick.
+
+2. MUSIC: a short, pompous institutional newsreel fanfare — stately brass and strings in the style of a mid-century official announcement, solemn and self-important, as if something of great consequence were being declared. The comedy comes from that solemnity being completely out of proportion to what actually happens, which is nothing. Restrained and dignified, NOT wacky, NOT a cartoon chase, NOT celebratory, NO marching band, NO bagpipes, NO singing. It must loop perfectly: the final bar leads straight back into the first with no gap and no fade.
+
+Nothing else. No ending sting: the loop is continuous.
+
+Photographic, real physical object on a real set, subtle grain, true depth of field. Not a cartoon, not a 3D render.

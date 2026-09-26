@@ -27,7 +27,7 @@ habla; luego aplica la voz correcta, ubica el copy en su runtime y respeta las s
 | `JULIO_REYES_VOICE_SYSTEM.md` | Voz autoral de Julio, corpus, firma narrativa, running motifs y router Julio/Efeonce. Obligatorio para piezas firmadas o habladas por él. |
 | `COPYWRITING_BOUNDARY.md` | Sinergia + regla de precedencia vs UX-writing, growth-cro, digital-marketing, seo-aeo, efeonce-agency, email. |
 | `COPY_IN_THE_REPO.md` | `src/lib/copy/` SSOT + nomenclature + email copy; cómo el craft aterriza en runtime (craftear → tokenizar). |
-| `BILINGUAL_CRAFT.md` | Transcreación es-CL/en-US para clientes Globe internacionales. |
+| `BILINGUAL_CRAFT.md` | Transcreación es-CL/en-US para clientes Globe internacionales y localización a la variedad estándar de otro mercado hispano (p. ej. México). |
 
 ## Regla de una frase (repetida por seguridad)
 

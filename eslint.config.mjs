@@ -22,11 +22,19 @@ import prettierConfig from 'eslint-config-prettier'
 import importPlugin from 'eslint-plugin-import'
 
 import greenhousePlugin from './eslint-plugins/greenhouse/index.mjs'
+import { gitignoreIgnores } from './eslint-plugins/greenhouse/gitignore-ignores.mjs'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 export default [
+  /*
+    Lo que git no versiona, ESLint no lo juzga. Cierra la clase «un WIP o un artefacto ignorado de
+    otra sesión bloquea el pre-push de todos» (cinco veces; la última, una copia mutante del arnés
+    de CTA que `.gitignore` ya excluía). Ver `eslint-plugins/greenhouse/gitignore-ignores.mjs`.
+  */
+  gitignoreIgnores(resolve(__dirname, '.gitignore')),
+
   /*
     Ignore patterns. Equivalente flat-config del antiguo `ignorePatterns`
     en `.eslintrc.js` + ignores adicionales que en eslint 8 absorbia
@@ -391,6 +399,12 @@ export default [
       // dominio AEO + site-substrate sin imports de growth/*. Error desde commit-1
       // (cero violaciones verificadas); la rule universal es de TASK-1713.
       'greenhouse/growth-substrate-boundary': 'error',
+      // ISSUE-177 — todo src/** puede terminar en una función de Vercel (límite 250 MB). Del motor
+      // de composición sólo se importan TIPOS del barrel o valores de `@/lib/artifact-composer/pure`;
+      // ningún deep-import; y Playwright/pdf-lib/puppeteer sólo como tipo. `error` desde commit-1:
+      // los cuatro deep-imports vivos migraron a `pure` en el mismo cambio. El motor y los tests
+      // quedan exentos por path dentro de la propia regla.
+      'greenhouse/no-worker-only-module-in-vercel-code': 'error',
       // TASK-1033 — views/app/components NO importan @floating-ui/* directo;
       // consumir GreenhouseFloatingSurface. Mode `error` desde commit-1 (cero
       // violaciones en superficies de producto: pilotos migrados; el resto son

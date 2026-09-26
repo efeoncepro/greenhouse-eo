@@ -105,6 +105,7 @@ Leer solo lo necesario:
 - `references/metrics-and-scorecards.md` para métricas y scorecards.
 - `references/branding-as-a-service.md` para ofertas, delivery, pricing logic y handoff.
 - `references/research-sources-2026.md` para evidencia fechada, confianza y fuentes de investigación.
+- `references/graphic-line-orbit.md` para la línea gráfica «La órbita» de Efeonce: usos, reglas duras, tokens, artefactos y QA.
 
 Usar las plantillas de `templates/` cuando el usuario necesite un artefacto formal. Ejecutar `scripts/validate-brand-artifact.py` antes de cerrar entregables estructurados.
 
@@ -134,6 +135,45 @@ de fotografía, bokeh natural para la firma, tipografía y producción pertenece
 El [caso canónico](../../../docs/operations/social/2026-09-13-fiestas-patrias-production-method.md) distingue
 decisiones del operador, ejecución y evidencia; no tratar una aprobación estética como brand equity medido.
 
+### Línea gráfica «La órbita» (canónica 2026-09-25)
+
+La forma propia de Efeonce: anillo fino + arco con esfera + halo, nacida del isotipo. Tres usos: **rodea** (palabra,
+lente, objeto), **mide** (el arco es avance real) y **enfoca** (la lente y el foco «Te hacemos visible»). La familia
+(Efeonce, Globe, Wave, Reach) comparte la órbita y cambia el acento. Operar con
+[la referencia](references/graphic-line-orbit.md); contenido en el
+[manual V1](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) y decisión en el
+[ADR](../../../docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md).
+
+- **Qué decide esta skill:** alcance (marca propia y familia; **nunca** identidad de producto Greenhouse ni trabajo de
+  clientes), papel de la órbita en la pieza, voz pregunta-respuesta y su banco de pares, y el estado de evidencia.
+  **Qué decide `design-studio`:** composición, lente, foto y QA de píxeles; los valores salen de los tokens
+  `efeonceGraphicLine` de AXIS, **nunca** HEX/px transcritos.
+- **Reglas duras:** ningún texto cruza la órbita · una lente u órbita por pieza, muro o vidrio, nunca patrón · sin
+  dato real no hay arco · `efeoncepro.com` siempre en la burbuja oficial `url-lum`, nunca como texto · el logo en una
+  frase de display sólo alineado a línea base y altura de x · sin velo navy sobre fotos de banco.
+- **Estado:** **sistema consistente, NO activo distintivo demostrado**: la prueba de atribución sin logo (600
+  personas) no se ha corrido. «Te hacemos visible» no sale a pauta sin revisión legal.
+
+### Lenguaje fotográfico de marca (aprobado 2026-09-19)
+
+Sistema para la fotografía e imagen fotorrealista de **la marca propia Efeonce**: idea «El oficio a la vista» (la obra
+y el oficio de cada servicio, el sistema o dato y personas decidiendo; nunca reuniones genéricas), firma con primer
+plano desenfocado **planeado** y logo SVG oficial al 20 % del lado corto (25 % en 16:9 en piezas nuevas), y roles de color (azul activo = la casa, naranja = la idea,
+lima = el resultado). Aprobado por el operador el 2026-09-19.
+
+- **Qué decide esta skill:** papel de la marca, test de sustitución, que la paleta viva en luz y material (no en
+  vestir de navy), cuándo una pieza va **sin firma** (emblema legible o 3D de marca protagonista) y la evidencia de
+  reconocimiento. **Qué decide `design-studio`:** tomas, luz, color medido, lecho, composición y QA de imagen, según
+  [su referencia operativa](../design-studio/references/efeonce-photographic-language.md).
+- **Estado:** **sistema consistente**, **NO activo distintivo medido**. La prueba de reconocimiento (n≥100,
+  distractores coherentes, antes/después) está pendiente; NUNCA presentarlo como brand equity.
+- **Regla dura:** NUNCA anclar la serie en la categoría de un cliente real ni insinuar trabajo con un cliente (la
+  pintura se leyó como Berel: «nosotros NO somos Berel»). Variar industrias; nunca etiquetar con nombre de cliente.
+- Fuente: [lenguaje fotográfico V1](../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) ·
+  [índice](../../../docs/operations/brand-photography/README.md) ·
+  [manual de uso](../../../docs/manual-de-uso/marketing/fotografia-de-marca-efeonce.md). Referencias en OneDrive
+  `5. Contenidos/13- Branding/Lenguaje Fotografico Efeonce/v01/`.
+
 ### Isotipo 3D de Efeonce (biblioteca aprobada 2026-09-17)
 
 La nave (isotipo) existe en 3D en navy y blanco, aprobada por el operador, en OneDrive
@@ -159,7 +199,7 @@ del equipo: hay una cápsula por contexto**, decidida por el operador:
 
 | Contexto | Prenda |
 |---|---|
-| **Frente a cliente** (prenda principal) | polo piqué navy `#023c70` con **emblema bordado**, espalda limpia |
+| **Frente a cliente** (prenda principal) | polo piqué navy `#023c70` con **emblema bordado** al pecho y, desde el 2026-09-21, **logo + eslogan bordados en la espalda** |
 | **Reunión formal, comité, licitación** | camisa o blusa blanca + chaqueta softshell o blazer navy, emblema bordado discreto |
 | **Evento, feria, stand** | polera navy |
 | **Producción, terreno, grabación, streaming** | hoodie, polera royal y gorra |
@@ -182,6 +222,22 @@ ExtraBold itálica, *your* ExtraBold, *Growth* Black itálica) sobre el logo, y 
 texto a un modelo de imagen es cómo se pierde la ortografía y los pesos. Método y producción:
 [kit de referencia de prenda](../greenhouse-ai-image-generator/references/garment-reference-kit.md).
 
+### Gadgets, wearables y equipo de Nexa **[operador, 2026-09-21]**
+
+*«Nexa es tecnológica… sus accesorios deben ser siempre tecnología premium.»* Dos capas distintas:
+
+- **Signature elements** (identidad, viajan en toda pieza suya y los resuelve `foto:prompt`): anillo
+  geométrico plata mate en el **índice derecho** · **SMARTWATCH** en la muñeca izquierda —**nunca** un reloj
+  analógico— · aretes de **plata**, nunca dorados · uñas de un solo color.
+- **Props de escena** (se declaran en la `escena`): iPhone, iPad con Pencil, MacBook, Mac de escritorio,
+  AirPods · **DJI Osmo Pocket** y **Osmo Action** · **DJI Mic 3** o lavalier **Rode** · **Shure** en podcast ·
+  cuerpo **Sony α** o **Canon EOS R**.
+
+**Siempre la generación vigente, nunca un modelo descontinuado** — se nombran familias, no números de modelo.
+Encendidos y en uso, nunca de adorno; la silueta sí, **ningún logotipo de tercero legible**; un objeto manda
+por escena. No es atrezzo: el valor §1.3 del Character Bible es «tecnología con criterio», y los objetos son
+donde eso se ve sin decirlo. Canon: [props tecnológicos](../../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md).
+
 ### Sistema de credencial (lanyard, yoyo, portacarnet y carnet — aprobado 2026-09-17)
 
 La credencial es un asset de marca más, en OneDrive `5. Contenidos/13- Branding/Lanyard Efeonce/v01/`: cinta navy
@@ -195,3 +251,16 @@ vez del gris de marca `#848484`, que da 2,98:1 de contraste y no resuelve en ser
 da 7,06:1; «Growth» en blanco, 11,15:1). Es una excepción de legibilidad para sustratos oscuros impresos, **no
 drift**: en pantalla y sobre fondos claros el gris de marca sigue vigente. Método:
 [merch con arte impreso](../greenhouse-ai-image-generator/references/garment-reference-kit.md#merch-con-arte-impreso-y-piezas-mecánicas).
+
+## Recursos canónicos en anuncios Efeonce
+
+Para Nexa, mascotas, vestuario y espacios en Paid Media, aplicar el [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md). Separar referencia de identidad por ángulo, kit de prenda/objeto y plate. Verificar rasgos, accesorios, ropa y emblemas sobre el render; nombrar un recurso en el prompt no acredita su uso. La firma editorial proviene del SVG oficial y cierra al pie sobre materia real. No agrandar el lecho hasta borrar media escena. Conservar derechos y procedencia por uso previsto; Finales no significa pauta autorizada.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+Referencias de identidad/vestuario/mascotas/logos se registran con ruta, vista, versión y permiso por canal.
+Accesibilidad del archivo o aprobación orgánica no habilita paid. La firma editorial se compone desde recurso
+oficial. No inventar certificaciones, clientes, derechos o recursos para completar el brief.

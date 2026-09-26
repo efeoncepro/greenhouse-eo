@@ -1,5 +1,43 @@
 # TASK-1849 — Efeonce Insights: biblioteca, creación y experiencia web compartida
 
+## Delta 2026-09-25 (TASK-1889 code complete)
+
+- **El render ya compone con el diseño aprobado:** los catálogos `insights-report` e `insights-deck` sólo tienen
+  plantillas v2 (portada navy/blanca con logo, «Lo esencial», páginas de figura por familia vía
+  `src/lib/efeonce-insights/render/figure-slots.ts`); `report-analysis`/`insights-evidence` y
+  `render/figure-pages.ts` se retiraron. Una vista previa del builder debe mostrar estas páginas, no las v1. Para
+  revisar con datos reales: `scripts/insights/preview-edition.ts --editorial-v2`. — por trabajo en TASK-1889
+
+## Delta 2026-09-25 (TASK-1888 code complete)
+
+- **Ya existe (flag `INSIGHTS_EDITORIAL_V2_ENABLED` OFF):** command `setInsightCoverPreference` + reader
+  `getInsightCoverPreference` (`src/lib/efeonce-insights/commands/cover-preference.ts`), lanes
+  `GET/POST /api/platform/app/insights/cover-preference` (capability `insights.cover_preference.manage` para fijar,
+  `insights.report.read` para leer) y `brand.coverTheme` opcional en el encargo. El builder sólo los consume: la regla
+  vive en `resolveInsightCover` (`contracts/cover.ts`) y la portada queda sellada en `plan.cover`. La variante de logo
+  para fondo oscuro se carga con `POST /api/organizations/[id]/brand-assets/logo` `{ variant: 'on_dark' }`; no tiene
+  UI todavía. — por trabajo en TASK-1888
+
+## Delta 2026-09-25
+
+- TASK-1847 cerrada (complete 2026-09-25): catálogos `insights-report` e `insights-deck` en producción desde el
+  2026-09-24 y render productivo de A4 y deck verificado con datos reales. Se retira de `Blocked by`. El rediseño
+  premium aprobado por el operador vive en TASK-1888/TASK-1889. — cerrado por trabajo en TASK-1847
+- **Rediseño Insights (planificado, no construido).** El builder (S2) expone el cambio opcional de portada en el
+  encargo — `InsightBrandV1.coverTheme?: 'auto' | 'dark' | 'light'`, dentro del mismo `InsightRequestV1` (sin él, el
+  hash del encargo no cambia) — y muestra la preferencia de portada por cliente; si esta task ofrece editarla, lo hace
+  con el command `setInsightCoverPreference` y su reader (TASK-1888, Slice 5). Es **consumer** del contrato de
+  TASK-1888, sin lógica propia: la regla (`encargo > preferencia del cliente > auto`, con `auto` = navy sólo si el
+  cliente tiene logo apto para fondo oscuro) y el sellado en la edición viven en el dominio; la UI no decide ni
+  recalcula la portada. Si la biblioteca o el detalle dibujan gráficos, respetan los mismos roles de color de datos que
+  los PDF (actual / anterior / oportunidad / ausencia con rayado), según la dirección visual de TASK-1889. Master flow
+  actualizado: `docs/ui/flows/EPIC-045-efeonce-insights-UI-FLOW.md` (delta 2026-09-25). — por trabajo en
+  TASK-1888/TASK-1889
+
+## Delta 2026-09-18
+
+- **TASK-1848 en producción 2026-09-18** (release `bda1cf2cd938`, flags OFF en producción; ON en staging): ya existen en el lane App `/api/platform/app/insights/**` las rutas de **shares** (crear/listar/revocar), **deliveries** (crear, leer, cancel/retry/reconcile) y **schedules** (crear, leer, activate/pause/retire); ecosystem y MCP sólo leen envíos y recurrencias. Errores de lane: 503 `sharing_disabled|delivery_disabled|schedules_disabled`, 429 `quota_exceeded`, 409 `not_ready`. La modalidad de envío **`portal_link` responde `not_ready` hasta que esta task construya la ruta de la edición en el portal**. In-app/Teams siguen fuera de V1 (TASK-690–693 / esta task). Ya no bloquea: queda TASK-1847. — por TASK-1848
+
 ## Delta 2026-09-15
 
 - **Decisión del operador (ADR delta 2026-09-15):** la vista web compartida NO se construye en Greenhouse: se renderiza en `efeonce-think` desde `InsightWebModelV1` (endpoint público de TASK-1848). Esta task conserva biblioteca/builder/detalle del portal + presentación email en Greenhouse, y la experiencia compartida como slice ejecutado en el repo `efeonce-think` (mismo modelo de trabajo que TASK-1325). Los criterios de GVC/estados (expirado/revocado/unknown) aplican allá; el `StatusScreen` de Think ya cubre `not_found`/`gone`. **Ese slice tiene ID propio: TASK-1875** (nodo S6 del master flow `docs/ui/flows/EPIC-045-efeonce-insights-UI-FLOW.md`); esta task conserva S1–S5 y S7 y el botón «Copiar enlace» apunta a la URL de 1875.
@@ -31,7 +69,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui|agency`
-- Blocked by: `TASK-1847, TASK-1848`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin branch dedicada ni worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

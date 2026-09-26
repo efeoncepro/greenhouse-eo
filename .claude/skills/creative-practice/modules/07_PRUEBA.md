@@ -1,4 +1,4 @@
-# 07 · Prueba sin mentir — no tenemos portafolio citable, y eso nos obliga a probar mejor
+# 07 · Prueba sin mentir — un caso de delivery publicado (SKY), sin caso de negocio todavía, y eso nos obliga a probar mejor
 
 ## Addendum Creative Velocity
 
@@ -13,8 +13,10 @@ Para Embedded Creative Capacity, el proof debe demostrar no sólo calidad y deli
 pod, adopción de rituales, mejora de brief, feedback accionable, tiempo de aprobación, confianza del equipo interno y
 memoria reutilizada.
 
-> ## ✅ SKY ya puede nombrarse como caso de éxito autorizado.
-> **`efeonce/ESTADO_ACTUAL.md` § 6 lo dice sin adornos.** Este módulo no existe para tapar eso.
+> ## ✅ SKY ya puede nombrarse como caso de éxito autorizado — y su caso creativo está publicado.
+> **Actualización 2026-09-23:** `https://experiencia.efeoncepro.com` muestra el caso con métricas de entrega
+> *(ver tabla § 1)*. **`efeonce/ESTADO_ACTUAL.md` § 6 dice sin adornos lo que falta:** métrica de negocio, baseline
+> del día 0 y autorización escrita para citarlo fuera del wrapper. Este módulo no existe para tapar eso.
 > Existe porque **la prueba que sí tenemos es mejor que un portafolio — y casi nadie la puede copiar.**
 
 ---
@@ -23,11 +25,13 @@ memoria reutilizada.
 
 | Lo que tenemos | Lo que NO tenemos |
 |---|---|
-| ✅ **SKY** — cliente real, licitación Wherex, **TCV CLP 124,8M / 2 años** | 🔴 Es trabajo de **contenido/SEO**, no de creatividad de marca |
+| ✅ **SKY — Blog SEO/AEO** — licitación Wherex **adjudicada 2026-09-23**, **TCV CLP 72M neto / 24 meses** *(equipo de Marca; la cifra de 124,8M era de la oferta original, superseded)* | 🔴 Es trabajo de **contenido/SEO**, no de creatividad de marca |
+| ✅ **SKY — Agencia Creativa** — retainer desde ago-2025 con el **equipo de Performance**, **renovado por un año más**. **Actualización 2026-09-23: caso PUBLICADO** en `https://experiencia.efeoncepro.com` — +2.000 piezas aprobadas · 39 campañas · 88% on-time · 0,12 ajustes/pieza · 5 mercados · −25% tiempo de producción | 🔴 Son métricas de **entrega/operación**, no de negocio del cliente; **sin baseline del día 0**; autorización escrita para citarlo **fuera del wrapper** sin verificar |
 | ✅ **Bresler** — **+180% de tráfico orgánico** *(dato duro)* | 🔴 Es **SEO**, no creativo |
 | ✅ **Berel** — cliente real | 🔴 Sin caso creativo formalizado |
 | ✅ **Informe AI Visibility de SKY** — público, con URL *(overall 73,3 · citation quality 90,9)* | 🔴 Prueba **visibilidad**, no que sepamos **diseñar** |
-| — | 🔴 **Casos creativos con métrica de negocio verificable + autorización: NINGUNO.** |
+| ✅ **Caso Travel Sale · Sky Airline** *(Notion `MET-1530`, aprobado, mar-2026)*: 4 mercados + Brasil, 178 piezas (66 de Efeonce), −21–25% tiempo de campaña, 27 piezas (9 videos) actualizadas en 10 min | 🔴 Métricas de **eficiencia de producción**, no de negocio del cliente; citarlo fuera exige autorización escrita |
+| — | 🔴 **Casos creativos con métrica de NEGOCIO verificable + autorización escrita confirmada: NINGUNO todavía.** *(SKY prueba delivery, no resultado de negocio.)* |
 
 > ### Un mockup lindo en un deck NO es un caso.
 > Es una imagen. **No prueba que salió, ni que sirvió, ni que el cliente nos deja contarlo.**
@@ -175,7 +179,9 @@ que no te vamos a maquillar el reporte, y **le da al comité la frase con la que
 
 ## 6. 🔴 El plan para tener casos: el caso arranca el DÍA 1, no al final
 
-**No tenemos casos porque no los diseñamos. No porque no hicimos el trabajo.**
+**Casi no tenemos casos porque no los diseñamos. No porque no hicimos el trabajo.** *(Actualización 2026-09-23: el
+de SKY existe y está publicado, pero se armó desde la telemetría de entrega y sin baseline de negocio del día 0 —
+justo lo que este plan evita.)*
 
 | # | Paso | Cuándo | Dueño |
 |---|---|---|---|
@@ -199,7 +205,8 @@ regla 10)*. **Es:** *"su operación creativa pasó de {X rondas / {Y} días / {Z
 ## 7. Reglas duras
 
 1. 🔴 **Un mockup no es un caso.** Métrica verificable + relación sana + autorización escrita, o no se cita.
-2. 🔴 **Nunca insinúes trabajo creativo donde hubo SEO.** *(SKY y Bresler son casos de contenido/SEO.)*
+2. 🔴 **Nunca insinúes trabajo creativo donde hubo SEO.** *(El Blog de SKY y Bresler son casos de contenido/SEO;
+   la Agencia Creativa de SKY sí es creativa. No cruces la evidencia de uno al otro.)*
 3. 🔴 **La autorización se pide en el contrato.** Después es un favor, y el favor se niega.
 4. 🔴 **Nunca muestres `Creative Hub`, `ROI Reports`, `Exports` ni ningún viewCode sin página.**
 5. 🔴 **Nunca digas que todos los clientes ya usan el portal.** *(Login activo declarado: 0%.)*

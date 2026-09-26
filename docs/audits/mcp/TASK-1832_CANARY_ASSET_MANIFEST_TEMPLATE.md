@@ -74,6 +74,25 @@ Una fila por `producto + versión + local|hospedado`:
 El logo del correo y el icono MCP son assets distintos. El primero se prueba en el mensaje recibido; el segundo
 depende de la metadata serializada y de que el cliente lo renderice. No marques uno verde con evidencia del otro.
 
+## Clientes OAuth y muestras por sujeto
+
+Completar antes del primer write. Un cliente sin clasificar bloquea la corrida.
+
+| Cliente | Registro | Ownership | Cleanup | Dry-run por sujeto antes de invitar |
+| --- | --- | --- | --- | --- |
+| `PENDIENTE` | DCR `software_id=run_id` o CIMD | `run_owned` o `shared` | por `client_id` o por environment + sujeto | `PENDIENTE` |
+
+Muestras de observación, siempre filtradas por los sujetos exactos de la corrida y sin huecos hasta la
+revocación:
+
+| Muestra UTC | Sujetos | Eventos por sujeto | Señales agregadas del cliente (sólo contexto) | Perfil DB del dry-run |
+| --- | --- | --- | --- | --- |
+| `PENDIENTE` | fingerprint truncado | `PENDIENTE` | no se usan como blocker sin correlación | `ops` |
+
+Gates y carril de apagado: `EXTERNAL_IDENTITY_CANARY_ENABLED` (repo var GitHub + `auth-server-deploy.yml`,
+Vercel Production + redeploy) y `MCP_NATIVE_EXTERNAL_CANARY_ENABLED` (environment `production` de
+`efeonce-mcp` + `deploy.yml`).
+
 ## Preflight de eliminación
 
 - [ ] Gates canary OFF o registro revocado; no existe dispatch autorizado.

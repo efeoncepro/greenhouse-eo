@@ -1,0 +1,20 @@
+{
+  "id": "E-estudio-como-oficio",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "objetos": [
+    "hoodie-efeonce"
+  ],
+  "escena": "SCENE (a photography studio of the agency, mid-shoot): this is a WORKING SET, not a clean backdrop. The frame is built around the LIGHT ITSELF: a large softbox stands INSIDE the picture on the LEFT, RIGGED LOW — the way a small object is actually lit: its arm is dropped so the whole panel sits between knee and chest height, angled DOWN towards the block, and its TOP EDGE stays clearly BELOW THE MIDDLE OF THE FRAME. Its diffusion panel is turned towards the subject and glows as the brightest thing in the room — it is visible as the physical source, with its metal speedring, its black fabric edge and its stand and sandbag on the floor. A second smaller strip light sits further back at the right, switched on but dimmer, and also rigged LOW, its top edge below the middle of the frame. Everything the camera sees is lit BY those two lamps and nothing else: the fall-off across the floor is steep and readable, and the far side of the room sinks into darkness. In the middle of that light, on a low concrete block on the seamless paper, stands the SUBJECT OF THE SHOOT: a small stack of printed brand pieces — folded cards and a flat printed sheet, no text legible at this size — arranged with a tweezer that rests beside them. A member of the team in the royal blue Efeonce hoodie stands at the left, half inside the light and half in shadow, one hand ON the softbox arm and the head turned away from the camera towards the block, checking what the light is doing to the edge of the paper; her face is in three-quarter profile, lit only by the spill of the panel. Behind her, at waist height and out of the key light, a tethered monitor on a rolling stand shows the frame she just shot, small and dim. The seamless paper curves up behind everything into a clean ink-blue field that fills the whole TOP THIRD of the picture, unbroken: no lamp, no softbox, no stand, no cable, no monitor and no light patch may enter that band, and no glow from the lamps may wash up into it — it is one unbroken, evenly dark field of ink blue from the left edge to the right edge — the softbox, the strip light and every pool of light they throw stay BELOW THE MIDDLE OF THE FRAME. The room is a real studio: a power cable taped down along the floor, one C-stand parked at the back, nothing else. Everything is completely unbranded except her hoodie. 50mm at f/2.8 from a metre and a half, focus on the printed pieces on the block.",
+  "lecho": {
+    "objeto": "the black rubber-and-steel base of a light stand crossing the ENTIRE bottom of the frame from left edge to right edge, a hand's width from the lens",
+    "tono": "DEEP MATTE BLACK, even across its whole width — NOTHING else appears in that bottom strip: no cable, no gaffer tape, no highlight, no reflection"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the clean ink-blue seamless paper curving up behind the set and filling the top third",
+      "tinta": "blanca"
+    }
+  }
+}

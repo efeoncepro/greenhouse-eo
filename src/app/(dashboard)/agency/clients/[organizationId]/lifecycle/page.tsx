@@ -24,6 +24,8 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { requireServerSession } from '@/lib/auth/require-server-session'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import type { SearchConsoleConnectionPanelConnection } from '@/views/greenhouse/agency/clients/SearchConsoleConnectionPanel'
+import type { Ga4ConnectionPanelData } from '@/views/greenhouse/agency/clients/Ga4ConnectionPanel'
+import { getGa4Connection, isGa4Enabled } from '@/lib/growth/analytics-ga4'
 
 export const metadata: Metadata = { title: 'Ciclo de vida del cliente | Greenhouse' }
 export const dynamic = 'force-dynamic'
@@ -53,18 +55,21 @@ const Page = async ({ params }: { params: Promise<{ organizationId: string }> })
   const { organizationId } = await params
   const canManageSearchConsole = can(subject, 'growth.search_console.connect', 'execute', 'tenant')
   const searchConsoleEnabled = isSearchConsoleEnabled()
+  const canManageGa4 = can(subject, 'growth.ga4.connect', 'execute', 'tenant')
+  const ga4Enabled = isGa4Enabled()
 
   let data: LifecycleTimelineData | null = null
   let organizationName = 'Cliente'
   let degraded = false
   let searchConsoleConnection: SearchConsoleConnectionPanelConnection | null = null
+  let ga4Connection: Ga4ConnectionPanelData | null = null
   let checklist: LifecycleChecklistItemVm[] = []
   let notionAnchors: { notionDatabaseId: string; title: string }[] = []
   let teamsAnchor: { teamId: string; teamName: string } | null = null
   let caseId: string | null = null
 
   try {
-    const [timeline, name, activeCase, searchConsole] = await Promise.all([
+    const [timeline, name, activeCase, searchConsole, ga4] = await Promise.all([
       getLifecycleTimelineForOrganization(organizationId),
       getOrganizationDisplayName(organizationId),
       getActiveCaseForOrganization(organizationId, 'onboarding'),
@@ -75,6 +80,14 @@ const Page = async ({ params }: { params: Promise<{ organizationId: string }> })
         })
 
         return null as SearchConsoleConnection | null
+      }),
+      (ga4Enabled ? getGa4Connection(organizationId) : Promise.resolve(null)).catch(error => {
+        captureWithDomain(error, 'growth', {
+          tags: { source: 'client_lifecycle:ga4_connection_panel' },
+          extra: { organizationId }
+        })
+
+        return null
       })
     ])
 
@@ -90,6 +103,12 @@ const Page = async ({ params }: { params: Promise<{ organizationId: string }> })
           lastErrorCode: searchConsole.lastErrorCode
         }
       : null
+    ga4Connection = ga4 ? {
+      organizationId: ga4.organizationId,
+      propertyId: ga4.propertyId,
+      propertyName: ga4.propertyName,
+      status: ga4.status
+    } : null
 
     if (activeCase) {
       caseId = activeCase.caseId
@@ -139,6 +158,9 @@ const Page = async ({ params }: { params: Promise<{ organizationId: string }> })
       searchConsoleConnection={searchConsoleConnection}
       searchConsoleEnabled={searchConsoleEnabled}
       canManageSearchConsole={canManageSearchConsole}
+      ga4Connection={ga4Connection}
+      ga4Enabled={ga4Enabled}
+      canManageGa4={canManageGa4}
     />
   )
 }

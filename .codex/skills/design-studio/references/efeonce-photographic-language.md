@@ -1,0 +1,642 @@
+# Lenguaje fotográfico de Efeonce — guía operativa para dirigir
+
+Cargar cuando el trabajo sea **fotografía o imagen fotorrealista de la marca propia Efeonce** (redes, web,
+KV, piezas de equipo, espacios, objetos o 3D en escena). No aplica a clientes: cada cliente tiene su lenguaje.
+Aprobado por el operador (Julio Reyes) el **2026-09-19** («todas me gustaron»). Esta guía condensa lo operativo;
+el contrato completo, las mediciones y los prompts verbatim viven en la documentación canónica (§14).
+
+> **Estado honesto.** Es un **sistema consistente aprobado**, **no un activo distintivo medido**. Falta la prueba
+> de reconocimiento (n≥100, distractores coherentes, antes/después). NUNCA afirmar que «se reconoce como Efeonce».
+
+## Preflight visual obligatorio antes de generar
+
+**Leer esta guía no sustituye mirar las imágenes que aprobó el operador.** Abre la hoja
+`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg` cuando salgan
+Julio o Nexa, la hoja `rondas/curado/set-curado-12.jpg` para la serie de color y al menos dos finales individuales
+comparables a tamaño completo. Antes del prompt, registra los archivos que viste y la comparación concreta:
+oficio/momento, cómo viven el azul activo y el naranja **o** lima en la composición, lecho desenfocado, firma y rasgos
+de identidad. Declara en la ficha su relación natural con luz, reflejos, materiales, superficies y planos de la
+escena; ningún color exige un objeto propio ni utilería añadida para cumplir la paleta. **Un HEX en un bloque
+genérico no basta**. Después de generar, mira el plate junto a las aprobadas y usa las métricas como apoyo, no como
+cuota de píxeles: un acento visible en sombra puede medir poco. Si la relación cromática se siente forzada, el color
+desaparece visualmente o el lecho falla, vuelve a dirigir y regenera; no lo declares aprobado. Canon operativo:
+[pipeline §0](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
+
+## 1. La idea: «El oficio a la vista»
+
+Se fotografía **la obra y el oficio de cada servicio** (Creative, Growth, RevOps/CRM, Media, Digital/Wave,
+Channel & Commerce), **el sistema o el dato** que lo sostiene y **personas decidiendo**. Nunca reuniones genéricas.
+Objetivo del operador: que la foto y su colorimetría se sientan de la agencia, **premium, de clase mundial**.
+
+Arquetipos a evitar: **consultora** (talleres, post-its, mesas genéricas), **performance** (dashboards sin idea),
+**creativa pura** (oficio sin sistema). La V2 de «salas tonales + gente en mesas» se rechazó por genérica.
+
+## 2. Barra de juicio (cada pieza la pasa o se rehace)
+
+1. **Test de sustitución:** con el logo de otra agencia deja de funcionar.
+2. **Hay obra** (algo que Efeonce hace), **hay mecanismo** (sistema, traza, dato) y **hay idea** (situación con tensión).
+3. Funciona en los **3 modos** (equipo con uniforme, equipo sin marca, sin personas: objetos/espacios/3D) y a **390 px**.
+4. **Verdad operativa:** nada que no hagamos; nada que parezca stock.
+5. **Paleta = luz y material, no ropa.** «La colorimetría no es vestir de navy».
+6. **Regla madre:** «una buena imagen de IA es la que no se siente que es IA».
+
+> Esta barra es la del **registro documental**. El de **puesta en escena** tiene la suya, y juzgar una pieza con la
+> barra del otro registro es el error que describe la sección siguiente.
+
+## Registros A/B y extensión C — la barra depende del mensaje
+
+El canon V1 describió **un** registro. Existían dos, y el segundo ya estaba publicado y aprobado sin estar escrito:
+de ahí la sensación del operador de que «el lenguaje me limita» al intentar meter una pieza del segundo por la
+puerta del primero.
+
+**Se decide ANTES de producir, con una sola pregunta: ¿la foto ES el mensaje, o es el SOPORTE de una idea?**
+Y se reconoce a simple vista por **si el sujeto mira al lente**.
+
+### A · Documental — «el oficio a la vista»
+
+Es §1 y §2 de esta guía: obra, mecanismo y personas decidiendo. La foto **es** el mensaje, **nadie mira al lente**
+y se juzga con los **siete criterios completos**. Sirve para credibilidad: sitio, piezas de equipo, «esto es lo que
+hacemos». Evidencia nueva: `F-podcast-v1.png` (la escucha) y `E-estudio-v2.png` (el estudio en operación).
+
+### B · Puesta en escena
+
+La foto **no documenta nada, y no tiene por qué**: su trabajo es que la idea entre en dos segundos. Lo que cambia
+en la dirección de arte es acotado y concreto: **composición armada** en vez de encontrada · **sujeto centrado** ·
+fondo **controlado** · **aire reservado para el titular** · elementos de marca —mascotas, cursores, caja de
+selección, tipografía— **en la escena o encima** · y **el sujeto SÍ mira al lente**, que es el marcador del
+registro. Barra propia: **idea clara · marca sostenida · texto legible · identidad y colorimetría intactas**.
+Evidencia: «¿Claude o Codex?», el KV de Clawd, `copiloto`, `G-podcast-v5.png`.
+
+**«¿Claude o Codex?» está publicada, aprobada y funciona, y NO pasa la barra de §2** **[medido]**: no hay obra, no
+hay mecanismo, y el test de sustitución queda **parcial** —lo anclan las mascotas de partner y el polo—. No es una
+excepción ni un error: es el otro registro.
+
+### C · La respuesta a la vista
+
+El [maestro, registro C](../../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#delta-2026-09-21-tarde--tercer-registro-c--la-respuesta-a-la-vista) incorpora como sujeto la respuesta y quien la encarna: Nexa, criatura del motor u objeto digital. Si hay persona, recibe la respuesta, sin protagonismo corporativo genérico. Debe significar sin titular y conservar identidad, materia, luz, color, reservas y firma. C no es un filtro ni una licencia para HUD/scrims. La mirada al lente distingue casos A/B; no basta para clasificar C.
+
+### Qué NO cambia entre uno y otro
+
+Identidad y set de referencias · **código de vestuario por el registro de la escena** · el bloque de realismo («no
+se siente IA», sin suciedad) · **la colorimetría entera** —sin grade, sin navy en ropa grande, sin paneles azules
+grandes de fondo, lámparas prácticas apagadas, acento cálido 1 de cada 2— · la firma · **las seis reservas del
+plate** · y **el bloque de impacto**.
+
+### 🔴 La puesta en escena también lleva el bloque de impacto **[decisión del operador, 2026-09-21]**
+
+> «la de puesta en escena necesito un poco las palancas del documental no? luz, etc etc etc impacto»
+
+Un retrato centrado, bien expuesto y sin más, **queda plano**: es exactamente `G-podcast-v2.png`, correcta y sin
+nada. Lo que lo corrige, medido en la misma ficha (`G-podcast-v4/v5.png`):
+
+- **Luz con carácter** — llave **dura y baja muy a la izquierda**, rasante, con un lado del rostro en sombra
+  abierta y la sombra de la nariz legible en la mejilla; **segunda fuente detrás y baja** que recorta un rim en el
+  pelo, el hombro y el micrófono, separándola de la pared.
+- **Atmósfera** — `bruma`, con el haz de la contra **visible** cruzando la sala. El haz, su resplandor y **cada
+  mancha que proyecta** quedan **bajo la mitad del cuadro**; arriba va el campo limpio del titular.
+- **Tres planos** — primer plano desenfocado · sujeto nítido · al fondo, fuera de foco, un segundo brazo con pop
+  filter tomando el rim, para que la sala tenga profundidad en vez de ser una pared plana.
+
+Y la firma tampoco se negocia: en el retrato centrado 4:5 la banda de texto y el lecho **compiten por el alto**
+—tres pasadas de encuadre y ninguna cerró las dos—, y firmar sobre el muro está **descartado** («la puesta en
+escena también debe tener lecho igual que la documental»). La salida es **un objeto del oficio en primer plano,
+fuera de toda luz**: el micrófono del invitado cruzando el borde inferior dio **banda 0,34 y lecho 8,32** en la
+misma pieza.
+
+### El «estudio como oficio»: la vía que acopla el look de estudio **[medido]**
+
+**Un retrato contra fondo liso falla cuatro de los siete criterios** —obra, mecanismo, idea y paleta en la
+composición— y choca con dos prohibiciones explícitas de esta guía: «salas tonales genéricas» y «paneles azules
+grandes de fondo». El estudio no está prohibido: **el fondo liso no es el estudio**.
+
+La vía que sí acopla es **fotografiar el estudio EN OPERACIÓN** — el ciclorama con la luz montada, el softbox,
+alguien corrigiendo, el monitor con la toma ya tirada. Cumple la barra entera y encaja en la tabla de servicios
+bajo Creative Services. Evidencia: `E-estudio-v2.png`, palanca `luz-motivada`.
+
+**Regla que salió de ahí — la lámpara se riggea BAJA** **[medido]**: `luz-motivada` pide fuente visible y que sea lo
+más brillante del cuadro; la reserva pide el tercio superior limpio. Con el softbox a la altura del pecho la banda
+midió **0,00** (inservible); riggeado **entre rodilla y pecho** —que además es como se ilumina de verdad un objeto
+pequeño— sube a **0,28**. **Con fuente visible en cuadro: lámpara baja, o no hay banda de texto.**
+
+## 3. La firma: lecho planeado + logo compuesto
+
+- El primer plano desenfocado es una **herramienta o superficie del oficio** entre cámara y sujeto,
+  **planeada en la toma** (va en el prompt como `FOREGROUND`). NUNCA se añade después.
+- **Declarar SIEMPRE el tono del lecho** («DARK near black» / «VERY LIGHT almost white»). La madera de tono medio
+  (lum 139–171) produjo 6+ fallos: el logo no pasaba ni en blanco ni en navy.
+- **Medir** nitidez dentro del lecho (p99 Sobel): **p99 ≤ ~20 (máx ≤ ~25)**, muy por debajo del rostro (200–780).
+  Transición gradual (≥5% del alto); cortes de 1–3% se leen como «banda». Si falla, **se regenera**.
+- **Logo:** SVG oficial (`public/branding/logo-negative.svg` blanco / `logo-full.svg` navy `#023c70`), compuesto
+  determinísticamente, **centrado horizontal**, centro vertical ≈ **93,5%** del alto en 4:5, **ancho 20%** del lienzo
+  (decisión del operador 2026-09-20). Color por contraste medido: blanco contra el píxel más claro del área,
+  navy contra el más oscuro; **mínimo 4,5:1**.
+- **Sin firma** cuando el emblema bordado se lee a tamaño de consumo (polo) o un 3D de marca es protagonista.
+  **Una sola marca protagonista por foto.**
+- En feed, **alternar lechos claros/oscuros y materiales**: la misma banda repetida se vuelve plantilla.
+
+Lechos probados: borde de mesa a ras del lente · respaldo de silla del espectador («tu lugar en la mesa») ·
+escritorio del visitante · matte box / rig · consola de corrección de color · borde de mesa de luz · fila de
+latas/botellas («casi tocando el lente, f/1.4, sin bordes», o sale nítido) · marco de vidrio · maleta de equipo
+en el piso · techo de auto sin logos · cabezas del público · cámara de estudio · mostrador de fruta ·
+**desenfoque óptico del tilt-shift** (el más natural) · borde curvo de mesa en ojo de pez.
+Dron o tomas todo-enfocadas: sin lecho; firma sobre pavimento sereno claro — **decisión pendiente** (¿url-lum?).
+
+Detalle: [firma y primer plano](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md)
+y [brand-in-scene](../../social-media-studio/references/brand-in-scene.md).
+
+### Selección colaborativa AXIS (recurso, ~1 de 3 piezas)
+
+Cursores con nombre sobre el **objeto real**, vía `renderCollaborationSelection` +
+`resolveCollaborationSelectionIntent` (nunca coordenadas decorativas). Etiquetas cortas: Arte (naranja `#F55D01`),
+Cliente (lima `#6EC207`, aprueba), RevOps/Efeonce (azul `#0375DB`), Nexa (`#d6246e`), SEO (`#12afa2`).
+Anclas hacia el espacio libre; mejor sobre objetos grandes que sobre UI chica. **NUNCA** el nombre de un cliente real.
+
+## 4. Roles de color
+
+| Color | Rol | Cómo aparece |
+|---|---|---|
+| Azul activo `#0375DB` | **La casa**, en todas | relación cromática integrada en luz, reflejos, materiales o planos de la escena; puede leerse como acento o campo |
+| Naranja `#F55D01` | **La idea**, momento creativo | señal cromática nacida de la acción o de la composición; no requiere utilería naranja |
+| Lima `#6EC207` | **El resultado** | señal cromática nacida del resultado o de la composición; no requiere tarjeta ni check |
+
+- **Un solo acento** (naranja o lima) por pieza además del azul, nacido de la situación. El 1–5% **a ojo**
+  orienta la lectura, no obliga a fabricar un objeto ni es un umbral de aprobación de `metricas.cjs`. Una relación
+  entre áreas, un reflejo o una luz pueden llevarlo con naturalidad. Utilería puesta (jarrón o libro naranja) se lee
+  falsa; la taza azul repetida en 3–4 piezas fue sesgo.
+- **Los objetos sí son válidos** cuando pertenecen al oficio o al lugar y aportan un acento sutil y elegante.
+  Evaluar su función y cómo se integran con luz, personas y espacio; «no obligatorio» nunca significa «prohibido»
+  **[aclaración del operador, 2026-09-20]**.
+- Azul **nunca intermedio en ropa grande** (camisa 16%, hoodie 17% = demasiado).
+- Navy **nunca** en pared + ropa + logo a la vez; uniforme navy sobre set **no** azul (se funde con tinta).
+- HEX en prompt se interpreta laxo (ΔE 15–19): **pedir por material** («dusty matte deep ink blue, low sheen»).
+
+Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_COLORIMETRY_V1.md).
+
+## 5. Balance de blancos y exposición
+
+- **Sin grade.** El grade «Navy Shadow» (V0) fue rechazado: color natural. Si falla, **se regenera**; corrección
+  técnica mínima sólo si es imprescindible.
+- **Neutro-cálido ~5200 K**, blancos levemente cálidos, **sombras neutras, nunca azules**. **Exponer para las altas
+  luces** (un KV pasó de 31,5% quemado a 0,05%).
+- Lámparas prácticas encendidas dan look podcast-stock: en sets oscuros, apagadas o puntuales.
+- Rangos objetivo (script de métricas Lab, pieza a 576 px): quemado ≤ 0,5–1% (contraluz ≤ 2–3%); aplastado ≤ 5%
+  (clave baja ≤ 8%, pedir «shadows deep but always with visible texture»); contraste p95−p5 70–90 en piezas de
+  impacto; croma p95 ≤ ~40 salvo campo azul; b\* altas +2 a +12; b\* sombras −3 a +3; piel L 44–61, C 18–31.
+  La dispersión de tono es **control, no bloqueo**.
+
+## 6. Palancas de impacto (nivel +1)
+
+«El impacto viene de la luz y la composición, no del modelo»:
+
+- **Luz con carácter:** haz de sol duro, sombras gráficas (persianas), contraluz, hora dorada, mediodía duro.
+- **Momento decisivo:** harina en el aire, risa real, celebración, gesto a mitad.
+- **Composición gráfica:** geometría, marco dentro del marco, escala (persona pequeña en espacio grande), espacio negativo.
+- **Tres planos de profundidad** (lecho · sujeto · fondo) y **bloque de color** cuando el azul es campo.
+- **Atmósfera** — aire con materia cuya función es **hacer visible la luz**: `polvo` dentro del haz, `bruma` que
+  para los rayos como columnas sólidas, `vapor`, `humo` de escena a contraluz. **Exige un haz declarado**: sin
+  luz con dirección no tiene qué revelar y se lee pegada (`pnpm foto:prompt` aborta). El polvo vive **sólo dentro
+  de la luz**, nunca como suciedad. Es la palanca de mayor retorno **[medido 2026-09-20]**.
+- **Acción suspendida** — congelar **lo que está en vuelo** en el pico de su arco, con peso y trayectoria reales;
+  nunca un esparcido decorativo ni confeti. Se declara QUÉ vuela, en concreto. **Dosis: 1 de cada 4 piezas**
+  **[decisión del operador]**; el comando cuenta la tanda y avisa con el número si se pasa.
+
+- **Punto de vista subjetivo** (`palanca: pov`) — la cámara **ocupa el lugar de la persona con la que se
+  trabaja**: el asiento del cliente, la silla del visitante, a altura de ojos sentado. Es el Why de Efeonce hecho
+  encuadre y **la que mejor pasa el test de sustitución**: otra agencia no la copia sin tener esa idea.
+- **Manos como sujeto** (`palanca: manos`) — sólo manos y antebrazos, **ni una cara ni siquiera desenfocada**.
+  Da piezas sin depender de identidad y mata el casting de modelo.
+- **Luz motivada** (`palanca: luz-motivada`) — la luz sale de una **fuente visible en cuadro** (monitor, práctica,
+  ventana) con caída visible. Es lo que separa luz real de un grade, que el operador rechazó.
+- **Larga exposición** (`palanca: larga-exposicion`) — **duración acumulada** en vez de instante: estelas, con un
+  elemento nítido que ancla. **No tiene momento decisivo** y es correcto que no lo tenga.
+- **Oclusión** (`palanca: oclusion` + `ocluye`) — la cámara **miró desde detrás de algo**. Debe cubrir **una parte
+  real** del sujeto: pedida a medias se lee «hay algo delante» y la palanca se anula **[medido]**.
+- **Silueta** (`palanca: silueta`) — contraluz que **borra el rostro**: deja el gesto y quita la identidad.
+- **Reflejo** (`palanca: reflejo`) — dos realidades en un cuadro a través de un vidrio, **ambas visibles a la vez**.
+- **Ausencia** (`palanca: ausencia`) — **no hay nadie**; queda la huella del trabajo recién ocurrido. Sin momento,
+  y es correcto.
+- **Fragmento** (`palanca: fragmento` + `corta`) — el sujeto **no cabe**. «Radical» no significa nada: se declara
+  **por dónde corta el borde**.
+- **Instrumento** (`palanca: instrumento` + `instrumento`) — a través de la herramienta del oficio (lupa, visor,
+  prisma). **Pasa el test de sustitución por construcción**.
+- **Cenital** (`palanca: cenital`) — perpendicular sobre la mesa, oficio en curso, manos por los bordes. Sin lecho.
+- **Suelo oblicuo** (`palanca: suelo-oblicuo`) — la cámara **apoyada en el piso**, ladeada y rotada.
+- **Little planet** (`palanca: little-planet`) — proyección estereográfica: horizonte **circular cerrado**. Sin lecho.
+- **Sombra** (`palanca: sombra`) — **la sombra es el sujeto**, la forma más detallada del cuadro.
+- **Dentro del objeto** (`palanca: dentro-del-objeto` + `objetoContenedor`) — el lente vive dentro y mira afuera.
+- **Escucha** (`palanca: escucha`) — fotografía a quien **recibe**: boca cerrada, mirada fuera del cuadro, la
+  herramienta de hablar presente y sin usar. Con `pov`, el Why de Efeonce hecho encuadre.
+- **Atraviesa** (`palanca: atraviesa`) — un objeto largo del oficio cruza en **diagonal nítida** delante del
+  sujeto **sin cubrirlo**: la composición la manda el objeto, no la cara.
+- **Entre dos** (`palanca: entre-dos`) — la cámara en el aire **entre** dos que se hablan; ninguno mira al lente.
+- **Quién sostiene** (`palanca: quien-sostiene`) — nítido **quien opera**, fuera de foco quien actúa. La
+  inversión de foco ES la palanca.
+
+> **El oficio con IA no está en la máquina, está en la decisión.** Generar es barato y no se ve; elegir,
+> descartar, corregir y dirigir es el trabajo. **Nunca robots, circuitos ni interfaces flotantes**: es la parte
+> que no vale nada y la que hace todo el mundo. Cuatro palancas fotografían el juicio:
+
+- **Variantes** (`palanca: variantes`) — la misma pieza repetida con diferencias **mínimas** y **una** apartada.
+  El sujeto es la elección, no el objeto.
+- **Descarte** (`palanca: descarte`) — la pila de lo **no** elegido, lo más grande del cuadro; lo aprobado NO
+  está y nadie aparece. Enseña el volumen real del trabajo.
+- **Marcado** (`palanca: marcado`) — las **marcas de la revisión** encima de la obra son lo más nítido y donde
+  cae el ojo primero; **la mano es como mucho un fragmento desenfocado al borde, nunca el sujeto**.
+- **Proyección** (`palanca: proyeccion`) — la obra proyectada sobre materia áspera, cuyo grano **se ve a través**
+  de ella, y sobre el cuerpo de quien está en el haz. **Ni pantalla ni monitor.**
+
+> **Las 34 palancas en cuatro familias —5 siempre activas · 4 atmósferas · 1 acción suspendida · estas 24 de
+> encuadre—, las 20 tomas de cámara y las cinco descartadas con su
+> razón medida:** [catálogo de palancas](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md).
+
+> **Dosis del acento: 1 de cada 2** **[auditoría ciega 2026-09-20]**. El azul portador es estructura y va en
+> todas; el acento cálido es puntuación. Dos evaluadores que no sabían nada del canon lo contaron en 9 y 12 de
+> 12 piezas: «la primera vez es identidad, a la octava se siente forzado» y «puesto ahí sólo para cumplir la
+> cuota de naranja». `pnpm foto:prompt` cuenta la tanda. Evidencia:
+> [auditoría ciega](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_BLIND_AUDIT_2026-09-20.md).
+
+> **El texto de la escena EXISTE y queda ilegible por causa física** —pequeño, fuera de foco, cortado, en
+> ángulo, en sombra—, **nunca por estar en blanco**. La regla vieja («no text anywhere») protegía de marcas de
+> terceros y producía un mundo sin letras que delata la generación: «con lomos de libros y etiquetas en cuadro,
+> cero texto legible es estadísticamente imposible». Corregido en `bloque-realismo-v3`.
+
+> 🔴 **El emblema bordado NO se genera** **[medido 2026-09-20]**: tres prendas dieron tres emblemas distintos y
+> ninguno era el de Efeonce. Mismo hecho que gobierna la firma. En orden: que **no se lea**, **componerlo**
+> después, o **editar con máscara**. **NUNCA** publicarlo como sale del generador; **NUNCA** cerrar sin
+> `pnpm foto:emblema <plate.png>`, que lo amplía — a tamaño de feed un bordado inventado pasa por bueno.
+
+> **Código de vestuario** **[operador, 2026-09-20]**: la prenda dice el REGISTRO. **Polera piqué** = oficina
+> casual · **Chaqueta** = reunión o instancia importante · **Gorra + polo** = terreno · **Hoodie** = terreno ·
+> **Lanyard y carnet** = transversales, van igual en casual y en formal. Se elige por el registro de la escena,
+> nunca por variedad visual. Detalle:
+> [personas, identidad y vestuario](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
+
+> **Dos categorías de pieza** **[operador, 2026-09-20]**: la **muda** —sólo foto y firma— es legítima y sirve de
+> **descanso visual** para relajar el feed; la **con voz** lleva la capa gráfica. La diferencia se decide **antes**
+> de generar, no después. Muda: `foto:prompt` → `foto:validar`. Con CTA: `foto:prompt` con `reservas` →
+> `foto:validar --zona-texto` → **`pnpm foto:componer:cta`** → **`pnpm foto:cta:gate`** → revisión humana.
+> `foto:componer` conserva las piezas sin CTA. El prototipo gráfico rechazado el 2026-09-19 es histórico;
+> el sistema Tres voces + acción se aprobó después, sin aprobar automáticamente cada pieza.
+
+> **Si la pieza va a llevar titular, copy o cursores, `reservas` se declara EN LA TOMA** y se valida con
+> `pnpm foto:validar <plate> --zona-texto`. Medido: **12 de 12** piezas auditadas reprobaron la banda de texto
+> (mejor caso 0,10 del alto contra 0,28) porque ninguna la declaró — el campo es opt-in y nadie lo encendía.
+> **Reservar después de generar no existe: o está en la toma, o el texto no cabe.**
+
+> **El sistema de color va en TODAS.** Al probar una palanca nueva es fácil concentrarse en la geometría y
+> dejar la paleta fuera: pasó en **21 de 21** fichas y las piezas salieron como fotografía genérica en vez de
+> Efeonce **[medido 2026-09-20]**. El azul va **en un portador visible** (pantalla, panel, lona, carpeta, tinta
+> cian de un pliego), nunca como HEX suelto; el acento naranja o lima, 1–5%, **nace de la situación** (cinta de
+> marcaje, post-it, lápiz graso, sandbag). `pnpm foto:prompt` avisa si la escena no declara ninguno.
+
+> **UNA palanca dominante por pieza.** Combinar dos las diluye: cada una pide el control de la escena y el
+> resultado tiene un poco de cada una y lo mejor de ninguna **[medido 2026-09-20]**. El comando rechaza una lista.
+
+> **«Épica» no es la palabra** (arrastra escala grandilocuente y horizonte, el stock premium que este lenguaje
+> rechaza). Lo que se busca es **realismo cinematográfico**, y son cuatro cosas distintas: **registro documental**
+> (la cámara llega a algo que ya pasaba), **momento decisivo** (el pico), **acción suspendida** (lo que vuela) y
+> **atmósfera** (el aire que revela la luz). Ambas palancas se piden **por ficha**, nunca desde el bloque fijo.
+> Detalle y evidencia: [pipeline §3.9](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
+
+## 7. Catálogo corto de tomas (lente declarado en el prompt)
+
+| Toma | Lente / ajuste | Uso | Lecho |
+|---|---|---|---|
+| Asiento en la mesa (base) | 50 mm f/2, lente a ras | co-creación, sesiones | borde de mesa oscuro/claro |
+| Ojo de pez a ras / fuerte | 10 mm / 8 mm desde el borde de la mesa | taller, energía | borde curvo de mesa (tono declarado) |
+| Tilt-shift | balcón 45°, franja nítida | rodaje en calle | desenfoque óptico |
+| Contrapicado | 24 mm f/2,8, cámara en el piso | Run & Gun, dirección | maleta de equipo |
+| Reflejo en vidrio | 50 mm f/2 | estrategia, journey | marco del vidrio |
+| Tele | 200 mm f/2,8 | equipo en ciudad, escenario | techo de auto / público |
+| Retrato | 105–135 mm f/2 | equipo | escritorio o mesa |
+| Marco dentro del marco | 50 mm f/2,8 desde pasillo | estrategia | consola («dissolves into abstract blur») |
+| Escala | 35 mm f/4 | datos, espacio | piso de concreto |
+| Macro · barrido · noche · dron | 100 mm f/4 · 35 mm lento · 50 mm f/1,8 · cenital 25 m | textura · Run & Gun · cierre · eventos | según toma (dron: sin lecho) |
+
+El operador aprobó **dos ángulos de Nexa**: ojo de pez fuerte (N1b) y ojo de pez a ras del borde de la mesa (N1).
+El lenguaje se probó en **4:5 1152×1440**, **9:16 1152×2048** y **16:9 2048×1152** nativos; 1:1 no tiene ronda validada. El catálogo de tomas conserva sus mediciones históricas por encuadre:
+[cámara, lente y ángulo](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md).
+
+## 8. Realismo sin suciedad
+
+- Realismo desde **personas, luz y materiales**: poros, pelo suelto, pliegues, polvo en el haz, leve movimiento de
+  manos, viñeteo natural, encuadre imperfecto. Espacios **limpios y cuidados** con 1–2 detalles de uso.
+- **NUNCA** suciedad, manchas, cinta, cables ni «clutter» (la versión con coffee rings se rechazó: «tanto desorden
+  y suciedad tampoco se ve bien»). Tampoco piel plástica, simetría perfecta, CGI, HDR ni sonrisas de stock.
+- Nadie mira a cámara salvo decisión explícita; **sin texto ni logos** generados.
+- Objetos de terceros: pedir «completely unbranded, no brand names» y **revisar al zoom** (se coló «Blackmagic»).
+- Casting latinoamericano, caras no-modelo, edades variadas. Para **publicar**, preferir equipo real como base;
+  la IA explora espacios, objetos y 3D [criterio del revisor adversarial].
+
+## 9. Variedad de industrias (sesgo corregido)
+
+**NUNCA anclar la serie en la categoría de un cliente real** ni insinuar trabajo con un cliente: demasiada pintura
+se leyó como Berel («nosotros NO somos Berel»). Variar: café, bebidas, panadería, retail, finanzas, gastronomía,
+eventos. Tampoco repetir el mismo objeto de acento ni el mismo panel azul de fondo entre piezas.
+
+## 10. Pantallas: curación generativa, nunca UI pegada
+
+Las composiciones deterministas sólo sirven **como referencia** para curar con IA. Método: plate con la pantalla en
+**chroma verde puro `#00FF00`** («entirely inside the frame, no reflections») → UI de referencia determinística →
+edición con plate + UI + **máscara** pidiendo glare, reflejo, perspectiva y oclusión → **restaurar** fuera de la
+pantalla desde el plate original. La máscara no preserva píxeles: verificar identidad al zoom. Receta técnica
+(máscara de un canal, gotchas): [greenhouse-ai-image-generator](../../greenhouse-ai-image-generator/SKILL.md#fotografía-de-marca-propia-efeonce).
+
+## 11. Personas: Julio y Nexa
+
+- Motor **`gpt-image-2.5-sunburst`** `--quality high` 1152×1440, referencias con rol («Images 1-3 are Julio
+  (identity only; ignore their clothing and backgrounds)») + bloque **IDENTITY** con rasgos.
+- Referencias: Julio `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/` —11 retratos aprobados, `julio-ap-04` primero para rostro y `julio-ap-11` para cuerpo, según `MANIFIESTO.json`— más seis ángulos en `set-identidad/angulos/`; selección por `foto:prompt`. `julio-ap-02.png` es pieza compuesta y no sirve de ancla; las fotos fuente y descartes permanecen aparte. El set de 2026-09-17 quedó retirado como ancla de identidad;
+  Nexa `ai-generations/_identidad-nexa/1-anclas/` y sus ocho ángulos fotorrealistas confirmados por el operador
+  el 2026-09-24 en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/` (polera gris neutra,
+  vista resuelta mediante `foto:prompt`). Esa ropa no es obligatoria en todas las escenas. 🔴 Las rutas anteriores
+  —`nexa-the-point.png`, `nexa-the-listen.png`— **son identidad B y quedan retiradas como ancla de rostro**
+  [2026-09-21]. Identidad sostenida en 5 tomas (135/24/200/50/200 mm) con el set anterior.
+- Uniforme: kit del polo como Images 4-5; **revisar el emblema letra por letra** antes de publicar. El
+  uniforme es el **contexto 6** del wardrobe de Nexa [operador, 2026-09-21]: los contextos son situaciones y
+  la prenda la dicta la situación.
+- 🔴 **Los CUATRO signature elements de Nexa viajan en toda pieza suya** (los resuelve `foto:prompt`, no se
+  escriben a mano): anillo geométrico plata mate en el **índice derecho** · **SMARTWATCH** en la muñeca
+  izquierda —**nunca** un reloj analógico— · aretes de **plata**, nunca dorados · uñas de un solo color.
+  Medido: el bloque gana metal, forma y presencia, pero **el DEDO sólo se gana editando**, no generando.
+- 🔴 **Gadgets y equipo: siempre tecnología premium y de la generación vigente.** Apple Watch, iPhone, iPad
+  con Pencil, MacBook, Mac de escritorio, AirPods; para grabar **DJI Osmo Pocket/Action**, **DJI Mic 3** o
+  lavalier **Rode**, **Shure** en podcast, cuerpo **Sony α** o **Canon EOS R**. Encendidos y en uso, nunca de
+  adorno; ningún logotipo de tercero legible; un objeto manda por escena. Canon:
+  [props tecnológicos](../../../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md).
+- 🔴 **Editar en otro aspect ratio REENCUADRA al sujeto.** El canon es 4:5 y el modelo sólo entrega 1:1, 2:3
+  y 3:2: hay que **padear, editar y recortar** o la cabeza sale desproporcionada. Receta medida en
+  [bloques y pipeline](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
+- Detalle: [personas, identidad y vestuario](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md)
+  · [ficha del Character Bible](../../../../docs/operations/brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md)
+  · [el Bible completo](../../../../docs/operations/social/NEXA_CHARACTER_BIBLE_V1.md).
+
+## 12. Flujo de producción (resumen)
+
+Ficha de toma (servicio/oficio, industria no-cliente, mercado, cámara/lente/ángulo, luz y hora, momento, acento y su
+origen, lecho + tono, formato) → prompt = bloque realismo + bloque impacto + color/WB + escena + `FOREGROUND` →
+`gpt-image-2.5-flare` `high` para explorar (Sunburst si hay identidad o edición; `xhigh` sólo masters) → hoja de
+contacto → medir lecho → regenerar si falla → curar pantallas → componer firma (`LOGO=0.20`) → métricas → QA al zoom.
+Costo observado ≈ USD 0,05 por imagen high 1152×1440 (xhigh ≈ 0,09). Bloques de prompt y scripts:
+[bloques y pipeline](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
+
+## 13. Checklist QA (antes de mostrar o entregar)
+
+- [ ] Pasa la barra (§2): sustitución, obra, mecanismo, idea, 3 modos, 390 px, verdad operativa.
+- [ ] Industria no-cliente y sin objeto de acento repetido en la serie.
+- [ ] Azul y un solo acento (naranja o lima) integrados en la composición, nacidos de la situación; juzgar visualmente
+      su función y naturalidad antes de interpretar los porcentajes medidos.
+- [ ] Sin grade; WB neutro-cálido; sombras no azules; quemado y aplastado dentro de rango.
+- [ ] Lecho planeado, tono declarado, p99 ≤ ~20 y transición gradual; o excepción sin firma justificada.
+- [ ] Logo SVG oficial al 20%, centrado, contraste ≥ 4,5:1 medido; una sola marca protagonista.
+- [ ] Sin texto ni marcas de terceros al zoom; pantallas curadas, sin fantasmas de máscara.
+- [ ] Identidad (Julio/Nexa) y emblema verificados al zoom; nadie mira a cámara sin decisión.
+- [ ] No se siente IA. Si hay duda, se regenera; no se parcha con grade.
+
+## 14. Documentación canónica y evidencia
+
+- [Índice de fotografía de marca](../../../../docs/operations/brand-photography/README.md)
+- [Lenguaje fotográfico V1 (maestro)](../../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md)
+- [Firma y primer plano](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) ·
+  [Colorimetría](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_COLORIMETRY_V1.md) ·
+  [Cámaras y ángulos](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) ·
+  [Bloques y pipeline](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) ·
+  [Personas y vestuario](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md)
+- [Bitácora del método](../../../../docs/operations/social/2026-09-19-efeonce-photographic-language-production-method.md) ·
+  [Manual de uso](../../../../docs/manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
+- Corrida: `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/` (rondas, prompts, scripts `medir.mjs`,
+  `metricas.cjs`, `componer.mjs`). OneDrive: `5. Contenidos/13- Branding/Lenguaje Fotografico Efeonce/v01/`.
+
+**Pendientes:** espacio para texto (pedido del operador, no trabajado), formatos 9:16 y 16:9, firma en tomas
+todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `xhigh` con equipo real.
+
+## Los TRES comandos canónicos (2026-09-20)
+
+- **`pnpm foto:doctor`** — ¿esta máquina puede generar? Ejercita la cadena entera (bloques, sharp, ADC, secreto,
+  clave aceptada por OpenAI vía `/v1/models`, **sin costo**). La clave nunca se imprime. Sale 1 si algo bloquea.
+
+
+- **`pnpm foto:prompt <ficha.json> [--batch <out.json>]`** — arma el prompt desde una ficha de toma. El formato,
+  el porcentaje del lecho y el límite de sujetos salen de **una tabla**, no de un bloque copiado. La ficha declara
+  además `identidad` (personas, con vista por ángulo), `objetos` (kits de marca: logo, mascota, prenda, merch),
+  `palanca` (**una sola** de las 24 de encuadre, con su campo obligatorio si lo pide), `atmosfera`
+  (`polvo`/`bruma`/`vapor`/`humo`) y `suspendido` (qué está en el aire). Aborta si un
+  bloque compartido trae un valor de formato adentro, si se pide una reserva en una toma que no la admite, o si un
+  batch mezcla formatos. `--ficha-ejemplo` imprime la plantilla.
+- **`pnpm foto:validar <plate.png> [--zona-texto] [--objeto x0,y0,x1,y1]`** — valida las seis reservas sobre el
+  plate limpio y sale con código 1 si alguna **evaluada** falla. Las coordenadas van en fracciones, no en píxeles.
+
+**NUNCA armes un prompt de foto de marca concatenando bloques a mano.** Esa es la vía por la que «Vertical 4:5.»
+vivió dentro del bloque de realismo sin que nadie lo viera, y habría contaminado todo plate no-4:5.
+
+## La regla de la luz y la reserva **[medido 2026-09-20]**
+
+> **La luz con carácter va sobre el SUJETO; la reserva vive en la sombra pareja que esa luz deja, nunca en su
+> camino.**
+
+El canon ya la practicaba sin tenerla escrita. En la pieza aprobada, la luz dura entra por la ventana y cae sobre
+el panadero; el titular vive en la sombra pareja del muro. Al pedir la sombra gráfica **sobre el muro que era la
+reserva**, el contraste cayó de 82 a 77 y la zona de texto de 0,24 a 0,22: «campo parejo» y «luz dura» sobre la
+**misma** superficie es una contradicción, y el modelo la resuelve **aplanando la escena entera**.
+
+**NUNCA** pongas el dibujo de luz sobre la superficie que aloja la reserva. Escribe la luz en la escena —sube el
+contraste de verdad— pero sobre el sujeto.
+
+## Tres guardas nuevas del 2026-09-20 (por qué se perdió calidad)
+
+Una tanda de 34 planchas salió **sin dirección fotográfica**: el armador de esa sesión nunca incluyó el bloque de
+impacto. Medido sobre sus escenas contra la ronda que el operador aprobó: luz 64% vs **100%**, momento 26% vs
+**100%**, y **planos de profundidad 0% vs 40%**. La planitud viene de ahí — el bloque de impacto es el que pide
+«THREE distinct depth planes» y «rich but detailed darks, never flat, never evenly lit».
+
+- **Tope de tanda:** más de **6 fichas** exige que cada una declare `piloto: "<ruta a un plate ya generado>"` que
+  exista en disco. **La calidad nunca vino de un prompt mejor: vino de generar poco y MIRAR cada plate.** Con 34 de
+  una sola vez nadie mira ninguna; se mira una hoja de contacto, que es donde una cara de stock o un fondo plano
+  pasan desapercibidos.
+- **Anclas de categoría de cliente:** hoy **pintura**. **[decisión del operador]** «nosotros NO somos Berel». La
+  regla estaba escrita desde el 19/09 y una sesión generó igual un macro de un rodillo aplicando pintura azul.
+  **Un doc no impide nada; un comando que aborta, sí.** Se amplía sólo con lo que el operador declare.
+- **Avisos que no bloquean:** escena sin **fuente de luz** o sin **momento**. El aviso automático que cuestionaba
+  paneles, pantallas y otras áreas azules se retiró: también hay campos azules naturales en las fotos aprobadas.
+  La revisión visual decide si el color tiene razón de estar en la composición o si parece una pieza añadida.
+
+El comando además imprime, antes de cada batch, la ruta de **las piezas aprobadas**: son el estándar y ninguna
+sesión las tenía delante al armar.
+
+## Lo que se corrigió el 2026-09-20 (leer antes de citar un número)
+
+- **El tono nunca fue el problema; la materia lo es** **[decisión del operador]**. Una reserva **oscura está
+  perfecta** cuando la superficie oscura **existe y tiene nombre**. Lo prohibido es la reserva **sin materia**, en
+  cualquier tono: un prompt que pide un tono sin decir de qué está hecha la cosa obliga al modelo a inventar el
+  objeto, y lo que inventa es un panel liso flotando — la «losa» que el operador rechazó por «extremadamente
+  forzado». **NUNCA** decidas el tono por regla global («todo oscuro», «todo claro»): lo decide la escena.
+- **Ninguna métrica de píxel detecta la losa.** Planitud, dureza de canto y calma en L\* fallan las tres; la versión
+  buena tenía el canto **el doble de duro** que la rechazada. La diferencia es **semántica**. El detector está en la
+  **entrada**: `pnpm foto:prompt` aborta si la materia falta o es genérica.
+- **La calma se mide en L\*, no en luminancia lineal** **[medido]**. En Y la misma textura salta ~15× más arriba de
+  la escala, así que el umbral **premiaba la oscuridad**: la losa pasaba con 12× de margen y un muro pálido liso
+  reprobaba. `CALMA_MAX = 0.5`, de medir los dos extremos (pasa 0,18–0,29; reprueba 0,89–2,44).
+- **El chequeo del lecho es señal débil** **[frágil]**. Ni Y ni L\* miden desenfoque de forma confiable; la prueba
+  real del lecho sigue siendo **mirar el plate**. Medirlo bien está **[pendiente]**.
+- **Retirada la regla del lecho de §3.8.3** **[refutado]**: decía, como medida, que el lecho falla sin la frase «so
+  close to the lens». El prompt de esa corrida nunca se versionó, todos los prompts que sobreviven la llevan, y las
+  franjas miden igual: lo que separaba los números era el **formato**. El comando la emite igual como **precaución
+  declarada**; **NUNCA** la cites como evidencia de causa.
+- **Lecho por formato** **[medido]**: 4:5 18% · 9:16 22% · 16:9 16% · 1:1 18% *(sin validar)*.
+- **Reservas: seis, no cuatro.** Se sumaron «campo profundo al margen» (banda vertical continua ≥ 0,40 del alto;
+  el piloto da **0,60**) y «lecho por formato». La caja de selección necesita **padding**: pegada al objeto da
+  1,02:1, con 0,02 pasa a 3,29:1 y con 0,04 vuelve a caer. **Hay punto dulce, no monotonía** **[medido]**.
+
+## Espacio para texto y formatos (2026-09-19)
+
+- La zona del titular se pide en la toma con **tono declarado** («DEEP warm shadow… for white text» / «VERY LIGHT warm-white wall… for dark text») y **límite de cabezas** (verticales: bajo 36% del alto; 16:9: gente dentro del 55% derecho).
+- Zonas: 4:5 tercio superior; 9:16 franja 11–31% (la firma de esa ronda estaba a 0,875); 16:9 costado izquierdo 42% en `foto:prompt`. Para una pieza nueva con CTA en 16:9, el piso de legibilidad requiere cerca del 57% del ancho: reservar 58% o reducir el copy sigue pendiente de decisión, así que el comando conserva 42%. La firma de una pieza nueva es 25% del lado corto en horizontales y 20% en verticales/cuadrados; no se regeneran las aprobadas por ese cambio. [Contrato y corte](../../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
+- Compositor `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/titular.mjs` (Bricolage `ideaImpact` a trazos, color por contraste, autoajuste de zona ≥4,5:1).
+- **Canon operativo (aprobado, capa fotográfica):** [reserva de espacio en la toma](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) — las seis reservas, tono declarado, límite de cabezas, formato nativo, nunca scrim, medir antes de componer.
+- Bitácora de la ronda (composición **no aprobada**): [zonas de composición y formatos](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md).
+
+## La capa de composición no es sólo texto
+
+Una pieza puede llevar etiqueta (Poppins `structureLabel`), entrada/dominante/cierre (Bricolage `ideaLead`/
+`ideaImpact`/`ideaMedium` con `[[acento]]` naranja), tarjeta HUD (Poppins), gesto Guttery (1 por pieza, ≤3 palabras),
+**caja de selección AXIS** (`eight-handles` · `four-corners` · `open-brackets`), **cursor solo** (un cursor, sin cursor
+local) o **cursores multiplayer**, y la firma. Reservar en la toma: zona de texto con tono, objeto aislado para
+enmarcar, zona pareja para HUD y para el gesto. Compositor: `scripts/composicion.mjs` (contraste por capa, autoajuste,
+falla con glifos inexistentes como «→» y con gesto bajo 4,5:1). **Lo que la foto debe reservar** para todo esto está
+en [reserva de espacio en la toma](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md);
+**cómo se compone encima** sigue el sistema Tres voces + acción para piezas con CTA y la skill
+`efeonce-advertising-creative` (brief + ficha tipográfica + gate); cada resultado exige revisión humana.
+
+**Compositor de ads con CTA:** `pnpm foto:componer:cta` (`scripts/foto/componer-cta.mjs`) y
+`pnpm foto:cta:gate` son el par canónico. `pnpm foto:componer` cubre la pieza sin CTA; el compositor del
+carrusel GTA VI (`2026-09-19_nivel-de-busqueda/componer-v2.mjs`) es antecedente archivado, no punto de partida
+para una campaña nueva. **Nunca** copies uno de esos scripts a la carpeta de una corrida.
+
+**NUNCA scrims ni overlays sobre la foto** para ganar contraste (decisión del operador 2026-09-19: «es muy 2010, le
+resta limpieza»). El contraste se planifica en la toma con el tono declarado de la zona; si no pasa 4,5:1 se
+regenera el plate o se mueve el texto.
+
+**NUNCA** el marcador-estrella naranja junto a la etiqueta: fue puntual del post de GTA VI (marcaba la misión), no del
+lenguaje de marca (`labelStar` opt-in, apagado por defecto).
+
+**CTA de ads, decisión 2026-09-22:** [Tres voces + acción](../../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md)
+autoriza texto, contorno y relleno acotado para la acción en Poppins. Es capa gráfica funcional, no scrim ni panel de
+contenido. La selección puede tener como target ese grupo CTA medido; proteger personaje y lecho de firma.
+
+**NUNCA** la tarjeta HUD de vidrio con línea naranja (era del post de GTA VI): el dato va como nota de texto limpio
+(Poppins) sobre una zona clara de la foto. Una selección sobre la **foto** exige un objeto aislado elegido en la
+ficha de toma; una selección sobre **texto o CTA compuesto** sigue el canon publicitario y sus bounds reales.
+
+**La caja de selección tiene propósito:** enmarca un objeto con sentido (la obra en revisión, el resultado aprobado)
+o una palabra del titular para énfasis. Nunca sobre vacío, nunca sobre una persona, y si la foto no tiene ese objeto,
+no va selección. El objeto se decide en la ficha de toma.
+
+**Craft tipográfico (no negociable):** Bricolage es la **única** voz expresiva (sólo el dominante); etiqueta,
+entrada, cierre y notas van en **Poppins** (`structureLabel` en mayúsculas +0,08 em; `structureCopy` leading 1,5).
+El aire entre tramos se mide como **gap de tinta** ≈ **0,09 del tamaño del dominante** (0,10 tras la etiqueta), no
+como leading; `foto:componer` lo reporta en `qa.json`.
+
+> **Estado:** la fotografía de este lenguaje está aprobada (2026-09-19); el prototipo de capa gráfica de ese
+> día fue rechazado. El sistema publicitario Tres voces + acción se aprobó el 2026-09-22. Una pieza real con CTA
+> usa el compositor y gate vigentes, además de revisión humana: un contraste que pasa no demuestra calidad visual
+> ni autoriza pauta. La certificación adversarial global de la CLI sigue inconclusa.
+
+
+## Recorrido de la vista **[criterio del operador, 2026-09-21]**
+
+> «Tienes que añadir o entrenar un criterio, y es la capacidad de ver hacia dónde se guía la vista del lector.»
+
+La mirada **entra por el titular, baja por el eje central hasta la escena y sale por la firma**. Un elemento puesto
+al **margen y a media altura** queda fuera de ese recorrido: es un desvío lateral sin destino y se lee como un adorno
+pegado, **aunque no tape nada y aunque su contraste pase**. No es un problema de oclusión ni de contraste sino de
+jerarquía. Si el elemento va, **va sobre el eje**, como escalón entre el titular y la escena. La pieza aprobada lo
+confirma: el chip «Contexto: 0 %» está **centrado bajo el titular**.
+
+**NUNCA** cuelgues un chip, una nota o una tarjeta al costado «porque ahí hay espacio libre»: el espacio libre no es
+un destino de lectura. Y **NUNCA** des por buena la posición de un elemento sólo porque pasó el contraste — ese
+número responde otra pregunta.
+
+## Guarda medida para un elemento gráfico sobre la foto **[implementada, 2026-09-21]**
+
+«No puede tapar a Nexa» **no se afirma: se mide.** Del plate se extrae la caja del elemento **más un aire de la mitad
+de su alto** y se promedia el **gradiente horizontal** de ese recorte: un muro liso da **< 3** (medido **0,76–1,67**),
+un rostro o una figura dan bordes y lo suben. **Sobre 3, aborta.**
+
+El aire no es adorno del método: la primera versión midió la **caja estricta**, pasó, y el borde del chip **rozaba el
+signo de interrogación**. Un elemento gráfico no compite sólo con lo que cubre, también con lo que toca.
+
+## 🔴 Componer lo sensible, y que el modelo sólo TERMINE **[operador, 2026-09-21]**
+
+**Para resultados óptimos, la composición se arma con todos sus elementos sensibles APARTE, se juntan
+determinísticamente, y recién entonces se le pasa esa referencia al modelo, que aporta ACABADO y nunca
+DIBUJO.**
+
+Sensible es toda **marca, texto exacto, cifra o arte oficial**. Un modelo no sostiene una marca:
+medido el 2026-09-21 en cuatro pasadas sobre la misma pieza, describirle el logotipo dio un borrón con
+forma de flecha, pasarle el arte plano lo dejó ilegible y, aun con la foto del producto delante, la
+nave de la «o» salió distinta cada vez. No se arregla pidiéndoselo mejor: se arregla **no
+pidiéndoselo**.
+
+| Paso | Qué se hace |
+|---|---|
+| 1 | **Separar lo sensible** y componerlo desde el archivo oficial; lo neutro va en SVG plano |
+| 2 | **Armar** la pieza con esas partes ya resueltas (warp/composite determinístico) |
+| 3 | **Pasarle el armado al modelo** pidiéndole SÓLO material y luz — tejido, relieve, plástico, metal, acrílico, sombras—, repitiendo que las marcas no se tocan |
+| 4 | **Mirar el resultado al 100%** antes de usarlo |
+
+Dos reglas que salieron del mismo caso:
+
+- **Las proporciones se CALCULAN desde el objeto real, no se fijan a ojo.** El operador cazó dos a la
+  primera: la unidad del patrón de la cinta mide **7,05 veces** su ancho (puesta a ojo en 3,4 el
+  logotipo salió alargado y el eslogan achatado) y el yoyo **1,6 veces** ese ancho —32 mm contra 20 mm
+  reales— cuando estaba en 2,5.
+- **Arte plano ≠ foto del producto.** El arte plano sirve para **producir** vistas de un kit; para
+  **usar** la pieza en una escena, la referencia es la **foto del producto terminado**.
+
+Herramienta: **`pnpm foto:lanyard`**. Caso completo y medido:
+`ai-generations/2026-09-21_lanyard-deterministico/LEEME.md`.
+
+
+🔴 **ANTES de generar una pieza con un asset de marca —ropa corporativa, lanyard, merch, logo 3D,
+isotipo, nave o mascotas— carga el [contrato de selección de referencias](../../../../docs/operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md).** Hay **279 archivos en
+10 kits**: el problema nunca es que falte la vista, es **elegir la correcta**. Resume tres reglas:
+
+1. **Tres clases de asset, no intercambiables.** Arte plano → **producir** vistas del kit · pieza
+   aislada → **construir** · **pieza en uso / producto terminado → USAR en una escena**. Darlos al
+   revés hace que el modelo **reinvente la marca**.
+2. **Lo sensible se compone; el modelo sólo termina.** Toda marca, texto exacto o arte oficial se arma
+   determinístico y al modelo se le pide **sólo material y luz**. Un modelo no sostiene una marca:
+   cuatro pasadas sobre la misma pieza dieron cuatro logotipos distintos.
+3. **Las proporciones se calculan del objeto real**, nunca a ojo.
+
+Y **abre el `LEEME.md` y el manifiesto del kit antes del prompt**: su `cuando_usarla` dice qué vista
+corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida.
+
+## Paid media como consumidor: atención sin cambiar el lenguaje (2026-09-21)
+
+Para convertir los registros A/B/C en anuncios, cargar
+[palancas visuales para paid media](../../efeonce-advertising-creative/references/paid-visual-attention-playbook.md).
+La hipótesis publicitaria se declara en el brief y se traduce a una palanca fotográfica admitida por el
+compilador; no cambia identidad, colorimetría, reservas ni aprobación del registro C. Comparar estático,
+video o híbrido con métricas propias del formato. La calidad cinematográfica no acredita performance.
+
+## Firma en fullscreen 9:16 y UI de plataforma
+
+La altura de firma de feed no es universal. Texto, CTA y puntero respetan la intersección de reserva
+fotográfica y zona segura. La firma debe cerrar al pie sobre el lecho físico; no subirla al centro para
+satisfacer un guardrail. El operador rechazó la v05 al 63% y señaló como referencia la firma baja de Claude.
+La v06 usa centro 83,3%, SVG oficial y contraste ≥4,5:1. Es un criterio editorial, no certificación Reels:
+registrar el posible solapamiento y revisar el placement real. Ver §Zonas seguras de Tres voces + acción.
+
+## Lecho proporcionado: corregir la foto, no sólo la firma
+
+El operador rechazó el lecho de los verticales SEO/AEO v05/v06: había nacido para la firma alta y ocupaba casi media foto. Bajar el SVG dejó la escena comprimida. Corregir el plate para recuperar área narrativa, conservar un primer plano físico desenfocado sólo donde necesita descansar la firma y revisar el conjunto a 390 px. La v07 busca aproximadamente el quinto inferior; no convertirlo en nueva tabla universal. Prohibidos banda añadida, scrim o desenfoque artificial usado como sustituto de materia. [Método y evidencia](../../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md).
+
+**Corrección del operador, misma sesión:** además de reducir el lecho, la firma debe estar DENTRO de su materia desenfocada, separada del borde de transición. No trasladar el Y de Claude o de v06 a otra foto. Si el logo queda encima del lecho, es REWORK aunque contraste y bounds den PASS. El centro 90% fue una iteración anterior; las cuatro stories finales v07 se fijaron en 0,8565, dentro de AXIS. Es un caso, no un token.
+
+**Criterio vigente para nuevas adaptaciones 9:16 (operador):** si bajar la firma la saca de la zona segura y
+subirla mucho destruye el cierre, elevar ligeramente el inicio del lecho para alojarla dentro de su materia y
+de la zona segura, con aire, manteniéndola visualmente al pie. No convertir el 90% histórico ni el 0,8565 de las
+cuatro stories finales v07 en preset. Esas cuatro finales sí se recompusieron dentro de AXIS; siguen fuera de la
+guarda conservadora de Reels. No agrandar de nuevo el lecho hasta comprimir la escena. Verificar ambos límites
+sobre el export y el preview del placement antes de pautar.

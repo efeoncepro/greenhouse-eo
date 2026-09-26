@@ -1,8 +1,15 @@
 # Programa AEO / AI Visibility — Estado y Qué Sigue
 
 > **Tipo de documento:** Estado de programa + roadmap operativo (SSOT de "dónde estamos / qué sigue")
-> **Versión:** 1.4
+> **Versión:** 1.5
 > **Creado:** 2026-07-16 por Claude (auditoría multi-agente del programa AEO)
+>
+> 🔴 **Delta 2026-09-23 — primera licitación AEO ganada con la evidencia del programa.** SKY adjudicó a Efeonce el
+> **Blog SEO/AEO** (licitación privada vía Wherex; CLP 3.000.000 netos/mes + IVA × 24 meses; inicio 2026-11-01;
+> Deal `62535094842` en Cierre ganado). Entre los motivos del cierre está la **evidencia verificable** que produjo
+> este programa: informe del AI Visibility Grader publicado, Radiografía AEO con artículo real y el panel
+> competitivo del 2026-09-11. Práctica dueña: `seo-aeo-practice`. Workspace:
+> [`sky-blog-2026`](../commercial/tenders/sky-blog-2026/README.md).
 >
 > 🔴 **Delta 2026-09-11 — primer panel competitivo real.** Se corrió el grader sobre **SKY y 4 competidores**
 > (LATAM, JetSMART, Avianca, Gol) con el mismo set curado de 12 preguntas, el mismo día, mercado Chile y 5 motores:
@@ -22,7 +29,7 @@
 > Lo que falta no es ingeniería sino **demanda**: el último lead es del 2026-07-05. Las secciones de
 > abajo se escribieron antes de esos cierres y las que los tratan como pendientes están corregidas
 > en línea; los conteos de childs abiertas del cuerpo son de 2026-08-07 (hoy: 14, medido).
-> **Última actualización:** 2026-09-11 por Claude (Delta 2026-09-11: primer panel competitivo multi-marca, caso SKY; tres defectos del grader registrados como TASK-1867/1868 y TASK-1861/1863/1864 como base de la capacidad gobernada)
+> **Última actualización:** 2026-09-23 por Claude (Delta 2026-09-23: SKY adjudica el Blog SEO/AEO; antes, Delta 2026-09-11: primer panel competitivo multi-marca, caso SKY; tres defectos del grader registrados como TASK-1867/1868 y TASK-1861/1863/1864 como base de la capacidad gobernada)
 > **Documentación técnica:** [`../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`](../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 > **Epics que agrupa:** EPIC-020, EPIC-021, EPIC-022, EPIC-023, EPIC-024
 

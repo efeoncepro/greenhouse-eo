@@ -157,7 +157,8 @@ Detalle completo: `docs/architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_I
 **🏆 Hito:** la oferta **SKY Airline** (blog, plataforma **Wherex**) se **compuso y ENVIÓ** end-to-end con
 el composer — **la primera licitación de Efeonce hecha de forma programática.** Deck de 28 láminas, PDF a
 OneDrive `Licitaciones/Sky Airlines/`. Prueba viva de que el motor sirve para un entregable real de alto
-riesgo.
+riesgo. *(Actualización 2026-09-23: esa licitación se **adjudicó a Efeonce**; las cifras económicas del deck
+son las de la oferta original, superseded por la adjudicación.)*
 
 Dos plantillas **domain-free** de prueba social entran al catálogo, en el cluster de cierre
 (`berel → clientes → testimonios → seguro`, antes de la económica):

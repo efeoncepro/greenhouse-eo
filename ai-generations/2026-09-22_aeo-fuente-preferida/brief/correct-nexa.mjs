@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+import {construirPrompt} from '../../../scripts/foto/build-prompt.mjs';
+const dir='ai-generations/2026-09-22_aeo-fuente-preferida/brief';
+const jobs=[];
+for(const suffix of ['916','169']){
+ const id='02-reconoces-'+suffix;
+ const f=JSON.parse(fs.readFileSync(`${dir}/${id}.json`));
+ f.palanca='luz-motivada';
+ f.lecho={objeto:'the lower matte charcoal mullion and sill of the actual studio glass partition very close to the camera, completely outside the key light',tono:'DARK near black, dissolving gradually into soft optical blur, no sharp edge, not a graphic strip'};
+ f.escena=`CORRECT THE PROVIDED PHOTOGRAPH. Preserve canonical Nexa identity, navy corporate polo, photographic realism, neutral warm light, the studio and illustrative mismatch between real business and AI portrayal. Re-stage the action and camera coherently: camera observes from beside and slightly behind Nexa's right shoulder, her face visible only in side profile. Nexa holds the tablet low at waist height with BOTH hands, the fingers naturally curled around the lower side edges and thumbs on the bezel. Anatomically plausible joints and exactly five fingers per hand, naturally occluded as appropriate. NO pointing finger, NO hand raised toward the large display. Tablet screen tilted upward and inward towards Nexa's face, NEVER presented outward to camera. Camera sees the same tablet screen obliquely over her shoulder; no impossible reversed tablet. Her gaze is lowered towards the tablet. The tablet shows a modern office tower website; ahead of her a REAL wall-mounted opaque monitor shows a generic AI answer with a mismatching warehouse photograph. Distinct physical device bezels and sensible shared viewing direction, not a transparent floating UI. Remove third-party logos and invented symbols from interfaces. The large screen is the motivated source lighting her cheek and hands. Chest turned away, no readable invented embroidery. Foreground is the actual matte charcoal window sill crossed by the camera viewpoint with gradual optical blur and center calm enough for later logo; do not use the giant chair dome. `+(suffix==='916'?'Native vertical 9:16. Head and entire activity below 36% height; top 10–32% uninterrupted graphite wall in deep natural shadow, no window shaft or bright frame. Action 36–78%, lower22% natural gradual foreground blur.':'Native landscape16:9. Entire action in right55%; left42% uninterrupted graphite wall in deep shadow. Bottom16% gradual physical foreground blur.')+' Clean photographic plate, no titles or signature; no new decorative objects.';
+ fs.writeFileSync(`${dir}/${id}-v2.json`,JSON.stringify(f,null,2));
+ const built=construirPrompt(f);fs.writeFileSync(`${dir}/${id}-v2.prompt.txt`,built.prompt);jobs.push({id,prompt:built.prompt,refs:built.imagenes});
+}
+fs.writeFileSync(`${dir}/correction-jobs.json`,JSON.stringify(jobs,null,2));

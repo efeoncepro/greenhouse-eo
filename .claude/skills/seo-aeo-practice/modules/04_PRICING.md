@@ -5,6 +5,15 @@
 >
 > 🎯 **Eso es cierto a medias — y la mitad que es falsa es la buena noticia.**
 
+> ✅ **Actualización 2026-09-23 — SKY blog ADJUDICADO.** Las cifras de SKY en este módulo (5,2M · 6,9M · ad-hoc
+> 260k · 8 artículos · TCV 124,8M · loaded 2,26M · piso 3,9M/4,6M; y después BAFO 4,3M y piso 5,0M) son la
+> **oferta original y su negociación: historia, superseded.** Se conservan porque la lección de método sigue
+> valiendo. **Condiciones vigentes:** Core **CLP 3.000.000 netos/mes + IVA · 24 meses · TCV CLP 72.000.000** ·
+> capacidad gobernada de 45–50 contenidos/mes · newsletter incluida · addons aparte · **sin precio unitario por
+> artículo**; cost-to-serve validado internamente por el operador. **Cómo se llegó:** ajuste por **alcance** al
+> presupuesto declarado por SKY (~USD 3.000/mes), no descuento sobre la misma caja. Detalle:
+> `efeonce/ESTADO_ACTUAL.md` § 1 y § 3d.
+
 ---
 
 ## 🔴 Corrección 2026-08-15 — el alcance de Berel estaba mal, y la acción #4 de este módulo estaba invertida
@@ -61,7 +70,8 @@ Greenhouse **tiene** un motor de pricing cost-plus completo, gobernado y con Ful
 | Loaded cost real | `src/lib/commercial-cost-basis/**` (nómina real, snapshots de proveedores) |
 | Consumers | Portal · **Nexa** (`quote_price`) · **MCP** · API Platform |
 
-**Y se usó exactamente una vez: en el squad blueprint de SKY.**
+**Y se usó exactamente una vez: en el squad blueprint de SKY** *(oferta original; la configuración adjudicada el
+2026-09-23 es otra)*.
 De ahí salieron los únicos tres números honestos de la práctica: `loaded 2,26M → precio 5,2M → piso 3,9M`.
 
 > ## El motor calcula. Alguien tiene que decidir el margen.
@@ -76,7 +86,7 @@ página existe.** Lo que falta es **disciplina**, no herramienta.
 
 **FX as-of 2026-07-13** *(reverificar antes de cotizar — ver `SOURCES.md`)*: **USD/MXN 17,54** · **USD/CLP ~930**.
 
-| | **Berel** (MX) | **SKY** (CL, licitación) |
+| | **Berel** (MX) | **SKY** (CL — **oferta original, superseded 2026-09-23**) |
 |---|---|---|
 | Precio | **52.000 MXN/mes** — ⚠️ **lista 60.000 − 13,3% de descuento** | **5.200.000 CLP/mes** *(plan base, 8 artículos)* |
 | **En USD** | **≈ 2.965** *(lista: ≈ 3.421)* | **≈ 5.591** |
@@ -143,7 +153,7 @@ agotamiento del equipo y en un año sin utilidad.**)*
 | Cobran > USD 5.000/mes | **solo el 5,5%** de las agencias | — |
 | **Small business** | USD 2.500 – 5.000 | — |
 | 🔴 **Mid-market** | **USD 5.000 – 10.000** | 🔴 **Berel: USD 2.965** |
-| 🔴 **Enterprise** | **USD 10.000 – 50.000+** | 🔴 **SKY: USD 5.591** |
+| 🔴 **Enterprise** | **USD 10.000 – 50.000+** | 🔴 **SKY: USD 5.591** *(oferta original; adjudicado a CLP 3,0M, ajustado al presupuesto declarado de ~USD 3.000)* |
 | 🎯 **AEO/GEO** | **se cobra APARTE, desde USD 900/mes** *(el 37% de las agencias que subieron precio en 2025-26 lo hizo por esto)* | ⚠️ **Nosotros lo vendemos ADENTRO del retainer — y en Berel está contratado y pagado, no regalado** *(corregido 2026-08-15)* |
 
 ### 🔴 Lo que dice esta tabla
@@ -153,7 +163,7 @@ agotamiento del equipo y en un año sin utilidad.**)*
 
 - **Berel paga por debajo del promedio global de un retainer de SEO** *(USD 2.965 vs 3.209)* —
   siendo, por tamaño, **mid-market: un tramo donde el mercado cobra USD 5.000-10.000.**
-- **SKY**, una aerolínea, **paga USD 5.591** — el piso del tramo *enterprise*, **donde el mercado cobra
+- **SKY**, una aerolínea, **pagaba USD 5.591 en la oferta original** *(adjudicado a CLP 3,0M el 2026-09-23)* — el piso del tramo *enterprise*, **donde el mercado cobra
   USD 10.000-50.000+.**
 
 ⚠️ **El benchmark es global/US. LATAM cobra menos, y eso es real.** Pero:
@@ -186,7 +196,7 @@ agotamiento del equipo y en un año sin utilidad.**)*
 | Caso | Uso del USD 900+ |
 |---|---|
 | **Cliente nuevo** | ✅ **Anclar.** El AEO tiene precio de mercado propio — cotizarlo como capa con valor explícito, esté o no empaquetado |
-| **SKY** *(licitación viva)* | ✅ **Válido como argumento de valor** — el AEO va dentro del retainer, pero **su precio de mercado justifica el nivel del retainer** |
+| **SKY** *(adjudicado 2026-09-23)* | ✅ **Válido como argumento de valor** — el AEO va dentro del retainer, pero **su precio de mercado justifica el nivel del retainer** |
 | 🔴 **Berel** *(adjudicado, AEO contratado y pagado)* | 🔴 **NO.** No es revenue en la mesa. **La palanca es el descuento, no un cobro nuevo** — ver § 12 |
 
 > 🔴 **La excepción que estamos pagando no es "regalar el AEO". Es entregar el Escenario Crecimiento completo
@@ -200,7 +210,8 @@ agotamiento del equipo y en un año sin utilidad.**)*
 La métrica de valor de la oferta actual es **artículos por mes**.
 
 ```
-SKY:  8 artículos → CLP 5,2M     (650.000 por artículo)
+SKY (oferta original, superseded):
+      8 artículos → CLP 5,2M     (650.000 por artículo)
      12 artículos → CLP 6,9M     (575.000 por artículo)
      +1 ad-hoc   → CLP 260.000
 ```
@@ -319,6 +330,9 @@ PISO = loaded cost del pod          ← del squad blueprint (nómina real, %dedi
 
 ### 🔴 Aplicado a SKY — y el piso declarado NO pasa la regla
 
+*(Sobre la oferta original. **Actualización 2026-09-23:** se adjudicó otra configuración — Core 3,0M con alcance
+rediseñado — y su cost-to-serve lo validó el operador. El método de abajo sigue siendo el correcto.)*
+
 **Loaded delivery: CLP 2.260.000/mes (2,2 FTE).**
 **Las bases del tender reconocen un riesgo de penalidades del 10-15% + comisión Wherex.**
 
@@ -367,7 +381,7 @@ PISO = loaded cost del pod          ← del squad blueprint (nómina real, %dedi
 | | Margen bruto | Qué significa |
 |---|---|---|
 | 🔴 **Piso duro** | **45%** | **Debajo de esto no se cotiza. Punto.** ✅ El mercado dice que **bajo 40% el delivery está roto**; 45% es el margen de seguridad sobre esa línea |
-| ✅ **Target** | **55-60%** | Por encima del 50% sano, dentro del rango de agencia especializada. *(SKY a precio de lista: **56%** ✅ — **el precio de lista está bien.** Es lo único que hicimos bien sin método)* |
+| ✅ **Target** | **55-60%** | Por encima del 50% sano, dentro del rango de agencia especializada. *(SKY, oferta original a precio de lista: **56%** ✅ — **el precio de lista está bien.** Es lo único que hicimos bien sin método)* |
 | 🎯 **Plataforma** | **80%+** | Costo marginal ≈ 0 |
 | ⚠️ **Sobre 75% en servicios puros** | Revisar | O sub-inviertes en delivery, o tienes **leverage de software** — que en ASaaS **es legítimo y hay que declararlo**, no esconderlo |
 
@@ -401,9 +415,11 @@ existe como tool). *"Nexa, ¿a cuánto sale un pod de 1,5 FTE para un cliente en
 
 ---
 
-## 6. Los tres bugs de la oferta viva de SKY
+## 6. Los tres bugs de la oferta original de SKY
 
-*(Encontrados el 2026-07-13 leyendo `docs/commercial/tenders/sky-blog-2026/oferta-economica.md`.)*
+*(Encontrados el 2026-07-13 leyendo `docs/commercial/tenders/sky-blog-2026/oferta-economica.md`.
+**Actualización 2026-09-23:** superados — la oferta adjudicada es un Core de capacidad gobernada, sin precio
+unitario por artículo. Quedan como lección.)*
 
 ### 🔴 Bug 1 — El plan ampliado está dominado
 
@@ -454,7 +470,7 @@ precio, no en la esperanza.**
 | Riesgo | Qué pasa | Impacto real |
 |---|---|---|
 | **MXN se devalúa** *(de 17,5 a 20 — pasó en 2025)* | Berel sigue pagando 52.000 MXN | 🔴 **USD 2.965 → 2.600. −12% de margen, en silencio** |
-| **CLP se devalúa** | SKY sigue pagando 5,2M CLP | Idem, agravado por los 2 años sin reajuste |
+| **CLP se devalúa** | SKY paga CLP 3,0M fijos *(adjudicado; 24 meses)* | Idem — ⚠️ confirmar si la adenda trae reajuste |
 
 > 🔴 **Confirmado 2026-08-15 contra el expediente:** el `Presupuesto Detallado Abril.pdf` de Berel fija
 > **"fee mensual fijo en MXN"** y **no contiene ninguna cláusula de reajuste ni de FX**. **No era una suposición:
@@ -568,7 +584,7 @@ referencia, tu caso y tu moral de equipo.**
 |---|---|---|---|
 | **0** | 🔴🔴 **Despertar el grader para Berel** | **Es entrega contratada:** monitoreo mensual + KPI de **15-25 AI citations/mes**. **Sin correr desde el 2026-07-17** | 🔴 **Riesgo de incumplimiento, no upside** |
 | **1** | 🔴 **Correr el squad blueprint de Berel** | **Podemos estar al 18% de margen y no saberlo** — y ahora sabemos que el alcance es **Crecimiento completo al 87% de lista** | — |
-| **2** | 🔴 **Arreglar la oferta de SKY** *(el plan dominado + el ad-hoc invertido)* | **Está viva.** Un analista de compras encuentra el bug en 30 segundos | Reputacional |
+| **2** | ✅ ~~Arreglar la oferta de SKY~~ — **cerrada 2026-09-23:** la oferta adjudicada no tiene plan dominado ni precio unitario | — | — |
 | **3** | 🔴 **Sembrar la política de margen en el motor** + **declarar el piso de 45%** | 🎯 **Es lo que convierte esta página en una política y no en un ensayo** | — |
 | **4** | 🔴 **RETIRADA — era "desagregar AEO en Berel"** → reemplazada por **el instrumento de renovación** *(abajo)* | **El AEO de Berel está contratado y pagado.** El benchmark de USD 900+ **se conserva para clientes nuevos** | ⚠️ **No es +30%. Era un error** |
 | **5** | ⚠️ **Poner cláusula FX + reajuste** en Berel y en el próximo contrato | ✅ **Confirmado: el presupuesto de Berel no tiene ninguna de las dos** | **~12% de margen expuesto** |
@@ -593,7 +609,8 @@ referencia, tu caso y tu moral de equipo.**
 ⚠️ **Ninguna de las dos se mueve antes del blueprint (#1), ni antes de confirmar el timing en el contrato** —
 el mínimo son 6 meses y el repo fecha la adjudicación en **may-2026**. 🔴 **No asumas que la ventana de renovación
 está abierta.** Y ojo con el timing reputacional: **estamos citando a Berel como comparable en la licitación viva
-de SKY** *(`oferta-tecnica.md:656-658`)*.
+de SKY** *(`oferta-tecnica.md:656-658`)*. *(Actualización 2026-09-23: SKY ya adjudicó; Berel sigue siendo su
+comparable, pero el timing de la licitación ya no bloquea.)*
 
 ### ⚠️ wherEX no es compra pública
 
@@ -622,7 +639,9 @@ el contrato** — no aplica régimen de contratación pública ni impugnación d
 **Internas (✅ verificadas en el repo):**
 
 - **SKY:** `docs/commercial/tenders/sky-blog-2026/oferta-economica.md` (precio 5,2M/6,9M/260k) +
-  `squad-blueprint-INTERNO.md` (loaded cost **2,26M** · piso **3,9M** · 2,2 FTE).
+  `squad-blueprint-INTERNO.md` (loaded cost **2,26M** · piso **3,9M** · 2,2 FTE) — **oferta original,
+  superseded.** Adjudicación 2026-09-23 (Core 3,0M · 24 meses · TCV 72M): correo de adjudicación de Wherex +
+  HubSpot deal `62535094842` (Cierre ganado).
 - **Berel** *(fuente corregida 2026-08-15 — antes decía "operador, 2026-07-13")*:
   - **Expediente de licitación** *(OneDrive `4. Comercial/Licitaciones/Pinturas Berel/1. SEO/Listo/`)*:
     **`Alcance del Servicio.pdf`** *(feb-2026 — 3 escenarios, AEO en los tres)* + **`Presupuesto Detallado Abril.pdf`**

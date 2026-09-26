@@ -1,0 +1,30 @@
+{
+  "id": "julio-2-cue-sonido-evento",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["julio"],
+  "servicio": "Media y experiencia en vivo: control de sonido de un contenido propio",
+  "industria": "espacio de eventos hipotético, sin cliente real",
+  "mercado": "Bogotá",
+  "preflightVisual": {
+    "vistos": [
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/set-curado-12.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/J1-retrato-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/J3-escenario-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas2/J5-respaldo-final.png",
+      "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-04.png",
+      "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-08.png",
+      "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-11.png"
+    ],
+    "comparacion": "J3 prueba un campo azul fuerte detrás de un rostro bien iluminado; aquí el azul no es un telón sino reflejo del cue de escena a través del vidrio de la cabina. J1 aporta la proximidad y naturalidad del rostro, J5 el mecanismo concreto. El nivel verde lima de la mesa de audio aparece por la señal que Julio está ajustando, pequeño y funcional. El lecho oscuro pertenece al borde de la consola y permite firma blanca. Esta toma se diferencia de la prueba del kiosco por luz interior, escala de rostro, lente tele corto, lecho y mecanismo analógico.",
+    "azul": "reflejo real del cue azul activo que viene de una escena fuera de foco y atraviesa el vidrio de la cabina, sin pantalla o muro azul plano",
+    "acento": "pequeño tramo lima en el medidor de nivel de audio mientras la señal alcanza el punto deseado",
+    "lecho": "borde acolchado mate de la mesa de mezcla, negro carbón y pegado al lente"
+  },
+  "escena": "SCENE (independent Efeonce live-content rehearsal in a small, anonymous event space in Bogotá, just before the room opens): Julio Reyes is the ONLY person in frame, operating a real compact sound console in a clean control booth. He wears an unbranded off-white linen shirt with sleeves loosely rolled, dark charcoal trousers and his familiar silver rectangular glasses; no navy jacket, no uniform emblem, no logo on the body. The documentary frame catches him just as his hand rides one physical audio fader while his eyes track the performer cue beyond the booth glass, face clear in a relaxed three-quarter view and taking a substantial part of the frame. The console, slider and glass establish the working mechanism: he is balancing a spoken line to a live cue, not posing at a random desk. A real azure-blue #0375DB stage cue from the distant venue is seen as a restrained irregular reflection in the booth glass behind him and a soft rim along the console edge, never a flat blue wall or generic display; warm-neutral skin and neutral shadows remain intact. A tiny lime #6EC207 segment on the actual audio level meter is the single story accent, a result of the level he just set; no orange. The meter has no readable scale, numbers, letters or brands. Natural late-day sidelight and a small neutral practical illuminate his face and knuckles; stage color does not tint his skin. Photograph from a candid slightly high 85mm f/2 viewpoint across the near edge of the console, with three distinct depth planes and subtle optical depth of field. Keep the room premium, functional and tidy, materials tactile, pose imperfect, fingers plausible, sound gear entirely generic and unbranded. No audience, podcast microphones, invented text, labels, third-party marks, artificial color grade, or client attribution. The face follows the approved Julio identity references, not their suit or background.",
+  "lecho": {
+    "objeto": "the real padded charcoal-black near lip of the sound console almost touching the photographer's lens, visible as identifiable equipment at the edges but dissolved into soft blur across the logo area",
+    "tono": "DARK near-black matte charcoal with even shadow and no bright hardware in the center"
+  }
+}

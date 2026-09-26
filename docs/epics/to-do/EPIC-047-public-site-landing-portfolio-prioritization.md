@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Orden fijado 2026-09-11; 20 tasks reancladas desde EPIC-019; 4 cerradas el mismo día`
+- Status real: `Orden actualizado 2026-09-19: landing transversal humano-agente en 03 y entradas públicas en H2; sin implementación`
 - Rank: `TBD`
 - Domain: `commercial|marketing-ops|public-site|cross-domain`
 - Owner: `Julio Reyes`
@@ -17,7 +17,7 @@
 
 Agrupa las landings del sitio público (`efeoncepro.com`) en un solo portafolio y fija **en qué orden se
 ejecutan**. El orden vive en el campo `Rank` de cada task (`EPIC-047-01` … `EPIC-047-10`) y en la tabla de
-`## Child Tasks`; ambos se mueven juntos.
+`## Child Tasks`; ambos se mueven juntos. Al 2026-09-19 el rango es `EPIC-047-01` … `EPIC-047-11`.
 
 Este epic ordena **qué superficie comercial se construye primero**. La infraestructura para gobernar el sitio
 (bridge WordPress, manifest, publish pipeline, drift, attribution) sigue en
@@ -39,6 +39,12 @@ Tres criterios, en este peso:
    `docs/context/08_estrategia-comercial.md`.
 2. **Demanda real de búsqueda:** volumen y dificultad medidos (Semrush) en la task o su PDR.
 3. **Costo de terminar:** lo publicado o casi terminado va primero; ya costó y todavía no rinde.
+
+La [investigación DataForSEO + GSC del 2026-09-19](../../audits/public-site/2026-09-19-efeonce-human-agent-landing-demand.md)
+complementa, pero no reemplaza, este orden: Labs CL/es estima demanda de mercado; GSC registra exposición propia
+sin el mismo filtro geográfico. La categoría «equipos humano-agente» todavía no tiene volumen utilizable en esa
+muestra, de modo que su rango `03` se sostiene por el servicio probado y la utilidad comercial de la página,
+**no por SEO previsto**. CPC histórico de Labs tampoco es forecast ni aprobación de paid.
 
 Una landing publicada que **daña** (URL duplicada indexable, promesa sin prueba) sube por encima de su criterio.
 
@@ -64,20 +70,22 @@ Una landing publicada que **daña** (URL duplicada indexable, promesa sin prueba
 | --- | --- | --- | --- | --- | --- |
 | `01` | [TASK-1350](../../tasks/to-do/TASK-1350-landing-agencia-creativa.md) | Agencia Creativa | `/agencia-creativa-v2/` **y** `/agencia-creativa/` ambas `index, follow` con canonical propio | Dos URLs indexables compiten por el mismo término; creatividad es la línea del retainer base | Decidir URL final + 301 de la otra; dirección de arte del hero y motion |
 | `02` | [TASK-1862](../../tasks/to-do/TASK-1862-landing-aso.md) | ASO | Diseño; promoción atada a la extensión Search & App Visibility (`Proposed`) | **Pitch activo con Berel** (operador, 2026-09-11): acompaña una expansión en cuenta existente. Sin ese pitch sería la última (~20 búsquedas/mes) | Validar PDR-023 + llevar la extensión a `Approved for validation` — ahora urgentes |
-| `03` | [TASK-1401](../../tasks/to-do/TASK-1401-landing-hubspot-precios.md) | HubSpot · Precios | Diseño | Única página del hub con demanda real (~1.500/mes en el bloque hispano); el Pillar ya está publicado | Decidir la URL padre del hub (ver decisiones) |
-| `04` | [TASK-1403](../../tasks/to-do/TASK-1403-landing-hubspot-agentes.md) | HubSpot · Servicio de agentes (diseño, construcción, despliegue y operación) | Diseño; reenfocada 2026-09-13 a landing de servicio; contratos UI por rehacer | Familia formal «Agent Hub & Agentic Operations»; caso ANAM con Customer Agent activo y en producción | URL padre del hub + verificar la métrica ANAM y el alcance de su autorización + rehacer dirección visual, wireframe, flow y motion |
-| `05` | [TASK-1812](../../tasks/to-do/TASK-1812-salesforce-services-landing.md) | Salesforce | Oferta, wireframe, flow y motion listos | La práctica no tiene superficie pública; oportunidad SGS observada. **Sube a `03` si SGS está en pitch activo** | Readback de partnership/derechos, first fold, CTA binding |
-| `06` | [TASK-1865](../../tasks/to-do/TASK-1865-landing-performance-marketing.md) | Performance Marketing | Diseño | Mejor demanda pura de las nuevas: 480–590/mes en Chile, KD 11–13, Efeonce no rankea; retira la legacy `242862` con 301 | Validar PDR-022 |
-| `07` | [TASK-1860](../../tasks/to-do/TASK-1860-landing-trade-marketing-btl.md) | Trade Marketing & BTL | Diseño | ~880/mes, pero SERP informativo y laboral; el modificador comercial tiene ~10/mes | Validar PDR-021 |
-| `08` | [TASK-1803](../../tasks/to-do/TASK-1803-landing-branding-studio-sistema-marca.md) | Branding Studio | Estrategia y contratos UI listos | La ruta de Réditos incluye branding, pero está bloqueada | CTA/Brand Diagnostic, casos y derechos, SEO/canonical |
-| `09` | [TASK-1369](../../tasks/to-do/TASK-1369-about-us-identidad.md) | About Us | Diseño | Identidad y E-E-A-T, no captura | Bios reales del equipo + arte del hero |
-| `10` | [TASK-1859](../../tasks/to-do/TASK-1859-landing-product-design-360.md) | Product Design 360 | Diseño | Publicación por fases atada al business model | Aprobación comercial del modelo |
+| `03` | [TASK-1877](../../tasks/to-do/TASK-1877-equipos-humano-agente-landing.md) | Equipos humano-agente · transversal | Brief y UI inicial; ruta propuesta aún `404` (2026-09-19) | Servicio aprobado y probado; explica oferta independiente de CRM y ruta marketing/AEO, además de revenue y servicio | Proof/rights publicables, slug/canonical, CTA y QA; sin asumir demanda orgánica ni elegibilidad de agentes |
+| `04` | [TASK-1401](../../tasks/to-do/TASK-1401-landing-hubspot-precios.md) | HubSpot · Precios | Diseño | Única página del hub con demanda real (~1.500/mes en el bloque hispano); el Pillar ya está publicado | Decidir la URL padre del hub (ver decisiones) |
+| `05` | [TASK-1403](../../tasks/to-do/TASK-1403-landing-hubspot-agentes.md) | HubSpot · Servicio de agentes (diseño, construcción, despliegue y operación) | Diseño; contratos UI por rehacer | Familia formal «Agent Hub & Agentic Operations»; caso ANAM con Customer Agent activo y en producción; puente a TASK-1877 sólo tras live readback | URL padre del hub + verificar la métrica ANAM y el alcance de su autorización + rehacer dirección visual, wireframe, flow y motion |
+| `06` | [TASK-1812](../../tasks/to-do/TASK-1812-salesforce-services-landing.md) | Salesforce | Oferta, wireframe, flow y motion listos | La práctica no tiene superficie pública; oportunidad SGS observada. Reordenar si SGS pasa a pitch activo | Readback de partnership/derechos, first fold, CTA binding |
+| `07` | [TASK-1865](../../tasks/to-do/TASK-1865-landing-performance-marketing.md) | Performance Marketing | Diseño | Mejor demanda pura de las nuevas: 480–590/mes en Chile, KD 11–13, Efeonce no rankea; retira la legacy `242862` con 301 | Validar PDR-022 |
+| `08` | [TASK-1860](../../tasks/to-do/TASK-1860-landing-trade-marketing-btl.md) | Trade Marketing & BTL | Diseño | ~880/mes, pero SERP informativo y laboral; el modificador comercial tiene ~10/mes | Validar PDR-021 |
+| `09` | [TASK-1803](../../tasks/to-do/TASK-1803-landing-branding-studio-sistema-marca.md) | Branding Studio | Estrategia y contratos UI listos | La ruta de Réditos incluye branding, pero está bloqueada | CTA/Brand Diagnostic, casos y derechos, SEO/canonical |
+| `10` | [TASK-1369](../../tasks/to-do/TASK-1369-about-us-identidad.md) | About Us | Diseño | Identidad y E-E-A-T, no captura | Bios reales del equipo + arte del hero |
+| `11` | [TASK-1859](../../tasks/to-do/TASK-1859-landing-product-design-360.md) | Product Design 360 | Diseño | Publicación por fases atada al business model | Aprobación comercial del modelo |
 
 ### Habilitador transversal
 
 | Rank | Task | Superficie | Por qué importa | Qué la destraba |
 | --- | --- | --- | --- | --- |
 | `H1` | [TASK-1801](../../tasks/complete/TASK-1801-contacto-multistakeholder-form-agenda.md) ✅ | Contacto | Landing pública aprobada y cerrada 2026-09-15 | Hardening operativo fuera del alcance cerrado; Meetings sigue en TASK-1510 |
+| `H2` | [TASK-1878](../../tasks/to-do/TASK-1878-public-landing-entrypaths-human-agent.md) | Entradas Home, HubSpot y AEO hacia oferta humano-agente | Enrutamiento contextual sin reabrir landings cerradas | TASK-1877 publicada y verificada; cambios page-scoped y QA |
 
 ### Artículos del hub HubSpot (fuera del ranking de landings)
 
@@ -158,7 +166,7 @@ Ya están en ejecución; no compiten por prioridad, sólo tienen que cerrarse.
 
 - Reemplazar EPIC-019 ni su control plane técnico.
 - Autorizar publicaciones, cambios de indexación, redirects o escrituras en WordPress: cada una sigue su gate.
-- Cambiar `Priority`, `Impact` o el alcance de las tasks hijas.
+- Cambiar `Priority` o `Impact` de las tasks hijas.
 - Crear landings nuevas: una superficie nueva nace como task propia y entra acá con `Rank`.
 
 ## Delta 2026-09-11
@@ -197,3 +205,17 @@ superados y se rehacen dentro de la task; su posición en el ranking no cambia.
 
 El alcance de esa landing es sólo agentes de HubSpot. Una landing de agentes en otras plataformas (Agentforce y
 demás) queda anotada como futura, sin task ni `Rank` hasta que el operador la priorice.
+
+## Delta 2026-09-19
+
+La oferta aprobada de transformación de equipos humano-agente entra como TASK-1877 (rank `03`), independiente de
+plataforma y con ruta de marketing/AEO además de revenue, servicio y operaciones. Las posiciones antes `03`–`10`
+se desplazan juntas a `04`–`11`; el orden de las páginas específicas no cambia. TASK-1878 (`H2`) gobierna
+entradas desde Home, HubSpot y AEO sin reabrir las tasks cerradas y sin enlazar una URL `404`. TASK-1403 y
+TASK-1812 conservan las implementaciones por proveedor. El comentario de 2026-09-13 sobre «otra landing» queda
+acotado a futuros productos Agentforce; no describe la oferta transversal ahora registrada.
+
+Readback HTTP 2026-09-19: Home, `/servicios-contratar-hubspot/` y `/aeo-2/` responden `200`;
+`/servicios/hubspot/` redirige a un artículo antiguo; `/servicios/hubspot/agentes/`,
+`/servicios/salesforce/` y la ruta propuesta `/servicios/equipos-humano-agente/` responden `404`.
+No hubo escritura WordPress ni autorización de publicación, redirects o pauta.

@@ -1,0 +1,830 @@
+{
+  "nota": "Piezas con CTA aprobadas al corte del canon 2026-09-23: siguen con las reglas del canon 2026-09-22. Cada una se reconoce por el sha256 de su plate y la huella de su definición en el plan sin la ruta del plate (una pieza editada deja de estar aquí y nace con el canon vigente). Es una foto del corte: NO se regenera ni se le agregan piezas nuevas; hacerlo es decisión del operador, con commit.",
+  "corte": "2026-09-23",
+  "enmiendas": [
+    {
+      "fecha": "2026-09-23",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/piezas.json",
+      "piezas": [
+        "01-fuera-916",
+        "02-reconoces-916",
+        "03-referencia-916",
+        "04-elegida-916"
+      ],
+      "cambio": "Firma de las cuatro stories finales de v07 movida dentro de la zona segura de AXIS (signatureY 0,9 → 0,8565; signatureSafeArea y 0,85–0,97 → 0,80–0,87; placementLimitation reescrita). El resto de cada pieza no cambia; las huellas se reemplazan, no se agregan: la versión anterior ya no existe en el repo.",
+      "decision": "Operador, 2026-09-23: mover la firma sólo en las stories finales de v07; el canon nuevo rige hacia adelante y estas piezas siguen con el canon 2026-09-22.",
+      "huellasAnteriores": {
+        "01-fuera-916": "33ee1d5dfed73397a24e74a4e0e48cbb6d0c84ea06119b1f943e4ea945e90162",
+        "02-reconoces-916": "c32173686f65c6e3fe3b6a88ddaee647c841e0ec60cb1ae321f7d630e42914ff",
+        "03-referencia-916": "9cb3a287b0176fb8c78a31406adeb17c13a423ec8d3798b2fec77db5124138bc",
+        "04-elegida-916": "5766ba0dd66293bbf58d2911a4a3a202903d7e64ac41d696fc6e98b0daa0d91d"
+      }
+    },
+    {
+      "fecha": "2026-09-23",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/piezas.json",
+      "piezas": [
+        "04-elegida-916"
+      ],
+      "cambio": "Plate con el primer plano subido para que la firma quede dentro del lecho y no sobre su canto (lo detectó el operador). Primer plano (lecho y apoyabrazos) subido 60 px del plate (69 px en la pieza) como una capa rígida, como con la cámara un poco más baja; el corte sigue el borde del propio objeto, con 10 px de fundido. Sin IA y sin deformar su forma. Ruta: plates/04-elegida-916.png → plates/04-elegida-916-lecho.png. La definición de la pieza no cambia (misma huella); cambia el sha256 del plate.",
+      "decision": "Operador, 2026-09-23: aprobó esta versión («Si, ahí si quedó bien») tras rechazar dos propuestas por forzadas. Como en la enmienda de la firma, la pieza sigue con el canon 2026-09-22.",
+      "platesAnteriores": {
+        "04-elegida-916": "af747aa7a04d052fa8df3dcc3a72f30cee3c6d6d4b6778f1e5534994c501f7be"
+      }
+    }
+  ],
+  "piezas": [
+    {
+      "id": "b2-primero-el-numero-169",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-bofu-formatos.json",
+      "plate": "fed3be9f655f13156b6511059d414f92342264ca649f8ba0d32ce30b914543ea",
+      "pieza": "ca9260a6c270dba8502a962bd95813f0d6c8d206e68ef76ad9fe6b4b7963313a"
+    },
+    {
+      "id": "b2-primero-el-numero-916",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-bofu-formatos.json",
+      "plate": "8ecc16530dee336de118f6e7dc0e2adf2edf6763a6a7f3280b8e73aef6d53606",
+      "pieza": "60cb78bd9fd469cc0474b8ccb33860909407a21600ad9bf17fc4ca15d9c5651f"
+    },
+    {
+      "id": "b2-primero-el-numero",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-bofu.json",
+      "plate": "bbed06535ec69481ebe0710c6ac4f33170682db6a3fd1d2583d53e823faa4a4b",
+      "pieza": "c8577146de54c36a73a13961140effdbc8af2119e2e200abc809620adb65352b"
+    },
+    {
+      "id": "p1-atril-busqueda-16x9-cta",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta-formatos.json",
+      "plate": "bf42f0b4b7a4c82812b3d4e1ca8c7fb2d0932f42fbf89f5b484271c763f234d4",
+      "pieza": "0680310fbe739b3f77696c366e46d474858d4c1a9bd2ec9b324d7d456050eb9a"
+    },
+    {
+      "id": "p1-atril-busqueda-9x16-cta",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta-formatos.json",
+      "plate": "fad78bf8f90b3da16574b01c77dc75aef11e59d1066efdd85acde46fe6480673",
+      "pieza": "3acdb15ec3bde2c87e92eea2c6e0933a7558bd6479771901a5fe5174b5d6380c"
+    },
+    {
+      "id": "p2-expediente-16x9-cta",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta-formatos.json",
+      "plate": "1802cae22de1718386e9c2d671ca19f7bc867fea8ffc0b5b24c9f675e650ea08",
+      "pieza": "dd00e31187a208808b05685e096826e8744b014c40989b66df4f8e112901de34"
+    },
+    {
+      "id": "p2-expediente-9x16-cta",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta-formatos.json",
+      "plate": "a3517abfd9e25436b76fb58c2954873132fd25a5378f4649ea1b6af56639e417",
+      "pieza": "29f4ca1b526cf1b8a9b6dcd6aec6600f2853b22f72a8f73d65265f87970bff6f"
+    },
+    {
+      "id": "p3-megafono-16x9-cta",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta-formatos.json",
+      "plate": "849bd10d7f20b3e650c171d281868edbce3edca780d556b29c4b29e9811c098e",
+      "pieza": "4a2bb9f59b897d3c3825171850830064f370edf42222ab2ee0639f38b5a82ff9"
+    },
+    {
+      "id": "p3-megafono-9x16-cta",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta-formatos.json",
+      "plate": "88b35f03f08d85eb00a0c251f55b5ec12068c309ca66e5cb7e43af924cd740e8",
+      "pieza": "122c83ad1c321df475ede481ab718f2c0c0252f3f160a7ee60ebe2827b99692a"
+    },
+    {
+      "id": "p1-cta-contorno",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta.json",
+      "plate": "1c637b6ea1b3aefcc313f606642dfdce837c5bccda1c404644a6baff4c20f060",
+      "pieza": "9a07e0f33dc3b8183cb74809ca01a41b1eb41893876b2a7e27fb421d2d029f24"
+    },
+    {
+      "id": "p2-cta-relleno",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta.json",
+      "plate": "daa7f797345a6f61d50e19de7ed67a6ffbc8e572c6227b1e9784c4ca0ccbc1c7",
+      "pieza": "2f46198a414cc15f993786d0acb23c545382e0c96ad56105dd325cf9f48f2bc0"
+    },
+    {
+      "id": "p3-cta-texto",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-cta.json",
+      "plate": "dd42905580156f3f50e2c1b594880a45a8bff303f4da515f66164a12f0f2b67c",
+      "pieza": "6ae02272414af541bf7d9fdabc4d880576a4840683372a778a61256deb306c33"
+    },
+    {
+      "id": "m1-no-te-eligen",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-mofu-DESCARTADO-cdr005.json",
+      "plate": "bb571ae3d79ce34b5252184e1e34d0f6d22b4fd30d972a09b2e51c74af9ffd4e",
+      "pieza": "a6f26975cd28545676cddb8db62bf63fcf1c713b62b36758fb2150a91f92838d"
+    },
+    {
+      "id": "m2-ya-no-puedes",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-mofu-DESCARTADO-cdr005.json",
+      "plate": "17b171c4f24446af5f3b37b45c46ff41f79489f6cb26d1702d63c0a4bb7c93e9",
+      "pieza": "b50e089a1cb173da6fa0e52c17cf42765e029ca2360f88ec60c992df85b59cee"
+    },
+    {
+      "id": "m3-que-rompiste",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-mofu-DESCARTADO-cdr005.json",
+      "plate": "a3198a5b6d4e76487f7fcc4f44ebdc985b90d4a4fb160fe1a340ca9953e7bada",
+      "pieza": "7fa79367c952a1366509931016832e97352a2dd29d6db3420400286b7feca74a"
+    },
+    {
+      "id": "mo1-canal-nuevo-169",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-mofu-formatos.json",
+      "plate": "eaf7c04888e20cb9df8a2096d1259c3193f0b3d56bae35bd2b53a8ca84e1718a",
+      "pieza": "b7f0033ec5f5a4cf726217a6f987ece442302842223923e14c58d407e34c9c47"
+    },
+    {
+      "id": "mo1-canal-nuevo-916",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-mofu-formatos.json",
+      "plate": "2f4846cf7a125d12ab3cf55aaba0a2c6ff909454f409941d9f08ef874360c56f",
+      "pieza": "7c288e028f38e11019ac081e65d670121283bad933d495d8c119508e9a18cdbb"
+    },
+    {
+      "id": "mo2-no-te-citan-169",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-mofu-formatos.json",
+      "plate": "114e0de2fbc7b84b4b6de6a96e1bd165d9ee54cad652d16eb52402fd09ba9c36",
+      "pieza": "e665950eaa974c20d711a6dce43e3d51326edf07d469f08b3898503d4d211505"
+    },
+    {
+      "id": "mo2-no-te-citan-916",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-mofu-formatos.json",
+      "plate": "15771e75deebeab0a8da43b22d27f5c018e6f87d82e25eacb13d014088929001",
+      "pieza": "ea0cad4369998fb33f0c744e50485c42309b16e8028880a9577ca8c57f424779"
+    },
+    {
+      "id": "mo3-no-creernos-169",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-mofu-formatos.json",
+      "plate": "7ee549ccc712170018f9ce6f0f09ca5901915278c0c66627a263a79e871051dd",
+      "pieza": "1535400fff0ebcb078e570909101d3977c56e8097234470ff218c592f2ee14e4"
+    },
+    {
+      "id": "mo3-no-creernos-916",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-mofu-formatos.json",
+      "plate": "3e2d5e7e9682d5da318cb7f8d53cb73b2e3dfb97c6b4e16bb1e872f807373daf",
+      "pieza": "49debe23d6303a6c35a31b95b92e2532ef47878c0feac8f417c4510b13207202"
+    },
+    {
+      "id": "mo2-no-te-citan",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-mofu-v2.json",
+      "plate": "aaf5444e55bf7aefa0554c725e8d14152b1adc2d60badf9dc884121ddd785fc0",
+      "pieza": "d8a6af91c31bccd88eacc20033e9b1af6617894f97eb353e390a5b95660cf4a7"
+    },
+    {
+      "id": "mo1-canal-nuevo",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-mofu-v2b.json",
+      "plate": "2837f902609f5717a7d87809d58124701001e590fdb79401040dc42e3c634dba",
+      "pieza": "878da64931d649b06250ceb30a7bb5e73fcff23409e15cb1a88d994c8c6cf5b3"
+    },
+    {
+      "id": "mo3-no-creernos",
+      "plan": "ai-generations/2026-09-21_registro-c-respuesta/piezas-mofu-v2b.json",
+      "plate": "02b977fd187ac13e97ff8df6ab628f638df4aa1814da615da71e24a8244efa51",
+      "pieza": "eddacffad74594024825ec9cd9bbdb9d62fca3e7331103e6018c5c2cc9a851b1"
+    },
+    {
+      "id": "01-fuera-916",
+      "plan": "ai-generations/2026-09-22_aeo-compositor-audit/piezas.json",
+      "plate": "2976aa8d60740a7b802979c61fb4489e7e1e260fd92a2a703edd2a747236e833",
+      "pieza": "3545c871c3b39c58c5f4eb934c4304485c29019e0fce7db4e3149dd81e905e4e"
+    },
+    {
+      "id": "02-reconoces-916",
+      "plan": "ai-generations/2026-09-22_aeo-compositor-audit/piezas.json",
+      "plate": "c759b7fe980c4978381e722c19ee2ac016795f3f81afb3649a8800ac65a14e88",
+      "pieza": "5d39bba3a5f567ab75ccd9370af83a0405138f53fa8a79f734dd20b47a6f6f3d"
+    },
+    {
+      "id": "03-referencia-916",
+      "plan": "ai-generations/2026-09-22_aeo-compositor-audit/piezas.json",
+      "plate": "4c55cbeeca432d9f8252fefe45085c34b323a8308dda84411ccacacfb49926a4",
+      "pieza": "8f2a5c09fd32358fa76c8d384378a2649caf4e3cc0648a8a1aa866bf88358e02"
+    },
+    {
+      "id": "04-elegida-169",
+      "plan": "ai-generations/2026-09-22_aeo-compositor-audit/piezas.json",
+      "plate": "fe174c066b9b91b804b55e8e7afd6be9716680c8235e08ad238d1c6101e6f4cc",
+      "pieza": "4e0e91158ce04b5153536fb9713867f645e15c87341eaaa26b2d259291318c51"
+    },
+    {
+      "id": "01-fuera-169",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/piezas.json",
+      "plate": "1013917024780dbcd30e75ce9299639bbe1bf62cbd4383e2f4eb59e15cef8315",
+      "pieza": "1a616bdcb35fbb409294a90e6215c02710cb75efc7150852576bb5e08e3319c9"
+    },
+    {
+      "id": "01-fuera-916",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/piezas.json",
+      "plate": "d656f1448ee7302eb5ba1db8dfe59f149d0ad03e68919db2a0f0460e85ec1c85",
+      "pieza": "0611085b91ad6b7be5ec3b7f063f3e1e6e226625fbf4af8b290f22ffe4416113"
+    },
+    {
+      "id": "02-reconoces-169",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/piezas.json",
+      "plate": "2659e296a69e3172167e3aa039063dc5f0e102c900bf9fdc56afbb97ec8345d5",
+      "pieza": "366e987204a8fb6c3454d060542120137442441cd7f209b792a8a30c9a30efd9"
+    },
+    {
+      "id": "02-reconoces-916",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/piezas.json",
+      "plate": "4be8c9c983992a904d6f7564a0391601fce9f5ab222db0735a3b7570d5086f55",
+      "pieza": "cd3ab181b97244b22f6e15e0a9ceea99a19aab7ead8d2ca128273c1acad2082a"
+    },
+    {
+      "id": "03-referencia-169",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/piezas.json",
+      "plate": "5acbef7d4e6843676f00528d397a38328f96dc76b12245f9e0bac6e33220f040",
+      "pieza": "46f444c0aa45dafb26c1c6331a12985409cd0ce529f32b1ac425b19e5ab93086"
+    },
+    {
+      "id": "03-referencia-916",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/piezas.json",
+      "plate": "3d785c3d6fbb3dbe596576be887d1629fcf2f4798620db1238c09641792cda48",
+      "pieza": "2fc1363177551fabaf0494c5788e89c63ccc7860703a9fe0265ab6fc4f4dd9b8"
+    },
+    {
+      "id": "04-elegida-169",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/piezas.json",
+      "plate": "fe174c066b9b91b804b55e8e7afd6be9716680c8235e08ad238d1c6101e6f4cc",
+      "pieza": "d5f32cf04fdb73129f91199e084b603ed007553754c95789d2d66d3c3d7e0c0b"
+    },
+    {
+      "id": "04-elegida-916",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/piezas.json",
+      "plate": "16382fc95d1801ca9610d8271014678fa6416346fc095794052b7fa6593e22d2",
+      "pieza": "bd7542b984e510fa084d58888c613e0dba921a762170fa9ac9de672e385d55ac"
+    },
+    {
+      "id": "01-fuera-169",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/reproduccion-verificada/piezas.json",
+      "plate": "1013917024780dbcd30e75ce9299639bbe1bf62cbd4383e2f4eb59e15cef8315",
+      "pieza": "403cd7a8e90118e827d95804b32c6cac0276fc0ba42f7b4e746ac1110e6f8914"
+    },
+    {
+      "id": "01-fuera-916",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/reproduccion-verificada/piezas.json",
+      "plate": "d656f1448ee7302eb5ba1db8dfe59f149d0ad03e68919db2a0f0460e85ec1c85",
+      "pieza": "05265aff65eb264436be058b72be6609949e913901cc4fdd0efe082bb2592b2b"
+    },
+    {
+      "id": "02-reconoces-169",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/reproduccion-verificada/piezas.json",
+      "plate": "2659e296a69e3172167e3aa039063dc5f0e102c900bf9fdc56afbb97ec8345d5",
+      "pieza": "d97f91301a4a924adfc1f56b04b6971f45124cf5d7620b0a35f98a3771a42032"
+    },
+    {
+      "id": "02-reconoces-916",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/reproduccion-verificada/piezas.json",
+      "plate": "4be8c9c983992a904d6f7564a0391601fce9f5ab222db0735a3b7570d5086f55",
+      "pieza": "114145a5539bfe560cf8ad267d4a806fb1cf2f4f1438b78b10bebbf1a8236c68"
+    },
+    {
+      "id": "03-referencia-169",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/reproduccion-verificada/piezas.json",
+      "plate": "5acbef7d4e6843676f00528d397a38328f96dc76b12245f9e0bac6e33220f040",
+      "pieza": "c33e014e6ecf63563d60b53131b569ae860482fde16f168578ed53965e9c9978"
+    },
+    {
+      "id": "03-referencia-916",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/reproduccion-verificada/piezas.json",
+      "plate": "3d785c3d6fbb3dbe596576be887d1629fcf2f4798620db1238c09641792cda48",
+      "pieza": "9b37f1666102afa62302beed43e17fb4556fbd74d36146eb100a340609e1cf3e"
+    },
+    {
+      "id": "04-elegida-169",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/reproduccion-verificada/piezas.json",
+      "plate": "fe174c066b9b91b804b55e8e7afd6be9716680c8235e08ad238d1c6101e6f4cc",
+      "pieza": "928c4fe1a27e4707a1c142a89822c8f124996539fd58a0ebb31da79160e26147"
+    },
+    {
+      "id": "04-elegida-916",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v03/reproduccion-verificada/piezas.json",
+      "plate": "16382fc95d1801ca9610d8271014678fa6416346fc095794052b7fa6593e22d2",
+      "pieza": "d65309b9a69579afbb32e62b3171e613fcda818e9263dccefb4848fed213bfca"
+    },
+    {
+      "id": "01-fuera-11",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/piezas.json",
+      "plate": "256357f5185bc25b8045da5ead15174f17c9e54616718602684196670f8444b4",
+      "pieza": "470666c97a1be70c3fe77ed7fa6fbfec1eab740350d9f661b1a828d6fee2e888"
+    },
+    {
+      "id": "01-fuera-45",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/piezas.json",
+      "plate": "856999869c69681684ac57bb1b6fca0c0e5fe97a3c23599f0030a6d26a4d949c",
+      "pieza": "a8b0762ca67567fb443baffa7fc173e436fcf19ce925d3ce7992b5b34c404218"
+    },
+    {
+      "id": "02-reconoces-11",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/piezas.json",
+      "plate": "c722be4695789a669d90fdc4b9c0ad324fa6be46cfefde968d50e4675feb6397",
+      "pieza": "c68296924366731a5b92f1922905ab6bae969426ef6b1a7d1c4bea557f7d7b69"
+    },
+    {
+      "id": "02-reconoces-45",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/piezas.json",
+      "plate": "092972e5ca0738be37eb9951dbfb8d52b388bcead251b1d68048861a3de2cd70",
+      "pieza": "e29a0a6a756a0fb1f5523f0e56b5ef1b05b9e9618ae61c14ed8af00184c80610"
+    },
+    {
+      "id": "03-referencia-11",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/piezas.json",
+      "plate": "f17db172416e820cad0ca584a49d8d8d30835a69d09753479ac3e5a745a39573",
+      "pieza": "557f16e27ddbdb468b9d52ae04453b67d8b12e885aeca94207d8e32c1e1c7683"
+    },
+    {
+      "id": "03-referencia-45",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/piezas.json",
+      "plate": "a8b426e6282a69669eb01a6186b5c350481effcd1dda6d0c1f5866b585268d68",
+      "pieza": "517cda2f48057390e5eb3baaf197c3de12a2b7f2cecb6894eda61361e8ae6ae0"
+    },
+    {
+      "id": "04-elegida-11",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/piezas.json",
+      "plate": "b2df1437c9727c8d266588b98d5ea2d3a77eab2efe504da60ee646556916af74",
+      "pieza": "ca3cfb37c9544b80c8063b010d8383460bb7844a05ceda89260a9bfa19e1f150"
+    },
+    {
+      "id": "04-elegida-45",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/piezas.json",
+      "plate": "e04b514589a2b56045e52b84fdcd2eac3f79d33978d2af1231bb5d00b8dccb6b",
+      "pieza": "676abd2f8ad08b62323cec5ab6688ce9c8c3480d80b7ba5d25845e5bea263a17"
+    },
+    {
+      "id": "01-fuera-11",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/reproduccion-verificada/piezas.json",
+      "plate": "256357f5185bc25b8045da5ead15174f17c9e54616718602684196670f8444b4",
+      "pieza": "fe20c84831b3457c7374f239585aa42b4f0dd54c2843c8198d6fbb6277fe9aad"
+    },
+    {
+      "id": "01-fuera-45",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/reproduccion-verificada/piezas.json",
+      "plate": "856999869c69681684ac57bb1b6fca0c0e5fe97a3c23599f0030a6d26a4d949c",
+      "pieza": "b462040dfd0ec5d945a9fcb35c2df5e0e6b172e6d8134e399ffb95a01bf8b8ae"
+    },
+    {
+      "id": "02-reconoces-11",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/reproduccion-verificada/piezas.json",
+      "plate": "c722be4695789a669d90fdc4b9c0ad324fa6be46cfefde968d50e4675feb6397",
+      "pieza": "6d985c79826979206dc5baf16606107357b5fbd4272b94d2f4c3fd2e0b234090"
+    },
+    {
+      "id": "02-reconoces-45",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/reproduccion-verificada/piezas.json",
+      "plate": "092972e5ca0738be37eb9951dbfb8d52b388bcead251b1d68048861a3de2cd70",
+      "pieza": "e56b797fadb03877ae777f80cb3cdd90635339d1cb1aadd07e893f250dba224d"
+    },
+    {
+      "id": "03-referencia-11",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/reproduccion-verificada/piezas.json",
+      "plate": "f17db172416e820cad0ca584a49d8d8d30835a69d09753479ac3e5a745a39573",
+      "pieza": "92fdd9945769f8aaf49c834a1aeeeb31e66d333471d175136befe92177a0b9eb"
+    },
+    {
+      "id": "03-referencia-45",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/reproduccion-verificada/piezas.json",
+      "plate": "a8b426e6282a69669eb01a6186b5c350481effcd1dda6d0c1f5866b585268d68",
+      "pieza": "aff260fce7894f07258870c847a812085f51aa27214c5edb307b638c1b81fd59"
+    },
+    {
+      "id": "04-elegida-11",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/reproduccion-verificada/piezas.json",
+      "plate": "b2df1437c9727c8d266588b98d5ea2d3a77eab2efe504da60ee646556916af74",
+      "pieza": "c375a070b56f6d1ab8c61737fb91cb0f9f805907b66353d7598a46c79748eeec"
+    },
+    {
+      "id": "04-elegida-45",
+      "plan": "ai-generations/2026-09-22_aeo-cta-v04/reproduccion-verificada/piezas.json",
+      "plate": "e04b514589a2b56045e52b84fdcd2eac3f79d33978d2af1231bb5d00b8dccb6b",
+      "pieza": "10e7588a0ff1acbf87f2606ed925a393160b13b65249569f8cd95095999817d3"
+    },
+    {
+      "id": "01-fuera-11",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "256357f5185bc25b8045da5ead15174f17c9e54616718602684196670f8444b4",
+      "pieza": "a88966f828eea7257ad4a0eeea0893fea6e31727544b20ba3f9fbfc692705a70"
+    },
+    {
+      "id": "01-fuera-169",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "1013917024780dbcd30e75ce9299639bbe1bf62cbd4383e2f4eb59e15cef8315",
+      "pieza": "9fb2a20752d0fd4c46b21b48406b8724eb308cf6f5d1d7da553080158721deea"
+    },
+    {
+      "id": "01-fuera-45",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "856999869c69681684ac57bb1b6fca0c0e5fe97a3c23599f0030a6d26a4d949c",
+      "pieza": "da21f600adbb084912f20f1031911919b88e5aed704747e12f970905b31f33f2"
+    },
+    {
+      "id": "01-fuera-916",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "2976aa8d60740a7b802979c61fb4489e7e1e260fd92a2a703edd2a747236e833",
+      "pieza": "ccd86d1c5ef9d639f299dca7e425cec2351e030a9a9688621b4b2da0169d6fc8"
+    },
+    {
+      "id": "02-reconoces-11",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "c722be4695789a669d90fdc4b9c0ad324fa6be46cfefde968d50e4675feb6397",
+      "pieza": "694a6f264edf66b600bf619cce612228b605a13fe3389c7141bf51cb6a782bc1"
+    },
+    {
+      "id": "02-reconoces-169",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "2659e296a69e3172167e3aa039063dc5f0e102c900bf9fdc56afbb97ec8345d5",
+      "pieza": "6cb1d2b6fa80c79b3e184868f9d829600753994f4822b6ad78cfcf300aa19515"
+    },
+    {
+      "id": "02-reconoces-45",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "092972e5ca0738be37eb9951dbfb8d52b388bcead251b1d68048861a3de2cd70",
+      "pieza": "9007fc468ff1e8440db835c417faec7a456c5dd5c69f6e7bdac093be106f4236"
+    },
+    {
+      "id": "02-reconoces-916",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "c759b7fe980c4978381e722c19ee2ac016795f3f81afb3649a8800ac65a14e88",
+      "pieza": "d102782ec78a390f0ea0d82a6b59f5ac8c683e5c245cbe631b9e7b9b05566f5e"
+    },
+    {
+      "id": "03-referencia-11",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "f17db172416e820cad0ca584a49d8d8d30835a69d09753479ac3e5a745a39573",
+      "pieza": "149feeefe49575dbbe102e6ef30ae9632625d157711133d772b74b49dcebe583"
+    },
+    {
+      "id": "03-referencia-169",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "5acbef7d4e6843676f00528d397a38328f96dc76b12245f9e0bac6e33220f040",
+      "pieza": "1f7fd6ad0078e0b152e1b84026b9b0dbfe59897924b444b638b47af3c88e5b78"
+    },
+    {
+      "id": "03-referencia-45",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "a8b426e6282a69669eb01a6186b5c350481effcd1dda6d0c1f5866b585268d68",
+      "pieza": "38b2ab2ff37c4caac4516563fce815a03e97e20c00cdf10c751c60ebc13d4569"
+    },
+    {
+      "id": "03-referencia-916",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "4c55cbeeca432d9f8252fefe45085c34b323a8308dda84411ccacacfb49926a4",
+      "pieza": "8fc6ea7e68cd1354bc298567ab143ad9057be65f83e7d1cb33847c0a0c5867e3"
+    },
+    {
+      "id": "04-elegida-11",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "b2df1437c9727c8d266588b98d5ea2d3a77eab2efe504da60ee646556916af74",
+      "pieza": "812cb992c9bdc4b78f6c5d4d2f263408c50c5cd9794dd1a96f6de25b3d6754e2"
+    },
+    {
+      "id": "04-elegida-169",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "fe174c066b9b91b804b55e8e7afd6be9716680c8235e08ad238d1c6101e6f4cc",
+      "pieza": "6fe9d888bb206a680994465e7bb284643962d7e9f110a92416ae0de2c4fbb1c0"
+    },
+    {
+      "id": "04-elegida-45",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "e04b514589a2b56045e52b84fdcd2eac3f79d33978d2af1231bb5d00b8dccb6b",
+      "pieza": "6e11bec25c6cbc13bb69fb76bbdb2660a4a6539441354a6d06357b7be4f2fa47"
+    },
+    {
+      "id": "04-elegida-916",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v05/piezas.json",
+      "plate": "ae8324fe3518c5dbf95c82e68cb00e09319d17c8d41d95cc4fa302351346c44e",
+      "pieza": "e6893d479f35f7973b471d71ed08ef697d79b7ef2721d900cfe39622d19d2168"
+    },
+    {
+      "id": "01-fuera-916",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v06/piezas.json",
+      "plate": "2976aa8d60740a7b802979c61fb4489e7e1e260fd92a2a703edd2a747236e833",
+      "pieza": "246cceda392bd6fe321ac1a45155666d56dc4084634171caa45ccac67b518869"
+    },
+    {
+      "id": "02-reconoces-916",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v06/piezas.json",
+      "plate": "c759b7fe980c4978381e722c19ee2ac016795f3f81afb3649a8800ac65a14e88",
+      "pieza": "7d794e13e51d5afc3a5ab47e0aedd05990af25b29daccab2a61a39d4b20b8a8f"
+    },
+    {
+      "id": "03-referencia-916",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v06/piezas.json",
+      "plate": "4c55cbeeca432d9f8252fefe45085c34b323a8308dda84411ccacacfb49926a4",
+      "pieza": "ebdd6801c5fde65592ea6510cdee4f66d6d142e02c8952af06f940a53e15c5e0"
+    },
+    {
+      "id": "04-elegida-916",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v06/piezas.json",
+      "plate": "ae8324fe3518c5dbf95c82e68cb00e09319d17c8d41d95cc4fa302351346c44e",
+      "pieza": "a89d453955b64d06cafedcfef3836e471506adf6263f6711938b1b10044a7ad3"
+    },
+    {
+      "id": "01-fuera-11",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/origen-v06/piezas.json",
+      "plate": "256357f5185bc25b8045da5ead15174f17c9e54616718602684196670f8444b4",
+      "pieza": "655fd4c45695e4ccedb9f5a1223cf4316b07dd1789fde873c21b3c2d6c36cfb9"
+    },
+    {
+      "id": "01-fuera-169",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/origen-v06/piezas.json",
+      "plate": "1013917024780dbcd30e75ce9299639bbe1bf62cbd4383e2f4eb59e15cef8315",
+      "pieza": "5f05de3df646654bd0a48b150344793b03ddd830197fa641c37077f69e95a7ad"
+    },
+    {
+      "id": "01-fuera-45",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/origen-v06/piezas.json",
+      "plate": "856999869c69681684ac57bb1b6fca0c0e5fe97a3c23599f0030a6d26a4d949c",
+      "pieza": "4aa6d4ce5423ea6742d3384af8752f9c7f29aa5f6e807390af15711fc70fe91f"
+    },
+    {
+      "id": "02-reconoces-11",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/origen-v06/piezas.json",
+      "plate": "c722be4695789a669d90fdc4b9c0ad324fa6be46cfefde968d50e4675feb6397",
+      "pieza": "062fdb468623f83614c637e4e27c2a00887f026028347976ecfe510dfb541c65"
+    },
+    {
+      "id": "02-reconoces-169",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/origen-v06/piezas.json",
+      "plate": "2659e296a69e3172167e3aa039063dc5f0e102c900bf9fdc56afbb97ec8345d5",
+      "pieza": "dcc0933c22c8ebce394018868a1202d354be28d2b0f93c9c4e3cfb01821ad0ed"
+    },
+    {
+      "id": "02-reconoces-45",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/origen-v06/piezas.json",
+      "plate": "092972e5ca0738be37eb9951dbfb8d52b388bcead251b1d68048861a3de2cd70",
+      "pieza": "64f9f393433567ef2475c4ef340f10ca24a3ff1d05cc323bb84e560e2e014545"
+    },
+    {
+      "id": "03-referencia-11",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/origen-v06/piezas.json",
+      "plate": "f17db172416e820cad0ca584a49d8d8d30835a69d09753479ac3e5a745a39573",
+      "pieza": "736ca3aab077efa3e8c2182ac7fd488104377ede1aeb72c170efbd279306ec04"
+    },
+    {
+      "id": "03-referencia-169",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/origen-v06/piezas.json",
+      "plate": "5acbef7d4e6843676f00528d397a38328f96dc76b12245f9e0bac6e33220f040",
+      "pieza": "9ced29d109f2829a81290953c52ca16c0d9ffafac4e720f7f51a554079c03cec"
+    },
+    {
+      "id": "03-referencia-45",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/origen-v06/piezas.json",
+      "plate": "a8b426e6282a69669eb01a6186b5c350481effcd1dda6d0c1f5866b585268d68",
+      "pieza": "a325d9aded7a6404cc79befbe3542f553c6f7f73ba36055d3ce53b7c5ffe8e86"
+    },
+    {
+      "id": "04-elegida-11",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/origen-v06/piezas.json",
+      "plate": "b2df1437c9727c8d266588b98d5ea2d3a77eab2efe504da60ee646556916af74",
+      "pieza": "107c8df1b037231f8b1dd63710bcb37c7fff544c8d8ec43cb301e1b08564da34"
+    },
+    {
+      "id": "04-elegida-169",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/origen-v06/piezas.json",
+      "plate": "fe174c066b9b91b804b55e8e7afd6be9716680c8235e08ad238d1c6101e6f4cc",
+      "pieza": "0d336e69d3fab0b19b57a31bff439d877d4127bd42dcc211d3e36bb7a4bb51fa"
+    },
+    {
+      "id": "04-elegida-45",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/origen-v06/piezas.json",
+      "plate": "e04b514589a2b56045e52b84fdcd2eac3f79d33978d2af1231bb5d00b8dccb6b",
+      "pieza": "d7d63e9d80e461989ce4539901c905d977b224fdbbee3fa5f6570b0fa055ad7b"
+    },
+    {
+      "id": "01-fuera-916",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/piezas.json",
+      "plate": "e321a6c2b0f3ec325a37dbb3eab28b17fd395dd68f43593f14a8d77ec2658702",
+      "pieza": "cd88f7fe677aae86705b0689b2779e61713be498a11245194d1a78439cc2ec80"
+    },
+    {
+      "id": "02-reconoces-916",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/piezas.json",
+      "plate": "3eca7df3ef7214a9c326f1a42a848a72d4023eeac271a9086bb64d0f90b7005f",
+      "pieza": "1bd856b8f8a2d911634fcf68420ece2ed1d40ae11c57a85f90fa854b9ae70ab4"
+    },
+    {
+      "id": "03-referencia-916",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/piezas.json",
+      "plate": "d190fe79a40925d60ff755216ebdfc432ebb6cd57eb802e2d5077a6702868872",
+      "pieza": "017ee0398b9c0d7b1a5d21246e583920396a95049851f3fcef36e2b09cec2ef2"
+    },
+    {
+      "id": "04-elegida-916",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/piezas.json",
+      "plate": "e49c32ecd6505ea67328fe4f015050c58dce7b9e82b7d2dce268c97b5b74330c",
+      "pieza": "d13948be96a988690868fd4bbb781e715df9ab1a1e0df25460034e63661b6d89"
+    },
+    {
+      "id": "KV-01-11",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "483856c3f017b376d5dfbaaeec45d4f6e32b04b5d6cd0fc0e77a2a1d9ec44d13",
+      "pieza": "dba2611f69cff8bcd570ba2cf5b0fc98ee5295ea641f7d15f4a683c19fea0000"
+    },
+    {
+      "id": "KV-01-169",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "dfac102cd47986e9b014264afbee5b2d845133e61ef15ff36a626e7f34adda99",
+      "pieza": "4a233155006eaa3ef1ebf58eb2e38061e253c496556c6d32d6037e6d55658f50"
+    },
+    {
+      "id": "KV-01-916",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "3ea5ae8bc870a3d5a613844de6bdfcbeddc31ff5d05617d2eef6f1c38ecc750f",
+      "pieza": "7a1eece82b1dc3986873443cc13c814fee4917384ab12306ea105bd06d1e59e6"
+    },
+    {
+      "id": "KV-02-11",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "41d7dbb83f441215604e595a9f53976366dcf172645393e67f9a2a56370ef633",
+      "pieza": "a675e31af23503193a611e5f5944ef7b308dac42ad07eec07265fd3b5ba4f1cf"
+    },
+    {
+      "id": "KV-02-169",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "82aec3a89060cbf11b89c739720b041af455ae5b56fd891e2b5b03aab16ef5f8",
+      "pieza": "fd3caa464d6392efecd940bb7b2516dfc6fd4cd720fce94a7cf3c3fad2f8d17c"
+    },
+    {
+      "id": "KV-02-916",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "f678fb4a9f4d6793aa6924601968e1c7d46f377bc2a19afd5196cb85300f0dd8",
+      "pieza": "3379686c442fca3a52111e7a3d0a380e549139db634ced8082b952b26a38f6fb"
+    },
+    {
+      "id": "KV-04-11",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "629606441b3db1e699e39121c46d0b6ec0380b8ae89c9ec65240c41821573cfc",
+      "pieza": "dbc6a1f58f123abb651a85a8c45162d3739cf1a8ec599238e0a3efeb05e6f439"
+    },
+    {
+      "id": "KV-04-169",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "cc5b77ccd7d1cd56079f097750856c63a932ab97d7636cc1a313e09db402f4d1",
+      "pieza": "fa29549f4fc53e4683aa485f1c079aca293443008dc070a54b60b1a2779de06a"
+    },
+    {
+      "id": "KV-04-916",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "5d6ce18e7a5b6f6d46ffab7eb8673a838527b009d27bfe12be5cedc9b90adc80",
+      "pieza": "c54c1207d1610789f51d597921f519d82fe3707800aca3a1cfab991578bedc3f"
+    },
+    {
+      "id": "KV-05-11",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "e58fa73cb8b095e091d337d58572a9f9d7454d91fa00d1ace3d6343399345779",
+      "pieza": "5bd360dba1afbdc263d76f87df86a73e9475b1737968c8fb4216174a4404bd8e"
+    },
+    {
+      "id": "KV-05-169",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "4230a9cc5cecb621d10e02776a7416118b2884132157313f2e0b40027c015cf2",
+      "pieza": "a2b0f37e9d71dd317b173f37c1abdead36fa488c7176ec811b7b8ed27a03b91d"
+    },
+    {
+      "id": "KV-05-916",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "4342ea394a8bf8b8cdca357db5b5eb70c6ce58ea2a5739804586e757cece1a8c",
+      "pieza": "d4b8dbc34584185bd7d2db69244d2b47db2fe1059eba14f2aac38b605f4d663f"
+    },
+    {
+      "id": "KV-06-11",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "4a7baae929c958a5577b5231bbb50b61ec6869b2f03c379b057a8dffc6d32233",
+      "pieza": "c224c4772add6c0a02c71f3fd4c7cdfb05fb7196848ca3f9daa77e6229554a2a"
+    },
+    {
+      "id": "KV-06-169",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "d6e4cc6bd9f62c4618e648ff6cb658d6289015598fe6aed398bcc7d3ba5b5590",
+      "pieza": "81394f0e3ec7c0878371d0d226058f9198fe5768ea38f3e2a14393d2daf7f9f4"
+    },
+    {
+      "id": "KV-06-916",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "22efd08b1862e21e4fadda835416064a60a5fed5474dfda502884ffbc30ed1a4",
+      "pieza": "0f810907b7fb8a29cd386048618a9954736381a052b4d53497aa85cf53461efc"
+    },
+    {
+      "id": "KV-07-11",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "405d2273bf63842ebcf8fa136fbe9869eb89febdf3dda0179f10db677ea5a0c5",
+      "pieza": "33ed0393266aca0f7e5a38680db5054f2f96041e4a56999b0210d5ce2f616f44"
+    },
+    {
+      "id": "KV-07-169",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "6ba804a09e0811459a5f1ab6c2ad55d09e89f6045d901cb29a4071d090a7e6f6",
+      "pieza": "f1e4cde5974d628113805285b33bd8dbcda9abf1ced12a74260d323f5dbf444a"
+    },
+    {
+      "id": "KV-07-916",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json",
+      "plate": "6af1e3d57b2bc40cd30f2e50cdb8e64a241aab99581c8e367d83ebe43bd9cbd2",
+      "pieza": "8395cbd7366a6b1cd0c88b37a75de2ccb2edd7f43209ca8aa4f172cbf83e3b4f"
+    },
+    {
+      "id": "KV-01",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion/piezas.json",
+      "plate": "fce92f8c451b920996e35bb283d1fd4154ee024e453c19fdb7fda0826b9cc9b6",
+      "pieza": "f67fd58e4768ca47be18833f542ee58af917ddec0cec008cc9ae8482bb3e793c"
+    },
+    {
+      "id": "KV-02",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion/piezas.json",
+      "plate": "3d356bd18c5acd49db792085ef4726c8fcb1802446897748cfc0ce0bdba06a2c",
+      "pieza": "5dabb7af7be504cdc2452f6d353940c7a366b8380518c9e764cec149f5ac8c5c"
+    },
+    {
+      "id": "KV-04",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion/piezas.json",
+      "plate": "9abe50f1859b614a8e0eae746976c761c16f4afdb21462cd7389bb8fd9784146",
+      "pieza": "87f031f11345f53fb2de90e4cf5cb22743bd0eff8ceb7c905f13c108b12cf82a"
+    },
+    {
+      "id": "KV-05",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion/piezas.json",
+      "plate": "e4b3950f07b0a74f8a0d5cbb7400a656ccb0ee9bbcba09f05b9aacb466f69d08",
+      "pieza": "a2494a76f727fdb0afb6c50cd28fb3d7efbb7a3536b11ed8f11cb0af734b816a"
+    },
+    {
+      "id": "KV-06",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion/piezas.json",
+      "plate": "8ba0a53f8e86802639c1d68b0450d9c2588c0716cdb07af526484f2bafc0e3d0",
+      "pieza": "4e5501879d81f691f163efa2f9cd4a5bd5e0a0537be01c46ecd654a036ae57ae"
+    },
+    {
+      "id": "KV-07",
+      "plan": "ai-generations/2026-09-22_cmp002-hubspot/composicion/piezas.json",
+      "plate": "bf903280ff683cb75053f86fc86360f783a405af12326b3a307a607a20f31e52",
+      "pieza": "798158f12b4a662b7a06e9822a78bba2c2671d46d190469474e0dbf52f49a086"
+    },
+    {
+      "id": "abierto",
+      "plan": "ai-generations/2026-09-22_cta-p1-v02/estudio-tracking/piezas.json",
+      "plate": "1c637b6ea1b3aefcc313f606642dfdce837c5bccda1c404644a6baff4c20f060",
+      "pieza": "d0fa1e71a56e6c55d280df4cd0b2a187329b9b75f0da301d4338f1288229c8c7"
+    },
+    {
+      "id": "cerrado",
+      "plan": "ai-generations/2026-09-22_cta-p1-v02/estudio-tracking/piezas.json",
+      "plate": "1c637b6ea1b3aefcc313f606642dfdce837c5bccda1c404644a6baff4c20f060",
+      "pieza": "c70abd458493feb2e9c5a428d5aa3a8372b75147a48d8f2af584995ae5da1a6b"
+    },
+    {
+      "id": "equilibrado",
+      "plan": "ai-generations/2026-09-22_cta-p1-v02/estudio-tracking/piezas.json",
+      "plate": "1c637b6ea1b3aefcc313f606642dfdce837c5bccda1c404644a6baff4c20f060",
+      "pieza": "421285f3f03c501e4498b361c238cb4ed6107e08cdc1704adeb43855b2baf99d"
+    },
+    {
+      "id": "a-texto-cursor",
+      "plan": "ai-generations/2026-09-22_cta-p1-v02/piezas.json",
+      "plate": "1c637b6ea1b3aefcc313f606642dfdce837c5bccda1c404644a6baff4c20f060",
+      "pieza": "91b843ef69a9430de379f06bf775a67fe56d3523da0fd28f188c98f9cc70d896"
+    },
+    {
+      "id": "b-contorno-redondeado",
+      "plan": "ai-generations/2026-09-22_cta-p1-v02/piezas.json",
+      "plate": "1c637b6ea1b3aefcc313f606642dfdce837c5bccda1c404644a6baff4c20f060",
+      "pieza": "469d066731d6c23f851df75eab91ab96e1e11fc44d91c5b870b1f403f7829752"
+    },
+    {
+      "id": "c-boton-lima",
+      "plan": "ai-generations/2026-09-22_cta-p1-v02/piezas.json",
+      "plate": "1c637b6ea1b3aefcc313f606642dfdce837c5bccda1c404644a6baff4c20f060",
+      "pieza": "cd16046d1828cecef9ba5e9046554c2e0a4eaa205ad1372189b528b5b270a09a"
+    },
+    {
+      "id": "a-texto-cursor",
+      "plan": "ai-generations/2026-09-22_cta-p1/piezas.json",
+      "plate": "1c637b6ea1b3aefcc313f606642dfdce837c5bccda1c404644a6baff4c20f060",
+      "pieza": "37580ea2cfab5f8b0212229c122df478ca25d05bb72ba23dc86317762c40fd04"
+    },
+    {
+      "id": "b-contorno-redondeado",
+      "plan": "ai-generations/2026-09-22_cta-p1/piezas.json",
+      "plate": "1c637b6ea1b3aefcc313f606642dfdce837c5bccda1c404644a6baff4c20f060",
+      "pieza": "b67d3759a67d4fabff83b2a43c3dfe91d6652288030f478d440f5c8f68287ebc"
+    },
+    {
+      "id": "c-boton-lima",
+      "plan": "ai-generations/2026-09-22_cta-p1/piezas.json",
+      "plate": "1c637b6ea1b3aefcc313f606642dfdce837c5bccda1c404644a6baff4c20f060",
+      "pieza": "9c04fd3d26e3746f9ccc033f7059e4f09e3c943bb48b070d1aa6caa8fa26e628"
+    },
+    {
+      "id": "a-texto-cursor",
+      "plan": "ai-generations/2026-09-22_cta-p2/piezas.json",
+      "plate": "985f09141fac04eff3f60cef9c196e14061485e7ae1bb5f3857ad40712a0f46b",
+      "pieza": "b8f335cd0f69c44b1487e9ed29e1697f9938eb249b00e393eeeac2815dc75e37"
+    },
+    {
+      "id": "b-contorno-redondeado",
+      "plan": "ai-generations/2026-09-22_cta-p2/piezas.json",
+      "plate": "985f09141fac04eff3f60cef9c196e14061485e7ae1bb5f3857ad40712a0f46b",
+      "pieza": "9770ae902d2e6835e8dbf48995a08945c44a67a6d0cc335cfbd6cabc3d15a8d2"
+    },
+    {
+      "id": "c-boton-lima",
+      "plan": "ai-generations/2026-09-22_cta-p2/piezas.json",
+      "plate": "985f09141fac04eff3f60cef9c196e14061485e7ae1bb5f3857ad40712a0f46b",
+      "pieza": "f9d026bbea2992307342885b7c2884c5ea5c4dfb20bac4ef632b9ec5caf6f36b"
+    }
+  ]
+}

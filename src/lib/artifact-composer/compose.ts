@@ -27,7 +27,7 @@ import {
   type ArtifactCatalog, TemplateAuthorityError } from './catalog'
 import type { DeckPlan, TemplateContract, TemplateName } from './contracts'
 import { findTemplate, selectTemplate } from './selector'
-import { launchComposerBrowser, mergeSlidePdfs, renderSlide } from './render'
+import { launchComposerBrowser, mergeSlidePdfs, renderSlide, type CatalogRenderRuntime } from './render'
 import { DeckValidationError, validateDeck } from './validate'
 
 /**
@@ -62,6 +62,13 @@ export interface ComposeOptions {
    * Default 20 MB, que es el techo típico. Ajustalo al que diga el RFP.
    */
   maxPdfMb?: number
+  /**
+   * Assets EXTERNOS al catálogo que el plan referencia como `asset-ref:<clave>` (TASK-1889: el logo
+   * privado de la organización cliente). El plan sella la REFERENCIA —su hash no cambia— y quien
+   * compone entrega aquí los bytes ya autorizados como data URI. Una referencia sin entrada en este
+   * mapa falla el render: nunca se dibuja un logo ajeno ni un hueco silencioso.
+   */
+  externalAssets?: Readonly<Record<string, string>>
 }
 
 const DEFAULT_CONCURRENCY = 4
@@ -179,6 +186,9 @@ export const composeArtifact = async (
 
   const emitPdf = catalog.outputTarget === 'pdf-merged'
 
+  // El runtime del render: el catálogo + los assets externos autorizados por quien compone.
+  const runtime: CatalogRenderRuntime = { ...catalog, externalAssets: options.externalAssets }
+
   // Launch determinista canónico: mismos slots → mismo píxel (ver `launchComposerBrowser`).
   const browser = await launchComposerBrowser()
 
@@ -191,10 +201,10 @@ export const composeArtifact = async (
 
       // El PNG es para revisión visual (y ES el artefacto en `png-set`); el PDF (vectorial) sólo
       // se imprime cuando el target lo ensambla.
-      await renderSlide(browser, templateHtmlPath, slide, contract, { kind: 'png', outPath: `${stem}.png` }, catalog, deckPlan)
+      await renderSlide(browser, templateHtmlPath, slide, contract, { kind: 'png', outPath: `${stem}.png` }, runtime, deckPlan)
 
       if (emitPdf) {
-        await renderSlide(browser, templateHtmlPath, slide, contract, { kind: 'pdf', outPath: `${stem}.pdf` }, catalog, deckPlan)
+        await renderSlide(browser, templateHtmlPath, slide, contract, { kind: 'pdf', outPath: `${stem}.pdf` }, runtime, deckPlan)
       }
 
       return { png: `${stem}.png`, pdf: emitPdf ? `${stem}.pdf` : null }

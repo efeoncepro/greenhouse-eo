@@ -1,0 +1,21 @@
+{
+  "id": "04-elegida-11",
+  "formato": "1:1",
+  "impacto": true,
+  "palanca": "instrumento",
+  "instrumento": "the large optical glass surface of a real inclined touch display, seen at almost grazing angle",
+  "objetos": [
+    "codex"
+  ],
+  "reservas": {
+    "texto": {
+      "muro": "the fine-grained graphite plaster of the real studio wall, naturally in deep even shadow",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the rounded dark graphite upholstered back of the empty viewer chair close to lens, outside all light",
+    "tono": "near black charcoal fabric in natural shadow with extremely soft optical defocus, not a graphic band"
+  },
+  "escena": "EDIT THE PROVIDED PHOTOGRAPH, keeping its exact character identity, wardrobe, material palette, lighting character, physical screen orientation, anatomically correct hand grip and visual story. Output a native 1:1 photograph, NOT a crop or letterbox. Re-stage the framing for this ratio. The edit target is the already corrected campaign photograph, not a generic inspiration. Keep the upper 36% as the existing real graphite wall in deep even shadow, with no head, projection, screen or bright beam in that area. The storytelling action must be clear and impactful, placed between 42% and 80% of image height. The bottom 18% is the natural defocused foreground object described below. No baked headline, CTA, signature or logos. Preserve close-up of one natural index finger hovering just before selecting a source card on a real inclined glass touchscreen, visible reflection, blue physical frame and canonical blue Codex character farther behind. Screen and character remain large and readable as shapes. Dark softly defocused foreground housing."
+}

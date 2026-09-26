@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  InsightsChapterSlide — apertura de capítulo del deck (TASK-1889). DERIVADA de la apertura A4
+  aprobada (`Premium-Capitulo`): el canvas no la diseñó. La aprueba el operador antes de congelar su
+  baseline. El número en contorno lo escribe el layout hook del catálogo (sangra fuera del lienzo).
+-->
+<link rel="stylesheet" href="deck-tokens.css" />
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="deck-editorial.css" />
+<style>
+  .slogan { font-family: var(--axis-deck-type-display); line-height: 1; }
+
+  .slogan-empower { font-weight: 800; font-style: italic; }
+
+  .slogan-your { font-weight: 800; }
+
+  .slogan-growth { font-weight: 900; font-style: italic; }
+
+  .orbit .ring { fill: none; stroke: var(--axis-deck-role-halo); stroke-width: 1; }
+
+  .orbit .arc { fill: none; stroke: var(--axis-deck-role-navyAccent); stroke-width: 1.6; stroke-linecap: round; }
+
+  .orbit .dot { fill: var(--axis-deck-role-navyAccent); }
+
+  .lockup { display: flex; align-items: center; gap: 16px; }
+
+  .lockup img { height: 30px; width: auto; display: block; }
+
+  .lockup .divider { width: 1px; height: 22px; background: rgba(var(--axis-deck-role-navyInk-rgb), 0.26); }
+
+  .lockup .product {
+    font-family: var(--axis-deck-type-display);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--axis-deck-role-navyAccent);
+  }
+
+  .kicker {
+    font-family: var(--axis-deck-type-display);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(var(--axis-deck-role-navyMuted-rgb), 0.85);
+  }
+
+  .numeral-art .chapter-numeral {
+    font-family: var(--axis-deck-type-display);
+    font-size: 440px;
+    font-weight: 700;
+    letter-spacing: -20px;
+    fill: none;
+    stroke: var(--axis-deck-role-navyAccent);
+    stroke-opacity: 0.32;
+    stroke-width: 1.5;
+  }
+
+  .chapter { position: absolute; inset: 0; padding: 44px 72px 36px; display: flex; flex-direction: column; }
+
+  .chapter-head { display: flex; justify-content: space-between; align-items: baseline; }
+
+  .chapter-label { font-family: var(--axis-deck-type-display); font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--axis-deck-role-navyAccent); }
+
+  .chapter-running { font-family: var(--axis-deck-type-display); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--axis-deck-role-navyMuted); }
+
+  .chapter-body { margin-top: 96px; display: grid; grid-template-columns: 560px 400px; gap: 64px; align-items: start; }
+
+  .chapter-intro { display: flex; flex-direction: column; }
+
+  .chapter-title { margin: 24px 0 0; font-family: var(--axis-deck-type-display); font-size: 50px; line-height: 1.04; font-weight: 700; letter-spacing: -0.025em; }
+
+  .chapter-lead { margin: 20px 0 0; font-size: 18px; line-height: 1.45; color: var(--axis-deck-role-navyLead); }
+
+  .section-label { font-family: var(--axis-deck-type-display); font-size: 10.5px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--axis-deck-role-navyAccent); }
+
+  .measured { margin-top: 30px; display: flex; flex-direction: column; gap: 14px; }
+
+  .measured:empty { display: none; }
+
+  .channels { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; }
+
+  .channel { display: inline-flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 500; color: var(--axis-deck-role-navyLead); }
+
+  .channel-disc {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--axis-deck-role-navyInk);
+    box-shadow: 0 0 0 1px rgba(var(--axis-deck-role-navyInk-rgb), 0.35);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .channel-disc img { width: 18px; height: 18px; display: block; object-fit: contain; }
+
+  .contents { padding-top: 70px; display: flex; flex-direction: column; }
+
+  .contents:empty { display: none; }
+
+  .contents .section-label { margin-bottom: 10px; }
+
+  .contents-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 9px 0;
+    border-top: 1px solid rgba(var(--axis-deck-role-navyInk-rgb), 0.14);
+    font-size: 14px;
+  }
+
+  .contents-entry:last-child { border-bottom: 1px solid rgba(var(--axis-deck-role-navyInk-rgb), 0.14); }
+
+  .contents-folio { font-family: var(--axis-deck-type-display); font-weight: 600; color: var(--axis-deck-role-navyAccent); }
+
+  .grow { flex-grow: 1; }
+
+  .chapter-foot { display: flex; justify-content: space-between; align-items: center; }
+
+  .chapter-foot .lockup img { height: 13px; }
+
+  .chapter-foot .lockup { gap: 12px; }
+
+  .chapter-foot .lockup .divider { height: 12px; background: rgba(var(--axis-deck-role-navyInk-rgb), 0.3); }
+
+  .chapter-foot .lockup .product { font-size: 9px; font-weight: 600; letter-spacing: 0.16em; color: var(--axis-deck-role-navyMuted); }
+
+  .chapter-folio { font-family: var(--axis-deck-type-display); font-size: 18px; font-weight: 600; color: rgba(var(--axis-deck-role-navyInk-rgb), 0.85); }
+</style>
+</head>
+<body>
+  <div class="lamina">
+    <svg class="numeral-art art" width="1280" height="720" viewBox="0 0 1280 720" aria-hidden="true">
+      <text class="chapter-numeral" x="1330" y="690" text-anchor="end">01</text>
+    </svg>
+
+    <div class="chapter">
+      <div class="chapter-head">
+        <span class="chapter-label" data-slot="chapterLabel">Capítulo 01</span>
+        <span class="chapter-running" data-slot="runningLabel">Informe de agosto 2026</span>
+      </div>
+
+      <div class="chapter-body">
+        <div class="chapter-intro">
+          <span class="deck-rule"></span>
+          <h1 class="chapter-title" data-slot="chapterTitle">Visibilidad orgánica</h1>
+          <p class="chapter-lead" data-slot="chapterLead">El sitio convierte mejor lo que muestra.</p>
+          <div class="measured" data-slot="measuredChannels"><span class="section-label" data-slot-field="label">Medimos la marca en</span><div class="channels" data-slot-field="channels"><span class="channel"><span class="channel-disc"><img data-slot-field="channelId" src="assets/channels/google.svg" alt="" /></span><span data-slot-field="name">Google</span></span></div></div>
+        </div>
+        <div class="contents" data-slot="contents"><span class="section-label" data-slot-field="label">En este capítulo</span><div class="contents-list" data-slot-field="entries"><div class="contents-entry"><span data-slot-field="title">Clics, impresiones y CTR</span><span class="contents-folio num" data-slot-field="folio">06</span></div></div></div>
+      </div>
+
+      <div class="grow"></div>
+
+      <div class="chapter-foot">
+        <div class="lockup">
+          <img src="assets/brand/logo-negative.svg" alt="Efeonce" />
+          <span class="divider"></span>
+          <span class="product">Insights</span>
+        </div>
+        <span class="chapter-folio num" data-slot="pageFolio">05</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

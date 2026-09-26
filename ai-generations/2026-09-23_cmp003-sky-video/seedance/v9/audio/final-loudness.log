@@ -1,0 +1,41 @@
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/sky-v9-fal-1080p-musica-sfx-sin-voz.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf62.12.101
+  Duration: 00:00:30.04, start: 0.000000, bitrate: 5212 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1080x1920 [SAR 1:1 DAR 9:16], 4958 kb/s, 24 fps, 24 tbr, 12288 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+  Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 247 kb/s (default)
+    Metadata:
+      handler_name    : SoundHandler
+Stream mapping:
+  Stream #0:1 -> #0:0 (aac (native) -> pcm_s16le (native))
+Press [q] to stop, [?] for help
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf62.12.101
+  Stream #0:0(und): Audio: pcm_s16le, 192000 Hz, stereo, s16, 6144 kb/s (default)
+    Metadata:
+      encoder         : Lavc62.28.101 pcm_s16le
+      handler_name    : SoundHandler
+size=N/A time=00:00:23.80 bitrate=N/A speed=47.1x elapsed=0:00:00.50    [Parsed_loudnorm_0 @ 0x7a97024b40] 
+{
+	"input_i" : "-16.47",
+	"input_tp" : "-1.49",
+	"input_lra" : "10.40",
+	"input_thresh" : "-27.13",
+	"output_i" : "-16.74",
+	"output_tp" : "-1.50",
+	"output_lra" : "7.60",
+	"output_thresh" : "-27.25",
+	"normalization_type" : "dynamic",
+	"target_offset" : "0.74"
+}
+[out#0/null @ 0x7a970243c0] video:0KiB audio:22544KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+size=N/A time=00:00:30.10 bitrate=N/A speed=  50x elapsed=0:00:00.60    

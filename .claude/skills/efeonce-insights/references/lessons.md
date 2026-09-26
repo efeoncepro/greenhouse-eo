@@ -1,10 +1,207 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-25 · A per-figure reading that repeats the page is not a reading.** Real PDFs (Berel p. 5, Sky p. 7)
+  printed the same sentence twice, and the targets page was titled with the period comparison because the planner
+  emitted no `conclusion`. Also: bounded AI authoring only REWRITES, so interpretation has to be computed by the
+  deterministic planner (findings over cited facts), never expected from the model. Rule: `conclusion` is always a
+  finding; `meaning` only if it says something else; check real PDFs, not only the plan JSON.
+- **2026-09-25 · TASK-1889 · Sólo los datos reales revelaron cinco defectos que el canvas no mostraba.** Con el canvas
+  en 20/21 de fidelidad y el visual gate a 0 px, las ediciones reales de Berel (`EO-INS-000019`) y Sky
+  (`EO-INS-000022`) destaparon: métricas SEO agrupadas en un eje común, la capitular suelta y presupuestos de texto
+  cortos (sección del A4 y del deck, título de figura del deck, nombre de métrica, etiqueta de columna). Regla: un
+  catálogo no está verificado hasta componer ediciones reales con `preview-edition.ts --editorial-v2`; el fixture de
+  ejemplo prueba la forma, no el contenido.
+- **2026-09-25 · TASK-1889 · Un umbral de negocio no se escribe en una plantilla: viene del registro dueño.** La zona de
+  atención de las metas se dibujó primero con `0,85 × meta`; la revisión de la sesión de TASK-1846 lo detectó y se
+  quitó. Ahora sólo existe si el plan trae `band` (`bandFactId`, límite del registro ICO emitido por TASK-1888); sin
+  banda, pista única. Regla: ninguna cifra de negocio (meta, umbral, banda) se inventa en el render; si falta el hecho,
+  la figura muestra menos, no algo supuesto.
+- **2026-09-25 · TASK-1889 · Un canal compartido no hace comparables dos métricas.** Las métricas SEO de Berel llevaban
+  todas `channelId = google` y caían en «columnas sobre un eje», mezclando clics con CTR. Regla: van a un eje común
+  sólo si `dimensionChannelIds` son todos no nulos y **distintos** (la dimensión ES el canal); si las dimensiones son
+  métricas, comparación con escala propia por métrica.
+- **2026-09-25 · TASK-1889 · Una capitular CSS se aplica aunque el párrafo tenga una línea.** `::first-letter` no mide:
+  con un párrafo corto la letra grande quedaba colgando. Se movió a un hook (`narrativeDropCapHook`) que mide el
+  layout compuesto y la aplica sólo con ≥ 3 líneas. Regla: toda decisión tipográfica que depende del largo real del
+  texto se toma midiendo el layout compuesto, no con CSS estático.
+
+- **2026-09-25 · `artifact-composer/pure` is not browser-safe.** Importing the chart geometry into `contracts/` to
+  validate value invariants failed the worker-in-Vercel lint and would have dragged Node crypto (manifest hash) into
+  every browser consumer of the contracts. Rule: `contracts/**` stays structural; anything that needs the geometry
+  lives in `editorial/` (`chart-values.ts`). The boundary test greps the contract SOURCE TEXT for `node:crypto`, so even a
+  comment naming it fails — describe it in words.
+- **2026-09-25 · Generation runs in the `ops-worker` too: watch what the composing phase imports.** Resolving the cover
+  through `organization-brand-assets.ts` pulled storage, Kysely and the assets client into the generation graph (the
+  commands tests broke on a `@/lib/db` mock). Rule: give the worker a light owner reader (`organization-logo-variants-reader.ts`)
+  instead of importing the owner's command module.
+- **2026-09-25 · Rounding hides a tiny pp change.** Berel CTR 1,83 % vs 1,87 % printed «1,8 % … 1,9 %, variación 0,0 pp».
+  No unit test would have found it; the read-only v2 preview over real data did. Rule: preview real editions
+  (`preview-edition.ts --editorial-v2 --plan-only`) before declaring the contract; under 0,05 pp print two decimals.
+- **2026-09-25 · The AEO adapter only reads the LATEST grader run.** The comparison window never has its own score, so
+  a gauge «with the previous period» has no evidence even though the canvas shows one. Rule: the family × evidence
+  matrix decides, not the canvas; enabling it means selecting the run by window in the grader's domain.
+- **2026-09-25 · ICO thresholds lived in several docs with different numbers.** Registry (runtime) FTR ≥ 80; glossary
+  said ≥ 70; ICO contract ≥ 85. The operator made `ICO_METRIC_REGISTRY` the single source the same day (docs aligned in
+  `9172cf5df`, formerly `f1a41cda0` before the 2026-09-25 history rewrite; hand-written portal semaphores → TASK-1900). Rule: the printed target comes from the registry via a
+  reference fact; never copy a number from a doc.
+
+- **2026-09-25 · Un canvas aprobado no es un diseño construido.** TASK-1847 cerró el mismo día en que el operador
+  aprobó el rediseño premium en un canvas; producción siguió sirviendo los catálogos v1 y el rediseño quedó en dos
+  tasks nuevas (1888 contrato, 1889 catálogos). Decir «los informes se ven así» mirando el canvas habría sido falso.
+  Regla: al cerrar una task de catálogos, o al describir el producto, nombrar **qué diseño sirve producción hoy** (qué
+  catálogo, qué release) y dónde vive el aprobado-sin-construir; nunca presentar una dirección aprobada como disponible.
+- **2026-09-25 · La fidelidad a un diseño aprobado se exige con referencias por página y un umbral, no a ojo.** El
+  operador pidió que el informe quede «igual al canvas». Eso se volvió medible: 41 páginas de referencia a tamaño nativo
+  versionadas en el repo, un paquete fuente que las regenera (40 de 41 byte a byte; la restante 0,008 % por
+  antialiasing), un fixture por plantilla con los datos de ejemplo del canvas y `pixelmatch` (umbral 0,1) con techo de
+  1 % de píxeles distintos por página; lo que exceda se corrige o se justifica en el dossier con la región y la
+  aprobación del operador. Regla: antes de construir contra un diseño, dejar referencias durables, reproducibles y un
+  criterio numérico; «se parece» no es un gate. Y el fixture del canvas vive sólo en pruebas: nunca datos de ejemplo en
+  producción.
+- **2026-09-25 · Material de referencia con marcado HTML va empaquetado dentro del repo.** Las fuentes `.dc.html` del
+  canvas se guardaron como `fuente-canvas-2026-09-25.tar.gz` para que el escaneo de Tailwind no lea su marcado (lee
+  cualquier archivo de texto del árbol y materializa sus clases). Regla: HTML de referencia, ejemplos o prototipos que no
+  son código del producto entran comprimidos o fuera del árbol escaneado, con el script que los reproduce al lado.
+- **2026-09-25 · Un diseño aprobado no autoriza familias, y la evidencia se verifica en la fuente, no se supone.** El
+  canvas dibuja 15 familias con datos de ejemplo; varias (embudo, Venn, UpSet, cascada) piden evidencia que ningún
+  adapter produce hoy. Y en sentido contrario, la primera matriz de TASK-1888 subestimó lo que sí existe: Sky tenía 11
+  meses de ICO en BigQuery, el snapshot traía `ftr_pct` que el adapter no leía y SEO ya declaraba granularidad
+  `day`/`month` (corregida en `e845ab562`). Regla: la matriz familia × evidencia decide qué se emite; cada veredicto se
+  verifica contra el adapter y la fuente (BigQuery/PG), nunca contra el diseño ni contra la memoria del planner.
+- **2026-09-25 · Los títulos del planner determinista repiten la etiqueta del hecho.** Hallazgo del cierre de
+  TASK-1847: el título repite la etiqueta en vez de afirmar la conclusión. Es del contrato del plan
+  (TASK-1888), no de un catálogo: arreglarlo en la plantilla escondería el defecto en una sola salida.
+
+- **2026-09-24 · El gate global puede bloquear un catálogo nuevo por drift histórico ajeno.** El baseline de
+  `deck-axis`/SKY ya difería en el `develop` limpio. Usa `--catalog=insights` para congelar y comparar sólo los
+  frames de Insights, preservando hashes ajenos; valida ambos comandos y mantén ISSUE-122 abierta para el gate global.
+
+- **2026-09-24 · Campos geométricos vacíos pueden borrar geometría SVG authored.** El resolver scatter escribía
+  `d=""` desde slots vacíos aunque el SVG ya tuviera path; el PDF quedaba sin puntos. Regla: un efecto de figura
+  vacío debe ser no-op y no sobrescribir la geometría del molde; cubrirlo con una regresión y abrir el PDF real.
+
+- **2026-09-24 · El baseline de Insights no puede promoverse sobre veinte frames ajenos.** El freeze halló cambios
+  declarados en diez plantillas nuevas y veinte frames `deck-axis` no declarados; las plantillas comerciales estaban
+  limpias en Git. Regla: conservar el baseline y resolver esa deriva con su dueño; no añadir frames ajenos al ledger
+  para forzar el freeze de otra task.
+
+- **2026-09-24 · El primer baseline de un catálogo nuevo sigue sujeto al commit atómico.** `composer:visual-gate`
+  reportó diez frames Insights aún no promovidos; el nuevo índice ya estaba declarado y el resto era el set del
+  2026-09-21. Regla: conserva los frames ajenos intactos y no ejecutes `--freeze` sin poder incluir baseline y
+  catálogo en el mismo commit.
+
+- **2026-09-22 · OTD nunca llegó a un informe, y nada falló.** El adapter ICO buscaba `metricId === 'otd'`; el
+  registro del motor lo llama `otd_pct`. Sin match, el `if (otd)` sin `else` omitía la métrica en silencio, y el
+  fixture del test repetía el id equivocado, así que el test confirmaba el error en vez de detectarlo. Regla: los ids que
+  un adapter lee de otro dominio van en una constante exportada (`ICO_SNAPSHOT_METRIC_IDS`) que un test cruza contra
+  el registro dueño (`ICO_METRIC_REGISTRY`); y una métrica esperada que no llega se narra como límite, nunca se omite.
+- **2026-09-22 · La barra destacada era invisible.** El molde A4 define `.lead` (párrafo introductorio con
+  `margin-top`); la barra usaba la clase de tono `lead`, heredaba el margen y quedaba fuera de su riel. Ningún test ni
+  gate lo vio: sólo mirar el PDF. Regla: las clases de estado de un resolver van con espacio de nombres propio
+  (`tone-lead`/`tone-rest`), nunca con nombres que un molde pueda usar para tipografía.
+- **2026-09-22 · La guarda barra↔etiqueta rechazaba toda etiqueta bien redondeada.** Exigía igualdad exacta entre
+  «1,9 %» y 1,88. Regla: la tolerancia es media unidad del último decimal IMPRESO (`roundingToleranceOf`); una cifra
+  distinta sigue fallando. La guarda vive una sola vez en `artifact-composer/bar-figure.ts` (las copias por catálogo
+  ya habían divergido).
+- **2026-09-22 · El deck productivo sobre `deck-axis` no servía con datos reales.** Recortaba con «…», imprimía el
+  período anterior como otra métrica con el mismo nombre y callaba lo que no cabía (2 de 6 métricas SEO). Cutover a
+  `insights-deck` (`insights-deck-mapper.ts`): toda afirmación aparece en alguna lámina, nada se recorta. Lo ya
+  encolado con `deck-axis` sigue componiendo con su input sellado.
+- **2026-09-22 · Una figura de comparación necesita pares con escala propia.** En escala compartida, 9 mil clics
+  junto a 488 mil impresiones quedan como una raya; y nombrar la barra por la serie («Período») no dice qué mide.
+  `figure-pages.ts`: cada métrica es un grupo (período + anterior, `scaleGroup`), la figura se pagina sin partir
+  pares ni dejar una barra sola, y cada página se narra con las afirmaciones que citan sus hechos.
+- **2026-09-22 · El período se rotulaba con el mes de inicio.** Una edición del 1 al 20 de septiembre decía
+  «Septiembre de 2026». `render/labels.ts` rotula la ventana civil medida, dentro del presupuesto de 28.
+- **2026-09-22 · Límites y metodología imprimían identificadores internos.** `ico`, `rank`, el `detail` del adapter
+  («Rank evolution: no_data») y el nombre de la función lectora (`readSeoOverviewKpisForWindow`) llegaban tal cual al
+  documento. El planner los redacta desde `GH_INSIGHTS` (`metrics`, `sources`, `units`); un test barre todo
+  identificador conocido. AEO usa el copy es-CL que el grader ya declara para clientes.
+- **2026-09-22 · La edición de Demo no ejercita nada.** Sin datos, el A4 de Demo salió «perfecto» y no mostró ninguno
+  de los defectos anteriores: todos aparecieron con Berel y Sky. El canary de un render se hace con datos reales, y la
+  vista previa local (adapters → planner → validador → mapper → composer) los encuentra antes de desplegar.
+- **2026-09-22 · El validador de cifras rechazaba toda edición SEO real, y la de ICO iba a caer igual.** Síntoma:
+  la edición de Berel falló con `unreferenced_number` por `"10"` y `"-08"`. Causas: el lector de cifras partía
+  `2026-08` en `2026` + `-08` (el mes, leído como negativo), y la etiqueta del hecho —texto del adapter— traía cifras
+  propias (`Keywords en primera página (≤10)`, `Tráfico orgánico estimado 2026-08`, y en ICO `RpA · <space> · <mes>`).
+  Los fixtures sólo usaban etiquetas sin cifras: el gate probaba la forma del primer caso, no la de los adapters.
+  Regla: una fecha ISO es UN token; la etiqueta LITERAL de un hecho **referenciado** se enmascara antes de leer
+  cifras (una cifra fuera de ella, o la etiqueta de un hecho no referenciado, se sigue rechazando). **NUNCA** se
+  arregla renombrando la etiqueta en el adapter (el snapshot ya sellado la conserva) ni agregando las cifras de la
+  etiqueta al conjunto permitido (eso sí relaja la guarda). Los fixtures del validador usan etiquetas reales.
+- **2026-09-22 · Un import de VALOR desde el barrel del composer rompe la función de Vercel.** Síntoma: staging
+  falló el deploy con una función de 441 MB (límite 250 MB). `report-mapper.ts` corre en Vercel (encola) e importaba
+  `paginateFlow` desde `@/lib/artifact-composer`, que arrastra Playwright, pdf-lib y los catálogos. `pnpm build` local
+  no lo detecta. Regla: código que corre en Vercel importa del composer sólo TIPOS (barrel) o VALORES de la entrada
+  liviana `@/lib/artifact-composer/pure` (paginate, chart-geometry, bar-figure, manifest-hash); el catálogo viaja como
+  string (`INSIGHT_RENDER_CATALOG_BY_OUTPUT`). Desde ISSUE-177 lo hace cumplir la regla ESLint
+  `greenhouse/no-worker-only-module-in-vercel-code` y el gate `pnpm vercel:reachability-gate`.
+- **2026-09-22 · Un capítulo sin afirmaciones se narra, no se rechaza.** Mi guarda del mapper A4 rechazaba el
+  capítulo vacío y contradecía la filosofía de narrar lo que falta. Ahora el titular es el título del capítulo y el
+  cuerpo dice que la sección no registró hallazgos en el período.
+- **2026-09-21 · El riel de una barra puede leerse como el dato.** En el deck, el fondo del riel usaba `fieldMid`
+  (#023c70) sobre el navy del molde y se leía como una barra llena: el valor chico (3,1 %) parecía grande. Ningún
+  test lo vio; salió de abrir el PNG. Regla: el riel va un escalón por encima del fondo (`fieldEdge`), nunca a media
+  distancia entre fondo y relleno — un riel que compite con su relleno es un segundo dato que nadie declaró.
+- **2026-09-21 · `CompositionPlanInput` usa `artifactId`, no `deckId`.** Una sonda con el campo equivocado compone
+  igual y deja un `undefined.manifest.json` y un `undefined.pdf` junto a los archivos buenos. No es un bug del motor:
+  es el campo mal escrito, y el motor no lo reclama.
+- **2026-09-21 · El llenador clona el PRIMER HIJO del contenedor.** Un campo declarado directamente sobre ese hijo
+  (`<th data-slot-field="label">`) no se encuentra: el campo va DENTRO del elemento repetible
+  (`<th><span data-slot-field="label">`). Y un dato de presentación que se repetiría por fila —la alineación de una
+  columna numérica— se resuelve en el CSS del molde por posición, no declarándolo en cada item.
+
+- **2026-09-21 · Una guarda que no puede fallar es una afirmación, no un mecanismo.** Escribí en el resolver del
+  catálogo A4 una verificación de que la etiqueta impresa representara el valor que dibuja la barra, y la anuncié en
+  el commit. Estaba muerta: `printedValue` es `string` por contrato y el helper sólo aceptaba `number`, así que
+  siempre daba `null` y la comparación se saltaba entera. El render pasaba. Regla: para toda guarda, escribir primero
+  el test que la hace SALTAR (etiqueta que contradice el dato, etiqueta ilegible); si no se puede escribir ese test,
+  la guarda no existe. Y una entrada ilegible nunca desactiva una verificación: la convierte en error.
+- **2026-09-21 · Los tests verdes NO son typecheck.** 263 tests del composer pasaban con cuatro errores TS vivos
+  (`ResolverRegistry`/`FieldEffect` importados del módulo equivocado): Vitest transpila con esbuild y no verifica
+  tipos. Regla: `pnpm typecheck` es un gate propio, no una consecuencia de la suite; correrlo antes de cada commit
+  de código, no sólo al cerrar.
+- **2026-09-21 · El `composer:visual-gate` da rojo en `develop` limpio, y es más ancho que ISSUE-122.** Sin tocar
+  nada: 19 de 33 plantillas, 1–443 píxeles. El runbook documenta la variación de rasterización entre entornos, pero
+  ISSUE-122 la acota a láminas con FOTOS, y acá fallan también `ProcessStepsFull` (443), `TimelineFull` (332) y
+  `MaturityLadderFull` (197), que son geometría y texto. El gate no corre en CI: es local. Regla: al tocar el
+  composer, exigir cero píxeles SÓLO en los frames que uno introduce, y nunca re-congelar frames ajenos para
+  ponerse en verde — el runbook llama a eso «rebaseline silencioso».
+- **2026-09-21 · La tubería de marca estaba atada al primer catálogo.** El ADR del Composer sostiene que agregar un
+  catálogo no toca el motor — cierto para el motor, falso para `compile-tokens`, que derivaba TODAS sus rutas de
+  `deckAxisCatalogDir`. Mientras hubo un solo catálogo, «el catálogo es dato» no se probó en esa frontera. Regla: al
+  extraer una tubería compartida, la no-regresión se verifica con el mecanismo que el repo YA tiene
+  (`brand-pack-sync` compara CSS compilado vs committeado) y con `sha256`, no con un script inventado para la ocasión.
+- **2026-09-21 · Un redondeo cosmético puede romper la promesa del gráfico.** El Venn de dos conjuntos resuelve por
+  bisección la distancia entre centros cuya lente vale exactamente la intersección. Redondear esa distancia a 4
+  decimales degradaba el área fuera de tolerancia; su propio test lo detectó porque **recalcula el área desde la
+  geometría devuelta** con una implementación independiente. Regla: cuando un valor alimenta otra magnitud, la
+  precisión del intermedio es parte del contrato. Y un test de geometría que sólo comprueba que el código corre no
+  prueba nada.
+- **2026-09-21 · Venn de tres conjuntos no se implementa, y no por costo.** Con tres conjuntos las áreas
+  proporcionales exactas en general NO existen: es una limitación matemática. Un Venn de tres con números adentro es
+  un esquema, y si aparenta proporcionalidad, miente. El caso de 3+ es UpSet (longitud de barra, escala a N).
+- **2026-09-21 · Contrato de catálogo: `item.shape`, no `item.fields`; y `consumer`.** Un campo del item que no se
+  imprime se declara `consumer: 'resolver-only'` o `'validation-only'`; si no, el motor exige un
+  `[data-slot-field]` en el HTML y falla con «quedaría el contenido de ejemplo del prototipo». `composeArtifact`
+  tiene firma POSICIONAL `(catalog, deckPlan, outDir, options)`.
+
+- **2026-09-18 · Release from an explicit SHA, not from the tip of `develop`.** TASK-1848's release was cut from an explicit
+  SHA to exclude a peer commit on `develop` that had not been validated. Rule: dispatch the release from the explicit, validated SHA so an
+  unvalidated peer commit stays out; verify the manifest's `target_sha` before approving.
+- **2026-09-18 · The gateway deploys only after the Greenhouse release that publishes its routes.** `efeonce-mcp`
+  `deploy.yml` is `workflow_dispatch` (merging to its `main` does NOT deploy). Federating tools whose ecosystem routes are
+  not yet in production makes the gateway point at 404s. Order: Greenhouse release → contract canary → dispatch the
+  gateway deploy → provider canary.
+- **2026-09-18 · "Delivered" cannot be read from the ledger.** Resend's lifecycle webhook does not operate (ISSUE-160), so
+  `provider_status` stays null after `accepted`. Rule: a real-email canary is confirmed by the operator looking at the
+  authorized inbox and saying so; record it as human evidence, never as ledger evidence.
 - **2026-09-18 · A concurrent burst against a public route nearly exhausted the shared PostgreSQL.** Measuring the share
   reader's rate limit with 64 concurrent requests left 86–88 idle `greenhouse_app` connections (max 100) for exactly 5 min:
   each Vercel invocation opens its own pool, the pool's idle timeout never runs while the function is frozen, and the
-  server only cuts at `idle_session_timeout` (5 min). DB-backed rate limiters spend a connection before rejecting. Rule:
-  never probe limits with concurrent bursts against the shared instance; sequence them. Fix owner: TASK-1876 (ISSUE-174).
+  server only cuts at `idle_session_timeout` (5 min). DB-backed rate limiters spend a connection before rejecting, so the
+  limiter itself does not protect the database. Rule: never probe limits with concurrent bursts against public DB-backed
+  routes on the single shared Cloud SQL (it serves production); sequence them. Fix owner: TASK-1876 (ISSUE-174).
 - **2026-09-18 · The email platform's token-sensitive intent index is unique per (type, source_event_id, source_entity).**
   Symptom: a retry that reuses the SAME correlation never creates a new `email_deliveries` row (it collides with the
   previous attempt). Rule: correlate per attempt — `idlr-<uuid>` for attempt 1, `idlr-<uuid>:aN` for retries N=2..5 —
@@ -125,3 +322,10 @@
   decks too — it is a catalog defect, invisible to slot validation and to the pixel gate (baselined). Separate issue.
 - **2026-09-16 · macOS `xargs` has no `-a`.** Use `git add --pathspec-from-file=<file>` / `git commit --pathspec-from-file`
   for explicit-path commits in the shared checkout.
+- **2026-09-25 · The sandbox org cannot prove a report with data.** «Greenhouse Demo» has no ICO snapshots, so a
+  productive canary with figures needs an internal edition of a real client (operator authorization). Check the
+  source (BigQuery) before concluding a client "has no data": Sky had 11 months while the sandbox had none.
+- **2026-09-25 · A percentage delta printed as a relative percent is ambiguous.** OTD 80,1 → 81,9 printed
+  «+2,2 %»; the reader expects «+1,8 pp». Owned by TASK-1888 (plan contract), not a catalog fix.
+- **2026-09-25 · `cmd; echo EXIT=$?; tail log` reports tail's exit code.** A background gate must end with
+  `exit $rc` of the gated command, or its green notification proves nothing.

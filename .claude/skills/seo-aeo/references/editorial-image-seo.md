@@ -1,6 +1,6 @@
 # SEO y accesibilidad para imágenes editoriales y SVG
 
-> **As-of:** 2026-07-18.
+> **As-of:** 2026-09-24.
 > **Carga cuando:** un artículo use infografías, diagramas, `<picture>`, SVG directo, featured u Open Graph.
 
 ## Decisión rápida
@@ -65,10 +65,16 @@ preferir una sección/anchor con descripción, fuente, permisos y canonical sobr
 4. Confirmar canonical, robots y sitemap de la página.
 5. Separar “rastreable” de “indexado”: Google decide de forma asíncrona.
 6. Observar Search Console cuando corresponda; no prometer plazo ni inclusión.
+7. Para la tendencia de búsqueda visual, comparar `Web: multimodal` contra
+   `Web: text-based` en Search Console con la misma ventana y dimensiones. El
+   nuevo filtro cubre ciertos recorridos de búsqueda web iniciados con imagen;
+   no indica qué imagen usó el usuario ni garantiza que toda la demanda visual
+   esté clasificada ahí. Ver `../modules/07_MEASUREMENT.md`.
 
 ## Fuentes primarias
 
 - `https://developers.google.com/search/docs/appearance/google-images`
 - `https://developers.google.com/search/docs/crawling-indexing/indexable-file-types`
+- `https://developers.google.com/search/blog/2026/09/web-multimodal-in-sc`
+- `https://support.google.com/webmasters/answer/16984139`
 - `https://www.w3.org/WAI/tutorials/images/complex/`
-

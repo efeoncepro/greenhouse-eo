@@ -24,7 +24,7 @@
 - Backend impact: `none`
 - Epic: `EPIC-047`
 - Status real: `Diseno`
-- Rank: `EPIC-047-06`
+- Rank: `EPIC-047-07`
 - Domain: `content|ui`
 - Blocked by: `none`
 - Promotion blocked by: `dirección visual aprobada; copy ledger aprobado; revisión legal de la tabla de posición y de los hechos de 2026; Growth Form y Growth CTA publicados; slug y migración de la URL legacy validados`
@@ -440,8 +440,8 @@ La especificación completa por región —layout desktop y mobile, contenido, I
 | R5 | Firma: cambia la señal | `greenhouse_performance_signal` |
 | R6 | Dos formas de trabajar | `greenhouse_performance_motions` |
 | R7 | Cinco frentes | `greenhouse_performance_modules` |
-| R8 | Ocho canales con estado | `greenhouse_performance_channels` |
-| R9 | Cómo empezamos | `greenhouse_performance_ladder` |
+| R8 | Servicios por plataforma (diez, con estado) | `greenhouse_performance_channels` |
+| R9 | Cómo trabajamos contigo: escalera + otras formas de trabajar | `greenhouse_performance_engagement` |
 | R10 | Posición por tipo de proveedor | `greenhouse_comparison_table` (reuse) |
 | R11 | Reglas del juego + lo que no se promete | `greenhouse_performance_operating` |
 | R12 | Qué recibes + marcas | `greenhouse_performance_proof` + `greenhouse_social_trust` |
@@ -518,8 +518,8 @@ CRM ni contexto. El control de la firma no emite eventos en V1.
 
 - `public-website:verify-performance-landing-fidelity`: por viewport (1536, 1440, 890, 390 y reduced motion) valida
   separación bajo el masthead, un H1, orden del first fold, tres instancias del rol verde, firma que cambia de primer ítem,
-  `<ol>` en firma y escalera, rótulo ilustrativo, ausencia de números sin fuente y de logos de plataformas, ocho canales con
-  chip, catorce preguntas operables, form montado con diez campos, CTA que abre el scheduler nativo, dock `inert` cuando está
+  `<ol>` en firma y escalera, rótulo ilustrativo, ausencia de números sin fuente y de logos de plataformas, diez servicios por plataforma sin
+  chip de estado ni mención de partner, catorce preguntas operables, form montado con diez campos, CTA que abre el scheduler nativo, dock `inert` cuando está
   oculto, consola sin errores propios y `scrollWidth === clientWidth`.
 - `public-website:verify-performance-seo-package`: title, meta, canonical, robots, OG/Twitter, imagen social, `Service` y
   `FAQPage` sin entidades duplicadas, sitemap, menú y HTML inicial.
@@ -542,7 +542,7 @@ CRM ni contexto. El control de la firma no emite eventos en V1.
 | La legacy sigue mostrando contadores en cero y claims no verificados hasta la promoción | Contenido / legal | high | Riesgo aceptado por el owner (2026-09-11); desaparece con el 301 del Slice 6 | Sin signal automática; fecha de promoción |
 | Un claim de resultado o de partner se cuela en el copy | Contenido / legal | medium | Revisión legal en Slice 2 y aserciones del gate de fidelidad | Revisión del owner; gate de fidelidad |
 | Un hecho de 2026 queda desactualizado | Contenido | medium | Fecha visible y revisión trimestral; retiro del bloque | Revisión trimestral registrada en el manual |
-| La disponibilidad de ChatGPT Ads cambia | Contenido | high | Fecha visible en canales y FAQ; revisión mensual contra el centro de ayuda de OpenAI | Revisión mensual registrada en el manual |
+| La disponibilidad de ChatGPT Ads cambia o un cliente en Chile espera campañas inmediatas | Contenido / comercial | medium | El copy no afirma países ni fechas; preventa y diagnóstico aclaran disponibilidad por mercado; revisión mensual contra el centro de ayuda de OpenAI | Revisión mensual registrada en el manual |
 | Pérdida de interactividad al compilar el diseño | UI | high | Módulos semánticos; gate que ejercita firma, FAQ, form y scheduler | Gate de fidelidad en rojo |
 | El renderer del form no monta | Growth Forms | medium | Estado `partial` con reunión y contacto; el gate exige campos montados | Gate en rojo; `gh_form_viewed` en cero |
 | Un guardado en Elementor borra metadata SEO | SEO | medium | Gate SEO después de cada guardado | Gate SEO en rojo |
@@ -617,10 +617,11 @@ el motor ya soporta.
 - [ ] La firma cambia de primer ítem al cambiar la señal, funciona con teclado, anuncia el cambio y muestra el rótulo
       ilustrativo sin interacción.
 - [ ] Ninguna región muestra un número sin fuente y fecha, un contador, un logo de plataforma o un badge de partner.
-- [ ] Los ocho canales aparecen con su chip de estado; ChatGPT Ads muestra su fecha de vigencia.
+- [ ] Las diez plataformas aparecen con qué hacemos en cada una, sin chip de estado ni mención de partner; Amazon Ads
+  dice que es para México y la región muestra su fecha de vigencia.
 - [ ] La tabla de posición no nombra ninguna empresa y muestra la nota por tipo de proveedor.
 - [ ] Ninguna sección promete ROAS, retorno, leads, pipeline, ventas ni precios.
-- [ ] El partner programático no se nombra en la página.
+- [ ] La página no nombra partners ni dice que alguna plataforma se opera con partner.
 - [ ] El rol verde aparece exactamente en los tres CTAs de reunión.
 - [ ] El form `efeonce-performance-brief` está publicado con consentimiento, Turnstile, gate corporativo y retención `730d`.
 - [ ] Los estados ready, loading, empty, partial, error, denied y success del form fueron verificados.
@@ -695,6 +696,27 @@ el motor ya soporta.
   cabezas, línea de léxico en R2, "Meta Ads: Facebook e Instagram", "Retail media y Mercado Ads", SEM en Google,
   "Marketing B2B", media buyers y traffickers, y dos preguntas nuevas (Google Ads y pauta digital); el FAQ pasa a
   catorce. La segunda fuente del Slice 1 sigue pendiente.
+
+## Delta 2026-09-19
+
+- **Pedido del owner:** la landing presenta **servicios, no precios**, y los servicios se reconocen por plataforma.
+  - **R8 "Servicios por plataforma"** (anchor `#servicios`): diez tarjetas con qué hacemos en cada una y su estado. Son
+    Google Ads, Meta Ads, TikTok Ads, LinkedIn Ads, Microsoft Advertising, Anuncios en ChatGPT, Programmatic y
+    pantallas digitales, Retail media y Mercado Ads, Amazon Ads (México) y X Ads. Microsoft y Amazon son nuevas en la
+    página. Todo sale de la cobertura de canales de la
+    [ficha](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md).
+  - **R9 "Cómo trabajamos contigo"** (`greenhouse_performance_engagement`, anchor `#como-empezamos`): la escalera de
+    cuatro pasos con qué se lleva el cliente, más especialista dedicado y asesoría.
+  - El formulario suma Microsoft Advertising, pantallas digitales y Amazon a "Dónde inviertes hoy".
+- Se mantiene la doctrina de la ficha: ninguna plataforma se vende suelta ni con precio por plataforma; todas se activan
+  dentro del diagnóstico, el sprint o la operación mensual, y la página lo dice (`channels.contract`).
+- **Segundo ajuste del owner (mismo día):** R8 no lleva chip de estado ("Lo operamos", "Con partner tecnológico",
+  "Donde está disponible", "Bajo pedido") y la página no menciona partners en ninguna región, incluida FAQ 9. Las
+  condiciones útiles para el cliente (país, requisito) quedan dentro del texto de cada tarjeta.
+- **Tercer ajuste del owner:** Anuncios en ChatGPT se presenta como servicio sin aclarar que aún no está disponible en
+  Chile (tarjeta de R8 y FAQ 10). La disponibilidad por país se aclara en preventa y en el diagnóstico.
+- Programmatic nombra las pantallas digitales en R8 y FAQ 9, sin nombrar al partner ni mostrar CPM: Real Audiences y
+  Basis siguen en evaluación, sin acuerdo firmado.
 
 ## Open Questions
 

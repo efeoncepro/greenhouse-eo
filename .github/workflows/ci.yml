@@ -199,6 +199,16 @@ jobs:
         # cobertura del metafile de esbuild (arbol real, transitivos incluidos).
         run: pnpm worker:deploy-path-gate
 
+      - name: Vercel function reachability gate (ISSUE-177)
+        # Una funcion de Vercel sobre 250 MB tumba el deploy recien en el build remoto,
+        # con local:check y el build local en verde. Paso 3 veces en 3 semanas: un valor
+        # importado desde el barrel del Artifact Composer (Playwright + pdf-lib) y una
+        # ruta armada con process.cwd() + un segmento variable. Este gate recorre el grafo
+        # de imports de cada entrada del App Router con esbuild (~2 s, sin build) y falla
+        # si alcanza la denylist o una ruta de runtime variable fuera de la allowlist.
+        # Corre en todos los eventos: en develop Vercel es el unico build.
+        run: pnpm vercel:reachability-gate && pnpm vercel:reachability-gate:test
+
       # NOTA (TASK-1160): los gates de CLAUDE.md (budget + rule-audit) viven en su
       # workflow dedicado `claude-md-governance.yml`, porque ESTE workflow ignora
       # `**/*.md` y `docs/**` en sus triggers — un PR que solo edita CLAUDE.md NO
@@ -266,3 +276,11 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=6144
         run: pnpm build
+
+      - name: Vercel function size gate (ISSUE-177)
+        # Mide el tamano trazado (sin comprimir) de cada funcion sumando los *.nft.json
+        # del build recien hecho, y falla sobre 200 MB (50 MB de margen bajo el limite de
+        # Vercel). Cubre lo que el gate de alcanzabilidad no ve: un paquete pesado que llega
+        # por otro paquete, un directorio trazado por readdir. Mismo `if:` que Build.
+        if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+        run: pnpm vercel:function-size-gate && pnpm vercel:function-size-gate:test

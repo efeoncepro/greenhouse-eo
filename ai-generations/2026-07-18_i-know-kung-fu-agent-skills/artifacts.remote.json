@@ -1,0 +1,71 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-23T12:29:39.856Z",
+  "run": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-07-18_i-know-kung-fu-agent-skills",
+  "totalBytes": 4534249,
+  "fileCount": 10,
+  "files": [
+    {
+      "path": "cover-v2/kfu-cover-hi-yaah-master-v1.png",
+      "sizeBytes": 2087965,
+      "sha256": "fbfda5fd368135b07ef241f4b9dd15459ea863b643583b4d8666a0b276446761",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_i-know-kung-fu-agent-skills/cover-v2/kfu-cover-hi-yaah-master-v1.png"
+    },
+    {
+      "path": "cover-v2/kfu-cover-hi-yaah-og-1200x630-v1.png",
+      "sizeBytes": 1189494,
+      "sha256": "c1e0b3c2b750c514ca94b1525550e3241aafee683248a4cb07ee48071b0899c3",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_i-know-kung-fu-agent-skills/cover-v2/kfu-cover-hi-yaah-og-1200x630-v1.png"
+    },
+    {
+      "path": "delivery/kfu-v02-tacit-knowledge-loop-mobile-fallback-v2.png",
+      "sizeBytes": 201964,
+      "sha256": "63824c03c7df580ca263e809b8fc3393fe7bba65368957761fb5af08f17acbf0",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v02-tacit-knowledge-loop-mobile-fallback-v2.png"
+    },
+    {
+      "path": "delivery/kfu-v04-agent-skills-og-featured-v1.png",
+      "sizeBytes": 157290,
+      "sha256": "58bf7922e12bab17fafee2374a68db6589cff5ed558a42bf8ac37cfa8123ea2e",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_i-know-kung-fu-agent-skills/delivery/kfu-v04-agent-skills-og-featured-v1.png"
+    },
+    {
+      "path": "review/kfu-v01-desktop.png",
+      "sizeBytes": 154619,
+      "sha256": "cc48fe6ebd9cfcb7b4a7afd3fc2b12f1e05c8e0d43a3e558a7cf11667cdd9256",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_i-know-kung-fu-agent-skills/review/kfu-v01-desktop.png"
+    },
+    {
+      "path": "review/kfu-v01-mobile.png",
+      "sizeBytes": 136444,
+      "sha256": "555456ae4807da12ccbc482b9db2a0f5d9eaf312d4b1231204952ec1e2e778fb",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_i-know-kung-fu-agent-skills/review/kfu-v01-mobile.png"
+    },
+    {
+      "path": "review/kfu-v02-desktop.png",
+      "sizeBytes": 134108,
+      "sha256": "c6a23af67484ab531d0f4ab54271843b5603fcd6292845679918daea11609726",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_i-know-kung-fu-agent-skills/review/kfu-v02-desktop.png"
+    },
+    {
+      "path": "review/kfu-v02-mobile.png",
+      "sizeBytes": 176501,
+      "sha256": "6cb625b5467431d638f5a6f5ab0e3f98552038972b7d77b25ab4d8ce2ca3d712",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_i-know-kung-fu-agent-skills/review/kfu-v02-mobile.png"
+    },
+    {
+      "path": "review/kfu-v03-social.png",
+      "sizeBytes": 152914,
+      "sha256": "efbfa9cb15b8826d4c7798781a77099048297fa6b0456d9a2fb2d2acf070fddf",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_i-know-kung-fu-agent-skills/review/kfu-v03-social.png"
+    },
+    {
+      "path": "review/mobile-column.png",
+      "sizeBytes": 142950,
+      "sha256": "b626f3843d7b4a0ab1654a30b77526c677e878f4d8989d64186e95f079a60e05",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-07-18_i-know-kung-fu-agent-skills/review/mobile-column.png"
+    }
+  ]
+}

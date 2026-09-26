@@ -1,0 +1,182 @@
+[
+  {
+    "slot": 1,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/cielo/C1-b.png",
+    "sha256": "3b411ee2cc9263dd4e1ef6a83f58a27a960a1da5993c64d5978e25ff4ed61b98",
+    "higgsfield_media_id": "067250ac-511d-4ab9-aa6d-adf422e4978b"
+  },
+  {
+    "slot": 2,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/01-search-empty.png",
+    "sha256": "ffc345e8f2dc4fa7c88d937bc7b1dde0555cf94030ed1ed780af1aa67bc9830b",
+    "higgsfield_media_id": "1095976d-a205-4458-80d4-e798c207b681"
+  },
+  {
+    "slot": 3,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/02-search-question.png",
+    "sha256": "eb807d5d780cd1e75eeedd2dfc384c33599875dec758eebea6bcd679346f036b",
+    "higgsfield_media_id": "bfcae795-f1cf-42e6-9824-426e9cf5ff5f"
+  },
+  {
+    "slot": 4,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/03-results.png",
+    "sha256": "ac3ff614e8ab3f5ba4beff0ab9eb4ad76b334a5357f695f4c06a9fc310dc8456",
+    "higgsfield_media_id": "cfe48c79-e48b-4e8f-8954-e27cfec5969a"
+  },
+  {
+    "slot": 5,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/refs/camera-A-user-alone.png",
+    "sha256": "23464e800e3b99f7f42d7da95f75583f1f1fbcd108d507ccca71035ae4525517",
+    "higgsfield_media_id": "fe7c6472-bd22-4405-9a6b-d44b91f8d18f"
+  },
+  {
+    "slot": 6,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/05-answer-citation.png",
+    "sha256": "28363fb381518a902bc8457da720d77d68f40b5aaa08a966ac28f60d653e9530",
+    "higgsfield_media_id": "1e1e5779-5380-4d22-9786-0dd2f8f38572"
+  },
+  {
+    "slot": 7,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/06-chip-glow.png",
+    "sha256": "946f635fcc40b0fd4f377c4a12cb58d601e607582d5ea464e14a705011c057bb",
+    "higgsfield_media_id": "440a6508-0dbb-4b21-9bfe-f21f1d54a9b9"
+  },
+  {
+    "slot": 8,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/cam-A-frontal-photo.png",
+    "sha256": "178b838e4dc2d0792bb1e33406d67363366b5d495755d9b5a231b678d5298869",
+    "higgsfield_media_id": "a2a389bb-8af8-4a15-adb9-f6ee9c728bd4"
+  },
+  {
+    "slot": 9,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/cam-C-overhead-photo.png",
+    "sha256": "f34485a6b6282f0ca895acb7bfe942b67c5cc0729d637aff74f2bca427b2f9e0",
+    "higgsfield_media_id": "787b9dcd-0cd7-46c0-9568-81cc09a8d5b2"
+  },
+  {
+    "slot": 10,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/refs/cam-B-rear-departure.png",
+    "sha256": "d8b5823fb7943f7eb992a319482a8f0494a8e3f0608972ef4ed46e3f31231809",
+    "higgsfield_media_id": "d3918504-0ce8-47d0-b2c1-1fda083ae5c7"
+  },
+  {
+    "slot": 11,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/refs/A320neo_CFM_SKY_V02.png",
+    "sha256": "d669dd73731f7b5168e5cccd3107e9222136ce9992643ced4f5f4a291f847dd8",
+    "higgsfield_media_id": "9901d95d-645e-443d-a688-bd91dfc97025"
+  },
+  {
+    "slot": 12,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/refs/A320neo_CFM_SKY_V10.png",
+    "sha256": "eb94715932219d270a375656d9503c06cc2930406aade0c783b41bb57703092f",
+    "higgsfield_media_id": "cb683a8e-76e4-4ab4-a227-3d4253ecbbc0"
+  },
+  {
+    "slot": 13,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/refs/A320neo_CFM_SKY_VR.png",
+    "sha256": "3282a86fa0eb9fd771b4b10d3d84ec5e24fd364388483c00289851ac3f762d49",
+    "higgsfield_media_id": "36b5870b-edf7-4ad4-85d7-0f1a3e869e00"
+  },
+  {
+    "slot": 14,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/refs/A320neo_CFM_SKY_V16.png",
+    "sha256": "13adbcc03fbe78559c96ba245040d2e6c353c4e26c27f640a9fd908bd4415d0a",
+    "higgsfield_media_id": "6ec10edc-cf89-4c1d-9347-5287203c5db2"
+  },
+  {
+    "slot": 15,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/07-year.png",
+    "sha256": "abffd2dbdf0758e130718e9a12c5588e7b2db0d4814e0b933f2baca0183263ea",
+    "higgsfield_media_id": "f7d5a12c-005a-426b-b2bb-4921077a72dc"
+  },
+  {
+    "slot": 16,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/08-2000.png",
+    "sha256": "5071a4ebda0c1dfe3923255b31599ebd9256888ea153d9670c444db59acb40c5",
+    "higgsfield_media_id": "7f444147-05f2-427b-b010-7060c0fe9d2e"
+  },
+  {
+    "slot": 17,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/09-agency.png",
+    "sha256": "df1107bccde43fbf214cef19d37e613176296e1f9e8e8044f1706a80fe8fa8b1",
+    "higgsfield_media_id": "37485393-4121-46e7-b7c8-94bef4f7d155"
+  },
+  {
+    "slot": 18,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/10-thanks.png",
+    "sha256": "737bbbe15e932838d44e41c797b4ea77def20ffad245068cc8065e2dd4b20f16",
+    "higgsfield_media_id": "a0456be3-6cbf-47a4-b71e-b90adef8753e"
+  },
+  {
+    "slot": 19,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/11-close-blue-9x16.png",
+    "sha256": "de9def327cac28e30db1bc636cc1513767a289ba9c690ae47f1b7db72ff8b897",
+    "higgsfield_media_id": "b19d12d0-cd2d-46f2-b000-5d4df72a1bb1"
+  },
+  {
+    "slot": 20,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/cierre/cierre-9x16.png",
+    "sha256": "92e96d5d9615bf6ac237637d5f7bde62c5d4134147480de155f356ed866ba6c5",
+    "higgsfield_media_id": "456fb450-ed6d-4669-86a0-5a7c2f52e16b"
+  },
+  {
+    "slot": 21,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/kit/out/piezas/T08-un-ano-creando-con-sky.png",
+    "sha256": "6b4189b09abe6d8106224aeaf9595a5ec2f0d1973b5495352da9e5c653f0829b",
+    "higgsfield_media_id": "1f76ce65-fbb8-4774-87ac-1fe7fc427e30"
+  },
+  {
+    "slot": 22,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/kit/out/piezas/T09-mas-2000-piezas.png",
+    "sha256": "cf4c6b7d826ff1dc64f7cf7f97ef9f92e0d6f34655d775b46f88b73e22de15b0",
+    "higgsfield_media_id": "52e731e7-fd4f-4a87-9f5f-cd8f0a60ffac"
+  },
+  {
+    "slot": 23,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/kit/out/piezas/T10a-y-ahora-nos-eligio-como.png",
+    "sha256": "86d5efe19579fc5b75e89713b7364a9dd54ae61bb3e3b31eb11dbddce1f54b88",
+    "higgsfield_media_id": "f840028f-f4cb-4de3-8577-743079fe0839"
+  },
+  {
+    "slot": 24,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/kit/out/piezas/T10b-su-agencia-seo-aeo.png",
+    "sha256": "9128d03843674c49d77b6d2aa9730507295baea0705b270dfb44f14c87d257dc",
+    "higgsfield_media_id": "f3d216e6-7769-4f4d-8b06-1ab054b17f5a"
+  },
+  {
+    "slot": 25,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/kit/out/piezas/T11-gracias-sky.png",
+    "sha256": "88fc4322b5e9945c2e995879289e4d9fdfb759d9f1c775431ba6d81c1b457ea6",
+    "higgsfield_media_id": "a2ea67ec-4db4-4498-9bcb-128affd912ce"
+  },
+  {
+    "slot": 26,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/kit/out/piezas/L01-logo-efeonce-negativo.png",
+    "sha256": "5b53f35ee1de01a4b7044d1614aa79e5ec43b1e75613949003519e7252c303e1",
+    "higgsfield_media_id": "30565f80-e58c-4eeb-bf41-62c2297b6ad9"
+  },
+  {
+    "slot": 27,
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/kit/out/piezas/L02-logo-sky-blanco.png",
+    "sha256": "30f9b91a1e01f4a359d72d22adbdd2e918dfac0c6fb86e2de12fa507909ebaa0",
+    "higgsfield_media_id": "c180c3f1-0ca4-4323-8912-932c59628413"
+  },
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/refs/camera-B-ui-side.png",
+    "slot": 28,
+    "sha256": "8315c8e997d92b00ae35bb10f0562228b9662399bac4486210c9d44e7fd58469",
+    "higgsfield_media_id": "f5da8faa-c3f3-4a8d-95fc-1491190ba4c2"
+  },
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/refs/camera-C-results-oblique.png",
+    "slot": 29,
+    "sha256": "df9b97817f63b69bcfc3a529507547735f6be68834777fbc0af08c532dae41ef",
+    "higgsfield_media_id": "41b2f301-7980-450d-85cf-73ae00db3a81"
+  },
+  {
+    "path": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/refs/camera-C-agency-orbit.png",
+    "slot": 30,
+    "sha256": "9caa0cf8fdb6915fb5561bf312e9f7d3a144648b1a522a9d5becdc5d987ec16e",
+    "higgsfield_media_id": "82e492ba-1cdd-42f5-bb16-818c65e622ed"
+  }
+]

@@ -41,7 +41,9 @@ capability dentro del sistema, no presentarse como agencia suelta.
 ## Now
 
 - **Orden de ejecución de las landings → [EPIC-047](../epics/to-do/EPIC-047-public-site-landing-portfolio-prioritization.md)**
- (2026-09-11). Este roadmap cuenta el porqué de cada superficie; el epic fija cuál va primero (`Rank EPIC-047-01…10`).
+  (actualizado 2026-09-19). Este roadmap cuenta el porqué de cada superficie; el epic fija cuál va primero
+  (`Rank EPIC-047-01…11`). TASK-1877 añade la oferta transversal humano-agente y TASK-1878 sus entradas
+  desde Home, HubSpot y AEO; no equivale a publicación ni a redirección.
 
 - **PDR-001 — Landing SEO complementaria al AEO** (decidido): posicionamiento SEO
  como *cimiento* de la promesa de visibilidad (no commodity), hermana de

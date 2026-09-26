@@ -118,7 +118,7 @@ Carga selectiva: no traigas los 7 módulos de una.
 4. **No dupliques craft ni canal.** El studio **dirige y opera**; delega palabras (`copywriting`), descubribilidad (`seo-aeo`), conversión (`growth-marketing-cro`), social (`social-media-studio`), assets (studios de asset), publicación (runtime).
 5. **IA con gobernanza.** Contenido asistido por IA con fidelidad de voz + barra de edición humana; nunca output crudo. Nunca reimplementar el Content Factory ni el publishing — operarlos vía su skill dueña.
 6. **Todo mapea a etapa de funnel + ICP.** Contenido sin JTBD, etapa ni ICP es ruido. El *encaje al negocio/bow-tie* se valida con `efeonce-agency`/`commercial-expert`, no se inventa aquí.
-7. **es-CL neutro, tuteo**, sin voseo. Copy visible se valida con `copywriting` / `greenhouse-ux-writing`. Para clientes internacionales, transcreación, no traducción literal.
+7. **es-CL neutro, tuteo**, sin voseo. Copy visible se valida con `copywriting` / `greenhouse-ux-writing`. Para clientes internacionales, transcreación, no traducción literal; para un cliente de otro mercado hispano (p. ej. México), variedad estándar de ese país sin coloquialismos (`copywriting/efeonce/BILINGUAL_CRAFT.md`).
 8. **Contenido no es producto.** Una Pillar puede crear lenguaje, demanda e hipótesis; un ebook debe agregar
    método y una tool requiere PDR, modelo, privacidad, analytics, QA y ejecución formal. Nunca conviertas una
    buena respuesta editorial en feature o claim de disponibilidad por inferencia.
@@ -202,3 +202,28 @@ sustituye ese flujo: clasificar oportunidad, definir aportación y papel de marc
 Una firma editorial exacta conserva el contrato de infografía; marca física sobre un objeto usa
 [brand-in-scene](../social-media-studio/references/brand-in-scene.md). No extender footer-only a escenas
 sociales ni adaptar una reacción a canales fuera de su ventana; conservar el catálogo editorial de la cuenta.
+
+## Campañas — el brief manda
+
+🔴 **Si la pieza pertenece a una campaña, lee su `BRIEF.md` ANTES de producir.** Vive en OneDrive
+`Alineación/2. Campañas/CMP-###_…`. Gobierna **la promesa, lo que NO se promete, la audiencia y su job, el
+vocabulario permitido, los destinos, la medición y los límites de uso** — y lo hace **igual para todos los
+canales**, porque una campaña la ejecutan varios agentes en varias sesiones y sin fuente única **diverge sin
+que nadie lo note**.
+
+- **Los assets van a la carpeta de su canal**, nunca a la de campaña; la campaña los referencia por ruta en
+  su `ASSETS.md`, donde hay que **registrar la fila** al sumar una pieza.
+- Si tu pieza necesita una promesa que el brief no tiene, **el brief se actualiza primero** (con el operador).
+- Un brief **crece con aportes de varios agentes**: léelo de nuevo antes de producir, **no de memoria**.
+
+Canon: `docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md`.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+En campañas de visibilidad, conectar Content con SEO/AEO: conocimiento propio y evidencia que resuelven
+preguntas/decisiones pertinentes. Investigar cobertura antes de producir; actualizar/consolidar puede ser mejor
+que otro artículo. Multiformato es capacidad, no el job central. Conservar revisión experta y aprobación;
+un ejemplo ficticio de landing no es caso de cliente.

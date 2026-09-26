@@ -1,0 +1,248 @@
+[
+  {
+    "id": "b1-feed",
+    "plate": "plates/b1-reflejo-45-plate.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.84,
+    "lead": "Le preguntaron a **ChatGPT** por tu categoría.",
+    "leadFamily": "bricolage",
+    "leadSize": 44,
+    "leadGap": 0.15,
+    "dominant": "No estabas.",
+    "dominantSize": 175,
+    "dominantMax": 0.8,
+    "after": "Tu competencia **sí**.",
+    "afterFamily": "poppins",
+    "afterSize": 40,
+    "afterGap": 0.12,
+    "afterFill": "#ffffff",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.7,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        },
+        {
+          "id": "seo",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "SEO",
+          "who": "role",
+          "color": "#12afa2"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "leadFill": "#ffffff"
+  },
+  {
+    "id": "b2-stories",
+    "plate": "plates/b2-larga-916-plate.png",
+    "align": "left",
+    "top": 0.1,
+    "textWidth": 0.84,
+    "lead": "Tu competencia no corre más rápido.",
+    "leadFamily": "bricolage",
+    "leadSize": 46,
+    "leadGap": 0.14,
+    "dominant": "La citan.",
+    "dominantSize": 190,
+    "dominantMax": 0.76,
+    "after": "A ti **no**.",
+    "afterFamily": "poppins",
+    "afterSize": 42,
+    "afterGap": 0.11,
+    "afterFill": "#ffffff",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.7,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        },
+        {
+          "id": "data",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "Data",
+          "who": "role",
+          "color": "#5d50ff"
+        },
+        {
+          "id": "nexa",
+          "state": "moving",
+          "region": "lower-end",
+          "label": "Nexa",
+          "who": "person",
+          "color": "#d6246e"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "leadFill": "#ffffff"
+  },
+  {
+    "id": "b3-display",
+    "plate": "plates/b3-larga-169-plate.png",
+    "align": "left",
+    "top": 0.2,
+    "textWidth": 0.44,
+    "lead": "**ChatGPT**, **Perplexity** y **Gemini** ya describen tu marca.",
+    "leadFamily": "bricolage",
+    "leadSize": 52,
+    "leadGap": 0.22,
+    "dominant": "Nadie revisó",
+    "dominantSize": 158,
+    "dominantMax": 0.44,
+    "after": "**qué dicen**.",
+    "afterFamily": "poppins",
+    "afterSize": 48,
+    "afterGap": 0.18,
+    "afterFill": "#ffffff",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.5,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "leadFill": "#ffffff"
+  },
+  {
+    "id": "c2-actionable",
+    "plate": "plates/c2-pov-45-plate.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.84,
+    "lead": "Un agente entró a tu sitio a comprar.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 44,
+    "leadGap": 0.15,
+    "dominant": "No pudo.",
+    "dominantSize": 175,
+    "dominantMax": 0.62,
+    "after": "Y no **volvió**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 40,
+    "afterGap": 0.12,
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.7,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        },
+        {
+          "id": "dev",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "Dev",
+          "who": "role",
+          "color": "#0375db"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    }
+  },
+  {
+    "id": "a1-muda",
+    "plate": "plates/a1-marcado-45-plate.png",
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    }
+  },
+  {
+    "id": "a2-muda",
+    "plate": "plates/a2-proyeccion-45-plate.png",
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    }
+  },
+  {
+    "id": "c1-readable",
+    "plate": "plates/c1-oclusion-45-plate.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.84,
+    "lead": "La IA no entendió a qué te dedicas.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 44,
+    "leadGap": 0.15,
+    "dominant": "Lo inventó.",
+    "dominantSize": 175,
+    "dominantMax": 0.62,
+    "after": "Con lo que **encontró**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 40,
+    "afterGap": 0.12,
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.7,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        },
+        {
+          "id": "contenido",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "Contenido",
+          "who": "role",
+          "color": "#ff6500"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    }
+  }
+]

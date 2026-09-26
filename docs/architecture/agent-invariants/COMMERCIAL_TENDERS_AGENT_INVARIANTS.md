@@ -115,10 +115,16 @@ melkin, valentina` → `assets/squad/squad-<nombre>.png`); nombre desconocido �
 
 ---
 
+## Delta 2026-09-23 — 🏆 primera licitación adjudicada con el flujo agéntico
+
+🏆 **Hito 2026-09-23 — primera licitación GANADA con el flujo agéntico de licitaciones.** La propuesta SKY Blog (Wherex) se construyó con el método de la skill `greenhouse-public-private-tenders` (bases → admisibilidad → diagnóstico → oferta) y se compuso con el **Artifact Composer**: deck desde catálogo, oferta técnica y económica y Excel generados desde fuente versionada, y evidencia viva (AI Visibility Grader y Radiografía AEO). La operó el operador junto a un agente. La adjudicación **no se atribuye sólo al flujo**: pesaron la relación existente con SKY, las reuniones de ronda 2, la negociación humana y el ajuste económico por alcance. Pero es la **primera validación en el mercado** de lo construido: una oferta producida con este flujo compitió contra ~15 propuestas y ganó, y lo hizo en una **cuenta de talla enterprise** (SKY Airline, aerolínea), no en un piloto menor. Detalle: [`sky-blog-2026/README.md`](../../commercial/tenders/sky-blog-2026/README.md).
+
 ## Delta 2026-07-15 — prueba social reusable (muro de logos + testimonios) · 🏆 primera oferta enviada programáticamente
 
 **🏆 Hito:** la oferta **SKY Airline** (blog, plataforma **Wherex**) se compuso y **ENVIÓ** end-to-end con
-el composer — la primera licitación de Efeonce hecha de forma programática. Dos plantillas nuevas
+el composer — la primera licitación de Efeonce hecha de forma programática. *(Estado 2026-09-23: **adjudicada** a
+Efeonce, con condiciones finales ajustadas por alcance — CLP 3,0M netos/mes × 24; ver
+[`sky-blog-2026/README.md`](../../commercial/tenders/sky-blog-2026/README.md).)* Dos plantillas nuevas
 domain-free, con gate, en el cluster de prueba social del cierre (`berel → clientes → testimonios → seguro`):
 
 1. **`ClientLogosFull`** (contentType `client-logos`): muro de logos de clientes **a color** en panel

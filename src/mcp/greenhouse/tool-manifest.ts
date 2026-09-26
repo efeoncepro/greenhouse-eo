@@ -509,6 +509,21 @@ export const GREENHOUSE_MCP_TOOL_MANIFEST: readonly GreenhouseMcpToolManifestEnt
     writes: false,
     spendsProviderBudget: false,
     purpose: 'Una recurrencia con su plantilla, política de revisión y el resultado de sus últimas ocurrencias.'
+  },
+  // ── Efeonce Insights (TASK-1888) — portada preferida por organización ──
+  {
+    name: 'get_insight_cover_preference',
+    domain: 'insights',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Portada preferida de los informes de una organización (automática, navy o blanca); auto si nunca se fijó.'
+  },
+  {
+    name: 'set_insight_cover_preference',
+    domain: 'insights',
+    writes: true,
+    spendsProviderBudget: false,
+    purpose: 'Fija la portada preferida de los informes de una organización; aplica a las ediciones que se generen después.'
   }
 ] as const
 

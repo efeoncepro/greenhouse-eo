@@ -1,0 +1,124 @@
+[
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/01-search.png",
+    "sha256": "147a1ebc99192f2e55d7c585be13122e5f53bebc7ee18659f917d05810d2c625",
+    "url": "https://v3b.fal.media/files/b/0aabaf4b/_0dumRf3YHLzuQLmgTQGT_01-search.png",
+    "kind": "image"
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/02-results.png",
+    "sha256": "a887f7d91d08d1b65535190e4bade36f3b41367f304c0f06a7fd2b1cb35d3012",
+    "url": "https://v3b.fal.media/files/b/0aabaf4c/aJjtJuo9NgdD8NffqwzQO_02-results.png",
+    "kind": "image"
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/03-user.png",
+    "sha256": "2faa96819d1d76a679413bf81d04b54d7a885c9421521f534b21c6ae1976c1ab",
+    "url": "https://v3b.fal.media/files/b/0aabaf4c/Qa6EtXm9ydOWgJ0bnBHez_03-user.png",
+    "kind": "image"
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/04-answer-opening.png",
+    "sha256": "fa124468f0c21019b2467d57d35e93029efe172b30a84e88cf5c1a9b07a5e5c4",
+    "url": "https://v3b.fal.media/files/b/0aabaf4c/cXYArhxjU4X8MIS9rTVVt_04-answer-opening.png",
+    "kind": "image"
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/05-answer-complete.png",
+    "sha256": "330498dcd2c00f1bc791a6bba2f5931be8e90cd113b5e2729465947eae6dcfb3",
+    "url": "https://v3b.fal.media/files/b/0aabaf4c/sXvHhdE8s_XR5V730SmMh_05-answer-complete.png",
+    "kind": "image"
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/06-citation-focus.png",
+    "sha256": "74af8bf6b95e5bcef0ad146f4180a76f050f270e8314af51076b2fdd94b32ca1",
+    "url": "https://v3b.fal.media/files/b/0aabaf4d/beR021aMziyLt5fhESEcL_06-citation-focus.png",
+    "kind": "image"
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/07-year.png",
+    "sha256": "e5bb1e6a94fdf9b59bc08edeafb6a0330a64d8d264924eb0b5439a438a5a7623",
+    "url": "https://v3b.fal.media/files/b/0aabaf4d/hAYWLGdwJU6s1NjuE3lOb_07-year.png",
+    "kind": "image"
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/08-plus-isolated.png",
+    "sha256": "9a5117ad66d6afb09f7f9ab49f5d4d0a4984adf688f7f97e27024c3b0f23e5a6",
+    "url": "https://v3b.fal.media/files/b/0aabaf4d/_oICZj3U93AJhNnHgBGNr_08-plus-isolated.png",
+    "kind": "image"
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/09-proof.png",
+    "sha256": "e54b90f4d65037c126c02259c6dad8927f2eb972a80facd95a3f10a3544b19ad",
+    "url": "https://v3b.fal.media/files/b/0aabaf4d/OG3K21ZeFZ1JQgVyZhuXy_09-proof.png",
+    "kind": "image"
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/10-agency-intro.png",
+    "sha256": "a1b5aef81f229677b805b114022d726a92ea157de117cb25195aa687d49bee71",
+    "url": "https://v3b.fal.media/files/b/0aabaf4d/AOqbSgF1l0vEyzKwojRgB_10-agency-intro.png",
+    "kind": "image"
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/11-agency-complete.png",
+    "sha256": "069c8e0c40d13c137e3d1dcf12c794fd4b3a4e9e5577d849e33dab9c346ea193",
+    "url": "https://v3b.fal.media/files/b/0aabaf4e/paaDntQKWKUK2ZFe0lQuW_11-agency-complete.png",
+    "kind": "image"
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/12-thanks.png",
+    "sha256": "11404082656df3d0d10d3fd81b8a0d2d176278fc9260a2441df332a4056dcd41",
+    "url": "https://v3b.fal.media/files/b/0aabaf4e/EZ5cAg2c-hf7jhZirmHdw_12-thanks.png",
+    "kind": "image"
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/13-close-blue.png",
+    "sha256": "9513d5aeab4e97c0b5c3aa6fa1376b95febda99214e09b7fa3b8830c88c220e5",
+    "url": "https://v3b.fal.media/files/b/0aabaf4e/UNVdq841s_MOLu2doq61O_13-close-blue.png",
+    "kind": "image"
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/refs/14-close-purple.png",
+    "sha256": "4840c8227523fd92f88a58d2fb32bea28c3b824aafb60e8d107211f1c4cdb0df",
+    "url": "https://v3b.fal.media/files/b/0aabaf4e/WaGla2AD_rSvLZOCzA9jz_14-close-purple.png",
+    "kind": "image"
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/aircraft-inputs/V02.png",
+    "sha256": "d1677e50b8883f54a68c7077f7ecf7a2b4a89d2e1f9176fdb848417990e14749",
+    "url": "https://v3b.fal.media/files/b/0aabaf53/v3rCkHLs3TovrOVjwlr59_sky-airframe-V02.png",
+    "kind": "image",
+    "originalPath": "ai-generations/2026-09-23_cmp003-sky-video/seedance/refs/A320neo_CFM_SKY_V02.png",
+    "normalization": "Transparent letterbox only; original aircraft pixels unscaled and unchanged. 908x512 input validation."
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/aircraft-inputs/V10.png",
+    "sha256": "9060200ce6393c37e476991f639eb98f85446992c911f8c031df3e5e30a1f0dc",
+    "url": "https://v3b.fal.media/files/b/0aabaf53/DWDghZMsuk63OtOjg_pGG_sky-airframe-V10.png",
+    "kind": "image",
+    "originalPath": "ai-generations/2026-09-23_cmp003-sky-video/seedance/refs/A320neo_CFM_SKY_V10.png",
+    "normalization": "Transparent letterbox only; original aircraft pixels unscaled and unchanged. 908x512 input validation."
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/aircraft-inputs/VR.png",
+    "sha256": "96564feb574f8db0800dc728c6561cb7e4927305f7869292680c972e1f6df1d9",
+    "url": "https://v3b.fal.media/files/b/0aabaf54/it73NLTKHNZ5ahwO_u9x2_sky-airframe-VR.png",
+    "kind": "image",
+    "originalPath": "ai-generations/2026-09-23_cmp003-sky-video/seedance/refs/A320neo_CFM_SKY_VR.png",
+    "normalization": "Transparent letterbox only; original aircraft pixels unscaled and unchanged. 908x512 input validation."
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/aircraft-inputs/V16.png",
+    "sha256": "9a8409d89324f6fb6f9e97887d7a43286706a4e7a833589eabf19e8ef6251d32",
+    "url": "https://v3b.fal.media/files/b/0aabaf54/JCwuTO3qNeJei4nlch2A-_sky-airframe-V16.png",
+    "kind": "image",
+    "originalPath": "ai-generations/2026-09-23_cmp003-sky-video/seedance/refs/A320neo_CFM_SKY_V16.png",
+    "normalization": "Transparent letterbox only; original aircraft pixels unscaled and unchanged. 908x512 input validation."
+  },
+  {
+    "path": "ai-generations/2026-09-23_cmp003-sky-video/seedance/v9/sky-v9-guide-silent.mp4",
+    "sha256": "db42e93a35a55368d55ea8a465717130d1ec0ccdb517c18aafa09dfa109b6f36",
+    "url": "https://v3b.fal.media/files/b/0aabaf4f/4MbB2PyQBik9uS6LR_F8z_sky-v9-guide-silent.mp4",
+    "kind": "video"
+  }
+]

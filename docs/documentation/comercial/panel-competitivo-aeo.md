@@ -1,9 +1,9 @@
 # Panel Competitivo AEO — Comparar marcas en las respuestas de IA
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-11 por Claude
-> **Ultima actualizacion:** 2026-09-11 por Claude
+> **Ultima actualizacion:** 2026-09-23 por Claude
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 > **Manual comercial:** [Usar el Panel Competitivo AEO en venta](../../manual-de-uso/comercial/panel-competitivo-aeo-en-venta.md)
 > **Estado:** procedimiento operador (todavía no es una capacidad gobernada; ver "Lo que viene")
@@ -135,7 +135,8 @@ se declaran en cada entrega.
 ## Ejemplo: el caso SKY (2026-09-11)
 
 **Contexto.** Lo pidió Nicolá Lamiaux, Gerente de Marketing de SKY Airline. Se hizo **fuera de la licitación de
-SEO en curso con SKY**: sin propuesta ni precio, sólo para mostrar el método.
+SEO en curso con SKY**: sin propuesta ni precio, sólo para mostrar el método. *(Esa licitación se adjudicó a Efeonce
+el 2026-09-23; el benchmark AEO competitivo figura entre la evidencia verificable que explica el cierre.)*
 
 **Medición.** Cinco aerolíneas, mercado Chile, 12 preguntas × 5 motores = 60 respuestas por marca (300 en total).
 Cada run tardó unos 17 minutos; los cinco quedaron listos en alrededor de una hora.

@@ -58,6 +58,29 @@ Fuentes de perspectiva/material y sus límites se mantienen en [brand-in-scene.m
 duplicar un segundo contrato de placement. La doctrina creativa dueña está en
 [el módulo 11](../modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md).
 
+## Caso GTA VI «Nivel de búsqueda» — consultado el 2026-09-19
+
+**Vigencia: el meme «We got X before GTA 6» y la tensión de la espera caducan el 19-nov-2026** (lanzamiento). Tras
+esa fecha, no reutilizar el gancho; la estética puede seguir como código, con estudio revalidado. Estudio completo
+con etiquetas `[V]/[O]/[NV]`: `ai-generations/2026-09-19_nivel-de-busqueda/brief/gta6-visual-study.md`.
+Bitácora: `docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md`.
+
+| Fuente | Aporte aplicado | Límite |
+|---|---|---|
+| [Rockstar Newswire — Grand Theft Auto VI: The Album](https://www.rockstargames.com/newswire/article/7599a881942544/announcing-grand-theft-auto-vi-the-album-coming-november-19) | álbum oficial sale el 19-nov-2026 (corrigió un «19-sep» del brief) | anuncio del álbum, no del juego |
+| [Variety](https://variety.com/2025/gaming/news/gta-6-release-delayed-november-2026-1236571679/) y [Wikipedia — GTA VI](https://en.wikipedia.org/wiki/Grand_Theft_Auto_VI) | lanzamiento 19-nov-2026 tras dos retrasos; época 2020s, sátira de redes/influencers | Wikipedia es secundaria; revalidar la fecha si hay nuevo retraso |
+| [Wikipedia — GTA V](https://en.wikipedia.org/wiki/Grand_Theft_Auto_V) | GTA V salió el 17-sep-2013: «13 años de espera» | — |
+| [Wikipedia — GTA: Vice City](https://en.wikipedia.org/wiki/Grand_Theft_Auto:_Vice_City) | la estética synthwave de 1986 es la entrega anterior, no GTA VI | explica el error v1; no describe GTA VI |
+| [Creative Boom, 27-ago-2026](https://www.creativeboom.com/insight/what-gta-6s-trailers-tell-us-about-vice-city-lucia-and-the-biggest-creative-launch-of-the-decade/) | registro de sátira del presente; paleta rosa, púrpura y turquesa | análisis editorial `[O]` |
+| [Rockstar Intel — carátula y logo](https://rockstarintel.com/new-gta-6-cover-art-wallpapers-logo-released/) | carátula en collage de paneles; logo 2026 | fan site; la técnica pictórica exacta quedó `[NV]` |
+| [allthings.how — HUD](https://allthings.how/gta-6-hud-icons-and-meters-explained-extended-look/) y [Sportskeeda — UI](https://www.sportskeeda.com/gta/all-ui-elements-revealed-gta-6-extended-look) | HUD mínimo: estrellas, minimapa, notificaciones; base del HUD propio dibujado | describen el Extended Look; la UI final puede cambiar |
+| [GTA Wiki ES — Nivel de búsqueda](https://gta.fandom.com/es/wiki/Nivel_de_b%C3%BAsqueda_de_Grand_Theft_Auto_V) | «nivel de búsqueda» es el término de la comunidad hispana | string de la UI localizada de GTA VI `[NV]` |
+| [Know Your Meme — We got X before GTA 6](https://knowyourmeme.com/memes/we-got-x-before-gta-6) | origen 2021, auge 2023; estructura del gancho de portada | muestra de uso, no medición de alcance |
+| [allthings.how — vallas Spotify](https://allthings.how/spotify-s-gta-6-billboards-what-s-confirmed-and-what-isn-t/) y [TechPowerUp](https://www.techpowerup.com/352815/spotify-teases-gta-6-collaboration-with-billboards-in-major-us-cities) | Spotify con vallas en NY, LA y Miami desde el 16-sep-2026 | marcas no listadas = no documentadas, no ausentes |
+| [Netflix Tudum](https://www.netflix.com/tudum/articles/grand-theft-auto-6-extended-first-look) | Netflix estrenó el Extended Look | — |
+| [PlayStation LifeStyle, 11-sep-2026](https://www.playstationlifestyle.net/2026/09/11/gta-6-real-life-vice-city-miami-beach-advertising-deal/) | acuerdo de Miami (USD 3 M, marca discreta 15-oct–31-dic); ejemplo de límite de IP | no es asesoría legal |
+| [Monster — Ultra Vice Guava](https://www.monsterenergy.com/en-us/energy-drinks/zero-sugar/ultra-vice-guava/) | asociación por vocabulario visual sin licencia de la IP | lectura `[O]` de la intención de la marca |
+
 ## Investigación de creatividad y psicología — 2026-09-12
 
 Las fuentes académicas, alcance de acceso y límites se mantienen junto a su aplicación en

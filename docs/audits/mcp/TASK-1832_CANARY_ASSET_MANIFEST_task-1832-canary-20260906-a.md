@@ -8,9 +8,8 @@ no contiene correos completos, tokens, códigos, cookies, verifiers, hashes de s
 - `run_id`: `task-1832-canary-20260906-a`
 - `canary_registration_id`: `xcr-48dacd1f-ad4b-4a73-b454-3d94574e7d09`
 - `environment`: `efeonce-auth` — asset compartido, nunca eliminar
-- `state`: `production_observation_pending_cleanup`; compatibilidad histórica certificada; la señal agregada
-  del CIMD compartido fue atribuida a un perfil interno y el cleanup aún no soporta artefactos canary en un
-  cliente compartido
+- `state`: `deleted` (2026-09-18); authority revocada, grafo run-owned en cero, CIMD compartido preservado y
+  ambos gates canary `false` con readback servido
 - `created_at`: `2026-09-06T19:43:30Z`
 - `created_by`: `jreye` mediante sesión admin gobernada
 - `reason`: `TASK-1832 external MCP compatibility certification`
@@ -164,11 +163,12 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
       sin `offline_access`; Claude Code y Claude.ai rotaron una vez post-TTL, siempre base-only. Las cinco
       negativas, incluidos TTL natural `401 invalid_token`, refresh/familia y authority revocada en `19.272 s`,
       pasaron.
-- [ ] Cleanup dry-run: `deletionReady=true`, `unexpectedRefs=0`, sin blockers/shared delete attempts.
+- [x] Cleanup dry-run: `deletionReady=true`, `unexpectedRefs=0`, sin blockers ni intentos de borrar shared (2026-09-18, tras la revocación).
 - [x] Observación diaria programada en `task-1832-observaci-n-y-retiro-canary`; permanece silenciosa sin drift
       y sólo puede iniciar el retiro desde `delete_after` con todas las precondiciones verdes.
-- [ ] Siete días steady o aprobación explícita de retiro anticipado.
-- [ ] Cleanup apply y readback cero de todos los IDs exactos.
+- [x] Ventana específica cumplida en tiempo: el retiro empezó después de `2026-09-18T01:33:34.325Z`. Evidencia de actividad: la correlación por sujeto del 2026-09-14 no encontró eventos canary posteriores al `2026-09-11T01:33:34.325Z`; entre el 2026-09-14 y el retiro no se registró una muestra por sujeto adicional (dato no verificado, no inferido como steady).
+- [x] Cleanup apply y readback cero de todos los IDs exactos (2026-09-18, perfil `ops`).
+- [x] Gates canary OFF con readback en la revisión servida (2026-09-18, ver §Registro de retiro).
 
 ## Registro de observación
 
@@ -296,10 +296,28 @@ La lectura del canary desde ChatGPT pasó después de la sustitución (gateway r
   `registration_active|active_authority|active_auth`; 2 profiles/links, 5 invitaciones, 3 grants, 22 DCR,
   18 sesiones, 14 magic links, 2 passkeys, 5 challenges, 21 codes/consents, 29 refresh/access tokens y 4
   authorization contexts; `activeAuthorityCount=4`, `activeAuthCount=56`, sin intento de apply
-- `apply_at`: `PENDIENTE`
-- `apply_actor`: `PENDIENTE`
-- `apply_result`: `PENDIENTE`
-- `refusal_reason`: `2026-09-14: registration_active|active_authority|active_auth|oauth_client_not_run_owned; la señal global de Codex no es canary; cleanup sujeto-específico y ventana hasta 2026-09-18T01:33:34.325Z pendientes; no apply`
+- `revoke_at`: `2026-09-18T12:46:01Z` — registro y binding revocados; `activeAuthorityCount=0`, `activeAuthCount=0`
+- `apply_at`: `2026-09-18`, después de la revocación y del deploy de `74638aed0` (cleanup sujeto-específico)
+- `apply_actor`: operador mediante el wrapper `identity:external-canary:cleanup`, perfil DB `ops`
+- `apply_result`: `deletionReady=true`, `unexpectedRefs=0`, cero blockers; grafo run-owned (organización,
+  registro, binding, grants, invitaciones, perfiles, source links, DCR, codes/consents, tokens, sesiones, magic
+  links, passkeys, challenges y contexts) en cero. El CIMD compartido de ChatGPT/Codex y los artefactos de otros
+  sujetos quedaron con recibos de preservación idénticos antes/después. Audit/outbox y deliveries retenidos;
+  wordmark compartido HTTP 200.
+- `refusal_reason` histórico: `2026-09-14: registration_active|active_authority|active_auth|oauth_client_not_run_owned` — resuelto por `74638aed0` + revocación; no se allowlisteó nada
+- `aggregate_readback`: `2026-09-18T14:09:17Z` — `registrations=0`, `canary_bindings=0`, drift externo/interno
+  `0/0`, `smoke_in_person_360=0`
+- `gates_off` (readback en la revisión que sirve el 100 %):
+  - `EXTERNAL_IDENTITY_CANARY_ENABLED`: variable GitHub de repositorio `false` (`2026-09-18T13:52:35Z`), sin
+    overrides en `Production|Preview|staging|copilot`; auth-server `auth-server-00076-t2t`, 100 %,
+    `GIT_SHA=bda1cf2cd938`, valor servido `false` (run `35353431957`, mismo SHA, sólo config); Vercel Production
+    `false` + redeploy `dpl_CWnDKTVmLkrQY2xUtLHnxEL64ZG9` sobre `bda1cf2cd938`, alias productivo; Vercel staging
+    `false` sin cambios
+  - `MCP_NATIVE_EXTERNAL_CANARY_ENABLED`: variable del environment `production` de `efeonce-mcp` `false`
+    (`2026-09-18T13:52:37Z`); gateway `efeonce-mcp-gateway-00056-kgs`, 100 %, `GATEWAY_BUILD_SHA=4c9d7c44cf0e`,
+    valor servido `false` (run `35353391431`)
+  - flags nativos generales intactos; `auth.efeonce.org/readyz` 200, PRM del gateway 200, `POST /mcp` sin
+    bearer `401`
 
 El estado `deleted` se usa únicamente después de releer cero en organización, registro, binding, grants,
 invitaciones, perfiles, links, contextos, consents, codes, tokens y sesiones, con Person/Account 360 y

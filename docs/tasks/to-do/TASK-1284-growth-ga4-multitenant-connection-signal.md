@@ -1,5 +1,11 @@
 # TASK-1284 — Growth GA4 (Google Analytics 4) multi-tenant connection + grader signal
 
+## Delta 2026-09-19 — conexión visible solicitada por el operador
+
+El operador pidió exponer la conexión GA4 junto al botón de Search Console en el Account 360 del cliente. Se implementaron localmente el panel, OAuth read-only, selector de propiedades, comandos, capability, reader histórico y migración additive. La dirección visual está en `docs/architecture/growth/ga4-connection-ui-v1.md`.
+
+**Estado real:** typecheck, lint, cinco pruebas de autorización/API y GVC local desktop/móvil verdes para el panel (`.captures/2026-09-19T23-25-04_ga4-connection-panel`). Faltan OAuth/IAM de Google, aplicación de migración con el release y smoke real de Grupo Berel. El cableado al grader y su señal de salud siguen pendientes dentro de esta task. No marcar la task completa por la sola presencia del panel. La migración SQL queda estacionada en `docs/tasks/pending-migrations/` hasta el release, conforme al contrato de tooling de base de datos.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

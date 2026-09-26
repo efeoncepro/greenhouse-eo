@@ -1,0 +1,44 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 ai:omni /Users/jreye/Documents/greenhouse-eo
+> tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/gemini-omni.ts --project efeonce-group --wait ChBiZWNiNjVlMDA5NjZkOTJhEAgaATAqBG1haW4 --out ai-generations/2026-09-23_cmp003-sky-video/omni/v10-pilot-01/omni-edit-native.mp4
+
+{
+  "project": "efeonce-group",
+  "model": "gemini-omni-1.1-flash-preview",
+  "id": "ChBiZWNiNjVlMDA5NjZkOTJhEAgaATAqBG1haW4",
+  "status": "completed",
+  "videos": [
+    {
+      "uri": "gs://efeonce-group-greenhouse-private-assets-dev/ai-tooling/cmp003-sky/v10-pilot-01/output/2182662994034398922.mp4",
+      "mimeType": "video/mp4"
+    }
+  ],
+  "inlineVideoCount": 0,
+  "usage": {
+    "total_tokens": 141190,
+    "total_input_tokens": 58012,
+    "input_tokens_by_modality": [
+      {
+        "modality": "video",
+        "tokens": 53100
+      },
+      {
+        "modality": "text",
+        "tokens": 512
+      },
+      {
+        "modality": "image",
+        "tokens": 4400
+      }
+    ],
+    "total_output_tokens": 82536,
+    "output_tokens_by_modality": [
+      {
+        "modality": "video",
+        "tokens": 82536
+      }
+    ],
+    "total_thought_tokens": 642
+  }
+}
+MP4: /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/omni/v10-pilot-01/omni-edit-native.mp4 (9246426 bytes)

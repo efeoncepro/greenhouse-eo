@@ -20,7 +20,7 @@
 | **Freelance senior** | **USD 900–1.500/día** | Talento puntual | Continuidad, cobertura, gobierno, escala |
 | 🎯 **In-house** *(¡su equipo!)* | **1 art director: USD 7.500–13.300/mes** loaded · **equipo de 3: USD 20k–30k/mes** | Contexto total, dedicación | 🎯 **Capacidad elástica, cobertura, y personas que no se queman** |
 | **No hacer nada** | 0 | Nada | *(y es el competidor que más deals gana — ver §7)* |
-| **Efeonce — Managed Squad** | **CLP 5,2M/mes** *(9 roles, 2,2 FTE — caso SKY)* | Capacidad + estrategia + **gobierno medido** | — |
+| **Efeonce — Managed Squad** | **CLP 5,2M/mes** *(9 roles, 2,2 FTE — oferta original del blog SKY, superseded: adjudicado a 3,0M)* | Capacidad + estrategia + **gobierno medido** | — |
 
 > ## Nuestro squad completo de 9 roles cuesta menos de lo que le cuesta a un cliente enterprise UN SOLO director de arte interno.
 > **Y está en el mismo rango que Superside — que vende capacidad sin estrategia y sin métricas de calidad.**

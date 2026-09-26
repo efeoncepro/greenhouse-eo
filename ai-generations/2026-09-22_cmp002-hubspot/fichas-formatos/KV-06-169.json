@@ -1,0 +1,34 @@
+{
+  "id": "KV-06-169",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "reflejo",
+  "atmosfera": "bruma",
+  "identidad": [
+    {
+      "persona": "nexa",
+      "vista": "perfil-izq"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "polo-efeonce",
+      "puesta": "frente-cuerpo-b"
+    },
+    {
+      "objeto": "sprocket-hubspot",
+      "vista": "rodando"
+    }
+  ],
+  "escena": "SCENE (finance floor at night, Santiago): TWO realities in one frame through a glass partition, both visible at once. On the far side of the glass, a glowing cool blue cost board is lit and dense with committed lines. Reflected on the same glass, Nexa stands on the near side in a navy piqué polo, almost frontal, caught in the act of turning her eyes to the board — and the reflection of the board's results column falls exactly where it is empty. Her reflected face and the lit board overlap without hiding each other. A hard low light from the left picks her out with very high contrast; thin haze makes its beam visible and the beam stays inside the action area. A small orange sculpture sits on the ledge of the partition, catching the blue light on one side. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. The sculpture's ring-and-nodes symbol belongs ONLY to the sculpture: it never appears on her clothing, and no symbol of it is printed, embroidered or reflected on the polo. Everything except the sculpture is completely unbranded and no text or figure anywhere is readable: the board's lines read as structure, never as amounts. CRITICAL FRAMING (horizontal 16:9): the ACTION AREA is the RIGHT 55% of the frame. The LEFT 45% of the frame, top to bottom, is one single dark, evenly toned surface with NOTHING in it: no person, no object, no screen, no lamp, no window, no light beam, no bright spot, no shadow edge. Every person, every object, all the action, all the light and every bright patch stay inside the right 55%.",
+  "lecho": {
+    "objeto": "the near edge of the glass partition's dark metal frame crossing the very bottom against the lens",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the dark unlit ceiling and back wall of the finance floor, even in tone, concrete texture visible",
+      "tinta": "blanca"
+    }
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "criterion": "≤ 1 % de píxeles distintos (pixelmatch, umbral 0,1)",
+  "rows": [
+    {
+      "reference": "Deck-Agrupadas",
+      "template": "InsightsFigureColumnsSlide",
+      "changed": 20503,
+      "total": 921600,
+      "ratio": 0.022247178819444446,
+      "pass": true,
+      "exception": "operador 2026-09-25: Corrimiento de 3 px del propio canvas; la plantilla queda alineada con las otras tres láminas de figura."
+    },
+    {
+      "reference": "Deck-Comparacion",
+      "template": "InsightsFigureComparisonSlide",
+      "changed": 58,
+      "total": 921600,
+      "ratio": 0.00006293402777777778,
+      "pass": true
+    },
+    {
+      "reference": "Deck-Lectura",
+      "template": "InsightsReadingSlide",
+      "changed": 0,
+      "total": 921600,
+      "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Deck-Lineas",
+      "template": "InsightsFigureTrendSlide",
+      "changed": 71,
+      "total": 921600,
+      "ratio": 0.00007703993055555555,
+      "pass": true
+    },
+    {
+      "reference": "Deck-Metas",
+      "template": "InsightsFigureTargetsSlide",
+      "changed": 1485,
+      "total": 921600,
+      "ratio": 0.001611328125,
+      "pass": true
+    },
+    {
+      "reference": "Deck-Plan",
+      "template": "InsightsPlanSlide",
+      "changed": 0,
+      "total": 921600,
+      "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Deck-Resumen",
+      "template": "InsightsSummarySlide",
+      "changed": 0,
+      "total": 921600,
+      "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Agrupadas",
+      "template": "ReportFigureColumnsPage",
+      "changed": 254,
+      "total": 891662,
+      "ratio": 0.0002848613039470113,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Capitulo",
+      "template": "ReportChapterPage",
+      "changed": 0,
+      "total": 891662,
+      "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Capitulo-02",
+      "template": "ReportChapterPage",
+      "changed": 0,
+      "total": 891662,
+      "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Capitulo-03",
+      "template": "ReportChapterPage",
+      "changed": 0,
+      "total": 891662,
+      "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Contraportada",
+      "template": "ReportBackCoverPage",
+      "changed": 0,
+      "total": 891662,
+      "ratio": 0,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Evidencia",
+      "template": "ReportFigureComparisonPage",
+      "changed": 333,
+      "total": 891662,
+      "ratio": 0.0003734598984817117,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Lectura",
+      "template": "ReportReadingPage",
+      "changed": 243,
+      "total": 891662,
+      "ratio": 0.0002725247907839518,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Lineas",
+      "template": "ReportFigureTrendPage",
+      "changed": 241,
+      "total": 891662,
+      "ratio": 0.0002702817883906682,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Metas",
+      "template": "ReportFigureTargetsPage",
+      "changed": 1174,
+      "total": 891662,
+      "ratio": 0.001316642404857446,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Plan",
+      "template": "ReportPlanPage",
+      "changed": 234,
+      "total": 891662,
+      "ratio": 0.0002624312800141758,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Portada",
+      "template": "ReportCoverPage",
+      "changed": 426,
+      "total": 891662,
+      "ratio": 0.0004777595097693969,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Portada-Clara",
+      "template": "ReportCoverLightPage",
+      "changed": 463,
+      "total": 891662,
+      "ratio": 0.0005192550540451426,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Portada-Clara-Creativo",
+      "template": "ReportCoverLightPage",
+      "changed": 1655,
+      "total": 891662,
+      "ratio": 0.0018560844804421405,
+      "pass": true
+    },
+    {
+      "reference": "Premium-Resumen",
+      "template": "ReportSummaryPage",
+      "changed": 262,
+      "total": 891662,
+      "ratio": 0.0002938333135201455,
+      "pass": true
+    }
+  ]
+}

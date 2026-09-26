@@ -1,0 +1,15 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 ai:omni /Users/jreye/Documents/greenhouse-eo
+> tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/gemini-omni.ts --task edit --project efeonce-group --video /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v10-local/planning/omni-pilot-source-6_50-16_00.mp4 --resolution 1080p --prompt-file /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/omni/v10-pilot-01/prompt.txt --staging-uri gs://efeonce-group-greenhouse-private-assets-dev/ai-tooling/cmp003-sky/v10-pilot-01/inputs/ --gcs-output gs://efeonce-group-greenhouse-private-assets-dev/ai-tooling/cmp003-sky/v10-pilot-01/output/ --state-file /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/omni/v10-pilot-01/state.json --max-usd 1.53 --image /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/cam-A-frontal-photo.png --image /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/cam-B-tracking-photo.png --image /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v6/refs/cam-B-rear-departure.png --image /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/seedance/v5/refs/05-answer-citation.png --yes
+
+Omni 1.1 Cloud · edit · 1080p · cota de video output para hasta 10s ≈ USD 1.520 + input/texto/impuestos.
+{
+  "project": "efeonce-group",
+  "model": "gemini-omni-1.1-flash-preview",
+  "id": "ChBiZWNiNjVlMDA5NjZkOTJhEAgaATAqBG1haW4",
+  "status": "in_progress",
+  "videos": [],
+  "inlineVideoCount": 0
+}
+Estado local: /Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-23_cmp003-sky-video/omni/v10-pilot-01/state.json
+Retomar: pnpm ai:omni --project efeonce-group --wait ChBiZWNiNjVlMDA5NjZkOTJhEAgaATAqBG1haW4 --out clip.mp4

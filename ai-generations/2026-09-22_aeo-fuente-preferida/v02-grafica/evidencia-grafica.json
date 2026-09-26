@@ -1,0 +1,903 @@
+[
+  {
+    "id": "01-fuera-916",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "imageRegenerated": false,
+    "parent": "v01-Codex",
+    "intent": {
+      "targetId": "dominante",
+      "targetKind": "text",
+      "variant": "open-brackets",
+      "padding": "standard",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "seo",
+          "kind": "collaborator",
+          "targetId": "dominante",
+          "anchor": "top-end",
+          "action": "select",
+          "label": "SEO",
+          "participantKind": "role"
+        },
+        {
+          "id": "cliente",
+          "kind": "collaborator",
+          "targetId": "dominante",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "Cliente",
+          "participantKind": "role"
+        }
+      ]
+    },
+    "manifest": {
+      "schema": "axis.collaboration-selection-composition.v1",
+      "contract": {
+        "id": "efeonce.collaboration-selection",
+        "version": "0.2.0"
+      },
+      "target": {
+        "id": "dominante",
+        "kind": "text"
+      },
+      "selection": {
+        "variant": "open-brackets",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursors": [
+        {
+          "id": "seo",
+          "kind": "collaborator",
+          "targetId": "dominante",
+          "anchor": "top-end",
+          "action": "select",
+          "label": "SEO",
+          "participantKind": "role",
+          "state": "acting",
+          "direction": "south-west",
+          "attachment": "south-west"
+        },
+        {
+          "id": "cliente",
+          "kind": "collaborator",
+          "targetId": "dominante",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "Cliente",
+          "participantKind": "role",
+          "state": "acting",
+          "direction": "north-west",
+          "attachment": "north-west"
+        }
+      ]
+    },
+    "presentation": {
+      "variant": "open-brackets",
+      "padding": "standard",
+      "overlay": "none",
+      "scale": 1.5,
+      "cursors": [
+        {
+          "id": "seo",
+          "label": "SEO",
+          "anchor": "top-end",
+          "color": "#12afa2"
+        },
+        {
+          "id": "cliente",
+          "label": "Cliente",
+          "anchor": "bottom-end",
+          "color": "#6ec207"
+        }
+      ]
+    },
+    "typography": {
+      "idea": {
+        "family": "Bricolage Grotesque",
+        "file": "src/assets/fonts/BricolageGrotesque-Variable.ttf",
+        "recipe": {
+          "role": "idea",
+          "weight": 780,
+          "width": 96,
+          "opticalSize": 88,
+          "tracking": "-0.035em",
+          "lineHeight": 0.9,
+          "maxWords": 3
+        },
+        "width": 78,
+        "requestedSize": 137,
+        "maximumWidthFraction": 0.58,
+        "accent": "#ff6500"
+      },
+      "structure": {
+        "family": "Poppins",
+        "files": [
+          "src/assets/fonts/Poppins-Regular.ttf",
+          "src/assets/fonts/Poppins-Bold.ttf"
+        ],
+        "weights": [
+          400,
+          700
+        ],
+        "leadSize": 29,
+        "afterSize": 26
+      },
+      "gesture": null
+    },
+    "adviser": {
+      "source": "AXIS Lab local source: creative-typography.astro",
+      "inputs": {
+        "format": "story",
+        "length": "short",
+        "intent": "impact"
+      },
+      "candidateWeight": [
+        760,
+        800
+      ],
+      "publicPageRead": "web tool inaccessible; source consulted"
+    },
+    "qa": "out/qa.json; out/qa-firma.txt; final390 previews visually reviewed"
+  },
+  {
+    "id": "01-fuera-169",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "imageRegenerated": false,
+    "parent": "v01-Codex",
+    "intent": {
+      "targetId": "dominante",
+      "targetKind": "text",
+      "variant": "open-brackets",
+      "padding": "standard",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "seo",
+          "kind": "collaborator",
+          "targetId": "dominante",
+          "anchor": "top-end",
+          "action": "select",
+          "label": "SEO",
+          "participantKind": "role"
+        },
+        {
+          "id": "cliente",
+          "kind": "collaborator",
+          "targetId": "dominante",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "Cliente",
+          "participantKind": "role"
+        }
+      ]
+    },
+    "manifest": {
+      "schema": "axis.collaboration-selection-composition.v1",
+      "contract": {
+        "id": "efeonce.collaboration-selection",
+        "version": "0.2.0"
+      },
+      "target": {
+        "id": "dominante",
+        "kind": "text"
+      },
+      "selection": {
+        "variant": "open-brackets",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursors": [
+        {
+          "id": "seo",
+          "kind": "collaborator",
+          "targetId": "dominante",
+          "anchor": "top-end",
+          "action": "select",
+          "label": "SEO",
+          "participantKind": "role",
+          "state": "acting",
+          "direction": "south-west",
+          "attachment": "south-west"
+        },
+        {
+          "id": "cliente",
+          "kind": "collaborator",
+          "targetId": "dominante",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "Cliente",
+          "participantKind": "role",
+          "state": "acting",
+          "direction": "north-west",
+          "attachment": "north-west"
+        }
+      ]
+    },
+    "presentation": {
+      "variant": "open-brackets",
+      "padding": "standard",
+      "overlay": "none",
+      "scale": 1.2,
+      "cursors": [
+        {
+          "id": "seo",
+          "label": "SEO",
+          "anchor": "top-end",
+          "color": "#12afa2"
+        },
+        {
+          "id": "cliente",
+          "label": "Cliente",
+          "anchor": "bottom-end",
+          "color": "#6ec207"
+        }
+      ]
+    },
+    "typography": {
+      "idea": {
+        "family": "Bricolage Grotesque",
+        "file": "src/assets/fonts/BricolageGrotesque-Variable.ttf",
+        "recipe": {
+          "role": "idea",
+          "weight": 780,
+          "width": 96,
+          "opticalSize": 88,
+          "tracking": "-0.035em",
+          "lineHeight": 0.9,
+          "maxWords": 3
+        },
+        "width": 78,
+        "requestedSize": 143,
+        "maximumWidthFraction": 0.3,
+        "accent": "#ff6500"
+      },
+      "structure": {
+        "family": "Poppins",
+        "files": [
+          "src/assets/fonts/Poppins-Regular.ttf",
+          "src/assets/fonts/Poppins-Bold.ttf"
+        ],
+        "weights": [
+          400,
+          700
+        ],
+        "leadSize": 32,
+        "afterSize": 29
+      },
+      "gesture": null
+    },
+    "adviser": {
+      "source": "AXIS Lab local source: creative-typography.astro",
+      "inputs": {
+        "format": "cover",
+        "length": "short",
+        "intent": "impact"
+      },
+      "candidateWeight": [
+        760,
+        800
+      ],
+      "publicPageRead": "web tool inaccessible; source consulted"
+    },
+    "qa": "out/qa.json; out/qa-firma.txt; final390 previews visually reviewed"
+  },
+  {
+    "id": "02-reconoces-916",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "imageRegenerated": false,
+    "parent": "v01-Codex",
+    "intent": {
+      "targetId": "dominante",
+      "targetKind": "text",
+      "variant": "four-corners",
+      "padding": "standard",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "nexa",
+          "kind": "collaborator",
+          "targetId": "dominante",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "Nexa",
+          "participantKind": "role"
+        }
+      ]
+    },
+    "manifest": {
+      "schema": "axis.collaboration-selection-composition.v1",
+      "contract": {
+        "id": "efeonce.collaboration-selection",
+        "version": "0.2.0"
+      },
+      "target": {
+        "id": "dominante",
+        "kind": "text"
+      },
+      "selection": {
+        "variant": "four-corners",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursors": [
+        {
+          "id": "nexa",
+          "kind": "collaborator",
+          "targetId": "dominante",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "Nexa",
+          "participantKind": "role",
+          "state": "acting",
+          "direction": "north-west",
+          "attachment": "north-west"
+        }
+      ]
+    },
+    "presentation": {
+      "variant": "four-corners",
+      "padding": "standard",
+      "overlay": "none",
+      "scale": 1.45,
+      "cursors": [
+        {
+          "id": "nexa",
+          "label": "Nexa",
+          "anchor": "bottom-end",
+          "color": "#d6246e"
+        }
+      ]
+    },
+    "typography": {
+      "idea": {
+        "family": "Bricolage Grotesque",
+        "file": "src/assets/fonts/BricolageGrotesque-Variable.ttf",
+        "recipe": {
+          "role": "idea",
+          "weight": 780,
+          "width": 96,
+          "opticalSize": 88,
+          "tracking": "-0.035em",
+          "lineHeight": 0.9,
+          "maxWords": 3
+        },
+        "width": 78,
+        "requestedSize": 137,
+        "maximumWidthFraction": 0.65,
+        "accent": "#ff6500"
+      },
+      "structure": {
+        "family": "Poppins",
+        "files": [
+          "src/assets/fonts/Poppins-Regular.ttf",
+          "src/assets/fonts/Poppins-Bold.ttf"
+        ],
+        "weights": [
+          400,
+          700
+        ],
+        "leadSize": 29,
+        "afterSize": 26
+      },
+      "gesture": null
+    },
+    "adviser": {
+      "source": "AXIS Lab local source: creative-typography.astro",
+      "inputs": {
+        "format": "story",
+        "length": "short",
+        "intent": "impact"
+      },
+      "candidateWeight": [
+        760,
+        800
+      ],
+      "publicPageRead": "web tool inaccessible; source consulted"
+    },
+    "qa": "out/qa.json; out/qa-firma.txt; final390 previews visually reviewed"
+  },
+  {
+    "id": "02-reconoces-169",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "imageRegenerated": false,
+    "parent": "v01-Codex",
+    "intent": {
+      "targetId": "dominante",
+      "targetKind": "text",
+      "variant": "four-corners",
+      "padding": "standard",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "nexa",
+          "kind": "collaborator",
+          "targetId": "dominante",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "Nexa",
+          "participantKind": "role"
+        }
+      ]
+    },
+    "manifest": {
+      "schema": "axis.collaboration-selection-composition.v1",
+      "contract": {
+        "id": "efeonce.collaboration-selection",
+        "version": "0.2.0"
+      },
+      "target": {
+        "id": "dominante",
+        "kind": "text"
+      },
+      "selection": {
+        "variant": "four-corners",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursors": [
+        {
+          "id": "nexa",
+          "kind": "collaborator",
+          "targetId": "dominante",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "Nexa",
+          "participantKind": "role",
+          "state": "acting",
+          "direction": "north-west",
+          "attachment": "north-west"
+        }
+      ]
+    },
+    "presentation": {
+      "variant": "four-corners",
+      "padding": "standard",
+      "overlay": "none",
+      "scale": 1.2,
+      "cursors": [
+        {
+          "id": "nexa",
+          "label": "Nexa",
+          "anchor": "bottom-end",
+          "color": "#d6246e"
+        }
+      ]
+    },
+    "typography": {
+      "idea": {
+        "family": "Bricolage Grotesque",
+        "file": "src/assets/fonts/BricolageGrotesque-Variable.ttf",
+        "recipe": {
+          "role": "idea",
+          "weight": 780,
+          "width": 96,
+          "opticalSize": 88,
+          "tracking": "-0.035em",
+          "lineHeight": 0.9,
+          "maxWords": 3
+        },
+        "width": 78,
+        "requestedSize": 143,
+        "maximumWidthFraction": 0.265,
+        "accent": "#ff6500"
+      },
+      "structure": {
+        "family": "Poppins",
+        "files": [
+          "src/assets/fonts/Poppins-Regular.ttf",
+          "src/assets/fonts/Poppins-Bold.ttf"
+        ],
+        "weights": [
+          400,
+          700
+        ],
+        "leadSize": 32,
+        "afterSize": 29
+      },
+      "gesture": null
+    },
+    "adviser": {
+      "source": "AXIS Lab local source: creative-typography.astro",
+      "inputs": {
+        "format": "cover",
+        "length": "short",
+        "intent": "impact"
+      },
+      "candidateWeight": [
+        760,
+        800
+      ],
+      "publicPageRead": "web tool inaccessible; source consulted"
+    },
+    "qa": "out/qa.json; out/qa-firma.txt; final390 previews visually reviewed"
+  },
+  {
+    "id": "03-referencia-916",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "imageRegenerated": false,
+    "parent": "v01-Codex",
+    "intent": null,
+    "manifest": null,
+    "presentation": null,
+    "typography": {
+      "idea": {
+        "family": "Bricolage Grotesque",
+        "file": "src/assets/fonts/BricolageGrotesque-Variable.ttf",
+        "recipe": {
+          "role": "idea",
+          "weight": 780,
+          "width": 96,
+          "opticalSize": 88,
+          "tracking": "-0.035em",
+          "lineHeight": 0.9,
+          "maxWords": 3
+        },
+        "width": 78,
+        "requestedSize": 137,
+        "maximumWidthFraction": 0.84,
+        "accent": "#ff6500"
+      },
+      "structure": {
+        "family": "Poppins",
+        "files": [
+          "src/assets/fonts/Poppins-Regular.ttf",
+          "src/assets/fonts/Poppins-Bold.ttf"
+        ],
+        "weights": [
+          400,
+          700
+        ],
+        "leadSize": 29,
+        "afterSize": 26
+      },
+      "gesture": {
+        "family": "Guttery",
+        "file": "~/Library/Fonts/Guttery.otf",
+        "fontFilesBundled": false,
+        "text": "Que cuente.",
+        "size": 43,
+        "x": 0.4,
+        "y": 0.265,
+        "rotate": -5,
+        "color": "#ffffff"
+      }
+    },
+    "adviser": {
+      "source": "AXIS Lab local source: creative-typography.astro",
+      "inputs": {
+        "format": "story",
+        "length": "short",
+        "intent": "impact"
+      },
+      "candidateWeight": [
+        760,
+        800
+      ],
+      "publicPageRead": "web tool inaccessible; source consulted"
+    },
+    "qa": "out/qa.json; out/qa-firma.txt; final390 previews visually reviewed"
+  },
+  {
+    "id": "03-referencia-169",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "imageRegenerated": false,
+    "parent": "v01-Codex",
+    "intent": null,
+    "manifest": null,
+    "presentation": null,
+    "typography": {
+      "idea": {
+        "family": "Bricolage Grotesque",
+        "file": "src/assets/fonts/BricolageGrotesque-Variable.ttf",
+        "recipe": {
+          "role": "idea",
+          "weight": 780,
+          "width": 96,
+          "opticalSize": 88,
+          "tracking": "-0.035em",
+          "lineHeight": 0.9,
+          "maxWords": 3
+        },
+        "width": 78,
+        "requestedSize": 143,
+        "maximumWidthFraction": 0.32,
+        "accent": "#ff6500"
+      },
+      "structure": {
+        "family": "Poppins",
+        "files": [
+          "src/assets/fonts/Poppins-Regular.ttf",
+          "src/assets/fonts/Poppins-Bold.ttf"
+        ],
+        "weights": [
+          400,
+          700
+        ],
+        "leadSize": 32,
+        "afterSize": 29
+      },
+      "gesture": {
+        "family": "Guttery",
+        "file": "~/Library/Fonts/Guttery.otf",
+        "fontFilesBundled": false,
+        "text": "Que cuente.",
+        "size": 59,
+        "x": 0.09,
+        "y": 0.65,
+        "rotate": -5,
+        "color": "#ffffff"
+      }
+    },
+    "adviser": {
+      "source": "AXIS Lab local source: creative-typography.astro",
+      "inputs": {
+        "format": "cover",
+        "length": "short",
+        "intent": "impact"
+      },
+      "candidateWeight": [
+        760,
+        800
+      ],
+      "publicPageRead": "web tool inaccessible; source consulted"
+    },
+    "qa": "out/qa.json; out/qa-firma.txt; final390 previews visually reviewed"
+  },
+  {
+    "id": "04-elegida-916",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "imageRegenerated": false,
+    "parent": "v01-Codex",
+    "intent": {
+      "targetId": "dominante",
+      "targetKind": "text",
+      "variant": "open-brackets",
+      "padding": "standard",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "targetId": "dominante",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "manifest": {
+      "schema": "axis.collaboration-selection-composition.v1",
+      "contract": {
+        "id": "efeonce.collaboration-selection",
+        "version": "0.2.0"
+      },
+      "target": {
+        "id": "dominante",
+        "kind": "text"
+      },
+      "selection": {
+        "variant": "open-brackets",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "targetId": "dominante",
+          "anchor": "end-center",
+          "action": "select",
+          "orientation": "screen-fixed",
+          "direction": "north-west"
+        }
+      ]
+    },
+    "presentation": {
+      "variant": "open-brackets",
+      "padding": "standard",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "typography": {
+      "idea": {
+        "family": "Bricolage Grotesque",
+        "file": "src/assets/fonts/BricolageGrotesque-Variable.ttf",
+        "recipe": {
+          "role": "idea",
+          "weight": 780,
+          "width": 96,
+          "opticalSize": 88,
+          "tracking": "-0.035em",
+          "lineHeight": 0.9,
+          "maxWords": 3
+        },
+        "width": 78,
+        "requestedSize": 137,
+        "maximumWidthFraction": 0.72,
+        "accent": "#ff6500"
+      },
+      "structure": {
+        "family": "Poppins",
+        "files": [
+          "src/assets/fonts/Poppins-Regular.ttf",
+          "src/assets/fonts/Poppins-Bold.ttf"
+        ],
+        "weights": [
+          400,
+          700
+        ],
+        "leadSize": 29,
+        "afterSize": 26
+      },
+      "gesture": null
+    },
+    "adviser": {
+      "source": "AXIS Lab local source: creative-typography.astro",
+      "inputs": {
+        "format": "story",
+        "length": "short",
+        "intent": "impact"
+      },
+      "candidateWeight": [
+        760,
+        800
+      ],
+      "publicPageRead": "web tool inaccessible; source consulted"
+    },
+    "qa": "out/qa.json; out/qa-firma.txt; final390 previews visually reviewed"
+  },
+  {
+    "id": "04-elegida-169",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "imageRegenerated": false,
+    "parent": "v01-Codex",
+    "intent": {
+      "targetId": "dominante",
+      "targetKind": "text",
+      "variant": "open-brackets",
+      "padding": "standard",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "targetId": "dominante",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "manifest": {
+      "schema": "axis.collaboration-selection-composition.v1",
+      "contract": {
+        "id": "efeonce.collaboration-selection",
+        "version": "0.2.0"
+      },
+      "target": {
+        "id": "dominante",
+        "kind": "text"
+      },
+      "selection": {
+        "variant": "open-brackets",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "targetId": "dominante",
+          "anchor": "end-center",
+          "action": "select",
+          "orientation": "screen-fixed",
+          "direction": "north-west"
+        }
+      ]
+    },
+    "presentation": {
+      "variant": "open-brackets",
+      "padding": "standard",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ],
+      "scale": 1.2
+    },
+    "typography": {
+      "idea": {
+        "family": "Bricolage Grotesque",
+        "file": "src/assets/fonts/BricolageGrotesque-Variable.ttf",
+        "recipe": {
+          "role": "idea",
+          "weight": 780,
+          "width": 96,
+          "opticalSize": 88,
+          "tracking": "-0.035em",
+          "lineHeight": 0.9,
+          "maxWords": 3
+        },
+        "width": 78,
+        "requestedSize": 143,
+        "maximumWidthFraction": 0.29,
+        "accent": "#ff6500"
+      },
+      "structure": {
+        "family": "Poppins",
+        "files": [
+          "src/assets/fonts/Poppins-Regular.ttf",
+          "src/assets/fonts/Poppins-Bold.ttf"
+        ],
+        "weights": [
+          400,
+          700
+        ],
+        "leadSize": 32,
+        "afterSize": 29
+      },
+      "gesture": null
+    },
+    "adviser": {
+      "source": "AXIS Lab local source: creative-typography.astro",
+      "inputs": {
+        "format": "cover",
+        "length": "short",
+        "intent": "impact"
+      },
+      "candidateWeight": [
+        760,
+        800
+      ],
+      "publicPageRead": "web tool inaccessible; source consulted"
+    },
+    "qa": "out/qa.json; out/qa-firma.txt; final390 previews visually reviewed"
+  }
+]

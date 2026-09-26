@@ -1,6 +1,6 @@
 # Fuentes y vigencia
 
-Fecha de revisión: **2026-09-16**. Abre la fuente primaria antes de convertir un dato perecible en claim, propuesta o diseño.
+Fecha de revisión: **2026-09-18**. Abre la fuente primaria antes de convertir un dato perecible en claim, propuesta o diseño.
 
 | Tema | Fuente primaria | Uso |
 |---|---|---|
@@ -20,6 +20,8 @@ Fecha de revisión: **2026-09-16**. Abre la fuente primaria antes de convertir u
 | Novedades de Marketing Cloud desde Dreamforce | https://www.salesforce.com/marketing/whats-new/ | Campaign Agent, Palmata, Headless Marketing, Data Guardian, Budget Optimization y fechas GA |
 | AIforce regional | https://www.salesforce.com/ap/news/press-releases/2026/09/16/sg-salesforce-unveils-aiforce-bringing-the-full-power-of-its-platform-to-any-interface/ | Capa de interfaz, contexto gobernado y acciones desde Claude, Slack y otras superficies |
 | Missionforce y OpenAI | https://www.salesforce.com/news/stories/missionsforce-expansion-agents-nvidia-openai-partnerships/ | Capacidades gubernamentales, modelos y condiciones de entornos regulados |
+| Dreamforce 2026 media resources | https://www.salesforce.com/news/dreamforce-26-media-resources/ | Lineup oficial de anuncios y casos del 15–16/09; consultado 2026-09-18 |
+| Dreamforce 2026 session catalog | https://reg.salesforce.com/flow/plus/df26/sessioncatalog/page/catalog | Sesiones y distribución pública por día; consultado 2026-09-18 |
 
 ## Jerarquía
 

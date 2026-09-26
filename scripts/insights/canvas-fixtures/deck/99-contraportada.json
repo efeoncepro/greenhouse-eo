@@ -1,0 +1,17 @@
+{
+  "reference": null,
+  "catalog": "deck",
+  "contentType": "insights-back-cover",
+  "slots": {
+    "editionLabel": "Efeonce Insights · Agosto 2026",
+    "contact": {
+      "email": "sales@efeoncepro.com",
+      "phonePrimary": "+56 9 3732 3064",
+      "phoneSecondary": "+1 (239) 235-2073",
+      "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile"
+    },
+    "marketsLine": "Chile · Estados Unidos · Colombia · México · Perú",
+    "legalLine": "Efeonce Group SpA · RUT 77.357.182-1 · Documento confidencial para uso exclusivo del cliente · Cifras al 31 de agosto de 2026"
+  },
+  "name": "deck-contraportada"
+}

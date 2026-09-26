@@ -1,0 +1,11 @@
+{
+  "status": "approved",
+  "maxAttempts": 1,
+  "maxUsd": 25,
+  "estimatedUsd": 23.88204,
+  "requestSha256": "a601879b4648f7379a526cd80deff29d9179a917957bc3d36a6c8d83bb2fca1d",
+  "approvedAt": "2026-09-24T09:38:50.150478+00:00",
+  "approvedBy": "Julio Reyes",
+  "userInstruction": "El presupuesto está, tienes One show necesito que lo aproveches bien, asegúrate de que todo este perfectamente planificado, todas las piezas, proceso, método todo",
+  "scope": "One full 30-second 1080p Seedance 2.5 generation via fal. No automatic retries. Native audio disabled. Music/SFX deferred until picture lock."
+}

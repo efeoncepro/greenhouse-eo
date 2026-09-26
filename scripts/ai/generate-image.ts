@@ -5,6 +5,7 @@ import { basename, dirname, isAbsolute, join } from 'node:path'
 import { spawn } from 'node:child_process'
 
 import { config as loadEnv } from 'dotenv'
+import sharp from 'sharp'
 
 import {
   assertOpenAIImageQualitySupported,
@@ -28,6 +29,8 @@ import {
   type OpenAIImageQuality,
   type OpenAIImageSize
 } from '@/lib/ai/openai-image'
+
+import { resolveOutputDir } from './resolve-output-dir'
 
 // Self-contained: load .env.local so OPENAI_API_KEY_SECRET_REF resolves without manual sourcing.
 loadEnv({ path: join(process.cwd(), '.env.local') })
@@ -66,6 +69,7 @@ loadEnv({ path: join(process.cwd(), '.env.local') })
  *                           Sólo lo transportan gpt-image-1.5 / 1 / 1-mini. En la familia 2.5 la guía de
  *                           OpenAI lo excluye explícitamente: se ignora y la identidad se pide por prompt.
  *   --out <path>            Output file path (single prompt). Default: <out-dir>/<slug>-<ts>.png
+ *                           Con --batch es el DIRECTORIO del lote (sin extensión); con extensión de imagen aborta.
  *   --out-dir <dir>         Output directory. Default: public/images/generated
  *   --size <WxH>            1024x1024 | 1536x1024 | 1024x1536 | 2048x... (default 1536x1024). Se valida en local:
  *                           GPT Image 2/2.5 = múltiplos de 16, borde ≤ 3840, relación ≤ 3:1, área 655.360–8.294.400;
@@ -116,7 +120,7 @@ const HELP = `Greenhouse AI image CLI — OpenAI GPT Image (2.5 family + gpt-ima
                 # --model gpt-image-2.5-flare|gpt-image-2.5-sunburst · --quality xhigh|max (sólo 2.5)
                 [--timeout 280000] [--open]
   pnpm ai:image --prompt-file <path> ...
-  pnpm ai:image --batch <json>          # [{ "filename": "a.png", "prompt": "…" }, …]
+  pnpm ai:image --batch <json> [--out <dir>]   # [{ "filename": "a.png", "prompt": "…" }, …]; --out = directorio
   pnpm ai:image --concept <loop> --batch <json> [--task TASK-###]   # conceptos del design-loop
   pnpm ai:image --image <ref.png> --prompt "<delta>" --out <out.png>   # EDIT image-to-image (consistencia)
   pnpm ai:image --image <base.png> --mask <mask.png> --prompt "<qué va en la zona>" --out <out.png>
@@ -135,6 +139,11 @@ Concept mode:
 
 Defaults: model gpt-image-2 · size 1536x1024 · quality high · background opaque · out-dir public/images/generated
 Requires OPENAI_API_KEY_SECRET_REF (or OPENAI_API_KEY) — resolved server-side, never printed.`
+
+// Editar una imagen sin declarar `--size` devolvía el default horizontal (1536x1024) y CAMBIABA la
+// relación de aspecto en silencio: un plate 4:5 volvía apaisado. Medido por la sesión peer el
+// 2026-09-21. Al editar, el tamaño de la base es lo que uno espera, así que se hereda y se avisa.
+let sizeExplicito = false
 
 const parseArgs = (argv: string[]): CliArgs => {
   const args: CliArgs = {
@@ -191,6 +200,7 @@ const parseArgs = (argv: string[]): CliArgs => {
         break
       case '--size':
         args.size = next() as OpenAIImageSize
+        sizeExplicito = true
         break
 
       case '--quality': {
@@ -424,6 +434,24 @@ const main = async () => {
   // La combinación model × quality se valida acá y no por pieza: dentro del loop, un --count 5 repetiría
   // el mismo error cinco veces y ya habría creado directorios de salida.
   assertOpenAIImageQualitySupported({ model: args.model, quality: args.quality })
+
+  if (!sizeExplicito && args.image?.length) {
+    const base = sharp(args.image[0])
+    const meta = await base.metadata()
+
+    if (meta.width && meta.height) {
+      const heredado = `${meta.width}x${meta.height}` as OpenAIImageSize
+
+      try {
+        assertOpenAIImageSizeSupported({ model: args.model, size: heredado })
+        console.error(`  ⚠ editando sin --size: se hereda ${heredado} de la imagen base (el default habría sido ${args.size} y habría cambiado la relación de aspecto).`)
+        args.size = heredado
+      } catch {
+        console.error(`  ⚠ editando sin --size y la base mide ${meta.width}x${meta.height}, que el modelo no acepta: se usa ${args.size}. La relación de aspecto VA A CAMBIAR — pasa --size explícito.`)
+      }
+    }
+  }
+
   assertOpenAIImageSizeSupported({ model: args.model, size: args.size })
 
   if (args.background === 'transparent' && args.format === 'jpeg') {
@@ -439,7 +467,16 @@ const main = async () => {
   // --concept <loop> rutea a la taxonomía de conceptos de GVC (gitignored, trazable,
   // protegida del garbage collector). Tiene prioridad sobre --out-dir.
   const conceptLoop = args.concept ? slugify(args.concept) : null
-  const outDir = conceptLoop ? join(CONCEPTS_DIR, conceptLoop) : args.outDir ? resolvePath(args.outDir) : DEFAULT_OUT_DIR
+
+  const outDir = resolveOutputDir({
+    batch: Boolean(args.batch),
+    out: args.out,
+    outDir: args.outDir,
+    conceptDir: conceptLoop ? join(CONCEPTS_DIR, conceptLoop) : null,
+    defaultDir: DEFAULT_OUT_DIR,
+    resolvePath
+  })
+
   const items: GenItem[] = []
 
   if (args.batch) {

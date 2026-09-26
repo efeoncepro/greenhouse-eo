@@ -1,0 +1,40 @@
+A 10-second seamless loop for a vertical social ad. Image 1 is the EXACT target look of the finished frame — its typography, its text hierarchy, its selection box and its cursors are the reference to reproduce faithfully. Image 2 is the clean set. Images 3, 4 and 5 are the same blue cloud character in the exact poses it must hit.
+
+THE SET (from image 2, locked): a small blue cloud-shaped vinyl character stands behind a dark lectern at a press conference, four foam microphones angled toward it, a glowing horizontal search bar across the lectern, black empty background. The camera is LOCKED OFF for the whole shot: no pan, no tilt, no zoom, no dolly. The character never changes size or position in frame; only its arms, its slight lean and its screen-face move.
+
+THE PERFORMANCE — the character acts like an official spokesperson delivering a statement, with real conviction:
+- 0.0–1.2s  At rest, facing front, arms down, screen-face showing the prompt glyphs (pose of image 5).
+- 1.2–3.5s  It leans toward the microphones and throws ONE short arm up in a wide, emphatic "point one" gesture, body tilted with authority (pose of image 4). Its screen-face glyphs flicker rapidly like syllables.
+- 3.5–5.8s  PEAK: it straightens and throws BOTH short arms wide open and high above its head in a big declarative gesture (pose of image 3, arms fully raised and spread). Its screen-face changes to two bright arched shapes like happy squinting eyes.
+- 5.8–7.8s  It holds dead still, arms still up, as if waiting for a follow-up question that never comes.
+- 7.8–10.0s Arms drop and it settles back into the exact rest pose of the first frame, screen-face back to the prompt glyphs.
+The gesture must be BIG and readable in silhouette. Its body stays planted behind the lectern the whole time.
+
+THE SEARCH BAR stays COMPLETELY EMPTY for all ten seconds: its small text cursor blinks slowly and no words, letters or query ever appear inside it. This emptiness is the point of the piece.
+
+THE GRAPHIC LAYER — reproduce the typography, weights, sizes, colours and positions exactly as in image 1, animating them IN THIS ORDER. Each line must stay on screen long enough to be READ COMFORTABLY before the next one appears — this is a piece meant to be READ, so never rush the sequence:
+1. 1.0s  The thin white line "Hoy alguien habló en nombre de tu empresa." fades in at the top.
+2. 1.8s  The huge bold white headline "No fuiste tú." SLAMS in hard — a fast punch-in scale from 104% to 100% with no bounce. It is by far the largest, heaviest text in the frame, and it then HOLDS untouched while the rest arrives.
+3. 2.8s  A small teal arrow cursor labelled "IA" glides in from the right and a thin dashed selection rectangle with eight small square handles draws itself around "No fuiste tú.", then stays.
+4. 3.8s  The line "Ni te preguntó nada." fades in below the headline.
+5. 5.0s  The light blue line "Descubre qué dice de tu marca." fades in.
+6. 6.2s  A lime-green rounded outline button reading "Pide el diagnóstico" fades in, with the small line "Diagnóstico SEO + AEO" under it.
+7. 7.4s  A white arrow cursor glides to that button and clicks: the button's lime outline pulses once, brightly.
+8. 8.6–9.4s  EVERYTHING fades out together — all text, both cursors, the selection rectangle and the button. By 9.4s the frame is COMPLETELY CLEAN and identical to the very first frame: only the character, the microphones and the empty glowing bar. The final moment holds that clean frame so the loop is seamless. Do NOT leave any text on screen at the end.
+TEXT SIZE AND LAYOUT — match image 1 exactly, do not shrink it:
+- The whole text block occupies the upper 45% of the frame and is LEFT-ALIGNED, starting at 7% in from the left edge and 5% down from the top.
+- The headline "No fuiste tú." is HUGE: its line spans about 62% of the frame width. It is by far the largest element in the picture — several times taller than any other line. Do NOT render it small or centred.
+- The thin line above it is roughly one fifth of the headline's height; the lines below it about one fifth as well.
+- The selection rectangle hugs the headline tightly with its eight handles on the corners and edge midpoints, and the teal "IA" label sits just outside its lower-right corner.
+- The lime button is about 40% of the frame width, with its descriptor line directly beneath it.
+Text is crisp, perfectly legible, correctly spelled Spanish, never warped and never handwritten.
+
+AUDIO — both halves went wrong last time; read this carefully:
+
+VOICE — it must sound like MUTTERING, not like singing or shouting. The character produces fast, low-effort, high-pitched conversational GIBBERISH: quick nonsense syllables strung together like someone chattering rapidly in a made-up language, the way a small cartoon creature talks. It is SPOKEN, never sung, never chanted, never shouted, never a war cry, never a crowd or a chorus. NO Spanish, NO English, NO real words in any language, and a listener must not even be able to guess which language it might be — the viewer has to READ the screen, and any understandable or attention-grabbing vocal steals the eye away from reading. Keep it soft and SECONDARY in the mix, sitting under the music. Its rhythm follows the gesture: busier during the "point one", a short triumphant burst at the arms-up peak, and SILENCE during the still hold.
+
+MUSIC — classic golden-age cartoon orchestra, the scoring style of 1940s–50s theatrical animation shorts: light orchestral strings, playful woodwinds, pizzicato, xylophone runs and small orchestral stabs that punctuate the character's movements beat by beat. Mischievous, comedic, nimble. Absolutely NO marching band, NO brass band, NO bagpipes, NO military drums, NO folk dance music, NO singing. It must loop perfectly: the final bar leads straight back into the first with no gap and no fade.
+
+Plus subtle room tone and one soft microphone thump at the very start. No ending sting: the loop is continuous.
+
+Photographic, real physical object on a real set, subtle grain, true depth of field. Not a cartoon, not a 3D render.

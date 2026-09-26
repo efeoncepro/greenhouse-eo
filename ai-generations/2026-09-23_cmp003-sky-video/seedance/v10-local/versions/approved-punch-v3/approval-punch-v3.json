@@ -1,0 +1,27 @@
+{
+  "date": "2026-09-24",
+  "status": "creative-approved-title-preview-only",
+  "approval": "GENIAL!!! Quedó muy muy bueno",
+  "scope": "Post-aircraft title choreography and closing graphics in punch-v3 preview. Not whole film, generated sky integration, final audio, 4:5, expenditure or publication.",
+  "source_offset_seconds": 15.75,
+  "duration_seconds": 14.25,
+  "fps": 24,
+  "files": {
+    "prueba-cartelas-punch-v3.mp4": "71daf664907d768ababdac883cf217fa55543f6e2a454cd5ff5ca706bf03f6dc",
+    "titulos-y-firma-alpha.mov": "950d8648b04161354971e5910871a227d112bb1754a4ee2ff4d20b28fa61b485",
+    "url-bubble-luminosidad-alpha.mov": "a21246124aa6bfdb9e03b38a37a2804c2afc5cadffc359b1d9b2699135ddbcee",
+    "animator/timeline.js": "5e659332abf2072dab1fa34d87e637ed3bb273e7b033778e275bc934c1a0d26f",
+    "animator/title-plan.json": "85501144c1fcd0e4ad488ce4a1cf62d98c8f90c29d7e9d88e154d8489c9e1c25",
+    "animator/title-scene.js": "361af6ba8d45b82e64887733445f9755eb9d4bd8bf53126d8fa49b6218fd6d81",
+    "build-overlay.mjs": "190fea3160a5f214ad1cf5fd8d1aa95fcbc5c878bebf4c5ed4f1ca3e82191673",
+    "render-overlay.mjs": "7a45327df0a7e6292e8ca7d92219359013f3df7aa4fc29b53fd397ea5b114e0e",
+    "cue-sheet.json": "ec2c7262d545d2f7cfe6c0c043eb544c51ba3e63b6fafbbf29ba9547fa3d312c"
+  },
+  "pending": [
+    "generative footage corrections",
+    "continuous animated sky integration",
+    "clean instrumental music and synchronized SFX",
+    "full-film review",
+    "4:5 adaptation"
+  ]
+}

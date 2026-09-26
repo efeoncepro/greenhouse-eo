@@ -1,0 +1,6 @@
+  $ costo estimado ≈ USD 0.098 (1 × 3276 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-09-23_cmp003-sky-hangar/v3-16x9-clean.png (edit) …
+  ✓ 4273KB · gpt-image-2.5-sunburst · 2560x1440 · xhigh
+    usage: in 1639 (img 1508 · txt 131) · out 3276 · total 4915
+done
+{"painted":23409,"Lref":207,"logo":[646,237]}

@@ -1,9 +1,9 @@
 # Radiografía AEO — Muestra de Trabajo, Educación y Habilitación de Ventas
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-07-14 por Claude (TASK-1410)
-> **Última actualización:** 2026-07-14
+> **Última actualización:** 2026-09-23 por Claude
 > **Documentación técnica:** [Radiografía AEO — Arquitectura](../../think/radiografia-aeo-architecture.md)
 > **Manual técnico:** [Radiografía AEO — Manual](../../think/radiografia-aeo-manual.md)
 > **Manual comercial:** [Usar la Radiografía AEO en venta y educación](../../manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md)
@@ -150,4 +150,4 @@ El motor es genérico: **el cliente es un payload** (un archivo JSON), no códig
 - **Nunca** compartir el patrón de URL sin el token: es lo único que impide que un cliente adivine la URL de la muestra de otro.
 - **Nunca** dejar que la pieza hable de **nuestros** documentos ("nuestra oferta dice…") ni que le narre la interfaz al lector. La muestra **se defiende sola**.
 
-> **Detalle técnico:** los invariantes vigentes, el gate de 46 asserts y las razones de cada decisión están en la [arquitectura](../../think/radiografia-aeo-architecture.md). Cómo se crea la muestra de un cliente nuevo, paso a paso, en el [manual](../../think/radiografia-aeo-manual.md). El caso vivo (SKY, licitación Wherex 2026) en [`TASK-1410`](../../tasks/complete/TASK-1410-aeo-article-xray.md).
+> **Detalle técnico:** los invariantes vigentes, el gate de 46 asserts y las razones de cada decisión están en la [arquitectura](../../think/radiografia-aeo-architecture.md). Cómo se crea la muestra de un cliente nuevo, paso a paso, en el [manual](../../think/radiografia-aeo-manual.md). El caso vivo (SKY, licitación Wherex 2026 — adjudicada a Efeonce el 2026-09-23; la Radiografía con artículo real figura entre la evidencia verificable que explica el cierre) en [`TASK-1410`](../../tasks/complete/TASK-1410-aeo-article-xray.md).

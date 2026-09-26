@@ -1,8 +1,9 @@
 # Efeonce MCP — matriz de clientes y tokens del canary externo
 
-> TASK-1832 · abierta 2026-09-06 · estado: **canary productivo en observación; helper, Playwright, Codex,
-> ChatGPT hospedado, Claude Code `2.1.263`, Claude.ai y Claude Desktop `1.46388.4` certificados; sólo quedan
-> observación y retiro**.
+> TASK-1832 · abierta 2026-09-06 · estado al 2026-09-18: **certificación vigente como evidencia histórica;
+> corrida retirada** (authority revocada, cleanup con readback cero, CIMD compartido preservado y gates canary
+> `false` servidos). Helper, Playwright, Codex, ChatGPT hospedado, Claude Code `2.1.263`, Claude.ai y Claude
+> Desktop `1.46388.4` quedaron certificados base-only. Repetir la matriz exige una corrida nueva.
 
 ## Alcance y regla de evidencia
 
@@ -177,9 +178,21 @@ No se ejecuta `--apply` antes de `delete_after`. El cierre exige cortar authorit
 `deletionReady=true`, aplicar con el ID exacto y confirmar cero para todo el grafo run-owned. El environment,
 los buzones, deliveries/audit y el wordmark público son compartidos o evidencia retenida y nunca se borran.
 
+**Retiro 2026-09-18.** Authority revocada a `12:46:01Z` (`activeAuthorityCount=0`, `activeAuthCount=0`). El
+cleanup sujeto-específico (`74638aed0`, perfil `ops`) aplicó con `deletionReady=true`, `unexpectedRefs=0` y cero
+blockers: el grafo run-owned quedó en cero y el CIMD compartido de ChatGPT/Codex conservó sus artefactos de otros
+sujetos con recibos idénticos. Readback agregado `14:09:17Z`: `registrations=0`, `canary_bindings=0`, drift
+`0/0`, Person 360 `0`. Gates OFF servidos: auth-server `00076-t2t` (`bda1cf2cd938`), Vercel Production
+`dpl_CWnDKTVm…` (`bda1cf2cd938`) y gateway `00056-kgs` (`4c9d7c44cf0e`), todos al 100 %. Detalle en el
+manifiesto.
+
 ## Veredicto
 
 `CERTIFICACIÓN TÉCNICA DE CLIENTES PASS — runtime productivo, helper/Playwright/Codex/ChatGPT hospedado, Claude
 Code 2.1.263, Claude.ai web, Claude Desktop 1.46388.4 y las cinco negativas están verdes. Los dos clientes OAuth
 Claude renovaron post-TTL sin widening; Desktop ejecutó sobre el conector remoto. Permanecen abiertos siete días
 de observación y el cleanup/readback final; TASK-1832 no está completa.`
+
+Actualización 2026-09-18: el cleanup/readback final y los gates OFF quedaron hechos. La certificación se conserva
+como evidencia técnica histórica de esas revisiones de cliente; no autoriza cohortes ni clientes reales
+(`TASK-1841`).

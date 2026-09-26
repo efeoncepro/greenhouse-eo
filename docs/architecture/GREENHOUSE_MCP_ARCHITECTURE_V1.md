@@ -865,7 +865,7 @@ del binding, releída por Greenhouse en cada llamada.
   `spendsProviderBudget: false`). El artefacto `tool-manifest.generated.json` quedó en **51 tools**
   (`manifestHash` `4089283477991d676a30c4123e1c5c55e54f392d1c530d38d425a64555d525ac`); la cifra se lee del artefacto,
   nunca de este texto. Las cuatro delegan en el lane ecosystem `/api/platform/ecosystem/insights/**`
-  (`src/lib/api-platform/resources/ecosystem-insights.ts`): el servidor sigue siendo downstream del lane.
+  (`src/lib/api-platform/resources/ecosystem-insights.ts` y, para lecturas, `ecosystem-insights-read.ts`): el servidor sigue siendo downstream del lane.
 - **Manual servido (§23):** `efeonce-insights` (`audience: internal`, `appliesTo` las cuatro tools), declarado en
   `skill-manifest.ts` y publicado en `docs/mcp/skills/efeonce-insights/SKILL.md`; el test de fuga sigue aplicando
   (sin task ids, rutas de repo, UUIDs ni secretos en el cuerpo).

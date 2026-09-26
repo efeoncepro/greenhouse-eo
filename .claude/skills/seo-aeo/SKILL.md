@@ -145,7 +145,7 @@ decláralo. Ramifica la recomendación según las respuestas.
 | 404, búsqueda interna, categorías/tags/autor/fecha, paginación imposible y archivos vacíos | `modules/01_SEO_TECHNICAL.md` §Superficies especiales; en WordPress carga `../efeonce-public-site-wordpress/references/miscellaneous-surfaces.md` |
 | Intent, topical authority, pillar/cluster, programmatic, decay, canibalización | `modules/02_SEO_CONTENT.md` |
 | Cobertura por categorías y prioridad de negocio antes de minar | `modules/02_SEO_CONTENT.md` + `docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md` §2.3; para Berel, `berel-content-production/modules/14_PLANEACION_TEMATICA_Y_COBERTURA.md` |
-| Confianza/autoridad de marca y autor, **entidad/Knowledge Graph**, YMYL | `modules/03_EEAT_ENTITY.md` |
+| Confianza/autoridad de marca y autor, **entidad/Knowledge Graph**, YMYL; **autoría institucional** (`Organization`) cuando el cliente no quiere que firme una persona | `modules/03_EEAT_ENTITY.md` |
 | **Pieza-hito anual** (color del año, informe, ranking, premio): cadencia propia + de mercado, ventana de publicación y **claim perecedero** con tarea de retiro; **canibalización interna** (leyendo contenido, no slugs), **estacionalidad vinculante** y **pre-emptor de tesis** antes de fijar el ángulo | `modules/02_SEO_CONTENT.md` (+ `modules/04_AEO_GEO.md` si otra marca publicó el mismo concepto: **atribución equivocada**) |
 | **Entidad de marca que se repite cada año** (color del año, informe anual, ranking, premio, índice): no es pieza de calendario, es un **clúster que compone** — kit de cadencia relativa al anuncio + bidireccionalidad año N ↔ N−1 | `modules/03_EEAT_ENTITY.md` ⭐ (+ `modules/05_OFFPAGE_AUTHORITY.md` para medir si el encadenamiento existe de verdad) |
 | **El canal lo opera un tercero** (otra agencia / el equipo del cliente): medición no nativa, objetivo de *cobertura de insumo entregado* y paquete de handoff | `modules/07_MEASUREMENT.md` + `../content-marketing-studio/modules/05_DISTRIBUTION_AMPLIFICATION.md` |
@@ -153,6 +153,7 @@ decláralo. Ramifica la recomendación según las respuestas.
 | Backlinks, digital PR, brand SERP, menciones, **Reddit/UGC**, y **capilaridad del grafo interno** (medir sólo enlaces editoriales: descartar lo que aparece en >50% de las páginas) | `modules/05_OFFPAGE_AUTHORITY.md` |
 | Google Business Profile / local pack, multirregión, hreflang, localización | `modules/06_LOCAL_INTERNATIONAL.md` |
 | Medir resultados: GSC/GA4/BigQuery + **Share of Voice IA** + tráfico IA + exactitud | `modules/07_MEASUREMENT.md` |
+| **Nuevo filtro de Search Console `Web: multimodal`** (Lens, Circle to Search, imagen subida, Chrome “Search this image”): segmentar, comparar y reportar límites de interfaz/API | `modules/07_MEASUREMENT.md` + `modules/01_SEO_TECHNICAL.md` + `references/editorial-image-seo.md` (**verificado** as-of 2026-09-24) |
 | **Cambio de fórmula de una métrica de terceros** (ETV/DataForSEO, Semrush Traffic u otro proxy): versionar metodología, shadow, rebaseline/breakpoint y no atribuir el salto a performance | `modules/07_MEASUREMENT.md` + skill dueña del proveedor (`dataforseo-operator` para ETV) |
 | **Priorizar sólo con datos propios de GSC**: striking distance 8–20, curva de CTR del propio sitio, canibalización como consolidación; y **frescura real de GSC** (no hay D-1) + posición ponderada por impresiones | `modules/02_SEO_CONTENT.md` + `modules/07_MEASUREMENT.md` (**medido** as-of 2026-08-05) |
 | **Los dos carriles** (empujar página existente con GSC vs. cubrir demanda nueva con volumen de terceros — no se sustituyen) + **trampas de lectura de GSC**: piso mínimo de impresiones, doble conteo por sitelinks, curva de CTR propia deprimida, largo de la serie | `modules/02_SEO_CONTENT.md` + `modules/07_MEASUREMENT.md` (**medido** as-of 2026-08) |
@@ -165,7 +166,7 @@ decláralo. Ramifica la recomendación según las respuestas.
 | GSC API, Platform Properties, URL Inspection, sitemaps, ping o aviso de una URL nueva | `references/google-search-console-api-indexing.md` + `modules/01_SEO_TECHNICAL.md` |
 | Infografías, SVG directo, `<picture>`, image SEO, ALT/caption, featured/OG y descripción larga | `references/editorial-image-seo.md` + `modules/01_SEO_TECHNICAL.md` |
 | **Fórmulas y cortes de terceros** (scoring de visibilidad IA, priorización de clusters, canibalización SERP-first, gap de backlinks, auditoría de cartera, índice de visibilidad, offer bank): qué método usa la competencia y **dónde contradice lo que ya medimos** | `references/competitor-methodologies-2026-09.md` ⚠️ (fórmulas ajenas **no validadas con nuestros datos**; donde hay motor propio —canibalización sobre GSC, curvas de CTR— **manda el propio**; endpoints y costos → skill `dataforseo-operator`) |
-| Blogposts, pillars y guías: dossier, traducción de metadata, E-E-A-T, publicación WordPress/Think, link health y verificación live | `references/agentic-editorial-eeat.md` + `content-marketing-studio/references/metadata-translation-method.md` |
+| Blogposts, pillars y guías: dossier, traducción de metadata, E-E-A-T, publicación WordPress/Think, link health y verificación live; **revisión adversarial por lentes** para campañas o rondas de comentarios del cliente | `references/agentic-editorial-eeat.md` + `content-marketing-studio/references/metadata-translation-method.md` |
 | Pillar Experience Efeonce: canonical, mapa de cluster, `ItemList`, enlaces y placement Think/host | `docs/public-site/decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md`; esta skill valida semántica/schema, no elige el CMS por SEO |
 | Cluster Experience federada: nodos owned/platform-native, indexación social y medición por superficie | Canon editorial en `../content-marketing-studio/references/content-engineering.md`; aplicar contrato de búsqueda federada abajo y reverificar plataformas |
 | **Content Engineering**: contenido como experiencia humana + computable, sin duplicar fuentes ni esconder conocimiento | Canon editorial en `../content-marketing-studio/references/content-engineering.md`; esta skill gobierna semántica, schema, entidades, recuperación y citabilidad |
@@ -346,3 +347,27 @@ una estimación como medición.
 7. **Una verdad, dos interfaces.** En Content Engineering, la experiencia humana y la representación computable
    deben derivar del mismo contenido gobernado. Schema, FAQ, entidades y respuestas nunca mantienen una versión
    manual paralela a lo visible.
+
+## Promesa creativa AEO en anuncios
+
+El [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) aplica el objetivo deseado de ser **fuente preferida en la respuesta** y los riesgos de ausencia o representación incorrecta. Es una aspiración estratégica, no una posición 1 garantizada ni evidencia de que un motor describa mal una marca concreta. Mantener la diferencia entre aparecer, ser citado, ser elegido por el usuario y convertir. El lote TOFU documentado usa diagnóstico SEO+AEO como siguiente paso; no sustituirlo automáticamente por un grader ni prometer gratuidad. En MOFU/BOFU, usar la acción y el destino del brief vigente según el avance del comprador.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+En campañas, separar mención, cita de URL, exactitud/atribución, recomendación, preferencia del usuario y
+conversión. Fuente preferida es aspiración, no posición garantizada. Auditar contenido+técnica+entidad/autoridad
+según la brecha; no prometer más citas por publicar más. La campaña gobierna el siguiente paso: diagnóstico
+para entrada, demostración/evaluación para MOFU, alcance/conversación para BOFU cuando corresponda.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+Revisar correspondencia entre claim, diagnóstico y destino antes de entregar copy de pauta. Aparición, cita, representación, preferencia y oportunidad son hechos distintos; no convertir estudios ajenos en lift prometido. Los datos del manifiesto no certifican el servicio ni su atribución.
+
+
+## Lanzamiento del grader y programación aprobada
+
+Para copy de lanzamiento del grader, cargar [framework BeX](efeonce/EFEONCE_AGENTIC_READINESS_FRAMEWORK.md) y [producto](efeonce/AI_VISIBILITY_GRADER.md). Explicar muestra de respuestas, señales públicas y prioridades; separar percepción y operabilidad. No presentar monitoreo recurrente o auditoría completa como incluido en un diagnóstico gratuito, ni inferioridad de competidores sin verificación actual. Caso: [CMP-001](../../../docs/operations/social/2026-09-22-cmp-001-campaign-brief-handoff.md).

@@ -1,0 +1,30 @@
+{
+  "source": "music-v2.5-intro-repaired.wav",
+  "sourceSha256": "3771f8021bdb031b286ac40da152c1cb01a2ab1423b4743c157f2420afafc948",
+  "sourcePhrase": [
+    2.05,
+    6.3
+  ],
+  "destination": [
+    6.05,
+    10.3
+  ],
+  "crossfadeSeconds": [
+    0.16,
+    0.26
+  ],
+  "speed": 1,
+  "repriseCount": 1,
+  "newGeneration": false,
+  "cost": 0,
+  "untouchedAfter": 10.3,
+  "rmsSeconds6to11": [
+    0.09158746898174286,
+    0.08953529596328735,
+    0.1068509891629219,
+    0.09833753854036331,
+    0.16538749635219574,
+    0.1734001487493515
+  ],
+  "perceptualListening": "User review required; agent has no audio perception"
+}

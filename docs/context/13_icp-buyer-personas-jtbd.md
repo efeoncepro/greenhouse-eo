@@ -212,7 +212,7 @@ Cada job mapea a una capacidad del portal. Esto es lo accionable:
 | "Una sola fuente de verdad" (BP5) | Confiabilidad del dato = por qué el test coverage en finance/identity no es opcional; revisar arquitectura vigente y `04` antes de tocar esos dominios. |
 | "Sacar de mi equipo los frentes que nunca alcanza" (BP9 · candidata) | Telemetría **por frente** (OTD/FTR/RpA, first-time-right del handoff, drift, adopción del design system) visible al líder de diseño **sin medir a su gente**. Se prioriza sólo si BP9 se valida. |
 
-**Regla para el agente:** antes de construir una feature, identifica la línea de negocio, product brand habilitadora, BP y tier del job. Una feature que no sirve a un job de BP1/BP2/BP5/BP6 (los que usan el portal) probablemente no es prioridad. Para casos reales por ICP usa solo los confirmados (`01`/`06`): Sky (Creative Services), Bresler y Berel (Growth Strategy & Measurement / AEO+SEO).
+**Regla para el agente:** antes de construir una feature, identifica la línea de negocio, product brand habilitadora, BP y tier del job. Una feature que no sirve a un job de BP1/BP2/BP5/BP6 (los que usan el portal) probablemente no es prioridad. Para casos reales por ICP usa solo los confirmados (`01`/`06`): Sky (Creative Services; desde 2026-09-23 también Blog SEO/AEO adjudicado, con inicio 2026-11-01 — todavía sin resultados propios que citar), Bresler y Berel (Growth Strategy & Measurement / AEO+SEO).
 
 ---
 

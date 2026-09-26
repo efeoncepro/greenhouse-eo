@@ -57,3 +57,22 @@ export const periodLabelOf = (edition: Pick<InsightEditionRecord, 'request'>, lo
 
 export const issuedLabelOf = (edition: Pick<InsightEditionRecord, 'issuedAt'>, unissued: string): string =>
   edition.issuedAt ? edition.issuedAt.slice(0, 10) : unissued
+
+/** TASK-1889 — fecha larga de emisión («2 de septiembre de 2026»); sin emitir, el rótulo de no emitida. */
+export const issuedLongLabelOf = (edition: Pick<InsightEditionRecord, 'issuedAt'>, unissued: string, locale = 'es-CL'): string =>
+  edition.issuedAt ? format(civil(edition.issuedAt.slice(0, 10)), { day: 'numeric', month: 'long', year: 'numeric' }, locale) : unissued
+
+/** TASK-1889 — último día medido de la ventana («31 de agosto de 2026»), para «Cifras al …». */
+export const periodEndLongLabelOf = (edition: Pick<InsightEditionRecord, 'request'>, locale = 'es-CL'): string =>
+  format(
+    new Date(civil(edition.request.period.endExclusive).getTime() - 86_400_000),
+    { day: 'numeric', month: 'long', year: 'numeric' },
+    locale
+  )
+
+/** TASK-1889 — el período en minúscula inicial, para rótulos corridos («Informe de agosto de 2026»). */
+export const periodInlineOf = (edition: Pick<InsightEditionRecord, 'request'>, locale = 'es-CL'): string => {
+  const label = periodLabelOf(edition, locale)
+
+  return label.charAt(0).toLowerCase() + label.slice(1)
+}

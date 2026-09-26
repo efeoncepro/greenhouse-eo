@@ -1,0 +1,41 @@
+{
+  "asOf": "2026-09-22",
+  "revision": "3934d4e269103de7ec1f9669cf1259c8e9e4f306",
+  "sourceHashes": {
+    "scripts/foto/componer-cta.mjs": "40ef02e6448777773f97d989f36c626f1e5909adbd1510a56dcc580bda2fb5e9",
+    "scripts/foto/componer-cta.gate.mjs": "15bcfadf28cca4bfee0c3ec33dcf560cb32b328db1572b7cc6504516fba58920"
+  },
+  "scope": "Audit only. No canonical code or final exports changed.",
+  "gateFixtures": [
+    {
+      "fixture": "valid",
+      "exitCode": 0,
+      "output": "✓ 1 pieza(s) con CTA cumplen los mínimos (texto ≥4.5:1 · superficie ≥3:1)."
+    },
+    {
+      "fixture": "missing-cta",
+      "exitCode": 1,
+      "output": "✗ expected: falta `contraste.cta`. Una variante sin medir NO pasa por no tener dato.\n\n✗ 1 fallo(s) en 1 pieza(s) con CTA."
+    },
+    {
+      "fixture": "empty-qa",
+      "exitCode": 0,
+      "output": "✓ 0 pieza(s) con CTA cumplen los mínimos (texto ≥4.5:1 · superficie ≥3:1)."
+    },
+    {
+      "fixture": "wrong-id",
+      "exitCode": 0,
+      "output": "✓ 0 pieza(s) con CTA cumplen los mínimos (texto ≥4.5:1 · superficie ≥3:1)."
+    },
+    {
+      "fixture": "missing-descriptor",
+      "exitCode": 0,
+      "output": "✓ 1 pieza(s) con CTA cumplen los mínimos (texto ≥4.5:1 · superficie ≥3:1)."
+    },
+    {
+      "fixture": "duplicate-id",
+      "exitCode": 0,
+      "output": "✓ 2 pieza(s) con CTA cumplen los mínimos (texto ≥4.5:1 · superficie ≥3:1)."
+    }
+  ]
+}

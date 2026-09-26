@@ -33,7 +33,7 @@ const plan = (over: Partial<EditorialPlanV1> = {}): EditorialPlanV1 =>
 // Forma real de un capítulo SEO: comparación de períodos por métrica, una afirmación por métrica.
 const seo = (metrics: number) => {
   const facts = Array.from({ length: metrics }, (_, i) => [
-    { factId: `cur${i}`, value: (i + 1) * 1000, unit: 'count', evidenceRef: `c${i}` },
+    { factId: `cur${i}`, value: (i + 1) * 1000, unit: 'count', evidenceRef: `c${i}`, comparisonFactId: `prev${i}` },
     { factId: `prev${i}`, value: (i + 1) * 900, unit: 'count', evidenceRef: `p${i}` }
   ]).flat()
 
@@ -52,15 +52,31 @@ const seo = (metrics: number) => {
 }
 
 const textOf = (slides: { slots: Record<string, unknown> }[]) =>
-  slides.flatMap(slide => [slide.slots.assertion, ...((slide.slots.points as { text: string }[] | undefined) ?? []).map(p => p.text)]).filter(Boolean) as string[]
+  slides
+    .flatMap(slide => [slide.slots.assertion, slide.slots.conclusion, ...((slide.slots.points as { text: string }[] | undefined) ?? []).map(p => p.text)])
+    .filter(Boolean) as string[]
 
 describe('buildInsightsDeckPlanInput', () => {
-  it('abre con portada, rotula la ventana medida y cierra con límites', () => {
+  it('abre con portada, rotula la ventana medida y cierra con límites y contraportada (TASK-1889)', () => {
     const slides = buildInsightsDeckPlanInput({ edition, report, plan: plan(), snapshot: { facts: [] } as never }).slides
 
     expect(slides[0]!.contentType).toBe('insights-cover')
-    expect(slides[0]!.slots.periodLabel).toBe('1–20 de septiembre de 2026')
-    expect(slides.at(-1)!.contentType).toBe('insights-limits')
+    expect(slides[0]!.slots.editionLabel).toBe('Informe mensual · 1–20 de septiembre de 2026')
+    expect(slides.at(-2)!.contentType).toBe('insights-limits')
+    expect(slides.at(-1)!.contentType).toBe('insights-back-cover')
+  })
+
+  it('cada capítulo abre con su apertura, y las láminas editoriales llevan folio «NN / total»', () => {
+    const slides = buildInsightsDeckPlanInput({ edition, report, plan: plan(), snapshot: { facts: [] } as never }).slides
+    const opening = slides.find(slide => slide.contentType === 'insights-chapter')!
+
+    expect(opening.slots).toMatchObject({ chapterLabel: 'Capítulo 01', chapterNumeral: '01', chapterTitle: 'Visibilidad orgánica' })
+
+    for (const [i, slide] of slides.entries()) {
+      const folio = slide.slots.folio as { page: string; total: string } | undefined
+
+      if (folio) expect(folio).toEqual({ page: String(i + 1).padStart(2, '0'), total: String(slides.length).padStart(2, '0') })
+    }
   })
 
   it('ninguna afirmación del plan queda fuera: el deck no tiene tabla que la sostenga', () => {
@@ -77,28 +93,24 @@ describe('buildInsightsDeckPlanInput', () => {
     for (const c of [...claims, claim('s0', 'Resumen: la visibilidad cayó.')]) expect(printed, c.text).toContain(c.text)
   })
 
-  it('las figuras caben en su plantilla (≤5 barras) y nunca parten un par', () => {
+  it('las figuras caben en su plantilla (≤4 métricas por lámina) y cada métrica lleva su par', () => {
     const { facts, claims, chart } = seo(6)
 
-    const evidence = buildInsightsDeckPlanInput({ edition, report, plan: plan({ chapters: [chapter({ claims, charts: [chart] as never })] }), snapshot: { facts } as never })
-      .slides.filter(slide => slide.contentType === 'insights-evidence')
+    const figures = buildInsightsDeckPlanInput({ edition, report, plan: plan({ chapters: [chapter({ claims, charts: [chart] as never })] }), snapshot: { facts } as never })
+      .slides.filter(slide => slide.contentType === 'insights-figure-comparison')
 
-    const rows = evidence.flatMap(slide => slide.slots.figureSeries as { scaleGroup: string }[])
+    const metrics = figures.flatMap(slide => slide.slots.metrics as { current: string; prior: string }[])
 
-    expect(rows).toHaveLength(12)
+    expect(metrics).toHaveLength(6)
 
-    for (const slide of evidence) {
-      const groups = (slide.slots.figureSeries as { scaleGroup: string }[]).map(row => row.scaleGroup)
-
-      expect(groups.length).toBeLessThanOrEqual(5)
-      for (const group of new Set(groups)) expect(groups.filter(g => g === group)).toHaveLength(2)
-    }
+    for (const slide of figures) expect((slide.slots.metrics as unknown[]).length).toBeLessThanOrEqual(4)
+    for (const metric of metrics) expect(metric.prior).toBeTruthy()
   })
 
   it('un capítulo sin datos se narra; un plan sin capítulos se rechaza', () => {
     const slides = buildInsightsDeckPlanInput({ edition, report, plan: plan(), snapshot: { facts: [] } as never }).slides
 
-    expect(slides.some(slide => slide.contentType === 'insights-narrative' && slide.slots.chapterLabel === 'Visibilidad orgánica')).toBe(true)
+    expect(slides.some(slide => slide.contentType === 'insights-narrative' && slide.slots.section === 'Visibilidad orgánica')).toBe(true)
     expect(() => buildInsightsDeckPlanInput({ edition, report, plan: plan({ chapters: [] }), snapshot: { facts: [] } as never })).toThrow(InsightsRenderRejectedError)
   })
 
@@ -108,8 +120,8 @@ describe('buildInsightsDeckPlanInput', () => {
     expect(() => buildInsightsDeckPlanInput({ edition, report, plan: plan({ chapters: [chapter({ claims: [long] })] }), snapshot: { facts: [] } as never })).toThrow(InsightsRenderRejectedError)
   })
 
-  it('renderiza un deck PDF real de 25 láminas y conserva todas las afirmaciones', async () => {
-    const chapters = Array.from({ length: 23 }, (_, index) =>
+  it('renderiza un deck PDF real con el catálogo editorial y conserva todas las afirmaciones', async () => {
+    const chapters = Array.from({ length: 10 }, (_, index) =>
       chapter({
         chapterId: `chapter-${index + 1}`,
         title: `Capítulo ${index + 1}`,
@@ -121,10 +133,10 @@ describe('buildInsightsDeckPlanInput', () => {
     const outDir = await mkdtemp(path.join(os.tmpdir(), 'task-1847-deck-25-slides-'))
 
     try {
-      expect(input.slides).toHaveLength(25) // portada + 23 capítulos + cierre de límites
+      expect(input.slides).toHaveLength(23) // portada + 10 × (apertura + narrativa) + límites + contraportada
       const printed = textOf(input.slides.map(slide => ({ slots: slide.slots as Record<string, unknown> })))
 
-      for (let index = 1; index <= 23; index++) {
+      for (let index = 1; index <= 10; index++) {
         expect(printed).toContain(`Hallazgo íntegro ${index}: la evidencia conserva cada período y su alcance.`)
       }
 
@@ -133,89 +145,88 @@ describe('buildInsightsDeckPlanInput', () => {
       expect(result.pdfPath).toBeDefined()
       const pdf = await PDFDocument.load(await readFile(result.pdfPath!))
 
-      expect(pdf.getPageCount()).toBe(25)
+      expect(pdf.getPageCount()).toBe(23)
     } finally {
       await rm(outDir, { recursive: true, force: true })
     }
   }, 120_000)
 
-  it('renderiza line, pie, donut y scatter desde hechos en el PDF del deck', async () => {
-    const values = [
-      ['line-1', 10], ['line-2', 30], ['line-3', 20],
-      ['pie-1', 6], ['pie-2', 3], ['pie-3', 1],
-      ['donut-1', 2], ['donut-2', 5], ['donut-3', 3],
-      ['scatter-x1', 1], ['scatter-x2', 2], ['scatter-x3', 3],
-      ['scatter-y1', 4], ['scatter-y2', 2], ['scatter-y3', 8]
-    ] as const
+  it('renderiza metas, tendencia y columnas por canal en el PDF del deck; una familia sin página se rechaza', async () => {
+    const facts = [
+      ['otd', 82, 'percent'], ['otd-target', 90, 'percent'], ['otd-band', 70, 'percent'],
+      ['m1', 10, 'count'], ['m2', 30, 'count'], ['m3', 20, 'count'],
+      ['gpt', 12, 'count'], ['gem', 8, 'count']
+    ].map(([factId, value, unit]) => ({ factId: String(factId), value, unit, label: String(factId), metricId: String(factId), evidenceRef: `ev-${factId}` }))
 
-    const facts = values.map(([factId, value]) => ({ factId, value, unit: 'count', evidenceRef: `ev-${factId}` }))
-
-    const spec = (family: 'line' | 'pie' | 'donut' | 'scatter', series: { seriesId: string; label: string; factIds: string[]; unit: string }[]) => ({
-      specVersion: 'chart_spec_v1' as const,
-      chartId: `chart-${family}`,
-      family,
-      relation: family === 'line' ? 'trend' as const : family === 'scatter' ? 'correlation' as const : 'composition' as const,
-      title: `Figura ${family}`,
-      series,
-      dimensionLabels: ['Punto 1', 'Punto 2', 'Punto 3'],
-      unit: 'count',
-      scale: { kind: 'linear' as const, baseline: family === 'line' ? null : 0 },
-      references: [],
-      tabularEquivalent: {
-        columns: series.map(item => item.label),
-        rows: [0, 1, 2].map(index => series.map(item => item.factIds[index]!))
-      }
-    })
+    const base = { specVersion: 'chart_spec_v1' as const, references: [], scale: { kind: 'linear' as const, baseline: 0 as const }, tabularEquivalent: { columns: [], rows: [] } }
 
     const charts = [
-      spec('line', [{ seriesId: 'line', label: 'Tendencia', factIds: ['line-1', 'line-2', 'line-3'], unit: 'count' }]),
-      spec('pie', [{ seriesId: 'pie', label: 'Composición', factIds: ['pie-1', 'pie-2', 'pie-3'], unit: 'count' }]),
-      spec('donut', [{ seriesId: 'donut', label: 'Composición', factIds: ['donut-1', 'donut-2', 'donut-3'], unit: 'count' }]),
-      spec('scatter', [
-        { seriesId: 'x', label: 'X', factIds: ['scatter-x1', 'scatter-x2', 'scatter-x3'], unit: 'count' },
-        { seriesId: 'y', label: 'Y', factIds: ['scatter-y1', 'scatter-y2', 'scatter-y3'], unit: 'count' }
-      ])
+      { ...base, chartId: 'chart.bullet', family: 'bullet', relation: 'target', title: 'Entregas a tiempo', series: [], dimensionLabels: ['Space'], unit: 'percent',
+        data: { kind: 'bullet', direction: 'higher_is_better', items: [{ itemId: 'i1', label: 'Space', valueFactId: 'otd', targetFactId: 'otd-target', bandFactId: 'otd-band' }] } },
+      { ...base, chartId: 'chart.line', family: 'line', relation: 'trend', title: 'Tendencia', unit: 'count', dimensionLabels: ['2026-07', '2026-08', '2026-09'],
+        series: [{ seriesId: 's', label: 'Clics', factIds: ['m1', 'm2', 'm3'], unit: 'count' }] },
+      { ...base, chartId: 'chart.bar', family: 'bar', relation: 'comparison', title: 'Menciones por motor', unit: 'count', dimensionLabels: ['ChatGPT', 'Gemini'],
+        dimensionChannelIds: ['chatgpt', 'gemini'], series: [{ seriesId: 's', label: 'Período', factIds: ['gpt', 'gem'], unit: 'count' }] }
     ]
-
-    const chartFactIds = facts.map(fact => fact.factId)
 
     const input = buildInsightsDeckPlanInput({
       edition,
       report,
-      plan: plan({ chapters: [chapter({ claims: [claim('chart-claims', 'Los datos sostienen estas cuatro figuras.', chartFactIds)], charts: charts as never })] }),
+      plan: plan({ chapters: [chapter({ claims: [claim('c', 'Los datos sostienen estas tres figuras.', facts.map(f => f.factId))], charts: charts as never })] }),
       snapshot: { facts } as never
     })
 
-    const figures = input.slides.filter(slide => slide.contentType === 'insights-evidence')
+    expect(input.slides.map(slide => slide.contentType)).toEqual(expect.arrayContaining(['insights-figure-targets', 'insights-figure-trend', 'insights-figure-columns']))
 
-    expect(figures).toHaveLength(4)
-    expect(figures.map(slide => (slide.slots.figureSeries as { chartFamily: string; geometryPath1: string }[])[0])).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ chartFamily: 'line', geometryPath1: expect.stringMatching(/^M /) }),
-        expect.objectContaining({ chartFamily: 'pie', geometryPath1: expect.stringMatching(/^M /) }),
-        expect.objectContaining({ chartFamily: 'donut', geometryPath1: expect.stringMatching(/^M /) }),
-        expect.objectContaining({ chartFamily: 'scatter', geometryPath1: expect.stringMatching(/^M /) })
-      ])
-    )
-    const outDir = await mkdtemp(path.join(os.tmpdir(), 'insights-deck-chart-families-'))
+    const targets = input.slides.find(slide => slide.contentType === 'insights-figure-targets')!
+
+    expect(targets.slots.bulletRows).toEqual([expect.objectContaining({ value: '82,0 %', target: '90,0 %', band: '70,0 %', pct: '8,0 pp' })])
+
+    const outDir = await mkdtemp(path.join(os.tmpdir(), 'insights-deck-figures-'))
 
     try {
       const result = await composeArtifact(insightsDeckCatalog, input as never, outDir, { concurrency: 2 })
-
-      expect(result.pdfPath).toBeDefined()
       const pdf = await PDFDocument.load(await readFile(result.pdfPath!))
 
       expect(pdf.getPageCount()).toBe(input.slides.length)
-      expect(result.slidePaths).toHaveLength(input.slides.length)
     } finally {
       await rm(outDir, { recursive: true, force: true })
     }
+
+    // Una familia sin página del catálogo no se dibuja en una plantilla ajena.
+    const pie = { ...base, chartId: 'chart.pie', family: 'pie', relation: 'composition', title: 'Composición', unit: 'count', dimensionLabels: ['A', 'B'],
+      series: [{ seriesId: 's', label: 'Partes', factIds: ['m1', 'm2'], unit: 'count' }] }
+
+    expect(() =>
+      buildInsightsDeckPlanInput({ edition, report, plan: plan({ chapters: [chapter({ charts: [pie] as never })] }), snapshot: { facts } as never })
+    ).toThrow(InsightsRenderRejectedError)
   }, 120_000)
+
+  it('«Lo esencial» (v2) va en la lámina de resumen, con el número de la lámina que lo respalda', () => {
+    const { facts, claims, chart } = seo(2)
+
+    const slides = buildInsightsDeckPlanInput({
+      edition, report,
+      plan: plan({
+        executiveSummary: [claim('s0', 'La visibilidad subió.'), claim('s1', 'Bajada.'), claim('s2', 'Tercera afirmación.')],
+        essentials: [{ ...claims[1]!, claimId: 'essential.k1' }],
+        chapters: [chapter({ claims, charts: [chart] as never })]
+      } as never),
+      snapshot: { facts: facts.map(f => ({ ...f, label: 'Métrica' })) } as never
+    }).slides
+
+    const summary = slides.find(slide => slide.contentType === 'insights-summary')!
+    const figureIndex = slides.findIndex(slide => slide.contentType === 'insights-figure-comparison')
+
+    expect(summary.slots.essentials).toEqual([{ figure: '2.000', title: 'Métrica', folio: `p. ${String(figureIndex + 1).padStart(2, '0')}` }])
+    // Lo que la tesis y su bajada no dicen se narra: la tercera afirmación no se pierde.
+    expect(textOf(slides)).toContain('Tercera afirmación.')
+  })
 
   it('el resumen con una sola afirmación dice dónde está el resto, nunca que no hay más', () => {
     // Caso real (Sky): el resumen toma una afirmación por módulo; el capítulo traía además OTD.
     const slides = buildInsightsDeckPlanInput({ edition, report, plan: plan({ executiveSummary: [claim('s0', 'RpA: 1,33.')] }), snapshot: { facts: [] } as never }).slides
-    const summary = slides.find(slide => slide.slots.chapterLabel === 'Resumen ejecutivo')!
+    const summary = slides.find(slide => slide.contentType === 'insights-narrative' && slide.slots.section === 'Resumen ejecutivo')!
 
     expect((summary.slots.points as { text: string }[]).map(point => point.text)).toEqual([
       'El detalle de cada módulo, con todas sus cifras, está en los capítulos siguientes.'

@@ -1,0 +1,22 @@
+{
+  "reference": "Premium-Capitulo-03",
+  "catalog": "report",
+  "contentType": "report-chapter",
+  "slots": {
+    "chapterLabel": "Capítulo 03",
+    "chapterNumeral": "03",
+    "runningLabel": "Informe de agosto 2026",
+    "chapterTitle": "Del clic al negocio",
+    "chapterLead": "Las visitas llegan y se quedan. El desafío ahora es que se conviertan en conversaciones comerciales.",
+    "contents": {
+      "label": "En este capítulo",
+      "entries": [
+        {
+          "title": "Embudo de conversión: del clic a la oportunidad",
+          "folio": "20"
+        }
+      ]
+    },
+    "pageFolio": "19"
+  }
+}

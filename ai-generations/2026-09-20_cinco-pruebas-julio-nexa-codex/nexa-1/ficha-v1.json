@@ -1,0 +1,27 @@
+{
+  "id": "nexa-revision-medio-exterior-santiago",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "preflightVisual": {
+    "abiertas": [
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/set-curado-12.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/N1-ojo-pez-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/N2-reflejo-final.png",
+      "ai-generations/2026-09-20_pruebas-julio-nexa-codex/nexa/final-v3.png",
+      "ai-generations/2026-09-20_pruebas-color-en-composicion/nexa/final.png"
+    ],
+    "comparacion": "N1 muestra gesto decisivo con Nexa mirando su obra, profundidad y lecho claro; N2 muestra decisión sobre vidrio con luz de hora dorada y lecho oscuro. Los dos recientes usan un panel de set y proyección en muro. Esta escena cambia a exterior real y mecanismo de medios; el color lo aportan una superficie digital instalada y el tránsito, sin utilería de estudio.",
+    "oficio": "Media & Distribution: revisión de legibilidad y reflejos de una superficie de medio exterior en terreno, sin atribución a cliente.",
+    "azul": "El área azul activa se ve en una pantalla digital real bajo prueba y en su leve reflejo sobre vidrio; ocupa una porción acotada y tiene motivo operativo.",
+    "acento": "Un pequeño destello de la luz ámbar anaranjada de un vehículo en movimiento cruza la escena, propio de la calle y no agregado como utilería; no lima.",
+    "lecho": "El marco oscuro de la ventana de un vehículo cercano atraviesa el borde inferior, muy próximo al lente y desenfocado; no es una banda inventada.",
+    "identidadVestuario": "Rostro, cejas y cabello ondulado de Nexa según las tres referencias canónicas. Camisa marfil y sobrecamisa de arena pálida, pantalón carbón; sin prendas azules o logos."
+  },
+  "escena": "SCENE (Efeonce Media & Distribution location check in a contemporary Santiago street, clear late-afternoon sun): Nexa is the ONLY recognizable person, photographed candidly in three-quarter profile while she takes one careful step to the side and raises a small unbranded handheld light meter toward an unbranded digital outdoor-media display inside a real glass transit shelter. She is checking whether late sun glare hides the artwork, a real operational decision, not posing or holding a product for the camera. The display shows a clean, text-free AZURE BLUE (#0375DB) calibration frame, visibly integrated into the shelter architecture; its narrow reflection on the side glass continues the same blue into a second depth plane. The display must feel like a practical media placement under test, not a graphic poster or decorative wall. A moving city bus passes behind her and a tiny natural AMBER-ORANGE (#F55D01) turn-signal glint catches on its brushed metal at the decisive instant; orange is small and functional, with no other saturated accents and no lime. Nexa wears an ivory cotton shirt under a pale warm-sand overshirt and charcoal trousers, no blue or navy garments. Her hair is long, dark and wavy; face and defined brows exactly match the references. She looks at the shelter display and meter, never the camera. Long-lens street photograph, 135mm f/2.8 from across the curb at face height; her face, meter hand and edge of the installation are sharp, passing street movement softly blurred. A strong directional shaft of neutral-warm late sun catches her cheek and the shelter frame, while a crisp real architectural shadow creates graphic geometry away from her face. THREE depth planes: optically blurred dark window frame of a near unbranded vehicle at the very bottom, Nexa and light meter sharp, transit shelter and passing bus behind. Space and clothing clean and cared-for. No readable text, letters, numbers, logos, brand names, watermarks or UI anywhere.",
+  "lecho": {
+    "objeto": "the genuinely dark charcoal lower window frame of an unbranded vehicle immediately beside the photographer, a real nearby street surface beneath the sightline to Nexa and the transit shelter",
+    "tono": "DARK near black, textured charcoal vehicle interior material in neutral shade, never a featureless graphic slab"
+  }
+}

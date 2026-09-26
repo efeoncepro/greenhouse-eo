@@ -1,0 +1,24 @@
+{
+  "state": "produced-reviewed-awaiting-cover-approval",
+  "published": false,
+  "exports": [
+    {
+      "file": "sky-reel-cover-1080x1920.png",
+      "bytes": 1783647,
+      "sha256": "88da07c0f4d07e74996d8048d07313f9ef141013341d5eac5bc9174ef52da8c8",
+      "delivery": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/11. Spot/02. SKY - SEO y AEO/Portada/sky-reel-cover-1080x1920.png"
+    },
+    {
+      "file": "sky-reel-cover-1080x1920.jpg",
+      "bytes": 398217,
+      "sha256": "60f92b34afc98866b2095e3de2fd705e82cc251f20c14935bc703ce92e01b716",
+      "delivery": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/11. Spot/02. SKY - SEO y AEO/Portada/sky-reel-cover-1080x1920.jpg"
+    },
+    {
+      "file": "sky-reel-cover-2160x3840.png",
+      "bytes": 8094904,
+      "sha256": "c2861838fda6864a520f5934c6725823cfb6b6eefbf4ed4715bf0049c05aaa72",
+      "delivery": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/11. Spot/02. SKY - SEO y AEO/Portada/sky-reel-cover-2160x3840.png"
+    }
+  ]
+}

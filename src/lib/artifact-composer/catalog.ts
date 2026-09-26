@@ -124,6 +124,11 @@ export interface ArtifactCatalog {
     compiledFiles: string[]
     /** Manifest de fuentes del pack (JSON con `fonts[]: {family, weight, style, sha256}`). */
     fontsManifestPath?: string
+    /**
+     * Extensiones del pack que el catálogo adopta (`editorial`, TASK-1889). Una fuente con
+     * `extension` sólo se sella —y sólo se compila— en los catálogos que la declaran aquí.
+     */
+    packExtensions?: readonly string[]
   }
 }
 
@@ -211,10 +216,12 @@ export const resolveBrandSeal = async (
 
   if (catalog.brand.fontsManifestPath) {
     const manifest = JSON.parse(await fs.readFile(catalog.brand.fontsManifestPath, 'utf8')) as {
-      fonts: Array<{ family: string; weight: number; style: string; sha256: string }>
+      fonts: Array<{ family: string; weight: number; style: string; sha256: string; extension?: string }>
     }
 
-    fonts = manifest.fonts.map(font => ({
+    const extensions = catalog.brand.packExtensions ?? []
+
+    fonts = manifest.fonts.filter(font => !font.extension || extensions.includes(font.extension)).map(font => ({
       family: font.family,
       variant: `${font.weight}${font.style === 'italic' ? ' italic' : ''}`,
       checksum: font.sha256

@@ -101,6 +101,23 @@ Bitácora: `ai-generations/2026-09-17_kv-tu-ia-no-conoce/LEEME.md`.
 | Logo dentro de un desenfoque de primer plano | Medir primero el gradiente del plate limpio: si la superficie cercana (mesa, escritorio) ya mide como el fondo, el logo va ahí con contraste medido; añadir objeto sólo si mide en foco ([brand-in-scene](brand-in-scene.md)) | Añadir un objeto para fabricar el desenfoque (panel, franja, tapa de portátil, follaje), o logo flotando en una caja o esquina forzada |
 | Pieza pedida en 4:5 y 9:16 | Misma escena: 9:16 nativo y 4:5 abriendo el encuadre a los lados; revisar ambos | 4:5 nativo con la cabeza arriba y sin aire, o dos escenas distintas |
 
+## Regresiones observadas: carrusel «Nivel de búsqueda» — GTA VI (2026-09-19)
+
+Bitácora: `docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md`.
+Corrida: `ai-generations/2026-09-19_nivel-de-busqueda/` (`LEEME.md`, `brief/gta6-visual-study.md`).
+
+| Caso / entrada | Conducta esperada | Señal de fallo |
+|---|---|---|
+| Trendjacking de una franquicia con varias eras (Vice City 2002 vs GTA VI 2026) | Estudio visual con fuentes y etiquetas `[V]/[O]/[NV]` antes del primer prompt; bloque de estilo que diga también qué NO es | Dirigir la estética de memoria o por la era equivocada (la v1 synthwave ochentera fue rechazada: «no está mal, pero no está bien») |
+| Lámina con titular + apoyo casi del mismo peso y color | Escala de voces con una dominante indiscutible (contrato en `efeonce-advertising-creative`); revisar en miniatura | Jerarquía plana: entrada 740 vs dominante 780 en el mismo blanco; agrandar todo por igual |
+| Palabra clave en naranja sobre horizonte o skyline encendido | Acento sólo sobre cielo oscurecido; si no se lee, énfasis por peso blanco; registrar la revisión visual cuando p98 marque bajo por luces puntuales | Naranja a 1,0–2,0:1 aceptado porque «es el color de marca», o etiqueta naranja sobre violeta |
+| Plate sin cielo para el titular o logo cortado en el borde | Regenerar declarando el layout en el prompt (porcentajes de alto, banda superior de cielo oscuro, base mate reservada) | Tapar con un velo rectangular o subir el scrim hasta apagar la escena |
+| Hoja de revisión armada por orden alfabético con una pieza suelta | Hoja en orden de publicación (`c01…c09`); pieza suelta aparte o rotulada fuera de la secuencia | El operador cree que la contraportada no es la última lámina |
+| Etiqueta de colaborador larga con dos colaboradores en esquina | Etiqueta corta («Efeonce»); con texto alineado a la izquierda usar `top-end`/`bottom-end`; si `withinCanvas:false`, leer `cursorEvidence[].labelBounds` | «Equipo Efeonce» sale del lienzo o choca con el HUD y se entrega igual |
+| Activo de marca (Nexa, logo 3D, nave, mascotas) dentro del mundo del trend | Referencia canónica en la pasada + QA letra por letra y color al 100 % | Color derivado (Nexa azul rey en vez de navy) o letras/órbita alteradas aceptadas por el estilo pintado |
+| Código de la IP muy tentador (logo «VI», Pricedown, «Wasted», personajes) | UI y tipografía propias; nombres sólo como referencia nominativa; pauta pasa por revisión legal | Recrear logo, fuente o frases literales del juego «porque es orgánico» |
+| Meme con fecha de caducidad conocida | `expires_at` = fecha del lanzamiento; no programar después | Publicar «antes de GTA 6» cuando el juego ya salió |
+
 ## Protocolo de evaluación documental
 
 1. Elegir escenarios que ejerciten decisiones diferentes: estacional, reactivo con evidencia incompleta,

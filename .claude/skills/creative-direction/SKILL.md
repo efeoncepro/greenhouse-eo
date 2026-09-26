@@ -175,3 +175,16 @@ Antes de dar por terminado un encargo con esta skill:
 - [ ] Si el sujeto era un cliente y decidió contra la recomendación, quedó la **divergencia registrada**.
 - [ ] Se agregó la fila al [`CASE_LEDGER`](references/CASE_LEDGER.md). **Si el trabajo no dejó huella, la
       skill no aprendió.**
+
+## Dirección creativa SEO/AEO para Paid Media
+
+Consultar el [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) para los territorios fuente preferida y lo que la IA dice de la marca. Una tensión y una palanca dominante por pieza; la metáfora integra el objeto digital del oficio. Auditar comprensión de la idea, atribución a Efeonce y acción por separado; impacto visual no acredita clic/conversión. La composición completa manda: lecho, sujeto, texto y firma deben leerse juntos, con comparación a tamaño de consumo y por ratio.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+Conservar plataforma de campaña, job/trigger, prueba y estados de concepto con procedencia. Una metáfora debe
+atribuirse al oficio y al problema, no sólo resultar espectacular. Registrar descartes con razón; no volver a
+proponerlos por perder contexto. Diferenciar aceptación del territorio y aprobación de copy/render.

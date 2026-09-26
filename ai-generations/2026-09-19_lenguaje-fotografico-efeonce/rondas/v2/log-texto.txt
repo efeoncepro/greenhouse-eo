@@ -1,0 +1,6 @@
+  $ costo estimado ≈ USD 0.251 (5 × 1669 tokens de salida × USD 30/1M; la entrada suma aparte)
+  ✓ 2083KB · gpt-image-2.5-flare · 1152x1440 · high
+  ✓ 2039KB · gpt-image-2.5-flare · 1152x1440 · high
+  ✓ 1846KB · gpt-image-2.5-flare · 1152x1440 · high
+  ✓ 2138KB · gpt-image-2.5-flare · 1152x1440 · high
+  ✓ 1836KB · gpt-image-2.5-flare · 1152x1440 · high

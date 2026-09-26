@@ -2,19 +2,50 @@
   "template": "InsightsNarrativeSlide",
   "figmaNodeId": null,
   "version": "0.1",
+  "note": "TASK-1889 — lámina narrada del deck con la gramática de «Nuestra lectura» (sin lámina propia en el canvas).",
   "viewport": {
-    "width": 1920,
-    "height": 1080
+    "width": 1280,
+    "height": 720
   },
   "slots": {
-    "chapterLabel": {
-      "selector": "[data-slot='chapterLabel']",
+    "tabNumber": {
+      "selector": "[data-slot='tabNumber']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 2,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "notes": "Número de capítulo de la pestaña («00» en el resumen)."
+    },
+    "section": {
+      "selector": "[data-slot='section']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 44,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "period": {
+      "selector": "[data-slot='period']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "eyebrow": {
+      "selector": "[data-slot='eyebrow']",
       "type": "string",
       "required": true,
       "constraints": {
         "maxCharacters": 40,
         "maxLines": 1,
-        "transform": "uppercase",
         "overflow": "reject"
       }
     },
@@ -25,10 +56,10 @@
       "constraints": {
         "maxCharacters": 120,
         "maxLines": 3,
+        "overflow": "reject",
         "allowedTags": [
           "em"
-        ],
-        "overflow": "reject"
+        ]
       }
     },
     "points": {
@@ -37,28 +68,88 @@
       "required": true,
       "constraints": {
         "minItems": 1,
-        "maxItems": 4,
-        "overflow": "reject"
+        "maxItems": 4
       },
       "item": {
         "type": "object",
         "shape": {
-          "text": {
+          "ordinal": {
             "type": "string",
+            "required": false,
+            "resolver": "deck-ordinal",
+            "consumer": "resolver-only"
+          },
+          "text": {
+            "type": "rich-string",
             "required": true,
             "maxCharacters": 190,
-            "maxLines": 3
+            "maxLines": 6,
+            "allowedTags": [
+              "strong"
+            ]
           }
         }
+      }
+    },
+    "oneLiner": {
+      "selector": "[data-slot='oneLiner']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "maxLines": 1
+        },
+        "text": {
+          "type": "rich-string",
+          "required": true,
+          "maxCharacters": 150,
+          "maxLines": 2,
+          "allowedTags": [
+            "em"
+          ]
+        }
+      }
+    },
+    "footerEdition": {
+      "selector": "[data-slot='footerEdition']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 48,
+        "maxLines": 1,
+        "overflow": "reject"
       },
-      "notes": "Máximo 4: una lámina que se proyecta no sostiene más. El resto va al informe A4."
+      "notes": "«Insights · Informe de <período>»."
     },
     "fixed-urlBubble": {
       "selector": "[data-slot='urlBubble']",
       "type": "fixed-asset",
       "required": true,
       "agentMayOverride": false,
-      "note": "template-owned. El pie de una lámina lleva COMO MÁXIMO la URL bubble: dirección, teléfonos y folio son del informe escrito."
+      "note": "template-owned: el HTML ya lo trae."
+    },
+    "folio": {
+      "selector": "[data-slot='folio']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "page": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        },
+        "total": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 3,
+          "maxLines": 1
+        }
+      },
+      "notes": "«NN / total» del plan de láminas de la misma composición."
     }
   }
 }

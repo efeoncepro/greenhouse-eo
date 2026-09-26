@@ -27,3 +27,4 @@ does not satisfy this contract.
 - [TASK-1453 — Premium UI Platform](./TASK-1453-premium-ui-platform-direction.md) — dirección transversal para surfaces premium y recipes.
 - [TASK-1558 — Globe Share Board](./TASK-1558-globe-share-board-direction.md) — la única superficie client-facing de Globe: lámina montada (passepartout) + riel de líneas, sobre el SSOT de tokens de Globe (NO AXIS/MUI de Greenhouse).
 - [EPIC-028 — Producer V3 Unified Studios](./EPIC-028-producer-v3-unified-studios.md) — dirección repo-native para el shell unificado de Image, Video y Audio Studio; diseño listo para handoff, implementación sujeta a tasks dueñas y GVC.
+- [TASK-1889 — Catálogos premium de Efeonce Insights](./TASK-1889-efeonce-insights-premium-catalogs-direction.md) — `source-led` desde el canvas aprobado el 2026-09-25; hojas durables A4, deck y escala de grises; roles de color en los datos y portada por módulo.

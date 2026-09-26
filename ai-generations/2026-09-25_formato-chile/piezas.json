@@ -1,0 +1,57 @@
+[
+  {
+    "id": "formato-chile-4x5-v2",
+    "plate": "plates/plate-v1-1.png",
+    "align": "left",
+    "top": 0.07,
+    "textWidth": 0.7,
+    "lead": "El brief pedía el KV en todos los formatos.",
+    "leadFamily": "bricolage",
+    "leadSize": 50,
+    "dominant": "Hasta en|formato [[Chile]].",
+    "dominantSize": 198,
+    "dominantMax": 0.7,
+    "leadGap": 0.12,
+    "after": "No lo estiramos. Lo recompusimos.",
+    "afterFamily": "bricolage",
+    "afterSize": 66,
+    "afterGap": 0.16,
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "targetKind": "object",
+      "box": [
+        0.829,
+        0.05,
+        0.921,
+        0.842
+      ],
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "top-start",
+          "action": "select"
+        },
+        {
+          "id": "da",
+          "anchor": "bottom-start",
+          "action": "select",
+          "label": "Dirección de arte",
+          "who": "role",
+          "color": "#ff6500"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.19,
+      "variant": "auto"
+    },
+    "final": [
+      1080,
+      1350
+    ]
+  }
+]

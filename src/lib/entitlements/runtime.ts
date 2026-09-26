@@ -406,6 +406,14 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: operatorSource
     })
 
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ga4.connect',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
     // TASK-1301 — Growth SEO (EPIC-022): target.configure (autor de targets/keywords/
     // competitors) + audit.run (disparar site audit). Mismo set operador que run.operator:
     // quien opera el motor de venta/servicio configura y dispara. El GASTO real lo gatea
@@ -3107,7 +3115,10 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       // TASK-1848 — recurrencia (borradores para revisión; nunca autoemite ni autoenvía).
       { capability: 'insights.schedule.manage', action: 'create' },
       { capability: 'insights.schedule.manage', action: 'read' },
-      { capability: 'insights.schedule.manage', action: 'update' }
+      { capability: 'insights.schedule.manage', action: 'update' },
+      // TASK-1888 — portada preferida por organización (quien opera la cuenta la fija; el encargo puede cambiarla).
+      { capability: 'insights.cover_preference.manage', action: 'read' },
+      { capability: 'insights.cover_preference.manage', action: 'update' }
     ] as const) {
       addEntitlement(entries, {
         module: 'insights',
@@ -3133,6 +3144,22 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
         source: 'role'
       })
     }
+  }
+
+  // TASK-1890 — Marketing Studio (lectura por API/MCP). Quienes operan campañas y cuentas; la escritura y la
+  // aprobación son capabilities separadas (TASK-1894/1899).
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
+  ) {
+    addEntitlement(entries, {
+      module: 'marketing_studio',
+      capability: 'marketing_studio.campaign.read',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
   }
 
   if (subject.tenantType === 'client') {

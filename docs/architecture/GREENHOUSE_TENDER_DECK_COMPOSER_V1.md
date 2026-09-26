@@ -10,6 +10,10 @@
 > **Spec raíz:** `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md` (§4 deck pipeline, Apéndices A/B)
 > **Fuente de layouts y primitivas de presentación:** Figma `Sistema Axis - PPT` (fileKey `GXYeJaRjotmFuczfnd8hLi`; `Color Primitives` `33:2`). Sus aliases se llevaron locales a las primeras plantillas en `b38a8d0e2` y se replicaron al catálogo de 25 en `e78e9dfb2`; TASK-1393 los centraliza sin sustituirlos por el mirror UI.
 
+## Delta 2026-09-23 — primera licitación ganada con el composer
+
+🏆 **Hito 2026-09-23:** SKY Blog (Wherex) es la **primera licitación ganada** con el flujo agéntico de licitaciones —método de `greenhouse-public-private-tenders` + Artifact Composer, operado por el operador con un agente— y en una **cuenta de talla enterprise** (SKY Airline). No todo el mérito es del flujo (pesaron la relación, la ronda 2 y la negociación humana), pero es la primera validación en el mercado de lo construido.
+
 ## Delta 2026-07-12 — TASK-1391 APLICADA: el composer **ya no es solo CLI** — hay un pipeline de render gobernado
 
 > ⚠️ **Este doc describe el DESIGN SYSTEM del deck (molde, plantillas, resolvers, tipografía).** El

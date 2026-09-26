@@ -80,7 +80,7 @@ Si te citan, recuperas el 91%.                       ← esto sí se mide en tu 
 ## 5. Cómo construir el primer caso citable (la acción de mayor ROI de la práctica)
 
 🔴 **Hoy: cero.** Sin caso, **el precio y el Grader están haciendo el trabajo de la prueba** — y por eso
-**un error de aritmética en una oferta nos cuesta más de lo normal** *(y tenemos uno vivo en SKY)*.
+**un error de aritmética en una oferta nos cuesta más de lo normal** *(lo tuvimos en la oferta original de SKY; la adjudicada el 2026-09-23 ya no lo tiene)*.
 
 ### Las tres condiciones (heredadas de la práctica HubSpot)
 
@@ -146,6 +146,27 @@ resultado nuestro ni le cuelgues encima una promesa de tráfico. **Las reglas de
 ⚠️ **Cuidado al leerlo en reunión:** GSC **no publica el día de ayer** *(responde vacío, sin error)* y
 consolida con ~48h de retraso. **Nunca muestres "ayer"** — es un cero que no existe. → `seo-aeo`,
 `modules/07_MEASUREMENT.md`.
+
+### Delta 2026-09-24: diagnóstico visual en GSC
+
+El segundo diagnóstico también puede segmentar `Web: multimodal`, un nuevo
+filtro de Search Console para resultados web donde el usuario inició con una
+imagen (Lens, Circle to Search, subida a Google Search o “Search this image” en
+Chrome). Compararlo con `Web: text-based` en la misma ventana puede mostrar si
+existe demanda visual observada para el prospecto y qué páginas conviene revisar.
+
+Preséntalo como **un corte de medición gratuito sujeto a disponibilidad y
+muestra**, no como prueba de visibilidad total en búsqueda visual, lift causado
+por nuestro trabajo ni oportunidad de revenue garantizada. La API de Search
+Analytics aún no documenta este subfiltro: consulta la interfaz/exportación y
+no lo sustituyas por todo `type=web` o `type=image`. Ver `seo-aeo`,
+`modules/07_MEASUREMENT.md`.
+
+La mención de la captura a Instagram, TikTok y YouTube alude a **Platform
+Properties**, otra capacidad de Search Console que informa cómo aparecen
+cuentas/canales compatibles en Google Search. No es analítica de impresiones en
+sus feeds ni prueba que el nuevo subfiltro multimodal esté disponible para esas
+propiedades. Declara el alcance con precisión.
 
 ---
 

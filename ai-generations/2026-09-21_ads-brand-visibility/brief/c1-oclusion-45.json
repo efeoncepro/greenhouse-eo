@@ -1,0 +1,22 @@
+{
+  "id": "c1-oclusion-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "oclusion",
+  "ocluye": "a tall stack of printed proof sheets standing on the near edge of the table at the RIGHT side of the frame, rising only as high as her shoulder and never above it",
+  "objetos": [
+    "polo-efeonce",
+    "chaqueta-bomber-efeonce"
+  ],
+  "escena": "SCENE (Efeonce studio, Santiago, late afternoon): a woman sits at a worktable and looks STRAIGHT INTO THE LENS past the stack of paper, steady and unhurried, caught at the instant she sets down the sheet in her hand. She is wearing the Efeonce bomber jacket over the Efeonce navy piqué polo, both exactly as in the references, with the jacket's embroidered chest mark clearly in frame. A hard low sun from a window on the left rakes across her face and leaves the far side in open shadow; the light stays BELOW the middle of the frame and never reaches the wall above her. A cool blue glow from a monitor low at the table edge picks out the paper stack from below. She sits LOW in the frame, her head well down from the top edge, and above her the plaster wall fills the entire upper third of the picture as one smooth unbroken surface in deep shadow, with nothing on it and no window, no lamp and no bright spot anywhere in it. 85mm lens at f/2.",
+  "reservas": {
+    "texto": {
+      "muro": "the smooth plaster studio wall above and behind her",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "a dark equipment road case standing in the immediate foreground, its top edge running unbroken across the whole width of the frame",
+    "tono": "DARK charcoal road-case panel in deep shadow, matte, its texture still faintly visible, far outside the light"
+  }
+}

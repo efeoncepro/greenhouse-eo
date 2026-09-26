@@ -9,6 +9,7 @@ import { composeArtifact } from '@/lib/artifact-composer'
 import { insightsReportCatalog } from '@/lib/artifact-composer/catalogs/insights-report'
 
 import { buildInsightReportPlanInput } from './report-mapper'
+import { formatFactValue } from '../editorial/format'
 import { InsightsRenderRejectedError } from '../errors'
 import type { EditorialPlanV1, PlanChapterV1 } from '../contracts/plan'
 
@@ -48,6 +49,8 @@ const chapter = (over: Partial<PlanChapterV1> = {}): PlanChapterV1 =>
     ...over
   }) as PlanChapterV1
 
+const claim0 = (text: string) => ({ claimId: text, text, factIds: [] })
+
 const plan = (over: Partial<EditorialPlanV1> = {}): EditorialPlanV1 =>
   ({
     planVersion: 'editorial_plan_v1',
@@ -62,91 +65,137 @@ const plan = (over: Partial<EditorialPlanV1> = {}): EditorialPlanV1 =>
   }) as EditorialPlanV1
 
 describe('buildInsightReportPlanInput', () => {
-  it('abre con la portada y cierra con los límites', () => {
+  type Folio = { folio?: { page: string; total: string }; pageFolio?: string }
+  type Entry = { mark: string; title: string; folio: string }
+
+  /** El folio impreso de cada página, venga del pie en papel (`folio.page`) o de la apertura (`pageFolio`). */
+  const printedFolios = (slides: { slots: unknown }[]) =>
+    slides.map(s => (s.slots as Folio).folio?.page ?? (s.slots as Folio).pageFolio ?? null)
+
+  it('abre con la portada y cierra con los límites y la contraportada (TASK-1889)', () => {
     const types = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan() }).slides.map(s => s.contentType)
 
-    expect(types[0]).toBe('report-cover')
-    expect(types.at(-1)).toBe('report-limits')
+    expect(types).toEqual(['report-cover', 'report-index', 'report-chapter', 'report-narrative', 'report-limits', 'report-back-cover'])
   })
 
-  it('numera los folios de corrido, que es lo que permite resolver el índice sin segunda pasada', () => {
+  it('numera los folios de corrido con el total real, que es lo que permite resolver el índice sin segunda pasada', () => {
     const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan() })
 
-    expect(input.slides.map(s => (s.slots as { pageFolio: string }).pageFolio)).toEqual(
-      input.slides.map((_s, i) => String(i + 1))
-    )
-    expect(input.slides[1]!.contentType).toBe('report-index')
-    expect((input.slides[1]!.slots as { indexEntries: { title: string; pageNumber: string }[] }).indexEntries).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ title: 'Visibilidad orgánica', pageNumber: '3' }),
-        expect.objectContaining({ title: 'Límites y metodología', pageNumber: '4' })
-      ])
-    )
+    // Portada y contraportada no llevan folio (canvas aprobado); el resto imprime su página física.
+    expect(printedFolios(input.slides)).toEqual([null, '02', '03', '04', '05', null])
+
+    for (const slide of input.slides) {
+      const folio = (slide.slots as Folio).folio
+
+      if (folio) expect(folio.total).toBe('06')
+    }
+
+    expect((input.slides[1]!.slots as { entries: Entry[] }).entries).toEqual([
+      { mark: '01', title: 'Visibilidad orgánica', folio: '03' },
+      { mark: 'L', title: 'Límites y metodología', folio: '05' }
+    ])
   })
 
-  it('compone una edición de 30 páginas con índice real y folios físicos', () => {
+  it('la apertura de cada capítulo lista sus páginas con su folio físico', () => {
+    const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan() })
+    const opening = input.slides.find(s => s.contentType === 'report-chapter')!
+
+    expect(opening.slots).toMatchObject({ chapterLabel: 'Capítulo 01', chapterNumeral: '01', pageFolio: '03' })
+    expect((opening.slots as { contents: { entries: { title: string; folio: string }[] } }).contents.entries).toEqual([
+      { title: 'La visibilidad creció en el período', folio: '04' }
+    ])
+  })
+
+  it('la narrada lleva en su columna las páginas que la respaldan, con folio real (TASK-1889)', () => {
+    const rows = [['/a', '10', null]]
+
+    const input = buildInsightReportPlanInput({
+      edition, report, snapshot,
+      plan: plan({
+        executiveSummary: [claim0('Resumen del mes'), claim0('Detalle')],
+        decision: claim0('Aprobar el plan de septiembre.'),
+        chapters: [chapter({ claims: [claim0('Titular'), claim0('Párrafo')], tables: [{ tableId: 't1', title: 'Páginas', columns: ['Página', 'Clics'], rows }] as never })]
+      } as never)
+    })
+
+    const narratives = input.slides.filter(s => s.contentType === 'report-narrative')
+    const summary = narratives.find(s => (s.slots as { runningSection: string }).runningSection === 'Resumen ejecutivo')!
+    const chapterNarrative = narratives.find(s => s !== summary)!
+    const tableFolio = (input.slides.findIndex(s => s.contentType === 'report-table') + 1).toString().padStart(2, '0')
+    const openingFolio = (input.slides.findIndex(s => s.contentType === 'report-chapter') + 1).toString().padStart(2, '0')
+
+    expect(chapterNarrative.slots).toMatchObject({ evidence: { label: 'En este capítulo', items: [{ folio: `p. ${tableFolio}`, text: 'Páginas' }] } })
+    expect(summary.slots).toMatchObject({
+      evidence: { label: 'En este informe', items: [{ folio: `p. ${openingFolio}`, text: 'Visibilidad orgánica' }] },
+      closing: [{ kind: 'action', label: 'Para decidir en la reunión', text: 'Aprobar el plan de septiembre.' }]
+    })
+  })
+
+  it('contacto, mercados y línea legal de la contraportada salen del SSOT de marca', () => {
+    const back = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan() }).slides.at(-1)!
+
+    expect(back.slots).toMatchObject({
+      contact: { email: 'sales@efeoncepro.com', phonePrimary: '+56 9 3732 3064', phoneSecondary: '+1 (239) 235-2073' },
+      marketsLine: 'Chile · Estados Unidos · Colombia · México · Perú'
+    })
+    expect((back.slots as { legalLine: string }).legalLine).toMatch(/Efeonce Group SpA · RUT 77\.357\.182-1 · .* · Cifras al 31 de agosto de 2026$/)
+  })
+
+  it('compone una edición grande con índice real y folios físicos', () => {
     const chapters = Array.from({ length: 27 }, (_, index) =>
       chapter({ chapterId: `chapter-${index + 1}`, title: `Capítulo ${index + 1}` })
     )
 
     const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ chapters }) })
-    const index = input.slides.find(page => page.contentType === 'report-index')!
-    const entries = (index.slots as { indexEntries: { title: string; pageNumber: string }[] }).indexEntries
+    const entries = input.slides.filter(page => page.contentType === 'report-index').flatMap(page => (page.slots as { entries: Entry[] }).entries)
 
-    expect(input.slides).toHaveLength(30)
-    expect(entries).toHaveLength(28) // 27 capítulos + límites y metodología
-    expect(entries[0]).toEqual({ title: 'Capítulo 1', pageNumber: '3' })
-    expect(entries.at(-1)).toEqual({ title: 'Límites y metodología', pageNumber: '30' })
-    expect(input.slides.map(page => (page.slots as { pageFolio: string }).pageFolio)).toEqual(
-      input.slides.map((_page, pageIndex) => String(pageIndex + 1))
-    )
+    // Portada + 2 de índice (28 secciones a 20 por página) + 27 × (apertura + narrativa) + límites + contraportada.
+    expect(input.slides).toHaveLength(59)
+    expect(entries).toHaveLength(28)
+    expect(entries[0]).toEqual({ mark: '01', title: 'Capítulo 1', folio: '04' })
+    expect(entries.at(-1)).toEqual({ mark: 'L', title: 'Límites y metodología', folio: '58' })
+
+    printedFolios(input.slides).forEach((folio, i) => {
+      if (folio !== null) expect(folio).toBe(String(i + 1).padStart(2, '0'))
+    })
   })
 
-  it('renderiza un PDF real de 30 páginas con índice y folios convergentes', async () => {
-    const chapters = Array.from({ length: 27 }, (_, index) =>
+  it('renderiza un PDF real con el catálogo editorial y folios convergentes', async () => {
+    const chapters = Array.from({ length: 12 }, (_, index) =>
       chapter({ chapterId: `chapter-${index + 1}`, title: `Capítulo ${index + 1}` })
     )
 
     const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ chapters }) })
-    const outDir = await mkdtemp(path.join(os.tmpdir(), 'task-1847-report-30-pages-'))
+    const outDir = await mkdtemp(path.join(os.tmpdir(), 'task-1889-report-'))
 
     try {
-      expect(input.slides).toHaveLength(30)
-      expect(input.slides[1]!.contentType).toBe('report-index')
-
-      for (const slide of input.slides.slice(1)) {
-        expect((slide.slots as { runningChapter?: string }).runningChapter).toBeTruthy()
-        expect((slide.slots as { runningPeriod?: string }).runningPeriod).toBeTruthy()
-      }
+      expect(input.slides).toHaveLength(28)
 
       const result = await composeArtifact(insightsReportCatalog, input as never, outDir, { concurrency: 4 })
 
       expect(result.pdfPath).toBeDefined()
       const pdf = await PDFDocument.load(await readFile(result.pdfPath!))
 
-      expect(pdf.getPageCount()).toBe(30)
-      expect(input.slides.map(slide => (slide.slots as { pageFolio: string }).pageFolio)).toEqual(
-        input.slides.map((_slide, pageIndex) => String(pageIndex + 1))
-      )
+      expect(pdf.getPageCount()).toBe(28)
     } finally {
       await rm(outDir, { recursive: true, force: true })
     }
-  }, 120_000)
+  }, 180_000)
 
-  it('pagina el índice cuando hay más de 28 secciones y conserva los folios reales', () => {
-    const chapters = Array.from({ length: 29 }, (_, index) =>
+  it('pagina el índice cuando hay más de 20 secciones y conserva los folios reales', () => {
+    const chapters = Array.from({ length: 21 }, (_, index) =>
       chapter({ chapterId: `chapter-${index + 1}`, title: `Capítulo ${index + 1}` })
     )
 
     const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ chapters }) })
     const indexPages = input.slides.filter(page => page.contentType === 'report-index')
     const secondIndex = indexPages[1]!
-    const entries = (secondIndex.slots as { indexEntries: { title: string; pageNumber: string }[] }).indexEntries
+    const entries = (secondIndex.slots as { entries: Entry[] }).entries
 
     expect(indexPages).toHaveLength(2)
-    expect((secondIndex.slots as { indexTitle: string }).indexTitle).toBe('Índice (continuación)')
-    expect(entries[0]).toEqual({ title: 'Capítulo 29', pageNumber: '32' })
-    expect(entries.at(-1)).toEqual({ title: 'Límites y metodología', pageNumber: '33' })
+    expect((secondIndex.slots as { title: string }).title).toBe('Índice (continuación)')
+    expect(entries[0]).toEqual({ mark: '21', title: 'Capítulo 21', folio: '44' })
+    expect(entries.at(-1)).toEqual({ mark: 'L', title: 'Límites y metodología', folio: '46' })
   })
 
   it('NO omite un capítulo sin figura: lo narra', () => {
@@ -168,9 +217,33 @@ describe('buildInsightReportPlanInput', () => {
       s => s.contentType === 'report-table'
     )
 
-    expect(tablePages.length).toBe(3)
+    expect(tablePages.length).toBe(4) // 16 filas por página (tablero de barras, TASK-1889)
     expect((tablePages[0]!.slots as Record<string, unknown>).continuationLabel).toBeUndefined()
     expect((tablePages[1]!.slots as Record<string, unknown>).continuationLabel).toBeDefined()
+  })
+
+  it('una tabla de una sola unidad lleva barras en la escala de la tabla COMPLETA; sin hallazgo, sin cifra principal', () => {
+    const rows = Array.from({ length: 30 }, (_, i) => [`/p${i}`, String((i + 1) * 100), null])
+
+    const pages = buildInsightReportPlanInput({
+      edition, report, snapshot,
+      plan: plan({ chapters: [chapter({ tables: [{ tableId: 't1', title: 'Páginas', columns: ['Página', 'Clics'], rows }] })] })
+    }).slides.filter(p => p.contentType === 'report-table')
+
+    expect(pages).toHaveLength(2)
+
+    for (const page of pages) {
+      // La misma escala en las dos páginas: la barra de /p0 no cambia de tamaño al pasar la hoja.
+      expect(page.slots).toMatchObject({ barScaleMax: '3000', source: { label: 'Fuente' }, legend: { label: 'Clics' } })
+      // «La fila más alta» no es un hallazgo: sin lectura del capítulo, la tabla no inventa cifra principal.
+      expect(page.slots).not.toHaveProperty('heroFigure')
+      expect(page.slots).not.toHaveProperty('barMode')
+      expect((page.slots as { tableColumns: { label: string }[] }).tableColumns[0]).toEqual({ label: '#' })
+    }
+
+    // El ranking continúa en la página siguiente: la segunda página empieza en la fila 17.
+    expect((pages[0]!.slots as { rankOffset?: string }).rankOffset).toBeUndefined()
+    expect((pages[1]!.slots as { rankOffset?: string }).rankOffset).toBe('16')
   })
 
   it('ninguna página de tabla excede la capacidad declarada del molde', () => {
@@ -182,7 +255,7 @@ describe('buildInsightReportPlanInput', () => {
 
     for (const page of buildInsightReportPlanInput({ edition, report, snapshot, plan: withTable }).slides) {
       if (page.contentType !== 'report-table') continue
-      expect((page.slots as { tableRows: unknown[] }).tableRows.length).toBeLessThanOrEqual(26)
+      expect((page.slots as { tableRows: unknown[] }).tableRows.length).toBeLessThanOrEqual(16)
     }
   })
 
@@ -269,91 +342,229 @@ describe('buildInsightReportPlanInput', () => {
       plan: withChart
     }).slides
 
-    const analysis = pages.find(p => p.contentType === 'report-analysis')
+    const figure = pages.find(p => p.contentType === 'report-figure-columns')
 
-    expect(analysis).toBeDefined()
+    expect(figure).toBeDefined()
 
-    const series = (analysis!.slots as { figureSeries: { printedValue: string; emphasis: string }[] }).figureSeries
+    const slots = figure!.slots as { columnGroups: { label: string; current: string }[]; provenance: { label: string; text: string }[]; keyFigure: string }
 
-    expect(series).toHaveLength(2)
-    // El formateador canónico del plan (el de tablas y afirmaciones), no uno propio: un nivel no lleva «+».
-    expect(series[0]!.printedValue).toBe('61,4 %')
-    expect(series[0]!.emphasis).toBe('lead')
-    // Cada barra se nombra por su métrica (dimensionLabels), no por la etiqueta de la serie.
-    expect((analysis!.slots as { figureSeries: { name: string }[] }).figureSeries.map(row => row.name)).toEqual(['Nuevas', 'Optimizadas'])
-    expect((analysis!.slots as { figureUnit: string }).figureUnit).toBe('Porcentaje')
+    // Cada columna se nombra por su dimensión y lleva la cifra del formateador canónico (un nivel no lleva «+»).
+    expect(slots.columnGroups.map(group => [group.label, group.current])).toEqual([['Nuevas', '61,4 %'], ['Optimizadas', '3,1 %']])
+    expect(slots.keyFigure).toBe('61,4 %')
+    expect(slots.provenance[0]).toEqual({ label: 'Unidad', text: 'porcentaje' })
   })
 
-  it('compone line, pie, donut y scatter desde sus hechos como SVG en el PDF A4', async () => {
+  it('compone metas, tendencia, columnas y comparación en el PDF A4; una familia sin página se rechaza', async () => {
     const facts = [
-      ...[
-        ['line-1', 10], ['line-2', 30], ['line-3', 20],
-        ['pie-1', 6], ['pie-2', 3], ['pie-3', 1],
-        ['donut-1', 2], ['donut-2', 5], ['donut-3', 3],
-        ['scatter-x1', 1], ['scatter-x2', 2], ['scatter-x3', 3],
-        ['scatter-y1', 4], ['scatter-y2', 2], ['scatter-y3', 8]
-      ] as const
-    ].map(([factId, value]) => ({ factId, value, unit: 'count', evidenceRef: `ev-${factId}` }))
+      ['otd', 82, 'percent'], ['otd-target', 90, 'percent'], ['otd-band', 70, 'percent'],
+      ['m1', 10, 'count'], ['m2', 30, 'count'], ['m3', 20, 'count'],
+      ['gpt', 12, 'count'], ['gem', 8, 'count'],
+      ['c1', 1284, 'count'], ['p1', 1102, 'count'], ['c2', 48310, 'count'], ['p2', 51940, 'count']
+    ].map(([factId, value, unit]) => ({ factId: String(factId), value, unit, label: String(factId), metricId: String(factId), evidenceRef: `ev-${factId}` }))
 
-    const chart = (family: 'line' | 'pie' | 'donut' | 'scatter', series: { seriesId: string; label: string; factIds: string[]; unit: string }[]) => ({
-      specVersion: 'chart_spec_v1' as const,
-      chartId: `chart-${family}`,
-      family,
-      relation: family === 'line' ? 'trend' as const : family === 'scatter' ? 'correlation' as const : 'composition' as const,
-      title: `Figura ${family}`,
-      series,
-      dimensionLabels: ['Punto 1', 'Punto 2', 'Punto 3'],
-      unit: 'count',
-      scale: { kind: 'linear' as const, baseline: family === 'line' ? null : 0 },
-      references: [],
-      tabularEquivalent: { columns: series.map(item => item.label), rows: [0, 1, 2].map(index => series.map(item => item.factIds[index]!)) }
-    })
+    const base = { specVersion: 'chart_spec_v1' as const, references: [], scale: { kind: 'linear' as const, baseline: 0 as const }, tabularEquivalent: { columns: [], rows: [] } }
 
     const charts = [
-      chart('line', [{ seriesId: 'line', label: 'Tendencia', factIds: ['line-1', 'line-2', 'line-3'], unit: 'count' }]),
-      chart('pie', [{ seriesId: 'pie', label: 'Composición', factIds: ['pie-1', 'pie-2', 'pie-3'], unit: 'count' }]),
-      chart('donut', [{ seriesId: 'donut', label: 'Composición', factIds: ['donut-1', 'donut-2', 'donut-3'], unit: 'count' }]),
-      chart('scatter', [
-        { seriesId: 'x', label: 'X', factIds: ['scatter-x1', 'scatter-x2', 'scatter-x3'], unit: 'count' },
-        { seriesId: 'y', label: 'Y', factIds: ['scatter-y1', 'scatter-y2', 'scatter-y3'], unit: 'count' }
-      ])
+      { ...base, chartId: 'chart.bullet', family: 'bullet', relation: 'target', title: 'Entregas a tiempo', series: [], dimensionLabels: ['Space'], unit: 'percent',
+        data: { kind: 'bullet', direction: 'higher_is_better', items: [{ itemId: 'i1', label: 'Space', valueFactId: 'otd', targetFactId: 'otd-target', bandFactId: 'otd-band' }] } },
+      { ...base, chartId: 'chart.line', family: 'line', relation: 'trend', title: 'Tendencia', unit: 'count', dimensionLabels: ['2026-07', '2026-08', '2026-09'],
+        series: [{ seriesId: 's', label: 'Clics', factIds: ['m1', 'm2', 'm3'], unit: 'count' }] },
+      { ...base, chartId: 'chart.bar', family: 'bar', relation: 'comparison', title: 'Menciones por motor', unit: 'count', dimensionLabels: ['ChatGPT', 'Gemini'],
+        dimensionChannelIds: ['chatgpt', 'gemini'], series: [{ seriesId: 's', label: 'Período', factIds: ['gpt', 'gem'], unit: 'count' }] },
+      { ...base, chartId: 'chart.cmp', family: 'bar_grouped', relation: 'comparison', title: 'Search Console', unit: 'count', dimensionLabels: ['Clics', 'Impresiones'],
+        series: [
+          { seriesId: 'p', label: 'Período anterior', factIds: ['p1', 'p2'], unit: 'count' },
+          { seriesId: 'c', label: 'Período', factIds: ['c1', 'c2'], unit: 'count' }
+        ] }
     ]
 
     const input = buildInsightReportPlanInput({
-      edition,
-      report,
+      edition, report,
       snapshot: { facts, sources: [], rejections: [] } as never,
-      plan: plan({ chapters: [chapter({ charts: charts as never })] })
+      plan: plan({ chapters: [chapter({ claims: [{ claimId: 'c', text: 'Los datos sostienen estas figuras.', factIds: facts.map(f => f.factId) }], charts: charts as never })] })
     })
 
-    const figures = input.slides.filter(slide => slide.contentType === 'report-analysis')
-
-    expect(figures).toHaveLength(4)
-    expect(figures.map(slide => (slide.slots as { figureSeries: { chartFamily: string; geometryPath1: string }[] }).figureSeries[0])).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ chartFamily: 'line', geometryPath1: expect.stringMatching(/^M /) }),
-        expect.objectContaining({ chartFamily: 'pie', geometryPath1: expect.stringMatching(/^M /) }),
-        expect.objectContaining({ chartFamily: 'donut', geometryPath1: expect.stringMatching(/^M /) }),
-        expect.objectContaining({ chartFamily: 'scatter', geometryPath1: expect.stringMatching(/^M /) })
-      ])
+    expect(input.slides.map(slide => slide.contentType)).toEqual(
+      expect.arrayContaining(['report-figure-targets', 'report-figure-trend', 'report-figure-columns', 'report-figure-comparison'])
     )
 
-    const outDir = await mkdtemp(path.join(os.tmpdir(), 'insights-chart-families-'))
+    const outDir = await mkdtemp(path.join(os.tmpdir(), 'insights-report-figures-'))
+
+    try {
+      const result = await composeArtifact(insightsReportCatalog, input as never, outDir, { concurrency: 2 })
+      const pdf = await PDFDocument.load(await readFile(result.pdfPath!))
+
+      expect(pdf.getPageCount()).toBe(input.slides.length)
+    } finally {
+      await rm(outDir, { recursive: true, force: true })
+    }
+
+    const pie = { ...base, chartId: 'chart.pie', family: 'pie', relation: 'composition', title: 'Composición', unit: 'count', dimensionLabels: ['A', 'B'],
+      series: [{ seriesId: 's', label: 'Partes', factIds: ['m1', 'm2'], unit: 'count' }] }
+
+    expect(() =>
+      buildInsightReportPlanInput({ edition, report, snapshot: { facts, sources: [], rejections: [] } as never, plan: plan({ chapters: [chapter({ charts: [pie] as never })] }) })
+    ).toThrow(InsightsRenderRejectedError)
+  }, 120_000)
+
+  it('«Lo esencial» (v2) va en la página de resumen, con el folio real de la figura que lo respalda', async () => {
+    const facts = [
+      { factId: 'c1', value: 1284, unit: 'count', label: 'Clics', metricId: 'clicks', evidenceRef: 'e1', comparisonFactId: 'p1' },
+      { factId: 'p1', value: 1102, unit: 'count', label: 'Clics', metricId: 'clicks', evidenceRef: 'e2' },
+      { factId: 'c2', value: 48310, unit: 'count', label: 'Impresiones', metricId: 'impressions', evidenceRef: 'e3' },
+      { factId: 'p2', value: 51940, unit: 'count', label: 'Impresiones', metricId: 'impressions', evidenceRef: 'e4' }
+    ]
+
+    const chart = {
+      specVersion: 'chart_spec_v1', chartId: 'chart.cmp', family: 'bar_grouped', relation: 'comparison', title: 'Search Console', unit: 'count',
+      dimensionLabels: ['Clics', 'Impresiones'], references: [], scale: { kind: 'linear', baseline: 0 }, tabularEquivalent: { columns: [], rows: [] },
+      series: [
+        { seriesId: 'p', label: 'Período anterior', factIds: ['p1', 'p2'], unit: 'count' },
+        { seriesId: 'c', label: 'Período', factIds: ['c1', 'c2'], unit: 'count' }
+      ]
+    }
+
+    const claims = [{ claimId: 'k1', text: 'Clics: 1.284 (período anterior 1.102).', factIds: ['c1', 'p1'] }]
+
+    const input = buildInsightReportPlanInput({
+      edition, report,
+      snapshot: { facts, sources: [], rejections: [] } as never,
+      plan: plan({
+        executiveSummary: [{ claimId: 's0', text: 'Agosto trajo más clics con menos impresiones.', factIds: [] }],
+        essentials: [{ ...claims[0]!, claimId: 'essential.k1' }],
+        decision: { claimId: 'd', text: 'Aprobar el plan de septiembre.', factIds: [] },
+        chapters: [chapter({ claims, charts: [chart] as never })]
+      } as never)
+    })
+
+    const summary = input.slides.find(slide => slide.contentType === 'report-summary')!
+    const figureIndex = input.slides.findIndex(slide => slide.contentType === 'report-figure-comparison')
+
+    expect(summary.slots.essentials).toEqual([
+      { figure: '1.284', title: 'Clics', detail: 'Clics: 1.284 (período anterior 1.102).', folio: `p. ${String(figureIndex + 1).padStart(2, '0')}` }
+    ])
+    expect(summary.slots.decision).toEqual(expect.objectContaining({ text: 'Aprobar el plan de septiembre.' }))
+
+    const outDir = await mkdtemp(path.join(os.tmpdir(), 'insights-report-essentials-'))
 
     try {
       const result = await composeArtifact(insightsReportCatalog, input as never, outDir, { concurrency: 2 })
 
-      expect(result.pdfPath).toBeDefined()
-      const pdf = await PDFDocument.load(await readFile(result.pdfPath!))
-
-      expect(pdf.getPageCount()).toBe(input.slides.length)
-      expect(result.slidePaths).toHaveLength(input.slides.length)
+      expect((await PDFDocument.load(await readFile(result.pdfPath!))).getPageCount()).toBe(input.slides.length)
     } finally {
       await rm(outDir, { recursive: true, force: true })
     }
+  }, 120_000)
+
+  it('una esencial que ES la conclusión de una figura apunta a esa figura, no a la primera que dibuja su hecho (caso Sky)', () => {
+    const facts = [
+      { factId: 'ftr', value: 90.9, unit: 'percent', label: 'FTR', metricId: 'ftr', evidenceRef: 'e' },
+      { factId: 'ftr-prev', value: 96.5, unit: 'percent', label: 'FTR', metricId: 'ftr', evidenceRef: 'e' },
+      { factId: 'otd', value: 81.9, unit: 'percent', label: 'OTD', metricId: 'otd', evidenceRef: 'e' },
+      { factId: 'otd-prev', value: 80.1, unit: 'percent', label: 'OTD', metricId: 'otd', evidenceRef: 'e' },
+      { factId: 'ftr-target', value: 80, unit: 'percent', label: 'Meta FTR', metricId: 'target.ftr', evidenceRef: 'e', role: 'reference' }
+    ]
+
+    const base = { specVersion: 'chart_spec_v1', references: [], scale: { kind: 'linear', baseline: 0 }, tabularEquivalent: { columns: [], rows: [] } }
+
+    const comparison = { ...base, chartId: 'chart.cmp', family: 'bar_grouped', relation: 'comparison', title: 'Entrega', unit: 'percent', dimensionLabels: ['FTR', 'OTD'],
+      series: [{ seriesId: 'p', label: 'Período anterior', factIds: ['ftr-prev', 'otd-prev'], unit: 'percent' }, { seriesId: 'c', label: 'Período', factIds: ['ftr', 'otd'], unit: 'percent' }] }
+
+    const bullet = { ...base, chartId: 'chart.bullet', family: 'bullet', relation: 'target', title: 'FTR contra la meta', unit: 'percent', series: [], dimensionLabels: ['Sky'],
+      data: { kind: 'bullet', direction: 'higher_is_better', items: [{ itemId: 'i', label: 'Sky', valueFactId: 'ftr', targetFactId: 'ftr-target' }] } }
+
+    const meets = { claimId: 'chart.bullet.conclusion', text: 'Cumple la meta de primera entrega correcta: 90,9 % (meta 80,0 %).', factIds: ['ftr', 'ftr-target'] }
+
+    const input = buildInsightReportPlanInput({
+      edition, report,
+      snapshot: { facts, sources: [], rejections: [] } as never,
+      plan: plan({
+        executiveSummary: [{ claimId: 's0', text: 'La entrega cumple su meta de calidad.', factIds: [] }],
+        essentials: [{ ...meets, claimId: `essential.${meets.claimId}` }],
+        chapters: [chapter({ claims: [], charts: [comparison, bullet] as never, readings: [{ chartId: 'chart.bullet', conclusion: meets, nextStep: null }] } as never)]
+      } as never)
+    })
+
+    const targetsIndex = input.slides.findIndex(slide => slide.contentType === 'report-figure-targets')
+    const summary = input.slides.find(slide => slide.contentType === 'report-summary')!
+
+    expect((summary.slots.essentials as Array<{ folio: string }>)[0]!.folio).toBe(`p. ${String(targetsIndex + 1).padStart(2, '0')}`)
   })
 
-  // Forma real de un plan SEO (canary Berel, 2026-09-22): comparación de períodos por métrica.
+  it('una esencial de un hecho sin figura apunta a la narrada que lo afirma (caso Berel CTR)', () => {
+    const facts = [
+      { factId: 'ctr', value: 1.8, unit: 'percent', label: 'CTR', metricId: 'ctr', module: 'seo', evidenceRef: 'e' },
+      { factId: 'ctr-prev', value: 1.9, unit: 'percent', label: 'CTR', metricId: 'ctr', module: 'seo', evidenceRef: 'e' }
+    ]
+
+    // Una comparación de una sola métrica no tiene página: el CTR sólo se cuenta en prosa.
+    const ctrOnly = { specVersion: 'chart_spec_v1', chartId: 'chart.seo.percent', family: 'bar_grouped', relation: 'comparison', title: 'CTR', unit: 'percent',
+      dimensionLabels: ['CTR'], references: [], scale: { kind: 'linear', baseline: 0 }, tabularEquivalent: { columns: [], rows: [] },
+      series: [{ seriesId: 'p', label: 'Período anterior', factIds: ['ctr-prev'], unit: 'percent' }, { seriesId: 'c', label: 'Período', factIds: ['ctr'], unit: 'percent' }] }
+
+    const headline = { claimId: 'claim.head', text: 'Visibilidad orgánica en agosto.', factIds: [] }
+    const ctrClaim = { claimId: 'claim.fact.seo.ctr', text: 'CTR: 1,8 % (período anterior 1,9 %).', factIds: ['ctr', 'ctr-prev'] }
+
+    const input = buildInsightReportPlanInput({
+      edition, report,
+      snapshot: { facts, sources: [], rejections: [] } as never,
+      plan: plan({
+        executiveSummary: [{ claimId: 's0', text: 'El CTR se mantuvo.', factIds: [] }],
+        essentials: [{ ...ctrClaim, claimId: 'essential.fact.seo.ctr.2026-09-01_2026-09-21' }],
+        chapters: [chapter({ module: 'seo', claims: [headline, ctrClaim], charts: [ctrOnly] as never })]
+      } as never)
+    })
+
+    const narrativeIndex = input.slides.findIndex(slide => slide.contentType === 'report-narrative' && ((slide.slots.paragraphs as string[] | undefined) ?? []).includes(ctrClaim.text))
+    const summary = input.slides.find(slide => slide.contentType === 'report-summary')!
+
+    expect(narrativeIndex).toBeGreaterThan(0)
+    expect((summary.slots.essentials as Array<{ folio: string }>)[0]!.folio).toBe(`p. ${String(narrativeIndex + 1).padStart(2, '0')}`)
+  })
+
+  it('tabla real con unidades distintas (Berel/Sky): sin barras, columna de variación, cifra del hallazgo y fuente real', () => {
+    const f = (factId: string, label: string, value: number, unit: string, comparisonFactId?: string) =>
+      ({ factId, label, value, unit, module: 'seo', metricId: factId, evidenceRef: 'e', method: { name: 'gsc_window_aggregate' }, ...(comparisonFactId ? { comparisonFactId } : {}) })
+
+    const facts = [
+      f('clicks', 'Clics orgánicos', 9377, 'count', 'clicks-prev'), f('clicks-prev', 'Clics orgánicos', 10662, 'count'),
+      f('imp', 'Impresiones', 512113, 'count', 'imp-prev'), f('imp-prev', 'Impresiones', 566297, 'count'),
+      f('ctr', 'CTR', 1.83, 'percent', 'ctr-prev'), f('ctr-prev', 'CTR', 1.88, 'percent'),
+      f('pos', 'Posición media', 6.6, 'position', 'pos-prev'), f('pos-prev', 'Posición media', 6.6, 'position')
+    ]
+
+    const row = (id: string, prev: string) => {
+      const fact = facts.find(x => x.factId === id)!
+      const before = facts.find(x => x.factId === prev)!
+
+      return [fact.label, formatFactValue(fact.value, fact.unit as never, 'es-CL'), formatFactValue(before.value, before.unit as never, 'es-CL'), '2026-09-20']
+    }
+
+    const reading = { chartId: 'chart.seo.count', keyFigure: { factId: 'clicks', value: '9.377', caption: { claimId: 'k', text: 'Clics orgánicos.', factIds: ['clicks'] } },
+      conclusion: { claimId: 'c', text: 'Los clics bajaron de 10.662 a 9.377 (-12,1 %).', factIds: ['clicks', 'clicks-prev'] }, nextStep: null }
+
+    const [page] = buildInsightReportPlanInput({
+      edition, report,
+      snapshot: { facts, sources: [], rejections: [] } as never,
+      plan: plan({ chapters: [chapter({ module: 'seo', readings: [reading], tables: [{ tableId: 't', title: 'Visibilidad orgánica', columns: ['Métrica', 'Período', 'Período anterior', 'Corte de la fuente'],
+        rows: [row('clicks', 'clicks-prev'), row('imp', 'imp-prev'), row('ctr', 'ctr-prev'), row('pos', 'pos-prev')] }] } as never)] })
+    }).slides.filter(p => p.contentType === 'report-table')
+
+    const slots = page!.slots as Record<string, any>
+
+    expect(slots.heroFigure).toBe('9.377')
+    expect(slots.heroText).toBe(reading.conclusion.text)
+    expect(slots.barMode).toBe('none')
+    expect(slots.barScaleMax).toBeUndefined()
+    expect(slots.tableColumns.map((c: { label: string }) => c.label)).toEqual(['#', 'Métrica', 'Período', 'Variación'])
+    expect(slots.tableRows.map((r: { valueB: string; trend?: string }) => [r.valueB, r.trend])).toEqual([
+      ['12,1 %', 'down:neutral'], ['9,6 %', 'down:neutral'], ['0,1 pp', 'down:neutral'], ['sin cambio', 'flat:neutral']
+    ])
+    expect(slots.legend).toBeUndefined()
+    expect(slots.source.text).toBe('Google Search Console')
+    expect(slots.lead).not.toMatch(/orden del plan|la barra compara/)
+  })
+
   const periodComparison = (metrics: number) => {
     const facts = Array.from({ length: metrics }, (_, i) => [
       { factId: `cur${i}`, value: (i + 1) * 1000, unit: 'count', evidenceRef: `ev-c${i}` },
@@ -374,33 +585,25 @@ describe('buildInsightReportPlanInput', () => {
       edition, report,
       snapshot: { facts, sources: [], rejections: [] } as never,
       plan: plan({ chapters: [chapter({ charts: [chart] as never })] })
-    }).slides.filter(p => p.contentType === 'report-analysis').map(p => p.slots as { figureTitle: string; figureSeries: { name: string; printedValue: string; scaleGroup?: string }[] })
+    }).slides.filter(p => p.contentType === 'report-figure-comparison').map(p => p.slots as { figureTitle: string; metrics: { name: string; current: string; prior: string; direction: string; delta: string }[] })
   }
 
-  it('una comparación de períodos dibuja pares con nombre de métrica y escala propia', () => {
+  it('una comparación de períodos dibuja, por métrica, el período, el anterior y la variación', () => {
     const [figure] = periodComparison(2)
 
-    expect(figure!.figureSeries.map(row => [row.name, row.printedValue, row.scaleGroup])).toEqual([
-      ['Métrica 1', '1.000', 'dimension-0'],
-      ['Período anterior', '900', 'dimension-0'],
-      ['Métrica 2', '2.000', 'dimension-1'],
-      ['Período anterior', '1.800', 'dimension-1']
+    expect(figure!.metrics.map(row => [row.name, row.current, row.prior, row.direction, row.delta])).toEqual([
+      // Sin dirección declarada para la métrica, el tono es neutro: el triángulo dice que subió, no que mejoró.
+      ['Métrica 1', '1.000', '900', 'up:neutral', '11,1 %'],
+      ['Métrica 2', '2.000', '1.800', 'up:neutral', '11,1 %']
     ])
   })
 
-  it('una figura que no cabe se PAGINA sin recortar barras ni partir un par', () => {
+  it('una figura que no cabe se PAGINA equilibrada, sin recortar métricas ni partir un par', () => {
     const figures = periodComparison(6)
-    const rows = figures.flatMap(figure => figure.figureSeries)
 
-    expect(rows).toHaveLength(12)
-    expect(figures.map(figure => figure.figureSeries.length)).toEqual([6, 6])
-    expect(figures[1]!.figureTitle).toBe('Visibilidad orgánica · Cantidad (continuación)')
+    expect(figures.map(figure => figure.metrics.length)).toEqual([3, 3])
 
-    for (const figure of figures) {
-      const groups = figure.figureSeries.map(row => row.scaleGroup)
-
-      for (const group of new Set(groups)) expect(groups.filter(g => g === group)).toHaveLength(2)
-    }
+    for (const row of figures.flatMap(figure => figure.metrics)) expect(row.prior).toBeTruthy()
   })
 
   it('reparte las barras de una serie para que ninguna página quede con una sola', () => {
@@ -416,7 +619,7 @@ describe('buildInsightReportPlanInput', () => {
       edition, report,
       snapshot: { facts, sources: [], rejections: [] } as never,
       plan: plan({ chapters: [chapter({ charts: [chart] as never })] })
-    }).slides.filter(p => p.contentType === 'report-analysis').map(p => (p.slots as { figureSeries: unknown[] }).figureSeries.length)
+    }).slides.filter(p => p.contentType === 'report-figure-columns').map(p => (p.slots as { columnGroups: unknown[] }).columnGroups.length)
 
     expect(figures).toEqual([4, 3])
   })
@@ -425,7 +628,7 @@ describe('buildInsightReportPlanInput', () => {
     const claims = Array.from({ length: 10 }, (_, i) => ({ claimId: `s${i}`, text: `Hallazgo ${i + 1}.`, factIds: [] }))
 
     const narrative = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ executiveSummary: claims }) })
-      .slides.filter(p => (p.slots as { runningChapter?: string }).runningChapter === 'Resumen ejecutivo')
+      .slides.filter(p => (p.slots as { runningSection?: string }).runningSection === 'Resumen ejecutivo')
       .flatMap(p => (p.slots as { paragraphs: string[] }).paragraphs)
 
     expect(narrative).toHaveLength(9)
@@ -453,7 +656,7 @@ describe('buildInsightReportPlanInput', () => {
       plan: withChart
     }).slides
 
-    expect(pages.some(p => p.contentType === 'report-analysis')).toBe(false)
+    expect(pages.some(p => p.contentType.startsWith('report-figure-'))).toBe(false)
     expect(pages.some(p => p.contentType === 'report-narrative')).toBe(true)
   })
 })

@@ -184,11 +184,18 @@ Los artefactos internos que mencionan CLP 124.800.000/24 meses, CLP 5.200.000 me
 conservan como versiones de propuesta y deben reconciliarse con la versión efectivamente evaluada por el comprador
 antes de atribuir MRR.
 
+> **Actualización 2026-09-23:** reconciliado. SKY adjudicó el Blog SEO/AEO en **CLP 3.000.000 netos/mes + IVA ×
+> 24 meses** (TCV CLP 72.000.000 neto), formalizado como adenda al contrato vigente con Marketing; inicio
+> 2026-11-01. El Deal `62535094842` quedó en **Cierre ganado**. CLP 124.800.000 y CLP 5.200.000 son históricos.
+> SKY queda con dos servicios (Agencia Creativa para el equipo de Performance · Blog SEO/AEO para el equipo de
+> Marca), cada uno con su práctica dueña (`creative-practice` · `seo-aeo-practice`); no se mezclan alcance ni
+> márgenes. La concentración SKY del punto 7 de §7 aumenta desde noviembre 2026.
+
 ## 9. Backlog para empezar a construir
 
 ### Fase 1 — control comercial
 
-1. reconciliar SKY Blog entre propuesta, HubSpot y evidencia del comprador;
+1. ~~reconciliar SKY Blog entre propuesta, HubSpot y evidencia del comprador~~ — cerrado 2026-09-23 (adjudicado en CLP 3,0M netos/mes × 24);
 2. agregar la clasificación `service_family × account_segment` al registro interno de agentes antes de automatizar;
 3. limpiar `closedate`, buyer group, próximo paso, modalidad y campos MRR/term de las oportunidades que sí compiten por
    la cuota;

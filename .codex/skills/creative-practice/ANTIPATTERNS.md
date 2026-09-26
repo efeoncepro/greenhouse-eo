@@ -18,11 +18,17 @@
 > 15/07/2026 y aún no se sube**, con **2 años en CLP, sin reajuste y costos en USD.**
 > 🔴 **Un error de piso en un contrato sin reajuste no se corrige después: se paga 24 meses.**
 >
+> **Actualización 2026-09-23:** esa licitación **se adjudicó** — a **CLP 3,0M neto/mes, 24 meses, capacidad
+> gobernada y sin precio unitario por artículo** *(margen validado internamente por el operador)*. Las cifras
+> de A–C son de la **oferta original** y quedan como registro histórico del error, no como condiciones vigentes.
+>
 > 🩸 **Los bugs que SÍ son de esta práctica son F, G e I** — y son peores.
 
 ### 🩸 A. Publicamos un precio unitario, y le dimos al cliente la calculadora
 
-**Qué pasó:** la oferta económica de SKY publica **"artículo adicional: CLP 260.000"**.
+**Qué pasó:** la oferta económica **original** del blog de SKY publicaba **"artículo adicional: CLP 260.000"**.
+*(Actualización 2026-09-23: las condiciones adjudicadas ya van **sin precio unitario por artículo**; el riesgo
+de que el comprador haya visto la cifra original sigue siendo la lección.)*
 ⚠️ **Y agrava:** SKY **ya es cliente** *(performance)*. **Le estamos enseñando a comprarnos por unidad a una
 cuenta con la que queremos expandir durante años.**
 
@@ -101,18 +107,25 @@ tiempo** que alguien lo prometa. Y el día del onboarding, el cliente abre el me
 
 ---
 
-### 🩸 F. Cero casos creativos citables — y nadie está construyendo el primero
+### 🩸 F. Un solo caso creativo publicado — y sin proceso para construir el siguiente
 
 🎯 **Ojo — SÍ tenemos trabajo creativo vigente:** **SKY** tiene los service modules **`agencia_creativa` +
 `globe`** activos, con un squad nombrado *(Daniela Ferreira como Creative Operations Lead + Melkin Hernández
-y Andrés Carlosama como Senior Visual Designers)* y un proyecto que corre **ago-2025 → jul-2026.**
+y Andrés Carlosama como Senior Visual Designers)*, que atiende al **equipo de Performance** de SKY desde **ago-2025**; cumplido el primer año,
+**el contrato se renovó por un año más**.
 
-🔴 **Pero no tenemos un CASO** — porque un caso exige **métrica verificable** + relación sana +
-**autorización escrita**, y **la métrica no existe** *(ver G)*.
+🎯 **Actualización 2026-09-23: el caso creativo de SKY EXISTE y está publicado** en
+`https://experiencia.efeoncepro.com` *(primer wrapper de la Experiencia Efeonce)*, con métricas de **entrega/operación**
+de 12 meses: **+2.000 piezas aprobadas · 39 campañas · 88% on-time · 0,12 ajustes promedio por pieza · 5 mercados ·
+25% menos tiempo de producción**. La versión anterior de este archivo decía "no tenemos un CASO": ya no es cierto.
+
+🔴 **Lo que ese caso NO es:** son métricas de **delivery**, no de **negocio del cliente**; **no hay baseline del día 0**;
+y la **autorización escrita para citarlo fuera del wrapper no está verificada**. Un caso exige métrica verificable +
+relación sana + autorización escrita — la doctrina no cambia, sólo el hecho.
 
 **Por qué es grave:** cada engagement que cierra sin iniciar su caso es **munición perdida para siempre**.
 Rescatar un caso un año después es pedir un favor; documentarlo desde el día 1 es un proceso.
-**Llevamos ~1 año con SKY y no hay nada capturado.**
+**Con SKY se capturó tarde y sin baseline de negocio del día 0:** el caso salió de la telemetría de operación, no de un proceso que arrancó el día 1.
 
 **Fix:** **todo engagement creativo arranca su `templates/caso-estudio.md` el día 1**, y **la autorización de
 portafolio se pide EN EL CONTRATO** *(cláusula, no favor)*. → `modules/05_SCOPE_SOW.md` §4.
@@ -251,7 +264,7 @@ es una ventaja competitiva que se protege callándola.**
 | **Aceptar un brief sin owner nombrado** | Sin alguien que apruebe **no hay ronda 1: hay rondas infinitas** |
 | **Ceder derechos perpetuos/exclusivos/ilimitados en el fee base** | Regalas **2-3× el trabajo**. Y nadie se entera: simplemente el margen nunca llega |
 | **Entregar archivos abiertos "de buena onda"** | Le entregas la capacidad de reproducirte |
-| **Olvidar la autorización de portafolio en el contrato** | Después es un favor. En el contrato es una cláusula que nadie discute. **Y sin ella, cero casos** |
+| **Olvidar la autorización de portafolio en el contrato** | Después es un favor. En el contrato es una cláusula que nadie discute. **Y sin ella, el caso se queda dentro del wrapper** |
 | **Ejecutar trabajo extra y facturarlo después** | Facturar una sorpresa es cómo se pierden clientes. **El change order va ANTES** |
 | 🔴 **Cobrar la corrección de un error NUESTRO** | **Jamás.** Comer tus errores en silencio es lo que te da el derecho moral a cobrar los cambios de él |
 

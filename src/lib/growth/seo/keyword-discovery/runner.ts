@@ -21,6 +21,7 @@
 
 import 'server-only'
 
+import { DataForSeoConfigurationError } from '@/lib/ai/dataforseo-errors'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
@@ -207,6 +208,7 @@ const executeClaimedRun = async (run: ClaimedRun): Promise<RunKeywordDiscoveryRe
   let marketRowsWritten = 0
   let fenceTripped = false
   let breakerOpen = false
+  let configurationMissing = false
 
   // Auditoría SEO 2026-08-14 (patrón TASK-1303/1661): el fence re-verifica contra el costo REAL
   // del remanente planificado, no contra "una llamada más". Subllamadas del plan: una por seed
@@ -242,7 +244,10 @@ const executeClaimedRun = async (run: ClaimedRun): Promise<RunKeywordDiscoveryRe
     return !fenceTripped
   }
 
-  const registerOutcome = async (outcome: DiscoveryCallOutcome, subcall: { method: SeoDiscoveryMethod; seeds: string[] }) => {
+  const registerOutcome = async (
+    outcome: DiscoveryCallOutcome,
+    subcall: { method: SeoDiscoveryMethod; seeds: string[] }
+  ) => {
     providerCalls += 1
 
     if (outcome.costUsd > 0) chargedCalls += 1
@@ -309,7 +314,7 @@ const executeClaimedRun = async (run: ClaimedRun): Promise<RunKeywordDiscoveryRe
 
   // ── Expansión: sugerencias/relacionadas = por seed; ideas/dominio = por corrida ──
   for (const spec of methods) {
-    if (breakerOpen) break
+    if (breakerOpen || configurationMissing) break
 
     const subcalls: Array<{ seed?: string; seeds?: string[]; targetDomain?: string; seedsLabel: string[] }> =
       spec.method === 'keyword_suggestions' || spec.method === 'related_keywords'
@@ -319,7 +324,7 @@ const executeClaimedRun = async (run: ClaimedRun): Promise<RunKeywordDiscoveryRe
           : [{ targetDomain: run.root_domain, seedsLabel: [run.root_domain] }]
 
     for (const [index, subcall] of subcalls.entries()) {
-      if (breakerOpen) break
+      if (breakerOpen || configurationMissing) break
 
       if (providerCalls >= MAX_DISCOVERY_PROVIDER_CALLS) break
 
@@ -334,9 +339,14 @@ const executeClaimedRun = async (run: ClaimedRun): Promise<RunKeywordDiscoveryRe
 
         await registerOutcome(outcome, { method: spec.method, seeds: subcall.seedsLabel })
       } catch (error) {
-        // Excepción del transporte (red/timeout): subllamada fallida, la corrida sigue.
-        providerCalls += 1
-        providerErrors += 1
+        if (error instanceof DataForSeoConfigurationError) {
+          configurationMissing = true
+        } else {
+          // Red/timeout: una llamada intentada; falta de configuración: cero I/O proveedor.
+          providerCalls += 1
+          providerErrors += 1
+        }
+
         captureWithDomain(error, 'growth', {
           tags: { source: 'seo_keyword_discovery_runner' },
           extra: { runId: run.run_id, method: spec.method, subcall: index }
@@ -346,7 +356,7 @@ const executeClaimedRun = async (run: ClaimedRun): Promise<RunKeywordDiscoveryRe
   }
 
   // ── Enriquecimiento top-up: SOLO keywords sin métrica vigente en el store ──
-  if (!breakerOpen && !fenceTripped && candidates.size > 0) {
+  if (!breakerOpen && !configurationMissing && !fenceTripped && candidates.size > 0) {
     const uniqueKeywords = [...new Set([...candidates.values()].map(candidate => candidate.normalizedKeyword))].slice(
       0,
       MAX_DISCOVERY_ENRICHMENT_KEYWORDS
@@ -424,12 +434,19 @@ const executeClaimedRun = async (run: ClaimedRun): Promise<RunKeywordDiscoveryRe
 
         marketRowsWritten += persisted.rowsWritten
       } catch (error) {
-        providerCalls += 1
-        providerErrors += 1
+        if (error instanceof DataForSeoConfigurationError) {
+          configurationMissing = true
+        } else {
+          providerCalls += 1
+          providerErrors += 1
+        }
+
         captureWithDomain(error, 'growth', {
           tags: { source: 'seo_keyword_discovery_runner' },
           extra: { runId: run.run_id, method: 'keyword_overview', offset }
         })
+
+        if (configurationMissing) break
       }
     }
   }
@@ -440,7 +457,10 @@ const executeClaimedRun = async (run: ClaimedRun): Promise<RunKeywordDiscoveryRe
   let status: SeoDiscoveryRunStatus
   let errorCode: string | null = null
 
-  if (fenceTripped) {
+  if (configurationMissing) {
+    status = candidateList.length > 0 ? 'partial' : 'failed'
+    errorCode = 'provider_configuration_missing'
+  } else if (fenceTripped) {
     status = candidateList.length > 0 ? 'partial' : 'budget_blocked'
     errorCode = 'budget_exhausted'
   } else if (providerErrors > 0 && successfulCalls === 0 && methods.length > 0) {
@@ -526,7 +546,14 @@ const finalizeRun = async (
               completed_at = clock_timestamp()
         WHERE run_id = $1
           AND status = 'running'`,
-      [run.run_id, input.status, input.errorCode, input.providerCalls, Number(input.actualCostUsd.toFixed(6)), insertedCount]
+      [
+        run.run_id,
+        input.status,
+        input.errorCode,
+        input.providerCalls,
+        Number(input.actualCostUsd.toFixed(6)),
+        insertedCount
+      ]
     )
 
     await publishOutboxEvent(

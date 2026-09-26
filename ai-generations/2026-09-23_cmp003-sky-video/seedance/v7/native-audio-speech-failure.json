@@ -1,0 +1,45 @@
+{
+  "source": "sky-v7-seedance-native.mp4",
+  "check": {
+    "flow_id": "c1xwy5PjHyOFVHtKgBAy",
+    "flow_created": false,
+    "url": "https://elevenlabs.io/app/flows/c1xwy5PjHyOFVHtKgBAy",
+    "flow_url": "https://elevenlabs.io/app/flows/c1xwy5PjHyOFVHtKgBAy",
+    "session_id": "iHh7VrPalhdu3UH4WRgd",
+    "generations": [
+      {
+        "id": "gJZLH5caJdwsWsdsIMjx",
+        "status": "completed",
+        "model_id": "eleven_scribe_v1",
+        "modality": "text",
+        "created_at_unix_ms": 1790234289981,
+        "price": {
+          "credits": 168.9091166769738,
+          "price_cents": 3.716000566893424,
+          "cost_fiat_currency": "usd"
+        }
+      }
+    ],
+    "all_completed": true,
+    "has_failures": false,
+    "session_ids": [
+      "iHh7VrPalhdu3UH4WRgd"
+    ],
+    "transcripts": [
+      {
+        "generation_id": "gJZLH5caJdwsWsdsIMjx",
+        "text": "Un año creando con Sky, dos mil piezas, y ahora nos eligió como su agencia SEO. Gracias, Sky. ",
+        "model_id": "eleven_scribe_v1",
+        "download_url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/iHh7VrPalhdu3UH4WRgd/gJZLH5caJdwsWsdsIMjx/content.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T071823Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22transcript-gJZLH5caJdwsWsdsIMjx.txt%22&X-Goog-Signature=286685d431ed546e3f8c13c6a0beb613a1cf9a308f79be417b312a5a6f272b9a19c143944c7717046b3a98576f2281282487b415f698e0c9af5afac34b183bc731dbfd5eb30e2b760a55258372b15c81ba8b18a2411ae87352c0815b697ce904e0a6a6a7bfdef6ec5218a4bb513c2ccd5a0886f7a70d69d552be41c0f305384d5006051ff7539361bbb339e8a38481954cdca2a70ab6fd3fe01b5d2c21e46f71ca870648e172da574a486768043398ac331162ed5bed05680e7f7e22ae795d759dcdbc33c7741f0a63947bd62591de922e6c96cb5383e86de018670e21238913e41362fccdf266e5ab2e68c4c09edb215caab6de17474e3c30da27b7b660e1f3",
+        "language_code": "spa",
+        "language_probability": 0.9779298901557922,
+        "spoken_duration_secs": 23.8,
+        "source": {
+          "kind": "audio",
+          "url": "https://storage.googleapis.com/xi-backend/database/workspace/3512dd4f376e494789b1aad94ca38670/content_generation/content_asset/kz6sq9tWAaqmK9EAF2Nl/asset_preview.mp3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=xi-backend-prod%40xi-labs.iam.gserviceaccount.com%2F20260924%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260924T071823Z&X-Goog-Expires=7200&X-Goog-SignedHeaders=host&X-Goog-Signature=672b7dcfcd963c1ed0c7ca1d6bb32a6c919e9bc845d8146ba05527e61694d31659b3eacd0a94d094ed92ef4db8a7a40941892f72dc81b44941ca133ab6ba144cc437956407244778bea72e4d640465fbc434eeba19793dc12be2ba463bb1230179594c64b35825af65f19ceabd858cac97bc8d194038735860e22b39c8112a21a0c2e149eb69fc622b7964b78505cd39fa51d03ca828323305933c277249391302865ca2b89644c6a76d8ac64b10eb7d14095ab5e16e54b7b446a800eb31bdaf42eacf535892fb28202833cd32484fe43138fd3b9fdca69e857036426ee360bc9b86483e010054b81d579a7f74bad9804898c140567dcc3a8fc0c0c01ad150ed"
+        }
+      }
+    ]
+  },
+  "decision": "Rejected: narration reads title copy despite explicit zero-voice prompt. Do not deliver raw candidate as improved final."
+}

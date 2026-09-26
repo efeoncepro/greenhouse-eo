@@ -21,6 +21,20 @@ type OrganizationBrandAssetOrgRow = {
   organization_name: string
   is_operating_entity: boolean
   logo_asset_id: string | null
+  logo_on_dark_asset_id: string | null
+}
+
+/**
+ * TASK-1888 — variante del logo. `default` es el logo de siempre (`logo_asset_id`); `on_dark` es la versión apta para
+ * fondo oscuro (`logo_on_dark_asset_id`), que la portada navy de Efeonce Insights exige. Misma línea gobernada para
+ * ambas: capability `organization.brand_asset`, bloqueo de operating entities, asset privado servido por proxy.
+ */
+export const ORGANIZATION_LOGO_VARIANTS = ['default', 'on_dark'] as const
+export type OrganizationLogoVariant = (typeof ORGANIZATION_LOGO_VARIANTS)[number]
+
+const LOGO_VARIANT_COLUMN: Record<OrganizationLogoVariant, 'logo_asset_id' | 'logo_on_dark_asset_id'> = {
+  default: 'logo_asset_id',
+  on_dark: 'logo_on_dark_asset_id'
 }
 
 type CandidateRow = {
@@ -37,6 +51,7 @@ export type AttachOrganizationLogoResult = {
   previousLogoAssetId: string | null
   logoAssetId: string
   logoUrl: string
+  variant: OrganizationLogoVariant
 }
 
 export type OrganizationBrandAssetCandidateSource =
@@ -118,7 +133,7 @@ export class OrganizationBrandAssetError extends Error {
 const getOrganizationForLogoUpdate = async (client: QueryableClient, organizationId: string) => {
   const result = await client.query<OrganizationBrandAssetOrgRow>(
     `
-      SELECT organization_id, public_id, organization_name, is_operating_entity, logo_asset_id
+      SELECT organization_id, public_id, organization_name, is_operating_entity, logo_asset_id, logo_on_dark_asset_id
       FROM greenhouse_core.organizations
       WHERE organization_id = $1 OR public_id = $1
       FOR UPDATE
@@ -183,16 +198,20 @@ export const attachOrganizationLogoAsset = async ({
   assetId,
   actorUserId,
   candidateId,
-  reason
+  reason,
+  variant = 'default'
 }: {
   organizationId: string
   assetId: string
   actorUserId: string
   candidateId?: string | null
   reason?: string | null
+  /** TASK-1888 — `on_dark` fija la variante apta para fondo oscuro; ausente = el logo de siempre. */
+  variant?: OrganizationLogoVariant
 }): Promise<AttachOrganizationLogoResult> =>
   withGreenhousePostgresTransaction(async client => {
     const organization = await getOrganizationForLogoUpdate(client, organizationId)
+    const column = LOGO_VARIANT_COLUMN[variant]
 
     if (!organization) {
       throw new OrganizationBrandAssetError('organization_not_found')
@@ -226,7 +245,7 @@ export const attachOrganizationLogoAsset = async ({
 
     await markPreviousLogoSuperseded({
       client,
-      previousLogoAssetId: organization.logo_asset_id,
+      previousLogoAssetId: organization[column],
       nextLogoAssetId: assetId,
       actorUserId
     })
@@ -241,8 +260,9 @@ export const attachOrganizationLogoAsset = async ({
       ownerMemberId: asset.ownerMemberId,
       metadata: {
         organizationId: organization.organization_id,
-        previousLogoAssetId: organization.logo_asset_id,
-        reason: reason || null
+        previousLogoAssetId: organization[column],
+        reason: reason || null,
+        variant
       },
       client
     })
@@ -250,7 +270,7 @@ export const attachOrganizationLogoAsset = async ({
     await client.query(
       `
         UPDATE greenhouse_core.organizations
-        SET logo_asset_id = $2,
+        SET ${column} = $2,
             updated_at = CURRENT_TIMESTAMP
         WHERE organization_id = $1
       `,
@@ -285,10 +305,11 @@ export const attachOrganizationLogoAsset = async ({
       payload: {
         organizationId: organization.organization_id,
         assetId: attachedAsset.assetId,
-        previousLogoAssetId: organization.logo_asset_id,
+        previousLogoAssetId: organization[column],
         candidateId: candidateId || null,
         actorUserId,
-        reason: reason || null
+        reason: reason || null,
+        variant
       }
     }, client)
 
@@ -298,15 +319,16 @@ export const attachOrganizationLogoAsset = async ({
       eventType: EVENT_TYPES.organizationUpdated,
       payload: {
         organizationId: organization.organization_id,
-        updatedFields: ['logo_asset_id']
+        updatedFields: [column]
       }
     }, client)
 
     return {
       organizationId: organization.organization_id,
-      previousLogoAssetId: organization.logo_asset_id,
+      previousLogoAssetId: organization[column],
       logoAssetId: attachedAsset.assetId,
-      logoUrl: resolveOrganizationLogoUrl(attachedAsset.assetId) as string
+      logoUrl: resolveOrganizationLogoUrl(attachedAsset.assetId) as string,
+      variant
     }
   })
 

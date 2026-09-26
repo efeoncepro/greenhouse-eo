@@ -1,0 +1,11 @@
+{
+  "formato": "4:5",
+  "impacto": true,
+  "id": "L8-ausencia-cierre",
+  "palanca": "ausencia",
+  "escena": "SCENE (end of a project cycle for an olive-oil producer, golden hour, a bare modern studio with raw grey concrete walls, no shelves, no books, no plants): on a long pale oak table lies the final approved print — an olive branch on a deep ink-blue field — slightly askew where it was dropped; beside it a black marker with its cap off, a pencil with a worn tip and two glasses of water half drunk. Two chairs are pushed back at an angle from the table, one swivelled away toward the window, a jacket still hanging on its back. One small desk lamp is still on. Low warm sun from the window at the back throws long shadows of the glasses and chair legs toward the camera. 50mm f/2.8, focus on the print, which sits in the centre of the frame. LENS FRAMING: everything essential sits inside a centred circle about 55% of the frame width, centred slightly above the middle, with air around it; outside that circle the picture holds only calm secondary material. Nobody looks at the lens.",
+  "lecho": {
+    "objeto": "the near edge of the oak table right at the lens",
+    "tono": "DARK near black"
+  }
+}

@@ -1,0 +1,1912 @@
+// `pnpm foto:componer:cta:pruebas [--ref <git-ref>] [--solo P01,P07] [--compositor <archivo>] [--gate <archivo>]` — 10 pruebas de punta a punta del compositor
+// de piezas con CTA, sobre piezas REALES del repo y sobre variantes rotas a propósito.
+//
+//   P01 determinismo · P02 no regresión (harness completo) · P03 guarda de sujeto · P04 crecer respira (medición
+//   independiente) · P05 crecer no degrada contraste · P06 zona segura y eje · P07 validación del plan · P08 cortes
+//   de línea · P09 accesibilidad y contraste · P10 gate
+//
+// Nada se compone en las carpetas reales: todo corre en un directorio temporal. Las pruebas que MIDEN no usan el
+// código que prueban (P04 recalcula la distancia al sujeto desde la máscara, P08 trae su propio oráculo de cortes):
+// una prueba que se verifica a sí misma no prueba nada. Deja reporte.json, reporte.md y la evidencia en disco.
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+import { execFile } from 'node:child_process'
+import { createHash, randomBytes } from 'node:crypto'
+import { fileURLToPath } from 'node:url'
+import { promisify } from 'node:util'
+
+import sharp from 'sharp'
+
+const run = promisify(execFile)
+const ROOT = fileURLToPath(new URL('../../', import.meta.url))
+const args0 = process.argv.slice(2)
+// `--compositor <archivo>` corre las pruebas contra OTRA versión (p. ej. un mutante en
+// scripts/foto/.componer-cta@<nombre>.regresion.mjs, ignorado por git): una prueba que no falla ante un mutante que
+// rompe lo que ella cuida no está probando nada. La regresión (P02) usa ese mismo archivo como candidato.
+const COMPOSITOR = path.resolve(ROOT, args0.includes('--compositor') ? args0[args0.indexOf('--compositor') + 1] : 'scripts/foto/componer-cta.mjs')
+// `--gate <archivo>`: lo mismo para el gate — un gate mutante que deja de verificar algo debe hacer fallar a P10.
+const GATE = path.resolve(ROOT, args0.includes('--gate') ? args0[args0.indexOf('--gate') + 1] : 'scripts/foto/componer-cta.gate.mjs')
+// `--regresion <archivo>`: lo mismo para el arnés de regresión (P02 lo pone a prueba con casos hechos a propósito).
+const REGRESION = path.resolve(ROOT, args0.includes('--regresion') ? args0[args0.indexOf('--regresion') + 1] : 'scripts/foto/componer-cta.regresion.mjs')
+// `--p02-rapido`: P02 sólo verifica el arnés (vacío, cobertura, avisos, referencia hermética), sin la regresión completa.
+const P02_RAPIDO = args0.includes('--p02-rapido')
+const REPORTE_A11Y = path.join(ROOT, 'scripts/foto/accesibilidad-reporte.mjs')
+const MASCARAS = path.join(ROOT, 'node_modules/.cache/foto-sujeto')
+const args = process.argv.slice(2)
+const opt = (n, d) => (args.includes(n) ? args[args.indexOf(n) + 1] : d)
+const REF = opt('--ref', 'HEAD')
+const SOLO = opt('--solo', null)?.split(',')
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'foto-pruebas-'))
+
+// Identidad de la suite (tramo 10): el gate acepta el aprobador `suite-pruebas` y `--comando` ajeno sólo en planes bajo una
+// carpeta con la marca `.suite-pruebas` cuyo valor coincide con `FOTO_SUITE_NONCE`. Los procesos hijos heredan el valor.
+process.env.FOTO_SUITE_NONCE = randomBytes(24).toString('hex')
+fs.writeFileSync(path.join(TMP, '.suite-pruebas'), process.env.FOTO_SUITE_NONCE)
+const sha = b => createHash('sha256').update(b).digest('hex')
+
+// ── Piezas reales del repo ──────────────────────────────────────────────────────────────────────────
+const CMP001 = 'ai-generations/2026-09-21_registro-c-respuesta'
+const V07 = 'ai-generations/2026-09-22_aeo-final-safe-v07/piezas.json'
+const CMP002 = 'ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json'
+
+const FIX = {
+  mo2_916: [`${CMP001}/piezas-mofu-formatos.json`, 'mo2-no-te-citan-916'],
+  mo1_169: [`${CMP001}/piezas-mofu-formatos.json`, 'mo1-canal-nuevo-169'],
+  mo3_916: [`${CMP001}/piezas-mofu-formatos.json`, 'mo3-no-creernos-916'],
+  b2_916: [`${CMP001}/piezas-bofu-formatos.json`, 'b2-primero-el-numero-916'],
+  b2_169: [`${CMP001}/piezas-bofu-formatos.json`, 'b2-primero-el-numero-169'],
+  p1_45: [`${CMP001}/piezas-cta.json`, 'p1-cta-contorno'],
+  rec_916: [V07, '02-reconoces-916'],
+  ele_169: [V07, '04-elegida-169'],
+  ref_916: [V07, '03-referencia-916'],
+  ref_169: [V07, '03-referencia-169'],
+  kv07_916: [CMP002, 'KV-07-916'],
+  kv06_169: [CMP002, 'KV-06-169'],
+  fue_916: [V07, '01-fuera-916'],
+  v03_fue: ['ai-generations/2026-09-22_aeo-cta-v03/piezas.json', '01-fuera-916']
+}
+
+const pieza = k => {
+  const [rel, id] = FIX[k]
+  const plan = path.join(ROOT, rel)
+  const p = JSON.parse(fs.readFileSync(plan, 'utf8')).find(x => x.id === id)
+
+  if (!p) throw new Error(`fixture ${k}: no existe ${id} en ${rel}`)
+
+  return { ...structuredClone(p), plate: path.resolve(path.dirname(plan), p.plate) }
+}
+
+// La misma pieza, ajustada al canon: zona segura de AXIS, CTA en la columna y firma de 20 % del lado corto (25 % en los
+// horizontales, canon 2026-09-23) en una Y que se lea (`logo.y: "auto"`). Es lo que un plan nuevo declara para pasar el
+// gate. Al cambiar, la pieza deja de ser la aprobada: se juzga con el canon vigente.
+const canon = k => {
+  const p = pieza(k)
+
+  p.safeArea = 'axis'
+  p.cta.x = 'columna'
+  if (p.note) p.note.x = 'columna'
+  p.logo = { ...(p.logo ?? {}), width: /169$/.test(k) ? 0.25 : 0.2, x: 0.5, y: 'auto' }
+
+  return p
+}
+
+// Un 16:9 NUEVO con el piso de legibilidad (decisión del operador del 2026-09-23: en un teléfono de 390 CSS px, el CTA mide
+// 11 px y las demás voces 9). El lienzo mide 2048 de ancho: son ≥ 58 y ≥ 48 px del lienzo, y el titular sube para seguir
+// midiendo 3× la entrada. Sin crecer (juzga los tamaños declarados) y sin la nota (el bloque cabe). Es la receta de un 16:9.
+const canonLegible169 = k => {
+  const p = canon(k)
+
+  delete p.note
+  Object.assign(p, { textGrowth: false, leadSize: 48, dominantSize: 160, dominantMax: 0.5, textWidth: 0.5, afterSize: 48 })
+  // Ritmo del canon (tramo 16): el concepto y la acción, con más aire que el botón y su descriptor (43 px en este lienzo).
+  Object.assign(p.cta, { fontSize: 60, descriptorSize: 48, paddingX: 39, paddingY: 22, descriptorGap: 24, gapAfterNote: 56 })
+
+  return p
+}
+
+async function componer(nombre, piezas, ids = [], env = {}) {
+  const dir = path.join(TMP, nombre)
+  const planPath = path.join(dir, 'piezas.json')
+
+  fs.mkdirSync(dir, { recursive: true })
+  fs.writeFileSync(planPath, JSON.stringify(piezas, null, 2))
+
+  try {
+    const r = await run(process.execPath, [COMPOSITOR, planPath, ...ids], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6, env: { ...process.env, ...env } })
+    // QA por plan (`qa-<plan>.json`) desde 2026-09-23: una corrida parcial lo fusiona con el que ya había.
+    const qaFile = path.join(dir, 'out', 'qa-piezas.json')
+
+    return { ok: true, dir, planPath, salida: r.stdout + r.stderr, qa: JSON.parse(fs.readFileSync(qaFile, 'utf8')) }
+  } catch (e) {
+    const texto = String(e.stderr ?? '') + String(e.stdout ?? '')
+
+    return { ok: false, dir, planPath, salida: texto, error: (texto.match(/Error: ([^\n]+)/) ?? [null, String(e.message).split('\n')[0]])[1] }
+  }
+}
+
+async function gate(planPath, extra = []) {
+  try {
+    const r = await run(process.execPath, [GATE, planPath, '--comando', COMPOSITOR, ...extra], { cwd: ROOT, maxBuffer: 16e6, timeout: 20 * 60e3 })
+
+    return { code: 0, salida: r.stdout + r.stderr }
+  } catch (e) {
+    return { code: e.code ?? 1, salida: String(e.stdout ?? '') + String(e.stderr ?? '') }
+  }
+}
+
+const leerMascara = async plate => {
+  const f = path.join(MASCARAS, `${sha(fs.readFileSync(plate))}.png`)
+  const { data, info } = await sharp(f).extractChannel(0).raw().toBuffer({ resolveWithObject: true })
+
+  return { data, W: info.width, H: info.height }
+}
+
+// Distancia euclidiana mínima de una caja a la silueta (px del lienzo). Oráculo independiente del compositor.
+function distanciaAlSujeto(m, caja, canvasW, canvasH, radio) {
+  const sx = m.W / canvasW, sy = m.H / canvasH
+  let min = Infinity
+
+  for (let y = Math.max(0, Math.floor((caja.top - radio) * sy)); y < Math.min(m.H, Math.ceil((caja.bottom + radio) * sy)); y++) {
+    for (let x = Math.max(0, Math.floor((caja.left - radio) * sx)); x < Math.min(m.W, Math.ceil((caja.right + radio) * sx)); x++) {
+      if (m.data[y * m.W + x] <= 127) continue
+      const X = (x + 0.5) / sx, Y = (y + 0.5) / sy
+      const d = Math.hypot(Math.max(caja.left - X, 0, X - caja.right), Math.max(caja.top - Y, 0, Y - caja.bottom))
+
+      if (d < min) min = d
+    }
+  }
+
+  return min
+}
+
+const TEXTO = new Set(['etiqueta', 'entrada', 'dominante', 'cierre-frase', 'nota', 'cta', 'descriptor'])
+const leer = (dir, f) => JSON.parse(fs.readFileSync(path.join(dir, 'out', f), 'utf8'))
+
+// Oráculo de cortes, independiente del compositor: palabras cortas que no cierran línea en español.
+const DEBILES = new Set(['a', 'al', 'con', 'de', 'del', 'e', 'el', 'en', 'la', 'las', 'lo', 'los', 'mi', 'mis', 'ni', 'o', 'para', 'por', 'que', 'se', 'sin', 'su', 'sus', 'tu', 'tus', 'u', 'un', 'una', 'unas', 'unos', 'y'])
+const palabras = l => l.split(/\s+/).filter(Boolean)
+const limpia = w => w.toLowerCase().replace(/[^\p{L}]/gu, '')
+
+const defectosCorte = lineas => {
+  const d = []
+
+  if (lineas.length < 2) return d
+  lineas.slice(0, -1).forEach((l, i) => { if (DEBILES.has(limpia(palabras(l).at(-1)))) d.push(`línea ${i + 1} termina en «${palabras(l).at(-1)}»`) })
+  if (palabras(lineas.at(-1)).length === 1 && lineas.flatMap(palabras).length >= 3) d.push(`viuda: «${lineas.at(-1)}»`)
+
+  return d
+}
+
+const plano = t => String(t ?? '').replace(/\*\*|\[\[|\]\]/g, '').replace(/\s*\|\s*/g, ' ').replace(/\s+/g, ' ').trim()
+
+// ── Las 10 pruebas ─────────────────────────────────────────────────────────────────────────────────
+let harness = null
+const crecidas = {}
+
+const PRUEBAS = [
+  {
+    id: 'P01', nombre: 'Determinismo: la misma pieza compuesta dos veces es idéntica al píxel',
+    async correr() {
+      const [a, b] = await Promise.all([componer('P01-a', [pieza('mo2_916')]), componer('P01-b', [pieza('mo2_916')])])
+
+      if (!a.ok || !b.ok) return { ok: false, detalle: `no compuso: ${a.error ?? b.error}` }
+      const png = d => sha(fs.readFileSync(path.join(d, 'out', 'mo2-no-te-citan-916.png')))
+      const iguales = { png: png(a.dir) === png(b.dir), layout: JSON.stringify(leer(a.dir, 'mo2-no-te-citan-916-layout.json')) === JSON.stringify(leer(b.dir, 'mo2-no-te-citan-916-layout.json')), qa: JSON.stringify(a.qa) === JSON.stringify(b.qa) }
+
+      return { ok: Object.values(iguales).every(Boolean), detalle: `png ${iguales.png} · layout ${iguales.layout} · qa ${iguales.qa} (sha ${png(a.dir).slice(0, 12)})` }
+    }
+  },
+  {
+    id: 'P02', nombre: `No regresión: todas las piezas con CTA del repo contra ${REF}`,
+    async correr() {
+      // El ARNÉS también se prueba (tramo 5; auditoría 2026-09-23, hallazgo 13): una red de seguridad con agujeros da
+      // verde sin mirar. Cuatro casos hechos a propósito, cada uno con lo que el arnés tiene que decir.
+      const arnes = async (extra, env = {}) => run(process.execPath, [REGRESION, ...extra], { cwd: ROOT, timeout: 30 * 60e3, maxBuffer: 64e6, env: { ...process.env, ...env } }).then(r => ({ code: 0, salida: r.stdout + r.stderr }), e => ({ code: e.code ?? 1, salida: String(e.stdout ?? '') + String(e.stderr ?? '') }))
+      const vacio = await arnes(['--solo', 'zzz-ningun-plan-se-llama-asi'])
+      const PLAN_CHICO = '2026-09-21_registro-c-respuesta/piezas-cta.json'
+      const coberturaFalsa = path.join(TMP, 'P02-cobertura.json')
+
+      fs.writeFileSync(coberturaFalsa, JSON.stringify({ piezas: [`ai-generations/${PLAN_CHICO}#pieza-que-ya-no-esta`] }))
+      // Un candidato que sólo agrega un aviso: el píxel no cambia, así que sólo la comparación de avisos lo ve.
+      const candidatoAviso = path.join(ROOT, `scripts/foto/.componer-cta@p02-aviso-${process.pid}.regresion.mjs`)
+
+      fs.writeFileSync(candidatoAviso, fs.readFileSync(COMPOSITOR, 'utf8').replace('async function composePiece(s, opts = {}) {', "async function composePiece(s, opts = {}) {\n  if (!opts.dry) console.warn(`  ⚠ ${s.id}: aviso de prueba del arnés`)"))
+      const conAviso = await arnes(['--solo', PLAN_CHICO, '--candidato', candidatoAviso, '--cobertura', coberturaFalsa])
+
+      fs.rmSync(candidatoAviso, { force: true })
+      const hermetica = await run(process.execPath, ['--test', 'scripts/foto/regresion-ref.test.mjs'], { cwd: ROOT }).then(() => true, () => false)
+      // Tramo 9: sin manifiesto de cobertura el arnés falla; y un candidato que sólo SUMA una voz que no pasa (el QA
+      // gana una clave, el píxel no cambia) es una diferencia, porque cambia el veredicto del gate.
+      const sinManifiesto = await arnes(['--solo', PLAN_CHICO, '--cobertura', path.join(TMP, 'P02-no-existe.json')])
+      const candidatoGate = path.join(ROOT, `scripts/foto/.componer-cta@p02-gate-${process.pid}.regresion.mjs`)
+
+      fs.writeFileSync(candidatoGate, fs.readFileSync(COMPOSITOR, 'utf8').replace('  accesibilidad.altText = textoAlternativo(s)', "  accesibilidad.voces['voz-de-prueba'] = { wcag: 1.2, umbralWcag: 4.5, cumpleWcag: false, metodo: 'limite' }\n  accesibilidad.altText = textoAlternativo(s)"))
+      const conGate = await arnes(['--solo', PLAN_CHICO, '--candidato', candidatoGate])
+
+      fs.rmSync(candidatoGate, { force: true })
+
+      const arnesOk = {
+        'vacío falla': vacio.code !== 0 && /0 piezas que verificar/.test(vacio.salida),
+        'pieza faltante de la cobertura falla': conAviso.code !== 0 && /Faltan piezas del manifiesto de COBERTURA/.test(conAviso.salida),
+        'un aviso nuevo es una diferencia': conAviso.code !== 0 && /Cambian los AVISOS/.test(conAviso.salida) && /aviso de prueba del arnés/.test(conAviso.salida),
+        'referencia hermética': hermetica,
+        'sin manifiesto de cobertura falla': sinManifiesto.code !== 0 && /no existe el manifiesto de cobertura/.test(sinManifiesto.salida),
+        'un cambio del veredicto del gate es una diferencia': conGate.code !== 0 && /Cambia el VEREDICTO del gate/.test(conGate.salida) && /el gate suma: ✗ .*voz-de-prueba/.test(conGate.salida)
+      }
+
+      const detalleArnes = Object.entries(arnesOk).map(([k, v]) => `${k} ${v ? '✓' : '✗'}`).join(' · ')
+
+      if (P02_RAPIDO) return { ok: Object.values(arnesOk).every(Boolean), detalle: `arnés: ${detalleArnes} (sin la regresión completa: --p02-rapido)` }
+
+      try {
+        // `--conservar`: P08 y P09 leen las 86 piezas que deja la regresión; la suite borra esa carpeta al final.
+        const r = await run(process.execPath, [REGRESION, '--ref', REF, '--candidato', COMPOSITOR, '--conservar'], { cwd: ROOT, timeout: 60 * 60e3, maxBuffer: 64e6 })
+
+        harness = r.stdout.match(/Reporte: (\S+)/)?.[1]
+
+        return { ok: Object.values(arnesOk).every(Boolean), detalle: `${r.stdout.split('\n').filter(l => /^Iguales|^🔵|^ℹ️/.test(l)).join(' · ')} · arnés: ${detalleArnes}`, evidencia: harness }
+      } catch (e) {
+        harness = String(e.stdout).match(/Reporte: (\S+)/)?.[1]
+
+        return { ok: false, detalle: `${String(e.stdout).split('\n').filter(l => /^Iguales|^🔴|^🟠|^🟡|^🟣|^⚪|^⛔/.test(l)).join(' · ')} · arnés: ${detalleArnes}`, evidencia: harness }
+      }
+    }
+  },
+  {
+    id: 'P03', nombre: 'Guarda de sujeto: el texto nunca toca a una persona',
+    async correr() {
+      const encima = pieza('rec_916')
+
+      encima.top = 0.3
+      const [kv07, movida, sana] = await Promise.all([componer('P03-kv07', [pieza('kv07_916')]), componer('P03-encima', [encima]), componer('P03-sana', [pieza('rec_916')])])
+      const tapa = r => !r.ok && /tapa al sujeto/.test(r.error)
+
+      // Una pieza que aborta no deja archivos suyos (antes quedaban el layout, el SVG de controles y la evidencia).
+      const rastro = fs.existsSync(path.join(movida.dir, 'out')) ? fs.readdirSync(path.join(movida.dir, 'out'), { recursive: true }).filter(f => String(f).includes(encima.id)) : []
+
+      // Caché envenenada: una máscara en negro del MISMO tamaño en una caché aislada. El compositor debe verificar la
+      // huella de la entrada, regenerarla y abortar igual; confiar en la caché dejaría el texto sobre la persona.
+      const cacheAislada = path.join(TMP, 'P03-cache')
+      const shaPlate = sha(fs.readFileSync(encima.plate))
+
+      fs.mkdirSync(cacheAislada, { recursive: true })
+      for (const ext of ['png', 'json']) if (fs.existsSync(path.join(MASCARAS, `${shaPlate}.${ext}`))) fs.copyFileSync(path.join(MASCARAS, `${shaPlate}.${ext}`), path.join(cacheAislada, `${shaPlate}.${ext}`))
+      const { width: mw, height: mh } = await sharp(encima.plate).metadata()
+
+      fs.writeFileSync(path.join(cacheAislada, `${shaPlate}.png`), await sharp({ create: { width: mw, height: mh, channels: 3, background: '#000' } }).extractChannel(0).png().toBuffer())
+      const envenenada = await componer('P03-envenenada', [encima], [], { FOTO_MASCARAS_DIR: cacheAislada })
+
+      const ok = tapa(kv07) && tapa(movida) && sana.ok && !rastro.length && tapa(envenenada)
+
+      return { ok, detalle: `KV-07-916 aborta: ${tapa(kv07)} (${kv07.error?.slice(0, 90)}) · texto movido sobre la persona aborta: ${tapa(movida)} (${movida.error?.slice(0, 90)}) · sin archivos tras abortar: ${!rastro.length}${rastro.length ? ` (${rastro.join(', ')})` : ''} · con la caché envenenada también aborta: ${tapa(envenenada)} · original compone: ${sana.ok}` }
+    }
+  },
+  {
+    id: 'P04', nombre: 'Crecer respira: el texto crecido queda a ≥ 3,5 % del sujeto (medición independiente)',
+    async correr() {
+      const claves = ['mo2_916', 'mo1_169', 'rec_916', 'ele_169', 'fue_916']
+      const rs = await Promise.all(claves.map(k => componer(`P04-${k}`, [pieza(k)])))
+      const filas = []
+      let ok = true
+
+      for (const [i, r] of rs.entries()) {
+        if (!r.ok) { ok = false; filas.push(`${claves[i]} no compuso: ${r.error}`); continue }
+        const p = pieza(claves[i])
+        const q = r.qa[0]
+        const L = leer(r.dir, `${p.id}-layout.json`)
+        const E = leer(r.dir, `${p.id}-cta-evidence.json`)
+        const W = L.canvas.width, H = L.canvas.height
+        const m = await leerMascara(p.plate)
+        const cajas = [...L.elements.filter(e => TEXTO.has(e.id)), { id: 'boton', box: E.surface }]
+        const d = Math.min(...cajas.map(c => distanciaAlSujeto(m, c.box, W, H, Math.min(W, H) * 0.1)))
+        const exigido = Math.min(W, H) * 0.035 - 1
+
+        crecidas[claves[i]] = { dir: r.dir, id: p.id, qa: q }
+        const bien = q.escala <= 1 || d >= exigido
+
+        ok &&= bien
+        filas.push(`${p.id} ×${q.escala.toFixed(2)} → ${Number.isFinite(d) ? `${((d / Math.min(W, H)) * 100).toFixed(2)} %` : 'sin sujeto cerca'} ${bien ? '✓' : '✗'}`)
+      }
+
+      // Una prueba de crecimiento donde nada crece no prueba nada (auditor adversarial, 2026-09-23): con la
+      // segmentación rota, las piezas quedan a ×1 y la prueba pasaba de oficio.
+      const crecieron = Object.values(crecidas).filter(c => c.qa.escala > 1).length
+
+      if (crecieron < 3) { ok = false; filas.push(`sólo ${crecieron} pieza(s) crecieron: la prueba no tiene qué medir`) }
+
+      return { ok, detalle: filas.join(' · ') }
+    }
+  },
+  {
+    id: 'P05', nombre: 'Crecer no degrada el contraste de ninguna voz',
+    async correr() {
+      const filas = []
+      let ok = true
+
+      for (const [k, c] of Object.entries(crecidas)) {
+        const fija = { ...pieza(k), textGrowth: false }
+        const r = await componer(`P05-${k}`, [fija])
+
+        if (!r.ok) { ok = false; filas.push(`${k} fija no compuso: ${r.error}`); continue }
+        const base = r.qa[0].contraste
+        // Techo por tipo (contrato AXIS): texto 4,5:1; un LÍMITE no textual —el relleno del CTA contra la escena— 3:1.
+        const techo = v => (/superficie|relleno|borde/.test(v) ? 3 : 4.5)
+        const peores = Object.entries(base).filter(([v, x]) => (c.qa.contraste[v] ?? 0) < Math.min(x, techo(v)) - 0.05)
+        const fijaEsUno = r.qa[0].escala === 1
+        // Tramo 2: el TRAZO de cada voz, con margen — umbral × 1,1 o lo que ya tenía a ×1 (menos 0,05 de ruido).
+        const trazoBase = Object.entries(r.qa[0].accesibilidad?.voces ?? {}).filter(([, m]) => m?.glifo)
+        const trazoPeor = trazoBase.filter(([v, m]) => (c.qa.accesibilidad?.voces?.[v]?.glifo?.wcag ?? 0) < Math.min(m.glifo.wcag - 0.05, m.glifo.umbralWcag * 1.1) - 0.01)
+
+        ok &&= !peores.length && fijaEsUno && trazoBase.length > 0 && !trazoPeor.length
+        filas.push(`${c.id} ×${c.qa.escala.toFixed(2)}: ${peores.length || trazoPeor.length ? `✗ ${[...peores.map(([v, x]) => `${v} ${x}→${c.qa.contraste[v]}`), ...trazoPeor.map(([v, m]) => `trazo ${v} ${m.glifo.wcag}→${c.qa.accesibilidad.voces[v].glifo.wcag}`)].join(', ')}` : '✓'}${fijaEsUno ? '' : ' (textGrowth:false no congeló)'}${trazoBase.length ? '' : ' (sin medición del trazo)'}`)
+      }
+
+      if (!Object.keys(crecidas).length) return { ok: false, detalle: 'depende de P04' }
+
+      // Una pieza donde el PISO DEL TRAZO es el que frena (hallazgo 16; visto por la puntuación de mutantes el
+      // 2026-09-23): desde el tramo 3, a 01-fuera-916 la frena antes su reserva editorial, y un mutante sin el piso del
+      // trazo pasaba. Sin la reserva, el trazo vuelve a ser el freno: crecida y fija se comparan con la misma regla.
+      const libre = pieza('fue_916')
+
+      delete libre.editorialReserve
+      const [crecidaLibre, fijaLibre] = await Promise.all([componer('P05-fue-libre', [libre]), componer('P05-fue-libre-fija', [{ ...structuredClone(libre), textGrowth: false }])])
+
+      if (!crecidaLibre.ok || !fijaLibre.ok) {
+        ok = false
+        filas.push(`01-fuera-916 sin reserva no compuso: ${crecidaLibre.error ?? fijaLibre.error}`)
+      } else {
+        const base = Object.entries(fijaLibre.qa[0].accesibilidad.voces).filter(([, m]) => m?.glifo)
+        const vc = crecidaLibre.qa[0].accesibilidad.voces
+        const peor = base.filter(([v, m]) => (vc[v]?.glifo?.wcag ?? 0) < Math.min(m.glifo.wcag - 0.05, m.glifo.umbralWcag * 1.1) - 0.01)
+
+        ok &&= base.length > 0 && !peor.length && crecidaLibre.qa[0].escala > 1
+        filas.push(`01-fuera-916 sin reserva ×${crecidaLibre.qa[0].escala.toFixed(2)}: ${peor.length ? `✗ ${peor.map(([v, m]) => `trazo ${v} ${m.glifo.wcag}→${vc[v]?.glifo?.wcag}`).join(', ')}` : '✓'}`)
+      }
+
+      return { ok, detalle: filas.join(' · ') }
+    }
+  },
+  {
+    id: 'P06', nombre: 'Zona segura declarada y eje del bloque',
+    async correr() {
+      // Sin P04 (corrida parcial), P06 compone su propia pieza crecida: una prueba no depende del orden de otra.
+      let rec = crecidas.rec_916
+
+      if (!rec) {
+        const r = await componer('P06-rec', [pieza('rec_916')])
+
+        rec = r.ok ? { dir: r.dir, id: r.qa[0].id, qa: r.qa[0] } : null
+      }
+
+      let dentro = false
+      let detalleA = 'no compuso 02-reconoces-916'
+
+      if (rec) {
+        const p = pieza('rec_916')
+        const L = leer(rec.dir, `${p.id}-layout.json`)
+        const E = leer(rec.dir, `${p.id}-cta-evidence.json`)
+        const W = L.canvas.width, H = L.canvas.height, a = p.safeArea
+        const cajas = [...L.elements.filter(e => TEXTO.has(e.id)).map(e => e.box), E.surface, ...E.geometry.cursorEvidence.map(c => c.bounds)]
+        const fuera = cajas.filter(b => b.left < a.x0 * W - 0.5 || b.right > a.x1 * W + 0.5 || b.top < a.y0 * H - 0.5 || b.bottom > a.y1 * H + 0.5)
+
+        dentro = !fuera.length
+        detalleA = `02-reconoces-916 ×${rec.qa.escala.toFixed(2)} dentro de su safeArea: ${dentro}`
+      }
+
+      const izquierda = pieza('ref_916')
+
+      Object.assign(izquierda, { align: 'left' })
+      delete izquierda.centerX
+      Object.assign(izquierda.cta, { align: 'left', x: 0.08 })
+
+      const conIA = anc => {
+        const p = pieza('mo2_916')
+
+        p.textGrowth = false
+        p.cta.seleccion = { cursores: [{ id: 'usuario', kind: 'local', anchor: 'end-center' }, { id: 'ia', kind: 'collaborator', anchor: anc, label: 'IA', who: 'role' }] }
+
+        return p
+      }
+
+      // Zona protegida (tramo 2): un objeto de la escena que el texto no puede tapar aunque no sea una persona.
+      const protegida = pieza('mo2_916')
+
+      protegida.textGrowth = false
+      protegida.protect = [{ box: [0, 0, 1, 0.5], reason: 'prueba: toda la mitad superior protegida' }]
+
+      // Tramo 3: invariantes de maquetación compartidas por búsqueda, composición y gate.
+      const firmaEncima = pieza('mo2_916')
+
+      firmaEncima.textGrowth = false
+      firmaEncima.logo = { ...firmaEncima.logo, y: firmaEncima.top ?? 0.05 }
+      // Firma EXTERNA declarada sobre el texto: el compositor la reserva y aborta (la pondría otra herramienta encima).
+      const externaEncima = pieza('mo2_916')
+
+      externaEncima.textGrowth = false
+      delete externaEncima.logo
+      externaEncima.firma = { modo: 'externa', razon: 'prueba: la firma la pone firmar.mjs' }
+      externaEncima.signatureY = 0.25
+      const reservaChica = pieza('mo2_916')
+
+      reservaChica.textGrowth = false
+      reservaChica.editorialReserve = { maxBottom: 200, maxRight: 900 }
+
+      const enCanon = await componer('P06-canon', [canon('b2_916')])
+      // Con "axis" el texto también arranca dentro de la zona por arriba: p1-cta-contorno declara top 0,05 y feed pide 6 %.
+      // Tramo 12: sin su selección del titular, cuyo marco tapa la entrada en el canon nuevo (se prueba aparte).
+      const p1SinSeleccion = canon('p1_45')
+
+      delete p1SinSeleccion.selection
+      const arriba = await componer('P06-axis-arriba', [p1SinSeleccion])
+      let respetaArriba = false
+
+      if (arriba.ok) {
+        const La = leer(arriba.dir, 'p1-cta-contorno-layout.json')
+
+        respetaArriba = Math.min(...La.maquetacion.elementos.filter(e => e.tipo !== 'firma').map(e => e.box.top)) >= 0.06 * La.canvas.height - 0.5
+      }
+
+      // La zona declarada como freno: mo1-canal-nuevo-169 crece ×1,6 sin sujeto cerca; con el borde derecho de la zona a
+      // 5 % del ancho de su texto a ×1, sólo la zona puede detener el crecimiento.
+      const fija = { ...pieza('mo1_169'), textGrowth: false }
+      const rFija = await componer('P06-zona-base', [fija])
+      let zonaFrena = false
+      let detalleZona = 'no compuso la base'
+
+      if (rFija.ok) {
+        const Lf = leer(rFija.dir, `${fija.id}-layout.json`)
+        const derecha = Math.max(...Lf.elements.filter(e => TEXTO.has(e.id)).map(e => e.box.right))
+        const x1 = +(derecha / Lf.canvas.width + 0.05).toFixed(3)
+        const acotada = { ...pieza('mo1_169'), safeArea: { x0: 0.05, y0: 0.04, x1, y1: 0.96 } }
+        const rZona = await componer('P06-zona-frena', [acotada])
+
+        if (rZona.ok) {
+          const Lz = leer(rZona.dir, `${acotada.id}-layout.json`)
+          const derechaZ = Math.max(...Lz.elements.filter(e => TEXTO.has(e.id)).map(e => e.box.right))
+
+          zonaFrena = rZona.qa[0].escala > 1 && rZona.qa[0].escala < 1.5 && derechaZ <= x1 * Lz.canvas.width + 0.5
+          detalleZona = `×${rZona.qa[0].escala.toFixed(2)}, texto hasta ${(derechaZ / Lz.canvas.width).toFixed(3)} con la zona en ${x1}`
+        } else detalleZona = rZona.error
+      }
+
+      let zonaAxis = false
+      let enColumna = false
+      let firmaAuto = false
+
+      if (enCanon.ok) {
+        const p = canon('b2_916')
+        const L = leer(enCanon.dir, `${p.id}-layout.json`)
+        const q = enCanon.qa[0]
+        const W = L.canvas.width, H = L.canvas.height
+        // Medición propia: story de AXIS = 10 % a los lados y 13 % arriba y abajo.
+        const dentro = b => b.left >= 0.1 * W - 0.5 && b.right <= 0.9 * W + 0.5 && b.top >= 0.13 * H - 0.5 && b.bottom <= 0.87 * H + 0.5
+        const cajas = L.maquetacion.elementos.filter(e => e.tipo !== 'acento')
+
+        zonaAxis = cajas.length > 0 && cajas.every(e => dentro(e.box))
+        const boton = cajas.find(e => e.id === 'cta-boton')?.box
+        const desc = cajas.find(e => e.id === 'descriptor')?.box
+
+        enColumna = Boolean(boton && desc) && Math.abs(boton.left - L.columna) <= 1 && Math.abs(desc.left - L.columna) <= 1
+        const logo = cajas.find(e => e.id === 'logo')?.box
+
+        // Tramo 6: debajo de todo lo compuesto, y con el trazo medido ≥ 4,5:1 (no sólo la caja).
+        const contenido = Math.max(...cajas.filter(e => e.tipo !== 'firma').map(e => e.box.bottom))
+
+        firmaAuto = q.firma?.auto === true && q.firma.encontrada === true && Boolean(logo) && dentro(logo) && logo.top >= contenido && q.contraste.logo >= 4.5 && q.firma.trazo?.cumpleWcag === true && Math.abs(q.firma.anchoLadoCorto - 0.2) <= 0.005
+      }
+
+      // Tramo 9: la firma automática respeta las zonas `protect` (la primera versión las leía con otra forma y las
+      // ignoraba). Se protege el lugar donde cayó la firma en la pieza canónica: tiene que ir a otra Y.
+      let respetaProtect = false
+      let cuartoInferior = false
+      let detalleProtect = 'sin la pieza canónica'
+
+      if (enCanon.ok) {
+        const L0 = leer(enCanon.dir, 'b2-primero-el-numero-916-layout.json')
+        const lg = L0.maquetacion.elementos.find(e => e.id === 'logo')?.box
+
+        if (lg) {
+          const [cw, ch] = [L0.canvas.width, L0.canvas.height]
+          const zona = [Math.max(0, lg.left / cw - 0.02), Math.max(0, lg.top / ch - 0.01), Math.min(1, lg.right / cw + 0.02), Math.min(1, lg.bottom / ch + 0.01)].map(v => +v.toFixed(4))
+          const conProtect = canon('b2_916')
+
+          conProtect.protect = [{ box: zona, reason: 'prueba: un detalle del plate que la firma no puede tapar' }]
+          const rp = await componer('P06-firma-protect', [conProtect])
+
+          if (rp.ok) {
+            const Lp = leer(rp.dir, 'b2-primero-el-numero-916-layout.json')
+            const nuevo = Lp.maquetacion.elementos.find(e => e.id === 'logo')?.box
+            const [x0, y0, x1, y1] = zona.map((v, i) => v * (i % 2 ? Lp.canvas.height : Lp.canvas.width))
+
+            // Tramo 11: con el pie protegido y el sujeto ocupando el resto del cuarto inferior, en el canon nuevo la firma puede
+            // no encontrar lugar (y el gate la bloquea al pie); lo que no puede es tapar la zona protegida ni subir.
+            respetaProtect = Boolean(nuevo) && !(nuevo.left < x1 && nuevo.right > x0 && nuevo.top < y1 && nuevo.bottom > y0)
+            // Tramo 11: en el canon nuevo la búsqueda sólo recorre el cuarto inferior (antes subía a media pieza).
+            cuartoInferior = Boolean(nuevo) && nuevo.top >= 0.75 * Lp.canvas.height - 0.5
+            detalleProtect = `firma en ${nuevo ? Math.round(nuevo.top) : '—'} px, zona protegida ${Math.round(y0)}–${Math.round(y1)} px`
+          } else detalleProtect = rp.error
+        }
+      }
+
+      // KV-06-169 al canon: la búsqueda subía hasta encima del titular (auditoría de diseño, N1). Ahora la firma queda en
+      // la banda del pie o no se encuentra (y entonces el gate la mide al pie); nunca por encima del contenido.
+      const kv06 = await componer('P06-firma-banda', [canon('kv06_169')])
+      let firmaEnBanda = false
+      let detalleBanda = kv06.ok ? '' : kv06.error
+
+      if (kv06.ok) {
+        const L = leer(kv06.dir, 'KV-06-169-layout.json')
+        const logo = L.maquetacion.elementos.find(e => e.id === 'logo')?.box
+        const contenido = Math.max(...L.maquetacion.elementos.filter(e => e.tipo !== 'firma' && e.tipo !== 'acento').map(e => e.box.bottom))
+
+        firmaEnBanda = Boolean(logo) && logo.top >= contenido
+        detalleBanda = `firma en ${logo ? Math.round(logo.top) : '—'} px, contenido hasta ${Math.round(contenido)} px, encontrada ${kv06.qa[0].firma?.encontrada}`
+      }
+
+      const [original, alineada, choca, cabe, tapaZona, firmaSobre, fueraReserva, v03, externaSobre] = await Promise.all([componer('P06-eje', [pieza('ref_916')]), componer('P06-izquierda', [izquierda]), componer('P06-choque', [conIA('top-end')]), componer('P06-cabe', [conIA('bottom-end')]), componer('P06-protect', [protegida]), componer('P06-firma', [firmaEncima]), componer('P06-reserva', [reservaChica]), componer('P06-v03', [pieza('v03_fue')]), componer('P06-firma-externa', [externaEncima])])
+
+      // Tramo 7: una excepción «reserva-editorial» cambia el veredicto del gate, nunca cuánto crece la pieza (antes crecía
+      // ×1,251 en vez de ×1,236). Oráculo: la misma escala con y sin la excepción.
+      // Tramo 11: las dos en el canon vigente (declararlo cambia la huella) para que la ÚNICA diferencia sea la excepción.
+      const v03Nueva = pieza('v03_fue')
+      const v03Exc = pieza('v03_fue')
+
+      v03Nueva.canon = '2026-09-23'
+      v03Exc.canon = '2026-09-23'
+      // Tramo 14: en el canon vigente la zona de AXIS por defecto ya frenaba el crecimiento antes que la reserva y la excepción
+      // no cambiaba nada (el mutante t7 sobrevivía). Con una zona declarada amplia, la que frena vuelve a ser la reserva
+      // (medido: ×1,236 con reserva, ×1,251 sin ella).
+      v03Nueva.safeArea = { x0: 0.05, y0: 0.05, x1: 0.95, y1: 0.95 }
+      v03Exc.safeArea = { x0: 0.05, y0: 0.05, x1: 0.95, y1: 0.95 }
+
+      v03Exc.excepciones = [{ regla: 'reserva-editorial', razon: 'prueba: la reserva se revisa aparte', aprobadoPor: 'suite-pruebas', plate: sha(fs.readFileSync(v03Exc.plate)), hasta: 5000 }]
+      const [conExc, sinExc] = await Promise.all([componer('P06-reserva-excepcion', [v03Exc]), componer('P06-reserva-sin-excepcion', [v03Nueva])])
+      const reservaSinEfecto = conExc.ok && sinExc.ok && conExc.qa[0].escala === sinExc.qa[0].escala
+      const protegeZona = !tapaZona.ok && /zona protegida/.test(tapaZona.error)
+      const firmaRechazada = !firmaSobre.ok && /choca con «logo»|«logo» choca/.test(firmaSobre.error)
+      const externaRechazada = !externaSobre.ok && /choca con «firma-externa»|«firma-externa» choca/.test(externaSobre.error)
+      // La reserva no aborta la composición (hay piezas aprobadas con reservas que nadie verificaba): la bloquea el gate.
+      const gReserva = fueraReserva.ok ? await gate(fueraReserva.planPath) : { code: -1, salida: fueraReserva.error }
+      const reservaRechazada = gReserva.code !== 0 && /fuera de la reserva editorial/.test(gReserva.salida)
+      let dentroReserva = false
+
+      if (v03.ok) {
+        // Medición independiente: todo lo dibujado (menos la firma) dentro de la reserva que declara el plan.
+        const p = pieza('v03_fue')
+        const L = leer(v03.dir, `${p.id}-layout.json`)
+        const dibujado = L.maquetacion.elementos.filter(e => e.tipo !== 'firma')
+
+        dentroReserva = dibujado.length > 0 && Math.max(...dibujado.map(e => e.box.right)) <= p.editorialReserve.maxRight + 0.5 && Math.max(...dibujado.map(e => e.box.bottom)) <= p.editorialReserve.maxBottom + 0.5
+      }
+
+      const choqueRechazado = !choca.ok && /tapa «nota»/.test(choca.error)
+      // Tramo 11 (canon 2026-09-23): una pieza NUEVA sin `safeArea` usa la zona de AXIS; el 16:9 nuevo crece con esa zona
+      // (el marco del CTA que no se pinta ya no lo frena).
+      const sinZona = canon('b2_916')
+
+      delete sinZona.safeArea
+      const [rSinZona, rCrece] = await Promise.all([componer('P06-zona-por-defecto', [sinZona]), componer('P06-crece-169', [canon('mo1_169')])])
+      let zonaPorDefecto = false
+
+      if (rSinZona.ok) {
+        const Lz = leer(rSinZona.dir, 'b2-primero-el-numero-916-layout.json')
+        const z = rSinZona.qa[0].zonaSegura
+
+        zonaPorDefecto = rSinZona.qa[0].canon === '2026-09-23' && Lz.elements.filter(e => TEXTO.has(e.id)).every(e => e.box.left >= z.x0 * Lz.canvas.width - 0.5 && e.box.top >= z.y0 * Lz.canvas.height - 0.5)
+      }
+
+      const creceConZona = rCrece.ok && rCrece.qa[0].escala > 1.2
+
+      // Tramo 12 (cuarta certificación, N1): el marco de la selección del titular y los corchetes del CTA entran en las
+      // invariantes del canon nuevo; un cursor no tapa las letras de su destino; la columna deja lugar a los corchetes; y en
+      // una pieza aprobada el marco que tapa una voz se avisa (no se mueve nada aprobado).
+      const conCursorLocal = canon('b2_916')
+      const corchetesSobreNota = canon('b2_916')
+      const ctaTexto = canon('b2_916')
+
+      conCursorLocal.selection = { variant: 'eight-handles', padding: 'standard', cursors: [{ id: 'yo', kind: 'local', anchor: 'top-start' }] }
+      Object.assign(corchetesSobreNota.cta, { variant: 'text', gapAfterNote: 0 })
+      Object.assign(ctaTexto.cta, { variant: 'text' })
+      const [rMarcoP1, rCursorLocal, rCorchetes, rCtaTexto, rP1Legado] = await Promise.all([componer('P06-marco-titular', [canon('p1_45')]), componer('P06-cursor-local', [conCursorLocal]), componer('P06-corchetes-nota', [corchetesSobreNota]), componer('P06-cta-texto', [ctaTexto]), componer('P06-p1-legado', [pieza('p1_45')])])
+      const marcoTitularRechazado = !rMarcoP1.ok && /marco de la selección del titular tapa «/.test(rMarcoP1.error)
+      const cursorRechazado = !rCursorLocal.ok && /cursor «yo» tapa «dominante»/.test(rCursorLocal.error)
+      const corchetesRechazados = !rCorchetes.ok && /marco de la selección del CTA tapa «nota»/.test(rCorchetes.error)
+      const reservaCorchetes = rCtaTexto.ok && !(rCtaTexto.qa[0].fueraDeZona ?? []).some(id => /seleccion|cursor|marco/.test(id))
+      const legadoAvisa = rP1Legado.ok && rP1Legado.qa[0].canon === '2026-09-22' && /marco de la selección del titular tapa «/.test(rP1Legado.salida) && (rP1Legado.qa[0].marcoSobreVoz ?? []).length > 0
+      // Tramo 10: una selección sobre un OBJETO de la foto no tapa ninguna voz —ni con el marco, ni con el cursor o la
+      // etiqueta— (auditorías de arquitectura y de diseño, hallazgo 1: las manijas cruzaban el titular con el gate en 0).
+      const sobreObjeto = canon('b2_916')
+
+      sobreObjeto.selection = { box: [0.3, 0.2, 0.8, 0.3], targetKind: 'object', cursors: [{ id: 'cliente', kind: 'collaborator', anchor: 'top-start', label: 'Cliente', who: 'role' }] }
+      const objeto = await componer('P06-seleccion-objeto', [sobreObjeto])
+      const objetoRechazado = !objeto.ok && /marco de la selección sobre el objeto tapa «/.test(objeto.error)
+      const ejeRechazado = !original.ok && /eje corrido/.test(original.error)
+      let margen = false
+
+      if (alineada.ok) {
+        const L = leer(alineada.dir, '03-referencia-916-layout.json')
+
+        margen = Math.min(...L.elements.filter(e => TEXTO.has(e.id)).map(e => e.box.left)) >= izquierda.safeArea.x0 * L.canvas.width - 0.5
+      }
+
+      return { ok: marcoTitularRechazado && cursorRechazado && corchetesRechazados && reservaCorchetes && legadoAvisa && zonaPorDefecto && creceConZona && cuartoInferior && objetoRechazado && dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona && firmaRechazada && reservaRechazada && dentroReserva && zonaAxis && enColumna && firmaAuto && zonaFrena && externaRechazada && respetaArriba && firmaEnBanda && reservaSinEfecto && respetaProtect, detalle: `marco de la selección del titular sobre el texto rechazado: ${marcoTitularRechazado}${marcoTitularRechazado ? '' : ` (${rMarcoP1.error ?? 'compuso'})`} · cursor sobre el titular rechazado: ${cursorRechazado}${cursorRechazado ? '' : ` (${rCursorLocal.error ?? 'compuso'})`} · corchetes del CTA de texto sobre la nota rechazados: ${corchetesRechazados}${corchetesRechazados ? '' : ` (${rCorchetes.error ?? 'compuso'})`} · la columna deja lugar a los corchetes del CTA de texto: ${reservaCorchetes}${rCtaTexto.ok ? ` (fuera de zona: ${(rCtaTexto.qa[0].fueraDeZona ?? []).join(', ') || 'nada'})` : ` (${rCtaTexto.error})`} · la pieza aprobada con el marco sobre una voz compone y avisa: ${legadoAvisa} · zona AXIS por defecto en una pieza nueva: ${zonaPorDefecto}${rSinZona.ok ? '' : ` (${rSinZona.error})`} · el 16:9 nuevo crece con la zona AXIS: ${creceConZona} (×${rCrece.ok ? rCrece.qa[0].escala : rCrece.error}) · la firma automática del canon nuevo queda en el cuarto inferior: ${cuartoInferior} · selección sobre un objeto que tapa el texto rechazada: ${objetoRechazado}${objetoRechazado ? '' : ` (${objeto.error ?? 'compuso'})`} · la firma automática respeta las zonas protect: ${respetaProtect} (${detalleProtect}) · crecer no usa la excepción de la reserva: ${reservaSinEfecto}${conExc.ok ? '' : ` (${conExc.error})`} · la firma automática nunca sube por encima del contenido (KV-06-169): ${firmaEnBanda} (${detalleBanda}) · con "axis" el texto arranca dentro de la zona por arriba: ${respetaArriba}${arriba.ok ? '' : ` (${arriba.error})`} · firma externa sobre el texto rechazada: ${externaRechazada} · crecimiento frenado por la zona declarada: ${zonaFrena} (${detalleZona}) · zona de AXIS con safeArea "axis": ${zonaAxis}${enCanon.ok ? '' : ` (${enCanon.error})`} · CTA y descriptor en la columna: ${enColumna} · firma automática 20 % legible dentro de la zona: ${firmaAuto} · ${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona} · firma sobre el texto rechazada: ${firmaRechazada} · texto fuera de la reserva editorial rechazado: ${reservaRechazada} · v03 01-fuera-916 compone dentro de su reserva: ${dentroReserva}${v03.ok ? '' : ` (${v03.error})`}` }
+    }
+  },
+  {
+    id: 'P07', nombre: 'Validación: un plan mal escrito falla ANTES de componer, nombrando pieza y campo',
+    async correr() {
+      const base = () => pieza('p1_45')
+      const sinFont = base()
+      const token = base()
+      const final = base()
+      const muda = base()
+      const plate = base()
+      const ignorar = base()
+      const extra = base()
+      const ancla = base()
+      const prom = base()
+
+      delete sinFont.cta.fontSize
+      token.cta.surfaceToken = 'accentSurfce'
+      final.final = [1080, 1080]
+      delete muda.dominant
+      delete muda.lead
+      delete muda.label
+      plate.plate = path.join(ROOT, 'no/existe.png')
+      ignorar.subjectGuard = { ignore: [{ box: [0, 0, 0.1, 0.1] }] }
+      extra.colorFondo = '#000'
+      delete extra.selection
+      ancla.cta.seleccion = { cursores: [{ id: 'ia', kind: 'collaborator', anchor: 'end-center', label: 'IA', who: 'role' }] }
+      Object.assign(prom.cta, { variant: 'auto', prominencia: 'enorme' })
+      // Tramo 1 de la certificación (2026-09-23): el id es parte de rutas de archivo; una guarda no se apaga entera
+      // ni sin nombre de quien lo aprobó; un nulo no es un valor.
+      const idMalo = base()
+      const ignorarTodo = base()
+      const sinAprobador = base()
+      const nulo = base()
+
+      idMalo.id = '../fuera'
+      ignorarTodo.subjectGuard = { ignore: [{ box: [0, 0, 1, 1], reason: 'no hay sujeto en esta foto', aprobadoPor: 'prueba' }] }
+      sinAprobador.subjectGuard = { ignore: [{ box: [0, 0, 0.05, 0.05], reason: 'afiche del fondo detectado' }] }
+      nulo.cta.fontSize = null
+      // Tramo 3: un carácter que la fuente no tiene saldría como un cuadro vacío.
+      const emoji = base()
+      const hebreo = base()
+
+      emoji.cta.text = 'Hablemos 🚀'
+      hebreo.lead = 'שלום a todos'
+      // Tramo 8: rangos, entidades fuera de Unicode, ids que sólo difieren en mayúsculas, plate ilegible y columna en un
+      // bloque centrado (auditoría de arquitectura, hallazgos 4, 14, N6 y N10).
+      const tracking = base()
+      const diminuto = base()
+      const entidad = base()
+      const mayus = base()
+      const ilegible = base()
+      const centrada = base()
+
+      tracking.dominantTracking = -0.45
+      diminuto.final = [8, 10]
+      entidad.lead = 'Hola &#99999999; mundo'
+      mayus.id = mayus.id.toUpperCase()
+      fs.mkdirSync(path.join(TMP, 'P07-plates'), { recursive: true })
+      ilegible.plate = path.join(TMP, 'P07-plates', 'roto.png')
+      fs.writeFileSync(ilegible.plate, 'esto no es una imagen')
+      centrada.align = 'center'
+      centrada.cta.x = 'columna'
+      // Tramo 10 (auditorías de la tercera certificación): espacios que la fuente no tiene, texto sin tinta, zona de la
+      // firma incompleta, estado interno inyectado, escalas sin techo, un `final` que se aleja de lo medido y una firma
+      // externa fuera de la imagen.
+      const espacioFino = base()
+      const espacioIdeografico = base()
+      const sinTinta = base()
+      const zonaFirma = base()
+      const interno = base()
+      const escala = base()
+      const lejano = base()
+      const firmaFuera = base()
+      const conVelo = base()
+
+      // En `cta.text` (Poppins, que no tiene U+202F): la entrada de p1 va en Bricolage, que sí lo tiene y lo dibuja bien.
+      espacioFino.cta.text = 'Hablemos\u202Fya'
+      espacioIdeografico.dominant = 'Hola\u3000mundo'
+      sinTinta.dominant = '\u200B'
+      zonaFirma.signatureSafeArea = { x0: 0.1 }
+      interno.ctaVarianteResuelta = { elegida: 'solid', tokens: { surfaceToken: 'inkOnDark', inkToken: 'inkOnDark' } }
+      escala.cta.cursorScale = 4.5
+      // p1-cta-contorno mide 1152×1440: 900×1125 es la misma proporción al 78 % (piso: 85 % del máster).
+      lejano.final = [900, 1125]
+      delete firmaFuera.logo
+      firmaFuera.firma = { modo: 'externa', razon: 'prueba: la firma la pone firmar.mjs' }
+      firmaFuera.signatureY = 0.995
+      conVelo.scrimTop = { opacity: 0.8, to: 0.42, color: '#050818' }
+      // Tramo 12 (cuarta certificación): marcado donde se dibujaría literal, entidades, saltos de línea, `placement` chico
+      // y un plate con transparencia.
+      const marcado = base()
+      const entidadLiteral = base()
+      const salto = base()
+      const pantallaChica = base()
+      const conAlfa = base()
+
+      marcado.cta.text = 'Agenda tu **discovery**'
+      entidadLiteral.lead = 'Marketing &amp; ventas'
+      salto.dominant = 'Uno\ndos'
+      pantallaChica.placement = { anchoCssPx: 15, razon: 'prueba: una pantalla diminuta' }
+      conAlfa.plate = path.join(TMP, 'P07-plates', 'con-alfa.png')
+      await sharp(base().plate).ensureAlpha(0.5).png().toFile(conAlfa.plate)
+      // Tramo 13 (quinta certificación, N2 y N3): transparencia en 16 bits y en gris con alfa, que el chequeo por
+      // `channels[3].min < 255` no veía, y una entidad con dígitos en el nombre.
+      const alfa16 = base()
+      const grisAlfa = base()
+      const entidadDigito = base()
+
+      alfa16.plate = path.join(TMP, 'P07-plates', 'alfa-16-bits.png')
+      grisAlfa.plate = path.join(TMP, 'P07-plates', 'gris-con-alfa.png')
+      await sharp(base().plate).ensureAlpha(0.5).toColourspace('rgb16').png().toFile(alfa16.plate)
+      await sharp(base().plate).greyscale().ensureAlpha(0.5).toColourspace('b-w').png().toFile(grisAlfa.plate)
+      entidadDigito.cta.text = 'Cotiza tus 50 m&sup2;'
+      // Tramo 14 (sexta certificación, O1 e Y7): un plate SVG que enlaza la foto y una entidad sin punto y coma.
+      const conSvg = base()
+      const entidadSinPunto = base()
+      const { width: anchoSvg, height: altoSvg } = await sharp(base().plate).metadata()
+
+      fs.copyFileSync(base().plate, path.join(TMP, 'P07-plates', 'foto-enlazada.png'))
+      conSvg.plate = path.join(TMP, 'P07-plates', 'enlaza-la-foto.svg')
+      fs.writeFileSync(conSvg.plate, `<svg xmlns="http://www.w3.org/2000/svg" width="${anchoSvg}" height="${altoSvg}"><image href="foto-enlazada.png" width="${anchoSvg}" height="${altoSvg}"/></svg>`)
+      entidadSinPunto.lead = 'Marketing &amp ventas'
+      // Tramo 15 (séptima, R1 y diseño N2): una tilde escrita como entidad sin punto y coma, y el CTA centrado en un bloque
+      // alineado a la izquierda.
+      const entidadTilde = base()
+      const ctaCentrado = base()
+
+      entidadTilde.cta.text = 'Agenda tu caf&eacute hoy'
+      delete ctaCentrado.cta.x
+      ctaCentrado.cta.align = 'center'
+      // Tramo 16 (octava): un invisible que parte una entidad, la barra en la etiqueta de un cursor y un plate chico sin `final`.
+      const entidadPartida = base()
+      const barraEtiqueta = base()
+      const plateChico = base()
+
+      entidadPartida.cta.text = 'Agenda tu caf&\u200Beacute hoy'
+      barraEtiqueta.cta.seleccion = { cursores: [{ id: 'eq', kind: 'collaborator', anchor: 'bottom-end', label: 'Tu|marca', who: 'department' }] }
+      plateChico.plate = path.join(TMP, 'P07-plates', 'chico.png')
+      delete plateChico.final
+      await sharp(base().plate).resize(432, 768, { fit: 'fill' }).removeAlpha().png().toFile(plateChico.plate)
+
+      const casos = [
+        ['falta cta.fontSize', [sinFont], [], /falta `cta\.fontSize`/],
+        ['ids repetidos', [base(), base()], [], /ids repetidos/],
+        ['id pedido inexistente', [base()], ['no-existe'], /no están en el plan: no-existe/],
+        ['token de color inexistente', [token], [], /`cta\.surfaceToken` debe ser uno de/],
+        ['final con otra proporción', [final], [], /no tiene la proporción/],
+        ['pieza muda', [muda], [], /pieza muda/],
+        ['plate inexistente', [plate], [], /no existe el plate/],
+        ['zona ignorada sin razón', [ignorar], [], /reason/],
+        ['colaborador anclado fuera de una esquina (regla AXIS)', [ancla], [], /collaborator-anchor-not-corner/],
+        ['prominencia inexistente', [prom], [], /prominencia/],
+        ['id con ruta (../)', [idMalo], [], /`id`: sólo letras/],
+        ['guarda de sujeto apagada entera', [ignorarTodo], [], /una guarda no se apaga entera/],
+        ['zona ignorada sin quien la aprobó', [sinAprobador], [], /aprobadoPor/],
+        ['campo obligatorio en null', [nulo], [], /falta `cta\.fontSize`/],
+        ['emoji que la fuente no tiene', [emoji], [], /`cta\.text` usa caracteres que su fuente no tiene.*U\+1F680/],
+        ['hebreo que la fuente no tiene', [hebreo], [], /`lead` usa caracteres que su fuente no tiene/],
+        ['tracking del dominante fuera de rango', [tracking], [], /`dominantTracking` debe ser ≥ -0\.08/],
+        ['final diminuto', [diminuto], [], /`final\.0` debe ser ≥ 320/],
+        ['entidad fuera de Unicode', [entidad], [], /`lead` trae una entidad que no es un carácter Unicode: &#99999999;/],
+        ['ids que sólo difieren en mayúsculas', [base(), mayus], [], /sólo difieren en mayúsculas/],
+        ['plate ilegible, con su pieza', [ilegible], [], /p1-cta-contorno: el plate .* no es una imagen legible/],
+        ['columna en un bloque centrado', [centrada], [], /«columna» es la columna del texto alineado a la izquierda/],
+        ['espacio U+202F que la fuente no tiene', [espacioFino], [], /`cta\.text` usa caracteres que su fuente no tiene.*U\+202F/],
+        ['espacio U+3000 que la fuente no tiene', [espacioIdeografico], [], /`dominant` usa caracteres que su fuente no tiene.*U\+3000/],
+        ['texto sin tinta (U+200B)', [sinTinta], [], /`dominant` no tiene nada que dibujar/],
+        ['zona de la firma incompleta', [zonaFirma], [], /falta `signatureSafeArea\.y0`/],
+        ['campo interno en la raíz', [interno], [], /`ctaVarianteResuelta`: campo interno del compositor/],
+        ['escala del cursor sin techo', [escala], [], /`cta\.cursorScale` debe ser ≤ 1\.2/],
+        ['final que se aleja de lo medido', [lejano], [], /reduce demasiado la pieza/],
+        ['firma externa fuera de la imagen', [firmaFuera], [], /firma-externa .* cae fuera de la imagen/],
+        ['velo (el lecho sale del prompt)', [conVelo], [], /`scrimTop`: el velo no se usa/],
+        ['marcado en el CTA', [marcado], [], /`cta\.text` no admite `\*\*`/],
+        ['entidad que se dibujaría literal', [entidadLiteral], [], /`lead` trae la entidad «&amp;»/],
+        ['salto de línea que sale como cuadro', [salto], [], /`dominant` trae un salto de línea/],
+        ['placement bajo 320 CSS px', [pantallaChica], [], /`placement\.anchoCssPx` debe ser ≥ 320/],
+        ['plate con transparencia', [conAlfa], [], /tiene transparencia/],
+        ['plate con transparencia en 16 bits', [alfa16], [], /tiene transparencia/],
+        ['plate gris con alfa', [grisAlfa], [], /tiene transparencia/],
+        ['entidad con dígitos en el nombre', [entidadDigito], [], /`cta\.text` trae la entidad «&sup2;»/],
+        ['plate SVG que enlaza la foto', [conSvg], [], /es svg: usa una imagen raster/],
+        ['entidad sin punto y coma', [entidadSinPunto], [], /`lead` trae la entidad «&amp» sin punto y coma/],
+        ['tilde escrita como entidad sin punto y coma', [entidadTilde], [], /`cta\.text` trae la entidad «&eacute» sin punto y coma/],
+        ['CTA centrado en un bloque a la izquierda', [ctaCentrado], [], /`cta\.align: "center"` en un bloque alineado a la izquierda/],
+        ['entidad partida por un carácter invisible', [entidadPartida], [], /`cta\.text` trae la entidad «&eacute» sin punto y coma/],
+        ['barra en la etiqueta de un cursor', [barraEtiqueta], [], /`cta\.seleccion\.cursores\.0\.label` trae `\|`/],
+        ['plate bajo 780 px sin final', [plateChico], [], /el plate mide 432×768 y se entrega así/]
+      ]
+
+      const rs = await Promise.all(casos.map(([, piezas, ids], i) => componer(`P07-${i}`, piezas, ids)))
+
+      const filas = casos.map(([n, , , re], i) => {
+        const r = rs[i]
+        const sinPng = !fs.existsSync(path.join(r.dir, 'out', 'p1-cta-contorno.png'))
+        const bien = !r.ok && re.test(r.error) && sinPng
+
+        return { n, bien, error: r.error }
+      })
+
+      const aviso = await componer('P07-aviso', [extra])
+      const avisa = aviso.ok && /campos que este comando no lee — colorFondo/.test(aviso.salida)
+
+      return { ok: filas.every(f => f.bien) && avisa, detalle: `${filas.map(f => `${f.n} ${f.bien ? '✓' : `✗ (${f.error})`}`).join(' · ')} · campo desconocido avisa y compone: ${avisa}` }
+    }
+  },
+  {
+    id: 'P08', nombre: 'Cortes de línea: sin viudas ni líneas que terminan en palabra corta',
+    async correr() {
+      const fuentes = []
+
+      if (harness) {
+        for (const r of JSON.parse(fs.readFileSync(harness, 'utf8')).resultados.filter(x => x.cand === 'compone')) fuentes.push([r.id, JSON.parse(fs.readFileSync(path.join(r.dir, 'cand/out/qa-piezas.json'), 'utf8'))[0]])
+      } else {
+        for (const c of Object.values(crecidas)) fuentes.push([c.id, c.qa])
+      }
+
+      const malos = []
+
+      for (const [id, q] of fuentes) {
+        for (const voz of ['entrada', 'cierre', 'nota']) for (const d of defectosCorte(q.lineas?.[voz] ?? [])) malos.push(`${id} ${voz}: ${d}`)
+      }
+
+      // Cero piezas revisadas no es un pase (auditor adversarial, 2026-09-23).
+      return { ok: fuentes.length > 0 && !malos.length, detalle: `${fuentes.length} piezas revisadas · ${malos.length} defectos${malos.length ? `: ${malos.slice(0, 6).join(' · ')}` : ''}` }
+    }
+  },
+  {
+    id: 'P09', nombre: 'Accesibilidad y contraste: WCAG 2.2 AA por voz, límites del CTA, alternativa completa',
+    async correr() {
+      const fuentes = []
+      const claves = ['mo2_916', 'mo1_169', 'fue_916', 'p1_45', 'rec_916']
+      // ORÁCULO INDEPENDIENTE (tramo 2; hallazgo 16: P09 se verificaba a sí misma). Con FOTO_EVIDENCIA=1 el compositor
+      // deja la capa de texto sola y el fondo sin texto; más abajo se recalcula, con aritmética propia de WCAG, el 1 %
+      // peor del trazo de cada voz, y se mide en el PNG final el grosor del borde del contorno.
+      const evid = await componer('P09-evidencia', claves.map(pieza), [], { FOTO_EVIDENCIA: '1' })
+
+      if (harness) {
+        for (const r of JSON.parse(fs.readFileSync(harness, 'utf8')).resultados.filter(x => x.cand === 'compone')) {
+          fuentes.push([r.id, JSON.parse(fs.readFileSync(path.join(r.dir, 'cand/out/qa-piezas.json'), 'utf8'))[0], JSON.parse(fs.readFileSync(path.join(r.dir, 'cand/piezas.json'), 'utf8'))[0]])
+        }
+      } else if (evid.ok) {
+        // Corrida parcial (sin P02): las piezas del set de evidencia hacen de fuente, para que P09 pruebe algo solo.
+        for (const q of evid.qa) fuentes.push([q.id, q, claves.map(pieza).find(p => p.id === q.id)])
+      }
+
+      const fallas = []
+      const incompletas = []
+      const conBoton = []
+      const sinRol = []
+      let avisos = 0
+
+      for (const [id, q, p] of fuentes) {
+        const a = q.accesibilidad
+
+        if (!a) { fallas.push(`${id} sin medición`); continue }
+
+        for (const [v, m] of Object.entries(a.voces)) {
+          if (m && !m.cumpleWcag) fallas.push(`${id}:${v} ${m.wcag}<${m.umbralWcag}`)
+          if (m && (m.cumpleApca === false || m.cumpleDaltonismo === false)) avisos++
+        }
+
+        // Sin distinguir mayúsculas: si la descripción de la escena ya dice el texto («…sé la referencia…»), la alternativa
+        // no lo repite (tramo 4), y un lector de pantalla lo lee igual en mayúscula o minúscula.
+        const alt = a.altText.toLowerCase()
+        const faltan = [p.lead, p.dominant, p.after, p.note?.text, p.cta?.text, p.cta?.descriptor].map(plano).filter(t => t && !alt.includes(t.toLowerCase()))
+
+        if (faltan.length) incompletas.push(`${id}: ${faltan.join(' / ')}`)
+        if (/Botón:/.test(a.altText)) conBoton.push(id)
+        // Tramo 8: el rol del CTA se anuncia SIEMPRE, aunque la escena cite su texto (en v07 lo perdían las 15 piezas).
+        if (p.cta && !/Llamado a la acción/.test(a.altText)) sinRol.push(id)
+      }
+
+      // Hallazgos del TRAZO en las piezas del repo: se reportan, no hacen fallar la prueba — son de las piezas, no del
+      // comando (el gate las rechaza). Lo que esta prueba exige es que la medición sea correcta.
+      const trazos = fuentes.flatMap(([id, q]) => Object.entries(q.accesibilidad?.voces ?? {}).filter(([, m]) => m?.glifo && !m.glifo.cumpleWcag).map(([v, m]) => `${id}:${v} ${m.glifo.wcag}<${m.glifo.umbralWcag}`))
+
+      fs.writeFileSync(path.join(TMP, 'P09-trazos-bajo-umbral.json'), JSON.stringify(trazos, null, 2))
+
+
+      const lin = c => {
+        const v = c / 255
+
+        return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4
+      }
+
+      const lumO = (r, g, b) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+      const razon = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)
+      const desacuerdos = []
+      const delgados = []
+      let vocesOraculo = 0
+      let bordes = 0
+
+      for (const q of evid.ok ? evid.qa : []) {
+        const tx = await sharp(path.join(evid.dir, 'out', `${q.id}-texto.png`)).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+        const fo = await sharp(path.join(evid.dir, 'out', `${q.id}-fondo.png`)).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+        const ancho = tx.info.width
+
+        for (const [voz, m] of Object.entries(q.accesibilidad.voces)) {
+          if (!m?.glifo) continue
+          const [l, t, r, b] = m.glifo.caja
+          const rs = []
+
+          for (let y = t; y < b; y++) {
+            for (let x = l; x < r; x++) {
+              const j = (y * ancho + x) * 4
+
+              if (tx.data[j + 3] < 128) continue
+              const i = (y * ancho + x) * 3
+
+              rs.push(razon(lumO(tx.data[j], tx.data[j + 1], tx.data[j + 2]), lumO(fo.data[i], fo.data[i + 1], fo.data[i + 2])))
+            }
+          }
+
+          rs.sort((a, b2) => a - b2)
+          const p1 = rs[Math.min(rs.length - 1, Math.floor(rs.length * 0.01))]
+
+          vocesOraculo++
+          if (!rs.length || Math.abs(p1 - m.glifo.wcag) > 0.011) desacuerdos.push(`${q.id}:${voz} QA ${m.glifo.wcag} · oráculo ${p1?.toFixed(3)}`)
+        }
+
+        if (!q.accesibilidad.voces['cta-borde']) continue
+        // Grosor del borde en el PNG final: filas cuyo color está a menos de 60 del color del borde, en el centro del
+        // tramo superior. Se lleva a CSS px de un teléfono de 390 px de ancho.
+        const E = leer(evid.dir, `${q.id}-cta-evidence.json`)
+        const L = leer(evid.dir, `${q.id}-layout.json`)
+        const png = await sharp(path.join(evid.dir, 'out', `${q.id}.png`)).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+        const k = png.info.width / L.canvas.width
+        const [br, bg, bb] = [1, 3, 5].map(i => parseInt(E.colors.surface.slice(i, i + 2), 16))
+        const cx = Math.round(((E.surface.left + E.surface.right) / 2) * k)
+        let filas = 0
+
+        for (let y = Math.floor((E.surface.top - 12) * k); y <= Math.ceil((E.surface.top + 12) * k); y++) {
+          const i = (y * png.info.width + cx) * 3
+
+          if (Math.max(Math.abs(png.data[i] - br), Math.abs(png.data[i + 1] - bg), Math.abs(png.data[i + 2] - bb)) <= 60) filas++
+        }
+
+        const css = (filas * 390) / png.info.width
+
+        bordes++
+        if (css < 0.95 || !q.accesibilidad.voces['cta-borde'].anillo) delgados.push(`${q.id} ${css.toFixed(2)} CSS px${q.accesibilidad.voces['cta-borde'].anillo ? '' : ' (sin anillo en el QA)'}`)
+      }
+
+      // Las pruebas unitarias de los módulos puros (WCAG, APCA, Machado, variantes) también son parte de esta prueba.
+      const unitarias = await run(process.execPath, ['--test', 'scripts/foto/accesibilidad.test.mjs', 'scripts/foto/cta-variantes.test.mjs', 'scripts/foto/cta-invariantes.test.mjs', 'scripts/foto/svg-texto.test.mjs', 'scripts/foto/cta-integridad.test.mjs', 'scripts/foto/cta-esquema.test.mjs'], { cwd: ROOT }).then(() => true, () => false)
+
+      // Y la herramienta de reporte corre sobre un plan compuesto y deja las vistas de daltonismo.
+      // El plan de P04 si corrió; si no, el del set de evidencia (que también trae mo2-no-te-citan-916).
+      const dirReporte = crecidas.mo2_916?.dir ?? (evid.ok ? evid.dir : null)
+      const plan = dirReporte && path.join(dirReporte, 'piezas.json')
+      let reporte = false
+
+      if (plan) {
+        await run(process.execPath, [REPORTE_A11Y, plan], { cwd: ROOT })
+        reporte = fs.existsSync(path.join(dirReporte, 'out/accesibilidad/reporte.md')) && fs.existsSync(path.join(dirReporte, 'out/accesibilidad/mo2-no-te-citan-916-daltonismo.png'))
+      }
+
+      return {
+        ok: fuentes.length > 0 && !fallas.length && !incompletas.length && !conBoton.length && !sinRol.length && reporte && evid.ok && vocesOraculo > 0 && !desacuerdos.length && bordes > 0 && !delgados.length && unitarias,
+        detalle: `${fuentes.length} piezas · voces bajo WCAG AA: ${fallas.length}${fallas.length ? ` (${fallas.slice(0, 4).join(', ')})` : ''} · alternativas incompletas: ${incompletas.length}${incompletas.length ? ` (${incompletas.slice(0, 3).join('; ')})` : ''} · anuncian «Botón»: ${conBoton.length} · sin el rol del CTA: ${sinRol.length}${sinRol.length ? ` (${sinRol.slice(0, 3).join(', ')})` : ''} · avisos APCA/daltonismo: ${avisos} · reporte y vistas de daltonismo: ${reporte} · oráculo del trazo: ${evid.ok ? `${vocesOraculo} voces, ${desacuerdos.length} desacuerdos${desacuerdos.length ? ` (${desacuerdos.slice(0, 3).join('; ')})` : ''}` : `no compuso (${evid.error})`} · bordes ≥ 1 CSS px: ${bordes - delgados.length}/${bordes}${delgados.length ? ` (${delgados.join(', ')})` : ''} · unitarias: ${unitarias} · piezas del repo con trazo bajo umbral: ${trazos.length}`,
+        evidencia: plan && path.join(dirReporte, 'out/accesibilidad/reporte.md')
+      }
+    }
+  },
+  {
+    id: 'P10', nombre: 'Gate: aprueba lo bueno y rechaza QA incompleto, viejo, CTA sin acento y voz bajo WCAG',
+    async correr() {
+      const bueno = await componer('P10-bueno', [canon('b2_916'), canonLegible169('b2_169')])
+      const gBueno = bueno.ok ? await gate(bueno.planPath) : { code: -1, salida: bueno.error }
+
+      // Corrida parcial: recompone una pieza y el QA conserva la otra (antes iba a un `qa-parcial.json` aparte).
+      const parcial = bueno.ok ? await run(process.execPath, [COMPOSITOR, bueno.planPath, 'b2-primero-el-numero-916'], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 }).then(() => true, () => false) : false
+      const gParcial = parcial ? await gate(bueno.planPath) : { code: -1, salida: 'la corrida parcial no compuso' }
+
+      // Dos planes en la MISMA carpeta: cada uno con su QA; componer el segundo no invalida al primero.
+      const dirDos = path.join(TMP, 'P10-dos-planes')
+
+      fs.mkdirSync(dirDos, { recursive: true })
+      fs.writeFileSync(path.join(dirDos, 'piezas-a.json'), JSON.stringify([canon('b2_916')], null, 2))
+      fs.writeFileSync(path.join(dirDos, 'piezas-b.json'), JSON.stringify([canonLegible169('b2_169')], null, 2))
+      const dos = await ['piezas-a.json', 'piezas-b.json'].reduce((cadena, f) => cadena.then(ok => ok && run(process.execPath, [COMPOSITOR, path.join(dirDos, f)], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 }).then(() => true, () => false)), Promise.resolve(true))
+      const [gDosA, gDosB] = dos ? [await gate(path.join(dirDos, 'piezas-a.json')), await gate(path.join(dirDos, 'piezas-b.json'))] : [{ code: -1 }, { code: -1 }]
+
+      // QA incompleto: se quita una fila.
+      const incompleto = await componer('P10-incompleto', [pieza('b2_916'), pieza('b2_169')])
+
+      if (incompleto.ok) fs.writeFileSync(path.join(incompleto.dir, 'out/qa-piezas.json'), JSON.stringify(incompleto.qa.slice(0, 1)))
+      const gIncompleto = await gate(incompleto.planPath)
+
+      // HUELLAS (tramo 1, 2026-09-23): el QA vale sólo para el plan, el plate y el PNG que lo produjeron. Se prueba sobre
+      // UNA composición, alterando una cosa por vez y restaurándola antes de la siguiente.
+      const h = await componer('P10-huellas', [canon('b2_916')])
+      const idH = 'b2-primero-el-numero-916'
+      const archivo = rel => path.join(h.dir, rel)
+      // El QA de la pieza tiene que estar en qa-<plan>.json; sin él, los casos que lo alteran fallan sin reventar.
+      const qaPorPlan = fs.existsSync(archivo('out/qa-piezas.json'))
+
+      const conCambio = async (rel, cambiar) => {
+        // Si el archivo no está donde debe (p. ej. el QA no quedó en qa-<plan>.json), el caso falla sin reventar la prueba.
+        if (!fs.existsSync(archivo(rel))) return { code: -1, salida: `falta ${rel}` }
+        const original = fs.readFileSync(archivo(rel))
+
+        cambiar(archivo(rel), original)
+        const g = await gate(h.planPath)
+
+        fs.writeFileSync(archivo(rel), original)
+
+        return g
+      }
+
+      const futuro = new Date(Date.now() + 60e3)
+
+      fs.utimesSync(h.planPath, futuro, futuro)
+      // La FECHA ya no decide: tocar el plan sin cambiar su contenido no invalida el QA.
+      const gFecha = await gate(h.planPath)
+
+      const gPlan = await conCambio('piezas.json', (f, o) => {
+        const plan = JSON.parse(o)
+
+        plan[0].cta.variantReason = 'cambio posterior a la composición'
+        fs.writeFileSync(f, JSON.stringify(plan, null, 2))
+      })
+
+      const gPng = await conCambio(`out/${idH}.png`, f => fs.copyFileSync(archivo(`out/preview-390/${idH}.png`), f))
+
+      const editarQa = cambio => conCambio('out/qa-piezas.json', (f, o) => {
+        const q = JSON.parse(o)
+
+        cambio(q[0])
+        fs.writeFileSync(f, JSON.stringify(q))
+      })
+
+      const gSinMascara = await editarQa(r => { r.guardaSujeto = 'sin-mascara' })
+      const gNulo = await editarQa(r => { r.accesibilidad.voces.cta = null })
+      const gSinHuellas = await editarQa(r => { delete r.huellas })
+
+      const gTrazo = await editarQa(r => {
+        const v = Object.values(r.accesibilidad.voces).find(m => m?.glifo)
+
+        Object.assign(v.glifo, { wcag: 2.1, cumpleWcag: false })
+      })
+
+      const gSinMetodo = await editarQa(r => { for (const m of Object.values(r.accesibilidad.voces)) if (m) delete m.metodo })
+
+      // Layout alterado CON su huella al día: el gate no confía en el QA, recalcula las invariantes y lo rechaza.
+      const layoutRel = `out/${idH}-layout.json`
+      let gMaquetacion = { code: -1, salida: 'falta el QA o el layout' }
+
+      if (qaPorPlan && fs.existsSync(archivo(layoutRel))) {
+        const layoutOriginal = fs.readFileSync(archivo(layoutRel))
+        const qaOriginal = fs.readFileSync(archivo('out/qa-piezas.json'))
+        const Lmal = JSON.parse(layoutOriginal)
+        const cajaDom = Lmal.maquetacion.elementos.find(e => e.id === 'dominante').box
+
+        Lmal.maquetacion.elementos.push({ id: 'firma-de-prueba', tipo: 'firma', box: { ...cajaDom } })
+        const layoutMal = JSON.stringify(Lmal, null, 2)
+
+        fs.writeFileSync(archivo(layoutRel), layoutMal)
+        const qaMal = JSON.parse(qaOriginal)
+
+        qaMal[0].huellas.layout = sha(layoutMal)
+        fs.writeFileSync(archivo('out/qa-piezas.json'), JSON.stringify(qaMal))
+        gMaquetacion = await gate(h.planPath)
+
+        fs.writeFileSync(archivo(layoutRel), layoutOriginal)
+        fs.writeFileSync(archivo('out/qa-piezas.json'), qaOriginal)
+      }
+
+      // Piso perceptual del CTA (APCA y daltonismo bloquean desde el 2026-09-23): se altera sólo esa medición.
+      const gPerceptual = await editarQa(r => {
+        Object.assign(r.accesibilidad.voces.cta, { apca: 30, umbralApca: 60, cumpleApca: false })
+      })
+
+      const gAnillo = await editarQa(r => {
+        const b = r.accesibilidad.voces['cta-borde']
+
+        if (b?.anillo) Object.assign(b.anillo, { wcag: 1.8, cumpleWcag: false })
+      })
+
+      // TRAMO 6 · «no certificable» no es un pase (auditoría de arquitectura, N1, N2 y N4): sale con 3, no con 0.
+      const gComando = await editarQa(r => { r.huellas.compositor = 'otra-version-del-comando' })
+      const gTrazoFirma = await editarQa(r => { Object.assign(r.firma.trazo, { wcag: 2.2, cumpleWcag: false, pctBajoUmbral: 12 }) })
+      // Tramo 9 (auditoría de arquitectura, N5: un gate con 9 guardas apagadas pasaba P10): cada guarda del canon con
+      // un caso que la hace fallar, alterando sólo su medición en el QA.
+      const gFirmaCaja = await editarQa(r => { r.contraste.logo = 3.1 })
+      const gFirmaSujeto = await editarQa(r => { r.firmaSobreSujeto = 420 })
+      const gJerarquia = await editarQa(r => { r.ratioDominanteEntrada = 2.1 })
+      const gSinRolAlt = await editarQa(r => { r.accesibilidad.altText = 'Una escena. Texto en la imagen: «Hola»' })
+      const gCtaCaja = await editarQa(r => { r.contraste.cta = 3.9 })
+      const gDescriptorCaja = await editarQa(r => { r.contraste.descriptor = 3.2 })
+      // El CTA medido como «texto grande» (3:1) no pasa: el gate no le cree al umbral que trae el QA (tramo 7).
+      const gCtaGrande = await editarQa(r => { Object.assign(r.accesibilidad.voces.cta, { umbralWcag: 3, wcag: 3.8, cumpleWcag: true }) })
+      // Un cierre más grande que el dominante: se cambia la tipografía del layout y se re-firma su huella.
+      let gDominante = { code: -1, salida: 'falta el layout' }
+
+      if (fs.existsSync(archivo(`out/${idH}-layout.json`)) && qaPorPlan) {
+        const rutaL = archivo(`out/${idH}-layout.json`)
+        const rutaQ = archivo('out/qa-piezas.json')
+        const [lOrig, qOrig] = [fs.readFileSync(rutaL), fs.readFileSync(rutaQ)]
+        const L = JSON.parse(lOrig)
+
+        L.typography.closure = L.typography.dominant + 12
+        const nuevo = JSON.stringify(L, null, 2)
+        const q = JSON.parse(qOrig)
+
+        q[0].huellas.layout = sha(Buffer.from(nuevo))
+        fs.writeFileSync(rutaL, nuevo)
+        fs.writeFileSync(rutaQ, JSON.stringify(q))
+        gDominante = await gate(h.planPath)
+        fs.writeFileSync(rutaL, lOrig)
+        fs.writeFileSync(rutaQ, qOrig)
+      }
+
+      // La firma automática por encima del contenido: se sube la caja del logo en el layout y se re-firma su huella, para
+      // que el gate llegue a la regla (si no, lo frena la huella del layout, que es otra guarda).
+      let gFirmaArriba = { code: -1, salida: 'falta el layout' }
+
+      if (fs.existsSync(archivo(`out/${idH}-layout.json`)) && qaPorPlan) {
+        const rutaL = archivo(`out/${idH}-layout.json`)
+        const rutaQ = archivo('out/qa-piezas.json')
+        const [lOrig, qOrig] = [fs.readFileSync(rutaL), fs.readFileSync(rutaQ)]
+        const L = JSON.parse(lOrig)
+        const logo = L.maquetacion.elementos.find(e => e.id === 'logo')
+
+        if (logo) {
+          const alto = logo.box.bottom - logo.box.top
+
+          logo.box.top = 10
+          logo.box.bottom = 10 + alto
+          const nuevo = JSON.stringify(L, null, 2)
+          const q = JSON.parse(qOrig)
+
+          q[0].huellas.layout = sha(Buffer.from(nuevo))
+          q[0].firma = { ...q[0].firma, auto: true, encontrada: true }
+          fs.writeFileSync(rutaL, nuevo)
+          fs.writeFileSync(rutaQ, JSON.stringify(q))
+          gFirmaArriba = await gate(h.planPath)
+        }
+
+        fs.writeFileSync(rutaL, lOrig)
+        fs.writeFileSync(rutaQ, qOrig)
+      }
+
+      // Certificación por reproducción: lo entregado idéntico → certifica; un layout alterado → lo rechaza.
+      const gReproduce = h.ok ? await gate(h.planPath, ['--reproducir']) : { code: -1, salida: h.error }
+      let gReproduceMal = { code: -1, salida: 'falta el layout' }
+
+      if (fs.existsSync(archivo(`out/${idH}-layout.json`))) {
+        const rutaL = archivo(`out/${idH}-layout.json`)
+        const orig = fs.readFileSync(rutaL)
+
+        fs.writeFileSync(rutaL, Buffer.concat([orig, Buffer.from(' ')]))
+        gReproduceMal = await gate(h.planPath, ['--reproducir'])
+        fs.writeFileSync(rutaL, orig)
+      }
+
+      // Caché de máscaras ajena: la primera composición segmenta (fresca); la segunda lee esa caché (ajena al repo).
+      const cacheAjena = path.join(TMP, 'P10-cache-ajena')
+      const ajena1 = await componer('P10-cache-ajena-1', [canon('b2_916')], [], { FOTO_MASCARAS_DIR: cacheAjena })
+      const ajena2 = await componer('P10-cache-ajena-2', [canon('b2_916')], [], { FOTO_MASCARAS_DIR: cacheAjena })
+      const ajenaFresca = ajena1.ok && ajena1.qa[0].mascara?.origen === 'fresca'
+      const ajenaCache = ajena2.ok && ajena2.qa[0].mascara?.origen === 'cache-externa'
+      const gAjena = ajena2.ok ? await gate(ajena2.planPath) : { code: -1, salida: ajena2.error }
+      // Gesto manuscrito: compone, pero no se certifica (decisión del operador 2026-09-23: fuera de alcance).
+      const conGesto = canon('b2_916')
+
+      conGesto.gesture = { text: 'mírala', size: 110, x: 0.3, y: 0.66 }
+      const rGesto = await componer('P10-gesto', [conGesto])
+      const gGesto = rGesto.ok ? await gate(rGesto.planPath) : { code: -1, salida: rGesto.error }
+
+      let gLegado = { code: -1, salida: 'falta out/qa-piezas.json' }
+
+      if (qaPorPlan) {
+        fs.renameSync(archivo('out/qa-piezas.json'), archivo('out/qa.json'))
+        gLegado = await gate(h.planPath)
+        fs.renameSync(archivo('out/qa.json'), archivo('out/qa-piezas.json'))
+      }
+
+      // Plate cambiado: una copia del plate, compuesta y alterada después (el real no se toca).
+      const conPlate = pieza('b2_916')
+      const dirPlate = path.join(TMP, 'P10-plate-origen')
+
+      fs.mkdirSync(dirPlate, { recursive: true })
+      const copia = path.join(dirPlate, `plate${path.extname(conPlate.plate)}`)
+
+      fs.copyFileSync(conPlate.plate, copia)
+      conPlate.plate = copia
+      const plateC = await componer('P10-plate', [conPlate])
+
+      fs.writeFileSync(copia, await sharp(fs.readFileSync(copia)).modulate({ brightness: 1.02 }).toBuffer())
+      const gPlate = plateC.ok ? await gate(plateC.planPath) : { code: -1, salida: plateC.error }
+
+      // Tramo 9: dos planes de la misma carpeta con el MISMO id. Componer el segundo avisa que invalida al primero.
+      const dirMismo = path.join(TMP, 'P10-mismo-id')
+
+      fs.mkdirSync(dirMismo, { recursive: true })
+      fs.writeFileSync(path.join(dirMismo, 'piezas-a.json'), JSON.stringify([canon('b2_916')], null, 2))
+      fs.writeFileSync(path.join(dirMismo, 'piezas-b.json'), JSON.stringify([canon('b2_916')], null, 2))
+      const componerEn = f => run(process.execPath, [COMPOSITOR, path.join(dirMismo, f)], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 }).then(r => r.stdout + r.stderr, e => String(e.stdout ?? '') + String(e.stderr ?? ''))
+      const salidaMismo = await componerEn('piezas-a.json').then(() => componerEn('piezas-b.json'))
+
+      // Dos composiciones en la MISMA carpeta a la vez: una se rechaza (antes se empalmaban, 7 de 8 corridas).
+      const dirC = path.join(TMP, 'P10-concurrente')
+
+      fs.mkdirSync(dirC, { recursive: true })
+      fs.writeFileSync(path.join(dirC, 'piezas.json'), JSON.stringify([pieza('b2_916')], null, 2))
+      const correr = () => run(process.execPath, [COMPOSITOR, path.join(dirC, 'piezas.json')], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 }).then(() => 'ok', e => String(e.stderr ?? '') + String(e.stdout ?? ''))
+      const concurrentes = await Promise.all([correr(), correr()])
+
+      // Tramo 4: el canon hecho regla, con excepción auditada.
+      const sinFirma = canon('b2_916')
+      const firmaChica = canon('b2_916')
+      const firmaChicaAuditada = canon('b2_916')
+      const sinCierre = canon('b2_916')
+      const reducida = canon('b2_916')
+
+      delete sinFirma.logo
+      firmaChica.logo.width = 0.1
+      firmaChicaAuditada.logo.width = 0.1
+      // Tramo 7: la excepción nombra un aprobador del registro, el sha del plate y el tope que aprueba (`hasta`).
+      const plateB2 = sha(fs.readFileSync(firmaChicaAuditada.plate))
+      const excepcionFirma = extra => [{ regla: 'firma-tamano', razon: 'prueba: la marca del partner manda en esta pieza', aprobadoPor: 'suite-pruebas', plate: plateB2, hasta: 0.09, ...extra }]
+
+      firmaChicaAuditada.excepciones = excepcionFirma({})
+
+      const [excAjeno, excOtroPlate, excSinTope, excFueraTope] = [{ aprobadoPor: 'abc' }, { plate: '0'.repeat(64) }, { hasta: undefined }, { hasta: 0.15 }].map(extra => {
+        const p = canon('b2_916')
+
+        p.logo.width = 0.1
+        p.excepciones = excepcionFirma(extra).map(e => JSON.parse(JSON.stringify(e)))
+
+        return p
+      })
+
+      // Salida sin medir (pieza sin firma) sin aprobador; placement de escritorio con una entrada que falla en el teléfono.
+      const sinFirmaSinAprob = canon('b2_916')
+
+      delete sinFirmaSinAprob.logo
+      sinFirmaSinAprob.firma = { modo: 'sin-firma', razon: 'prueba: el cliente pidió la pieza sin marca' }
+      const escritorio = canon('b2_916')
+
+      escritorio.leadFill = '#707070'
+      escritorio.placement = { anchoCssPx: 1600, razon: 'prueba: se publica en el sitio de escritorio' }
+      delete sinCierre.after
+      delete reducida.after
+      reducida.conceptoReducido = { razon: 'prueba: pieza de recordación de una sola frase', aprobadoPor: 'suite-pruebas', plate: plateB2 }
+      // Firma externa declarada (la pone otra herramienta): el gate la acepta como declaración y mide su contrato.
+      const externa = canon('b2_916')
+
+      delete externa.logo
+      externa.firma = { modo: 'externa', razon: 'prueba: la firma la pone firmar.mjs' }
+      externa.signatureY = 0.9
+      // La forma que ya usan los planes v05–v07: sólo `signatureY`, sin `firma` ni `logo`.
+      const externaLegado = canon('b2_916')
+
+      delete externaLegado.logo
+      externaLegado.signatureY = 0.9
+      const [rExterna, rLegado] = await Promise.all([componer('P10-firma-externa', [externa]), componer('P10-firma-signatureY', [externaLegado])])
+      const gExterna = rExterna.ok ? await gate(rExterna.planPath) : { code: -1, salida: rExterna.error }
+      const gLegadoFirma = rLegado.ok ? await gate(rLegado.planPath) : { code: -1, salida: rLegado.error }
+      // Y si donde va la firma el fondo no da 4,5:1, el gate lo rechaza (se altera sólo esa medición del QA).
+      let gExternaMala = { code: -1, salida: 'no compuso' }
+
+      if (rExterna.ok) {
+        const qaExt = path.join(rExterna.dir, 'out/qa-piezas.json')
+        const q = JSON.parse(fs.readFileSync(qaExt, 'utf8'))
+
+        q[0].contraste.firmaExterna = 2.1
+        fs.writeFileSync(qaExt, JSON.stringify(q))
+        gExternaMala = await gate(rExterna.planPath)
+      }
+
+      const rs4 = await Promise.all([['P10-sin-firma', sinFirma], ['P10-firma-chica', firmaChica], ['P10-firma-auditada', firmaChicaAuditada], ['P10-sin-cierre', sinCierre], ['P10-reducida', reducida], ['P10-fuera-zona', pieza('b2_916')], ['P10-exc-ajeno', excAjeno], ['P10-exc-otro-plate', excOtroPlate], ['P10-exc-sin-tope', excSinTope], ['P10-exc-fuera-tope', excFueraTope], ['P10-sin-firma-sin-aprob', sinFirmaSinAprob], ['P10-escritorio', escritorio]].map(([n, p]) => componer(n, [p])))
+      const [gSinFirma, gFirmaChica, gFirmaAuditada, gSinCierre, gReducida, gFueraZona, gExcAjeno, gExcOtroPlate, gExcSinTope, gExcFueraTope, gSinFirmaSinAprob, gEscritorio] = await Promise.all(rs4.map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
+
+      // 01-fuera-916 al tamaño al que la hacía crecer el compositor anterior (×1.48, medido el 2026-09-23 en P04 sobre
+      // 27eb6bc08): la caja de sus voces pasa y el trazo, no (hallazgo 3). El gate tiene que rechazarla.
+      const vieja = pieza('fue_916')
+      const f = 1.48
+      const px = v => (typeof v === 'number' ? Math.round(v * f) : v)
+
+      vieja.textGrowth = false
+      if (vieja.lead && vieja.leadSize == null) vieja.leadSize = 70
+      if (vieja.after && vieja.afterSize == null) vieja.afterSize = 74
+      for (const k of ['leadSize', 'dominantSize', 'afterSize', 'labelSize']) vieja[k] = px(vieja[k])
+      if (vieja.note) for (const k of ['size', 'gapAfterClosure']) vieja.note[k] = px(vieja.note[k])
+      for (const k of ['fontSize', 'descriptorSize', 'paddingX', 'paddingY', 'radius', 'descriptorGap', 'gapAfterNote']) vieja.cta[k] = px(vieja.cta[k])
+      const crecida = await componer('P10-trazo-real', [vieja])
+      const gCrecida = crecida.ok ? await gate(crecida.planPath) : { code: -1, salida: crecida.error }
+      // Tramo 8: el tamaño ENTREGADO es el del plan. Una pieza con `final` más chico que el máster compone y pasa; si el PNG entregado
+      // mide otra cosa (se reemplaza por uno del plate, re-firmando su huella) el gate la rechaza.
+      const conFinal = canon('b2_916')
+
+      // 1080×1920 (94 %): dentro del piso de `final` (85 % del máster, tramo 10) y distinto del máster de 1152×2048.
+      conFinal.final = [1080, 1920]
+      const rFinal = await componer('P10-final', [conFinal])
+      const gFinal = rFinal.ok ? await gate(rFinal.planPath) : { code: -1, salida: rFinal.error }
+      let gOtroTamano = { code: -1, salida: 'no compuso' }
+
+      if (rFinal.ok) {
+        const png = path.join(rFinal.dir, 'out', `${conFinal.id}.png`)
+        const qaF = path.join(rFinal.dir, 'out', 'qa-piezas.json')
+        const otro = await sharp(conFinal.plate).png().toBuffer()
+        const q = JSON.parse(fs.readFileSync(qaF, 'utf8'))
+
+        q[0].huellas.png = sha(otro)
+        fs.writeFileSync(png, otro)
+        fs.writeFileSync(qaF, JSON.stringify(q))
+        gOtroTamano = await gate(rFinal.planPath)
+      }
+
+      // Un CTA de 58 px en 1080: ≈ 21 CSS px en negrita, «texto grande» para WCAG (3:1). El canon del CTA exige 4,5:1.
+      const grande = canon('b2_916')
+
+      grande.cta.fontSize = 58
+      const ctaGrande = await componer('P10-cta-grande', [grande])
+
+      const sinAcento = await componer('P10-sin-acento', [pieza('ref_169')])
+      const gSinAcento = await gate(sinAcento.planPath)
+
+      const oscura = pieza('p1_45')
+
+      oscura.leadFill = '#333333'
+      delete oscura.selection
+      const bajo = await componer('P10-wcag', [oscura])
+      const gBajo = await gate(bajo.planPath)
+
+      const firma = await componer('P10-firma', [pieza('mo3_916')])
+      const gFirma = await gate(firma.planPath)
+
+      const variantesPlan = await componer('P10-variantes-base', [pieza('b2_916')])
+      let hoja = false
+
+      try {
+        await run(process.execPath, [COMPOSITOR, variantesPlan.planPath, '--variantes'], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 })
+        hoja = fs.existsSync(path.join(variantesPlan.dir, 'out/variantes/b2-primero-el-numero-916.png')) && ['text', 'outline', 'solid'].every(v => fs.existsSync(path.join(variantesPlan.dir, `out/variantes/b2-primero-el-numero-916--${v}.png`)))
+      } catch {
+        hoja = false
+      }
+
+      const auto = pieza('b2_916')
+
+      Object.assign(auto.cta, { variant: 'auto', prominencia: 'discreta' })
+      const rAuto = await componer('P10-auto', [auto])
+      const eleccion = rAuto.ok ? rAuto.qa[0].ctaVariante : null
+
+      // ── Tramo 10 (tercera certificación) ──
+      const copiarBueno = nombre => {
+        const d = path.join(TMP, nombre)
+
+        fs.cpSync(bueno.dir, d, { recursive: true })
+        fs.rmSync(path.join(d, 'out', '.componer.lock'), { force: true })
+
+        return d
+      }
+
+      // El texto alternativo entregado lleva huella: reemplazarlo daba 0.
+      let gAltCambiado = { code: -1, salida: 'no compuso' }
+
+      if (bueno.ok) {
+        const d = copiarBueno('P10-alt-cambiado')
+
+        fs.writeFileSync(path.join(d, 'out', 'b2-primero-el-numero-916.alt.txt'), 'Imagen decorativa.\n')
+        gAltCambiado = await gate(path.join(d, 'piezas.json'))
+      }
+
+      // Con `--reproducir`, la fila del QA entregado tiene que ser la que produce el comando (antes no se comparaba).
+      let gFilaCambiada = { code: -1, salida: 'no compuso' }
+
+      if (bueno.ok) {
+        const d = copiarBueno('P10-fila-cambiada')
+        const qaF = path.join(d, 'out', 'qa-piezas.json')
+        const q = JSON.parse(fs.readFileSync(qaF, 'utf8'))
+
+        fs.writeFileSync(path.join(d, 'piezas.json'), JSON.stringify([canon('b2_916')], null, 2))
+        q.find(x => x.id === 'b2-primero-el-numero-916').contraste.cta = 21
+        fs.writeFileSync(qaF, JSON.stringify(q))
+        gFilaCambiada = await gate(path.join(d, 'piezas.json'), ['--reproducir'])
+      }
+
+      // `--origen` ya no es un flag público.
+      const gOrigen = await gate(bueno.planPath, ['--origen', path.join(os.tmpdir(), 'x.json')])
+
+      // Fuera de la suite (una carpeta sin su marca): el aprobador de pruebas no vale y un comando ajeno no certifica.
+      // Se compone con el compositor del repo: estas guardas son del gate.
+      const FUERA = fs.mkdtempSync(path.join(os.tmpdir(), 'foto-fuera-'))
+      const CANONICO = path.join(ROOT, 'scripts/foto/componer-cta.mjs')
+
+      const componerFuera = async (nombre, piezas) => {
+        const d = path.join(FUERA, nombre)
+        const planPath = path.join(d, 'piezas.json')
+
+        fs.mkdirSync(d, { recursive: true })
+        fs.writeFileSync(planPath, JSON.stringify(piezas, null, 2))
+
+        return run(process.execPath, [CANONICO, planPath], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 }).then(() => ({ ok: true, planPath }), e => ({ ok: false, planPath, error: String(e.stderr ?? e.message) }))
+      }
+
+      const gateFuera = (planPath, extra = []) => run(process.execPath, [GATE, planPath, ...extra], { cwd: ROOT, maxBuffer: 16e6, timeout: 20 * 60e3 }).then(r => ({ code: 0, salida: r.stdout + r.stderr }), e => ({ code: e.code ?? 1, salida: String(e.stdout ?? '') + String(e.stderr ?? '') }))
+      const fueraAprob = canon('b2_916')
+
+      delete fueraAprob.logo
+      fueraAprob.firma = { modo: 'sin-firma', razon: 'prueba: el cliente pidió la pieza sin marca', aprobadoPor: 'suite-pruebas', plate: plateB2 }
+      const [rFueraAprob, rFueraBueno] = await Promise.all([componerFuera('aprobador', [fueraAprob]), componerFuera('bueno', [canon('b2_916')])])
+      const gFueraAprob = rFueraAprob.ok ? await gateFuera(rFueraAprob.planPath) : { code: -1, salida: rFueraAprob.error }
+      const gFueraBueno = rFueraBueno.ok ? await gateFuera(rFueraBueno.planPath) : { code: -1, salida: rFueraBueno.error }
+      let gFueraAjeno = { code: -1, salida: 'no compuso' }
+
+      if (rFueraBueno.ok) {
+        const copia = path.join(FUERA, 'componer-cta.mjs')
+
+        fs.copyFileSync(CANONICO, copia)
+        gFueraAjeno = await gateFuera(rFueraBueno.planPath, ['--comando', copia])
+      }
+
+      fs.rmSync(FUERA, { recursive: true, force: true })
+
+      // El HUD no entra en ninguna guarda: no se certifica.
+      const conHud = canon('b2_916')
+
+      conHud.hud = { lit: 3 }
+      // `auto` se juzga con los tokens que se dibujaron: un QA con la superficie resuelta sin acento no pasa.
+      const autoCanon = canon('b2_916')
+
+      Object.assign(autoCanon.cta, { variant: 'auto', prominencia: 'delimitada' })
+      // El cierre con su tamaño por defecto (74 px) sobre un titular de 72: el layout registra el tamaño RESUELTO.
+      const cierreDefecto = canon('b2_916')
+
+      delete cierreDefecto.afterSize
+      Object.assign(cierreDefecto, { dominantSize: 72, leadSize: 20, textGrowth: false })
+      // Una aprobación de otro plate no vale.
+      const reducidaOtroPlate = canon('b2_916')
+
+      delete reducidaOtroPlate.after
+      reducidaOtroPlate.conceptoReducido = { razon: 'prueba: pieza de recordación de una sola frase', aprobadoPor: 'suite-pruebas', plate: '0'.repeat(64) }
+      const [rHud, rAutoCanon, rCierre, rOtroPlate] = await Promise.all([['P10-hud', conHud], ['P10-auto-canon', autoCanon], ['P10-cierre-defecto', cierreDefecto], ['P10-otro-plate', reducidaOtroPlate]].map(([n, p]) => componer(n, [p])))
+      const [gHud, gAutoCanon, gCierre, gOtroPlate] = await Promise.all([rHud, rAutoCanon, rCierre, rOtroPlate].map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
+      let gAcentoForjado = { code: -1, salida: 'no compuso' }
+
+      // ── Tramo 11 · canon 2026-09-23 (piezas nuevas) ──
+      const c11Nueva = () => canon('b2_916')
+      const c11FirmaArriba = c11Nueva()
+      const c11FirmaGigante = c11Nueva()
+      const c11Desordenada = c11Nueva()
+      const c11RolAlto = c11Nueva()
+      const c11SinAire = c11Nueva()
+      const c11ExternaNueva = c11Nueva()
+      const c11ExternaAprobada = c11Nueva()
+
+      c11FirmaArriba.logo = { width: 0.2, x: 0.5, y: 0.1 }
+      c11FirmaGigante.logo = { width: 0.45, x: 0.5, y: 'auto' }
+      Object.assign(c11Desordenada, { top: 0.3, note: { ...c11Desordenada.note, y: 0.14, gapAfterClosure: undefined } })
+      Object.assign(c11RolAlto, { dominantSize: 60, textGrowth: false })
+      // Relleno positivo pero bajo el piso de `cta-aire`: con 0 el borde toca el texto y aborta el compositor (tramo 14).
+      Object.assign(c11SinAire.cta, { paddingX: 8, paddingY: 4 })
+      delete c11ExternaNueva.logo
+      c11ExternaNueva.firma = { modo: 'externa', razon: 'prueba: la firma la pone firmar.mjs' }
+      c11ExternaNueva.signatureY = 0.8
+      delete c11ExternaAprobada.logo
+      c11ExternaAprobada.firma = { modo: 'externa', razon: 'prueba: la firma la pone firmar.mjs', aprobadoPor: 'suite-pruebas', plate: plateB2 }
+      c11ExternaAprobada.signatureY = 0.8
+      const c11CanonNuevo = [['P10-firma-arriba', c11FirmaArriba], ['P10-firma-gigante', c11FirmaGigante], ['P10-c11Desordenada', c11Desordenada], ['P10-rol-alto', c11RolAlto], ['P10-sin-aire', c11SinAire], ['P10-externa-c11Nueva', c11ExternaNueva], ['P10-externa-aprobada', c11ExternaAprobada], ['P10-legado', pieza('fue_916')]]
+      const c11RsCanon = await Promise.all(c11CanonNuevo.map(([n, p]) => componer(n, [p])))
+      const [c11GFirmaArriba, c11GFirmaGigante, c11GDesordenada, c11GRolAlto, c11GSinAire, c11GExternaNueva, c11GExternaAprobada, c11GLegado] = await Promise.all(c11RsCanon.map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
+      const c11RLegadoCanon = c11RsCanon.at(-1)
+      // El QA no puede declararse de otro canon: el gate lo recalcula del registro.
+      let c11GCanonForjado = { code: -1, salida: 'no compuso' }
+
+      if (bueno.ok) {
+        const d = copiarBueno('P10-canon-forjado')
+        const qaF = path.join(d, 'out', 'qa-piezas.json')
+        const q = JSON.parse(fs.readFileSync(qaF, 'utf8'))
+
+        q.find(x => x.id === 'b2-primero-el-numero-916').canon = '2026-09-22'
+        fs.writeFileSync(qaF, JSON.stringify(q))
+        c11GCanonForjado = await gate(path.join(d, 'piezas.json'))
+      }
+
+      // ── Tramo 12 · cuarta certificación ──
+      const c12Centrada = canon('b2_916')
+      const c12Tracking = canon('b2_916')
+      const c12Pegada = canon('b2_916')
+
+      Object.assign(c12Centrada, { align: 'center' })
+      Object.assign(c12Centrada.cta, { x: 0.5 })
+      delete c12Centrada.note.x
+      c12Tracking.dominantTracking = -0.07
+      // La firma, con `logo.y` fija, a 2 px del final del contenido: se mide el contenido de la MISMA pieza sin crecer.
+      const c12Base = canon('b2_916')
+
+      c12Base.textGrowth = false
+      c12Pegada.textGrowth = false
+      const rC12Base = await componer('P10-pegada-base', [c12Base])
+      const Lb = rC12Base.ok ? leer(rC12Base.dir, 'b2-primero-el-numero-916-layout.json') : null
+      const c12Contenido = Lb ? Math.max(...Lb.maquetacion.elementos.filter(e => e.tipo !== 'firma' && e.tipo !== 'acento').map(e => e.box.bottom)) : 0
+
+      c12Pegada.logo = { width: 0.2, x: 0.5, y: Lb ? +((c12Contenido + 2) / Lb.canvas.height).toFixed(4) : 0.5 }
+      const c12Rs = await Promise.all([['P10-centrada-fuera-eje', c12Centrada], ['P10-tracking', c12Tracking], ['P10-firma-pegada', c12Pegada]].map(([n, p]) => componer(n, [p])))
+      const [gC12Centrada, gC12Tracking, gC12Pegada] = await Promise.all(c12Rs.map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
+
+      // ── Tramo 13 · quinta certificación ──
+      const c13Losa = canon('b2_916')
+      const c13LosaAprobada = canon('b2_916')
+      const c13Lejos = canon('b2_916')
+      const c13CtaChico = canon('b2_916')
+      const c13Tinta = canon('b2_916')
+      const c13Nada = canon('b2_916')
+      const c13Chica = canon('b2_916')
+      const c13Esquina = canon('b2_916')
+
+      Object.assign(c13Losa.cta, { paddingX: 110, paddingY: 70 })
+      Object.assign(c13LosaAprobada.cta, { paddingX: 110, paddingY: 70 })
+      // Un botón-losa también pasa el área del titular (`cta-tamano`, tramo 14): la aprobación cubre las dos reglas.
+      c13LosaAprobada.excepciones = [{ regla: 'cta-relleno', razon: 'prueba: botón grande aprobado a propósito', aprobadoPor: 'suite-pruebas', plate: plateB2, hasta: 2.5 }, { regla: 'cta-tamano', razon: 'prueba: botón grande aprobado a propósito', aprobadoPor: 'suite-pruebas', plate: plateB2, hasta: 2 }]
+      // 1,5× el cuerpo del CTA (40 px). El caso de la auditoría —150 px— no cabe en esta escena: el descriptor invade la
+      // protección del sujeto y el compositor aborta antes de llegar al gate.
+      c13Lejos.cta.descriptorGap = 60
+      c13CtaChico.afterSize = 48
+      c13Tinta.leadFill = '#39ff14'
+      // La caja de la auditoría de diseño (h02): una pared vacía.
+      c13Nada.selection = { variant: 'eight-handles', padding: 'standard', overlay: 'subtle', box: [0.12, 0.47, 0.28, 0.55], targetKind: 'object', razon: 'prueba: aprobada para medir sólo la cobertura', aprobadoPor: 'suite-pruebas', plate: plateB2, cursors: [{ id: 'ia', kind: 'collaborator', anchor: 'top-end', label: 'IA', who: 'role' }] }
+      // Sin crecer: el QA mide el tamaño en pantalla ya crecido, y el 9:16 crece.
+      c13Chica.textGrowth = false
+      c13Chica.note.size = 22
+      c13Esquina.cta.radius = 200
+      const c13Rs = await Promise.all([['P10-losa', c13Losa], ['P10-losa-aprobada', c13LosaAprobada], ['P10-descriptor-lejos', c13Lejos], ['P10-cta-chico', c13CtaChico], ['P10-tinta-fuera', c13Tinta], ['P10-seleccion-nada', c13Nada], ['P10-legibilidad', c13Chica], ['P10-esquina', c13Esquina]].map(([n, p]) => componer(n, [p])))
+      const [gC13Losa, gC13LosaAprobada, gC13Lejos, gC13CtaChico, gC13Tinta, gC13Nada, gC13Chica] = await Promise.all(c13Rs.slice(0, 7).map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
+      const rC13Esquina = c13Rs[7]
+      // ── Tramo 14 · sexta certificación ──
+      const c14Cierre = canon('b2_916')
+      const c14DescColab = canon('b2_916')
+      const c14CtaGrande = canon('b2_916')
+      const c14SelSinAprobar = canon('b2_916')
+      const c14NadaProtect = canon('b2_916')
+      const c14Etiqueta = canon('b2_916')
+      const c14Borde = canon('b2_916')
+      const c14Vacia = canon('b2_916')
+
+      c14Cierre.after = '[[Eso es lo que operamos.]]'
+      c14DescColab.cta.text = 'Agenda ya'
+      c14DescColab.cta.seleccion = { cursores: [{ id: 'eq', kind: 'collaborator', anchor: 'bottom-end', label: 'Equipo AEO', who: 'department' }] }
+      // Sin la nota, para que el descriptor no llegue a la protección del sujeto: la única falla es el tamaño del CTA.
+      delete c14CtaGrande.note
+      Object.assign(c14CtaGrande.cta, { text: 'Agenda ya', fontSize: 75, paddingX: 90, paddingY: 60 })
+      // Sobre el monitor (79 % de sujeto): la única falla es que nadie la aprobó.
+      c14SelSinAprobar.selection = { variant: 'eight-handles', padding: 'standard', overlay: 'subtle', box: [0.3, 0.52, 0.62, 0.66], targetKind: 'object', cursors: [{ id: 'ia', kind: 'collaborator', anchor: 'top-start', label: 'IA', who: 'role' }] }
+      c14NadaProtect.selection = structuredClone(c13Nada.selection)
+      c14NadaProtect.protect = [{ box: [0.12, 0.47, 0.28, 0.55], reason: 'prueba: zona protegida falsa sobre la pared vacía' }]
+      Object.assign(c14Etiqueta, { label: 'CASO REAL', labelSize: 28, top: 0.14 })
+      Object.assign(c14Borde.cta, { paddingX: 0, paddingY: 0 })
+      fs.mkdirSync(path.join(TMP, 'P10-plates'), { recursive: true })
+      c14Vacia.plate = path.join(TMP, 'P10-plates', 'uniforme.png')
+      const { width: anchoB2, height: altoB2 } = await sharp(c14Cierre.plate).metadata()
+
+      await sharp({ create: { width: anchoB2, height: altoB2, channels: 3, background: '#0b0d12' } }).png().toFile(c14Vacia.plate)
+      const c14Rs = await Promise.all([['P10-cierre-acento', c14Cierre, { FOTO_EVIDENCIA: '1' }], ['P10-descriptor-colaborador', c14DescColab], ['P10-cta-grande', c14CtaGrande], ['P10-seleccion-sin-aprobar', c14SelSinAprobar], ['P10-seleccion-protect', c14NadaProtect], ['P10-etiqueta', c14Etiqueta], ['P10-borde', c14Borde], ['P10-mascara-vacia', c14Vacia]].map(([n, p, env]) => componer(n, [p], [], env)))
+      const [rC14Cierre, , , , , rC14Etiqueta, rC14Borde] = c14Rs
+      const [gC14Cierre, gC14DescColab, gC14CtaGrande, gC14SelSinAprobar, gC14NadaProtect] = await Promise.all(c14Rs.slice(0, 5).map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
+      const gC14Vacia = c14Rs[7].ok ? await gate(c14Rs[7].planPath) : { code: -1, salida: c14Rs[7].error }
+      // El remate del cierre, en la capa de texto: ningún píxel naranja dentro de su caja.
+      let naranjaCierre = Infinity
+
+      if (rC14Cierre.ok) {
+        const Lc = leer(rC14Cierre.dir, 'b2-primero-el-numero-916-layout.json')
+        const caja = Lc.maquetacion.elementos.find(e => e.id === 'cierre-frase').box
+        const tx = await sharp(path.join(rC14Cierre.dir, 'out', 'b2-primero-el-numero-916-texto.png')).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+
+        naranjaCierre = 0
+
+        for (let y = Math.floor(caja.top); y < Math.ceil(caja.bottom); y++) {
+          for (let x = Math.floor(caja.left); x < Math.ceil(caja.right); x++) {
+            const i = (y * tx.info.width + x) * 4
+
+            if (tx.data[i + 3] > 128 && tx.data[i] > 200 && tx.data[i + 1] > 60 && tx.data[i + 1] < 140 && tx.data[i + 2] < 60) naranjaCierre++
+          }
+        }
+      }
+
+      let etiquetaEnColumna = false
+
+      if (rC14Etiqueta.ok) {
+        const Le = leer(rC14Etiqueta.dir, 'b2-primero-el-numero-916-layout.json')
+        const et = Le.maquetacion.elementos.find(e => e.id === 'etiqueta')?.box
+
+        etiquetaEnColumna = Boolean(et) && typeof Le.columna === 'number' && Math.abs(et.left - Le.columna) <= 1
+      }
+
+      // Una selección cuyo QA no trae la medición de sujeto no pasa: la ausencia es la falla.
+      let gC13SinMedida = { code: -1, salida: 'no compuso' }
+
+      if (c13Rs[5].ok) {
+        const qaF = path.join(c13Rs[5].dir, 'out', 'qa-piezas.json')
+        const q = JSON.parse(fs.readFileSync(qaF, 'utf8'))
+
+        delete q[0].seleccionSujeto
+        fs.writeFileSync(qaF, JSON.stringify(q))
+        gC13SinMedida = await gate(c13Rs[5].planPath)
+      }
+
+      if (rAutoCanon.ok) {
+        const qaF = path.join(rAutoCanon.dir, 'out', 'qa-piezas.json')
+        const q = JSON.parse(fs.readFileSync(qaF, 'utf8'))
+
+        q[0].ctaVariante.tokens = { surfaceToken: 'inkOnDark', inkToken: 'inkOnDark' }
+        fs.writeFileSync(qaF, JSON.stringify(q))
+        gAcentoForjado = await gate(rAutoCanon.planPath)
+      }
+
+      // ── Tramo 15 · séptima certificación ──
+      const c15Pegadas = canon('b2_916')
+      const c15Trazo = canon('b2_916')
+      const c15Columna = canon('b2_916')
+      const c15Losa = canon('b2_916')
+      const c15Texto = canon('b2_916')
+
+      // Diseño N1: voces pegadas (con 0 el gate daba 0) y el borde del contorno, que pisa la tinta con su medio trazo exterior.
+      Object.assign(c15Pegadas, { leadGap: 0, afterGap: 0 })
+      // Con 0 el cierre y la nota se solapan y ya aborta el compositor; con 2 px se tocan sin solaparse, que es lo que pasaba.
+      c15Pegadas.note.gapAfterClosure = 2
+      c15Pegadas.cta.gapAfterNote = 0
+      Object.assign(c15Trazo.cta, { variant: 'outline', gapAfterNote: 9.3 })
+      // Diseño N2: el CTA en una fracción lejos de la columna, en una pieza nueva.
+      c15Columna.cta.x = 0.25
+      // Diseño H3: losa de relleno. Pasa el techo de CTA/titular; sólo la frena el techo del área del relleno.
+      Object.assign(c15Losa.cta, { variant: 'solid', text: 'Agenda ya', fontSize: 61, paddingX: 73, paddingY: 48 })
+      // Arquitectura N4: CTA de texto con el descriptor lejos de su TEXTO (la caja del relleno no se dibuja).
+      Object.assign(c15Texto.cta, { variant: 'text', paddingY: 20, descriptorGap: 45 })
+      const c15Rs = await Promise.all([['P10-pegadas', c15Pegadas], ['P10-trazo', c15Trazo], ['P10-columna', c15Columna], ['P10-losa', c15Losa], ['P10-cta-texto', c15Texto]].map(([n, pz]) => componer(n, [pz])))
+      const [gC15Pegadas, gC15Trazo, gC15Columna, gC15Losa, gC15Texto] = await Promise.all(c15Rs.map(x => (x.ok ? gate(x.planPath) : { code: -1, salida: x.error })))
+      // El caso del trazo tiene que caer en la ventana que sólo el medio trazo cierra: la caja de la nota queda a ≥ el piso del
+      // botón, y a menos del piso si se cuenta el medio trazo exterior. Si el plan deriva, la prueba lo dice.
+      let trazoEnVentana = false
+
+      if (c15Rs[1].ok) {
+        const Lt = leer(c15Rs[1].dir, 'b2-primero-el-numero-916-layout.json')
+        const cajas = Object.fromEntries(Lt.maquetacion.elementos.map(e => [e.id, e.box]))
+        // Desde el tramo 16 el piso del par nota–botón es 0,25 em del cuerpo menor (y nunca menos que el 0,4 % del lado corto).
+        const piso = Math.max(Math.min(Lt.canvas.width, Lt.canvas.height) * 0.004, Math.min(Lt.typography.benefit, Lt.typography.cta) * 0.25)
+        const medio = Math.max(2, Math.ceil(Lt.canvas.width / 390)) / 2
+        const hueco = cajas['cta-boton'].top - cajas.nota.bottom
+
+        trazoEnVentana = hueco >= piso && hueco - medio < piso
+      }
+
+      // Arquitectura N7 (el arreglo de Y1, tramo 14, no tenía prueba): un plan DEL REPO con un `.origen` forjado que apunta a la
+      // suite, el nonce en el entorno y `--reproducir --comando <otro compositor>`. El hijo de `--reproducir` heredaba ese origen,
+      // se juzgaba como suite y certificaba con 0 un compositor ajeno. Ahora el origen es el plan que se certifica: sale con 3.
+      let gY1 = { code: -1, salida: 'no se preparó' }
+      const rY1 = await componer('P10-y1', [canon('b2_916')])
+      const dirY1 = fs.mkdtempSync(path.join(ROOT, 'ai-generations', '.cta-prueba-y1-'))
+      const copiaY1 = path.join(path.dirname(COMPOSITOR), `.componer-cta@prueba-y1-${process.pid}.regresion.mjs`)
+
+      try {
+        if (rY1.ok) {
+          fs.cpSync(rY1.dir, dirY1, { recursive: true })
+          fs.copyFileSync(COMPOSITOR, copiaY1)
+          const nonceY1 = randomBytes(24).toString('hex')
+
+          fs.writeFileSync(path.join(dirY1, '.origen'), JSON.stringify({ origen: path.join(TMP, 'P10-y1-suite', 'piezas.json'), nonce: nonceY1 }))
+
+          try {
+            const x = await run(process.execPath, [GATE, path.join(dirY1, 'piezas.json'), '--reproducir', '--comando', copiaY1], { cwd: ROOT, maxBuffer: 16e6, timeout: 20 * 60e3, env: { ...process.env, FOTO_GATE_ORIGEN_NONCE: nonceY1 } })
+
+            gY1 = { code: 0, salida: x.stdout + x.stderr }
+          } catch (e) {
+            gY1 = { code: e.code ?? 1, salida: String(e.stdout ?? '') + String(e.stderr ?? '') }
+          }
+        }
+      } finally {
+        fs.rmSync(dirY1, { recursive: true, force: true })
+        fs.rmSync(copiaY1, { force: true })
+      }
+
+      // ── Tramo 16 · octava certificación ──
+      const c16CasiPegadas = canon('b2_916')
+      const c16Relleno = canon('b2_916')
+      const c16Ritmo = canon('b2_916')
+      const c16TextoGrande = canon('b2_916')
+      const c16TextoColumna = canon('b2_916')
+      const c16TextoHolgura = canon('b2_916')
+      const c16Canto = canon('b2_916')
+
+      // Diseño N1: voces sobre el 0,4 % del lado corto pero bajo 0,25 em: se leen como un solo párrafo.
+      Object.assign(c16CasiPegadas, { leadGap: 0.036, afterGap: 0.036 })
+      // El relleno cuenta 1 px de trazo por fuera: la nota a 9 px del botón queda a 8, bajo 0,25 em de la nota (8,5 px).
+      Object.assign(c16Relleno.cta, { variant: 'solid', gapAfterNote: 9 })
+      // Ritmo invertido: poco aire entre el concepto y la acción, mucho dentro de la acción.
+      c16Ritmo.note.gapAfterClosure = 12
+      c16Ritmo.cta.gapAfterNote = 60
+      // CTA de texto (arquitectura T1): el techo de área mide su texto; en la columna no se corre por su caja; la holgura no
+      // cuenta la caja, que no se dibuja.
+      Object.assign(c16TextoGrande.cta, { variant: 'text', text: 'Agenda tu diagnóstico de visibilidad hoy', fontSize: 60 })
+      Object.assign(c16TextoColumna.cta, { variant: 'text' })
+      // Sin marco: los corchetes rodean la caja y, a 2 px de la nota, la tapan (y ya aborta el compositor).
+      Object.assign(c16TextoHolgura.cta, { variant: 'text', paddingY: 30, gapAfterNote: 2, seleccion: { marco: 'ninguno' } })
+      // Diseño F1: un plate con un escalón de luz justo donde la búsqueda automática pondría la firma.
+      c16Canto.plate = path.join(TMP, 'P10-plates', 'escalon.png')
+      const escalonY = Math.round(altoB2 * 0.86)
+
+      await sharp({ create: { width: anchoB2, height: altoB2, channels: 3, background: '#12141a' } }).composite([{ input: { create: { width: anchoB2, height: altoB2 - escalonY, channels: 3, background: '#46484e' } }, left: 0, top: escalonY }]).png().toFile(c16Canto.plate)
+      const c16Rs = await Promise.all([['P10-casi-pegadas', c16CasiPegadas], ['P10-relleno-trazo', c16Relleno], ['P10-ritmo', c16Ritmo], ['P10-texto-grande', c16TextoGrande], ['P10-texto-columna', c16TextoColumna], ['P10-texto-holgura', c16TextoHolgura], ['P10-canto', c16Canto]].map(([n, pz]) => componer(n, [pz])))
+      const [gC16CasiPegadas, gC16Relleno, gC16Ritmo, gC16TextoGrande, gC16TextoColumna, gC16TextoHolgura] = await Promise.all(c16Rs.slice(0, 6).map(x => (x.ok ? gate(x.planPath) : { code: -1, salida: x.error })))
+      let rellenoEnVentana = false
+
+      if (c16Rs[1].ok) {
+        const Lr = leer(c16Rs[1].dir, 'b2-primero-el-numero-916-layout.json')
+        const cj = Object.fromEntries(Lr.maquetacion.elementos.map(e => [e.id, e.box]))
+        const pisoPar = Math.max(Math.min(Lr.canvas.width, Lr.canvas.height) * 0.004, Math.min(Lr.typography.benefit, Lr.typography.cta) * 0.25)
+        const hueco = cj['cta-boton'].top - cj.nota.bottom
+
+        rellenoEnVentana = hueco >= pisoPar && hueco - 1 < pisoPar
+      }
+
+      // La búsqueda automática no deja la firma sobre el escalón: el QA registra una pendiente bajo el techo.
+      const cantoEvitado = c16Rs[6].ok && typeof c16Rs[6].qa[0].firmaCanto === 'number' && c16Rs[6].qa[0].firmaCanto <= 18.5
+      // Un canto en el QA de una pieza nueva: el gate lo bloquea (el QA se forja después de juzgar la pieza tal cual).
+      let gC16CantoForjado = { code: -1, salida: 'no compuso' }
+
+      if (c16Rs[4].ok) {
+        const qaF = path.join(c16Rs[4].dir, 'out', 'qa-piezas.json')
+        const q = JSON.parse(fs.readFileSync(qaF, 'utf8'))
+
+        q[0].firmaCanto = 25
+        fs.writeFileSync(qaF, JSON.stringify(q))
+        gC16CantoForjado = await gate(c16Rs[4].planPath)
+      }
+
+      const r = {
+        'aprueba el plan bueno': gBueno.code === 0,
+        'rechaza texto alternativo reemplazado': gAltCambiado.code === 1 && /no es el texto alternativo que registró la composición/.test(gAltCambiado.salida),
+        'con --reproducir rechaza el QA entregado alterado': gFilaCambiada.code === 1 && /la fila de b2-primero-el-numero-916 en el QA entregado/.test(gFilaCambiada.salida),
+        '--origen ya no es un flag público': gOrigen.code === 2 && /`--origen` ya no existe/.test(gOrigen.salida),
+        'rechaza aprobador de pruebas fuera de la suite': gFueraAprob.code === 1 && /sólo vale en los planes de la suite de pruebas/.test(gFueraAprob.salida),
+        'fuera de la suite, el plan bueno certifica': gFueraBueno.code === 0,
+        'comando ajeno no certifica fuera de la suite': gFueraAjeno.code === 3 && /no es el compositor del repo/.test(gFueraAjeno.salida),
+        'HUD no certificable': gHud.code === 3 && /lleva HUD/.test(gHud.salida),
+        'auto certifica con sus tokens resueltos': gAutoCanon.code === 0,
+        'acento verificado sobre la variante resuelta': gAcentoForjado.code === 1 && /no es un acento/.test(gAcentoForjado.salida),
+        'rechaza cierre por defecto mayor que el dominante': gCierre.code === 1 && /no es la voz mayor: .*cierre 74 px/.test(gCierre.salida),
+        'rechaza aprobación de otro plate': gOtroPlate.code === 1 && /concepto REDUCIDO se aprobó para otro plate/.test(gOtroPlate.salida),
+        'rechaza firma arriba del contenido (canon nuevo)': c11GFirmaArriba.code === 1 && /la firma queda por encima del final del contenido/.test(c11GFirmaArriba.salida),
+        'rechaza firma gigante (canon nuevo)': c11GFirmaGigante.code === 1 && /canon: hasta 35 %/.test(c11GFirmaGigante.salida),
+        'rechaza orden de lectura alterado (canon nuevo)': c11GDesordenada.code === 1 && /el orden de lectura no es el del canon/.test(c11GDesordenada.salida),
+        'rechaza jerarquía por rol (canon nuevo)': c11GRolAlto.code === 1 && /la jerarquía por rol no se sostiene .*CTA 40 px/.test(c11GRolAlto.salida),
+        'rechaza botón sin aire (canon nuevo)': c11GSinAire.code === 1 && /el botón tiene poco aire/.test(c11GSinAire.salida),
+        'firma externa del canon nuevo exige aprobación': c11GExternaNueva.code === 1 && /firma EXTERNA .* sin aprobador del registro/.test(c11GExternaNueva.salida) && /firma EXTERNA .* \(aprobó suite-pruebas\)/.test(c11GExternaAprobada.salida),
+        'la pieza aprobada sigue con su canon': c11RLegadoCanon.ok && c11RLegadoCanon.qa[0].canon === '2026-09-22' && !/firma EXTERNA|orden de lectura|jerarquía por rol|texto chico en un teléfono/.test(c11GLegado.salida),
+        'rechaza QA con otro canon': c11GCanonForjado.code === 1 && /el QA dice canon 2026-09-22 y la pieza es del canon 2026-09-23/.test(c11GCanonForjado.salida),
+        'rechaza bloque centrado fuera del eje': gC12Centrada.code === 1 && /en un bloque centrado, fuera del eje/.test(gC12Centrada.salida),
+        'rechaza tracking del titular fuera de rango (canon nuevo)': gC12Tracking.code === 1 && /el tracking del titular \(-0\.07 em\)/.test(gC12Tracking.salida),
+        'rechaza firma pegada al contenido (canon nuevo)': gC12Pegada.code === 1 && /queda pegada al contenido/.test(gC12Pegada.salida),
+        'rechaza botón-losa': gC13Losa.code === 1 && /el botón es una losa/.test(gC13Losa.salida),
+        'acepta botón-losa con excepción auditada': gC13LosaAprobada.code === 0 && /excepción auditada «cta-relleno»/.test(gC13LosaAprobada.salida),
+        'rechaza descriptor lejos del botón': gC13Lejos.code === 1 && /el descriptor queda lejos de su botón/.test(gC13Lejos.salida),
+        'rechaza CTA menor que el cuerpo': gC13CtaChico.code === 1 && /el CTA \(\d+ px\) es menor que el cuerpo: cierre/.test(gC13CtaChico.salida),
+        'rechaza tinta de cuerpo fuera de la paleta': gC13Tinta.code === 1 && /tinta fuera de la paleta de AXIS para el cuerpo: entrada #39ff14/.test(gC13Tinta.salida),
+        'rechaza selección sobre nada': gC13Nada.code === 1 && /la selección no encierra nada/.test(gC13Nada.salida),
+        'rechaza selección sin su medición': gC13SinMedida.code === 3 && /la selección no trae su medición de sujeto/.test(gC13SinMedida.salida),
+        'rechaza texto chico en el teléfono (canon nuevo)': gC13Chica.code === 1 && /texto chico en un teléfono .*nota [\d.]+ px \(piso 9\)/.test(gC13Chica.salida),
+        'rechaza esquina del botón sobre el texto': !rC13Esquina.ok && /la esquina del botón entra en el texto del CTA/.test(rC13Esquina.error ?? ''),
+        'el cierre en [[ ]] sale blanco, no naranja': rC14Cierre.ok && gC14Cierre.code === 0 && naranjaCierre < 30,
+        'rechaza descriptor que el cursor empuja': gC14DescColab.code === 1 && /el descriptor queda lejos de su botón/.test(gC14DescColab.salida),
+        'rechaza CTA que compite con el titular': gC14CtaGrande.code === 1 && /el CTA compite con el titular/.test(gC14CtaGrande.salida),
+        'selección sobre un objeto exige aprobación (canon nuevo)': gC14SelSinAprobar.code === 1 && /selección sobre un OBJETO .* sin aprobador del registro/.test(gC14SelSinAprobar.salida),
+        'rechaza selección sobre nada aunque declare protect': gC14NadaProtect.code === 1 && /la selección no encierra nada/.test(gC14NadaProtect.salida),
+        'la etiqueta arranca en la columna': etiquetaEnColumna,
+        'rechaza borde del botón sobre el texto': !rC14Borde.ok && /el borde del botón toca el texto del CTA/.test(rC14Borde.error ?? ''),
+        'rechaza máscara vacía': gC14Vacia.code === 1 && /la máscara no marca ningún sujeto/.test(gC14Vacia.salida),
+        'rechaza voces pegadas': gC15Pegadas.code === 1 && /texto, botón y firma se tocan: «entrada» y «dominante» a 0\.0 px/.test(gC15Pegadas.salida),
+        'rechaza voces casi pegadas (0,25 em)': gC16CasiPegadas.code === 1 && /texto, botón y firma sin aire: .*«entrada» y «dominante» a [\d.]+ px \(piso 9\.0 px\)/.test(gC16CasiPegadas.salida),
+        'el relleno cuenta su trazo': rellenoEnVentana && gC16Relleno.code === 1 && /«nota» y «cta-boton» a [\d.]+ px \(piso 8\.5 px\)/.test(gC16Relleno.salida),
+        'rechaza ritmo invertido (canon nuevo)': gC16Ritmo.code === 1 && /el ritmo está invertido/.test(gC16Ritmo.salida),
+        'el techo de un CTA de texto mide su texto': gC16TextoGrande.code === 1 && /para un CTA de texto, 0\.45× el área/.test(gC16TextoGrande.salida),
+        'un CTA de texto en la columna no se corre por su caja': c16Rs[4].ok && !/fuera de la columna/.test(gC16TextoColumna.salida),
+        'la holgura no cuenta la caja de un CTA de texto': c16Rs[5].ok && !/«nota» y «cta-boton»/.test(gC16TextoHolgura.salida),
+        'la firma automática evita el canto (canon nuevo)': cantoEvitado,
+        'rechaza firma sobre el canto (canon nuevo)': gC16CantoForjado.code === 1 && /la firma cae sobre un canto/.test(gC16CantoForjado.salida),
+        'el borde del contorno cuenta medio trazo': trazoEnVentana && gC15Trazo.code === 1 && /«nota» y «cta-boton» a/.test(gC15Trazo.salida),
+        'rechaza CTA fuera de la columna (canon nuevo)': gC15Columna.code === 1 && /el CTA arranca \d+ px .*fuera de la columna del texto/.test(gC15Columna.salida),
+        'rechaza losa de relleno por área': gC15Losa.code === 1 && /el CTA compite con el titular: .*para un CTA de relleno, 0\.7× el área/.test(gC15Losa.salida),
+        'mide el descriptor desde el texto del CTA': gC15Texto.code === 1 && /el descriptor queda lejos de su botón/.test(gC15Texto.salida),
+        'el origen heredado no certifica un compositor ajeno': gY1.code === 3 && /no es el compositor del repo/.test(gY1.salida),
+        'el QA queda en qa-<plan>.json': qaPorPlan && bueno.ok && fs.existsSync(path.join(bueno.dir, 'out/qa-piezas.json')),
+        'rechaza pieza sin firma declarada': gSinFirma.code !== 0 && /no declara firma/.test(gSinFirma.salida),
+        'acepta la firma externa declarada y la mide': rExterna.ok && !/no declara firma/.test(gExterna.salida) && typeof rExterna.qa[0].contraste.firmaExterna === 'number',
+        'mide el contrato de la firma externa': gExternaMala.code !== 0 && /donde va la firma externa, la mejor tinta mide 2\.1:1/.test(gExternaMala.salida),
+        'acepta signatureY como firma externa': rLegado.ok && !/no declara firma/.test(gLegadoFirma.salida) && typeof rLegado.qa[0].contraste.firmaExterna === 'number',
+        'rechaza firma bajo el 20 % del lado corto': gFirmaChica.code !== 0 && /del lado corto/.test(gFirmaChica.salida),
+        'acepta la excepción auditada y la imprime': gFirmaAuditada.code === 0 && /excepción auditada «firma-tamano»/.test(gFirmaAuditada.salida),
+        'rechaza concepto sin cierre': gSinCierre.code !== 0 && /cierre que remata/.test(gSinCierre.salida),
+        'acepta conceptoReducido con razón y aprobador': !/cierre que remata/.test(gReducida.salida) && /concepto REDUCIDO — .*aprobó suite-pruebas/.test(gReducida.salida),
+        'rechaza texto fuera de la zona de AXIS': gFueraZona.code !== 0 && /zona segura story de AXIS/.test(gFueraZona.salida),
+        '--variantes arma la hoja de las tres': hoja,
+        'auto elige y deja el motivo': Boolean(eleccion?.elegida && eleccion.motivo),
+        'rechaza QA incompleto': gIncompleto.code !== 0 && /sin QA/.test(gIncompleto.salida),
+        'la corrida parcial conserva el resto': gParcial.code === 0,
+        'dos planes en una carpeta no se pisan': gDosA.code === 0 && gDosB.code === 0,
+        'la fecha sola no invalida': h.ok && gFecha.code === 0,
+        'rechaza plan cambiado': gPlan.code !== 0 && /el plan de la pieza cambió/.test(gPlan.salida),
+        'rechaza PNG ajeno': gPng.code !== 0 && /no es el PNG que registró/.test(gPng.salida),
+        'rechaza plate cambiado': gPlate.code !== 0 && /el plate cambió/.test(gPlate.salida),
+        'rechaza sin máscara': gSinMascara.code !== 0 && /segmentación del sujeto no corrió/.test(gSinMascara.salida),
+        'rechaza medición ausente': gNulo.code !== 0 && /no tiene medición/.test(gNulo.salida),
+        'rechaza QA sin huellas': gSinHuellas.code !== 0 && /no trae huellas/.test(gSinHuellas.salida),
+        'rechaza trazo bajo umbral': gTrazo.code !== 0 && /1 % peor del trazo/.test(gTrazo.salida),
+        'rechaza QA sin método de medición': gSinMetodo.code !== 0 && /no dice cómo se midió/.test(gSinMetodo.salida),
+        'rechaza borde que se mezcla en el teléfono': gAnillo.code !== 0 && /borde del CTA mide/.test(gAnillo.salida),
+        'rechaza CTA bajo el piso perceptual': gPerceptual.code !== 0 && /el CTA no alcanza el piso perceptual/.test(gPerceptual.salida),
+        'recalcula las invariantes sobre el layout': gMaquetacion.code !== 0 && /la maquetación no cumple/.test(gMaquetacion.salida),
+        'rechaza 01-fuera-916 al tamaño anterior (el trazo no alcanza)': gCrecida.code !== 0 && /1 % peor del trazo/.test(gCrecida.salida),
+        'formato anterior: no certificable (sale con 3)': gLegado.code === 3 && /NO CERTIFICABLE/.test(gLegado.salida) && /formato anterior/.test(gLegado.salida),
+        'otra versión del comando: no certificable (3)': gComando.code === 3 && /otra versión del comando/.test(gComando.salida),
+        'caché de máscaras ajena: no certificable (3)': ajenaFresca && ajenaCache && gAjena.code === 3 && /caché ajena/.test(gAjena.salida),
+        'gesto manuscrito: no certificable (3)': gGesto.code === 3 && /gesto manuscrito/.test(gGesto.salida),
+        '--reproducir certifica lo idéntico': gReproduce.code === 0 && /idéntico a la reproducción/.test(gReproduce.salida),
+        '--reproducir rechaza lo que el comando no produce': gReproduceMal.code === 1 && /no es lo que produce el comando vigente/.test(gReproduceMal.salida),
+        'rechaza firma automática por encima del contenido': gFirmaArriba.code === 1 && /por encima del contenido/.test(gFirmaArriba.salida),
+        'rechaza trazo de la firma bajo 4,5:1': gTrazoFirma.code === 1 && /trazo de la firma/.test(gTrazoFirma.salida),
+        'rechaza excepción de aprobador no registrado': gExcAjeno.code === 1 && /no está en el registro de aprobadores/.test(gExcAjeno.salida),
+        'rechaza excepción aprobada para otro plate': gExcOtroPlate.code === 1 && /se aprobó para otro plate/.test(gExcOtroPlate.salida),
+        'rechaza excepción sin tope': gExcSinTope.code === 1 && /no declara `hasta`/.test(gExcSinTope.salida),
+        'rechaza excepción que no cubre la medida': gExcFueraTope.code === 1 && /va más allá de lo aprobado/.test(gExcFueraTope.salida),
+        'rechaza sin-firma sin aprobador': gSinFirmaSinAprob.code === 1 && /pieza SIN firma sin aprobador del registro/.test(gSinFirmaSinAprob.salida),
+        'CTA siempre ≥ 4,5:1': gCtaGrande.code === 1 && /el CTA exige 4\.5:1/.test(gCtaGrande.salida),
+        'el QA del CTA grande se mide con 4,5:1': ctaGrande.ok && ctaGrande.qa[0].accesibilidad.voces.cta.cssPx >= 18.66 && ctaGrande.qa[0].accesibilidad.voces.cta.umbralWcag === 4.5 && (ctaGrande.qa[0].accesibilidad.voces.cta.glifo?.umbralWcag ?? 4.5) === 4.5,
+        'rechaza dominante que no es la voz mayor': gDominante.code === 1 && /no es la voz mayor/.test(gDominante.salida),
+        'placement no afloja': gEscritorio.code === 1 && /«entrada»/.test(gEscritorio.salida),
+        'el tamaño entregado es el del plan': gFinal.code === 0,
+        'rechaza PNG de otro tamaño': gOtroTamano.code === 1 && /mide \d+×\d+ y el plan pide 1080×1920/.test(gOtroTamano.salida),
+        'avisa corchetes bajo 1 CSS px': /los corchetes del CTA miden/.test(gSinAcento.salida),
+        'rechaza composición concurrente': concurrentes.filter(x => x === 'ok').length === 1 && concurrentes.some(x => /otra composición usa/.test(x)),
+        'rechaza firma bajo 4,5:1 en su caja': gFirmaCaja.code === 1 && /la firma mide 3\.1:1 contra su fondo/.test(gFirmaCaja.salida),
+        'rechaza firma sobre el sujeto': gFirmaSujeto.code === 1 && /la firma queda sobre el sujeto \(420 px/.test(gFirmaSujeto.salida),
+        'rechaza jerarquía bajo tres veces': gJerarquia.code === 1 && /regla de las tres veces/.test(gJerarquia.salida),
+        'rechaza texto alternativo sin el rol del CTA': gSinRolAlt.code === 1 && /no anuncia el rol del CTA/.test(gSinRolAlt.salida),
+        'rechaza CTA bajo 4,5:1 en su caja': gCtaCaja.code === 1 && /CTA 3\.9:1 < 4\.5:1/.test(gCtaCaja.salida),
+        'rechaza descriptor bajo 4,5:1 en su caja': gDescriptorCaja.code === 1 && /descriptor 3\.2:1 < 4\.5:1/.test(gDescriptorCaja.salida),
+        'avisa id que otro plan de la carpeta registra': /también los registra out\/qa-piezas-a\.json/.test(salidaMismo),
+        'rechaza CTA sin acento': gSinAcento.code !== 0 && /no es un acento/.test(gSinAcento.salida),
+        'rechaza voz bajo WCAG': gBajo.code !== 0 && /entrada.*WCAG 2\.2 AA/.test(gBajo.salida),
+        'avisa firma sobre sujeto': /firma queda sobre el sujeto/.test(gFirma.salida)
+      }
+
+      return { ok: Object.values(r).every(Boolean), detalle: Object.entries(r).map(([k, v]) => `${k} ${v ? '✓' : '✗'}`).join(' · ') }
+    }
+  }
+]
+
+// ── Ejecución y reporte ──────────────────────────────────────────────────────────────────────────────
+console.log(`Pruebas del compositor de CTA · ${TMP}`)
+const resultados = []
+
+for (const p of PRUEBAS.filter(x => !SOLO || SOLO.includes(x.id))) {
+  const t0 = Date.now()
+  let r
+
+  try { r = await p.correr() } catch (e) { r = { ok: false, detalle: `error de la prueba: ${e.message}` } }
+  resultados.push({ id: p.id, nombre: p.nombre, ...r, segundos: Math.round((Date.now() - t0) / 1000) })
+  console.log(`${r.ok ? '✓' : '✗'} ${p.id} ${p.nombre} (${Math.round((Date.now() - t0) / 1000)} s)\n    ${r.detalle}`)
+}
+
+const md = [
+  '# Pruebas del compositor de CTA', '', `Referencia de regresión: \`${REF}\` · directorio: \`${TMP}\``, '',
+  '| # | prueba | resultado | detalle |', '|---|---|---|---|',
+  ...resultados.map(r => `| ${r.id} | ${r.nombre} | ${r.ok ? '✓ pasa' : '✗ falla'} | ${String(r.detalle).replace(/\|/g, '/')} |`)
+].join('\n')
+
+fs.writeFileSync(path.join(TMP, 'reporte.json'), JSON.stringify({ ref: REF, tmp: TMP, resultados }, null, 2))
+
+// La carpeta de la regresión pesa ~535 MB: se borra salvo que se pida conservarla.
+if (harness && !args.includes('--conservar')) fs.rmSync(path.dirname(harness), { recursive: true, force: true })
+fs.writeFileSync(path.join(TMP, 'reporte.md'), `${md}\n`)
+// Los temporales de la suite pesan 80–190 MB por corrida (auditoría de arquitectura, N11; al auditar había 5,4 GB): se
+// borran salvo el reporte, a menos que se pida --conservar.
+if (!args.includes('--conservar')) for (const f of fs.readdirSync(TMP)) if (!/^reporte\./.test(f)) fs.rmSync(path.join(TMP, f), { recursive: true, force: true })
+console.log(`\n${resultados.filter(r => r.ok).length} de ${resultados.length} pasan · ${path.join(TMP, 'reporte.md')}`)
+process.exitCode = resultados.every(r => r.ok) ? 0 : 1

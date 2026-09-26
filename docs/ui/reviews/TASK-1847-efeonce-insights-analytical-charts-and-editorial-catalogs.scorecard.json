@@ -1,0 +1,88 @@
+{
+  "taskId": "TASK-1847",
+  "surface": "Catálogos de documento: deck 16:9 (insights-deck) e informe A4 (insights-report)",
+  "reviewedAt": "2026-09-21",
+  "note": "La superficie es un documento, no una pantalla: no tiene ruta ni viewport. Los campos de evidencia 'desktop' y 'mobile' se usan acá con el significado declarado en el dossier — condición de lectura HORIZONTAL (lámina proyectada) y VERTICAL (hoja impresa). No son viewports.",
+  "evidence": {
+    "desktop": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/deck-evidencia.png",
+    "mobile": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/informe-analitica.png",
+    "dossier": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/README.md"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 5,
+      "rationale": "Afirmación → figura que la prueba → procedencia → límite. El orden se sostiene en ambos formatos y sobrevive en escala de grises.",
+      "evidence": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/informe-analitica.png"
+    },
+    "proportions": {
+      "score": 4,
+      "rationale": "La retícula A4 (450+180) y la lámina respiran bien, pero una página con poco contenido deja un hueco inferior notorio.",
+      "nextAction": "Verificar la proporción con un plan real de 20+ páginas, donde el reparto llena las páginas.",
+      "evidence": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/informe-analitica.png"
+    },
+    "rhythm": {
+      "score": 5,
+      "rationale": "El molde compartido fija cabecera, banda de pie y roles tipográficos, así que el ritmo es idéntico entre plantillas por construcción, no por disciplina.",
+      "evidence": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/informe-tabla.png"
+    },
+    "density": {
+      "score": 4,
+      "rationale": "Densidad correcta por formato —alta en A4, baja en lámina—, pero aún no verificada con una tabla de 26 filas ni un capítulo largo reales.",
+      "nextAction": "Componer una edición real y revisar la página más densa a tamaño físico.",
+      "evidence": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/informe-tabla.png"
+    },
+    "depth": {
+      "score": 4.5,
+      "rationale": "Planos tonales y tipografía; sin sombras, sin tarjetas, sin card-on-card. En papel la tarjeta no tiene hover ni drill que la justifiquen.",
+      "evidence": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/informe-portada.png"
+    },
+    "surfaceEconomy": {
+      "score": 5,
+      "rationale": "Cero contenedores decorativos. Ninguna superficie existe sin función: marginalia, filete de acento y banda de pie son todos portadores de información.",
+      "evidence": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/informe-analitica.png"
+    },
+    "visualImpact": {
+      "score": 4.5,
+      "rationale": "Cada formato tiene su momento dominante: el titular Poppins de la portada y la afirmación con acento en la lámina de evidencia.",
+      "evidence": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/deck-evidencia.png"
+    },
+    "typography": {
+      "score": 5,
+      "rationale": "Poppins display y Geist texto desde los roles del brand pack, nunca literales; tabular-nums en todo lo numérico; sin monospace.",
+      "evidence": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/informe-portada.png"
+    },
+    "color": {
+      "score": 4,
+      "rationale": "La primera revisión encontró que el teal medio perdía separación en grises. El informe ahora aplica el token AXIS teal-750 a las marcas principales y conserva peso/cursiva en el énfasis; el probe A4 actualizado mantiene la distinción al convertirlo a grises.",
+      "nextAction": "Confirmar la misma separación en la exportación completa de 30 páginas, impresa a tamaño físico.",
+      "evidence": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/informe-analitica-gris.png"
+    },
+    "iconography": {
+      "score": 4,
+      "rationale": "Iconografía mínima y deliberada: sólo los dos glifos del pie institucional. No hay sistema de íconos porque el documento no lo necesita.",
+      "nextAction": "Revisar si las páginas de límites ganan con un glifo de estado, o confirmar que el texto basta.",
+      "evidence": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/informe-portada.png"
+    },
+    "responsive": {
+      "score": 4,
+      "rationale": "No hay viewport: hay dos formatos con moldes propios, que es la transformación real del dominio. El A4 se fija a 794×1123 px, la aproximación más cercana a A4 exacto con píxeles enteros.",
+      "nextAction": "Medir el PDF exportado a tamaño físico para confirmar 210×297 mm dentro de tolerancia.",
+      "evidence": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/deck-evidencia.png"
+    },
+    "motion": {
+      "score": 5,
+      "rationale": "Exclusión declarada y coherente: un documento no anima. El contrato de motion existe para hacer explícita la equivalencia bajo prefers-reduced-motion.",
+      "evidence": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/deck-evidencia-gris.png"
+    },
+    "fidelity": {
+      "score": 4.5,
+      "rationale": "El render real se comparó contra la dirección sellada en cada iteración; los tres defectos encontrados salieron de mirar el archivo y se corrigieron antes de cerrar.",
+      "evidence": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/deck-evidencia.png"
+    },
+    "genericTemplateResistance": {
+      "score": 4.5,
+      "rationale": "Tres rasgos que no salen de una plantilla genérica: la marginalia de procedencia con columna propia, el cierre «lo que esta edición no puede afirmar» como pieza deliberada, y el techo de porciones que deriva a barra en vez de apretar una torta.",
+      "evidence": "docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs/informe-analitica.png"
+    }
+  }
+}

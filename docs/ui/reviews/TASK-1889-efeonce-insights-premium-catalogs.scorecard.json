@@ -1,0 +1,89 @@
+{
+  "task": "TASK-1889",
+  "surface": "efeonce-insights.catalogs.insights-report+insights-deck",
+  "verdict": "pass-local",
+  "reviewedAt": "2026-09-25",
+  "reviewer": "claude-opus-5-5 (frames mirados: 21 lado a lado canvas | render en color y gris, y las ediciones reales Berel EO-INS-000019 y Sky EO-INS-000022)",
+  "evidence": {
+    "dossier": "docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md",
+    "fidelity": "docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/fidelity/fidelity.json",
+    "gray": "docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/fidelity/*.gris.png",
+    "desktop": "docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/fidelity/Premium-Evidencia.png",
+    "mobile": "docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/fidelity/Deck-Comparacion.png"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.7,
+      "rationale": "Cifra principal a 76 px (A4) / 104–132 px (deck) domina; la conclusión en Poppins 23/27 px la sigue; la figura y el cierre navy cierran la lectura. Mismo orden en las 8 páginas de figura, verificado en Berel y Sky reales.",
+      "evidence": "fidelity/Premium-Evidencia.png"
+    },
+    "proportions": {
+      "score": 4.6,
+      "rationale": "Retícula del canvas medida en píxeles (≤ 0,2 % de diferencia): 290/1fr en la cabecera, 150/1fr/104 en filas de métrica, 372/1fr en el deck.",
+      "evidence": "fidelity/Premium-Metas.png"
+    },
+    "rhythm": {
+      "score": 4.5,
+      "rationale": "Espaciado del canvas (38/16/40 px) constante entre páginas; el panel de cierre ancla el pie con el espacio flexible. Con una sola fila de datos (ICO) el vacío entre la figura y el cierre crece.",
+      "evidence": "fidelity/Premium-Agrupadas.png"
+    },
+    "density": {
+      "score": 4.2,
+      "rationale": "Correcta con 3–6 métricas. Deuda honesta: una figura ICO de un solo espacio deja media página vacía antes del cierre (edición real Sky, pp. 5–8). Se acepta porque la página no inventa contenido para llenar.",
+      "evidence": "EO-INS-000022 pp. 5–8 (local, no versionado: datos de cliente)",
+      "nextAction": "Evaluar con el operador una variante compacta de la página de figura para una sola fila (cifra + figura + cierre sin espacio flexible) cuando haya más ediciones ICO reales; no se rellena con contenido inventado."
+    },
+    "depth": {
+      "score": 4.6,
+      "rationale": "Sin card-on-card: papel plano, un solo panel navy por página (el cierre). En el deck, un único panel translúcido para la figura.",
+      "evidence": "fidelity/Deck-Comparacion.png"
+    },
+    "surfaceEconomy": {
+      "score": 4.6,
+      "rationale": "Cada página tiene una sola figura y una sola superficie de énfasis; el navy aparece sólo en el cierre (crítica «no se ve premium» aplicada).",
+      "evidence": "fidelity/Premium-Lineas.png"
+    },
+    "visualImpact": {
+      "score": 4.6,
+      "rationale": "La cifra grande con su conclusión es el momento dominante; las figuras tienen marca propia (banda de primera página, oportunidad discontinua, meta como marca vertical, halo en el cierre de la línea).",
+      "evidence": "fidelity/Premium-Lineas.png"
+    },
+    "typography": {
+      "score": 4.8,
+      "rationale": "Poppins/Geist del font pack con cifras tabulares; cero familias o tamaños literales fuera del sistema del catálogo; cortes de línea medidos contra el canvas.",
+      "evidence": "fidelity/Premium-Resumen.png"
+    },
+    "color": {
+      "score": 4.6,
+      "rationale": "Roles de dato del pack (actual, anterior, oportunidad, ausencia); ninguna serie se distingue sólo por color: forma (triángulo, discontinua, grosor) y rótulo. Hojas en gris en el dossier. Coral sobre papel 2,94:1 advisory, siempre con rótulo.",
+      "evidence": "fidelity/Premium-Agrupadas.gris.png"
+    },
+    "iconography": {
+      "score": 4.5,
+      "rationale": "Set de trazo del canvas (8 íconos) por métrica; una métrica sin ícono propio no recibe uno ajeno; isotipos de canal del catálogo.",
+      "evidence": "fidelity/Premium-Evidencia.png"
+    },
+    "responsive": {
+      "score": 4.5,
+      "rationale": "Lienzos fijos por diseño (A4 794×1123 y 16:9 1280×720), ambos verificados; el contenido largo se pagina equilibrado y el texto que no cabe falla cerrado en vez de recortarse.",
+      "evidence": "fidelity/fidelity.json"
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "No aplica: documento impreso (PDF). Sin animación por diseño.",
+      "evidence": "docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/fidelity/fidelity.json"
+    },
+    "fidelity": {
+      "score": 4.8,
+      "rationale": "20 de 21 páginas del canvas a ≤ 1 % (máximo 0.186 %); Deck-Agrupadas 2,2 % por un corrimiento de 3 px del propio canvas, excepción aprobada por el operador el 2026-09-25.",
+      "evidence": "fidelity/fidelity.json"
+    },
+    "genericTemplateResistance": {
+      "score": 4.7,
+      "rationale": "Anatomía propia del canvas Efeonce (pestaña de capítulo, cifra + conclusión, procedencia, cierre «Lo que significa / Próximo paso»); nada de dashboard genérico.",
+      "evidence": "fidelity/Premium-Metas.png"
+    }
+  },
+  "average": 4.59,
+  "notes": "Loop real: tres rondas de crítica del operador sobre tabla, narrada y límites; ediciones reales que revelaron cinco defectos corregidos (métricas en un eje común, capitular suelta, presupuestos de cabecera/pestaña/título, etiquetas largas en columnas, logo privado en la vista previa). Deuda: densidad de figuras ICO de una sola fila. El documento no tiene viewports responsive: «desktop» es la página A4 y «mobile» la lámina 16:9, ambas a tamaño físico."
+}

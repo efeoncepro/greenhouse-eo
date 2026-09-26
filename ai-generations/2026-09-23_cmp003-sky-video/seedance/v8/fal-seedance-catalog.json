@@ -1,0 +1,720 @@
+{
+  "models": [
+    {
+      "endpoint_id": "bytedance/seedance-2.5/us/reference-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.5 US Reference to Video",
+        "category": "image-to-video",
+        "description": "US-hosted ByteDance Seedance 2.5 generates video with native audio from up to 30 images, 10 videos, and 10 audio references. Supports reference-guided generation, video editing, and extension at 480p or 720p.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-09-19T03:10:46.660Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0aaafd55/ogacIYGKhsmZQEk3gCfK-.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.5/us/reference-to-video",
+        "license_type": "commercial",
+        "date": "2026-09-19T01:18:10.313Z",
+        "group": {
+          "key": "seedance-2.5-us",
+          "label": "Reference to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.5/us/image-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.5 US Image to Video",
+        "category": "image-to-video",
+        "description": "US-hosted ByteDance Seedance 2.5 animates still images with synchronized audio and optional end-frame control. Generate videos up to 30 seconds at 480p or 720p.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-09-19T03:10:13.447Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0aaafd55/0c84v0HjbaufuRK6VuCFC.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.5/us/image-to-video",
+        "license_type": "commercial",
+        "date": "2026-09-19T01:16:54.572Z",
+        "group": {
+          "key": "seedance-2.5-us",
+          "label": "Image to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.5/us/text-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.5 US Text to Video",
+        "category": "text-to-video",
+        "description": "US-hosted ByteDance Seedance 2.5 generates cinematic video from text with synchronized audio, up to 30-second duration, and 480p or 720p output.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-09-19T03:09:55.123Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0aaafd52/5TgJyrglFwBoFB-lx_IZg.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.5/us/text-to-video",
+        "license_type": "commercial",
+        "date": "2026-09-19T01:16:28.104Z",
+        "group": {
+          "key": "seedance-2.5-us",
+          "label": "Text to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.0/us/text-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.0 US Text to Video",
+        "category": "text-to-video",
+        "description": "US hosted version of ByteDance's most advanced text-to-video model. Cinematic output with native audio, multi-shot editing, real-world physics, and director-level camera control.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-09-15T20:39:39.360Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0aaa8c18/G-pLPV2kcuJH5WkGAe6od.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.0/us/text-to-video",
+        "license_type": "commercial",
+        "date": "2026-09-15T16:58:14.090Z",
+        "group": {
+          "key": "seedance-us",
+          "label": "Text to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.0/us/reference-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.0 US Reference to Video",
+        "category": "image-to-video",
+        "description": "US hosted version of ByteDance's most advanced reference-to-video model. Generate video from up to 9 images, 3 videos, and 3 audio clips with native audio and cinematic camera control.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-09-15T20:39:08.066Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0aaa8c08/7_knk4LEEeG7fTTb8QcN-.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.0/us/reference-to-video",
+        "license_type": "commercial",
+        "date": "2026-09-15T16:55:35.996Z",
+        "group": {
+          "key": "seedance-us",
+          "label": "Reference to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.0/us/image-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.0 US Image to Video",
+        "category": "image-to-video",
+        "description": "US hosted version of ByteDance's most advanced image-to-video model. Animate still images into cinematic video with synchronized audio, start and end frame control, and motion prompts.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-09-15T20:39:01.294Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0aaa8c0f/moIjOdx9iGvFio-n6ROjH.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.0/us/image-to-video",
+        "license_type": "commercial",
+        "date": "2026-09-15T16:56:27.143Z",
+        "group": {
+          "key": "seedance-us",
+          "label": "Image to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.5/reference-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.5 Reference to Video",
+        "category": "image-to-video",
+        "description": "Dreamina Seedance 2.5 generates video from up to 50 multimodal references images, video, audio, and style inputs, locking a character, set, and palette across a full 30-second take for production-grade consistency.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-09-09T17:43:56.710Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0aa30ee1/AvoWQSXcqJuX5CggoM3uh.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.5/reference-to-video",
+        "license_type": "commercial",
+        "date": "2026-07-20T21:04:34.821Z",
+        "group": {
+          "key": "Seedance-25",
+          "label": "Reference to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.5/image-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.5 Image to Video",
+        "category": "image-to-video",
+        "description": "Dreamina Seedance 2.5 animates a single still into a native 30-second clip at up to 720p, extending one frame into continuous, coherent motion without the drift or stitching of shorter multi-clip workflows.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-08-28T18:46:17.166Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0aa30ef9/4Ux9T9X2458w7LH1AI_oz.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.5/image-to-video",
+        "license_type": "commercial",
+        "date": "2026-07-20T21:02:38.001Z",
+        "group": {
+          "key": "Seedance-25",
+          "label": "Image to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.5/text-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.5 Text to Video",
+        "category": "text-to-video",
+        "description": "Dreamina Seedance 2.5 generates native 30-second single-shot video at up to 720p from a single text prompt, reasoning about the whole shot at once so motion, lighting, and subject identity stay coherent from first frame to last.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-08-28T18:45:54.815Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0aa30edb/Ckq9fPYW5fP_nqcCC-SHh.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.5/text-to-video",
+        "license_type": "commercial",
+        "date": "2026-07-20T21:03:22.667Z",
+        "group": {
+          "key": "Seedance-25",
+          "label": "Text to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.0/mini/reference-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.0 Mini",
+        "category": "image-to-video",
+        "description": "Seedance 2.0 Mini is a faster version of Seedance 2.0 that brings great performance and high generation speed at a lower cost.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-07-17T03:48:03.287Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0a9f7e63/evQshZj8rTqx3E564ZJOf_17a33801d0344490944bae38639ba9fd.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.0/mini/reference-to-video",
+        "license_type": "commercial",
+        "date": "2026-06-23T20:04:48.224Z",
+        "group": {
+          "key": "seedance-2.0-fal",
+          "label": "Reference to Video Mini"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.0/mini/image-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.0 Mini Image to Video",
+        "category": "image-to-video",
+        "description": "Seedance 2.0 Mini is a faster version of Seedance 2.0 that brings great performance and high generation speed at a lower cost.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-07-17T03:48:03.287Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0a9f7e64/hqSxiLW2DPExuIrP_Nh6e_9e1fcd4255554d659310e3fd469b3cb3.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.0/mini/image-to-video",
+        "license_type": "commercial",
+        "date": "2026-06-23T19:22:43.862Z",
+        "group": {
+          "key": "seedance-2.0-fal",
+          "label": "Image to Video Mini"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.0/mini/text-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.0 Mini Text to Video",
+        "category": "text-to-video",
+        "description": "Seedance 2.0 Mini is a faster version of Seedance 2.0 that brings great performance and high generation speed at a lower cost.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-07-17T03:48:03.287Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0a9f7e59/QR4fszdxC1WKHff7uSfwK_027c3c79ba7b49ab855976d21fc1171b.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.0/mini/text-to-video",
+        "license_type": "commercial",
+        "date": "2026-06-23T18:05:01.397Z",
+        "group": {
+          "key": "seedance-2.0-fal",
+          "label": "Text to Video mini"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.0/text-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.0 Text to Video API",
+        "category": "text-to-video",
+        "description": "ByteDance's most advanced text-to-video model. Cinematic output with native audio, multi-shot editing, real-world physics, and director-level camera control.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-07-10T18:12:05.187Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0a9c2f13/XcRHMX9gZIMSYL7ImArbn_ed7636768b1f41d286c66ed5ebc0521d.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.0/text-to-video",
+        "license_type": "commercial",
+        "date": "2026-04-01T18:49:18.123Z",
+        "group": {
+          "key": "seedance-2.0-fal",
+          "label": "Text to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.0/reference-to-video",
+      "metadata": {
+        "display_name": "Seedance 2 Reference to Video",
+        "category": "image-to-video",
+        "description": "ByteDance's most advanced reference-to-video model. Generate video from up to 9 images, 3 videos, and 3 audio clips with native audio and cinematic camera control.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-07-01T20:49:35.883Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0a9c2f1a/nie2992p9QXZaJbgszHZY_d584fa3e77b44d57a33417a48fac06ab.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.0/reference-to-video",
+        "license_type": "commercial",
+        "date": "2026-04-01T18:48:22.239Z",
+        "group": {
+          "key": "seedance-2.0-fal",
+          "label": "Reference to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.0/fast/text-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.0 Fast Text to Video",
+        "category": "text-to-video",
+        "description": "ByteDance's most advanced text-to-video model, fast tier. Lower latency and cost with cinematic output, native audio, multi-shot editing, and director-level camera control.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-05-29T18:20:56.533Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0a9c2f1c/JJWaVP5VEiyeEiqaEXWli_321bd6ab4d3f4ee8bf0003a332814416.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.0/fast/text-to-video",
+        "license_type": "commercial",
+        "date": "2026-04-01T18:47:38.648Z",
+        "group": {
+          "key": "seedance-2.0-fal",
+          "label": "Text to Video Fast"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.0/image-to-video",
+      "metadata": {
+        "display_name": "Seedance 2 Image to Video",
+        "category": "image-to-video",
+        "description": "ByteDance's most advanced image-to-video model. Animate still images into cinematic video with synchronized audio, start and end frame control, and motion prompts.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-06-22T18:20:04.465Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0a9c2f2b/C5HNQz1oux7K-6Tqfd_-9_c4a7c912a6db402686fe2c01591a1687.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.0/image-to-video",
+        "license_type": "commercial",
+        "date": "2026-04-01T18:47:20.614Z",
+        "group": {
+          "key": "seedance-2.0-fal",
+          "label": "Image to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.0/fast/reference-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.0 Fast Reference to Video",
+        "category": "image-to-video",
+        "description": "ByteDance's most advanced reference-to-video model, fast tier. Lower latency and cost with up to 9 images, 3 videos, and 3 audio clips as inputs.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-07-01T20:55:35.293Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0a9c2f0f/CksSmhus-kf2wceFqGv6u_28b605ee7aca4793871852ab3ecd70b6.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.0/fast/reference-to-video",
+        "license_type": "commercial",
+        "date": "2026-04-01T18:46:16.471Z",
+        "group": {
+          "key": "seedance-2.0-fal",
+          "label": "Reference to Video Fast"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "bytedance/seedance-2.0/fast/image-to-video",
+      "metadata": {
+        "display_name": "Seedance 2.0 Fast Image to Video",
+        "category": "image-to-video",
+        "description": "ByteDance's most advanced image-to-video model, fast tier. Lower latency and cost with synchronized audio, start and end frame control, and motion prompts.",
+        "status": "active",
+        "tags": [
+          "stylized",
+          "transform",
+          "lipsync"
+        ],
+        "updated_at": "2026-04-22T18:07:06.536Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0a9460fd/T3K2mVx51M-pOewqVAb1g_408d1bcc1efc4cfa902293ac5b1f378d.jpg",
+        "model_url": "https://fal.run/bytedance/seedance-2.0/fast/image-to-video",
+        "license_type": "commercial",
+        "date": "2026-04-01T18:43:34.817Z",
+        "group": {
+          "key": "seedance-2.0-fal",
+          "label": "Image to Video Fast"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "fal-ai/bytedance/seedance/v1.5/pro/text-to-video",
+      "metadata": {
+        "display_name": "Bytedance Seedance V1.5 Pro Text To Video",
+        "category": "text-to-video",
+        "description": "Generate videos with audio with Seedance 1.5",
+        "status": "active",
+        "tags": [
+          "bytedance",
+          "seedance",
+          "audio"
+        ],
+        "updated_at": "2026-04-21T17:44:34.169Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0a876c8c/7ieGsrCnzZmiES-uDGNXs_d16568d7e335443fb7a8dece1f9a9b0d.jpg",
+        "model_url": "https://fal.run/fal-ai/bytedance/seedance/v1.5/pro/text-to-video",
+        "license_type": "commercial",
+        "date": "2025-12-23T06:59:34.673Z",
+        "group": {
+          "key": "seedance-v15",
+          "label": "Text to Video Pro v1.5"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "fal-ai/bytedance/seedance/v1.5/pro/image-to-video",
+      "metadata": {
+        "display_name": "Bytedance Seedance V1.5 Pro Image To Video",
+        "category": "image-to-video",
+        "description": "Generate videos with audio with Seedance 1.5 (supports start & end frame) ",
+        "status": "active",
+        "tags": [
+          "bytedance",
+          "seedance",
+          "audio"
+        ],
+        "updated_at": "2026-04-21T17:44:33.564Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0a876c74/q6J8OsmO08A3zCFGCtsUj_cb48562eeef345b29269689dd4f95671.jpg",
+        "model_url": "https://fal.run/fal-ai/bytedance/seedance/v1.5/pro/image-to-video",
+        "license_type": "commercial",
+        "date": "2025-12-23T06:56:11.614Z",
+        "group": {
+          "key": "seedance-v15",
+          "label": "Image to Video Pro v1.5"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "fal-ai/bytedance/seedance/v1/pro/fast/image-to-video",
+      "metadata": {
+        "display_name": "Bytedance Seedance V1 Pro Fast Image To Video",
+        "category": "image-to-video",
+        "description": "Image to Video endpoint for Seedance 1.0 Pro Fast, a next-generation video model designed to deliver maximum performance at minimal cost",
+        "status": "active",
+        "tags": [
+          "bytedance",
+          "seedance",
+          "pro",
+          "fast"
+        ],
+        "updated_at": "2026-04-21T17:44:36.450Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/kangaroo/OHnRF5artsmMtvv5DikBL_0d31376b45fc47c28ad70e15245ca449.jpg",
+        "model_url": "https://fal.run/fal-ai/bytedance/seedance/v1/pro/fast/image-to-video",
+        "license_type": "commercial",
+        "date": "2025-10-24T11:57:48.061Z",
+        "group": {
+          "key": "seedance-v1",
+          "label": "Seedance 1.0 Pro Fast -- Image to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "fal-ai/bytedance/seedance/v1/pro/fast/text-to-video",
+      "metadata": {
+        "display_name": "Bytedance Seedance V1 Pro Fast Text To Video",
+        "category": "text-to-video",
+        "description": "Text to Video endpoint for Seedance 1.0 Pro Fast, a next-generation video model designed to deliver maximum performance at minimal cost",
+        "status": "active",
+        "tags": [
+          "bytedance",
+          "fast",
+          "motion"
+        ],
+        "updated_at": "2026-04-21T17:44:37.016Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://v3b.fal.media/files/b/monkey/vuOJvxcEA4z0fsRkw3r4Y_4930420a08f045c9ae3c401e3a6d20fc.jpg",
+        "model_url": "https://fal.run/fal-ai/bytedance/seedance/v1/pro/fast/text-to-video",
+        "license_type": "commercial",
+        "date": "2025-10-24T11:54:23.140Z",
+        "group": {
+          "key": "seedance-v1",
+          "label": "Seedance 1.0 Pro Fast --Text to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "fal-ai/bytedance/seedance/v1/lite/reference-to-video",
+      "metadata": {
+        "display_name": "Bytedance Seedance V1 Lite Reference To Video",
+        "category": "image-to-video",
+        "description": "Seedance lite reference-to-video allows the use of 1 to 4 images as reference to create a high-quality video.",
+        "status": "deprecated",
+        "tags": [
+          "reference-to-video",
+          "image-to-video",
+          ""
+        ],
+        "updated_at": "2026-05-13T11:12:31.221Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://fal.media/files/kangaroo/B49-COdFROSlS850S1PfV_be7c6c85a41b4410ae02216253e5c6f8.jpg",
+        "model_url": "https://fal.run/fal-ai/bytedance/seedance/v1/lite/reference-to-video",
+        "license_type": "commercial",
+        "date": "2025-09-01T13:56:37.039Z",
+        "group": {
+          "key": "seedance-v1",
+          "label": "Seedance 1.0 Lite -- Reference to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "fal-ai/bytedance/seedance/v1/pro/text-to-video",
+      "metadata": {
+        "display_name": "Seedance 1.0 Pro",
+        "category": "text-to-video",
+        "description": "Seedance 1.0 Pro, a high quality video generation model developed by Bytedance.",
+        "status": "active",
+        "tags": [],
+        "updated_at": "2026-04-21T17:44:38.216Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://storage.googleapis.com/fal_cdn/fal/for%20videos-1.jpg",
+        "model_url": "https://fal.run/fal-ai/bytedance/seedance/v1/pro/text-to-video",
+        "license_type": "commercial",
+        "date": "2025-06-16T16:22:01.447Z",
+        "group": {
+          "key": "seedance-v1",
+          "label": "Seedance 1.0 Pro -- Text to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "fal-ai/bytedance/seedance/v1/pro/image-to-video",
+      "metadata": {
+        "display_name": "Seedance 1.0 Pro",
+        "category": "image-to-video",
+        "description": "Seedance 1.0 Pro, a high quality video generation model developed by Bytedance.",
+        "status": "active",
+        "tags": [],
+        "updated_at": "2026-04-21T17:44:37.616Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://storage.googleapis.com/fal_cdn/fal/for%20videos-3.jpg",
+        "model_url": "https://fal.run/fal-ai/bytedance/seedance/v1/pro/image-to-video",
+        "license_type": "commercial",
+        "date": "2025-06-16T16:19:27.807Z",
+        "group": {
+          "key": "seedance-v1",
+          "label": "Seedance 1.0 Pro -- Image to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "fal-ai/bytedance/seedance/v1/lite/image-to-video",
+      "metadata": {
+        "display_name": "Seedance 1.0 Lite",
+        "category": "image-to-video",
+        "description": "Seedance 1.0 Lite",
+        "status": "deprecated",
+        "tags": [],
+        "updated_at": "2026-05-13T11:11:23.272Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://storage.googleapis.com/fal_cdn/fal/for%20videos-1.jpg",
+        "model_url": "https://fal.run/fal-ai/bytedance/seedance/v1/lite/image-to-video",
+        "license_type": "commercial",
+        "date": "2025-06-13T04:31:01.040Z",
+        "group": {
+          "key": "seedance-v1",
+          "label": "Seedance 1.0 Lite -- Image to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    },
+    {
+      "endpoint_id": "fal-ai/bytedance/seedance/v1/lite/text-to-video",
+      "metadata": {
+        "display_name": "Seedance 1.0 Lite",
+        "category": "text-to-video",
+        "description": "Seedance 1.0 Lite",
+        "status": "deprecated",
+        "tags": [],
+        "updated_at": "2026-05-13T11:11:51.376Z",
+        "is_favorited": null,
+        "thumbnail_url": "https://storage.googleapis.com/fal_cdn/fal/Sound-2.jpg",
+        "model_url": "https://fal.run/fal-ai/bytedance/seedance/v1/lite/text-to-video",
+        "license_type": "commercial",
+        "date": "2025-06-13T04:30:22.765Z",
+        "group": {
+          "key": "seedance-v1",
+          "label": "Seedance 1.0 Lite -- Text to Video"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      }
+    }
+  ],
+  "next_cursor": null,
+  "has_more": false
+}

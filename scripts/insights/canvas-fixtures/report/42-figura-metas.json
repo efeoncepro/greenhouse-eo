@@ -1,0 +1,109 @@
+{
+  "reference": "Premium-Metas",
+  "catalog": "report",
+  "contentType": "report-figure-targets",
+  "slots": {
+    "runningSection": "Resumen ejecutivo",
+    "runningPeriod": "Agosto 2026 · contra la meta",
+    "eyebrow": {
+      "icon": "target",
+      "label": "Metas del mes"
+    },
+    "keyFigure": "107 %",
+    "keyCaption": "de la meta de clics; las otras tres metas quedaron entre 76 % y 89 %",
+    "conclusion": "Se cumplió la meta de clics; la brecha más grande está en las citas de IA",
+    "lead": "Los clics superaron su meta en 84. El CTR y las keywords en primera página quedaron cerca; las citas con enlace, a 6 de la meta.",
+    "figureTitle": "Resultado de agosto contra la meta de cada indicador",
+    "legend": {
+      "achieved": "Logrado",
+      "target": "Meta",
+      "gap": "Mayor brecha"
+    },
+    "bulletDirection": "higher_is_better",
+    "bulletRows": [
+      {
+        "icon": "clicks",
+        "name": "Clics desde Google",
+        "unit": "cantidad",
+        "value": "1.284",
+        "achievedLabel": "logrado",
+        "targetLabel": "meta",
+        "target": "1.200",
+        "pct": "107 %",
+        "band": "1.020"
+      },
+      {
+        "icon": "search",
+        "name": "Keywords en primera página",
+        "unit": "cantidad",
+        "value": "26",
+        "achievedLabel": "logrado",
+        "targetLabel": "meta",
+        "target": "30",
+        "pct": "87 %",
+        "band": "25,5"
+      },
+      {
+        "icon": "ctr",
+        "name": "CTR",
+        "unit": "porcentaje",
+        "value": "2,66 %",
+        "achievedLabel": "logrado",
+        "targetLabel": "meta",
+        "target": "3,00 %",
+        "pct": "89 %",
+        "band": "2,55 %"
+      },
+      {
+        "icon": "link",
+        "name": "Citas de IA con enlace",
+        "unit": "cantidad",
+        "value": "19",
+        "achievedLabel": "logrado",
+        "targetLabel": "meta",
+        "target": "25",
+        "pct": "76 %",
+        "band": "21,25"
+      }
+    ],
+    "note": {
+      "text": "Cada fila usa su propia escala: la marca vertical es la meta y la barra, lo logrado."
+    },
+    "provenance": [
+      {
+        "label": "Unidad",
+        "text": "Cada indicador en su unidad; a la derecha, el porcentaje de la meta."
+      },
+      {
+        "label": "Fuente",
+        "text": "Search Console, posiciones y motores de respuesta"
+      },
+      {
+        "label": "Cobertura",
+        "text": "Metas acordadas para agosto 2026"
+      }
+    ],
+    "closing": [
+      {
+        "kind": "measure",
+        "label": "Lo que significa",
+        "text": "El sitio ya atrae más tráfico del previsto. Falta que ese alcance se convierta en citas de IA y en primeras posiciones."
+      },
+      {
+        "kind": "action",
+        "label": "Próximo paso",
+        "text": "Priorizar el contenido citable (p. 16) y el refuerzo de las keywords en posiciones 11 a 20 (p. 07).",
+        "signature": "Recomendación de Efeonce"
+      }
+    ],
+    "footerEdition": "Insights · Informe de agosto 2026",
+    "footerContact": {
+      "address": "Dr. Manuel Barros Borgoño 71, of. 1105, Providencia, Chile",
+      "phone": "+56 9 3732 3064"
+    },
+    "folio": {
+      "page": "04",
+      "total": "24"
+    }
+  }
+}

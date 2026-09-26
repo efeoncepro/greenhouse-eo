@@ -1,0 +1,69 @@
+{
+  "state": "awaiting-generated-picture",
+  "technical": [
+    "native duration/dimensions/fps",
+    "no native audio",
+    "decode every frame",
+    "no empty/corrupt frames"
+  ],
+  "visual": [
+    {
+      "interval": [
+        0,
+        1.8
+      ],
+      "gate": "Entire query readable, lateral camera persists while typing; no cropping or premature frontal flattening"
+    },
+    {
+      "interval": [
+        1.8,
+        4.4
+      ],
+      "gate": "Visible submit, three ordered results, transition to distinct user turn; no duplicated search/chat UI"
+    },
+    {
+      "interval": [
+        4.4,
+        8.4
+      ],
+      "gate": "Correct assistant answer, smooth downward reveal, attached SKY citation, reading time"
+    },
+    {
+      "interval": [
+        8.4,
+        10
+      ],
+      "gate": "Purple/lime activation into aircraft with continuous optical speed; no dead pause or tiny plane inside letters"
+    },
+    {
+      "interval": [
+        10,
+        15.75
+      ],
+      "gate": "One photoreal aircraft with consistent livery, continuous approach/pass/rear departure; no ghost/dissolve/deformation/smoke"
+    },
+    {
+      "interval": [
+        15.75,
+        25.75
+      ],
+      "gate": "Continuous animated sky, free from generated words, appropriate calm/contrast for approved overlays"
+    },
+    {
+      "interval": [
+        25.75,
+        30
+      ],
+      "gate": "Transition to blue by26, blue then purple, blank background suitable for actual logo/URL overlays"
+    }
+  ],
+  "composite": [
+    "source frames retained in order, no retiming of flight",
+    "approved title files preserve original hashes",
+    "title offset15.75s; URL26s with non-separable Luminosity",
+    "check contrast over actual moving sky at entrances/holds/exits",
+    "watch complete assembled picture and recheck every transition"
+  ],
+  "sound_order": "Only after picture is fixed, measure actual action frames, then generate music/SFX; no pre-generated score to force picture timing",
+  "hard_failure_action": "Do not spend another generation; report defects and keep approved assets untouched."
+}

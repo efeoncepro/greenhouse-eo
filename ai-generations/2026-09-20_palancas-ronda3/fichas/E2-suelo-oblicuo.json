@@ -1,0 +1,11 @@
+{
+  "id": "E2-suelo-oblicuo-lima",
+  "formato": "4:5",
+  "impacto": true,
+  "atmosfera": "polvo",
+  "escena": "SCENE (Run and Gun set, warehouse in Lima, late afternoon, NO recognisable faces): the camera LIES FLAT ON THE FLOOR, its body actually resting on the concrete, tilted up at about 30 degrees AND rotated so the horizon runs DIAGONALLY across the frame from lower left to upper right. Verify it by these landmarks: the concrete floor fills the entire bottom third, out of focus and enormous, with its grain and grit right at the lens; the legs and boots of the crew rise like columns from that floor; the ceiling trusses converge steeply overhead; and every vertical in the room leans because of the tilt. A hard low sun beam cuts across the floor at the instant a crew member steps over the lens. 16mm at f/4, camera on the ground. Everything is completely unbranded, no readable text anywhere.",
+  "lecho": {
+    "objeto": "the concrete floor itself, right at the lens, filling the bottom of the frame",
+    "tono": "DARK grey concrete in shadow, matte"
+  }
+}

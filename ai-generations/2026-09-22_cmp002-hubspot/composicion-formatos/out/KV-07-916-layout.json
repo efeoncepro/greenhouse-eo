@@ -1,0 +1,65 @@
+{
+  "canvas": {
+    "width": 1152,
+    "height": 2048
+  },
+  "subjectProtection": {
+    "top": 645,
+    "minClearance": 24
+  },
+  "elements": [
+    {
+      "id": "entrada",
+      "box": {
+        "left": 81,
+        "right": 517.770608,
+        "top": 286.72,
+        "bottom": 317.356
+      }
+    },
+    {
+      "id": "dominante",
+      "box": {
+        "left": 81,
+        "right": 977.7245923809523,
+        "top": 331.356,
+        "bottom": 430.476
+      }
+    },
+    {
+      "id": "cierre-frase",
+      "box": {
+        "left": 81,
+        "right": 828.9319999999999,
+        "top": 441.476,
+        "bottom": 476.53000000000003
+      }
+    },
+    {
+      "id": "cta",
+      "box": {
+        "left": 116.16,
+        "right": 663.4000000000001,
+        "top": 514.53,
+        "bottom": 557.2099999999999
+      }
+    },
+    {
+      "id": "descriptor",
+      "box": {
+        "left": 92.16,
+        "right": 462.15199999999993,
+        "top": 596.274,
+        "bottom": 618.6179999999999
+      }
+    }
+  ],
+  "typography": {
+    "lead": 36,
+    "dominant": 118,
+    "closure": 34,
+    "cta": 40,
+    "descriptor": 28
+  },
+  "selection": null
+}

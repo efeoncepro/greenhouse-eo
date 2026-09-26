@@ -1,0 +1,26 @@
+{
+  "id": "julio-rodaje-reflejos-arquitectonicos-v3",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["julio"],
+  "servicio": "Creative Services: dirección de una toma de arquitectura para una experiencia cultural independiente",
+  "industria": "evento cultural hipotetico, sin cliente identificado",
+  "mercado": "Santiago",
+  "preflightVisual": {
+    "vistos": [
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/set-curado-12.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/J1-retrato-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/J2-rodaje-polo-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/JN3-calle-final.png"
+    ],
+    "comparacion": "J1 aporta los rasgos de Julio; J2 el gesto de dirección y equipo real, pero esta alternativa se muda al exterior. JN3 demuestra luz urbana natural y profundidad. Frente a la primera versión de proyección, el azul se rompe en reflejos de cielo sobre vidrio existente en distintos planos, sin gran pantalla o bloque liso. El naranja nace de sol rasante sobre un plano arquitectónico cálido y nunca de utilería. Un estuche de cámara real cercano a la lente forma el lecho oscuro."
+  },
+  "azul": "reflejos irregulares del cielo azul activo en varios paneles de vidrio y metal arquitectonicos a distinta profundidad; sin objeto o fondo azul uniforme",
+  "acento": "pequeño filo anaranjado del sol rasante sobre muro de terracota existente y su reflexion, sin objeto añadido",
+  "lecho": {
+    "objeto": "the near soft edge of an unbranded black camera bag resting beside the photographer at ground level",
+    "tono": "DARK charcoal near black in even shade, with subtle woven fabric texture"
+  },
+  "escena": "SCENE (on-location rehearsal of an architectural establishing shot for a hypothetical independent cultural event, Santiago, late afternoon): Julio is the ONLY person in frame. He wears a soft unbranded pale stone linen overshirt over a light grey shirt and charcoal trousers, no navy garment. A candid full-frame 35mm f/2.8 photograph made from a low position beside the camera bag catches the exact moment Julio adjusts the focus ring of a compact professional camera on a tripod while checking the alignment of a real glass walkway and stairs; his face remains visible in three-quarter view, with his familiar short salt-and-pepper curls, thin rectangular silver glasses, full greying beard and warm brown skin clearly preserved. The visible work is a location shot being composed; the mechanism is the camera and its sightline through the architecture; the idea is finding the decisive convergence of the stair, glass and sunlight. Bright active azure-blue clear sky appears ONLY as multiple irregular reflected fragments across existing angled glass balustrade panes and slim brushed-metal edges in the middle and far depth planes. These blue reflections vary with angle and material; they are not a flat blue screen, panel, rectangle, painted wall, prop, bottle or clothing. One small natural saturated warm-orange glint from low sun lands on a real terracotta masonry wall off to the side and echoes faintly in one glass edge; it is subordinate and comes from the site's existing light and material, never a colored prop. Strong late sunlight sculpts Julio's hand and cheek while his skin stays neutral-warm; shadows retain texture and stay neutral, never blue. Show a tactile clean public setting with three distinct depth planes, slight lived-in imperfection, a decisive working gesture, no client logo, no artificial neon, no cinematic color grade, no stock pose. No text, letters, numbers, generated logos or watermarks anywhere."
+}
