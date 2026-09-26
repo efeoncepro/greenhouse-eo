@@ -526,15 +526,27 @@
         "estrategia de campaña",
         "message house",
         "matriz de audiencias",
-        "plan de contenidos de campaña"
+        "plan de contenidos de campaña",
+        "agente de medios",
+        "planificador de medios",
+        "plan de medios IA",
+        "reparto de presupuesto de campaña",
+        "flight de campaña",
+        "agente SEO/AEO de campaña",
+        "plan SEO/AEO de campaña",
+        "seguimiento SEO de campaña",
+        "agentes de rol de Marketing Studio"
       ],
       "skills": [
         "efeonce-marketing-studio",
         "efeonce-campaign-planning",
+        "efeonce-agent-media-planner",
+        "efeonce-agent-seo-aeo",
         "efeonce-mcp-platform"
       ],
       "sources": [
         "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md",
+        "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md",
         "docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md",
         "docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md",
         "docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md",
