@@ -328,8 +328,11 @@ jobs:
     with:
       environment: production
       expected_sha: ${{ inputs.target_sha }}
+    # workflow_call does not inherit repo secrets: forward the worker's declared runtime inputs.
     secrets:
       GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      DATAFORSEO_API_LOGIN: ${{ secrets.DATAFORSEO_API_LOGIN }}
+      GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID }}
 
   deploy-commercial-cost-worker:
     name: Deploy commercial-cost-worker
