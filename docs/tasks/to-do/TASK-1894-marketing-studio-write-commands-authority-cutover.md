@@ -6,6 +6,21 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 — TASK-1893 y TASK-1896 cerradas
+
+- **TASK-1896 complete:** la precondición de producción está cumplida. Ensayo de restauración verde contra
+  `marketing_studio` (paridad 18 tablas, job 49 s), falla forzada probada en staging, scheduler del ensayo activo,
+  Sentry, uptime y señal `platform.marketing_studio.health` en producción. Las brechas que quedaron (reglas de alerta
+  propias de Sentry, error forzado, caída simulada, mensaje real a Teams) están en sus Follow-ups y no bloquean esta
+  task.
+- **TASK-1893 complete:** hereda el almacén de originales en producción (`studio.media_object`, bucket
+  `efeonce-marketing-studio-originals`, objeto por sha256 con `ifGenerationMatch=0`), la descarga firmada
+  (`issueOriginalDownload`, 10 min, auditada), los derechos por versión (`setAssetVersionRights`, CLI) y
+  `studio.worker_run`. El worker genera derivados por la notificación `OBJECT_FINALIZE` del prefijo `originals/`:
+  si la subida firmada escribe en ese prefijo, los derivados deberían salir sin trabajo extra (inferido, verificar al
+  diseñar `requestAssetUpload`). 24 imágenes de CMP-002 siguen sólo en OneDrive por
+  falta de sha256 en el catálogo.
+
 ## Delta 2026-09-26
 
 - TASK-1896 quedó code complete (rollout pendiente): los commands de escritura heredan `captureWithDomain` y

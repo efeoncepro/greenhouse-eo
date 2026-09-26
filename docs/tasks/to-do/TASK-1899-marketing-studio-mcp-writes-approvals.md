@@ -6,6 +6,12 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26
+
+- TASK-1896 complete: la condición «cerrada antes del flag ON en producción» está cumplida. La tool de lectura
+  `studio.asset.download` (TASK-1893) está en el manifiesto pero sin federar en el gateway (Follow-up de TASK-1893);
+  quien toque el provider primero hace el sync.
+
 ## Delta 2026-09-25
 
 - El patrón de provider ya existe (TASK-1891, gateway 1.8.0 con flag OFF): `src/providers/marketing-studio.ts`, sync `pnpm studio:manifest:sync` → `marketing-studio-tool-manifest.generated.ts` con hash verificado al cargar, y guard `marketing-studio-tool-parity.ts`, que ya rechaza tools de escritura sin clase de scope. Extenderlo; no crear otro provider.

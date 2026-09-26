@@ -1,9 +1,9 @@
 # Efeonce Marketing Studio — Arquitectura V1
 
 > **Tipo:** arquitectura técnica (contrato para agentes y desarrolladores)
-> **Versión:** 1.4
+> **Versión:** 1.5
 > **Creado:** 2026-09-25 por Claude (TASK-1887)
-> **Última actualización:** 2026-09-26 por Claude (TASK-1896: observabilidad, health profundo, restauración)
+> **Última actualización:** 2026-09-26 por Claude (estado: TASK-1893 y TASK-1896 en producción)
 > **Estado:** Accepted. En vivo en `https://studio.efeonce.org` desde 2026-09-25 (TASK-1887)
 > **Decisión gobernante:** [`EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`](../EFEONCE_STUDIO_API_FIRST_DECISION_V1.md) (principio 2026-09-23 + deltas de placement y de agentes 2026-09-25)
 > **Programa:** [`EPIC-049`](../../epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md)
@@ -64,7 +64,7 @@ Nace del prototipo local `ABRIR CAMPAIGN MANAGER.html` (Codex, OneDrive `5. Cont
   Efeonce MCP (mcp.efeonce.org) ─► provider marketing-studio ─► /api/v1 con bearer de servicio
        └─ por cada llamada canjea el token de la persona en Greenhouse (RFC 8693) antes de llamar a Studio
   scripts/ (CLI)  ─► import del catálogo OneDrive · renditions · alta/revocación de api_client · manifiesto de tools
-  apps/worker     ─► (futuro, Cloud Run + Scheduler, TASK-1893) renditions automáticas, readback de Metricool
+  apps/worker     ─► Cloud Run + Pub/Sub + Scheduler (TASK-1893, en producción) derivados automáticos, barrido, readback de Metricool
 ```
 
 Reglas de capas:
@@ -274,8 +274,9 @@ prefijo; el público `EO-ORG-####` es sólo presentación y el importador lo rec
 
 ## 7.2 Almacén de originales y worker de medios (TASK-1893)
 
-Estado: **code complete, rollout pendiente** (buckets, SA, Pub/Sub, Cloud Run, Scheduler, migración de producción,
-ingesta y release de Greenhouse). Runbook: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) §Originales y worker.
+Estado: **en producción desde 2026-09-26** (TASK-1893 complete; release de Greenhouse `92002873ced9`). Pendiente: 24
+imágenes de CMP-002 sin sha256 en el catálogo, federación de `studio.asset.download` en el gateway y costo del primer
+mes. Runbook: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) §Originales y worker.
 
 - **Buckets** `efeonce-marketing-studio-originals` / `-staging` (us-east4, Standard, UBLA, PAP `enforced`, versionado,
   soft delete 30 días, labels `app`/`env`). Lifecycle: no vigentes se borran a los 30 días; `daysSinceCustomTime > 30`
@@ -338,8 +339,9 @@ ingesta y release de Greenhouse). Runbook: [`MARKETING_STUDIO_RUNTIME_HANDOFF.md
 
 ## 9. Observabilidad y operación (TASK-1896)
 
-Estado: **code complete, rollout pendiente** (proyecto Sentry, variables de Vercel, uptime check, rol y job del
-ensayo, secreto del cliente de Greenhouse y release de Greenhouse). Runbooks:
+Estado: **en producción desde 2026-09-26** (TASK-1896 complete; release de Greenhouse `92002873ced9`). Las reglas de
+alerta propias de Sentry no se crearon (Sentry movió las alertas de issues a Workflows); rige el workflow por defecto de
+alta prioridad hasta portar el script. RTO de referencia medido ≈ 1 min. Runbooks:
 [`MARKETING_STUDIO_RUNTIME_HANDOFF.md`](../../operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md) y
 [`MARKETING_STUDIO_RESTORE_RUNBOOK.md`](../../operations/marketing-studio/MARKETING_STUDIO_RESTORE_RUNBOOK.md).
 
@@ -397,7 +399,7 @@ romperlos si el registro falla. El worker de TASK-1893 registra en su propia `st
 - Ensayo `pnpm ops:restore-rehearsal`: conteo y `pg_dump --snapshot` sobre el mismo snapshot `REPEATABLE READ`, base
   temporal `marketing_studio_restore_<16 hex>`, paridad por tabla del schema `studio`, `DROP` siempre y verificado,
   `ops_run` + `audit_event`. Rol dedicado `marketing_studio_restore` (por SQL, `CREATEDB`, sin `CREATEROLE`, tope 3).
-  Cloud Run Job `marketing-studio-restore-rehearsal` + Scheduler pausado hasta el primer ensayo verde; dump conservado
+  Cloud Run Job `marketing-studio-restore-rehearsal` + Scheduler pausado hasta el primer ensayo verde (activo desde 2026-09-26); dump conservado
   30 días en `efeonce-marketing-studio-restore-dumps`.
 
 ### 9.5 Alertas
@@ -410,7 +412,7 @@ romperlos si el registro falla. El worker de TASK-1893 registra en su propia `st
   `error` si un componente o el ensayo está `down`, `warning` con cualquier degradación, `ok` con `not_configured`,
   `unknown` sin credencial o sin respuesta. Aviso diario a Teams **«EO - Admin»** (destino
   `marketing-studio-reliability-alerts`, decisión del operador 2026-09-26) sólo en `error`, desde el ops-worker
-  (`POST /marketing-studio/health-watch`, scheduler `ops-marketing-studio-health-watch`, nace pausado). Studio nunca
+  (`POST /marketing-studio/health-watch`, scheduler `ops-marketing-studio-health-watch`, nace pausado; activo desde 2026-09-26). Studio nunca
   recibe credenciales del bot de Teams.
 
 ### 9.6 SLOs (producto interno, sin error budget formal ni guardia fuera de horario)
@@ -438,10 +440,10 @@ romperlos si el registro falla. El worker de TASK-1893 registra en su propia `st
 | Task | Qué entrega | Estado |
 |---|---|---|
 | TASK-1887 | Fundación | Complete |
-| TASK-1890 | Registro de operaciones, manifiesto, semántica, bearer, organización canónica, capability, manual | Code complete; falta servir el manual en producción (release de Greenhouse) |
-| TASK-1891 | Provider `marketing-studio` en el gateway | Gateway 1.8.0 desplegado con flag OFF; falta release de Greenhouse → flag ON → canary |
-| TASK-1893 | Originales en GCS + worker de medios | To-do |
-| TASK-1896 | Observabilidad, alertas y restauración | In-progress: code complete (Studio + Greenhouse), rollout pendiente |
+| TASK-1890 | Registro de operaciones, manifiesto, semántica, bearer, organización canónica, capability, manual | Complete |
+| TASK-1891 | Provider `marketing-studio` en el gateway | Complete (provider ON en producción) |
+| TASK-1893 | Originales en GCS + worker de medios | Complete 2026-09-26 (en producción) |
+| TASK-1896 | Observabilidad, alertas y restauración | Complete 2026-09-26 (en producción; restauración probada) |
 | TASK-1892 | Métricas desde Greenhouse (GA4 aún no en producción: TASK-1284) | To-do |
 | TASK-1894 | Commands de escritura, brief como entidad, corte de autoridad, subida firmada | To-do |
 | TASK-1895 | UI de edición, revisión y métricas | To-do |

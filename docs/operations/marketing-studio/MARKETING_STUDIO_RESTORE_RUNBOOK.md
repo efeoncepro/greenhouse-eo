@@ -1,9 +1,9 @@
 # Efeonce Marketing Studio — Runbook de restauración y ensayo
 
 > **Tipo:** runbook operativo
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-26 por Claude (TASK-1896)
-> **Última actualización:** 2026-09-26 por Claude (TASK-1896)
+> **Última actualización:** 2026-09-26 por Claude (TASK-1896: ensayos en Cloud Run y scheduler activo)
 > **Arquitectura:** [EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) §9
 > **Runtime:** [MARKETING_STUDIO_RUNTIME_HANDOFF.md](MARKETING_STUDIO_RUNTIME_HANDOFF.md)
 > **Código:** `efeonce-marketing-studio` → `scripts/ops/restore-rehearsal.ts`, `scripts/ops/infra/restore-rehearsal-job.sh`, `scripts/ops/sql/restore-role*.sql`, `infra/restore-rehearsal/`
@@ -44,14 +44,18 @@ extracción lógica), nunca restaurados sobre la instancia compartida.
 | Mientras OneDrive sea la fuente (hasta TASK-1894) | Reimport idempotente del catálogo + renditions | la última versión del catálogo | ≤ 1 h |
 
 La restauración lógica medida (dump + restore + paridad) es el piso técnico del RTO. Ensayo local 2026-09-26 sobre
-un clúster desechable con datos mínimos: ~0,4 s. **Pendiente:** la cifra real del primer ensayo contra
-`marketing_studio` de producción se anota aquí (`counts.totalMs` de su fila en `studio.ops_run`).
+un clúster desechable con datos mínimos: ~0,4 s. Primer ensayo contra `marketing_studio` de producción (2026-09-26):
+restore 2 s y job completo 49 s, así que el **RTO de referencia es ≈ 1 min** para el tamaño actual de la base.
 
 | Fecha | Origen | Tablas | Filas | Dump | Restore | Total | Resultado |
 |---|---|---|---|---|---|---|---|
 | 2026-09-26 | clúster local (PG 18, desechable) | 18 | 11 | 43 ms | 203 ms | 365 ms | succeeded; forzado `--simulate-parity-failure` → failed, exit 1 |
-| _pendiente_ | `marketing_studio_staging` (Cloud Run Job) | | | | | | |
-| _pendiente_ | `marketing_studio` (Cloud Run Job) | | | | | | |
+| 2026-09-26 | `marketing_studio_staging` (Cloud Run Job) | 18 | — | — | 2 s | 64 s (job) | succeeded, paridad 18 tablas |
+| 2026-09-26 | `marketing_studio_staging` (Cloud Run Job, `--simulate-parity-failure`) | 18 | — | — | — | 90 s (job) | failed `parity_mismatch`, exit 1 (esperado) |
+| 2026-09-26 | `marketing_studio` (Cloud Run Job, `--dump-bucket`) | 18 | — | — | 2 s | 49 s (job) | succeeded, paridad 18 tablas; dump en `efeonce-marketing-studio-restore-dumps` |
+
+Tras los tres ensayos no quedó ninguna base `marketing_studio_restore_*`. El scheduler quedó ENABLED el 2026-09-26; su
+primera corrida programada es el martes 2026-09-29 a las 05:30 America/Santiago.
 
 ## Rol del ensayo (una vez, por SQL)
 
@@ -188,4 +192,5 @@ gcloud sql instances delete studio-recovery-<fecha> --project efeonce-group
 | `pg_dump_failed` … «secuencia studio_pgmigrations_id_seq» | faltan los GRANT del historial de migraciones | `restore-role-grants.sql` en esa base |
 | exit 3 | otro ensayo en curso | esperar; si quedó colgado, se libera solo a las 6 h |
 | `parity_mismatch` | la restaurada no tiene las mismas filas | no poner en servicio; revisar `audit_event` (`mismatchDetail`) y el log del job |
+| el rol del ensayo no puede conectarse a la base | el `GRANT CONNECT` lo dio alguien que no es dueño de la base | darlo como `marketing_studio_migrator`, dueño de las bases (scripts corregidos en Studio `f9e6cbb`) |
 | `temp_database_not_dropped` | falló el `DROP` | borrar a mano como `marketing_studio_restore` y revisar conexiones abiertas |

@@ -184,20 +184,16 @@ preview 1600 WebP, ffmpeg frame at 1 s for videos; idempotent, no overwrite). St
 - **MCP `forbidden`** → the Greenhouse exchange denied: person lacks `marketing_studio.campaign.read`, or
   `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` lacks `efeonce-mcp-marketing-studio` in that deployment.
 
-## Program status (2026-09-25) and pending
+## Program status (2026-09-26) and pending
 
-- Studio in production at `d3ab68e`; API 1.1.0; 12 tools + 5 exclusions; manifest hash `96d1f0caf6e5…`.
-- TASK-1887 complete. TASK-1890 in-progress (code complete; pending: Greenhouse release that serves the manual).
-- TASK-1896 in-progress: code complete in Studio + Greenhouse (not pushed), `ops_run` on staging; rollout pending
-  (Sentry, Vercel env, uptime, restore role/job/scheduler, production migration, Greenhouse release). See ledger.
-  TASK-1891 in-progress (gateway 1.8.0 deployed with provider flag **OFF**; pending: Greenhouse release → flag ON +
-  dispatch → canary with human Entra token → MCP session).
-- Greenhouse local `develop` holds the exchange client, capability, manual and registry drift fix, **not pushed**
-  (remote commit collides with foreign WIP in `scripts/foto`).
-- TASK-1893 (2026-09-26) code complete, rollout pending: original store in GCS, `studio.asset.download` (API 1.2.0,
-  13 tools), rights, media worker `apps/worker`, Metricool readback. **Apply the Studio production migration before
-  pushing `main`**: the readers now select `media_object` and the rights columns.
-- Order: 1890 → 1891 · 1893 · 1896 → 1892 → 1894 → 1895 · 1899 → 1897 → 1898. Details: `references/program-ledger.md`.
+- Studio in production; API 1.2.0; 13 tools + 5 exclusions in the Studio manifest; the gateway federates 12 (the
+  `studio.asset.download` federation is a TASK-1893 follow-up).
+- Complete: TASK-1887, TASK-1890, TASK-1891, TASK-1893 and TASK-1896 (the last two rolled out on 2026-09-26 with the
+  Greenhouse release `92002873ced9`). Restore is proven in production (rehearsal job 49 s, monthly scheduler).
+- Open follow-ups: 24 CMP-002 images without sha256 (still only in OneDrive); gateway federation of
+  `studio.asset.download`; Sentry custom rules (API moved to Workflows); forced prod error, simulated uptime outage and
+  real Teams message not exercised; first scheduled rehearsal on 2026-09-29; first-month costs.
+- Next: TASK-1892 → 1894 → 1895 · 1899 → 1897 → 1898. Details: `references/program-ledger.md`.
 
 ## Routing
 

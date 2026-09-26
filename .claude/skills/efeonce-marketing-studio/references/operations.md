@@ -151,7 +151,14 @@ Manifest change in the gateway: `STUDIO_REPO=… GREENHOUSE_REPO=… pnpm studio
 (`test/marketing-studio*.test.ts`, `test/authorized-tools.test.ts`, version gate) → `pnpm surface:baseline` →
 bump `version` in `package.json` → PR → merge → dispatch. A description change is a breaking surface change (bump).
 
-## Observability and restore (TASK-1896, verified 2026-09-26)
+## Observability and restore (TASK-1896, in production since 2026-09-26)
+
+Live: Sentry project `efeonce-marketing-studio` (id `4512153019809792`), uptime check `studio-api-v1-health-A2vbXH5AjzI`
++ policy `17467591732187545239` (email `jreyes@efeoncepro.com`), rehearsal job + scheduler ENABLED, Greenhouse
+scheduler `ops-marketing-studio-health-watch` ENABLED. Two known limits of the scripts: Sentry **project creation**
+must be done in the UI (the org disables it for members via API), and `sentry.sh` step 4 (alert rules) is stale —
+`/projects/.../rules/` returns 404 because Sentry moved issue alerts to **Workflows**; the default «Send a notification
+for high priority issues» workflow is what alerts today.
 
 All infra is idempotent shell in the Studio repo, **dry-run by default** (`--apply` executes; secrets always piped):
 
@@ -174,7 +181,7 @@ gcloud run jobs execute marketing-studio-restore-rehearsal --region us-east4 --w
 ```
 
 Order: role by SQL (`scripts/ops/sql/restore-role.sql` as instance admin + `restore-role-grants.sql` as migrator per
-DB) → job `--apply` → staging rehearsal → forced failure → production rehearsal (record times in the runbook) →
+DB; `GRANT CONNECT` must come from the DB owner `marketing_studio_migrator`, Studio `f9e6cbb`) → job `--apply` → staging rehearsal → forced failure → production rehearsal (record times in the runbook) →
 `--activate`. Local testing of the rehearsal works against a throwaway cluster (see lessons: socket path limit).
 
 Deep health (with a `studio:health` token, never `studio:read`):
@@ -186,11 +193,16 @@ unset T
 ```
 
 Greenhouse side: Vercel production needs `MARKETING_STUDIO_HEALTH_TOKEN_SECRET_REF=greenhouse-marketing-studio-health-token`;
-the ops-worker declares it in `deploy.sh`. Alert scheduler `ops-marketing-studio-health-watch` is born paused; resume
-it only after the first green production rehearsal. Rollback: DSN empty + redeploy; `pnpm migrate down` (ops_run);
+the ops-worker declares it in `deploy.sh`. Alert scheduler `ops-marketing-studio-health-watch` was born paused and was
+resumed on 2026-09-26 after the first green production rehearsal. Rollback: DSN empty + redeploy; `pnpm migrate down` (ops_run);
 pause both schedulers; disable the uptime policy.
 
-## Originals, download, rights and media worker (TASK-1893, code complete 2026-09-26)
+## Originals, download, rights and media worker (TASK-1893, in production since 2026-09-26)
+
+Live flags: `STUDIO_ORIGINAL_DOWNLOADS_ENABLED` production `true`, preview `false`; `MEDIA_WORKER_DERIVATIVES_ENABLED`
+`true` staging + prod; `MEDIA_WORKER_METRICOOL_READBACK_ENABLED` `true` prod, `false` staging;
+`MEDIA_WORKER_ARCHIVE_TIERING_ENABLED` `false`. Worker revisions: prod `00001-sgb`, staging `00002-svt`. Metricool
+`userId` 3116862. Worker PG roles need `GRANT CONNECT` from the DB owner (Studio `82aeab6`).
 
 Full ordered rollout: `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md` §Originales y worker.
 

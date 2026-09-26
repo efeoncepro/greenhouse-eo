@@ -6,6 +6,44 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 — cierre en producción
+
+- **Sentry:** proyecto `efeonce-marketing-studio` (org `efeonce-group-spa`, id `4512153019809792`,
+  `javascript-nextjs`) creado por la UI, porque la API rechazó crear proyectos («Your organization has disabled this
+  feature for members»). Scrubbing del lado del servidor aplicado con `scripts/ops/infra/sentry.sh`; DSN en Secret
+  Manager `marketing-studio-sentry-dsn` v1; Vercel de Studio con `SENTRY_DSN` y `NEXT_PUBLIC_SENTRY_DSN` en production y
+  preview. **No se crearon las 3 reglas de alerta propias:** Sentry movió las alertas de issues a Workflows y
+  `/projects/.../rules/` responde 404; el proyecto conserva el workflow por defecto «Send a notification for high
+  priority issues», que avisa al operador (único miembro del team). Tampoco se creó el token de source maps (opcional).
+- **Uptime:** check `studio-api-v1-health-A2vbXH5AjzI` (4 regiones, cada 5 min, matcher `"database":"reachable"`),
+  política `17467591732187545239`, canal de email `11422563510758505577` → `jreyes@efeoncepro.com`.
+- **Base:** `studio.ops_run` en producción (migración `1790409464603` aplicada el 2026-09-26 junto con la
+  `1790409193629` de TASK-1893).
+- **Health profundo en producción** con el bearer `studio:health` del `api_client` de Greenhouse (secreto
+  `greenhouse-marketing-studio-health-token`, legible por `greenhouse-portal@`): `database`, `database_connections`,
+  `media_bucket` y `media_worker` `ok`; `greenhouse_metrics` `not_configured`; frescura `catalog_import`,
+  `pending_renditions`, `metricool_readback`, `restore_rehearsal` y `rights_expiring` `ok`;
+  `overdue_unverified_posts` `degraded` (señal real de negocio: 3 posts vencidos sin verificar). Con ese token,
+  `/campaigns` → 403.
+- **Restauración:** rol `marketing_studio_restore` (`LOGIN CREATEDB NOCREATEROLE`, límite 3, miembro de
+  `marketing_studio_runtime`). Los `GRANT CONNECT` los debe dar el dueño de la base, `marketing_studio_migrator`
+  (corregido en los scripts de Studio, commit `f9e6cbb`). Cloud Run Job `marketing-studio-restore-rehearsal` + bucket
+  `efeonce-marketing-studio-restore-dumps` (retención 30 días). Ensayos: staging `succeeded` (paridad 18 tablas,
+  restore 2 s, job 64 s); staging con `--simulate-parity-failure` → `failed` `parity_mismatch`, exit 1 (90 s);
+  producción `succeeded` (paridad 18 tablas, restore 2 s, job 49 s, dump en el bucket). No quedó ninguna base
+  `marketing_studio_restore_*`. Scheduler `marketing-studio-restore-rehearsal` ENABLED (martes 05:30 America/Santiago,
+  `--skip-if-recent-days 28`). RTO de referencia ≈ 1 min para el tamaño actual.
+- **Greenhouse:** release `92002873ced9-c1f1b1b3-117d-4bfb-893b-9624e046f701` (run `36244075462`, PR #243) publicó la
+  señal `platform.marketing_studio.health`, el destino Teams `marketing-studio-reliability-alerts` («EO - Admin») y
+  `POST /marketing-studio/health-watch` del ops-worker. `ops-worker-00719-gbm` al 100 % con
+  `MARKETING_STUDIO_HEALTH_TOKEN_SECRET_REF`; el POST canary respondió 200 `severity: warning`, `alerted: false`.
+  Scheduler `ops-marketing-studio-health-watch` ENABLED (diario 12:20 America/Santiago). No se envió un mensaje real a
+  Teams (sólo sale en `error`); el paso a `error` por ensayo fallido o de más de 45 días está cubierto sólo por tests
+  unitarios.
+- Lección de la sesión: el paquete nuevo `@efeoncepro/axis-brand-assets` no tenía acceso de GitHub Packages para el CI
+  de Greenhouse y lo bloqueó (`ERR_PNPM_FETCH_403`); la regla quedó en
+  `docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md` (commit `efa2ce2ae`).
+
 ## Delta 2026-09-26 — code complete, rollout pendiente
 
 - **Studio** (`efeonce-marketing-studio`, sin push): `3d9a497` paquete `@studio/observability` + Sentry 11 en el
@@ -34,7 +72,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -47,7 +85,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-049`
-- Status real: `Avanzada`
+- Status real: `Complete 2026-09-26 — en producción: Sentry (proyecto + DSN + scrubbing), uptime check con email, studio.ops_run, health profundo con bearer studio:health, ensayos de restauración verdes en staging y producción (más la falla forzada), scheduler del ensayo activo, señal platform.marketing_studio.health y aviso Teams (release 92002873ced9). Brechas no bloqueantes, en Follow-ups: 3 reglas de alerta de Sentry sin crear (la API de reglas cambió a Workflows; queda el workflow por defecto), sin token de source maps, sin error forzado en Sentry de producción, sin caída simulada del uptime, sin mensaje real a Teams, primera corrida programada del ensayo pendiente (martes 29/09), requestId contra los logs de Vercel sin comprobar en producción, costo del primer mes sin observar`
 - Rank: `TBD`
 - Domain: `ops`
 - Blocked by: `none`
@@ -434,20 +472,20 @@ decide conservarlo. La cifra real queda en la arquitectura de Studio.
 
 ## Acceptance Criteria
 
-- [ ] Un error forzado en una ruta `/api/v1` de producción aparece en el proyecto Sentry de Studio con `requestId`, environment y release, y sin `Authorization`, cookies ni cuerpo.
+- [ ] Un error forzado en una ruta `/api/v1` de producción aparece en el proyecto Sentry de Studio con `requestId`, environment y release, y sin `Authorization`, cookies ni cuerpo. — **Sin tildar:** el proyecto existe, el DSN está en Vercel production y preview y el scrubbing del servidor está aplicado (2026-09-26), pero no se ejercitó un error forzado en producción. Follow-up.
 - [x] El test de scrubbing de `packages/observability` falla si un evento sale con un header sensible, y corre en `pnpm check`. — Evidencia: `packages/observability/src/sentry-e2e.test.ts` usa el SDK real y lee el sobre; con `beforeSend` anulado el test falla (verificado 2026-09-26); `pnpm check` exit 0 en copia aislada de HEAD.
-- [ ] Cada respuesta de `/api/v1` devuelve un id de request que coincide con la línea JSON del log de Vercel. — Verificado con `next start` local (header `X-Correlation-Id` = `requestId` de la línea `studio_request`); falta en Vercel tras el deploy.
-- [ ] `studio.ops_run` existe en staging y producción; import, renditions y readback de Metricool registran su corrida. — Staging aplicado y verificado 2026-09-26; producción pendiente. Import/renditions/readback por CLI registran (código + clúster local); el readback del worker registra en `worker_run` (TASK-1893).
-- [x] `/api/v1/health?deep=1` con bearer `studio:health` devuelve componentes y frescura; sin bearer devuelve el health superficial; un test de fuga verifica que no aparecen hosts, bases, secretos ni proyectos. — Evidencia: build de producción servido local con token `studio:health` (profundo 200, sin bearer superficial, token inválido 401, el token de salud recibe 403 en `/campaigns`); `health-deep.test.ts` (fuga + schema estricto). El curl en producción queda en Verification.
-- [x] Los componentes de TASK-1892 y TASK-1893 aparecen como `not_configured` mientras no existan, sin degradar el estado global. — Evidencia: test «todo sano: ok, y lo no configurado no degrada» + lectura real contra staging (`greenhouse_metrics` y `media_worker` `not_configured`).
-- [ ] El uptime check sobre `studio.efeonce.org` está activo y una caída simulada en staging dispara el email al operador.
-- [ ] Un ensayo de restauración contra producción terminó `succeeded` con paridad de filas por tabla del schema `studio`, la base temporal no existe al terminar y su duración quedó en el runbook.
-- [x] Un ensayo con paridad forzada a fallar termina `failed` y sale con código distinto de 0. — Evidencia: `--simulate-parity-failure` en clúster Postgres local → `ops_run.status=failed`, `error_code=parity_mismatch`, exit 1, base temporal eliminada (2026-09-26). Repetir en el Cloud Run Job contra staging.
-- [ ] El Cloud Scheduler del ensayo está activo y su primera corrida programada quedó registrada.
-- [ ] La señal `platform.marketing_studio.health` aparece en el Reliability Control Plane de producción y pasa a `error` cuando el último ensayo falló o tiene más de 45 días.
-- [ ] El aviso por Teams llega al canal acordado cuando la señal está en `error`, y no se envía en `ok` ni `warning`.
-- [x] SLOs, costo mensual y postura de backup de la instancia están escritos en la arquitectura de Studio, con la regla de no restaurar la instancia compartida. — Arquitectura §9.4–9.7 (postura leída con `gcloud sql instances describe`, sólo lectura); el costo real se verifica tras el primer mes.
-- [ ] EPIC-049 marca como cumplido el exit criterion de restauración probada, y TASK-1894 tiene su `## Delta` con esta dependencia.
+- [ ] Cada respuesta de `/api/v1` devuelve un id de request que coincide con la línea JSON del log de Vercel. — **Sin tildar:** verificado con `next start` local (header `X-Correlation-Id` = `requestId` de la línea `studio_request`); no se comprobó contra los logs de Vercel de producción. Follow-up.
+- [x] `studio.ops_run` existe en staging y producción; import, renditions y readback de Metricool registran su corrida. — Evidencia: staging aplicado y verificado 2026-09-26; producción con la migración `1790409464603` aplicada el 2026-09-26. Los ensayos de staging y producción dejaron sus filas (`restore_rehearsal` `ok` en el health profundo de producción). Import y renditions registran por CLI; el readback del worker registra en `studio.worker_run` (TASK-1893) y el health de producción lo lee `ok`.
+- [x] `/api/v1/health?deep=1` con bearer `studio:health` devuelve componentes y frescura; sin bearer devuelve el health superficial; un test de fuga verifica que no aparecen hosts, bases, secretos ni proyectos. — Evidencia: `health-deep.test.ts` (fuga + schema estricto) y, en producción (2026-09-26), el bearer `studio:health` de Greenhouse devuelve componentes y frescura; el mismo token recibe 403 en `/campaigns`.
+- [x] Los componentes de TASK-1892 y TASK-1893 aparecen como `not_configured` mientras no existan, sin degradar el estado global. — Evidencia: test «todo sano: ok, y lo no configurado no degrada» + lectura real contra staging (`greenhouse_metrics` y `media_worker` `not_configured`). En producción, con el worker de TASK-1893 desplegado, `media_worker` pasó a `ok` y `greenhouse_metrics` sigue `not_configured`.
+- [ ] El uptime check sobre `studio.efeonce.org` está activo y una caída simulada en staging dispara el email al operador. — **Sin tildar:** el check `studio-api-v1-health-A2vbXH5AjzI` está activo (4 regiones, cada 5 min) con política `17467591732187545239` y canal de email a `jreyes@efeoncepro.com`, pero no se probó una caída simulada. Follow-up.
+- [x] Un ensayo de restauración contra producción terminó `succeeded` con paridad de filas por tabla del schema `studio`, la base temporal no existe al terminar y su duración quedó en el runbook. — Evidencia: Cloud Run Job contra `marketing_studio` 2026-09-26: `succeeded`, paridad 18 tablas, restore 2 s, job 49 s, dump en `efeonce-marketing-studio-restore-dumps`; ninguna base `marketing_studio_restore_*` al terminar; tiempos en la tabla de RTO del runbook de restauración.
+- [x] Un ensayo con paridad forzada a fallar termina `failed` y sale con código distinto de 0. — Evidencia: clúster local (2026-09-26) y Cloud Run Job contra staging con `--simulate-parity-failure` → `failed` `parity_mismatch`, exit 1 (90 s).
+- [ ] El Cloud Scheduler del ensayo está activo y su primera corrida programada quedó registrada. — **Sin tildar:** `marketing-studio-restore-rehearsal` está ENABLED (martes 05:30 America/Santiago, `--skip-if-recent-days 28`), pero su primera corrida programada es el martes 2026-09-29. Follow-up.
+- [ ] La señal `platform.marketing_studio.health` aparece en el Reliability Control Plane de producción y pasa a `error` cuando el último ensayo falló o tiene más de 45 días. — **Sin tildar:** la señal salió en el release `92002873ced9` y el canary del ops-worker la leyó en producción (`severity: warning`); el paso a `error` sólo está cubierto por tests unitarios y no se miró la vista `/admin`. Follow-up.
+- [ ] El aviso por Teams llega al canal acordado cuando la señal está en `error`, y no se envía en `ok` ni `warning`. — **Sin tildar:** en producción, con la señal en `warning`, el endpoint respondió `alerted: false` (no envía en `warning`); no se envió un mensaje real a «EO - Admin» porque sólo sale en `error`. Follow-up.
+- [x] SLOs, costo mensual y postura de backup de la instancia están escritos en la arquitectura de Studio, con la regla de no restaurar la instancia compartida. — Arquitectura §9.4–9.7 (postura leída con `gcloud sql instances describe`, sólo lectura); el costo real se verifica tras el primer mes (Follow-up).
+- [x] EPIC-049 marca como cumplido el exit criterion de restauración probada, y TASK-1894 tiene su `## Delta` con esta dependencia. — EPIC-049 actualizado al cierre (2026-09-26); TASK-1894 tiene el Delta de la dependencia y uno nuevo que la da por satisfecha.
 
 ## Verification
 
@@ -459,16 +497,35 @@ decide conservarlo. La cifra real queda en la arquitectura de Studio.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] runbook `MARKETING_STUDIO_RUNTIME_HANDOFF.md` y runbook de restauración actualizados; EPIC-049 actualizado; TASK-1894 desbloqueada para producción
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (TASK-1894, 1895, 1898, 1899)
+- [x] runbook `MARKETING_STUDIO_RUNTIME_HANDOFF.md` y runbook de restauración actualizados; EPIC-049 actualizado; TASK-1894 desbloqueada para producción
 
 ## Follow-ups
 
+Brechas del cierre 2026-09-26 (ninguna bloquea: Studio alerta por uptime y por el workflow por defecto de Sentry, y la
+restauración está probada en producción):
+
+- Portar el paso 4 de `scripts/ops/infra/sentry.sh` (Studio) a la API de Workflows de Sentry y crear las 3 reglas
+  propias (issue nuevo en `production`, más de 10 eventos en 5 min, regresión); hoy `/projects/.../rules/` responde 404
+  y sólo existe el workflow por defecto «Send a notification for high priority issues».
+- Token de source maps (`marketing-studio-sentry-auth-token` + `SENTRY_AUTH_TOKEN` en Vercel), opcional.
+- Ejercitar un error forzado en producción (o en un preview con base inválida) y confirmar en Sentry `requestId`,
+  environment, release y ausencia de `Authorization`, cookies y cuerpo.
+- Comprobar en los logs de Vercel de producción que el `X-Correlation-Id` coincide con la línea `studio_request`.
+- Caída simulada del uptime check (por ejemplo, un check temporal contra una ruta que responda 503) y confirmar el
+  email en Outlook.
+- Verificar la primera corrida programada del ensayo (martes 2026-09-29, 05:30 America/Santiago) en `studio.ops_run`.
+- Forzar la señal `platform.marketing_studio.health` a `error` (staging o ensayo simulado) y confirmar el mensaje real en
+  «EO - Admin» y la vista en `/admin`.
+- Costo real del primer mes (Sentry, Cloud Monitoring, Cloud Run Job, bucket de dumps) contra la estimación de §9.7;
+  confirmar con eso el plan y la cuota de Sentry compartidos con Greenhouse.
+- `overdue_unverified_posts` está `degraded` en producción por 3 posts vencidos sin verificar: es una señal real de
+  negocio que el operador debe revisar, no un defecto.
 - Drain de logs de Vercel a Cloud Logging si la retención no alcanza para investigar incidentes.
 - Señal de derechos por vencer cuando el schema tenga vencimiento de derechos de uso (task de escrituras o de derechos).
 - Evaluar instancia Cloud SQL propia para Studio si el volumen o el RPO exigido superan lo que da el dump lógico.
@@ -477,4 +534,4 @@ decide conservarlo. La cifra real queda en la arquitectura de Studio.
 
 - ~~Canal Teams~~ Resuelto 2026-09-26: «EO - Admin» (reemplaza «EO - Teams» del 2026-09-25); ids en `manual-teams-announcements.ts`.
 - ~~¿El dump del ensayo se descarta o se conserva?~~ Resuelto 2026-09-25: se conserva 30 días en bucket privado (copia independiente de la instancia compartida; KB–MB, un ensayo mensual, costo prácticamente cero).
-- Plan y cuota de la org Sentry: confirmar que un proyecto más no desborda la cuota compartida con Greenhouse.
+- ~~Plan y cuota de la org Sentry~~ Pasa a Follow-ups (se confirma con el costo del primer mes).

@@ -6,6 +6,12 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26
+
+- TASK-1893 complete: descarga firmada (`GET /api/v1/assets/{assetId}/versions/{versionNo}/download`, API 1.2.0),
+  `rights.status` en cada versión, `poster` y `crop_*` (rotulados como vista previa de colocación) y evidencia de
+  publicación (`post_observation`) ya existen en producción. Se quita de `Blocked by`; siguen TASK-1892 y TASK-1894.
+
 ## Delta 2026-09-25
 
 - TASK-1899: el diálogo de aprobación llama `dryRun`, muestra el diff y envía el `proposalDigest` al confirmar.
@@ -30,7 +36,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-1892, TASK-1893, TASK-1894`
+- Blocked by: `TASK-1892, TASK-1894`
 - Branch: `efeonce-marketing-studio main (código) · Greenhouse develop (docs, wireframe, flow, scorecard); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

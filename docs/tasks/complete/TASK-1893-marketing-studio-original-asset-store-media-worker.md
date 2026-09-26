@@ -6,6 +6,43 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 — cierre en producción
+
+- **Buckets** `efeonce-marketing-studio-originals` y `-staging`: us-east4, PAP `enforced`, UBLA, versionado, soft delete
+  30 días (2 592 000 s) y lifecycle; IAM verificado sin `allUsers` ni `allAuthenticatedUsers`. SA de ingesta y worker
+  (prod + `-stg`) y `marketing-studio-invoker@`; rol custom `marketingStudioOriginalsMetadataWriter`; tópicos + DLQ;
+  suscripción push con OIDC, ack 600 s y DLQ tras 5 intentos; notificación `OBJECT_FINALIZE` con prefijo `originals/`.
+- **Base:** migración `1790409193629` aplicada en staging y producción. Roles PG `marketing_studio_worker` /
+  `marketing_studio_staging_worker` (límite 6); el `CONNECT` lo da el dueño de la base (Studio `82aeab6`).
+- **Worker:** Cloud Run `marketing-studio-media-worker` (prod, revisión `00001-sgb`) y `-staging` (`00002-svt`);
+  derivados ON en staging y producción.
+- **Ingesta:** dry-run en staging y producción, ambos `to_upload` 30 y `unverifiable` 24 (las 24 imágenes de CMP-002
+  sin sha256 en el catálogo; la pregunta abierta sigue), `drift`/`rejected`/`missing_local` 0. Apply en staging y
+  producción: 30 subidas, 30 enlazadas, 0 fallidas. Re-run en staging: 0 subidas, `already_gcs` 30 (idempotente).
+  Worker: 30 `original_finalized` `succeeded` por ambiente (más los reintentos esperados `media_object_pending`: 25 en
+  staging, 27 en producción), DLQ 0; renditions `thumb` 54, `preview` 54, `poster` 4, `crop_1x1` 11, `crop_16x9` 5,
+  `crop_4x5` 2. Barrido (staging): se borraron las dos renditions de una versión `gcs`, se disparó el job →
+  `repaired 1, checked 30, failed 0` y volvieron las 2. El rechazo de PSD/AEP y el dedup compartido quedaron probados en
+  la prueba de integración contra staging (no se re-ejercitaron en vivo).
+- **Descarga (canary en producción,** `STUDIO_ORIGINAL_DOWNLOADS_ENABLED=true` en Vercel production con redeploy; preview
+  sigue `false`): cliente con scope → 200, URL V4 firmada que vence en 10,0 min, `sha256` y `rights` (`unknown`); GET de
+  la URL firmada 200 (3,1 MB); anónimo 403 `download_disabled`; organización ajena 404 anti-oráculo; versión de CMP-002
+  sólo en OneDrive → 404 `original_not_stored`; `audit_event` `asset_version.download_issued` registrado; el cliente
+  temporal se revocó. El cálculo de `rights.status = expired` queda cubierto por tests.
+- **Metricool:** token en `marketing-studio-metricool-api-token` v1 (accessor: SA del worker), `userId` 3116862, blogs
+  `3961547` (Efeonce Group) y `5105024` (Julio Reyes) verificados. Readback → `succeeded`: 6 candidatos, 5 observados,
+  2 publicados, 1 `not_found`, 0 errores de marca; `post_observation` 5 filas. Schedulers
+  `marketing-studio-reconcile-derivatives(-staging)` y `marketing-studio-metricool-readback` ENABLED.
+- **Greenhouse:** capability `marketing_studio.asset.download` publicada en el release `92002873ced9` (migración
+  aplicada). `studio.asset.download` está en el manifiesto de Studio (13 tools); **la federación en el gateway no se
+  hizo** → Follow-up (sync del manifiesto en el gateway + scope en el canje + scope del cliente + token del gateway
+  rotado).
+- **Flags:** registrados en `FEATURE_FLAG_STATE_LEDGER.md` para que el estado sea visible desde Greenhouse; la fuente de
+  verdad sigue en el repo Studio (Vercel del proyecto `efeonce-marketing-studio` y `apps/worker/deploy.sh`):
+  `STUDIO_ORIGINAL_DOWNLOADS_ENABLED` prod `true` / preview `false`; `MEDIA_WORKER_DERIVATIVES_ENABLED` `true` en
+  staging y prod; `MEDIA_WORKER_METRICOOL_READBACK_ENABLED` `true` en prod, `false` en staging;
+  `MEDIA_WORKER_ARCHIVE_TIERING_ENABLED` `false`.
+
 ## Delta 2026-09-26 — ejecución (code complete, rollout pendiente)
 
 - **Studio** (`efeonce-marketing-studio`, sin push): `ef2d253` migración `1790409193629_media-originals` (aplicada y
@@ -33,7 +70,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -46,7 +83,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-049`
-- Status real: `code complete, rollout pendiente — código, tests y dry-runs verdes; staging con la migración; falta toda la infraestructura GCP, la migración de producción, la ingesta real, el release de Greenhouse, el token de Metricool y la federación de la tool en el gateway`
+- Status real: `Complete 2026-09-26 — en producción: buckets e IAM, migración en ambas bases, worker Cloud Run en staging y producción con derivados automáticos y barrido, ingesta de 30 versiones por ambiente, descarga firmada con canary verde, readback de Metricool con evidencia real y capability de Greenhouse (release 92002873ced9). Brechas no bloqueantes, en Follow-ups: 24 imágenes de CMP-002 sin sha256 en el catálogo (unverifiable, siguen sólo en OneDrive), federación de studio.asset.download en el gateway sin hacer, descarga apagada en preview, costo real del primer mes sin observar`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -242,11 +279,11 @@ Reglas obligatorias:
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en `packages/domain/src/media` y `rights`, no en handlers, scripts ni en el worker.
-- [ ] Ingesta y derechos modelados como commands con auditoría e idempotencia; descarga como reader con autorización por scope, organización y capability.
-- [ ] Capability `marketing_studio.asset.download` + grant a ≥1 rol real en el mismo commit de Greenhouse.
-- [ ] Camino programático declarado: `/api/v1` + tool `studio.asset.download`; CLI para ingesta y derechos; API de escritura de derechos en TASK-1894.
-- [ ] Un primitive, muchos consumers: web, CLI, worker y MCP usan los mismos primitives.
+- [x] Lógica en `packages/domain/src/media` y `rights`, no en handlers, scripts ni en el worker. — Studio `4884fb9`: `ingest`, `download`, `derivatives`, `rights` en el dominio; ruta, CLI y worker son adapters.
+- [x] Ingesta y derechos modelados como commands con auditoría e idempotencia; descarga como reader con autorización por scope, organización y capability. — `audit_event` por ingesta y por descarga (verificado en producción: `asset_version.download_issued`); re-run idempotente en staging.
+- [x] Capability `marketing_studio.asset.download` + grant a ≥1 rol real en el mismo commit de Greenhouse. — `f98c63bff`, publicada en el release `92002873ced9`.
+- [x] Camino programático declarado: `/api/v1` + tool `studio.asset.download`; CLI para ingesta y derechos; API de escritura de derechos en TASK-1894.
+- [x] Un primitive, muchos consumers: web, CLI, worker y MCP usan los mismos primitives. — El MCP lo consumirá al federarse (Follow-up); la tool ya está en el manifiesto.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -466,24 +503,24 @@ Los endpoints del worker no forman parte de `/api/v1` ni del OpenAPI; se documen
 
 ## Acceptance Criteria
 
-- [ ] Los buckets `efeonce-marketing-studio-originals` y `-staging` existen en `us-east4` con PAP `enforced`, acceso uniforme, versionado, soft delete de 30 días y las reglas de lifecycle descritas, verificados con `gcloud storage buckets describe`.
-- [ ] Ningún binding de los buckets de originales incluye `allUsers` ni `allAuthenticatedUsers`, y los permisos por SA coinciden con la matriz IAM.
-- [ ] La migración aplica en ambas bases con `-- Up Migration`, bloque `DO … RAISE EXCEPTION` y `-- Down Migration` de sólo undo. — Staging: aplicada y verificada (up → down → up, `information_schema` + `pg_constraint` validados, grants del runtime) el 2026-09-26. **Falta producción** (va antes de empujar `main`).
-- [x] `pnpm media:ingest` sin `--apply` no escribe nada y reporta `to_upload`, `dedup`, `already_gcs`, `drift`, `rejected` y `missing_local`. — Dry-run real contra staging 2026-09-26: `to_upload` 30, `unverifiable` 24, resto 0; prueba de integración: el dry-run no toca el bucket (+ `unverifiable` para versiones sin huella).
-- [ ] Re-ejecutar `media:ingest --apply` sobre el mismo set produce cero subidas y cero cambios de filas. — Probado en la prueba de integración contra Postgres real de staging (bucket simulado): segunda corrida = `already_gcs` 2, 0 subidas, 0 audit nuevos. Falta la corrida real con bucket.
-- [ ] Las 54 piezas vigentes (o las que existan al cerrar) tienen su versión aprobada en `gcs` en producción, o figuran en el reporte con su causa (`drift` / `missing_local`).
+- [x] Los buckets `efeonce-marketing-studio-originals` y `-staging` existen en `us-east4` con PAP `enforced`, acceso uniforme, versionado, soft delete de 30 días y las reglas de lifecycle descritas, verificados con `gcloud storage buckets describe`. — Verificado 2026-09-26 (soft delete 2 592 000 s).
+- [x] Ningún binding de los buckets de originales incluye `allUsers` ni `allAuthenticatedUsers`, y los permisos por SA coinciden con la matriz IAM. — IAM verificado 2026-09-26: SA de ingesta, worker e invocadora + rol custom `marketingStudioOriginalsMetadataWriter`, sin bindings públicos.
+- [x] La migración aplica en ambas bases con `-- Up Migration`, bloque `DO … RAISE EXCEPTION` y `-- Down Migration` de sólo undo. — Staging (up → down → up) y producción, 2026-09-26.
+- [x] `pnpm media:ingest` sin `--apply` no escribe nada y reporta `to_upload`, `dedup`, `already_gcs`, `drift`, `rejected` y `missing_local`. — Dry-run real en staging y producción 2026-09-26: `to_upload` 30, `unverifiable` 24, resto 0; prueba de integración: el dry-run no toca el bucket.
+- [x] Re-ejecutar `media:ingest --apply` sobre el mismo set produce cero subidas y cero cambios de filas. — Re-run real en staging con bucket: 0 subidas, `already_gcs` 30.
+- [x] Las 54 piezas vigentes (o las que existan al cerrar) tienen su versión aprobada en `gcs` en producción, o figuran en el reporte con su causa (`drift` / `missing_local`). — Producción: 30 subidas y enlazadas, 0 fallidas; las 24 restantes figuran en el reporte como `unverifiable` (imágenes de CMP-002 sin sha256 en el catálogo), una causa distinta de `drift`/`missing_local` que queda como Follow-up.
 - [x] Dos versiones con el mismo sha256 comparten un único objeto y una única fila de `media_object`. — Prueba de integración contra staging: 2 versiones enlazadas, 1 subida, 1 fila de `media_object` (objeto por contenido + PK sha256).
-- [x] Un archivo PSD o AEP presentado a la ingesta queda en `rejected` y no llega al bucket. — Unit (`.psd`/`.aep` por extensión; PSD/AEP/ZIP renombrados por firma) + integración: `rejected` 2 y el bucket simulado sin el objeto.
+- [x] Un archivo PSD o AEP presentado a la ingesta queda en `rejected` y no llega al bucket. — Unit (`.psd`/`.aep` por extensión; PSD/AEP/ZIP renombrados por firma) + integración: `rejected` 2 y el bucket simulado sin el objeto. No se re-ejercitó en vivo.
 - [x] Un reimport con `import:catalog --apply` deja intactas las versiones en `gcs` (test y verificación en staging). — Prueba de integración contra la base de staging (transacción revertida): tras `applyImportPlan` la versión sigue `gcs`, mismo objeto, `provenance.onedrive_path` actualizado.
-- [ ] La descarga responde 200 con URL que vence en ≤ 15 min para un `api_client` con scope; 403 `download_disabled` para el actor anónimo; 404 fuera de su organización; 404 `original_not_stored` para una versión sólo en OneDrive.
-- [x] Cada emisión de descarga deja un `audit_event`. — Integración contra staging: +1 `asset_version.download_issued` por emisión (firmante simulado).
-- [x] Toda respuesta de versión y de descarga trae `rights.status`, y una versión con `rights_usage_ends_on` pasado devuelve `expired`. — DTO obligatorio (`Rights` en `AssetVersion`/`OriginalDownload`); unit de borde en hora de Santiago; integración: `expired` en descarga y en `getAsset`; `next start` local contra staging devuelve `rights.status: unknown`.
-- [ ] Una versión nueva en el bucket de staging recibe `thumb`, `preview`, `poster` (video) y los recortes aplicables sin intervención manual, y la DLQ queda en 0.
-- [ ] El barrido horario repara una versión `gcs` a la que se le borraron los derivados.
-- [ ] El readback registra en `post_observation` la publicación real de al menos un post de producción, o el Slice 6 salió a una task hija con evidencia de la falta de acceso a la API.
-- [x] `studio.asset.download` figura en el manifiesto de tools (o, si TASK-1890 no aterrizó, la task deja la entrada lista y enlazada en TASK-1890). — Manifiesto 13 tools + 5 exclusiones, hash `02db316d2d2e…`, API 1.2.0 (`pnpm mcp:manifest:check` OK). La federación en el gateway es un paso aparte (pendiente).
-- [ ] `marketing_studio.asset.download` existe en el catálogo TS y en `capabilities_registry`, con grant a ≥1 rol real y coverage test verde. — Catálogo TS + grant + `pnpm test src/lib/entitlements` verde (33 tests) en `f98c63bff`; la migración de seed existe pero **no está aplicada** (va con el release de Greenhouse).
-- [ ] Arquitectura de Studio, runbook, Handoff, changelog y EPIC-049 actualizados, incluidos los recursos, flags y el costo observado.
+- [x] La descarga responde 200 con URL que vence en ≤ 15 min para un `api_client` con scope; 403 `download_disabled` para el actor anónimo; 404 fuera de su organización; 404 `original_not_stored` para una versión sólo en OneDrive. — Canary en producción 2026-09-26: 200 con URL que vence en 10,0 min (GET de la URL 200, 3,1 MB), anónimo 403, organización ajena 404, versión de CMP-002 404 `original_not_stored`; cliente temporal revocado.
+- [x] Cada emisión de descarga deja un `audit_event`. — Integración contra staging y canary de producción: `asset_version.download_issued`.
+- [x] Toda respuesta de versión y de descarga trae `rights.status`, y una versión con `rights_usage_ends_on` pasado devuelve `expired`. — DTO obligatorio; unit de borde en hora de Santiago; integración: `expired` en descarga y en `getAsset`; producción devuelve `rights.status: unknown` en la descarga.
+- [x] Una versión nueva en el bucket de staging recibe `thumb`, `preview`, `poster` (video) y los recortes aplicables sin intervención manual, y la DLQ queda en 0. — Staging y producción: 30 `original_finalized` `succeeded` por ambiente disparados por la notificación del bucket, DLQ 0; renditions `thumb` 54, `preview` 54, `poster` 4, `crop_1x1` 11, `crop_16x9` 5, `crop_4x5` 2.
+- [x] El barrido horario repara una versión `gcs` a la que se le borraron los derivados. — Staging: se borraron las dos renditions de una versión, se disparó el job del barrido → `repaired 1, checked 30, failed 0`, las 2 renditions volvieron. Scheduler horario ENABLED.
+- [x] El readback registra en `post_observation` la publicación real de al menos un post de producción, o el Slice 6 salió a una task hija con evidencia de la falta de acceso a la API. — Producción: 6 candidatos, 5 observados, 2 publicados, 1 `not_found`; `post_observation` 5 filas.
+- [x] `studio.asset.download` figura en el manifiesto de tools (o, si TASK-1890 no aterrizó, la task deja la entrada lista y enlazada en TASK-1890). — Manifiesto 13 tools + 5 exclusiones, hash `02db316d2d2e…`, API 1.2.0. La federación en el gateway queda como Follow-up.
+- [x] `marketing_studio.asset.download` existe en el catálogo TS y en `capabilities_registry`, con grant a ≥1 rol real y coverage test verde. — Catálogo + grant + `pnpm test src/lib/entitlements` verde (`f98c63bff`); migración de seed aplicada con el release `92002873ced9`.
+- [ ] Arquitectura de Studio, runbook, Handoff, changelog y EPIC-049 actualizados, incluidos los recursos, flags y el costo observado. — **Sin tildar:** todo actualizado el 2026-09-26 salvo el costo observado, que sólo existe tras el primer mes de operación. Follow-up.
 
 ## Verification
 
@@ -495,18 +532,28 @@ Los endpoints del worker no forman parte de `/api/v1` ni del OpenAPI; se documen
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (TASK-1894, 1895, 1898, 1899)
 
-- [ ] EPIC-049 actualizado; `TASK-1894`, `TASK-1895` y `TASK-1896` reciben un `## Delta` con lo que heredan (almacén, descarga, derechos, `worker_run`)
-- [ ] Costo real del primer mes contrastado con la estimación en el runbook
+- [x] EPIC-049 actualizado; `TASK-1894` y `TASK-1895` reciben un `## Delta` con lo que heredan (almacén, descarga, derechos, `worker_run`); `TASK-1896` cerró en la misma fecha y su health profundo ya lee `worker_run` (`media_worker` `ok`)
+- [ ] Costo real del primer mes contrastado con la estimación en el runbook — **Sin tildar:** el costo real no es observable hasta un mes después de la ingesta (billing export, en CLP). Follow-up.
 
 ## Follow-ups
 
+Brechas del cierre 2026-09-26 (ninguna bloquea: el almacén, la descarga, el worker y el readback operan en producción):
+
+- **24 imágenes de CMP-002 sin sha256 en el catálogo** (`unverifiable`): siguen sólo en OneDrive. Regenerar el catálogo
+  del Campaign Manager con su huella, reimportar (el import la adopta en la misma versión) y volver a correr la ingesta.
+- **Federar `studio.asset.download` en el gateway:** `pnpm studio:manifest:sync` en `efeonce-mcp`, scope
+  `marketing_studio.asset.download` en el cliente de canje, cliente nuevo de Studio con `studio:read` +
+  `studio:assets:download` (los scopes son inmutables), nueva versión del secreto del gateway y revocación del cliente
+  anterior tras el redeploy.
+- Prender `STUDIO_ORIGINAL_DOWNLOADS_ENABLED` en preview cuando haga falta probar la descarga fuera de producción.
+- Costo real del primer mes contra la estimación (< USD 10/mes; revisión si supera USD 25 en el billing export).
 - URL firmada de subida y versión creada desde Studio (`TASK-1894`).
 - Derivados de audio y PDF.
 - Deploy del worker desde GitHub Actions con WIF (hoy `deploy.sh` manual).
@@ -514,6 +561,7 @@ Los endpoints del worker no forman parte de `/api/v1` ni del OpenAPI; se documen
 
 ## Open Questions
 
-- ~~¿Metricool expone API?~~ Resuelto 2026-09-25: sí, el plan tiene API; el Slice 6 queda en esta task. Falta obtener el token de servidor y guardarlo en `marketing-studio-metricool-api-token`.
-- ¿La infraestructura del bucket y del worker se declara con `gcloud` en un script idempotente o con Terraform? Se decide en Discovery según lo que ya use el repo de Studio.
-- ¿Los recortes automáticos aportan valor frente a las piezas reales por formato que ya existen? Si Discovery muestra que casi todos los conceptos tienen todos sus formatos, el recorte queda sólo como vista previa de colocación.
+- ~~¿Metricool expone API?~~ Resuelto 2026-09-25: sí; token en `marketing-studio-metricool-api-token` v1 desde 2026-09-26.
+- ~~¿`gcloud` o Terraform?~~ Resuelto 2026-09-26: scripts `gcloud` idempotentes con dry-run por defecto (el repo no usa Terraform).
+- ~~¿Los recortes automáticos aportan valor?~~ Resuelto 2026-09-26: sólo para proporciones ausentes, rotulados como vista previa de colocación.
+- ¿Cómo se obtiene la huella de las 24 imágenes de CMP-002? Sigue abierta (ver Follow-ups).

@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-26 — Marketing Studio: originales en GCS, worker de medios y restauración probada (TASK-1893, TASK-1896)
+
+Studio guarda en GCS una copia verificada (sha256 + crc32c, deduplicada) de los finales aprobados: 30 versiones por
+ambiente; las 24 imágenes de CMP-002 siguen en OneDrive porque el catálogo no trae su huella. Un worker de Cloud Run
+genera miniatura, preview, portada de video y recortes al llegar cada original, repara faltantes con un barrido horario
+y lee de Metricool la evidencia real de publicación. Un cliente autorizado descarga un original por URL firmada de
+10 min, auditada, con su estado de derechos (`STUDIO_ORIGINAL_DOWNLOADS_ENABLED` sólo en production). Studio además
+tiene Sentry propio, uptime check con email, health profundo, registro de corridas y una restauración lógica ensayada
+contra producción (job 49 s) con ensayo mensual programado; Greenhouse lo observa con la señal
+`platform.marketing_studio.health` y avisa a Teams «EO - Admin» en `error`. Release Greenhouse `92002873ced9` (PR #243).
+Pendientes en los Follow-ups de cada task. Rollback: flags a `false` + redeploy, pausar schedulers, `media:ingest
+--revert-provider`.
+
 ## 2026-09-26 — Efeonce Insights: diseño premium en producción (TASK-1889)
 
 Los informes A4 y los decks de Insights salen con el diseño premium aprobado por el operador: portada blanca o navy
@@ -556,15 +569,3 @@ entrega 4K (verificado: 3840×2160). Gemini Omni salió del carril: irá directo
 Dos correcciones que venían mal documentadas: el prefijo `fal-ai/` depende del endpoint y no del proveedor
 (Seedream 5 sin él, Seedream 4/4.5 con él), y la subida de archivos es `uploadFalFile`, no un CDN temporal.
 Tres capas documentales y las skills de imagen, video y dirección de arte actualizadas.
-
-## 2026-09-16 — Efeonce Insights: render durable (TASK-1846, code complete, rollout pendiente)
-
-- Artifact Worker despacha por `RenderConsumer` (Proposal intacto: `composer:visual-gate` 61 frames a cero píxeles);
-  tablas `insight_render_runs`/`insight_outputs`/`insight_render_events`; lease + fencing (columnas additive
-  también en `proposal_render_jobs`, reclamo de Proposal apagado); cuota por org, retry sin duplicar, cancelación
-  honesta, señal `insights.render.orphaned_output`.
-- `requestInsightRender` + `InsightOutputsPort` real; lanes `…/insights/editions/{id}/render` y `…/render-runs/{id}`
-  (app + ecosystem); tools MCP `request/get/retry/cancel_insight_render`; eventos `insights.render.*`; errores
-  `render_disabled`/`render_rejected`; `renderableOutputs: ['deck_pdf']`.
-- Flag `INSIGHTS_RENDER_ENABLED` (OFF; dos runtimes). Hash del manifest domain-free en el composer.
-  Sin deploy, sin push, sin canary: exigen autorización.

@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Fundación en vivo (TASK-1887). Studio listo para agentes (TASK-1890) y federado en Efeonce MCP con lectura en producción (TASK-1891, 2026-09-26). Siguen TASK-1892–1899 (métricas, originales, escrituras y aprobaciones).`
+- Status real: `Fundación en vivo (TASK-1887). Studio listo para agentes (TASK-1890) y federado en Efeonce MCP con lectura en producción (TASK-1891). Originales en GCS + worker de medios (TASK-1893) y observabilidad + restauración probada (TASK-1896) en producción desde 2026-09-26 (release Greenhouse 92002873ced9). Siguen TASK-1892, 1894, 1895, 1897, 1898 y 1899 (métricas, escrituras, UI, CONNECT, login y aprobaciones por MCP).`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Julio Reyes`
@@ -56,10 +56,10 @@ Orden recomendado (2026-09-25): 1890 → 1891 · 1893 en paralelo · 1896 → 18
 - `TASK-1890` — **Complete 2026-09-26** (manual servido en producción tras el release `0e87c7a443a2`). Studio listo para agentes: registro único de operaciones (17: 12 tools + 5 exclusiones), manifiesto con paridad, semántica, bearer de servicio, organización canónica, capability `marketing_studio.campaign.read` y manual. En producción de Studio desde `d08387f`. **Pendiente:** release de Greenhouse a producción para servir el manual `marketing-studio`.
 - `TASK-1891` — **Complete 2026-09-26**: provider encendido y verificado en producción (`00061-sbc`, canary MCP real verde; la denegación en vivo a una persona sin capability queda sin ejercitar, cubierta por tests). Federación en Efeonce MCP de las 12 tools del manifiesto. Canje RFC 8693 en Greenhouse (cliente `efeonce-mcp-marketing-studio`, migrado) y gateway 1.8.0 desplegado (PR `efeonce-mcp#19`, revisión `00057-w8h`) con el flag OFF. **Pendiente:** release de Greenhouse (canje + manual) → `MARKETING_STUDIO_PROVIDER_ENABLED=true` + dispatch → `pnpm studio:canary` con token Entra humano → sesión MCP real. Regla desde aquí: toda capacidad nueva de Studio nace con su tool en el manifiesto o una exclusión con razón.
 - `TASK-1892` — To-do. Métricas de marketing desde Greenhouse (Search Console, GA4, SEO) por el lane ecosystem `/api/platform/ecosystem/growth/*`, nunca por SQL. Pauta (Meta/LinkedIn) y social orgánico (Metricool) quedan en adapters propios de Studio.
-- `TASK-1893` — **In progress (2026-09-26).** Almacén de originales en GCS (finales aprobados, sha256, versionado, derechos) y worker Cloud Run de medios: renditions automáticas, portadas de video, recortes y readback de Metricool.
+- `TASK-1893` — **Complete 2026-09-26.** Almacén de originales en GCS (finales aprobados, sha256, versionado, derechos) y worker Cloud Run de medios: renditions automáticas, portadas de video, recortes y readback de Metricool. En producción: 30 versiones ingestadas por ambiente, derivados automáticos, canary de descarga verde, readback con 2 posts publicados observados. **Pendiente (Follow-ups):** 24 imágenes de CMP-002 sin sha256 en el catálogo, federación de `studio.asset.download` en el gateway, costo del primer mes.
 - `TASK-1894` — To-do. Commands de escritura con idempotencia, `If-Match` y auditoría; corte de autoridad desde OneDrive.
 - `TASK-1895` — To-do. UI de edición, revisión, subida de versiones y panel de métricas (consumidora de 1892–1894).
-- `TASK-1896` — **In progress (2026-09-26).** Observabilidad, alertas y restauración verificada de `marketing_studio`. Antes de que las escrituras lleguen a producción.
+- `TASK-1896` — **Complete 2026-09-26.** Observabilidad, alertas y restauración verificada de `marketing_studio`: Sentry, uptime con email, health profundo, `studio.ops_run`, ensayo verde en producción (job 49 s) con scheduler activo, señal `platform.marketing_studio.health` y aviso Teams «EO - Admin». **Pendiente (Follow-ups):** reglas propias de Sentry (API a Workflows), error forzado, caída simulada del uptime, mensaje real a Teams, primera corrida programada del ensayo (29/09).
 - `TASK-1897` — To-do. (Greenhouse) Cerrar `CONNECT` de PUBLIC en `greenhouse_app` y en las bases de Studio.
 - `TASK-1899` — To-do. Escrituras y aprobaciones por MCP: todas las tools de clase `write` federadas con scope propio e identidad delegada de la persona (el actor auditado es la persona), `dryRun` → confirmación explícita. Bloqueada por TASK-1891 y TASK-1894.
 - `TASK-1898` — To-do. Login con Efeonce ID (`auth.efeonce.org`) y cambio de `STUDIO_ACCESS_MODE` a `efeonce_id`. Última del programa por decisión del operador (2026-09-25).
@@ -77,7 +77,7 @@ Orden recomendado (2026-09-25): 1890 → 1891 · 1893 en paralelo · 1896 → 18
 - [ ] Las campañas vigentes viven en Studio como fuente, con corte de autoridad declarado. Progreso: CMP-001..005 importadas como proyección reimportable; corte = TASK-1894.
 - [ ] Toda operación de la UI tiene su endpoint `/api/v1` documentado en OpenAPI. Progreso: la UI actual (sólo lectura) ya consume operaciones del registro único con test de paridad handlers ↔ registro; queda abierto hasta que la UI de edición (TASK-1895) nazca igual.
 - [x] Efeonce MCP federa al menos las lecturas de Studio: 12 tools `studio.*` en producción desde 2026-09-26 (`efeonce-mcp-gateway-00061-sbc`), con canary MCP real verde (TASK-1891).
-- [ ] Restauración de la base `marketing_studio` probada. Progreso: sin empezar (TASK-1896).
+- [x] Restauración de la base `marketing_studio` probada: ensayo lógico en Cloud Run contra producción `succeeded` el 2026-09-26 (paridad de 18 tablas, restore 2 s, job 49 s, base temporal eliminada), falla forzada probada en staging y ensayo mensual programado (TASK-1896).
 
 ## Non-goals
 
