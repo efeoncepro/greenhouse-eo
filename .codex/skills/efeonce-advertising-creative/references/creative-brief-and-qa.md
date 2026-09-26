@@ -113,6 +113,32 @@ necesitan gritar a la vez, el problema es de jerarquía, no de tamaño.
 | Propósito del bounding box | Enmarca un objeto con sentido (obra en revisión, resultado aprobado) o una palabra del titular | Caja sobre vacío, sobre una persona, o «porque sí» |
 | Firma web | url-lum con evidencia `non-separable-luminosity`; si el logo 3D es héroe, sólo url-lum | Segundo logo plano compitiendo con el héroe |
 
+## Línea gráfica «La órbita» en piezas de marca propia (canónica desde 2026-09-25)
+
+Aplica a piezas publicitarias de la marca propia Efeonce y su familia (Globe, Wave, Reach cambian sólo el acento);
+nunca a piezas con marca de cliente. Contrato:
+[manual](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) (§1.3 órbita, §1.4 foco, §1.5
+lente, §8.5 URL, §9 foto, §10.1 campaña y grillas). Reglas completas y checklist:
+[referencia operativa](../../efeonce-brand-studio/references/graphic-line-orbit.md). Valores desde los tokens
+`efeonceGraphicLine` de AXIS, nunca transcritos.
+
+| Elemento | DO | DON’T |
+|---|---|---|
+| Órbita en campaña | Rodea la lente con aire; esfera arriba a la izquierda, lejos de la cara | Esfera sobre el rostro o suelta, fuera de la punta del arco |
+| Texto | Vive fuera de la órbita (tercio inferior izquierdo) | Titular, CTA o URL cruzando el anillo |
+| Cantidad | Una lente u órbita por pieza | Órbitas repetidas como patrón o textura |
+| Arco de avance | Mide un dato real citable | Arco decorativo o dato inventado |
+| Foto en la lente | Toma del banco `ai-generations/2026-09-25_banco-lente-orbita/` o del pipeline `foto:*`; sujeto en un círculo del 55 % del lado corto; sin emblema legible | Velo navy sobre una foto de banco; foto débil sin punto de interés |
+| Grosor y margen | ×1,75 en lienzos ≤ 1200 px; margen 9 % del lado corto en redes y 140 px en 16:9; en 9:16 fuera de la zona de la interfaz | Grosor del informe A4 llevado a un post de 1080 |
+| URL | Burbuja `url-lum`; variante horneada donde la fusión no está garantizada | `efeoncepro.com` como texto suelto |
+| Claim | «Te hacemos visible» con su prueba al lado | Pautar el claim antes de la revisión legal pendiente |
+
+**Sin resolver (decisión del operador, no la tomes tú):** (1) si el CTA en naranja o lima de una política cromática
+de campaña cuenta como segundo acento frente al teal de la órbita, que la línea limita a uno por pieza; (2) cómo
+convive el tratamiento de la lente (foto en navy apagado fuera del círculo) con la regla de esta skill que prohíbe
+cualquier scrim en fotografía de marca cuando hay texto sobre esa zona. Mientras tanto, mide el contraste del texto en
+los píxeles finales y registra la duda en el brief. La prueba de atribución sin logo sigue sin medir.
+
 ## Salida de la revisión
 
 Registra `PASS | REWORK | DON’T` por jerarquía, tipografía, contraste, marca, safe area, formato, motion y

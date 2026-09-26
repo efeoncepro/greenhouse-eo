@@ -157,6 +157,28 @@ Dos ejes ortogonales — **superficies** front-of-house (por audiencia/etapa) qu
 - Ilustraciones/personajes propietarios (`characters/greenhouse-*.png`, Nexa) = obra del equipo
   creativo, NO stock. Úsalas con criterio de marca; producción visual nueva → generadores (§tooling).
 
+### Línea gráfica «La órbita» en redes (canónica desde 2026-09-25)
+
+Rige toda pieza social de la marca propia Efeonce y su familia (Globe, Wave, Reach cambian sólo el acento).
+**No** aplica a clientes ni a Greenhouse. Contrato: [manual](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
+(§1.3 órbita, §1.5 lente, §8.5 URL, §9 foto, §10.1 grillas y campaña). Referencia operativa y checklist de QA:
+[graphic-line-orbit.md](../../efeonce-brand-studio/references/graphic-line-orbit.md). Los valores salen de los
+tokens `efeonceGraphicLine` de `@efeoncepro/axis-tokens`; nunca HEX ni px transcritos a mano.
+
+- **Lo que cambia en redes:** grosores ×1,75 en lienzos de hasta 1200 px; margen del 9 % del lado corto; en 9:16,
+  la órbita y el texto respetan la zona que tapa la interfaz de cada red (medidas en
+  `docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md`, §Zonas seguras).
+- **Ningún texto cruza la órbita.** Una órbita o una lente por pieza, nunca como patrón. El arco de avance mide un
+  dato real; sin dato, no hay arco.
+- **Campaña con foto:** la órbita rodea la lente con aire y la esfera va arriba a la izquierda, lejos de la cara.
+  La foto sale del banco propio `ai-generations/2026-09-25_banco-lente-orbita/` (8 tomas, una por palanca, fichas
+  en `fichas/`) o del pipeline `foto:*`; sin velo navy, sin emblema legible, sujeto dentro de un círculo del 55 %
+  del lado corto.
+- **URL:** `efeoncepro.com` va siempre en la burbuja oficial `url-lum`, nunca como texto suelto; si el render no
+  garantiza la fusión de luminosidad, usa la variante horneada (`deliverables/assets/url-lum-{light,dark}.svg`).
+- **«Te hacemos visible»** siempre con su prueba y sin pauta mientras falte la revisión legal (§1.4). La prueba de
+  atribución sin logo sigue sin medir: no afirmes que la órbita ya se reconoce sola.
+
 ## Narrativa del período (Q4 2026 – Q3 2027)
 
 Las piezas sociales de marca de Efeonce que no son seasonality se anclan a un capítulo de **«Tu IA no conoce tu

@@ -36,6 +36,15 @@ visual transversal requiere validación en varias portadas.
   sale de `theme.axis.*` / `axis-tokens.ts`, nunca HEX inline. El `AxisWordmark` es **solo del
   design system** — NUNCA en producto, login, emails, PDFs ni portal cliente ni en piezas de marketing.
 - **`DESIGN.md`** es el contrato visual agent-facing; leerlo cuando la pieza toque UI.
+- **Línea gráfica «La órbita»** (canónica 2026-09-25) = la forma gráfica de la **marca Efeonce y su familia**
+  (Globe, Wave, Reach cambian sólo el acento). Rodea, mide (el arco = avance real; sin dato no hay arco) y enfoca
+  (lente: foto en navy apagado, a color dentro del círculo). Valores: tokens AXIS `efeonceGraphicLine`, nunca HEX/px
+  transcritos; referencia pública `axis.efeonce.org/references/graphic-line`. Duras: ningún texto cruza la órbita ·
+  una órbita o lente por pieza, nunca patrón · `efeoncepro.com` sólo en la burbuja `url-lum` · sin velo navy sobre
+  fotos · foto de la lente desde el lenguaje fotográfico (`pnpm foto:*`). **No** se aplica a la UI de Greenhouse ni a
+  piezas de clientes Globe. Operación y QA:
+  [`graphic-line-orbit.md`](../../efeonce-brand-studio/references/graphic-line-orbit.md) · manual
+  [`EFEONCE_GRAPHIC_LINE_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md).
 - **Ilustraciones propietarias** (`characters/greenhouse-*.png`, mascota **Nexa**) = obra del equipo
   creativo de Efeonce, **NO stock ni Vuexy**. Úsalas con criterio de marca; producción nueva → §tooling.
 

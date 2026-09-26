@@ -14,13 +14,13 @@ runtime-agnostic and keep product-specific behavior in adapters.
 Before changing a contract, token, package, consumer, canary or release, read only the relevant
 canonical source:
 
-- Architecture and ownership: [shared UI platform decision](../../docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md).
-- Distribution and credentials: [private package runbook](../../docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
-- Current continuity and evidence: [AXIS continuity map](../../docs/operations/AXIS_CONTINUITY_MAP_2026-07-29.md).
-- Ownership decision: [AXIS ownership ADR](../../docs/architecture/EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md).
+- Architecture and ownership: [shared UI platform decision](../../../docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md).
+- Distribution and credentials: [private package runbook](../../../docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+- Current continuity and evidence: [AXIS continuity map](../../../docs/operations/AXIS_CONTINUITY_MAP_2026-07-29.md).
+- Ownership decision: [AXIS ownership ADR](../../../docs/architecture/EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md).
 - Agent-facing visual guide: [AXIS `DESIGN.md`](https://github.com/efeoncepro/axis-design-system/blob/main/DESIGN.md), generated from the token package and pushed at commit `0e3c4d6`.
-- Color ownership cutover: [TASK-1600](../../docs/tasks/in-progress/TASK-1600-axis-color-ownership-inversion.md).
-- Foundation history and task status: [TASK-1589](../../docs/tasks/in-progress/TASK-1589-efeonce-ui-package-foundation.md) when present.
+- Color ownership cutover: [TASK-1600](../../../docs/tasks/complete/TASK-1600-axis-color-ownership-inversion.md).
+- Foundation history and task status: [TASK-1589](../../../docs/tasks/in-progress/TASK-1589-efeonce-ui-package-foundation.md) when present.
 - Release procedure: \`.codex/skills/greenhouse-production-release/SKILL.md\`.
 - Secret procedure: \`.codex/skills/greenhouse-secret-hygiene/SKILL.md\`.
 
@@ -122,7 +122,7 @@ pins that exact set and its Campaign Layout Compiler implements the first non-La
 For a commercial piece evoking AEO, search with AI, a ChatGPT/Gemini conversation or citability, start at the sibling AXIS
 [agent composition index](../../../../axis-design-system/docs/agent-composition/README.md) and the
 [public Creative Resources Lab](https://axis.efeonce.org/references/creative-resources/). Compose this skill with
-`efeonce-advertising-creative`; the [Greenhouse manual](../../docs/manual-de-uso/creative/componer-recursos-aeo-con-axis.md)
+`efeonce-advertising-creative`; the [Greenhouse manual](../../../docs/manual-de-uso/creative/componer-recursos-aeo-con-axis.md)
 describes how to place the output in a campaign piece. Select the smallest requested resource:
 
 | Intent | Command in `../axis-design-system` | Do not infer |
@@ -140,6 +140,33 @@ separate. Verify each cited passage, favicon host, provenance and final pixels. 
 example; `captured-output` needs a real interaction, reference and date. These tools are local candidate
 resolvers, not published package contracts, a Greenhouse/Globe adapter, an MCP tool, a live model result or
 creative approval.
+
+### Efeonce graphic line «La órbita» (canonical tokens + reference page)
+
+Efeonce's own-brand graphic line (orbit: thin ring, arc with sphere, halo; lens and spotlight) became canonical on
+2026-09-25. Greenhouse is the control plane: the [ADR](../../../docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
+and the [manual](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) live there; the
+operating summary is [`graphic-line-orbit.md`](../efeonce-brand-studio/references/graphic-line-orbit.md). AXIS holds:
+
+- **Tokens:** `efeonceGraphicLine` in `packages/tokens/src/tokens.ts` (exported from `@efeoncepro/axis-tokens`),
+  `status: 'canonical'`, with contrast/shape tests in `tokens.test.ts`. It groups `color`, per-brand `family`
+  (Efeonce, Globe, Wave, Reach: accent on dark/light, dark background, verb, slogan word), `sphere`, `orbit`
+  (measures per `baseWidthPx` 794 of canvas width, social multiplier for canvases up to `socialMaxWidthPx`), `type`,
+  `logo` and `isotype` rules. It is an opt-in brand branch, not part of the `axisTokens` aggregate.
+- **Reference page:** public https://axis.efeonce.org/references/graphic-line (source
+  `apps/lab/src/pages/references/graphic-line.astro`), every canvas plate rebuilt as native HTML.
+
+Rules for agents:
+
+- Consume the token; **never transcribe HEX or px** from the manual, PDF, canvas or page. A value change means
+  changing the token and its test in AXIS, signed through the Greenhouse ADR, not editing a document.
+- Before pinning a consumer, confirm which **published** package version contains the export; do not assume the
+  workspace source is released.
+- **There is no semantic composition contract or orbit component yet**: only tokens plus the reference page. Do not
+  invent an intent/manifest, resolver command or adapter for the orbit, and do not copy the Lab Astro/CSS into a
+  product. If a surface needs it, report the component as pending.
+- Scope: Efeonce's own brand and its family. Never Greenhouse product UI and never client work. The URL bubble
+  (`url-lum`) baked variants live as SVG assets in Greenhouse, not as tokens.
 
 ### AXIS Lab
 

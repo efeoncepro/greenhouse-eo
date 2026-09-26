@@ -86,8 +86,23 @@ Su tratamiento de referencia vive en:
 `src/lib/artifact-composer/catalogs/deck-axis/deck-signature.css`
 
 Para una entrega SVG autónoma, consumir esa geometría durante el build e incrustarla en el SVG final. No enlazarla
-como recurso remoto, no redibujarla y no mutar el source. Resolver su fill/opacidad por canvas. El viejo sello
-`efeonce.cl` no se mantiene en piezas nuevas.
+como recurso remoto, no redibujarla y no mutar el source. El viejo sello `efeonce.cl` no se mantiene en piezas
+nuevas.
+
+**Color del sello (línea gráfica «La órbita», §8.5 del
+[manual](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md), 2026-09-25):** el sello se
+mantiene gris y toma el fondo con `mix-blend-mode: luminosity`; no se recolorea a mano. Donde la fusión no está
+garantizada —SVG autónomo abierto en visores, PDF, correo, referencia para IA— se usa el resultado horneado:
+`docs/operations/brand-graphic-line/deliverables/assets/url-lum-light.svg` (sobre blanco o papel) o
+`url-lum-dark.svg` (sobre navy); el color ya viene horneado como atributo del trazo y no se transcribe. Esto
+reemplaza la instrucción anterior de «resolver fill/opacidad por canvas».
+
+**Relación con la órbita:** el manual no define todavía una aplicación de la órbita para la infografía de cuerpo;
+mientras no exista, su firma sigue siendo wordmark + sello en el footer derecho y la órbita no se agrega como
+decoración. Si una pieza derivada (hero, OG, social, deck) usa la órbita, aplica la
+[referencia operativa](../../efeonce-brand-studio/references/graphic-line-orbit.md): ningún texto la cruza, una sola
+por pieza y el arco sólo mide un dato real — el mismo principio que prohíbe «órbitas decorativas sin encoding» en
+la tabla de arquetipos.
 
 Wordmarks públicos oficiales: `public/branding/logo-full.svg` en light y
 `public/branding/logo-negative.svg` en dark. `AxisWordmark` es interno y no se usa en piezas públicas.

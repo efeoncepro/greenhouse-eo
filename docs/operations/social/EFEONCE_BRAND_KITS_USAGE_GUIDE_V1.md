@@ -201,3 +201,13 @@ familia. Ficha comparada en [bibliotecas de mascotas de partners](PARTNER_MASCOT
 - **Gobernanza:** es propiedad de Google, como Clawd de Anthropic y Codex de OpenAI. Uso **interno y orgánico**;
   orgánico aprobado ≠ pauta, y antes de pautar se valida la guía de marca de Google. **Una sola mascota de partner
   por imagen** por defecto.
+
+## Delta 2026-09-25 — línea gráfica «La órbita»
+
+La marca propia ya tiene forma canónica: [«La órbita»](../brand-graphic-line/README.md). Los kits siguen fijando la
+**forma** de la prenda o del objeto; la línea fija **qué va encima** en ediciones nuevas de merch y vestuario: al
+frente, la palabra en Bricolage con su punto (la órbita, opcional, alrededor de la palabra); al dorso, el logo solo.
+**La órbita nunca rodea el logo** y el uniforme actual sigue vigente. Las fotos de merch de la línea se hicieron con
+este mismo método (arte plano exacto + kit de prenda como referencia; el modelo sólo pone material y luz) y son
+maquetas de presentación. Reglas y medidas en el
+[manual §10.4–§10.8](../brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#104-objetos--la-regla).

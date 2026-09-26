@@ -108,6 +108,13 @@ it without repeating what already cost a day*. It grows with every task: see the
   contract (41 reference pages in `…/TASK-1889-efeonce-insights-premium-catalogs/paginas/`, `pixelmatch` 0.1, ≤ 1 % of
   differing pixels per page). **The approved canvas is built but not deployed:** until TASK-1889 releases with
   `INSIGHTS_EDITORIAL_V2_ENABLED`, every report comes out with the v1 design — never describe the redesign as live.
+- Brand graphic line «La órbita» (canonical for the Efeonce brand since 2026-09-25; manual
+  `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md`, operational reference
+  [`graphic-line-orbit.md`](../efeonce-brand-studio/references/graphic-line-orbit.md)): the orbit was born in the
+  Insights covers (`insights-report/report-cover*.html`, `report-back-cover.html`), and the brand canvas tested it
+  over Insights as boards **P-01 (A4 report)** and **P-02 (plan/deck)**. That is a **canvas proposal, not adopted**:
+  it is not implemented in the runtime catalogs (those are governed by TASK-1889). Never describe P-01/P-02 as the
+  Insights design, and never add the orbit to a catalog outside that task.
 - Sharing/email/schedules → `resend-email-platform`, `greenhouse-email` + TASK-1848.
 - Portal UI → `greenhouse-ux` + `greenhouse-ai-design-studio` + TASK-1849 (Composition Shell, GVC).
 - Shared web render → `efeonce-think` repo + `astro` skill + TASK-1875 (headless model, token server-side).

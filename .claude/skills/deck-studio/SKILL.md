@@ -40,6 +40,23 @@ El pie de una lámina lleva como máximo la URL bubble oficial. No hereda direcc
 
 **Excepción aprobada (2026-09-25): el deck de Efeonce Insights.** Su pie lleva logo, edición, URL bubble y folio «NN / total», sin dirección ni teléfonos; los demás decks conservan la regla anterior. Ese deck es además la referencia aprobada de lámina de evidencia (cifra principal y título a la izquierda, gráfico en panel a la derecha, franja «Lo que significa / Próximo paso») y de color de datos por rol. Detalle en el estándar, sección «Delta 2026-09-25», y en `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`. Es diseño aprobado: el catálogo premium está en implementación (TASK-1889) y producción sirve el v1.
 
+### Línea gráfica «La órbita» en decks de marca Efeonce (canónica desde 2026-09-25)
+
+Aplica a decks de la marca propia Efeonce y su familia (Globe, Wave, Reach cambian sólo el acento); no a decks con
+marca de cliente ni a Greenhouse. Contrato: [manual](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
+§1.3 y §10.1; referencia operativa y checklist: [graphic-line-orbit.md](../efeonce-brand-studio/references/graphic-line-orbit.md).
+
+- **La órbita es la navegación.** Portada con un arco corto; cada sección suma su tramo; el cierre completa la
+  órbita con la esfera arriba. En las láminas de contenido en papel, la órbita baja a 80 px en la esquina.
+- **El arco mide:** en navegación, el tramo corresponde a la sección real en que va el deck; un arco de dato sólo
+  existe con un dato real que se pueda citar. Nunca un arco decorativo.
+- **Ningún texto cruza la órbita**, una sola por lámina, fuera de eje hacia arriba a la derecha; margen de 140 px
+  en 16:9.
+- **Pie:** la URL va en la burbuja oficial `url-lum` (regla de pie de arriba); en un PDF donde la fusión de
+  luminosidad no esté garantizada, la variante horneada de `docs/operations/brand-graphic-line/deliverables/assets/`.
+- Valores desde los tokens `efeonceGraphicLine` (`@efeoncepro/axis-tokens`), nunca HEX ni px transcritos. El
+  componente de órbita en AXIS está pendiente: hoy hay tokens y una página de referencia, no una primitive.
+
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 
 Casi todo el mal deck del mundo nace de saltarse una de estas. **Contéstalas en voz alta.**

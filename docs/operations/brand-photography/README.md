@@ -1,9 +1,9 @@
 # Fotografía de marca Efeonce — índice
 
 > **Tipo de documento:** Índice operativo de carpeta
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-23
+> **Última actualización:** 2026-09-25 (banco de la lente de la línea gráfica)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Bitácora del caso](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida de evidencia](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md)
 
 Esta carpeta guarda el **Lenguaje Fotográfico de la marca propia de Efeonce**, aprobado por el operador (Julio
@@ -63,6 +63,7 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 | Bitácora del caso | [`docs/operations/social/2026-09-19-efeonce-photographic-language-production-method.md`](../social/2026-09-19-efeonce-photographic-language-production-method.md) | Ronda por ronda: qué se probó, qué resultó, qué decidió el operador, qué se aprendió, fallos con números |
 | Corrida de evidencia | [`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/`](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md) | Prompts verbatim por ronda (`batch*.json`, `*.txt`), bloques de prompt, scripts de medición y composición. Las imágenes son locales (gitignoreadas) |
 | Entrega en OneDrive | `5. Contenidos/13- Branding/Lenguaje Fotografico Efeonce/v01/` | Carpeta de entrega de la versión 1 para el equipo |
+| Banco de la lente (línea gráfica) | [`ai-generations/2026-09-25_banco-lente-orbita/`](../../../ai-generations/2026-09-25_banco-lente-orbita/LEEME.md) | Consumidor del lenguaje: 8 tomas documentales para la lente de [«La órbita»](../brand-graphic-line/README.md), hechas con `pnpm foto:generar`, sin emblema legible; reemplazaron a tres fotos repetidas. Plates locales |
 | Manual de uso | [`docs/manual-de-uso/marketing/fotografia-de-marca-efeonce.md`](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md) | Paso a paso para producir una foto de marca (lo escribe otro agente) |
 
 ## Orden de lectura recomendado

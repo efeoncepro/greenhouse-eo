@@ -27,6 +27,9 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   `pnpm foto:componer:cta` + `pnpm foto:cta:gate`: veredictos certificado/falla/no certificable, huellas, guarda de
   sujeto por segmentación, zona segura AXIS, firma, WCAG 2.2 AA sobre el trazo a 390 px, APCA y daltonismo en el CTA,
   excepciones con aprobador, texto alternativo y cómo se prueba el propio comando.
+- [Línea gráfica Efeonce — La órbita](creative/linea-grafica-efeonce.md) — la forma canónica de la marca propia de
+  Efeonce y su familia (Globe, Wave, Reach) desde 2026-09-25: qué es, sus tres trabajos (rodea, mide, enfoca), a qué
+  piezas aplica (y que no aplica a la UI de Greenhouse ni a clientes), reglas clave, dónde vive cada cosa y pendientes.
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
 - [Creator Influence & Content](media-distribution/creator-influence-content.md) — reglas funcionales para separar

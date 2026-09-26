@@ -325,6 +325,25 @@ calcula desde el ancho real de cada pieza** más un espacio: fijarlo a mano sola
 **Lo plano no se genera:** el carnet, la tarjeta o la etiqueta en plano **son** el arte compuesto, no una
 generación.
 
+### Merch de la línea gráfica «La órbita» (2026-09-25)
+
+La línea gráfica canónica de Efeonce ([manual](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
+§10.4–§10.8; [referencia operativa](../../efeonce-brand-studio/references/graphic-line-orbit.md)) trae 17 fotos de
+producto generadas con `gpt-image-2.5-sunburst` bajo este mismo método:
+
+- **Referencia = el arte plano exacto de cada pieza** (lapiceros, pulseras, polo, polera, gorra, carnet, pin, llavero, paraguas, caja de bienvenida, stand…), compuesto desde
+  los archivos oficiales, más los **kits reales** de polo, gorra y lanyard como referencia de forma y tela. El
+  modelo sólo pone material y luz; la órbita, la palabra con su punto y el logo nunca se describen para que el
+  modelo los dibuje.
+- **Se conservan las versiones planas.** La foto es una maqueta de presentación; la producción sale de los
+  vectoriales y de una muestra física del proveedor.
+- **La regla del objeto viaja al prompt:** frente con la palabra en Bricolage y su punto (órbita opcional,
+  alrededor de la palabra); dorso con el logo solo, chico y abajo. La órbita alrededor del logo está descartada.
+  Declarar lo que la pieza NO lleva, igual que en el caso de la gorra.
+- **Sólo marca propia Efeonce y su familia**, nunca merch de un cliente.
+- Prompts, artes y runner: `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/merch-ia/`
+  (`items.mjs`, `arte/`, `prompts/`, `out/`).
+
 ### Vistas que cierran reinterpretación
 
 Además de las familias de §2, cualquier merch con arte impreso y partes mecánicas necesita:

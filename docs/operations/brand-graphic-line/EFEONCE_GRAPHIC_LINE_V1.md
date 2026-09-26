@@ -6,7 +6,7 @@
 > **Última actualización:** 2026-09-25
 > **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
 > **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (39 láminas, siete capítulos)
-> **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (axis.efeonce.org/references/graphic-line/, pendiente de publicar). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
+> **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
 > **Manual en PDF:** [`deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](./deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) (A4, 54 hojas, confidencial · uso interno). Se regenera con `node scripts/documents/render-efeonce-graphic-line.mjs`.
 > **Fuentes del repo:** `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/` (generador del canvas, texturas, renders, firma de mail, merch generativo y prueba sin logo)
 > **Relacionados:** [Lenguaje fotográfico](../brand-photography/README.md) · [Selección de referencias de marca](../EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md) · `docs/context/09_marca-agencia.md` · `src/config/efeonce-brand.ts`
@@ -287,7 +287,7 @@ SVG`. Nunca se redibujan ni se exportan desde una captura.
 
 La foto va en la lente o en el foco, con su luz y **sin velo**. Personas reales del equipo o escenas del oficio;
 nunca banco de imágenes. Se produce con el pipeline canónico del [lenguaje fotográfico](../brand-photography/README.md)
-(`pnpm foto:prompt` → `pnpm foto:validar`), nunca armando prompts a mano.
+(`pnpm foto:prompt` para revisar el prompt, `pnpm foto:generar <ficha>` para producir el plate con las referencias que la ficha declara y `pnpm foto:validar` para medirlo), nunca armando prompts a mano.
 
 **Reglas de la toma para la lente:** el sujeto cabe en un círculo del 55 % del lado corto con 15 % de aire · fuera
 del círculo la foto tolera quedar en navy apagado · **sin emblema legible** (el logo lo pone la pieza, no la ropa) ·

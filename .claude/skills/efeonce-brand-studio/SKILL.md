@@ -105,6 +105,7 @@ Leer solo lo necesario:
 - `references/metrics-and-scorecards.md` para métricas y scorecards.
 - `references/branding-as-a-service.md` para ofertas, delivery, pricing logic y handoff.
 - `references/research-sources-2026.md` para evidencia fechada, confianza y fuentes de investigación.
+- `references/graphic-line-orbit.md` para la línea gráfica «La órbita» de Efeonce: usos, reglas duras, tokens, artefactos y QA.
 
 Usar las plantillas de `templates/` cuando el usuario necesite un artefacto formal. Ejecutar `scripts/validate-brand-artifact.py` antes de cerrar entregables estructurados.
 
@@ -134,11 +135,30 @@ de fotografía, bokeh natural para la firma, tipografía y producción pertenece
 El [caso canónico](../../../docs/operations/social/2026-09-13-fiestas-patrias-production-method.md) distingue
 decisiones del operador, ejecución y evidencia; no tratar una aprobación estética como brand equity medido.
 
+### Línea gráfica «La órbita» (canónica 2026-09-25)
+
+La forma propia de Efeonce: anillo fino + arco con esfera + halo, nacida del isotipo. Tres usos: **rodea** (palabra,
+lente, objeto), **mide** (el arco es avance real) y **enfoca** (la lente y el foco «Te hacemos visible»). La familia
+(Efeonce, Globe, Wave, Reach) comparte la órbita y cambia el acento. Operar con
+[la referencia](references/graphic-line-orbit.md); contenido en el
+[manual V1](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) y decisión en el
+[ADR](../../../docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md).
+
+- **Qué decide esta skill:** alcance (marca propia y familia; **nunca** identidad de producto Greenhouse ni trabajo de
+  clientes), papel de la órbita en la pieza, voz pregunta-respuesta y su banco de pares, y el estado de evidencia.
+  **Qué decide `design-studio`:** composición, lente, foto y QA de píxeles; los valores salen de los tokens
+  `efeonceGraphicLine` de AXIS, **nunca** HEX/px transcritos.
+- **Reglas duras:** ningún texto cruza la órbita · una lente u órbita por pieza, muro o vidrio, nunca patrón · sin
+  dato real no hay arco · `efeoncepro.com` siempre en la burbuja oficial `url-lum`, nunca como texto · el logo en una
+  frase de display sólo alineado a línea base y altura de x · sin velo navy sobre fotos de banco.
+- **Estado:** **sistema consistente, NO activo distintivo demostrado**: la prueba de atribución sin logo (600
+  personas) no se ha corrido. «Te hacemos visible» no sale a pauta sin revisión legal.
+
 ### Lenguaje fotográfico de marca (aprobado 2026-09-19)
 
 Sistema para la fotografía e imagen fotorrealista de **la marca propia Efeonce**: idea «El oficio a la vista» (la obra
 y el oficio de cada servicio, el sistema o dato y personas decidiendo; nunca reuniones genéricas), firma con primer
-plano desenfocado **planeado** y logo SVG oficial al 15%, y roles de color (azul activo = la casa, naranja = la idea,
+plano desenfocado **planeado** y logo SVG oficial al 20 % del lado corto (25 % en 16:9 en piezas nuevas), y roles de color (azul activo = la casa, naranja = la idea,
 lima = el resultado). Aprobado por el operador el 2026-09-19.
 
 - **Qué decide esta skill:** papel de la marca, test de sustitución, que la paleta viva en luz y material (no en

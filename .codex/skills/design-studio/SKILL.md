@@ -94,6 +94,13 @@ Para fotografía propia Efeonce, cargar
 la composición sin forzar utilería y comparar los píxeles finales con esas referencias. Haber leído la guía o
 reutilizado un prompt no lo cumple.
 
+Para piezas de la marca propia Efeonce o su familia (Globe, Wave, Reach) con la **línea gráfica «La órbita»**
+(canónica 2026-09-25: anillo, arco con esfera, halo; lente y foco), cargar
+[`../efeonce-brand-studio/references/graphic-line-orbit.md`](../efeonce-brand-studio/references/graphic-line-orbit.md)
+y el [manual V1](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md). Valores desde los tokens
+AXIS `efeonceGraphicLine`, nunca HEX/px a mano; ningún texto cruza la órbita; una órbita o lente por pieza; URL en
+burbuja `url-lum`. No aplica a UI de Greenhouse ni a clientes.
+
 Cuando aparezca Julio, usar su identidad fotorrealista aprobada: `refs-aprobadas/` (11 referencias; `julio-ap-04`
 primera opción de rostro y `julio-ap-11` de cuerpo) más `set-identidad/angulos/` (seis ángulos), ambos bajo
 `ai-generations/2026-09-20_identidad-julio-nexa/`. Consultar el manifiesto y resolver vistas con `foto:prompt`;

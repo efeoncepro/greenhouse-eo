@@ -35,6 +35,25 @@ El operador aprobó página por página el diseño de los informes de Efeonce In
 - Reglas reutilizables (navy manda en papel, teal sólo sobre navy, roles de color de datos, oportunidad nunca sólo por el coral en papel, portadas, logo del cliente, contraportada y pie): estándar de informes, sección «Delta 2026-09-25».
 - Es diseño aprobado, no plantilla construida: producción sirve los catálogos v1 de Insights y los catálogos premium están en implementación (TASK-1889). Fuera del Composer, reprodúcelo con los tokens y assets reales; no copies los datos de ejemplo de las páginas de referencia.
 
+## Línea gráfica «La órbita» y la burbuja de URL (canónica desde 2026-09-25)
+
+Los documentos emitidos con la marca Efeonce siguen la línea gráfica «La órbita»: manual
+`docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` y referencia operativa
+`.claude/skills/efeonce-brand-studio/references/graphic-line-orbit.md` (checklist de QA incluido). Nunca en una pieza
+con la marca del cliente ni en Greenhouse. Valores desde los tokens `efeonceGraphicLine` de `@efeoncepro/axis-tokens`.
+
+- **Burbuja de URL en el pie (§8.5):** `efeoncepro.com` va siempre en la burbuja oficial, nunca como texto. En HTML
+  se aplica `url-lum.svg` en gris con `mix-blend-mode: luminosity`; no se recolorea ni se redibuja. En PDF, visores,
+  correo o cualquier salida donde la fusión no esté garantizada, usa la variante horneada:
+  `docs/operations/brand-graphic-line/deliverables/assets/url-lum-light.svg` sobre blanco o papel y
+  `url-lum-dark.svg` sobre navy. Comprueba en el PDF final que el trazo no salió negro (punto 6 del contrato).
+- **Portadas y contraportadas:** la órbita nace de las portadas de Insights (`report-cover.html`,
+  `report-cover-light.html`, `report-back-cover.html` del catálogo `insights-report`). Ningún texto cruza la órbita;
+  una por página; el arco de avance sólo mide un dato real del informe.
+- **Hoja membretada A4 (§10.7):** logo arriba a la izquierda, la órbita recortada en la esquina superior derecha al
+  18 % en navy, la línea del pie termina en la esfera; texto en Poppins 11 pt; nunca la órbita detrás del texto; la
+  continuación no lleva órbita. El contenido del pie (URL, dirección, teléfono) sigue el contrato de arriba.
+
 ## Responsabilidad editorial
 
 Efeonce es el emisor responsable de su servicio. «Publicamos», «corregiremos» o «proponemos» dependen del estado real: no conviertas una propuesta en promesa ni describas como ajeno un defecto de nuestro propio trabajo. Distingue ejecución de Efeonce, coordinación con cliente y terceros, y decisiones de alcance nuevo.
