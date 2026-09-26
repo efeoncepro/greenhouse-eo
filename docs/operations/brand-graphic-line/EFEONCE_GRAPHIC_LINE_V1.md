@@ -266,7 +266,14 @@ El isotipo ya es una órbita: no se le agrega nada.
 **Aviso conocido:** el isotipo de Wave en negativo (repo y OneDrive) conserva media figura en azul. Si existe una
 versión toda blanca, se reemplaza.
 
-### 8.5 Archivos
+### 8.5 La URL: siempre en su burbuja
+
+Donde aparezca `efeoncepro.com` va la **burbuja oficial** (`url-lum.svg`, el mismo asset del pie de Insights y del
+deck), nunca la URL como texto: stand, pendón, tarjeta, carnet, hoja membretada, firma de mail y pies de página.
+El SVG se mantiene gris y se aplica con **`mix-blend-mode: luminosity`**, que lo adapta al fondo; no se recolorea
+ni se redibuja. En correo, donde la fusión no está soportada, va el mismo archivo sin fusión y enlazado.
+
+### 8.6 Archivos
 
 `public/branding/` y `public/branding/SVG/` en el repo; `OneDrive › Alineación › 5. Contenidos › 13- Branding ›
 SVG`. Nunca se redibujan ni se exportan desde una captura.
