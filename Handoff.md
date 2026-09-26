@@ -2,7 +2,7 @@
 
 **Línea gráfica «La órbita» (25/09):** canónica y componible por intención (AXIS 0.2.6, `pnpm creative:orbit:render`); [índice](docs/operations/brand-graphic-line/README.md). Pendiente: prueba sin logo y firma A/B.
 
-**Marketing Studio (25/09):** en vivo en https://studio.efeonce.org (abierto, solo lectura). TASK-1890 y [TASK-1891](docs/tasks/in-progress/TASK-1891-marketing-studio-mcp-federation.md) code complete: 12 tools `studio.*` desde el registro de operaciones; canje RFC 8693 por persona en Greenhouse (cliente `efeonce-mcp-marketing-studio`, migración aplicada, allowlist en Vercel prod/staging); gateway 1.8.0 desplegado (revisión `00057-w8h`) con `MARKETING_STUDIO_PROVIDER_ENABLED=false`. **Falta:** push de develop (el commit remoto choca con WIP ajeno en `scripts/foto`) y release de Greenhouse (canje + manual) → flag ON + dispatch → `pnpm studio:canary` con token Entra humano. Skill nueva `efeonce-marketing-studio` (espejada). Programa TASK-1890…1899 en [EPIC-049](docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md); runbook [runtime handoff](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
+**Marketing Studio (25/09):** TASK-1890/1891 code complete; gateway 1.8.0 con `MARKETING_STUDIO_PROVIDER_ENABLED=false`. Falta: release de Greenhouse (canje RFC 8693 + manual) → flag ON + dispatch → `pnpm studio:canary` con token Entra humano. Detalle: [TASK-1891](docs/tasks/in-progress/TASK-1891-marketing-studio-mcp-federation.md) · skill `efeonce-marketing-studio` · [runbook](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
 
 **Insights (25/09):** [TASK-1888](docs/tasks/in-progress/TASK-1888-efeonce-insights-editorial-contract-v2.md) code complete, rollout pendiente (flag OFF, migración aplicada, [efeonce-mcp#18](https://github.com/efeoncepro/efeonce-mcp/pull/18) sin deploy; sin push). Plan de rollout: arquitectura §14.8.
 
@@ -389,14 +389,7 @@ Platform debe promoverla y medir ahorro. Reactivación/evidencia:
 
 **TASK-1829 (EPIC-044 U02) — `code complete, rollout pendiente`** (greenhouse-eo-45; commits `263ee3a74` · `19d1658de` · `d31e6e913`). Superficie OAuth del emisor detrás de `AUTH_SERVER_OAUTH_ENABLED=false` (ya en producción por el release de arriba): metadata, CIMD primario + DCR compat, authorize/token/revoke/introspect/consent, JWT ES256 con `gv`, 7 tablas `greenhouse_auth` y 2 capabilities aplicadas, 3 señales `auth.oauth.*`; contrato `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. Decisión del operador: `localhost` como loopback sólo para clientes públicos. Próximo paso: flag ON en staging (environment `efeonce-auth` a `active`, metadata validada, clientes CIMD/DCR de prueba); persona real exige TASK-1830 (`SubjectSessionPort`). `pnpm build` de producción no se corrió localmente (CI/Vercel lo construyeron). No se corrió el canary de Globe OAuth (hibernado).
 
-**EPIC-044 (2026-09-03) — authorization server PROPIO, decidido por el operador; WorkOS descartado.** ADR aceptado
-`docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`; excepción EPIC-027 para `services/auth-server` aprobada.
-TASK-1828 runtime vivo (KMS HSM `auth-server-es256`, schema `greenhouse_auth`, JWKS desde PG); detalle y estado por task en
-`docs/tasks/**/TASK-1828*`…`TASK-1834*` y el changelog 2026-09. Siguiente ID libre entonces `TASK-1835` / `EPIC-045`.
-**TASK-1631 (U04) Slice 1, 2026-09-04 — code complete, rollout pendiente.** Binding aplicado en PG, dominio
-`src/lib/identity/external-access/**`, rutas admin, reader del gateway `GET /api/platform/ecosystem/identity/binding` y 4
-señales; smoke `pnpm identity:external-access:smoke`. **Staging verificado 2026-09-04** (develop `02dc5d987` pusheado coordinado con TASK-1828): 4 señales en `/api/admin/reliability`, rutas admin 200, lane ecosystem 401 sin consumer. **En producción** desde el release 2026-09-04 (run 33893120972; canary del lane 400/200 `environment_inactive`/401; emisor `efeonce-auth` en `draft`). **Próximo paso:** operador lee las 4 señales en `/admin/operations` prod con sesión humana; TASK-1829 emite tokens y pasa el environment a `active`; TASK-1831 consume el reader.
-Paridad registry↔catálogo roja por 11 capabilities ajenas sin seed (task aparte).
+**EPIC-044 (2026-09-03) — authorization server propio** (ADR `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`; WorkOS descartado). Estado por task en `docs/tasks/**/TASK-1828*`…`TASK-1834*`. **TASK-1631 (U04)** en producción desde el release 2026-09-04 (run 33893120972); próximo paso: el operador lee las 4 señales en `/admin/operations` prod; TASK-1829 emite tokens y activa el environment; TASK-1831 consume el reader. Paridad registry↔catálogo: 4 capabilities sembradas el 2026-09-25; el resto sigue como task aparte.
 
 Release SEO/D4 (2026-09-13): PR #235, run `34754161855`, manifiesto `released`; [auditoría](docs/audits/hiring/2026-09-13-seo-assignment-readiness.md).
 
@@ -421,19 +414,7 @@ draft 07-29, decisión manual de HR), executed_member_still_active **0**, deprov
 trataba como salida decidida (`identity_only` ejecutado → `full_period`). Compensaciones cerradas por command,
 `hasDecidedExitFact` ya excluye `identity_only`, el live test limpia al terminar; fix en PR #220 (`main`).
 
-**Valentina Hoyos — restauración gobernada APLICADA por Codex a las 18:38:48Z:** member activo/status activo,
-asignable y sin corte antiguo; asignación existente activa sin fecha final. Se verificaron alias Production hacia
-`a824d073` y 100% del tráfico `ops-worker-00641-dl2` hacia el árbol corregido antes de aplicar. Las siete categorías
-protegidas (relaciones, engagements, envíos, payables, usuario, obligación y orden) siguen idénticas; SSO elegible con
-correo nuevo y rol collaborator. Clave `valentina-lifecycle-reentry-restore-2026-09-03`; no repetir ni usar el SQL retirado.
-Eventos publicados 18:40:03Z y People completado 18:42:05Z; employee cerrado y datos protegidos idénticos.
-**Release cerrado:** `33795564223` success, manifest `a824d073a5fb-c2cf99e9-1ba1-40b3-9d85-76ad0a8e8372`
-released 19:30:49Z, health success y watchdog ok/4 de 4 workers. Dos intentos anteriores fueron abortados por
-cancelaciones concurrentes; Claude se retiró y Codex cerró bajo un solo operador. La auditoría conserva el incidente
-independiente de matching SHA/run ID. Readback final: recuperación y siete categorías protegidas intactas.
-[Auditoría](docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md) ·
-[runbook](docs/operations/runbooks/workforce-reentry-recovery.md).
-Finance de Felipe (obligación junio + SII) sigue como dependencia sin command de anulación. UI: TASK-1814.
+**Valentina Hoyos (2026-09-03) — cerrado:** restauración gobernada aplicada (clave `valentina-lifecycle-reentry-restore-2026-09-03`, no repetir ni usar el SQL retirado); release `33795564223` released. Detalle: [auditoría](docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md) · [runbook](docs/operations/runbooks/workforce-reentry-recovery.md). Pendiente: Finance de Felipe (obligación junio + SII) sin command de anulación; UI TASK-1814.
 
 **Delta Claude 19:40Z — PR #220 CERRADO por Codex** (run `33795564223`, manifest released 19:30:49Z; ver arriba).
 Attempts 1 y 2 `aborted` por cancelaciones cruzadas: el webhook empareja por `target_sha` antes que por
