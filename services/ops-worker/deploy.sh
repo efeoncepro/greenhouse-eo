@@ -293,6 +293,11 @@ ENV_VARS="${ENV_VARS},INSIGHTS_GENERATION_ENABLED=${INSIGHTS_GENERATION_ENABLED:
 # actualmente OFF en producción.
 ENV_VARS="${ENV_VARS},INSIGHTS_EDITORIAL_V2_ENABLED=${INSIGHTS_EDITORIAL_V2_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},REACTIVE_BATCH_SIZE=${REACTIVE_BATCH_SIZE}"
+# TASK-1896 — health profundo de Efeonce Marketing Studio (sistema par, HTTP + bearer studio:health). El valor es
+# el NOMBRE del secreto; lo resuelve resolveSecret (sin montar el token). Sin secreto la señal queda `unknown` y la
+# alerta no envía nada. El acceso de greenhouse-portal@ al secreto lo da el script de Studio
+# scripts/ops/infra/greenhouse-health-client.sh.
+ENV_VARS="${ENV_VARS},MARKETING_STUDIO_HEALTH_TOKEN_SECRET_REF=${MARKETING_STUDIO_HEALTH_TOKEN_SECRET_REF:-greenhouse-marketing-studio-health-token}"
 ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
 ENV_VARS="${ENV_VARS},GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF=${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF}"
 ENV_VARS="${ENV_VARS},HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL=${HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL}"
@@ -1665,6 +1670,21 @@ upsert_scheduler_job \
   "/seo/etv-methodology-drift-watch" \
   '{}'
 echo "  -> ops-seo-etv-drift-watch: 0 12 * * * (alerta Teams diaria si drift de metodología ETV=error, TASK-1806)"
+
+# TASK-1896 — chequeo diario y determinista de la señal platform.marketing_studio.health; alerta a Teams SOLO si
+# severity=error (destino marketing-studio-reliability-alerts, canal "EO - Admin"). Misma semántica que TASK-1806:
+# la cadencia diaria ES el dedup.
+#
+# 🔴 NACE PAUSADO: se despausa sólo después del primer ensayo de restauración verde en producción y de crear el
+# secreto greenhouse-marketing-studio-health-token (runbook MARKETING_STUDIO_RESTORE_RUNBOOK.md). Antes, la señal
+# estaría en `unknown` (sin credencial) o degradada por "ensayo nunca corrido", sin nada accionable.
+upsert_scheduler_job \
+  "ops-marketing-studio-health-watch" \
+  "20 12 * * *" \
+  "/marketing-studio/health-watch" \
+  '{}' \
+  "true"
+echo "  -> ops-marketing-studio-health-watch: 20 12 * * * PAUSADO (alerta Teams diaria si Marketing Studio=error, TASK-1896)"
 
 # TASK-1662 — cobertura mensual de keywords de competidores declarados (keyword gap).
 # Día 18: cadencia mensual en día propio para no apilar gasto con los jobs SEO de los
