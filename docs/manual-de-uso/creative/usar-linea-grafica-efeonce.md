@@ -1,7 +1,7 @@
 # Usar la línea gráfica de Efeonce — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-25 por Claude
 > **Ultima actualizacion:** 2026-09-26 por Claude
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
@@ -227,6 +227,27 @@ foto nueva de ese tipo:
 5. Trátala como **maqueta de dirección**: la producción sale de los archivos vectoriales, con prueba de color sobre el
    material real.
 
+## Paso a paso — armar una firma de correo
+
+La firma v3.1 está aprobada en dos versiones: **A · sobre papel** y **B · tarjeta navy**. Las reglas completas están
+en el [manual §10.2](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#102-firma-de-mail); el contrato
+que las hace cumplir es `efeonce.email-signature` de AXIS.
+
+1. **Reúne los datos de la persona:** nombre, cargo, teléfono, correo, LinkedIn y su foto aprobada.
+2. **Genera la firma** con `node ai-generations/2026-09-26_firma-partners/build4.mjs` (hoy tiene los datos de Julio
+   Reyes en `P`; cámbialos para otra persona). Sale en `out/v3.1/`: A y B en escritorio, móvil y sin fuentes web, y
+   la firma de respuesta.
+3. **Revisa las tres vistas.** La versión sin fuentes web es la que ven Outlook y Gmail: debe leerse bien en Arial.
+4. **Revisa los partners** contra el [registro de partnerships](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
+   Sólo entran relaciones activas, aceptadas o declaradas por el operador. Truora no va en la firma.
+5. **Instálala en Outlook:** la firma completa para correos nuevos y la de una línea para respuestas y reenvíos. Las
+   imágenes tienen que estar servidas desde una URL pública; con imágenes incrustadas, muchos clientes las muestran
+   como adjuntos.
+
+**Qué no hacer con la firma:** agregar «Quedo atento.» o «Saludos» (van en el cuerpo del correo) · poner una
+segunda esfera en la línea de los partners · mostrar logos de partners a color o en insignias de nivel sin haberlas
+confirmado en el portal del programa · escribir la URL como texto en vez de usar la burbuja.
+
 ## Paso a paso — regenerar el PDF del manual
 
 El PDF (`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`, A4, 56 hojas, confidencial) se genera desde una fuente HTML. Se
@@ -257,7 +278,7 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 | **Canónica (2026-09-25)** | la órbita es la forma oficial de la marca propia; cuando una pieza la usa, toma sus valores de los tokens de AXIS. No va por defecto en toda pieza |
 | **Sistema consistente, no activo distintivo demostrado** | no se ha medido si la gente reconoce a Efeonce sin el logo; no afirmes que la órbita se reconoce sola |
 | **Candidato sin aprobar** | pares de copy del banco; sirven de referencia, no de copy final |
-| **Decisión pendiente** | firma de mail A o B; panel de la prueba sin logo; si el contraste mínimo de la burbuja-firma sigue en 4,5:1 o baja a 3:1 |
+| **Decisión pendiente** | panel de la prueba sin logo; si el contraste mínimo de la burbuja-firma sigue en 4,5:1 o baja a 3:1 |
 | **No certificable** (`foto:cta:gate`) | pieza del canon anterior que firma con la URL; se dibuja igual que antes y no se recertificó |
 | **Maqueta de presentación** | las fotos de merch y de oficina del canvas generadas con IA; la producción sale de los archivos vectoriales y de una muestra física del proveedor |
 | **[propuesta]** en el manual técnico | valor a validar con prueba de impresión (por ejemplo, tamaños mínimos del logo e isotipo impresos) |

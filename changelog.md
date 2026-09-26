@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-26 — Firma de correo v3.1 aprobada: zona de partners y contrato `efeonce.email-signature`
+
+El operador aprobó la firma de correo en sus dos versiones (A sobre papel, B tarjeta navy). La línea que termina en la
+esfera va una vez; los partners (HubSpot, Salesforce, Adobe, Microsoft, AWS, Google Cloud, Claude, OpenAI y BytePlus)
+abren su propia zona con una regla fina sin esfera, en logos oficiales de un solo tono y el mismo peso óptico. Sin
+«Quedo atento» y todo el texto que no es el nombre en Poppins. AXIS `c7717ef`: tokens
+`efeonceGraphicLine.emailSignature`, contrato `efeonce.email-signature` 0.3.0 (`stable`) con `pnpm signature:resolve`,
+guía para agentes y lámina 4.5 del Lab. Greenhouse: manual §10.2, ADR, documentación funcional, manual de uso y las
+skills `efeonce-brand-studio` y `axis-design-system`. Pendiente: subir las imágenes a una URL pública, instalar en
+Outlook y publicar los paquetes AXIS con el contrato.
+
 ## 2026-09-26 — Línea gráfica «La órbita»: AXIS 0.3, recetas fieles al canvas y motion V1.1
 
 AXIS publicó 0.3.0 (tokens, contratos, registro y assets) y el paquete nuevo `@efeoncepro/axis-graphic-line` 0.3.1,
@@ -553,18 +564,3 @@ Al revisar cómo hace video a video Seedance, apareció que no tiene un endpoint
 dentro de reference-to-video con `--task`, y la 2.0 sólo usa el video como guía. El registro tenía mal la
 duración mínima (4 s, no 1) y no declaraba cuántas referencias acepta cada versión; ambas cosas quedaron
 corregidas y validadas antes de encolar. La edición y extensión con Seedance 2.5 siguen sin probarse en real.
-
-## 2026-09-16 — Minimax H3 entra a `pnpm ai:fal`: video en segundos, control de cámara y LoRAs
-
-El CLI de fal suma los 17 endpoints de Minimax H3. Nueve quedaron verificados con corridas reales: texto,
-imagen y referencias a video en sus tres variantes (base, Max y Max Turbo) y el control de cámara, que
-congela la escena y sólo mueve el encuadre. Max Turbo cuesta USD 0,0125 por segundo y cada corrida volvió
-en menos de 10 segundos, así que sirve para explorar antes de gastar en Seedance. Las variantes con LoRA y
-los cuatro entrenadores quedan declarados pero sin probar (exigen una LoRA o se cobran por step), y el
-Director se lista como no operable: es un stream en tiempo real, no un trabajo de cola.
-
-H3 no se parece a Seedance en la forma de los pedidos (duración entera, resolución en mayúsculas,
-image-to-video sin aspect ratio, expansión de prompt obligatoria en Max), y el CLI lo valida antes de
-encolar. Dos mejoras alcanzan a todos los modelos: el `request_id` se imprime apenas fal acepta el trabajo
-y `--request-id` retoma uno que siguió corriendo tras un timeout, sin volver a cobrarlo. De paso se corrigió
-`--task`, que sólo acepta Seedance 2.5 y hasta ahora se dejaba pasar a la 2.0.

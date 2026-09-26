@@ -106,7 +106,7 @@ acentos de producto se usan en piezas de Efeonce (recomendación: no). Manual §
 
 - **Prueba de atribución sin logo:** 600 personas, panel a cotizar. Hasta medirla, la línea es un sistema
   consistente, no un activo distintivo demostrado.
-- Elegir firma de mail A o B y aprobar el banco de pares de copy.
+- Aprobar el banco de pares de copy. (La firma de mail quedó resuelta el 2026-09-26: ver delta.)
 - Archivos de impresión y plantillas editables. Delta 2026-09-25: la órbita ya tiene contrato de composición por intención en AXIS 0.2.6 (`efeonce.graphic-line-orbit`, candidate; ADR `GRAPHIC_LINE_ORBIT_COMPOSITION_DECISION_V1` en AXIS) con adapters en el Lab y en Greenhouse (`pnpm creative:orbit:render`).
 - Delta 2026-09-26: contrato `0.2.0` (paquetes AXIS `0.2.7`) con `signature` (logo centrado; burbuja URL centrada
   y con fusión sólo si el logo ya está en la imagen), `slogan`, `state` y `brand-close`; la órbita no sustituye la
@@ -118,3 +118,7 @@ acentos de producto se usan en piezas de Efeonce (recomendación: no). Manual §
   tipografía creativa firman con el logo centrado, y la sección nueva 4.9 muestra la oficina fotografiada.
 - Decisión del operador: si el umbral de la burbuja-firma sigue en 4,5:1 o baja a 3:1 (objeto gráfico).
 - Copy en inglés, revisión legal de «Te hacemos visible» y tamaños mínimos validados con prueba de impresión.
+- Delta 2026-09-26 (tarde): **firma de correo v3.1 aprobada** en sus dos versiones (A sobre papel, B tarjeta navy).
+  La línea que termina en la esfera va una vez; los partners abren su propia zona con una regla fina **sin esfera**.
+  Contrato AXIS `efeonce.email-signature` 0.3.0 (`stable`), tokens `efeonceGraphicLine.emailSignature`, lámina 4.5 del
+  Lab. Detalle en el manual §10.2.

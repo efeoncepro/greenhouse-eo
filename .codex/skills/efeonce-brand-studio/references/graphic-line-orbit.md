@@ -69,6 +69,22 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
 - **Pendiente del operador:** si el umbral de la burbuja-firma sigue en 4,5:1 o baja a 3:1 (objeto gráfico). Hasta
   que decida, 4,5:1.
 
+## La firma de correo (v3.1, aprobada 2026-09-26)
+
+- **Dos versiones aprobadas:** A sobre papel y B tarjeta navy. Contrato AXIS `efeonce.email-signature` 0.3.0
+  (`stable`), tokens `efeonceGraphicLine.emailSignature`, lámina 4.5 del Lab, manual §10.2.
+- **Zonas en orden fijo:** foto con órbita · nombre (Bricolage 800 + punto de acento) y cargo · teléfono y correo
+  (Poppins 13, íconos Tabler outline en el acento) · burbuja URL y LinkedIn · **línea que termina en la esfera** ·
+  cierre de marca (logo + eslogan) · **regla de sección sin esfera** · «Partner oficial de» + franja. Aire: 18 · 14 ·
+  20 · 16 px.
+- **Las dos líneas son la regla:** la de la esfera va **una vez**; la que abre la zona de partners **nunca** lleva
+  esfera. Sin regla, los partners se leían como bajada del logo de Efeonce.
+- **Franja de partners:** logos oficiales en un solo tono por superficie, mismo peso óptico, filas justificadas, una
+  sola imagen con `alt` que nombra a cada uno. Sólo relaciones que el registro de partnerships permite declarar;
+  **Truora no va en la firma** (operador).
+- **No va en la firma:** «Quedo atento», «Saludos» (van en el cuerpo). La firma de respuesta es una línea de texto.
+- Todo el texto que no es el nombre va en **Poppins**; Outlook y Gmail muestran Arial y la firma se revisa así.
+
 ## Reglas duras (las más caras de romper)
 
 1. **Ningún texto cruza la órbita.** Texto en el tercio inferior izquierdo; órbita fuera de eje, arriba a la derecha.
@@ -284,7 +300,8 @@ La página de AXIS es pública: lo que allí aparece queda expuesto.
 - **Prueba de atribución sin logo** (600 personas, panel a cotizar) sin medir: hoy la línea es **sistema consistente,
   no activo distintivo demostrado**. No reportarla como brand equity.
 - Umbral de la burbuja-firma: 4,5:1 o 3:1 (decisión del operador).
-- Elegir firma de mail A o B; aprobar el banco de pares de copy (hoy candidatos).
+- Aprobar el banco de pares de copy (hoy candidatos). La firma de correo v3.1 está aprobada; falta subir sus
+  imágenes a una URL pública e instalarla en Outlook.
 - Archivos de impresión y plantillas editables.
 - Pasar los tiempos del motion V1.1 a tokens de AXIS (`brandReveal` / `brandOpen`); hoy viven en el script.
 - Copy en inglés; revisión legal de «Te hacemos visible»; tamaños mínimos del logo con prueba de impresión.

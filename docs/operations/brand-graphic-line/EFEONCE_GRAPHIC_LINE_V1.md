@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita · V1
 
 > **Tipo de documento:** Manual de marca (contrato operativo de diseño)
-> **Versión:** 1.4
+> **Versión:** 1.5
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
-> **Última actualización:** 2026-09-26 por Claude (Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
+> **Última actualización:** 2026-09-26 por Claude (firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
 > **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
 > **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (40 láminas, siete capítulos)
 > **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Desde AXIS 0.2.7 los archivos oficiales (logo e isotipo de las cuatro marcas y las tres burbujas URL) viven en el paquete `@efeoncepro/axis-brand-assets`; desde AXIS 0.3.0 el contrato de composición es `efeonce.graphic-line-orbit` 0.3.0 (`stable`) y el paquete `@efeoncepro/axis-graphic-line` 0.3.1 pinta la órbita, sus recetas y su movimiento (§13). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
@@ -440,10 +440,45 @@ foco, y en los estímulos de la prueba sin logo.
 
 ### 10.2 Firma de mail
 
-HTML con texto vivo y máximo dos imágenes; en Outlook de escritorio fija a 460 px y fluida en móvil. Dos opciones
-con la órbita alrededor de la foto: **A · clara** (divisor que termina en la esfera) y **B · tarjeta navy**
-(recomendada: se reconoce de lejos y funciona en modo oscuro). **Decisión pendiente: A o B.** Generador:
-`exploracion-v5/firma/`.
+**Aprobada el 2026-09-26 (v3.1) en sus dos versiones:** **A · sobre papel** y **B · tarjeta navy**. HTML de correo
+con tablas y estilos en línea, 460 px en escritorio y fluida en móvil. Contrato AXIS `efeonce.email-signature` 0.3.0
+(`stable`), tokens `efeonceGraphicLine.emailSignature`, lámina 4.5 del Lab y guía
+`docs/agent-composition/email-signature.md` en el repo de AXIS. Generador vigente:
+`ai-generations/2026-09-26_firma-partners/build4.mjs` (salida en `out/v3.1/`).
+
+**Zonas, en este orden** (las opcionales se omiten; el orden no cambia):
+
+| Zona | Aire antes | Regla |
+|---|---|---|
+| Foto con órbita | — | `portraitOrbitSvg`, 96 px, PNG 2× (proporciones abajo) |
+| Nombre y cargo | — | El nombre es la única voz de titular: Bricolage 800, 22 px, con el punto en el acento de la línea. El cargo, Poppins 400 |
+| Teléfono y correo | — | Texto vivo en Poppins 13 con íconos Tabler outline (trazo 1,75) en el acento |
+| Burbuja URL y LinkedIn | — | La URL siempre en su burbuja horneada; LinkedIn como ícono con enlace |
+| **Línea que termina en la esfera** | 18 px | **Una sola vez**: separa a la persona de la marca |
+| Cierre de marca | 14 px | Logo de Efeonce + «Empower your Growth» (palabra de la línea) |
+| **Regla de sección** | 20 px | Línea fina **sin esfera**, en el color de borde de la superficie. Abre la zona de partners |
+| Partner oficial de | 16 px | Etiqueta Poppins 500 11 px + la franja de logos |
+
+**Las dos líneas son la regla.** La que termina en la esfera va una vez; la regla de la zona de partners nunca lleva
+esfera: si la esfera se repite, deja de ser identidad. Con 16 px y sin regla, «Partner oficial de» se leía como bajada
+del logo de Efeonce; el operador comparó espacio solo, línea fina y banda de pie, y eligió la línea fina.
+
+**Franja de partners:** logos **oficiales** de cada programa en **un solo tono** por superficie (`#7c92aa` sobre
+navy, `#8a95a2` sobre papel) y con **el mismo peso óptico** (misma área de tinta, 430 px² a 1×, en una caja de 80 × 24
+px), en filas justificadas de hasta cinco (9 → 5 + 4). Va horneada como **una sola imagen** con un texto alternativo
+que nombra a cada partner. Sólo entran relaciones que el [registro de partnerships](../EFEONCE_PARTNERSHIP_REGISTRY_V1.md)
+permite declarar (activas, aceptadas o declaradas por el operador); el contrato rechaza las demás. Hoy: HubSpot,
+Salesforce, Adobe, Microsoft, AWS, Google Cloud, Claude, OpenAI y BytePlus. **Truora es partner pero no va en la
+firma** (decisión del operador, 2026-09-26). La insignia oficial de cada programa (tier, uso permitido) sigue
+pendiente de readback en su portal; la firma usa los logotipos de marca, no insignias de nivel.
+
+**Lo que no va en la firma:** «Quedo atento.», «Saludos» y cualquier cierre van en el cuerpo del correo. En Outlook,
+la **firma de respuestas y reenvíos** es una línea de texto vivo (nombre, cargo, teléfono), sin imágenes.
+
+**Correo real:** Outlook y Gmail no cargan fuentes web y muestran Arial (se revisa también así); no muestran SVG ni
+fusiones, así que foto, íconos, logo, burbuja y franja van en PNG servidos desde una URL pública; la regla de sección
+es el borde superior de una celda (Outlook ignora un bloque de 1 px). **Pendiente:** subir las imágenes a una URL
+pública e instalar la firma en Outlook.
 
 **Proporciones del retrato (lámina 4.5, medidas del original, caja de 208 px):** anillo de radio 96, foto recortada en
 círculo de radio 78, arco de 200° a 250° con trazo 4 y la esfera de radio 7 en su punta; anillo de 2 px en navy al
@@ -588,11 +623,10 @@ confianza. Kit: `exploracion-v5/prueba-sin-logo/` (protocolo, cuestionario, 24 e
 **Pendiente (decisión del operador):**
 
 1. Panel de la prueba sin logo (Netquest, Cint o Toluna, a cotizar).
-2. Firma de mail A o B, e instalarla.
-3. Aprobar el banco de pares de copy.
-4. Umbral de la burbuja-firma: mantener 4,5:1 o bajarlo a 3:1 (objeto gráfico) (§8.5).
+2. Aprobar el banco de pares de copy.
+3. Umbral de la burbuja-firma: mantener 4,5:1 o bajarlo a 3:1 (objeto gráfico) (§8.5).
 
-**Pendiente (producción):** archivos de impresión y plantillas editables · las variantes que faltan de las animaciones
+**Pendiente (producción):** subir las imágenes de la firma de correo v3.1 a una URL pública e instalarla en Outlook (§10.2) · archivos de impresión y plantillas editables · las variantes que faltan de las animaciones
 del logo V1.1 (OneDrive y bucket) y sus tiempos como tokens `brandReveal` / `brandOpen` de AXIS (§10.1) · la
 frontera Greenhouse ↔ Efeonce (la línea es de Efeonce, no de Greenhouse) · que la línea no se filtre al trabajo de
 clientes · copy en inglés · revisión legal de «Te hacemos visible» · accesibilidad medida en las piezas reales ·

@@ -168,13 +168,19 @@ set (versions are independent per package): `axis-tokens`, `axis-ui-contracts`, 
   `accentSphere*` ratios are deprecated), `portrait` (orbit around a person photo: email signature, team cards),
   `pieces` (fixed-format pieces measured one by one: `lens` wall/deck-cover/post/story/campaign-post/linkedin,
   `spotlight` photo/event, `deck` cover/section/content/close), `spotlight`, `urlBubble`, `signature`, `slogan`,
-  `state` and `brandClose`.
+  `state`, `brandClose` and `emailSignature` (the approved email signature v3.1).
 - **Contract:** `efeonce.graphic-line-orbit` `0.3.0` (`stable`), manifest `axis.graphic-line-orbit-composition.v1`.
   An agent declares `orbit`, `measure` (value 0–1 **with a source**), `progress`, `lens`, `spotlight`, `family-map`,
   `url-bubble`, `voice`, `logo-inline`, `signature`, `slogan`, `state` or `brand-close`; the resolver enforces the
   line's rules and resolves every value from the tokens. Rejections, adapter checks and entry points: see the
   operating reference; in AXIS `pnpm orbit:resolve` (manual `docs/agent-composition/graphic-line-orbit.md`, ADR
   `GRAPHIC_LINE_ORBIT_COMPOSITION_DECISION_V1.md`).
+- **Contract:** `efeonce.email-signature` `0.3.0` (`stable`, approved v3.1 on 2026-09-26), manifest
+  `axis.email-signature-composition.v1`. Zones in a fixed order; the line that ends in the sphere appears **once**;
+  the partner endorsement is its own zone opened by a thin `section-rule` **without a sphere**, and only shows
+  partners whose registry status allows the claim (`active`, `accepted`, `declared`). A closing phrase or a second
+  sphere is an error; `reply` is one line of live text. In AXIS `pnpm signature:resolve` (guide
+  `docs/agent-composition/email-signature.md`, Lab board 4.5). Greenhouse manual §10.2.
 - **Package `@efeoncepro/axis-graphic-line`** (declared exception to "values, not painted components", only for this
   brand form): `orbitSvg`, `measureSvg`, `composeGraphicLine`/`paintGraphicLine`, `runAdapterChecks`, recipes
   `lensRecipe`, `spotlightRecipe`, `deckSlideHtml` (with `stats`/note), `portraitOrbitSvg`, `sphereDividerSvg`,

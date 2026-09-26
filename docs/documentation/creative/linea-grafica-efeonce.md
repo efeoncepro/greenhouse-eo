@@ -1,7 +1,7 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-25 por Claude
 > **Ultima actualizacion:** 2026-09-26 por Claude
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
@@ -136,6 +136,25 @@ sonido (para usarlas tal cual) o transparentes (para montarlas sobre otro fondo 
 
 > Detalle técnico: [spec de motion](../../operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md) · [manual §10.1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#101-pantalla-y-campaña) · [cómo usarlas](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md#paso-a-paso--usar-las-animaciones-de-marca)
 
+## La firma de correo
+
+Aprobada el 2026-09-26 en dos versiones: **A**, sobre el fondo blanco del correo, y **B**, una tarjeta navy. Se lee de
+arriba abajo así: la foto con su órbita, el nombre y el cargo, el teléfono y el correo, el sitio y LinkedIn; después
+**la línea que termina en la esfera**, el logo de Efeonce con «Empower your Growth», y al final una **línea fina sin
+esfera** que abre la zona «Partner oficial de», con los logos de los partners en gris.
+
+| Regla | Por qué |
+|---|---|
+| La línea con la esfera aparece una sola vez | es parte de la identidad; repetida, deja de serlo |
+| Los partners van en su propia zona, separados por una línea fina | pegados al logo, se leían como parte de la marca de Efeonce |
+| Los logos de los partners van en un solo gris y con el mismo peso visual | ninguno domina y la franja no compite con la marca |
+| Sólo aparecen partners que el registro permite declarar | la firma no puede afirmar una relación que no existe |
+| Sin «Quedo atento» ni «Saludos» | eso va en el cuerpo del correo |
+| Para responder y reenviar, una línea de texto | no se repiten imágenes en cada respuesta |
+
+> Detalle técnico: [manual §10.2](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#102-firma-de-mail) ·
+> contrato `efeonce.email-signature` y tokens `efeonceGraphicLine.emailSignature` en AXIS.
+
 ## Dónde está cada cosa
 
 | Qué | Dónde | Para quién |
@@ -167,7 +186,7 @@ la órbita se reconozca sola.
 | Pendiente | Tipo | Qué falta |
 |---|---|---|
 | Prueba de atribución sin logo | decisión del operador | elegir panel y correrla con 600 personas (300 por versión); el kit está listo |
-| Firma de mail | decisión del operador | elegir entre A (clara) y B (tarjeta navy, la recomendada) e instalarla |
+| Firma de mail | producción | la v3.1 está aprobada (A sobre papel y B tarjeta navy, con la zona de partners); falta subir sus imágenes a una URL pública e instalarla en Outlook |
 | Banco de pares de copy | decisión del operador | aprobar los pares pregunta/respuesta candidatos |
 | Archivos de impresión y plantillas editables | producción | no existen todavía |
 | Variantes restantes de las animaciones del logo | producción | algunos formatos y fondos siguen en render; se suman a OneDrive y al bucket a medida que terminan |
