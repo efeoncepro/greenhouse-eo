@@ -1,0 +1,11 @@
+{
+  "formato": "4:5",
+  "impacto": true,
+  "id": "L1-manos-curva",
+  "palanca": "manos",
+  "escena": "SCENE (colour grading suite of a small Santiago studio, mid-afternoon, grading a bakery campaign): two hands work a colour-grading control surface with deep ink-blue matte anodised trackballs and rings; the right fingertips are caught mid-turn on a ring, the left hand steadies the panel edge. Beyond the hands, soft and out of focus, a calibrated monitor shows a warm photograph of bread crust whose glow falls on the knuckles. Hard low afternoon sun from a side window rakes across the panel so every knob throws its own shadow. 85mm f/2, focus on the fingertips. LENS FRAMING: everything essential sits inside a centred circle about 55% of the frame width, centred slightly above the middle, with air around it; outside that circle the picture holds only calm secondary material. Nobody looks at the lens.",
+  "lecho": {
+    "objeto": "the near rim of the grading desk, a dark walnut edge right at the lens",
+    "tono": "DARK near black"
+  }
+}

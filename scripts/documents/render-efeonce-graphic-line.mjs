@@ -90,6 +90,7 @@ const assets = {
   URL_BUBBLE_DARK: svgUri('docs/operations/brand-graphic-line/deliverables/assets/url-lum-dark.svg'),
   LOCK_NEG: `data:image/png;base64,${b64(path.join(expl, 'assets/lockup-claim-neg.png'))}`,
   FIG_FAMILIA: await fig('O-03-orbita-familia.jpg', 250, 1100),
+  FIG_BANCO: await fig('O-08-orbita-fotografia.jpg', 670, 925),
   FIG_ISOTIPO: await fig('D-05-isotipo.jpg', 280, 880),
   FIG_OBJETOS: await fig('M-01-merch-foto-llevar.jpg', 280, 640),
   FIG_BIENVENIDA: await fig('M-02-merch-foto-identificarse.jpg', 280, 1140),

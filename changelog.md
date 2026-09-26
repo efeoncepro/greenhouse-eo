@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-25 — Línea gráfica «La órbita»: banco de fotos y canon en AXIS
+
+Banco propio de 8 fotos para la lente, hecho con el lenguaje fotográfico (`pnpm foto:generar`, 11 generaciones, ~USD 0,55; tres rehechas por el lenguaje). Reemplaza a las tres fotos repetidas con emblema en canvas, estímulos de la prueba sin logo, PDF y AXIS. ADR de canonización y tokens `efeonceGraphicLine` pasados a `canonical` en AXIS. [ADR](docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) · [manual](docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md). Atribución sin logo sin medir.
+
 ## 2026-09-25 — Insights: el diseño aprobado llega al informe y al deck (TASK-1889)
 
 Los catálogos `insights-report` (A4) e `insights-deck` (16:9) componen sólo con el canvas aprobado el mismo día: portada navy o blanca con el logo privado del cliente (sellado como referencia, bytes autorizados por el worker), índice, «Lo esencial» con el folio real de su evidencia, aperturas de capítulo, una página de figura por familia (comparación de períodos, columnas por canal, metas con banda del registro ICO, tendencia), tabla, límites y contraportada desde el SSOT de marca. Se retiraron la página analítica y la lámina de evidencia v1. Fidelidad al canvas 20/21 ≤ 1 % (Deck-Agrupadas con excepción aprobada); gate visual de Insights a 0 px; ediciones reales de Berel y Sky compuestas en local, que revelaron y corrigieron cinco defectos. Code complete en develop, sin push; rollout pendiente. [Dossier](docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md).

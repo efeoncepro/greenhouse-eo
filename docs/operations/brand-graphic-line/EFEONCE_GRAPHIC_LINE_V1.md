@@ -4,7 +4,7 @@
 > **Versión:** 1.0
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
 > **Última actualización:** 2026-09-25
-> **Estado:** dirección aprobada por el operador; **candidata a canon**. La canonización formal queda para el ADR, que el operador pidió hacer una vez cerrado todo. Mientras no exista, este documento no reemplaza `DESIGN.md`, AXIS ni `src/config/efeonce-brand.ts`: los complementa.
+> **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
 > **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (39 láminas, siete capítulos)
 > **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (axis.efeonce.org/references/graphic-line/, pendiente de publicar). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
 > **Manual en PDF:** [`deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](./deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) (A4, 54 hojas, confidencial · uso interno). Se regenera con `node scripts/documents/render-efeonce-graphic-line.mjs`.
@@ -291,13 +291,28 @@ nunca banco de imágenes. Se produce con el pipeline canónico del [lenguaje fot
 
 **Reglas de la toma para la lente:** el sujeto cabe en un círculo del 55 % del lado corto con 15 % de aire · fuera
 del círculo la foto tolera quedar en navy apagado · **sin emblema legible** (el logo lo pone la pieza, no la ropa) ·
-un acento cálido dentro del círculo, nunca en el fondo · la obra en proceso · registro documental: nadie mira al
-lente.
+el azul lo porta un objeto del oficio, nunca un muro de fondo · un acento cálido (naranja o lima) en una de cada dos
+fotos, nacido de la acción · la obra en proceso · registro documental: nadie mira al lente.
 
-**Banco propio (brief listo, sin generar):** 8 tomas — manos ajustando una curva de color · dos personas
-decidiendo entre dos versiones · estratega en la pizarra con la órbita · cámara detrás del monitor · revisión de un
-informe impreso · llamada con cliente (sólo la escucha) · pieza aprobada en pantalla grande · mesa vacía al final
-del ciclo. Costo estimado USD 5–10; **espera aprobación de presupuesto**.
+**Banco propio (generado el 2026-09-25):** ocho tomas en el lenguaje fotográfico de Efeonce, una ficha por toma con
+`pnpm foto:generar` (11 generaciones, del orden de USD 0,55). Fichas, plates y descartes en
+`ai-generations/2026-09-25_banco-lente-orbita/`.
+
+| # | Toma | Palanca | Acento |
+|---|---|---|---|
+| 1 | Manos ajustando una curva de color | manos | — |
+| 2 | Elegir entre doce pruebas de una etiqueta | variantes | naranja |
+| 3 | Estratega pone el imán sobre la órbita | sombra | lima |
+| 4 | Camarógrafo revisa la toma en el monitor | quien-sostiene | — |
+| 5 | Informe impreso, la línea que sube | cenital | lima |
+| 6 | Llamada con cliente, sólo la escucha | escucha | — |
+| 7 | La pieza aprobada, proyectada sobre ladrillo | proyeccion | naranja |
+| 8 | Mesa al final del ciclo, con la pieza impresa | ausencia | — |
+
+Tres se rehicieron por el lenguaje (la 5 salió como flatlay de stock, la 8 como oficina ordenada sin huella, la 6
+con un muro navy de fondo). Las palancas de la 3 y la 4 cambiaron respecto del brief: `instrumento` exige mirar a
+través de una herramienta. El banco reemplaza a las tres fotos repetidas en todas las piezas con lente, ventana y
+foco, y en los estímulos de la prueba sin logo.
 
 ---
 
@@ -430,11 +445,9 @@ confianza. Kit: `exploracion-v5/prueba-sin-logo/` (protocolo, cuestionario, 24 e
 
 **Pendiente (decisión del operador):**
 
-1. Presupuesto del banco de fotos propio (8 tomas, USD 5–10).
-2. Panel de la prueba sin logo (Netquest, Cint o Toluna, a cotizar).
-3. Firma de mail A o B, e instalarla.
-4. Aprobar el banco de pares de copy.
-5. El ADR de canonización.
+1. Panel de la prueba sin logo (Netquest, Cint o Toluna, a cotizar).
+2. Firma de mail A o B, e instalarla.
+3. Aprobar el banco de pares de copy.
 
 **Pendiente (producción):** archivos de impresión y plantillas editables · componente de órbita en AXIS (hoy son tokens y una página de referencia) · la
 frontera Greenhouse ↔ Efeonce (la línea es de Efeonce, no de Greenhouse) · que la línea no se filtre al trabajo de
