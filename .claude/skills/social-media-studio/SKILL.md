@@ -89,7 +89,7 @@ ni fotos fuente/descartes como anclas. Canon:
    `greenhouse-talent-people-operator`.
 5. **Aterriza a Efeonce** si el trabajo es de canales propios o de un cliente internacional:
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`. Globe es un adaptador futuro gated, no una dependencia.
-   Pieza de marca propia Efeonce o de su familia (nunca cliente): aplica la línea gráfica «La órbita» ([referencia operativa](../efeonce-brand-studio/references/graphic-line-orbit.md); reglas de redes en `efeonce/EFEONCE_OVERLAY.md` §Marca).
+   Pieza de marca propia Efeonce o de su familia (nunca cliente): aplica la línea gráfica «La órbita» ([referencia operativa](../efeonce-brand-studio/references/graphic-line-orbit.md); reglas de redes en `efeonce/EFEONCE_OVERLAY.md` §Marca). La órbita se usa en casos declarados y nunca reemplaza la composición fotográfica; la pieza firma con el logo de Efeonce centrado y la burbuja URL sólo lo reemplaza si el logo ya está en la imagen.
 6. **Cierra con el resultado solicitado**: artefacto de `templates/` en ejecución, pieza si se encargó producción,
    o explicación si sólo se pidió comprender/evaluar. No inventar un entregable para una pregunta.
    Para seasonalities, metáforas visuales y planificación anticipada de canales propios,

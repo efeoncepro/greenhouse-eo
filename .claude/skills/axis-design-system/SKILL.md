@@ -84,6 +84,9 @@ Use the sources in this order for every piece with advertising text:
    and validate the final pixels. If the Workbench and contract diverge, stop and report the drift; never copy
    the visual projection back into tokens by eye.
 
+The Workbench signs with the centered Efeonce logo by default (`signatureMode` `logo`); `url-bubble` only when the
+logo already appears in the image, following the graphic line signature rule below.
+
 The Workbench is the guided visual projection of the guide, not another source of truth and not creative
 approval. Its recommendation does not authorize a brand decision, client delivery, scheduling or publication.
 Do not make its adapter, families or recipes global, and do not package licensed font files with AXIS.
@@ -113,8 +116,9 @@ render, call a model, approve or publish. A surface adapter consumes only the no
 formats. Never copy the Lab Astro/CSS or fall back to free `top`/`left` coordinates. If no adapter exists, report
 the capability as pending.
 
-The portable advertising and collaboration contracts are published in the AXIS `0.2.5` package set. Greenhouse
-pins that exact set and its Campaign Layout Compiler implements the first non-Lab adapter for
+The portable advertising and collaboration contracts were first published in the AXIS `0.2.5` package set.
+Greenhouse now pins the `0.2.7` set (which adds the graphic line contract and `@efeoncepro/axis-brand-assets`) and
+its Campaign Layout Compiler implements the first non-Lab adapter for
 `headline|support|hook|lockup`; this evidence does not imply that Globe or another runtime has adopted it.
 
 ### AEO creative graphics for agents (local candidate)
@@ -151,10 +155,19 @@ operating summary is [`graphic-line-orbit.md`](../efeonce-brand-studio/reference
 - **Tokens:** `efeonceGraphicLine` in `packages/tokens/src/tokens.ts` (exported from `@efeoncepro/axis-tokens`),
   `status: 'canonical'`, with contrast/shape tests in `tokens.test.ts`. It groups `color`, per-brand `family`
   (Efeonce, Globe, Wave, Reach: accent on dark/light, dark background, verb, slogan word), `sphere`, `orbit`
-  (measures per `baseWidthPx` 794 of canvas width, social multiplier for canvases up to `socialMaxWidthPx`), `type`,
-  `logo` and `isotype` rules. It is an opt-in brand branch, not part of the `axisTokens` aggregate.
+  (measures per `baseWidthPx` 794 of canvas width, social multiplier for canvases up to `socialMaxWidthPx`), `lens`,
+  `spotlight`, `urlBubble` (+ `source` `#848484`), `type`, `logo` and `isotype` rules, and since `0.2.7`
+  `signature` (center, anchored bottom-center, margin 0.09 of the short side, default mode `logo`, the URL bubble
+  requires brand-in-scene, width 0.2 of the short side / 0.25 in 16:9, min contrast 4.5), `slogan` (lead «Empower
+  your», lockup/standalone forms, closing role only, no caps, no sphere), `state` (free = ring, busy = sphere, never
+  traffic-light colors) and `brandClose` (4 500 ms sequence; reduced motion shows the final frame). It is an opt-in
+  brand branch, not part of the `axisTokens` aggregate.
 - **Reference page:** public https://axis.efeonce.org/references/graphic-line (source
-  `apps/lab/src/pages/references/graphic-line.astro`), every canvas plate rebuilt as native HTML.
+  `apps/lab/src/pages/references/graphic-line.astro`), every canvas plate rebuilt as native HTML; section 5.7
+  «Componer con agentes» (examples resolved and painted at build time; the post signs with the centered logo) and
+  section 4.9 «Oficina en foto» (`#oficina-foto`, 9 photos). The Lab deploys on every push to `main` and syncs the
+  brand-assets package files on each build (`pnpm brand:sync`, byte-for-byte test); it no longer keeps its own
+  copies.
 
 Rules for agents:
 
@@ -165,21 +178,40 @@ Rules for agents:
 - **Compose by intent, never by coordinates.** AXIS `0.2.7` publishes the candidate contract
   `efeonce.graphic-line-orbit` `0.2.0` and manifest `axis.graphic-line-orbit-composition.v1`: an agent declares
   `orbit`, `measure` (value 0–1 **with a source**, or no arc), `progress`, `lens`, `spotlight`, `family-map`,
-  `url-bubble`, `voice`, `logo-inline`, `signature`, `slogan`, `state` or `brand-close`; the resolver enforces the line's rules (one ring per piece, answer ≤ 3
-  words, URL never as text) and resolves every value from `efeonceGraphicLine`. In AXIS: `pnpm orbit:resolve`
+  `url-bubble`, `voice`, `logo-inline`, `signature`, `slogan`, `state` or `brand-close`; the resolver enforces the
+  line's rules and resolves every value from `efeonceGraphicLine`. It rejects: two rings in a piece, `measure`
+  without `source`, an answer over three words, a bare `url-bubble` in channel `social` (sign with `signature`),
+  more than one signature, signature and bubble together, a bubble signature for a brand other than Efeonce, a
+  slogan outside a close, a `state` without label, and `brand-close` in channel `print`. `signature` resolves
+  `mode` `logo|url-bubble`, the brand-assets `assetId` and, on web, the `luminosity` blend with its `source`.
+  Adapter checks: `text-never-crosses-ring`, `ring-center-on-target-center`, `sphere-on-arc-end`,
+  `lens-subject-inside-circle` (manual), `url-as-bubble-never-text`, `decorative-svg-hidden-from-accessibility-tree`,
+  `signature-centered`, `signature-min-contrast`, `orbit-never-over-subject-or-reserves`. In AXIS: `pnpm orbit:resolve`
   (manual `docs/agent-composition/graphic-line-orbit.md`, ADR `GRAPHIC_LINE_ORBIT_COMPOSITION_DECISION_V1.md`).
   In Greenhouse: `pnpm creative:orbit:resolve` (manifest) and `pnpm creative:orbit:render --intent --bindings
   --out-dir` (SVG, PNG and `qa.json`; exits 1 when an adapter check such as text crossing the ring fails). The
-  bindings carry measured geometry (targets, photos, text boxes, `protect` zones); never copy the Lab painter.
+  bindings carry measured geometry (targets, photos, text boxes, `protect: [{ id, kind: subject|reserve|bed, x, y,
+  w, h }]`); never copy the Lab painter. Greenhouse's adapter is `scripts/creative/layout-compiler/graphic-line.mjs`;
+  its Campaign Layout Compiler (`pnpm creative:layout`) accepts an optional per-format `graphic_line: { intent,
+  protect }` layer (ring elements only; copy and signature stay with the compiler) and `brand.signature: {
+  brand_in_scene }`, and `pnpm foto:componer:cta` signs photo pieces through `marcaEnEscena` (gate rule
+  `firma-burbuja`).
 - **Signature rule (operator, 2026-09-26):** a piece signs with the Efeonce logo, centered. The URL bubble signs
   instead ONLY when the Efeonce logo already appears in the image (`signature.brandInScene: true`), also centered and
-  luminosity-blended on the real pixels; a bare `url-bubble` is rejected in `social`. The blend fixes the gray's
-  lightness, so the bubble passes 4.5:1 only on a truly dark bed.
+  luminosity-blended on the real pixels at opacity 1; a bare `url-bubble` is rejected in `social`. Never beside
+  the logo or off to a side. The blend fixes the gray's lightness, so the bubble passes 4.5:1 only on a truly dark
+  bed (measured 2026-09-26: 6.17/6.78 max pixel and ~4.4–4.9 on the worst 1 % of solid ink over near-black; 1.6–3.1
+  on mid or light backgrounds; never at opacity 0.72). Footer uses (deck, report, stationery, mail) keep the baked
+  variants. Whether the threshold stays 4.5:1 or drops to 3:1 is pending the operator.
 - **The orbit never replaces the photographic composition:** it is declared on purpose, never by default, and never
   crosses the subject or the text reserves (`orbit-never-over-subject-or-reserves`).
-- **Official files:** `@efeoncepro/axis-brand-assets` (logos, isotypes and URL bubbles of the four brands, SHA-256
-  sealed, aspect ratio from the viewBox). Contracts resolve ids; consumers read the file from the package. It is
-  not `efeonce.brand-logos` (third-party logo provenance in UIs).
+- **Official files:** `@efeoncepro/axis-brand-assets` `0.2.7`: 19 SVG (positive/negative logo and isotype of
+  Efeonce, Globe, Wave and Reach; `url-bubble-source` gray for blending; `url-bubble-baked-light` and
+  `url-bubble-baked-dark`), SHA-256 sealed, aspect ratio from the viewBox; `findBrandAsset`, `brandAssetUrl`; reseal
+  with `pnpm --filter @efeoncepro/axis-brand-assets seal`. Contracts resolve ids; consumers read the file from the
+  package, never a hand copy (Greenhouse guards its remaining local copies with
+  `src/config/efeonce-brand-assets.test.ts`). Fonts and photos are not in the package. It is not
+  `efeonce.brand-logos` (third-party logo provenance in UIs).
 - Scope: Efeonce's own brand and its family. Never Greenhouse product UI and never client work.
 
 ### AXIS Lab

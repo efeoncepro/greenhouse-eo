@@ -446,10 +446,18 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 - **Nunca un scrim.** Si el contraste no da, se **regenera** el plate; no se oscurece en post. Desde el 2026-09-23
   (decisión del operador: «todo se genera desde el prompt») el compositor CTA **rechaza** `scrimTop`/`scrimBottom` al
   validar el plan.
-- 🔴 **Firma: logo centrado; la burbuja URL sólo si el logo ya está en la imagen** **[operador, 2026-09-26]**. En un
-  mockup u objeto con el logo de Efeonce visible, firma la burbuja (`marcaEnEscena: true` + `url`, sin `logo`), centrada
-  y con fusión de luminosidad; nunca junto al logo. Sólo pasa 4,5:1 sobre un lecho muy oscuro. Gate `firma-burbuja`
-  (tramo 17; contrato CTA §19.6).
+- 🔴 **Firma: logo centrado; la burbuja URL sólo si el logo ya está en la imagen** **[operador, 2026-09-26]**. La
+  burbuja nunca va por defecto. En un mockup, objeto o merch con el logo de Efeonce visible, firma la burbuja sola
+  (`marcaEnEscena: true` + `url`, sin `logo`), centrada y con fusión de luminosidad a opacidad 1 (a 0,72 no llega a
+  4,5:1 sobre ningún fondo); nunca a un costado ni junto al logo. Sólo pasa 4,5:1 sobre un lecho muy oscuro. Gates
+  `firma-burbuja`, `firma-contraste` y `firma-sobre-sujeto` (tramo 17; contrato CTA §19.6). Las piezas aprobadas no se
+  recertificaron: el gate las muestra 3 hasta recomponerlas. Números en la
+  [firma §5.1](../../docs/operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26).
+- 🔴 **La órbita no sustituye la composición ni las formas del lenguaje fotográfico** **[operador, 2026-09-26]**. Es
+  una capa para casos específicos (lente, medida, progreso, foco), se declara a propósito y nunca va por defecto; nunca
+  cruza el sujeto, las reservas de texto, el lecho ni la firma. `pnpm creative:orbit:render` lo mide con
+  `bindings.protect` (check `orbit-never-over-subject-or-reserves`). Canon:
+  [línea gráfica §1.3](../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-la-órbita--anatomía-y-regla).
 - **El plate nace sin logo ni texto.** La firma es el SVG oficial compuesto después, **20% del lado corto del lienzo**
   (decisión del operador 2026-09-20), contraste ≥ 4,5:1 medido. En una pieza con CTA, `foto:cta:gate` lo exige —en la
   caja y, si el logo lo dibuja el compositor, también en su trazo; fuera del sujeto y dentro de la zona de AXIS— y la
@@ -603,3 +611,11 @@ isotipo, nave o mascotas— carga el [contrato de selección de referencias](../
 
 Y **abre el `LEEME.md` y el manifiesto del kit antes del prompt**: su `cuando_usarla` dice qué vista
 corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida.
+
+🔴 **Espacio u objeto de marca fotografiado desde el arte plano** (oficina y merch de la línea gráfica, láminas 4.8 y
+4.9) **[medido 2026-09-25/26]**: el arte plano es la referencia exacta y el modelo sólo pone espacio, material y luz.
+(1) **El modelo imprime todo lo que ve en el arte, incluidas las notas de la lámina**: el arte de referencia va sin
+leyendas. (2) **El logo chico se reinventa**: se repone editando la foto con el logo oficial como segunda referencia, y
+se revisa al 100 %. (3) La puntuación se revisa letra por letra. (4) **Se corrige editando la foto generada, no
+regenerando** (editar conserva). Son maquetas de dirección, no archivos de producción.
+[Línea gráfica §10.9](../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#109-oficina-en-foto).

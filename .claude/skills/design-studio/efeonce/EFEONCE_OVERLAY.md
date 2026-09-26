@@ -39,10 +39,15 @@ visual transversal requiere validación en varias portadas.
 - **Línea gráfica «La órbita»** (canónica 2026-09-25) = la forma gráfica de la **marca Efeonce y su familia**
   (Globe, Wave, Reach cambian sólo el acento). Rodea, mide (el arco = avance real; sin dato no hay arco) y enfoca
   (lente: foto en navy apagado, a color dentro del círculo). Valores: tokens AXIS `efeonceGraphicLine`, nunca HEX/px
-  transcritos; referencia pública `axis.efeonce.org/references/graphic-line`. Duras: ningún texto cruza la órbita ·
-  una órbita o lente por pieza, nunca patrón · `efeoncepro.com` sólo en la burbuja `url-lum` · sin velo navy sobre
-  fotos · foto de la lente desde el lenguaje fotográfico (`pnpm foto:*`). **No** se aplica a la UI de Greenhouse ni a
-  piezas de clientes Globe. Operación y QA:
+  transcritos; logos y burbujas desde `@efeoncepro/axis-brand-assets` (nunca copias a mano); referencia pública
+  `axis.efeonce.org/references/graphic-line`. Duras: ningún texto cruza la órbita · una órbita o lente por pieza,
+  nunca patrón · `efeoncepro.com` nunca como texto, sólo en su burbuja · sin velo navy sobre fotos · foto de la lente
+  desde el lenguaje fotográfico (`pnpm foto:*`) · **la órbita se usa en casos específicos y nunca sustituye la
+  composición del lenguaje fotográfico** (no cruza sujeto, reservas, lecho ni firma). **Firma de pieza gráfica:** logo
+  de Efeonce centrado abajo; la burbuja URL sólo lo reemplaza si el logo ya está dentro de la imagen, centrada, sola,
+  fusionada a opacidad 1 y ≥ 4,5:1 medido. Se compone por intención con `pnpm creative:orbit:resolve|render`
+  (contrato AXIS 0.2.0), `pnpm creative:layout` o `pnpm foto:componer:cta`. **No** se aplica a la UI de Greenhouse
+  ni a piezas de clientes Globe. Operación y QA:
   [`graphic-line-orbit.md`](../../efeonce-brand-studio/references/graphic-line-orbit.md) · manual
   [`EFEONCE_GRAPHIC_LINE_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md).
 - **Ilustraciones propietarias** (`characters/greenhouse-*.png`, mascota **Nexa**) = obra del equipo

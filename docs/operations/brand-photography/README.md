@@ -1,9 +1,9 @@
 # Fotografía de marca Efeonce — índice
 
 > **Tipo de documento:** Índice operativo de carpeta
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-25 (banco de la lente de la línea gráfica)
+> **Última actualización:** 2026-09-26 por Claude (regla de la firma, órbita sobre la foto y marca fotografiada desde el arte plano)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Bitácora del caso](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida de evidencia](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md)
 
 Esta carpeta guarda el **Lenguaje Fotográfico de la marca propia de Efeonce**, aprobado por el operador (Julio
@@ -44,7 +44,7 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 | # | Documento | Qué resuelve | Autor |
 |---|---|---|---|
 | 1 | [`EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md`](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) | Documento maestro: alcance, origen en el posicionamiento, la idea «El oficio a la vista», principios, qué no es Efeonce, historia de decisiones y pendientes | Claude |
-| 2 | [`EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md`](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) | La firma: primer plano desenfocado planeado desde la toma, catálogo de lechos, reglas medibles, logo y selección colaborativa AXIS | Claude |
+| 2 | [`EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md`](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) | La firma: primer plano desenfocado planeado desde la toma, catálogo de lechos, reglas medibles, logo, **burbuja URL sólo con el logo ya en la imagen** (§5.1, 2026-09-26) y selección colaborativa AXIS | Claude |
 | 3 | [`EFEONCE_PHOTO_COLORIMETRY_V1.md`](./EFEONCE_PHOTO_COLORIMETRY_V1.md) | Colorimetría: roles de color (azul, naranja, lima), balance de blancos, métricas Lab y rangos objetivo | Otro agente |
 | 4 | [`EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md`](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) | Catálogo de cámaras, lentes y ángulos probados, con su uso, su lecho y lo medido | Otro agente |
 | 5 | [`EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md`](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) | Bloques de prompt (realismo, impacto, FOREGROUND), ficha de toma y pipeline de producción con scripts | Otro agente |
@@ -101,6 +101,25 @@ Resultados: `MARGIN FIELD` pasa en 4:5 y en 16:9 nativo con **banda continua has
 aprobado «¿Claude o Codex?» llegaba a 0,35). `SELECTION TARGET` sirve **con padding de 0,02 del lienzo** (3,29:1);
 pegado al objeto falla (1,02:1) porque el objeto trae su propio borde claro, y con 0,04 vuelve a fallar porque la
 caja toca a las personas. Hay punto dulce, no monotonía.
+
+## Delta 2026-09-26 — firma, órbita y marca fotografiada
+
+- 🔴 **Firma de una pieza gráfica: el logo de Efeonce centrado** **[decisión del operador]**. La burbuja URL
+  (`efeoncepro.com`) no se agrega por defecto: sólo reemplaza al logo cuando el logo ya aparece dentro de la imagen
+  (mockup, objeto, merch), sola, centrada, fusionada a opacidad 1 y sobre un lecho muy oscuro (a 0,72 no llega a 4,5:1
+  sobre ningún fondo). Se declara con `marcaEnEscena` en `foto:componer:cta` (tramo 17, gate `firma-burbuja`) y con
+  `brand.signature` en `creative:layout`. Números y detalle en la
+  [firma §5.1](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md#51-la-burbuja-url-como-firma--regla-del-operador-2026-09-26).
+  Los pies de deck, informe, papelería y firma de mail no cambian.
+- 🔴 **La órbita no sustituye la composición ni las formas de este lenguaje** **[decisión del operador]**. La línea
+  gráfica [«La órbita»](../brand-graphic-line/README.md) es una capa para casos específicos (lente, medida, progreso,
+  foco), declarada a propósito y nunca por defecto; nunca cruza el sujeto, las reservas de texto, el lecho ni la firma.
+  La foto conserva su composición. Ver el [delta del documento maestro](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#delta-2026-09-26--la-órbita-no-sustituye-la-composición).
+- **Marca fotografiada desde el arte plano** **[medido]**: las láminas 4.8 (merch, 17 fotos) y 4.9 (oficina, 9 fotos) de
+  la línea gráfica usan el arte plano como referencia exacta y el modelo sólo pone espacio, material y luz, en registro
+  documental. Lecciones: el arte va sin leyendas de lámina (el modelo las imprime), el logo chico se reinventa y se
+  repone editando con el logo oficial, la puntuación se revisa letra por letra y se corrige editando la foto, no
+  regenerando. Son maquetas de dirección. [Línea gráfica §10.9](../brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#109-oficina-en-foto).
 
 ## Delta 2026-09-22 — CTA aprobado sobre foto
 

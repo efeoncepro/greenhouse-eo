@@ -210,7 +210,10 @@ activos canónicos como referencia de forma (edición con `--image`, intención 
 
 Hasta cuatro referencias en una sola pasada funcionaron (Clawd + Codex + logo + silueta). QA obligatorio por
 activo, recortado al 100 %: **letra por letra** para el logo (letras, órbita con sus cortes), color sin deriva,
-perspectiva coherente. Donde el logo 3D ya es héroe, la firma es la URL (`url-lum.svg`), no un segundo logo plano.
+perspectiva coherente. Donde el logo 3D ya es héroe, la firma es la URL (`url-lum.svg`), no un segundo logo plano:
+centrada, con fusión de luminosidad a opacidad 1 y sobre lecho muy oscuro (≥ 4,5:1). Sin la marca en escena, la
+firma es el logo centrado y no se agrega burbuja. En `pnpm foto:componer:cta` se declara con `marcaEnEscena: true`
+(sin `logo`) y la juzga la regla `firma-burbuja`.
 Dos mascotas de partners juntas sólo con pedido explícito del operador (la regla del KV paraguas dice una).
 Con **Gigi** en cuadro, el color de la pieza ya está tomado: es el espectro completo de Google, así que ella es el
 único acento de color y Efeonce vive en el navy y la estructura. Si hay ropa Efeonce en la misma pieza, prohibir

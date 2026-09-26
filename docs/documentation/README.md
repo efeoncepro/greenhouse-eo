@@ -29,7 +29,9 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   excepciones con aprobador, texto alternativo y cómo se prueba el propio comando.
 - [Línea gráfica Efeonce — La órbita](creative/linea-grafica-efeonce.md) — la forma canónica de la marca propia de
   Efeonce y su familia (Globe, Wave, Reach) desde 2026-09-25: qué es, sus tres trabajos (rodea, mide, enfoca), a qué
-  piezas aplica (y que no aplica a la UI de Greenhouse ni a clientes), reglas clave, dónde vive cada cosa y pendientes.
+  piezas aplica (y que no aplica a la UI de Greenhouse ni a clientes), reglas clave (firma con el logo centrado; la
+  burbuja URL sólo con el logo ya en la imagen; la órbita no reemplaza la composición de la foto), merch y oficina
+  fotografiados, dónde vive cada cosa y pendientes.
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
 - [Creator Influence & Content](media-distribution/creator-influence-content.md) — reglas funcionales para separar

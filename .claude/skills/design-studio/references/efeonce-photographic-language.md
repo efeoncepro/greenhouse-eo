@@ -126,12 +126,21 @@ pequeño— sube a **0,28**. **Con fuente visible en cuadro: lámpara baja, o no
   (lum 139–171) produjo 6+ fallos: el logo no pasaba ni en blanco ni en navy.
 - **Medir** nitidez dentro del lecho (p99 Sobel): **p99 ≤ ~20 (máx ≤ ~25)**, muy por debajo del rostro (200–780).
   Transición gradual (≥5% del alto); cortes de 1–3% se leen como «banda». Si falla, **se regenera**.
-- **Logo:** SVG oficial (`public/branding/logo-negative.svg` blanco / `logo-full.svg` navy `#023c70`), compuesto
+- **Logo:** SVG oficial (`public/branding/logo-negative.svg` blanco / `logo-full.svg` navy `#023c70`; copias que la guarda `src/config/efeonce-brand-assets.test.ts` mantiene iguales a `@efeoncepro/axis-brand-assets`), compuesto
   determinísticamente, **centrado horizontal**, centro vertical ≈ **93,5%** del alto en 4:5, **ancho 20%** del lienzo
   (decisión del operador 2026-09-20). Color por contraste medido: blanco contra el píxel más claro del área,
   navy contra el más oscuro; **mínimo 4,5:1**.
 - **Sin firma** cuando el emblema bordado se lee a tamaño de consumo (polo) o un 3D de marca es protagonista.
   **Una sola marca protagonista por foto.**
+- **Burbuja URL como firma** (regla del operador, 2026-09-26, [línea gráfica](../../efeonce-brand-studio/references/graphic-line-orbit.md#la-firma-de-una-pieza-gráfica-operador-2026-09-26)):
+  la burbuja `efeoncepro.com` **no se agrega por defecto**. Sólo **reemplaza** al logo cuando el logo de Efeonce ya
+  aparece dentro de la imagen (mockup, objeto, merch): centrada, sola, con fusión de luminosidad a opacidad 1 y
+  **≥ 4,5:1 medido** — y la fusión sólo alcanza eso sobre un lecho **muy oscuro** (1,6–3,1:1 sobre fondos medios o
+  claros). Nunca a un costado ni junto al logo. En `pnpm foto:componer:cta` se declara con `url` +
+  `"marcaEnEscena": true` y sin `logo`; el gate la juzga con `firma-burbuja`, `firma-contraste` y `firma-sobre-sujeto`.
+- **La órbita no es parte de la firma ni de la composición por defecto.** Si una pieza fotográfica lleva la línea
+  gráfica, la órbita se declara a propósito y nunca cruza sujeto, reservas, lecho ni firma
+  (`orbit-never-over-subject-or-reserves`); la composición sigue siendo la de este lenguaje.
 - En feed, **alternar lechos claros/oscuros y materiales**: la misma banda repetida se vuelve plantilla.
 
 Lechos probados: borde de mesa a ras del lente · respaldo de silla del espectador («tu lugar en la mesa») ·
@@ -139,7 +148,8 @@ escritorio del visitante · matte box / rig · consola de corrección de color �
 latas/botellas («casi tocando el lente, f/1.4, sin bordes», o sale nítido) · marco de vidrio · maleta de equipo
 en el piso · techo de auto sin logos · cabezas del público · cámara de estudio · mostrador de fruta ·
 **desenfoque óptico del tilt-shift** (el más natural) · borde curvo de mesa en ojo de pez.
-Dron o tomas todo-enfocadas: sin lecho; firma sobre pavimento sereno claro — **decisión pendiente** (¿url-lum?).
+Dron o tomas todo-enfocadas: sin lecho; firma sobre pavimento sereno claro — **decisión pendiente**. La burbuja URL
+no resuelve este caso: sólo firma si el logo ya está en la imagen, y sobre un pavimento claro no llega a 4,5:1.
 
 Detalle: [firma y primer plano](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md)
 y [brand-in-scene](../../social-media-studio/references/brand-in-scene.md).

@@ -180,7 +180,10 @@ el campo explicativo. Consumir el sello canónico `efeoncepro.com` desde
 `src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg`; si el brief exige además un wordmark, también
 debe componerse dentro del footer y sin competir con fuente, fecha o contenido. El header queda reservado para
 kicker, título y bajada editorial. Hero/OG constituye otra superficie y puede usar una firma dentro de su zona
-segura si el brief lo declara. El logo de un cliente identifica el caso y
+segura si el brief lo declara; en la marca propia Efeonce, una superficie gráfica (hero/OG con foto, social,
+anuncio) firma con el logo centrado abajo y la burbuja URL sólo lo reemplaza si el logo ya está en la imagen
+(fusión de luminosidad sobre lecho muy oscuro; [referencia](../../efeonce-brand-studio/references/graphic-line-orbit.md)).
+El sello de footer de la infografía de cuerpo no cambia. El logo de un cliente identifica el caso y
 requiere autorización específica; no reemplaza ni se fusiona con la firma de Efeonce. No pedir al generador que
 dibuje una firma editorial: componer el activo oficial de forma determinística después de seleccionar el master.
 Esta regla gobierna firma gráfica y contenido informativo exacto. Para una escena social con marca física

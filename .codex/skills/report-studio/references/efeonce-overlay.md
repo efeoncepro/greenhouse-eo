@@ -47,6 +47,14 @@ con la marca del cliente ni en Greenhouse. Valores desde los tokens `efeonceGrap
   correo o cualquier salida donde la fusión no esté garantizada, usa la variante horneada:
   `docs/operations/brand-graphic-line/deliverables/assets/url-lum-light.svg` sobre blanco o papel y
   `url-lum-dark.svg` sobre navy. Comprueba en el PDF final que el trazo no salió negro (punto 6 del contrato).
+  Estas copias locales son el dibujo de `@efeoncepro/axis-brand-assets` (`url-bubble-source`,
+  `url-bubble-baked-light`, `url-bubble-baked-dark`), vigiladas por `src/config/efeonce-brand-assets.test.ts`:
+  nunca se editan a mano.
+- **Pie ≠ firma de pieza gráfica:** la burbuja de pie de informes, papelería y membretes sigue como está. La regla
+  del 2026-09-26 rige sólo la **firma** de piezas gráficas (post, anuncio, portada con foto): logo de Efeonce
+  centrado y la burbuja sólo cuando el logo ya está en la imagen. No la trasladas a un pie ni la inviertes aquí.
+- **Eslogan «Empower your …»:** sólo en la contraportada o el cierre, desde el archivo oficial; nunca en mayúsculas
+  ni con esfera.
 - **Portadas y contraportadas:** la órbita nace de las portadas de Insights (`report-cover.html`,
   `report-cover-light.html`, `report-back-cover.html` del catálogo `insights-report`). Ningún texto cruza la órbita;
   una por página; el arco de avance sólo mide un dato real del informe.

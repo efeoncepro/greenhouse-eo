@@ -114,7 +114,11 @@ it without repeating what already cost a day*. It grows with every task: see the
   Insights covers (`insights-report/report-cover*.html`, `report-back-cover.html`), and the brand canvas tested it
   over Insights as boards **P-01 (A4 report)** and **P-02 (plan/deck)**. That is a **canvas proposal, not adopted**:
   it is not implemented in the runtime catalogs (those are governed by TASK-1889). Never describe P-01/P-02 as the
-  Insights design, and never add the orbit to a catalog outside that task.
+  Insights design, and never add the orbit to a catalog outside that task. The URL bubble in the Insights report and
+  deck **footers** stays as it is: the operator's 2026-09-26 signature rule (centered Efeonce logo; the bubble only
+  when the logo is already inside the image) governs graphic pieces such as social posts and ads, not report footers.
+  The catalogs' `assets/url-lum.svg` copies are the `url-bubble-source` drawing of `@efeoncepro/axis-brand-assets`,
+  guarded by `src/config/efeonce-brand-assets.test.ts` — never edit them by hand.
 - Sharing/email/schedules → `resend-email-platform`, `greenhouse-email` + TASK-1848.
 - Portal UI → `greenhouse-ux` + `greenhouse-ai-design-studio` + TASK-1849 (Composition Shell, GVC).
 - Shared web render → `efeonce-think` repo + `astro` skill + TASK-1875 (headless model, token server-side).

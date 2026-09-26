@@ -54,7 +54,13 @@ marca de cliente ni a Greenhouse. Contrato: [manual](../../../docs/operations/br
   en 16:9.
 - **Pie:** la URL va en la burbuja oficial `url-lum` (regla de pie de arriba); en un PDF donde la fusión de
   luminosidad no esté garantizada, la variante horneada de `docs/operations/brand-graphic-line/deliverables/assets/`.
-- Valores desde los tokens `efeonceGraphicLine` (`@efeoncepro/axis-tokens`), nunca HEX ni px transcritos. La órbita
+  Esa burbuja de pie es propia del deck: **no** es la firma de una pieza gráfica. Si una lámina se reutiliza como
+  post, anuncio o portada con foto, firma con el logo de Efeonce centrado abajo y la burbuja sólo lo reemplaza
+  cuando el logo ya está en la imagen (regla del 2026-09-26, en la referencia operativa).
+- **Eslogan «Empower your …»** sólo en el cierre, desde el archivo oficial: nunca en cada lámina, nunca con esfera,
+  nunca en mayúsculas.
+- Valores desde los tokens `efeonceGraphicLine` (`@efeoncepro/axis-tokens`) y logos/burbujas desde
+  `@efeoncepro/axis-brand-assets`, nunca HEX, px ni archivos transcritos. La órbita
   de navegación se compone por intención con `progress` (`sections`, `current`) en `pnpm creative:orbit:render`;
   ver [graphic-line-orbit.md](../efeonce-brand-studio/references/graphic-line-orbit.md).
 

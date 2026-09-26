@@ -277,10 +277,16 @@ arco con esfera en la punta y halo), extraída del propio isotipo. Rodea, **mide
 hay arco) y enfoca (la lente sobre una foto del lenguaje fotográfico). Es la misma forma para Efeonce, Globe, Wave y
 Reach —cambia sólo el acento— y aplica a redes, decks, informes, oficina, merch, eventos, papelería y firma de mail;
 **no** a la UI de Greenhouse ni al trabajo de clientes. Reglas duras: ningún texto cruza la órbita, la URL va en su
-burbuja oficial y una sola órbita o lente por pieza. Hasta correr la prueba de atribución sin logo es un sistema
-consistente, no un activo distintivo demostrado. Manual y valores:
+burbuja oficial y una sola órbita o lente por pieza. Desde el 2026-09-26 (regla del operador): **la órbita no
+sustituye la composición** ni las formas del lenguaje fotográfico —se usa en casos específicos, declarada a propósito,
+nunca sobre el sujeto, las reservas de texto, el lecho o la firma—, y **una pieza gráfica firma con el logo de Efeonce
+centrado**; la burbuja URL no se agrega por defecto y sólo reemplaza al logo, centrada y fusionada, cuando el logo ya
+aparece en la imagen (sólo llega a 4,5:1 sobre lechos muy oscuros; el umbral está pendiente de decisión). Los usos de
+la burbuja como pie (deck, informe, papelería, firma de mail) no cambian. Hasta correr la prueba de atribución sin
+logo es un sistema consistente, no un activo distintivo demostrado. Manual y valores:
 [`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · tokens
-`efeonceGraphicLine` de AXIS · [índice de la carpeta](../operations/brand-graphic-line/README.md).
+`efeonceGraphicLine` y archivos oficiales `@efeoncepro/axis-brand-assets` de AXIS 0.2.7 ·
+[índice de la carpeta](../operations/brand-graphic-line/README.md).
 
 ## Identidad en informes
 

@@ -111,7 +111,7 @@ necesitan gritar a la vez, el problema es de jerarquía, no de tamaño.
 | Tarjeta HUD en foto | Dato como texto limpio sobre zona clara de la foto | Tarjeta de vidrio con línea naranja (era de GTA VI) |
 | Marcador-estrella | Sólo el post de GTA VI (marcaba la misión) | Estrella junto a la etiqueta en cualquier otra pieza |
 | Propósito del bounding box | Enmarca un objeto con sentido (obra en revisión, resultado aprobado) o una palabra del titular | Caja sobre vacío, sobre una persona, o «porque sí» |
-| Firma web | url-lum con evidencia `non-separable-luminosity`; si el logo 3D es héroe, sólo url-lum | Segundo logo plano compitiendo con el héroe |
+| Firma de la pieza | Logo de Efeonce centrado abajo, sin URL. Si el logo ya aparece dentro de la imagen (logo 3D héroe, mockup, merch), la burbuja URL lo reemplaza: centrada, sola, fusión `luminosity` a opacidad 1 y ≥ 4,5:1 medido (regla del operador, 2026-09-26) | Burbuja agregada por defecto, a un costado o junto al logo; segundo logo plano compitiendo con el héroe |
 
 ## Línea gráfica «La órbita» en piezas de marca propia (canónica desde 2026-09-25)
 
@@ -122,6 +122,12 @@ lente, §8.5 URL, §9 foto, §10.1 campaña y grillas). Reglas completas y check
 [referencia operativa](../../efeonce-brand-studio/references/graphic-line-orbit.md). Valores desde los tokens
 `efeonceGraphicLine` de AXIS, nunca transcritos.
 
+Entradas: `pnpm creative:orbit:resolve|render` (contrato AXIS `efeonce.graphic-line-orbit` 0.2.0; `render` sale 1 si
+falla un check como texto que cruza el anillo, firma descentrada o bajo 4,5:1, u órbita sobre el sujeto),
+`pnpm creative:layout` (capa opcional `graphic_line: { intent, protect }` por formato y `brand.signature: {
+brand_in_scene }`) y `pnpm foto:componer:cta` (`marcaEnEscena`). La órbita **no sustituye** la composición del
+lenguaje fotográfico: se usa en casos específicos y nunca cruza sujeto, reservas de texto, lecho ni firma.
+
 | Elemento | DO | DON’T |
 |---|---|---|
 | Órbita en campaña | Rodea la lente con aire; esfera arriba a la izquierda, lejos de la cara | Esfera sobre el rostro o suelta, fuera de la punta del arco |
@@ -130,7 +136,9 @@ lente, §8.5 URL, §9 foto, §10.1 campaña y grillas). Reglas completas y check
 | Arco de avance | Mide un dato real citable | Arco decorativo o dato inventado |
 | Foto en la lente | Toma del banco `ai-generations/2026-09-25_banco-lente-orbita/` o del pipeline `foto:*`; sujeto en un círculo del 55 % del lado corto; sin emblema legible | Velo navy sobre una foto de banco; foto débil sin punto de interés |
 | Grosor y margen | ×1,75 en lienzos ≤ 1200 px; margen 9 % del lado corto en redes y 140 px en 16:9; en 9:16 fuera de la zona de la interfaz | Grosor del informe A4 llevado a un post de 1080 |
-| URL | Burbuja `url-lum`; variante horneada donde la fusión no está garantizada | `efeoncepro.com` como texto suelto |
+| Uso de la órbita | Declarada a propósito (lente, medida con fuente, progreso, foco); la foto conserva su composición | Órbita por defecto en toda pieza, o sobre sujeto, reservas, lecho o firma |
+| URL | Firma: burbuja sólo con el logo en la imagen (ver Firma). Pie de deck, informe, papelería o mail: burbuja, horneada donde la fusión no está garantizada | `efeoncepro.com` como texto suelto; burbuja como firma por defecto |
+| Archivos | Logos y burbujas desde `@efeoncepro/axis-brand-assets` por id | SVG copiado o redibujado a mano |
 | Claim | «Te hacemos visible» con su prueba al lado | Pautar el claim antes de la revisión legal pendiente |
 
 **Sin resolver (decisión del operador, no la tomes tú):** (1) si el CTA en naranja o lima de una política cromática
@@ -195,6 +203,11 @@ se falsifica. Conserva la salida del gate junto a la versión revisada.
   la automática, debajo de todo el contenido. La firma externa se reserva al 20 % fijo y requiere atención
   especial en un horizontal nuevo. Por formato:
   [safe zones y firma §2c](paid-format-safe-zones-and-craft.md#2c-la-firma-en-cada-formato-el-contrato-del-gate).
+  **Burbuja URL como firma (tramo 17):** sólo en pieza nueva con el logo de Efeonce ya dentro de la imagen, declarada
+  con `url` + `"marcaEnEscena": true` y sin `logo`; se fusiona a opacidad 1 y se mide el 1 % peor de su tinta sólida.
+  Reglas: `firma-burbuja` (burbuja sin marca en escena, o junto al logo; exceptuable), `firma-contraste` (≥ 4,5:1) y
+  `firma-sobre-sujeto`. Las piezas del canon anterior siguen «no certificables» con URL; las aprobadas no se
+  recertificaron y el gate las muestra en 3 hasta recomponerlas. Ningún workflow de CI corre este gate: córrelo a mano.
 - **Maquetación:** zona segura de AXIS como piso, reserva editorial, nada encimado y ninguna selección sobre otra voz.
 
 Un ⚠ de excepción auditada o de salida aprobada (`sin-firma`, `conceptoReducido`, zona del sujeto ignorada) no es un
