@@ -143,9 +143,10 @@ archivan en GCS con `pnpm media:archive-ai-generation`. Nunca en git.
 
 **En el Lab de AXIS** (4.4.2 «Animaciones de marca», axis.efeonce.org) van versiones web livianas —MP4 H.264 de
 1280 px a 30 fps con sonido, 100–170 KB, y el cuadro final en WebP como póster— de reveal (16:9 y 1:1), apertura
-(16:9 navy y claro) y sting (16:9 y 4:5 claro), con una ficha por animación. Para servir los masters descargables se
-propuso un bucket público de AXIS en GCP (`efeonce-group-axis-public-media`); crearlo requiere autorización del
-operador.
+(16:9 navy y claro) y sting (16:9 y 4:5 claro), con una ficha por animación. Los masters descargables (MP4, ProRes 4444,
+WebM y HEVC con alfa) se sirven desde el bucket público de AXIS `gs://efeonce-group-axis-public-media` (creado el
+2026-09-26 con autorización del operador; lectura pública, CORS para el Lab) en `motion/logo/v1.1/<anim>/<formato>/<fondo>/`,
+con `gcloud storage rsync` desde `deliverables/` (sin las secuencias por capas). Nunca en git.
 
 ## 7. Cómo se produce
 
