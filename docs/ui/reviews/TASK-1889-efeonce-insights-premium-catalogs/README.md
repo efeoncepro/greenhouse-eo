@@ -52,7 +52,7 @@ operador.
 Compuestas localmente con `scripts/insights/preview-edition.ts --editorial-v2` (lectura de datos reales, logo
 privado por el lector acotado del worker): Berel SEO + AEO (`EO-INS-000019`, informe 16 páginas, deck 13
 láminas) y Sky ICO (`EO-INS-000022`, 12 y 9). Los PDFs NO se versionan (datos de cliente); quedan en
-`.captures/insights-preview/`. Defectos que revelaron y se corrigieron (`b88fd447c`):
+`.captures/insights-preview/`. Defectos que revelaron y se corrigieron (`198ce883a` (antes `b88fd447c`)):
 
 1. Métricas SEO en un eje común (todas con canal `google`): ahora comparación, cada una en su escala.
 2. Capitular suelta en narradas de afirmaciones cortas: sólo con primer párrafo de ≥ 3 líneas.
