@@ -122,10 +122,10 @@ sharing/delivery/schedules flags OFF there (ON in staging); the four migrations 
 | MCP | `src/mcp/greenhouse/{tool-manifest,server,tools,http-client}.ts` | 7 tools (62 total, hash `9fc46c8d90d3`) |
 | Gateway | `efeonce-mcp` 1.7.0 (PR #16 `4c9d7c44`, revision `00055-gk6`, 58 tools), provider `greenhouse-insights` contract `task-1848-v1` | federates the 7 tools; share create/revoke on `efeonce.mcp.insights.write` (fail-closed: no client carries it), 5 reads on the base scope; native authority `unsupported` per tool with the surface's real capability |
 
-## TASK-1888 / TASK-1889 — approved redesign (2026-09-25): code complete, rollout pending
+## TASK-1888 / TASK-1889 — approved redesign: both complete 2026-09-26, in production
 
 Status legend: **exists** = committed and verified in the repo; **planificado (TASK-18xx)** = named by the task, not built.
-Production still renders with the TASK-1847 v1 catalogs and the v1 contract until the 1888/1889 release.
+Production renders with these catalogs and the v2 contract since the 2026-09-26 releases (`0e87c7a443a2` + `f9257b9c94af`).
 
 ### Design references (exist, committed in `1ae82624d` and `568bfa669`)
 
@@ -168,7 +168,7 @@ Production still renders with the TASK-1847 v1 catalogs and the v1 contract unti
 | Copy | `src/lib/copy/insights.ts` (`scopeLines`, `chapterOpenings`, `channels`, `targets`, `figures`, `reading`) | TASK-1889 owns `GH_INSIGHTS.catalog` |
 | Preview | `scripts/insights/preview-edition.ts --editorial-v2 --plan-only` | read-only v2 plan over real data |
 
-### Built by TASK-1889 (ui-ux) — code shipped in release `0e87c7a443a2` (runtime state owned by TASK-1889)
+### Built by TASK-1889 (ui-ux) — complete 2026-09-26, in production
 
 Detail: architecture §14.9, implementation record §8.z.
 

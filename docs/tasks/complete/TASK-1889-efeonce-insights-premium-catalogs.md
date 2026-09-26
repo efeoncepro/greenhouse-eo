@@ -12,12 +12,13 @@
   `36236940651` success; el Job `artifact-worker` se desplegó). El código de Insights en `origin/main` es idéntico al de
   `develop`, verificado comparando blobs: los releases son squash y la ancestría de commits no sirve para esto. El
   contrato editorial v2 de TASK-1888 está ON en producción; «Blocked by» pasó a `none`.
-- **Falta el criterio de producción.** No hay renders posteriores al release: el último output es del 2026-09-25
-  15:59Z, con los catálogos v1. Receta para cerrarlo: crear por el lane ecosystem una edición `internal` de Berel
-  (SEO+AEO, 2026-09-01 → 2026-09-21) y otra de Sky (ICO, agosto de 2026), con el mismo `request` de las ediciones
-  aprobadas y títulos de cliente (no «Canary…»); `POST …/editions/<id>/render`, esperar al dispatcher y revisar los
-  PDFs. Emitir y compartir siguen OFF en producción, así que el cliente no ve nada. El clasificador de permisos
-  bloqueó el POST: necesita la autorización explícita del operador para escribir en producción.
+- **Criterio de producción cumplido.** Con autorización explícita del operador («sí, crea y renderiza en producción las
+  ediciones internas de Berel y Sky»), se crearon por el lane ecosystem dos ediciones `internal` con el mismo `request`
+  de las aprobadas y títulos de cliente: primeras ediciones internas renderizadas en producción con el diseño nuevo el 2026-09-26 — Berel `insed-7d470d9f-7119-4a84-b8af-c3fb584ceb92` (run `irun-dcd1fbed…`: A4 16 páginas + deck 15 láminas) y Sky `insed-9370d0cc-eb60-43c5-a547-70f10e011309` (run `irun-e5882459…`: A4 12 + deck 10), los cuatro PDF al primer intento (dispatcher 13:00Z, ejecución `artifact-worker-j47zl`). Los PDF tienen el mismo número de páginas que los aprobados
+  y el diseño premium completo (portada blanca con logo, índice, «Lo esencial», capítulos, figuras, tabla, límites,
+  contraportada). En la tabla de Sky, RpA «▼ 7,6 %» y entregas a tiempo «▲ 1,8 pp» salen en el tono de mejor, y
+  primera entrega correcta «▼ 5,6 pp» en el de peor. Emitir y compartir siguen OFF: nada llegó a clientes. El primer
+  intento de POST lo bloqueó el clasificador de permisos; la autorización del operador lo destrabó.
 - **Tono de las variaciones** (`373e56485` (antes `26937733b`), `5ee201c0c` (antes `d8354471b`)): el triángulo sigue al
   valor y el tono dice mejor o peor según la dirección de la métrica. Posición = menor es mejor; si no, la dirección del
   propio hecho o la de su meta ICO (`dimension.metric`); si no hay dirección, tono neutro. Verificado con la evidencia
@@ -86,7 +87,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -99,7 +100,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Código en producción (releases 0e87c7a443a2 + f9257b9c94af, 2026-09-26); PDFs reales aprobados 2026-09-25; falta el primer render real en producción (edición interna), que requiere autorización del operador para escribir en producción`
+- Status real: `Complete 2026-09-26 — en producción (releases 0e87c7a443a2 + f9257b9c94af); PDFs reales aprobados 2026-09-25; ediciones internas de Berel y Sky renderizadas en producción con el diseño nuevo`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none` (el contrato editorial v2 quedó completo y en producción el 2026-09-26)
@@ -510,8 +511,10 @@ El operador exige que el informe quede **igual al canvas**. «Igual» se define 
   `paginas/` (tabla por página en el dossier); las excepciones están justificadas y aprobadas por el operador.
 - [x] El dossier incluye la hoja lado a lado referencia | render de cada página, en color y en gris.
 - [x] El operador aprobó los PDFs internos de Berel y Sky y la estructura del deck.
-- [ ] En producción, una edición interna real compone con el diseño nuevo antes de compartir con clientes.
+- [x] En producción, una edición interna real compone con el diseño nuevo antes de compartir con clientes.
 
+> Evidencia 2026-09-26 (producción): primeras ediciones internas renderizadas en producción con el diseño nuevo el 2026-09-26 — Berel `insed-7d470d9f-7119-4a84-b8af-c3fb584ceb92` (run `irun-dcd1fbed…`: A4 16 páginas + deck 15 láminas) y Sky `insed-9370d0cc-eb60-43c5-a547-70f10e011309` (run `irun-e5882459…`: A4 12 + deck 10), los cuatro PDF al primer intento (dispatcher 13:00Z, ejecución `artifact-worker-j47zl`). Emitir y compartir siguen OFF en producción.
+>
 > Evidencia 2026-09-25 (aprobación): el operador aprobó los cuatro PDFs con «Bien, aprobado» en el chat de la
 > sesión TASK-1846 (procedencia: esa sesión lo informó a ésta, no se dijo en este hilo). Aprobado: Berel EO-INS-000019
 > (`insed-8fdb55a9-…`), informe 16 páginas + deck 15 láminas; Sky EO-INS-000022 (`insed-0729ee9e-…`), informe 12 + deck
@@ -550,14 +553,14 @@ El operador exige que el informe quede **igual al canvas**. «Igual» se define 
 
 - [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
 - [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] Skill `efeonce-insights` actualizada y espejada a `.codex/` con `pnpm skills:mirrors` verde.
-- [ ] Arquitectura §14, documentación funcional y manual de uso de Insights actualizados.
-- [ ] EPIC-045 actualizado con el estado real de la unidad.
+- [x] Skill `efeonce-insights` actualizada y espejada a `.codex/` con `pnpm skills:mirrors` verde.
+- [x] Arquitectura §14, documentación funcional y manual de uso de Insights actualizados.
+- [x] EPIC-045 actualizado con el estado real de la unidad.
 
 ## Follow-ups
 

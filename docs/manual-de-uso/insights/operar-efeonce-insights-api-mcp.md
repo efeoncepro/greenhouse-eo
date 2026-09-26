@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.11
+> **Version:** 1.12
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-26 por Claude (cierre de TASK-1888: contrato editorial v2 encendido en producción, cómo verificar una edición v2, rollback y el problema del salto de línea en el valor del flag; antes, TASK-1889: revisar el diseño aprobado antes de compartir)
+> **Ultima actualizacion:** 2026-09-26 por Claude (cierre de TASK-1889: diseño premium en producción y cómo verificar un render real)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
@@ -477,14 +477,23 @@ Para volver a prenderlo, el mismo camino al revés, cargando el valor exacto (ve
   INSIGHTS_EDITORIAL_V2_ENABLED production` (tras `vercel env rm`), haz `vercel redeploy` y repite la verificación
   con una edición interna nueva. En el `ops-worker`, confirma el valor exacto en la revisión activa.
 
-## Revisar el diseño antes de compartir (TASK-1889 — en producción, cierre pendiente)
+## Revisar el diseño antes de compartir (TASK-1889 — en producción)
 
 Para qué: ver cómo sale un informe A4 o un deck con el diseño aprobado (portada, índice, «Lo esencial», páginas de
 gráfico, límites, contraportada) usando datos reales, y comprobar que las plantillas siguen fieles al canvas aprobado.
 Nada de esto comparte ni emite: es revisión local. Estado al 2026-09-26: los catálogos `insights-report` e
-`insights-deck` (sólo v2) salieron a producción en el release del 2026-09-26, junto con el contrato v2 de TASK-1888
-(flag ON). El cierre formal de TASK-1889, incluida la aprobación del operador de las piezas derivadas y los PDF
-reales, lo lleva su propia task.
+`insights-deck` (sólo v2) están en producción junto con el contrato v2 de TASK-1888 (flag ON). Toda edición nueva sale
+con este diseño; las primeras ediciones internas de Berel y Sky se generaron en producción el 2026-09-26.
+
+**Verificar un render en producción (escribe en producción: pide antes la autorización del operador).**
+1. Crea una edición `internal` de un cliente con datos por el lane ecosystem (`POST
+   /api/platform/ecosystem/insights/editions` con el token del gateway y
+   `externalScopeType=other&externalScopeId=efeonce-mcp-gateway&organizationId=<org>`). Usa un título de cliente, no
+   «Canary…».
+2. Pide el render con `POST …/editions/<id>/render` y `{"outputs":["deck_pdf","report_pdf"]}`.
+3. Espera al dispatcher: toma un PDF cada 2 minutos. Un informe completo (deck + A4) tarda unos 4 a 5 minutos.
+4. Consulta `GET …/render-runs/<id>` hasta `completed` y revisa los PDF (número de páginas, portada, tabla y tonos).
+   Emitir y compartir siguen apagados en producción: el cliente no ve nada.
 
 **Antes de empezar.**
 

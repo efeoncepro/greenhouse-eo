@@ -16,10 +16,14 @@ The Composer's historical global visual set also drifts on clean, unrelated fram
 `pnpm composer:visual-gate --catalog=insights --selftest`, then the declared scoped freeze and scoped gate for
 Insights templates. This scope preserves existing `deck-axis`/SKY baseline images and hashes.
 
-## TASK-1889 premium catalogs — how to operate (code shipped in release `0e87c7a443a2`; task still open)
+## TASK-1889 premium catalogs — how to operate (complete 2026-09-26, in production)
 
-Its code went out in release `0e87c7a443a2` (2026-09-26); the task is owned by another session, which records the
-runtime verification and closure — do not describe the redesign as live from this skill. No own flag;
+In production since releases `0e87c7a443a2` + `f9257b9c94af` (2026-09-26); first internal editions rendered in Production with the new design on 2026-09-26 — Berel `insed-7d470d9f…` (run `irun-dcd1fbed…`: A4 16 pages + deck 15 slides) and Sky `insed-9370d0cc…` (run `irun-e5882459…`: A4 12 + deck 10), all four PDFs on the first attempt. Recipe for a
+production render check: create an `internal` edition of a real client with data through the ecosystem lane (gateway
+consumer token, `externalScopeType=other&externalScopeId=efeonce-mcp-gateway&organizationId=<org>`), `POST
+…/editions/<id>/render`, wait for the dispatcher (1 output per 2-min tick) and read the PDFs from the asset store. It
+writes to Production, so it needs the operator's explicit authorization (the permission classifier blocks it
+otherwise). No own flag;
 the v2 content (readings, essentials, cover, bands) only exists in plans generated with `INSIGHTS_EDITORIAL_V2_ENABLED`
 (TASK-1888). A v1 plan composes on the v2 templates with the documented fallbacks.
 

@@ -97,7 +97,7 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md` (contrato v2, lectura por figura, matriz)
-- `docs/tasks/in-progress/TASK-1889-efeonce-insights-premium-catalogs.md` (páginas de figura y regla de familia del render)
+- `docs/tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md` (páginas de figura y regla de familia del render)
 - `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md` (qué revelaron las ediciones reales)
 
 ## Dependencies & Impact

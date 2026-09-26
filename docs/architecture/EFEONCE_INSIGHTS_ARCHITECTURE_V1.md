@@ -1109,15 +1109,13 @@ TASK-1900. Si el registro cambia, el informe lo sigue sin tocar este dominio.
 (`reading.conclusion`) tampoco. El medidor necesita que el adapter AEO elija el run por ventana (follow-up en el
 dominio del grader). Métricas por página o keyword de SEO, conjuntos por consulta de IA y embudo CRM siguen fuera.
 
-### 14.9 Estado de TASK-1889 — catálogos premium del canvas (código en producción 2026-09-26; falta el primer render real)
+### 14.9 Estado de TASK-1889 — catálogos premium del canvas (complete 2026-09-26, en producción)
 
 > **Estado verificado 2026-09-26.** El código salió en el release `0e87c7a443a2` y quedó completo en producción con
 > `f9257b9c94af` (run `36236940651`, success, con el Job `artifact-worker` desplegado). El código de Insights en
 > `origin/main` es idéntico al de `develop` (blobs comparados; los releases son squash, así que la ancestría no sirve).
-> El operador aprobó el 2026-09-25 los PDFs internos de Berel y Sky y la estructura del deck. **Falta:** que una
-> edición interna real se renderice en producción con el diseño nuevo. Al 2026-09-26 no hay ningún render posterior
-> al release (el último output es del 2026-09-25 15:59Z, con los catálogos v1). Crear esa edición requiere
-> autorización explícita del operador para escribir en producción (el lane ecosystem crea ediciones reales).
+> El operador aprobó el 2026-09-25 los PDFs internos de Berel y Sky y la estructura del deck. **Render real en
+> producción:** primeras ediciones internas renderizadas en producción con el diseño nuevo el 2026-09-26 — Berel `insed-7d470d9f-7119-4a84-b8af-c3fb584ceb92` (run `irun-dcd1fbed…`: A4 16 páginas + deck 15 láminas) y Sky `insed-9370d0cc-eb60-43c5-a547-70f10e011309` (run `irun-e5882459…`: A4 12 + deck 10), los cuatro PDF al primer intento (dispatcher 13:00Z, ejecución `artifact-worker-j47zl`). Emitir y compartir siguen OFF en producción.
 > `artifact-composer/chart-figure.ts` quedó retirado.
 
 **Qué se construyó (commits en `develop`).** Commits: Slices 1–2 `61d1ef690` (antes `d357e0224`), `4a4c77748` (antes `b649080c7`); Slice 3

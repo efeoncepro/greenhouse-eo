@@ -610,9 +610,9 @@ Fuente: [TASK-1848](../tasks/in-progress/TASK-1848-efeonce-insights-sharing-deli
 | Gateway `efeonce-mcp` | v1.7.0 (PR #16 `4c9d7c44`, deploy `35351850324`, revisión `00055-gk6` al 100 %) | provider `greenhouse-insights` contrato `task-1848-v1`; 51 → 58 tools; crear/revocar enlace exigen `efeonce.mcp.insights.write` (fail-closed); envío y recurrencia no existen por MCP |
 | Migraciones | 4 (share grants, delivery intents, skip reason edition, schedules) | aplicadas en la instancia única |
 
-### 8.z Catálogos premium del canvas — TASK-1889 (2026-09-25, code complete, sin push)
+### 8.z Catálogos premium del canvas — TASK-1889 (complete 2026-09-26, en producción)
 
-Fuente: [TASK-1889](../tasks/in-progress/TASK-1889-efeonce-insights-premium-catalogs.md), arquitectura §14.9 y el
+Fuente: [TASK-1889](../tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md), arquitectura §14.9 y el
 dossier [`docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md`](../ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md).
 
 **Commits (en `develop`, sin push).**
@@ -736,7 +736,7 @@ en 2026-07/08); se ejercitó el camino «sin datos declarados», no el de un cli
 | Vercel `staging` + `ops-worker` (TASK-1848, 2026-09-18) | `INSIGHTS_SHARING/DELIVERY/SCHEDULES/ISSUANCE_ENABLED=true` en staging; `ops-worker` con DELIVERY/SCHEDULES/GENERATION | Canary sintético completo (`EO-INS-000015`); el operador confirmó la llegada de los dos correos | TASK-1848 Delta 2026-09-18 |
 | Vercel `Production` (TASK-1848) | release `bda1cf2cd938` (PR #238, orquestador `35349506106`, `released` 13:41Z) | Código vivo, **flags OFF** (sharing/delivery/schedules/emisión) hasta TASK-1875; canary: crear enlace ⇒ 503 `sharing_disabled`, token inexistente ⇒ 404, sin token ⇒ 401 | TASK-1848 Delta 2026-09-18 |
 | Cloud Run `efeonce-mcp-gateway` (TASK-1848) | v1.7.0, 58 tools | Rev `00055-gk6` al 100 %; canary del provider contra producción verde | TASK-1848 Delta 2026-09-18 |
-| `develop` local (TASK-1889, 2026-09-25) | catálogos premium v2 (`insights-report`, `insights-deck`), regla de familia, portada con logo del cliente | **Sin push**: ni staging, ni Job `artifact-worker`, ni producción. Rollout: staging con `INSIGHTS_EDITORIAL_V2_ENABLED` → release (Job único staging/prod) → aprobación de PDFs reales → edición interna en producción | §8.z; arquitectura §14.9 |
+| Vercel Production + Job `artifact-worker` (TASK-1889, 2026-09-26) | catálogos premium v2 (`insights-report`, `insights-deck`), regla de familia, portada con logo del cliente | **En producción** (releases `0e87c7a443a2` + `f9257b9c94af`); primeras ediciones internas renderizadas en producción con el diseño nuevo el 2026-09-26 — Berel `insed-7d470d9f-7119-4a84-b8af-c3fb584ceb92` (run `irun-dcd1fbed…`: A4 16 páginas + deck 15 láminas) y Sky `insed-9370d0cc-eb60-43c5-a547-70f10e011309` (run `irun-e5882459…`: A4 12 + deck 10), los cuatro PDF al primer intento (dispatcher 13:00Z, ejecución `artifact-worker-j47zl`) | §8.z; arquitectura §14.9 |
 | Vercel staging + Production + `ops-worker` (TASK-1888, 2026-09-26) | contrato editorial v2 (release `0e87c7a443a2`, luego `f9257b9c94af`) + `INSIGHTS_EDITORIAL_V2_ENABLED=true` en los dos runtimes lectores; gateway `efeonce-mcp` v1.9.0 | **En producción, flag ON**; canary de producción selló plan v2 (`insed-f5768172…`); emisión, enlaces y envío siguen OFF | §8.aa |
 | Ledgers | `FEATURE_FLAG_STATE_LEDGER.md` (3 filas + snapshot), `PRODUCTION_RELEASE_TIMING_LEDGER.md` (fila del release) | Al día | líneas 249–251, 383–385; línea 78 |
 

@@ -256,7 +256,7 @@ With the flag OFF the adapters return v1 evidence and the planner emits a v1 pla
 - **Percent deltas** — a metric already in percent varies in pp (`formatDeltaPoints`, «+1,8 pp»; two decimals under
   0,05 pp). Relative deltas stay for absolute metrics. Sealed plans with the old relative text still validate.
 
-## Render contract of the premium catalogs (TASK-1889 — code shipped in release `0e87c7a443a2`; task still open)
+## Render contract of the premium catalogs (TASK-1889 — complete 2026-09-26, in production)
 
 Verified against code on 2026-09-25. Detail: architecture §14.9.
 

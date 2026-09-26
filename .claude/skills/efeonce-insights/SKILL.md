@@ -1,6 +1,6 @@
 ---
 name: efeonce-insights
-description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 shipped in release `0e87c7a443a2`, its runtime state owned by TASK-1889), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
+description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 complete 2026-09-26 and rendering in Production), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
 ---
 
 # Efeonce Insights (living skill)
@@ -116,13 +116,12 @@ it without repeating what already cost a day*. It grows with every task: see the
   2026-09-26, in production**: releases `0e87c7a443a2` + `f9257b9c94af`, flag ON in Vercel staging, Vercel Production
   and the `ops-worker`, gateway `efeonce-mcp` v1.9.0; issuance/sharing/delivery stay OFF in Production; see
   `references/contracts.md` § Editorial contract v2 and `references/program-ledger.md`).
-  Premium A4/deck templates → TASK-1889 (its code shipped in release `0e87c7a443a2`; the task is still open and owned
-  by another session, which records its runtime state; see
+  Premium A4/deck templates → TASK-1889 (complete 2026-09-26: releases `0e87c7a443a2` + `f9257b9c94af`; first internal editions rendered in Production with the new design on 2026-09-26 — Berel `insed-7d470d9f…` (run `irun-dcd1fbed…`: A4 16 pages + deck 15 slides) and Sky `insed-9370d0cc…` (run `irun-e5882459…`: A4 12 + deck 10), all four PDFs on the first attempt; see
   `references/contracts.md` § Render contract of the premium catalogs and `references/operations.md` § TASK-1889) with the approved direction
   `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`, its wireframe and its fidelity
   contract (41 reference pages in `…/TASK-1889-efeonce-insights-premium-catalogs/paginas/`, `pixelmatch` 0.1, ≤ 1 % of
-  differing pixels per page). Never describe the redesign as live until the TASK-1889 session closes it with runtime
-  evidence (real PDFs approved by the operator).
+  differing pixels per page). Every new edition renders with these templates; editions created before the release
+  keep the PDFs they already have (outputs are immutable).
 - Brand graphic line «La órbita» (canonical for the Efeonce brand since 2026-09-25; manual
   `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md`, operational reference
   [`graphic-line-orbit.md`](../efeonce-brand-studio/references/graphic-line-orbit.md)): the orbit was born in the

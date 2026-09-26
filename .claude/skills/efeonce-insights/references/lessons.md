@@ -1,5 +1,17 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-26 · TASK-1889 · El tono de una variación sale de la dirección de la métrica, y las metas ICO se casan por
+  `dimension.metric`.** El triángulo sigue al valor (▲ subió, ▼ bajó) y el tono dice mejor o peor. Para saber qué es
+  «mejor», posición = menor es mejor; si no, la dirección del propio hecho y, si falta, la de su meta. Las metas ICO
+  reales se llaman `target.rpa`/`band.rpa` y nombran su métrica en `dimension.metric`: buscarlas por `metricId` no
+  encuentra nada y deja todo en tono neutro. El test con un fixture que compartía `metricId` pasaba por construcción;
+  lo detectó la revisión del PDF real de Sky. Se testea con la forma real del adapter.
+- **2026-09-26 · TASK-1889 · Los releases son squash: la ancestría no dice qué está desplegado.** Ningún commit de
+  1889 era ancestro de `main` y, aun así, todo el código estaba en producción. Se verifica comparando blobs de los
+  archivos (`git rev-parse origin/main:<path>` vs `origin/develop:<path>`) y el `headSha` del release exitoso.
+- **2026-09-26 · TASK-1889 · Un render real en producción escribe en producción: pedir la autorización al minuto
+  cero.** Crear ediciones por el lane ecosystem es una escritura real; el clasificador de permisos la bloquea sin la
+  autorización explícita del operador en el chat. Pedirla al proponer el paso, no después de intentarlo.
 - **2026-09-25 · A per-figure reading that repeats the page is not a reading.** Real PDFs (Berel p. 5, Sky p. 7)
   printed the same sentence twice, and the targets page was titled with the period comparison because the planner
   emitted no `conclusion`. Also: bounded AI authoring only REWRITES, so interpretation has to be computed by the

@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-26 — Efeonce Insights: diseño premium en producción (TASK-1889)
+
+Los informes A4 y los decks de Insights salen con el diseño premium aprobado por el operador: portada blanca o navy
+con el logo del cliente, índice, «Lo esencial», capítulos, páginas de gráfico por familia, tabla de respaldo, límites y
+contraportada; el diseño anterior se retiró del código. Las variaciones muestran la dirección del valor con el triángulo
+y, con el tono, si el cambio es mejor o peor para esa métrica (posición y RpA: menor es mejor). Código en los releases
+`0e87c7a443a2` y `f9257b9c94af`. Verificado en producción con las primeras ediciones internas de Berel (A4 16 páginas +
+deck 15 láminas) y Sky (A4 12 + deck 10), los cuatro PDF al primer intento. Emisión y compartir siguen OFF en
+producción. Rollback: revert del código de catálogos y release.
+
 ## 2026-09-26 — Efeonce Insights: contrato editorial v2 encendido en producción (TASK-1888)
 
 Los informes nuevos de Insights salen con el contrato v2: lectura por figura (cifra principal, conclusión, próximo
@@ -558,10 +568,3 @@ Tres capas documentales y las skills de imagen, video y dirección de arte actua
   `render_disabled`/`render_rejected`; `renderableOutputs: ['deck_pdf']`.
 - Flag `INSIGHTS_RENDER_ENABLED` (OFF; dos runtimes). Hash del manifest domain-free en el composer.
   Sin deploy, sin push, sin canary: exigen autorización.
-
-## 2026-09-16 — Skills Salesforce alineadas con Dreamforce 2026
-
-Las skills espejo de CRM, Marketing Cloud Next y Marketing Cloud Engagement incorporan el ledger de AIforce,
-Claudeforce, Slackforce, Koa, Agentforce long-horizon y las integraciones AWS/Google/NVIDIA/Siemens. Cada claim
-conserva su estado `GA`, beta, piloto, preview o roadmap; la actualización no cambia entitlements, contratos,
-orgs ni rollout.

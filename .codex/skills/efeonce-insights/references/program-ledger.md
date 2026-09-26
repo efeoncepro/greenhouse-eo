@@ -12,7 +12,7 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
 | TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | to-do (blocked by 1848) | — | — |
 | TASK-1888 | Editorial contract v2: `ChartSpec` 7 → 15 families, per-figure reading and hero figure in the plan, `channelId`, per-org cover preference + sealed cover, flag `INSIGHTS_EDITORIAL_V2_ENABLED` | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af`; gateway efeonce-mcp v1.9.0 (rev `00062-ct5`); flag ON in Vercel staging (`greenhouse-9t9fwhrvz`), Vercel Production (`greenhouse-8hl5hf54w`) and ops-worker (`00719-gbm`) | staging internal editions Berel `insed-56226fa1…` / Sky `insed-1e003760…` with sealed v2 plan; Production synthetic canary `insed-f5768172…` sealed 3 scope lines + cover (first canary `insed-356e948c…` sealed v1 before the env value fix) |
-| TASK-1889 | Premium catalogs from the approved canvas (A4 + deck), canvas-fidelity gate, internal Berel/Sky editions, release together with the 1888 flag | **in-progress — code shipped in release `0e87c7a443a2` (2026-09-26)**; owned by another session, which records runtime verification and closure | code in the release `0e87c7a443a2`; runtime state recorded by the TASK-1889 session | local real editions Berel `EO-INS-000019` (16 pp / 13 slides) and Sky `EO-INS-000022` (12 / 9); fidelity 20/21 + 1 approved exception; visual gate 27 frames at 0 px |
+| TASK-1889 | Premium catalogs from the approved canvas (A4 + deck), canvas-fidelity gate, internal Berel/Sky editions, release together with the 1888 flag | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af` (Job `artifact-worker` deployed); first internal editions rendered in Production with the new design on 2026-09-26 — Berel `insed-7d470d9f…` (run `irun-dcd1fbed…`: A4 16 pages + deck 15 slides) and Sky `insed-9370d0cc…` (run `irun-e5882459…`: A4 12 + deck 10), all four PDFs on the first attempt | local real editions Berel `EO-INS-000019` (16 pp / 13 slides) and Sky `EO-INS-000022` (12 / 9); fidelity 20/21 + 1 approved exception; visual gate 27 frames at 0 px |
 
 ## TASK-1845 — foundation (complete 2026-09-16)
 
@@ -371,7 +371,7 @@ opcionales de `InsightWebModelV1`.
 flag ON sólo en Vercel staging; merge y deploy de efeonce-mcp#18 después de ese release; el operador fija la
 preferencia de Berel y Sky y carga logos oscuros si los hay.
 
-## TASK-1889 — catálogos premium (in-progress · code complete 2026-09-25, rollout pendiente)
+## TASK-1889 — catálogos premium (complete 2026-09-26, en producción)
 
 **Qué es:** llevar a `insights-report` (A4) e `insights-deck` (16:9) el diseño aprobado, verificarlo con ediciones
 internas reales y liberarlo. `ui-ux`, `UI impact: layout`, asignación Claude. Detalle: arquitectura §14.9 y registro de
@@ -383,7 +383,7 @@ implementación §8.z.
 
 - Catálogos **sólo v2** (A4 794×1123, deck 1280×720); la guarda `insights-catalogs-v2-only.test.ts` no admite legado.
   Retirados `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css`, `render/figure-pages.ts`
-  y los resolvers v1 de barra/familia/path. `artifact-composer/chart-figure.ts` quedó sin consumidores (follow-up).
+  y los resolvers v1 de barra/familia/path. `artifact-composer/chart-figure.ts` quedó sin consumidores y se retiró el 2026-09-26.
 - Cuatro páginas A4 y cuatro láminas de figura (`report-figure-*` / `insights-figure-*`: comparación, columnas, metas,
   tendencia) con la regla de familia de `render/figure-slots.ts`, compartida por ambos mappers.
 - Portada blanca o navy según `plan.cover`, logo del cliente por `asset-ref:org-logo:<id>` leído en el worker con
@@ -391,8 +391,13 @@ implementación §8.z.
 - «Lo esencial» del plan v2 en `report-summary` / `insights-summary` con folio real.
 - Motor compartido: `render.ts` espera `img.decode()`; `synthesize.ts` honra `example` del contrato.
 
-**Dónde corre:** el código salió en el release `0e87c7a443a2` (2026-09-26). La verificación de runtime y el cierre los
-registra la sesión dueña de TASK-1889.
+**Dónde corre:** producción desde los releases `0e87c7a443a2` + `f9257b9c94af` (2026-09-26; el código de Insights en
+`main` es idéntico al de `develop`, verificado por blobs porque los releases son squash). Primeras ediciones internas
+renderizadas en producción el 2026-09-26: Berel `insed-7d470d9f-7119-4a84-b8af-c3fb584ceb92` (run `irun-dcd1fbed…`,
+A4 16 + deck 15) y Sky `insed-9370d0cc-eb60-43c5-a547-70f10e011309` (run `irun-e5882459…`, A4 12 + deck 10), los
+cuatro PDF al primer intento; tono de variaciones verificado en el PDF de producción. Emitir y compartir siguen OFF.
+Después del cierre: `373e56485`/`5ee201c0c` (tono mejor/peor por dirección de la métrica) y `8f16401b3` (retiro de
+`chart-figure.ts`).
 
 **Verificación:** `pnpm insights:canvas-fidelity` 20/21 ≤ 1 % + `Deck-Agrupadas` 2,2 % con excepción aprobada por el
 operador (techo 2,5 %); `pnpm composer:visual-gate --catalog=insights` 27 frames a 0 px (deltas g–j); `ui:quality`

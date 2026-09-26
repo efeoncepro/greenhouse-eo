@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.12
+> **Version:** 1.13
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-26 por Claude (cierre de TASK-1888: el contrato editorial v2 está encendido en producción; qué trae hoy un informe y las reglas de redacción; antes, TASK-1889: cómo se ve un informe y un deck con el diseño aprobado)
+> **Ultima actualizacion:** 2026-09-26 por Claude (cierre de TASK-1889: el diseño premium está en producción y ya generó las primeras ediciones internas de Berel y Sky)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -129,8 +129,8 @@ devuelve el mismo pedido anterior, no produce archivos duplicados.
 
 > Estado (2026-09-26): **el contrato editorial v2 está encendido en staging y producción** (TASK-1888, cerrada el
 > 2026-09-26). Toda edición nueva sale con el plan v2: lectura por figura, «Lo esencial», líneas de alcance y portada
-> sellada (ver «Qué trae hoy un informe»). El código de las plantillas nuevas (TASK-1889) salió a producción en el
-> mismo release; su cierre formal lo lleva su propia task. Las ediciones ya creadas no cambian: son inmutables, y las
+> sellada (ver «Qué trae hoy un informe»). Las plantillas nuevas (TASK-1889) también están en producción: el
+> 2026-09-26 se generaron allí las primeras ediciones internas de Berel y Sky con el diseño aprobado. Las ediciones ya creadas no cambian: son inmutables, y las
 > reglas nuevas aplican a las ediciones nuevas. Emitir, compartir y enviar siguen apagados en producción, así que
 > ninguna edición llega a un cliente sin revisión humana.
 
@@ -224,16 +224,16 @@ anterior; las ya creadas no cambian (ver el manual).
 > Detalle técnico: arquitectura §6 (delta 2026-09-25, rediseño premium aprobado);
 > `docs/tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md` (estado en arquitectura §14.8; flag
 > `INSIGHTS_EDITORIAL_V2_ENABLED` en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`);
-> `docs/tasks/to-do/TASK-1889-efeonce-insights-premium-catalogs.md`; dirección visual
+> `docs/tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md`; dirección visual
 > `docs/ui/visual-directions/TASK-1889-efeonce-insights-premium-catalogs-direction.md`.
 
 ## Cómo se ve un informe y un deck con el diseño aprobado
 
 > Estado (2026-09-26): las plantillas del informe A4 y del deck tienen **sólo** el diseño aprobado por el operador;
-> el diseño anterior se retiró del código. Se revisó en local con ediciones reales de Berel (visibilidad orgánica y en
-> IA) y Sky (entrega), y **su código salió a producción en el release del 2026-09-26**, junto con el contrato editorial
-> v2. El cierre formal (incluida la aprobación de los PDF reales por el operador) lo lleva TASK-1889. Nada se comparte
-> con un cliente hasta que una edición interna en producción haya pasado por su revisión.
+> el diseño anterior se retiró del código. El operador aprobó los PDF de Berel (visibilidad orgánica y en
+> IA) y Sky (entrega) el 2026-09-25, y **el diseño está en producción desde el 2026-09-26**: las primeras ediciones
+> internas de Berel y Sky se generaron ahí con el mismo número de páginas que las aprobadas. Emitir y compartir siguen
+> apagados en producción, así que nada llega a un cliente sin revisión humana.
 
 El informe A4 y el deck dicen lo mismo, en el mismo orden; cambia cuánto cabe en cada página.
 
@@ -284,7 +284,7 @@ Sky, revisadas en local, destaparon cinco defectos que los datos de ejemplo no m
 > Detalle técnico: [arquitectura §14.9](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) (estado de
 > TASK-1889) y §6 (dirección premium); catálogos `src/lib/artifact-composer/catalogs/insights-report/` e
 > `insights-deck/`; página por forma de gráfico en `src/lib/efeonce-insights/render/figure-slots.ts`;
-> task `docs/tasks/in-progress/TASK-1889-efeonce-insights-premium-catalogs.md`.
+> task `docs/tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md`.
 
 ## Estado de disponibilidad (2026-09-26)
 
