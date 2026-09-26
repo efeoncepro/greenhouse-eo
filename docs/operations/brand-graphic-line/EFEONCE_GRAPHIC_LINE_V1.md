@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita · V1
 
 > **Tipo de documento:** Manual de marca (contrato operativo de diseño)
-> **Versión:** 1.8
+> **Versión:** 1.9
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
-> **Última actualización:** 2026-09-26 por Claude (decisiones del operador D1–D15 del 2026-09-26: contraste del acento y magenta de Revenue-HubSpot, §2; «Growth» en el acento en el cierre del deck, §5 y §10.1; logo dentro de la órbita sólo en cierres de marca, §8.2, §8.3, §10.1, §10.3 y §10.6; un solo anillo en el banner de LinkedIn y el fondo de Teams, §1.3; halo a la mitad sobre papel y anillo de la esfera sólo «en vivo», §1.3; umbral de la burbuja 4,5:1, §8.5; reglas P1–P12 y conflictos P-1..P-9 resueltos, §9 y §9.1; firma de equipo para `people@`, §10.2; impresión, prueba sin logo, banco de pares y revisión legal, §4, §1.4 y §12. Antes, el mismo día: §9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
+> **Última actualización:** 2026-09-26 por Claude (iconografía canónica, Trazo y Plastilina, D16–D22: §14. Antes, el mismo día: decisiones del operador D1–D15 del 2026-09-26: contraste del acento y magenta de Revenue-HubSpot, §2; «Growth» en el acento en el cierre del deck, §5 y §10.1; logo dentro de la órbita sólo en cierres de marca, §8.2, §8.3, §10.1, §10.3 y §10.6; un solo anillo en el banner de LinkedIn y el fondo de Teams, §1.3; halo a la mitad sobre papel y anillo de la esfera sólo «en vivo», §1.3; umbral de la burbuja 4,5:1, §8.5; reglas P1–P12 y conflictos P-1..P-9 resueltos, §9 y §9.1; firma de equipo para `people@`, §10.2; impresión, prueba sin logo, banco de pares y revisión legal, §4, §1.4 y §12. Antes, el mismo día: §9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
 > **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
 > **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (40 láminas, siete capítulos)
 > **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Desde AXIS 0.2.7 los archivos oficiales (logo e isotipo de las cuatro marcas y las tres burbujas URL) viven en el paquete `@efeoncepro/axis-brand-assets`; desde AXIS 0.3.0 el contrato de composición es `efeonce.graphic-line-orbit` 0.3.0 (`stable`) y el paquete `@efeoncepro/axis-graphic-line` 0.3.1 pinta la órbita, sus recetas y su movimiento (§13). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
@@ -858,4 +858,32 @@ operador.
 | `pnpm foto:componer:cta` + `pnpm foto:cta:gate` (tramo 17) | Campo de plan `marcaEnEscena`. En piezas **nuevas**, la burbuja (`url` + `marcaEnEscena: true`, sin `logo`) se fusiona a opacidad 1, se mide y la juzgan las reglas `firma-burbuja`, `firma-contraste` y `firma-sobre-sujeto`. Las piezas del canon anterior se dibujan igual y siguen «no certificables» con URL; no se recertificaron (el gate las mostrará en 3 hasta recomponerlas) y ningún workflow de CI corre este gate. Detalle: [contrato del compositor §19.6](../EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) |
 | `scripts/creative/brand-motion/` (`render-orbit-motion.mjs`, `orbit-sound.mjs`, `encode-orbit-motion.mjs`) | Render, sonido y codificación de las animaciones del logo V1.1 (reveal, apertura y sting). Lee cada tiempo y proporción de `efeonceGraphicLine.motion`; spec en [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](./EFEONCE_ORBIT_REVEAL_MOTION_V1.md) y reglas en [`EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`](./EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md) |
 | `src/config/efeonce-brand-assets.test.ts` | Guarda de deriva: las copias locales del logo y de la burbuja deben ser el mismo dibujo que el paquete de assets |
+
+## 14. Iconografía: Trazo y Plastilina
+
+La línea tiene su propia iconografía, canónica desde el 2026-09-26 (D16–D22), en **dos voces de una familia**:
+
+| | Trazo | Plastilina |
+| --- | --- | --- |
+| Dice | lo que se mide | lo que se crea |
+| Líneas | Growth, Engine, Revenue | Brand (Voice, por decidir) |
+| Forma | trazo limpio 1,5 en grilla 24 | masa blanda con giro y calados en grilla 48 |
+| Esfera | radio 1,75; reemplaza o completa el glifo | radio 3,4 con anillo calado, donde está la acción |
+| Mínimo | responde desde 20 px | 32 px (más chico, Trazo) |
+
+- **La esfera es un estado, no parte del dibujo:** en reposo no está; cuando el ícono responde, aparece en el acento de
+  la línea de servicio **de la pieza**. Responde uno solo, el que importa, y sólo si la pieza no tiene otra esfera.
+- **Fondo `#001a33` en todas las líneas**; tinta blanca sobre oscuro y navy sobre papel. Plano, sin volumen ni brillo.
+- **Las voces no se mezclan** en un grupo; si conviven, Plastilina manda en grande y el Trazo apoya en chico.
+- **Órbita sesgada:** la firma de Plastilina alrededor del objeto protagonista (elipse −16°, pasa por detrás y por
+  delante); una por pieza, nunca cruza el texto y **nunca mide** (lo que mide sigue en la órbita circular, §1).
+- **Un glifo nuevo no se dibuja dentro de una pieza:** entra al set con su verificación y la aprobación del operador.
+
+**Dónde vive:** AXIS es la fuente de verdad — tokens `efeonceGraphicLine.icons`, el paquete
+`@efeoncepro/axis-graphic-line/icons` (`resolveIcon`, `auditIconGroup`, `skewedOrbitHeroSvg`), los comandos
+`pnpm icons:export|check|vectorize`, la página [axis.efeonce.org/references/iconography](https://axis.efeonce.org/references/iconography/)
+y la guía `docs/agent-composition/iconography.md` del repositorio de AXIS. Estado: implementado en la rama
+`feat/iconography`, **sin publicar** (tokens 0.3.6, `axis-graphic-line` 0.4.0). La firma de correo y la de equipo siguen
+con íconos Tabler hasta que el operador decida el reemplazo. Criterio e historia: skill `efeonce-graphic-line`,
+`references/iconography.md`.
 

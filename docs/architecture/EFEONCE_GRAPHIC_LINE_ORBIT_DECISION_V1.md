@@ -160,6 +160,24 @@ Aprobadas por el operador (Julio Reyes) el 2026-09-26. Detalle y ubicación en e
   proveedor del panel y presupuesto son decisión del operador.
 - **D15.** «Te hacemos visible»: revisión legal antes de cualquier pauta, sin excepción (regla reafirmada).
 
+### Delta 2026-09-26 (f) — Iconografía canónica: Trazo y Plastilina (D16–D22)
+
+El operador definió en el canvas «Íconos de La órbita» y canonizó (D22) la iconografía de la línea, en dos voces de
+una familia: **Trazo** (lo que se mide; grilla 24, trazo 1,5, esfera 1,75) y **Plastilina** (lo que se crea; masa
+blanda en grilla 48, esfera 3,4 con anillo calado, gesto en tinta del protagonista), con la esfera como **estado**
+(reposo o respuesta, en el acento de la línea de la pieza), el fondo `#001a33` en todas las líneas (D21) y la **órbita
+sesgada** como firma de Plastilina (D20: nunca mide; lo que mide sigue siendo circular). Voz por línea: Trazo para
+Growth, Engine y Revenue; Plastilina para Brand; Voice por decidir.
+
+Se implementó en AXIS (rama `feat/iconography`, commit `b5a621f`, **sin publicar**): tokens `efeonceGraphicLine.icons`
+(`axis-tokens` 0.3.6), `@efeoncepro/axis-graphic-line/icons` (0.4.0) con los 30 glifos aprobados y la API para agentes
+(`resolveIcon`, `auditIconGroup`, `skewedOrbitHeroSvg`), los comandos `pnpm icons:export|check|vectorize` para dar de
+alta glifos nuevos, la página `/references/iconography/` y la guía `docs/agent-composition/iconography.md` (ADR de AXIS
+`ICONOGRAPHY_DECISION_V1.md`). El método se validó con una prueba a ciegas (un agente sin contexto produjo una guitarra en
+Plastilina y una keynote en Trazo sólo con la documentación); lo que tuvo que adivinar se corrigió. Criterio e historia en
+la skill `efeonce-graphic-line` (`references/iconography.md`, `ledger.md` D16–D22). Pendientes: opacidad del anillo
+sesgado, voz de Voice, aire del Trazo a 20 px, publicación de los paquetes y reemplazo de Tabler en las firmas.
+
 ## Alternativas descartadas
 
 | Alternativa | Por qué no |

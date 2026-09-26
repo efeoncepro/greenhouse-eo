@@ -1,14 +1,28 @@
-# Iconografía de la línea: íconos de trazo (reposo y respuesta)
+# Iconografía de la línea: Trazo y Plastilina
 
-> Verificado contra: canvas «Íconos de La órbita» (claude.ai/artifact/Y9mx42L72zYc6iLg4j3Maj, versión 20; maestros
-> `project/Icono.dc.html` e `IconoE.dc.html`) — 2026-09-26 · greenhouse-eo@33c570afb · decisiones del operador D16–D21
-> ([ledger.md](ledger.md)).
+> Verificado contra: AXIS `feat/iconography@b5a621f` (tokens `0.3.6`, `@efeoncepro/axis-graphic-line` `0.4.0`, **sin
+> publicar**) y el canvas «Íconos de La órbita» (claude.ai/artifact/Y9mx42L72zYc6iLg4j3Maj, versión 20) — 2026-09-26 ·
+> decisiones del operador D16–D22 ([ledger.md](ledger.md)).
 >
-> **Estado:** estilo **aprobado por el operador el 2026-09-26**. Todavía **no** vive en AXIS: no hay tokens
-> `efeonceGraphicLine.icons` ni archivos en `@efeoncepro/axis-brand-assets`. Hasta que existan, la geometría canónica es la
-> de este documento (sección 9), copiada del ícono maestro del canvas. La iconografía **plana** (rellena) está en
-> complementaria **Plastilina** tiene nombre, dirección y órbita sesgada aprobados; su receta, el método para glifos
-> nuevos, el inventario, los «no hacer» y los formatos están **en revisión del operador** (sección 11).
+> **Estado: canónica** (el operador la canonizó el 2026-09-26, D22). **La fuente de verdad es AXIS**, no este documento:
+> valores en `efeonceGraphicLine.icons` (`@efeoncepro/axis-tokens`), geometría y reglas ejecutables en
+> `@efeoncepro/axis-graphic-line/icons`, guía completa en `axis-design-system/docs/agent-composition/iconography.md`,
+> página para el equipo en `axis.efeonce.org/references/iconography/` y datos para agentes en
+> `/references/iconography.json`. Este documento resume el criterio y la historia; si difiere de AXIS, manda AXIS.
+
+## 0. Cómo lo usa un agente (lo primero)
+
+1. La voz la decide la línea de servicio de la pieza: `iconVoiceForLine(line)` → Trazo (Growth, Engine, Revenue) o
+   Plastilina (Brand); Voice, por decidir.
+2. El glifo sale de `ICON_CATALOG` (12 de Trazo, 18 de Plastilina). **Si no existe, no se dibuja dentro de la pieza**: se
+   da de alta con `pnpm icons:check` (Trazo) o `pnpm icons:vectorize` + `pnpm icons:check` (Plastilina), en el repo AXIS,
+   y con la aprobación del operador.
+3. Se pinta con `resolveIcon({ glyph, state, size, line, surface, gesture, label })`: nunca se transcriben HEX ni px.
+4. Reposo por defecto; responde uno solo y sólo si la pieza no tiene otra esfera. Antes de entregar,
+   `auditIconGroup(items, { pieceHasSphere })`.
+5. Plastilina protagonista: `skewedOrbitHeroSvg` (el objeto en reposo, la órbita pone la esfera).
+6. Los paquetes aún no están publicados: en Greenhouse se usan desde el repo hermano (`../axis-design-system`) o se
+   exportan con `pnpm icons:export`. Greenhouse todavía no consume `/icons`.
 
 ## 1. La idea
 
@@ -158,22 +172,24 @@ Un glifo nuevo se dibuja una vez, entra al set y recién después se usa en piez
 1. **Dibujar en la grilla 24** con margen 2 y remates redondos. Llena la guía que corresponde a su forma: círculo de
    radio 10 (objetos redondos), cuadrado de 18 (compactos) o rectángulo de 20 × 16 (apaisados: pantallas, láminas).
 2. **Prever la esfera desde el dibujo:** elegir el modo (reemplaza o completa, §3) y dejarle su lugar.
-3. **Medir el aire** de la esfera contra todos los trazos, con el trazo incluido: ≥ 0,5 con trazo 1,5.
-4. **Renderizar el control** a 64, 32, 24 y 20 px (y 160 si será héroe), sobre `#001a33` y sobre papel.
-5. **Registrar:** una fila en la tabla de §9 y el glifo en el maestro `Icono.dc.html` del canvas. Queda **en revisión**
-   hasta que el operador lo apruebe; antes, no sale en piezas.
+3. **Escribirlo en JSON** (`key`, `label`, `use`, `mode`, `rest`, `response`, `dot`); ejemplo en AXIS
+   `docs/examples/iconography/stroke-glyph-keynote.json`.
+4. **Verificar** con `pnpm icons:check -- --glyph <glifo.json> --out <dir>` (en AXIS): mide el aire (≥ 0,5 con trazo 1,5),
+   el margen y deja el control a 160, 64, 32, 24 y 20 px sobre `#001a33` y papel. Sale con 1 si falla.
+5. **Alta:** con la aprobación del operador entra a `STROKE_GLYPHS` (`packages/graphic-line/src/icons-stroke-data.ts`),
+   cuya prueba mide el aire de todo el set. Antes, no sale en piezas.
 
 ## 10. Implementación y pendientes
 
-- **Hoy:** el ícono maestro del canvas es la referencia visual; este documento, la geometría.
-- **Pendiente (AXIS):** tokens `efeonceGraphicLine.icons` (grilla, trazo, pisos y topes ópticos, radio y aire de la
-  esfera, respuesta mínima) y los SVG del set en `@efeoncepro/axis-brand-assets` (reposo y respuesta por glifo). Hasta
-  entonces, nada de esto se transcribe a código de producto.
+- **Hecho (2026-09-26, AXIS `b5a621f`, sin publicar):** tokens `efeonceGraphicLine.icons` (`axis-tokens` 0.3.6) y el
+  subpath `@efeoncepro/axis-graphic-line/icons` (0.4.0) con la geometría de este §9, la API y los comandos
+  `icons:export|check|vectorize`; página `/references/iconography/`.
+- **Pendiente:** publicar los paquetes con el próximo tag (visto bueno del operador) y que un consumidor los fije.
 - **Pendiente (operador):** el inventario del set (qué íconos necesita la marca: líneas, canales, áreas, contacto) y si
   este set reemplaza a los Tabler outline de la firma de correo y de la firma de equipo (`emailSignature.icons`,
   `team.areaMark`). Mientras no se decida, la firma sigue con Tabler.
 
-## 11. Plastilina, la voz blanda
+## 11. Plastilina, la voz blanda (canónica desde D22)
 
 El operador pidió un estilo **complementario** con punch y personalidad para el oficio creativo. Tras descartar los
 tratamientos dibujados a mano y dos rondas generadas, eligió la dirección E y la llamó **Plastilina** (D19); la
@@ -181,18 +197,18 @@ tratamientos dibujados a mano y dos rondas generadas, eligió la dirección E y 
 sección 2 del canvas «Íconos de La órbita»: anatomía E1, post E2, set E3, receta E4, no hacer E5, story E6, LinkedIn E7,
 stickers E8 e ícono maestro vectorial `IconoE.dc.html`.
 
-> **Estado de cada parte:** nombre, dirección, color por línea, órbita sesgada y fondo, **aprobados**. Receta, método,
-> los nueve íconos nuevos, los «no hacer» y los formatos, **en revisión del operador**: se usan para explorar, no en
-> piezas publicadas, hasta que el ledger los marque vigentes.
+> **Estado:** canónica (D22, 2026-09-26): nombre, dirección, color por línea, órbita sesgada, fondo, receta, método,
+> los 18 glifos, los «no hacer» y los formatos. Siguen abiertos sólo los pendientes del ledger (voz de Voice, aire a
+> 20 px, opacidad del anillo sesgado, esfera en voz o ícono).
 
-### 11.1 Dos voces, una familia (propuesta)
+### 11.1 Dos voces, una familia
 
 Trazo para lo que se mide (Growth, Engine, Revenue; decks, informes, listas); Plastilina para lo que se crea
 (Brand/Globe). Voice está por decidir. Comparten la paleta, la esfera (reposo o respuesta), las grillas 24 y 48 y los
 remates redondos. En una pieza con las dos manda una (Plastilina grande, Trazo chico de apoyo), una sola esfera responde
 y nunca se mezclan en un mismo grupo.
 
-### 11.2 Receta (E4, en revisión)
+### 11.2 Receta (E4)
 
 | Parte | Valor |
 |---|---|
@@ -201,9 +217,9 @@ y nunca se mezclan en un mismo grupo.
 | Silueta | Masa plana y gorda; el contorno conserva la mano, nunca una esquina viva |
 | Giro | El objeto va inclinado, tomado en uso; nunca de frente y quieto |
 | Calados | Recortes redondos contra el fondo, con las curvas de la silueta |
-| Esfera | Radio 3,4 en la grilla de 48 (el mismo tamaño relativo que el Trazo), con 1,1 de aire calado (anillo de 4,5 en máscara) |
+| Esfera | Radio 3,4 en la grilla de 48 (casi el mismo tamaño relativo que el Trazo: 7,1 % contra 7,3 %), con 1,1 de aire calado (anillo de 4,5 en máscara) |
 | Reposo | Sin esfera y **sin** el anillo calado: el objeto queda entero, con sus calados propios |
-| Gesto | Trazo de 2,8 con remate redondo, **en tinta**, sólo en el protagonista y con la respuesta. Son 2 a 5 trazos cortos (2,5 a 5,6 de largo), fuera de la silueta, que dicen qué hace el objeto: rayos que irradian (bombillo), líneas de velocidad paralelas (rayo), marcas de vibración a los lados (teléfono). Hoy: bombillo, rayo y teléfono |
+| Gesto | Trazo de 2,8 con remate redondo, **en tinta**, sólo en el protagonista (en respuesta, o en reposo cuando la órbita sesgada pone la esfera). Son 2 a 5 trazos cortos (2,5 a 5,6 de largo), fuera de la silueta, que dicen qué hace el objeto: rayos que irradian (bombillo), líneas de velocidad paralelas (rayo), marcas de vibración a los lados (teléfono). Hoy: bombillo, rayo y teléfono |
 | Contenido de pantallas | Barras redondeadas de 2,6, en tinta |
 | Tamaños | Desde 32 px; más chico, se usa el Trazo. Si un calado se empasta a 32 px, se simplifica el objeto (se funden o se quitan los calados finos), nunca se agranda la esfera |
 | Color | Fondo `#001a33` en todas las líneas, tinta blanca (navy `#023c70` sobre papel `#f7f8f6`). El acento de la línea va **sólo en la esfera**: el oscuro sobre `#001a33` y el claro sobre papel (§4). Gesto y barras, en tinta |
@@ -237,28 +253,18 @@ decidir:** 22 % o 30 % (prueba de teléfono a 390 px en E4).
 6. **QA:** render a 160, 64 y 32 px sobre `#001a33` y sobre papel. Revisar que la esfera no choque con el objeto (se
    corrigieron cámara, rayo, laptop, pincel y cuentagotas), que los calados se lean a 32 px y que el set se lea como
    familia. Los chequeos están en `qa-checklist.md` §8b; todavía no hay comando: la medición es un script propio.
-7. **Registrar:** agregar el glifo a `plastilina-glyphs.json` y al maestro del canvas. Queda **en revisión** hasta que
-   el operador lo apruebe.
+7. **Registrar:** con la aprobación del operador, el glifo entra a `PLASTILINA_GLYPHS`
+   (`axis-design-system/packages/graphic-line/src/icons-plastilina-data.ts`) con su prueba, y se publica una versión.
 
 ### 11.4 Inventario (E3)
 
 Dieciocho glifos en `IconoE.dc.html`: rayo, paleta, pincel, cuentagotas, bombillo, tablet, laptop, escritorio,
 teléfono (primera tanda) y cámara, claqueta, micrófono, pluma, cursor, tijeras, megáfono, audífonos, corazón (segunda
-tanda, en revisión). La geometría canónica está en el repo, en
-[plastilina-glyphs.json](plastilina-glyphs.json) (exportada del maestro `IconoE.dc.html`). Cada glifo tiene `t`
-(transformación: normalización + potrace), `d` (trazado), `dot` (centro de la esfera), `over` (barras de contenido) y
-`gesto` (marcas de acción). Se pinta así, en `viewBox="0 0 48 48"`:
+tanda). La geometría canónica vive en AXIS: `PLASTILINA_GLYPHS` en
+`packages/graphic-line/src/icons-plastilina-data.ts` (`t` transformación, `d` trazado, `dot` esfera, `over` barras,
+`gesture` marcas de acción). `resolveIcon` la pinta con su máscara, su gesto y su esfera; no se copia a mano.
 
-```svg
-<mask id="m"><rect x="-8" y="-8" width="64" height="64" fill="#fff"/>
-  <circle cx="DOT_X" cy="DOT_Y" r="4.5" fill="#000"/></mask>   <!-- sólo en respuesta -->
-<g mask="url(#m)"><path d="D" transform="T" fill="TINTA"/></g>
-<path d="OVER" stroke="TINTA" stroke-width="2.6" stroke-linecap="round"/>   <!-- por cada barra -->
-<path d="GESTO" stroke="TINTA" stroke-width="2.8" stroke-linecap="round"/>  <!-- sólo protagonista -->
-<circle cx="DOT_X" cy="DOT_Y" r="3.4" fill="ACENTO"/>                       <!-- sólo en respuesta -->
-```
-
-### 11.5 No hacer (E5, en revisión)
+### 11.5 No hacer (E5)
 
 - Las dos voces en un mismo grupo o fila.
 - La órbita sesgada midiendo un dato: la sesgada es gesto; lo que mide va en la circular.
@@ -267,7 +273,7 @@ tanda, en revisión). La geometría canónica está en el repo, en
 - Volumen, brillo, sombras o degradés.
 - La órbita cruzando el texto: rodea sólo al objeto; la voz vive fuera, en el tercio inferior.
 
-### 11.6 Formatos (en revisión)
+### 11.6 Formatos
 
 | Formato | Canvas | Composición |
 |---|---|---|

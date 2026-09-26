@@ -245,6 +245,17 @@ Rules for agents:
   added to the token with its reason, never written in a script — see `motion-design-studio`.
 - Scope: Efeonce's own brand and its family. Never Greenhouse product UI and never client work.
 
+### Efeonce iconography (Trazo and Plastilina)
+
+Canonized by the operator on 2026-09-26 (D22). Values in `efeonceGraphicLine.icons` (`axis-tokens` `0.3.6`); geometry
+(12 stroke + 18 Plastilina glyphs) and executable rules in `@efeoncepro/axis-graphic-line/icons` (`0.4.0`):
+`resolveIcon`, `iconSvg`, `auditIconGroup`, `skewedOrbitHeroSvg`, `iconVoiceForLine`, `strokeSphereClearance`. Commands in
+AXIS: `pnpm icons:export`, `pnpm icons:check` (gate for a new glyph), `pnpm icons:vectorize` (Plastilina sheet → glyph
+JSON). Guide `docs/agent-composition/iconography.md`, ADR `ICONOGRAPHY_DECISION_V1.md`, Lab `/references/iconography/`
+and `/references/iconography.json`. State: branch `feat/iconography@b5a621f`, **not published**; no consumer pins it
+yet. Never draw a glyph by hand inside a piece; a new glyph needs `icons:check` and operator approval. Criterion and
+history: `efeonce-graphic-line` → `references/iconography.md`.
+
 ### AXIS Lab
 
 The Lab lives in `../axis-design-system/apps/lab`, not in Greenhouse. Its current runtime is Astro 7.1.6

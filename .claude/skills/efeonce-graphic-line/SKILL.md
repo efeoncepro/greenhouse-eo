@@ -33,7 +33,7 @@ propón agregarlo.
 | Una pieza con foto, o briefear una foto que llevará la órbita | [references/photography-convergence.md](references/photography-convergence.md) |
 | Animar (la órbita sola o las animaciones del logo) | [references/motion.md](references/motion.md) |
 | Dónde está cada doc, archivo, medio y repositorio | [references/sources-and-assets.md](references/sources-and-assets.md) |
-| **Íconos**: el estilo de trazo aprobado (reposo y respuesta), su construcción, la geometría canónica del set, cuándo responde la esfera y la iconografía plana en exploración | [references/iconography.md](references/iconography.md) |
+| **Íconos**: las dos voces canónicas (Trazo y Plastilina), la esfera como estado, cuándo responde, la órbita sesgada y cómo dar de alta un glifo nuevo. **Fuente de verdad en AXIS**: `efeonceGraphicLine.icons` + `@efeoncepro/axis-graphic-line/icons` (`resolveIcon`, `auditIconGroup`) y `pnpm icons:*` | [references/iconography.md](references/iconography.md) |
 | Revisar antes de entregar | [references/qa-checklist.md](references/qa-checklist.md) |
 | Qué decidió el operador, qué está pendiente, qué versiones hay | [references/ledger.md](references/ledger.md) |
 | Trampas que ya costaron tiempo | [references/lessons.md](references/lessons.md) |

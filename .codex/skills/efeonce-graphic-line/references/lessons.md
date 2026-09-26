@@ -41,7 +41,7 @@
 - **Documentar el método leyendo el maestro, no de memoria (íconos, 2026-09-26).** Síntoma: un agente sin contexto
   siguió la receta de Plastilina y pintó el gesto en el acento. Causa: la receta decía «acento en la esfera y el gesto»,
   pero el maestro `IconoE` lo pinta en tinta; y la geometría vivía sólo en el canvas. Regla: toda receta se contrasta
-  contra el código del maestro antes de publicarse, la geometría canónica vive en el repo (`plastilina-glyphs.json`), y
+  contra el código del maestro antes de publicarse, la geometría canónica vive en código versionado (hoy AXIS: `@efeoncepro/axis-graphic-line/icons`), y
   un método nuevo se prueba con un subagente sin contexto antes de darlo por documentado.
 
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)

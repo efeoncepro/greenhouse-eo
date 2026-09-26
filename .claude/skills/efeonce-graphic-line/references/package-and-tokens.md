@@ -848,3 +848,29 @@ de la página es `orbitSvg` con `circle` y `channel: 'social'`.
 | `src/config/efeonce-brand.ts` | `EFEONCE_SLOGAN_COLOR = '#848484'` | token `slogan.leadColor.onLight = '#6b6b6b'` (el gris viejo da 3,5:1) |
 | `scripts/creative/brand-motion/render-orbit-motion.mjs` | eslogan claro `#848484` | token claro `#6b6b6b` |
 | `sphereDividerSvg` | esfera 6 px, línea navy/halo al 38 % | token de la firma: esfera 9 px, color `surface-line`; pasar `spherePx: 9` en correo |
+
+## Iconografía (`efeonceGraphicLine.icons` y `@efeoncepro/axis-graphic-line/icons`)
+
+> AXIS `feat/iconography@b5a621f`, 2026-09-26: `axis-tokens` **0.3.6** y `axis-graphic-line` **0.4.0** en el código,
+> **sin publicar**. Guía: `axis-design-system/docs/agent-composition/iconography.md`.
+
+| Token | Qué guarda |
+| --- | --- |
+| `icons.background` / `paper` / `ink` | `#001a33` en todas las líneas (D21), papel `#f7f8f6`, tinta `onDark` blanca y `onLight` navy |
+| `icons.voiceByLine` | `stroke` para growth, engine y revenue-*; `plastilina` para brand; `null` para voice (pendiente) |
+| `icons.stroke` | grilla 24, margen 2, guías (círculo 10, cuadrado 18, rectángulo 20 × 16), trazo 1,5 / 1,75 a ≤ 20 px / tope 4 px sobre 64, esfera 1,75, aire 0,5, respuesta desde 20 px, tamaños de QA |
+| `icons.plastilina` | grilla 48, área 560, radio 22,5, esfera 3,4, calado 4,5, gesto 2,8 (2–5 trazos), barras 2,6, mínimo 32 px, QA 160/64/32, `generation` (modelo, rejilla, colores, parámetros de vectorización y potrace) |
+| `icons.skewedOrbit` | −16°, alto 1/3, calado 12 px, anillo 22 % de 2,4 px, arco 3,8 px de 118° a 52°, esfera 8,3 (anillo 12,5), base 1080, objeto ≥ 320 px, una por pieza |
+
+| Función (`/icons`) | Qué hace |
+| --- | --- |
+| `ICON_CATALOG` | los 30 glifos aprobados con voz, nombre, uso, modo y gesto |
+| `resolveIcon(req)` / `iconSvg(req)` | SVG con las reglas; errores `IconRequestError` (`unknown-glyph`, `plastilina-below-min`, `gesture-not-drawn`, `gesture-only-plastilina`, `unknown-line`); aviso `response-below-min` |
+| `auditIconGroup(items, { pieceHasSphere })` | issues `mixed-voices`, `more-than-one-response`, `response-with-piece-sphere`, `more-than-one-gesture`, `gesture-not-protagonist` |
+| `skewedOrbitHeroSvg(input)` | Plastilina protagonista dentro de su órbita sesgada (objeto en reposo) |
+| `iconVoiceForLine`, `iconColors`, `strokeWidthFor`, `strokeSphereClearance`, `samplePath` | voz, colores, grosor óptico, aire de la esfera, muestreo de trazados |
+
+Comandos (raíz de AXIS): `pnpm icons:export -- --out <dir>`, `pnpm icons:check -- --glyph <json> --out <dir>`,
+`pnpm icons:vectorize -- --sheet <png> --names a,b,… --out <dir>`. Página `/references/iconography/`, datos
+`/references/iconography.json`.
+

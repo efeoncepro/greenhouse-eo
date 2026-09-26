@@ -147,6 +147,9 @@ Detalle y geometría en [iconography.md](iconography.md).
 | [ ] | Tinta blanca sobre oscuro y navy sobre papel; el acento ≥ 3:1 contra su fondo; nunca `#36c8bf` sobre papel | Medir sobre los píxeles finales |
 | [ ] | Sin volumen, brillo, degradé ni patrón; nunca mezclado con otra familia de íconos (salvo Tabler en la firma, mientras dure) | Revisión |
 | [ ] | Fondo `#001a33` en todas las líneas (D21) | Revisión |
+| [ ] | Íconos pintados con `resolveIcon` de `@efeoncepro/axis-graphic-line/icons` (sin geometría ni colores a mano) y sin `warnings` sin reportar | Revisión del código o del SVG |
+| [ ] | El grupo pasa `auditIconGroup(items, { pieceHasSphere })` sin issues | Ejecutar la función |
+| [ ] | Glifo nuevo: `pnpm icons:check` en AXIS sale 0 y el operador aprobó el alta | Salida del comando + ledger |
 | [ ] | Plastilina: el glifo sale del maestro (`IconoE`), grilla 48, tamaño óptico por área, desde 32 px (más chico, Trazo) | Revisión contra `iconography.md` §11 |
 | [ ] | Plastilina: esfera de radio 3,4 con su anillo calado; gesto en tinta, sólo en el protagonista; una sola esfera responde por pieza | Revisión |
 | [ ] | Plastilina: los calados se leen a 32 px; si se empastan, se simplifica el objeto | Render a 32 px |

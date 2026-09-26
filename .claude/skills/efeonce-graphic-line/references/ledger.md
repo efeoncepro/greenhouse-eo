@@ -35,6 +35,7 @@
 | 2026-09-26 | **Firma de correo (D11):** cada persona la instala en Outlook desde el HTML generado; `people@efeoncepro.com` usa la firma de equipo del área **Talent**. |
 | 2026-09-26 | **«Te hacemos visible» (D15, regla reafirmada):** revisión legal antes de cualquier pauta. |
 | 2026-09-26 | **Plastilina (D19):** la iconografía plana complementaria es la dirección E, que se llama **Plastilina**: masa blanda de contorno a mano, proporciones con carácter, giro, calados redondos, la esfera como la acción y gesto en el protagonista. Es la voz del oficio creativo (Brand); el **Trazo** sigue siendo la voz de lo que se mide. Especificación en exploración: canvas «Íconos de La órbita», sección 2. |
+| 2026-09-26 | **Iconografía canonizada (D22):** el operador canonizó la iconografía completa («esto es lo que quiero»): Trazo (12 glifos) y Plastilina (18 glifos, receta, método, «no hacer», formatos) y las dos voces por línea (Trazo: Growth, Engine, Revenue; Plastilina: Brand; Voice por decidir). Vive en AXIS: tokens `efeonceGraphicLine.icons` (`axis-tokens` 0.3.6), `@efeoncepro/axis-graphic-line/icons` (0.4.0) con `resolveIcon`, `auditIconGroup`, `skewedOrbitHeroSvg` y los comandos `icons:export|check|vectorize`, página `/references/iconography/` y guía `docs/agent-composition/iconography.md` (rama `feat/iconography`, commit `b5a621f`, sin publicar). |
 | 2026-09-26 | **Fondo de la iconografía (D21):** el fondo Efeonce `#001a33` va en **todas** las líneas de servicio, no sólo en Growth («El fondo de Efeonce es el que quiero»). Hoy los tokens de AXIS dan `#091951` (productInk) a las líneas que no son Growth: el cambio de token queda pendiente de implementación en AXIS; hasta entonces, en piezas con íconos se usa `#001a33`. Todos los acentos pasan 3:1 contra ese fondo (Engine 3,8; Voice 4,7). |
 | 2026-09-26 | **Órbita sesgada (D20):** se queda como la firma de Plastilina. Una elipse inclinada alrededor del objeto protagonista, que pasa por detrás y por delante con un calado (el gesto del isotipo, la nave dentro de su órbita); el arco en el acento recorre el frente y termina en la esfera, fuera del objeto. Sólo alrededor del protagonista de Plastilina, una por pieza, nunca cruza el texto y **nunca mide**: todo lo que mide, enfoca o cierra la marca sigue siendo circular. |
 | 2026-09-26 | **Íconos planos, color (D18):** consistente dentro de cada línea de servicio (fondo, tinta y el acento de la línea) y cambia de acento según la línea; nada de colores por objeto ni tintes inventados. La primera exploración a mano quedó descartada. |
@@ -54,11 +55,9 @@
   proveedor y presupuesto los decide el operador. Hasta correrla, la órbita es un sistema consistente, **no** un activo
   distintivo demostrado.
 - **Firma de correo:** la URL de LinkedIn de la empresa.
-- **Íconos, pendientes de Plastilina (propuesta en el canvas, E4–E8 e `iconography.md` §11):** aprobar la receta y el
-  método; aprobar los nueve íconos nuevos (cámara, claqueta, micrófono, pluma, cursor, tijeras, megáfono, audífonos,
-  corazón) y los cuatro de trazo (embudo, CRM, automatización, informe); la opacidad del anillo de la órbita sesgada
-  (22 % o 30 %); los «no hacer»; los formatos story, LinkedIn y stickers; si Voice usa Trazo o Plastilina; y en piezas
-  con las dos voces, si la esfera va en la respuesta o en el ícono. **Detectado en la prueba a ciegas (2026-09-26):**
+- **Íconos, pendientes tras D22:** la opacidad del anillo de la órbita sesgada (22 % o 30 %); si Voice usa Trazo o
+  Plastilina; en piezas con las dos voces, si la esfera va en la respuesta o en el ícono; publicar los paquetes AXIS
+  (tag) y decidir el reemplazo de Tabler en las firmas. **Detectado en la prueba a ciegas (2026-09-26):**
   a 20 px el trazo sube a 1,75 y el aire de la esfera baja de 0,5 a ~0,375 (la regla D17 se midió con 1,5). Opciones:
   respuesta desde 24 px, o aceptar 0,375 de aire a 20 px. Hasta decidir, la regla sigue siendo «respuesta desde 20 px».
   Diferidos: el motion de los íconos (necesita los
@@ -70,10 +69,10 @@
 
 ### Pendiente de implementación (decidido, falta código o texto)
 
-- Íconos de trazo (D16–D17): tokens `efeonceGraphicLine.icons` y los SVG del set (reposo y respuesta) en
-  `@efeoncepro/axis-brand-assets`. Hasta entonces la geometría canónica vive en `iconography.md` §9.
-- Fondo de la iconografía (D21): en AXIS, el fondo oscuro de las líneas que no son Growth pasa de `#091951` a
-  `#001a33` en las piezas con íconos (o un token de fondo de iconografía, a decidir en AXIS).
+- Íconos (D16–D22): **hecho en código** en AXIS `feat/iconography@b5a621f` — tokens `efeonceGraphicLine.icons`
+  (incluye `background: '#001a33'` para todas las líneas, D21) y `@efeoncepro/axis-graphic-line/icons`. Falta: publicar
+  (`axis-tokens` 0.3.6, `axis-graphic-line` 0.4.0) con el próximo tag y el visto bueno del operador; hasta entonces,
+  ningún consumidor los fija. Los SVG del set se exportan con `pnpm icons:export` (no van a `axis-brand-assets`).
 
 - Task «foto:prompt y chequeos de la lente» (sin ID): P5 (chequeos de lecho y reservas para lente y foco;
   `lens-subject-inside-circle` medido), P9 (campo `reservas.lente`), P-6 (formato nativo 1200×627) y P-8 (el límite del
