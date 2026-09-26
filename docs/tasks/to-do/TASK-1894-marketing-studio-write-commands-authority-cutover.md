@@ -14,6 +14,7 @@
 - Decisiones del operador: escriben `efeonce_admin`, `efeonce_operations`, `efeonce_account` y `designer`; el brief es entidad estructurada propia (sección «Brief como entidad»).
 - TASK-1895 (UI consumidora) pide dos cosas a esta task: (1) una proyección de permisos en el reader de campaña — `writable`, `lockReason` (`open_mode` | `missing_capability` | `authority_onedrive`), transiciones permitidas por estado y `revision`; (2) un actor de prueba local y una campaña sandbox en staging para ejercitar escrituras antes del login (TASK-1898). Sin ellas, TASK-1895 se detiene en su Slice 1.
 - TASK-1896 (observabilidad) debe cerrar antes de que estas escrituras lleguen a producción.
+- (TASK-1890/1891) Cada command nace en el registro único `packages/contracts/src/operations.ts` con su tool de clase `write` o exclusión con razón; `pnpm mcp:manifest:generate` y el test de paridad handlers ↔ registro lo exigen. La API ya tiene 17 operaciones (`assets/{id}`, `assets/{id}/preview`, `media/{token}` y `tool-manifest` además de las de la fundación) y 3 migraciones (`1790362617534_organization-canonical.sql`). El scope `studio:write` se agrega a `API_SCOPES` (hoy sólo `studio:read`). Tras cada cambio del manifiesto, el gateway corre `pnpm studio:manifest:sync` o su guard bidireccional falla.
 
 ## Status
 
@@ -111,7 +112,7 @@ Reglas obligatorias:
 - `.claude/skills/efeonce-mcp-platform/SKILL.md` y la skill `mcp-craft` (nombres, descripciones y anotaciones de tools de escritura).
 - `.claude/skills/greenhouse-backend/` (command semantics, errores canónicos, idempotencia).
 - `AGENTS.md` y `CLAUDE.md` del repo `efeonce-marketing-studio` (comandos vigentes, gates `absolute-path-gate` y `domain-boundary-gate`).
-- `docs/tasks/to-do/TASK-1890-marketing-studio-agent-ready-contract.md` (manifiesto, bearer, semántica: esta task los extiende, no los redefine).
+- `docs/tasks/in-progress/TASK-1890-marketing-studio-agent-ready-contract.md` (manifiesto, bearer, semántica: esta task los extiende, no los redefine).
 
 ## Dependencies & Impact
 

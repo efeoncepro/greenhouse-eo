@@ -1,7 +1,7 @@
 # Efeonce Marketing Studio: plataforma API-first y consumo futuro desde Efeonce MCP
 
-Fecha: 2026-09-23 · Delta de nombre, runtime y persistencia: 2026-09-25.
-Estado: Accepted para el principio API-first y el consumo futuro por Efeonce MCP, por instrucción explícita del operador. **Delta 2026-09-25: Accepted el nombre, la ubicación del runtime y la persistencia** (ver § Delta 2026-09-25). Implementación, dominio/DNS y rollout siguen pendientes; no implica implementación ni federación activa.
+Fecha: 2026-09-23 · Deltas 2026-09-25: nombre, runtime y persistencia; agentes, autoridad y medios.
+Estado: Accepted para el principio API-first y el consumo por Efeonce MCP, por instrucción explícita del operador. **Delta 2026-09-25: Accepted el nombre, la ubicación del runtime y la persistencia** y **Accepted las decisiones de agentes, autoridad por persona y medios** (ver ambas secciones Delta 2026-09-25). Implementado y en vivo en `studio.efeonce.org` (TASK-1887, TASK-1890); el provider MCP está desplegado con flag OFF (TASK-1891). Estado técnico vigente: [arquitectura V1](marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md).
 
 ## Contexto y decisión
 
@@ -116,6 +116,38 @@ Login con Efeonce ID como relying party first-party (sin compartir cookies ni se
 ### Pendiente para la task de fundación
 
 Nombre final del repo, bases por ambiente, proyecto Vercel, dominio/DNS, bucket, modelo de dominio derivado del JSON del prototipo (campaña, concepto, asset, copy, anuncio, audiencia, flight, post) e import de CMP-001 a CMP-005 con corte explícito de autoridad frente a OneDrive.
+
+## Delta 2026-09-25 — Agentes, autoridad de la persona y medios
+
+Decisiones tomadas al implementar TASK-1890 y TASK-1891 y en el flujo maestro de EPIC-049. Detalle técnico en la
+[arquitectura V1](marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) §4, §4.1, §5 y §7.1.
+
+1. **Registro único de operaciones.** Toda operación de `/api/v1` se declara una sola vez en
+   `packages/contracts/src/operations.ts` con su exposición: `tool` para agentes o `exclusion` con razón. De ese
+   registro se derivan el OpenAPI y el manifiesto de tools `studio-tool-manifest.v1` (con `manifestHash`), y un test
+   compara el registro con los route handlers reales. La paridad UI ↔ API ↔ MCP queda **garantizada por
+   construcción**: una ruta sin entrada o una entrada sin ruta rompe el check; el gateway sincroniza el artefacto y un
+   guard bidireccional detecta drift. Esto concreta la sección «Futuro consumer Efeonce MCP»: el inventario ya no se
+   declara a mano.
+2. **Studio no conoce personas.** La autorización por persona ocurre en Greenhouse: el gateway canjea (RFC 8693) el
+   token de la persona en el endpoint de plataformas hermanas de Greenhouse con un cliente propio
+   (`efeonce-mcp-marketing-studio`), donde se ejecuta `can(persona, 'marketing_studio.campaign.read')`. Sólo si se
+   aprueba, el gateway llama a Studio con un **bearer de servicio** (`api_client`) acotado por organización. El token
+   canjeado nunca viaja a Studio y Studio vuelve a acotar por organización. La organización es siempre el id canónico
+   de Greenhouse (`org-…`); un `organizationId` del request intersecta, nunca amplía.
+3. **Imágenes por enlace firmado, sin base.** Las miniaturas se sirven por `/api/v1/media/{token}` con HMAC y
+   expiración semanal: el reader ya autorizó al armar la respuesta, así que servir la imagen no consulta Postgres. Se
+   decidió tras el incidente del mismo día (una consulta por miniatura agotaba el tope de conexiones del rol). Los
+   originales, en cambio, se descargarán con URLs firmadas de vida corta emitidas y auditadas por el dominio
+   (TASK-1893).
+4. **Paridad UI → API → MCP, incluidas las aprobaciones.** Todo lo que se puede hacer en la UI se puede hacer por la
+   API y por MCP. Las aprobaciones (brief, presupuesto, creatividad, autorización de medios) las **decide una
+   persona**; un agente las ejecuta con la identidad delegada de esa persona y su confirmación explícita (propuesta con
+   digest → confirmación). Un `api_client` de máquina sin persona no aprueba. Escrituras: TASK-1894; federación de
+   escrituras y aprobaciones con scopes propios: TASK-1899.
+5. **Login al final.** Studio opera en modo `open` (lectura sin login, `noindex`) hasta que existan las piezas
+   anteriores; el login con Efeonce ID (TASK-1898) es la última task del programa por decisión del operador. El modo
+   `efeonce_id` hoy falla cerrado.
 
 ## Futuro consumer Efeonce MCP
 

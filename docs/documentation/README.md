@@ -270,7 +270,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Marketing Studio
 
-- [Efeonce Marketing Studio — Gestión de campañas](marketing-studio/efeonce-marketing-studio.md) — qué muestra, reglas de estados y acceso abierto de solo lectura (TASK-1887).
+- [Efeonce Marketing Studio — Gestión de campañas](marketing-studio/efeonce-marketing-studio.md) — qué muestra cada pantalla, vista previa por formato, los tres estados, presupuestos sin sumar, acceso abierto de solo lectura, API y agentes por Efeonce MCP (12 herramientas de lectura, hoy apagadas) y lo que viene (TASK-1887 · TASK-1890 · TASK-1891).
 
 ## Documentacion tecnica (arquitectura)
 

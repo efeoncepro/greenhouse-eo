@@ -10,7 +10,7 @@ La diferencia con otras capas de documentacion:
 
 ## Indice por categoria
 
-- [Operar Efeonce Marketing Studio](marketing-studio/operar-marketing-studio.md) — revisar campañas, preview en feed, UTM, y actualizar datos desde OneDrive (import + renditions) en staging y producción.
+- [Operar Efeonce Marketing Studio](marketing-studio/operar-marketing-studio.md) — revisar campañas (preview por formato, UTM, estados y presupuestos), actualizar datos desde OneDrive (import), generar imágenes (renditions), dar y revocar acceso por API, leer Studio con un agente por MCP y resolver problemas comunes.
 
 ### Social y Creative Studio
 

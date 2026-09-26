@@ -6,6 +6,11 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-25
+
+- Las renditions ya no se sirven por `/api/v1/renditions/{id}` en la web: los readers devuelven enlaces firmados HMAC `/api/v1/media/{token}` (`STUDIO_MEDIA_URL_SECRET`, vida de una a dos semanas) que se sirven desde el bucket **sin consultar Postgres** (incidente `too many connections for role` del 2026-09-25, `packages/domain/src/media-url.ts`). `/renditions/{id}` queda como compatibilidad y exclusión del manifiesto. Esos enlaces NO son el modelo de la descarga de originales de esta task (URL firmada V4 de GCS, vida ≤ 15 min, emitida y auditada por el dominio): no reutilizar `media-url.ts` para originales. Si el worker cambia el nombre de objeto de las renditions, debe conservar el prefijo `renditions/`, que el endpoint exige.
+- TASK-1890 ya está en `in-progress` (code complete): el bearer existe y hoy `API_SCOPES = ['studio:read']`. `studio.asset.download` se declara en `packages/contracts/src/operations.ts` (tool o exclusión con razón) + `pnpm mcp:manifest:generate`; el test de paridad handlers ↔ registro falla si falta. El scope nuevo se agrega a `API_SCOPES` en `packages/domain/src/auth/api-client.ts`.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -80,7 +85,7 @@ Revisar y respetar:
 - `docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md` (§trabajo asíncrono en Cloud Run + Scheduler; adapters de proveedor en Studio)
 - `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md` (SA `marketing-studio-runtime@` / `-stg@`, WIF, buckets de media)
 - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` (capability nueva con grant)
-- `docs/tasks/to-do/TASK-1890-marketing-studio-agent-ready-contract.md` (manifiesto de tools y bearer de servicio)
+- `docs/tasks/in-progress/TASK-1890-marketing-studio-agent-ready-contract.md` (manifiesto de tools y bearer de servicio)
 
 Reglas obligatorias:
 

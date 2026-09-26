@@ -1,0 +1,123 @@
+# Efeonce Marketing Studio — architecture map
+
+Verified against code on 2026-09-25 (Studio `d3ab68e`, gateway `efeonce-mcp` `9b93d6a` / v1.8.0). Secret **names**
+only; never write values here.
+
+## Repositories
+
+| Repo | Role | Local path |
+|---|---|---|
+| `efeoncepro/efeonce-marketing-studio` | Studio code (private, `main` = production) | `~/Documents/efeonce-marketing-studio` |
+| `efeoncepro/efeonce-mcp` | Gateway `mcp.efeonce.org`; provider `marketing-studio` | `~/Documents/efeonce-mcp` |
+| `efeoncepro/greenhouse-eo` | All docs + capability + RFC 8693 exchange + MCP-served manual | `~/Documents/greenhouse-eo` |
+
+## Studio monorepo layout (pnpm workspace `apps/*`, `packages/*`)
+
+| Path | Responsibility |
+|---|---|
+| `apps/web` | Next.js 16.3 app (Vercel root). Pages + `/api/v1/**` in the same deployment |
+| `apps/web/src/app/page.tsx` | "Hoy" (attention) |
+| `apps/web/src/app/campaigns/page.tsx`, `campaigns/[campaignId]/page.tsx` | Campaign list; detail with tabs pieces / copies / ads / media / calendar |
+| `apps/web/src/app/{calendar,media,library}/page.tsx` | Cross-campaign calendar, media, library |
+| `apps/web/src/app/robots.ts` + `layout.tsx` `robots:{index:false}` | Disallow all + noindex (open mode) |
+| `apps/web/src/app/api/v1/**/route.ts` | 17 route handlers, one per registry operation (see `contracts.md`) |
+| `apps/web/src/server/api.ts` | `handle()` adapter: correlation id, actor, `organizationId` narrowing, error classification, `Cache-Control: no-store` |
+| `apps/web/src/server/runtime.ts` | One DB handle per function instance, Google auth client, `accessMode()`, `resolveRequestActor()` (bearer → api_client; no header → mode actor), `configureMediaUrls(STUDIO_MEDIA_URL_SECRET)` |
+| `apps/web/src/server/collect.ts` | Server-side collection helpers for pages |
+| `apps/web/src/server/operations-parity.test.ts` | Route handlers ↔ registry parity (both directions) |
+| `apps/web/src/components/*` | `Shell`, `Nav`, `CommandPalette` (⌘K), `PiecesWorkspace`, `MediaImage` (one retry, then «Vista previa no disponible»), `MediaPlanView`, `Pipeline`, `ThemeToggle`, `theme.ts` (cookie `studio-theme`) |
+| `apps/web/src/styles/theme.generated.css` | Generated from `@efeoncepro/axis-tokens@0.2.5` (`theme:generate` / `theme:check`) |
+| `apps/web/src/copy.ts` | Visible copy (neutral Spanish) |
+| `packages/contracts/src/operations.ts` | **Single operations registry** (tool or exclusion per operation) |
+| `packages/contracts/src/semantics.ts` | Canonical glossary reused by OpenAPI + tool descriptions |
+| `packages/contracts/src/dto.ts` | zod DTOs and filters (→ OpenAPI 3.1) |
+| `packages/contracts/src/openapi.ts` | OpenAPI builder, `API_VERSION = '1.1.0'` |
+| `packages/contracts/src/tool-manifest.ts` (+ `.test.ts`) | Derives `studio-tool-manifest.v1`, inlines `$ref`, sha256 `manifestHash`; tests: coverage, names, annotations, self-contained schemas, leak, determinism |
+| `packages/contracts/generated/tool-manifest.json` | Committed artifact (never hand-edited) |
+| `packages/contracts/src/errors.ts` | Closed `ERROR_CATALOG` |
+| `packages/domain/src/actor.ts` | `Actor` union (`anonymous_open`, `api_client`, `user`, `operator_cli`), `ORGANIZATION_ID`, visibility |
+| `packages/domain/src/auth/api-client.ts` | `mst_` tokens: generate, sha256, resolve, `requireScope`, `narrowToOrganization`, create/revoke with `audit_event` |
+| `packages/domain/src/media-url.ts` | HMAC-signed media links (week-rounded expiry), `verifyMediaToken` |
+| `packages/domain/src/readers/campaigns.ts` | Campaign, assets, asset detail + preview location, copies, ads (`buildUrlWithUtm`), plan, posts, `checkDatabase` |
+| `packages/domain/src/readers/overview.ts` | Attention, calendar range, search, rendition location |
+| `packages/domain/src/import/catalog.ts` | Catalog/registry/readback schemas, `buildImportPlan`, `applyImportPlan` (idempotent) |
+| `packages/domain/src/cursor.ts`, `errors.ts` | Opaque cursors; `StudioDomainError` |
+| `packages/database/src/connection.ts` | **Only place a Pool is created**; Cloud SQL connector or direct host; WIF via Vercel OIDC; password or Secret Manager ref; DATE parser `1082` → string |
+| `packages/database/src/schema.ts` | Kysely types |
+| `packages/database/src/storage.ts` | GCS JSON API: `readObject`, `uploadObjectIfAbsent` (`ifGenerationMatch=0`) |
+| `packages/database/migrations/*.sql` | `1758800000000_studio-foundation`, `1758830000000_asset-renditions`, `1790362617534_organization-canonical` (table `studio_pgmigrations`, `--check-order`) |
+| `scripts/import-catalog.ts` | `pnpm import:catalog` |
+| `scripts/media-renditions.ts` | `pnpm media:renditions` (sharp + ffmpeg) |
+| `scripts/api-client.ts` | `pnpm api-client:create|revoke` |
+| `scripts/tool-manifest.ts` | `pnpm mcp:manifest:generate|check` |
+| `scripts/seeds/campaign-registry.json` | Campaign registry for the import |
+| `scripts/gates/*.mjs` | `absolute-path-gate`, `domain-boundary-gate`, `dependency-catalog-gate` (+ `gates.test.mjs`) |
+
+## Database (schema `studio`)
+
+Tables: `campaign`, `concept`, `asset`, `asset_version`, `asset_rendition`, `copy_variant`, `audience`,
+`ad_configuration`, `media_flight`, `budget_line`, `scheduled_post`, `import_run`, `audit_event`, `api_client`.
+Imported data (both DBs): 5 campaigns CMP-001..005, 21 concepts, 54 pieces, 48 copies, 72 ads, 4 audiences,
+1 flight, 7 budget lines, 6 posts, 108 renditions; all `organization_id = org-2df565fb-98aa-42f7-b324-ea9a2209017f`.
+
+## Runtime resources
+
+| Resource | Value |
+|---|---|
+| Vercel project | `efeonce-marketing-studio` · `prj_dztLezZkYxAJikDuPSdT9QROEJRS` · team `efeonce-7670142f` · root `apps/web` · pin `.vercel/project.json` |
+| Domain | `studio.efeonce.org` (CNAME `studio` → `e33b47bdb5fb489f.vercel-dns-016.com.` in HostGator) |
+| Cloud SQL | shared `efeonce-group:us-east4:greenhouse-pg-dev`; DBs `marketing_studio` (prod), `marketing_studio_staging` (preview + development) |
+| PG roles | `marketing_studio_migrator` (owner, conn limit 5) · `marketing_studio_runtime` (NOLOGIN, DML) · `marketing_studio_app` (prod, conn limit **20**) · `marketing_studio_staging_app` (conn limit 10) |
+| Service accounts | `marketing-studio-runtime@efeonce-group.iam.gserviceaccount.com` (prod) · `marketing-studio-runtime-stg@…` (preview/dev) |
+| WIF | pool `vercel`, provider `greenhouse-eo`; subject `owner:efeonce-7670142f:project:efeonce-marketing-studio:environment:<env>` |
+| Buckets | `efeonce-marketing-studio-media`, `efeonce-marketing-studio-media-staging` (us-east4, private, uniform access) |
+| Local tunnel | `cloud-sql-proxy efeonce-group:us-east4:greenhouse-pg-dev --port 15433` (own port, not Greenhouse's) |
+
+## Environment variables (Studio)
+
+| Var | Meaning |
+|---|---|
+| `STUDIO_PG_INSTANCE_CONNECTION_NAME` / `STUDIO_PG_HOST` + `STUDIO_PG_PORT` | Connector (Vercel) or direct (local proxy) |
+| `STUDIO_PG_DATABASE`, `STUDIO_PG_USER` | Target DB and role |
+| `STUDIO_PG_PASSWORD` / `STUDIO_PG_PASSWORD_SECRET_REF` | Password or `projects/<p>/secrets/<s>/versions/<v>` |
+| `STUDIO_PG_MAX_CONNECTIONS` | Pool size (default 3 on Vercel, 5 elsewhere) |
+| `STUDIO_PG_SSL` | `true` to force SSL |
+| `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SERVICE_ACCOUNT_EMAIL` | WIF impersonation (else ADC) |
+| `STUDIO_ACCESS_MODE` | unset/`open` or `efeonce_id` (fails closed until TASK-1898) |
+| `STUDIO_PUBLIC_URL` | `https://studio.efeonce.org` (prod; OpenAPI `servers`) |
+| `STUDIO_MEDIA_URL_SECRET` | HMAC secret for media links (≥ 32 chars, sensitive, different per environment); absent ⇒ fallback `/renditions/{id}` |
+| `NODE_AUTH_TOKEN` | Read token for the AXIS package registry (only the `_authToken`) |
+
+## Secrets (Secret Manager, project `efeonce-group`)
+
+`marketing-studio-pg-app-password`, `marketing-studio-pg-staging-app-password`,
+`marketing-studio-pg-migrator-password`, `marketing-studio-mcp-gateway-token` (v1, raw `mst_` scalar, org Efeonce;
+`secretAccessor` for `efeonce-mcp-gateway@efeonce-group.iam.gserviceaccount.com`), `axis-packages-read-token`
+(a full `.npmrc`).
+
+## Gateway (`efeonce-mcp`)
+
+| Path | Responsibility |
+|---|---|
+| `src/providers/marketing-studio.ts` | Provider: per call, Google ID token → RFC 8693 exchange in Greenhouse → Studio call with service bearer; maps errors; image output (≤ 2 MB, webp/png/jpeg) |
+| `src/providers/marketing-studio-tool-manifest.generated.ts` | Synced manifest + `appliesTo` of the manual (generated) |
+| `src/providers/marketing-studio-tool-parity.ts` | Hash check at load + bidirectional parity finder |
+| `src/auth/tool-policy.ts` | Exact inventory from the manifest; `unsupported(BASE_READ_SCOPE, [capability], 'marketing_studio_native_policy_missing')` |
+| `src/surface.ts` | Declared surface built with every provider maximal (version gate) |
+| `src/config.ts` | `MARKETING_STUDIO_PROVIDER_ENABLED`, `_API_URL`, `_API_TOKEN`, `_TOKEN_EXCHANGE_URL`, `_GREENHOUSE_VERCEL_BYPASS_SECRET` |
+| `scripts/sync-marketing-studio-tool-manifest.mjs` | `pnpm studio:manifest:sync` (`STUDIO_REPO`, `GREENHOUSE_REPO`) |
+| `scripts/marketing-studio-canary.mjs` | `pnpm studio:canary` (uses `dist/`) |
+| `test/marketing-studio*.test.ts`, `test/authorized-tools.test.ts` | Provider, MCP wiring, policy coverage |
+| `.github/workflows/deploy.yml` | Mounts `marketing-studio-mcp-gateway-token` only when the flag is ON |
+
+Runtime: Cloud Run `efeonce-mcp-gateway` in `southamerica-west1`.
+
+## Greenhouse
+
+| Path / object | Responsibility |
+|---|---|
+| Capability `marketing_studio.campaign.read` (module `marketing_studio`) | Grants: `efeonce_admin`, `efeonce_account`, `efeonce_operations` |
+| `src/lib/sister-platforms/mcp-token-exchange.ts` | `resourceFamily: 'marketing_studio'`, `authorizeMarketingStudio` = `can(persona, …, 'read', 'tenant')` |
+| OAuth client `efeonce-mcp-marketing-studio` (migration applied) | Confidential exchange client; allowed via `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` |
+| `src/mcp/greenhouse/skill-manifest.ts` (`'marketing-studio': { toolPrefix: 'studio.' }`) | Served manual entry; Greenhouse validates the prefix, the gateway validates existence |
+| `docs/mcp/skills/marketing-studio/SKILL.md` | MCP-served manual (internal audience, English) |

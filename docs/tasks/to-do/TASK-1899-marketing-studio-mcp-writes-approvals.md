@@ -6,6 +6,13 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-25
+
+- El patrón de provider ya existe (TASK-1891, gateway 1.8.0 con flag OFF): `src/providers/marketing-studio.ts`, sync `pnpm studio:manifest:sync` → `marketing-studio-tool-manifest.generated.ts` con hash verificado al cargar, y guard `marketing-studio-tool-parity.ts`, que ya rechaza tools de escritura sin clase de scope. Extenderlo; no crear otro provider.
+- El gate de versión del gateway mide la superficie **construida** con providers máximos: `src/surface.ts` registra las tools de Studio desde `MARKETING_STUDIO_TOOL_MANIFEST.tools`. Si el carril de escritura registra tools por otra vía, declararlas en `src/surface.ts` y en el test de cobertura de políticas, o quedan fuera de la cuenta y del bump.
+- El campo `Branch` dice «auto-deploy de Cloud Run»: no es así. El deploy del gateway es dispatch manual de `deploy.yml` (exposure `public-oauth`), nunca automático al merge.
+- Precedente de lectura: la autoridad de la persona hoy se prueba con un canje RFC 8693 en **Greenhouse** (`/api/integrations/v1/sister-platforms/oauth/token`, cliente `efeonce-mcp-marketing-studio`) y Studio recibe sólo el bearer de servicio. El diseño de esta task (token delegado de `auth.efeonce.org` con audiencia Studio) es distinto a propósito, porque la escritura debe auditar a la persona en Studio; declarar en el ADR cómo conviven ambos carriles.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -25,7 +32,7 @@
 - Rank: `TBD`
 - Domain: `platform|identity`
 - Blocked by: `TASK-1891 (provider marketing-studio de lectura en el gateway), TASK-1894 (commands de escritura, tools de clase write en el manifiesto y capability marketing_studio.campaign.write). Depende además de que el emisor nativo auth.efeonce.org porte la identidad de la persona hasta Studio (Slices 2–3 de esta task). NO depende de TASK-1898: la identidad MCP llega desde Efeonce ID vía el gateway, no desde la sesión web de Studio.`
-- Branch: `Greenhouse develop (emisor nativo, scopes, capability, readers, docs) · efeonce-mcp main vía PR (auto-deploy de Cloud Run) · efeonce-marketing-studio main (actor delegado y guardas); sin worktrees`
+- Branch: `Greenhouse develop (emisor nativo, scopes, capability, readers, docs) · efeonce-mcp main vía PR (deploy por dispatch manual de deploy.yml, nunca automático al merge) · efeonce-marketing-studio main (actor delegado y guardas); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 

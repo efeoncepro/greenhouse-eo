@@ -22,9 +22,14 @@ say so and point them to the Studio web app.
    counts, or `studio.search` when you only have a word from its name, a piece title or a copy.
 3. **Open it with `studio.campaign.get`.** You get its states with the operator's notes, concepts and decisions.
 4. **Go to the specific part you need:**
-   - pieces → `studio.campaign.assets.list` (paginated), then `studio.asset.get` for one piece in full
-     (all versions, the ads that use it, the copies of its concept);
-   - to actually look at a piece → `studio.asset.preview` (a still image; for a video it is a frame);
+   - pieces → `studio.campaign.assets.list` (paginated, filterable by kind, aspect ratio and concept), then
+     `studio.asset.get` for one piece in full: all its versions with their previews, the ad configurations that
+     use it and the copies of its concept. Prefer `studio.asset.get` over the preview when the person asks about
+     data (format, version, which ads use it); look at the image only when they ask what it shows;
+   - to actually look at a piece → `studio.asset.preview`. It returns the image itself: by default the
+     thumbnail (longest side 640 px), which is enough to recognize and describe a piece. Ask for
+     `size: "preview"` (1600 px) only when you must read fine detail such as small text. For a video it is a
+     single frame, not the video;
    - copies → `studio.campaign.copies.list`;
    - ad configurations → `studio.campaign.ads.list`;
    - budget, flight and audiences → `studio.campaign.media_plan.get`;
@@ -85,9 +90,19 @@ you need is `null`, say that the information is not recorded.
 
 ## Organizations
 
-Each campaign belongs to one organization. Your connection only sees the organizations it is allowed to; the
-optional `organizationId` filter narrows the answer and never widens it. A campaign or piece you cannot see answers
-as not found — do not speculate about whether it exists.
+Each campaign belongs to one organization, identified by its canonical Greenhouse organization id. Your connection
+only sees the organizations it is allowed to. The optional `organizationId` filter narrows the answer to one of
+them and never widens it: asking for an organization your connection cannot see does not reveal anything, it
+simply answers as not found. Omit the filter unless the person asked about a specific client.
+
+## When a call fails
+
+| Answer | What it means | What to do |
+|---|---|---|
+| `authorization_denied` | The person you act for does not hold the Marketing Studio read permission. | Tell them; access is granted in Greenhouse, not by retrying. |
+| `not_found` | The campaign or piece does not exist **or** is not visible to this connection. The answer is the same on purpose. | Do not speculate about whether it exists. Check the id, or search with `studio.search`. |
+| `invalid_request` | A parameter did not match the tool input (an id, a date, a cursor). | Fix the input; never invent a cursor. |
+| `upstream_unavailable` | Studio could not answer right now. | Say the information is temporarily unavailable. Do not fill the gap from memory. |
 
 ## What never to claim
 

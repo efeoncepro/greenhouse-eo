@@ -504,6 +504,37 @@
       ]
     },
     {
+      "id": "efeonce-marketing-studio",
+      "triggers": [
+        "Marketing Studio",
+        "studio.efeonce.org",
+        "efeonce-marketing-studio",
+        "Campaign Manager",
+        "campañas CMP",
+        "CMP-001",
+        "plan de medios de campaña",
+        "studio.* MCP tools",
+        "api_client de Studio",
+        "token mst_",
+        "importar catálogo de campañas",
+        "renditions de piezas",
+        "EPIC-049",
+        "TASK-1890",
+        "TASK-1891"
+      ],
+      "skills": [
+        "efeonce-marketing-studio",
+        "efeonce-mcp-platform"
+      ],
+      "sources": [
+        "docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md",
+        "docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md",
+        "docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md",
+        "docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md",
+        "docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md"
+      ]
+    },
+    {
       "id": "efeonce-mcp-platform",
       "triggers": [
         "MCP",

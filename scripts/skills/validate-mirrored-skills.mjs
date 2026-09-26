@@ -128,6 +128,14 @@ const mirroredSkills = [
     claude: '.claude/skills/efeonce-insights',
   },
   {
+    // TASK-1890/1891 — Efeonce Marketing Studio (EPIC-049): los dos harness deben enseñar el mismo registro de
+    // operaciones, la misma autoridad de persona (canje RFC 8693) y las mismas reglas de rollout del provider.
+    id: 'efeonce-marketing-studio',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-marketing-studio',
+    claude: '.claude/skills/efeonce-marketing-studio',
+  },
+  {
     // La operación de imágenes comparte código, modelos y restricciones de formato. Una divergencia
     // entre agentes puede convertir una capacidad preview del proveedor en un fallback deprecated.
     id: 'greenhouse-ai-image-generator',

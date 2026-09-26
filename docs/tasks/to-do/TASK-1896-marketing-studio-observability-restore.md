@@ -6,6 +6,11 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-25
+
+- Incidente 2026-09-25: con una consulta Postgres por miniatura, una grilla de 20+ agotó el tope de 20 conexiones de `marketing_studio_app` (`too many connections for role`; 18 de 40 pedidos simultáneos = 500). Se corrigió con enlaces firmados sin base (`/api/v1/media/{token}`). Esta task debe sumar una señal/alerta de saturación de conexiones por rol de Studio (`marketing_studio_app` 20, `marketing_studio_staging_app` 10, `marketing_studio_migrator` 5) y el conteo de 5xx de `/api/v1/media` y `/api/v1/renditions`; es el modo de falla ya observado.
+- El bearer de TASK-1890 ya existe (code complete): `studio:health` se agrega a `API_SCOPES` en `packages/domain/src/auth/api-client.ts` (hoy sólo `studio:read`); el Slice 5 no espera. El health actual devuelve `status`, `database`, `accessMode` y `version` (503 si la base no responde); el profundo es aditivo.
+
 ## Status
 
 - Lifecycle: `to-do`

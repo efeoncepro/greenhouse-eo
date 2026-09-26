@@ -9,6 +9,7 @@
 ## Delta 2026-09-25
 
 - TASK-1899 comparte con esta task el reader de acceso a producto de Greenhouse y el verificador JWKS de Studio; quien llegue primero lo construye.
+- (TASK-1890) Las imágenes se sirven por enlaces firmados HMAC `/api/v1/media/{token}` que **no llevan identidad**: quien tenga el enlace lo abre sin sesión durante una a dos semanas. Al cerrar el modo `open`, decidir explícitamente si ese radio es aceptable, si se acorta la vida o si el endpoint exige sesión (sin volver a una consulta de base por imagen: incidente `too many connections for role`). Rotar `STUDIO_MEDIA_URL_SECRET` invalida los enlaces vigentes. El bearer `api_client` ya existe: inválido = 401 aunque el modo sea `open`.
 
 ## Status
 

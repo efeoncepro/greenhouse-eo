@@ -1,0 +1,7 @@
+interface:
+  display_name: "Efeonce Marketing Studio (living skill)"
+  short_description: "Operate and extend Efeonce Marketing Studio (studio.efeonce.org, EPIC-049): campaigns CMP-###, /api/v1 operations registry, studio.* MCP tools and their federation in efeonce-mcp, api_client bearers, import/renditions, rollout and rollback. Not Efeonce Creative Studio (Globe)."
+  default_prompt: "Use $efeonce-marketing-studio before touching the efeonce-marketing-studio repo, the studio.* MCP tools, the marketing-studio provider in efeonce-mcp, the marketing_studio.* capabilities or any EPIC-049 task (1887, 1890–1899). Read references/program-ledger.md first. At task closure you MUST update this skill per its Skill Maintenance Contract and mirror .claude/ to .codex/."
+
+policy:
+  allow_implicit_invocation: true
