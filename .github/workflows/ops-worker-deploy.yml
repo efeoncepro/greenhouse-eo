@@ -72,6 +72,10 @@ on:
     secrets:
       GCP_WORKLOAD_IDENTITY_PROVIDER:
         required: true
+      DATAFORSEO_API_LOGIN:
+        required: true
+      GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID:
+        required: true
 
 # TASK-848 Slice 3 (Opcion A) — concurrency fix canonica para production.
 #
