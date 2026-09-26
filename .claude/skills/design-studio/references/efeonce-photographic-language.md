@@ -141,6 +141,12 @@ pequeño— sube a **0,28**. **Con fuente visible en cuadro: lámpara baja, o no
 - **La órbita no es parte de la firma ni de la composición por defecto.** Si una pieza fotográfica lleva la línea
   gráfica, la órbita se declara a propósito y nunca cruza sujeto, reservas, lecho ni firma
   (`orbit-never-over-subject-or-reserves`); la composición sigue siendo la de este lenguaje.
+- **Pieza que combina foto y órbita** (lente, foco, una medida o una voz de la línea sobre la foto): carga además la
+  skill `efeonce-graphic-line` y su
+  [contrato de convergencia](../../efeonce-graphic-line/references/photography-convergence.md). Dice quién manda en cada
+  tipo de pieza, cómo se briefea la foto con los campos de `foto:prompt` (centro y diámetro visible de la lente por
+  formato), cómo la órbita lee la foto (`protect`, `signature.y` sobre el lecho), el QA conjunto y los pendientes del
+  operador. Este lenguaje no cambia: esa referencia sólo suma puentes.
 - En feed, **alternar lechos claros/oscuros y materiales**: la misma banda repetida se vuelve plantilla.
 
 Lechos probados: borde de mesa a ras del lente · respaldo de silla del espectador («tu lugar en la mesa») ·

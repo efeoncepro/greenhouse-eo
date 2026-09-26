@@ -75,6 +75,7 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
      letras escalonadas 28 ms; jerarquía: anillo héroe 78/80/84 % y logo final **50/56/66 %** del lado corto
      (16:9 / cuadrado / vertical), eslogan al 64 % del logo.
   7. **El sonido acompaña el golpe:** sintetizado, un golpe por impacto, cierre con fundido de 0,45 s.
+  Para el criterio de la línea, las piezas de motion y dónde viven los masters, cargar la skill viva [`efeonce-graphic-line`](../../efeonce-graphic-line/references/motion.md).
 
   **Los números viven en el token `efeonceGraphicLine.motion`** (`@efeoncepro/axis-tokens` ≥ 0.3.3; Greenhouse lo fija
   en `develop`). Se importan, nunca se escriben en un script ni se copian de la norma; si falta un valor, se agrega al

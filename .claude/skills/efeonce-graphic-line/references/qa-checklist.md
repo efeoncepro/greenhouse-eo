@@ -1,0 +1,144 @@
+# Lista de verificación antes de entregar una pieza con la órbita
+
+> Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26
+>
+> Cada ítem dice **cómo se verifica**. «Automático» = lo hace fallar un comando o una función; «Revisión» = hay que
+> mirar el cuadro real (el adapter de Greenhouse lo marca `manual`). Una pieza no se entrega con un ítem en rojo, y
+> pasar esta lista **no aprueba ni publica**: eso lo decide el operador.
+
+## 0. Antes de empezar
+
+- [ ] La pieza es **marca propia de Efeonce o su familia**. No es trabajo de un cliente ni interfaz de Greenhouse.
+- [ ] La órbita hace uno de sus trabajos (rodear, medir, navegar, enfocar). Si no, la pieza va sin órbita.
+- [ ] La intención valida sin códigos: `pnpm orbit:resolve -- --input intent.json` (AXIS) o
+      `pnpm creative:orbit:resolve -- --input intent.json` (Greenhouse); en código, `validateGraphicLineIntent(intent)`
+      devuelve `[]`.
+- [ ] Todo valor sale del manifest o de los tokens: en el archivo de la pieza no hay HEX, grosores, radios ni grados
+      escritos a mano (salvo el círculo de una pieza medida, que viene de `efeonceGraphicLine.pieces`).
+
+## 1. Geometría
+
+| ✓ | Ítem | Cómo se verifica |
+|---|---|---|
+| [ ] | Un solo elemento con anillo en la pieza (orbit, measure, progress, lens, spotlight, family-map o brand-close) | Automático: `single-ring-per-piece` |
+| [ ] | Alrededor de contenido, un solo anillo, sin órbitas interiores (interiores sólo en órbita vacía o mapa de familia) | Automático: `inner-orbits-never-around-content`; revisión: `grep -c 'inner-orbit'` del SVG = 0 en lente, deck y cierre |
+| [ ] | El anillo está centrado en su objeto, con aire 0,12 × su radio (0,1 en el foco) | Revisión (`ring-center-on-target-center`); los `circles` del resultado vs tu medición |
+| [ ] | La esfera está en la punta del arco, nunca suelta; la lente lleva anillo + arco + esfera | Revisión (`sphere-on-arc-end`); en el SVG existen `data-axis-part="arc"` y `"sphere"` dentro del grupo de la lente |
+| [ ] | Arco genérico de acento de 50°, centrado en su posición (arriba a la izquierda = 200°→250°) | Automático por el contrato; revisión si el adapter es propio |
+| [ ] | Una medida: la esfera en valor × 360° desde las 12 en sentido horario, estela ≤ 50° que no pasa antes de la partida, marca de partida visible; 0 % = esfera en la partida; 100 % = esfera de vuelta arriba | Automático: `measure-origin-is-top`, `trajectory.sweepDeg`; revisión: la marca `data-axis-part="origin"` (el adapter de Greenhouse no la pinta) |
+| [ ] | Dos datos en la misma pieza comparten radio y partida | Revisión |
+| [ ] | Progreso: portada con arco corto; cada sección suma su tramo; el cierre completa la vuelta **con** la esfera arriba | Automático: `closed`, `sphere` no nulo; prueba `4.2 · deck navigation` |
+| [ ] | Formatos fijos reproducen su pieza medida (lente, foco, deck, retrato) | Automático: prueba «every fixed-format recipe paints its canvas piece» del paquete; si no usas la receta, compara con `efeonceGraphicLine.pieces`/`portrait` |
+| [ ] | El foco lleva su anillo concéntrico con la luz y la lámpara arriba a la derecha | Automático en la receta; revisión si pintas a mano |
+| [ ] | Formatos chicos: esfera ≥ 4 px de diámetro en pantalla (1,5 mm impresa), arco nunca un pelo | `minSphereRadiusPx` / `minArcStrokePx` en `PaintBindings`; `portraitOrbitSvg` ya aplica pisos |
+| [ ] | Logo ≥ 96 px (25 mm impreso; recomendado ≥ 160 px); isotipo ≥ 24 px (8 mm); resguardo X respetado | Revisión |
+
+## 2. Texto y voz
+
+| ✓ | Ítem | Cómo se verifica |
+|---|---|---|
+| [ ] | **Ningún texto cruza el anillo** (cada caja entera adentro o entera afuera) | Automático: `textCrossesRing(box, circle)` para cada caja; `runAdapterChecks({ svg, circles, texts })`; las recetas lanzan «crosses the ring»; Greenhouse: `bindings.texts` → check `text-never-crosses-ring` |
+| [ ] | Ningún texto se sale del lienzo | Automático en recetas («does not fit the canvas») |
+| [ ] | Respuesta de 1 a 3 palabras, en Bricolage 760, ≥ 3× la pregunta | Automático: `voice-answer-too-long` (con `answerText`), recetas «more than 3 words»; revisión del tamaño |
+| [ ] | La respuesta cierra con la esfera (0,2 em, en el acento, hueco óptico de su última letra) escrita con `answerHtml` o con los valores del manifest | Revisión; nunca un punto tipeado ni una esfera dibujada a mano |
+| [ ] | La esfera es parte del texto: guías, marcas de corte, selección y cursores miden palabras + esfera | Automático: `runAdapterChecks({ answers: [{ group: answerGroupBox(...), tools }] })` → `answer-period-part-of-text`; `toolContainsAnswer` |
+| [ ] | Sin esfera en la pregunta, eyebrow, etiquetas, cuerpo ni eslogan; una esfera final por pieza | Revisión |
+| [ ] | Pregunta real con su anillo chico delante; un solo par pregunta/respuesta | Automático: `single-voice-pair-per-piece`; revisión del copy |
+| [ ] | Una medida imprime su valor (`trajectory.valueLabel`, p. ej. «60 %») **y su fuente** como texto | Revisión (`measure-shows-value-and-source`) |
+| [ ] | El arco de acento no queda junto a un número | Revisión (`accent-arc-never-reads-as-data`) |
+| [ ] | Eslogan sólo en cierres, desde el archivo oficial, sin esfera, sin mayúsculas, sin traducir; palabra final = la de la línea | Automático: `slogan-closes-only`; revisión de pesos (*Empower* 800 itálica, *your* 800, palabra 900 itálica) |
+| [ ] | El foco va con su prueba («Y lo medimos.» o el mecanismo) y sin competidores reales en la penumbra | Automático en `spotlightRecipe` (sin `proof` lanza); revisión |
+| [ ] | Español neutro con tuteo, sin voseo; la respuesta no promete lo que no se prueba | Revisión |
+
+## 3. Color y contraste
+
+| ✓ | Ítem | Umbral / valor medido | Cómo se verifica |
+|---|---|---|---|
+| [ ] | Un acento por pieza, el de la línea de servicio; nunca dos acentos en una órbita | — | `manifest.palette.accent`; revisión |
+| [ ] | El teal claro `#36c8bf` sólo sobre oscuro | 8,51:1 sobre `#001a33`; 2,06:1 sobre blanco (prohibido) | Revisión |
+| [ ] | Sobre claro, Growth usa `#0e8c82` **sólo en gráfico** | 3,87:1 sobre papel (no alcanza 4,5:1 para texto chico) | Revisión |
+| [ ] | Todo texto ≥ 4,5:1 contra su fondo real | blanco/`#001a33` 17,56 · navy/papel 10,47 · «Empower your» `#6b6b6b`/papel 5,00 · `#e2e2e2`/`#001a33` 13,56 | Medir sobre los píxeles finales |
+| [ ] | La esfera y el arco son gráfico (no se les exige 4,5:1), pero deben leerse | Engine oscuro 3,60 y Voice claro 3,53 son los más bajos | Revisión en el formato más chico |
+| [ ] | Estado por forma (anillo/esfera) en el acento de la línea, nunca rojo/amarillo/verde | — | Automático: `state` resuelve `trafficLightColorsAllowed false`; revisión |
+| [ ] | No usar el gris viejo del eslogan `#848484` sobre claro | 3,51:1 sobre papel (falla) | Revisión (ojo: `src/config/efeonce-brand.ts` y el render de motion aún lo usan) |
+| [ ] | Sobre producción física, color con prueba del proveedor (valores son sRGB) | — | Revisión |
+
+## 4. Firma
+
+| ✓ | Ítem | Cómo se verifica |
+|---|---|---|
+| [ ] | Una sola firma, y es de **Efeonce** (cualquier línea) | Automático: `single-signature-per-piece`; `assetId` empieza con `efeonce-logo-` o es la burbuja |
+| [ ] | Logo centrado abajo: ancho 20 % del lado corto (25 % en 16:9), margen inferior 9 % del lado corto | Automático: check `signature-centered` (Greenhouse: ≤ 1 px del centro); el pintor lo ubica solo |
+| [ ] | Logo negativo sobre oscuro, positivo sobre claro; nunca con velo encima | `assetId` del manifest; revisión |
+| [ ] | La burbuja URL firma **sólo** si el logo de Efeonce ya está en la imagen (`brandInScene: true` / `marcaEnEscena: true` / `brand_in_scene: true`) | Automático: contrato; `pnpm foto:cta:gate` regla `firma-burbuja`; `creative:layout` exige burbuja centrada |
+| [ ] | Nunca burbuja y logo juntos ni burbuja a un costado; en social nunca `url-bubble` suelto | Automático: `signature-already-decides-url-bubble`, `social-signs-with-signature-not-url-bubble`, gate `firma-burbuja` |
+| [ ] | Contraste de la firma ≥ 4,5:1 sobre los píxeles finales (1 % peor de su tinta sólida) | Automático: Greenhouse `renderGraphicLine` → `signature.contrast` + check `signature-min-contrast`; gate `firma-contraste`. La burbuja fusionada sólo pasa sobre lechos muy oscuros (a opacidad 1: 6,17:1 sobre `#001a33` en el píxel máximo; del orden de 4,4–4,9:1 en el 1 % peor; 1,6–3,1:1 sobre fondos medios o claros) |
+| [ ] | La firma no cae sobre el sujeto ni sobre un canto de luz | Automático: Greenhouse `orbit-never-over-subject-or-reserves` (firma sobre `subject`/`reserve`); gate `firma-sobre-sujeto`, `firma-canto` |
+| [ ] | Burbuja en web con fusión de luminosidad (`url-bubble-source`); en correo, PDF o visores sin fusión, la horneada (`url-bubble-baked-light` / `-dark`) | `assetId` y `blend` del manifest |
+| [ ] | La URL nunca como texto | Automático en Greenhouse: un texto con `efeoncepro.com` falla `url-as-bubble-never-text` |
+
+## 5. Interacción con la foto (lenguaje fotográfico)
+
+| ✓ | Ítem | Cómo se verifica |
+|---|---|---|
+| [ ] | La órbita se declaró a propósito; la foto conserva su composición | Revisión |
+| [ ] | El anillo no cruza el sujeto ni las reservas de texto (ni el lecho ni la firma) | Automático: paquete `runAdapterChecks({ protectedBoxes })` / `ringCrossesBox`; Greenhouse `bindings.protect` (`subject`, `reserve`, `bed`) y `creative:layout` agrega el campo de copy como reserva |
+| [ ] | Lente: el sujeto cabe dentro del círculo (55 % del lado corto, 15 % de aire) y la esfera no toca la cara | Revisión (`lens-subject-inside-circle` queda `manual`) |
+| [ ] | Foto producida con el pipeline fotográfico (`pnpm foto:prompt`, `pnpm foto:generar`, `pnpm foto:validar`), sin emblema legible, sin banco de imágenes, sin velo navy encima | Revisión y el QA del pipeline fotográfico |
+| [ ] | Si la foto la pinta un rasterizador (sharp), el tratamiento de afuera de la lente usa filtros SVG (como el adapter de Greenhouse), no `filter` CSS | Revisión del PNG final |
+
+## 6. Movimiento
+
+| ✓ | Ítem | Cómo se verifica |
+|---|---|---|
+| [ ] | La órbita sola: anillo 0–500 ms, arco 400–1400, la esfera asienta 1400–1700, halo 1200–2000, firma 1900–2500 | `ORBIT_MOTION_TIMELINE` (prueba «motion follows the brand close») |
+| [ ] | Con `prefers-reduced-motion: reduce` se ve el cuadro final | Revisión en el navegador con movimiento reducido; `ORBIT_MOTION_CSS` lo incluye |
+| [ ] | El foco y su órbita se mueven como un solo conjunto | Revisión (`spotlight-light` y `spotlight-orbit`) |
+| [ ] | Animaciones del logo: valores leídos de `efeonceGraphicLine.motion`, curvas por papel (llega `emphasized`, transforma `standard`, sale `emphasizedAccelerate`), un protagonista a la vez, golpe al llegar, resorte ≤ 1,5 %, desenfoque sólo en tramos rápidos | Prueba de `tokens.test.ts` («the orbit motion language»); storyboard `--storyboard` comparado con el anterior |
+| [ ] | Jerarquía del cuadro: anillo héroe 78/80/84 % del lado corto; logo final 50/56/66 %; eslogan al 64 % del logo | Revisión del cuadro final |
+| [ ] | Sonido: 48 kHz, 24 bit, pico −1 dBFS, fundido 450 ms | Revisión del WAV |
+| [ ] | Nada generado con un modelo de video; el cuadro final es el logo oficial | Revisión |
+| [ ] | `brand-close` no se usa en impresos | Automático: `brand-close-needs-motion-channel` |
+
+## 7. Archivos y entrega
+
+| ✓ | Ítem | Cómo se verifica |
+|---|---|---|
+| [ ] | Logos, isotipos y burbujas salen de `@efeoncepro/axis-brand-assets` por su id; ninguna copia editada | `findBrandAsset(id)`; en Greenhouse `src/config/efeonce-brand-assets.test.ts` |
+| [ ] | Si el medio no ejecuta JS (correo, Office, diseño), usar las órbitas estáticas `orbit-<línea>-<superficie>-<canal>` | `findOrbitAsset(line, surface, channel)` |
+| [ ] | Correo: tablas y estilos en línea, 460 px, imágenes PNG (retrato a 2×, íconos a 3×) desde URL pública, regla de sección como borde de celda, franja de partners como una imagen, sin frase de cierre, se ve bien sin fuentes web y a 390 px | `AXIS_EMAIL_SIGNATURE_BUILDER_CHECKS` + `validateEmailSignatureIntent` sin códigos |
+| [ ] | Partners en la firma sólo con estado `active`, `accepted` o `declared` | Automático: `endorsement-partner-claim-not-allowed` |
+| [ ] | Ids SVG: piezas idénticas en una misma página llevan cada una su `idPrefix` | Revisión: ningún `id="…"` repetido en la página; prueba del paquete «different pieces never share an id» |
+| [ ] | Masters pesados (ProRes, WebM/HEVC con alfa, 4K) en el bucket público de AXIS u OneDrive, nunca en git | Revisión |
+| [ ] | Merch y oficina: la foto IA es maqueta de dirección; la producción sale del vector con prueba física | Revisión |
+| [ ] | Greenhouse: `qa.json` con `status: 'pass'` y los `manual` revisados a ojo | `pnpm creative:orbit:render` (sale 1 si falla) |
+
+## 8. Accesibilidad
+
+| ✓ | Ítem | Cómo se verifica |
+|---|---|---|
+| [ ] | El SVG de la órbita es decorativo: `aria-hidden="true"` y `focusable="false"`, sin `<title>`, `<desc>` ni `tabindex` | Automático: `isDecorativeSvg(svg)`; `runAdapterChecks` → `decorative-svg`. Ojo: el adapter de Greenhouse sólo pone `aria-hidden` (le falta `focusable="false"`) |
+| [ ] | Las palabras de la pieza viven en nodos de texto propios, no dentro del SVG | Revisión |
+| [ ] | La foto de una lente o foco lleva `alt` descriptivo | Automático: `photo-alt-required` |
+| [ ] | La firma tiene su texto alternativo (`alt` del manifest: «Efeonce» o «efeoncepro.com») | `manifest.elements[signature].alt` |
+| [ ] | El significado nunca depende sólo del color: el estado lleva su etiqueta en texto; la medida, su valor y fuente en texto | Automático: `state-label-required`; revisión de la medida |
+| [ ] | La burbuja URL enlaza con el texto `efeoncepro.com` donde hay enlace (web, correo) | `linkText` del manifest; revisión |
+| [ ] | Firma de correo: foto con `alt` = nombre, contacto como texto vivo, íconos decorativos, franja de partners con `alt` que nombra a cada uno | `accessibility` del contrato `efeonce.email-signature`; `endorsement.alt` |
+| [ ] | Movimiento reducido respetado | ver §6 |
+
+## 9. Comandos y pruebas de referencia
+
+| Qué | Dónde | Comando |
+|---|---|---|
+| Validar y resolver un intent | AXIS | `pnpm orbit:resolve -- --input intent.json` |
+| Validar y resolver un intent | Greenhouse | `pnpm creative:orbit:resolve -- --input intent.json` |
+| Pintar, firmar, medir contraste y correr chequeos | Greenhouse | `pnpm creative:orbit:render -- --intent i.json --bindings b.json --out-dir out/` |
+| Pruebas del compilador y del adapter | Greenhouse | `pnpm creative:layout:test` |
+| Campaña con capa `graphic_line` | Greenhouse | `pnpm creative:layout -- --contract c.yaml --mode check` |
+| Piezas con CTA y firma | Greenhouse | `pnpm foto:componer:cta plan.json` + `pnpm foto:cta:gate plan.json` |
+| Firma de correo | AXIS | `pnpm signature:resolve -- --input intent.json` |
+| Pruebas de tokens, contratos, paquete y archivos (trayectoria, piezas medidas, ids, órbitas byte a byte, contrastes) | AXIS | `pnpm build && pnpm test` |
+| e2e del Lab (página de la línea, ids duplicados, foco concéntrico) | AXIS | `pnpm --dir apps/lab test:e2e` |
+| Regenerar órbitas estáticas tras cambiar tokens | AXIS | `pnpm orbit:assets` |
+| Video de la órbita sola | AXIS | `pnpm orbit:video -- --format 16x9 --surface dark --out /tmp/orbita` |
+| Storyboard de una animación del logo | Greenhouse | `node scripts/creative/brand-motion/render-orbit-motion.mjs --out <dir> --anim reveal --storyboard` |

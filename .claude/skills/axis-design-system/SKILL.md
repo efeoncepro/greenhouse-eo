@@ -155,6 +155,8 @@ creative approval.
 
 ### Efeonce graphic line «La órbita» (tokens, stable contract, orbit package)
 
+> **Owning skill:** [`efeonce-graphic-line`](../efeonce-graphic-line/SKILL.md) (living) holds the full API map (tokens, contracts, `axis-graphic-line` recipes), composition, applications and motion. Load it before composing; this section keeps only the AXIS release and consumption boundary.
+
 Efeonce's own-brand graphic line (orbit: thin ring, arc with sphere, halo; lens and spotlight) became canonical on
 2026-09-25. Greenhouse is the control plane: the [ADR](../../../docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 and the [manual](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) live there; the

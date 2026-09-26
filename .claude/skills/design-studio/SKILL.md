@@ -94,6 +94,8 @@ Para fotografía propia Efeonce, cargar
 la composición sin forzar utilería y comparar los píxeles finales con esas referencias. Haber leído la guía o
 reutilizado un prompt no lo cumple.
 
+> **Skill dueña:** [`efeonce-graphic-line`](../efeonce-graphic-line/SKILL.md) — criterio, paquete, aplicaciones, motion y convergencia con el lenguaje fotográfico (`references/photography-convergence.md`).
+
 Para piezas de la marca propia Efeonce o su familia (Globe, Wave, Reach) con la **línea gráfica «La órbita»**
 (canónica 2026-09-25: anillo, arco con esfera, halo; lente y foco), cargar
 [`../efeonce-brand-studio/references/graphic-line-orbit.md`](../efeonce-brand-studio/references/graphic-line-orbit.md)

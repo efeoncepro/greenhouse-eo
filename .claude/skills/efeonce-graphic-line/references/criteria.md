@@ -1,0 +1,525 @@
+# El criterio de la órbita: cuándo, cómo, con qué y por qué
+
+> Verificado contra: axis-design-system@e26bd85 y greenhouse-eo@7cb24df17 — 2026-09-26.
+> Fuentes: láminas del canvas reconstruidas en AXIS (`apps/lab/src/data/graphic-line-elements.json`, citadas como
+> «lámina X.Y»); página del Lab `apps/lab/src/pages/references/graphic-line.astro` («Lab X.Y»); manual
+> `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` («manual §»); ADR
+> `docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md`; norma
+> `EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`; `docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md` («Tres
+> voces»); `docs/context/05_voz-tono-estilo.md` y `09_marca-agencia.md`; decisiones del operador del 2026-09-26.
+> Lo que no está en una fuente va marcado **«inferido»**: tómalo como lectura razonada, no como regla.
+
+Este archivo no repite números: esos viven en los tokens `efeonceGraphicLine` y los explica
+[package-and-tokens.md](package-and-tokens.md). Tampoco repite recetas: están en [composition.md](composition.md). Aquí
+está **el juicio**: qué significa cada elemento, cuándo corresponde y cuándo no, con qué convive y qué delata que no se
+entendió la línea. Decide como el director de arte que la diseñó: cada elemento tiene un trabajo y, fuera de él, sobra
+(lámina 5.6).
+
+---
+
+## 1. La idea en una frase y el porqué
+
+**Una esfera que recorre su órbita** (manual §0; Lab 0.1). La esfera del isotipo —la nave con su anillo y su esfera— es
+el activo. Recorre su órbita: el avance se ve, el oficio está a la vista y la conversación cierra con una respuesta
+(lámina 0.2, «1 · Idea»).
+
+Por qué esta forma y no otra:
+
+- **No inventa un símbolo: abre el que ya existía.** La «o» de efeonce es una órbita; adentro va una nave con tres
+  ventanas («tres puntos… lo que todavía se está pensando») y arriba, cortando el anillo, una sola esfera: el punto que
+  cierra. «Tres puntos que se vuelven uno» (Lab 0.1, manifiesto). Por eso el isotipo nunca lleva otra órbita: ya trae la
+  suya (lámina 5.5).
+- **La gramática es la marca.** «El anillo pregunta. La esfera responde. El arco avanza, solo si un dato lo prueba. El
+  halo ilumina. Lo justo» (Lab 0.1). Anillo = lo abierto, lo libre, lo que todavía se pregunta; esfera = lo decidido,
+  lo ocupado, lo que cierra (manual §0, idea 2). Esa gramática rige la voz, la oficina, las credenciales y los objetos.
+- **Atención, no decoración.** «La órbita no decora. Trabaja. Rodea lo que importa. Mide lo que avanza. Enfoca donde se
+  decide» (Lab 0.1). Tres usos, un sistema (ADR, decisión 2): **rodea**, **mide**, **enfoca**.
+- **El oficio a la vista.** La línea es la forma visible del Why de Efeonce: «No te entregamos crecimiento: lo
+  construimos contigo. A la vista. Vuelta a vuelta» (Lab 0.1; `09_marca-agencia.md` §Golden Circle). El avance se
+  muestra, no se promete; por eso el arco sólo existe con un dato (creencia contraria #3 de `05`: las vanity metrics son
+  un acuerdo de silencio).
+- **Línea fina y luz, nunca un disco plano** (manual §0, idea 3). Un trazo tenue, un arco, una esfera en la punta; el
+  halo es luz. Nada de discos rellenos, brillos, reflejos ni esferas de vidrio (lámina 0.2, «10 · No hacer»). La línea
+  retiró del canvas el punto gigante, la esfera tipográfica y el objeto 3D (lámina 6.1): se leían como puntuación, no
+  como forma, y no medían ni enfocaban (ADR, alternativas descartadas).
+
+**Estado honesto:** hasta correr la prueba sin logo (600 personas, lámina 6.2), la línea es un sistema consistente,
+**no** un activo distintivo demostrado. No la vendas como *brand equity*.
+
+---
+
+## 2. Cuándo sí usar la órbita y cuándo no
+
+### 2.1 La prueba de decisión
+
+Antes de dibujar un anillo, contesta en orden. Un «no» corta el camino: la pieza va sin órbita y la fotografía y la
+tipografía bastan.
+
+1. **¿Es de Efeonce o de su familia?** La línea es de la marca propia. No va en trabajo de clientes ni en la interfaz de
+   Greenhouse (ADR, decisión 6; lámina 3.2: «La línea gráfica es de Efeonce: no se aplica a la interfaz de
+   Greenhouse»).
+2. **¿Hay algo concreto que rodear, medir o enfocar?** Una palabra, una lente, un objeto, una foto de persona (rodea);
+   un dato real con fuente o la navegación de un deck (mide); el lugar donde está la decisión o el cliente (enfoca).
+   Además, cuatro trabajos derivados que el canvas validó: el **estado** (libre / ocupado), el **mapa de familia**, el
+   **cierre de marca** y la **firma de correo**. Si no hay nada de esto, no hay órbita.
+3. **¿La pieza ya tiene su composición?** La órbita **no sustituye** la composición ni las formas del lenguaje
+   fotográfico; se usa en casos específicos, **se declara a propósito** y nunca va por defecto (operador, 2026-09-26;
+   manual §1.3). Una pieza fotográfica sin órbita es lo normal, no una pieza incompleta.
+4. **¿Cabe con su aire, sin cruzar nada?** Nunca sobre el sujeto de la foto, las reservas de texto, el lecho ni la
+   firma (chequeo `orbit-never-over-subject-or-reserves`); ningún texto la cruza (lámina 5.1). Si para meterla hay que
+   empujar el texto o tapar la cara, la respuesta es no.
+5. **¿Ya hay otra órbita, lente o foco en la pieza?** Una sola por pieza, por muro, por vidrio (lámina 4.1, 4.3 2/3;
+   ADR 5). Si ya está, no se suma otra.
+
+### 2.2 Contención
+
+- **Una de cada cosa por pieza:** una órbita o lente, una esfera, un acento, una sola luz de foco, una pregunta y una
+  respuesta (láminas 0.2, 1.4, 2.1, 3.1). Del oficio a la vista, **máximo dos herramientas** además de la esfera
+  (lámina 2.3).
+- **Lo que se lee no se decora.** La señalética de servicio (cocina, baños, salida) va en Poppins, **sin esfera ni
+  órbita**: «se lee, no decora» (lámina 4.3 1/3).
+- **Lo que viaja no se anuncia.** El envío a clientes va sobrio por fuera (logo chico y un anillo): «lo que viaja por
+  correo no anuncia lo que lleva» (lámina 4.7 1/3).
+- **La segunda hoja se calla.** La hoja membretada lleva la órbita en la esquina; la continuación, no: logo chico y
+  número de página (lámina 4.7 2/3). En el deck, el contenido en papel baja la órbita a 80 px en la esquina, sólo como
+  indicador (lámina 4.2).
+- **Nada de patrones.** Una lente o una órbita por muro o vidrio (lámina 4.3 2/3); repetir la esfera como patrón es un
+  «no» explícito (lámina 1.1).
+
+### 2.3 Frecuencia en una campaña (inferido)
+
+Las fuentes fijan la regla por pieza, no por serie. De ellas se sigue: en una campaña, la órbita aparece en las piezas
+donde tiene trabajo (una lente sobre una foto con un punto de interés claro, un dato real, un cierre) y **no** en todas.
+La lente «depende de que la foto tenga un punto de interés claro; con una foto débil, se nota el truco» (lámina 1.3):
+repetirla en cada pieza de la serie convierte una forma que enfoca en una plantilla. El eslogan sigue la misma lógica:
+«no va en cada post: ahí la respuesta con esfera ya cierra» (lámina 2.2). *(inferido a partir de 1.3, 2.2, 4.3 y la
+regla «nunca por defecto»)*
+
+---
+
+## 3. La gramática, elemento por elemento
+
+Anatomía (lámina 1.2; Lab 1.2): **anillo** (el recorrido) · **arco** (lo avanzado) · **esfera** en la punta (dónde
+vamos) · **halo** (el foco sobre lo importante) · **órbitas interiores** (máximo dos) · **satélites** (canales o
+productos). La órbita es **circular**; nunca un óvalo (operador, 2026-09-26): el óvalo sólo aparece como la órbita 3D
+del isotipo dentro de la animación del logo, cuando el anillo de la línea se inclina hasta volverse la órbita de la nave
+(Lab 4.4.2, reveal).
+
+### 3.1 Anillo — el recorrido
+
+- **Significa:** el camino, lo abierto, lo libre, la pregunta. En la oficina, sala libre; en un evento, el asistente;
+  en el llavero, la argolla (láminas 4.3 2/3, 4.6 3/3, 4.7 2/3).
+- **Cuándo:** siempre que haya órbita; es su base. Solo, con la pregunta: en cuadernos, pizarras y formularios la
+  pregunta queda sola con su anillo y «responde quien lo usa» (lámina 2.1, «Abierta»).
+- **Cómo:** fino y tenue (1 px por cada 794 px de ancho, opacidad baja; el 22 % sólo con órbitas interiores o
+  satélites, manual §1.3). En oscuro es luz de halo; en papel, navy (resolver del contrato). Con algo adentro, el anillo
+  guarda aire alrededor del objeto (`ringAirRatio`).
+- **Combina con:** el arco y la esfera; una palabra, una lente, una foto de persona, un ícono de área (firma de equipo).
+- **Nunca:** grueso, muchos, detrás del texto (lámina 5.6), alrededor del logo (lámina 5.4), ovalado, cortado por texto.
+- **Error típico:** usar el anillo como marco decorativo de cualquier cosa. Un anillo sin nada que recorrer ni rodear es
+  ruido.
+
+### 3.2 Arco — lo avanzado
+
+- **Significa:** cuánto se avanzó. Es el único elemento que afirma algo medible, por eso es el más controlado.
+- **Cuatro papeles, cuatro reglas** (Lab 1.2.1, «Trayectoria»; token `trajectory`):
+
+  | Papel | Qué dice | Regla de criterio |
+  |---|---|---|
+  | **Dato** (`measure`) | un valor real, con su fuente | el dato es la **posición de la esfera**, no un arco que se llena (ver 3.4) |
+  | **Avance** (`progress`) | en qué sección va un deck o informe | la portada con arco corto; cada sección suma su tramo; el cierre completa la órbita con la esfera arriba |
+  | **Acento** (`orbit`) | movimiento, no un dato | corto, arriba a la izquierda; **nunca junto a un número** |
+  | **Satélites** | el mapa de portafolio | largo, en degradé, **sin esfera**; los satélites van sobre él |
+
+- **Cómo:** punta redonda, sentido horario; el acento va centrado en su posición (arriba a la izquierda) y lleva la
+  esfera en la punta (manual §1.3).
+- **Nunca:** un arco de avance sin dato real («Arco de avance sin dato real», lámina 0.2); un arco decorativo al lado de
+  una cifra, porque se lee como dato; un arco inventado para «dar sensación de progreso» (lámina 5.6: «decorativo o
+  inventado» es el no).
+- **Error típico:** tratar el arco como barra de carga. Ver 3.4: la órbita **recorre**, no se llena.
+
+### 3.3 Esfera — el punto que cierra
+
+La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso se cuida más que ningún otro elemento.
+
+| Papel | Dónde | Fuente |
+|---|---|---|
+| **Punto final** de la respuesta o del titular display de marca propia | titulares, voz, «Hacer.» en la taza blanca, nombre en la firma y el carnet | lámina 1.1, 4.4, 4.5, 4.6 3/3 |
+| **Punta del arco:** dónde vamos | toda órbita con acento, dato o avance | lámina 1.2 |
+| **Estado ocupado / decidido** | salas, plan de Insights, credencial de staff | láminas 4.3 2/3, 4.6 3/3, 7.2 |
+| **Lámpara del foco** | «Te hacemos visible» | lámina 1.4 |
+| **Planeta** del isotipo | la animación reveal: la esfera se vuelve el planeta | Lab 4.4.2; norma, regla 6 |
+| **Divisor acostado:** la línea que termina en la esfera | firma de correo, pie de la hoja membretada | lámina 4.5, 4.7 2/3; manual §10.2 |
+| **Botón, sello, cuenta, imán** | lapicero, gorra y polo; sello del sobre («cerrado = respondido»); llavero; imán de pizarra que avanza | láminas 4.6, 4.7, 5.1 |
+| **Último punto de una figura** | la mirada termina donde está la respuesta | lámina 7.1 |
+
+- **Cuándo:** donde algo se decidió, se respondió o está ocupado. Si nada se decidió, no hay esfera.
+- **Cómo, como punto final:** es **parte del texto**, no un adorno al lado (operador, 2026-09-26; manual §1.2). Se apoya
+  en la línea base, sin superar la altura de x, a 0,20 em de la palabra dominante, con el espaciado óptico de la última
+  letra (lámina 1.1). Bajo el mínimo legible **se omite**, no se agranda. Sola, con dos diámetros de aire. El texto de
+  la respuesta no lleva un «.» tipeado además de la esfera: la esfera **es** el punto (compositor, modo
+  `graphicVoice`: «sin punto final»).
+- **Toda herramienta la incluye:** la guía derecha, las marcas de corte, la selección colaborativa y sus cursores, y el
+  aire hasta la órbita miden la palabra **con** su esfera (lámina 2.3; contrato `answer-period-part-of-text`). **Un
+  titular sin su esfera está incompleto; una selección que termina en la última letra está mal.**
+- **Nunca la llevan:** la pregunta (lleva el anillo delante), el eyebrow, las etiquetas, el cuerpo de texto ni el
+  eslogan (manual §1.2, §5). Tampoco el logo: «la esfera es de la palabra, no del logo» (lámina 5.4).
+- **Nunca:** como viñeta; dos por pieza; otro color que el acento de la línea; con volumen, brillo o sombra; deformada o
+  agrandada; repetida como patrón; reemplazando letras («Hac●r»); suelta, fuera de la punta del arco; el teal usado en
+  textos o fondos (láminas 1.1, 5.6).
+- **La excepción que confirma la regla:** en la firma de correo conviven el punto del nombre (la única voz de titular)
+  y la línea que termina en la esfera; lo que **no** se repite es la línea con esfera. La regla de la zona de partners
+  va sin esfera, porque «si la esfera se repite, deja de ser identidad» (manual §10.2).
+
+### 3.4 Estela — el rastro del recorrido
+
+- **Significa:** que la esfera viene de algún lado. Es lo que distingue **recorrer** de **llenar**.
+- **Cómo:** en un dato, la esfera parte a las 12 (una marca en el anillo señala la partida), viaja en sentido horario
+  valor × 360° y lleva detrás una estela corta del acento, **nunca antes de la partida**. 60 % es siempre la esfera a
+  216°, en cualquier pieza. 0 %: la esfera en la partida, sin estela. 100 %: la esfera vuelve a las 12 tras la vuelta
+  completa (Lab 1.2.1; token `trajectory.measure`).
+- **Criterio del operador (2026-09-26):** la órbita que **recorre** es la que mejor funciona. Un dato no es un loader:
+  es la posición de la esfera con una estela corta. **Al 100 % la esfera se queda**: perderla es un error, porque el
+  dato completo sigue siendo una decisión, no un anillo vacío.
+- **Con qué:** la cifra entera impresa («60 %») y su fuente. Dos datos en una pieza: mismo radio, misma partida.
+- **Nunca:** un arco que crece desde el origen hasta volverse anillo; una estela más larga que lo recorrido; un dato sin
+  fuente (la esfera no se mueve sin dato real).
+
+### 3.5 Halo — la luz
+
+- **Significa:** el foco sobre lo importante. «El halo ilumina. Lo justo» (Lab 0.1).
+- **Cuándo:** en la forma «con halo»: portadas y cierres sobre oscuro (Lab 1.2, formas). En movimiento sube al final,
+  cuando la esfera ya asentó (4.4).
+- **Cómo:** degradé radial suave que se apaga hacia el borde y toma el color del acento de la línea (manual §2). Pleno
+  sobre oscuro; sobre papel se reduce (el manual lo fija en navy al 6 %, frente al 13 % del oscuro, §2) o se omite: en
+  impresión, los degradados bajo 5 % hacen bandas en offset (lámina 5.1). *Nota de deriva: el resolver 0.3.0 pinta el
+  halo con las mismas paradas en ambas superficies; si una pieza en papel lo necesita, compáralo con la lámina antes de
+  entregar.*
+- **Nunca en:** la forma **plana** (sobre fotos, en papel y en tamaños chicos, Lab 1.2), el dato y el avance (el
+  resolver no les pone halo), la cerámica, el vinilo y la pizarra (lámina 5.1). Nunca brillo, reflejo ni esfera de
+  vidrio.
+- **Error típico:** usar el halo como «glow» para dar volumen. El halo no es un efecto: es la luz del foco, y sólo
+  existe donde hay algo que iluminar.
+
+### 3.6 Órbitas interiores
+
+- **Significan:** profundidad de un sistema vacío: la anatomía, el portafolio.
+- **Cuándo:** **sólo en una órbita vacía que las necesita** (el diagrama de anatomía, el mapa de portafolio). Máximo
+  dos (manual §1.3; Lab 1.2).
+- **Regla del operador (2026-09-26):** **un solo anillo alrededor del contenido.** Cuando la órbita rodea algo —una
+  palabra, el logo, un objeto, una lente, un texto—, queda el anillo que recorre, con su arco y su esfera, y el objeto
+  adentro. El cierre de marca, el deck y la lente llevan un solo anillo. El contrato lo rechaza
+  (`inner-orbits-never-around-content`).
+- **Error típico:** órbitas interiores alrededor de una palabra «para darle más marca». Compiten con la palabra y
+  convierten la órbita en diana.
+
+### 3.7 Satélites
+
+- **Significan:** lo que orbita a Efeonce: los productos y Greenhouse en el portafolio, o los canales donde medimos.
+- **Cómo:** discos pequeños con el ícono del canal o del producto sobre la órbita exterior, con el arco largo en degradé
+  y **sin esfera** (lámina 1.2). En el mapa de portafolio, el arco y el centro son de Efeonce; Globe, Wave, Reach y
+  Greenhouse orbitan con su isotipo: **son contexto, no firma** (lámina 3.2; Lab 3.2).
+- **Nunca:** logos de terceros presentados como alianzas. «Los satélites de canales muestran dónde medimos, no con quién
+  nos asociamos» (lámina 0.2, «No hacer»). Las alianzas reales sólo se declaran en la zona de partners de la firma de
+  correo, con el registro de partnerships (manual §10.2).
+
+### 3.8 Lente — la foto como sujeto de atención
+
+- **Significa:** mirar de cerca, decidir. «La esfera muestra lo que importa: donde está la decisión» (lámina 1.3).
+- **Por qué funciona:** contraste de tratamiento, monocromo contra color: el ojo va directo al círculo. Tiene
+  significado (enfocar, decidir, mirar de cerca) y encaja con el oficio a la vista. Funciona con cualquier foto del
+  lenguaje fotográfico, sin producir imágenes nuevas (lámina 1.3, «Por qué tiene punch»).
+- **Cuándo:** una foto con un punto de interés claro que quepa en el círculo con aire. Si la foto es débil, se nota el
+  truco: cambia la foto o no uses lente (lámina 1.3, «Riesgo»).
+- **Cómo:** la foto entera en navy apagado; dentro del círculo, a todo color y ampliada; alrededor, **la misma órbita
+  de siempre**: anillo con su aire, arco corto y la esfera en su punta, arriba a la izquierda, **lejos de la cara**
+  (manual §1.5; lámina 4.2).
+- **Con qué:** la voz (pregunta y respuesta) al costado del anillo, nunca cruzándolo; la firma de Efeonce abajo.
+- **Nunca:** un disco suelto en vez de la órbita (se corrigió el 2026-09-26: la esfera suelta era seis veces más grande
+  y sin arco); velo navy sobre fotos de banco; emblema legible en la ropa («el logo lo pone la pieza, no la ropa»,
+  lámina 5.2); la órbita sobre la cara o el gesto (lámina 4.1).
+
+### 3.9 Foco — «Te hacemos visible»
+
+- **Significa:** la lente leída como foco de escenario. La esfera, en la punta de su arco, es la lámpara; el círculo, su
+  luz; lo que queda dentro, el cliente. Es la promesa más clara del marketing dicha con la forma de la marca (lámina
+  1.4).
+- **Siempre con su prueba:** «Te hacemos visible.» va con «Y lo medimos.» y con el mecanismo al lado (visibilidad en
+  buscadores y respuestas de IA, alcance medido). Es anti-humo: calza sobre todo con Engine (Wave) y Voice (Reach)
+  (lámina 1.4, «Cuidar»; `05`: «promesas sin mecanismo» es un no).
+- **Cómo:** penumbra navy y **una sola luz** por pieza; el foco **siempre lleva su anillo**, concéntrico con la luz,
+  con la lámpara arriba a la derecha (operador, 2026-09-26). En espacio, un foco real proyecta el círculo en recepción,
+  stand o escenario. En movimiento, el foco barre la escena y se posa sobre el cliente.
+- **Lo propio:** el foco de escenario es un recurso conocido; lo que lo hace Efeonce es la esfera en la punta del arco,
+  la penumbra navy y una sola luz (lámina 1.4).
+- **Nunca:** un foco sin anillo; dos luces; nombres reales de competidores en el campo en penumbra; pauta sin la
+  revisión legal del claim (pendiente, manual §1.4).
+
+### 3.10 Marca de estado
+
+- **Significa:** la gramática de la voz llevada a la arquitectura: «El estado se dice con la forma» (lámina 4.3 2/3).
+  Anillo = libre o abierto; esfera = ocupado o decidido.
+- **Cómo:** acompaña al texto del estado, **no lo reemplaza** (lámina 7.2); el contrato exige etiqueta. Si hay arco, mide
+  tiempo real (estado de sala); sin dato, no hay arco.
+- **Extensiones validadas:** credencial de evento, el rol por la forma (anillo = asistente, órbita = speaker, esfera =
+  staff; lámina 4.6 3/3); cabina de llamadas «anillo libre, esfera en el aire»; sobre «cerrado = respondido».
+- **Nunca:** como semáforo de colores (verde/rojo); sin etiqueta.
+
+### 3.11 Cierre de marca
+
+- **Significa:** la pieza termina; aparece quién la firma.
+- **Cuándo:** final de video, última lámina, contraportada, pantalla de recepción en loop, sin sonido (láminas 4.1, 4.3
+  1/3, 7.2). No va en impresos (contrato).
+- **Cómo:** el anillo aparece, el arco crece, la esfera llega y asienta, sube el halo y, al final, la firma (lámina 4.1;
+  ver 9). En la contraportada y la última lámina, la órbita se completa con la esfera arriba y **el logo va fuera de la
+  órbita** (lámina 7.2). La animación de la órbita **sin logo** sirve para piezas que ya tienen su firma o su texto (Lab
+  4.4.2).
+
+### 3.12 Mapa de familia
+
+- **Significa:** Efeonce en el centro; todo lo demás orbita (lámina 3.2).
+- **Cómo:** la única órbita que admite órbitas interiores y satélites a la vez; el arco y el centro son de Efeonce; los
+  productos y Greenhouse van como satélites con su isotipo. Es el único lugar de la línea donde aparece la marca de
+  Greenhouse (G verde), y como contexto.
+
+### 3.13 Todas las formas del canvas son legítimas
+
+Decisión del operador (2026-09-26): todas las formas que el canvas exploró siguen disponibles y no se descartan
+(Lab 1.2, formas):
+
+| Forma | Para qué |
+|---|---|
+| **Con halo** | portadas y cierres sobre oscuro |
+| **Plana**, sin halo | sobre fotos, en papel y en tamaños chicos |
+| **Con órbitas interiores** | sólo una órbita vacía: anatomía, portafolio |
+| **Con satélites** | arco largo en degradé, sin esfera; el portafolio o los canales |
+| **Un dato** | la esfera recorre hasta el valor con su estela corta |
+| **Lente**, **foco**, **marca de estado**, **cierre de marca**, **mapa de familia** | sus trabajos de 3.8 a 3.12 |
+
+Elegir una forma es elegir un trabajo. Si ninguna calza con el trabajo de la pieza, la respuesta no es inventar una
+sexta: es no usar órbita.
+
+---
+
+## 4. Las voces: pregunta y respuesta
+
+**«Siempre hay dos voces»** (lámina 2.1). La pregunta abre con el anillo: es la voz de quien trabaja con nosotros. La
+respuesta cierra con la esfera: la decisión. La evidencia, cuando existe, va debajo.
+
+| Voz | Forma | Criterio |
+|---|---|---|
+| **Pregunta** | Poppins Light 300, con el anillo pequeño delante | una pregunta **real** del cliente, no retórica; una pregunta abierta **es** el anillo |
+| **Respuesta** | Bricolage 760, de una a tres palabras, cierra con la esfera | es el dominante: mide **al menos 3×** la pregunta; la respuesta está decidida, por eso lleva la esfera |
+| **Evidencia** | Poppins, una palabra en negrita | dato, fuente o mecanismo; puede faltar |
+
+**Por qué este par expresa la marca.** La personalidad de Efeonce es «obsesión por la prueba» y «honestidad incómoda»
+(`05`); el formato pregunta-respuesta obliga a contestar lo que el cliente de verdad pregunta, con una respuesta corta
+que se hace cargo, y deja lugar a la prueba debajo. «Pregunta chica, respuesta grande» (lámina 5.6) pone el peso en la
+decisión, no en la duda. Es la misma gramática del anillo y la esfera, dicha en palabras.
+
+**Tono** (lámina 2.1, «Cuidar»; `05`):
+
+- Preguntas que el cliente hace de verdad; nunca chistes ni frases motivacionales.
+- Tuteo neutro; sin voseo ni modismos.
+- Nunca dos preguntas ni dos respuestas seguidas.
+- La respuesta no promete resultados que no podemos probar. Toda afirmación de impacto se puede rastrear a un dato o un
+  caso (`05`, *non-negotiable*).
+
+**Sí / no** (lámina 5.6): pregunta chica, respuesta grande de una a tres palabras · **no:** pregunta grande, respuesta
+larga y chica. Bricolage para decir, Poppins para explicar · **no:** Bricolage en párrafos ni monoespaciada.
+
+**Banco de pares (candidatos, sin aprobar;** lámina 2.1**):** ¿Lo medimos? Siempre · ¿Quién decide? Tú, con evidencia ·
+¿Y si después lo hago yo? Esa es la idea · ¿Y el reporte del viernes? Ya lo viste · ¿Cuánto rindió? Te mostramos todo ·
+¿Cómo va? En vivo · ¿Dónde quedó lo aprendido? En tu historial · ¿Otra agencia más? No. Un sistema · ¿Y si lo probamos?
+Hoy. Úsalos como calibración del tono, no como copy aprobado. Verbos de la línea: Hacer, Medir, Crear, Aparecer,
+Llegar, Siempre, Adelante, Gracias, Aquí (manual §4).
+
+**Cómo se cruza con las tres voces + acción de publicidad.** El compositor de anuncios materializa esta voz con
+`graphicVoice: "efeonce"`: pregunta en Poppins Light con su anillo, respuesta en Bricolage 760 de hasta tres palabras
+con la esfera al final de la última línea, la regla de ≥3× y la selección que incluye la esfera (compositor de CTA,
+§«Voz de la línea gráfica sobre fotografía», opt-in del 2026-09-26). La correspondencia con el concepto de Tres voces es
+**inferida**: la pregunta ocupa el papel de la **entrada**, la respuesta el del **titular dominante** (la misma regla
+de 3× que mide `ratioDominanteEntrada`) y la evidencia el del **remate**. El grupo de acción (beneficio, CTA,
+descriptor) sigue igual, en Poppins y sin esfera; una caja de énfasis sobre la respuesta no pide otra sobre el CTA. Un
+solo cursor local se vincula al CTA; el colaborador sólo cuando un argumento lo justifica (Tres voces, «Cursores con
+significado»).
+
+---
+
+## 5. El eslogan y las líneas de servicio
+
+**«El acento cierra, también en el eslogan»** (lámina 2.2). La palabra final del eslogan hace el mismo papel que la
+esfera: el acento va al cierre.
+
+- **Dos formas oficiales:** el bloque con el logo (centrado debajo) y el eslogan solo, con la palabra final destacada.
+  Se usa desde el archivo oficial; no se rearma (lámina 2.2).
+- **Sólo cierra:** final de video, última lámina, contratapa, firma de correo, recepción, merch. **No va en cada post**:
+  ahí la respuesta con esfera ya cierra (lámina 2.2).
+- **La palabra es de la línea de servicio, no del producto** (operador, 2026-09-26): Growth (Efeonce; su producto
+  Greenhouse, la plataforma que controla todo), Brand (servicios creativos; Globe), Engine (web, infraestructura, SEO y
+  medición; Wave), Voice (medios y distribución; Reach), **Revenue** (RevOps y CRM). La palabra toma el acento de la
+  línea. *Deriva: el manual §7 aún dice «palabra por decidir» para RevOps; los tokens (`lines[].sloganWord`) y el ledger
+  ya fijan Revenue.*
+- **RevOps tiene dos acentos:** no tiene plataforma propia y toma el acento de la plataforma en que se opera, HubSpot o
+  Salesforce, **en tonos propios de Efeonce, nunca los colores de la marca del partner** (tokens `lines`; Lab 3.1).
+- **«Empower your» en gris medido:** sobre claro, un gris que alcanza 5,0:1 (el `#848484` anterior daba 3,5:1 y no
+  pasaba; operador, 2026-09-26); sobre oscuro, gris claro (token `slogan.leadColor`). *`05_voz-tono-estilo.md` todavía
+  nombra el gris `#848484`: manda el token.*
+- **Pesos del SSOT** (`src/config/efeonce-brand.ts`): *Empower* ExtraBold itálica, *your* ExtraBold, palabra final Black
+  itálica. No cambian por línea.
+- **Nunca:** en mayúsculas, con esfera, traducido, con otros pesos o cursivas (láminas 2.2, 5.6; token `slogan`).
+- **Pendiente:** si «Growth» va en blanco (como el canvas) o en el acento de la línea en el cierre del deck.
+
+---
+
+## 6. La firma y la burbuja URL
+
+**El razonamiento:** Efeonce es la única marca que se construye activamente (`09`, arquitectura de marca). Por eso
+**Efeonce firma todo**, de cualquier línea de servicio; los productos (Globe, Wave, Reach, Greenhouse) aparecen como
+**contexto** —su nombre, su interfaz en un mockup, su isotipo pequeño dentro de su propia superficie— y nunca firman
+(operador, 2026-09-26; manual §7). *Esto reemplaza lo que decía la lámina 3.1 («la firma: el logo propio de cada
+producto, con «by efeonce»»): el lockup «by efeonce» vive sólo en la superficie del propio producto.*
+
+- **La firma de una pieza gráfica es el logo de Efeonce centrado, abajo al centro.** Cierra la composición al pie
+  (manual §8.1; Tres voces, «la firma debe cerrar la composición al pie»).
+- **La burbuja URL sólo reemplaza al logo si el logo ya aparece en la imagen** (un mockup, un objeto, merch). Entonces
+  va centrada, sola, con fusión de luminosidad. **Nunca las dos**, y nunca la burbuja a un costado ni junto al logo:
+  repetiría la marca (manual §8.5).
+- **Por qué casi nunca alcanza:** la fusión fija la luminosidad del gris, así que la burbuja sólo llega a 4,5:1 sobre un
+  lecho muy oscuro. Si no pasa, se cambia el lecho o la foto, no la burbuja (manual §8.5). Esa es la razón de que sea la
+  excepción y no la regla.
+- **Nunca la URL como texto.** Donde aparezca `efeoncepro.com` va la burbuja oficial (ADR, regla dura). En pies (deck,
+  informe, papelería, stand, firma de correo) la burbuja sigue como pie, fusionada u horneada: eso no es firma.
+- **El logo es un archivo cerrado:** se cambia dónde y sobre qué se pone, nunca el logo. «Si ninguna versión funciona,
+  cambia el fondo o la foto, no el logo» (lámina 5.4). Logo e isotipo nunca en la misma vista (lámina 3.3).
+- **Logo dentro de un titular:** sí, con reglas, sólo en display grande, alineado a la línea base y la altura de x, una
+  vez por pieza y sin repetirlo como firma en la misma vista (manual §8.2).
+- **Objetos:** frente, la palabra con su punto; dorso, el logo solo, chico y abajo, sin órbita ni texto. La órbita
+  alrededor del logo quedó descartada (lámina 4.4). **Sí:** frente palabra · dorso logo solo. **No:** logo y órbita
+  juntos al frente (lámina 5.6).
+- *Tensión sin resolver:* la lámina 4.3 (1/3) pone el logo completo «una sola vez, en el muro de recepción, dentro de su
+  órbita», y la tarjeta de presentación lleva atrás «la órbita con el logo y el eslogan» (4.6 3/3), mientras la 5.4 dice
+  «órbita alrededor del logo: nunca». En piezas nuevas sigue la 5.4 (logo fuera de la órbita, como en la contraportada
+  de 7.2) y consulta al operador antes de repetir el caso del muro.
+- **Firma de correo:** la línea que termina en la esfera aparece **una vez** y separa a la persona de la marca; la regla
+  que abre la zona de partners va **sin esfera**. Sin esa regla, «Partner oficial de» se leía como bajada del logo de
+  Efeonce (manual §10.2).
+
+---
+
+## 7. Composición y espacio
+
+- **La órbita fuera de eje, el texto abajo a la izquierda.** Centro de la órbita hacia la derecha y arriba; el texto en
+  el tercio inferior izquierdo y **nunca cruza la órbita** (lámina 5.1). Mismo gesto en objetos grandes: la órbita a la
+  derecha del telón del stand, bajo el mouse en la alfombra, a la derecha del fondo de pantalla para dejar libre la
+  cámara (láminas 4.3 3/3, 4.6, 4.7 3/3).
+- **Aire alrededor del anillo:** el anillo rodea con aire, no ajusta. La órbita rodea la lente «con aire» (lámina 4.2);
+  «anillo fino, arco y esfera, al costado del texto» es el sí (lámina 5.6).
+- **Lejos de la cara:** en fotos la órbita no tapa la cara ni el gesto; la esfera de la lente va arriba a la izquierda,
+  lejos de la cara (láminas 4.1, 4.2).
+- **Jerarquía:** un solo dominante (la respuesta), una pregunta chica, la evidencia debajo, la firma al pie. La órbita
+  acompaña; **no reemplaza la voz**: «el titular sigue cerrando con su punto» (láminas 4.1, 4.2).
+- **Cuándo se centra:** cuando la órbita **es** la pieza o su cierre: el cierre de marca y la última lámina (la órbita
+  completa con la esfera arriba), la firma al pie, el pecho de la polera, el paraguas visto desde arriba, el retrato de
+  la firma de correo (láminas 4.2, 4.6 2/3, 4.7 3/3). En una pieza con texto y foto, nunca. *(la regla general
+  «centrar cuando la órbita es la pieza» es inferida de esos casos)*
+- **Márgenes y zonas:** respeta el margen del formato y, en 9:16, la zona que tapa la interfaz de cada red (lámina 5.1).
+- **Densidad:** una órbita, una esfera, un acento, una luz, máximo dos herramientas del oficio (sección 2.2). La
+  continuación de un documento baja el volumen, no lo repite.
+- **La órbita no se mete debajo del texto:** nunca detrás del texto (láminas 4.7 2/3, 5.6). En la hoja membretada, la
+  órbita recortada en la esquina y la carta en Poppins, sin tocarse.
+- **Oficio a la vista:** guía, marcas de corte, selección, nota al margen (una por pieza, firmada) y cursores; las guías y
+  marcas en azules; la selección y los cursores son los de AXIS tal como se resuelven, **nunca coordenadas
+  decorativas** (lámina 2.3). Los cursores dicen quién actúa (local, multiplayer acting) y quién sólo está
+  (multiplayer moving).
+
+---
+
+## 8. Color con criterio
+
+- **Un acento por pieza.** La órbita, la esfera, el halo y la palabra final del eslogan van en el acento de la **línea de
+  servicio**; el logo que firma sigue siendo el de Efeonce (manual §7). Nunca dos acentos en la misma órbita (lámina
+  3.2).
+- **El teal es sólo de Efeonce** y nunca aparece en una pieza de otra línea (lámina 3.1). Si los acentos de producto se
+  usan en piezas de Efeonce está pendiente; la recomendación es que no (ADR, delta del 2026-09-26).
+- **Papeles del color:** en oscuro, navy profundo de fondo, el acento en la gráfica y la luz del halo; en papel, navy
+  para el texto y el acento **oscuro sólo para gráfica** (esfera, arco, anillo): en texto chico no llega a 4,5:1 (lámina
+  1.2, «Color»). Las demás líneas usan una tinta oscura propia como fondo.
+- **La esfera es gráfico; el texto cumple 4,5:1 siempre** (Lab 3). El teal claro como texto sobre blanco (2,1:1) es el no
+  de la lámina 5.6. Mide el contraste sobre los píxeles finales, no sobre la paleta teórica: un color de marca no
+  garantiza legibilidad (Tres voces).
+- *Pendiente:* el contraste de las palabras Engine y Voice sobre sus fondos, que son **texto** y en algunos casos no
+  llegan a 4,5:1; y el magenta de Revenue-HubSpot (ledger).
+- **Materiales:** los valores son sRGB; en papel, cerámica, vinilo y tela el color se fija con prueba física del
+  proveedor, nunca sin prueba (lámina 5.1).
+- **Nada de semáforo:** el estado se dice con la forma, no con el color (lámina 4.3 2/3).
+
+---
+
+## 9. Cómo se lee en movimiento
+
+La gramática no cambia al moverse; se vuelve secuencia (lámina 4.1; Lab 4.4.1; guion de la lámina 4.4):
+
+1. **El anillo aparece:** se abre el escenario, el recorrido.
+2. **El arco crece:** el avance.
+3. **La esfera llega y asienta,** con golpe: la decisión.
+4. **Sube el halo:** el foco.
+5. **Al final, la firma** (logo y eslogan en el cierre de 4,5 s).
+
+El foco tiene su propia frase: entra, busca a quien importa, se posa y la lámpara llega (Lab 4.4.1).
+
+Reglas de criterio (norma de movimiento): ritmo lento–rápido–lento con anticipación; **un protagonista a la vez**, nunca
+dos; **llegar con golpe**, nunca deslizarse ni detenerse suave; la onda de acento sólo en un encaje, nunca como adorno;
+la esfera es la protagonista (viaja en la punta, se vuelve el planeta). Con movimiento reducido, el cuadro final. Las
+animaciones del logo nunca se generan con un modelo de video y son sólo de Efeonce, nunca de clientes ni de la interfaz
+de Greenhouse. Detalle en [motion.md](motion.md).
+
+*Inferido:* un dato animado sigue la regla de la trayectoria: la esfera viaja desde las 12 hasta su valor con la estela
+detrás; nunca se anima como una barra que se llena.
+
+---
+
+## 10. Errores que delatan que no se entendió la línea
+
+Cada uno tiene su fuente. Si ves uno en una pieza, no está terminada.
+
+| Error | Por qué está mal | Fuente |
+|---|---|---|
+| La órbita se **llena como un loader** | un dato es la posición de la esfera con estela corta; la órbita recorre | operador 2026-09-26; Lab 1.2.1 |
+| **La esfera desaparece al 100 %** | el dato completo sigue siendo una decisión; la esfera se queda | operador 2026-09-26; token `trajectory` |
+| **Órbita ovalada** | la órbita es circular; el óvalo sólo existe en la animación del isotipo 3D | operador 2026-09-26 |
+| **Disco suelto** en la lente | la lente lleva la misma órbita: anillo, arco corto y esfera en la punta | manual §1.5; lámina 1.3 |
+| **Foco sin anillo** | el foco siempre lleva su anillo, concéntrico con la luz | operador 2026-09-26 |
+| **Órbitas interiores alrededor de una palabra** | un solo anillo alrededor del contenido | operador 2026-09-26; `inner-orbits-never-around-content` |
+| **Esfera en una pregunta**, eyebrow, etiqueta, cuerpo o eslogan | la pregunta lleva anillo; la esfera es la decisión | manual §1.2; lámina 5.6 |
+| **Esfera como viñeta** o dos esferas por pieza | la esfera pierde identidad si se repite | lámina 5.6; manual §10.2 |
+| **Selección o marca de corte que deja la esfera afuera** | la esfera es parte del texto | lámina 2.3; `answer-period-part-of-text` |
+| **Arco decorativo sin dato**, o acento junto a un número | el arco afirma avance: sin dato real con fuente no hay arco | lámina 0.2; token `trajectory.accent` |
+| **Texto cruzando la órbita**, o la órbita detrás del texto | ningún texto cruza la órbita | lámina 5.1; ADR |
+| **Órbita sobre la cara**, el sujeto, la reserva, el lecho o la firma | la órbita no sustituye la composición fotográfica | operador 2026-09-26; `orbit-never-over-subject-or-reserves` |
+| **Órbita por defecto** en toda pieza, o un **patrón** de órbitas | se declara a propósito; una por pieza, muro o vidrio | manual §1.3; lámina 4.3 2/3 |
+| **Órbita alrededor del logo**, esfera pegada al logo | la órbita rodea palabras; la esfera es de la palabra | lámina 5.4 |
+| **Logo y órbita juntos al frente** de un objeto | frente la palabra, dorso el logo solo | láminas 4.4, 5.6 |
+| **URL como texto**, o **burbuja junto al logo**, o **firma y burbuja a la vez** | la burbuja sólo reemplaza al logo cuando el logo ya está en la imagen | manual §8.5; ADR |
+| **Producto que firma** la pieza (o «by efeonce» como firma) | Efeonce firma todo; el producto es contexto | operador 2026-09-26; manual §7 |
+| **Dos acentos** en una pieza, o **teal en una pieza de otra línea** | una línea, un acento; el teal es de Efeonce | láminas 3.1, 3.2 |
+| **Teal claro como texto sobre blanco** | 2,1:1, no alcanza | láminas 1.1, 5.6 |
+| **Eslogan en mayúsculas, con esfera, traducido o rearmado**, o en cada post | sólo el bloque oficial, sólo en cierres | láminas 2.2, 5.6 |
+| **Pregunta grande y respuesta larga y chica**, dos preguntas seguidas, pregunta retórica o chiste | la respuesta domina; la pregunta es real | láminas 2.1, 5.6 |
+| **«Te hacemos visible» sin «Y lo medimos.»** ni mecanismo | anti-humo: la visibilidad se mide | lámina 1.4 |
+| **Logos de terceros como satélites-alianza** | los satélites muestran dónde medimos, no con quién | lámina 0.2 |
+| **Estado en colores de semáforo**, o sin etiqueta | el estado se dice con la forma y acompaña al texto | láminas 4.3 2/3, 7.2 |
+| **Discos rellenos, brillos, reflejos, esferas de vidrio**, halo como «glow» | línea fina y luz | lámina 0.2; manual §0 |
+| **Velo navy sobre foto de banco**, emblema legible en la ropa | la foto es oficio real; el logo lo pone la pieza | láminas 5.2, 5.6 |
+| **Valores transcritos** de una captura o un comentario | los números salen de los tokens | ADR, decisión 3 |
+| **Dos protagonistas a la vez** en movimiento, llegada suave, onda de acento como adorno | lenguaje de movimiento | norma, reglas 1 y 2 |
+| **La línea aplicada a un cliente o a la interfaz de Greenhouse** | es marca propia de Efeonce | ADR, decisión 6 |
+
+---
+
+## Mantenimiento
+
+Toda corrección del operador sobre qué significa un elemento, cuándo va o qué error delata entra aquí **en el momento**,
+con fecha, el ejemplo y la razón (Skill Maintenance Contract de `SKILL.md`, punto 0). Las tensiones y derivas marcadas
+en este archivo (halo en papel, logo en la órbita del muro, palabra de RevOps en el manual, gris del eslogan en `05`) se
+resuelven con el operador; cuando se resuelvan, se reescribe la entrada y se registra en [ledger.md](ledger.md).

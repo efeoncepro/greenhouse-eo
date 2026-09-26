@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-26 — Skill viva `efeonce-graphic-line` y la órbita junto a la foto
+
+Nace la skill dueña de la línea gráfica «La órbita» (Claude y Codex, espejo byte-idéntico): el criterio de cada elemento
+(anillo, arco, esfera, halo, lente, foco, voces, eslogan, firma), todo lo que existe en AXIS (tokens, contratos y
+recetas de `axis-graphic-line`), cada aplicación (post, story, banner de LinkedIn, deck, informe, firma de correo,
+oficina, merch, eventos, video), el motion del logo, la convergencia con el lenguaje fotográfico, el QA, un registro de
+decisiones y pendientes del operador, y un contrato de mantenimiento. El manual de la línea suma §9.1 (la foto en la
+línea) y fija «Revenue» como palabra del eslogan de RevOps; el lenguaje fotográfico suma §11 (la línea en la foto). El
+router de CLAUDE.md y AGENTS.md apunta a la skill nueva.
+
 ## 2026-09-26 — Marketing Studio: capa de estrategia y operación híbrida con agentes (ADR aceptados)
 
 Quedaron aceptadas tres decisiones de EPIC-049. Studio + un bucket GCP son la fuente única de los archivos de campaña, con
@@ -555,11 +565,3 @@ gobierno y acciones a interfaces como Claude y Slack. Missionforce suma capacida
 regulados con OpenAI/NVIDIA. Marketing Cloud Next incorpora Campaign Agent, Headless Marketing/MCP, Palmata,
 Data Guardian, Budget Optimization y otras capacidades con estados GA/fechas separados. Koa se conserva como
 lanzamiento del 15/09 en pilotos seleccionados. [Ledger](.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md)
-
-## 2026-09-16 — HubSpot actualizado con Fall Spotlight y UNBOUND 2026
-
-Las skills espejo y el catálogo HubSpot incorporan ChatGPT Ads en beta pública, la expansión del MCP/Claude,
-Agent Hub, Agent Builder, Breeze y Scheduled Prompts, además de Developer Platform 2026.09, sus APIs GA y betas.
-Se documentan requisitos de portal, plan, créditos, permisos, consentimiento, Audit Log y la separación entre
-capacidad anunciada, elegibilidad y runtime. También queda registrada la deprecación de APIs y apps legacy, con
-enforcement previsto para septiembre de 2027. [Detalle](docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md)

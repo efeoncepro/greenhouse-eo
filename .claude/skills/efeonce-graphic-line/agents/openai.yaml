@@ -1,0 +1,7 @@
+interface:
+  display_name: "Efeonce «La órbita» (living skill)"
+  short_description: "Everything about the Efeonce graphic line: AXIS tokens, contracts and the axis-graphic-line package, how to compose every piece, the motion language and the three logo animations, and its convergence with the Efeonce photographic language."
+  default_prompt: "Use $efeonce-graphic-line before composing, animating, coding or documenting anything with the Efeonce orbit, lens, spotlight, sphere, slogan, signature or logo animations. Read the reference the router points to; never invent an API or a value. When you change the line, update this skill per its Skill Maintenance Contract and mirror .claude/ ↔ .codex/."
+
+policy:
+  allow_implicit_invocation: true

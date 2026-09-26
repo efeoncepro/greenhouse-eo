@@ -137,6 +137,8 @@ decisiones del operador, ejecución y evidencia; no tratar una aprobación esté
 
 ### Línea gráfica «La órbita» (canónica 2026-09-25)
 
+> **Skill dueña de la línea:** [`efeonce-graphic-line`](../efeonce-graphic-line/SKILL.md) (viva) guarda el criterio, todo lo disponible en AXIS, las aplicaciones, el motion y la convergencia con la foto. Cárgala para componer; esta sección resume sólo lo que decide marca.
+
 La forma propia de Efeonce: anillo fino + arco con esfera + halo, nacida del isotipo. Tres usos: **rodea** (palabra,
 lente, objeto), **mide** (el arco es avance real) y **enfoca** (la lente y el foco «Te hacemos visible»). **Efeonce firma
 todo:** Globe (suite de estudio creativo, en desarrollo), Wave y Reach aparecen como contexto, nunca como firma;

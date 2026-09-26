@@ -1,9 +1,9 @@
 # Lenguaje Fotográfico Efeonce V1 — «El oficio a la vista»
 
 > **Tipo de documento:** Especificación canónica de marca (documento maestro)
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-26 por Claude — la órbita de la línea gráfica no sustituye la composición de este lenguaje, y la regla de la firma; ver el [delta 2026-09-26](#delta-2026-09-26--la-órbita-no-sustituye-la-composición). Antes (2026-09-21): el sistema se declara en **dos registros** (documental y puesta en escena); ver el [delta 2026-09-21](#delta-2026-09-21--dos-registros-documental-y-puesta-en-escena)
+> **Última actualización:** 2026-09-26 por Claude — §11 «La línea gráfica en la foto»: cómo se prepara una foto que llevará la órbita y qué puede hacer la órbita sobre ella, con enlace al contrato de convergencia. Antes (mismo día): la órbita de la línea gráfica no sustituye la composición de este lenguaje, y la regla de la firma; ver el [delta 2026-09-26](#delta-2026-09-26--la-órbita-no-sustituye-la-composición). Antes (2026-09-21): el sistema se declara en **dos registros** (documental y puesta en escena); ver el [delta 2026-09-21](#delta-2026-09-21--dos-registros-documental-y-puesta-en-escena)
 > **Estado:** Aprobado por el operador (Julio Reyes, dueño de Efeonce) el 2026-09-19. Sistema consistente; **no** es todavía un activo distintivo medido.
 > **Documentación relacionada:** [Índice](./README.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Bitácora](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md) · [Marca de agencia](../../context/09_marca-agencia.md) · [Quiénes somos](../../context/01_quienes-somos.md) · [Marca en escena](../../../.claude/skills/social-media-studio/references/brand-in-scene.md)
 
@@ -263,6 +263,47 @@ Recorrido completo ronda por ronda en la [bitácora](../social/2026-09-19-efeonc
 - Paleta de marca: `.claude/skills/content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md` §2.
 - Evidencia: [`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/`](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md).
 - Propuesta intermedia descartada (grade navy): `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/prompts/PROPUESTA_LENGUAJE_FOTOGRAFICO_V1.md` (su §5 de prueba de reconocimiento sigue vigente como método).
+
+## 11. La línea gráfica en la foto
+
+**[decisión del operador, 2026-09-26]** Este lenguaje sigue vigente entero. La línea gráfica
+[«La órbita»](../brand-graphic-line/README.md) converge con él: la foto **muestra el oficio** y la órbita **señala lo que
+importa dentro de él**. Los dos canon comparten la idea al pie de la letra: este documento es «El oficio a la vista» y la
+línea tiene su propio §6 «Oficio a la vista». Esta sección no cambia ninguna regla de arriba; dice cómo se prepara una
+foto que va a llevar la órbita y qué puede hacer la órbita sobre ella.
+
+**Cómo se prepara la foto** (con la ficha de `pnpm foto:prompt`, nunca a mano):
+
+| Qué necesita la órbita | Cómo lo trae la foto |
+|---|---|
+| Un solo punto de interés | La escena concentra la obra o la decisión en un lugar; la lente de la línea exige una foto con un punto claro (línea §1.5) |
+| El sujeto dentro del círculo | La escena declara el encuadre de la lente del formato (el banco de 2026-09-25 lo escribe como `LENS FRAMING` en la `escena`); `foto:prompt` no tiene todavía un campo propio |
+| Formato | El nativo de la pieza final; nunca se recorta de otro formato (reserva §2, regla 4) |
+| Registro | A, documental: nadie mira al lente (línea §9) |
+| Una sola marca | Sin emblema legible: la pieza firma (firma §6; línea §9) |
+| Color | El azul en un objeto del oficio, nunca un muro de fondo; el acento cálido nace de la acción, una de cada dos fotos |
+| Luz | Luz con carácter sobre el sujeto; con foco, sobre el sujeto que quedará dentro de la luz |
+| Firma | El lecho de siempre, con su tono declarado: ahí aterriza la firma que pone la línea |
+
+**Qué puede hacer la órbita sobre la foto:** rodear, medir (un dato real con fuente) o enfocar (la lente o el foco), una
+sola vez por pieza y declarada a propósito. **Qué no puede hacer:** ir por defecto; cruzar el sujeto, las reservas de
+texto, el lecho o la firma; velar u oscurecer la foto fuera del tratamiento propio de la lente y del foco; poner un halo
+sobre la foto; o sustituir la composición, las palancas o las reservas que este documento decide. La medición vive en
+`pnpm creative:orbit:render` (zonas `protect`: sujeto, reservas y lecho) y en la capa `graphic_line` de
+`pnpm creative:layout`; la revisión al 100 % sigue siendo humana.
+
+Nueve puntos donde las dos reglas parecen chocar (por ejemplo, el texto de la lente sobre la foto apagada frente a
+«nunca un scrim», el círculo del 55 % frente a lo que muestra la lente en el post, o el límite de cabezas del 36 %
+frente al centro de la lente) quedan como **pendientes del operador** en la referencia de convergencia; no se
+resuelven aquí.
+
+- Paso a paso de producción: [manual de fotografía de marca](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
+  y [manual de la línea gráfica](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md).
+- Contrato completo de convergencia (quién manda por tipo de pieza, brief, lectura de la órbita, reglas de sinergia
+  vigentes y propuestas, QA conjunto, pendientes y un ejemplo de punta a punta):
+  [`photography-convergence.md`](../../../.claude/skills/efeonce-graphic-line/references/photography-convergence.md)
+  de la skill `efeonce-graphic-line`.
+- Canon de la línea sobre la foto: [línea gráfica §9](../brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#9-fotografía).
 
 ## Delta 2026-09-19 (tarde) — espacio para texto y formatos
 

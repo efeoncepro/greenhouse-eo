@@ -19,6 +19,14 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    // La línea gráfica «La órbita» es una skill viva: si Codex y Claude componen con criterios distintos, la marca
+    // sale con dos gramáticas bajo la misma firma. Nace byte-identical.
+    id: 'efeonce-graphic-line',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-graphic-line',
+    claude: '.claude/skills/efeonce-graphic-line',
+  },
+  {
     // El método de video debe conservar producción, post y evidencia entre ambos agentes.
     id: 'motion-design-studio',
     mode: 'byte-identical',

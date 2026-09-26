@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita · V1
 
 > **Tipo de documento:** Manual de marca (contrato operativo de diseño)
-> **Versión:** 1.6
+> **Versión:** 1.7
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
-> **Última actualización:** 2026-09-26 por Claude (lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
+> **Última actualización:** 2026-09-26 por Claude (§9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
 > **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
 > **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (40 láminas, siete capítulos)
 > **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Desde AXIS 0.2.7 los archivos oficiales (logo e isotipo de las cuatro marcas y las tres burbujas URL) viven en el paquete `@efeoncepro/axis-brand-assets`; desde AXIS 0.3.0 el contrato de composición es `efeonce.graphic-line-orbit` 0.3.0 (`stable`) y el paquete `@efeoncepro/axis-graphic-line` 0.3.1 pinta la órbita, sus recetas y su movimiento (§13). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
@@ -240,7 +240,7 @@ su eslogan y su producto:
 | **Web, infraestructura, SEO y medición** (Digital Services & Engineering) | Empower your **Engine** | **Wave** | vigente |
 | **Medios y distribución** | Empower your **Voice** | **Reach** | inferido de «y así sucesivamente»; confirmar |
 | **Efeonce** (marca madre) · Growth Strategy & Measurement | Empower your **Growth** | **Greenhouse**, el producto de Efeonce que controla todo | Greenhouse vigente; la línea Growth Strategy, inferida (confirmar) |
-| **RevOps y CRM** (sublínea de Efeonce) | palabra por decidir | sin plataforma propia: se opera en **HubSpot** y **Salesforce** | color según la plataforma; pendiente |
+| **RevOps y CRM** (sublínea de Efeonce) | **Revenue** («Empower your Revenue»; operador, 2026-09-26) | sin plataforma propia: se opera en **HubSpot** y **Salesforce** | color según la plataforma: HubSpot magenta berenjena, Salesforce cielo (tokens `lines`) |
 
 **Greenhouse** es el producto de Efeonce y la plataforma que controla y orquesta todas las líneas (operador,
 2026-09-26). Aparece como contexto igual que los demás productos —su nombre o su interfaz en un mockup—; su propia
@@ -258,7 +258,8 @@ producto con que se hace. Los pesos del eslogan no cambian (`src/config/efeonce-
 - **Cada pieza toma el color de su línea** (operador, 2026-09-26): la esfera, el anillo y la palabra final del
   eslogan van en el acento de la línea; el logo que firma sigue siendo el de Efeonce. Los acentos viven en los tokens
   `family` de AXIS (hoy colgados del producto; deuda: pasarlos a la línea). RevOps y CRM toma el color de la plataforma
-  en que se opera (HubSpot o Salesforce); los valores están por decidir.
+  en que se opera (HubSpot o Salesforce): los dos acentos viven en los tokens `lines` (`revenue-hubspot`,
+  `revenue-salesforce`); el magenta de HubSpot sigue a revisión del operador.
 - **Mapa de portafolio:** el arco y el centro son de Efeonce; los productos van como satélites con su isotipo.
 - **Hilo de familia (decidido):** la órbita misma, más la palabra final del eslogan. Descartado: el anillo teal
   en productos.
@@ -403,6 +404,33 @@ Tres se rehicieron por el lenguaje (la 5 salió como flatlay de stock, la 8 como
 con un muro navy de fondo). Las palancas de la 3 y la 4 cambiaron respecto del brief: `instrumento` exige mirar a
 través de una herramienta. El banco reemplaza a las tres fotos repetidas en todas las piezas con lente, ventana y
 foco, y en los estímulos de la prueba sin logo.
+
+### 9.1 La foto en la línea
+
+**El lenguaje fotográfico de Efeonce sigue vigente entero** (decisión del operador, 2026-09-26): la línea converge con
+él y los dos se enriquecen. La foto muestra el oficio; la órbita señala lo que importa dentro de él. Los dos comparten la
+idea al pie de la letra: el [lenguaje fotográfico](../brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) se llama
+«El oficio a la vista» y el §6 de este manual también.
+
+- **Quién manda:** en una pieza con foto sin dato ni foco, la foto, y no hay órbita. En la lente y el foco, la órbita
+  manda el layout y la foto manda lo que hay dentro del círculo. La composición, las palancas, las reservas y el lecho
+  siguen siendo del lenguaje fotográfico.
+- **La foto se prepara para la órbita desde la toma**, con `pnpm foto:prompt`: un solo punto de interés en el centro de
+  la lente del formato, formato nativo, registro documental, sin emblema legible, el azul en un objeto del oficio y la
+  luz sobre el sujeto.
+- **La órbita lee la foto sin romperla:** las zonas `protect` del adapter (sujeto, reservas y lecho), la firma a la
+  altura medida del lecho (`signature.y`), nunca un halo ni un velo sobre la foto fuera del tratamiento propio de la
+  lente y del foco.
+- **Lo que queda abierto** —por ejemplo, el texto de la lente sobre la foto apagada frente a «nunca un scrim» del
+  lenguaje fotográfico, o el círculo del 55 % frente a lo que muestra la lente del post— está escrito como pendiente del
+  operador; ninguna de las dos reglas se modificó.
+
+Canon fotográfico: [índice](../brand-photography/README.md) y su
+[§11 «La línea gráfica en la foto»](../brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#11-la-línea-gráfica-en-la-foto).
+Contrato completo (vocabulario común, tabla de quién manda por pieza, brief campo por campo, lo que la lente muestra por
+formato, reglas de sinergia vigentes y propuestas, QA conjunto, pendientes y un ejemplo de punta a punta):
+[`photography-convergence.md`](../../../.claude/skills/efeonce-graphic-line/references/photography-convergence.md) de la
+skill `efeonce-graphic-line`.
 
 ---
 
