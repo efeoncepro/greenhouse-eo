@@ -26,6 +26,7 @@ manual, la decisión y los entregables para personas.
 | Banco de fotos para la lente | `ai-generations/2026-09-25_banco-lente-orbita/` ([`LEEME.md`](../../../ai-generations/2026-09-25_banco-lente-orbita/LEEME.md)) | 8 tomas documentales hechas con `pnpm foto:generar`: fichas y prompts versionados, plates locales |
 | Composición por intención | `pnpm creative:orbit:resolve` · `pnpm creative:orbit:render` (`scripts/creative/layout-compiler/graphic-line.mjs`) | Adapter de Greenhouse del contrato AXIS `efeonce.graphic-line-orbit` 0.2.0 (AXIS 0.2.7): manifest, SVG, PNG firmado (logo o burbuja fusionada, contraste medido) y `qa.json`; `bindings.protect` para sujeto, reservas y lecho |
 | La línea en campañas | `pnpm creative:layout` (`graphic_line` por formato y `brand.signature`) · `pnpm foto:componer:cta` + `pnpm foto:cta:gate` (tramo 17, `marcaEnEscena`) | La regla de la firma aplicada en los dos compositores, sólo en piezas nuevas (manual §13.2) |
+| Reveal y apertura (motion) | [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](./EFEONCE_ORBIT_REVEAL_MOTION_V1.md) · `scripts/creative/brand-motion/` | Línea → logo (4,2 s) y logo → línea (2,8 s), con fondo y transparentes (ProRes 4444, WebM, HEVC, PNG por capas) y sonido sintetizado; conviven con el cierre anterior |
 
 ## Documentación para personas
 

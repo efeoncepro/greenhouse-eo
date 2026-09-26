@@ -45,6 +45,9 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   `@efeoncepro/axis-brand-assets`, nunca con un modelo de video. El eslogan «Empower your …» sólo cierra: nunca en
   mayúsculas ni con esfera. El foco (§1.4) se anima barriendo la escena hasta posarse sobre el cliente, una sola luz.
   La órbita no reemplaza la composición del plano: se declara donde aporta (cierre, foco), no en cada escena.
+  **Reveal y apertura del logo** (línea → logo y logo → línea, conviven con el cierre): spec, tiempos, oclusión,
+  sonido y entregables en [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md);
+  generador en `scripts/creative/brand-motion/` (render, sonido y codificación).
   Reglas y checklist: [graphic-line-orbit.md](../../efeonce-brand-studio/references/graphic-line-orbit.md).
 - **`DESIGN.md`** es el contrato visual agent-facing; leerlo si la pieza toca UI (pero recuerda: motion de
   UI runtime NO es esta skill).
