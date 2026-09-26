@@ -1,7 +1,7 @@
 # Lista de verificación antes de entregar una pieza con la órbita
 
 > Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 · decisiones del
-> operador D1–D15 del 2026-09-26 registradas (los chequeos marcados «0.3.1» vienen en el contrato publicado con contracts 0.3.5,
+> operador D1–D17 del 2026-09-26 registradas (los chequeos marcados «0.3.1» vienen en el contrato publicado con contracts 0.3.5,
 > tag `v0.3.5`).
 >
 > Cada ítem dice **cómo se verifica**. «Automático» = lo hace fallar un comando o una función; «Revisión» = hay que
@@ -132,6 +132,20 @@
 | [ ] | La burbuja URL enlaza con el texto `efeoncepro.com` donde hay enlace (web, correo) | `linkText` del manifest; revisión |
 | [ ] | Firma de correo: foto con `alt` = nombre, contacto como texto vivo, íconos decorativos, franja de partners con `alt` que nombra a cada uno | `accessibility` del contrato `efeonce.email-signature`; `endorsement.alt` |
 | [ ] | Movimiento reducido respetado | ver §6 |
+
+## 8b. Íconos
+
+Detalle y geometría en [iconography.md](iconography.md).
+
+| | Chequeo | Cómo se verifica |
+|---|---|---|
+| [ ] | El glifo sale del set (§9 de iconography.md), en la grilla 24 con margen 2, trazo 1,5 y remates redondos | Revisión contra la geometría canónica |
+| [ ] | Trazo óptico: 1,75 en 20 px o menos; tope de 4 px sobre 64 px | Revisión (medir el trazo en el export) |
+| [ ] | La esfera: rellena, radio 1,75 en la grilla, en el acento de la línea, con 0,5 de aire contra todo trazo | Revisión |
+| [ ] | Responde a lo más un ícono por pieza, y sólo si la pieza no tiene otra esfera (órbita o respuesta) | Revisión |
+| [ ] | En listas, tablas, contacto, satélites y dentro de una órbita, reposo; bajo 20 px, reposo | Revisión |
+| [ ] | Tinta blanca sobre oscuro y navy sobre papel; el acento ≥ 3:1 contra su fondo; nunca `#36c8bf` sobre papel | Medir sobre los píxeles finales |
+| [ ] | Sin volumen, brillo, degradé ni patrón; nunca mezclado con otra familia de íconos (salvo Tabler en la firma, mientras dure) | Revisión |
 
 ## 9. Comandos y pruebas de referencia
 

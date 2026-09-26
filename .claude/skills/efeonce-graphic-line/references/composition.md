@@ -7,6 +7,8 @@
 > Los resultados «esperados» de los ejemplos se obtuvieron ejecutando las funciones contra los `dist` de AXIS y el
 > comando de Greenhouse ese día. El inventario completo (tokens, códigos, firmas) está en
 > [package-and-tokens.md](package-and-tokens.md); la lista de verificación, en [qa-checklist.md](qa-checklist.md).
+>
+> Íconos (trazo aprobado en reposo y respuesta, y cuándo responde la esfera en una pieza): [iconography.md](iconography.md).
 
 ## 0. El flujo, siempre el mismo
 

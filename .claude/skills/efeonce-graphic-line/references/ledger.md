@@ -34,6 +34,7 @@
 | 2026-09-26 | **Conflictos entre canon (D10):** P-1 el oscurecimiento de la lente cuenta como la reserva del texto (el «nunca scrim» sigue en piezas sin lente) · P-2 se pide el lecho igual (= P12) · P-3 el 55 % es del círculo visible de la lente: se ajusta la toma · P-4 un anillo en la escena cuenta como órbita → otro plate · P-5 capa gráfica sobre foto aprobada sólo en los casos de la línea (voz, lente, medida con fuente) · P-6 1200×627 nativo en `foto:prompt` (task), nunca recortado de 16:9 · P-7 el retrato de perfil es categoría propia del lenguaje fotográfico, se permite mirar a cámara, su barra está por escribir · P-8 el límite del 36 % de cabezas y manos sólo con reserva de texto (task) · P-9 en piezas con lente manda el encuadre; las palancas que llenan el cuadro sólo en piezas sólo foto. |
 | 2026-09-26 | **Firma de correo (D11):** cada persona la instala en Outlook desde el HTML generado; `people@efeoncepro.com` usa la firma de equipo del área **Talent**. |
 | 2026-09-26 | **«Te hacemos visible» (D15, regla reafirmada):** revisión legal antes de cualquier pauta. |
+| 2026-09-26 | **Íconos, especificación (D17): aprobada.** Grilla 24 con margen 2; trazo 1,5 (1,75 en 20 px o menos; tope de 4 px sobre 64 px); remates y uniones redondos; esfera rellena de radio 1,75 en el acento con 0,5 de aire; respuesta desde 20 px; responde sólo el ícono activo o protagonista, descansa si la pieza ya tiene esfera y nunca va como viñeta. Documentada en `iconography.md`. |
 | 2026-09-26 | **Íconos (D16): híbrido A + B.** El trazo limpio es el ícono (estado **reposo**); la esfera es un estado (**respuesta**), no parte del dibujo: una pieza del glifo se vuelve esfera (reemplaza) o la esfera aparece donde la acción se resuelve (completa). Tinta blanco/navy; el acento sólo en la esfera. La dirección C (órbita abierta, contornos con corte) queda descartada. Canvas de trabajo: claude.ai/artifact/Y9mx42L72zYc6iLg4j3Maj. |
 
 ## Pendientes del operador (no decidir por tu cuenta)
@@ -47,14 +48,14 @@
   proveedor y presupuesto los decide el operador. Hasta correrla, la órbita es un sistema consistente, **no** un activo
   distintivo demostrado.
 - **Firma de correo:** la URL de LinkedIn de la empresa.
-- **Íconos, especificación (propuesta del 2026-09-26, sin aprobar):** grilla 24 con margen 2; trazo 1,5, que sube a 1,75
-  en 20 px o menos, con un tope de 4 px sobre 64 px para no pesar más que la órbita; remates y uniones redondos; esfera
-  rellena de radio 1,75 en el acento, con 0,5 de aire contra cualquier trazo; respuesta desde 20 px. Regla de uso
-  propuesta: responde sólo el ícono activo o protagonista; si la pieza ya tiene esfera (órbita o respuesta), el ícono
-  descansa; nunca como viñeta. Falta además el inventario del set y decidir si reemplaza a los Tabler de la firma de
-  equipo. Hasta aprobarse, nada de esto va a tokens `efeonceGraphicLine`.
+- **Íconos:** el inventario del set (qué íconos necesita la marca) y si reemplaza a los Tabler outline de la firma de
+  correo y de equipo. La **iconografía plana** complementaria (rayo, paleta, pincel, cuentagotas, bombillo, tablet,
+  laptop, Mac de escritorio, teléfono) está en exploración: tres tratamientos en el canvas; no se usa hasta decidir.
 
 ### Pendiente de implementación (decidido, falta código o texto)
+
+- Íconos de trazo (D16–D17): tokens `efeonceGraphicLine.icons` y los SVG del set (reposo y respuesta) en
+  `@efeoncepro/axis-brand-assets`. Hasta entonces la geometría canónica vive en `iconography.md` §9.
 
 - Task «foto:prompt y chequeos de la lente» (sin ID): P5 (chequeos de lecho y reservas para lente y foco;
   `lens-subject-inside-circle` medido), P9 (campo `reservas.lente`), P-6 (formato nativo 1200×627) y P-8 (el límite del

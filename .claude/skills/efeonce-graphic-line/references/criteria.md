@@ -1,6 +1,6 @@
 # El criterio de la órbita: cuándo, cómo, con qué y por qué
 
-> Verificado contra: axis-design-system@e26bd85 y greenhouse-eo@7cb24df17 — 2026-09-26 (decisiones del operador D1–D15
+> Verificado contra: axis-design-system@e26bd85 y greenhouse-eo@7cb24df17 — 2026-09-26 (decisiones del operador D1–D17
 > del 2026-09-26 registradas; ver [ledger.md](ledger.md)).
 > Fuentes: láminas del canvas reconstruidas en AXIS (`apps/lab/src/data/graphic-line-elements.json`, citadas como
 > «lámina X.Y»); página del Lab `apps/lab/src/pages/references/graphic-line.astro` («Lab X.Y»); manual
@@ -323,13 +323,14 @@ sexta: es no usar órbita.
   la esfera aparece donde se resuelve (el centro de la lupa). La esfera es un **estado**, no parte del dibujo.
 - **Por qué:** conserva la gramática de la marca («la esfera responde») sin gastar la esfera en cada ícono. El trazo
   limpio convive con cualquier pieza; la respuesta se reserva para lo que importa.
-- **Cuándo responde (propuesta, sin aprobar):** sólo el ícono activo o protagonista. Si la pieza ya tiene esfera —la de
+- **Cuándo responde (aprobado 2026-09-26, D17):** sólo el ícono activo o protagonista, desde 20 px. Si la pieza ya tiene esfera —la de
   la órbita o la que cierra la respuesta—, el ícono descansa. En listas, tablas, contacto y satélites, reposo.
 - **Error típico:** todos los íconos de una fila respondiendo. La esfera se vuelve viñeta (el mismo error de la esfera
   repetida, sección 3.3).
 - **Descartado:** la dirección «órbita abierta» (cada contorno con un corte): compite con la órbita del isotipo en vez
   de acompañarla.
-- Especificación propuesta y pendientes: [ledger.md](ledger.md), «Íconos, especificación».
+- Construcción, geometría canónica, contenedores y la iconografía plana en exploración:
+  [iconography.md](iconography.md).
 
 ---
 
