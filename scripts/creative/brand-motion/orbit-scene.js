@@ -680,10 +680,10 @@
         tx: S.logoT.tx + S.isoToLogo.tx * ls,
         ty: S.logoT.ty + S.isoToLogo.ty * ls
       }
-      // Eslogan: ancho = 78 % del logotipo, debajo con aire de medio alto del logotipo.
+      // Eslogan: ancho = 64 % del logotipo (subordinado: acompaña al logo sin competir), debajo con aire de medio alto.
       S.slogan.setAttribute('font-size', 100)
       const w100 = S.slogan.getComputedTextLength() || 900
-      const fs = (logoW * 0.78) / w100 * 100
+      const fs = (logoW * 0.64) / w100 * 100
 
       S.slogan.setAttribute('font-size', fs)
       S.sloganBase = { x: W / 2, y: S.logoT.ty + 196.68 * ls + fs * 1.35, fs }

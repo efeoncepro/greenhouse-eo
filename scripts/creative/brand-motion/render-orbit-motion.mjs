@@ -69,7 +69,8 @@ export async function openScene(browser, { format, scheme, ss }) {
 
 // Tramos rápidos: ahí cada cuadro promedia subcuadros (obturador de 180°) para un desenfoque de movimiento real.
 export const BLUR = { reveal: [[1250, 1900], [2050, 2750]], open: [[350, 950], [1150, 1550]], sting: [[100, 600], [720, 1250]] }
-const SUB = 5
+// Subcuadros por cuadro en los tramos rápidos (5 en masters; --sub 3 para vistas previas).
+const SUB = Number(opt('--sub', 5))
 
 export async function shootBlurred(scene, t, anim, pass, ss, fps) {
   if (!BLUR[anim].some(([a, b]) => t > a && t < b)) return shoot(scene, t, anim, pass, ss)
