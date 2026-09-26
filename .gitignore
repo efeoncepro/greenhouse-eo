@@ -102,6 +102,18 @@ src/assets/iconify-icons/generated-icons.css
 /ai-generations/**/*.webm
 /ai-generations/**/*.mov
 /ai-generations/**/*.m4v
+# Audio, video sin comprimir y comprimidos (2026-09-25): se archivan con `pnpm media:archive-ai-generation`.
+/ai-generations/**/*.mkv
+/ai-generations/**/*.avi
+/ai-generations/**/*.wav
+/ai-generations/**/*.aif
+/ai-generations/**/*.aiff
+/ai-generations/**/*.flac
+/ai-generations/**/*.mp3
+/ai-generations/**/*.m4a
+/ai-generations/**/*.aac
+/ai-generations/**/*.ogg
+/ai-generations/**/*.zip
 # Legacy AI skill artifacts (not the src/lib/ai/ module which is tracked)
 
 

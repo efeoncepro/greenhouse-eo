@@ -1,0 +1,47 @@
+{
+  "schema": "greenhouse.aiGenerationArtifacts.v1",
+  "generatedAt": "2026-09-26T01:37:00.702Z",
+  "run": "ai-generations/2026-09-22_voz-chilena",
+  "bucket": "efeonce-group-greenhouse-private-assets-prod",
+  "prefix": "ai-generations/2026-09-22_voz-chilena",
+  "totalBytes": 1265553,
+  "fileCount": 6,
+  "files": [
+    {
+      "path": "catalina-toma-1.mp3",
+      "sizeBytes": 327841,
+      "sha256": "56af30e6874e69e0346f78e6e51d71be702fc041689095598e7fd2745f4254fc",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_voz-chilena/catalina-toma-1.mp3"
+    },
+    {
+      "path": "catalina-toma-2.mp3",
+      "sizeBytes": 316138,
+      "sha256": "639e50b722c0c75270ab0d3a55d38879bb140d37a0390c41ffdb9c8eeede0a00",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_voz-chilena/catalina-toma-2.mp3"
+    },
+    {
+      "path": "catalina-tono_-2st.mp3",
+      "sizeBytes": 155498,
+      "sha256": "7230f7d5847c2aaf4c39ad73f7d5f5e9abf39de8d3ad17a9f85936d2e8a12fb9",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_voz-chilena/catalina-tono_-2st.mp3"
+    },
+    {
+      "path": "catalina-tono_-4st.mp3",
+      "sizeBytes": 155498,
+      "sha256": "ada3b62656eeddfcf010fc085d35996e89892762021ea20c4068654d93159dc1",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_voz-chilena/catalina-tono_-4st.mp3"
+    },
+    {
+      "path": "catalina-tono_2st.mp3",
+      "sizeBytes": 155289,
+      "sha256": "bc3029da2259ccb9213dd25723a120a7bb7a972ae82a1a501d2374b6b2c21062",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_voz-chilena/catalina-tono_2st.mp3"
+    },
+    {
+      "path": "catalina-tono_4st.mp3",
+      "sizeBytes": 155289,
+      "sha256": "ba1dbc209c50efa9f1bcd65ae34492827ba503aa4c68413e22b74d0b89a1456b",
+      "gsUri": "gs://efeonce-group-greenhouse-private-assets-prod/ai-generations/2026-09-22_voz-chilena/catalina-tono_4st.mp3"
+    }
+  ]
+}

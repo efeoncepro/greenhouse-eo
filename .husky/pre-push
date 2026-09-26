@@ -18,6 +18,11 @@
 
 set -e
 
+# Blobs pesados primero: GitHub corta la conexión sin nombrar el archivo cuando el paquete trae uno
+# de más de 100 MB (caso 2026-09-25). git entrega por stdin los refs que se empujan.
+echo "[pre-push] Checking large blobs…"
+node scripts/ci/large-blob-gate.mjs
+
 echo "[pre-push] Running pnpm local:check (lint + tsc)…"
 pnpm local:check
 

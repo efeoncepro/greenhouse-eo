@@ -13,7 +13,20 @@ const BINARY_EXTENSIONS = new Set([
   '.mp4',
   '.webm',
   '.mov',
-  '.m4v'
+  '.m4v',
+  // Audio, video sin comprimir y comprimidos: tampoco se versionan. Faltaban aquí y en `.gitignore`, y el
+  // 2026-09-25 un checkpoint arrastró 91 de ellos (985 MB, un MKV de 470 MB) y GitHub cortó el push.
+  '.mkv',
+  '.avi',
+  '.wav',
+  '.aif',
+  '.aiff',
+  '.flac',
+  '.mp3',
+  '.m4a',
+  '.aac',
+  '.ogg',
+  '.zip'
 ])
 
 const usage = `Usage:
@@ -101,11 +114,13 @@ async function describeFile(file) {
   }
 }
 
-function runGcloud(args) {
-  const result = spawnSync('gcloud', args, { encoding: 'utf8' })
+function runGcloud(args, { stream = false } = {}) {
+  // `stream`: la salida va directo a la terminal. Una sincronización de miles de archivos imprime más de
+  // 1 MB y `spawnSync` con buffer mata al proceso (ENOBUFS) a mitad de la subida.
+  const result = spawnSync('gcloud', args, stream ? { stdio: ['ignore', 'inherit', 'inherit'] } : { encoding: 'utf8' })
 
   if (result.status !== 0) {
-    throw new Error(`gcloud ${args.join(' ')} failed:\n${result.stderr || result.stdout}`)
+    throw new Error(`gcloud ${args.join(' ')} failed (status ${result.status}, ${result.error?.code ?? 'sin código'}):\n${result.stderr || result.stdout || ''}`)
   }
 
   
@@ -140,12 +155,13 @@ async function main() {
 return
   }
 
-  for (const item of described) {
-    const source = path.join(rootDir, item.path)
+  // Una sola sincronización paralela en vez de un `gcloud` por archivo: una corrida de video tiene miles de
+  // frames y subirlos uno a uno tomaba horas. `rsync` conserva las rutas relativas, omite lo ya subido
+  // (reanudable) y sólo considera las extensiones del archivo: todo lo demás queda excluido por regex.
+  const onlyBinaries = `(?i)^(?!.*\\.(${[...BINARY_EXTENSIONS].map(ext => ext.slice(1)).join('|')})$).*$`
 
-    runGcloud(['storage', 'cp', '--quiet', source, item.gsUri])
-    console.log(`uploaded ${item.path} -> ${item.gsUri}`)
-  }
+  runGcloud(['storage', 'rsync', rootDir, `gs://${args.bucket}/${objectPrefix}`, '--recursive', '--quiet', `--exclude=${onlyBinaries}`], { stream: true })
+  console.log(`uploaded ${described.length} files -> gs://${args.bucket}/${objectPrefix}/`)
 
   const manifest = {
     schema: 'greenhouse.aiGenerationArtifacts.v1',
