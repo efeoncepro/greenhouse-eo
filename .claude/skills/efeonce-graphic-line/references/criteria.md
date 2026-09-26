@@ -315,6 +315,22 @@ Decisión del operador (2026-09-26): todas las formas que el canvas exploró sig
 Elegir una forma es elegir un trabajo. Si ninguna calza con el trabajo de la pieza, la respuesta no es inventar una
 sexta: es no usar órbita.
 
+### 3.14 Íconos — reposo y respuesta
+
+- **Decisión del operador (2026-09-26, D16):** el ícono de la línea es un **híbrido**. En **reposo** es trazo limpio,
+  sin acento: el ícono de todos los días. En **respuesta** una sola esfera en el acento marca dónde se resuelve la
+  acción: o una pieza del glifo se vuelve esfera (la punta de la flecha de Revenue, el tope de la barra de Medición), o
+  la esfera aparece donde se resuelve (el centro de la lupa). La esfera es un **estado**, no parte del dibujo.
+- **Por qué:** conserva la gramática de la marca («la esfera responde») sin gastar la esfera en cada ícono. El trazo
+  limpio convive con cualquier pieza; la respuesta se reserva para lo que importa.
+- **Cuándo responde (propuesta, sin aprobar):** sólo el ícono activo o protagonista. Si la pieza ya tiene esfera —la de
+  la órbita o la que cierra la respuesta—, el ícono descansa. En listas, tablas, contacto y satélites, reposo.
+- **Error típico:** todos los íconos de una fila respondiendo. La esfera se vuelve viñeta (el mismo error de la esfera
+  repetida, sección 3.3).
+- **Descartado:** la dirección «órbita abierta» (cada contorno con un corte): compite con la órbita del isotipo en vez
+  de acompañarla.
+- Especificación propuesta y pendientes: [ledger.md](ledger.md), «Íconos, especificación».
+
 ---
 
 ## 4. Las voces: pregunta y respuesta
