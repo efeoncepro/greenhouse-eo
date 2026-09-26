@@ -32,7 +32,7 @@ const member = GL.family.find(f => f.key === 'efeonce')
 
 export const SCHEMES = {
   dark: { background: GL.color.dark, logo: '#ffffff', ringLine: GL.color.halo, accent: member.accentOnDark, slogan: '#e2e2e2' },
-  light: { background: GL.color.paper, logo: GL.color.navy, ringLine: GL.color.navy, accent: member.accentOnLight, slogan: '#848484', haloScale: 0.5 }
+  light: { background: GL.color.paper, logo: GL.color.navy, ringLine: GL.color.navy, accent: member.accentOnLight, slogan: '#848484', haloScale: GL.orbit.haloOnLightScale }
 }
 
 const bez = s => s.match(/[\d.]+/g).map(Number)

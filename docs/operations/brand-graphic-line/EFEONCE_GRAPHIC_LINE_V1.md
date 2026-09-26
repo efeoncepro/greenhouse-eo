@@ -844,7 +844,10 @@ operador.
 - **Delta 2026-09-26 (noche) — decisiones del operador en AXIS:** `accentContrast` (nuevo en `axis-tokens` 0.3.5; el
   acento a 3:1 en gráfico y texto ≥ 24 px, nunca en texto menor; §2), `orbit.haloOnLightScale: 0.5` (halo a la mitad
   sobre papel; §1.3) y `urlBubble.minContrast: 4.5` (§8.5); el contrato rechaza `sphereRing` sin `live: true` (issue
-  `sphere-ring-only-live`; §1.3). Greenhouse sigue fijando `axis-tokens` 0.3.3 hasta adoptar la nueva versión.
+  `sphere-ring-only-live`; §1.3). Juego publicado con el tag `v0.3.5`: tokens y contracts 0.3.5, registry y brand-assets
+  0.3.1, graphic-line 0.3.2. **Greenhouse lo adopta en `develop` el 2026-09-26** (tokens 0.3.5, contracts 0.3.5, registry
+  y brand-assets 0.3.1; el adapter del compositor soporta el contrato de la órbita 0.3.1 y el render del motion lee
+  `haloOnLightScale`). El Lab muestra las 30 variantes de las animaciones del logo (commit AXIS `d847b44`).
 
 ### 13.2 Greenhouse
 

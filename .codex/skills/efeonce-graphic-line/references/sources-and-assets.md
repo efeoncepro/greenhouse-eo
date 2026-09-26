@@ -50,7 +50,8 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
 
 ## Versiones publicadas (2026-09-26)
 
-`axis-tokens` 0.3.4 (con `motion` y la firma de equipo) · `axis-ui-contracts` 0.3.4 (con `efeonce.email-signature` y su variante `team`) · `axis-ui-registry`
-0.3.0 · `axis-brand-assets` 0.3.0 · `axis-graphic-line` 0.3.1. Greenhouse fija tokens 0.3.3 y los otros tres en 0.3.0 (no
+`axis-tokens` 0.3.5 · `axis-ui-contracts` 0.3.5 (contrato de la órbita 0.3.1) · `axis-ui-registry` 0.3.1 ·
+`axis-brand-assets` 0.3.1 · `axis-graphic-line` 0.3.2 (tag `v0.3.5`). Greenhouse fija tokens y contracts 0.3.5 y
+registry y brand-assets 0.3.1 en `develop` (no
 usa `axis-graphic-line`: su compositor tiene pintor propio raster-safe). Cada paquete nuevo necesita «Manage Actions
 access → Read» para cada repositorio consumidor antes de que éste lo agregue.

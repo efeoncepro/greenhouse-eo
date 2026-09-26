@@ -25,16 +25,16 @@ separado.
 
 | Paquete | Versión en `main` de AXIS | Último tag de release | Fija Greenhouse (`package.json`) | Qué trae para la línea |
 |---|---|---|---|---|
-| `@efeoncepro/axis-tokens` | **0.3.4** (commit `a5c21ae`, sin tag todavía) | `v0.3.3` (suma `efeonceGraphicLine.motion`) | **0.3.3** | `efeonceGraphicLine`, `axisMotion` |
-| `@efeoncepro/axis-ui-contracts` | **0.3.4** (commit `a5c21ae`, sin tag) | `v0.3.2` (suma `efeonce.email-signature`) | **0.3.0** | `efeonce.graphic-line-orbit`, `efeonce.collaboration-selection`, `efeonce.email-signature` (≥ 0.3.2), firma de equipo (≥ 0.3.4) |
-| `@efeoncepro/axis-graphic-line` | **0.3.1** | `v0.3.1` | **no lo instala** | el pintor: SVG, recetas, React, Web Component, movimiento |
-| `@efeoncepro/axis-brand-assets` | **0.3.0** | `v0.3.0` | **0.3.0** | 19 SVG oficiales + 48 órbitas estáticas (SVG + PNG) |
-| `@efeoncepro/axis-ui-registry` | 0.3.0 | `v0.3.0` | 0.3.0 | no referencia la línea gráfica |
+| `@efeoncepro/axis-tokens` | **0.3.5** | `v0.3.5` (contraste del acento, halo sobre papel, anillo «en vivo», burbuja 4,5:1) | **0.3.5** | `efeonceGraphicLine`, `axisMotion` |
+| `@efeoncepro/axis-ui-contracts` | **0.3.5** | `v0.3.5` (contrato de la órbita 0.3.1) | **0.3.5** | `efeonce.graphic-line-orbit`, `efeonce.collaboration-selection`, `efeonce.email-signature` (≥ 0.3.2), firma de equipo (≥ 0.3.4) |
+| `@efeoncepro/axis-graphic-line` | **0.3.2** | `v0.3.5` | **no lo instala** | el pintor: SVG, recetas, React, Web Component, movimiento |
+| `@efeoncepro/axis-brand-assets` | **0.3.1** | `v0.3.5` (órbitas estáticas regeneradas) | **0.3.1** | 19 SVG oficiales + 48 órbitas estáticas (SVG + PNG) |
+| `@efeoncepro/axis-ui-registry` | 0.3.1 | `v0.3.5` | 0.3.1 | no referencia la línea gráfica |
 
-**En publicación (2026-09-26):** `axis-tokens` 0.3.5 (`accentContrast`, `urlBubble.minContrast`,
+**Publicado el 2026-09-26 (tag `v0.3.5`):** `axis-tokens` 0.3.5 (`accentContrast`, `urlBubble.minContrast`,
 `orbit.haloOnLightScale`), `axis-ui-contracts` 0.3.5 con el contrato `efeonce.graphic-line-orbit` **0.3.1** (`live`,
 `sphere-ring-only-live`, el halo a la mitad en claro, el chequeo `accent-text-min-size`) y `axis-graphic-line` 0.3.2
-(`deckSlideHtml('close')` con la palabra del eslogan en el acento). Greenhouse no las fija todavía.
+(opción y atributo `live`). Greenhouse las fija en `develop` desde el 2026-09-26.
 
 Consecuencias que un agente debe saber:
 

@@ -96,4 +96,4 @@
 
 Lab AXIS (`c2affc6`, 2026-09-26): la lámina 6.1 lista las decisiones del 26-09 y lo que sigue abierto; el acento ya no colorea texto de menos de 24 px en 1.2 y en las láminas de Insights; la anatomía de 1.2 ya no dibuja el anillo de la esfera; 5.4, 5.1 y 4.5 al día. Quedan en acento sólo rótulos de cotas en diagramas técnicos («0,20 em», la «X» del resguardo), que no son piezas.
 
-Greenhouse: tokens 0.3.3, contracts/registry/brand-assets 0.3.0 en `develop` (llega a producción con el próximo release); no usa todavía el contrato de firma.
+Greenhouse: tokens y contracts 0.3.5, registry y brand-assets 0.3.1 en `develop` desde el 2026-09-26 (llega a producción con el próximo release); el adapter soporta el contrato de la órbita 0.3.1; no usa todavía el contrato de firma. Motion V1.1: las 30 variantes en el bucket (7596 archivos verificados) y en la galería del Lab (AXIS `d847b44`).

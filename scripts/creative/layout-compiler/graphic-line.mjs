@@ -13,7 +13,7 @@ import { AXIS_GRAPHIC_LINE_ORBIT_CONTRACT, resolveGraphicLineIntent } from '@efe
 
 import { compositeLuminosity } from './compiler.mjs'
 
-export const SUPPORTED_CONTRACT_VERSION = '0.3.0'
+export const SUPPORTED_CONTRACT_VERSION = '0.3.1'
 export const SUPPORTED_SCHEMA = 'axis.graphic-line-orbit-composition.v1'
 
 // The URL bubble as a signature blends at full opacity: measured 2026-09-26, at the 0.72 of the campaign footer it never
