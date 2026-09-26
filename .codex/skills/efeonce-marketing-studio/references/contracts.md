@@ -122,6 +122,21 @@ Health body: `{ status: ok|degraded, database: reachable|unreachable, accessMode
   `placementPreview`, `publishedAt`, `permalink`.
 - Worker endpoints (`/events/original-finalized`, `/jobs/*`) are NOT `/api/v1` and not in the registry (Cloud Run only).
 
+## Asset version ingest — DECIDED, NOT IN CODE (ADR 2026-09-26)
+
+Canon: `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`. Names are working
+names; TASK-1894/1899 fix the final ones in the registry.
+
+- Command `createAssetVersion` (route under `/api/v1`, tool `studio.asset.version.create`, class `write`): idempotent
+  by sha256 + `Idempotency-Key`, `If-Match` on the piece's `revision`, person as actor, `audit_event`, `rights`
+  with at least `licenseKind` required. New versions land pending review.
+- Upload request (tool e.g. `studio.asset.upload.request`): returns a signed V4 upload URL scoped to
+  `originals/sha256/<2>/<sha256>` with `ifGenerationMatch=0` (resumable session for big video), or "already stored"
+  when the sha256 exists. Bytes never travel in an MCP call.
+- Confirm: size, mime (allowlist + byte signature) and recomputed sha256 verified before the version exists.
+- Capabilities: `marketing_studio.asset.write` (upload) and `marketing_studio.campaign.approve` (approve); API needs a
+  write scope for assets. Open: size limits, where sha256 is recomputed for big files, cleanup of unconfirmed uploads.
+
 ## Tool manifest (`studio-tool-manifest.v1`)
 
 ```

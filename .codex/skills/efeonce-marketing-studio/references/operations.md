@@ -215,6 +215,8 @@ bash scripts/ops/infra/media-originals.sh --env staging --wiring [--apply]  # pu
 # Ingest (ADC impersonating marketing-studio-ingest[-stg]@; the CLI refuses a bucket that does not match the DB)
 pnpm media:ingest --root "<…>/Alineación/5. Contenidos" --bucket efeonce-marketing-studio-originals-staging [--campaign CMP-004] [--apply]
 pnpm media:ingest --revert-provider [--campaign …] [--apply]
+# ADR 2026-09-26: media:ingest is the TRANSITIONAL door. After a campaign's dated cutover it never creates finals for that
+# campaign (history backfill only, then retired); new finals enter by createAssetVersion (CLI studio:upload / MCP / UI).
 pnpm media:rights --asset <assetId> --version <n> --license stock --reference "…" [--from YYYY-MM-DD] [--until YYYY-MM-DD] [--territory CL] [--channel linkedin]
 # Domain integration test against staging (everything rolled back; app role)
 PGPASSWORD="$(gcloud secrets versions access latest --secret=marketing-studio-pg-staging-app-password)" \
