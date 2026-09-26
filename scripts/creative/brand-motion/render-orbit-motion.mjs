@@ -21,7 +21,7 @@ const REPO = path.resolve(HERE, '../../..')
 const args = process.argv.slice(2)
 const opt = (name, fallback) => (args.includes(name) ? args[args.indexOf(name) + 1] : fallback)
 
-export const DURATION = { reveal: 4200, open: 2800 }
+export const DURATION = { reveal: 3600, open: 2400, sting: 1600 }
 export const FORMATS = { '16x9': [1920, 1080], '16x9-4k': [3840, 2160], '1x1': [1080, 1080], '4x5': [1080, 1350], '9x16': [1080, 1920] }
 
 // Paletas por fondo. Oscuro: logo negativo; claro: logo positivo y acento «sobre claro». Todo desde tokens.
@@ -68,7 +68,7 @@ export async function openScene(browser, { format, scheme, ss }) {
 }
 
 // Tramos rápidos: ahí cada cuadro promedia subcuadros (obturador de 180°) para un desenfoque de movimiento real.
-export const BLUR = { reveal: [[1550, 2250], [2450, 3250]], open: [[600, 1300], [1100, 1700]] }
+export const BLUR = { reveal: [[1250, 1900], [2050, 2750]], open: [[350, 950], [1150, 1550]], sting: [[100, 600], [720, 1250]] }
 const SUB = 5
 
 export async function shootBlurred(scene, t, anim, pass, ss, fps) {
@@ -133,7 +133,7 @@ async function main() {
           const dir = path.join(out, `${anim}_${format}_${scheme}`)
 
           const times = storyboard
-            ? (anim === 'reveal' ? [0, 300, 700, 1100, 1450, 1700, 1950, 2250, 2600, 2950, 3300, 4200] : [0, 500, 900, 1250, 1500, 1800, 2100, 2400, 2800])
+            ? ({ reveal: [0, 250, 600, 1000, 1300, 1600, 1900, 2000, 2300, 2600, 3000, 3600], open: [0, 300, 700, 1000, 1150, 1300, 1500, 1800, 2400], sting: [0, 200, 450, 600, 700, 900, 1100, 1300, 1600] })[anim]
             : Array.from({ length: total + 1 }, (_, i) => (i * 1000) / fps)
 
           mkdirSync(path.join(dir, 'main'), { recursive: true })

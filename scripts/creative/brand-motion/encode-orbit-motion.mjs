@@ -21,16 +21,16 @@ const soundRoot = path.resolve(opt('--sound', 'sound'))
 const outRoot = path.resolve(opt('--out', 'deliverables'))
 const only = opt('--only', null)?.split(',')
 const FPS = 60
-const DUR = { reveal: 4.2, open: 2.8 }
+const DUR = { reveal: 3.6, open: 2.4, sting: 1.6 }
 const ff = a => execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', ...a], { stdio: 'inherit' })
 
-const variants = readdirSync(framesRoot).filter(d => /^(reveal|open)_/.test(d) && (!only || only.includes(d)))
+const variants = readdirSync(framesRoot).filter(d => /^(reveal|open|sting)_/.test(d) && (!only || only.includes(d)))
 
 for (const v of variants) {
   const [anim, format, scheme] = v.split('_')
   const src = path.join(framesRoot, v)
-  const base = `efeonce-orbita-${anim === 'reveal' ? 'reveal' : 'apertura'}_${format}_${scheme === 'dark' ? 'navy' : 'claro'}`
-  const out = path.join(outRoot, anim === 'reveal' ? 'reveal' : 'apertura', format, scheme === 'dark' ? 'navy' : 'claro')
+  const base = `efeonce-orbita-${({ reveal: 'reveal', open: 'apertura', sting: 'sting' })[anim]}_${format}_${scheme === 'dark' ? 'navy' : 'claro'}`
+  const out = path.join(outRoot, ({ reveal: 'reveal', open: 'apertura', sting: 'sting' })[anim], format, scheme === 'dark' ? 'navy' : 'claro')
   const alphaTag = scheme === 'dark' ? 'alpha-para-fondo-oscuro' : 'alpha-para-fondo-claro'
 
   mkdirSync(out, { recursive: true })
