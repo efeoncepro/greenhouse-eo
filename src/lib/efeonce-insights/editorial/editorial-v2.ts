@@ -432,7 +432,6 @@ const barReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, local
   const biggest = ordered[0]
   const uniqueBiggest = biggest && (ordered.length === 1 || ordered[1]!.change.text.replace('-', '') !== biggest.change.text.replace('-', ''))
   const highest = [...facts].sort((a, b) => (b.value as number) - (a.value as number))[0]!
-  const highestUnique = facts.filter(fact => fmt(fact, locale) === fmt(highest, locale)).length === 1
 
   const conclusionText = biggest
     ? firstFitting(
@@ -444,7 +443,9 @@ const barReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, local
       ? highestText(facts, context, locale)
       : firstFitting(L.conclusion, `${subjectOf(first, context)}: ${valueText(first, locale)}.`)
 
-  const key = biggest?.fact ?? (facts.length > 1 && highestUnique ? highest : first)
+  // En un empate la cifra principal es el valor EMPATADO (cualquiera de los empatados imprime lo mismo), nunca el primer
+  // hecho de la figura: «39» con la bajada «Dimensiones evaluadas.» mentía (Berel en staging, 2026-09-26).
+  const key = biggest?.fact ?? (facts.length > 1 ? highest : first)
   const cited = biggest ? [biggest.fact.factId, biggest.change.previous.factId] : facts.length > 1 ? facts.filter(fact => fmt(fact, locale) === fmt(highest, locale)).map(fact => fact.factId) : [key.factId]
 
   if (!conclusionText) return null
