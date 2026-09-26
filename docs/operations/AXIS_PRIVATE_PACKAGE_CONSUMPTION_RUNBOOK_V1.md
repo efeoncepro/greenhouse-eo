@@ -57,6 +57,19 @@ source control.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
 
+## Delta 2026-09-26 — un paquete AXIS nuevo rompió el CI de develop durante horas
+
+- AXIS 0.2.7 publicó por primera vez `@efeoncepro/axis-brand-assets` (07:45Z; los 19 SVG oficiales de logos,
+  isotipos y burbujas de URL, sellados por SHA-256). Greenhouse lo adoptó una hora después (`30313912e`).
+- El paquete nuevo sólo daba acceso a `axis-design-system`. Todos los `pnpm install --frozen-lockfile` del CI de
+  `greenhouse-eo` fallaron con `ERR_PNPM_FETCH_403`, desde la corrida de `63ccc07fd` (08:24Z), y bloquearon el PR
+  de release #243. El release de TASK-1888 salió desde una rama propia y no lo detectó.
+- Causa: esta sección decía «los tres paquetes AXIS». La regla era por paquete y el paquete nuevo quedó fuera. Separar
+  los assets en un paquete propio fue correcto: son archivos sellados, distintos de valores (tokens) y de lógica
+  (contratos). El error fue de proceso: nadie dio el acceso al consumidor ni leyó el veredicto del CI después del push.
+- Arreglo: `Manage Actions access → Read` para `greenhouse-eo` en el paquete. La regla ahora cubre todo paquete
+  nuevo; ver §Required GitHub package access.
+
 ## Delta 2026-09-14 — composición publicitaria y selección colaborativa publicadas
 
 El tag `v0.2.5` publicó `axisAdvertising.compositions.supportingTagline`,
@@ -339,7 +352,16 @@ Add:
 - `efeoncepro/greenhouse-eo`
 - `efeoncepro/efeonce-globe`
 
-Repeat for all three AXIS packages. Do not make the packages public as a shortcut.
+Repeat for **every** AXIS package — today `axis-tokens`, `axis-ui-contracts`, `axis-ui-registry` and
+`axis-brand-assets` — and for **every new package** the AXIS repo publishes. Access is per package: a new package
+only grants its source repository (`axis-design-system`), and it does not inherit the consumers of the other AXIS
+packages. Do not make the packages public as a shortcut.
+
+🔴 **Publishing a NEW AXIS package is not done until each consumer repository can install it from Actions.** Grant
+`Manage Actions access → Read` to `greenhouse-eo`, `efeonce-globe` and `efeonce-marketing-studio` (whichever will
+depend on it) **before** any consumer adds the dependency. Then push the consumer change and read the CI verdict
+of that exact SHA: laptops and Vercel use a personal `read:packages` token, so only the `GITHUB_TOKEN` of Actions
+exposes a missing grant (`ERR_PNPM_FETCH_403` on `npm.pkg.github.com/download/@efeoncepro/<package>`).
 
 ## Consumer `.npmrc`
 
