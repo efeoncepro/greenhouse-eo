@@ -1,13 +1,13 @@
 # Línea gráfica Efeonce — La órbita · V1
 
 > **Tipo de documento:** Manual de marca (contrato operativo de diseño)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
-> **Última actualización:** 2026-09-25
+> **Última actualización:** 2026-09-26 (4.9 · Oficina en foto)
 > **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
-> **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (39 láminas, siete capítulos)
+> **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (40 láminas, siete capítulos)
 > **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
-> **Manual en PDF:** [`deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](./deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) (A4, 54 hojas, confidencial · uso interno). Se regenera con `node scripts/documents/render-efeonce-graphic-line.mjs`.
+> **Manual en PDF:** [`deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](./deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) (A4, 56 hojas, confidencial · uso interno). Se regenera con `node scripts/documents/render-efeonce-graphic-line.mjs`.
 > **Fuentes del repo:** `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/` (generador del canvas, texturas, renders, firma de mail, merch generativo y prueba sin logo)
 > **Relacionados:** [Lenguaje fotográfico](../brand-photography/README.md) · [Selección de referencias de marca](../EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md) · `docs/context/09_marca-agencia.md` · `src/config/efeonce-brand.ts`
 
@@ -345,6 +345,7 @@ con la órbita alrededor de la foto: **A · clara** (divisor que termina en la e
   pregunta y su respuesta por espacio.
 - **Convivir:** tazas, cuaderno, credencial, stickers, fondos de pantalla (la órbita a la derecha, la zona izquierda
   libre para la cámara) y tarjetas de mesa con la voz. Los datos reales los completa la oficina.
+- **En foto:** las nueve aplicaciones fotografiadas en un espacio real están en §10.9.
 
 ### 10.4 Objetos — la regla
 
@@ -403,6 +404,28 @@ El canvas incluye 17 fotos de producto generadas con IA (GPT Image 2.5 Sunburst)
 de cada pieza como referencia, y de los kits reales de prenda (polo, gorra, lanyard) como referencia de forma y
 tela. El modelo sólo pone material y luz. **Son maquetas de presentación**: la producción sale de los archivos
 vectoriales y de una muestra física del proveedor. Prompts y runner: `exploracion-v5/merch-ia/`.
+
+### 10.9 Oficina en foto
+
+La lámina 4.9 muestra las nueve aplicaciones de oficina de 10.3 fotografiadas en un espacio real: mural de
+recepción, vidrio de sala, muro del pasillo, pizarra de proyecto, pantalla de estado de sala, muro de voz, cocina,
+puesto de bienvenida y cabinas. Mismo método que el merch: el arte plano de la lámina 4.3 es la referencia exacta y
+GPT Image 2.5 Sunburst (`xhigh`) sólo pone el espacio, el material y la luz, en el registro documental del
+lenguaje fotográfico (luz de día con una dirección, materiales reales, nadie mira al lente).
+
+Lo que enseñó la corrida (9 generaciones y 4 ediciones):
+
+- **El modelo imprime todo lo que ve en el arte, incluidas las notas de la lámina.** Dos fotos salieron con la
+  anotación pintada en el muro («v07 · aprobada por dirección de arte», «Muro de voz: una pregunta…»). El arte que
+  se pasa como referencia debe quedar **sin leyendas de lámina**; si ya salió, se corrige editando la foto.
+- **El logo chico se reinventa.** En el carnet, el símbolo del logotipo salió como una mancha. Se corrigió editando
+  la foto con el logo oficial (`public/branding/logo-full.svg`) como segunda referencia; revisarlo siempre al 100 %.
+- **La puntuación se revisa letra por letra:** un espacio antes del punto final se corrigió editando la foto.
+- Las correcciones se hacen **editando la foto generada** (editar conserva) y no regenerando la escena.
+
+Son **maquetas de dirección**: la producción sale de los archivos vectoriales, con prueba de color sobre el
+material real (vinilo, pintura, cerámica, impresión). Runner, ediciones y prompts:
+`exploracion-v5/oficina-ia/` (`items.mjs`, `edits.mjs`, `LEEME.md`).
 
 ---
 

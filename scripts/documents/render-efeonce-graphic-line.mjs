@@ -94,6 +94,7 @@ const assets = {
   FIG_ISOTIPO: await fig('D-05-isotipo.jpg', 280, 880),
   FIG_OBJETOS: await fig('M-01-merch-foto-llevar.jpg', 280, 640),
   FIG_BIENVENIDA: await fig('M-02-merch-foto-identificarse.jpg', 280, 1140),
+  FIG_OFICINA: await fig('M-04-oficina-foto.jpg', 262, 1560),
   FIG_SINO: await fig('D-03-elementos-si-no.jpg', 280, 960),
   ANNEX: annex.join('\n')
 }

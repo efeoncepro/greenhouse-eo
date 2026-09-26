@@ -101,7 +101,7 @@ con cliente, una pieza proyectada, entre otras. Se hicieron con la cadena del le
 |---|---|---|
 | Manual técnico-operativo (fuente de verdad) | [`EFEONCE_GRAPHIC_LINE_V1.md`](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) | quien produce o audita |
 | Decisión (ADR) | [`EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md`](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) | quien necesita saber qué se decidió y qué se descartó |
-| Manual en PDF (A4, 54 hojas, confidencial) | [`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](../../operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) | el equipo (uso interno) |
+| Manual en PDF (A4, 56 hojas, confidencial) | [`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](../../operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) | el equipo (uso interno) |
 | Referencia pública en el sistema de diseño AXIS | [axis.efeonce.org/references/graphic-line](https://axis.efeonce.org/references/graphic-line) | cualquiera que necesite ver los elementos vivos |
 | Valores oficiales (grosores, colores, proporciones) | tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` | quien construye piezas en código |
 | Canvas de trabajo (taller, privado) | [Canvas «Línea gráfica Efeonce»](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) | quien explora nuevas aplicaciones |

@@ -130,7 +130,7 @@ Un agente no dibuja la órbita a mano: declara qué hace en la pieza y AXIS resu
 
 ## Paso a paso — regenerar el PDF del manual
 
-El PDF (`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`, A4, 54 hojas, confidencial) se genera desde una fuente HTML. Se
+El PDF (`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`, A4, 56 hojas, confidencial) se genera desde una fuente HTML. Se
 regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 
 1. Edita la fuente: `docs/operations/brand-graphic-line/deliverables/linea-grafica-efeonce.src.html`. Si cambias una
@@ -159,7 +159,7 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 | **Sistema consistente, no activo distintivo demostrado** | no se ha medido si la gente reconoce a Efeonce sin el logo; no afirmes que la órbita se reconoce sola |
 | **Candidato sin aprobar** | pares de copy del banco; sirven de referencia, no de copy final |
 | **Decisión pendiente** | firma de mail A o B; panel de la prueba sin logo |
-| **Maqueta de presentación** | las fotos de merch del canvas generadas con IA; la producción sale de los archivos vectoriales y de una muestra física del proveedor |
+| **Maqueta de presentación** | las fotos de merch y de oficina del canvas generadas con IA; la producción sale de los archivos vectoriales y de una muestra física del proveedor |
 | **[propuesta]** en el manual técnico | valor a validar con prueba de impresión (por ejemplo, tamaños mínimos del logo e isotipo impresos) |
 
 ### Salida del comando del PDF

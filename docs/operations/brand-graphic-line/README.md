@@ -14,13 +14,13 @@ manual, la decisión y los entregables para personas.
 |---|---|---|
 | Manual técnico-operativo (fuente de verdad) | [`EFEONCE_GRAPHIC_LINE_V1.md`](./EFEONCE_GRAPHIC_LINE_V1.md) | Las 12 secciones: esfera, color, tipografía, voz, eslogan, oficio, familia, logo e isotipo, fotografía, aplicaciones, do's & don'ts y decisiones |
 | Decisión (ADR) | [`EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md`](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) | Qué se decidió, alternativas descartadas, consecuencias y pendientes |
-| Manual en PDF | [`deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](./deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) | A4, 54 hojas, confidencial · uso interno |
+| Manual en PDF | [`deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](./deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) | A4, 56 hojas, confidencial · uso interno |
 | Fuente del PDF | [`deliverables/linea-grafica-efeonce.src.html`](./deliverables/linea-grafica-efeonce.src.html) | HTML editable del PDF |
 | Renderer del PDF | [`scripts/documents/render-efeonce-graphic-line.mjs`](../../../scripts/documents/render-efeonce-graphic-line.mjs) | `node scripts/documents/render-efeonce-graphic-line.mjs`; lee las láminas locales de `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/canvas/laminas-full/` |
 | Burbujas de URL horneadas | [`deliverables/assets/url-lum-light.svg`](./deliverables/assets/url-lum-light.svg) · [`url-lum-dark.svg`](./deliverables/assets/url-lum-dark.svg) | Para visores, correo, PDF y referencias para IA, donde la fusión de luminosidad no está garantizada |
 | Referencia pública en AXIS | [axis.efeonce.org/references/graphic-line](https://axis.efeonce.org/references/graphic-line) | Láminas reconstruidas en HTML nativo; repo `efeoncepro/axis-design-system` (un push a `main` despliega el proyecto `axis-design-system-lab`) |
 | Tokens | `efeonceGraphicLine` en `@efeoncepro/axis-tokens` | Valores oficiales con pruebas de contraste; nunca se transcriben |
-| Canvas de trabajo (privado) | [claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) | Taller de exploración (39 láminas, siete capítulos) |
+| Canvas de trabajo (privado) | [claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) | Taller de exploración (40 láminas, siete capítulos) |
 | Taller de la exploración | `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/` | Generador del canvas, texturas, renders, firma de mail, merch generativo y kit de la prueba sin logo |
 | Banco de fotos para la lente | `ai-generations/2026-09-25_banco-lente-orbita/` ([`LEEME.md`](../../../ai-generations/2026-09-25_banco-lente-orbita/LEEME.md)) | 8 tomas documentales hechas con `pnpm foto:generar`: fichas y prompts versionados, plates locales |
 | Composición por intención | `pnpm creative:orbit:resolve` · `pnpm creative:orbit:render` (`scripts/creative/layout-compiler/graphic-line.mjs`) | Adapter de Greenhouse del contrato AXIS `efeonce.graphic-line-orbit` 0.1.0 (AXIS 0.2.6): manifest, SVG, PNG y `qa.json` |

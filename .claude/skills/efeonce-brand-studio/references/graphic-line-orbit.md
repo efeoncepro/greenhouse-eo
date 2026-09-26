@@ -70,10 +70,10 @@ versión publicada del paquete está el export (no asumirlo). Los HEX de la burb
 |---|---|---|
 | Manual (SSOT de contenido) | `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` | contrato operativo |
 | ADR | `docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md` | decisión y alternativas descartadas |
-| PDF (A4, 54 hojas, confidencial) | `docs/operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf` | entregable para personas; regenerar con `node scripts/documents/render-efeonce-graphic-line.mjs` desde `deliverables/linea-grafica-efeonce.src.html` |
+| PDF (A4, 56 hojas, confidencial) | `docs/operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf` | entregable para personas; regenerar con `node scripts/documents/render-efeonce-graphic-line.mjs` desde `deliverables/linea-grafica-efeonce.src.html` |
 | AXIS (pública, canónica) | https://axis.efeonce.org/references/graphic-line | láminas en HTML nativo |
 | Tokens | `efeonceGraphicLine` en `@efeoncepro/axis-tokens` | valores |
-| Canvas (taller, privado) | https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii | 39 láminas, 7 capítulos; exploración, no fuente |
+| Canvas (taller, privado) | https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii | 40 láminas, 7 capítulos; exploración, no fuente |
 | Banco de fotos de lente | `ai-generations/2026-09-25_banco-lente-orbita/` | 8 tomas propias (`pnpm foto:generar`), fichas y plates |
 | Burbuja URL horneada | `docs/operations/brand-graphic-line/deliverables/assets/url-lum-{light,dark}.svg` | firma de dirección web |
 
