@@ -291,6 +291,7 @@ import { getReleasePendingWithoutJobsSignal } from './queries/release-pending-wi
 import { getReleaseStaleApprovalSignal } from './queries/release-stale-approval'
 import { getReleaseWorkerRevisionDriftSignal } from './queries/release-worker-revision-drift'
 import { getKortexGithubCiLastStatusSignal } from './queries/kortex-github-ci-last-status'
+import { getMarketingStudioHealthSignal } from './queries/marketing-studio-health'
 import { getPublicSiteAstroDeployFailedSignal } from './queries/public-site-astro-deploy-failed'
 import { getPublicSiteAstroCiFailedSignal } from './queries/public-site-astro-ci-failed'
 import { getDesignHandoffStaleEntriesSignal } from './queries/design-handoff-stale-entries'
@@ -1092,6 +1093,13 @@ interface ReliabilityOverviewSources {
   kortexGithubCiLastStatus?: ReliabilitySignal | null
 
   /**
+   * TASK-1896 — Efeonce Marketing Studio (sistema par): health profundo por HTTP con bearer studio:health.
+   *   - platform.marketing_studio.health (runtime)
+   * Roll up bajo moduleKey='platform'. El detalle (componentes y frescura) vive en Studio.
+   */
+  marketingStudioHealth?: ReliabilitySignal | null
+
+  /**
    * TASK-1161 — Public Site Astro/Vercel binding reader signal.
    *   - public_site.astro_deploy_failed (incident)
    * Roll up bajo moduleKey='platform' hasta que exista subsystem Public Site dedicado.
@@ -1429,6 +1437,8 @@ export const buildReliabilityOverview = (
     ...(sources.productionRelease ?? []),
     // TASK-1166 — Kortex GitHub repository control plane runtime signal.
     ...(sources.kortexGithubCiLastStatus ? [sources.kortexGithubCiLastStatus] : []),
+    // TASK-1896 — Efeonce Marketing Studio aggregated health (sister platform over HTTP).
+    ...(sources.marketingStudioHealth ? [sources.marketingStudioHealth] : []),
     // TASK-1161 — Public Site Astro/Vercel production deploy failure.
     ...(sources.publicSiteAstroDeployFailed ? [sources.publicSiteAstroDeployFailed] : []),
     // TASK-1167 — Public Site Astro GitHub repository CI runtime signal.
@@ -2769,6 +2779,11 @@ export const getReliabilityOverview = async (
       ? preloadedSources.kortexGithubCiLastStatus
       : await getKortexGithubCiLastStatusSignal().catch(() => null)
 
+  const marketingStudioHealth =
+    preloadedSources.marketingStudioHealth !== undefined
+      ? preloadedSources.marketingStudioHealth
+      : await getMarketingStudioHealthSignal().catch(() => null)
+
   const publicSiteAstroDeployFailed =
     preloadedSources.publicSiteAstroDeployFailed !== undefined
       ? preloadedSources.publicSiteAstroDeployFailed
@@ -3113,6 +3128,7 @@ export const getReliabilityOverview = async (
     commercialHealth,
     productionRelease,
     kortexGithubCiLastStatus,
+    marketingStudioHealth,
     publicSiteAstroDeployFailed,
     publicSiteAstroCiFailed,
     designHandoffStaleEntries,

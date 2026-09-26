@@ -73,6 +73,22 @@ export const MANUAL_TEAMS_ANNOUNCEMENT_DESTINATIONS: Record<string, ManualTeamsA
     teamId: 'aae47836-8e59-4d9a-bce5-37d12978a1ad',
     channelId: '19:19UgRoht3Vmw0qgzfC71rKlOpHtfEI4Qz1jVdWMGqXE1@thread.tacv2',
     defaultCtaLabel: 'Ver /admin/operations'
+  },
+  // TASK-1896 — Alertas deterministas de Efeonce Marketing Studio (señal platform.marketing_studio.health en
+  // severidad error). Canal "EO - Admin" del Equipo Efeonce por decisión del operador (2026-09-26); channelCode
+  // propio para audit trazable de origen.
+  'marketing-studio-reliability-alerts': {
+    key: 'marketing-studio-reliability-alerts',
+    label: 'Marketing Studio Reliability Alerts (EO - Admin)',
+    description: 'Alertas deterministas de Efeonce Marketing Studio en severidad error (base caída, conexiones saturadas, ensayo de restauración fallido o vencido). Destino: canal "EO - Admin" del Equipo Efeonce.',
+    channelCode: 'marketing-studio-reliability-watch',
+    secretRef: 'greenhouse-teams-bot-client-credentials',
+    botAppId: 'a1397477-4aae-4f16-a0a2-a213cb1b00b2',
+    azureTenantId: 'a80bf6c1-7c45-4d70-b043-51389622a0e4',
+    recipientKind: 'channel',
+    teamId: 'aae47836-8e59-4d9a-bce5-37d12978a1ad',
+    channelId: '19:19UgRoht3Vmw0qgzfC71rKlOpHtfEI4Qz1jVdWMGqXE1@thread.tacv2',
+    defaultCtaLabel: 'Ver /admin/operations'
   }
 }
 

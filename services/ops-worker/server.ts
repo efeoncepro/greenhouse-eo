@@ -19,6 +19,7 @@
  *   POST /nexa/weekly-digest           → Send the weekly Nexa executive digest via email
  *   POST /reliability-ai-watch         → Reliability AI Observer (TASK-638): Gemini watcher over RCP overview
  *   POST /seo/etv-methodology-drift-watch → Daily deterministic Teams alert if seo.etv_methodology.drift=error (TASK-1806)
+ *   POST /marketing-studio/health-watch → Daily deterministic Teams alert if platform.marketing_studio.health=error (TASK-1896)
  *   POST /cloud-cost-ai-watch          → Cloud cost FinOps AI + deterministic alert sweep (TASK-769)
  *   POST /finance/account-balances/fx-drift/remediate → Bounded FX drift remediation (TASK-842)
  *   POST /finance/dte-emission-retry → Retry queued DTE emissions (TASK-1194)
@@ -697,6 +698,31 @@ const handleSeoEtvMethodologyDriftWatch = async (_req: IncomingMessage, res: Ser
     const message = error instanceof Error ? error.message : 'Unknown error'
 
     console.error('[ops-worker] /seo/etv-methodology-drift-watch failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
+/**
+ * POST /marketing-studio/health-watch
+ * TASK-1896: chequeo diario de la señal platform.marketing_studio.health (health profundo de Studio por HTTP);
+ * alerta a Teams sólo si severity=error. Determinista, sin LLM; ver marketing-studio/health-alert.ts.
+ */
+const handleMarketingStudioHealthWatch = async (_req: IncomingMessage, res: ServerResponse) => {
+  console.log('[ops-worker] POST /marketing-studio/health-watch')
+
+  try {
+    const { checkAndAlertMarketingStudioHealth } = await import('@/lib/marketing-studio/health-alert')
+    const result = await checkAndAlertMarketingStudioHealth()
+
+    console.log(
+      `[ops-worker] /marketing-studio/health-watch done — severity=${result.severity} alerted=${result.alerted}${result.teamsError ? ` teamsError=${result.teamsError}` : ''}`
+    )
+
+    json(res, 200, result)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /marketing-studio/health-watch failed:', message)
     json(res, 500, { error: message })
   }
 }
@@ -3207,6 +3233,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/seo/etv-methodology-drift-watch') {
       await handleSeoEtvMethodologyDriftWatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/marketing-studio/health-watch') {
+      await handleMarketingStudioHealthWatch(req, res)
 
       return
     }
