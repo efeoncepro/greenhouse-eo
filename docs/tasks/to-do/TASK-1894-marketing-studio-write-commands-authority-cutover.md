@@ -6,6 +6,55 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 (capa de estrategia)
+
+- **Decisión nueva que también gobierna esta task:**
+  [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md)
+  (`Accepted` 2026-09-26; §4.1 paridad y ejecución por agentes, §4.2 catálogo de canales, §5 niveles de riesgo, §8
+  invariantes). Su §9 la declara base de los commands de la capa de estrategia. Tasks nuevas que la consumen:
+  `TASK-1905` (catálogo de canales, `riskTier`, referencia ICP), `TASK-1907` (plan; usa el brief y sus KPI),
+  `TASK-1909` (IA; usa `createCopyVariant`), `TASK-1910` (readback: las líneas `actual` nacen sólo de readback) y
+  `TASK-1911` (experimentos sobre piezas, copys y audiencias).
+- **Brief con canal del catálogo:** `studio.campaign_brief.channels text[]` pasa a nacer como
+  `channel_keys text[]` + `channel_catalog_version int NULL`. La tabla es nueva (Slice 5), así que el brief no tiene
+  expand ni backfill: nunca existe una columna de canal libre en el brief.
+- **El canal se llama `channelKey`/`channelKeys` en todo DTO de escritura desde que nace** (copy, anuncio, línea de
+  presupuesto por canal, post, derechos de versión `rights.channelKeys`, brief), para que el contrato que ven los
+  agentes no cambie cuando llegue el catálogo. Nunca con sufijo de mercado (`linkedin_ads`, jamás `linkedin_ads_cl`).
+- **Validación de canal al escribir:** los commands de copy, pieza (derechos, también al pedir la subida), anuncio,
+  presupuesto, post y brief llaman al validador del catálogo de TASK-1905 (`validateAgainstChannelCatalog`) por un
+  puerto del kernel: canal desconocido o límite duro excedido ⇒ `422` sin escribir (modo `enforce`); límite
+  recomendado excedido o formato requerido faltante ⇒ se escribe y el resultado trae `warnings[]` (hallazgo visible en
+  «atención»). Los códigos (`channel_unknown`, `channel_hard_limit_exceeded`) los define TASK-1905.
+- **Nivel de riesgo obligatorio:** toda entrada del registro `operations.ts` (las 18 lecturas vigentes, las
+  operaciones de esta task y las exclusiones) declara `riskTier` (`T0` lectura · `T1` borrador o edición reversible ·
+  `T2` aprobación, destructiva, gasto o credenciales externas), explícito por entrada y exportado por tool en el
+  manifiesto. El kernel lo **lee del registro** y lo aplica: `T1` exige `Idempotency-Key` e `If-Match` sobre entidad
+  existente; `T2` pasa su `dryRun` por el punto de extensión `confirmation` (el `428 confirmation_required` por falta de
+  digest lo implementa TASK-1899). Ningún parámetro del request cambia el nivel. Tabla en Detailed Spec §«Nivel de
+  riesgo por operación».
+- **Decisión de dependencia con TASK-1905: en paralelo con fallback documentado, no bloqueo.** TASK-1905 está
+  bloqueada por esta task (necesita el kernel, los commands, el brief y las capabilities de escritura), así que
+  hacerla bloqueante de un slice de ésta crearía un ciclo. Reparto:
+  1. El campo `riskTier` y su aplicación en el kernel nacen aquí (Slice 1), con el contrato que fija TASK-1905 §Slice 1
+     (tipo `'T0' | 'T1' | 'T2'`, valor explícito por entrada, exportado por tool). TASK-1905 Slice 1 hereda el campo y
+     conserva lo suyo: los detectores ampliados del test de paridad (casos c–e) y la lectura del nivel por el gateway
+     desde el artefacto sincronizado.
+  2. El Slice 1 define el puerto `ChannelValidator` con la firma de `validateAgainstChannelCatalog`
+     (`{ blocking, warnings }`) y un adaptador por defecto que no bloquea ni advierte y deja
+     `channel_catalog_version = NULL` («sin validar contra el catálogo»). TASK-1905 Slice 3 reemplaza el adaptador por
+     el real sin tocar commands ni contrato.
+  3. Mientras no existan las columnas `channel_key` de TASK-1905 Slice 4, el `channelKey` recibido se guarda en la
+     columna de texto vigente de su tabla (`copy_variant.channel`, `ad_configuration.channel`,
+     `budget_line.channel`, `scheduled_post.network`, `asset_version.rights_channels`) y entra al backfill de
+     TASK-1905 como cualquier alias (mapeo humano, nunca adivinado).
+  4. Si los Slices 2–4 de TASK-1905 ya están en producción cuando esta task llega al Slice 6, el Slice 6 nace con el
+     validador real y escribe `channel_key` + `channel_catalog_version` directamente.
+- **No cambia:** el brief sigue siendo la entrada humana y nunca guarda personas locales; las referencias al modelo de
+  cliente de Greenhouse (organización, versión, id) viven en `studio.audience` y `studio.campaign` (TASK-1905 Slice 6)
+  y en la matriz del plan (TASK-1907). `campaign_brief_audience` sigue siendo texto del brief con referencia opcional a
+  `studio.audience`.
+
 ## Delta 2026-09-26 — Re-scope por el ADR de fuente de verdad e ingreso (Accepted 2026-09-26)
 
 - **Decisión que gobierna esta task:**
@@ -150,7 +199,8 @@ el catálogo ya registró con sha256 (24 imágenes de CMP-002 no entraron por es
 Revisar y respetar:
 
 - `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md` (**gobernante**, Accepted 2026-09-26; §4.2 un command y tres puertas, §4.4 aprobación humana, §4.5 corte, §8 invariantes)
-- `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` (§3 invariantes, §4 contrato, §5 acceso, §7 import y corte, §7.2 originales y worker, §9 observabilidad)
+- `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md` (Accepted 2026-09-26; §4.1 paridad y ejecución por agentes, §4.2 catálogo de canales, §5 niveles de riesgo, §8 invariantes)
+- `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` (§3 invariantes, §3.1 capa de estrategia, §4 contrato, §5 acceso, §7 import y corte, §7.2 originales y worker, §9 observabilidad)
 - `docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md` (§Contrato obligatorio; §Futuro consumer Efeonce MCP)
 - `docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md` y `docs/campaigns/` (CDRs: qué es una campaña y sus estados)
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
@@ -172,6 +222,8 @@ Reglas obligatorias:
 - `anonymous_open` nunca escribe, aunque `STUDIO_ACCESS_MODE=open`.
 - Capability nueva ⇒ grant a ≥1 rol real en `src/lib/entitlements/runtime.ts` en el mismo commit (`capability-grant-coverage.test.ts`).
 - El importador y `media:ingest` nunca pisan una pieza con versiones de origen `studio` ni una campaña con `source_of_truth = 'studio'`.
+- Toda entrada del registro declara `riskTier` (`T0`/`T1`/`T2`); el kernel lo lee del registro y ningún cliente lo degrada.
+- Todo canal que escribe un command es un `channelKey` del catálogo de TASK-1905 (sin sufijo de mercado) y pasa por el puerto `ChannelValidator`; nunca un campo de canal en texto libre nuevo.
 - Sin SQL contra la base de Greenhouse; sin restaurar ni clonar la instancia Cloud SQL compartida.
 
 ## Normative Docs
@@ -198,12 +250,17 @@ Reglas obligatorias:
 - `TASK-1899` (MCP de escritura y aprobaciones): federa las tools de clase `write`/`approve` de este manifiesto, siembra `marketing_studio.campaign.approve` e implementa el puerto de autoridad del actor delegado.
 - `TASK-1898` (login): implementa el puerto de autoridad del actor `user`; no reescribe commands.
 - `TASK-1892`: sin impacto directo (lecturas de métricas).
+- `TASK-1905` (bloqueada por esta task): hereda el campo `riskTier` del registro y su aplicación en el kernel, enchufa `validateAgainstChannelCatalog` en el puerto `ChannelValidator` (Slice 3 de 1905), agrega las columnas `channel_key` y la referencia ICP, y mapea por alias los `channelKey` guardados en columnas de texto antes de su expand. Coordinación en paralelo, no bloqueo (Delta 2026-09-26, capa de estrategia).
+- `TASK-1907` (plan de campaña): consume `studio.campaign_brief` + `campaign_brief_kpi` (los KPI del plan se vinculan a `brief_kpi_id`), el kernel y los commands de pieza, copy, anuncio y post para vincular ítems del plan de contenidos.
+- `TASK-1909` (IA y procedencia): una propuesta de IA crea una variante nueva con `createCopyVariant`; usa los derechos de versión y el kernel.
+- `TASK-1910` (medición): las líneas `budget_line.kind = 'actual'` nacen sólo de readback observado; ningún command de esta task las escribe.
+- `TASK-1911` (experimentos): referencia piezas, copys y audiencias creadas por estos commands.
 - Operación de campañas `CMP-001…CMP-005`: tras el corte, sus finales y su catálogo sólo cambian en Studio.
 - Gateway `efeonce-mcp`: cada cambio del manifiesto exige `pnpm studio:manifest:sync` (sin federar escrituras hasta TASK-1899).
 
 ### Files owned
 
-- Repo Studio — dominio: `packages/domain/src/commands/**` (nuevo: `kernel.ts`, `idempotency.ts`, `authority.ts`, `asset-version.ts`, `asset-review.ts`, `campaign.ts`, `brief.ts`, `concept.ts`, `asset.ts`, `copy.ts`, `ad.ts`, `media-plan.ts`, `calendar.ts`, `state-transitions.ts`, `cutover.ts`), `packages/domain/src/state-machines/**`, `packages/domain/src/media/upload.ts` [nuevo], `packages/domain/src/media/filename-convention.ts` [nuevo], `packages/domain/src/media/ports.ts`, `packages/domain/src/rights/rights.ts` (extraer validación reutilizable), `packages/domain/src/readers/campaigns.ts` y `packages/domain/src/readers/overview.ts` (versión vigente, permisos, señal), `packages/domain/src/health/**` (frescura nueva), `packages/domain/src/import/catalog.ts` (guardas de autoridad), `packages/domain/src/export/catalog-export.ts` [nuevo], `packages/domain/src/auth/api-client.ts` (scopes nuevos), `packages/domain/src/errors.ts`, `packages/domain/src/index.ts`
+- Repo Studio — dominio: `packages/domain/src/commands/**` (nuevo: `kernel.ts`, `idempotency.ts`, `authority.ts`, `channel-validation.ts` (puerto `ChannelValidator` + adaptador por defecto), `asset-version.ts`, `asset-review.ts`, `campaign.ts`, `brief.ts`, `concept.ts`, `asset.ts`, `copy.ts`, `ad.ts`, `media-plan.ts`, `calendar.ts`, `state-transitions.ts`, `cutover.ts`), `packages/domain/src/state-machines/**`, `packages/domain/src/media/upload.ts` [nuevo], `packages/domain/src/media/filename-convention.ts` [nuevo], `packages/domain/src/media/ports.ts`, `packages/domain/src/rights/rights.ts` (extraer validación reutilizable), `packages/domain/src/readers/campaigns.ts` y `packages/domain/src/readers/overview.ts` (versión vigente, permisos, señal), `packages/domain/src/health/**` (frescura nueva), `packages/domain/src/import/catalog.ts` (guardas de autoridad), `packages/domain/src/export/catalog-export.ts` [nuevo], `packages/domain/src/auth/api-client.ts` (scopes nuevos), `packages/domain/src/errors.ts`, `packages/domain/src/index.ts`
 - Repo Studio — contrato y base: `packages/contracts/src/operations.ts`, `packages/contracts/src/dto.ts`, `packages/contracts/src/commands.ts` [nuevo], `packages/contracts/src/errors.ts`, `packages/contracts/src/health.ts`, `packages/contracts/src/semantics.ts`, `packages/contracts/src/openapi.ts`, `packages/contracts/src/tool-manifest.ts`, `packages/contracts/generated/**` (sólo por `pnpm mcp:manifest:generate`), `packages/database/migrations/*_asset-ingest-door.sql` [nuevo], `packages/database/migrations/*_catalog-write-commands.sql` [nuevo], `packages/database/migrations/*_campaign-authority-cutover.sql` [nuevo], `packages/database/src/schema.ts`, `packages/database/src/storage.ts` (firma V4 de subida), `packages/database/src/storage-write.ts` (borrado con precondición de generación, sólo worker)
 - Repo Studio — adaptadores: `apps/web/src/app/api/v1/**` (rutas `POST`/`PATCH` nuevas), `apps/web/src/server/api.ts`, `apps/web/src/server/runtime.ts`, `apps/web/src/server/uploads.ts` [nuevo], `apps/web/src/server/operations-parity.test.ts`, `apps/worker/src/handlers.ts`, `apps/worker/src/server.ts`, `apps/worker/src/config.ts`, `apps/worker/deploy.sh`, `scripts/studio-upload.ts` [nuevo], `scripts/studio-write.ts` [nuevo], `scripts/cutover-campaign.ts` [nuevo], `scripts/export-catalog.ts` [nuevo], `scripts/import-catalog.ts`, `scripts/media-ingest.ts`, `scripts/api-client.ts`, `scripts/gates/domain-boundary-gate.mjs`, `scripts/ops/infra/media-originals.sh`, `package.json` (scripts nuevos)
 - Greenhouse: `src/config/entitlements-catalog.ts`, `src/lib/entitlements/runtime.ts`, `migrations/*marketing-studio-asset-write-capability*` [nuevo], `migrations/*marketing-studio-campaign-write-capability*` [nuevo], `src/lib/reliability/queries/marketing-studio-health.ts` (sólo si la frescura nueva exige cambio de severidad), `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md`, `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md`, `docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md`, `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`, `docs/manual-de-uso/marketing-studio/**`, `docs/documentation/marketing-studio/efeonce-marketing-studio.md`, `docs/mcp/skills/marketing-studio/SKILL.md`, `.claude/skills/efeonce-marketing-studio/**` (+ espejo `.codex/`)
@@ -261,13 +318,13 @@ Reglas obligatorias:
 ### Contract surface
 
 - Contrato existente a respetar: `OpenAPI v1 de Studio; errores { error, code, actionable }; tool-manifest y guard de paridad de TASK-1890; health profundo de TASK-1896; almacén y descarga de TASK-1893; MCP_TOOL_SURFACE_INVARIANTS; ADR API-first; ADR de fuente de verdad e ingreso`
-- Contrato nuevo o modificado: `operaciones requestAssetVersionUpload y createAssetVersion (Entregable A); reviewAssetVersion y demás commands (Entregable B, tabla del Detailed Spec); cabeceras Idempotency-Key (obligatoria en todo POST/PATCH) e If-Match (obligatoria en mutación de entidad existente); ETag en lecturas de entidad; tools de clase write/approve con requiresPerson; scopes studio:assets:write y studio:write; capabilities marketing_studio.asset.write y marketing_studio.campaign.write; DTO de versión con reviewState, origin y createdBy; frescura approved_without_original; columna source_of_truth + cutover_on; export inverso`
+- Contrato nuevo o modificado: `campo riskTier obligatorio en toda entrada del registro y en el manifiesto; campo warnings[] en el resultado de los commands que escriben canal; channelKey/channelKeys como nombre del canal en todo DTO de escritura; operaciones requestAssetVersionUpload y createAssetVersion (Entregable A); reviewAssetVersion y demás commands (Entregable B, tabla del Detailed Spec); cabeceras Idempotency-Key (obligatoria en todo POST/PATCH) e If-Match (obligatoria en mutación de entidad existente); ETag en lecturas de entidad; tools de clase write/approve con requiresPerson; scopes studio:assets:write y studio:write; capabilities marketing_studio.asset.write y marketing_studio.campaign.write; DTO de versión con reviewState, origin y createdBy; frescura approved_without_original; columna source_of_truth + cutover_on; export inverso`
 - Backward compatibility: `compatible — rutas y tools nuevas; las lecturas agregan campos; la versión «vigente» cambia de «la última» a «la última aprobada o importada», que es idéntica para todo dato existente (todas las filas actuales quedan imported)`
 - Full API parity: `cada escritura es un command con contrato; HTTP, CLI, MCP y UI son adaptadores del mismo command; el guard de paridad del manifiesto exige tool o exclusión para cada operación nueva`
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: `studio.asset_upload [nueva], studio.idempotency_record [nueva], studio.asset (+revision), studio.asset_version (+origin, +review_state, +created_by, +original_filename, +reviewed_by, +reviewed_at, +review_note), studio.media_object (inserción por el worker tras verificar; o por el camino de dedup, sobre un objeto ya verificado), studio.audit_event, studio.api_client (scopes nuevos); después: studio.campaign (+source_of_truth, +cutover_on, +cutover_by), studio.campaign_brief + campaign_brief_audience + campaign_brief_kpi [nuevas], studio.concept, studio.copy_variant, studio.ad_configuration, studio.media_flight, studio.budget_line, studio.scheduled_post, studio.import_run (conteos de salto)`
+- Entidades/tablas/views afectadas: `studio.asset_upload [nueva], studio.idempotency_record [nueva], studio.asset (+revision), studio.asset_version (+origin, +review_state, +created_by, +original_filename, +reviewed_by, +reviewed_at, +review_note), studio.media_object (inserción por el worker tras verificar; o por el camino de dedup, sobre un objeto ya verificado), studio.audit_event, studio.api_client (scopes nuevos); después: studio.campaign (+source_of_truth, +cutover_on, +cutover_by), studio.campaign_brief (con channel_keys text[] y channel_catalog_version) + campaign_brief_audience + campaign_brief_kpi [nuevas], studio.concept, studio.copy_variant, studio.ad_configuration, studio.media_flight, studio.budget_line, studio.scheduled_post, studio.import_run (conteos de salto)`
 - Invariantes que no se pueden romper:
   - **No existe ninguna fila de `asset_version` ni de `media_object` cuyo sha256 no se haya recalculado sobre los bytes.** La versión la crea el worker después de recalcular sha256, tamaño y tipo (extensión + firma de bytes, `classifyOriginal`) y compararlos con la subida; el camino de dedup sólo enlaza un `media_object` ya existente (verificado cuando nació). Un objeto que no coincide se borra con precondición de generación y la subida queda `rejected`.
   - Una versión de origen `studio` nace siempre con `review_state = 'pending_review'`, `created_by` = actor, `original_filename` y derechos con al menos `rights_license_kind`; nunca nace aprobada.
@@ -282,6 +339,8 @@ Reglas obligatorias:
   - Los tres estados sólo cambian por su command de transición y dentro de su matriz legal; una transición ilegal devuelve `409 invalid_state_transition` sin escribir.
   - Ningún command, reader ni export suma `budget_line` de `kind` distinto; `actual` no se escribe por command.
   - El copy se persiste byte a byte; ningún command marca un post como publicado; `PATCH` distingue omitido de `null`.
+  - Toda operación declara `riskTier` en el registro; el kernel lo aplica y un request nunca lo cambia.
+  - Un canal escrito por command siempre pasa por `ChannelValidator`; con el adaptador por defecto queda `channel_catalog_version = NULL` («sin validar contra el catálogo»), nunca como validado.
 - Write-target allowlist: `N/A — Studio no tiene boundary test de destinos de escritura por tabla; el domain-boundary-gate se extiende (Slice 1) para que sólo packages/domain/src/commands/**, packages/domain/src/media/upload.ts, packages/domain/src/media/ingest.ts, packages/domain/src/media/derivatives.ts, packages/domain/src/media/worker-run.ts, packages/domain/src/rights/**, packages/domain/src/auth/** e packages/domain/src/import/** escriban en studio.* [verificar la lista contra los escritores actuales]; apps/web sigue sin poder importar @studio/database/storage-write`
 - Tenant/space boundary: `organización canónica de Greenhouse en campaign.organization_id; api_client se intersecta con organization_ids; operator_cli ve todo; user (TASK-1898) y el actor delegado (TASK-1899) pasan por el puerto de autoridad, que en esta task niega por defecto`
 - Idempotency/concurrency: `Idempotency-Key obligatoria en todo POST/PATCH (studio.idempotency_record, PK (actor, operation_id, idempotency_key), request_sha256, respuesta terminal, expires_at = 24 h): misma llave + mismo cuerpo ⇒ misma respuesta sin reescribir; misma llave + cuerpo distinto ⇒ 422 idempotency_key_reused; sólo se guardan respuestas terminales (201/200/4xx de negocio), nunca 202 ni 5xx. Concurrencia optimista: If-Match con la revisión vigente de la entidad (campaign.revision, asset.revision, copy_variant.revision, …); distinta ⇒ 412 revision_conflict sin escribir; ausente en mutación ⇒ 428 precondition_required. UPDATE … WHERE revision = $expected; revision = revision + 1. Numeración de versiones con SELECT … FOR UPDATE sobre studio.asset + UNIQUE (asset_id, version_no) como guarda de carrera`
@@ -363,6 +422,8 @@ que llega a producción**; el B no empieza a exponerse hasta que A está verde e
 - `packages/contracts/src/errors.ts`: códigos nuevos (Detailed Spec §«Errores»).
 - `packages/domain/src/auth/api-client.ts`: `API_SCOPES` += `studio:assets:write`, `studio:write`; `pnpm api-client:create --scope` los acepta.
 - `packages/contracts/src/operations.ts`: `method` admite `'POST' | 'PATCH' | 'PUT' | 'DELETE'`; `ToolSpec` pasa a unión: lectura (`writes: false`, como hoy) o escritura (`writes: true`, `class: 'write' | 'approve'`, `requiresPerson`, `destructive`, `idempotent: true`, `capability`, `capabilityAction` (`create` | `update` | `approve`), `apiScope` (`null` en `approve`)). Cada operación de escritura declara su **transporte**: `pathParams`, cabecera `Idempotency-Key` desde el argumento `idempotencyKey` (siempre obligatoria), cabecera `If-Match` desde `expectedRevision` (`required` | `optional` | `none`), `dryRun` en la query y el resto del input en el cuerpo JSON. `packages/contracts/src/tool-manifest.ts` exporta, por tool de escritura, `method`, `path`, `class`, `requiresPerson`, `destructive`, `idempotent`, `capability`, `capabilityAction`, `apiScope` y el bloque `transport` (requisito de TASK-1899 para construir la petición sin adivinar); el input schema de la tool incluye `idempotencyKey`, `expectedRevision` (si aplica) y `dryRun`. `openapi.ts` documenta cuerpos, cabeceras y códigos por operación. `pnpm mcp:manifest:check` y el leak test cubren los campos nuevos.
+- Nivel de riesgo (ADR de capa de estrategia §5; contrato de TASK-1905 §Slice 1): `Operation.riskTier: 'T0' | 'T1' | 'T2'` obligatorio y explícito en cada entrada de `operations.ts` (lecturas vigentes `T0`; tabla de Detailed Spec §«Nivel de riesgo por operación» para las nuevas), exportado por tool en el manifiesto. `runCommand` toma el nivel del registro por `operationId`: `T1` exige `Idempotency-Key` y, sobre entidad existente, `If-Match`; `T2` exige además que su `dryRun` pase por `confirmation` (el digest lo agrega TASK-1899). Test: un parámetro del request no cambia el nivel; una entrada sin `riskTier` rompe `pnpm check`.
+- `packages/domain/src/commands/channel-validation.ts`: puerto `ChannelValidator` con la firma de `validateAgainstChannelCatalog` de TASK-1905 (`{ entityType, channelKey, placementKey?, formatHint?, fields, objectiveKey?, catalogVersion }` → `{ blocking, warnings }`) inyectado en las dependencias del kernel, y adaptador por defecto sin hallazgos que marca el registro como no validado. `CommandResult` suma `warnings[]` (vacío por defecto).
 - `scripts/gates/domain-boundary-gate.mjs` + su test: sólo los módulos listados en «Write-target allowlist» escriben en `studio.*` (detección por `insertInto|updateTable|deleteFrom` sobre `studio.`); `apps/web` sigue sin poder importar `@studio/database/storage-write` (la web sólo firma).
 - Tests: kernel (anónimo 403, scope 403, organización 404, idempotencia replay/reuse, revisión 412/428, un `audit_event` por escritura, `dryRun` sin filas nuevas).
 
@@ -393,7 +454,7 @@ que llega a producción**; el B no empieza a exponerse hasta que A está verde e
   - `POST /api/v1/campaigns/{campaignId}/uploads` → `requestAssetVersionUpload`.
   - `POST /api/v1/campaigns/{campaignId}/asset-versions` → `createAssetVersion`.
 - Registro (`operations.ts`): ambas con tool de clase `write`, capability `marketing_studio.asset.write`, scope `studio:assets:write`, `requiresPerson: false` (Detailed Spec §«Operaciones y tools»); `pnpm mcp:manifest:generate`; `API_VERSION` 1.3.0.
-- CLI `scripts/studio-upload.ts` (`pnpm studio:upload <archivo…> [--campaign CMP-###] [--asset <assetId>] [--new-asset] [--license <kind>] [--reference <texto>] [--from AAAA-MM-DD] [--until AAAA-MM-DD] [--territory XX] [--channel <canal>] [--note <texto>] [--dry-run] [--resume <uploadId>]`): corre como `operator_cli` (impersonando la SA de ingesta del ambiente, como `media:ingest`) e invoca los **mismos** primitives: calcula sha256 en stream, pide la subida, hace PUT (reanudable para video o > 32 MiB) con reintentos (un `412` del PUT significa que el objeto ya existe: se confirma igual y el worker lo verifica), confirma con `createAssetVersion` y repite la misma llamada con la misma `Idempotency-Key` mientras reciba `202` (tope 10 min; si vence, informa `pendiente de verificación` con el `uploadId` para retomarlo con `--resume <uploadId>`). Deduce todo lo posible del nombre y **pregunta sólo lo que falta** (TTY: pregunta interactiva; sin TTY: sale con código 2 y la lista exacta de lo que falta). `--dry-run` muestra inferencia, pieza destino, versión resultante y derechos sin subir. Salida: una línea por archivo (`creado v4 · pendiente de revisión`, `duplicado de v3`, `rechazado: sha256_mismatch`).
+- CLI `scripts/studio-upload.ts` (`pnpm studio:upload <archivo…> [--campaign CMP-###] [--asset <assetId>] [--new-asset] [--license <kind>] [--reference <texto>] [--from AAAA-MM-DD] [--until AAAA-MM-DD] [--territory XX] [--channel <channelKey>] [--note <texto>] [--dry-run] [--resume <uploadId>]`): corre como `operator_cli` (impersonando la SA de ingesta del ambiente, como `media:ingest`) e invoca los **mismos** primitives: calcula sha256 en stream, pide la subida, hace PUT (reanudable para video o > 32 MiB) con reintentos (un `412` del PUT significa que el objeto ya existe: se confirma igual y el worker lo verifica), confirma con `createAssetVersion` y repite la misma llamada con la misma `Idempotency-Key` mientras reciba `202` (tope 10 min; si vence, informa `pendiente de verificación` con el `uploadId` para retomarlo con `--resume <uploadId>`). Deduce todo lo posible del nombre y **pregunta sólo lo que falta** (TTY: pregunta interactiva; sin TTY: sale con código 2 y la lista exacta de lo que falta). `--dry-run` muestra inferencia, pieza destino, versión resultante y derechos sin subir. Salida: una línea por archivo (`creado v4 · pendiente de revisión`, `duplicado de v3`, `rechazado: sha256_mismatch`).
 - Greenhouse: capability `marketing_studio.asset.write` en `src/config/entitlements-catalog.ts` (`module: 'marketing_studio'`, `actions: ['create', 'update']`, `defaultScope: 'tenant'`, convención de las capabilities `.write` del catálogo) + migración seed en `capabilities_registry` (`allowed_actions = ARRAY['create','update']`, `allowed_scopes = ARRAY['tenant']`, patrón de `20260926075619118_task-1893-marketing-studio-asset-download-capability.sql`) + grant en `src/lib/entitlements/runtime.ts` de ambas acciones a `efeonce_admin`, `efeonce_account`, `efeonce_operations` y `designer` (verificar contra `src/config/role-codes.ts`); `capability-grant-coverage.test.ts` verde. Release por el control plane.
 - Gateway (`efeonce-mcp`, PR): `pnpm studio:manifest:sync`; las tools de escritura quedan fuera de la superficie federada por el guard `write_tool_without_scope_class` hasta `TASK-1899` (verificar en Discovery que el guard excluye y no rompe el arranque; si lo rompe, el sync espera a TASK-1899 y el gateway sigue con el manifiesto anterior, lo que el runbook debe decir).
 - Docs: §7.2 de la arquitectura (puerta de ingreso), runbook (`MARKETING_STUDIO_RUNTIME_HANDOFF.md` §Subidas), manual `docs/manual-de-uso/marketing-studio/` («Subir un final a Studio»), filas nuevas en `FEATURE_FLAG_STATE_LEDGER.md`, ledger y contratos de la skill.
@@ -410,7 +471,8 @@ que llega a producción**; el B no empieza a exponerse hasta que A está verde e
 #### Slice 5 — Campaña, brief, concepto, pieza y derechos por API
 
 - `createCampaign` (nace con `source_of_truth = 'studio'`), `updateCampaign` (campos descriptivos; nunca estados), `upsertCampaignBrief` + `approveCampaignBrief` (persona), `createConcept`, `updateConcept`, `createAsset`, `updateAsset`, `setAssetVersionRights` expuesto por API (reusa `rights.ts`).
-- Migración `<ts>_catalog-write-commands.sql`: `studio.campaign_brief`, `campaign_brief_audience`, `campaign_brief_kpi` (Detailed Spec §«Brief como entidad»), `revision` + `updated_at` en toda tabla escribible que no los tenga [verificar tabla por tabla].
+- Migración `<ts>_catalog-write-commands.sql`: `studio.campaign_brief` (con `channel_keys text[]` y `channel_catalog_version int NULL`, nunca una columna de canal libre), `campaign_brief_audience`, `campaign_brief_kpi` (Detailed Spec §«Brief como entidad»), `revision` + `updated_at` en toda tabla escribible que no los tenga [verificar tabla por tabla].
+- `upsertCampaignBrief` valida `channelKeys` por el puerto `ChannelValidator`; `setAssetVersionRights` y `requestAssetVersionUpload` validan `rights.channelKeys` por el mismo puerto.
 - Toda escritura del catálogo sobre una campaña en `source_of_truth = 'onedrive'` responde `409 campaign_not_studio_owned`, salvo `createCampaign`, la puerta de ingreso (autoridad por pieza) y la revisión de versiones.
 
 #### Slice 6 — Copy, anuncios, plan de medios y calendario
@@ -419,6 +481,7 @@ que llega a producción**; el B no empieza a exponerse hasta que A está verde e
 - `createAdConfiguration`, `updateAdConfiguration` (pieza, copy y audiencia de la misma campaña; la pieza debe tener versión vigente).
 - `createMediaFlight`, `updateMediaFlight`, `setBudgetLine` (un `kind` por llamada; sólo `proposed`), `approveBudgetLine` (persona; crea la línea `approved` con referencia obligatoria), `removeBudgetLine` (sólo `proposed`, destructiva).
 - `createScheduledPost`, `updateScheduledPost`, `cancelScheduledPost` (destructiva; nunca estado publicado).
+- Todos los commands de este slice que escriben canal reciben `channelKey` y llaman al puerto `ChannelValidator` antes de escribir: copy (límites por campo), anuncio (canal, placement, objetivo y formato de la pieza vigente), línea de presupuesto por canal (canal conocido) y post (canal orgánico conocido). `blocking` ⇒ `422` sin escribir; `warnings` ⇒ se escribe y el resultado los devuelve. Con el validador real de TASK-1905 se prueba en staging; antes, con un doble en test que devuelva `blocking` y `warnings`.
 
 #### Slice 7 — Exposición del Entregable B y lo que pide TASK-1895
 
@@ -566,7 +629,7 @@ worker) y `(requested_by) WHERE state IN (…mismos…)` (tope de 20 abiertas po
   `ai_generated`, `mixed`).
 - Obligatorio además `rights.reference` (≤ 500) para `client_supplied`, `stock`, `talent`, `music` y `mixed`.
 - Opcionales: `usageStartsOn`, `usageEndsOn` (inclusive, fecha de Santiago, `ends ≥ starts`), `territories`,
-  `channels`. Validación reutilizada de `rights.ts` (extraer `validateRightsInput`; `setAssetVersionRights` y
+  `channelKeys` (claves del catálogo de canales, validadas por el puerto `ChannelValidator`). Validación reutilizada de `rights.ts` (extraer `validateRightsInput`; `setAssetVersionRights` y
   `requestAssetVersionUpload` la comparten). Los derechos se declaran al pedir la subida: una confirmación nunca los
   cambia.
 - Sin lo obligatorio ⇒ `422 rights_required` (`actionable: true`) con la lista de campos.
@@ -581,7 +644,7 @@ type RequestAssetVersionUploadBody = {
   assetId?: string                                                  // obligatorio si la inferencia no resuelve
   newAsset?: { conceptId: string; title: string; kind: 'image' | 'video'; aspectRatio: string } // confirmación explícita
   rights: { licenseKind: LicenseKind; reference?: string; usageStartsOn?: string; usageEndsOn?: string;
-            territories?: string[]; channels?: string[] }
+            territories?: string[]; channelKeys?: string[] }
   note?: string; dryRun?: boolean
 }
 type AssetUploadTicket = {
@@ -637,6 +700,19 @@ type CreateAssetVersionResult =
   `import:catalog`. Rutas y nombres finales se confirman con `mcp-craft` en el Slice 1 (Entregable A) y en el Slice 7
   (Entregable B); cualquier cambio de nombre se refleja aquí antes de implementar.
 
+### Nivel de riesgo por operación (ADR de capa de estrategia §5)
+
+| Nivel | Operaciones de esta task | Cómo las ejecuta el kernel |
+|---|---|---|
+| `T0` | las 18 lecturas vigentes; `export:catalog` (exclusión) | directa; anti-oráculo por organización |
+| `T1` | `requestAssetVersionUpload`, `createAssetVersion`, `requestAssetVersionChanges`, `setAssetVersionRights`, `transitionCreativeState`, `transitionMediaAuthorization`, `transitionLaunchState`, `createCampaign`, `updateCampaign`, `upsertCampaignBrief`, `createConcept`, `updateConcept`, `createAsset`, `updateAsset`, `createCopyVariant`, `updateCopyVariant`, `createAdConfiguration`, `updateAdConfiguration`, `createMediaFlight`, `updateMediaFlight`, `setBudgetLine`, `createScheduledPost`, `updateScheduledPost` | `Idempotency-Key` + `If-Match` sobre entidad existente + `audit_event`; actor = persona o `api_client` con scope |
+| `T2` | `approveAssetVersion`, `approveCreative`, `authorizeMedia`, `approveCampaignBrief`, `approveBudgetLine` (aprobación, persona) · `removeBudgetLine`, `cancelScheduledPost` (destructivas) · `cutover:campaign`, `api-client:*` (exclusiones de operador: autoridad y credenciales) | `dryRun` → `confirmation` → ejecución; el digest y el `428` los agrega TASK-1899 |
+
+- Editar un brief aprobado lo devuelve a borrador y sigue siendo `T1` (no aprueba, no gasta, no destruye); volver a
+  aprobarlo es `T2`.
+- Las transiciones genéricas son `T1` porque los destinos aprobatorios sólo se alcanzan por sus commands `T2`.
+- `import:catalog` (exclusión) declara `T1` mientras exista; queda retirado en el Slice 10.
+
 ### Errores (nuevos en `ERROR_CATALOG`, prosa es-CL)
 
 | code | HTTP | actionable | Cuándo |
@@ -678,7 +754,10 @@ proyecto ya tiene roles personalizados y si `roles/storage.objectViewer` incluye
 
 `studio.campaign_brief` (1:1 con campaña, `revision`, `approved_by`, `approved_at`, `approval_ref`): objetivo,
 problema, insight, mensaje central, presupuesto envolvente (monto + moneda, **propuesto**, nunca sumado al plan),
-ventana (inicio, fin), canales (`text[]`), mandatorios (`text[]`), aprobadores (`text[]`, etiquetas de persona).
+ventana (inicio, fin), canales (`channel_keys text[]` del catálogo de TASK-1905 + `channel_catalog_version`),
+mandatorios (`text[]`), aprobadores (`text[]`, etiquetas de persona). El brief no guarda personas, segmentos ni etapas
+del bow-tie: esas referencias son del modelo de cliente de Greenhouse y viven en `studio.audience`/`studio.campaign`
+(TASK-1905) y en el plan (TASK-1907).
 `studio.campaign_brief_audience` (n por brief: nombre, descripción, referencia a `studio.audience` opcional) y
 `studio.campaign_brief_kpi` (n por brief: métrica, meta, unidad, fuente esperada). El texto del brief es literal
 (misma regla que el copy). Editar un brief aprobado lo devuelve a borrador en la misma transacción (auditado).
@@ -706,8 +785,13 @@ type CommandInput<T> = {
   payload: T
 }
 
-type CommandResult<R> = { entity: R; revision: number; auditEventId: string | null; replayed: boolean }
+type CommandResult<R> = {
+  entity: R; revision: number; auditEventId: string | null; replayed: boolean
+  warnings: ChannelFinding[] // hallazgos no bloqueantes del catálogo de canales; [] por defecto
+}
 ```
+
+El kernel resuelve el `riskTier` de la operación desde el registro (nunca desde `CommandInput`).
 
 ## Rollout Plan & Risk Matrix
 
@@ -743,6 +827,8 @@ type CommandResult<R> = { entity: R; revision: number; auditEventId: string | nu
 | Un agente escribe sin confirmación humana | MCP | low | tools de escritura fuera de la superficie federada hasta TASK-1899; `dryRun` disponible | tool `write` visible en el gateway antes de TASK-1899 |
 | Manifiesto nuevo rompe el gateway | MCP | low | `studio:manifest:sync` en PR con tests; verificar comportamiento del guard | gateway sin arrancar tras el sync |
 | Capability sin grant | entitlements | low | `capability-grant-coverage.test.ts` | CI rojo |
+| Una operación nace sin `riskTier` o un cliente lo degrada | registro / kernel | low | campo obligatorio en el tipo + test del registro + el kernel lo lee por `operationId` | `pnpm check` rojo |
+| Claves de canal escritas antes del catálogo quedan sin validar | datos de campaña | medium | adaptador por defecto deja `channel_catalog_version = NULL`; el backfill de TASK-1905 las mapea por alias con revisión humana | frescura `channel_unmapped` de TASK-1905 |
 
 ### Feature flags / cutover
 
@@ -827,6 +913,10 @@ Entregable B — commands del catálogo:
 - [ ] `marketing_studio.campaign.write` existe con `allowed_actions = ['create','update']`, scope `tenant` y grant de ambas acciones a `efeonce_admin`, `efeonce_operations`, `efeonce_account` y `designer` (coverage test verde).
 - [ ] El `dryRun` de toda operación `requiresPerson` o `destructive` pasa por el punto de extensión `confirmation` del kernel (probado con un doble en test), listo para el `proposalDigest` de TASK-1899.
 - [ ] Cada escritura exitosa deja exactamente un `audit_event` con actor, operación, entidad y `correlation_id`.
+- [ ] Toda entrada de `operations.ts` (lecturas, escrituras y exclusiones) declara `riskTier` según §«Nivel de riesgo por operación», el manifiesto lo exporta por tool y una entrada sin nivel rompe `pnpm check`.
+- [ ] El kernel toma el nivel del registro por `operationId`: `T1` sin `Idempotency-Key` o sin `If-Match` sobre entidad existente se rechaza; el `dryRun` de toda operación `T2` pasa por `confirmation`; un parámetro del request no cambia el nivel (test).
+- [ ] `studio.campaign_brief` guarda `channel_keys` (sin columna de canal libre) y todo DTO de escritura nombra el canal `channelKey`/`channelKeys`.
+- [ ] Los commands de copy, anuncio, línea de presupuesto por canal, post, derechos de versión, solicitud de subida y brief llaman al puerto `ChannelValidator`: con un doble que devuelve `blocking` responden `422` sin escribir; con uno que devuelve `warnings` escriben y los devuelven en `warnings[]`; con el adaptador por defecto dejan `channel_catalog_version = NULL`.
 
 Entregable C — corte, señal y retiro:
 
@@ -858,6 +948,7 @@ Entregable C — corte, señal y retiro:
 - [ ] EPIC-049 actualizado con la puerta de ingreso, el corte de autoridad y el estado de OneDrive
 - [ ] `TASK-1899` recibe un `## Delta` con las tools de clase `write`/`approve` disponibles y el puerto de autoridad que debe implementar
 - [ ] `TASK-1895` recibe un `## Delta` con las operaciones, DTOs y códigos reales del OpenAPI desplegado
+- [ ] `TASK-1905` recibe un `## Delta` con el campo `riskTier` y el puerto `ChannelValidator` ya disponibles (lo que su Slice 1 hereda y dónde enchufa su Slice 3)
 - [ ] Skill `efeonce-marketing-studio` actualizada según su contrato de mantenimiento (ledger, mapa, contratos, operación, lecciones) y espejada
 
 ## Follow-ups
@@ -880,5 +971,6 @@ Entregable C — corte, señal y retiro:
 - Límites de tamaño por tipo y umbral de subida reanudable (ADR §11.2): esta task usa 1 GiB para todo y reanudable para video o > 32 MiB; el operador puede fijar otros antes del Slice 2.
 - Matrices de transición: confirmar con el operador y los CDRs las reaperturas permitidas (`approved → in_production`, `authorized → blocked`).
 - ¿`request_changes` sobre una versión exige persona? Esta task asume que no (es clase `write`); confirmar con el operador en el Slice 4.
+- ¿Las transiciones a estados terminales (`launch_state → ended`) deben ser `T2` en vez de `T1`? Esta task las deja `T1` (registran un hecho, no aprueban ni gastan); confirmar con el operador en el Slice 4 y reflejarlo en §«Nivel de riesgo por operación».
 - ¿El export inverso debe incluir las versiones de origen `studio` (ruta de trabajo inexistente en OneDrive) o sólo su referencia? Decidir en el Slice 8 con la prueba de ida y vuelta.
 - ¿La señal `approved_without_original` debe contar también campañas en `onedrive` con creatividad `approved` (hoy CMP-002 la pondría en `degraded` antes de su corte)? Esta task las cuenta en Atención pero sólo las cortadas cambian el estado; confirmar con el operador.

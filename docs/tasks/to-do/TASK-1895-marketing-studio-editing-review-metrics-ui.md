@@ -6,6 +6,43 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 (capa de estrategia)
+
+- **Decisión nueva:**
+  [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md)
+  (`Accepted` 2026-09-26) y el Delta del flujo maestro
+  [`EPIC-049-marketing-studio-UI-FLOW.md`](../../ui/flows/EPIC-049-marketing-studio-UI-FLOW.md) (nodos `MS-N3.10`,
+  `MS-N11`, `MS-N12`, cuya superficie es de `TASK-1912`).
+- **Fila de pestañas de 8:** `Brief · Estrategia · Piezas · Copys · Anuncios · Medios · Calendario · Resultados`.
+  «Estrategia» (`MS-N3.10`, `?tab=strategy&section=…`) va después de «Brief»; su contenido es de `TASK-1912`, que
+  agrega la entrada detrás de `STUDIO_STRATEGY_PLAN_ENABLED` (TASK-1907). Esta task construye la fila para 8 (scroll
+  interno contenido en 390 px, nunca scroll horizontal de página), la pestaña Brief (`MS-N3.2`, delta §17.1 del flujo
+  maestro) y los enlaces hacia Estrategia (desde Brief: «Ver estrategia»); no renderiza contenido de Estrategia.
+  «Resultados» deja de ser la «sexta pestaña»: es la última de 8. Piezas sigue siendo la pestaña por defecto.
+- **`MS-N11` Aprendizajes y `MS-N12` Programas** son de TASK-1912 (destinos suplementarios por ⌘K y enlaces
+  contextuales); el rail conserva sus 5 destinos y el `Nav placement` de esta task sigue en `none`. Esta task sólo
+  agrega «Ir a piezas» a ⌘K; «Ir a aprendizajes» e «Ir a programas» los agrega TASK-1912.
+- **Selectores de canal desde el catálogo:** todo campo de canal (brief, anuncio, grilla de presupuesto, derechos de
+  versión) se elige de `studio.channels.list` (`GET /api/v1/channels`, TASK-1905) y envía `channelKey`/`channelKeys`;
+  placements y objetivos del anuncio salen de `studio.channel.get`. Nunca un canal en texto libre. Los hallazgos del
+  catálogo se muestran: `422 channel_unknown`/`channel_hard_limit_exceeded` junto al campo, `warnings[]` del resultado
+  como aviso no bloqueante, y la marca «validado con especificación anterior» cuando el reader la trae. El navegador no
+  valida límites: los muestra como referencia y decide el command.
+- **Tarjeta «Pauta» opcional en Resultados** vía `studio.campaign.paid_performance.get`
+  (`GET /api/v1/campaigns/{id}/paid-performance`, `T0`, TASK-1910): gasto real y resultados observados por plataforma,
+  con fuente, ventana y frescura; «Sin datos de pauta» cuando no hay readback, nunca «0». Se construye sólo si la
+  operación existe en el OpenAPI desplegado en staging al llegar al Slice 9; si no, queda como follow-up de TASK-1912.
+- **Nivel de riesgo en la UI:** la UI no decide qué exige confirmación: lee `riskTier` del registro de
+  `packages/contracts`. `T1` guarda directo (idempotente, `If-Match`); `T2` (aprobaciones, `removeBudgetLine`,
+  `cancelScheduledPost`) abre `ConfirmDialog` con `dryRun` → diff → `confirmation.proposalDigest` (TASK-1899).
+- **Paridad verificable:** `apps/web/src/client/studio-api.ts` llama cada operación por su `operationId` tipado del
+  registro, para que el test de paridad ampliado de TASK-1905 (detector d) inventaríe estáticamente las mutaciones que
+  dispara la web.
+- **Dependencias nuevas sin bloqueo total:** los selectores de canal (Slices 3, 4, 6 y 7) esperan a que
+  `studio.channels.list` (TASK-1905 Slice 5) exista en staging; sin él, esas partes no se construyen con texto libre
+  (el resto del slice avanza). La tarjeta Pauta espera a TASK-1910. Las audiencias con referencia al modelo de cliente
+  se editan en la sección Audiencias de Estrategia (TASK-1912), no en esta task.
+
 ## Delta 2026-09-26 — ADR de fuente de verdad e ingreso (Accepted)
 
 - **Gobierna esta task:**
@@ -67,7 +104,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-1892, TASK-1894` (los Slices 2 y 4 sólo necesitan el Entregable A de TASK-1894 —puerta de ingreso— desplegado en staging; el resto, sus Entregables A y B)
+- Blocked by: `TASK-1892, TASK-1894` (los Slices 2 y 4 sólo necesitan el Entregable A de TASK-1894 —puerta de ingreso— desplegado en staging; el resto, sus Entregables A y B) · parcial: `TASK-1905` Slice 5 (`studio.channels.list`) sólo para los selectores de canal de los Slices 3, 4, 6 y 7 · opcional: `TASK-1910` para la tarjeta Pauta del Slice 9
 - Branch: `efeonce-marketing-studio main (código) · Greenhouse develop (docs, wireframe, flow, scorecard); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -115,7 +152,9 @@ que las usa, y esa superficie tiene riesgos propios que ningún contrato resuelv
 Revisar y respetar:
 
 - `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md` (**gobernante** para subida, revisión y aprobación de versiones; §4.2 un command, tres puertas; §4.4 aprobación humana; §8 invariantes)
-- `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` (§3 invariantes, §4 contrato, §5 acceso, §7 corte de autoridad, §8 interfaz)
+- `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md` (Accepted 2026-09-26; §4.1 la UI escribe sólo por commands registrados, §4.2 catálogo de canales, §5 niveles de riesgo, §8 invariantes)
+- `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` (§3 invariantes, §3.1 capa de estrategia, §4 contrato, §5 acceso, §7 corte de autoridad, §8 interfaz)
+- `docs/ui/flows/EPIC-049-marketing-studio-UI-FLOW.md` (flujo maestro: nodos `MS-N3.1…MS-N3.9` de esta task; `MS-N3.10`, `MS-N11` y `MS-N12` de TASK-1912)
 - `docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 - `docs/epics/in-progress/EPIC-049-efeonce-marketing-studio-platform.md`
@@ -129,6 +168,8 @@ Reglas obligatorias:
 - Permisos, autoridad de la campaña y umbrales de derechos se resuelven en el servidor; el navegador sólo los muestra.
 - Los bytes van del navegador directo a GCS por la URL firmada; nunca a una ruta de Studio. Una versión subida se muestra «Pendiente de revisión» y nunca como vigente; sólo `permissions.canApprove` habilita «Aprobar versión».
 - Tokens del tema salen de `@efeoncepro/axis-tokens` vía `apps/web/scripts/generate-theme.mjs`; ningún hex nuevo en `app.css`.
+- Todo canal se elige del catálogo (`studio.channels.list`) y viaja como `channelKey`; nunca un input de canal en texto libre.
+- La confirmación de una acción la decide su `riskTier` del registro (`T2` ⇒ `dryRun` → diff → digest), nunca una lista escrita en un componente.
 
 ## Normative Docs
 
@@ -149,16 +190,21 @@ Reglas obligatorias:
 - `TASK-1894`: Entregable A — `requestAssetVersionUpload`, `createAssetVersion` (`202 pending_verification` / `201`), dedup por sha256, derechos obligatorios, inferencia desde el nombre, `reviewState`/`pendingVersionNo` en los DTO; Entregable B — `approveAssetVersion`, `requestAssetVersionChanges`, commands de campaña, brief, copy, anuncio, plan y tres estados con `Idempotency-Key`, `If-Match` y auditoría; `permissions` en `getCampaign` (`writable`, `lockReason`, `allowedTransitions`, `canApprove`, `revision`); campaña sandbox `CMP-900` y `api_client` de pruebas en staging.
 - ADR `EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md` (Accepted 2026-09-26).
 - `TASK-1898`: login con Efeonce ID; condición para que la edición se use en producción (no bloquea el code complete).
+- `TASK-1905` (parcial): `studio.channels.list` y `studio.channel.get` para los selectores de canal; `riskTier` en el registro; hallazgos de canal (`warnings[]`, `validatedWithPreviousSpec`).
+- `TASK-1910` (opcional): `studio.campaign.paid_performance.get` para la tarjeta Pauta de Resultados.
+- `TASK-1899`: `dryRun` + `proposalDigest` para las acciones `T2`.
 
 ### Blocks / Impacts
 
 - `TASK-1898`: al activar `STUDIO_ACCESS_MODE=efeonce_id`, la edición de esta task se habilita sin cambio de UI.
 - Corte de autoridad OneDrive → Studio (CDR/ADR de EPIC-049): esta UI es la condición visible para declararlo por campaña.
 - `TASK-1891`: sin impacto directo; comparte los commands que el gateway federará.
+- `TASK-1912` (bloqueada por esta task): reusa `Sheet`, `ConfirmDialog`, `ConflictDialog`, `WriteGateNotice`, `studio-api.ts`, la región `aria-live`, la pestaña Brief y la fila de pestañas de 8, donde agrega la entrada «Estrategia» y sus destinos `MS-N11`/`MS-N12`.
+- `TASK-1905`: su test de paridad ampliado inventaría las mutaciones de `studio-api.ts` (por eso cada llamada nombra su `operationId`).
 
 ### Files owned
 
-- Repo `efeonce-marketing-studio`: `apps/web/src/app/campaigns/[campaignId]/page.tsx`, `apps/web/src/components/Shell.tsx`, `apps/web/src/components/Pipeline.tsx`, `apps/web/src/components/PiecesWorkspace.tsx`, `apps/web/src/components/MediaPlanView.tsx`, `apps/web/src/components/{Sheet,ConfirmDialog,ConflictDialog,WriteGateNotice,CampaignHeroActions,EditCampaignSheet,VersionHistory,UploadVersionDialog,RightsStatus,CopyEditorSheet,AdEditorSheet,BudgetProposalSheet,BudgetApprovalDialog,ReviewSheet,CampaignResults,MetricSeries}.tsx`, `apps/web/src/client/studio-api.ts`, `apps/web/src/client/sha256-worker.ts` [nuevo], `apps/web/src/copy.ts`, `apps/web/src/copy.test.ts`, `apps/web/src/styles/app.css`, `apps/web/e2e/**`, `apps/web/playwright.config.ts`, `apps/web/package.json` (Playwright y axe como dependencias de desarrollo)
+- Repo `efeonce-marketing-studio`: `apps/web/src/app/campaigns/[campaignId]/page.tsx`, `apps/web/src/components/Shell.tsx`, `apps/web/src/components/Pipeline.tsx`, `apps/web/src/components/PiecesWorkspace.tsx`, `apps/web/src/components/MediaPlanView.tsx`, `apps/web/src/components/{Sheet,ConfirmDialog,ConflictDialog,WriteGateNotice,CampaignHeroActions,CampaignTabs,BriefTab,BriefSectionSheet,EditCampaignSheet,VersionHistory,UploadVersionDialog,RightsStatus,ChannelSelect,ChannelFindings,CopyEditorSheet,AdEditorSheet,BudgetProposalSheet,BudgetApprovalDialog,ReviewSheet,CampaignResults,PaidPerformanceCard,MetricSeries}.tsx`, `apps/web/src/components/CommandPalette.tsx` (entrada «Ir a piezas»), `apps/web/src/client/studio-api.ts`, `apps/web/src/client/sha256-worker.ts` [nuevo], `apps/web/src/copy.ts`, `apps/web/src/copy.test.ts`, `apps/web/src/styles/app.css`, `apps/web/e2e/**`, `apps/web/playwright.config.ts`, `apps/web/package.json` (Playwright y axe como dependencias de desarrollo)
 - Greenhouse: `docs/ui/wireframes/TASK-1895-marketing-studio-editing-review-metrics.md`, `docs/ui/flows/TASK-1895-marketing-studio-editing-review-metrics-flow.md`, `docs/ui/reviews/TASK-1895-marketing-studio-editing-review-metrics.scorecard.json`, `docs/manual-de-uso/marketing-studio/operar-marketing-studio.md`, `docs/documentation/marketing-studio/efeonce-marketing-studio.md`
 
 ## Current Repo State
@@ -199,11 +245,11 @@ Reglas obligatorias:
 - Momento del flujo: la campaña ya existe en Studio y la persona necesita corregirla, versionarla, aprobarla o medirla desde su espacio de campaña, a menudo llegando desde una decisión de Hoy.
 - Resultado perceptible esperado: el cambio se guarda una sola vez, la vista muestra el dato del servidor y un anuncio confirma qué cambió; ninguna aprobación ocurre sin confirmación explícita.
 - Friccion que debe reducir: ir a OneDrive y regenerar el HTML para cambiar un copy o una pieza; dudar si un presupuesto está aprobado; perder cambios por edición concurrente.
-- No-goals UX: crear campañas; lanzar pauta; programar posts; editar definiciones de audiencia; métricas de pauta pagada; persistir borradores en el navegador.
+- No-goals UX: crear campañas; lanzar pauta; programar posts; editar definiciones de audiencia (son de la sección Audiencias de Estrategia, TASK-1912); contenido de la pestaña Estrategia; métricas de pauta más allá de la tarjeta Pauta de sólo lectura (TASK-1910); editar el catálogo de canales; persistir borradores en el navegador.
 
 ### Surface & system decision
 
-- Surface: `/campaigns/[campaignId]` (hero, pestañas existentes y nueva `?tab=results`), `Shell` (píldora «Solo lectura» como botón con razón). Sin rutas nuevas.
+- Surface: `/campaigns/[campaignId]` (hero y fila de 8 pestañas `Brief · Estrategia · Piezas · Copys · Anuncios · Medios · Calendario · Resultados`; nuevas de esta task `?tab=brief` y `?tab=results`; `?tab=strategy` la llena TASK-1912), `Shell` (píldora «Solo lectura» como botón con razón). Sin rutas nuevas.
 - Nav placement: `none` — la task no agrega destinos de navegación; Resultados es una pestaña dentro de la campaña y las hojas no tienen URL.
 - Composition Shell: `no aplica` — Studio no es el portal Greenhouse ni usa su Composition Shell; se respeta la composición propia aprobada (`Shell` + hero + pestañas + inspector).
 - Primitive decision: `extend` — extiende `Pipeline` (pasos como botones), `PiecesWorkspace`, `MediaPlanView` y `Shell`; nacen `Sheet`, `ConfirmDialog` y `ConflictDialog` como primitives locales de Studio sobre `<dialog>` y tokens vigentes.
@@ -220,7 +266,8 @@ Reglas obligatorias:
 - Error: el `error` es-CL del contrato canónico tal cual; «Reintentar» sólo con `actionable: true`.
 - Degraded / partial: «Datos parciales» con fecha del último dato; «Generando miniaturas…» tras una versión nueva.
 - Permission denied: acciones `aria-disabled` con razón (modo `open`, sin capability, autoridad OneDrive).
-- Long content: copys largos con `white-space: pre-wrap` y contador; nombres de campaña con elipsis en migas; lista de versiones con scroll interno sobre 6 filas.
+- Long content: copys largos con `white-space: pre-wrap` y contador (con el límite recomendado y el duro del canal como referencia cuando el catálogo los declara); nombres de campaña con elipsis en migas; lista de versiones con scroll interno sobre 6 filas; fila de 8 pestañas con scroll interno contenido en 390 px.
+- Channel findings: `422 channel_unknown`/`channel_hard_limit_exceeded` junto al campo sin guardar; `warnings[]` como aviso no bloqueante tras guardar; «Validado con especificación anterior» como nota del registro.
 - Mobile / compact: hojas y diálogos a pantalla completa; grilla de presupuesto como lista por mes; acciones del hero en fila propia.
 - Keyboard / focus: foco atrapado en superficies modales, `Esc`, retorno de foco al disparador, pista y pestañas recorribles con Tab.
 - Reduced motion: sin movimiento nuevo; la preferencia global de Studio ya anula transiciones y las hojas aparecen sin desplazamiento.
@@ -247,12 +294,12 @@ Reglas obligatorias:
 
 ### Implementation mapping
 
-- Route / surface: `apps/web/src/app/campaigns/[campaignId]/page.tsx` (+ `tab=results`, `review=`), `apps/web/src/components/Shell.tsx`.
+- Route / surface: `apps/web/src/app/campaigns/[campaignId]/page.tsx` (+ `tab=brief`, `tab=results`, `review=`; la entrada `tab=strategy` la agrega TASK-1912 en la misma fila), `apps/web/src/components/Shell.tsx`.
 - Primitive / variant / kind: `Sheet` (`md` 560 px, pantalla completa < 860 px), `ConfirmDialog` (`default`|`danger`), `ConflictDialog`, `Pipeline` `interactive`.
-- Component candidates: `CampaignHeroActions`, `WriteGateNotice`, `EditCampaignSheet`, `VersionHistory`, `UploadVersionDialog`, `RightsStatus`, `CopyEditorSheet`, `AdEditorSheet`, `BudgetProposalSheet`, `BudgetApprovalDialog`, `ReviewSheet`, `CampaignResults`, `MetricSeries`.
+- Component candidates: `CampaignHeroActions`, `CampaignTabs` (fila de 8), `BriefTab`, `BriefSectionSheet`, `WriteGateNotice`, `EditCampaignSheet`, `VersionHistory`, `UploadVersionDialog`, `RightsStatus`, `ChannelSelect`, `ChannelFindings`, `CopyEditorSheet`, `AdEditorSheet`, `BudgetProposalSheet`, `BudgetApprovalDialog`, `ReviewSheet`, `CampaignResults`, `PaidPerformanceCard`, `MetricSeries`.
 - Copy source: `apps/web/src/copy.ts` (namespaces `write`, `edit`, `conflict`, `piece`, `upload`, `rights`, `copyEdit`, `ad`, `plan`, `review`, `results`).
-- Data reader / command: readers vigentes + `GET /api/v1/assets/{assetId}` (TASK-1890/1893, con `reviewState` y `pendingVersionNo` de TASK-1894) + `GET /api/v1/campaigns/{id}/metrics` (TASK-1892) + commands de TASK-1894: `requestAssetVersionUpload`, `createAssetVersion`, `approveAssetVersion`, `requestAssetVersionChanges`, `setAssetVersionRights` y los del Entregable B según su OpenAPI desplegado.
-- API parity: la UI es un cliente de `/api/v1`; si un command no existe en el OpenAPI, su affordance no se construye y se registra follow-up.
+- Data reader / command: readers vigentes + `GET /api/v1/assets/{assetId}` (TASK-1890/1893, con `reviewState` y `pendingVersionNo` de TASK-1894) + `GET /api/v1/campaigns/{id}/metrics` (TASK-1892) + `studio.channels.list`/`studio.channel.get` (TASK-1905) + `studio.campaign.paid_performance.get` (TASK-1910, opcional) + `upsertCampaignBrief`/`approveCampaignBrief` (TASK-1894) + commands de TASK-1894: `requestAssetVersionUpload`, `createAssetVersion`, `approveAssetVersion`, `requestAssetVersionChanges`, `setAssetVersionRights` y los del Entregable B según su OpenAPI desplegado.
+- API parity: la UI es un cliente de `/api/v1`; cada llamada de `studio-api.ts` nombra su `operationId` del registro (inventario estático del test de paridad de TASK-1905); la confirmación sale del `riskTier` de la operación; si un command no existe en el OpenAPI, su affordance no se construye y se registra follow-up.
 - Access / capability: `marketing_studio.asset.write` (subir), `marketing_studio.campaign.write` (editar) y `marketing_studio.campaign.approve` (aprobar) + modo de acceso + autoridad de campaña, proyectados por el servidor en `permissions`.
 - States to implement: los de «State inventory» y la máquina del flow contract (closed, locked, opening, open, loading, dirty, submitting, hashing, uploading, verifying, conflict, error, rejected, expired, complete, duplicate); la versión suma `pending_review` y `changes_requested` como estados visibles del historial.
 
@@ -264,20 +311,20 @@ Reglas obligatorias:
 - Quality profile: `premium`
 - Required steps: recorrido del flow contract (solo lectura → edición → conflicto → subida y duplicado → copy literal → anuncio → propuesta y aprobación → revisión por cada estado → resultados completos, parciales y ausentes).
 - Required captures: cada estado del inventario en ambos viewports y temas.
-- Required `data-capture` markers: `campaign-hero`, `review-sheet`, `edit-campaign-sheet`, `piece-inspector`, `piece-versions`, `upload-dialog`, `rights-status`, `copy-editor`, `ad-editor`, `plan-cards`, `budget-approval`, `conflict-dialog`, `results`, `write-gate`.
+- Required `data-capture` markers: `campaign-hero`, `campaign-tabs`, `brief-tab`, `channel-select`, `paid-performance`, `review-sheet`, `edit-campaign-sheet`, `piece-inspector`, `piece-versions`, `upload-dialog`, `rights-status`, `copy-editor`, `ad-editor`, `plan-cards`, `budget-approval`, `conflict-dialog`, `results`, `write-gate`.
 - Assertions: copy guardado igual byte a byte; un solo registro por doble clic; propuesto/aprobado/real nunca sumados; «Activa» ausente como acción; «0» ausente en fuentes sin datos.
-- Scroll-width checks: `document.documentElement.scrollWidth <= clientWidth` en todas las capturas.
+- Scroll-width checks: `document.documentElement.scrollWidth <= clientWidth` en todas las capturas, incluida la fila de 8 pestañas en 390 px (con `STUDIO_STRATEGY_PLAN_ENABLED` ON y OFF).
 - Reduced-motion / focus evidence: una pasada con `reducedMotion: 'reduce'`; foco atrapado, `Esc` y retorno de foco verificados por teclado; axe sin violaciones serias.
 - Review dossier: capturas + video corto de subida y conflicto + scorecard en Greenhouse.
 - Baseline decision / surface ID: línea base tras aprobar los artboards `v3 · Edición`; surface ID `marketing-studio-campaign-editing`.
 
 ### Design decision log
 
-- Decision: edición en hojas modales sobre el espacio de campaña; la pista de tres estados como puerta de la revisión; Resultados como sexta pestaña; escritura sólo por `/api/v1`; sin actualizaciones optimistas.
+- Decision: edición en hojas modales sobre el espacio de campaña; la pista de tres estados como puerta de la revisión; fila de 8 pestañas (`Brief · Estrategia · Piezas · Copys · Anuncios · Medios · Calendario · Resultados`) con Resultados al final y Estrategia llenada por TASK-1912; canal siempre del catálogo; escritura sólo por `/api/v1`; sin actualizaciones optimistas.
 - Alternatives considered: edición en línea (descartada: copy literal y 412 necesitan diff y pie de acciones); rutas `/edit` (descartada: rompe el contexto aprobado); pantalla global de aprobaciones (descartada por ahora: Hoy ya dirige a la decisión); Server Actions (descartadas: segundo camino de escritura fuera del contrato de CLI y MCP).
 - Why this pattern: preserva la dirección aprobada, concentra la escritura en superficies con estado explícito y mantiene Full API Parity.
 - Reuse / extend / new primitive: extend (`Pipeline`, `PiecesWorkspace`, `MediaPlanView`, `Shell`) + new local (`Sheet`, `ConfirmDialog`, `ConflictDialog`).
-- Open risks: commands y DTOs de TASK-1892/1893/1894 aún sin OpenAPI; artboards de edición sin aprobar; escrituras en runtime antes del login dependen del actor local de TASK-1894.
+- Open risks: commands y DTOs de TASK-1892/1893/1894 aún sin OpenAPI; `studio.channels.list` (TASK-1905) y `paid_performance` (TASK-1910) pueden llegar después que esta task; artboards de edición sin aprobar; escrituras en runtime antes del login dependen del actor local de TASK-1894.
 
 ### Visual verification
 
@@ -309,7 +356,8 @@ Reglas obligatorias:
 
 ### Slice 1 — Dirección visual de edición aprobada
 
-- Página `v3 · Edición` en el canvas «Efeonce Marketing Studio» con los artboards `Edit-Campaign`, `Edit-Piece-Upload`, `Edit-Copy`, `Edit-Plan-Approve`, `Review-Sheet`, `Conflict`, `Results` y `Edit-Mobile`, en claro y oscuro, sobre datos reales de CMP-001 a CMP-005.
+- Página `v3 · Edición` en el canvas «Efeonce Marketing Studio» con los artboards `Edit-Campaign`, `Brief`, `Edit-Piece-Upload`, `Edit-Copy`, `Edit-Plan-Approve`, `Review-Sheet`, `Conflict`, `Results` (con la tarjeta Pauta) y `Edit-Mobile` (fila de 8 pestañas en 390 px), en claro y oscuro, sobre datos reales de CMP-001 a CMP-005. La fila de pestañas muestra las 8, con «Estrategia» como entrada cuyo contenido es de la dirección `v4 · Estrategia` (TASK-1912).
+- Conciliación con el flujo maestro (Delta 2026-09-26 de capa de estrategia): wireframe y flow de esta task declaran la fila de 8, el nodo `MS-N3.2 Brief` y el enlace a `MS-N3.10`, y remiten `MS-N11`/`MS-N12` a TASK-1912.
 - Aprobación explícita del operador; wireframe y flow conciliados con lo aprobado; `UI ready: yes` sólo con `pnpm task:lint --task TASK-1895` sin hallazgos.
 - Conciliación de contratos: lista de commands, DTOs y códigos de error reales del OpenAPI de TASK-1892/1894 contra el Implementation Mapping; cualquier capacidad sin command queda fuera y con follow-up.
 - Conciliación con el ADR de fuente de verdad e ingreso (ver Delta 2026-09-26): en el flow, la subida pasa a los commands de TASK-1894, el sha256 del navegador es obligatorio y se agregan los estados `pending_verification`, `rejected` (con motivo), `expired` y `pending_review`; en el wireframe, «Data reader / command» apunta a TASK-1894 y el ledger de copy suma las claves de §«Copy nuevo de la subida y la revisión», validadas con `greenhouse-ux-writing`. El artboard `Edit-Piece-Upload` muestra inferencia, derechos obligatorios, verificación y el resultado «Pendiente de revisión»; se agrega un artboard `Version-Review` (versión pendiente con Aprobar / Pedir cambios).
@@ -320,10 +368,12 @@ Reglas obligatorias:
 - Primitives `Sheet`, `ConfirmDialog`, `ConflictDialog` (diff por campo: versión guardada vs tu versión; sin «sobrescribir»).
 - `WriteGateNotice` y proyección de permisos en la página: acciones `aria-disabled` con razón para modo `open`, sin capability y autoridad OneDrive; píldora «Solo lectura» como botón con la razón.
 - Región `aria-live` en `Shell`; namespaces de copy nuevos en `copy.ts` con su test.
+- `studio-api.ts` llama cada operación por su `operationId` tipado del registro y decide confirmación por su `riskTier` (`T2` ⇒ `ConfirmDialog` con `dryRun` → diff → digest); `CampaignTabs` construye la fila de 8 con scroll interno contenido en 390 px (la entrada «Estrategia» la agrega TASK-1912 detrás de su flag); `ChannelSelect` (opciones de `studio.channels.list`, placements y objetivos de `studio.channel.get`) y `ChannelFindings` (422 junto al campo, `warnings[]`, «validado con especificación anterior»); ⌘K suma «Ir a piezas».
 
 ### Slice 3 — Campaña y brief
 
 - `CampaignHeroActions` (`Editar campaña`, `Revisión`) y `EditCampaignSheet` con los campos que el command de TASK-1894 acepte (nombre, servicio, fase, audiencia resumida, URL de destino, referencia de brief, decisiones, nota interna).
+- Pestaña **Brief** (`MS-N3.2`, `?tab=brief`, primera de la fila): lectura por secciones y edición por sección en `BriefSectionSheet` sobre `upsertCampaignBrief`; «Registrar aprobación del brief» sobre `approveCampaignBrief` (`T2`, sólo con `permissions.canApprove`); canales con `ChannelSelect` (`channelKeys`); «Ver estrategia» lleva a `?tab=strategy` cuando la pestaña existe. El brief no muestra ni edita personas, segmentos ni etapas del bow-tie (son de Estrategia).
 - Salida con cambios → confirmación de descarte; `beforeunload` mientras hay cambios.
 
 ### Slice 4 — Piezas: versiones, subida, revisión y derechos
@@ -336,21 +386,22 @@ Reglas obligatorias:
   4. `PUT` (o sesión reanudable) a la URL firmada con XHR para tener progreso de bytes; `Cancelar subida` aborta; un `412` del PUT significa que el objeto ya existe y se sigue igual; salir de la página muestra la advertencia nativa.
   5. `createAssetVersion` con la misma `Idempotency-Key` repetida mientras responda `202` (respetando `Retry-After`): «Verificando el archivo en Studio…». `201` ⇒ «Versión v{n} registrada · pendiente de revisión»; `422 upload_rejected` ⇒ el motivo en lenguaje llano (huella distinta, tipo no permitido, proporción distinta); `410 upload_expired` ⇒ pedir una subida nueva.
 - Revisión de la versión (en el inspector, sólo si hay `pendingVersionNo`): `Aprobar versión` (visible sólo con `permissions.canApprove`; confirmación con consecuencias; `dryRun` → `proposalDigest` cuando TASK-1899 lo exija) y `Pedir cambios` (nota obligatoria); un `designer` ve «Pendiente de revisión» sin acción de aprobar.
-- `RightsStatus` en el inspector y punto de estado en el tablero con etiqueta accesible; el estado (vigente, por vencer, vencido, sin datos) llega calculado del servidor. Editar derechos de una versión existente usa `setAssetVersionRights`.
+- `RightsStatus` en el inspector y punto de estado en el tablero con etiqueta accesible; el estado (vigente, por vencer, vencido, sin datos) llega calculado del servidor. Editar derechos de una versión existente usa `setAssetVersionRights`. Los canales de derechos (en la subida y en la edición) se eligen con `ChannelSelect` y viajan como `rights.channelKeys`.
 
 ### Slice 5 — Copys
 
 - `CopyEditorSheet` con `<textarea>` sin corrección ni autocompletado (`spellCheck={false}`, `autoCorrect="off"`, `autoCapitalize="off"`), envío sin `trim` ni normalización, contador igual al del reader y «Ver cambios» con saltos de línea visibles.
 - Si el contrato devuelve el copy a revisión al editarlo, la hoja lo anuncia antes de guardar.
+- El contador muestra, cuando el catálogo los declara para el canal y el campo, el límite recomendado y el duro como referencia; el `422 channel_hard_limit_exceeded` y los `warnings[]` del command se muestran con `ChannelFindings`. El editor nunca recorta para cumplir un límite.
 
 ### Slice 6 — Anuncios
 
-- `AdEditorSheet` para crear y editar configuración: pieza (con miniatura y estado de derechos), copy, canal, placement, audiencia (del plan), objetivo, URL de destino y UTM; «URL final» calculada por la función pura del contrato si TASK-1894 la exporta, o mostrada tras guardar.
+- `AdEditorSheet` para crear y editar configuración: pieza (con miniatura y estado de derechos), copy, canal (`ChannelSelect`), placement y objetivo (de `studio.channel.get` para ese canal), audiencia (elegida de las audiencias de la campaña; su definición y su referencia al modelo de cliente se editan en Estrategia, TASK-1912), URL de destino y UTM; «URL final» calculada por la función pura del contrato si TASK-1894 la exporta, o mostrada tras guardar.
 - Aviso permanente «Guardar no lanza el anuncio»; pieza con derechos vencidos avisada, con la regla decidida por el command.
 
 ### Slice 7 — Plan de medios
 
-- `BudgetProposalSheet`: flight (fechas, países, moneda, alcance, responsables) y grilla mes × canal sólo para líneas `proposed`; moneda bloqueada con líneas registradas; lista por mes en móvil.
+- `BudgetProposalSheet`: flight (fechas, países, moneda, alcance, responsables) y grilla mes × canal sólo para líneas `proposed`, con canales del catálogo (`channelKey`; el país vive en el flight, nunca en el canal); moneda bloqueada con líneas registradas; lista por mes en móvil.
 - `BudgetApprovalDialog`: montos aprobados por mes y canal con «Copiar montos de la propuesta» explícito, referencia obligatoria, resumen previo y confirmación.
 - Tarjeta Gasto real sin acción, con la explicación vigente.
 
@@ -362,7 +413,8 @@ Reglas obligatorias:
 
 ### Slice 9 — Resultados
 
-- Pestaña `?tab=results` con `CampaignResults`: una tarjeta por fuente (Search Console, GA4, SEO, Pauta) con fuente, ventana, frescura y estado (`ok`, parcial, ausente, error, sin permiso) según el DTO de TASK-1892; ventanas sólo las que el contrato acepte.
+- Pestaña `?tab=results` (última de la fila) con `CampaignResults`: una tarjeta por fuente (Search Console, GA4, SEO) con fuente, ventana, frescura y estado (`ok`, parcial, ausente, error, sin permiso) según el DTO de TASK-1892; ventanas sólo las que el contrato acepte.
+- Tarjeta **Pauta** opcional (`PaidPerformanceCard`) sobre `studio.campaign.paid_performance.get` (TASK-1910): gasto real y resultados observados por plataforma con fuente, ventana y frescura; «Sin datos de pauta» sin readback, nunca «0»; no se suma con Propuesto ni Aprobado. Sólo si la operación está en el OpenAPI de staging al llegar a este slice; si no, follow-up de TASK-1912.
 - `MetricSeries` en SVG nativo con resumen textual y tabla alternativa; sin librería de gráficos.
 
 ### Slice 10 — Evidencia y documentación
@@ -378,6 +430,9 @@ Reglas obligatorias:
 - Lanzar pauta, programar posts en Metricool o leer métricas de pauta pagada y social orgánico.
 - Registrar gasto real a mano.
 - Federación MCP de los commands (TASK-1891 y sucesoras).
+- Contenido de la pestaña Estrategia, `/learnings` y `/programs` (`MS-N3.10`, `MS-N11`, `MS-N12`): TASK-1912.
+- Audiencias con referencia al modelo de cliente y UI del catálogo de canales: TASK-1912 y follow-up de TASK-1905.
+- Métricas de pauta más allá de la tarjeta Pauta de sólo lectura, y cualquier escritura en plataformas publicitarias.
 - Cambios al portal Greenhouse fuera de los documentos listados.
 
 ## Detailed Spec
@@ -461,7 +516,7 @@ y abre el gap en TASK-1894.
 
 - Slice 1 → todo lo demás: sin artboards aprobados y contratos conciliados no se escribe JSX.
 - Slice 2 → Slices 3 a 9: toda escritura pasa por el cliente único y las primitives.
-- Slices 3 a 9 pueden ir en cualquier orden entre sí, cada una sólo cuando su command o reader exista en el OpenAPI desplegado en staging.
+- Slices 3 a 9 pueden ir en cualquier orden entre sí, cada una sólo cuando su command o reader exista en el OpenAPI desplegado en staging. Los selectores de canal de los Slices 3, 4, 6 y 7 esperan `studio.channels.list` (TASK-1905 Slice 5); nunca se reemplazan por texto libre mientras tanto. La tarjeta Pauta espera `studio.campaign.paid_performance.get` (TASK-1910).
 - Slice 10 cierra: evidencia sobre el conjunto y documentación.
 
 ### Risk matrix
@@ -476,6 +531,8 @@ y abre el gap en TASK-1894.
 | Métrica ausente leída como cero | UI | low | estados del DTO de TASK-1892 + aserción de ausencia de «0» | escenario de Resultados |
 | Commands de TASK-1894 cambian de forma | UI | medium | Slice 1 concilia contra el OpenAPI; tipos desde `packages/contracts` | typecheck de Studio |
 | El hash de un video grande congela o agota la pestaña | UI | medium | SHA-256 incremental en Web Worker por bloques; nunca el archivo completo en memoria | medición en Slice 1 (> 20 s/GiB) y prueba con un video real de 1 GiB |
+| La fila de 8 pestañas desborda la página en 390 px | UI | medium | scroll interno contenido en `CampaignTabs`; captura con el flag de Estrategia ON y OFF | chequeo de `scrollWidth` del escenario |
+| Un campo de canal vuelve a texto libre porque el catálogo no llegó | datos de campaña | medium | sin `studio.channels.list` el selector no se construye; nunca un input libre | revisión del slice + test de `ChannelSelect` |
 | Se muestra como vigente una versión sin aprobar | UI | low | la UI usa la vigente y `pendingVersionNo` del reader; nunca ordena versiones por su cuenta | aserción del escenario de subida |
 
 ### Feature flags / cutover
@@ -531,6 +588,11 @@ y abre el gap en TASK-1894.
 - [ ] La edición de presupuesto escribe sólo líneas propuestas; la aprobación exige referencia y confirmación; Propuesto, Aprobado y Gasto real nunca se suman ni se muestran como una cifra.
 - [ ] `ReviewSheet` muestra sólo los cambios permitidos por el reader, pide motivo para bloquear o retroceder y nunca ofrece «Activa» como acción.
 - [ ] Resultados muestra fuente, ventana y frescura por fuente; parcial con fecha del último dato; ausente como «Sin datos», nunca «0».
+- [ ] La fila de pestañas es `Brief · Estrategia · Piezas · Copys · Anuncios · Medios · Calendario · Resultados` (con la entrada «Estrategia» de TASK-1912 presente sólo con su flag ON), sin scroll horizontal de página en 390 px en ambos casos; Piezas sigue por defecto.
+- [ ] La pestaña Brief lee y edita por sección con `upsertCampaignBrief`, registra la aprobación sólo con `permissions.canApprove` y no muestra personas, segmentos ni etapas del bow-tie.
+- [ ] Ningún campo de canal es texto libre: brief, anuncio, grilla de presupuesto y derechos eligen de `studio.channels.list` y envían `channelKey`/`channelKeys`; un `422` de canal aparece junto al campo sin guardar y los `warnings[]` como aviso tras guardar.
+- [ ] La confirmación con `dryRun` → digest se abre para toda operación `T2` según el `riskTier` del registro y para ninguna `T1`; cada llamada de `studio-api.ts` nombra su `operationId`.
+- [ ] Si la tarjeta Pauta se construye, muestra fuente, ventana y frescura, «Sin datos de pauta» sin readback y nunca suma con Propuesto ni Aprobado; si no se construye, queda registrada como follow-up de TASK-1912.
 - [ ] Todo texto visible nuevo vive en `apps/web/src/copy.ts` y pasa `copy.test.ts`.
 - [ ] Ningún hex nuevo en `app.css`; los roles faltantes se generan desde AXIS y `theme:check` pasa.
 - [ ] Evidencia en 1440×1000 y 390×844, tema claro y oscuro, sin scroll horizontal de página, axe sin violaciones serias y recorrido por teclado completo.
@@ -561,11 +623,14 @@ y abre el gap en TASK-1894.
 - Master UI flow de EPIC-049 (`docs/ui/flows/EPIC-049-…-UI-FLOW.md`) con los nodos MS-N1…MS-N7 declarados en el flow contract de esta task.
 - Capacidades de escritura que el OpenAPI de TASK-1894 no exponga al conciliar (p. ej. edición de derechos fuera de la subida): task propia, sin affordance falsa mientras tanto.
 - Decisiones de derechos por vencer en Hoy, si el reader de atención las incorpora.
+- Tarjeta Pauta en Resultados si TASK-1910 no estaba en staging al llegar al Slice 9 (la toma TASK-1912).
+- UI del catálogo de canales (alta de versión, mapeo de alias): follow-up de TASK-1905, fuera de esta task.
 
 ## Open Questions
 
 - ~~¿Aprobar presupuesto y autorizar medios requieren una capability distinta de `marketing_studio.campaign.write`?~~ Resuelto 2026-09-26 (ADR + TASK-1894/1899): sí, `marketing_studio.campaign.approve`, sólo para personas; la UI sólo lee `permissions.canApprove`.
 - ~~¿La UI calcula el sha256?~~ Resuelto 2026-09-26: sí, siempre (el command lo exige al pedir la subida); el servidor lo recalcula en el worker.
+- ¿La pestaña Estrategia necesita un contador o marca de «plan por aprobar» en la fila de pestañas? Por defecto no (la señal vive en Hoy y en el encabezado de Estrategia); confirmar al aprobar `v3 · Edición` junto con `v4 · Estrategia`.
 - ¿El diálogo de subida admite varios archivos a la vez (la CLI sí)? Esta task asume uno por vez; confirmar en los artboards del Slice 1.
 - ¿Editar un copy aprobado lo devuelve a revisión? Regla de dominio de TASK-1894; la hoja la anuncia si el contrato la declara.
 - ¿Qué ventanas acepta el endpoint de métricas (vuelo de la campaña, últimos 28 días, otras)? Lo fija TASK-1892.

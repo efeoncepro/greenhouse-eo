@@ -6,6 +6,45 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-26 (capa de estrategia)
+
+- **Decisión nueva:**
+  [`EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md`](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md)
+  (`Accepted` 2026-09-26). §4.1 y §5 fijan que la mecánica de escritura MCP de **toda** la capa de estrategia es la de
+  esta task: una clase `efeonce.mcp.marketing_studio.write`, canje por la capability exacta de la tool, token delegado
+  revalidado por Studio y `dryRun` → digest → confirmación para `T2`. Las tasks nuevas `TASK-1905`, `TASK-1907`,
+  `TASK-1908`, `TASK-1909`, `TASK-1910` y `TASK-1911` están bloqueadas por ésta y federan sus tools por este carril.
+- **Dos filas nuevas en la tabla de contratos de canje** (Detailed Spec §«Contratos de canje»):
+  `marketing_studio.catalog.manage` → `efeonce-mcp-marketing-studio-catalog-manage` (dueña: TASK-1905 Slices 7–8) y
+  `marketing_studio.integration.manage` → `efeonce-mcp-marketing-studio-integration-manage` (dueña: TASK-1910
+  Slice 8). Ambas con input scope `efeonce.mcp.marketing_studio.write` y reenvío del token a Studio. **Reparto:** cada
+  task dueña siembra su capability, su cliente de canje por migración, su fila en `resolveScopeContract` (Greenhouse) y
+  en `marketing-studio-exchange-contracts.ts` (gateway), y entrega sus propias tools; **esta task es dueña de la
+  mecánica compartida** — la tabla y su test de paridad Greenhouse ↔ gateway, el guard
+  (`capability_without_exchange_contract`, `write_tool_without_transport`, clase obligatoria), el canje por capability
+  exacta, el reenvío de `Efeonce-Delegated-Token`, el actor delegado y la revalidación en `userinfo`, el
+  `proposalDigest`, el mapa de errores y el flag `MARKETING_STUDIO_MCP_WRITES_ENABLED`. La tabla debe crecer por datos
+  (una fila por capability), sin cambiar código del provider.
+- **Tools de escritura que se federan por este carril** (nombres de trabajo; manda el manifiesto sincronizado):
+  Detailed Spec §«Tools de escritura de la capa de estrategia».
+- **El digest se exige por `riskTier = T2`**, no sólo por `requiresPerson` o `destructive`: TASK-1894 declara el nivel
+  en el registro y lo exporta en el manifiesto (contrato de TASK-1905). `T2` incluye aprobaciones, destructivas,
+  credenciales externas (`studio.ad_connection.connect`/`revoke`, TASK-1910) y descartes de borradores. Hay tools `T1`
+  con `requiresPerson` (p. ej. `studio.ai_draft.accept`, TASK-1909): exigen persona delegada pero no digest.
+- **Lecturas por `POST`:** TASK-1909 trae operaciones `T0` que usan `POST` sin escribir (`studio.copy.validate`,
+  `studio.creative.check`). El transporte acepta `POST` en tools `writes: false`, y el guard clasifica por `writes` y
+  `riskTier`, nunca por el método: esas tools siguen el camino de lectura (`campaign.read`, sin reenvío de token).
+- **Operaciones sin scope de bearer** (`apiScope: null`: aprobaciones, `catalog.manage`, `integration.manage`,
+  `studio.campaign.seo_snapshot.declare_competitive`): sólo las ejecuta una persona delegada; el `api_client` del
+  gateway nunca las cubre con su propio scope.
+- **Relacionado, del lado de Greenhouse (no es fila de esta tabla):** TASK-1906 crea la clase
+  `efeonce.mcp.commercial.write` y el cliente `efeonce-mcp-customer-model` para escribir el modelo de cliente; TASK-1908
+  usa la clase existente `efeonce.mcp.seo.write` y el cliente `efeonce-mcp-growth-seo-write` para que
+  `track_seo_keywords` (`T2`) lo ejecute Greenhouse con la persona. Ninguna de las dos pasa por el provider
+  `marketing-studio`; ambas respetan la misma regla: la clase nunca va al cliente público compartido.
+- **Fuera de esta task, con su propia clase cuando exista:** cualquier escritura que mueva dinero en una plataforma
+  publicitaria (lanzar, pausar, presupuesto) exige ADR nuevo y una clase por radio de impacto (ADR §5).
+
 ## Delta 2026-09-26 — reescrita sobre el ADR de fuente única e ingesta
 
 - ADR gobernante: [`EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md`](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md)
@@ -103,6 +142,9 @@ Revisar y respetar:
 
 - `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_SSOT_AND_INGEST_DECISION_V1.md` (ADR gobernante:
   §4.2 un command, tres puertas; §4.3 inferencia; §4.4 aprobación humana; §8 invariantes; §9 mapa)
+- `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md` (Accepted 2026-09-26:
+  §4.1 los agentes ejecutan toda acción de la UI con identidad delegada; §5 niveles `T0`/`T1`/`T2` y una clase por radio
+  de impacto; §8 invariantes)
 - `docs/architecture/EFEONCE_STUDIO_API_FIRST_DECISION_V1.md` (paridad UI → API → MCP; registro único de operaciones)
 - `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` (§Agentes, §7 originales)
 - `docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` (§«El scope de escritura NO se cablea al cliente
@@ -123,6 +165,10 @@ Reglas obligatorias:
 - **La clase nunca se cablea al cliente PKCE público compartido** (`32617b87-e7ef-493a-838f-1ff3f0213b93`): no entra
   en su `requiredResourceAccess`, ni en el PRM, ni en `scopes_supported`, ni en `PUBLISHED_SCOPES_SUPPORTED`. Se
   descubre sólo por el `403 insufficient_scope` de la tool y llega por consentimiento dinámico de la persona.
+- **La tabla de contratos crece por datos:** cada capability nueva de Studio (hoy `catalog.manage` de TASK-1905 e
+  `integration.manage` de TASK-1910) suma una fila y un cliente de canje que entrega su task dueña; el provider no
+  cambia de código por una capability nueva.
+- **El digest lo exige el `riskTier = T2` de la operación**, leído del manifiesto; nunca una lista escrita a mano.
 - **La capability la elige la tool, nunca los argumentos.** El canje pide `tool.capability` del manifiesto; un argumento
   no puede cambiar la autoridad. Toda aprobación es una tool propia con `requiresPerson: true`.
 - **Un cliente confidencial de canje por capability.** `assertFederatedClient` sigue exigiendo exactamente un scope por
@@ -178,11 +224,24 @@ Reglas obligatorias:
 - `TASK-1898`: el actor `user` de sesión y el delegado comparten la forma `Actor` que esta task extiende con
   `authority`.
 - Futuras escrituras de Studio (otras capabilities): se federan con la misma receta (cliente de canje por capability).
+- `TASK-1905` (bloqueada por ésta): federa las tools del catálogo de canales, alias, audiencias con referencia ICP y
+  revalidación; entrega la fila y el cliente de `marketing_studio.catalog.manage`.
+- `TASK-1907` (bloqueada por ésta): federa las tools del plan de campaña y de programas con `.campaign.write` y
+  `.campaign.approve` (sin clientes nuevos).
+- `TASK-1908` (bloqueada por ésta): federa las tools del bloque SEO/AEO de Studio; el rastreo real lo ejecuta Greenhouse
+  por `efeonce.mcp.seo.write` (fuera del provider `marketing-studio`).
+- `TASK-1909` (bloqueada por TASK-1905/1907/1899): federa borradores de IA, procedencia, reglas de voz
+  (`.catalog.manage`) y lecturas por `POST`.
+- `TASK-1910` (bloqueada por ésta): federa conexiones de cuentas publicitarias (`T2`, `.integration.manage`), readback,
+  chequeo de destino y mapeo de métricas; entrega la fila y el cliente de `marketing_studio.integration.manage`.
+- `TASK-1911` (bloqueada por ésta): federa experimentos y aprendizajes (`T2` con `.campaign.approve`).
+- `TASK-1912`: el diálogo de aprobación de la UI de estrategia usa el mismo `dryRun` + `proposalDigest`.
+- `TASK-1906` (relacionada, Greenhouse): misma receta para `efeonce.mcp.commercial.write`; sin dependencia de código.
 
 ### Files owned
 
 - Repo `efeonce-mcp`: `src/providers/marketing-studio.ts`, `src/providers/marketing-studio-tool-manifest.generated.ts` (sólo por sync), `src/providers/marketing-studio-tool-parity.ts`, `src/providers/marketing-studio-exchange-contracts.ts` [nuevo], `scripts/sync-marketing-studio-tool-manifest.mjs`, `src/auth/tool-policy.ts`, `src/app.ts` (challenge de scope por tool), `src/config.ts` (`MARKETING_STUDIO_WRITE_SCOPE`, flag de escrituras), `src/mcp.ts` (registro, mensajes de error y status), `src/surface.ts` [verificar si requiere cambio], `.github/workflows/deploy.yml`, `scripts/marketing-studio-canary.mjs`, `scripts/marketing-studio-write-session-canary.mjs` [nuevo], `surface-baseline.json`, `package.json` (`version`), `test/marketing-studio.test.ts`, `test/marketing-studio-mcp.test.ts`, `test/authorized-tools.test.ts`, `test/version.test.ts`.
-- Greenhouse: `src/lib/sister-platforms/mcp-token-exchange.ts` + `mcp-token-exchange.test.ts`, `src/lib/sister-platforms/oauth-broker.ts` (revalidación de capability en `userinfo` para la familia `marketing_studio`) + su test, `src/lib/auth-server/oauth/scopes.ts` + `scopes.test.ts`, `src/config/entitlements-catalog.ts` + `src/lib/entitlements/runtime.ts` (capability `marketing_studio.campaign.approve` y su grant), `migrations/*task-1899-marketing-studio-campaign-approve-capability*` [nuevo], `migrations/*task-1899-mcp-marketing-studio-exchange-clients*` [nuevo], `docs/mcp/skills/marketing-studio/SKILL.md`, `docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` (Delta), `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md`, `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` (§Agentes), `docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`, `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md`, `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`, skills `efeonce-marketing-studio` y `efeonce-mcp-platform` (ambos espejos).
+- Greenhouse: `src/lib/sister-platforms/mcp-token-exchange.ts` + `mcp-token-exchange.test.ts` (dueña de la forma de la tabla y su test de paridad; las filas de `catalog.manage` e `integration.manage` las agregan TASK-1905 y TASK-1910), `src/lib/sister-platforms/oauth-broker.ts` (revalidación de capability en `userinfo` para la familia `marketing_studio`) + su test, `src/lib/auth-server/oauth/scopes.ts` + `scopes.test.ts`, `src/config/entitlements-catalog.ts` + `src/lib/entitlements/runtime.ts` (capability `marketing_studio.campaign.approve` y su grant), `migrations/*task-1899-marketing-studio-campaign-approve-capability*` [nuevo], `migrations/*task-1899-mcp-marketing-studio-exchange-clients*` [nuevo], `docs/mcp/skills/marketing-studio/SKILL.md`, `docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` (Delta), `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md`, `docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md` (§Agentes), `docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`, `docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md`, `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`, skills `efeonce-marketing-studio` y `efeonce-mcp-platform` (ambos espejos).
 - Repo `efeonce-marketing-studio`: `apps/web/src/server/delegated-actor.ts` [nuevo], `apps/web/src/server/runtime.ts` (`resolveRequestActor`), `apps/web/src/server/api.ts` (`handle()`), `packages/domain/src/actor.ts`, el adaptador delegado del puerto de autoridad de personas que deja TASK-1894 [verificar ruta en `packages/domain`], `packages/domain/src/commands/confirmation.ts` [nuevo; junto al kernel `runCommand` de TASK-1894], `packages/contracts/src/errors.ts`, tests asociados.
 
 ## Current Repo State
@@ -263,7 +322,9 @@ Reglas obligatorias:
   - Con `userinfo` inaccesible o con timeout, Studio responde `503 delegation_unavailable` sin escribir (fail-closed, sin caché).
   - El token canjeado nunca se registra en logs, `audit_event`, respuestas ni errores; el `audit_event` guarda `actor = user:<sub>`, `authority.kind = delegated_oauth`, `via = mcp`, la capability y el `correlationId` del canje.
   - Las lecturas `marketing_studio.campaign.read` no reenvían el token (camino de TASK-1891 intacto); `studio.asset.download` y toda escritura sí.
-  - Una tool `requiresPerson` o `destructive` sin `confirmation.proposalDigest` responde `428 confirmation_required`; con un digest distinto del recalculado sobre el estado vigente, `409 confirmation_mismatch`; ambas sin escribir. Vale para toda puerta (CLI, UI, MCP).
+  - Una operación `riskTier = T2` (aprobación, destructiva, credenciales externas o descarte) sin `confirmation.proposalDigest` responde `428 confirmation_required`; con un digest distinto del recalculado sobre el estado vigente, `409 confirmation_mismatch`; ambas sin escribir. Vale para toda puerta (CLI, UI, MCP). El nivel sale del registro (manifiesto), nunca del request.
+  - Una tool `writes: false` con método `POST` (lecturas de validación de TASK-1909) sigue el camino de lectura: canje `campaign.read`, sin reenvío de token.
+  - Una operación con `apiScope: null` sólo se ejecuta con persona delegada; el scope del `api_client` del gateway no la cubre.
   - `dryRun` no escribe filas (ni entidad, ni `idempotency_record`, ni `audit_event`) y devuelve `diff`, `baseRevision` y `proposalDigest`.
   - El gateway nunca genera `Idempotency-Key` ni reintenta una escritura; ante timeout responde `upstream_timeout_unknown_outcome`.
   - La URL firmada de subida es de vida corta y apunta a un solo objeto que define TASK-1894 conforme al ADR (`originals/sha256/<2 primeros hex>/<sha256>` con `ifGenerationMatch=0`); el gateway no la interpreta ni la modifica y sólo aparece en la respuesta de la tool, nunca en logs.
@@ -399,8 +460,9 @@ Reglas obligatorias:
   `authority.kind`, sin el token.
 - Confirmación (dueña esta task, ADR §9 y TASK-1894 §Out of Scope): función de dominio que calcula `proposalDigest` =
   SHA-256 hex del JSON canónico (claves ordenadas) de `{ operationId, entityId, baseRevision, payload normalizado,
-  actor.subject }`; `dryRun` de toda operación `requiresPerson` o `destructive` lo devuelve; la ejecución lo exige
-  (428/409). Aplica a toda puerta (CLI, UI, MCP).
+  actor.subject }`; `dryRun` de toda operación con `riskTier = T2` (el nivel que el kernel de TASK-1894 lee del
+  registro; incluye `requiresPerson` y `destructive`) lo devuelve; la ejecución lo exige (428/409). Aplica a toda puerta
+  (CLI, UI, MCP) y a toda operación `T2` futura de la capa de estrategia sin cambio de código.
 - Errores nuevos en `packages/contracts/src/errors.ts` con copy es-CL y `actionable`: `delegation_required`,
   `delegation_invalid`, `delegation_insufficient`, `delegation_unavailable`, `confirmation_required`,
   `confirmation_mismatch`.
@@ -417,7 +479,9 @@ Reglas obligatorias:
 ### Slice 4 — Gateway: carril de escritura del provider
 
 - `pnpm studio:manifest:sync` con el manifiesto que dejó TASK-1894; el script y el tipo
-  `MarketingStudioManifestTool` aceptan `method: 'GET' | 'POST' | 'PATCH'`, `requiresPerson` y el bloque `transport`.
+  `MarketingStudioManifestTool` aceptan `method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'`, `requiresPerson`,
+  `riskTier` y el bloque `transport`. El transporte admite `POST` en tools `writes: false` (lecturas de validación de
+  TASK-1909) y el guard clasifica por `writes`/`riskTier`, no por el método.
 - `src/providers/marketing-studio-exchange-contracts.ts`: tabla cerrada `capability → { clientId, inputScope, forwardDelegatedToken }`
   (Detailed Spec §Contratos de canje). El guard suma `capability_without_exchange_contract` y
   `write_tool_without_transport`, y reemplaza `write_tool_without_scope_class` por la comprobación real: toda tool
@@ -502,15 +566,51 @@ Reglas obligatorias:
 | `marketing_studio.asset.write` | `efeonce-mcp-marketing-studio-asset-write` | `efeonce.mcp.marketing_studio.write` | la de `allowed_actions` que siembre TASK-1894 [verificar] | sí |
 | `marketing_studio.campaign.write` | `efeonce-mcp-marketing-studio-campaign-write` | `efeonce.mcp.marketing_studio.write` | la de `allowed_actions` que siembre TASK-1894 [verificar] | sí |
 | `marketing_studio.campaign.approve` | `efeonce-mcp-marketing-studio-campaign-approve` | `efeonce.mcp.marketing_studio.write` | la que siembre esta task (Slice 1) | sí |
+| `marketing_studio.catalog.manage` (fila y cliente de **TASK-1905** Slices 7–8) | `efeonce-mcp-marketing-studio-catalog-manage` | `efeonce.mcp.marketing_studio.write` | `update` (TASK-1905 Slice 7) | sí |
+| `marketing_studio.integration.manage` (fila y cliente de **TASK-1910** Slice 8) | `efeonce-mcp-marketing-studio-integration-manage` | `efeonce.mcp.marketing_studio.write` | `update` por la convención de TASK-1894 (`create` y `update` se conceden juntas) [verificar en TASK-1910] | sí |
 
 La tabla vive en dos lugares con paridad por test: `resolveScopeContract` (Greenhouse) y
 `marketing-studio-exchange-contracts.ts` (gateway). Si el manifiesto sincronizado trae una tool `writes` con una
 capability fuera de la tabla, esta task le agrega su fila, su cliente y su contrato con la misma receta; el guard
 falla hasta que exista.
 
+Las dos últimas filas **no las implementa esta task**: esta task deja la tabla, el test de paridad y el guard listos
+para que TASK-1905 y TASK-1910 agreguen su fila, su cliente por migración (misma política con
+`requireOnPrivilegedAction = true`) y su valor en `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS`, con release de
+Greenhouse antes del dispatch del gateway.
+
 Por qué un cliente por capability: `assertFederatedClient` exige hoy un scope por cliente y esa guarda es la que
 impide que un token canjeado para una capability sirva para otra; se revoca y se audita por cliente. Precedente:
 `efeonce-mcp-hiring` y `efeonce-mcp-hiring-review`.
+
+### Tools de escritura de la capa de estrategia (federadas por este carril)
+
+Nombres de trabajo de cada task dueña; manda el manifiesto sincronizado. Cada task entrega sus tools (registro,
+ruta, manifiesto, sync, bump del gateway, canary); esta task entrega la mecánica que las hace federables sin código
+nuevo en el provider.
+
+| Task dueña | Tools (`writes: true`) | Capability | Nivel |
+|---|---|---|---|
+| TASK-1905 | `studio.channel_catalog.draft.create`, `studio.channel_catalog.draft.channel.upsert`, `studio.channel_catalog.version.publish`, `studio.channel_alias.map` | `.catalog.manage` | `T1` |
+| TASK-1905 | `studio.channel_catalog.draft.discard` | `.catalog.manage` | `T2` |
+| TASK-1905 | `studio.campaign.channels.revalidate`, `studio.campaign.audience.upsert`, `studio.campaign.customer_model_version.set` | `.campaign.write` | `T1` |
+| TASK-1905 | `studio.campaign.audience.remove` | `.campaign.write` | `T2` |
+| TASK-1907 | `studio.campaign.strategy_plan.draft.create`, `…strategy.set`, `…audience_matrix.set`, `…message_house.set`, `…content_item.upsert`, `…content_item.remove`, `…measurement.set`, `studio.campaign.content_item.progress.set`, `studio.program.upsert`, `studio.campaign.program.set` | `.campaign.write` | `T1` |
+| TASK-1907 | `studio.campaign.strategy_plan.draft.discard`, `studio.program.close` | `.campaign.write` | `T2` |
+| TASK-1907 | `studio.campaign.strategy_plan.approve` | `.campaign.approve` | `T2` (persona) |
+| TASK-1908 | `studio.campaign.strategy_plan.seo.set`, `studio.campaign.seo_snapshots.capture`, `studio.campaign.seo_tracking.propose`, `studio.campaign.seo_tracking.withdraw` | `.campaign.write` | `T1` |
+| TASK-1908 | `studio.campaign.seo_snapshot.declare_competitive` | `.campaign.write` (sólo persona interna, sin scope de bearer) | `T1` |
+| TASK-1909 | `studio.ai_draft.accept`, `studio.ai_draft.reject` (persona), `studio.content_brief.upsert`, `studio.qa_report.create`, `studio.readout.upsert` | `.campaign.write` | `T1` |
+| TASK-1909 | `studio.voice_rules.draft.upsert`, `studio.voice_rules.publish` | `.catalog.manage` | `T1` (restringida) |
+| TASK-1910 | `studio.ad_connection.connect`, `studio.ad_connection.revalidate`, `studio.ad_connection.revoke` (persona) | `.integration.manage` | `T2` |
+| TASK-1910 | `studio.ad.provider_link.set`, `studio.campaign.paid_performance.readback`, `studio.campaign.landing_check.run`, `studio.campaign.metrics_mapping.set` | `.campaign.write` | `T1` |
+| TASK-1911 | `studio.experiment.design.upsert`, `studio.experiment.start`, `studio.experiment.result.capture`, `studio.learning.propose` | `.campaign.write` | `T1` |
+| TASK-1911 | `studio.experiment.conclude`, `studio.experiment.abandon`, `studio.learning.validate`, `studio.learning.retire` (persona) | `.campaign.approve` | `T2` |
+
+Lecturas por `POST` (`writes: false`, camino de lectura): `studio.copy.validate`, `studio.creative.check` (TASK-1909).
+El rastreo de palabras clave (`track_seo_keywords`, TASK-1908) y la escritura del modelo de cliente (TASK-1906) son
+tools de Greenhouse con sus propias clases (`efeonce.mcp.seo.write`, `efeonce.mcp.commercial.write`), no de este
+provider.
 
 ### Flujo de una escritura
 
@@ -553,8 +653,9 @@ El digest prueba que lo ejecutado es lo propuesto sobre esa revisión y para esa
 haya visto. Esa parte la sostienen el consentimiento de la clase, las descripciones de las tools, la capability de
 aprobación y la auditoría. La confirmación por elicitation no se usa (ver `mcp-craft/protocol-radar.md`).
 
-Tools de aprobación (tabla de TASK-1894; manda el manifiesto sincronizado y el gateway las deriva de
-`requiresPerson: true`, nunca de una lista a mano): `studio.asset.version.approve`, `studio.campaign.creative.approve`,
+Las tools que exigen este protocolo se derivan del manifiesto por `riskTier = T2` (y la persona, por
+`requiresPerson: true`), nunca de una lista a mano; eso incluye las `T2` de la capa de estrategia (§«Tools de escritura
+de la capa de estrategia»). Tools de aprobación de TASK-1894: `studio.asset.version.approve`, `studio.campaign.creative.approve`,
 `studio.campaign.media.authorize`, `studio.campaign.brief.approve` y `studio.media_plan.budget_line.approve`. Las
 destructivas (`studio.media_plan.budget_line.remove`, `studio.calendar.post.cancel`) exigen el mismo `dryRun` + digest
 aunque no requieran la capability de aprobación.
@@ -587,6 +688,10 @@ El `upstreamCode` de Studio se conserva en logs saneados, nunca el cuerpo.
   que falta preguntar. `marketing_studio.campaign.approve` la siembra esta task, no TASK-1894.
 - **TASK-1895**: el diálogo de aprobación llama `dryRun`, muestra el diff y envía `confirmation.proposalDigest`.
 - **TASK-1898**: el actor `user` de sesión reutiliza `authority` con `kind: 'session'`.
+- **TASK-1905** y **TASK-1910**: cada una agrega su fila a la tabla de contratos de canje (Greenhouse y gateway), su
+  cliente por migración y su valor en la allowlist, con la receta de esta task; el guard falla hasta que existan.
+- **TASK-1907, TASK-1908, TASK-1909, TASK-1911**: federan sus tools con las capabilities existentes (`.campaign.write`,
+  `.campaign.approve`, `.catalog.manage`); sin clientes nuevos. Sus `T2` quedan cubiertas por el digest sin código nuevo.
 
 ## Rollout Plan & Risk Matrix
 
@@ -671,6 +776,9 @@ El `upstreamCode` de Studio se conserva en logs saneados, nunca el cuerpo.
 - [ ] `marketing_studio.campaign.approve` existe en catálogo, registry y grant (tres roles, sin `designer`) con `capability-grant-coverage.test.ts` verde.
 - [ ] Los cuatro clientes de canje existen activos, con un solo scope cada uno y política que valida con `sisterPlatformOAuthPolicyV1Schema` (`requireOnPrivilegedAction = true`).
 - [ ] El canje de cada tool pide su `capability` y el gateway rechaza una respuesta con otro `scope`.
+- [ ] La tabla de contratos de canje está en Greenhouse y en el gateway con test de paridad que cubre filas agregadas después (probado agregando una fila de prueba sólo en un lado: el test falla), y el provider no necesita cambio de código para una capability nueva.
+- [ ] El digest se exige por `riskTier = T2` leído del manifiesto: una operación `T2` sin `requiresPerson` ni `destructive` (doble de prueba) responde `428 confirmation_required` sin digest; una `T1` con `requiresPerson` no lo exige.
+- [ ] Una tool `writes: false` con método `POST` se federa por el camino de lectura (canje `campaign.read`, sin reenvío de token).
 - [ ] `userinfo` de un token `marketing_studio` responde 403 cuando la persona perdió la capability después del canje (test).
 - [ ] Una tool de escritura sin la clase en el token responde `403 insufficient_scope` con challenge que nombra `efeonce.mcp.marketing_studio.write`.
 - [ ] Con `MARKETING_STUDIO_MCP_WRITES_ENABLED=false`, toda tool de escritura responde `policy_blocked: writes_disabled` sin canje.
@@ -725,6 +833,7 @@ El `upstreamCode` de Studio se conserva en logs saneados, nunca el cuerpo.
 
 ## Open Questions
 
+- Acción de `can()` para `marketing_studio.integration.manage` (TASK-1910): esta task propone `update` por la misma convención; la fija TASK-1910 al sembrarla.
 - Acción de `can()` para `marketing_studio.asset.write` y `marketing_studio.campaign.write`: se toma de
   `allowed_actions` que siembre TASK-1894; confirmar en Discovery y fijarla en ambas tablas de contratos (la de
   `campaign.approve` la decide esta task al sembrarla).
