@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-25 — La órbita se compone por intención (AXIS 0.2.6)
+
+Contrato candidate `efeonce.graphic-line-orbit` 0.1.0 en `@efeoncepro/axis-ui-contracts` 0.2.6: un agente declara órbita, medida (con fuente o sin arco), progreso de deck, lente, foco, mapa de familia, burbuja de URL, voz o logo en frase, y AXIS valida las reglas y resuelve cada valor desde los tokens. Adapter de Greenhouse: `pnpm creative:orbit:resolve` y `pnpm creative:orbit:render` (SVG, PNG y `qa.json`; falla si un texto cruza el anillo). Pines AXIS a 0.2.6. [Manual](docs/manual-de-uso/creative/usar-linea-grafica-efeonce.md) · [skill](.claude/skills/efeonce-brand-studio/references/graphic-line-orbit.md).
+
 ## 2026-09-25 — Línea gráfica «La órbita»: banco de fotos y canon en AXIS
 
 Banco propio de 8 fotos para la lente, hecho con el lenguaje fotográfico (`pnpm foto:generar`, 11 generaciones, ~USD 0,55; tres rehechas por el lenguaje). Reemplaza a las tres fotos repetidas con emblema en canvas, estímulos de la prueba sin logo, PDF y AXIS. ADR de canonización y tokens `efeonceGraphicLine` pasados a `canonical` en AXIS. [ADR](docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) · [manual](docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md). Atribución sin logo sin medir.
@@ -22,6 +26,10 @@ Studio publica un registro único de operaciones del que se derivan su OpenAPI (
 ## 2026-09-25 — Efeonce Marketing Studio: fundación en producción
 
 Nuevo producto `studio.efeonce.org` (EPIC-049 / TASK-1887). Repo `efeoncepro/efeonce-marketing-studio`, solo código, con docs en este repo. Next.js en Vercel con `/api/v1` (OpenAPI 3.1, 12 rutas) y dominio sin framework. Bases `marketing_studio` y `marketing_studio_staging` en `greenhouse-pg-dev`, con roles propios. Renditions WebP en buckets privados servidas por la API. UI aprobada en claro y oscuro con tema generado desde `@efeoncepro/axis-tokens`. Import idempotente de CMP-001 a CMP-005 aplicado en prod. Acceso abierto de solo lectura; el login es task aparte y el CNAME del dominio está pendiente. [Arquitectura](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) · [runbook](docs/operations/marketing-studio/MARKETING_STUDIO_RUNTIME_HANDOFF.md).
+
+## 2026-09-25 — CTA: política cromática por campaña
+
+Política optativa con archivo/hash, paleta AXIS y tratamientos explícitos; compositor y gate validan la decisión y conservan contraste/guardas. Legacy mantiene comportamiento: 13 piezas idénticas frente a HEAD. 39 tests, 14 verificaciones de integración y cuatro candidatas CMP-004 reproducidas; aprobación creativa pendiente. [Contrato](docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#20-política-cromática-por-campaña-optativa) · [ADR](docs/architecture/EFEONCE_ADVERTISING_CAMPAIGN_COLOR_POLICY_DECISION_V1.md) · [evidencia](docs/audits/social/2026-09-25-cmp004-typography-grouping-review.md). Sin modificación del motor tipográfico/espacial, commit o publicación.
 
 ## 2026-09-24 — ANAM: foto oficial de Emma, avatar de chat y cargo comercial
 
@@ -659,22 +667,3 @@ identidad interna real y que el MCP posterior a la certificación funciona media
 mantiene su propio corte al `2026-09-11T01:33:34.325Z`; el retiro continúa bloqueado hasta completar siete días y
 hasta que el cleanup preserve el cliente compartido y sus artefactos ajenos. El runbook, manual y skills espejo
 ahora exigen correlación por sujeto antes de usar una señal por `client_id` como blocker canary.
-
-## 2026-09-14 — Harness publicitario AXIS consumible por agentes en Greenhouse
-
-AXIS `v0.2.5` publica `supportingTagline`, advertising contract `0.2.1` y
-`efeonce.collaboration-selection` `0.2.0`; CI `34859611394` y release `34859795624` terminaron en `success`.
-Greenhouse fija los tres packages en `0.2.5` y amplía `pnpm creative:layout` con un adapter Sharp/fontkit: copy
-arbitrario continuo con espacios naturales, Poppins Regular/Bold Italic reales, fitting al lockup, bounding box
-adaptativo, overlay luminosity, cursor local y multiplayer acting/moving. Los targets soportados son
-`headline|support|hook|lockup` con tipos `text|text|object|group`; las relaciones se resuelven sin coordenadas
-libres y quedan verificadas en manifests y QA.
-
-El mismo adapter consume `src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg` como URL Bubble real:
-firma fija `efeoncepro.com`, escala proporcional, opacidad `0.72` y blend raster no separable `luminosity` contra
-el canvas compuesto. El gate compara el master con un render idéntico sin la burbuja para impedir que un marcador
-SVG presente pero no rasterizado produzca un falso positivo.
-
-La skill publicitaria incluye contrato e intent reutilizables para sesiones nuevas. Sus fixtures cubren texto y
-objeto en 16:9/9:16. No se generó una pieza de campaña, no hubo publicación ni cambio MCP. Advertising permanece
-`trial`, collaboration `candidate` y Globe/otros runtimes `pending adapter` hasta implementar y comparar su motor.

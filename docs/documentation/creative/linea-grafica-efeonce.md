@@ -125,7 +125,7 @@ la órbita se reconozca sola.
 | Firma de mail | decisión del operador | elegir entre A (clara) y B (tarjeta navy, la recomendada) e instalarla |
 | Banco de pares de copy | decisión del operador | aprobar los pares pregunta/respuesta candidatos |
 | Archivos de impresión y plantillas editables | producción | no existen todavía |
-| Componente de órbita en AXIS | producción | hoy hay tokens y una página de referencia, no un componente reutilizable |
+| Contrato de composición de la órbita | producción | publicado en AXIS 0.2.6 como `candidate`: un agente compone por intención (`pnpm creative:orbit:render`); pasa a estable con una pieza real por un segundo runtime |
 | Versión en inglés | producción | el copy de la línea está sólo en español |
 | Revisión legal de «Te hacemos visible» | legal | necesaria antes de usar el claim en pauta |
 

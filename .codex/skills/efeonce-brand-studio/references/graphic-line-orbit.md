@@ -92,11 +92,29 @@ La página de AXIS es pública: lo que allí aparece queda expuesto.
 - [ ] Foto del banco o del pipeline `foto:*`; sin velo, sin emblema legible, nadie mira al lente.
 - [ ] «Te hacemos visible» sólo con su prueba y sin pauta mientras falte la revisión legal.
 
+## Componer con agentes (contrato `efeonce.graphic-line-orbit`)
+
+Una pieza con la órbita se compone por **intención**, no con coordenadas: el agente declara qué hace la órbita
+(`orbit`, `measure`, `progress`, `lens`, `spotlight`, `family-map`, `url-bubble`, `voice`, `logo-inline`) y AXIS
+valida las reglas de la línea y resuelve cada valor desde los tokens.
+
+```bash
+pnpm creative:orbit:resolve -- --input intent.json --out manifest.json
+pnpm creative:orbit:render -- --intent intent.json --bindings bindings.json --out-dir out/
+```
+
+`render` escribe `manifest.json`, `piece.svg`, `piece.png` y `qa.json`, y **sale con 1** si falla un chequeo del
+adapter (texto que cruza el anillo, URL como texto). Los bindings llevan la geometría medida: objetos, fotos,
+lugar de la burbuja y cajas de texto; la respuesta con `fontSize`, `baseline` y `lastChar` para cerrar con su
+esfera. Rechazos típicos del resolver: dos anillos en una pieza, `measure` sin `source`, respuesta de más de tres
+palabras. Contrato y manual en AXIS: `docs/agent-composition/graphic-line-orbit.md`; ejemplos pintados en la
+sección 5.7 de https://axis.efeonce.org/references/graphic-line.
+
 ## Pendientes (no presentarlos como resueltos)
 
 - **Prueba de atribución sin logo** (600 personas, panel a cotizar) sin medir: hoy la línea es **sistema consistente,
   no activo distintivo demostrado**. No reportarla como brand equity.
 - Elegir firma de mail A o B; aprobar el banco de pares de copy (hoy candidatos).
-- Archivos de impresión y plantillas editables; **componente de órbita en AXIS** (hoy sólo tokens + página, sin
-  contrato semántico de composición).
+- Archivos de impresión y plantillas editables. La órbita ya se compone por intención (ver abajo); su contrato
+  sigue en `candidate` hasta que una pieza real salga por un segundo runtime con evidencia.
 - Copy en inglés; revisión legal de «Te hacemos visible»; tamaños mínimos del logo con prueba de impresión.

@@ -162,9 +162,15 @@ Rules for agents:
   changing the token and its test in AXIS, signed through the Greenhouse ADR, not editing a document.
 - Before pinning a consumer, confirm which **published** package version contains the export; do not assume the
   workspace source is released.
-- **There is no semantic composition contract or orbit component yet**: only tokens plus the reference page. Do not
-  invent an intent/manifest, resolver command or adapter for the orbit, and do not copy the Lab Astro/CSS into a
-  product. If a surface needs it, report the component as pending.
+- **Compose by intent, never by coordinates.** AXIS `0.2.6` publishes the candidate contract
+  `efeonce.graphic-line-orbit` `0.1.0` and manifest `axis.graphic-line-orbit-composition.v1`: an agent declares
+  `orbit`, `measure` (value 0–1 **with a source**, or no arc), `progress`, `lens`, `spotlight`, `family-map`,
+  `url-bubble`, `voice` or `logo-inline`; the resolver enforces the line's rules (one ring per piece, answer ≤ 3
+  words, URL never as text) and resolves every value from `efeonceGraphicLine`. In AXIS: `pnpm orbit:resolve`
+  (manual `docs/agent-composition/graphic-line-orbit.md`, ADR `GRAPHIC_LINE_ORBIT_COMPOSITION_DECISION_V1.md`).
+  In Greenhouse: `pnpm creative:orbit:resolve` (manifest) and `pnpm creative:orbit:render --intent --bindings
+  --out-dir` (SVG, PNG and `qa.json`; exits 1 when an adapter check such as text crossing the ring fails). The
+  bindings carry measured geometry (targets, photos, URL-bubble slot, text boxes); never copy the Lab painter.
 - Scope: Efeonce's own brand and its family. Never Greenhouse product UI and never client work. The URL bubble
   (`url-lum`) baked variants live as SVG assets in Greenhouse, not as tokens.
 

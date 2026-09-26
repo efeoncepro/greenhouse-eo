@@ -54,8 +54,9 @@ marca de cliente ni a Greenhouse. Contrato: [manual](../../../docs/operations/br
   en 16:9.
 - **Pie:** la URL va en la burbuja oficial `url-lum` (regla de pie de arriba); en un PDF donde la fusión de
   luminosidad no esté garantizada, la variante horneada de `docs/operations/brand-graphic-line/deliverables/assets/`.
-- Valores desde los tokens `efeonceGraphicLine` (`@efeoncepro/axis-tokens`), nunca HEX ni px transcritos. El
-  componente de órbita en AXIS está pendiente: hoy hay tokens y una página de referencia, no una primitive.
+- Valores desde los tokens `efeonceGraphicLine` (`@efeoncepro/axis-tokens`), nunca HEX ni px transcritos. La órbita
+  de navegación se compone por intención con `progress` (`sections`, `current`) en `pnpm creative:orbit:render`;
+  ver [graphic-line-orbit.md](../efeonce-brand-studio/references/graphic-line-orbit.md).
 
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 

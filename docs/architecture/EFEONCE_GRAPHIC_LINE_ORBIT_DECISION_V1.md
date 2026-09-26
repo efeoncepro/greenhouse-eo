@@ -56,5 +56,5 @@ merch, oficina, eventos, redes, decks, correo y producto (Efeonce Insights).
 - **Prueba de atribución sin logo:** 600 personas, panel a cotizar. Hasta medirla, la línea es un sistema
   consistente, no un activo distintivo demostrado.
 - Elegir firma de mail A o B y aprobar el banco de pares de copy.
-- Archivos de impresión, plantillas editables y un componente de órbita en AXIS (hoy son tokens y una página).
+- Archivos de impresión y plantillas editables. Delta 2026-09-25: la órbita ya tiene contrato de composición por intención en AXIS 0.2.6 (`efeonce.graphic-line-orbit`, candidate; ADR `GRAPHIC_LINE_ORBIT_COMPOSITION_DECISION_V1` en AXIS) con adapters en el Lab y en Greenhouse (`pnpm creative:orbit:render`).
 - Copy en inglés, revisión legal de «Te hacemos visible» y tamaños mínimos validados con prueba de impresión.

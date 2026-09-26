@@ -449,7 +449,7 @@ confianza. Kit: `exploracion-v5/prueba-sin-logo/` (protocolo, cuestionario, 24 e
 2. Firma de mail A o B, e instalarla.
 3. Aprobar el banco de pares de copy.
 
-**Pendiente (producción):** archivos de impresión y plantillas editables · componente de órbita en AXIS (hoy son tokens y una página de referencia) · la
+**Pendiente (producción):** archivos de impresión y plantillas editables · el contrato de composición `efeonce.graphic-line-orbit` (AXIS 0.2.6) sigue en `candidate` hasta una pieza real por un segundo runtime · la
 frontera Greenhouse ↔ Efeonce (la línea es de Efeonce, no de Greenhouse) · que la línea no se filtre al trabajo de
 clientes · copy en inglés · revisión legal de «Te hacemos visible» · accesibilidad medida en las piezas reales ·
 tamaños mínimos del logo validados con prueba de impresión.

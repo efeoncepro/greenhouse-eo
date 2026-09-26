@@ -23,6 +23,7 @@ manual, la decisión y los entregables para personas.
 | Canvas de trabajo (privado) | [claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) | Taller de exploración (39 láminas, siete capítulos) |
 | Taller de la exploración | `ai-generations/2026-09-25_efeonce-studio-props/exploracion-v5/` | Generador del canvas, texturas, renders, firma de mail, merch generativo y kit de la prueba sin logo |
 | Banco de fotos para la lente | `ai-generations/2026-09-25_banco-lente-orbita/` ([`LEEME.md`](../../../ai-generations/2026-09-25_banco-lente-orbita/LEEME.md)) | 8 tomas documentales hechas con `pnpm foto:generar`: fichas y prompts versionados, plates locales |
+| Composición por intención | `pnpm creative:orbit:resolve` · `pnpm creative:orbit:render` (`scripts/creative/layout-compiler/graphic-line.mjs`) | Adapter de Greenhouse del contrato AXIS `efeonce.graphic-line-orbit` 0.1.0 (AXIS 0.2.6): manifest, SVG, PNG y `qa.json` |
 
 ## Documentación para personas
 
