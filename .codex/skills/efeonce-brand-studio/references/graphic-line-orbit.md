@@ -91,6 +91,13 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
 11. **Eslogan** sólo en cierres, desde el archivo oficial: «Empower your» + palabra de la marca, sin mayúsculas y sin
     esfera (§5).
 12. **Estado:** anillo = libre, esfera = ocupado, siempre con etiqueta escrita; nunca verde/rojo.
+13. **La esfera final es parte del texto** (operador, 2026-09-26): la respuesta y el titular display de marca propia
+    cierran con ella, y la guía, las marcas de corte, la selección colaborativa y sus cursores miden la palabra
+    **con** la esfera. Nunca una selección que termina en la última letra. En AXIS: `answerHtml` / `answerGroupBox`
+    del paquete y el chequeo `answer-period-part-of-text` (§1.2, §6).
+14. **La lente lleva la órbita, nunca un disco suelto:** anillo, arco corto de 50° y la esfera en su punta, con los
+    valores de `lens.anatomy` (esfera 7,6 px en 1080, 13,5 px en 1920). El adapter de Greenhouse fijado en AXIS 0.2.7
+    todavía dibuja el disco: no entregar una lente de `creative:layout` sin revisarla hasta adoptar 0.3.0 (§1.5).
 
 ## De dónde salen los valores y los archivos
 

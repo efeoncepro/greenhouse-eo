@@ -57,6 +57,15 @@ your Voice» (Reach, por confirmar); Efeonce → «Growth», con **Greenhouse** 
 todas las líneas (su interfaz sigue con `DESIGN.md`). Pendiente: palabra de RevOps y CRM y de Growth Strategy, y si los
 acentos de producto se usan en piezas de Efeonce (recomendación: no). Manual §7 y §8.1.
 
+### Delta 2026-09-26 (b) — La lente lleva la órbita; la esfera final es parte del texto
+
+- **La lente** usa la anatomía de la órbita medida en la lámina 1.3 (anillo 1,4 px al 28 %, arco de 50° y esfera r
+  5,6 px por 794 px de ancho, sólo por ancho). Se retira la esfera de acento suelta (0,14 del diámetro), que era seis
+  veces más grande y sin arco.
+- **La esfera que cierra la respuesta o el titular de marca propia es parte del texto:** guías, marcas de corte,
+  selección y cursores la incluyen. Regla de contrato en AXIS (`answer-period-part-of-text`;
+  `efeonce.collaboration-selection` 0.3.0 con `target.bounds`). Detalle en el manual §1.2, §1.5 y §6.
+
 ## Alternativas descartadas
 
 | Alternativa | Por qué no |

@@ -60,6 +60,10 @@ Tres ideas sostienen todo lo demás:
 | t | 0 |
 
 - Sola (sin palabra): área de respeto de **2 diámetros**.
+- **Es parte del texto, no un adorno al lado** (operador, 2026-09-26). Cierra la respuesta de la voz y el titular
+  display de marca propia, y toda herramienta que mide ese texto lo mide **con** la esfera: la guía derecha, las
+  marcas de corte, la selección colaborativa y sus cursores, y el aire hasta la órbita o la nota al margen. No la
+  llevan la pregunta (anillo delante), el eyebrow, las etiquetas, el cuerpo de texto ni el eslogan (§5).
 - **Nunca:** otro color que el acento de la marca · volumen, brillo o sombra · deformarla o agrandarla ·
   repetirla como patrón · reemplazar letras con ella · usar el teal en textos o fondos · ponerla en una
   pregunta · usarla como viñeta · más de una por pieza.
@@ -113,6 +117,11 @@ prueba**: «Te hacemos visible. Y lo medimos.»
 La foto entera en navy apagado; dentro del círculo, a todo color y ampliada. La esfera muestra lo que importa:
 dónde está la decisión. Funciona con cualquier foto del lenguaje fotográfico. **Riesgo:** exige una foto con un
 punto de interés claro; con una foto débil se nota el truco.
+
+La órbita de la lente es la misma de siempre, **nunca un disco suelto**: anillo con su aire (1,4 px al 28 %), un arco
+corto de 50° y la esfera en su punta (radio 5,6 px), medidos por 794 px de ancho y escalados sólo por el ancho (en
+1080 px: esfera 7,6 px; en 1920 px: 13,5 px). El arco va arriba a la izquierda, lejos de la cara (lámina 1.3; token
+`efeonceGraphicLine.lens.anatomy`, corregido el 2026-09-26: antes dibujaba una esfera seis veces más grande y sin arco).
 
 ---
 
@@ -193,6 +202,13 @@ El trabajo se ve mientras ocurre. Cinco herramientas, **máximo dos por pieza** 
 
 Las guías y marcas van en azules; la selección y los cursores son los de AXIS tal como se resuelven en
 producción (`@efeoncepro/axis-ui-contracts`), nunca coordenadas decorativas.
+
+**El titular cierra con su esfera y las herramientas la incluyen** (operador, 2026-09-26): la selección, las marcas
+de corte y los cursores miden la palabra con su esfera, porque la esfera es parte del texto (§1.2). Una selección que
+termina en la última letra y deja la esfera afuera está mal. En AXIS es regla de contrato: el chequeo
+`answer-period-part-of-text` de la línea gráfica y `target.bounds: 'rendered-group-including-terminal-sphere'` de
+`efeonce.collaboration-selection` 0.3.0; en el paquete, `answerHtml` escribe la respuesta con su esfera y
+`answerGroupBox` da la caja que miden las herramientas (lámina 2.3).
 
 ---
 
@@ -569,6 +585,12 @@ operador.
   «Componer con agentes», donde el post de ejemplo ahora firma con el logo centrado. El banco de tipografía creativa
   (`references/creative-typography`) también firma con el logo centrado por defecto; la burbuja sólo con el logo en la
   imagen. El Lab toma los archivos del paquete de assets en cada build y ya no guarda copias propias.
+- **Delta 2026-09-26 — en AXIS local, sin publicar (sale con los paquetes 0.3.0 y el contrato 0.3.0):** la lente
+  resuelve anillo, arco y esfera desde `lens.anatomy` (§1.5; `accentSphereDiameterRatio` queda obsoleto); la esfera
+  que cierra el texto es parte del texto (§1.2, §6) en la línea gráfica y en `efeonce.collaboration-selection`
+  0.3.0; el paquete nuevo `@efeoncepro/axis-graphic-line` pinta la órbita, sus recetas y su movimiento. Greenhouse
+  sigue fijado en 0.2.7: su adapter (`scripts/creative/layout-compiler/graphic-line.mjs`) todavía dibuja la lente con
+  el disco suelto y `axis-advertising.mjs` exige la selección 0.2.0; ambos se corrigen al adoptar 0.3.0.
 
 ### 13.2 Greenhouse
 

@@ -116,6 +116,13 @@ render, call a model, approve or publish. A surface adapter consumes only the no
 formats. Never copy the Lab Astro/CSS or fall back to free `top`/`left` coordinates. If no adapter exists, report
 the capability as pending.
 
+The bound geometry is the rendered group: when the text closes with the graphic-line sphere (a voice answer or an
+own-brand display headline), the selection, crop marks and cursors include the sphere — it is part of the text,
+never an ornament beside it (operator, 2026-09-26). Source contract `0.3.0` declares
+`target.bounds: 'rendered-group-including-terminal-sphere'`; the graphic line adds the adapter check
+`answer-period-part-of-text`, and `@efeoncepro/axis-graphic-line` exposes `answerHtml` and `answerGroupBox`.
+Greenhouse still pins `0.2.0` of this contract (the `0.2.7` set) until it adopts the new release.
+
 The portable advertising and collaboration contracts were first published in the AXIS `0.2.5` package set.
 Greenhouse now pins the `0.2.7` set (which adds the graphic line contract and `@efeoncepro/axis-brand-assets`) and
 its Campaign Layout Compiler implements the first non-Lab adapter for
