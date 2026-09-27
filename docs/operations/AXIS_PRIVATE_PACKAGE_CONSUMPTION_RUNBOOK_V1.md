@@ -8,6 +8,11 @@ source control.
 
 ## Current state — 2026-09-14
 
+> **Actualizado 2026-09-27 (noche):** lo último publicado es el tag `v0.3.12` de AXIS (Glitch, TASK-1922):
+> `axis-tokens` `0.3.12`, `axis-ui-contracts` `0.3.10`, `axis-brand-assets` `0.3.5` y `axis-graphic-line` `0.7.0`, con
+> `axis-ui-registry` `0.3.1`. **Greenhouse fija esas cinco versiones** (commit `4dfb147f7` de `develop`). Ver
+> **Delta 2026-09-27 (d)**; los párrafos siguientes quedan como historia.
+
 > **Actualizado 2026-09-27 (tarde):** lo último publicado es `axis-tokens` `0.3.10` (tag `v0.3.10`), con
 > `axis-ui-contracts` `0.3.8`, `axis-ui-registry` `0.3.1`, `axis-brand-assets` `0.3.4` y `axis-graphic-line` `0.6.0`
 > (versiones leídas en GitHub Packages). Greenhouse fija `axis-tokens` `0.3.8`, `axis-ui-contracts` `0.3.7`,
@@ -74,6 +79,35 @@ source control.
   La evidencia del piloto pasa de **local** a **CI**.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
+
+## Delta 2026-09-27 (d) — `v0.3.12` publicado y fijado: Glitch en AXIS (TASK-1922)
+
+- **Publicado** el 2026-09-27 con el tag `v0.3.12` sobre el commit `29a40b5` de `main` de AXIS (push
+  `47acc3d..29a40b5` y tag autorizados por el operador, Julio Reyes, ese día; CI run `36352781574` `success`;
+  `release-packages.yml` run `36352864790` `success`). Sube cuatro paquetes; `axis-ui-registry` sigue en `0.3.1`:
+  - `axis-tokens` `0.3.12`: token **`glitchLine`** (export de primer nivel, nunca rama de `efeonceGraphicLine`; estado
+    `candidate`): color, tipo, cabecera, bytes, manzana, firma, íconos, formatos, zonas seguras, motion, piezas con
+    estado y rotación de portada.
+  - `axis-ui-contracts` `0.3.10`: contrato **`efeonce.glitch-line`** 0.1.0 `candidate` (`validateGlitchLineIntent`,
+    `resolveGlitchLineIntent`, manifiesto `axis.glitch-line-composition.v1`, 23 códigos de issue estables; falla
+    cerrado).
+  - `axis-brand-assets` `0.3.5`: **`AXIS_GLITCH_ASSETS`** (`glitch-logo-positive`, `glitch-logo-negative`,
+    `glitch-apple`), sellado aparte de `AXIS_BRAND_ASSETS`.
+  - `axis-graphic-line` `0.7.0`: los 5 glifos Plastilina de Glitch (guardar, compartir, recomendar, comentar,
+    deslizar) entran a `PLASTILINA_GLYPHS` (decisión D27): 36 Trazo + 48 Plastilina = 84, con 48 volúmenes.
+- **Tramo intermedio del mismo día** (sin delta propio): el tag `v0.3.11` publicó `axis-tokens` `0.3.11` y
+  `axis-ui-contracts` `0.3.9` (`efeonce.surface-composition` 0.1.2); Greenhouse lo fijó en el commit `0d8a2b025`
+  (TASK-1927 Slice 1), que además sumó el rol `info` a `COMPATIBILITY_ROLES` del drift test.
+- **Greenhouse lo fija** (commit `4dfb147f7` de `develop`, 2026-09-27): `axis-tokens` `0.3.12`, `axis-ui-contracts`
+  `0.3.10`, `axis-brand-assets` `0.3.5`, `axis-graphic-line` `0.7.0` y `axis-ui-registry` `0.3.1`. Los tokens
+  compilados de los catálogos `graphic-line-*` sólo cambian la versión de origen (`pnpm brand:tokens`).
+- **Evidencia:** `pnpm typecheck` verde; test focal `src/config/axis-glitch-line-package.test.ts` (token, contrato y
+  activos aislados de la familia); brand-surfaces + catálogos + drift 106/106; `pnpm composer:visual-gate
+  --catalog=graphic-line`: los 24 frames del baseline a 0 px (idénticos por sha256).
+- **Instalación local:** con un `NPM_CONFIG_USERCONFIG` efímero fuera del repo y el token del `gh` CLI del operador;
+  el token **nunca** se escribió en un archivo del repo.
+- **Consumo:** fuera del test focal, Greenhouse todavía no lee `glitchLine`. Los catálogos del Composer lo consumen en TASK-1923 y
+  el taller (`efeonce-brand-workshop`, `tools/glitch-motion`) deja su espejo de paleta y manzana en TASK-1924.
 
 ## Delta 2026-09-27 (c) — `axis-tokens` 0.3.10 (tag `v0.3.10`): `color.info` y motion sin valores dobles; Greenhouse no lo fija
 

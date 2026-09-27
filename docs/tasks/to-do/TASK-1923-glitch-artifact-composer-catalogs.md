@@ -1,5 +1,40 @@
 # TASK-1923 — Glitch en el Artifact Composer
 
+## Delta 2026-09-27 — TASK-1922 publicada en AXIS `v0.3.12`: se levanta el bloqueo
+
+- **Bloqueo levantado.** TASK-1922 publicó en AXIS el tag `v0.3.12` (commit `29a40b5`; CI y release-packages verdes):
+  `@efeoncepro/axis-tokens` `0.3.12`, `@efeoncepro/axis-ui-contracts` `0.3.10`, `@efeoncepro/axis-brand-assets` `0.3.5`
+  y `@efeoncepro/axis-graphic-line` `0.7.0` (`axis-ui-registry` sigue en `0.3.1`). Greenhouse `develop` fija exactamente
+  esas versiones desde `4dfb147f7` (gate visual de graphic-line: 24 cuadros a 0 px). Esta task consume esas cuatro
+  versiones; el `Blocked by: TASK-1922` queda satisfecho y los Slices 2–4 ya no esperan a AXIS.
+- **Extensión `glitch` del brand pack (Slice 2):** lee el token `glitchLine` (export de primer nivel, tipo `GlitchLine`,
+  `status: candidate`) y **nunca copia valores**; `pnpm glitch:tokens` compila desde él. El wordmark y la manzana salen de
+  `AXIS_GLITCH_ASSETS` (`glitch-logo-positive`, `glitch-logo-negative`, `glitch-apple`, sellados en
+  `GLITCH_ASSET_SEALS`; API `findGlitchAsset` / `glitchAssetUrl(id)`), fuera de `AXIS_BRAND_ASSETS`. Los cinco glifos
+  (guardar, compartir, recomendar, comentar, deslizar) ya son catálogo en `PLASTILINA_GLYPHS` (D27) y en Glitch van
+  **siempre planos** (`glitchLine.icons.actions.rendering: 'flat'`, `volume: 'never'`). **AXIS no publica fuentes:**
+  Guttery sigue sellada por checksum en la extensión del brand pack (licencia declarada en `glitchLine.type.narrator`).
+- **Validadores semánticos:** reutilizan (llaman) `validateGlitchLineIntent(intent, { narratorLicenseStatus })` y
+  `resolveGlitchLineIntent` del contrato `efeonce.glitch-line` `0.1.0`; las plantillas consumen el manifiesto
+  `axis.glitch-line-composition.v1` (lienzo, paleta por superficie, tipo, titular, cabecera, wordmark, esfera, bytes,
+  zonas seguras, `cover`, `actionIcons`, firma, `adapterChecks`). Falla cerrado: cualquier issue → `status: 'invalid'`
+  sin cuerpo, y no se renderiza. Códigos que esta task debe propagar sin duplicar: `piece-not-approved`,
+  `previous-cover-template-required`, `cover-template-repeated`, `sphere-count-exceeded`, `accent-text-on-light`,
+  `bytes-over-face`, `headline-weight-contrast-missing`, `narrator-font-unlicensed`, `narrator-rotation-invalid`,
+  `slogan-not-applicable`, `icon-volume-not-applicable` y `url-bubble-not-applicable`. El mecanismo local
+  `glitch.piece-approval@1` se concilia con el `piece-not-approved` del contrato en vez de mantener dos fuentes.
+- **Piezas, formatos y rotación ya están en el token:** `glitchLine.formats` (`linkedin-4x5`, `landscape-16x9`,
+  `square-1x1`, `blog-inline-16x9`, `reel-9x16`), `glitchLine.pieces` (id → estado/superficie/formato/plantilla/esfera/
+  titular; todas `aprobada` salvo `historia-9x16` y `carrusel-panoramico` = `exploracion`; `interior-lente` con esfera
+  `lens`; `blog-banner-square-a/b/c` con su plantilla 1:1 propia; `blog-banner-interno`) y `glitchLine.coverRotation`
+  (A/B/C, nunca la misma que la semana anterior). El selector lee `coverRotation`; el estado de cada plantilla sale de
+  `pieces`. El token lista `reel-portada` como `aprobada`: el `[verificar]` del Delta (noche) se resuelve contra el
+  token al empezar el Slice 7, no decidiéndolo en el composer.
+- **Contexto vigente:** el flujo de composición está `Accepted` y todas las piezas estáticas están aprobadas (blog y
+  lámina con lente incluidos). Guía y ejemplos para escribir intents: `docs/agent-composition/glitch.md`,
+  `docs/agent-composition/glitch-line-intent.schema.json` y `docs/examples/glitch/` del repo AXIS; CLI de referencia
+  `pnpm glitch:resolve -- --input <intent.json> --out <manifest.json>`.
+
 ## Delta 2026-09-27 (noche) — blog y lente aprobados
 
 Decisión del operador (Julio Reyes), registrada en el
@@ -78,7 +113,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 - Status real: `Diseño. Bloqueada por TASK-1922 (token glitchLine, archivos oficiales y contrato efeonce.glitch-line). Los Slices 1 y 5 (contrato del manifiesto y geometría pura de la falla) pueden adelantarse sin TASK-1922. Desde el 2026-09-27 (noche) el blog (banners 16:9 A/B/C, 1:1 propia, banner interno de noticia) y la lámina con lente están aprobados: se construyen abiertos; sólo la portada del reel, la miniatura y los overlays PNG del reel siguen en proposed [verificar].`
 - Rank: `TBD`
 - Domain: `content|creative|platform`
-- Blocked by: `TASK-1922`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; AXIS main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

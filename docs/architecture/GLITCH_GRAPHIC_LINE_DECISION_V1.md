@@ -15,7 +15,10 @@
 > **lámina con lente** quedaron **Accepted** el 2026-09-27 ([Delta — blog y lente aprobados](#delta-2026-09-27--blog-y-lente-aprobados)):
 > ya no queda ninguna pieza estática en propuesta.
 > **Creado:** 2026-09-27 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude ([Delta del blog y la lente](#delta-2026-09-27--blog-y-lente-aprobados):
+> **Última actualización:** 2026-09-27 por Claude ([Delta de TASK-1922](#delta-2026-09-27--tokens-contrato-y-archivos-publicados-en-axis-task-1922): **tokens `glitchLine`, contrato
+> `efeonce.glitch-line` 0.1.0 y archivos de Glitch publicados en AXIS** —tag `v0.3.12`, autorizado por el operador— y
+> consumidos por Greenhouse (`4dfb147f7`); íconos de acción de la contraportada siempre Plastilina plana; antes,
+> [Delta del blog y la lente](#delta-2026-09-27--blog-y-lente-aprobados):
 > **blog completo y lámina con lente aprobados**, callout «DROP» v2 desde la #17; antes, [Delta del reel](#delta-2026-09-27--el-reel-abre-directo-con-la-apertura):
 > **el reel abre directo con la apertura, sin pre-roll**; el pre-roll queda sólo en el vlog; antes, [Delta de la tarde](#delta-2026-09-27-tarde--música-y-pre-roll-integrados-en-el-taller):
 > música y pre-roll **integrados en el taller**, huellas sha256, intro/salida reemplazan a los efectos de apertura y
@@ -102,9 +105,11 @@ mano.
    - Publicado el 2026-09-27 en `efeoncepro/axis-design-system` (`main`, `d5846e8`): página del Lab
      `/references/glitch/`, gemelo JSON `/references/glitch.json` y guía de composición para agentes
      `docs/agent-composition/glitch.md`.
-   - Por hacer: tokens `glitchLine` en `@efeoncepro/axis-tokens` (color, tipo, cabecera, bytes, manzana, zonas seguras
-     por formato, motion); assets en `@efeoncepro/axis-brand-assets` (wordmark light/dark, manzana SVG, glifos
-     Plastilina, Guttery si la licencia lo permite); contrato `efeonce.glitch-line` 0.1.0 con reglas verificables (una
+   - Publicado el 2026-09-27 con el tag `v0.3.12` (TASK-1922, [Delta](#delta-2026-09-27--tokens-contrato-y-archivos-publicados-en-axis-task-1922)): tokens `glitchLine` en
+     `@efeoncepro/axis-tokens` (color, tipo, cabecera, bytes, manzana, zonas seguras por formato, motion); assets en
+     `@efeoncepro/axis-brand-assets` (wordmark positivo y negativo, manzana SVG) y glifos Plastilina en
+     `@efeoncepro/axis-graphic-line` (Guttery **no** entra a ningún paquete: se instala en la máquina que renderiza);
+     contrato `efeonce.glitch-line` 0.1.0 con reglas verificables (una
      esfera por pieza, verde nunca como texto sobre claro, nada sobre la cara, rotación de plantillas, contraste).
 3. **Composición con el Artifact Composer** (motor domain-free de Greenhouse, `src/lib/artifact-composer/**`; catálogos
    como dato; render hermético en el Cloud Run Job `artifact-worker`):
@@ -149,7 +154,8 @@ Se revisó el motor (`src/lib/artifact-composer/catalog.ts`, `compose.ts`, `cont
   de la semana anterior como dato, porque un validador no consulta la base); y un **layout hook** para la falla en bytes
   derivada de la foto, determinista.
 - **No va por `src/lib/brand-surfaces` ni por `efeonce.surface-composition`:** ese puente es de las recetas de La órbita
-  por superficie. Glitch es una franquicia con su propio contrato (`efeonce.glitch-line`, pendiente). Cuando exista la ruta
+  por superficie. Glitch es una franquicia con su propio contrato (`efeonce.glitch-line` 0.1.0 `candidate`, publicado el 2026-09-27;
+  ver el [Delta de TASK-1922](#delta-2026-09-27--tokens-contrato-y-archivos-publicados-en-axis-task-1922)). Cuando exista la ruta
   productiva gobernada de TASK-1921, los catálogos de Glitch pueden usarla.
 - El movimiento (overlays animados, apertura y cierre) sigue fuera del Composer: HyperFrames.
 
@@ -157,12 +163,12 @@ Se revisó el motor (`src/lib/artifact-composer/catalog.ts`, `compose.ts`, `cont
 
 | # | Trabajo | Depende de |
 |---|---|---|
-| a | **TASK-1922** — Tokens, assets y contrato de Glitch en AXIS (incluye e y f) | — (la manzana y el verde se aprobaron el 2026-09-27) |
+| a | **TASK-1922** — Tokens, assets y contrato de Glitch en AXIS (incluye e y f) | **hecho** el 2026-09-27: tag `v0.3.12` de AXIS (`29a40b5`), consumido por Greenhouse en `4dfb147f7` ([Delta](#delta-2026-09-27--tokens-contrato-y-archivos-publicados-en-axis-task-1922)) |
 | b | **TASK-1923** — Catálogos `glitch-carousel` (PDF), `glitch-stills` y `glitch-overlays` (PNG) sobre un mismo `templatesDir`, extensión `glitch` del brand pack, selector de rotación y validadores | (a) |
 | c | **TASK-1924** — Overlays HyperFrames + render con alfa | (a); aprobación del kit de overlays del reel |
 | d | Callout v2 en el bloque de WordPress `efeoncepro/glitch-drop` (TASK-1337) | callout v2 **aprobado** el 2026-09-27; se aplica **antes de publicar la #17** |
-| e | Alta de los 5 glifos Plastilina en AXIS | — (aprobada el 2026-09-27) |
-| f | Licencia de Guttery | confirmada por el operador (2026-09-27); falta registrar la referencia del contrato de licencia |
+| e | Alta de los 5 glifos Plastilina en AXIS | **hecho** el 2026-09-27: `PLASTILINA_GLYPHS` de `axis-graphic-line` `0.7.0` (tag `v0.3.12`, decisión D27), con volúmenes 3D aprobados por el operador antes del sellado |
+| f | Licencia de Guttery | **hecho** en el token el 2026-09-27: `glitchLine.type.narrator` registra la licencia web + video y su `licenseRef` («confirmada por el operador en chat, 2026-09-27; número de contrato pendiente»); falta sólo el número de contrato |
 
 ## Delta — flujo aceptado, hogar del movimiento y Marketing Studio (2026-09-27)
 
@@ -208,8 +214,9 @@ Se revisó el motor (`src/lib/artifact-composer/catalog.ts`, `compose.ts`, `cont
 
 - Toda pieza de Glitch sigue la norma de la sub-línea; toda pieza de Efeonce sigue ignorando los rasgos exclusivos de
   Glitch.
-- Hasta que existan los tokens `glitchLine`, los valores de referencia viven en la norma y en el JSON publicado de AXIS
-  (`/references/glitch.json`); al publicarse, mandan los tokens y la norma deja de guardar números.
+- Desde el 2026-09-27 los valores viven en el token `glitchLine` (`@efeoncepro/axis-tokens` `0.3.12`) y el Lab los
+  sirve en `/references/glitch.json`; mandan los tokens. Los números que la norma conserva son una referencia humana
+  espejada del token: si difieren, gana el token ([Delta de TASK-1922](#delta-2026-09-27--tokens-contrato-y-archivos-publicados-en-axis-task-1922)).
 - El callout v2, si se aprueba, obliga a cambiar el bloque de WordPress `efeoncepro/glitch-drop` desplegado por TASK-1337.
 - La numeración de ediciones quedó resuelta el 2026-09-27: la próxima es la **#17** y la serie sigue la del blog y del
   ADR del pipeline editorial. Los «#11»–«#14» de las maquetas del canvas son ejemplos de diseño.
@@ -232,14 +239,20 @@ El único pendiente de la música es probar la mezcla con la voz real del host. 
   bloque `efeoncepro/glitch-drop` antes de publicar la #17. El vlog 16:9, el reel (kit de overlays) y las
   tarjetas finales quedaron aprobados con el motion el 2026-09-27 ([Delta — motion aprobado](#delta-2026-09-27--motion-aprobado)).
 - Contenido del lower third: definido el 2026-09-27 (ver el Delta del piloto de motion).
-- Licencia de Guttery: confirmada por el operador (2026-09-27); falta registrar la referencia del contrato.
+- Licencia de Guttery: confirmada por el operador (2026-09-27) y registrada en `glitchLine.type.narrator` (tag
+  `v0.3.12`); falta sólo el número de contrato.
+- TASK-1923 (catálogos del Composer que leen `glitchLine`) y TASK-1924 (el taller lee `glitchLine` y retira su espejo de
+  paleta y manzana); promoción del contrato `efeonce.glitch-line` desde `candidate` tras la primera edición compuesta.
 
 ## Reversibilidad
 
-Alta. La sub-línea es documentación y piezas; nada del runtime de Greenhouse depende de ella y en AXIS sólo está
-publicada la página de referencia (sin tokens ni contrato). Revertir la decisión aceptada es retirar la norma y volver a componer Glitch con La órbita. El flujo propuesto
-no existe todavía; su costo de revertir crece cuando se publiquen tokens y contrato en AXIS y el catálogo entre al
-Composer.
+Alta. La sub-línea es documentación y piezas; nada del runtime de Greenhouse depende de ella. Desde el 2026-09-27 AXIS
+publica, además de la página de referencia, el token `glitchLine`, el contrato `efeonce.glitch-line` 0.1.0 y los
+archivos de Glitch (tag `v0.3.12`), todos en estado `candidate`, y Greenhouse fija esas versiones sin leerlas todavía
+en código (sólo un test focal). Revertir la decisión aceptada es retirar la norma y volver a componer Glitch con La
+órbita; en AXIS, deprecar el token, el contrato y `AXIS_GLITCH_ASSETS` en una versión nueva (lo publicado no se
+borra). El costo de revertir crece cuando el catálogo entre al Composer (TASK-1923) y el taller lea el token
+(TASK-1924).
 
 ## Delta 2026-09-27 — piloto de motion en el taller
 
@@ -465,3 +478,54 @@ guarda su sha256); y el código no pasó por PR ni por el CI del taller (commits
 - **Consecuencia para TASK-1337:** el callout v2 es trabajo del bloque de WordPress, no una plantilla del Composer.
 - **Reversible:** cada pieza vuelve a PROPUESTA con una decisión del operador; el callout v1 sigue en los posts anteriores
   a la #17.
+
+## Delta 2026-09-27 — tokens, contrato y archivos publicados en AXIS (TASK-1922)
+
+> **Alcance:** sólo Glitch, nunca Efeonce. Cierra las filas a, e y f del [trabajo a crear](#trabajo-a-crear-tasks-creadas-el-2026-09-27-task-1922-task-1923-task-1924-d-vive-en-el-bloque-de-task-1337);
+> detalle en la [norma §3, §12 y §13.1](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#3-elementos-y-valores)
+> y en el [runbook de consumo de AXIS](../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md), Delta 2026-09-27 (d).
+> Supersede los «hasta que existan los tokens `glitchLine`» y «pendiente (TASK-1922)» de los Deltas anteriores.
+
+- **Publicación autorizada por el operador** (Julio Reyes, 2026-09-27): push a `main` de `efeoncepro/axis-design-system`
+  (`47acc3d..29a40b5`) y tag **`v0.3.12`** sobre `29a40b5`. CI run `36352781574` `success`; `release-packages` run
+  `36352864790` `success`.
+- **Versiones publicadas:** `@efeoncepro/axis-tokens` `0.3.12`, `@efeoncepro/axis-ui-contracts` `0.3.10`,
+  `@efeoncepro/axis-brand-assets` `0.3.5` y `@efeoncepro/axis-graphic-line` `0.7.0` (`axis-ui-registry` sigue en `0.3.1`).
+- **Qué se publicó:**
+  - **Token `glitchLine`** (export de primer nivel, nunca rama de `efeonceGraphicLine`; estado `candidate`): color (el
+    fondo referencia `efeonceGraphicLine.color.dark`; acento `#6ec207`, navy `#022a4e`; `accentOnLight` nunca texto,
+    borde ni separador), tipo (entrada Bricolage 300 wdth 100 0,72 em, remate 800 wdth 78; Poppins; narrador Guttery
+    con licencia web + video, instalada en la máquina que renderiza, nunca en git ni en un paquete de AXIS; `licenseRef`
+    «confirmada por el operador en chat, 2026-09-27; número de contrato pendiente»), cabecera, bytes, manzana
+    (`glitch-apple`, viewBox `539 0 118 154`), firma (Growth, eslogan sólo en la contraportada, sin burbuja URL), íconos,
+    formatos, zonas seguras, motion (aprobado, 30 fps; curvas, sobrepasos, pulso, onda y halo referenciados de
+    `efeonceGraphicLine.motion`; apertura 120 cuadros con golpes 24/48/69, tarjeta final 90 cuadros con golpes 6/57/74,
+    pre-roll 96 cuadros sólo en el vlog, sincronía del mnemónico en el cuadro 48), piezas con su estado (todas aprobadas
+    salvo `historia-9x16` y `carrusel-panoramico`, en exploración) y rotación de portada.
+  - **Contrato `efeonce.glitch-line` 0.1.0 `candidate`** en `axis-ui-contracts`: `validateGlitchLineIntent`,
+    `resolveGlitchLineIntent`, manifiesto `axis.glitch-line-composition.v1` y 23 códigos de issue estables, cada uno con
+    su mensaje es-CL. Falla cerrado: cualquier issue deja el estado en `invalid` y no hay manifiesto. Comando en AXIS:
+    `pnpm glitch:resolve -- --input <intent.json> --out <manifest.json>`; schema, 13 ejemplos (8 válidos, 5 inválidos),
+    guía `docs/agent-composition/glitch.md` y ADR propio de AXIS (`GLITCH_LINE_TOKEN_CONTRACT_DECISION_V1.md`).
+  - **Archivos `AXIS_GLITCH_ASSETS`** en `axis-brand-assets` (`glitch-logo-positive` navy sobre claro,
+    `glitch-logo-negative` blanco sobre oscuro, `glitch-apple`), sellados aparte de `AXIS_BRAND_ASSETS`; idénticos al
+    píxel a los originales de `public/branding/glitch/`.
+  - **Iconografía D27:** guardar, compartir, recomendar, comentar y deslizar entran a `PLASTILINA_GLYPHS` (cada uno
+    pasa `icons:check`); sus volúmenes 3D se generaron con el método D24 y el operador los aprobó antes del sellado.
+    Set: 36 Trazo + 48 Plastilina = 84, con 48 volúmenes.
+  - **Lab:** `/references/glitch.json` sirve ahora `tokens` (export `glitchLine`), `contract` y 3 `assets`;
+    `iconography.json` sirve 84 glifos y 48 volúmenes.
+- **Decisión del operador (2026-09-27) — íconos de acción planos:** «si es para la slide de cierre de glitch, prefiero
+  los iconos plastilina en vectores que en 3d». La fila «SI TE SIRVIÓ» de la contraportada y el pie «Desliza» van
+  **siempre** en vectores Plastilina planos, **nunca** en el volumen 3D (`glitchLine.icons.actions`; el contrato lo
+  rechaza con `icon-volume-not-applicable`). Los volúmenes existen porque son glifos del catálogo, no para Glitch.
+- **Greenhouse consume** (commit `4dfb147f7` de `develop`): fija las cuatro versiones; typecheck verde; test focal
+  `src/config/axis-glitch-line-package.test.ts`; `pnpm composer:visual-gate --catalog=graphic-line` 24 frames a 0 px.
+- **Diferencias resueltas a favor del token:** el Lab decía «tarjeta final del reel 2 s»; el token y el motion aprobado
+  dicen 3 s (90 cuadros). La entrada del titular: la norma y el token dicen 0,72 em; el taller usa 0,66 (0,62/0,56 en
+  el reel); la diferencia la resuelve TASK-1924.
+- **Sigue pendiente:** TASK-1923 (los catálogos del Composer leen `glitchLine`), TASK-1924 (el taller deja de espejar la
+  paleta y la manzana en `src/brand.mjs` y lee `glitchLine`), el número de contrato de la licencia de Guttery y la
+  promoción del contrato desde `candidate` tras la primera edición compuesta con él.
+- **Reversible:** deprecar el token, el contrato y `AXIS_GLITCH_ASSETS` en una versión nueva de AXIS y volver a fijar en
+  Greenhouse las versiones anteriores (`v0.3.11`); nada del runtime de Greenhouse los lee todavía.

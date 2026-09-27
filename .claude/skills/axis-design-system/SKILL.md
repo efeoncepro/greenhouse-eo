@@ -237,8 +237,10 @@ Rules for agents:
   change means changing the token and its test in AXIS, signed through the Greenhouse ADR, not editing a document.
 - Before pinning a consumer, confirm which **published** package version contains the export; do not assume the
   workspace source is released.
-- **Greenhouse consumption (verified 2026-09-27 in `package.json`):** `develop` pins `axis-tokens` `0.3.8`,
-  `axis-ui-contracts` `0.3.7`, `axis-ui-registry` `0.3.1`, `axis-brand-assets` `0.3.4` and `axis-graphic-line` `0.6.0`.
+- **Greenhouse consumption (verified 2026-09-27 in `package.json`):** `develop` pins `axis-tokens` `0.3.12`,
+  `axis-ui-contracts` `0.3.10`, `axis-ui-registry` `0.3.1`, `axis-brand-assets` `0.3.5` and `axis-graphic-line` `0.7.0`
+  (AXIS tag `v0.3.12`, Greenhouse commit `4dfb147f7`, graphic-line visual gate 24 frames at 0 px; earlier the same day
+  TASK-1927 had pinned tokens `0.3.11` + contracts `0.3.9`).
   It does not use `efeonce.email-signature` yet. `axis-graphic-line` paints the orbit only in the Artifact Composer
   brand surfaces (`src/lib/brand-surfaces`, `src/lib/artifact-composer/catalogs/graphic-line-*`); the layout-compiler
   adapter `scripts/creative/layout-compiler/graphic-line.mjs` still resolves the contract from `axis-ui-contracts` and
@@ -373,13 +375,50 @@ Plastilina = 79**, with **43 volume PNGs**. Published with tag `v0.6.0`: `axis-g
 did not change for D26; its latest is `0.3.10`, see Surface composition). Greenhouse pins `axis-graphic-line` `0.6.0` and `axis-brand-assets` `0.3.4`. Guide §«Catálogo
 aprobado», ADR delta «IA, social y staff: 19 glifos nuevos (D26)», Lab `/references/iconography/` (79 glyphs, 43 volumes).
 
-### Glitch sub-line (Lab page + JSON; published 2026-09-27)
+**Glitch action glyphs (D27, 2026-09-27; AXIS tag `v0.3.12`, commit `29a40b5`):** 5 new Plastilina glyphs in
+`PLASTILINA_GLYPHS` — `guardar`, `compartir`, `recomendar`, `comentar` and the gesture `deslizar`. Their volumes were
+generated with the D24 method and approved by the operator before sealing (the `icons:check` warnings on `comentar` and
+`deslizar` were reviewed, not ignored). The set is now **36 Trazo + 48 Plastilina = 84**, with **48 volume PNGs**.
+Published in `axis-graphic-line` `0.7.0` and `axis-brand-assets` `0.3.5`; Greenhouse pins both. They are ordinary catalog
+glyphs, but **in Glitch pieces they are always flat**: `glitchLine.icons.actions` (`row` = back cover «SI TE SIRVIÓ»
+with guardar/compartir/recomendar/comentar; `swipe` = `deslizar` on covers and interior slides; `rendering: 'flat'`,
+`volume: 'never'`). Operator, verbatim: «si es para la slide de cierre de glitch, prefiero los iconos plastilina en
+vectores que en 3d en esa lámina». The Glitch contract rejects volume with `icon-volume-not-applicable`.
 
-Glitch (Efeonce's weekly magazine) has a sub-line of «La órbita» that applies **only to Glitch**. AXIS holds its Lab
-page `/references/glitch/`, agent JSON `/references/glitch.json` and guide `docs/agent-composition/glitch.md` published on
-`main` (`d5846e8`). Tokens, assets and contract: TASK-1922. There are **no Glitch tokens, assets or contract** (`glitchLine`,
-`efeonce.glitch-line` are pending): values live in the Greenhouse norm
-`docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md`. Criterion: `efeonce-graphic-line` →
+### Glitch sub-line (tokens, contract, assets; published 2026-09-27, tag `v0.3.12`)
+
+Glitch (Efeonce's weekly magazine) has a sub-line of «La órbita» that applies **only to Glitch**. TASK-1922 published it
+in AXIS tag **`v0.3.12`** (commit `29a40b5`, push authorized by the operator; CI and release-packages green):
+
+- **Token `glitchLine`** (`@efeoncepro/axis-tokens` `0.3.12`, top-level export, type `GlitchLine`, `status: candidate`):
+  `color` (`ground` is `efeonceGraphicLine.color.dark` by reference; `accent`, `navy`, `onLight`, `accentOnLight`,
+  `explorationAccents`…), `type` (headline entry 300 / wdth 100 / 0.72 em, close 800 / wdth 78, `headlineContrast`
+  entry ≤ 400 / close ≥ 700, `narrator` Guttery licensed web + video, rotation −5..−3, installed on the render machine),
+  `masthead`, `bytes`, `apple` (`glitch-apple`, viewBox `[539,0,118,154]`, `perPiece: 1`, halo =
+  `efeonceGraphicLine.orbit.halo`), `assets`, `dots`, `signature` (Efeonce logo; slogan Growth only on the back cover;
+  `urlBubble: false`), `icons` (actions flat, never volume), `formats` (`linkedin-4x5`, `landscape-16x9`, `square-1x1`,
+  `blog-inline-16x9`, `reel-9x16`), `safeZones`, `motion` (`approved`, 30 fps, curves by reference to
+  `efeonceGraphicLine.motion`; pieces apertura 120 frames / tarjetaFinal 90 frames / preroll 96 frames landscape only;
+  `mnemonicSync` apertura f48 sound B; kit; transitions; `reducedMotion: 'final-frame'`), `pieces`, `coverRotation`
+  (A/B/C, never the same as the previous week) and `pendingDecisions`. Nothing in `efeonceGraphicLine` or the La órbita
+  contracts references it (tested).
+- **Contract `efeonce.glitch-line` `0.1.0` (candidate)** in `@efeoncepro/axis-ui-contracts` `0.3.10`:
+  `AXIS_GLITCH_LINE_CONTRACT`, `AXIS_GLITCH_LINE_ACCEPTED_VERSIONS`, `AXIS_GLITCH_LINE_ISSUE_CODES` (23, es-CL messages in
+  `AXIS_GLITCH_LINE_ISSUE_MESSAGES`), `validateGlitchLineIntent(intent, { narratorLicenseStatus? })` and
+  `resolveGlitchLineIntent` → manifest `axis.glitch-line-composition.v1`. Fails closed: any issue → `status: 'invalid'`,
+  no body. CLI in AXIS: `pnpm glitch:resolve -- --input <intent.json> --out <manifest.json>`; schema
+  `docs/agent-composition/glitch-line-intent.schema.json`; examples `docs/examples/glitch/` (8 valid with committed
+  manifests, 5 invalid + `invalid-expected-issues.json`); AXIS ADR `docs/architecture/GLITCH_LINE_TOKEN_CONTRACT_DECISION_V1.md`.
+- **Assets** in `@efeoncepro/axis-brand-assets` `0.3.5`: `AXIS_GLITCH_ASSETS`, `findGlitchAsset`, `glitchAssetUrl(id)`
+  (`glitch-logo-positive`, `glitch-logo-negative`, `glitch-apple`, sealed in `GLITCH_ASSET_SEALS`), deliberately outside
+  `AXIS_BRAND_ASSETS` / `AXIS_BRAND_ASSET_BRANDS`. Fonts (Guttery included) never ship in AXIS.
+- **Lab** `/references/glitch/` and `/references/glitch.json` now read the token (the JSON adds `tokens`, `contract`,
+  `assets`; schema still `axis.glitch-line.v1`); `apps/lab/src/data/glitch.ts` holds no HEX nor Glitch measures.
+
+Greenhouse `develop` pins these versions since commit `4dfb147f7`. Consumers read `glitchLine` or resolve an intent;
+**never copy Glitch values** into templates, overlays or scripts. Still pending outside AXIS: the Composer catalogs
+(TASK-1923) and the workshop motion reading the token and assets instead of its mirror (TASK-1924). Human canon:
+`docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md`; criterion: `efeonce-graphic-line` →
 `references/glitch.md`. Never use the apple, Glitch green, byte glitch, Guttery or the «EDICIÓN #N» masthead in Efeonce pieces.
 
 ### Efeonce sonic identity (Lab page + public bucket; recommended)

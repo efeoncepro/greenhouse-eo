@@ -10,17 +10,24 @@
 > al taller (`2c8f36c`, `ed89a0b`) y en producción en AXIS (`87c3298`, `#musica`): ver §13.7 · **el reel abre directo
 > con la apertura, sin pre-roll** (decisión del operador del 2026-09-27; taller `1f323ca`, sin empujar): el pre-roll
 > queda sólo en el vlog · **blog completo y lámina con lente APROBADOS** (operador, 2026-09-27: «Vamos en todas con tu
-> recomendación»; norma v1.10): ya no quedan piezas estáticas en PROPUESTA.
+> recomendación»; norma v1.10): ya no quedan piezas estáticas en PROPUESTA · **tokens, contrato y assets de Glitch
+> publicados en AXIS `v0.3.12`** (TASK-1922, 2026-09-27; Greenhouse los fija desde `4dfb147f7`).
 >
 > **Canon humano:** norma [`GLITCH_GRAPHIC_LINE_V1.md`](../../../../docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
 > + ADR [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](../../../../docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
 > (ambos redactados el 2026-09-27). Si esta referencia y la norma no coinciden, manda la norma y se corrige aquí.
 >
-> **AXIS (publicado 2026-09-27):** página `https://axis.efeonce.org/references/glitch/`, gemelo para agentes
-> `https://axis.efeonce.org/references/glitch.json` y guía `docs/agent-composition/glitch.md` del repo
-> `efeoncepro/axis-design-system` (`main`, `d5846e8`). **No existen tokens ni contrato de Glitch
-> en AXIS**: los valores de abajo salen de la norma. Nunca inventes un token `glitchLine`, un contrato
-> `efeonce.glitch-line` ni un asset de `axis-brand-assets` para Glitch: están pendientes (§9).
+> **AXIS (publicado 2026-09-27, tag `v0.3.12`, commit `29a40b5`; TASK-1922):** página
+> `https://axis.efeonce.org/references/glitch/`, gemelo para agentes `https://axis.efeonce.org/references/glitch.json`
+> (ahora con `tokens`, `contract` y `assets`; schema `axis.glitch-line.v1`) y guía `docs/agent-composition/glitch.md`
+> del repo `efeoncepro/axis-design-system`. **La fuente de verdad de los valores es el token `glitchLine`**
+> (`@efeoncepro/axis-tokens` 0.3.12, export de primer nivel, tipo `GlitchLine`, `status: candidate`), el **contrato
+> `efeonce.glitch-line` 0.1.0** (`@efeoncepro/axis-ui-contracts` 0.3.10) y los **assets `AXIS_GLITCH_ASSETS`**
+> (`@efeoncepro/axis-brand-assets` 0.3.5). Greenhouse `develop` fija exactamente esas versiones desde `4dfb147f7`.
+> Los números de esta referencia son **referencia humana**: si difieren del token, manda el token. **Nunca copies
+> valores a mano** en una plantilla, overlay o script: léelos de `glitchLine` o resuelve la pieza con
+> `pnpm glitch:resolve -- --input <intent.json> --out <manifest.json>` (repo AXIS; intent → manifiesto
+> `axis.glitch-line-composition.v1`; §9).
 
 ## 0. Alcance — decide esto primero
 
@@ -53,13 +60,19 @@ pieza de la marca.
 - Línea de servicio: **Growth** (decisión del operador, 2026-09-27) → eslogan de la contraportada «Empower your Growth».
 - Motivo: **«El micrófono se abre…»** (narrador de radio); cierra con **«El micrófono se cierra.»**.
 - Fuentes de marca: guía de tono v3 en OneDrive `Alineación/5. Contenidos/09. Glitch/Marca/Glitch-Guia-Tono-Voz-Personalidad-v3.docx`;
-  [PDR-020 §6](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md); wordmark en
-  `public/branding/glitch/glitch-{light,dark}.svg`; bloque Gutenberg
+  [PDR-020 §6](../../../../docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md); wordmark
+  canónico en AXIS (`AXIS_GLITCH_ASSETS`: `glitch-logo-positive` sobre claro, `glitch-logo-negative` sobre oscuro;
+  `glitchLine.assets`), con copia de UI en `public/branding/glitch/glitch-{light,dark}.svg`; bloque Gutenberg
   [TASK-1337](../../../../docs/ui/wireframes/TASK-1337-glitch-gutenberg-block.md).
 - Blog real `efeoncepro.com/glitch/…`: cita de fecha + «El micrófono se abre.», tabla de contenidos, 8 × (H2 numerado,
   imagen de la fuente con «Fuente:», párrafos, callout Glitch), «el hilo» al cierre y «— El equipo editorial de Glitch».
 
-## 2. Elementos y valores (desde la norma; AXIS pendiente)
+## 2. Elementos y valores (referencia humana; fuente de verdad: token `glitchLine`)
+
+> Los valores de esta tabla son los de la norma y **coinciden con `glitchLine`** al 2026-09-27 (color, `type`,
+> `masthead`, `bytes`, `apple`, `dots`, `signature`, `icons`, `formats`, `safeZones`). Para producir, **lee el token**
+> o resuelve la pieza con el contrato; nunca transcribas estos números. Nada de `efeonceGraphicLine` ni de los contratos
+> de La órbita referencia `glitchLine` (probado): es sólo de Glitch.
 
 | Elemento | Valor / regla |
 |---|---|
@@ -68,15 +81,15 @@ pieza de la marca.
 | Navy Glitch | `#022a4e`: texto y tinta sobre claro en el blog |
 | Texto sobre oscuro | `#ffffff` / `#e6edf3`; secundario `#9fb3c8`; líneas `#1d3a57` |
 | Verde sobre blanco | ~2,25:1 → **nunca** texto, borde ni separador sobre claro; en claro, los momentos de marca van en bloques navy |
-| La manzana | la esfera de Glitch (path oficial del wordmark; caja AB `{x:539,y:0,w:118,h:154}`). Cierra el titular o el POV como punto final. **Una por pieza o pantalla.** **APROBADA** como esfera de Glitch (2026-09-27); el token de franquicia en AXIS está pendiente (TASK-1922) |
+| La manzana | la esfera de Glitch (path oficial del wordmark; caja AB `{x:539,y:0,w:118,h:154}`). Cierra el titular o el POV como punto final. **Una por pieza o pantalla.** **APROBADA** como esfera de Glitch (2026-09-27). En AXIS: `glitchLine.apple` (`assetId: 'glitch-apple'`, viewBox `[539,0,118,154]`, `perPiece: 1`, halo = `efeonceGraphicLine.orbit.halo` por referencia) y el SVG `glitch-apple` de `AXIS_GLITCH_ASSETS` |
 | Falla en bytes | la foto de la noticia en navy apagado (duotono `#001a33`→`#cfe4fa`) se desarma en celdas por su borde (abajo o lateral), **nunca sobre un rostro**. La manzana también se arma o desarma en bytes (8 bits por celda) |
 | Los tres puntos | «El micrófono se abre…»: dos puntos + el tercero se desarma en bytes. En los cierres, el tercero se resuelve en la manzana. Son las tres ventanas de la nave y el territorio sonoro «Puntos suspensivos» |
-| Bricolage Grotesque | contraste de pesos: entrada 300 (wdth 100, 0,72 em) + remate 800 condensado (`font-stretch: 78%; font-variation-settings: 'wdth' 78`); tracking +0,01 em en titulares |
+| Bricolage Grotesque | contraste de pesos: entrada 300 (wdth 100, 0,72 em) + remate 800 condensado (`font-stretch: 78%; font-variation-settings: 'wdth' 78`); tracking +0,01 em en titulares. Token: `glitchLine.type.headlineEntry` / `headlineClose` / `headlineTracking`; el contrato exige el contraste (`headlineContrast`: entrada ≤ 400, remate ≥ 700 → si no, `headline-weight-contrast-missing`) |
 | Poppins | etiquetas (600, versalitas espaciadas), cuerpo y subtítulos |
-| Guttery | muletillas del narrador («spoiler:», «sin anestesia.», «nos vemos el lunes.», «el #N+1 sale el lunes.»), en el acento, rotada −3/−5°. **Licencia para web y video confirmada por el operador (2026-09-27)**; úsala sólo para las muletillas |
+| Guttery | muletillas del narrador («spoiler:», «sin anestesia.», «nos vemos el lunes.», «el #N+1 sale el lunes.»), en el acento, rotada −3/−5°. **Licencia para web y video confirmada por el operador (2026-09-27)**; úsala sólo para las muletillas. Token: `glitchLine.type.narrator` (licencia web + video, rotación −5..−3, instalada en la máquina de render). **AXIS nunca distribuye la fuente** |
 | Cabecera | wordmark (290 px en 1080) a la izquierda + «EDICIÓN» (Poppins 600, 16 px, tracking 0,24 em) sobre «#N» (Bricolage 92 px: «#» 300 blanco, número 800 condensado en el acento), alineados a la derecha, en una fila centrada verticalmente. **Sin línea fina debajo** |
 | Secciones | «MARKETING + IA», «CREATIVIDAD + IA», «TECNOLOGÍA + IA»: la IA es el cruce, no una sección aparte |
-| Íconos | AXIS Trazo y **Plastilina** (elección del operador para Glitch). Cinco glifos Plastilina nuevos (guardar, compartir, recomendar, comentar, deslizar) en `ai-generations/2026-09-26_glitch-iconos/elegidos/*.json`: pasan `icons:check` (área 537–560 u²), **alta en `PLASTILINA_GLYPHS` aprobada (2026-09-27)**; la ejecuta TASK-1922 y hasta publicarse en AXIS no son catálogo |
+| Íconos | AXIS Trazo y **Plastilina** (elección del operador para Glitch). Los cinco glifos Plastilina de Glitch (guardar, compartir, recomendar, comentar y el gesto deslizar) **ya son catálogo**: `PLASTILINA_GLYPHS` de AXIS (decisión D27, 2026-09-27; set 36 Trazo + 48 Plastilina = 84). **En piezas de Glitch van siempre planos** (`glitchLine.icons.actions.rendering: 'flat'`, `volume: 'never'`): fila de la contraportada «SI TE SIRVIÓ» (guardar, compartir, recomendar, comentar) y «deslizar» en portadas y láminas interiores. Operador: «si es para la slide de cierre de glitch, prefiero los iconos plastilina en vectores que en 3d en esa lámina». Pedir volumen en Glitch = `icon-volume-not-applicable` |
 | Firma | logo de Efeonce centrado abajo (negativo sobre oscuro). Eslogan «Empower your Growth» (Glitch es línea Growth) sólo en la contraportada, más chico que el logo, «Growth» en blanco o en el acento |
 
 ## 3. Sistema de portada — APROBADO (2026-09-27)
@@ -108,7 +121,7 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
   resto en navy). **Sólo** cuando el POV trata de un detalle nítido de la foto; nunca por defecto. **La esfera ya está en
   la lente → esa lámina no cierra con la manzana** (una sola esfera por pieza).
 - **Contraportada — APROBADA:** «El micrófono se cierra» con contraste de pesos; los puntos se resuelven en la manzana;
-  textura de manzana en bytes; fila Plastilina «SI TE SIRVIÓ» (guardar, compartir, recomendar, comentar); CTA en píldora
+  textura de manzana en bytes; fila Plastilina **plana** «SI TE SIRVIÓ» (guardar, compartir, recomendar, comentar; nunca en volumen); CTA en píldora
   blanca «Suscríbete a [wordmark]»; la misma cabecera; firma Efeonce 300 px + eslogan.
 - Historia 9:16 y carrusel panorámico: exploración anterior, **no canon**.
 
@@ -186,6 +199,9 @@ aprobada (el vlog embebido ya lo estaba con el motion).
   al logo si el logo ya está en la imagen).
 - Descargar y resubir clips o imágenes de terceros: se embeben o se licencian.
 - Presentar como reales los titulares y noticias de las maquetas: son de ejemplo.
+- Íconos Plastilina en volumen (3D) en una pieza de Glitch: van planos (`glitchLine.icons.actions.rendering: 'flat'`).
+- Copiar a mano un valor de Glitch (HEX, medida, tiempo) a una plantilla, overlay o script: se lee de `glitchLine` o se
+  resuelve con `pnpm glitch:resolve`. Tampoco inventes claves que el token no tenga.
 
 ## 8. Estado por pieza
 
@@ -197,10 +213,10 @@ aprobada (el vlog embebido ya lo estaba con el motion).
 | Variante con lente | **APROBADO** (2026-09-27) como variante ocasional (sólo POV sobre un detalle nítido de la foto; sin manzana en esa lámina) |
 | Blog: banners 16:9 A/B/C, 1:1 con plantilla propia, maqueta del post completa, callout «DROP» v2 | **APROBADO** (2026-09-27). Callout v2 **desde la #17**: el bloque de TASK-1337 se actualiza antes de publicarla; los posts anteriores siguen con el v1 |
 | Vlog 16:9, kit de overlays del reel, tarjetas finales (y los tableros de video del canvas) | **APROBADO** (2026-09-27, con el motion) |
-| La manzana como esfera y el verde como acento | **APROBADO** (2026-09-27); token de franquicia en AXIS pendiente (TASK-1922) |
+| La manzana como esfera y el verde como acento | **APROBADO** (2026-09-27); publicados en AXIS en `glitchLine.apple` y `glitchLine.color.accent` (v0.3.12) |
 | Línea de servicio Growth («Empower your Growth») | **APROBADO** (2026-09-27) |
 | Historia 9:16, carrusel panorámico; teal y naranja como acento | EXPLORACIÓN (no canon) |
-| Cinco glifos Plastilina nuevos | pasan `icons:check`; alta **APROBADA** (2026-09-27), publicación en AXIS pendiente (TASK-1922) |
+| Cinco glifos Plastilina nuevos | **publicados** en `PLASTILINA_GLYPHS` (D27, AXIS v0.3.12); volúmenes aprobados por el operador antes de sellar, pero en Glitch siempre planos |
 | Guttery en video y web | licencia **confirmada por el operador** (2026-09-27) |
 | Mnemónico del video | **APROBADO** como parte del diseño sonoro de Glitch, versión B (2026-09-27, §13) |
 | Lower third del reel y del vlog | **APROBADO** (2026-09-27, §12) |
@@ -223,11 +239,27 @@ taller converge con Globe cuando se reactive. Seguimiento: cada edición se regi
 Objetivo: que ningún agente reinterprete. **Los agentes llenan datos; nunca eligen coordenadas ni plantilla a mano.**
 
 1. **Canon humano en Greenhouse:** norma + ADR (arriba).
-2. **Valores y contratos en AXIS:** página, JSON y guía (publicados 2026-09-27). Pendiente: tokens
-   `glitchLine` en `@efeoncepro/axis-tokens` (color, tipo, cabecera, bytes, manzana, zonas seguras por formato, motion),
-   assets en `@efeoncepro/axis-brand-assets` (wordmark claro/oscuro, manzana SVG, glifos Plastilina, Guttery si la
-   licencia lo permite) y contrato `efeonce.glitch-line` 0.1.0 con reglas verificables (una esfera por pieza, verde
-   nunca texto sobre claro, nada sobre la cara, rotación de plantillas, contraste).
+2. **Valores y contratos en AXIS — PUBLICADOS** (TASK-1922, tag `v0.3.12`, 2026-09-27):
+   - **Token `glitchLine`** (`@efeoncepro/axis-tokens` 0.3.12): `color` (el `ground` es `efeonceGraphicLine.color.dark`
+     por referencia), `type`, `masthead`, `bytes`, `apple`, `assets`, `dots`, `signature`, `icons`, `formats`
+     (`linkedin-4x5`, `landscape-16x9`, `square-1x1`, `blog-inline-16x9`, `reel-9x16`), `safeZones`, `motion`
+     (aprobado: piezas, golpes, `mnemonicSync` f48, kit, transiciones), `pieces` (id → estado/superficie/formato/
+     plantilla/esfera/titular), `coverRotation` y `pendingDecisions`.
+   - **Contrato `efeonce.glitch-line` 0.1.0** (`@efeoncepro/axis-ui-contracts` 0.3.10): `validateGlitchLineIntent` y
+     `resolveGlitchLineIntent` → manifiesto `axis.glitch-line-composition.v1` (lienzo, paleta por superficie, tipo,
+     titular, cabecera, wordmark, esfera, bytes, zonas seguras, caras, overlays, motion sólo para reel/vlog, portada,
+     `actionIcons` planos, firma, `adapterChecks`). **Falla cerrado:** cualquier issue → `status: 'invalid'` sin cuerpo.
+     23 códigos (mensajes es-CL), entre ellos `piece-not-approved`, `sphere-count-exceeded`, `accent-text-on-light`,
+     `overlay-over-host-face`, `overlay-over-app-ui`, `bytes-over-face`, `previous-cover-template-required`,
+     `cover-template-repeated`, `headline-weight-contrast-missing`, `narrator-font-unlicensed`,
+     `slogan-not-applicable`, `icon-volume-not-applicable`, `url-bubble-not-applicable`.
+   - **CLI** (repo AXIS): `pnpm glitch:resolve -- --input <intent.json> --out <manifest.json>`; schema
+     `docs/agent-composition/glitch-line-intent.schema.json`; ejemplos `docs/examples/glitch/` (8 válidos con su
+     manifiesto + 5 inválidos + `invalid-expected-issues.json`); ADR AXIS
+     `docs/architecture/GLITCH_LINE_TOKEN_CONTRACT_DECISION_V1.md`.
+   - **Assets** (`@efeoncepro/axis-brand-assets` 0.3.5): `AXIS_GLITCH_ASSETS`, `findGlitchAsset`, `glitchAssetUrl(id)`
+     con `glitch-logo-positive`, `glitch-logo-negative` y `glitch-apple` (sellados en `GLITCH_ASSET_SEALS`), **fuera** de
+     la familia `AXIS_BRAND_ASSETS`. Las fuentes (Guttery incluida) **nunca** viven en AXIS.
 3. **Composición con el Artifact Composer** (`src/lib/artifact-composer/**`, catálogos = dato, render en el Cloud Run
    Job `artifact-worker`): catálogo `glitch-edition` con portada A/B/C, interior, interior-noticia-1, interior-lente,
    contraportada, historia 9:16, banner blog A/B/C 16:9 (+1:1), banner interno 1600×900, portada de reel y miniatura.
@@ -256,10 +288,12 @@ la propuesta son catálogos delgados sobre un mismo `templatesDir` (`glitch-caro
 `glitch-overlays` PNG) + extensión `glitch` del brand pack `axis` (Guttery) + selector de rotación + validadores. No va por
 `brand-surfaces`. Detalle en el ADR, §«Encaje verificado en el Artifact Composer».
 
-**Hoy 2 y 3 no están disponibles** (sin catálogo `glitch-edition`, sin tokens, sin contrato): no los cites como
-existentes. **4 existe y está aprobado** (2026-09-27) en `tools/glitch-motion/` del taller, con la paleta y la manzana de
-Glitch como propuesta espejada de AXIS Lab hasta TASK-1922: cómo operarlo en §12. El trabajo ya tiene tasks: (a) tokens, assets y contrato de Glitch en AXIS
-→ TASK-1922 (incluye (e) el alta de los cinco glifos Plastilina, aprobada, y (f) la licencia de Guttery); (b) catálogos
+**Estado:** **2 está publicado** (TASK-1922, AXIS `v0.3.12`). **3 todavía no existe** (sin catálogo `glitch-edition`):
+no lo cites como existente. **4 existe y está aprobado** (2026-09-27) en `tools/glitch-motion/` del taller; todavía
+lleva la paleta y la manzana espejadas en `src/brand.mjs` y el wordmark desde `public/branding/glitch` de Greenhouse:
+pasarlos a `glitchLine` y `AXIS_GLITCH_ASSETS` es trabajo de TASK-1924 (cómo operarlo hoy en §12). Tasks: (a) tokens,
+assets y contrato de Glitch en AXIS → TASK-1922 (**publicado en AXIS `v0.3.12`**: incluye el alta de los cinco glifos Plastilina,
+D27, y la licencia de Guttery declarada en `glitchLine.type.narrator`); (b) catálogos
 de Glitch en el Composer → TASK-1923; (c) overlays HyperFrames + render con alfa → TASK-1924; (d) callout v2 en el
 bloque de WordPress (aprobado el 2026-09-27, desde la #17) → bloque de TASK-1337, antes de publicar la #17.
 
@@ -284,13 +318,17 @@ el hogar del movimiento ya está decidido (repo taller).
 - [ ] Blog: la 1:1 sale de su plantilla propia (nunca la portada 4:5 recortada); cada banner interno lleva el crédito
       de la foto; el callout «DROP» v2 sólo desde la #17 y con el bloque ya actualizado.
 - [ ] Lámina con lente sólo si el POV trata de un detalle nítido de la foto; esa lámina no cierra con la manzana.
+- [ ] Íconos de acción («SI TE SIRVIÓ», «deslizar») planos, nunca en volumen.
+- [ ] Si la pieza sale de un intent, `validateGlitchLineIntent` (o `pnpm glitch:resolve`) no devuelve issues; un
+      manifiesto `status: 'invalid'` no se renderiza ni se corrige a mano: se corrige el intent.
 
 ## 11. Dónde se ve
 
 - Canvas de diseño: https://claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS («Glitch en La órbita»): análisis, aplicaciones,
   punch #11, para evaluar, sistema de portada (APROBADO), blog y vlog, vlog en reel.
 - AXIS Lab (publicado 2026-09-27): `/references/glitch/` y `/references/glitch.json` de
-  `efeoncepro/axis-design-system`. Composición: TASK-1922 (AXIS), TASK-1923 (Composer), TASK-1924 (movimiento).
+  `efeoncepro/axis-design-system`; ambos leen el token `glitchLine` (`apps/lab/src/data/glitch.ts` no guarda HEX ni
+  medidas de Glitch). Composición: TASK-1922 (AXIS, publicado), TASK-1923 (Composer), TASK-1924 (movimiento).
 - Movimiento: repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/` (**aprobado** el 2026-09-27;
   lo sigue TASK-1924) y sus corridas en `corridas/` del taller. Entregas en OneDrive
   `Alineación/5. Contenidos/09. Glitch/Motion/piloto/` (la carpeta conserva su nombre; cada `.mov` con su WAV al lado).
@@ -322,7 +360,12 @@ el hogar del movimiento ya está decidido (repo taller).
   Se opera **desde `greenhouse-eo`** con `pnpm -C ../efeonce-brand-workshop --filter glitch-motion …`.
 - HyperFrames 0.6.69 (HTML + GSAP → video), GSAP 3.14.2 con CustomEase copiados al build (render sin red),
   `@efeoncepro/axis-tokens` 0.3.8 (curvas, sobrepasos, onda, pulso, letras), `@efeoncepro/axis-brand-assets` 0.3.4
-  (logo de Efeonce). Paleta y manzana de Glitch: propuesta espejada de AXIS Lab hasta TASK-1922.
+  (logo de Efeonce). Paleta y manzana de Glitch: **todavía espejadas** en `src/brand.mjs` (y el wordmark desde
+  `public/branding/glitch` de Greenhouse). Ya existen en AXIS (`glitchLine` en tokens 0.3.12, `AXIS_GLITCH_ASSETS` en
+  brand-assets 0.3.5): el taller debe leerlos y retirar el espejo (TASK-1924). `glitchLine.motion` ya guarda los tiempos
+  aprobados (piezas, golpes, `mnemonicSync` f48, kit, transiciones): `TIMING`/`KIT_TIMING` del taller deben coincidir
+  con él o leerse de él. Diferencia conocida por conciliar: la entrada del titular es 0,72 em en el token y 0,66 em
+  (0,62/0,56 en el reel) en el taller. Hasta que TASK-1924 lo cierre, **no cambies valores del taller a mano**.
 - Fuentes: Bricolage (font pack del Artifact Composer), Poppins 500/600/700, Guttery (licenciada, **instalada en la
   máquina, nunca en git**). Instalar dependencias: `NODE_AUTH_TOKEN=$(gh auth token) pnpm -C ../efeonce-brand-workshop install`.
 - Salida: **ProRes 4444 con alfa** (`.mov`, `yuva444p12le`), **30 fps**, sin audio; al lado de cada `.mov` va su WAV
@@ -496,8 +539,8 @@ Esquema de `tools/glitch-motion/ejemplos/edicion-17.ejemplo.json`:
 - **Qué falta para el día a día** (no lo presentes como hecho): hoy cada edición la corre alguien con el taller, `gh`,
   ffmpeg, HyperFrames y Guttery instalados **en su máquina** (el kit completo ≈ 4 min). No hay autoservicio: el
   formulario en Marketing Studio (recomendado) y el dominio de ediciones (TASK-1442) están pendientes (pipeline
-  editorial: EPIC-031). Plataforma: tokens en AXIS (TASK-1922), assets en `axis-brand-assets`, catálogo
-  `glitch-edition` (TASK-1923) y archivo de binarios en GCS (hoy sólo OneDrive + sha256 en los manifiestos).
+  editorial: EPIC-031). Plataforma: tokens, contrato y assets en AXIS ya publicados (TASK-1922, v0.3.12; falta que el
+  taller los lea, TASK-1924), catálogo `glitch-edition` (TASK-1923) y archivo de binarios en GCS (hoy sólo OneDrive + sha256 en los manifiestos).
 - **Si cambias tiempos del motion** (en `pieces.mjs`, `overlays.mjs` o `transitions.mjs` del taller), vuelve a correr
   el mismo comando del motion: el sonido lee los tiempos del código y sale de nuevo junto a cada `.mov` (§13.5). La
   música **no** se mueve con el motion: está amarrada a la grilla de 150 BPM y sus másteres son fijos (§13.7); cambiar

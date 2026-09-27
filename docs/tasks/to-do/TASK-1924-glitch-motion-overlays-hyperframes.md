@@ -1,5 +1,35 @@
 # TASK-1924 — Glitch en movimiento con HyperFrames
 
+## Delta 2026-09-27 — TASK-1922 publicada en AXIS `v0.3.12`: el taller debe leer el token
+
+- **Bloqueo por TASK-1922 levantado.** AXIS tag `v0.3.12` (commit `29a40b5`): `@efeoncepro/axis-tokens` `0.3.12` (token
+  `glitchLine`), `@efeoncepro/axis-ui-contracts` `0.3.10` (contrato `efeonce.glitch-line` `0.1.0`),
+  `@efeoncepro/axis-brand-assets` `0.3.5` (`AXIS_GLITCH_ASSETS`) y `@efeoncepro/axis-graphic-line` `0.7.0` (glifos D27).
+  Greenhouse los fija desde `4dfb147f7`. Siguen vigentes los otros bloqueos (TASK-1923 y el CI mínimo del taller de
+  TASK-1925).
+- **Retirar el espejo del taller:** `tools/glitch-motion` debe leer `glitchLine` (paleta, manzana, tipo, zonas) y tomar
+  el wordmark y la manzana de `AXIS_GLITCH_ASSETS` (`glitch-logo-positive`, `glitch-logo-negative`, `glitch-apple`,
+  sellados en `GLITCH_ASSET_SEALS`) en vez de `public/branding/glitch` de Greenhouse; se retiran la paleta y la manzana
+  espejadas en `src/brand.mjs` y se sube el pin del taller (hoy tokens `0.3.8`, brand-assets `0.3.4`). **AXIS no publica
+  fuentes:** el `[verificar]` sobre Bricolage/Poppins/Guttery en `axis-brand-assets` se responde que no; el token declara
+  Guttery instalada en la máquina de render (`glitchLine.type.narrator`).
+- **`glitchLine.motion` ya guarda los tiempos aprobados** (`status: approved`, 30 fps; curvas, sobrepasos, pulso,
+  `impactScale`, onda y halo por referencia a `efeonceGraphicLine.motion`): `pieces.apertura` 120 cuadros con golpes
+  24/48/69, `pieces.tarjetaFinal` 90 cuadros con golpes 6/57/74, `pieces.preroll` 96 cuadros a 150 BPM sólo en
+  `landscape-16x9`; `mnemonicSync` = apertura, cuadro 48, sonido B; `loop`; `kit` (por overlay `durationMs` + cuadros,
+  espejo de `KIT_TIMING`); `transitions` (escena fast 500 / normal 800 ms + orígenes, héroe 1200 ms / 36 cuadros,
+  `byteCellPx` reel 60 / vlog 64); `reducedMotion: 'final-frame'`. `TIMING` y `KIT_TIMING` del taller deben coincidir con
+  el token o leerse de él. Los nombres finales reemplazan a las «claves mínimas esperadas» de §«Contrato de movimiento
+  que se consume» (`mnemonicSyncMs` → `mnemonicSync`, etc.).
+- **Diferencias conocidas por conciliar** (decisión del operador o PR en AXIS; nunca a mano en el taller): la entrada
+  del titular es 0,72 em en el token y 0,66 em (0,62/0,56 en el reel) en el taller. El Lab decía antes que la tarjeta
+  final del reel duraba 2 s; ahora dice 3 s (90 cuadros), el motion aprobado.
+- **Zonas y reglas desde el contrato:** `glitchLine.safeZones` (reel: interfaz 0–220, desde 1500 y desde x 940;
+  cabecera 240–440; texto 1150–1480; posiciones del kit; 16:9 con sus posiciones del kit). `resolveGlitchLineIntent`
+  devuelve `motion` sólo para piezas reel/vlog, con curvas `cubic-bezier` resueltas, y el contrato rechaza
+  `overlay-outside-canvas`, `overlay-over-host-face`, `overlay-over-app-ui` y `bytes-over-face`: la verificación del kit
+  puede apoyarse en él en vez de repetir las reglas.
+
 ## Delta 2026-09-27 — el reel abre directo con la apertura (pre-roll sólo en el vlog)
 
 - **Decisión del operador** (2026-09-27; aceptó la recomendación de Claude): el **vlog 16:9** abre con pre-roll +
@@ -159,7 +189,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 - Status real: `2026-09-27: motion, sonido (B) y música APROBADOS e integrados en el repo taller efeonce-brand-workshop, tools/glitch-motion (main = ed89a0b, empujado): apertura/tarjeta final v2, pre-roll de la intro (los tres puntos al ritmo), kit de overlays reel y vlog, lower third con la órbita real, transiciones de bytes (piezas y escenas); cada render entrega el WAV B junto a cada .mov y la música desde los másteres por URL + sha256 (2d411b8, 2c8f36c); verificado v2 37/37, kit 95/95, 12/12 pruebas. Actualización 2026-09-27: el reel abre directo con la apertura y el pre-roll queda sólo en el vlog (decisión del operador; taller 1f323ca sin empujar: intro del reel de 4,0 s, script deliver, verificado v2 37/37, kit 95/95, 13/13 pruebas). Falta: prueba de los editores con la voz del host (y el ducking), decisiones del operador (fps, bytes, subtítulos, ritmo, rostros), textos reales de la #17, reconciliar con TASK-1922 (glitchLine.motion) y TASK-1923 (manifiesto), entrega.json, PR con CI del taller y archivo en GCS`
 - Rank: `TBD`
 - Domain: `creative|brand`
-- Blocked by: `TASK-1922, TASK-1923, CI mínimo del taller de TASK-1925 antes de integrar código a su main` (la aprobación del operador del kit de overlays y de las tarjetas finales, gate del Slice 2, quedó dada el 2026-09-27)
+- Blocked by: `TASK-1923, CI mínimo del taller de TASK-1925 antes de integrar código a su main` (la aprobación del operador del kit de overlays y de las tarjetas finales, gate del Slice 2, quedó dada el 2026-09-27)
 - Branch: `efeonce-brand-workshop: rama de trabajo + PR a main (el CI del taller sólo corre en pull_request); Greenhouse develop sólo para docs y skills; AXIS main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

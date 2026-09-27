@@ -76,7 +76,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -89,10 +89,10 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-031`
-- Status real: `Slices 0–6 code complete en AXIS main local (7 commits sobre 47acc3d, sin push; gates verdes). Falta la autorización del operador para el Slice 7 (push a main y tag v0.3.12) y después el Slice 8 en Greenhouse`
+- Status real: `Complete: AXIS v0.3.12 publicado (glitchLine, efeonce.glitch-line 0.1.0 candidate, AXIS_GLITCH_ASSETS, 5 glifos D27) y fijado en Greenhouse develop (4dfb147f7)`
 - Rank: `TBD`
 - Domain: `creative|brand|platform`
-- Blocked by: `autorización explícita del operador del push a main de AXIS y del tag para PUBLICAR (Slice 7); la manzana y el verde quedaron aprobados el 2026-09-27; los slices locales en AXIS pueden avanzar sin push`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; AXIS main (commits locales; push a main sólo con CI verde y autorización explícita del operador); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -393,11 +393,11 @@ Greenhouse (`/Users/jreye/Documents/greenhouse-eo`):
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
 - [ ] *(No aplica: la task no crea tablas ni escribe en base de datos.)* Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
 - [ ] *(No aplica: no toca datos sensibles; los errores del validador son issues con código estable.)* Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -663,7 +663,18 @@ verde) y `glitchLine.status`/`lifecycle: 'candidate'`.
 > inválidos → 1. El diff de AXIS no toca el bloque `efeonceGraphicLine` ni los contratos de La órbita. Notas: el
 > archivo del Lab conserva sólo el tamaño de las imágenes de vista previa (metadato de `<img>`, no valores de Glitch);
 > el Lab decía «tarjeta final del reel 2 s» y ahora dice 3 s, el valor del motion aprobado. Guttery va sin binario
-> porque AXIS no redistribuye fuentes. Pendientes: publicación (Slice 7) y consumo en Greenhouse (Slice 8).
+> porque AXIS no redistribuye fuentes.
+>
+> **Slices 7–8 (2026-09-27):** el operador autorizó en chat el push y el tag. AXIS `release(glitch)` `29a40b5`, push
+> `47acc3d..29a40b5`, CI 36352781574 success, tag `v0.3.12`, `release-packages` 36352864790 success; publicados
+> `axis-tokens` 0.3.12, `axis-ui-contracts` 0.3.10, `axis-brand-assets` 0.3.5 y `axis-graphic-line` 0.7.0 (verificado en
+> GitHub Packages). El Lab desplegado sirve `glitch.json` con `contract` `efeonce.glitch-line` 0.1.0, `tokens`
+> `glitchLine` y 3 `assets`, e `iconography.json` con 84 glifos y 48 volúmenes. Greenhouse `4dfb147f7` fija las cuatro
+> versiones: `pnpm typecheck` verde, focales 106/106 (incluye `src/config/axis-glitch-line-package.test.ts`), `pnpm test`
+> completo 15 646 pruebas en verde, `pnpm composer:visual-gate --catalog=graphic-line` 24 frames a 0 px. Norma v1.11,
+> ADR (Delta de publicación), runbook (Delta d), skills `efeonce-graphic-line` y `axis-design-system` (con espejo) y
+> deltas en TASK-1923 y TASK-1924 al día. Pedido del operador durante la task: los íconos de acción de Glitch van en
+> Plastilina plana, nunca en volumen (`glitchLine.icons.actions`, `icon-volume-not-applicable`).
 
 - [x] `@efeoncepro/axis-tokens` exporta `glitchLine` con `color`, `type`, `masthead`, `bytes`, `apple`, `safeZones`,
       `motion`, `pieces` y `coverRotation`.
@@ -693,12 +704,12 @@ verde) y `glitchLine.status`/`lifecycle: 'candidate'`.
 - [x] `apps/lab/src/data/glitch.ts` no contiene ningún HEX ni medida de Glitch; el Lab y `glitch.json` leen el token y
       el JSON expone `tokens` y `contract`.
 - [x] Pruebas unitarias y e2e del Lab (bloque Glitch) en verde.
-- [ ] La publicación ocurrió sólo después de la aprobación explícita del operador de la manzana y el verde, registrada
+- [x] La publicación ocurrió sólo después de la aprobación explícita del operador de la manzana y el verde, registrada
       en el ADR de Glitch con fecha.
-- [ ] CI de AXIS verde en `main` y run de `release-packages.yml` verde con las versiones nuevas publicadas.
-- [ ] Greenhouse fija las versiones nuevas, `pnpm install --frozen-lockfile` y `pnpm typecheck` pasan, y
+- [x] CI de AXIS verde en `main` y run de `release-packages.yml` verde con las versiones nuevas publicadas.
+- [x] Greenhouse fija las versiones nuevas, `pnpm install --frozen-lockfile` y `pnpm typecheck` pasan, y
       `pnpm composer:visual-gate --catalog=graphic-line` queda a cero píxeles.
-- [ ] Norma, ADR de Glitch y referencia `glitch.md` de la skill (con espejo `.codex/`) citan el token; el drift «Lab sin
+- [x] Norma, ADR de Glitch y referencia `glitch.md` de la skill (con espejo `.codex/`) citan el token; el drift «Lab sin
       push» quedó corregido.
 
 ## Verification
@@ -712,17 +723,17 @@ verde) y `glitchLine.status`/`lifecycle: 'candidate'`.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] TASK-1923 y TASK-1924 recibieron un `## Delta` con los nombres finales del token, del contrato, de los códigos de
+- [x] TASK-1923 y TASK-1924 recibieron un `## Delta` con los nombres finales del token, del contrato, de los códigos de
       issue y de los assets
-- [ ] la referencia `glitch.md` de la skill `efeonce-graphic-line` quedó actualizada y espejada
-- [ ] el ADR de Glitch registra con fecha las aprobaciones del operador que habilitaron la publicación
+- [x] la referencia `glitch.md` de la skill `efeonce-graphic-line` quedó actualizada y espejada
+- [x] el ADR de Glitch registra con fecha las aprobaciones del operador que habilitaron la publicación
 
 ## Follow-ups
 
