@@ -1,5 +1,41 @@
 # TASK-1922 — Glitch en AXIS: token de franquicia, archivos oficiales y contrato
 
+## Delta 2026-09-27 (noche) — recalibración antes de ejecutar
+
+Discovery de la sesión que toma la task (AXIS `main` en `47acc3d`). Manda sobre lo que diga el cuerpo de esta spec
+cuando se contradigan; el cuerpo se conserva como la spec original.
+
+- **Estados de pieza:** ya no queda ninguna pieza estática ni de video en propuesta (motion aprobado, y blog y lente
+  aprobados el 2026-09-27, [ADR](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--blog-y-lente-aprobados)).
+  Sólo siguen en **exploración** la historia 9:16, el carrusel panorámico y los acentos teal y naranja. `piece-not-approved`
+  se conserva para esas y para piezas futuras. El Lab todavía dice «propuesta»: lo corrige el commit local `4a7dd4f`
+  de la sesión de Glitch (rama `feat/glitch-line`), y el Slice 6 parte de ahí.
+- **Mnemónico resuelto:** sonido B aprobado; golpes f24/f48/f69 (apertura) y f6/f57/f74 (tarjeta final); **f48 es el
+  cuadro de sincronía**. `glitchLine.motion.mnemonicSync` se publica (la Open Question 4 queda resuelta).
+- **Flujo de composición:** `Accepted` (Open Question 6 resuelta).
+- **Guttery:** licenciada (web y video). AXIS **no redistribuye fuentes** (`packages/brand-assets/src/index.ts:7`,
+  README de brand-assets): el Slice 4 publica el rol `narrator` con `licenseStatus: 'licensed'` y la referencia
+  «confirmada por el operador en chat, 2026-09-27; web y video» (decisión del operador del 2026-09-27; el número de
+  contrato se agrega cuando exista). Sin binario; el sellado para el render sigue en TASK-1923.
+- **Volumen de los 5 glifos:** `apps/lab/src/test/unit/iconography.test.ts:31` exige que el set en volumen sea
+  exactamente el set Plastilina. El operador decidió (2026-09-27) **generar los 5 volúmenes** con el método D24
+  (`pnpm icons:volume`; la generación usa el modelo de imagen fuera de AXIS) y revisarlos antes de sellar. No se
+  debilita la prueba de paridad (Open Question 3 resuelta).
+- **Activos de franquicia:** `AXIS_BRAND_ASSET_BRANDS` es la familia de productos (efeonce, globe, wave, reach) y su
+  prueba exige logo e isotipo por marca. Glitch entra como **activo de franquicia** declarado aparte, para que ningún
+  consumidor de La órbita lo reciba. `glitch-light.svg` (navy, sobre claro) → positivo; `glitch-dark.svg` (blanco,
+  sobre oscuro) → negativo. Los `<style>` pasan a atributos `fill` sin tocar la geometría; la manzana se extrae del
+  light (caja 539,0,118,154).
+- **Contratos:** no existe `recipe-not-approved` en ningún contrato de AXIS; `piece-not-approved` es comportamiento
+  nuevo. Los issues vigentes son `{ code, path }`; `glitch-line` agrega `message` en es-CL (aditivo). El molde es
+  `surface-composition.ts` (el resolver devuelve `status`, no lanza).
+- **Versiones:** `v0.3.11` (Task 1927) toma tokens 0.3.11 y contracts 0.3.9. Las próximas libres: `axis-tokens`
+  **0.3.12**, `axis-ui-contracts` **0.3.10**, `axis-brand-assets` **0.3.5**, `axis-graphic-line` **0.7.0** (se
+  re-verifican en el Slice 7). Ningún tag `v*` hasta que termine el release de Task 1927.
+- **Titular:** la norma dice entrada 0,72 em; el taller usa 0,66 (0,62/0,56 en el reel). El token publica 0,72 y la
+  diferencia queda para TASK-1924.
+- `pnpm design:check` y `tokens.css` no leen los bloques de marca: `glitchLine` no los mueve.
+
 ## Delta 2026-09-27 (tarde) — el motion salió antes que los tokens
 
 - El motion, el sonido (versión B) y la música de Glitch quedaron **aprobados** e implementados en el taller
@@ -40,7 +76,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -53,7 +89,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-031`
-- Status real: `Diseno`
+- Status real: `En ejecución: Slices 0–6 locales en AXIS aprobados por el operador (2026-09-27); Slice 7 (push y tag) exige su autorización`
 - Rank: `TBD`
 - Domain: `creative|brand|platform`
 - Blocked by: `autorización explícita del operador del push a main de AXIS y del tag para PUBLICAR (Slice 7); la manzana y el verde quedaron aprobados el 2026-09-27; los slices locales en AXIS pueden avanzar sin push`

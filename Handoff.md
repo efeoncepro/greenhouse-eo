@@ -2,6 +2,8 @@
 
 **AXIS 0.3.10 (27/09):** bump de Greenhouse pendiente: [runbook Delta c](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
+**Glitch en AXIS (27/09):** [TASK-1922](docs/tasks/in-progress/TASK-1922-glitch-axis-franchise-token-contract.md) en ejecución: Slices 0–6 locales en AXIS `main` (sobre `47acc3d`, sin push). Versiones reservadas tokens 0.3.12 · contracts 0.3.10 · brand-assets 0.3.5 · graphic-line 0.7.0; ningún tag hasta que termine `v0.3.11` (Task 1927). Slice 6 parte del `4a7dd4f` de la sesión de Glitch.
+
 **La órbita (26–27/09):** [índice](docs/operations/brand-graphic-line/README.md). [TASK-1919](docs/tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) y [TASK-1920](docs/tasks/complete/TASK-1920-photo-isotype-compose-official-emblem.md) completas y en `develop`: 20 recetas aprobadas por `pnpm brand:compose` (AXIS `v0.3.8`, contrato 0.1.1). Pendiente: 5 preguntas del operador y la ruta productiva [TASK-1921](docs/tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md).
 
 **Portadas y contraportadas (27/09):** aprobadas por el operador en el canvas Deck. Norma: [composición §4.6](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) (foto ↔ sin foto, mensaje del cierre según documento, voz en portada, logo 500 px); recetas en AXIS Lab › Superficies › Deck (`8bed171`, sin release de paquetes); plates en [registro cine §16](docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md). Integración: TASK-1927/1926.
