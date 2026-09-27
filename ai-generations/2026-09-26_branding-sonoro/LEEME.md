@@ -89,6 +89,8 @@ En el cierre con voz, la esfera cae en la palabra final del eslogan.
 | `motor/glitch-sfx.mjs` | **HISTÓRICO:** la versión viva está en el taller (`tools/glitch-motion/src/sound.mjs` + `tools/brand-sound`, commit `2d411b8`). **Glitch, diseño sonoro (ronda 6, aprobado en B el 2026-09-27):** `--intensity a\|b --outdir <dir>` → apertura, cierre, bucle y animatic amarrados a los cuadros del piloto de motion v2 (`efeonce-brand-workshop/tools/glitch-motion`, `pieces.mjs` TIMING y `overlays.mjs`) |
 | `glitch-sfx/<a\|b>/kit/` · `transiciones/` | Un WAV por overlay del kit (incluida la transición de bytes) y por transición entre escenas (3 orígenes × 2 velocidades + héroe, reel y vlog), leídos de la misma programación de celdas que la imagen |
 | `glitch-sfx/` | WAV de A y B y `web/` con los videos del piloto con sonido (fuera de git; copia en OneDrive `09. Glitch/Motion/piloto/sonido-propuesta/`) |
+| `motor/glitch-music.mjs` | **Glitch, música (ronda 7, PROPUESTA, sólo Glitch):** `--style pulso\|club --piece intro\|cortina [--no-apple]`. Maqueta con la estructura exacta; usa las primitivas del taller (`tools/brand-sound`, `BRAND_SOUND_DIR` lo sobreescribe). Se re-graba con `ai-music.ts --route sa --plan <estilo>-<pieza> --outdir glitch-musica/ai --strength 0.6` y la manzana propia se monta con `sello.mjs` en el instante de `<pieza>.json` |
+| `glitch-musica/` | Ronda 7: `maqueta/`, `ai/` (Stable Audio 0,6, sello y `onsets.json`), `final/` (−14 LUFS) y `web/` (MP3). Fuera de git |
 | `motor/transcribir.ts` | QA: transcripción con marcas de tiempo por palabra (ElevenLabs STT vía fal) |
 | `candidatos/` · `sting/` · `cierre/` · `lineas/` · `voz/` | WAV 48 kHz / 24 bits, MP4 del sting (fuera de git) |
 | `web/` | MP3/MP4 publicados en la sala de escucha |
@@ -104,6 +106,7 @@ En el cierre con voz, la esfera cae en la palabra final del eslogan.
   de ElevenLabs (`voz/conector/`, USD 0,0044): 0,85 de similitud de hablante contra `growth-brian.mp3`; las demás
   etiquetas aprobadas 0,73–0,83; George y otras dos «Brian» 0,62–0,72 (Resemblyzer). Falta la confirmación de oído.
 - Glitch, ronda 6 (2026-09-27): cada golpe cae en su cuadro (espectrograma con marcas de cuadro); el corte de la apertura baja a silencio digital real (−180 dBFS); apertura con el golpe de la manzana en −1 dBFS de pico (≈ −19 LUFS, casi todo transiente) y la misma escala en todas las pistas. Ajustes tras mirar el espectrograma: la campana de la manzana decae 2,2 veces más rápido (tapaba «se abre»), el temblor pasa por un pasa-bajos de 7 kHz (aliasing áspero) y el golpe 3 sube 2–3 dB.
+- Glitch, ronda 7 (2026-09-27): Stable Audio conservó el golpe final de las intros al milisegundo (Pulso 0 ms, Club −2 ms; medido por ataque); en la cortina de Pulso el detector de ataque tomó un corte del tartamudeo (−126 ms) y la energía confirmó el golpe en 0,98 s, igual que la maqueta. Todo a −14 LUFS. Si el operador la aprueba, la sesión de motion la integra al taller (`tools/glitch-motion/src/music.mjs`).
 - **Sin verificar:** si suena propio, si se recuerda, si se siente Efeonce. Nadie de esta sesión escuchó el audio.
 
 ## Trampas

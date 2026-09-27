@@ -157,7 +157,7 @@ Puntos de contacto por prioridad: video y redes → podcast Glitch → eventos.
 
 | Recurso | Dónde | Qué es |
 |---|---|---|
-| Página de referencia | [axis.efeonce.org/references/sonic-brand](https://axis.efeonce.org/references/sonic-brand/) | La norma para personas, con reproductores. PR `efeoncepro/axis-design-system#4`, squash `55486aa`; publicado 2026-09-26 |
+| Página de referencia | [axis.efeonce.org/references/sonic-brand](https://axis.efeonce.org/references/sonic-brand/) | La norma para personas, con reproductores. PR `efeoncepro/axis-design-system#4`, squash `55486aa`; publicado 2026-09-26. Desde el 2026-09-27 (PR #9, `612b9b1`) muestra a Glitch en «La familia: Glitch» (sección 09 y `family` en el JSON): su sonido propio, sólo de Glitch, que no usa ni se mezcla con este kit; los datos se leen de la página de Glitch |
 | Kit para el equipo (OneDrive) | `Alineación › 5. Contenidos › 13- Branding › Identidad Sonora Efeonce › v1` | Las seis carpetas del kit y un `LEEME.txt`, junto a «Motion Órbita Efeonce» |
 | JSON para agentes | [axis.efeonce.org/references/sonic-brand.json](https://axis.efeonce.org/references/sonic-brand.json) | Esquema `axis.efeonce-sonic-brand.v1`: URL, duración, LUFS, pico y SHA-256 de cada archivo |
 | Guía para agentes | `docs/agent-composition/sonic-brand.md` en el repo AXIS | Cómo elegir y usar cada archivo |

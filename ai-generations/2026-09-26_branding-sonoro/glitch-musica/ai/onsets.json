@@ -1,0 +1,22 @@
+{
+ "pulso-intro": {
+  "maqueta": 18.0,
+  "sa": 18.0,
+  "dif_ms": 0.0
+ },
+ "club-intro": {
+  "maqueta": 18.3333,
+  "sa": 18.3313,
+  "dif_ms": -2.0
+ },
+ "pulso-cortina": {
+  "maqueta": 0.975,
+  "sa": 0.849,
+  "dif_ms": -126.0
+ },
+ "club-cortina": {
+  "maqueta": 0.8208,
+  "sa": 0.8348,
+  "dif_ms": 14.0
+ }
+}

@@ -18,6 +18,7 @@ const args = process.argv.slice(2)
 const opt = (n: string, f: string) => (args.includes(n) ? args[args.indexOf(n) + 1] : f)
 const route = opt('--route', 'sa')
 const input = join(RUN, opt('--in', 'rock/maqueta-larga.mp3'))
+const outDir = join(RUN, opt('--outdir', 'rock/ai'))
 const tag = opt('--tag', route)
 const piece = opt('--plan', 'larga')
 
@@ -28,6 +29,20 @@ const STYLE = [
   '120 BPM, A major, confident, energetic, big and clean mix'
 ]
 const NEGATIVE = ['vocals', 'singing', 'lyrics', 'orchestra', 'lo-fi', 'metal screaming']
+
+// Música de Glitch (ronda 7, sólo Glitch): dos registros del mismo ADN. Sin nostalgia: nada de chiptune, synthwave ni lo-fi.
+const GLITCH_STYLES: Record<string, string[]> = {
+  pulso: [
+    'minimal hypnotic electronic music, precise contemporary production in the style of Four Tet and Jon Hopkins',
+    'soft round four-on-the-floor kick, plucked FM synth arpeggio, warm analog pad, crisp tuned glitchy percussion',
+    'subtle digital stutter edits, 120 BPM, A major, focused, intelligent, modern 2026 sound, clean wide mix, no vocals'
+  ],
+  club: [
+    'modern jersey club, bouncy broken kick pattern with stuttering kick rolls, crisp layered claps, deep 808 bass',
+    'chopped synth stabs, short tuned chirps on the off-beats, glitchy buffer-repeat edits as a stylistic effect',
+    '144 BPM, A major, energetic, playful, social media ready, contemporary 2026 production, punchy clean mix, no vocals'
+  ]
+}
 
 // Tramos de la pieza larga (ms), alineados con la maqueta. El texto dirige; la referencia pone riff y energía.
 const PLANS: Record<string, Array<{ name: string; from: number; to: number; text: string; styles?: string[] }>> = {
@@ -50,19 +65,19 @@ const fetchTo = async (url: string, file: string) => {
 }
 
 const main = async () => {
-  const up = await uploadFalFile({ bytes: await readFile(input), fileName: basename(input), contentType: 'audio/mpeg' })
+  const up = await uploadFalFile({ bytes: await readFile(input), fileName: basename(input), contentType: input.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg' })
 
   if (route === 'sa') {
     const strength = Number(opt('--strength', '0.55'))
     const res = await runFalModel<{ audio: { url: string } }>({
       model: 'fal-ai/stable-audio-25/audio-to-audio',
       pollTimeoutMs: 400000,
-      input: { audio_url: up.url, prompt: (piece.startsWith('glitch') ? [...STYLE, 'glitchy electronic stutter edits, bitcrushed buffer repeats, digital artifacts as a stylistic effect'] : STYLE).join(', '), strength, num_inference_steps: 8, guidance_scale: Number(opt('--guidance', '1')), seed: 42 }
+      input: { audio_url: up.url, prompt: (GLITCH_STYLES[piece.split('-')[0]] ?? (piece.startsWith('glitch') ? [...STYLE, 'glitchy electronic stutter edits, bitcrushed buffer repeats, digital artifacts as a stylistic effect'] : STYLE)).join(', '), strength, num_inference_steps: 8, guidance_scale: Number(opt('--guidance', '1')), seed: 42 }
     })
     const url = res.output?.audio?.url
 
     if (!url) throw new Error(`sin audio: ${JSON.stringify(res).slice(0, 400)}`)
-    const file = join(RUN, `rock/ai/${piece}-${tag}.${url.split('.').pop()?.split('?')[0] ?? 'wav'}`)
+    const file = join(outDir, `${piece}-${tag}.${url.split('.').pop()?.split('?')[0] ?? 'wav'}`)
 
     console.log(`sa strength=${strength}: ${file} (${await fetchTo(url, file)} bytes)`)
   } else {
