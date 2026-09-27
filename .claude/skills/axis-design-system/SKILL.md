@@ -53,6 +53,23 @@ canonical source:
 4. Run the AXIS repository's build, typecheck, tests and promotion gates.
 5. Record the published package version and consumer evidence in the runbook.
 
+### Styling with AXIS CSS tokens (`--efeonce-*`)
+
+A `var()` pointing to a token that does not exist fails **silently**: the whole declaration falls back to its
+initial value (`gap: 0`, `padding: 0`), and in a shorthand such as `padding: var(--efeonce-spacing-4)
+var(--efeonce-spacing-5)` the valid value is lost too. Only use names that `@efeoncepro/axis-tokens/css` emits:
+
+- **Spacing:** only `--efeonce-spacing-1|2|3|4|6|8` (0.25 / 0.5 / 0.75 / 1 / 1.5 / 2rem). There is no `-5` or `-7`.
+- **Color:** `--efeonce-color-danger` (never `-error`); `--efeonce-color-info` exists only since `axis-tokens`
+  `0.3.10`; there is no `--efeonce-color-border-strong` (use `--efeonce-color-border`).
+- **Elevation:** the CSS publishes no `--efeonce-shadow-*`. Elevation comes from the `axisElevation` roles; a dense
+  card with a border goes with elevation `none`.
+
+The AXIS Lab enforces this with `apps/lab/src/test/unit/design-tokens.test.ts`: it fails (with file:line) when a Lab
+sheet uses a `var(--efeonce-*)` without fallback that is neither in `@efeoncepro/axis-tokens/css` nor defined in the Lab,
+and it tolerates no exceptions (AXIS `ed97c0b`/`0a6da3b`, 2026-09-27). The token build (`packages/tokens/scripts/emit-css.mjs`)
+emits each property once and fails if two groups give it different values.
+
 ### Agent-facing visual guide
 
 `../axis-design-system/DESIGN.md` is the AXIS visual guide for humans and coding agents. It follows the
@@ -220,12 +237,13 @@ Rules for agents:
   change means changing the token and its test in AXIS, signed through the Greenhouse ADR, not editing a document.
 - Before pinning a consumer, confirm which **published** package version contains the export; do not assume the
   workspace source is released.
-- **Greenhouse consumption:** pins on `develop` `axis-tokens` `0.3.3` (commit `0fdd8f492`) and `axis-ui-contracts`,
-  `axis-ui-registry` and `axis-brand-assets` `0.3.0` (commit `a98751daa`); neither is in `main` until the next release.
-  It does not use `efeonce.email-signature` yet (so contracts stays on `0.3.0`) and
-  does **not** use `axis-graphic-line`: its adapter `scripts/creative/layout-compiler/graphic-line.mjs` keeps its own
-  raster-safe painter on contract `0.3.0` (lens with arc + sphere, deck one ring), and `axis-advertising.mjs`
-  requires collaboration-selection `0.3.0`. Entry points `pnpm creative:orbit:resolve|render`, the per-format
+- **Greenhouse consumption (verified 2026-09-27 in `package.json`):** `develop` pins `axis-tokens` `0.3.8`,
+  `axis-ui-contracts` `0.3.7`, `axis-ui-registry` `0.3.1`, `axis-brand-assets` `0.3.4` and `axis-graphic-line` `0.6.0`.
+  It does not use `efeonce.email-signature` yet. `axis-graphic-line` paints the orbit only in the Artifact Composer
+  brand surfaces (`src/lib/brand-surfaces`, `src/lib/artifact-composer/catalogs/graphic-line-*`); the layout-compiler
+  adapter `scripts/creative/layout-compiler/graphic-line.mjs` still resolves the contract from `axis-ui-contracts` and
+  keeps its own raster-safe painter (lens with arc + sphere, deck one ring), and `axis-advertising.mjs` requires
+  collaboration-selection `0.3.0`. Entry points `pnpm creative:orbit:resolve|render`, the per-format
   `graphic_line` layer and `brand.signature` of `pnpm creative:layout`, and `marcaEnEscena` of
   `pnpm foto:componer:cta`. Never copy the Lab painter.
 - **Signature rule (operator, 2026-09-26):** the Efeonce logo, centered. The URL bubble signs instead ONLY when the
@@ -267,6 +285,10 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
   `surface-document-intent.schema.json`, manifest `axis.surface-document.v1`; brochure rules `brochure-cover-first`,
   `brochure-close-last`, `brochure-needs-service-page`; `sections` and the line propagate; cover and close always
   carry the document's line, `document-line-mismatch`). `pnpm surface:resolve` detects `pages` and resolves a document.
+  `axis-tokens` has since moved to **`0.3.10`** (tag `v0.3.10`, 2026-09-27, AXIS `main@aa1a638`: `color.info` and a
+  single-valued `motion`, no surface change); `axis-ui-contracts` stays `0.3.8`. Transitive pins, verified in the
+  registry: `axis-ui-contracts` `0.3.8` depends on `axis-tokens` exactly `0.3.9` and `axis-graphic-line` `0.6.0` on
+  exactly `0.3.8`, so a transitive-only consumer never receives `0.3.10`.
 - **Cine gate:** `photo.register: 'cine'` passes only with recipe `proposal-cinematic` or `photo.subject: 'nexa'`
   (issue `cine-requires-nexa-or-proposal`, token `efeonceGraphicLine.surfaces.photo.cine`). The register itself (camera, the
   line as light, wardrobe, traps) is the Greenhouse doc
@@ -274,7 +296,13 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
 - **Greenhouse consumption:** `pnpm brand:compose` (`src/lib/brand-surfaces`) still pins `axis-tokens` `0.3.8` +
   `axis-ui-contracts` `0.3.7` (contract `0.1.1`). **`0.1.2` is pending integration** until the dependency is bumped:
   no templates for `cover-classic`/`close-classic`, no `use`/`layout`, no documents there yet. Bump both packages
-  together and rerun `pnpm composer:visual-gate --catalog=graphic-line`.
+  together and rerun `pnpm composer:visual-gate --catalog=graphic-line`. Integration task:
+  [TASK-1927](../../../docs/tasks/to-do/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md).
+- **Bump impact from `axis-tokens` `0.3.10`:** `src/@core/theme/axis-package-drift.test.ts` requires
+  `Object.keys(efeonceTokens.color)` to be exactly the compatibility roles plus neutrals, so pinning ≥ `0.3.10` fails
+  it until `info: axisSemanticHex.info` is added to `COMPATIBILITY_ROLES` in the same change. `efeonceTokens.motion`
+  now aliases `axisMotion.duration` (`fast` 150ms, `standard` **200ms** — was 220ms in TS, the CSS already emitted
+  200ms —, `slow` 300ms); the drift test only checks the keys, so review any TS consumer of those values.
 
 ### Efeonce iconography (Trazo and Plastilina)
 
@@ -321,8 +349,8 @@ Gemini); hoodie and cap carry no drawn logo — the sphere is the brand (on the 
 notes: `influencer` (Trazo) in response resembles `talent`, never together; `chispa` never with `estrella` or `varita`;
 `galeria` and `biblioteca` look alike, use them apart; `prompt` is the weakest at 32 px. The set is now **36 Trazo + 43
 Plastilina = 79**, with **43 volume PNGs**. Published with tag `v0.6.0`: `axis-graphic-line` `0.6.0` and
-`axis-brand-assets` `0.3.4` (`axis-tokens` is at `0.3.8`, published by another session with the surfaces work, and does
-not change for D26). Greenhouse pins `axis-graphic-line` `0.6.0` and `axis-brand-assets` `0.3.4`. Guide §«Catálogo
+`axis-brand-assets` `0.3.4` (`axis-tokens` was at `0.3.8`, published by another session with the surfaces work, and
+did not change for D26; its latest is `0.3.10`, see Surface composition). Greenhouse pins `axis-graphic-line` `0.6.0` and `axis-brand-assets` `0.3.4`. Guide §«Catálogo
 aprobado», ADR delta «IA, social y staff: 19 glifos nuevos (D26)», Lab `/references/iconography/` (79 glyphs, 43 volumes).
 
 ### Glitch sub-line (Lab page + JSON; published 2026-09-27)

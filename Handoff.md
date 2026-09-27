@@ -1,5 +1,7 @@
 # Handoff activo
 
+**AXIS 0.3.10 (27/09):** bump de Greenhouse pendiente: [runbook Delta c](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+
 **La órbita (26–27/09):** [índice](docs/operations/brand-graphic-line/README.md). [TASK-1919](docs/tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) y [TASK-1920](docs/tasks/complete/TASK-1920-photo-isotype-compose-official-emblem.md) completas y en `develop`: 20 recetas aprobadas por `pnpm brand:compose` (AXIS `v0.3.8`, contrato 0.1.1). Pendiente: 5 preguntas del operador y la ruta productiva [TASK-1921](docs/tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md).
 
 **Registro cine + taller (27/09):** [registro cine](docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (ads 9:16/4:5 en prueba, canvas «Publicidad · cine»); brochure con 4 opciones de portada/contraportada por elegir; repo taller [`efeonce-brand-workshop`](docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) + [TASK-1925](docs/tasks/to-do/TASK-1925-brand-workshop-migration.md); AXIS `v0.3.9` (surface-composition 0.1.2), Greenhouse aún en 0.1.1.

@@ -67,7 +67,7 @@ bruma alrededor, estás en cine. Los otros tres registros no fabrican su fuente 
 
 **El contrato lo vigila [medido]:** AXIS rechaza `photo.register: "cine"` fuera de esos casos con el issue
 **`cine-requires-nexa-or-proposal`** (`@efeoncepro/axis-ui-contracts`, `surface-composition.js`): pasa si la receta es
-`proposal-cinematic` **o** si `photo.subject` es `nexa`. El token vive en `@efeoncepro/axis-tokens` (desde 0.3.8; vigente 0.3.9),
+`proposal-cinematic` **o** si `photo.subject` es `nexa`. El token vive en `@efeoncepro/axis-tokens` (desde 0.3.8; vigente 0.3.10 al 2026-09-27),
 `efeonceGraphicLine.surfaces.photo.cine`: `{ recipes: ['proposal-cinematic'], subjects: ['nexa'], lensMm: 85,
 cameraDistanceM: 2 }`, y la regla transversal `cine-only-nexa-or-proposal`, junto a `no-close-gaze-pairs`.
 

@@ -7,6 +7,21 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-27 — AXIS `axis-tokens` 0.3.10: `color.info`, motion de un solo valor y tokens CSS que existen
+
+AXIS corrigió el Lab, que usaba `var(--efeonce-spacing-5)` y `-7`: no existen (la escala publicada es `1/2/3/4/6/8`), y
+un `var()` de un token inexistente no avisa, porque la declaración entera vuelve a su valor inicial (`main@ed97c0b`).
+También reemplazó `color-error` por `color-danger` y `color-border-strong` por `color-border`, y quitó `shadow-sm`; un
+test nuevo del Lab (`design-tokens.test.ts`) falla si reaparece un token inexistente (`main@0a6da3b`). Publicó
+`@efeoncepro/axis-tokens` `0.3.10` (tag `v0.3.10`, `main@aa1a638`, run `36324516573` en verde; los demás paquetes no
+cambian): `--efeonce-color-info` (#1f6fd4), `efeonceTokens.motion` como alias de `axisMotion.duration` (`standard` pasa de
+220 a 200 ms en TS; el CSS ya emitía 200) y un build que falla si una propiedad sale con dos valores. Greenhouse sigue
+fijando `axis-tokens` 0.3.8: al subir a ≥ 0.3.10, `axis-package-drift.test.ts` falla hasta agregar
+`info: axisSemanticHex.info` a `COMPATIBILITY_ROLES`. Documentado en el runbook de consumo AXIS (Delta 2026-09-27 c), el
+mapa de continuidad, TASK-1927 (nota de dependencia), el registro cine, TASK-1926 y la skill `axis-design-system`
+(+espejo `.claude`), que ahora trae la regla de tokens CSS y corrige los pines de Greenhouse. Sin cambios de código en
+Greenhouse.
+
 ## 2026-09-27 — Registro cine con documento propio, pruebas publicitarias, repo taller y AXIS 0.3.9
 
 El operador pidió documentar «con altísimo nivel de detalle» el estilo cinematográfico: nace

@@ -56,6 +56,16 @@ sólo la documenta (manual de la línea §14). **No hay adopción runtime en Gre
 entre versiones; un consumidor nuevo necesita su propio `Read` (runbook, Delta 2026-09-26 (d)). Este mapa no autoriza
 el bump.
 
+## Actualización — 2026-09-27: `axis-tokens` 0.3.10 y pines vigentes de Greenhouse
+
+El tag `v0.3.10` de AXIS publicó `@efeoncepro/axis-tokens` `0.3.10`: `efeonceTokens.color.info`, `efeonceTokens.motion`
+como alias de `axisMotion.duration` (`standard` 200 ms) y un build que falla si `tokens.css` emite una propiedad con
+dos valores. Los pines de la actualización anterior quedaron superados: Greenhouse **sí** depende de
+`axis-graphic-line` (`0.6.0`, usado por `src/lib/brand-surfaces`) y fija `axis-tokens` `0.3.8`, `axis-ui-contracts`
+`0.3.7`, `axis-brand-assets` `0.3.4` y `axis-ui-registry` `0.3.1` (`package.json`, verificado el 2026-09-27). Subir a
+`0.3.10` rompe a propósito el drift test de Greenhouse, porque `efeonceTokens.color` gana `info`; el detalle y el
+arreglo están en el runbook, Delta 2026-09-27 (c). Este mapa no autoriza el bump.
+
 ---
 
 ## 0. Los cuatro actores, y por qué confundirlos es caro

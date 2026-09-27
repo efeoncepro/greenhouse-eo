@@ -88,7 +88,7 @@ Reglas obligatorias:
 
 - `TASK-1918` modifica `scripts/foto/build-prompt.mjs` (chequeos de la lente). Esta task toca el mismo archivo: se
   ejecuta después de 1918 o acuerda el orden con su sesión; nunca en paralelo sobre ese archivo.
-- `@efeoncepro/axis-tokens` con `efeonceGraphicLine.surfaces.photo.cine` (existe desde 0.3.8; vigente 0.3.9).
+- `@efeoncepro/axis-tokens` con `efeonceGraphicLine.surfaces.photo.cine` (existe desde 0.3.8; vigente 0.3.10 al 2026-09-27).
 
 ### Blocks / Impacts
 

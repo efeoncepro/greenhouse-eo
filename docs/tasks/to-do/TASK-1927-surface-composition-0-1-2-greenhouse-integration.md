@@ -132,6 +132,13 @@ Reglas obligatorias:
 - AXIS `v0.3.9` publicado (hecho el 2026-09-27): `@efeoncepro/axis-tokens` 0.3.9 y `@efeoncepro/axis-ui-contracts`
   0.3.8 en el registry privado. `[verificar]` que `pnpm view @efeoncepro/axis-ui-contracts@0.3.8` responda con la
   auth local del runbook de consumo.
+  - **Nota 2026-09-27 (tarde) — ya hay `axis-tokens` 0.3.10** (tag `v0.3.10`; sólo cambió `axis-tokens`, el contrato
+    0.1.2 y `axis-ui-contracts` 0.3.8 son los mismos). Esta task sigue fijando 0.3.9; si al tomarla se decide fijar 0.3.10 o más, el bump de tokens deja de ser
+    neutro para los tests: `efeonceTokens.color` gana `info` y `src/@core/theme/axis-package-drift.test.ts` falla hasta
+    agregar `info: axisSemanticHex.info` a `COMPATIBILITY_ROLES` en el mismo commit; `efeonceTokens.motion.standard`
+    pasa de 220 a 200 ms (el test sólo mira claves y nada en Greenhouse lee ese valor). `axis-ui-contracts` 0.3.8
+    depende de `axis-tokens` 0.3.9 exacto y `axis-graphic-line` 0.6.0 de 0.3.8, así que con 0.3.10 directo el lockfile
+    resuelve 0.3.10, 0.3.9 y 0.3.8 a la vez. Detalle: runbook de consumo AXIS, Delta 2026-09-27 (c).
 - `TASK-1919` (complete): catálogos `graphic-line-{deck,stills,overlays}`, mapper `src/lib/brand-surfaces`, CLI
   `pnpm brand:compose`, scope `graphic-line` del gate.
 - `@efeoncepro/axis-graphic-line` 0.6.0 (ya fijado): pinta la órbita (`paintGraphicLine`) y `deckSlideHtml`.

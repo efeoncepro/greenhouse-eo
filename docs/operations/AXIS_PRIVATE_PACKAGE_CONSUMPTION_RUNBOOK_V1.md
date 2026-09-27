@@ -8,6 +8,13 @@ source control.
 
 ## Current state — 2026-09-14
 
+> **Actualizado 2026-09-27 (tarde):** lo último publicado es `axis-tokens` `0.3.10` (tag `v0.3.10`), con
+> `axis-ui-contracts` `0.3.8`, `axis-ui-registry` `0.3.1`, `axis-brand-assets` `0.3.4` y `axis-graphic-line` `0.6.0`
+> (versiones leídas en GitHub Packages). Greenhouse fija `axis-tokens` `0.3.8`, `axis-ui-contracts` `0.3.7`,
+> `axis-brand-assets` `0.3.4`, `axis-graphic-line` `0.6.0` y `axis-ui-registry` `0.3.1` (commits `016d0a183` y
+> `f9bc73bb4`, los dos en `origin/develop`). Ver **Delta 2026-09-27 (c)**, con el impacto de subir a `0.3.10`; los
+> párrafos siguientes quedan como historia.
+
 > **Actualizado 2026-09-27:** publicados y **fijados en Greenhouse** `axis-tokens` `0.3.8` y `axis-ui-contracts`
 > `0.3.7` (tag `v0.3.8`), `axis-brand-assets` `0.3.3` y `axis-graphic-line` `0.5.0` (tag `v0.5.0`), con
 > `axis-ui-registry` `0.3.1`. Greenhouse **ya depende de `axis-graphic-line`** (mapper `src/lib/brand-surfaces`,
@@ -67,6 +74,46 @@ source control.
   La evidencia del piloto pasa de **local** a **CI**.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
+
+## Delta 2026-09-27 (c) — `axis-tokens` 0.3.10 (tag `v0.3.10`): `color.info` y motion sin valores dobles; Greenhouse no lo fija
+
+- **Publicado** el 2026-09-27 (14:03Z) con el tag anotado `v0.3.10` (commit `aa1a638` de `main` de AXIS; workflow
+  `release-packages.yml`, run `36324516573`, `success`). Sólo sube `axis-tokens`; `axis-ui-contracts` `0.3.8`,
+  `axis-ui-registry` `0.3.1`, `axis-brand-assets` `0.3.4` y `axis-graphic-line` `0.6.0` ya estaban en el registry y el
+  run los saltó. Qué trae (commit `0a6da3b`):
+  - `efeonceTokens.color.info` = `axisSemanticHex.info` (`#1f6fd4`), emitido como `--efeonce-color-info`. **La forma
+    de `efeonceTokens.color` crece.**
+  - `efeonceTokens.motion` pasa a ser alias de `axisMotion.duration`: `fast` 150ms, `standard` **200ms** y `slow`
+    300ms. Antes el TS decía 220ms para `standard`; `tokens.css` ya decía 200ms porque la propiedad se emitía dos veces
+    y ganaba la segunda. Ahora `emit-css.mjs` emite cada propiedad una sola vez y falla el build si recibe dos valores
+    distintos.
+- **Nombres CSS que no existen** (los usaba el Lab; corregidos en `ed97c0b` y `0a6da3b`): la escala de espaciado
+  publicada es sólo `--efeonce-spacing-1|2|3|4|6|8` (0.25/0.5/0.75/1/1.5/2rem), sin `-5` ni `-7`; el rol de error es
+  `--efeonce-color-danger` (no `--efeonce-color-error`), el borde es `--efeonce-color-border` (no `-border-strong`) y
+  no hay `--efeonce-shadow-*`: `tokens.css` no publica sombras, la elevación va por los roles `axisElevation`. Un
+  `var()` a un token inexistente no avisa: la declaración entera resuelve a su valor inicial, y en un shorthand se
+  pierde también el valor válido. En AXIS lo vigila ahora `apps/lab/src/test/unit/design-tokens.test.ts` (falla con
+  archivo:línea si una hoja del Lab usa un `var(--efeonce-*)` sin fallback que no existe); **ese gate cubre sólo el
+  Lab**, no a los consumidores.
+- **Tramos intermedios del mismo día** (sin delta propio): tag `v0.6.0` (commit `cf77452`) publicó
+  `axis-graphic-line` `0.6.0` y `axis-brand-assets` `0.3.4`; tag `v0.3.9` (commit `ff0505a`) publicó `axis-tokens`
+  `0.3.9` y `axis-ui-contracts` `0.3.8` con `efeonce.surface-composition` 0.1.2 (su adopción es TASK-1927).
+- **Transitivos:** los paquetes declaran `axis-tokens` como `workspace:*`, y el publish lo fija a la versión exacta del
+  momento. `axis-ui-contracts` `0.3.8` depende de `axis-tokens` `0.3.9`; `axis-graphic-line` `0.6.0`, de `axis-tokens`
+  `0.3.8` y `axis-ui-contracts` `0.3.7` (se publicó antes que `0.3.9`; verificado en el registry y en el lockfile de
+  Greenhouse). Ningún paquete publicado depende todavía de `axis-tokens` `0.3.10`: quien lo fije directo instala además
+  la versión exacta que pida cada transitivo.
+- **Greenhouse no lo fija** (`package.json` verificado el 2026-09-27; sin cambios de código). Impacto al subir
+  `axis-tokens` a `0.3.10` o más:
+  - `src/@core/theme/axis-package-drift.test.ts` exige que `Object.keys(efeonceTokens.color)` sea **exactamente** los
+    roles de `COMPATIBILITY_ROLES` más los neutrales. Con `info`, falla: es el gate haciendo su trabajo (descubre roles
+    nuevos en vez de listarlos). El bump agrega `info: axisSemanticHex.info` a `COMPATIBILITY_ROLES` en el mismo
+    commit.
+  - El test de motion sólo compara claves (`fast`, `slow`, `standard`), que no cambian. Ningún código de Greenhouse
+    lee `efeonceTokens.motion` como valor (`rg`, 2026-09-27; el otro consumidor de `efeonceTokens`,
+    `scripts/auth-server/styles.ts`, sólo lee `radius`).
+  - Greenhouse no importa `tokens.css` ni usa ningún `var(--efeonce-*)` de AXIS (`rg`, 2026-09-27): los nombres
+    inexistentes del Lab no le afectan.
 
 ## Delta 2026-09-27 (b) — `v0.3.8` publicado y fijado: `efeonce.surface-composition` 0.1.1 (TASK-1919)
 
