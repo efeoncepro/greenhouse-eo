@@ -39,7 +39,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `creative|brand|platform`
-- Blocked by: `TASK-1919`
+- Blocked by: `none` (el Slice 1 espera la decisión de dueño de dominio, ver Open Questions)
 - Branch: `Greenhouse develop; efeonce-mcp main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

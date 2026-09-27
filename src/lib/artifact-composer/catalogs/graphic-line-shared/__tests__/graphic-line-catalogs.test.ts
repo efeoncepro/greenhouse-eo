@@ -40,6 +40,22 @@ describe('catálogos de La órbita', () => {
     expect(violations, 'el color y la tipografía salen de graphic-line-tokens.css').toEqual([])
   })
 
+  it('GUARD: ninguna plantilla ni molde anima ni escribe duraciones: el movimiento es del pipeline de motion y sus tiempos, de los tokens', () => {
+    const violations: string[] = []
+
+    for (const catalog of GL_CATALOGS) {
+      for (const file of handWrittenFiles(catalog)) {
+        const source = fs.readFileSync(path.join(CATALOGS_DIR, catalog, file), 'utf8')
+
+        for (const match of source.matchAll(/\b(transition|animation)\s*:|@keyframes|\b\d+(\.\d+)?m?s\b(?=\s*[;,)])/g)) {
+          violations.push(`${catalog}/${file}: ${match[0]}`)
+        }
+      }
+    }
+
+    expect(violations, 'una plantilla del composer es un cuadro fijo; los tiempos viven en efeonceGraphicLine.motion').toEqual([])
+  })
+
   it('cada registry mapea contentTypes <superficie>.<receta>[.<formato>] a plantillas declaradas', () => {
     for (const catalog of GL_CATALOGS) {
       const registry = JSON.parse(fs.readFileSync(path.join(CATALOGS_DIR, catalog, 'registry.json'), 'utf8')) as {

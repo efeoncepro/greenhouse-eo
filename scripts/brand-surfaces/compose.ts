@@ -14,7 +14,9 @@
  * Es el taller local. La ruta productiva (API + artifact-worker + MCP) es TASK-1921.
  */
 
+import crypto from 'node:crypto'
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import path from 'node:path'
 
 import sharp from 'sharp'
@@ -143,6 +145,50 @@ export const materializeAssets = async (assets: SurfaceAssetRequest[], root: str
   return out
 }
 
+const sha256 = (data: Buffer | string): string => crypto.createHash('sha256').update(data).digest('hex')
+
+/** Versión instalada de un paquete: su package.json está junto a su entrada (no todos lo exportan). */
+const packageVersion = (name: string): string => {
+  let dir = path.dirname(createRequire(path.join(process.cwd(), 'package.json')).resolve(name))
+
+  while (dir !== path.dirname(dir)) {
+    const candidate = path.join(dir, 'package.json')
+
+    if (fs.existsSync(candidate)) {
+      const pkg = JSON.parse(fs.readFileSync(candidate, 'utf8')) as { name?: string; version?: string }
+
+      if (pkg.name === name && pkg.version) return pkg.version
+    }
+
+    dir = path.dirname(dir)
+  }
+
+  return 'desconocida'
+}
+
+/**
+ * Procedencia de la pieza: qué pedido, qué fotos y qué versión de AXIS la gobernaron. Sin fechas: dos
+ * composiciones del mismo pedido con los mismos plates escriben la misma procedencia.
+ */
+export const surfaceProvenance = (
+  intentRaw: string,
+  piece: { catalog: string; contentType: string; assets: SurfaceAssetRequest[] },
+  root: string
+) => ({
+  schema: 'efeonce.brand-surface-piece.provenance.v1',
+  intentSha256: sha256(intentRaw),
+  catalog: piece.catalog,
+  contentType: piece.contentType,
+  plates: piece.assets
+    .filter((asset): asset is Extract<SurfaceAssetRequest, { kind: 'plate' }> => asset.kind === 'plate')
+    .map(asset => ({ ref: asset.ref, path: asset.path, sha256: sha256(fs.readFileSync(path.resolve(root, asset.path))) })),
+  axis: Object.fromEntries(
+    ['@efeoncepro/axis-ui-contracts', '@efeoncepro/axis-tokens', '@efeoncepro/axis-graphic-line', '@efeoncepro/axis-brand-assets'].map(
+      name => [name, packageVersion(name)]
+    )
+  )
+})
+
 const main = async (): Promise<void> => {
   const intentPath = arg('intent')
 
@@ -151,7 +197,8 @@ const main = async (): Promise<void> => {
     process.exit(2)
   }
 
-  const intent = JSON.parse(fs.readFileSync(intentPath, 'utf8')) as SurfaceIntent
+  const intentRaw = fs.readFileSync(intentPath, 'utf8')
+  const intent = JSON.parse(intentRaw) as SurfaceIntent
   const artifactId = arg('artifact-id') ?? path.basename(intentPath).replace(/-intent\.json$|\.json$/i, '')
   const outDir = path.resolve(arg('out') ?? path.join('.captures', 'brand-surfaces', artifactId))
 
@@ -182,6 +229,10 @@ const main = async (): Promise<void> => {
   )
 
   fs.writeFileSync(path.join(outDir, `${artifactId}.surface-manifest.json`), `${JSON.stringify(piece.manifest, null, 2)}\n`)
+  fs.writeFileSync(
+    path.join(outDir, `${artifactId}.provenance.json`),
+    `${JSON.stringify(surfaceProvenance(intentRaw, piece, process.cwd()), null, 2)}\n`
+  )
 
   console.log(`✓ ${piece.contentType} → ${piece.catalog}`)
   console.log(`  ${outDir}`)

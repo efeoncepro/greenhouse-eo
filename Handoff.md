@@ -1,6 +1,6 @@
 # Handoff activo
 
-**La órbita (26–27/09):** [índice](docs/operations/brand-graphic-line/README.md). [TASK-1919](docs/tasks/in-progress/TASK-1919-graphic-line-surfaces-artifact-composer.md) avanzada, local sin push: `pnpm brand:compose`, AXIS `v0.3.8`; falta cierre, 5 preguntas del operador y [TASK-1921](docs/tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md). TASK-1920 (`foto:isotipo`) commiteada.
+**La órbita (26–27/09):** [índice](docs/operations/brand-graphic-line/README.md). [TASK-1919](docs/tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) y [TASK-1920](docs/tasks/complete/TASK-1920-photo-isotype-compose-official-emblem.md) completas y en `develop`: 20 recetas aprobadas por `pnpm brand:compose` (AXIS `v0.3.8`, contrato 0.1.1). Pendiente: 5 preguntas del operador y la ruta productiva [TASK-1921](docs/tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md).
 
 **Marketing Studio (26/09):** [TASK-1893](docs/tasks/complete/TASK-1893-marketing-studio-original-asset-store-media-worker.md) y [TASK-1896](docs/tasks/complete/TASK-1896-marketing-studio-observability-restore.md) complete en producción (release `92002873ced9`, PR #243), junto a 1890/1891; restauración probada (job 49 s) y EPIC-049 con ese exit criterion cumplido. Follow-ups no bloqueantes en cada task. Gateway en `efeonce-mcp-gateway-00063-l9j`; sigue sin probar en vivo la denegación a una persona sin capability (1891).
 

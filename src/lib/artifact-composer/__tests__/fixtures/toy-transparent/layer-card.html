@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: transparent;
+      }
+      .layer {
+        position: relative;
+        width: 800px;
+        height: 450px;
+      }
+      .caption {
+        position: absolute;
+        left: 200px;
+        top: 180px;
+        margin: 0;
+        padding: 20px 32px;
+        font: 600 40px sans-serif;
+        color: white;
+        background: black;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layer">
+      <p class="caption" data-slot="caption">Capa de ejemplo</p>
+    </div>
+  </body>
+</html>

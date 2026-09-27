@@ -1,0 +1,16 @@
+{
+  "version": "0.1",
+  "canvas": { "width": 800, "height": 450 },
+  "contentTypeTaxonomy": ["layer"],
+  "templates": [
+    {
+      "name": "LayerCard",
+      "kind": "overlay",
+      "contentTypes": ["layer"],
+      "prototype": "layer-card.html",
+      "slotsRef": "layer-card.slots.json",
+      "status": "built"
+    }
+  ],
+  "selector": { "map": { "layer": "LayerCard" } }
+}

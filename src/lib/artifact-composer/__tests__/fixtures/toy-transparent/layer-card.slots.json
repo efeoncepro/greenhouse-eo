@@ -1,0 +1,14 @@
+{
+  "template": "LayerCard",
+  "version": "0.1",
+  "viewport": { "width": 800, "height": 450 },
+  "render": { "background": "transparent" },
+  "slots": {
+    "caption": {
+      "selector": "[data-slot='caption']",
+      "type": "string",
+      "required": true,
+      "constraints": { "maxCharacters": 40, "overflow": "reject" }
+    }
+  }
+}

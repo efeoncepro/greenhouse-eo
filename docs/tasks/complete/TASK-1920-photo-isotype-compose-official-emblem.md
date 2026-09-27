@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Implementación completa; cierre documental pendiente (Handoff/changelog con TASK-1919)`
+- Status real: `Completa (2026-09-27): comando modular con pruebas, salida byte a byte idéntica, regla/canon/skill con el orden de uso; pnpm test completo y pnpm build en verde; push a develop.`
 - Rank: `TBD`
 - Domain: `creative|brand`
 - Blocked by: `none`
@@ -224,14 +224,14 @@ Ninguna — repo-only change.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (TASK-1918, hermana de `foto:prompt` y lente, no cambia)
 
-- [ ] la regla, el canon y la skill quedaron coherentes entre sí (mismo orden, mismo comando)
+- [x] la regla, el canon y la skill quedaron coherentes entre sí (mismo orden, mismo comando)
 
 ## Follow-ups
 

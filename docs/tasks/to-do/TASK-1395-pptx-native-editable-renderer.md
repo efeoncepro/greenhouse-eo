@@ -1,5 +1,12 @@
 # TASK-1395 — PPTX Native Editable Renderer for Artifact Composer
 
+## Delta 2026-09-27
+
+- El contrato de plantilla (`TemplateContract`) suma `render.background: 'opaque' | 'transparent'` (PNG con alfa para
+  capas que se montan sobre video) y existen tres catálogos nuevos de La órbita (`graphic-line-deck`, `-stills`,
+  `-overlays`). La matriz de capacidad del renderer PPTX debe declarar qué hace con una plantilla transparente (fallar
+  cerrado o exportarla como imagen con alfa) — cerrado por trabajo en TASK-1919.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -22,7 +29,7 @@
 - Status real: `Diseno`
 - Rank: `TBD — posterior a TASK-1393; habilita el primer target editable antes de su incorporación productiva en TASK-1391`
 - Domain: `commercial|platform|ops`
-- Blocked by: `TASK-1393 (Artifact Composer, catalog snapshot y ResolvedCompositionManifest)`
+- Blocked by: `none` (TASK-1393 complete)
 - Branch: `task/TASK-1395-pptx-native-editable-renderer`
 - Legacy ID: `none`
 - GitHub Issue: `none`
