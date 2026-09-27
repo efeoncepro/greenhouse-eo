@@ -90,7 +90,7 @@ Antes de los detalles, este es el orden completo de una edición con música, de
 | Glitch Drop (después de la noticia que dice el archivo de edición; en el ejemplo, la 2) | `drop` | su WAV; **sin cama**: el Drop la corta |
 | Paso a la noticia 3 | — | la cortina empieza 1,6 s antes de `cabecera-3` |
 | Noticia 3 | `cabecera-3` y su `_fijo`; `lower-third-invitado` si hay invitado (su primera aparición); `noticia-3`; `fuente-3` si trae imagen | cama bajo el relato |
-| Fin de las noticias | `cabecera-salida` y, enseguida, `cta` (el cierre sobre el host) | sus WAV. La norma dice que la cama no va bajo el host fuera de las noticias (tampoco bajo este cierre), pero el animatic la deja sonar hasta la tarjeta final: confirma con el operador `[verificar]` y, mientras tanto, sigue la norma |
+| Fin de las noticias | `cabecera-salida` y, enseguida, `cta` (el cierre sobre el host) | sus WAV. **La cama termina aquí**, con la salida de la cabecera (fin del relato de la última noticia): nunca va bajo el cierre del host ni bajo otra toma del host fuera de las noticias. El animatic ya lo respeta (taller `7ed6219`) |
 | Tarjeta final | `glitch-cierre-*.mov` (3 s) | `glitch-salida-*.wav` en el mismo cuadro; **sin cama** |
 
 El orden de los momentos sale del animatic del taller; en tu edición, la duración de cada noticia la pone el relato del

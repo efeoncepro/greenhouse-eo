@@ -147,6 +147,29 @@ Reglas del video:
 > [TASK-1924](../../tasks/to-do/TASK-1924-glitch-motion-overlays-hyperframes.md) · montaje paso a paso en
 > [Editar el video de Glitch](../../manual-de-uso/creative/editar-video-glitch.md)
 
+### Qué recibe el equipo en cada edición
+
+Cada edición llega en OneDrive (`Alineación › 5. Contenidos › 09. Glitch › Motion`), en los dos formatos, reel y vlog,
+lista para que el editor la monte sobre la grabación:
+
+| Qué llega | Para qué sirve |
+|---|---|
+| **Pre-roll de la intro** (3,2 s) | los tres puntos que laten al ritmo de la banda, antes de la apertura. Es opaco (fondo navy) y su último cuadro es igual al primero de la apertura, así que el paso no se nota |
+| **Apertura y tarjeta final** | el comienzo y el cierre del video, con fondo transparente para ver al host debajo |
+| **Kit de gráficos** de la edición | cabeceras de cada noticia, rótulos del host y del invitado, tarjetas de noticia, imagen de la fuente, Glitch Drop y llamado a la acción, con los textos de esa edición |
+| **Un archivo de sonido junto a cada gráfico** | con el mismo nombre y la misma duración: se pone en el mismo instante que su gráfico |
+| **La música** | la intro (que ya incluye el sonido de la apertura), la salida (que ya incluye el del cierre), la cortina entre noticias y la música de fondo para las noticias; y las versiones para el podcast |
+| **Transiciones entre escenas** | la ola de bytes, lista para usar entre imágenes, y la versión héroe cuando se pide para un corte concreto |
+| **Un animatic** | el video completo armado sobre una toma de prueba, con sonido y música: la guía de dónde va cada cosa |
+| **Una versión sin música** | los sonidos de la apertura y el cierre por separado, por si una edición tiene que ir sin música |
+
+Cada entrega queda registrada con una huella de cada archivo, así se puede comprobar después que nadie los cambió. Los
+textos salen del archivo de la edición: si uno está mal, se corrige ahí y se vuelve a generar el gráfico (una pieza en
+segundos; el kit completo en unos 4 minutos).
+
+> Detalle técnico: cómo se producen, [Producir el motion, el sonido y la música de Glitch](../../manual-de-uso/creative/producir-motion-glitch.md) ·
+> referencia de comandos en la [norma §13.13](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1313-referencia-de-comandos-y-argumentos)
+
 ## Cómo suena Glitch (aprobado)
 
 > **⚠️ Sólo para Glitch.** Este sonido **no es de Efeonce**: no forma parte de la identidad sonora de Efeonce y nunca se
@@ -249,8 +272,9 @@ animarían y exportarían con fondo transparente para que el editor los ponga so
 | Canvas de diseño «Glitch en La órbita» (privado) | [claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS](https://claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS) |
 | Logo de Glitch | `public/branding/glitch/glitch-light.svg` y `glitch-dark.svg` |
 | Gráficos animados del video (aprobados; cada uno con su sonido al lado) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto` (la carpeta conserva su nombre) |
-| Sonido del video (aprobado, versión B) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto › sonido-propuesta` → carpeta `b` (la carpeta conserva su nombre; `a` es la alternativa descartada) · [axis.efeonce.org/references/glitch/#sonido](https://axis.efeonce.org/references/glitch/#sonido) |
-| Música del video (aprobada) | almacenamiento público `glitch/music/v1/` (ver la norma §13.12) · [axis.efeonce.org/references/glitch/#musica](https://axis.efeonce.org/references/glitch/#musica) · el taller la entrega junto a cada gráfico animado |
+| Sonido del video (aprobado, versión B) | junto a cada gráfico animado, en las mismas carpetas de OneDrive · [axis.efeonce.org/references/glitch/#sonido](https://axis.efeonce.org/references/glitch/#sonido). La carpeta `Motion › piloto › sonido-propuesta` guarda el histórico de la decisión (`b` la aprobada, `a` la descartada) |
+| Música del video (aprobada) | OneDrive: la intro, la salida y el pre-roll en `Motion › piloto › v2`; la cama y la cortina en `Motion › piloto › kit`, junto al kit; la versión sin música en `v2 › sin-musica` · los originales en el almacenamiento público `glitch/music/v1/` (ver la norma §13.12) · [axis.efeonce.org/references/glitch/#musica](https://axis.efeonce.org/references/glitch/#musica) |
+| Cómo se produce todo lo del video | [Producir el motion, el sonido y la música de Glitch](../../manual-de-uso/creative/producir-motion-glitch.md) · repo taller `efeoncepro/efeonce-brand-workshop` (`tools/glitch-motion/`) |
 | Guía de tono y voz de Glitch (v3) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Marca` |
 | Página de Glitch en el sistema de diseño AXIS | publicada en [axis.efeonce.org/references/glitch/](https://axis.efeonce.org/references/glitch/) (2026-09-27) |
 | Línea gráfica de Efeonce (la línea madre) | [La órbita](./linea-grafica-efeonce.md) |
@@ -265,7 +289,25 @@ animarían y exportarían con fondo transparente para que el editor los ponga so
 | Gráficos animados del video | ya aprobados (2026-09-27); falta la cadencia de grabación (hoy 30 cuadros por segundo), la prueba con los editores en una edición real, el ritmo ajustable, dónde se usa la transición de bytes (se recomienda sólo en tarjetas y Drop), el estilo de subtítulos, los textos reales de la #17, el formulario para cambiar textos sin programar, guardar una copia en la nube de Google y cualquier excepción a la regla de rostros |
 | Música de Glitch | ya aprobada (2026-09-27), publicada en AXIS y entregada por el taller junto a cada pieza, con el pre-roll de los tres puntos; sólo falta probar la mezcla con la voz real del host en una edición real |
 | Letra Guttery | licencia para web y video confirmada por el operador (2026-09-27) |
-| Producción automática | el video ya se produce solo desde los datos de la edición; falta construir la de piezas fijas (portadas, carrusel, banners: TASK-1923) |
+| Producción automática | los gráficos, el sonido y la música del video ya se generan con un comando a partir del archivo de la edición, pero alguien tiene que correrlo (ver abajo); falta construir la de piezas fijas (portadas, carrusel, banners: TASK-1923) |
+
+### Qué falta para producir el video en el día a día
+
+Nada de esto está decidido todavía; queda anotado para que nadie lo dé por resuelto:
+
+- **Decisiones del operador:** a cuántos cuadros por segundo se graba (hoy 30), la prueba con los editores en una
+  edición real con la voz del host (incluye comprobar cómo baja la música de fondo cuando habla), a qué piezas va la
+  transición de bytes (la recomendación es tarjetas y Drop), el estilo de los subtítulos, un control de ritmo (se
+  puede hacer, no está hecho) y cualquier excepción a la regla de rostros.
+- **Contenido:** los textos reales de la edición #17 (titulares, medios, fotos con crédito, invitado).
+- **Operación:** hoy cada edición la produce alguien **en su propia máquina**, con el taller y sus herramientas
+  instaladas; el kit completo tarda unos 4 minutos. No hay autoservicio: el formulario para cargar la edición sin
+  programar (la opción recomendada, en Marketing Studio) y el registro de ediciones que produciría el archivo de la
+  edición (TASK-1442) están pendientes. El flujo editorial con agentes está descrito en EPIC-031.
+- **Plataforma:** los valores de Glitch en el sistema de diseño AXIS (TASK-1922; hoy la paleta y la manzana son una
+  propuesta copiada en el taller), los archivos de marca de Glitch en AXIS, la composición automática de las piezas
+  fijas (TASK-1923) y guardar una copia de los videos en la nube de Google (hoy sólo están en OneDrive, con su huella en
+  los registros del taller).
 
 Ya resuelto el 2026-09-27: Glitch es línea de servicio **Growth** y la próxima edición es la **#17**.
 

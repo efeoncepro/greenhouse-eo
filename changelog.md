@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-27 — Glitch: motion, sonido y música listos para producir desde el taller (docs, manuales, skills)
+
+Con motion, sonido B y música aprobados, se sincronizó todo lo que un editor humano o agente necesita para producir una
+edición: norma de Glitch v1.8 con §13.13 como referencia única de comandos y argumentos (`--sound`, `--music`,
+`--deliver`, `--skip-render`…), manual nuevo `producir-motion-glitch.md` (runbook del taller) y manual del editor al día
+(mapa de la edición, pre-roll, cama y cortina, podcast), TASK-1924/1925/1922/1923 y EPIC-031, ADR del taller v1.1,
+AGENTS.md y skills graphic-line, motion-design-studio, audio-studio y hyperframes (+espejos). En el taller: la cama de la
+última noticia ya no suena bajo el cierre del host (`7ed6219`, kit re-entregado 95/95) y el comando `sonido`, declarado
+pero inexistente, quedó implementado. Pendiente abierto: si el reel abre con el pre-roll (rompe el bucle exacto).
+
 ## 2026-09-27 — Glitch: música aprobada, publicada e integrada (tema B + cama post-punk), sólo Glitch
 
 El operador aprobó la música de Glitch: tema B (intro, cortina y salida: «Me parecen bien todas») y la cama post-punk bajo
@@ -598,12 +608,3 @@ Las bibliotecas de mascotas pasaron a `14. Mascotas de partners` en la raíz de 
 indicación del operador, y se sumó el sprocket de HubSpot en 3D: 8 ángulos y 8 escenas desde el SVG oficial. Como es
 marca registrada y HubSpot exige aprobación previa para usarlo, la biblioteca queda como uso interno hasta obtenerla.
 El relleno de huecos de `pnpm ai:image:rmbg` ahora reconoce el fondo en sombra visto a través de un agujero del objeto.
-
-## 2026-09-17 — Bibliotecas de poses 3D de Clawd y Codex, y recorte sin huecos
-
-Quedaron en la carpeta de contenidos de Marketing dos bibliotecas de mascotas de partners: Clawd (Claude) y Codex
-(OpenAI), cada una con 8 ángulos de cámara y 8 poses con accesorios ligados a servicios de Efeonce, en fondo de estudio y
-transparente, más su fuente oficial (sprite del binario de Claude Code y atlas del app de ChatGPT). `pnpm ai:image:rmbg`
-ahora rellena por defecto los huecos internos que el recorte automático deja en el sujeto (ojos, visores, glifos) y
-conserva los huecos reales de fondo. El método quedó documentado para repetirlo con Nexa; inventario en
-`docs/operations/social/PARTNER_MASCOT_POSE_LIBRARIES.md`.

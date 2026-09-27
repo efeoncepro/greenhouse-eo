@@ -335,7 +335,7 @@ el hogar del movimiento ya está decidido (repo taller).
 | Pruebas del paquete (timelines registradas, determinismo, sin red, datos de edición, pre-roll, huellas de la música, sonido completo y determinista) | `test` (12 pruebas, `node --test`) |
 
 **Argumentos clave** (tabla completa en la norma §13.13): `--run <id>` (carpeta `out/<id>/` y `corridas/<id>/`;
-defecto `<fecha>_glitch-motion`) · `--edition <n>` (defecto 17) · `--edition-file <json>` · `--assets <carpeta>` (fotos,
+defecto `<fecha>_glitch-motion` en `render`; `_glitch-kit`/`_glitch-transiciones`/`_glitch-heroe` en los otros) · `--edition <n>` (defecto 17) · `--edition-file <json>` · `--assets <carpeta>` (fotos,
 nunca en git) · `--transition basic|bytes` · `--only a,b` · `--skip-render` (`kit`, `transiciones`: reutiliza los `.mov`
 ya renderizados y rehace verificaciones, WAV, vistas previas y entrega) · `--opening-run <id>` (`kit`: corrida de donde
 toma apertura, tarjeta final y pre-roll para el animatic; defecto `2026-09-27_glitch-motion-piloto-v2`) ·

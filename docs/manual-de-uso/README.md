@@ -50,6 +50,11 @@ La diferencia con otras capas de documentacion:
   (soltar en 0,0, cabecera sostenida con el PNG `_fijo`, plano dividido, rótulo del host sólo la primera vez), la
   transición entre escenas con Track Matte Key, cómo pedir la versión héroe o un cambio de texto, montar el sonido y la
   música (intro con su pre-roll, cortina, salida y cama bajo la noticia con ducking), estados y problemas comunes.
+- [Producir el motion, el sonido y la música de Glitch](creative/producir-motion-glitch.md) — **sólo para Glitch**:
+  runbook de quien corre el taller (persona o agente): requisitos de la máquina, `doctor`, flujo de una edición (archivo
+  de edición → `kit` → `render` si cambia el número → entrega con `--deliver`), todos los scripts y argumentos, qué
+  verifica cada comando (una FALLA no entrega), manifiestos en `corridas/`, música por huella (nunca regenerada),
+  re-entrega con `--skip-render`, edición sin música y problemas comunes.
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
   lenguaje fotográfico aprobado el 2026-09-19.

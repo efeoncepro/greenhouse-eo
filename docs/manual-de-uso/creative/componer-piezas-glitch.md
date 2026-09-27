@@ -1,9 +1,12 @@
 # Componer piezas de Glitch — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.3: el motion de Glitch y los tableros de video quedaron aprobados)
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.4: la música de Glitch quedó aprobada e integrada al taller, con
+> el pre-roll de la intro; el flujo del editor agente pasa al manual [Producir el motion, el sonido y la música de
+> Glitch](./producir-motion-glitch.md) y se corrigen las cifras de verificación. v1.3: el motion de Glitch y los
+> tableros de video quedaron aprobados)
 > **Modulo:** Creative · Glitch, magazine semanal de Efeonce (sub-línea de «La órbita»)
 > **Ruta en portal:** no aplica — las piezas se arman desde el canvas de diseño; todavía no hay composición automática
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/linea-grafica-glitch.md) · [Norma de la sub-línea](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) · [ADR](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md) · [Usar la línea gráfica de Efeonce](./usar-linea-grafica-efeonce.md)
@@ -118,7 +121,9 @@ de grabación, la prueba con los editores en una edición real, el estilo de sub
    noticia, imagen de la fuente (plano dividido), Glitch Drop y última frase («el #N+1 sale el lunes.» + «Sigue a
    Glitch»). Sólo la portada del reel y la tarjeta final son pantalla completa. El **lower third** está aprobado
    (ver [Video y motion](#video-y-motion)); no inventes otro contenido.
-   El **sonido** de apertura y cierre está aprobado (versión B, 2026-09-27): cada `.mov` trae su WAV al lado.
+   El **sonido** está aprobado (versión B, 2026-09-27): cada `.mov` trae su WAV al lado. La **música** también (tema B
+   y cama post-punk bajo la noticia, 2026-09-27): la intro, con su pre-roll de los tres puntos, la cortina, la salida y
+   la cama llegan junto a las piezas.
 6. **Tarjeta final:** centrada, espejo de la apertura (los puntos se resuelven en la manzana, para que el reel empalme en
    loop), un mensaje, una acción, la firma y sin texturas finas.
 7. Los gráficos animados con fondo transparente se generan desde el repo taller y están **aprobados** (ver
@@ -141,11 +146,13 @@ de grabación, la prueba con los editores en una edición real, el estilo de sub
 > **⚠️ Sólo para Glitch.** Los gráficos animados y la transición de la manzana en bytes son **exclusivos de Glitch**:
 > nunca se usan en piezas de Efeonce ni de clientes. El motion está **APROBADO** (2026-09-27): apertura y tarjeta
 > final v2, kit de gráficos, transición de bytes entre piezas (falta decidir a qué piezas se aplica) y transición entre
-> escenas. El sonido también (versión B).
+> escenas. El sonido también (versión B), y la música (tema B y cama post-punk, con el pre-roll de la intro).
 
 - **Para el editor humano** (Premiere Pro y After Effects): todo el montaje está en
   [Editar el video de Glitch](./editar-video-glitch.md). Este apartado no lo repite.
-- **Para un agente**, el flujo es:
+- **Para quien corre el taller** (persona o agente): el runbook completo —requisitos, `doctor`, todos los comandos y
+  argumentos, verificaciones, manifiestos, música por huella y entregas— está en
+  [Producir el motion, el sonido y la música de Glitch](./producir-motion-glitch.md). En corto, el flujo es:
   1. **Dónde se produce:** repo taller `efeoncepro/efeonce-brand-workshop`, paquete `tools/glitch-motion/`, operado
      desde `greenhouse-eo` (el taller vive como carpeta hermana). Nada de video entra al `package.json` de Greenhouse.
   2. **Revisa el entorno:** `pnpm -C ../efeonce-brand-workshop --filter glitch-motion doctor`. Si faltan
@@ -165,12 +172,15 @@ de grabación, la prueba con los editores en una edición real, el estilo de sub
      | versión héroe para un corte | `heroe -- --run <corrida> --a <archivo>[@seg] --b <archivo>[@seg] [--origin centro\|izquierda\|marca] [--formats reel,vlog]` |
      | pruebas del paquete | `test` |
 
-  5. **Verifica:** cada comando verifica códec, cuadros y alfa de lo que genera (con el sonido: kit 84/84, transiciones 84/84,
-     héroe 8/8, kit con bytes 24/24, apertura y tarjeta final 26/26). **Si una verificación falla, no se entrega.**
+  5. **Verifica:** cada comando verifica códec, cuadros y alfa de lo que genera (con sonido y música, al 2026-09-27:
+     apertura, tarjeta final y pre-roll 37/37, kit 95/95, transiciones 84/84, héroe 8/8, kit con bytes 24/24).
+     **Si una verificación falla, no se entrega.**
   6. **Manifiesto:** cada corrida deja `corridas/<corrida>/manifiesto.json` en el taller (sha256 de cada archivo,
      verificaciones, versiones, entrega y estado aprobado). Los binarios nunca entran a git.
      **Sonido:** cada comando entrega el WAV junto a cada `.mov`, con el mismo nombre (`--sound b|a|off`; `b`, la
-     aprobada, por defecto).
+     aprobada, por defecto). **Música:** `render` entrega el pre-roll, la intro y la salida (y sus versiones de
+     podcast) y `kit` la cama y la cortina; los másteres se bajan del bucket y se verifican por sha256, nunca se
+     regeneran (`--music on|off`; `on` por defecto).
   7. **Entrega:** con `--deliver` a OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto`, en la
      subcarpeta que corresponda (`v2/`, `kit/`, `transiciones/`…); la carpeta conserva el nombre `piloto`.
 - Reglas y detalle para agentes: skill `efeonce-graphic-line`, `references/glitch.md` (sección del editor agente).
@@ -179,7 +189,7 @@ de grabación, la prueba con los editores en una edición real, el estilo de sub
 
 | Estado | Qué significa |
 |---|---|
-| **APROBADO** (2026-09-27) | se usa como pieza final: portada A/B/C con rotación, lámina interior, noticia 1 y contraportada; también la manzana como esfera, el verde como acento, la línea Growth, el alta de los cinco íconos Plastilina, el sonido (versión B) y el motion del video (apertura y tarjeta final v2, kit de gráficos con el lower third, transiciones) con los tableros de video del canvas (vlog 16:9 y reel) |
+| **APROBADO** (2026-09-27) | se usa como pieza final: portada A/B/C con rotación, lámina interior, noticia 1 y contraportada; también la manzana como esfera, el verde como acento, la línea Growth, el alta de los cinco íconos Plastilina, el sonido (versión B), la música (tema B y cama post-punk, con el pre-roll de la intro) y el motion del video (apertura y tarjeta final v2, kit de gráficos con el lower third, transiciones) con los tableros de video del canvas (vlog 16:9 y reel) |
 | **PROPUESTA** | se puede armar para mostrarla al operador, pero no se publica como final: lente y blog. (El flujo de composición está aceptado; su automatización de piezas fijas es TASK-1923) |
 | **EXPLORACIÓN** | idea en estudio, no canon: los acentos teal y naranja del canvas, la historia 9:16 y el carrusel panorámico |
 | **Aprobado, sin publicar en AXIS** | la manzana, el verde y los cinco íconos Plastilina de Glitch están aprobados (2026-09-27), pero todavía no están en los paquetes oficiales de AXIS (TASK-1922) |
@@ -224,5 +234,5 @@ de grabación, la prueba con los editores en una edición real, el estilo de sub
 - Bloque del Glitch Drop en WordPress: [wireframe TASK-1337](../../ui/wireframes/TASK-1337-glitch-gutenberg-block.md)
 - Pipeline editorial: [ADR del pipeline de Glitch](../../architecture/GREENHOUSE_GLITCH_AGENTIC_EDITORIAL_PIPELINE_DECISION_V1.md)
 - Skill para agentes: `efeonce-graphic-line`, `references/glitch.md`
-- Video y motion: [Editar el video de Glitch](./editar-video-glitch.md) · repo taller `efeoncepro/efeonce-brand-workshop` (`tools/glitch-motion/`) · [ADR del taller](../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) · [TASK-1924](../../tasks/to-do/TASK-1924-glitch-motion-overlays-hyperframes.md)
+- Video y motion: [Editar el video de Glitch](./editar-video-glitch.md) · [Producir el motion, el sonido y la música de Glitch](./producir-motion-glitch.md) · repo taller `efeoncepro/efeonce-brand-workshop` (`tools/glitch-motion/`) · [ADR del taller](../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) · [TASK-1924](../../tasks/to-do/TASK-1924-glitch-motion-overlays-hyperframes.md)
 - AXIS (publicado): [/references/glitch/](https://axis.efeonce.org/references/glitch/), `/references/glitch.json` y `docs/agent-composition/glitch.md` de `efeoncepro/axis-design-system`

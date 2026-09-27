@@ -6,6 +6,13 @@
   `/Users/jreye/Documents/efeonce-brand-workshop`.
 - Rol: taller de producción de marca (fotografía, composición, motion de «La órbita» y de Glitch). No es un
   producto: no despliega, no tiene runtime ni clientes, no guarda binarios ni documentación gobernante.
+- Hoy aloja (al 2026-09-27, `main` = `ed89a0b`, empujado): `tools/glitch-motion` — motion, sonido y música de
+  **Glitch** (sólo Glitch), **aprobados** por el operador el 2026-09-27: apertura y tarjeta final, pre-roll de la
+  intro, kit de overlays, transiciones entre piezas y entre escenas, sonido versión B y música tema B + cama post-punk
+  (másteres por URL + sha256, nunca regenerados) — y `tools/brand-sound`, las primitivas de síntesis del sonido de
+  marca (base común del audio). Manifiestos por corrida en `corridas/`. Runbook:
+  `docs/manual-de-uso/creative/producir-motion-glitch.md`; canon en
+  `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` §13.
 - Se opera desde sesiones en `greenhouse-eo`, con sus skills; los comandos `foto:*` pasan a delegar al taller (TASK-1925).
 - Decisión: `docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md`. Converge con Globe cuando Globe reactive su generación.
 - Regla cross-repo: el taller no tiene auto-deploy; su CI (cuando exista) corre sólo en `pull_request`.

@@ -411,6 +411,7 @@ movimiento** (repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-mot
 | Prueba de los editores | abrir y montar el motion aprobado en Premiere y After Effects en una edición real, con la voz del host (incluye validar el ducking de la cama y definir qué efecto de Premiere lo aplica) |
 | Parámetro de ritmo | entradas y salidas más rápidas o más lentas sin tocar la permanencia: se puede, no está implementado |
 | Transición de bytes entre piezas | decidir a qué piezas se aplica (la recomendación es sólo tarjetas y Drop) |
+| Reel en bucle y pre-roll | decidir si el reel abre con el pre-roll o directo con la apertura: el cierre termina en el primer cuadro de la apertura (bucle exacto), no en el del pre-roll, así que con pre-roll el bucle del reel deja de ser exacto |
 | Excepción de rostros | la regla se aplica por defecto; cualquier excepción la aprueba el operador |
 | Subtítulos | el estilo de captions en Premiere no está hecho |
 | Textos reales de la #17 | titulares, medios, fotos e invitado (el archivo de ejemplo trae textos entre corchetes) |
@@ -1102,14 +1103,14 @@ pnpm -C ../efeonce-brand-workshop --filter glitch-motion <script> -- <argumentos
 | `kit` | overlays desde el archivo de edición, sus WAV, la cama y la cortina, la hoja de piezas y el animatic |
 | `transiciones` | paquete máscara + capa (3 orígenes × 2 duraciones), demos y `LEEME` |
 | `heroe` | transición héroe renderizada entre dos clips concretos |
-| `sonido` | sólo el juego de WAV, sin render de video |
+| `sonido` | sólo el juego de WAV, sin render de video, en `out/<run>/sonido-<b\|a>/` |
 | `test` | las 12 pruebas: timelines registradas, determinismo, sin red, datos de edición, pre-roll, huellas de la música y sonido completo y determinista |
 
 **Argumentos:**
 
 | Argumento | Aplica a | Valor / por defecto |
 |---|---|---|
-| `--run <id>` | todos | carpeta `out/<id>/` y `corridas/<id>/`; por defecto `<fecha>_glitch-motion` |
+| `--run <id>` | todos | carpeta `out/<id>/` y `corridas/<id>/`; por defecto `<fecha>_glitch-motion` (`render`), `_glitch-kit`, `_glitch-transiciones` o `_glitch-heroe` |
 | `--edition <n>` | `render`, `sonido` | número de la edición (por defecto 17); con otra edición, el sonido vuelve a sembrar sólo el animatic |
 | `--edition-file <json>` | `kit` | archivo de edición (por defecto `ejemplos/edicion-17.ejemplo.json`, §13.5) |
 | `--assets <carpeta>` | `kit` | imágenes de las fuentes de las noticias (**nunca** en git) |
@@ -1117,7 +1118,7 @@ pnpm -C ../efeonce-brand-workshop --filter glitch-motion <script> -- <argumentos
 | `--only a,b` | `kit` | sólo esas piezas (p. ej. `cabecera-1,drop`) |
 | `--skip-render` | `kit`, `transiciones` | reutiliza los `.mov` ya renderizados; rehace verificaciones, WAV, vistas previas y entrega |
 | `--opening-run <id>` | `kit` | corrida de la que toma apertura, tarjeta final y pre-roll para el animatic (por defecto `2026-09-27_glitch-motion-piloto-v2`) |
-| `--formats reel,vlog` | `render`, `transiciones`, `heroe` | formatos (por defecto ambos) |
+| `--formats reel,vlog` | `render`, `kit`, `transiciones`, `heroe` | formatos (por defecto ambos) |
 | `--workers <n>` | `render`, `kit`, `transiciones` | workers de HyperFrames (por defecto 2) |
 | `--deliver "<carpeta>"` | `render`, `kit`, `transiciones`, `heroe` | copia la entrega (p. ej. a OneDrive) y lo anota en el manifiesto |
 | `--a <archivo>[@seg] --b <archivo>[@seg]` | `transiciones` (demos), `heroe` | clips A y B y el segundo del corte |
