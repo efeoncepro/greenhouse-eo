@@ -54,13 +54,15 @@ grave (HubSpot y Salesforce usan la misma). Elige el archivo de tu línea; no ca
 
 ### Paso 3 · Baja el archivo
 
-1. **Página de AXIS** (cuando esté publicada): [axis.efeonce.org/references/sonic-brand](https://axis.efeonce.org/references/sonic-brand/).
+1. **Página de AXIS:** [axis.efeonce.org/references/sonic-brand](https://axis.efeonce.org/references/sonic-brand/).
    Escucha cada pieza y descárgala desde ahí.
-2. **Bucket público** (siempre disponible):
+2. **OneDrive del equipo:** `Alineación › 5. Contenidos › 13- Branding › Identidad Sonora Efeonce › v1`, con un
+   `LEEME.txt` que resume qué usar en cada caso.
+3. **Bucket público** (mismos archivos, con SHA-256 en el JSON):
    [storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/](https://storage.googleapis.com/efeonce-group-axis-public-media/sonic/v1/)
    - `masters/` → archivos para editar y entregar (en `03-motion`, WAV y MP4 en 16:9 y 9:16).
    - `web/` → MP3, MP4 a 720p y pósters WebP, para vistas previas y la web.
-3. **Si eres un agente:** lee el JSON [sonic-brand.json](https://axis.efeonce.org/references/sonic-brand.json) (esquema
+4. **Si eres un agente:** lee el JSON [sonic-brand.json](https://axis.efeonce.org/references/sonic-brand.json) (esquema
    `axis.efeonce-sonic-brand.v1`). Trae la URL, la duración, los LUFS, el pico y el SHA-256 de cada archivo; verifica
    el SHA-256 después de bajar.
 
@@ -127,7 +129,7 @@ anterior.
 
 | Problema | Causa probable | Qué hacer |
 |---|---|---|
-| La página de AXIS no carga | el PR de AXIS #4 aún no se mergea | baja los archivos desde el bucket público |
+| La página de AXIS no carga | un problema de red o del sitio | baja los archivos desde OneDrive o el bucket público |
 | La animación del logo suena con el sonido viejo | bajaste de `motion/logo/v1.1/` | usa `sonic/v1/masters/03-motion` |
 | Una pieza suena mucho más fuerte o más baja que otra | se niveló por pico | vuelve a nivelar por sonoridad al objetivo del destino |
 | Los logos Brand, Voice y Revenue miden cerca de −15 LUFS | el golpe toca el techo de pico y no se comprime | es esperado; no lo comprimas para subirlo |

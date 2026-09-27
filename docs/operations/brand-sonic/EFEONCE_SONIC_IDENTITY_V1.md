@@ -148,6 +148,7 @@ Puntos de contacto por prioridad: video y redes → podcast Glitch → eventos.
 | Recurso | Dónde | Qué es |
 |---|---|---|
 | Página de referencia | [axis.efeonce.org/references/sonic-brand](https://axis.efeonce.org/references/sonic-brand/) | La norma para personas, con reproductores. PR `efeoncepro/axis-design-system#4`, squash `55486aa`; publicado 2026-09-26 |
+| Kit para el equipo (OneDrive) | `Alineación › 5. Contenidos › 13- Branding › Identidad Sonora Efeonce › v1` | Las seis carpetas del kit y un `LEEME.txt`, junto a «Motion Órbita Efeonce» |
 | JSON para agentes | [axis.efeonce.org/references/sonic-brand.json](https://axis.efeonce.org/references/sonic-brand.json) | Esquema `axis.efeonce-sonic-brand.v1`: URL, duración, LUFS, pico y SHA-256 de cada archivo |
 | Guía para agentes | `docs/agent-composition/sonic-brand.md` en el repo AXIS | Cómo elegir y usar cada archivo |
 | Fuentes del Lab | `apps/lab/src/data/sonic-brand.ts` (criterio) y `sonic-brand-assets.ts` (generado del bucket), repo AXIS | Lo que pinta la página |
@@ -214,9 +215,18 @@ contrato algo que todavía es recomendación.
 - **Stable Audio 2.5 audio-to-audio** (`fal-ai/stable-audio-25/audio-to-audio`, USD 0,20 por pieza) conserva el
   tiempo al milisegundo (golpe final en 32,874 s contra 32,875 s de la maqueta), pero **redondea la duración a segundos
   enteros** (8,5 → 8): las maquetas se hacen de duración entera.
-- **Licencia de Stable Audio:** Stability declara uso comercial (datos licenciados); licencia comunitaria gratuita
-  hasta USD 1 millón de facturación anual y Enterprise sobre eso; fal lo marca «Commercial use». Falta confirmar con
-  legal cómo aplica vía fal.
+- **Licencias — evidencia reunida (2026-09-26, no es visto bueno legal):**
+  - Stable Audio 2.5 audio-to-audio: fal lo marca «Commercial use». Stability declara uso comercial, entrenamiento con
+    datos licenciados y que el usuario es dueño de la salida; su licencia comunitaria es gratuita hasta USD 1 millón de
+    facturación anual y exige Enterprise sobre eso.
+  - Voz ElevenLabs v3 vía fal: fal la marca «Commercial use» y su página dice «Commercial use rights included».
+  - ElevenLabs Music v2.5 no quedó en la versión final (el híbrido se descartó): su licencia no aplica.
+  - **Pregunta abierta para legal:** el FAQ de fal dice que «cada modelo tiene su propia licencia» y no aclara si el
+    umbral de USD 1 millón de Stability aplica cuando el modelo se usa vía la API de fal. Si aplica y Efeonce lo supera,
+    el registro de energía necesita licencia Enterprise de Stability o re-grabarse por otra vía. Fuentes:
+    [fal · Stable Audio 2.5](https://fal.ai/models/fal-ai/stable-audio-25/audio-to-audio) ·
+    [fal · ElevenLabs v3](https://fal.ai/models/fal-ai/elevenlabs/tts/eleven-v3) · [fal FAQ](https://fal.ai/docs/model-apis/faq) ·
+    [Stability License](https://stability.ai/license).
 - **`runFalModel` espera 120 s por defecto.** Para música, pasar un `pollTimeoutMs` mayor; un trabajo vencido se
   recupera sin volver a pagar con `awaitFalRequest` (`recuperar.ts`).
 - **El conector MCP de ElevenLabs tiene mal la credencial:** se cargó el ID de la clave, no la clave `sk_…` (error
@@ -234,6 +244,7 @@ contrato algo que todavía es recomendación.
 
 - **Glitch (podcast).** Hay dos versiones exploradas: serena, con una falla en la tercera nota, y rock, con tartamudeo
   de banda. La recomendación era intro y outro rock más cortina serena; al operador «aún no le convence».
-- **Licencias:** Stable Audio vía fal y voz de ElevenLabs.
+- **Licencias:** confirmar con legal si el umbral de USD 1 millón de Stability aplica vía fal (la evidencia reunida
+  está en [Trampas de proveedores](#trampas-de-proveedores-medidas)); la voz tiene «Commercial use rights included» en fal.
 - **Prueba de reconocimiento sin logo** antes de pautar, como la D14 de la órbita.
 - **Tokens AXIS**, reemplazo del sonido de los masters V1.1 y guía en el manual de la línea gráfica.
