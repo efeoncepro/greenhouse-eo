@@ -1,6 +1,6 @@
 # Handoff activo
 
-**AXIS 0.3.10 (27/09):** bump de Greenhouse pendiente: [runbook Delta c](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+**AXIS 0.3.14 (27/09):** publicado y fijado; [TASK-1927](docs/tasks/in-progress/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) Slice 1 hecho.
 
 **Plugin OpenAI Efeonce MCP (26/09):** [TASK-1904](docs/tasks/to-do/TASK-1904-efeonce-openai-plugin-private-distribution.md) registrada: marca, OAuth, skills e instalación privada Codex/ChatGPT sin revisión pública. TASK-1864 conserva routing/eval. Sin implementación.
 
