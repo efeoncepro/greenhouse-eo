@@ -19,7 +19,7 @@
     "muletilla": {
       "selector": "[data-slot='muletilla']",
       "type": "string",
-      "required": true,
+      "required": false,
       "constraints": {
         "maxCharacters": 18,
         "overflow": "reject",

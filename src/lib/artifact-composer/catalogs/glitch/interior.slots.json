@@ -150,6 +150,20 @@
       "required": false,
       "consumer": "validation-only",
       "example": "[]"
+    },
+    "photoLicense": {
+      "selector": "[data-gx-root]",
+      "type": "string",
+      "required": true,
+      "consumer": "validation-only",
+      "example": "generated:glitch-probe"
+    },
+    "faces": {
+      "selector": "[data-gx-root]",
+      "type": "string",
+      "required": true,
+      "consumer": "validation-only",
+      "example": "[]"
     }
   }
 }

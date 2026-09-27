@@ -116,8 +116,8 @@ export const glitchEditionManifestSchema = z
         muletilla: nonEmpty.nullable(),
         /** Titular de portada con contraste de pesos. */
         headline: glitchHeadlineSchema,
-        /** Dos líneas de portada «+ IA». */
-        lines: z.array(nonEmpty).length(2)
+        /** Dos líneas de portada «+ IA»: otras dos noticias de la edición, en seis palabras (la sección sale de la noticia). */
+        lines: z.array(z.object({ newsId: z.string(), text: nonEmpty }).strict()).length(2)
       })
       .strict(),
     news: z.array(glitchNewsSchema).length(8),
@@ -147,6 +147,7 @@ export const glitchEditionManifestSchema = z
     }
 
     ref(m.cover.newsId, ['cover', 'newsId'])
+    m.cover.lines.forEach((line, i) => ref(line.newsId, ['cover', 'lines', i, 'newsId']))
     m.cover.mosaic?.forEach((id, i) => ref(id, ['cover', 'mosaic', i]))
 
     if (m.cover.mosaic && new Set(m.cover.mosaic).size !== 4) {

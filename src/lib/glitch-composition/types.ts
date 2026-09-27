@@ -55,8 +55,27 @@ export type GlitchAssetRequest =
       path: string
       /** Tamaño exacto del hueco en px CSS; el materializador lo multiplica por el deviceScaleFactor. */
       fit: { width: number; height: number }
-      /** Duotono navy de la falla en bytes (valores del token), o `color` para el detalle de la lente. */
-      treatment: 'duotone' | 'color'
+      /** Duotono navy de la falla en bytes (valores del token). */
+      treatment: 'duotone'
+      /** Si la foto se desarma en bytes: dónde está en el lienzo y en qué lámina(s) pintar la falla. */
+      fracture?: {
+        slideIds: string[]
+        box: { x: number; y: number; w: number; h: number }
+        edge: 'bottom' | 'left' | 'right'
+        faceRegions: { x: number; y: number; w: number; h: number }[]
+        /** La tarjeta del mosaico: ninguna celda sale de ella. */
+        clip?: { x: number; y: number; w: number; h: number }
+        canvas: { width: number; height: number }
+      }
+    }
+  | {
+      ref: string
+      kind: 'lens'
+      path: string
+      /** La foto de la lámina, a su tamaño: el detalle se corta de ahí. */
+      fit: { width: number; height: number }
+      region: { x: number; y: number; w: number; h: number }
+      diameter: number
     }
 
 export interface GlitchCatalogPlan {

@@ -32,8 +32,14 @@
       "punch": "del clic."
     },
     "lines": [
-      "Marketing + IA: el buscador contesta solo",
-      "Tecnología + IA: el agente llena el formulario"
+      {
+        "newsId": "n2",
+        "text": "[Ejemplo] Campaña con video generativo"
+      },
+      {
+        "newsId": "n8",
+        "text": "[Ejemplo] El agente llena el formulario"
+      }
     ]
   },
   "news": [

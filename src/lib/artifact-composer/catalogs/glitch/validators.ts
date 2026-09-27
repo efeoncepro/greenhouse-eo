@@ -30,7 +30,7 @@ export const glitchTemplateOf = (registry: DeckRegistry, name: string): GlitchTe
 
 export const catalogMembershipValidator = (catalog: GlitchCatalogKey): CatalogSemanticValidator => ({
   name: 'glitch.catalog-membership',
-  version: 1,
+  version: '1.0.0',
   validate: (plan, { registry }) =>
     plan.slides.flatMap((slide): CatalogSemanticViolation[] => {
       const template = glitchTemplateOf(registry, slide.template)
@@ -49,7 +49,7 @@ export const catalogMembershipValidator = (catalog: GlitchCatalogKey): CatalogSe
 
 export const pieceApprovalValidator: CatalogSemanticValidator = {
   name: 'glitch.piece-approval',
-  version: 1,
+  version: '1.0.0',
   validate: (plan, { registry }) =>
     plan.slides.flatMap((slide): CatalogSemanticViolation[] =>
       glitchTemplateOf(registry, slide.template)?.approval === 'approved'

@@ -17,6 +17,7 @@ import path from 'node:path'
 import type { ArtifactCatalog, CatalogLayoutHook, CatalogSemanticValidator, OutputTarget } from '../../catalog'
 import { axisPackDir } from '../../brand-packs/axis'
 import { GLITCH_COMPILED_FILES, GLITCH_PACK_EXTENSIONS, glitchCatalogDir } from './brand'
+import { glitchEditionValidators } from './edition-validators'
 import { glitchFractureHook } from './fracture-hook'
 import { glitchResolvers } from './resolvers'
 import { catalogMembershipValidator, pieceApprovalValidator, type GlitchCatalogKey } from './validators'
@@ -24,7 +25,7 @@ import { catalogMembershipValidator, pieceApprovalValidator, type GlitchCatalogK
 export { glitchCatalogDir } from './brand'
 
 export interface GlitchCatalogOptions {
-  /** Validadores de edición que agrega el mapper (rotación, esfera única, crédito, falla sobre rostros…). */
+  /** Validadores extra del consumer (los de edición —rotación, esfera, crédito, rostros…— ya vienen siempre). */
   editionValidators?: CatalogSemanticValidator[]
   /** Hooks de maquetación (la falla en bytes), por plantilla. */
   layoutHooks?: Record<string, CatalogLayoutHook>
@@ -40,7 +41,7 @@ const create = (key: GlitchCatalogKey, outputTarget: OutputTarget, options: Glit
   outputTarget,
   resolvers: glitchResolvers(),
   layoutHooks: { ...Object.fromEntries(GLITCH_FRACTURE_TEMPLATES.map((t) => [t, glitchFractureHook])), ...options.layoutHooks },
-  semanticValidators: [catalogMembershipValidator(key), pieceApprovalValidator, ...(options.editionValidators ?? [])],
+  semanticValidators: [catalogMembershipValidator(key), pieceApprovalValidator, ...glitchEditionValidators(key), ...(options.editionValidators ?? [])],
   brand: {
     packName: 'axis',
     compiledFiles: [...GLITCH_COMPILED_FILES],
