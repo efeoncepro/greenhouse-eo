@@ -192,11 +192,11 @@
 
 <main class="page">
   <header>
-    <div class="eyebrow">Branding sonoro · ronda 4 · prototipos sin aprobar</div>
+    <div class="eyebrow">Branding sonoro · ronda 5 · prototipos sin aprobar</div>
     <h1>Tres puntos que se vuelven uno<span class="sphere" aria-hidden="true"></span></h1>
     <p class="lede">El logo sonoro traduce la gramática de <strong>La órbita</strong>: el anillo pregunta, tres notas breves piensan
       (las tres ventanas de la nave), hay una pausa y la esfera responde con golpe. Todo está en <strong>La mayor</strong>, la
-      tonalidad del motion aprobado, y sale de síntesis propia: sin muestras ni música de terceros.</p>
+      tonalidad del motion aprobado. El logo y las piezas serenas salen de síntesis propia, sin muestras; la versión rock parte de una maqueta propia re-grabada con IA.</p>
   </header>
 
   <div class="chosen" aria-label="Lo que ya elegiste">
@@ -215,6 +215,72 @@
     <div><b>Esfera · la respuesta</b><span>Una nota de campana con impacto grave. Es el único golpe.</span></div>
     <div><b>Halo · la luz</b><span>El acorde de La florece debajo y se apaga con una cola corta.</span></div>
   </div>
+
+  <section id="rock">
+    <div class="section-head">
+      <h2>Con punch: la versión rock</h2>
+      <p>Los puntos suspensivos dichos por una banda: <strong>tres golpes apagados de guitarra en Mi y el acorde abierto con bombo, platillo y bajo</strong>. A 120 BPM, la pausa entre el tercer golpe y el acorde son tres semicorcheas (0,375 s): la misma del logo aprobado. La armonía es la de la pieza serena, así que la nota La sigue sonando en cada golpe.</p>
+      <p>Cómo se hizo: una <strong>maqueta propia</strong> con el riff exacto, <strong>re-grabada con IA</strong> para que suene a banda real, y encima <strong>la esfera del sistema</strong> (campana en La y golpe grave), idéntica a la aprobada. Masterizado a −14 LUFS.</p>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-larga-sa50.mp3" aria-label="Reproducir rock, re-grabación fiel"></button>
+        <div><h3>Re-grabación fiel</h3><p>Stable Audio 2.5 a intensidad 0,5: la más cercana a la maqueta, con el riff y los tiempos intactos.</p></div>
+        <div class="meta">37 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-larga-sa70.mp3" aria-label="Reproducir rock, re-grabación libre"></button>
+        <div><h3>Re-grabación libre</h3><p>Stable Audio 2.5 a 0,7: reinterpreta más el sonido y mantiene la estructura y el golpe final al milisegundo.</p></div>
+        <div class="meta">37 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-larga-hibrido.mp3" aria-label="Reproducir rock, híbrido"></button>
+        <div><h3>Híbrido</h3><p>ElevenLabs Music v2.5 hasta la subida (la más «producida») y el final de Stable Audio. ElevenLabs no respetó el corte ni el golpe final en ningún intento.</p></div>
+        <div class="meta">37 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-larga-sa70-brian.mp3" aria-label="Reproducir rock con Brian"></button>
+        <div><h3>Re-grabación libre, con Brian</h3><p>«Growth» cae con el golpe (32,84 s y 32,875 s).</p></div>
+        <div class="meta">37 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-maqueta-larga.mp3" aria-label="Reproducir la maqueta rock"></button>
+        <div><h3>La maqueta</h3><p>Para comparar: el esqueleto sintetizado que guió a la IA.</p></div>
+        <div class="meta">37 s</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="glitch-rock">
+    <div class="section-head">
+      <h2>Glitch con punch</h2>
+      <p>La misma banda. La falla digital pasa a ser un <strong>tartamudeo de toda la banda</strong>: el tercer golpe y la caja se repiten cada vez más degradados antes del acorde. Re-grabado con Stable Audio y masterizado a −16 LUFS.</p>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-glitch-intro.mp3" aria-label="Reproducir intro de Glitch rock"></button>
+        <div><h3>Intro</h3><p>Redoble de entrada, los tres golpes, el tartamudeo y el acorde; la banda sigue dos compases y baja.</p></div>
+        <div class="meta">8 s · −16 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-glitch-cortina.mp3" aria-label="Reproducir cortina de Glitch rock"></button>
+        <div><h3>Cortina</h3><p>Los tres golpes, el tartamudeo y el acorde.</p></div>
+        <div class="meta">2 s · −16 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-glitch-outro.mp3" aria-label="Reproducir outro de Glitch rock"></button>
+        <div><h3>Outro</h3><p>Un compás de banda y la firma limpia.</p></div>
+        <div class="meta">6 s · −15 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/rock-glitch-outro-brian.mp3" aria-label="Reproducir outro de Glitch rock con Brian"></button>
+        <div><h3>Outro con Brian</h3><p>«Growth» sobre el acorde (2,84 s y 2,875 s).</p></div>
+        <div class="meta">6 s · −15 LUFS</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="round">Ronda 4 · versión serena</div>
 
   <section id="larga">
     <div class="section-head">
@@ -487,8 +553,8 @@
     </div>
     <div class="decide">
       <ol>
-        <li><b>La pieza larga:</b> ¿el carácter te sirve (sereno, minimalista) o la quieres con más energía o más brillo?</li>
-        <li><b>Glitch:</b> ¿la falla en la tercera ventana funciona como guiño o se siente como un error?</li>
+        <li><b>El rock:</b> ¿re-grabación fiel, libre o híbrido? ¿Convive con la versión serena (una para energía, otra para fondo) o la reemplaza?</li>
+        <li><b>Glitch:</b> ¿rock o sereno?</li>
       </ol>
       <p class="note"><b>Cómo se revisó.</b> La estructura, las notas, los tiempos y el volumen se verificaron con espectrogramas, medición de volumen y transcripción de las voces. Lo que no se puede medir así —si suena propio, si se recuerda, si se siente Efeonce— sólo lo decide tu oído. Con esto aprobado, lo que falta es formalizar: los valores a tokens de AXIS, la guía de identidad sonora y los formatos por red.</p>
     </div>

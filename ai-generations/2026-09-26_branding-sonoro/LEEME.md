@@ -1,6 +1,6 @@
 # Branding sonoro Efeonce — ronda 1 (2026-09-26)
 
-Estado: **ronda 4, prototipos sin aprobar** (núcleo aprobado: logo, reveal, apertura, etiquetas). Sala de escucha: https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9
+Estado: **ronda 5, prototipos sin aprobar** (núcleo aprobado: logo, reveal, apertura, etiquetas). Sala de escucha: https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9
 
 ## Decisiones del operador (2026-09-26)
 
@@ -37,6 +37,24 @@ Estado: **ronda 4, prototipos sin aprobar** (núcleo aprobado: logo, reveal, ape
   cada pieza se normaliza por sonoridad a su destino, nunca por pico.
 - Balance: la primera versión de la pieza larga tenía ~5 dB de graves de más y ~5 dB de agudos de menos contra el logo
   aprobado (bandas <200 Hz, 200 Hz–2 kHz y >2 kHz). Sigue más oscura que el logo (colchón): decisión de carácter pendiente.
+
+## Ronda 5 — versión rock (operador, 2026-09-26: «más punch, sin perder los puntos suspensivos»)
+
+- Traducción: tres golpes apagados de guitarra en Mi (las ventanas) y el acorde abierto con bombo, platillo y bajo (la
+  esfera). A 120 BPM, tres semicorcheas = 0,375 s: la misma pausa del logo.
+- Método en tres capas: (1) maqueta propia `motor/rock.mjs` (riff exacto, batería, bajo, guitarras Karplus-Strong con
+  saturación y caja, dobladas L/R); (2) re-grabación con IA vía fal (`motor/ai-music.ts`); (3) la esfera exacta encima
+  (`motor/sello.mjs`: campana La + golpe grave) y masterización (`motor/master.sh <in> <out> <LUFS> [shelf]`).
+- **Stable Audio 2.5 audio-to-audio** (`fal-ai/stable-audio-25/audio-to-audio`, USD 0,20 por pieza) conserva el tiempo al
+  milisegundo: silencio 32,00–32,25 s y golpe final en 32,874 s (maqueta 32,875). Candidatas: intensidad 0,5 y 0,7.
+- **ElevenLabs Music v3 no está en fal** (2026-09-26): lo más nuevo es `elevenlabs/music/v2.5` (USD 0,60/min), que
+  acepta `audio_reference` por tramo (`strength` low|medium|high|xhigh, ventana ≤ 30 s, líneas de texto ≤ 200 caracteres).
+  Suena más producido pero **no respeta la estructura**: con `high` y con `xhigh` se saltó el corte y el golpe final
+  (termina ~34 s), y con `xhigh` alargó la intro a 10 s. Uso posible: colchón hasta la subida (versión «híbrida»).
+- Trampas: Stable Audio **redondea la duración a segundos enteros** (8,5 → 8; 2,6 → 2): las maquetas se hacen de
+  duración entera. `runFalModel` espera 120 s por defecto; Stable Audio a 37 s necesita `pollTimeoutMs` mayor, y un
+  trabajo vencido se recupera sin volver a pagar con `motor/recuperar.ts <modelo> <requestId> <salida>`.
+- **Licencia pendiente de verificar** antes de uso comercial pagado: salidas de Stable Audio 2.5 y ElevenLabs Music vía fal.
 
 ## Concepto
 

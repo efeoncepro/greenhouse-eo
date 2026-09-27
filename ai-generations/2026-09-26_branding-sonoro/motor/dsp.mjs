@@ -13,6 +13,22 @@ export const smooth = x => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x))
 export const env = (t, a, b, c, d) => (t < a || t > d ? 0 : t < b ? smooth((t - a) / (b - a)) : t < c ? 1 : 1 - smooth((t - c) / (d - c)))
 const clamp01 = x => Math.max(0, Math.min(1, x))
 
+// Biquad RBJ sobre un arreglo (in situ). type: lowpass | highpass | peak | bandpass.
+export function biquad(x, type, f, q = 0.707, gainDb = 0) {
+  const w = (2 * Math.PI * f) / SR, cw = Math.cos(w), sw = Math.sin(w), al = sw / (2 * q), A = 10 ** (gainDb / 40)
+  let b0, b1, b2, a0, a1, a2
+  if (type === 'lowpass') { b0 = (1 - cw) / 2; b1 = 1 - cw; b2 = b0; a0 = 1 + al; a1 = -2 * cw; a2 = 1 - al }
+  else if (type === 'highpass') { b0 = (1 + cw) / 2; b1 = -(1 + cw); b2 = b0; a0 = 1 + al; a1 = -2 * cw; a2 = 1 - al }
+  else if (type === 'bandpass') { b0 = al; b1 = 0; b2 = -al; a0 = 1 + al; a1 = -2 * cw; a2 = 1 - al }
+  else { b0 = 1 + al * A; b1 = -2 * cw; b2 = 1 - al * A; a0 = 1 + al / A; a1 = -2 * cw; a2 = 1 - al / A }
+  let x1 = 0, x2 = 0, y1 = 0, y2 = 0
+  for (let i = 0; i < x.length; i++) {
+    const y = (b0 * x[i] + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2) / a0
+    x2 = x1; x1 = x[i]; y2 = y1; y1 = y; x[i] = y
+  }
+  return x
+}
+
 export function createMix({ dur, seed = 0x9e3779b9 }) {
   const N = Math.round(SR * dur)
   const dry = [new Float64Array(N), new Float64Array(N)]
@@ -126,5 +142,10 @@ export function createMix({ dur, seed = 0x9e3779b9 }) {
     writeFileSync(path, buf)
   }
 
-  return { N, I, modal, tick, tone, noise, write }
+  // Suma un bus estéreo ya procesado (p. ej. guitarras distorsionadas) a la mezcla.
+  function addStereo(L, R, sendAmt = 0.2, gain = 1) {
+    for (let i = 0; i < N; i++) { const l = L[i] * gain, r = R[i] * gain; dry[0][i] += l; dry[1][i] += r; send[0][i] += l * sendAmt; send[1][i] += r * sendAmt }
+  }
+
+  return { N, I, modal, tick, tone, noise, write, addStereo, rnd }
 }
