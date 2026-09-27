@@ -32,6 +32,17 @@ const NEGATIVE = ['vocals', 'singing', 'lyrics', 'orchestra', 'lo-fi', 'metal sc
 
 // Música de Glitch (ronda 7, sólo Glitch): dos registros del mismo ADN. Sin nostalgia: nada de chiptune, synthwave ni lo-fi.
 const GLITCH_STYLES: Record<string, string[]> = {
+  // Ronda 9 (el tema): producción real, sin sonidos de videojuego. A = experto y oscuro · B = irreverente y desafiante.
+  'tema-a': [
+    'dark cinematic electronic score, tense newsroom energy, heavy distorted analog synth bass, industrial processed percussion',
+    'precise, confident, sophisticated and restrained, tech-thriller tension, wide and deep modern mix',
+    '150 BPM half-time feel, A major tonality, no vocals, no chiptune, no video game sounds, no retro synthwave'
+  ],
+  'tema-b': [
+    'irreverent big beat, live breakbeat drums with swagger, dirty overdriven bass guitar riff, gritty distorted electric guitar stabs',
+    'provocative, cocky and confident attitude, raw and punchy, modern heavy mix with real instruments',
+    '150 BPM, A major, no vocals, no chiptune, no video game sounds, no retro synthwave'
+  ],
   pulso: [
     'minimal hypnotic electronic music, precise contemporary production in the style of Four Tet and Jon Hopkins',
     'soft round four-on-the-floor kick, plucked FM synth arpeggio, warm analog pad, crisp tuned glitchy percussion',
@@ -72,7 +83,7 @@ const main = async () => {
     const res = await runFalModel<{ audio: { url: string } }>({
       model: 'fal-ai/stable-audio-25/audio-to-audio',
       pollTimeoutMs: 400000,
-      input: { audio_url: up.url, prompt: (GLITCH_STYLES[piece.split('-')[0]] ?? (piece.startsWith('glitch') ? [...STYLE, 'glitchy electronic stutter edits, bitcrushed buffer repeats, digital artifacts as a stylistic effect'] : STYLE)).join(', '), strength, num_inference_steps: 8, guidance_scale: Number(opt('--guidance', '1')), seed: 42 }
+      input: { audio_url: up.url, prompt: (GLITCH_STYLES[piece] ?? GLITCH_STYLES[piece.split('-')[0]] ?? (piece.startsWith('glitch') ? [...STYLE, 'glitchy electronic stutter edits, bitcrushed buffer repeats, digital artifacts as a stylistic effect'] : STYLE)).join(', '), strength, num_inference_steps: 8, guidance_scale: Number(opt('--guidance', '1')), seed: 42 }
     })
     const url = res.output?.audio?.url
 
