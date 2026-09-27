@@ -6,7 +6,8 @@
 > **Tipo de documento:** ADR (decisión de marca y de composición)
 > **Estado:** **Accepted** (2026-09-27) para la existencia de la sub-línea, su alcance y las piezas aprobadas, más las
 > decisiones del [Delta 2026-09-27](#delta-2026-09-27--decisiones-del-operador) (manzana y verde, línea Growth,
-> numeración #17, glifos Plastilina) · **Proposed** (pendiente del operador) para el flujo de composición
+> numeración #17, glifos Plastilina) y el flujo de composición (aceptado por el operador el 2026-09-27; el hogar del
+> movimiento sigue abierto, ver §«Delta — flujo aceptado»)
 > **Creado:** 2026-09-27 por Claude, a pedido del operador (Julio Reyes)
 > **Última actualización:** 2026-09-27 por Claude
 > **Norma operativa:** [`GLITCH_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
@@ -72,12 +73,13 @@ contigo».
 | 5 | Mnemónico en el video de Glitch | hay que **evaluarlo y aprobarlo**; se hará una evaluación dedicada. Nada se decide todavía | **pendiente** (evaluación dedicada) |
 | 6 | Contenido del lower third del reel y del vlog | se define **junto con el operador** (sesión en curso) | **en definición con el operador** |
 | 7 | Licencia de Guttery | el operador aclaró después: «En gutery tenemos licencia» (2026-09-27) | **confirmada**; falta registrar la referencia del contrato |
-| 8 | Paso del flujo de composición de `Proposed` a `Accepted` | sin respuesta | **pendiente** |
+| 8 | Paso del flujo de composición de `Proposed` a `Accepted` | «Acéptalo si» | **aceptado** (el hogar del movimiento sigue abierto) |
 
-## Decisión propuesta — flujo de composición
+## Decisión — flujo de composición
 
-> **Estado: Proposed.** Pendiente de aprobación del operador. Hasta aceptarla no existe nada de lo que sigue: hoy las
-> piezas se arman desde el canvas.
+> **Estado: Accepted** (operador, 2026-09-27: «Acéptalo»). Hoy las piezas todavía se arman desde el canvas; el flujo
+> se construye con TASK-1922 (AXIS), TASK-1923 (Composer) y TASK-1924 (movimiento). **El hogar del movimiento
+> (punto 4) queda abierto:** ver §«Delta — flujo aceptado».
 
 Objetivo: **que ningún agente reinterprete la línea.** Los agentes llenan datos; nunca eligen coordenadas ni plantilla a
 mano.
@@ -148,6 +150,23 @@ Se revisó el motor (`src/lib/artifact-composer/catalog.ts`, `compose.ts`, `cont
 | d | Callout v2 en el bloque de WordPress `efeoncepro/glitch-drop` | aprobación del callout v2 |
 | e | Alta de los 5 glifos Plastilina en AXIS | — (aprobada el 2026-09-27) |
 | f | Licencia de Guttery | confirmada por el operador (2026-09-27); falta registrar la referencia del contrato de licencia |
+
+## Delta — flujo aceptado, hogar del movimiento y Marketing Studio (2026-09-27)
+
+- **Flujo aceptado** por el operador. Los estáticos se componen en el Artifact Composer de Greenhouse (TASK-1923: el
+  motor y su ruta productiva viven aquí; los catálogos son datos).
+- **Hogar del movimiento: abierto.** El operador no quiere cargar Greenhouse con producción de video fuera de su scope,
+  y cuestionó AXIS porque es el design system vivo. Hay una decisión previa que aplica: el 2026-07-11 la producción de
+  video con HyperFrames que se proponía dentro de Greenhouse
+  ([Creative Video Studio](./GREENHOUSE_CREATIVE_VIDEO_STUDIO_V1.md), superseded) se reasignó a **Efeonce Creative
+  Studio (Globe)**, la plataforma hermana que produce y gobierna piezas. Por eso la recomendación es: **AXIS define**
+  (tokens `glitchLine.motion`, contrato, spec de movimiento; nada de render por edición), **Globe produce** (capability de
+  render de plantillas de movimiento, con Efeonce como organización cliente) y **Marketing Studio registra**. Mientras
+  el operador decide, el prototipo de HyperFrames (apertura y tarjeta final) se hace fuera de los repos, como material
+  para aprobar.
+- **Seguimiento Marketing Studio (aceptado):** cada edición renderizada —el PDF del carrusel, los PNG y los clips— se
+  registra en Marketing Studio como piezas con versión en el calendario orgánico, por su API `/api/v1` o su tool MCP.
+  Marketing Studio no produce piezas: las registra (su arquitectura §1). Queda como follow-up de TASK-1923 y TASK-1924.
 
 ## Alternativas descartadas
 

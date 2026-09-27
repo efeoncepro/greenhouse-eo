@@ -746,6 +746,7 @@ Sin producción en esta task (repo-only, no production runtime impact). Verifica
 
 ## Follow-ups
 
+- **Registro en Marketing Studio (aceptado por el operador, 2026-09-27):** cada edición compuesta —PDF del carrusel y PNG— se registra como piezas con versión en el calendario orgánico de Marketing Studio vía `/api/v1` o su tool MCP. Marketing Studio registra; no produce.
 - Ruta productiva de Glitch (command, endpoint, capability con grant, consumer del `artifact-worker`, asset con
   procedencia, tool MCP, flag): sumarla a TASK-1921 si su dueño de dominio lo admite, o abrir una task nueva de EPIC-031.
 - Adapter del dominio de ediciones de TASK-1442 → `GlitchEditionManifest` cuando ese dominio exista.

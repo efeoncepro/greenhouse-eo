@@ -179,7 +179,10 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
 
 Una PROPUESTA no se entrega como canon ni se publica: se muestra al operador para aprobar.
 
-## 9. Flujo de composición propuesto — PROPUESTA (ADR pendiente de aceptación)
+## 9. Flujo de composición — ACEPTADO (2026-09-27; hogar del movimiento abierto)
+
+**Aceptado por el operador el 2026-09-27.** Hogar del movimiento abierto (recomendación: Globe produce, AXIS define,
+Marketing Studio registra; ver el Delta del ADR). Seguimiento: cada edición se registra en Marketing Studio.
 
 Objetivo: que ningún agente reinterprete. **Los agentes llenan datos; nunca eligen coordenadas ni plantilla a mano.**
 

@@ -14,7 +14,7 @@
 > **Decisión:** [ADR `GLITCH_GRAPHIC_LINE_DECISION_V1`](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
 > (sub-línea y piezas aprobadas: `Accepted`; decisiones del operador del 2026-09-27 —manzana y verde, línea Growth,
 > numeración #17, glifos Plastilina—: `Accepted`, ver su [Delta 2026-09-27](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--decisiones-del-operador);
-> flujo de composición: `Proposed`)
+> flujo de composición: `Accepted` el 2026-09-27; hogar del movimiento abierto)
 > **Línea madre:** [Línea gráfica Efeonce «La órbita»](../EFEONCE_GRAPHIC_LINE_V1.md) · [índice de la carpeta](../README.md)
 > **Canvas de referencia (privado):** [«Glitch en La órbita»](https://claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS)
 > **Valores en AXIS:** página del Lab `/references/glitch/` y gemelo JSON `/references/glitch.json` del repo
@@ -343,7 +343,7 @@ la manzana y el verde (aprobados; falta el token en AXIS, TASK-1922), la línea 
 | Mnemónico del video | evaluarlo y aprobarlo (evaluación dedicada) |
 | Lower third | definir su contenido junto con el operador (en definición) |
 | Guttery | licencia para web y video **confirmada por el operador (2026-09-27)** |
-| Flujo de composición | pasar el ADR de `Proposed` a `Accepted` (sus tasks ya existen: TASK-1922, TASK-1923, TASK-1924) |
+| Hogar del movimiento | decidir dónde vive el render de HyperFrames (recomendación: Globe produce, AXIS define, Marketing Studio registra) |
 
 ---
 

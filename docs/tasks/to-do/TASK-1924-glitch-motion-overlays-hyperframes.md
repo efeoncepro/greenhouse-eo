@@ -604,6 +604,8 @@ Sin runtime de producción (repo-only, no production runtime impact). Verificaci
 
 ## Follow-ups
 
+- **Registro en Marketing Studio (aceptado por el operador, 2026-09-27):** los clips de cada edición se registran como piezas con versión en el calendario orgánico de Marketing Studio.
+- **Hogar del movimiento (abierto, 2026-09-27):** el operador no quiere el render de HyperFrames en Greenhouse y cuestionó AXIS; la recomendación en el ADR de Glitch es que Globe (Efeonce Creative Studio) produzca, AXIS defina los valores y Marketing Studio registre. Esta task se reubica cuando el operador decida.
 - Plantillas MOGRT de Premiere si el editor necesita editar texto en su programa.
 - Ruta productiva gobernada del render de video (Efeonce Creative Studio / Globe, o un consumer análogo a TASK-1921).
 - Pista del mnemónico de Glitch cuando la identidad sonora lo decida.
