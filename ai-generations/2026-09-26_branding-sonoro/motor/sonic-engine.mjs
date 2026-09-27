@@ -4,7 +4,7 @@
 // Síntesis determinística, sin muestras ni modelos de terceros (misma doctrina que
 // scripts/creative/brand-motion/orbit-sound.mjs, cuyas capas de SFX se reutilizan para el sting).
 //
-//   node sonic-engine.mjs --territory puntos|pregunta|orbita --mode logo|sting|reveal [--line growth|brand|engine|voice|revenue]
+//   node sonic-engine.mjs --territory puntos|pregunta|orbita --mode logo|sting|reveal|open [--line growth|brand|engine|voice|revenue]
 //     [--timbre <instrumento de la esfera>] [--bloom <s>] --out <file.wav>
 //
 // Gramática: el anillo (acorde abierto) pregunta · tres notas breves = las tres ventanas, lo que se piensa ·
@@ -39,7 +39,10 @@ const TIMING = {
   logo: { dur: 2.9, ring: 0.0, dots: [0.3, 0.44, 0.58], sphere: 0.95, bloom: 1.0 },
   sting: { dur: 2.2, ring: 0.0, dots: [0.16, 0.28, 0.4], sphere: 0.58, bloom: 1.25 },
   // reveal: calza con pieces.reveal V1.1 (nave 1250–1900, impacto 1870, letras 2350, eslogan 2650–3050) + 1 s de cuadro final.
-  reveal: { dur: 4.6, ring: 0.0, dots: [1.42, 1.54, 1.66], sphere: 1.87, bloom: 2.75 }
+  reveal: { dur: 4.6, ring: 0.0, dots: [1.42, 1.54, 1.66], sphere: 1.87, bloom: 2.75 },
+  // open (apertura): calza con pieces.open V1.1 (letras se recogen 150–450, retroceso 1000–1150, lanzamiento 1150,
+  // el arco se abre 1650–2250, nace la esfera 2150). Termina en el anillo abierto: el video sigue.
+  open: { dur: 3.4, ring: 1.6, ringAfter: true, dots: [0.62, 0.74, 0.86], sphere: 1.15, bloom: null }
 }[mode]
 if (!TIMING) throw new Error(`modo desconocido: ${mode}`)
 if (args.includes('--bloom')) TIMING.bloom = Number(opt('--bloom'))
@@ -203,7 +206,12 @@ const impact = (t0, level = -8) => {
 const { dots, sphere } = T
 
 // El anillo: acorde abierto (quinta), sostenido y tenue. Pregunta, no resuelve.
-for (const [n, lv] of [['A2', -34], ['E3', -34], ['A3', -35], ['E4', -38]]) {
+if (TIMING.ringAfter) {
+  // Apertura: el anillo se abre DESPUÉS de la esfera y queda sonando (la pregunta vuelve a abrirse).
+  for (const [n, lv] of [['A2', -32], ['E3', -32], ['A3', -34], ['E4', -36], ['B4', -40]]) {
+    addTone({ t0: TIMING.ring, t1: TIMING.dur, freq: () => hz(N_[n]), partials: [[1, 1], [2, 0.15], [3, 0.05]], gain: t => db(lv) * env(t, TIMING.ring, TIMING.ring + 0.6, TIMING.dur - 0.5, TIMING.dur), pan: () => 0 })
+  }
+} else for (const [n, lv] of [['A2', -34], ['E3', -34], ['A3', -35], ['E4', -38]]) {
   addTone({ t0: TIMING.ring, t1: TIMING.sphere + 0.05, freq: () => hz(N_[n]), partials: [[1, 1], [2, 0.15], [3, 0.05]], gain: t => db(lv) * env(t, TIMING.ring, TIMING.ring + 0.25, TIMING.sphere - 0.12, TIMING.sphere + 0.05), pan: () => 0 })
 }
 
@@ -215,7 +223,7 @@ impact(TIMING.sphere, mode === 'sting' ? -6 : -9)
 INSTR[SPHERE_TIMBRE](TIMING.sphere + 0.004, hz(N_[sphere]), -8, 0)
 
 // El halo: el acorde de La florece suave bajo la esfera (misma resolución que el motion aprobado).
-for (const [n, lv] of [['A4', -30], ['Cs5', -33], ['E5', -33], ['A5', -36]]) {
+if (TIMING.bloom != null) for (const [n, lv] of [['A4', -30], ['Cs5', -33], ['E5', -33], ['A5', -36]]) {
   modal({ t0: TIMING.bloom, f: hz(N_[n]), level: lv, partials: [[1, 1, 1.3], [2.01, 0.2, 2.5]], attack: 0.06, sendAmt: 0.6, len: 2.5 })
 }
 
@@ -227,6 +235,18 @@ if (mode === 'reveal') {
   addTone({ t0: 0.75, t1: 1.5, freq: t => 150 + 75 * smooth((t - 0.8) / 0.6), partials: [[1, 1], [1.5, 0.5], [2, 0.2]], gain: t => db(-27) * env(t, 0.8, 1.2, 1.3, 1.5) })
   whoosh(1.2, 1.95, 1.75, -13, t => -0.9 + 0.9 * smooth((t - 1.25) / 0.6))
   whoosh(2.05, 2.8, 2.25, -21, () => 0)
+}
+
+if (mode === 'open') {
+  // Capas de la apertura aprobada: las letras se recogen (aire que se cierra), la cámara vuelve, el retroceso
+  // (tensión corta), el lanzamiento a la derecha, el giro de vuelta y el arco que se abre. La esfera renace suave.
+  addNoise({ t0: 0.12, t1: 0.5, cutoff: t => 3200 - 2400 * smooth((t - 0.12) / 0.35), q: 1.1, gain: t => db(-26) * env(t, 0.12, 0.35, 0.4, 0.5), pan: () => 0 })
+  whoosh(0.35, 1.0, 0.6, -22, () => 0)
+  addTone({ t0: 0.98, t1: 1.16, freq: t => 300 + 500 * smooth((t - 0.98) / 0.17), partials: [[1, 1], [2, 0.3]], gain: t => db(-30) * env(t, 0.98, 1.1, 1.14, 1.16) })
+  whoosh(1.15, 1.75, 1.35, -11, t => 0.9 * smooth((t - 1.15) / 0.45))
+  addTone({ t0: 1.25, t1: 1.95, freq: t => 230 - 70 * smooth((t - 1.25) / 0.6), partials: [[1, 1], [1.5, 0.4], [2, 0.15]], gain: t => db(-29) * env(t, 1.25, 1.5, 1.7, 1.95) })
+  addTone({ t0: 1.65, t1: 2.3, freq: t => 520 + 140 * smooth((t - 1.65) / 0.6), partials: [[1, 1], [2, 0.12]], gain: t => db(-32) * env(t, 1.65, 1.8, 2.1, 2.3) })
+  modal({ t0: 2.15, f: hz(N_.A5), level: -26, partials: [[1, 1, 3], [2.01, 0.3, 5]], sendAmt: 0.6, len: 1.2 })
 }
 
 if (mode === 'sting') {

@@ -1,6 +1,6 @@
 # Branding sonoro Efeonce — ronda 1 (2026-09-26)
 
-Estado: **ronda 2, prototipos sin aprobar**. Sala de escucha: https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9
+Estado: **ronda 3, prototipos sin aprobar**. Sala de escucha: https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9
 
 ## Decisiones del operador (2026-09-26)
 
@@ -15,6 +15,15 @@ Estado: **ronda 2, prototipos sin aprobar**. Sala de escucha: https://claude.ai/
 - Pidió escucharlo en el **reveal**: `--mode reveal` calza con `pieces.reveal` V1.1 (tres notas en 1,42/1,54/1,66 s,
   esfera con el golpe a 1,87 s, acorde a 2,75 s). Versión con Brian: `--bloom 3.08` y la voz desplazada 2,09 s para
   que «Growth» y el acorde caigan cuando termina de entrar el eslogan.
+
+## Elecciones de la ronda 2 (operador, 2026-09-26)
+
+- **Voice = `eco`** (cuerda y pulso descartados). Es el default de `--line voice` en el motor.
+- **Reveal: se quedan las dos versiones**, con voz y sin voz, según el contexto.
+- Ronda 3: **apertura** (`--mode open`: tres notas mientras se recogen las letras, esfera con el lanzamiento a 1,15 s,
+  termina en el anillo abierto) y **etiquetas de las cinco líneas con Brian**. Las tomas se igualaron en ritmo: pausa
+  «Empower»→«your» a 0,14 s recortando sólo el silencio (Brian la alargaba hasta 0,28 s en Engine, Voice y Revenue;
+  subir la estabilidad a 0,8 no bastó). Tomas elegidas y palabra final en `voz/final/` (`onsets.json`).
 
 ## Concepto
 

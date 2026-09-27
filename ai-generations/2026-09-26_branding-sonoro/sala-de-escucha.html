@@ -191,7 +191,7 @@
 
 <main class="page">
   <header>
-    <div class="eyebrow">Branding sonoro · ronda 2 · prototipos sin aprobar</div>
+    <div class="eyebrow">Branding sonoro · ronda 3 · prototipos sin aprobar</div>
     <h1>Tres puntos que se vuelven uno<span class="sphere" aria-hidden="true"></span></h1>
     <p class="lede">El logo sonoro traduce la gramática de <strong>La órbita</strong>: el anillo pregunta, tres notas breves piensan
       (las tres ventanas de la nave), hay una pausa y la esfera responde con golpe. Todo está en <strong>La mayor</strong>, la
@@ -202,7 +202,8 @@
     <span>Territorio <b>Puntos suspensivos</b></span>
     <span>Voz <b>Brian</b></span>
     <span>Acento por línea <b>se queda</b></span>
-    <span>Voice <b>nuevo timbre</b></span>
+    <span>Voice <b>Eco</b></span>
+    <span>Reveal <b>con y sin voz</b></span>
   </div>
 
   <div class="grammar" aria-label="Cómo se traduce la línea gráfica a sonido">
@@ -212,9 +213,58 @@
     <div><b>Halo · la luz</b><span>El acorde de La florece debajo y se apaga con una cola corta.</span></div>
   </div>
 
+  <section id="apertura">
+    <div class="section-head">
+      <h2>En la apertura</h2>
+      <p>La apertura cuenta la historia al revés: el logo se abre y vuelve a ser línea. Las tres notas suenan mientras las letras se recogen, la pausa cae en el retroceso de la nave y la esfera, con el golpe del lanzamiento, a los 1,15 s. Termina en el anillo abierto, sin resolver, porque después empieza el video.</p>
+    </div>
+    <div class="videos two">
+      <figure>
+        <video controls preload="metadata" playsinline src="audio/apertura-puntos.mp4"></video>
+        <figcaption><b>Apertura</b> · 2,4 s más un segundo de cuadro final</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="etiquetas">
+    <div class="section-head">
+      <h2>La etiqueta de cada línea, con Brian</h2>
+      <p>La misma melodía, la esfera con el timbre de su línea y el golpe sobre la palabra final. Las tomas se igualaron en ritmo: la pausa entre «Empower» y «your» mide 0,14 s en las cinco (Brian la alargaba hasta 0,28 s en algunas), recortada sólo en el silencio.</p>
+    </div>
+    <div class="list">
+      <div class="row" style="--line: var(--growth)">
+        <button class="orbit" data-src="audio/cierre-linea-growth.mp3" aria-label="Reproducir Empower your Growth"></button>
+        <div><span class="chip">Empower your Growth</span><p>Campana.</p></div>
+        <div class="meta">−13,2 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--brand)">
+        <button class="orbit" data-src="audio/cierre-linea-brand.mp3" aria-label="Reproducir Empower your Brand"></button>
+        <div><span class="chip">Empower your Brand</span><p>Marimba.</p></div>
+        <div class="meta">−12,6 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--engine)">
+        <button class="orbit" data-src="audio/cierre-linea-engine.mp3" aria-label="Reproducir Empower your Engine"></button>
+        <div><span class="chip">Empower your Engine</span><p>FM sintético.</p></div>
+        <div class="meta">−12,3 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--voice)">
+        <button class="orbit" data-src="audio/cierre-linea-voice.mp3" aria-label="Reproducir Empower your Voice"></button>
+        <div><span class="chip">Empower your Voice</span><p>Eco.</p></div>
+        <div class="meta">−12,9 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--revenue)">
+        <button class="orbit" data-src="audio/cierre-linea-revenue.mp3" aria-label="Reproducir Empower your Revenue"></button>
+        <div><span class="chip">Empower your Revenue</span><p>Campana grave.</p></div>
+        <div class="meta">−13,0 LUFS</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="round">Ronda 2</div>
+
   <section id="reveal">
     <div class="section-head">
-      <h2>En el reveal</h2>
+      <h2>En el reveal<span class="status">Se quedan las dos</span></h2>
       <p>El video V1.1 no cambia. Las tres notas suenan mientras entra la nave y la esfera cae con el golpe del encaje, a los 1,87 s. Se conservan el aire de la línea, el arco que sube, el giro y la cámara del sonido aprobado; la campanilla del planeta la reemplazan las tres ventanas. Se agregó un segundo de cuadro final para oír la cola.</p>
     </div>
     <div class="videos two">
@@ -237,17 +287,17 @@
     <div class="list">
       <div class="row" style="--line: var(--voice)">
         <button class="orbit" data-src="audio/ronda2-voice-eco.mp3" aria-label="Reproducir Voice, eco"></button>
-        <div><h3>Eco</h3><p>La esfera suena y se repite cuatro veces de lado a lado, cada vez más lejos: el mensaje que se propaga.</p></div>
+        <div><h3>Eco<span class="status">Elegido</span></h3><p>La esfera suena y se repite cuatro veces de lado a lado, cada vez más lejos: el mensaje que se propaga.</p></div>
         <div class="meta">−15,0 LUFS</div>
       </div>
       <div class="row" style="--line: var(--voice)">
         <button class="orbit" data-src="audio/ronda2-voice-cuerda.mp3" aria-label="Reproducir Voice, cuerda"></button>
-        <div><h3>Cuerda pulsada</h3><p>Una cuerda tocada, cercana: la voz de quien cuenta algo. Afinada exacto en La.</p></div>
+        <div><h3>Cuerda pulsada<span class="status off">Descartada</span></h3><p>Una cuerda tocada, cercana: la voz de quien cuenta algo. Afinada exacto en La.</p></div>
         <div class="meta">−15,2 LUFS</div>
       </div>
       <div class="row" style="--line: var(--voice)">
         <button class="orbit" data-src="audio/ronda2-voice-pulso.mp3" aria-label="Reproducir Voice, pulso"></button>
-        <div><h3>Pulso</h3><p>La nota vibra con un trémolo de 6 Hz, como una señal que se transmite.</p></div>
+        <div><h3>Pulso<span class="status off">Descartado</span></h3><p>La nota vibra con un trémolo de 6 Hz, como una señal que se transmite.</p></div>
         <div class="meta">−14,4 LUFS</div>
       </div>
     </div>
@@ -384,10 +434,10 @@
     </div>
     <div class="decide">
       <ol>
-        <li><b>El reveal:</b> ¿con voz, sin voz o las dos según el uso? Y si algo del sonido aprobado que conservé sobra.</li>
-        <li><b>Voice:</b> eco, cuerda o pulso.</li>
+        <li><b>La apertura:</b> ¿funciona terminar en el anillo abierto, o prefieres que también resuelva?</li>
+        <li><b>Las cinco etiquetas:</b> ¿algún timbre o toma de Brian que no calce con su línea?</li>
       </ol>
-      <p class="note"><b>Cómo se revisó.</b> La estructura, las notas, los tiempos y el volumen se verificaron con espectrogramas, medición de volumen y transcripción de las voces. Lo que no se puede medir así —si suena propio, si se recuerda, si se siente Efeonce— sólo lo decide tu oído. Después siguen la apertura, las etiquetas con voz de las cinco líneas, la pieza larga y las cortinillas para Glitch.</p>
+      <p class="note"><b>Cómo se revisó.</b> La estructura, las notas, los tiempos y el volumen se verificaron con espectrogramas, medición de volumen y transcripción de las voces. Lo que no se puede medir así —si suena propio, si se recuerda, si se siente Efeonce— sólo lo decide tu oído. Después siguen la pieza larga (30–60 s) sobre el motivo y las cortinillas para Glitch.</p>
     </div>
   </section>
 </main>
