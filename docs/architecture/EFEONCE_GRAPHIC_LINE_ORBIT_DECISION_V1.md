@@ -3,7 +3,7 @@
 > **Tipo de documento:** ADR (decisión de marca y sistema de diseño)
 > **Estado:** Accepted (2026-09-25) — canonizada en AXIS; atribución sin logo sin medir
 > **Creado:** 2026-09-25 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude (delta: oficio, 30 glifos nuevos, D25; antes, el mismo día: Plastilina en volumen, D24). Antes, 2026-09-26 (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1; delta (d): lenguaje de movimiento como norma y `efeonceGraphicLine.motion` en `axis-tokens` 0.3.3; delta (e): decisiones del operador D1–D15 sobre contraste, logo en la órbita, halo, anillo de la esfera, convergencia con la foto y operación)
+> **Última actualización:** 2026-09-27 por Claude (delta: IA, social y staff, 19 glifos nuevos, D26; antes, el mismo día: oficio, 30 glifos nuevos, D25; antes, el mismo día: Plastilina en volumen, D24). Antes, 2026-09-26 (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1; delta (d): lenguaje de movimiento como norma y `efeonceGraphicLine.motion` en `axis-tokens` 0.3.3; delta (e): decisiones del operador D1–D15 sobre contraste, logo en la órbita, halo, anillo de la esfera, convergencia con la foto y operación)
 > **Manual canónico:** [`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
 > **Entregable:** [`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](../operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf)
 > **Sistema de diseño:** AXIS, página `references/graphic-line` en `axis.efeonce.org` y tokens `efeonceGraphicLine`
@@ -227,11 +227,33 @@ varita, taza, lámpara, trofeo, estrella), estos también en volumen (D24). El s
   encuadre es composición y formatos, no recorte; presentación convive con la keynote de ejemplo, que queda sólo como
   ejemplo del método. Lista completa en la guía de AXIS y en la skill (`references/iconography.md` §13).
 
-**Dónde vive:** AXIS main (2026-09-27) — `ICON_CATALOG` en `@efeoncepro/axis-graphic-line` **0.5.0** y los volúmenes en
+**Dónde vive:** AXIS main@cf77452 (2026-09-27) — `ICON_CATALOG` en `@efeoncepro/axis-graphic-line` **0.5.0** y los volúmenes en
 `@efeoncepro/axis-brand-assets` **0.3.3**, publicados con el tag `v0.5.0` (`axis-tokens` sigue en 0.3.7); guía
 `docs/agent-composition/iconography.md` §«Catálogo aprobado»; ADR de AXIS, delta «Oficio: 30 glifos nuevos (D25)»; el
-Lab `/references/iconography/` muestra los 60 del catálogo y los 33 volúmenes. Greenhouse todavía fija
-`axis-graphic-line` 0.4.0 y `axis-brand-assets` 0.3.2.
+Lab `/references/iconography/` mostró entonces los 60 del catálogo y los 33 volúmenes. (Greenhouse fijó 0.5.0 y 0.3.3
+ese día; hoy fija las versiones de D26.)
+
+### Delta 2026-09-27 — IA, social y staff: 19 glifos nuevos (D26)
+
+El operador aprobó (D26) **19 íconos de IA, social y staff**: «Subelos todos a excepción del hoodie de trazo que no
+parece un hoodie». **9 de Trazo** (ia, composer, buscador, influencer, prensa, social, multimedia, assets y
+staff-gorra, rótulo «Staff») y **10 de Plastilina** (chispa, prompt, barra-busqueda, aro-de-luz, television, like
+«Me gusta», galeria, biblioteca «Biblioteca de assets», hoodie «Hoodie Efeonce» y gorra «Gorra Efeonce»), cada uno con
+su volumen. El Trazo del hoodie (`staff-hoodie`) **no entró**: no se leía como hoodie, y el hoodie existe sólo en
+Plastilina. El set queda en **36 Trazo + 43 Plastilina = 79 glifos**, con 43 PNG de volumen.
+
+- **Una clave por voz para cada concepto:** ia/chispa, composer/prompt, buscador/barra-busqueda,
+  influencer/aro-de-luz, prensa/television, social/like, multimedia/galeria, assets/biblioteca, staff-gorra/gorra.
+- **Sin terceros ni logos dibujados:** ninguno imita la interfaz ni el logo de un asistente de terceros (ChatGPT,
+  Gemini); hoodie y gorra van sin logo, y la marca la pone la esfera (en la capucha y en el panel frontal).
+- **Notas de uso:** influencer (Trazo) al responder se parece a talent, no van juntos; chispa no va con estrella ni
+  varita; galería y biblioteca se usan separados; prompt es el más débil a 32 px.
+
+**Dónde vive:** AXIS main@cf77452 (2026-09-27) — `ICON_CATALOG` en `@efeoncepro/axis-graphic-line` **0.6.0** y los volúmenes
+en `@efeoncepro/axis-brand-assets` **0.3.4**, publicados con el tag `v0.6.0` (`axis-tokens` va en 0.3.8, publicado por
+otra sesión con superficies, y no cambia por D26); guía `docs/agent-composition/iconography.md` §«Catálogo aprobado»;
+ADR de AXIS, delta «IA, social y staff: 19 glifos nuevos (D26)»; el Lab muestra los 79 y los 43 volúmenes. Greenhouse
+fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 
 ## Alternativas descartadas
 

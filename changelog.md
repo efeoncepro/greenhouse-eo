@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-27 — Iconografía: IA, social y staff (D26)
+
+El operador aprobó 19 íconos nuevos de la línea gráfica («Subelos todos a excepción del hoodie de trazo que no parece
+un hoodie»): 9 de Trazo (ia, composer, buscador, influencer, prensa, social, multimedia, assets, staff-gorra) y 10 de
+Plastilina con su volumen (chispa, prompt, barra-busqueda, aro-de-luz, television, like, galeria, biblioteca, hoodie,
+gorra). El Trazo `staff-hoodie` no entró. El set queda en 36 Trazo + 43 Plastilina = 79 glifos y 43 volúmenes, publicados
+en AXIS con el tag `v0.6.0` (`axis-graphic-line` 0.6.0, `axis-brand-assets` 0.3.4); Greenhouse fija axis-graphic-line
+0.6.0 y axis-brand-assets 0.3.4. Documentado en el ADR (delta D26), el manual §14, la doc funcional 1.11, el manual de
+uso 1.9 y las skills `efeonce-graphic-line` y `axis-design-system`.
+
 ## 2026-09-27 — «La órbita» por superficie en el Artifact Composer (TASK-1919) y `foto:isotipo` (TASK-1920)
 
 Las 20 recetas aprobadas de la línea gráfica por superficie son plantillas del Artifact Composer en tres catálogos

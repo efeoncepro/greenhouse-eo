@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita · V1
 
 > **Tipo de documento:** Manual de marca (contrato operativo de diseño)
-> **Versión:** 1.10
+> **Versión:** 1.11
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
-> **Última actualización:** 2026-09-27 por Claude (oficio, D25: §14 y §14.1, 30 íconos nuevos, set en 27 Trazo + 33 Plastilina = 60 y 33 volúmenes; `axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3, publicados con el tag `v0.5.0`. Antes, el mismo día: Plastilina en volumen, D24: §14.1, tercera capa de la iconografía, canónica en AXIS `main` con `axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, publicados con el tag `v0.3.7`; Greenhouse ya fija esas versiones (commit `f3f93c926`). Antes, el mismo día: composición por superficie: §10.0 nueva, que apunta a la norma [`EFEONCE_SURFACE_COMPOSITION_V1.md`](./EFEONCE_SURFACE_COMPOSITION_V1.md), al contrato AXIS `efeonce.surface-composition` 0.1.0 y al canvas por superficie; §10.1 remite a ella. Antes, el 2026-09-26: iconografía canónica, Trazo y Plastilina, D16–D22: §14. Antes, el mismo día: decisiones del operador D1–D15 del 2026-09-26: contraste del acento y magenta de Revenue-HubSpot, §2; «Growth» en el acento en el cierre del deck, §5 y §10.1; logo dentro de la órbita sólo en cierres de marca, §8.2, §8.3, §10.1, §10.3 y §10.6; un solo anillo en el banner de LinkedIn y el fondo de Teams, §1.3; halo a la mitad sobre papel y anillo de la esfera sólo «en vivo», §1.3; umbral de la burbuja 4,5:1, §8.5; reglas P1–P12 y conflictos P-1..P-9 resueltos, §9 y §9.1; firma de equipo para `people@`, §10.2; impresión, prueba sin logo, banco de pares y revisión legal, §4, §1.4 y §12. Antes, el mismo día: §9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
+> **Última actualización:** 2026-09-27 por Claude (IA, social y staff, D26: §14 y §14.1, 19 íconos nuevos, set en 36 Trazo + 43 Plastilina = 79 y 43 volúmenes; `axis-graphic-line` 0.6.0 y `axis-brand-assets` 0.3.4, publicados con el tag `v0.6.0`; Greenhouse fija esas versiones. Antes, el mismo día: oficio, D25: §14 y §14.1, 30 íconos nuevos, set en 27 Trazo + 33 Plastilina = 60 y 33 volúmenes; `axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3, publicados con el tag `v0.5.0`. Antes, el mismo día: Plastilina en volumen, D24: §14.1, tercera capa de la iconografía, canónica en AXIS `main` con `axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, publicados con el tag `v0.3.7`; Greenhouse ya fija esas versiones (commit `f3f93c926`). Antes, el mismo día: composición por superficie: §10.0 nueva, que apunta a la norma [`EFEONCE_SURFACE_COMPOSITION_V1.md`](./EFEONCE_SURFACE_COMPOSITION_V1.md), al contrato AXIS `efeonce.surface-composition` 0.1.0 y al canvas por superficie; §10.1 remite a ella. Antes, el 2026-09-26: iconografía canónica, Trazo y Plastilina, D16–D22: §14. Antes, el mismo día: decisiones del operador D1–D15 del 2026-09-26: contraste del acento y magenta de Revenue-HubSpot, §2; «Growth» en el acento en el cierre del deck, §5 y §10.1; logo dentro de la órbita sólo en cierres de marca, §8.2, §8.3, §10.1, §10.3 y §10.6; un solo anillo en el banner de LinkedIn y el fondo de Teams, §1.3; halo a la mitad sobre papel y anillo de la esfera sólo «en vivo», §1.3; umbral de la burbuja 4,5:1, §8.5; reglas P1–P12 y conflictos P-1..P-9 resueltos, §9 y §9.1; firma de equipo para `people@`, §10.2; impresión, prueba sin logo, banco de pares y revisión legal, §4, §1.4 y §12. Antes, el mismo día: §9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
 > **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
 > **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (40 láminas, siete capítulos)
 > **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Desde AXIS 0.2.7 los archivos oficiales (logo e isotipo de las cuatro marcas y las tres burbujas URL) viven en el paquete `@efeoncepro/axis-brand-assets`; desde AXIS 0.3.0 el contrato de composición es `efeonce.graphic-line-orbit` 0.3.0 (`stable`) y el paquete `@efeoncepro/axis-graphic-line` 0.3.1 pinta la órbita, sus recetas y su movimiento (§13). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
@@ -908,23 +908,38 @@ La línea tiene su propia iconografía, canónica desde el 2026-09-26 (D16–D22
 **Dónde vive:** AXIS es la fuente de verdad — tokens `efeonceGraphicLine.icons`, el paquete
 `@efeoncepro/axis-graphic-line/icons` (`resolveIcon`, `auditIconGroup`, `skewedOrbitHeroSvg`), los comandos
 `pnpm icons:export|check|vectorize`, la página [axis.efeonce.org/references/iconography](https://axis.efeonce.org/references/iconography/)
-y la guía `docs/agent-composition/iconography.md` del repositorio de AXIS. Estado: publicado el 2026-09-26 con el
-tag `v0.3.6` (tokens 0.3.6, `axis-graphic-line` 0.4.0). La firma de correo y la de equipo siguen
+y la guía `docs/agent-composition/iconography.md` del repositorio de AXIS. Estado: publicado por primera vez el
+2026-09-26 con el tag `v0.3.6` (tokens 0.3.6, `axis-graphic-line` 0.4.0); el catálogo vigente, con el tag `v0.6.0`. La firma de correo y la de equipo siguen
 con íconos Tabler hasta que el operador decida el reemplazo. Criterio e historia: skill `efeonce-graphic-line`,
 `references/iconography.md`.
 
-**El set: 27 Trazo + 33 Plastilina = 60 glifos** (verificado contra AXIS main@aa66225, 2026-09-27). La base de D22 tenía 12 de
+**El set: 36 Trazo + 43 Plastilina = 79 glifos** (AXIS main@cf77452 (2026-09-27)). La base de D22 tenía 12 de
 Trazo y 18 de Plastilina. El **2026-09-27 (D25)** el operador aprobó **30 íconos de oficio**, objetos del trabajo diario
 que el set no tenía, producidos con el método de alta de cada voz y revisados en el canvas «Íconos de La órbita»
 (sección 7): 15 de Trazo (correo, llamada, calendario, reunión, objetivo, presentación, contrato, checklist, código,
 base de datos, nube, integración, seguridad, ubicación, reloj) y 15 de Plastilina (lápiz, rodillo, aerosol, escuadra,
 post-it, encuadre, película, vinilo, guitarra, reproducir, varita, taza, lámpara, trofeo, estrella), estos también en
 volumen (§14.1). Publicados con el tag `v0.5.0`: `axis-graphic-line` **0.5.0** y `axis-brand-assets` **0.3.3**
-(`axis-tokens` sigue en 0.3.7); Greenhouse todavía fija 0.4.0 y 0.3.2. Las claves son únicas entre voces (el Trazo del
+(`axis-tokens` seguía en 0.3.7). Las claves son únicas entre voces (el Trazo del
 teléfono es `llamada`; `telefono` es la Plastilina del móvil). Notas de uso que conservó la aprobación: el checklist no va
 en una lista de verdad (la esfera sería viñeta); varita y estrella no van en el mismo grupo; encuadre es composición y
-formatos, no recorte. La lista completa con claves y notas vive en la guía de AXIS §«Catálogo aprobado» y en la skill
-(`references/iconography.md` §13).
+formatos, no recorte.
+
+El **mismo 2026-09-27 (D26)** el operador aprobó **19 íconos de IA, social y staff** («Subelos todos a excepción del
+hoodie de trazo que no parece un hoodie»): 9 de Trazo (ia, composer, buscador, influencer, prensa, social, multimedia,
+assets y staff-gorra, con el rótulo «Staff») y 10 de Plastilina (chispa, prompt, barra de búsqueda, aro de luz,
+televisión, like con el rótulo «Me gusta», galería, biblioteca con el rótulo «Biblioteca de assets», hoodie «Hoodie
+Efeonce» y gorra «Gorra Efeonce»), estos también en volumen (§14.1). El Trazo del hoodie (`staff-hoodie`) no entró
+porque no se leía como hoodie: el hoodie existe sólo en Plastilina. Cada concepto tiene una clave por voz (ia/chispa,
+composer/prompt, buscador/barra-busqueda, influencer/aro-de-luz, prensa/television, social/like, multimedia/galeria,
+assets/biblioteca, staff-gorra/gorra). Ninguno imita la interfaz ni el logo de un asistente de terceros (ChatGPT,
+Gemini); hoodie y gorra van sin logo dibujado: la marca la pone la esfera (en la capucha y en el panel frontal). Notas
+de uso: influencer (Trazo) al responder se parece a talent, así que no van juntos; chispa no va con estrella ni varita;
+galería y biblioteca se parecen y se usan separados; prompt es el más débil a 32 px. Publicados con el tag `v0.6.0`:
+`axis-graphic-line` **0.6.0** y `axis-brand-assets` **0.3.4** (`axis-tokens` va en 0.3.8, publicado con superficies, y
+no cambia por D26). Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4. La lista completa con claves y
+notas vive en la guía de AXIS §«Catálogo aprobado» (delta del ADR «IA, social y staff: 19 glifos nuevos (D26)») y en la
+skill (`references/iconography.md` §13).
 
 ### 14.1 Plastilina en volumen (D24, 2026-09-27)
 
@@ -951,8 +966,9 @@ volvió relieve o figura y fondo se invirtieron. Extruir el vector en Blender se
 «galleta»).
 
 **Dónde vive:** AXIS (commit `c18e3d3` en `main`, 2026-09-27) — tokens `efeonceGraphicLine.icons.volume`
-(`@efeoncepro/axis-tokens` **0.3.7**), los PNG en `@efeoncepro/axis-brand-assets` (18 en **0.3.2**; **33** desde **0.3.3**,
-tag `v0.5.0`, con los 15 de oficio de D25) (`assets/volume/<glifo>.png`,
+(`@efeoncepro/axis-tokens` **0.3.7**), los PNG en `@efeoncepro/axis-brand-assets` (18 en **0.3.2**; 33 en **0.3.3**,
+tag `v0.5.0`, con los 15 de oficio de D25; **43** desde **0.3.4**, tag `v0.6.0`, con los 10 de IA, social y staff de
+D26) (`assets/volume/<glifo>.png`,
 sellados en `src/volume-manifest.ts`; API `AXIS_VOLUME_ICONS`, `findVolumeIcon(glyph)`, `volumeIconUrl(glyph)`), el
 comando `pnpm icons:volume -- refs|key|check|publish`, el prompt `docs/agent-composition/iconography/volume-prompt.txt`,
 la guía `iconography.md` §9 y la sección 05 del Lab
@@ -962,5 +978,6 @@ la guía `iconography.md` §9 y la sección 05 del Lab
 **Estado:** canónico en AXIS `main` y en el Lab; los paquetes `axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2 están
 **publicados** con el tag `v0.3.7` (2026-09-27, sobre `main@c0020b6`; la 0.3.7 de tokens salió coordinada junto con los
 cambios de superficies). Greenhouse ya fija esas versiones (commit `f3f93c926`, 2026-09-27). El volumen del oficio
-(D25) salió en `axis-brand-assets` 0.3.3 (tag `v0.5.0`): el Lab muestra los 33 volúmenes; Greenhouse todavía fija 0.3.2.
+(D25) salió en `axis-brand-assets` 0.3.3 (tag `v0.5.0`) y el de IA, social y staff (D26) en 0.3.4 (tag `v0.6.0`): el Lab
+muestra los 43 volúmenes. Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 

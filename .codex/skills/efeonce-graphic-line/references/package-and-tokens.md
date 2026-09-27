@@ -18,6 +18,10 @@
 > (`axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3, **publicados** con el tag `v0.5.0`; `axis-tokens` sigue en
 > 0.3.7). Versiones que fija Greenhouse leídas de `package.json` el 2026-09-27.
 >
+> IA, social y staff (D26): catálogo de 79 glifos y 43 volúmenes, AXIS main@cf77452 (2026-09-27) (`axis-graphic-line` 0.6.0 y
+> `axis-brand-assets` 0.3.4, **publicados** con el tag `v0.6.0`; `axis-tokens` va en 0.3.8 y no cambia por D26).
+> Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
+>
 > Composición por superficie y su ruta por el Artifact Composer (TASK-1919): verificado contra greenhouse-eo@016d0a183
 > — 2026-09-27 (`axis-tokens` 0.3.8 y `axis-ui-contracts` 0.3.7, tag `v0.3.8`, contrato `efeonce.surface-composition`
 > 0.1.1; `src/lib/brand-surfaces`, `scripts/brand-surfaces/`, catálogos `graphic-line-*`).
@@ -35,11 +39,12 @@
 Registro privado: GitHub Packages (`@efeoncepro:registry=https://npm.pkg.github.com`). Cada paquete se versiona por
 separado.
 
-> **Al 2026-09-27 (manda sobre la tabla, que es la foto del 2026-09-26):** publicado `axis-graphic-line` **0.5.0**
-> (`v0.5.0`, catálogo de 60 glifos con el oficio D25) · `axis-brand-assets` **0.3.3** (`v0.5.0`, 33 PNG de volumen) ·
-> `axis-tokens` **0.3.8** y `axis-ui-contracts` **0.3.7** (`v0.3.8`, contrato `efeonce.surface-composition` 0.1.1;
-> `efeonceGraphicLine.surfaces` desde 0.3.7). **Greenhouse fija todo eso** (tokens 0.3.8, contracts 0.3.7, registry
-> 0.3.1, brand-assets 0.3.3 y `axis-graphic-line` 0.5.0 como dependencia directa; commits `8d817f29e` y `016d0a183`).
+> **Al 2026-09-27 (manda sobre la tabla, que es la foto del 2026-09-26):** publicado `axis-graphic-line` **0.6.0**
+> (`v0.6.0`, catálogo de 79 glifos con el oficio D25 e IA, social y staff D26) · `axis-brand-assets` **0.3.4**
+> (`v0.6.0`, 43 PNG de volumen) · `axis-tokens` **0.3.8** y `axis-ui-contracts` **0.3.7** (`v0.3.8`, contrato
+> `efeonce.surface-composition` 0.1.1; `efeonceGraphicLine.surfaces` desde 0.3.7). **Greenhouse fija todo eso**
+> (tokens 0.3.8, contracts 0.3.7, registry 0.3.1; commits `8d817f29e` y `016d0a183`). Greenhouse fija
+> axis-graphic-line 0.6.0 (dependencia directa) y axis-brand-assets 0.3.4.
 
 | Paquete | Versión en `main` de AXIS | Último tag de release | Fija Greenhouse (`package.json`) | Qué trae para la línea |
 |---|---|---|---|---|
@@ -56,7 +61,7 @@ separado.
 
 Consecuencias que un agente debe saber:
 
-- **Greenhouse depende de `axis-graphic-line` desde el 2026-09-27** (dependencia directa, hoy 0.5.0). Lo usa **sólo**
+- **Greenhouse depende de `axis-graphic-line` desde el 2026-09-27** (dependencia directa, hoy 0.6.0). Lo usa **sólo**
   el mapper de superficies `src/lib/brand-surfaces` (`paintGraphicLine`, `resolveIcon`) para los catálogos del Artifact
   Composer (TASK-1919). Las piezas sociales y de campaña siguen con el adapter propio
   (`scripts/creative/layout-compiler/graphic-line.mjs`), raster-safe, sobre el contrato de la órbita. *(Antes de esa
@@ -599,7 +604,8 @@ centrada, fondo transparente, con halo. Las genera `pnpm orbit:assets` desde `or
 compara cada SVG byte a byte. Guarda de deriva en Greenhouse: `src/config/efeonce-brand-assets.test.ts`.
 
 **Plastilina en volumen (desde 0.3.2, publicado con el tag `v0.3.7`; D24):** `assets/volume/<glifo>.png` — 18 PNG de 1024 px
-en 0.3.2 y **33** desde 0.3.3 (tag `v0.5.0`, con los 15 de oficio de D25)
+en 0.3.2, 33 en 0.3.3 (tag `v0.5.0`, con los 15 de oficio de D25) y **43** desde 0.3.4 (tag `v0.6.0`, con los 10 de
+IA, social y staff de D26)
 (~130 KB cada uno, paleta con alfa), los glifos de Plastilina en respuesta con el acento de Brand y el gesto donde
 existe; sellados en `src/volume-manifest.ts` (la prueba falla si un PNG cambia sin `publish`, si queda uno sin sellar o
 si pierde el alfa).
@@ -900,7 +906,9 @@ de la página es `orbitSvg` con `circle` y `channel: 'social'`.
 
 > AXIS `main@5b8ab20`, 2026-09-26: `axis-tokens` **0.3.6** y `axis-graphic-line` **0.4.0**, publicados con el tag
 > `v0.3.6`. Oficio (D25), AXIS main@aa66225, 2026-09-27: `axis-graphic-line` **0.5.0** (tag `v0.5.0`) lleva el catálogo a
-> **60 glifos: 27 Trazo + 33 Plastilina**; los tokens no cambian (`axis-tokens` 0.3.7). Guía:
+> 60 glifos (27 Trazo + 33 Plastilina). IA, social y staff (D26), AXIS main@cf77452 (2026-09-27): `axis-graphic-line`
+> **0.6.0** (tag `v0.6.0`) lo lleva a **79 glifos: 36 Trazo + 43 Plastilina**; los tokens no cambian por D26
+> (`axis-tokens` va en 0.3.8 por superficies). Guía:
 > `axis-design-system/docs/agent-composition/iconography.md` (§«Catálogo aprobado»).
 
 | Token | Qué guarda |
@@ -914,7 +922,7 @@ de la página es `orbitSvg` con `circle` y `channel: 'social'`.
 
 | Función (`/icons`) | Qué hace |
 | --- | --- |
-| `ICON_CATALOG` | los glifos aprobados con clave, voz, nombre, uso, modo y gesto: **60** desde 0.5.0 (27 Trazo + 33 Plastilina, con los 30 de oficio de D25); 30 en 0.4.0. Las claves son únicas entre voces (`llamada` es Trazo; `telefono`, Plastilina) |
+| `ICON_CATALOG` | los glifos aprobados con clave, voz, nombre, uso, modo y gesto: **79** desde 0.6.0 (36 Trazo + 43 Plastilina, con los 19 de IA, social y staff de D26); 60 en 0.5.0 (con los 30 de oficio de D25); 30 en 0.4.0. Las claves son únicas entre voces (`llamada` es Trazo; `telefono`, Plastilina; en D26 cada concepto tiene una clave por voz, p. ej. `ia` / `chispa`) |
 | `resolveIcon(req)` / `iconSvg(req)` | SVG con las reglas; errores `IconRequestError` (`unknown-glyph`, `plastilina-below-min`, `gesture-not-drawn`, `gesture-only-plastilina`, `unknown-line`); aviso `response-below-min` |
 | `auditIconGroup(items, { pieceHasSphere })` | issues `mixed-voices`, `more-than-one-response`, `response-with-piece-sphere`, `more-than-one-gesture`, `gesture-not-protagonist` |
 | `skewedOrbitHeroSvg(input)` | Plastilina protagonista dentro de su órbita sesgada (objeto en reposo) |

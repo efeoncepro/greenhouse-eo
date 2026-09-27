@@ -248,13 +248,14 @@ Rules for agents:
 ### Efeonce iconography (Trazo and Plastilina)
 
 Canonized by the operator on 2026-09-26 (D22). Values in `efeonceGraphicLine.icons` (`axis-tokens` `0.3.6`); geometry
-(60 glyphs since `0.5.0`: 27 Trazo + 33 Plastilina; `0.4.0` shipped the 30 base glyphs) and executable rules in
+(79 glyphs since `0.6.0`: 36 Trazo + 43 Plastilina; `0.5.0` shipped 60 and `0.4.0` the 30 base glyphs) and executable
+rules in
 `@efeoncepro/axis-graphic-line/icons`:
 `resolveIcon`, `iconSvg`, `auditIconGroup`, `skewedOrbitHeroSvg`, `iconVoiceForLine`, `strokeSphereClearance`. Commands in
 AXIS: `pnpm icons:export`, `pnpm icons:check` (gate for a new glyph), `pnpm icons:vectorize` (Plastilina sheet → glyph
 JSON). Guide `docs/agent-composition/iconography.md`, ADR `ICONOGRAPHY_DECISION_V1.md`, Lab `/references/iconography/`
-and `/references/iconography.json`. State: published 2026-09-26 with tag `v0.3.6` (AXIS `main@5b8ab20`); no consumer pins
-it yet. Never draw a glyph by hand inside a piece; a new glyph needs `icons:check` and operator approval. Criterion and
+and `/references/iconography.json`. State: first published 2026-09-26 with tag `v0.3.6` (AXIS `main@5b8ab20`); current
+catalog published with tag `v0.6.0` (see D26 below). Never draw a glyph by hand inside a piece; a new glyph needs `icons:check` and operator approval. Criterion and
 history: `efeonce-graphic-line` → `references/iconography.md`.
 
 **Plastilina en volumen (D24, 2026-09-27):** third layer — each Plastilina glyph in inflated matte clay, 1024 px PNG with
@@ -273,10 +274,25 @@ contracts `0.3.6`, brand-assets `0.3.2`, and `axis-graphic-line` `0.4.0` as a di
 `nube`, `integracion`, `seguridad`, `ubicacion`, `reloj`) and 15 Plastilina (`lapiz`, `rodillo`, `aerosol`, `escuadra`,
 `postit`, `encuadre`, `pelicula`, `vinilo`, `guitarra`, `reproducir`, `varita`, `taza`, `lampara`, `trofeo`, `estrella`),
 the Plastilina ones also in volume. The set is now 27 Trazo + 33 Plastilina = 60, with 33 volume PNGs. Published with tag
-`v0.5.0`: `axis-graphic-line` `0.5.0` and `axis-brand-assets` `0.3.3` (`axis-tokens` stays at `0.3.7`); Greenhouse still
-pins `0.4.0` and `0.3.2`. Keys are unique across voices (the phone Trazo is `llamada`; `telefono` is the Plastilina), and
+`v0.5.0`: `axis-graphic-line` `0.5.0` and `axis-brand-assets` `0.3.3` (`axis-tokens` stays at `0.3.7`). Keys are unique across voices (the phone Trazo is `llamada`; `telefono` is the Plastilina), and
 Trazo never uses elliptical arcs (`samplePath` only measures circular ones: ovals are four tangent circular arcs). Guide
-§«Catálogo aprobado» (with the design notes), ADR delta D25, Lab `/references/iconography/` (60 glyphs, 33 volumes).
+§«Catálogo aprobado» (with the design notes), ADR delta D25.
+
+**AI, social and staff glyphs (D26, 2026-09-27; AXIS main@cf77452 (2026-09-27)):** operator, verbatim: «Subelos todos a excepción
+del hoodie de trazo que no parece un hoodie». 19 new glyphs — 9 Trazo (`ia`, `composer`, `buscador`, `influencer`,
+`prensa`, `social`, `multimedia`, `assets`, `staff-gorra` labeled «Staff») and 10 Plastilina (`chispa`, `prompt`,
+`barra-busqueda`, `aro-de-luz`, `television`, `like` «Me gusta», `galeria`, `biblioteca` «Biblioteca de assets»,
+`hoodie` «Hoodie Efeonce», `gorra` «Gorra Efeonce»), each Plastilina with its volume. The Trazo hoodie (`staff-hoodie`)
+was rejected (it did not read as a hoodie): the hoodie exists only in Plastilina. One key per voice per concept
+(ia/chispa, composer/prompt, buscador/barra-busqueda, influencer/aro-de-luz, prensa/television, social/like,
+multimedia/galeria, assets/biblioteca, staff-gorra/gorra). None imitates a third-party assistant's UI or logo (ChatGPT,
+Gemini); hoodie and cap carry no drawn logo — the sphere is the brand (on the hood, on the cap's front panel). Usage
+notes: `influencer` (Trazo) in response resembles `talent`, never together; `chispa` never with `estrella` or `varita`;
+`galeria` and `biblioteca` look alike, use them apart; `prompt` is the weakest at 32 px. The set is now **36 Trazo + 43
+Plastilina = 79**, with **43 volume PNGs**. Published with tag `v0.6.0`: `axis-graphic-line` `0.6.0` and
+`axis-brand-assets` `0.3.4` (`axis-tokens` is at `0.3.8`, published by another session with the surfaces work, and does
+not change for D26). Greenhouse pins `axis-graphic-line` `0.6.0` and `axis-brand-assets` `0.3.4`. Guide §«Catálogo
+aprobado», ADR delta «IA, social y staff: 19 glifos nuevos (D26)», Lab `/references/iconography/` (79 glyphs, 43 volumes).
 
 ### Glitch sub-line (Lab page + JSON; pending publication)
 

@@ -342,7 +342,7 @@ sexta: es no usar órbita.
 - **Órbita sesgada (D20):** la firma de Plastilina. Una elipse inclinada −16° alrededor del objeto protagonista, que
   pasa por detrás arriba y por delante abajo; el objeto va en **reposo** y la esfera la pone la órbita. Una por pieza,
   nunca cruza el texto y **nunca mide**: lo que mide, enfoca o cierra la marca sigue siendo la órbita circular.
-- **Cómo:** glifo de `ICON_CATALOG` (27 de Trazo, 33 de Plastilina) → `resolveIcon` → `auditIconGroup(items,
+- **Cómo:** glifo de `ICON_CATALOG` (79: 36 de Trazo, 43 de Plastilina, desde D26) → `resolveIcon` → `auditIconGroup(items,
   { pieceHasSphere })` antes de entregar; Plastilina protagonista con `skewedOrbitHeroSvg`.
 - **Un glifo que no existe no se dibuja dentro de la pieza:** se da de alta en AXIS (`pnpm icons:check`; Plastilina,
   antes `pnpm icons:vectorize`) y lo aprueba el operador. El control mide el peso, no el carácter: que se lea como

@@ -1,9 +1,9 @@
 # Usar la línea gráfica de Efeonce — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (1.8: los 30 íconos de oficio, D25, en «buscar un ícono» y en volumen; set de 60, verificado contra AXIS main@aa66225, 2026-09-27) · 2026-09-27 (1.7: usar y pedir un ícono en volumen — Plastilina en volumen, D24) · 2026-09-26 (1.6: usar y pedir un ícono de la marca — iconografía Trazo y Plastilina, AXIS `v0.3.6`)
+> **Ultima actualizacion:** 2026-09-27 por Claude (1.9: los 19 íconos de IA, redes sociales y staff, D26, en «buscar un ícono», sus notas de uso y en volumen; set de 79 y 43 volúmenes, AXIS main@cf77452 (2026-09-27), tag `v0.6.0`) · 2026-09-27 (1.8: los 30 íconos de oficio, D25, en «buscar un ícono» y en volumen; set de 60, verificado contra AXIS main@aa66225, 2026-09-27) · 2026-09-27 (1.7: usar y pedir un ícono en volumen — Plastilina en volumen, D24) · 2026-09-26 (1.6: usar y pedir un ícono de la marca — iconografía Trazo y Plastilina, AXIS `v0.3.6`)
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — es un sistema de marca; los valores viven en AXIS y el PDF se regenera con un comando local
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Manual técnico-operativo V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) · [Producir una foto de marca](../marketing/fotografia-de-marca-efeonce.md)
@@ -302,17 +302,28 @@ este paso a paso no las repite todas.
 2. **Elige la voz por la línea de servicio de la pieza:** Growth, Engine o Revenue → Trazo; Brand → Plastilina. La
    línea Voice todavía no tiene voz fija: elige con criterio y decláralo en la pieza. Una voz por grupo, nunca las dos
    juntas.
-3. **Busca el ícono en la [página del Lab](https://axis.efeonce.org/references/iconography/):** muestra los 60
-   aprobados (27 de Trazo y 33 de Plastilina) en cada línea y fondo, con «Copiar SVG». Desde el 2026-09-27 incluye los
+3. **Busca el ícono en la [página del Lab](https://axis.efeonce.org/references/iconography/):** muestra los 79
+   aprobados (36 de Trazo y 43 de Plastilina) en cada línea y fondo, con «Copiar SVG». Desde el 2026-09-27 incluye los
    **30 íconos de oficio**: en Trazo, correo, llamada, calendario, reunión, objetivo, presentación, contrato, checklist,
    código, base de datos, nube, integración, seguridad, ubicación y reloj; en Plastilina, lápiz, rodillo, aerosol,
-   escuadra, post-it, encuadre, película, vinilo, guitarra, reproducir, varita, taza, lámpara, trofeo y estrella. Al
-   elegir, ten en cuenta:
+   escuadra, post-it, encuadre, película, vinilo, guitarra, reproducir, varita, taza, lámpara, trofeo y estrella. Y los
+   **19 de IA, redes sociales y staff** (D26): en Trazo, ia, composer, buscador, influencer, prensa, social, multimedia,
+   assets y staff-gorra («Staff»); en Plastilina, chispa, prompt, barra de búsqueda, aro de luz, televisión, like
+   («Me gusta»), galería, biblioteca («Biblioteca de assets»), hoodie («Hoodie Efeonce») y gorra («Gorra Efeonce»).
+   Cada idea tiene su clave en cada voz (ia/chispa, composer/prompt, buscador/barra-busqueda, influencer/aro-de-luz,
+   prensa/television, social/like, multimedia/galeria, assets/biblioteca, staff-gorra/gorra); el hoodie existe sólo
+   en Plastilina. Al elegir, ten en cuenta:
    - **Llamada o teléfono:** «llamada» es el teléfono en Trazo; «teléfono» es el móvil en Plastilina. Elige según la
      voz de la pieza.
    - **Checklist:** su esfera cae en la columna de vistos. No lo uses como viñeta de una lista de verdad.
    - **Varita y estrella:** comparten la estrella; no las pongas en el mismo grupo.
    - **Encuadre** es composición y formatos, no recortar (para eso está tijeras).
+   - **Influencer (Trazo) y talent:** al responder se parecen; no los pongas juntos.
+   - **Chispa:** no va con la estrella ni con la varita.
+   - **Galería y biblioteca:** se parecen; úsalas por separado.
+   - **Prompt:** es el más débil a 32 px; míralo a ese tamaño antes de entregar.
+   - **Hoodie y gorra:** no llevan logo dibujado; la marca la pone la esfera (en la capucha y en el panel frontal).
+     Ningún ícono de IA imita la pantalla ni el logo de ChatGPT o Gemini: no les agregues uno.
    Si el que necesitas no está, **no lo dibujes**: pídelo (ver abajo).
 4. **Decide el estado.** Reposo por defecto. **Responde uno solo**, el que importa, y sólo si la pieza no tiene otra
    esfera (una órbita, una voz con esfera o un marcador de estado). En listas, tablas, contacto y navegación, reposo.
@@ -324,10 +335,11 @@ este paso a paso no las repite todas.
    la órbita. Una por pieza, rodea sólo al objeto y el texto vive fuera.
 8. **Si trabajas en código o con un agente,** pinta con `resolveIcon`, revisa el grupo con
    `auditIconGroup(items, { pieceHasSphere })` antes de entregar y usa `skewedOrbitHeroSvg` para la protagonista
-   (`@efeoncepro/axis-graphic-line/icons`, desde 0.4.0; los íconos de oficio, desde 0.5.0, publicado con el tag
-   `v0.5.0`). El set completo como archivos sale con `pnpm icons:export` en el repositorio de AXIS. Nunca copies HEX
-   ni px: salen de `efeonceGraphicLine.icons`. Greenhouse fija todavía la 0.4.0 (sin el oficio) y no consume
-   `/icons`; hoy se usa desde AXIS o copiando el SVG del Lab.
+   (`@efeoncepro/axis-graphic-line/icons`, desde 0.4.0; los íconos de oficio, desde 0.5.0, tag `v0.5.0`; los de IA,
+   redes sociales y staff, desde 0.6.0, tag `v0.6.0`). El set completo como archivos sale con `pnpm icons:export` en
+   el repositorio de AXIS. Nunca copies HEX ni px: salen de `efeonceGraphicLine.icons`. Greenhouse fija
+   axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4; dentro de Greenhouse sólo lo usa el generador de piezas por
+   superficie. Para otra pieza, úsalo desde AXIS o copia el SVG del Lab.
 
 ### Pedir un ícono nuevo
 
@@ -354,11 +366,12 @@ con fondo transparente. Es para el objeto protagonista de una pieza, no para aco
    interfaz, **no uses el volumen**: usa el ícono plano o el Trazo.
 2. **Confirma que es uno solo en la pieza** y que no va agrupado con íconos planos (de Plastilina o de Trazo).
 3. **Búscalo en la sección «Plastilina en volumen» del [Lab](https://axis.efeonce.org/references/iconography/#volumen)**
-   y descarga el PNG. Hay 33, uno por cada Plastilina plana (incluidos los 15 de oficio). Si el objeto no está, ve a
+   y descarga el PNG. Hay 43, uno por cada Plastilina plana (incluidos los 15 de oficio y los 10 de IA, redes sociales
+   y staff). Si el objeto no está, ve a
    «Pedir un ícono en volumen».
 4. **Si trabajas con un agente o en código,** pídele que tome el archivo de `@efeoncepro/axis-brand-assets` con
-   `volumeIconUrl(glyph)` (falla si el glifo no es de Plastilina). Greenhouse fija la 0.3.3 (tag `v0.5.0`), con los 33
-   (los 18 de la base y los 15 de oficio). El Lab sirve para descargarlos a mano.
+   `volumeIconUrl(glyph)` (falla si el glifo no es de Plastilina). Greenhouse fija la 0.3.4 (tag `v0.6.0`), con los 43
+   (los 18 de la base, los 15 de oficio y los 10 de IA, redes sociales y staff). El Lab sirve para descargarlos a mano.
 5. **Colócalo a 160 px o más.** Si tiene que ir más chico, usa el ícono plano.
 6. **Ponlo tal como viene:** ya está en respuesta, con el naranja de Brand y su gesto. No lo recolorees ni le cambies
    la forma. El PNG trae fondo transparente y los huecos abiertos, así que sirve sobre cualquier fondo; si la pieza
