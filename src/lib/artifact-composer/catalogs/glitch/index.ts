@@ -17,6 +17,8 @@ import path from 'node:path'
 import type { ArtifactCatalog, CatalogLayoutHook, CatalogSemanticValidator, OutputTarget } from '../../catalog'
 import { axisPackDir } from '../../brand-packs/axis'
 import { GLITCH_COMPILED_FILES, GLITCH_PACK_EXTENSIONS, glitchCatalogDir } from './brand'
+import { glitchFractureHook } from './fracture-hook'
+import { glitchResolvers } from './resolvers'
 import { catalogMembershipValidator, pieceApprovalValidator, type GlitchCatalogKey } from './validators'
 
 export { glitchCatalogDir } from './brand'
@@ -28,13 +30,16 @@ export interface GlitchCatalogOptions {
   layoutHooks?: Record<string, CatalogLayoutHook>
 }
 
+/** Plantillas con foto que se desarma en bytes: el hook pinta la geometría que trae el plan. */
+export const GLITCH_FRACTURE_TEMPLATES = ['CoverPhoto', 'CoverMosaic', 'Interior', 'InteriorOpening'] as const
+
 const create = (key: GlitchCatalogKey, outputTarget: OutputTarget, options: GlitchCatalogOptions): ArtifactCatalog => ({
   name: `glitch-${key}`,
   ownerOrgId: 'efeonce',
   templatesDir: glitchCatalogDir,
   outputTarget,
-  resolvers: {},
-  layoutHooks: options.layoutHooks,
+  resolvers: glitchResolvers(),
+  layoutHooks: { ...Object.fromEntries(GLITCH_FRACTURE_TEMPLATES.map((t) => [t, glitchFractureHook])), ...options.layoutHooks },
   semanticValidators: [catalogMembershipValidator(key), pieceApprovalValidator, ...(options.editionValidators ?? [])],
   brand: {
     packName: 'axis',
