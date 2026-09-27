@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-27 — Registro cine con documento propio, pruebas publicitarias, repo taller y AXIS 0.3.9
+
+El operador pidió documentar «con altísimo nivel de detalle» el estilo cinematográfico: nace
+[`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (cámara,
+luz de la línea como fenómeno, color por línea, vestuario, emblema compuesto, robots agentes, reservas, ficha comentada,
+trampas, barra de juicio y evidencia), con punteros en el canon, la regla auto-load y diez skills (+espejo `.codex`).
+Primera tanda publicitaria 9:16 y 4:5 en prueba: la firma caía sobre el sujeto con el contraste pasando hasta usar un
+primer plano oscuro como lecho. Se creó el repo taller `efeoncepro/efeonce-brand-workshop` (ADR
+`EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1`, TASK-1925) para sacar la producción de marca de Greenhouse sin reactivar
+Globe. AXIS publicó `v0.3.9`: `efeonce.surface-composition` 0.1.2 (uso propuesta/brochure, portada y cierre, layouts de
+`proposal-cinematic`, documento brochure).
+
 ## 2026-09-27 — Iconografía: IA, social y staff (D26)
 
 El operador aprobó 19 íconos nuevos de la línea gráfica («Subelos todos a excepción del hoodie de trazo que no parece
@@ -83,7 +95,6 @@ guía. Manual de la línea §10.0, lenguaje fotográfico v1.6, doc funcional 1.7
 El contrato AXIS `efeonce.surface-composition` 0.1.0 (`candidate`, `pnpm surface:resolve`, tokens
 `efeonceGraphicLine.surfaces`) está en `main` de AXIS (Lab `/references/surfaces/` publicado; paquetes sin publicar en npm); sin cambios de
 código en Greenhouse.
-
 
 ## 2026-09-26 — Iconografía de La órbita canónica: Trazo y Plastilina (AXIS v0.3.6)
 
@@ -569,20 +580,3 @@ cotizar. En Seedance y Wan 3.0, que solo publican una fórmula, calcula un techo
 `--cancel` anula un trabajo que sigue en cola. La llave quedó en Secret Manager. Las 44 opciones cotizaron con la
 cuenta de Efeonce, pero todavía no se generó nada: la cuenta de la API de Higgsfield no tiene créditos. Si el Recraft de
 esta API entrega SVG está sin probar, y Veo 3.1, Sora 2 y Nano Banana Pro no están disponibles por esta vía.
-
-## 2026-09-16 — Los comandos de IA avisan cuánto van a costar antes de gastar
-
-`pnpm ai:fal` ahora calcula el costo antes de mandar un trabajo y se detiene si pasa de USD 1 (o del tope que
-indiques) hasta que confirmes con `--yes`. Sin `--resolution`, usa la resolución más barata del modelo en vez del
-valor caro por defecto de algunos proveedores. También dejó de guardar archivos con la extensión equivocada, rechaza
-`--seed` en los modelos que no lo aceptan y avisa antes de mandar más imágenes de las que el modelo usa. `pnpm
-ai:image` valida tamaño, fondo y formato antes de llamar a OpenAI, permite elegir PNG, JPEG o WebP, y muestra el
-costo estimado con la fórmula oficial. Guía, catálogo, manuales y skills quedaron al día.
-
-## 2026-09-16 — Efeonce Insights ya entrega decks en producción
-
-El render de Insights quedó en producción: una edición pedida por API o MCP produce su deck descargable sin
-intervención, y el gateway de MCP de Efeonce ya expone las cuatro herramientas de render. El release llevó por primera
-vez al orquestador de producción un Cloud Run Job, el worker de render, que el watchdog y el rollback ya saben leer.
-La prueba final en producción siguió el camino real: el despacho automático lanzó el worker y el deck quedó listo al
-primer intento. Emitir la edición al cliente sigue apagado y es el siguiente paso de EPIC-045.
