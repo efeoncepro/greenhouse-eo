@@ -334,10 +334,11 @@ Gateway (`efeonce-mcp`, PR aparte):
   - **Claude Code:** plugin `efeonce` con `.mcp.json` (`type: http`, `https://mcp.efeonce.org/mcp`) y una skill router
     `efeonce-mcp` (cuándo usar el MCP, cómo cargar manuales, confirmación antes de gastar/escribir, cómo esperar un run
     asíncrono). Instalación por marketplace git o local [verificar el mecanismo de marketplace vigente].
-  - **Codex:** skill `efeonce-mcp` para `$HOME/.agents/skills/` con `agents/openai.yaml` que declara la dependencia MCP
-    (`type: mcp`, `transport: streamable_http`, URL del gateway) y, si el formato lo permite, plugin que empaqueta skill +
-    configuración [verificar formato de plugin de Codex]; snippet de `config.toml` recomendado: `tool_timeout_sec = 120`,
-    `default_tools_approval_mode = "writes"`; línea sugerida para `~/.codex/AGENTS.md`.
+  - **Codex:** router `efeonce-mcp` generado en `client-kit/codex/`, con dependencia MCP y metadata
+    compatibles con el cliente vigente. Es entrada para el paquete instalable de TASK-1904, no un segundo
+    plugin comercial. Este slice prueba el router con el harness; TASK-1904 posee manifest, marca, mapping
+    de conexión, marketplace y certificación de instalación privada en Codex/ChatGPT. Ningún generador
+    sobrescribe `~/.codex/AGENTS.md` ni configuración personal sin un paso de instalación explícito.
   - **claude.ai:** guía de conector personalizado (depende sólo de instructions + manuales; sin skills).
 - Test: el kit no contiene cuerpos de manuales y nombra sólo manuales existentes.
 
@@ -501,7 +502,7 @@ Client services: load client-service-enablement; writes need a human delegated t
 - [ ] Las instructions totales no superan el tope declarado y nombran sólo manuales y tools existentes (tests).
 - [ ] Editar instructions cambia el digest de superficie y el gate exige bump de versión (test visto fallar).
 - [ ] Una respuesta con `data.next` produce en el gateway la línea normalizada; con `requiresHumanConfirmation: true` dice "ask the human" (test).
-- [ ] El kit generado para Claude Code y Codex instala el MCP y la skill router, sin cuerpos de manual (test de contenido).
+- [ ] El kit Claude Code instala MCP y router; el router Codex generado funciona en el harness y se entrega con contrato probado a TASK-1904, sin cuerpos de manual. La instalación del producto OpenAI se certifica en TASK-1904.
 - [ ] `pnpm mcp:selection-eval` no empeora `toolAccuracy` ni `spendDiscipline` tras agregar instructions.
 - [ ] El escenario `seo-read` pasa sus umbrales con Claude Code y con Codex (evidencia en `docs/audits/mcp/`).
 - [ ] El escenario `aeo-grade` pasa sus umbrales con ambos clientes una vez disponible `TASK-1861` (o queda registrado como pendiente con motivo).
@@ -553,3 +554,12 @@ Client services: load client-service-enablement; writes need a human delegated t
    instalación manual documentada en una primera etapa?
 4. **Idioma de las instructions.** Los manuales SEO están en inglés; propuesto inglés para el `head` (lo leen modelos de
    ambos proveedores) con manuales en su idioma vigente.
+
+## Delta 2026-09-26 — Distribución OpenAI con dueño separado
+
+[TASK-1904](TASK-1904-efeonce-openai-plugin-private-distribution.md), EPIC-044 U21, posee el plugin
+oficial instalable para Codex y ChatGPT: marca, metadata, registro privado, OAuth en la experiencia del
+cliente, distribución, actualización y soporte. Esta task conserva instructions, `next`, digest,
+`client-kit/codex/**` como router generado, kit Claude y eval de agentes. TASK-1904 consume ese router;
+no hay dos paquetes OpenAI ni copia de manuales. El cierre de U20 no depende de instalar/publicar el
+producto U21; U21 sí integra el router para cerrar sus skills. Sin implementación en este delta.

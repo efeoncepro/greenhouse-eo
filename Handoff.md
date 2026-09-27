@@ -2,6 +2,8 @@
 
 **AXIS 0.3.10 (27/09):** bump de Greenhouse pendiente: [runbook Delta c](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
+**Plugin OpenAI Efeonce MCP (26/09):** [TASK-1904](docs/tasks/to-do/TASK-1904-efeonce-openai-plugin-private-distribution.md) registrada: marca, OAuth, skills e instalación privada Codex/ChatGPT sin revisión pública. TASK-1864 conserva routing/eval. Sin implementación.
+
 **Glitch en AXIS (27/09):** [TASK-1922](docs/tasks/complete/TASK-1922-glitch-axis-franchise-token-contract.md) **complete**: AXIS `v0.3.12` (`29a40b5`) publica `glitchLine`, `efeonce.glitch-line` 0.1.0 candidate (`pnpm glitch:resolve`), `AXIS_GLITCH_ASSETS` y 5 glifos Plastilina D27 (84 glifos/48 volúmenes); Greenhouse los fija en `4dfb147f7`. Íconos de acción de Glitch siempre planos (operador). Siguen: TASK-1923 (Composer lee el token), TASK-1924 (el taller retira su espejo de paleta/manzana; reconciliar entrada 0,72 vs 0,66 em); número de contrato de Guttery pendiente.
 
 **La órbita (26–27/09):** [índice](docs/operations/brand-graphic-line/README.md). [TASK-1919](docs/tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) y [TASK-1920](docs/tasks/complete/TASK-1920-photo-isotype-compose-official-emblem.md) completas y en `develop`: 20 recetas aprobadas por `pnpm brand:compose` (AXIS `v0.3.8`, contrato 0.1.1). Pendiente: 5 preguntas del operador y la ruta productiva [TASK-1921](docs/tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md).
