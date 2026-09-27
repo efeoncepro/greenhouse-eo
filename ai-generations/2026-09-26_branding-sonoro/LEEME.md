@@ -1,6 +1,6 @@
 # Branding sonoro Efeonce — ronda 1 (2026-09-26)
 
-Estado: **ronda 5, prototipos sin aprobar** (núcleo aprobado: logo, reveal, apertura, etiquetas). Sala de escucha: https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9
+Estado: **versión recomendada armada** (2026-09-26), sin canonizar. Guía: https://claude.ai/artifact/NgfYHfeNJX6Frjco6hXtnG · historial de rondas: la sala de escucha. Sala de escucha: https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9
 
 ## Decisiones del operador (2026-09-26)
 
@@ -55,6 +55,20 @@ Estado: **ronda 5, prototipos sin aprobar** (núcleo aprobado: logo, reveal, ape
   duración entera. `runFalModel` espera 120 s por defecto; Stable Audio a 37 s necesita `pollTimeoutMs` mayor, y un
   trabajo vencido se recupera sin volver a pagar con `motor/recuperar.ts <modelo> <requestId> <salida>`.
 - **Licencia pendiente de verificar** antes de uso comercial pagado: salidas de Stable Audio 2.5 y ElevenLabs Music vía fal.
+
+## Versión recomendada (operador, 2026-09-26: «vamos con tu recomendación»)
+
+- **Dos registros, mismo ADN:** fondo (serena, 96 BPM; debajo de locución, webinars, explicativos) y energía (rock,
+  120 BPM, Stable Audio 2.5 a 0,7 «re-grabación libre»; redes, lanzamientos, eventos). Nunca se cambia de registro
+  dentro de una pieza ni va energía debajo de una locución. El híbrido con ElevenLabs quedó descartado (el empalme cae
+  justo antes de la firma).
+- **Glitch: pendiente** de decisión del operador.
+- Kit en `entrega/` (01 logo por línea · 02 etiquetas Brian · 03 motion WAV + MP4 16:9 y 9:16 · 04 piezas largas ·
+  05 cierre de energía 5,1 s cortado del rock desde 31,9 s · 06 voz sola). Nivelado a −14 LUFS; los logos de Brand,
+  Revenue y Voice quedan en −15 porque el golpe toca el techo de pico (−1 dBFS) y no se comprime.
+- Pendiente para canonizar: Glitch · licencias (Stable Audio: uso comercial declarado, licencia comunitaria hasta
+  USD 1M/año — confirmar vía fal; voz ElevenLabs) · prueba de reconocimiento sin logo · tokens AXIS + reemplazo del
+  sonido de los masters V1.1 + guía en el manual de la línea gráfica.
 
 ## Concepto
 
