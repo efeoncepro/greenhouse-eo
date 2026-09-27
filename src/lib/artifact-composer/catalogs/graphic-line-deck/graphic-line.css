@@ -763,3 +763,67 @@ body {
   font: 400 var(--gl-note-px) / 1.4 var(--gl-text-family);
   color: var(--gl-soft-dark);
 }
+
+/* ══ proposal-cinematic · composición `lines` (TASK-1927) ═══════════════════════════════════════════════
+ *
+ * Sin respaldo: cada medida llega del manifest de AXIS como custom property y todos los campos son obligatorios.
+ * El acento de cada fila lo pone la clase de SU línea (`gl-line-*`, tokens compilados): es la única lámina con los
+ * cinco acentos.
+ */
+
+.gl-pl .gl-pl-logo {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-logo-top);
+  z-index: 2;
+  width: auto;
+  height: var(--gl-logo-height);
+}
+
+.gl-pl .gl-pl-phrase {
+  position: absolute;
+  left: var(--gl-phrase-left);
+  top: var(--gl-phrase-top);
+  z-index: 2;
+  margin: 0;
+  font-family: var(--gl-text-family);
+  font-weight: var(--gl-phrase-wght);
+  font-size: var(--gl-phrase-px);
+  color: var(--gl-ink-dark);
+  white-space: nowrap;
+}
+
+.gl-pl .gl-pl-lines {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-lines-top);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gl-lines-row-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-pl .gl-pl-name {
+  margin: 0 0 var(--gl-lines-word-gap);
+  font-family: var(--gl-text-family);
+  font-weight: var(--gl-line-name-wght);
+  font-size: var(--gl-line-name-px);
+  letter-spacing: var(--gl-line-name-tracking);
+  text-transform: uppercase;
+  color: var(--gl-soft-dark);
+  white-space: nowrap;
+}
+
+.gl-pl .gl-pl-word {
+  margin: 0;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-line-word-px);
+  line-height: var(--gl-line-word-leading);
+  letter-spacing: var(--gl-line-word-tracking);
+  color: var(--gl-accent);
+  white-space: nowrap;
+}

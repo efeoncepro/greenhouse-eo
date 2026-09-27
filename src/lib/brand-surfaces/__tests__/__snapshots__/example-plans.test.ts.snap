@@ -537,6 +537,158 @@ exports[`planes de los intents de ejemplo > deck-method-staircase-intent.json co
 }
 `;
 
+exports[`planes de los intents de ejemplo > deck-proposal-cinematic-hero-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "format": "16x9",
+        "height": 1080,
+        "unit": "px",
+        "width": 1920,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_deck-nexa/plates/NX5b-nexa-bionica-isotipo.png",
+      "ref": "asset-ref:plate:NX5b-nexa-bionica-isotipo",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic.hero",
+  "plan": {
+    "artifactId": "deck-proposal-cinematic-hero",
+    "slides": [
+      {
+        "contentType": "deck.proposal-cinematic.hero",
+        "slideId": "deck-proposal-cinematic",
+        "slots": {
+          "body": "Nexa y sus agentes arrancan contigo. Cada agente con su tarea, todos en el mismo equipo.",
+          "frame": {
+            "answerPx": 176,
+            "answerTop": 285,
+            "bodyPx": 27,
+            "bodyTop": 560,
+            "bodyWidth": 500,
+            "eyebrowTop": 110,
+            "line": "growth",
+            "margin": 140,
+            "questionTop": 200,
+          },
+          "photo": {
+            "alt": "Nexa, con traje biónico navy y blanco con el isotipo de Efeonce en el pecho y lentes transparentes azulados, mira a cámara en la partida; cinco mini robots agentes de caras alegres la rodean y al fondo se encienden cinco luces de partida",
+            "src": "asset-ref:plate:NX5b-nexa-bionica-isotipo",
+          },
+          "selection": {
+            "anchor": "top-end",
+            "label": "Nexa",
+            "participantKind": "department",
+            "scale": 1.2,
+          },
+          "voice": {
+            "answer": "Vamos",
+            "eyebrow": "Fuerza de trabajo híbrida",
+            "question": "¿Listos para la carrera?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-proposal-cinematic-lines-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "format": "16x9",
+        "height": 1080,
+        "unit": "px",
+        "width": 1920,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png",
+      "ref": "asset-ref:plate:NX6b-nexa-cinco-orbitas-isotipo",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic.lines",
+  "plan": {
+    "artifactId": "deck-proposal-cinematic-lines",
+    "slides": [
+      {
+        "contentType": "deck.proposal-cinematic.lines",
+        "slideId": "deck-proposal-cinematic",
+        "slots": {
+          "body": "Cinco líneas. Una sola relación.",
+          "eyebrow": "Nuestras líneas de servicio",
+          "frame": {
+            "eyebrowTop": 96,
+            "line": "growth",
+            "lineNamePx": "--gl-line-name-px=17px",
+            "lineNameTracking": "--gl-line-name-tracking=0.12em",
+            "lineNameWeight": "--gl-line-name-wght=500",
+            "lineWordLeading": "--gl-line-word-leading=0.95",
+            "lineWordPx": "--gl-line-word-px=96px",
+            "lineWordTracking": "--gl-line-word-tracking=-0.04em",
+            "linesTop": "--gl-lines-top=262px",
+            "logoHeight": "--gl-logo-height=52px",
+            "logoTop": "--gl-logo-top=150px",
+            "margin": 140,
+            "phraseLeft": "--gl-phrase-left=430px",
+            "phrasePx": "--gl-phrase-px=30px",
+            "phraseTop": "--gl-phrase-top=160px",
+            "phraseWeight": "--gl-phrase-wght=300",
+            "rowGap": "--gl-lines-row-gap=10px",
+            "wordGap": "--gl-lines-word-gap=2px",
+          },
+          "lines": [
+            {
+              "key": "growth",
+              "name": "Growth Strategy & Measurement",
+              "word": "Growth",
+            },
+            {
+              "key": "brand",
+              "name": "Creative Services",
+              "word": "Brand",
+            },
+            {
+              "key": "engine",
+              "name": "Digital Services & Engineering",
+              "word": "Engine",
+            },
+            {
+              "key": "voice",
+              "name": "Media & Distribution",
+              "word": "Voice",
+            },
+            {
+              "key": "revenue-hubspot",
+              "name": "RevOps & CRM",
+              "word": "Revenue",
+            },
+          ],
+          "photo": {
+            "alt": "Nexa, con la chaqueta de Efeonce, mira a cámara mientras cinco esferas de luz en teal, naranja, azul, rojo y magenta orbitan a su alrededor dejando estelas; la naranja flota sobre su palma",
+            "src": "asset-ref:plate:NX6b-nexa-cinco-orbitas-isotipo",
+          },
+          "selection": {
+            "anchor": "bottom-end",
+            "label": "Nexa",
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "department",
+            "scale": 1.25,
+            "targetKind": "group",
+            "variant": "eight-handles",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`planes de los intents de ejemplo > deck-section-classic-intent.json compone el mismo plan 1`] = `
 {
   "assets": [

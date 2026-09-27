@@ -1,0 +1,30 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "proposal",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "recipe": "proposal-cinematic",
+  "layout": "hero",
+  "voice": {
+    "eyebrow": "Fuerza de trabajo híbrida",
+    "question": "¿Listos para la carrera?",
+    "answer": [
+      "Vamos"
+    ]
+  },
+  "body": "Nexa y sus agentes arrancan contigo. Cada agente con su tarea, todos en el mismo equipo.",
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-09-26_deck-nexa/plates/NX5b-nexa-bionica-isotipo.png",
+    "alt": "Nexa, con traje biónico navy y blanco con el isotipo de Efeonce en el pecho y lentes transparentes azulados, mira a cámara en la partida; cinco mini robots agentes de caras alegres la rodean y al fondo se encienden cinco luces de partida"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Nexa"
+  }
+}

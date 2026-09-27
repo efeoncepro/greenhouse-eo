@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · propuesta cinematográfica · líneas de servicio</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `proposal-cinematic`, composición `lines` (contrato 0.1.2): el portafolio. Su «respuesta» es el stack de
+      las líneas de servicio, cada una con su nombre y su palabra en el acento de ESA línea. Es la única lámina con
+      los cinco acentos (`five-accents-only-in-lines`) y no lleva esfera de voz. La marca es el sujeto: el logo va
+      junto a la frase y la burbuja URL se queda en el pie. La selección toma el GRUPO. Los nombres y las palabras
+      llegan de `content.lines` del manifest; el acento lo pone la clase de la línea desde los tokens.
+      Referencia aprobada: `proposal-cinematic-nexa-lines`.
+    -->
+    <main class="gl-slide gl-pl" data-gl-root data-slot="frame">
+      <figure class="gl-photo" data-slot="photo">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <p class="gl-eyebrow" data-slot="eyebrow">Nuestras líneas de servicio</p>
+
+      <img class="gl-pl-logo" data-slot="logo" src="assets/efeonce-logo-negative.svg" alt="Efeonce" />
+
+      <p class="gl-pl-phrase" data-slot="body">Cinco líneas. Una sola relación.</p>
+
+      <ol class="gl-pl-lines" data-slot="lines" data-gl-selection-target>
+        <li class="gl-pl-line">
+          <p class="gl-pl-name" data-slot-field="name">Growth Strategy &amp; Measurement</p>
+          <p class="gl-pl-word" data-slot-field="word">Growth</p>
+        </li>
+      </ol>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-bubble" data-slot="urlBubble" src="assets/url-bubble-baked-dark.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

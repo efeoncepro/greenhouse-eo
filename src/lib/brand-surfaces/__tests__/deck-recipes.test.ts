@@ -264,3 +264,76 @@ describe('recetas aprobadas del deck', () => {
     expectCode(() => planSurfacePiece({ ...intent, levels }, { artifactId: 'prueba' }), 'invalid-intent')
   })
 })
+
+/**
+ * Las tres composiciones de `proposal-cinematic` (TASK-1927, contrato 0.1.2). La composición es explícita
+ * (`layout` del intent) y cada una tiene su plantilla: la de `service` no cambia.
+ */
+describe('deck · composiciones de proposal-cinematic', () => {
+  const service = JSON.parse(
+    fs.readFileSync(path.join(__dirname, 'deck-proposal-cinematic-intent.json'), 'utf8')
+  ) as SurfaceIntent
+
+  it('un intent anterior a 0.1.2 compone `service` con su plantilla de siempre', () => {
+    const { template, violations, piece } = plan(service)
+
+    expect(service.layout).toBeUndefined()
+    expect(template).toBe('ProposalCinematic')
+    expect(piece.contentType).toBe('deck.proposal-cinematic')
+    expect(violations).toEqual([])
+  })
+
+  it('`layout: service` explícito compone el mismo plan que sin layout', () => {
+    const implicit = plan({ ...service, version: '0.1.2' }).piece.plan
+    const explicit = plan({ ...service, version: '0.1.2', layout: 'service' }).piece.plan
+
+    expect(explicit).toEqual(implicit)
+  })
+
+  it('`hero` lleva la respuesta a su tamaño mayor y la selección sobre la respuesta, sin prueba ni pasos', () => {
+    const { template, violations, slots, piece } = plan(example('proposal-cinematic-hero'))
+
+    expect(template).toBe('ProposalCinematicHero')
+    expect(piece.layout).toBe('hero')
+    expect(violations).toEqual([])
+    expect(slots.frame).toMatchObject({ answerPx: 176, answerTop: 285, eyebrowTop: 110, questionTop: 200, bodyTop: 560 })
+    expect(slots.proof).toBeUndefined()
+    expect(slots.steps).toBeUndefined()
+    expect(slots.selection).toMatchObject({ label: 'Nexa', anchor: 'top-end' })
+  })
+
+  it('`hero` con prueba o pasos lo rechaza AXIS', () => {
+    const hero = example('proposal-cinematic-hero')
+
+    expectCode(() => plan({ ...hero, proof: { text: 'Sky: +2.000 piezas', source: 'deck Sky' } }), 'surface-issues')
+    expectCode(() => plan({ ...hero, steps: service.steps }), 'surface-issues')
+  })
+
+  it('`lines` arma el stack desde `content.lines`, con la selección del grupo', () => {
+    const { template, violations, slots, piece } = plan(example('proposal-cinematic-lines'))
+
+    expect(template).toBe('ProposalCinematicLines')
+    expect(piece.layout).toBe('lines')
+    expect(violations).toEqual([])
+
+    const lines = slots.lines as unknown as { key: string; name: string; word: string }[]
+
+    expect(lines.map(line => line.word)).toEqual(['Growth', 'Brand', 'Engine', 'Voice', 'Revenue'])
+    expect(lines[1]).toMatchObject({ key: 'brand', name: 'Creative Services' })
+    expect(slots.selection).toMatchObject({ targetKind: 'group', anchor: 'bottom-end', scale: 1.25 })
+    expect(slots.voice).toBeUndefined()
+  })
+
+  it('el intent elige qué líneas mostrar; una desconocida o repetida la rechaza AXIS', () => {
+    const lines = example('proposal-cinematic-lines')
+    const two = plan({ ...lines, lines: ['brand', 'engine'] }).slots.lines as unknown as { word: string }[]
+
+    expect(two.map(line => line.word)).toEqual(['Brand', 'Engine'])
+    expectCode(() => plan({ ...lines, lines: ['brand', 'brand'] }), 'surface-issues')
+    expectCode(() => plan({ ...lines, lines: ['no-existe'] }), 'surface-issues')
+  })
+
+  it('`lines` fuera de su composición lo rechaza AXIS', () => {
+    expectCode(() => plan({ ...service, version: '0.1.2', lines: ['brand'] }), 'surface-issues')
+  })
+})

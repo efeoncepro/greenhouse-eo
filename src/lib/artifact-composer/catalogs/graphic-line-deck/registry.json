@@ -1,10 +1,12 @@
 {
   "version": "0.1",
   "status": "candidate",
-  "note": "Recetas APROBADAS de la superficie deck de «La órbita» (contrato efeonce.surface-composition 0.1.0 de AXIS). Una receta en opción o pendiente no tiene plantilla hasta que el operador la aprueba. El contentType es `<surface>.<recipe>`: lo deriva src/lib/brand-surfaces del manifest, nunca el autor.",
+  "note": "Recetas APROBADAS de la superficie deck de «La órbita» (contrato efeonce.surface-composition 0.1.2 de AXIS). Una receta en opción o pendiente no tiene plantilla hasta que el operador la aprueba. El contentType es `<surface>.<recipe>`: lo deriva src/lib/brand-surfaces del manifest, nunca el autor.",
   "canvas": { "width": 1920, "height": 1080 },
   "contentTypeTaxonomy": [
     "deck.proposal-cinematic",
+    "deck.proposal-cinematic.hero",
+    "deck.proposal-cinematic.lines",
     "deck.section-classic",
     "deck.section-split",
     "deck.content-measure",
@@ -22,6 +24,28 @@
       "contentTypes": ["deck.proposal-cinematic"],
       "prototype": "proposal-cinematic.html",
       "slotsRef": "proposal-cinematic.slots.json"
+    },
+    {
+      "name": "ProposalCinematicHero",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.proposal-cinematic.hero"],
+      "prototype": "proposal-cinematic-hero.html",
+      "slotsRef": "proposal-cinematic-hero.slots.json"
+    },
+    {
+      "name": "ProposalCinematicLines",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.proposal-cinematic.lines"],
+      "prototype": "proposal-cinematic-lines.html",
+      "slotsRef": "proposal-cinematic-lines.slots.json"
     },
     {
       "name": "SectionClassic",
@@ -82,6 +106,8 @@
   "selector": {
     "map": {
       "deck.proposal-cinematic": "ProposalCinematic",
+      "deck.proposal-cinematic.hero": "ProposalCinematicHero",
+      "deck.proposal-cinematic.lines": "ProposalCinematicLines",
       "deck.section-classic": "SectionClassic",
       "deck.section-split": "SectionSplit",
       "deck.content-measure": "ContentMeasure",

@@ -7,7 +7,8 @@
  * esfera y las fotos de cine degradaría lo que ese catálogo protege.
  *
  * Sólo tiene plantilla una receta APROBADA por el operador (hoy: proposal-cinematic, section-classic, section-split,
- * content-measure, triptych y method-staircase). El contentType es `deck.<receta>` y lo
+ * content-measure, triptych y method-staircase). `proposal-cinematic` tiene una plantilla por composición (`service`,
+ * `hero`, `lines`; contrato 0.1.2): la de `service` no cambia. El contentType es `deck.<receta>[.<layout>]` y lo
  * deriva `src/lib/brand-surfaces` desde el manifest de AXIS: un autor nunca elige plantilla.
  *
  * La selección colaborativa necesita medir el DOM ya lleno, así que es un layout hook; su pintura la
@@ -26,7 +27,7 @@ import { makeSelectionHook } from '../graphic-line-shared/selection-hook'
 export const graphicLineDeckCatalogDir = path.dirname(fileURLToPath(import.meta.url))
 
 /** Plantillas que pueden llevar selección colaborativa sobre la respuesta. */
-const TEMPLATES_WITH_SELECTION = ['ProposalCinematic'] as const
+const TEMPLATES_WITH_SELECTION = ['ProposalCinematic', 'ProposalCinematicHero', 'ProposalCinematicLines'] as const
 
 /**
  * En la escalera del método la selección toma un NIVEL (`selection.level`, 1 = el de abajo), no la respuesta. El

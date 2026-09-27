@@ -1,5 +1,20 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-27 (b) — TASK-1927: composiciones `hero` y `lines` de `proposal-cinematic` (`efeonce.surface-composition` 0.1.2)
+
+Greenhouse fija el contrato 0.1.2 de AXIS (tag `v0.3.11`). El bump **no movió ningún píxel**: los 22 frames del scope
+`graphic-line` quedaron a 0 px antes de tocar una plantilla, y el plan de los intents publicados es idéntico al previo
+(snapshot en `src/lib/brand-surfaces/__tests__/example-plans.test.ts`).
+
+`proposal-cinematic` gana una plantilla por composición en vez de ramas dentro de la existente: así
+`ProposalCinematic.png` (composición `service`) **no cambia**. El CSS nuevo está acotado a `.gl-pl`; `hero` reutiliza
+el molde de la voz sin modificarlo. Comparadas a ojo con el plate real contra las referencias aprobadas
+(`proposal-cinematic-nexa` y `proposal-cinematic-nexa-lines`): mismas posiciones y cuerpos; la caja de la selección
+sale del pintor canónico de Greenhouse y queda unos px más ajustada que en el prototipo.
+
+- `templates-graphic-line-deck/ProposalCinematicHero.png` — 🆕 deck.proposal-cinematic.hero
+- `templates-graphic-line-deck/ProposalCinematicLines.png` — 🆕 deck.proposal-cinematic.lines
+
 ## 2026-09-27 — TASK-1919: los catálogos de «La órbita» entran al gate (scope `graphic-line`)
 
 Tres catálogos nuevos (`graphic-line-deck`, `graphic-line-stills`, `graphic-line-overlays`) con las 20 recetas
@@ -575,7 +590,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 915fd45d901f00bc094881c1af0be3e6e07422c921b1cd48211827cd121061cc -->
+<!-- manifest-digest: 44f3384858246ba9e916807d581cffcb29c2004d23d9cfd3a3b2e06f35c8bf1e -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

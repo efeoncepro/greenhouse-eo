@@ -24,6 +24,7 @@ import {
   selectionSlot,
   upper,
   voiceSlots,
+  type SurfaceContent,
   type SurfaceIntent,
   type SurfaceManifest
 } from '../shared'
@@ -53,7 +54,22 @@ type StepsLayoutToken = {
  * a la derecha, voz en el espacio oscuro de la izquierda, prueba con fuente y hasta cuatro pasos con íconos de
  * la voz de la línea en reposo. Hasta tres pasos van en fila (`inline-3`); cuatro, en columnas (`columns-4`).
  */
-export const proposalCinematic: RecipeBuilder = ({ intent, manifest, recipe }) => {
+export const proposalCinematic: RecipeBuilder = ctx => {
+  // La composición es la que resolvió AXIS (`manifest.layout`), nunca se infiere de los campos presentes. Un intent
+  // anterior a 0.1.2 no trae layout y compone `service`, como siempre.
+  const layout = ctx.manifest.layout ?? 'service'
+
+  if (layout === 'hero') return proposalCinematicHero(ctx)
+  if (layout === 'lines') return proposalCinematicLines(ctx)
+
+  if (layout !== 'service') {
+    throw new SurfacePieceError(`\`proposal-cinematic\` no tiene plantilla para la composición «${layout}».`, 'recipe-without-template')
+  }
+
+  return proposalCinematicService(ctx)
+}
+
+const proposalCinematicService: RecipeBuilder = ({ intent, manifest, recipe }) => {
   const { width, height } = manifest.canvas
   const type = manifest.type ?? {}
   const margin = manifest.safeArea?.marginPx ?? Math.round(width * 0.0729)
@@ -138,6 +154,130 @@ export const proposalCinematic: RecipeBuilder = ({ intent, manifest, recipe }) =
   if (selection) slots.selection = selection
 
   return { slots, assets }
+}
+
+/** Una medida que el manifest de AXIS debe traer: si falta, la plantilla no la inventa. */
+const measured = <T>(value: T | null | undefined, what: string): T => {
+  if (value === null || value === undefined) {
+    throw new SurfacePieceError(`El manifest de AXIS no midió ${what}.`, 'invalid-intent')
+  }
+
+  return value
+}
+
+type MeasuredType = { px?: number | [number, number]; weight?: number; lineHeight?: number | null; tracking?: string | null; maxWidthPx?: number | [number, number] }
+
+const typeOf = (manifest: SurfaceManifest, voice: string): MeasuredType =>
+  measured((manifest.type as Record<string, MeasuredType> | undefined)?.[voice], `la tipografía de «${voice}»`)
+
+const fixedPx = (type: MeasuredType, what: string): number => {
+  if (typeof type.px !== 'number') throw new SurfacePieceError(`El manifest de AXIS no fijó el tamaño de ${what}.`, 'invalid-intent')
+
+  return type.px
+}
+
+const topOf = (manifest: SurfaceManifest, band: string): number =>
+  ofHeight(manifest, measured(reserve(manifest, band)?.fromTop, `la altura de «${band}»`))
+
+/**
+ * `proposal-cinematic` · `hero`: la escena es la protagonista (Nexa en la partida). Voz completa, la respuesta a su
+ * tamaño mayor y la selección sobre la respuesta; AXIS prohíbe prueba y pasos en esta composición.
+ */
+const proposalCinematicHero: RecipeBuilder = ({ intent, manifest }) => {
+  const content = contentOf(manifest)
+  const voice = voiceSlots(manifest)
+  const body = typeOf(manifest, 'body')
+
+  if (!voice.eyebrow) throw new SurfacePieceError('La composición `hero` lleva eyebrow.', 'invalid-intent')
+  if (!content.body) throw new SurfacePieceError('La composición `hero` lleva bajada (`body`).', 'invalid-intent')
+
+  const photo = plateAsset(manifest, manifest.canvas)
+
+  const slots: Record<string, unknown> = {
+    frame: {
+      line: intent.line,
+      margin: measured(manifest.safeArea?.marginPx, 'el margen'),
+      eyebrowTop: topOf(manifest, 'eyebrow'),
+      questionTop: topOf(manifest, 'question'),
+      answerTop: topOf(manifest, 'answer'),
+      answerPx: fixedPx(typeOf(manifest, 'answer'), 'la respuesta'),
+      bodyTop: topOf(manifest, 'body'),
+      bodyPx: fixedPx(body, 'la bajada'),
+      bodyWidth: measured(typeof body.maxWidthPx === 'number' ? body.maxWidthPx : null, 'el ancho de la bajada')
+    },
+    photo: { src: photo.ref, alt: photo.alt },
+    voice,
+    body: content.body
+  }
+
+  const selection = selectionSlot(manifest)
+
+  if (selection) slots.selection = selection
+
+  return { contentType: 'deck.proposal-cinematic.hero', slots, assets: [photo.asset] }
+}
+
+/**
+ * `proposal-cinematic` · `lines`: el portafolio. El stack sale de `content.lines` (nombre y palabra de cada línea, de
+ * `efeonceGraphicLine.lines`); el intent sólo elige cuáles. La selección toma el grupo y la marca es el sujeto: logo
+ * junto a la frase, burbuja URL en el pie.
+ */
+const proposalCinematicLines: RecipeBuilder = ({ intent, manifest, recipe }) => {
+  const content = contentOf(manifest) as SurfaceContent & { lines?: { key: string; name: string; sloganWord: string; accent: string }[] | null }
+  const lines = content.lines ?? []
+
+  if (lines.length === 0) throw new SurfacePieceError('La composición `lines` lleva al menos una línea.', 'invalid-intent')
+  if (!content.eyebrow) throw new SurfacePieceError('La composición `lines` lleva eyebrow.', 'invalid-intent')
+  if (!content.body) throw new SurfacePieceError('La composición `lines` lleva la frase (`body`).', 'invalid-intent')
+
+  const tokens = measured(
+    (recipe.layouts as Record<string, { lines?: { rowGapPx?: number; wordGapPx?: number } }> | undefined)?.lines?.lines,
+    'el stack de líneas'
+  )
+
+  const signature = manifest.signature as { logo?: { heightPx?: number; assetId?: string } } | undefined
+
+  if (signature?.logo?.assetId !== 'efeonce-logo-negative') {
+    throw new SurfacePieceError('La composición `lines` firma con el logo oficial junto a la frase.', 'invalid-intent')
+  }
+
+  const phrase = typeOf(manifest, 'body')
+  const name = typeOf(manifest, 'lineName')
+  const word = typeOf(manifest, 'lineWord')
+  const photo = plateAsset(manifest, manifest.canvas)
+
+  const slots: Record<string, unknown> = {
+    frame: {
+      line: intent.line,
+      margin: measured(manifest.safeArea?.marginPx, 'el margen'),
+      eyebrowTop: topOf(manifest, 'eyebrow'),
+      logoTop: px('logo-top', topOf(manifest, 'logo')),
+      logoHeight: px('logo-height', measured(signature.logo.heightPx, 'el alto del logo')),
+      phraseLeft: px('phrase-left', ofWidth(manifest, measured((reserve(manifest, 'body') as { inset?: number } | undefined)?.inset, 'la sangría de la frase'))),
+      phraseTop: px('phrase-top', topOf(manifest, 'body')),
+      phrasePx: px('phrase-px', fixedPx(phrase, 'la frase')),
+      phraseWeight: px('phrase-wght', measured(phrase.weight, 'el peso de la frase'), ''),
+      linesTop: px('lines-top', topOf(manifest, 'lines')),
+      rowGap: px('lines-row-gap', measured(tokens.rowGapPx, 'el aire entre líneas')),
+      wordGap: px('lines-word-gap', measured(tokens.wordGapPx, 'el aire entre nombre y palabra')),
+      lineNamePx: px('line-name-px', fixedPx(name, 'el nombre de la línea')),
+      lineNameWeight: px('line-name-wght', measured(name.weight, 'el peso del nombre de la línea'), ''),
+      lineNameTracking: `--gl-line-name-tracking=${measured(name.tracking, 'el tracking del nombre de la línea')}`,
+      lineWordPx: px('line-word-px', fixedPx(word, 'la palabra de la línea')),
+      lineWordLeading: px('line-word-leading', measured(word.lineHeight, 'el interlineado de la palabra'), ''),
+      lineWordTracking: `--gl-line-word-tracking=${measured(word.tracking, 'el tracking de la palabra')}`
+    },
+    photo: { src: photo.ref, alt: photo.alt },
+    eyebrow: content.eyebrow,
+    body: content.body,
+    lines: lines.map(line => ({ key: line.key, name: line.name, word: line.sloganWord }))
+  }
+
+  const selection = selectionSlot(manifest)
+
+  if (selection) slots.selection = selection
+
+  return { contentType: 'deck.proposal-cinematic.lines', slots, assets: [photo.asset] }
 }
 
 /* ── Capas de la órbita ─────────────────────────────────────────────────────────────────────────────────────
