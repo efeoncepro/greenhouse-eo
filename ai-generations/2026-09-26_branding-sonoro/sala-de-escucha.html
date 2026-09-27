@@ -112,6 +112,7 @@
     text-wrap: balance;
   }
   .section-head p { margin: 0; color: var(--muted); }
+  .section-head strong { color: var(--ink); font-weight: 600; }
 
   .list { display: grid; border-top: 1px solid var(--rule); }
   .row {
@@ -191,7 +192,7 @@
 
 <main class="page">
   <header>
-    <div class="eyebrow">Branding sonoro · ronda 3 · prototipos sin aprobar</div>
+    <div class="eyebrow">Branding sonoro · ronda 4 · prototipos sin aprobar</div>
     <h1>Tres puntos que se vuelven uno<span class="sphere" aria-hidden="true"></span></h1>
     <p class="lede">El logo sonoro traduce la gramática de <strong>La órbita</strong>: el anillo pregunta, tres notas breves piensan
       (las tres ventanas de la nave), hay una pausa y la esfera responde con golpe. Todo está en <strong>La mayor</strong>, la
@@ -204,6 +205,8 @@
     <span>Acento por línea <b>se queda</b></span>
     <span>Voice <b>Eco</b></span>
     <span>Reveal <b>con y sin voz</b></span>
+    <span>Apertura <b>termina abierta</b></span>
+    <span>Etiquetas <b>las cinco con Brian</b></span>
   </div>
 
   <div class="grammar" aria-label="Cómo se traduce la línea gráfica a sonido">
@@ -213,9 +216,59 @@
     <div><b>Halo · la luz</b><span>El acorde de La florece debajo y se apaga con una cola corta.</span></div>
   </div>
 
+  <section id="larga">
+    <div class="section-head">
+      <h2>La pieza larga</h2>
+      <p>40 segundos para videos de marca, eventos y webinars, a 96 BPM, construida sobre el logo sonoro. Empieza con el anillo y dos preguntas sin respuesta; entra la armonía y la esfera empieza a responder. La idea: <strong>la esfera responde siempre La mientras los acordes cambian debajo</strong> (La, Re, Fa♯ menor y Mi): el contexto cambia, la respuesta no. Sube con el arco, hace silencio y cierra con el logo sonoro completo.</p>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/r4-larga.mp3" aria-label="Reproducir pieza larga"></button>
+        <div><h3>Sin voz</h3><p>Para usar debajo de un video o de una locución: el cierre queda libre.</p></div>
+        <div class="meta">40,5 s · −14 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/r4-larga-brian.mp3" aria-label="Reproducir pieza larga con Brian"></button>
+        <div><h3>Con Brian</h3><p>Cierra con «Empower your Growth»; «growth» cae con la esfera (35,92 s y 35,95 s).</p></div>
+        <div class="meta">40,5 s · −14 LUFS</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="glitch">
+    <div class="section-head">
+      <h2>Glitch, el podcast</h2>
+      <p>Glitch lleva su propio guiño sin salirse del sistema: la tercera ventana <strong>tartamudea</strong>, como una falla digital, antes de que la esfera responda. En el cierre ya no hay falla: el logo sonoro suena limpio. Masterizado a −16 LUFS, el estándar de podcast.</p>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/r4-glitch-intro.mp3" aria-label="Reproducir intro de Glitch"></button>
+        <div><h3>Intro</h3><p>Pulso, el motivo con la falla y la esfera; después la base sigue unos segundos y se apaga para que entre la voz del anfitrión.</p></div>
+        <div class="meta">8,5 s · −16 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/r4-glitch-cortina.mp3" aria-label="Reproducir cortina de Glitch"></button>
+        <div><h3>Cortina</h3><p>Entre segmentos: el motivo con la falla y una esfera suave, sin golpe.</p></div>
+        <div class="meta">2,4 s · −16 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/r4-glitch-outro.mp3" aria-label="Reproducir outro de Glitch"></button>
+        <div><h3>Outro</h3><p>El logo sonoro limpio, que resuelve.</p></div>
+        <div class="meta">6,5 s · −15 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/r4-glitch-outro-brian.mp3" aria-label="Reproducir outro de Glitch con Brian"></button>
+        <div><h3>Outro con Brian</h3><p>Igual, con «Empower your Growth» sobre la esfera.</p></div>
+        <div class="meta">6,5 s · −15 LUFS</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="round">Ronda 3</div>
+
   <section id="apertura">
     <div class="section-head">
-      <h2>En la apertura</h2>
+      <h2>En la apertura<span class="status">Aprobada</span></h2>
       <p>La apertura cuenta la historia al revés: el logo se abre y vuelve a ser línea. Las tres notas suenan mientras las letras se recogen, la pausa cae en el retroceso de la nave y la esfera, con el golpe del lanzamiento, a los 1,15 s. Termina en el anillo abierto, sin resolver, porque después empieza el video.</p>
     </div>
     <div class="videos two">
@@ -228,7 +281,7 @@
 
   <section id="etiquetas">
     <div class="section-head">
-      <h2>La etiqueta de cada línea, con Brian</h2>
+      <h2>La etiqueta de cada línea, con Brian<span class="status">Aprobadas</span></h2>
       <p>La misma melodía, la esfera con el timbre de su línea y el golpe sobre la palabra final. Las tomas se igualaron en ritmo: la pausa entre «Empower» y «your» mide 0,14 s en las cinco (Brian la alargaba hasta 0,28 s en algunas), recortada sólo en el silencio.</p>
     </div>
     <div class="list">
@@ -434,10 +487,10 @@
     </div>
     <div class="decide">
       <ol>
-        <li><b>La apertura:</b> ¿funciona terminar en el anillo abierto, o prefieres que también resuelva?</li>
-        <li><b>Las cinco etiquetas:</b> ¿algún timbre o toma de Brian que no calce con su línea?</li>
+        <li><b>La pieza larga:</b> ¿el carácter te sirve (sereno, minimalista) o la quieres con más energía o más brillo?</li>
+        <li><b>Glitch:</b> ¿la falla en la tercera ventana funciona como guiño o se siente como un error?</li>
       </ol>
-      <p class="note"><b>Cómo se revisó.</b> La estructura, las notas, los tiempos y el volumen se verificaron con espectrogramas, medición de volumen y transcripción de las voces. Lo que no se puede medir así —si suena propio, si se recuerda, si se siente Efeonce— sólo lo decide tu oído. Después siguen la pieza larga (30–60 s) sobre el motivo y las cortinillas para Glitch.</p>
+      <p class="note"><b>Cómo se revisó.</b> La estructura, las notas, los tiempos y el volumen se verificaron con espectrogramas, medición de volumen y transcripción de las voces. Lo que no se puede medir así —si suena propio, si se recuerda, si se siente Efeonce— sólo lo decide tu oído. Con esto aprobado, lo que falta es formalizar: los valores a tokens de AXIS, la guía de identidad sonora y los formatos por red.</p>
     </div>
   </section>
 </main>

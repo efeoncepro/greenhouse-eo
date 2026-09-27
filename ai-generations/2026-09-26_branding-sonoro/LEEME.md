@@ -1,6 +1,6 @@
 # Branding sonoro Efeonce — ronda 1 (2026-09-26)
 
-Estado: **ronda 3, prototipos sin aprobar**. Sala de escucha: https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9
+Estado: **ronda 4, prototipos sin aprobar** (núcleo aprobado: logo, reveal, apertura, etiquetas). Sala de escucha: https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9
 
 ## Decisiones del operador (2026-09-26)
 
@@ -24,6 +24,19 @@ Estado: **ronda 3, prototipos sin aprobar**. Sala de escucha: https://claude.ai/
   termina en el anillo abierto) y **etiquetas de las cinco líneas con Brian**. Las tomas se igualaron en ritmo: pausa
   «Empower»→«your» a 0,14 s recortando sólo el silencio (Brian la alargaba hasta 0,28 s en Engine, Voice y Revenue;
   subir la estabilidad a 0,8 no bastó). Tomas elegidas y palabra final en `voz/final/` (`onsets.json`).
+
+## Elecciones de la ronda 3 (operador, 2026-09-26)
+
+- **Apertura aprobada** tal cual: termina en el anillo abierto.
+- **Las cinco etiquetas con Brian aprobadas.**
+- Ronda 4 (`motor/composer.mjs` sobre `motor/dsp.mjs`, 96 BPM): **pieza larga** de 40,5 s (la esfera responde siempre La
+  mientras la armonía cambia: La · Re/La · Fa♯m7 · Mi sus4) y **Glitch** (intro 8,5 s, cortina 2,4 s, outro 6,5 s; la
+  tercera ventana tartamudea con reducción de resolución; el outro suena limpio). Masterización en `motor/master.sh`:
+  realce +3 dB sobre 5 kHz y loudnorm en dos pasadas (−14 LUFS video/redes, −16 LUFS podcast).
+- Trampa medida: normalizar por pico dejó la cortina a −8,8 LUFS y la intro a −17,9 (el golpe grave manda el pico);
+  cada pieza se normaliza por sonoridad a su destino, nunca por pico.
+- Balance: la primera versión de la pieza larga tenía ~5 dB de graves de más y ~5 dB de agudos de menos contra el logo
+  aprobado (bandas <200 Hz, 200 Hz–2 kHz y >2 kHz). Sigue más oscura que el logo (colchón): decisión de carácter pendiente.
 
 ## Concepto
 
