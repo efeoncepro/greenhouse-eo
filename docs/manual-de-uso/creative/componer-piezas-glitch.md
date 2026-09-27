@@ -1,9 +1,11 @@
 # Componer piezas de Glitch — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.4: la música de Glitch quedó aprobada e integrada al taller, con
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.5: el blog completo y la lámina con lente quedaron aprobados;
+> la versión 1:1 del banner es una plantilla propia, el callout «DROP» v2 rige desde la #17 y la lente es una variante
+> ocasional. v1.4: la música de Glitch quedó aprobada e integrada al taller, con
 > el pre-roll de la intro; el flujo del editor agente pasa al manual [Producir el motion, el sonido y la música de
 > Glitch](./producir-motion-glitch.md) y se corrigen las cifras de verificación. v1.3: el motion de Glitch y los
 > tableros de video quedaron aprobados)
@@ -30,7 +32,7 @@ animados del video** se generan desde el repo taller y están **aprobados** (202
 
 - **Confirma que la pieza es de Glitch.** Si no, este manual no aplica.
 - **Abre el canvas** [«Glitch en La órbita»](https://claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS) (privado). La sección
-  «Sistema de portada» es la aprobada; en «Blog y vlog» el blog es propuesta y los tableros de video están aprobados;
+  «Sistema de portada» es la aprobada; en «Blog y vlog» el blog y los tableros de video están aprobados;
   «Vlog en reel» está aprobada (2026-09-27).
 - **Ten a mano la norma** ([`GLITCH_GRAPHIC_LINE_V1.md`](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)):
   ahí están los colores, las letras, la cabecera y las medidas.
@@ -79,8 +81,9 @@ que el contenido permita. Nunca dos semanas seguidas con la misma.
    porqué.
 5. Avance «n/8» en ocho segmentos y «DESLIZA» con la mano Plastilina.
 6. **Noticia 1:** agrega la franja «EL MICRÓFONO SE ABRE» con los puntos entre la cabecera y la foto.
-7. **Lente (sólo propuesta):** si la opinión habla de un detalle nítido de la foto, la variante con lente existe en el
-   canvas, pero no está aprobada. Si se usa en una prueba, la opinión **no** cierra con la manzana (una sola esfera).
+7. **Lente (variante ocasional, aprobada el 2026-09-27):** úsala **sólo** cuando la opinión habla de un detalle nítido
+   de la foto; si no, va la lámina interior normal. La lente amplía ese detalle a color y el resto queda en navy. Esa
+   lámina **no** cierra con la manzana: la esfera ya está en la lente (una sola esfera por pieza).
 
 ### Paso 4 · Arma la contraportada
 
@@ -91,18 +94,25 @@ que el contenido permita. Nunca dos semanas seguidas con la misma.
 5. La misma cabecera; firma de Efeonce con el eslogan «Empower your Growth» (Glitch es línea Growth), más chico que el
    logo.
 
-### Paso 5 · Piezas del blog (propuesta)
+### Paso 5 · Piezas del blog (aprobado)
 
-Todo el blog está en **propuesta**. Mientras no se apruebe, publica con la estructura vigente del post y usa estas piezas
-sólo para mostrarlas al operador:
+Todo el blog está **aprobado** desde el 2026-09-27 («Vamos en todas con tu recomendación»). Arma el post así:
 
-- Banners 16:9 con las plantillas A/B/C en horizontal, sin «Desliza», más una versión **1:1** porque el archivo del blog
-  recorta la imagen destacada en cuadrado (sirve la portada 4:5 recortada).
-- Apertura navy «El micrófono se abre» + tesis + «Vamos.», escaleta de las ocho, banners internos por noticia, callout
-  Glitch v2, banner de suscripción, vlog embebido, «El hilo de la semana» y el cierre «El micrófono se cierra.» + «— El
-  equipo editorial de Glitch».
-- El **callout v2** no se puede usar en WordPress todavía: exige actualizar el bloque `efeoncepro/glitch-drop`. El bloque
-  publicado hoy es el v1.
+- **Imagen destacada:** banner 16:9 (1920 × 1080) con la plantilla A/B/C de la semana en horizontal, sin «Desliza».
+- **Versión 1:1:** el archivo del blog recorta la imagen destacada en cuadrado, así que agrega la versión 1:1 con su
+  **plantilla propia** (derivada de las portadas). **Nunca** recortes la portada 4:5: pierde un quinto del alto y puede
+  cortar el titular o la manzana. La plantilla la construye TASK-1923; mientras no exista, recompón la portada de la
+  semana en el cuadrado (mismos elementos reubicados, titular y manzana completos) en lugar de recortarla.
+- **Apertura:** bloque navy «El micrófono se abre» + tesis + «Vamos.». Reemplaza la cita con fecha.
+- **Escaleta:** el índice de las ocho noticias, como en radio.
+- **Banner interno de cada noticia** (1600 × 900): foto en duotono navy + bytes + chip número/sección + wordmark, **con
+  el crédito de la foto siempre**. Reemplaza la imagen cruda de la fuente.
+- **Callout «DROP» v2** (bloque navy, puntos + wordmark + «DROP», remate con manzana, porqué debajo, bytes en la
+  esquina): rige **desde la #17**. Antes de publicar la #17 hay que actualizar el bloque de WordPress
+  `efeoncepro/glitch-drop` (TASK-1337); hasta entonces el bloque publicado es el v1. Los posts anteriores a la #17
+  siguen con el v1: no los edites para cambiarlo.
+- Banner de suscripción a mitad del post, vlog embebido, «El hilo de la semana» (cierre navy) y el cierre «El micrófono
+  se cierra.» + «— El equipo editorial de Glitch» + íconos Plastilina versión papel.
 - En el blog, que es claro, **el verde no va como texto, borde ni línea**: los momentos de marca van en bloques navy.
 
 ### Paso 6 · Video (aprobado)
@@ -189,8 +199,8 @@ de grabación, la prueba con los editores en una edición real, el estilo de sub
 
 | Estado | Qué significa |
 |---|---|
-| **APROBADO** (2026-09-27) | se usa como pieza final: portada A/B/C con rotación, lámina interior, noticia 1 y contraportada; también la manzana como esfera, el verde como acento, la línea Growth, el alta de los cinco íconos Plastilina, el sonido (versión B), la música (tema B y cama post-punk, con el pre-roll de la intro) y el motion del video (apertura y tarjeta final v2, kit de gráficos con el lower third, transiciones) con los tableros de video del canvas (vlog 16:9 y reel) |
-| **PROPUESTA** | se puede armar para mostrarla al operador, pero no se publica como final: lente y blog. (El flujo de composición está aceptado; su automatización de piezas fijas es TASK-1923) |
+| **APROBADO** (2026-09-27) | se usa como pieza final: portada A/B/C con rotación, lámina interior, noticia 1, contraportada, la lámina con lente (variante ocasional) y el blog completo (banners 16:9 y 1:1 propia, apertura, escaleta, banner interno con crédito, callout «DROP» v2 desde la #17, suscripción, «El hilo de la semana» y cierre); también la manzana como esfera, el verde como acento, la línea Growth, el alta de los cinco íconos Plastilina, el sonido (versión B), la música (tema B y cama post-punk, con el pre-roll de la intro) y el motion del video (apertura y tarjeta final v2, kit de gráficos con el lower third, transiciones) con los tableros de video del canvas (vlog 16:9 y reel) |
+| **PROPUESTA** | se puede armar para mostrarla al operador, pero no se publica como final. Hoy no hay piezas fijas en propuesta; el estado queda para piezas nuevas. (El flujo de composición está aceptado; su automatización de piezas fijas es TASK-1923) |
 | **EXPLORACIÓN** | idea en estudio, no canon: los acentos teal y naranja del canvas, la historia 9:16 y el carrusel panorámico |
 | **Aprobado, sin publicar en AXIS** | la manzana, el verde y los cinco íconos Plastilina de Glitch están aprobados (2026-09-27), pero todavía no están en los paquetes oficiales de AXIS (TASK-1922) |
 | **Pendiente** (video) | la cadencia de grabación (hoy 30 fps), la prueba con los editores en una edición real, el ritmo ajustable, a qué piezas se aplica la transición de bytes, el estilo de subtítulos, los textos reales de la #17 y cualquier excepción de rostros |
@@ -214,14 +224,14 @@ de grabación, la prueba con los editores en una edición real, el estilo de sub
 
 | Síntoma | Causa | Solución |
 |---|---|---|
-| La imagen destacada del blog se ve cortada | el archivo del blog recorta la destacada en cuadrado | agrega la versión 1:1 (la portada 4:5 recortada) |
+| La imagen destacada del blog se ve cortada | el archivo del blog recorta la destacada en cuadrado | agrega la versión 1:1 con su plantilla propia; nunca recortes la portada 4:5 |
 | El verde no se lee en el blog | el verde sobre blanco da ~2,25:1 | pasa ese momento de marca a un bloque navy |
 | La lámina con lente tiene dos esferas | la opinión cierra con la manzana y además está la lente | quita la manzana del cierre: con lente, la esfera es la lente |
 | Los bytes cortan la cara de una persona | la falla se aplicó sobre el borde equivocado | desarma la foto por el otro borde (abajo o lateral) o cambia la foto |
 | En el reel, un gráfico queda tapado por la interfaz de la app | el gráfico cayó en una zona reservada | muévelo a su zona del mapa (cabecera 240–440, texto 1150–1480) |
 | La tarjeta final se ve sucia al publicar | la compresión del video ensucia las texturas finas | quita las texturas finas de la tarjeta |
 | Dos semanas seguidas con la misma portada | no se revisó la plantilla anterior | aplica la regla de rotación y cambia a la siguiente que el contenido permita |
-| El callout v2 no aparece en WordPress | el bloque `efeoncepro/glitch-drop` publicado es el v1 | el v2 es propuesta; requiere actualizar el bloque antes de usarlo |
+| El callout v2 no aparece en WordPress | el bloque `efeoncepro/glitch-drop` publicado sigue en el v1 | el v2 está aprobado desde la #17, pero el bloque se actualiza antes de publicarla (TASK-1337); avisa si la #17 está por salir sin el bloque nuevo |
 | Un agente pregunta qué número lleva la edición, o copia el «#11» de una maqueta | los «#11»–«#14» del canvas son ejemplos de diseño | la próxima es la **#17**: la serie sigue la del blog y del pipeline editorial (decisión del operador, 2026-09-27) |
 
 ## Referencias técnicas

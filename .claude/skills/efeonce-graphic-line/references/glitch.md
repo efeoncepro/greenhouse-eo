@@ -9,7 +9,8 @@
 > post-punk) **aprobada** por el operador el 2026-09-27, másteres en `glitch/music/v1/` del bucket de AXIS, integrada
 > al taller (`2c8f36c`, `ed89a0b`) y en producción en AXIS (`87c3298`, `#musica`): ver §13.7 · **el reel abre directo
 > con la apertura, sin pre-roll** (decisión del operador del 2026-09-27; taller `1f323ca`, sin empujar): el pre-roll
-> queda sólo en el vlog.
+> queda sólo en el vlog · **blog completo y lámina con lente APROBADOS** (operador, 2026-09-27: «Vamos en todas con tu
+> recomendación»; norma v1.10): ya no quedan piezas estáticas en PROPUESTA.
 >
 > **Canon humano:** norma [`GLITCH_GRAPHIC_LINE_V1.md`](../../../../docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
 > + ADR [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](../../../../docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
@@ -102,27 +103,34 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
   segmentos; «DESLIZA» + mano Plastilina.
 - **Noticia 1 — ajuste del operador (aplicado):** la interior con una franja «EL MICRÓFONO SE ABRE» + puntos en el acento, entre la cabecera y
   la foto.
-- **Variante con lente — PROPUESTA:** la lente de La órbita (token `lens`: anillo 1,9 px al 28 %, arco de 50° arriba a la
-  izquierda y lejos de la cara, esfera 7,6 px, zoom 1,25, detalle a color y el resto en navy). Uso ocasional, cuando el
-  POV trata de un detalle nítido de la foto. **La esfera ya está en la lente → el POV no cierra con la manzana.**
+- **Variante con lente — APROBADA (2026-09-27) como variante ocasional:** la lente de La órbita (token `lens`: anillo
+  1,9 px al 28 %, arco de 50° arriba a la izquierda y lejos de la cara, esfera 7,6 px, zoom 1,25, detalle a color y el
+  resto en navy). **Sólo** cuando el POV trata de un detalle nítido de la foto; nunca por defecto. **La esfera ya está en
+  la lente → esa lámina no cierra con la manzana** (una sola esfera por pieza).
 - **Contraportada — APROBADA:** «El micrófono se cierra» con contraste de pesos; los puntos se resuelven en la manzana;
   textura de manzana en bytes; fila Plastilina «SI TE SIRVIÓ» (guardar, compartir, recomendar, comentar); CTA en píldora
   blanca «Suscríbete a [wordmark]»; la misma cabecera; firma Efeonce 300 px + eslogan.
 - Historia 9:16 y carrusel panorámico: exploración anterior, **no canon**.
 
-## 5. Blog — PROPUESTA
+## 5. Blog — APROBADO (2026-09-27)
 
-- **Banners 16:9 (1920×1080)** con las plantillas A/B/C en horizontal, sin «Desliza». El archivo del blog recorta la
-  destacada en cuadrado → hace falta una versión 1:1 (sirve la portada 4:5 recortada).
+Aprobado todo por el operador el 2026-09-27 («Vamos en todas con tu recomendación»): la maqueta del post completa queda
+aprobada (el vlog embebido ya lo estaba con el motion).
+
+- **Banners 16:9 (1920×1080)** con las plantillas A/B/C en horizontal, sin «Desliza»: la imagen destacada. El archivo
+  del blog recorta la destacada en cuadrado → la versión **1:1** es una **plantilla propia** derivada de las portadas
+  (plantilla de TASK-1923). **Nunca** recortar la portada 4:5: pierde un quinto del alto y puede cortar el titular o la
+  manzana.
 - **Maqueta del post** (blog claro): banner destacado → **apertura** navy «El micrófono se abre» + tesis + «Vamos.»
   (reemplaza la cita con fecha) → **la escaleta** (índice de las ocho, como en radio) → **banner interno de noticia**
-  1600×900 (foto en navy + bytes + chip número/sección + wordmark; reemplaza la imagen cruda de la fuente) → **callout
-  Glitch v2** → **banner de suscripción** a mitad del post → **vlog embebido** → **«El hilo de la semana»** (cierre navy)
+  1600×900 (foto en duotono navy + bytes + chip número/sección + wordmark; reemplaza la imagen cruda de la fuente;
+  **crédito de la foto obligatorio**) → **callout «DROP» v2** → **banner de suscripción** a mitad del post → **vlog embebido** → **«El hilo de la semana»** (cierre navy)
   → **cierre** «El micrófono se cierra.» + «— El equipo editorial de Glitch» + íconos Plastilina versión papel.
 - **Callout v2 vs v1:** el v1 de TASK-1337 está **publicado** (bloque `efeoncepro/glitch-drop`: panel claro navy 5 %,
   barra navy, wordmark 18 px). El v2 (pedido del operador: «más punch») es bloque navy con puntos + wordmark + «DROP»,
-  remate Bricolage 800 con la manzana, porqué en Poppins y bytes en la esquina. Aplicarlo exige actualizar el bloque de
-  WordPress; hasta la aprobación, **el v1 sigue vigente**.
+  remate Bricolage 800 con la manzana, porqué en Poppins y bytes en la esquina. **Aprobado desde la #17**: el bloque de
+  WordPress se actualiza al v2 **antes de publicar la #17**; los posts anteriores siguen con el v1. El v2 no es plantilla
+  del Composer: vive sólo en el bloque. Hasta que el bloque se actualice, lo publicado es el v1.
 
 ## 6. Video — motion APROBADO (2026-09-27)
 
@@ -186,8 +194,8 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
 | Sistema de portada A/B/C + regla de rotación + feed de nueve semanas | **APROBADO** (2026-09-27) |
 | Lámina interior y contraportada | **APROBADO** |
 | Noticia 1 (franja «El micrófono se abre») | ajuste del operador, aplicado |
-| Variante con lente | PROPUESTA |
-| Blog: banners 16:9 (+1:1), maqueta del post, callout v2 | PROPUESTA (el callout v1 de TASK-1337 sigue publicado) |
+| Variante con lente | **APROBADO** (2026-09-27) como variante ocasional (sólo POV sobre un detalle nítido de la foto; sin manzana en esa lámina) |
+| Blog: banners 16:9 A/B/C, 1:1 con plantilla propia, maqueta del post completa, callout «DROP» v2 | **APROBADO** (2026-09-27). Callout v2 **desde la #17**: el bloque de TASK-1337 se actualiza antes de publicarla; los posts anteriores siguen con el v1 |
 | Vlog 16:9, kit de overlays del reel, tarjetas finales (y los tableros de video del canvas) | **APROBADO** (2026-09-27, con el motion) |
 | La manzana como esfera y el verde como acento | **APROBADO** (2026-09-27); token de franquicia en AXIS pendiente (TASK-1922) |
 | Línea de servicio Growth («Empower your Growth») | **APROBADO** (2026-09-27) |
@@ -201,7 +209,8 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
 | Diseño sonoro de Glitch (ronda 6: apertura, tarjeta final, kit, lower third, transiciones) | **APROBADO, versión B** (2026-09-27, §13): «La b me encanta más. Sus sonidos están aprobados». La A queda como alternativa descartada |
 | Música de Glitch: tema B (intro, cortina, salida) y cama post-punk bajo la noticia | **APROBADO** (2026-09-27, §13.7): «Definitivamente la B es la decisión», «Me parecen bien todas», «Post-punk definitivamente». **Integrada al taller** (`music.mjs`, pre-roll animado de la intro elegido por el operador) y **en producción en AXIS** (`#musica`, `glitch.json → music`). Único pendiente: probar la mezcla con la voz real del host |
 
-Una PROPUESTA no se entrega como canon ni se publica: se muestra al operador para aprobar.
+Una PROPUESTA no se entrega como canon ni se publica: se muestra al operador para aprobar. Desde el 2026-09-27 no queda
+ninguna pieza estática en PROPUESTA; el estado sigue valiendo para piezas nuevas.
 
 ## 9. Flujo de composición — ACEPTADO (2026-09-27; hogar del movimiento: repo taller)
 
@@ -252,13 +261,13 @@ existentes. **4 existe y está aprobado** (2026-09-27) en `tools/glitch-motion/`
 Glitch como propuesta espejada de AXIS Lab hasta TASK-1922: cómo operarlo en §12. El trabajo ya tiene tasks: (a) tokens, assets y contrato de Glitch en AXIS
 → TASK-1922 (incluye (e) el alta de los cinco glifos Plastilina, aprobada, y (f) la licencia de Guttery); (b) catálogos
 de Glitch en el Composer → TASK-1923; (c) overlays HyperFrames + render con alfa → TASK-1924; (d) callout v2 en el
-bloque de WordPress, sin task hasta que se apruebe.
+bloque de WordPress (aprobado el 2026-09-27, desde la #17) → bloque de TASK-1337, antes de publicar la #17.
 
 **Resuelto por el operador el 2026-09-27:** manzana y verde aprobados; línea Growth; próxima edición #17; alta de los
 cinco glifos aprobada; el diseño sonoro de Glitch (y con él el mnemónico): **versión B aprobada**, con sus cuatro
 decisiones (§13.6); el motion de Glitch (apertura y tarjeta final v2, kit con el lower third, transiciones) con el vlog
-16:9, el reel y las tarjetas finales: **aprobado**. **Pendientes del operador (no decidas por tu cuenta):** aprobación
-de lente y blog; la licencia de Guttery (confirmada; registrar la referencia); y los pendientes del motion de §12.7. El flujo de composición ya está `Accepted` y
+16:9, el reel y las tarjetas finales: **aprobado**; el blog completo y la lámina con lente: **aprobados**.
+**Pendientes del operador (no decidas por tu cuenta):** la licencia de Guttery (confirmada; registrar la referencia); y los pendientes del motion de §12.7. El flujo de composición ya está `Accepted` y
 el hogar del movimiento ya está decidido (repo taller).
 
 ## 10. QA de una pieza de Glitch (además de [qa-checklist.md](qa-checklist.md))
@@ -272,6 +281,9 @@ el hogar del movimiento ya está decidido (repo taller).
 - [ ] Reel: nada en 0–220, desde 1500 ni desde x 940; la cara del host libre; subtítulos presentes.
 - [ ] Firma: logo de Efeonce centrado abajo; sin burbuja URL ni URL como texto.
 - [ ] Foto o clip de la fuente embebido o licenciado, con crédito.
+- [ ] Blog: la 1:1 sale de su plantilla propia (nunca la portada 4:5 recortada); cada banner interno lleva el crédito
+      de la foto; el callout «DROP» v2 sólo desde la #17 y con el bloque ya actualizado.
+- [ ] Lámina con lente sólo si el POV trata de un detalle nítido de la foto; esa lámina no cierra con la manzana.
 
 ## 11. Dónde se ve
 

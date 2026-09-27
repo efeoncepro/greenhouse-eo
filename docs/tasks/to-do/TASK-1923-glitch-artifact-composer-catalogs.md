@@ -1,5 +1,31 @@
 # TASK-1923 — Glitch en el Artifact Composer
 
+## Delta 2026-09-27 (noche) — blog y lente aprobados
+
+Decisión del operador (Julio Reyes), registrada en el
+[Delta — blog y lente aprobados del ADR de Glitch](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--blog-y-lente-aprobados)
+y en la [norma §5, §6 y §9](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#6-blog--aprobado-2026-09-27):
+«Vamos en todas con tu recomendación».
+
+- **Aprobadas** las plantillas que el Slice 7 construía cerradas: `InteriorLens` (como **variante ocasional**: sólo
+  cuando el POV trata de un detalle nítido de la foto; no cierra con la manzana), `BlogBannerPhoto`, `BlogBannerType`,
+  `BlogBannerMosaic` (16:9, las portadas A/B/C en horizontal, sin «Desliza»), `BlogBannerSquare` y `BlogNewsBanner`.
+  Pasan a construirse **abiertas** (`approval: "approved"`) y entran a la línea base de píxeles.
+- **`BlogBannerSquare` es una plantilla propia 1:1**, derivada de las portadas; **nunca** el recorte de la portada 4:5
+  (pierde un quinto del alto y puede cortar el titular o la manzana). No es un diseño nuevo que aprobar.
+- **`BlogNewsBanner` (1600 × 900, duotono navy + bytes + chip número/sección + wordmark) exige el crédito de la foto**
+  como slot requerido y pintado; reemplaza la imagen cruda de la fuente.
+- **El callout «DROP» v2 no es plantilla de este composer:** vive en el bloque de WordPress `efeoncepro/glitch-drop`
+  (TASK-1337), que pasa al v2 antes de publicar la #17 (los posts anteriores siguen con el v1). Coherente con Out of
+  Scope, que ya lo dejaba fuera, igual que la maqueta del post (apertura, escaleta, suscripción, «El hilo de la
+  semana», cierre), que es WordPress.
+- **El mecanismo de PROPUESTA se conserva** (`approval` como dato, `piece-not-approved`, `glitch.piece-approval@1`)
+  para piezas futuras. Hoy la norma no tiene piezas estáticas en PROPUESTA.
+- `[verificar]` **Portada del reel (`ReelCover`), miniatura (`VideoThumbnail`) y las versiones PNG de los overlays del
+  reel:** esta aprobación no las nombra. El kit de overlays del reel quedó aprobado como **motion** (HyperFrames,
+  TASK-1924) y la norma no les da un estado propio como piezas estáticas. Siguen en el Slice 7 con `approval:
+  "proposed"` hasta que el operador confirme si se construyen en el composer y con qué estado.
+
 ## Delta 2026-09-27 (tarde) — el motion lee su propio archivo de edición
 
 - El motion de Glitch (TASK-1924) ya existe, está **aprobado** y **no espera este manifiesto**: lee su propio archivo de
@@ -49,7 +75,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-031`
-- Status real: `Diseño. Bloqueada por TASK-1922 (token glitchLine, archivos oficiales y contrato efeonce.glitch-line). Los Slices 1 y 5 (contrato del manifiesto y geometría pura de la falla) pueden adelantarse sin TASK-1922.`
+- Status real: `Diseño. Bloqueada por TASK-1922 (token glitchLine, archivos oficiales y contrato efeonce.glitch-line). Los Slices 1 y 5 (contrato del manifiesto y geometría pura de la falla) pueden adelantarse sin TASK-1922. Desde el 2026-09-27 (noche) el blog (banners 16:9 A/B/C, 1:1 propia, banner interno de noticia) y la lámina con lente están aprobados: se construyen abiertos; sólo la portada del reel, la miniatura y los overlays PNG del reel siguen en proposed [verificar].`
 - Rank: `TBD`
 - Domain: `content|creative|platform`
 - Blocked by: `TASK-1922`
@@ -68,11 +94,13 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 ## Summary
 
 Convierte las piezas aprobadas de Glitch (portada A/B/C con regla de rotación, lámina interior, interior de la noticia
-1 y contraportada) en plantillas del Artifact Composer, repartidas en tres catálogos delgados sobre un mismo
+1, contraportada y, desde el 2026-09-27, la lámina con lente, los banners del blog 16:9 A/B/C y 1:1 y el banner interno
+de noticia) en plantillas del Artifact Composer, repartidas en tres catálogos delgados sobre un mismo
 `templatesDir`: `glitch-carousel` (PDF del carrusel de LinkedIn), `glitch-stills` (PNG sueltos) y `glitch-overlays`
 (PNG con alfa). Un **manifiesto de edición** validado entra por `pnpm glitch:compose` y sale como PDF, PNG y un manifest
-resuelto con procedencia, sin que ningún agente elija plantilla ni coordenadas. Las piezas en PROPUESTA se construyen
-pero fallan cerradas hasta que el operador las apruebe.
+resuelto con procedencia, sin que ningún agente elija plantilla ni coordenadas. Una pieza en PROPUESTA se construye
+pero falla cerrada hasta que el operador la apruebe (hoy la norma no tiene piezas estáticas en PROPUESTA; el mecanismo
+queda para piezas futuras).
 
 ## Why This Task Exists
 
@@ -93,8 +121,8 @@ semánticos, el hook de la falla en bytes y el comando que va de un manifiesto d
 - Las reglas duras de la sub-línea (una esfera por pieza, crédito y licencia de la foto, contraste de pesos del
   titular, verde nunca como texto sobre claro, falla nunca sobre un rostro, slots con `maxCharacters` y `overflow:
   reject`) fallan cerradas antes del render.
-- Las plantillas aprobadas quedan bajo `pnpm composer:visual-gate` a cero píxeles; las PROPUESTA existen detrás de un
-  estado de aprobación que es dato y fallan con un error legible.
+- Las plantillas aprobadas quedan bajo `pnpm composer:visual-gate` a cero píxeles; una pieza en PROPUESTA existe
+  detrás de un estado de aprobación que es dato y falla con un error legible.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -145,7 +173,8 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` (norma: §3 elementos, §4 portada y rotación, §5
-  láminas del carrusel, §6–§7 blog y video en propuesta, §8 NUNCA, §9 estado de cada pieza).
+  láminas del carrusel, §6 blog aprobado el 2026-09-27, §7 video con motion aprobado, §8 NUNCA, §9 estado de cada
+  pieza).
 - `.claude/skills/efeonce-graphic-line/references/glitch.md` (criterio para agentes y QA §10).
 - `docs/operations/runbooks/composer-visual-gate.md` (protocolo del freeze: single-owner, atómico).
 - `docs/issues/open/ISSUE-122-composer-visual-gate-photo-nondeterminism-concurrency-docs.md` (fotos raster y cero
@@ -455,14 +484,23 @@ Reglas obligatorias:
 - Tests con fixtures: la tabla de rotación completa (A→¬A, B→¬B, C→¬C, `none` en la primera edición compuesta); un
   plan con `template` declarado → `TemplateAuthorityError`; cada validador con un caso que pasa y uno que falla.
 
-### Slice 7 — Plantillas en PROPUESTA (construidas, cerradas hasta su aprobación)
+### Slice 7 — Lente, blog y piezas del reel
 
-- `approval: "proposed"` en el registry; sin línea base de píxeles (sólo prueba de humo: renderiza, tiene tinta, no cae
-  en fuente de respaldo). Entran a la línea base en el mismo PR que las aprueba.
+- **Aprobadas el 2026-09-27** (construidas abiertas, `approval: "approved"`, con línea base de píxeles como las del
+  Slice 4):
   - `InteriorLens` (lente de La órbita; `sphere: "lens"`, el POV no cierra con manzana) — `carousel`, `stills`.
-  - `BlogBannerPhoto`, `BlogBannerType`, `BlogBannerMosaic` (1920 × 1080) y `BlogBannerSquare` (1:1 para el archivo del
-    blog) — `stills`.
-  - `BlogNewsBanner` (banner interno 1600 × 900) — `stills`.
+    **Variante ocasional:** sólo cuando el POV trata de un detalle nítido de la foto; nunca por defecto. `[verificar]`
+    cómo lo declara el manifiesto: el schema del Detailed Spec todavía no tiene el campo que la activa (lo define el
+    Slice 1, sin que el autor elija plantilla).
+  - `BlogBannerPhoto`, `BlogBannerType`, `BlogBannerMosaic` (1920 × 1080, las portadas A/B/C en horizontal, sin
+    «Desliza») — `stills`.
+  - `BlogBannerSquare` (1:1 para el archivo del blog): **plantilla propia** derivada de las portadas, nunca el recorte
+    de la portada 4:5 — `stills`.
+  - `BlogNewsBanner` (banner interno 1600 × 900, duotono navy + bytes + chip número/sección + wordmark), con el
+    **crédito de la foto obligatorio** (slot requerido y pintado) — `stills`.
+- **Siguen en `approval: "proposed"`** `[verificar]` con el operador (la aprobación del 2026-09-27 no las nombra; el kit
+  del reel se aprobó como motion): sin línea base de píxeles (sólo prueba de humo: renderiza, tiene tinta, no cae en
+  fuente de respaldo); entran a la línea base en el mismo PR que las aprueba.
   - `ReelCover` (1080 × 1920) y `VideoThumbnail` (1280 × 720) — `stills`.
   - Overlays del reel con `render.background: "transparent"` (1080 × 1920, respetando el mapa de zonas: nada en 0–220,
     desde 1500 ni desde x 940): `ReelHeader`, `ReelLowerThird`, `ReelSubtitle`, `ReelNewsCard`, `ReelSourceSplit`,
@@ -659,7 +697,7 @@ productiva.
 | Slice 4 | revertir las plantillas aprobadas | minutos | si |
 | Slice 5 | revertir `byte-fracture.ts`, el hook y el materializador | minutos | si |
 | Slice 6 | revertir el mapper y los validadores | minutos | si |
-| Slice 7 | revertir las plantillas en propuesta (no tienen línea base) | minutos | si |
+| Slice 7 | revertir las plantillas de lente, blog y reel; las aprobadas retiran su línea base con una fila en `BASELINE_DELTAS.md` | minutos | si |
 | Slice 8 | revertir `scripts/glitch/compose.ts` y el script de `package.json` | minutos | si |
 | Slice 9 | quitar la entrada de probe, revertir `templates-glitch/**` y agregar fila de retiro en `BASELINE_DELTAS.md` | minutos | si |
 | Slice 10 | revertir los deltas de docs y skill | minutos | si |
@@ -706,8 +744,12 @@ Sin producción en esta task (repo-only, no production runtime impact). Verifica
 - [ ] Una plantilla pedida a un catálogo al que no pertenece falla con `glitch.catalog-membership`.
 - [ ] Las seis plantillas aprobadas (`CoverPhoto`, `CoverType`, `CoverMosaic`, `Interior`, `InteriorOpening`,
       `BackCover`) existen con `approval: "approved"`; todos sus textos declaran `maxCharacters` y `overflow: "reject"`.
-- [ ] Cada plantilla en PROPUESTA pedida por el CLI sale con código distinto de cero y `piece-not-approved`, y un plan
-      armado a mano con ella falla en `glitch.piece-approval`.
+- [ ] Las plantillas aprobadas el 2026-09-27 (`InteriorLens`, `BlogBannerPhoto`, `BlogBannerType`,
+      `BlogBannerMosaic`, `BlogBannerSquare` propia 1:1 y `BlogNewsBanner` con crédito requerido) existen con
+      `approval: "approved"` y línea base de píxeles; `BlogBannerSquare` no es un recorte de la portada 4:5.
+- [ ] El mecanismo de PROPUESTA se conserva para piezas futuras: una plantilla con `approval: "proposed"` (las piezas
+      del reel que sigan así o, si no queda ninguna, un fixture de test) pedida por el CLI sale con código distinto de
+      cero y `piece-not-approved`, y un plan armado a mano con ella falla en `glitch.piece-approval`.
 - [ ] La tabla de rotación del Detailed Spec pasa completa en tests, incluido `cover-rotation-unsatisfiable`.
 - [ ] Un plan que declara `template` falla con `TemplateAuthorityError`.
 - [ ] Cada uno de los nueve validadores semánticos tiene un fixture que pasa y uno que falla.
@@ -761,8 +803,10 @@ Sin producción en esta task (repo-only, no production runtime impact). Verifica
   procedencia, tool MCP, flag): sumarla a TASK-1921 si su dueño de dominio lo admite, o abrir una task nueva de EPIC-031.
 - Adapter del dominio de ediciones de TASK-1442 → `GlitchEditionManifest` cuando ese dominio exista.
 - Detección asistida de rostros para proponer `faceRegions` (hoy los declara el editor).
-- Aprobación y línea base de cada pieza en PROPUESTA a medida que el operador las apruebe.
-- Callout v2 del bloque de WordPress, si se aprueba (fuera del composer).
+- Aprobación y línea base de cada pieza en PROPUESTA a medida que el operador las apruebe (hoy sólo las piezas del
+  reel del Slice 7 `[verificar]`).
+- Callout «DROP» v2 del bloque de WordPress: **aprobado el 2026-09-27** desde la #17; lo ejecuta TASK-1337 antes de
+  publicar la #17 (fuera del composer).
 
 ## Open Questions
 
@@ -771,8 +815,10 @@ Sin producción en esta task (repo-only, no production runtime impact). Verifica
    del pipeline editorial; los «#11»–«#14» del canvas son ejemplos de diseño. El ejemplo es `edition-17.example.json`.
 2. **Licencia de Guttery (resuelta 2026-09-27):** el operador confirmó la licencia para web y video. Guttery entra a la
    extensión `glitch` del pack con `embedRights: true` y la referencia del contrato que registra TASK-1922.
-3. **Aprobación de las piezas en PROPUESTA** (interior con lente, banners del blog 16:9 y 1:1, banner interno, portada
-   del reel, miniatura, overlays del reel). Se construyen cerradas; cada aprobación las abre y las lleva a línea base.
+3. **Aprobación de las piezas en PROPUESTA** — **resuelta en parte el 2026-09-27:** aprobados el interior con lente
+   (variante ocasional), los banners del blog 16:9 A/B/C, la 1:1 como plantilla propia y el banner interno (con
+   crédito). Sigue abierta para la portada del reel, la miniatura y los overlays PNG del reel `[verificar]`: la
+   aprobación no las nombra y el kit del reel se aprobó como motion.
 4. **Límite de LinkedIn para documentos** (peso y páginas del PDF) `[verificar]` en la documentación vigente de
    LinkedIn antes del Slice 8.
 5. **Precedencia de la portada** cuando el contenido califica para más de una plantilla: se propone A > B > C (orden de

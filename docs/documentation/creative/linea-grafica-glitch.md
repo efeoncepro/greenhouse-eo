@@ -1,9 +1,10 @@
 # Línea gráfica de Glitch — sub-línea de La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.9
+> **Version:** 1.10
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.9: el reel abre directo con la apertura, sin los segundos de
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.10: el blog completo y la lámina con lente quedaron aprobados;
+> ya no hay piezas fijas en propuesta; v1.9: el reel abre directo con la apertura, sin los segundos de
 > banda previos; el pre-roll queda sólo en el video 16:9; v1.8: qué recibe el equipo en cada edición, el sonido se toma junto a
 > cada gráfico y qué falta para producir en el día a día; manual nuevo para quien corre el taller; v1.7: la música de Glitch ya está publicada en AXIS y el taller la
 > entrega junto a cada pieza, con el pre-roll de los tres puntos; se suma el porqué de cada decisión y la regla de la
@@ -85,8 +86,8 @@ abre con la franja «El micrófono se abre». El carrusel cierra con la **contra
 | Portada (tres plantillas + regla de rotación) | **aprobada** el 2026-09-27 |
 | Lámina interior y primera noticia del carrusel | **aprobadas** el 2026-09-27 |
 | Contraportada | **aprobada** el 2026-09-27 |
-| Lámina con lente (la foto con un detalle ampliado a color) | propuesta |
-| Blog: banners, apertura, índice, callout «más punch», cierres | propuesta |
+| Lámina con lente (la foto con un detalle ampliado a color) | **aprobada** el 2026-09-27, para usarla de vez en cuando: sólo si la opinión habla de un detalle nítido de la foto; esa lámina no cierra con la manzana |
+| Blog: banners (horizontales y una versión cuadrada propia), apertura, índice de las ocho noticias, banner de cada noticia (con el crédito de la foto), callout «más punch», banner de suscripción, «El hilo de la semana» y cierre | **aprobado** el 2026-09-27 («Vamos en todas con tu recomendación»). El callout nuevo se usa **desde la #17**: antes hay que actualizar el bloque de WordPress; los posts anteriores siguen con el callout actual |
 | Video horizontal (vlog) y reel vertical con gráficos encima del host | **aprobados** el 2026-09-27 |
 | Tarjeta final de video | **aprobada** el 2026-09-27 |
 | Gráficos animados del video (apertura, tarjeta final, kit y transiciones) | **aprobados** el 2026-09-27 («Si, el tuyo también está aprobado») |
@@ -97,7 +98,8 @@ abre con la franja «El micrófono se abre». El carrusel cierra con la **contra
 | Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | **aprobados** el 2026-09-27 (falta sumarlos al catálogo de AXIS) |
 
 Lo que está en **propuesta** o **exploración** se puede mostrar para conversar, pero no se usa como pieza final hasta
-que el operador lo apruebe. Las noticias y los titulares de las maquetas son de ejemplo, no reales.
+que el operador lo apruebe. Hoy no queda ninguna pieza fija en propuesta; siguen en exploración los colores de acento
+teal y naranja, la historia vertical y el carrusel panorámico. Las noticias y los titulares de las maquetas son de ejemplo, no reales.
 
 > Detalle técnico: [norma §9 Estado de cada pieza](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#9-estado-de-cada-pieza-2026-09-27)
 
@@ -289,7 +291,7 @@ animarían y exportarían con fondo transparente para que el editor los ponga so
 |---|---|
 | La manzana y el verde | ya aprobados (2026-09-27); falta registrarlos en AXIS |
 | Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | ya aprobados (2026-09-27); falta sumarlos al catálogo de AXIS |
-| Piezas en propuesta | aprobar lente y blog (el video y las tarjetas finales ya se aprobaron el 2026-09-27) |
+| Callout nuevo del blog | aprobado (2026-09-27); falta actualizar el bloque de WordPress antes de publicar la #17 |
 | Gráficos animados del video | ya aprobados (2026-09-27); falta la cadencia de grabación (hoy 30 cuadros por segundo), la prueba con los editores en una edición real, el ritmo ajustable, dónde se usa la transición de bytes (se recomienda sólo en tarjetas y Drop), el estilo de subtítulos, los textos reales de la #17, el formulario para cambiar textos sin programar, guardar una copia en la nube de Google y cualquier excepción a la regla de rostros |
 | Música de Glitch | ya aprobada (2026-09-27), publicada en AXIS y entregada por el taller junto a cada pieza, con el pre-roll de los tres puntos; sólo falta probar la mezcla con la voz real del host en una edición real |
 | Letra Guttery | licencia para web y video confirmada por el operador (2026-09-27) |

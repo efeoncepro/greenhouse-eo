@@ -11,10 +11,12 @@
 > ([decisión del taller](./EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md)); ver §«Delta — flujo aceptado». El **diseño
 > sonoro de Glitch** quedó **Accepted, versión B**, el 2026-09-27 (ver su Delta), y el **motion de Glitch** quedó
 > **Accepted** el mismo día ([Delta — motion aprobado](#delta-2026-09-27--motion-aprobado)), igual que la **música de
-> Glitch** (tema B + cama post-punk; [Delta — música aprobada](#delta-2026-09-27--música-aprobada)). Lente y blog siguen
-> en propuesta.
+> Glitch** (tema B + cama post-punk; [Delta — música aprobada](#delta-2026-09-27--música-aprobada)). El **blog** y la
+> **lámina con lente** quedaron **Accepted** el 2026-09-27 ([Delta — blog y lente aprobados](#delta-2026-09-27--blog-y-lente-aprobados)):
+> ya no queda ninguna pieza estática en propuesta.
 > **Creado:** 2026-09-27 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude ([Delta del reel](#delta-2026-09-27--el-reel-abre-directo-con-la-apertura):
+> **Última actualización:** 2026-09-27 por Claude ([Delta del blog y la lente](#delta-2026-09-27--blog-y-lente-aprobados):
+> **blog completo y lámina con lente aprobados**, callout «DROP» v2 desde la #17; antes, [Delta del reel](#delta-2026-09-27--el-reel-abre-directo-con-la-apertura):
 > **el reel abre directo con la apertura, sin pre-roll**; el pre-roll queda sólo en el vlog; antes, [Delta de la tarde](#delta-2026-09-27-tarde--música-y-pre-roll-integrados-en-el-taller):
 > música y pre-roll **integrados en el taller**, huellas sha256, intro/salida reemplazan a los efectos de apertura y
 > cierre; antes, Delta: **música aprobada**, sólo Glitch; antes, Delta del **motion
@@ -151,14 +153,14 @@ Se revisó el motor (`src/lib/artifact-composer/catalog.ts`, `compose.ts`, `cont
   productiva gobernada de TASK-1921, los catálogos de Glitch pueden usarla.
 - El movimiento (overlays animados, apertura y cierre) sigue fuera del Composer: HyperFrames.
 
-### Trabajo a crear (tasks creadas el 2026-09-27: TASK-1922, TASK-1923, TASK-1924; d queda sin task hasta aprobar el callout v2)
+### Trabajo a crear (tasks creadas el 2026-09-27: TASK-1922, TASK-1923, TASK-1924; d vive en el bloque de TASK-1337)
 
 | # | Trabajo | Depende de |
 |---|---|---|
 | a | **TASK-1922** — Tokens, assets y contrato de Glitch en AXIS (incluye e y f) | — (la manzana y el verde se aprobaron el 2026-09-27) |
 | b | **TASK-1923** — Catálogos `glitch-carousel` (PDF), `glitch-stills` y `glitch-overlays` (PNG) sobre un mismo `templatesDir`, extensión `glitch` del brand pack, selector de rotación y validadores | (a) |
 | c | **TASK-1924** — Overlays HyperFrames + render con alfa | (a); aprobación del kit de overlays del reel |
-| d | Callout v2 en el bloque de WordPress `efeoncepro/glitch-drop` | aprobación del callout v2 |
+| d | Callout v2 en el bloque de WordPress `efeoncepro/glitch-drop` (TASK-1337) | callout v2 **aprobado** el 2026-09-27; se aplica **antes de publicar la #17** |
 | e | Alta de los 5 glifos Plastilina en AXIS | — (aprobada el 2026-09-27) |
 | f | Licencia de Guttery | confirmada por el operador (2026-09-27); falta registrar la referencia del contrato de licencia |
 
@@ -225,7 +227,9 @@ glifos Plastilina, el flujo de composición (`Accepted`), el hogar del movimient
 (tema B y cama post-punk, publicada en AXIS e integrada en el taller; ver [su Delta](#delta-2026-09-27--música-aprobada)).
 El único pendiente de la música es probar la mezcla con la voz real del host. Siguen pendientes:
 
-- Aprobación de la lente y el blog (banners + maqueta + callout v2). El vlog 16:9, el reel (kit de overlays) y las
+- La lente y el blog (banners + maqueta + callout v2) quedaron aprobados el 2026-09-27
+  ([Delta — blog y lente aprobados](#delta-2026-09-27--blog-y-lente-aprobados)); falta **ejecutar** el callout v2 en el
+  bloque `efeoncepro/glitch-drop` antes de publicar la #17. El vlog 16:9, el reel (kit de overlays) y las
   tarjetas finales quedaron aprobados con el motion el 2026-09-27 ([Delta — motion aprobado](#delta-2026-09-27--motion-aprobado)).
 - Contenido del lower third: definido el 2026-09-27 (ver el Delta del piloto de motion).
 - Licencia de Guttery: confirmada por el operador (2026-09-27); falta registrar la referencia del contrato.
@@ -432,3 +436,32 @@ guarda su sha256); y el código no pasó por PR ni por el CI del taller (commits
   v2 37/37, kit 95/95, **13 pruebas**. En OneDrive, `glitch-preroll-reel.mov` pasó a `v2/descartado/` con un LEEME.
 - **Reversible:** volver a sumar el reel a `TIMING.preroll.formats` y re-renderizar; el pre-roll del reel sigue en
   `v2/descartado/`.
+
+## Delta 2026-09-27 — blog y lente aprobados
+
+> **Alcance:** sólo Glitch, nunca Efeonce. Cierra el pendiente «Piezas estáticas en propuesta» de la
+> [norma §11](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#11-pendientes-de-decisión-del-operador);
+> detalle en la norma §5, §6 y §9. Supersede el «sigue en propuesta» de la lente y el blog en los Deltas anteriores y
+> en el punto 6 de la decisión aceptada.
+
+**Decisión (operador, 2026-09-27; aceptó la recomendación de Claude en las ocho):** «Vamos en todas con tu recomendación».
+
+| # | Pieza | Decisión |
+|---|---|---|
+| 1 | Banners 16:9 A/B/C del blog (imagen destacada, 1920 × 1080) | **Accepted** tal cual: las portadas aprobadas en horizontal, sin «Desliza» |
+| 2 | Versión 1:1 del banner | **plantilla propia** derivada de las portadas, no el recorte de la portada 4:5 (pierde un quinto del alto y puede cortar el titular o la manzana). Es una plantilla más de TASK-1923, sin diseño nuevo que aprobar |
+| 3 | Apertura del post (bloque navy «El micrófono se abre» + tesis + «Vamos.») | **Accepted**; reemplaza la cita con fecha |
+| 4 | La escaleta (índice de las ocho noticias, como en radio) | **Accepted** |
+| 5 | Banner interno de noticia (1600 × 900: foto en duotono navy + bytes + chip número/sección + wordmark) | **Accepted**; reemplaza la imagen cruda de la fuente; **crédito de la foto obligatorio** |
+| 6 | Callout «DROP» v2 (bloque navy, puntos + wordmark + «DROP», remate en Bricolage 800 con manzana, porqué en Poppins, bytes en la esquina) | **Accepted desde la #17**. Reemplaza al v1 en producción (bloque `efeoncepro/glitch-drop`, TASK-1337): el bloque se actualiza **antes de publicar la #17**; los posts anteriores siguen con el v1 |
+| 7 | Banner de suscripción, «El hilo de la semana» y cierre («El micrófono se cierra.» + «— El equipo editorial de Glitch» + íconos Plastilina versión papel) | **Accepted**. Con esto la maqueta del post completa queda aprobada (el vlog embebido ya lo estaba) |
+| 8 | Carrusel: interior con lente | **Accepted como variante ocasional**: sólo cuando el POV trata de un detalle nítido de la foto; esa lámina no cierra con la manzana (una sola esfera por pieza) |
+
+- **Consecuencia:** ya no queda ninguna pieza estática en PROPUESTA. Siguen en EXPLORACIÓN (sin cambios) los acentos teal
+  y naranja del canvas, la historia 9:16 y el carrusel panorámico.
+- **Consecuencia para TASK-1923:** las plantillas del blog y la lámina con lente se construyen **abiertas** (aprobadas);
+  se suma la plantilla 1:1 propia. El mecanismo de fallar cerrado ante una plantilla en propuesta se conserva para piezas
+  futuras.
+- **Consecuencia para TASK-1337:** el callout v2 es trabajo del bloque de WordPress, no una plantilla del Composer.
+- **Reversible:** cada pieza vuelve a PROPUESTA con una decisión del operador; el callout v1 sigue en los posts anteriores
+  a la #17.

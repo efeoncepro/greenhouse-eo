@@ -47,6 +47,9 @@ Reglas duras:
   La intro y la salida **reemplazan** a `apertura.wav` y `cierre.wav` (ya los traen: nunca soltar ambos). En el taller
   la música sale junto al motion (`src/music.mjs`); `--music off` la apaga. Publicada en AXIS (`#musica`, campo `music`).
 - Aprobado: sistema de portada A/B/C con rotación, lámina interior, contraportada; manzana como esfera y verde como acento; línea Growth; próxima edición #17; alta de los 5 glifos Plastilina (2026-09-27); diseño sonoro de Glitch, versión B (2026-09-27); música de Glitch, tema B + cama post-punk (2026-09-27); **motion de Glitch (2026-09-27)**: apertura y tarjeta final v2, kit de overlays con el lower third, transición de bytes entre piezas y transición entre escenas, con los tableros de video del canvas (vlog 16:9 y reel); pre-roll de la intro «los tres puntos al ritmo» (3,2 s, opaco, empalma exacto con la apertura), **sólo en el vlog**: el reel abre directo con la apertura (decisión del operador del 2026-09-27; bucle exacto) y su intro, `glitch-intro-reel.wav`, es la intro aprobada desde 3,2 s (4,0 s, en 0 junto a la apertura). Cada render entrega el WAV junto a cada `.mov` (`--sound b|a|off`, `b` por defecto) y la música (el reel usa los másteres de vlog).
-  Blog y lente siguen en **propuesta**: no se entregan como canon ni se publican sin el operador. Pendientes del motion
+  **Blog y lente APROBADOS (2026-09-27)**: banners 16:9 A/B/C, 1:1 con plantilla propia (nunca recortar la portada
+  4:5), maqueta del post completa, banner interno con crédito obligatorio, callout «DROP» v2 **desde la #17** (el bloque
+  `efeoncepro/glitch-drop` se actualiza antes de publicarla; posts anteriores con v1) y la lente como variante ocasional
+  (sin manzana en esa lámina). Ya no hay piezas estáticas en propuesta. Pendientes del motion
   (no decidir por el operador): fps, prueba con editores, ritmo, a qué piezas va la transición de bytes, subtítulos,
   textos reales de la #17, autoservicio, tokens (TASK-1922), archivo en GCS, mezcla de la música con la voz real del host y excepción de rostros.
