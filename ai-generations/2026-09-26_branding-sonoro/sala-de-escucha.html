@@ -156,6 +156,17 @@
   }
   .chip::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
 
+  .status {
+    display: inline-block; margin-left: 8px; padding: 3px 8px; border-radius: 999px;
+    font: 600 11px/1.2 var(--body); letter-spacing: .04em; vertical-align: 2px;
+    border: 1px solid var(--accent); color: var(--accent);
+  }
+  .status.off { border-color: var(--rule); color: var(--muted); text-decoration: line-through; }
+  .chosen { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; }
+  .chosen span { display: inline-flex; gap: 6px; align-items: baseline; }
+  .chosen b { font-weight: 600; }
+  .round { font: 600 11px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding-top: 8px; border-top: 1px solid var(--rule); }
+  .videos.two { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
   .decide { display: grid; gap: 12px; max-width: 72ch; }
   .decide ol { margin: 0; padding-left: 20px; display: grid; gap: 10px; }
   .decide li::marker { font-weight: 600; color: var(--accent); }
@@ -180,12 +191,19 @@
 
 <main class="page">
   <header>
-    <div class="eyebrow">Branding sonoro · ronda 1 · prototipos sin aprobar</div>
+    <div class="eyebrow">Branding sonoro · ronda 2 · prototipos sin aprobar</div>
     <h1>Tres puntos que se vuelven uno<span class="sphere" aria-hidden="true"></span></h1>
     <p class="lede">El logo sonoro traduce la gramática de <strong>La órbita</strong>: el anillo pregunta, tres notas breves piensan
       (las tres ventanas de la nave), hay una pausa y la esfera responde con golpe. Todo está en <strong>La mayor</strong>, la
       tonalidad del motion aprobado, y sale de síntesis propia: sin muestras ni música de terceros.</p>
   </header>
+
+  <div class="chosen" aria-label="Lo que ya elegiste">
+    <span>Territorio <b>Puntos suspensivos</b></span>
+    <span>Voz <b>Brian</b></span>
+    <span>Acento por línea <b>se queda</b></span>
+    <span>Voice <b>nuevo timbre</b></span>
+  </div>
 
   <div class="grammar" aria-label="Cómo se traduce la línea gráfica a sonido">
     <div><b>Anillo · la pregunta</b><span>Acorde abierto de quinta, tenue y sin resolver.</span></div>
@@ -193,6 +211,49 @@
     <div><b>Esfera · la respuesta</b><span>Una nota de campana con impacto grave. Es el único golpe.</span></div>
     <div><b>Halo · la luz</b><span>El acorde de La florece debajo y se apaga con una cola corta.</span></div>
   </div>
+
+  <section id="reveal">
+    <div class="section-head">
+      <h2>En el reveal</h2>
+      <p>El video V1.1 no cambia. Las tres notas suenan mientras entra la nave y la esfera cae con el golpe del encaje, a los 1,87 s. Se conservan el aire de la línea, el arco que sube, el giro y la cámara del sonido aprobado; la campanilla del planeta la reemplazan las tres ventanas. Se agregó un segundo de cuadro final para oír la cola.</p>
+    </div>
+    <div class="videos two">
+      <figure>
+        <video controls preload="metadata" playsinline src="audio/reveal-puntos.mp4"></video>
+        <figcaption><b>Sin voz</b> · el acorde de La florece con las letras, a los 2,75 s</figcaption>
+      </figure>
+      <figure>
+        <video controls preload="metadata" playsinline src="audio/reveal-puntos-brian.mp4"></video>
+        <figcaption><b>Con Brian</b> · «Growth» y el acorde caen juntos cuando termina de entrar el eslogan, a los 3,05 s</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="voice">
+    <div class="section-head">
+      <h2>Voice: tres timbres nuevos</h2>
+      <p>El coro quedó fuera. Voice es medios y distribución (Reach): estas tres buscan el mensaje que llega a otros, sin nada vocal. La melodía es la misma.</p>
+    </div>
+    <div class="list">
+      <div class="row" style="--line: var(--voice)">
+        <button class="orbit" data-src="audio/ronda2-voice-eco.mp3" aria-label="Reproducir Voice, eco"></button>
+        <div><h3>Eco</h3><p>La esfera suena y se repite cuatro veces de lado a lado, cada vez más lejos: el mensaje que se propaga.</p></div>
+        <div class="meta">−15,0 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--voice)">
+        <button class="orbit" data-src="audio/ronda2-voice-cuerda.mp3" aria-label="Reproducir Voice, cuerda"></button>
+        <div><h3>Cuerda pulsada</h3><p>Una cuerda tocada, cercana: la voz de quien cuenta algo. Afinada exacto en La.</p></div>
+        <div class="meta">−15,2 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--voice)">
+        <button class="orbit" data-src="audio/ronda2-voice-pulso.mp3" aria-label="Reproducir Voice, pulso"></button>
+        <div><h3>Pulso</h3><p>La nota vibra con un trémolo de 6 Hz, como una señal que se transmite.</p></div>
+        <div class="meta">−14,4 LUFS</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="round">Ronda 1</div>
 
   <section id="logo">
     <div class="section-head">
@@ -203,7 +264,7 @@
       <div class="row">
         <button class="orbit" data-src="audio/candidatos-puntos-logo.mp3" aria-label="Reproducir Puntos suspensivos"></button>
         <div>
-          <h3>Puntos suspensivos</h3>
+          <h3>Puntos suspensivos<span class="status">Elegido</span></h3>
           <p>Tres puntos iguales que se vuelven uno. La esfera sube una cuarta: la cadencia más decidida de las tres.</p>
           <div class="melody" data-notes="76,76,76,81"></div>
           <div class="notes">Mi · Mi · Mi → La</div>
@@ -262,7 +323,7 @@
     <div class="list">
       <div class="row">
         <button class="orbit" data-src="audio/cierre-cierre-puntos-brian.mp3" aria-label="Reproducir voz Brian"></button>
-        <div><h3>Brian</h3><p>Masculina, grave y resonante. La de más autoridad.</p></div>
+        <div><h3>Brian<span class="status">Elegida</span></h3><p>Masculina, grave y resonante. La de más autoridad.</p></div>
         <div class="meta">«growth» en 0,96 s</div>
       </div>
       <div class="row">
@@ -306,7 +367,7 @@
       </div>
       <div class="row" style="--line: var(--voice)">
         <button class="orbit" data-src="audio/lineas-puntos-voice.mp3" aria-label="Reproducir Voice"></button>
-        <div><span class="chip">Voice · Reach</span><p>Coro breve en «a»: aire vocal, sin palabras.</p></div>
+        <div><span class="chip">Voice · Reach</span><span class="status off">Descartado</span><p>Coro breve en «a». Reemplazado por los tres timbres de arriba.</p></div>
         <div class="meta">−13,2 LUFS</div>
       </div>
       <div class="row" style="--line: var(--revenue)">
@@ -319,15 +380,14 @@
 
   <section id="decidir">
     <div class="section-head">
-      <h2>Qué necesito de ti</h2>
+      <h2>Qué necesito de ti ahora</h2>
     </div>
     <div class="decide">
       <ol>
-        <li><b>Un territorio</b> (o dos para cruzar), y qué te gustó o te sobró de cada uno.</li>
-        <li><b>Una voz</b> para la etiqueta, o una indicación de qué buscar si ninguna calza: español o inglés con acento latino, más joven, más grave.</li>
-        <li><b>Si la idea del acento por línea se queda</b>, y qué timbre no representa a su línea.</li>
+        <li><b>El reveal:</b> ¿con voz, sin voz o las dos según el uso? Y si algo del sonido aprobado que conservé sobra.</li>
+        <li><b>Voice:</b> eco, cuerda o pulso.</li>
       </ol>
-      <p class="note"><b>Cómo se revisó.</b> La estructura, las notas, los tiempos y el volumen se verificaron con espectrogramas, medición de volumen y transcripción de las voces. Lo que no se puede medir así —si suena propio, si se recuerda, si se siente Efeonce— sólo lo decide tu oído. Con el territorio elegido siguen la pieza larga, las cortinillas del podcast y la re-sonorización del reveal y la apertura.</p>
+      <p class="note"><b>Cómo se revisó.</b> La estructura, las notas, los tiempos y el volumen se verificaron con espectrogramas, medición de volumen y transcripción de las voces. Lo que no se puede medir así —si suena propio, si se recuerda, si se siente Efeonce— sólo lo decide tu oído. Después siguen la apertura, las etiquetas con voz de las cinco líneas, la pieza larga y las cortinillas para Glitch.</p>
     </div>
   </section>
 </main>

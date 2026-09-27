@@ -1,12 +1,20 @@
 # Branding sonoro Efeonce — ronda 1 (2026-09-26)
 
-Estado: **prototipos sin aprobar**. Sala de escucha: https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9
+Estado: **ronda 2, prototipos sin aprobar**. Sala de escucha: https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9
 
 ## Decisiones del operador (2026-09-26)
 
 - Todo se produce en casa, sin músico ni compositor humano: motor propio + ElevenLabs + Higgsfield.
 - Puntos de contacto, en orden: video y redes → podcast Glitch → eventos.
 - Los cierres largos llevan etiqueta con voz: «Empower your <Línea>».
+
+## Elecciones de la ronda 1 (operador, 2026-09-26)
+
+- Territorio **Puntos suspensivos** (Mi Mi Mi → La) · voz **Brian** (ElevenLabs v3) · el **acento por línea se queda**.
+- El timbre de **Voice** (coro) no gustó: ronda 2 propone `eco`, `cuerda` (Karplus-Strong) y `pulso` (trémolo 6 Hz).
+- Pidió escucharlo en el **reveal**: `--mode reveal` calza con `pieces.reveal` V1.1 (tres notas en 1,42/1,54/1,66 s,
+  esfera con el golpe a 1,87 s, acorde a 2,75 s). Versión con Brian: `--bloom 3.08` y la voz desplazada 2,09 s para
+  que «Growth» y el acorde caigan cuando termina de entrar el eslogan.
 
 ## Concepto
 
