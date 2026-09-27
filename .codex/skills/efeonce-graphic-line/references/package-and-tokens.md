@@ -25,6 +25,11 @@
 > Composición por superficie y su ruta por el Artifact Composer (TASK-1919): verificado contra greenhouse-eo@016d0a183
 > — 2026-09-27 (`axis-tokens` 0.3.8 y `axis-ui-contracts` 0.3.7, tag `v0.3.8`, contrato `efeonce.surface-composition`
 > 0.1.1; `src/lib/brand-surfaces`, `scripts/brand-surfaces/`, catálogos `graphic-line-*`).
+>
+> Contrato 0.1.2 en Greenhouse (TASK-1927): verificado contra el árbol local de `develop` — 2026-09-27
+> (`package.json`: `axis-tokens` 0.3.14, `axis-ui-contracts` 0.3.12, `axis-graphic-line` 0.7.0, `axis-brand-assets`
+> 0.3.5; `src/lib/brand-surfaces/recipes/{deck,frame}.ts`, `document.ts`, `registry.json` de `graphic-line-deck`).
+> **Manda sobre las versiones que esta referencia cite más abajo para la composición por superficie.**
 
 Índice: [1 Paquetes](#1-paquetes-versiones-e-instalación) · [2 Tokens](#2-tokens-efeoncegraphicline) ·
 [3 Contrato de la órbita](#3-contrato-efeoncegraphic-line-orbit) · [4 Selección colaborativa](#4-contrato-efeoncecollaboration-selection) ·
@@ -808,10 +813,19 @@ Ejemplos de intent en `docs/examples/graphic-line/` (`post-lens`, `deck-progress
 | `node scripts/creative/brand-motion/encode-orbit-motion.mjs --frames <dir> --sound <dir> --out <dir> [--only …]` | MP4 60/30 fps, GIF, ProRes 4444, WebM, HEVC, PNG por capas |
 | `pnpm brand:compose -- --intent <intent.json> [--out <dir>] [--artifact-id <id>]` (`scripts/brand-surfaces/compose.ts`, TASK-1919) | compone una receta **aprobada** por superficie en el Artifact Composer: exige receta aprobada → `resolveSurfaceComposition` (con `issues`, no compone) → builder de la receta → plan + assets (plate de `photo.plateRef` recortado, íconos `resolveIcon`, capas SVG de `paintGraphicLine`) → PDF (deck) o PNG (resto; capas de video con alfa). Salida por defecto `.captures/brand-surfaces/<id>/` más `<id>.surface-manifest.json`. Errores (`SurfacePieceError.code`): `recipe-not-approved`, `recipe-outside-composer` (`audiovisual.close-reveal`), `surface-issues` (lista los issues de AXIS), `recipe-without-template`, `missing-photo`, `invalid-intent`. Ejemplos por receta: `src/lib/brand-surfaces/examples/*-intent.json` |
 | `pnpm brand:tokens [--check]` (`scripts/brand-surfaces/compile-tokens.ts`) | compila `efeonceGraphicLine` a `graphic-line-tokens.{json,css}` de cada catálogo `graphic-line-*` y copia byte a byte los archivos de marca desde `axis-brand-assets`; `--check` falla si lo commiteado no coincide con la versión instalada |
-| `pnpm composer:visual-gate --catalog=graphic-line [--selftest\|--freeze]` | gate visual a 0 px de los 22 frames de los catálogos de La órbita (runbook `docs/operations/runbooks/composer-visual-gate.md`) |
+| `pnpm composer:visual-gate --catalog=graphic-line [--selftest\|--freeze]` | gate visual a 0 px de los 32 frames (desde TASK-1927) de los catálogos de La órbita (runbook `docs/operations/runbooks/composer-visual-gate.md`) |
 
-**Catálogos del Artifact Composer (TASK-1919):** `graphic-line-deck` (PDF 16:9: `deck.proposal-cinematic`,
-`method-staircase`, `section-classic`, `section-split`, `content-measure`, `triptych`), `graphic-line-stills` (PNG:
+**Documento (TASK-1927):** si el intent de `pnpm brand:compose` trae `pages`, compone un documento
+(`planSurfaceDocument`, `src/lib/brand-surfaces/document.ts`; valida con `resolveSurfaceDocument`): un PDF multipágina
+16:9, `<id>.surface-document-manifest.json` (`axis.surface-document.v1`), `<id>.provenance.json`
+(`efeonce.brand-surface-document.provenance.v1`) y un PNG y un PDF por página, en `.captures/brand-surfaces/<id>/`.
+Un solo issue deja al documento sin plan. Campos y códigos: [applications.md §L](applications.md), «Componer el deck
+hoy».
+
+**Catálogos del Artifact Composer (TASK-1919, deck ampliado por TASK-1927):** `graphic-line-deck` (PDF 16:9, 16
+`contentType`: `deck.proposal-cinematic` + `.hero` + `.lines`, `method-staircase`, `section-classic`, `section-split`
++ `.corner-bottom` + `.panel-end`, `content-measure`, `triptych`, `cover-brochure`, `cover-proposal` + `.dawn`,
+`close-brochure` + `.photo`, `close-proposal`), `graphic-line-stills` (PNG:
 `web.hero-lens`, `hero-bleed`, `hero-uniform-tablet`, `hero-mobile-native.<formato>` 360/390/430,
 `dooh.caminero-lens`, `motion.loop-lens-reveal` —el último cuadro— y `motion.storyboard`) y `graphic-line-overlays`
 (PNG con alfa: `audiovisual.cartela`, `zocalo`, `callout-selection`, `data-super`, `subtitles`; opacas `split-screen` y

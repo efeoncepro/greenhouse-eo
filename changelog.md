@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-27 — El deck y el brochure de «La órbita» se componen con `pnpm brand:compose` (TASK-1927)
+
+- Greenhouse consume `efeonce.surface-composition` 0.1.2 (AXIS `v0.3.14`). El catálogo `graphic-line-deck` pasa de 6 a
+  16 plantillas: portadas y contraportadas aprobadas de brochure y propuesta, composiciones `hero` y `lines`, la
+  sección partida por la izquierda con tres composiciones y el tríptico de una palabra por toma.
+- `pnpm brand:compose` acepta un documento (`pages`) y entrega un PDF multipágina con su manifest y procedencia.
+  Detalle: [norma de superficie §2.1 y §4.6](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) y
+  [manual](docs/manual-de-uso/creative/componer-por-superficie-con-axis.md). Local en `develop`, sin runtime productivo.
+
 ## 2026-09-27 — Glitch en AXIS: token `glitchLine`, contrato `efeonce.glitch-line` y archivos publicados (TASK-1922)
 
 Los valores de Glitch dejaron de vivir como literales en el Lab, la norma y el canvas. AXIS `v0.3.12` (`29a40b5`, push y
@@ -605,16 +614,3 @@ automatizada con Playwright (`opportunity`, `provider`; la key responde `unsuppo
 ahora con `--headless/--no-login`, detrás de `search [--match] [--enrich]`. Verificado en vivo (20 recomendadas
 enriquecidas; 175 del listado completo). Receta 0 en la skill de licitaciones y manual
 `revisar-licitaciones-licitalab-con-cli.md`. El agente nunca ingresa la contraseña: renovar sesiones es del operador.
-
-## 2026-09-17 — Nave de Efeonce en 3D, navy y blanco
-
-Quedó en `13- Branding/Nave Efeonce 3D` la biblioteca del isotipo en 3D: 16 ángulos de cámara por color (con versiones
-transparentes) y 8 escenas. El blanco se obtuvo recoloreando los renders navy aprobados, porque generarlo aparte salió
-plano; los ángulos extremos usaron una guía de perspectiva proyectada desde la silueta oficial.
-
-## 2026-09-17 — Sprocket de HubSpot en 3D (uso interno) y mascotas en carpeta propia
-
-Las bibliotecas de mascotas pasaron a `14. Mascotas de partners` en la raíz de la carpeta de contenidos, por
-indicación del operador, y se sumó el sprocket de HubSpot en 3D: 8 ángulos y 8 escenas desde el SVG oficial. Como es
-marca registrada y HubSpot exige aprobación previa para usarlo, la biblioteca queda como uso interno hasta obtenerla.
-El relleno de huecos de `pnpm ai:image:rmbg` ahora reconoce el fondo en sombra visto a través de un agujero del objeto.

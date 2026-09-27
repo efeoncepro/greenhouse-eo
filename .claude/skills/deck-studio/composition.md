@@ -71,10 +71,13 @@ no cosmética. *(Y el límite lo fijan **las bases**, no el portal. Ver [`eviden
 
 ### Catálogos de La órbita (marca propia Efeonce) — no son `deck-axis`
 
-Desde el 2026-09-27 (TASK-1919) las láminas **aprobadas** de «La órbita» por superficie son un catálogo propio,
-**`graphic-line-deck`** (PDF 16:9): `deck.proposal-cinematic`, `deck.method-staircase`, `deck.section-classic`,
-`deck.section-split`, `deck.content-measure` y `deck.triptych`. Viven junto a `graphic-line-stills` (heros web,
-caminero, cuadros de motion) y `graphic-line-overlays` (capas de video con alfa).
+Desde el 2026-09-27 (TASK-1919, ampliado por TASK-1927) las láminas de «La órbita» con plantilla son un catálogo
+propio, **`graphic-line-deck`** (PDF 16:9), con 16 `contentType`: `deck.proposal-cinematic` (+ `.hero`, `.lines`),
+`deck.method-staircase`, `deck.section-classic`, `deck.section-split` (+ `.corner-bottom`, `.panel-end`),
+`deck.content-measure`, `deck.triptych` y el marco `deck.cover-brochure`, `deck.cover-proposal` (+ `.dawn`),
+`deck.close-brochure` (+ `.photo`) y `deck.close-proposal`. Viven junto a `graphic-line-stills` (heros web, caminero,
+cuadros de motion) y `graphic-line-overlays` (capas de video con alfa). Tabla receta → `layout` → `contentType` y
+campos del intent: [SKILL.md](SKILL.md) §«Componer hoy con `pnpm brand:compose`».
 
 - **Se componen desde un intent de superficie**, no desde un `Plan` escrito a mano:
   `pnpm brand:compose -- --intent <intent.json>`. El mapper `src/lib/brand-surfaces` exige receta aprobada, valida con
@@ -82,40 +85,42 @@ caminero, cuadros de motion) y `graphic-line-overlays` (capas de video con alfa)
   vigente `TemplateAuthorityError`).
 - **No se mezclan con `deck-axis`.** `deck-axis` es el catálogo de las ofertas a comité, con su molde y la línea base
   de SKY; meter ahí el fondo Efeonce, la voz con esfera o las fotos de cine degradaría lo que protege. Un deck de
-  marca propia que necesita más láminas que las seis aprobadas combina `brand:compose` con el resto del deck armado
-  con el oficio de esta skill; una receta nueva entra al catálogo sólo con la aprobación del operador.
+  marca propia que necesita láminas sin plantilla combina `brand:compose` con el resto del deck armado con el oficio
+  de esta skill (maqueta declarada); una receta nueva entra al catálogo sólo con la aprobación del operador.
 - **La pintura de la selección y del CTA se inyecta** (`createCatalog({ selectionPainter, ctaPainter })`): el catálogo
   no importa paquetes.
-- **Gate:** `pnpm composer:visual-gate --catalog=graphic-line` (22 frames a 0 px; runbook
+- **Gate:** `pnpm composer:visual-gate --catalog=graphic-line` (32 frames a 0 px desde TASK-1927; altas y cambios
+  declarados en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`, entradas 2026-09-27 b–e; runbook
   `docs/operations/runbooks/composer-visual-gate.md`). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §2.1.
-- **Lo que el catálogo todavía no tiene (contrato 0.1.2, AXIS `v0.3.9`, pendiente de integrar).** El mapper
-  (`src/lib/brand-surfaces/recipes/deck.ts`) sigue sobre la 0.1.1: no hay plantilla para `cover-classic` ni
-  `close-classic`, no lee `use` ni `layout`, y no compone **documentos** (`pages`, manifest
-  `axis.surface-document.v1`). Un brochure de varias páginas se valida entero con `pnpm surface:resolve` en AXIS
-  (reglas `brochure-cover-first`, `brochure-close-last`, `brochure-needs-service-page`) y el PDF se sigue armando
-  página por página hasta que se suba la dependencia; nunca se «adivina» el manifest de la 0.1.2 a mano. Resumen del
-  contrato: [SKILL.md](SKILL.md) §«El deck como superficie», bloque «Contrato 0.1.2 y el brochure».
-- **Portadas y contraportadas (delta operador, 2026-09-27).** `cover-classic` y `close-classic` quedaron **retiradas**
-  como opción (logo de 230 y 220 px; el mínimo aprobado es 500 px en 1920): que falte su plantilla ya no es un hueco a
-  cerrar. El set aprobado —portadas de brochure con foto, una por línea de servicio, contraportadas de brochure con
-  «¿Conversamos? Cuando quieras.», portadas de propuesta sin foto con el logo del cliente y contraportadas de
-  propuesta con «Empower your Growth»— tampoco tiene plantilla todavía: su integración al contrato es TASK-1927 y la
-  producción de plates, TASK-1926. Hasta entonces se arma como maqueta de dirección declarada, con la norma de
-  `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 y el resumen de [SKILL.md](SKILL.md) §«Portadas y contraportadas».
+- **Contrato 0.1.2, integrado (TASK-1927, 2026-09-27; local en `develop`).** Greenhouse fija
+  `@efeoncepro/axis-tokens` 0.3.14 y `@efeoncepro/axis-ui-contracts` 0.3.12. El mapper lee `use` y `layout` (el que
+  resolvió AXIS, nunca inferido) y el marco vive en `src/lib/brand-surfaces/recipes/frame.ts`. Un intent 0.1.0 o 0.1.1
+  resuelve igual.
+- **Documentos.** Un intent con `pages` compone **un PDF multipágina** con su manifest `axis.surface-document.v1` y su
+  procedencia (`planSurfaceDocument` en `src/lib/brand-surfaces/document.ts`, que valida con
+  `resolveSurfaceDocument` de AXIS). Un solo issue (`brochure-cover-first`, `brochure-close-last`,
+  `brochure-needs-service-page`, `document-line-mismatch`, `frame-photo-must-alternate`, …) deja el documento sin
+  componer: nunca se arma página por página para esquivar la validación ni se «adivina» el manifest a mano. El
+  documento completo no tiene frame en el gate (usa fotos reales); lo cubren sus páginas.
+- **Portadas y contraportadas (operador, 2026-09-27).** `cover-classic` y `close-classic` **no se usan**: el
+  operador no las aprobó, en AXIS quedan `supersededBy` y no tienen plantilla. El marco aprobado sí la tiene:
+  `cover-brochure` (con foto), `cover-proposal` (sin foto, logo del cliente), `close-brochure` (`orbit` sin foto,
+  `photo` con foto) y `close-proposal` (con foto, «Empower your Growth»). Portada con foto ↔ contraportada sin foto, y
+  al revés. La producción idempotente de los plates es TASK-1926. Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6;
+  resumen en [SKILL.md](SKILL.md) §«Portadas y contraportadas».
 - **Recetas por lámina (operador, 2026-09-27): las 69 láminas del canvas «Deck» están aprobadas** y cada una tiene su
   receta en `docs/operations/brand-graphic-line/deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json` (esquema
   `efeonce.deck-slide-recipes.v1`; índice humano en el README de esa carpeta, regenerado con `pnpm brand:deck-recipes`).
-  Para el composer, la receta es el **contrato de slots** de la futura plantilla: cada `slots[]` trae `name`, `type`
+  Para el composer, la receta es el **contrato de slots** de la plantilla: cada `slots[]` trae `name`, `type`
   (`text`, `richText`, `number`, `metric`, `list`, `image`, `logo`, `person`, `money`, `date`, `enum`, `section`),
   `required` y `maxChars` **medido en la referencia aprobada** (lo que cabe sin cruzar la órbita ni al sujeto);
   `fixed[]` es lo que la plantilla quema y el autor no toca; `selection` declara el objetivo para
   `efeonce.collaboration-selection`; `pairsWith` (`cover↔close`, `variant`, `sequence`) alimenta la validación del
   documento. **El `id` de la receta reutiliza el de AXIS cuando existe** (`content-pricing`, `decision-next-steps`,
-  `method-staircase`…); los nuevos son kebab-case en inglés. Hoy sólo `section-classic`, `content-measure`,
-  `method-staircase` y `proposal-cinematic` (`service`) componen tal cual; `section-split` (debe subir por la
-  izquierda) y `triptych` (una palabra por toma, cada una con esfera) tienen plantilla en la versión anterior; el resto
-  no tiene plantilla. Llevarlas al catálogo `graphic-line-deck` con el visual gate es TASK-1927: **nunca** se agrega una
-  plantilla sin su receta ni una receta sin la aprobación del operador.
+  `method-staircase`…); los nuevos son kebab-case en inglés. **El catálogo de recetas sirve para elegir la lámina; se
+  compone con el intent de AXIS.** Hoy componen las de la tabla de [SKILL.md](SKILL.md) (sección partida por la
+  izquierda y tríptico de una palabra por toma incluidos); las **38 restantes no tienen plantilla: TASK-1928**.
+  **Nunca** se agrega una plantilla sin su receta ni una receta sin la aprobación del operador.
 
 ### Destinos editables posteriores — no confundir fuente, conversión ni renderer
 

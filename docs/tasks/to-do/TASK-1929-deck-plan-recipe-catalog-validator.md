@@ -24,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `content|platform`
-- Blocked by: `TASK-1927`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -105,7 +105,7 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/manual-de-uso/creative/componer-deck-con-recetas.md`
-- `docs/tasks/in-progress/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md` (entrada de documento y
+- `docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md` (entrada de documento y
   `resolveSurfaceDocument`)
 - `docs/tasks/to-do/TASK-1419-deck-orchestrator-outline.md` (orquestador del outline de las decks de licitación; mismo
   molde, catálogo distinto)

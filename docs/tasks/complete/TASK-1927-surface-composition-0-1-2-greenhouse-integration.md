@@ -72,7 +72,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -85,7 +85,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Implementacion completa en local (slices 1-5 y delta d); faltan docs y skills en curso, aprobacion visual del operador, pnpm build y push`
+- Status real: `Cerrada 2026-09-27 en develop local; sin push (espera la senal del operador) y sin runtime productivo que desplegar`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -472,13 +472,13 @@ explícito, y los intents existentes resuelven igual. El cutover es inmediato al
 - [x] Los 19 intents de ejemplo previos resuelven sin issues y producen el mismo plan que antes del bump (test en verde). — Comparación antes/después idéntica en 20 intents; snapshot en `__tests__/example-plans.test.ts`. El único plan que cambió después es el del tríptico, a propósito (`e811bc98c`).
 - [x] Un intent sin `use` resuelve `use: 'proposal'`; un `use` no admitido por la receta aborta la composición con el código de AXIS. — Tests en `plan-surface-piece.test.ts` (`d368ad1cc`).
 - [x] `selection.anchor` del manifest llega al adaptador de selección (test). — `d368ad1cc`.
-- [ ] **No se hace (decisión del operador, 2026-09-27): el marco clásico no está aprobado.** `cover-classic` y `close-classic` no entran al catálogo; los reemplazan las portadas y contraportadas del delta (d).
+- [x] **No se hace (decisión del operador, 2026-09-27): el marco clásico no está aprobado.** `cover-classic` y `close-classic` no entran al catálogo; los reemplazan las portadas y contraportadas del delta (d).
 - [x] `proposal-cinematic` compone con `layout` `service`, `hero` y `lines`; un intent pre-0.1.2 compone igual que antes. — `5983b55f0`; una plantilla por composición, `ProposalCinematic.png` sin cambios. Compuestas con plate real y comparadas contra las referencias aprobadas.
 - [x] Ninguna plantilla nueva o modificada contiene px, HEX o familia tipográfica literales que el token o el manifest ya declaran. — Guard `graphic-line-catalogs.test.ts` en verde; las plantillas del marco, `lines` y las composiciones nuevas no declaran respaldo: cada medida llega como custom property obligatoria.
 - [x] `pnpm brand:compose` con el intent de brochure produce un único PDF multipágina, el manifest `axis.surface-document.v1` y la procedencia. — `deck-brochure-document.json` → PDF de 9 páginas 16:9, manifest de documento y procedencia (`6b5d3a97b`, `d24e62c4e`).
 - [x] Un intent de documento con issues (portada fuera del primer lugar, sin página `service`, línea del marco distinta) no produce PDF y reporta los códigos de AXIS. — Tests en `document.test.ts` (`6b5d3a97b`).
 - [x] `pnpm composer:visual-gate --catalog=graphic-line` queda a 0 px con los frames nuevos, y cada cambio de píxel (altas y modificaciones) está declarado en `BASELINE_DELTAS.md`. — 32 frames a 0 px; entradas 2026-09-27 (b), (c), (d) y (e).
-- [ ] `EFEONCE_SURFACE_COMPOSITION_V1.md` (§2.1, §4.6 y §7), el manual de uso y las skills `deck-studio` y `efeonce-graphic-line` describen 0.1.2, y `pnpm skills:mirrors` pasa.
+- [x] `EFEONCE_SURFACE_COMPOSITION_V1.md` (§2.1, §4.6 y §7), el manual de uso y las skills `deck-studio` y `efeonce-graphic-line` describen 0.1.2, y `pnpm skills:mirrors` pasa. — Norma v1.4, manual v1.2, ocho archivos de skills con su espejo Codex; `skills:mirrors` en verde.
 - [x] El operador aprobó a ojo la portada, el cierre, los layouts `hero`/`lines` y el brochure compuestos. — Aprobado por el operador el 2026-09-27 («Están perfectas») sobre las láminas `hero` y `lines` y el brochure de 9 páginas compuestos con `pnpm brand:compose` y plates reales.
 - [x] (Delta d) `section-split` sube por la izquierda con la esfera arriba a la izquierda, y `section-split-corner-bottom` y `section-split-panel-end` componen desde su intent con frame en el gate. — `f5e8c9e1c`, con el arco desde el token de AXIS 0.3.13. Queda abierta para el operador la pregunta de unificar el barrido a n/N.
 - [x] (Delta d) `triptych` compone una palabra por toma, cada una con su esfera («Escucha.» «Crea.» «Mide.»). — `e811bc98c`; frame declarado como modificación en `BASELINE_DELTAS.md`.
@@ -496,15 +496,15 @@ explícito, y los intents existentes resuelven igual. El cutover es inmediato al
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas — deltas en TASK-1921 y TASK-1928.
 
-- [ ] `## Delta` en `TASK-1921` indicando que su command debe aceptar también el intent de documento y dónde vive la función pura
-- [ ] `pnpm build` corrido con autorización del operador, o el cierre dice `code complete, build pendiente de autorización`
+- [x] `## Delta` en `TASK-1921` indicando que su command debe aceptar también el intent de documento y dónde vive la función pura
+- [x] `pnpm build` corrido con autorización del operador (2026-09-27): salida 0, «Compiled successfully». `pnpm test` completo: 1.851 archivos en verde, 64 omitidos, 0 fallos.
 
 ## Follow-ups
 

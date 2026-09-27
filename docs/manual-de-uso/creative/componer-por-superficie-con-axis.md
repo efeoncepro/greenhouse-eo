@@ -1,9 +1,9 @@
 # Componer una pieza por superficie con AXIS — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (1.1: las recetas aprobadas se componen enteras con `pnpm brand:compose` en el Artifact Composer, TASK-1919)
+> **Ultima actualizacion:** 2026-09-27 por Claude (1.2: portadas y contraportadas, brochure o propuesta completos con el comando de documento, códigos de documento y problemas nuevos, TASK-1927. Antes, 1.1: las recetas aprobadas se componen enteras con `pnpm brand:compose` en el Artifact Composer, TASK-1919)
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — se compone con comandos locales en AXIS y en Greenhouse
 > **Documentacion relacionada:** [Norma de composición por superficie](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) · [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md#componer-por-superficie) · [Usar la línea gráfica de Efeonce](./usar-linea-grafica-efeonce.md) · [Compositor de piezas con CTA](./compositor-piezas-cta.md) · [Producir una foto de marca](../marketing/fotografia-de-marca-efeonce.md)
@@ -14,9 +14,10 @@ Este manual explica cómo producir una pieza de la marca Efeonce **según dónde
 letrero de vía pública (DOOH), una pantalla digital en la calle (pDOOH), una gráfica animada con foto, un video o una
 lámina de deck. Cada superficie tiene sus recetas aprobadas, sus reservas, su escala de voces, su forma de firmar y
 sus tiempos. Tú (o un agente) describes la pieza; AXIS devuelve un manifest con todo resuelto desde los tokens, y las
-herramientas de Greenhouse la pintan, la firman y la miden. Si la receta está **aprobada**, un solo comando de
-Greenhouse (`pnpm brand:compose`) hace todo el recorrido y entrega la pieza terminada (Ruta A); si no, se compone por
-delegates (Ruta B).
+herramientas de Greenhouse la pintan, la firman y la miden. Si la receta está **aprobada y tiene plantilla**, un solo
+comando de Greenhouse (`pnpm brand:compose`) hace todo el recorrido y entrega la pieza terminada (Ruta A); si no, se
+compone por delegates (Ruta B). El mismo comando compone una **portada**, una **contraportada** o un **documento
+completo** (un brochure o una propuesta en un solo PDF).
 
 Sirve para el equipo creativo y para los agentes (Claude, Codex). No sirve para piezas de clientes ni para la
 interfaz de Greenhouse.
@@ -30,13 +31,15 @@ interfaz de Greenhouse.
   **aprobada**; las opciones no son canon.
 - **Lee la sección de tu superficie** en la
   [norma](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#4-por-superficie).
-- **Para la Ruta A basta Greenhouse:** el contrato `efeonce.surface-composition` 0.1.1 (`candidate`, acepta intents
-  0.1.0) viene en los paquetes AXIS que Greenhouse ya fija (`axis-ui-contracts` 0.3.7, `axis-tokens` 0.3.8). Corre
-  `pnpm install` si acabas de traer cambios. **Para la Ruta B** necesitas además el repo de AXIS en
+- **Para la Ruta A basta Greenhouse:** el contrato `efeonce.surface-composition` 0.1.2 (`candidate`; un intent 0.1.0 o
+  0.1.1 resuelve igual) viene en los paquetes AXIS que Greenhouse ya fija (`axis-ui-contracts` 0.3.12, `axis-tokens`
+  0.3.14). Corre `pnpm install` si acabas de traer cambios. **Para la Ruta B** necesitas además el repo de AXIS en
   `../axis-design-system` al día con `main` (ahí vive `pnpm surface:resolve`).
 - **Carga las skills:** `efeonce-graphic-line` siempre; `deck-studio` para láminas; `motion-design-studio` para
   motion y video; `efeonce-advertising-creative` para DOOH, pDOOH y piezas con texto o CTA; `design-studio` para la
   foto.
+- **Si vas a componer una portada de propuesta,** ten el logo del cliente en SVG o PNG y el nombre con el que lo vas a
+  describir.
 - **Si la pieza lleva foto,** prepara la ficha con `pnpm foto:prompt` y ten a mano el
   [lenguaje fotográfico](../../operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md).
 - **Si la pieza lleva una cifra,** ten la fuente a mano. Sin fuente, no hay cifra. Los precios van siempre como
@@ -66,16 +69,22 @@ trabajo de la pieza y edítalo. Campos que suelen aplicar:
 | `body`, `proof` | la bajada y la prueba **con su fuente** |
 | `steps` | hasta cuatro pasos, cada uno con glifo, rótulo y nombre |
 | `photo` | registro (`documental`, `puesta-en-escena`, `respuesta` o `cine`) y la placa |
-| `selection` | qué toma la selección y el colaborador |
+| `selection` | qué toma la selección y el colaborador; `selection.anchor` elige la esquina del colaborador |
+| `use` | para qué documento es la lámina: `proposal` o `brochure`. Si lo omites, AXIS toma el de la receta |
+| `layout` | la composición de la receta (por ejemplo `service`, `hero` o `lines` en `proposal-cinematic`). **Escríbelo siempre:** no se deduce del contenido |
+| `column.topPx` | sólo en portadas con columna de voz: a qué altura empieza la columna (paso 3, «Portada o contraportada») |
+| `clientLogo` | sólo en portadas de propuesta: el archivo del logo del cliente y su texto alternativo |
 | `timeline`, `variants` | duración y cierre (motion, pDOOH, video); variantes por franja (pDOOH) |
 
-**No pongas coordenadas ni tamaños.** Si sientes que te falta un número, es porque falta en el token: pídelo.
+**No pongas coordenadas ni tamaños.** Si sientes que te falta un número, es porque falta en el token: pídelo. La única
+medida que el intent admite es `column.topPx`, y sólo dentro del rango que fija el token.
 
 ### Paso 3 · Ruta A — compón la pieza aprobada con el Artifact Composer
 
-Úsala cuando la receta es una de las 20 aprobadas con plantilla ([norma §2.1](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#21-la-ruta-por-el-artifact-composer-desde-el-2026-09-27-task-1919)):
-las seis del deck, los cuatro heros web, el caminero, el último cuadro del loop y el storyboard de motion, y las siete
-capas de video.
+Úsala cuando la receta está aprobada y tiene plantilla ([norma §2.1](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#21-la-ruta-por-el-artifact-composer-desde-el-2026-09-27-task-1919)):
+las del deck (propuesta de servicio en sus tres composiciones, sección clásica, sección partida en sus tres
+composiciones, la órbita que mide la cifra, tríptico, escalera, portadas y contraportadas), los cuatro heros web, el
+caminero, el último cuadro del loop y el storyboard de motion, y las siete capas de video.
 
 1. Parte del ejemplo de tu receta en `src/lib/brand-surfaces/examples/<superficie>-<receta>-intent.json` (en
    Greenhouse). La foto se declara en `photo.plateRef` (ruta al plate aprobado, que vive fuera de git en
@@ -87,12 +96,86 @@ capas de video.
    # opcional: --out <dir> (por defecto .captures/brand-surfaces/<id>/) y --artifact-id <id>
    ```
 
-3. Revisa la salida: el PDF (deck) o el PNG (el resto; las capas de video, con fondo transparente) y
-   `<id>.surface-manifest.json`, el manifest de AXIS que gobernó la pieza. La consola dice
-   `✓ <superficie>.<receta> → <catálogo>`.
+3. Revisa la salida: el PDF (deck) o el PNG (el resto; las capas de video, con fondo transparente),
+   `<id>.surface-manifest.json` (el manifest de AXIS que gobernó la pieza) y `<id>.provenance.json` (con qué intent,
+   qué fotos y qué versiones de AXIS se compuso). La consola dice `✓ <superficie>.<receta> → <catálogo>`.
 
 Con la Ruta A saltas el paso 5: el comando pinta la órbita, la voz, la selección y los íconos. El paso 4 sólo aplica
 si todavía no tienes el plate aprobado (hazlo antes de componer). Sigue en el paso 6. Si el comando se niega, lee el código del error en «Qué significan los estados».
+
+#### Portada o contraportada
+
+Elige la receta según el documento. **La regla que manda: si la portada lleva foto, la contraportada va sin foto, y al
+revés.**
+
+| Documento | Pieza | Receta | `layout` | ¿Foto? | Ejemplo para copiar (`src/lib/brand-surfaces/examples/`) |
+|---|---|---|---|---|---|
+| Brochure | portada general | `cover-brochure` | `document` | sí | `deck-cover-brochure-cine-orbit-intent.json` |
+| Brochure | portada de una línea de servicio | `cover-brochure` | `line` | sí | `deck-cover-brochure-line-growth-intent.json` |
+| Brochure | contraportada | `close-brochure` | `orbit` | no | `deck-close-brochure-orbit-intent.json` |
+| Brochure | contraportada | `close-brochure` | `photo` | sí | `deck-close-brochure-horizon-intent.json` |
+| Propuesta | portada, órbita gigante | `cover-proposal` | `orbit` | no | `deck-cover-proposal-orbit-intent.json` |
+| Propuesta | portada, amanecer | `cover-proposal` | `dawn` | no | `deck-cover-proposal-dawn-intent.json` |
+| Propuesta | contraportada | `close-proposal` | — | sí | `deck-close-proposal-horizon-intent.json` |
+
+Parejas que resultan: **brochure** = portada con foto + contraportada `orbit`; **propuesta** = portada sin foto +
+contraportada con foto. La contraportada de brochure con foto (`photo`) sólo empareja con una portada sin foto, y hoy no
+hay una portada de brochure sin foto aprobada.
+
+1. Copia el ejemplo y cambia la voz. En la portada, `voice` lleva eyebrow, pregunta y respuesta; la contraportada de
+   brochure lleva «¿Conversamos? Cuando quieras.» y la de propuesta **no lleva voz** (su mensaje es el eslogan).
+2. Escribe la evidencia en `body`. Marca **una** palabra en negrita con `**palabra**`; si no marcas ninguna, va la
+   primera. Los saltos de línea que escribas se respetan.
+3. Si la portada lleva foto, ajusta `column.topPx` mirando la foto: sube o baja la columna hasta que ningún texto cruce
+   al sujeto ni a la órbita. El valor tiene que caer dentro de la reserva del logo; si lo omites, va el valor por
+   defecto. Parte del valor del ejemplo más parecido a tu foto.
+4. Si es una portada de propuesta, declara el logo del cliente:
+
+   ```json
+   "clientLogo": { "path": "<ruta>/logo-del-cliente.svg", "alt": "Nombre del cliente" }
+   ```
+
+   El archivo va en SVG o PNG y el `alt` es obligatorio. Si no pones `clientLogo`, sale el marcador «Logo del cliente»,
+   que sirve para una plantilla. El nombre del cliente va en la evidencia, no como título.
+5. No escribas el contacto: el correo, los teléfonos y la dirección de la contraportada salen del registro de marca de
+   Efeonce.
+6. Compón con `pnpm brand:compose` como cualquier otra pieza.
+
+#### Un brochure o una propuesta completos
+
+Un documento es un solo archivo de intent que declara el uso una vez y lista sus páginas en orden.
+
+1. Copia el ejemplo: `src/lib/brand-surfaces/examples/deck-brochure-document.json` (nueve páginas: portada, cuatro
+   servicios, hero de Nexa, líneas de servicio, escalera del método y contraportada). Para una propuesta, parte de
+   `deck-proposal-document.json` (siete páginas interiores).
+2. Arriba, deja `version` en 0.1.2 (los documentos nacieron en esa versión), `surface`, `format`, `use` (`brochure` o
+   `proposal`), la línea y el número de secciones. Cada página
+   hereda eso: sólo escribe lo propio (receta, `layout`, voz, foto, pasos). Una página puede declarar su propia línea
+   cuando presenta un servicio de otra línea.
+3. Ordena las páginas. En un brochure la portada va primero, la contraportada al final y hay al menos una página de
+   servicio. Portada y contraportada alternan foto y sin foto.
+4. Revisa que cada foto exista en la ruta de su `photo.plateRef`. Si falta una sola, el comando se detiene antes de
+   crear nada.
+5. Compón:
+
+   ```bash
+   pnpm brand:compose -- --intent src/lib/brand-surfaces/examples/deck-brochure-document.json
+   # opcional: --artifact-id <id> y --out <dir>
+   ```
+
+6. Revisa lo que entrega, en `.captures/brand-surfaces/<id>/`:
+
+   | Archivo | Para qué sirve |
+   |---|---|
+   | `<id>.pdf` | el documento: un solo PDF 16:9 con todas las páginas |
+   | `<id>.surface-document-manifest.json` | cómo resolvió AXIS el documento, página por página |
+   | `<id>.provenance.json` | con qué intent, qué fotos y qué versiones de AXIS se compuso |
+   | un PNG y un PDF por página | para revisar o reemplazar una lámina suelta |
+
+   La consola dice `✓ documento <uso> · <n> páginas → graphic-line-deck`.
+
+**Un solo error deja al documento sin salida.** Si una página falla, no sale ninguna, ni siquiera las que estaban bien:
+corrige el intent y vuelve a componer. Los códigos están en «Qué significan los estados».
 
 ### Paso 3 · Ruta B — resuélvelo en AXIS
 
@@ -131,8 +214,9 @@ Si la prenda lleva el isotipo, **pide la prenda lisa** y compón el isotipo ofic
 | Íconos | `resolveIcon` en AXIS (`pnpm icons:export`); en la Ruta A los pinta el comando |
 | Cierre de marca en video (reveal, sting) | `scripts/creative/brand-motion/` |
 
-Para un deck completo, arma el deck con `deck-studio`; las seis láminas aprobadas de La órbita (entre ellas
-`proposal-cinematic` y `method-staircase`) salen por la Ruta A. En `method-staircase` no hay paso 4: no lleva foto.
+Para un deck completo, arma el deck con `deck-studio`; las láminas de La órbita que tienen plantilla (entre ellas
+`proposal-cinematic`, `method-staircase` y las portadas y contraportadas) salen por la Ruta A, sueltas o como documento.
+En `method-staircase`, en las portadas de propuesta y en la contraportada `orbit` no hay paso 4: no llevan foto.
 
 ### Paso 6 · Revisa y entrega
 
@@ -141,7 +225,12 @@ Para un deck completo, arma el deck con `deck-studio`; las seis láminas aprobad
   y sin movimiento reducido.
 - En la Ruta A, mira la pieza contra la lámina aprobada del canvas: si difiere en algo que esté entre las preguntas
   abiertas del operador (lente del caminero, arco del super de dato, burbuja URL en las láminas de sección, contenido y
-  tríptico, gris de la bajada web, paleta), dilo en la entrega; no lo corrijas a mano.
+  tríptico, gris de la bajada web, paleta, cuánto barre el indicador de la sección partida), dilo en la entrega; no lo
+  corrijas a mano.
+- En portadas y contraportadas hay tres diferencias conocidas contra el prototipo del canvas: «Cuando quieras.» sale
+  algo más grande, la burbuja URL es la horneada y la caja de selección queda algo más ajustada. No son errores.
+- Las láminas del deck que hoy tienen plantilla fueron aprobadas a ojo por el operador el 2026-09-27. Una lámina con
+  copy o foto nuevos se entrega como compuesta: la aprobación fue de la plantilla, no de cada pieza futura.
 - Entrega el intent, el manifest, la pieza y la lista de lo que es opción o maqueta. Componer y medir **no** aprueba
   ni publica: la aprobación es del operador.
 
@@ -162,7 +251,24 @@ Para un deck completo, arma el deck con `deck-studio`; las seis láminas aprobad
 | `missing-photo` | `pnpm brand:compose` | la receta lleva foto y el intent no trae `photo.plateRef` o su `alt` |
 | `invalid-intent` | `pnpm brand:compose` | falta algo que la receta necesita (por ejemplo, la voz) o el intent tiene una forma antigua |
 | `recipe-without-template` | `pnpm brand:compose` | la receta está aprobada pero todavía no tiene plantilla: avisa; es un hueco del catálogo |
+| `use-not-for-recipe` | `pnpm brand:compose` (bajo `surface-issues`) | pediste un uso que la receta no admite (por ejemplo, una portada de propuesta con `use: 'brochure'`) |
+| `layout-invalid`, `layout-not-in-recipe` | `pnpm brand:compose` (bajo `surface-issues`) | el `layout` no existe en esa receta, o la receta no tiene composiciones |
 | `sinValidar` | compositor con CTA, formato 1:1 | el 1:1 ajustado está aprobado en el canvas, pero el compositor todavía no lo certifica (se cierra con TASK-1918) |
+
+### Códigos de un documento
+
+Salen cuando compones un brochure o una propuesta. Con cualquiera de ellos, el documento no entrega nada.
+
+| Código | Qué pasó | Qué hacer |
+|---|---|---|
+| `brochure-cover-first` | el brochure no empieza con su portada | pon la portada como primera página |
+| `brochure-close-last` | el brochure no termina con su contraportada | pon la contraportada como última página |
+| `brochure-needs-service-page` | el brochure no tiene ninguna página de servicio | agrega al menos una lámina de servicio (`proposal-cinematic`) |
+| `document-line-mismatch` | la línea del documento y la de su portada o contraportada no coinciden | usa la misma línea en el documento y en el marco |
+| `frame-photo-must-alternate` | portada y contraportada llevan foto las dos, o ninguna | cambia una: con portada con foto, contraportada sin foto, y al revés |
+| `document-pages-required` | el documento no trae páginas | agrega la lista `pages` con al menos una lámina |
+| `document-surface-invalid` | el documento pide una superficie que no admite documentos | usa `surface: 'deck'` |
+| `page[i]:<código>` | falló una página; `i` dice cuál (la primera es la 0) y el código es el mismo que tendría la lámina sola | corrige esa página según su código |
 
 ## Qué no hacer
 
@@ -184,6 +290,14 @@ Para un deck completo, arma el deck con `deck-studio`; las seis láminas aprobad
   algo no calza, es el intent, el token o un hueco del catálogo.
 - **No pidas un video al composer:** entrega cuadros fijos y capas; la animación es de motion.
 - **No subas una opción al catálogo** para poder componerla: una receta entra sólo cuando el operador la aprueba.
+- **No pongas foto en portada y contraportada a la vez**, ni las dejes a las dos sin foto.
+- **No uses el marco clásico** (la portada y el cierre anteriores del contrato): el operador no lo aprobó y no tiene
+  plantilla.
+- **No pongas el eslogan en la portada** ni «¿Conversamos?» en la contraportada de una propuesta.
+- **No pidas selección en una portada de brochure:** el contrato no la admite. En la portada de propuesta, la selección
+  va sólo sobre el logo del cliente.
+- **No escribas el contacto de Efeonce en el intent** ni dejes el logo de un cliente sin texto alternativo.
+- **No compongas un documento por partes para saltarte un error:** si el conjunto no pasa, el documento no está listo.
 
 ## Problemas comunes
 
@@ -197,7 +311,14 @@ Para un deck completo, arma el deck con `deck-studio`; las seis láminas aprobad
 | El pecho sale con un cohete o un símbolo inventado | el modelo dibujó un emblema | pide la prenda lisa («NO emblem, NO logo, NO symbol») y compón el isotipo oficial |
 | La lente de la LED no coincide con la maqueta del canvas | la receta del paquete y la pieza medida difieren | manda el token de superficie; avisa en la entrega (norma §6, fila 7) |
 | El teléfono parece el escritorio achicado | se compuso desde el escritorio | recompón mobile-first, con toma vertical nativa |
-| `No encuentro el plate …` | el plate vive fuera de git (`ai-generations/**`) y no está en tu equipo | genéralo o cópialo a la ruta de `photo.plateRef` antes de componer |
+| `No encuentro el plate …` | el plate vive fuera de git (`ai-generations/**`) y no está en tu equipo | genéralo o cópialo a la ruta de `photo.plateRef` antes de componer. En un documento basta que falte uno para que no salga nada: el comando se detiene antes de crear la carpeta |
+| El mensaje dice que `column.topPx` «va entre … y … px» | la altura de la columna quedó fuera de la reserva del logo | usa un valor dentro del rango que indica el mensaje, o quita el campo para usar el valor por defecto |
+| El mensaje dice que `clientLogo.alt` «nombra al cliente» | declaraste el logo del cliente sin texto alternativo | agrega `alt` con el nombre del cliente |
+| `El archivo … no es SVG ni PNG` o `No encuentro el archivo …` | el logo del cliente está en otro formato o la ruta no existe | entrega el logo en SVG o PNG y corrige `clientLogo.path` |
+| `surface-issues` con `use-not-for-recipe` | el uso no corresponde a la receta (una receta de propuesta pedida para brochure, o al revés) | cambia `use` o elige la receta del documento correcto (tabla de «Portada o contraportada») |
+| `Cada toma del tríptico lleva una palabra, con su esfera.` | una toma del tríptico trae más de una palabra | deja una sola palabra por toma («Escucha», «Crea», «Mide») |
+| `frame-photo-must-alternate` | portada y contraportada llevan foto las dos | en un brochure, cierra con la contraportada `orbit`; en una propuesta, abre con una portada sin foto |
+| `La contraportada de propuesta no lleva voz…` | escribiste pregunta o respuesta en `close-proposal` | quita `voice`: el mensaje es el eslogan |
 | La capa de video sale con fondo negro | se abrió en un visor que no muestra el alfa | revísala en el editor de video o sobre un fondo de prueba: el PNG es transparente |
 
 ## Referencias técnicas
@@ -208,9 +329,14 @@ Para un deck completo, arma el deck con `deck-studio`; las seis láminas aprobad
 - Foto: [`EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md`](../../operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) (delta 2026-09-27, registro cine).
 - Pendiente del 1:1: [TASK-1918](../../tasks/to-do/TASK-1918-photo-prompt-and-lens-checks-graphic-line.md).
 - Ruta A: catálogos `src/lib/artifact-composer/catalogs/graphic-line-{deck,stills,overlays}/`, mapper
-  `src/lib/brand-surfaces`, CLI `scripts/brand-surfaces/compose.ts`; ADR del composer (delta 2026-09-27); gate
-  `pnpm composer:visual-gate --catalog=graphic-line` ([runbook](../../operations/runbooks/composer-visual-gate.md));
-  ruta productiva en [TASK-1921](../../tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md).
+  `src/lib/brand-surfaces` (documento: `src/lib/brand-surfaces/document.ts`; portadas y contraportadas:
+  `src/lib/brand-surfaces/recipes/frame.ts`), CLI `scripts/brand-surfaces/compose.ts`; ADR del composer (delta
+  2026-09-27); gate `pnpm composer:visual-gate --catalog=graphic-line`
+  ([runbook](../../operations/runbooks/composer-visual-gate.md)); ruta productiva en
+  [TASK-1921](../../tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md).
+- Integración del contrato 0.1.2: [TASK-1927](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md).
+  Recetas restantes del deck: [TASK-1928](../../tasks/to-do/TASK-1928-graphic-line-deck-remaining-recipe-templates.md).
+- Contacto de marca: `EFEONCE_CONTACT` en `src/config/efeonce-brand.ts`.
 - AXIS (en `main` desde el 2026-09-27; [página del Lab](https://axis.efeonce.org/references/surfaces/)):
   [guías por superficie](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/surfaces/README.md),
   [schema del intent](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/surface-composition-intent.schema.json),

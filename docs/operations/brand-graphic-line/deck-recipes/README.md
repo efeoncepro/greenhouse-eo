@@ -13,7 +13,7 @@
 > **Relacionados:** [manual de uso · componer un deck con las recetas](../../../manual-de-uso/creative/componer-deck-con-recetas.md) ·
 > [documentación funcional de la línea](../../../documentation/creative/linea-grafica-efeonce.md) · skill
 > [`deck-studio`](../../../../.claude/skills/deck-studio/SKILL.md) · [TASK-1926](../../../tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md)
-> (fotos) · [TASK-1927](../../../tasks/in-progress/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (plantillas).
+> (fotos) · [TASK-1927](../../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (plantillas).
 
 ## Qué es
 

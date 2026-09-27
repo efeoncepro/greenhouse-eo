@@ -341,3 +341,26 @@ provocador ES CONTRAPRODUCENTE** — refuerza el status quo, no lo rompes.
 > su trabajo no es ganar la discusión con tu champion (ésa ya está ganada o perdida), sino
 > **permitirle sobrevivir la discusión con procurement, finanzas y los escépticos a los que tiene
 > que convencer sin ti en la sala.**
+
+---
+
+## Fuentes internas: componer decks de marca propia en Greenhouse (2026-09-27)
+
+No son bibliografía: son el código y los docs que respaldan lo que SKILL.md y composition.md dicen sobre
+`pnpm brand:compose`. Si el código no coincide con la skill, manda el código y se corrige la skill.
+
+- Task: `docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md` (contrato 0.1.2, marco
+  de portadas y contraportadas, documento). Siguientes: `docs/tasks/to-do/TASK-1928-graphic-line-deck-remaining-recipe-templates.md`
+  (38 recetas sin plantilla), `docs/tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md` (ruta
+  productiva) y `docs/tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md` (plates).
+- Código: `src/lib/brand-surfaces/recipes/deck.ts`, `src/lib/brand-surfaces/recipes/frame.ts`,
+  `src/lib/brand-surfaces/document.ts`, `scripts/brand-surfaces/compose.ts`,
+  `src/lib/artifact-composer/catalogs/graphic-line-deck/registry.json`, `src/config/efeonce-brand.ts`
+  (`EFEONCE_CONTACT`).
+- Ejemplos: `src/lib/brand-surfaces/examples/deck-*-intent.json`, `deck-brochure-document.json` y
+  `deck-proposal-document.json`.
+- Docs: `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6,
+  `docs/operations/brand-graphic-line/deck-recipes/README.md`,
+  `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` (entradas 2026-09-27 b–e).
+- Versiones: `package.json` (`@efeoncepro/axis-tokens` 0.3.14, `@efeoncepro/axis-ui-contracts` 0.3.12,
+  `@efeoncepro/axis-graphic-line` 0.7.0, `@efeoncepro/axis-brand-assets` 0.3.5).

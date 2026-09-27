@@ -105,8 +105,19 @@ D26. Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 **Publicado el 2026-09-27 (tag `v0.3.8`):** `axis-tokens` 0.3.8 y `axis-ui-contracts` 0.3.7, con el contrato
 `efeonce.surface-composition` 0.1.1 (`candidate`, acepta intents 0.1.0; modela el contenido de las láminas aprobadas).
 
-**Vigente en Greenhouse (2026-09-27, `package.json`):** `axis-tokens` 0.3.8 · `axis-ui-contracts` 0.3.7 ·
-`axis-brand-assets` 0.3.4 · `axis-graphic-line` 0.6.0 (dependencia directa) · `axis-ui-registry` 0.3.1. El
+**Vigente en Greenhouse (2026-09-27, `package.json`, tras TASK-1927 y TASK-1922):** `axis-tokens` 0.3.14 ·
+`axis-ui-contracts` 0.3.12 · `axis-brand-assets` 0.3.5 · `axis-graphic-line` 0.7.0 (dependencia directa) ·
+`axis-ui-registry` 0.3.1. Contrato `efeonce.surface-composition` 0.1.2.
+
+**Fuentes de la composición del deck (TASK-1927, 2026-09-27):** task
+`docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md`; código
+`src/lib/brand-surfaces/recipes/deck.ts`, `src/lib/brand-surfaces/recipes/frame.ts`,
+`src/lib/brand-surfaces/document.ts`, `scripts/brand-surfaces/compose.ts` y
+`src/lib/artifact-composer/catalogs/graphic-line-deck/registry.json`; ejemplos
+`src/lib/brand-surfaces/examples/deck-*-intent.json`, `deck-brochure-document.json` y `deck-proposal-document.json`;
+deltas del gate en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`; recetas por lámina en
+`docs/operations/brand-graphic-line/deck-recipes/`. Siguientes: TASK-1928 (38 recetas sin plantilla), TASK-1921 (ruta
+productiva) y TASK-1926 (plates). El
 `axis-graphic-line` lo usa sólo `src/lib/brand-surfaces` (`paintGraphicLine`, `resolveIcon`) para los catálogos del
 Artifact Composer; las piezas de campaña siguen con el adapter propio raster-safe. Fuera de esa ruta, los SVG de
 íconos salen de `pnpm icons:export` en AXIS o del Lab.

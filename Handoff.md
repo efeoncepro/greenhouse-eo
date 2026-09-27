@@ -1,6 +1,6 @@
 # Handoff activo
 
-**AXIS 0.3.14 (27/09):** publicado y fijado; [TASK-1927](docs/tasks/in-progress/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) Slice 1 hecho.
+**Deck compuesto (27/09):** [TASK-1927](docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) en local, sin push: AXIS `v0.3.14`; 31 de 69 láminas y el brochure en PDF por `pnpm brand:compose`; aprobado por el operador. Siguen TASK-1928 y TASK-1921.
 
 **Plugin OpenAI Efeonce MCP (26/09):** [TASK-1904](docs/tasks/to-do/TASK-1904-efeonce-openai-plugin-private-distribution.md) registrada: marca, OAuth, skills e instalación privada Codex/ChatGPT sin revisión pública. TASK-1864 conserva routing/eval. Sin implementación.
 
@@ -8,13 +8,11 @@
 
 **Glitch en AXIS (27/09):** [TASK-1922](docs/tasks/complete/TASK-1922-glitch-axis-franchise-token-contract.md) **complete**: AXIS `v0.3.12` (`29a40b5`) publica `glitchLine`, `efeonce.glitch-line` 0.1.0 candidate (`pnpm glitch:resolve`), `AXIS_GLITCH_ASSETS` y 5 glifos Plastilina D27 (84 glifos/48 volúmenes); Greenhouse los fija en `4dfb147f7`. Íconos de acción de Glitch siempre planos (operador). Siguen: TASK-1923 (Composer lee el token), TASK-1924 (el taller retira su espejo de paleta/manzana; reconciliar entrada 0,72 vs 0,66 em); número de contrato de Guttery pendiente.
 
-**La órbita (26–27/09):** [índice](docs/operations/brand-graphic-line/README.md). [TASK-1919](docs/tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) y [TASK-1920](docs/tasks/complete/TASK-1920-photo-isotype-compose-official-emblem.md) completas y en `develop`: 20 recetas aprobadas por `pnpm brand:compose` (AXIS `v0.3.8`, contrato 0.1.1). Pendiente: 5 preguntas del operador y la ruta productiva [TASK-1921](docs/tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md).
+**La órbita (26–27/09):** [índice](docs/operations/brand-graphic-line/README.md); TASK-1919/1920 completas. Pendiente: 5 preguntas del operador.
 
-**Portadas y contraportadas (27/09):** aprobadas por el operador en el canvas Deck. Norma: [composición §4.6](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) (foto ↔ sin foto, mensaje del cierre según documento, voz en portada, logo 500 px); recetas en AXIS Lab › Superficies › Deck (`8bed171`, sin release de paquetes); plates en [registro cine §16](docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md). Integración: TASK-1927/1926.
+**Deck, recetas (27/09):** 69 láminas aprobadas; catálogo [deck-recipes/](docs/operations/brand-graphic-line/deck-recipes/README.md), norma [§4.6](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md). Fotos idempotentes: TASK-1926.
 
-**Recetas por lámina del deck (27/09):** las 69 láminas del canvas Deck aprobadas; catálogo [deck-recipes/](docs/operations/brand-graphic-line/deck-recipes/README.md) (JSON + índice `pnpm brand:deck-recipes`), manual [componer-deck-con-recetas](docs/manual-de-uso/creative/componer-deck-con-recetas.md), norma de superficie v1.3 (delta c), registro cine v1.2 (excepción secciones/about), skills + espejos Codex, AXIS Lab › Superficies › Deck con vista ampliada. Pendiente: plantillas del Composer y tokens 0.1.2 (TASK-1927), fotos idempotentes (TASK-1926).
-
-**Registro cine + taller (27/09):** [registro cine](docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (ads 9:16/4:5 en prueba, canvas «Publicidad · cine»); brochure con 4 opciones de portada/contraportada por elegir; repo taller [`efeonce-brand-workshop`](docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) + [TASK-1925](docs/tasks/to-do/TASK-1925-brand-workshop-migration.md); AXIS `v0.3.9` (surface-composition 0.1.2), Greenhouse aún en 0.1.1.
+**Registro cine + taller (27/09):** [registro cine](docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (ads 9:16/4:5 en prueba); repo taller [`efeonce-brand-workshop`](docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) + [TASK-1925](docs/tasks/to-do/TASK-1925-brand-workshop-migration.md).
 
 **Marketing Studio (26/09):** [TASK-1893](docs/tasks/complete/TASK-1893-marketing-studio-original-asset-store-media-worker.md) y [TASK-1896](docs/tasks/complete/TASK-1896-marketing-studio-observability-restore.md) complete en producción (release `92002873ced9`, PR #243), junto a 1890/1891; restauración probada (job 49 s) y EPIC-049 con ese exit criterion cumplido. Follow-ups no bloqueantes en cada task. Gateway en `efeonce-mcp-gateway-00063-l9j`; sigue sin probar en vivo la denegación a una persona sin capability (1891).
 

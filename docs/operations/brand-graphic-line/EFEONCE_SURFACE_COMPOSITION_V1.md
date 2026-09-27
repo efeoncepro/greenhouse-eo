@@ -1,25 +1,29 @@
 # Línea gráfica Efeonce — Composición por superficie V1
 
 > **Tipo de documento:** Norma de marca (composición por superficie)
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude (1.3: las 69 láminas del canvas «Deck» aprobadas y convertidas en
+> **Última actualización:** 2026-09-27 por Claude (1.4: estado tras TASK-1927 — contrato 0.1.2 fijado en Greenhouse
+> con `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12; el catálogo `graphic-line-deck` compone las tres composiciones
+> de `proposal-cinematic`, las tres de la sección partida, el tríptico de una palabra por toma y las portadas y
+> contraportadas aprobadas; `pnpm brand:compose` compone también un documento completo, brochure o propuesta; §2.1,
+> §4.6, §6 y §7. Antes, 1.3: las 69 láminas del canvas «Deck» aprobadas y convertidas en
 > recetas por lámina — [catálogo](./deck-recipes/README.md) `efeonce.deck-slide-recipes.v1`; tríptico con tres esferas,
 > sección partida por la izquierda con dos variantes nuevas, cotización en tres variantes, día a día y «vívelo»,
 > próximos pasos con impacto y excepción del registro cine para secciones y «about»; ver el delta de abajo. Antes, 1.2:
 > §4.6 «Portadas y contraportadas» completa — reglas 1–10, catálogo
 > aprobado de brochure y propuesta, receta medida de la columna de voz, selección en portadas, láminas de sección
 > reubicadas y descartes; §6 filas 15–20. Antes, 1.1: ruta por el Artifact Composer, §2.1 — 20 recetas aprobadas como
-> plantilla con `pnpm brand:compose`, TASK-1919; contrato 0.1.1 publicado en AXIS `v0.3.8` y fijado en Greenhouse)
+> plantilla con `pnpm brand:compose`, TASK-1919; contrato 0.1.1 publicado en AXIS `v0.3.8`)
 > **Estado:** Vigente para lo marcado **aprobado**. Las opciones y los pendientes no se usan como canon hasta que el
 > operador los apruebe. El contrato AXIS que la acompaña está en `candidate`.
 > **Valores:** tokens `efeonceGraphicLine.surfaces.<superficie>` en `@efeoncepro/axis-tokens` (AXIS). Este documento
 > dice qué se aprobó, qué reglas rigen y cómo se compone; **no guarda números**. Si un valor no está en el token, no
 > existe: se agrega al token con su razón.
-> **Contrato:** `efeonce.surface-composition` 0.1.1 (`candidate`, owner `efeonce-brand-studio`, manifest
-> `axis.surface-composition.v1`; acepta intents 0.1.0) en `efeoncepro/axis-design-system`. **Publicado** en AXIS
-> `v0.3.8` (`axis-tokens` 0.3.8 con `efeonceGraphicLine.surfaces`, `axis-ui-contracts` 0.3.7) y **fijado en
-> Greenhouse** (2026-09-27). Lab: https://axis.efeonce.org/references/surfaces/ ([JSON](https://axis.efeonce.org/references/surfaces.json)).
+> **Contrato:** `efeonce.surface-composition` 0.1.2 (`candidate`, owner `efeonce-brand-studio`, manifests
+> `axis.surface-composition.v1` para una pieza y `axis.surface-document.v1` para un documento; un intent 0.1.0 o 0.1.1
+> resuelve igual) en `efeoncepro/axis-design-system`. **Publicado** en AXIS `v0.3.14` (`axis-tokens` 0.3.14 con
+> `efeonceGraphicLine.surfaces`, `axis-ui-contracts` 0.3.12) y **fijado en Greenhouse** (2026-09-27, TASK-1927). Lab: https://axis.efeonce.org/references/surfaces/ ([JSON](https://axis.efeonce.org/references/surfaces.json)).
 > **Canvas del equipo (por superficie):** [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7),
 > con las páginas «DOOH · pDOOH», «Web», «Motion», «Producción audiovisual», «Deck» y «Firma y 1:1». A la izquierda de
 > cada página hay una lámina guía, «Guía · cómo componer …», que resume para esa superficie lo que esta norma detalla.
@@ -53,10 +57,14 @@ Decisiones que cambian esta norma (detalle en §4.6, «Recetas por lámina»):
    «vívelo»; **próximos pasos** con impacto (reemplaza las tres columnas); **clientes** en un tono navy con excepción
    tonal; **caso Sky** con foto de ejemplo; **BeX** con la escalera como principal.
 
-Los tokens y las recetas de AXIS todavía describen parte de lo anterior (sección partida por la derecha, frase única
-del tríptico, próximos pasos en tres columnas, opciones sin aprobar); se sincronizan en
-[TASK-1927](../../tasks/in-progress/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md), con las fotos en
-[TASK-1926](../../tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md). Mientras tanto manda esta norma.
+**Qué ya está en AXIS y en el composer** (contrato 0.1.2,
+[TASK-1927](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md)): el tríptico de una
+palabra por toma, la sección partida por la izquierda con sus tres composiciones, las composiciones `hero` y `lines` de
+`proposal-cinematic` y las portadas y contraportadas aprobadas (§2.1 y §4.6). **Qué falta:** las plantillas de las
+recetas restantes del deck
+([TASK-1928](../../tasks/to-do/TASK-1928-graphic-line-deck-remaining-recipe-templates.md)) y las fotos idempotentes
+([TASK-1926](../../tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md)). Donde una lámina aprobada
+todavía no tiene plantilla, manda esta norma y su receta del catálogo.
 
 ## Para qué sirve
 
@@ -146,7 +154,7 @@ un intent, con un solo comando en Greenhouse:
 
 ```bash
 pnpm brand:compose -- --intent <intent.json> [--out <dir>] [--artifact-id <id>]
-# salida por defecto: .captures/brand-surfaces/<id>/ ; deja además <id>.surface-manifest.json
+# salida por defecto: .captures/brand-surfaces/<id>/ ; deja además <id>.surface-manifest.json y <id>.provenance.json
 ```
 
 El comando valida que la receta esté aprobada, resuelve el intent con el contrato de AXIS (`resolveSurfaceComposition`;
@@ -156,27 +164,81 @@ si hay `issues`, no compone), arma el plan con el builder de la receta y compone
 
 | Catálogo | Salida | Recetas con plantilla |
 |---|---|---|
-| `graphic-line-deck` | PDF 16:9 | `proposal-cinematic`, `method-staircase`, `section-classic`, `section-split`, `content-measure`, `triptych` |
+| `graphic-line-deck` | PDF 16:9 | 16 plantillas: las seis recetas interiores (`proposal-cinematic` y `section-split` con tres composiciones cada una, `section-classic`, `content-measure`, `triptych`, `method-staircase`) y las cuatro del marco (`cover-brochure`, `cover-proposal`, `close-brochure`, `close-proposal`). Detalle en la tabla de abajo |
 | `graphic-line-stills` | PNG | web `hero-lens`, `hero-bleed`, `hero-uniform-tablet`, `hero-mobile-native` (una plantilla por ancho: 360, 390 y 430); DOOH `caminero-lens`; motion `loop-lens-reveal` (el **último cuadro** del loop, su estático de respaldo) y `storyboard` |
 | `graphic-line-overlays` | PNG con alfa (capas para montar sobre el video) | `cartela`, `zocalo`, `callout-selection`, `data-super`, `subtitles`; opacas: `split-screen` y `shot-plan` |
+
+**El catálogo del deck (`graphic-line-deck`).** La composición de una receta se elige con `layout`, que va **siempre
+explícito** en el intent: nunca se infiere del contenido. El tipo de contenido (`contentType`) lo deriva
+`src/lib/brand-surfaces` del manifest; el autor no lo escribe.
+
+| Receta | `layout` | `contentType` | Qué compone |
+|---|---|---|---|
+| `proposal-cinematic` | `service` | `deck.proposal-cinematic` | la propuesta de un servicio: foto de cine a sangre, voz, bajada y hasta cuatro pasos; la prueba es **opcional** desde la 0.1.2 y, si va, lleva fuente |
+| `proposal-cinematic` | `hero` | `deck.proposal-cinematic.hero` | la respuesta en grande con la selección sobre ella; sin prueba ni pasos |
+| `proposal-cinematic` | `lines` | `deck.proposal-cinematic.lines` | la pila de líneas de servicio, que sale del contrato (el intent sólo elige cuáles con `lines`); la selección toma el grupo y el logo acompaña la frase; es la única lámina con los cinco acentos |
+| `section-classic` | — | `deck.section-classic` | el número dentro del anillo que marca la sección |
+| `section-split` | `corner-top` (también sin `layout`) | `deck.section-split` | panel en papel con la esquina curva arriba |
+| `section-split` | `corner-bottom` | `deck.section-split.corner-bottom` | la misma sección con la esquina curva abajo |
+| `section-split` | `panel-end` | `deck.section-split.panel-end` | el panel a la derecha, con la foto espejada |
+| `content-measure` | — | `deck.content-measure` | la órbita mide la cifra, con fuente |
+| `triptych` | — | `deck.triptych` | tres tomas verticales, **una palabra por toma**, cada una con su esfera; una toma con más de una palabra falla con `invalid-intent` |
+| `method-staircase` | — | `deck.method-staircase` | el método como escalera, sin foto |
+| `cover-brochure` (uso `brochure`) | `document` o `line` | `deck.cover-brochure` | portada con foto de cine a sangre y la columna de voz; sin selección y sin burbuja URL |
+| `cover-proposal` (uso `proposal`) | `orbit` | `deck.cover-proposal` | portada **sin foto**: la órbita gigante sostiene el logo del cliente, con la selección sobre su caja y la burbuja URL |
+| `cover-proposal` (uso `proposal`) | `dawn` | `deck.cover-proposal.dawn` | portada **sin foto**: la órbita sale como el sol; mismo logo de cliente, selección y burbuja URL |
+| `close-brochure` (uso `brochure`) | `orbit` | `deck.close-brochure` | contraportada **sin foto**: «¿Conversamos? Cuando quieras.», con los corchetes y el cursor de quien lee sobre la respuesta; eslogan como firma, redes y contacto |
+| `close-brochure` (uso `brochure`) | `photo` | `deck.close-brochure.photo` | la misma contraportada sobre una foto |
+| `close-proposal` (uso `proposal`) | — | `deck.close-proposal` | contraportada **con foto** y sin voz: el mensaje es el eslogan «Empower your Growth» |
+
+**Un documento completo (brochure o propuesta).** Un intent que trae `pages` es un documento: declara una vez
+`surface: 'deck'`, `format`, `use` (`brochure` o `proposal`) y, si aplica, `line` y `sections`; cada página es un
+intent de lámina que puede omitir lo que el documento ya dijo. Se compone con el mismo comando:
+
+```bash
+pnpm brand:compose -- --intent src/lib/brand-surfaces/examples/deck-brochure-document.json
+# opcional: --artifact-id <id> y --out <dir>
+```
+
+Deja en `.captures/brand-surfaces/<id>/` tres archivos del documento, además de un PNG y un PDF por página:
+
+| Archivo | Qué es |
+|---|---|
+| `<id>.pdf` | un solo PDF 16:9 con todas las páginas, en orden |
+| `<id>.surface-document-manifest.json` | el manifest `axis.surface-document.v1` con el que AXIS resolvió el documento |
+| `<id>.provenance.json` | la procedencia (`efeonce.brand-surface-document.provenance.v1`): huella del intent, plates y archivos usados, y versiones de AXIS |
+
+El documento se valida **como un todo** con `resolveSurfaceDocument` de AXIS; Greenhouse no reimplementa ninguna regla
+(función pura `planSurfaceDocument` en `src/lib/brand-surfaces/document.ts`). **Un solo issue deja al documento sin
+salida:** no se compone ninguna página, ni siquiera las válidas. Los issues del conjunto tienen código propio
+(`brochure-cover-first`, `brochure-close-last`, `brochure-needs-service-page`, `document-line-mismatch`,
+`frame-photo-must-alternate`, `document-pages-required`, `document-surface-invalid`) y los de una página llegan con el
+prefijo `page[i]:<código>`. Si falta un plate, el comando falla **antes** de crear la carpeta de salida. Ejemplos:
+`deck-brochure-document.json` (nueve páginas: portada, cuatro servicios, hero de Nexa, líneas, escalera y contraportada)
+y `deck-proposal-document.json` (siete páginas interiores), en `src/lib/brand-surfaces/examples/`.
 
 **Qué queda fuera, a propósito:**
 
 - **Las opciones y pendientes** (paleta DOOH, todo pDOOH) no tienen plantilla: el comando falla con
-  `recipe-not-approved`. Una receta entra al catálogo sólo cuando el operador la aprueba. Las láminas del deck
-  aprobadas el 2026-09-27 que todavía no tienen plantilla (§4.6, «Recetas por lámina») tampoco salen del comando
-  hasta TASK-1927 (el contrato fijado las trata como opción o no las conoce): están aprobadas, pero su plantilla no
-  existe aún.
+  `recipe-not-approved`. Una receta entra al catálogo sólo cuando el operador la aprueba.
+- **Las recetas restantes del deck.** Las láminas aprobadas el 2026-09-27 que no están en la tabla de arriba (§4.6,
+  «Recetas por lámina») todavía no tienen plantilla: son
+  [TASK-1928](../../tasks/to-do/TASK-1928-graphic-line-deck-remaining-recipe-templates.md).
+- **El marco clásico** (`cover-classic`, `close-classic`): el operador no lo aprobó y no entra al catálogo; en AXIS
+  nombra su reemplazo (`supersededBy`). Tampoco entra `cover-brochure-cine-lines-selection`: el contrato no admite
+  selección en esa portada (§4.6).
 - **El video.** El composer entrega cuadros fijos y capas; la animación sigue en la pipeline de motion (§4.4, §4.5).
   `audiovisual.close-reveal` falla con `recipe-outside-composer`: el cierre son los masters del reveal v1.1 o
   `pnpm orbit:video` en AXIS.
 - **La ruta productiva** (API, `artifact-worker`, MCP): es
-  [TASK-1921](../../tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md). Hoy `brand:compose` es el
-  taller local.
+  [TASK-1921](../../tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md), que debe aceptar también
+  el intent de documento. Hoy `brand:compose` es el taller local.
 
 Componer no aprueba: la pieza sigue pasando la revisión de §4 y del manual de uso. Paso a paso y errores:
 [manual de uso](../../manual-de-uso/creative/componer-por-superficie-con-axis.md). Gate visual:
-[runbook](../runbooks/composer-visual-gate.md) (scope `graphic-line`).
+[runbook](../runbooks/composer-visual-gate.md) (`pnpm composer:visual-gate --catalog=graphic-line`: 32 frames a cero
+píxeles; altas y cambios declarados en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`). El documento
+completo no tiene frame propio, porque usa fotos reales: lo cubren sus páginas por separado.
 
 ---
 
@@ -392,11 +454,11 @@ sección guarda las reglas y las decisiones; el catálogo, la receta de cada lá
 | Receta | Qué es | Estado |
 |---|---|---|
 | Sección clásica | `deckSlideHtml('section')`: el número dentro del anillo que marca la sección | **aprobado** |
-| Sección partida (`section-split`) | panel en papel con una esquina curva arriba a la derecha; la foto se extiende bajo la curva; **el indicador sube por la izquierda** y la esfera queda arriba a la izquierda | **aprobado** (corregido el 2026-09-27) |
-| Sección partida, esquina abajo (`section-split-corner-bottom`) y panel a la derecha (`section-split-panel-end`) | las dos variantes de ritmo de la sección partida, con el mismo indicador por la izquierda | **aprobado** (2026-09-27) |
+| Sección partida (`section-split`, `layout: 'corner-top'`) | panel en papel con una esquina curva arriba a la derecha; la foto se extiende bajo la curva; **el indicador sube por la izquierda** y la esfera queda arriba a la izquierda | **aprobado** (corregido el 2026-09-27) |
+| Sección partida, esquina abajo y panel a la derecha (en el catálogo de recetas, `section-split-corner-bottom` y `section-split-panel-end`; en el contrato, `section-split` con `layout: 'corner-bottom'` o `'panel-end'`) | las dos variantes de ritmo de la sección partida, con el mismo indicador por la izquierda; con el panel a la derecha la foto va espejada | **aprobado** (2026-09-27) |
 | Contenido «la órbita mide la cifra» | la lente con el arco que barre el porcentaje real, con fuente o «datos de muestra» | **aprobado** |
 | Tríptico «Escucha. Crea. Mide.» | tres tomas verticales nativas a sangre; **una palabra por toma, cada una con su esfera** | **aprobado** (corregido el 2026-09-27) |
-| **`proposal-cinematic`** | foto de cine a sangre y la propuesta de un servicio (abajo) | **aprobado** (seis láminas) |
+| **`proposal-cinematic`** | foto de cine a sangre y la propuesta de un servicio (abajo), en tres composiciones: `service`, `hero` y `lines` | **aprobado** (seis láminas) |
 | **`method-staircase`** | el método como escalera, sin foto (abajo); la principal de BeX | **aprobado** (BeX, 2026-09-27) |
 | Sección con lente, sección a sangre, respiro, foco, hoja de contactos, secciones de cine (servicios, equipo, quiénes somos, por qué lo hacemos) y las láminas de contenido, método, prueba, propuesta por línea, cotización y próximos pasos | el resto de las láminas del canvas | **aprobado** (2026-09-27); receta de cada una en el catálogo |
 
@@ -406,10 +468,17 @@ sección guarda las reglas y las decisiones; el catálogo, la receta de cada lá
 - Las viñetas nunca llevan la esfera. La órbita con satélites lleva el arco largo en degradé **sin esfera**.
 - Una receta nueva nace en el canvas, se aprueba y recién entonces entra al catálogo de recetas, al token y al
   contrato.
-- **Una receta aprobada no es todavía una plantilla.** Hoy `pnpm brand:compose` produce la sección clásica,
-  «la órbita mide la cifra», `method-staircase` y `proposal-cinematic` con `layout: 'service'`; la sección partida y el
-  tríptico tienen plantilla en su versión anterior y el resto no la tiene. Lo que no tiene plantilla se arma como
-  maqueta de dirección declarada con el `prompts.composition` de su receta (TASK-1927).
+- **Una receta aprobada no es todavía una plantilla.** Hoy `pnpm brand:compose` produce las recetas de la tabla de
+  §2.1: `proposal-cinematic` en sus tres composiciones, la sección clásica, la sección partida en sus tres
+  composiciones, «la órbita mide la cifra», el tríptico de una palabra por toma, `method-staircase` y las portadas y
+  contraportadas aprobadas. El resto de las láminas aprobadas no tiene plantilla todavía (TASK-1928): se arma como
+  maqueta de dirección declarada con el `prompts.composition` de su receta.
+- **El intent declara `use` y `layout`.** `use` (`proposal` o `brochure`) dice para qué documento es la lámina; si se
+  omite, AXIS toma el de la receta, y un uso que la receta no admite se rechaza (`use-not-for-recipe`). `layout` va
+  siempre explícito: la composición nunca se infiere del contenido.
+- **El indicador de la sección partida** nace abajo a la izquierda y sube en sentido horario, y barre las secciones **ya
+  recorridas** (la sección n de N muestra n − 1 de N). **Pregunta abierta del operador**, anotada en el token: si ese
+  barrido se unifica con el de la lente y la sección clásica, que miden n de N. Hasta decidir, manda el token.
 
 #### Receta `proposal-cinematic` (aprobada el 2026-09-27)
 
@@ -437,7 +506,7 @@ línea y a 24 px o más (D1). Fuera de esta lámina rigen «una esfera por pieza
 | Voz | a la izquierda, en el espacio oscuro que la toma reserva (la ficha declara la reserva): eyebrow «Nuestra propuesta · \<línea\>», pregunta con anillo y respuesta con esfera |
 | Selección | sobre la respuesta, con su esfera, y un colaborador de tipo departamento («Cliente»; «Nexa» en la pieza de Nexa) |
 | Bajada | una frase que explica el servicio |
-| Prueba | una cifra o un hecho **con fuente**; si no hay fuente, no hay prueba |
+| Prueba | **opcional** desde la 0.1.2; cuando va, es una cifra o un hecho **con fuente**; si no hay fuente, no hay prueba |
 | Pasos | hasta cuatro, con íconos de la voz de la línea (Brand = Plastilina; Growth, Engine y Revenue = Trazo), en reposo; el **rótulo del primer paso va en blanco o en el suave de la voz, nunca en el acento** (texto menor de 24 px, D1) |
 | Pie | la burbuja URL; sin logo en la lámina |
 | Navegación | las piezas aprobadas van sin indicador de deck; la navegación la retoman las secciones |
@@ -468,8 +537,9 @@ las láminas de la ronda de propuestas quedaron aprobadas o rechazadas.
 
 **Cómo se compone:** la voz, la selección y los íconos salen de los `delegates`; la foto, de la ficha esperada
 (`foto:prompt` con el registro y la reserva izquierda). La lámina sale entera con `pnpm brand:compose` (§2.1,
-catálogo `graphic-line-deck`, PDF 16:9), igual que las otras cinco recetas aprobadas del deck; el resto del deck se arma
-con `deck-studio`. No vive en `deck-axis`, que es el catálogo de las ofertas a comité.
+catálogo `graphic-line-deck`, PDF 16:9), con la composición que declare `layout`: `service` para la propuesta de un
+servicio, `hero` para la respuesta en grande (la carrera de Nexa) y `lines` para las líneas de servicio con Nexa. El
+resto del deck se arma con `deck-studio`. No vive en `deck-axis`, que es el catálogo de las ofertas a comité.
 
 #### Receta `method-staircase` (aprobada el 2026-09-27)
 
@@ -494,11 +564,44 @@ selección, cuando la lleva, toma un nivel de la escalera (`selection.level`, 1 
 Esta es la norma completa de portadas y contraportadas del **brochure** y de la **propuesta comercial**, y de las
 láminas de sección que salieron de la misma ronda. **Fuente visual:** la página «Deck» del
 [canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7), donde el operador las
-aprobó. **Recetas:** recetas de portada y contraportada del AXIS Lab › Superficies › Deck (formalización en curso). La
-integración en Greenhouse (renderizarlas desde el contrato) es parte de
-[TASK-1927](../../tasks/in-progress/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) y la producción idempotente
-de sus fotos, de [TASK-1926](../../tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md). Hasta que eso cierre, **no tienen plantilla en el Artifact Composer**: los scripts que las
-renderizaron en el canvas no viven en el repo, y `pnpm brand:compose` no las produce.
+aprobó. **Recetas del contrato (0.1.2):** `cover-brochure`, `cover-proposal`, `close-brochure` y `close-proposal`, cada
+una atada a su uso. **Ya son plantillas del Artifact Composer** (catálogo `graphic-line-deck`, §2.1): salen con
+`pnpm brand:compose`, solas o como primera y última página de un documento
+([TASK-1927](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md)). El operador aprobó a
+ojo las láminas compuestas el 2026-09-27. La producción idempotente de sus fotos es
+[TASK-1926](../../tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md).
+
+**Cómo se pide cada una**
+
+| Documento | Pieza | Receta y `layout` | Lleva |
+|---|---|---|---|
+| Brochure | portada general | `cover-brochure`, `layout: 'document'` | foto, voz completa y evidencia |
+| Brochure | portada de una línea de servicio | `cover-brochure`, `layout: 'line'` | lo mismo, con el acento de la línea (`line`) |
+| Brochure | contraportada sin foto | `close-brochure`, `layout: 'orbit'` | la voz «¿Conversamos? Cuando quieras.» |
+| Brochure | contraportada con foto | `close-brochure`, `layout: 'photo'` | lo mismo, sobre la foto |
+| Propuesta | portada, órbita gigante | `cover-proposal`, `layout: 'orbit'` | voz, evidencia y logo del cliente; sin foto |
+| Propuesta | portada, amanecer | `cover-proposal`, `layout: 'dawn'` | lo mismo, en eje central; sin foto |
+| Propuesta | contraportada | `close-proposal` | foto; **sin voz** (el mensaje es el eslogan) |
+
+**Campos propios del marco**
+
+- **`column.topPx`** (portadas con columna de voz): la altura a la que empieza la columna. Se elige según la foto, para
+  que el texto no cruce al sujeto, y debe caer dentro de la reserva del logo que fija el token; si se omite, va el valor
+  por defecto del token. Fuera de la reserva, el comando falla con `invalid-intent`.
+- **`clientLogo: { path, alt }`** (portadas de propuesta): el archivo del logo del cliente, en SVG o PNG, y su texto
+  alternativo, que es **obligatorio**. Sin `clientLogo` sale el marcador «Logo del cliente». La selección toma la caja
+  del logo (`selection.target: 'client-logo'`); `selection.anchor` elige la esquina del colaborador.
+- **`body`** es la **evidencia** de la portada: lleva **una** palabra en negrita, marcada como `**palabra**`; si no se
+  marca ninguna, va la primera. Los saltos de línea del texto se respetan.
+- **El contacto de las contraportadas** (correo, teléfonos y dirección) sale de `EFEONCE_CONTACT`, en
+  `src/config/efeonce-brand.ts`. AXIS sólo define su estilo; nunca se escribe en el intent.
+
+Ejemplos: los 17 intents `deck-cover-*-intent.json` y `deck-close-*-intent.json` de
+`src/lib/brand-surfaces/examples/`.
+
+**Diferencias conocidas contra los prototipos del canvas** (a favor de AXIS o del SSOT de marca): el tamaño de «Cuando
+quieras.», algo mayor que en el prototipo; la burbuja URL, que va horneada en lugar de la de luminosidad; y la caja de
+selección, que sale del pintor canónico y queda algo más ajustada.
 
 ##### Las reglas
 
@@ -506,7 +609,7 @@ renderizaron en el canvas no viven en el repo, y `pnpm brand:compose` no las pro
 
 | # | Regla |
 |---|---|
-| 1 | **Foto y sin foto se alternan** entre portada y contraportada. Vale para el brochure y para la propuesta comercial. **[decisión del operador, 2026-09-27]** |
+| 1 | **Foto y sin foto se alternan** entre portada y contraportada. Vale para el brochure y para la propuesta comercial. En un documento la aplica el contrato: si las dos llevan foto, o ninguna, el documento se rechaza con `frame-photo-must-alternate`. **[decisión del operador, 2026-09-27]** |
 | 2 | **El mensaje de la contraportada depende del documento.** Propuesta comercial: el mensaje principal es el eslogan **«Empower your Growth»**, grande y protagonista, en sus pesos oficiales, porque la propuesta llega **después** de conversar y «¿Conversamos?» no aplica. Brochure: **«¿Conversamos? Cuando quieras.»** en la voz pregunta–respuesta, con el eslogan como firma debajo, porque el brochure busca abrir la conversación. **[decisión del operador, 2026-09-27]** |
 | 3 | **Los textos de portada siguen la voz de la línea** ([manual §4](./EFEONCE_GRAPHIC_LINE_V1.md#4-la-voz-pregunta-y-respuesta)): eyebrow en Poppins 500, mayúsculas espaciadas · pregunta en Poppins Light 300 con su anillo en el acento · respuesta en Bricolage 760 con su esfera en el acento, de una a tres palabras y **al menos 3× la pregunta** · evidencia en Poppins 400 con una palabra en negrita. **Nada de títulos sueltos** tipo «Servicios 2026» sin voz. **[decisión del operador, 2026-09-27]** |
 | 4 | **El eslogan va sólo en el cierre**, nunca en la portada. El operador lo preguntó y se descartó: recarga la portada, repite la respuesta y la esquina inferior derecha es zona del sujeto o de la órbita. **[decisión del operador, 2026-09-27]** |
@@ -540,7 +643,10 @@ Revenue».
 | Nexa frente a la órbita | `2026-09-27_brochure/plates/BR1b-portada-orbita-isotipo.png` | `cover-brochure-cine-orbit` | **aprobado** (2026-09-27) |
 | Nexa y las cinco líneas (cinco esferas) + burbuja URL | `2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png` | `cover-brochure-cine-lines` | **aprobado** (2026-09-27) |
 | Nexa y el equipo con agentes | `2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png` | `cover-brochure-cine-team` | **aprobado** (2026-09-27) |
-| La de las cinco líneas con selección y cursor de Nexa sobre «Crecer.» | la misma de las cinco líneas | `cover-brochure-cine-lines-selection` | **aprobado** (2026-09-27; antes «prueba») |
+| La de las cinco líneas con selección y cursor de Nexa sobre «Crecer.» | la misma de las cinco líneas | `cover-brochure-cine-lines-selection` | **aprobado** en el canvas (2026-09-27; antes «prueba»); **sin plantilla**: el contrato no admite selección en la portada de brochure |
+
+Las tres primeras se piden como `cover-brochure` con `layout: 'document'` y su plate; los nombres de la columna
+«Receta» son los del [catálogo de recetas por lámina](./deck-recipes/README.md).
 
 ##### Brochure — una portada por línea de servicio (aprobadas las cinco)
 
@@ -592,9 +698,10 @@ your en ExtraBold, Growth en Black itálica en teal) · burbuja URL y redes · c
 
 ##### La columna de voz — receta medida (1920 × 1080)
 
-Medida sobre las láminas aprobadas del canvas. Es la **referencia** hasta que entre al token
-`efeonceGraphicLine.surfaces.deck` con la formalización de las recetas (TASK-1927); cuando el token exista, manda el
-token.
+Medida sobre las láminas aprobadas del canvas. **Los valores ya viven en el token** `efeonceGraphicLine.surfaces.deck`
+(`axis-tokens` 0.3.14: columna de voz, eje del amanecer, pintura de las órbitas, estilo del contacto y caja del logo del
+cliente) y las plantillas los leen del manifest. Esta tabla queda como **registro de la medición**: no se copia de aquí
+ningún valor y, si difiere del token, manda el token.
 
 | Elemento | Posición | Medida |
 |---|---|---|
@@ -621,7 +728,7 @@ lecho oscuro abajo; la luz de acento es la de la línea. Guardas del registro en
 | Portadas de propuesta (las cuatro) | marco de 8 manijas sobre el logo del cliente | colaborador «Cliente» o «SKY» |
 | Lámina de sección de servicios («Crecer.») | 8 manijas sobre «Crecer.» | propio |
 | Contraportada órbita gigante del brochure | corchetes abiertos sobre «Cuando quieras.» (invitación a actuar) | propio |
-| Portada de las cinco líneas con Nexa (`cover-brochure-cine-lines-selection`) | sobre «Crecer.» | de Nexa — **aprobado** (2026-09-27) |
+| Portada de las cinco líneas con Nexa (`cover-brochure-cine-lines-selection`) | sobre «Crecer.» | de Nexa — **aprobado** en el canvas (2026-09-27); no se compone: el contrato no admite selección en esa portada |
 | Fotos de cine | ninguna por defecto | — |
 
 ##### Láminas de sección (reubicadas como interiores)
@@ -679,8 +786,9 @@ excepción vale **sólo** para láminas de sección y «about» del deck: no abr
 láminas de contenido, que siguen en los registros A, B o C. Guardas iguales al resto del registro: proporciones
 reales, uniforme por registro de escena con el isotipo compuesto, nunca dos personas mirándose de cerca y ningún texto
 sobre el sujeto. En la variante con el panel a la derecha, la persona es **del cliente** (sin uniforme Efeonce) y su
-pantalla nunca muestra una interfaz legible de terceros. El contrato AXIS (`cine-requires-nexa-or-proposal`) todavía no
-la conoce: se lleva al contrato en TASK-1927.
+pantalla nunca muestra una interfaz legible de terceros. El contrato AXIS ya admite el registro cine en la sección
+partida, en la sección de cine y en las portadas y contraportadas con foto (`axis-tokens` 0.3.14); las láminas «about»
+llegan con su receta (TASK-1928).
 
 **Pendientes de QA** (no bloquean la aprobación; la plantilla usa el valor del canon): respuestas bajo 3× la pregunta
 en cotización, clientes, plan, partners y contraportadas de brochure; acento en texto de menos de 24 px en etiquetas
@@ -729,21 +837,23 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
 | 15 | Las dos contraportadas de brochure **con foto** están aprobadas, pero todas las portadas de brochure aprobadas llevan foto y la regla 1 exige alternar | **Pendiente (operador):** hoy la única pareja válida del brochure es portada con foto + órbita gigante sin foto; falta decidir si las contraportadas con foto esperan una portada de brochure sin foto |
 | 16 | La documentación funcional y el manual de uso dicen «una portada con foto se firma con el logo de Efeonce abajo, al centro»; las portadas aprobadas del brochure llevan el logo de 500 px **arriba**, en la columna | **Pendiente (operador):** confirmar que la firma centrada abajo es de social y pauta, y que el deck y el brochure firman según §4.6 (la firma por soporte de §5 apunta en esa dirección, pero no lo dice de forma explícita) |
 | 17 | El manual §10.1 y la base común de §4.6 dicen «la portada lleva un arco corto» y «el cierre lleva el logo dentro de la órbita»; las portadas de propuesta aprobadas usan la órbita gigante o el amanecer y las contraportadas aprobadas no declaran el logo dentro de la órbita | **Pendiente (operador):** decidir si las recetas del 2026-09-27 reemplazan esas reglas para el brochure y la propuesta o si conviven |
-| 18 | Esta norma dice que «no guarda números», pero §4.6 registra la receta medida de la columna de voz | **Transitorio:** la receta queda como medida de referencia de las láminas aprobadas hasta que entre al token `efeonceGraphicLine.surfaces.deck` (TASK-1927); después manda el token |
+| 18 | Esta norma dice que «no guarda números», pero §4.6 registra la receta medida de la columna de voz | **Resuelto (TASK-1927):** los valores entraron al token `efeonceGraphicLine.surfaces.deck` (`axis-tokens` 0.3.14) y las plantillas los leen del manifest; la tabla de §4.6 queda como registro de la medición y manda el token |
 | 19 | «Nexa frente a la órbita» y «Nexa y el equipo con agentes» figuran como opción de portada de brochure y, a la vez, como láminas interiores de sección reubicadas | **Resuelto por el operador (2026-09-27):** las 69 láminas quedaron aprobadas; las fotos sirven como portada (`cover-brochure-cine-orbit`, `cover-brochure-cine-team`) y como apertura interior (`section-cine-services`, `section-cine-team`), nunca las dos veces en el mismo documento |
 | 20 | El manual §4 describe la pregunta «con anillo teal»; las portadas por línea llevan el anillo y la esfera en el acento de su línea | **Resuelto por el operador (regla 9 de §4.6):** en una pieza de línea, anillo y esfera toman el acento de la línea |
-| 21 | El tríptico aprobado muestra una esfera por palabra; la norma, el token AXIS (`voice.mode: phrase-across-panels`) y la plantilla del composer pedían una frase única con la esfera al final | **Resuelto por el operador (2026-09-27):** una palabra por toma, cada una con su esfera. Token AXIS y plantilla `triptych` pendientes de actualizar (TASK-1927) |
-| 22 | La sección partida aprobada sube por la izquierda; la norma, el token AXIS (`progress.flipped`) y `src/lib/brand-surfaces/recipes/deck.ts` (`sectionSplit`) decían «sube por la derecha». Además, el arco mide (n−1) × 72° en los prototipos y n/N en la lente y la clásica | **Resuelto por el operador (2026-09-27):** sube por la izquierda, con la esfera arriba a la izquierda, en las tres variantes. Token, plantilla y la unificación del barrido quedan para TASK-1927 |
-| 23 | Las fotos aprobadas de las secciones partidas (esquina abajo, panel a la derecha) y de «Quiénes somos» / «Por qué lo hacemos» son de cine sin cumplir «Nexa protagonista o `proposal-cinematic`» | **Resuelto por el operador (2026-09-27):** excepción aprobada del registro cine para secciones y láminas «about» (§3, regla 5); el issue AXIS `cine-requires-nexa-or-proposal` debe conocerla (TASK-1927) |
+| 21 | El tríptico aprobado muestra una esfera por palabra; la norma, el token AXIS (`voice.mode: phrase-across-panels`) y la plantilla del composer pedían una frase única con la esfera al final | **Resuelto por el operador (2026-09-27):** una palabra por toma, cada una con su esfera. Token AXIS y plantilla `triptych` **actualizados** (TASK-1927): una toma con más de una palabra falla |
+| 22 | La sección partida aprobada sube por la izquierda; la norma, el token AXIS (`progress.flipped`) y `src/lib/brand-surfaces/recipes/deck.ts` (`sectionSplit`) decían «sube por la derecha». Además, el arco mide (n−1) × 72° en los prototipos y n/N en la lente y la clásica | **Resuelto por el operador (2026-09-27):** sube por la izquierda, con la esfera arriba a la izquierda, en las tres variantes. Token y plantillas **actualizados** (TASK-1927): el indicador barre las secciones ya recorridas, (n − 1)/N. **Sigue abierta** la pregunta del operador de unificar el barrido a n/N |
+| 23 | Las fotos aprobadas de las secciones partidas (esquina abajo, panel a la derecha) y de «Quiénes somos» / «Por qué lo hacemos» son de cine sin cumplir «Nexa protagonista o `proposal-cinematic`» | **Resuelto por el operador (2026-09-27):** excepción aprobada del registro cine para secciones y láminas «about» (§3, regla 5); el contrato AXIS ya admite el cine en la sección partida y en la sección de cine (`axis-tokens` 0.3.14); las láminas «about» llegan con su receta (TASK-1928) |
 | 24 | El token AXIS de `decision-next-steps` (tres columnas, CTA con el descriptor bajo el cursor) y su referencia describen la versión anterior | **Resuelto por el operador (2026-09-27):** manda la versión con la agenda abierta; AXIS actualiza token y referencia (TASK-1927) |
 
 ---
 
 ## 7. Estado y pendientes
 
-- **Contrato:** `efeonce.surface-composition` 0.1.1 `candidate` (acepta intents 0.1.0); pasa a `stable` sólo con la
-  aprobación del operador y con evidencia (paquete, pruebas y Lab). Publicado en AXIS `v0.3.8` (`axis-tokens` 0.3.8,
-  `axis-ui-contracts` 0.3.7); la 0.1.1 modela el contenido de las láminas aprobadas (`levels`, `note`, `panels`,
+- **Contrato:** `efeonce.surface-composition` 0.1.2 `candidate` (un intent 0.1.0 o 0.1.1 resuelve igual); pasa a
+  `stable` sólo con la aprobación del operador y con evidencia (paquete, pruebas y Lab). Publicado en AXIS `v0.3.14` y
+  fijado en Greenhouse: `axis-tokens` 0.3.14, `axis-ui-contracts` 0.3.12, `axis-graphic-line` 0.7.0 y
+  `axis-brand-assets` 0.3.5. La 0.1.2 suma `use`, `layout`, las recetas del marco (portadas y contraportadas), el
+  documento de varias páginas y los tokens del marco; la 0.1.1 modela el contenido de las láminas aprobadas (`levels`, `note`, `panels`,
   `figures` con fuente, `nav`, `photo.focus`/`native`, título y marcos de hojas, `chapter`, `selection.box`, `shots`,
   `subtitles`, `selection.level`). Greenhouse lo fija y lo consume en `src/lib/brand-surfaces` (§2.1).
 - **Recetas por aprobar:** todas las de pDOOH, la paleta de DOOH y la firma por soporte (salvo el caminero). El deck
@@ -752,19 +862,25 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
   `foto:prompt` (TASK-1918) y la ruta productiva de `brand:compose` (API, `artifact-worker`, MCP:
   [TASK-1921](../../tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md)). **Hechos el
   2026-09-27:** las 20 recetas aprobadas como catálogo del Artifact Composer (TASK-1919, §2.1) y el isotipo compuesto
-  sobre la prenda con `pnpm foto:isotipo` (TASK-1920).
+  sobre la prenda con `pnpm foto:isotipo` (TASK-1920). **Hechos con TASK-1927 (en `develop` local, sin publicar):** el
+  catálogo `graphic-line-deck` con 16 plantillas (§2.1), el documento completo con `pnpm brand:compose` y el gate visual
+  `graphic-line` con 32 frames a cero píxeles.
+- **TASK-1927:** láminas compuestas aprobadas a ojo por el operador (2026-09-27). Su estado de cierre (gates y
+  publicación en `develop`) se lee en la task.
 - **Preguntas abiertas del operador (TASK-1919):** la posición de la lente del caminero (el token dice 0,70 y la
   lámina aprobada la muestra cerca de 0,77); el super de dato, ¿arco completo como en la lámina o la estela canónica
   de la medida?; la burbuja URL en `section-classic`, `section-split`, `content-measure` y `triptych` (las láminas
   aprobadas no la llevan y el manifest del deck dice `url-bubble-footer`: se siguió la lámina); el gris del descriptor
   y la bajada web, que no tiene token; y la paleta DOOH, 20 % o 35 %. Hasta decidir, las plantillas siguen la lámina
-  aprobada y no se inventa un token.
+  aprobada y no se inventa un token. **Se suma con TASK-1927:** el barrido del indicador de la sección partida, ¿se
+  unifica a n de N? (§4.6).
 - **Láminas del deck:** las 69 de la página «Deck» quedaron aprobadas el 2026-09-27 y tienen receta en el
-  [catálogo](./deck-recipes/README.md). Falta llevarlas a plantilla del composer y sincronizar AXIS (tokens, recetas,
-  `cine-requires-nexa-or-proposal`): TASK-1927; fotos idempotentes: TASK-1926; pendientes de QA en §4.6.
-- **Portadas y contraportadas (2026-09-27):** aprobadas y descritas en §4.6; sus recetas se publican en AXIS Lab ›
-  Superficies › Deck (formalización en curso) y la integración en Greenhouse queda en TASK-1927. Preguntas abiertas en
-  §6, filas 15 a 18 (la 19 quedó resuelta el mismo día).
+  [catálogo](./deck-recipes/README.md). Las que tienen plantilla están en §2.1; las 38 recetas restantes del deck son
+  [TASK-1928](../../tasks/to-do/TASK-1928-graphic-line-deck-remaining-recipe-templates.md); fotos idempotentes:
+  TASK-1926; pendientes de QA en §4.6.
+- **Portadas y contraportadas (2026-09-27):** aprobadas, descritas en §4.6 y con plantilla en el composer (TASK-1927).
+  El marco clásico no entra al catálogo. Diferencias conocidas contra los prototipos, en §4.6. Preguntas abiertas en
+  §6, filas 15 a 17 (la 18 y la 19 quedaron resueltas).
 
 ## 8. Referencias
 

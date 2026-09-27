@@ -58,6 +58,11 @@
 
 ## Pendientes del operador (no decidir por tu cuenta)
 
+- **Deck compuesto (TASK-1927, 2026-09-27):** las láminas compuestas (layouts `hero` y `lines` y el brochure de 9
+  páginas) están **aprobadas a ojo por el operador** (2026-09-27). Sigue abierta la pregunta de la **sección
+  partida**, anotada en el token: el indicador barre las secciones ya recorridas, (n−1) de N: ¿se unifica a n de N?
+  Hasta decidir, la plantilla sigue el token.
+
 - **Plantillas de La órbita (TASK-1919, 2026-09-27):** posición de la lente del caminero (token 0,70 vs ≈0,77 en la
   lámina aprobada); super de dato con arco completo (lámina) o la estela canónica de la medida; burbuja URL en
   `section-classic`, `section-split`, `content-measure` y `triptych` (las láminas no la llevan, el manifest del deck
@@ -118,6 +123,17 @@
   glifos en `ICON_CATALOG` y `axis-brand-assets` **0.3.4** con 43 PNG en `volume/`; `axis-tokens` va en 0.3.8 y no
   cambia por D26). Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 
+- Contrato 0.1.2 en Greenhouse (TASK-1927, 2026-09-27): **hecho, local en `develop`, sin push; la task sigue
+  `in-progress`**. Hecho: Greenhouse fija `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12; `pnpm brand:compose`
+  compone `proposal-cinematic` en `service`, `hero` y `lines`, la sección partida por la izquierda en tres
+  composiciones, el tríptico de una palabra por toma, y el marco aprobado (`cover-brochure`, `cover-proposal`,
+  `close-brochure`, `close-proposal`); compone documentos (`pages`) en un PDF con manifest y procedencia
+  (`planSurfaceDocument`); gate `--catalog=graphic-line` con 32 frames a 0 px (deltas b–e en `BASELINE_DELTAS.md`).
+  `cover-classic` y `close-classic` no entran (no aprobadas; `supersededBy` en AXIS), ni
+  `cover-brochure-cine-lines-selection` (el contrato no admite selección en esa portada). **Aprobado a ojo por el operador** (2026-09-27).
+  **Pendiente:** las 38 recetas restantes del deck (TASK-1928); la ruta productiva, que debe aceptar también el intent de documento
+  (TASK-1921); plates idempotentes (TASK-1926). Diferencias conocidas contra los prototipos: tamaño de «Cuando
+  quieras.», burbuja URL horneada, caja de selección unos píxeles más ajustada.
 - Composición por superficie en Greenhouse (TASK-1919): **hecho, local en `develop`** — las 20 recetas aprobadas son
   plantillas del Artifact Composer (`graphic-line-deck`, `graphic-line-stills`, `graphic-line-overlays`), `pnpm
   brand:compose` y gate `--catalog=graphic-line` a 0 px. Falta la ruta productiva (TASK-1921: API, `artifact-worker`,
@@ -146,7 +162,8 @@
 | 2026-09-27 | axis-graphic-line 0.5.0 · axis-brand-assets 0.3.3 (AXIS main@aa66225, 2026-09-27; `axis-tokens` sigue en 0.3.7) | publicado (tag `v0.5.0`) | Oficio (D25): 30 glifos nuevos en `ICON_CATALOG` (27 Trazo + 33 Plastilina = 60) y los 15 volúmenes de oficio en `volume/` (33 PNG) |
 | 2026-09-27 | axis-tokens 0.3.8 · axis-ui-contracts 0.3.7 | publicado (tag `v0.3.8`) | contrato `efeonce.surface-composition` 0.1.1 (`candidate`, acepta intents 0.1.0): modela el contenido de las láminas aprobadas (`levels`, `note`, `panels`, `figures` con fuente, `nav`, `photo.focus`/`native`, título y marcos de hojas, `chapter`, `selection.box`, `shots`, `subtitles`, `selection.level`). `efeonceGraphicLine.surfaces` entró en 0.3.7 (contrato 0.1.0). Greenhouse lo fija (commit `016d0a183`) |
 | 2026-09-27 | axis-graphic-line 0.6.0 · axis-brand-assets 0.3.4 (AXIS main@cf77452 (2026-09-27); `axis-tokens` va en 0.3.8 y no cambia) | publicado (tag `v0.6.0`) | IA, social y staff (D26): 19 glifos nuevos en `ICON_CATALOG` (36 Trazo + 43 Plastilina = 79) y los 10 volúmenes nuevos en `volume/` (43 PNG). Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4 |
-| 2026-09-27 | axis-tokens 0.3.9 · axis-ui-contracts 0.3.8 (AXIS `main@ff0505a`) | publicado (tag `v0.3.9`) | contrato `efeonce.surface-composition` 0.1.2 (`candidate`, aditivo): `use` proposal/brochure, recetas aprobadas `cover-classic` y `close-classic` (logo sin burbuja URL; cierre con eslogan en tres tramos), `layout` service/hero/lines de `proposal-cinematic`, `selection.anchor`, documento `resolveSurfaceDocument`/`validateSurfaceDocumentIntent` (manifest `axis.surface-document.v1`). **Greenhouse sigue en 0.3.8/0.3.7 (contrato 0.1.1): pendiente de integrar** |
+| 2026-09-27 | axis-tokens 0.3.9 · axis-ui-contracts 0.3.8 (AXIS `main@ff0505a`) | publicado (tag `v0.3.9`) | contrato `efeonce.surface-composition` 0.1.2 (`candidate`, aditivo): `use` proposal/brochure, recetas aprobadas `cover-classic` y `close-classic` (logo sin burbuja URL; cierre con eslogan en tres tramos), `layout` service/hero/lines de `proposal-cinematic`, `selection.anchor`, documento `resolveSurfaceDocument`/`validateSurfaceDocumentIntent` (manifest `axis.surface-document.v1`). Greenhouse lo integró el mismo día con TASK-1927 (fila siguiente) |
+| 2026-09-27 | axis-tokens · axis-ui-contracts, releases de TASK-1927 | publicados (tags `v0.3.11`, `v0.3.13`, `v0.3.14`) | contrato `efeonce.surface-composition` 0.1.2 con sus deltas: `v0.3.11` (deltas b y c), `v0.3.13` (delta e: tokens del marco de portadas y contraportadas; `cover-classic` y `close-classic` quedan `supersededBy`) y `v0.3.14` (tipografía completa de las contraportadas). **Greenhouse fija `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12** (`axis-graphic-line` 0.7.0 y `axis-brand-assets` 0.3.5 los fijó TASK-1922) |
 
 Lab AXIS (`c2affc6`, 2026-09-26): la lámina 6.1 lista las decisiones del 26-09 y lo que sigue abierto; el acento ya no colorea texto de menos de 24 px en 1.2 y en las láminas de Insights; la anatomía de 1.2 ya no dibuja el anillo de la esfera; 5.4, 5.1 y 4.5 al día. Quedan en acento sólo rótulos de cotas en diagramas técnicos («0,20 em», la «X» del resguardo), que no son piezas.
 
