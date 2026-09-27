@@ -1,5 +1,36 @@
 # TASK-1923 — Glitch en el Artifact Composer
 
+## Delta 2026-09-27 (noche) — recalibración antes de ejecutar
+
+Manda sobre el cuerpo de la spec cuando se contradigan. Decisiones del operador (Julio Reyes, 2026-09-27) y hallazgos
+del Discovery:
+
+- **Un `templatesDir` compartido, con una sola entrada de probe.** El precedente de La órbita usa una carpeta por
+  catálogo; aquí los tres catálogos (`glitch-carousel`, `glitch-stills`, `glitch-overlays`) comparten
+  `catalogs/glitch/` y su `registry.json`. Consecuencias aceptadas: la pertenencia la controla
+  `glitch.catalog-membership@1` (campo `catalogs` del registry), el gate tiene **una** entrada `PROBE_CATALOGS` con
+  `frameDir: 'templates-glitch'` y scope propio `--catalog=glitch`, y `composer:brand-pack` escribe los archivos de
+  fuentes una vez (una sola entrada en su lista `CATALOGS`).
+- **Tokens:** Greenhouse fija `axis-tokens` 0.3.14 / `axis-ui-contracts` 0.3.12 (TASK-1927); `glitchLine` y
+  `efeonce.glitch-line` 0.1.0 siguen iguales. `pnpm glitch:tokens` es un compilador propio (el de La órbita,
+  `brand:tokens`, es otro), más una entrada en `scripts/artifact-composer/compile-brand-pack.ts`.
+- **Validadores sobre el contrato AXIS:** el mapper arma un intent `efeonce.glitch-line` por lámina y los validadores
+  semánticos llaman `validateGlitchLineIntent`; no se duplican reglas.
+- **Guttery entra al repo privado** (operador: la licencia lo permite): `brand-packs/axis/fonts.json` con
+  `extension: "glitch"`, `embedRights: true` y el binario en `brand-packs/axis/fonts/`. **Cambia la norma §3.4**
+  («nunca entra a git»), que se actualiza en el Slice 10.
+- **Portada del reel (`ReelCover`, 1080 × 1920) y miniatura del vlog (`VideoThumbnail`, 1280 × 720) aprobadas** por
+  el operador: se construyen abiertas y entran a la línea base. Los **overlays PNG del reel quedan fuera**: el kit del
+  reel es motion (taller, TASK-1924). `glitch-overlays` queda como catálogo sin plantillas activas hasta que existan.
+- **Licencias de foto admitidas:** `licensed`, `owned` y `generated`. **El kit de prensa no cuenta** (necesita licencia
+  aparte).
+- **Precedencia de portada:** A > B > C (orden de la norma §4.2).
+- **Fuente visual:** el canvas «Glitch en La órbita» tiene el HTML fuente de cada pieza aprobada (`project/PortadaA.dc.html`,
+  `PortadaB`, `PortadaC`, `Interior`, `Interior1`, `InteriorLente`, `Contraportada`, `BlogA/B/C`, `ReelPortada`,
+  `VlogMiniatura`, `Header`, `Bytes`, `Manzana`): las plantillas se reconstruyen desde esa fuente, cambiando cada valor
+  literal por su token.
+- La procedencia del ejemplo es `glitch-17.provenance.json` (no `glitch-11`).
+
 ## Delta 2026-09-27 — TASK-1922 publicada en AXIS `v0.3.12`: se levanta el bloqueo
 
 - **Bloqueo levantado.** TASK-1922 publicó en AXIS el tag `v0.3.12` (commit `29a40b5`; CI y release-packages verdes):
@@ -97,7 +128,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -110,7 +141,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-031`
-- Status real: `Diseño. Bloqueada por TASK-1922 (token glitchLine, archivos oficiales y contrato efeonce.glitch-line). Los Slices 1 y 5 (contrato del manifiesto y geometría pura de la falla) pueden adelantarse sin TASK-1922. Desde el 2026-09-27 (noche) el blog (banners 16:9 A/B/C, 1:1 propia, banner interno de noticia) y la lámina con lente están aprobados: se construyen abiertos; sólo la portada del reel, la miniatura y los overlays PNG del reel siguen en proposed [verificar].`
+- Status real: `En ejecución: plan aprobado por el operador (2026-09-27); Slices 0–10 locales en develop, sin push`
 - Rank: `TBD`
 - Domain: `content|creative|platform`
 - Blocked by: `none`
@@ -796,7 +827,7 @@ Sin producción en esta task (repo-only, no production runtime impact). Verifica
       confirmada por escrito; si no, `CoverType` queda fuera de las candidatas con `font-license-missing` y así lo
       registra la procedencia.
 - [ ] `pnpm glitch:compose` sobre el ejemplo produce un PDF de 10 páginas a 1080 × 1350, un PNG por lámina, un
-      `*.resolved-manifest.json` por catálogo y `glitch-11.provenance.json` sin fechas.
+      `*.resolved-manifest.json` por catálogo y `glitch-17.provenance.json` sin fechas.
 - [ ] Dos corridas en procesos separados con el mismo manifiesto y las mismas fotos dan PNG idénticos byte a byte.
 - [ ] `pnpm glitch:tokens --check` pasa contra la versión de AXIS fijada.
 - [ ] `pnpm composer:visual-gate --catalog=glitch` da cero píxeles en las plantillas aprobadas y el gate global no
