@@ -38,6 +38,12 @@ const GLITCH_STYLES: Record<string, string[]> = {
     'precise, confident, sophisticated and restrained, tech-thriller tension, wide and deep modern mix',
     '150 BPM half-time feel, A major tonality, no vocals, no chiptune, no video game sounds, no retro synthwave'
   ],
+  // La cama bajo la voz: el mismo estilo que el tema B, en segundo plano.
+  'cama-b': [
+    'background bed for spoken news narration, same irreverent big beat style but restrained and minimal',
+    'filtered laid-back breakbeat drums, dirty overdriven bass groove, subtle texture, no lead melody, no chords in the midrange, leaves room for a voice',
+    '150 BPM half-time feel, A major, steady and loopable, no vocals, no chiptune, no video game sounds'
+  ],
   'tema-b': [
     'irreverent big beat, live breakbeat drums with swagger, dirty overdriven bass guitar riff, gritty distorted electric guitar stabs',
     'provocative, cocky and confident attitude, raw and punchy, modern heavy mix with real instruments',

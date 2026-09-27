@@ -23,14 +23,15 @@ const args = process.argv.slice(2)
 const opt = (n, f) => (args.includes(n) ? args[args.indexOf(n) + 1] : f)
 const STAGE = opt('--stage', 'maqueta')
 const VERSION = opt('--version', 'vlog')
-const PIECE = opt('--piece', 'intro') // intro | cortina | salida
+const PIECE = opt('--piece', 'intro') // intro | cortina | salida | cama
 const OUT = path.resolve(opt('--out', `glitch-tema-${PIECE}-${VERSION}-${STAGE}.wav`))
 
 const S = 0.1, BEAT = 0.4, BAR = 1.6 // 150 BPM: una semicorchea = 3 cuadros
 const PRE = VERSION === 'podcast' ? 6 : 2
 const TA = PRE * BAR // inicio de la apertura aprobada
 // intro: pre-roll + la apertura (4 s) · cortina: un compás + 0,4 s · salida: la tarjeta final (3 s) y, en el podcast, dos compases más
-const END = PIECE === 'cortina' ? BAR + 0.4 : PIECE === 'salida' ? (VERSION === 'podcast' ? 7 : 3) : TA + 4
+// cama: dos vueltas de 8 compases (se extrae la del medio como loop sin costura)
+const END = PIECE === 'cama' ? 16 * BAR + 0.4 : PIECE === 'cortina' ? BAR + 0.4 : PIECE === 'salida' ? (VERSION === 'podcast' ? 7 : 3) : TA + 4
 const DUR = Math.ceil(END) // Stable Audio redondea a segundos enteros
 const idx = t => Math.round(t * SR)
 
@@ -86,7 +87,17 @@ if (STAGE === 'maqueta') {
     bass(t0 + 9 * S, ROOT[bar % 4] === 'A2' ? 'A2' : ROOT[bar % 4], 0.55, -8)
     if (full) chord(t0 + 9 * S, ROOT[bar % 4].replace('2', '3'), 0.6)
   }
-  if (PIECE === 'cortina') {
+  if (PIECE === 'cama') {
+    // La cama bajo la voz: medio tiempo, sin acordes (pelean con la voz), bombo y caja suaves, hats arriba y el motivo en
+    // el bajo sólo cada cuatro compases. El resto del bajo es un pedal en La que respira.
+    for (let b = 0; b < 16; b++) {
+      const t0 = b * BAR
+      ;[0, 10].forEach(k => kick(t0 + k * S, -9)); snare(t0 + 8 * S, -14)
+      for (let k = 0; k < 16; k += 2) hat(t0 + k * S, k % 4 === 2 ? -23 : -27, false)
+      if (b % 4 === 3) { [[0, 0.16], [3, 0.16], [6, 0.16]].forEach(([k, len]) => bass(t0 + k * S, 'E2', len, -13)); bass(t0 + 9 * S, 'A2', 0.5, -12) }
+      else { bass(t0, 'A1', 0.5, -14); bass(t0 + 8 * S, 'A1', 0.3, -15) }
+    }
+  } else if (PIECE === 'cortina') {
     groove(0, 0)
   } else if (PIECE === 'salida') {
     // «se cierra.» (f6 = semicorchea 2): la banda entra con el golpe; el groove sigue hasta el corte (f57, semicorchea 19).
@@ -135,6 +146,20 @@ function copy(src, dst, len, { gain = 1, crushBits = 0 } = {}) {
 }
 // El tiempo 4 de un compás tartamudea sobre la grabación real (semicorcheas, fusas, cada vez más roto) hasta el corte.
 const stutterBeat4 = t0 => { let t = t0 + 12 * S; [[S, 2, 0], [S / 2, 2, 0], [S / 4, 2, 10], [S / 8, 4, 8]].forEach(([len, times, bits]) => { for (let k = 0; k < times; k++) { copy(t0 + 12 * S, t, len, { crushBits: bits, gain: 1 + 0.06 * k }); t += len } }) }
+if (PIECE === 'cama') {
+  // Loop sin costura: los compases 5 a 12 de la re-grabación (lejos de los bordes), con 20 ms de fundido cruzado en la unión.
+  const a = idx(4 * BAR), n = idx(8 * BAR), x = idx(0.02)
+  const L = new Float64Array(n), R = new Float64Array(n)
+  for (let i = 0; i < n; i++) { L[i] = TL[a + i]; R[i] = TR[a + i] }
+  for (let i = 0; i < x; i++) { const e = i / x; L[i] = L[i] * e + TL[a + n + i] * (1 - e); R[i] = R[i] * e + TR[a + n + i] * (1 - e) }
+  // El hueco de la voz: el medio se baja (300 Hz–3 kHz) para que la locución pase limpia.
+  for (const ch of [L, R]) { biquad(ch, 'peak', 700, 0.6, -6); biquad(ch, 'peak', 1800, 0.7, -7); biquad(ch, 'peak', 3200, 1, -3) }
+  let peak = 0; for (let i = 0; i < n; i++) peak = Math.max(peak, Math.abs(L[i]), Math.abs(R[i]))
+  for (let i = 0; i < n; i++) { L[i] *= db(-1) / peak; R[i] *= db(-1) / peak }
+  writeWav(OUT, [L, R])
+  console.log(`final cama: ${OUT} (loop de 8 compases, ${(8 * BAR).toFixed(1)} s)`)
+  process.exit(0)
+}
 if (PIECE !== 'intro') {
   if (PIECE === 'cortina') { copy(0, 0, 12 * S); stutterBeat4(0) }
   else {
