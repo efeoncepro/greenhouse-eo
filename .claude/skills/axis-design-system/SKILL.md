@@ -256,6 +256,17 @@ and `/references/iconography.json`. State: published 2026-09-26 with tag `v0.3.6
 it yet. Never draw a glyph by hand inside a piece; a new glyph needs `icons:check` and operator approval. Criterion and
 history: `efeonce-graphic-line` → `references/iconography.md`.
 
+**Plastilina en volumen (D24, 2026-09-27):** third layer — each Plastilina glyph in inflated matte clay, 1024 px PNG with
+alpha, generated from its approved vector. Only for hero moments (cover, key visual, single-object social piece), one per
+piece, ≥ 160 px; never in lists, tables, deck content, dashboards or UI. Tokens `efeonceGraphicLine.icons.volume`
+(`axis-tokens` `0.3.7`); files `@efeoncepro/axis-brand-assets` `0.3.2` `assets/volume/<glyph>.png` (18, sealed in
+`src/volume-manifest.ts`; API `AXIS_VOLUME_ICONS`, `findVolumeIcon`, `volumeIconUrl(glyph)`); command
+`pnpm icons:volume -- refs|key|check|publish`. Canonical on AXIS `main` (`c18e3d3`) and in the Lab
+(`/references/iconography/#volumen`). **Both packages are published** (tag `v0.3.7`, 2026-09-27, on `main@c0020b6`:
+`axis-tokens` `0.3.7`, `axis-brand-assets` `0.3.2`, `axis-ui-contracts` `0.3.6`, released together with the surfaces work;
+`axis-graphic-line` stays at `0.4.0`). Greenhouse already pins these versions (commit `f3f93c926`, 2026-09-27: tokens `0.3.7`,
+contracts `0.3.6`, brand-assets `0.3.2`, and `axis-graphic-line` `0.4.0` as a direct dependency). Guide §9, ADR delta D24.
+
 ### Efeonce sonic identity (Lab page + public bucket; recommended)
 
 State: **recommended by the operator on 2026-09-26, NOT canon.** What AXIS publishes (PR

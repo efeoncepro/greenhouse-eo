@@ -1,9 +1,9 @@
 # Usar la línea gráfica de Efeonce — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-26 por Claude (1.6: usar y pedir un ícono de la marca — iconografía Trazo y Plastilina, AXIS `v0.3.6`)
+> **Ultima actualizacion:** 2026-09-27 por Claude (1.7: usar y pedir un ícono en volumen — Plastilina en volumen, D24) · 2026-09-26 (1.6: usar y pedir un ícono de la marca — iconografía Trazo y Plastilina, AXIS `v0.3.6`)
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — es un sistema de marca; los valores viven en AXIS y el PDF se regenera con un comando local
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Manual técnico-operativo V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) · [Producir una foto de marca](../marketing/fotografia-de-marca-efeonce.md)
@@ -333,6 +333,40 @@ este paso a paso no las repite todas.
 5. **Recién entonces entra al set** y se publica una versión nueva del paquete. Mientras no esté aprobado, no se usa
    en piezas.
 
+## Paso a paso — usar un ícono en volumen
+
+**Plastilina en volumen** es la tercera capa de los íconos: cada Plastilina en arcilla mate e inflada, como imagen PNG
+con fondo transparente. Es para el objeto protagonista de una pieza, no para acompañar texto. Reglas completas en el
+[manual §14.1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#141-plastilina-en-volumen-d24-2026-09-27).
+
+1. **Confirma que es un momento protagonista:** portada, key visual, pieza social con un solo objeto, escenario, merch
+   o el objeto en escena. Si el ícono va en una lista, tabla, menú, lámina de contenido de un deck, dashboard o
+   interfaz, **no uses el volumen**: usa el ícono plano o el Trazo.
+2. **Confirma que es uno solo en la pieza** y que no va agrupado con íconos planos (de Plastilina o de Trazo).
+3. **Búscalo en la sección «Plastilina en volumen» del [Lab](https://axis.efeonce.org/references/iconography/#volumen)**
+   y descarga el PNG. Hay 18, uno por cada Plastilina plana. Si el objeto no está, ve a «Pedir un ícono en volumen».
+4. **Si trabajas con un agente o en código,** pídele que tome el archivo de `@efeoncepro/axis-brand-assets` con
+   `volumeIconUrl(glyph)` (falla si el glifo no es de Plastilina). Ese paquete (0.3.2) ya está publicado con el tag
+   `v0.3.7` y Greenhouse ya lo tiene fijado (desde el 2026-09-27). El Lab sigue sirviendo para descargar el PNG a mano.
+5. **Colócalo a 160 px o más.** Si tiene que ir más chico, usa el ícono plano.
+6. **Ponlo tal como viene:** ya está en respuesta, con el naranja de Brand y su gesto. No lo recolorees ni le cambies
+   la forma. El PNG trae fondo transparente y los huecos abiertos, así que sirve sobre cualquier fondo; si la pieza
+   necesita una sombra en el piso, agrégala al componer.
+
+### Pedir un ícono en volumen
+
+1. **Si el objeto ya tiene su Plastilina plana,** pide su volumen al operador de la línea.
+2. **Si no la tiene,** primero se pide el ícono plano (ver «Pedir un ícono nuevo»). Nunca se genera un objeto nuevo
+   directo en 3D.
+3. **Quien lo produce sigue el método de AXIS** (guía `iconography.md` §9 del repositorio de AXIS):
+   `pnpm icons:volume -- refs` arma la referencia desde el ícono plano; en Greenhouse,
+   `pnpm ai:image --model gpt-image-2.5-sunburst --quality high --size 1024x1024 --image <ref.png> --prompt-file <volume-prompt.txt> --out <crudo.png>` (sin `--input-fidelity`: la familia 2.5 lo ignora; la fidelidad la da el prompt)
+   genera el volumen con el prompt canónico (no se reescribe; si un detalle falla, se agrega una línea que lo nombre);
+   `pnpm icons:volume -- key` recorta por color, `-- check` compara con el plano y `-- publish` lo deja en el paquete y
+   en el Lab.
+4. **El operador aprueba** mirando cada ícono al 100 %. Los avisos de `check` no rechazan solos: se rechaza sólo si la
+   forma se reinventó, un hueco se volvió relieve o figura y fondo se invirtieron.
+
 ## Paso a paso — regenerar el PDF del manual
 
 El PDF (`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`, A4, 56 hojas, confidencial) se genera desde una fuente HTML. Se
@@ -402,7 +436,10 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 - No mezcles Trazo y Plastilina en un mismo grupo ni hagas que todos los íconos respondan.
 - No dibujes un ícono a mano dentro de una pieza: si no está en el catálogo, pídelo.
 - No pintes el cuerpo, el gesto o el trazo de un ícono con el acento, ni le des volumen, brillo o sombra: el acento va
-  sólo en la esfera.
+  sólo en la esfera. El volumen sólo existe como los PNG aprobados de «Plastilina en volumen».
+- No uses un ícono en volumen en listas, tablas, menús, decks de contenido, dashboards ni UI; no pongas más de uno por
+  pieza ni lo mezcles con íconos planos; no lo generes de nuevo si ya existe.
+- No recortes un ícono en volumen con `pnpm ai:image:rmbg`: rellena los huecos. El recorte es por color.
 - No uses la órbita sesgada para medir: lo que mide va en la órbita circular.
 - No cambies los íconos Tabler de la firma de correo o de equipo por los de la línea: espera la decisión del operador.
 
@@ -425,6 +462,10 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 | Un ícono pedido en respuesta **sale sin esfera** | es Trazo a menos de 20 px: `resolveIcon` lo deja en reposo y avisa `response-below-min` | agrándalo a 20 px o más, o déjalo en reposo |
 | `resolveIcon` falla con `plastilina-below-min` | Plastilina a menos de 32 px | agrándalo o usa el ícono equivalente en Trazo |
 | `auditIconGroup` reporta `mixed-voices`, `more-than-one-response` o `response-with-piece-sphere` | dos voces en un grupo, varios íconos respondiendo, o un ícono respondiendo en una pieza que ya tiene esfera | una voz por grupo; que responda uno solo; si la pieza ya tiene esfera, todos en reposo |
+| Un ícono en volumen tiene **los huecos rellenos** o una pieza suelta semitransparente | se recortó con matting por IA (`pnpm ai:image:rmbg`) | recórtalo por color con `pnpm icons:volume -- key` o, mejor, usa el PNG aprobado del Lab |
+| Un ícono en volumen se ve **plano, como una galleta** | se extruyó el vector en Blender | ese método está descartado; el volumen se genera editando el ícono plano con el método de AXIS |
+| `pnpm icons:volume -- check` sale con código 1 | hay avisos de silueta, huecos o piezas sueltas | míralo al 100 %: se rechaza sólo si la forma se reinventó, un hueco se volvió relieve o figura y fondo se invirtieron; si no, se acepta |
+| `volumeIconUrl` lanza un error | el glifo no es de Plastilina | usa un glifo de Plastilina o el ícono plano que corresponda |
 | `resolveIcon` falla con `unknown-glyph` | el ícono no está en el catálogo aprobado | pídelo con el método de alta; no lo dibujes en la pieza |
 | Un repositorio nuevo no puede instalar `@efeoncepro/axis-graphic-line` o `axis-tokens` (error 403) | el acceso de GitHub Packages es por paquete y ese repositorio no lo tiene | pide `Manage Actions access → Read` para el repositorio en cada paquete ([runbook de paquetes AXIS](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)) |
 | Una foto de merch u oficina trae **las notas de la lámina** pintadas | el arte de referencia llevaba leyendas | corrige editando la foto; en adelante pasa el arte sin leyendas |
@@ -442,4 +483,4 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 - Contrato y herramientas (AXIS 0.3.0 y `axis-graphic-line` 0.3.1, `creative:orbit:render`, `creative:layout`, `foto:componer:cta` tramo 17): [manual técnico §13](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-contrato-y-herramientas-axis-03)
 - Animaciones de marca: [norma del lenguaje de movimiento](../../operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md) · [spec de motion](../../operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md) · valores en `efeonceGraphicLine.motion` (`@efeoncepro/axis-tokens` 0.3.3) · masters en `gs://efeonce-group-axis-public-media/motion/logo/v1.1/`
 - Compositor de piezas con CTA: [manual de uso](./compositor-piezas-cta.md)
-- Iconografía (Trazo y Plastilina): [manual técnico §14](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#14-iconografía-trazo-y-plastilina) · [guía en AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/iconography.md) · [página del Lab](https://axis.efeonce.org/references/iconography/) y [datos para agentes](https://axis.efeonce.org/references/iconography.json) · `efeonceGraphicLine.icons` (`@efeoncepro/axis-tokens` 0.3.6) · `@efeoncepro/axis-graphic-line/icons` (0.4.0) · comandos `pnpm icons:export|check|vectorize` en el repo de AXIS
+- Iconografía (Trazo y Plastilina): [manual técnico §14](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#14-iconografía-trazo-y-plastilina) · [guía en AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/iconography.md) · [página del Lab](https://axis.efeonce.org/references/iconography/) y [datos para agentes](https://axis.efeonce.org/references/iconography.json) · `efeonceGraphicLine.icons` (`@efeoncepro/axis-tokens` 0.3.6) · `@efeoncepro/axis-graphic-line/icons` (0.4.0) · comandos `pnpm icons:export|check|vectorize` en el repo de AXIS · Plastilina en volumen: [manual técnico §14.1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#141-plastilina-en-volumen-d24-2026-09-27) · [Lab, sección 05](https://axis.efeonce.org/references/iconography/#volumen) · `efeonceGraphicLine.icons.volume` (`axis-tokens` 0.3.7) · `@efeoncepro/axis-brand-assets` 0.3.2 (publicado con el tag `v0.3.7`) · `pnpm icons:volume` en el repo de AXIS

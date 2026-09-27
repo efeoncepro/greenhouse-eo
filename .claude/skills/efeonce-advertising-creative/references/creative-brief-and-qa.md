@@ -140,6 +140,7 @@ lenguaje fotográfico: se usa en casos específicos y nunca cruza sujeto, reserv
 | URL | Firma: burbuja sólo con el logo en la imagen (ver Firma). Pie de deck, informe, papelería o mail: burbuja, horneada donde la fusión no está garantizada | `efeoncepro.com` como texto suelto; burbuja como firma por defecto |
 | Archivos | Logos y burbujas desde `@efeoncepro/axis-brand-assets` por id | SVG copiado o redibujado a mano |
 | Íconos | Del `ICON_CATALOG` vía `resolveIcon` (voz por la línea de la pieza); `auditIconGroup(items, { pieceHasSphere })` sin issues; responde uno solo y sólo sin otra esfera; Plastilina protagonista en su órbita sesgada | Ícono dibujado o generado suelto; Trazo y Plastilina en un mismo grupo; acento en el cuerpo del ícono; varios respondiendo |
+| Íconos en volumen (D24) | Plastilina en volumen sólo como objeto protagonista del KV: PNG de AXIS (`volumeIconUrl(glyph)`), **uno por pieza**, **≥ 160 px**, en respuesta con acento de Brand; sombra de contacto sólo si la compone la pieza | Volumen regenerado o creado directo en 3D; dos por pieza; bajo 160 px; en un grupo, lista o junto a plano/Trazo |
 | Claim | «Te hacemos visible» con su prueba al lado | Pautar el claim antes de la revisión legal pendiente |
 
 **Sin resolver (decisión del operador, no la tomes tú):** (1) si el CTA en naranja o lima de una política cromática

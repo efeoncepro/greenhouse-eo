@@ -2,7 +2,7 @@
 
 > Verificado contra: axis-design-system@e26bd85 (iconografía §3.14: AXIS `main@5b8ab20`, tag `v0.3.6`) y
 > greenhouse-eo@7cb24df17 — 2026-09-26 (decisiones del operador D1–D22 del 2026-09-26 registradas; ver
-> [ledger.md](ledger.md)).
+> [ledger.md](ledger.md)). §3.14 «Plastilina en volumen» (D24): AXIS `main@c18e3d3` — 2026-09-27.
 > Fuentes: láminas del canvas reconstruidas en AXIS (`apps/lab/src/data/graphic-line-elements.json`, citadas como
 > «lámina X.Y»); página del Lab `apps/lab/src/pages/references/graphic-line.astro` («Lab X.Y»); manual
 > `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` («manual §»); ADR
@@ -348,8 +348,27 @@ sexta: es no usar órbita.
   antes `pnpm icons:vectorize`) y lo aprueba el operador. El control mide el peso, no el carácter: que se lea como
   familia lo decide un ojo humano ([lessons.md](lessons.md)).
 - **Errores típicos:** todos los íconos de una fila respondiendo (la esfera se vuelve viñeta, como en §3.3) · Trazo y
-  Plastilina en un mismo grupo · un acento por objeto · volumen, brillo, sombra o degradé · la órbita sesgada midiendo o
-  cruzando el texto · un glifo dibujado a mano en la pieza.
+  Plastilina en un mismo grupo · un acento por objeto · volumen, brillo, sombra o degradé inventados en el plano (el
+  único volumen es el del set aprobado, abajo) · la órbita sesgada midiendo o cruzando el texto · un glifo dibujado a
+  mano en la pieza.
+- **Plastilina en volumen (D24, 2026-09-27):** la **tercera capa** (Trazo · Plastilina plana · Plastilina en volumen):
+  el mismo glifo en arcilla mate inflada, derivado de su vector aprobado.
+  - **Significa:** el objeto como **protagonista** con cuerpo, la presencia física del oficio. Por eso es uno por pieza
+    y sólo donde el objeto es la pieza: portada, key visual, social de un objeto, escenario, merch, el objeto en
+    escena.
+  - **Complementa, no reemplaza:** el plano sigue siendo el ícono de todos los días; el volumen es el momento. Donde el
+    ícono organiza información (listas, tablas, navegación, contenido de deck, dashboards, UI) va el plano o el Trazo.
+    Nunca en un grupo con el plano o con el Trazo; bajo 160 px, el plano.
+  - **Sale del vector, nunca al revés:** un objeto que no existe en el set plano no se genera en 3D. Primero entra al
+    set plano con su aprobación; recién después, su volumen. Así el volumen hereda silueta, calados, esfera y gesto, y
+    la familia se sostiene.
+  - **«Clay» vs Plastilina:** «clay» es como el diseño suele llamar al estilo 3D de arcilla (claymorphism). Cuando el
+    operador dice «los clay» se refiere a Plastilina; el nombre canónico es **Plastilina** (en inglés, «Plasticine»), y
+    el volumen es una capa suya, no una voz nueva. Las librerías «Clay 3D» del equipo en OneDrive son otra cosa
+    (ilustración genérica para propuestas) y no se mezclan con Plastilina en una pieza.
+  - **Errores típicos:** generarlo de nuevo dentro de una pieza en vez de usar el PNG aprobado · dos objetos en volumen
+    en la misma pieza · el volumen como viñeta o en una fila de servicios · un objeto nuevo inventado directo en 3D ·
+    extruir el vector (sale plano, una «galleta»: rechazado por el operador).
 - **Descartado:** la dirección «órbita abierta» (cada contorno con un corte): compite con la órbita del isotipo en vez
   de acompañarla (D16).
 - **Todavía no:** las firmas de correo y de equipo siguen con íconos Tabler hasta que el operador decida; el motion de

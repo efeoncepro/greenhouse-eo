@@ -2,7 +2,9 @@
 
 > Verificado contra: AXIS `main@5b8ab20` (tokens `0.3.6`, `@efeoncepro/axis-graphic-line` `0.4.0`, publicados con el
 > tag `v0.3.6`) y el canvas «Íconos de La órbita» (claude.ai/artifact/Y9mx42L72zYc6iLg4j3Maj, versión 20) — 2026-09-26 ·
-> decisiones del operador D16–D22 ([ledger.md](ledger.md)).
+> decisiones del operador D16–D22 ([ledger.md](ledger.md)). §12 (Plastilina en volumen, D24): AXIS `main@c18e3d3`
+> (`axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, **publicados** con el tag `v0.3.7` sobre `main@c0020b6`) —
+> 2026-09-27.
 >
 > **Estado: canónica** (el operador la canonizó el 2026-09-26, D22). **La fuente de verdad es AXIS**, no este documento:
 > valores en `efeonceGraphicLine.icons` (`@efeoncepro/axis-tokens`), geometría y reglas ejecutables en
@@ -23,6 +25,8 @@
 5. Plastilina protagonista: `skewedOrbitHeroSvg` (el objeto en reposo, la órbita pone la esfera).
 6. Paquetes publicados (tag `v0.3.6`): un consumidor fija `@efeoncepro/axis-graphic-line` `0.4.0` y `axis-tokens`
    `0.3.6`. Greenhouse todavía no consume `/icons`: para una pieza, `pnpm icons:export` en AXIS o el paquete.
+7. Un objeto protagonista en volumen (D24): usa el PNG de `@efeoncepro/axis-brand-assets` (`volumeIconUrl(glyph)`);
+   nunca lo generes de nuevo ni lo uses en listas o UI (§12).
 
 ## 1. La idea
 
@@ -122,7 +126,8 @@ adentro con aire ([criteria.md](criteria.md) §3.1 y §3.7).
 - Todos los íconos de una fila respondiendo: la esfera se vuelve viñeta.
 - Responder junto a otra esfera (órbita o respuesta).
 - La esfera fuera de regla: más grande, sin acento (en tinta), hueca o suelta lejos del glifo.
-- Volumen, brillo, sombras, degradés o esferas de vidrio.
+- Volumen, brillo, sombras, degradés o esferas de vidrio en el Trazo o en el plano (el único volumen es Plastilina en
+  volumen, §12, que sale del set aprobado; nunca se inventa en la pieza).
 - El acento oscuro sobre papel.
 - El ícono cruzando el anillo de una órbita.
 - Mezclar este set con otra familia de íconos en la misma pieza (salvo Tabler en la firma de correo mientras dure la
@@ -267,7 +272,8 @@ tanda). La geometría canónica vive en AXIS: `PLASTILINA_GLYPHS` en
 - La órbita sesgada midiendo un dato: la sesgada es gesto; lo que mide va en la circular.
 - Todos los íconos con gesto y con esfera: responde uno solo, el protagonista.
 - Un objeto sin carácter: de frente, simétrico, con esquinas vivas y quieto (se lee como stock).
-- Volumen, brillo, sombras o degradés.
+- Volumen, brillo, sombras o degradés en el plano. El volumen es otra capa (§12), con su PNG aprobado; no se «infla» el
+  plano dentro de una pieza.
 - La órbita cruzando el texto: rodea sólo al objeto; la voz vive fuera, en el tercio inferior.
 
 ### 11.6 Formatos
@@ -281,3 +287,99 @@ tanda). La geometría canónica vive en AXIS: `PLASTILINA_GLYPHS` en
 
 La voz sigue siempre el canon de la línea (pregunta Poppins 300 con aro, respuesta Bricolage 760 con esfera de cierre;
 ver `criteria.md`).
+
+## 12. Plastilina en volumen (canónica desde D24, 2026-09-27)
+
+> **Estado:** canónica en AXIS `main@c18e3d3` y en el Lab (operador, 2026-09-27: «Bien, ese estilo me gusta,
+> canonízalo y mándalo también a la web y a todos los espacios que corresponda»). Los paquetes que la traen
+> (`axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2) están **publicados** con el tag `v0.3.7` (2026-09-27). Greenhouse
+> ya fija esas versiones (commit `f3f93c926`, 2026-09-27). Guía completa: AXIS `docs/agent-composition/iconography.md`
+> §«Plastilina en volumen»; ADR AXIS `docs/architecture/ICONOGRAPHY_DECISION_V1.md` §«Delta 2026-09-27 — Plastilina en
+> volumen (D24)». Si difiere de AXIS, manda AXIS.
+
+### 12.1 Qué es
+
+La **tercera capa** de la iconografía: Trazo · Plastilina plana · **Plastilina en volumen**. Cada glifo de Plastilina en
+**arcilla mate, inflada, sin aristas**, generado **desde su vector aprobado**, nunca una forma nueva. **Complementa al
+plano, no lo reemplaza.** «Clay» es como el diseño suele llamar a este estilo 3D (claymorphism); el nombre canónico
+sigue siendo **Plastilina** (en inglés, «Plasticine»), y el volumen es una capa de ella, no una voz nueva.
+
+### 12.2 Cuándo sí y cuándo no
+
+| Sí | No |
+|---|---|
+| Portada, key visual | Listas, tablas, navegación |
+| Pieza social con un solo objeto | Contenido de deck (columnas, filas de servicios) |
+| Escenario, merch | Dashboards y UI (ahí van el plano o el Trazo) |
+| El objeto en escena | Un grupo con Plastilina plana o con el Trazo |
+| Desde 160 px | Bajo 160 px: se usa el plano |
+
+**Uno por pieza** (`perPiece: 1`). Sólo marca propia Efeonce, igual que toda la iconografía: nunca clientes ni la UI del
+producto Greenhouse.
+
+### 12.3 Qué entrega el set
+
+- Los **18 glifos de Plastilina**, en **respuesta**, con el acento de **Brand** (naranja; Plastilina es la voz de
+  Brand) y el **gesto** donde el glifo lo tiene (rayo, bombillo, teléfono: los gestos son rollitos o cápsulas de
+  arcilla).
+- PNG de **1024 px** (~130 KB cada uno, paleta con alfa), con **alfa** y los calados abiertos: va sobre cualquier fondo.
+- **Sin sombra de contacto**: si la pieza la necesita, se agrega al componer.
+- El Trazo **no tiene volumen**.
+
+### 12.4 Dónde vive y API
+
+- Tokens: `efeonceGraphicLine.icons.volume` (`@efeoncepro/axis-tokens` 0.3.7, publicado en `v0.3.7`). Detalle en
+  [package-and-tokens.md](package-and-tokens.md) §«Iconografía».
+- Archivos: `@efeoncepro/axis-brand-assets` 0.3.2 (publicado en `v0.3.7`), `assets/volume/<glifo>.png`, sellados en
+  `src/volume-manifest.ts`.
+
+```ts
+import { AXIS_VOLUME_ICONS, findVolumeIcon, volumeIconUrl } from '@efeoncepro/axis-brand-assets'
+
+const url = volumeIconUrl('bombillo') // lanza con un glifo que no es de Plastilina
+```
+
+- Lab: `https://axis.efeonce.org/references/iconography/#volumen` (sección 05: set de 18 con descarga PNG, tabla de
+  spec, dónde va y dónde no, método, avisos revisados). Para agentes: `/references/iconography.json`, bloque `volume`.
+
+### 12.5 Cómo se da de alta un glifo en volumen
+
+**Nunca se genera una forma nueva directo en 3D:** el glifo entra primero al set plano (§11.3, con la aprobación del
+operador) y el volumen se genera desde ese vector. En AXIS, con `pnpm icons:volume` (`scripts/icons-volume.mjs`):
+
+```bash
+pnpm icons:volume -- refs    --out ./ref                 # el plano en respuesta (con gesto), 760 px sobre #001a33, centrado en 1024
+# generación (en Greenhouse, necesita la llave):
+#   pnpm ai:image --model gpt-image-2.5-sunburst --quality high --size 1024x1024 \
+#     --image <ref.png> --prompt-file <volume-prompt.txt> --out <crudo.png>
+pnpm icons:volume -- key     --in ./crudo --out ./alfa   # alfa por COLOR contra el fondo liso (nunca matting con IA)
+pnpm icons:volume -- check   --refs ./ref --in ./alfa    # silueta, calados y piezas contra el plano
+pnpm icons:volume -- publish --in ./alfa                 # comprime (paleta), copia al paquete y al Lab, sella el hash
+```
+
+1. **El modelo sólo pone volumen y material.** Sin `--input-fidelity`: la familia 2.5 no lo acepta (el CLI lo
+   ignora en silencio); la fidelidad la da el prompt. Prompt canónico: AXIS
+   `docs/agent-composition/iconography/volume-prompt.txt` (copia en el Lab: `/media/iconography/volume-prompt.txt`).
+   **No se reescribe**; si un detalle falla, se agrega UNA línea que lo nombre.
+2. **Recorte por color, nunca con IA** (ver [lessons.md](lessons.md), 2026-09-27).
+3. **El QA avisa; la persona decide.** `check` mide la silueta normalizada por caja (≥ 0,75) y la misma cantidad de
+   calados y de piezas sueltas; sale con 1 si hay avisos, pero un aviso **no** es un rechazo. Se mira al 100 % y se
+   rechaza sólo si la forma se reinventó, un calado se volvió relieve o figura y fondo se invirtieron.
+4. **Publicar sella:** la prueba del paquete falla si un PNG cambia sin `publish`, si queda uno sin sellar o si pierde
+   el alfa.
+5. **Alta** con la aprobación del operador, mirando el resultado junto al set aprobado.
+
+### 12.6 Avisos del set del 2026-09-27 (revisados y aceptados)
+
+11 de 18 pasaron sin avisos. Aceptados tras mirarlos: laptop (silueta 0,44, algo menos inclinado, tercera pasada),
+escritorio (0,64) y teléfono (0,73) por perspectiva y grosor; pluma, tijeras y audífonos juntan piezas que se tocan;
+megáfono deja el anillo de la esfera como hueco.
+
+### 12.7 Qué no es
+
+- **No** es extruir el vector en Blender: el operador lo rechazó (plano, «galleta cortada»). El volumen aprobado salió de
+  GPT Image 2.5 Sunburst **editando** el ícono plano aprobado.
+- **No** son las librerías «Clay 3D» del equipo en OneDrive (283 + 108 PNG heterogéneos, ilustraciones para
+  propuestas): esas son ilustración clay genérica; Plastilina en volumen es iconografía de marca derivada del vector.
+  **No se mezclan en una pieza.**
+- **No** se anima con el paquete: es un PNG, y el motion de los íconos sigue diferido (ver [ledger.md](ledger.md)).

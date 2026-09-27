@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
+> **Ultima actualizacion:** 2026-09-27 por Claude (1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
 
@@ -192,7 +192,7 @@ La línea Voice (medios) todavía no tiene voz fija: se elige con criterio y se 
 | **La esfera es un estado** | en reposo el ícono es sólo su forma; cuando **responde**, aparece la esfera en el color de la línea de la pieza |
 | **Responde uno solo** | el que importa (el servicio que se vende, la sección donde vamos), y sólo si la pieza no tiene ya otra esfera |
 | **El color es de la pieza, no del ícono** | el mismo ícono va en teal en un deck de Growth y en el acento de Brand en uno de Brand |
-| **Plano y sobre el mismo fondo** | fondo navy profundo en todas las líneas; sin volumen, brillo, sombras ni degradés |
+| **Plano y sobre el mismo fondo** | fondo navy profundo en todas las líneas; sin volumen, brillo, sombras ni degradés (la única excepción es la capa «Plastilina en volumen», que se explica abajo y tiene sus propios archivos) |
 | **Las voces no se mezclan** | nunca Trazo y Plastilina en un mismo grupo; si conviven, Plastilina manda en grande y el Trazo apoya en chico |
 | **La órbita sesgada es la firma de Plastilina** | una elipse inclinada alrededor del objeto protagonista; una por pieza, nunca cruza el texto y **nunca mide** (lo que mide sigue en la órbita circular) |
 | **Un ícono que falta no se dibuja en la pieza** | se pide, se verifica y entra al set con la aprobación del operador |
@@ -205,6 +205,30 @@ anteriores (Tabler) hasta que el operador decida su reemplazo.
 > [página del Lab](https://axis.efeonce.org/references/iconography/) · tokens `efeonceGraphicLine.icons`
 > (`@efeoncepro/axis-tokens` 0.3.6) y `@efeoncepro/axis-graphic-line/icons` (0.4.0) ·
 > [cómo usar y pedir un ícono](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md#paso-a-paso--usar-un-ícono-de-la-marca)
+
+### Plastilina en volumen
+
+Desde el 2026-09-27 los íconos de Plastilina tienen una **tercera capa**: el mismo dibujo convertido en un objeto de
+**arcilla mate, inflada y sin aristas**, como si alguien lo hubiera modelado a mano. No es un ícono nuevo: sale del
+ícono plano ya aprobado, y el plano sigue existiendo y se sigue usando.
+
+| Regla | Qué significa en la práctica |
+|---|---|
+| **Sólo para el momento protagonista** | la portada, el key visual, una pieza social con un solo objeto, un escenario, el merch o el objeto en escena. **Uno por pieza** |
+| **Nunca en lo que se lee rápido** | ni en listas, tablas, menús, láminas de contenido de un deck, dashboards ni en la interfaz: ahí va el ícono plano o el Trazo |
+| **No se mezcla** | nunca junto a íconos de Plastilina plana o de Trazo en un mismo grupo |
+| **Grande o nada** | no baja de 160 px; si tiene que ir más chico, se usa el plano |
+| **Ya viene listo** | el set está en respuesta, con el naranja de Brand y el gesto donde existe (rayo, bombillo, teléfono); es una imagen con fondo transparente y los huecos abiertos, así que va sobre cualquier fondo. Si la pieza necesita sombra en el piso, se agrega al componer |
+| **Un objeto que falta no se inventa en 3D** | primero entra al set plano con la aprobación del operador y después se le hace el volumen |
+
+Hay **18 íconos en volumen**, uno por cada Plastilina. Se ven y se descargan en la sección «Plastilina en volumen» de la
+página del Lab. Sólo son para la marca propia de Efeonce; no se usan en trabajo de clientes ni en Greenhouse, y no se
+combinan en una pieza con las ilustraciones «Clay 3D» que el equipo usa en propuestas (son otra cosa).
+
+> Detalle técnico: [manual §14.1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#141-plastilina-en-volumen-d24-2026-09-27) ·
+> [Lab, sección 05](https://axis.efeonce.org/references/iconography/#volumen) · tokens `efeonceGraphicLine.icons.volume`
+> (`@efeoncepro/axis-tokens` 0.3.7) y archivos en `@efeoncepro/axis-brand-assets` 0.3.2, ambos publicados con el tag
+> `v0.3.7` (Greenhouse ya fija esas versiones, commit `f3f93c926`, 2026-09-27) · [cómo usar un ícono en volumen](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md#paso-a-paso--usar-un-ícono-en-volumen)
 
 ## Componer por superficie
 

@@ -3,7 +3,7 @@
 > **Tipo de documento:** ADR (decisión de marca y sistema de diseño)
 > **Estado:** Accepted (2026-09-25) — canonizada en AXIS; atribución sin logo sin medir
 > **Creado:** 2026-09-25 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-26 por Claude (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1; delta (d): lenguaje de movimiento como norma y `efeonceGraphicLine.motion` en `axis-tokens` 0.3.3; delta (e): decisiones del operador D1–D15 sobre contraste, logo en la órbita, halo, anillo de la esfera, convergencia con la foto y operación)
+> **Última actualización:** 2026-09-27 por Claude (delta: Plastilina en volumen, D24). Antes, 2026-09-26 (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1; delta (d): lenguaje de movimiento como norma y `efeonceGraphicLine.motion` en `axis-tokens` 0.3.3; delta (e): decisiones del operador D1–D15 sobre contraste, logo en la órbita, halo, anillo de la esfera, convergencia con la foto y operación)
 > **Manual canónico:** [`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
 > **Entregable:** [`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](../operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf)
 > **Sistema de diseño:** AXIS, página `references/graphic-line` en `axis.efeonce.org` y tokens `efeonceGraphicLine`
@@ -177,6 +177,37 @@ alta glifos nuevos, la página `/references/iconography/` y la guía `docs/agent
 Plastilina y una keynote en Trazo sólo con la documentación); lo que tuvo que adivinar se corrigió. Criterio e historia en
 la skill `efeonce-graphic-line` (`references/iconography.md`, `ledger.md` D16–D22). Pendientes: opacidad del anillo
 sesgado, voz de Voice, aire del Trazo a 20 px, publicación de los paquetes y reemplazo de Tabler en las firmas.
+
+### Delta 2026-09-27 — Plastilina en volumen (D24)
+
+El operador aprobó y canonizó (D24) una **tercera capa** de la iconografía: **Plastilina en volumen**, cada glifo de
+Plastilina en arcilla mate, inflada y sin aristas, generado **desde su vector aprobado** (nunca una forma nueva).
+Complementa al plano; no lo reemplaza. Viene de D23 (2026-09-26): el Trazo queda funcional y la distinción de la
+iconografía la carga Plastilina.
+
+- **Uso:** sólo en momentos protagonistas (portada, key visual, pieza social con un solo objeto, escenario, merch, el
+  objeto en escena), **uno por pieza**, mínimo 160 px. Nunca en listas, tablas, navegación, contenido de deck,
+  dashboards ni UI, ni en un grupo con Plastilina plana o con el Trazo. Sólo marca propia Efeonce.
+- **Forma del set:** en respuesta, con el acento de Brand y el gesto donde existe; PNG de 1024 px con alfa y calados
+  abiertos, sin sombra de contacto (se agrega al componer si hace falta). Un glifo nuevo entra primero al set plano.
+- **Método:** edición con GPT Image 2.5 Sunburst sobre el ícono plano aprobado (referencia a 760 px sobre `#001a33`) y
+  un prompt canónico que no se reescribe; recorte por color contra el fondo liso; QA de silueta, calados y piezas
+  sueltas que avisa y no rechaza (el juicio final es mirar al 100 %).
+
+**Alternativas descartadas:** extruir el vector en Blender (el operador lo rechazó: volumen plano, de «galleta»);
+recortar con matting por IA (`pnpm ai:image:rmbg` rellenó los calados —3 966 px en el bombillo— y dejó
+semitransparente una pieza suelta).
+
+**Dónde vive:** AXIS, commit `c18e3d3` en `main` (2026-09-27) — tokens `efeonceGraphicLine.icons.volume`
+(`axis-tokens` 0.3.7), 18 PNG en `@efeoncepro/axis-brand-assets` 0.3.2 (`AXIS_VOLUME_ICONS`, `findVolumeIcon`,
+`volumeIconUrl`), `pnpm icons:volume -- refs|key|check|publish`, prompt `docs/agent-composition/iconography/volume-prompt.txt`,
+guía `iconography.md` §9, ADR de AXIS `ICONOGRAPHY_DECISION_V1.md` (delta 2026-09-27) y la sección 05 del Lab
+(`/references/iconography/#volumen`). Reglas en el manual §14.1.
+
+**Estado:** canónico en AXIS `main` y en el Lab, y los dos paquetes están **publicados** con el tag `v0.3.7`
+(2026-09-27, sobre `main@c0020b6`: `axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2; la 0.3.7 de tokens salió coordinada
+junto con los cambios de superficies). Greenhouse ya fija esas versiones (commit `f3f93c926`,
+2026-09-27).
 
 ## Alternativas descartadas
 

@@ -335,6 +335,41 @@ export const estimateOpenAIImageOutputUsd = (params: { model: OpenAIImageModel; 
 export const getOpenAIImageModelCapabilities = (model: OpenAIImageModel): OpenAIImageModelCapabilities =>
   OPENAI_IMAGE_MODEL_CAPABILITIES[model]
 
+/** Modelos que declaran una capacidad: fuente única para la ayuda del CLI y los mensajes de error. */
+export const openAIImageModelsWith = (capability: keyof OpenAIImageModelCapabilities): OpenAIImageModel[] =>
+  OPENAI_IMAGE_MODEL_IDS.filter(model => OPENAI_IMAGE_MODEL_CAPABILITIES[model][capability])
+
+export const OPENAI_IMAGE_INPUT_FIDELITIES: OpenAIImageInputFidelity[] = ['low', 'high']
+
+export const isOpenAIImageInputFidelity = (value: string): value is OpenAIImageInputFidelity =>
+  (OPENAI_IMAGE_INPUT_FIDELITIES as string[]).includes(value)
+
+/**
+ * `input_fidelity` sólo existe en los modelos que lo declaran. Antes se descartaba en silencio con la familia 2.5: el
+ * pedido salía sin el parámetro y quien lo pidió creía que la fidelidad estaba aplicada (así llegó «--input-fidelity
+ * high» a un método canónico, a sus tokens y a su documentación, el 2026-09-27). Ahora falla acá, antes de la red, con
+ * la alternativa: en 2.5 la preservación se pide por prompt.
+ */
+export const assertOpenAIImageInputFidelitySupported = ({
+  model,
+  inputFidelity
+}: {
+  model: OpenAIImageModel
+  inputFidelity?: OpenAIImageInputFidelity
+}) => {
+  if (inputFidelity === undefined) return
+
+  if (!isOpenAIImageInputFidelity(inputFidelity)) {
+    throw new Error(`OpenAI image input fidelity "${inputFidelity}" is not valid. Use one of: ${OPENAI_IMAGE_INPUT_FIDELITIES.join(', ')}.`)
+  }
+
+  if (OPENAI_IMAGE_MODEL_CAPABILITIES[model].inputFidelity) return
+
+  throw new Error(
+    `"${model}" does not accept input_fidelity; ask for preservation in the prompt instead (e.g. "keep the exact silhouette"). Models with input_fidelity: ${openAIImageModelsWith('inputFidelity').join(', ')}.`
+  )
+}
+
 /**
  * `xhigh` y `max` existen sólo en la familia 2.5. Pedirlos a un modelo anterior falla acá, antes de la red,
  * en vez de gastar un request que el proveedor rechaza.
@@ -787,6 +822,7 @@ export const editOpenAIImage = async ({
   const resolvedRequest = resolveOpenAIImageRequestModel({ model, background })
 
   assertOpenAIImageQualitySupported({ model: resolvedRequest.model, quality })
+  assertOpenAIImageInputFidelitySupported({ model: resolvedRequest.model, inputFidelity })
 
   const resolvedSize = resolveOpenAIImageSize({ model: resolvedRequest.model, size, aspectRatio })
 
@@ -809,7 +845,7 @@ export const editOpenAIImage = async ({
     formData.append('background', resolvedBackground)
   }
 
-  if (inputFidelity && OPENAI_IMAGE_MODEL_CAPABILITIES[resolvedRequest.model].inputFidelity) {
+  if (inputFidelity) {
     formData.append('input_fidelity', inputFidelity)
   }
 

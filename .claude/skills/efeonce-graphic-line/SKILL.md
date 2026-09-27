@@ -36,6 +36,7 @@ propón agregarlo.
 | **Sonido de la marca**: logo sonoro, motion con sonido y etiqueta con voz (identidad **recomendada**, no canon; Glitch pendiente) | [references/motion.md](references/motion.md) §Sonido · [canon](../../../docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md) · skill `audio-studio` · AXIS `/references/sonic-brand.json` |
 | Dónde está cada doc, archivo, medio y repositorio | [references/sources-and-assets.md](references/sources-and-assets.md) |
 | **Íconos**: las dos voces canónicas (Trazo y Plastilina), la esfera como estado, cuándo responde, la órbita sesgada y cómo dar de alta un glifo nuevo. **Fuente de verdad en AXIS**: `efeonceGraphicLine.icons` + `@efeoncepro/axis-graphic-line/icons` (`resolveIcon`, `auditIconGroup`) y `pnpm icons:*` | [references/iconography.md](references/iconography.md) |
+| **Un objeto protagonista en volumen** (Plastilina en volumen, D24): la tercera capa, arcilla mate inflada derivada del vector aprobado; portada, KV, social de un objeto, escenario, merch. PNG con alfa de `@efeoncepro/axis-brand-assets` (`volumeIconUrl(glyph)`), tokens `efeonceGraphicLine.icons.volume`, alta con `pnpm icons:volume` en AXIS | [references/iconography.md §12](references/iconography.md) + [criteria.md §3.14](references/criteria.md) |
 | Revisar antes de entregar | [references/qa-checklist.md](references/qa-checklist.md) |
 | Qué decidió el operador, qué está pendiente, qué versiones hay | [references/ledger.md](references/ledger.md) |
 | Trampas que ya costaron tiempo | [references/lessons.md](references/lessons.md) |
@@ -68,7 +69,10 @@ propón agregarlo.
     se pinta con `resolveIcon` (`@efeoncepro/axis-graphic-line/icons`), con la voz de la línea de la pieza, en reposo por
     defecto; responde **uno solo** y sólo si la pieza no tiene otra esfera, y el grupo pasa `auditIconGroup` antes de
     entregar. Un glifo nuevo se da de alta en AXIS con `pnpm icons:check` (Plastilina, antes `icons:vectorize`) **y** la
-    aprobación del operador: el control mide el peso, no el carácter.
+    aprobación del operador: el control mide el peso, no el carácter. **Plastilina en volumen** (D24): sólo el PNG de
+    `@efeoncepro/axis-brand-assets` (`volumeIconUrl(glyph)`), uno por pieza, protagonista y desde 160 px; nunca se
+    genera de nuevo dentro de una pieza, nunca en listas, contenido de deck, dashboards ni UI, y nunca junto al plano o
+    al Trazo en un mismo grupo.
 13. **Se compone por superficie** (2026-09-27): fuera de social, 1:1 y firma (que siguen en el contrato de la órbita),
     la pieza se declara con superficie, formato, papel y receta en `efeonce.surface-composition` y se resuelve con
     `pnpm surface:resolve` en AXIS; los `delegates` del manifest van a los compositores de Greenhouse. **Nunca

@@ -140,7 +140,8 @@ it without repeating what already cost a day*. It grows with every task: see the
   `catalogs/insights-shared/editorial-resolvers.ts`) frozen by the TASK-1889 fidelity contract. They are **not** yet
   the canonical set. Adopting it (Insights measures, so **Trazo**; rest state in lists/tables; one responds per group,
   none on a page that already has a sphere) needs its own task with the visual gate and operator approval: never
-  swap or mix sets piecemeal, and never hand-draw a new icon into a catalog.
+  swap or mix sets piecemeal, and never hand-draw a new icon into a catalog. The third layer, **Plastilina en volumen**
+  (D24, 2026-09-27: matte-clay PNG from AXIS, hero moments only), never goes into Insights reports, dashboards or UI.
 - Sharing/email/schedules → `resend-email-platform`, `greenhouse-email` + TASK-1848.
 - Portal UI → `greenhouse-ux` + `greenhouse-ai-design-studio` + TASK-1849 (Composition Shell, GVC).
 - Shared web render → `efeonce-think` repo + `astro` skill + TASK-1875 (headless model, token server-side).

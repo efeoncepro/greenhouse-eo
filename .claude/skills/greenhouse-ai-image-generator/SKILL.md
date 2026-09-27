@@ -75,6 +75,14 @@ genera sólo con el método de AXIS: `pnpm ai:image --image ../axis-design-syste
 luego `icons:vectorize` + `icons:check` y aprobación del operador; nunca un prompt ad hoc. Ver
 `axis-design-system/docs/agent-composition/iconography.md` §Un glifo nuevo de Plastilina.
 
+**Plastilina en volumen (D24, 2026-09-27):** el PNG de un objeto protagonista se usa desde AXIS (`volumeIconUrl(glyph)`
+de `@efeoncepro/axis-brand-assets`), nunca se regenera. Sólo para dar de alta el volumen de un glifo que ya está en el set
+plano: EDITAR desde su vector aprobado (`pnpm icons:volume -- refs` en AXIS) con el prompt canónico de AXIS
+`docs/agent-composition/iconography/volume-prompt.txt` (no se reescribe; si un detalle falla, se agrega UNA línea que lo
+nombre): `pnpm ai:image --model gpt-image-2.5-sunburst --quality high --size 1024x1024 --image <ref.png> --prompt-file <volume-prompt.txt> --out <crudo.png>`,
+luego `icons:volume -- key|check|publish` y mirar al 100 %. Extruir el vector en Blender dio una «galleta» plana y el
+operador lo rechazó. Criterio: [`efeonce-graphic-line` → iconography](../efeonce-graphic-line/references/iconography.md).
+
 For art direction, Key Visual design or **audit**, marketing/campaign imagery, visual concept/mood, or choosing which AI model to use for a task (Nano Banana / Midjourney / Ideogram / Recraft / FLUX / Firefly / Seedance / Veo, etc.), the director is the `design-studio` skill — it directs and delegates production back here for assets that live in the Greenhouse UI.
 
 ## Core Rule
@@ -462,12 +470,18 @@ pnpm ai:image --image <ref.png> --prompt "keep this exact <subject>, change ONLY
 #   --mask <path>         INPAINTING: PNG con las zonas a reemplazar en TRANSPARENTE. Requiere --image
 #                         (sin ella aborta), mismo formato y mismas dimensiones que la primera --image.
 #   --input-fidelity high strict reference preservation — SÓLO gpt-image-1.5 / gpt-image-1 / gpt-image-1-mini.
-#                         En 2.5 no se envía (la guía lo excluye); la identidad se pide por prompt.
+#                         Con cualquier otro modelo (2.5, gpt-image-2) el CLI y el helper ABORTAN antes de gastar
+#                         (desde 2026-09-27; antes lo descartaban en silencio). En 2.5 la identidad se pide por prompt.
 pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (AI matting, soft edges)
 ```
 
 `ai:image:rmbg` rellena **por defecto** los huecos internos que el matting deja transparentes y no son fondo
 (glifos, emblemas); el fondo real encerrado se conserva. `--no-fill-holes` lo desactiva.
+
+🔴 **Con fondo liso conocido, recorte por COLOR, no matting con IA — medido 2026-09-27 (Plastilina en volumen):**
+`ai:image:rmbg` rellenó calados que debían quedar abiertos (3 966 px en el bombillo) y dejó **semitransparente una
+esfera suelta** (la de la cámara). El recorte por color (distancia al fondo + des-mezcla del borde) de
+`pnpm icons:volume -- key` en AXIS dejó los calados abiertos y sin halo.
 
 🔴 **Editar NO abarata — medido 2026-09-16, `flare · low · 1024x1024`:** el modelo devuelve la imagen
 **completa** aunque la máscara acote qué cambia, así que el output se cobra **idéntico** a una generación

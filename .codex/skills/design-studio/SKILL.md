@@ -127,6 +127,11 @@ nunca como texto. No aplica a UI de Greenhouse ni a clientes.
   (`@efeoncepro/axis-graphic-line/icons`), nunca dibujados ni generados sueltos (no es el «icono» de UI de Greenhouse
   del árbol §2). Glifo nuevo: método de alta de AXIS (Plastilina: referencia de estilo + prompt de AXIS vía
   `pnpm ai:image`) y aprobación del operador. Criterio: [`efeonce-graphic-line` → iconography](../efeonce-graphic-line/references/iconography.md).
+  **Plastilina en volumen** (D24, 2026-09-27; tercera capa): el glifo de Plastilina en arcilla mate inflada, PNG con alfa
+  de `@efeoncepro/axis-brand-assets` (`volumeIconUrl(glyph)`), sólo como objeto protagonista (portada, KV, pieza social
+  de un objeto, escenario, merch), uno por pieza, ≥ 160 px, en respuesta con el acento de Brand, sin sombra de contacto
+  (se agrega al componer); nunca en listas, contenido, UI ni mezclado con plano o Trazo, y nunca regenerado ni inventado
+  directo en 3D. No es la ilustración «Clay 3D» del equipo: no se mezclan en una pieza.
 
 Cuando aparezca Julio, usar su identidad fotorrealista aprobada: `refs-aprobadas/` (11 referencias; `julio-ap-04`
 primera opción de rostro y `julio-ap-11` de cuerpo) más `set-identidad/angulos/` (seis ángulos), ambos bajo

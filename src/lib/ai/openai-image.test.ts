@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  assertOpenAIImageInputFidelitySupported,
   assertOpenAIImageSizeSupported,
   editOpenAIImage,
   estimateOpenAIImageOutputTokens,
@@ -11,6 +12,7 @@ import {
   getOpenAIImageModel,
   isOpenAIImageModel,
   isOpenAIImageQuality,
+  openAIImageModelsWith,
   resolveOpenAIImageBackground,
   resolveOpenAIImageRequestModel,
   resolveOpenAIImageSize,
@@ -281,23 +283,32 @@ describe('GPT Image 2.5 family contract (TASK-1851)', () => {
     expect(resolveOpenAIImageSize({ model: 'gpt-image-2.5-sunburst', size: '2048x1152' })).toBe('2048x1152')
   })
 
-  it('never sends input_fidelity with a 2.5 model', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(jsonResponse())
+  it.each(['gpt-image-2.5-sunburst', 'gpt-image-2.5-flare', 'gpt-image-2'] as const)(
+    'rejects input_fidelity on %s before any network call, instead of dropping it silently',
+    async model => {
+      const fetchMock = vi.fn()
 
-    vi.stubGlobal('fetch', fetchMock)
+      vi.stubGlobal('fetch', fetchMock)
 
-    await editOpenAIImage({
-      prompt: 'Change only the background colour, keep everything else the same.',
-      image: { bytes: new Uint8Array([1, 2, 3]), filename: 'anchor.png', mimeType: 'image/png' },
-      model: 'gpt-image-2.5-sunburst',
-      inputFidelity: 'high'
-    })
+      await expect(
+        editOpenAIImage({
+          prompt: 'Change only the background colour, keep everything else the same.',
+          image: { bytes: new Uint8Array([1, 2, 3]), filename: 'anchor.png', mimeType: 'image/png' },
+          model,
+          inputFidelity: 'high'
+        })
+      ).rejects.toThrow(/does not accept input_fidelity.*gpt-image-1\.5/)
 
-    const [, request] = fetchMock.mock.calls[0] as [string, RequestInit]
-    const body = request.body as FormData
+      expect(fetchMock).not.toHaveBeenCalled()
+    }
+  )
 
-    expect(body.get('model')).toBe('gpt-image-2.5-sunburst')
-    expect(body.get('input_fidelity')).toBeNull()
+  it('rejects an invalid input_fidelity value before any network call', () => {
+    expect(() => assertOpenAIImageInputFidelitySupported({ model: 'gpt-image-1.5', inputFidelity: 'max' as never })).toThrow(/not valid/)
+  })
+
+  it('lists the models with input_fidelity from the capability table', () => {
+    expect(openAIImageModelsWith('inputFidelity')).toEqual(['gpt-image-1.5', 'gpt-image-1', 'gpt-image-1-mini'])
   })
 
   it('still sends input_fidelity for the earlier models that document it', async () => {

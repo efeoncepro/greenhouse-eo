@@ -45,7 +45,7 @@ Alcance: **marca propia de Efeonce y su familia**. Nunca trabajo de clientes ni 
 | **Superficie** (nueva) | formato, papel, receta, reservas por región, escala de voces, firma, tiempos y referencias aprobadas | contrato `efeonce.surface-composition` + tokens `efeonceGraphicLine.surfaces` |
 | Elemento: órbita, lente, progreso, voz, firma | la geometría y el dibujo de cada elemento | contrato `efeonce.graphic-line-orbit` + tokens `efeonceGraphicLine` (`lens`, `pieces`, `signature`, `type`, `motion`, `brandClose`) |
 | Elemento: selección y cursores | cajas, esquinas, colaboradores | contrato `efeonce.collaboration-selection` |
-| Elemento: íconos | glifo y voz (Trazo o Plastilina) | `resolveIcon` de `@efeoncepro/axis-graphic-line/icons` + `efeonceGraphicLine.icons` |
+| Elemento: íconos | glifo y voz (Trazo o Plastilina); en el objeto protagonista de la superficie (portada, key visual, escenario), **Plastilina en volumen**: uno por pieza, ≥ 160 px, nunca en contenido de deck ni UI ([manual §14.1](./EFEONCE_GRAPHIC_LINE_V1.md#141-plastilina-en-volumen-d24-2026-09-27)) | `resolveIcon` de `@efeoncepro/axis-graphic-line/icons` + `efeonceGraphicLine.icons`; el volumen, PNG de `@efeoncepro/axis-brand-assets` 0.3.2 (`volumeIconUrl`, sin publicar: mientras tanto, desde el Lab) |
 | Foto | registro, palancas, reservas, lecho | [lenguaje fotográfico](../brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) + `pnpm foto:*` |
 
 El contrato de superficie **no repinta nada**: traduce la superficie a intents de los contratos de elemento. Por eso

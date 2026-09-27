@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-27 — Iconografía: Plastilina en volumen canónica (D24) y el Trazo sin rasgo propio (D23)
+
+El operador canonizó la tercera capa de la iconografía: **Plastilina en volumen**, cada glifo de Plastilina en arcilla
+mate inflada, generado desde su vector aprobado (GPT Image 2.5 Sunburst editando el ícono plano) y entregado como PNG
+con alfa. Complementa al plano: sólo en momentos protagonistas, uno por pieza, desde 160 px; nunca en listas, contenido
+de deck, dashboards ni UI. En AXIS `main` (c18e3d3): tokens `efeonceGraphicLine.icons.volume` (axis-tokens 0.3.7),
+los 18 PNG sellados en `@efeoncepro/axis-brand-assets` 0.3.2 (`volumeIconUrl`), `pnpm icons:volume -- refs|key|check|publish`
+y la sección `#volumen` del Lab con su bloque en `/references/iconography.json`; publicados con el tag v0.3.7 (tokens 0.3.7, brand-assets 0.3.2).
+Lecciones: el extruido en Blender quedó plano y se rechazó; `ai:image:rmbg` rellena los calados, así que el alfa se saca
+por color contra el fondo liso; el QA compara silueta, calados y piezas con el plano y avisa sin rechazar. D23: «El corte»
+en el Trazo se descartó; el Trazo queda funcional y la distinción la carga Plastilina. Skill `efeonce-graphic-line`,
+skills vecinas, manual, ADR, doc funcional y manual de uso al día. Corrida: `ai-generations/2026-09-27_plastilina-3d-gpt/`.
+
 ## 2026-09-27 — La órbita se compone por superficie
 
 Nace la norma [`EFEONCE_SURFACE_COMPOSITION_V1.md`](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md):
@@ -548,21 +561,3 @@ Investigar para escribirla corrigió varias cosas que dábamos por ciertas. fal 
 no llega a 4K, y el 2K y 4K de H3 son reescalados. La fórmula de tokens de Seedance sí calza con lo que pagamos, y el
 costo de GPT Image 2.5 se puede estimar antes de gastar. La guía, el catálogo, los manuales y las skills creativas
 quedaron alineados, y las fallas del CLI detectadas quedan para una tarea aparte.
-
-## 2026-09-16 — `pnpm ai:fal` trabaja con dos cuentas de fal y ya puede encolar sin esperar
-
-El CLI de fal ahora conoce dos cuentas. Elige la que tiene más saldo y, si fal bloquea una por falta de fondos, pasa sola a
-la otra antes de gastar. `--balance` muestra ambos saldos, y cada corrida dice qué cuenta usó. También se puede encolar un
-video y seguir trabajando: `--detach` deja el trabajo en fal y `--status` avisa cuándo está listo, sin necesidad de montar
-un webhook. Con la cuenta con saldo se terminaron de verificar Wan 3.0 y todas las variantes de Seedance (47 de 55
-capacidades). Las pruebas costaron USD 7,71, el doble de lo estimado para Seedance, y mostraron que su filtro rechaza
-material con marcas o personas reales después de cobrar. Queda pendiente rotar la clave nueva, que se compartió por chat.
-
-## 2026-09-16 — La recarga de fal no llegó a la cuenta de la clave; `pnpm ai:fal --balance` lo muestra en segundos
-
-Después de recargar USD 50, el CLI seguía bloqueado por saldo. La cuenta de fal dueña de la clave que usamos tenía
-−3,86 USD: la recarga no estaba ahí. Se descartó que otro sistema estuviera gastando: Globe usa la misma clave, pero no
-hubo llamadas a fal desde ningún servidor en una semana. Ahora `pnpm ai:fal --balance` muestra ese saldo sin costo y el
-CLI lo imprime solo cuando fal bloquea una corrida. Wan 3.0 sumó tres verificaciones; quedan documentados como
-pendientes las pruebas de Seedance, el entrenamiento de LoRA de H3 (postergado) y Recraft, que hoy no tiene vía
-operativa porque la CLI de Higgsfield perdió la sesión.

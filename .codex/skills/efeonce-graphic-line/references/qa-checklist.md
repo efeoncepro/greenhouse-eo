@@ -2,7 +2,7 @@
 
 > Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 · decisiones del
 > operador D1–D17 del 2026-09-26 registradas (los chequeos marcados «0.3.1» vienen en el contrato publicado con contracts 0.3.5,
-> tag `v0.3.5`).
+> tag `v0.3.5`). §8c (Plastilina en volumen, D24): AXIS `main@c18e3d3` — 2026-09-27.
 >
 > Cada ítem dice **cómo se verifica**. «Automático» = lo hace fallar un comando o una función; «Revisión» = hay que
 > mirar el cuadro real (el adapter de Greenhouse lo marca `manual`). Una pieza no se entrega con un ítem en rojo, y
@@ -145,7 +145,7 @@ Detalle y geometría en [iconography.md](iconography.md).
 | [ ] | Responde a lo más un ícono por pieza, y sólo si la pieza no tiene otra esfera (órbita o respuesta) | Revisión |
 | [ ] | En listas, tablas, contacto, satélites y dentro de una órbita, reposo; bajo 20 px, reposo | Revisión |
 | [ ] | Tinta blanca sobre oscuro y navy sobre papel; el acento ≥ 3:1 contra su fondo; nunca `#36c8bf` sobre papel | Medir sobre los píxeles finales |
-| [ ] | Sin volumen, brillo, degradé ni patrón; nunca mezclado con otra familia de íconos (salvo Tabler en la firma, mientras dure) | Revisión |
+| [ ] | Sin volumen, brillo, degradé ni patrón en el Trazo o el plano (el volumen sólo es el del set aprobado, §8c); nunca mezclado con otra familia de íconos (salvo Tabler en la firma, mientras dure) | Revisión |
 | [ ] | Fondo `#001a33` en todas las líneas (D21) | Revisión |
 | [ ] | Íconos pintados con `resolveIcon` de `@efeoncepro/axis-graphic-line/icons` (sin geometría ni colores a mano) y sin `warnings` sin reportar | Revisión del código o del SVG |
 | [ ] | El grupo pasa `auditIconGroup(items, { pieceHasSphere })` sin issues | Ejecutar la función |
@@ -156,6 +156,22 @@ Detalle y geometría en [iconography.md](iconography.md).
 | [ ] | Trazo, glifo nuevo: control a 64, 32, 24 y 20 px sobre `#001a33` y papel; aire ≥ 0,5 con trazo 1,5 | Render + medición |
 | [ ] | Nunca Trazo y Plastilina en un mismo grupo; en una pieza con las dos, Plastilina manda y el Trazo apoya en chico | Revisión |
 | [ ] | Órbita sesgada: sólo alrededor del protagonista de Plastilina, pasa detrás y delante con su calado, nunca cruza el texto ni mide | Revisión sobre los píxeles finales |
+
+## 8c. Plastilina en volumen (D24)
+
+Detalle en [iconography.md](iconography.md) §12.
+
+| | Chequeo | Cómo se verifica |
+|---|---|---|
+| [ ] | El PNG sale de `@efeoncepro/axis-brand-assets` (`volumeIconUrl(glyph)`) o de la descarga del Lab; nunca generado de nuevo dentro de la pieza | Revisión del origen del archivo |
+| [ ] | Uno por pieza, y es el protagonista (portada, KV, social de un objeto, escenario, merch, objeto en escena) | Revisión |
+| [ ] | No está en listas, tablas, navegación, contenido de deck, dashboards ni UI | Revisión |
+| [ ] | No comparte grupo con Plastilina plana ni con el Trazo; no se mezcla con las ilustraciones «Clay 3D» del equipo | Revisión |
+| [ ] | Se ve a 160 px o más en la pieza final; más chico, se usa el plano | Medir en los píxeles finales |
+| [ ] | Los calados siguen abiertos y sin halo sobre el fondo de la pieza (el alfa no se rellenó ni se recortó con IA) | Revisión al 100 % sobre el fondo final |
+| [ ] | La sombra de contacto, si la hay, se agregó al componer (el PNG no la trae) y no ensucia el calado | Revisión |
+| [ ] | Glifo nuevo en volumen: antes entró al set plano con aprobación; `pnpm icons:volume -- check` corrido y **cada aviso mirado al 100 %** (se rechaza sólo si la forma se reinventó, un calado se volvió relieve o figura y fondo se invirtieron); `publish` selló el PNG; el operador aprobó | Salida del comando + revisión + ledger |
+| [ ] | El prompt es el canónico de AXIS (`volume-prompt.txt`), sin reescribir; como mucho una línea agregada que nombra el detalle que falló | Diff contra el prompt canónico |
 
 ## 9. Comandos y pruebas de referencia
 
@@ -172,4 +188,5 @@ Detalle y geometría en [iconography.md](iconography.md).
 | e2e del Lab (página de la línea, ids duplicados, foco concéntrico) | AXIS | `pnpm --dir apps/lab test:e2e` |
 | Regenerar órbitas estáticas tras cambiar tokens | AXIS | `pnpm orbit:assets` |
 | Video de la órbita sola | AXIS | `pnpm orbit:video -- --format 16x9 --surface dark --out /tmp/orbita` |
+| Plastilina en volumen: referencias, alfa por color, QA contra el plano y sello | AXIS | `pnpm icons:volume -- refs\|key\|check\|publish` |
 | Storyboard de una animación del logo | Greenhouse | `node scripts/creative/brand-motion/render-orbit-motion.mjs --out <dir> --anim reveal --storyboard` |

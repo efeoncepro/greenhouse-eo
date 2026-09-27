@@ -292,6 +292,9 @@ logo es un sistema consistente, no un activo distintivo demostrado. Manual y val
 Engine, Revenue), y **Plastilina**, lo que se crea (Brand)—; la esfera es un estado (responde uno solo) y no aplica a
 clientes ni a la UI de Greenhouse. Fuente de verdad en AXIS (`efeonceGraphicLine.icons`,
 `@efeoncepro/axis-graphic-line/icons`): [manual §14](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#14-iconografía-trazo-y-plastilina).
+Desde el 2026-09-27 (D24) hay una tercera capa, **Plastilina en volumen**: cada glifo de Plastilina en arcilla mate
+inflada (PNG con alfa), sólo para momentos protagonistas —portada, key visual, escenario, merch—, uno por pieza y
+nunca en UI, listas ni decks ([manual §14.1](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#141-plastilina-en-volumen-d24-2026-09-27)).
 
 ## Identidad en informes
 

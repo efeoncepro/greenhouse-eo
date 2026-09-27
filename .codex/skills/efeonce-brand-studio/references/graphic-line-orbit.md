@@ -179,6 +179,17 @@ nunca mide, nunca cruza texto). Glifos de `ICON_CATALOG`, pintados con `resolveI
 aprobación del operador. Guía `axis-design-system/docs/agent-composition/iconography.md`; criterio en
 [`efeonce-graphic-line`](../../efeonce-graphic-line/references/iconography.md).
 
+**Plastilina en volumen (D24, 2026-09-27), tercera capa:** cada glifo de Plastilina en arcilla mate, inflada y sin
+aristas, PNG de 1024 px con alfa (calados abiertos, sin sombra de contacto: se agrega al componer si hace falta), en
+respuesta con el acento de Brand y el gesto donde existe. **Sólo** en momentos protagonistas (portada, key visual, pieza
+social de un solo objeto, escenario, merch, el objeto en escena), **uno por pieza**, **≥ 160 px** (más chico, el plano);
+**nunca** en listas, tablas, navegación, contenido de deck, dashboards ni UI, ni en un grupo con Plastilina plana o
+Trazo. Se usa el PNG de `@efeoncepro/axis-brand-assets` 0.3.2 (`assets/volume/`, `volumeIconUrl(glyph)`; tokens
+`efeonceGraphicLine.icons.volume` en `axis-tokens` 0.3.7): **ambos publicados con el tag `v0.3.7`**; Greenhouse ya
+fija esas versiones (commit `f3f93c926`, 2026-09-27). El set de 18 también se descarga a mano del Lab (https://axis.efeonce.org/references/iconography/#volumen).
+Nunca se regenera ni se crea una forma nueva directo en 3D: el glifo entra primero al set plano y el volumen sale de ese
+vector (`pnpm icons:volume` en AXIS). No se mezcla con las librerías «Clay 3D» de OneDrive (ilustración de propuestas).
+
 ## Componer con agentes (contrato `efeonce.graphic-line-orbit` 0.3.0)
 
 Una pieza con la órbita se compone por **intención**, no con coordenadas. Contrato `0.3.0` (`stable`), manifest
@@ -307,6 +318,7 @@ el pre-push `scripts/ci/large-blob-gate.mjs` bloquea blobs grandes.
 | Archivos oficiales | `@efeoncepro/axis-brand-assets` 0.3.0 | logos, isotipos, burbujas y 48 órbitas; el Lab los sincroniza en cada build (`pnpm brand:sync`) |
 | Órbita pintada | `@efeoncepro/axis-graphic-line` 0.3.1 | recetas, motion, React y Web Component (Greenhouse no lo usa) |
 | Íconos | `@efeoncepro/axis-graphic-line/icons` 0.4.0 · `efeonceGraphicLine.icons` (tokens 0.3.6) · https://axis.efeonce.org/references/iconography/ | Trazo y Plastilina: catálogo, `resolveIcon`, `auditIconGroup`, órbita sesgada |
+| Íconos en volumen (D24) | `@efeoncepro/axis-brand-assets` 0.3.2 `assets/volume/` · `efeonceGraphicLine.icons.volume` (tokens 0.3.7) · ambos publicados (tag `v0.3.7`) · Lab `#volumen` | Plastilina en volumen: 18 PNG con alfa, `volumeIconUrl(glyph)`, sólo objeto protagonista |
 | Motion | `docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md` · `EFEONCE_ORBIT_REVEAL_MOTION_V1.md` | norma del lenguaje de movimiento · spec de reveal, apertura y sting V1.1 |
 | Adapter | `scripts/creative/layout-compiler/graphic-line.mjs` | resolver + pintor + medición de firma |
 | Canvas (taller, privado) | https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii | 40 láminas, 7 capítulos (lámina 4.9 «Oficina en foto»); exploración, no fuente |

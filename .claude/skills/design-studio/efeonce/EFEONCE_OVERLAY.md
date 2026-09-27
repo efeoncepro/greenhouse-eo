@@ -54,7 +54,10 @@ visual transversal requiere validación en varias portadas.
   en Brand; responde un solo ícono y sólo si la pieza no tiene otra esfera; Plastilina protagonista dentro de su órbita
   sesgada. Salen de `resolveIcon` (`@efeoncepro/axis-graphic-line/icons`), nunca se dibujan ni generan sueltos. Guía en
   AXIS `docs/agent-composition/iconography.md`; criterio en
-  [`efeonce-graphic-line`](../../efeonce-graphic-line/references/iconography.md).
+  [`efeonce-graphic-line`](../../efeonce-graphic-line/references/iconography.md). **Plastilina en volumen** (D24,
+  2026-09-27): el objeto protagonista en arcilla mate, PNG con alfa desde `volumeIconUrl(glyph)` de
+  `@efeoncepro/axis-brand-assets` (0.3.2, publicado con el tag `v0.3.7`); uno por pieza, ≥ 160 px, nunca en listas ni UI, nunca
+  regenerado. Es otra cosa que las librerías «Clay 3D» de OneDrive (ilustración de propuestas): no se mezclan.
 - **Registro cine ampliado (operador, 2026-09-27):** la foto de cine de ficción se permite en **dos casos**: piezas
   con **Nexa protagonista** (traje de ficción permitido) y la receta de deck **`proposal-cinematic`**, ahora también
   con **personas del equipo**, que conservan su **uniforme por registro de escena** (piqué, chaqueta, gorra y polo,

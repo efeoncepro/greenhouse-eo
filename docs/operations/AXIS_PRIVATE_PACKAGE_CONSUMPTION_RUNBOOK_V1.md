@@ -63,6 +63,21 @@ source control.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
 
+## Delta 2026-09-27 — Plastilina en volumen: `axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, publicados (tag `v0.3.7`)
+
+- **Publicado en GitHub Packages** con el tag `v0.3.7` (2026-09-27, release run `36292203529`, success, sobre el
+  commit `c0020b6` de `main`; el volumen entró en `main` con `c18e3d3`): `axis-tokens` `0.3.7` suma
+  `efeonceGraphicLine.icons.volume` y `axis-brand-assets` `0.3.2` suma los 18 PNG de `assets/volume/<glifo>.png`
+  (sellados en `src/volume-manifest.ts`; API `AXIS_VOLUME_ICONS`, `findVolumeIcon`, `volumeIconUrl`). En el mismo tag
+  salió `axis-ui-contracts` `0.3.6`; `axis-graphic-line` sigue en `0.4.0`. Es la decisión D24 (manual
+  `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` §14.1).
+- **Coordinación:** la `0.3.7` de `axis-tokens` comparte versión con los cambios de superficies
+  (`efeonceGraphicLine.surfaces`) de otra sesión; se publicó coordinada junto con ellos.
+- **Greenhouse ya fija esas versiones** (commit `f3f93c926` de `develop`, 2026-09-27): `axis-tokens` `0.3.7`,
+  `axis-ui-contracts` `0.3.6`, `axis-brand-assets` `0.3.2` y `axis-graphic-line` `0.4.0` como dependencia directa. El
+  bump va en su propio commit y se lee el veredicto de CI de ese SHA. El Lab sigue sirviendo para descargar los PNG a
+  mano.
+
 ## Delta 2026-09-26 (d) — iconografía de La órbita: `axis-tokens` 0.3.6 y `axis-graphic-line` 0.4.0
 
 - **Publicado** (tag `v0.3.6` del repo AXIS, PR `efeoncepro/axis-design-system#3` mergeado; versiones verificadas en

@@ -113,6 +113,9 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   definido todavía** (pendiente en AXIS: necesita los tokens `axisMotion` y la norma de movimiento). No se inventa: en
   una pieza animada, el ícono entra como cualquier elemento del plano y se queda en el estado que `resolveIcon` pinta,
   sin animar la esfera ni el trazo. Criterio: [iconography.md](../../efeonce-graphic-line/references/iconography.md).
+  La **Plastilina en volumen** (D24, 2026-09-27) es un PNG **estático** con alfa (`volumeIconUrl(glyph)`): puede entrar
+  como objeto protagonista del plano (uno, ≥ 160 px), pero animarlo es otra decisión
+  pendiente del operador: no se anima ni se regenera con un modelo de video.
 - **`DESIGN.md`** es el contrato visual agent-facing; leerlo si la pieza toca UI (pero recuerda: motion de
   UI runtime NO es esta skill).
 

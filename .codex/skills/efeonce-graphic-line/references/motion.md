@@ -5,6 +5,7 @@
 > tras D22). Identidad sonora recomendada revisada contra el PR AXIS #4 (squash `55486aa` en `main`, publicado) — 2026-09-26.
 > Norma: `docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`.
 > Producción: `docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md` (v1.3).
+> Plastilina en volumen (D24): AXIS `main@c18e3d3` — 2026-09-27 (sólo la línea de «Qué no hacer»).
 > Valores: tokens `efeonceGraphicLine.motion` en `@efeoncepro/axis-tokens` ≥ 0.3.3 (la 0.3.2 salió sin `motion`).
 
 ## Dos familias distintas (no se mezclan)
@@ -110,3 +111,5 @@ cierre, marca lo ya subido y relanza.
 - Escribir tiempos, sobrepasos o proporciones en un script: se leen del token.
 - Mover dos protagonistas a la vez, frenar sin golpe o usar la onda o el pulso como adorno sin un encaje.
 - Poner esfera o mayúsculas en el eslogan; usar las animaciones del logo para clientes o UI de Greenhouse.
+- Animar un objeto de Plastilina en volumen (D24) con el paquete: es un PNG fijo, no se regenera, y el motion de los
+  íconos sigue sin definir (pendiente en el ledger).

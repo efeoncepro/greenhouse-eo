@@ -177,6 +177,8 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
    Íconos en una pieza de marca propia: sólo de la iconografía canónica de «La órbita» (Trazo o Plastilina según la
    línea de la pieza), pintados con `resolveIcon` y con el grupo pasado por `auditIconGroup`; nunca dibujados ni
    generados dentro de la pieza ([criterio](../efeonce-graphic-line/references/iconography.md)).
+   Un KV con un objeto protagonista puede usar la **Plastilina en volumen** (D24, 2026-09-27): el PNG con alfa de
+   `@efeoncepro/axis-brand-assets` (`volumeIconUrl(glyph)`), uno por pieza, ≥ 160 px, nunca regenerado ni en un grupo.
 4. **Diseña contraste.** Prueba peso, ancho, tamaño, leading, tracking, cortes y densidad juntos. ExtraBold no
    es un default; una cursiva o Guttery larga tampoco. El contraste útil puede venir de peso, escala, espacio,
    color, posición o tiempo, pero cada capa debe conservar una función.

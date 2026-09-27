@@ -180,6 +180,10 @@ Kortex y Verk, fuera por ahora. Operar con
   Voice sin voz fija. La esfera es un estado: responde uno solo y sólo si la pieza no tiene otra esfera. Glifos de
   `ICON_CATALOG`, pintados con `resolveIcon` (`@efeoncepro/axis-graphic-line/icons`); nunca un ícono dibujado o
   generado suelto. Criterio en [`efeonce-graphic-line` → iconography](../efeonce-graphic-line/references/iconography.md).
+  Tercera capa, **Plastilina en volumen** (D24, 2026-09-27): cada glifo de Plastilina en arcilla mate inflada, PNG con
+  alfa derivado de su vector aprobado (`volumeIconUrl(glyph)`, `@efeoncepro/axis-brand-assets`); complementa al plano,
+  no lo reemplaza. Sólo en momentos protagonistas, uno por pieza, ≥ 160 px; nunca en listas, contenido de deck,
+  dashboards ni UI. Detalle en [la referencia](references/graphic-line-orbit.md) §Íconos.
 - **Motion:** animaciones del logo V1.1 aprobadas (reveal 3,6 s, apertura 2,4 s, sting 1,6 s;
   [spec](../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md)); la animación de la órbita
   sin logo sale del paquete de AXIS. Masters en el bucket público de AXIS, nunca en git (ver referencia). **Antes de

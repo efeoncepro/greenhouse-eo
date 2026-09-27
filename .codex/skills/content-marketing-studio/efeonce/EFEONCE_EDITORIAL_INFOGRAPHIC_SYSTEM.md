@@ -119,7 +119,8 @@ que se mide, **Plastilina** para lo que se crea, desde 32 px) y no se mezclan en
 en un grupo responde uno solo, en el acento de la línea de la pieza, y ninguno si la pieza ya tiene esfera. Un glifo
 que falta se da de alta (`icons:check` + aprobación). Criterio:
 [iconography.md](../../efeonce-graphic-line/references/iconography.md); guía en AXIS
-`docs/agent-composition/iconography.md`.
+`docs/agent-composition/iconography.md`. La **Plastilina en volumen** (D24, 2026-09-27: el glifo en arcilla mate, PNG
+de AXIS) **no va en infografías**: es sólo para un objeto protagonista; en nodos y categorías van el plano o el Trazo.
 
 Wordmarks públicos oficiales: `public/branding/logo-full.svg` en light y
 `public/branding/logo-negative.svg` en dark. `AxisWordmark` es interno y no se usa en piezas públicas.

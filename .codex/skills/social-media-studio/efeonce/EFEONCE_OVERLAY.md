@@ -198,6 +198,11 @@ tokens `efeonceGraphicLine` de `@efeoncepro/axis-tokens`; nunca HEX ni px transc
   el texto (la voz vive en el tercio inferior). Fuera de eso, reposo por defecto; responde uno solo y sólo si la pieza
   no tiene otra esfera. Plastilina no baja de 32 px. Todo sale de `resolveIcon` y pasa `auditIconGroup`; nunca un ícono
   generado suelto. Criterio: [`efeonce-graphic-line`](../../efeonce-graphic-line/references/iconography.md).
+- **Plastilina en volumen (D24, 2026-09-27):** un post con **un solo objeto** protagonista es uso válido de la tercera
+  capa: el glifo de Plastilina en arcilla mate, PNG con alfa desde `volumeIconUrl(glyph)` de
+  `@efeoncepro/axis-brand-assets` (o descarga del Lab `iconography/#volumen` mientras el paquete no se publique), en
+  respuesta con el acento de Brand, uno por pieza, ≥ 160 px, sin sombra de contacto salvo que la composición la pida.
+  Nunca en carruseles de listas ni junto a íconos planos o Trazo, y nunca regenerado con un modelo.
 - **«Te hacemos visible»** siempre con su prueba y sin pauta mientras falte la revisión legal (§1.4). La prueba de
   atribución sin logo sigue sin medir: no afirmes que la órbita ya se reconoce sola.
 

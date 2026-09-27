@@ -9,6 +9,10 @@
 > Todo lo de este archivo se leyó del código (`packages/*/src`, `scripts/`, `apps/lab`) y se ejecutó contra los `dist`
 > de AXIS y contra el adapter de Greenhouse. Si un número de aquí no coincide con el código, **manda el código**:
 > vuelve a leer `packages/tokens/src/tokens.ts` y actualiza este archivo.
+>
+> Plastilina en volumen (D24): `icons.volume`, `volume/` de brand-assets y `pnpm icons:volume` verificados contra AXIS
+> `main@c18e3d3` — 2026-09-27 (`axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, **publicados** con el tag `v0.3.7`
+> sobre `main@c0020b6`; Greenhouse ya fija esas versiones, commit `f3f93c926`, 2026-09-27).
 
 Índice: [1 Paquetes](#1-paquetes-versiones-e-instalación) · [2 Tokens](#2-tokens-efeoncegraphicline) ·
 [3 Contrato de la órbita](#3-contrato-efeoncegraphic-line-orbit) · [4 Selección colaborativa](#4-contrato-efeoncecollaboration-selection) ·
@@ -578,6 +582,17 @@ superficies × 4 canales. Lienzos: social 1080×1350, screen y deck 1920×1080, 
 centrada, fondo transparente, con halo. Las genera `pnpm orbit:assets` desde `orbitAssetSvg`; la prueba del paquete
 compara cada SVG byte a byte. Guarda de deriva en Greenhouse: `src/config/efeonce-brand-assets.test.ts`.
 
+**Plastilina en volumen (desde 0.3.2, publicado con el tag `v0.3.7`; D24):** `assets/volume/<glifo>.png` — 18 PNG de 1024 px
+(~130 KB cada uno, paleta con alfa), los glifos de Plastilina en respuesta con el acento de Brand y el gesto donde
+existe; sellados en `src/volume-manifest.ts` (la prueba falla si un PNG cambia sin `publish`, si queda uno sin sellar o
+si pierde el alfa).
+
+| Función | Qué hace |
+|---|---|
+| `AXIS_VOLUME_ICONS` | el set sellado |
+| `findVolumeIcon(glyph)` | el registro de un glifo |
+| `volumeIconUrl(glyph)` | file URL del PNG dentro del paquete; **lanza** con un glifo que no es de Plastilina (el Trazo no tiene volumen) |
+
 ---
 
 ## 7. `@efeoncepro/axis-graphic-line`: cada export
@@ -748,6 +763,7 @@ Se pinta en shadow DOM (ids aislados) y el host recibe `aria-hidden="true"`.
 | `pnpm orbit:video -- --format 16x9\|1x1\|4x5\|9x16 --surface dark\|light [--line …] [--fps 30] --out <dir>` | video de la órbita **sin logo** (2,0 s + 0,5 s de reposo), MP4 + cuadro final PNG + JSON; necesita Playwright del Lab y `ffmpeg` |
 | `pnpm signature:resolve -- --input <intent.json> [--out …]` | resuelve la firma de correo |
 | `pnpm collaboration:resolve -- …` | resuelve la selección colaborativa |
+| `pnpm icons:volume -- refs\|key\|check\|publish` (`scripts/icons-volume.mjs`) | Plastilina en volumen (D24): `refs` el plano en respuesta (con gesto) a 760 px sobre `#001a33`, centrado en 1024 · `key` alfa por color contra el fondo liso · `check` silueta ≥ 0,75 y misma cantidad de calados y piezas sueltas (avisa, sale 1; no rechaza) · `publish` comprime, copia al paquete y al Lab y sella. Detalle: `iconography.md` §12 |
 | `pnpm design:generate` · `pnpm design:check` | genera / verifica el DESIGN.md desde tokens |
 | `pnpm build` · `pnpm test` · `pnpm typecheck` · `pnpm lint` | en todos los paquetes (`node --test dist/*.test.js`) |
 | `pnpm --dir apps/lab test:e2e` | e2e del Lab (incluye la página de la línea y ids duplicados) |
@@ -861,6 +877,7 @@ de la página es `orbitSvg` con `circle` y `channel: 'social'`.
 | `icons.stroke` | grilla 24, margen 2, guías (círculo 10, cuadrado 18, rectángulo 20 × 16), trazo 1,5 / 1,75 a ≤ 20 px / tope 4 px sobre 64, esfera 1,75, aire 0,5, respuesta desde 20 px, tamaños de QA |
 | `icons.plastilina` | grilla 48, área 560, radio 22,5, esfera 3,4, calado 4,5, gesto 2,8 (2–5 trazos), barras 2,6, mínimo 32 px, QA 160/64/32, `generation` (modelo, rejilla, colores, parámetros de vectorización y potrace) |
 | `icons.skewedOrbit` | −16°, alto 1/3, calado 12 px, anillo 22 % de 2,4 px, arco 3,8 px de 118° a 52°, esfera 8,3 (anillo 12,5), base 1080, objeto ≥ 320 px, una por pieza |
+| `icons.volume` (0.3.7, publicado en `v0.3.7`; D24) | `status: 'canonical'`, `line: 'brand'`, `state: 'response'`, `sizePx: 1024`, `minPx: 160`, `perPiece: 1`; `generation` { `model: 'gpt-image-2.5-sunburst'`, `quality: 'high'`, `referencePx: 760`, `background: '#001a33'` } (sin `inputFidelity`: la familia 2.5 no lo acepta; la fidelidad la da el prompt); `key` { `from: 28`, `to: 95`, `frameSamplePx: 24` } (distancia RGB al fondo); `qa` { `minIoU: 0.75`, `sameHoles: true`, `sameParts: true` } |
 
 | Función (`/icons`) | Qué hace |
 | --- | --- |
@@ -871,6 +888,10 @@ de la página es `orbitSvg` con `circle` y `channel: 'social'`.
 | `iconVoiceForLine`, `iconColors`, `strokeWidthFor`, `strokeSphereClearance`, `samplePath` | voz, colores, grosor óptico, aire de la esfera, muestreo de trazados |
 
 Comandos (raíz de AXIS): `pnpm icons:export -- --out <dir>`, `pnpm icons:check -- --glyph <json> --out <dir>`,
-`pnpm icons:vectorize -- --sheet <png> --names a,b,… --out <dir>`. Página `/references/iconography/`, datos
-`/references/iconography.json`.
+`pnpm icons:vectorize -- --sheet <png> --names a,b,… --out <dir>`, `pnpm icons:volume -- refs|key|check|publish`.
+Página `/references/iconography/` (volumen: `#volumen`), datos `/references/iconography.json` (bloque `volume`: assets
+con url, use, method, review, prompt). Los PNG del volumen están en `@efeoncepro/axis-brand-assets` (§6), no en
+`/icons`. Generación (en Greenhouse, necesita la llave): `pnpm ai:image --model gpt-image-2.5-sunburst --quality high
+--size 1024x1024 --image <ref.png> --prompt-file <volume-prompt.txt> --out <crudo.png>`; prompt canónico AXIS
+`docs/agent-composition/iconography/volume-prompt.txt`.
 

@@ -53,6 +53,33 @@
   **y** el ojo del operador junto al set aprobado. Si un glifo «pasa» pero se ve distinto, se descarta la variante, no
   se afloja la regla.
 
+## 2026-09-27 (Plastilina en volumen, D24)
+
+- **Extruir el vector en Blender da una «galleta».** Síntoma: el primer volumen salió plano, como una galleta cortada
+  con molde; el operador lo rechazó («no me gusta, al menos no así»). Causa: la extrusión sólo empuja el contorno; no
+  infla la masa. Regla: el volumen sale de un modelo de imagen **editando** el ícono plano aprobado (GPT Image 2.5
+  Sunburst, `pnpm icons:volume -- refs` como referencia), nunca de extruir el vector.
+- **El matting con IA rellena los calados.** Síntoma: `pnpm ai:image:rmbg` rellenó los huecos internos (3 966 px en el
+  bombillo) y dejó semitransparente la esfera suelta de la cámara. Causa: el matting decide figura por semántica, no por
+  color. Regla: con fondo liso conocido (`#001a33`), recorte por **color** (distancia al fondo + des-mezcla del borde,
+  `pnpm icons:volume -- key`); nunca matting con IA para el volumen.
+- **Figura y fondo se pueden invertir sin que el QA lo vea.** Síntoma: la primera pasada del laptop devolvió la pantalla
+  como marco hueco con barras en relieve (en el plano es una losa sólida con ranuras); la segunda dejó las ranuras
+  hundidas, no pasantes. Causa: la silueta normalizada no distingue qué es hueco y qué es relieve. Regla: el volumen se
+  mira al 100 % siempre; si un detalle falla, se agrega **una** línea al prompt que lo nombre (la que resolvió el
+  laptop: «la pantalla es una losa sólida; sus ranuras y cada tecla atraviesan la arcilla») y no se reescribe el prompt.
+- **Contar calados no detecta un disco perdido dentro de un anillo.** Síntoma: la cámara perdió el disco del lente y el
+  conteo de calados seguía igual (un agujero en ambos casos). Causa: el disco perdido no cambia la cantidad de huecos.
+  Regla: el QA cuenta también las **piezas sueltas** (3 → 2 lo detecta); ambas cuentas van en `check`.
+- **librsvg (sharp) recorta el gesto.** Síntoma: en la referencia faltaban los trazos del gesto que salen de la grilla
+  48. Causa: `overflow="visible"` no se respeta al rasterizar. Regla: la referencia se renderiza abriendo el viewBox al
+  lienzo, no confiando en el overflow.
+- **Un aviso del QA no es un rechazo.** Síntoma: 7 de 18 glifos salieron con avisos (laptop 0,44, escritorio 0,64,
+  teléfono 0,73 por perspectiva y grosor; pluma, tijeras y audífonos juntan piezas que se tocan; megáfono deja el anillo
+  de la esfera como hueco). Causa: el volumen cambia la silueta y fusiona piezas en contacto sin reinventar la forma.
+  Regla: se revisan al 100 % y se aceptan salvo forma reinventada, calado vuelto relieve o figura-fondo invertida; los
+  aceptados quedan anotados (AXIS guía §9 y [iconography.md](iconography.md) §12.6).
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos

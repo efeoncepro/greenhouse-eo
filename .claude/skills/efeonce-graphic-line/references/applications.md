@@ -1,7 +1,8 @@
 # Aplicaciones de «La órbita» — guía por pieza y por espacio
 
 Verificado contra: greenhouse-eo@7cb24df17 · axis-design-system@a5c21ae (íconos: AXIS `main@5b8ab20`, tag `v0.3.6`)
-— 2026-09-26 (decisiones del operador D1–D22 del 2026-09-26 registradas; ver `ledger.md`)
+— 2026-09-26 (decisiones del operador D1–D22 del 2026-09-26 registradas; ver `ledger.md`) · Plastilina en volumen
+(D24, §0.3 y A10): AXIS `main@c18e3d3` — 2026-09-27
 
 Esta guía dice, **para cada aplicación**, qué elementos de la línea van (y cuáles nunca), dónde se ubican, cuánto espacio
 ocupan, en qué superficie y color, y cómo se produce. No repite la API (ver `package-and-tokens.md`), el significado de
@@ -107,6 +108,11 @@ vale en toda aplicación:
   Un glifo que no está en `ICON_CATALOG` no se dibuja en la pieza: se da de alta en AXIS con la aprobación del operador.
 - **Excepción vigente:** la firma de correo personal y la de equipo siguen con íconos **Tabler** hasta que el operador
   decida (C1, C2).
+- **Plastilina en volumen (D24, 2026-09-27):** la tercera capa, para el objeto **protagonista** con cuerpo. **Sí:**
+  portada (de deck, informe o perfil), key visual, pieza social con un solo objeto, escenario (pantalla de evento,
+  stand), merch, el objeto en escena. **No:** contenido de deck (columnas, filas de servicios), listas, tablas,
+  navegación, dashboards, UI, firmas de correo; ahí van el plano o el Trazo. Uno por pieza, desde 160 px, nunca en un
+  grupo con el plano o el Trazo. Se usa el PNG aprobado (`volumeIconUrl(glyph)`), nunca se regenera. Tarjeta en A10.
 
 ---
 
@@ -245,6 +251,27 @@ vale en toda aplicación:
 - **Cómo se produce:** `skewedOrbitHeroSvg({ glyph, line, surface, width, height, object, gesture?, label? })` de
   `@efeoncepro/axis-graphic-line/icons`.
 - **Fuente:** guía de iconografía de AXIS §«La órbita sesgada»; T `icons.skewedOrbit`; decisión D20.
+
+### A10. Pieza con un objeto de Plastilina en volumen (D24)
+
+- **Para qué:** el momento en que el objeto es la pieza y conviene que tenga cuerpo: portada, key visual, pieza social
+  con un solo objeto, escenario, merch, el objeto en escena.
+- **Va:** **un** glifo de Plastilina en volumen (PNG con alfa, en respuesta, con el acento de Brand y el gesto donde
+  existe) sobre el fondo que pida la pieza; la voz y la firma según §0.
+- **Espacio:** desde 160 px; más chico, el plano.
+- **Nunca:** dos objetos en volumen en la pieza · el volumen en listas, tablas, navegación, contenido de deck,
+  dashboards o UI · en un grupo con Plastilina plana o con el Trazo · un objeto que no está en el set plano generado
+  directo en 3D · regenerar el objeto en la pieza · mezclarlo con las ilustraciones «Clay 3D» del equipo · piezas de
+  clientes o la UI del producto Greenhouse.
+- **Color y superficie:** el PNG va sobre cualquier fondo (alfa con los calados abiertos). No trae sombra de contacto:
+  si la pieza la necesita, se agrega al componer.
+- **Cómo se produce:** `volumeIconUrl(glyph)` de `@efeoncepro/axis-brand-assets` 0.3.2 (publicado con el tag
+  `v0.3.7`; Greenhouse ya fija esa versión, commit `f3f93c926`, 2026-09-27). El Lab `/references/iconography/#volumen` sigue sirviendo para
+  descargar el PNG a mano. Un glifo nuevo: primero al set plano, luego
+  `pnpm icons:volume` en AXIS (ver `iconography.md` §12).
+- **Errores comunes:** usarlo como ícono de fila «porque se ve mejor» · agrandar un volumen a partir del plano en la
+  pieza · un volumen bajo 160 px.
+- **Fuente:** guía de iconografía de AXIS §«Plastilina en volumen»; T `icons.volume`; decisión D24.
 
 ---
 
@@ -623,6 +650,7 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Avatar / favicon | ninguna (el isotipo ya es órbita) | isotipo al 60 % | archivo oficial |
 | Ad con CTA | ninguna por defecto; declarada si trabaja | tres voces + CTA + logo 20–25 % | `pnpm foto:componer:cta` |
 | Objeto de Plastilina protagonista | órbita sesgada (nunca mide) | objeto en reposo, voz en el tercio inferior, firma | `skewedOrbitHeroSvg` |
+| Objeto de Plastilina en volumen (portada, KV, social de un objeto, escenario, merch) | la que pida la pieza (combinación con la órbita sesgada, por decidir) | un objeto protagonista, desde 160 px, voz y firma | `volumeIconUrl(glyph)` |
 | Fila de íconos (deck, lámina, servicios) | ninguna propia | una voz, 48–56 px, responde uno solo o ninguno | `resolveIcon` + `auditIconGroup` |
 | Deck | progreso: arco por sección; 80 px en contenido; completa al cierre | voz, cifras reales, eslogan sólo al cierre | `deckSlideHtml` |
 | Portada de deck con foto | lente | foto + voz | `lensRecipe('deck-cover')` |
@@ -674,6 +702,8 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 7. Que la cocina no lleve logo en el muro (D3).
 8. La proporción del muro de recepción descrita como «algo más de la mitad del alto» es una medida de la lámina, no
    una regla de obra; la regla física es la órbita Ø 1,2 m con su centro a 1,5 m (§0.1).
+9. Si un objeto de Plastilina en volumen puede ir dentro de la órbita sesgada (A9 + A10): ninguna fuente lo dice; el
+   set viene en respuesta, y la órbita sesgada pide el objeto en reposo. No combinarlos hasta que el operador decida.
 
 ---
 

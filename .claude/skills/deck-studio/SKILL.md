@@ -73,6 +73,9 @@ marca de cliente ni a Greenhouse. Contrato: [manual](../../../docs/operations/br
   vende o la sección donde vamos) en el acento de la línea **del deck**, y ninguno si la lámina ya tiene esfera
   (órbita, título o voz con esfera). Cerrar con `auditIconGroup`. Criterio:
   [iconography.md](../efeonce-graphic-line/references/iconography.md); guía completa en AXIS `docs/agent-composition/iconography.md`.
+  **Plastilina en volumen** (D24, 2026-09-27; arcilla mate, PNG con alfa de AXIS vía `volumeIconUrl(glyph)`): sólo como
+  objeto protagonista de la **portada o el cierre**, uno por lámina, ≥ 160 px; **nunca** en láminas de contenido,
+  filas de íconos ni junto a plano o Trazo, y nunca regenerado.
 
 #### El deck como superficie: recetas `proposal-cinematic` y `method-staircase` (2026-09-27)
 

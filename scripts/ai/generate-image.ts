@@ -8,6 +8,7 @@ import { config as loadEnv } from 'dotenv'
 import sharp from 'sharp'
 
 import {
+  assertOpenAIImageInputFidelitySupported,
   assertOpenAIImageQualitySupported,
   assertOpenAIImageSizeSupported,
   editOpenAIImage,
@@ -17,8 +18,11 @@ import {
   isOpenAIImageBackground,
   isOpenAIImageFormat,
   isOpenAIImageModel,
+  isOpenAIImageInputFidelity,
   isOpenAIImageQuality,
+  openAIImageModelsWith,
   OPENAI_IMAGE_BACKGROUNDS,
+  OPENAI_IMAGE_INPUT_FIDELITIES,
   OPENAI_IMAGE_FORMATS,
   OPENAI_IMAGE_MODEL_IDS,
   OPENAI_IMAGE_QUALITIES,
@@ -129,7 +133,9 @@ const HELP = `Greenhouse AI image CLI — OpenAI GPT Image (2.5 family + gpt-ima
 Edit mode (--image):
   Edita la imagen de referencia en vez de generar desde cero (editOpenAIImage). Preserva
   identidad/estilo/logo de la referencia; el prompt cambia SOLO el delta. --image es repetible.
-  --input-fidelity low|high ajusta cuán estricta es la preservación (solo modelos ≠ gpt-image-2).
+  --input-fidelity low|high ajusta cuán estricta es la preservación. Sólo lo aceptan:
+  ${openAIImageModelsWith('inputFidelity').join(', ')}. Con otro modelo el CLI aborta antes de gastar;
+  en la familia 2.5 la preservación se pide en el prompt.
 
 Concept mode:
   --concept <loop>   Rutea a .captures/concepts/<loop>/ (gitignored, trazable, protegido
@@ -183,9 +189,17 @@ const parseArgs = (argv: string[]): CliArgs => {
         args.mask = next()
         break
 
-      case '--input-fidelity':
-        args.inputFidelity = next() as OpenAIImageInputFidelity
+      case '--input-fidelity': {
+        const value = next()
+
+        if (!isOpenAIImageInputFidelity(value)) {
+          throw new Error(`--input-fidelity "${value}" is not valid. Valid values: ${OPENAI_IMAGE_INPUT_FIDELITIES.join(' | ')}.`)
+        }
+
+        args.inputFidelity = value
         break
+      }
+
       case '--out':
         args.out = next()
         break
@@ -434,6 +448,14 @@ const main = async () => {
   // La combinación model × quality se valida acá y no por pieza: dentro del loop, un --count 5 repetiría
   // el mismo error cinco veces y ya habría creado directorios de salida.
   assertOpenAIImageQualitySupported({ model: args.model, quality: args.quality })
+
+  // Antes se descartaba en silencio con la familia 2.5: el pedido salía sin el parámetro y quien lo pidió creía
+  // que la fidelidad estaba aplicada. Ahora aborta antes de gastar.
+  if (args.inputFidelity && !args.image?.length) {
+    throw new Error('--input-fidelity sólo aplica en modo edición (--image).')
+  }
+
+  assertOpenAIImageInputFidelitySupported({ model: args.model, inputFidelity: args.inputFidelity })
 
   if (!sizeExplicito && args.image?.length) {
     const base = sharp(args.image[0])
