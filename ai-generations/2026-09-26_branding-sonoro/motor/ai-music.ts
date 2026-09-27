@@ -61,6 +61,24 @@ const GLITCH_STYLES: Record<string, string[]> = {
   ]
 }
 
+// Ronda 11b · la cama bajo la noticia, SIN maqueta (la maqueta sintetizada y el recorte de medios la volvieron arcade:
+// medios 13 % contra 45 % de la intro aprobada). Generada desde texto, instrumentos reales, cuerpo en los medios.
+const BED_STYLES: Record<string, { styles: string[]; text: string }> = {
+  'cama-postpunk': {
+    styles: ['instrumental post-punk groove, live band in a room', 'overdriven bass guitar riff with swagger, tight dry live drums, one scratchy muted electric guitar', 'cocky, irreverent, restrained, leaves space for a talking voice', 'A major, 150 BPM'],
+    text: '[Groove] {bass guitar and dry drums hold a cocky, steady groove; a muted guitar scratches on the off-beats; no melody, no build, same energy throughout}'
+  },
+  'cama-hiphop': {
+    styles: ['instrumental hip-hop beat for a news podcast, live-played', 'dusty punchy boom bap drums, warm electric bass guitar, muted Rhodes chords, subtle vinyl-free clean mix', 'confident, smart, a bit defiant, unobtrusive under a voice', 'A major, 75 BPM half-time'],
+    text: '[Beat] {laid-back head-nodding beat with bass and sparse Rhodes stabs; steady, no melody hook, no build, same energy throughout}'
+  },
+  'cama-tension': {
+    styles: ['modern newsroom underscore, organic and tense', 'muted palm-picked electric bass pulse in eighths, brushed snare and rim clicks, soft felt piano notes, subtle tape texture', 'expert, focused, slightly dark, unobtrusive under a voice', 'A major, 150 BPM'],
+    text: '[Underscore] {steady pulse under spoken narration; minimal, no melody hook, no build, same energy throughout}'
+  }
+}
+const BED_NEGATIVE = ['vocals', 'singing', 'chiptune', 'video game', '8-bit', 'synthwave', 'arcade', 'lead synth', 'EDM drop']
+
 // Tramos de la pieza larga (ms), alineados con la maqueta. El texto dirige; la referencia pone riff y energía.
 const PLANS: Record<string, Array<{ name: string; from: number; to: number; text: string; styles?: string[] }>> = {
   larga: [
@@ -82,6 +100,32 @@ const fetchTo = async (url: string, file: string) => {
 }
 
 const main = async () => {
+  if (route === 'el-bed' || route === 'sa-bed') {
+    const bed = BED_STYLES[piece]
+    const seconds = Number(opt('--seconds', '32'))
+
+    if (!bed) throw new Error(`cama desconocida: ${piece}`)
+    const res = route === 'el-bed'
+      ? await runFalModel<{ audio: { url: string } }>({
+          model: 'elevenlabs/music/v2.5',
+          pollTimeoutMs: 400000,
+          input: { composition_plan: { chunks: [{ text: bed.text, duration_ms: seconds * 1000, positive_styles: bed.styles, negative_styles: BED_NEGATIVE, context_adherence: 'high' }] }, seed: Number(opt('--seed', '7')), output_format: 'mp3_48000_192' }
+        })
+      : await runFalModel<{ audio: { url: string } }>({
+          model: 'fal-ai/stable-audio-25/text-to-audio',
+          pollTimeoutMs: 400000,
+          input: { prompt: [...bed.styles, 'no vocals, no chiptune, no video game sounds'].join(', '), seconds_total: seconds, num_inference_steps: 8, guidance_scale: 1, seed: Number(opt('--seed', '42')) }
+        })
+    const url = res.output?.audio?.url
+
+    if (!url) throw new Error(`sin audio: ${JSON.stringify(res).slice(0, 400)}`)
+    const file = join(outDir, `${piece}-${tag}.${url.split('.').pop()?.split('?')[0] ?? 'mp3'}`)
+
+    console.log(`${route}: ${file} (${await fetchTo(url, file)} bytes)`)
+
+    return
+  }
+
   const up = await uploadFalFile({ bytes: await readFile(input), fileName: basename(input), contentType: input.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg' })
 
   if (route === 'sa') {
