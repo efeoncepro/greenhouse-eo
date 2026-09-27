@@ -14,7 +14,7 @@ const W = 600
 const H = 400
 const NAVY = { r: 12, g: 30, b: 70 }
 
-const plateConEmblemaFalso = async dir => {
+const plateConEmblemaFalso = async (dir: string): Promise<string> => {
   const falso = Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><ellipse cx="300" cy="200" rx="46" ry="26" fill="none" stroke="#f2f2f2" stroke-width="6"/><circle cx="300" cy="200" r="8" fill="#f2f2f2"/></svg>`
   )
@@ -29,21 +29,24 @@ const plateConEmblemaFalso = async dir => {
   return file
 }
 
-const pixel = async (file, x, y) => {
+const pixel = async (file: string, x: number, y: number): Promise<number[]> => {
   const { data, info } = await sharp(file).raw().toBuffer({ resolveWithObject: true })
   const i = (y * info.width + x) * info.channels
 
   return [data[i], data[i + 1], data[i + 2]]
 }
 
-const cercaDe = (rgb, ref, tol = 18) => Math.abs(rgb[0] - ref.r) < tol && Math.abs(rgb[1] - ref.g) < tol && Math.abs(rgb[2] - ref.b) < tol
+const cercaDe = (rgb: number[], ref: { r: number; g: number; b: number }, tol = 18): boolean => Math.abs(rgb[0] - ref.r) < tol && Math.abs(rgb[1] - ref.g) < tol && Math.abs(rgb[2] - ref.b) < tol
 
 describe('foto:isotipo', () => {
   it('limpia el emblema inventado y compone el oficial con su procedencia', async () => {
     const dir = mkdtempSync(path.join(tmpdir(), 'isotipo-'))
     const plate = await plateConEmblemaFalso(dir)
 
-    const { out, procedencia } = await componerIsotipo({ plate, centro: [0.5, 0.5], ancho: 0.1 })
+    const { out, procedencia } = (await componerIsotipo({ plate, centro: [0.5, 0.5], ancho: 0.1 })) as {
+      out: string
+      procedencia: { sha256: string; archivo: string }
+    }
 
     // El borde izquierdo del óvalo falso (x=254) cae fuera del isotipo oficial de 60 px: vuelve a ser tela.
     expect(cercaDe(await pixel(out, 254, 200), NAVY)).toBe(true)

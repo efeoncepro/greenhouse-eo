@@ -11,7 +11,7 @@ import path from 'node:path'
 import { efeonceGraphicLine } from '@efeoncepro/axis-tokens'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { SlideSpec } from '../../artifact-composer/catalog'
+import type { SlideSpec } from '@/lib/artifact-composer/pure'
 import { makeSelectionHook } from '../../artifact-composer/catalogs/graphic-line-shared/selection-hook'
 import { planSurfacePiece, SurfacePieceError, type SurfaceIntent } from '../index'
 
