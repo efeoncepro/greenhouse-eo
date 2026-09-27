@@ -1,5 +1,5 @@
 {
-  "template": "SectionSplit",
+  "template": "SectionSplitPanelEnd",
   "version": "0.1",
   "viewport": {
     "width": 1920,
@@ -21,13 +21,13 @@
           "type": "string",
           "required": true,
           "resolver": "gl-split-layout",
-          "example": "corner-top"
+          "example": "panel-end"
         },
         "margin": {
           "type": "number",
           "required": true,
           "resolver": "gl-px-margin",
-          "example": 140
+          "example": 1100
         },
         "questionTop": {
           "type": "number",
@@ -39,13 +39,13 @@
           "type": "number",
           "required": true,
           "resolver": "gl-px-answerTop",
-          "example": 670
+          "example": 668
         },
         "answerPx": {
           "type": "number",
           "required": true,
           "resolver": "gl-px-answerPx",
-          "example": 120
+          "example": 132
         },
         "numberTop": {
           "type": "string",
@@ -93,7 +93,7 @@
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-photo-left=660px"
+          "example": "--gl-photo-left=0px"
         },
         "photoWidth": {
           "type": "string",
@@ -105,13 +105,13 @@
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-panel-left=0px"
+          "example": "--gl-panel-left=960px"
         },
         "columnWidth": {
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-column-width=820px"
+          "example": "--gl-column-width=1780px"
         }
       }
     },
@@ -144,7 +144,7 @@
           "required": true,
           "maxCharacters": 320,
           "resolver": "gl-alt",
-          "example": "Una mujer sentada a una mesa oscura mira hacia la ventana, con la mano sobre un cuaderno azul"
+          "example": "Una mujer sonríe mirando su teléfono de noche junto a una ventana"
         }
       }
     },
@@ -157,13 +157,13 @@
           "type": "string",
           "required": true,
           "maxCharacters": 2,
-          "example": "02"
+          "example": "04"
         },
         "label": {
           "type": "string",
           "required": true,
           "maxCharacters": 24,
-          "example": "Sección 2 de 5"
+          "example": "Sección 4 de 5"
         }
       }
     },
@@ -176,7 +176,7 @@
           "type": "string",
           "required": true,
           "maxCharacters": 34,
-          "example": "¿Quién decide el corte?"
+          "example": "¿Qué responde la IA?"
         },
         "answerLead": {
           "type": "string",
@@ -189,7 +189,7 @@
           "required": true,
           "maxCharacters": 12,
           "resolver": "gl-answer",
-          "example": "El dato"
+          "example": "Tu marca"
         }
       }
     }

@@ -422,24 +422,57 @@ export const sectionClassic: RecipeBuilder = ({ intent, manifest, recipe }) => {
 }
 
 /**
- * `section-split`: un panel de papel con UNA esquina curva grande arriba a la derecha y la foto que se extiende bajo
- * la curva. El indicador de sección (pieza `pieces.deck.content`, 80 px) nace abajo y sube por la derecha
- * (`progress.flipped`). Número, «Sección n de N», pregunta y respuesta sobre el papel, en sus reservas de AXIS.
+ * `section-split`: un panel de papel con UNA esquina curva grande y la foto que se extiende bajo la curva. El indicador
+ * de sección (pieza `pieces.deck.content`, 80 px) nace abajo a la izquierda y SUBE POR LA IZQUIERDA en sentido horario
+ * (corrección del operador, regla `split-indicator-rises-start`). Tres composiciones (`manifest.layout`): `corner-top`
+ * (la de siempre, también sin layout), `corner-bottom` y `panel-end` (panel a la derecha, foto espejada). Número,
+ * «Sección n de N», pregunta y respuesta sobre el papel, en sus reservas de AXIS.
  */
+type SplitTokens = {
+  panel: { side: 'start' | 'end'; share: number; cornerRadiusPx: number; corner: string }
+  photo: { fromOfWidth: number; widthOfWidth?: number; mirrored?: boolean }
+  progress: {
+    indicator: { cxOfWidth: number; cyOfHeight: number; rPx: number }
+    startFromTopDeg?: number
+    direction?: string
+    sweep?: { rule?: string }
+  }
+  type: { number: { px: number; weight?: number }; sectionLabel: { px: number }; question: { px: number }; answer: { px: number } }
+  layouts?: Record<string, Partial<Pick<SplitTokens, 'panel' | 'photo' | 'progress' | 'type'>>>
+}
+
+const SPLIT_CORNER_BY_LAYOUT: Record<string, string> = { 'corner-top': 'top-end', 'corner-bottom': 'bottom-end', 'panel-end': 'top-start' }
+
 export const sectionSplit: RecipeBuilder = ({ intent, manifest, recipe }) => {
   const progress = contentOf(manifest).progress
 
   if (!progress) throw new SurfacePieceError('`section-split` lleva `progress` (sección n de N).', 'invalid-intent')
 
-  const { width, height } = manifest.canvas
-  const margin = manifest.safeArea?.marginPx ?? 140
+  const base = recipe as unknown as SplitTokens
+  const layout = manifest.layout ?? 'corner-top'
+  const override = base.layouts?.[layout]
 
-  const tokens = recipe as {
-    panel: { share: number; cornerRadiusPx: number }
-    photo: { fromOfWidth: number }
-    progress: { indicator: { cxOfWidth: number; cyOfHeight: number; rPx: number }; sweepDeg: number; flipped: boolean }
-    type: { number: { px: number; weight?: number }; sectionLabel: { px: number }; question: { px: number }; answer: { px: number } }
+  if (!override) throw new SurfacePieceError(`\`section-split\` no tiene la composición «${layout}».`, 'recipe-without-template')
+
+  // La composición trae lo que cambia y hereda el resto de la receta (como `withLayout` de AXIS).
+  const tokens = {
+    panel: { ...base.panel, ...override.panel },
+    photo: { ...base.photo, ...override.photo },
+    progress: { ...base.progress, ...override.progress, indicator: { ...base.progress.indicator, ...override.progress?.indicator } },
+    type: { ...base.type, ...override.type }
   }
+
+  if (tokens.panel.corner !== SPLIT_CORNER_BY_LAYOUT[layout]) {
+    throw new SurfacePieceError(`La composición «${layout}» declara la esquina «${tokens.panel.corner}» y la plantilla pinta otra.`, 'recipe-without-template')
+  }
+
+  const startFromTop = tokens.progress.startFromTopDeg
+
+  if (typeof startFromTop !== 'number' || tokens.progress.direction !== 'clockwise' || tokens.progress.sweep?.rule !== 'sections-completed') {
+    throw new SurfacePieceError('El token de AXIS no declara el arco de la sección partida (inicio, sentido y barrido).', 'invalid-intent')
+  }
+
+  const { width, height } = manifest.canvas
 
   const indicator = {
     cx: ofWidth(manifest, tokens.progress.indicator.cxOfWidth),
@@ -453,29 +486,34 @@ export const sectionSplit: RecipeBuilder = ({ intent, manifest, recipe }) => {
   // El delegado apunta al indicador como objeto (`targetId: indicator`); su círculo es el que midió la receta.
   const resolved = resolveOrbit(canvas, element)
 
-  // El arco de la receta mide `sweepDeg` desde las 12 y, volteado en vertical, nace abajo y sube por la derecha.
-  applyPiece(resolved.elements[0]!, piece, { arc: { startDeg: -90, sweepDeg: tokens.progress.sweepDeg } })
+  // El arco nace donde dice el token (desde las 12, en sentido horario) y barre las secciones YA recorridas:
+  // (n − 1) / N de la vuelta, como las tres referencias aprobadas.
+  const sweepDeg = ((progress.current - 1) / progress.sections) * 360
 
-  let svg = paintGraphicLine(resolved as never, {
-    background: false,
-    idPrefix: 'gl-ss',
-    circles: { [String(element.id)]: indicator }
-  }).svg
+  applyPiece(resolved.elements[0]!, piece, { arc: { startDeg: -90 + startFromTop, sweepDeg } })
 
-  if (tokens.progress.flipped) {
-    svg = svg.replace(/(<svg[^>]*>)/, `$1<g transform="matrix(1 0 0 -1 0 ${2 * indicator.cy})">`).replace(/<\/svg>$/, '</g></svg>')
-  }
+  const layer = layerAsset(
+    `section-split-indicator-${layout}-${progress.current}-of-${progress.sections}-${intent.line}`,
+    paintGraphicLine(resolved as never, { background: false, idPrefix: 'gl-ss', circles: { [String(element.id)]: indicator } }).svg
+  )
 
-  const layer = layerAsset(`section-split-indicator-${progress.current}-of-${progress.sections}-${intent.line}`, svg)
-  const photoLeft = ofWidth(manifest, tokens.photo.fromOfWidth)
-  const photo = plateAsset(manifest, { width: width - photoLeft, height })
   const panelWidth = ofWidth(manifest, tokens.panel.share)
+  const panelLeft = tokens.panel.side === 'end' ? width - panelWidth : 0
+  const photoLeft = ofWidth(manifest, tokens.photo.fromOfWidth)
+  const photoWidth = tokens.photo.widthOfWidth ? ofWidth(manifest, tokens.photo.widthOfWidth) : width - photoLeft
+  const photo = plateAsset(manifest, { width: photoWidth, height })
   const voice = voiceSlots(manifest)
+
+  // La columna de la voz: su sangría es la de la reserva (el margen, o el interior del panel cuando va a la derecha).
+  const inset = (reserve(manifest, 'voice') as { inset?: number } | undefined)?.inset
+  const margin = typeof inset === 'number' ? ofWidth(manifest, inset) : (manifest.safeArea?.marginPx ?? 140)
+  const edge = manifest.safeArea?.marginPx ?? 140
 
   return {
     slots: {
       frame: {
         line: intent.line,
+        layout,
         margin,
         questionTop: ofHeight(manifest, reserve(manifest, 'voice')?.fromTop ?? 0.5556),
         answerTop: ofHeight(manifest, reserve(manifest, 'answer')?.fromTop ?? 0.6204),
@@ -488,8 +526,10 @@ export const sectionSplit: RecipeBuilder = ({ intent, manifest, recipe }) => {
         panelWidth: px('panel-width', panelWidth),
         panelRadius: px('panel-radius', tokens.panel.cornerRadiusPx),
         photoLeft: px('photo-left', photoLeft),
+        photoWidth: px('photo-width', photoWidth),
+        panelLeft: px('panel-left', panelLeft),
         // La voz vive en el papel: nunca cruza al borde del panel (mismo margen a ambos lados).
-        columnWidth: px('column-width', panelWidth - margin)
+        columnWidth: px('column-width', panelLeft + panelWidth - edge)
       },
       indicator: { src: layer.ref },
       photo: { src: photo.ref, alt: photo.alt },
@@ -499,7 +539,9 @@ export const sectionSplit: RecipeBuilder = ({ intent, manifest, recipe }) => {
       },
       voice: { question: voice.question, answer: voice.answer }
     },
-    assets: [layer.asset, photo.asset]
+    assets: [layer.asset, photo.asset],
+    // Las tres composiciones comparten plantilla; cada una tiene su contrato de slots (y su frame en el gate).
+    ...(layout === 'corner-top' ? {} : { contentType: `deck.section-split.${layout}` })
   }
 }
 

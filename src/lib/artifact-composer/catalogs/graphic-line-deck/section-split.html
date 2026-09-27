@@ -9,11 +9,14 @@
   </head>
   <body>
     <!--
-      Receta `section-split` (surface deck, papel section). Un panel de papel con UNA esquina curva grande arriba a
-      la derecha; la foto se extiende por debajo de la curva. El indicador de sección (80 px) nace abajo y sube por
-      la derecha. Número, «Sección n de N», pregunta y respuesta sobre el papel. Referencia: DeckSeccionMedia.
+      Receta `section-split` (surface deck, papel section). Un panel de papel con UNA esquina curva grande y la foto
+      que se extiende por debajo de la curva. Tres composiciones aprobadas (contrato 0.1.2, `manifest.layout`):
+      `corner-top` (panel a la izquierda, curva arriba a la derecha), `corner-bottom` (curva abajo a la derecha) y
+      `panel-end` (panel a la derecha, curva arriba a la izquierda, foto espejada a la izquierda). El indicador de
+      sección nace abajo a la izquierda y SUBE POR LA IZQUIERDA en sentido horario (corrección del operador, regla
+      `split-indicator-rises-start`); lo pinta AXIS. Número, «Sección n de N», pregunta y respuesta sobre el papel.
     -->
-    <main class="gl-slide gl-paper gl-ss gl-ring-small" data-gl-root data-slot="frame">
+    <main class="gl-slide gl-paper gl-ss gl-ss-corner-top gl-ring-small" data-gl-root data-slot="frame">
       <figure class="gl-split-photo" data-slot="photo">
         <img data-slot-field="src" alt="" />
       </figure>

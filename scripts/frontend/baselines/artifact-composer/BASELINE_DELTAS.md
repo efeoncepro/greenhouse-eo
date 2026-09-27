@@ -1,5 +1,22 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-27 (d) — TASK-1927: la sección partida sube por la izquierda y gana dos composiciones
+
+Corrección explícita del operador (canvas Deck, 2026-09-27; regla `split-indicator-rises-start` de AXIS): el indicador
+de la sección partida nace abajo a la izquierda (≈ las 8) y sube por la IZQUIERDA en sentido horario, con la esfera
+arriba a la izquierda en la 2 de 5. La versión que subía por la derecha queda rechazada. El arco sale del token
+(`progress.startFromTopDeg` −115, `sweep.rule: 'sections-completed'`, `axis-tokens` 0.3.13) y barre las secciones ya
+recorridas, como las tres referencias aprobadas; la pregunta «¿unificar a n / N?» sigue abierta en el token. La capa ya
+no se voltea.
+
+Las tres composiciones comparten `section-split.html`; cada una tiene su contrato de slots y su frame. Comparadas a
+ojo con el plate real contra `section-split`, `section-split-corner-bottom` y `section-split-panel-end`. El probe del
+gate usa una capa de órbita sintética (el arco real lo pinta AXIS al componer), así que `SectionSplit.png` **no
+cambia**: byte-idéntico al baseline.
+
+- `templates-graphic-line-deck/SectionSplitCornerBottom.png` — 🆕 deck.section-split.corner-bottom
+- `templates-graphic-line-deck/SectionSplitPanelEnd.png` — 🆕 deck.section-split.panel-end
+
 ## 2026-09-27 (c) — TASK-1927: el tríptico pasa a una palabra por toma, cada una con su esfera
 
 Decisión del operador (canvas Deck, 2026-09-27), ya en el token de AXIS: `triptych.voice.sphere: 'per-panel'`,
@@ -599,7 +616,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 4b4bddcbc3ab369ed42fe476a05d156b4df76d442499c14d369a38e336556d57 -->
+<!-- manifest-digest: a095c6bd26b00e8d7d03b7487b159be55ab37d30e1241da431f6daf33357816a -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

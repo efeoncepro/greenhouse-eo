@@ -9,6 +9,8 @@
     "deck.proposal-cinematic.lines",
     "deck.section-classic",
     "deck.section-split",
+    "deck.section-split.corner-bottom",
+    "deck.section-split.panel-end",
     "deck.content-measure",
     "deck.triptych",
     "deck.method-staircase"
@@ -70,6 +72,28 @@
       "slotsRef": "section-split.slots.json"
     },
     {
+      "name": "SectionSplitCornerBottom",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.section-split.corner-bottom"],
+      "prototype": "section-split.html",
+      "slotsRef": "section-split-corner-bottom.slots.json"
+    },
+    {
+      "name": "SectionSplitPanelEnd",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.section-split.panel-end"],
+      "prototype": "section-split.html",
+      "slotsRef": "section-split-panel-end.slots.json"
+    },
+    {
       "name": "ContentMeasure",
       "kind": "full-bleed",
       "source": "design",
@@ -110,6 +134,8 @@
       "deck.proposal-cinematic.lines": "ProposalCinematicLines",
       "deck.section-classic": "SectionClassic",
       "deck.section-split": "SectionSplit",
+      "deck.section-split.corner-bottom": "SectionSplitCornerBottom",
+      "deck.section-split.panel-end": "SectionSplitPanelEnd",
       "deck.content-measure": "ContentMeasure",
       "deck.triptych": "Triptych",
       "deck.method-staircase": "MethodStaircase"

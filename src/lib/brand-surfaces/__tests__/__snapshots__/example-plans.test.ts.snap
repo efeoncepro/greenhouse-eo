@@ -739,13 +739,81 @@ exports[`planes de los intents de ejemplo > deck-section-classic-intent.json com
 }
 `;
 
+exports[`planes de los intents de ejemplo > deck-section-split-corner-bottom-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:section-split-indicator-corner-bottom-3-of-5-growth",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="216" data-axis-value="0.6"><circle data-axis-part="ring" cx="180" cy="170" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="100.53" pathLength="1" d="M 143.75 186.9 A 40 40 0 0 1 199.39 135.02" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="199.39" cy="135.02" r="7.7" fill="#0e8c82"/></g></svg>",
+    },
+    {
+      "fit": {
+        "height": 1080,
+        "width": 1260,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-27_secciones-partidas/plates/SP2b-dias-no-meses-isotipo.png",
+      "ref": "asset-ref:plate:SP2b-dias-no-meses-isotipo",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.section-split.corner-bottom",
+  "plan": {
+    "artifactId": "deck-section-split-corner-bottom",
+    "slides": [
+      {
+        "contentType": "deck.section-split.corner-bottom",
+        "slideId": "deck-section-split",
+        "slots": {
+          "frame": {
+            "answerPx": 132,
+            "answerTop": 670,
+            "columnWidth": "--gl-column-width=820px",
+            "labelPx": "--gl-label-px=24px",
+            "labelTop": "--gl-label-top=450px",
+            "layout": "corner-bottom",
+            "line": "growth",
+            "margin": 140,
+            "numberPx": "--gl-number-px=190px",
+            "numberTop": "--gl-number-top=260px",
+            "numberWeight": "--gl-number-wght=300",
+            "panelLeft": "--gl-panel-left=0px",
+            "panelRadius": "--gl-panel-radius=300px",
+            "panelWidth": "--gl-panel-width=960px",
+            "photoLeft": "--gl-photo-left=660px",
+            "photoWidth": "--gl-photo-width=1260px",
+            "questionTop": 600,
+          },
+          "indicator": {
+            "src": "asset-ref:layer:section-split-indicator-corner-bottom-3-of-5-growth",
+          },
+          "photo": {
+            "alt": "Un creativo de Efeonce con polo cuelga pruebas impresas en una pared de referencias y mira hacia atrás sonriendo, con más láminas en la otra mano",
+            "src": "asset-ref:plate:SP2b-dias-no-meses-isotipo",
+          },
+          "progress": {
+            "label": "Sección 3 de 5",
+            "number": "03",
+          },
+          "voice": {
+            "answer": "En días",
+            "question": "¿Cuánto tarda tu campaña?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`planes de los intents de ejemplo > deck-section-split-intent.json compone el mismo plan 1`] = `
 {
   "assets": [
     {
       "kind": "svg",
-      "ref": "asset-ref:layer:section-split-indicator-2-of-5-growth",
-      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g transform="matrix(1 0 0 -1 0 340)"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="144" data-axis-value="0.4"><circle data-axis-part="ring" cx="180" cy="170" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="50.27" pathLength="1" d="M 180 130 A 40 40 0 0 1 218.04 157.64" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="218.04" cy="157.64" r="7.7" fill="#0e8c82"/></g></g></svg>",
+      "ref": "asset-ref:layer:section-split-indicator-corner-top-2-of-5-growth",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="144" data-axis-value="0.4"><circle data-axis-part="ring" cx="180" cy="170" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="50.27" pathLength="1" d="M 143.75 186.9 A 40 40 0 0 1 152.72 140.75" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="152.72" cy="140.75" r="7.7" fill="#0e8c82"/></g></svg>",
     },
     {
       "fit": {
@@ -772,18 +840,21 @@ exports[`planes de los intents de ejemplo > deck-section-split-intent.json compo
             "columnWidth": "--gl-column-width=820px",
             "labelPx": "--gl-label-px=24px",
             "labelTop": "--gl-label-top=450px",
+            "layout": "corner-top",
             "line": "growth",
             "margin": 140,
             "numberPx": "--gl-number-px=190px",
             "numberTop": "--gl-number-top=260px",
             "numberWeight": "--gl-number-wght=300",
+            "panelLeft": "--gl-panel-left=0px",
             "panelRadius": "--gl-panel-radius=300px",
             "panelWidth": "--gl-panel-width=960px",
             "photoLeft": "--gl-photo-left=660px",
+            "photoWidth": "--gl-photo-width=1260px",
             "questionTop": 600,
           },
           "indicator": {
-            "src": "asset-ref:layer:section-split-indicator-2-of-5-growth",
+            "src": "asset-ref:layer:section-split-indicator-corner-top-2-of-5-growth",
           },
           "photo": {
             "alt": "Una mujer sentada a una mesa oscura mira hacia la ventana, con la mano sobre un cuaderno azul",
@@ -796,6 +867,74 @@ exports[`planes de los intents de ejemplo > deck-section-split-intent.json compo
           "voice": {
             "answer": "El dato",
             "question": "¿Quién decide el corte?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-section-split-panel-end-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:section-split-indicator-panel-end-4-of-5-growth",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="288" data-axis-value="0.8"><circle data-axis-part="ring" cx="1140" cy="170" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="150.8" pathLength="1" d="M 1103.75 186.9 A 40 40 0 1 1 1179.27 177.63" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1179.27" cy="177.63" r="7.7" fill="#0e8c82"/></g></svg>",
+    },
+    {
+      "fit": {
+        "height": 1080,
+        "width": 1260,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-27_secciones-partidas/plates/SP1-la-ia-te-cita.png",
+      "ref": "asset-ref:plate:SP1-la-ia-te-cita",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.section-split.panel-end",
+  "plan": {
+    "artifactId": "deck-section-split-panel-end",
+    "slides": [
+      {
+        "contentType": "deck.section-split.panel-end",
+        "slideId": "deck-section-split",
+        "slots": {
+          "frame": {
+            "answerPx": 132,
+            "answerTop": 668,
+            "columnWidth": "--gl-column-width=1780px",
+            "labelPx": "--gl-label-px=24px",
+            "labelTop": "--gl-label-top=450px",
+            "layout": "panel-end",
+            "line": "growth",
+            "margin": 1100,
+            "numberPx": "--gl-number-px=190px",
+            "numberTop": "--gl-number-top=260px",
+            "numberWeight": "--gl-number-wght=300",
+            "panelLeft": "--gl-panel-left=960px",
+            "panelRadius": "--gl-panel-radius=300px",
+            "panelWidth": "--gl-panel-width=960px",
+            "photoLeft": "--gl-photo-left=0px",
+            "photoWidth": "--gl-photo-width=1260px",
+            "questionTop": 600,
+          },
+          "indicator": {
+            "src": "asset-ref:layer:section-split-indicator-panel-end-4-of-5-growth",
+          },
+          "photo": {
+            "alt": "Una mujer de pelo rizado sonríe mirando su teléfono de noche, junto a una ventana con la ciudad iluminada",
+            "src": "asset-ref:plate:SP1-la-ia-te-cita",
+          },
+          "progress": {
+            "label": "Sección 4 de 5",
+            "number": "04",
+          },
+          "voice": {
+            "answer": "Tu marca",
+            "question": "¿Qué responde la IA?",
           },
         },
       },

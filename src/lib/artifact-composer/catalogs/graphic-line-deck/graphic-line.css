@@ -353,6 +353,8 @@ body {
   --gl-panel-width: 960px;
   --gl-panel-radius: 300px;
   --gl-photo-left: 660px;
+  --gl-photo-width: 1260px;
+  --gl-panel-left: 0px;
   --gl-column-width: 820px;
   --gl-question-top: 600px;
   --gl-answer-top: 670px;
@@ -363,9 +365,14 @@ body {
   position: absolute;
   left: var(--gl-photo-left);
   top: 0;
-  right: 0;
+  width: var(--gl-photo-width);
   height: 100%;
   margin: 0;
+}
+
+/* `panel-end`: la foto va espejada para que la persona mire hacia el texto (`photo.mirrored` de AXIS). */
+.gl-ss-panel-end .gl-split-photo img {
+  transform: scaleX(-1);
 }
 
 .gl-ss .gl-split-photo img {
@@ -377,13 +384,25 @@ body {
 
 .gl-ss .gl-split-panel {
   position: absolute;
-  left: 0;
+  left: var(--gl-panel-left);
   top: 0;
   z-index: 1;
   width: var(--gl-panel-width);
   height: 100%;
   background: var(--gl-bg-paper);
+}
+
+/* UNA esquina curva, la que declara la composición (`panel.corner` de AXIS). */
+.gl-ss-corner-top .gl-split-panel {
   border-top-right-radius: var(--gl-panel-radius);
+}
+
+.gl-ss-corner-bottom .gl-split-panel {
+  border-bottom-right-radius: var(--gl-panel-radius);
+}
+
+.gl-ss-panel-end .gl-split-panel {
+  border-top-left-radius: var(--gl-panel-radius);
 }
 
 .gl-ss .gl-section-number {

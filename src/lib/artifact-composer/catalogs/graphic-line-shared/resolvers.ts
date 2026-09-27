@@ -121,6 +121,16 @@ export const graphicLineResolvers = (): ResolverRegistry => {
           : null
     },
 
+    // La composición de la sección partida (contrato 0.1.2): dónde va el panel de papel y cuál es su esquina curva.
+    // Es una decisión de AXIS (`manifest.layout`); la plantilla sólo sabe pintar las tres aprobadas.
+    'gl-split-layout': {
+      known: ['corner-top', 'corner-bottom', 'panel-end'],
+      build: value =>
+        ['corner-top', 'corner-bottom', 'panel-end'].includes(value)
+          ? [{ selector: ':self', toneClass: `gl-ss-${value}`, toneGroup: ['gl-ss-corner-top', 'gl-ss-corner-bottom', 'gl-ss-panel-end'] }]
+          : null
+    },
+
     // Texto alternativo de la foto: describe la escena, nunca transcribe el copy de la lámina.
     'gl-alt': {
       known: ['<descripción de la escena>'],

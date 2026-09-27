@@ -116,7 +116,7 @@ describe('recetas aprobadas del deck', () => {
     expectCode(() => planSurfacePiece({ ...example('triptych'), version: '0.1.0' }, { artifactId: 'prueba' }), 'missing-photo')
   })
 
-  it('section-split: reservas, panel e indicador volteado salen de la receta de AXIS', () => {
+  it('section-split: reservas, panel e indicador salen de la receta de AXIS', () => {
     const { piece, violations, slots } = plan(example('section-split'))
 
     expect(piece.contentType).toBe('deck.section-split')
@@ -136,8 +136,20 @@ describe('recetas aprobadas del deck', () => {
 
     const layer = piece.assets.find(a => a.kind === 'svg')
 
-    // El arco nace abajo y sube por la derecha: la capa va volteada en vertical sobre el centro del indicador.
-    expect(layer && 'svg' in layer ? layer.svg : '').toContain('matrix(1 0 0 -1 0 340)')
+    // El arco nace abajo a la izquierda (≈ las 8) y sube por la IZQUIERDA en sentido horario: en la 2 de 5 empieza a
+    // la izquierda y debajo del centro del indicador (180 · 170) y termina arriba a la izquierda, donde va la esfera.
+    const svg = layer && 'svg' in layer ? layer.svg : ''
+    const arc = /data-axis-part="arc"[^>]* d="M ([\d.]+) ([\d.]+) A 40 40 0 0 1 ([\d.]+) ([\d.]+)"/.exec(svg)
+
+    expect(arc).not.toBeNull()
+
+    const [startX, startY, endX, endY] = arc!.slice(1).map(Number) as [number, number, number, number]
+
+    expect(startX).toBeLessThan(180)
+    expect(startY).toBeGreaterThan(170)
+    expect(endX).toBeLessThan(180)
+    expect(endY).toBeLessThan(170)
+    expect(svg).not.toContain('matrix(')
   })
 
   it('section-split: sin foto falla cerrado', () => {
@@ -344,5 +356,59 @@ describe('deck · composiciones de proposal-cinematic', () => {
 
   it('`lines` fuera de su composición lo rechaza AXIS', () => {
     expectCode(() => plan({ ...service, version: '0.1.2', lines: ['brand'] }), 'surface-issues')
+  })
+})
+
+/**
+ * La sección partida corregida (TASK-1927, delta d): el indicador sube por la IZQUIERDA y la receta tiene tres
+ * composiciones. El arco sale del token de AXIS (`progress.startFromTopDeg`, `sweep.rule`).
+ */
+describe('deck · section-split por la izquierda y sus composiciones', () => {
+  const arcOf = (intent: SurfaceIntent): string => {
+    const asset = plan(intent).piece.assets.find(a => a.ref.startsWith('asset-ref:layer:section-split-indicator'))!
+
+    return (asset as { svg: string }).svg
+  }
+
+  it('sin layout compone `corner-top`, con su plantilla de siempre', () => {
+    const { template, violations, slots, piece } = plan(example('section-split'))
+
+    expect(template).toBe('SectionSplit')
+    expect(piece.contentType).toBe('deck.section-split')
+    expect(violations).toEqual([])
+    expect(slots.frame).toMatchObject({ layout: 'corner-top', margin: 140, panelLeft: '--gl-panel-left=0px', photoLeft: '--gl-photo-left=660px' })
+  })
+
+  it('el arco barre las secciones ya recorridas: crece con la sección y no existe en la primera', () => {
+    const intent = example('section-split')
+    const svg = (current: number) => arcOf({ ...intent, progress: { sections: 5, current } })
+
+    expect(svg(2)).not.toBe(svg(3))
+    expect(svg(3)).not.toBe(svg(4))
+    // El indicador ya no se voltea: el arco nace donde dice el token, sin transformaciones sobre el SVG.
+    expect(svg(2)).not.toContain('matrix(1 0 0 -1')
+  })
+
+  it('`corner-bottom` y `panel-end` componen desde su intent con su propio contrato', () => {
+    const bottom = plan(example('section-split-corner-bottom'))
+    const end = plan(example('section-split-panel-end'))
+
+    expect(bottom.template).toBe('SectionSplitCornerBottom')
+    expect(bottom.violations).toEqual([])
+    expect(bottom.slots.frame).toMatchObject({ layout: 'corner-bottom', answerPx: 132, margin: 140 })
+
+    expect(end.template).toBe('SectionSplitPanelEnd')
+    expect(end.violations).toEqual([])
+    expect(end.slots.frame).toMatchObject({
+      layout: 'panel-end',
+      margin: 1100,
+      panelLeft: '--gl-panel-left=960px',
+      photoLeft: '--gl-photo-left=0px',
+      photoWidth: '--gl-photo-width=1260px'
+    })
+  })
+
+  it('una composición desconocida la rechaza AXIS', () => {
+    expectCode(() => plan({ ...example('section-split'), version: '0.1.2', layout: 'panel-start' }), 'surface-issues')
   })
 })

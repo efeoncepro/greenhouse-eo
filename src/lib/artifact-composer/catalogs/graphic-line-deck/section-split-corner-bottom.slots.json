@@ -1,5 +1,5 @@
 {
-  "template": "SectionSplit",
+  "template": "SectionSplitCornerBottom",
   "version": "0.1",
   "viewport": {
     "width": 1920,
@@ -21,7 +21,7 @@
           "type": "string",
           "required": true,
           "resolver": "gl-split-layout",
-          "example": "corner-top"
+          "example": "corner-bottom"
         },
         "margin": {
           "type": "number",
@@ -45,7 +45,7 @@
           "type": "number",
           "required": true,
           "resolver": "gl-px-answerPx",
-          "example": 120
+          "example": 132
         },
         "numberTop": {
           "type": "string",
@@ -144,7 +144,7 @@
           "required": true,
           "maxCharacters": 320,
           "resolver": "gl-alt",
-          "example": "Una mujer sentada a una mesa oscura mira hacia la ventana, con la mano sobre un cuaderno azul"
+          "example": "Un creativo de Efeonce cuelga pruebas impresas en una pared de referencias"
         }
       }
     },
@@ -157,13 +157,13 @@
           "type": "string",
           "required": true,
           "maxCharacters": 2,
-          "example": "02"
+          "example": "03"
         },
         "label": {
           "type": "string",
           "required": true,
           "maxCharacters": 24,
-          "example": "Sección 2 de 5"
+          "example": "Sección 3 de 5"
         }
       }
     },
@@ -176,7 +176,7 @@
           "type": "string",
           "required": true,
           "maxCharacters": 34,
-          "example": "¿Quién decide el corte?"
+          "example": "¿Cuánto tarda tu campaña?"
         },
         "answerLead": {
           "type": "string",
@@ -189,7 +189,7 @@
           "required": true,
           "maxCharacters": 12,
           "resolver": "gl-answer",
-          "example": "El dato"
+          "example": "En días"
         }
       }
     }
