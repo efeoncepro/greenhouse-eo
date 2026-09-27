@@ -53,7 +53,7 @@ Medidas al producir la identidad sonora de Efeonce (`EFEONCE_OVERLAY.md` §Ident
 
 | Ruta | Modelo fal | Lo medido | Script |
 |---|---|---|---|
-| TTS | `fal-ai/elevenlabs/tts/eleven-v3` | input `voice` por nombre (Brian) | `voz.ts` |
+| TTS | `fal-ai/elevenlabs/tts/eleven-v3` | input `voice` por nombre (Brian = la de fábrica `nPczCjzI2devNBz1zQrb`; en el conector de ElevenLabs, siempre por ID: hay 25 «Brian») | `voz.ts` |
 | STT | `fal-ai/elevenlabs/speech-to-text` | devuelve `words` con `start`/`end`: sirve para caer la esfera sobre una palabra | `transcribir.ts` |
 | Música | `elevenlabs/music/v2.5` (sin prefijo `fal-ai`; USD 0,60/min) | acepta `composition_plan.chunks[].audio_reference` (`strength` low\|medium\|high\|xhigh, ventana ≤ 30 s, líneas ≤ 200 caracteres). Suena más producido pero **no respeta la estructura**: con high/xhigh se saltó el corte y el golpe final. **ElevenLabs Music v3 NO está en fal** | `ai-music.ts` |
 | Re-grabación | `fal-ai/stable-audio-25/audio-to-audio` (USD 0,20 por pieza) | **conserva el tiempo al milisegundo** (golpe 32,874 s vs 32,875 de la maqueta); **redondea la duración a segundos enteros** (8,5 → 8): maquetas de duración entera | `ai-music.ts` |

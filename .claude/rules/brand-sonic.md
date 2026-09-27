@@ -19,6 +19,7 @@ Reglas duras:
   `efeonceGraphicLine.motion.sound`, con el reemplazo del sonido de los masters V1.1 (hoy siguen con `orbit-sound.mjs`).
 - **NUNCA regenerar** el logo sonoro, la voz de Brian ni la esfera con un modelo: se usan los archivos del kit por URL y
   se verifica su `sha256`.
+- La voz es Brian **por ID** `nPczCjzI2devNBz1zQrb` (hay 25 «Brian» en ElevenLabs); en fal, `voice: "Brian"` ya es ésa.
 - La melodía **Mi · Mi · Mi → La** con su pausa no cambia; la línea de servicio cambia sólo el timbre de la esfera.
 - **Glitch (podcast) está pendiente** de decisión del operador: no se sonoriza con este kit ni se documenta como canon.
 - Nivelar por **sonoridad al destino** (−14 LUFS video/redes, −16 podcast, pico −1 dBFS), nunca por pico ni comprimiendo

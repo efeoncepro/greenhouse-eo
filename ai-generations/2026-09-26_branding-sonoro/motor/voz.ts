@@ -1,4 +1,5 @@
 // Etiqueta de voz del branding sonoro: «Empower your <Línea>.» con ElevenLabs v3 vía fal (cliente canónico).
+// En fal, `voice: "Brian"` es la de fábrica (ID nPczCjzI2devNBz1zQrb). Fuera de fal, pedirla siempre por ID: hay 25 «Brian».
 //   pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs ai-generations/2026-09-26_branding-sonoro/motor/voz.ts \
 //     --voices Brian,George,Sarah,Alice --text "Empower your Growth." --prefix growth
 import { writeFile } from 'node:fs/promises'

@@ -70,7 +70,13 @@ La línea de servicio cambia **sólo el timbre de la esfera**; melodía, pausa y
 
 ## Voz: la etiqueta
 
-- Voz: **Brian** (ElevenLabs v3). Las cinco tomas están aprobadas.
+- Voz: **Brian** (ElevenLabs v3), la voz de fábrica «Brian – Deep, Resonant and Comforting», ID de voz `nPczCjzI2devNBz1zQrb`. Las
+  cinco tomas están aprobadas.
+- **Se pide por ID, nunca por nombre.** La biblioteca de ElevenLabs tiene 25 voces llamadas «Brian» (2026-09-27); pedir
+  «Brian» en un buscador puede devolver otra. En fal, `voice: "Brian"` sí resuelve a esta, porque su lista de voces es la
+  de fábrica de ElevenLabs. Verificado el 2026-09-27: una toma con el ID en el conector de ElevenLabs midió 0,85 de
+  similitud de hablante contra la etiqueta aprobada de Growth (las otras cuatro etiquetas aprobadas, 0,73–0,83; George y
+  otras dos «Brian» de la biblioteca, 0,62–0,72). La confirmación de oído es del operador.
 - Texto: «Empower your <Línea>.», en inglés y nunca traducido.
 - La palabra final cae con la esfera.
 - La pausa entre «Empower» y «your» quedó igualada a 0,14 s en las cinco tomas, recortando sólo silencio (Brian la
@@ -137,7 +143,7 @@ Puntos de contacto por prioridad: video y redes → podcast Glitch → eventos.
 | Tonalidad | La mayor |
 | Fondo | 96 BPM · La · Re/La · Fa♯m7 · Mi sus4 · síntesis propia sin muestras |
 | Energía | 120 BPM · pausa de 375 ms (tres semicorcheas) · Stable Audio 2.5 audio-to-audio, intensidad 0,7 · esfera propia encima |
-| Voz | Brian, ElevenLabs v3 · «Empower your <Línea>.» · pausa «Empower»→«your» 0,14 s |
+| Voz | Brian, ElevenLabs v3, ID `nPczCjzI2devNBz1zQrb` · «Empower your <Línea>.» · pausa «Empower»→«your» 0,14 s |
 | Esfera en el motion | sting 0,58 s · reveal 1,87 s · apertura 1,15 s · reveal con voz 3,05–3,08 s · +1 s de cola |
 | Nivel de entrega | −14 LUFS video/redes · −16 LUFS podcast · pico −1 dBFS |
 | Excepción medida | los logos Brand, Voice y Revenue quedan cerca de −15 LUFS: el golpe toca el techo de pico y no se comprime |
@@ -199,8 +205,11 @@ contrato algo que todavía es recomendación.
 2. **Energía: maqueta → re-grabación → sello.** Se compone una maqueta propia (`rock.mjs`) con duración en segundos
    enteros, se re-graba con Stable Audio 2.5 audio-to-audio (intensidad 0,7) y se monta la esfera propia encima
    (`sello.mjs`). La estructura y el golpe final los fija la maqueta, no el modelo.
-3. **Voz vía fal.** TTS con `fal-ai/elevenlabs/tts/eleven-v3` (voz Brian por nombre); para caer con la esfera, STT con
-   `fal-ai/elevenlabs/speech-to-text`, que devuelve cada palabra con inicio y fin.
+3. **Voz vía fal o el conector de ElevenLabs.** TTS con `fal-ai/elevenlabs/tts/eleven-v3` (`voice: "Brian"`, que en fal
+   es la de fábrica) o, en el conector de ElevenLabs, con el ID `nPczCjzI2devNBz1zQrb` y el modelo `eleven_v3`; nunca por nombre fuera
+   de fal. Para caer con la esfera, STT con `fal-ai/elevenlabs/speech-to-text`, que devuelve cada palabra con inicio y
+   fin. Una frase nueva: tres tomas → pausa «Empower»→«your» a 0,14 s recortando sólo silencio → palabra final por STT →
+   esfera de la línea en ese instante → `master.sh` a −14 LUFS → el operador escucha y aprueba → bucket y JSON de AXIS.
 4. **QA sin oído.** El agente no escucha: verifica con espectrograma, medición de bandas y de LUFS, y transcripción. Lo
    perceptual lo decide el operador.
 5. **Nivelar por sonoridad, nunca por pico.** `master.sh <in> <out> <LUFS> [shelf]`, loudnorm en dos pasadas, al

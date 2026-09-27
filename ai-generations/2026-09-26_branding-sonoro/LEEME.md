@@ -97,6 +97,9 @@ En el cierre con voz, la esfera cae en la palabra final del eslogan.
 - Volumen: −13 a −15 LUFS integrados, pico −1 dBFS.
 - Voces: las cuatro dicen «Empower your growth» (transcripción); el golpe de la esfera cae en el inicio de «growth».
 - Reproductor (AXIS y las dos páginas privadas): el botón de pausa no respondía porque el script reemplazaba el `innerHTML` del botón en cada cuadro y el clic humano perdía su destino. Se arma el SVG una vez y sólo cambian atributos, con `pointer-events: none` en el SVG (AXIS PR #6). **Probar con un clic sostenido real, no con `el.click()`:** el `.click()` sintético pasaba y escondía el bug.
+- Brian es la voz de fábrica, ID `nPczCjzI2devNBz1zQrb` (hay 25 «Brian» en la biblioteca de ElevenLabs). Toma de prueba en el conector
+  de ElevenLabs (`voz/conector/`, USD 0,0044): 0,85 de similitud de hablante contra `growth-brian.mp3`; las demás
+  etiquetas aprobadas 0,73–0,83; George y otras dos «Brian» 0,62–0,72 (Resemblyzer). Falta la confirmación de oído.
 - **Sin verificar:** si suena propio, si se recuerda, si se siente Efeonce. Nadie de esta sesión escuchó el audio.
 
 ## Trampas

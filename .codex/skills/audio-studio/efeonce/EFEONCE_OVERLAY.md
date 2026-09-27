@@ -42,7 +42,7 @@ Nexa) o un cliente Globe. Para audio genérico basta `../modules/`.
   poner energía debajo de una locución; el fondo va ~15 dB bajo la voz.
 - **Acento por línea = timbre de la esfera:** Growth campana · Brand marimba · Engine FM · Voice eco · Revenue
   campana grave (Revenue HubSpot y Salesforce comparten). La melodía y su pausa no cambian nunca.
-- **Voz:** Brian (ElevenLabs v3), «Empower your <Línea>.», inglés nunca traducido; la palabra final cae con la
+- **Voz:** Brian (ElevenLabs v3, ID `nPczCjzI2devNBz1zQrb`, nunca por nombre fuera de fal), «Empower your <Línea>.», inglés nunca traducido; la palabra final cae con la
   esfera; pausa «Empower»→«your» igualada a 0,14 s. NUNCA otra voz para el eslogan.
 - **Reglas clave:** un solo golpe por pieza y sin comprimirlo; nivelar por destino (−14 LUFS video/redes,
   −16 podcast, pico −1 dBFS); usar los archivos del kit, no regenerar. NUNCA en clientes ni en la UI de
