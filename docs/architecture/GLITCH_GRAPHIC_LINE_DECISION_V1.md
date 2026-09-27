@@ -4,8 +4,9 @@
 > Efeonce ([ADR «La órbita»](./EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)) ni se aplica a ninguna otra pieza de Efeonce.
 >
 > **Tipo de documento:** ADR (decisión de marca y de composición)
-> **Estado:** **Accepted** (2026-09-27) para la existencia de la sub-línea, su alcance y las piezas aprobadas ·
-> **Proposed** (pendiente del operador) para el flujo de composición
+> **Estado:** **Accepted** (2026-09-27) para la existencia de la sub-línea, su alcance y las piezas aprobadas, más las
+> decisiones del [Delta 2026-09-27](#delta-2026-09-27--decisiones-del-operador) (manzana y verde, línea Growth,
+> numeración #17, glifos Plastilina) · **Proposed** (pendiente del operador) para el flujo de composición
 > **Creado:** 2026-09-27 por Claude, a pedido del operador (Julio Reyes)
 > **Última actualización:** 2026-09-27 por Claude
 > **Norma operativa:** [`GLITCH_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
@@ -50,9 +51,28 @@ sistema de portada y las láminas del carrusel el 2026-09-27.
    - **Contraportada** con «El micrófono se cierra», acciones Plastilina, CTA de suscripción y firma con eslogan.
    - Ajustes ya aplicados: cabecera sin línea fina; «El micrófono se abre…» fuera de la portada (abre la noticia 1);
      «Desliza» con la mano Plastilina en el pie de portada.
-6. **Lo que no está en el punto 5 no es canon**: la variante con lente, el blog, el vlog 16:9, el reel y las tarjetas
-   finales son propuesta; la manzana y el verde como token de franquicia, los acentos alternativos, la historia 9:16 y el
-   carrusel panorámico son exploración (norma §9).
+6. **Lo que no está en el punto 5 ni en el Delta 2026-09-27 no es canon**: la variante con lente, el blog, el vlog
+   16:9, el reel y las tarjetas finales son propuesta; los acentos alternativos, la historia 9:16 y el carrusel
+   panorámico son exploración (norma §9). La manzana y el verde dejaron de ser exploración: los aprobó el operador el
+   2026-09-27 (Delta abajo).
+
+## Delta 2026-09-27 — decisiones del operador
+
+Respuesta del operador (Julio Reyes) a las preguntas abiertas de esta decisión y de TASK-1922/1923/1924: «Si, aprueba
+la manzana, temas licencia de Gutery, glitch es línea growth, la próxima edición efectivamente es la 17, aprueba el
+alta de los 5 glifos, el nemonico hay que evaluarlo y aprobarlo, que lleva el lower third? Me gustaría definirlo junto
+contigo».
+
+| # | Tema | Decisión | Estado |
+|---|---|---|---|
+| 1 | La manzana como esfera de Glitch y el verde `#6ec207` como acento de franquicia | **aprobados** (el «Sí» responde a la pregunta que incluía ambos). Dejan de ser exploración; el token `glitchLine` de AXIS (TASK-1922) ya no está bloqueado por esta aprobación | **Accepted** |
+| 2 | Línea de servicio de Glitch | **Growth**. El eslogan de la contraportada queda «Empower your Growth» (ya estaba así) | **Accepted** |
+| 3 | Numeración de ediciones | la próxima edición es la **#17**. La serie sigue la del blog y la del [pipeline editorial](./GREENHOUSE_GLITCH_AGENTIC_EDITORIAL_PIPELINE_DECISION_V1.md); los «#11»–«#14» de las maquetas del canvas son ejemplos de diseño, no numeración real. El conflicto «#11 vs #16» queda resuelto | **Accepted** |
+| 4 | Alta de los 5 glifos Plastilina (guardar, compartir, recomendar, comentar, deslizar) | **aprobada**. El gate del slice de glifos de TASK-1922 queda liberado | **Accepted** |
+| 5 | Mnemónico en el video de Glitch | hay que **evaluarlo y aprobarlo**; se hará una evaluación dedicada. Nada se decide todavía | **pendiente** (evaluación dedicada) |
+| 6 | Contenido del lower third del reel y del vlog | se define **junto con el operador** (sesión en curso) | **en definición con el operador** |
+| 7 | Licencia de Guttery | el operador aclaró después: «En gutery tenemos licencia» (2026-09-27) | **confirmada**; falta registrar la referencia del contrato |
+| 8 | Paso del flujo de composición de `Proposed` a `Accepted` | sin respuesta | **pendiente** |
 
 ## Decisión propuesta — flujo de composición
 
@@ -122,12 +142,12 @@ Se revisó el motor (`src/lib/artifact-composer/catalog.ts`, `compose.ts`, `cont
 
 | # | Trabajo | Depende de |
 |---|---|---|
-| a | **TASK-1922** — Tokens, assets y contrato de Glitch en AXIS (incluye e y f) | aprobación de la manzana y el verde como token de franquicia |
+| a | **TASK-1922** — Tokens, assets y contrato de Glitch en AXIS (incluye e y f) | — (la manzana y el verde se aprobaron el 2026-09-27) |
 | b | **TASK-1923** — Catálogos `glitch-carousel` (PDF), `glitch-stills` y `glitch-overlays` (PNG) sobre un mismo `templatesDir`, extensión `glitch` del brand pack, selector de rotación y validadores | (a) |
 | c | **TASK-1924** — Overlays HyperFrames + render con alfa | (a); aprobación del kit de overlays del reel |
 | d | Callout v2 en el bloque de WordPress `efeoncepro/glitch-drop` | aprobación del callout v2 |
-| e | Alta de los 5 glifos Plastilina en AXIS | aprobación del operador |
-| f | Licencia de Guttery | — |
+| e | Alta de los 5 glifos Plastilina en AXIS | — (aprobada el 2026-09-27) |
+| f | Licencia de Guttery | confirmada por el operador (2026-09-27); falta registrar la referencia del contrato de licencia |
 
 ## Alternativas descartadas
 
@@ -149,24 +169,28 @@ Se revisó el motor (`src/lib/artifact-composer/catalog.ts`, `compose.ts`, `cont
 - Hasta que existan los tokens `glitchLine`, los valores de referencia viven en la norma y en el JSON publicado de AXIS
   (`/references/glitch.json`); al publicarse, mandan los tokens y la norma deja de guardar números.
 - El callout v2, si se aprueba, obliga a cambiar el bloque de WordPress `efeoncepro/glitch-drop` desplegado por TASK-1337.
-- La numeración de ediciones que usa esta línea (la próxima es la #11) no coincide con la del ADR del pipeline editorial
-  (#16 en adelante); hay que reconciliarlas.
+- La numeración de ediciones quedó resuelta el 2026-09-27: la próxima es la **#17** y la serie sigue la del blog y del
+  ADR del pipeline editorial. Los «#11»–«#14» de las maquetas del canvas son ejemplos de diseño.
 - Si se acepta el flujo propuesto, los catálogos de Glitch serían los primeros de una franquicia editorial en el
   Composer, y Guttery entraría como extensión `glitch` del brand pack `axis` (hoy el único pack).
-- La pieza sonora de Glitch sigue pendiente en la identidad sonora; el mnemónico del video depende de esa decisión.
+- La pieza sonora de Glitch sigue pendiente en la identidad sonora; el mnemónico del video hay que evaluarlo y
+  aprobarlo en una evaluación dedicada (Delta 2026-09-27, punto 5).
 
 ## Pendiente
 
-- La manzana como esfera y el verde como acento → token de franquicia en AXIS.
-- Línea de servicio de Glitch: Growth (recomendada) o Brand (alternativa).
+Resueltos el 2026-09-27 (ver Delta): la manzana y el verde, la línea Growth, la numeración (#17) y el alta de los 5
+glifos Plastilina. Siguen pendientes:
+
 - Aprobación de la lente, el blog (banners + maqueta + callout v2), el vlog 16:9, el reel (kit de overlays) y las
   tarjetas finales.
-- Alta de los 5 glifos Plastilina; licencia de Guttery.
-- Pasar el flujo de composición a `Accepted` y crear sus tasks.
+- Mnemónico del video: evaluarlo y aprobarlo (evaluación dedicada).
+- Contenido del lower third: en definición con el operador.
+- Licencia de Guttery: confirmada por el operador (2026-09-27); falta registrar la referencia del contrato.
+- Pasar el flujo de composición a `Accepted` (sus tasks ya existen: TASK-1922, TASK-1923, TASK-1924).
 
 ## Reversibilidad
 
-Alta. La sub-línea es documentación y piezas; nada del runtime de Greenhouse depende de ella y AXIS no tiene nada
-publicado. Revertir la decisión aceptada es retirar la norma y volver a componer Glitch con La órbita. El flujo propuesto
+Alta. La sub-línea es documentación y piezas; nada del runtime de Greenhouse depende de ella y en AXIS sólo está
+publicada la página de referencia (sin tokens ni contrato). Revertir la decisión aceptada es retirar la norma y volver a componer Glitch con La órbita. El flujo propuesto
 no existe todavía; su costo de revertir crece cuando se publiquen tokens y contrato en AXIS y el catálogo entre al
 Composer.

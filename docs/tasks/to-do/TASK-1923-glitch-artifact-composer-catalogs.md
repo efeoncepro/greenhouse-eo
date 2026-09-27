@@ -1,5 +1,23 @@
 # TASK-1923 — Glitch en el Artifact Composer
 
+## Delta 2026-09-27
+
+- **Guttery:** el operador confirmó la licencia para web y video (2026-09-27, segunda respuesta). La Open Question de Guttery queda resuelta; la task registra la referencia del contrato de licencia y sella la fuente.
+
+Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del ADR de Glitch](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--decisiones-del-operador):
+
+- **Numeración resuelta** (Open Question 1): la próxima edición es la **#17**; la serie sigue la del blog y del
+  pipeline editorial (TASK-1441/1442). Los «#11»–«#14» de las maquetas del canvas son ejemplos de diseño. El ejemplo
+  del manifiesto pasa a `edition-17.example.json` (edición #17, anterior #16).
+- **Glitch es línea de servicio Growth** (Open Question 8 resuelta): el eslogan de la contraportada queda «Empower your
+  Growth».
+- **Aprobados la manzana como esfera y el verde `#6ec207` como acento de franquicia**, y el **alta de los 5 glifos
+  Plastilina**: TASK-1922 ya no espera esas aprobaciones (sigue bloqueando esta task hasta publicar el token, los
+  archivos y el contrato).
+- **Siguen abiertas:** el paso del flujo de composición a `Accepted` (Open Question 7: sin respuesta). El mnemónico queda
+  pendiente de evaluación dedicada y el contenido del lower third en definición con el operador (ambos afectan a
+  TASK-1924, no a esta task).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -35,7 +53,7 @@
 > comparten tres consumidores (este CLI, las composiciones de movimiento de TASK-1924 y la ruta productiva futura) y que
 > mañana producirá el dominio de ediciones de TASK-1442. `UI impact: none`: las piezas son artefactos de marca
 > (PDF/PNG), no pantallas del portal; el Lab de AXIS tampoco es UI de Greenhouse. Prioridad P1 inferida porque la
-> próxima edición (#11) se sigue armando a mano desde el canvas.
+> próxima edición (#17) se sigue armando a mano desde el canvas.
 
 ## Summary
 
@@ -254,7 +272,7 @@ Reglas obligatorias:
   `ComposeOptions.externalAssets` (`compose.ts`), selector y `TemplateAuthorityError`, `CatalogSemanticValidator`.
 - Contrato nuevo:
   - `GlitchEditionManifest` (`schemaVersion: 1`) con schema zod en `src/lib/glitch-composition/manifest.ts` y ejemplo
-    `src/lib/glitch-composition/examples/edition-11.example.json`.
+    `src/lib/glitch-composition/examples/edition-17.example.json`.
   - `planGlitchEdition(manifest, options) → { carousel: CompositionPlanInput; stills: CompositionPlanInput; overlays: CompositionPlanInput; assets: GlitchAssetRequest[] }`
     y `GlitchPieceError` con códigos estables (`manifest-invalid`, `piece-not-approved`, `cover-rotation-unsatisfiable`,
     `font-license-missing`, `photo-license-missing`, `fracture-over-face`).
@@ -311,7 +329,7 @@ Reglas obligatorias:
 - Local checks: tests focales de `src/lib/glitch-composition` y del catálogo; `pnpm composer:visual-gate`;
   `pnpm local:check`; `pnpm test` completo al cerrar.
 - DB/runtime checks: sin base de datos.
-- Integration checks: `pnpm glitch:compose` sobre `edition-11.example.json` produce PDF de 10 páginas, PNG y
+- Integration checks: `pnpm glitch:compose` sobre `edition-17.example.json` produce PDF de 10 páginas, PNG y
   procedencia; `pnpm glitch:tokens --check` sin drift contra la versión instalada de AXIS.
 - Reliability signals/logs: sin señal; el gate visual y los tests son la vigilancia.
 - Production verification sequence: sin producción en esta task; vive en la ruta productiva.
@@ -344,7 +362,7 @@ Reglas obligatorias:
 
 - `src/lib/glitch-composition/manifest.ts`: tipo `GlitchEditionManifest` + schema zod (`schemaVersion: 1`), con la
   forma de «Detailed Spec · Manifiesto de edición».
-- `src/lib/glitch-composition/examples/edition-11.example.json`: edición #11 con **titulares y noticias de ejemplo**
+- `src/lib/glitch-composition/examples/edition-17.example.json`: edición #17 con **titulares y noticias de ejemplo**
   (marcados así en el JSON, `"example": true`) y fotos sintéticas propias generadas por un script de fixtures (nada
   descargado de terceros).
 - `src/lib/glitch-composition/types.ts`: `GlitchPieceError` y sus códigos.
@@ -502,9 +520,9 @@ Reglas obligatorias:
 ```jsonc
 {
   "schemaVersion": 1,
-  "edition": { "number": 11, "publishDate": "2026-10-05", "weekRange": { "from": "2026-09-28", "to": "2026-10-04" } },
+  "edition": { "number": 17, "publishDate": "2026-10-05", "weekRange": { "from": "2026-09-28", "to": "2026-10-04" } },
   "thesis": "…",                                   // tesis de la edición (apertura y blog)
-  "previousEdition": { "number": 10, "coverTemplate": "A" },   // "A" | "B" | "C" | "none" (explícito)
+  "previousEdition": { "number": 16, "coverTemplate": "A" },   // "A" | "B" | "C" | "none" (explícito)
   "cover": {
     "newsId": "n1",                                // noticia de portada
     "standalonePov": { "entry": "…", "punch": "…" } | null,   // candidata B
@@ -538,7 +556,8 @@ Reglas obligatorias:
 - `strict`: campos desconocidos se rechazan (así un `template` no se cuela).
 - Los largos máximos no viven en el schema sino en los `*.slots.json` (única fuente: el contrato de la plantilla); el
   mapper no recorta nada.
-- La numeración es dato: el composer no decide si la próxima es #11 o #16.
+- La numeración es dato: el composer no decide la serie (el operador fijó el 2026-09-27 que la próxima es la #17, en la
+  serie del blog y del pipeline editorial).
 
 ### Pertenencia y aprobación (un `templatesDir`, tres catálogos)
 
@@ -641,7 +660,7 @@ Sin producción en esta task (repo-only, no production runtime impact). Verifica
 
 1. Tests focales de `src/lib/glitch-composition` y de `catalogs/glitch/` (schema, rotación, validadores, geometría).
 2. `pnpm glitch:tokens --check` sin drift.
-3. `pnpm glitch:compose -- --manifest src/lib/glitch-composition/examples/edition-11.example.json`: PDF de 10 páginas a
+3. `pnpm glitch:compose -- --manifest src/lib/glitch-composition/examples/edition-17.example.json`: PDF de 10 páginas a
    1080 × 1350, PNG y procedencia.
 4. Dos corridas seguidas del paso 3 en procesos separados: PNG idénticos byte a byte.
 5. Casos de falla del CLI: portada repetida, pieza en propuesta, foto sin licencia, rostro en la banda.
@@ -667,9 +686,9 @@ Sin producción en esta task (repo-only, no production runtime impact). Verifica
 ## Acceptance Criteria
 
 - [ ] El ADR de Glitch tiene el flujo de composición en `Accepted` antes del primer commit de código.
-- [ ] `GlitchEditionManifest` (`schemaVersion: 1`) valida `edition-11.example.json` y rechaza, con la ruta del campo,
+- [ ] `GlitchEditionManifest` (`schemaVersion: 1`) valida `edition-17.example.json` y rechaza, con la ruta del campo,
       un manifiesto sin crédito, sin licencia, sin `faceRegions`, con menos de ocho noticias o con un campo `template`.
-- [ ] `edition-11.example.json` usa titulares de ejemplo marcados como tales y fotos sintéticas propias; ningún archivo
+- [ ] `edition-17.example.json` usa titulares de ejemplo marcados como tales y fotos sintéticas propias; ningún archivo
       de terceros entra al repo.
 - [ ] Los tres catálogos (`glitch-carousel` `pdf-merged`, `glitch-stills` `png-set`, `glitch-overlays` `png-set`)
       comparten un mismo `templatesDir` y ningún archivo del motor cambia (`git diff` vacío en
@@ -706,7 +725,7 @@ Sin producción en esta task (repo-only, no production runtime impact). Verifica
 - `pnpm test` (completo al cerrar) y tests focales de `src/lib/glitch-composition` y `src/lib/artifact-composer`
 - `pnpm composer:visual-gate --catalog=glitch` y el gate global
 - `pnpm glitch:tokens --check`
-- `pnpm glitch:compose -- --manifest src/lib/glitch-composition/examples/edition-11.example.json`
+- `pnpm glitch:compose -- --manifest src/lib/glitch-composition/examples/edition-17.example.json`
 - `pnpm skills:mirrors`
 - `pnpm build` (gate de cierre)
 
@@ -736,11 +755,11 @@ Sin producción en esta task (repo-only, no production runtime impact). Verifica
 
 ## Open Questions
 
-1. **Numeración: #11 o #16.** El operador dice que la próxima edición es la #11; el ADR del pipeline editorial y
-   TASK-1441/1442 usan #16 en adelante. El composer toma el número como dato, pero el ejemplo y la futura fuente
-   (TASK-1442, «edición numerada única») tienen que decir lo mismo.
-2. **Licencia de Guttery** para web y video. Sin licencia escrita no entra al pack y la portada B no se compone (la
-   rotación sigue con A y C). ¿Se confirma, o se define una alternativa licenciada para las muletillas?
+1. ~~**Numeración: #11 o #16.** El operador dice que la próxima edición es la #11; el ADR del pipeline editorial y
+   TASK-1441/1442 usan #16 en adelante.~~ **Resuelta el 2026-09-27:** la próxima es la **#17**, en la serie del blog y
+   del pipeline editorial; los «#11»–«#14» del canvas son ejemplos de diseño. El ejemplo es `edition-17.example.json`.
+2. **Licencia de Guttery (resuelta 2026-09-27):** el operador confirmó la licencia para web y video. Guttery entra a la
+   extensión `glitch` del pack con `embedRights: true` y la referencia del contrato que registra TASK-1922.
 3. **Aprobación de las piezas en PROPUESTA** (interior con lente, banners del blog 16:9 y 1:1, banner interno, portada
    del reel, miniatura, overlays del reel). Se construyen cerradas; cada aprobación las abre y las lleva a línea base.
 4. **Límite de LinkedIn para documentos** (peso y páginas del PDF) `[verificar]` en la documentación vigente de
@@ -749,6 +768,8 @@ Sin producción en esta task (repo-only, no production runtime impact). Verifica
    la norma §4.2). ¿Es correcta?
 6. **Licencias admitidas para fotos de noticias**: ¿el kit de prensa de la fuente cuenta como licencia suficiente, o
    sólo `licensed`/`owned`/`generated`?
-7. **Flujo de composición `Proposed`**: el ADR debe pasar a `Accepted` antes de tomar la task.
-8. **Línea de servicio de Glitch** (Growth recomendada, Brand alternativa): define la última palabra del eslogan de la
-   contraportada; hasta decidir, el eslogan sale del token tal como lo publique TASK-1922.
+7. **Flujo de composición `Proposed` (abierta):** el ADR debe pasar a `Accepted` antes de tomar la task; sin respuesta
+   del operador al 2026-09-27.
+8. ~~**Línea de servicio de Glitch** (Growth recomendada, Brand alternativa): define la última palabra del eslogan de la
+   contraportada.~~ **Resuelta el 2026-09-27:** Growth; el eslogan es «Empower your Growth» y sale del token que
+   publique TASK-1922.

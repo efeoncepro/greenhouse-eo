@@ -1,5 +1,25 @@
 # TASK-1922 — Glitch en AXIS: token de franquicia, archivos oficiales y contrato
 
+## Delta 2026-09-27
+
+- **Guttery:** el operador confirmó la licencia para web y video (2026-09-27, segunda respuesta). La Open Question de Guttery queda resuelta; la task registra la referencia del contrato de licencia y sella la fuente.
+
+Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del ADR de Glitch](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--decisiones-del-operador):
+
+- **Aprobados la manzana como esfera de Glitch y el verde `#6ec207` como acento de franquicia** (Open Question 1
+  resuelta). El token `glitchLine` ya no está bloqueado por esa aprobación; publicar (Slice 7) sigue exigiendo la
+  autorización explícita del operador del push a `main` de AXIS y del tag.
+- **Glitch es línea de servicio Growth** (Open Question 2 resuelta): el eslogan de la contraportada queda «Empower your
+  Growth», como ya estaba.
+- **Aprobado el alta de los 5 glifos Plastilina** (guardar, compartir, recomendar, comentar, deslizar) en
+  `PLASTILINA_GLYPHS` (Open Question 3 resuelta en su parte principal): el gate del Slice 3 queda liberado. Si llevan
+  versión en volumen sigue sin respuesta.
+- **Numeración resuelta:** la próxima edición es la **#17** y la serie sigue la del blog y del pipeline editorial; los
+  «#11»–«#14» del canvas son ejemplos de diseño. Deja de ser un conflicto fuera de alcance.
+- **Siguen abiertas:** el mnemónico (Open Question 4: el operador pide evaluarlo y aprobarlo en una evaluación
+  dedicada; mientras tanto el motion se publica sin punto de sincronía), y el paso del flujo de composición a `Accepted` (Open Question
+  6: sin respuesta). El contenido del lower third (TASK-1924) está en definición con el operador.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -24,7 +44,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `creative|brand|platform`
-- Blocked by: `aprobación del operador de la manzana como esfera y el verde como acento de franquicia (Open Question 1) para PUBLICAR; los slices locales en AXIS pueden avanzar antes, sin push`
+- Blocked by: `autorización explícita del operador del push a main de AXIS y del tag para PUBLICAR (Slice 7); la manzana y el verde quedaron aprobados el 2026-09-27; los slices locales en AXIS pueden avanzar sin push`
 - Branch: `Greenhouse develop; AXIS main (commits locales; push a main sólo con CI verde y autorización explícita del operador); sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -102,7 +122,8 @@ Reglas obligatorias:
   norma §9): el resolver falla cerrado ante una pieza no aprobada, igual que `recipe-not-approved` en
   `efeonce.surface-composition`. Esta task **no cambia** ningún estado de aprobación.
 - **Nunca** publicar el token ni el contrato sin la aprobación explícita del operador de la manzana como esfera y el
-  verde como acento (Open Question 1). Hasta entonces, `glitchLine.status` no pasa de `candidate`.
+  verde como acento (Open Question 1; **otorgada el 2026-09-27**, ver Delta) y sin su autorización del push y del tag.
+  Hasta publicar, `glitchLine.status` no pasa de `candidate`.
 - **Cross-repo**: la regla de push de AXIS es parte del contrato de esta task (ver `Out-of-band coordination`).
 
 ## Normative Docs
@@ -122,9 +143,11 @@ Reglas obligatorias:
 
 ### Depends on
 
-- Aprobación del operador de la manzana como esfera y el verde como acento de franquicia (gate de publicación).
-- Aprobación del operador del alta de los 5 glifos Plastilina (gate del Slice 3).
-- Licencia de Guttery para web y video (gate del Slice 4; sin ella, el slice queda bloqueado con fallback documentado).
+- Aprobación del operador de la manzana como esfera y el verde como acento de franquicia (gate de publicación):
+  **otorgada el 2026-09-27**.
+- Aprobación del operador del alta de los 5 glifos Plastilina (gate del Slice 3): **otorgada el 2026-09-27**.
+- Licencia de Guttery para web y video (gate del Slice 4; sin ella, el slice queda bloqueado con fallback documentado):
+  **por confirmar con el operador (2026-09-27)**.
 - AXIS en `main` `cf77452` (v0.6.0: `axis-tokens` 0.3.8, `axis-ui-contracts` 0.3.7, `axis-brand-assets` 0.3.4,
   `axis-graphic-line` 0.6.0, `axis-ui-registry` 0.3.1), las mismas versiones que fija Greenhouse hoy en `package.json`.
 - `efeonceGraphicLine` (`packages/tokens/src/tokens.ts`, incluido `motion`, `lens` e `icons.volume`) y el patrón de
@@ -387,7 +410,7 @@ Todos los slices 1–7 se commitean en AXIS `main` **localmente**; nada se empuj
 - Pruebas: cada zona cabe en su lienzo; las zonas de interfaz y de texto del reel no se solapan; ninguna duración de
   motion es literal fuera del token.
 
-### Slice 3 — Archivos oficiales: wordmark, manzana y 5 glifos Plastilina (gate: aprobación de los glifos)
+### Slice 3 — Archivos oficiales: wordmark, manzana y 5 glifos Plastilina (gate: aprobación de los glifos, liberado el 2026-09-27)
 
 - Wordmark de Glitch claro y oscuro en `packages/brand-assets/assets/` desde `public/branding/glitch/glitch-{light,dark}.svg`
   de Greenhouse `[verificar]` cuál es cuál y la convención de nombre (`glitch-logo-positive|negative` como
@@ -439,7 +462,7 @@ Todos los slices 1–7 se commitean en AXIS `main` **localmente**; nada se empuj
 - `glitch.test.ts`: los valores vienen del token (no hay HEX literal de Glitch en `data/glitch.ts`); los estados no
   cambian. `lab.spec.ts`: el JSON trae `contract.id === 'efeonce.glitch-line'` y sin scroll horizontal.
 
-### Slice 7 — Release de AXIS (gate: aprobación del operador de la manzana y el verde, y del push)
+### Slice 7 — Release de AXIS (gate: aprobación del operador de la manzana y el verde, otorgada el 2026-09-27, y del push)
 
 - Versiones: `axis-tokens` 0.3.8 → 0.4.0, `axis-ui-contracts` 0.3.7 → 0.4.0 `[verificar]` minor o patch según la
   política de AXIS, `axis-brand-assets` 0.3.4 → 0.3.5, `axis-graphic-line` 0.6.0 → 0.7.0 (como D26 llevó a 0.6.0);
@@ -469,8 +492,8 @@ Todos los slices 1–7 se commitean en AXIS `main` **localmente**; nada se empuj
   `efeonce.surface-composition` no se tocan.
 - Cambiar estados de aprobación de piezas (lente, blog, vlog, reel, tarjetas finales siguen en propuesta).
 - La pieza sonora de Glitch y el mnemónico (identidad sonora).
-- Resolver la numeración de ediciones (#11 del operador vs #16+ del ADR del pipeline) y el dominio de ediciones
-  (TASK-1442).
+- El dominio de ediciones (TASK-1442). La numeración ya no es un conflicto: el operador resolvió el 2026-09-27 que la
+  próxima edición es la #17 (la serie del blog y del pipeline editorial).
 - Ruta productiva gobernada en Greenhouse (command, API, MCP): TASK-1921/TASK-1923.
 
 ## Detailed Spec
@@ -515,8 +538,8 @@ aprobadas; una opción `allowProposal` para el Lab `[verificar]` si hace falta m
   por id.
 - Slice 4 corre cuando exista respuesta sobre la licencia; si sigue sin licencia, el Slice 7 publica con
   `licenseStatus: 'pending'`.
-- Slice 7 MUST NOT correr sin la aprobación del operador de la manzana y el verde (Open Question 1) y sin su
-  autorización del push: publicar es irreversible en GitHub Packages.
+- Slice 7 MUST NOT correr sin la aprobación del operador de la manzana y el verde (Open Question 1, otorgada el
+  2026-09-27) y sin su autorización del push: publicar es irreversible en GitHub Packages.
 - Slice 8 MUST esperar el run verde de `release-packages.yml`: Greenhouse fija versiones exactas y no puede instalar lo
   que no existe.
 
@@ -556,7 +579,8 @@ verde) y `glitchLine.status`/`lifecycle: 'candidate'`.
 1. AXIS local: `pnpm build && pnpm typecheck && pnpm test && pnpm lint && pnpm design:check`.
 2. `pnpm glitch:resolve` con cada ejemplo válido (sale 0) y con cada inválido (sale distinto de 0 con el issue esperado).
 3. `pnpm icons:check` sobre los 5 glifos; `pnpm --dir apps/lab test` y `pnpm --dir apps/lab test:e2e` (bloque Glitch).
-4. El operador revisa el Lab local (`/references/glitch/`) y aprueba manzana/verde y el push.
+4. El operador revisa el Lab local (`/references/glitch/`) y autoriza el push (manzana y verde ya aprobados el
+   2026-09-27).
 5. Push a `main` de AXIS → CI verde → el Lab desplegado sirve `/references/glitch.json` con `tokens` y `contract`.
 6. Tag → `release-packages.yml` verde → versiones visibles en GitHub Packages.
 7. Greenhouse: bump, `pnpm install --frozen-lockfile`, `pnpm typecheck`, test focal, visual gate de `graphic-line` a
@@ -564,8 +588,9 @@ verde) y `glitchLine.status`/`lifecycle: 'candidate'`.
 
 ### Out-of-band coordination required
 
-- **Operador (Julio Reyes):** aprobación de la manzana como esfera y el verde como acento; aprobación del alta de los 5
-  glifos; confirmación de la licencia de Guttery; autorización explícita del push a `main` de AXIS y del tag.
+- **Operador (Julio Reyes):** aprobación de la manzana como esfera y el verde como acento (otorgada el 2026-09-27);
+  aprobación del alta de los 5 glifos (otorgada el 2026-09-27); confirmación de la licencia de Guttery (por confirmar);
+  autorización explícita del push a `main` de AXIS y del tag.
 - **Regla de push a `main` de AXIS:** un push a `main` despliega `axis.efeonce.org` y un tag publica paquetes que los
   consumidores fijan por versión exacta. Antes de empujar: CI verde local, `git log origin/main..HEAD` revisado, el
   último deploy del Lab en verde y autorización del operador en chat. Nunca `--no-verify`; nunca empujar commits ajenos
@@ -650,16 +675,20 @@ verde) y `glitchLine.status`/`lifecycle: 'candidate'`.
 
 ## Open Questions
 
-1. **Gate de publicación:** ¿apruebas la manzana como esfera de Glitch y el verde `#6ec207` como acento de franquicia
-   (hoy en exploración)? Sin esta aprobación el token y el contrato no se publican (Slice 7).
-2. **Línea de servicio de Glitch:** ¿Growth (recomendada) o Brand? Afecta el eslogan de la contraportada («Empower your
-   Growth», con «Growth» en blanco/acento) y lo que el token declara para esa pieza.
-3. **Glifos Plastilina:** ¿apruebas el alta de `guardar`, `compartir`, `recomendar`, `comentar` y `deslizar` en
-   `PLASTILINA_GLYPHS`, y deben llevar versión en volumen?
-4. **Mnemónico:** ¿se decide ya el punto de sincronía de la apertura/cierre con el mnemónico, o se publica el motion
-   sin ese campo y TASK-1924 queda esperando la identidad sonora de Glitch?
-5. **Guttery:** ¿hay licencia para web y video? Si no, ¿aceptas el fallback (Poppins 600 itálica en el acento, rotada)?
-6. **Flujo de composición del ADR:** sigue `Proposed`. ¿Lo aceptas junto con esta task, o esta task avanza sólo como
-   fuente de valores y el flujo se acepta al abrir TASK-1923?
+1. ~~**Gate de publicación:** ¿apruebas la manzana como esfera de Glitch y el verde `#6ec207` como acento de franquicia
+   (hoy en exploración)? Sin esta aprobación el token y el contrato no se publican (Slice 7).~~ **Resuelta el
+   2026-09-27:** aprobados ambos. Publicar sigue exigiendo la autorización del push y del tag.
+2. ~~**Línea de servicio de Glitch:** ¿Growth (recomendada) o Brand? Afecta el eslogan de la contraportada («Empower your
+   Growth», con «Growth» en blanco/acento) y lo que el token declara para esa pieza.~~ **Resuelta el 2026-09-27:**
+   Growth; el eslogan queda «Empower your Growth».
+3. ~~**Glifos Plastilina:** ¿apruebas el alta de `guardar`, `compartir`, `recomendar`, `comentar` y `deslizar` en
+   `PLASTILINA_GLYPHS`?~~ **Resuelta el 2026-09-27:** alta aprobada; el Slice 3 queda liberado. **Sigue abierto:** ¿deben
+   llevar versión en volumen?
+4. **Mnemónico (abierta):** el operador pidió **evaluarlo y aprobarlo** en una evaluación dedicada (2026-09-27). Hasta
+   entonces el motion se publica sin punto de sincronía y TASK-1924 espera esa evaluación.
+5. **Guttery (resuelta 2026-09-27):** el operador confirmó la licencia para web y video («En gutery tenemos
+   licencia»). El Slice 4 registra la referencia del contrato de licencia y sella la fuente; el fallback no aplica.
+6. **Flujo de composición del ADR (abierta):** sigue `Proposed`, sin respuesta del operador. ¿Lo aceptas junto con esta
+   task, o esta task avanza sólo como fuente de valores y el flujo se acepta al abrir TASK-1923?
 7. **Nombre del export:** `glitchLine` (top-level) vs una rama bajo la línea de Efeonce; se recomienda top-level para
    que ningún consumidor de La órbita lo reciba por accidente.

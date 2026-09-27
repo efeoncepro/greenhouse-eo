@@ -1,7 +1,7 @@
 # Componer piezas de Glitch — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-27 por Claude
 > **Ultima actualizacion:** 2026-09-27 por Claude
 > **Modulo:** Creative · Glitch, magazine semanal de Efeonce (sub-línea de «La órbita»)
@@ -29,7 +29,7 @@ siguiendo la norma.
   «Sistema de portada» es la aprobada; «Blog y vlog» y «Vlog en reel» son propuesta.
 - **Ten a mano la norma** ([`GLITCH_GRAPHIC_LINE_V1.md`](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)):
   ahí están los colores, las letras, la cabecera y las medidas.
-- **Ten el contenido de la edición:** número (la próxima es la #11), tesis de la semana, las ocho noticias con su sección
+- **Ten el contenido de la edición:** número (la próxima es la #17), tesis de la semana, las ocho noticias con su sección
   («Marketing + IA», «Creatividad + IA» o «Tecnología + IA»), titular, medio, fecha, foto con crédito y licencia, y la
   opinión del narrador (remate + porqué) de cada una.
 - **Anota la plantilla de portada de la semana pasada.** La necesitas para la regla de rotación.
@@ -83,7 +83,8 @@ que el contenido permita. Nunca dos semanas seguidas con la misma.
 2. Textura de manzana en bytes.
 3. Fila de acciones Plastilina «SI TE SIRVIÓ»: guardar, compartir, recomendar, comentar.
 4. CTA en píldora blanca «Suscríbete a [logo de Glitch]».
-5. La misma cabecera; firma de Efeonce con el eslogan «Empower your Growth», más chico que el logo.
+5. La misma cabecera; firma de Efeonce con el eslogan «Empower your Growth» (Glitch es línea Growth), más chico que el
+   logo.
 
 ### Paso 5 · Piezas del blog (propuesta)
 
@@ -110,8 +111,10 @@ Todo el video está en **propuesta**. Si se produce una prueba:
    zonas del lienzo 1080 × 1920: nada entre 0 y 220 ni desde 1500 (interfaz de la app), nada desde x 940 (botones),
    cabecera entre 240 y 440, texto entre 1150 y 1480, y **nunca** sobre la cara del host.
 5. Las ocho piezas del reel son transparentes: apertura, cabecera (noticia n/3 + logo), lower third, subtítulo, tarjeta de
-   noticia, imagen de la fuente (plano dividido), Glitch Drop y última frase («el #12 sale el lunes.» + «Sigue a
-   Glitch»). Sólo la portada del reel y la tarjeta final son pantalla completa.
+   noticia, imagen de la fuente (plano dividido), Glitch Drop y última frase («el #N+1 sale el lunes.» + «Sigue a
+   Glitch»). Sólo la portada del reel y la tarjeta final son pantalla completa. El contenido del **lower third** está en
+   definición con el operador: no lo inventes.
+   El **mnemónico** de apertura y cierre todavía hay que evaluarlo y aprobarlo: no uses ninguno como definitivo.
 6. **Tarjeta final:** centrada, espejo de la apertura (los puntos se resuelven en la manzana, para que el reel empalme en
    loop), un mensaje, una acción, la firma y sin texturas finas.
 7. Hoy los gráficos se hacen a mano desde el canvas: todavía no hay render automático con fondo transparente.
@@ -131,10 +134,11 @@ Todo el video está en **propuesta**. Si se produce una prueba:
 
 | Estado | Qué significa |
 |---|---|
-| **APROBADO** (2026-09-27) | se usa como pieza final: portada A/B/C con rotación, lámina interior, noticia 1 y contraportada |
+| **APROBADO** (2026-09-27) | se usa como pieza final: portada A/B/C con rotación, lámina interior, noticia 1 y contraportada; también la manzana como esfera, el verde como acento, la línea Growth y el alta de los cinco íconos Plastilina |
 | **PROPUESTA** | se puede armar para mostrarla al operador, pero no se publica como final: lente, blog, vlog 16:9, reel, tarjetas finales y el flujo de composición automática |
-| **EXPLORACIÓN** | idea en estudio, no canon: la manzana y el verde como token oficial, los acentos teal y naranja del canvas, la historia 9:16 y el carrusel panorámico |
-| **Alta pendiente** | los cinco íconos Plastilina de Glitch existen, pero todavía no están en el catálogo oficial de AXIS |
+| **EXPLORACIÓN** | idea en estudio, no canon: los acentos teal y naranja del canvas, la historia 9:16 y el carrusel panorámico |
+| **Aprobado, sin publicar en AXIS** | la manzana, el verde y los cinco íconos Plastilina de Glitch están aprobados (2026-09-27), pero todavía no están en los paquetes oficiales de AXIS (TASK-1922) |
+| **En definición / por confirmar** | el lower third (se define con el operador), el mnemónico (evaluación dedicada) y la licencia de Guttery (confirmada por el operador el 2026-09-27) |
 | **Publicada** (AXIS) | la página y la guía de Glitch están en axis.efeonce.org desde el 2026-09-27; los tokens de Glitch todavía no existen (TASK-1922) |
 
 ## Qué no hacer
@@ -147,7 +151,7 @@ Todo el video está en **propuesta**. Si se produce una prueba:
 - No escribas la dirección web como texto ni uses la burbuja URL de La órbita.
 - No descargues clips de terceros para subirlos: embébelos o licéncialos.
 - No publiques titulares o noticias de las maquetas: son de ejemplo.
-- No uses Guttery en web o video como pieza final hasta confirmar su licencia.
+- Guttery tiene licencia para web y video (confirmada por el operador el 2026-09-27); úsala sólo para las muletillas del narrador.
 - No elijas la plantilla por gusto ni repitas la de la semana anterior.
 
 ## Problemas comunes
@@ -162,7 +166,7 @@ Todo el video está en **propuesta**. Si se produce una prueba:
 | La tarjeta final se ve sucia al publicar | la compresión del video ensucia las texturas finas | quita las texturas finas de la tarjeta |
 | Dos semanas seguidas con la misma portada | no se revisó la plantilla anterior | aplica la regla de rotación y cambia a la siguiente que el contenido permita |
 | El callout v2 no aparece en WordPress | el bloque `efeoncepro/glitch-drop` publicado es el v1 | el v2 es propuesta; requiere actualizar el bloque antes de usarlo |
-| Un agente pregunta qué número lleva la edición | la numeración del operador (la próxima, #11) no coincide con la del pipeline editorial | usa la numeración del operador y avisa la diferencia |
+| Un agente pregunta qué número lleva la edición, o copia el «#11» de una maqueta | los «#11»–«#14» del canvas son ejemplos de diseño | la próxima es la **#17**: la serie sigue la del blog y del pipeline editorial (decisión del operador, 2026-09-27) |
 
 ## Referencias técnicas
 

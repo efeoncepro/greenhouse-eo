@@ -1,7 +1,7 @@
 # Línea gráfica de Glitch — sub-línea de La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-27 por Claude
 > **Ultima actualizacion:** 2026-09-27 por Claude
 > **Documentacion tecnica:** [Norma de la sub-línea de Glitch](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) · [ADR de la línea de Glitch](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
@@ -45,8 +45,10 @@ logo de Glitch aparece en la cabecera y en la invitación a suscribirse, nunca e
 
 ## Cómo se ve una edición
 
-Cada edición se numera como **«Edición #N»**. La próxima es la **#11**. Las secciones son «Marketing + IA»,
-«Creatividad + IA» y «Tecnología + IA»: la IA cruza todas, no es una sección aparte.
+Cada edición se numera como **«Edición #N»**. La próxima es la **#17**: la numeración sigue la del blog (los «#11» a
+«#14» que se ven en las maquetas del canvas son ejemplos de diseño, no números reales). Las secciones son «Marketing +
+IA», «Creatividad + IA» y «Tecnología + IA»: la IA cruza todas, no es una sección aparte. Glitch pertenece a la línea de
+servicio **Growth**, por eso la contraportada cierra con el eslogan «Empower your Growth».
 
 ### La portada
 
@@ -81,7 +83,8 @@ abre con la franja «El micrófono se abre». El carrusel cierra con la **contra
 | Blog: banners, apertura, índice, callout «más punch», cierres | propuesta |
 | Video horizontal (vlog) y reel vertical con gráficos encima del host | propuesta |
 | Tarjeta final de video | propuesta |
-| La manzana y el verde como elementos oficiales en el sistema de diseño | exploración |
+| La manzana como esfera de Glitch y el verde como su color de acento | **aprobados** el 2026-09-27 (falta sumarlos al sistema de diseño AXIS) |
+| Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | **aprobados** el 2026-09-27 (falta sumarlos al catálogo de AXIS) |
 
 Lo que está en **propuesta** o **exploración** se puede mostrar para conversar, pero no se usa como pieza final hasta
 que el operador lo apruebe. Las noticias y los titulares de las maquetas son de ejemplo, no reales.
@@ -126,11 +129,14 @@ animarían y exportarían con fondo transparente para que el editor los ponga so
 
 | Pendiente | Qué falta |
 |---|---|
-| La manzana y el verde como elementos oficiales | que el operador los apruebe y se registren en AXIS |
-| Línea de servicio de Glitch | elegir entre Growth (recomendada) y Brand; define la palabra final del eslogan |
+| La manzana y el verde | ya aprobados (2026-09-27); falta registrarlos en AXIS |
+| Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | ya aprobados (2026-09-27); falta sumarlos al catálogo de AXIS |
 | Piezas en propuesta | aprobar lente, blog, video y tarjetas finales |
-| Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | que el operador apruebe sumarlos al catálogo |
-| Letra Guttery | confirmar la licencia para web y video |
-| Producción automática | aprobar la propuesta y crear el trabajo para construirla |
+| Sonido de apertura y cierre del video (mnemónico) | evaluarlo y aprobarlo en una revisión dedicada |
+| Texto del rótulo inferior del video (lower third) | se está definiendo junto con el operador |
+| Letra Guttery | licencia para web y video confirmada por el operador (2026-09-27) |
+| Producción automática | aprobar la propuesta (el trabajo para construirla ya está creado) |
+
+Ya resuelto el 2026-09-27: Glitch es línea de servicio **Growth** y la próxima edición es la **#17**.
 
 > Detalle técnico: [norma §11 Pendientes](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#11-pendientes-de-decisión-del-operador) · [ADR, pendiente](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#pendiente)

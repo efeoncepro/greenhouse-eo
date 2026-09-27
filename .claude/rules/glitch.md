@@ -13,7 +13,7 @@ Glitch (el magazine semanal de Efeonce: portadas, carrusel, blog, vlog/reel) tie
 `efeonce-advertising-creative` si lleva texto, `social-media-studio`, `motion-design-studio` para video). Canon:
 `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` + ADR
 `docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md`. AXIS `/references/glitch/` y `/references/glitch.json`:
-pendientes de publicar; no hay tokens ni contrato de Glitch.
+publicados (2026-09-27); los tokens y el contrato de Glitch llegan con TASK-1922.
 
 Reglas duras:
 
@@ -21,5 +21,5 @@ Reglas duras:
 - **Una sola esfera por pieza**: manzana **o** lente/órbita, nunca las dos.
 - El verde nunca como texto, borde ni separador sobre claro; la falla nunca sobre un rostro; ningún overlay sobre la
   cara del host ni la interfaz de la app. Firma: logo de Efeonce centrado abajo.
-- Aprobado: sistema de portada A/B/C con rotación, lámina interior, contraportada. Blog, lente, vlog y reel son
+- Aprobado: sistema de portada A/B/C con rotación, lámina interior, contraportada; manzana como esfera y verde como acento; línea Growth; próxima edición #17; alta de los 5 glifos Plastilina (2026-09-27). Blog, lente, vlog y reel son
   **propuesta**: no se entregan como canon ni se publican sin el operador.

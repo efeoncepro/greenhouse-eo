@@ -48,6 +48,8 @@
 | 2026-09-26 | **Capa gráfica sobre la foto, entera (amplía P-5 de D10):** el operador la aprobó también fuera de los casos de la línea (voz, lente, medida). Se compone sobre las reservas de la toma, sin scrim; los ejemplos compuestos rechazados del 19-09 siguen sin valer. Canon: maestro §9, §10 y P-5; `photography-convergence.md` P-5. |
 | 2026-09-26 | **Banco de fotografía y guía «El porqué» en AXIS:** aprobados por el operador y publicados (`/references/photography/` y `/references/photography/why/`, con `why.json` para agentes). Complementan las skills de fotografía; el canon sigue en `docs/operations/brand-photography/`. |
 | 2026-09-27 | **Glitch: sub-línea complementaria de La órbita, sólo para Glitch.** Aprobados el sistema de portada A/B/C con su regla de rotación (nunca dos semanas seguidas con la misma plantilla) y el feed de nueve semanas, la lámina interior y la contraportada del carrusel; ajustes aplicados: cabecera sin línea fina, «El micrófono se abre…» abre la noticia 1 (no la portada), «Desliza» con la mano Plastilina. Detalle y estado por pieza: [glitch.md](glitch.md). |
+| 2026-09-27 | **Glitch: decisiones del operador (Delta del ADR de Glitch):** «Si, aprueba la manzana, temas licencia de Gutery, glitch es línea growth, la próxima edición efectivamente es la 17, aprueba el alta de los 5 glifos, el nemonico hay que evaluarlo y aprobarlo, que lleva el lower third? Me gustaría definirlo junto contigo». **Aprobados:** la manzana como esfera de Glitch y el verde `#6ec207` como acento de franquicia (dejan de ser exploración; el token `glitchLine` de TASK-1922 ya no está bloqueado por esa aprobación); Glitch es línea de servicio **Growth** (eslogan «Empower your Growth», como ya estaba); la próxima edición es la **#17** (la serie sigue la del blog y del pipeline editorial; los «#11»–«#14» del canvas son ejemplos de diseño; el conflicto #11 vs #16 queda resuelto); el alta de los 5 glifos Plastilina (guardar, compartir, recomendar, comentar, deslizar), que libera el gate de ese slice en TASK-1922. **Sin decidir:** el mnemónico del video (evaluarlo y aprobarlo en una evaluación dedicada); el contenido del lower third (en definición con el operador); la licencia de Guttery (respuesta ambigua, **por confirmar con el operador**); el paso del flujo de composición del ADR a `Accepted` (sin respuesta). Detalle: [glitch.md](glitch.md). |
+| 2026-09-27 | **Glitch: licencia de Guttery confirmada.** El operador aclaró «En gutery tenemos licencia»: Guttery se usa en web y video para las muletillas del narrador; TASK-1922 registra la referencia del contrato y la sella en AXIS. Detalle: [glitch.md](glitch.md). |
 | 2026-09-27 | **El video no se compone en el Artifact Composer (opción b, TASK-1919):** el composer entrega cuadros fijos, el último cuadro del loop y capas con alfa; la animación sigue en la pipeline de motion (`orbit:video`, masters del reveal v1.1). Sólo las recetas **aprobadas** tienen plantilla; `audiovisual.close-reveal` falla con `recipe-outside-composer`. |
 
 ## Pendientes del operador (no decidir por tu cuenta)
@@ -57,10 +59,11 @@
   `section-classic`, `section-split`, `content-measure` y `triptych` (las láminas no la llevan, el manifest del deck
   dice `url-bubble-footer`; se siguió la lámina); gris del descriptor y la bajada web, sin token; paleta DOOH 20 % vs
   35 %. Hasta decidir, la plantilla sigue la lámina aprobada y no se inventa un token.
-- **Glitch (2026-09-27):** la manzana como esfera y el verde `#6ec207` como token de franquicia en AXIS; la línea de
-  servicio de Glitch (Growth recomendado, Brand alternativa); aprobar lente, blog (banners, maqueta, callout v2), vlog
-  16:9, kit de overlays del reel y tarjetas finales; alta de los cinco glifos Plastilina; licencia de Guttery; pasar el
-  flujo de composición a ADR aceptado y a tasks. Detalle: [glitch.md](glitch.md) §8–§9.
+- **Glitch (actualizado 2026-09-27):** aprobar lente, blog (banners, maqueta, callout v2), vlog 16:9, kit de overlays
+  del reel y tarjetas finales; evaluar y aprobar el mnemónico del video; definir con el operador el contenido del lower
+  third; licencia de Guttery (confirmada el 2026-09-27; registrar la referencia); pasar el flujo de composición
+  del ADR a `Accepted`. Ya resueltos: manzana y verde, línea Growth, edición #17 y alta de los glifos (fila del
+  2026-09-27 arriba). Detalle: [glitch.md](glitch.md) §8–§9.
 - **Banco de pares pregunta/respuesta (D12):** el operador lo revisa y aprobará **2 pares por línea de servicio** con
   respuestas verificables. Hasta entonces el banco es candidato: calibra el tono, no es copy aprobado.
 - **Archivos de impresión (D13):** se empieza por la tarjeta de presentación y el muro de recepción, en PDF vectorial

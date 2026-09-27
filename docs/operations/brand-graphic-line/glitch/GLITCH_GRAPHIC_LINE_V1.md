@@ -6,13 +6,15 @@
 > reglas y agrega lo propio de Glitch.
 >
 > **Tipo de documento:** Norma de marca (sub-línea de franquicia editorial)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
 > **Última actualización:** 2026-09-27 por Claude
 > **Estado:** vigente para lo marcado **APROBADO** (2026-09-27). Lo marcado **PROPUESTA** o **EXPLORACIÓN** no se usa
 > como canon hasta que el operador lo apruebe.
 > **Decisión:** [ADR `GLITCH_GRAPHIC_LINE_DECISION_V1`](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
-> (sub-línea y piezas aprobadas: `Accepted`; flujo de composición: `Proposed`)
+> (sub-línea y piezas aprobadas: `Accepted`; decisiones del operador del 2026-09-27 —manzana y verde, línea Growth,
+> numeración #17, glifos Plastilina—: `Accepted`, ver su [Delta 2026-09-27](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--decisiones-del-operador);
+> flujo de composición: `Proposed`)
 > **Línea madre:** [Línea gráfica Efeonce «La órbita»](../EFEONCE_GRAPHIC_LINE_V1.md) · [índice de la carpeta](../README.md)
 > **Canvas de referencia (privado):** [«Glitch en La órbita»](https://claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS)
 > **Valores en AXIS:** página del Lab `/references/glitch/` y gemelo JSON `/references/glitch.json` del repo
@@ -75,9 +77,10 @@ firma el logo de Efeonce. El wordmark de Glitch va en la cabecera y en el CTA, n
 | Qué es | magazine semanal de Efeonce de **marketing, tecnología y creatividad + IA** (el «+ IA» es grande, no menor) |
 | Formato | top 8 semanal; lo que manda es el **POV del narrador**, no la noticia |
 | A quién le habla | marketers, creativos y apasionados por la IA y la tecnología |
-| Numeración | **«Edición #N»**. La próxima es la **#11** (numeración del operador, no la #16+ del blog ni del [ADR del pipeline editorial](../../../architecture/GREENHOUSE_GLITCH_AGENTIC_EDITORIAL_PIPELINE_DECISION_V1.md)) |
+| Numeración | **«Edición #N»**. La próxima es la **#17** (decisión del operador, 2026-09-27): la serie sigue la del blog y la del [ADR del pipeline editorial](../../../architecture/GREENHOUSE_GLITCH_AGENTIC_EDITORIAL_PIPELINE_DECISION_V1.md). Los «#11»–«#14» de las maquetas del canvas son ejemplos de diseño, no numeración real |
 | Motivo recurrente | «El micrófono se abre…»: narrador de radio que abre el micrófono, cuenta y comenta; cierra con «El micrófono se cierra.» |
 | Secciones | «MARKETING + IA», «CREATIVIDAD + IA», «TECNOLOGÍA + IA». La IA es el cruce de todas, no una sección aparte |
+| Línea de servicio | **Growth** (decisión del operador, 2026-09-27): el eslogan de la contraportada es «Empower your Growth» |
 
 **Fuentes de marca:**
 
@@ -101,7 +104,7 @@ firma el logo de Efeonce. El wordmark de Glitch va en la cabecera y en el CTA, n
 | Elemento | Valor / regla |
 |---|---|
 | Fondo | `#001a33` (el oscuro de La órbita) |
-| Acento Glitch | verde `#6ec207` (propiedad `accent`). El canvas permite teal `#36c8bf` y naranja `#ff6500` sólo como **exploración** |
+| Acento Glitch | verde `#6ec207` (propiedad `accent`), **APROBADO** como acento de franquicia (2026-09-27). El canvas permite teal `#36c8bf` y naranja `#ff6500` sólo como **exploración** |
 | Navy Glitch | `#022a4e` (del wordmark); texto y tinta sobre claro en el blog |
 | Texto sobre oscuro | `#ffffff` / `#e6edf3`; secundario `#9fb3c8`; líneas `#1d3a57` |
 | Verde sobre blanco | ~2,25:1 → **nunca** texto, borde ni separador sobre claro. En claro, los momentos de marca van en bloques navy |
@@ -111,7 +114,8 @@ firma el logo de Efeonce. El wordmark de Glitch va en la cabecera y en el CTA, n
 - Es la **esfera de Glitch**: el path oficial del wordmark (caja AB `{x:539, y:0, w:118, h:154}`).
 - Cierra el titular o el POV como punto final.
 - **Una sola por pieza o pantalla.**
-- Estado: **EXPLORACIÓN** hasta que AXIS la registre como token de franquicia (§12).
+- Estado: **APROBADO** por el operador como esfera de Glitch (2026-09-27). Falta registrarla como token de franquicia en
+  AXIS (TASK-1922, §12); hasta entonces sus valores viven en esta norma.
 
 ### 3.2 La falla en bytes
 
@@ -133,7 +137,7 @@ firma el logo de Efeonce. El wordmark de Glitch va en la cabecera y en el CTA, n
 | Titulares (contraste de pesos) | **Bricolage Grotesque**: entrada 300 (wdth 100, 0,72 em) + remate 800 condensado (`font-stretch: 78%`; `font-variation-settings: 'wdth' 78`); tracking +0,01 em |
 | Etiquetas | **Poppins** 600, versalitas espaciadas |
 | Cuerpo y subtítulos | **Poppins** |
-| Muletillas del narrador («spoiler:», «sin anestesia.», «nos vemos el lunes.», «el #12 sale el lunes.») | **Guttery**, en el acento, rotada −3° a −5°. La fuente está subida; **licencia para video y web a confirmar** |
+| Muletillas del narrador («spoiler:», «sin anestesia.», «nos vemos el lunes.», «el #N+1 sale el lunes.») | **Guttery**, en el acento, rotada −3° a −5°. La fuente está subida; **licencia para video y web por confirmar con el operador (2026-09-27)** |
 
 ### 3.5 Cabecera (masthead)
 
@@ -149,13 +153,14 @@ firma el logo de Efeonce. El wordmark de Glitch va en la cabecera y en el CTA, n
 - Cinco glifos Plastilina nuevos creados con el método AXIS: **guardar, compartir, recomendar, comentar, deslizar**. Viven
   en [`ai-generations/2026-09-26_glitch-iconos/elegidos/`](../../../../ai-generations/2026-09-26_glitch-iconos/elegidos/)
   (`*.json`; pasan `icons:check`, área 537–560 u²).
-- **Su alta en `PLASTILINA_GLYPHS` de AXIS está pendiente de aprobación del operador.** Hasta entonces no son catálogo.
+- **Su alta en `PLASTILINA_GLYPHS` de AXIS está APROBADA por el operador (2026-09-27)**; la ejecuta TASK-1922. Hasta que
+  se publique en AXIS no son catálogo.
 
 ### 3.7 Firma
 
 - Logo de Efeonce centrado abajo (negativo sobre oscuro).
 - El eslogan «Empower your Growth» va **sólo en la contraportada**, más chico que el logo, con «Growth» en blanco o en el
-  acento. (La línea de servicio de Glitch sigue pendiente: §11.)
+  acento. Glitch es línea de servicio **Growth** (decisión del operador, 2026-09-27).
 - La burbuja URL de La órbita **no aplica** a Glitch (§8).
 
 ---
@@ -224,7 +229,8 @@ firma el logo de Efeonce. El wordmark de Glitch va en la cabecera y en el CTA, n
 - **Un guion, dos formatos:** 16:9 (YouTube y blog; miniatura 1280 × 720) y 9:16 reel (Instagram, TikTok, LinkedIn).
 - Host a cámara con el micrófono en cuadro. Se graba **una vez** en 4K horizontal, con aire arriba y abajo; el reel sale
   del recorte vertical.
-- Mnemónico al abrir y al cerrar (la pieza sonora de Glitch está pendiente en la identidad sonora).
+- Mnemónico al abrir y al cerrar: la pieza sonora de Glitch está pendiente en la identidad sonora y el operador pidió
+  **evaluarlo y aprobarlo** en una evaluación dedicada (2026-09-27). Nada se da por decidido.
 - **Subtítulos siempre:** Poppins 600, blanco sobre navy al 78 %, una palabra en el acento.
 - Imagen de las fuentes: **embebida o licenciada, nunca descargada**; en navy, con bytes en el borde y crédito.
 
@@ -249,12 +255,12 @@ firma el logo de Efeonce. El wordmark de Glitch va en la cabecera y en el CTA, n
 |---|---|---|
 | 1 | Apertura | los puntos, sincronizados con el mnemónico; la tarjeta final es su espejo |
 | 2 | Cabecera | noticia n/3 + wordmark |
-| 3 | Lower third | contenido sin detallar en el canvas (pendiente) |
+| 3 | Lower third | contenido **en definición con el operador** (2026-09-27); no se arma con contenido inventado |
 | 4 | Subtítulo | Poppins 600, blanco sobre navy 78 %, una palabra en el acento |
 | 5 | Tarjeta de noticia | la noticia que se está comentando |
 | 6 | Imagen de la fuente | plano dividido: la noticia arriba se desarma hacia el host, que queda reencuadrado abajo |
 | 7 | Glitch Drop | el POV del narrador |
-| 8 | Última frase | «el #12 sale el lunes.» + píldora «Sigue a Glitch» |
+| 8 | Última frase | «el #N+1 sale el lunes.» (en el canvas, «el #12…», número de ejemplo) + píldora «Sigue a Glitch» |
 
 Sólo son pantalla completa la **portada del reel** y la **tarjeta final**.
 
@@ -303,10 +309,13 @@ La foto del host de las maquetas es del banco de marca, generada con IA
 | Vlog 16:9 | **PROPUESTA** |
 | Reel (kit de overlays y mapa de zonas) | **PROPUESTA** |
 | Tarjetas finales de video | **PROPUESTA** |
-| La manzana como esfera y el verde como acento (token de franquicia en AXIS) | **EXPLORACIÓN** |
+| La manzana como esfera y el verde como acento | **APROBADO** (2026-09-27); token de franquicia en AXIS pendiente (TASK-1922) |
 | Acentos teal y naranja en el canvas | **EXPLORACIÓN** |
 | Historia 9:16 y carrusel panorámico | **EXPLORACIÓN** (no canon) |
-| Cinco glifos Plastilina de Glitch | creados; **alta en AXIS pendiente** |
+| Cinco glifos Plastilina de Glitch | alta **APROBADA** (2026-09-27); publicación en AXIS pendiente (TASK-1922) |
+| Línea de servicio Growth y eslogan «Empower your Growth» | **APROBADO** (2026-09-27) |
+| Mnemónico del video | **pendiente**: evaluarlo y aprobarlo (evaluación dedicada) |
+| Lower third del reel y del vlog | **en definición con el operador** |
 | Flujo de composición (Composer + HyperFrames) | **PROPUESTA** de arquitectura ([ADR](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)) |
 
 ---
@@ -324,12 +333,17 @@ El flujo propuesto (canon en Greenhouse, valores y contratos en AXIS, composici�
 
 | Pendiente | Qué falta |
 |---|---|
-| La manzana como esfera y el verde como acento | registrarlos como token de franquicia en AXIS |
-| Línea de servicio de Glitch | elegir entre **Growth** (recomendada) y **Brand** (alternativa). Afecta la palabra final del eslogan de la contraportada |
+Resuelto el 2026-09-27 ([Delta del ADR](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--decisiones-del-operador)):
+la manzana y el verde (aprobados; falta el token en AXIS, TASK-1922), la línea de servicio (**Growth**), la numeración
+(la próxima es la **#17**) y el alta de los cinco glifos Plastilina (aprobada; la ejecuta TASK-1922).
+
+| Pendiente | Qué falta |
+|---|---|
 | Piezas en propuesta | aprobar lente, blog (banners + maqueta + callout v2), vlog 16:9, reel (kit de overlays) y tarjetas finales |
-| Glifos Plastilina | alta de los cinco glifos en `PLASTILINA_GLYPHS` de AXIS |
-| Guttery | confirmar la licencia para video y web |
-| Flujo de composición | pasar el ADR de `Proposed` a `Accepted` y crear las tasks |
+| Mnemónico del video | evaluarlo y aprobarlo (evaluación dedicada) |
+| Lower third | definir su contenido junto con el operador (en definición) |
+| Guttery | licencia para web y video **confirmada por el operador (2026-09-27)** |
+| Flujo de composición | pasar el ADR de `Proposed` a `Accepted` (sus tasks ya existen: TASK-1922, TASK-1923, TASK-1924) |
 
 ---
 

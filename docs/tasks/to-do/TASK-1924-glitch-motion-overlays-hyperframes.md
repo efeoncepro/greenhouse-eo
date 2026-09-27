@@ -1,5 +1,23 @@
 # TASK-1924 — Glitch en movimiento con HyperFrames
 
+## Delta 2026-09-27
+
+- **Guttery:** el operador confirmó la licencia para web y video (2026-09-27, segunda respuesta). La Open Question de Guttery queda resuelta; la task registra la referencia del contrato de licencia y sella la fuente.
+
+Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del ADR de Glitch](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--decisiones-del-operador):
+
+- **Numeración resuelta** (Open Question 8): la próxima edición es la **#17**, en la serie del blog y del pipeline
+  editorial; la última frase («el #N+1 sale el …») toma N del manifiesto. Los «#11»–«#14» del canvas son ejemplos de
+  diseño.
+- **Aprobados la manzana como esfera y el verde `#6ec207` como acento de franquicia**, y **Glitch es línea Growth**:
+  la apertura y la tarjeta final (puntos → manzana) ya no dependen de esa aprobación; siguen dependiendo de TASK-1922 y
+  TASK-1923 y de la aprobación del kit de overlays y las tarjetas finales, que siguen en PROPUESTA.
+- **Mnemónico (Open Question 3, abierta):** el operador pidió **evaluarlo y aprobarlo** en una evaluación dedicada.
+  Hasta entonces los clips salen mudos con marcador de sincronía y ningún mnemónico se usa como canon.
+- **Lower third (Open Question 2, abierta):** su contenido está **en definición con el operador** (sesión en curso).
+  La pieza `lower-third` no se construye con contenido inventado.
+- **Sigue abierto también:** el paso del flujo de composición del ADR a `Accepted` (sin respuesta).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -36,7 +54,7 @@
 - GitHub Issue: `none`
 
 > Prioridad `P2`, impacto `Medio` y esfuerzo `Alto` son inferencia del planificador: todo el video de Glitch está en
-> PROPUESTA y el carrusel (TASK-1923) llega antes al público. Ajustar si el operador quiere el vlog para la edición #11.
+> PROPUESTA y el carrusel (TASK-1923) llega antes al público. Ajustar si el operador quiere el vlog para la edición #17.
 
 ## Summary
 
@@ -598,9 +616,11 @@ Sin runtime de producción (repo-only, no production runtime impact). Verificaci
    (Playwright + sharp + FFmpeg) con desenfoque real por subcuadros, que HyperFrames no ofrece de forma documentada
    [verificar]. ¿HyperFrames para todo el kit, o el pipeline de `brand-motion` para la apertura y la tarjeta final si
    necesitan desenfoque real?
-2. **Lower third:** ¿qué lleva (nombre del host y rol, «Glitch en voz alta», sección + IA, número de edición)?
-3. **Mnemónico:** la pieza sonora de Glitch está pendiente (serena con falla vs rock). ¿Los clips salen mudos con
-   marcador de sincronía, y el punto de sincronía es la caída de la esfera (La) del motivo «Puntos suspensivos»?
+2. **Lower third (abierta, en definición con el operador):** ¿qué lleva (nombre del host y rol, «Glitch en voz alta»,
+   sección + IA, número de edición)? El operador preguntó qué lleva y pidió definirlo en conjunto (2026-09-27).
+3. **Mnemónico (abierta, pendiente de evaluación dedicada):** la pieza sonora de Glitch está pendiente (serena con falla
+   vs rock) y el operador pidió **evaluarla y aprobarla** (2026-09-27). ¿Los clips salen mudos con marcador de
+   sincronía, y el punto de sincronía es la caída de la esfera (La) del motivo «Puntos suspensivos»?
 4. **Toma y línea de tiempo:** ¿a qué fps graba el host (HyperFrames `0.6.69` acepta enteros y racionales como
    29,97 en render local) y en qué resolución edita el 16:9 (1920 × 1080 o 3840 × 2160)?
 5. **Zonas:** ¿rango vertical de la columna de botones del reel (desde x 940), zona de la cara en el plano dividido y
@@ -610,8 +630,9 @@ Sin runtime de producción (repo-only, no production runtime impact). Verificaci
    palabra en el acento (marcada en el guion o por regla)?
 7. **Datos de video:** ¿bloque opcional `video` dentro del manifiesto de TASK-1923 (recomendado: una sola fuente por
    edición) o un manifiesto de video aparte que referencie la edición?
-8. **Numeración:** la próxima edición es la #11 para el operador y la #16+ para el ADR del pipeline; afecta
-   «el #N+1 sale el lunes» de la última frase.
+8. ~~**Numeración:** la próxima edición es la #11 para el operador y la #16+ para el ADR del pipeline; afecta
+   «el #N+1 sale el lunes» de la última frase.~~ **Resuelta el 2026-09-27:** la próxima es la **#17**, en la serie del
+   blog y del pipeline editorial; «el #N+1 sale el lunes» toma N del manifiesto.
 9. **16:9:** ¿la noticia y el Drop siguen como pantallas completas o pasan a overlays (norma §7.4 «a revisar»)?
 10. **Instalación:** ¿devDependency exacta de `hyperframes` (recomendado) o `pnpm dlx hyperframes@<versión>`? El
     paquete descarga su propio Chrome.
