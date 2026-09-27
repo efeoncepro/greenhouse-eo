@@ -671,7 +671,8 @@ verde) y `glitchLine.status`/`lifecycle: 'candidate'`.
 > GitHub Packages). El Lab desplegado sirve `glitch.json` con `contract` `efeonce.glitch-line` 0.1.0, `tokens`
 > `glitchLine` y 3 `assets`, e `iconography.json` con 84 glifos y 48 volúmenes. Greenhouse `4dfb147f7` fija las cuatro
 > versiones: `pnpm typecheck` verde, focales 106/106 (incluye `src/config/axis-glitch-line-package.test.ts`), `pnpm test`
-> completo 15 646 pruebas en verde, `pnpm composer:visual-gate --catalog=graphic-line` 24 frames a 0 px. Norma v1.11,
+> completo 15 646 pruebas en verde, `pnpm build` de producción verde (compilado sin errores, autorizado por el
+> operador), `pnpm composer:visual-gate --catalog=graphic-line` 24 frames a 0 px. Norma v1.11,
 > ADR (Delta de publicación), runbook (Delta d), skills `efeonce-graphic-line` y `axis-design-system` (con espejo) y
 > deltas en TASK-1923 y TASK-1924 al día. Pedido del operador durante la task: los íconos de acción de Glitch van en
 > Plastilina plana, nunca en volumen (`glitchLine.icons.actions`, `icon-volume-not-applicable`).
