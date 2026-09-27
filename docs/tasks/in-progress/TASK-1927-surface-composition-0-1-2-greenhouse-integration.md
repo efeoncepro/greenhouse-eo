@@ -85,7 +85,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Implementacion — Slice 1 hecho (AXIS 0.3.11 / 0.3.9 fijados, gate a 0 px)`
+- Status real: `Implementacion — hechos bump AXIS, mapper (use/layout/anchor), hero y lines, triptico por palabra y documento multipagina; faltan las 18 portadas y contraportadas y section-split por la izquierda (esperan tokens nuevos en AXIS), docs y skills`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
