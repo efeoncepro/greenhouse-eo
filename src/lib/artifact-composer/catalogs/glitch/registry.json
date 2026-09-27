@@ -1,0 +1,157 @@
+{
+  "version": "0.1",
+  "status": "candidate",
+  "note": "Catálogos de Glitch (sólo Glitch; TASK-1923). Una carpeta, tres catálogos: `catalogs` dice a cuál pertenece cada plantilla (glitch.catalog-membership@1) y `approval` si es canon (glitch.piece-approval@1). `piece` es el id de la pieza en glitchLine.pieces de AXIS: el estado de aprobación sale de ahí (test de drift). El lienzo real lo declara cada *.slots.json. El autor nunca elige plantilla: el mapper decide el contentType por contenido y rotación.",
+  "canvas": {
+    "width": 1080,
+    "height": 1350
+  },
+  "contentTypeTaxonomy": [
+    "glitch.cover.a",
+    "glitch.cover.b",
+    "glitch.cover.c",
+    "glitch.interior",
+    "glitch.interior.opening",
+    "glitch.interior.lens",
+    "glitch.back"
+  ],
+  "templates": [
+    {
+      "name": "CoverPhoto",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.cover.a"
+      ],
+      "prototype": "cover-photo.html",
+      "slotsRef": "cover-photo.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "portada-a"
+    },
+    {
+      "name": "CoverType",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.cover.b"
+      ],
+      "prototype": "cover-type.html",
+      "slotsRef": "cover-type.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "portada-b"
+    },
+    {
+      "name": "CoverMosaic",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.cover.c"
+      ],
+      "prototype": "cover-mosaic.html",
+      "slotsRef": "cover-mosaic.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "portada-c"
+    },
+    {
+      "name": "Interior",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.interior"
+      ],
+      "prototype": "interior.html",
+      "slotsRef": "interior.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "interior"
+    },
+    {
+      "name": "InteriorOpening",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.interior.opening"
+      ],
+      "prototype": "interior-opening.html",
+      "slotsRef": "interior-opening.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "interior-noticia-1"
+    },
+    {
+      "name": "InteriorLens",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.interior.lens"
+      ],
+      "prototype": "interior-lens.html",
+      "slotsRef": "interior-lens.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "sphere": "lens",
+      "surfaceTone": "dark",
+      "piece": "interior-lente"
+    },
+    {
+      "name": "BackCover",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.back"
+      ],
+      "prototype": "back-cover.html",
+      "slotsRef": "back-cover.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "contraportada"
+    }
+  ],
+  "selector": {
+    "map": {
+      "glitch.cover.a": "CoverPhoto",
+      "glitch.cover.b": "CoverType",
+      "glitch.cover.c": "CoverMosaic",
+      "glitch.interior": "Interior",
+      "glitch.interior.opening": "InteriorOpening",
+      "glitch.interior.lens": "InteriorLens",
+      "glitch.back": "BackCover"
+    }
+  }
+}
