@@ -56,6 +56,10 @@ import {
   graphicLineOverlaysCatalogDir
 } from '@/lib/artifact-composer/catalogs/graphic-line-overlays'
 import { createCatalog as createGraphicLineStills, graphicLineStillsCatalogDir } from '@/lib/artifact-composer/catalogs/graphic-line-stills'
+import {
+  auditGraphicLineRendered,
+  type RenderedAuditViolation
+} from '@/lib/artifact-composer/catalogs/graphic-line-shared/rendered-audit'
 
 import { greenhouseCtaPainter, greenhouseSelectionPainter } from '../brand-surfaces/compose'
 
@@ -125,6 +129,13 @@ const SCOPE_LABEL: Record<CatalogScope, string> = { all: 'el set completo', insi
 
 const frameInScope = (frame: string, scope: CatalogScope): boolean =>
   scope === 'all' || frame.startsWith(SCOPE_FRAME_PREFIXES[scope])
+
+/**
+ * Las reglas de La órbita que sólo se ven renderizadas (D1: acento bajo 24 px; 3× en láminas de decisión) se miden
+ * sobre cada probe de sus catálogos. Una violación aborta el render: no se congela ni se aprueba un frame que rompe
+ * la norma, aunque coincida píxel a píxel con un baseline viejo.
+ */
+const renderedAuditFindings: { frame: string; violation: RenderedAuditViolation }[] = []
 
 const catalogsInScope = (scope: CatalogScope) =>
   scope === 'all' ? PROBE_CATALOGS : PROBE_CATALOGS.filter(target => target.frameDir.startsWith(SCOPE_FRAME_PREFIXES[scope]))
@@ -237,6 +248,12 @@ const renderOneCatalogProbes = async (
     try {
       await fillSlide(page, path.join(target.dir, entry.prototype), slide, contract, target.catalog)
       await page.screenshot({ path: path.join(outDir, rel) })
+
+      if (target.frameDir.startsWith(SCOPE_FRAME_PREFIXES['graphic-line'])) {
+        for (const violation of await auditGraphicLineRendered(page, entry.contentTypes)) {
+          renderedAuditFindings.push({ frame: rel, violation })
+        }
+      }
     } finally {
       await page.close()
     }
@@ -266,14 +283,28 @@ const renderAll = async (runDir: string, scope: CatalogScope = 'all'): Promise<s
 
   const browser = await launchComposerBrowser()
 
+  renderedAuditFindings.length = 0
+
+  let frames: string[]
+
   try {
     const probeFrames = await renderCatalogProbes(browser, runDir, catalogsInScope(scope))
     const skyFrames = scope === 'all' ? await renderSkyDeck(runDir) : []
 
-    return [...probeFrames, ...skyFrames].sort()
+    frames = [...probeFrames, ...skyFrames].sort()
   } finally {
     await browser.close()
   }
+
+  if (renderedAuditFindings.length > 0) {
+    throw new Error(
+      'La norma de La órbita falla sobre la lámina renderizada:\n' +
+        renderedAuditFindings.map(({ frame, violation }) => `  - ${frame} · ${violation.rule}: ${violation.detail}`).join('\n') +
+        '\n  Se corrige la plantilla o su token en AXIS; la regla no se relaja.'
+    )
+  }
+
+  return frames
 }
 
 interface FrameDiff {
