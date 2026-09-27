@@ -114,6 +114,8 @@ const DEPENDENCIAS = [
   'scripts/foto/accesibilidad.mjs',
   'scripts/foto/cta-variantes.mjs',
   'scripts/foto/cta-esquema.mjs',
+  'scripts/foto/cta-color-policy.mjs',
+  'scripts/foto/cta-graphic-voice.mjs',
   'scripts/foto/cta-integridad.mjs',
   'scripts/foto/cta-invariantes.mjs',
   'scripts/foto/svg-texto.mjs',
@@ -127,6 +129,7 @@ const DEPENDENCIAS = [
 export const ACTIVOS = [
   'src/assets/fonts/BricolageGrotesque-Variable.ttf',
   'src/assets/fonts/Poppins-Regular.ttf',
+  'src/assets/fonts/Poppins-Light.ttf',
   'src/assets/fonts/Poppins-Medium.ttf',
   'src/assets/fonts/Poppins-SemiBold.ttf',
   'src/assets/fonts/Poppins-Bold.ttf',

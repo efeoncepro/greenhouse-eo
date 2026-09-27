@@ -272,6 +272,8 @@ Un único cursor local hacia la acción cuando se use selección; multiplayer s�
 firma y envolvente completa del cursor; medir gaps de tinta, contraste y cada formato. El relleno acotado del CTA
 está autorizado sobre foto; no habilita tarjetas de contenido, paneles HUD ni scrims. Los tamaños de pilotos son
 casos, no nuevos tokens AXIS. Entregar copy/parámetros/compositor editables y conservar el estado de cada pieza.
+**Política por campaña (2026-09-25):** para una dirección contextual, declarar `cta.colorPolicy` con versión, campaña, archivo, SHA-256, tratamiento y razón por pieza. La política central fija paleta AXIS, roles y tratamientos; variante, prominencia y tokens del CTA deben coincidir. Permite integración, contraste deliberado o neutral sin convertir un color en default. Contraste sigue obligatorio; armonía y jerarquía requieren revisión visual. La ruta contextual no cambia colores automáticamente: `auto` y `--variantes` se conservan sólo en legacy; las alternativas contextuales se declaran como piezas con tratamientos autorizados. QA y gate comprueban la política y su evidencia; nunca marcar la pieza aprobada por pasar ese control. [Contrato y ejemplo](../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#20-política-cromática-por-campaña-optativa).
+
 **Color a demanda:** lima no es obligatorio; naranja, teal u otro autorizado según composición. Elegir tinta,
 contorno y relleno por separado: CTA/descriptor ≥4,5:1; borde/silueta y controles significativos ≥3:1. Medir
 el fondo real desfavorable, no sólo paleta o p98; documentar color resuelto y prueba. Ver método en el canon.
@@ -430,7 +432,7 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    `y: "auto"` descarta esas alturas. En las aprobadas avisa: KV-06-916 (CMP-002) mide 29,3 y queda como decisión del
    operador. Calibrado: el canto de «Que te elijan» 23,3; con el lecho subido, 6,0; pasan 85 de 86 firmas aprobadas. La
    guarda no reemplaza mirarla al 100 %.
-5. **CTA:** `variant: "auto"` + `prominencia` (ver arriba) o una variante fija con `cta.variantReason`. El acento es
+5. **CTA legacy sin `cta.colorPolicy`:** `variant: "auto"` + `prominencia` (ver arriba) o una variante fija con `cta.variantReason`. El acento es
    obligatorio: `surfaceToken` (contorno y relleno) o `inkToken` (texto) sólo aceptan `accentSurface`, `growthOnDark` o
    `accentInkOnLight`, y omitirlo resuelve lima. Si el acento no alcanza, se regenera el plate: el color no se apaga.
    **Nuevo:** en contorno y relleno, padding ≥ 0,5× (horizontal) y 0,25× (vertical) el cuerpo del CTA (`cta-aire`).

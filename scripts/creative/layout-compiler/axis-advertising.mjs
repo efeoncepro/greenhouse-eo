@@ -215,7 +215,7 @@ const labelPlacement = ({ hotspot, direction, labelWidth, labelHeight, cursorSiz
   return { x, y }
 }
 
-const selectionControls = ({ bounds, variant, stroke, handleSize }) => {
+const selectionControls = ({ bounds, variant, stroke, handleSize, minBracketStrokePx = 0 }) => {
   const width = bounds.right - bounds.left
   const height = bounds.bottom - bounds.top
 
@@ -233,7 +233,7 @@ const selectionControls = ({ bounds, variant, stroke, handleSize }) => {
   if (variant === 'open-brackets') {
     const arm = Math.min(width, height) * 0.12
 
-    return `<path d="M ${round(bounds.left + arm)} ${round(bounds.top)} H ${round(bounds.left)} V ${round(bounds.top + arm)} M ${round(bounds.right - arm)} ${round(bounds.top)} H ${round(bounds.right)} V ${round(bounds.top + arm)} M ${round(bounds.right)} ${round(bounds.bottom - arm)} V ${round(bounds.bottom)} H ${round(bounds.right - arm)} M ${round(bounds.left + arm)} ${round(bounds.bottom)} H ${round(bounds.left)} V ${round(bounds.bottom - arm)}" fill="none" stroke="${stroke}" stroke-width="${round(handleSize * 0.22)}"/>`
+    return `<path d="M ${round(bounds.left + arm)} ${round(bounds.top)} H ${round(bounds.left)} V ${round(bounds.top + arm)} M ${round(bounds.right - arm)} ${round(bounds.top)} H ${round(bounds.right)} V ${round(bounds.top + arm)} M ${round(bounds.right)} ${round(bounds.bottom - arm)} V ${round(bounds.bottom)} H ${round(bounds.right - arm)} M ${round(bounds.left + arm)} ${round(bounds.bottom)} H ${round(bounds.left)} V ${round(bounds.bottom - arm)}" fill="none" stroke="${stroke}" stroke-width="${round(Math.max(handleSize * 0.22, minBracketStrokePx))}"/>`
   }
 
   const activePoints = variant === 'four-corners' ? [points[0], points[2], points[4], points[6]] : points
@@ -311,6 +311,7 @@ const labelInkFor = color => (contrastRatio('#ffffff', color) >= contrastRatio('
 /**
  * `presentation` (opcional) adapta la escala de lectura a la superficie, sin tocar la semántica del manifest:
  * - `collaboratorScale`: multiplica cursor colaborador, etiqueta y separación (campañas leídas a 390 px necesitan >1).
+ * - `minBracketStrokePx`: optical floor for open brackets at the target display size; default zero preserves existing pixels.
  * - `localCursorScale`: multiplica el cursor local.
  * - `participantColors`: color por id de cursor colaborador (p. ej. color de marca de un partner). Debe ser #rrggbb y
  *   la tinta resultante debe alcanzar 4,5:1 o el render falla.
@@ -331,8 +332,9 @@ export const renderCollaborationSelection = ({ manifest, targetBounds, canvas, m
 
   const bounds = expandedBounds(targetBounds, manifest.selection.paddingRatio, canvas.width)
   const handleSize = Math.max(7, canvas.width * 0.008)
-  const { collaboratorScale = 1, localCursorScale = 1, participantColors = {}, frame = true } = presentation
+  const { collaboratorScale = 1, localCursorScale = 1, participantColors = {}, frame = true, minBracketStrokePx = 0 } = presentation
 
+  if (!Number.isFinite(minBracketStrokePx) || minBracketStrokePx < 0) throw new Error('minBracketStrokePx must be a finite nonnegative number')
   for (const [id, value] of Object.entries(participantColors))
     if (!/^#[0-9a-f]{6}$/i.test(value)) throw new Error(`participantColors.${id} must be #rrggbb`)
   if (!(collaboratorScale > 0) || !(localCursorScale > 0)) throw new Error('Presentation scales must be positive numbers')
@@ -349,7 +351,7 @@ export const renderCollaborationSelection = ({ manifest, targetBounds, canvas, m
       ? `<rect data-axis-selection-overlay-layer="true" x="${round(bounds.left)}" y="${round(bounds.top)}" width="${round(bounds.right - bounds.left)}" height="${round(bounds.bottom - bounds.top)}" fill="#808080" opacity="${manifest.selection.overlayOpacity}" style="mix-blend-mode:${manifest.selection.overlayBlendMode}"/>`
       : ''
 
-  const controls = frame ? selectionControls({ bounds, variant: manifest.selection.variant, stroke: '#a6cdf5', handleSize }) : ''
+  const controls = frame ? selectionControls({ bounds, variant: manifest.selection.variant, stroke: '#a6cdf5', handleSize, minBracketStrokePx }) : ''
   const cursors = []
   const cursorEvidence = []
   let collaboratorIndex = 0

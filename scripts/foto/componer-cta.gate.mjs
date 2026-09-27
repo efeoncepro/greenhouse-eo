@@ -16,6 +16,7 @@ import { axisAdvertising } from '@efeoncepro/axis-tokens'
 import { CANON_ANTERIOR, CANON_VIGENTE, COMPOSITOR, REPO, canonDe, dentroDelRepo, estable, huellaComando, huellaPieza, marcaDeSuite, registroCanonAlterado, rutaQa, rutaReal, sha } from './cta-integridad.mjs'
 import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
 import { TECHO_CANTO, copiaEnEscena } from './accesibilidad.mjs'
+import { resolveCtaColorPolicy, resolveColorPolicyPath } from './cta-color-policy.mjs'
 
 // Ancho y alto de un PNG, leídos de su cabecera (IHDR): el gate verifica el tamaño ENTREGADO sin decodificar la imagen.
 const dimensionesPng = b => (b.length >= 24 && b.readUInt32BE(12) === 0x49484452 ? [b.readUInt32BE(16), b.readUInt32BE(20)] : null)
@@ -184,7 +185,7 @@ if (REPRODUCIR) {
   let codigo = 1
 
   try {
-    const piezasPlan = JSON.parse(readFileSync(path.resolve(plan), 'utf8')).map(p => ({ ...p, plate: path.resolve(dir, p.plate) }))
+    const piezasPlan = JSON.parse(readFileSync(path.resolve(plan), 'utf8')).map(p => resolveColorPolicyPath({ ...p, plate: path.resolve(dir, p.plate) }, dir))
     const planTmp = path.join(tmp, path.basename(plan))
 
     writeFileSync(planTmp, JSON.stringify(piezasPlan, null, 2))
@@ -280,6 +281,26 @@ if (legado) {
 const piezas = JSON.parse(readFileSync(path.resolve(plan), 'utf8'))
 const qa = JSON.parse(readFileSync(qaPath, 'utf8'))
 const conCta = new Set(piezas.filter(p => p.cta).map(p => p.id))
+const politicasColor = new Map()
+
+// La política sustituye sólo la lista legacy de acentos. Archivo, decisión y evidencia se releen;
+// nunca se acepta un campo de QA como autorización para omitir las guardas de contraste.
+for (const p of piezas.filter(p => p.cta)) {
+  try {
+    const expected = resolveCtaColorPolicy(p.cta, dir)
+    const recorded = qa.find(r => r.id === p.id)?.ctaColorPolicy
+
+    if (expected) {
+      if (!recorded || estable(recorded) !== estable(expected)) throw new Error('la evidencia de política cromática falta o no coincide; recompón')
+      politicasColor.set(p.id, expected)
+    } else if (recorded !== undefined) throw new Error('el QA declara una política cromática que el plan no solicita')
+  } catch (error) {
+    console.error(`✗ ${p.id}: ${error.message}`)
+    process.exitCode = 1
+  }
+}
+
+if (process.exitCode) process.exit(1)
 
 // 🔴 Una pieza del plan que NO está en el QA no pasó: no se compuso [2026-09-22]. El loop de abajo sólo recorre
 // lo que el QA trae, así que una pieza ausente salía en verde por omisión — el mismo bug class que este archivo
@@ -435,7 +456,7 @@ if (process.exitCode) process.exit(1)
 const MIN_TEXTO = 4.5   // CTA y descriptor
 const MIN_BORDE = 3.0   // borde, controles y superficie contra la escena
 
-// 🔴 El acento del CTA es OBLIGATORIO, y este gate no lo veía [2026-09-22].
+// Ruta legacy SIN política de campaña: el acento sigue siendo obligatorio [2026-09-22].
 // El canon dice «color a demanda»: eso elige CUÁL color, nunca SI hay color. La corrección medida en
 // «Sé la referencia» degradó la TINTA a blanco cuando el naranja no alcanzaba — y conservó
 // `surface: accentSurface`. Las 8 piezas de `2026-09-22_aeo-cta-v03` lo confirman: surface es
@@ -484,7 +505,7 @@ for (const r of qa) {
   const campo = esText ? 'inkToken' : 'surfaceToken'
   const token = resuelta?.tokens ? resuelta.tokens[campo] : pieza.cta[campo]
 
-  if (token && !ACENTOS.has(token) && bloquea(
+  if (!politicasColor.has(pieza.id) && token && !ACENTOS.has(token) && bloquea(
     pieza, 'acento-cta',
     `\`${campo}: ${token}\` no es un acento (${[...ACENTOS].join(' · ')}). ` +
       (esText
@@ -690,6 +711,16 @@ const NOMBRE_VOZ = { label: 'etiqueta', lead: 'entrada', closure: 'cierre', bene
 
 for (const r of qa.filter(x => conCta.has(x.id))) {
   const p = piezas.find(x => x.id === r.id)
+
+  if (p?.graphicVoice) {
+    const g = r.graphicVoice
+    const inside = (a, b) => a && b && a.left >= b.left && a.right <= b.right && a.top >= b.top && a.bottom <= b.bottom
+
+    const valid = g?.contract === 'efeonce.graphic-line-orbit' && g.questionWeight === 300 && g.answerWeight === 760 && g.sphereCssPx >= 4 && inside(g.answerSphere, g.answerGroup)
+      && r.accesibilidad?.voces?.['pregunta-anillo']?.cumpleWcag && r.accesibilidad?.voces?.['respuesta-esfera']?.cumpleWcag
+
+    if (!valid) { console.error(`✗ ${r.id}: falta evidencia válida de la pregunta con anillo y respuesta con esfera AXIS`); fallos++ }
+  }
 
   for (const z of r.zonasIgnoradas ?? []) {
     const motivo = motivoAprobador(z.aprobadoPor)
@@ -1049,3 +1080,4 @@ const como = ORIGEN
   : 'cumplen el canon según su QA (verificación rápida: confía en el QA; la imagen se certifica con `--reproducir`)'
 
 console.log(`✓ ${n} pieza(s) con CTA ${como} · huellas del plan, el plate, el PNG, el layout, el texto alternativo y el comando · texto ≥${MIN_TEXTO}:1 · superficie ≥${MIN_BORDE}:1 · toda voz en WCAG 2.2 AA por su trazo, según su tamaño en pantalla · firma y zona segura del canon.`)
+if (politicasColor.size) console.log(`  Política cromática verificada en ${politicasColor.size} pieza(s); armonía, jerarquía del conjunto y aprobación creativa requieren revisión visual.`)

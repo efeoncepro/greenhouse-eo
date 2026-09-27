@@ -267,6 +267,8 @@ variante (§ abajo) y la de degradación por contraste.
 
 ### El portador del acento cambia por variante — y el gate lo verifica
 
+**Alcance desde 2026-09-25:** esta exigencia de acento rige para planes sin `cta.colorPolicy`. La ruta optativa de §20 verifica una política de campaña y permite tratamientos neutros con intención explícita, conservando contraste y todas las guardas. La historia siguiente explica la ruta legacy.
+
 **Verificado en `componer-cta.mjs:638` por la sesión «Ads con lenguaje fotográfico Efeonce», 2026-09-22.**
 En `variant: 'text'` el rect **no se dibuja**, así que `surfaceToken` es un campo **inerte**:
 
@@ -2026,7 +2028,7 @@ aprobador ni copia `suite-pruebas` a un plan real: si falta la aprobación, preg
   grande), medida sobre el trazo —el 1 % peor de los píxeles de glifo— y no sólo sobre la caja. Relleno y borde del
   CTA ≥ 3:1; el borde del contorno, ≥ 1 CSS px y ≥ 3:1 como se ve en un teléfono (390 px × DPR 2). Una voz sin
   medición falla.
-- **CTA:** 4,5:1 a cualquier tamaño, CTA y descriptor; APCA y daltonismo (`cta-perceptual`); acento obligatorio, con el
+- **CTA:** 4,5:1 a cualquier tamaño, CTA y descriptor; APCA y daltonismo (`cta-perceptual`); política cromática de campaña (§20), o acento obligatorio en planes sin política, con el
   portador que corresponde a la variante (`acento-cta`); en `solid`, el relleno contra la escena ≥ 3:1.
 - **Zona segura de AXIS** (`zona-segura`), con la firma medida contra su propia franja.
 - **Firma:** declarada siempre; ≥ 4,5:1 en la caja y en el trazo (`firma-contraste`); ≥ 20 % del lado corto
@@ -2284,3 +2286,84 @@ piezas del canon anterior; en una nueva el piso bloquea (`legibilidad`, tramo 13
 | `<id>: el borde del botón toca el texto del CTA…` | El relleno es menor que medio trazo del contorno (tramo 14) | Subir `paddingX`/`paddingY` |
 | `` <id>: el plate `…` es svg: usa una imagen raster… `` | El plate no es PNG, JPEG, WebP, AVIF ni TIFF (tramo 14) | Exportar la foto como imagen raster |
 | `<id>: el plate mide W×H y se entrega así: queda bajo 780 px de ancho, la densidad 2× de un teléfono de 390 CSS px…` | Sin `final`, lo entregado es el plate, y mide menos de 780 px de ancho (tramo 16) | Un plate de 780 px de ancho o más; las aprobadas entregan 1080 o más |
+
+
+## 20. Política cromática por campaña (optativa)
+
+Implementación local del 2026-09-25. [Decisión arquitectónica](../architecture/EFEONCE_ADVERTISING_CAMPAIGN_COLOR_POLICY_DECISION_V1.md). El plan sigue siendo un array y los comandos no cambian. Sin `cta.colorPolicy`, se conserva la ruta anterior: defaults, `auto`, `--variantes` y lista fija de acentos. No se cambian tamaños, composición, tipografía o espaciado.
+
+### Definir campaña y elegir tratamiento
+
+La política es un JSON local, con `version: 1`, `id`, `campaignId`, `direction`, `palette` y `treatments`. Fuente ejecutable de ejemplo: [CMP-004-color-v1.json](../campaigns/policies/CMP-004-color-v1.json). El esquema es `campaignColorPolicySchema` en `scripts/foto/cta-color-policy.mjs`.
+
+- `direction`: razones de paleta y roles de escena, texto y acción.
+- `palette`: tokens existentes en `axisAdvertising.color`, sin duplicados; nunca HEX inventados.
+- Cada tratamiento: ID único, estrategia `scene-related | intentional-contrast | neutral`, prominencia `discreta | delimitada | destacada`, variante explícita `text | outline | solid`, `inkToken`, `surfaceToken` cuando pinta borde/relleno, y razón.
+- `text` declara sólo tinta; una superficie sería ficticia y se rechaza. En contorno se registra borde; en sólido, relleno.
+
+En cada `cta` del plan, declarar `colorPolicy` y hacer coincidir `variant`, `prominencia`, `inkToken` y `surfaceToken` con el tratamiento elegido:
+
+```json
+{
+  "version": 1,
+  "campaignId": "CMP-004",
+  "source": "../../../docs/campaigns/policies/CMP-004-color-v1.json",
+  "sha256": "<sha256 real de los bytes del archivo>",
+  "treatment": "editorial-outline",
+  "reason": "La escena ya concentra azul y lima; el contorno conecta la acción con la tipografía."
+}
+```
+
+Ese objeto se coloca en `cta.colorPolicy`; el SHA ilustrativo debe reemplazarse por el real. La ruta es relativa al archivo de plan (también admite absoluta). `shasum -a 256 <archivo>` obtiene el hash. No se descargan políticas de URLs. Se valida todo antes de producir; política ausente, otra campaña, tratamiento desconocido, versión no soportada, hash distinto o parámetros que no coinciden son errores accionables.
+
+La política declara decisiones de dirección; no atribuye aprobación del operador a una pieza. Una nueva revisión debe conservar trazabilidad y actualizar explícitamente las referencias que migran. Los planes anteriores no se migran solos.
+
+### Alternativas y conflicto
+
+En esta versión contextual no se utiliza `auto` ni `--variantes`: elegir/autorizar los tratamientos primero y declarar cada alternativa como otra pieza con ID propio. La CLI explica el conflicto y conserva el plan; no cambia silenciosamente tono, variante o tinta para pasar contraste. La ruta legacy mantiene ambos modos. Si todas las opciones fallan, revisar tratamiento, composición o plate.
+
+### Evidencia y gate
+
+El QA incluye `ctaColorPolicy`: campaña, ID/hash de política, tratamiento, estrategia, prominencia, razones, variante y roles con token **y valor resuelto**. `visualReview: required` indica que este dato no certifica armonía. No contiene rutas específicas de la máquina, para poder comparar reproducciones.
+
+El gate relee y valida la política, recalcula la decisión y exige evidencia idéntica. Una evidencia ausente, manipulada o agregada a un plan sin política falla. `--reproducir` resuelve las referencias desde la ubicación original; el arnés de regresión también conserva esas rutas. El módulo nuevo participa de la huella del comando. Los QA de versiones anteriores pueden pedir recomposición porque cambió esa huella, aunque el píxel legacy sea idéntico.
+
+La política sustituye **sólo** la lista global `acento-cta`; no exceptúa lectura, contraste de texto/borde/relleno, controles, tamaño, ritmo, safe area, firma ni sujetos. El gate anuncia que armonía y jerarquía del conjunto necesitan revisión visual. Revisar master y escala de uso, pieza y serie; no inferir efectividad publicitaria del contraste.
+
+### Verificación dirigida
+
+```sh
+node --test scripts/foto/cta-color-policy.test.mjs scripts/foto/cta-esquema.test.mjs scripts/foto/cta-integridad.test.mjs scripts/foto/cta-variantes.test.mjs
+pnpm foto:componer:cta ai-generations/2026-09-25_cmp004-creative-kvs/color-policy-v1/piezas.json
+pnpm foto:cta:gate ai-generations/2026-09-25_cmp004-creative-kvs/color-policy-v1/piezas.json --reproducir
+```
+
+La evidencia fechada y el alcance de regresión viven en la [auditoría CMP-004](../audits/social/2026-09-25-cmp004-typography-grouping-review.md). La implementación de color no cierra la propuesta anterior de tipografía/espaciado ni la certificación global pendiente del compositor.
+
+## Voz de la línea gráfica sobre fotografía (opt-in, 2026-09-26)
+
+`graphicVoice: "efeonce"` materializa la pregunta y respuesta de `efeonce.graphic-line-orbit`
+(ADR aceptado `EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1`). Requiere alineación izquierda y pregunta
+Poppins; la respuesta admite hasta tres palabras, sin punto final ni marcado enriquecido. Usa
+Poppins Light 300, Bricolage 760 de ancho normal, tracking AXIS y esfera al final de la última línea,
+anclada a su baseline. El anillo abre la pregunta. El tamaño mantiene la regla de ≥3× y la esfera
+mide ≥4 CSS px en la vista de referencia. Los valores de marca se importan de `efeonceGraphicLine`.
+
+La selección raíz `selection` incluye respuesta y esfera; sigue siendo independiente de
+`cta.seleccion`. Elegir el CTA por intención, jerarquía y relación con la escena. Una caja de énfasis
+sobre la respuesta no requiere otra caja sobre el CTA. Las tres variantes de acción siguen vigentes.
+
+Los alias `brandDark`, `brandAccentOnDark`, `brandAccentOnLight` y `brandAccentSoft` resuelven los
+valores AXIS `dark`, `teal`, `tealDark` y `halo`. Su uso requiere una decisión explícita en la política
+de campaña; no implica recoloración automática ni aprobación visual. QA y layout registran la
+geometría del anillo, texto, esfera y conjunto. El gate comprueba evidencia y contraste de ambos
+signos. La fuente Light y el módulo están incluidos en la huella de integridad.
+
+Sin `graphicVoice`, la composición existente conserva sus píxeles. La verificación dirigida de la
+ronda `2026-09-26_cmp004-cmp005-reconciliation-r04` compara cuatro fixtures anteriores; no sustituye
+la certificación global. Las reservas fotográficas generales y la evaluación de la composición
+final se registran por separado: una prueba 4:5 legible no certifica adaptaciones a otros formatos.
+
+El adapter de selección admite `presentation.minBracketStrokePx` (cero por defecto). La voz optativa lo fija a un píxel CSS mínimo a escala de referencia, y QA mide ese mismo trazo; el cursor y sus anclas no cambian.
+
+En el modo `graphicVoice: "efeonce"`, los CTA `outline` y `solid` requieren `cta.radius > 0`: contorno y relleno son rectángulos redondeados según Tres voces + acción. Radio cero o ausente falla en el preflight; el tratamiento `text` no dibuja superficie. El radio se declara proporcional a cada composición y se revisa en el export; no se fija un valor universal ni se alteran planes legacy.

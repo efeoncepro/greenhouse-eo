@@ -41,6 +41,8 @@ SKY V17: companions Motion/Audio.
 
 **CTA:** [corte](docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#1910-regresión-y-mutantes-cómo-leerlos): tramo 16 local; novena sin informe, mutantes 81/175 parciales y P10 intermitente. No más rondas.
 
+**CTA color (25/09):** [política por campaña](docs/architecture/EFEONCE_ADVERTISING_CAMPAIGN_COLOR_POLICY_DECISION_V1.md) optativa local; 39 tests, 14 verificaciones, 13 regresiones idénticas y 4 candidatas CMP-004 reproducidas. Revisión visual del operador pendiente; tipografía/espaciado sin implementar. [Evidencia](docs/audits/social/2026-09-25-cmp004-typography-grouping-review.md).
+
 [EPIC-048](docs/epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md): revisión adversarial aplicada; ADR Proposed, tasks to-do; sin runtime/bono.
 
 **DataForSEO:** ISSUE-175 y TASK-1341 cerrados (guard en `ops-worker-deploy`, revisión 00699, smoke AIO PASS).
