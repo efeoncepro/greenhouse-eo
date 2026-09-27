@@ -31,11 +31,15 @@ Reglas duras:
   `pnpm -C ../efeonce-brand-workshop --filter glitch-motion {doctor|render|kit|transiciones|heroe|test}`. El texto sale
   del archivo de edición: nunca editar los `.mov` ni tocar tiempos o coordenadas de las composiciones.
 - Sonido de Glitch = **APROBADO, versión B (2026-09-27), sólo Glitch** (nunca Efeonce; la A quedó descartada): un WAV
-  sidecar por `.mov` (sólo los de `b/`); dos golpes graves (apertura y Drop); voz sola bajo las noticias; nunca la falla
-  sonora sobre la voz del host ni sonido de transición hacia o desde el host; nunca whooshes. Archivos por URL + SHA-256
-  en `gs://efeonce-group-axis-public-media/glitch/sound/v1/` (`/references/glitch.json` → `sound`). Canon §13.11 de la
+  sidecar por `.mov` (sólo los de `b/`); dos golpes graves (apertura y Drop); nunca la falla sonora sobre la voz del
+  host ni sonido de transición hacia o desde el host; nunca whooshes. Archivos por URL + SHA-256 en
+  `gs://efeonce-group-axis-public-media/glitch/sound/v1/` (`/references/glitch.json` → `sound`). Canon §13.11 de la
   norma; operativo en `references/glitch.md` §13.
-- Aprobado: sistema de portada A/B/C con rotación, lámina interior, contraportada; manzana como esfera y verde como acento; línea Growth; próxima edición #17; alta de los 5 glifos Plastilina (2026-09-27); diseño sonoro de Glitch, versión B (2026-09-27); **motion de Glitch (2026-09-27)**: apertura y tarjeta final v2, kit de overlays con el lower third, transición de bytes entre piezas y transición entre escenas, con los tableros de video del canvas (vlog 16:9 y reel). Cada render entrega el WAV junto a cada `.mov` (`--sound b|a|off`, `b` por defecto).
+- Música de Glitch = **APROBADA (2026-09-27), sólo Glitch**: tema B (intro, cortina, salida) + **cama post-punk bajo la
+  voz de las noticias** (reemplaza «voz sola»): 15 dB bajo la voz, ducking por sidechain, **nunca recortar los medios** y
+  **nunca síntesis pura** (lo «arcade» es falta de medios). Másteres por URL + sha256 en
+  `gs://efeonce-group-axis-public-media/glitch/music/v1/`; nunca regenerarlos. Canon §13.12 de la norma.
+- Aprobado: sistema de portada A/B/C con rotación, lámina interior, contraportada; manzana como esfera y verde como acento; línea Growth; próxima edición #17; alta de los 5 glifos Plastilina (2026-09-27); diseño sonoro de Glitch, versión B (2026-09-27); música de Glitch, tema B + cama post-punk (2026-09-27); **motion de Glitch (2026-09-27)**: apertura y tarjeta final v2, kit de overlays con el lower third, transición de bytes entre piezas y transición entre escenas, con los tableros de video del canvas (vlog 16:9 y reel). Cada render entrega el WAV junto a cada `.mov` (`--sound b|a|off`, `b` por defecto).
   Blog y lente siguen en **propuesta**: no se entregan como canon ni se publican sin el operador. Pendientes del motion
   (no decidir por el operador): fps, prueba con editores, ritmo, a qué piezas va la transición de bytes, subtítulos,
   textos reales de la #17, autoservicio, tokens (TASK-1922), archivo en GCS, push del taller y excepción de rostros.

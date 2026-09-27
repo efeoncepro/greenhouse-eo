@@ -103,6 +103,13 @@ spectral repair — el estándar de restauración), **Adobe Podcast / Enhance** 
 - **Nivel de la voz:** apunta la voz a **-16 LUFS integrado** en la mezcla.
 - **Música bajo la voz:** cuando hay voz encima, la música va **-18 a -20 dB** por debajo, con
   **ducking** automático para que baje al hablar y suba en los silencios.
+  - **Receta medida de una cama bajo la voz (caso Glitch, aprobada 2026-09-27; los valores de nivel y de estilo son
+    sólo de Glitch):** nivel **15 dB bajo la voz** (voz −16 LUFS → cama −31; en video −14 → −29); ducking por
+    **sidechain desde la voz** con umbral 0,05 (≈ −26 dBFS), razón 3:1, ataque 15 ms, relajación 350 ms; el bucle
+    corta en un **tiempo fuerte** con un fundido de potencia constante de **30 ms** en la juntura (sin clic);
+    **sin EQ de recorte de medios** y **mide los medios** (energía 300 Hz–3 kHz ≥ ~35 %): recortarlos la volvió
+    delgada, «arcade» (ver `ANTIPATTERNS.md`). La cama entra con la cabecera de cada noticia y la corta la cortina;
+    los SFX van encima sin atenuar. Detalle: `efeonce-graphic-line` → `references/glitch.md` §13.7.
 - **Balance entre voces:** iguala loudness percibida entre host e invitado (no dejes que uno
   suene lejos y el otro encima).
 

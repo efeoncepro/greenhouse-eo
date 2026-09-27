@@ -1,13 +1,15 @@
 # Identidad sonora de Efeonce V1
 
 > **Tipo de documento:** Norma de marca (sonido) · canon operativo
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-09-26 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude (v1.2: Glitch deja de estar pendiente; su diseño sonoro propio quedó aprobado, versión B)
+> **Última actualización:** 2026-09-27 por Claude (v1.3: puntero a la música propia de Glitch, §13.12 de su norma; sólo de Glitch. v1.2: Glitch deja de estar pendiente; su diseño sonoro propio quedó aprobado, versión B)
 > **Estado:** **Recomendada, no canon.** El operador aceptó la recomendación el 2026-09-26 («vamos con tu
 > recomendación»); la canonización queda pendiente (ver [Pendientes para canonizar](#pendientes-para-canonizar)).
 > **Glitch (podcast):** no forma parte de esta norma. Glitch tiene su diseño sonoro propio, **aprobado (versión B,
-> 2026-09-27)**, **sólo de Glitch**, en la [norma de Glitch](../brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) §13.11.
+> 2026-09-27)**, **sólo de Glitch**, en la [norma de Glitch](../brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) §13.11,
+> y también **música propia** (tema B + cama post-punk bajo la noticia, aprobada el 2026-09-27, sólo de Glitch) en la
+> §13.12 de esa norma. Nada de eso cambia esta identidad, que sigue «recomendada».
 > **Decisión:** [ADR `EFEONCE_SONIC_IDENTITY_DECISION_V1`](../../architecture/EFEONCE_SONIC_IDENTITY_DECISION_V1.md)
 > **Referencia viva:** [axis.efeonce.org/references/sonic-brand](https://axis.efeonce.org/references/sonic-brand/) ·
 > [JSON para agentes](https://axis.efeonce.org/references/sonic-brand.json) (publicados el 2026-09-26: PR de AXIS #4, squash `55486aa`)
@@ -112,7 +114,7 @@ Puntos de contacto por prioridad: video y redes → podcast Glitch → eventos.
 | Con locución, webinar o video explicativo | pieza larga de **fondo**, ~15 dB bajo la voz |
 | Lanzamiento, redes con ritmo, evento | pieza larga de **energía** o cierre de energía (5,1 s) |
 | Pieza de una sola línea de servicio | logo o etiqueta con el timbre de esa línea |
-| Glitch (podcast) | no se usa este kit. Glitch tiene su diseño sonoro propio, **aprobado (B)**, sólo de Glitch, en la [norma de Glitch](../brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) §13.11 |
+| Glitch (podcast) | no se usa este kit. Glitch tiene su diseño sonoro propio, **aprobado (B)**, sólo de Glitch, en la [norma de Glitch](../brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) §13.11, y su música propia (aprobada, sólo de Glitch) en la §13.12 |
 | Pantalla de recepción | sin sonido |
 | Clientes · UI de Greenhouse | no se usa |
 
@@ -265,5 +267,6 @@ Ya no es pendiente de esta norma: **Glitch (podcast).** Las rondas 4 y 5 explora
 rock) que al operador «aún no le convencían»; la ronda 6 cambió a **diseño sonoro en vez de música** y el operador
 aprobó la **versión B** el 2026-09-27. Glitch tiene su diseño sonoro propio, aprobado (B), **sólo de Glitch**, en la
 [norma de Glitch](../brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) §13.11 y en
-[axis.efeonce.org/references/glitch/#sonido](https://axis.efeonce.org/references/glitch/#sonido). No cambia esta
-identidad, que sigue «recomendada».
+[axis.efeonce.org/references/glitch/#sonido](https://axis.efeonce.org/references/glitch/#sonido). Desde el mismo día
+tiene también **música propia** (tema B + cama post-punk bajo la noticia), sólo de Glitch, en la §13.12 de esa norma.
+No cambia esta identidad, que sigue «recomendada».

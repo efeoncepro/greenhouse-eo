@@ -114,12 +114,20 @@ hipótesis de montaje, no benchmarks; revisar secuencia completa y no sólo el p
    **Glitch** (vlog «Glitch en voz alta» y reel): sub-línea sólo de Glitch en `efeonce-graphic-line` →
    `references/glitch.md` §6. El reel es un kit de **overlays con alfa encima de la toma del host** (mapa de zonas; la
    cara y la interfaz de la app nunca se tapan) + tarjeta final en loop; HyperFrames es el motor **propuesto**, aún sin
-   catálogo ni composiciones. Todo el video de Glitch está en PROPUESTA hasta que el operador lo apruebe.
+   catálogo ni composiciones. El motion de Glitch está **APROBADO** (2026-09-27, norma §7 y §13), igual que su sonido
+   (§13.11) y su música (§13.12); lo que sigue pendiente lo lista la norma §11.
    **Dónde:** repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/` (TASK-1924), operado desde
    `greenhouse-eo` con `pnpm -C ../efeonce-brand-workshop`; nunca en Greenhouse ni en Globe.
    **Sonido de Glitch (APROBADO, versión B, 2026-09-27; sólo Glitch):** cada pieza de motion de Glitch tiene una pista de sonido sidecar
    (WAV con el mismo nombre y duración que su `.mov`); si cambian los tiempos del motion, vuelve a correr el motor de
    sonido (`references/glitch.md` §13 de `efeonce-graphic-line`).
+   **Música de Glitch (APROBADA 2026-09-27; sólo Glitch):** tema B (intro, cortina, salida) y cama post-punk bajo la
+   noticia, a 150 BPM amarrados al motion. Se entrega **junto al motion consumiendo los másteres del bucket por URL +
+   sha256** (`glitch/music/v1/`; **nunca se regeneran**, y cambiar tiempos del motion no los rehace): intro con su
+   pre-roll, cortina 1,6 s antes de la cabecera siguiente, salida con la tarjeta final y la cama bajo cada noticia
+   (15 dB bajo la voz, ducking, sin recortar medios; nunca bajo el Drop ni la tarjeta final). Pendiente: integrarla en
+   `tools/glitch-motion` y **definir el motion del pre-roll de la intro** (3,2 s vlog / 9,6 s podcast antes de la
+   apertura). Detalle: `references/glitch.md` §13.7 de `efeonce-graphic-line`.
    **Registro cine (2026-09-27):** es un registro **fotográfico** del lenguaje de Efeonce
    ([`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)),
    no un estilo de video. Un video con **Nexa protagonista** que tome ese look respeta la misma frontera (cine sólo con

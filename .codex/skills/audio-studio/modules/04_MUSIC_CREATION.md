@@ -136,7 +136,8 @@ nivel pro. Flujo canónico:
 4. **Edita/arregla** (humano): recorta a la duración exacta, ajusta la estructura, alinea el hit
    point, hace *stem editing* si el modelo entrega stems, corrige transiciones.
 5. **Mezcla/mastering** (módulo 09): EQ contra la voz, loudness al target del destino, *ducking*
-   si va bajo VO.
+   si va bajo VO. Con mesura: vaciar los medios de una cama la deja delgada y suena a arcade (medido
+   en Glitch, ver `ANTIPATTERNS.md`); primero el ducking, y el EQ sólo si todavía hace falta.
 6. **Documenta la licencia** y pasa por **confirmación humana** antes de entregar.
 
 > **Lo que la IA todavía hace mal (cúralo tú):** transiciones abruptas entre secciones, *outros*

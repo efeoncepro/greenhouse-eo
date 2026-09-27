@@ -50,6 +50,7 @@ dos esferas en una pieza (manzana + lente u órbita).
 | Trampas que ya costaron tiempo | [references/lessons.md](references/lessons.md) |
 | **Una pieza de Glitch** (magazine semanal): portada A/B/C, carrusel, blog, vlog/reel — sub-línea sólo para Glitch | [references/glitch.md](references/glitch.md) |
 | **Sonido de Glitch** (APROBADO, versión B, 2026-09-27; sólo Glitch, nunca Efeonce): WAV sidecar por `.mov` del motion, archivos en `glitch/sound/v1/` del bucket de AXIS, motor migrado al taller (`tools/glitch-motion/src/sound.mjs` sobre `tools/brand-sound`, commit `2d411b8`): regenerar = correr el mismo comando de `glitch-motion` | [references/glitch.md §13](references/glitch.md) |
+| **Música de Glitch** (APROBADA 2026-09-27; sólo Glitch): tema B (intro, cortina, salida) y cama post-punk bajo la noticia; másteres por URL + sha256 en `glitch/music/v1/` del bucket de AXIS, nunca regenerados; cama 15 dB bajo la voz con ducking, sin recortar medios | [references/glitch.md §13.7](references/glitch.md) |
 
 ## Reglas duras (las más caras de romper)
 

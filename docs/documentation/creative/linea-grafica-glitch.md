@@ -1,10 +1,11 @@
 # Línea gráfica de Glitch — sub-línea de La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.5: los gráficos animados del video quedaron aprobados; v1.4: el
-> sonido de Glitch quedó aprobado, versión B)
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.6: la música de Glitch quedó aprobada, con música de fondo bajo
+> las noticias; v1.5: los gráficos animados del video quedaron aprobados; v1.4: el sonido de Glitch quedó aprobado,
+> versión B)
 > **Documentacion tecnica:** [Norma de la sub-línea de Glitch](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) · [ADR de la línea de Glitch](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
 > **Manual de uso:** [Componer piezas de Glitch](../../manual-de-uso/creative/componer-piezas-glitch.md) · [Editar el video de Glitch](../../manual-de-uso/creative/editar-video-glitch.md)
 
@@ -87,6 +88,7 @@ abre con la franja «El micrófono se abre». El carrusel cierra con la **contra
 | Gráficos animados del video (apertura, tarjeta final, kit y transiciones) | **aprobados** el 2026-09-27 («Si, el tuyo también está aprobado») |
 | Subtítulos del video | pendiente: falta definir su estilo |
 | Sonido de Glitch (sólo Glitch) | **aprobado**, versión B «más punch» (2026-09-27) |
+| Música de Glitch (sólo Glitch): intro, cortina entre noticias, salida y música de fondo bajo la noticia | **aprobada** el 2026-09-27 |
 | La manzana como esfera de Glitch y el verde como su color de acento | **aprobados** el 2026-09-27 (falta sumarlos al sistema de diseño AXIS) |
 | Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | **aprobados** el 2026-09-27 (falta sumarlos al catálogo de AXIS) |
 
@@ -162,12 +164,41 @@ Reglas simples:
 
 Se hicieron dos intensidades, **A** (contenida) y **B** (más punch). El operador eligió la **B** y la aprobó el
 2026-09-27 («La b me encanta más. Sus sonidos están aprobados»); la A queda descartada. Con eso quedó decidido también
-que el video lleva dos golpes graves (uno por cada vez que aparece la manzana), que bajo las noticias va sólo la voz,
-sin música, y que el clic del micrófono y el trazo de plumón se quedan como están. El editor recibe un archivo de
+que el video lleva dos golpes graves (uno por cada vez que aparece la manzana), que bajo las noticias iba sólo la voz,
+sin música (esto cambió el mismo día: ver «La música de Glitch»), y que el clic del micrófono y el trazo de plumón se
+quedan como están. El editor recibe un archivo de
 audio por cada gráfico animado, listo para ponerlo junto a él. Los archivos aprobados también están en la página de
 Glitch del sistema de diseño AXIS, en la sección de sonido.
 
 > Detalle técnico: [norma §13.11 Sonido](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1311-sonido--sólo-glitch-aprobado-versión-b) ·
+> montaje en [Editar el video de Glitch](../../manual-de-uso/creative/editar-video-glitch.md#6--montar-el-sonido)
+
+### La música de Glitch (aprobada el 2026-09-27)
+
+> **⚠️ Sólo para Glitch.** Esta música **no es de Efeonce** y nunca se usa en piezas de Efeonce ni de clientes.
+
+Además de los sonidos, Glitch tiene **música propia**: una banda con actitud (batería, bajo sucio y guitarra), irreverente
+y desafiante, que toca las mismas tres notas de Efeonce «con un bug» y va al mismo ritmo que los gráficos animados, así
+que cada golpe del video cae a tiempo con la música. Son cuatro piezas:
+
+- **Intro:** unos segundos de banda antes de la apertura; se corta en seco cuando empieza la apertura y la banda
+  vuelve a entrar cuando se rompe el tercer punto, con la manzana como el golpe más fuerte.
+- **Cortina:** un compás corto entre noticia y noticia, que se corta en seco cuando entra la siguiente noticia.
+- **Salida:** acompaña la tarjeta final y se corta con ella.
+- **Música de fondo bajo la noticia:** el operador la pidió porque, con voz sola, «el oyente se va a aburrir». Es un
+  post-punk suave que se repite mientras se relata cada noticia, bastante más bajo que la voz, y que baja solo cuando
+  alguien habla. No suena bajo el Drop ni bajo la tarjeta final.
+
+Antes de llegar aquí se descartaron varias versiones que sonaban «arcade», como de videojuego. Se midió por qué: les
+faltaba cuerpo en los sonidos medios. Por eso la regla es usar instrumentos de verdad y no quitarle esos medios a la
+música para hacerle espacio a la voz: ese espacio se lo da la música bajando sola cuando alguien habla.
+
+Hay versión para video y redes y versión para podcast. Los archivos aprobados están guardados en un almacenamiento
+público de Efeonce con una huella para comprobar que no cambiaron; también se van a mostrar en la página de Glitch del
+sistema de diseño AXIS, sección de música, cuando se publique el cambio. Falta que los gráficos animados entreguen la
+música junto a cada pieza y decidir qué se ve durante la intro, antes de la apertura.
+
+> Detalle técnico: [norma §13.12 Música](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1312-música--sólo-glitch-aprobada-tema-b--cama-post-punk) ·
 > montaje en [Editar el video de Glitch](../../manual-de-uso/creative/editar-video-glitch.md#6--montar-el-sonido)
 
 ## Cómo se va a producir (flujo aceptado; piezas fijas en construcción)
@@ -189,6 +220,7 @@ animarían y exportarían con fondo transparente para que el editor los ponga so
 | Logo de Glitch | `public/branding/glitch/glitch-light.svg` y `glitch-dark.svg` |
 | Gráficos animados del video (aprobados; cada uno con su sonido al lado) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto` (la carpeta conserva su nombre) |
 | Sonido del video (aprobado, versión B) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto › sonido-propuesta` → carpeta `b` (la carpeta conserva su nombre; `a` es la alternativa descartada) · [axis.efeonce.org/references/glitch/#sonido](https://axis.efeonce.org/references/glitch/#sonido) |
+| Música del video (aprobada) | almacenamiento público `glitch/music/v1/` (ver la norma §13.12) · página de Glitch en AXIS, sección de música (se publica con el cambio de AXIS) |
 | Guía de tono y voz de Glitch (v3) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Marca` |
 | Página de Glitch en el sistema de diseño AXIS | publicada en [axis.efeonce.org/references/glitch/](https://axis.efeonce.org/references/glitch/) (2026-09-27) |
 | Línea gráfica de Efeonce (la línea madre) | [La órbita](./linea-grafica-efeonce.md) |
@@ -201,6 +233,7 @@ animarían y exportarían con fondo transparente para que el editor los ponga so
 | Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | ya aprobados (2026-09-27); falta sumarlos al catálogo de AXIS |
 | Piezas en propuesta | aprobar lente y blog (el video y las tarjetas finales ya se aprobaron el 2026-09-27) |
 | Gráficos animados del video | ya aprobados (2026-09-27); falta la cadencia de grabación (hoy 30 cuadros por segundo), la prueba con los editores en una edición real, el ritmo ajustable, dónde se usa la transición de bytes (se recomienda sólo en tarjetas y Drop), el estilo de subtítulos, los textos reales de la #17, el formulario para cambiar textos sin programar, guardar una copia en la nube de Google y cualquier excepción a la regla de rostros |
+| Música de Glitch | ya aprobada (2026-09-27); falta que los gráficos animados la entreguen junto a cada pieza, decidir qué se ve durante la intro antes de la apertura y publicarla en AXIS |
 | Letra Guttery | licencia para web y video confirmada por el operador (2026-09-27) |
 | Producción automática | el video ya se produce solo desde los datos de la edición; falta construir la de piezas fijas (portadas, carrusel, banners: TASK-1923) |
 

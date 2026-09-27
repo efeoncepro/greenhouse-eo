@@ -20,6 +20,13 @@
 - ❌ **Una cola de campana larga sobre el evento siguiente.** Medido (Glitch, 2026-09-27): la campana de la manzana
   tapaba el golpe de texto que venía después. ✅ Acorta el decaimiento (se aceleró 2,2 veces) y revisa en el
   espectrograma, con marcas de cuadro, que cada golpe quede limpio.
+- ❌ **Recortar los medios de una cama para abrirle espacio a la voz.** Medido (Glitch, 2026-09-27): una cama con EQ
+  −6 dB a 700 Hz, −7 a 1,8 kHz y −3 a 3,2 kHz quedó con **13 %** de su energía entre 300 Hz y 3 kHz (sub +
+  chisporroteo agudo) contra **45 %** de la intro aprobada, y el operador la rechazó: «Vuelvo a sentir en tono
+  arcade». Además, **una maqueta sintetizada delgada contagia la re-grabación**: la IA conserva la falta de cuerpo.
+  ✅ El espacio lo da el **ducking** (sidechain desde la voz), no la EQ; parte de instrumentos reales (grabación con
+  IA desde texto o re-grabación de una maqueta con cuerpo) y mide los medios (≥ ~35 %; la cama aprobada tiene 38 %)
+  antes de pedir el oído del operador. Receta: `modules/07_PODCAST_PRODUCTION.md` §5.
 - ❌ **Podcast que suena distinto cada semana.** ✅ Consistencia (mismo sonido/estructura/día) = confianza
   algorítmica + hábito del oyente. Workflow documentado.
 

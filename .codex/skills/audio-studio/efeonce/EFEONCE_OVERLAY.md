@@ -64,7 +64,8 @@ Nexa) o un cliente Globe. Para audio genérico basta `../modules/`.
 > Canon: norma de Glitch [`GLITCH_GRAPHIC_LINE_V1.md`](../../../../docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
 > §13.11; operativo en `efeonce-graphic-line` → `references/glitch.md` §13.
 
-- **Reglas clave:** afinado en La mayor; diseño sonoro, no música; sin whooshes, subidas de tráiler ni chiptune (el
+- **Reglas clave:** afinado en La mayor; el sonido de la ronda 6 es diseño sonoro, no música (la música aprobada
+  va aparte, ver **Música** abajo); sin whooshes, subidas de tráiler ni chiptune (el
   corte es silencio digital en seco); un golpe grave por aparición de la manzana y el golpe sin comprimir; **la falla
   nunca sobre la voz del host** y ninguna transición suena hacia o desde la toma del host; la firma de Efeonce muda.
 - **Qué hay:** un WAV sidecar por cada `.mov` del motion (mismo nombre y duración; las transiciones con pista por
@@ -76,9 +77,19 @@ Nexa) o un cliente Globe. Para audio genérico basta `../modules/`.
   `gs://efeonce-group-axis-public-media/glitch/sound/v1/` (sólo la B: `masters/` y `web/`); entrega al editor en
   OneDrive `Alineación/5. Contenidos/09. Glitch/Motion/piloto/sonido-propuesta/b/` (la carpeta conserva su nombre).
 - **Estado:** **aprobado, versión B** (2026-09-27): «La b me encanta más. Sus sonidos están aprobados». Quedaron
-  resueltas las cuatro decisiones: B; dos golpes graves (apertura y Drop); voz sola bajo las noticias; el clic del
-  micrófono y el trazo del plumón sintetizados se quedan. Observación no bloqueante: en B, el golpe del cuadro 74 de la
+  resueltas las cuatro decisiones: B; dos golpes graves (apertura y Drop); ~~voz sola bajo las noticias~~ (**reemplazada
+  el 2026-09-27** por la cama post-punk, ver abajo); el clic del micrófono y el trazo del plumón sintetizados se quedan. Observación no bloqueante: en B, el golpe del cuadro 74 de la
   tarjeta final queda más tapado que en A.
+- **Música (APROBADA 2026-09-27, sólo Glitch):** tema B, irreverente y desafiante (big beat de banda: breakbeat, bajo
+  saturado con Mi · Mi · Mi → La, quintas sucias; 150 BPM amarrados al motion, una semicorchea = 3 cuadros a 30 fps):
+  intro con pre-roll, cortina entre noticias (corta en seco en 1,6 s, cae con la cabecera siguiente) y salida, en
+  versión vlog (−14 LUFS) y podcast (−16); y **cama post-punk** en bucle de 19,2 s bajo el relato de cada noticia
+  («Post-punk definitivamente»). Cama: 15 dB bajo la voz, ducking por sidechain (umbral 0,05, 3:1, 15 ms / 350 ms),
+  **sin recortar medios**, nunca bajo el Drop ni la tarjeta final. Lección medida: lo «arcade» es falta de medios
+  (13 % en la cama rechazada contra 45 % en la intro y 38 % en la cama aprobada); nunca síntesis pura para la música de
+  Glitch. Másteres por URL + sha256 en `gs://efeonce-group-axis-public-media/glitch/music/v1/` (con `index.json`);
+  **nunca se regeneran**: un cambio es una ronda nueva aprobada por el operador. Detalle, tabla de sha256, producción y
+  pendientes: `efeonce-graphic-line` → `references/glitch.md` §13.7; canon: norma §13.12 «Música — sólo Glitch».
 
 ## Ecosistema digital (SSOT: `docs/public-site/decisions/PDR-003`)
 

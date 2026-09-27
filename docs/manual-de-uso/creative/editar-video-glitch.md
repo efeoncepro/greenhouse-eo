@@ -1,9 +1,10 @@
 # Editar el video de Glitch con los gráficos animados — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.3: el motion quedó aprobado y cada `.mov` trae su WAV al lado;
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.4: la música quedó aprobada; se monta la cama post-punk bajo la
+> noticia, §6.1. v1.3: el motion quedó aprobado y cada `.mov` trae su WAV al lado;
 > v1.2: el sonido quedó aprobado, versión B; se monta desde `b/`)
 > **Modulo:** Creative · Glitch, magazine semanal de Efeonce (sub-línea de «La órbita») · video y motion
 > **Ruta en portal:** no aplica — los gráficos se entregan como archivos de video en OneDrive y se montan en Premiere Pro o After Effects
@@ -25,7 +26,8 @@ gráficos llegan hechos y tú los ubicas en la línea de tiempo.
 
 **Estado:** el motion que describe este manual está **aprobado** (2026-09-27; el operador: «Si, el tuyo también está
 aprobado»): apertura y tarjeta final v2, kit de gráficos, transición de bytes entre piezas y transición entre escenas.
-El **sonido** también está aprobado (versión B, 2026-09-27; sección 6). Siguen pendientes la prueba con los editores
+El **sonido** también está aprobado (versión B, 2026-09-27; sección 6), y la **música** (tema B y cama post-punk bajo la
+noticia, 2026-09-27; sección 6.1). Siguen pendientes la prueba con los editores
 en una edición real, la cadencia de grabación, el estilo de subtítulos, a qué piezas se aplica la transición de bytes
 y los textos reales de la #17: no publiques un video con textos entre corchetes.
 
@@ -212,8 +214,9 @@ transiciones entre escenas, que tienen una pista por formato.
    máscara y la capa**. La versión héroe tiene su pista `…-centro-heroe.wav`.
 4. **Transición de bytes entre piezas** (aprobada, en tarjeta y Drop): usa `noticia-bytes.wav` y `drop-bytes.wav` junto
    a la versión en bytes de esas piezas.
-5. **La voz del host va encima** y sin efectos: los sonidos del kit quedan debajo de la voz. **Bajo las noticias va
-   sólo la voz, sin música.**
+5. **La voz del host va encima** y sin efectos: los sonidos del kit quedan debajo de la voz. **Bajo las noticias va la
+   cama de música post-punk**, 15 dB bajo la voz y con ducking (ver [6.1 · Montar la música](#61--montar-la-música));
+   hasta el 2026-09-27 la regla era voz sola, sin música.
 6. Reproduce y revisa que cada golpe caiga con su movimiento (por ejemplo, la manzana de la apertura en el cuadro 48).
 
 **Qué no hacer con el sonido:**
@@ -233,6 +236,61 @@ transiciones entre escenas, que tienen una pista por formato.
 | El sonido ya no calza aunque esté bien alineado | cambió el motion (tiempos de una pieza o de una transición) después de generar el sonido | pide un nuevo render del motion: el mismo comando entrega otra vez el WAV junto a cada `.mov`, con los tiempos nuevos |
 | La transición no suena con el barrido | usaste la pista de otro formato, origen o duración, o no la alineaste con la máscara | usa la pista de tu formato con el mismo origen y duración, y alinéala al inicio de la máscara y la capa |
 | Hay un silencio seco al final de la apertura | es a propósito: el corte de Glitch es silencio | no lo rellenes |
+| La música de fondo suena delgada, «como de videojuego» | se le bajaron los medios con un ecualizador, o no es el archivo aprobado | quita la ecualización (el espacio para la voz lo da el ducking) y verifica el sha256 del archivo |
+| La cama tapa la voz | está más alta que 15 dB bajo la voz o falta el ducking | déjala a −29 LUFS (video) o −31 LUFS (podcast) y aplica el ducking desde la voz |
+| La cortina corta antes o después de la cabecera | no empieza 1,6 s antes de la cabecera siguiente | muévela para que su corte caiga en el cuadro en que entra la cabecera |
+
+#### 6.1 · Montar la música
+
+> **⚠️ Sólo para Glitch.** La música **no es de Efeonce**: no la uses en videos de Efeonce ni de clientes. Está
+> **aprobada** desde el 2026-09-27 (tema B completo y la cama post-punk bajo la noticia; el operador: «Post-punk
+> definitivamente»). Va **junto con** los sonidos de arriba, no en su lugar.
+
+**Dónde están los archivos:** en el almacenamiento público de Glitch,
+`https://storage.googleapis.com/efeonce-group-axis-public-media/glitch/music/v1/`, carpeta `masters/`. Hay una versión
+para **video y redes** (`-vlog`, a −14 LUFS) y otra para **podcast** (`-podcast`, a −16 LUFS); la cama es una sola para
+los dos. Cuando se publique el cambio de AXIS, también estarán en la página de Glitch, sección
+[Música](https://axis.efeonce.org/references/glitch/#musica).
+
+| Archivo | Qué es |
+|---|---|
+| `glitch-intro-vlog.wav` (7,2 s) · `glitch-intro-podcast.wav` (13,6 s) | la intro: banda antes de la apertura y, a continuación, la apertura aprobada con la banda (el archivo **ya trae montado** el sonido de la apertura) |
+| `glitch-cortina-vlog.wav` · `glitch-cortina-podcast.wav` (2 s) | la cortina entre noticias; corta en seco en 1,6 s |
+| `glitch-salida-vlog.wav` (3 s) · `glitch-salida-podcast.wav` (7 s) | la salida, con la tarjeta final (**ya trae montado** el sonido del cierre) |
+| `glitch-cama-bucle.wav` (19,2 s) | la cama post-punk que va en bucle bajo cada noticia |
+
+1. **Descarga el archivo** desde su dirección, por ejemplo
+   `curl -O https://storage.googleapis.com/efeonce-group-axis-public-media/glitch/music/v1/masters/glitch-cama-bucle.wav`.
+2. **Verifica que sea el aprobado:** en Mac, en Terminal, `shasum -a 256 glitch-cama-bucle.wav`. El resultado tiene que
+   ser idéntico al sha256 de ese archivo en la tabla de la
+   [norma §13.12](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1312-música--sólo-glitch-aprobada-tema-b--cama-post-punk)
+   (o en el `index.json` de la misma carpeta). Si no coincide, no lo uses y avisa al operador.
+3. **Intro:** ponla al comienzo del video. Primero suena el **pre-roll** de banda (3,2 s en video, 9,6 s en podcast);
+   la **apertura** empieza justo en ese punto (3,2 s o 9,6 s dentro del archivo), así que suelta el `.mov` de la
+   apertura en ese mismo instante. El archivo ya trae el sonido de la apertura montado: **no sumes aparte
+   `apertura.wav`** (sonaría doble). Desde ahí la banda entra con el quiebre (f24) y la manzana (f48) es el golpe
+   fuerte.
+4. **Cortina entre noticias:** empieza **1,6 s antes** de que entre la cabecera «NOTICIA n/3» siguiente, para que su
+   corte en seco caiga justo cuando aparece la cabecera.
+5. **Salida:** va con la tarjeta final, empezando en el mismo cuadro: la banda entra con «se cierra.», corta con la falla
+   (1,9 s) y después sólo queda el cierre de la manzana. Ya trae el sonido del cierre montado: **no sumes aparte
+   `cierre.wav`**.
+6. **Cama bajo la noticia:** en una pista propia, empieza con la cabecera «NOTICIA n/3» (el archivo arranca en el tiempo
+   fuerte) y **se repite en bucle** lo que dure el relato de la noticia (el bucle no tiene costura). **La corta la
+   cortina** (o el Drop, o la tarjeta final). No va bajo el Drop ni bajo la tarjeta final.
+7. **Nivel de la cama: 15 dB bajo la voz.** Con la voz a −14 LUFS (video), la cama queda a −29 LUFS; con la voz a
+   −16 LUFS (podcast), a −31 LUFS.
+8. **Ducking desde la voz:** a la pista de la cama ponle un compresor con entrada sidechain alimentada por la pista de
+   voz, con **umbral 0,05 (≈ −26 dBFS), razón 3:1, ataque 15 ms y relajación 350 ms**. La cama baja cuando alguien habla
+   y sube un poco en las pausas.
+9. **No ecualices la cama para bajarle los medios** («para que la voz se escuche mejor»): eso es justo lo que la hace
+   sonar «arcade». El espacio para la voz lo da el ducking.
+10. Los sonidos del kit (cabecera, lower third, noticia…) van **encima, a su nivel**, sin bajarlos.
+11. Escucha una noticia completa con voz, cama y cortina, y revisa que la cortina corte cuando entra la cabecera
+    siguiente.
+
+La demo `web/glitch-noticia-con-cama-16x9.mp4` muestra cómo queda una noticia con la cama; su voz es **sintética y
+provisional**: en el video real va la voz del host.
 
 ### Cambiar un texto
 
@@ -250,13 +308,13 @@ la acción) **salen de un archivo de edición** y los gráficos se vuelven a gen
 |---|---|
 | **Piloto** | primera versión hecha para probar el flujo y el montaje. Sirve para ensayar en Premiere o After Effects |
 | **Propuesta** | versión que se le muestra al operador para decidir. Se puede montar en pruebas, **no se publica como final** |
-| **Aprobado** | el operador la aprobó y se usa como pieza final. **Desde el 2026-09-27 el motion de este manual está aprobado** (apertura y tarjeta final v2, kit, transición de bytes entre piezas y transición entre escenas), y el sonido también (versión B) |
+| **Aprobado** | el operador la aprobó y se usa como pieza final. **Desde el 2026-09-27 el motion de este manual está aprobado** (apertura y tarjeta final v2, kit, transición de bytes entre piezas y transición entre escenas), y el sonido también (versión B), igual que la música (tema B y cama post-punk) |
 
 Aplicados a pedido del operador y aprobados: más punch (v2), la órbita real en el rótulo del host, la transición de
 bytes entre piezas y entre escenas. Siguen pendientes de decisión: la cadencia de grabación (hoy 30 fps), la prueba de
 los editores en Premiere y After Effects en una edición real, el ritmo ajustable, dónde se usa la transición de bytes
 (se recomienda sólo en tarjetas y Drop), el estilo de subtítulos, los textos reales de la #17 y cualquier excepción de
-rostros (por defecto, la falla nunca va sobre una cara). El sonido ya está decidido: **versión B aprobada** (2026-09-27).
+rostros (por defecto, la falla nunca va sobre una cara). El sonido ya está decidido: **versión B aprobada** (2026-09-27); la música también (tema B y cama post-punk, 2026-09-27).
 
 ## Qué no hacer
 
@@ -294,6 +352,7 @@ rostros (por defecto, la falla nunca va sobre una cara). El sonido ya está deci
 
 - Norma de la sub-línea (sección de video y motion): [`GLITCH_GRAPHIC_LINE_V1.md`](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
 - Sonido de Glitch (aprobado, versión B, sólo Glitch): [norma §13.11](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1311-sonido--sólo-glitch-aprobado-versión-b)
+- Música de Glitch (aprobada, tema B + cama post-punk, sólo Glitch): [norma §13.12](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1312-música--sólo-glitch-aprobada-tema-b--cama-post-punk)
 - Decisión de la línea: [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
 - Dónde se produce el motion (repo taller): [`EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md`](../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) · código en `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/`
 - Trabajo en curso: [TASK-1924](../../tasks/to-do/TASK-1924-glitch-motion-overlays-hyperframes.md)

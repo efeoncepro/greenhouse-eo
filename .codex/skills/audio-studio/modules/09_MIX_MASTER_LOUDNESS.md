@@ -63,7 +63,9 @@ Sabe qué hace cada parámetro y por qué lo mueves:
 ## 4. Balance, paneo y cadena de master
 
 - **Balance:** iguala la loudness percibida de cada elemento (no el fader, el **oído**). La voz
-  al frente; música y efectos ceden espacio con EQ complementario y ducking.
+  al frente; música y efectos ceden espacio con EQ complementario y ducking. El EQ es un corte
+  suave, no un vaciado: una cama sin medios suena delgada y arcade (caso Glitch medido: 13 % de
+  energía entre 300 Hz y 3 kHz contra 45 % del tema aprobado; ver `ANTIPATTERNS.md`).
 - **Paneo:** ubica elementos en el estéreo para que no se peleen por el centro; en podcast/VO la
   voz va **al centro y mono-compatible**.
 - **Cadena de bus/master (orden típico):** EQ correctivo → compresión de bus suave (glue, 1–3 dB)

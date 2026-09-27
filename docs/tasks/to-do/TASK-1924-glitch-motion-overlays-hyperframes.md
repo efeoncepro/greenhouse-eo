@@ -1,5 +1,19 @@
 # TASK-1924 — Glitch en movimiento con HyperFrames
 
+## Delta 2026-09-27 — música de Glitch aprobada (sólo Glitch)
+
+- **Música APROBADA** por el operador el 2026-09-27: tema B completo (intro, cortina y salida; «Me parecen bien
+  todas») y **cama post-punk bajo la noticia** («Post-punk definitivamente»). Reemplaza la decisión 3 del sonido («voz
+  sola bajo las noticias»). Sólo Glitch, nunca Efeonce. Canon en la
+  [norma §13.12](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1312-música--sólo-glitch-aprobada-tema-b--cama-post-punk).
+- **Másteres** (fuente de verdad, por URL + sha256): bucket público `gs://efeonce-group-axis-public-media/glitch/music/v1/`
+  (`masters/`, `web/` e `index.json`; 17 archivos verificados), separado de `glitch/sound/v1/`. Nunca se regeneran.
+- **Pendiente para esta task:** que cada render de `tools/glitch-motion` entregue la música junto a su pieza,
+  **consumiendo los másteres del bucket por URL + sha256** (intro con su pre-roll, cortina 1,6 s antes de la cabecera
+  siguiente, salida con la tarjeta final y cama bajo cada noticia, 15 dB bajo la voz con ducking y sin recortar medios);
+  definir el motion del pre-roll de la intro (3,2 s vlog / 9,6 s podcast; los puntos quietos de la ronda 8 son
+  provisorios). AXIS (`/references/glitch/#musica`, campo `music`) sale con su PR. El Lifecycle no cambia.
+
 ## Delta 2026-09-27 — motion de Glitch aprobado y sonido integrado
 
 - **Motion APROBADO** por el operador (Julio Reyes, 2026-09-27): «Si, el tuyo también está aprobado». Cubre la apertura

@@ -6,9 +6,10 @@
 > reglas y agrega lo propio de Glitch.
 >
 > **Tipo de documento:** Norma de marca (sub-línea de franquicia editorial)
-> **Versión:** 1.5
+> **Versión:** 1.6
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude (v1.5: **motion APROBADO**, §7, §9 y §13 — el operador: «Si, el tuyo
+> **Última actualización:** 2026-09-27 por Claude (v1.6: **música APROBADA**, tema B completo —intro, cortina, salida—
+> y cama post-punk bajo la noticia, §13.12; reemplaza la decisión 3 del sonido. v1.5: **motion APROBADO**, §7, §9 y §13 — el operador: «Si, el tuyo
 > también está aprobado». v1.4: diseño sonoro **APROBADO, versión B**, §13.11 — «La b me encanta más. Sus sonidos están
 > aprobados». Lente y blog siguen en **PROPUESTA**)
 > **Estado:** vigente para lo marcado **APROBADO** (2026-09-27). Lo marcado **PROPUESTA** o **EXPLORACIÓN** no se usa
@@ -18,6 +19,7 @@
 > numeración #17, glifos Plastilina—: `Accepted`, ver su [Delta 2026-09-27](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--decisiones-del-operador);
 > flujo de composición: `Accepted` el 2026-09-27; diseño sonoro de Glitch: `Accepted`, versión B, el 2026-09-27;
 > motion de Glitch: `Accepted` el 2026-09-27, ver su [Delta 2026-09-27 — motion aprobado](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--motion-aprobado);
+> música de Glitch (tema B + cama post-punk): `Accepted` el 2026-09-27, ver su [Delta 2026-09-27 — música aprobada](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--música-aprobada);
 > hogar del movimiento decidido: repo taller
 > [`efeoncepro/efeonce-brand-workshop`](../../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md), `tools/glitch-motion/`)
 > **Línea madre:** [Línea gráfica Efeonce «La órbita»](../EFEONCE_GRAPHIC_LINE_V1.md) · [índice de la carpeta](../README.md)
@@ -361,6 +363,7 @@ La foto del host de las maquetas es del banco de marca, generada con IA
 | Cinco glifos Plastilina de Glitch | alta **APROBADA** (2026-09-27); publicación en AXIS pendiente (TASK-1922) |
 | Línea de servicio Growth y eslogan «Empower your Growth» | **APROBADO** (2026-09-27) |
 | Diseño sonoro de Glitch (mnemónico, kit, lower third y transiciones) | **APROBADO, versión B** (2026-09-27, §13.11): «La b me encanta más. Sus sonidos están aprobados». La A queda como alternativa descartada. **Sólo de Glitch** |
+| Música de Glitch (tema B: intro, cortina y salida; cama post-punk bajo la noticia) | **APROBADA** (2026-09-27, §13.12): «Definitivamente la B es la decisión», «Me parecen bien todas» y «Post-punk definitivamente». Reemplaza la decisión 3 del sonido (voz sola bajo las noticias). **Sólo de Glitch**; pendientes la integración en el taller, el motion del pre-roll de la intro y AXIS |
 | Flujo de composición (Composer + HyperFrames en el repo taller) | **ACEPTADO** 2026-09-27 ([ADR](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)); en construcción: TASK-1922, TASK-1923, TASK-1924 (el motion de TASK-1924 ya existe en el taller y está **APROBADO** desde el 2026-09-27) |
 
 ---
@@ -383,8 +386,10 @@ la manzana y el verde (aprobados; falta el token en AXIS, TASK-1922), la línea 
 (la próxima es la **#17**), el alta de los cinco glifos Plastilina (aprobada; la ejecuta TASK-1922), la **licencia de
 Guttery** (confirmada para web y video; falta registrar la referencia del contrato), el **contenido del lower third**
 (definido: «AL AIRE · GLITCH #N», nombre y cargo, con la órbita real; variante de invitado), el **diseño sonoro**
-(aprobada la **versión B**, con sus cuatro decisiones: dos golpes graves, voz sola bajo las noticias y el clic del
-micrófono y el trazo del plumón sintetizados; §13.11), el **motion** (aprobado: apertura y tarjeta final v2, kit de
+(aprobada la **versión B**, con sus cuatro decisiones: dos golpes graves, voz sola bajo las noticias —reemplazada el
+mismo día por la cama post-punk de la música, §13.12— y el clic del micrófono y el trazo del plumón sintetizados;
+§13.11), la **música** (aprobado el tema B completo —intro, cortina y salida— y la cama post-punk bajo la noticia;
+§13.12), el **motion** (aprobado: apertura y tarjeta final v2, kit de
 overlays, lower third, transición de bytes entre piezas y transición entre escenas, con los tableros de video del
 canvas; ver el [Delta del ADR](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--motion-aprobado))
 y el **hogar del
@@ -405,6 +410,9 @@ movimiento** (repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-mot
 | Tokens | subir los valores de Glitch a tokens `glitchLine` (TASK-1922) |
 | Archivo en GCS | guardar el motion aprobado en GCS: pendiente |
 | Push del repo taller | los commits del taller están sin push |
+| Música en el taller | que cada render de `tools/glitch-motion` entregue la música junto a su pieza, consumiendo los másteres del bucket por URL + sha256 (§13.12) |
+| Motion del pre-roll de la intro | qué se ve en los 3,2 s (vlog) o 9,6 s (podcast) antes de la apertura; los puntos quietos de la ronda 8 son provisorios |
+| Música en AXIS | `/references/glitch/#musica` y campo `music` de `/references/glitch.json`: se publican con el PR de AXIS |
 
 ---
 
@@ -423,6 +431,9 @@ movimiento** (repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-mot
 | Entregas de sonido | OneDrive `Alineación/5. Contenidos/09. Glitch/Motion/piloto/sonido-propuesta/` (la carpeta conserva su nombre): `b/` es la versión **aprobada**; `a/` queda como alternativa descartada; `vista-previa/` y `LEEME.txt` | **APROBADO** (B) |
 | Sonido en AXIS | [axis.efeonce.org/references/glitch/#sonido](https://axis.efeonce.org/references/glitch/#sonido) (dentro de Motion) y `/references/glitch.json`, campo `sound` (URL + SHA-256 de cada archivo) | **publicado** 2026-09-27; contenido **APROBADO** (B) |
 | Archivos de sonido | bucket público `gs://efeonce-group-axis-public-media/glitch/sound/v1/` ([URL](https://storage.googleapis.com/efeonce-group-axis-public-media/glitch/sound/v1/)): sólo la B, `masters/` y `web/` | **APROBADO** (B) |
+| Sala de escucha de la música | [claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9](https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9) → rondas 9, 10, 11 y 11b | privado; aprobados el tema B y la cama post-punk |
+| Archivos de música | bucket público `gs://efeonce-group-axis-public-media/glitch/music/v1/` ([URL](https://storage.googleapis.com/efeonce-group-axis-public-media/glitch/music/v1/)): `masters/`, `web/` e `index.json` (§13.12) | **APROBADA** (2026-09-27) |
+| Música en AXIS | [axis.efeonce.org/references/glitch/#musica](https://axis.efeonce.org/references/glitch/#musica) y `/references/glitch.json`, campo `music` (URL + sha256) | se publica con el PR de AXIS |
 | Tokens `glitchLine` (`@efeoncepro/axis-tokens`) | — | **no existen todavía** |
 | Assets (`@efeoncepro/axis-brand-assets`: wordmark, manzana SVG, glifos Plastilina, Guttery si la licencia lo permite) | — | **no existen todavía** |
 | Contrato `efeonce.glitch-line` 0.1.0 | — | **no existe todavía** |
@@ -613,6 +624,9 @@ En corto:
 - Sonido (aprobado, versión B, §13.11): cada `.mov` trae al lado su WAV con el mismo nombre (y las vistas previas ya
   traen el sonido); cada WAV se suelta en 0 junto a su `.mov`; las transiciones entre escenas, al mismo
   inicio que la máscara y la capa. La voz del host nunca se procesa con la falla.
+- Música (aprobada, tema B + cama post-punk, §13.12): intro con su pre-roll, cortina 1,6 s antes de la cabecera
+  siguiente, salida con la tarjeta final y la cama en bucle bajo cada noticia, 15 dB bajo la voz, con ducking y sin
+  recortar medios.
 
 ### 13.10 Para el editor agente
 
@@ -654,7 +668,10 @@ pnpm -C ../efeonce-brand-workshop --filter glitch-motion test
 > aprobados»**. La **A** (contenida) queda como **alternativa descartada**: no se usa. La aprobación resuelve las cuatro
 > decisiones que estaban abiertas (abajo). Es la aprobación **del sonido**; el motion (imagen) tiene su propia aprobación,
 > también del 2026-09-27 (§13). Las rondas 4 y 5 exploraron dos versiones **musicales** (serena, con falla en la 3.ª nota; rock, con tartamudeo de
-> banda) que todavía no le convencían; la ronda 6 cambió el enfoque: **diseño sonoro, no música**.
+> banda) que todavía no le convencían; la ronda 6 cambió el enfoque: **diseño sonoro, no música**. Esa ronda resolvió
+> sólo el diseño sonoro; la **música** de Glitch vino después (rondas 8 a 11b) y quedó aprobada el 2026-09-27 en la
+> [§13.12](#1312-música--sólo-glitch-aprobada-tema-b--cama-post-punk): se monta junto a este diseño sonoro, no lo
+> reemplaza.
 
 **Concepto: «el sonido de Efeonce, con un bug».** En lo visual, Glitch es La órbita con una falla: dos puntos limpios y
 el tercero se rompe en bytes y se rearma como la manzana. El sonido hace lo mismo con el motivo de Efeonce:
@@ -795,8 +812,175 @@ del sonido):
 
 1. **B** (más punch). La A queda como alternativa descartada.
 2. **Dos golpes graves en el video**, apertura y Drop: uno por cada aparición de la manzana, tal como se produjo.
-3. **Voz sola bajo las noticias**, sin música.
+3. ~~**Voz sola bajo las noticias**, sin música.~~ **Reemplazada el 2026-09-27** por la aprobación de la música:
+   **cama post-punk bajo la voz de las noticias**, con sus reglas (15 dB bajo la voz, ducking, sin recortar medios);
+   ver [§13.12](#1312-música--sólo-glitch-aprobada-tema-b--cama-post-punk).
 4. El **clic del micrófono y el trazo del plumón sintetizados se quedan** (no pasan a ElevenLabs).
 
 **Observación (no bloqueante):** la sesión de motion midió que, en B, el golpe del cuadro 74 de la tarjeta final (el
 tercer punto que vuelve) queda más tapado que en A. Queda registrada; no cambia la aprobación.
+
+### 13.12 Música — sólo Glitch (APROBADA, tema B + cama post-punk)
+
+> **⚠️ Alcance:** esta música es **SÓLO de Glitch. No es de Efeonce**: no forma parte de la
+> [identidad sonora de Efeonce](../../brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md) y nunca se usa en piezas de Efeonce, de
+> su familia (Globe, Wave, Reach) ni de clientes. Igual que el diseño sonoro (§13.11), toma el motivo de Efeonce y le
+> pone «un bug», sólo en Glitch. La identidad sonora de Efeonce **no cambia** (sigue «recomendada»); en esa norma Glitch
+> sólo aparece como puntero a esta sección y a la §13.11.
+>
+> **Estado:** **APROBADO el tema completo de Glitch —intro, cortina, salida y cama bajo la noticia—** (2026-09-27). El
+> operador, en la sala de escucha:
+>
+> - Ronda 9: eligió la **dirección B** del tema: **«Definitivamente la B es la decisión»**. La A (experto y oscuro)
+>   queda descartada.
+> - Ronda 10: aprobó intro, cortina y salida del tema B: **«Me parecen bien todas»**. Y pidió música bajo la noticia:
+>   «y la música que va de fondo mientras relatan una noticia?» y «mientras estén dando la noticia el oyente se va a
+>   aburrir si es voz sola».
+> - Ronda 11 (cama sintetizada, bucle de 12,8 s desde la maqueta): **rechazada**: «No me gusta mucho, la cama sorry..
+>   Vuelvo a sentir en tono arcade».
+> - Ronda 11b (tres camas desde texto: post-punk, hip-hop tocado, tensión de redacción): eligió **«Post-punk
+>   definitivamente»**.
+>
+> **Cambia la decisión 3 del sonido** (§13.11): antes «voz sola bajo las noticias, sin música»; desde el 2026-09-27,
+> **cama post-punk bajo la voz de las noticias, con las reglas de abajo**. El diseño sonoro de la §13.11 no cambia: la
+> música se monta con él, no lo reemplaza.
+
+**Historial de lo descartado** (para que nadie lo repita): rondas 4 y 5 (versiones musicales serena y rock de la
+identidad: no convencieron) · ronda 7 (Pulso y Club, en síntesis: «no tiene el espíritu Glitch») · ronda 8 (el tema en
+síntesis pura: «se escucha muy arcade; Glitch es irreverente, desafiante, experto») · ronda 9, dirección A · ronda 11,
+cama sintetizada («tono arcade»).
+
+**Concepto: dirección B, irreverente y desafiante.** Big beat de banda: batería breakbeat, bajo sucio saturado con el
+motivo **Mi · Mi · Mi → La** (el motivo de Efeonce «con un bug») y quintas sucias. **150 BPM amarrados al motion:** una
+semicorchea = 0,1 s = 3 cuadros a 30 fps, así que todos los golpes del motion caen en la grilla (apertura: quiebre f24 =
+semicorchea 8, manzana f48 = 16, «se abre» f69 = 23, corte f105, silencio f108; tarjeta final: «se cierra.» f6 = 0,2 s,
+corte f57 = 1,9 s, el punto vuelve f74).
+
+La música respeta las reglas del sonido (§13.11): tonalidad **La mayor** (quintas, sin tercera en el tema); **un solo
+golpe grave por aparición de la manzana** (el sub propio suena sólo en la manzana); la apertura y el cierre aprobados
+(SFX de la B) se montan **intactos** encima; el **silencio digital** es parte del ritmo; **nunca** whooshes, chiptune
+ni subidas de tráiler; **nunca** la falla sobre la voz del host; la firma de Efeonce no suena.
+
+**Las piezas** (másteres en el bucket; vlog y redes a −14 LUFS, podcast a −16 LUFS):
+
+| Pieza | Vlog / redes (−14 LUFS) | Podcast (−16 LUFS) | Qué es |
+|---|---|---|---|
+| Intro | `glitch-intro-vlog.wav`, 7,2 s | `glitch-intro-podcast.wav`, 13,6 s | Pre-roll de banda (vlog: 2 compases = 3,2 s; podcast: 6 compases = 9,6 s); el último tiempo tartamudea sobre la grabación y corta. La **apertura aprobada** empieza en 3,2 s (vlog) o 9,6 s (podcast): silencio hasta el quiebre (f24), la banda entra desde el quiebre, la manzana (f48) es el drop con su sub y desde f108 hay silencio digital |
+| Cortina entre noticias | `glitch-cortina-vlog.wav`, 2 s | `glitch-cortina-podcast.wav`, 2 s | Un compás de banda con el motivo en el bajo; el último tiempo tartamudea sobre la grabación y **corta en seco en 1,6 s**. Se monta para que el corte caiga cuando entra la cabecera «NOTICIA n/3» siguiente: la cortina empieza **1,6 s antes** |
+| Salida | `glitch-salida-vlog.wav`, 3 s | `glitch-salida-podcast.wav`, 7 s | Va con la tarjeta final: la banda entra con «se cierra.» (0,2 s) y corta con la falla en f57 (1,9 s); después sólo suena el cierre aprobado (la manzana implosiona sola). El podcast suma dos compases (el segundo tartamudea) y la respuesta en La, cortada en seco |
+| Cama bajo la noticia | `glitch-cama-bucle.wav`, 19,2 s, bucle sin costura, máster a −16 LUFS | el mismo archivo | Post-punk instrumental: bajo eléctrico saturado con actitud, batería seca de sala y una guitarra rasgueada apagada en los contratiempos. Exacta a 150,00 BPM (medido). 12 compases desde el tiempo fuerte en 0,83 s de la toma; 30 ms de fundido de potencia constante en la juntura, sin clic (transiente en la unión 0,017, contra 0,018–0,028 de un tiempo fuerte normal) |
+
+**La intro y la salida ya traen montados la apertura y el cierre aprobados** (la etapa final de `glitch-theme.mjs` los
+monta intactos sobre la grabación): cuando se usa la música, **no se suma aparte** `apertura.wav` ni `cierre.wav` de la
+§13.11. La cortina y la cama no llevan SFX de la §13.11 dentro.
+
+**Reglas de montaje de la cama** (para el editor y para agentes):
+
+- Suena **sólo bajo el relato de cada noticia**: entra con la cabecera «NOTICIA n/3» (arranca en el tiempo fuerte, que
+  es el inicio del archivo) y **la corta la cortina** (o el Drop, o la tarjeta final). Se repite en bucle lo que dure la
+  noticia.
+- **No va bajo el Drop** (la manzana es el único grave) **ni bajo la tarjeta final**. La cama no lleva tartamudeos ni
+  falla.
+- **Sin EQ de recorte de medios** (ver la lección de abajo).
+- Los SFX del kit (cabecera, lower third, noticia…) van **encima, a su nivel del kit, sin atenuar** (ya vienen suaves:
+  −33/−34 LUFS).
+
+**Nivel y mezcla de la cama:**
+
+| Qué | Valor |
+|---|---|
+| Nivel | **15 dB bajo la voz**: voz a −16 LUFS en podcast → cama a −31 LUFS; voz a −14 LUFS en video → cama a −29 LUFS |
+| Ducking | **compresión por sidechain desde la voz**: umbral 0,05 (≈ −26 dBFS), razón 3:1, ataque 15 ms, relajación 350 ms. La cama baja cuando alguien habla y sube un poco en las pausas |
+| Ecualización | ninguna de recorte de medios: el espacio para la voz lo da el ducking |
+| SFX del kit | encima, a su nivel del kit, sin atenuar |
+
+**Lección medida: lo «arcade» es falta de medios.** Lo que al operador le sonó «arcade» es la **falta de cuerpo en los
+medios**. Medido: la intro aprobada tiene el **45 %** de su energía entre 300 Hz y 3 kHz; la cama rechazada, el **13 %**
+(sub más chisporroteo agudo); la cama post-punk aprobada, el **38 %**. Causas: la maqueta sintetizada era delgada y
+además se le recortaron los medios (EQ −6 dB a 700 Hz, −7 dB a 1,8 kHz y −3 dB a 3,2 kHz) para «dejar espacio a la
+voz». De ahí salen dos reglas:
+
+- **Nunca recortar los medios de la música de Glitch para abrirle espacio a la voz**: ese espacio lo da el ducking.
+- **Nunca síntesis pura para la música de Glitch**: instrumentos reales (grabación con IA desde texto o re-grabación de
+  la maqueta).
+
+Criterio numérico de control, que **no reemplaza el oído del operador**: medios (300 Hz–3 kHz) ≥ ~35 % de la energía.
+
+**Producción** (repo `greenhouse-eo`, carpeta de corrida `ai-generations/2026-09-26_branding-sonoro/`; el audio pesado
+queda fuera de git, los scripts y el LEEME están en git):
+
+| Qué | Cómo |
+|---|---|
+| `motor/glitch-theme.mjs` | Tres etapas: `--stage maqueta` (banda derecha propia) → re-grabación con IA → `--stage final --piece intro\|cortina\|salida --version vlog\|podcast --from <regrabado> [--apertura\|--cierre glitch-sfx/b/…]`. Aplica cortes, tartamudeo de búfer y silencio digital sobre la grabación real; monta intactos la apertura y el cierre de la B; el sub propio suena sólo en la manzana |
+| `motor/ai-music.ts` | Vía fal (cliente canónico `src/lib/ai/fal.ts`). Tema: `--route sa --plan tema-b --strength 0.7–0.75` = Stable Audio 2.5 audio a audio (conserva el tiempo de la maqueta con 0–5 ms de desvío y redondea a segundos enteros). **Cama:** `--route el-bed --plan cama-postpunk` = ElevenLabs Music v2.5 desde texto, sin maqueta, seed 7, 32 s. Estilos: «instrumental post-punk groove, live band in a room · overdriven bass guitar riff with swagger, tight dry live drums, one scratchy muted electric guitar · cocky, irreverent, restrained, leaves space for a talking voice · A major, 150 BPM»; negativos: vocals, singing, chiptune, video game, 8-bit, synthwave, arcade, lead synth, EDM drop |
+| `motor/glitch-cama-bucle.mjs` | Arma el bucle de 12 compases desde la toma (`--start 0.83 --bars 12`), con fundido de 30 ms, y lo masteriza a −16 LUFS con `motor/master.sh`. Determinista: dos corridas, mismo sha256 |
+| `motor/master.sh` | Sonoridad al destino (−14 LUFS video y redes, −16 podcast, pico −1 dBFS) sólo con ganancia lineal: el golpe no se comprime |
+
+Las piezas del tema son **grabación re-interpretada más edición**, no síntesis reproducible byte a byte desde cero: la
+**fuente de verdad son los archivos del bucket** (por URL + sha256). **Nunca se regeneran** con un modelo; si algo
+cambia, se produce una ronda nueva y la aprueba el operador.
+
+**Archivos (bucket público, sólo de Glitch):** `gs://efeonce-group-axis-public-media/glitch/music/v1/`
+([URL](https://storage.googleapis.com/efeonce-group-axis-public-media/glitch/music/v1/)), con un `index.json` que lista
+path, bytes, sha256, durationSec, lufs y truePeakDbfs. CORS permite `axis.efeonce.org`. Es un espacio separado del
+sonido (`glitch/sound/v1/`, cuyos hashes no se tocaron). 17 archivos, con los sha256 verificados descargando.
+
+| Path | s | LUFS | Pico real (dBTP) | sha256 |
+|---|---|---|---|---|
+| `masters/glitch-cama-bucle.wav` | 19,2 | −16,0 | −3,5 | `7fcfe7c7efe818a05a94d99a7496bd46336af0be024a080c408cec6544c9f8f0` |
+| `masters/glitch-cortina-podcast.wav` | 2,0 | −16,0 | −11,2 | `7b8eeafe106e83d837667818a976afba7c4a00602ab96992e4ae45e761fb607d` |
+| `masters/glitch-cortina-vlog.wav` | 2,0 | −14,0 | −9,1 | `f496f8ce8d3998d7111b9b509608c39f7510db664b121e0e62f18c25fe5a292b` |
+| `masters/glitch-intro-podcast.wav` | 13,6 | −16,3 | −3,6 | `c15fe1da1ec7ac351617177e14a92f64a64c1099f0fc07d0daeff3a50a74f59b` |
+| `masters/glitch-intro-vlog.wav` | 7,2 | −13,7 | −1,0 | `353b05bca5069ab09a40ffec663382b375e43555ecc52f1de0f39f61e0ae910d` |
+| `masters/glitch-salida-podcast.wav` | 7,0 | −16,2 | −3,5 | `04e31a3030798d0cac101490b77b9a653c86a92e5a63069ae8a49fa7f9fda25b` |
+| `masters/glitch-salida-vlog.wav` | 3,0 | −13,9 | −1,0 | `a4150f4c10b0217db1797df073b5d4de72c1eabd62589c91a4a286916b61ed61` |
+| `web/glitch-cama-3-vueltas.mp3` | 57,6 | −16,3 | −3,6 | `2dbe3e70b6f2f96720450b7ad841613203ac26ca91ea3eb25e601b52a1ba5691` |
+| `web/glitch-cortina-vlog.mp3` | 2,0 | | | `8d4eca8c76f9492c52387cbcb11cc3e82b073e0e2ea2d7a698af3d32736bdae6` |
+| `web/glitch-intro-podcast.mp3` | 13,6 | | | `10a7c1cd1715c1ea082dcb6ce63491a930d7cb92421630f3fc04aa6a9b3f08b8` |
+| `web/glitch-intro-vlog.mp3` | 7,2 | | | `3a1aa5497562f7c9fc5f076354c8100512f96e6944716effafc144ac989bad95` |
+| `web/glitch-noticia-con-cama-16x9.mp4` (+ `.webp`) | 24,0 | −14,0 | | `e682b285ab8548d992fbd416e5c97597dd156adb093be965b65c8f5cd16137df` |
+| `web/glitch-salida-podcast.mp3` | 7,0 | | | `961a6c6719a6c0078af95c9589d1cf061801cd2c0aa07838cc5a3097b5257d89` |
+| `web/glitch-salida-vlog.mp3` | 3,0 | | | `2b87103e87737c3d320f651e495a79eb4b6d0e1237ae3d961b603bd96b120c7a` |
+| `web/glitch-tema-edicion-16x9.mp4` (+ `.webp`) | 15,4 | | | `15e888da0086a61e0c576088622885b3b29ad2b1eb6673572a06522655826416` |
+
+- `glitch-noticia-con-cama-16x9.mp4` es una **demo**: la voz es **sintética y provisional** (voz TTS masculina «BRYAN
+  LOCUTOR 2» de ElevenLabs sobre una foto de host). En producción va la voz del host real.
+- `glitch-tema-edicion-16x9.mp4` es una edición de 15 s: intro → host (sin voz) → cortina → host → salida.
+- Sala de escucha (privada): [claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9](https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9)
+  → rondas 9, 10, 11 y 11b.
+- AXIS: [axis.efeonce.org/references/glitch/#musica](https://axis.efeonce.org/references/glitch/#musica) y el campo
+  `music` de `/references/glitch.json` (URL + sha256 de cada archivo), más la mención en «La familia: Glitch» de
+  `/references/sonic-brand/`: **se publican con el PR de AXIS** (`efeoncepro/axis-design-system`).
+
+**Reglas para el agente:**
+
+- Sólo en piezas de Glitch. **Nunca** mezclarla con el kit sonoro de Efeonce ni usarla fuera de Glitch.
+- **Usar los másteres por URL y verificar su sha256**; nunca regenerarlos con un modelo ni retocarlos a mano. Si algo
+  cambia, es una ronda nueva que aprueba el operador.
+- Cama: 15 dB bajo la voz, con ducking por sidechain (umbral 0,05, 3:1, 15 ms, 350 ms), **sin recortar medios**, sólo
+  bajo el relato de cada noticia; nunca bajo el Drop ni la tarjeta final.
+- **Nunca síntesis pura** para la música de Glitch; si una propuesta nueva suena delgada, medir los medios
+  (300 Hz–3 kHz ≥ ~35 % de la energía) antes de mostrarla. El número no reemplaza el oído del operador.
+- La apertura y el cierre aprobados (§13.11) van intactos encima; la falla nunca sobre la voz del host; la firma de
+  Efeonce no suena.
+- **Nunca** marcar como aprobada una ronda nueva ni hacer push sin la señal del operador.
+
+**Verificación hecha** (sin oído: el agente no escucha):
+
+| Qué | Resultado |
+|---|---|
+| Sonoridad | ebur128 de cada máster (tabla de archivos) |
+| Tempo | 150,00 BPM, medido por autocorrelación de ataques |
+| Juntura del bucle | sin clic (transiente 0,017 en la unión, contra 0,018–0,028 de un tiempo fuerte normal) |
+| Medios de la cama | 38 % de la energía entre 300 Hz y 3 kHz |
+| Integridad | sha256 de los 17 archivos verificados descargando del bucket |
+| Cómo suena | lo decidió el operador de oído: aprobó el tema completo (2026-09-27) |
+
+**Pendientes** (no bloquean la aprobación):
+
+| Pendiente | Qué falta |
+|---|---|
+| Integración en el taller | en `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion`: que cada render entregue la música junto a su pieza, **consumiendo los másteres del bucket por URL + sha256** (sin regenerarlos): intro con su pre-roll, cortina 1,6 s antes de la cabecera siguiente, salida con la tarjeta final y cama bajo cada noticia |
+| Motion del pre-roll de la intro | está **por definir** qué se ve en los 3,2 s (vlog) o 9,6 s (podcast) antes de la apertura; en la ronda 8 los puntos quietos se marcaron como provisorios |
+| AXIS | `/references/glitch/#musica`, campo `music` de `/references/glitch.json` y la mención en «La familia: Glitch» de `/references/sonic-brand/`: se publican con el PR de AXIS |
+| Push | sólo con la señal del operador |

@@ -10,10 +10,12 @@
 > movimiento quedó **decidido** el 2026-09-27: repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/`
 > ([decisión del taller](./EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md)); ver §«Delta — flujo aceptado». El **diseño
 > sonoro de Glitch** quedó **Accepted, versión B**, el 2026-09-27 (ver su Delta), y el **motion de Glitch** quedó
-> **Accepted** el mismo día ([Delta — motion aprobado](#delta-2026-09-27--motion-aprobado)). Lente y blog siguen en
-> propuesta.
+> **Accepted** el mismo día ([Delta — motion aprobado](#delta-2026-09-27--motion-aprobado)), igual que la **música de
+> Glitch** (tema B + cama post-punk; [Delta — música aprobada](#delta-2026-09-27--música-aprobada)). Lente y blog siguen
+> en propuesta.
 > **Creado:** 2026-09-27 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude (Delta: **motion aprobado**; antes, Delta del diseño sonoro
+> **Última actualización:** 2026-09-27 por Claude (Delta: **música aprobada**, sólo Glitch; antes, Delta del **motion
+> aprobado**; antes, Delta del diseño sonoro
 > **aprobado, versión B**, sólo Glitch)
 > **Norma operativa:** [`GLITCH_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
 > **Línea madre:** [`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
@@ -337,3 +339,31 @@ guarda su sha256); y el código no pasó por PR ni por el CI del taller (commits
   qué piezas se aplica la transición de bytes (recomendación: tarjetas y Drop); estilo de subtítulos; textos reales de
   la #17; formulario de autoservicio en Marketing Studio; tokens de Glitch (TASK-1922); archivo en GCS; push del repo
   taller; y cualquier excepción de rostros (la regla por defecto sigue: la falla nunca sobre un rostro).
+
+## Delta 2026-09-27 — música aprobada
+
+> **Alcance:** sólo Glitch, nunca Efeonce. No modifica la [identidad sonora de Efeonce](./EFEONCE_SONIC_IDENTITY_DECISION_V1.md),
+> que sigue «recomendada». Detalle operativo en la
+> [norma §13.12](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1312-música--sólo-glitch-aprobada-tema-b--cama-post-punk).
+
+- **Estado: Accepted (2026-09-27).** El operador eligió la dirección B del tema («Definitivamente la B es la
+  decisión»; la A, experta y oscura, queda descartada), aprobó intro, cortina y salida («Me parecen bien todas»),
+  rechazó la cama sintetizada («Vuelvo a sentir en tono arcade») y eligió la cama desde texto: **«Post-punk
+  definitivamente»**.
+- **Qué se decidió:** big beat de banda, irreverente y desafiante, con el motivo **Mi · Mi · Mi → La** en el bajo, en
+  La mayor y a **150 BPM amarrados al motion** (una semicorchea = 3 cuadros a 30 fps). Piezas: intro con pre-roll
+  (vlog y podcast), cortina entre noticias, salida con la tarjeta final y **cama post-punk en bucle bajo la noticia**,
+  15 dB bajo la voz, con ducking por sidechain y sin recortar medios.
+- **Supersede** la decisión 3 del [Delta del diseño sonoro](#delta-2026-09-27--diseño-sonoro-aprobado-versión-b-sólo-glitch)
+  («voz sola bajo las noticias, sin música»), que se conserva como historia. El diseño sonoro B no cambia: la música se
+  monta con él.
+- **Lección que queda como regla:** lo que suena «arcade» es falta de medios (medios 300 Hz–3 kHz: intro aprobada
+  45 %, cama rechazada 13 %, cama aprobada 38 %). **Nunca** recortar los medios de la música para abrirle espacio a la
+  voz (lo da el ducking) y **nunca** síntesis pura para la música de Glitch.
+- **Cómo se produce y dónde vive:** motores en `ai-generations/2026-09-26_branding-sonoro/motor/` (`glitch-theme.mjs`,
+  `ai-music.ts` vía fal, `glitch-cama-bucle.mjs`, `master.sh`). Las piezas son grabación re-interpretada más edición:
+  la **fuente de verdad son los 17 archivos** del bucket público `gs://efeonce-group-axis-public-media/glitch/music/v1/`
+  (con `index.json`; sha256 verificados), separado de `glitch/sound/v1/`. Nunca se regeneran con un modelo.
+- **Pendiente:** integrar la música en el taller (`tools/glitch-motion`, consumiendo los másteres por URL + sha256);
+  definir el motion del pre-roll de la intro; AXIS `/references/glitch/#musica` y campo `music` de
+  `/references/glitch.json`, que se publican con el PR de AXIS; push sólo con la señal del operador.
