@@ -467,22 +467,22 @@ explícito, y los intents existentes resuelven igual. El cutover es inmediato al
 
 ## Acceptance Criteria
 
-- [ ] `package.json` fija `@efeoncepro/axis-tokens` `0.3.9` y `@efeoncepro/axis-ui-contracts` `0.3.8`, y el lockfile coincide.
-- [ ] `pnpm brand:tokens --check` pasa sin diferencias.
-- [ ] Los 19 intents de ejemplo previos resuelven sin issues y producen el mismo plan que antes del bump (test en verde).
-- [ ] Un intent sin `use` resuelve `use: 'proposal'`; un `use` no admitido por la receta aborta la composición con el código de AXIS.
-- [ ] `selection.anchor` del manifest llega al adaptador de selección (test).
-- [ ] `cover-classic` y `close-classic` componen desde su intent de ejemplo, firmados con logo y sin burbuja URL; el cierre muestra el eslogan en tres tramos desde `content.slogan`.
-- [ ] `proposal-cinematic` compone con `layout` `service`, `hero` y `lines`; un intent pre-0.1.2 compone igual que antes.
+- [x] `package.json` fija `@efeoncepro/axis-tokens` `0.3.9` y `@efeoncepro/axis-ui-contracts` `0.3.8`, y el lockfile coincide. — Superado: se fijó `0.3.11` / `0.3.9` (release AXIS `v0.3.11` con los deltas b y c, commit `0d8a2b025`); TASK-1922 subió después a `0.3.12` / `0.3.10` (`4dfb147f7`).
+- [x] `pnpm brand:tokens --check` pasa sin diferencias. — Verificado tras el bump (`0d8a2b025`).
+- [x] Los 19 intents de ejemplo previos resuelven sin issues y producen el mismo plan que antes del bump (test en verde). — Comparación antes/después idéntica en 20 intents; snapshot en `__tests__/example-plans.test.ts`. El único plan que cambió después es el del tríptico, a propósito (`e811bc98c`).
+- [x] Un intent sin `use` resuelve `use: 'proposal'`; un `use` no admitido por la receta aborta la composición con el código de AXIS. — Tests en `plan-surface-piece.test.ts` (`d368ad1cc`).
+- [x] `selection.anchor` del manifest llega al adaptador de selección (test). — `d368ad1cc`.
+- [ ] **No se hace: el operador no aprobó el marco clásico (2026-09-27); lo reemplazan las 18 portadas y contraportadas del delta (d).** `cover-classic` y `close-classic` componen desde su intent de ejemplo, firmados con logo y sin burbuja URL; el cierre muestra el eslogan en tres tramos desde `content.slogan`.
+- [x] `proposal-cinematic` compone con `layout` `service`, `hero` y `lines`; un intent pre-0.1.2 compone igual que antes. — `5983b55f0`; una plantilla por composición, `ProposalCinematic.png` sin cambios. Compuestas con plate real y comparadas contra las referencias aprobadas.
 - [ ] Ninguna plantilla nueva o modificada contiene px, HEX o familia tipográfica literales que el token o el manifest ya declaran.
-- [ ] `pnpm brand:compose` con el intent de brochure produce un único PDF multipágina, el manifest `axis.surface-document.v1` y la procedencia.
-- [ ] Un intent de documento con issues (portada fuera del primer lugar, sin página `service`, línea del marco distinta) no produce PDF y reporta los códigos de AXIS.
+- [ ] `pnpm brand:compose` con el intent de brochure produce un único PDF multipágina, el manifest `axis.surface-document.v1` y la procedencia. — Parcial (`6b5d3a97b`): el documento de propuesta de 7 páginas sale en un PDF con manifest y procedencia; el brochure se detiene en `cover-brochure`, que aún no tiene plantilla.
+- [x] Un intent de documento con issues (portada fuera del primer lugar, sin página `service`, línea del marco distinta) no produce PDF y reporta los códigos de AXIS. — Tests en `document.test.ts` (`6b5d3a97b`).
 - [ ] `pnpm composer:visual-gate --catalog=graphic-line` queda a 0 px con los frames nuevos, y cada cambio de píxel (altas y modificaciones) está declarado en `BASELINE_DELTAS.md`.
 - [ ] `EFEONCE_SURFACE_COMPOSITION_V1.md` (§2.1, §4.6 y §7), el manual de uso y las skills `deck-studio` y `efeonce-graphic-line` describen 0.1.2, y `pnpm skills:mirrors` pasa.
 - [ ] El operador aprobó a ojo la portada, el cierre, los layouts `hero`/`lines` y el brochure compuestos.
-- [ ] (Delta d) `section-split` sube por la izquierda con la esfera arriba a la izquierda, y `section-split-corner-bottom` y `section-split-panel-end` componen desde su intent con frame en el gate.
-- [ ] (Delta d) `triptych` compone una palabra por toma, cada una con su esfera («Escucha.» «Crea.» «Mide.»).
-- [ ] (Delta d) Las portadas y contraportadas del delta (b) que AXIS declare `approved` componen desde su intent, con respuesta ≥ 3× en «Cuando quieras.», logo dentro de la órbita en el cierre y dirección desde `EFEONCE_CONTACT`; las que AXIS aún no declare quedan listadas en el cierre con su estado.
+- [ ] (Delta d) **Espera token en AXIS: el ángulo de inicio del arco (−115° desde las 12) y la regla de barrido ((n−1)×72°) sólo existen en el script aprobado.** `section-split` sube por la izquierda con la esfera arriba a la izquierda, y `section-split-corner-bottom` y `section-split-panel-end` componen desde su intent con frame en el gate.
+- [x] (Delta d) `triptych` compone una palabra por toma, cada una con su esfera («Escucha.» «Crea.» «Mide.»). — `e811bc98c`; frame declarado como modificación en `BASELINE_DELTAS.md`.
+- [ ] (Delta d) **Espera tokens en AXIS: pintura de la órbita gigante y del amanecer, tipografía y aire del bloque de contacto y redes, y el top de la columna de voz por lámina.** Las portadas y contraportadas del delta (b) que AXIS declare `approved` componen desde su intent, con respuesta ≥ 3× en «Cuando quieras.», logo dentro de la órbita en el cierre y dirección desde `EFEONCE_CONTACT`; las que AXIS aún no declare quedan listadas en el cierre con su estado.
 
 ## Verification
 
