@@ -347,6 +347,14 @@ propia, no.
 > emblema, y **`pnpm foto:emblema <plate.png>`** recorta y amplía las zonas del bordado en una hoja
 > para mirarlas. No deciden —un emblema se compara letra por letra contra el kit, no por píxeles—:
 > quitan la excusa de no haberlo mirado.
+>
+> Desde el 2026-09-27 hay un tercero para corregir: **`pnpm foto:isotipo <plate.png> --centro x,y --ancho w`**
+> limpia el emblema inventado midiendo el tono de la tela y compone el isotipo oficial de
+> `@efeoncepro/axis-brand-assets` (negativo sobre prenda oscura, positivo sobre clara) con la luz de la escena,
+> y escribe un `.json` de procedencia con la versión del paquete y el SHA-256 del SVG. El orden no cambia: las
+> vistas del kit en la ficha primero, `foto:emblema` al 100 % siempre, y `foto:isotipo` sólo cuando esa revisión
+> muestra un emblema distinto del oficial. No simula bordado: un primer plano que pide bordado verosímil se
+> rehace con otro encuadre.
 
 ### La técnica de aplicación la decide la TELA, no la costumbre del kit **[decisión del operador, 2026-09-21]**
 

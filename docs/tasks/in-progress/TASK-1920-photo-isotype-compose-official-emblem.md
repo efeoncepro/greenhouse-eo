@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Parcial`
+- Status real: `Implementación completa; cierre documental pendiente (Handoff/changelog con TASK-1919)`
 - Rank: `TBD`
 - Domain: `creative|brand`
 - Blocked by: `none`
@@ -204,14 +204,17 @@ Ninguna — repo-only change.
 
 - [x] `pnpm foto:isotipo` existe y compone el isotipo de `@efeoncepro/axis-brand-assets` con procedencia (commit
       `f3f93c926`).
-- [ ] `scripts/foto/isotipo.test.mjs` prueba que un emblema falso sintético desaparece de la zona y que el isotipo
-      oficial queda en la caja.
-- [ ] La prueba verifica que la procedencia registra versión del paquete y SHA-256 del SVG.
-- [ ] Argumentos inválidos (`--centro`/`--ancho` fuera de 0–1, `--prenda` desconocida, plate inexistente) fallan con
-      mensaje y código distinto de cero, con prueba.
-- [ ] La salida del comando sobre el plate sintético es idéntica antes y después del refactor.
-- [ ] `.claude/rules/brand-photography.md`, el canon de fotografía y la skill `design-studio` nombran el orden
-      referencias del kit → `foto:emblema` → `foto:isotipo` sólo si difiere; espejos `.codex/` al día.
+- [x] `scripts/foto/isotipo.test.ts` prueba que un emblema falso sintético desaparece de la zona y que el isotipo
+      oficial queda en la caja (va en `.ts` para que lo corra la suite `vitest` de CI; los `.test.mjs` de `scripts/foto` no
+      están en ningún runner).
+- [x] La prueba verifica que la procedencia registra versión del paquete y SHA-256 del SVG.
+- [x] Argumentos inválidos (`--centro`/`--ancho` fuera de 0–1, `--prenda` desconocida, plate inexistente) fallan con
+      mensaje y código distinto de cero, con prueba (`IsotipoError`; el CLI sale con 1 e imprime el uso).
+- [x] La salida del comando es idéntica antes y después del refactor: medido sobre el plate real M1 del polo
+      (`web-movil/plates/M1-avanza-polo.png`), 0 bytes distintos de 7 340 032.
+- [x] `.claude/rules/brand-photography.md`, el canon de fotografía (`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`) y la
+      skill `design-studio` (`references/efeonce-photographic-language.md`) nombran el orden referencias del kit →
+      `foto:emblema` → `foto:isotipo` sólo si difiere; espejo `.codex/` al día (`pnpm skills:mirrors` idéntico).
 
 ## Verification
 

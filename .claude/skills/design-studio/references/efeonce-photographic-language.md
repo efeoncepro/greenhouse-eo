@@ -311,6 +311,10 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 > ninguno era el de Efeonce. Mismo hecho que gobierna la firma. En orden: que **no se lea**, **componerlo**
 > después, o **editar con máscara**. **NUNCA** publicarlo como sale del generador; **NUNCA** cerrar sin
 > `pnpm foto:emblema <plate.png>`, que lo amplía — a tamaño de feed un bordado inventado pasa por bueno.
+> Si la revisión muestra un emblema distinto del oficial, **`pnpm foto:isotipo <plate.png> --centro x,y --ancho w`**
+> (2026-09-27) lo corrige: limpia la marca inventada y compone el isotipo de `@efeoncepro/axis-brand-assets` con la
+> luz de la escena y procedencia con SHA-256. El orden no cambia: vistas del kit en la ficha → `foto:emblema` al
+> 100 % → `foto:isotipo` sólo si difiere.
 
 > **Código de vestuario** **[operador, 2026-09-20]**: la prenda dice el REGISTRO. **Polera piqué** = oficina
 > casual · **Chaqueta** = reunión o instancia importante · **Gorra + polo** = terreno · **Hoodie** = terreno ·

@@ -174,6 +174,7 @@ pnpm foto:componer <piezas.json>    # la CAPA GRÁFICA encima: voces, selección
 pnpm foto:componer:cta <plan.json>  # pieza CON CTA: compone y emite su QA con huellas (out/qa-<plan>.json)
 pnpm foto:cta:gate <plan.json>      # la certifica: 0 certificado · 1 falla · 2 uso · 3 NO certificable (no es pase)
 pnpm foto:emblema <plate.png>       # amplía el bordado para mirarlo al 100% (no decide: quita la excusa)
+pnpm foto:isotipo <plate.png> --centro x,y --ancho w   # compone el isotipo OFICIAL si foto:emblema muestra otro
 pnpm foto:lanyard --nombre … --cargo … --foto …   # arma el lanyard determinístico; el modelo sólo lo termina
 ```
 
@@ -296,6 +297,10 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 - 🔴 **El emblema bordado NO se genera.** Medido 2026-09-20: tres prendas dieron **tres emblemas distintos y
   ninguno era el de Efeonce** (una espiral, dos barras, otras dos). Es el mismo hecho que gobierna la firma. En
   orden: que **no se lea** (de espaldas, en sombra, pequeño) · **componerlo** después · **editar con máscara**.
+  **Componerlo es `pnpm foto:isotipo`** (2026-09-27): limpia la marca inventada midiendo el tono de la tela,
+  compone el SVG de `@efeoncepro/axis-brand-assets` (negativo en prenda oscura) con la luz de la escena y deja
+  procedencia con SHA-256. **No reemplaza las referencias del kit** en la ficha (`objetos`), que siguen siendo el
+  primer paso: el orden es referencias → `foto:emblema` al 100 % → `foto:isotipo` sólo si el emblema difiere.
   **NUNCA** publicar el emblema tal como sale del generador, y **NUNCA** cerrar sin `pnpm foto:emblema`: el QA
   sobre una hoja de contacto no sirve, a 520 px un bordado no se lee y pasa por bueno.
 - 🔴 **La técnica de aplicación de marca la decide la TELA, no la costumbre del kit** **[operador, 2026-09-21]**:

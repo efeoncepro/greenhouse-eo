@@ -1,15 +1,19 @@
 // pnpm foto:isotipo <plate.png> --centro x,y --ancho w [--prenda oscura|clara] [--rotacion grados] [--out archivo.png]
 //
 // Compone el isotipo OFICIAL de Efeonce sobre el pecho de una prenda generada. Existe porque el modelo
-// no reproduce la marca: inventa una nave parecida, la mueve, la agranda o la espeja (caso fuente
-// 2026-09-20, cinco piezas con una espiral en lugar del emblema). `foto:emblema` sólo amplía la zona
-// para revisarla; este comando la corrige con el archivo de `@efeoncepro/axis-brand-assets`.
+// no reproduce la marca con garantía: aun con las vistas del kit como referencia, cuando el emblema queda
+// chico en el cuadro inventa una nave parecida, la mueve, la agranda o la espeja (caso fuente 2026-09-20,
+// cinco piezas con una espiral en lugar del emblema).
+//
+// Orden de uso (canon de fotografía de marca): 1) las referencias del kit en la ficha (`objetos`) — el
+// camino principal; 2) `pnpm foto:emblema` para mirar el bordado al 100 %; 3) este comando SÓLO si esa
+// revisión muestra un emblema distinto del oficial. No es un atajo para saltarse las referencias.
 //
 // Qué hace, en orden:
 //   1. Limpia la zona: los píxeles que se apartan del tono de la tela (medido en el anillo que rodea la
 //      caja) se rellenan con la tela suavizada. Así desaparece el emblema inventado sin borrar la trama.
-//   2. Rasteriza el isotipo oficial —negativo sobre prenda oscura, positivo sobre clara— al ancho pedido
-//      y lo compone en el centro de la caja, con la rotación que declares.
+//   2. Rasteriza el isotipo oficial —negativo sobre prenda oscura, positivo sobre clara— al ancho pedido,
+//      le da la luz de la escena (`brillo`) y lo compone en el centro de la caja con la rotación declarada.
 //   3. Escribe `<plate>-isotipo.png` y un `.json` de procedencia (versión del paquete, SHA-256 del SVG,
 //      caja, prenda) para que la pieza se pueda auditar después.
 //
@@ -18,15 +22,17 @@
 // NO simula bordado: compone el emblema plano con una leve suavización. Si la pieza pide un bordado
 // verosímil en primer plano, la foto se rehace con la prenda de espaldas o el emblema pequeño.
 import { createHash } from 'node:crypto'
+import { existsSync } from 'node:fs'
 import { readFile, writeFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import sharp from 'sharp'
 
 const require = createRequire(import.meta.url)
 
-const USO = `
+export const USO = `
 pnpm foto:isotipo <plate.png> --centro x,y --ancho w [opciones]
 
   --centro x,y     centro del emblema en fracciones del plate (0–1), p. ej. 0.62,0.58
@@ -38,84 +44,77 @@ pnpm foto:isotipo <plate.png> --centro x,y --ancho w [opciones]
   --sin-limpiar    no toca la tela; sólo compone el isotipo encima
   --out archivo    salida. Default: <plate>-isotipo.png junto al plate
 
-Después: pnpm foto:emblema <salida> para mirarlo al 100 % antes de aprobar.
+Antes: las referencias del kit en la ficha y pnpm foto:emblema. Después: pnpm foto:emblema <salida> para mirarlo al 100 %.
 `
 
-const args = process.argv.slice(2)
-const plate = args.find(a => !a.startsWith('--') && !isValueOf(a))
-
-function isValueOf(a) {
-  const i = args.indexOf(a)
-
-  return i > 0 && args[i - 1].startsWith('--') && !['--sin-limpiar'].includes(args[i - 1])
+export class IsotipoError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = 'IsotipoError'
+  }
 }
 
-function opt(name, fallback) {
-  const i = args.indexOf(`--${name}`)
-
-  return i === -1 ? fallback : args[i + 1]
+const validar = ({ centro, ancho, prenda, rotacion, brillo, umbral }) => {
+  if (centro.length !== 2 || centro.some(v => !(v >= 0 && v <= 1))) throw new IsotipoError('--centro debe ser x,y entre 0 y 1.')
+  if (!(ancho > 0 && ancho < 0.5)) throw new IsotipoError('--ancho debe estar entre 0 y 0,5 del ancho del plate.')
+  if (!['oscura', 'clara'].includes(prenda)) throw new IsotipoError('--prenda es oscura o clara.')
+  if (!(brillo >= 0.5 && brillo <= 1)) throw new IsotipoError('--brillo va entre 0,5 y 1.')
+  if (!Number.isFinite(rotacion) || Math.abs(rotacion) > 45) throw new IsotipoError('--rotacion va entre -45 y 45 grados.')
+  if (!(umbral > 0 && umbral < 255)) throw new IsotipoError('--umbral va entre 1 y 254.')
 }
 
-function fail(msg) {
-  console.error(`foto:isotipo — ${msg}\n${USO}`)
-  process.exit(1)
+/** Lee y valida los argumentos del CLI. Lanza `IsotipoError` con el mensaje para el operador. */
+export const parseArgs = argv => {
+  const args = [...argv]
+
+  const isValueOf = a => {
+    const i = args.indexOf(a)
+
+    return i > 0 && args[i - 1].startsWith('--') && args[i - 1] !== '--sin-limpiar'
+  }
+
+  const opt = (name, fallback) => {
+    const i = args.indexOf(`--${name}`)
+
+    return i === -1 ? fallback : args[i + 1]
+  }
+
+  const plate = args.find(a => !a.startsWith('--') && !isValueOf(a))
+
+  if (!plate) throw new IsotipoError('falta el plate.')
+
+  const opciones = {
+    plate,
+    centro: (opt('centro', '') || '').split(',').map(Number),
+    ancho: Number(opt('ancho', 'NaN')),
+    prenda: opt('prenda', 'oscura'),
+    rotacion: Number(opt('rotacion', '0')),
+    umbral: Number(opt('umbral', '38')),
+    brillo: Number(opt('brillo', '0.85')),
+    limpiar: !args.includes('--sin-limpiar'),
+    out: opt('out', plate.replace(/\.png$/i, '') + '-isotipo.png')
+  }
+
+  validar(opciones)
+
+  return opciones
 }
 
-if (!plate) fail('falta el plate.')
+/** El SVG oficial del paquete de marca y su huella. */
+export const isotipoOficial = async prenda => {
+  const pkgJson = require.resolve('@efeoncepro/axis-brand-assets/package.json')
+  const pkg = JSON.parse(await readFile(pkgJson, 'utf8'))
+  const variante = prenda === 'oscura' ? 'efeonce-isotype-negative' : 'efeonce-isotype-positive'
+  const svg = await readFile(path.join(path.dirname(pkgJson), 'assets', `${variante}.svg`))
 
-const centro = (opt('centro', '') || '').split(',').map(Number)
-const ancho = Number(opt('ancho', 'NaN'))
-const prenda = opt('prenda', 'oscura')
-const rotacion = Number(opt('rotacion', '0'))
-const umbral = Number(opt('umbral', '38'))
-const brillo = Number(opt('brillo', '0.85'))
-const limpiar = !args.includes('--sin-limpiar')
-
-if (centro.length !== 2 || centro.some(v => !(v >= 0 && v <= 1))) fail('--centro debe ser x,y entre 0 y 1.')
-if (!(ancho > 0 && ancho < 0.5)) fail('--ancho debe estar entre 0 y 0,5 del ancho del plate.')
-if (!['oscura', 'clara'].includes(prenda)) fail('--prenda es oscura o clara.')
-if (!(brillo >= 0.5 && brillo <= 1)) fail('--brillo va entre 0,5 y 1.')
-if (!Number.isFinite(rotacion) || Math.abs(rotacion) > 45) fail('--rotacion va entre -45 y 45 grados.')
-
-const out = opt('out', plate.replace(/\.png$/i, '') + '-isotipo.png')
-
-const pkgJson = require.resolve('@efeoncepro/axis-brand-assets/package.json')
-const pkgDir = path.dirname(pkgJson)
-const pkg = JSON.parse(await readFile(pkgJson, 'utf8'))
-const variante = prenda === 'oscura' ? 'efeonce-isotype-negative' : 'efeonce-isotype-positive'
-const svgPath = path.join(pkgDir, 'assets', `${variante}.svg`)
-const svg = await readFile(svgPath)
-const svgSha = createHash('sha256').update(svg).digest('hex')
-
-const base = sharp(plate).ensureAlpha()
-const meta = await base.metadata()
-const W = meta.width
-const H = meta.height
-
-const embW = Math.max(8, Math.round(ancho * W))
-const cx = Math.round(centro[0] * W)
-const cy = Math.round(centro[1] * H)
-
-// El isotipo es 727,4 × 516,12: la caja de limpieza toma el emblema con holgura para cubrir la marca
-// inventada, que suele ser más grande que la oficial.
-const embH = Math.round(embW * (516.12 / 727.4))
-const pad = Math.round(embW * 0.35)
-
-const box = {
-  left: Math.max(0, cx - Math.round(embW / 2) - pad),
-  top: Math.max(0, cy - Math.round(embH / 2) - pad)
+  return { svg, variante, paquete: `${pkg.name}@${pkg.version}`, sha256: createHash('sha256').update(svg).digest('hex') }
 }
 
-box.width = Math.min(W - box.left, embW + pad * 2)
-box.height = Math.min(H - box.top, embH + pad * 2)
-
-const { data: raw, info } = await sharp(plate).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
-const ch = info.channels
-
-let limpio = raw
-
-if (limpiar) {
-  // Tono de la tela: mediana del anillo de 4 px que rodea la caja.
+/**
+ * Tono de la tela: mediana del anillo de 4 px que rodea la caja. Los píxeles de la caja que se apartan de
+ * ese tono (el emblema inventado) se rellenan con la tela suavizada; la trama del resto queda intacta.
+ */
+const limpiarZona = async (raw, { W, H, ch, box, umbral, embW }) => {
   const anillo = []
   const ring = 4
 
@@ -141,7 +140,6 @@ if (limpiar) {
   const lum = (r, g, b) => 0.2126 * r + 0.7152 * g + 0.0722 * b
   const telaLum = lum(...tela)
 
-  // Máscara del emblema inventado + la tela con esos píxeles reemplazados por el tono de la tela.
   const mask = new Uint8Array(box.width * box.height)
   const relleno = Buffer.alloc(box.width * box.height * 3)
 
@@ -185,7 +183,7 @@ if (limpiar) {
     .raw()
     .toBuffer()
 
-  limpio = Buffer.from(raw)
+  const limpio = Buffer.from(raw)
 
   for (let y = 0; y < box.height; y++) {
     for (let x = 0; x < box.width; x++) {
@@ -199,52 +197,118 @@ if (limpiar) {
       limpio[i + 2] = suave[j * 3 + 2]
     }
   }
+
+  return limpio
 }
 
-let emblema = sharp(svg, { density: 72 * Math.max(1, (embW * 2) / 727.4) })
-  .resize({ width: embW })
-  .png()
+/**
+ * Compone el isotipo oficial sobre el plate y escribe la salida y su procedencia.
+ * @returns {Promise<{ out: string, procedencia: object, embW: number, variante: string }>}
+ */
+export const componerIsotipo = async opciones => {
+  const { plate, centro, ancho, prenda, rotacion, umbral, brillo, limpiar, out } = {
+    prenda: 'oscura',
+    rotacion: 0,
+    umbral: 38,
+    brillo: 0.85,
+    limpiar: true,
+    ...opciones
+  }
 
-if (rotacion) emblema = emblema.rotate(rotacion, { background: { r: 0, g: 0, b: 0, alpha: 0 } })
+  validar({ centro, ancho, prenda, rotacion, brillo, umbral })
 
-// Una suavización mínima: el emblema no puede quedar más nítido que la tela que lo lleva.
-// El hilo recibe la misma luz que la tela: el blanco puro de un archivo vectorial se lee pegado encima.
-const embBuf = await sharp(await emblema.toBuffer())
-  .linear([brillo, brillo, brillo, 1], [0, 0, 0, 0])
-  .blur(0.4)
-  .png()
-  .toBuffer()
+  if (!plate || !existsSync(plate)) throw new IsotipoError(`no existe el plate ${plate ?? '(vacío)'}.`)
 
-const embMeta = await sharp(embBuf).metadata()
+  const destino = out ?? plate.replace(/\.png$/i, '') + '-isotipo.png'
+  const oficial = await isotipoOficial(prenda)
 
-await sharp(limpio, { raw: { width: W, height: H, channels: ch } })
-  .composite([
-    {
-      input: embBuf,
-      left: Math.round(cx - embMeta.width / 2),
-      top: Math.round(cy - embMeta.height / 2),
-      blend: 'over'
-    }
-  ])
-  .png()
-  .toFile(out)
+  const { data: raw, info } = await sharp(plate).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+  const W = info.width
+  const H = info.height
+  const ch = info.channels
 
-const procedencia = {
-  schema: 'efeonce.foto.isotipo.v1',
-  plate: path.basename(plate),
-  salida: path.basename(out),
-  paquete: `${pkg.name}@${pkg.version}`,
-  archivo: `assets/${variante}.svg`,
-  sha256: svgSha,
-  prenda,
-  caja: { centro, ancho, rotacion },
-  brillo,
-  limpieza: limpiar ? { umbral } : null,
-  creado: new Date().toISOString()
+  const embW = Math.max(8, Math.round(ancho * W))
+  const cx = Math.round(centro[0] * W)
+  const cy = Math.round(centro[1] * H)
+
+  // El isotipo es 727,4 × 516,12: la caja de limpieza toma el emblema con holgura para cubrir la marca
+  // inventada, que suele ser más grande que la oficial.
+  const embH = Math.round(embW * (516.12 / 727.4))
+  const pad = Math.round(embW * 0.35)
+
+  const box = {
+    left: Math.max(0, cx - Math.round(embW / 2) - pad),
+    top: Math.max(0, cy - Math.round(embH / 2) - pad)
+  }
+
+  box.width = Math.min(W - box.left, embW + pad * 2)
+  box.height = Math.min(H - box.top, embH + pad * 2)
+
+  const limpio = limpiar ? await limpiarZona(raw, { W, H, ch, box, umbral, embW }) : raw
+
+  let emblema = sharp(oficial.svg, { density: 72 * Math.max(1, (embW * 2) / 727.4) })
+    .resize({ width: embW })
+    .png()
+
+  if (rotacion) emblema = emblema.rotate(rotacion, { background: { r: 0, g: 0, b: 0, alpha: 0 } })
+
+  // El hilo recibe la misma luz que la tela: el blanco puro de un archivo vectorial se lee pegado encima.
+  // Y el emblema no puede quedar más nítido que la tela que lo lleva.
+  const embBuf = await sharp(await emblema.toBuffer())
+    .linear([brillo, brillo, brillo, 1], [0, 0, 0, 0])
+    .blur(0.4)
+    .png()
+    .toBuffer()
+
+  const embMeta = await sharp(embBuf).metadata()
+
+  await sharp(limpio, { raw: { width: W, height: H, channels: ch } })
+    .composite([
+      {
+        input: embBuf,
+        left: Math.round(cx - embMeta.width / 2),
+        top: Math.round(cy - embMeta.height / 2),
+        blend: 'over'
+      }
+    ])
+    .png()
+    .toFile(destino)
+
+  const procedencia = {
+    schema: 'efeonce.foto.isotipo.v1',
+    plate: path.basename(plate),
+    salida: path.basename(destino),
+    paquete: oficial.paquete,
+    archivo: `assets/${oficial.variante}.svg`,
+    sha256: oficial.sha256,
+    prenda,
+    caja: { centro, ancho, rotacion },
+    brillo,
+    limpieza: limpiar ? { umbral } : null,
+    creado: new Date().toISOString()
+  }
+
+  await writeFile(destino.replace(/\.png$/i, '.json'), JSON.stringify(procedencia, null, 2) + '\n')
+
+  return { out: destino, procedencia, embW, variante: oficial.variante }
 }
 
-await writeFile(out.replace(/\.png$/i, '.json'), JSON.stringify(procedencia, null, 2) + '\n')
+const esCli = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 
-console.log(`foto:isotipo → ${out}
-  ${variante} de ${pkg.name}@${pkg.version} (sha256 ${svgSha.slice(0, 12)}…), ${embW} px de ancho.
+if (esCli) {
+  try {
+    const opciones = parseArgs(process.argv.slice(2))
+    const { out, procedencia, embW, variante } = await componerIsotipo(opciones)
+
+    console.log(`foto:isotipo → ${out}
+  ${variante} de ${procedencia.paquete} (sha256 ${procedencia.sha256.slice(0, 12)}…), ${embW} px de ancho.
   Revisa al 100 %: pnpm foto:emblema ${out}`)
+  } catch (error) {
+    if (error instanceof IsotipoError) {
+      console.error(`foto:isotipo — ${error.message}\n${USO}`)
+      process.exit(1)
+    }
+
+    throw error
+  }
+}
