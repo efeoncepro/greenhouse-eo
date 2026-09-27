@@ -81,6 +81,33 @@ export interface PlanGlitchEditionOptions {
    * de la contraportada no se componen (`font-license-missing`).
    */
   narratorLicenseStatus?: 'licensed' | 'pending'
+  /**
+   * Tamaño original de cada foto (por su ruta en el manifiesto). Los rostros y la región de la lente se declaran sobre la
+   * foto ORIGINAL; la foto se recorta centrada para llenar su hueco (cover), así que el mapper los traslada a ese
+   * recorte. Sin el tamaño (pruebas), se asume que la foto ya tiene la proporción del hueco.
+   */
+  photoSizes?: Readonly<Record<string, { width: number; height: number }>>
+}
+
+type Region = { x: number; y: number; w: number; h: number }
+
+/**
+ * Lleva una región normalizada a la foto original al recorte centrado que llena `fit` (cover, como el materializador).
+ * Devuelve `null` si la región queda entera fuera del recorte; la recorta al borde si queda en parte.
+ */
+export const fitRegion = (region: Region, source: { width: number; height: number }, fit: { width: number; height: number }): Region | null => {
+  const scale = Math.max(fit.width / source.width, fit.height / source.height)
+  const ox = (source.width * scale - fit.width) / 2
+  const oy = (source.height * scale - fit.height) / 2
+  const x0 = (region.x * source.width * scale - ox) / fit.width
+  const y0 = (region.y * source.height * scale - oy) / fit.height
+  const x1 = ((region.x + region.w) * source.width * scale - ox) / fit.width
+  const y1 = ((region.y + region.h) * source.height * scale - oy) / fit.height
+  const [cx0, cy0, cx1, cy1] = [Math.max(0, x0), Math.max(0, y0), Math.min(1, x1), Math.min(1, y1)]
+
+  if (cx1 <= cx0 || cy1 <= cy0) return null
+
+  return { x: cx0, y: cy0, w: cx1 - cx0, h: cy1 - cy0 }
 }
 
 /**
@@ -127,7 +154,7 @@ const newsById = (manifest: GlitchEditionManifest, id: string): GlitchNews => {
 const licenseOf = (news: GlitchNews) => `${news.photo.license.kind}:${news.photo.license.ref}`
 
 /** Rostros de la foto en px del lienzo (la foto ocupa `box`). */
-const faceBoxes = (box: Box, regions: GlitchNews['photo']['faceRegions']): Box[] =>
+const faceBoxes = (box: Box, regions: readonly Region[]): Box[] =>
   regions.map((r) => ({ x: Math.round(box.x + r.x * box.w), y: Math.round(box.y + r.y * box.h), w: Math.round(r.w * box.w), h: Math.round(r.h * box.h) }))
 
 const outletOf = (news: GlitchNews) => `${news.outlet} · ${glitchShortDate(news.date)}`
@@ -153,6 +180,15 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
   const cover = resolveCoverTemplate(manifest, options)
   const assets: GlitchAssetRequest[] = []
 
+  /** Las regiones de una foto, llevadas al recorte de su hueco. */
+  const regionsIn = (file: string, regions: readonly Region[], box: Box): Region[] => {
+    const source = options.photoSizes?.[file]
+
+    return source ? regions.flatMap((r) => fitRegion(r, source, { width: box.w, height: box.h }) ?? []) : [...regions]
+  }
+
+  const facesOf = (news: GlitchNews, box: Box) => faceBoxes(box, regionsIn(news.photo.file, news.photo.faceRegions, box))
+
   /** Pide una foto de noticia al tamaño exacto de su hueco, con su falla (el perfil y el borde los fija la plantilla). */
   const photo = (ref: string, news: GlitchNews, box: Box, canvas: Canvas, slideIds: string[], parts: FracturePart[]) => {
     assets.push({
@@ -161,7 +197,7 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
       path: news.photo.file,
       fit: { width: box.w, height: box.h },
       treatment: 'duotone',
-      fractures: parts.map((p) => ({ slideIds, box, edge: p.edge ?? news.photo.fractureEdge, profile: p.profile, faceRegions: news.photo.faceRegions, clip: p.clip, canvas }))
+      fractures: parts.map((p) => ({ slideIds, box, edge: p.edge ?? news.photo.fractureEdge, profile: p.profile, faceRegions: regionsIn(news.photo.file, news.photo.faceRegions, box), clip: p.clip, canvas }))
     })
 
     return `asset-ref:${ref}`
@@ -192,7 +228,7 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
       }
     })
 
-    const faces = cards.flatMap((c, i) => faceBoxes(boxes[i], c.news.photo.faceRegions))
+    const faces = cards.flatMap((c, i) => facesOf(c.news, boxes[i]))
 
     return {
       faces,
@@ -214,14 +250,14 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
         photo: { src: photo('photo:cover', coverNews, COVER_PHOTO, CANVAS_4X5, ['cover'], [{ profile: 'band' }]), alt: `Foto de la noticia de portada: ${coverNews.headline}` },
         credit: coverNews.photo.credit,
         photoLicense: licenseOf(coverNews),
-        faces: JSON.stringify(faceBoxes(COVER_PHOTO, coverNews.photo.faceRegions)),
+        faces: JSON.stringify(facesOf(coverNews, COVER_PHOTO)),
         edition,
         outlet: outletOf(coverNews),
         headline: { entry: coverHeadline.entry, ...punchParts(coverHeadline.punch) },
         lines,
         previousCoverTemplate: manifest.previousEdition.coverTemplate
       },
-      intent: { piece: 'portada-a', previousCoverTemplate: previous, faces: faceBoxes(COVER_PHOTO, coverNews.photo.faceRegions), headline: coverIntent }
+      intent: { piece: 'portada-a', previousCoverTemplate: previous, faces: facesOf(coverNews, COVER_PHOTO), headline: coverIntent }
     })
   } else if (cover === 'B') {
     const pov = manifest.cover.standalonePov!
@@ -255,7 +291,7 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
       ])
     }
 
-    const faces = faceBoxes(INTERIOR_PHOTO, news.photo.faceRegions)
+    const faces = facesOf(news, INTERIOR_PHOTO)
 
     const common = {
       edition,
@@ -272,7 +308,7 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
     }
 
     if (news.lens) {
-      const r = news.lens.region
+      const r = regionsIn(news.photo.file, [news.lens.region], INTERIOR_PHOTO)[0] ?? news.lens.region
 
       assets.push({ ref: `photo:${news.id}-lens`, kind: 'lens', path: news.photo.file, fit: { width: INTERIOR_PHOTO.w, height: INTERIOR_PHOTO.h }, region: r, diameter: LENS_DIAMETER })
       slides.push({
@@ -326,7 +362,7 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
     if (cover === 'A') {
       const box = square ? SQUARE_PHOTO : BLOG_PHOTO
       const parts: FracturePart[] = square ? [{ edge: 'bottom', profile: 'band' }] : [{ edge: 'bottom', profile: 'band' }, { edge: 'left', profile: 'side' }]
-      const faces = faceBoxes(box, coverNews.photo.faceRegions)
+      const faces = facesOf(coverNews, box)
 
       return {
         slideId,
@@ -375,7 +411,8 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
     const slideId = thumbnail ? 'video-thumbnail' : 'reel-cover'
     const box = thumbnail ? THUMB_HOST : REEL_HOST
     const canvas = thumbnail ? CANVAS_THUMB : CANVAS_9X16
-    const faces = faceBoxes(box, host.faceRegions)
+    const hostRegions = regionsIn(host.file, host.faceRegions, box)
+    const faces = faceBoxes(box, hostRegions)
 
     assets.push({
       ref: `photo:${slideId}`,
@@ -383,7 +420,7 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
       path: host.file,
       fit: { width: box.w, height: box.h },
       treatment: 'color',
-      fractures: [{ slideIds: [slideId], box, edge: thumbnail ? 'left' : 'top', profile: thumbnail ? 'side' : 'host', faceRegions: host.faceRegions, canvas }]
+      fractures: [{ slideIds: [slideId], box, edge: thumbnail ? 'left' : 'top', profile: thumbnail ? 'side' : 'host', faceRegions: hostRegions, canvas }]
     })
 
     return {
@@ -411,7 +448,7 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
     else if (output.startsWith('blog:news:')) {
       const news = newsById(manifest, output.slice('blog:news:'.length))
       const slideId = `blog-news-${news.id}`
-      const faces = faceBoxes(NEWS_PHOTO, news.photo.faceRegions)
+      const faces = facesOf(news, NEWS_PHOTO)
 
       extra.push({
         slideId,

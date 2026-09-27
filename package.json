@@ -312,6 +312,7 @@
     "brand:compose": "tsx scripts/brand-surfaces/compose.ts",
     "brand:deck-recipes": "node scripts/creative/deck-recipes/render-index.mjs",
     "brand:tokens": "tsx scripts/brand-surfaces/compile-tokens.ts",
+    "glitch:compose": "tsx scripts/glitch/compose.ts",
     "glitch:tokens": "tsx scripts/glitch/compile-tokens.ts",
     "foto:generar": "node scripts/foto/generar.mjs",
     "foto:lanyard": "node scripts/foto/lanyard.mjs",

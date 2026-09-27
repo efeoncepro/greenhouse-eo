@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 import { resolvePlan } from '@/lib/artifact-composer/catalog'
 import { createGlitchCarouselCatalog, createGlitchOverlaysCatalog, createGlitchStillsCatalog } from '@/lib/artifact-composer/catalogs/glitch'
 
-import { GlitchPieceError, attachFractures, planGlitchEdition, resolveCoverTemplate } from '..'
+import { GlitchPieceError, attachFractures, fitRegion, planGlitchEdition, resolveCoverTemplate } from '..'
 import type { GlitchEditionManifest } from '../manifest'
 
 const EXAMPLE = path.resolve(__dirname, '../examples/edition-17.example.json')
@@ -239,5 +239,30 @@ describe('planGlitchEdition', () => {
     expect(stills.validators.every((v) => v.result === 'pass')).toBe(true)
     expect(overlays.slides).toHaveLength(18)
     expect(overlays.validators.every((v) => v.result === 'pass')).toBe(true)
+  })
+})
+
+describe('fitRegion — rostros y lente llevados al recorte centrado del hueco', () => {
+  it('una foto 3:2 en un hueco 1080 × 450 pierde arriba y abajo: la región se estira en alto', () => {
+    const r = fitRegion({ x: 0.4, y: 0.4, w: 0.2, h: 0.2 }, { width: 1200, height: 800 }, { width: 1080, height: 450 })!
+
+    expect(r.x).toBeCloseTo(0.4, 5)
+    expect(r.w).toBeCloseTo(0.2, 5)
+    // Escala 0,9 (llena el ancho): la foto mide 720 de alto y se recortan 135 px arriba y abajo.
+    expect(r.y).toBeCloseTo((0.4 * 720 - 135) / 450, 5)
+    expect(r.h).toBeCloseTo((0.2 * 720) / 450, 5)
+  })
+
+  it('una región que queda fuera del recorte desaparece; una en el borde se recorta', () => {
+    expect(fitRegion({ x: 0.4, y: 0, w: 0.2, h: 0.1 }, { width: 1200, height: 800 }, { width: 1080, height: 450 })).toBeNull()
+    expect(fitRegion({ x: 0.4, y: 0.1, w: 0.2, h: 0.2 }, { width: 1200, height: 800 }, { width: 1080, height: 450 })!.y).toBe(0)
+  })
+
+  it('con el tamaño de la foto, el mapper pide la falla con los rostros ya trasladados', () => {
+    const m = load()
+    const plan = planGlitchEdition(m, { photoSizes: Object.fromEntries(m.news.map((n) => [n.photo.file, { width: 1200, height: 750 }])) })
+    const cover = plan.assets.find((a) => a.ref === 'photo:cover')!
+
+    expect(cover.kind === 'photo' && cover.fractures[0].faceRegions[0].h).toBeGreaterThan(m.news[0].photo.faceRegions[0].h)
   })
 })

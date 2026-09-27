@@ -24,6 +24,7 @@ export type GlitchPieceErrorCode =
   | 'photo-license-missing'
   | 'fracture-over-face'
   | 'contract-issues'
+  | 'carousel-too-heavy'
 
 export interface GlitchIssue {
   code: string

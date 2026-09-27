@@ -3,6 +3,8 @@
  *
  * - Duotono navy de la falla en bytes: luminancia → mezcla entre `glitchLine.bytes.duotone.from` y `.to` (valores del
  *   token, nunca literales). La foto de la lente conserva su color (`treatment: 'color'`).
+ * - Recorte CENTRADO para llenar el hueco (cover): el mapper traslada los rostros y la lente a ese mismo recorte
+ *   (`fitRegion`), así que el recorte no puede ser «inteligente».
  * - Pre-rasterizado al tamaño EXACTO del hueco × deviceScaleFactor, PNG sin perfil embebido: Chromium hace blit 1:1 sin
  *   re-muestrear (mitigación de ISSUE-122).
  * - Devuelve el SHA-256 de la foto procesada (la semilla de la falla) y las muestras de color del borde, una por
@@ -31,7 +33,7 @@ export interface ProcessedPhoto {
 export const processPhoto = async (input: Buffer, fit: { width: number; height: number }, treatment: 'duotone' | 'color', scale = 1): Promise<ProcessedPhoto> => {
   const width = Math.round(fit.width * scale)
   const height = Math.round(fit.height * scale)
-  const resized = sharp(input).rotate().resize(width, height, { fit: 'cover', position: 'attention' }).removeAlpha()
+  const resized = sharp(input).rotate().resize(width, height, { fit: 'cover', position: 'centre' }).removeAlpha()
   let png: Buffer
 
   if (treatment === 'color') {
@@ -106,7 +108,7 @@ export const processLensDetail = async (
   zoom = 1.25,
   scale = 1
 ): Promise<ProcessedPhoto> => {
-  const base = await sharp(input).rotate().resize(fit.width, fit.height, { fit: 'cover', position: 'attention' }).removeAlpha().png().toBuffer()
+  const base = await sharp(input).rotate().resize(fit.width, fit.height, { fit: 'cover', position: 'centre' }).removeAlpha().png().toBuffer()
   const side = Math.round(diameter / zoom)
   const cx = (region.x + region.w / 2) * fit.width
   const cy = (region.y + region.h / 2) * fit.height
