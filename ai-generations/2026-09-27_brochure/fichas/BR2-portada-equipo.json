@@ -1,0 +1,12 @@
+{
+  "id": "BR2-portada-equipo",
+  "formato": "16:9",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "objetos": [{ "objeto": "chaqueta-softshell-efeonce" }, { "objeto": "polo-efeonce" }, { "objeto": "hoodie-efeonce" }],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic ensemble movie poster still, a dark studio at night): on the RIGHT half of the frame, a team of four stands in a loose staggered V, all facing the camera and all looking straight into the lens; nobody looks at anyone else. In FRONT and in the center of the group, she (the woman of the references) wears the NAVY EFEONCE SOFTSHELL JACKET, framed from the knees up, arms relaxed, a calm confident half-smile. Half a step behind her, to her left, a Chilean strategist in her thirties with dark hair tied back wears the NAVY EFEONCE POLO; to her right, a Chilean art director in his late twenties with short dark hair and a light beard wears the NAVY EFEONCE HOODIE; further back, slightly out of focus, a Chilean developer in his forties with glasses wears the NAVY EFEONCE POLO. At their feet and on one shoulder, five small friendly robot agents with rounded white bodies and happy glowing screen faces stand with them, each the size of a cat. REALISTIC ADULT PROPORTIONS: camera about three meters away at chest height, 85mm. A strong cool teal-white rim light from behind cuts every silhouette from the dark and crosses a thin haze; a soft low key from the front models the faces. The LEFT 45% of the frame is calm, deep dark studio space with nothing in it, only faint haze. Rich contrast, deep navy blacks, no text, no logos of any other brand.",
+  "lecho": { "objeto": "the dark studio floor in the lowest fifth, dissolved into shadow", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the calm, deep dark studio space on the left 45% of the frame", "tinta": "blanca" } }
+}

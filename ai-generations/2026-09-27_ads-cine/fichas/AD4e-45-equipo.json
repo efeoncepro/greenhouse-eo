@@ -1,0 +1,32 @@
+{
+  "id": "AD4e-45-equipo",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    },
+    {
+      "objeto": "polo-efeonce"
+    },
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic ensemble movie poster still, vertical, an empty dark studio at night, no desks, no monitors, no plants, no lamps): in the LOWER two thirds of the frame, a team of four stands side by side in one shallow line, shoulder to shoulder, all facing the camera and all looking straight into the lens; nobody looks at anyone else. In FRONT and in the center of the group, she (the woman of the references) wears the NAVY EFEONCE SOFTSHELL JACKET, framed from the thighs up, arms relaxed, a calm confident half-smile. Half a step behind her, to her left, a Chilean strategist in her thirties with dark hair tied back wears the NAVY EFEONCE POLO; to her right, a Chilean art director in his late twenties with short dark hair and a light beard wears the NAVY EFEONCE HOODIE; at the far right, beside the art director and at the same depth, a Chilean developer in his forties with glasses wears the NAVY EFEONCE POLO. Four small friendly robot agents with rounded white bodies and happy glowing screen faces are with them, each the size of a cat: two sit on the left shoulder and arm of the strategist and the art director, two sit on the developer's forearm and shoulder, all above the waist of the people. In the lowest fifth, close to the lens and in front of the whole team, the dark blurred edge of a matte black stage riser crosses the entire frame, outside every light, hiding their legs. REALISTIC ADULT PROPORTIONS: camera about four meters away at chest height, 85mm. A strong cool teal-white rim light from behind cuts every silhouette from the dark and crosses a thin haze; a soft low key from the front models the faces. ALL FOUR heads sit in the same band, between 38% and 52% of the frame height; no head, hair or robot rises above 38% of the frame height. The TOP 30% of the frame is calm, deep dark studio space with nothing in it, only faint haze. Rich contrast, deep navy blacks, no text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a matte black stage riser close to the lens across the lowest fifth, in front of the team, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "calm, deep dark studio space with only faint haze",
+      "tinta": "blanca"
+    }
+  }
+}

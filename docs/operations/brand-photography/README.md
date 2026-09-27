@@ -1,9 +1,9 @@
 # Fotografía de marca Efeonce — índice
 
 > **Tipo de documento:** Índice operativo de carpeta
-> **Versión:** 1.5
+> **Versión:** 1.6
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-26 por Claude (la capa gráfica sobre la foto queda aprobada; guía «El porqué» en AXIS; antes, el mismo día: convergencia con la línea gráfica, la lente como reserva del texto, P1–P12 y P-1..P-9; antes: regla de la firma, órbita sobre la foto y marca fotografiada desde el arte plano)
+> **Última actualización:** 2026-09-27 por Claude (el registro cine tiene documento propio, [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md); antes, el 2026-09-26: la capa gráfica sobre la foto queda aprobada; guía «El porqué» en AXIS; antes, el mismo día: convergencia con la línea gráfica, la lente como reserva del texto, P1–P12 y P-1..P-9; antes: regla de la firma, órbita sobre la foto y marca fotografiada desde el arte plano)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Bitácora del caso](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida de evidencia](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md)
 
 Esta carpeta guarda el **Lenguaje Fotográfico de la marca propia de Efeonce**, aprobado por el operador (Julio
@@ -53,6 +53,7 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 | 8 | [`EFEONCE_PHOTO_BLIND_AUDIT_2026-09-20.md`](./EFEONCE_PHOTO_BLIND_AUDIT_2026-09-20.md) | **Auditoría ciega**: dos evaluadores independientes sin acceso al canon; qué coincidió, los tells de generación, el plan derivado y la ronda «obra real» | Claude |
 | 9 | [`NEXA_CHARACTER_BIBLE_FICHA_V1.md`](./NEXA_CHARACTER_BIBLE_FICHA_V1.md) | **Nexa, el Bible aplicado a producción**: qué referencia del repo corresponde a cada nombre del documento de marca (las 8 expresiones, los 5 contextos), la auditoría medida de qué cumple el material, el veredicto A/B contra la ficha y lo que queda abierto | Claude |
 | 10 | [`NEXA_TECH_PROPS_V1.md`](./NEXA_TECH_PROPS_V1.md) | **Nexa, props y ecosistema tecnológico**: qué dispositivos lleva y usa —smartwatch, iPhone, iPad, MacBook, DJI, Rode, Shure, Sony/Canon—, cómo entran en la escena y qué NO es Nexa. La regla es la familia vigente, nunca un modelo descontinuado | Claude |
+| 11 | [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md) | **Registro cine · la marca en su película**: cuándo se usa (sólo Nexa protagonista o la receta de deck `proposal-cinematic`), la idea (el servicio en acción, la línea como luz), cámara a ≈ 2 m y 85 mm, luz y bruma, color por línea desde tokens, vestuario y emblema compuesto, mini robots agentes, reservas y capa gráfica, plantilla de ficha comentada, trampas medidas, barra de juicio, evidencia y formatos publicitarios en prueba | Claude |
 
 ## Registros y evidencia
 
@@ -101,6 +102,15 @@ Resultados: `MARGIN FIELD` pasa en 4:5 y en 16:9 nativo con **banda continua has
 aprobado «¿Claude o Codex?» llegaba a 0,35). `SELECTION TARGET` sirve **con padding de 0,02 del lienzo** (3,29:1);
 pegado al objeto falla (1,02:1) porque el objeto trae su propio borde claro, y con 0,04 vuelve a fallar porque la
 caja toca a las personas. Hay punto dulce, no monotonía.
+
+## Delta 2026-09-27 — el registro cine tiene documento propio
+
+**[decisión del operador, 2026-09-27]** «El registro cinematográfico me encantó»: el registro cine deja de vivir sólo
+en dos deltas del maestro y pasa a [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](./EFEONCE_PHOTO_REGISTER_CINE_V1.md), que es
+desde hoy su fuente vigente. Alcance sin cambios: **Nexa protagonista** o la receta de deck **`proposal-cinematic`**
+(issue AXIS `cine-requires-nexa-or-proposal`); las pruebas publicitarias en 9:16 y 4:5 con personas del equipo quedan
+**en prueba**, pendientes de decisión del operador. El documento trae la plantilla de ficha comentada y las trampas
+medidas del compilador (reserva izquierda forzada en 16:9, accesorios de Nexa contra la ficha).
 
 ## Delta 2026-09-26 (b) — convergencia con la línea gráfica: decisiones del operador
 

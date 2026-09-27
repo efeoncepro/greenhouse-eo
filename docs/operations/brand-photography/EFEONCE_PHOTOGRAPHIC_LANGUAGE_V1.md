@@ -594,6 +594,8 @@ y [ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md).
 
 ## Delta 2026-09-26 (noche) — excepción declarada: registro cine para piezas de Nexa
 
+> **Fuente vigente desde el 2026-09-27:** [registro cine · la marca en su película](./EFEONCE_PHOTO_REGISTER_CINE_V1.md). Este delta queda como historia de la decisión.
+
 **Decisión del operador (2026-09-27, hilo del canvas «OOH La órbita — pruebas», lámina «fuerza híbrida, cine»).**
 Las piezas donde **Nexa es la protagonista** pueden usar un registro de **cine de ficción**: vestuario de ficción
 (traje biónico), agentes representados como mini robots con cara y la escena como set de película. Nexa mira al
@@ -627,6 +629,8 @@ compartido. La cercanía y la tensión se dirigen al trabajo o a la cámara, no 
 personas: «con dos personas, la mirada va al otro o al mismo objeto».
 
 ## Delta 2026-09-27 — el registro cine se amplía a la receta `proposal-cinematic`
+
+> **Fuente vigente desde el 2026-09-27:** [registro cine · la marca en su película](./EFEONCE_PHOTO_REGISTER_CINE_V1.md). Este delta queda como historia de la decisión.
 
 **[decisión del operador, 2026-09-27, página «Deck» del [canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7)]**
 El operador aprobó dos láminas de propuesta con **personas del equipo, no Nexa**, en registro de cine: servicios

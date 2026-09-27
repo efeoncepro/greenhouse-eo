@@ -102,6 +102,10 @@ excepción ni un error: es el otro registro.
 
 El [maestro, registro C](../../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#delta-2026-09-21-tarde--tercer-registro-c--la-respuesta-a-la-vista) incorpora como sujeto la respuesta y quien la encarna: Nexa, criatura del motor u objeto digital. Si hay persona, recibe la respuesta, sin protagonismo corporativo genérico. Debe significar sin titular y conservar identidad, materia, luz, color, reservas y firma. C no es un filtro ni una licencia para HUD/scrims. La mirada al lente distingue casos A/B; no basta para clasificar C.
 
+### Cine · La marca en su película
+
+El [registro cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (2026-09-27) es ficción declarada: el servicio en acción como fenómeno de luz con el acento de su línea, el sujeto a la derecha mirando al lente, cámara ≈ 2 m y 85 mm, bruma y rim, isotipo compuesto. Sólo con Nexa protagonista o en la receta de deck `proposal-cinematic` (AXIS `cine-requires-nexa-or-proposal`); fuera de eso, A, B o C. Trae plantilla de ficha comentada, trampas del compilador y barra de juicio.
+
 ### Qué NO cambia entre uno y otro
 
 Identidad y set de referencias · **código de vestuario por el registro de la escena** · el bloque de realismo («no

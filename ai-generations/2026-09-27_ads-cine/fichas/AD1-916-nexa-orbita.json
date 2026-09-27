@@ -1,0 +1,12 @@
+{
+  "id": "AD1-916-nexa-orbita",
+  "formato": "9:16",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "objetos": [{ "objeto": "chaqueta-softshell-efeonce" }],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster poster still, vertical, a vast dark studio at night): she stands centered in the LOWER two thirds of the frame, framed from the thighs up, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, no lanyard, no jewelry. REALISTIC ADULT PROPORTIONS: camera about two and a half meters away at chest height, 85mm, she does not lean toward the lens. She looks straight into the lens with calm, confident determination, arms relaxed. Behind her, far away and enormous, ONE thin luminous ring of pure teal light (#36C8BF) hangs in the haze, tilted like a planet's orbit, centered behind her chest, so wide that it passes behind her shoulders and its far side fades into the haze; the ring stays entirely BELOW 36% of the frame height; on the ring, a single small bright sphere of teal light on its right side, the only point on the orbit. The ring is the only strong light: it rims her hair, shoulders and jacket with a thin teal edge from behind; a soft, low cool key light from the front models her face. Thin haze catches the ring's glow. The TOP third of the frame is calm, deep dark studio space: no ring, no objects, no spheres, only faint haze. The bottom fifth is a dark polished floor that barely reflects the ring. Rich contrast, deep navy blacks, no text, no logos of any other brand.",
+  "lecho": { "objeto": "the dark polished studio floor in the lowest fifth, outside the ring's reflection", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "calm, deep dark studio space with only faint haze", "tinta": "blanca" } }
+}

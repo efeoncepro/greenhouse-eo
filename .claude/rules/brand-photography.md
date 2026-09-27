@@ -62,6 +62,10 @@ era de OpenAI. Con **Gigi es peor y la regla cambia**: no «porta un color», **
 y perder. La regla correcta es **la criatura como único acento de color, y Efeonce en el navy y en la
 estructura**) y **la contaminación del emblema**.
 
+🔴 **El registro cine tiene documento propio: [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)**
+(2026-09-27) — sólo Nexa protagonista o la receta `proposal-cinematic`; cámara ≈ 2 m y 85 mm, la línea como luz, isotipo
+compuesto, plantilla de ficha y trampas del compilador. Cárgalo antes de escribir una ficha cine.
+
 🔴 **El lecho de la firma lo mata el REFLEJO, no la luz directa** **[medido 2026-09-22]**. Una vitrina de
 museo sobre un **plinto de aluminio cepillado claro** dio la firma en **3,55:1** con el LED ya apantallado
 hacia adentro y el suelo declarado en sombra: lo que contaminaba era el **reflejo especular del plinto en el

@@ -1,0 +1,11 @@
+{
+  "id": "AD3-45-aeo-foco",
+  "formato": "4:5",
+  "impacto": true,
+  "objetos": [{ "objeto": "polo-efeonce" }],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, epic scale, a vast dark cathedral-like space at night, slight low camera angle): an EFEONCE SEO strategist, a Latin American woman in her early thirties, dark hair in a low bun, wearing the NAVY EFEONCE POLO, stands slightly LEFT of center in the lower two thirds of the frame, framed from the waist up, looking straight into the lens with a quiet, confident half-smile, holding a thin tablet at her side. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. Behind her, receding for hundreds of meters into the darkness, floats an immense field of THOUSANDS of identical thin dark glass cards in endless rows and columns, all unlit, anonymous and barely visible, like every brand nobody sees. From the upper right, OUTSIDE the frame, a WIDE, dramatic volumetric azure-blue (#0375DB) follow-spot beam, like a stage spotlight, cuts diagonally down through thick haze and lands on ONE single card just beside her right shoulder: that card blazes brilliant white with an azure core, much larger and closer than the others, lifted forward out of the field, radiating light rays and fine glowing particles, with a teal (#36C8BF) rim; its light floods her face, hair and shoulder. The beam enters the frame only below 32% of its height. The beam is the brightest element of the frame and the only strong light besides a cool rim behind her; every other card stays in darkness. Dust and haze sparkle inside the beam. The TOP 30% of the frame is calm, deep dark space with only faint haze, no cards, no beam, no objects. Enormous contrast, punchy, awe-inspiring, no logos of any other brand, no readable text.",
+  "lecho": { "objeto": "the dark blurred edge of a desk close to the lens across the bottom, outside every light", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "calm, deep dark space with only faint haze", "tinta": "blanca" } }
+}

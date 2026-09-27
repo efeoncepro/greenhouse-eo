@@ -1,0 +1,12 @@
+{
+  "id": "BR3-contra-horizonte",
+  "formato": "16:9",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "objetos": [{ "objeto": "chaqueta-softshell-efeonce", "puesta": "espalda" }],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic closing shot, the last frame of a film): she (the woman of the references) is seen FROM BEHIND, her back to the camera, walking away toward the center of the frame across a vast dark polished floor, small in the frame (about a quarter of the frame height), wearing the NAVY EFEONCE SOFTSHELL JACKET seen from the back. Far ahead of her, low on the horizon at the center of the frame, ONE enormous thin ring of pure teal light (#36C8BF) stands upright like a gateway, its bottom touching the floor and reflected on it, with a single small bright teal sphere on its top. The ring is the only light: it backlights her silhouette with a thin teal rim and throws her long shadow toward the camera. Thin haze glows around the ring. The TOP 40% of the frame is a calm, deep, evenly dark sky of haze with nothing in it. The BOTTOM fifth is dark polished floor close to the lens, out of the ring's reflection. Symmetrical, centered composition, 50mm, camera at waist height about eight meters behind her. Rich contrast, deep navy blacks, no text, no logos of any other brand.",
+  "lecho": { "objeto": "the dark polished floor close to the lens in the lowest fifth, outside the ring's reflection", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the calm, deep dark sky of haze on the top 40% of the frame", "tinta": "blanca" } }
+}
