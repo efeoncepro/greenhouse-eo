@@ -63,13 +63,17 @@
   `section-classic`, `section-split`, `content-measure` y `triptych` (las láminas no la llevan, el manifest del deck
   dice `url-bubble-footer`; se siguió la lámina); gris del descriptor y la bajada web, sin token; paleta DOOH 20 % vs
   35 %. Hasta decidir, la plantilla sigue la lámina aprobada y no se inventa un token.
-- **Glitch (actualizado 2026-09-27, cierre del día):** aprobar lente y blog (banners, maqueta, callout v2); registrar
+- **Glitch (actualizado 2026-09-27, cierre del día):** decidir cómo el bloque WordPress `efeoncepro/glitch-drop` pasa al
+  callout v2 desde la #17 sin cambiar los posts anteriores (variante dentro del bloque, recomendada, o bloque nuevo;
+  TASK-1337); confirmar si portada del reel, miniatura y overlays PNG del reel van al Composer (TASK-1923); registrar
   la referencia de la licencia de Guttery; del video: fps de grabación (hoy 30), prueba de los editores con una edición
   real y la voz del host (incluye validar el ducking de la cama), a qué piezas va la transición de bytes
   (recomendación: tarjetas y Drop), estilo de subtítulos, parámetro de ritmo (factible, no hecho), excepción de
   rostros y los textos reales de la #17. Ya resueltos: manzana y verde, línea Growth, edición #17, alta de los glifos,
   flujo de composición `Accepted`, y el vlog 16:9, el kit, el lower third, las tarjetas finales, el mnemónico, el
-  sonido (B), la música y el pre-roll (filas del 2026-09-27 arriba). Detalle: [glitch.md](glitch.md) §8, §9 y §12.7.
+  sonido (B), la música, el pre-roll (sólo vlog; el reel abre con la apertura), el blog completo (banners 16:9, 1:1
+  con plantilla propia, maqueta del post, callout v2 desde la #17) y la lámina con lente como variante ocasional
+  (filas del 2026-09-27 arriba). Detalle: [glitch.md](glitch.md) §8, §9 y §12.7.
 - **Banco de pares pregunta/respuesta (D12):** el operador lo revisa y aprobará **2 pares por línea de servicio** con
   respuestas verificables. Hasta entonces el banco es candidato: calibra el tono, no es copy aprobado.
 - **Archivos de impresión (D13):** se empieza por la tarjeta de presentación y el muro de recepción, en PDF vectorial
