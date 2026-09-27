@@ -7,6 +7,27 @@
      ═══════════════════════════════════════════════════════════ -->
 
 
+## Delta 2026-09-27 (b) — set de portadas y contraportadas aprobado
+
+- El operador **aprobó el set completo** de portadas, contraportadas y láminas de sección del brochure y de la propuesta
+  comercial. Norma completa, catálogo, receta medida de la columna de voz y descartes:
+  `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 «Portadas y contraportadas». Supera las
+  «opciones vivas» del delta anterior.
+- Brochure: portada con foto (voz «¿Qué hace Efeonce? Crecer.») y **cinco portadas por línea** con el acento de su línea
+  y su par aprobado; contraportadas con «¿Conversamos? Cuando quieras.» y el eslogan de firma (órbita gigante sin foto,
+  y dos con foto).
+- Propuesta: **cuatro portadas sin foto** con el logo del cliente (órbita gigante y amanecer, plantilla y ejemplo SKY;
+  voz «¿Cómo crecemos en 2027? Con foco.») y **dos contraportadas con foto** con «Empower your Growth» como mensaje
+  principal.
+- Reglas nuevas: foto ↔ sin foto, mensaje de contraportada según el documento, voz en la portada, eslogan sólo en el
+  cierre, logo de Efeonce a 500 px en 1920, ningún texto cruza la órbita ni al sujeto, selección sólo sobre la columna
+  o el logo del cliente (un cursor en 16:9).
+- **Descartadas** las portadas clásicas de propuesta del contrato (logo 230, y su versión a 500) y el cierre clásico
+  (logo 220) como contraportada. Su ajuste ya estaba asignado a esta task; qué hacer con esas recetas en el contrato
+  (retirarlas o reemplazarlas) se confirma con el operador.
+- Sus recetas se están publicando en **AXIS Lab › Superficies › Deck** (formalización en curso). **La integración en
+  Greenhouse — renderizar estas portadas y contraportadas desde el contrato — queda en el alcance de esta task.**
+
 ## Delta 2026-09-27 — portadas y contraportadas decididas en el canvas
 
 - Regla del operador: **portada con foto ↔ contraportada sin foto, y al revés** (brochure y propuesta). La validación

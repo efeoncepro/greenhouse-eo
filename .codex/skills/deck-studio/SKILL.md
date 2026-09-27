@@ -34,7 +34,7 @@ description: >-
 
 ## Pie institucional de decks Efeonce
 
-Cuando se solicite la contraportada institucional, reutiliza `BackCoverFull` del Artifact Composer. Su bloque de redes y contacto pertenece a esa composición oficial de cierre; no se replica como pie en las otras láminas.
+Cuando se solicite la contraportada institucional, reutiliza `BackCoverFull` del Artifact Composer. Su bloque de redes y contacto pertenece a esa composición oficial de cierre; no se replica como pie en las otras láminas. En un brochure o una propuesta de marca propia con La órbita, la contraportada es la del set aprobado el 2026-09-27 (§«Portadas y contraportadas», más abajo), con su propio bloque de redes y contacto.
 
 El pie de una lámina lleva como máximo la URL bubble oficial. No hereda dirección, teléfonos, separadores ni folio de un informe escrito, aunque se exporte a PDF A4. Mantén los logos oficiales en la composición. Canon: `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md`.
 
@@ -48,6 +48,8 @@ marca de cliente ni a Greenhouse. Contrato: [manual](../../../docs/operations/br
 
 - **La órbita es la navegación.** Portada con un arco corto; cada sección suma su tramo; el cierre completa la
   órbita con la esfera arriba. En las láminas de contenido en papel, la órbita baja a 80 px en la esquina.
+  (Delta 2026-09-27: en brochure y propuesta, la portada y la contraportada aprobadas son las de foto o de órbita
+  gigante de «Portadas y contraportadas» más abajo; la portada de arco corto era la clásica, ya retirada.)
 - **El arco mide:** en navegación, el tramo corresponde a la sección real en que va el deck; un arco de dato sólo
   existe con un dato real que se pueda citar. Nunca un arco decorativo.
 - **Ningún texto cruza la órbita**, una sola por lámina, fuera de eje hacia arriba a la derecha; margen de 140 px
@@ -58,7 +60,9 @@ marca de cliente ni a Greenhouse. Contrato: [manual](../../../docs/operations/br
   post, anuncio o portada con foto, firma con el logo de Efeonce centrado abajo y la burbuja sólo lo reemplaza
   cuando el logo ya está en la imagen (regla del 2026-09-26, en la referencia operativa).
 - **Eslogan «Empower your …»** sólo en el cierre, desde el archivo oficial: nunca en cada lámina, nunca con esfera,
-  nunca en mayúsculas.
+  nunca en mayúsculas, **nunca en la portada** (operador, 2026-09-27). En la contraportada de una propuesta comercial
+  es el mensaje principal; en la de un brochure firma debajo de «¿Conversamos? Cuando quieras.» (ver «Portadas y
+  contraportadas» abajo).
 - Valores desde los tokens `efeonceGraphicLine` (`@efeoncepro/axis-tokens`) y logos/burbujas desde
   `@efeoncepro/axis-brand-assets`, nunca HEX, px ni archivos transcritos. La órbita
   de navegación se compone por intención con `progress` (`sections`, `current`) en `pnpm creative:orbit:render`;
@@ -125,7 +129,9 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   `deck-axis` ni al revés. Una opción del canvas no tiene plantilla (`recipe-not-approved`): se arma como maqueta de
   dirección y se declara así. Gate: `pnpm composer:visual-gate --catalog=graphic-line`. Detalle:
   [composition.md](composition.md) §Catálogos de La órbita. Precios siempre placeholder.
-- **Portada y contraportada alternan foto y sin foto** (operador, 2026-09-27): si la portada lleva fotografía, la contraportada va sin fotografía, y al revés. La portada de propuesta comercial lleva espacio fijo para el logo del cliente (dentro de la órbita) y la burbuja URL alineada a la columna; la del brochure no lleva cliente. **Mensaje de la contraportada según el documento:** en la propuesta comercial, «Empower your Growth» como mensaje principal (la propuesta llega después de conversar); en el brochure, «¿Conversamos? Cuando quieras.». Los textos de portada siguen la voz de la línea gráfica (pregunta con anillo, respuesta con esfera, evidencia). El logo de Efeonce en portada y contraportada se lee a ≥ 96 px en un teléfono (≥ 473 px en 1920). Parejas y detalle: `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6.
+- **Portadas y contraportadas de brochure y propuesta** (operador, 2026-09-27): foto ↔ sin foto, mensaje de la
+  contraportada por documento, voz en portada y logo a 500 px. Todo en la subsección «Portadas y contraportadas
+  (aprobado 2026-09-27)» más abajo.
 - **Contrato 0.1.2 y el brochure (2026-09-27; AXIS tag `v0.3.9`: `@efeoncepro/axis-tokens` 0.3.9 +
   `@efeoncepro/axis-ui-contracts` 0.3.8).** Guía AXIS `docs/agent-composition/surfaces/deck.md` (§«Dos usos»,
   §`proposal-cinematic`, §«El documento») y ejemplo `docs/examples/surfaces/deck-brochure-servicios-document.json`.
@@ -146,12 +152,18 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   - **Portada y contraportada clásicas:** recetas aprobadas `cover-classic` (logo arriba a la izquierda con el
     eyebrow, pregunta y respuesta en la mitad baja, arco corto de acento; marca 0 de N) y `close-classic` (órbita
     completa con el logo dentro, eslogan «Empower your \<Línea>» en tres tramos; marca N de N). Las dos firman con
-    logo y **sin burbuja URL** (`logo-signs-without-url-bubble`).
+    logo y **sin burbuja URL** (`logo-signs-without-url-bubble`). **Delta (operador, 2026-09-27):** retiradas como
+    opción de portada y contraportada de brochure y propuesta (su logo de 230 y 220 px no llega al mínimo de 500 px en
+    1920, ni en su versión a 500 px se aprobaron); el contrato 0.1.2 todavía las acepta hasta que TASK-1927 integre el
+    set nuevo. No las ofrezcas: usa la subsección «Portadas y contraportadas» de abajo.
   - **Portada y contraportada cinematográficas, con Nexa:** `BR1b` («Nexa frente a la órbita») y `BR3` («Nexa camina
     hacia la órbita») caben en el registro cine porque Nexa protagoniza, pero **no son receta del contrato**: se
-    compusieron en sesión (`ai-generations/2026-09-27_brochure/componer-brochure.mjs`) y su aprobación está pendiente
-    de registrar. El documento sólo acepta como portada y cierre una receta de papel `cover` / `close` (hoy, las
-    clásicas). Su anillo de luz **es** la órbita de la pieza: no se le agrega otra.
+    compusieron en sesión (`ai-generations/2026-09-27_brochure/componer-brochure.mjs`). **Delta (operador,
+    2026-09-27):** el set de portadas y contraportadas quedó decidido en el canvas (subsección de abajo); `BR3` es
+    contraportada aprobada (de brochure y, con «Empower your Growth», de propuesta) y `BR1b` es opción de portada de
+    brochure y lámina de apertura de la sección de servicios. Siguen sin ser receta del contrato: el documento sólo
+    acepta como portada y cierre una receta de papel `cover` / `close` (hoy, las clásicas retiradas) hasta TASK-1927.
+    Su anillo de luz **es** la órbita de la pieza: no se le agrega otra.
   - **El documento** (`resolveSurfaceDocument` / `validateSurfaceDocumentIntent`, manifest `axis.surface-document.v1`;
     `pnpm surface:resolve` lo detecta por `pages`): en un brochure la portada va primero (`brochure-cover-first`), el
     cierre al final (`brochure-close-last`) y hay al menos una `proposal-cinematic` con `layout: 'service'`
@@ -162,6 +174,98 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
     [registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (fuente vigente desde
     el 2026-09-27: cámara, la línea como luz, vestuario, robots, reservas, trampas y barra de juicio). Esta skill no
     dirige la foto: la pide por ficha (`pnpm foto:*`).
+
+#### Portadas y contraportadas (aprobado 2026-09-27)
+
+Decidido por el operador en la página Deck del
+[canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7). La norma, las parejas
+y el detalle viven en [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
+§4.6: esto es el resumen operativo. Vale para brochure y propuesta comercial de marca propia (no para `deck-axis`).
+
+**Tres reglas.**
+
+1. **Foto ↔ sin foto.** Si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.
+2. **El mensaje de la contraportada depende del documento.** Propuesta comercial: **«Empower your Growth»** grande y
+   protagonista, en sus pesos oficiales (la propuesta llega después de conversar: «¿Conversamos?» no aplica).
+   Brochure: **«¿Conversamos? Cuando quieras.»** (pregunta–respuesta) con el eslogan como firma debajo (el brochure
+   abre la conversación).
+3. **La portada habla con la voz de la línea** (§4 del manual): eyebrow (Poppins 500, mayúsculas espaciadas) ·
+   pregunta (Poppins Light 300, anillo en el acento) · respuesta (Bricolage 760, esfera en el acento, 1–3 palabras,
+   ≥ 3× la pregunta) · evidencia (Poppins 400, una palabra en negrita). Nunca un título suelto tipo «Servicios 2026».
+
+Y además: el **eslogan nunca en la portada** (recarga, repite la respuesta y la esquina inferior derecha es del
+sujeto o la órbita) · **logo de Efeonce a 500 px en 1920** en portada y contraportada (≥ 473 px =
+`efeonceGraphicLine.logo.minScreenPx`, 96 px en un teléfono de 390 px) · **ningún texto cruza la órbita ni al
+sujeto**: la columna vive en el 45 % izquierdo oscuro; si cruza un haz, una mano o la órbita, se acorta la frase
+(«¿Qué hacemos por tu marca?» → «¿Qué hace Efeonce?»; «¿Dónde pongo el presupuesto?» → «¿Dónde invierto?») o se parte
+la evidencia en 2–3 líneas.
+
+**Catálogo aprobado (compacto; plates bajo `ai-generations/`).**
+
+- **Brochure, portada general con foto** (registro cine, sin cliente): logo 500 · «Brochure · Servicios 2026» ·
+  «¿Qué hace Efeonce?» (anillo teal) · **«Crecer.»** (esfera teal) · «**Cinco** líneas de servicio: Growth · Brand ·
+  Engine · Voice · Revenue». Opciones del canvas: Nexa frente a la órbita (`2026-09-27_brochure/plates/BR1b-…`),
+  Nexa y las cinco esferas + burbuja URL (`2026-09-26_deck-nexa/plates/NX6b-…`), Nexa y el equipo con agentes
+  (`2026-09-27_brochure/plates/BR2b-…`). La variante con cursor de Nexa sobre «Crecer.» es **prueba**, no aprobada.
+- **Brochure, una portada por línea** (✅ las cinco): anillo y esfera en el acento de la línea
+  (`efeonceGraphicLine.lines`), eyebrow «Brochure · \<Línea\>» y como evidencia las categorías de la línea en
+  `docs/services/` (conteo en negrita; textos exactos en §4.6). Sus pares quedaron **aprobados** (salen de
+  «candidatos» del banco del §4):
+
+  | Línea (token) | Par | Plate |
+  |---|---|---|
+  | Growth Strategy & Measurement (`growth`) | ¿Lo medimos? **Siempre.** | `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png` |
+  | Creative Services (`brand`) | ¿Quién crea mi contenido? **Tu squad.** | `2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png` |
+  | Digital Services & Engineering (`engine`) | ¿Te encuentra la IA? **Visible.** | `2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png` |
+  | Media & Distribution (`voice`) | ¿Dónde invierto? **Donde rinde.** | `2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png` |
+  | RevOps & CRM (`revenue-hubspot`) | ¿Y el reporte del viernes? **Ya lo viste.** | `2026-09-26_deck-revops/plates/RV1b-motor-de-revenue-isotipo.png` |
+
+  Pendiente opcional: la variante RevOps Salesforce (acento cielo).
+- **Brochure, contraportadas** (✅ las tres): Nexa camina hacia la órbita (foto, `BR3-contra-horizonte`), Nexa y un
+  agente hacia la órbita al amanecer (foto, `BR4-contra-amanecer`) y **la órbita gigante sin foto** (SVG, sin plate;
+  corchetes abiertos + cursor propio sobre «Cuando quieras.»), que es la pareja de las portadas de brochure con foto.
+  Bloque común: logo 500 · «¿Conversamos? Cuando quieras.» · eslogan de firma · burbuja URL + redes (Spotify,
+  Instagram, LinkedIn, Threads, YouTube, TikTok) · correo, dos teléfonos y dirección.
+- **Propuesta, portadas sin foto con el logo del cliente** (✅ las cuatro: dos plantillas + su ejemplo con SKY): eyebrow
+  «Propuesta comercial · Octubre 2026» · «¿Cómo crecemos en 2027?» · **«Con foco.»** · «Preparada para **[Cliente]** ·
+  Confidencial» · burbuja URL alineada a la columna. **La órbita gigante sostiene el logo** (caja fija 460×200 dentro
+  de la órbita) o **la órbita sale como el sol** (amanecer, eje central, logo 480, texto centrado, caja 340×130 dentro
+  del domo). El nombre del cliente nunca se repite como título: vive en la evidencia y en su logo, que sale de la
+  biblioteca del composer (SKY: `sky-on-dark.svg`). La órbita gigante sin foto es recurso de **esta** portada, no de
+  la del brochure.
+- **Propuesta, contraportadas con foto** (✅ las dos): BR3 (hacia la órbita) y BR4 (al amanecer) con logo 500 ·
+  **«Empower your Growth»** a 72 px como mensaje principal (Empower ExtraBold itálica, your ExtraBold, Growth Black
+  itálica en teal) · burbuja URL + redes · contacto completo. Sin «¿Conversamos?».
+- **Láminas interiores de sección:** «¿Qué hace Efeonce? Crecer.» con Nexa frente a la órbita abre la sección de
+  servicios (brochure o propuesta); ✅ «¿Quién hace crecer tu marca? Este equipo.» (Nexa + equipo + agentes) abre la
+  del equipo; la escalera BeX es lámina interior, junto a la BeX original.
+
+**Columna de voz (1920×1080, medida):** x = 140; desde un `top` de 200–300 → logo 500 px en top · eyebrow 22 px en
+top+190 · pregunta 40 px en top+238 · respuesta 124 px Bricolage 760, line-height .95, en top+300 (+28 con selección) ·
+evidencia 28 px/1.3 Poppins 400 a 34 px bajo la respuesta (130 con selección, para la etiqueta del colaborador) ·
+respuesta cerrada con `answerHtml` (esfera 0,2 em en el acento) · burbuja URL abajo a la izquierda (bottom 51–72).
+Cierre de propuesta: eslogan 72 px en top 420 y bloque de contacto en 600.
+
+**Plate de portada** (registro cine; la foto la dirige `design-studio` y se pide por ficha `pnpm foto:*`): sujeto en
+la mitad derecha, de la cintura arriba, 85 mm a ~2 m, mirando al lente; el 45 % izquierdo, estudio oscuro y calmo (sin
+haces, objetos ni órbita); lecho oscuro abajo; la luz de acento es la de la línea. Ficha de ejemplo:
+`ai-generations/2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json`.
+
+**Selección y cursores en portada:** sólo sobre la columna de texto o el logo del cliente, nunca sobre la persona; en
+16:9, un solo cursor (propio o de un colaborador). Quedaron en: portadas de propuesta (marco de 8 manijas sobre el logo
+del cliente + colaborador «Cliente» o «SKY»), sección de servicios (8 manijas + cursor propio sobre «Crecer.») y
+contraportada de órbita gigante (corchetes abiertos + cursor propio sobre «Cuando quieras.», invitación a actuar). Las
+fotos de cine, por defecto, sin interfaz.
+
+**Descartado (no lo ofrezcas):** portadas clásicas de propuesta del contrato (logo 230) y su versión a 500 px; anillo
+completo con el logo del cliente al centro; órbita gigante como portada de brochure; cierre clásico AXIS (logo 220)
+como contraportada; portadas genéricas (clásica de brochure, sólo logo); contraportadas partidas y la v4 centrada;
+«Plastilina en su órbita» y «Tipográfica XXL» sin foto.
+
+**Estado:** el set todavía no es receta del contrato ni tiene plantilla en `graphic-line-deck`. Los scripts que lo
+renderizaron vivieron en el scratchpad de la sesión, no en el repo: la producción idempotente de los plates es
+TASK-1926 (registro cine / `foto:*`) y la integración al contrato de superficies, TASK-1927. Mientras tanto, una
+portada o contraportada se arma como maqueta de dirección que se declara así, siguiendo §4.6.
 
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 

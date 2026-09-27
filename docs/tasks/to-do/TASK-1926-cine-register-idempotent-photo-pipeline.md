@@ -1,5 +1,22 @@
 # TASK-1926 — Registro cine en el pipeline `foto:*` y comando idempotente de punta a punta
 
+## Delta 2026-09-27 (b)
+
+- **Plates de portada y contraportada aprobados** [decisión del operador, 2026-09-27]: brochure (tres portadas
+  generales, una por cada línea de servicio (cinco) y dos contraportadas con foto) y propuesta comercial
+  (contraportadas con foto). Receta de toma, plates por uso y rutas en
+  [registro cine §16](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#16-plates-para-portada-y-contraportada-aprobado-2026-09-27).
+- **`LN4` se produjo con `pnpm foto:generar` desde una ficha declarada**
+  (`ai-generations/2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json`, ≈ USD 0,04). La ficha es la fuente
+  que la vuelve reproducible; que la corrida sea idempotente —sin volver a cobrar ni producir otro archivo con la misma
+  entrada— sigue siendo el gap de esta task (§Gap).
+- **Alcance que se suma:** el pipeline cine debe poder regenerar desde sus fichas estos plates —`BR1b`, `BR2b`, `BR3`,
+  `BR4`, `LN4` y los de deck reusados como portada (`NX6b`, `CR2b`, `WB1b`, `RV1b`, `HW1`)—, con su isotipo cuando
+  corresponda. Hoy la voz, la firma y la columna de las portadas salieron de scripts de la sesión, fuera del repo; la
+  integración con el contrato de superficies es TASK-1927.
+- Dos cosas que el orquestador no debe asumir: `HW1` es documental, no cine (registro cine §2 y §16.3); y `BR3` pide
+  reserva arriba, que el compilador todavía convierte en reserva izquierda (trampa 6).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

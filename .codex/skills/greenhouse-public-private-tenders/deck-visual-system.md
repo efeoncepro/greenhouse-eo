@@ -116,6 +116,16 @@ Sufijo `Split` = bipartito (dos mitades) · `Full` = full-bleed (a sangre).
 | `ToolStackFull` · `DailyOpsHubFull` · `ContentHubAnatomyFull` | stack operativo · día a día colaborativo · anatomía de entregable |
 | `EvidenceStoryGrid` · `HumanImpactFull` | provisionales |
 
+> **Delta 2026-09-27 — portada y contraportada de propuesta comercial en La órbita (operador).** Si la propuesta se
+> arma como deck de marca propia con La órbita (catálogo `graphic-line-deck`, **nunca** mezclado con este
+> `deck-axis`), la **portada va sin foto con el logo del cliente** en una caja fija dentro de la órbita (el nombre
+> del cliente sólo en la evidencia: «Preparada para **[Cliente]** · Confidencial»; «¿Cómo crecemos en 2027? Con
+> foco.») y la **contraportada va con foto y «Empower your Growth» como mensaje principal**, sin «¿Conversamos?»
+> (la propuesta llega después de conversar). Ejemplo aprobado: SKY. Norma:
+> `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6; resumen en `deck-studio`
+> §«Portadas y contraportadas». En este catálogo siguen `CoverFull` / `BackCoverFull`: si la oferta a comité adopta
+> el set nuevo lo decide el operador, no el agente.
+
 ### Las que puntúan (no son opcionales)
 
 Del gap-analysis contra `propuesta-tecnica-economica.md`, estas mueven la adjudicación o **evitan el

@@ -291,6 +291,10 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
   (`deckSlideHtml('close')`), el cierre de video y el muro de recepción—, con el resguardo X del logo respetado: el
   anillo queda fuera de ese resguardo. En cualquier otro cierre el logo va **fuera** de la órbita, como la contraportada
   de Insights (lámina 7.2).
+- **Delta (operador, 2026-09-27):** en brochure y propuesta comercial, el cierre clásico del deck (logo de 220 px dentro
+  de la órbita) quedó retirado como contraportada: el logo de Efeonce de portada y contraportada va a 500 px en 1920.
+  Y la **portada de propuesta** lleva dentro de su órbita gigante el **logo del cliente** (caja fija), no el de
+  Efeonce: D5 sigue hablando del logo de Efeonce. Detalle: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6.
 
 ### 3.12 Mapa de familia
 
@@ -410,6 +414,28 @@ respuestas verificables, D12):** ¿Lo medimos? Siempre · ¿Quién decide? Tú, 
 Hoy. Úsalos como calibración del tono, no como copy aprobado. Verbos de la línea: Hacer, Medir, Crear, Aparecer,
 Llegar, Siempre, Adelante, Gracias, Aquí (manual §4).
 
+**Pares aprobados en portadas (operador, 2026-09-27;** canvas por superficie, página Deck; norma
+`EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6**).** Una portada de brochure por línea de servicio, con el acento de la
+línea en el anillo y la esfera; estos cinco salen de «candidatos» (los dos primeros venían del banco de arriba):
+
+| Línea | Par |
+|---|---|
+| Growth | ¿Lo medimos? **Siempre.** |
+| Brand | ¿Quién crea mi contenido? **Tu squad.** |
+| Engine | ¿Te encuentra la IA? **Visible.** |
+| Voice | ¿Dónde invierto? **Donde rinde.** |
+| Revenue (HubSpot) | ¿Y el reporte del viernes? **Ya lo viste.** |
+
+Además, dentro de piezas aprobadas ese día: la portada de propuesta comercial («¿Cómo crecemos en 2027? **Con
+foco.**», evidencia «Preparada para **[Cliente]** · Confidencial»; el nombre del cliente nunca como título), la
+contraportada de brochure («¿Conversamos? **Cuando quieras.**») y la lámina que abre la sección del equipo («¿Quién
+hace crecer tu marca? **Este equipo.**»). La portada general de brochure y la lámina que abre la sección de servicios
+usan «¿Qué hace Efeonce? **Crecer.**». Cómo se escribe una portada: eyebrow · pregunta · respuesta de 1–3 palabras
+(≥ 3× la pregunta) · evidencia con una palabra en negrita; nunca un título suelto tipo «Servicios 2026». Si la
+pregunta o la evidencia cruzarían la órbita o al sujeto de la foto, **se acorta la frase** («¿Qué hacemos por tu
+marca?» → «¿Qué hace Efeonce?»; «¿Dónde pongo el presupuesto?» → «¿Dónde invierto?») o se parte la evidencia en 2–3
+líneas.
+
 **Cómo se cruza con las tres voces + acción de publicidad.** El compositor de anuncios materializa esta voz con
 `graphicVoice: "efeonce"`: pregunta en Poppins Light con su anillo, respuesta en Bricolage 760 de hasta tres palabras
 con la esfera al final de la última línea, la regla de ≥3× y la selección que incluye la esfera (compositor de CTA,
@@ -431,6 +457,12 @@ esfera: el acento va al cierre.
   Se usa desde el archivo oficial; no se rearma (lámina 2.2).
 - **Sólo cierra:** final de video, última lámina, contratapa, firma de correo, recepción, merch. **No va en cada post**:
   ahí la respuesta con esfera ya cierra (lámina 2.2).
+- **Nunca en la portada; en la contraportada depende del documento** (operador, 2026-09-27). En la portada recarga,
+  repite la respuesta y ocupa la esquina inferior derecha, que es del sujeto o la órbita. En la contraportada de una
+  **propuesta comercial** es el mensaje principal: «Empower your Growth» grande y protagonista (72 px en 1920, en sus
+  pesos oficiales, «Growth» en el acento), sin «¿Conversamos?», porque la propuesta llega después de conversar. En la
+  de un **brochure** el mensaje es «¿Conversamos? Cuando quieras.» y el eslogan firma debajo, porque el brochure abre la
+  conversación. Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6.
 - **La palabra es de la línea de servicio, no del producto** (operador, 2026-09-26): Growth (Efeonce; su producto
   Greenhouse, la plataforma que controla todo), Brand (servicios creativos; Globe), Engine (web, infraestructura, SEO y
   medición; Wave), Voice (medios y distribución; Reach), **Revenue** (RevOps y CRM). La palabra toma el acento de la

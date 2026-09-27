@@ -241,6 +241,13 @@ mata el test del segundo consumidor de `arch-architect`).
 > archivo. Es el mismo *"míralo en el SET, sobre el fondo real"* de los assets clay — un SVG puede
 > compilar, pasar el build y aun así salir invisible, diminuto o roto.
 
+**Delta 2026-09-27 — el logo del cliente en la portada de una propuesta de marca propia** (La órbita, operador): va
+en una **caja fija dentro de la órbita**, sobre fondo oscuro, así que se usa su versión para oscuro de la biblioteca
+del composer (SKY: `sky-on-dark.svg`) y se mira renderizado como arriba. El nombre del cliente no se repite como
+título: vive en la evidencia («Preparada para **[Cliente]** · Confidencial») y en su logo. Mismo guardrail: sólo un
+cliente real. Medidas de la caja y portadas aprobadas: [SKILL.md](SKILL.md) §«Portadas y contraportadas» y
+`docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6.
+
 ### Lo que se lee a stock (y a IA)
 
 Gente-que-no-existe sonriendo · manos estrechándose · gráficos genéricos flotando · el mismo

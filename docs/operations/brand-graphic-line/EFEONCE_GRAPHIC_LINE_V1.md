@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita · V1
 
 > **Tipo de documento:** Manual de marca (contrato operativo de diseño)
-> **Versión:** 1.11
+> **Versión:** 1.12
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
-> **Última actualización:** 2026-09-27 por Claude (IA, social y staff, D26: §14 y §14.1, 19 íconos nuevos, set en 36 Trazo + 43 Plastilina = 79 y 43 volúmenes; `axis-graphic-line` 0.6.0 y `axis-brand-assets` 0.3.4, publicados con el tag `v0.6.0`; Greenhouse fija esas versiones. Antes, el mismo día: oficio, D25: §14 y §14.1, 30 íconos nuevos, set en 27 Trazo + 33 Plastilina = 60 y 33 volúmenes; `axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3, publicados con el tag `v0.5.0`. Antes, el mismo día: Plastilina en volumen, D24: §14.1, tercera capa de la iconografía, canónica en AXIS `main` con `axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, publicados con el tag `v0.3.7`; Greenhouse ya fija esas versiones (commit `f3f93c926`). Antes, el mismo día: composición por superficie: §10.0 nueva, que apunta a la norma [`EFEONCE_SURFACE_COMPOSITION_V1.md`](./EFEONCE_SURFACE_COMPOSITION_V1.md), al contrato AXIS `efeonce.surface-composition` 0.1.0 y al canvas por superficie; §10.1 remite a ella. Antes, el 2026-09-26: iconografía canónica, Trazo y Plastilina, D16–D22: §14. Antes, el mismo día: decisiones del operador D1–D15 del 2026-09-26: contraste del acento y magenta de Revenue-HubSpot, §2; «Growth» en el acento en el cierre del deck, §5 y §10.1; logo dentro de la órbita sólo en cierres de marca, §8.2, §8.3, §10.1, §10.3 y §10.6; un solo anillo en el banner de LinkedIn y el fondo de Teams, §1.3; halo a la mitad sobre papel y anillo de la esfera sólo «en vivo», §1.3; umbral de la burbuja 4,5:1, §8.5; reglas P1–P12 y conflictos P-1..P-9 resueltos, §9 y §9.1; firma de equipo para `people@`, §10.2; impresión, prueba sin logo, banco de pares y revisión legal, §4, §1.4 y §12. Antes, el mismo día: §9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
+> **Última actualización:** 2026-09-27 por Claude (1.12: portadas y contraportadas aprobadas por el operador — pares aprobados para portadas y contraportada de brochure, §4; el eslogan como mensaje principal de la contraportada de propuesta y nunca en la portada, §5; puntero de §10.1 a la composición por superficie §4.6. Antes, el mismo día: IA, social y staff, D26: §14 y §14.1, 19 íconos nuevos, set en 36 Trazo + 43 Plastilina = 79 y 43 volúmenes; `axis-graphic-line` 0.6.0 y `axis-brand-assets` 0.3.4, publicados con el tag `v0.6.0`; Greenhouse fija esas versiones. Antes, el mismo día: oficio, D25: §14 y §14.1, 30 íconos nuevos, set en 27 Trazo + 33 Plastilina = 60 y 33 volúmenes; `axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3, publicados con el tag `v0.5.0`. Antes, el mismo día: Plastilina en volumen, D24: §14.1, tercera capa de la iconografía, canónica en AXIS `main` con `axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, publicados con el tag `v0.3.7`; Greenhouse ya fija esas versiones (commit `f3f93c926`). Antes, el mismo día: composición por superficie: §10.0 nueva, que apunta a la norma [`EFEONCE_SURFACE_COMPOSITION_V1.md`](./EFEONCE_SURFACE_COMPOSITION_V1.md), al contrato AXIS `efeonce.surface-composition` 0.1.0 y al canvas por superficie; §10.1 remite a ella. Antes, el 2026-09-26: iconografía canónica, Trazo y Plastilina, D16–D22: §14. Antes, el mismo día: decisiones del operador D1–D15 del 2026-09-26: contraste del acento y magenta de Revenue-HubSpot, §2; «Growth» en el acento en el cierre del deck, §5 y §10.1; logo dentro de la órbita sólo en cierres de marca, §8.2, §8.3, §10.1, §10.3 y §10.6; un solo anillo en el banner de LinkedIn y el fondo de Teams, §1.3; halo a la mitad sobre papel y anillo de la esfera sólo «en vivo», §1.3; umbral de la burbuja 4,5:1, §8.5; reglas P1–P12 y conflictos P-1..P-9 resueltos, §9 y §9.1; firma de equipo para `people@`, §10.2; impresión, prueba sin logo, banco de pares y revisión legal, §4, §1.4 y §12. Antes, el mismo día: §9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
 > **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
 > **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (40 láminas, siete capítulos)
 > **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Desde AXIS 0.2.7 los archivos oficiales (logo e isotipo de las cuatro marcas y las tres burbujas URL) viven en el paquete `@efeoncepro/axis-brand-assets`; desde AXIS 0.3.0 el contrato de composición es `efeonce.graphic-line-orbit` 0.3.0 (`stable`) y el paquete `@efeoncepro/axis-graphic-line` 0.3.1 pinta la órbita, sus recetas y su movimiento (§13). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
@@ -209,6 +209,27 @@ después lo hago yo? Esa es la idea. · ¿Y el reporte del viernes? Ya lo viste.
 todo. · ¿Cómo va? En vivo. · ¿Dónde quedó lo aprendido? En tu historial. · ¿Otra agencia más? No. Un sistema. ·
 ¿Y si lo probamos? Hoy.
 
+**Pares aprobados para portadas y contraportadas (operador, 2026-09-27).** Estos pares salen del estado de candidatos
+y se usan tal cual en las piezas que indica la tabla. Norma de uso, piezas y medidas en la
+[composición por superficie §4.6](./EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) («Portadas y contraportadas»).
+
+| Pieza | Pregunta | Respuesta | Evidencia |
+|---|---|---|---|
+| Portada de brochure | ¿Qué hace Efeonce? | **Crecer.** | **Cinco** líneas de servicio: Growth · Brand · Engine · Voice · Revenue |
+| Portada de propuesta comercial | ¿Cómo crecemos en 2027? | **Con foco.** | Preparada para **[Cliente]** · Confidencial |
+| Portada de brochure · Growth | ¿Lo medimos? | **Siempre.** | **Seis** capacidades: Estrategia · GTM · Revenue enablement · Analítica · Medición · Orquestación |
+| Portada de brochure · Brand | ¿Quién crea mi contenido? | **Tu squad.** | **Seis** capacidades: Squad creativo · Brand systems · Campañas · Contenido y social · Audiovisual · Run & Gun |
+| Portada de brochure · Engine | ¿Te encuentra la IA? | **Visible.** | **Cinco** capacidades: Search Visibility · Web Experience · Medición · Sistemas de agentes · Automatización |
+| Portada de brochure · Voice | ¿Dónde invierto? | **Donde rinde.** | **Tres** soluciones y una operación: Estrategia de distribución · Performance · Influencia y earned · Managed Media |
+| Portada de brochure · Revenue (HubSpot) | ¿Y el reporte del viernes? | **Ya lo viste.** | **Seis** soluciones: Marketing y AEO · Ventas y pipeline · Revenue lifecycle · Servicio · Datos y CRM · Operación con agentes |
+| Contraportada de brochure | ¿Conversamos? | **Cuando quieras.** | — (el eslogan firma debajo, §5) |
+
+- En las portadas por línea, el **anillo y la esfera toman el acento de la línea** (no el teal) y la evidencia lista
+  las categorías de la línea del catálogo de servicios.
+- «¿Lo medimos? Siempre.» y «¿Y el reporte del viernes? Ya lo viste.» venían del banco; los demás son nuevos.
+- El criterio de **dos pares por línea** sigue en pie: con estas portadas cada línea tiene uno aprobado; el segundo
+  sigue pendiente de la revisión del banco.
+
 **Verbos de la línea:** Hacer (Efeonce) · Medir · Crear (Globe) · Aparecer (Wave) · Llegar (Reach) · Siempre ·
 Adelante · Gracias · Aquí.
 
@@ -225,6 +246,12 @@ solo**, con la palabra final destacada. La palabra final rota por capability y t
 - No va en cada post: ahí la respuesta con esfera ya cierra.
 - **En el cierre del deck, la palabra final va en el acento de la línea, no en blanco** (operador, 2026-09-26):
   «Growth» en teal sobre `#001A33` da 8,5:1.
+- **En la contraportada, según el documento** (operador, 2026-09-27): en la **propuesta comercial** el eslogan es el
+  **mensaje principal**, grande y protagonista, en sus pesos oficiales, porque la propuesta llega después de conversar;
+  en el **brochure** el mensaje es «¿Conversamos? Cuando quieras.» y el eslogan va **debajo, como firma**
+  ([composición por superficie §4.6](./EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck)).
+- **En la portada no va** (operador, 2026-09-27): recarga, repite la respuesta y la esquina inferior derecha es zona del
+  sujeto o de la órbita. El eslogan va sólo en el cierre.
 - **Nunca:** pegarle la esfera · traducirlo · cambiarle pesos o cursivas · escribirlo en mayúsculas.
 
 ---
@@ -301,6 +328,8 @@ producto con que se hace. Los pesos del eslogan no cambian (`src/config/efeonce-
 - **Logo completo:** post, slide, portada, email, reverso de taza, muro, stand; siempre que quepa a 96 px o más.
 - **Firma de una pieza gráfica** (post, anuncio, portada con foto): el logo de Efeonce **centrado abajo**; la burbuja
   URL sólo lo reemplaza cuando el logo ya está dentro de la imagen (§8.5).
+  **No aplica a la portada de un deck, brochure o propuesta:** esa lleva el logo de 500 px arriba, en la columna de voz
+  (norma de composición §4.6, operador 2026-09-27).
 - **Isotipo:** avatar, favicon, ícono de app, pin, sticker, credencial, lomo de cuaderno, marca de agua en video.
 - **Nunca los dos en la misma vista.**
 - Productos: **nunca firman una pieza**; la firma es siempre Efeonce (§7). Su isotipo o su lockup «by efeonce» sólo
@@ -515,6 +544,9 @@ el deck, el cierre de marca y las animaciones del logo.
   completa la órbita con la esfera arriba. En el contenido en papel, la órbita baja a 80 px en la esquina. **Cierre del
   deck** (operador, 2026-09-26): es uno de los tres cierres de marca donde el logo va dentro de la órbita, con el anillo
   fuera del resguardo X (§8.3 n.º 8), y la palabra final del eslogan va en el acento de la línea, no en blanco (§5).
+  **Portadas y contraportadas de brochure y propuesta** (aprobadas el 2026-09-27: foto y sin foto se alternan, mensaje
+  de la contraportada según el documento, voz en la portada, logo a 500 px en 1920): ver la
+  [composición por superficie §4.6](./EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck), «Portadas y contraportadas».
 - **Banner de LinkedIn (lámina 4.1) y fondo de Teams (lámina 4.3):** un solo anillo, sin órbitas interiores (§1.3). En
   el banner **nunca** va el logo dentro de la órbita (§8.3 n.º 8).
 - **Campaña:** la órbita rodea la lente con aire; la esfera va arriba a la izquierda, lejos de la cara.

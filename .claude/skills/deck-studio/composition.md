@@ -95,6 +95,13 @@ caminero, cuadros de motion) y `graphic-line-overlays` (capas de video con alfa)
   (reglas `brochure-cover-first`, `brochure-close-last`, `brochure-needs-service-page`) y el PDF se sigue armando
   página por página hasta que se suba la dependencia; nunca se «adivina» el manifest de la 0.1.2 a mano. Resumen del
   contrato: [SKILL.md](SKILL.md) §«El deck como superficie», bloque «Contrato 0.1.2 y el brochure».
+- **Portadas y contraportadas (delta operador, 2026-09-27).** `cover-classic` y `close-classic` quedaron **retiradas**
+  como opción (logo de 230 y 220 px; el mínimo aprobado es 500 px en 1920): que falte su plantilla ya no es un hueco a
+  cerrar. El set aprobado —portadas de brochure con foto, una por línea de servicio, contraportadas de brochure con
+  «¿Conversamos? Cuando quieras.», portadas de propuesta sin foto con el logo del cliente y contraportadas de
+  propuesta con «Empower your Growth»— tampoco tiene plantilla todavía: su integración al contrato es TASK-1927 y la
+  producción de plates, TASK-1926. Hasta entonces se arma como maqueta de dirección declarada, con la norma de
+  `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 y el resumen de [SKILL.md](SKILL.md) §«Portadas y contraportadas».
 
 ### Destinos editables posteriores — no confundir fuente, conversión ni renderer
 

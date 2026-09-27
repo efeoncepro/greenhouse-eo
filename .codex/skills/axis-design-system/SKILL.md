@@ -298,6 +298,13 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
   no templates for `cover-classic`/`close-classic`, no `use`/`layout`, no documents there yet. Bump both packages
   together and rerun `pnpm composer:visual-gate --catalog=graphic-line`. Integration task:
   [TASK-1927](../../../docs/tasks/to-do/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md).
+- **Covers and back covers (operator, 2026-09-27):** the approved brochure/proposal cover and back-cover set
+  (photo ↔ no photo, back-cover message per document, line voice on the cover, Efeonce logo at 500 px in 1920, client
+  logo inside the orbit on proposal covers) **is being published in the AXIS Lab › Superficies › Deck**; until that
+  release it is not a contract recipe and the norm lives in Greenhouse
+  [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
+  §4.6. For brochure and proposal, `cover-classic` / `close-classic` were retired by the operator (230/220 px logo);
+  the contract still accepts them. Do not invent recipe IDs for the new set.
 - **Bump impact from `axis-tokens` `0.3.10`:** `src/@core/theme/axis-package-drift.test.ts` requires
   `Object.keys(efeonceTokens.color)` to be exactly the compatibility roles plus neutrals, so pinning ≥ `0.3.10` fails
   it until `info: axisSemanticHex.info` is added to `COMPATIBILITY_ROLES` in the same change. `efeonceTokens.motion`

@@ -1,6 +1,8 @@
 # Registro cine · la marca en su película — el lenguaje
 
-> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.0 · **Creado:** 2026-09-27 por Claude
+> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.1 · **Creado:** 2026-09-27 por Claude
+> **Última actualización:** 2026-09-27 por Claude (plates para portada y contraportada de brochure y propuesta,
+> aprobados por el operador: [§16](#16-plates-para-portada-y-contraportada-aprobado-2026-09-27))
 > **Nace en:** los dos deltas cine del maestro —[excepción para piezas de Nexa](EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#delta-2026-09-26-noche--excepción-declarada-registro-cine-para-piezas-de-nexa)
 > (2026-09-26, noche) y [ampliación a `proposal-cinematic`](EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#delta-2026-09-27--el-registro-cine-se-amplía-a-la-receta-proposal-cinematic)
 > (2026-09-27)—, que siguen escritos allí como historia. **Desde hoy, este documento es la fuente vigente del registro.**
@@ -9,7 +11,8 @@
 > **Primeros consumers:** láminas `proposal-cinematic` del deck (`ai-generations/2026-09-26_deck-*/`) y el brochure PDF
 > horizontal (`ai-generations/2026-09-27_brochure/`).
 > **Estado:** **aprobado en su alcance** (Nexa protagonista y `proposal-cinematic`); seis láminas de deck aprobadas;
-> formatos publicitarios 9:16 y 4:5 **en prueba**; sin prueba de reconocimiento.
+> portadas y contraportadas de brochure y propuesta aprobadas el 2026-09-27 (§16); formatos publicitarios 9:16 y 4:5
+> **en prueba**; sin prueba de reconocimiento.
 > **Documentación relacionada:** [maestro](EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [registro C](EFEONCE_PHOTO_REGISTER_C_V1.md) ·
 > [personas y vestuario](EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [colorimetría](EFEONCE_PHOTO_COLORIMETRY_V1.md) ·
 > [palancas](EFEONCE_PHOTO_LEVERS_CATALOG_V1.md) · [firma](EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) ·
@@ -281,7 +284,9 @@ escena con `foto:generar`, nunca injertar la cara).
 (`chaqueta-softshell-efeonce`, `polo-efeonce`, `hoodie-efeonce`); se revisa al 100 % con `pnpm foto:emblema`; y el
 isotipo oficial se **compone** encima con `pnpm foto:isotipo` desde `@efeoncepro/axis-brand-assets` —negativo (blanco)
 sobre prenda oscura, positivo sobre clara—. Todas las placas aprobadas llevan sufijo `b`: son la versión con el
-isotipo compuesto (`NX5b`, `NX6b`, `CR2b`, `WB1b`, `RV1b`, `AE2b`, `BR1b`, `BR2b`).
+isotipo compuesto (`NX5b`, `NX6b`, `CR2b`, `WB1b`, `RV1b`, `AE2b`, `BR1b`, `BR2b`). Las portadas y contraportadas
+aprobadas el 2026-09-27 traen cuatro placas sin `b` (`HW1`, `LN4`, `BR3`, `BR4`): el porqué de cada una está en §16.3
+y §16.4.
 
 **En el brochure el emblema generado salió fiel, y aun así se compuso [de la sesión que lo produjo, 2026-09-27].**
 Las referencias del kit bastaron para un emblema correcto, pero la regla no cambia: el publicable lleva el isotipo
@@ -392,7 +397,8 @@ creativos, `photo.register: "cine"`, `subject: "person"`, `plateRef` → `CR2b`)
 
 **En el brochure [de la sesión que lo produjo, 2026-09-27]:** voz pregunta (Poppins 300) + respuesta Bricolage 760
 con esfera teal, escrita con `answerHtml` de `@efeoncepro/axis-graphic-line`; **logo arriba a la izquierda** y el
-eyebrow «Servicios · 2026».
+eyebrow «Servicios · 2026». **Superado el 2026-09-27:** la portada aprobada lleva logo de 500 px y el eyebrow
+«Brochure · Servicios 2026»; la receta de toma y los plates aprobados están en §16.
 
 ### 9.4 Una sola órbita por pieza — y el anillo de la foto cuenta
 
@@ -614,9 +620,11 @@ Antes de mostrar una pieza cine, las doce, en orden:
 | Web · «¿Para quién es tu web? Para todos.» | `WB1b` | `2026-09-26_deck-web/` | ✅ **Aprobada** [operador, 2026-09-27] |
 | RevOps · «¿Tu CRM vende contigo? Con agentes.» | `RV1b` | `2026-09-26_deck-revops/` | ✅ **Aprobada** [operador, 2026-09-27, 01:46] |
 | AEO · «¿Te encuentra la IA? Visible.» | `AE2b` | `2026-09-26_deck-aeo/` | ✅ **Aprobada** [operador, 2026-09-27, 01:46]; `AE1` es la versión previa, superada por la del foco |
-| Brochure, portada «Nexa frente a la órbita» | `BR1b` | `2026-09-27_brochure/` | Producida y compuesta; aprobación **[pendiente de registrar]** |
-| Brochure, «el equipo» | `BR2b` | `2026-09-27_brochure/` | Producida y compuesta; aprobación **[pendiente de registrar]** |
-| Brochure, contraportada «Nexa camina hacia la órbita» | `BR3` | `2026-09-27_brochure/` | Producida y compuesta; sin versión `b` (§7.3); aprobación **[pendiente de registrar]** |
+| Brochure, portada «Nexa frente a la órbita» | `BR1b` | `2026-09-27_brochure/` | ✅ **Aprobada** como opción de portada [operador, 2026-09-27] (§16) |
+| Brochure, «el equipo» | `BR2b` | `2026-09-27_brochure/` | ✅ **Aprobada** como opción de portada y como lámina de sección del equipo [operador, 2026-09-27] (§16) |
+| Brochure y propuesta, contraportada «Nexa camina hacia la órbita» | `BR3` | `2026-09-27_brochure/` | ✅ **Aprobada** [operador, 2026-09-27]; sin versión `b` (§7.3) (§16) |
+| Brochure y propuesta, contraportada «Nexa y un agente hacia la órbita al amanecer» | `BR4` | `2026-09-27_brochure/` | ✅ **Aprobada** [operador, 2026-09-27]; sin versión `b` (§16) |
+| Brochure, portada de Media & Distribution · «¿Dónde invierto? Donde rinde.» | `LN4` | `2026-09-27_portadas-lineas/` | ✅ **Aprobada** [operador, 2026-09-27]; sin versión `b` (§16.4) |
 | La carrera v1 (cámara pegada, cohete inventado) | `NX3` | `2026-09-26_deck-nexa/` | 🔴 Rechazada |
 | Nexa y un director de arte mirándose de cerca | `NX2` | `2026-09-26_deck-nexa/` | 🔴 Rechazada (se lee romántica) |
 | Servicios creativos en Plastilina (bombillo) | ¿`C-bombillo-primer-plano`? | `2026-09-26_plastilina-volumen/` **[inferido]** | 🔴 Rechazada |
@@ -643,4 +651,153 @@ carpetas aparecían sin seguimiento en git al escribir este documento.
 | 5 | **Accesorios de Nexa en cine:** ¿el traje biónico y el uniforme llevan smartwatch y anillo? (trampa 8) | Operador |
 | 6 | **Reconciliar con la colorimetría:** teal-and-orange de noche, navy sobre set oscuro, azul royal en prenda grande; y medir las placas cine con `metricas.cjs` y `foto:validar` (§6) | Colorimetría |
 | 7 | **Una sola descripción de los robots agentes** para que sean el mismo personaje en todas las láminas (§8) | Quien produzca la próxima tanda |
-| 8 | Revisar al 100 % el logotipo de espalda de `BR3` y registrar la aprobación del brochure (§14) | Sesión del brochure |
+| 8 | Revisar al 100 % el logotipo de espalda de `BR3` y `BR4` (§7.3). La aprobación del brochure ya quedó registrada (§14, §16) | Sesión del brochure |
+| 9 | Pendientes de las portadas y contraportadas: §16.6 | Operador + AXIS + TASK-1926 |
+
+---
+
+## 16. Plates para portada y contraportada (aprobado 2026-09-27)
+
+**[decisión del operador, 2026-09-27]** En el [canvas «Design» por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7)
+(página Deck), el operador aprobó portadas y contraportadas de **brochure** y de **propuesta comercial** hechas sobre
+plates de este registro. Aquí queda **lo que el plate debe traer**. La composición encima —voz pregunta–respuesta,
+logo de 500 px, burbuja URL, la regla de que portada y contraportada alternan foto y sin foto, el mensaje de la
+contraportada según el documento— vive en [superficie §4.6](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck),
+y la reserva medida de la columna, en [reserva de espacio en la toma](EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md)
+(delta 2026-09-27).
+
+### 16.1 La receta de toma para portada
+
+| Qué | Cómo se pide |
+|---|---|
+| **Sujeto** | En la **mitad derecha** del cuadro, **de la cintura arriba**, **mirando al lente** |
+| **Cámara** | **85 mm a ≈ 2 m**, a la altura del pecho (§4): *«REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm»* |
+| **Reserva** | El **45 % izquierdo** es estudio oscuro y calmo: **sin haces, sin objetos y sin órbita**, sólo bruma tenue. Se niega por escrito en la escena, igual que en §9.1 |
+| **Lecho** | Oscuro abajo, `DARK near black`, fuera de toda luz y de todo reflejo (§9.2) |
+| **Luz de acento** | La de la **línea de servicio** de la portada (tokens `efeonceGraphicLine.lines`): el mismo acento que después toman el anillo de la pregunta y la esfera de la respuesta |
+
+**Por qué el 45 % [medido en la receta de la columna, 1920 × 1080]:** la voz arranca en x = 140 y el logo de 500 px
+llega a x = 640; debajo van el eyebrow, la pregunta, la respuesta de 124 px en Bricolage 760 y la evidencia, y abajo a
+la izquierda la burbuja URL. Todo eso vive en la izquierda oscura; el sujeto no puede entrar ahí.
+
+**Sin interfaz por defecto [decisión del operador]:** la foto cine va limpia. Si la portada lleva selección
+colaborativa o cursor, van **sólo sobre la columna de texto o sobre el logo del cliente**, nunca sobre la persona, y en
+16:9 un solo cursor (§4.6). La portada de las cinco líneas con el cursor de Nexa sobre «Crecer.» es **prueba**, no
+aprobada.
+
+### 16.2 La variante de contraportada: de espaldas, hacia la órbita
+
+La contraportada con foto no mira al lente: es **el último fotograma de la película**. Dos placas aprobadas, las dos
+con Nexa y la chaqueta pedida de espalda (`"puesta": "espalda"`), por eso **ninguna lleva versión `b`**: no hay pecho
+donde componer el isotipo (§7.3).
+
+| Placa | La escena | Cámara | Reserva declarada |
+|---|---|---|---|
+| `BR3` · hacia la órbita | *«seen FROM BEHIND, her back to the camera, walking away toward the center of the frame»*, pequeña (≈ ¼ del alto), hacia **un anillo teal enorme de pie como un portal**, con su esfera arriba, reflejado en el piso pulido | 50 mm, a la altura de la cintura, ≈ 8 m detrás; composición simétrica | *«the calm, deep dark sky of haze on the top 40% of the frame»* (**arriba**) |
+| `BR4` · al amanecer | De espaldas, **en la mitad derecha**, por una calzada oscura sobre agua quieta, con **un robot agente pequeño a la altura de la rodilla**; el anillo teal sale **inclinado, a medias sobre el horizonte, como un sol** | 50 mm, a la altura de la cintura, ≈ 8 m detrás | *«the calm, deep dark sky and water on the left 45% of the frame»* |
+
+En las dos, el anillo es **la única luz fuerte**, recorta la silueta con un borde teal y tira la sombra larga hacia la
+cámara; el lecho es el piso o la calzada cerca del lente, *«outside the ring's reflection»*. Las dos sirven para el
+brochure («¿Conversamos? Cuando quieras.») y para la propuesta («Empower your Growth» como mensaje principal): qué
+contraportada acompaña a qué portada lo decide la regla de parejas de §4.6.
+
+**[criterio]** Para una contraportada nueva, partir de la geometría de `BR4` (sujeto a la derecha, reserva izquierda
+del 45 %): es la que el compilador respeta. La de `BR3`, con reserva arriba, cae en la trampa 6 de §10 —el compilador
+fuerza la reserva izquierda y el anillo quedó a la derecha del centro— hasta que `foto:prompt` acepte una reserva
+superior en 16:9.
+
+### 16.3 Plates aprobados por uso
+
+Rutas relativas a `ai-generations/`. Las placas son locales (gitignoreadas); lo versionado son fichas y prompts.
+
+**Brochure · portada general** (voz «¿Qué hace Efeonce? **Crecer.**», acento teal). Tres opciones:
+
+| Opción | Placa | Ruta |
+|---|---|---|
+| Nexa frente a la órbita | `BR1b` | `2026-09-27_brochure/plates/BR1b-portada-orbita-isotipo.png` |
+| Nexa y las cinco líneas (cinco esferas), con burbuja URL | `NX6b` | `2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png` |
+| Nexa y el equipo con agentes (también abre la sección del equipo) | `BR2b` | `2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png` |
+
+**Brochure · una portada por línea de servicio** (las cinco aprobadas):
+
+| Línea (token) | Acento | Voz | Placa | Ruta |
+|---|---|---|---|---|
+| Growth Strategy & Measurement (`growth`) | teal `#36c8bf` | ¿Lo medimos? **Siempre.** | `HW1` | `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png` |
+| Creative Services (`brand`) | naranja `#ff6500` | ¿Quién crea mi contenido? **Tu squad.** | `CR2b` | `2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png` |
+| Digital Services & Engineering (`engine`) | azul `#0375db` | ¿Te encuentra la IA? **Visible.** | `WB1b` | `2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png` |
+| Media & Distribution (`voice`) | rojo anaranjado `#f83902` | ¿Dónde invierto? **Donde rinde.** | `LN4` (nueva, §16.4) | `2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png` |
+| RevOps & CRM (`revenue-hubspot`) | magenta HubSpot `#e86bd0` | ¿Y el reporte del viernes? **Ya lo viste.** | `RV1b` | `2026-09-26_deck-revops/plates/RV1b-motor-de-revenue-isotipo.png` |
+
+⚠️ **`HW1` no es cine [medido en su ficha]:** es la toma documental de §2 (*«nobody looks at the lens»*, reserva
+*«the calm, evenly shadowed bare dark wall on the left half»*, sin isotipo compuesto). El operador la aprobó igual como
+portada de Growth, pero **no cumple la receta de §16.1** (no mira al lente): no sirve de modelo para una portada nueva.
+
+**Contraportadas con foto** (brochure y propuesta): `BR3` → `2026-09-27_brochure/plates/BR3-contra-horizonte.png` ·
+`BR4` → `2026-09-27_brochure/plates/BR4-contra-amanecer.png` (§16.2).
+
+Las portadas de **propuesta** son **sin foto** (la órbita gigante sostiene el logo del cliente): no usan plate.
+
+### 16.4 La ficha nueva: `LN4`, la portada de Media & Distribution
+
+| | |
+|---|---|
+| Ficha | `ai-generations/2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json` |
+| Prompt compilado | `ai-generations/2026-09-27_portadas-lineas/prompts/LN4-voice-distribucion.txt` |
+| Placa | `ai-generations/2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png` |
+| Cómo se produjo | `pnpm foto:generar` desde la ficha declarada |
+| Costo | ≈ **USD 0,04** (en línea con el ≈ USD 0,037 de salida por placa de §10) |
+| Emblema | El bordado se revisó al 100 % y **coincide con el isotipo oficial**; por eso no se corrió `foto:isotipo` y la placa no lleva sufijo `b` (la tensión con §7.3 queda en §16.6) |
+
+Es la **receta de prompt reutilizable para una portada de línea**. Ficha verbatim:
+
+```json
+{
+  "id": "LN4-voice-distribucion",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    { "objeto": "chaqueta-softshell-efeonce" }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood blockbuster still, a dark studio at night): a Latin American media and distribution lead in her early thirties, straight dark hair tied back, wearing the NAVY EFEONCE SOFTSHELL JACKET over the navy polo, stands on the RIGHT half of the frame, framed from the waist up, looking straight into the lens with calm confidence. REALISTIC ADULT PROPORTIONS: camera about two meters away at chest height, 85mm. In her open palm, held at chest height, glows ONE small bright sphere of warm red-orange light (#F83902). From that single sphere, dozens of thin beams of the same red-orange light fan out behind her into the depth of the studio, each beam ending on a small glowing screen floating far away in the haze: phones, a laptop, a billboard, a TV, a podcast microphone glow, all tiny and out of focus, like one message reaching many audiences at once. The sphere is the brightest light: it lights her face, hand and jacket in warm orange; a cool rim light from behind separates her from the dark. Haze catches the beams. The LEFT 45% of the frame is calm, deep dark studio space with only faint haze, no beams, no screens, no objects. Rich contrast, punchy color, no text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark blurred edge of a presentation table close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": { "muro": "the calm, deep dark studio space on the left 45% of the frame", "tinta": "blanca" }
+  }
+}
+```
+
+**Qué cambia de una línea a otra [criterio]:** el rol y el casting del sujeto, la prenda del kit en `objetos` y el
+fenómeno de luz con el **HEX de su línea** (aquí, una sola esfera roja anaranjada en la palma de la que salen haces
+hacia pantallas lejanas: un mensaje que llega a muchas audiencias). Lo demás se copia tal cual: la mitad derecha, la
+cintura arriba, la mirada al lente, las proporciones a 2 m y 85 mm, el rim frío, la bruma, la negación del 45 %
+izquierdo, el lecho y el cierre *«no text, no logos of any other brand»*. Cada campo está explicado en §12.
+
+**Al compilarla [medido en el prompt]:** la trampa 7 de §10 sigue presente —la tabla del 16:9 escribe «LEFT 42%» y la
+ficha, «left 45%»—; el bloque de accesorios de Nexa (trampa 8) no aparece porque la ficha no declara identidad.
+
+### 16.5 El texto nunca cruza al sujeto, un haz, una mano ni la órbita
+
+**Regla [decisión del operador, 2026-09-27]:** ninguna palabra de la portada o la contraportada cruza al sujeto, un haz,
+una mano o la órbita. La columna vive en la izquierda oscura. **Si una línea cruza, no se mueve la foto: se corrige el
+texto**, acortando la pregunta o partiendo la evidencia en dos o tres líneas. Dos casos del brochure:
+
+| Antes | Después |
+|---|---|
+| «¿Qué hacemos por tu marca?» | «¿Qué hace Efeonce?» |
+| «¿Dónde pongo el presupuesto?» | «¿Dónde invierto?» |
+
+Amplía §9.5: se prueba contra el borde real del haz, la mano o el anillo más cercano, no contra el 45 % nominal.
+
+### 16.6 Pendientes de las portadas
+
+| # | Pendiente | Dueño |
+|---|---|---|
+| 1 | **Alcance del registro:** las portadas de línea del brochure usan personas del equipo (`CR2b`, `WB1b`, `RV1b`, hechas para `proposal-cinematic`, y `LN4`, hecha para el brochure). §2 y el issue AXIS `cine-requires-nexa-or-proposal` sólo admiten Nexa o la receta `proposal-cinematic`: una portada de brochure declarada como cine con persona del equipo hoy la rechazaría el contrato. El operador las aprobó; falta llevarlo al contrato | Operador + AXIS (TASK-1927) |
+| 2 | **`LN4` sin isotipo compuesto.** Sigue el orden de las invariantes de fotografía (`.claude/rules/brand-photography.md`: referencias → `foto:emblema` al 100 % → `foto:isotipo` **sólo si el emblema difiere**), pero choca con §7.3 de este registro («el publicable lleva el isotipo oficial», todas las aprobadas con `b`). Decidir cuál manda en cine y alinear el otro | Operador |
+| 3 | **Regenerar desde las fichas:** hoy `foto:generar` vuelve a cobrar en cada corrida y la voz y la firma salieron de scripts de sesión que no están en el repo. El pipeline cine idempotente debe poder regenerar estos plates desde sus fichas | TASK-1926 |
+| 4 | Variante opcional de RevOps con Salesforce (cielo `#2fb8ff`) | Operador |

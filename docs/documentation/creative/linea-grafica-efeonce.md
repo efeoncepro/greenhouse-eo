@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.11
+> **Version:** 1.12
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
+> **Ultima actualizacion:** 2026-09-27 por Claude (1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
 
@@ -75,7 +75,7 @@ Estas son las reglas que no se negocian. El manual tiene el detalle y las medida
 | Regla | Qué significa en la práctica |
 |---|---|
 | **Ningún texto cruza la órbita** | el texto vive al costado (normalmente abajo a la izquierda) y la órbita al otro lado; nunca se superponen |
-| **La pieza firma con el logo centrado** | un post, un anuncio o una portada con foto se firma con el logo de Efeonce abajo, al centro |
+| **La pieza firma con el logo centrado** | un post, un anuncio o una portada con foto se firma con el logo de Efeonce abajo, al centro. La portada de un deck, brochure o propuesta no: lleva el logo grande arriba, junto al texto (2026-09-27) |
 | **La burbuja de la dirección web sólo firma si el logo ya está en la imagen** | si la foto ya muestra el logo de Efeonce (en un objeto, una prenda o una maqueta), la firma pasa a ser la burbuja de `efeoncepro.com`, centrada y fundida con el fondo, y nunca al lado del logo. Sólo se lee bien sobre un fondo muy oscuro |
 | **La URL va siempre en su burbuja** | donde aparezca `efeoncepro.com` se usa la burbuja oficial, nunca la dirección escrita como texto. En pies de decks, informes, papelería, stand y firma de mail se sigue usando como siempre |
 | **La órbita no reemplaza la composición de la foto** | se usa en casos puntuales y a propósito, no en toda pieza; nunca tapa a la persona u objeto principal, el espacio del texto, la base donde se apoya el texto ni la firma |
@@ -389,6 +389,27 @@ El 2026-09-26 el operador cerró varias preguntas abiertas de la línea:
   de la fotografía, donde se puede mirar a cámara.
 
 > Detalle técnico: [manual §12, tabla D1–D15](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#12-decisiones-y-validación) · [ADR, delta (e)](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) · [lenguaje fotográfico §11](../../operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#11-la-línea-gráfica-en-la-foto)
+
+## Delta 2026-09-27 — portadas y contraportadas del brochure y la propuesta
+
+El 2026-09-27 el operador aprobó las portadas y contraportadas del brochure y de la propuesta comercial. Tres reglas
+nuevas mandan:
+
+- **Foto y sin foto se alternan.** Si la portada lleva fotografía, la contraportada va sin fotografía, y al revés. Vale
+  para el brochure y para la propuesta.
+- **El mensaje de la contraportada depende del documento.** En la propuesta comercial el mensaje principal es el
+  eslogan «Empower your Growth», porque la propuesta llega después de conversar. En el brochure va «¿Conversamos?
+  Cuando quieras.», con el eslogan de firma debajo, porque el brochure busca abrir la conversación. El eslogan nunca va
+  en la portada.
+- **La portada habla con la voz de la línea:** una etiqueta arriba, la pregunta chica con su anillo, la respuesta
+  grande con su esfera y una evidencia con una palabra en negrita. Nada de títulos sueltos como «Servicios 2026». El
+  brochure pregunta «¿Qué hace Efeonce?» y responde «Crecer.»; la propuesta pregunta «¿Cómo crecemos en 2027?» y
+  responde «Con foco.», con el nombre del cliente en la evidencia y su logo dentro de la órbita.
+
+También quedaron aprobadas una portada por cada línea de servicio, con su color y su par de pregunta y respuesta.
+Todavía no salen con `pnpm brand:compose`: su paso a plantilla es una task aparte (TASK-1927).
+
+> Detalle técnico: [norma de composición por superficie §4.6, «Portadas y contraportadas»](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) (reglas, catálogo, medidas y descartes) · [manual §4, pares aprobados, y §5, el eslogan](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#4-la-voz-pregunta-y-respuesta) · [canvas por superficie, página «Deck»](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7)
 
 ## Estado y pendientes
 

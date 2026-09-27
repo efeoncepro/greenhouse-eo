@@ -73,6 +73,11 @@ creencias contra el status quo de la industria (`../modules/04`).
 - Tagline de marca: **"Empower your Growth"** (`src/config/efeonce-brand.ts`). No lo reescribas ni
   lo traduzcas ad-hoc; es SSOT. Nota: Efeonce ≠ Greenhouse — respeta la arquitectura de marca
   (doctrina en `efeonce-agency`).
+- **Dónde va en un brochure o una propuesta** (operador, 2026-09-27): **nunca en la portada** (ahí habla la voz
+  pregunta–respuesta de la línea gráfica). En la contraportada de una **propuesta comercial** es el mensaje
+  principal (la propuesta llega después de conversar); en la de un **brochure**, el mensaje es «¿Conversamos? Cuando
+  quieras.» y el eslogan firma debajo. Norma: `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md`
+  §4.6.
 
 ## Reglas duras
 

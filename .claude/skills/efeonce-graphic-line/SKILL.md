@@ -67,7 +67,9 @@ dos esferas en una pieza (manzana + lente u órbita).
    aparece en la imagen, y nunca va como texto. **El logo va dentro de la órbita sólo en cierres de marca** (cierre del
    deck, cierre de video, muro de recepción), con su resguardo X fuera del anillo; en todo lo demás, nunca.
 8. **La línea de servicio decide el acento y la palabra del eslogan** («Empower your Growth | Brand | Engine | Voice |
-   Revenue»). El eslogan sólo cierra, sin esfera ni mayúsculas. **El acento mide ≥ 3:1 contra su fondo** en gráfico y en
+   Revenue»). El eslogan sólo cierra, sin esfera ni mayúsculas, **nunca en la portada** (operador, 2026-09-27): en la
+   contraportada de una propuesta comercial es el mensaje principal («Empower your Growth»); en la de un brochure firma
+   debajo de «¿Conversamos? Cuando quieras.» (norma `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6). **El acento mide ≥ 3:1 contra su fondo** en gráfico y en
    texto ≥ 24 px, y **nunca va en texto de menos de 24 px** (ahí navy sobre claro, blanco sobre oscuro).
 9. **La órbita no sustituye la composición fotográfica**: se declara a propósito y nunca cubre sujeto, reservas, lecho
    ni firma (chequeo `orbit-never-over-subject-or-reserves`).

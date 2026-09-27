@@ -49,7 +49,9 @@ Estas reglas no se repiten en cada tarjeta; se asumen siempre.
 9. **Logo una vez por vista**, logo o isotipo, nunca los dos (M §8.1). En piezas gráficas la firma es el **logo de
    Efeonce centrado abajo**; la burbuja URL lo reemplaza sólo si el logo ya está en la imagen (M §8.5).
 10. **El eslogan sólo en cierres** (M §5): final de video, última lámina, contratapa, firma de correo, recepción, merch.
-    Nunca en cada post, nunca con esfera, nunca traducido ni en mayúsculas.
+    Nunca en cada post, nunca en la portada, nunca con esfera, nunca traducido ni en mayúsculas. En la contraportada de
+    propuesta comercial es el mensaje principal; en la de brochure firma bajo «¿Conversamos? Cuando quieras.»
+    (operador, 2026-09-27; §L).
 11. **Objetos: frente la palabra con su punto; dorso el logo solo** (M §10.4). La órbita, si va, rodea la palabra.
     **Nunca** la órbita alrededor del logo en un objeto.
 12. **Color:** una marca y un acento por pieza (M §2). Oscuro Efeonce `#001A33` + teal `#36C8BF` + halo `#72DED8`;
@@ -302,6 +304,10 @@ vale en toda aplicación:
   tiene esfera —el indicador de 80 px o una respuesta que cierra con su esfera—, los íconos descansan
   (`auditIconGroup(items, { pieceHasSphere: true })`).
 - **Fuente:** L 4.1, L 4.2; M §10.1; `EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md` §Identidad y pie.
+- **Delta (operador, 2026-09-27) — brochure y propuesta comercial:** la portada y el cierre de esta tabla (logo de 230
+  y 220 px) quedaron **retirados** como portada y contraportada de esos documentos; el logo va a 500 px en 1920 y el
+  set aprobado (portadas con foto o de órbita gigante, contraportadas por documento) está en §L, «Portadas y
+  contraportadas».
 
 ### B2. Portada de deck con lente (foto)
 
@@ -747,7 +753,7 @@ bajada web sin token, y la paleta 20 % vs 35 %.
 | pDOOH | nada todavía (LED, mupi, spot sin audio y variantes por franja son opción) | LED bajo la respuesta, mupi centrada (opción) | J |
 | Motion | animación en bucle foto-para-la-lente + reveal, y su storyboard | nunca en la toma; firma el cierre | J |
 | Audiovisual | storyboard de planos «Cómo trabajamos» y escenas con generadores de texto | firma la marca en el cierre, nunca la toma | J |
-| Deck | sección clásica, sección partida, «la órbita mide la cifra», tríptico, `proposal-cinematic` (seis láminas) y `method-staircase` (BeX); en AXIS 0.1.2 también `cover-classic` y `close-classic` (sin plantilla en Greenhouse todavía) | burbuja URL en el pie; logo sólo en portada, cierre o marca-sujeto | B1, B2 |
+| Deck | sección clásica, sección partida, «la órbita mide la cifra», tríptico, `proposal-cinematic` (seis láminas) y `method-staircase` (BeX); en AXIS 0.1.2 también `cover-classic` y `close-classic` (sin plantilla en Greenhouse todavía; retiradas como portada y contraportada de brochure y propuesta el 2026-09-27) + el set de portadas y contraportadas de abajo (sin plantilla) | burbuja URL en el pie; logo sólo en portada, cierre o marca-sujeto | B1, B2 |
 
 **Reglas que un agente necesita en el momento**
 
@@ -790,7 +796,9 @@ nivel de llegada en bloque sólido en el acento de la línea (BeX: cinco peldañ
 - **Portada y cierre:** `cover-classic` (logo arriba a la izquierda con el eyebrow, voz en la mitad baja, arco corto;
   marca 0 de N) y `close-classic` (órbita completa con el logo dentro y el eslogan «Empower your \<Línea>» en tres
   tramos; marca N de N) pasan a recetas aprobadas del deck. Firman con el logo y **sin burbuja URL**
-  (`logo-signs-without-url-bubble`): la burbuja sólo reemplaza al logo.
+  (`logo-signs-without-url-bubble`): la burbuja sólo reemplaza al logo. **Delta (operador, 2026-09-27):** retiradas
+  como portada y contraportada de brochure y propuesta (su logo de 230 y 220 px no llega a los 500 px aprobados); el
+  contrato las sigue aceptando hasta que TASK-1927 integre el set nuevo.
 - **Layouts de `proposal-cinematic`:** `service` (por defecto: pregunta, respuesta y bajada; prueba opcional, hasta
   cuatro pasos), `hero` (eyebrow, pregunta, respuesta y bajada; sin prueba ni pasos; selección de Nexa) y `lines` (eyebrow
   y la frase; sin pregunta ni respuesta ni esfera de voz; la pila sale de `efeonceGraphicLine.lines`, cada palabra en
@@ -807,6 +815,19 @@ nivel de llegada en bloque sólido en el acento de la línea (BeX: cinco peldañ
   del registro: [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
   §9.4. Las portadas cinematográficas del brochure con Nexa (`BR1b`, `BR3`) no son receta del contrato: el documento
   sólo acepta como portada y cierre las recetas de papel `cover` / `close`.
+
+**Portadas y contraportadas (aprobado por el operador, 2026-09-27; norma `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6,
+resumen operativo en la skill `deck-studio` §«Portadas y contraportadas»).** Tres reglas: **foto ↔ sin foto** entre
+portada y contraportada; **mensaje de la contraportada por documento** (propuesta: «Empower your Growth» como mensaje
+principal; brochure: «¿Conversamos? Cuando quieras.» con el eslogan de firma); **voz de la línea en la portada**
+(eyebrow, pregunta con anillo, respuesta con esfera, evidencia), nunca el eslogan. Logo de Efeonce a 500 px en 1920
+(≥ `logo.minScreenPx`). Ningún texto cruza la órbita ni al sujeto. Aprobado: portadas de brochure con foto
+(«¿Qué hace Efeonce? Crecer.») y una por línea de servicio con su acento (pares en `criteria.md` §4); contraportadas
+de brochure (Nexa hacia la órbita, al amanecer, y la órbita gigante sin foto); portadas de propuesta sin foto con el
+logo del cliente dentro de la órbita (órbita gigante y amanecer); contraportadas de propuesta con foto y «Empower your
+Growth». La órbita gigante sin foto es portada de **propuesta**, nunca de brochure (en brochure sólo es
+contraportada). Selección y cursores sólo sobre la columna de texto o el logo del cliente, nunca sobre la persona, un
+cursor en 16:9. Todavía no son receta del contrato: TASK-1926 (plates) y TASK-1927 (contrato).
 
 **Lo inferido en esta sección (confirmar con el operador):** que `proposal-cinematic` se quede sin indicador de deck
 en versiones futuras (así se aprobaron las piezas); que la firma por soporte de web, paleta, LED y mupi pase de

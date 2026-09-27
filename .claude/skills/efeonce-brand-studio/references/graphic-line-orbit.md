@@ -55,6 +55,8 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
 ## La firma de una pieza gráfica (operador, 2026-09-26)
 
 - **Por defecto**, un post, anuncio o portada con foto firma con **el logo de Efeonce centrado, abajo al centro**.
+  No aplica a la portada de un deck, brochure o propuesta: esa lleva el logo de 500 px arriba, en la columna de voz
+  (§4.6 de la norma de composición, operador 2026-09-27).
   Sin URL.
 - La **burbuja URL** (`efeoncepro.com`) **no se agrega por defecto**. Sólo **reemplaza** al logo cuando el logo de
   Efeonce **ya aparece dentro de la imagen** (mockup, objeto, merch o similar). Entonces va **centrada**, sola, con
@@ -114,7 +116,17 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
 10. **Voz pregunta-respuesta:** pregunta real en Poppins 300 con anillo; respuesta de 1–3 palabras en Bricolage 760,
     ≥ 3× la pregunta, cerrada por la esfera; la esfera nunca va en una pregunta (§3, §4).
 11. **Eslogan** sólo en cierres, desde el archivo oficial: «Empower your» + palabra de la marca, sin mayúsculas y sin
-    esfera (§5).
+    esfera (§5). **Nunca en la portada** (operador, 2026-09-27). En la contraportada de una **propuesta comercial** es
+    el mensaje principal («Empower your Growth», grande, en sus pesos oficiales: la propuesta llega después de
+    conversar); en la de un **brochure** firma debajo de «¿Conversamos? Cuando quieras.» (el brochure abre la
+    conversación).
+11b. **Portadas y contraportadas de brochure y propuesta** (operador, 2026-09-27): foto ↔ sin foto entre portada y
+    contraportada; la portada habla con la voz de la línea (eyebrow, pregunta con anillo, respuesta con esfera,
+    evidencia), nunca con un título suelto; logo de Efeonce a 500 px en 1920 (las clásicas de 230 y 220 px quedaron
+    retiradas); ningún texto cruza la órbita ni al sujeto. Una portada de brochure por línea de servicio con su acento;
+    la portada de propuesta, sin foto, lleva el logo del cliente dentro de la órbita (el nombre del cliente sólo en la
+    evidencia). Catálogo, pares y parejas: `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6
+    (resumen operativo en `deck-studio` §«Portadas y contraportadas»).
 12. **Estado:** anillo = libre, esfera = ocupado, siempre con etiqueta escrita; nunca verde/rojo.
 13. **La esfera final es parte del texto** (operador, 2026-09-26): la respuesta y el titular display de marca propia
     cierran con ella, y la guía, las marcas de corte, la selección colaborativa y sus cursores miden la palabra

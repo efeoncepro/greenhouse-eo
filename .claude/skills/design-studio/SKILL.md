@@ -373,6 +373,10 @@ izquierda oscura en 16:9— y **sólo** se usa con **Nexa protagonista** o en la
 (AXIS `cine-requires-nexa-or-proposal`); la publicidad 9:16 y 4:5 en cine está **en prueba**, no aprobada. Marcador,
 barra, trampas y comandos en la referencia (§Registros); canon vigente:
 [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
+**Plate de portada de brochure o propuesta** (operador, 2026-09-27): sujeto a la derecha, 45 % izquierdo oscuro y
+calmo para la columna de texto, 85 mm, lecho oscuro y la luz de acento de la línea; en la contraportada con foto, el
+sujeto de espaldas caminando hacia la órbita. Receta y ficha de ejemplo
+(`ai-generations/2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json`) en la referencia, §Cine.
 
 🔴 **Tres trampas medidas el 2026-09-22 (CMP-001) que el validador da por buenas.** Detalle, frases exactas y
 casos en la regla auto-load `.claude/rules/brand-photography.md`:

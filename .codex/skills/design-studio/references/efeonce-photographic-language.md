@@ -176,9 +176,30 @@ pnpm brand:compose -- --intent <intent.json>               # lámina o brochure:
 ```
 
 `brand:compose` sigue el contrato AXIS `efeonce.surface-composition`. La 0.1.2 (`candidate`, AXIS) agrega
-`use: proposal|brochure`, las recetas `cover-classic` y `close-classic`, y las composiciones `service|hero|lines` de
+`use: proposal|brochure`, las recetas `cover-classic` y `close-classic` (retiradas por el operador el 2026-09-27
+como portada y contraportada de brochure y propuesta; ver abajo), y las composiciones `service|hero|lines` de
 `proposal-cinematic`; **Greenhouse todavía fija la 0.1.1** en sus intents: verifica la versión antes de usar esos
 campos. La plantilla de ficha comentada (`RV1`, verbatim) está en §12 del registro.
+
+**Plate de portada y contraportada de brochure o propuesta [operador, 2026-09-27].** La portada con foto lleva texto
+encima (logo de Efeonce a 500 px, eyebrow, pregunta, respuesta, evidencia) en una columna a la izquierda, así que el
+plate se pide para esa columna:
+
+- **Portada:** sujeto en la **mitad derecha**, de la cintura arriba, a **85 mm y ~2 m**, mirando al lente; el **45 %
+  izquierdo es estudio oscuro y calmo** (sin haces, objetos ni órbita: ningún texto puede cruzar la luz, una mano o
+  al sujeto); **lecho oscuro abajo**; la luz de acento es la de la **línea de servicio** de la portada (una portada de
+  brochure por línea, cada una con su acento).
+- **Contraportada con foto:** el sujeto **de espaldas, caminando hacia la órbita** (Nexa hacia el horizonte o al
+  amanecer: `ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png` y `BR4-contra-amanecer.png`), con el
+  mismo lado oscuro para el bloque de cierre. Recuerda la regla foto ↔ sin foto: una contraportada con foto va con una
+  portada sin foto, y al revés.
+- **Ficha de ejemplo** (portada de Media & Distribution, acento Voice, chaqueta Efeonce; USD ~0,04;
+  bordado revisado al 100 % = isotipo oficial):
+  `ai-generations/2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json` → plate
+  `…/plates/LN4-voice-distribucion.png`. Sigue la ruta de comandos de arriba.
+- La producción idempotente de estos plates es TASK-1926; lo que va encima (voz, logo, selección) no lo decide esta
+  skill: norma `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 y skill `deck-studio`
+  §«Portadas y contraportadas». Registro: [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
 
 **Dónde viven las herramientas.** Hoy `pnpm foto:*` vive en Greenhouse (`scripts/foto/`).
 [TASK-1925](../../../../docs/tasks/to-do/TASK-1925-brand-workshop-migration.md) lo migra al repo taller

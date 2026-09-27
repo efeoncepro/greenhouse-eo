@@ -96,7 +96,7 @@ Los valores exactos están en los tokens y en el §2 del manual técnico.
 
 ### Paso 6 · Firma la pieza
 
-1. **Pieza gráfica (post, anuncio, portada con foto):** firma con el **logo de Efeonce centrado abajo**. No agregues la
+1. **Pieza gráfica (post, anuncio, portada con foto):** firma con el **logo de Efeonce centrado abajo**. La portada de un deck, brochure o propuesta no sigue esta regla: lleva el logo de 500 px arriba, en la columna de voz (`EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6, 2026-09-27). No agregues la
    burbuja de URL.
 2. **¿El logo de Efeonce ya aparece dentro de la imagen** (una maqueta, un objeto, una prenda)? Entonces no repitas el
    logo: firma con la **burbuja URL, centrada y con fusión de luminosidad**, sola. Nunca a un costado ni junto al logo.
