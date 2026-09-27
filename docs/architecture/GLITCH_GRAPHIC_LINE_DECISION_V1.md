@@ -92,12 +92,38 @@ mano.
    renderiza todas las superficies → QA humano → publicación (LinkedIn vía Metricool, blog vía WordPress) → grabación del
    host → el editor monta los overlays renderizados del mismo manifiesto.
 
+### Encaje verificado en el Artifact Composer (2026-09-27)
+
+Se revisó el motor (`src/lib/artifact-composer/catalog.ts`, `compose.ts`, `contracts.ts`) y los catálogos vigentes
+(`deck-axis`, `insights-*`, `graphic-line-deck`, `graphic-line-stills`, `graphic-line-overlays`):
+
+- **No hace falta un «kind» nuevo de social post en el motor.** `catalog.ts` lo dice como regla: un carrusel 4:5 → PNG
+  set es un catálogo (un directorio de datos), no un fork. Los destinos ya implementados cubren a Glitch:
+  `pdf-merged` (N páginas: el documento del carrusel de LinkedIn) y `png-set` (N PNG: Instagram, un post suelto, banners).
+  El viewport es por plantilla (1080 × 1350, 1920 × 1080, 1080 × 1920) y `render.background: 'transparent'` da PNG con
+  alfa para las piezas estáticas del reel, como ya hace `graphic-line-overlays`. Un post suelto es un `png-set` de una
+  página.
+- **Un catálogo declara un solo `outputTarget`.** Como la misma edición sale en PDF (LinkedIn) y en PNG (Instagram, blog,
+  reel), se proponen catálogos delgados sobre un mismo `templatesDir`, sin tocar el motor: `glitch-carousel`
+  (`pdf-merged`), `glitch-stills` (`png-set`: láminas sueltas, banners del blog, portada del reel, miniatura) y
+  `glitch-overlays` (`png-set` transparente).
+- **Lo que sí hay que construir:** las plantillas y sus `*.slots.json` + `registry.json`; una **extensión `glitch` del
+  brand pack `axis`** (mecanismo `packExtensions`, el mismo que usa `editorial`) con Guttery sellada por checksum y los
+  valores leídos del token `glitchLine` de AXIS; el **selector** de portada por la regla de rotación; **validadores
+  semánticos** del catálogo (una esfera por lámina, contraste de pesos en el titular, rotación: el plan trae la plantilla
+  de la semana anterior como dato, porque un validador no consulta la base); y un **layout hook** para la falla en bytes
+  derivada de la foto, determinista.
+- **No va por `src/lib/brand-surfaces` ni por `efeonce.surface-composition`:** ese puente es de las recetas de La órbita
+  por superficie. Glitch es una franquicia con su propio contrato (`efeonce.glitch-line`, pendiente). Cuando exista la ruta
+  productiva gobernada de TASK-1921, los catálogos de Glitch pueden usarla.
+- El movimiento (overlays animados, apertura y cierre) sigue fuera del Composer: HyperFrames.
+
 ### Trabajo a crear (sin ID de task reservado)
 
 | # | Trabajo | Depende de |
 |---|---|---|
 | a | Tokens, assets y contrato de Glitch en AXIS | aprobación de la manzana y el verde como token de franquicia |
-| b | Catálogo `glitch-edition` del Artifact Composer | (a) |
+| b | Catálogos `glitch-carousel` (PDF), `glitch-stills` y `glitch-overlays` (PNG) sobre un mismo `templatesDir`, extensión `glitch` del brand pack, selector de rotación y validadores | (a) |
 | c | Overlays HyperFrames + render con alfa | (a); aprobación del kit de overlays del reel |
 | d | Callout v2 en el bloque de WordPress `efeoncepro/glitch-drop` | aprobación del callout v2 |
 | e | Alta de los 5 glifos Plastilina en AXIS | aprobación del operador |
@@ -125,8 +151,8 @@ mano.
 - El callout v2, si se aprueba, obliga a cambiar el bloque de WordPress `efeoncepro/glitch-drop` desplegado por TASK-1337.
 - La numeración de ediciones que usa esta línea (la próxima es la #11) no coincide con la del ADR del pipeline editorial
   (#16 en adelante); hay que reconciliarlas.
-- Si se acepta el flujo propuesto, `glitch-edition` sería el primer catálogo social del Composer (hoy tiene
-  `deck-axis` e `insights-*`) y Guttery tendría que entrar a un brand pack del motor, que hoy sólo tiene `axis`.
+- Si se acepta el flujo propuesto, los catálogos de Glitch serían los primeros de una franquicia editorial en el
+  Composer, y Guttery entraría como extensión `glitch` del brand pack `axis` (hoy el único pack).
 - La pieza sonora de Glitch sigue pendiente en la identidad sonora; el mnemónico del video depende de esa decisión.
 
 ## Pendiente

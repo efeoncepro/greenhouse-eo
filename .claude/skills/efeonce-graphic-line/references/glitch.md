@@ -197,6 +197,13 @@ Objetivo: que ningún agente reinterprete. **Los agentes llenan datos; nunca eli
    superficies → QA humano → publicación (LinkedIn vía Metricool, blog vía WordPress; ambas con confirmación humana) →
    grabación del host → el editor monta los overlays del mismo manifiesto.
 
+**Encaje en el Artifact Composer (verificado 2026-09-27):** el carrusel NO necesita un «kind» nuevo en el motor. Un
+catálogo es datos y los destinos ya existen: `pdf-merged` (carrusel de LinkedIn) y `png-set` (Instagram, post suelto,
+banners; con `render.background: 'transparent'` para overlays con alfa). Como un catálogo tiene un solo `outputTarget`,
+la propuesta son catálogos delgados sobre un mismo `templatesDir` (`glitch-carousel` PDF, `glitch-stills` y
+`glitch-overlays` PNG) + extensión `glitch` del brand pack `axis` (Guttery) + selector de rotación + validadores. No va por
+`brand-surfaces`. Detalle en el ADR, §«Encaje verificado en el Artifact Composer».
+
 **Hoy nada de 2–4 está disponible** (sin catálogo `glitch-edition`, sin tokens, sin contrato, sin composiciones
 HyperFrames, sin tasks con ID). No los cites como existentes. Trabajo a crear: (a) tokens, assets y contrato de Glitch
 en AXIS; (b) catálogo `glitch-edition`; (c) overlays HyperFrames + render con alfa; (d) callout v2 en el bloque de
