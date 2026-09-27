@@ -2,7 +2,8 @@
 
 > Verificado contra: greenhouse-eo@bc6fedc28 — 2026-09-27 · inventario de la sesión «Integrar Glitch en la línea
 > gráfica» (2026-09-27) · decisiones del operador del 2026-09-27 (Delta del ADR: manzana y verde aprobados, línea
-> Growth, próxima edición #17, alta de los 5 glifos aprobada).
+> Growth, próxima edición #17, alta de los 5 glifos aprobada) · piloto de motion en el repo taller (2026-09-27,
+> commits sin push 38ac584…c2a08c3): ver §12.
 >
 > **Canon humano:** norma [`GLITCH_GRAPHIC_LINE_V1.md`](../../../../docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
 > + ADR [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](../../../../docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
@@ -137,8 +138,8 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
   | desde x 940 | botones de la app: nada |
   | cara del host | **nunca se tapa** |
 
-  Ocho piezas con fondo transparente: apertura, cabecera (noticia n/3 + wordmark), lower third (contenido **en
-  definición con el operador**: no lo inventes), subtítulo, tarjeta de noticia, imagen de la fuente (plano dividido: la
+  Ocho piezas con fondo transparente: apertura, cabecera (noticia n/3 + wordmark), lower third (hay **piloto**, §12;
+  no inventes otro contenido), subtítulo, tarjeta de noticia, imagen de la fuente (plano dividido: la
   noticia arriba se desarma hacia el host, host reencuadrado abajo), Glitch Drop y última frase («el #N+1 sale el
   lunes.» + píldora «Sigue a Glitch»).
 - **Tarjeta final** (16:9 y reel): centrada, espejo de la apertura (los puntos se resuelven en la manzana → el reel
@@ -150,6 +151,7 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
 ## 7. NUNCA
 
 - La manzana, el verde Glitch, los bytes, Guttery o la cabecera «EDICIÓN #N» en una pieza de Efeonce.
+- La transición de la manzana en bytes (entre piezas o entre escenas) fuera de Glitch: es exclusiva de Glitch (§12).
 - Dos esferas en la misma pieza o pantalla (manzana + esfera de la lente, o manzana + esfera de la órbita).
 - El verde como texto, borde o separador sobre fondo claro.
 - La falla sobre un rostro; un overlay sobre la cara del host o sobre la interfaz de la app.
@@ -175,7 +177,8 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
 | Cinco glifos Plastilina nuevos | pasan `icons:check`; alta **APROBADA** (2026-09-27), publicación en AXIS pendiente (TASK-1922) |
 | Guttery en video y web | licencia **confirmada por el operador** (2026-09-27) |
 | Mnemónico del video | pendiente: evaluarlo y aprobarlo (evaluación dedicada) |
-| Lower third del reel y del vlog | en definición con el operador |
+| Lower third del reel y del vlog | PILOTO (2026-09-27, §12); sin aprobar |
+| Motion: apertura/tarjeta final v1 y v2, kit, transición de bytes entre piezas y entre escenas, héroe | PILOTO / PROPUESTA (2026-09-27, §12); **ninguna pieza de motion aprobada** |
 
 Una PROPUESTA no se entrega como canon ni se publica: se muestra al operador para aprobar.
 
@@ -207,7 +210,7 @@ Objetivo: que ningún agente reinterprete. **Los agentes llenan datos; nunca eli
    WebM con alfa) para ponerlas sobre la toma; apertura y cierre (puntos → manzana) sincronizados con el mnemónico.
    Valores: `efeonceGraphicLine.motion` + spec de Glitch a registrar en AXIS. MOGRT de Premiere sólo si el editor
    necesita editar texto en su programa. **Dónde se produce:** en el taller, operado desde tu sesión de `greenhouse-eo`
-   (el taller vive como hermano): `pnpm -C ../efeonce-brand-workshop --filter glitch-motion <render|verify|doctor>`.
+   (el taller vive como hermano): `pnpm -C ../efeonce-brand-workshop --filter glitch-motion <doctor|render|kit|transiciones|heroe|test>` (§12).
    Nunca agregues HyperFrames ni scripts de video al `package.json` de Greenhouse, nunca copies esta skill al taller y
    nunca metas binarios (ProRes, WebM, PNG) ni rutas absolutas en git del taller: las corridas van a `corridas/` con
    `manifiesto.json` por sha256 y los binarios a GCS u OneDrive. El manifiesto de edición llega al taller como archivo
@@ -223,8 +226,9 @@ la propuesta son catálogos delgados sobre un mismo `templatesDir` (`glitch-caro
 `glitch-overlays` PNG) + extensión `glitch` del brand pack `axis` (Guttery) + selector de rotación + validadores. No va por
 `brand-surfaces`. Detalle en el ADR, §«Encaje verificado en el Artifact Composer».
 
-**Hoy nada de 2–4 está disponible** (sin catálogo `glitch-edition`, sin tokens, sin contrato, sin composiciones
-HyperFrames). No los cites como existentes. El trabajo ya tiene tasks: (a) tokens, assets y contrato de Glitch en AXIS
+**Hoy 2 y 3 no están disponibles** (sin catálogo `glitch-edition`, sin tokens, sin contrato): no los cites como
+existentes. **4 existe como piloto** (2026-09-27) en `tools/glitch-motion/` del taller, con la paleta y la manzana de
+Glitch como propuesta espejada de AXIS Lab hasta TASK-1922: cómo operarlo en §12. El trabajo ya tiene tasks: (a) tokens, assets y contrato de Glitch en AXIS
 → TASK-1922 (incluye (e) el alta de los cinco glifos Plastilina, aprobada, y (f) la licencia de Guttery); (b) catálogos
 de Glitch en el Composer → TASK-1923; (c) overlays HyperFrames + render con alfa → TASK-1924; (d) callout v2 en el
 bloque de WordPress, sin task hasta que se apruebe.
@@ -253,6 +257,136 @@ el hogar del movimiento ya está decidido (repo taller).
   punch #11, para evaluar, sistema de portada (APROBADO), blog y vlog, vlog en reel.
 - AXIS Lab (publicado 2026-09-27): `/references/glitch/` y `/references/glitch.json` de
   `efeoncepro/axis-design-system`. Composición: TASK-1922 (AXIS), TASK-1923 (Composer), TASK-1924 (movimiento).
-- Movimiento: repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/` (lo construye TASK-1924; hoy el
-  paquete todavía no existe) y sus corridas en `corridas/` del taller. Se opera desde `greenhouse-eo` con
+- Movimiento: repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/` (piloto del 2026-09-27; lo
+  sigue TASK-1924) y sus corridas en `corridas/` del taller. Entregas en OneDrive
+  `Alineación/5. Contenidos/09. Glitch/Motion/piloto/`. Manual del editor humano:
+  [`editar-video-glitch.md`](../../../../docs/manual-de-uso/creative/editar-video-glitch.md). Se opera desde `greenhouse-eo` con
   `pnpm -C ../efeonce-brand-workshop`.
+
+## 12. Editor agente — motion de Glitch (PILOTO, 2026-09-27)
+
+> **Sólo Glitch.** Todo lo de esta sección es exclusivo de Glitch. **La transición de la manzana en bytes (entre piezas
+> y entre escenas) es exclusiva de Glitch y nunca se usa en piezas de Efeonce ni de clientes.** Nada está aprobado:
+> todo es PILOTO / PROPUESTA hasta que el operador lo apruebe. Manual del editor humano (Premiere/AE):
+> [`editar-video-glitch.md`](../../../../docs/manual-de-uso/creative/editar-video-glitch.md).
+
+### 12.1 Motor y entorno
+
+- Código en el taller `efeoncepro/efeonce-brand-workshop` → `tools/glitch-motion/` (paquete pnpm `glitch-motion`).
+  Se opera **desde `greenhouse-eo`** con `pnpm -C ../efeonce-brand-workshop --filter glitch-motion …`.
+- HyperFrames 0.6.69 (HTML + GSAP → video), GSAP 3.14.2 con CustomEase copiados al build (render sin red),
+  `@efeoncepro/axis-tokens` 0.3.8 (curvas, sobrepasos, onda, pulso, letras), `@efeoncepro/axis-brand-assets` 0.3.4
+  (logo de Efeonce). Paleta y manzana de Glitch: propuesta espejada de AXIS Lab hasta TASK-1922.
+- Fuentes: Bricolage (font pack del Artifact Composer), Poppins 500/600/700, Guttery (licenciada, **instalada en la
+  máquina, nunca en git**). Instalar dependencias: `NODE_AUTH_TOKEN=$(gh auth token) pnpm -C ../efeonce-brand-workshop install`.
+- Salida: **ProRes 4444 con alfa** (`.mov`, `yuva444p12le`), **30 fps**, sin audio. Determinista: PRNG con semilla, sin
+  reloj, sin red.
+- Curvas por rol (AXIS): llegar = emphasized `cubic-bezier(0.2,0,0,1)`; transformar = standard `(0.4,0,0.2,1)`; salir =
+  emphasizedAccelerate `(0.3,0,0.8,0.15)`. Sobrepasos: esfera 2, letras 1,6, default 1,2. Onda: escala 1,02→1,5, trazo
+  9→1,5 px, opacidad 0,85, exponente de fade 1,6. Eco del pulso 0,55. Empujón de impacto 0,045. No los reemplaces por
+  valores a ojo.
+
+### 12.2 Qué comando usar
+
+| Pedido | Comando (prefijo `pnpm -C ../efeonce-brand-workshop --filter glitch-motion`) |
+|---|---|
+| Revisar el entorno antes de cualquier corrida | `doctor` |
+| Apertura (4 s, 120 cuadros) + tarjeta final (3 s, 90 cuadros), reel y vlog, con verificación y manifiesto | `render -- --run <corrida> --edition 17 [--deliver "<carpeta>"]` |
+| Kit de overlays (reel 1080×1920 y vlog 1920×1080) | `kit -- --run <corrida> --edition-file ejemplos/edicion-17.ejemplo.json --assets "<imágenes>" [--transition bytes] [--only a,b] [--skip-render] [--deliver "<carpeta>"]` |
+| Cambiar una sola pieza (texto corregido) | `kit … --only <pieza>` (segundos; el kit completo ≈ 4 min) |
+| Transición entre escenas (máscara + capa, orígenes centro/izquierda/marca, 0,5 s y 0,8 s) | `transiciones -- --run <corrida> [--a <imagen\|video>[@seg]] [--b …] [--deliver "<carpeta>"]` |
+| Transición héroe para un corte puntual (1,2 s, 36 cuadros, opaca) | `heroe -- --run <corrida> --a <archivo>[@seg] --b <archivo>[@seg] [--origin centro\|izquierda\|marca] [--formats reel,vlog]` |
+| Pruebas del paquete (registro de timelines, determinismo, sin red, datos de edición en pantalla) | `test` (7 pruebas) |
+
+Corridas del piloto (referencia de nombres): `2026-09-27_glitch-motion-piloto`, `…-piloto-v2`,
+`2026-09-27_glitch-kit-piloto`, `2026-09-27_glitch-kit-transicion`, `2026-09-27_glitch-transiciones`,
+`2026-09-27_glitch-transicion-heroe`.
+
+### 12.3 Archivo de edición (la única fuente del texto)
+
+Esquema de `tools/glitch-motion/ejemplos/edicion-17.ejemplo.json`:
+
+| Campo | Tipo / ejemplo |
+|---|---|
+| `edition` | número de la edición (`17`) |
+| `nextEdition` | la siguiente (`18`) |
+| `host` | `{ name, role }` — Julio Reyes · «Managing & GTM Director · Efeonce» |
+| `guest` | `{ name, role }` o `null` (sin invitado no hay `lower-third-invitado`) |
+| `news` | tres noticias `{ section, headline, shortHeadline, source, image: { file, credit } \| null }` (sin imagen no hay `fuente-N`) |
+| `drop` | `{ newsIndex, lite, bold }`: la noticia, la frase liviana y el remate |
+| `cta` | `{ reel, vlog }` |
+| `transition` | opcional: `"basic"` o `"bytes"` |
+
+- Las imágenes llegan por `--assets` y **nunca entran a git**; el motor las pasa a duotono navy (sombra `#001a33` → luz
+  `#cfdcea`, propuesta).
+- El ejemplo trae textos entre corchetes: **nunca los entregues como reales**. Los textos reales de la #17 están
+  pendientes del operador; no los inventes.
+- Cambiar un texto = cambiar el archivo y volver a correr. **Nunca** se editan los `.mov` en Premiere. A futuro este
+  archivo lo produce el dominio de ediciones (TASK-1442). Autoservicio evaluado: formulario en Marketing Studio
+  (recomendado) vs `.mogrt` (descartado por duplicar el diseño a mano); ninguno está construido.
+
+### 12.4 Verificaciones — una FALLA bloquea la entrega
+
+| Corrida | Qué verifica | Debe dar |
+|---|---|---|
+| `render` | apertura y tarjeta final; bucle exacto (último cuadro de la tarjeta = primero de la apertura) | 22/22 (11 por formato: códec, tamaño, 30 fps y cuadros, sin audio y alfa de entrada y salida por pieza, más el bucle con PSNR ∞) |
+| `kit` | códec, cuadros, alfa de entrada y salida | 60/60 |
+| `kit --transition bytes` (tarjeta y Drop) | ídem | 18/18 |
+| `transiciones` | máscara + capa por formato, origen y duración | 72/72 |
+| `heroe` | ídem | 6/6 |
+| `test` | 7 pruebas del paquete | 7/7 |
+
+- **Si una sola verificación falla, no se entrega**: se corrige y se vuelve a correr. Nunca entregues «casi verde» ni
+  borres una verificación para que pase. Los cuatro comandos (`render`, `kit`, `transiciones`, `heroe`) se niegan
+  solos a entregar con `--deliver` si hay una FALLA y salen con código distinto de cero.
+- Además de la verificación mecánica, **mira cuadros reales** (golpes, bucle, que nada caiga sobre la cara del host).
+
+### 12.5 Cómo entregar
+
+1. Corre con `--deliver "<carpeta>"` apuntando a OneDrive `Alineación/5. Contenidos/09. Glitch/Motion/piloto/`, en la
+   subcarpeta que toca: raíz (v1), `v2/`, `kit/{reel,vlog}/`, `kit-transicion-bytes/{reel,vlog}/`,
+   `transiciones/{reel,vlog}/` (con su `LEEME.txt`), `transiciones/heroe/{reel,vlog}/`.
+2. Cada corrida deja `corridas/<corrida>/manifiesto.json` en el taller: sha256 de cada binario, verificaciones,
+   versiones y entrega. **Commitea el manifiesto, nunca el binario.** Antes de commitear, confirma que el manifiesto
+   no tenga rutas absolutas de la máquina. La entrega queda así: `"delivery": { "location": "OneDrive: Alineación/5.
+   Contenidos/09. Glitch/Motion/piloto/kit", "files": ["reel/…", …] }` (ruta dentro de la biblioteca, nunca la de la máquina).
+3. Avisa al operador qué se entregó, en qué estado (PILOTO/PROPUESTA) y dónde. Nada se publica sin su aprobación.
+
+### 12.6 Piezas y reglas de montaje (resumen; detalle humano en el manual)
+
+- **Apertura v2:** golpes f24 (bytes), **f48 = cuadro de sincronía** (manzana con aplaste, doble onda, halo), f69 («se
+  abre»); termina transparente. **Tarjeta final v2:** golpes f6, f57, f74; entra desde transparente. v1 queda en la raíz.
+- **Kit:** cada `.mov` es cuadro completo con alfa, ya ubicado en su zona → se suelta en 0,0. `cabecera-1` (2 s),
+  `cabecera-2/-3` (1,2 s) con PNG `_fijo` para sostener, `cabecera-salida` (0,4 s), `lower-third-host` (5 s, sólo la
+  primera aparición), `lower-third-invitado` (5 s, sólo si hay invitado), `noticia-1..3` (5 s), `fuente-N` (5 s, plano
+  dividido; host reencuadrado: reel cabeza ~y 1050, vlog a la derecha), `drop` (4 s; 4,5 s con bytes), `cta` (4 s).
+- **Zonas reel:** UI de la app 0–220 y desde 1500, botones desde x 940; cabecera y 250, lower third y 1150, tarjeta y
+  1300, Drop y 1150, cierre y 1250. **Vlog:** cabecera y 60 (x 72), lower third y 818, tarjeta y 776 (ancho 1140),
+  cierre y 872. Nunca muevas una zona a mano: si algo choca, se corrige en el motor.
+- **Transición de piezas (`transition: "bytes"`):** recomendada sólo en tarjetas y Drop; cabecera y lower third
+  conservan su entrada propia.
+- **Transición entre escenas:** paquete MÁSCARA (`…-mascara.mov`, track matte de ALFA) + CAPA (`…-capa.mov`, manzana
+  y destellos). Orígenes centro/izquierda/marca (reel x 876 y 276; vlog x 1772 y 82). Celda reel 60 px, vlog 64 px.
+  Montaje Premiere: A en V1; B en V2 desde el inicio; máscara en V3 con el ojo apagado; a B «Track Matte Key» →
+  Matte: Video 3 → Composite using: Matte Alpha; cortar B donde termina la máscara y quitar el efecto al resto; capa en
+  V4. After Effects: máscara sobre B con Track Matte «Alpha Matte»; capa arriba.
+
+### 12.7 Reglas duras del motion
+
+- **Sólo Glitch.** Ninguna pieza de este motion (apertura, tarjeta final, kit, transición de bytes entre piezas o entre
+  escenas, héroe) va a una pieza de Efeonce ni de clientes.
+- **Rostros:** la falla nunca sobre un rostro. La transición entre escenas va entre imágenes de noticias, b-roll y
+  pantallas; **hacia o desde la toma del host a cámara → corte seco o transición de tarjeta** (aplicado por defecto;
+  excepción sólo con aprobación del operador). El borde en bytes de `fuente-N` nunca toca una cara.
+- **Firma sin falla:** la firma de Efeonce nunca recibe la falla; sólo se corta.
+- **Órbita = la esfera que recorre el anillo:** en el lower third del host, anillo fijo al 28 % y la manzana lo
+  recorre con la estela de acento de 50°, siempre derecha. Nunca un arco suelto girando (el operador lo rechazó: «es
+  una línea rotando»).
+- **Una sola esfera en pantalla:** la manzana con onda del Drop es la única de su pantalla.
+- **Voz:** si se suma locución, persona con **español latinoamericano neutro**.
+- **Git:** nunca binarios (`.mov`, `.mp4`, PNG, imágenes de noticias, fuentes) ni rutas de máquina en git del taller;
+  sólo código y `manifiesto.json`. Nunca agregues HyperFrames ni scripts de video a `greenhouse-eo`.
+- **No decidas por el operador:** intensidad v2, cadencia de grabación (hoy 30 fps), parámetro de ritmo (posible, no
+  implementado), a qué piezas va la transición de bytes, subtítulos (estilo de captions en Premiere, no hecho),
+  mnemónico (golpes marcados para el diseño sonoro), textos reales de la #17, formulario de autoservicio, excepción de
+  rostros, subir valores a tokens (TASK-1922) y push de los repos siguen pendientes.

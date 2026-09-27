@@ -38,7 +38,14 @@ La diferencia con otras capas de documentacion:
 - [Componer piezas de Glitch](creative/componer-piezas-glitch.md) — **sólo para Glitch** (no para piezas de
   Efeonce): elegir la portada con la regla de rotación, armar portada, láminas interiores, noticia 1 y contraportada,
   piezas del blog y del video en propuesta (mapa de zonas del reel), checklist, estados y problemas comunes. Hoy se
-  parte del canvas: la composición automática todavía no existe.
+  parte del canvas: la composición automática de las piezas estáticas todavía no existe; el motion tiene un piloto
+  (2026-09-27) y su flujo para agentes está en la sección «Video y motion».
+- [Editar el video de Glitch](creative/editar-video-glitch.md) — **sólo para Glitch** (la transición de la manzana en
+  bytes es exclusiva de Glitch): para el editor en Premiere Pro y After Effects, dónde están los gráficos en OneDrive
+  (ProRes 4444 con alfa, 30 fps), apertura y tarjeta final en bucle con su cuadro de sincronía, cada pieza del kit
+  (soltar en 0,0, cabecera sostenida con el PNG `_fijo`, plano dividido, rótulo del host sólo la primera vez), la
+  transición entre escenas con Track Matte Key, cómo pedir la versión héroe o un cambio de texto, estados (todo piloto)
+  y problemas comunes.
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
   lenguaje fotográfico aprobado el 2026-09-19.

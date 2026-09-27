@@ -1,7 +1,7 @@
 # Componer piezas de Glitch — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-27 por Claude
 > **Ultima actualizacion:** 2026-09-27 por Claude
 > **Modulo:** Creative · Glitch, magazine semanal de Efeonce (sub-línea de «La órbita»)
@@ -18,9 +18,10 @@ Explica cómo armar las piezas de una edición de Glitch con su línea gráfica:
 láminas del carrusel de LinkedIn, la contraportada, las piezas del blog y los gráficos del video (vlog horizontal y reel
 vertical).
 
-**Hoy no hay composición automática.** El motor de composición y los gráficos animados para video (Artifact Composer y
-HyperFrames) son una propuesta pendiente de aprobación. Por ahora se parte del **canvas de diseño** y se ajusta a mano
-siguiendo la norma.
+**Hoy no hay composición automática de las piezas estáticas.** El motor de composición (Artifact Composer) todavía no
+tiene los catálogos de Glitch: se parte del **canvas de diseño** y se ajusta a mano siguiendo la norma. Los **gráficos
+animados del video** sí tienen un **piloto** (2026-09-27) que se genera desde el repo taller: ver
+[Video y motion](#video-y-motion) y el manual [Editar el video de Glitch](./editar-video-glitch.md).
 
 ## Antes de empezar
 
@@ -112,12 +113,14 @@ Todo el video está en **propuesta**. Si se produce una prueba:
    cabecera entre 240 y 440, texto entre 1150 y 1480, y **nunca** sobre la cara del host.
 5. Las ocho piezas del reel son transparentes: apertura, cabecera (noticia n/3 + logo), lower third, subtítulo, tarjeta de
    noticia, imagen de la fuente (plano dividido), Glitch Drop y última frase («el #N+1 sale el lunes.» + «Sigue a
-   Glitch»). Sólo la portada del reel y la tarjeta final son pantalla completa. El contenido del **lower third** está en
-   definición con el operador: no lo inventes.
+   Glitch»). Sólo la portada del reel y la tarjeta final son pantalla completa. El **lower third** existe como piloto
+   (ver [Video y motion](#video-y-motion)); no inventes otro contenido.
    El **mnemónico** de apertura y cierre todavía hay que evaluarlo y aprobarlo: no uses ninguno como definitivo.
 6. **Tarjeta final:** centrada, espejo de la apertura (los puntos se resuelven en la manzana, para que el reel empalme en
    loop), un mensaje, una acción, la firma y sin texturas finas.
-7. Hoy los gráficos se hacen a mano desde el canvas: todavía no hay render automático con fondo transparente.
+7. Los gráficos animados con fondo transparente ya se generan como **piloto** desde el repo taller (ver
+   [Video y motion](#video-y-motion)). El montaje en Premiere o After Effects está en
+   [Editar el video de Glitch](./editar-video-glitch.md).
 
 ### Paso 7 · Revisa antes de entregar
 
@@ -130,6 +133,42 @@ Todo el video está en **propuesta**. Si se produce una prueba:
 - [ ] Ninguna pieza en **propuesta** o **exploración** salió como final sin aprobación.
 - [ ] Ningún elemento de Glitch se coló en una pieza de Efeonce.
 
+## Video y motion
+
+> **⚠️ Sólo para Glitch.** Los gráficos animados y la transición de la manzana en bytes son **exclusivos de Glitch**:
+> nunca se usan en piezas de Efeonce ni de clientes. Todo es **piloto / propuesta** (2026-09-27): ninguna pieza de
+> motion está aprobada.
+
+- **Para el editor humano** (Premiere Pro y After Effects): todo el montaje está en
+  [Editar el video de Glitch](./editar-video-glitch.md). Este apartado no lo repite.
+- **Para un agente**, el flujo es:
+  1. **Dónde se produce:** repo taller `efeoncepro/efeonce-brand-workshop`, paquete `tools/glitch-motion/`, operado
+     desde `greenhouse-eo` (el taller vive como carpeta hermana). Nada de video entra al `package.json` de Greenhouse.
+  2. **Revisa el entorno:** `pnpm -C ../efeonce-brand-workshop --filter glitch-motion doctor`. Si faltan
+     dependencias: `NODE_AUTH_TOKEN=$(gh auth token) pnpm -C ../efeonce-brand-workshop install`. Guttery vive
+     instalada en la máquina, nunca en git.
+  3. **Archivo de edición:** el texto sale de un JSON con el esquema de
+     `tools/glitch-motion/ejemplos/edicion-17.ejemplo.json` (edición, siguiente edición, host, invitado, tres noticias,
+     Drop, llamado a la acción y, opcional, la transición). Las imágenes de las noticias se pasan con `--assets` y
+     nunca entran a git.
+  4. **Genera** según lo que se pida (`pnpm -C ../efeonce-brand-workshop --filter glitch-motion …`):
+
+     | Qué | Comando |
+     |---|---|
+     | apertura + tarjeta final (reel y vlog) | `render -- --run <corrida> --edition 17 [--deliver "<carpeta>"]` |
+     | kit de gráficos | `kit -- --run <corrida> --edition-file <archivo de edición> --assets "<imágenes>" [--transition bytes] [--only a,b] [--skip-render] [--deliver "<carpeta>"]` |
+     | transición entre escenas | `transiciones -- --run <corrida> [--a <imagen\|video>[@seg]] [--b …] [--deliver "<carpeta>"]` |
+     | versión héroe para un corte | `heroe -- --run <corrida> --a <archivo>[@seg] --b <archivo>[@seg] [--origin centro\|izquierda\|marca] [--formats reel,vlog]` |
+     | pruebas del paquete | `test` |
+
+  5. **Verifica:** cada comando verifica códec, cuadros y alfa de lo que genera (kit 60/60, transiciones 72/72, héroe
+     6/6, kit con bytes 18/18). **Si una verificación falla, no se entrega.**
+  6. **Manifiesto:** cada corrida deja `corridas/<corrida>/manifiesto.json` en el taller (sha256 de cada archivo,
+     verificaciones, versiones y entrega). Los binarios nunca entran a git.
+  7. **Entrega:** con `--deliver` a OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto`, en la
+     subcarpeta que corresponda (`v2/`, `kit/`, `transiciones/`…).
+- Reglas y detalle para agentes: skill `efeonce-graphic-line`, `references/glitch.md` (sección del editor agente).
+
 ## Qué significan los estados
 
 | Estado | Qué significa |
@@ -138,7 +177,8 @@ Todo el video está en **propuesta**. Si se produce una prueba:
 | **PROPUESTA** | se puede armar para mostrarla al operador, pero no se publica como final: lente, blog, vlog 16:9, reel, tarjetas finales y el flujo de composición automática |
 | **EXPLORACIÓN** | idea en estudio, no canon: los acentos teal y naranja del canvas, la historia 9:16 y el carrusel panorámico |
 | **Aprobado, sin publicar en AXIS** | la manzana, el verde y los cinco íconos Plastilina de Glitch están aprobados (2026-09-27), pero todavía no están en los paquetes oficiales de AXIS (TASK-1922) |
-| **En definición / por confirmar** | el lower third (se define con el operador), el mnemónico (evaluación dedicada) y la licencia de Guttery (confirmada por el operador el 2026-09-27) |
+| **En definición / por confirmar** | el lower third (hay un piloto del 2026-09-27, sin aprobar), el mnemónico (evaluación dedicada) y la licencia de Guttery (confirmada por el operador el 2026-09-27) |
+| **PILOTO** (motion) | apertura, tarjeta final, kit de gráficos y transiciones de video generados desde el repo taller (2026-09-27): sirven para probar el montaje; ninguno está aprobado |
 | **Publicada** (AXIS) | la página y la guía de Glitch están en axis.efeonce.org desde el 2026-09-27; los tokens de Glitch todavía no existen (TASK-1922) |
 
 ## Qué no hacer
@@ -178,4 +218,5 @@ Todo el video está en **propuesta**. Si se produce una prueba:
 - Bloque del Glitch Drop en WordPress: [wireframe TASK-1337](../../ui/wireframes/TASK-1337-glitch-gutenberg-block.md)
 - Pipeline editorial: [ADR del pipeline de Glitch](../../architecture/GREENHOUSE_GLITCH_AGENTIC_EDITORIAL_PIPELINE_DECISION_V1.md)
 - Skill para agentes: `efeonce-graphic-line`, `references/glitch.md`
+- Video y motion: [Editar el video de Glitch](./editar-video-glitch.md) · repo taller `efeoncepro/efeonce-brand-workshop` (`tools/glitch-motion/`) · [ADR del taller](../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) · [TASK-1924](../../tasks/to-do/TASK-1924-glitch-motion-overlays-hyperframes.md)
 - AXIS (publicado): [/references/glitch/](https://axis.efeonce.org/references/glitch/), `/references/glitch.json` y `docs/agent-composition/glitch.md` de `efeoncepro/axis-design-system`

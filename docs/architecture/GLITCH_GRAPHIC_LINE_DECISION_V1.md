@@ -224,3 +224,50 @@ Alta. La sub-línea es documentación y piezas; nada del runtime de Greenhouse d
 publicada la página de referencia (sin tokens ni contrato). Revertir la decisión aceptada es retirar la norma y volver a componer Glitch con La órbita. El flujo propuesto
 no existe todavía; su costo de revertir crece cuando se publiquen tokens y contrato en AXIS y el catálogo entre al
 Composer.
+
+## Delta 2026-09-27 — piloto de motion en el taller
+
+> **Alcance:** todo este piloto es **SÓLO para Glitch**. La transición de la manzana en bytes es exclusiva de Glitch y
+> nunca se usa en piezas de Efeonce, de su familia ni de clientes. Detalle operativo en la
+> [norma §13](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#13-motion-y-transiciones--solo-glitch).
+
+**Qué se construyó** (repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/`, paquete pnpm
+`glitch-motion`; commits locales **sin push** `38ac584`, `f4782cb`, `5282f80`, `9f6a1ea`, `c2a08c3` y manifiestos de
+corrida `95cf425`, `8dfa69c`, `17f80f2`, `ac5d021`, `2ae0f65`):
+
+- Motor **HyperFrames 0.6.69** (HTML + GSAP 3.14.2 con CustomEase, copiados al build: sin red), valores de
+  `@efeoncepro/axis-tokens` 0.3.8 y logo de `@efeoncepro/axis-brand-assets` 0.3.4; paleta y manzana de Glitch como
+  propuesta espejada del AXIS Lab hasta TASK-1922. Salida ProRes 4444 con alfa (`yuva444p12le`), 30 fps, sin audio,
+  determinista.
+- **Apertura (4 s) y tarjeta final (3 s)** en reel y vlog: v1 y v2 «más punch», con tres golpes marcados para el
+  diseño sonoro y bucle exacto entre el último cuadro de la tarjeta y el primero de la apertura.
+- **Kit de overlays** del reel (1080 × 1920) y del vlog (1920 × 1080): cabeceras, lower third del host y del invitado,
+  tarjetas de noticia, imagen de la fuente en plano dividido, Drop y CTA, generados desde un archivo de edición JSON
+  (fuente única del texto) y verificados 60/60.
+- **Transición de piezas «manzana en bytes»** (prototipo en tarjeta y Drop, 18/18) y **transición entre escenas**:
+  paquete máscara + capa (72/72) y versión héroe (6/6).
+- Entregas en OneDrive `Alineación/5. Contenidos/09. Glitch/Motion/piloto/` y un manifiesto por corrida con el sha256
+  de cada binario. Ningún binario ni la fuente Guttery entran a git.
+
+**Decisiones del operador aplicadas en el piloto (2026-09-27):**
+
+| # | Tema | Decisión | Estado |
+|---|---|---|---|
+| 1 | Intensidad de la apertura y la tarjeta final | pidió **más punch** → v2 (tres golpes, falla RGB en franjas, barrido de bytes, aplaste) | aplicado; aprobar la intensidad v2 sigue **pendiente** |
+| 2 | Ícono del lower third | rechazó el arco suelto girando («es una línea rotando»): va la **órbita real**, un anillo fijo al 28 % que la manzana recorre con la estela de 50°, siempre derecha | aplicado; pieza en **PROPUESTA** |
+| 3 | Contenido del lower third | «AL AIRE · GLITCH #N», nombre y cargo del host; variante «INVITADO» sólo si hay invitado; sólo en la primera aparición del host | **definido**; cierra el punto 6 del Delta de decisiones |
+| 4 | Transición de bytes | pidió la transición de la manzana en bytes entre piezas y entre escenas; es **exclusiva de Glitch** | aplicada como **PILOTO / PROPUESTA**; falta decidir a qué piezas se aplica |
+| 5 | Regla de rostros en transiciones | la falla nunca sobre un rostro: hacia o desde la toma del host a cámara va corte seco o transición de tarjeta | **aplicada por defecto**; una excepción sólo con aprobación del operador |
+| 6 | Firma de Efeonce en el corte con falla | la firma **nunca** recibe la falla: sólo se corta | aplicada |
+
+**Qué queda propuesto o pendiente:** el operador **no aprobó ninguna pieza de motion**: todo es PILOTO / PROPUESTA.
+Pendientes: aprobar la intensidad v2 y el kit; fps de grabación (hoy 30); prueba de los editores en Premiere y After
+Effects; parámetro de ritmo (posible, no implementado); a qué piezas va la transición de bytes; subtítulos (estilo de
+captions, no hecho); mnemónico (golpes ya marcados, evaluación dedicada pendiente); textos reales de la #17; formulario
+de autoservicio del texto en Marketing Studio (recomendado; `.mogrt` descartado por duplicar el diseño a mano);
+excepción de rostros; subir los valores a tokens `glitchLine` (TASK-1922); push de los repos.
+
+**Desvíos respecto del flujo aceptado, a reconciliar en TASK-1924:** el piloto lee su propio archivo de edición
+(`tools/glitch-motion/ejemplos/edicion-17.ejemplo.json`) y no el manifiesto de TASK-1923; los valores de Glitch no
+vienen todavía de un token; los binarios se entregaron en OneDrive y todavía no están archivados en GCS (el manifiesto
+guarda su sha256); y el código no pasó por PR ni por el CI del taller (commits sin push).
