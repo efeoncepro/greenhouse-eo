@@ -96,6 +96,7 @@ En el cierre con voz, la esfera cae en la palabra final del eslogan.
 - Notas, tiempos y ausencia de clics: espectrogramas en `qa/` (se corrigió un corte seco del golpe grave y de las notas).
 - Volumen: −13 a −15 LUFS integrados, pico −1 dBFS.
 - Voces: las cuatro dicen «Empower your growth» (transcripción); el golpe de la esfera cae en el inicio de «growth».
+- Reproductor (AXIS y las dos páginas privadas): el botón de pausa no respondía porque el script reemplazaba el `innerHTML` del botón en cada cuadro y el clic humano perdía su destino. Se arma el SVG una vez y sólo cambian atributos, con `pointer-events: none` en el SVG (AXIS PR #6). **Probar con un clic sostenido real, no con `el.click()`:** el `.click()` sintético pasaba y escondía el bug.
 - **Sin verificar:** si suena propio, si se recuerda, si se siente Efeonce. Nadie de esta sesión escuchó el audio.
 
 ## Trampas

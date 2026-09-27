@@ -564,8 +564,8 @@
 <script>
   (() => {
     const R = 26, C = 2 * Math.PI * R
-    const PLAY = '<path class="icon" d="M28 24.5v15l12-7.5z"/>'
-    const PAUSE = '<path class="icon" d="M27 24h3.6v16H27zM33.4 24H37v16h-3.6z"/>'
+    const PLAY = 'M28 24.5v15l12-7.5z'
+    const PAUSE = 'M27 24h3.6v16H27zM33.4 24H37v16h-3.6z'
     let current = null
 
     // Melodía: la altura de cada punto es la nota; la esfera, en acento.
@@ -581,28 +581,33 @@
       el.setAttribute('aria-hidden', 'true')
     })
 
-    const draw = (btn, p, playing) => {
-      const a = p * 2 * Math.PI - Math.PI / 2
-      const x = 32 + R * Math.cos(a), y = 32 + R * Math.sin(a)
-      const arc = p > 0 ? `<circle class="arc" cx="32" cy="32" r="${R}" stroke-dasharray="${(p * C).toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 32 32)"/>` : ''
-      const dot = p > 0 ? `<circle class="dot" cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="4"/>` : ''
-      btn.innerHTML = `<svg viewBox="0 0 64 64" aria-hidden="true"><circle class="track" cx="32" cy="32" r="${R}"/>${arc}${dot}${playing ? PAUSE : PLAY}</svg>`
+    // El SVG se arma una vez y sólo cambian atributos: reemplazarlo en cada cuadro dejaba sin destino el clic humano.
+    const build = (btn) => {
+      btn.innerHTML = `<svg viewBox="0 0 64 64" aria-hidden="true" style="pointer-events:none"><circle class="track" cx="32" cy="32" r="${R}"/><circle class="arc" cx="32" cy="32" r="${R}" transform="rotate(-90 32 32)" stroke-dasharray="0 ${C.toFixed(2)}" visibility="hidden"/><circle class="dot" cx="32" cy="${32 - R}" r="4" visibility="hidden"/><path class="icon" d="${PLAY}"/></svg>`
+      return { arc: btn.querySelector('.arc'), dot: btn.querySelector('.dot'), icon: btn.querySelector('.icon') }
+    }
+    const draw = (parts, p, playing) => {
+      const a = p * 2 * Math.PI - Math.PI / 2, shown = p > 0 ? 'visible' : 'hidden'
+      parts.arc.setAttribute('stroke-dasharray', `${(p * C).toFixed(2)} ${C.toFixed(2)}`); parts.arc.setAttribute('visibility', shown)
+      parts.dot.setAttribute('cx', (32 + R * Math.cos(a)).toFixed(2)); parts.dot.setAttribute('cy', (32 + R * Math.sin(a)).toFixed(2)); parts.dot.setAttribute('visibility', shown)
+      parts.icon.setAttribute('d', playing ? PAUSE : PLAY)
     }
 
     document.querySelectorAll('.orbit').forEach(btn => {
       const audio = new Audio()
       audio.preload = 'none'
       audio.src = btn.dataset.src
-      draw(btn, 0, false)
+      const parts = build(btn)
+      draw(parts, 0, false)
       let raf = 0
       const tick = () => {
         const p = audio.duration ? Math.min(1, audio.currentTime / audio.duration) : 0
-        draw(btn, p, !audio.paused)
+        draw(parts, p, !audio.paused)
         if (!audio.paused) raf = requestAnimationFrame(tick)
       }
       audio.addEventListener('play', () => { raf = requestAnimationFrame(tick) })
       audio.addEventListener('pause', () => { cancelAnimationFrame(raf); tick() })
-      audio.addEventListener('ended', () => { cancelAnimationFrame(raf); draw(btn, 1, false) })
+      audio.addEventListener('ended', () => { cancelAnimationFrame(raf); draw(parts, 1, false) })
       btn.addEventListener('click', () => {
         if (current && current !== audio) current.pause()
         document.querySelectorAll('video').forEach(v => v.pause())
