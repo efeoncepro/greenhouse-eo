@@ -1,5 +1,11 @@
 # TASK-1395 — PPTX Native Editable Renderer for Artifact Composer
 
+## Delta 2026-09-27 (b) — decks «La órbita» desde Proposal Studio
+
+- TASK-1928 suma 38 plantillas a `graphic-line-deck` y TASK-1932 pide PPTX de decks «La órbita» desde Proposal Studio.
+  TASK-1932 falla cerrado (`brand_deck_pptx_not_supported`) cuando la matriz de capacidad no cubre una plantilla; para
+  eso la matriz tiene que declararlas.
+
 ## Delta 2026-09-27
 
 - El contrato de plantilla (`TemplateContract`) suma `render.background: 'opaque' | 'transparent'` (PNG con alfa para
@@ -295,6 +301,7 @@ que cada content type tenga implementación y evidencia.
 - [ ] Existe evidencia PowerPoint macOS/Windows con diferencias aceptadas documentadas.
 - [ ] Error/access/idempotencia/migración/rollback tienen postura explícita y testeada.
 - [ ] Target no es publicable hasta TASK-1391 + rollout.
+- [ ] (Delta 2026-09-27 b) La matriz de capacidad declara cada plantilla de `graphic-line-deck` como nativa o no soportada (con código), sin rasterizar una lámina entera.
 
 ## Verification
 

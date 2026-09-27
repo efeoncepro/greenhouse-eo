@@ -7,6 +7,21 @@
      ═══════════════════════════════════════════════════════════ -->
 
 
+## Delta 2026-09-27 (d) — frontera con TASK-1928…TASK-1932
+
+- Se registraron las cinco piezas que llevan las 69 recetas al flujo de producto: TASK-1928 (plantillas de las 38
+  recetas sin plantilla ni dueña), TASK-1929 (plan validado contra el catálogo), TASK-1930 (datos reales en los slots),
+  TASK-1931 (banco de plates) y TASK-1932 (salida desde Proposal Studio con Nexa/MCP).
+- **Esta task conserva** lo que sus deltas (b) y (c) ya declaraban: las portadas y contraportadas aprobadas (13
+  `cover-brochure-*`/`cover-proposal-*` y 5 `close-*` del catálogo de recetas, las que AXIS declare `approved`),
+  `section-split` corregida más `section-split-corner-bottom` y `section-split-panel-end`, el `triptych` de una palabra
+  por toma con su esfera, y los pendientes de QA de esas láminas (respuesta ≥ 3× en «Cuando quieras.», logo dentro de
+  la órbita en el cierre, dirección desde `EFEONCE_CONTACT`). Se agregan como criterios abajo, porque prosa no es
+  criterio.
+- **Pasa a TASK-1928** el resto de las recetas sin plantilla, incluida `decision-next-steps` (el delta c la nombra como
+  cambio del canon; su plantilla es de 1928). La validación del plan contra el catálogo es de TASK-1929 y se apoya en
+  `resolveSurfaceDocument` sin duplicarlo.
+
 ## Delta 2026-09-27 (c) — las 69 láminas aprobadas, con receta por lámina
 
 - El operador aprobó **las 69 láminas** del canvas «Deck»; cada una tiene receta (slots con `maxChars` medido, fijos,
@@ -465,6 +480,9 @@ explícito, y los intents existentes resuelven igual. El cutover es inmediato al
 - [ ] `pnpm composer:visual-gate --catalog=graphic-line` queda a 0 px con los frames nuevos, y cada cambio de píxel (altas y modificaciones) está declarado en `BASELINE_DELTAS.md`.
 - [ ] `EFEONCE_SURFACE_COMPOSITION_V1.md` (§2.1, §4.6 y §7), el manual de uso y las skills `deck-studio` y `efeonce-graphic-line` describen 0.1.2, y `pnpm skills:mirrors` pasa.
 - [ ] El operador aprobó a ojo la portada, el cierre, los layouts `hero`/`lines` y el brochure compuestos.
+- [ ] (Delta d) `section-split` sube por la izquierda con la esfera arriba a la izquierda, y `section-split-corner-bottom` y `section-split-panel-end` componen desde su intent con frame en el gate.
+- [ ] (Delta d) `triptych` compone una palabra por toma, cada una con su esfera («Escucha.» «Crea.» «Mide.»).
+- [ ] (Delta d) Las portadas y contraportadas del delta (b) que AXIS declare `approved` componen desde su intent, con respuesta ≥ 3× en «Cuando quieras.», logo dentro de la órbita en el cierre y dirección desde `EFEONCE_CONTACT`; las que AXIS aún no declare quedan listadas en el cierre con su estado.
 
 ## Verification
 

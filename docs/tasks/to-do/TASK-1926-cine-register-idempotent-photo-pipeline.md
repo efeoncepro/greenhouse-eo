@@ -1,5 +1,12 @@
 # TASK-1926 — Registro cine en el pipeline `foto:*` y comando idempotente de punta a punta
 
+## Delta 2026-09-27 (d) — banco de plates gobernado (TASK-1931)
+
+- TASK-1931 registra en un banco gobernado los plates aprobados por receta (sha256, ficha, emblema, isotipo, aprobación
+  de una persona) y los sirve al render por `assetId`. La procedencia que produce esta task (isotipo declarativo, reuso
+  por huella) es la entrada del banco: los plates con pendientes de QA de isotipo quedan `pending` en el banco hasta que
+  esta task registre su procedencia. El banco no genera: la generación sigue siendo de esta task.
+
 ## Delta 2026-09-27 (c)
 
 - **Las 69 láminas del deck quedaron aprobadas** [decisión del operador, 2026-09-27] y cada una tiene receta con su
@@ -270,6 +277,7 @@ pegada, cabeza ~35 % del alto), `AD1`/`AD4` (firma sobre el sujeto en vertical),
 - [ ] AD1–AD4 y BR1b/BR2b/BR3 se reproducen desde manifiestos.
 - [ ] Ningún script de composición nuevo: la capa pasa por `foto:componer:cta` o su extensión.
 - [ ] §12 del registro cine y las skills citan `foto:cine`.
+- [ ] (Delta d) Cada plate producido por `foto:cine`/`foto:generar` deja su procedencia (ficha y su sha256, modelo, proveedor, sha del prompt, resultado de `foto:emblema`, registro de `foto:isotipo`) en un formato que `pnpm foto:banco -- --register` (TASK-1931) lee sin transformación manual.
 
 ## Verification
 

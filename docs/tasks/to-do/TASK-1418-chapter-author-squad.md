@@ -1,5 +1,11 @@
 # TASK-1418 — Chapter-author de equipo/squad: la lámina `team-gallery` desde el roster real (fotos allowlist, nunca IA)
 
+## Delta 2026-09-27 — segundo consumidor de los hechos del roster
+
+- TASK-1930 liga los slots de equipo de la receta `content-team` del deck «La órbita» a los hechos del roster de esta
+  task y al allowlist `squad-person`. No recalcula el roster: por eso los hechos deben poder importarse sin la forma de
+  `TeamGalleryFull`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -242,6 +248,7 @@ Mismo riel que diagnóstico/económica, con el matiz de que los "hechos" son ide
 - [ ] Sin PII más allá de nombre/rol/dedicación (test).
 - [ ] Corrida real con render y frame revisado.
 - [ ] `pnpm composer:visual-gate` a 0 px.
+- [ ] (Delta 2026-09-27) Los hechos del roster y el resolver `squad-person` se exportan sin dependencias de la plantilla `TeamGalleryFull`, y TASK-1930 los consume para `content-team` sin copiar la derivación.
 
 ## Verification
 

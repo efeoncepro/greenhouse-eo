@@ -1,5 +1,14 @@
 # TASK-1921 — Ruta productiva de las piezas de marca por superficie (Full API Parity)
 
+## Delta 2026-09-27 (b) — recetas del deck al flujo de producto
+
+- Nacen TASK-1928…TASK-1932. Lo que esta task recibe de ellas: plantillas nuevas de `graphic-line-deck` (TASK-1928,
+  además de las de TASK-1927), plates por `assetId` desde el banco gobernado (TASK-1931, `resolvePlateForRecipe`),
+  planes validados por `validateDeckPlan` (TASK-1929) con rastro de slots de `bindDeckSlots` (TASK-1930).
+- TASK-1932 delega en el command de documento de esta task la confirmación de brochure, pitch y QBR (decks sin
+  `Proposal`). La tool MCP para **proponer** decks es de TASK-1932; la de esta task sigue siendo pedir y leer piezas y
+  documentos, sin duplicar la propuesta.
+
 ## Delta 2026-09-27
 
 - Lo que esta task consume ya existe (TASK-1919, local en `develop`): catálogos
@@ -409,6 +418,8 @@ Reglas obligatorias:
 - [ ] La tool MCP está federada (tool, scope, manifiesto, tests, release) y opera contra staging.
 - [ ] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` con sus dos runtimes y `pnpm docs:closure-check` pasa.
 - [ ] Documentación técnica, funcional y manual de uso publicadas.
+- [ ] (Delta 2026-09-27 b) El command de documento acepta un plan validado por `validateDeckPlan` (TASK-1929) con rastro de slots (TASK-1930) y plates por `assetId` del banco (TASK-1931), y rechaza plates referenciados por ruta local.
+- [ ] (Delta 2026-09-27 b) Esta task no expone una tool MCP para proponer planes de deck (es de TASK-1932); su tool pide y lee piezas y documentos.
 
 ## Verification
 

@@ -1,5 +1,13 @@
 # TASK-1419 — Orquestador del deck (§5-ter nodo 1): outline agéntico + fan-out determinista sobre chapter-authors
 
+## Delta 2026-09-27 — plan de recetas «La órbita» (TASK-1929, TASK-1932)
+
+- TASK-1929 crea el plan de deck contra el catálogo de recetas de «La órbita» (validador determinista + propuesta
+  estructurada) y TASK-1932 lo lleva a Proposal Studio. Mismo molde propose → confirm, catálogo distinto: el plan de
+  recetas **no** autora capítulos ni hace fan-out. Si una propuesta mezcla capítulos autorados y recetas, TASK-1932 pide
+  los capítulos por este orquestador. No se crean dos orquestadores; la convergencia en un nodo de outline con catálogo
+  inyectado queda como follow-up de ambas.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -244,6 +252,7 @@ La forma exacta ya está decidida en el ADR (§5-ter, diagrama del pipeline): es
 - [ ] Cota de llamadas respetada (test): 1 outline + N proposes (+ retries del motor).
 - [ ] Corrida real integrada con render de capítulos exitosos y frames revisados.
 - [ ] Motor y authors existentes sin modificar (diff vacío en sus archivos).
+- [ ] (Delta 2026-09-27) El registry de authors y el outline reciben la taxonomía del catálogo como dependencia (no fijan `deck-axis` como único catálogo), para que la convergencia con TASK-1929 no obligue a reescribirlos.
 
 ## Verification
 
