@@ -41,6 +41,7 @@ export class SurfacePieceError extends Error {
       | 'surface-issues'
       | 'recipe-not-approved'
       | 'recipe-without-template'
+      | 'recipe-outside-composer'
       | 'missing-photo'
       | 'invalid-intent',
     readonly issues: readonly unknown[] = []

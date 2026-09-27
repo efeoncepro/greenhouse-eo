@@ -135,6 +135,26 @@ export const graphicLineResolvers = (): ResolverRegistry => {
         value.startsWith('asset-ref:icon:') ? [{ selector: ':field', attr: 'src', value }] : null
     },
 
+    // Una capa gráfica ya pintada por AXIS (órbita, lente, arco de medida, progreso) como SVG externo
+    // (`asset-ref:layer:<id>`). La geometría la resolvió el paquete de la línea gráfica, no la plantilla.
+    'gl-layer-ref': {
+      known: ['asset-ref:layer:<id>'],
+      build: value =>
+        value.startsWith('asset-ref:layer:') ? [{ selector: ':field', attr: 'src', value }] : null
+    },
+
+    // Una custom property `--gl-*` con su valor, cuando la receta necesita una medida que no está en la lista
+    // cerrada de `gl-px-*` (el centro y el radio de una lente, el ancho de una columna). Sólo acepta nombres
+    // `--gl-` y valores numéricos con unidad: nunca un color ni una familia.
+    'gl-css': {
+      known: ['--gl-<nombre>=<número>(px|em|%)?'],
+      build: value => {
+        const match = /^(--gl-[a-z0-9-]+)=(-?\d+(?:\.\d+)?(?:px|em|%)?)$/.exec(value.trim())
+
+        return match ? [{ selector: ':self', styleProp: match[1]!, styleValue: match[2]! }] : null
+      }
+    },
+
     // La foto de la pieza: un plate aprobado, entregado como asset externo (`asset-ref:plate:<id>`).
     'gl-plate-ref': {
       known: ['asset-ref:plate:<id>'],

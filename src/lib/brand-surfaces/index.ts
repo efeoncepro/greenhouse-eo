@@ -35,6 +35,16 @@ const CATALOG_BY_SURFACE: Record<string, GraphicLineCatalogName> = {
   audiovisual: 'graphic-line-overlays'
 }
 
+/**
+ * Recetas aprobadas que NO son una imagen fija: son video. Las produce el pipeline de motion, y pedírselas al
+ * composer es un error con la ruta correcta, no una lámina vacía. El composer sí entrega el ÚLTIMO CUADRO del
+ * loop de motion (`motion.loop-lens-reveal`), que es su estático de respaldo.
+ */
+const OUTSIDE_COMPOSER: Record<string, string> = {
+  'audiovisual.close-reveal':
+    'es el cierre en video con el reveal aprobado: usa los masters del reveal v1.1 (efeonceGraphicLine.motion) o pnpm orbit:video en AXIS'
+}
+
 /** Builders por superficie. Una receta aprobada sin builder falla con `recipe-without-template`. */
 const BUILDERS: Record<string, Record<string, RecipeBuilder>> = {
   deck: DECK_BUILDERS,
@@ -73,6 +83,12 @@ export const planSurfacePiece = (intent: SurfaceIntent, options: PlanSurfacePiec
       'surface-issues',
       issues
     )
+  }
+
+  const outside = OUTSIDE_COMPOSER[`${intent.surface}.${intent.recipe}`]
+
+  if (outside) {
+    throw new SurfacePieceError(`${intent.surface}.${intent.recipe} ${outside}.`, 'recipe-outside-composer')
   }
 
   const builder = BUILDERS[intent.surface]?.[intent.recipe]
