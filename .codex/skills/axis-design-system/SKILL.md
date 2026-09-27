@@ -294,11 +294,11 @@ Plastilina = 79**, with **43 volume PNGs**. Published with tag `v0.6.0`: `axis-g
 not change for D26). Greenhouse pins `axis-graphic-line` `0.6.0` and `axis-brand-assets` `0.3.4`. Guide §«Catálogo
 aprobado», ADR delta «IA, social y staff: 19 glifos nuevos (D26)», Lab `/references/iconography/` (79 glyphs, 43 volumes).
 
-### Glitch sub-line (Lab page + JSON; pending publication)
+### Glitch sub-line (Lab page + JSON; published 2026-09-27)
 
 Glitch (Efeonce's weekly magazine) has a sub-line of «La órbita» that applies **only to Glitch**. AXIS holds its Lab
-page `/references/glitch/`, agent JSON `/references/glitch.json` and guide `docs/agent-composition/glitch.md` on branch
-`feat/glitch-line`, **not pushed or published yet**. There are **no Glitch tokens, assets or contract** (`glitchLine`,
+page `/references/glitch/`, agent JSON `/references/glitch.json` and guide `docs/agent-composition/glitch.md` published on
+`main` (`d5846e8`). Tokens, assets and contract: TASK-1922. There are **no Glitch tokens, assets or contract** (`glitchLine`,
 `efeonce.glitch-line` are pending): values live in the Greenhouse norm
 `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md`. Criterion: `efeonce-graphic-line` →
 `references/glitch.md`. Never use the apple, Glitch green, byte glitch, Guttery or the «EDICIÓN #N» masthead in Efeonce pieces.

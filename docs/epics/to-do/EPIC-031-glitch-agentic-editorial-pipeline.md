@@ -47,6 +47,9 @@ El flujo cruza doctrina editorial, skills, datos, API, Notion, scheduler/worker,
 - `TASK-1446` — ejecuta rollout gradual y cierre operativo/documental.
 - `TASK-1447` — crea Glitch Desk como workbench humano de supervisión, evidencia y recovery.
 - `TASK-1448` — formaliza promoción gobernada de candidata Daily/Flash a `glitchFlash` publicable.
+- `TASK-1922` — Glitch en AXIS: token de franquicia `glitchLine`, archivos oficiales y contrato `efeonce.glitch-line` (composición visual; sub-línea gráfica sólo de Glitch).
+- `TASK-1923` — Glitch en el Artifact Composer: catálogos `glitch-carousel` (PDF LinkedIn), `glitch-stills` y `glitch-overlays` (PNG), selector de rotación y validadores; consume el manifiesto de edición que a futuro produce `TASK-1442`.
+- `TASK-1924` — Glitch en movimiento: overlays del reel/vlog, apertura y tarjeta final con HyperFrames, video con alfa por edición.
 
 ## Existing Related Work
 

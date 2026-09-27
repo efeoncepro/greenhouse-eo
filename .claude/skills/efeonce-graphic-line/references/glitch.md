@@ -7,9 +7,9 @@
 > + ADR [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](../../../../docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
 > (ambos redactados el 2026-09-27). Si esta referencia y la norma no coinciden, manda la norma y se corrige aquí.
 >
-> **AXIS (pendiente de publicar):** página `https://axis.efeonce.org/references/glitch/`, gemelo para agentes
+> **AXIS (publicado 2026-09-27):** página `https://axis.efeonce.org/references/glitch/`, gemelo para agentes
 > `https://axis.efeonce.org/references/glitch.json` y guía `docs/agent-composition/glitch.md` del repo
-> `efeoncepro/axis-design-system`, hoy en la rama `feat/glitch-line` sin push. **No existen tokens ni contrato de Glitch
+> `efeoncepro/axis-design-system` (`main`, `d5846e8`). **No existen tokens ni contrato de Glitch
 > en AXIS**: los valores de abajo salen de la norma. Nunca inventes un token `glitchLine`, un contrato
 > `efeonce.glitch-line` ni un asset de `axis-brand-assets` para Glitch: están pendientes (§9).
 
@@ -176,7 +176,7 @@ Una PROPUESTA no se entrega como canon ni se publica: se muestra al operador par
 Objetivo: que ningún agente reinterprete. **Los agentes llenan datos; nunca eligen coordenadas ni plantilla a mano.**
 
 1. **Canon humano en Greenhouse:** norma + ADR (arriba).
-2. **Valores y contratos en AXIS:** página, JSON y guía (hechos en `feat/glitch-line`, sin publicar). Pendiente: tokens
+2. **Valores y contratos en AXIS:** página, JSON y guía (publicados 2026-09-27). Pendiente: tokens
    `glitchLine` en `@efeoncepro/axis-tokens` (color, tipo, cabecera, bytes, manzana, zonas seguras por formato, motion),
    assets en `@efeoncepro/axis-brand-assets` (wordmark claro/oscuro, manzana SVG, glifos Plastilina, Guttery si la
    licencia lo permite) y contrato `efeonce.glitch-line` 0.1.0 con reglas verificables (una esfera por pieza, verde
@@ -229,5 +229,5 @@ de los glifos; licencia de Guttery; pasar el flujo a ADR aceptado y a tasks.
 
 - Canvas de diseño: https://claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS («Glitch en La órbita»): análisis, aplicaciones,
   punch #11, para evaluar, sistema de portada (APROBADO), blog y vlog, vlog en reel.
-- AXIS Lab (pendiente de publicar): `/references/glitch/` y `/references/glitch.json`, rama `feat/glitch-line` de
-  `efeoncepro/axis-design-system`, sin push hasta que el operador autorice.
+- AXIS Lab (publicado 2026-09-27): `/references/glitch/` y `/references/glitch.json` de
+  `efeoncepro/axis-design-system`. Composición: TASK-1922 (AXIS), TASK-1923 (Composer), TASK-1924 (movimiento).

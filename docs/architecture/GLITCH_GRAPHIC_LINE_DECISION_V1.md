@@ -64,7 +64,7 @@ mano.
 
 1. **Canon humano en Greenhouse:** la norma de la sub-línea y este ADR.
 2. **Valores y contratos en AXIS** (dueño de los valores):
-   - Hecho en la rama `feat/glitch-line` de `efeoncepro/axis-design-system`, sin push: página del Lab
+   - Publicado el 2026-09-27 en `efeoncepro/axis-design-system` (`main`, `d5846e8`): página del Lab
      `/references/glitch/`, gemelo JSON `/references/glitch.json` y guía de composición para agentes
      `docs/agent-composition/glitch.md`.
    - Por hacer: tokens `glitchLine` en `@efeoncepro/axis-tokens` (color, tipo, cabecera, bytes, manzana, zonas seguras
@@ -118,13 +118,13 @@ Se revisó el motor (`src/lib/artifact-composer/catalog.ts`, `compose.ts`, `cont
   productiva gobernada de TASK-1921, los catálogos de Glitch pueden usarla.
 - El movimiento (overlays animados, apertura y cierre) sigue fuera del Composer: HyperFrames.
 
-### Trabajo a crear (sin ID de task reservado)
+### Trabajo a crear (tasks creadas el 2026-09-27: TASK-1922, TASK-1923, TASK-1924; d queda sin task hasta aprobar el callout v2)
 
 | # | Trabajo | Depende de |
 |---|---|---|
-| a | Tokens, assets y contrato de Glitch en AXIS | aprobación de la manzana y el verde como token de franquicia |
-| b | Catálogos `glitch-carousel` (PDF), `glitch-stills` y `glitch-overlays` (PNG) sobre un mismo `templatesDir`, extensión `glitch` del brand pack, selector de rotación y validadores | (a) |
-| c | Overlays HyperFrames + render con alfa | (a); aprobación del kit de overlays del reel |
+| a | **TASK-1922** — Tokens, assets y contrato de Glitch en AXIS (incluye e y f) | aprobación de la manzana y el verde como token de franquicia |
+| b | **TASK-1923** — Catálogos `glitch-carousel` (PDF), `glitch-stills` y `glitch-overlays` (PNG) sobre un mismo `templatesDir`, extensión `glitch` del brand pack, selector de rotación y validadores | (a) |
+| c | **TASK-1924** — Overlays HyperFrames + render con alfa | (a); aprobación del kit de overlays del reel |
 | d | Callout v2 en el bloque de WordPress `efeoncepro/glitch-drop` | aprobación del callout v2 |
 | e | Alta de los 5 glifos Plastilina en AXIS | aprobación del operador |
 | f | Licencia de Guttery | — |
@@ -146,8 +146,8 @@ Se revisó el motor (`src/lib/artifact-composer/catalog.ts`, `compose.ts`, `cont
 
 - Toda pieza de Glitch sigue la norma de la sub-línea; toda pieza de Efeonce sigue ignorando los rasgos exclusivos de
   Glitch.
-- Hasta que existan los tokens `glitchLine`, los valores de referencia viven en la norma y en el JSON de AXIS de la rama
-  sin publicar; al publicarse, mandan los tokens y la norma deja de guardar números.
+- Hasta que existan los tokens `glitchLine`, los valores de referencia viven en la norma y en el JSON publicado de AXIS
+  (`/references/glitch.json`); al publicarse, mandan los tokens y la norma deja de guardar números.
 - El callout v2, si se aprueba, obliga a cambiar el bloque de WordPress `efeoncepro/glitch-drop` desplegado por TASK-1337.
 - La numeración de ediciones que usa esta línea (la próxima es la #11) no coincide con la del ADR del pipeline editorial
   (#16 en adelante); hay que reconciliarlas.

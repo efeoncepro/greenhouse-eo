@@ -119,7 +119,7 @@ animarían y exportarían con fondo transparente para que el editor los ponga so
 | Canvas de diseño «Glitch en La órbita» (privado) | [claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS](https://claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS) |
 | Logo de Glitch | `public/branding/glitch/glitch-light.svg` y `glitch-dark.svg` |
 | Guía de tono y voz de Glitch (v3) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Marca` |
-| Página de Glitch en el sistema de diseño AXIS | en preparación; todavía sin publicar |
+| Página de Glitch en el sistema de diseño AXIS | publicada en [axis.efeonce.org/references/glitch/](https://axis.efeonce.org/references/glitch/) (2026-09-27) |
 | Línea gráfica de Efeonce (la línea madre) | [La órbita](./linea-grafica-efeonce.md) |
 
 ## Estado y pendientes

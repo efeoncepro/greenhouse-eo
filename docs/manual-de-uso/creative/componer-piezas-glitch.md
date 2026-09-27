@@ -135,7 +135,7 @@ Todo el video está en **propuesta**. Si se produce una prueba:
 | **PROPUESTA** | se puede armar para mostrarla al operador, pero no se publica como final: lente, blog, vlog 16:9, reel, tarjetas finales y el flujo de composición automática |
 | **EXPLORACIÓN** | idea en estudio, no canon: la manzana y el verde como token oficial, los acentos teal y naranja del canvas, la historia 9:16 y el carrusel panorámico |
 | **Alta pendiente** | los cinco íconos Plastilina de Glitch existen, pero todavía no están en el catálogo oficial de AXIS |
-| **Sin publicar** (AXIS) | la página y la guía de Glitch en AXIS existen en una rama, sin publicar hasta que el operador lo autorice |
+| **Publicada** (AXIS) | la página y la guía de Glitch están en axis.efeonce.org desde el 2026-09-27; los tokens de Glitch todavía no existen (TASK-1922) |
 
 ## Qué no hacer
 
@@ -174,4 +174,4 @@ Todo el video está en **propuesta**. Si se produce una prueba:
 - Bloque del Glitch Drop en WordPress: [wireframe TASK-1337](../../ui/wireframes/TASK-1337-glitch-gutenberg-block.md)
 - Pipeline editorial: [ADR del pipeline de Glitch](../../architecture/GREENHOUSE_GLITCH_AGENTIC_EDITORIAL_PIPELINE_DECISION_V1.md)
 - Skill para agentes: `efeonce-graphic-line`, `references/glitch.md`
-- AXIS (sin publicar): `/references/glitch/`, `/references/glitch.json` y `docs/agent-composition/glitch.md` en la rama `feat/glitch-line` de `efeoncepro/axis-design-system`
+- AXIS (publicado): [/references/glitch/](https://axis.efeonce.org/references/glitch/), `/references/glitch.json` y `docs/agent-composition/glitch.md` de `efeoncepro/axis-design-system`

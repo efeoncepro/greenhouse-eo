@@ -15,8 +15,8 @@
 > (sub-línea y piezas aprobadas: `Accepted`; flujo de composición: `Proposed`)
 > **Línea madre:** [Línea gráfica Efeonce «La órbita»](../EFEONCE_GRAPHIC_LINE_V1.md) · [índice de la carpeta](../README.md)
 > **Canvas de referencia (privado):** [«Glitch en La órbita»](https://claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS)
-> **Valores en AXIS:** página del Lab `/references/glitch/` y gemelo JSON `/references/glitch.json` en la rama
-> `feat/glitch-line` del repo `efeoncepro/axis-design-system`, **sin publicar**. Los tokens `glitchLine` todavía no existen
+> **Valores en AXIS:** página del Lab `/references/glitch/` y gemelo JSON `/references/glitch.json` del repo
+> `efeoncepro/axis-design-system`, **publicados** en axis.efeonce.org (`main`, `d5846e8`, 2026-09-27). Los tokens `glitchLine` todavía no existen
 > (ver §12).
 > **Documentación para personas:** [funcional](../../../documentation/creative/linea-grafica-glitch.md) ·
 > [manual de uso](../../../manual-de-uso/creative/componer-piezas-glitch.md)
@@ -338,8 +338,8 @@ El flujo propuesto (canon en Greenhouse, valores y contratos en AXIS, composici�
 | Qué | Dónde | Estado |
 |---|---|---|
 | Canvas de diseño | [claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS](https://claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS) («Glitch en La órbita»): análisis, aplicaciones, punch #11, para evaluar, sistema de portada (APROBADO), blog y vlog, vlog en reel | privado |
-| AXIS Lab | `/references/glitch/` y `/references/glitch.json`, rama `feat/glitch-line` de `efeoncepro/axis-design-system` | **sin publicar** hasta que el operador autorice el push |
-| Guía para agentes en AXIS | `docs/agent-composition/glitch.md`, misma rama | **sin publicar** |
+| AXIS Lab | [axis.efeonce.org/references/glitch/](https://axis.efeonce.org/references/glitch/) y `/references/glitch.json` (`efeoncepro/axis-design-system`, `d5846e8`) | **publicado** 2026-09-27 |
+| Guía para agentes en AXIS | `docs/agent-composition/glitch.md` | **publicada** 2026-09-27 |
 | Tokens `glitchLine` (`@efeoncepro/axis-tokens`) | — | **no existen todavía** |
 | Assets (`@efeoncepro/axis-brand-assets`: wordmark, manzana SVG, glifos Plastilina, Guttery si la licencia lo permite) | — | **no existen todavía** |
 | Contrato `efeonce.glitch-line` 0.1.0 | — | **no existe todavía** |
