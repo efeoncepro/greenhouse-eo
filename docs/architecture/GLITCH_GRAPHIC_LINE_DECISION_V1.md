@@ -14,7 +14,8 @@
 > Glitch** (tema B + cama post-punk; [Delta — música aprobada](#delta-2026-09-27--música-aprobada)). Lente y blog siguen
 > en propuesta.
 > **Creado:** 2026-09-27 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude ([Delta de la tarde](#delta-2026-09-27-tarde--música-y-pre-roll-integrados-en-el-taller):
+> **Última actualización:** 2026-09-27 por Claude ([Delta del reel](#delta-2026-09-27--el-reel-abre-directo-con-la-apertura):
+> **el reel abre directo con la apertura, sin pre-roll**; el pre-roll queda sólo en el vlog; antes, [Delta de la tarde](#delta-2026-09-27-tarde--música-y-pre-roll-integrados-en-el-taller):
 > música y pre-roll **integrados en el taller**, huellas sha256, intro/salida reemplazan a los efectos de apertura y
 > cierre; antes, Delta: **música aprobada**, sólo Glitch; antes, Delta del **motion
 > aprobado**; antes, Delta del diseño sonoro
@@ -397,15 +398,37 @@ guarda su sha256); y el código no pasó por PR ni por el CI del taller (commits
   sha256**; se bajan a una caché local, se verifican y el comando **falla cerrado** si el bucket cambia. **Nunca se
   regeneran**: si algo cambia, es una ronda nueva que aprueba el operador. `--music on|off` (por defecto `on`).
 - **Pre-roll de la intro: «los tres puntos al ritmo»** (elección del operador entre opciones). 3,2 s = 2 compases a
-  150 BPM, 96 cuadros, opaco, reel y vlog; su último cuadro es idéntico al primero de la apertura (empalme PSNR ∞).
+  150 BPM, 96 cuadros, opaco, reel y vlog (superado: hoy sólo vlog, ver el Delta del reel); su último cuadro es idéntico al primero de la apertura (empalme PSNR ∞).
   Supersede el pendiente «definir el motion del pre-roll» del Delta de la música.
 - **Decisión de montaje: con música, la intro y la salida reemplazan a los WAV de efectos de apertura y cierre**, para
   no sonar doble (ya los traen montados). Los WAV sin música ya entregados se movieron a `v2/sin-musica/` con un LEEME
   (no se borraron): son para una edición sin música.
-- **El reel usa los másteres de vlog** (`glitch-intro-reel.wav` = intro de vlog, 7,2 s).
+- **El reel usa los másteres de vlog** (`glitch-intro-reel.wav` = intro de vlog, 7,2 s; superado: hoy es la intro desde
+  3,2 s, 4,0 s, ver el Delta del reel).
 - **Verificado:** v2 37/37 · kit 95/95 · pre-roll 96 cuadros, opaco y empalme PSNR ∞ · huellas sha256 = las aprobadas ·
   12/12 pruebas del taller.
 - **Sigue pendiente** (decisión del operador, no bloquea lo aprobado): la prueba de los editores con una edición real y
   la voz del host (incluye validar el ducking), fps de grabación, a qué piezas va la transición de bytes, subtítulos,
   parámetro de ritmo, textos reales de la #17, autoservicio (formulario en Marketing Studio y dominio de ediciones,
   TASK-1442), tokens (TASK-1922), catálogo `glitch-edition` (TASK-1923) y archivo en GCS.
+
+## Delta 2026-09-27 — el reel abre directo con la apertura
+
+> **Alcance:** sólo Glitch, nunca Efeonce. Cierra el pendiente «Reel en bucle y pre-roll» de la
+> [norma §11](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#11-pendientes-de-decisión-del-operador);
+> detalle en la norma §13.2, §13.8 y §13.9.
+
+- **Decisión (operador, 2026-09-27; aceptó la recomendación de Claude):** el **vlog 16:9** abre con pre-roll + apertura
+  (intro de 7,2 s), sin cambios; el **reel abre directo con la apertura, sin pre-roll**. El podcast no cambia (su
+  pre-roll de audio de 9,6 s).
+- **Por qué:** en un reel el primer segundo manda (retención), y sin pre-roll el bucle queda exacto: la tarjeta final
+  termina en el primer cuadro de la apertura, no en el del pre-roll.
+- **Audio del reel:** `glitch-intro-reel.wav` = la intro aprobada **desde 3,2 s** (corte por muestra, sin retocar el
+  máster; ahí está en silencio, −90 dBFS); dura **4,0 s**, lo mismo que la apertura, y se pone en 0 junto a ella. La
+  salida no cambia y su final cae en silencio (−55 dBFS): el bucle de audio salida → intro no hace clic.
+- **En el taller:** `efeonce-brand-workshop` `1f323ca` (sin empujar): `TIMING.preroll.formats = ['vlog']`,
+  `prerollFor(format)`, `introWithoutPreroll()` y `peakDb()`; dos verificaciones nuevas del reel; animatic del reel
+  45,2 s y del vlog 48,4 s; script `deliver` (re-entrega desde el manifiesto sin verificar ni renderizar). Verificado:
+  v2 37/37, kit 95/95, **13 pruebas**. En OneDrive, `glitch-preroll-reel.mov` pasó a `v2/descartado/` con un LEEME.
+- **Reversible:** volver a sumar el reel a `TIMING.preroll.formats` y re-renderizar; el pre-roll del reel sigue en
+  `v2/descartado/`.

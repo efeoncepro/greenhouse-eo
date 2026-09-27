@@ -1,9 +1,11 @@
 # Producir el motion, el sonido y la música de Glitch — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.0: runbook del operador o editor agente que corre el taller:
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.1: el **pre-roll queda sólo en el vlog** y el reel abre directo
+> con la apertura, con una intro de 4,0 s; dos verificaciones nuevas del reel; 13 pruebas; script `deliver` para
+> re-entregar desde el manifiesto. v1.0: runbook del operador o editor agente que corre el taller:
 > requisitos, `doctor`, flujo de una edición, todos los comandos y argumentos, verificaciones, manifiestos, música por
 > huella y re-entrega sin volver a renderizar)
 > **Modulo:** Creative · Glitch, magazine semanal de Efeonce (sub-línea de «La órbita») · video, motion, sonido y música
@@ -24,7 +26,7 @@ agente»). El montaje en Premiere Pro o After Effects está en [Editar el video 
 **Estado (2026-09-27):** todo lo que se produce aquí está **aprobado** por el operador: el motion («Si, el tuyo también
 está aprobado»), el sonido en su versión B («La b me encanta más») y la música, tema B y cama post-punk («Post-punk
 definitivamente»). La música ya está integrada al taller y el pre-roll de la intro («los tres puntos al ritmo») ya está
-hecho. Lo que falta para producir en el día a día está en [Qué falta](#qué-falta-para-el-día-a-día).
+hecho; va **sólo en el vlog**: el reel abre directo con la apertura (decisión del operador del 2026-09-27). Lo que falta para producir en el día a día está en [Qué falta](#qué-falta-para-el-día-a-día).
 
 ## Antes de empezar
 
@@ -116,17 +118,18 @@ pnpm … kit -- --run 2026-10-05_glitch-kit-17 \
 Genera, en reel y vlog: cabeceras «NOTICIA n / 3» (con su PNG `_fijo` para sostenerlas), rótulos del host y del
 invitado, tarjeta de cada noticia, plano dividido de las noticias con imagen, Glitch Drop y llamado a la acción. Junto
 a cada `.mov` deja su WAV (sonido B) con el mismo nombre, más la **cama** y la **cortina** de la música, una hoja con un
-cuadro de cada pieza y el **animatic** de la edición completa, con el pre-roll, el sonido y la música ya mezclados.
+cuadro de cada pieza y el **animatic** de la edición completa, con el sonido y la música ya mezclados (vlog 48,4 s, con
+el pre-roll; reel 45,2 s, sin pre-roll).
 **Tarda unos 4 minutos** el kit completo; una pieza sola (con `--only`), segundos.
 
-El animatic toma la apertura, la tarjeta final y el pre-roll de otra corrida (la de `render`), indicada con
+El animatic toma la apertura, la tarjeta final y el pre-roll del vlog de otra corrida (la de `render`), indicada con
 `--opening-run`; por defecto usa `2026-09-27_glitch-motion-piloto-v2`, la aprobada. Si esa corrida no está en tu
 máquina, el animatic se omite y el comando lo avisa.
 
 ### 4 · Vuelve a correr `render` sólo si cambia el número de la edición
 
 La apertura muestra el número de la edición («#17») y la tarjeta final el de la siguiente. `render` produce la
-apertura, la tarjeta final y el pre-roll de la intro en reel y vlog, con su música:
+apertura y la tarjeta final en reel y vlog, y el pre-roll de la intro sólo en el vlog, con su música:
 
 ```bash
 pnpm … render -- --run 2026-10-05_glitch-motion-18 --edition 18
@@ -137,10 +140,13 @@ Si el número no cambió, reutiliza la corrida aprobada: no hace falta volver a 
 Con la música activada (por defecto), `render` entrega:
 
 - `glitch-apertura-{reel,vlog}.mov` y `glitch-cierre-{reel,vlog}.mov` (la tarjeta final).
-- `glitch-preroll-{reel,vlog}.mov`: el pre-roll de la intro, 3,2 s (96 cuadros), **opaco** (fondo navy), «los tres
-  puntos al ritmo». Su último cuadro es idéntico al primero de la apertura: van uno tras otro sin corte visible.
-- `glitch-intro-{reel,vlog}.wav` (pre-roll + apertura, con los efectos de la apertura ya montados) y
-  `glitch-salida-{reel,vlog}.wav` (con la tarjeta final y su efecto ya montado). El reel usa los másteres de vlog.
+- `glitch-preroll-vlog.mov`: el pre-roll de la intro, 3,2 s (96 cuadros), **opaco** (fondo navy), «los tres puntos
+  al ritmo». Su último cuadro es idéntico al primero de la apertura: van uno tras otro sin corte visible. **El reel no
+  lleva pre-roll**: abre directo con la apertura, así su bucle queda exacto (`TIMING.preroll.formats = ['vlog']`).
+- `glitch-intro-vlog.wav` (pre-roll + apertura, 7,2 s, con los efectos de la apertura ya montados),
+  `glitch-intro-reel.wav` (la misma intro desde 3,2 s, cortada por muestra y sin retoque: 4,0 s, lo mismo que la
+  apertura) y `glitch-salida-{reel,vlog}.wav` (con la tarjeta final y su efecto ya montado). El reel usa los másteres
+  de vlog.
 - `glitch-intro-podcast.wav`, `glitch-cortina-podcast.wav` y `glitch-salida-podcast.wav`: la versión de audio para el
   podcast.
 - Vistas previas sobre la toma de prueba (`vista-previa_{formato}_{apertura,cierre,bucle,intro}.mp4`, ya con sonido y
@@ -197,28 +203,29 @@ Esto es lo que necesitas para operar.
 | Script | Qué hace |
 |---|---|
 | `doctor` | revisa fuentes, logo de Efeonce, logo de Glitch, toma de prueba, ffmpeg y HyperFrames |
-| `build` | arma las composiciones HTML de la apertura y la tarjeta final (y las del pre-roll si la música va), sin renderizar |
-| `render` | `build` + `hyperframes lint` + render + `verify`: apertura, tarjeta final y **pre-roll** (reel y vlog) |
+| `build` | arma las composiciones HTML de la apertura y la tarjeta final (y la del pre-roll del vlog si la música va), sin renderizar |
+| `render` | `build` + `hyperframes lint` + render + `verify`: apertura y tarjeta final (reel y vlog) y **pre-roll** (sólo vlog) |
 | `verify` | verifica lo ya renderizado por `render` y rearma vistas previas, WAV y manifiesto. **No entrega** |
+| `deliver` | re-entrega una corrida ya verificada desde su manifiesto (`corridas/<run>/manifiesto.json`), **sin verificar ni renderizar**: copia a `--deliver` lo que lista el manifiesto y anota la entrega. Argumentos: `--run` y `--deliver` |
 | `kit` | los gráficos del kit desde el archivo de edición + sus WAV + cama y cortina + hoja + animatic |
 | `transiciones` | el paquete máscara + capa (3 orígenes × 2 duraciones) + sus WAV + demos + `LEEME.txt` |
 | `heroe` | la transición héroe entre dos clips concretos, renderizada |
 | `sonido` | sólo el juego de WAV, sin render de video, en `out/<run>/sonido-<b\|a>/` (acepta `--sound` y `--edition`). Para entregar, el sonido sale junto a cada `.mov` con `render`, `kit`, `transiciones` y `heroe` |
-| `test` | 12 pruebas del paquete: registro de timelines, determinismo, sin red, datos de edición en pantalla, pre-roll, huellas de la música y el juego de sonido completo y determinista |
+| `test` | 13 pruebas del paquete: registro de timelines, determinismo, sin red, datos de edición en pantalla, pre-roll, pre-roll sólo en el vlog (el reel abre con la apertura y su intro dura lo que la apertura), huellas de la música y el juego de sonido completo y determinista |
 
 | Argumento | Sirve en | Valor y por defecto |
 |---|---|---|
-| `--run <id>` | todos | nombre de la corrida: su carpeta `out/<id>/` (fuera de git) y su manifiesto `corridas/<id>/`. Por defecto, la fecha más `_glitch-motion` (`render`), `_glitch-kit`, `_glitch-transiciones` o `_glitch-heroe`. Ponle siempre un nombre explícito |
+| `--run <id>` | todos (incluido `deliver`) | nombre de la corrida: su carpeta `out/<id>/` (fuera de git) y su manifiesto `corridas/<id>/`. Por defecto, la fecha más `_glitch-motion` (`render`), `_glitch-kit`, `_glitch-transiciones` o `_glitch-heroe`. Ponle siempre un nombre explícito |
 | `--edition <n>` | `render` | número de la edición (por defecto 17) |
 | `--edition-file <json>` | `kit` | archivo de edición (por defecto `ejemplos/edicion-17.ejemplo.json`, relativo a `tools/glitch-motion/`) |
 | `--assets "<carpeta>"` | `kit` | carpeta con las imágenes de las noticias. Obligatoria si alguna noticia trae imagen |
 | `--transition basic\|bytes` | `kit` | transición de las piezas; por defecto la del archivo de edición y, si no dice, `basic` |
 | `--only a,b` | `kit` | sólo esas piezas, por ejemplo `--only cabecera-1,drop` |
 | `--skip-render` | `kit`, `transiciones` | reutiliza los `.mov` ya renderizados de esa corrida; rehace verificaciones, WAV, vistas previas y entrega |
-| `--opening-run <id>` | `kit` | corrida de la que toma apertura, tarjeta final y pre-roll para el animatic (por defecto `2026-09-27_glitch-motion-piloto-v2`) |
+| `--opening-run <id>` | `kit` | corrida de la que toma apertura, tarjeta final y pre-roll (el del vlog) para el animatic (por defecto `2026-09-27_glitch-motion-piloto-v2`) |
 | `--formats reel,vlog` | `render`, `kit`, `transiciones`, `heroe` | formatos a producir (por defecto los dos) |
 | `--workers <n>` | `render`, `kit`, `transiciones`, `heroe` | procesos de render de HyperFrames (por defecto 2) |
-| `--deliver "<carpeta>"` | `render`, `kit`, `transiciones`, `heroe` | copia la entrega y la anota en el manifiesto. Sólo si todo pasó |
+| `--deliver "<carpeta>"` | `render`, `kit`, `transiciones`, `heroe`, `deliver` | copia la entrega y la anota en el manifiesto. Sólo si todo pasó (con `deliver`, lo que ya pasó en esa corrida) |
 | `--a <archivo>[@seg]` · `--b <archivo>[@seg]` | `transiciones` (sólo para las demos), `heroe` | escena A y escena B (imagen o video) y el segundo exacto del corte. Sin `@seg`, de A se toma el final y de B el inicio |
 | `--origin centro\|izquierda\|marca` | `heroe` | de dónde nace la manzana (por defecto `centro`) |
 | `--sound b\|a\|off` | `render`, `kit`, `transiciones`, `heroe` | **`b` por defecto (la aprobada)**; `a` es la alternativa descartada: no se usa; `off` sin WAV |
@@ -250,10 +257,10 @@ pnpm … test
 
 | Comando | Verifica | Resultado del 2026-09-27 |
 |---|---|---|
-| `render` | ProRes 4444 con alfa, tamaño del formato, 30 fps, cuadros exactos, sin audio; la apertura abre opaca y termina transparente, la tarjeta final al revés; **bucle**: el último cuadro de la tarjeta final = el primero de la apertura; pre-roll de 96 cuadros, opaco de punta a punta y con su último cuadro = el primero de la apertura; la huella (sha256) de cada máster de música; cada WAV a 48 kHz, 24 bits, estéreo y con la misma duración que su video | 37/37 |
+| `render` | ProRes 4444 con alfa, tamaño del formato, 30 fps, cuadros exactos, sin audio; la apertura abre opaca y termina transparente, la tarjeta final al revés; **bucle**: el último cuadro de la tarjeta final = el primero de la apertura; pre-roll del vlog de 96 cuadros, opaco de punta a punta y con su último cuadro = el primero de la apertura; en el reel, «intro reel: el corte del pre-roll cae en silencio» (−90 dBFS en 3,2 s) y «bucle de audio reel: el final de la salida cae en silencio» (−55 dBFS); la huella (sha256) de cada máster de música; cada WAV a 48 kHz, 24 bits, estéreo y con la misma duración que su video | 37/37 |
 | `kit` | por pieza: ProRes 4444 con alfa, tamaño, 30 fps, cuadros exactos, sin audio, entra desde transparente y sale a transparente; cada WAV igual que arriba; la huella de la música | 95/95 |
 | `transiciones` · `heroe` | máscara y capa (o héroe) con su formato, cuadros y alfa; su WAV | 84/84 · 8/8 |
-| `test` | las 12 pruebas del paquete | 12/12 |
+| `test` | las 13 pruebas del paquete | 13/13 |
 
 El render usa `hyperframes lint` antes de renderizar: si una composición tiene un error o una advertencia, se detiene.
 
@@ -290,9 +297,15 @@ volver a correr el comando.
   `.mov` que ya están en `out/<corrida>/` y rehace verificaciones, WAV, vistas previas y la entrega. Sirve, por ejemplo,
   para entregar a otra carpeta o para regenerar el sonido y la música sin volver a renderizar.
 - **Apertura y tarjeta final (`render`):** no tiene `--skip-render`. `verify -- --run <corrida>` vuelve a verificar y
-  rearma vistas previas, WAV y manifiesto sin renderizar, pero **no entrega**. El CLI tiene además un subcomando
-  `deliver` que vuelve a copiar lo listado en el manifiesto, pero no está expuesto como script de pnpm: su uso
-  `[verificar]` antes de usarlo en una entrega real. Si dudas, vuelve a correr `render` con `--deliver`.
+  rearma vistas previas, WAV y manifiesto sin renderizar, pero **no entrega**. Para entregar una corrida que ya pasó,
+  usa el script `deliver`: re-entrega desde el manifiesto de la corrida, **sin verificar ni renderizar**:
+
+  ```bash
+  pnpm … deliver -- --run 2026-09-27_glitch-motion-piloto-v2 --deliver "<OneDrive>/…/Motion/piloto/v2"
+  ```
+
+  Úsalo sólo con una corrida cuyo manifiesto muestre todas las verificaciones en verde; si cambiaste algo después,
+  corre `verify` (o `render`) antes.
 - `--skip-render` sólo sirve si los `.mov` siguen en `out/<corrida>/` de **esta máquina**: esa carpeta no está en git.
 
 ## Edición sin música

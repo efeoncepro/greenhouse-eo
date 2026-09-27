@@ -1,9 +1,10 @@
 # Editar el video de Glitch con los gráficos animados — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.6: mapa de la edición completa en la línea de tiempo; el sonido
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.7: el **reel abre directo con la apertura, sin pre-roll**, y
+> `glitch-intro-reel.wav` dura 4,0 s; el pre-roll queda sólo en el vlog; el del reel pasó a `v2/descartado/`. v1.6: mapa de la edición completa en la línea de tiempo; el sonido
 > se toma de los WAV que vienen junto a cada `.mov` y `sonido-propuesta/` queda como histórico; el pre-roll entra en la
 > sección 1; el método del ducking en Premiere queda a validar en la prueba de los editores; puntero al manual de
 > producción. v1.5: el taller entrega la música junto a cada pieza, con el pre-roll
@@ -33,7 +34,7 @@ gráficos llegan hechos y tú los ubicas en la línea de tiempo.
 aprobado»): apertura y tarjeta final v2, kit de gráficos, transición de bytes entre piezas y transición entre escenas.
 El **sonido** también está aprobado (versión B, 2026-09-27; sección 6), y la **música** (tema B y cama post-punk bajo la
 noticia, 2026-09-27; sección 6.1), y desde ese mismo día cada entrega trae la música junto a su pieza, con el
-**pre-roll** de la intro. De la música sólo falta probar la mezcla con la voz real del host. Siguen pendientes la prueba con los editores
+**pre-roll** de la intro en el vlog (el reel abre directo con la apertura). De la música sólo falta probar la mezcla con la voz real del host. Siguen pendientes la prueba con los editores
 en una edición real, la cadencia de grabación, el estilo de subtítulos, a qué piezas se aplica la transición de bytes
 y los textos reales de la #17: no publiques un video con textos entre corchetes.
 
@@ -46,7 +47,8 @@ y los textos reales de la #17: no publiques un video con textos entre corchetes.
   | Carpeta | Qué tiene |
   |---|---|
   | `piloto/` (la raíz) | apertura y tarjeta final **v1**, la versión más sencilla |
-  | `v2/` | apertura y tarjeta final **v2**, «más punch» (la **aprobada**), más el **pre-roll** de la intro y la música de la intro y la salida (ver [6.1](#61--montar-la-música)) |
+  | `v2/` | apertura y tarjeta final **v2**, «más punch» (la **aprobada**), más el **pre-roll** de la intro del vlog y la música de la intro y la salida (ver [6.1](#61--montar-la-música)) |
+| `v2/descartado/` | `glitch-preroll-reel.mov`, con su `LEEME`: el reel ya **no** lleva pre-roll. No lo uses |
   | `v2/sin-musica/` | las entregas anteriores, **sin música**, con su `LEEME`. Úsalas sólo si te piden un video sin música |
   | `kit/reel/` y `kit/vlog/` | el kit de gráficos que van encima de la toma, uno por formato, más la cama y la cortina de música (`glitch-kit-*-cama.wav`, `glitch-kit-*-cortina.wav`) |
   | `kit-transicion-bytes/reel/` y `kit-transicion-bytes/vlog/` | el kit con la entrada y salida de la manzana en bytes en la tarjeta y el Drop (**aprobada**; falta decidir a qué piezas se aplica) |
@@ -54,7 +56,7 @@ y los textos reales de la #17: no publiques un video con textos entre corchetes.
   | `transiciones/heroe/reel/` y `transiciones/heroe/vlog/` | la versión héroe de la transición, hecha para un corte puntual |
   | `sonido-propuesta/` | el **histórico** de la decisión del sonido (`b/` la aprobada, `a/` la descartada). No lo necesitas para montar: cada `.mov` ya trae su WAV |
 
-  **Qué bajar para una edición:** `v2/` (pre-roll, apertura, tarjeta final y la música de la intro y la salida), la
+  **Qué bajar para una edición:** `v2/` (pre-roll del vlog, apertura, tarjeta final y la música de la intro y la salida), la
   carpeta de tu formato en `kit/` (gráficos con sus WAV, la cama y la cortina, y el animatic de guía) y, si vas a usar
   transiciones entre escenas, la carpeta de tu formato en `transiciones/` (y `kit-transicion-bytes/` si la tarjeta o el
   Drop llevan la manzana en bytes).
@@ -62,12 +64,13 @@ y los textos reales de la #17: no publiques un video con textos entre corchetes.
 - **Formato de los archivos:** video **ProRes 4444 con canal alfa** (`.mov`), a **30 cuadros por segundo** y **sin
   audio**. **Cada `.mov` trae al lado su WAV con el mismo nombre** (el sonido aprobado, versión B) y las vistas
   previas ya traen el sonido: ver [Montar el sonido](#6--montar-el-sonido). Premiere Pro y After Effects los abren directo, con el fondo transparente.
-  La excepción es el **pre-roll** de la intro (`glitch-preroll-*.mov`): es **opaco**, con fondo navy, porque va antes de
+  La excepción es el **pre-roll** de la intro del vlog (`glitch-preroll-vlog.mov`): es **opaco**, con fondo navy, porque va antes de
   la apertura y no encima de una toma.
 - **Arma la secuencia a 30 fps** y del tamaño del formato: 1080 × 1920 para el reel, 1920 × 1080 para el vlog.
 - **Los `.mp4` que empiezan con `demo_`** (en `transiciones/`) son sólo para mirar cómo se ve cada transición. No van en
   la línea de tiempo.
-- **El animatic** (uno por formato; con la música dura 48,4 s) muestra el orden y el momento de cada pieza sobre la
+- **El animatic** (uno por formato; con la música, el del vlog dura 48,4 s y el del reel 45,2 s, porque el reel no
+  lleva pre-roll) muestra el orden y el momento de cada pieza sobre la
   toma, y ya trae mezclados el sonido y la música. Úsalo de guía para ubicar el kit. Está en `kit/reel/animatic_reel.mp4` y `kit/vlog/animatic_vlog.mp4`.
 - **Los textos vienen de un archivo de edición**, no del video: si algo está mal escrito, no lo corrijas en Premiere;
   pídelo (ver [Cambiar un texto](#cambiar-un-texto)).
@@ -83,7 +86,8 @@ Antes de los detalles, este es el orden completo de una edición con música, de
 
 | Momento | Video (pistas de arriba) | Audio |
 |---|---|---|
-| Intro | `glitch-preroll-*.mov` (3,2 s, opaco) y, pegada a él, `glitch-apertura-*.mov` (4 s) | `glitch-intro-*.wav` desde el primer cuadro del pre-roll (cubre los dos) |
+| Intro (vlog) | `glitch-preroll-vlog.mov` (3,2 s, opaco) y, pegada a él, `glitch-apertura-vlog.mov` (4 s) | `glitch-intro-vlog.wav` (7,2 s) desde el primer cuadro del pre-roll (cubre los dos) |
+| Intro (reel) | **sin pre-roll**: `glitch-apertura-reel.mov` (4 s) en 0 | `glitch-intro-reel.wav` (4,0 s) en 0, junto a la apertura |
 | Noticia 1 | `cabecera-1` y su PNG `_fijo` estirado; `lower-third-host` en la primera aparición del host (sólo esa vez); `noticia-1`; `fuente-1` si la noticia trae imagen | cada WAV al lado de su `.mov`; la **cama** entra con la cabecera, en bucle, 15 dB bajo la voz y con ducking |
 | Paso a la noticia 2 | — | la **cortina** empieza 1,6 s antes de `cabecera-2` y corta la cama |
 | Noticia 2 | `cabecera-2` y su `_fijo`; `noticia-2`; `fuente-2` si trae imagen | cama bajo el relato |
@@ -107,17 +111,18 @@ La **tarjeta final** dura 3 s (90 cuadros). **Entra desde transparente**, muestr
 lunes.», el botón («Sigue a Glitch» en el reel; «Las otras noticias, en el blog de Glitch» en el vlog) y la firma de
 Efeonce, y termina con la manzana que se deshace en bytes y el tercer punto que vuelve.
 
-1. **Con música (lo normal):** antes de la apertura va el **pre-roll** (`glitch-preroll-*.mov`, 3,2 s, 96 cuadros,
-   **opaco** con fondo navy): los tres puntos aparecen, laten al ritmo y el tercero tartamudea. Ponlo al inicio de la
-   secuencia y la **apertura pegada a él**, desde el segundo 3,2, sin recortar ninguno de los dos: el último cuadro del
-   pre-roll es idéntico al primero de la apertura, así que el paso no se ve. El audio de los dos es
-   `glitch-intro-*.wav` (ver [6.1](#61--montar-la-música)). Sin música, la apertura va al inicio, sin pre-roll.
+1. **Con música (lo normal), en el vlog:** antes de la apertura va el **pre-roll** (`glitch-preroll-vlog.mov`, 3,2 s,
+   96 cuadros, **opaco** con fondo navy): los tres puntos aparecen, laten al ritmo y el tercero tartamudea. Ponlo al
+   inicio de la secuencia y la **apertura pegada a él**, desde el segundo 3,2, sin recortar ninguno de los dos: el último
+   cuadro del pre-roll es idéntico al primero de la apertura, así que el paso no se ve. El audio de los dos es
+   `glitch-intro-vlog.wav` (ver [6.1](#61--montar-la-música)). **En el reel no hay pre-roll:** la apertura va al
+   inicio, con `glitch-intro-reel.wav` en 0. Sin música, la apertura va al inicio en los dos formatos.
 2. Pon la **apertura** en la pista de arriba, encima de la primera toma: termina transparente y deja ver al host.
 3. Pon la **tarjeta final** al final, encima de la última toma, con `glitch-salida-*.wav` en el mismo cuadro.
-4. **Bucle del reel:** el último cuadro de la tarjeta final es idéntico al primer cuadro de la apertura. Si el reel
-   termina con la tarjeta final y empieza con la apertura, al repetirse empalma sin salto. No recortes el último cuadro.
-   Con el pre-roll al comienzo, el reel empieza con el pre-roll y no con la apertura: si ese reel se publica en bucle,
-   confirma con el operador si abre con el pre-roll o directo con la apertura `[verificar]`.
+4. **Bucle del reel:** el último cuadro de la tarjeta final es idéntico al primer cuadro de la apertura. El reel abre
+   **directo con la apertura** (sin pre-roll, decisión del operador del 2026-09-27) y termina con la tarjeta final: al
+   repetirse empalma sin salto. El audio también: el final de `glitch-salida-reel.wav` y el inicio de
+   `glitch-intro-reel.wav` caen en silencio, así que el bucle no hace clic. No recortes el último cuadro.
 4. **Cuadro de sincronía:** el golpe principal de la apertura es el **cuadro 48** (1,6 s), cuando la manzana cae con
    su onda. Es el cuadro que manda en el sonido y en la música: ahí cae el único golpe grave de la apertura.
 5. **Golpes** (el sonido aprobado cae en estos cuadros; ver [Montar el sonido](#6--montar-el-sonido)):
@@ -299,8 +304,9 @@ transiciones entre escenas, que tienen una pista por formato.
 | La cortina corta antes o después de la cabecera | no empieza 1,6 s antes de la cabecera siguiente | muévela para que su corte caiga en el cuadro en que entra la cabecera |
 | La apertura o la tarjeta final suenan doble, o con eco | sumaste `apertura.wav` o `cierre.wav` además de la intro o la salida | quítalos: con música, `glitch-intro-*.wav` y `glitch-salida-*.wav` ya los traen |
 | No encuentro `apertura.wav` ni `cierre.wav` en la entrega | es a propósito: las entregas con música no los traen | usa la intro y la salida; si te piden un video sin música, usa `v2/sin-musica/` |
-| Se nota un salto al pasar del pre-roll a la apertura | la apertura no empieza justo cuando termina el pre-roll (3,2 s), o se recortó un cuadro | pon la apertura pegada al final del pre-roll, sin recortar ninguno de los dos: el último cuadro del pre-roll es igual al primero de la apertura |
-| La música de la intro no calza con los puntos del pre-roll | el WAV de la intro no empieza en el mismo cuadro que el pre-roll | alinea el inicio de `glitch-intro-*.wav` con el primer cuadro de `glitch-preroll-*.mov` |
+| Se nota un salto al pasar del pre-roll a la apertura (vlog) | la apertura no empieza justo cuando termina el pre-roll (3,2 s), o se recortó un cuadro | pon la apertura pegada al final del pre-roll, sin recortar ninguno de los dos: el último cuadro del pre-roll es igual al primero de la apertura |
+| La música de la intro no calza con los puntos del pre-roll (vlog) | el WAV de la intro no empieza en el mismo cuadro que el pre-roll | alinea el inicio de `glitch-intro-vlog.wav` con el primer cuadro de `glitch-preroll-vlog.mov` |
+| La intro del reel no calza con la apertura, o el reel arranca con un fondo navy | usaste la intro del vlog (7,2 s) o el pre-roll en el reel | en el reel no hay pre-roll: `glitch-apertura-reel.mov` y `glitch-intro-reel.wav` (4,0 s), los dos en 0 |
 | Se oye la cama bajo el cierre del host o bajo el Drop | la pista de la cama sigue después de que termina el relato de la noticia | córtala con la cortina, el Drop o la tarjeta final; fuera de las noticias la voz del host va sola |
 | La cama no suena igual en el animatic que en tu edición | el animatic no tiene voz: ahí la cama va fija a −13 dB, sin ducking | el animatic es sólo guía: en tu edición aplica el nivel y el ducking de [6.1](#61--montar-la-música) con la voz real |
 
@@ -315,8 +321,9 @@ OneDrive del motion. No tienes que descargar nada aparte:
 
 | Archivo | Carpeta | Qué es |
 |---|---|---|
-| `glitch-preroll-reel.mov` · `glitch-preroll-vlog.mov` (3,2 s) | `v2/` | el **pre-roll** de la intro: video opaco (fondo navy) con los tres puntos, que va **antes** de la apertura |
-| `glitch-intro-reel.wav` · `glitch-intro-vlog.wav` (7,2 s) | `v2/` | la intro: la banda del pre-roll y, a continuación, la apertura con la banda (**ya trae montado** el sonido de la apertura) |
+| `glitch-preroll-vlog.mov` (3,2 s) | `v2/` | el **pre-roll** de la intro del vlog: video opaco (fondo navy) con los tres puntos, que va **antes** de la apertura. **El reel no lleva pre-roll** (el del reel quedó en `v2/descartado/`) |
+| `glitch-intro-vlog.wav` (7,2 s) | `v2/` | la intro del vlog: la banda del pre-roll y, a continuación, la apertura con la banda (**ya trae montado** el sonido de la apertura) |
+| `glitch-intro-reel.wav` (4,0 s) | `v2/` | la intro del reel: la misma intro aprobada desde 3,2 s, sin el pre-roll; dura lo mismo que la apertura y **ya trae montado** su sonido |
 | `glitch-salida-reel.wav` · `glitch-salida-vlog.wav` (3 s) | `v2/` | la salida, con la tarjeta final (**ya trae montado** el sonido del cierre) |
 | `glitch-kit-reel-cortina.wav` · `glitch-kit-vlog-cortina.wav` (2 s) | `kit/reel/` · `kit/vlog/` | la cortina entre noticias; corta en seco en 1,6 s |
 | `glitch-kit-reel-cama.wav` · `glitch-kit-vlog-cama.wav` (19,2 s) | `kit/reel/` · `kit/vlog/` | la cama post-punk que va en bucle bajo cada noticia |
@@ -331,10 +338,10 @@ Todos estos archivos son copias exactas de los másteres aprobados, que también
 sección [Música](https://axis.efeonce.org/references/glitch/#musica), y en el almacenamiento público
 `https://storage.googleapis.com/efeonce-group-axis-public-media/glitch/music/v1/` (carpeta `masters/`). El taller los
 verifica con su huella (sha256) antes de entregarlos y nunca los vuelve a generar. Cada archivo de OneDrive es copia
-byte a byte de un máster: `glitch-intro-reel.wav` y `glitch-intro-vlog.wav` = `glitch-intro-vlog.wav` (el reel usa los
-másteres de vlog), `glitch-salida-reel.wav` y `glitch-salida-vlog.wav` = `glitch-salida-vlog.wav`,
+byte a byte de un máster (el reel usa los másteres de vlog): `glitch-intro-vlog.wav` es el máster del mismo nombre, `glitch-salida-reel.wav` y `glitch-salida-vlog.wav` = `glitch-salida-vlog.wav`,
 `glitch-kit-*-cortina.wav` = `glitch-cortina-vlog.wav` y `glitch-kit-*-cama.wav` = `glitch-cama-bucle.wav`; los de
-podcast conservan su nombre. Por eso su sha256 es el de ese máster. Si alguna vez necesitas bajar uno directo,
+podcast conservan su nombre. Por eso su sha256 es el de ese máster. La excepción es `glitch-intro-reel.wav`: es
+`glitch-intro-vlog.wav` cortado por muestra desde 3,2 s, sin retoque, así que su sha256 no coincide con el del máster. Si alguna vez necesitas bajar uno directo,
 compruébalo tú:
 
 1. **Descarga el archivo** desde su dirección, por ejemplo
@@ -346,14 +353,17 @@ compruébalo tú:
 
 **Montaje:**
 
-1. **Intro con su pre-roll (video):** al comienzo de la secuencia, en la pista de video de arriba, pon primero
-   `glitch-preroll-*.mov` (3,2 s, 96 cuadros) y, **pegada a él**, la apertura (`glitch-apertura-*.mov`), que empieza en
-   el segundo 3,2. En una pista de audio, suelta `glitch-intro-*.wav` **en el mismo cuadro en que empieza el pre-roll**:
+1. **Intro del vlog, con su pre-roll (video):** al comienzo de la secuencia, en la pista de video de arriba, pon primero
+   `glitch-preroll-vlog.mov` (3,2 s, 96 cuadros) y, **pegada a él**, la apertura (`glitch-apertura-vlog.mov`), que empieza en
+   el segundo 3,2. En una pista de audio, suelta `glitch-intro-vlog.wav` **en el mismo cuadro en que empieza el pre-roll**:
    dura 7,2 s, lo mismo que el pre-roll más la apertura. En el pre-roll los tres puntos aparecen, laten uno tras otro
    al ritmo de las tres notas del bajo, se juntan en el tiempo fuerte y el tercero tartamudea en el último tiempo;
    luego la apertura sigue como siempre, con la banda entrando en el quiebre (f24) y la manzana (f48) como golpe
    fuerte. El último cuadro del pre-roll es igual al primero de la apertura: **no recortes ninguno de los dos**, así
    el paso no se nota. **No sumes `apertura.wav`.**
+   **Intro del reel, sin pre-roll:** pon `glitch-apertura-reel.mov` en 0 y `glitch-intro-reel.wav` en 0, junto a ella
+   (4,0 s, lo mismo que la apertura). Así el reel queda en bucle exacto con la tarjeta final y `glitch-salida-reel.wav`.
+   **No sumes `apertura.wav`.**
 2. **Intro (podcast):** el podcast no lleva video; `glitch-intro-podcast.wav` va al comienzo del episodio y su banda
    dura más (9,6 s) antes de que suene la apertura.
 3. **Cortina entre noticias:** empieza **1,6 s antes** de que entre la cabecera «NOTICIA n/3» siguiente, para que su
@@ -426,7 +436,7 @@ bytes entre piezas y entre escenas. Siguen pendientes de decisión: la cadencia 
 los editores en Premiere y After Effects en una edición real, el ritmo ajustable, dónde se usa la transición de bytes
 (se recomienda sólo en tarjetas y Drop), el estilo de subtítulos, los textos reales de la #17 y cualquier excepción de
 rostros (por defecto, la falla nunca va sobre una cara). El sonido ya está decidido: **versión B aprobada** (2026-09-27); la música también (tema B y cama post-punk, 2026-09-27),
-con el pre-roll de la intro que eligió el operador. De la música sólo falta probar la mezcla con la voz real del host.
+con el pre-roll de la intro que eligió el operador (sólo en el vlog: el reel abre directo con la apertura). De la música sólo falta probar la mezcla con la voz real del host.
 
 ## Qué no hacer
 
@@ -467,7 +477,7 @@ con el pre-roll de la intro que eligió el operador. De la música sólo falta p
 | El reel da un salto al repetirse | se recortó el último cuadro de la tarjeta final o el primero de la apertura | deja ambas piezas completas: el último cuadro de la tarjeta es igual al primero de la apertura |
 | Un texto está mal escrito o dice `[…]` | es un texto de ejemplo o un error en el archivo de edición | pide la corrección; no lo arregles encima del video |
 | No hay `fuente-N` para una noticia | esa noticia no trae imagen | es lo esperado: esa noticia va sin plano dividido |
-| Se ve un fondo navy (no transparente) al comienzo del video | es el pre-roll de la intro: es opaco a propósito | déjalo; va antes de la apertura, no encima de una toma |
+| Se ve un fondo navy (no transparente) al comienzo del video | en el vlog, es el pre-roll de la intro: es opaco a propósito; en el reel no debería estar | vlog: déjalo, va antes de la apertura. Reel: quítalo, el reel abre directo con la apertura |
 | El kit de la carpeta no coincide con los textos de tu edición | la entrega es de otra edición o del ejemplo | pide la entrega de tu edición; el nombre de la corrida está en el manifiesto del taller |
 
 ## Referencias técnicas

@@ -1,9 +1,10 @@
 # Línea gráfica de Glitch — sub-línea de La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.8: qué recibe el equipo en cada edición, el sonido se toma junto a
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.9: el reel abre directo con la apertura, sin los segundos de
+> banda previos; el pre-roll queda sólo en el video 16:9; v1.8: qué recibe el equipo en cada edición, el sonido se toma junto a
 > cada gráfico y qué falta para producir en el día a día; manual nuevo para quien corre el taller; v1.7: la música de Glitch ya está publicada en AXIS y el taller la
 > entrega junto a cada pieza, con el pre-roll de los tres puntos; se suma el porqué de cada decisión y la regla de la
 > música de fondo fuera de las noticias; v1.6: la música de Glitch quedó aprobada, con música de fondo bajo
@@ -211,7 +212,10 @@ que cada golpe del video cae a tiempo con la música. Son cuatro piezas:
   vuelve a entrar cuando se rompe el tercer punto, con la manzana como el golpe más fuerte. Mientras suena esa banda,
   en pantalla va el **pre-roll**: los tres puntos aparecen, laten uno tras otro al ritmo de las tres notas, se juntan
   en el tiempo fuerte y el tercero tartamudea en el último tiempo. Su último cuadro es igual al primero de la
-  apertura, así que el paso no se nota. Lo eligió el operador.
+  apertura, así que el paso no se nota. Lo eligió el operador. Esto vale para el **video 16:9**; el **reel abre
+  directo con la apertura**, sin esos segundos previos, porque en un reel el primer segundo manda y así el reel se
+  repite en bucle sin salto (decisión del operador, 2026-09-27). Su intro es la misma, sólo que empieza con la
+  apertura.
 - **Cortina:** un compás corto entre noticia y noticia, que se corta en seco cuando entra la siguiente noticia.
 - **Salida:** acompaña la tarjeta final y se corta con ella.
 - **Música de fondo bajo la noticia:** el operador la pidió porque, con voz sola, «el oyente se va a aburrir». Es un
@@ -246,7 +250,7 @@ Hay versión para video y redes y versión para podcast. Los archivos aprobados 
 público de Efeonce con una huella para comprobar que no cambiaron, y ya están publicados en la página de Glitch del
 sistema de diseño AXIS, sección de música
 ([axis.efeonce.org/references/glitch/#musica](https://axis.efeonce.org/references/glitch/#musica)). El taller de
-gráficos animados **ya entrega la música junto a cada pieza** (la intro con su pre-roll, la cortina, la salida y la
+gráficos animados **ya entrega la música junto a cada pieza** (la intro —en el video 16:9, con su pre-roll—, la cortina, la salida y la
 música de fondo), tomando siempre esos mismos archivos aprobados. **Lo único pendiente** es probar la mezcla con la voz
 real del host en una edición real: la demostración usa una voz provisional, y la música de fondo la baja el editor
 cuando habla el host, con los valores del manual.

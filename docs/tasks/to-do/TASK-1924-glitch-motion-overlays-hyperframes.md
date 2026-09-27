@@ -1,5 +1,22 @@
 # TASK-1924 — Glitch en movimiento con HyperFrames
 
+## Delta 2026-09-27 — el reel abre directo con la apertura (pre-roll sólo en el vlog)
+
+- **Decisión del operador** (2026-09-27; aceptó la recomendación de Claude): el **vlog 16:9** abre con pre-roll +
+  apertura (intro de 7,2 s), sin cambios; el **reel abre directo con la apertura, sin pre-roll**, porque en un reel el
+  primer segundo manda y así el bucle queda exacto (la tarjeta final termina en el primer cuadro de la apertura). El
+  podcast no cambia. Cierra el pendiente «Reel en bucle y pre-roll» de la
+  [norma §11](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#11-pendientes-de-decisión-del-operador).
+- **Hecho en el taller** (`efeonce-brand-workshop` `1f323ca`, commiteado sin empujar): `TIMING.preroll.formats =
+  ['vlog']` + `prerollFor(format)`; `introWithoutPreroll()` y `peakDb()` en `src/music.mjs`; `glitch-intro-reel.wav` =
+  la intro aprobada desde 3,2 s (corte por muestra, sin retocar el máster; ahí está en silencio, −90 dBFS), dura 4,0 s
+  como la apertura; verificaciones nuevas «intro reel: el corte del pre-roll cae en silencio» y «bucle de audio reel: el
+  final de la salida cae en silencio» (−55 dBFS); animatic del reel 45,2 s y del vlog 48,4 s; script `deliver`
+  (re-entrega desde el manifiesto sin verificar ni renderizar; `--run`, `--deliver`).
+- **Verificado:** v2 37/37 · kit 95/95 · **13/13 pruebas** (nueva: «pre-roll sólo en el vlog»). OneDrive:
+  `glitch-preroll-reel.mov` pasó a `v2/descartado/` con un LEEME; `vista-previa_reel_intro.mp4` es sólo la apertura con
+  su intro y la vista previa del bucle del reel ya lleva la música. El Lifecycle no cambia.
+
 ## Delta 2026-09-27 (cierre del día) — motion, sonido, música y pre-roll en el taller
 
 - **Hecho y verificado** (taller `efeonce-brand-workshop`, `main` = `ed89a0b`, empujado): motion **aprobado**; sonido
@@ -139,7 +156,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
   > de producción que crea el Slice 8 (`docs/operations/brand-graphic-line/glitch/GLITCH_MOTION_OVERLAYS_V1.md`).
 - Backend impact: `none`
 - Epic: `EPIC-031`
-- Status real: `2026-09-27: motion, sonido (B) y música APROBADOS e integrados en el repo taller efeonce-brand-workshop, tools/glitch-motion (main = ed89a0b, empujado): apertura/tarjeta final v2, pre-roll de la intro (los tres puntos al ritmo), kit de overlays reel y vlog, lower third con la órbita real, transiciones de bytes (piezas y escenas); cada render entrega el WAV B junto a cada .mov y la música desde los másteres por URL + sha256 (2d411b8, 2c8f36c); verificado v2 37/37, kit 95/95, 12/12 pruebas. Falta: prueba de los editores con la voz del host (y el ducking), decisiones del operador (fps, bytes, subtítulos, ritmo, rostros), textos reales de la #17, reconciliar con TASK-1922 (glitchLine.motion) y TASK-1923 (manifiesto), entrega.json, PR con CI del taller y archivo en GCS`
+- Status real: `2026-09-27: motion, sonido (B) y música APROBADOS e integrados en el repo taller efeonce-brand-workshop, tools/glitch-motion (main = ed89a0b, empujado): apertura/tarjeta final v2, pre-roll de la intro (los tres puntos al ritmo), kit de overlays reel y vlog, lower third con la órbita real, transiciones de bytes (piezas y escenas); cada render entrega el WAV B junto a cada .mov y la música desde los másteres por URL + sha256 (2d411b8, 2c8f36c); verificado v2 37/37, kit 95/95, 12/12 pruebas. Actualización 2026-09-27: el reel abre directo con la apertura y el pre-roll queda sólo en el vlog (decisión del operador; taller 1f323ca sin empujar: intro del reel de 4,0 s, script deliver, verificado v2 37/37, kit 95/95, 13/13 pruebas). Falta: prueba de los editores con la voz del host (y el ducking), decisiones del operador (fps, bytes, subtítulos, ritmo, rostros), textos reales de la #17, reconciliar con TASK-1922 (glitchLine.motion) y TASK-1923 (manifiesto), entrega.json, PR con CI del taller y archivo en GCS`
 - Rank: `TBD`
 - Domain: `creative|brand`
 - Blocked by: `TASK-1922, TASK-1923, CI mínimo del taller de TASK-1925 antes de integrar código a su main` (la aprobación del operador del kit de overlays y de las tarjetas finales, gate del Slice 2, quedó dada el 2026-09-27)
@@ -866,9 +883,11 @@ Todos los comandos se corren desde `greenhouse-eo`, con el taller clonado como h
       primero de la apertura (criterio agregado el 2026-09-27).
       > 2026-09-27: «los tres puntos al ritmo» (elección del operador); `glitch-preroll-{reel,vlog}.mov`, 96 cuadros,
       > opaco, empalme PSNR ∞; incluido en la verificación v2 37/37.
+      > 2026-09-27 (después): el operador decidió que el reel abre directo con la apertura; el pre-roll queda sólo en el
+      > vlog (`1f323ca`; el del reel pasó a `v2/descartado/`) y la intro del reel dura 4,0 s.
 - [x] Las pruebas del paquete (`pnpm -C ../efeonce-brand-workshop --filter glitch-motion test`) pasan en verde.
       > 2026-09-27: 12/12 (timelines registradas, determinismo, sin red, datos de edición, pre-roll, huellas de la
-      > música y sonido completo y determinista).
+      > música y sonido completo y determinista). Desde `1f323ca`: 13/13 (suma «pre-roll sólo en el vlog»).
 - [ ] `pnpm -C ../efeonce-brand-workshop --filter glitch-motion verify` sale con código 0 sobre la entrega del fixture y
       con código distinto de 0 si se corrompe el alfa, la duración o una zona, o si `entrega.json` contiene una ruta
       absoluta.
@@ -891,7 +910,7 @@ Todos los comandos se corren desde `greenhouse-eo`, con el taller clonado como h
 >   lista binarios, pero no hubo PR ni CI del taller.
 > - Valores desde tokens, prueba «sin literales» y clave faltante: no existe `glitchLine`; la paleta y la manzana son
 >   propuesta espejada del AXIS Lab.
-> - Determinismo: el render es determinista y existe una prueba de determinismo entre las 12 del paquete. Hoy: 12/12 en
+> - Determinismo: el render es determinista y existe una prueba de determinismo entre las 13 del paquete. Hoy: 13/13 en
 >   verde (2026-09-27); la prueba es estática (sin azar, reloj ni red) y falta la comparación
 >   cuadro a cuadro entre dos renders.
 > - Apertura y tarjeta final: existen en reel y vlog con bucle exacto (PSNR ∞), pero no hay `entrega.json` con el
