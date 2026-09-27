@@ -1,5 +1,21 @@
 # TASK-1928 — Plantillas del deck «La órbita» para las 38 recetas aprobadas que aún no tienen
 
+## Delta 2026-09-27 — lo que TASK-1927 ya dejó hecho
+
+- Las **17 portadas y contraportadas** aprobadas que el contrato admite ya tienen plantilla en `graphic-line-deck`
+  (`cover-brochure`, `cover-proposal` orbit/dawn, `close-brochure` orbit/photo, `close-proposal`), igual que
+  `proposal-cinematic` hero y lines, las tres composiciones de `section-split` y el tríptico de una palabra por toma.
+  Esta task queda sólo con las recetas interiores.
+- Queda fuera de las dos tasks `cover-brochure-cine-lines-selection`: el contrato de AXIS no admite selección en
+  `cover-brochure`. Necesita una decisión en AXIS antes de tener plantilla.
+- Patrones que esta task puede reutilizar, ya probados: una plantilla por composición con `contentType`
+  `deck.<receta>.<layout>` (sin ramas dentro de una plantilla aprobada); varias composiciones sobre un mismo HTML con un
+  contrato de slots por composición (`section-split`); plantillas sin respaldo en CSS, con cada medida como custom
+  property obligatoria; resolvers `gl-color`, `gl-slogan-run`, `gl-backdrop-ref`, `gl-file-ref` y `gl-split-layout`;
+  builders del marco en `src/lib/brand-surfaces/recipes/frame.ts`.
+- Lección de TASK-1927: antes de escribir una plantilla, confirmar que AXIS mide TODO lo que la lámina pinta. Lo que
+  sólo existía en el script aprobado se tokenizó en AXIS (`v0.3.13`, `v0.3.14`) antes de componer.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

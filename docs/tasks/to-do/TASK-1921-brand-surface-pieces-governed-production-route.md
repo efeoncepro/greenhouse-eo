@@ -1,5 +1,22 @@
 # TASK-1921 — Ruta productiva de las piezas de marca por superficie (Full API Parity)
 
+## Delta 2026-09-27 (c) — documento multipágina y contrato 0.1.2 (cerrado por TASK-1927)
+
+- El command de esta task debe aceptar también el **intent de documento** (un intent con `pages`: brochure o
+  propuesta). La función pura ya existe: `planSurfaceDocument(intent, { artifactId })` en
+  `src/lib/brand-surfaces/document.ts`. Valida con `resolveSurfaceDocument` de AXIS, devuelve
+  `{ catalog, use, plan, assets, manifest }` (una lámina por página y la unión de assets) y, ante un solo issue, no
+  devuelve plan. `planFromManifest` es el paso compartido entre pieza y documento.
+- El contrato vigente es `efeonce.surface-composition` **0.1.2** (`axis-tokens` 0.3.14, `axis-ui-contracts` 0.3.12, tag
+  `v0.3.14`). El plan de una pieza devuelve además `use` y `layout`.
+- `SurfaceAssetRequest` tiene un tercer tipo, `file` (el logo de un cliente, SVG o PNG): el consumer del
+  `artifact-worker` debe materializarlo como hace `materializeAssets` del CLI. En producción ese archivo viene de
+  Account 360 (TASK-1930), no de una ruta del repo.
+- El CLI ya escribe la procedencia de pieza y de documento (`efeonce.brand-surface-document.provenance.v1`, con sha del
+  intent, de cada plate y de cada archivo). Lo que sigue siendo de esta task es el asset store y la ruta gobernada.
+- El catálogo `graphic-line-deck` pasó de 6 a 16 plantillas (32 frames en el scope `graphic-line` del gate); la
+  contraportada de brochure sin foto usa el hook de CTA (`makeCtaHook`), así que el consumer necesita los DOS pintores.
+
 ## Delta 2026-09-27 (b) — recetas del deck al flujo de producto
 
 - Nacen TASK-1928…TASK-1932. Lo que esta task recibe de ellas: plantillas nuevas de `graphic-line-deck` (TASK-1928,
