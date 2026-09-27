@@ -81,6 +81,12 @@ de marca que no son del dominio comercial (`graphic-line-stills`, y las recetas 
 más ahí: una receta nueva de ese tipo nace en AXIS; su composición se resuelve en el taller o en el motor
 extraído. **No se agrega un catálogo de publicidad en Greenhouse.**
 
+> **Delta 2026-09-27 — extender `foto:*` antes de la migración está permitido** (decisión del operador). Mientras
+> TASK-1925 no migre el pipeline, una capacidad nueva de fotografía se construye **extendiendo los comandos `foto:*`
+> en Greenhouse** (caso: TASK-1926, registro cine y `foto:cine`) y se muda con el resto. Construirla en el taller
+> partiría el pipeline en dos. Lo que no cambia: nada de catálogos de publicidad en el Artifact Composer ni
+> compositores nuevos.
+
 ## 4. Reglas duras
 
 - **NUNCA** un binario en el repo del taller; **NUNCA** una ruta absoluta de una máquina en un archivo versionado.

@@ -6,6 +6,11 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+
+## Delta 2026-09-27
+
+- TASK-1926 agrega al pipeline `foto:*` el registro cine y `pnpm foto:cine` (con sus módulos); se migran con el resto en esta task.
+
 ## Status
 
 - Lifecycle: `to-do`
