@@ -40,9 +40,9 @@ export const greenhouseSelectionPainter: GraphicLineSelectionPainter = request =
   const manifest = resolveCollaborationSelectionIntent({
     targetId: 'answer',
     targetKind: request.targetKind,
-    variant: 'eight-handles',
-    padding: 'standard',
-    overlay: request.targetKind === 'text' ? 'subtle' : 'none',
+    variant: request.variant ?? 'eight-handles',
+    padding: request.padding ?? 'standard',
+    overlay: request.overlay ?? (request.targetKind === 'text' ? 'subtle' : 'none'),
     cursors: [
       {
         id: 'collaborator',

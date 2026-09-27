@@ -1,0 +1,14 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.0",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "section",
+  "recipe": "section-classic",
+  "line": "growth",
+  "theme": "light",
+  "progress": { "sections": 5, "current": 2 },
+  "unmodeled": {
+    "voice": { "question": "¿Quién decide el corte?", "answer": ["El dato"] }
+  }
+}

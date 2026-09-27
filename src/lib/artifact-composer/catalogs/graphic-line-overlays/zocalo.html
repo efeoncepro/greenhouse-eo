@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · zócalo</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `zocalo` (audiovisual, papel lower-third). Generador de caracteres en la voz de la línea: el lugar y
+      la hora con el anillo, el rol con la esfera, en la reserva inferior del plano. El grupo entero es el objetivo
+      de la selección: los corchetes y el cursor del rol lo «firman». Capa transparente; entra en 0,4 s.
+      Referencia aprobada: «Escenas con texto · 02 generador de caracteres (zócalo)».
+    -->
+    <main class="gl-layer gl-zocalo" data-gl-root data-slot="frame">
+      <div class="gl-lower-third" data-slot="voice" data-gl-selection-target>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">Terreno · panadería del cliente, 06:40</span></p>
+        <p class="gl-answer"><span data-slot-field="answer">Producción</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+    </main>
+  </body>
+</html>

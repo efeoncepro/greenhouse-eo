@@ -1,0 +1,16 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.0",
+  "surface": "audiovisual",
+  "format": "16x9",
+  "role": "subtitles",
+  "recipe": "subtitles",
+  "line": "growth",
+  "theme": "dark",
+  "subtitles": {
+    "lines": [
+      "«Ya no discutimos el gusto:",
+      "vemos qué corte vende.»"
+    ]
+  }
+}

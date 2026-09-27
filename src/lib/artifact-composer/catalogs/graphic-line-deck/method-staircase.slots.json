@@ -1,0 +1,270 @@
+{
+  "template": "MethodStaircase",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "engine"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 110
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 200
+        },
+        "answerTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerTop",
+          "example": 270
+        },
+        "answerPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerPx",
+          "example": 140
+        },
+        "bodyTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyTop",
+          "example": 590
+        },
+        "bodyPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyPx",
+          "example": 25
+        },
+        "bodyWidth": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyWidth",
+          "example": 500
+        },
+        "stairX0": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-stair-x0=760px"
+        },
+        "stairDx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-stair-dx=70px"
+        },
+        "stairY0": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-stair-y0=798px"
+        },
+        "stairDy": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-stair-dy=132px"
+        },
+        "slabHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-slab-height=124px"
+        },
+        "levelNamePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-level-name-px=76px"
+        },
+        "levelTopNamePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-level-top-name-px=86px"
+        },
+        "levelNumberPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-level-number-px=30px"
+        },
+        "levelDescriptorPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-level-descriptor-px=23px"
+        },
+        "notePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-note-px=17px"
+        },
+        "noteTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-note-top=930px"
+        },
+        "columnWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-column-width=740px"
+        }
+      }
+    },
+    "levels": {
+      "selector": "[data-slot='levels']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 5,
+        "maxItems": 5,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "name": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 16
+          },
+          "descriptor": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 28
+          }
+        }
+      }
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "eyebrow": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 40
+        },
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 30
+        },
+        "answerLead": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 10
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 10,
+          "resolver": "gl-answer",
+          "example": "por capa"
+        }
+      }
+    },
+    "body": {
+      "selector": "[data-slot='body']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 120,
+        "maxLines": 4,
+        "overflow": "reject"
+      }
+    },
+    "note": {
+      "selector": "[data-slot='note']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 70,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "selection": {
+      "selector": "[data-slot='selection']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "level": {
+          "type": "number",
+          "required": true,
+          "consumer": "validation-only"
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "consumer": "validation-only"
+        },
+        "anchor": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "consumer": "validation-only"
+        },
+        "participantKind": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "consumer": "validation-only"
+        },
+        "scale": {
+          "type": "number",
+          "required": false,
+          "consumer": "validation-only"
+        },
+        "targetKind": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only"
+        },
+        "overlay": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only"
+        }
+      }
+    },
+    "urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/url-bubble-baked-dark.svg"
+    }
+  }
+}

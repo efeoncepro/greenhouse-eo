@@ -1,0 +1,16 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.0",
+  "surface": "audiovisual",
+  "format": "16x9",
+  "role": "data-super",
+  "recipe": "data-super",
+  "line": "growth",
+  "theme": "dark",
+  "measure": {
+    "value": 0.62,
+    "label": "62%",
+    "source": "Maqueta de dirección «Cómo trabajamos» (2026-09-26): cifra ilustrativa, reemplazar por la medida real del cliente antes de publicar"
+  },
+  "body": "de los cortes se aprueban a la primera"
+}

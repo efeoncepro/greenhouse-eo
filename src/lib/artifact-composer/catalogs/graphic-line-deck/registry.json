@@ -3,7 +3,14 @@
   "status": "candidate",
   "note": "Recetas APROBADAS de la superficie deck de «La órbita» (contrato efeonce.surface-composition 0.1.0 de AXIS). Una receta en opción o pendiente no tiene plantilla hasta que el operador la aprueba. El contentType es `<surface>.<recipe>`: lo deriva src/lib/brand-surfaces del manifest, nunca el autor.",
   "canvas": { "width": 1920, "height": 1080 },
-  "contentTypeTaxonomy": ["deck.proposal-cinematic"],
+  "contentTypeTaxonomy": [
+    "deck.proposal-cinematic",
+    "deck.section-classic",
+    "deck.section-split",
+    "deck.content-measure",
+    "deck.triptych",
+    "deck.method-staircase"
+  ],
   "templates": [
     {
       "name": "ProposalCinematic",
@@ -15,7 +22,71 @@
       "contentTypes": ["deck.proposal-cinematic"],
       "prototype": "proposal-cinematic.html",
       "slotsRef": "proposal-cinematic.slots.json"
+    },
+    {
+      "name": "SectionClassic",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.section-classic"],
+      "prototype": "section-classic.html",
+      "slotsRef": "section-classic.slots.json"
+    },
+    {
+      "name": "SectionSplit",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.section-split"],
+      "prototype": "section-split.html",
+      "slotsRef": "section-split.slots.json"
+    },
+    {
+      "name": "ContentMeasure",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-measure"],
+      "prototype": "content-measure.html",
+      "slotsRef": "content-measure.slots.json"
+    },
+    {
+      "name": "Triptych",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.triptych"],
+      "prototype": "triptych.html",
+      "slotsRef": "triptych.slots.json"
+    },
+    {
+      "name": "MethodStaircase",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.method-staircase"],
+      "prototype": "method-staircase.html",
+      "slotsRef": "method-staircase.slots.json"
     }
   ],
-  "selector": { "map": { "deck.proposal-cinematic": "ProposalCinematic" } }
+  "selector": {
+    "map": {
+      "deck.proposal-cinematic": "ProposalCinematic",
+      "deck.section-classic": "SectionClassic",
+      "deck.section-split": "SectionSplit",
+      "deck.content-measure": "ContentMeasure",
+      "deck.triptych": "Triptych",
+      "deck.method-staircase": "MethodStaircase"
+    }
+  }
 }

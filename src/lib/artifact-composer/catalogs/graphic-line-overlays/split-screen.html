@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · pantalla dividida</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `split-screen` (audiovisual, papel split-screen). Dos planos en el mismo cuadro y una frase que los une,
+      una palabra por plano; la esfera cierra la última. La línea divisoria es el acento de la receta.
+      Es la única capa OPACA junto al plan de planos: los dos planos SON la composición (el editor la monta como un
+      cuadro completo, no sobre otra toma), y la frase necesita la zona oscura de cada plano debajo.
+      Referencia aprobada: «Escenas con texto · 05 pantalla dividida».
+    -->
+    <main class="gl-layer gl-split" data-gl-root data-slot="frame">
+      <figure class="gl-panel gl-panel-start" data-slot="start">
+        <img data-slot-field="src" alt="" />
+        <p class="gl-answer" data-slot-field="word">Escucha</p>
+      </figure>
+
+      <figure class="gl-panel gl-panel-end" data-slot="end">
+        <img data-slot-field="src" alt="" />
+        <p class="gl-answer"><span data-slot-field="word">mide</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </figure>
+
+      <div class="gl-divider" aria-hidden="true"></div>
+    </main>
+  </body>
+</html>

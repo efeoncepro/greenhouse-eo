@@ -1,0 +1,27 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.0",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "content",
+  "recipe": "triptych",
+  "line": "growth",
+  "theme": "dark",
+  "voice": { "question": "¿Cómo trabajamos?", "answer": ["Escucha,", "crea", "y mide"] },
+  "unmodeled": {
+    "panels": [
+      {
+        "plateRef": "ai-generations/2026-09-26_deck-triptico-v2/plates/T1-escucha.png",
+        "alt": "Una estratega de Efeonce toma notas mientras un panadero le explica su oficio frente al horno"
+      },
+      {
+        "plateRef": "ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png",
+        "alt": "Un creativo con el hoodie de Efeonce fija pruebas de fotografía en una pared del estudio"
+      },
+      {
+        "plateRef": "ai-generations/2026-09-26_deck-triptico-v2/plates/T3-mide.png",
+        "alt": "Una consultora de Efeonce señala una curva de resultados en la pantalla de la sala del cliente"
+      }
+    ]
+  }
+}

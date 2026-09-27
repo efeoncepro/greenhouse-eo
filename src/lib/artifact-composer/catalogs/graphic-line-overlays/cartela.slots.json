@@ -1,0 +1,177 @@
+{
+  "template": "Cartela",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "render": {
+    "background": "transparent"
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "growth"
+        },
+        "voiceLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-voice-left=150px"
+        },
+        "voiceTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-voice-top=196px"
+        },
+        "answerLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-answer-left=128px"
+        },
+        "answerTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-answer-top=318px"
+        },
+        "questionPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-question-px=52px"
+        },
+        "answerPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-answer-px=400px"
+        },
+        "answerTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-answer-tracking=-0.06em"
+        },
+        "ringCx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ring-cx=1420px"
+        },
+        "ringCy": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ring-cy=520px"
+        },
+        "ringR": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-ring-r=380px"
+        },
+        "chapterWordPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-chapter-word-px=96px"
+        },
+        "chapterLabelPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-chapter-label-px=34px"
+        }
+      }
+    },
+    "orbit": {
+      "selector": "[data-slot='orbit']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
+      }
+    },
+    "chapter": {
+      "selector": "[data-slot='chapter']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "title": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 14
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24
+        }
+      }
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 6,
+          "resolver": "gl-answer",
+          "example": "Así"
+        }
+      }
+    },
+    "selection": {
+      "selector": "[data-slot='selection']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "consumer": "validation-only"
+        },
+        "anchor": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "consumer": "validation-only"
+        },
+        "participantKind": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "consumer": "validation-only"
+        },
+        "scale": {
+          "type": "number",
+          "required": false,
+          "consumer": "validation-only"
+        }
+      }
+    }
+  }
+}

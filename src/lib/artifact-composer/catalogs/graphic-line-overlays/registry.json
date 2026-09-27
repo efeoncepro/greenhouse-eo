@@ -1,9 +1,35 @@
 {
   "version": "0.1",
   "status": "candidate",
-  "note": "Recetas APROBADAS de producción audiovisual de «La órbita» (contrato efeonce.surface-composition 0.1.0 de AXIS): capas con fondo transparente para montar sobre el plano. El contentType es `audiovisual.<recipe>`.",
+  "note": "Recetas APROBADAS de producción audiovisual de «La órbita» (contrato efeonce.surface-composition 0.1.0 de AXIS): capas con fondo transparente para montar sobre el plano, salvo la pantalla dividida (sus dos planos son la composición) y el plan de planos (una hoja). El cierre con el reveal es video y no tiene plantilla. El contentType es `audiovisual.<recipe>`: lo deriva src/lib/brand-surfaces del manifest, nunca el autor.",
   "canvas": { "width": 1920, "height": 1080 },
-  "contentTypeTaxonomy": [],
-  "templates": [],
-  "selector": { "map": {} }
+  "contentTypeTaxonomy": [
+    "audiovisual.cartela",
+    "audiovisual.zocalo",
+    "audiovisual.callout-selection",
+    "audiovisual.data-super",
+    "audiovisual.split-screen",
+    "audiovisual.subtitles",
+    "audiovisual.shot-plan"
+  ],
+  "templates": [
+    { "name": "Cartela", "kind": "overlay", "source": "design", "figmaNode": null, "owner": "claude", "status": "built", "contentTypes": ["audiovisual.cartela"], "prototype": "cartela.html", "slotsRef": "cartela.slots.json" },
+    { "name": "Zocalo", "kind": "overlay", "source": "design", "figmaNode": null, "owner": "claude", "status": "built", "contentTypes": ["audiovisual.zocalo"], "prototype": "zocalo.html", "slotsRef": "zocalo.slots.json" },
+    { "name": "CalloutSelection", "kind": "overlay", "source": "design", "figmaNode": null, "owner": "claude", "status": "built", "contentTypes": ["audiovisual.callout-selection"], "prototype": "callout-selection.html", "slotsRef": "callout-selection.slots.json" },
+    { "name": "DataSuper", "kind": "overlay", "source": "design", "figmaNode": null, "owner": "claude", "status": "built", "contentTypes": ["audiovisual.data-super"], "prototype": "data-super.html", "slotsRef": "data-super.slots.json" },
+    { "name": "SplitScreen", "kind": "full-bleed", "source": "design", "figmaNode": null, "owner": "claude", "status": "built", "contentTypes": ["audiovisual.split-screen"], "prototype": "split-screen.html", "slotsRef": "split-screen.slots.json" },
+    { "name": "Subtitles", "kind": "overlay", "source": "design", "figmaNode": null, "owner": "claude", "status": "built", "contentTypes": ["audiovisual.subtitles"], "prototype": "subtitles.html", "slotsRef": "subtitles.slots.json" },
+    { "name": "ShotPlan", "kind": "sheet", "source": "design", "figmaNode": null, "owner": "claude", "status": "built", "contentTypes": ["audiovisual.shot-plan"], "prototype": "shot-plan.html", "slotsRef": "shot-plan.slots.json" }
+  ],
+  "selector": {
+    "map": {
+      "audiovisual.cartela": "Cartela",
+      "audiovisual.zocalo": "Zocalo",
+      "audiovisual.callout-selection": "CalloutSelection",
+      "audiovisual.data-super": "DataSuper",
+      "audiovisual.split-screen": "SplitScreen",
+      "audiovisual.subtitles": "Subtitles",
+      "audiovisual.shot-plan": "ShotPlan"
+    }
+  }
 }

@@ -24,6 +24,10 @@ export interface GraphicLineSelectionRequest {
   participantKind: 'person' | 'role' | 'department'
   targetKind: 'text' | 'object' | 'group'
   scale: number
+  /** Variante, aire y velo que resolvió AXIS para la receta. Sin ellos, el painter usa los de la selección de texto. */
+  variant?: string
+  padding?: string
+  overlay?: string
 }
 
 export interface GraphicLineSelectionPaint {
@@ -36,6 +40,13 @@ export type GraphicLineSelectionPainter = (request: GraphicLineSelectionRequest)
 
 const ANCHORS = new Set(['top-start', 'top-end', 'bottom-end', 'bottom-start'])
 const KINDS = new Set(['person', 'role', 'department'])
+const TARGET_KINDS = new Set(['text', 'object', 'group'])
+
+const optional = (value: unknown): string | undefined => {
+  const text = String(value ?? '').trim()
+
+  return text ? text : undefined
+}
 
 export class GraphicLineSelectionError extends Error {
   constructor(slideId: string, reason: string) {
@@ -61,18 +72,29 @@ export const makeSelectionHook =
     const label = String(selection.label ?? '').trim()
     const anchor = String(selection.anchor ?? 'top-end')
     const participantKind = String(selection.participantKind ?? 'department')
+    const targetKind = String(selection.targetKind ?? 'text')
 
     if (!label) throw new GraphicLineSelectionError(slide.slideId, 'falta la etiqueta del participante.')
     if (!ANCHORS.has(anchor)) throw new GraphicLineSelectionError(slide.slideId, `ancla "${anchor}" no es de colaborador.`)
     if (!KINDS.has(participantKind)) throw new GraphicLineSelectionError(slide.slideId, `tipo "${participantKind}" desconocido.`)
+    if (!TARGET_KINDS.has(targetKind)) throw new GraphicLineSelectionError(slide.slideId, `objetivo "${targetKind}" desconocido.`)
 
-    const measured = await page.evaluate(() => {
+    const measured = await page.evaluate(kind => {
       const target = document.querySelector('[data-gl-selection-target]')
 
       if (!target) return null
 
-      // Límites intrínsecos del texto (sin el interlineado de la caja): la selección rodea las letras
-      // y la esfera, con el aire proporcional que pone el contrato — no la caja del párrafo.
+      const canvas = { width: document.documentElement.clientWidth, height: document.documentElement.clientHeight }
+
+      // Un objeto o un grupo se seleccionan por su caja: la que la plantilla posicionó desde el plan.
+      if (kind !== 'text') {
+        const box = target.getBoundingClientRect()
+
+        return { bounds: { left: box.left, top: box.top, right: box.right, bottom: box.bottom }, canvas }
+      }
+
+      // Texto: límites intrínsecos de las letras (sin el interlineado de la caja). La selección rodea las
+      // letras y la esfera, con el aire proporcional que pone el contrato — no la caja del párrafo.
       const range = document.createRange()
 
       range.selectNodeContents(target)
@@ -80,14 +102,17 @@ export const makeSelectionHook =
       const r = range.getBoundingClientRect()
       const pad = r.height * 0.16
 
-      return {
-        bounds: { left: r.left, top: r.top + pad, right: r.right, bottom: r.bottom - pad * 0.6 },
-        canvas: { width: document.documentElement.clientWidth, height: document.documentElement.clientHeight }
-      }
-    })
+      return { bounds: { left: r.left, top: r.top + pad, right: r.right, bottom: r.bottom - pad * 0.6 }, canvas }
+    }, targetKind)
 
     if (!measured) {
       throw new GraphicLineSelectionError(slide.slideId, 'la plantilla no marca `[data-gl-selection-target]`.')
+    }
+
+    const { bounds } = measured
+
+    if (bounds.right - bounds.left < 1 || bounds.bottom - bounds.top < 1) {
+      throw new GraphicLineSelectionError(slide.slideId, 'la caja del objetivo mide cero: el plan no la posicionó.')
     }
 
     const paint = painter({
@@ -96,8 +121,11 @@ export const makeSelectionHook =
       label,
       anchor: anchor as GraphicLineSelectionRequest['anchor'],
       participantKind: participantKind as GraphicLineSelectionRequest['participantKind'],
-      targetKind: 'text',
-      scale: Number(selection.scale ?? 1.2)
+      targetKind: targetKind as GraphicLineSelectionRequest['targetKind'],
+      scale: Number(selection.scale ?? 1.2),
+      variant: optional(selection.variant),
+      padding: optional(selection.padding),
+      overlay: optional(selection.overlay)
     })
 
     if (!paint.withinCanvas) {

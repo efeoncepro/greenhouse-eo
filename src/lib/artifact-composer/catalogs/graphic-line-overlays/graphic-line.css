@@ -1,0 +1,412 @@
+/**
+ * Molde de «La órbita» para producción audiovisual (catálogo `graphic-line-overlays`), 1920 × 1080.
+ *
+ * Casi todo son CAPAS: `html`, `body` y la raíz quedan sin fondo, y el PNG sale con alfa para montarlo sobre el
+ * plano en el editor (`render.background: "transparent"` en cada `*.slots.json`). Son opacas sólo las plantillas
+ * que SON el cuadro completo: la pantalla dividida (sus dos planos son parte de la capa) y el plan de planos.
+ *
+ * Todo color, familia y peso de marca sale de `graphic-line-tokens.css` (compilado desde @efeoncepro/axis-tokens
+ * por `pnpm brand:tokens`). Toda medida de la receta llega del manifest de AXIS como custom property (`--gl-*`,
+ * vía el resolver `gl-css` que llena el builder de `src/lib/brand-surfaces/recipes/overlays.ts`). Los valores de
+ * abajo son el RESPALDO: los de la lámina aprobada de referencia, no un default de diseño.
+ */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.gl-layer {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  color: var(--gl-ink-dark);
+  font-family: var(--gl-text-family);
+}
+
+.gl-hidden {
+  display: none;
+}
+
+/* ── Voz: pregunta con su anillo y respuesta con su esfera ──────────────────────────────────────── */
+
+.gl-question {
+  margin: 0;
+  font: var(--gl-question-weight) var(--gl-question-px) / 1.2 var(--gl-question-family);
+  color: var(--gl-soft-dark);
+  white-space: nowrap;
+}
+
+/* El anillo abre la pregunta: la órbita pregunta y la esfera responde. */
+.gl-ring {
+  display: inline-block;
+  width: 0.42em;
+  height: 0.42em;
+  margin-right: 0.35em;
+  border: max(1px, 0.06em) solid var(--gl-accent);
+  border-radius: 50%;
+  box-sizing: border-box;
+  vertical-align: 0.08em;
+}
+
+.gl-answer {
+  margin: 0;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-answer-px);
+  letter-spacing: var(--gl-answer-tracking);
+  color: var(--gl-ink-dark);
+  white-space: nowrap;
+}
+
+/* Una esfera por pieza: cierra la última línea de la respuesta. Nunca es viñeta. */
+.gl-sphere {
+  display: inline-block;
+  width: var(--gl-sphere-diameter);
+  height: var(--gl-sphere-diameter);
+  margin-left: var(--gl-sphere-gap);
+  border-radius: 50%;
+  background: var(--gl-accent);
+}
+
+/* ── Capa gráfica pintada por AXIS (arco de progreso, arco de medida) ──────────────────────────── */
+
+.gl-orbit {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+
+.gl-orbit img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── 01 · Cartela de apertura ──────────────────────────────────────────────────────────────────── */
+
+.gl-cartela {
+  --gl-voice-left: 150px;
+  --gl-voice-top: 196px;
+  --gl-answer-left: 128px;
+  --gl-answer-top: 318px;
+  --gl-question-px: 52px;
+  --gl-answer-px: 400px;
+  --gl-answer-tracking: -0.06em;
+  --gl-ring-cx: 1420px;
+  --gl-ring-cy: 520px;
+  --gl-ring-r: 380px;
+  --gl-chapter-word-px: 96px;
+  --gl-chapter-label-px: 34px;
+}
+
+.gl-cartela .gl-question {
+  position: absolute;
+  left: var(--gl-voice-left);
+  top: var(--gl-voice-top);
+}
+
+.gl-cartela .gl-answer {
+  position: absolute;
+  left: var(--gl-answer-left);
+  top: var(--gl-answer-top);
+  z-index: 2;
+  line-height: 0.9;
+}
+
+/* El capítulo vive dentro del anillo que lo mide, centrado en su círculo. */
+.gl-chapter {
+  position: absolute;
+  left: calc(var(--gl-ring-cx) - var(--gl-ring-r));
+  top: calc(var(--gl-ring-cy) - var(--gl-ring-r));
+  width: calc(2 * var(--gl-ring-r));
+  height: calc(2 * var(--gl-ring-r));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.gl-chapter-title {
+  margin: 0;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-chapter-word-px);
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+  color: var(--gl-ink-dark);
+  white-space: nowrap;
+}
+
+.gl-chapter-label {
+  margin: 0;
+  font: var(--gl-question-weight) var(--gl-chapter-label-px) / 1.5 var(--gl-text-family);
+  color: var(--gl-soft-dark);
+  white-space: nowrap;
+}
+
+/* ── 02 · Zócalo (generador de caracteres) ─────────────────────────────────────────────────────── */
+
+.gl-zocalo {
+  --gl-voice-left: 120px;
+  --gl-voice-top: 800px;
+  --gl-question-px: 38px;
+  --gl-answer-px: 128px;
+  --gl-answer-tracking: -0.045em;
+}
+
+/* El grupo entero (contexto + rol) es el objetivo de la selección: los corchetes lo firman juntos. */
+.gl-lower-third {
+  position: absolute;
+  left: var(--gl-voice-left);
+  top: var(--gl-voice-top);
+  z-index: 2;
+}
+
+.gl-lower-third .gl-answer {
+  margin-top: 4px;
+  line-height: 1;
+}
+
+/* ── 03 · Llamada con selección sobre un objeto del plano ──────────────────────────────────────── */
+
+.gl-callout {
+  --gl-target-left: 720px;
+  --gl-target-top: 560px;
+  --gl-target-width: 340px;
+  --gl-target-height: 240px;
+}
+
+/* La caja del objeto: invisible, sólo le da a la selección los límites que declaró el intent. */
+.gl-object-target {
+  position: absolute;
+  left: var(--gl-target-left);
+  top: var(--gl-target-top);
+  width: var(--gl-target-width);
+  height: var(--gl-target-height);
+}
+
+/* ── 04 · Super de dato ────────────────────────────────────────────────────────────────────────── */
+
+.gl-data-super {
+  --gl-ring-cx: 300px;
+  --gl-ring-cy: 760px;
+  --gl-ring-r: 150px;
+  --gl-value-px: 88px;
+  --gl-caption-px: 34px;
+  --gl-caption-left: 500px;
+  --gl-caption-width: 420px;
+}
+
+/* La cifra, centrada en el anillo que la mide. */
+.gl-datum-value {
+  position: absolute;
+  left: calc(var(--gl-ring-cx) - var(--gl-ring-r));
+  top: calc(var(--gl-ring-cy) - var(--gl-ring-r));
+  width: calc(2 * var(--gl-ring-r));
+  height: calc(2 * var(--gl-ring-r));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-value-px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--gl-ink-dark);
+  white-space: nowrap;
+}
+
+.gl-datum-caption {
+  position: absolute;
+  left: var(--gl-caption-left);
+  top: var(--gl-ring-cy);
+  width: var(--gl-caption-width);
+  margin: 0;
+  transform: translateY(-50%);
+  font: var(--gl-question-weight) var(--gl-caption-px) / 1.35 var(--gl-text-family);
+  color: var(--gl-ink-dark);
+}
+
+/* ── 05 · Pantalla dividida (opaca: los dos planos son parte de la capa) ───────────────────────── */
+
+.gl-split {
+  --gl-divider-left: 957px;
+  --gl-divider-px: 6px;
+  --gl-word-inset: 110px;
+  --gl-word-top: 860px;
+  --gl-answer-px: 90px;
+  --gl-answer-tracking: -0.04em;
+
+  background: var(--gl-bg-dark);
+}
+
+.gl-panel {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.gl-panel-start {
+  left: 0;
+  width: var(--gl-divider-left);
+}
+
+.gl-panel-end {
+  left: calc(var(--gl-divider-left) + var(--gl-divider-px));
+  right: 0;
+}
+
+.gl-panel img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--gl-focus-x, 50%) 50%;
+}
+
+.gl-panel .gl-answer {
+  position: absolute;
+  left: var(--gl-word-inset);
+  top: var(--gl-word-top);
+  line-height: 1;
+}
+
+/* La línea divisoria es el acento de la receta (token `divider`). */
+.gl-divider {
+  position: absolute;
+  top: 0;
+  left: var(--gl-divider-left);
+  width: var(--gl-divider-px);
+  height: 100%;
+  background: var(--gl-teal);
+}
+
+/* ── 06 · Subtítulos quemados: sin caja, dos líneas como máximo ────────────────────────────────── */
+
+.gl-subtitles-layer {
+  --gl-subtitle-inset: 96px;
+  --gl-subtitle-top: 880px;
+  --gl-subtitle-px: 46px;
+  --gl-subtitle-weight: 600;
+  --gl-subtitle-line-height: 1.3;
+  --gl-subtitle-max-lines: 2;
+  --gl-subtitle-shadow-y: 2px;
+  --gl-subtitle-shadow-blur: 6px;
+  --gl-subtitle-shadow-alpha: 55%;
+}
+
+/*
+ * La caja mide exactamente el máximo de líneas y recorta: una tercera línea no se esconde, hace fallar el render
+ * (`SlideGeometryError`, texto fuera de su caja). La sombra es la del token de AXIS (`type.subtitle.shadow`), que
+ * el builder verifica que sea negra; su opacidad, desplazamiento y desenfoque llegan como medidas.
+ */
+.gl-subtitles {
+  position: absolute;
+  left: var(--gl-subtitle-inset);
+  right: var(--gl-subtitle-inset);
+  top: var(--gl-subtitle-top);
+  max-height: calc(var(--gl-subtitle-max-lines) * var(--gl-subtitle-line-height) * var(--gl-subtitle-px));
+  margin: 0;
+  overflow: hidden;
+  font: var(--gl-subtitle-weight) var(--gl-subtitle-px) / var(--gl-subtitle-line-height) var(--gl-text-family);
+  color: var(--gl-ink-dark);
+  text-align: center;
+  text-shadow: 0 var(--gl-subtitle-shadow-y) var(--gl-subtitle-shadow-blur)
+    color-mix(in srgb, black var(--gl-subtitle-shadow-alpha), transparent);
+}
+
+.gl-subtitle-line {
+  display: block;
+}
+
+/* ── Plan de planos (hoja opaca, papel claro) ──────────────────────────────────────────────────── */
+
+/* La hoja fluye en columna y se centra en el alto del cuadro: título, planos y reglas con aire propio. */
+.gl-sheet {
+  --gl-sheet-margin: 80px;
+  --gl-shot-gap: 40px;
+  --gl-thumb-width: 410px;
+  --gl-thumb-height: 231px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 var(--gl-sheet-margin);
+  box-sizing: border-box;
+  background: var(--gl-bg-paper);
+  color: var(--gl-text-light);
+}
+
+.gl-sheet-title {
+  margin: 0 0 44px;
+  font: 600 34px / 1.25 var(--gl-text-family);
+  color: var(--gl-text-light);
+}
+
+.gl-shots {
+  display: flex;
+  gap: var(--gl-shot-gap);
+  margin: 0 0 64px;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-shot {
+  width: var(--gl-thumb-width);
+}
+
+.gl-shot-frame {
+  display: block;
+  width: var(--gl-thumb-width);
+  height: var(--gl-thumb-height);
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.gl-shot-heading {
+  margin: 20px 0 0;
+  font: 600 24px / 1.3 var(--gl-text-family);
+  color: var(--gl-text-light);
+}
+
+.gl-shot-spec {
+  margin: 8px 0 0;
+  font: var(--gl-question-weight) 19px / 1.5 var(--gl-text-family);
+  color: var(--gl-soft-light);
+}
+
+/* El registro de la escena: bajo 24 px el acento no colorea texto (accent-text-min-size), va en navy. */
+.gl-shot-note {
+  margin: 10px 0 0;
+  font: 600 18px / 1.4 var(--gl-text-family);
+  color: var(--gl-navy);
+}
+
+.gl-rules {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 48px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: gl-rule;
+}
+
+.gl-rule {
+  counter-increment: gl-rule;
+  font: var(--gl-question-weight) 20px / 1.5 var(--gl-text-family);
+  color: var(--gl-soft-light);
+}
+
+.gl-rule::before {
+  content: counter(gl-rule) '. ';
+  font-weight: 600;
+  color: var(--gl-text-light);
+}

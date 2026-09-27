@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · llamada con selección</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `callout-selection` (audiovisual, papel callout). Los controles de selección de AXIS marcan el detalle
+      que importa en el plano y el cursor del rol lo toma. No hay texto propio: la capa es la selección. La caja del
+      objeto la declara el intent en fracciones del lienzo y la plantilla sólo la posiciona (invisible).
+      Referencia aprobada: «Escenas con texto · 03 callout con selección».
+    -->
+    <main class="gl-layer gl-callout" data-gl-root data-slot="frame">
+      <div class="gl-object-target" data-slot="target" data-gl-selection-target data-gl-selection-kind="object"></div>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.0",
+  "surface": "audiovisual",
+  "format": "16x9",
+  "role": "opening-title",
+  "recipe": "cartela",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "question": "¿Cómo trabajamos?",
+    "answer": [
+      "Así"
+    ]
+  },
+  "progress": {
+    "sections": 3,
+    "current": 1
+  },
+  "chapter": {
+    "title": "Escucha"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Dirección de arte",
+    "participantKind": "role"
+  }
+}

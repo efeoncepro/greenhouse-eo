@@ -1,0 +1,28 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.0",
+  "surface": "audiovisual",
+  "format": "16x9",
+  "role": "split-screen",
+  "recipe": "split-screen",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "answer": [
+      "Escucha",
+      "mide"
+    ]
+  },
+  "panels": [
+    {
+      "plateRef": "ai-generations/2026-09-26_audiovisual/plates/V1-terreno.png",
+      "focusX": 0.8333,
+      "alt": "Una productora de Efeonce con gorra y hoodie filma con un estabilizador al panadero mientras saca el pan del horno"
+    },
+    {
+      "plateRef": "ai-generations/2026-09-26_audiovisual/plates/V3-sala.png",
+      "focusX": 0.9375,
+      "alt": "Una estratega de Efeonce con chaqueta señala en la pantalla la curva que sube, frente al equipo del cliente"
+    }
+  ]
+}

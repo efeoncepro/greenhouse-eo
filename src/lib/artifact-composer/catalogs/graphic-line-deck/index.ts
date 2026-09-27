@@ -6,7 +6,8 @@
  * molde, sus presupuestos de slot y el baseline del deck SKY; mezclar ahí el fondo Efeonce, la voz con
  * esfera y las fotos de cine degradaría lo que ese catálogo protege.
  *
- * Sólo tiene plantilla una receta APROBADA por el operador. El contentType es `deck.<receta>` y lo
+ * Sólo tiene plantilla una receta APROBADA por el operador (hoy: proposal-cinematic, section-classic, section-split,
+ * content-measure, triptych y method-staircase). El contentType es `deck.<receta>` y lo
  * deriva `src/lib/brand-surfaces` desde el manifest de AXIS: un autor nunca elige plantilla.
  *
  * La selección colaborativa necesita medir el DOM ya lleno, así que es un layout hook; su pintura la
@@ -27,11 +28,42 @@ export const graphicLineDeckCatalogDir = path.dirname(fileURLToPath(import.meta.
 /** Plantillas que pueden llevar selección colaborativa sobre la respuesta. */
 const TEMPLATES_WITH_SELECTION = ['ProposalCinematic'] as const
 
+/**
+ * En la escalera del método la selección toma un NIVEL (`selection.level`, 1 = el de abajo), no la respuesta. El
+ * nivel es un item del array `levels`, así que la plantilla no puede marcarlo de antemano: este hook marca la fila
+ * de ese nivel como objetivo y delega en el hook canónico de la selección, que la mide y la pinta.
+ */
+const levelSelectionHook =
+  (selectionHook: CatalogLayoutHook): CatalogLayoutHook =>
+  async (page, slide, deckPlan) => {
+    const selection = slide.slots.selection as { level?: unknown } | null | undefined
+
+    if (selection) {
+      const level = Number(selection.level)
+
+      const marked = await page.evaluate(index => {
+        const row = document.querySelectorAll('.gl-ms-level .gl-ms-row')[index]
+
+        if (!row) return false
+
+        row.setAttribute('data-gl-selection-target', '')
+
+        return true
+      }, level - 1)
+
+      if (!marked) throw new Error(`[${slide.slideId}] la selección pide el nivel ${level} y la escalera no lo tiene.`)
+    }
+
+    await selectionHook(page, slide, deckPlan)
+  }
+
 export const createCatalog = (options: GraphicLineCatalogOptions = {}): ArtifactCatalog => {
   const selectionHook = makeSelectionHook(options.selectionPainter)
   const layoutHooks: Record<string, CatalogLayoutHook> = {}
 
   for (const template of TEMPLATES_WITH_SELECTION) layoutHooks[template] = selectionHook
+
+  layoutHooks.MethodStaircase = levelSelectionHook(selectionHook)
 
   return {
     name: 'graphic-line-deck',

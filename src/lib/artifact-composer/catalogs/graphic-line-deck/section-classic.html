@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · sección clásica</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `section-classic` (surface deck, papel section). La sección de siempre, como la pinta
+      `deckSlideHtml('section')` de AXIS: sobre papel, el número DENTRO del anillo que marca en qué sección vamos
+      y «Sección n de N» debajo; la pregunta y la respuesta a la izquierda, sin cruzar el anillo. El anillo y su
+      arco los pinta AXIS (capa `asset-ref:layer:*`). Sin foto ni logo. Referencia: DeckSeccionClasica.
+    -->
+    <main class="gl-slide gl-paper gl-sc" data-gl-root data-slot="frame">
+      <figure class="gl-layer" data-slot="orbit">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div data-slot="progress">
+        <p class="gl-section-number" data-slot-field="number">02</p>
+        <p class="gl-section-label" data-slot-field="label">Sección 2 de 5</p>
+      </div>
+
+      <div class="gl-column" data-slot="voice">
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Quién decide el corte?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead"></span><span data-slot-field="answer">El dato</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+    </main>
+  </body>
+</html>

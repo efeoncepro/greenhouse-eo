@@ -1,0 +1,21 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.0",
+  "surface": "audiovisual",
+  "format": "16x9",
+  "role": "lower-third",
+  "recipe": "zocalo",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "question": "Terreno · panadería del cliente, 06:40",
+    "answer": [
+      "Producción"
+    ]
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Producción",
+    "participantKind": "role"
+  }
+}

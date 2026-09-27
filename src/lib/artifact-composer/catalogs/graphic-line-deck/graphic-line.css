@@ -217,3 +217,549 @@ body {
 .gl-hidden {
   display: none;
 }
+
+/* ══ Secciones, contenido y método (TASK-1919) ═════════════════════════════════════════════════════════
+ *
+ * Todo lo de abajo está acotado a la raíz de su plantilla (`.gl-sc`, `.gl-ss`, `.gl-cm`, `.gl-tr`, `.gl-ms`) o al
+ * papel (`.gl-paper`): ProposalCinematic no hereda nada nuevo. Las medidas llegan del builder
+ * (`src/lib/brand-surfaces/recipes/deck.ts`) como custom properties; los valores aquí son el RESPALDO de la lámina
+ * aprobada de cada receta.
+ */
+
+/* Papel: tinta navy y el acento de la línea sobre claro. El fondo sale del tema `light` de AXIS (paper). */
+.gl-slide.gl-paper {
+  --gl-accent: var(--gl-accent-light);
+
+  background: var(--gl-bg-paper);
+  color: var(--gl-ink-light);
+}
+
+.gl-paper .gl-question {
+  color: var(--gl-text-light);
+}
+
+.gl-paper .gl-answer {
+  color: var(--gl-ink-light);
+}
+
+/* Una capa de la órbita ya pintada por AXIS (SVG transparente a lienzo completo). */
+.gl-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  margin: 0;
+  pointer-events: none;
+}
+
+.gl-layer img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * La columna de la voz RECORTA: si la respuesta no cabe antes de la órbita o del borde del panel, su nodo queda
+ * cortado y el guard de geometría del composer falla cerrado (`SlideGeometryError`). Nunca se amputa copy en silencio.
+ */
+.gl-column {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  width: var(--gl-column-width);
+  height: 100%;
+  overflow: hidden;
+}
+
+/* El anillo chico de la pregunta (secciones partidas, contenido y tríptico). */
+.gl-ring-small .gl-ring {
+  width: 0.42em;
+  height: 0.42em;
+  margin-right: 0.35em;
+  border-width: max(1px, 0.06em);
+  vertical-align: 0.08em;
+}
+
+/*
+ * Número de sección: Bricolage en su peso de lectura. El font pack declara la fuente variable con el peso de la
+ * respuesta; el eje `wght` se fija aparte con el peso que da AXIS (`type.number.weight`).
+ */
+.gl-section-number {
+  position: absolute;
+  margin: 0;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-variation-settings: 'wght' var(--gl-number-wght);
+  font-size: var(--gl-number-px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--gl-ink-light);
+  white-space: nowrap;
+}
+
+.gl-section-label {
+  position: absolute;
+  margin: 0;
+  font: 500 var(--gl-label-px) / 1.4 var(--gl-text-family);
+  color: var(--gl-soft-light);
+  white-space: nowrap;
+}
+
+/* ── section-classic: el número dentro del anillo, la voz a la izquierda (`deckSlideHtml('section')`) ──── */
+
+.gl-slide.gl-sc {
+  --gl-ring-cx: 1420px;
+  --gl-number-top: 430px;
+  --gl-label-top: 640px;
+  --gl-number-px: 190px;
+  --gl-number-wght: 300;
+  --gl-label-px: 24px;
+  --gl-column-width: 1080px;
+  --gl-question-top: 420px;
+  --gl-answer-top: 495px;
+  --gl-answer-px: 120px;
+}
+
+.gl-sc .gl-section-number,
+.gl-sc .gl-section-label {
+  left: calc(var(--gl-ring-cx) - 200px);
+  width: 400px;
+  text-align: center;
+}
+
+.gl-sc .gl-section-number {
+  top: var(--gl-number-top);
+}
+
+.gl-sc .gl-section-label {
+  top: var(--gl-label-top);
+}
+
+.gl-sc .gl-answer,
+.gl-ss .gl-answer {
+  left: var(--gl-margin);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+/* ── section-split: panel de papel con una esquina curva y la foto bajo la curva ─────────────────────────── */
+
+.gl-slide.gl-ss {
+  --gl-number-top: 260px;
+  --gl-label-top: 450px;
+  --gl-number-px: 190px;
+  --gl-number-wght: 300;
+  --gl-label-px: 24px;
+  --gl-panel-width: 960px;
+  --gl-panel-radius: 300px;
+  --gl-photo-left: 660px;
+  --gl-column-width: 820px;
+  --gl-question-top: 600px;
+  --gl-answer-top: 670px;
+  --gl-answer-px: 120px;
+}
+
+.gl-ss .gl-split-photo {
+  position: absolute;
+  left: var(--gl-photo-left);
+  top: 0;
+  right: 0;
+  height: 100%;
+  margin: 0;
+}
+
+.gl-ss .gl-split-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gl-ss .gl-split-panel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  width: var(--gl-panel-width);
+  height: 100%;
+  background: var(--gl-bg-paper);
+  border-top-right-radius: var(--gl-panel-radius);
+}
+
+.gl-ss .gl-section-number {
+  left: var(--gl-margin);
+  top: var(--gl-number-top);
+}
+
+.gl-ss .gl-section-label {
+  left: calc(var(--gl-margin) + 6px);
+  top: var(--gl-label-top);
+}
+
+/* ── content-measure: la órbita de la lente mide la cifra ─────────────────────────────────────────────── */
+
+.gl-slide.gl-cm {
+  --gl-eyebrow-top: 150px;
+  --gl-question-top: 215px;
+  --gl-answer-top: 270px;
+  --gl-answer-px: 300px;
+  --gl-body-top: 590px;
+  --gl-body-px: 26px;
+  --gl-body-width: 560px;
+  --gl-eyebrow-px: 20px;
+  --gl-figure-px: 64px;
+  --gl-note-px: 17px;
+  --gl-lens-cx: 1420px;
+  --gl-lens-cy: 600px;
+  --gl-lens-r: 360px;
+  --gl-lens-grayscale: 1;
+  --gl-lens-contrast: 1.1;
+  --gl-lens-brightness: 0.5;
+  --gl-lens-multiply: 0.8;
+  --gl-column-width: 977px;
+}
+
+/* Fuera del círculo, la foto con el tratamiento de la lente de AXIS; dentro, limpia. */
+.gl-cm .gl-cm-photo,
+.gl-cm .gl-cm-shade,
+.gl-cm .gl-cm-lens {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+
+.gl-cm .gl-cm-photo img,
+.gl-cm .gl-cm-lens img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gl-cm .gl-cm-photo img {
+  filter: grayscale(var(--gl-lens-grayscale)) contrast(var(--gl-lens-contrast)) brightness(var(--gl-lens-brightness));
+}
+
+.gl-cm .gl-cm-shade {
+  background: var(--gl-bg-dark);
+  opacity: var(--gl-lens-multiply);
+  mix-blend-mode: multiply;
+}
+
+.gl-cm .gl-cm-lens {
+  clip-path: circle(var(--gl-lens-r) at var(--gl-lens-cx) var(--gl-lens-cy));
+}
+
+.gl-cm .gl-eyebrow {
+  font-size: var(--gl-eyebrow-px);
+}
+
+.gl-cm .gl-question {
+  color: var(--gl-ink-dark);
+}
+
+.gl-cm .gl-answer {
+  left: calc(var(--gl-margin) - 12px);
+  line-height: 1;
+}
+
+/* La bajada lee en tres líneas como máximo: una cuarta queda recortada y el composer la rechaza. */
+.gl-cm .gl-body {
+  max-height: calc(var(--gl-body-px) * 1.4 * 3);
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+.gl-cm .gl-cm-figures {
+  position: absolute;
+  left: var(--gl-margin);
+  top: 790px;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-cm .gl-cm-figure {
+  width: 300px;
+}
+
+.gl-cm .gl-cm-figure-value {
+  margin: 0;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-figure-px);
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  color: var(--gl-ink-dark);
+  white-space: nowrap;
+}
+
+.gl-cm .gl-cm-figure-label {
+  margin: 4px 0 0;
+  font: 300 21px / 1.35 var(--gl-text-family);
+  color: var(--gl-soft-dark);
+}
+
+.gl-cm .gl-cm-note {
+  position: absolute;
+  left: var(--gl-margin);
+  top: 960px;
+  margin: 0;
+  font: 300 var(--gl-note-px) var(--gl-text-family);
+  color: var(--gl-soft-dark);
+}
+
+/* ── triptych: tres tomas verticales y una frase que las recorre ──────────────────────────────────────── */
+
+.gl-slide.gl-tr {
+  --gl-question-top: 48px;
+  --gl-answer-top: 944px;
+  --gl-answer-px: 108px;
+  --gl-question-inset: 48px;
+  --gl-question-px: 34px;
+  --gl-panel-width: 636px;
+  --gl-gutter: 6px;
+  --gl-word-inset: 42px;
+  --gl-bed-blur: 16px;
+  --gl-bed-mask-solid: 110px;
+  --gl-bed-mask-end: 220px;
+  --gl-bed-shade: 82%;
+  --gl-bed-shade-height: 240px;
+}
+
+.gl-tr .gl-tr-panels {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  gap: var(--gl-gutter);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Cada panel recorta su palabra: una palabra que no cabe en su toma queda cortada y el composer la rechaza. */
+.gl-tr .gl-tr-panel {
+  position: relative;
+  flex: none;
+  width: var(--gl-panel-width);
+  height: 100%;
+  overflow: hidden;
+}
+
+.gl-tr .gl-tr-panel img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: bottom;
+}
+
+.gl-tr .gl-answer {
+  left: var(--gl-word-inset);
+  top: var(--gl-answer-top);
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+/* Una esfera por pieza: sólo la última palabra de la frase la lleva. */
+.gl-tr .gl-tr-panel:not(:last-child) .gl-sphere {
+  display: none;
+}
+
+/* El lecho de la pregunta: la primera toma difuminada, enmascarada hacia abajo, y un velo del fondo Efeonce. */
+.gl-tr .gl-tr-bed {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  width: var(--gl-panel-width);
+  height: 100%;
+  margin: 0;
+  mask-image: linear-gradient(to bottom, var(--gl-bg-dark) 0, var(--gl-bg-dark) var(--gl-bed-mask-solid), transparent var(--gl-bed-mask-end));
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+}
+
+/*
+ * La copia difuminada ocupa la toma completa (mismo recorte que el panel) y la máscara la corta: nada se recorta por
+ * `overflow`, que el guard de geometría leería como copy amputado.
+ */
+.gl-tr .gl-tr-bed img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: bottom;
+  filter: blur(var(--gl-bed-blur));
+}
+
+.gl-tr .gl-tr-shade {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  width: var(--gl-panel-width);
+  height: var(--gl-bed-shade-height);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--gl-bg-dark) var(--gl-bed-shade), transparent) 0,
+    color-mix(in srgb, var(--gl-bg-dark) 55%, transparent) var(--gl-bed-mask-solid),
+    transparent 100%
+  );
+}
+
+.gl-tr .gl-question {
+  left: var(--gl-question-inset);
+  top: var(--gl-question-top);
+  z-index: 2;
+  font-size: var(--gl-question-px);
+  line-height: normal;
+  color: var(--gl-soft-dark);
+}
+
+/* ── method-staircase: peldaños de vidrio que se iluminan y el nivel de llegada sólido en el acento ────── */
+
+.gl-slide.gl-ms {
+  --gl-eyebrow-top: 110px;
+  --gl-question-top: 200px;
+  --gl-answer-top: 270px;
+  --gl-answer-px: 140px;
+  --gl-body-top: 590px;
+  --gl-body-px: 25px;
+  --gl-body-width: 500px;
+  --gl-stair-x0: 760px;
+  --gl-stair-dx: 70px;
+  --gl-stair-y0: 798px;
+  --gl-stair-dy: 132px;
+  --gl-slab-height: 124px;
+  --gl-level-name-px: 76px;
+  --gl-level-top-name-px: 86px;
+  --gl-level-number-px: 30px;
+  --gl-level-descriptor-px: 23px;
+  --gl-note-px: 17px;
+  --gl-note-top: 930px;
+  --gl-column-width: 740px;
+  --gl-number-wght: 300;
+}
+
+.gl-ms .gl-ms-levels {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: gl-level;
+}
+
+/* Peldaño `--i` (0 abajo): sube y se corre a la derecha, y su vidrio se ilumina más a medida que sube. */
+.gl-ms .gl-ms-level {
+  --i: 0;
+
+  position: absolute;
+  left: calc(var(--gl-stair-x0) + var(--i) * var(--gl-stair-dx));
+  top: calc(var(--gl-stair-y0) - var(--i) * var(--gl-stair-dy));
+  right: 0;
+  height: var(--gl-slab-height);
+  box-sizing: border-box;
+  border-radius: 18px 0 0 18px;
+  border-top: 2px solid
+    color-mix(in srgb, color-mix(in srgb, var(--gl-accent), var(--gl-ink-dark) 35%) calc(25% + var(--i) * 15%), transparent);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--gl-accent) calc(10% + var(--i) * 7%), transparent) 0%,
+    color-mix(in srgb, var(--gl-accent) calc(4% + var(--i) * 4%), transparent) 100%
+  );
+  counter-increment: gl-level;
+}
+
+.gl-ms .gl-ms-level:nth-child(2) {
+  --i: 1;
+}
+
+.gl-ms .gl-ms-level:nth-child(3) {
+  --i: 2;
+}
+
+.gl-ms .gl-ms-level:nth-child(4) {
+  --i: 3;
+}
+
+.gl-ms .gl-ms-level:nth-child(5) {
+  --i: 4;
+}
+
+/* El nivel de llegada: sólido en el acento de la línea, con su brillo. */
+.gl-ms .gl-ms-level:last-child {
+  border-top: 0;
+  background: linear-gradient(
+    90deg,
+    var(--gl-accent) 0%,
+    var(--gl-accent) 70%,
+    color-mix(in srgb, var(--gl-accent), var(--gl-ink-dark) 22%) 100%
+  );
+  box-shadow: 0 0 90px color-mix(in srgb, var(--gl-accent) 55%, transparent);
+}
+
+.gl-ms .gl-ms-row {
+  position: absolute;
+  left: 34px;
+  top: 24px;
+  z-index: 2;
+  display: flex;
+  align-items: baseline;
+  gap: 22px;
+  white-space: nowrap;
+}
+
+.gl-ms .gl-ms-number {
+  width: 30px;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-variation-settings: 'wght' var(--gl-number-wght);
+  font-size: var(--gl-level-number-px);
+  color: var(--gl-soft-dark);
+}
+
+.gl-ms .gl-ms-number::before {
+  content: counter(gl-level);
+}
+
+.gl-ms .gl-ms-name {
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-level-name-px);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: var(--gl-ink-dark);
+  opacity: calc(0.62 + var(--i) * 0.1);
+}
+
+.gl-ms .gl-ms-descriptor {
+  font: 300 var(--gl-level-descriptor-px) var(--gl-text-family);
+  color: var(--gl-text-dark);
+}
+
+.gl-ms .gl-ms-level:last-child .gl-ms-number,
+.gl-ms .gl-ms-level:last-child .gl-ms-descriptor {
+  color: var(--gl-ink-dark);
+}
+
+.gl-ms .gl-ms-level:last-child .gl-ms-name {
+  font-size: var(--gl-level-top-name-px);
+  opacity: 1;
+}
+
+.gl-ms .gl-ms-level:last-child .gl-ms-descriptor {
+  font-weight: 500;
+}
+
+.gl-ms .gl-ms-note {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-note-top);
+  width: 520px;
+  margin: 0;
+  font: 400 var(--gl-note-px) / 1.4 var(--gl-text-family);
+  color: var(--gl-soft-dark);
+}
