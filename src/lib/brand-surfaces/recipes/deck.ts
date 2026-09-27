@@ -12,6 +12,7 @@ import { resolveGraphicLineIntent } from '@efeoncepro/axis-ui-contracts'
 import type { RecipeSlots, SurfaceAssetRequest } from '../types'
 
 import { FRAME_BUILDERS } from './frame'
+import { proposalService } from './proposal-service'
 import { SurfacePieceError } from '../types'
 import {
   answerPxWithinRange,
@@ -110,6 +111,9 @@ const proposalCinematicService: RecipeBuilder = ({ intent, manifest, recipe }) =
   assets.push(photo.asset)
 
   const stepItems = steps.map(step => {
+    // AXIS exige el ícono en los pasos de la propuesta cine (`step-glyph-required`); sin él, falla cerrado.
+    if (!step.glyph) throw new SurfacePieceError(`El paso «${step.name}» de la propuesta cine lleva ícono (\`glyph\`).`, 'invalid-intent')
+
     const icon = iconAsset(step.glyph, intent.line, layout.iconPx, step.name)
 
     if (!assets.some(a => a.ref === icon.ref)) assets.push(icon.asset)
@@ -828,6 +832,7 @@ export const methodStaircase: RecipeBuilder = ({ intent, manifest, recipe }) => 
 export const DECK_BUILDERS: Record<string, RecipeBuilder> = {
   ...FRAME_BUILDERS,
   'proposal-cinematic': proposalCinematic,
+  'proposal-service': proposalService,
   'section-classic': sectionClassic,
   'section-split': sectionSplit,
   'content-measure': contentMeasure,

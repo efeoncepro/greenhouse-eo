@@ -2034,6 +2034,448 @@ exports[`planes de los intents de ejemplo > deck-proposal-cinematic-lines-intent
 }
 `;
 
+exports[`planes de los intents de ejemplo > deck-proposal-service-aeo-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 440,
+        "width": 440,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_ooh-caminero-lente/plates/D2-led-medicion.png",
+      "ref": "asset-ref:plate:D2-led-medicion-lens-440x440",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:proposal-service-lens-engine",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><circle cx="1520" cy="330" r="246.4" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3"/><path d="M 1288.46 245.73 A 246.4 246.4 0 0 1 1435.73 98.46" fill="none" stroke="#0375db" stroke-width="6" stroke-linecap="round"/><circle cx="1435.73" cy="98.46" r="12" fill="#0375db"/></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-service",
+  "plan": {
+    "artifactId": "deck-proposal-service-aeo",
+    "slides": [
+      {
+        "contentType": "deck.proposal-service",
+        "slideId": "deck-proposal-service",
+        "slots": {
+          "body": "Vendemos visibilidad, entrando por SEO: que buscadores y motores de respuesta te encuentren, te entiendan y te recomienden.",
+          "footnote": "Sin promesas de ranking: medimos y mostramos el avance.",
+          "frame": {
+            "answerPx": 140,
+            "answerTop": 270,
+            "bodyPx": 26,
+            "bodyTop": 440,
+            "bodyWidth": 900,
+            "cardGutter": "--gl-ps-card-gutter=20px",
+            "cardHeight": "--gl-ps-card-height=270px",
+            "cardPadding": "--gl-ps-card-padding=26px",
+            "cardRadius": "--gl-ps-card-radius=16px",
+            "cardShadowBlur": "--gl-ps-card-shadow-blur=70px",
+            "cardShadowOpacity": "--gl-ps-card-shadow-opacity=40%",
+            "cardShadowY": "--gl-ps-card-shadow-y=30px",
+            "cardStroke": "--gl-ps-card-stroke=1.5px",
+            "cardWidth": "--gl-ps-card-width=395px",
+            "cardsTop": "--gl-ps-cards-top=680px",
+            "descGap": "--gl-ps-desc-gap=12px",
+            "descPx": "--gl-ps-desc-px=19px",
+            "eyebrowTop": 110,
+            "footLeft": "--gl-ps-foot-left=660px",
+            "footPx": "--gl-ps-foot-px=16px",
+            "footTop": "--gl-ps-foot-top=1000px",
+            "kickerPx": "--gl-ps-kicker-px=15px",
+            "lensLeft": "--gl-ps-lens-left=1300px",
+            "lensSize": "--gl-ps-lens-size=440px",
+            "lensTop": "--gl-ps-lens-top=110px",
+            "line": "engine",
+            "margin": 140,
+            "nameGap": "--gl-ps-name-gap=10px",
+            "namePx": "--gl-ps-name-px=38px",
+            "questionTop": 200,
+          },
+          "lens": {
+            "src": "asset-ref:layer:proposal-service-lens-engine",
+          },
+          "photo": {
+            "alt": "Un analista de growth de una cervecería artesanal se inclina sobre el laptop y toca con el dedo la curva que sube en la medición de la primera semana",
+            "src": "asset-ref:plate:D2-led-medicion-lens-440x440",
+          },
+          "selection": {
+            "anchor": "top-end",
+            "label": "Cliente",
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "department",
+            "scale": 1.1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+          },
+          "steps": [
+            {
+              "desc": "Brand Visibility Grader: tu presencia en ChatGPT, Claude, Perplexity, Gemini y Google.",
+              "kicker": "Empieza aquí · sin costo",
+              "name": "Diagnóstico",
+            },
+            {
+              "desc": "Proyecto de precio fijo: base técnica, entidad y contenido.",
+              "kicker": "Proyecto",
+              "name": "Foundation",
+            },
+            {
+              "desc": "Retainer mensual de visibilidad por capacidad declarada.",
+              "kicker": "On-Going",
+              "name": "Operación",
+            },
+            {
+              "desc": "Portal, métricas ICO y medición continua.",
+              "kicker": "Greenhouse",
+              "name": "Plataforma",
+            },
+          ],
+          "voice": {
+            "answer": "Visible",
+            "eyebrow": "Nuestra propuesta · AEO",
+            "question": "¿Te encuentra la IA?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-proposal-service-creative-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 440,
+        "width": 440,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png",
+      "ref": "asset-ref:plate:T2-crea-lens-440x440",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:proposal-service-lens-brand",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><circle cx="1520" cy="330" r="246.4" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3"/><path d="M 1288.46 245.73 A 246.4 246.4 0 0 1 1435.73 98.46" fill="none" stroke="#ff6500" stroke-width="6" stroke-linecap="round"/><circle cx="1435.73" cy="98.46" r="12" fill="#ff6500"/></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-service",
+  "plan": {
+    "artifactId": "deck-proposal-service-creative",
+    "slides": [
+      {
+        "contentType": "deck.proposal-service",
+        "slideId": "deck-proposal-service",
+        "slots": {
+          "body": "Convertimos estrategia e ideas en sistemas, contenido y producción confiable, con capacidad gobernada y memoria de marca.",
+          "footnote": "Sky: +2.000 piezas aprobadas en 12 meses, 88 % a tiempo. · Fuente: deck Sky, caso publicado",
+          "frame": {
+            "answerPx": 140,
+            "answerTop": 270,
+            "bodyPx": 26,
+            "bodyTop": 440,
+            "bodyWidth": 900,
+            "cardGutter": "--gl-ps-card-gutter=20px",
+            "cardHeight": "--gl-ps-card-height=270px",
+            "cardPadding": "--gl-ps-card-padding=26px",
+            "cardRadius": "--gl-ps-card-radius=16px",
+            "cardShadowBlur": "--gl-ps-card-shadow-blur=70px",
+            "cardShadowOpacity": "--gl-ps-card-shadow-opacity=40%",
+            "cardShadowY": "--gl-ps-card-shadow-y=30px",
+            "cardStroke": "--gl-ps-card-stroke=1.5px",
+            "cardWidth": "--gl-ps-card-width=533.33px",
+            "cardsTop": "--gl-ps-cards-top=680px",
+            "descGap": "--gl-ps-desc-gap=12px",
+            "descPx": "--gl-ps-desc-px=19px",
+            "eyebrowTop": 110,
+            "footLeft": "--gl-ps-foot-left=660px",
+            "footPx": "--gl-ps-foot-px=16px",
+            "footTop": "--gl-ps-foot-top=1000px",
+            "kickerPx": "--gl-ps-kicker-px=15px",
+            "lensLeft": "--gl-ps-lens-left=1300px",
+            "lensSize": "--gl-ps-lens-size=440px",
+            "lensTop": "--gl-ps-lens-top=110px",
+            "line": "brand",
+            "margin": 140,
+            "nameGap": "--gl-ps-name-gap=10px",
+            "namePx": "--gl-ps-name-px=38px",
+            "questionTop": 200,
+          },
+          "lens": {
+            "src": "asset-ref:layer:proposal-service-lens-brand",
+          },
+          "photo": {
+            "alt": "Un diseñador de Efeonce con el hoodie navy mueve una prueba de diagramación al tope de una grilla de pruebas impresas en el estudio de noche",
+            "src": "asset-ref:plate:T2-crea-lens-440x440",
+          },
+          "selection": {
+            "anchor": "top-end",
+            "label": "Cliente",
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "department",
+            "scale": 1.1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+          },
+          "steps": [
+            {
+              "desc": "Un proyecto pagado y acotado para probar el encaje con tu marca.",
+              "kicker": "Empieza aquí",
+              "name": "Creative Sprint",
+            },
+            {
+              "desc": "Squad dedicado On-Going, con capacidad gobernada y métricas de entrega.",
+              "kicker": "Managed Squad",
+              "name": "Creative Capacity",
+            },
+            {
+              "desc": "Sistema de producción con memoria de marca y control de derechos.",
+              "kicker": "Producción",
+              "name": "Creative Studio",
+            },
+          ],
+          "voice": {
+            "answer": "Con sistema",
+            "eyebrow": "Nuestra propuesta · Servicios creativos",
+            "question": "¿Cómo escalas tu contenido?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-proposal-service-revops-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 440,
+        "width": 440,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_web-hero/plates/H1b-estratega-uniforme.png",
+      "ref": "asset-ref:plate:H1b-estratega-uniforme-lens-440x440",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:proposal-service-lens-revenue-hubspot",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><circle cx="1520" cy="330" r="246.4" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3"/><path d="M 1288.46 245.73 A 246.4 246.4 0 0 1 1435.73 98.46" fill="none" stroke="#e86bd0" stroke-width="6" stroke-linecap="round"/><circle cx="1435.73" cy="98.46" r="12" fill="#e86bd0"/></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-service",
+  "plan": {
+    "artifactId": "deck-proposal-service-revops",
+    "slides": [
+      {
+        "contentType": "deck.proposal-service",
+        "slideId": "deck-proposal-service",
+        "slots": {
+          "body": "HubSpot operado como servicio: de la evaluación a la operación gestionada, con agentes que trabajan dentro de tu CRM.",
+          "footnote": "Marketing, ventas, servicio, datos y Agent Hub.",
+          "frame": {
+            "answerPx": 140,
+            "answerTop": 270,
+            "bodyPx": 26,
+            "bodyTop": 440,
+            "bodyWidth": 900,
+            "cardGutter": "--gl-ps-card-gutter=20px",
+            "cardHeight": "--gl-ps-card-height=270px",
+            "cardPadding": "--gl-ps-card-padding=26px",
+            "cardRadius": "--gl-ps-card-radius=16px",
+            "cardShadowBlur": "--gl-ps-card-shadow-blur=70px",
+            "cardShadowOpacity": "--gl-ps-card-shadow-opacity=40%",
+            "cardShadowY": "--gl-ps-card-shadow-y=30px",
+            "cardStroke": "--gl-ps-card-stroke=1.5px",
+            "cardWidth": "--gl-ps-card-width=395px",
+            "cardsTop": "--gl-ps-cards-top=680px",
+            "descGap": "--gl-ps-desc-gap=12px",
+            "descPx": "--gl-ps-desc-px=19px",
+            "eyebrowTop": 110,
+            "footLeft": "--gl-ps-foot-left=660px",
+            "footPx": "--gl-ps-foot-px=16px",
+            "footTop": "--gl-ps-foot-top=1000px",
+            "kickerPx": "--gl-ps-kicker-px=15px",
+            "lensLeft": "--gl-ps-lens-left=1300px",
+            "lensSize": "--gl-ps-lens-size=440px",
+            "lensTop": "--gl-ps-lens-top=110px",
+            "line": "revenue-hubspot",
+            "margin": 140,
+            "nameGap": "--gl-ps-name-gap=10px",
+            "namePx": "--gl-ps-name-px=38px",
+            "questionTop": 200,
+          },
+          "lens": {
+            "src": "asset-ref:layer:proposal-service-lens-revenue-hubspot",
+          },
+          "photo": {
+            "alt": "Una estratega de growth con el polo navy de Efeonce, de pie tras una mesa de nogal en el estudio de noche, justo después de salir en vivo una campaña",
+            "src": "asset-ref:plate:H1b-estratega-uniforme-lens-440x440",
+          },
+          "selection": {
+            "anchor": "top-end",
+            "label": "Cliente",
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "department",
+            "scale": 1.1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+          },
+          "steps": [
+            {
+              "desc": "Sin costo: dónde está tu CRM y qué le falta.",
+              "kicker": "Empieza aquí · sin costo",
+              "name": "Evaluación",
+            },
+            {
+              "desc": "El diseño pagado de tu operación de revenue.",
+              "kicker": "Proyecto",
+              "name": "Blueprint",
+            },
+            {
+              "desc": "Implementación o migración, lista para operar.",
+              "kicker": "Proyecto",
+              "name": "Implementación",
+            },
+            {
+              "desc": "HubSpot y agentes operados por nosotros, mes a mes.",
+              "kicker": "On-Going",
+              "name": "Operación gestionada",
+            },
+          ],
+          "voice": {
+            "answer": "Con agentes",
+            "eyebrow": "Nuestra propuesta · RevOps",
+            "question": "¿Tu CRM vende contigo?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-proposal-service-web-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 440,
+        "width": 440,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_ooh-caminero-lente/plates/D3-led-medicion-mira-izquierda.png",
+      "ref": "asset-ref:plate:D3-led-medicion-mira-izquierda-lens-440x440",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:proposal-service-lens-engine",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><circle cx="1520" cy="330" r="246.4" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3"/><path d="M 1288.46 245.73 A 246.4 246.4 0 0 1 1435.73 98.46" fill="none" stroke="#0375db" stroke-width="6" stroke-linecap="round"/><circle cx="1435.73" cy="98.46" r="12" fill="#0375db"/></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-service",
+  "plan": {
+    "artifactId": "deck-proposal-service-web",
+    "slides": [
+      {
+        "contentType": "deck.proposal-service",
+        "slideId": "deck-proposal-service",
+        "slots": {
+          "body": "Web diseñada para humanos, buscadores y agentes: que convierta, que se encuentre y que un agente pueda operarla.",
+          "frame": {
+            "answerPx": 140,
+            "answerTop": 270,
+            "bodyPx": 26,
+            "bodyTop": 440,
+            "bodyWidth": 900,
+            "cardGutter": "--gl-ps-card-gutter=20px",
+            "cardHeight": "--gl-ps-card-height=270px",
+            "cardPadding": "--gl-ps-card-padding=26px",
+            "cardRadius": "--gl-ps-card-radius=16px",
+            "cardShadowBlur": "--gl-ps-card-shadow-blur=70px",
+            "cardShadowOpacity": "--gl-ps-card-shadow-opacity=40%",
+            "cardShadowY": "--gl-ps-card-shadow-y=30px",
+            "cardStroke": "--gl-ps-card-stroke=1.5px",
+            "cardWidth": "--gl-ps-card-width=395px",
+            "cardsTop": "--gl-ps-cards-top=680px",
+            "descGap": "--gl-ps-desc-gap=12px",
+            "descPx": "--gl-ps-desc-px=19px",
+            "eyebrowTop": 110,
+            "footLeft": "--gl-ps-foot-left=660px",
+            "footPx": "--gl-ps-foot-px=16px",
+            "footTop": "--gl-ps-foot-top=1000px",
+            "kickerPx": "--gl-ps-kicker-px=15px",
+            "lensLeft": "--gl-ps-lens-left=1300px",
+            "lensSize": "--gl-ps-lens-size=440px",
+            "lensTop": "--gl-ps-lens-top=110px",
+            "line": "engine",
+            "margin": 140,
+            "nameGap": "--gl-ps-name-gap=10px",
+            "namePx": "--gl-ps-name-px=38px",
+            "questionTop": 200,
+          },
+          "lens": {
+            "src": "asset-ref:layer:proposal-service-lens-engine",
+          },
+          "photo": {
+            "alt": "Un analista de growth de una cervecería artesanal se inclina hacia el laptop a su izquierda para revisar la medición de la primera semana",
+            "src": "asset-ref:plate:D3-led-medicion-mira-izquierda-lens-440x440",
+          },
+          "selection": {
+            "anchor": "top-end",
+            "label": "Cliente",
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "department",
+            "scale": 1.1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+          },
+          "steps": [
+            {
+              "desc": "La base: arquitectura, contenido y medición bien hechos.",
+              "kicker": "Empieza aquí",
+              "name": "Web Foundation",
+            },
+            {
+              "desc": "Una web pensada para convertir, con experimentos y datos.",
+              "kicker": "Proyecto",
+              "name": "Conversion Website",
+            },
+            {
+              "desc": "Lista para que los agentes la lean y actúen sobre ella.",
+              "kicker": "Agentes",
+              "name": "Agent-Ready",
+            },
+            {
+              "desc": "Operación continua de rendimiento y mejora.",
+              "kicker": "On-Going",
+              "name": "Performance Ops",
+            },
+          ],
+          "voice": {
+            "answer": "Para todos",
+            "eyebrow": "Nuestra propuesta · Web",
+            "question": "¿Para quién es tu web?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`planes de los intents de ejemplo > deck-section-classic-intent.json compone el mismo plan 1`] = `
 {
   "assets": [

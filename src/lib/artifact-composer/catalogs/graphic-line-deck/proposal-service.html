@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · propuesta de servicio sobria</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `proposal-service` (surface deck, papel proposal, TASK-1928). La propuesta sobria, para cuando pide datos:
+      la foto en la LENTE arriba a la derecha (la única órbita), la voz a la izquierda y tres o cuatro formas de empezar
+      como tarjetas iguales sin íconos; la primera en papel (por dónde se empieza) y objetivo de la selección. Sin logo
+      ni indicador: firma la burbuja URL en el pie, junto a la nota o a la prueba con su fuente. Referencias:
+      DeckPropuestaAEO, DeckPropuestaCreativa, DeckPropuestaWeb, DeckPropuestaRevOps.
+    -->
+    <main class="gl-slide gl-ps" data-gl-root data-slot="frame">
+      <figure class="gl-ps-lens-photo" data-slot="photo">
+        <img data-slot-field="src" alt="" />
+      </figure>
+      <figure class="gl-layer" data-slot="lens">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Nuestra propuesta · AEO</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Te encuentra la IA?</span></p>
+        <p class="gl-answer"><span data-slot-field="answer">Visible</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body" data-slot="body">Vendemos visibilidad, entrando por SEO.</p>
+
+      <!-- La primera tarjeta es por dónde se empieza: el objetivo de la selección (el hook mide la primera marcada). -->
+      <ol class="gl-ps-cards" data-slot="steps">
+        <li class="gl-ps-card" data-gl-selection-target>
+          <p class="gl-ps-kicker" data-slot-field="kicker">Empieza aquí</p>
+          <p class="gl-ps-name" data-slot-field="name">Diagnóstico</p>
+          <p class="gl-ps-desc" data-slot-field="desc">Tu presencia en los motores de respuesta.</p>
+        </li>
+      </ol>
+
+      <p class="gl-ps-foot" data-slot="footnote">Sin promesas de ranking.</p>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-bubble" data-slot="urlBubble" src="assets/url-bubble-baked-dark.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

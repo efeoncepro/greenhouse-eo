@@ -412,3 +412,60 @@ describe('deck · section-split por la izquierda y sus composiciones', () => {
     expectCode(() => plan({ ...example('section-split'), version: '0.1.2', layout: 'panel-start' }), 'surface-issues')
   })
 })
+
+describe('deck · proposal-service, la propuesta sobria (TASK-1928)', () => {
+  const services = ['aeo', 'creative', 'web', 'revops'] as const
+
+  it.each(services)('%s compone con su plantilla y pasa su contrato de slots', service => {
+    const { template, violations, piece } = plan(example(`proposal-service-${service}`))
+
+    expect(template).toBe('ProposalService')
+    expect(piece.contentType).toBe('deck.proposal-service')
+    expect(violations).toEqual([])
+  })
+
+  it('las tarjetas reparten el contenido: cuatro de 395 px o tres de 533,33 px, con el canal del token', () => {
+    const four = plan(example('proposal-service-aeo')).slots.frame
+    const three = plan(example('proposal-service-creative')).slots.frame
+
+    expect(four).toMatchObject({ margin: 140, cardWidth: '--gl-ps-card-width=395px', cardGutter: '--gl-ps-card-gutter=20px' })
+    expect(three.cardWidth).toBe('--gl-ps-card-width=533.33px')
+    expect(four).toMatchObject({ lensLeft: '--gl-ps-lens-left=1300px', lensTop: '--gl-ps-lens-top=110px', lensSize: '--gl-ps-lens-size=440px' })
+  })
+
+  it('la respuesta nunca baja de 3× la pregunta y va en una línea', () => {
+    for (const service of services) {
+      expect(Number(plan(example(`proposal-service-${service}`)).slots.frame.answerPx)).toBeGreaterThanOrEqual(120)
+    }
+
+    expectCode(() => plan({ ...example('proposal-service-aeo'), voice: { question: '¿Te encuentra la IA?', answer: ['Visible', 'hoy'] } }), 'invalid-intent')
+  })
+
+  it('el pie lleva la nota, o la prueba con su fuente en la misma línea; nunca las dos', () => {
+    expect(plan(example('proposal-service-aeo')).slots.footnote).toBe('Sin promesas de ranking: medimos y mostramos el avance.')
+    expect(plan(example('proposal-service-creative')).slots.footnote).toBe(
+      'Sky: +2.000 piezas aprobadas en 12 meses, 88 % a tiempo. · Fuente: deck Sky, caso publicado'
+    )
+    expect(plan(example('proposal-service-web')).slots.footnote).toBeUndefined()
+
+    const both = { ...example('proposal-service-aeo'), proof: { text: '+30 %', source: 'caso publicado' } }
+
+    expectCode(() => plan(both), 'invalid-intent')
+  })
+
+  it('la lente es la única órbita: anillo, arco y esfera en una capa; la selección toma la primera tarjeta', () => {
+    const { piece, slots } = plan(example('proposal-service-aeo'))
+    const layer = piece.assets.find(asset => asset.ref.startsWith('asset-ref:layer:proposal-service-lens')) as { svg: string }
+
+    expect(layer.svg.match(/<circle/g)).toHaveLength(2)
+    expect(layer.svg.match(/<path/g)).toHaveLength(1)
+    expect(slots.selection).toMatchObject({ label: 'Cliente', anchor: 'top-end', targetKind: 'object' })
+  })
+
+  it('dos tarjetas o un paso con ícono los rechaza AXIS', () => {
+    const intent = example('proposal-service-aeo')
+
+    expect(issuesOf({ ...intent, steps: intent.steps!.slice(0, 2) })).toContain('steps-under-limit')
+    expect(issuesOf({ ...intent, steps: intent.steps!.map(step => ({ ...step, glyph: 'rayo' })) })).toContain('step-glyph-not-in-recipe')
+  })
+})

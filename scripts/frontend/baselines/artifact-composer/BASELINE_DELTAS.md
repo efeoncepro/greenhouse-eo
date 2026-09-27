@@ -1,5 +1,19 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-27 (f) — TASK-1928: la propuesta de servicio sobria (`proposal-service`)
+
+Primera familia de las 38 recetas aprobadas sin plantilla. Las cuatro láminas de la propuesta sobria (AEO, servicios
+creativos, web y RevOps) comparten geometría y son UNA receta nueva de AXIS (`axis-tokens` 0.3.15, `axis-ui-contracts`
+0.3.13, delta (f)): la foto en la lente arriba a la derecha (la única órbita: anillo en el halo, arco y esfera en el
+acento, dibujados por el builder desde el token), la voz a la izquierda y tres o cuatro tarjetas sin íconos de ancho
+derivado del contenido; la primera en papel, objetivo de la selección «Cliente». Compuestas con su plate real y
+comparadas a ojo contra las cuatro referencias: coinciden salvo las dos correcciones de la norma, el kicker de la
+primera tarjeta en navy (D1; la referencia lo tenía en el acento a 15 px) y la prueba de la creativa con su fuente
+visible en el pie. El CSS nuevo está acotado a `.gl-ps`: los 32 frames previos no cambian. La auditoría renderizada
+(D1 y 3×) del gate pasa sobre el probe.
+
+- `templates-graphic-line-deck/ProposalService.png` — 🆕 deck.proposal-service
+
 ## 2026-09-27 (e) — TASK-1927: portadas y contraportadas aprobadas del brochure y de la propuesta
 
 Las 17 referencias aprobadas del marco (decisión del operador, canvas Deck, 2026-09-27) pasan a plantillas del catálogo
@@ -637,7 +651,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 54442ba9d03204adce617e651e22687881921e2e9ad6b467a76bdac430500fcb -->
+<!-- manifest-digest: 069ef434fda8b30682fc8f41f35605a6d503b39361a3daca13ed21e4ee1eaa3a -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

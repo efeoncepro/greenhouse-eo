@@ -13,6 +13,7 @@
     "deck.proposal-cinematic",
     "deck.proposal-cinematic.hero",
     "deck.proposal-cinematic.lines",
+    "deck.proposal-service",
     "deck.section-classic",
     "deck.section-split",
     "deck.section-split.corner-bottom",
@@ -122,6 +123,17 @@
       "slotsRef": "proposal-cinematic-lines.slots.json"
     },
     {
+      "name": "ProposalService",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.proposal-service"],
+      "prototype": "proposal-service.html",
+      "slotsRef": "proposal-service.slots.json"
+    },
+    {
       "name": "SectionClassic",
       "kind": "full-bleed",
       "source": "design",
@@ -210,6 +222,7 @@
       "deck.proposal-cinematic": "ProposalCinematic",
       "deck.proposal-cinematic.hero": "ProposalCinematicHero",
       "deck.proposal-cinematic.lines": "ProposalCinematicLines",
+      "deck.proposal-service": "ProposalService",
       "deck.section-classic": "SectionClassic",
       "deck.section-split": "SectionSplit",
       "deck.section-split.corner-bottom": "SectionSplitCornerBottom",

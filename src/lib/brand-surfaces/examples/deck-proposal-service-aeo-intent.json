@@ -1,0 +1,53 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "proposal",
+  "use": "proposal",
+  "recipe": "proposal-service",
+  "line": "engine",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Nuestra propuesta · AEO",
+    "question": "¿Te encuentra la IA?",
+    "answer": [
+      "Visible"
+    ]
+  },
+  "body": "Vendemos visibilidad, entrando por SEO: que buscadores y motores de respuesta te encuentren, te entiendan y te recomienden.",
+  "steps": [
+    {
+      "kicker": "Empieza aquí · sin costo",
+      "name": "Diagnóstico",
+      "desc": "Brand Visibility Grader: tu presencia en ChatGPT, Claude, Perplexity, Gemini y Google."
+    },
+    {
+      "kicker": "Proyecto",
+      "name": "Foundation",
+      "desc": "Proyecto de precio fijo: base técnica, entidad y contenido."
+    },
+    {
+      "kicker": "On-Going",
+      "name": "Operación",
+      "desc": "Retainer mensual de visibilidad por capacidad declarada."
+    },
+    {
+      "kicker": "Greenhouse",
+      "name": "Plataforma",
+      "desc": "Portal, métricas ICO y medición continua."
+    }
+  ],
+  "note": "Sin promesas de ranking: medimos y mostramos el avance.",
+  "photo": {
+    "register": "documental",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_ooh-caminero-lente/plates/D2-led-medicion.png",
+    "alt": "Un analista de growth de una cervecería artesanal se inclina sobre el laptop y toca con el dedo la curva que sube en la medición de la primera semana"
+  },
+  "selection": {
+    "target": "object",
+    "label": "Cliente",
+    "participantKind": "department"
+  }
+}

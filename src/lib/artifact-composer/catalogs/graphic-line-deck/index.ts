@@ -6,9 +6,10 @@
  * molde, sus presupuestos de slot y el baseline del deck SKY; mezclar ahí el fondo Efeonce, la voz con
  * esfera y las fotos de cine degradaría lo que ese catálogo protege.
  *
- * Sólo tiene plantilla una receta APROBADA por el operador (hoy: proposal-cinematic, section-classic, section-split,
- * content-measure, triptych y method-staircase). `proposal-cinematic` tiene una plantilla por composición (`service`,
- * `hero`, `lines`; contrato 0.1.2): la de `service` no cambia. El contentType es `deck.<receta>[.<layout>]` y lo
+ * Sólo tiene plantilla una receta APROBADA por el operador (hoy: proposal-cinematic, proposal-service,
+ * section-classic, section-split, content-measure, triptych y method-staircase, además del marco de TASK-1927).
+ * `proposal-cinematic` tiene una plantilla por composición (`service`, `hero`, `lines`; contrato 0.1.2): la de
+ * `service` no cambia. El contentType es `deck.<receta>[.<layout>]` y lo
  * deriva `src/lib/brand-surfaces` desde el manifest de AXIS: un autor nunca elige plantilla.
  *
  * La selección colaborativa necesita medir el DOM ya lleno, así que es un layout hook; su pintura la
@@ -32,6 +33,8 @@ const TEMPLATES_WITH_SELECTION = [
   'ProposalCinematic',
   'ProposalCinematicHero',
   'ProposalCinematicLines',
+  // La propuesta sobria: la selección toma la primera tarjeta (por dónde se empieza).
+  'ProposalService',
   // Portadas de propuesta: la selección toma el logo del cliente.
   'CoverProposalOrbit',
   'CoverProposalDawn'

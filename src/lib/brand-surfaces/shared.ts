@@ -30,7 +30,8 @@ export interface SurfaceIntent {
   voice?: { eyebrow?: string; question?: string; answer?: string[] }
   body?: string
   proof?: { text: string; source: string }
-  steps?: { glyph: string; kicker: string; name: string }[]
+  /** Con ícono (`glyph`, la propuesta cine) o como tarjeta sin ícono con `desc` (la propuesta sobria, TASK-1928). */
+  steps?: { glyph?: string; kicker: string; name: string; desc?: string }[]
   photo?: { register?: string; subject?: string; plateRef?: string; alt?: string; native?: string; focus?: SurfaceFocus }
   selection?: { target?: string; label?: string; participantKind?: string; anchor?: string; level?: number; box?: Record<string, number> }
   [key: string]: unknown
@@ -94,7 +95,7 @@ export interface SurfacePhotoDelegate {
 export type SurfaceManifest = Record<string, unknown> & {
   canvas: { width: number; height: number }
   safeArea?: { marginPx?: number }
-  reserves?: { band: string; fromTop?: number; fromTopRange?: [number, number]; share?: number }[]
+  reserves?: { band: string; fromTop?: number; fromTopRange?: [number, number]; share?: number; inset?: number }[]
   type?: Record<string, { px?: number | [number, number]; maxWidthPx?: number | [number, number] }>
   content?: Partial<SurfaceContent>
   selection?: Record<string, unknown> | null

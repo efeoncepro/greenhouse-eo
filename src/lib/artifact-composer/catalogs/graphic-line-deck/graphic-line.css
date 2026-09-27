@@ -1075,3 +1075,96 @@ body {
 .gl-frame .gl-client-logo:empty {
   display: none;
 }
+
+/* ══ Propuesta de servicio sobria (`proposal-service`, TASK-1928) ═══════════════════════════════════════════
+ *
+ * La foto en la lente (arriba a la derecha) y su capa (anillo, arco y esfera) salen del builder; las tarjetas son
+ * iguales a lo ancho del contenido, con anchos en px (nunca % con canal). La primera va en papel con sombra y su texto
+ * en navy; las demás, con el contorno fino de la superficie oscura. Ningún texto chico en el acento (D1).
+ */
+
+.gl-ps-lens-photo {
+  position: absolute;
+  left: var(--gl-ps-lens-left);
+  top: var(--gl-ps-lens-top);
+  width: var(--gl-ps-lens-size);
+  height: var(--gl-ps-lens-size);
+  margin: 0;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.gl-ps-lens-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gl-ps-cards {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-ps-cards-top);
+  display: flex;
+  gap: var(--gl-ps-card-gutter);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-ps-card {
+  box-sizing: border-box;
+  width: var(--gl-ps-card-width);
+  height: var(--gl-ps-card-height);
+  padding: var(--gl-ps-card-padding);
+  border-radius: var(--gl-ps-card-radius);
+  box-shadow: inset 0 0 0 var(--gl-ps-card-stroke) var(--gl-rule-dark);
+}
+
+.gl-ps-card:first-child {
+  background: var(--gl-bg-paper);
+  box-shadow: 0 var(--gl-ps-card-shadow-y) var(--gl-ps-card-shadow-blur) color-mix(in srgb, black var(--gl-ps-card-shadow-opacity), transparent);
+}
+
+.gl-ps-kicker {
+  margin: 0;
+  font: 600 var(--gl-ps-kicker-px) var(--gl-text-family);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gl-soft-dark);
+}
+
+.gl-ps-name {
+  margin: var(--gl-ps-name-gap) 0 0;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-ps-name-px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--gl-ink-dark);
+}
+
+.gl-ps-desc {
+  margin: var(--gl-ps-desc-gap) 0 0;
+  font: 300 var(--gl-ps-desc-px) / 1.4 var(--gl-text-family);
+  color: var(--gl-text-dark);
+}
+
+.gl-ps-card:first-child .gl-ps-kicker,
+.gl-ps-card:first-child .gl-ps-name {
+  color: var(--gl-navy);
+}
+
+.gl-ps-card:first-child .gl-ps-desc {
+  color: var(--gl-text-light);
+}
+
+.gl-ps-foot {
+  position: absolute;
+  left: var(--gl-ps-foot-left);
+  top: var(--gl-ps-foot-top);
+  margin: 0;
+  font: 400 var(--gl-ps-foot-px) var(--gl-text-family);
+  color: var(--gl-soft-dark);
+  white-space: nowrap;
+}
