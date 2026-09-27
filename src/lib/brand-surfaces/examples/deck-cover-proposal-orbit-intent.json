@@ -1,0 +1,28 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-proposal",
+  "use": "proposal",
+  "layout": "orbit",
+  "line": "growth",
+  "voice": {
+    "eyebrow": "Propuesta comercial · Octubre 2026",
+    "question": "¿Cómo crecemos en 2027?",
+    "answer": [
+      "Con foco"
+    ]
+  },
+  "body": "Preparada para **[Cliente]** · Confidencial",
+  "selection": {
+    "target": "client-logo",
+    "label": "Cliente",
+    "participantKind": "role"
+  },
+  "column": {
+    "topPx": 220
+  }
+}

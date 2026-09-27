@@ -4,6 +4,12 @@
   "note": "Recetas APROBADAS de la superficie deck de «La órbita» (contrato efeonce.surface-composition 0.1.2 de AXIS). Una receta en opción o pendiente no tiene plantilla hasta que el operador la aprueba. El contentType es `<surface>.<recipe>`: lo deriva src/lib/brand-surfaces del manifest, nunca el autor.",
   "canvas": { "width": 1920, "height": 1080 },
   "contentTypeTaxonomy": [
+    "deck.cover-brochure",
+    "deck.cover-proposal",
+    "deck.cover-proposal.dawn",
+    "deck.close-brochure",
+    "deck.close-brochure.photo",
+    "deck.close-proposal",
     "deck.proposal-cinematic",
     "deck.proposal-cinematic.hero",
     "deck.proposal-cinematic.lines",
@@ -16,6 +22,72 @@
     "deck.method-staircase"
   ],
   "templates": [
+    {
+      "name": "CoverBrochure",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.cover-brochure"],
+      "prototype": "cover-brochure.html",
+      "slotsRef": "cover-brochure.slots.json"
+    },
+    {
+      "name": "CoverProposalOrbit",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.cover-proposal"],
+      "prototype": "cover-proposal-orbit.html",
+      "slotsRef": "cover-proposal-orbit.slots.json"
+    },
+    {
+      "name": "CoverProposalDawn",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.cover-proposal.dawn"],
+      "prototype": "cover-proposal-dawn.html",
+      "slotsRef": "cover-proposal-dawn.slots.json"
+    },
+    {
+      "name": "CloseBrochure",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.close-brochure"],
+      "prototype": "close-brochure.html",
+      "slotsRef": "close-brochure.slots.json"
+    },
+    {
+      "name": "CloseBrochurePhoto",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.close-brochure.photo"],
+      "prototype": "close-brochure.html",
+      "slotsRef": "close-brochure-photo.slots.json"
+    },
+    {
+      "name": "CloseProposal",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.close-proposal"],
+      "prototype": "close-proposal.html",
+      "slotsRef": "close-proposal.slots.json"
+    },
     {
       "name": "ProposalCinematic",
       "kind": "full-bleed",
@@ -129,6 +201,12 @@
   ],
   "selector": {
     "map": {
+      "deck.cover-brochure": "CoverBrochure",
+      "deck.cover-proposal": "CoverProposalOrbit",
+      "deck.cover-proposal.dawn": "CoverProposalDawn",
+      "deck.close-brochure": "CloseBrochure",
+      "deck.close-brochure.photo": "CloseBrochurePhoto",
+      "deck.close-proposal": "CloseProposal",
       "deck.proposal-cinematic": "ProposalCinematic",
       "deck.proposal-cinematic.hero": "ProposalCinematicHero",
       "deck.proposal-cinematic.lines": "ProposalCinematicLines",

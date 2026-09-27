@@ -139,6 +139,16 @@ export const materializeAssets = async (assets: SurfaceAssetRequest[], root: str
 
     const file = path.resolve(root, asset.path)
 
+    if (asset.kind === 'file') {
+      const mime = FILE_MIME[path.extname(file).toLowerCase()]
+
+      if (!mime) throw new Error(`El archivo ${asset.path} no es SVG ni PNG: un logo se entrega en uno de esos dos.`)
+      if (!fs.existsSync(file)) throw new Error(`No encuentro el archivo ${asset.path}.`)
+
+      out[key(asset.ref)] = `data:${mime};base64,${fs.readFileSync(file).toString('base64')}`
+      continue
+    }
+
     if (!fs.existsSync(file)) {
       throw new Error(
         `No encuentro el plate ${asset.path}. Los plates viven fuera de git (ai-generations/**/*.png): genéralo o cópialo antes de componer.`
@@ -155,6 +165,8 @@ export const materializeAssets = async (assets: SurfaceAssetRequest[], root: str
 
   return out
 }
+
+const FILE_MIME: Record<string, string> = { '.svg': 'image/svg+xml', '.png': 'image/png' }
 
 const sha256 = (data: Buffer | string): string => crypto.createHash('sha256').update(data).digest('hex')
 
@@ -193,6 +205,9 @@ export const surfaceProvenance = (
   plates: piece.assets
     .filter((asset): asset is Extract<SurfaceAssetRequest, { kind: 'plate' }> => asset.kind === 'plate')
     .map(asset => ({ ref: asset.ref, path: asset.path, sha256: sha256(fs.readFileSync(path.resolve(root, asset.path))) })),
+  files: piece.assets
+    .filter((asset): asset is Extract<SurfaceAssetRequest, { kind: 'file' }> => asset.kind === 'file')
+    .map(asset => ({ ref: asset.ref, path: asset.path, sha256: sha256(fs.readFileSync(path.resolve(root, asset.path))) })),
   axis: Object.fromEntries(
     ['@efeoncepro/axis-ui-contracts', '@efeoncepro/axis-tokens', '@efeoncepro/axis-graphic-line', '@efeoncepro/axis-brand-assets'].map(
       name => [name, packageVersion(name)]
@@ -223,6 +238,7 @@ export const surfaceDocumentProvenance = (
     pageCount: document.contentTypes.length,
     contentTypes: document.contentTypes,
     plates: piece.plates,
+    files: piece.files,
     axis: piece.axis
   }
 }

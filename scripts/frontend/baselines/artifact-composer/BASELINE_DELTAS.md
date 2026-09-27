@@ -1,5 +1,26 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-27 (e) — TASK-1927: portadas y contraportadas aprobadas del brochure y de la propuesta
+
+Las 17 referencias aprobadas del marco (decisión del operador, canvas Deck, 2026-09-27) pasan a plantillas del catálogo
+`graphic-line-deck`: `cover-brochure` (composiciones `document` y `line`), `cover-proposal` (`orbit` y `dawn`),
+`close-brochure` (`orbit` y `photo`) y `close-proposal`. El marco clásico (logo 230/220) no entra: el operador no lo
+aprobó. `cover-brochure-cine-lines-selection` queda fuera: el contrato de AXIS no admite selección en esa portada.
+
+Todas las medidas salen del manifest y de los tokens de AXIS (`axis-tokens` 0.3.14: columna de voz, eje del amanecer,
+pintura de las órbitas de luz, estilo del contacto, caja del logo del cliente); las plantillas nuevas no declaran
+respaldo. El contacto sale de `EFEONCE_CONTACT`. Compuestas con su plate real y comparadas a ojo contra las
+referencias. Diferencias conocidas, a favor de AXIS o del SSOT: «Cuando quieras.» a 124 px (la referencia, 118),
+dirección «71, of. 1105» y burbuja URL horneada. El CSS nuevo está acotado a `.gl-frame`: los 26 frames previos no
+cambian. El probe usa la capa de órbita, el plate y el logo de cliente sintéticos de `GRAPHIC_LINE_PROBE_ASSETS`.
+
+- `templates-graphic-line-deck/CoverBrochure.png` — 🆕 deck.cover-brochure
+- `templates-graphic-line-deck/CoverProposalOrbit.png` — 🆕 deck.cover-proposal
+- `templates-graphic-line-deck/CoverProposalDawn.png` — 🆕 deck.cover-proposal.dawn
+- `templates-graphic-line-deck/CloseBrochure.png` — 🆕 deck.close-brochure
+- `templates-graphic-line-deck/CloseBrochurePhoto.png` — 🆕 deck.close-brochure.photo
+- `templates-graphic-line-deck/CloseProposal.png` — 🆕 deck.close-proposal
+
 ## 2026-09-27 (d) — TASK-1927: la sección partida sube por la izquierda y gana dos composiciones
 
 Corrección explícita del operador (canvas Deck, 2026-09-27; regla `split-indicator-rises-start` de AXIS): el indicador
@@ -616,7 +637,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: a095c6bd26b00e8d7d03b7487b159be55ab37d30e1241da431f6daf33357816a -->
+<!-- manifest-digest: 54442ba9d03204adce617e651e22687881921e2e9ad6b467a76bdac430500fcb -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

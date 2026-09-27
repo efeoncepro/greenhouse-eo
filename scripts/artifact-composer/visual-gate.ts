@@ -88,6 +88,10 @@ const GRAPHIC_LINE_PROBE_ASSETS: Readonly<Record<string, string>> = {
   'icon:probe': svgDataUri(
     '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="none" stroke="#ffffff" stroke-width="3"/></svg>'
   ),
+  // El logo de un cliente (portadas de propuesta): un rótulo sintético, nunca la marca de un cliente real.
+  'file:probe': svgDataUri(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="460" height="200" viewBox="0 0 460 200"><rect x="30" y="50" width="400" height="100" rx="50" fill="#ffffff"/></svg>'
+  ),
   'layer:probe': svgDataUri(
     '<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080"><circle cx="1400" cy="540" r="300" fill="none" stroke="#36c8bf" stroke-width="4"/></svg>'
   )

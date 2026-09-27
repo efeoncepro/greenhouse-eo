@@ -846,3 +846,232 @@ body {
   color: var(--gl-accent);
   white-space: nowrap;
 }
+
+/* ══ Marco del documento: portadas y contraportadas aprobadas (TASK-1927) ═══════════════════════════════
+ *
+ * Estas plantillas NO declaran respaldo: cada medida, peso, interlineado, tracking y color llega del manifest y de los
+ * tokens de AXIS como custom property (resolvers `gl-px-*`, `gl-css` y `gl-color`), y todos sus campos son obligatorios.
+ * Un marco sin su medida falla al validar el plan; nunca se pinta con el valor de otra lámina.
+ */
+
+/* El fondo: la foto de cine a sangre o la órbita de luz que pintó el builder. */
+.gl-frame .gl-backdrop {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+
+.gl-frame .gl-backdrop img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gl-frame .gl-logo {
+  position: absolute;
+  left: var(--gl-logo-left);
+  top: var(--gl-logo-top);
+  z-index: 3;
+  width: var(--gl-logo-width);
+  height: auto;
+}
+
+.gl-frame .gl-eyebrow {
+  z-index: 3;
+  font-weight: var(--gl-eyebrow-wght);
+  font-size: var(--gl-eyebrow-px);
+  line-height: var(--gl-eyebrow-leading);
+  letter-spacing: var(--gl-eyebrow-tracking);
+  color: var(--gl-eyebrow-color);
+  white-space: nowrap;
+}
+
+.gl-frame .gl-question {
+  z-index: 3;
+  font-size: var(--gl-question-px);
+  line-height: var(--gl-question-leading);
+  color: var(--gl-question-color);
+}
+
+.gl-frame .gl-answer {
+  z-index: 3;
+  line-height: var(--gl-answer-leading);
+  letter-spacing: var(--gl-answer-tracking);
+  color: var(--gl-answer-color);
+}
+
+/* La columna: la respuesta entra hacia el margen lo que mide AXIS, para alinear ópticamente con la pregunta. */
+.gl-frame-column .gl-answer {
+  left: calc(var(--gl-margin) + var(--gl-answer-inset));
+}
+
+/* La evidencia: texto del autor con UNA palabra en negrita. */
+.gl-frame .gl-evidence {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-body-top);
+  z-index: 3;
+  width: var(--gl-body-width);
+  margin: 0;
+  font-family: var(--gl-text-family);
+  font-weight: var(--gl-body-wght);
+  font-size: var(--gl-body-px);
+  line-height: var(--gl-body-leading);
+  color: var(--gl-body-color);
+}
+
+.gl-frame .gl-evidence strong {
+  font-weight: var(--gl-body-strong-wght);
+}
+
+/* ── El eje central (portada «amanecer») ───────────────────────────────────────────────────────────────── */
+
+.gl-frame-axis .gl-logo {
+  left: calc(50% - var(--gl-logo-width) / 2);
+}
+
+.gl-frame-axis .gl-eyebrow,
+.gl-frame-axis .gl-question,
+.gl-frame-axis .gl-answer,
+.gl-frame-axis .gl-evidence {
+  left: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.gl-frame-axis .gl-frame-bubble {
+  position: absolute;
+  left: 50%;
+  top: var(--gl-bubble-top);
+  z-index: 4;
+  height: var(--gl-bubble-height);
+  transform: translateX(-50%);
+}
+
+/* ── El logo del cliente: su archivo dentro de la caja, o el marcador de la plantilla ──────────────────── */
+
+/* La caja del cliente la posiciona AXIS; dentro va su logo o el marcador, nunca los dos. Es el objetivo de la selección. */
+.gl-frame .gl-client {
+  position: absolute;
+  left: var(--gl-client-left);
+  top: var(--gl-client-top);
+  z-index: 3;
+  width: var(--gl-client-width);
+  height: var(--gl-client-height);
+}
+
+.gl-frame .gl-client-logo,
+.gl-frame .gl-client-placeholder {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.gl-frame .gl-client-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.gl-frame .gl-client-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--gl-client-border) dashed var(--gl-soft-dark);
+  border-radius: var(--gl-client-radius);
+  font-family: var(--gl-text-family);
+  font-weight: var(--gl-client-label-wght);
+  font-size: var(--gl-client-label-px);
+  line-height: var(--gl-client-label-leading);
+  letter-spacing: var(--gl-client-label-tracking);
+  text-transform: uppercase;
+  color: var(--gl-soft-dark);
+}
+
+/* ── La contraportada: eslogan y contacto ──────────────────────────────────────────────────────────────── */
+
+.gl-frame-close .gl-slogan {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-slogan-top);
+  z-index: 3;
+  margin: 0;
+  font-family: var(--gl-text-family);
+  font-size: var(--gl-slogan-px);
+  line-height: var(--gl-slogan-leading);
+  white-space: nowrap;
+}
+
+.gl-frame-close .gl-slogan-run + .gl-slogan-run::before {
+  content: ' ';
+  font-weight: normal;
+  font-style: normal;
+  white-space: pre;
+}
+
+.gl-frame-close .gl-contact {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-contact-top);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gl-contact-row-gap);
+  font-family: var(--gl-text-family);
+  font-style: normal;
+  font-weight: var(--gl-contact-wght);
+  font-size: var(--gl-contact-px);
+  line-height: var(--gl-contact-leading);
+  color: var(--gl-soft-dark);
+}
+
+.gl-frame-close .gl-contact-social {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-contact-social-gap);
+}
+
+.gl-frame-close .gl-contact-bubble {
+  display: block;
+  height: var(--gl-contact-bubble-height);
+}
+
+.gl-frame-close .gl-contact-socials {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-contact-social-icon-gap);
+}
+
+.gl-frame-close .gl-contact-social-icon {
+  display: block;
+  width: var(--gl-contact-social-icon);
+  height: var(--gl-contact-social-icon);
+  fill: var(--gl-ink-dark);
+  opacity: var(--gl-contact-icon-opacity);
+}
+
+.gl-frame-close .gl-contact-line {
+  display: flex;
+  align-items: center;
+  gap: var(--gl-contact-item-gap);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.gl-frame-close .gl-contact-icon {
+  display: block;
+  flex: none;
+  width: var(--gl-contact-item-icon);
+  height: var(--gl-contact-item-icon);
+  fill: var(--gl-ink-dark);
+  opacity: var(--gl-contact-icon-opacity);
+}
+
+/* Con el logo del cliente, el marcador no existe: su nodo queda vacío y no se pinta (ni su borde). */
+.gl-frame .gl-client-placeholder:empty,
+.gl-frame .gl-client-logo:empty {
+  display: none;
+}

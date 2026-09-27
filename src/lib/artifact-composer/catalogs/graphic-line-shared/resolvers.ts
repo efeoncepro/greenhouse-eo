@@ -165,6 +165,55 @@ export const graphicLineResolvers = (): ResolverRegistry => {
       }
     },
 
+    // Un color que resolvió AXIS para un texto de la receta (`manifest.type.<voz>.color`), como custom property
+    // `--gl-<nombre>-color`. El valor lo entrega el builder desde el manifest: la plantilla nunca lo escribe. Sólo HEX
+    // completos y sólo nombres que terminan en `-color`.
+    'gl-color': {
+      known: ['--gl-<nombre>-color=#rrggbb'],
+      build: value => {
+        const match = /^(--gl-[a-z0-9-]+-color)=(#[0-9a-fA-F]{6})$/.exec(value.trim())
+
+        return match ? [{ selector: ':self', styleProp: match[1]!, styleValue: match[2]!.toLowerCase() }] : null
+      }
+    },
+
+    // Un tramo del eslogan: peso, itálica y color como los resolvió AXIS (`content.slogan.runs`). El eslogan oficial
+    // tiene tres tramos con pesos distintos; la plantilla no los conoce, sólo los pinta.
+    'gl-slogan-run': {
+      known: ['<peso> <italic|normal> #rrggbb'],
+      build: value => {
+        const match = /^([1-9]00) (italic|normal) (#[0-9a-fA-F]{6})$/.exec(value.trim())
+
+        if (!match) return null
+
+        return [
+          { selector: ':self', styleProp: 'font-weight', styleValue: match[1]! },
+          { selector: ':self', styleProp: 'font-style', styleValue: match[2]! },
+          { selector: ':self', styleProp: 'color', styleValue: match[3]!.toLowerCase() }
+        ]
+      }
+    },
+
+    // El fondo de una portada o contraportada: una foto de cine a sangre (plate) o la órbita de luz que pintó el
+    // builder desde los tokens de AXIS (capa). Siempre un asset externo.
+    'gl-backdrop-ref': {
+      known: ['asset-ref:plate:<id>', 'asset-ref:layer:<id>'],
+      build: value =>
+        value.startsWith('asset-ref:plate:') || value.startsWith('asset-ref:layer:') ? [{ selector: ':field', attr: 'src', value }] : null
+    },
+
+    // El texto alternativo del fondo: describe la escena de la foto; una órbita es decorativa y va vacío.
+    'gl-backdrop-alt': {
+      known: ['<descripción de la escena>', ''],
+      build: value => [{ selector: 'img', attr: 'alt', value: value.trim() }]
+    },
+
+    // Un archivo que entrega quien compone tal cual (el logo de un cliente), como asset externo.
+    'gl-file-ref': {
+      known: ['asset-ref:file:<id>'],
+      build: value => (value.startsWith('asset-ref:file:') ? [{ selector: ':field', attr: 'src', value }] : null)
+    },
+
     // La foto de la pieza: un plate aprobado, entregado como asset externo (`asset-ref:plate:<id>`).
     'gl-plate-ref': {
       known: ['asset-ref:plate:<id>'],

@@ -10,6 +10,8 @@ import { efeonceGraphicLine } from '@efeoncepro/axis-tokens'
 import { resolveGraphicLineIntent } from '@efeoncepro/axis-ui-contracts'
 
 import type { RecipeSlots, SurfaceAssetRequest } from '../types'
+
+import { FRAME_BUILDERS } from './frame'
 import { SurfacePieceError } from '../types'
 import {
   answerPxWithinRange,
@@ -824,6 +826,7 @@ export const methodStaircase: RecipeBuilder = ({ intent, manifest, recipe }) => 
 }
 
 export const DECK_BUILDERS: Record<string, RecipeBuilder> = {
+  ...FRAME_BUILDERS,
   'proposal-cinematic': proposalCinematic,
   'section-classic': sectionClassic,
   'section-split': sectionSplit,

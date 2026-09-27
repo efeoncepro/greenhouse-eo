@@ -137,12 +137,22 @@ describe('planSurfaceDocument', () => {
     expect(codes(failure(() => planSurfaceDocument({ ...intent, surface: 'web' }, { artifactId: 'x' })))).toContain('document-surface-invalid')
   })
 
-  // PENDIENTE de TASK-1927 (Slice 3): AXIS acepta el brochure de ejemplo, pero su portada y su cierre
-  // (`cover-brochure`, `close-brochure`) todavía no tienen plantilla. Cuando la tengan, este test pasa a exigir el plan.
-  it('el brochure de ejemplo es válido para AXIS y hoy se detiene en la portada, que aún no tiene plantilla', () => {
-    const error = failure(() => planSurfaceDocument(brochure(), { artifactId: 'brochure' }))
+  it('el brochure de ejemplo compone entero: portada con foto, páginas y contraportada sin foto', () => {
+    const document = planSurfaceDocument(brochure(), { artifactId: 'brochure' })
 
-    expect(error.code).toBe('recipe-without-template')
-    expect(error.message).toContain('cover-brochure')
+    expect(document.use).toBe('brochure')
+    expect(document.plan.slides).toHaveLength(9)
+    expect(document.plan.slides[0]!.contentType).toBe('deck.cover-brochure')
+    expect(document.plan.slides[8]!.contentType).toBe('deck.close-brochure')
+    expect(document.manifest.outline.map(entry => entry.role)).toEqual(expect.arrayContaining(['cover', 'close']))
+  })
+
+  it('portada y contraportada alternan la foto: las dos con foto no se planean', () => {
+    const intent = brochure()
+    const close = { recipe: 'close-brochure', layout: 'photo', voice: { question: '¿Conversamos?', answer: ['Cuando', 'quieras'] }, photo: { register: 'cine', subject: 'nexa', plateRef: 'ai-generations/2026-09-27_brochure/plates/BR3-contra-horizonte.png', alt: 'Nexa camina hacia una órbita de luz' } }
+    const pages = [...intent.pages.slice(0, -1), close]
+    const error = failure(() => planSurfaceDocument({ ...intent, pages } as SurfaceDocumentIntent, { artifactId: 'brochure' }))
+
+    expect(codes(error)).toContain('frame-photo-must-alternate')
   })
 })

@@ -1,0 +1,415 @@
+{
+  "template": "CoverProposalOrbit",
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "frame": {
+      "selector": "[data-slot='frame']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "growth"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "logoLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-logo-left=140px"
+        },
+        "logoTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-logo-top=220px"
+        },
+        "logoWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-logo-width=500px"
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 410
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 458
+        },
+        "answerTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerTop",
+          "example": 520
+        },
+        "answerPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerPx",
+          "example": 124
+        },
+        "answerInset": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-answer-inset=-4px"
+        },
+        "bodyTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyTop",
+          "example": 672
+        },
+        "bodyPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyPx",
+          "example": 28
+        },
+        "bodyWidth": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyWidth",
+          "example": 724
+        },
+        "bodyLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-body-leading=1.3"
+        },
+        "bodyWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-body-wght=400"
+        },
+        "bodyStrongWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-body-strong-wght=600"
+        },
+        "bodyColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-body-color=#ffffff"
+        },
+        "eyebrowPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-eyebrow-px=22px"
+        },
+        "eyebrowWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-eyebrow-wght=500"
+        },
+        "eyebrowLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-eyebrow-leading=1.2"
+        },
+        "eyebrowTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-eyebrow-tracking=0.24em"
+        },
+        "eyebrowColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-eyebrow-color=#e2e2e2"
+        },
+        "questionPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-question-px=40px"
+        },
+        "questionLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-question-leading=1.2"
+        },
+        "questionColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-question-color=#ffffff"
+        },
+        "answerLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-answer-leading=0.95"
+        },
+        "answerTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-answer-tracking=-0.035em"
+        },
+        "answerColor": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-color",
+          "example": "--gl-answer-color=#ffffff"
+        },
+        "clientLeft": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-client-left=1170px"
+        },
+        "clientTop": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-client-top=440px"
+        },
+        "clientWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-client-width=460px"
+        },
+        "clientHeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-client-height=200px"
+        },
+        "clientBorder": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-client-border=2px"
+        },
+        "clientRadius": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-client-radius=24px"
+        },
+        "clientLabelPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-client-label-px=26px"
+        },
+        "clientLabelWeight": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-client-label-wght=500"
+        },
+        "clientLabelLeading": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-client-label-leading=1.2"
+        },
+        "clientLabelTracking": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-client-label-tracking=0.14em"
+        }
+      }
+    },
+    "backdrop": {
+      "selector": "[data-slot='backdrop']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-backdrop-ref",
+          "example": "asset-ref:layer:probe"
+        },
+        "alt": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 320,
+          "resolver": "gl-backdrop-alt",
+          "example": ""
+        }
+      }
+    },
+    "logo": {
+      "selector": "[data-slot='logo']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/efeonce-logo-negative.svg"
+    },
+    "voice": {
+      "selector": "[data-slot='voice']",
+      "type": "object",
+      "required": true,
+      "shape": {
+        "eyebrow": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 48,
+          "example": "Propuesta comercial · Octubre 2026"
+        },
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 32,
+          "example": "¿Cómo crecemos en 2027?"
+        },
+        "answerLead": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 14,
+          "example": ""
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 14,
+          "resolver": "gl-answer",
+          "example": "Con foco"
+        }
+      }
+    },
+    "evidence": {
+      "selector": "[data-slot='evidence']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 190,
+        "maxLines": 5,
+        "overflow": "reject"
+      },
+      "example": "Preparada para <strong>[Cliente]</strong> · Confidencial"
+    },
+    "clientLogo": {
+      "selector": "[data-slot='clientLogo']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-file-ref",
+          "example": "asset-ref:file:probe"
+        },
+        "alt": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 80,
+          "resolver": "gl-alt",
+          "example": "Logo del cliente"
+        }
+      },
+      "example": null,
+      "note": "El probe muestra la plantilla (marcador): el logo y el marcador nunca van juntos, así que el ejemplo del logo es nulo."
+    },
+    "clientPlaceholder": {
+      "selector": "[data-slot='clientPlaceholder']",
+      "type": "string",
+      "required": false,
+      "constraints": {
+        "maxCharacters": 24,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "Logo del cliente"
+    },
+    "selection": {
+      "selector": "[data-slot='selection']",
+      "type": "object",
+      "required": false,
+      "shape": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 24,
+          "consumer": "validation-only",
+          "example": "Cliente"
+        },
+        "anchor": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "top-end"
+        },
+        "participantKind": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "department"
+        },
+        "targetKind": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 8,
+          "consumer": "validation-only",
+          "example": "object"
+        },
+        "scale": {
+          "type": "number",
+          "required": false,
+          "consumer": "validation-only",
+          "example": 1.2
+        },
+        "variant": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "eight-handles"
+        },
+        "padding": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "standard"
+        },
+        "overlay": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "none"
+        }
+      }
+    },
+    "urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "defaultAsset": "assets/url-bubble-baked-dark.svg"
+    }
+  }
+}

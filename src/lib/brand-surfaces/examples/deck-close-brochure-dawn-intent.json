@@ -1,0 +1,25 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "close",
+  "recipe": "close-brochure",
+  "use": "brochure",
+  "layout": "photo",
+  "line": "growth",
+  "voice": {
+    "question": "¿Conversamos?",
+    "answer": [
+      "Cuando",
+      "quieras"
+    ]
+  },
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-09-27_brochure/plates/BR4-contra-amanecer.png",
+    "alt": "Nexa, de espaldas junto a un agente mini robot, camina por una pasarela sobre el agua hacia una órbita de luz teal inclinada que sale sobre el horizonte al amanecer"
+  }
+}

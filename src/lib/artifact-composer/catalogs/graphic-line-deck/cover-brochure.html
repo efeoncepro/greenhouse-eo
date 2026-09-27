@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · portada de brochure</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `cover-brochure` (surface deck, papel cover, uso brochure; aprobada 2026-09-27). Foto de cine a sangre con
+      el sujeto a la derecha y la COLUMNA DE VOZ a la izquierda: logo de 500 px, eyebrow, pregunta con su anillo,
+      respuesta con su esfera y la evidencia con una palabra en negrita. Composiciones `document` (el brochure general)
+      y `line` (una por línea, con el acento de SU línea). Sin cliente, sin eslogan, sin selección y sin burbuja URL.
+      Toda medida, peso y color llega del manifest y de los tokens de AXIS; la plantilla no declara respaldo.
+    -->
+    <main class="gl-slide gl-frame gl-frame-column" data-gl-root data-slot="frame">
+      <figure class="gl-backdrop" data-slot="backdrop">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <img class="gl-logo" data-slot="logo" src="assets/efeonce-logo-negative.svg" alt="Efeonce" />
+
+      <div data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Eyebrow</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Pregunta?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead"></span><span data-slot-field="answer">Respuesta</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-evidence" data-slot="evidence">Evidencia</p>
+    </main>
+  </body>
+</html>

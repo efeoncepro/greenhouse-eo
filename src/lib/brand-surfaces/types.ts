@@ -18,6 +18,8 @@ export type GraphicLineCatalogName = 'graphic-line-deck' | 'graphic-line-stills'
 export type SurfaceAssetRequest =
   | { ref: string; kind: 'plate'; path: string; fit: { width: number; height: number } }
   | { ref: string; kind: 'svg'; svg: string }
+  /** Un archivo que quien compone lee tal cual (el logo de un cliente): SVG o PNG, sin recorte. */
+  | { ref: string; kind: 'file'; path: string }
 
 /** Lo que un builder de receta devuelve: los slots de UNA lámina y los assets que referencia. */
 export interface RecipeSlots {

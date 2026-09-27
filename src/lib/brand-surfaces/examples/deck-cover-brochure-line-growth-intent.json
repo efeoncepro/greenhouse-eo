@@ -1,0 +1,29 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "theme": "dark",
+  "role": "cover",
+  "recipe": "cover-brochure",
+  "use": "brochure",
+  "layout": "line",
+  "line": "growth",
+  "voice": {
+    "eyebrow": "Brochure · Growth Strategy",
+    "question": "¿Lo medimos?",
+    "answer": [
+      "Siempre"
+    ]
+  },
+  "body": "**Seis** capacidades:\nEstrategia · GTM · Revenue enablement\nAnalítica · Medición · Orquestación",
+  "photo": {
+    "register": "cine",
+    "subject": "nexa",
+    "plateRef": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png",
+    "alt": "Una estratega de Efeonce con polo y lanyard revisa un tablero de resultados en un monitor, de noche"
+  },
+  "column": {
+    "topPx": 220
+  }
+}

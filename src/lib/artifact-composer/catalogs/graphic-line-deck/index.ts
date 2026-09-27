@@ -22,12 +22,26 @@ import type { ArtifactCatalog, CatalogLayoutHook } from '../../catalog'
 import { axisPackDir } from '../../brand-packs/axis'
 import { graphicLineResolvers } from '../graphic-line-shared/resolvers'
 import type { GraphicLineCatalogOptions } from '../graphic-line-shared/options'
+import { makeCtaHook } from '../graphic-line-shared/cta-hook'
 import { makeSelectionHook } from '../graphic-line-shared/selection-hook'
 
 export const graphicLineDeckCatalogDir = path.dirname(fileURLToPath(import.meta.url))
 
 /** Plantillas que pueden llevar selección colaborativa sobre la respuesta. */
-const TEMPLATES_WITH_SELECTION = ['ProposalCinematic', 'ProposalCinematicHero', 'ProposalCinematicLines'] as const
+const TEMPLATES_WITH_SELECTION = [
+  'ProposalCinematic',
+  'ProposalCinematicHero',
+  'ProposalCinematicLines',
+  // Portadas de propuesta: la selección toma el logo del cliente.
+  'CoverProposalOrbit',
+  'CoverProposalDawn'
+] as const
+
+/**
+ * La contraportada de brochure sin foto lleva el cursor del LECTOR sobre la respuesta (corchetes abiertos): es el
+ * mismo CTA canónico de las piezas con llamada a la acción, sin descriptor.
+ */
+const TEMPLATES_WITH_READER_CURSOR = ['CloseBrochure'] as const
 
 /**
  * En la escalera del método la selección toma un NIVEL (`selection.level`, 1 = el de abajo), no la respuesta. El
@@ -63,6 +77,10 @@ export const createCatalog = (options: GraphicLineCatalogOptions = {}): Artifact
   const layoutHooks: Record<string, CatalogLayoutHook> = {}
 
   for (const template of TEMPLATES_WITH_SELECTION) layoutHooks[template] = selectionHook
+
+  for (const template of TEMPLATES_WITH_READER_CURSOR) {
+    layoutHooks[template] = makeCtaHook(options.ctaPainter, { cursorScale: 1, descriptorGapOfWidth: 0 })
+  }
 
   layoutHooks.MethodStaircase = levelSelectionHook(selectionHook)
 
