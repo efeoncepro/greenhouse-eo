@@ -1,0 +1,41 @@
+/* GENERADO por `pnpm glitch:tokens` desde @efeoncepro/axis-tokens 0.3.14 (glitchLine). NO EDITAR A MANO. Sólo Glitch. */
+:root {
+  --gx-ground: #001a33;
+  --gx-accent: #6ec207;
+  --gx-navy: #022a4e;
+  --gx-text: #e6edf3;
+  --gx-text-strong: #ffffff;
+  --gx-sub: #9fb3c8;
+  --gx-line: #1d3a57;
+  --gx-on-light: #022a4e;
+  --gx-duotone-from: #001a33;
+  --gx-duotone-to: #cfe4fa;
+  --gx-font-headline: 'Bricolage Grotesque';
+  --gx-font-text: 'Poppins';
+  --gx-font-narrator: 'Guttery';
+  --gx-entry-weight: 300;
+  --gx-entry-width: 100;
+  --gx-entry-size: 0.72em;
+  --gx-close-weight: 800;
+  --gx-close-width: 78;
+  --gx-close-stretch: 78%;
+  --gx-headline-tracking: 0.01em;
+  --gx-label-weight: 600;
+  --gx-subtitle-weight: 600;
+  --gx-narrator-rotation: -3deg;
+  --gx-wordmark-width: 290px;
+  --gx-edition-label-size: 16px;
+  --gx-edition-label-weight: 600;
+  --gx-edition-label-tracking: 0.24em;
+  --gx-edition-number-size: 92px;
+  --gx-edition-hash-weight: 300;
+  --gx-edition-number-weight: 800;
+  --gx-edition-number-width: 78;
+  --gx-photo-band-top: 176px;
+  --gx-photo-band-height: 450px;
+  --gx-reel-ui-top: 220px;
+  --gx-reel-ui-bottom: 1500px;
+  --gx-reel-buttons: 940px;
+  --gx-reel-masthead-top: 240px;
+  --gx-reel-text-top: 1150px;
+}

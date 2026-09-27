@@ -191,6 +191,54 @@
       "embedRights": true,
       "extension": "graphic-line",
       "source": "Google Fonts css2 (TTF completo), 2026-09-25 — TASK-1889: el informe aprobado usa Poppins 500 en antetítulos y etiquetas; sin ella el navegador caía a 300. Es de la extensión editorial: deck-axis pide 500 en MaturityLadderFull y hoy lo resuelve a 300; darle la cara cambiaría las propuestas ya aprobadas. — también en la extensión graphic-line (eyebrow de La órbita, 500)"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "weight": "200 800",
+      "style": "normal",
+      "file": "fonts/bricolage-grotesque-variable.ttf",
+      "sha256": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682",
+      "bytes": 408496,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Mismo archivo variable de la extensión graphic-line, declarado con el rango de pesos que usa Glitch: entrada 300, remate 800 condensado (wdth 78) y POV del mosaico 400 (extensión glitch, TASK-1923: sólo Glitch)",
+      "extension": "glitch"
+    },
+    {
+      "family": "Poppins",
+      "weight": 400,
+      "style": "normal",
+      "file": "fonts/poppins-400.ttf",
+      "sha256": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a",
+      "bytes": 158240,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Copia de la entrada graphic-line (extensión glitch, TASK-1923: sólo Glitch)",
+      "extension": "glitch"
+    },
+    {
+      "family": "Poppins",
+      "weight": 500,
+      "style": "normal",
+      "file": "fonts/poppins-500.ttf",
+      "sha256": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016",
+      "bytes": 152860,
+      "license": "OFL-1.1",
+      "embedRights": true,
+      "source": "Copia de la entrada graphic-line (extensión glitch, TASK-1923: sólo Glitch)",
+      "extension": "glitch"
+    },
+    {
+      "family": "Guttery",
+      "weight": 400,
+      "style": "normal",
+      "file": "fonts/guttery-400.ttf",
+      "sha256": "fbf6b68787b5590b24219cc199975305b97927d3794c2616f6f99303ce2bc6cc",
+      "bytes": 61012,
+      "license": "Licencia comercial de Efeonce (web y video), confirmada por el operador el 2026-09-27; número de contrato pendiente",
+      "embedRights": true,
+      "source": "Guttery.otf instalado en el equipo del operador (contornos TrueType). El operador autorizó el 2026-09-27 que entre al repo privado y se embeba en PDF/PNG de Glitch; sólo para las muletillas del narrador (extensión glitch, TASK-1923: sólo Glitch)",
+      "extension": "glitch"
     }
   ]
 }

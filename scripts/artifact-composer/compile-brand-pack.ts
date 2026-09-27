@@ -24,6 +24,12 @@ import {
   DECK_TOKENS_PATH
 } from '@/lib/artifact-composer/catalogs/deck-axis/compile-tokens'
 import {
+  buildGlitchTokensCss,
+  syncGlitchFontBinaries,
+  GLITCH_FONTS_PATH,
+  GLITCH_TOKENS_PATH
+} from '@/lib/artifact-composer/catalogs/glitch/compile-tokens'
+import {
   buildInsightsReportTokensCss,
   syncReportFontBinaries,
   REPORT_FONTS_PATH,
@@ -108,6 +114,13 @@ const CATALOGS: {
     tokensPath: GRAPHIC_LINE_OVERLAYS_TOKENS_PATH,
     fontsPath: GRAPHIC_LINE_OVERLAYS_FONTS_PATH,
     syncFonts: syncGraphicLineOverlaysFontBinaries
+  },
+  {
+    name: 'glitch',
+    build: buildGlitchTokensCss,
+    tokensPath: GLITCH_TOKENS_PATH,
+    fontsPath: GLITCH_FONTS_PATH,
+    syncFonts: syncGlitchFontBinaries
   }
 ]
 

@@ -1,0 +1,304 @@
+{
+  "$comment": "GENERADO por `pnpm glitch:tokens` desde @efeoncepro/axis-tokens (glitchLine). NO EDITAR A MANO: el test de sincronía detecta el drift.",
+  "source": {
+    "package": "@efeoncepro/axis-tokens",
+    "version": "0.3.14"
+  },
+  "status": "candidate",
+  "franchise": "glitch",
+  "color": {
+    "ground": "#001a33",
+    "accent": "#6ec207",
+    "navy": "#022a4e",
+    "text": "#e6edf3",
+    "textStrong": "#ffffff",
+    "sub": "#9fb3c8",
+    "line": "#1d3a57",
+    "onLight": "#022a4e",
+    "accentOnLight": "never-text-border-separator",
+    "explorationAccents": [
+      "#36c8bf",
+      "#ff6500"
+    ]
+  },
+  "bytes": {
+    "edges": [
+      "bottom",
+      "side"
+    ],
+    "duotone": {
+      "from": "#001a33",
+      "to": "#cfe4fa"
+    },
+    "appleBitsPerCell": 8,
+    "neverOverFace": true
+  },
+  "apple": {
+    "assetId": "glitch-apple",
+    "viewBox": [
+      539,
+      0,
+      118,
+      154
+    ],
+    "perPiece": 1
+  },
+  "formats": {
+    "linkedin-4x5": {
+      "w": 1080,
+      "h": 1350
+    },
+    "landscape-16x9": {
+      "w": 1920,
+      "h": 1080
+    },
+    "square-1x1": {
+      "w": 1080,
+      "h": 1080
+    },
+    "blog-inline-16x9": {
+      "w": 1600,
+      "h": 900
+    },
+    "reel-9x16": {
+      "w": 1080,
+      "h": 1920
+    }
+  },
+  "pieces": {
+    "portada-a": {
+      "status": "aprobada",
+      "surface": "carousel",
+      "format": "linkedin-4x5",
+      "coverTemplate": "A",
+      "sphere": "apple",
+      "headline": true
+    },
+    "portada-b": {
+      "status": "aprobada",
+      "surface": "carousel",
+      "format": "linkedin-4x5",
+      "coverTemplate": "B",
+      "sphere": "apple",
+      "headline": true
+    },
+    "portada-c": {
+      "status": "aprobada",
+      "surface": "carousel",
+      "format": "linkedin-4x5",
+      "coverTemplate": "C",
+      "sphere": "apple",
+      "headline": true
+    },
+    "interior": {
+      "status": "aprobada",
+      "surface": "carousel",
+      "format": "linkedin-4x5",
+      "coverTemplate": null,
+      "sphere": "apple",
+      "headline": true
+    },
+    "interior-noticia-1": {
+      "status": "aprobada",
+      "surface": "carousel",
+      "format": "linkedin-4x5",
+      "coverTemplate": null,
+      "sphere": "apple",
+      "headline": true
+    },
+    "interior-lente": {
+      "status": "aprobada",
+      "surface": "carousel",
+      "format": "linkedin-4x5",
+      "coverTemplate": null,
+      "sphere": "lens",
+      "headline": true
+    },
+    "contraportada": {
+      "status": "aprobada",
+      "surface": "carousel",
+      "format": "linkedin-4x5",
+      "coverTemplate": null,
+      "sphere": "apple",
+      "headline": true
+    },
+    "blog-banner-a": {
+      "status": "aprobada",
+      "surface": "blog",
+      "format": "landscape-16x9",
+      "coverTemplate": "A",
+      "sphere": "apple",
+      "headline": true
+    },
+    "blog-banner-b": {
+      "status": "aprobada",
+      "surface": "blog",
+      "format": "landscape-16x9",
+      "coverTemplate": "B",
+      "sphere": "apple",
+      "headline": true
+    },
+    "blog-banner-c": {
+      "status": "aprobada",
+      "surface": "blog",
+      "format": "landscape-16x9",
+      "coverTemplate": "C",
+      "sphere": "apple",
+      "headline": true
+    },
+    "blog-banner-square-a": {
+      "status": "aprobada",
+      "surface": "blog",
+      "format": "square-1x1",
+      "coverTemplate": "A",
+      "sphere": "apple",
+      "headline": true
+    },
+    "blog-banner-square-b": {
+      "status": "aprobada",
+      "surface": "blog",
+      "format": "square-1x1",
+      "coverTemplate": "B",
+      "sphere": "apple",
+      "headline": true
+    },
+    "blog-banner-square-c": {
+      "status": "aprobada",
+      "surface": "blog",
+      "format": "square-1x1",
+      "coverTemplate": "C",
+      "sphere": "apple",
+      "headline": true
+    },
+    "blog-banner-interno": {
+      "status": "aprobada",
+      "surface": "blog",
+      "format": "blog-inline-16x9",
+      "coverTemplate": null,
+      "sphere": "none",
+      "headline": false
+    },
+    "reel-portada": {
+      "status": "aprobada",
+      "surface": "reel",
+      "format": "reel-9x16",
+      "coverTemplate": null,
+      "sphere": "apple",
+      "headline": true
+    },
+    "reel-overlay": {
+      "status": "aprobada",
+      "surface": "reel",
+      "format": "reel-9x16",
+      "coverTemplate": null,
+      "sphere": "apple",
+      "headline": false
+    },
+    "reel-tarjeta-final": {
+      "status": "aprobada",
+      "surface": "reel",
+      "format": "reel-9x16",
+      "coverTemplate": null,
+      "sphere": "apple",
+      "headline": true
+    },
+    "vlog-overlay": {
+      "status": "aprobada",
+      "surface": "vlog",
+      "format": "landscape-16x9",
+      "coverTemplate": null,
+      "sphere": "apple",
+      "headline": false
+    },
+    "vlog-tarjeta-final": {
+      "status": "aprobada",
+      "surface": "vlog",
+      "format": "landscape-16x9",
+      "coverTemplate": null,
+      "sphere": "apple",
+      "headline": true
+    },
+    "historia-9x16": {
+      "status": "exploracion",
+      "surface": "story",
+      "format": "reel-9x16",
+      "coverTemplate": null,
+      "sphere": "apple",
+      "headline": true
+    },
+    "carrusel-panoramico": {
+      "status": "exploracion",
+      "surface": "carousel",
+      "format": "linkedin-4x5",
+      "coverTemplate": null,
+      "sphere": "apple",
+      "headline": true
+    }
+  },
+  "coverRotation": {
+    "templates": [
+      "A",
+      "B",
+      "C"
+    ],
+    "rule": "never-same-as-previous-week",
+    "chooseBy": {
+      "strongPhoto": "A",
+      "standalonePov": "B",
+      "severalEqualNews": "C"
+    }
+  },
+  "icons": {
+    "voices": [
+      "stroke",
+      "plastilina"
+    ],
+    "glitchGlyphs": [
+      "guardar",
+      "compartir",
+      "recomendar",
+      "comentar",
+      "deslizar"
+    ],
+    "actions": {
+      "row": {
+        "pieces": [
+          "contraportada"
+        ],
+        "glyphs": [
+          "guardar",
+          "compartir",
+          "recomendar",
+          "comentar"
+        ]
+      },
+      "swipe": {
+        "pieces": [
+          "portada-a",
+          "portada-b",
+          "portada-c",
+          "interior",
+          "interior-noticia-1",
+          "interior-lente"
+        ],
+        "glyph": "deslizar"
+      },
+      "voice": "plastilina",
+      "rendering": "flat",
+      "volume": "never"
+    }
+  },
+  "signature": {
+    "logo": "efeonce-logo-negative",
+    "position": "bottom-center",
+    "slogan": {
+      "line": "growth",
+      "word": "Growth",
+      "text": "Empower your Growth",
+      "only": [
+        "contraportada"
+      ]
+    },
+    "urlBubble": false
+  }
+}
