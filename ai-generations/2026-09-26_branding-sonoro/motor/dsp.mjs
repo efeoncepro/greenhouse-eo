@@ -125,21 +125,24 @@ export function createMix({ dur, seed = 0x9e3779b9 }) {
   }
 
   // Mezcla final: halo, fundido, pico a −1 dBFS, WAV 48 kHz / 24 bits.
-  function write(path, { wet = 1.6, fadeMs = 450, peakDb = -1 } = {}) {
+  // gain: ganancia fija (misma escala entre archivos) en vez de normalizar por pico.
+  // gate(t): multiplicador final después del halo (corte en seco que también se lleva la cola).
+  function write(path, { wet = 1.6, fadeMs = 450, peakDb = -1, gain = null, gate = null } = {}) {
     const wl = freeverb(send[0], 0), wr = freeverb(send[1], 23)
     const L = new Float64Array(N), R = new Float64Array(N), fs = N - Math.round((SR * fadeMs) / 1000)
     let peak = 0
     for (let i = 0; i < N; i++) {
-      const f = i > fs ? 1 - smooth((i - fs) / (N - fs)) : 1
+      const f = (i > fs ? 1 - smooth((i - fs) / (N - fs)) : 1) * (gate ? gate(i / SR) : 1)
       L[i] = (dry[0][i] + wl[i] * wet) * f; R[i] = (dry[1][i] + wr[i] * wet) * f
       peak = Math.max(peak, Math.abs(L[i]), Math.abs(R[i]))
     }
-    const g = db(peakDb) / peak, buf = Buffer.alloc(44 + N * 6)
+    const g = gain ?? db(peakDb) / peak, buf = Buffer.alloc(44 + N * 6)
     buf.write('RIFF', 0); buf.writeUInt32LE(36 + N * 6, 4); buf.write('WAVEfmt ', 8); buf.writeUInt32LE(16, 16)
     buf.writeUInt16LE(1, 20); buf.writeUInt16LE(2, 22); buf.writeUInt32LE(SR, 24); buf.writeUInt32LE(SR * 6, 28)
     buf.writeUInt16LE(6, 32); buf.writeUInt16LE(24, 34); buf.write('data', 36); buf.writeUInt32LE(N * 6, 40)
     for (let i = 0; i < N; i++) for (const [c, ch] of [[0, L], [1, R]]) buf.writeIntLE(Math.round(Math.max(-1, Math.min(1, ch[i] * g)) * 8388607), 44 + i * 6 + c * 3, 3)
     writeFileSync(path, buf)
+    return { peak, gain: g }
   }
 
   // Suma un bus estéreo ya procesado (p. ej. guitarras distorsionadas) a la mezcla.
@@ -147,5 +150,11 @@ export function createMix({ dur, seed = 0x9e3779b9 }) {
     for (let i = 0; i < N; i++) { const l = L[i] * gain, r = R[i] * gain; dry[0][i] += l; dry[1][i] += r; send[0][i] += l * sendAmt; send[1][i] += r * sendAmt }
   }
 
-  return { N, I, modal, tick, tone, noise, write, addStereo, rnd }
+  // Suma un segmento mono ya sintetizado desde t0, con paneo y envío al halo.
+  function addMono(t0, seg, pan = 0, sendAmt = 0.1, gain = 1) {
+    const i0 = Math.round(t0 * SR)
+    for (let k = 0; k < seg.length; k++) { const i = i0 + k; if (i >= 0 && i < N) put(i, seg[k] * gain, pan, sendAmt) }
+  }
+
+  return { N, I, modal, tick, tone, noise, write, addStereo, addMono, rnd }
 }

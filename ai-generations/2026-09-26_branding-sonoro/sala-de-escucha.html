@@ -168,6 +168,10 @@
   .chosen b { font-weight: 600; }
   .round { font: 600 11px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding-top: 8px; border-top: 1px solid var(--rule); }
   .videos.two { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .videos.vert { grid-template-columns: repeat(auto-fit, minmax(170px, 240px)); }
+  .videos.vert video { aspect-ratio: 9 / 16; }
+  .cues { display: grid; gap: 6px; margin: 0; padding-left: 20px; max-width: 72ch; font-size: 14px; }
+  .cues b { font-weight: 600; }
   .decide { display: grid; gap: 12px; max-width: 72ch; }
   .decide ol { margin: 0; padding-left: 20px; display: grid; gap: 10px; }
   .decide li::marker { font-weight: 600; color: var(--accent); }
@@ -192,7 +196,7 @@
 
 <main class="page">
   <header>
-    <div class="eyebrow">Branding sonoro · ronda 5 · prototipos sin aprobar</div>
+    <div class="eyebrow">Branding sonoro · ronda 6 · prototipos sin aprobar</div>
     <h1>Tres puntos que se vuelven uno<span class="sphere" aria-hidden="true"></span></h1>
     <p class="lede">El logo sonoro traduce la gramática de <strong>La órbita</strong>: el anillo pregunta, tres notas breves piensan
       (las tres ventanas de la nave), hay una pausa y la esfera responde con golpe. Todo está en <strong>La mayor</strong>, la
@@ -215,6 +219,60 @@
     <div><b>Esfera · la respuesta</b><span>Una nota de campana con impacto grave. Es el único golpe.</span></div>
     <div><b>Halo · la luz</b><span>El acorde de La florece debajo y se apaga con una cola corta.</span></div>
   </div>
+
+  <div class="round">Ronda 6 · Glitch</div>
+
+  <section id="glitch-sfx">
+    <div class="section-head">
+      <h2>Glitch: el sonido de Efeonce, con un bug<span class="status">Propuesta</span></h2>
+      <p>No es música: es <strong>diseño sonoro</strong> sobre el piloto de motion v2. El motivo de Efeonce, <strong>Mi · Mi · Mi → La</strong>, con la tercera nota que falla: se rompe en bytes y se rearma como la manzana, que da <strong>el único golpe grave</strong> (La en campana, el timbre de Growth). Cada sonido cae en un cuadro de la animación.</p>
+      <p>Toda la falla está <strong>afinada en La mayor</strong>. Nada de chiptune, módem, máquina de escribir, vinilo ni whooshes: el corte es silencio digital. La voz del host nunca recibe la falla y la firma de Efeonce no suena. Síntesis propia, sin muestras.</p>
+    </div>
+
+    <h3>El bucle: tarjeta final → apertura (16:9)</h3>
+    <div class="videos two">
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-bucle-16x9-a.mp4"></video><figcaption><b>A · contenida.</b> La falla se oye, pero no empuja.</figcaption></figure>
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-bucle-16x9-b.mp4"></video><figcaption><b>B · más punch.</b> Más tartamudeo, cuerpo en los golpes de texto y la campana al revés cuando la manzana implosiona.</figcaption></figure>
+    </div>
+
+    <h3>La edición completa (animatic de 45 s)</h3>
+    <p class="note"><b>El video entero es el motivo en cámara lenta.</b> Cada cabecera «NOTICIA n/3» suena en Mi: la 1 y la 2 limpias, la 3 falla. El Glitch Drop es La: la manzana y el segundo golpe grave del video. En el animatic no hay voz: entre golpes queda sólo el aire del estudio, que es donde entra el host.</p>
+    <div class="videos two">
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-edicion-16x9-a.mp4"></video><figcaption><b>A · contenida</b></figcaption></figure>
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-edicion-16x9-b.mp4"></video><figcaption><b>B · más punch</b></figcaption></figure>
+    </div>
+
+    <h3>En el reel (9:16)</h3>
+    <div class="videos vert">
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-bucle-9x16-a.mp4"></video><figcaption><b>A</b></figcaption></figure>
+      <figure><video controls preload="metadata" playsinline src="audio/glitch-bucle-9x16-b.mp4"></video><figcaption><b>B</b></figcaption></figure>
+    </div>
+
+    <h3>Qué suena en cada momento</h3>
+    <ul class="cues">
+      <li><b>Los puntos escriben:</b> tres notas Mi, breves y puras.</li>
+      <li><b>El tercer punto tiembla y se rompe (0,8 s):</b> el Mi salta de altura cuadro a cuadro, pierde resolución y se corta en repeticiones cada vez más cortas.</li>
+      <li><b>Los bytes se arman como la manzana:</b> granos afinados que suben de altura fila por fila y recuperan resolución al llegar.</li>
+      <li><b>La manzana (1,6 s):</b> el golpe grave con la campana en La; su eco vuelve con la falla.</li>
+      <li><b>«El micrófono» / «se abre» (2,3 s):</b> ticks por letra, el clic del canal y el aire del estudio que entra.</li>
+      <li><b>El número decodifica:</b> ticks al azar que se asientan en La.</li>
+      <li><b>Salida:</b> desgarro de tres cuadros y silencio digital en seco.</li>
+      <li><b>«se cierra.»:</b> el clic del canal y el aire que se va. La muletilla en Guttery es el único sonido orgánico: un trazo de plumón.</li>
+      <li><b>La manzana implosiona:</b> los bytes vuelven hacia adentro, bajan de altura y caen en el Mi del tercer punto, que empalma con la apertura.</li>
+    </ul>
+
+    <div class="decide">
+      <h3>Lo que necesito que decidas</h3>
+      <ol>
+        <li><b>¿A o B?</b> O una mezcla: por ejemplo, la apertura de B con la tarjeta final de A.</li>
+        <li><b>¿Dos golpes graves en el video (apertura y Drop)?</b> Uno por cada aparición de la manzana.</li>
+        <li><b>¿Voz sola bajo las noticias, sin música?</b> Es mi recomendación.</li>
+        <li><b>El clic del micrófono y el plumón están sintetizados.</b> Si suenan artificiales, los paso a ElevenLabs.</li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="round">Ronda 5</div>
 
   <section id="rock">
     <div class="section-head">

@@ -476,7 +476,9 @@ Además hay un **animatic de 45 s por formato** con el orden y el momento de cad
 ### 13.3 Golpes para el diseño sonoro
 
 El piloto sale **mudo**. Estos cuadros quedan marcados para que el diseño sonoro (y el mnemónico, si el operador lo
-aprueba en su evaluación dedicada) caigan en su lugar. Tiempos a 30 fps:
+aprueba en su evaluación dedicada) caigan en su lugar. Tiempos a 30 fps. **Propuesta de diseño sonoro (2026-09-27, sin
+aprobar):** amarrada a estos cuadros y a los del kit, en dos intensidades, en OneDrive
+`Motion/piloto/sonido-propuesta/` y en la [identidad sonora](../../brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md#pendientes-para-canonizar).
 
 | Pieza | Cuadro | Tiempo | Qué pasa |
 |---|---|---|---|

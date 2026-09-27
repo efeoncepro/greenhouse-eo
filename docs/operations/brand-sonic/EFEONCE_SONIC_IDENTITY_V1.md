@@ -253,6 +253,10 @@ contrato algo que todavía es recomendación.
 
 - **Glitch (podcast).** Hay dos versiones exploradas: serena, con una falla en la tercera nota, y rock, con tartamudeo
   de banda. La recomendación era intro y outro rock más cortina serena; al operador «aún no le convence».
+  **Ronda 6 (2026-09-27, propuesta):** diseño sonoro en vez de música, «el sonido de Efeonce, con un bug» —el motivo
+  con la tercera nota que falla y se rearma como la manzana—, amarrado cuadro a cuadro al piloto de motion de Glitch,
+  en dos intensidades. Motor `motor/glitch-sfx.mjs`; pistas en OneDrive `09. Glitch/Motion/piloto/sonido-propuesta/`.
+  Sigue pendiente de la decisión del operador.
 - **Licencias:** confirmar con legal si el umbral de USD 1 millón de Stability aplica vía fal (la evidencia reunida
   está en [Trampas de proveedores](#trampas-de-proveedores-medidas)); la voz tiene «Commercial use rights included» en fal.
 - **Prueba de reconocimiento sin logo** antes de pautar, como la D14 de la órbita.
