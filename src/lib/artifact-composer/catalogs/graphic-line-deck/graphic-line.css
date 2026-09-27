@@ -562,10 +562,10 @@ body {
   letter-spacing: -0.05em;
 }
 
-/* Una esfera por pieza: sólo la última palabra de la frase la lleva. */
-.gl-tr .gl-tr-panel:not(:last-child) .gl-sphere {
-  display: none;
-}
+/*
+ * Una palabra por toma, cada una cerrada por su esfera (regla `triptych-word-per-panel` de AXIS: la excepción aprobada
+ * a «una esfera por pieza»). El builder exige que el token lo declare así; la plantilla no esconde ninguna.
+ */
 
 /* El lecho de la pregunta: la primera toma difuminada, enmascarada hacia abajo, y un velo del fondo Efeonce. */
 .gl-tr .gl-tr-bed {

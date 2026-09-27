@@ -867,17 +867,17 @@ exports[`planes de los intents de ejemplo > deck-triptych-intent.json compone el
             {
               "alt": "Una estratega de Efeonce toma notas mientras un panadero le explica su oficio frente al horno",
               "src": "asset-ref:plate:T1-escucha",
-              "word": "Escucha,",
+              "word": "Escucha",
             },
             {
               "alt": "Un creativo con el hoodie de Efeonce fija pruebas de fotografía en una pared del estudio",
               "src": "asset-ref:plate:T2-crea",
-              "word": "crea",
+              "word": "Crea",
             },
             {
               "alt": "Una consultora de Efeonce señala una curva de resultados en la pantalla de la sala del cliente",
               "src": "asset-ref:plate:T3-mide",
-              "word": "y mide",
+              "word": "Mide",
             },
           ],
           "question": "¿Cómo trabajamos?",

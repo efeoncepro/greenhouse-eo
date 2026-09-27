@@ -188,7 +188,7 @@ describe('recetas aprobadas del deck', () => {
     expect(issuesOf({ ...intent, figures: [figures[0], { value: '−38 %', label: 'costo por lead' }] })).toContain('figure-source-required')
   })
 
-  it('triptych: tres tomas nativas 9:16 de 636 px y una línea de la frase por toma', () => {
+  it('triptych: tres tomas nativas 9:16 de 636 px y una palabra por toma, cada una con su esfera', () => {
     const { piece, violations, slots } = plan(example('triptych'))
 
     expect(piece.contentType).toBe('deck.triptych')
@@ -200,12 +200,21 @@ describe('recetas aprobadas del deck', () => {
 
     const panels = slots.panels as unknown as { word: string }[]
 
-    expect(panels.map(p => p.word)).toEqual(['Escucha,', 'crea', 'y mide'])
+    expect(panels.map(p => p.word)).toEqual(['Escucha', 'Crea', 'Mide'])
 
     const plates = piece.assets.filter(a => a.kind === 'plate')
 
     expect(plates).toHaveLength(3)
     expect(plates.every(p => 'fit' in p && p.fit.width === 636 && p.fit.height === 1131)).toBe(true)
+  })
+
+  it('triptych: una toma con más de una palabra falla cerrado', () => {
+    const intent = example('triptych')
+
+    expectCode(
+      () => planSurfacePiece({ ...intent, voice: { ...intent.voice, answer: ['Escucha,', 'crea', 'y mide'] } }, { artifactId: 'prueba' }),
+      'invalid-intent'
+    )
   })
 
   it('triptych: una frase que no reparte en tres tomas falla cerrado; otro número de tomas lo rechaza AXIS', () => {

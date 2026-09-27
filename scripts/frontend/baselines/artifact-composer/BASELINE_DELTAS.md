@@ -1,5 +1,14 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-27 (c) — TASK-1927: el tríptico pasa a una palabra por toma, cada una con su esfera
+
+Decisión del operador (canvas Deck, 2026-09-27), ya en el token de AXIS: `triptych.voice.sphere: 'per-panel'`,
+`wordsPerPanel: 1`, regla `triptych-word-per-panel` (la excepción aprobada a «una esfera por pieza»). La plantilla deja
+de esconder la esfera de las dos primeras tomas y el probe pasa de «Escucha, / crea / y mide» a «Escucha / Crea /
+Mide». Comparado a ojo con el plate real contra la referencia aprobada `triptych`. Ningún otro frame cambia.
+
+- `templates-graphic-line-deck/Triptych.png` — ✏️ deck.triptych: una palabra por toma y una esfera por toma
+
 ## 2026-09-27 (b) — TASK-1927: composiciones `hero` y `lines` de `proposal-cinematic` (`efeonce.surface-composition` 0.1.2)
 
 Greenhouse fija el contrato 0.1.2 de AXIS (tag `v0.3.11`). El bump **no movió ningún píxel**: los 22 frames del scope
@@ -590,7 +599,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 44f3384858246ba9e916807d581cffcb29c2004d23d9cfd3a3b2e06f35c8bf1e -->
+<!-- manifest-digest: 4b4bddcbc3ab369ed42fe476a05d156b4df76d442499c14d369a38e336556d57 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

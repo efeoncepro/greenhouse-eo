@@ -599,13 +599,15 @@ export const contentMeasure: RecipeBuilder = ({ intent, manifest, recipe }) => {
 }
 
 /**
- * `triptych`: tres tomas verticales nativas a altura completa separadas por un canal fino, y UNA frase que recorre las
- * tres (una línea de la respuesta por panel); la esfera va sólo al final. La pregunta va arriba sobre un difuminado
+ * `triptych`: tres tomas verticales nativas a altura completa separadas por un canal fino, y UNA palabra por toma, cada
+ * una cerrada por su esfera (`voice.sphere: 'per-panel'`, regla `triptych-word-per-panel`: la excepción aprobada a una
+ * esfera por pieza). La pregunta va arriba sobre un difuminado
  * de la primera foto (`questionBed`). Las tres fotos y la palabra de cada una salen de `content.panels` del manifest
  * (AXIS valida que sean exactamente las de la receta, cada una con su plate y su alt: `panels-count-invalid`).
  */
 export const triptych: RecipeBuilder = ({ intent, manifest, recipe }) => {
   const tokens = recipe as {
+    voice: { sphere?: string; wordsPerPanel?: number }
     panels: { count: number; widthPx: number; gutterPx: number; native: string }
     questionBed: { blurPx: number; maskPx: [number, number]; gradient: { from: number; to: number; heightPx: number } }
     type: { question: { px: number }; answer: { px: number } }
@@ -623,6 +625,22 @@ export const triptych: RecipeBuilder = ({ intent, manifest, recipe }) => {
   if (content.answer.length !== tokens.panels.count || panels.some(panel => !panel.word)) {
     throw new SurfacePieceError(
       `El tríptico reparte UNA frase en ${tokens.panels.count} paneles: la respuesta trae ${content.answer.length} líneas.`,
+      'invalid-intent'
+    )
+  }
+
+  // La plantilla pinta una esfera por toma: es lo que AXIS aprobó. Si el token dijera otra cosa, no hay plantilla.
+  if (tokens.voice.sphere !== 'per-panel') {
+    throw new SurfacePieceError(`El tríptico aprobado lleva una esfera por toma; el token dice «${String(tokens.voice.sphere)}».`, 'recipe-without-template')
+  }
+
+  // AXIS declara cuántas palabras lleva cada toma (`wordsPerPanel`) pero su resolver no lo exige, para no rechazar
+  // intents publicados: lo sostiene la receta.
+  const wordsPerPanel = tokens.voice.wordsPerPanel ?? 1
+
+  if (panels.some(panel => panel.word!.trim().split(/\s+/).length > wordsPerPanel)) {
+    throw new SurfacePieceError(
+      `Cada toma del tríptico lleva ${wordsPerPanel === 1 ? 'una palabra' : `hasta ${wordsPerPanel} palabras`}, con su esfera.`,
       'invalid-intent'
     )
   }
