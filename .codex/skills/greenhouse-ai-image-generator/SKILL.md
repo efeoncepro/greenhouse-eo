@@ -696,7 +696,9 @@ diagnostica sin costo.
   pasa, o si el lecho sale de tono medio, **se regenera**. Sin grade: la corrección técnica es la excepción. Las **seis**
   reservas del plate se miden con `pnpm foto:validar`; el lecho sigue medido en luminancia y es **señal débil [frágil]**
   (medir desenfoque bien queda **[pendiente]**).
-- **Firma:** SVG oficial compuesto con `scripts/componer.mjs` (`LOGO=0.15`), nunca generado.
+- **Firma:** SVG oficial compuesto después con `pnpm foto:componer` (o `pnpm foto:componer:cta` si la pieza lleva CTA),
+  al **20 % del lado corto** (25 % en 16:9 nuevas) y con contraste ≥ 4,5:1 medido; nunca generada. El
+  `scripts/componer.mjs` de la corrida del 2026-09-19 (`LOGO=0.15`) es histórico.
 - **Pantallas por curación generativa:** plate con pantalla en chroma `#00FF00` → UI de referencia → edit con
   `--image plate --image ui --mask <máscara>` → restaurar fuera de la pantalla desde el plate. La máscara se arma
   detectando chroma (g>120, g>1,4r, g>1,4b), dilatando (blur 2 + threshold 20) y con **`.extractChannel(0)`**: sin eso
@@ -706,6 +708,33 @@ diagnostica sin costo.
   costo); `setopt nullglob` antes de copiar con globs (un glob sin match aborta el comando entero).
 - **Lotes:** JSON con `json.dump` (§Serie con estética de trend) y `--batch <json> --out <dir>` ya respeta el
   directorio (corregido 2026-09-19, §Brechas conocidas).
+
+### Registro cine: placas, emblema y tamaños
+
+El registro cine («la marca en su película», 2026-09-27) sólo se usa con **Nexa protagonista** o en la receta de deck
+**`proposal-cinematic`**; fuera de eso, la foto es A, B o C. La dirección (idea, marcador, barra, trampas) vive en
+[`design-studio` → §Registros](../design-studio/references/efeonce-photographic-language.md) y el canon vigente es
+[`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
+(plantilla de ficha en su §12). Lo que toca a la mano:
+
+- **Se genera con `pnpm foto:generar <ficha.json> --quality high --out <dir>`**, después de `pnpm foto:prompt` y de
+  **leer el prompt compilado** (el compilador fuerza la reserva izquierda del 16:9 y le inyecta a Nexa un smartwatch
+  aunque la ficha lo niegue). Sin `--out`, deja el plate en `plates/` junto a la carpeta de fichas. Motor observado en
+  los logs: `gpt-image-2.5-sunburst` `high`, ≈ USD 0,037 de salida por placa más la entrada de 4–6 referencias.
+- **Las placas salen en el tamaño del motor, no en el de la tabla.** `foto:generar` traduce a propósito: 9:16
+  1152×2048 → **1024×1792**, 4:5 1152×1440 → **1024×1280**, 16:9 2048×1152 → **1792×1024** (medido en los logs del
+  brochure y de `ai-generations/2026-09-27_ads-cine/`). Por eso las cajas (isotipo, reservas, firma) se miden **en
+  fracciones**, nunca en píxeles.
+- 🔴 **El emblema nunca se usa tal como sale**, aunque parezca fiel (en el brochure salió fiel y aun así se compuso):
+  la prenda se pide con las referencias del kit en `objetos` → `pnpm foto:emblema <plate.png>` al 100 % →
+  `pnpm foto:isotipo <plate.png> --centro x,y --ancho w [--prenda oscura|clara]`, **una vez por pecho**. Escribe
+  `<plate>-isotipo.png` y un `.json` de procedencia (paquete `@efeoncepro/axis-brand-assets`, SHA-256 del SVG): la placa
+  aprobada lleva sufijo `b`. `foto:isotipo` compone el isotipo del pecho, no el logotipo de una espalda.
+- **Nunca describir el emblema en la escena**: pedir *«the white Efeonce rocket emblem»* dio un cohete genérico. Se
+  prohíbe por nombre (*«NO emblem, NO logo, NO symbol, NO rocket, NO lettering»*) y se compone el oficial.
+- **Ubicación de la herramienta:** hoy `scripts/foto/` en Greenhouse;
+  [TASK-1925](../../../docs/tasks/to-do/TASK-1925-brand-workshop-migration.md) la migra al repo taller
+  `efeoncepro/efeonce-brand-workshop` con delegadores, y los comandos `pnpm foto:*` no cambian para el operador.
 
 ## Provider Choice
 

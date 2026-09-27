@@ -180,6 +180,27 @@ Antes de dar por terminado un encargo con esta skill:
 
 Consultar el [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) para los territorios fuente preferida y lo que la IA dice de la marca. Una tensión y una palanca dominante por pieza; la metáfora integra el objeto digital del oficio. Auditar comprensión de la idea, atribución a Efeonce y acción por separado; impacto visual no acredita clic/conversión. La composición completa manda: lecho, sujeto, texto y firma deben leerse juntos, con comparación a tamaño de consumo y por ratio.
 
+## Registro cine de Efeonce — una dirección disponible, con frontera
+
+Cuando el sujeto es Efeonce, la fotografía de marca tiene los registros A (documental), B (puesta en escena) y C (la
+respuesta a la vista), y desde 2026-09-27 uno más: **cine**, «la marca en su película» —el servicio **en acción**
+como un fenómeno de luz de ficción declarada, con el color de su línea saliendo de la escena—. Es una dirección que
+esta skill puede elegir para una idea, con tres límites:
+
+- **No reemplaza A, B ni C.** Está aprobado sólo con **Nexa protagonista** o en la receta de deck
+  `proposal-cinematic`; una pieza social, un hero web o una lámina de contenido con personas del equipo siguen en
+  A, B o C. La publicidad 9:16 y 4:5 en cine está **en prueba**, y con personas del equipo, fuera del alcance
+  aprobado hasta decisión del operador.
+- **La prueba es de idea, no de estética:** quítale a la escena el fenómeno de luz; si queda «una persona en un
+  estudio oscuro», el servicio estaba al lado y no adentro. Fijan la frontera tres rechazos del operador: el material
+  plástico no es cine aunque la escena sea imposible; un sujeto que **señala** el fenómeno no tiene punch (lo maneja);
+  y dos personas mirándose de cerca se leen románticas.
+- **Los valores de oficio no salen de acá** (regla dura 1): cámara, luz, color, reservas y firma son del canon y de
+  `design-studio` / `efeonce-advertising-creative`.
+
+Canon: [registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (§1–§3 para la
+idea; §13, la barra con la que se juzga la pieza).
+
 ## Continuidad de campañas CMP
 
 Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).

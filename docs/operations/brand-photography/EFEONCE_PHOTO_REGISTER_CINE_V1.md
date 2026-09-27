@@ -67,8 +67,8 @@ bruma alrededor, estás en cine. Los otros tres registros no fabrican su fuente 
 
 **El contrato lo vigila [medido]:** AXIS rechaza `photo.register: "cine"` fuera de esos casos con el issue
 **`cine-requires-nexa-or-proposal`** (`@efeoncepro/axis-ui-contracts`, `surface-composition.js`): pasa si la receta es
-`proposal-cinematic` **o** si `photo.subject` es `nexa`. El token vive en `@efeoncepro/axis-tokens@0.3.8`,
-`efeonceGraphicLine` → `photo.cine`: `{ recipes: ['proposal-cinematic'], subjects: ['nexa'], lensMm: 85,
+`proposal-cinematic` **o** si `photo.subject` es `nexa`. El token vive en `@efeoncepro/axis-tokens` (desde 0.3.8; vigente 0.3.9),
+`efeonceGraphicLine.surfaces.photo.cine`: `{ recipes: ['proposal-cinematic'], subjects: ['nexa'], lensMm: 85,
 cameraDistanceM: 2 }`, y la regla transversal `cine-only-nexa-or-proposal`, junto a `no-close-gaze-pairs`.
 
 **Otros usos observados [decisión del operador, 2026-09-27]:** después de aprobar las láminas, el operador dijo que
@@ -484,8 +484,11 @@ de `answerHtml`, alineada a la izquierda al 8 % del ancho) con los tamaños de l
 (`RECETA-POR-FORMATO`, escalados de 1152 a 1080: 9:16 → pregunta 43 px, respuesta 178 px, arranque al 10 % del alto;
 4:5 → 41 px y 164 px, arranque al 7,5 %), y la respuesta se achica sola si no cabe en el 84 % del ancho, nunca bajo
 3× la pregunta → firma: logo negativo centrado abajo, 20 % del lado corto, margen del 9 %. El script de composición
-fue de sesión (no es un compositor canónico): para producción, esta capa debe pasar por `foto:componer` o por una
-receta del Artifact Composer (pendiente 3).
+fue de sesión (no es un compositor canónico; quedó como evidencia en
+`ai-generations/2026-09-27_ads-cine/componer-ads-cine.mjs`): para producción, esta capa pasa por `foto:componer` /
+`foto:componer:cta`, y si las pruebas se aprueban, la receta nace en AXIS y la herramienta en el repo taller
+`efeonce-brand-workshop`, nunca como catálogo de publicidad en Greenhouse
+([ADR del taller](../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) §3; pendiente 3).
 
 **Lo que enseñó la tanda:**
 
@@ -635,7 +638,7 @@ carpetas aparecían sin seguimiento en git al escribir este documento.
 |---|---|---|
 | 1 | **Prueba de reconocimiento.** Con seis láminas el registro es un sistema coherente, no un activo distintivo medido (la misma condición que el maestro fija para A, B y C) | Operador |
 | 2 | **Publicidad con personas del equipo en cine** (9:16 y 4:5): decidir si se amplía la excepción; hoy el contrato la rechaza | Operador |
-| 3 | **Receta de anuncio para cine en AXIS / Artifact Composer.** No existe receta para 9:16 ni 4:5: `proposal-cinematic` es sólo deck 16:9 | AXIS + Greenhouse |
+| 3 | **Receta de anuncio para cine en AXIS** y herramienta parametrizada en el repo taller (no en Greenhouse, ADR del taller §3). No existe receta para 9:16 ni 4:5: `proposal-cinematic` es sólo deck 16:9 | AXIS + repo taller (TASK-1925) |
 | 4 | **Reserva superior en 16:9** y alinear el 42 % del compilador con el 0,45 del token (trampas 6 y 7) | `foto:prompt` |
 | 5 | **Accesorios de Nexa en cine:** ¿el traje biónico y el uniforme llevan smartwatch y anillo? (trampa 8) | Operador |
 | 6 | **Reconciliar con la colorimetría:** teal-and-orange de noche, navy sobre set oscuro, azul royal en prenda grande; y medir las placas cine con `metricas.cjs` y `foto:validar` (§6) | Colorimetría |

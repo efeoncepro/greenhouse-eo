@@ -218,6 +218,25 @@ lima = el resultado). Aprobado por el operador el 2026-09-19.
   [axis.efeonce.org/references/photography/](https://axis.efeonce.org/references/photography/) y el porqué de cada
   regla, para personas y agentes, en [/references/photography/why/](https://axis.efeonce.org/references/photography/why/)
   (`why.json` para agentes). Úsalos para explicar y defender las decisiones de marca ante el equipo o el cliente.
+- **Registro cine «la marca en su película» [operador, 2026-09-27]:** ficción declarada donde el servicio aparece en
+  acción y **el color de su línea sale de la escena como luz** (anillo, haz, holograma, moño, esferas), con el sujeto
+  mirando al lente. Dónde entra en la marca propia, y sólo ahí:
+  - **Piezas con Nexa protagonista** (traje de ficción permitido sólo a ella) y la **receta de deck
+    `proposal-cinematic`**, con personas del equipo en su **uniforme por registro de escena** o con Nexa. AXIS rechaza
+    el resto con `cine-requires-nexa-or-proposal`: una pieza social, un hero web o una lámina de contenido con el
+    equipo sigue en A, B o C.
+  - **Deck y brochure** (PDF horizontal 16:9) se componen con `pnpm brand:compose` (Artifact Composer, contrato AXIS
+    `efeonce.surface-composition`; la 0.1.2 de AXIS agrega `use: proposal|brochure`, `cover-classic`, `close-classic` y
+    las composiciones `service|hero|lines` de `proposal-cinematic`, pero Greenhouse todavía fija la 0.1.1). La lámina de líneas es la única con los cinco acentos;
+    en todo lo demás, un acento por pieza, tomado del `accentOnDark` de la línea que se vende.
+  - **Publicidad 9:16 y 4:5: en prueba** (`ai-generations/2026-09-27_ads-cine/`), **no aprobada ni autorizada para
+    pauta**. La receta de anuncio cine no existe en AXIS: el script de esa tanda fue de sesión, y en producción la capa
+    va por `pnpm foto:componer` / `foto:componer:cta`.
+  - **Qué decide esta skill:** si la pieza cabe en uno de los dos casos, qué línea (y qué acento) representa, y que no
+    se presente como activo distintivo: la prueba de reconocimiento del registro está pendiente. **Qué decide
+    `design-studio`:** la toma, la luz, las trampas y la barra de juicio, en
+    [su referencia](../design-studio/references/efeonce-photographic-language.md) (§Registros). Canon vigente:
+    [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
 
 ### Isotipo 3D de Efeonce (biblioteca aprobada 2026-09-17)
 
@@ -273,7 +292,10 @@ texto a un modelo de imagen es cómo se pierde la ortografía y los pesos. Méto
 
 - **Signature elements** (identidad, viajan en toda pieza suya y los resuelve `foto:prompt`): anillo
   geométrico plata mate en el **índice derecho** · **SMARTWATCH** en la muñeca izquierda —**nunca** un reloj
-  analógico— · aretes de **plata**, nunca dorados · uñas de un solo color.
+  analógico— · aretes de **plata**, nunca dorados · uñas de un solo color. **[pendiente]** En el registro cine las
+  fichas piden «no watch, no ring» y el compilador igual inyecta el smartwatch: si el traje biónico y el uniforme cine
+  llevan los signature elements lo decide el operador (trampa 8 del
+  [registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)).
 - **Props de escena** (se declaran en la `escena`): iPhone, iPad con Pencil, MacBook, Mac de escritorio,
   AirPods · **DJI Osmo Pocket** y **Osmo Action** · **DJI Mic 3** o lavalier **Rode** · **Shure** en podcast ·
   cuerpo **Sony α** o **Canon EOS R**.

@@ -361,8 +361,18 @@ máquina puede generar? seis chequeos que ejercitan la cadena, sin costo), `pnpm
 prompt desde una ficha de toma; formato, % del lecho y límite de sujetos salen de UNA tabla) y
 `pnpm foto:validar <plate.png>` (mide las **seis** reservas sobre el plate limpio). Canon de las reservas:
 [reserva de espacio en el plate](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md).
-La **capa de composición gráfica** sobre la foto (tipografía, jerarquía, cursores) **no está aprobada** y su canon es
-`efeonce-advertising-creative`, no los ejemplos de la carpeta de fotografía.
+La **capa de composición gráfica** sobre la foto (tipografía, jerarquía, cursores) **está aprobada desde el
+2026-09-26** (operador) y se compone sobre las reservas de la toma con los compositores canónicos (`foto:componer`,
+`foto:componer:cta`), sin scrim. Su canon es `efeonce-advertising-creative`, no los ejemplos de la carpeta de
+fotografía.
+
+**Cuatro registros, y se decide cuál ANTES de generar:** A documental · B puesta en escena · C la respuesta a la vista
+· **cine** «la marca en su película» (2026-09-27). Cine es ficción declarada —el servicio en acción como fenómeno de
+luz con el acento de su línea, sujeto a la derecha mirando al lente, cámara ≈ 2 m y 85 mm, bruma y rim, reserva
+izquierda oscura en 16:9— y **sólo** se usa con **Nexa protagonista** o en la receta de deck **`proposal-cinematic`**
+(AXIS `cine-requires-nexa-or-proposal`); la publicidad 9:16 y 4:5 en cine está **en prueba**, no aprobada. Marcador,
+barra, trampas y comandos en la referencia (§Registros); canon vigente:
+[`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
 
 🔴 **Tres trampas medidas el 2026-09-22 (CMP-001) que el validador da por buenas.** Detalle, frases exactas y
 casos en la regla auto-load `.claude/rules/brand-photography.md`:

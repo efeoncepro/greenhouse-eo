@@ -66,8 +66,10 @@ visual transversal requiere validación en varias portadas.
   (revisar con `pnpm foto:emblema`), reserva de texto declarada (el espacio oscuro a la izquierda), sujeto a la derecha
   mirando a cámara, lo digital o el servicio en acción y el color saliendo de la escena, y **nunca dos personas
   mirándose de cerca** (se lee romántico). Fuera de esos dos casos el cine no se usa (el contrato de superficie lo
-  rechaza con `cine-requires-nexa-or-proposal`). Canon:
-  [lenguaje fotográfico, delta 2026-09-27](../../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md)
+  rechaza con `cine-requires-nexa-or-proposal`). La publicidad 9:16 y 4:5 en cine está **en prueba**
+  (`ai-generations/2026-09-27_ads-cine/`), no aprobada ni autorizada para pauta. Canon vigente desde el 2026-09-27:
+  [registro cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (los deltas del
+  [maestro](../../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) quedan como historia)
   y [composición por superficie §4.6](../../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
   En la lámina aprobada de líneas de servicio con Nexa, las cinco esferas de luz son **luz de la foto**, no la esfera
   de la voz.

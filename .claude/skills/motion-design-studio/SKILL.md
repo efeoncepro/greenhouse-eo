@@ -117,6 +117,17 @@ hipótesis de montaje, no benchmarks; revisar secuencia completa y no sólo el p
    catálogo ni composiciones. Todo el video de Glitch está en PROPUESTA hasta que el operador lo apruebe.
    **Dónde:** repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/` (TASK-1924), operado desde
    `greenhouse-eo` con `pnpm -C ../efeonce-brand-workshop`; nunca en Greenhouse ni en Globe.
+   **Registro cine (2026-09-27):** es un registro **fotográfico** del lenguaje de Efeonce
+   ([`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)),
+   no un estilo de video. Un video con **Nexa protagonista** que tome ese look respeta la misma frontera (cine sólo con
+   Nexa protagonista o en láminas `proposal-cinematic`; con personas del equipo en publicidad sigue en prueba) y el
+   mismo canon: identidad A de Nexa, proporciones reales (cámara a ~2 m, 85 mm, sin escorzo), la luz de la línea como
+   fenómeno de la escena y no como grade, rim + bruma, mirada al lente, nunca dos personas mirándose de cerca y el
+   isotipo compuesto, nunca generado. Esa luz cuenta como la órbita de la pieza: no se suma otra.
+   **Motion de marca («La órbita», Glitch):** su hogar es el repo taller `efeoncepro/efeonce-brand-workshop`
+   ([ADR](../../../docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md), Accepted 2026-09-27): `tools/brand-motion`
+   (las animaciones del logo, hoy todavía en `scripts/creative/brand-motion/` de Greenhouse hasta que las migre
+   TASK-1925) y `tools/glitch-motion` (TASK-1924).
 6. **Cierra con un artefacto** de `templates/` (brief, storyboard, animatic/shotlist, prompt sheet,
    EDL, brief de sonido, spec de entrega, crítica), no con prosa suelta.
 

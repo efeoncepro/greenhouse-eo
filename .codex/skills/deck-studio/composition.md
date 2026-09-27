@@ -88,6 +88,13 @@ caminero, cuadros de motion) y `graphic-line-overlays` (capas de video con alfa)
   no importa paquetes.
 - **Gate:** `pnpm composer:visual-gate --catalog=graphic-line` (22 frames a 0 px; runbook
   `docs/operations/runbooks/composer-visual-gate.md`). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §2.1.
+- **Lo que el catálogo todavía no tiene (contrato 0.1.2, AXIS `v0.3.9`, pendiente de integrar).** El mapper
+  (`src/lib/brand-surfaces/recipes/deck.ts`) sigue sobre la 0.1.1: no hay plantilla para `cover-classic` ni
+  `close-classic`, no lee `use` ni `layout`, y no compone **documentos** (`pages`, manifest
+  `axis.surface-document.v1`). Un brochure de varias páginas se valida entero con `pnpm surface:resolve` en AXIS
+  (reglas `brochure-cover-first`, `brochure-close-last`, `brochure-needs-service-page`) y el PDF se sigue armando
+  página por página hasta que se suba la dependencia; nunca se «adivina» el manifest de la 0.1.2 a mano. Resumen del
+  contrato: [SKILL.md](SKILL.md) §«El deck como superficie», bloque «Contrato 0.1.2 y el brochure».
 
 operativas. El plan no agrupa láminas por disponibilidad de templates: las encadena por la decisión
 que el lector necesita tomar.

@@ -311,6 +311,16 @@ lente» (sin ID todavía); mientras tanto se aplican a mano.
 | **P-8** | `foto:prompt` emite siempre «All heads and hands stay BELOW 36% of the frame height» en 4:5 y 9:16. La lente se centra entre el 36 % y el 44 % del alto | **El límite del 36 % sólo aplica con reserva de texto** | [código pendiente] (misma task). Hasta que llegue, el comando lo sigue emitiendo en toda ficha 4:5 y 9:16: en una ficha para lente, esa línea del prompt contradice la decisión y hay que tenerlo presente al mirar el plate |
 | **P-9** | Palancas que **llenan el cuadro** (`variantes`, `manos`). Línea: lo esencial en un círculo, afuera la foto se apaga | **En piezas con lente manda el encuadre**; las palancas que llenan el cuadro, sólo en piezas sólo foto | Para lente, una palanca que concentre (`sombra`, `quien-sostiene`, `cenital`, `escucha`, `proyeccion`, `ausencia`) |
 
+**P-4 en el registro cine (2026-09-27).** El cuarto registro del lenguaje fotográfico
+([`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md),
+fuente vigente; sólo Nexa protagonista o la receta `proposal-cinematic`, issue AXIS `cine-requires-nexa-or-proposal`)
+**fabrica** su fuente de luz con el color de la línea: anillo, esfera, moño de partículas, esferas de acento. Ahí P-4
+se lee al revés: ese fenómeno **es** la órbita de la pieza, así que no se pide otro plate, **se renuncia a la órbita
+gráfica** encima (registro cine §9.4: el anillo de la portada y la contraportada del brochure por decisión del
+operador; el moño de RevOps, la órbita de pantallas y las cinco esferas de la lámina de líneas, por extensión). Una
+sola órbita por pieza, venga de la foto o de la línea. Las cinco esferas de color de la lámina de líneas son luz de la
+foto, no la esfera de la voz.
+
 Estas decisiones se escriben también en la sección recíproca de los dos canon (manual de la línea y maestro
 fotográfico); esta referencia no los edita.
 

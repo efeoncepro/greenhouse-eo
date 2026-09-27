@@ -712,7 +712,8 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 > Norma: [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
 > Contrato AXIS `efeonce.surface-composition` 0.1.1 (`candidate`, manifest `axis.surface-composition.v1`; acepta
 > intents 0.1.0), tokens `efeonceGraphicLine.surfaces.<superficie>` y `pnpm surface:resolve` — publicado en AXIS
-> `v0.3.8` y fijado en Greenhouse (2026-09-27),
+> `v0.3.8` y fijado en Greenhouse (2026-09-27). **La 0.1.2 ya está publicada en AXIS (tag `v0.3.9`) y en Greenhouse
+> está pendiente de integrar:** ver «Contrato 0.1.2» al final de esta sección,
 > [Lab](https://axis.efeonce.org/references/surfaces/). Canvas por superficie:
 > [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7), una página por
 > superficie con su lámina «Guía · cómo componer …» a la izquierda. Esta sección no copia valores: los números están
@@ -746,7 +747,7 @@ bajada web sin token, y la paleta 20 % vs 35 %.
 | pDOOH | nada todavía (LED, mupi, spot sin audio y variantes por franja son opción) | LED bajo la respuesta, mupi centrada (opción) | J |
 | Motion | animación en bucle foto-para-la-lente + reveal, y su storyboard | nunca en la toma; firma el cierre | J |
 | Audiovisual | storyboard de planos «Cómo trabajamos» y escenas con generadores de texto | firma la marca en el cierre, nunca la toma | J |
-| Deck | sección clásica, sección partida, «la órbita mide la cifra», tríptico, `proposal-cinematic` (seis láminas) y `method-staircase` (BeX) | burbuja URL en el pie; logo sólo en portada, cierre o marca-sujeto | B1, B2 |
+| Deck | sección clásica, sección partida, «la órbita mide la cifra», tríptico, `proposal-cinematic` (seis láminas) y `method-staircase` (BeX); en AXIS 0.1.2 también `cover-classic` y `close-classic` (sin plantilla en Greenhouse todavía) | burbuja URL en el pie; logo sólo en portada, cierre o marca-sujeto | B1, B2 |
 
 **Reglas que un agente necesita en el momento**
 
@@ -775,6 +776,37 @@ la carrera v1, Nexa y un director mirándose de cerca, líneas de servicio con N
 
 **`method-staircase`:** el método como escalera, **sin foto**: peldaños de vidrio que se iluminan al subir y el
 nivel de llegada en bloque sólido en el acento de la línea (BeX: cinco peldaños, el quinto Be Intrinsic en Engine).
+
+**Contrato 0.1.2 (2026-09-27; AXIS tag `v0.3.9`: `@efeoncepro/axis-tokens` 0.3.9 + `@efeoncepro/axis-ui-contracts`
+0.3.8; sigue `candidate`).** Aditivo: un intent 0.1.0 u 0.1.1 se resuelve como antes. Guía AXIS
+`docs/agent-composition/surfaces/deck.md`, ADR AXIS `docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md` (delta
+0.1.2), ejemplos en `docs/examples/surfaces/` (`deck-cover-classic-intent.json`, `deck-close-classic-intent.json`,
+`deck-brochure-servicios-document.json`). **En Greenhouse, `pnpm brand:compose` sigue sobre la 0.1.1** (fija
+`axis-tokens` 0.3.8 y `axis-ui-contracts` 0.3.7): pendiente de integrar hasta que se suba la dependencia.
+
+- **Usos:** `use: 'proposal' | 'brochure'` en el deck. Toda receta aprobada admite los dos (el brochure es un PDF
+  horizontal 16:9 que se lee sin presentador); una opción, sólo `proposal` (`use-not-for-recipe`). En el brochure,
+  `proposal-cinematic` es la página de servicio y su eyebrow nombra el servicio.
+- **Portada y cierre:** `cover-classic` (logo arriba a la izquierda con el eyebrow, voz en la mitad baja, arco corto;
+  marca 0 de N) y `close-classic` (órbita completa con el logo dentro y el eslogan «Empower your \<Línea>» en tres
+  tramos; marca N de N) pasan a recetas aprobadas del deck. Firman con el logo y **sin burbuja URL**
+  (`logo-signs-without-url-bubble`): la burbuja sólo reemplaza al logo.
+- **Layouts de `proposal-cinematic`:** `service` (por defecto: pregunta, respuesta y bajada; prueba opcional, hasta
+  cuatro pasos), `hero` (eyebrow, pregunta, respuesta y bajada; sin prueba ni pasos; selección de Nexa) y `lines` (eyebrow
+  y la frase; sin pregunta ni respuesta ni esfera de voz; la pila sale de `efeonceGraphicLine.lines`, cada palabra en
+  el acento de su línea, regla `five-accents-only-in-lines`; selección del grupo con «Nexa» abajo a la derecha; lleva
+  logo). `selection.anchor` declara otra esquina del colaborador.
+- **Documento:** `resolveSurfaceDocument` / `validateSurfaceDocumentIntent`, manifest `axis.surface-document.v1`. En
+  un brochure: portada primero, cierre al final y al menos una página `proposal-cinematic` con `layout: 'service'`;
+  `sections` y la línea se propagan a las páginas; la portada y el cierre llevan siempre la línea del documento
+  (`document-line-mismatch`), una página de servicio puede declarar la suya.
+- **Registro cine y órbita:** en la foto de cine la luz de la línea es un fenómeno de la escena (el anillo de la
+  portada del brochure, el moño de RevOps, la órbita de pantallas de servicios creativos, las cinco esferas de la
+  lámina de líneas) y **cuenta como la órbita de la pieza**: una sola por pieza, sin órbita gráfica encima. Las cinco
+  esferas de la lámina de líneas son luz de la foto, no la esfera de la voz (`photo-light-spheres-not-voice`). Fuente
+  del registro: [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
+  §9.4. Las portadas cinematográficas del brochure con Nexa (`BR1b`, `BR3`) no son receta del contrato: el documento
+  sólo acepta como portada y cierre las recetas de papel `cover` / `close`.
 
 **Lo inferido en esta sección (confirmar con el operador):** que `proposal-cinematic` se quede sin indicador de deck
 en versiones futuras (así se aprobaron las piezas); que la firma por soporte de web, paleta, LED y mupi pase de

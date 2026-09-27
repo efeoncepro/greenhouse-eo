@@ -89,8 +89,9 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
 - **Cómo se pide una lámina de marca propia:** intent con `surface: "deck"`, `format`, `role`, `recipe`, `line`, voz,
   prueba y pasos. **Si la receta está aprobada, `pnpm brand:compose -- --intent <intent.json>`** la compone entera en
   el Artifact Composer (catálogo `graphic-line-deck`, PDF 16:9; ejemplos en
-  `src/lib/brand-surfaces/examples/deck-*-intent.json`). Si no, `pnpm surface:resolve` en AXIS (contrato
-  `efeonce.surface-composition` 0.1.1 `candidate`) → los `delegates` van a `pnpm creative:orbit:render` (voz, órbita),
+  `src/lib/brand-surfaces/examples/deck-*-intent.json`; hoy sobre el contrato 0.1.1). Si no, `pnpm surface:resolve` en
+  AXIS (contrato `efeonce.surface-composition` 0.1.2 `candidate` desde el tag `v0.3.9`; ver el bloque «Contrato 0.1.2 y
+  el brochure» abajo) → los `delegates` van a `pnpm creative:orbit:render` (voz, órbita),
   la selección y `resolveIcon`. Valores desde `efeonceGraphicLine.surfaces.deck` y `pieces.deck`; **nunca coordenadas
   en la lámina**.
 - **Recetas aprobadas:** sección clásica, sección partida (el arco sube por la derecha), contenido «la órbita mide la
@@ -124,6 +125,42 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   `deck-axis` ni al revés. Una opción del canvas no tiene plantilla (`recipe-not-approved`): se arma como maqueta de
   dirección y se declara así. Gate: `pnpm composer:visual-gate --catalog=graphic-line`. Detalle:
   [composition.md](composition.md) §Catálogos de La órbita. Precios siempre placeholder.
+- **Contrato 0.1.2 y el brochure (2026-09-27; AXIS tag `v0.3.9`: `@efeoncepro/axis-tokens` 0.3.9 +
+  `@efeoncepro/axis-ui-contracts` 0.3.8).** Guía AXIS `docs/agent-composition/surfaces/deck.md` (§«Dos usos»,
+  §`proposal-cinematic`, §«El documento») y ejemplo `docs/examples/surfaces/deck-brochure-servicios-document.json`.
+  **Pendiente de integrar en Greenhouse:** `pnpm brand:compose` sigue sobre la 0.1.1 (fija `axis-tokens` 0.3.8 y
+  `axis-ui-contracts` 0.3.7) hasta que se suba la dependencia; mientras, lo nuevo se valida con `pnpm surface:resolve`
+  en AXIS y no tiene plantilla aquí.
+  - **Uso** (`use: 'proposal' | 'brochure'`, sin él es `proposal`): toda receta **aprobada** admite los dos; una opción
+    sólo `proposal` (`use-not-for-recipe`). El brochure es un **PDF horizontal 16:9 que se lee sin presentador**
+    (pregunta 1 de abajo: el artefacto se defiende solo). Las láminas `proposal-cinematic` sirven para propuesta y
+    brochure; en el brochure son la **página de servicio** y el eyebrow nombra el servicio («Web», «AEO»), no «Nuestra
+    propuesta» (copy del autor: el contrato no lo valida).
+  - **`layout` de `proposal-cinematic`:** `service` (por defecto; exige pregunta, respuesta y bajada; prueba opcional,
+    hasta cuatro pasos) · `hero` (la escena protagonista, Nexa en la partida; exige eyebrow, pregunta, respuesta y
+    bajada; sin prueba ni pasos) · `lines` (el portafolio; exige eyebrow y `body`; sin pregunta, respuesta, prueba ni
+    pasos; la pila sale de `efeonceGraphicLine.lines` y el intent sólo elige `lines`; la selección toma el grupo, con
+    «Nexa» abajo a la derecha; lleva logo porque la marca es el sujeto). `selection.anchor` mueve la esquina del
+    colaborador (RevOps: `bottom-end`).
+  - **Portada y contraportada clásicas:** recetas aprobadas `cover-classic` (logo arriba a la izquierda con el
+    eyebrow, pregunta y respuesta en la mitad baja, arco corto de acento; marca 0 de N) y `close-classic` (órbita
+    completa con el logo dentro, eslogan «Empower your \<Línea>» en tres tramos; marca N de N). Las dos firman con
+    logo y **sin burbuja URL** (`logo-signs-without-url-bubble`).
+  - **Portada y contraportada cinematográficas, con Nexa:** `BR1b` («Nexa frente a la órbita») y `BR3` («Nexa camina
+    hacia la órbita») caben en el registro cine porque Nexa protagoniza, pero **no son receta del contrato**: se
+    compusieron en sesión (`ai-generations/2026-09-27_brochure/componer-brochure.mjs`) y su aprobación está pendiente
+    de registrar. El documento sólo acepta como portada y cierre una receta de papel `cover` / `close` (hoy, las
+    clásicas). Su anillo de luz **es** la órbita de la pieza: no se le agrega otra.
+  - **El documento** (`resolveSurfaceDocument` / `validateSurfaceDocumentIntent`, manifest `axis.surface-document.v1`;
+    `pnpm surface:resolve` lo detecta por `pages`): en un brochure la portada va primero (`brochure-cover-first`), el
+    cierre al final (`brochure-close-last`) y hay al menos una `proposal-cinematic` con `layout: 'service'`
+    (`brochure-needs-service-page`). `surface`, `format`, `use`, `line` y `sections` se propagan a las páginas que no
+    los declaran; la navegación es una sola (portada 0, cierre `sections`); portada y cierre llevan siempre la línea
+    del documento (`document-line-mismatch`) y una página de servicio puede declarar la suya.
+  - **La foto** de estas láminas se rige por el
+    [registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (fuente vigente desde
+    el 2026-09-27: cámara, la línea como luz, vestuario, robots, reservas, trampas y barra de juicio). Esta skill no
+    dirige la foto: la pide por ficha (`pnpm foto:*`).
 
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 

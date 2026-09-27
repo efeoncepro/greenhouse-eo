@@ -41,7 +41,8 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
 6. **Para paid media, scroll-stop, hook/hold, cinematic ads o híbridos**, carga primero
    [palancas visuales y medición](references/paid-visual-attention-playbook.md): biblioteca de doce
    recursos, recetas por formato, diccionario de métricas y experimentos. Declara hipótesis, palanca
-   dominante, control y KPI antes de producir. Para Efeonce conserva el registro A/B/C y el pipeline de foto.
+   dominante, control y KPI antes de producir. Para Efeonce conserva el registro A/B/C y el pipeline de foto
+   (el registro cine, sólo en su alcance y hoy **en prueba** para publicidad: [§Registro cine](#registro-cine-en-publicidad--en-prueba-2026-09-27)).
    `Cinematic` es tratamiento; `thumb-stop` es una ratio custom con fórmula, no un estilo ni garantía.
    Estáticos: hook temporal de video N/A; CTR es respuesta, no atención. La
    [evidencia medida](references/ad-creative-evidence-2026.md) es su hermano y aporta lo que el playbook
@@ -218,6 +219,46 @@ caminero aprobado sale entero con `pnpm brand:compose -- --intent <intent.json>`
 - **pDOOH:** sin audio; la voz se arma en 2 s como máximo; el mensaje ocupa ≥ 80 % del tiempo; el último cuadro es el
   estático de respaldo; cada variante dinámica es un estático completo.
 - Sin íconos ni selección en DOOH estático. Una esfera y una órbita por pieza; el acento nunca en texto < 24 px.
+
+### Registro cine en publicidad — en prueba (2026-09-27)
+
+Canon vigente: [registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) —cárgalo
+completo antes de escribir una ficha cine; para publicidad, sobre todo §2 (cuándo se usa), §11 y §11.1 (formatos 9:16 y
+4:5) y §13 (la barra de doce)—. Aquí va sólo lo que cambia una decisión publicitaria.
+
+- 🔴 **Estado: en prueba, no aprobado.** El registro está aprobado sólo con **Nexa protagonista** o en la receta de
+  deck **`proposal-cinematic`** (16:9). No existe receta de anuncio cine para 9:16 ni 4:5 (pendiente 3 del canon).
+  Con Nexa, la pieza cabe en el caso 1 del contrato; **con personas del equipo queda fuera del alcance aprobado hasta
+  decisión del operador** —AXIS la rechaza con el issue `cine-requires-nexa-or-proposal`—. En los dos casos, nada se
+  publica ni se pauta como cine sin esa decisión; una pieza social o de campaña con el equipo sigue en A, B o C.
+- **Primera tanda** (`ai-generations/2026-09-27_ads-cine/`, página «Publicidad · cine» del canvas por superficie).
+  Las cuatro son prueba: ninguna aprobada ni autorizada para pauta.
+
+  | Pieza | Formato | Placa | Voz | Ratio | Firma (bajo su caja) |
+  |---|---|---|---|---|---|
+  | Nexa frente a la órbita | 9:16 | `AD1d` | «¿Qué hace Efeonce? **Crecer.**» | 4,14× | 19,69:1 |
+  | RevOps, el moño de luz con agentes | 9:16 | `AD2b` | «¿Tu CRM vende contigo? **Con agentes.**» | 3,91× | 20,28:1 |
+  | AEO, la IA ilumina una | 4:5 | `AD3b` | «¿Te encuentra la IA? **Visible.**» | 4,00× | 19,83:1 |
+  | El equipo con agentes | 4:5 | `AD4f` | «¿Quién hace crecer tu marca? **Este equipo.**» | 4,00× | 17,53:1 |
+
+- **Lo que enseñó, medido** (§11.1 del canon):
+  - 🔴 **En vertical, el lecho es un objeto oscuro en primer plano que cruza todo el ancho y tapa la cintura o las
+    piernas** (canto de una mesa negra mate, o una tarima para el equipo). Sin él, la firma cayó **sobre el sujeto**
+    —sobre la ropa oscura— **con el contraste pasando** (16–18:1 en `AD1`, `AD4`/`AD4b`). Un contraste que pasa no
+    dice dónde cae la caja: mírala al 100 %.
+  - **Equipo en 4:5: una sola línea, hombro con hombro, cámara a unos 4 m y cabezas en la banda del 38–52 % del
+    alto.** La V escalonada subió una cabeza al 17 % y rompió la franja de texto (`AD4d`).
+  - **Robots agentes arriba de la cintura** (hombros, brazos, costados). A los pies ensucian el lecho (`AD4b`: 3,01).
+  - **Declara el estudio vacío** (*«an empty dark studio at night, no desks, no monitors, no plants, no lamps»*): si
+    la escena calla, vuelve la oficina (planta, monitor, lámpara en `AD4`), el default del bloque de realismo.
+  - La geometría 16:9 (sujeto a la derecha, voz a la izquierda) no existe en vertical: la reserva sube y el sujeto
+    baja, y el fenómeno de luz vive **detrás o alrededor del sujeto, bajo la reserva**. El anillo de `BR1` sale como
+    elipse plana; probar un anillo vertical como el de `BR3` es criterio sin probar.
+- 🔴 **La composición de esa tanda fue un script de sesión** (`ai-generations/2026-09-27_ads-cine/componer-ads-cine.mjs`):
+  **no es canónico**; no se reutiliza ni se copia. La capa de producción sigue siendo `pnpm foto:componer`, o
+  `pnpm foto:componer:cta` + `pnpm foto:cta:gate` si la pieza lleva CTA. Una receta de anuncio cine, cuando exista,
+  nace en AXIS; las recetas en prueba viven en el taller `efeonce-brand-workshop`, nunca como catálogo de publicidad
+  en Greenhouse ([ADR del taller](../../../docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) §3).
 
 ## Tres voces + acción — ads con CTA
 

@@ -245,6 +245,37 @@ Rules for agents:
   added to the token with its reason, never written in a script — see `motion-design-studio`.
 - Scope: Efeonce's own brand and its family. Never Greenhouse product UI and never client work.
 
+### Surface composition (`efeonce.surface-composition`, `candidate`)
+
+> **Owning skill:** [`efeonce-graphic-line`](../efeonce-graphic-line/SKILL.md) (`references/applications.md` §L) and,
+> for decks, [`deck-studio`](../deck-studio/SKILL.md). This section keeps only the AXIS contract and release boundary.
+
+The line composed **by surface** (web, DOOH, pDOOH, motion, audiovisual, deck): tokens `efeonceGraphicLine.surfaces`,
+contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, resolver `pnpm surface:resolve --
+--input <intent.json> --out <manifest.json>`. Sources in AXIS: `docs/agent-composition/README.md`,
+`docs/agent-composition/surfaces/*.md`, ADR `docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md`, examples
+`docs/examples/surfaces/`. Greenhouse norm:
+[`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
+
+- **Current: `0.1.2`, published 2026-09-27 as `@efeoncepro/axis-tokens` `0.3.9` + `@efeoncepro/axis-ui-contracts`
+  `0.3.8` (tag `v0.3.9`, AXIS `main@ff0505a`).** Additive (a `0.1.0`/`0.1.1` intent resolves as before): deck `use:
+  'proposal' | 'brochure'` (approved recipes admit both; options only `proposal`, `use-not-for-recipe`); approved
+  recipes `cover-classic` and `close-classic` (logo signs, no URL bubble: `logo-signs-without-url-bubble`; the close
+  carries the slogan in three runs, `content.slogan`); `layout: 'service' | 'hero' | 'lines'` on `proposal-cinematic`
+  (`layout-field-required` / `layout-field-not-allowed`; `lines` takes the group selection, «Nexa», bottom-end);
+  `selection.anchor`; and the **document** API `resolveSurfaceDocument` / `validateSurfaceDocumentIntent` (schema
+  `surface-document-intent.schema.json`, manifest `axis.surface-document.v1`; brochure rules `brochure-cover-first`,
+  `brochure-close-last`, `brochure-needs-service-page`; `sections` and the line propagate; cover and close always
+  carry the document's line, `document-line-mismatch`). `pnpm surface:resolve` detects `pages` and resolves a document.
+- **Cine gate:** `photo.register: 'cine'` passes only with recipe `proposal-cinematic` or `photo.subject: 'nexa'`
+  (issue `cine-requires-nexa-or-proposal`, token `efeonceGraphicLine.surfaces.photo.cine`). The register itself (camera, the
+  line as light, wardrobe, traps) is the Greenhouse doc
+  [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
+- **Greenhouse consumption:** `pnpm brand:compose` (`src/lib/brand-surfaces`) still pins `axis-tokens` `0.3.8` +
+  `axis-ui-contracts` `0.3.7` (contract `0.1.1`). **`0.1.2` is pending integration** until the dependency is bumped:
+  no templates for `cover-classic`/`close-classic`, no `use`/`layout`, no documents there yet. Bump both packages
+  together and rerun `pnpm composer:visual-gate --catalog=graphic-line`.
+
 ### Efeonce iconography (Trazo and Plastilina)
 
 Canonized by the operator on 2026-09-26 (D22). Values in `efeonceGraphicLine.icons` (`axis-tokens` `0.3.6`); geometry

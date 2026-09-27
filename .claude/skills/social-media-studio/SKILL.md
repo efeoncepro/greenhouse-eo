@@ -68,6 +68,13 @@ referencias aprobadas y los seis ángulos de `ai-generations/2026-09-20_identida
 ni fotos fuente/descartes como anclas. Canon:
 [`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
 
+**Registro cine (2026-09-27): fuera de social salvo con Nexa protagonista.** El registro cine de la fotografía
+Efeonce —el servicio como fenómeno de luz, ficción declarada— sólo está aprobado con **Nexa protagonista** o en la
+receta de deck `proposal-cinematic`. Una pieza social con personas del equipo **sigue en A, B o C**, y sus formatos
+9:16 y 4:5 están **en prueba**: nada se publica como cine sin decisión del operador. Canon:
+[registro cine](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) §2 y §11; lecciones de la
+primera tanda publicitaria en `efeonce-advertising-creative` §«Registro cine en publicidad».
+
 1. **Clasifica la intención** con el árbol de §2. ¿Es realmente social de ejecución
    profunda, o pertenece a una skill hermana? Si pertenece a otra, carga la skill dueña (§5). Para encargos sociales integrales,
    conserva la dirección y la entrega; invocar una skill no autoriza crear subagentes.
