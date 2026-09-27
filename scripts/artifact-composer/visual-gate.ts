@@ -7,6 +7,8 @@
  *   pnpm composer:visual-gate --catalog=insights --freeze   # promueve sólo los frames declarados de Insights
  *   pnpm composer:visual-gate --catalog=graphic-line        # gate aislado de los catálogos de La órbita (TASK-1919)
  *   pnpm composer:visual-gate --catalog=graphic-line --freeze
+ *   pnpm composer:visual-gate --catalog=glitch              # gate aislado de los catálogos de Glitch (TASK-1923)
+ *   pnpm composer:visual-gate --catalog=glitch --freeze
  *   pnpm composer:visual-gate --freeze                      # congela/re-promueve el baseline completo
  *
  * Por qué existe: las tres operaciones centrales de TASK-1393 (tokenizar 80 bases de color, mover
@@ -56,6 +58,7 @@ import {
   graphicLineOverlaysCatalogDir
 } from '@/lib/artifact-composer/catalogs/graphic-line-overlays'
 import { createCatalog as createGraphicLineStills, graphicLineStillsCatalogDir } from '@/lib/artifact-composer/catalogs/graphic-line-stills'
+import { createGlitchStillsCatalog, glitchCatalogDir } from '@/lib/artifact-composer/catalogs/glitch'
 import {
   auditGraphicLineRendered,
   type RenderedAuditViolation
@@ -103,6 +106,18 @@ const GRAPHIC_LINE_PROBE_ASSETS: Readonly<Record<string, string>> = {
 
 const graphicLineProbe = <T extends object>(catalog: T) => ({ ...catalog, externalAssets: GRAPHIC_LINE_PROBE_ASSETS })
 
+/**
+ * Glitch (TASK-1923): una sola entrada para sus tres catálogos, que comparten carpeta y registry (el probe fotografía
+ * las 26 plantillas con los mismos resolvers y el mismo hook de la falla). La foto de cada hueco llega como
+ * `asset-ref:photo:probe`: un SVG sintético y determinista (nunca una foto real: ISSUE-122 no aplica). La falla en
+ * bytes del probe es la del `example` de su slot (vacía): la geometría real la prueban los tests de la falla.
+ */
+const GLITCH_PROBE_ASSETS: Readonly<Record<string, string>> = {
+  'photo:probe': svgDataUri(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800"><rect width="1200" height="800" fill="#2f4258"/><rect x="120" y="140" width="320" height="220" rx="18" fill="#cfe4fa" fill-opacity="0.25"/><circle cx="820" cy="300" r="120" fill="#cfe4fa" fill-opacity="0.6"/><rect x="660" y="430" width="320" height="370" rx="110" fill="#cfe4fa" fill-opacity="0.45"/></svg>'
+  )
+}
+
 const painters = { selectionPainter: greenhouseSelectionPainter, ctaPainter: greenhouseCtaPainter }
 
 const PROBE_CATALOGS = [
@@ -115,17 +130,19 @@ const PROBE_CATALOGS = [
     catalog: graphicLineProbe(createGraphicLineOverlays(painters)),
     dir: graphicLineOverlaysCatalogDir,
     frameDir: 'templates-graphic-line-overlays'
-  }
+  },
+  { catalog: { ...createGlitchStillsCatalog(), externalAssets: GLITCH_PROBE_ASSETS }, dir: glitchCatalogDir, frameDir: 'templates-glitch' }
 ]
 
-type CatalogScope = 'all' | 'insights' | 'graphic-line'
+type CatalogScope = 'all' | 'insights' | 'graphic-line' | 'glitch'
 
 const SCOPE_FRAME_PREFIXES: Record<Exclude<CatalogScope, 'all'>, string> = {
   insights: 'templates-insights-',
-  'graphic-line': 'templates-graphic-line-'
+  'graphic-line': 'templates-graphic-line-',
+  glitch: 'templates-glitch'
 }
 
-const SCOPE_LABEL: Record<CatalogScope, string> = { all: 'el set completo', insights: 'Insights', 'graphic-line': 'La órbita' }
+const SCOPE_LABEL: Record<CatalogScope, string> = { all: 'el set completo', insights: 'Insights', 'graphic-line': 'La órbita', glitch: 'Glitch' }
 
 const frameInScope = (frame: string, scope: CatalogScope): boolean =>
   scope === 'all' || frame.startsWith(SCOPE_FRAME_PREFIXES[scope])
@@ -699,8 +716,8 @@ const main = async (): Promise<void> => {
   const args = process.argv.slice(2)
   const catalogArg = args.find(arg => arg.startsWith('--catalog='))?.slice('--catalog='.length) ?? 'all'
 
-  if (catalogArg !== 'all' && catalogArg !== 'insights' && catalogArg !== 'graphic-line') {
-    console.error(`✗ Catálogo desconocido: ${catalogArg}. Usa --catalog=all, --catalog=insights o --catalog=graphic-line.\n`)
+  if (catalogArg !== 'all' && catalogArg !== 'insights' && catalogArg !== 'graphic-line' && catalogArg !== 'glitch') {
+    console.error(`✗ Catálogo desconocido: ${catalogArg}. Usa --catalog=all, --catalog=insights, --catalog=graphic-line o --catalog=glitch.\n`)
     process.exit(1)
   }
 

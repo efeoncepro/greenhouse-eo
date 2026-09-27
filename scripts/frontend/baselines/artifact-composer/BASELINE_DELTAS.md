@@ -1,5 +1,43 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-27 (g) — TASK-1923: Glitch entra al gate (26 plantillas, scope `--catalog=glitch`)
+
+Glitch (sólo Glitch) suma una entrada de probe: los catálogos `glitch-carousel`, `glitch-stills` y `glitch-overlays`
+comparten la carpeta `catalogs/glitch/`, así que el probe fotografía sus 26 plantillas una vez, en `templates-glitch/`.
+Todas están aprobadas: las 7 del carrusel, los banners del blog A/B/C y sus versiones 1:1, el banner de noticia, la
+portada del reel, la miniatura del vlog y los 10 overlays del reel y del vlog (el cuadro fijo del kit de motion). La
+foto de cada hueco es un SVG sintético (`GLITCH_PROBE_ASSETS`, `photo:probe`): ISSUE-122 no aplica al probe; la falla
+en bytes del probe es la del `example` de su slot (vacía). Los overlays se capturan sin alfa en el probe (fondo del
+navegador); el PNG entregado por `pnpm glitch:compose` sí lleva alfa. Selftest de dos corridas: 26 frames a 0 px.
+Ningún frame de otro catálogo cambia.
+
+- `templates-glitch/BackCover.png` — 🆕 glitch.back
+- `templates-glitch/BlogBannerMosaic.png` — 🆕 glitch.blog.banner.c
+- `templates-glitch/BlogBannerPhoto.png` — 🆕 glitch.blog.banner.a
+- `templates-glitch/BlogBannerType.png` — 🆕 glitch.blog.banner.b
+- `templates-glitch/BlogNewsBanner.png` — 🆕 glitch.blog.news
+- `templates-glitch/BlogSquareMosaic.png` — 🆕 glitch.blog.square.c
+- `templates-glitch/BlogSquarePhoto.png` — 🆕 glitch.blog.square.a
+- `templates-glitch/BlogSquareType.png` — 🆕 glitch.blog.square.b
+- `templates-glitch/CoverMosaic.png` — 🆕 glitch.cover.c
+- `templates-glitch/CoverPhoto.png` — 🆕 glitch.cover.a
+- `templates-glitch/CoverType.png` — 🆕 glitch.cover.b
+- `templates-glitch/Interior.png` — 🆕 glitch.interior
+- `templates-glitch/InteriorLens.png` — 🆕 glitch.interior.lens
+- `templates-glitch/InteriorOpening.png` — 🆕 glitch.interior.opening
+- `templates-glitch/OverlayCtaReel.png` — 🆕 glitch.overlay.cta.reel
+- `templates-glitch/OverlayCtaVlog.png` — 🆕 glitch.overlay.cta.vlog
+- `templates-glitch/OverlayDropReel.png` — 🆕 glitch.overlay.drop.reel
+- `templates-glitch/OverlayDropVlog.png` — 🆕 glitch.overlay.drop.vlog
+- `templates-glitch/OverlayHeaderReel.png` — 🆕 glitch.overlay.header.reel
+- `templates-glitch/OverlayHeaderVlog.png` — 🆕 glitch.overlay.header.vlog
+- `templates-glitch/OverlayLowerThirdReel.png` — 🆕 glitch.overlay.lower-third.reel
+- `templates-glitch/OverlayLowerThirdVlog.png` — 🆕 glitch.overlay.lower-third.vlog
+- `templates-glitch/OverlayNewsReel.png` — 🆕 glitch.overlay.news.reel
+- `templates-glitch/OverlayNewsVlog.png` — 🆕 glitch.overlay.news.vlog
+- `templates-glitch/ReelCover.png` — 🆕 glitch.reel.cover
+- `templates-glitch/VideoThumbnail.png` — 🆕 glitch.video.thumbnail
+
 ## 2026-09-27 (f) — TASK-1928: la propuesta de servicio sobria (`proposal-service`)
 
 Primera familia de las 38 recetas aprobadas sin plantilla. Las cuatro láminas de la propuesta sobria (AEO, servicios
@@ -651,7 +689,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 069ef434fda8b30682fc8f41f35605a6d503b39361a3daca13ed21e4ee1eaa3a -->
+<!-- manifest-digest: 23b4f64db4b46cb7cc51cd37fe4983082f4f7a6b3a27f280e7c66c11fe7fcd38 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.
