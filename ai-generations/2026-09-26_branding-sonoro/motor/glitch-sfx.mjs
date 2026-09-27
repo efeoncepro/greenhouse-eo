@@ -7,6 +7,8 @@
 //
 //   node glitch-sfx.mjs --intensity a|b --outdir <dir>
 //     → apertura.wav (4 s) · cierre.wav (3 s) · bucle.wav (cierre + apertura, 7 s) · animatic.wav (45,2 s)
+//     → kit/<overlay>.wav (uno por .mov) · transiciones/<formato>/<transición>.wav (lee la programación de celdas de
+//       transitions.mjs del taller) · demos/ (las mismas demos del taller, con la transición en 1,5 s)
 //
 // a = contenida · b = más punch. Síntesis determinística propia (sin muestras ni modelos). Principios:
 // la falla está afinada (todo en La mayor) · sin chiptune, módem, máquina de escribir ni vinilo · un solo golpe
@@ -282,25 +284,73 @@ function cabecera(M, T0, n) {
 }
 function cabeceraSalida(M, T0) { tear(M, T0, 3, LEVEL.tear - 4) }
 function lowerThird(M, T0, guest = false) {
-  // El rótulo se abre (f3): cuatro ticks que suben. La manzana nace en la órbita (f9): un tintineo agudo, no un golpe.
-  ;['E6', 'F#6', 'A6', 'B6'].forEach((n, i) => M.addMono(T0 + f(3) + i * 0.028, grain(note(n), 0.012), -0.5 + i * 0.1, 0.1, db(-33)))
+  // Entrada (f3, 0,35 s): el rótulo se abre de izquierda a derecha; los bytes suben por la pentatónica con el barrido.
+  for (let k = 0; k < 8; k++) M.addMono(T0 + f(3) + k * 0.04, crush(grain(PENTA[2 + k], 0.014), 6 + (k >> 1), 2), -0.75 + k * 0.1, 0.12, db(-31 + k * 0.4))
   if (guest) {
-    M.addMono(T0 + f(8), blip(E6, { len: 0.1, decay: 45 }), -0.4, 0.15, db(-30))
-    for (let k = 0; k < 3; k++) M.tick(T0 + f(20) + 0.35 + 0.7 * k, -36, 3000, -0.4, 250) // el punto hueco que late
-  } else M.addMono(T0 + f(9), bellSeg(A6, 0.6), -0.4, 0.4, db(-29))
-  // El nombre cae (f12): sólo un clic liviano; nada grave.
-  M.addMono(T0 + f(12), click(), -0.4, 0.03, db(-24))
-  typing(M, T0 + f(18), T0 + f(18) + 0.2, 5, -0.4)
+    // El punto hueco nace (f8) y late (desde f20, cada 0,7 s).
+    M.addMono(T0 + f(8), blip(E6, { len: 0.1, decay: 45 }), -0.4, 0.15, db(-29))
+    for (let k = 0; k < 3; k++) M.tick(T0 + f(20) + 0.35 + 0.7 * k, -35, 3000, -0.4, 250)
+  } else {
+    // La órbita real: el anillo aparece (f6), la manzana nace en él (f9) con un tintineo agudo —no es un golpe— y la
+    // estela se dibuja (f12, 0,4 s) como un deslizamiento suave de Mi a La.
+    M.tick(T0 + f(6), -36, 2600, -0.45, 200)
+    M.addMono(T0 + f(9), bellSeg(A6, 0.6, 1.5), -0.45, 0.4, db(-27))
+    M.tone({ t0: T0 + f(12), t1: T0 + f(12) + 0.4, freq: t => E6 * 2 ** ((5 / 12) * Math.min(1, (t - T0 - f(12)) / 0.4)), partials: [[1, 1]], gain: t => db(-40) * Math.sin(Math.PI * Math.min(1, (t - T0 - f(12)) / 0.4)), pan: () => -0.45, sendAmt: 0.3 })
+  }
+  // La etiqueta se teclea (f9 → f17) y el nombre cae de golpe (f12): clic liviano y su desgarro. Nada grave.
+  typing(M, T0 + f(9), T0 + f(17), 10, -0.45)
+  M.addMono(T0 + f(12), click(), -0.4, 0.03, db(-22))
+  tear(M, T0 + f(12) + 0.08, 3, LEVEL.tear - 8)
+  // Salida: falla de dos cuadros (f132) y el rótulo se cierra hacia la izquierda (f134, 0,22 s): los bytes bajan.
   tear(M, T0 + f(132), 2, LEVEL.tear - 6)
+  for (let k = 0; k < 6; k++) M.addMono(T0 + f(134) + k * 0.035, crush(grain(PENTA[8 - k], 0.012), 8 - k, 2), -0.2 - k * 0.1, 0.1, db(-32 - k * 0.5))
 }
-function noticia(M, T0, withSource) {
+// La transición de piezas «manzana en bytes» (overlays.mjs, appleBytes): la manzana nace en la esquina de la pieza, se
+// rompe en bytes que barren el rectángulo y se funden en la pieza; a la salida, los bytes vuelven y la manzana se va.
+function appleBytesSfx(M, t0, tOut, { n = 40, pan0 = -0.55, spread = 0.9 } = {}) {
+  M.addMono(t0, blip(A6, { len: 0.12, decay: 40, bend: 3 }), pan0, 0.2, db(-27))
+  const tBreak = t0 + 0.26
+  M.addMono(tBreak, noiseSeg(0.02, 3000, 12000, 120), pan0, 0.05, db(-27))
+  M.addMono(tBreak, crush(blip(A6, { len: 0.05, decay: 30 }), 4, 5), pan0, 0.05, db(-28))
+  for (let k = 0; k < n; k++) {
+    const dn = R(), j = R()
+    const g = crush(grain(PENTA[Math.min(PENTA.length - 1, Math.floor(dn * PENTA.length))], 0.009 + R() * 0.007), Math.round(5 + 7 * dn), dn < 0.5 ? 3 : 1)
+    M.addMono(tBreak + dn * 0.22 + j * 0.03 + 0.1, g, Math.max(-1, Math.min(1, pan0 + dn * spread)), 0.2, db(LEVEL.grain - 3 + (R() * 4 - 2)))
+  }
+  M.addMono(tBreak + 0.47, blip(E6, { len: 0.1, decay: 50 }), pan0 + spread / 2, 0.15, db(-31))
+  if (tOut == null) return
+  for (let k = 0; k < n; k++) {
+    const dn = R(), j = R()
+    const g = crush(grain(PENTA[Math.max(0, PENTA.length - 1 - Math.floor((1 - dn) * PENTA.length))], 0.009 + R() * 0.007), Math.round(12 - 7 * (1 - dn)), dn > 0.5 ? 3 : 1)
+    M.addMono(tOut + (1 - dn) * 0.15 + j * 0.02 + 0.15, g, Math.max(-1, Math.min(1, pan0 + dn * spread * (0.4 + 0.6 * (1 - dn)))), 0.2, db(LEVEL.grain - 4 + (R() * 4 - 2)))
+  }
+  const tBack = tOut + 0.38
+  M.addMono(tBack, blip(A6, { len: 0.1, decay: 45 }), pan0, 0.2, db(-28))
+  M.addMono(tBack + 0.12, blip(A6, { len: 0.16, decay: 30, bend: -6 }), pan0, 0.15, db(-31))
+}
+function noticia(M, T0) {
   M.tick(T0 + f(3), -30, 5000, 0.1, 380)
   bytes(M, T0 + f(3), T0 + f(9), 7, 'out', { center: 0.1, level: LEVEL.grain - 4 })
   tear(M, T0 + f(5), 2, LEVEL.tear - 7)
   typing(M, T0 + f(12), T0 + f(12) + 0.3, 9, 0.1)
   M.tick(T0 + f(27), -34, 4200, 0.1, 380)
-  if (withSource) bytes(M, T0 + f(3), T0 + f(3) + 0.45, 14, 'in', { center: -0.3, level: LEVEL.grain - 7 })
   tear(M, T0 + f(132), 2, LEVEL.tear - 7)
+}
+// Tarjeta de noticia con la transición de bytes (t0 f3, salida f129).
+function noticiaBytes(M, T0) {
+  appleBytesSfx(M, T0 + f(3), T0 + f(129))
+  const shown = T0 + f(3) + 0.73
+  typing(M, shown + 0.02, shown + 0.26, 12, -0.2)
+  typing(M, shown + 0.08, shown + 0.38, 9, 0)
+  M.tick(shown + 0.5, -34, 4200, 0, 380)
+  tear(M, T0 + f(126), 3, LEVEL.tear - 7)
+}
+// Imagen de la fuente: la foto entra (f3, 0,45 s) con el borde que se derrite en bytes y sale en f128–f133.
+function fuente(M, T0) {
+  bytes(M, T0 + f(3), T0 + f(3) + 0.45, 14, 'in', { center: -0.3, level: LEVEL.grain - 7 })
+  M.tick(T0 + f(20), -36, 3600, -0.3, 300)
+  bytes(M, T0 + f(128), T0 + f(128) + 0.3, 10, 'out', { center: -0.3, level: LEVEL.grain - 8 })
+  tear(M, T0 + f(130), 2, LEVEL.tear - 8)
 }
 function dropPiece(M, T0) {
   M.tick(T0 + f(3), -30, 5000, 0, 380)
@@ -312,6 +362,17 @@ function dropPiece(M, T0) {
   tear(M, T0 + f(31) + 0.08, 3)
   appleHit(M, T0 + f(37), { echoAt: T0 + f(41), level: B ? -8 : -10 })
   tear(M, T0 + f(106), 3)
+}
+function dropBytes(M, T0) {
+  appleBytesSfx(M, T0 + f(3), T0 + f(113), { n: 56, pan0: -0.6, spread: 1.4 })
+  const shown = T0 + f(3) + 0.73
+  for (let j = 0; j < 8; j++) M.addMono(shown + j * 2 * FR, crush(grain(HIGH[Math.floor(R() * HIGH.length)], 0.012), 5, 3), -0.3, 0.05, db(-32))
+  typing(M, shown, shown + 0.22, 11, -0.1)
+  typing(M, shown + 0.22, shown + 0.72, 18, 0)
+  M.addMono(shown + 0.8, thump(), 0, 0.08, db(LEVEL.thump))
+  tear(M, shown + 0.88, 3)
+  appleHit(M, shown + 0.98, { echoAt: shown + 0.98 + f(4), level: B ? -8 : -10 })
+  tear(M, T0 + f(108), 3)
 }
 function cta(M, T0) {
   M.addMono(T0 + f(3), marker(0.5), 0.1, 0.04, db(B ? -27 : -30))
@@ -342,13 +403,15 @@ let GAIN = null
 function render(name, dur, build, room, cuts = []) {
   const fx = createMix({ dur, seed: 0x51f0 })
   build(fx)
-  const fxFile = path.join(OUT, `.${name}-fx.wav`), roomFile = path.join(OUT, `.${name}-room.wav`)
+  const out = path.join(OUT, `${name}.wav`)
+  mkdirSync(path.dirname(out), { recursive: true })
+  if (!room.length) { fx.write(out, { wet: 1.2, fadeMs: 20, gain: GAIN, gate: gateCut(cuts) }); console.log(`${name}: ${out}`); return }
+  const fxFile = path.join(OUT, `.${name.replace(/\//g, '_')}-fx.wav`), roomFile = path.join(OUT, `.${name.replace(/\//g, '_')}-room.wav`)
   const w = fx.write(fxFile, { wet: 1.2, fadeMs: 20, gain: GAIN, gate: gateCut(cuts) })
   if (GAIN == null) GAIN = w.gain
   const rm = createMix({ dur, seed: 0x7a11 })
   for (const [a, b] of room) roomTone(rm, a, b)
   rm.write(roomFile, { wet: 0, fadeMs: 5, gain: GAIN })
-  const out = path.join(OUT, `${name}.wav`)
   execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', fxFile, '-i', roomFile, '-filter_complex', 'amix=inputs=2:normalize=0', '-c:a', 'pcm_s24le', out])
   rmSync(fxFile); rmSync(roomFile)
   console.log(`${name}: ${out}`)
@@ -361,11 +424,83 @@ render('bucle', 7, M => { cierre(M, 0); apertura(M, 3) }, [[0, f(6) + 0.03], [3 
 render('animatic', 45.2, M => {
   apertura(M, 0)
   cabecera(M, 4, 1); lowerThird(M, 5)
-  noticia(M, 10.5, true)
-  cabecera(M, 16, 2); noticia(M, 16.5, false)
+  noticia(M, 10.5); fuente(M, 10.5)
+  cabecera(M, 16, 2); noticia(M, 16.5)
   dropPiece(M, 22)
   cabecera(M, 26.5, 3); lowerThird(M, 27, true)
-  noticia(M, 32.2, false)
+  noticia(M, 32.2)
   cabeceraSalida(M, 38); cta(M, 38.2)
   cierre(M, 42.2)
 }, [[f(69), 42.2 + f(6) + 0.03]], [[f(108), 3.98]])
+
+// ── Kit: un WAV por cada .mov, misma duración y mismo nombre, para soltarlo en 0 junto a su overlay ──────────
+const KIT = [
+  ['cabecera-1', 2, M => cabecera(M, 0, 1)], ['cabecera-2', 1.2, M => cabecera(M, 0, 2)], ['cabecera-3', 1.2, M => cabecera(M, 0, 3)],
+  ['cabecera-salida', 0.4, M => cabeceraSalida(M, 0)],
+  ['lower-third-host', 5, M => lowerThird(M, 0)], ['lower-third-invitado', 5, M => lowerThird(M, 0, true)],
+  ['noticia', 5, M => noticia(M, 0)], ['fuente', 5, M => fuente(M, 0)], ['drop', 4, M => dropPiece(M, 0)], ['cta', 4, M => cta(M, 0)],
+  // Con la transición de bytes («transition": "bytes"): kit-transicion-bytes/.
+  ['noticia-bytes', 5, M => noticiaBytes(M, 0)], ['drop-bytes', 4.5, M => dropBytes(M, 0)]
+]
+for (const [name, dur, build] of KIT) render(`kit/${name}`, dur, build, [])
+
+// ── Transición entre escenas (transitions.mjs): la capa y la máscara comparten grilla y tiempos; el sonido también ──
+// El taller vive clonado como hermano de greenhouse-eo (norma de Glitch §13.10); GLITCH_MOTION_DIR lo sobreescribe.
+const MOTION_DIR = process.env.GLITCH_MOTION_DIR ?? new URL('../../../../efeonce-brand-workshop/tools/glitch-motion/', import.meta.url).pathname
+const TR = await import(path.join(MOTION_DIR, 'src/transitions.mjs'))
+const panOfX = (x, w) => Math.max(-0.9, Math.min(0.9, (x / w) * 2 - 1))
+function sceneTransition(M, T0, fmt, origin, durKey) {
+  const S = TR.schedule(fmt, origin, TR.TRANSITION.durations[durKey])
+  const { F, o, cells, duration } = S
+  const t0 = Math.min(...cells.map(q => q.t)), po = panOfX(o.x, F.w)
+  // La manzana nace en el origen y se rompe cuando se abre la primera celda.
+  M.addMono(T0, blip(A6, { len: 0.1, decay: 45, bend: 3 }), po, 0.2, db(-27))
+  M.addMono(T0 + t0, noiseSeg(0.02, 3000, 12000, 120), po, 0.05, db(-25))
+  M.addMono(T0 + t0, crush(blip(A6, { len: 0.05, decay: 30 }), 4, 5), po, 0.05, db(-27))
+  // El barrido: una lluvia de micro-clics, uno por celda que se abre (muestreadas), con su paneo real. Nada de
+  // soplo continuo: eso sería un whoosh.
+  const step = Math.max(1, Math.round(cells.length / (durKey === 'rapida' ? 110 : 160)))
+  cells.forEach((q, i) => {
+    if (i % step) return
+    const u = q.t / duration
+    M.tick(T0 + q.t, (B ? -31 : -34) + (R() * 4 - 2), 2600 + 5400 * u, panOfX(q.x + q.w / 2, F.w) * 0.85, 380 + R() * 200)
+  })
+  // Los destellos (verde, gris, blanco) son bytes afinados: verde = La/Mi agudos, gris = Mi, blanco = el más agudo.
+  const glints = cells.filter(q => q.glint)
+  const pick = glints.filter((_, i) => i % Math.max(1, Math.round(glints.length / (durKey === 'rapida' ? 36 : 54))) === 0)
+  for (const q of pick) {
+    const col = q.glint.toLowerCase()
+    const fr = col.includes('6ec207') ? [A6, note('E7')][Math.floor(R() * 2)] : col.includes('fff') ? note('C#7') : E6
+    M.addMono(T0 + q.t, crush(grain(fr, 0.01 + R() * 0.006), 7, 2), panOfX(q.x + q.w / 2, F.w), 0.2, db(LEVEL.grain - 2 + (R() * 4 - 2)))
+  }
+}
+// Héroe (1,2 s): los bytes de A vuelan (0,26 + dn·0,34 + j·0,05, vuelo 0,42) y se rearman como B.
+function heroTransition(M, T0, fmt, origin = 'centro') {
+  const F = TR.TRANSITION.formats[fmt], o = TR.TRANSITION.origins[origin](F), po = panOfX(o.x, F.w)
+  M.addMono(T0 + 0.05, blip(A6, { len: 0.1, decay: 45, bend: 3 }), po, 0.2, db(-26))
+  M.addMono(T0 + 0.26, noiseSeg(0.025, 2500, 12000, 100), po, 0.05, db(B ? -20 : -23))
+  stutter(M, T0 + 0.26, blip(A6, { len: 0.08, decay: 10 }), [30, 20, 13, 8, 5], B ? -18 : -21, 4, 5)
+  const cells = []
+  for (let y = 0; y < F.h; y += F.cell) for (let x = 0; x < F.w; x += F.cell) cells.push({ x: x + F.cell / 2, y: y + F.cell / 2 })
+  const maxD = Math.max(...cells.map(q => Math.hypot(q.x - o.x, q.y - o.y)))
+  const pick = cells.filter((_, i) => i % Math.round(cells.length / 70) === 0)
+  for (const q of pick) {
+    const dn = Math.hypot(q.x - o.x, q.y - o.y) / maxD, t = T0 + 0.26 + dn * 0.34 + R() * 0.05, pan = panOfX(q.x, F.w)
+    // Despegue: un byte que sale con un deslizamiento. Llegada (0,42 s después): el byte ya afinado en su lugar de B.
+    M.addMono(t, crush(blip(PENTA[Math.floor(R() * 5)], { len: 0.05, decay: 60, bend: 5 }), 6, 3), pan, 0.05, db(-36))
+    M.addMono(t + 0.42, grain(PENTA[Math.min(PENTA.length - 1, 3 + Math.floor(dn * 8))], 0.012), pan * 0.8, 0.2, db(LEVEL.grain - 3 + (R() * 3 - 1.5)))
+  }
+  // Lluvia de micro-clics con el despegue de cada byte (no un soplo).
+  cells.forEach((q, i) => { if (i % 5) return; const dn = Math.hypot(q.x - o.x, q.y - o.y) / maxD; M.tick(T0 + 0.26 + dn * 0.34 + R() * 0.05, (B ? -32 : -35) + (R() * 4 - 2), 2200 + 4000 * dn, panOfX(q.x, F.w) * 0.85, 400) })
+}
+for (const fmt of ['reel', 'vlog']) {
+  for (const origin of ['centro', 'izquierda', 'marca']) for (const dk of ['rapida', 'normal'])
+    render(`transiciones/${fmt}/glitch-transicion-${fmt}-${origin}-${dk}`, TR.TRANSITION.durations[dk], M => sceneTransition(M, 0, fmt, origin, dk), [])
+  render(`transiciones/${fmt}/glitch-transicion-${fmt}-centro-heroe`, TR.TRANSITION.hero.duration, M => heroTransition(M, 0, fmt), [])
+}
+
+// ── Demos con sonido: los mismos cortes que entregó el taller (la transición empieza en 1,5 s) y un recorrido del
+// lower third y la transición de bytes sobre la toma del host (0,3 · 5,8 · 11,3 s; 16,5 s). ──
+for (const origin of ['centro', 'izquierda', 'marca']) render(`demos/demo_vlog_${origin}`, 3.8, M => sceneTransition(M, 1.5, 'vlog', origin, 'normal'), [])
+render('demos/demo-heroe_vlog', 4.2, M => heroTransition(M, 1.5, 'vlog'), [])
+render('demos/recorrido-bytes', 16.5, M => { lowerThird(M, 0.3); noticiaBytes(M, 5.8); dropBytes(M, 11.3) }, [])

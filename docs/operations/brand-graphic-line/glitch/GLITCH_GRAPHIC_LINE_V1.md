@@ -533,6 +533,11 @@ cabecera y lower third conservan su entrada propia.
 | Paquete | **máscara** (`…-mascara.mov`: bytes blancos que llenan el cuadro en barrido; es un track matte de **alfa**) + **capa** (`…-capa.mov`: la manzana en el origen y destellos verde, gris y blanco en el borde). Misma grilla y mismos tiempos. Orígenes: centro, izquierda y marca (reel x 876, y 276; vlog x 1772, y 82: donde vive el wordmark). Celda: reel 60 px, vlog 64 px. Demos `demo_<formato>_<origen>.mp4` | rápida 0,5 s · normal 0,8 s |
 | Héroe | clip **opaco**: los píxeles de A se desprenden en bytes, vuelan (cada byte a un lugar de B en su misma franja de distancia) y se rearman como B; la manzana en el origen al inicio. Se genera por corte con los dos clips y el segundo del corte, y se inserta ya renderizado entre A y B | 1,2 s (36 cuadros) |
 
+**Sonido (propuesta, 2026-09-27, sin aprobar):** cada transición tiene su pista, alineada al mismo inicio que la máscara
+y la capa y calculada desde la misma programación de celdas: la manzana en el origen, una lluvia de clics que viaja con
+el barrido (nunca un whoosh) y los destellos como bytes afinados. Igual para la transición de piezas y el lower third.
+En OneDrive `Motion/piloto/sonido-propuesta/`.
+
 **Regla de rostros** (norma: la falla nunca sobre un rostro): la transición va entre imágenes de noticias, b-roll y
 pantallas. **Hacia o desde la toma del host a cámara va corte seco o transición de tarjeta.** El piloto la aplica por
 defecto; una excepción sólo vale si el operador la aprueba.
