@@ -85,11 +85,34 @@ Nexa) o un cliente Globe. Para audio genérico basta `../modules/`.
   intro con pre-roll, cortina entre noticias (corta en seco en 1,6 s, cae con la cabecera siguiente) y salida, en
   versión vlog (−14 LUFS) y podcast (−16); y **cama post-punk** en bucle de 19,2 s bajo el relato de cada noticia
   («Post-punk definitivamente»). Cama: 15 dB bajo la voz, ducking por sidechain (umbral 0,05, 3:1, 15 ms / 350 ms),
-  **sin recortar medios**, nunca bajo el Drop ni la tarjeta final. Lección medida: lo «arcade» es falta de medios
+  **sin recortar medios**, nunca bajo el Drop ni la tarjeta final. **Fuera de las noticias, la voz del host va sola:**
+  la cama no va bajo el cierre sobre el host ni bajo ninguna toma del host fuera del relato de una noticia (marca «el
+  tiempo de la noticia»). Lección medida: lo «arcade» es falta de medios
   (13 % en la cama rechazada contra 45 % en la intro y 38 % en la cama aprobada); nunca síntesis pura para la música de
   Glitch. Másteres por URL + sha256 en `gs://efeonce-group-axis-public-media/glitch/music/v1/` (con `index.json`);
   **nunca se regeneran**: un cambio es una ronda nueva aprobada por el operador. Detalle, tabla de sha256, producción y
-  pendientes: `efeonce-graphic-line` → `references/glitch.md` §13.7; canon: norma §13.12 «Música — sólo Glitch».
+  argumentos: `efeonce-graphic-line` → `references/glitch.md` §13.7; canon: norma §13.12 «Música — sólo Glitch».
+- **Producción y entrega (en el taller, 2026-09-27):** sonido B y música se producen y entregan **con el motion**, en
+  el repo taller `efeoncepro/efeonce-brand-workshop` (`main` = `ed89a0b`): `tools/glitch-motion/src/sound.mjs` sobre
+  `tools/brand-sound` (síntesis propia, determinista, byte a byte) y `src/music.mjs`, que **baja los siete másteres por
+  URL y verifica su sha256 fijado en el código** (falla cerrado si el bucket cambia; nunca regenera). Desde
+  `greenhouse-eo`: `pnpm -C ../efeonce-brand-workshop --filter glitch-motion <render|kit|transiciones|heroe|sonido>`
+  con `--sound b|a|off` (`b` por defecto) y `--music on|off` (`on` por defecto); comandos y argumentos completos en la
+  norma de Glitch §13.13. Con música, la intro (pre-roll + apertura) y la salida (con la tarjeta final) **reemplazan**
+  a `apertura.wav`/`cierre.wav`: nunca se sueltan ambos (sonaría doble). El reel usa los másteres de vlog. En el
+  animatic no hay voz: la cama va a −13 dB y el ducking lo aplica el editor. Nunca sonorices una pieza de Glitch a mano
+  ni con el kit sonoro de Efeonce: separación total.
+  - Música integrada en los commits `2c8f36c` y `ed89a0b` del taller; el **pre-roll animado de la intro** lo eligió el
+    operador; `kit` entrega cama y cortina y mezcla el animatic de 48,4 s.
+  - **En producción en AXIS** (PR #10, `87c3298`): `https://axis.efeonce.org/references/glitch/#musica` y
+    `/references/glitch.json` → `music` (17 archivos con URL y sha256); `/references/sonic-brand/` enlaza a ella.
+  - **Por qué, en corto:** banda real y no síntesis (tres rondas de síntesis sonaron a videojuego); 150 BPM porque una
+    semicorchea = 3 cuadros y todo golpe del motion cae en la grilla; cortes y tartamudeo aplicados después sobre la
+    grabación (el modelo difumina la falla); espacio para la voz por ducking, no por EQ (el recorte volvió arcade la
+    primera cama); 15 dB bajo la voz es valor sólo de Glitch (cama con actitud; el 18–20 dB genérico es para camas
+    neutras).
+  - **Único pendiente:** probar la mezcla con la voz real del host en una edición real (la demo usa una voz TTS
+    provisional); el ducking lo aplica el editor.
 
 ## Ecosistema digital (SSOT: `docs/public-site/decisions/PDR-003`)
 

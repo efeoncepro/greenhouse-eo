@@ -1,5 +1,17 @@
 # TASK-1922 — Glitch en AXIS: token de franquicia, archivos oficiales y contrato
 
+## Delta 2026-09-27 (tarde) — el motion salió antes que los tokens
+
+- El motion, el sonido (versión B) y la música de Glitch quedaron **aprobados** e implementados en el taller
+  (`tools/glitch-motion`, TASK-1924) **sin esperar a `glitchLine`**: las curvas vienen de `@efeoncepro/axis-tokens`
+  (`efeonceGraphicLine.motion`), pero la paleta y la manzana de Glitch son una **propuesta espejada** en
+  `src/brand.mjs` del taller. Cuando se publique `glitchLine`, el taller debe leerlo y retirar esa copia (lo reconcilia
+  TASK-1924). Los valores de motion de Glitch que hoy guarda la [norma §13.1](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#131-motor-y-dónde-vive) son los
+  candidatos a `glitchLine.motion`.
+- El mnemónico ya no está abierto: el diseño sonoro B quedó aprobado el 2026-09-27 y el motion lleva sus golpes
+  (§13.3 de la norma). El sonido y la música ya se publican en AXIS como archivos por URL + sha256 (campos `sound` y
+  `music` de `/references/glitch.json`), no como tokens.
+
 ## Delta 2026-09-27
 
 - **Guttery:** el operador confirmó la licencia para web y video (2026-09-27, segunda respuesta). La Open Question de Guttery queda resuelta; la task registra la referencia del contrato de licencia y sella la fuente.

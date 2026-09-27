@@ -7,6 +7,20 @@
      ═══════════════════════════════════════════════════════════ -->
 
 
+## Delta 2026-09-27 (tarde) — primeras herramientas ya viven en el taller
+
+- **Ya en el taller** (`main` = `ed89a0b`, empujado), fuera del alcance de esta task pero relevante para ella:
+  - `tools/glitch-motion` (sólo Glitch, TASK-1924): motion, sonido (B) y música aprobados; 12 pruebas en verde.
+  - `tools/brand-sound` (workspace, `exports ./dsp`): primitivas de síntesis **migradas byte a byte** (`2d411b8`) desde
+    `greenhouse-eo` `ai-generations/2026-09-26_branding-sonoro`, que queda como **histórico** (ya no es la fuente). Los
+    30 WAV de la versión B salen idénticos antes y después de la migración.
+- **Dependencia de red nueva y acotada:** `glitch-motion` baja los másteres de la música del bucket público por URL con
+  sha256 fijado (caché `.cache/`, ignorada por git; falla cerrado). Registrada en el
+  [Delta del ADR del taller](../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md#delta-2026-09-27--glitch-motion-y-brand-sound-en-el-taller).
+- **No cambia el alcance de esta task:** siguen pendientes el CI mínimo, el bucket de binarios, `foto` y
+  `brand-motion`. Si el motor de la identidad sonora de Efeonce (`orbit-sound.mjs` de `brand-motion`) migra, debe usar
+  `tools/brand-sound` (una sola lógica). El Lifecycle no cambia.
+
 ## Delta 2026-09-27
 
 - TASK-1926 agrega al pipeline `foto:*` el registro cine y `pnpm foto:cine` (con sus módulos); se migran con el resto en esta task.
@@ -26,7 +40,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Diseno. Fuera del alcance de esta task ya viven en el taller tools/glitch-motion (TASK-1924) y tools/brand-sound (migrado byte a byte desde ai-generations/2026-09-26_branding-sonoro, 2d411b8); CI, bucket, foto y brand-motion siguen sin migrar`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -122,10 +136,12 @@ Reglas obligatorias:
   `pnpm ai:image`.
 - `scripts/creative/brand-motion/`: `encode-orbit-motion.mjs`, `orbit-scene.js`, `orbit-sound.mjs`, `render-orbit-motion.mjs`.
 - `ai-generations/` (~156 carpetas, 13 GB locales; imágenes gitignoreadas, fichas y prompts versionados).
+- En el taller (2026-09-27): `tools/glitch-motion` (TASK-1924) y `tools/brand-sound` (primitivas de síntesis,
+  migradas byte a byte desde `ai-generations/2026-09-26_branding-sonoro`, que queda como histórico).
 
 ### Gap
 
-- El taller no tiene código, CI ni bucket de binarios.
+- El taller no tiene CI ni bucket de binarios (sí código: `tools/glitch-motion` y `tools/brand-sound`).
 - `foto:generar` depende del generador de Greenhouse.
 - La regla auto-load y las skills apuntan a rutas de Greenhouse.
 

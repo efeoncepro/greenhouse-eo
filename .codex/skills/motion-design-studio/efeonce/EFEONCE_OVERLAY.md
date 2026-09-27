@@ -40,6 +40,17 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   en `efeonce-graphic-line` → `references/glitch.md` §13; y su **música aprobada** (tema B + cama post-punk,
   2026-09-27) se monta junto al motion desde los másteres del bucket por URL + sha256, sin regenerarla (§13.7). Canon:
   [`EFEONCE_SONIC_IDENTITY_V1.md`](../../../../docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md).
+- **Motion de Glitch (APROBADO 2026-09-27; sólo Glitch):** apertura y tarjeta final v2, pre-roll de la intro, kit de
+  overlays, transición de bytes entre piezas y entre escenas y héroe. Se produce con **HyperFrames en el repo taller**
+  `efeoncepro/efeonce-brand-workshop` (`tools/glitch-motion`), operado desde `greenhouse-eo` con
+  `pnpm -C ../efeonce-brand-workshop --filter glitch-motion <doctor|render|kit|transiciones|heroe>`; cada render entrega
+  el WAV del sonido B y la música aprobada junto a cada `.mov`. La **música está integrada** (`src/music.mjs` baja y
+  verifica los másteres por sha256, nunca los regenera): el **pre-roll animado de la intro** (3,2 s, los tres puntos
+  laten Mi · Mi · Mi y empalman exacto con la apertura, PSNR ∞) lo **eligió el operador**; con música, la intro y la
+  salida **reemplazan** a `apertura.wav` y `cierre.wav`; `--music off` entrega como antes. **Único pendiente:** probar
+  la mezcla con la voz real del host. **La transición de la manzana en bytes es exclusiva de
+  Glitch**: nunca en piezas de Efeonce, su familia ni clientes. Nunca la animes a mano ni la reproduzcas fuera del
+  taller. Detalle: `efeonce-graphic-line` → `references/glitch.md` §12; comandos: norma de Glitch §13.13.
 - **Cierre de marca 4,5 s — línea gráfica «La órbita» (canónica desde 2026-09-25):** el end-card de la marca propia
   Efeonce y su familia (nunca de un cliente) sigue el
   [manual §10.1](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md). La línea de tiempo

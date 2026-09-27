@@ -2,11 +2,12 @@
 
 > Verificado contra: greenhouse-eo@bc6fedc28 — 2026-09-27 · inventario de la sesión «Integrar Glitch en la línea
 > gráfica» (2026-09-27) · decisiones del operador del 2026-09-27 (Delta del ADR: manzana y verde aprobados, línea
-> Growth, próxima edición #17, alta de los 5 glifos aprobada) · motion en el repo taller (2026-09-27, commits sin push
-> 38ac584…c2a08c3, sonido integrado en `2d411b8`, entregas `b40565e`), **APROBADO** por el operador el 2026-09-27: ver
-> §12 · diseño sonoro de Glitch **aprobado, versión B** (greenhouse-eo
+> Growth, próxima edición #17, alta de los 5 glifos aprobada) · motion en el repo taller (2026-09-27, empujado a
+> `main` = `ed89a0b`: 38ac584…c2a08c3, sonido integrado en `2d411b8`, música y pre-roll en `2c8f36c`, entregas
+> `b40565e` y `ed89a0b`), **APROBADO** por el operador el 2026-09-27: ver §12 · diseño sonoro de Glitch **aprobado, versión B** (greenhouse-eo
 > `2fee1f487` y `556c83ae2`; aprobado por el operador el 2026-09-27): ver §13 · música de Glitch (tema B + cama
-> post-punk) **aprobada** por el operador el 2026-09-27, másteres en `glitch/music/v1/` del bucket de AXIS: ver §13.7.
+> post-punk) **aprobada** por el operador el 2026-09-27, másteres en `glitch/music/v1/` del bucket de AXIS, integrada
+> al taller (`2c8f36c`, `ed89a0b`) y en producción en AXIS (`87c3298`, `#musica`): ver §13.7.
 >
 > **Canon humano:** norma [`GLITCH_GRAPHIC_LINE_V1.md`](../../../../docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
 > + ADR [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](../../../../docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
@@ -128,7 +129,9 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
   vez en 4K horizontal con aire arriba y abajo y el reel sale del recorte vertical. Mnemónico y diseño sonoro al abrir y al
   cerrar: **aprobado, versión B** (2026-09-27; sólo de Glitch, §13); los `.mov` salen mudos y cada uno trae al lado su
   WAV con el mismo nombre. El motion (apertura y tarjeta final v2, kit, transiciones) y los tableros de video del canvas
-  están **APROBADOS** (2026-09-27: «Si, el tuyo también está aprobado»).
+  están **APROBADOS** (2026-09-27: «Si, el tuyo también está aprobado»). La **música** (tema B + cama post-punk, §13.7)
+  y el **pre-roll de la intro** («los tres puntos al ritmo», 3,2 s) también están aprobados y el taller los entrega con
+  el motion (§12).
   Subtítulos siempre (Poppins 600, blanco sobre navy 78 %, una palabra en el acento). Imagen de las fuentes embebida o
   licenciada, **nunca descargada**; en navy, con bytes en el borde y crédito.
 - **Reel = overlays ENCIMA de la toma del host** (decisión del operador: el host está en cámara todo el tiempo).
@@ -161,6 +164,10 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
   Glitch, mezclado con el kit sonoro de Efeonce, sobre la voz del host o con whooshes (§13).
 - La música de Glitch (tema B y cama post-punk) fuera de Glitch; regenerarla con un modelo en vez de usar los másteres;
   música de Glitch en síntesis pura; recortarle los medios para abrirle espacio a la voz (§13.7).
+- Sonido doble: soltar `apertura.wav` o `cierre.wav` junto a la intro o la salida con música (ya los traen montados);
+  la cama bajo el Drop, bajo la tarjeta final o fuera del relato de una noticia (§13.7).
+- Animar, sonorizar o mezclar una pieza de Glitch a mano cuando existe el comando del taller: se corre `glitch-motion`
+  (§12) y se entrega lo que sale verificado.
 - Dos esferas en la misma pieza o pantalla (manzana + esfera de la lente, o manzana + esfera de la órbita).
 - El verde como texto, borde o separador sobre fondo claro.
 - La falla sobre un rostro; un overlay sobre la cara del host o sobre la interfaz de la app.
@@ -190,7 +197,7 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
 | Motion: apertura/tarjeta final v2, kit, transición de bytes entre piezas y entre escenas, héroe | **APROBADO** (2026-09-27, §12): «Si, el tuyo también está aprobado». La v1 queda como alternativa sin aprobar. Falta decidir a qué piezas va la transición de bytes |
 | Subtítulos del video | pendiente (estilo de captions en Premiere, no hecho) |
 | Diseño sonoro de Glitch (ronda 6: apertura, tarjeta final, kit, lower third, transiciones) | **APROBADO, versión B** (2026-09-27, §13): «La b me encanta más. Sus sonidos están aprobados». La A queda como alternativa descartada |
-| Música de Glitch: tema B (intro, cortina, salida) y cama post-punk bajo la noticia | **APROBADO** (2026-09-27, §13.7): «Definitivamente la B es la decisión», «Me parecen bien todas», «Post-punk definitivamente». Pendientes: integración en el taller (con el motion del pre-roll de la intro por definir) y AXIS `#musica` |
+| Música de Glitch: tema B (intro, cortina, salida) y cama post-punk bajo la noticia | **APROBADO** (2026-09-27, §13.7): «Definitivamente la B es la decisión», «Me parecen bien todas», «Post-punk definitivamente». **Integrada al taller** (`music.mjs`, pre-roll animado de la intro elegido por el operador) y **en producción en AXIS** (`#musica`, `glitch.json → music`). Único pendiente: probar la mezcla con la voz real del host |
 
 Una PROPUESTA no se entrega como canon ni se publica: se muestra al operador para aprobar.
 
@@ -280,15 +287,20 @@ el hogar del movimiento ya está decidido (repo taller).
   AXIS `https://axis.efeonce.org/references/glitch/#sonido` (archivos en `glitch/sound/v1/`) y sala de escucha
   https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9 («Ronda 6 · Glitch»).
 - Música (APROBADA, §13.7): másteres en `https://storage.googleapis.com/efeonce-group-axis-public-media/glitch/music/v1/`
-  (con `index.json`) y la misma sala de escucha, rondas 9, 10, 11 y 11b.
+  (con `index.json`), AXIS `https://axis.efeonce.org/references/glitch/#musica` (JSON `glitch.json → music`), el taller
+  (`tools/glitch-motion/src/music.mjs`) y la misma sala de escucha, rondas 9, 10, 11 y 11b.
 
 ## 12. Editor agente — motion de Glitch (APROBADO, 2026-09-27)
 
 > **Sólo Glitch.** Todo lo de esta sección es exclusivo de Glitch. **La transición de la manzana en bytes (entre piezas
 > y entre escenas) es exclusiva de Glitch y nunca se usa en piezas de Efeonce ni de clientes.** Estado: **APROBADO** por
 > el operador el 2026-09-27 («Si, el tuyo también está aprobado»): apertura y tarjeta final v2, kit de overlays,
-> transición de bytes entre piezas y transición entre escenas (paquete y héroe). Los pendientes están en §12.7. Manual del editor humano (Premiere/AE):
-> [`editar-video-glitch.md`](../../../../docs/manual-de-uso/creative/editar-video-glitch.md).
+> transición de bytes entre piezas y transición entre escenas (paquete y héroe), más el **pre-roll de la intro**
+> («los tres puntos al ritmo», elegido por el operador). Con él salen su **sonido B** (§13) y su **música** (§13.7),
+> ambos aprobados. Los pendientes están en §12.7. Manual del editor humano (Premiere/AE):
+> [`editar-video-glitch.md`](../../../../docs/manual-de-uso/creative/editar-video-glitch.md). **Referencia completa de
+> comandos, argumentos y variables de entorno:** norma §13.13 «Referencia de comandos y argumentos» (manda sobre esta
+> sección; aquí va el mínimo operable).
 
 ### 12.1 Motor y entorno
 
@@ -311,17 +323,44 @@ el hogar del movimiento ya está decidido (repo taller).
 
 | Pedido | Comando (prefijo `pnpm -C ../efeonce-brand-workshop --filter glitch-motion`) |
 |---|---|
-| Revisar el entorno antes de cualquier corrida | `doctor` |
-| Apertura (4 s, 120 cuadros) + tarjeta final (3 s, 90 cuadros), reel y vlog, con verificación y manifiesto | `render -- --run <corrida> --edition 17 [--deliver "<carpeta>"]` |
+| Revisar el entorno antes de cualquier corrida (fuentes, logo, wordmark, toma de prueba, ffmpeg, HyperFrames) | `doctor` |
+| Apertura (4 s, 120 cuadros) + tarjeta final (3 s, 90 cuadros) + **pre-roll** (3,2 s), reel y vlog, con `hyperframes lint`, verificación, WAV, música y manifiesto | `render -- --run <corrida> --edition 17 [--sound b\|a\|off] [--music on\|off] [--formats reel,vlog] [--workers <n>] [--deliver "<carpeta>"]` |
 | Kit de overlays (reel 1080×1920 y vlog 1920×1080) | `kit -- --run <corrida> --edition-file ejemplos/edicion-17.ejemplo.json --assets "<imágenes>" [--transition bytes] [--only a,b] [--skip-render] [--deliver "<carpeta>"]` |
 | Cambiar una sola pieza (texto corregido) | `kit … --only <pieza>` (segundos; el kit completo ≈ 4 min) |
 | Transición entre escenas (máscara + capa, orígenes centro/izquierda/marca, 0,5 s y 0,8 s) | `transiciones -- --run <corrida> [--a <imagen\|video>[@seg]] [--b …] [--deliver "<carpeta>"]` |
 | Transición héroe para un corte puntual (1,2 s, 36 cuadros, opaca) | `heroe -- --run <corrida> --a <archivo>[@seg] --b <archivo>[@seg] [--origin centro\|izquierda\|marca] [--formats reel,vlog]` |
-| Pruebas del paquete (registro de timelines, determinismo, sin red, datos de edición en pantalla) | `test` (7 pruebas) |
+| Sólo armar las composiciones HTML (incluye las del pre-roll si hay música), sin render | `build` |
+| Rehacer la verificación, vistas previas, WAV y manifiesto de una corrida ya renderizada | `verify -- --run <corrida>` |
+| Sólo el set de WAV del sonido, sin render de video | `sonido -- --run <corrida> [--edition <n>] [--sound b\|a]` |
+| Pruebas del paquete (timelines registradas, determinismo, sin red, datos de edición, pre-roll, huellas de la música, sonido completo y determinista) | `test` (12 pruebas, `node --test`) |
+
+**Argumentos clave** (tabla completa en la norma §13.13): `--run <id>` (carpeta `out/<id>/` y `corridas/<id>/`;
+defecto `<fecha>_glitch-motion`) · `--edition <n>` (defecto 17) · `--edition-file <json>` · `--assets <carpeta>` (fotos,
+nunca en git) · `--transition basic|bytes` · `--only a,b` · `--skip-render` (`kit`, `transiciones`: reutiliza los `.mov`
+ya renderizados y rehace verificaciones, WAV, vistas previas y entrega) · `--opening-run <id>` (`kit`: corrida de donde
+toma apertura, tarjeta final y pre-roll para el animatic; defecto `2026-09-27_glitch-motion-piloto-v2`) ·
+`--formats reel,vlog` · `--workers <n>` (defecto 2) · `--deliver "<carpeta>"` · `--sound b|a|off` (**`b` por defecto,
+la aprobada**) · `--music on|off` (**`on` por defecto, la aprobada**). Variables: `GREENHOUSE_DIR` (defecto
+`../greenhouse-eo`), `GLITCH_FONTS_DIR` (Guttery; defecto `~/Library/Fonts`), `GLITCH_HOST_PLATE` (toma para las vistas
+previas) y `NODE_AUTH_TOKEN` para instalar los paquetes `@efeoncepro`.
+
+**Flujo del editor agente (una edición):** `doctor` → `render` (apertura, tarjeta final, pre-roll, intro/salida) →
+`kit` con el archivo de edición y `--assets` → `transiciones` o `heroe` sólo si el montaje las pide → revisar cuadros y
+verificaciones → volver a correr con `--deliver` (o con `--skip-render` si sólo cambia la entrega o el sonido) →
+commitear sólo el `manifiesto.json` y avisar al operador (§12.5).
 
 **Sonido:** `render`, `kit`, `transiciones` y `heroe` entregan el WAV junto a cada `.mov` (mismo nombre, duración
 verificada) con `--sound b|a|off`: `b` por defecto (la aprobada), `a` la alternativa descartada (no se usa) y `off` sin
 sonido. Los tiempos del sonido se leen del código del motion.
+
+**Música (integrada, §13.7):** `render` entrega además el pre-roll animado de la intro, `glitch-intro-*.wav` (pre-roll +
+apertura, con sus efectos ya montados), `glitch-salida-*.wav` (con la tarjeta final) y las versiones de podcast; **con
+música no entrega `apertura.wav` ni `cierre.wav`** (la intro y la salida ya los traen: sonarían doble). `kit` entrega
+`glitch-kit-*-cama.wav` y `glitch-kit-*-cortina.wav` y mezcla el animatic de 48,4 s. **`--music off`** apaga la música
+y entrega como antes.
+El **reel usa los másteres de vlog** (`glitch-intro-reel.wav` = intro-vlog, 7,2 s). El pre-roll
+(`glitch-preroll-{reel,vlog}.mov`, 96 cuadros) es **opaco** (fondo navy) y su último cuadro es idéntico al primero de
+la apertura: se montan seguidos, sin corte visible. El podcast es audio: sin motion propio.
 
 Corridas (referencia de nombres; los nombres conservan «piloto»): `2026-09-27_glitch-motion-piloto`, `…-piloto-v2`,
 `2026-09-27_glitch-kit-piloto`, `2026-09-27_glitch-kit-transicion`, `2026-09-27_glitch-transiciones`,
@@ -354,12 +393,12 @@ Esquema de `tools/glitch-motion/ejemplos/edicion-17.ejemplo.json`:
 
 | Corrida | Qué verifica | Debe dar |
 |---|---|---|
-| `render` | apertura y tarjeta final; bucle exacto (último cuadro de la tarjeta = primero de la apertura) | 26/26 con sonido (22 del video, 11 por formato: códec, tamaño, 30 fps y cuadros, sin audio y alfa de entrada y salida por pieza, más el bucle con PSNR ∞) |
-| `kit` | códec, cuadros, alfa de entrada y salida, y el WAV de cada pieza | 84/84 |
+| `render` | apertura y tarjeta final; bucle exacto (último cuadro de la tarjeta = primero de la apertura); con música, el pre-roll (96 cuadros, opaco, empalme con la apertura PSNR ∞) y las huellas sha256 de los másteres | **37/37** con sonido y música (2026-09-27; antes de la música, 26/26) |
+| `kit` | códec, cuadros, alfa de entrada y salida, y el WAV de cada pieza; con música, cama y cortina | **95/95** con música (2026-09-27; antes, 84/84) |
 | `kit --transition bytes` (tarjeta y Drop) | ídem | 24/24 |
 | `transiciones` | máscara + capa por formato, origen y duración, y su WAV | 84/84 |
 | `heroe` | ídem | 8/8 |
-| `test` | 7 pruebas del paquete | 7/7 |
+| `test` | 12 pruebas del paquete | 12/12 |
 
 - **Si una sola verificación falla, no se entrega**: se corrige y se vuelve a correr. Nunca entregues «casi verde» ni
   borres una verificación para que pase. Los cuatro comandos (`render`, `kit`, `transiciones`, `heroe`) se niegan
@@ -369,8 +408,13 @@ Esquema de `tools/glitch-motion/ejemplos/edicion-17.ejemplo.json`:
 ### 12.5 Cómo entregar
 
 1. Corre con `--deliver "<carpeta>"` apuntando a OneDrive `Alineación/5. Contenidos/09. Glitch/Motion/piloto/`, en la
-   subcarpeta que toca: raíz (v1), `v2/`, `kit/{reel,vlog}/`, `kit-transicion-bytes/{reel,vlog}/`,
-   `transiciones/{reel,vlog}/` (con su `LEEME.txt`), `transiciones/heroe/{reel,vlog}/`.
+   subcarpeta que toca: raíz (v1, histórico), **`v2/` (la aprobada:** apertura, cierre, `glitch-preroll-*.mov`,
+   `glitch-intro-*.wav`, `glitch-salida-*.wav`, `glitch-{intro,cortina,salida}-podcast.wav`, vistas previas; y
+   `v2/sin-musica/` con los WAV de efectos de apertura y cierre + LEEME, para una edición sin música**)**,
+   `kit/{reel,vlog}/` (cada `.mov` con su `.wav`, más `glitch-kit-{fmt}-cama.wav`, `glitch-kit-{fmt}-cortina.wav` y
+   `animatic_{fmt}.mp4`), `kit-transicion-bytes/{reel,vlog}/`, `transiciones/{reel,vlog}/` (con su `LEEME.txt`),
+   `transiciones/heroe/{reel,vlog}/`. `sonido-propuesta/` es el histórico de la decisión del sonido (la B es la
+   aprobada).
 2. Cada corrida deja `corridas/<corrida>/manifiesto.json` en el taller: sha256 de cada binario, verificaciones,
    versiones, entrega y estado. **Commitea el manifiesto, nunca el binario.** Antes de commitear, confirma que el manifiesto
    no tenga rutas absolutas de la máquina. La entrega queda así: `"delivery": { "location": "OneDrive: Alineación/5.
@@ -396,6 +440,16 @@ Esquema de `tools/glitch-motion/ejemplos/edicion-17.ejemplo.json`:
   Montaje Premiere: A en V1; B en V2 desde el inicio; máscara en V3 con el ojo apagado; a B «Track Matte Key» →
   Matte: Video 3 → Composite using: Matte Alpha; cortar B donde termina la máscara y quitar el efecto al resto; capa en
   V4. After Effects: máscara sobre B con Track Matte «Alpha Matte»; capa arriba.
+- **Pre-roll «los tres puntos al ritmo»** (`TIMING.preroll` en `pieces.mjs`): 3,2 s = 2 compases a 150 BPM, opaco; los
+  puntos aparecen en los cuadros 0, 2 y 4, laten uno por tiempo (Mi · Mi · Mi), los tres juntos en el tiempo fuerte del
+  segundo compás y el tercero tartamudea en el último tiempo (cuadros 84, 87, 90, 93; quieto en el 95).
+- **Intro, salida, cortina y cama** (montaje): `glitch-preroll` + `glitch-apertura` seguidos en video y
+  `glitch-intro-*.wav` desde el inicio del pre-roll (cubre ambos); `glitch-cierre` con `glitch-salida-*.wav`; la
+  cortina se suelta 1,6 s antes de la cabecera «NOTICIA n/3» siguiente; la cama en bucle bajo el relato de cada noticia,
+  **−15 dB bajo la voz** con ducking por sidechain desde la voz (umbral 0,05, 3:1, 15 ms, 350 ms), cortada por la
+  cortina, el Drop o la tarjeta final. En el animatic no hay voz: la cama va a −13 dB y el ducking lo aplica el editor.
+  Qué efecto de Premiere usar para el sidechain no está documentado todavía `[verificar]`: se valida en la prueba con
+  los editores.
 
 ### 12.7 Reglas duras del motion
 
@@ -412,12 +466,22 @@ Esquema de `tools/glitch-motion/ejemplos/edicion-17.ejemplo.json`:
 - **Voz:** si se suma locución, persona con **español latinoamericano neutro**.
 - **Git:** nunca binarios (`.mov`, `.mp4`, PNG, imágenes de noticias, fuentes) ni rutas de máquina en git del taller;
   sólo código y `manifiesto.json`. Nunca agregues HyperFrames ni scripts de video a `greenhouse-eo`.
-- **No decidas por el operador:** cadencia de grabación (hoy 30 fps) y prueba con los editores en una edición real,
-  parámetro de ritmo (posible, no implementado), a qué piezas va la transición de bytes, subtítulos (estilo de captions
-  en Premiere, no hecho), textos reales de la #17, formulario de autoservicio en Marketing Studio, excepción de rostros,
-  subir valores a tokens (TASK-1922), archivo en GCS y push del repo taller siguen pendientes.
+- **No decidas por el operador:** cadencia de grabación (hoy 30 fps) y prueba con los editores en una edición real con
+  la voz del host (incluye validar el ducking de la cama), parámetro de ritmo (factible, no implementado), a qué piezas
+  va la transición de bytes (recomendación: tarjetas y Drop), subtítulos (estilo de captions en Premiere, no hecho),
+  textos reales de la #17, excepción de rostros. Ya **no** son pendientes: aprobar el motion, aprobar el sonido,
+  integrar la música, definir el pre-roll, push del taller (empujado).
+- **Qué falta para el día a día** (no lo presentes como hecho): hoy cada edición la corre alguien con el taller, `gh`,
+  ffmpeg, HyperFrames y Guttery instalados **en su máquina** (el kit completo ≈ 4 min). No hay autoservicio: el
+  formulario en Marketing Studio (recomendado) y el dominio de ediciones (TASK-1442) están pendientes (pipeline
+  editorial: EPIC-031). Plataforma: tokens en AXIS (TASK-1922), assets en `axis-brand-assets`, catálogo
+  `glitch-edition` (TASK-1923) y archivo de binarios en GCS (hoy sólo OneDrive + sha256 en los manifiestos).
 - **Si cambias tiempos del motion** (en `pieces.mjs`, `overlays.mjs` o `transitions.mjs` del taller), vuelve a correr
-  el mismo comando del motion: el sonido lee los tiempos del código y sale de nuevo junto a cada `.mov` (§13.5).
+  el mismo comando del motion: el sonido lee los tiempos del código y sale de nuevo junto a cada `.mov` (§13.5). La
+  música **no** se mueve con el motion: está amarrada a la grilla de 150 BPM y sus másteres son fijos (§13.7); cambiar
+  tiempos que rompan esa grilla es una decisión del operador.
+- **Nunca regeneres la música** ni sueltes `apertura.wav`/`cierre.wav` junto a la intro o la salida (sonaría doble);
+  **nunca** la cama bajo el Drop, bajo la tarjeta final ni con la falla.
 
 ## 13. Sonido de Glitch — APROBADO (versión B), sólo Glitch (2026-09-27)
 
@@ -464,6 +528,8 @@ Esquema de `tools/glitch-motion/ejemplos/edicion-17.ejemplo.json`:
   `kit/<overlay>.wav` (cabecera-1, cabecera-2, cabecera-3, cabecera-salida, lower-third-host, lower-third-invitado,
   noticia, fuente, drop, cta, noticia-bytes, drop-bytes),
   `transiciones/<reel|vlog>/glitch-transicion-<fmt>-<origen>-<rapida|normal>.wav` y `…-centro-heroe.wav`, y `demos/`.
+- **Con la música activa** (por defecto en el taller), la intro y la salida de la música **reemplazan** a `apertura.wav`
+  y `cierre.wav` en la entrega: ya los traen montados intactos (§13.7). Con `--music off` vuelven a entregarse.
 - Las transiciones entre escenas se alinean al **mismo inicio que la máscara y la capa**.
 - Dos intensidades producidas: **B** (más punch: más tartamudeo, cuerpo en los golpes de texto, campana al revés en la
   implosión de la tarjeta final) es **la aprobada**; **A** (contenida) es la alternativa descartada y no se usa.
@@ -509,6 +575,7 @@ Esquema de `tools/glitch-motion/ejemplos/edicion-17.ejemplo.json`:
   su nombre): **`b/` es la aprobada**, `a/` la alternativa descartada (con `kit/` y `transiciones/reel|vlog/`),
   `vista-previa/` (videos del motion con el sonido montado) y `LEEME.txt`.
 - **Sala de escucha:** https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9 → «Ronda 6 · Glitch».
+- La música vive aparte (`#musica`, campo `music`, bucket `glitch/music/v1/`): §13.7.
 - **Estado: APROBADO, versión B (2026-09-27).** El operador escuchó la ronda 6, dijo «Me gusta» y luego: «La b me
   encanta más. Sus sonidos están aprobados». Al aprobar lo producido en B quedaron **resueltas** las cuatro decisiones
   (ya no hay pendientes del sonido; la 3 se reemplazó después, el mismo día, con la música):
@@ -524,7 +591,8 @@ Esquema de `tools/glitch-motion/ejemplos/edicion-17.ejemplo.json`:
 ### 13.7 Música de Glitch — APROBADA (tema B + cama post-punk), sólo Glitch (2026-09-27)
 
 > **Sólo Glitch, nunca Efeonce** (ni su familia ni clientes; nunca mezclada con el kit sonoro de Efeonce). **APROBADO
-> el tema completo** (intro, cortina, salida y cama bajo la noticia) el 2026-09-27. **Canon:** norma
+> el tema completo** (intro, cortina, salida y cama bajo la noticia) el 2026-09-27; **integrada al taller** y **en
+> producción en AXIS** el mismo día. **Canon:** norma
 > [`GLITCH_GRAPHIC_LINE_V1.md`](../../../../docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
 > §13.12 «Música — sólo Glitch». Aquí va lo operativo; si no coincide, manda la norma. Oficio: skill `audio-studio`.
 
@@ -568,6 +636,8 @@ host y la firma de Efeonce muda.
   cama baja cuando alguien habla y sube un poco en las pausas.
 - **Sin EQ de recorte de medios** (ver la lección). Sin tartamudeos ni falla en la cama; no va bajo el Drop (la manzana
   es el único grave) ni bajo la tarjeta final.
+- **Fuera de las noticias, la voz del host va sola:** la cama **no** va bajo el cierre sobre el host ni bajo ninguna toma
+  del host fuera del relato de una noticia. La cama marca «el tiempo de la noticia».
 - Los SFX del kit (cabecera, lower third, noticia…) van encima a su nivel del kit, sin atenuar (ya vienen suaves:
   −33/−34 LUFS).
 
@@ -578,6 +648,28 @@ la voz». Reglas: **nunca recortes los medios de la música de Glitch** para abr
 el **ducking**); **nunca síntesis pura** para la música de Glitch: instrumentos reales (grabación con IA desde texto o
 re-grabación de maqueta). Control numérico (no reemplaza el oído del operador): medios 300 Hz–3 kHz ≥ ~35 % de la
 energía.
+
+**Por qué (para no reabrir ni repetir decisiones; detalle en la norma §13.12):**
+
+| Decisión | Por qué |
+|---|---|
+| Música además del diseño sonoro | «El oyente se va a aburrir si es voz sola»: los golpes marcan eventos; la música sostiene el tiempo entre ellos |
+| Dirección B, no A | Glitch es «irreverente, desafiante, experto»; A sonaba a thriller tecnológico serio, B a opinión con actitud de banda |
+| 150 BPM | Semicorchea = 0,1 s = 3 cuadros a 30 fps: todos los golpes del motion caen en la grilla; nada se ajusta a ojo |
+| Banda real, no síntesis | Tres rondas de síntesis rechazadas por sonar a videojuego (7, 8 y 11); la síntesis deja los medios vacíos |
+| Tema = maqueta propia + regrabación (Stable Audio 2.5 audio a audio) | La maqueta fija motivo y tiempos; la regrabación conserva el tiempo (0–5 ms). Desde texto no respeta cortes al cuadro |
+| Cortes, tartamudeo y silencio después, sobre la grabación | La falla es la firma y debe caer exacta; pedírsela al modelo la difumina |
+| Apertura y cierre B intactos dentro de intro y salida | Ya aprobados; la manzana sigue siendo el único golpe grave |
+| Cama post-punk | «Post-punk definitivamente»: es el tema en voz baja (misma banda); hip-hop sonaba a podcast genérico y tensión, a la A |
+| Cama desde texto (ElevenLabs Music v2.5), sin maqueta | La maqueta sintetizada contagió su delgadez a la primera cama; desde texto salió con 38 % de medios |
+| Ducking, no EQ | El recorte de medios volvió arcade la primera cama (13 % contra 45 % de la intro) |
+| 15 dB bajo la voz | Cama con actitud: a 15 dB con ducking la voz queda al frente. El 18–20 dB genérico de `audio-studio` es para camas neutras; 15 dB es sólo de Glitch |
+| Bucle de 12 compases (19,2 s) desde 0,83 s | Frase de mayor parecido fin-inicio (0,96); una noticia larga no oye la repetición; la juntura no hace clic |
+| Bucket aparte `glitch/music/v1` | No cambiar los hashes de `glitch/sound/v1` que consumen AXIS y el taller |
+| Nunca regenerar con un modelo | Otra corrida es otra toma; la fuente de verdad es el archivo aprobado (URL + sha256) |
+| Intro y salida reemplazan `apertura.wav`/`cierre.wav` | Ya los traen mezclados; soltarlos además los duplica |
+| Sin cama fuera de las noticias, bajo el Drop ni la tarjeta final | La cama marca el tiempo de la noticia; el Drop es el grave de la manzana; la tarjeta tiene su salida |
+| Todo sólo de Glitch | Como la manzana: la música de Glitch nunca entra a Efeonce, su familia ni clientes; la identidad sonora de Efeonce no cambia |
 
 **Archivos (bucket público, sólo de Glitch):** `gs://efeonce-group-axis-public-media/glitch/music/v1/`
 (`https://storage.googleapis.com/efeonce-group-axis-public-media/glitch/music/v1/`) con `index.json` (path, bytes,
@@ -614,20 +706,34 @@ git, scripts y LEEME en git; detalle en `audio-studio` → `efeonce/STUDIO_TOOLI
   `motor/master.sh`. Determinista (dos corridas, mismo sha256).
 - **La fuente de verdad son los archivos del bucket (URL + sha256), no los scripts:** las piezas son grabación
   re-interpretada + edición, no síntesis reproducible byte a byte. **Nunca regeneres con un modelo.** A diferencia del
-  sonido (§13.5), la música **no** se rehace corriendo el comando del motion: si algo cambia, es una ronda nueva que
-  aprueba el operador.
+  sonido (§13.5), el comando del motion **no rehace** la música: la baja del bucket y verifica su sha256 (ver «En el
+  taller»). Si algo cambia, es una ronda nueva que aprueba el operador.
 - Verificación sin oído (el agente no escucha): ebur128 de cada máster, tempo 150,00 por autocorrelación de ataques,
   juntura del bucle sin clic, medios 38 %, sha256 de los 17 archivos descargando del bucket. Cómo suena lo aprueba el
   operador. Sala de escucha: https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9 → rondas 9, 10, 11 y 11b.
 
-**Pendiente (no bloquea la aprobación):**
+**En el taller — INTEGRADA** (`efeoncepro/efeonce-brand-workshop`, `main`, commits `2c8f36c` y `ed89a0b`; README
+`tools/glitch-motion/README.md` §«Música (aprobada: tema B + cama post-punk)»):
 
-- **Integración en el taller** (`efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion`): cada render entrega la
-  música junto a su pieza **consumiendo los másteres del bucket por URL + sha256** (no los regenera): intro con su
-  pre-roll, cortina 1,6 s antes de la cabecera siguiente, salida con la tarjeta final, cama bajo cada noticia. **El
-  motion del pre-roll de la intro** (3,2 s vlog / 9,6 s podcast antes de la apertura) **está por definir** (en la
-  ronda 8 los puntos quietos se marcaron como provisorios).
-- **AXIS:** `/references/glitch/#musica`, campo `music` (URL + sha256) en `/references/glitch.json` y la mención en «La
-  familia: Glitch» de `/references/sonic-brand/` (PR en `efeoncepro/axis-design-system`, lo abre la sesión principal).
-  Hasta entonces, usa el bucket y su `index.json`.
-- Push: sólo con señal del operador.
+- `tools/glitch-motion/src/music.mjs` fija los **siete másteres** por URL y sha256 (`MUSIC_V1`, bucket
+  `glitch/music/v1/`): se bajan, se verifican y **nunca se regeneran** (si el bucket cambia, falla).
+- **Pre-roll animado de la intro** (`glitch-preroll-*.mov`, 3,2 s, 150 BPM), **elegido por el operador** entre las
+  opciones de la sesión de motion: los tres puntos aparecen, laten en secuencia Mi · Mi · Mi, se juntan en el tiempo
+  fuerte y el tercero tartamudea en semicorcheas en el último tiempo; su último cuadro es idéntico al primero de la
+  apertura (PSNR ∞).
+- `render` entrega el pre-roll, `glitch-intro-*.wav` (pre-roll + apertura con sus efectos), `glitch-salida-*.wav` (con
+  la tarjeta final) y las versiones de podcast; **con música no entrega `apertura.wav` ni `cierre.wav`**. `kit` entrega
+  `glitch-kit-*-cama.wav` y `glitch-kit-*-cortina.wav` y mezcla el **animatic de 48,4 s** (intro en 0; cortinas 1,6 s
+  antes de las cabeceras 2 y 3; cama bajo cada noticia, cortada por la cortina, el Drop o la tarjeta final, a −13 dB
+  porque no hay voz: el ducking lo aplica el editor; salida). **`--music off`** apaga la música y entrega como antes.
+- Niveles medidos en las entregas: intro −14, cama ≈ −31, cortinas −16, salida −14 LUFS. Verificaciones: v2 37/37 y
+  kit 95/95. En OneDrive, las entregas anteriores sin música quedaron en `v2/sin-musica/` con un LEEME.
+
+**En AXIS — EN PRODUCCIÓN** (PR #10 de `efeoncepro/axis-design-system`, commit `87c3298` en `main`, 2026-09-27):
+sección 09 «Música» en `https://axis.efeonce.org/references/glitch/#musica` y campo **`music`** en
+`/references/glitch.json` (17 archivos con URL y sha256, `index`, reglas, editor/agente, `never`); la página
+`/references/sonic-brand/` («La familia: Glitch») enlaza a la música. Guía para agentes:
+`docs/agent-composition/glitch.md` §«Música».
+
+**Único pendiente:** **probar la mezcla con la voz real del host** en una edición real (la demo usa una voz TTS
+provisional). El ducking lo aplica el editor con los valores de arriba.

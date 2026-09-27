@@ -1,5 +1,15 @@
 # TASK-1923 — Glitch en el Artifact Composer
 
+## Delta 2026-09-27 (tarde) — el motion lee su propio archivo de edición
+
+- El motion de Glitch (TASK-1924) ya existe, está **aprobado** y **no espera este manifiesto**: lee su propio archivo de
+  edición en el taller (`tools/glitch-motion/ejemplos/edicion-17.ejemplo.json`: `edition`, `nextEdition`, `host`,
+  `guest`, `news[3]` con `image {file, credit}`, `drop`, `cta`, `transition`; ver la
+  [norma §13.5](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#135-archivo-de-edición-la-fuente-del-texto)). El manifiesto de edición de esta task debe cubrir
+  esos campos (o declarar su mapeo) para que TASK-1924 migre a él sin perder datos.
+- Quedaron resueltos dos supuestos que esta task dejaba en TASK-1924: el mnemónico (diseño sonoro B aprobado) y el
+  contenido del lower third («AL AIRE · GLITCH #N», nombre y cargo, con la órbita real; variante de invitado).
+
 ## Delta 2026-09-27
 
 - **Guttery:** el operador confirmó la licencia para web y video (2026-09-27, segunda respuesta). La Open Question de Guttery queda resuelta; la task registra la referencia del contrato de licencia y sella la fuente.

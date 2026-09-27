@@ -52,6 +52,8 @@
 | 2026-09-27 | **Glitch: licencia de Guttery confirmada.** El operador aclaró «En gutery tenemos licencia»: Guttery se usa en web y video para las muletillas del narrador; TASK-1922 registra la referencia del contrato y la sella en AXIS. Detalle: [glitch.md](glitch.md). |
 | 2026-09-27 | **El video no se compone en el Artifact Composer (opción b, TASK-1919):** el composer entrega cuadros fijos, el último cuadro del loop y capas con alfa; la animación sigue en la pipeline de motion (`orbit:video`, masters del reveal v1.1). Sólo las recetas **aprobadas** tienen plantilla; `audiovisual.close-reveal` falla con `recipe-outside-composer`. |
 | 2026-09-27 | **Portadas y contraportadas de brochure y propuesta (canvas por superficie, página Deck):** foto ↔ sin foto entre portada y contraportada; mensaje de la contraportada por documento (propuesta: «Empower your Growth» como mensaje principal, sin «¿Conversamos?»; brochure: «¿Conversamos? Cuando quieras.» con el eslogan de firma); la portada habla con la voz de la línea y **nunca lleva el eslogan**; logo de Efeonce a 500 px en 1920 (las clásicas del contrato, 230 y 220 px, retiradas); ningún texto cruza la órbita ni al sujeto (se acorta la frase); una portada de brochure por línea con su acento y **cinco pares aprobados** (`criteria.md` §4); la órbita gigante sin foto es portada de propuesta (con el logo del cliente dentro, caja fija) y contraportada de brochure, nunca portada de brochure; selección y cursores sólo sobre la columna o el logo del cliente, un cursor en 16:9. Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6; resumen en `applications.md` §L y en la skill `deck-studio`. Sin receta del contrato todavía: TASK-1926 (plates) y TASK-1927 (contrato). |
+| 2026-09-27 | **Glitch: música aprobada, sólo Glitch** (tema B: intro, cortina y salida; cama post-punk bajo la noticia): «Definitivamente la B es la decisión», «Me parecen bien todas», «Post-punk definitivamente». Reemplaza la decisión «voz sola bajo las noticias» del sonido. Másteres en el bucket `glitch/music/v1/` (URL + sha256, nunca regenerados); integrada al taller (`tools/glitch-motion/src/music.mjs`, pre-roll animado de la intro elegido por el operador, `--music off`); en producción en AXIS (`/references/glitch/#musica`, `glitch.json → music`, commit `87c3298`). Único pendiente: probar la mezcla con la voz real del host. Detalle: [glitch.md](glitch.md) §13.7. |
+| 2026-09-27 | **Glitch: motion y sonido aprobados, sólo Glitch.** Motion (apertura y tarjeta final v2, kit de overlays con el lower third de la órbita, transición de bytes entre piezas y entre escenas, héroe): «Si, el tuyo también está aprobado». Diseño sonoro **versión B**: «La b me encanta más» / «Sus sonidos están aprobados» (la A queda descartada, sólo con `--sound a`). Pre-roll de la intro «los tres puntos al ritmo» (3,2 s, opaco, empalme PSNR ∞ con la apertura), elegido por el operador. Todo se produce en el taller `efeoncepro/efeonce-brand-workshop` (`tools/glitch-motion`, HyperFrames; sonido en `src/sound.mjs` sobre `tools/brand-sound`; música en `src/music.mjs`), empujado a `main` = `ed89a0b`. Verificado: v2 37/37, kit 95/95, 12/12 pruebas. Detalle: [glitch.md](glitch.md) §12–§13; comandos: norma de Glitch §13.13. |
 
 ## Pendientes del operador (no decidir por tu cuenta)
 
@@ -60,11 +62,13 @@
   `section-classic`, `section-split`, `content-measure` y `triptych` (las láminas no la llevan, el manifest del deck
   dice `url-bubble-footer`; se siguió la lámina); gris del descriptor y la bajada web, sin token; paleta DOOH 20 % vs
   35 %. Hasta decidir, la plantilla sigue la lámina aprobada y no se inventa un token.
-- **Glitch (actualizado 2026-09-27):** aprobar lente, blog (banners, maqueta, callout v2), vlog 16:9, kit de overlays
-  del reel y tarjetas finales; evaluar y aprobar el mnemónico del video; definir con el operador el contenido del lower
-  third; licencia de Guttery (confirmada el 2026-09-27; registrar la referencia); pasar el flujo de composición
-  del ADR a `Accepted`. Ya resueltos: manzana y verde, línea Growth, edición #17 y alta de los glifos (fila del
-  2026-09-27 arriba). Detalle: [glitch.md](glitch.md) §8–§9.
+- **Glitch (actualizado 2026-09-27, cierre del día):** aprobar lente y blog (banners, maqueta, callout v2); registrar
+  la referencia de la licencia de Guttery; del video: fps de grabación (hoy 30), prueba de los editores con una edición
+  real y la voz del host (incluye validar el ducking de la cama), a qué piezas va la transición de bytes
+  (recomendación: tarjetas y Drop), estilo de subtítulos, parámetro de ritmo (factible, no hecho), excepción de
+  rostros y los textos reales de la #17. Ya resueltos: manzana y verde, línea Growth, edición #17, alta de los glifos,
+  flujo de composición `Accepted`, y el vlog 16:9, el kit, el lower third, las tarjetas finales, el mnemónico, el
+  sonido (B), la música y el pre-roll (filas del 2026-09-27 arriba). Detalle: [glitch.md](glitch.md) §8, §9 y §12.7.
 - **Banco de pares pregunta/respuesta (D12):** el operador lo revisa y aprobará **2 pares por línea de servicio** con
   respuestas verificables. Hasta entonces el banco es candidato: calibra el tono, no es copy aprobado.
 - **Archivos de impresión (D13):** se empieza por la tarjeta de presentación y el muro de recepción, en PDF vectorial
@@ -88,8 +92,8 @@
 - **Identidad sonora (2026-09-26): recomendada, NO canon** («vamos con tu recomendación»). Elecciones del operador:
   territorio «Puntos suspensivos» (Mi Mi Mi → La); acento por línea como timbre de la esfera (Voice = eco); etiqueta
   con voz en cierres con **Brian** (las cinco tomas aprobadas); reveal con y sin voz; apertura tal cual; pieza larga en
-  dos registros, **fondo** y **energía** (rock re-grabado con Stable Audio 2.5). **Pendiente:** Glitch (podcast, sin
-  decisión: al operador «aún no le convence»); licencias (Stable Audio vía fal; voz ElevenLabs); prueba de
+  dos registros, **fondo** y **energía** (rock re-grabado con Stable Audio 2.5). Glitch ya no queda pendiente aquí: tiene sonido y música propios, aprobados y sólo de
+  Glitch ([glitch.md](glitch.md) §13). **Pendiente:** licencias (Stable Audio vía fal; voz ElevenLabs); prueba de
   reconocimiento sin logo antes de pautar (como D14); valores a tokens junto a `motion.sound` y reemplazo del sonido
   de los masters V1.1; (publicado en AXIS: PR #4, squash `55486aa`). Detalle: [motion.md](motion.md) §Sonido.
 

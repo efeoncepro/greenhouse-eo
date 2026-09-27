@@ -1,5 +1,22 @@
 # TASK-1924 — Glitch en movimiento con HyperFrames
 
+## Delta 2026-09-27 (cierre del día) — motion, sonido, música y pre-roll en el taller
+
+- **Hecho y verificado** (taller `efeonce-brand-workshop`, `main` = `ed89a0b`, empujado): motion **aprobado**; sonido
+  **aprobado (B)** integrado (`2d411b8`); música **aprobada** integrada (`2c8f36c`: `src/music.mjs` fija los siete
+  másteres por URL + sha256, caché local, falla cerrado, nunca se regeneran; `--music on|off`); **pre-roll** «los tres
+  puntos al ritmo», elegido por el operador (3,2 s, 96 cuadros, opaco, empalme exacto con la apertura). Con música, la
+  intro y la salida reemplazan a los WAV de efectos de apertura y cierre (los de la entrega piloto quedaron en
+  `v2/sin-musica/`); el reel usa los másteres de vlog.
+- **Verificaciones:** v2 37/37 · kit 95/95 · pre-roll 96 cuadros, opaco, empalme PSNR ∞ · huellas sha256 = las
+  aprobadas · 12/12 pruebas del paquete (`node --test`).
+- **Referencia de comandos y argumentos:** [norma §13.13](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1313-referencia-de-comandos-y-argumentos).
+- **Qué falta para cerrar** (por eso la task sigue en `to-do`): la **prueba de los editores** con una edición real y la
+  voz del host (incluye validar el ducking de la cama); decisiones del operador (fps, a qué piezas va la transición de
+  bytes, subtítulos, parámetro de ritmo, excepción de rostros); textos reales de la #17; y los desvíos de esta spec que
+  siguen abiertos (tokens `glitchLine` de TASK-1922, manifiesto de TASK-1923, `entrega.json`, `yuva444p10le`/WebM,
+  PR con CI del taller, archivo en GCS). El Lifecycle no cambia.
+
 ## Delta 2026-09-27 — música de Glitch aprobada (sólo Glitch)
 
 - **Música APROBADA** por el operador el 2026-09-27: tema B completo (intro, cortina y salida; «Me parecen bien
@@ -8,11 +25,18 @@
   [norma §13.12](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1312-música--sólo-glitch-aprobada-tema-b--cama-post-punk).
 - **Másteres** (fuente de verdad, por URL + sha256): bucket público `gs://efeonce-group-axis-public-media/glitch/music/v1/`
   (`masters/`, `web/` e `index.json`; 17 archivos verificados), separado de `glitch/sound/v1/`. Nunca se regeneran.
-- **Pendiente para esta task:** que cada render de `tools/glitch-motion` entregue la música junto a su pieza,
+- **Pendiente para esta task (cerrado; ver la actualización de abajo):** que cada render de `tools/glitch-motion` entregue la música junto a su pieza,
   **consumiendo los másteres del bucket por URL + sha256** (intro con su pre-roll, cortina 1,6 s antes de la cabecera
   siguiente, salida con la tarjeta final y cama bajo cada noticia, 15 dB bajo la voz con ducking y sin recortar medios);
   definir el motion del pre-roll de la intro (3,2 s vlog / 9,6 s podcast; los puntos quietos de la ronda 8 son
   provisorios). AXIS (`/references/glitch/#musica`, campo `music`) sale con su PR. El Lifecycle no cambia.
+- **Actualización (2026-09-27, tarde) — el pendiente de arriba quedó cerrado:** la música quedó **integrada en el
+  taller** (`efeonce-brand-workshop` `2c8f36c` y `ed89a0b`, empujados a `main`): `tools/glitch-motion/src/music.mjs` fija
+  los siete másteres por URL + sha256 (nunca se regeneran); pre-roll animado de 3,2 s (los tres puntos laten Mi · Mi ·
+  Mi), **elegido por el operador**; `render` entrega pre-roll, intro y salida (y no `apertura.wav` ni `cierre.wav`,
+  que ya vienen dentro); `kit` entrega cama y cortina y mezcla el animatic de 48,4 s; `--music off` la apaga; las
+  entregas sin música quedaron en `v2/sin-musica/` (OneDrive). **AXIS en producción:** PR #10 (`87c3298`) más
+  `d393c2e`. Único pendiente de la música: probar la mezcla con la voz real del host. El Lifecycle no cambia.
 
 ## Delta 2026-09-27 — motion de Glitch aprobado y sonido integrado
 
@@ -115,7 +139,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
   > de producción que crea el Slice 8 (`docs/operations/brand-graphic-line/glitch/GLITCH_MOTION_OVERLAYS_V1.md`).
 - Backend impact: `none`
 - Epic: `EPIC-031`
-- Status real: `Motion APROBADO por el operador (2026-09-27) en el repo taller efeonce-brand-workshop, tools/glitch-motion (commits locales sin push): apertura/tarjeta final v2, kit de overlays reel y vlog, lower third con la órbita real y transiciones de bytes (piezas y escenas); sonido aprobado (B) integrado: cada render entrega el WAV junto a cada .mov (2d411b8, b40565e); falta reconciliar con TASK-1922 (token glitchLine.motion) y TASK-1923 (manifiesto), PR con CI del taller, archivo en GCS, prueba de los editores en una edición real, fps, subtítulos y textos reales de la #17`
+- Status real: `2026-09-27: motion, sonido (B) y música APROBADOS e integrados en el repo taller efeonce-brand-workshop, tools/glitch-motion (main = ed89a0b, empujado): apertura/tarjeta final v2, pre-roll de la intro (los tres puntos al ritmo), kit de overlays reel y vlog, lower third con la órbita real, transiciones de bytes (piezas y escenas); cada render entrega el WAV B junto a cada .mov y la música desde los másteres por URL + sha256 (2d411b8, 2c8f36c); verificado v2 37/37, kit 95/95, 12/12 pruebas. Falta: prueba de los editores con la voz del host (y el ducking), decisiones del operador (fps, bytes, subtítulos, ritmo, rostros), textos reales de la #17, reconciliar con TASK-1922 (glitchLine.motion) y TASK-1923 (manifiesto), entrega.json, PR con CI del taller y archivo en GCS`
 - Rank: `TBD`
 - Domain: `creative|brand`
 - Blocked by: `TASK-1922, TASK-1923, CI mínimo del taller de TASK-1925 antes de integrar código a su main` (la aprobación del operador del kit de overlays y de las tarjetas finales, gate del Slice 2, quedó dada el 2026-09-27)
@@ -828,6 +852,23 @@ Todos los comandos se corren desde `greenhouse-eo`, con el taller clonado como h
       > 2026-09-27, piloto: la salida es ProRes 4444 con alfa, 30 fps, sin audio; los golpes quedan marcados por cuadro.
       > 2026-09-27, después: la pieza sonora quedó decidida (versión B aprobada). Los `.mov` siguen sin pista de audio
       > y el sonido va en un WAV aparte, con el mismo nombre, junto a cada `.mov` (taller `2d411b8`, `b40565e`).
+- [x] Cada render (`render`, `kit`, `transiciones`, `heroe`) entrega el WAV del sonido aprobado (versión B) junto a
+      cada `.mov`, con el mismo nombre y la duración verificada igual al video (criterio agregado el 2026-09-27, al
+      aprobarse el sonido).
+      > 2026-09-27: taller `2d411b8` (integración) y `b40565e` (entregas); los tiempos se leen del código del motion;
+      > kit 95/95 incluye formato y duración de cada WAV.
+- [x] La música aprobada sale junto a su pieza consumiendo los másteres del bucket por URL + sha256, sin regenerarlos,
+      y el comando falla cerrado si una huella no coincide; `--music off` la apaga (criterio agregado el 2026-09-27, al
+      aprobarse la música).
+      > 2026-09-27: taller `2c8f36c` (`src/music.mjs`, siete másteres con sha256 fijado) y `ed89a0b` (entregas): intro,
+      > salida, cortina, cama y podcast; animatic de 48,4 s con la música mezclada. Huellas = las aprobadas.
+- [x] El pre-roll de la intro está definido por el operador y producido en reel y vlog; su último cuadro es idéntico al
+      primero de la apertura (criterio agregado el 2026-09-27).
+      > 2026-09-27: «los tres puntos al ritmo» (elección del operador); `glitch-preroll-{reel,vlog}.mov`, 96 cuadros,
+      > opaco, empalme PSNR ∞; incluido en la verificación v2 37/37.
+- [x] Las pruebas del paquete (`pnpm -C ../efeonce-brand-workshop --filter glitch-motion test`) pasan en verde.
+      > 2026-09-27: 12/12 (timelines registradas, determinismo, sin red, datos de edición, pre-roll, huellas de la
+      > música y sonido completo y determinista).
 - [ ] `pnpm -C ../efeonce-brand-workshop --filter glitch-motion verify` sale con código 0 sobre la entrega del fixture y
       con código distinto de 0 si se corrompe el alfa, la duración o una zona, o si `entrega.json` contiene una ruta
       absoluta.
@@ -846,11 +887,12 @@ Todos los comandos se corren desde `greenhouse-eo`, con el taller clonado como h
 >   task, manuales, skill y regla); no se tilda hasta cerrar la task completa.
 > - Taller sin código de Greenhouse / JSON Schema / plan de movimiento: el piloto usa su propio archivo de edición, no
 >   el manifiesto de TASK-1923.
-> - `git ls-files` sin binarios y CI verde: commits sin push, sin PR ni CI del taller.
+> - `git ls-files` sin binarios y CI verde: los commits ya están empujados a `main` (`ed89a0b`) y `git ls-files` no
+>   lista binarios, pero no hubo PR ni CI del taller.
 > - Valores desde tokens, prueba «sin literales» y clave faltante: no existe `glitchLine`; la paleta y la manzana son
 >   propuesta espejada del AXIS Lab.
-> - Determinismo: el render es determinista y existe una prueba de determinismo entre las 7 del paquete, pero no está
->   registrado el resultado. Hoy: 7/7 en verde; la prueba es estática (sin azar, reloj ni red) y falta la comparación
+> - Determinismo: el render es determinista y existe una prueba de determinismo entre las 12 del paquete. Hoy: 12/12 en
+>   verde (2026-09-27); la prueba es estática (sin azar, reloj ni red) y falta la comparación
 >   cuadro a cuadro entre dos renders.
 > - Apertura y tarjeta final: existen en reel y vlog con bucle exacto (PSNR ∞), pero no hay `entrega.json` con el
 >   marcador de sincronía.
@@ -859,10 +901,12 @@ Todos los comandos se corren desde `greenhouse-eo`, con el taller clonado como h
 >   códec, cuadros y alfa de entrada y salida, no estos chequeos; `glitch-overlays` (TASK-1923) no existe.
 > - `font_unlicensed` en Guttery: Guttery ya está licenciada; el criterio queda para cuando exista la extensión `glitch`.
 > - Foto sin crédito o licencia: no implementado; en el archivo de edición el crédito es opcional.
-> - `entrega.json` con timecodes y `manifiesto.json` en GCS: hay manifiestos por corrida con sha256, pero sin push y con
+> - `entrega.json` con timecodes y `manifiesto.json` en GCS: hay manifiestos por corrida con sha256 (empujados desde el 2026-09-27), sin `entrega.json` y con
 >   los binarios en OneDrive.
 > - Subtítulos con `--transcript`: no hechos.
-> - `verify` con códigos de salida: no hay un script `verify` separado.
+> - `verify` con códigos de salida: desde el 2026-09-27 existe el script `verify` (deja código de salida 1 y bloquea la
+>   entrega si una verificación falla), pero no hay registro de las pruebas de corrupción que pide el criterio ni
+>   `entrega.json`.
 > - Prueba de importación del editor: pendiente (abrir y montar el motion aprobado en una edición real).
 > - Spec `GLITCH_MOTION_OVERLAYS_V1.md`: no existe; la documentación del piloto quedó en la norma de Glitch §13 y en el
 >   manual `docs/manual-de-uso/creative/editar-video-glitch.md`.

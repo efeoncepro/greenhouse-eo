@@ -1,7 +1,7 @@
 # Efeonce Brand Workshop — repo taller de producción de marca (ADR)
 
 > **Tipo:** decisión de arquitectura (ADR)
-> **Versión:** 1.0
+> **Versión:** 1.1 (2026-09-27: [Delta — `glitch-motion` y `brand-sound` en el taller](#delta-2026-09-27--glitch-motion-y-brand-sound-en-el-taller))
 > **Estado:** **Accepted** (2026-09-27) — decisión del operador (Julio Reyes)
 > **Creado:** 2026-09-27 por Claude
 > **Repo:** [`efeoncepro/efeonce-brand-workshop`](https://github.com/efeoncepro/efeonce-brand-workshop) (privado, rama `main`, esqueleto `430d5b0`)
@@ -111,7 +111,26 @@ extraído. **No se agrega un catálogo de publicidad en Greenhouse.**
 | Paso | Estado |
 |---|---|
 | Repo creado, privado, esqueleto con routers, `.gitignore` de binarios y workspace `tools/*` | ✅ 2026-09-27 (`430d5b0`) |
-| `tools/glitch-motion` | Lo construye TASK-1924 (sesión de Glitch, avisada el 2026-09-27) |
+| `tools/glitch-motion` | ✅ 2026-09-27: motion, sonido (versión B) y música de Glitch **aprobados** e integrados (`2d411b8`, `2c8f36c`; entregas `ed89a0b`, `main` empujado). TASK-1924 sigue abierta por la prueba de los editores y decisiones del operador |
+| `tools/brand-sound` | ✅ 2026-09-27 (`2d411b8`): primitivas de síntesis migradas byte a byte desde `greenhouse-eo` `ai-generations/2026-09-26_branding-sonoro` (que queda como histórico) |
 | Migración de `foto` y `brand-motion`, delegadores y reglas | TASK-1925 |
 | CI mínimo (`pull_request`) y bucket de binarios | TASK-1925 |
 | Convergencia con Globe | Cuando Globe reactive su capacidad de generación |
+
+## Delta 2026-09-27 — `glitch-motion` y `brand-sound` en el taller
+
+- **El taller ya aloja dos herramientas**, con commits empujados a `main` (`ed89a0b`):
+  - `tools/glitch-motion` (sólo Glitch): motion **aprobado**, sonido **aprobado (versión B)** y música **aprobada**
+    (tema B + cama post-punk), con 12 pruebas (`node --test`). Canon en la
+    [norma de Glitch §13](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#13-motion-y-transiciones--solo-glitch)
+    y comandos en su [§13.13](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1313-referencia-de-comandos-y-argumentos).
+  - `tools/brand-sound` (workspace, `exports ./dsp`): las primitivas de síntesis de sonido, **migradas byte a byte**
+    desde `greenhouse-eo` `ai-generations/2026-09-26_branding-sonoro`, que queda como **histórico** (ya no es la
+    fuente). Una sola lógica: si migra el motor de la identidad sonora de Efeonce, usa esta.
+- **Dependencia de red nueva y acotada:** los másteres de la música de Glitch se bajan del bucket público
+  `efeonce-group-axis-public-media/glitch/music/v1/` por URL, con su **sha256 fijado en el código**
+  (`tools/glitch-motion/src/music.mjs`); quedan en una caché local (`.cache/music-v1`, ignorada por git) y el comando
+  **falla cerrado** si una huella no coincide. Aparte de la instalación de paquetes, es la única red que usa
+  `glitch-motion` al correr: el render de HyperFrames sigue sin red y con `--music off` no se baja nada. No cambia la regla del §2.3: la música es un binario y vive en GCS, no en git.
+- **Siguen vigentes** las reglas del §4: ningún binario ni ruta absoluta versionados (las entregas quedan en el
+  manifiesto como «OneDrive: …»), ninguna documentación gobernante en el taller.
