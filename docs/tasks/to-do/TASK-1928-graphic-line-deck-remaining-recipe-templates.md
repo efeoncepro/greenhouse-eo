@@ -120,7 +120,7 @@ Reglas obligatorias:
 - `docs/operations/runbooks/composer-visual-gate.md`
 - `docs/issues/open/ISSUE-122-composer-visual-gate-photo-nondeterminism-concurrency-docs.md`
 - `docs/tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md`
-- `docs/tasks/to-do/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md`
+- `docs/tasks/in-progress/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md`
 - `ai-generations/2026-09-27_deck-recetas/DECISIONES.md` (fuera de git; las decisiones están también en la norma §4.6)
 
 ## Dependencies & Impact

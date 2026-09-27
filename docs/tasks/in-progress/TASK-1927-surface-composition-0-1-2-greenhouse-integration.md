@@ -72,7 +72,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -85,7 +85,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Implementacion — Slice 1 hecho (AXIS 0.3.11 / 0.3.9 fijados, gate a 0 px)`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`

@@ -105,7 +105,7 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/manual-de-uso/creative/componer-deck-con-recetas.md`
-- `docs/tasks/to-do/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md` (entrada de documento y
+- `docs/tasks/in-progress/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md` (entrada de documento y
   `resolveSurfaceDocument`)
 - `docs/tasks/to-do/TASK-1419-deck-orchestrator-outline.md` (orquestador del outline de las decks de licitación; mismo
   molde, catálogo distinto)

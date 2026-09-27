@@ -297,7 +297,7 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
   `axis-ui-contracts` `0.3.7` (contract `0.1.1`). **`0.1.2` is pending integration** until the dependency is bumped:
   no templates for `cover-classic`/`close-classic`, no `use`/`layout`, no documents there yet. Bump both packages
   together and rerun `pnpm composer:visual-gate --catalog=graphic-line`. Integration task:
-  [TASK-1927](../../../docs/tasks/to-do/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md).
+  [TASK-1927](../../../docs/tasks/in-progress/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md).
 - **Per-slide deck recipes (operator, 2026-09-27) — AXIS is behind.** All **69** slides of the canvas «Deck» are
   approved and each has a recipe in Greenhouse:
   [`docs/operations/brand-graphic-line/deck-recipes/`](../../../docs/operations/brand-graphic-line/deck-recipes/README.md)

@@ -55,7 +55,7 @@ Decisiones que cambian esta norma (detalle en §4.6, «Recetas por lámina»):
 
 Los tokens y las recetas de AXIS todavía describen parte de lo anterior (sección partida por la derecha, frase única
 del tríptico, próximos pasos en tres columnas, opciones sin aprobar); se sincronizan en
-[TASK-1927](../../tasks/to-do/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md), con las fotos en
+[TASK-1927](../../tasks/in-progress/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md), con las fotos en
 [TASK-1926](../../tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md). Mientras tanto manda esta norma.
 
 ## Para qué sirve
@@ -496,7 +496,7 @@ láminas de sección que salieron de la misma ronda. **Fuente visual:** la pági
 [canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7), donde el operador las
 aprobó. **Recetas:** recetas de portada y contraportada del AXIS Lab › Superficies › Deck (formalización en curso). La
 integración en Greenhouse (renderizarlas desde el contrato) es parte de
-[TASK-1927](../../tasks/to-do/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) y la producción idempotente
+[TASK-1927](../../tasks/in-progress/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) y la producción idempotente
 de sus fotos, de [TASK-1926](../../tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md). Hasta que eso cierre, **no tienen plantilla en el Artifact Composer**: los scripts que las
 renderizaron en el canvas no viven en el repo, y `pnpm brand:compose` no las produce.
 

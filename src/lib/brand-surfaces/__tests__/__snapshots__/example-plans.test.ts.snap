@@ -1,0 +1,1379 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`planes de los intents de ejemplo > audiovisual-callout-selection-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [],
+  "catalog": "graphic-line-overlays",
+  "contentType": "audiovisual.callout-selection",
+  "plan": {
+    "artifactId": "audiovisual-callout-selection",
+    "slides": [
+      {
+        "contentType": "audiovisual.callout-selection",
+        "slideId": "audiovisual-callout-selection",
+        "slots": {
+          "frame": {
+            "line": "growth",
+          },
+          "selection": {
+            "anchor": "top-start",
+            "label": "Dirección de arte",
+            "participantKind": "role",
+            "scale": 1.6,
+            "targetKind": "object",
+          },
+          "target": {
+            "height": "--gl-target-height=240px",
+            "left": "--gl-target-left=720px",
+            "top": "--gl-target-top=560px",
+            "width": "--gl-target-width=340px",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > audiovisual-cartela-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:cartela-progress-growth-1-of-3",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="120" data-axis-value="0.3333333333333333"><circle data-axis-part="ring" cx="1420.03" cy="520.02" r="380.05" fill="none" stroke="#72ded8" stroke-opacity="0.16" stroke-width="2.42"/><path data-axis-part="arc" data-axis-length="795.98" pathLength="1" d="M 1420.03 139.97 A 380.05 380.05 0 0 1 1749.17 710.05" fill="none" stroke="#36c8bf" stroke-width="14" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1749.17" cy="710.05" r="22" fill="#36c8bf"/></g></svg>",
+    },
+  ],
+  "catalog": "graphic-line-overlays",
+  "contentType": "audiovisual.cartela",
+  "plan": {
+    "artifactId": "audiovisual-cartela",
+    "slides": [
+      {
+        "contentType": "audiovisual.cartela",
+        "slideId": "audiovisual-cartela",
+        "slots": {
+          "chapter": {
+            "label": "capítulo 1 de 3",
+            "title": "Escucha",
+          },
+          "frame": {
+            "answerLeft": "--gl-answer-left=128px",
+            "answerPx": "--gl-answer-px=400px",
+            "answerTop": "--gl-answer-top=318px",
+            "answerTracking": "--gl-answer-tracking=-0.06em",
+            "chapterLabelPx": "--gl-chapter-label-px=34px",
+            "chapterWordPx": "--gl-chapter-word-px=96px",
+            "line": "growth",
+            "questionPx": "--gl-question-px=52px",
+            "ringCx": "--gl-ring-cx=1420px",
+            "ringCy": "--gl-ring-cy=520px",
+            "ringR": "--gl-ring-r=380px",
+            "voiceLeft": "--gl-voice-left=150px",
+            "voiceTop": "--gl-voice-top=196px",
+          },
+          "orbit": {
+            "src": "asset-ref:layer:cartela-progress-growth-1-of-3",
+          },
+          "selection": {
+            "anchor": "bottom-end",
+            "label": "Dirección de arte",
+            "participantKind": "role",
+            "scale": 1.6,
+          },
+          "voice": {
+            "answer": "Así",
+            "question": "¿Cómo trabajamos?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > audiovisual-data-super-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:data-super-growth-620",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="measure" data-axis-kind="measure" data-axis-trajectory="measure" data-axis-sweep="223.2" data-axis-value="0.62"><circle data-axis-part="ring" cx="300.1" cy="760" r="150.01" fill="none" stroke="#72ded8" stroke-opacity="0.16" stroke-width="2.42"/><path data-axis-part="arc" data-axis-length="130.91" pathLength="1" d="M 317.86 908.95 A 150.01 150.01 0 0 1 197.41 869.35" fill="none" stroke="#36c8bf" stroke-width="9" stroke-linecap="round"/><line data-axis-part="origin" x1="300.1" y1="616.03" x2="300.1" y2="603.93" stroke="#72ded8" stroke-opacity="0.6" stroke-width="2.42" stroke-linecap="round"/><circle data-axis-part="sphere" cx="197.41" cy="869.35" r="14" fill="#36c8bf"/></g></svg>",
+    },
+  ],
+  "catalog": "graphic-line-overlays",
+  "contentType": "audiovisual.data-super",
+  "plan": {
+    "artifactId": "audiovisual-data-super",
+    "slides": [
+      {
+        "contentType": "audiovisual.data-super",
+        "slideId": "audiovisual-data-super",
+        "slots": {
+          "datum": {
+            "caption": "de los cortes se aprueban a la primera",
+            "source": "Maqueta de dirección «Cómo trabajamos» (2026-09-26): cifra ilustrativa, reemplazar por la medida real del cliente antes de publicar",
+            "value": "62%",
+          },
+          "frame": {
+            "captionLeft": "--gl-caption-left=500px",
+            "captionPx": "--gl-caption-px=34px",
+            "captionWidth": "--gl-caption-width=420px",
+            "line": "growth",
+            "ringCx": "--gl-ring-cx=300px",
+            "ringCy": "--gl-ring-cy=760px",
+            "ringR": "--gl-ring-r=150px",
+            "valuePx": "--gl-value-px=88px",
+          },
+          "orbit": {
+            "src": "asset-ref:layer:data-super-growth-620",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > audiovisual-shot-plan-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 231,
+        "width": 410,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_audiovisual/plates/V1-terreno.png",
+      "ref": "asset-ref:plate:V1-terreno-410x231",
+    },
+    {
+      "fit": {
+        "height": 231,
+        "width": 410,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_audiovisual/plates/V2-detalle.png",
+      "ref": "asset-ref:plate:V2-detalle-410x231",
+    },
+    {
+      "fit": {
+        "height": 231,
+        "width": 410,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_audiovisual/plates/V3-sala.png",
+      "ref": "asset-ref:plate:V3-sala-410x231",
+    },
+    {
+      "fit": {
+        "height": 231,
+        "width": 410,
+      },
+      "kind": "plate",
+      "path": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/13- Branding/Motion Órbita Efeonce/v1.1/reveal/16x9/navy/efeonce-orbita-reveal_16x9_navy_cuadro-final.png",
+      "ref": "asset-ref:plate:efeonce-orbita-reveal_16x9_navy_cuadro-final-410x231",
+    },
+  ],
+  "catalog": "graphic-line-overlays",
+  "contentType": "audiovisual.shot-plan",
+  "plan": {
+    "artifactId": "audiovisual-shot-plan",
+    "slides": [
+      {
+        "contentType": "audiovisual.shot-plan",
+        "slideId": "audiovisual-shot-plan",
+        "slots": {
+          "frame": {
+            "line": "growth",
+            "sheetMargin": "--gl-sheet-margin=80px",
+            "shotGap": "--gl-shot-gap=40px",
+            "thumbHeight": "--gl-thumb-height=231px",
+            "thumbWidth": "--gl-thumb-width=410px",
+          },
+          "rules": [
+            "El primer cuadro de cada plano es una foto que pasó el QA fijo (foto:validar); recién entonces se anima.",
+            "Una luz con carácter y un registro por pieza; los planos se emparejan, no se mezclan.",
+            "El grade sólo empareja hacia la colorimetría de la foto, sin look propio; sombras sin azul.",
+            "Uniforme por registro de escena; el emblema se revisa cuadro a cuadro (si el modelo lo reinventa, no se lee o se compone).",
+            "Texto sólo en las reservas planeadas del plano, como cartela compuesta después, nunca generada.",
+            "Formato nativo por plano (cobertura 16:9, 9:16 y 1:1): no se recorta uno desde otro.",
+          ],
+          "shots": [
+            {
+              "alt": "Una productora de Efeonce filma al panadero junto al horno",
+              "heading": "01 · 0–3 s · Plano general",
+              "note": "Documental: nadie mira a cámara · gorra + hoodie (terreno)",
+              "spec": "Terreno, panadería del cliente · 35 mm · cámara en mano, avanza despacio · luz del horno + ventana",
+              "src": "asset-ref:plate:V1-terreno-410x231",
+            },
+            {
+              "alt": "Las manos de un director de arte marcan una prueba de impresión con lápiz rojo y una lupa",
+              "heading": "02 · 3–5 s · Inserto",
+              "note": "El oficio en primer plano · manga del polo (oficina)",
+              "spec": "Detalle de manos · macro 100 mm · fijo, foco en la punta del lápiz · una lámpara rasante",
+              "src": "asset-ref:plate:V2-detalle-410x231",
+            },
+            {
+              "alt": "Una estratega de Efeonce presenta la curva de resultados al equipo del cliente",
+              "heading": "03 · 5–9 s · Plano medio",
+              "note": "Documental · chaqueta sobre polo (reunión importante)",
+              "spec": "Sala del cliente · 50 mm · sobre el hombro del cliente, empuje lento · la pantalla es la luz",
+              "src": "asset-ref:plate:V3-sala-410x231",
+            },
+            {
+              "alt": "El último cuadro del reveal: el logo de Efeonce con su eslogan sobre el navy de la marca",
+              "heading": "04 · 9–12,6 s · Cierre",
+              "note": "La toma nunca lleva logo: firma el cierre",
+              "spec": "Reveal aprobado (3,6 s, con sonido) · masters de AXIS v1.1",
+              "src": "asset-ref:plate:efeonce-orbita-reveal_16x9_navy_cuadro-final-410x231",
+            },
+          ],
+          "title": "Producción audiovisual · un video de 12,6 s «Cómo trabajamos», cuadros clave generados",
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > audiovisual-split-screen-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 1080,
+        "width": 1920,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_audiovisual/plates/V1-terreno.png",
+      "ref": "asset-ref:plate:V1-terreno-1920x1080",
+    },
+    {
+      "fit": {
+        "height": 1080,
+        "width": 1920,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_audiovisual/plates/V3-sala.png",
+      "ref": "asset-ref:plate:V3-sala-1920x1080",
+    },
+  ],
+  "catalog": "graphic-line-overlays",
+  "contentType": "audiovisual.split-screen",
+  "plan": {
+    "artifactId": "audiovisual-split-screen",
+    "slides": [
+      {
+        "contentType": "audiovisual.split-screen",
+        "slideId": "audiovisual-split-screen",
+        "slots": {
+          "end": {
+            "alt": "Una estratega de Efeonce con chaqueta señala en la pantalla la curva que sube, frente al equipo del cliente",
+            "focus": "--gl-focus-x=93.75%",
+            "src": "asset-ref:plate:V3-sala-1920x1080",
+            "word": "mide",
+          },
+          "frame": {
+            "answerPx": "--gl-answer-px=90px",
+            "answerTracking": "--gl-answer-tracking=-0.035em",
+            "dividerLeft": "--gl-divider-left=957px",
+            "dividerPx": "--gl-divider-px=6px",
+            "line": "growth",
+            "wordInset": "--gl-word-inset=110px",
+            "wordTop": "--gl-word-top=860px",
+          },
+          "start": {
+            "alt": "Una productora de Efeonce con gorra y hoodie filma con un estabilizador al panadero mientras saca el pan del horno",
+            "focus": "--gl-focus-x=83.33%",
+            "src": "asset-ref:plate:V1-terreno-1920x1080",
+            "word": "Escucha",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > audiovisual-subtitles-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [],
+  "catalog": "graphic-line-overlays",
+  "contentType": "audiovisual.subtitles",
+  "plan": {
+    "artifactId": "audiovisual-subtitles",
+    "slides": [
+      {
+        "contentType": "audiovisual.subtitles",
+        "slideId": "audiovisual-subtitles",
+        "slots": {
+          "frame": {
+            "inset": "--gl-subtitle-inset=96px",
+            "line": "growth",
+            "lineHeight": "--gl-subtitle-line-height=1.3",
+            "maxLines": "--gl-subtitle-max-lines=2",
+            "px": "--gl-subtitle-px=46px",
+            "shadowAlpha": "--gl-subtitle-shadow-alpha=55%",
+            "shadowBlur": "--gl-subtitle-shadow-blur=6px",
+            "shadowY": "--gl-subtitle-shadow-y=2px",
+            "top": "--gl-subtitle-top=880px",
+            "weight": "--gl-subtitle-weight=600",
+          },
+          "lines": [
+            "«Ya no discutimos el gusto:",
+            "vemos qué corte vende.»",
+          ],
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > audiovisual-zocalo-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [],
+  "catalog": "graphic-line-overlays",
+  "contentType": "audiovisual.zocalo",
+  "plan": {
+    "artifactId": "audiovisual-zocalo",
+    "slides": [
+      {
+        "contentType": "audiovisual.zocalo",
+        "slideId": "audiovisual-zocalo",
+        "slots": {
+          "frame": {
+            "answerPx": "--gl-answer-px=128px",
+            "answerTracking": "--gl-answer-tracking=-0.035em",
+            "line": "growth",
+            "questionPx": "--gl-question-px=38px",
+            "voiceLeft": "--gl-voice-left=120px",
+            "voiceTop": "--gl-voice-top=800px",
+          },
+          "selection": {
+            "anchor": "top-end",
+            "label": "Producción",
+            "padding": "compact",
+            "participantKind": "role",
+            "scale": 1.2,
+            "targetKind": "group",
+            "variant": "open-brackets",
+          },
+          "voice": {
+            "answer": "Producción",
+            "question": "Terreno · panadería del cliente, 06:40",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-content-measure-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "format": "16x9",
+        "height": 1080,
+        "unit": "px",
+        "width": 1920,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_deck-web-motion/plates/P1-deck-lente-edicion.png",
+      "ref": "asset-ref:plate:P1-deck-lente-edicion",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:measure-620-growth",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="measure" data-axis-kind="measure" data-axis-trajectory="measure" data-axis-sweep="223.2" data-axis-value="0.62"><circle data-axis-part="ring" cx="1420" cy="600" r="403.16" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.39"/><path data-axis-part="arc" data-axis-length="1570.56" pathLength="1" d="M 1420 196.84 A 403.16 403.16 0 1 1 1144.02 893.89" fill="none" stroke="#36c8bf" stroke-width="6.77" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1144.02" cy="893.89" r="13.54" fill="#36c8bf"/></g></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-measure",
+  "plan": {
+    "artifactId": "deck-content-measure",
+    "slides": [
+      {
+        "contentType": "deck.content-measure",
+        "slideId": "deck-content-measure",
+        "slots": {
+          "body": "de los cortes se aprueban sin cambios. El arco de la lente recorre ese 62 %.",
+          "figures": [
+            {
+              "label": "de idea a pieza",
+              "value": "12 días",
+            },
+            {
+              "label": "costo por lead",
+              "value": "−38 %",
+            },
+          ],
+          "frame": {
+            "answerPx": 300,
+            "answerTop": 270,
+            "bodyPx": 26,
+            "bodyTop": 590,
+            "bodyWidth": 560,
+            "columnWidth": "--gl-column-width=976.84px",
+            "eyebrowPx": "--gl-eyebrow-px=20px",
+            "eyebrowTop": 150,
+            "figurePx": "--gl-figure-px=64px",
+            "lensBrightness": "--gl-lens-brightness=0.5",
+            "lensContrast": "--gl-lens-contrast=1.1",
+            "lensCx": "--gl-lens-cx=1420px",
+            "lensCy": "--gl-lens-cy=600px",
+            "lensGrayscale": "--gl-lens-grayscale=1",
+            "lensMultiply": "--gl-lens-multiply=0.8",
+            "lensR": "--gl-lens-r=359.97px",
+            "line": "growth",
+            "margin": 140,
+            "notePx": "--gl-note-px=17px",
+            "questionTop": 215,
+          },
+          "note": "Datos de muestra",
+          "orbit": {
+            "src": "asset-ref:layer:measure-620-growth",
+          },
+          "photo": {
+            "alt": "Un editor revisa un corte en la línea de tiempo de su pantalla, de noche, con una taza azul al lado",
+            "lensSrc": "asset-ref:plate:P1-deck-lente-edicion",
+            "src": "asset-ref:plate:P1-deck-lente-edicion",
+          },
+          "voice": {
+            "answer": "62 %",
+            "eyebrow": "Resultados · 3 de 5",
+            "question": "¿Cuántos cortes pasan a la primera?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-method-staircase-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.method-staircase",
+  "plan": {
+    "artifactId": "deck-method-staircase",
+    "slides": [
+      {
+        "contentType": "deck.method-staircase",
+        "slideId": "deck-method-staircase",
+        "slots": {
+          "body": "ChatGPT, Claude, Perplexity, Gemini y Google AI Overviews. Subimos tu marca nivel por nivel.",
+          "frame": {
+            "answerPx": 139,
+            "answerTop": 270,
+            "bodyPx": 25,
+            "bodyTop": 590,
+            "bodyWidth": 500,
+            "columnWidth": "--gl-column-width=740px",
+            "eyebrowTop": 110,
+            "levelDescriptorPx": "--gl-level-descriptor-px=23px",
+            "levelNamePx": "--gl-level-name-px=76px",
+            "levelNumberPx": "--gl-level-number-px=30px",
+            "levelTopNamePx": "--gl-level-top-name-px=86px",
+            "line": "engine",
+            "margin": 140,
+            "notePx": "--gl-note-px=17px",
+            "noteTop": "--gl-note-top=930px",
+            "questionTop": 200,
+            "slabHeight": "--gl-slab-height=124px",
+            "stairDx": "--gl-stair-dx=70px",
+            "stairDy": "--gl-stair-dy=132px",
+            "stairX0": "--gl-stair-x0=760px",
+            "stairY0": "--gl-stair-y0=798px",
+          },
+          "levels": [
+            {
+              "descriptor": "que te encuentre",
+              "name": "Be Found",
+            },
+            {
+              "descriptor": "que te entienda",
+              "name": "Be Readable",
+            },
+            {
+              "descriptor": "que te represente bien",
+              "name": "Be Correct",
+            },
+            {
+              "descriptor": "que pueda actuar",
+              "name": "Be Actionable",
+            },
+            {
+              "descriptor": "que te prefiera",
+              "name": "Be Intrinsic",
+            },
+          ],
+          "note": "Be Intrinsic es una trayectoria, no una garantía.",
+          "selection": {
+            "anchor": "bottom-end",
+            "label": "SEO · AEO",
+            "level": 3,
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "department",
+            "scale": 1.1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+          },
+          "voice": {
+            "answer": "por capa",
+            "answerLead": "Capa",
+            "eyebrow": "AEO · metodología BeX",
+            "question": "¿Te recomienda la IA?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-section-classic-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:section-progress-2-of-5-growth",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="144" data-axis-value="0.4"><circle data-axis-part="ring" cx="1420" cy="540" r="300" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="753.98" pathLength="1" d="M 1420 240 A 300 300 0 0 1 1596.34 782.71" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1596.34" cy="782.71" r="7.7" fill="#0e8c82"/></g></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.section-classic",
+  "plan": {
+    "artifactId": "deck-section-classic",
+    "slides": [
+      {
+        "contentType": "deck.section-classic",
+        "slideId": "deck-section-classic",
+        "slots": {
+          "frame": {
+            "answerPx": 120,
+            "answerTop": 495,
+            "columnWidth": "--gl-column-width=1080px",
+            "labelPx": "--gl-label-px=24px",
+            "labelTop": "--gl-label-top=640px",
+            "line": "growth",
+            "margin": 140,
+            "numberPx": "--gl-number-px=190px",
+            "numberTop": "--gl-number-top=430px",
+            "numberWeight": "--gl-number-wght=300",
+            "questionTop": 420,
+            "ringCx": "--gl-ring-cx=1420px",
+          },
+          "orbit": {
+            "src": "asset-ref:layer:section-progress-2-of-5-growth",
+          },
+          "progress": {
+            "label": "Sección 2 de 5",
+            "number": "02",
+          },
+          "voice": {
+            "answer": "El dato",
+            "question": "¿Quién decide el corte?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-section-split-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:section-split-indicator-2-of-5-growth",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g transform="matrix(1 0 0 -1 0 340)"><g data-axis-element="progress" data-axis-kind="progress" data-axis-trajectory="progress" data-axis-sweep="144" data-axis-value="0.4"><circle data-axis-part="ring" cx="180" cy="170" r="40" fill="none" stroke="#023c70" stroke-opacity="0.14" stroke-width="2.2"/><path data-axis-part="arc" data-axis-length="50.27" pathLength="1" d="M 180 130 A 40 40 0 0 1 218.04 157.64" fill="none" stroke="#0e8c82" stroke-width="3.96" stroke-linecap="round"/><circle data-axis-part="sphere" cx="218.04" cy="157.64" r="7.7" fill="#0e8c82"/></g></g></svg>",
+    },
+    {
+      "fit": {
+        "height": 1080,
+        "width": 1260,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_ronda-1x1/plates/Q3c-retrato-seccion.png",
+      "ref": "asset-ref:plate:Q3c-retrato-seccion",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.section-split",
+  "plan": {
+    "artifactId": "deck-section-split",
+    "slides": [
+      {
+        "contentType": "deck.section-split",
+        "slideId": "deck-section-split",
+        "slots": {
+          "frame": {
+            "answerPx": 120,
+            "answerTop": 670,
+            "columnWidth": "--gl-column-width=820px",
+            "labelPx": "--gl-label-px=24px",
+            "labelTop": "--gl-label-top=450px",
+            "line": "growth",
+            "margin": 140,
+            "numberPx": "--gl-number-px=190px",
+            "numberTop": "--gl-number-top=260px",
+            "numberWeight": "--gl-number-wght=300",
+            "panelRadius": "--gl-panel-radius=300px",
+            "panelWidth": "--gl-panel-width=960px",
+            "photoLeft": "--gl-photo-left=660px",
+            "questionTop": 600,
+          },
+          "indicator": {
+            "src": "asset-ref:layer:section-split-indicator-2-of-5-growth",
+          },
+          "photo": {
+            "alt": "Una mujer sentada a una mesa oscura mira hacia la ventana, con la mano sobre un cuaderno azul",
+            "src": "asset-ref:plate:Q3c-retrato-seccion",
+          },
+          "progress": {
+            "label": "Sección 2 de 5",
+            "number": "02",
+          },
+          "voice": {
+            "answer": "El dato",
+            "question": "¿Quién decide el corte?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-triptych-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 1131,
+        "width": 636,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_deck-triptico-v2/plates/T1-escucha.png",
+      "ref": "asset-ref:plate:T1-escucha",
+    },
+    {
+      "fit": {
+        "height": 1131,
+        "width": 636,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_deck-triptico-v2/plates/T2-crea.png",
+      "ref": "asset-ref:plate:T2-crea",
+    },
+    {
+      "fit": {
+        "height": 1131,
+        "width": 636,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_deck-triptico-v2/plates/T3-mide.png",
+      "ref": "asset-ref:plate:T3-mide",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.triptych",
+  "plan": {
+    "artifactId": "deck-triptych",
+    "slides": [
+      {
+        "contentType": "deck.triptych",
+        "slideId": "deck-triptych",
+        "slots": {
+          "bed": {
+            "src": "asset-ref:plate:T1-escucha",
+          },
+          "frame": {
+            "answerPx": 108,
+            "answerTop": 944,
+            "bedBlur": "--gl-bed-blur=16px",
+            "bedMaskEnd": "--gl-bed-mask-end=220px",
+            "bedMaskSolid": "--gl-bed-mask-solid=110px",
+            "bedShade": "--gl-bed-shade=82%",
+            "bedShadeHeight": "--gl-bed-shade-height=240px",
+            "gutter": "--gl-gutter=6px",
+            "line": "growth",
+            "panelWidth": "--gl-panel-width=636px",
+            "questionInset": "--gl-question-inset=48px",
+            "questionPx": "--gl-question-px=34px",
+            "questionTop": 48,
+            "wordInset": "--gl-word-inset=42px",
+          },
+          "panels": [
+            {
+              "alt": "Una estratega de Efeonce toma notas mientras un panadero le explica su oficio frente al horno",
+              "src": "asset-ref:plate:T1-escucha",
+              "word": "Escucha,",
+            },
+            {
+              "alt": "Un creativo con el hoodie de Efeonce fija pruebas de fotografía en una pared del estudio",
+              "src": "asset-ref:plate:T2-crea",
+              "word": "crea",
+            },
+            {
+              "alt": "Una consultora de Efeonce señala una curva de resultados en la pantalla de la sala del cliente",
+              "src": "asset-ref:plate:T3-mide",
+              "word": "y mide",
+            },
+          ],
+          "question": "¿Cómo trabajamos?",
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > dooh-caminero-lens-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 1000,
+        "width": 3000,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_ooh-caminero-lente/plates/C2-caminero-medicion-compacta.png",
+      "ref": "asset-ref:plate:C2-caminero-medicion-compacta-canvas-3000x1000",
+    },
+    {
+      "fit": {
+        "height": 1250,
+        "width": 3750,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_ooh-caminero-lente/plates/C2-caminero-medicion-compacta.png",
+      "ref": "asset-ref:plate:C2-caminero-medicion-compacta-lens-1.25-3750x1250",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:caminero-orbit-growth-3000x1000",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3000 1000" width="3000" height="1000" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="caminero-orbit" data-axis-kind="orbit"><circle data-axis-part="ring" cx="2100" cy="500" r="448" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="5.29"/><path data-axis-part="arc" data-axis-length="390.95" pathLength="1" d="M 1679.02 346.77 A 448 448 0 0 1 1946.77 79.02" fill="none" stroke="#36c8bf" stroke-width="10.58" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1946.77" cy="79.02" r="21.16" fill="#36c8bf"/></g></svg>",
+    },
+  ],
+  "catalog": "graphic-line-stills",
+  "contentType": "dooh.caminero-lens",
+  "plan": {
+    "artifactId": "dooh-caminero-lens",
+    "slides": [
+      {
+        "contentType": "dooh.caminero-lens",
+        "slideId": "dooh-caminero-lens",
+        "slots": {
+          "frame": {
+            "answerLineHeight": "--gl-answer-lh=1",
+            "answerNudge": "--gl-answer-nudge=0em",
+            "answerPx": 330,
+            "answerTop": 348,
+            "answerTracking": "--gl-answer-tracking=-0.035em",
+            "lensBrightness": "--gl-lens-brightness=0.5",
+            "lensContrast": "--gl-lens-contrast=1.1",
+            "lensCx": "--gl-lens-cx=2100px",
+            "lensCy": "--gl-lens-cy=500px",
+            "lensGray": "--gl-lens-gray=1",
+            "lensInsideX": "--gl-lens-inside-x=-525px",
+            "lensInsideY": "--gl-lens-inside-y=-125px",
+            "lensR": "--gl-lens-r=400px",
+            "lensVeil": "--gl-lens-veil=0.8",
+            "line": "growth",
+            "margin": 90,
+            "questionPx": "--gl-question-px=110px",
+            "questionTop": 200,
+            "signatureMargin": "--gl-signature-margin=90px",
+            "signatureWidth": "--gl-signature-width=500px",
+          },
+          "orbit": {
+            "src": "asset-ref:layer:caminero-orbit-growth-3000x1000",
+          },
+          "photo": {
+            "alt": "Un analista en una cervecería señala la curva que sube en su portátil; la lente la muestra a color",
+            "lensSrc": "asset-ref:plate:C2-caminero-medicion-compacta-lens-1.25-3750x1250",
+            "src": "asset-ref:plate:C2-caminero-medicion-compacta-canvas-3000x1000",
+          },
+          "voice": {
+            "answer": "Siempre",
+            "question": "¿Lo medimos?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > motion-loop-lens-reveal-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 1971,
+        "width": 1127,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_web-movil/plates/M1-avanza-polo.png",
+      "ref": "asset-ref:plate:M1-avanza-polo-lens-1127x1971",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:loop-orbit-growth-1920x1080",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="loop-orbit" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1150.08" cy="420.01" r="392.04" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.3903459183673474"/><path data-axis-part="arc" data-axis-length="342.12" pathLength="1" d="M 781.68 285.93 A 392.04 392.04 0 0 1 1015.99 51.61" fill="none" stroke="#36c8bf" stroke-width="6.770690816326531" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1015.99" cy="51.61" r="13.541381632653062" fill="#36c8bf"/></g></svg>",
+    },
+  ],
+  "catalog": "graphic-line-stills",
+  "contentType": "motion.loop-lens-reveal",
+  "plan": {
+    "artifactId": "motion-loop-lens-reveal",
+    "slides": [
+      {
+        "contentType": "motion.loop-lens-reveal",
+        "slideId": "motion-loop-lens-reveal",
+        "slots": {
+          "frame": {
+            "answerLineHeight": "--gl-answer-lh=0.92",
+            "answerNudge": "--gl-answer-nudge=-0.0706em",
+            "answerPx": 170,
+            "answerTop": 352,
+            "answerTracking": "--gl-answer-tracking=-0.05em",
+            "lensCx": "--gl-lens-cx=1150.08px",
+            "lensCy": "--gl-lens-cy=420.012px",
+            "lensR": "--gl-lens-r=350.0357px",
+            "line": "growth",
+            "margin": 140,
+            "photoX": "--gl-photo-x=636px",
+            "photoY": "--gl-photo-y=-138px",
+            "questionLineHeight": "--gl-question-lh=1.2",
+            "questionPx": "--gl-question-px=40px",
+            "questionTop": 214,
+          },
+          "orbit": {
+            "src": "asset-ref:layer:loop-orbit-growth-1920x1080",
+          },
+          "photo": {
+            "alt": "Una directora de cuentas con el polo de Efeonce avanza hacia la cámara y la mira",
+            "lensSrc": "asset-ref:plate:M1-avanza-polo-lens-1127x1971",
+          },
+          "selection": {
+            "anchor": "bottom-end",
+            "label": "Growth",
+            "participantKind": "role",
+            "scale": 1.6,
+          },
+          "voice": {
+            "answer": "sí",
+            "answerLead": "Ahora",
+            "question": "¿Tu marketing mide<br>lo que vende?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > motion-storyboard-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 1971,
+        "width": 1127,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_web-movil/plates/M1-avanza-polo.png",
+      "ref": "asset-ref:plate:M1-avanza-polo-lens-1127x1971",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:storyboard-hold-growth-1920x1080",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="storyboard-hold" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1150.08" cy="420.01" r="392.04" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.3903459183673474"/><path data-axis-part="arc" data-axis-length="342.12" pathLength="1" d="M 781.68 285.93 A 392.04 392.04 0 0 1 1015.99 51.61" fill="none" stroke="#36c8bf" stroke-width="6.770690816326531" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1015.99" cy="51.61" r="13.541381632653062" fill="#36c8bf"/></g></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:storyboard-anticipation-growth-1920x1080",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="storyboard-anticipation" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1150.08" cy="420.01" r="70" fill="none" stroke="#72ded8" stroke-opacity="0.35" stroke-width="3.3903459183673474"/><circle data-axis-part="sphere" cx="1123.86" cy="355.11" r="13.541381632653062" fill="#36c8bf"/></g></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:storyboard-lens-opens-growth-1920x1080",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="storyboard-lens-opens" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1150.08" cy="420.01" r="227.38" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.3903459183673474"/><path data-axis-part="arc" data-axis-length="71.43" pathLength="1" d="M 936.41 342.24 A 227.38 227.38 0 0 1 970.9 280.02" fill="none" stroke="#36c8bf" stroke-width="6.770690816326531" stroke-linecap="round"/><circle data-axis-part="sphere" cx="970.9" cy="280.02" r="13.541381632653062" fill="#36c8bf"/></g></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:storyboard-arc-runs-sphere-hits-growth-1920x1080",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="storyboard-arc-runs-sphere-hits" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1150.08" cy="420.01" r="392.04" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.3903459183673474"/><defs><linearGradient id="gl-storyboard-arc-runs-sphere-hits-storyboard-arc-runs-sphere-hits-arc" gradientUnits="userSpaceOnUse" x1="781.68" y1="285.93" x2="1015.99" y2="51.61"><stop offset="0" stop-color="#36c8bf" stop-opacity="0"/><stop offset="1" stop-color="#36c8bf" stop-opacity="1"/></linearGradient></defs><path data-axis-part="arc" data-axis-length="342.12" pathLength="1" d="M 781.68 285.93 A 392.04 392.04 0 0 1 1015.99 51.61" fill="none" stroke="url(#gl-storyboard-arc-runs-sphere-hits-storyboard-arc-runs-sphere-hits-arc)" stroke-width="6.770690816326531" stroke-linecap="round"/><circle data-axis-part="sphere" cx="1015.99" cy="51.61" r="13.541381632653062" fill="#36c8bf"/><circle data-axis-part="sphere-ring" cx="1015.99" cy="51.61" r="35.20759224489796" fill="none" stroke="#36c8bf" stroke-opacity="0.55"/></g></svg>",
+    },
+  ],
+  "catalog": "graphic-line-stills",
+  "contentType": "motion.storyboard",
+  "plan": {
+    "artifactId": "motion-storyboard",
+    "slides": [
+      {
+        "contentType": "motion.storyboard",
+        "slideId": "motion-storyboard",
+        "slots": {
+          "frame": {
+            "answerLineHeight": "--gl-answer-lh=0.92",
+            "answerNudge": "--gl-answer-nudge=-0.0706em",
+            "answerPx": 170,
+            "answerTop": 352,
+            "answerTracking": "--gl-answer-tracking=-0.05em",
+            "lensCx": "--gl-lens-cx=1150.08px",
+            "lensCy": "--gl-lens-cy=420.012px",
+            "line": "growth",
+            "margin": 140,
+            "photoX": "--gl-photo-x=636px",
+            "photoY": "--gl-photo-y=-138px",
+            "questionLineHeight": "--gl-question-lh=1.2",
+            "questionPx": "--gl-question-px=40px",
+            "questionTop": 214,
+          },
+          "frames": [
+            {
+              "answer": "sí",
+              "answerLead": "Ahora",
+              "caption": "Navy vacío. El anillo aparece chico y la esfera retrocede antes de salir.",
+              "kind": "orbit",
+              "lensR": "--gl-lens-r=350.0357px",
+              "orbit": "asset-ref:layer:storyboard-anticipation-growth-1920x1080",
+              "question": "¿Tu marketing mide<br>lo que vende?",
+              "time": "0,0–0,3 s",
+              "title": "Anticipación",
+            },
+            {
+              "answer": "sí",
+              "answerLead": "Ahora",
+              "caption": "El círculo crece y descubre la foto: la escena entra por la lente, rápido y con curva de llegada.",
+              "kind": "lens",
+              "lensR": "--gl-lens-r=203.0207px",
+              "orbit": "asset-ref:layer:storyboard-lens-opens-growth-1920x1080",
+              "question": "¿Tu marketing mide<br>lo que vende?",
+              "time": "0,3–0,8 s",
+              "title": "La lente se abre",
+            },
+            {
+              "answer": "sí",
+              "answerLead": "Ahora",
+              "caption": "Tramo rápido con estela; la esfera llega con sobrepaso y un pulso de impacto con eco.",
+              "kind": "lens",
+              "lensR": "--gl-lens-r=350.0357px",
+              "orbit": "asset-ref:layer:storyboard-arc-runs-sphere-hits-growth-1920x1080",
+              "question": "¿Tu marketing mide<br>lo que vende?",
+              "time": "0,8–1,2 s",
+              "title": "El arco corre y la esfera golpea",
+            },
+            {
+              "answer": "sí",
+              "answerLead": "Ahora",
+              "caption": "Pregunta primero; «Ahora» ya asentó; «sí» llega un 12 % más grande y se asienta.",
+              "kind": "overshoot",
+              "lensR": "--gl-lens-r=350.0357px",
+              "orbit": "asset-ref:layer:storyboard-hold-growth-1920x1080",
+              "question": "¿Tu marketing mide<br>lo que vende?",
+              "time": "1,2–1,8 s",
+              "title": "La voz entra con sobrepaso",
+            },
+            {
+              "answer": "sí",
+              "answerLead": "Ahora",
+              "caption": "Los corchetes de AXIS se ajustan a la respuesta y entra el cursor de Growth. Un protagonista a la vez.",
+              "kind": "voice",
+              "lensR": "--gl-lens-r=350.0357px",
+              "orbit": "asset-ref:layer:storyboard-hold-growth-1920x1080",
+              "question": "¿Tu marketing mide<br>lo que vende?",
+              "time": "1,8–2,4 s",
+              "title": "La selección encaja",
+            },
+            {
+              "answer": "sí",
+              "answerLead": "Ahora",
+              "caption": "Todo quieto salvo la foto, que respira dentro de la lente (hasta 10 %). Este cuadro es el estático de respaldo.",
+              "kind": "voice",
+              "lensR": "--gl-lens-r=350.0357px",
+              "orbit": "asset-ref:layer:storyboard-hold-growth-1920x1080",
+              "question": "¿Tu marketing mide<br>lo que vende?",
+              "time": "2,4–4,4 s",
+              "title": "Sostén",
+            },
+            {
+              "answer": "sí",
+              "answerLead": "Ahora",
+              "caption": "El reveal aprobado v1.1, el mismo cierre del audiovisual: la nave entra en su órbita y se asienta.",
+              "kind": "reveal",
+              "lensR": "--gl-lens-r=350.0357px",
+              "orbit": "asset-ref:layer:storyboard-hold-growth-1920x1080",
+              "question": "¿Tu marketing mide<br>lo que vende?",
+              "time": "4,4–5,4 s",
+              "title": "Cierre: reveal",
+            },
+            {
+              "answer": "sí",
+              "answerLead": "Ahora",
+              "caption": "Logo con el eslogan: la tapa de cierre del reveal. Con sonido, el golpe del lenguaje de movimiento.",
+              "kind": "endcard",
+              "lensR": "--gl-lens-r=350.0357px",
+              "orbit": "asset-ref:layer:storyboard-hold-growth-1920x1080",
+              "question": "¿Tu marketing mide<br>lo que vende?",
+              "time": "5,4–8,0 s",
+              "title": "Tapa final",
+            },
+          ],
+          "photo": {
+            "alt": "Una directora de cuentas con el polo de Efeonce avanza hacia la cámara y la mira",
+            "src": "asset-ref:plate:M1-avanza-polo-lens-1127x1971",
+          },
+          "selection": {
+            "anchor": "bottom-end",
+            "label": "Growth",
+            "participantKind": "role",
+            "scale": 1.6,
+          },
+          "title": "Motion · 8 s con foto fija · el lenguaje de movimiento de la órbita, cuadro a cuadro",
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > web-hero-bleed-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 900,
+        "width": 1440,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_web-hero/plates/H1b-estratega-uniforme.png",
+      "ref": "asset-ref:plate:H1b-estratega-uniforme-canvas-1440x900",
+    },
+  ],
+  "catalog": "graphic-line-stills",
+  "contentType": "web.hero-bleed",
+  "plan": {
+    "artifactId": "web-hero-bleed",
+    "slides": [
+      {
+        "contentType": "web.hero-bleed",
+        "slideId": "web-hero-bleed",
+        "slots": {
+          "cta": {
+            "descriptor": "Revisamos contigo qué mide hoy tu marketing.",
+            "label": "Agenda un diagnóstico",
+          },
+          "frame": {
+            "answerLineHeight": "--gl-answer-lh=1",
+            "answerNudge": "--gl-answer-nudge=-0.03em",
+            "answerPx": 166,
+            "answerTop": 351,
+            "answerTracking": "--gl-answer-tracking=-0.045em",
+            "ctaPadX": "--gl-cta-pad-x=40px",
+            "ctaPadY": "--gl-cta-pad-y=22px",
+            "ctaPx": "--gl-cta-px=22px",
+            "ctaRadius": "--gl-cta-radius=14px",
+            "ctaTop": "--gl-cta-top=612px",
+            "descriptorLineHeight": "--gl-descriptor-lh=1.45",
+            "descriptorPx": "--gl-descriptor-px=19px",
+            "descriptorWidth": "--gl-descriptor-width=330px",
+            "line": "growth",
+            "margin": 96,
+            "navHeight": "--gl-nav-height=84px",
+            "navLinkPx": "--gl-nav-link-px=16px",
+            "navLogoWidth": "--gl-nav-logo-width=150px",
+            "navPadX": "--gl-nav-pad-x=56px",
+            "questionPx": "--gl-question-px=30px",
+            "questionTop": 300,
+          },
+          "nav": {
+            "action": "Conversemos",
+            "links": [
+              "Servicios",
+              "Casos",
+              "Insights",
+              "Nosotros",
+            ],
+          },
+          "photo": {
+            "alt": "Una estratega de Efeonce con el polo y la credencial mira a cámara junto al portátil con el tablero del cliente",
+            "src": "asset-ref:plate:H1b-estratega-uniforme-canvas-1440x900",
+          },
+          "selection": {
+            "anchor": "bottom-end",
+            "label": "Growth",
+            "participantKind": "role",
+            "scale": 1.5,
+          },
+          "voice": {
+            "answer": "Ahora sí",
+            "question": "¿Tu marketing ya mide lo que vende?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > web-hero-lens-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 900,
+        "width": 1440,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_deck-web-motion/plates/P2-web-hero-taller.png",
+      "ref": "asset-ref:plate:P2-web-hero-taller-canvas-1440x900",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:hero-lens-orbit-growth-1440x900",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900" aria-hidden="true" focusable="false" data-axis-graphic-line="0.3.1"><g data-axis-element="hero-lens-orbit" data-axis-kind="orbit"><circle data-axis-part="ring" cx="1050.05" cy="500.04" r="369.63" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3.107782500000001"/><path data-axis-part="arc" data-axis-length="322.57" pathLength="1" d="M 702.71 373.62 A 369.63 369.63 0 0 1 923.63 152.7" fill="none" stroke="#36c8bf" stroke-width="6.2063975000000005" stroke-linecap="round"/><circle data-axis-part="sphere" cx="923.63" cy="152.7" r="12.412795000000001" fill="#36c8bf"/></g></svg>",
+    },
+  ],
+  "catalog": "graphic-line-stills",
+  "contentType": "web.hero-lens",
+  "plan": {
+    "artifactId": "web-hero-lens",
+    "slides": [
+      {
+        "contentType": "web.hero-lens",
+        "slideId": "web-hero-lens",
+        "slots": {
+          "body": "Estrategia, contenido y datos en un mismo equipo.",
+          "cta": {
+            "descriptor": "Revisamos contigo qué mide hoy tu marketing.",
+            "label": "Agenda un diagnóstico",
+          },
+          "frame": {
+            "answerLineHeight": "--gl-answer-lh=1",
+            "answerNudge": "--gl-answer-nudge=-0.03em",
+            "answerPx": 200,
+            "answerTop": 301,
+            "answerTracking": "--gl-answer-tracking=-0.045em",
+            "bodyLineHeight": "--gl-body-lh=1.55",
+            "bodyPx": 20,
+            "bodyTop": 560,
+            "bodyWidth": 470,
+            "ctaPadX": "--gl-cta-pad-x=40px",
+            "ctaPadY": "--gl-cta-pad-y=22px",
+            "ctaPx": "--gl-cta-px=22px",
+            "ctaRadius": "--gl-cta-radius=14px",
+            "ctaTop": "--gl-cta-top=676px",
+            "descriptorLineHeight": "--gl-descriptor-lh=1.45",
+            "descriptorPx": "--gl-descriptor-px=19px",
+            "descriptorWidth": "--gl-descriptor-width=360px",
+            "lensBrightness": "--gl-lens-brightness=0.5",
+            "lensContrast": "--gl-lens-contrast=1.1",
+            "lensCx": "--gl-lens-cx=1050.048px",
+            "lensCy": "--gl-lens-cy=500.04px",
+            "lensGray": "--gl-lens-gray=1",
+            "lensR": "--gl-lens-r=330.03px",
+            "lensVeil": "--gl-lens-veil=0.8",
+            "line": "growth",
+            "margin": 96,
+            "navHeight": "--gl-nav-height=84px",
+            "navLinkPx": "--gl-nav-link-px=16px",
+            "navLogoWidth": "--gl-nav-logo-width=150px",
+            "navPadX": "--gl-nav-pad-x=56px",
+            "questionPx": "--gl-question-px=30px",
+            "questionTop": 250,
+          },
+          "nav": {
+            "action": "Conversemos",
+            "links": [
+              "Servicios",
+              "Casos",
+              "Insights",
+              "Nosotros",
+            ],
+          },
+          "orbit": {
+            "src": "asset-ref:layer:hero-lens-orbit-growth-1440x900",
+          },
+          "photo": {
+            "alt": "Una estratega y un director de arte de Efeonce revisan una prueba impresa sobre la mesa del taller",
+            "lensSrc": "asset-ref:plate:P2-web-hero-taller-canvas-1440x900",
+            "src": "asset-ref:plate:P2-web-hero-taller-canvas-1440x900",
+          },
+          "selection": {
+            "anchor": "bottom-end",
+            "label": "Estrategia",
+            "participantKind": "role",
+            "scale": 1.5,
+          },
+          "voice": {
+            "answer": "Crecer",
+            "question": "¿Qué hace Efeonce?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > web-hero-mobile-native-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 844,
+        "width": 475,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_web-movil/plates/M2-voltea-chaqueta.png",
+      "ref": "asset-ref:plate:M2-voltea-chaqueta-native-475x844",
+    },
+  ],
+  "catalog": "graphic-line-stills",
+  "contentType": "web.hero-mobile-native.phone-390",
+  "plan": {
+    "artifactId": "web-hero-mobile-native",
+    "slides": [
+      {
+        "contentType": "web.hero-mobile-native.phone-390",
+        "slideId": "web-hero-mobile-native",
+        "slots": {
+          "cta": {
+            "descriptor": "Revisamos contigo qué mide hoy tu marketing.",
+            "label": "Agenda un diagnóstico",
+          },
+          "frame": {
+            "answerLineHeight": "--gl-answer-lh=0.9",
+            "answerNudge": "--gl-answer-nudge=0.04em",
+            "answerPx": 85,
+            "answerTop": 147,
+            "answerTracking": "--gl-answer-tracking=-0.055em",
+            "ctaPadX": "--gl-cta-pad-x=29px",
+            "ctaPadY": "--gl-cta-pad-y=18px",
+            "ctaPx": "--gl-cta-px=18px",
+            "ctaRadius": "--gl-cta-radius=14px",
+            "ctaTop": "--gl-cta-top=667px",
+            "descriptorLineHeight": "--gl-descriptor-lh=1.4",
+            "descriptorPx": "--gl-descriptor-px=14px",
+            "descriptorWidth": "--gl-descriptor-width=344px",
+            "line": "growth",
+            "margin": 23,
+            "navHeight": "--gl-nav-height=55px",
+            "navLogoWidth": "--gl-nav-logo-width=105px",
+            "navPadX": "--gl-nav-pad-x=23px",
+            "photoX": "--gl-photo-x=-85px",
+            "questionPx": "--gl-question-px=17px",
+            "questionTop": 114,
+            "statusHeight": "--gl-status-height=47px",
+          },
+          "photo": {
+            "alt": "Un estratega de Efeonce con la chaqueta del equipo se voltea sonriendo y señala la curva que sube en la pantalla",
+            "src": "asset-ref:plate:M2-voltea-chaqueta-native-475x844",
+          },
+          "selection": {
+            "anchor": "bottom-end",
+            "label": "Growth",
+            "participantKind": "role",
+            "scale": 0.696,
+          },
+          "voice": {
+            "answer": "Ahora sí",
+            "question": "¿Tu marketing mide lo que vende?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > web-hero-uniform-tablet-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 900,
+        "width": 1440,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-26_web-hero/plates/H2-pov-tablet.png",
+      "ref": "asset-ref:plate:H2-pov-tablet-canvas-1440x900",
+    },
+  ],
+  "catalog": "graphic-line-stills",
+  "contentType": "web.hero-uniform-tablet",
+  "plan": {
+    "artifactId": "web-hero-uniform-tablet",
+    "slides": [
+      {
+        "contentType": "web.hero-uniform-tablet",
+        "slideId": "web-hero-uniform-tablet",
+        "slots": {
+          "cta": {
+            "descriptor": "Revisamos contigo qué mide hoy tu marketing.",
+            "label": "Agenda un diagnóstico",
+          },
+          "frame": {
+            "answerLineHeight": "--gl-answer-lh=0.9",
+            "answerNudge": "--gl-answer-nudge=-0.0455em",
+            "answerPx": 176,
+            "answerTop": 230,
+            "answerTracking": "--gl-answer-tracking=-0.05em",
+            "ctaPadX": "--gl-cta-pad-x=40px",
+            "ctaPadY": "--gl-cta-pad-y=22px",
+            "ctaPx": "--gl-cta-px=22px",
+            "ctaRadius": "--gl-cta-radius=14px",
+            "ctaTop": "--gl-cta-top=612px",
+            "descriptorLineHeight": "--gl-descriptor-lh=1.45",
+            "descriptorPx": "--gl-descriptor-px=19px",
+            "descriptorWidth": "--gl-descriptor-width=330px",
+            "line": "growth",
+            "margin": 96,
+            "navHeight": "--gl-nav-height=84px",
+            "navLinkPx": "--gl-nav-link-px=16px",
+            "navLogoWidth": "--gl-nav-logo-width=150px",
+            "navPadX": "--gl-nav-pad-x=56px",
+            "questionPx": "--gl-question-px=32px",
+            "questionTop": 176,
+          },
+          "nav": {
+            "action": "Conversemos",
+            "links": [
+              "Servicios",
+              "Casos",
+              "Insights",
+              "Nosotros",
+            ],
+          },
+          "photo": {
+            "alt": "Una estratega de Efeonce con la chaqueta del equipo acerca a cámara una tableta con la curva que sube",
+            "src": "asset-ref:plate:H2-pov-tablet-canvas-1440x900",
+          },
+          "selection": {
+            "anchor": "bottom-end",
+            "label": "Growth",
+            "participantKind": "role",
+            "scale": 1.5,
+          },
+          "voice": {
+            "answer": "sí",
+            "answerLead": "Ahora",
+            "question": "¿Tu marketing ya mide lo que vende?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;

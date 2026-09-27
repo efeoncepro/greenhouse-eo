@@ -7,7 +7,8 @@ import { axisChartCategorical, axisChartCategoricalDark, axisChartDirectional, a
 
 const COMPATIBILITY_ROLES: Record<string, string> = {
   action: axisRamp.primary[500], actionStrong: axisRamp.primary[800], accent: axisRamp.secondary[500],
-  focus: axisRamp.primary[500], success: axisSemanticHex.success, warning: axisSemanticHex.warning, danger: axisSemanticHex.error
+  focus: axisRamp.primary[500], success: axisSemanticHex.success, warning: axisSemanticHex.warning, danger: axisSemanticHex.error,
+  info: axisSemanticHex.info
 }
 
 const NEUTRAL_ROLES = ['surface', 'canvas', 'text', 'textMuted', 'border'] as const
