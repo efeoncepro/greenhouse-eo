@@ -1,10 +1,10 @@
 # 04 · AEO / GEO — Ser recuperado y citado por motores de respuesta IA ⭐
 
 > El módulo de mayor valor diferencial y el más volátil. Carga para: cómo
-> recuperan los answer engines, **Query Fan-Out**, **chunking** semántico,
+> recuperan los answer engines, **Query Fan-Out**, estructura editorial,
 > **citabilidad**, **prompt/answer-space research**, `llms.txt`, y tácticas
-> **por-motor** (AI Overviews/AI Mode, ChatGPT Search, Perplexity, Gemini,
-> Copilot). Sello: as-of 2026-06 — **reverifica con WebSearch antes de afirmar
+> **por-plataforma** (AI Overviews/AI Mode, ChatGPT Search, Claude, Perplexity,
+> Gemini, Copilot). Sello: as-of 2026-09 — **reverifica con WebSearch antes de afirmar
 > cifras o features**; riesgo de **atribución equivocada** as-of 2026-08-25.
 
 ## Vocabulario (fíjalo)
@@ -13,10 +13,16 @@
   la respuesta directa; *GEO* enfatiza ser citado/incluido en la síntesis
   generativa. **LLMO** / "AI SEO" / "AI visibility" son etiquetas del mismo
   espacio. Ver `GLOSSARY.md`.
-- No optimizas "para IA" en abstracto: optimizas **para un motor concreto**.
-  Solo ~**11%** de los dominios citados se solapan entre ChatGPT y Perplexity.
+- No optimizas "para IA" en abstracto: define la **plataforma y superficie**
+  objetivo. Las diferencias de fuentes observadas entre plataformas son
+  descriptivas y dependen de la muestra; no prueban criterios universales.
 
-## Cómo funciona un answer engine (modelo mental)
+## Modelo de recuperación (ilustrativo, no contrato universal)
+
+El siguiente esquema resume un patrón posible en sistemas con búsqueda y
+generación. Cada producto puede cambiar el orden, combinar etapas, usar índices
+distintos o no exponer detalles suficientes para verificarlos. No atribuyas un
+pipeline a Google, OpenAI, Anthropic o Perplexity sin fuente primaria vigente.
 
 ```
 Query del usuario
@@ -37,59 +43,70 @@ Query del usuario
 Respuesta + citas
 ```
 
-Implicación: **te recuperan por pasajes, no por páginas**, y debes existir en el
-espacio de **sub-queries** del fan-out, no solo en la keyword principal.
+Implicación editorial: conviene que las páginas respondan con claridad a las
+necesidades reales del usuario. La recuperación por pasajes y la expansión de
+consultas son mecanismos posibles; no implican que todos los motores usen el
+mismo método ni que haya que fragmentar páginas para posicionar.
 
 ### Dos juegos distintos (no los confundas)
-- **Memorización (training):** el modelo "sabe" de tu marca porque estuvo en su
-  corpus de entrenamiento. Se gana con presencia amplia y consistente a lo largo
-  del tiempo (entidad + menciones). Lento, estructural.
-- **Retrieval (en query):** el motor *busca en vivo* y cita lo que encuentra.
-  Se gana con contenido estructurado, fresco y recuperable. Rápido, accionable.
-- AEO ataca **ambos**, pero el retrieval es donde mueves la aguja este trimestre.
+- **Conocimiento del modelo:** el modelo puede responder desde información
+  aprendida previamente. No equivale a búsqueda actual ni permite inferir qué
+  fuente influyó en una respuesta.
+- **Búsqueda/retrieval en tiempo de consulta:** algunas superficies consultan
+  fuentes actuales y pueden mostrar enlaces o citas. Disponibilidad, selección y
+  controles dependen del producto y el modo usado.
+- Mide y optimiza cada superficie por separado; no deduzcas entrenamiento,
+  acceso o cita a partir de una sola respuesta observada.
 
-## QUERY FAN-OUT — el concepto central de AI Mode
+## Ramificación de consultas — evidencia específica de Google
 
-Google AI Mode (y en parte AI Overviews) usa fan-out: descompone tu pregunta en
-**múltiples sub-queries simultáneas**. Internamente Google lo llama
-**"Scatter-Gather with Planning"** (*scatter* = lanza sub-queries a varias
-fuentes a la vez; *gather* = recolecta y fusiona).
+La guía de Google describe la ramificación como consultas relacionadas que el
+modelo genera para solicitar información adicional. No atribuyas a Google un
+nombre interno, una cantidad o una secuencia de ejecución salvo que una fuente
+primaria vigente lo documente explícitamente.
 
-**Data verificada (as-of 2026-06):** una query de AI Mode genera típicamente
-**8–12 sub-queries**; ~**59%** de los prompts disparan 5–11 sub-queries
-simultáneas (~9–11 en consultas complejas).
+La guía oficial de Google describe la ramificación de búsquedas en sus
+experiencias generativas. No establece un número universal de subconsultas ni
+indica que debamos crear una página por cada variante. Las cifras de estudios
+externos (por ejemplo, rangos de subconsultas) son observaciones de una muestra
+y metodología concretas; consérvalas solo con fuente, fecha, motor y límites.
 
-**Tipos de sub-query del fan-out (cúbrelos para ser recuperable):**
+**Preguntas relacionadas que conviene investigar (no son un checklist de cobertura):**
 - **Relacionadas** — facetas del tema principal.
 - **Comparativas** — "X vs Y", "alternativas a X".
 - **Implícitas** — lo que el usuario no preguntó pero el motor infiere que
   necesita (precio, requisitos, pros/cons, "cómo empezar").
 - **Recientes/temporales** — "en 2026", "última versión", novedades.
 
-### Cómo optimizar para fan-out (accionable)
-1. **Mapea el espacio de fan-out** de tu tema: lista 8–15 sub-preguntas que un
-   motor generaría. (Plantilla: `templates/fan-out-matrix.md`.) Usa "People
+### Cómo investigar consultas relacionadas (accionable)
+1. Mapea preguntas relacionadas que personas reales podrían tener en el tema.
+   La matriz `templates/fan-out-matrix.md` ayuda a investigarlas; no impone un
+   número por tema ni predice exactamente lo que un motor generará. Usa "People
    Also Ask", autocompletar, Semrush, y pregúntale directamente a los LLMs
    "¿qué sub-preguntas implica esta consulta?".
-2. **Cubre cada sub-query con un pasaje autocontenido** — un H2 = una
-   sub-pregunta = una answer capsule. Esto es exactamente la **topical
-   authority** de `02_SEO_CONTENT.md`: el cluster que cubre el tema completo es
-   lo que te hace recuperable en el fan-out.
-3. **Estructura entidad-céntrica** — schema + lenguaje claro de entidades ayuda
-   al matching durante el fan-out.
+2. Agrupa preguntas que expresen necesidades distintas y resuélvelas en páginas
+   útiles, sin forzar un H2 o URL por cada variante. Usa topical authority de
+   `02_SEO_CONTENT.md` para decidir qué merece cobertura editorial.
+3. Usa encabezados descriptivos y entidades claras para que personas y
+   buscadores entiendan el contenido. Schema solo cuando corresponda a datos
+   visibles y a una función documentada; no es requisito especial de IA.
 
-## CHUNKING — escribir para que te recuperen por pasajes
+## Estructura editorial — claridad antes que fragmentación
 
-Los motores trocean el contenido en **chunks** (pasajes) y recuperan/citan a ese
-nivel. Tu trabajo: que cada chunk sea **autosuficiente y citable**.
+Algunos sistemas pueden recuperar pasajes, pero Google indica que no hace falta
+dividir una página en fragmentos para que sus funciones de IA la entiendan y que
+no existe una longitud ideal. Escribe para que una persona pueda encontrar,
+entender y verificar cada respuesta; trata la recuperación por pasajes como una
+consideración de diseño, no como requisito ni garantía de cita.
 
-- **Auto-contención:** cada sección debe entenderse *sin el resto de la página*.
-  No "como vimos arriba"; repite el sujeto. El chunk viaja solo.
+- **Contexto suficiente:** cada sección debe entenderse en su contexto. Repite
+  sujeto o condiciones cuando evite ambigüedad; no dupliques texto solo para
+  hacer que un supuesto chunk viaje solo.
 - **Un H2 = una idea/pregunta.** Encabezados descriptivos en forma de pregunta o
   afirmación clara (no "Introducción", sí "Cuánto cuesta X en Chile").
 - **Answer capsule:** respuesta directa y completa justo tras el H2, autocontenida.
-  **Lo que la sostiene es el MECANISMO, no una cifra:** el motor recupera **pasajes**, no páginas —
-  si la respuesta vive en un pasaje que se entiende solo, se puede citar.
+  Es una opción de escritura para responder pronto y con claridad; no una
+  condición confirmada para ser citado por todos los motores.
   ⚠️ El **72.4%** (Search Engine Land) es un **base rate SIN grupo de control**: mide qué porcentaje
   de las páginas **citadas** tiene el patrón, **no** qué porcentaje de las **no citadas** también lo
   tiene. **Describe el patrón; no prueba el lift.** Y SEL define la cápsula como **~20-25 palabras**,
@@ -98,22 +115,25 @@ nivel. Tu trabajo: que cada chunk sea **autosuficiente y citable**.
   Ahrefs midió que lo que más separa a una página **citada** de una **recuperada-y-no-citada** es la
   **relevancia semántica del TÍTULO** frente a la sub-pregunta (**0,656** vs **0,484**). En ese mismo
   estudio **la cápsula no aparece entre los predictores**. → **Escribe cada H2 como la pregunta
-  literal del fan-out.** Es lo que más pesa, y es gratis.
+  literal de una subpregunta.** Es una asociación observada en ese estudio, no
+  evidencia de que cada encabezado deba copiar literalmente consultas de Google.
 - **Densidad semántica:** define términos, da el dato concreto, evita relleno
   antes del valor. El motor extrae el pasaje útil; no lo entierres.
-- **Formatos que se citan más:** tablas, listas, definiciones, Q&A, datos con unidades.
+- **Formatos observados en corpus externos:** tablas, listas, definiciones, Q&A y datos con unidades.
   ⚠️ 🔴 **NO digas "tabla + lista → 2,3× más citas".** Ese número es una **razón de PREVALENCIA entre
   dos corpus**: el **30%** de las páginas que ChatGPT cita **contienen** una tabla, contra el **13%**
   de las que rankean en Google (Nectiv). **No es un lift por agregar una tabla**, y **la lista
   numerada no está en el hallazgo** — se la agregamos nosotros. Es el error del `+41%` con otro
-  número. El argumento honesto es el **mecanismo**: una fila tabulada **es** la respuesta, y se extrae
-  sin ambigüedad.
+  número. Una tabla puede presentar comparaciones con claridad, pero el estudio
+  no demuestra que agregarla aumente las citas.
 
-## CITABILIDAD — las tácticas GEO con evidencia
+## Citabilidad — evidencia externa, no reglas de plataforma
 
 Investigación peer-reviewed (Princeton + Georgia Tech + Allen Institute for AI +
 IIT Delhi, **GEO**, KDD 2024; 10k queries, 25 dominios, validado en Perplexity).
-**Lift de visibilidad por táctica:**
+El estudio mide resultados en su propio benchmark; sus efectos no son una
+predicción de citas o rendimiento para una plataforma actual. Conserva siempre
+motor, corpus, métrica y límites junto con cualquier cifra:
 
 > 🔴 **TRES ADVERTENCIAS QUE VAN SIEMPRE QUE SE CITE ESTE PAPER.** Omitirlas es sobre-declarar, y
 > es el error más caro del oficio:
@@ -131,19 +151,23 @@ IIT Delhi, **GEO**, KDD 2024; 10k queries, 25 dominios, validado en Perplexity).
 | **Cite Sources** (citar fuentes) | **+30%** | enlazar a fuentes autoritativas a lo largo del texto |
 | **Fluency Optimization** | **+28%** | redacción clara, autoritativa, bien estructurada |
 
-Las tres primeras dominan. Síntesis operativa: **datos + citas textuales +
-fuentes + redacción autoritativa**. (Keyword stuffing y trucos clásicos NO
-mueven la aguja en GEO; algunos la bajan.)
+Estas tácticas pueden orientar una revisión editorial, no una receta ni un
+compromiso de lift. Prioriza exactitud, fuentes y claridad por su valor para el
+lector. No prometas que cambian la selección algorítmica de un motor actual.
 
-**Otras señales de citabilidad (data 2026):**
-- **Frescura:** contenido actualizado <2 meses → ~**+28%** citas. La IA cita
-  contenido ~25.7% más fresco que la búsqueda clásica. → fecha visible + refresh.
-- **Original research / data propietaria** = el tipo de contenido de mayor
-  leverage en los 3 motores. Case studies y páginas de **pricing** superan a
-  guías top-of-funnel para tráfico IA referido.
-- **Menciones de marca off-site** correlacionan ~3× más que backlinks con
-  visibilidad IA (`05_OFFPAGE_AUTHORITY.md`).
-- **Schema/JSON-LD** como hechos legibles por máquina (`01` + `templates/`).
+**Observaciones externas que requieren lectura contextual:**
+- No uses el claim “actualizar en menos de dos meses produce ~28% más citas”;
+  la fuente no está localizada y fue retirado del inventario de cifras de
+  `SOURCES.md`. Los estudios de frescura citados allí observan corpus y
+  superficies concretos, con resultados que no justifican una regla universal.
+- Investigación original y datos propios pueden diferenciar contenido y aportar
+  valor verificable. No está demostrado aquí que superen a otros formatos en
+  todos los motores o que causen más referencias.
+- La correlación entre menciones y visibilidad medida por Ahrefs se limita al
+  corpus y superficie especificados en `SOURCES.md`; no la presentes como
+  causalidad ni como resultado multiplataforma.
+- Usa Schema/JSON-LD cuando describa correctamente contenido visible o habilite
+  una función documentada; Google no exige marcado especial para IA.
 
 ### Atribución equivocada: que el motor le dé tu concepto a otra marca
 
@@ -187,8 +211,8 @@ conversacional, más largo, más contexto). Disciplina nueva:
 2. Córrelos en cada motor y registra: ¿aparece la marca? ¿se cita el sitio?
    ¿qué fuentes gana el competidor? (esto ES la medición de Share of Voice →
    `07_MEASUREMENT.md`).
-3. Mapea los gaps a contenido (answer capsules para los prompts donde no
-   apareces).
+3. Mapea brechas a mejoras de contenido útiles; una respuesta directa puede ser
+   adecuada, pero no es un requisito universal de citación.
 - Herramientas que descubren prompts: Profound, Peec, Otterly (ver `07`). Sin
   herramienta: usa WebSearch + correr los prompts manualmente.
 - **En Efeonce:** los "prompt packs" del AI Visibility Grader (dominio `growth`,
@@ -219,29 +243,35 @@ real o el operador pide el archivo, usa `templates/llms-txt.md`, define su mante
 y distingue utilidad operativa de un impacto SEO no demostrado. No uses estadísticas de
 adopción/requests sin fuente, muestra y fecha verificadas.
 
-## Tácticas POR MOTOR (cada uno es un canal distinto)
+## Verificación POR PLATAFORMA
 
-| Motor | Qué fuentes favorece (2026) | Palancas específicas |
+No mantengas una tabla atemporal de “fuentes favoritas” o señales de ranking:
+las citas observadas en un corpus no demuestran preferencia algorítmica ni
+efecto causal. Antes de una recomendación específica, registra para cada
+plataforma su documentación oficial vigente, mecanismo de descubrimiento
+documentado, bots y controles disponibles, superficies cubiertas, medición
+nativa, fecha de consulta y lo que sigue sin conocerse.
+
+| Plataforma/superficie | Base de trabajo | Verificar antes de prescribir |
 |---|---|---|
-| **Google AI Overviews / AI Mode** | usa Googlebot + índice de Google; favorece contenido que ya rankea + fan-out | gana en orgánico clásico, cubre el fan-out, answer capsules, schema |
-| **ChatGPT Search** | **Wikipedia (47.9%)**, contenido estructurado; bot `OAI-SearchBot` | answer capsules (72.4% de citados), entidad fuerte, presencia en Wikipedia |
-| **Perplexity** | **Reddit (~46.7%)**, fuentes frescas y citables; `PerplexityBot` | frescura, citas/datos, presencia en Reddit/foros, estructura Q&A |
-| **Gemini** | ecosistema Google + Knowledge Graph | entidad/Knowledge Graph, orgánico Google, datos estructurados |
-| **Copilot (Bing)** | índice de Bing | no descuidar **Bing Webmaster Tools** + IndexNow |
+| **Google AI Overviews / AI Mode** | Google dice que sus experiencias generativas se apoyan en los sistemas de búsqueda y calidad, y describe ramificación de búsquedas. | Requisitos de elegibilidad, controles de inclusión, funciones vigentes y el informe de Search Console. No prescribir `llms.txt`, chunking ni schema especial de IA. |
+| **ChatGPT Search** | Tratar la búsqueda web y el conocimiento del modelo como superficies distintas. | Documentación de OpenAI sobre búsqueda, controles de rastreo y bots; confirmar qué superficie y evidencia se está midiendo. |
+| **Claude** | No asumir que una respuesta de Claude implica búsqueda web o acceso al sitio. | Documentación de Anthropic sobre búsqueda/conectores, acceso y controles del sitio para el producto usado. |
+| **Perplexity** | Tratar producto, crawler y respuesta como mecanismos propios; no inferirlos de Google. | Documentación de Perplexity sobre fuentes, bots, controles y citas; confirmar fecha y superficie. |
+| **Gemini / Copilot** | No asumir equivalencia con Google Search o Bing por compartir ecosistema. | Documentación de producto sobre recuperación, indexación, controles y herramientas de webmaster aplicables. |
 
-**Patrones transversales:**
-- **Reddit es la fuente #1 citada** across engines (~1 de cada 5 citas en
-  Perplexity). **YouTube superó a Reddit** como plataforma social más citada a
-  inicios de 2026. → presencia genuina en comunidades + video (`05`).
-- **El fundamento es común:** contenido estructurado + autoridad verificada +
-  publicación consistente + presencia de marca más allá de tu sitio. Lo
-  específico por motor es la *capa fina*; los fundamentos son el 80%.
+**Fundamentos editoriales transferibles:** contenido accesible, útil, fiable,
+claro, actualizado cuando el tema lo requiera y enlazado con contexto. Son
+prácticas para lectores y descubrimiento; no garantizan inclusión, cita o
+ranking en ningún motor. Separa siempre el hecho documentado, la observación de
+un estudio externo y la hipótesis de optimización.
 
 ## Errores AEO frecuentes
 - Tratar "AEO" como un canal único en vez de optimizar por motor.
 - Obsesionarse con `llms.txt` y descuidar estructura/frescura.
-- Contenido sin answer capsules (pierdes citabilidad medible).
-- No cubrir el espacio de fan-out (solo la keyword principal).
+- Tratar answer capsules, chunking, una longitud o formato como requisito
+  universal para obtener citas.
+- Tratar cifras de fan-out observadas en un motor como predicción para otros.
 - Generar a escala con IA sin datos propios (cero citas + riesgo penalización).
 - No medir Share of Voice IA (no sabes si funciona).
 - No medir **atribución** cuando otra marca publicó el mismo concepto: un SoV alto con
@@ -249,6 +279,7 @@ adopción/requests sin fuente, muestra y fecha verificadas.
 
 > **Cross-refs:** topical authority que alimenta el fan-out → `02_SEO_CONTENT.md`.
 > Entidad/Knowledge Graph → `03_EEAT_ENTITY.md`. Reddit/UGC/menciones → `05`.
-> Crawlers IA (acceso) → `01_SEO_TECHNICAL.md`. Medir SoV/citas/exactitud →
+> Crawlers IA (acceso) → `01_SEO_TECHNICAL.md`. Google AI report y límites por
+> plataforma → `07_MEASUREMENT.md` y `SOURCES.md`. Medir SoV/citas/exactitud →
 > `07_MEASUREMENT.md`. Plantillas → `templates/` (fan-out-matrix, llms-txt,
 > content brief AEO).

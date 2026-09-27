@@ -16,8 +16,8 @@
 - [ ] Contenido crítico en HTML inicial (no depende de JS client-side)
 - [ ] CWV de campo OK (CrUX): LCP ≤2.5s · INP ≤200ms · CLS ≤0.1
 - [ ] robots.txt no bloquea recursos críticos
-- [ ] robots.txt permite **retrieval** IA (`OAI-SearchBot` · `PerplexityBot` · `ClaudeBot` · `Claude-SearchBot` · `ChatGPT-User`) — bloquearlos es **crítico**
-- [ ] Bloqueo de **training** (`GPTBot` · `Google-Extended` · `CCBot` · `anthropic-ai` · `Applebot-Extended`) leído como **postura de derechos**, nunca reportado como defecto crítico
+- [ ] Revisar acceso por plataforma y finalidad: búsqueda/indexación (p. ej. `OAI-SearchBot`, `Claude-SearchBot`, `PerplexityBot`), entrenamiento/desarrollo (p. ej. `GPTBot`, `ClaudeBot`) y acceso iniciado por usuario (`ChatGPT-User`, `Claude-User`, `Perplexity-User`); interpretar con documentación vigente, sin severidad universal
+- [ ] `Google-Extended` tratado como control de uso para Gemini/Vertex AI, no como control de Google Search ni de AI Overviews
 - [ ] Acceso real verificado en el **borde**: el home no responde 403/429 al rastreador identificado teniendo robots.txt limpio (si lo hace, el arreglo es WAF/CDN — hallazgo aparte)
 - [ ] Canonicals correctos (sin cadenas, sin apuntar a noindex)
 - [ ] Sitemap XML limpio (solo 200 indexables) y enviado a GSC — **404 en `/sitemap.xml` NO es defecto si el índice está declarado en la directiva `Sitemap:` del robots.txt**
@@ -31,7 +31,7 @@
 ## B. Contenido (`02`)
 - [ ] Contenido alineado a la intención que premia la SERP
 - [ ] Topical authority: cluster completo, no páginas sueltas
-- [ ] Answer capsules (40–60 palabras) en páginas clave
+- [ ] Respuestas directas y suficientes cuando ayuden a resolver la necesidad del lector (sin longitud fija)
 - [ ] Tablas + listas donde aplica (citabilidad)
 - [ ] Sin canibalización (una intención = una URL)
 - [ ] Frescura: páginas dinero actualizadas <2–3 meses
@@ -46,9 +46,9 @@
 - [ ] (YMYL) revisión experta + transparencia + exactitud
 
 ## D. AEO / GEO (`04`)
-- [ ] Cobertura del Query Fan-Out mapeada (matriz)
-- [ ] Chunks autocontenidos (cada H2 se entiende solo)
-- [ ] Tácticas GEO: stats + citas + fuentes + fluidez
+- [ ] Preguntas relacionadas investigadas y brechas editoriales justificadas (matriz opcional)
+- [ ] Encabezados claros y contexto suficiente, sin fragmentar por una regla de citación
+- [ ] Datos y fuentes pertinentes, con exactitud y contexto; sin promesas de lift por formato
 - [ ] Presencia verificada por motor (ChatGPT/Perplexity/AIO/Gemini)
 - [ ] Frescura visible (dateModified honesto)
 - [ ] (Opcional, ROI marginal) llms.txt presente y sincronizado

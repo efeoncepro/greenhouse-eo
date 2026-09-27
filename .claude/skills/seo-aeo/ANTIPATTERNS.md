@@ -152,9 +152,12 @@ reseñas, filtrado de usuarios y keyword stuffing.
   la metodología desde la fecha también es incorrecto: los defaults y los históricos pueden cambiar.
 - **Prometer rankings/timelines garantizados** — el SEO/AEO no se garantiza;
   quien lo promete miente. Comunica rangos y probabilidades.
-- **Ignorar el costo de bloquear bots IA** — bloquear retrieval bots = salir de
-  esas respuestas; data 2026: bloquear → −23.1% tráfico sin reducir citas de
-  forma fiable. Decisión consciente, no default (`01_SEO_TECHNICAL.md`).
+- **Tratar el bloqueo de bots como una señal universal** — evalúa el efecto por
+  plataforma y finalidad usando documentación vigente. Bloquear un bot de
+  búsqueda puede afectar la inclusión en la superficie documentada por ese
+  proveedor; no presupongas el efecto en todos los asistentes. Training,
+  búsqueda y acceso iniciado por usuario son hallazgos distintos
+  (`01_SEO_TECHNICAL.md`).
 - **Auditar ignorando robots.txt o suplantando crawlers de terceros** — el
   tooling propio de auditoría obedece el `robots.txt` del sujeto matcheando su
   propio token (en Greenhouse: `GreenhouseAEOGrader`, fallback `*`) y jamás se

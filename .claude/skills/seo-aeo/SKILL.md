@@ -5,8 +5,8 @@ description: >-
   auditar, priorizar y ejecutar búsqueda orgánica y visibilidad en motores de
   respuesta IA. Cubre SEO técnico (crawl/index, Core Web Vitals, JSON-LD y
   crawlers IA), contenido y topical authority, E-E-A-T y entidades, Query
-  Fan-Out, chunking y citabilidad, AI Overviews/AI Mode, ChatGPT, Perplexity,
-  Gemini y Copilot, off-page/digital PR, local e internacional, YMYL,
+  Fan-Out, estructura editorial y citabilidad, AI Overviews/AI Mode, ChatGPT,
+  Claude, Perplexity, Gemini y Copilot, off-page/digital PR, local e internacional, YMYL,
   GSC/GA4/BigQuery, Share of Voice, exactitud y playbooks de auditoría, migración
   y recovery, Google Search Console API/Platform Properties, con overlay Efeonce
   WordPress/Kinsta. Úsala también para blogposts,
@@ -92,11 +92,12 @@ resultado es advisory y la decisión permanece humana.
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Tesis 2026:** el 90% del trabajo técnico/contenido sirve a las tres capas a la
-vez. AEO **no reemplaza** SEO: lo *extiende*. Quien tiene fundamentos sólidos
-(Capa 1) parte ganando en las tres. Lo verdaderamente nuevo de AEO es: cómo se
-**recupera** (RAG/embeddings + Query Fan-Out), cómo se **estructura** para ser
-citable (chunking, answer capsules) y cómo se **mide** (Share of Voice en LLMs).
+**Tesis operativa:** gran parte del trabajo técnico y editorial beneficia a más
+de una superficie, pero no hay un pipeline ni conjunto de señales universal
+para Google, ChatGPT, Claude y Perplexity. AEO **no reemplaza** SEO: amplía el
+trabajo de descubrimiento y presencia. Recuperación, crawlers, citas y medición
+se verifican por plataforma; `04_AEO_GEO.md` separa evidencia primaria,
+estudios externos e hipótesis de trabajo.
 
 **Las tiendas de apps repiten las tres capas (delta 2026-09-10).** Fundamentos compartidos
 (la misma entidad en la web, la ficha y las reseñas) · ASO clásico (rankear en la búsqueda de
@@ -149,7 +150,7 @@ decláralo. Ramifica la recomendación según las respuestas.
 | **Pieza-hito anual** (color del año, informe, ranking, premio): cadencia propia + de mercado, ventana de publicación y **claim perecedero** con tarea de retiro; **canibalización interna** (leyendo contenido, no slugs), **estacionalidad vinculante** y **pre-emptor de tesis** antes de fijar el ángulo | `modules/02_SEO_CONTENT.md` (+ `modules/04_AEO_GEO.md` si otra marca publicó el mismo concepto: **atribución equivocada**) |
 | **Entidad de marca que se repite cada año** (color del año, informe anual, ranking, premio, índice): no es pieza de calendario, es un **clúster que compone** — kit de cadencia relativa al anuncio + bidireccionalidad año N ↔ N−1 | `modules/03_EEAT_ENTITY.md` ⭐ (+ `modules/05_OFFPAGE_AUTHORITY.md` para medir si el encadenamiento existe de verdad) |
 | **El canal lo opera un tercero** (otra agencia / el equipo del cliente): medición no nativa, objetivo de *cobertura de insumo entregado* y paquete de handoff | `modules/07_MEASUREMENT.md` + `../content-marketing-studio/modules/05_DISTRIBUTION_AMPLIFICATION.md` |
-| **Ser citado por IA**: fan-out, chunking, citabilidad, prompt research, llms.txt, por-motor | `modules/04_AEO_GEO.md` ⭐ |
+| **Ser citado por IA**: recuperación por plataforma, consultas relacionadas, citabilidad, prompt research, llms.txt | `modules/04_AEO_GEO.md` ⭐ |
 | Backlinks, digital PR, brand SERP, menciones, **Reddit/UGC**, y **capilaridad del grafo interno** (medir sólo enlaces editoriales: descartar lo que aparece en >50% de las páginas) | `modules/05_OFFPAGE_AUTHORITY.md` |
 | Google Business Profile / local pack, multirregión, hreflang, localización | `modules/06_LOCAL_INTERNATIONAL.md` |
 | Medir resultados: GSC/GA4/BigQuery + **Share of Voice IA** + tráfico IA + exactitud | `modules/07_MEASUREMENT.md` |
@@ -222,7 +223,8 @@ Effort     = persona-semanas (dev + contenido + PR)
 
 **Atajos de impacto típicos (orientativos, validar por caso):**
 - **Alto impacto / bajo esfuerzo (hacer ya):** corregir indexación rota, title/H1
-  por intención, `answer capsules` 40–60 palabras bajo H2, JSON-LD faltante,
+  por intención, respuestas directas y encabezados descriptivos cuando ayuden al
+  lector, JSON-LD faltante cuando corresponda,
   arreglar INP/LCP regresivos, internal linking a páginas dinero.
 - **Alto impacto / alto esfuerzo (planificar):** topical authority (cluster
   completo), construcción de entidad/Knowledge Graph, digital PR sostenido,
@@ -332,16 +334,18 @@ una estimación como medición.
 1. **Entidad > keyword.** En 2026 los motores (clásicos e IA) razonan por
    entidades. Construir la entidad de marca (`03_EEAT_ENTITY.md`) es el
    multiplicador de fondo de todo lo demás.
-2. **Estructura para recuperación.** El contenido se cita por *pasajes*, no por
-   páginas. Answer-first, autocontenido, con datos y fuentes (`04_AEO_GEO.md`).
+2. **Claridad editorial.** Encabezados descriptivos, respuestas directas y
+   contexto suficiente ayudan a las personas. Los mecanismos de recuperación y
+   las señales de cita se verifican por plataforma; no hay estructura universal
+   que garantice ser citado (`04_AEO_GEO.md`).
 3. **Las menciones de marca pesan ~3× más que los backlinks** para visibilidad
    IA (data 2026). Off-page moderno ≠ solo links (`05_OFFPAGE_AUTHORITY.md`).
 4. **La frescura es una señal que se prueba por motor, query set y vertical.** El contenido no se
    publica y se olvida; se mantiene, pero no uses el claim retirado «<2 meses → +28% citas»:
    `SOURCES.md` no pudo localizar una fuente reproducible para esa cifra.
-5. **Cada motor es un canal distinto.** Optimizar "para IA" en abstracto no
-   existe; optimizas para AI Overviews, o Perplexity, o ChatGPT — fuentes y
-   mecánicas difieren.
+5. **Cada plataforma y superficie tiene su evidencia.** No transfieras una
+   observación de Google a Perplexity, ChatGPT o Claude; declara qué motor y
+   modo verificaste, y separa documentación oficial de estudios externos.
 6. **Mide o no existió.** GSC/GA4 para clásico; Share of Voice + tráfico IA para
    AEO. Sin medición, no hay caso.
 7. **Una verdad, dos interfaces.** En Content Engineering, la experiencia humana y la representación computable

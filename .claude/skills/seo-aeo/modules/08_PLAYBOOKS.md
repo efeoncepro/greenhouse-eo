@@ -20,11 +20,12 @@ antes de interpretar el nuevo rastreo.
    objetivo, herramientas. Sin esto no hay auditoría útil.
 2. **Técnica** (`01`): indexación (GSC Pages) → render → CWV de campo → JSON-LD
    → robots/crawlers IA → internal linking → logs si es sitio grande.
-3. **Contenido** (`02`): cobertura de intención, topical authority, answer
-   capsules, decay, canibalización, calidad.
+3. **Contenido** (`02`): cobertura de intención, topical authority, respuestas
+   claras, decay, canibalización y calidad.
 4. **E-E-A-T / Entidad** (`03`): autoría, Knowledge Panel, Wikidata, `sameAs`,
    reputación; "¿qué sabe la IA de la marca?".
-5. **AEO** (`04`): mapa de fan-out, chunking/citabilidad, presencia por motor.
+5. **AEO** (`04`): necesidades relacionadas, prácticas editoriales y presencia
+   medida por plataforma/superficie; no asumas un pipeline común.
 6. **Off-page** (`05`): perfil de links (Semrush), menciones, Reddit/comunidades,
    brand SERP.
 7. **Local/Internacional** (`06`) si aplica: GBP, NAP, hreflang.
@@ -108,7 +109,8 @@ existen. Documenta el fix y su limitación residual.
 3. **Entidad desde el inicio** (`03`): schema `Organization`, `sameAs`, GBP si
    local, perfiles consistentes. Construir entidad temprano paga compuesto.
 4. **Contenido seed con topical authority** (`02`): pillar + cluster del tema
-   core, con answer capsules (`04`) desde el primer día.
+   core, con respuestas directas y encabezados claros cuando sirvan al lector
+   (`04`).
 5. **Off-page inicial** (`05`): digital PR de lanzamiento, menciones, presencia
    en comunidades.
 6. **Medición baseline** (`07`) y paciencia: sitios nuevos tienen "sandbox" de

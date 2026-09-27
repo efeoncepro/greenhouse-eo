@@ -12,6 +12,11 @@
 > despliegue global; el desglose visual se confirma en la propiedad, no se asume
 > disponible por igual para todas.
 
+> **Delta 2026-09-27 — informe de IA generativa de Google:** Search Console
+> documenta impresiones de AI Overviews y AI Mode. Es una medición de Google
+> Search; no representa ChatGPT, Claude ni Perplexity, y no equivale por sí sola
+> a citas correctas, clics, conversiones o revenue.
+
 ### Búsqueda web multimodal — nuevo corte de GSC (2026-09-24)
 
 Google añadió **Web: multimodal** a los informes de rendimiento de resultados
@@ -63,6 +68,35 @@ ni que cada propiedad de plataforma exponga ya ese filtro.
 según haya empezado con una imagen. Es observabilidad adicional para priorizar
 QA de imágenes y comparar tendencias; no es una señal de ranking, una medida de
 “calidad de indexación de imágenes”, ni evidencia causal de lift.
+
+### Rendimiento de IA generativa en Google Search Console (2026-09-27)
+
+Google documenta un informe de rendimiento para impresiones orgánicas en sus
+funciones generativas de Búsqueda, inicialmente AI Overviews y AI Mode. La ayuda
+indica dimensiones por página, país, fecha y dispositivo, con agregación y
+límites propios del informe. La disponibilidad puede depender del rollout y de
+que la propiedad acumule impresiones suficientes.
+
+**Lectura operativa**
+
+1. Confirma que el informe esté disponible para la propiedad y guarda propiedad,
+   rango de fechas, zona horaria, filtros, dimensión y fecha de lectura.
+2. Compara periodos equivalentes y usa las vistas por página, país y dispositivo
+   cuando estén disponibles. Conserva exportación y contexto de agregación.
+3. Interpreta la métrica como impresiones reportadas de enlaces en esas
+   superficies. No la llames “citas”, no infieras la respuesta completa ni
+   atribuyas clics, conversiones o revenue sin evidencia independiente.
+4. Los totales del gráfico y de la tabla pueden diferir por agregación; los
+   datos recientes pueden ser preliminares y la tabla puede estar limitada.
+   La ausencia del informe o de una fila no demuestra cero visibilidad.
+5. No extrapoles el dato a asistentes de terceros ni lo sumes a métricas de
+   proveedores de monitoreo de prompts como si compartieran definición,
+   cobertura o denominador.
+
+**Fuente primaria y alcance:** [Ayuda de Search Console — informe de
+rendimiento de IA generativa](https://support.google.com/webmasters/answer/16984139?hl=es).
+Reverifica superficies incluidas, despliegue, dimensiones y definiciones antes
+de cada implementación o informe; son detalles volátiles.
 
 ## PARTE A — Medición SEO clásica
 

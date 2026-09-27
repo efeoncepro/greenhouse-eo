@@ -66,13 +66,14 @@
 ## Cómo aplicar el núcleo a Efeonce (mapeo)
 1. **Técnico (`01`)** — ejecutar vía la skill WordPress: indexación, CWV en
    Kinsta (caché/CDN), JSON-LD (Organization de Efeonce + Article + Person de los
-   autores), robots permitiendo retrieval bots IA.
+   autores), y acceso a crawlers evaluado por finalidad/proveedor según la
+   superficie objetivo. No clasifiques todos los bots como retrieval.
 2. **Entidad (`03`)** — construir la entidad **Efeonce** (no Greenhouse):
    Organization schema + `sameAs` (LinkedIn, redes, prensa), descripción canónica
    alineada al context pack `09_marca-agencia.md`. Verificar qué saben ChatGPT/
    Perplexity/Gemini de "Efeonce" hoy y corregir vía fuentes.
-3. **Contenido + AEO (`02`,`04`)** — clusters por servicio/industria con answer
-   capsules; el AI Content Factory produce el draft, pero con data propia y
+3. **Contenido + AEO (`02`,`04`)** — clusters por servicio/industria que resuelvan
+   necesidades reales; respuestas directas cuando ayuden al lector. El AI Content Factory produce el draft, pero con data propia y
    revisión experta. Copy SIEMPRE validado con `greenhouse-ux-writing` (es-CL
    tuteo, sin voseo) y el context pack `05_voz-tono-estilo.md`.
 4. **Off-page (`05`)** — digital PR con data propia de la agencia (casos,

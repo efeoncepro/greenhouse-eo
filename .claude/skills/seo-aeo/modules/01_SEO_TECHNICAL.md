@@ -85,8 +85,8 @@ el proceso de comparación y las limitaciones de API están en
   side.
 - **Patrón recomendado 2026:** SSR o SSG/ISR para contenido indexable
   (Next.js App Router encaja perfecto). CSR puro = riesgo de contenido invisible
-  o tardío para indexar, y **peor aún para crawlers IA** (muchos bots de
-  retrieval **no ejecutan JS** o lo hacen pobremente).
+  o tardío para indexar. El soporte de JavaScript varía entre crawlers y
+  productos; no asumas que un bot de búsqueda ejecuta JS como Googlebot.
 - **Verificación:** URL Inspection en GSC ("ver página rastreada" / HTML
   renderizado), o `WebFetch` para ver qué HTML llega sin JS. Si el contenido no
   está en el HTML inicial, los bots IA probablemente no lo ven.
@@ -244,43 +244,55 @@ alto impacto/bajo esfuerzo y va primero. Una entidad residual aislada en un
 campo no elegible de una página de bajo valor no debe presentarse como incidente
 de ranking.
 
-## 6. Gestión de crawlers de IA (robots para bots LLM) — as-of 2026-06
+## 6. Crawlers y controles por plataforma — as-of 2026-09-27
 
-Decisión **estratégica**, no solo técnica. Hay dos familias de bots:
+Decisión **estratégica**, no solo técnica. Distingue al menos estas finalidades;
+un proveedor puede usar varios bots con controles independientes:
 
 | Familia | Qué hacen | Ejemplos | Si los bloqueas… |
 |---|---|---|---|
-| **Training** | Recolectan contenido para *entrenar* el modelo | `GPTBot` (OpenAI), `ClaudeBot` (Anthropic), `Google-Extended`, `CCBot` (Common Crawl), `Meta-ExternalAgent` | reduces aparición en *conocimiento entrenado* futuro; no quita citas en retrieval |
-| **Retrieval / user** | Fetch en *tiempo real* para responder una consulta | `OAI-SearchBot` + `ChatGPT-User` (ChatGPT Search), `PerplexityBot`, `Google` (AI Overviews usa Googlebot) | **te sacan de esa respuesta IA** — es el costo caro |
+| **Training/model development** | Recopilan contenido que podría contribuir al desarrollo o entrenamiento de modelos | `GPTBot` (OpenAI), `ClaudeBot` (Anthropic), `CCBot` (Common Crawl), `Meta-ExternalAgent` | Controla una finalidad descrita por el proveedor; no deduzcas el efecto en búsqueda web desde ese bot |
+| **Search/indexing de producto** | Rastreo declarado por un proveedor para búsqueda o indexación de sus productos | `OAI-SearchBot` (ChatGPT Search), `Claude-SearchBot` (búsqueda de Claude según Anthropic), `PerplexityBot` | Consulta la documentación vigente de cada proveedor para conocer elegibilidad y efecto del bloqueo; no es una regla compartida entre motores |
+| **Acceso iniciado por usuario** | Solicitud puntual relacionada con una acción o petición de usuario | `ChatGPT-User`, `Claude-User`, `Perplexity-User` | No lo agrupes automáticamente con rastreo/indexación de búsqueda; aplican controles y semánticas propias del proveedor |
 
-- **Estrategia que la mayoría recomienda en 2026:** *permitir retrieval, decidir
-  training según postura de licenciamiento*. Bloquear `OAI-SearchBot`/
-  `PerplexityBot`/Googlebot = desaparecer de esos answer engines.
-- **Dato clave (Rutgers/Wharton, dic-2025):** publishers que bloquearon
-  crawlers IA tuvieron **−23.1% de tráfico total** *sin* reducir de forma fiable
-  las citas. Conclusión: bloquear suele ser net-negativo salvo postura editorial
-  o legal explícita.
-- **AI Overviews / AI Mode** usan **Googlebot**: si quieres estar en orgánico de
-  Google, ya estás disponible para sus features IA (no hay opt-out granular del
-  AI Overview manteniendo orgánico, salvo `nosnippet`/`max-snippet`, que también
-  te quita el snippet clásico — trade-off duro).
+**Excepción de Google:** `Google-Extended` es un token de control de uso para
+Gemini Apps y Vertex AI; no es un crawler distinto ni afecta la inclusión en
+Google Search. AI Overviews y AI Mode dependen del acceso de Googlebot y de la
+elegibilidad normal de Search. No bloquees `Google-Extended` esperando controlar
+AI Overviews.
+
+- **Decisión por finalidad y proveedor:** permite o limita cada bot según la
+  política del sitio y la documentación vigente. No uses un único switch
+  “retrieval” para todos los asistentes ni afirmes que bloquear un bot elimina
+  toda posible referencia o enlace al sitio.
+- **Evidencia externa (Rutgers/Wharton, dic-2025):** el estudio reportó cambios
+  de tráfico y citas en su muestra tras bloquear crawlers. No conviertas su
+  resultado en un efecto causal universal ni extrapoles a bots, periodos o
+  superficies distintos; documenta método y alcance desde `SOURCES.md`.
+- **AI Overviews / AI Mode** requieren páginas indexadas y aptas para mostrarse
+  con fragmento en Google Search. Google indica además que el sitio debe estar
+  incluido en las funciones generativas de Search Console. No uses
+  `Google-Extended` para controlar esta inclusión. Los controles de fragmento
+  como `nosnippet` y `max-snippet` afectan la presentación en Search; revisa su
+  efecto y elegibilidad vigente antes de recomendarlos.
 - 🔴 **Un `robots.txt` limpio NO prueba acceso.** La forma más común del bloqueo vive en el
   **borde/CDN/WAF**: 403/429 al rastreador con el archivo impecable — 2 de cada 3 casos con
   problema en una muestra propia de 12 dominios LatAm/CL (2026-08-15). Verifica el status real
   del fetch, no sólo el archivo, y nunca suplantando el token de un bot ajeno (§8 d.2–d.3).
 - `llms.txt` **no** es robots.txt y Google no lo usa (ver `04_AEO_GEO.md`).
 
-**Snippet robots.txt (permitir retrieval, ejemplo conservador):**
+**Ejemplo `robots.txt`** (valida la política y controles de cada proveedor;
+no lo copies como default):
 ```
-# Retrieval / answer engines — permitir (queremos ser citados)
+# Crawlers de búsqueda/indexación de producto
 User-agent: OAI-SearchBot
-Allow: /
-User-agent: ChatGPT-User
 Allow: /
 User-agent: PerplexityBot
 Allow: /
+User-agent: Claude-SearchBot
+Allow: /
 
-# Training — decidir por política de marca (ejemplo: permitir)
+# Desarrollo/model use — decidir por política de marca (ejemplo: permitir)
 User-agent: GPTBot
 Allow: /
 User-agent: ClaudeBot
@@ -346,14 +358,14 @@ puntuar 95/100 y estar bloqueando a todos los answer engines. Ningún crawler co
 evalúa: hay que evaluarlo aparte, y hacerlo mal produce diagnósticos falsos en las dos
 direcciones. Las reglas del oficio:
 
-**d.1 — Retrieval y training son dos hallazgos distintos, nunca uno.** Bloquear el rastreo que
-te **cita** (`OAI-SearchBot`, `PerplexityBot`, `ClaudeBot`, `Claude-SearchBot`, `ChatGPT-User`)
-te saca de la respuesta: es **crítico**. Bloquear el que **entrena** (`GPTBot`,
-`Google-Extended`, `CCBot`, `anthropic-ai`, `Applebot-Extended`) es una **postura de derechos
-legítima y frecuente**, no un defecto técnico, y **jamás** se pinta crítico — como mucho un
-aviso con lectura de postura. Un evaluador que los mete en la misma bolsa con score
-proporcional saca en rojo a un sitio con el retrieval completamente abierto, y eso entrena al
-cliente a ignorar la severidad más alta del informe. Un bot que no cae limpio en una familia
+**d.1 — Clasifica la finalidad según el proveedor, no por una taxonomía universal.** Bloquear
+`OAI-SearchBot`, `Claude-SearchBot` o `PerplexityBot` puede afectar su descubrimiento en las
+superficies de búsqueda que cada proveedor documenta. `GPTBot` y `ClaudeBot` están asociados a
+desarrollo/entrenamiento; `Google-Extended` controla usos de Gemini fuera de Search. Los agentes
+de acceso iniciado por usuario (`ChatGPT-User`, `Claude-User`, `Perplexity-User`) tienen reglas
+distintas y no deben convertirse automáticamente en controles de indexación. No marques el
+bloqueo como crítico sin precisar producto, finalidad y efecto documentados. Un bot que no cae
+limpio en una familia
 (`Bytespider`, `Amazonbot`) se clasifica a mano y el default **nunca** es crítico: su bloqueo
 es práctica común y emitirlo como issue es ruido que erosiona la lista priorizada.
 
@@ -400,16 +412,14 @@ Lighthouse** —es laboratorio, igual que lo que el crawler ya da, y la señal d
 GSC/CrUX (punto **(a)**)— y **`llms.txt`**, de ROI marginal y que Google no usa
 (`04_AEO_GEO.md`).
 
-> **Estado en Greenhouse (as-of 2026-09-01).** El site audit de `/admin/growth/seo/audit` ya
-> tiene su **propia capa de hallazgos de SITIO** con estas reglas (`TASK-1670`): acceso de
-> crawlers IA cortado por familia (`ai_retrieval_crawlers_blocked` crítico ·
-> `ai_training_crawlers_blocked` aviso), bloqueo de borde con tipo propio
-> (`ai_crawler_edge_access_denied`), JSON-LD ausente, salud de sitemap con la regla d.4, y
-> `site_check_unverified` para lo que no se pudo medir. Se evalúa con fetches propios, **cero
-> gasto de proveedor**. 🔴 Su flag `GROWTH_SEO_SITE_FINDINGS_ENABLED` está **OFF** (runtime
-> ops-worker) hasta que `TASK-1671` despliegue la superficie: **hasta ese flip el punto ciego
-> sigue abierto** y el audit todavía declara sano un sitio invisible para los motores de IA. Al
-> auditar hoy, estas verificaciones se hacen a mano.
+> **Compatibilidad del AI Visibility Grader:** como se verificó en el código el
+> 2026-09-27, `site-findings.ts` aún agrupa bots en dos familias y asigna
+> severidad crítica a `ai_retrieval_crawlers_blocked`; además clasifica
+> `ClaudeBot` como retrieval y `Google-Extended` como training. Esto no coincide
+> con la documentación actual de Anthropic y Google. No interpretes esa salida
+> como exclusión universal de citas ni como control de AI Overviews. Antes de
+> usarla en un informe, verifica el estado live del flag y declara esta
+> limitación; la corrección del contrato/código requiere trabajo separado.
 
 Corolario: la checklist §A de `templates/audit-checklists.md` **no se puede tildar desde el
 reporte del crawler**. Varias de sus filas exigen verificación aparte.
@@ -428,7 +438,8 @@ borde, JSON-LD ausente ni la regla `Sitemap:`.
 2. ¿Contenido crítico requiere JS? → SSR/SSG.
 3. ¿CWV en rojo en campo (CrUX)? → INP y LCP primero.
 4. ¿El grafo existente representa la página y sus entidades? → corregir o completar sólo tipos pertinentes, sin duplicar dueño.
-5. ¿robots permite retrieval IA? → revisar.
+5. ¿Qué bots controla robots/WAF para cada plataforma y finalidad? → contrastar
+   con la documentación vigente y la política de derechos del sitio.
 6. ¿Internal linking a páginas dinero? → reforzar.
 7. ¿Logs muestran desperdicio de rastreo? → solo si sitio grande.
 

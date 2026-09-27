@@ -60,35 +60,37 @@ cluster**:
    (cluster)    (cluster)    (cluster)        y enlaza de vuelta al pillar
 ```
 
-- **Information gain:** Google premia contenido que *agrega* algo nuevo al corpus
-  (dato propio, ángulo, experiencia), no que reescribe lo que ya existe. En 2026
-  esto es doblemente cierto para AEO: el contenido derivativo no se cita.
-- **Cobertura de sub-intenciones = cobertura del Query Fan-Out** (ver
-  `04_AEO_GEO.md`): el mismo trabajo de cluster que da topical authority es el
-  que te hace recuperable cuando la IA descompone una query en sub-queries.
+- **Aporte propio:** Google recomienda perspectivas y experiencia que añadan
+  valor frente a resúmenes de material ya disponible. Esto ayuda a diferenciar
+  el contenido para lectores; no garantiza citación por Google ni por otros
+  motores.
+- **Cobertura de sub-intenciones** (ver `04_AEO_GEO.md`): mapear necesidades
+  relacionadas ayuda a decidir qué contenido merece existir y cómo organizarlo.
+  No equivale a cubrir un fan-out previsto ni garantiza recuperación en un
+  asistente; la expansión de consultas documentada por Google es específica de
+  sus experiencias generativas.
 
-## Anatomía de una página que rankea Y se cita (2026)
+## Anatomía editorial de una página útil (2026)
 
-1. **Answer capsule arriba** — respuesta directa en 40–60 palabras bajo un H2 con
-   la pregunta.
-   ⚠️ El **72.4%** (Search Engine Land) es un **base rate sin grupo de control**: describe el
-   patrón de las páginas citadas, **no prueba el lift**. Lo que sostiene la cápsula es el
-   **mecanismo** (el motor recupera pasajes). Y la palanca con **mejor evidencia primaria** es
-   otra: la **relevancia semántica del TÍTULO** frente a la sub-pregunta (Ahrefs, 1,4M de
-   prompts: 0,656 en citadas vs 0,484 en no citadas). Escribe el H2 como la pregunta del fan-out.
+1. **Respuesta directa cuando ayude al lector** — ubícala cerca del encabezado
+   pertinente y aporta contexto suficiente. Google indica que no hay longitud
+   ideal ni que se deba fragmentar una página para sus funciones de IA. No hay
+   fórmula universal para obtener citas.
 2. **Estructura escaneable** — H2/H3 como preguntas, párrafos cortos, listas,
    **tablas**. 🔴 NO digas «2,3× más citas»: ese número es una razón de PREVALENCIA entre
    corpus (30% de las citadas por ChatGPT contienen una tabla vs 13% de las que rankean en
    Google — Nectiv), **no un lift por agregar una tabla**, y **la lista no está en el
-   hallazgo**. El argumento honesto es el mecanismo: una fila tabulada ES la respuesta.
-3. **Densidad de hechos** — estadística/dato cada ~150–200 palabras, con fuente.
-4. **Fuentes y citas** — enlaza a autoridades; las citas/quotes aumentan la
-   citabilidad IA (ver tácticas GEO en `04`).
+   hallazgo**. Usa tablas cuando aclaren comparaciones para el lector.
+3. **Hechos verificables** — usa datos pertinentes con fuente y contexto; no
+   impongas una frecuencia fija de estadísticas por cantidad de palabras.
+4. **Fuentes y enlaces** — enlaza recursos pertinentes con anclas descriptivas;
+   no prometas un aumento de citación por añadir enlaces o citas.
 5. **Profundidad real** — cubre la pregunta y sus derivadas, no relleno. La
    longitud no es factor; la *completitud* sí.
-6. **Autoría visible** — byline con credenciales (`03_EEAT_ENTITY.md`).
-7. **Frescura** — fecha de actualización honesta; contenido <2 meses gana ~28%
-   más citas IA.
+6. **Autoría visible** — muestra quién produjo o revisó el contenido cuando
+   ayude a los lectores a evaluar su fiabilidad (`03_EEAT_ENTITY.md`).
+7. **Frescura** — actualiza cuando cambien los hechos o cuando aporte valor;
+   conserva fechas honestas y no uses una cadencia fija como promesa de citas.
 
 ## Pre-producción de una pieza: hito anual, canibalización interna y pre-emptor de tesis
 
@@ -485,7 +487,8 @@ cola de días recientes **todavía se está consolidando** → `07_MEASUREMENT.m
 
 ## Errores frecuentes de contenido
 - Escribir para el keyword y no para la intención real de la SERP.
-- Publicar sin answer capsule (pierdes citabilidad gratis).
+- Forzar answer capsules, longitudes o estructuras fijas como requisito universal
+  de citabilidad.
 - "Más palabras = mejor": no. Completitud, no longitud.
 - No actualizar nunca (decay garantizado).
 - Generar a escala con IA sin valor incremental (riesgo de penalización + cero

@@ -23,6 +23,12 @@
 > multimodal` en Search Console; alcance visual, despliegue y límite de API
 > documentados en `modules/07_MEASUREMENT.md`.
 
+> **Delta 2026-09-27:** Google publicó su guía para las funciones de IA
+> generativa y documentó el informe de rendimiento correspondiente en Search
+> Console. Se actualizaron el alcance por plataforma, las recomendaciones
+> editoriales y los límites de medición en `modules/04_AEO_GEO.md` y
+> `modules/07_MEASUREMENT.md`.
+
 > **Delta 2026-09-24:** Google anunció el filtro de rendimiento `Web:
 > multimodal` en Search Console; alcance visual, despliegue y límite de API
 > documentados en `modules/07_MEASUREMENT.md`.
@@ -42,6 +48,13 @@ no exige schema especial de IA. Método aplicado a Home/landings:
 | 🟡 **Semi-estable** | cambia en ~1 año | umbrales CWV, tipos de schema con rich result, mecánica general de fan-out, qué bots IA existen | cada ~trimestre o antes de un entregable importante |
 | 🔴 **Volátil** | cambia en semanas/meses; cifras y features | cobertura % de AI Overviews, cuotas de citación por motor, líder de herramientas SoV, precios, qué features tiene AI Mode hoy, últimos Google updates | **siempre** antes de afirmarlo como hecho |
 
+**Regla multiplataforma:** una guía oficial describe solo los productos y
+superficies de su publicador. No extrapoles el comportamiento de Google a
+OpenAI, Anthropic o Perplexity. Para cada plataforma separa documentación
+primaria, evidencia externa observacional e hipótesis; registra superficie,
+fecha, muestra y límites. La prevalencia de una característica entre páginas
+citadas no demuestra que añadirla cause más citas.
+
 **Proveedor/metodología también es 🔴.** Fórmulas de tráfico estimado, flags, defaults, pricing, históricos y
 matrices se reverifican en documentación oficial o correspondencia primaria documentada del proveedor. Caso
 vigente: DataForSEO ETV improved, contrato respondido el 2026-09-02 y corte
@@ -55,6 +68,13 @@ proveedor— y fecha. Nunca cites una cifra 🔴 de memoria en un entregable.
 **Oficiales / primarias (máxima confianza):**
 - Google Search Central (`developers.google.com/search`) — docs + "AI features"
   + "AI optimization guide" + Core Web Vitals.
+- [Google Search Central — guía de optimización para funciones de IA generativa
+  (actualizada 2026-07-15)](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide?hl=es)
+  — prácticas de Google Search, requisitos técnicos, tácticas que Google dice
+  que no necesita y orientación sobre medición y agentes. No extrapolar a otros
+  motores.
+- [Search Console Help — informe de rendimiento de IA generativa](https://support.google.com/webmasters/answer/16984139?hl=es)
+  — alcance, dimensiones, agregación y disponibilidad del informe de Google.
 - [Anuncio oficial del parser JSON-LD, 2026-08-21](https://www.linkedin.com/feed/update/urn:li:activity:7496492350907596801/)
   — una sola pasada de HTML unescaping; no clasificarlo como ranking update.
 - [RFC 8259 §7](https://www.rfc-editor.org/rfc/rfc8259.html#section-7) y
@@ -63,6 +83,20 @@ proveedor— y fecha. Nunca cites una cifra 🔴 de memoria en un entregable.
 - Search Console Help + API (`support.google.com/webmasters` y
   `developers.google.com/webmaster-tools`) — propiedades, Search Analytics, URL
   Inspection y sitemaps. Platform Properties y su paridad API son 🔴 volátiles.
+- [OpenAI — Overview of OpenAI Crawlers](https://developers.openai.com/api/docs/bots)
+  y [ChatGPT Search](https://help.openai.com/en/articles/9237897-chatgpt-search) —
+  finalidades documentadas de OAI-SearchBot, GPTBot y ChatGPT-User; verificar la
+  versión vigente antes de recomendar controles.
+- [Anthropic — crawler access controls](https://support.anthropic.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler)
+  — ClaudeBot, Claude-SearchBot y Claude-User; distinguir entrenamiento,
+  búsqueda y solicitudes iniciadas por usuarios.
+- [Perplexity — Crawlers](https://docs.perplexity.ai/docs/resources/perplexity-crawlers)
+  — PerplexityBot y Perplexity-User, finalidad declarada y controles WAF/
+  `robots.txt`.
+- [Google — AI features and your website](https://developers.google.com/search/docs/appearance/ai-features)
+  y [Google-Extended](https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers)
+  — elegibilidad/controles de Search frente a controles para Gemini y otros
+  productos de Google.
 - [Google Search Central — Web multimodal Search performance reporting (2026-09-24)](https://developers.google.com/search/blog/2026/09/web-multimodal-in-sc) — alcance del filtro y despliegue.
 - [Search Console Help — Generative AI performance report](https://support.google.com/webmasters/answer/16984139) — `Web: text-based` / `Web: multimodal` y lectura del informe.
 - [Search Console Help — Platform properties](https://support.google.com/webmasters/answer/34592) — medición en Google Search de cuentas/canales compatibles; función separada del filtro multimodal.
@@ -89,8 +123,9 @@ proveedor— y fecha. Nunca cites una cifra 🔴 de memoria en un entregable.
 
 ## 3. Protocolo de refresh de la skill
 1. Antes de cualquier entregable, reverifica los datos 🔴 que vayas a usar.
-2. Cada ~trimestre (o cuando haya un Google update grande): revisar módulos
-   `01` (CWV/bots), `04` (motores/fan-out/llms.txt) y `07` (herramientas SoV).
+2. Cada ~trimestre (o cuando haya cambios relevantes de una plataforma): revisar
+   módulos `01` (CWV/bots), `04` (motores/recuperación/llms.txt) y `07`
+   (herramientas SoV y medición nativa).
 3. Al detectar un cambio material, actualiza el módulo + el sello `as-of` + esta
    lista de datos clave. Registra qué cambió.
 4. Mantén el GLOSSARY al día cuando aparezcan/mueran términos (p.ej. SGE → AIO).
@@ -109,8 +144,11 @@ proveedor— y fecha. Nunca cites una cifra 🔴 de memoria en un entregable.
   (SparkToro/Datos 2026).
 - **CTR con AIO:** Pew Research (68k queries) → **−46.7%** relativo en clicks
   cuando aparece AIO. Marcas **citadas** en AIO: **+35%** clicks orgánicos.
-- **Query Fan-Out:** **8–12** sub-queries típicas; ~**59%** de prompts disparan
-  5–11; "Scatter-Gather with Planning" (Google).
+- **Ramificación de consultas en Google:** la guía oficial confirma consultas
+  relacionadas en AI Overviews/AI Mode. No publica un rango universal. Los
+  rangos **8–12** y la proporción **~59%** son datos de estudios externos;
+  conserva su método y corpus al citarlos, no los atribuyas a Google ni a otros
+  asistentes.
 - **GEO tácticas (KDD 2024):** quotations **+41%**, statistics **+32%**, cite
   sources **+30%**, fluency **+28%**.
   ⚠️ **TRES ADVERTENCIAS QUE HAY QUE DECIR SIEMPRE que se cite este paper** (se pagó caro no
@@ -146,25 +184,30 @@ proveedor— y fecha. Nunca cites una cifra 🔴 de memoria en un entregable.
     (**Ahrefs**, 75.000 marcas: menciones sin enlace **0,664** vs backlinks **0,218**).
     ✅ Bien atribuido — y **los propios autores advierten que es correlación, no causalidad**.
     Matiz: Ahrefs midió sobre **AI Overviews de Google**, no "citas en IA" en general.
-- **🟢 LA EVIDENCIA PRIMARIA MÁS FUERTE que existe hoy, y que casi nadie cita** (Ahrefs, **1,4
+- **Estudio observacional de terceros** (Ahrefs, **1,4
   millones de prompts de ChatGPT**): lo que más separa a una página **citada** de una
   **recuperada-y-no-citada** es la **relevancia semántica del TÍTULO** frente a la sub-pregunta
   (**0,656** vs **0,484**) y la claridad del slug (**89,8%** vs **81,1%**).
   ⚠️ Y en ese mismo estudio **la cápsula de respuesta NO aparece entre los predictores**.
-  → **Consecuencia operativa:** escribir cada H2 como **la pregunta literal del fan-out** es la
-  palanca con mejor evidencia. La cápsula se sostiene por **mecanismo** (el motor recupera
-  pasajes), no por una cifra.
-- **Solapamiento de fuentes:** solo **~11%** de dominios citados coinciden entre
-  ChatGPT y Perplexity (680M citas).
-- **Preferencias de cita:** ChatGPT ↦ Wikipedia (**47.9%**); Perplexity ↦ Reddit
-  (**~46.7%**); Reddit #1 across engines; **YouTube superó a Reddit** como social
-  más citada (inicios 2026).
+  → **Uso permitido:** puede orientar hipótesis editoriales sobre títulos en el
+  alcance de esa muestra. No demuestra causalidad, no convierte los H2 en una
+  señal confirmada de Google y no justifica copiar literalmente cada fan-out.
+  La respuesta directa es una opción de claridad editorial, no un requisito de
+  cita conocido.
+- **Solapamiento/prevalencia de fuentes:** cifras como **~11%** de solapamiento
+  entre ChatGPT y Perplexity, o tasas de menciones a Wikipedia/Reddit, son
+  observaciones de corpus externos, no políticas publicadas por las plataformas
+  ni preferencias estables. No las uses como playbook sin verificar estudio,
+  periodo, producto, muestra y definición.
 - **llms.txt (actualizado 2026-08-30):** no requerido ni señal de ranking en Google,
   según su aclaración del 15 de junio enlazada arriba. No extrapolar a otros sistemas
   ni reutilizar cifras de adopción/requests sin verificar fuente y muestra.
-- **AI crawlers:** training (GPTBot/ClaudeBot/Google-Extended/CCBot) vs retrieval
-  (OAI-SearchBot/ChatGPT-User/PerplexityBot); bloquear bots IA → **−23.1%**
-  tráfico sin reducir citas de forma fiable (Rutgers/Wharton, dic-2025).
+- **Crawlers:** verifica en documentación de cada proveedor la finalidad del
+  bot y el producto afectado. OpenAI distingue OAI-SearchBot (Search), GPTBot
+  (posible entrenamiento) y ChatGPT-User (acciones iniciadas por usuarios);
+  Anthropic distingue ClaudeBot, Claude-SearchBot y Claude-User; Perplexity
+  distingue PerplexityBot y Perplexity-User. `Google-Extended` controla ciertos
+  usos de Gemini, no Search. No asignes una finalidad universal por nombre.
 - **Core Web Vitals:** LCP ≤2.5s (posible afinamiento a 2.0 — verificar) · INP
   ≤200ms · CLS ≤0.1; update 2026 equiparó pesos; **55.9%** orígenes pasan los 3
   (CrUX may-2026).
