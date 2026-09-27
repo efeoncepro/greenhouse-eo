@@ -65,7 +65,7 @@ Decisiones que cambian esta norma (detalle en §4.6, «Recetas por lámina»):
 palabra por toma, la sección partida por la izquierda con sus tres composiciones, las composiciones `hero` y `lines` de
 `proposal-cinematic` y las portadas y contraportadas aprobadas (§2.1 y §4.6). **Qué falta:** las plantillas de las
 recetas restantes del deck
-([TASK-1928](../../tasks/to-do/TASK-1928-graphic-line-deck-remaining-recipe-templates.md)) y las fotos idempotentes
+([TASK-1928](../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md)) y las fotos idempotentes
 ([TASK-1926](../../tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md)). Donde una lámina aprobada
 todavía no tiene plantilla, manda esta norma y su receta del catálogo.
 
@@ -226,7 +226,7 @@ y `deck-proposal-document.json` (siete páginas interiores), en `src/lib/brand-s
   `recipe-not-approved`. Una receta entra al catálogo sólo cuando el operador la aprueba.
 - **Las recetas restantes del deck.** Las láminas aprobadas el 2026-09-27 que no están en la tabla de arriba (§4.6,
   «Recetas por lámina») todavía no tienen plantilla: son
-  [TASK-1928](../../tasks/to-do/TASK-1928-graphic-line-deck-remaining-recipe-templates.md).
+  [TASK-1928](../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md).
 - **El marco clásico** (`cover-classic`, `close-classic`): el operador no lo aprobó y no entra al catálogo; en AXIS
   nombra su reemplazo (`supersededBy`). Tampoco entra `cover-brochure-cine-lines-selection`: el contrato no admite
   selección en esa portada (§4.6).
@@ -912,7 +912,7 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
   la **aprobación visual** de las láminas compuestas ese día (las composiciones `hero` y `lines` y el brochure de nueve
   páginas). El estado de los gates se lee en la
   [task](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md). Con el cierre quedaron
-  desbloqueadas [TASK-1928](../../tasks/to-do/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) y
+  desbloqueadas [TASK-1928](../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) y
   [TASK-1929](../../tasks/to-do/TASK-1929-deck-plan-recipe-catalog-validator.md). **Quedó abierto:** la publicación en
   `develop`; la ruta productiva gobernada, que debe aceptar también el intent de documento (TASK-1921); las 38 recetas
   restantes del deck (TASK-1928); el control de foco de la sección partida, sin task (§4.6); la pregunta del barrido
@@ -926,7 +926,7 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
   unifica a n de N? (§4.6).
 - **Láminas del deck:** las 69 de la página «Deck» quedaron aprobadas el 2026-09-27 y tienen receta en el
   [catálogo](./deck-recipes/README.md). Las que tienen plantilla están en §2.1; las 38 recetas restantes del deck son
-  [TASK-1928](../../tasks/to-do/TASK-1928-graphic-line-deck-remaining-recipe-templates.md); fotos idempotentes:
+  [TASK-1928](../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md); fotos idempotentes:
   TASK-1926; pendientes de QA en §4.6.
 - **Portadas y contraportadas (2026-09-27):** aprobadas, descritas en §4.6 y con plantilla en el composer (TASK-1927).
   El marco clásico no entra al catálogo. Diferencias conocidas contra los prototipos, en §4.6. Preguntas abiertas en

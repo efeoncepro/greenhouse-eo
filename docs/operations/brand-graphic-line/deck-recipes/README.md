@@ -16,7 +16,7 @@
 > [documentación funcional de la línea](../../../documentation/creative/linea-grafica-efeonce.md) · skill
 > [`deck-studio`](../../../../.claude/skills/deck-studio/SKILL.md) · [TASK-1926](../../../tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md)
 > (fotos) · [TASK-1927](../../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (plantillas
-> de 31 recetas, `complete`) · [TASK-1928](../../../tasks/to-do/TASK-1928-graphic-line-deck-remaining-recipe-templates.md)
+> de 31 recetas, `complete`) · [TASK-1928](../../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md)
 > (las 38 recetas sin plantilla).
 
 ## Qué es
@@ -201,7 +201,7 @@ unos píxeles más ajustada.
 
 **31 de las 69 recetas caen en una plantilla** del catálogo `graphic-line-deck` del Artifact Composer y salen con
 `pnpm brand:compose`. Las **38 restantes no tienen plantilla** y son
-[TASK-1928](../../../tasks/to-do/TASK-1928-graphic-line-deck-remaining-recipe-templates.md).
+[TASK-1928](../../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md).
 [TASK-1927](../../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) está `complete`
 (2026-09-27); su trabajo está en `develop` local y el push sigue pendiente.
 

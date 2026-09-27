@@ -24,7 +24,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -37,7 +37,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Discovery y plan (2026-09-27): 25 de 38 recetas existen en AXIS casi sin medidas; 13 no existen en el contrato`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
