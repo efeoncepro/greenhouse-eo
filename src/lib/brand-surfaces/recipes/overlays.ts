@@ -8,7 +8,10 @@
  *   - La órbita (el arco que mide el capítulo de la cartela y el que mide la cifra del super): la pinta el paquete de
  *     la línea gráfica (`paintGraphicLine` sobre el delegado `efeonce.graphic-line-orbit` del manifest) y llega a la
  *     plantilla como capa SVG externa (`asset-ref:layer:*`). La plantilla nunca dibuja un arco.
- *   - La selección colaborativa: el delegado `efeonce.collaboration-selection` del manifest, en el shape del slot.
+ *   - La selección colaborativa: el delegado `efeonce.collaboration-selection` del manifest (etiqueta, ancla, escala,
+ *     objetivo, variante, aire, velo y la caja del objeto de la llamada), en el shape del slot.
+ *   - El contenido (voz, capítulo, cifra, planos de la pantalla dividida, subtítulos, plan de planos): de
+ *     `manifest.content`, que AXIS ya validó (contrato 0.1.1). El builder no repite una regla que AXIS aplica.
  *   - Lo que AXIS todavía no declara para estas recetas se calibra contra la lámina aprobada con una REGLA escrita
  *     aquí (constantes `CALIBRATED_*`), nunca con un número suelto en la plantilla.
  *
@@ -22,17 +25,10 @@ import { resolveGraphicLineIntent } from '@efeoncepro/axis-ui-contracts'
 
 import type { SurfaceAssetRequest } from '../types'
 import { SurfacePieceError } from '../types'
-import { selectionSlot, voiceSlots, type SurfaceManifest } from '../shared'
+import { contentOf, selectionDelegate, selectionSlot, voiceSlots, type SurfaceManifest } from '../shared'
 import type { RecipeBuilder } from './deck'
 
 // ── Reglas calibradas contra las láminas aprobadas (AXIS aún no las declara en estas recetas) ─────────────────
-
-/**
- * Escala del cursor del colaborador. AXIS la deja en `null` para las recetas audiovisuales; la lámina aprobada usa
- * 1,6 cuando la selección rodea una respuesta o un objeto (cartela, llamada: la etiqueta mide ~78 px de alto en
- * 1920) y 1,2 cuando firma un grupo pequeño (zócalo).
- */
-export const CALIBRATED_COLLABORATOR_SCALE = { text: 1.6, object: 1.6, group: 1.2 } as const
 
 /** Ancho óptico de la respuesta en Bricolage 760 con tracking negativo, por carácter (ver `answerPxWithinRange`). */
 const ANSWER_EM_PER_CHAR = 0.52
@@ -166,27 +162,11 @@ const paintRecipeOrbit = (
   return { svg, element: painted }
 }
 
-/** La selección que resolvió AXIS, con la escala calibrada cuando la receta no la declara. */
-const recipeSelection = (
-  manifest: SurfaceManifest,
-  targetKind: 'text' | 'object' | 'group'
-): Record<string, unknown> => {
+/** La selección que resolvió AXIS: todo (escala, objetivo, variante, aire, velo) sale del delegado. */
+const recipeSelection = (manifest: SurfaceManifest): Record<string, unknown> => {
   const slot = selectionSlot(manifest)
 
   if (!slot) throw new SurfacePieceError('La receta lleva selección y AXIS no la delegó con su etiqueta.', 'surface-issues')
-
-  const delegates = manifest.delegates as { selection?: { intent: Record<string, unknown>; collaboratorScale: number | null }[] }
-  const delegate = delegates.selection![0]!
-
-  slot.scale = delegate.collaboratorScale ?? CALIBRATED_COLLABORATOR_SCALE[targetKind]
-
-  if (targetKind !== 'text') {
-    slot.targetKind = targetKind
-
-    for (const key of ['variant', 'padding', 'overlay'] as const) {
-      if (delegate.intent[key]) slot[key] = String(delegate.intent[key])
-    }
-  }
 
   return slot
 }
@@ -202,7 +182,7 @@ const seconds = (ms: number): string => String(Number((ms / 1000).toFixed(1))).r
  */
 export const cartela: RecipeBuilder = ({ intent, manifest, recipe }) => {
   const { width, height } = manifest.canvas
-  const voice = voiceSlots(intent)
+  const voice = voiceSlots(manifest)
 
   if (voice.answerLead) invalid('La cartela lleva una respuesta de una sola línea.')
 
@@ -220,11 +200,11 @@ export const cartela: RecipeBuilder = ({ intent, manifest, recipe }) => {
     invalid(`«${voice.answer}» a ${pxOf(answer)} px cruza el anillo del capítulo: la cartela lleva una palabra corta.`)
   }
 
-  const progress = intent.progress as { sections: number; current: number } | undefined
-  const chapter = intent.chapter as { title?: string; label?: string } | undefined
+  // AXIS exige el progreso y el título del capítulo (`progress-required`, `chapter-title-required`); el capítulo ya
+  // llega con su número y su total.
+  const { progress, chapter } = contentOf(manifest)
 
-  if (!progress) invalid('La cartela mide el capítulo: falta `progress` (sections, current).')
-  if (!chapter?.title?.trim()) invalid('La cartela nombra el capítulo dentro del anillo: falta `chapter.title`.')
+  if (!progress || !chapter?.title) invalid('La cartela mide y nombra el capítulo: el manifest no trae `progress` ni `chapter`.')
 
   const tokens = recipe.progress as { arcStrokePx: number; spherePx: number }
   const orbit = paintRecipeOrbit(manifest, 'progress', circle, tokens, `gl-cartela-${progress!.current}-${progress!.sections}`)
@@ -249,11 +229,11 @@ export const cartela: RecipeBuilder = ({ intent, manifest, recipe }) => {
       },
       orbit: { src: layerRef },
       chapter: {
-        title: chapter!.title!.trim(),
-        label: chapter!.label?.trim() || `capítulo ${progress!.current} de ${progress!.sections}`
+        title: chapter!.title,
+        label: chapter!.label || `capítulo ${progress!.current} de ${progress!.sections}`
       },
       voice: { question: voice.question, answer: voice.answer },
-      selection: recipeSelection(manifest, 'text')
+      selection: recipeSelection(manifest)
     },
     assets: [{ ref: layerRef, kind: 'svg', svg: orbit.svg }]
   }
@@ -263,12 +243,11 @@ export const cartela: RecipeBuilder = ({ intent, manifest, recipe }) => {
 
 /**
  * `zocalo`: el contexto con su anillo y el rol con su esfera en la reserva inferior. Los corchetes firman el GRUPO
- * entero, como en la lámina aprobada (AXIS declara hoy `targetKind: text` sobre la respuesta; con esa caja los
- * corchetes y el cursor caerían encima del contexto).
+ * entero, como en la lámina aprobada: AXIS delega la selección como `group` con corchetes abiertos y aire compacto.
  */
 export const zocalo: RecipeBuilder = ({ intent, manifest }) => {
   const { width, height } = manifest.canvas
-  const voice = voiceSlots(intent)
+  const voice = voiceSlots(manifest)
 
   if (voice.answerLead) invalid('El zócalo lleva el rol en una sola línea.')
 
@@ -292,7 +271,7 @@ export const zocalo: RecipeBuilder = ({ intent, manifest }) => {
         answerTracking: css('--gl-answer-tracking', trackingEm(answer), 'em')
       },
       voice: { question: voice.question, answer: voice.answer },
-      selection: recipeSelection(manifest, 'group')
+      selection: recipeSelection(manifest)
     },
     assets: []
   }
@@ -301,31 +280,25 @@ export const zocalo: RecipeBuilder = ({ intent, manifest }) => {
 // ── 03 · Llamada con selección ────────────────────────────────────────────────────────────────────────────────
 
 /**
- * `callout-selection`: la selección sobre un OBJETO del plano. La caja la declara el intent en fracciones del
- * lienzo (`selection.box` = left, top, right, bottom entre 0 y 1), medida sobre el plano al que va la capa.
+ * `callout-selection`: la selección sobre un OBJETO del plano. La caja la declara el intent en fracciones del lienzo
+ * (`selection.box`); AXIS la valida (`selection-box-required`, `selection-box-invalid`) y la devuelve en el delegado
+ * de selección en fracciones y en px del master, medida sobre el plano al que va la capa.
  */
 export const calloutSelection: RecipeBuilder = ({ intent, manifest }) => {
-  const { width, height } = manifest.canvas
-  const box = (intent.selection as { box?: Record<string, unknown> } | undefined)?.box
+  const box = selectionDelegate(manifest)?.box
 
-  if (!box) invalid('La llamada necesita la caja del objeto: `selection.box` en fracciones del lienzo.')
-
-  const [left, top, right, bottom] = (['left', 'top', 'right', 'bottom'] as const).map(key => Number(box![key]))
-
-  if (![left, top, right, bottom].every(n => Number.isFinite(n) && n >= 0 && n <= 1) || !(left! < right!) || !(top! < bottom!)) {
-    invalid('`selection.box` va en fracciones del lienzo (0–1) con left < right y top < bottom.')
-  }
+  if (!box) invalid('La llamada necesita la caja del objeto: el manifest no trae `delegates.selection[].box`.')
 
   return {
     slots: {
       frame: { line: intent.line },
       target: {
-        left: css('--gl-target-left', left! * width),
-        top: css('--gl-target-top', top! * height),
-        width: css('--gl-target-width', (right! - left!) * width),
-        height: css('--gl-target-height', (bottom! - top!) * height)
+        left: css('--gl-target-left', box!.px.x),
+        top: css('--gl-target-top', box!.px.y),
+        width: css('--gl-target-width', box!.px.width),
+        height: css('--gl-target-height', box!.px.height)
       },
-      selection: recipeSelection(manifest, 'object')
+      selection: recipeSelection(manifest)
     },
     assets: []
   }
@@ -339,10 +312,10 @@ export const calloutSelection: RecipeBuilder = ({ intent, manifest }) => {
  */
 export const dataSuper: RecipeBuilder = ({ intent, manifest, recipe }) => {
   const { width } = manifest.canvas
-  const measure = intent.measure as { value: number; source: string; label?: string } | undefined
+  const { measure, body } = contentOf(manifest)
 
   if (!measure) invalid('El super de dato lleva `measure` (value 0–1 y source).')
-  if (!intent.body?.trim()) invalid('El super de dato lleva la leyenda de la cifra en `body`.')
+  if (!body) invalid('El super de dato lleva la leyenda de la cifra en `body`.')
 
   const circle = ringCircle(manifest)
   const value = typeOf(manifest, 'value')
@@ -374,7 +347,7 @@ export const dataSuper: RecipeBuilder = ({ intent, manifest, recipe }) => {
         captionWidth: css('--gl-caption-width', captionWidth)
       },
       orbit: { src: layerRef },
-      datum: { value: label, caption: intent.body!.trim(), source: measure!.source }
+      datum: { value: label, caption: body!, source: measure!.source }
     },
     assets: [{ ref: layerRef, kind: 'svg', svg: orbit.svg }]
   }
@@ -385,15 +358,18 @@ export const dataSuper: RecipeBuilder = ({ intent, manifest, recipe }) => {
 /**
  * `split-screen`: dos planos en el mismo cuadro y una frase que los une, una palabra por plano (`voice.answer` =
  * [palabra del primero, palabra del segundo]); la esfera cierra la última. Cada plano es un plate con la parte que
- * se ve elegida por `focusX` (0 = borde izquierdo del plate, 1 = borde derecho). Es opaca: los planos son la capa.
+ * se ve elegida por su foco (`panels[].focus.xOfWidth`: 0 = borde izquierdo del archivo, 1 = borde derecho). Es
+ * opaca: los planos son la capa. AXIS valida los dos planos con su plate y su alt y el foco en fracciones.
  */
 export const splitScreen: RecipeBuilder = ({ intent, manifest, recipe }) => {
   const { width, height } = manifest.canvas
-  const words = (intent.voice?.answer ?? []).map(word => String(word).trim()).filter(Boolean)
-  const panels = intent.panels as { plateRef?: string; alt?: string; focusX?: number }[] | undefined
+  const content = contentOf(manifest)
+  const words = content.answer
+  const panels = content.panels
 
+  // AXIS no ata las líneas de la respuesta a los planos (fuera del tríptico): una palabra por plano es de la receta.
   if (words.length !== 2) invalid('La pantalla dividida lleva una palabra por plano: `voice.answer` con dos líneas.')
-  if (!panels || panels.length !== 2) invalid('La pantalla dividida lleva dos planos: `panels` con dos plates.')
+  if (!panels || panels.length !== 2) invalid('La pantalla dividida lleva dos planos: el manifest no trae `panels`.')
 
   const divider = recipe.divider as { px: number; color: string; atOfWidth: number }
 
@@ -410,9 +386,8 @@ export const splitScreen: RecipeBuilder = ({ intent, manifest, recipe }) => {
 
   const panel = (index: 0 | 1) => {
     const source = panels![index]!
-    const focus = source.focusX ?? 0.5
+    const focus = source.focus?.xOfWidth ?? 0.5
 
-    if (!(focus >= 0 && focus <= 1)) invalid('`panels[].focusX` va entre 0 y 1.')
     if (inset + answerWidth(words[index]!, pxOf(answer)) > panelWidths[index]!) invalid(`«${words[index]}» no cabe en su plano.`)
 
     const plate = plateFromRef(source.plateRef, source.alt, { width, height }, `panels[${index}]`)
@@ -443,17 +418,18 @@ export const splitScreen: RecipeBuilder = ({ intent, manifest, recipe }) => {
 // ── 06 · Subtítulos ───────────────────────────────────────────────────────────────────────────────────────────
 
 /**
- * `subtitles`: una intervención por capa (`subtitles.lines`, dos como máximo). Peso, tamaño, interlineado, máximo de
- * líneas y sombra salen del token `type.subtitle` de AXIS; la reserva, de `reserves.subtitles`.
+ * `subtitles`: una intervención por capa (`subtitles.lines`). AXIS valida que haya texto y que no pase del máximo de
+ * líneas del token (`subtitle-line-required`, `subtitles-over-lines`). Peso, tamaño, interlineado, máximo de líneas y
+ * sombra salen del token `type.subtitle` de AXIS; la reserva, de `reserves.subtitles`.
  */
 export const subtitles: RecipeBuilder = ({ intent, manifest }) => {
   const { width, height } = manifest.canvas
   const type = typeOf(manifest, 'subtitle')
-  const maxLines = type.maxLines ?? 2
-  const lines = ((intent.subtitles as { lines?: string[] } | undefined)?.lines ?? []).map(l => String(l).trim()).filter(Boolean)
+  const content = contentOf(manifest).subtitles
+  const maxLines = content?.maxLines ?? type.maxLines ?? 2
+  const lines = content?.lines ?? []
 
-  if (lines.length === 0) invalid('Los subtítulos llevan su texto en `subtitles.lines`.')
-  if (lines.length > maxLines) invalid(`Los subtítulos van en ${maxLines} líneas como máximo.`)
+  if (lines.length === 0) invalid('Los subtítulos llevan su texto: el manifest no trae `subtitles.lines`.')
 
   // «0 2px 6px rgba(0,0,0,.55)»: el único color del token es el negro de la sombra; su opacidad viaja como medida.
   const shadow = /^0(?:px)?\s+(-?\d*\.?\d+)px\s+(\d*\.?\d+)px\s+rgba\(\s*0\s*,\s*0\s*,\s*0\s*,\s*(\d*\.?\d+)\s*\)$/.exec(
@@ -488,69 +464,57 @@ export const subtitles: RecipeBuilder = ({ intent, manifest }) => {
 
 // ── Plan de planos ────────────────────────────────────────────────────────────────────────────────────────────
 
-type ShotSegment = { id: string; fromMs: number; toMs: number; lensMm?: number; close?: string }
-
 /**
- * `shot-plan`: la hoja del plan. Los planos, sus tiempos y sus lentes salen del timeline de la receta (AXIS); el
- * intent pone el copy de cada plano (`shots[]` por `segment`) y su cuadro clave. Las reglas son las de producción
- * de la superficie con el texto de AXIS; la de la firma no se repite porque la dice el plano de cierre.
+ * `shot-plan`: la hoja del plan. Los planos llegan de `content.shots` en el orden del timeline de la receta, cada uno
+ * con su tiempo, su lente y su cierre (tokens de AXIS), y con el copy y el cuadro clave del intent. AXIS valida un
+ * plano por segmento (`shots-segments-mismatch`), su texto, plate y alt, que la ficha no nombre otra lente ni otra
+ * duración (`shot-lens-mismatch`, `shot-duration-mismatch`) y que el título no diga otra duración
+ * (`sheet-duration-mismatch`). Las reglas son las de producción de la superficie con el texto de AXIS; la de la firma
+ * no se repite porque la dice el plano de cierre.
  */
 export const shotPlan: RecipeBuilder = ({ intent, manifest }) => {
   const { width } = manifest.canvas
-  const timeline = manifest.timeline as { durationMs: number; segments: ShotSegment[] } | undefined
-  const segments = timeline?.segments ?? []
+  const timeline = manifest.timeline as { durationMs: number } | undefined
+  const { shots, title } = contentOf(manifest)
 
-  if (segments.length === 0) throw new SurfacePieceError('El manifest de AXIS no trae los planos del timeline.', 'surface-issues')
+  if (!timeline || !shots || shots.length === 0) {
+    throw new SurfacePieceError('El manifest de AXIS no trae los planos del timeline.', 'surface-issues')
+  }
 
-  const shots = (intent.shots as { segment?: string; title?: string; spec?: string; note?: string; plateRef?: string; alt?: string }[] | undefined) ?? []
-  const title = String(intent.title ?? '').trim()
-  const duration = `${seconds(timeline!.durationMs)} s`
+  const duration = `${seconds(timeline.durationMs)} s`
 
+  // AXIS rechaza un título que nombre otra duración, no uno que no la nombre: la hoja aprobada la dice siempre.
   if (!title) invalid('El plan de planos lleva `title`.')
-  if (!title.includes(duration)) invalid(`El título dice otra duración: el timeline de AXIS dura ${duration}.`)
-
-  const unknown = shots.filter(shot => !segments.some(segment => segment.id === shot.segment))
-
-  if (unknown.length > 0) invalid(`Planos que el timeline de AXIS no tiene: ${unknown.map(s => s.segment).join(', ')}.`)
+  if (!title!.includes(duration)) invalid(`El título no dice la duración: el timeline de AXIS dura ${duration}.`)
 
   const margin = Math.round(SHEET_MARGIN_OF_WIDTH * width)
   const gap = Math.round(SHEET_GAP_OF_WIDTH * width)
-  const thumbWidth = Math.floor((width - 2 * margin - (segments.length - 1) * gap) / segments.length)
+  const thumbWidth = Math.floor((width - 2 * margin - (shots.length - 1) * gap) / shots.length)
   const thumbHeight = Math.round((thumbWidth * 9) / 16)
   const assets: SurfaceAssetRequest[] = []
 
-  const items = segments.map((segment, index) => {
-    const shot = shots.find(s => s.segment === segment.id)
-
-    if (!shot?.title?.trim() || !shot.spec?.trim() || !shot.note?.trim()) {
-      invalid(`El plano ${segment.id} necesita title, spec y note en \`shots\`.`)
+  const items = shots.map((shot, index) => {
+    // AXIS rechaza una ficha que nombre otra lente, no una que no nombre ninguna: la ficha aprobada nombra la suya.
+    if (shot.lensMm !== null && !new RegExp(`\\b${shot.lensMm}\\s*mm\\b`).test(shot.spec)) {
+      invalid(`La ficha de ${shot.segment} no nombra su lente del timeline (${shot.lensMm} mm).`)
     }
 
-    // La lente es del token: la ficha la nombra y no puede contradecirla.
-    const lenses = [...shot!.spec!.matchAll(/(\d+)\s*mm\b/g)].map(m => Number(m[1]))
-
-    if (segment.lensMm !== undefined && !lenses.includes(segment.lensMm)) {
-      invalid(`La ficha de ${segment.id} no nombra su lente del timeline (${segment.lensMm} mm).`)
-    }
-
-    if (lenses.some(mm => mm !== segment.lensMm)) invalid(`La ficha de ${segment.id} nombra una lente que no es la del timeline.`)
-
-    const plate = plateFromRef(shot!.plateRef, shot!.alt, { width: thumbWidth, height: thumbHeight }, `shots[${segment.id}]`)
+    const plate = plateFromRef(shot.plateRef, shot.alt, { width: thumbWidth, height: thumbHeight }, `shots[${shot.segment}]`)
 
     if (!assets.some(a => a.ref === plate.ref)) assets.push(plate.asset)
 
     return {
       src: plate.ref,
       alt: plate.alt,
-      heading: `${String(index + 1).padStart(2, '0')} · ${seconds(segment.fromMs)}–${seconds(segment.toMs)} s · ${shot!.title!.trim()}`,
-      spec: shot!.spec!.trim(),
-      note: shot!.note!.trim()
+      heading: `${String(index + 1).padStart(2, '0')} · ${seconds(shot.fromMs)}–${seconds(shot.toMs)} s · ${shot.title}`,
+      spec: shot.spec,
+      note: shot.note
     }
   })
 
   const surfaceRules = (efeonceGraphicLine.surfaces as unknown as Record<string, { rules: string[] }>).audiovisual!.rules
   const texts = new Map((manifest.rules as { id: string; text: string | null }[]).map(rule => [rule.id, rule.text]))
-  const signsClose = segments.some(segment => segment.close)
+  const signsClose = shots.some(shot => shot.close)
 
   const rules = surfaceRules
     .filter(id => !(signsClose && id === 'signature-in-close-own-brand-only'))

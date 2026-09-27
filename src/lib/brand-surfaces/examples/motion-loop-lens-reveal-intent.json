@@ -1,6 +1,6 @@
 {
   "contract": "efeonce.surface-composition",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "surface": "motion",
   "format": "16x9",
   "role": "loop",
@@ -24,8 +24,8 @@
     "alt": "Una directora de cuentas con el polo de Efeonce avanza hacia la cámara y la mira",
     "native": "4:7",
     "focus": {
-      "xOfFile": 0.456,
-      "yOfFile": 0.2372
+      "xOfWidth": 0.456,
+      "yOfHeight": 0.2372
     }
   },
   "selection": {

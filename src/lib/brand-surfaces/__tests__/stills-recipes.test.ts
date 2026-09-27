@@ -61,6 +61,22 @@ const expectCode = (fn: () => unknown, code: SurfacePieceError['code']) => {
   throw new Error(`se esperaba SurfacePieceError ${code}`)
 }
 
+/** Los códigos con que AXIS rechazó el intent (falla si no lo rechazó con `surface-issues`). */
+const issuesOf = (intent: SurfaceIntent): string[] => {
+  let caught: unknown
+
+  try {
+    planSurfacePiece(intent, { artifactId: 'prueba' })
+  } catch (error) {
+    caught = error
+  }
+
+  expect(caught).toBeInstanceOf(SurfacePieceError)
+  expect((caught as SurfacePieceError).code).toBe('surface-issues')
+
+  return (caught as SurfacePieceError).issues.map(issue => (issue as { code: string }).code)
+}
+
 const RECIPES = [
   ['web-hero-lens', 'web.hero-lens'],
   ['web-hero-bleed', 'web.hero-bleed'],
@@ -224,13 +240,20 @@ describe('recetas de graphic-line-stills', () => {
       expectCode(() => planSurfacePiece(intent, { artifactId: 'prueba' }), 'invalid-intent')
     })
 
-    it('la hoja exige las ocho escenas del timeline, en su orden', () => {
+    it('la hoja exige las ocho escenas del timeline, en su orden: lo rechaza AXIS', () => {
       const intent = load('motion-storyboard')
+      const frames = intent.frames as unknown[]
 
-      expectCode(
-        () => planSurfacePiece({ ...intent, frames: (intent.frames as unknown[]).slice(0, 7) }, { artifactId: 'prueba' }),
-        'invalid-intent'
-      )
+      expect(issuesOf({ ...intent, frames: frames.slice(0, 7) })).toContain('frames-segments-mismatch')
+      expect(issuesOf({ ...intent, frames: [frames[1], frames[0], ...frames.slice(2)] })).toContain('frames-segments-mismatch')
+    })
+
+    it('un foco fuera del archivo o un encabezado sin acción los rechaza AXIS', () => {
+      const loop = load('motion-loop-lens-reveal')
+      const hero = load('web-hero-bleed')
+
+      expect(issuesOf({ ...loop, photo: { ...loop.photo, focus: { xOfWidth: 1.4, yOfHeight: 0.2 } } })).toContain('photo-focus-invalid')
+      expect(issuesOf({ ...hero, nav: { links: ['Servicios'] } })).toContain('nav-invalid')
     })
   })
 })

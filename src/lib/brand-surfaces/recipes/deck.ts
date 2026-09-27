@@ -14,10 +14,12 @@ import { SurfacePieceError } from '../types'
 import {
   answerPxWithinRange,
   clamp,
+  contentOf,
   iconAsset,
   lower,
   ofHeight,
   plateAsset,
+  plateFrom,
   reserve,
   selectionSlot,
   upper,
@@ -57,7 +59,8 @@ export const proposalCinematic: RecipeBuilder = ({ intent, manifest, recipe }) =
   const margin = manifest.safeArea?.marginPx ?? Math.round(width * 0.0729)
   const textShare = reserve(manifest, 'text')?.share ?? 0.45
 
-  const voice = voiceSlots(intent)
+  const voice = voiceSlots(manifest)
+  const content = contentOf(manifest)
   const answerRange: [number, number] = [lower(type.answer?.px, 140), upper(type.answer?.px, 176)]
   const answerPx = answerPxWithinRange(voice.answer!, answerRange, textShare * width - margin)
 
@@ -84,7 +87,7 @@ export const proposalCinematic: RecipeBuilder = ({ intent, manifest, recipe }) =
   const stepsTop = ofHeight(manifest, layout.fromTop ?? layout.fromTopRange![0])
 
   const assets: RecipeSlots['assets'] = []
-  const photo = plateAsset(intent, { width, height })
+  const photo = plateAsset(manifest, { width, height })
 
   assets.push(photo.asset)
 
@@ -96,11 +99,12 @@ export const proposalCinematic: RecipeBuilder = ({ intent, manifest, recipe }) =
     return { icon: icon.ref, kicker: step.kicker, name: step.name }
   })
 
-  if (!intent.proof?.text || !intent.proof.source) {
+  // AXIS exige la fuente cuando la prueba viene (`proof-source-required`); la receta, además, la lleva siempre.
+  if (!content.proof?.text || !content.proof.source) {
     throw new SurfacePieceError('La prueba va con su fuente (`proof.text` y `proof.source`).', 'invalid-intent')
   }
 
-  if (!intent.body) throw new SurfacePieceError('La receta lleva bajada (`body`).', 'invalid-intent')
+  if (!content.body) throw new SurfacePieceError('La receta lleva bajada (`body`).', 'invalid-intent')
 
   const slots: Record<string, unknown> = {
     frame: {
@@ -124,8 +128,8 @@ export const proposalCinematic: RecipeBuilder = ({ intent, manifest, recipe }) =
     },
     photo: { src: photo.ref, alt: photo.alt },
     voice,
-    body: intent.body,
-    proof: { text: intent.proof.text, source: intent.proof.source },
+    body: content.body,
+    proof: { text: content.proof.text, source: content.proof.source },
     steps: stepItems
   }
 
@@ -161,7 +165,6 @@ type OrbitPiece = {
 const GL = efeonceGraphicLine as unknown as {
   pieces: { deck: Record<string, OrbitPiece>; lens: Record<string, OrbitPiece> }
   orbit: { ringAirRatio: number }
-  type: { answer: { maxWords: number; tracking: string } }
   surfaces: { deck: { base: { answer: { rangePx: [number, number] } } } }
 }
 
@@ -214,53 +217,6 @@ const layerAsset = (id: string, svg: string): { ref: string; asset: SurfaceAsset
 
 const px = (name: string, value: number, unit = 'px'): string => `--gl-${name}=${Math.round(value * 100) / 100}${unit}`
 
-/* ── Contenido que el contrato 0.1.0 aún no modela ──────────────────────────────────────────────────────────
- *
- * ⚠️ WORKAROUND TEMPORAL, dueño TASK-1919, se retira cuando AXIS modele estas piezas en
- * `efeonce.surface-composition` (hueco declarado en SURFACE_COMPOSITION_DECISION_V1 §Holes). Hoy el contrato
- * declara `voice.mode: 'none'` en `section-classic` y `method-staircase` aunque sus láminas APROBADAS llevan pregunta
- * y respuesta (`deckSlideHtml('section')` las pinta), no tiene campo para los niveles de la escalera, ni para las tres
- * fotos del tríptico, ni para las cifras de apoyo de `content-measure`, ni selección en la escalera. Ese contenido
- * viaja en `intent.unmodeled` (el validador de AXIS lo ignora; el schema JSON de AXIS lo rechazaría) y el builder le
- * aplica aquí las mismas reglas que AXIS aplicaría (máximo de palabras de la respuesta, una esfera, cifras con fuente).
- * Cuando el contrato lo modele, el builder lee primero las claves canónicas (`voice`, …) y `unmodeled` se borra.
- */
-interface UnmodeledContent {
-  voice?: { eyebrow?: string; question?: string; answer?: string[] }
-  figures?: { value: string; label: string }[]
-  panels?: { plateRef: string; alt: string }[]
-  levels?: { name: string; descriptor: string }[]
-  note?: string
-  selection?: { level: number; label: string; anchor?: string; participantKind?: string; scale?: number }
-}
-
-const unmodeled = (intent: SurfaceIntent): UnmodeledContent => (intent.unmodeled ?? {}) as UnmodeledContent
-
-/** La voz de la lámina: la canónica si el contrato la acepta, si no la de `unmodeled`, con las reglas de AXIS. */
-const voiceOf = (intent: SurfaceIntent, recipeId: string): Record<string, string> => {
-  if (intent.voice?.answer?.length) return voiceSlots(intent)
-
-  const voice = unmodeled(intent).voice
-
-  if (!voice?.question || !voice.answer?.length) {
-    throw new SurfacePieceError(
-      `\`${recipeId}\` lleva pregunta y respuesta (lámina aprobada) y el contrato 0.1.0 todavía no las modela: van en \`unmodeled.voice\`.`,
-      'invalid-intent'
-    )
-  }
-
-  const words = voice.answer.join(' ').trim().split(/\s+/).length
-
-  if (words > GL.type.answer.maxWords) {
-    throw new SurfacePieceError(
-      `La respuesta tiene ${words} palabras; el máximo de AXIS es ${GL.type.answer.maxWords} (voice-answer-too-long).`,
-      'invalid-intent'
-    )
-  }
-
-  return voiceSlots({ ...intent, voice })
-}
-
 /** Una fracción del ancho del lienzo, en px enteros. */
 const ofWidth = (manifest: SurfaceManifest, fraction: number): number => Math.round(fraction * manifest.canvas.width)
 
@@ -270,7 +226,7 @@ const ofWidth = (manifest: SurfaceManifest, fraction: number): number => Math.ro
  * a la izquierda, sin cruzar el anillo. El arco suma su tramo desde las 12. Sin foto, sin logo.
  */
 export const sectionClassic: RecipeBuilder = ({ intent, manifest, recipe }) => {
-  const progress = intent.progress as { sections: number; current: number } | undefined
+  const progress = contentOf(manifest).progress
 
   if (!progress) throw new SurfacePieceError('`section-classic` lleva `progress` (sección n de N).', 'invalid-intent')
 
@@ -287,7 +243,7 @@ export const sectionClassic: RecipeBuilder = ({ intent, manifest, recipe }) => {
     paintGraphicLine(resolved as never, { background: false, idPrefix: 'gl-sc', circles: { [String(element.id)]: ring } }).svg
   )
 
-  const voice = voiceOf(intent, 'section-classic')
+  const voice = voiceSlots(manifest)
 
   // Las posiciones son las de `deckSlideHtml('section')` (el pintor canónico de esta lámina), atadas al anillo: la
   // pregunta 120 px sobre su centro, la respuesta 45 px, el número 110 px y su rótulo 100 px bajo el centro.
@@ -329,7 +285,7 @@ export const sectionClassic: RecipeBuilder = ({ intent, manifest, recipe }) => {
  * (`progress.flipped`). Número, «Sección n de N», pregunta y respuesta sobre el papel, en sus reservas de AXIS.
  */
 export const sectionSplit: RecipeBuilder = ({ intent, manifest, recipe }) => {
-  const progress = intent.progress as { sections: number; current: number } | undefined
+  const progress = contentOf(manifest).progress
 
   if (!progress) throw new SurfacePieceError('`section-split` lleva `progress` (sección n de N).', 'invalid-intent')
 
@@ -370,9 +326,9 @@ export const sectionSplit: RecipeBuilder = ({ intent, manifest, recipe }) => {
 
   const layer = layerAsset(`section-split-indicator-${progress.current}-of-${progress.sections}-${intent.line}`, svg)
   const photoLeft = ofWidth(manifest, tokens.photo.fromOfWidth)
-  const photo = plateAsset(intent, { width: width - photoLeft, height })
+  const photo = plateAsset(manifest, { width: width - photoLeft, height })
   const panelWidth = ofWidth(manifest, tokens.panel.share)
-  const voice = voiceOf(intent, 'section-split')
+  const voice = voiceSlots(manifest)
 
   return {
     slots: {
@@ -411,7 +367,8 @@ export const sectionSplit: RecipeBuilder = ({ intent, manifest, recipe }) => {
  * multiplicado sobre el fondo Efeonce) y limpia dentro. Bajada, hasta dos cifras de apoyo y la nota de fuente.
  */
 export const contentMeasure: RecipeBuilder = ({ intent, manifest, recipe }) => {
-  const measure = intent.measure as { value: number; source: string } | undefined
+  const content = contentOf(manifest)
+  const measure = content.measure
 
   if (!measure) throw new SurfacePieceError('`content-measure` lleva `measure` con su fuente.', 'invalid-intent')
 
@@ -454,14 +411,15 @@ export const contentMeasure: RecipeBuilder = ({ intent, manifest, recipe }) => {
     throw new SurfacePieceError('La lente multiplica sobre un color que no es el fondo Efeonce: la plantilla no lo puede pintar.', 'invalid-intent')
   }
 
-  const photo = plateAsset(intent, manifest.canvas)
-  const voice = voiceSlots(intent)
+  const photo = plateAsset(manifest, manifest.canvas)
+  const voice = voiceSlots(manifest)
   const type = (recipe.type ?? {}) as Record<string, { px?: number }>
-  const figures = unmodeled(intent).figures ?? []
 
-  if (figures.length > 2) throw new SurfacePieceError('`content-measure` lleva hasta dos cifras de apoyo.', 'invalid-intent')
+  // Las cifras de apoyo ya llegan validadas por AXIS: hasta `figures.max` de la receta (`figures-over-limit`) y cada
+  // una con su fuente (`figure-source-required`). La lámina aprobada muestra valor y leyenda; la fuente va en la nota.
+  const figures = (content.figures ?? []).map(figure => ({ value: figure.value, label: figure.label }))
 
-  if (!intent.body) throw new SurfacePieceError('`content-measure` lleva bajada (`body`).', 'invalid-intent')
+  if (!content.body) throw new SurfacePieceError('`content-measure` lleva bajada (`body`).', 'invalid-intent')
 
   return {
     slots: {
@@ -492,7 +450,7 @@ export const contentMeasure: RecipeBuilder = ({ intent, manifest, recipe }) => {
       photo: { src: photo.ref, lensSrc: photo.ref, alt: photo.alt },
       orbit: { src: layer.ref },
       voice,
-      body: intent.body,
+      body: content.body,
       figures: figures.length > 0 ? figures : null,
       note: measure.source
     },
@@ -503,7 +461,8 @@ export const contentMeasure: RecipeBuilder = ({ intent, manifest, recipe }) => {
 /**
  * `triptych`: tres tomas verticales nativas a altura completa separadas por un canal fino, y UNA frase que recorre las
  * tres (una línea de la respuesta por panel); la esfera va sólo al final. La pregunta va arriba sobre un difuminado
- * de la primera foto (`questionBed`). Las tres fotos viajan en `unmodeled.panels` (el contrato admite una sola).
+ * de la primera foto (`questionBed`). Las tres fotos y la palabra de cada una salen de `content.panels` del manifest
+ * (AXIS valida que sean exactamente las de la receta, cada una con su plate y su alt: `panels-count-invalid`).
  */
 export const triptych: RecipeBuilder = ({ intent, manifest, recipe }) => {
   const tokens = recipe as {
@@ -512,27 +471,30 @@ export const triptych: RecipeBuilder = ({ intent, manifest, recipe }) => {
     type: { question: { px: number }; answer: { px: number } }
   }
 
-  const answer = intent.voice?.answer ?? []
-  const panels = unmodeled(intent).panels ?? []
+  const content = contentOf(manifest)
+  const panels = content.panels ?? []
 
-  if (answer.length !== tokens.panels.count) {
+  if (panels.length !== tokens.panels.count) {
+    throw new SurfacePieceError(`El tríptico lleva ${tokens.panels.count} fotos en \`panels\`.`, 'missing-photo')
+  }
+
+  // AXIS reparte la frase panel a panel (`word`) pero no exige que las líneas sean tantas como las tomas: una línea
+  // de más se perdería y una de menos dejaría un panel mudo. Eso lo sostiene la receta.
+  if (content.answer.length !== tokens.panels.count || panels.some(panel => !panel.word)) {
     throw new SurfacePieceError(
-      `El tríptico reparte UNA frase en ${tokens.panels.count} paneles: la respuesta trae ${answer.length} líneas.`,
+      `El tríptico reparte UNA frase en ${tokens.panels.count} paneles: la respuesta trae ${content.answer.length} líneas.`,
       'invalid-intent'
     )
   }
 
-  if (panels.length !== tokens.panels.count) {
-    throw new SurfacePieceError(`El tríptico lleva ${tokens.panels.count} fotos en \`unmodeled.panels\`.`, 'missing-photo')
-  }
-
-  if (!intent.voice?.question) throw new SurfacePieceError('El tríptico lleva la pregunta arriba.', 'invalid-intent')
+  // La voz del tríptico es la frase en las tomas: AXIS no exige la pregunta, la lámina aprobada sí la lleva.
+  if (!content.question) throw new SurfacePieceError('El tríptico lleva la pregunta arriba.', 'invalid-intent')
 
   // Las tomas son verticales nativas: se entregan en su proporción (9:16) y la plantilla las recorta abajo.
   const [nw, nh] = tokens.panels.native.split(':').map(Number) as [number, number]
   const fit = { width: tokens.panels.widthPx, height: Math.round((tokens.panels.widthPx * nh) / nw) }
 
-  const plates = panels.map(panel => plateAsset({ ...intent, photo: { plateRef: panel.plateRef, alt: panel.alt } }, fit))
+  const plates = panels.map(panel => plateFrom(panel, fit, `El panel ${panel.index + 1}`))
   const voiceReserve = reserve(manifest, 'voice') as unknown as { inset: number; fromTop: number } | undefined
   const phraseTop = ofHeight(manifest, reserve(manifest, 'phrase')?.fromTop ?? 0.8741)
 
@@ -556,8 +518,8 @@ export const triptych: RecipeBuilder = ({ intent, manifest, recipe }) => {
         bedShadeHeight: px('bed-shade-height', tokens.questionBed.gradient.heightPx)
       },
       bed: { src: plates[0]!.ref },
-      question: intent.voice.question,
-      panels: plates.map((plate, i) => ({ src: plate.ref, alt: plate.alt, word: answer[i]! }))
+      question: content.question,
+      panels: plates.map((plate, i) => ({ src: plate.ref, alt: plate.alt, word: panels[i]!.word! }))
     },
     assets: plates.map(plate => plate.asset)
   }
@@ -568,6 +530,11 @@ export const triptych: RecipeBuilder = ({ intent, manifest, recipe }) => {
  * la derecha; el nivel de llegada es sólido en el acento de la línea, con brillo. La selección toma el nivel que se está
  * trabajando. AXIS aprobó la receta SIN medir su geometría (hueco `method-staircase` del deck): las medidas de abajo
  * son las de la lámina aprobada DeckBexEscalera (F2b), en un solo lugar, hasta que AXIS las mida.
+ *
+ * El contenido (voz, niveles, nota) y la selección salen del manifest: AXIS valida el número de niveles de la receta
+ * (`levels-count-invalid`), que cada uno tenga nombre y que la selección tome un nivel existente con su etiqueta
+ * (`selection-level-invalid`, `selection-label-required`), y delega la selección del peldaño como objeto con su
+ * variante, aire y velo.
  */
 const STAIRCASE_BOARD = {
   x0: 760,
@@ -590,18 +557,24 @@ const STAIRCASE_BOARD = {
 } as const
 
 export const methodStaircase: RecipeBuilder = ({ intent, manifest, recipe }) => {
-  const content = unmodeled(intent)
+  const content = contentOf(manifest)
   const levels = content.levels ?? []
   const expected = (recipe.levels as { count: number }).count
 
+  // AXIS ya rechazó otro número de niveles; aquí sólo se cierra el caso de un manifest sin ellos (un intent 0.1.0).
   if (levels.length !== expected) {
-    throw new SurfacePieceError(`\`method-staircase\` lleva ${expected} niveles en \`unmodeled.levels\`; llegaron ${levels.length}.`, 'invalid-intent')
+    throw new SurfacePieceError(`\`method-staircase\` lleva ${expected} niveles en \`levels\`; llegaron ${levels.length}.`, 'invalid-intent')
   }
 
-  if (!intent.body) throw new SurfacePieceError('`method-staircase` lleva bajada (`body`).', 'invalid-intent')
+  // AXIS deja el descriptor opcional; el peldaño aprobado lo lleva siempre bajo el nombre.
+  if (levels.some(level => !level.descriptor)) {
+    throw new SurfacePieceError('Cada nivel de la escalera lleva su descriptor (`levels[].descriptor`).', 'invalid-intent')
+  }
+
+  if (!content.body) throw new SurfacePieceError('`method-staircase` lleva bajada (`body`).', 'invalid-intent')
 
   const margin = manifest.safeArea?.marginPx ?? 140
-  const voice = voiceOf(intent, 'method-staircase')
+  const voice = voiceSlots(manifest)
   const B = STAIRCASE_BOARD
 
   // La respuesta: el mayor tamaño del rango del deck que cabe antes del primer peldaño (calibrado: «por capa» → 139,
@@ -609,11 +582,9 @@ export const methodStaircase: RecipeBuilder = ({ intent, manifest, recipe }) => 
   const longest = [voice.answerLead ?? '', voice.answer!].sort((a, b) => b.length - a.length)[0]!
   const answerPx = answerPxWithinRange(longest, GL.surfaces.deck.base.answer.rangePx, B.x0 - margin - 40)
 
-  const selection = content.selection
-
-  if (selection && (selection.level < 1 || selection.level > levels.length || !selection.label?.trim())) {
-    throw new SurfacePieceError('La selección de la escalera toma un nivel existente y lleva su etiqueta.', 'invalid-intent')
-  }
+  // La selección del peldaño: nivel, etiqueta, ancla, escala y el objetivo (objeto, sin velo sobre el vidrio, como la
+  // lámina aprobada F2b), todo del delegado de AXIS.
+  const selection = selectionSlot(manifest)
 
   return {
     slots: {
@@ -641,21 +612,10 @@ export const methodStaircase: RecipeBuilder = ({ intent, manifest, recipe }) => 
         columnWidth: px('column-width', B.x0 - 20)
       },
       voice,
-      body: intent.body,
-      levels: levels.map(level => ({ name: level.name, descriptor: level.descriptor })),
-      note: content.note ?? null,
-      selection: selection
-        ? {
-            level: selection.level,
-            label: selection.label,
-            anchor: selection.anchor ?? 'bottom-end',
-            participantKind: selection.participantKind ?? 'department',
-            scale: selection.scale ?? 1.1,
-            // La lámina aprobada (F2b) selecciona el PELDAÑO como objeto, sin velo sobre el vidrio.
-            targetKind: 'object',
-            overlay: 'none'
-          }
-        : null
+      body: content.body,
+      levels: levels.map(level => ({ name: level.name, descriptor: level.descriptor! })),
+      note: content.note,
+      selection
     },
     assets: []
   }

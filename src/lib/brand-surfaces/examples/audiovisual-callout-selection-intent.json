@@ -1,6 +1,6 @@
 {
   "contract": "efeonce.surface-composition",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "surface": "audiovisual",
   "format": "16x9",
   "role": "callout",

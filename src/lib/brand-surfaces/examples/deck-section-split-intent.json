@@ -1,14 +1,22 @@
 {
   "contract": "efeonce.surface-composition",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "surface": "deck",
   "format": "16x9",
   "role": "section",
   "recipe": "section-split",
   "line": "growth",
   "theme": "light",
-  "voice": { "question": "¿Quién decide el corte?", "answer": ["El dato"] },
-  "progress": { "sections": 5, "current": 2 },
+  "voice": {
+    "question": "¿Quién decide el corte?",
+    "answer": [
+      "El dato"
+    ]
+  },
+  "progress": {
+    "sections": 5,
+    "current": 2
+  },
   "photo": {
     "register": "documental",
     "subject": "person",

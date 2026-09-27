@@ -285,6 +285,20 @@
           "consumer": "validation-only",
           "example": "object"
         },
+        "variant": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 16,
+          "consumer": "validation-only",
+          "example": "eight-handles"
+        },
+        "padding": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 12,
+          "consumer": "validation-only",
+          "example": "standard"
+        },
         "overlay": {
           "type": "string",
           "required": false,

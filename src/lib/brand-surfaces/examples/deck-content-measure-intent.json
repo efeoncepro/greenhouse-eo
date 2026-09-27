@@ -1,24 +1,39 @@
 {
   "contract": "efeonce.surface-composition",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "surface": "deck",
   "format": "16x9",
   "role": "content",
   "recipe": "content-measure",
   "line": "growth",
   "theme": "dark",
-  "voice": { "eyebrow": "Resultados · 3 de 5", "question": "¿Cuántos cortes pasan a la primera?", "answer": ["62 %"] },
+  "voice": {
+    "eyebrow": "Resultados · 3 de 5",
+    "question": "¿Cuántos cortes pasan a la primera?",
+    "answer": [
+      "62 %"
+    ]
+  },
   "body": "de los cortes se aprueban sin cambios. El arco de la lente recorre ese 62 %.",
-  "measure": { "value": 0.62, "source": "Datos de muestra" },
+  "measure": {
+    "value": 0.62,
+    "source": "Datos de muestra"
+  },
   "photo": {
     "subject": "person",
     "plateRef": "ai-generations/2026-09-26_deck-web-motion/plates/P1-deck-lente-edicion.png",
     "alt": "Un editor revisa un corte en la línea de tiempo de su pantalla, de noche, con una taza azul al lado"
   },
-  "unmodeled": {
-    "figures": [
-      { "value": "12 días", "label": "de idea a pieza" },
-      { "value": "−38 %", "label": "costo por lead" }
-    ]
-  }
+  "figures": [
+    {
+      "value": "12 días",
+      "label": "de idea a pieza",
+      "source": "Datos de muestra"
+    },
+    {
+      "value": "−38 %",
+      "label": "costo por lead",
+      "source": "Datos de muestra"
+    }
+  ]
 }

@@ -21,7 +21,7 @@ import { efeonceGraphicLine } from '@efeoncepro/axis-tokens'
 
 import type { RecipeSlots, SurfaceAssetRequest } from '../types'
 import { SurfacePieceError } from '../types'
-import { selectionSlot, voiceSlots, type SurfaceIntent, type SurfaceManifest } from '../shared'
+import { contentOf, photoOf, plateFrom, selectionSlot, voiceSlots, type SurfaceManifest } from '../shared'
 import type { RecipeBuilder } from './deck'
 
 // ── Tipos mínimos de lo que se lee de AXIS ──────────────────────────────────────────────────────────
@@ -228,23 +228,23 @@ const lensPartsFromPiece = (
   }
 }
 
-/** Un plate con un recorte propio (la misma foto puede entrar dos veces con encuadres distintos). */
+/**
+ * Un plate con un recorte propio (la misma foto puede entrar dos veces con encuadres distintos). La foto es la que
+ * AXIS delegó (`delegates.photo`): el plate y su alt que el contrato aceptó.
+ */
 const plateAt = (
-  intent: SurfaceIntent,
+  manifest: SurfaceManifest,
   fit: { width: number; height: number },
   crop: string
-): { ref: string; alt: string; asset: SurfaceAssetRequest } => {
-  const plateRef = intent.photo?.plateRef
-  const alt = intent.photo?.alt?.trim()
+): { ref: string; alt: string; asset: SurfaceAssetRequest } => plateFrom(photoOf(manifest), fit, 'La foto', crop)
 
-  if (!plateRef) throw new SurfacePieceError('La receta lleva foto y el intent no trae `photo.plateRef`.', 'missing-photo')
-  if (!alt) throw new SurfacePieceError('La foto necesita `photo.alt`: describe la escena, no el copy.', 'missing-photo')
+/** La pregunta que resolvió AXIS: las recetas de web, DOOH y motion la llevan siempre. */
+const questionOf = (manifest: SurfaceManifest): string => {
+  const question = contentOf(manifest).question
 
-  const id = plateRef.split('/').pop()!.replace(/\.[a-z0-9]+$/i, '')
-  const size = { width: Math.round(fit.width), height: Math.round(fit.height) }
-  const ref = `asset-ref:plate:${id}-${crop}-${size.width}x${size.height}`
+  if (!question) throw new SurfacePieceError('La receta lleva pregunta y el intent no la trae (`voice.question`).', 'invalid-intent')
 
-  return { ref, alt, asset: { ref, kind: 'plate', path: plateRef, fit: size } }
+  return question
 }
 
 const pushAsset = (assets: SurfaceAssetRequest[], asset: SurfaceAssetRequest): void => {
@@ -329,23 +329,14 @@ const webCta = (manifest: SurfaceManifest): WebCopy => {
   return { label: cta.label, descriptor: cta.descriptor }
 }
 
-/** El encabezado del sitio: los enlaces y la acción los trae el intent (la marca firma con el logo del encabezado). */
-const webNav = (intent: SurfaceIntent): { links: string[]; action: string } | null => {
-  const nav = intent.nav as { links?: unknown; action?: unknown } | undefined
-
-  if (!nav) return null
-
-  const links = Array.isArray(nav.links) ? nav.links.filter((l): l is string => typeof l === 'string' && l.trim() !== '') : []
-
-  if (links.length === 0 || typeof nav.action !== 'string' || !nav.action.trim()) {
-    throw new SurfacePieceError('`nav` lleva `links` (1–5) y `action`, o no se declara.', 'invalid-intent')
-  }
-
-  return { links, action: nav.action }
-}
+/**
+ * El encabezado del sitio: los enlaces y la acción que AXIS validó (`nav-invalid`: 1–5 enlaces y una acción). La marca
+ * firma con el logo del encabezado.
+ */
+const webNav = (manifest: SurfaceManifest): { links: string[]; action: string } | null => contentOf(manifest).nav ?? null
 
 /** Las medidas comunes del hero de escritorio (voz, CTA y encabezado). */
-const desktopFrame = (manifest: SurfaceManifest, intent: SurfaceIntent, hasBody: boolean): Record<string, unknown> => {
+const desktopFrame = (manifest: SurfaceManifest, line: string, hasBody: boolean): Record<string, unknown> => {
   const { width, height } = manifest.canvas
   const chrome = GL.surfaces.web.chrome.desktop
   const ctaTokens = GL.surfaces.web.cta.desktop
@@ -369,7 +360,7 @@ const desktopFrame = (manifest: SurfaceManifest, intent: SurfaceIntent, hasBody:
   const [descMin, descMax] = ctaTokens.descriptor.maxWidthPx
 
   return {
-    line: intent.line,
+    line,
     margin,
     questionTop,
     questionPx: css('question-px', questionPx),
@@ -393,13 +384,13 @@ const desktopFrame = (manifest: SurfaceManifest, intent: SurfaceIntent, hasBody:
   }
 }
 
-const webSlotsBase = (intent: SurfaceIntent, manifest: SurfaceManifest): Record<string, unknown> => {
+const webSlotsBase = (manifest: SurfaceManifest): Record<string, unknown> => {
   const slots: Record<string, unknown> = {
-    voice: voiceSlots(intent),
+    voice: voiceSlots(manifest),
     cta: webCta(manifest)
   }
 
-  const nav = webNav(intent)
+  const nav = webNav(manifest)
 
   if (nav) slots.nav = nav
 
@@ -422,17 +413,19 @@ export const heroLens: RecipeBuilder = ({ intent, manifest, recipe }) => {
   const lensTokens = recipe.lens as { anatomyFrom?: string; arc?: { startDeg: number; endDeg: number } }
   const ringCircle = { ...photoCircle, r: photoCircle.r * (1 + (lens.ring.airRatio ?? GL.orbit.ringAirRatio)) }
 
-  if (!intent.body) throw new SurfacePieceError('El hero con lente lleva bajada (`body`).', 'invalid-intent')
+  const content = contentOf(manifest)
 
-  const frame = desktopFrame(manifest, intent, true)
+  if (!content.body) throw new SurfacePieceError('El hero con lente lleva bajada (`body`).', 'invalid-intent')
+
+  const frame = desktopFrame(manifest, intent.line, true)
   const questionPx = requirePx(manifest, 'question')
-  const lines = questionLines(intent.voice!.question!, questionPx, Number(frame.margin), ringGuard(ringCircle, lens))
+  const lines = questionLines(questionOf(manifest), questionPx, Number(frame.margin), ringGuard(ringCircle, lens))
 
   if (lines.length > 1) throw new SurfacePieceError('En el hero con lente la pregunta va en una línea: acórtala.', 'invalid-intent')
 
   const body = typeOf(manifest, 'body')
   const assets: RecipeSlots['assets'] = []
-  const photo = plateAt(intent, { width, height }, 'canvas')
+  const photo = plateAt(manifest, { width, height }, 'canvas')
 
   pushAsset(assets, photo.asset)
 
@@ -464,8 +457,8 @@ export const heroLens: RecipeBuilder = ({ intent, manifest, recipe }) => {
     },
     photo: { src: photo.ref, lensSrc: photo.ref, alt: photo.alt },
     orbit: { src: orbit.ref },
-    body: intent.body,
-    ...webSlotsBase(intent, manifest)
+    body: content.body,
+    ...webSlotsBase(manifest)
   }
 
   return { slots, assets }
@@ -478,14 +471,14 @@ export const heroLens: RecipeBuilder = ({ intent, manifest, recipe }) => {
 const heroBleedLike: RecipeBuilder = ({ intent, manifest }) => {
   const { width, height } = manifest.canvas
   const assets: RecipeSlots['assets'] = []
-  const photo = plateAt(intent, { width, height }, 'canvas')
+  const photo = plateAt(manifest, { width, height }, 'canvas')
 
   pushAsset(assets, photo.asset)
 
   const slots: Record<string, unknown> = {
-    frame: desktopFrame(manifest, intent, false),
+    frame: desktopFrame(manifest, intent.line, false),
     photo: { src: photo.ref, alt: photo.alt },
-    ...webSlotsBase(intent, manifest)
+    ...webSlotsBase(manifest)
   }
 
   return { slots, assets }
@@ -532,7 +525,8 @@ export const heroMobileNative: RecipeBuilder = ({ intent, manifest, recipe }) =>
   const ctaTokens = GL.surfaces.web.cta.phone
   const voice = requireReserve(manifest, 'voice')
   const answer = typeOf(manifest, 'answer')
-  const photoTokens = recipe.photo as { native?: string; cropCenterXOfFile?: number }
+  // La proporción de la toma y su centro de recorte: los que AXIS delegó con la foto (tokens de la receta).
+  const photoTokens = (photoOf(manifest) ?? recipe.photo) as { native?: string | null; cropCenterXOfFile?: number }
 
   const margin = Math.round((voice.inset ?? chrome.marginOfWidth) * width)
   const questionPx = Math.round(requirePx(manifest, 'question'))
@@ -547,7 +541,7 @@ export const heroMobileNative: RecipeBuilder = ({ intent, manifest, recipe }) =>
   const photoLeft = Math.max(0, Math.min(photoWidth - width, Math.round(centerX * photoWidth - width / 2)))
 
   const assets: RecipeSlots['assets'] = []
-  const photo = plateAt(intent, { width: photoWidth, height }, 'native')
+  const photo = plateAt(manifest, { width: photoWidth, height }, 'native')
 
   pushAsset(assets, photo.asset)
 
@@ -577,7 +571,7 @@ export const heroMobileNative: RecipeBuilder = ({ intent, manifest, recipe }) =>
       photoX: css('photo-x', -photoLeft)
     },
     photo: { src: photo.ref, alt: photo.alt },
-    ...webSlotsBase(intent, manifest)
+    ...webSlotsBase(manifest)
   }
 
   delete slots.nav
@@ -608,7 +602,7 @@ export const camineroLens: RecipeBuilder = ({ intent, manifest, recipe }) => {
   const margin = manifest.safeArea?.marginPx ?? signature.marginPx
   const questionPx = requirePx(manifest, 'question')
   const answer = typeOf(manifest, 'answer')
-  const lines = questionLines(intent.voice!.question!, questionPx, margin, ringGuard(ringCircle, lens))
+  const lines = questionLines(questionOf(manifest), questionPx, margin, ringGuard(ringCircle, lens))
 
   if (lines.length > 1) throw new SurfacePieceError('En el caminero la pregunta va en una línea: acórtala.', 'invalid-intent')
 
@@ -616,8 +610,8 @@ export const camineroLens: RecipeBuilder = ({ intent, manifest, recipe }) => {
   // otro recorte del mismo plate, desplazado para que el centro de la lente quede quieto.
   const zoom = lens.inside.zoom
   const assets: RecipeSlots['assets'] = []
-  const photo = plateAt(intent, { width, height }, 'canvas')
-  const inside = plateAt(intent, { width: width * zoom, height: height * zoom }, `lens-${zoom}`)
+  const photo = plateAt(manifest, { width, height }, 'canvas')
+  const inside = plateAt(manifest, { width: width * zoom, height: height * zoom }, `lens-${zoom}`)
 
   pushAsset(assets, photo.asset)
   pushAsset(assets, inside.asset)
@@ -655,7 +649,7 @@ export const camineroLens: RecipeBuilder = ({ intent, manifest, recipe }) => {
     },
     photo: { src: photo.ref, lensSrc: inside.ref, alt: photo.alt },
     orbit: { src: orbit.ref },
-    voice: voiceSlots(intent)
+    voice: voiceSlots(manifest)
   }
 
   return { slots, assets }
@@ -665,8 +659,9 @@ export const camineroLens: RecipeBuilder = ({ intent, manifest, recipe }) => {
 
 /**
  * La toma HECHA para la lente (`photo.madeForLens`) se ubica por su foco, no por un recorte centrado: el intent
- * declara la proporción del archivo (`photo.native`, «4:7») y dónde está la cara (`photo.focus`, fracciones del
- * archivo). Calibrado sobre la pieza aprobada (M1 · polo): a escala 1 el ancho de la toma mide 1,463 diámetros de
+ * declara la proporción del archivo (`photo.native`, «4:7») y dónde está la cara (`photo.focus`: `xOfWidth` y
+ * `yOfHeight`, fracciones del archivo); AXIS valida ambos (`photo-native-invalid`, `photo-focus-invalid`) y los
+ * devuelve en `delegates.photo`. Calibrado sobre la pieza aprobada (M1 · polo): a escala 1 el ancho de la toma mide 1,463 diámetros de
  * la foto de la lente, la receta la agranda `photo.scale` (1,1 → 1126 px para una foto de 350 px de radio) y la
  * cara queda sobre el centro de la lente, 0,257 radios más arriba (cabeza, hombros, polo y credencial adentro).
  */
@@ -675,15 +670,17 @@ const MADE_FOR_LENS_FACE_ABOVE_CENTER_OF_R = 0.257
 
 type LensPhotoPlacement = { fit: { width: number; height: number }; x: number; y: number }
 
-const madeForLensPlacement = (intent: SurfaceIntent, recipe: Record<string, unknown>, photoCircle: Circle): LensPhotoPlacement => {
-  const photo = intent.photo as { native?: unknown; focus?: { xOfFile?: unknown; yOfFile?: unknown } } | undefined
+const madeForLensPlacement = (manifest: SurfaceManifest, recipe: Record<string, unknown>, photoCircle: Circle): LensPhotoPlacement => {
+  const photo = photoOf(manifest)
   const aspect = parseAspect(photo?.native)
-  const fx = Number(photo?.focus?.xOfFile)
-  const fy = Number(photo?.focus?.yOfFile)
+  const fx = photo?.focus?.xOfWidth
+  const fy = photo?.focus?.yOfHeight
 
-  if (!aspect || !(fx >= 0 && fx <= 1) || !(fy >= 0 && fy <= 1)) {
+  // AXIS valida el formato del foco y de la proporción cuando vienen, pero no los exige: la toma hecha para la lente
+  // no se ubica sin los dos ejes del foco.
+  if (!aspect || typeof fx !== 'number' || typeof fy !== 'number') {
     throw new SurfacePieceError(
-      'La toma hecha para la lente se ubica por su foco: el intent trae `photo.native` («4:7») y `photo.focus` ({ xOfFile, yOfFile }).',
+      'La toma hecha para la lente se ubica por su foco: el intent trae `photo.native` («4:7») y `photo.focus` ({ xOfWidth, yOfHeight }).',
       'missing-photo'
     )
   }
@@ -713,7 +710,7 @@ const loopLens = (manifest: SurfaceManifest, line: string) => {
 const MOTION_QUESTION_LINE_HEIGHT = 1.2
 
 /** La voz del loop: la última línea de la pregunta se apoya en la reserva (así sube cuando se parte en dos). */
-const motionVoice = (manifest: SurfaceManifest, intent: SurfaceIntent, guard: number) => {
+const motionVoice = (manifest: SurfaceManifest, guard: number) => {
   const { width, height } = manifest.canvas
   const voiceReserve = requireReserve(manifest, 'voice')
   const answerReserve = requireReserve(manifest, 'answer')
@@ -722,7 +719,7 @@ const motionVoice = (manifest: SurfaceManifest, intent: SurfaceIntent, guard: nu
   const answer = typeOf(manifest, 'answer')
   const margin = Math.round((voiceReserve.inset ?? 0) * width)
   const answerLeft = Math.round((answerReserve.inset ?? voiceReserve.inset ?? 0) * width)
-  const lines = questionLines(intent.voice!.question!, questionPx, margin, guard)
+  const lines = questionLines(questionOf(manifest), questionPx, margin, guard)
   const lastLineTop = Math.round((voiceReserve.fromTop ?? 0) * height)
 
   return {
@@ -752,10 +749,10 @@ const joinLines = (lines: string[]): string => lines.join('<br>')
 export const loopLensReveal: RecipeBuilder = ({ intent, manifest, recipe }) => {
   const { line } = intent
   const { channel, ringCircle, photoCircle, lens } = loopLens(manifest, line)
-  const voice = motionVoice(manifest, intent, ringGuard(ringCircle, lens))
-  const placement = madeForLensPlacement(intent, recipe, photoCircle)
+  const voice = motionVoice(manifest, ringGuard(ringCircle, lens))
+  const placement = madeForLensPlacement(manifest, recipe, photoCircle)
   const assets: RecipeSlots['assets'] = []
-  const photo = plateAt(intent, placement.fit, 'lens')
+  const photo = plateAt(manifest, placement.fit, 'lens')
 
   pushAsset(assets, photo.asset)
 
@@ -782,7 +779,7 @@ export const loopLensReveal: RecipeBuilder = ({ intent, manifest, recipe }) => {
     },
     photo: { lensSrc: photo.ref, alt: photo.alt },
     orbit: { src: orbit.ref },
-    voice: { ...voiceSlots(intent), question: joinLines(voice.lines) }
+    voice: { ...voiceSlots(manifest), question: joinLines(voice.lines) }
   }
 
   const selection = selectionSlot(manifest)
@@ -832,8 +829,6 @@ const OPENING_ARC_DEG = 18
 const IMPACT_PULSE_OF_SPHERE = 2.6
 const IMPACT_PULSE_OPACITY = 0.55
 
-type StoryboardFrameInput = { segment: string; title: string; caption: string }
-
 /**
  * `motion.storyboard`: la hoja del cuadro a cuadro del loop. Cada cuadro es el mismo lienzo 16:9 del loop en un
  * estado de su timeline; la voz, la lente y la toma son las de `loop-lens-reveal`, resueltas por AXIS con el mismo
@@ -843,7 +838,7 @@ type StoryboardFrameInput = { segment: string; title: string; caption: string }
 export const storyboard: RecipeBuilder = ({ intent, manifest }) => {
   const timeline = manifest.timeline as { segments?: { id: string; fromMs: number; toMs: number }[] } | null
   const segments = timeline?.segments ?? []
-  const frames = (intent.frames as StoryboardFrameInput[] | undefined) ?? []
+  const { frames, title } = contentOf(manifest)
 
   if (
     segments.length !== STORYBOARD_SCENES.length ||
@@ -855,12 +850,10 @@ export const storyboard: RecipeBuilder = ({ intent, manifest }) => {
     )
   }
 
-  if (frames.length !== segments.length || frames.some((frame, i) => frame.segment !== segments[i]!.id)) {
-    throw new SurfacePieceError('`frames` trae un título y un pie por escena del timeline, en su orden.', 'invalid-intent')
-  }
-
-  if (typeof intent.title !== 'string' || !intent.title.trim()) {
-    throw new SurfacePieceError('La hoja lleva título (`title`).', 'invalid-intent')
+  // AXIS ya exige un cuadro por escena del timeline, en su orden, con título y pie (`frames-segments-mismatch`,
+  // `frame-text-required`) y el título de la hoja (`title-required`): aquí sólo se cierra un manifest sin ellos.
+  if (!frames || frames.length !== segments.length || !title) {
+    throw new SurfacePieceError('La hoja lleva título y un cuadro por escena del timeline (`title`, `frames`).', 'invalid-intent')
   }
 
   // La pieza que documenta la hoja: el loop, resuelto por AXIS con la misma voz, toma y línea.
@@ -889,11 +882,11 @@ export const storyboard: RecipeBuilder = ({ intent, manifest }) => {
 
   const { line } = intent
   const { channel, ringCircle, photoCircle, lens } = loopLens(loopManifest, line)
-  const voice = motionVoice(loopManifest, intent, ringGuard(ringCircle, lens))
-  const placement = madeForLensPlacement(intent, loopRecipe, photoCircle)
+  const voice = motionVoice(loopManifest, ringGuard(ringCircle, lens))
+  const placement = madeForLensPlacement(manifest, loopRecipe, photoCircle)
   const settled = lensPartsFromPiece(lens, 'wall', photoCircle.r)
   const assets: RecipeSlots['assets'] = []
-  const photo = plateAt(intent, placement.fit, 'lens')
+  const photo = plateAt(manifest, placement.fit, 'lens')
 
   pushAsset(assets, photo.asset)
 
@@ -905,7 +898,7 @@ export const storyboard: RecipeBuilder = ({ intent, manifest }) => {
     return painted.ref
   }
 
-  const answerVoice = voiceSlots(intent)
+  const answerVoice = voiceSlots(manifest)
   const question = joinLines(voice.lines)
   const loopSelection = selectionSlot(loopManifest)
 
@@ -988,7 +981,7 @@ export const storyboard: RecipeBuilder = ({ intent, manifest }) => {
       photoX: css('photo-x', placement.x),
       photoY: css('photo-y', placement.y)
     },
-    title: intent.title,
+    title,
     photo: { src: photo.ref, alt: photo.alt },
     frames: items
   }

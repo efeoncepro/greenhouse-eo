@@ -1,13 +1,18 @@
 {
   "contract": "efeonce.surface-composition",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "surface": "dooh",
   "format": "caminero-3x1",
   "role": "billboard",
   "recipe": "caminero-lens",
   "line": "growth",
   "theme": "dark",
-  "voice": { "question": "¿Lo medimos?", "answer": ["Siempre"] },
+  "voice": {
+    "question": "¿Lo medimos?",
+    "answer": [
+      "Siempre"
+    ]
+  },
   "photo": {
     "register": "documental",
     "subject": "person",

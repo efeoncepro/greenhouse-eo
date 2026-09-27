@@ -42,6 +42,22 @@ const expectCode = (fn: () => unknown, code: SurfacePieceError['code']) => {
   throw new Error(`se esperaba SurfacePieceError ${code}`)
 }
 
+/** Los códigos con que AXIS rechazó el intent (falla si no lo rechazó con `surface-issues`). */
+const issuesOf = (intent: SurfaceIntent): string[] => {
+  let caught: unknown
+
+  try {
+    plan(intent)
+  } catch (error) {
+    caught = error
+  }
+
+  expect(caught).toBeInstanceOf(SurfacePieceError)
+  expect((caught as SurfacePieceError).code).toBe('surface-issues')
+
+  return (caught as SurfacePieceError).issues.map(issue => (issue as { code: string }).code)
+}
+
 const RECIPES = ['cartela', 'zocalo', 'callout-selection', 'data-super', 'split-screen', 'subtitles', 'shot-plan']
 
 const recipeTokens = efeonceGraphicLine.surfaces.audiovisual.recipes as unknown as Record<string, Record<string, unknown>>
@@ -132,7 +148,7 @@ describe('recetas audiovisuales → catálogo graphic-line-overlays', () => {
     })
   })
 
-  it('llamada: la caja del objeto sale de las fracciones del intent, sin texto propio', () => {
+  it('llamada: la caja del objeto sale del delegado de selección de AXIS, sin texto propio', () => {
     const { piece, slots } = plan(intentOf('callout-selection'))
 
     expect(slots.target).toEqual({
@@ -218,7 +234,7 @@ describe('recetas audiovisuales: falla cerrado', () => {
         planSurfacePiece(
           {
             contract: 'efeonce.surface-composition',
-            version: '0.1.0',
+            version: '0.1.1',
             surface: 'audiovisual',
             format: '16x9',
             role: 'close',
@@ -254,18 +270,23 @@ describe('recetas audiovisuales: falla cerrado', () => {
     expectCode(() => plan({ ...intent, voice: { ...intent.voice, answer: ['Producción', 'y posproducción'] } }), 'invalid-intent')
   })
 
-  it('una llamada sin caja o con una caja invertida se rechaza', () => {
+  it('una llamada sin caja o con una caja invertida la rechaza AXIS', () => {
     const intent = intentOf('callout-selection')
+    const { box, ...selection } = intent.selection as Record<string, unknown>
 
-    expectCode(() => plan({ ...intent, selection: { ...intent.selection, box: undefined } } as SurfaceIntent), 'invalid-intent')
-    expectCode(
-      () => plan({ ...intent, selection: { ...intent.selection, box: { left: 0.6, top: 0.5, right: 0.4, bottom: 0.7 } } } as SurfaceIntent),
-      'invalid-intent'
-    )
+    void box
+    expect(issuesOf({ ...intent, selection } as SurfaceIntent)).toContain('selection-box-required')
+    expect(
+      issuesOf({ ...intent, selection: { ...intent.selection, box: { left: 0.6, top: 0.5, right: 0.4, bottom: 0.7 } } } as SurfaceIntent)
+    ).toContain('selection-box-invalid')
   })
 
-  it('subtítulos de tres líneas no pasan', () => {
-    expectCode(() => plan({ ...intentOf('subtitles'), subtitles: { lines: ['uno', 'dos', 'tres'] } }), 'invalid-intent')
+  it('subtítulos de tres líneas los rechaza AXIS', () => {
+    expect(issuesOf({ ...intentOf('subtitles'), subtitles: { lines: ['uno', 'dos', 'tres'] } })).toContain('subtitles-over-lines')
+  })
+
+  it('una cartela sin el título del capítulo la rechaza AXIS', () => {
+    expect(issuesOf({ ...intentOf('cartela'), chapter: { title: ' ' } })).toContain('chapter-title-required')
   })
 
   it('la pantalla dividida lleva una palabra por plano', () => {
@@ -274,13 +295,24 @@ describe('recetas audiovisuales: falla cerrado', () => {
     expectCode(() => plan({ ...intent, voice: { answer: ['Escucha'] } }), 'invalid-intent')
   })
 
-  it('el plan de planos no contradice el timeline de AXIS (duración ni lente)', () => {
+  it('el plan de planos no contradice el timeline de AXIS (duración ni lente): lo rechaza AXIS', () => {
     const intent = intentOf('shot-plan')
     const shots = intent.shots as { segment: string; spec: string }[]
 
-    expectCode(() => plan({ ...intent, title: 'Un video de 15 s «Cómo trabajamos»' }), 'invalid-intent')
+    expect(issuesOf({ ...intent, title: 'Un video de 15 s «Cómo trabajamos»' })).toContain('sheet-duration-mismatch')
+    expect(
+      issuesOf({ ...intent, shots: shots.map(s => (s.segment === 'shot-01-wide' ? { ...s, spec: s.spec.replace('35 mm', '24 mm') } : s)) })
+    ).toContain('shot-lens-mismatch')
+    expect(issuesOf({ ...intent, shots: shots.slice(0, 3) })).toContain('shots-segments-mismatch')
+  })
+
+  it('el plan de planos nombra su duración y cada ficha su lente (AXIS sólo rechaza la que dice otra)', () => {
+    const intent = intentOf('shot-plan')
+    const shots = intent.shots as { segment: string; spec: string }[]
+
+    expectCode(() => plan({ ...intent, title: 'Producción audiovisual «Cómo trabajamos»' }), 'invalid-intent')
     expectCode(
-      () => plan({ ...intent, shots: shots.map(s => (s.segment === 'shot-01-wide' ? { ...s, spec: s.spec.replace('35 mm', '24 mm') } : s)) }),
+      () => plan({ ...intent, shots: shots.map(s => (s.segment === 'shot-01-wide' ? { ...s, spec: s.spec.replace(' · 35 mm', '') } : s)) }),
       'invalid-intent'
     )
   })

@@ -1,7 +1,9 @@
 /**
  * Las recetas aprobadas de la superficie deck (TASK-1919): cada intent de ejemplo se traduce a un plan del catálogo
  * `graphic-line-deck` con las medidas que resolvió AXIS, el plan pasa el contrato de slots de su plantilla, y lo que
- * la receta no admite falla cerrado.
+ * la receta no admite falla cerrado. Desde el contrato 0.1.1 todo el contenido de la lámina viaja en claves canónicas
+ * (voz, niveles, nota, paneles, cifras) y lo que AXIS valida (niveles, cifras con fuente, nivel de la selección, largo
+ * de la respuesta) lo rechaza AXIS con `surface-issues` antes de llegar al builder.
  */
 
 import fs from 'node:fs'
@@ -59,6 +61,22 @@ const expectCode = (fn: () => unknown, code: SurfacePieceError['code']) => {
   throw new Error(`se esperaba SurfacePieceError ${code}`)
 }
 
+/** Los códigos con que AXIS rechazó el intent (falla si no lo rechazó con `surface-issues`). */
+const issuesOf = (candidate: SurfaceIntent): string[] => {
+  let caught: unknown
+
+  try {
+    planSurfacePiece(candidate, { artifactId: 'prueba' })
+  } catch (error) {
+    caught = error
+  }
+
+  expect(caught).toBeInstanceOf(SurfacePieceError)
+  expect((caught as SurfacePieceError).code).toBe('surface-issues')
+
+  return (caught as SurfacePieceError).issues.map(issue => (issue as { code: string }).code)
+}
+
 describe('recetas aprobadas del deck', () => {
   it('section-classic: número dentro del anillo de pieces.deck.section y la voz a su izquierda', () => {
     const { piece, template, violations, slots } = plan(example('section-classic'))
@@ -80,14 +98,22 @@ describe('recetas aprobadas del deck', () => {
     expect(layer && 'svg' in layer ? layer.svg : '').toContain('data-axis-kind="progress"')
   })
 
-  it('section-classic: sin la voz de la lámina aprobada falla, y en la clave canónica la rechaza AXIS', () => {
-    const bare = without(example('section-classic'), 'unmodeled')
+  it('section-classic: sin la voz de la lámina aprobada falla, y una respuesta de más de tres palabras la rechaza AXIS', () => {
+    const intent = example('section-classic')
 
-    expectCode(() => planSurfacePiece(bare as SurfaceIntent, { artifactId: 'prueba' }), 'invalid-intent')
+    expectCode(() => planSurfacePiece(without(intent, 'voice'), { artifactId: 'prueba' }), 'invalid-intent')
     expectCode(
-      () => planSurfacePiece({ ...bare, voice: { question: '¿Quién?', answer: ['El dato'] } } as SurfaceIntent, { artifactId: 'prueba' }),
+      () =>
+        planSurfacePiece({ ...intent, voice: { question: '¿Quién decide?', answer: ['El dato', 'de todos los días'] } }, { artifactId: 'prueba' }),
       'surface-issues'
     )
+  })
+
+  it('un intent del contrato 0.1.0 no trae el contenido de la lámina y falla cerrado', () => {
+    // AXIS lee un 0.1.0 como se escribió (ignora las claves de 0.1.1): la escalera la rechaza el contrato y el
+    // tríptico llega sin sus tomas, y el builder no compone una lámina a medias.
+    expectCode(() => planSurfacePiece({ ...example('method-staircase'), version: '0.1.0' }, { artifactId: 'prueba' }), 'surface-issues')
+    expectCode(() => planSurfacePiece({ ...example('triptych'), version: '0.1.0' }, { artifactId: 'prueba' }), 'missing-photo')
   })
 
   it('section-split: reservas, panel e indicador volteado salen de la receta de AXIS', () => {
@@ -139,15 +165,27 @@ describe('recetas aprobadas del deck', () => {
     expect(layer && 'svg' in layer ? layer.svg : '').toContain('data-axis-kind="measure"')
   })
 
-  it('content-measure: sin medida la rechaza AXIS; con tres cifras de apoyo falla', () => {
+  it('content-measure: las cifras de apoyo salen del manifest con valor y leyenda', () => {
+    const { slots } = plan(example('content-measure'))
+
+    expect(slots.figures).toEqual([
+      { value: '12 días', label: 'de idea a pieza' },
+      { value: '−38 %', label: 'costo por lead' }
+    ])
+  })
+
+  it('content-measure: sin medida, con tres cifras o con una cifra sin fuente la rechaza AXIS', () => {
     const bare = without(example('content-measure'), 'measure')
 
     expectCode(() => planSurfacePiece(bare as SurfaceIntent, { artifactId: 'prueba' }), 'surface-issues')
 
     const intent = example('content-measure')
-    const figures = [...(intent.unmodeled as { figures: unknown[] }).figures, { value: '3x', label: 'más' }]
+    const figures = intent.figures as { value: string; label: string; source: string }[]
 
-    expectCode(() => planSurfacePiece({ ...intent, unmodeled: { figures } }, { artifactId: 'prueba' }), 'invalid-intent')
+    expect(issuesOf({ ...intent, figures: [...figures, { value: '3x', label: 'más', source: 'Datos de muestra' }] })).toContain(
+      'figures-over-limit'
+    )
+    expect(issuesOf({ ...intent, figures: [figures[0], { value: '−38 %', label: 'costo por lead' }] })).toContain('figure-source-required')
   })
 
   it('triptych: tres tomas nativas 9:16 de 636 px y una línea de la frase por toma', () => {
@@ -170,14 +208,16 @@ describe('recetas aprobadas del deck', () => {
     expect(plates.every(p => 'fit' in p && p.fit.width === 636 && p.fit.height === 1131)).toBe(true)
   })
 
-  it('triptych: una frase que no reparte en tres tomas falla cerrado', () => {
+  it('triptych: una frase que no reparte en tres tomas falla cerrado; otro número de tomas lo rechaza AXIS', () => {
     const intent = example('triptych')
+    const panels = intent.panels as unknown[]
 
     expectCode(
       () => planSurfacePiece({ ...intent, voice: { ...intent.voice, answer: ['Escucha', 'y crea'] } }, { artifactId: 'prueba' }),
       'invalid-intent'
     )
-    expectCode(() => planSurfacePiece({ ...intent, unmodeled: {} }, { artifactId: 'prueba' }), 'missing-photo')
+
+    expect(issuesOf({ ...intent, panels: panels.slice(0, 2) })).toContain('panels-count-invalid')
   })
 
   it('method-staircase: los cinco niveles del token, la respuesta en el rango del deck y la selección de un nivel', () => {
@@ -189,39 +229,38 @@ describe('recetas aprobadas del deck', () => {
     expect(slots.frame!.answerPx).toBeGreaterThanOrEqual(104)
     expect(slots.frame!.answerPx).toBeLessThanOrEqual(176)
     expect(Math.abs((slots.frame!.answerPx as number) - 140)).toBeLessThanOrEqual(3)
-    expect(slots.selection).toMatchObject({ level: 3, label: 'SEO · AEO', anchor: 'bottom-end' })
+    expect(slots.note).toBe('Be Intrinsic es una trayectoria, no una garantía.')
+
+    // La selección del peldaño sale entera del delegado de AXIS: nivel, escala y el objetivo sin velo.
+    expect(slots.selection).toEqual({
+      level: 3,
+      label: 'SEO · AEO',
+      anchor: 'bottom-end',
+      participantKind: 'department',
+      scale: 1.1,
+      targetKind: 'object',
+      variant: 'eight-handles',
+      padding: 'standard',
+      overlay: 'none'
+    })
     expect(piece.assets).toEqual([])
   })
 
-  it('method-staircase: otro número de niveles o una selección fuera de la escalera fallan cerrado', () => {
+  it('method-staircase: otro número de niveles, una selección fuera de la escalera o una respuesta larga los rechaza AXIS', () => {
     const intent = example('method-staircase')
-    const content = intent.unmodeled as { levels: unknown[]; selection: Record<string, unknown> }
+    const levels = intent.levels as unknown[]
 
-    expectCode(
-      () => planSurfacePiece({ ...intent, unmodeled: { ...content, levels: content.levels.slice(0, 4) } }, { artifactId: 'prueba' }),
-      'invalid-intent'
-    )
-    expectCode(
-      () =>
-        planSurfacePiece(
-          { ...intent, unmodeled: { ...content, selection: { ...content.selection, level: 7 } } },
-          { artifactId: 'prueba' }
-        ),
-      'invalid-intent'
+    expect(issuesOf({ ...intent, levels: levels.slice(0, 4) })).toContain('levels-count-invalid')
+    expect(issuesOf({ ...intent, selection: { ...intent.selection, level: 7 } })).toContain('selection-level-invalid')
+    expect(issuesOf({ ...intent, voice: { question: '¿Te recomienda la IA?', answer: ['Capa por capa', 'siempre'] } })).toContain(
+      'voice-answer-too-long'
     )
   })
 
-  it('una respuesta de más de tres palabras fuera del contrato también la frena la regla de AXIS', () => {
+  it('method-staircase: un nivel sin descriptor falla cerrado (AXIS lo deja opcional, el peldaño aprobado no)', () => {
     const intent = example('method-staircase')
-    const content = intent.unmodeled as Record<string, unknown>
+    const levels = (intent.levels as { name: string; descriptor: string }[]).map((level, i) => (i === 2 ? { name: level.name } : level))
 
-    expectCode(
-      () =>
-        planSurfacePiece(
-          { ...intent, unmodeled: { ...content, voice: { question: '¿Te recomienda la IA?', answer: ['Capa por capa', 'siempre'] } } },
-          { artifactId: 'prueba' }
-        ),
-      'invalid-intent'
-    )
+    expectCode(() => planSurfacePiece({ ...intent, levels }, { artifactId: 'prueba' }), 'invalid-intent')
   })
 })
