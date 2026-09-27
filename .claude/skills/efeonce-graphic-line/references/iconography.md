@@ -4,7 +4,8 @@
 > tag `v0.3.6`) y el canvas «Íconos de La órbita» (claude.ai/artifact/Y9mx42L72zYc6iLg4j3Maj, versión 20) — 2026-09-26 ·
 > decisiones del operador D16–D22 ([ledger.md](ledger.md)). §12 (Plastilina en volumen, D24): AXIS `main@c18e3d3`
 > (`axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, **publicados** con el tag `v0.3.7` sobre `main@c0020b6`) —
-> 2026-09-27.
+> 2026-09-27. §13 (catálogo y oficio, D25): AXIS main@aa66225, 2026-09-27 (`@efeoncepro/axis-graphic-line` 0.5.0 y
+> `@efeoncepro/axis-brand-assets` 0.3.3, publicados con el tag `v0.5.0`; `axis-tokens` sigue en 0.3.7).
 >
 > **Estado: canónica** (el operador la canonizó el 2026-09-26, D22). **La fuente de verdad es AXIS**, no este documento:
 > valores en `efeonceGraphicLine.icons` (`@efeoncepro/axis-tokens`), geometría y reglas ejecutables en
@@ -16,15 +17,17 @@
 
 1. La voz la decide la línea de servicio de la pieza: `iconVoiceForLine(line)` → Trazo (Growth, Engine, Revenue) o
    Plastilina (Brand); Voice, por decidir.
-2. El glifo sale de `ICON_CATALOG` (12 de Trazo, 18 de Plastilina). **Si no existe, no se dibuja dentro de la pieza**: se
+2. El glifo sale de `ICON_CATALOG` (60: 27 de Trazo y 33 de Plastilina, con los 30 de oficio de D25; lista en §13).
+   **Si no existe, no se dibuja dentro de la pieza**: se
    da de alta con `pnpm icons:check` (Trazo) o `pnpm icons:vectorize` + `pnpm icons:check` (Plastilina), en el repo AXIS,
    y con la aprobación del operador.
 3. Se pinta con `resolveIcon({ glyph, state, size, line, surface, gesture, label })`: nunca se transcriben HEX ni px.
 4. Reposo por defecto; responde uno solo y sólo si la pieza no tiene otra esfera. Antes de entregar,
    `auditIconGroup(items, { pieceHasSphere })`.
 5. Plastilina protagonista: `skewedOrbitHeroSvg` (el objeto en reposo, la órbita pone la esfera).
-6. Paquetes publicados (tag `v0.3.6`): un consumidor fija `@efeoncepro/axis-graphic-line` `0.4.0` y `axis-tokens`
-   `0.3.6`. Greenhouse todavía no consume `/icons`: para una pieza, `pnpm icons:export` en AXIS o el paquete.
+6. Paquetes publicados: el catálogo completo de 60 glifos está en `@efeoncepro/axis-graphic-line` `0.5.0` (tag
+   `v0.5.0`); la 0.4.0 (tag `v0.3.6`) trae sólo los 30 de la base. Greenhouse fija `0.5.0` y `axis-brand-assets`
+   `0.3.3` desde el 2026-09-27; para una pieza, el paquete o `pnpm icons:export` en AXIS.
 7. Un objeto protagonista en volumen (D24): usa el PNG de `@efeoncepro/axis-brand-assets` (`volumeIconUrl(glyph)`);
    nunca lo generes de nuevo ni lo uses en listas o UI (§12).
 
@@ -173,6 +176,9 @@ Aire verificado a mano el 2026-09-26 (≥ 0,5 en todos; Embudo, CRM, Automatizac
 revisión del operador). Revenue y Medios se corrigieron para cumplirlo: la línea de
 Revenue termina en 17,5 / 11,5 y la esfera de Medios va en x 20,35.
 
+Esta tabla es la **base** (12). Los 15 de Trazo del oficio (D25, §13) no se transcriben aquí: su geometría vive sólo
+en `STROKE_GLYPHS` de AXIS (`@efeoncepro/axis-graphic-line` 0.5.0) y se pinta con `resolveIcon`.
+
 ### 9.1 Cómo entra un glifo nuevo de trazo
 
 Un glifo nuevo se dibuja una vez, entra al set y recién después se usa en piezas (§8).
@@ -187,12 +193,21 @@ Un glifo nuevo se dibuja una vez, entra al set y recién después se usa en piez
 5. **Alta:** con la aprobación del operador entra a `STROKE_GLYPHS` (`packages/graphic-line/src/icons-stroke-data.ts`),
    cuya prueba mide el aire de todo el set. Antes, no sale en piezas.
 
+Dos reglas que dejó el oficio (D25, ver [lessons.md](lessons.md), 2026-09-27): la **clave es única entre las dos voces**
+(el Trazo del teléfono se llama `llamada` porque `telefono` ya es la Plastilina), y el Trazo **no usa arcos
+elípticos**: `samplePath` sólo mide arcos circulares, así que un óvalo se dibuja con cuatro arcos circulares tangentes
+(caso: `base-de-datos`).
+
 ## 10. Implementación y pendientes
 
 - **Hecho y publicado el 2026-09-26 con el tag `v0.3.6` (AXIS `main@5b8ab20`):** tokens `efeonceGraphicLine.icons` (`axis-tokens` 0.3.6) y el
   subpath `@efeoncepro/axis-graphic-line/icons` (0.4.0) con la geometría de este §9, la API y los comandos
   `icons:export|check|vectorize`; página `/references/iconography/`.
-- **Pendiente:** que un consumidor los fije (versiones exactas `axis-tokens` 0.3.6 y `axis-graphic-line` 0.4.0).
+- **Hecho y publicado el 2026-09-27 con el tag `v0.5.0` (AXIS main@aa66225, 2026-09-27):** los 30 glifos de oficio (D25, §13)
+  en `@efeoncepro/axis-graphic-line` 0.5.0 y sus 15 volúmenes en `@efeoncepro/axis-brand-assets` 0.3.3; el Lab
+  muestra los 60 del catálogo y los 33 volúmenes.
+- **Pendiente:** que un consumidor adopte el catálogo completo (Greenhouse fija hoy `axis-graphic-line` 0.4.0 y
+  `axis-brand-assets` 0.3.2, sin el oficio).
 - **Pendiente (operador):** el inventario del set (qué íconos necesita la marca: líneas, canales, áreas, contacto) y si
   este set reemplaza a los Tabler outline de la firma de correo y de la firma de equipo (`emailSignature.icons`,
   `team.areaMark`). Mientras no se decida, la firma sigue con Tabler.
@@ -206,7 +221,8 @@ sección 2 del canvas «Íconos de La órbita»: anatomía E1, post E2, set E3, 
 stickers E8 e ícono maestro vectorial `IconoE.dc.html`.
 
 > **Estado:** canónica (D22, 2026-09-26): nombre, dirección, color por línea, órbita sesgada, fondo, receta, método,
-> los 18 glifos, los «no hacer» y los formatos. Siguen abiertos sólo los pendientes del ledger (voz de Voice, aire a
+> los 18 glifos de la base, los «no hacer» y los formatos. El 2026-09-27 (D25) entraron 15 de oficio: el set de
+> Plastilina queda en 33 (§13). Siguen abiertos sólo los pendientes del ledger (voz de Voice, aire a
 > 20 px, opacidad del anillo sesgado, esfera en voz o ícono).
 
 ### 11.1 Dos voces, una familia
@@ -262,7 +278,9 @@ ejecuta con sus comandos; esto es el resumen:
 
 Dieciocho glifos en `IconoE.dc.html`: rayo, paleta, pincel, cuentagotas, bombillo, tablet, laptop, escritorio,
 teléfono (primera tanda) y cámara, claqueta, micrófono, pluma, cursor, tijeras, megáfono, audífonos, corazón (segunda
-tanda). La geometría canónica vive en AXIS: `PLASTILINA_GLYPHS` en
+tanda). Es la **base**: el 2026-09-27 (D25) entraron 15 de oficio (lápiz, rodillo, aerosol, escuadra, post-it,
+encuadre, película, vinilo, guitarra, reproducir, varita, taza, lámpara, trofeo, estrella), que no están en
+`IconoE.dc.html`; el set queda en 33 (§13). La geometría canónica vive en AXIS: `PLASTILINA_GLYPHS` en
 `packages/graphic-line/src/icons-plastilina-data.ts` (`t` transformación, `d` trazado, `dot` esfera, `over` barras,
 `gesture` marcas de acción). `resolveIcon` la pinta con su máscara, su gesto y su esfera; no se copia a mano.
 
@@ -319,7 +337,7 @@ producto Greenhouse.
 
 ### 12.3 Qué entrega el set
 
-- Los **18 glifos de Plastilina**, en **respuesta**, con el acento de **Brand** (naranja; Plastilina es la voz de
+- Los **33 glifos de Plastilina** (18 de la base desde D24 y 15 de oficio desde D25), en **respuesta**, con el acento de **Brand** (naranja; Plastilina es la voz de
   Brand) y el **gesto** donde el glifo lo tiene (rayo, bombillo, teléfono: los gestos son rollitos o cápsulas de
   arcilla).
 - PNG de **1024 px** (~130 KB cada uno, paleta con alfa), con **alfa** y los calados abiertos: va sobre cualquier fondo.
@@ -330,8 +348,8 @@ producto Greenhouse.
 
 - Tokens: `efeonceGraphicLine.icons.volume` (`@efeoncepro/axis-tokens` 0.3.7, publicado en `v0.3.7`). Detalle en
   [package-and-tokens.md](package-and-tokens.md) §«Iconografía».
-- Archivos: `@efeoncepro/axis-brand-assets` 0.3.2 (publicado en `v0.3.7`), `assets/volume/<glifo>.png`, sellados en
-  `src/volume-manifest.ts`.
+- Archivos: `@efeoncepro/axis-brand-assets` 0.3.3 (publicado en `v0.5.0`; 33 PNG), `assets/volume/<glifo>.png`,
+  sellados en `src/volume-manifest.ts`. La 0.3.2 (tag `v0.3.7`) trae sólo los 18 de la base.
 
 ```ts
 import { AXIS_VOLUME_ICONS, findVolumeIcon, volumeIconUrl } from '@efeoncepro/axis-brand-assets'
@@ -339,7 +357,7 @@ import { AXIS_VOLUME_ICONS, findVolumeIcon, volumeIconUrl } from '@efeoncepro/ax
 const url = volumeIconUrl('bombillo') // lanza con un glifo que no es de Plastilina
 ```
 
-- Lab: `https://axis.efeonce.org/references/iconography/#volumen` (sección 05: set de 18 con descarga PNG, tabla de
+- Lab: `https://axis.efeonce.org/references/iconography/#volumen` (sección 05: set de 33 con descarga PNG, tabla de
   spec, dónde va y dónde no, método, avisos revisados). Para agentes: `/references/iconography.json`, bloque `volume`.
 
 ### 12.5 Cómo se da de alta un glifo en volumen
@@ -371,7 +389,8 @@ pnpm icons:volume -- publish --in ./alfa                 # comprime (paleta), co
 
 ### 12.6 Avisos del set del 2026-09-27 (revisados y aceptados)
 
-11 de 18 pasaron sin avisos. Aceptados tras mirarlos: laptop (silueta 0,44, algo menos inclinado, tercera pasada),
+Se refiere a los 18 de la base (los 15 volúmenes de oficio se aprobaron el mismo día con D25). 11 de 18 pasaron sin
+avisos. Aceptados tras mirarlos: laptop (silueta 0,44, algo menos inclinado, tercera pasada),
 escritorio (0,64) y teléfono (0,73) por perspectiva y grosor; pluma, tijeras y audífonos juntan piezas que se tocan;
 megáfono deja el anillo de la esfera como hueco.
 
@@ -383,3 +402,41 @@ megáfono deja el anillo de la esfera como hueco.
   propuestas): esas son ilustración clay genérica; Plastilina en volumen es iconografía de marca derivada del vector.
   **No se mezclan en una pieza.**
 - **No** se anima con el paquete: es un PNG, y el motion de los íconos sigue diferido (ver [ledger.md](ledger.md)).
+
+## 13. Catálogo aprobado (60 glifos; oficio desde D25, 2026-09-27)
+
+> **Estado:** canónico (operador, 2026-09-27: «Bien, subamos esos íconos al package de axis y a su web, cuidando el
+> diseño que ya tiene la web y documentando para agentes y el equipo»). Vive en AXIS main (2026-09-27):
+> `ICON_CATALOG` en `@efeoncepro/axis-graphic-line` **0.5.0** y los volúmenes en `@efeoncepro/axis-brand-assets`
+> **0.3.3**, publicados con el tag `v0.5.0` (`axis-tokens` sigue en 0.3.7). Guía: AXIS
+> `docs/agent-composition/iconography.md` §«Catálogo aprobado»; ADR AXIS, delta «Oficio: 30 glifos nuevos (D25)». Lab:
+> `/references/iconography/` (los 60 del catálogo y los 33 volúmenes). Si difiere de AXIS, manda AXIS.
+
+**27 Trazo + 33 Plastilina = 60 glifos.** Volumen: 33 PNG, uno por cada Plastilina.
+
+| Voz | Base (D22, 2026-09-26) | Oficio (D25, 2026-09-27) |
+|---|---|---|
+| **Trazo (27)** | búsqueda, medición, contenido, medios, revenue, web, talent, finanzas, embudo, CRM, automatización, informe (12) | `correo`, `llamada`, `calendario`, `reunion`, `objetivo`, `presentacion`, `contrato`, `checklist`, `codigo`, `base-de-datos`, `nube`, `integracion`, `seguridad`, `ubicacion`, `reloj` (15) |
+| **Plastilina (33)** | rayo\*, paleta, pincel, cuentagotas, bombillo\*, tablet, laptop, escritorio, teléfono\*, cámara, claqueta, micrófono, pluma, cursor, tijeras, megáfono, audífonos, corazón (18) | `lapiz`, `rodillo`, `aerosol`, `escuadra`, `postit`, `encuadre`, `pelicula`, `vinilo`, `guitarra`, `reproducir`, `varita`, `taza`, `lampara`, `trofeo`, `estrella` (15) |
+
+\* Con gesto dibujado. Las 33 Plastilina tienen su versión en volumen (§12): 18 desde D24 y las 15 de oficio desde D25.
+
+**Cómo entró el oficio.** Treinta objetos que el trabajo diario pedía y el set no tenía, producidos con el método de
+alta de cada voz (§9.1 y §11.3, y §12.5 para el volumen) y revisados juntos por el operador en el canvas «Íconos de La
+órbita», sección 7. Material de producción en [sources-and-assets.md](sources-and-assets.md).
+
+### 13.1 Notas de diseño que conservó la aprobación
+
+- **checklist:** la esfera cae en la columna de vistos. No se usa en una lista de verdad: ahí sería viñeta (§5).
+- **integración:** en reposo se lee «desconectado»; es el más liviano a 20 px.
+- **correo:** a 20 px el aire de la esfera baja a 0,48, dentro del pendiente del aire a 20 px ([ledger.md](ledger.md)).
+- **llamada** es el Trazo del teléfono; **teléfono** sigue siendo la Plastilina del móvil. Las claves son únicas entre
+  voces, a propósito.
+- **presentación** entra al catálogo; la keynote de ejemplo de AXIS
+  (`docs/examples/iconography/stroke-glyph-keynote.json`) no entra: queda sólo como ejemplo del método (así lo dice la guía de AXIS).
+- **varita** y **estrella** comparten la estrella: no van en el mismo grupo.
+- **encuadre** es composición y formatos, no recorte (recortar es **tijeras**).
+- **aerosol:** la esfera en la boquilla se lee como tapa.
+- **vinilo** puede leerse como CD a tamaño chico.
+- **base-de-datos:** el Trazo no usa arcos elípticos (`samplePath` sólo mide arcos circulares); los óvalos son cuatro
+  arcos circulares tangentes. Vale para cualquier glifo nuevo con óvalos.

@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
+> **Ultima actualizacion:** 2026-09-27 por Claude (1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
 
@@ -197,13 +197,24 @@ La línea Voice (medios) todavía no tiene voz fija: se elige con criterio y se 
 | **La órbita sesgada es la firma de Plastilina** | una elipse inclinada alrededor del objeto protagonista; una por pieza, nunca cruza el texto y **nunca mide** (lo que mide sigue en la órbita circular) |
 | **Un ícono que falta no se dibuja en la pieza** | se pide, se verifica y entra al set con la aprobación del operador |
 
-Hay **30 íconos aprobados**: 12 de Trazo y 18 de Plastilina. La firma de correo y la de equipo siguen con los íconos
-anteriores (Tabler) hasta que el operador decida su reemplazo.
+Hay **60 íconos aprobados**: 27 de Trazo y 33 de Plastilina. Los primeros 30 (12 y 18) se aprobaron el 26 de septiembre de
+2026; al día siguiente el operador sumó **30 íconos de oficio**, cosas que el equipo usa todos los días y que no estaban:
+
+| Voz | Íconos de oficio |
+|---|---|
+| Trazo (15) | correo, llamada, calendario, reunión, objetivo, presentación, contrato, checklist, código, base de datos, nube, integración, seguridad, ubicación, reloj |
+| Plastilina (15) | lápiz, rodillo, aerosol, escuadra, post-it, encuadre, película, vinilo, guitarra, reproducir, varita, taza, lámpara, trofeo, estrella |
+
+Algunos tienen su truco: «llamada» es el teléfono de Trazo y «teléfono» es el móvil de Plastilina; el checklist no se
+usa como viñeta de una lista; la varita y la estrella no van juntas; y «encuadre» habla de composición y formatos, no de
+recortar (para eso están las tijeras). La firma de correo y la de equipo siguen con los íconos anteriores (Tabler) hasta
+que el operador decida su reemplazo.
 
 > Detalle técnico: [manual §14 Iconografía](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#14-iconografía-trazo-y-plastilina) ·
 > [guía de la iconografía en AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/iconography.md) ·
 > [página del Lab](https://axis.efeonce.org/references/iconography/) · tokens `efeonceGraphicLine.icons`
-> (`@efeoncepro/axis-tokens` 0.3.6) y `@efeoncepro/axis-graphic-line/icons` (0.4.0) ·
+> (`@efeoncepro/axis-tokens` 0.3.6) y `@efeoncepro/axis-graphic-line/icons` (0.4.0; los 60 con el oficio desde 0.5.0,
+> tag `v0.5.0`, verificado contra AXIS main@aa66225, 2026-09-27) ·
 > [cómo usar y pedir un ícono](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md#paso-a-paso--usar-un-ícono-de-la-marca)
 
 ### Plastilina en volumen
@@ -221,14 +232,15 @@ Desde el 2026-09-27 los íconos de Plastilina tienen una **tercera capa**: el mi
 | **Ya viene listo** | el set está en respuesta, con el naranja de Brand y el gesto donde existe (rayo, bombillo, teléfono); es una imagen con fondo transparente y los huecos abiertos, así que va sobre cualquier fondo. Si la pieza necesita sombra en el piso, se agrega al componer |
 | **Un objeto que falta no se inventa en 3D** | primero entra al set plano con la aprobación del operador y después se le hace el volumen |
 
-Hay **18 íconos en volumen**, uno por cada Plastilina. Se ven y se descargan en la sección «Plastilina en volumen» de la
+Hay **33 íconos en volumen**, uno por cada Plastilina (los 15 de oficio incluidos). Se ven y se descargan en la sección «Plastilina en volumen» de la
 página del Lab. Sólo son para la marca propia de Efeonce; no se usan en trabajo de clientes ni en Greenhouse, y no se
 combinan en una pieza con las ilustraciones «Clay 3D» que el equipo usa en propuestas (son otra cosa).
 
 > Detalle técnico: [manual §14.1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#141-plastilina-en-volumen-d24-2026-09-27) ·
 > [Lab, sección 05](https://axis.efeonce.org/references/iconography/#volumen) · tokens `efeonceGraphicLine.icons.volume`
 > (`@efeoncepro/axis-tokens` 0.3.7) y archivos en `@efeoncepro/axis-brand-assets` 0.3.2, ambos publicados con el tag
-> `v0.3.7` (Greenhouse ya fija esas versiones, commit `f3f93c926`, 2026-09-27) · [cómo usar un ícono en volumen](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md#paso-a-paso--usar-un-ícono-en-volumen)
+> `v0.3.7` (Greenhouse ya fija esas versiones, commit `f3f93c926`, 2026-09-27); los 33 con el oficio, en
+> `axis-brand-assets` 0.3.3 (tag `v0.5.0`), que Greenhouse ya fija · [cómo usar un ícono en volumen](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md#paso-a-paso--usar-un-ícono-en-volumen)
 
 ## Componer por superficie
 
@@ -301,7 +313,7 @@ Ese contrato está en prueba (`candidate`) y todavía no se integra a la rama pr
 | Animaciones del logo para el equipo (MP4, GIF, cuadro final) | OneDrive `13- Branding › Motion Órbita Efeonce › v1.1` | quien edita video o arma presentaciones |
 | Masters de las animaciones (transparentes para editores de video, web y Apple) | bucket público de AXIS `efeonce-group-axis-public-media`, carpeta `motion/logo/v1.1/` | quien monta la animación sobre otro fondo |
 | Íconos de la marca (catálogo, reglas y «Copiar SVG») | [axis.efeonce.org/references/iconography](https://axis.efeonce.org/references/iconography/) · en datos para agentes: [`/references/iconography.json`](https://axis.efeonce.org/references/iconography.json) | quien usa o pide un ícono |
-| Íconos en código | `efeonceGraphicLine.icons` (`@efeoncepro/axis-tokens` desde 0.3.6) y `@efeoncepro/axis-graphic-line/icons` (desde 0.4.0); Greenhouse todavía no los consume | quien construye piezas en código |
+| Íconos en código | `efeonceGraphicLine.icons` (`@efeoncepro/axis-tokens` desde 0.3.6) y `@efeoncepro/axis-graphic-line/icons` (desde 0.4.0; los 60 con el oficio desde 0.5.0); Greenhouse todavía no los consume | quien construye piezas en código |
 | Canvas de trabajo (taller, privado; 40 láminas) | [Canvas «Línea gráfica Efeonce»](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) | quien explora nuevas aplicaciones |
 | Burbujas de URL listas para visores y correo | `docs/operations/brand-graphic-line/deliverables/assets/url-lum-{light,dark}.svg` | quien arma PDF, correo o referencias para IA |
 | Banco de fotos para la lente | `ai-generations/2026-09-25_banco-lente-orbita/` (fichas y prompts versionados; las imágenes son locales) | quien compone una lente |

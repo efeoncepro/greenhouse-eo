@@ -80,6 +80,18 @@
   Regla: se revisan al 100 % y se aceptan salvo forma reinventada, calado vuelto relieve o figura-fondo invertida; los
   aceptados quedan anotados (AXIS guía §9 y [iconography.md](iconography.md) §12.6).
 
+## 2026-09-27 (oficio: 30 glifos nuevos, D25)
+
+- **Las claves de glifo son únicas entre las dos voces.** Síntoma: el Trazo del teléfono no podía llamarse `telefono`.
+  Causa: `telefono` ya es la clave de la Plastilina del móvil, y `ICON_CATALOG` junta Trazo y Plastilina en un solo
+  espacio de claves. Regla: antes de dar de alta un glifo, buscar la clave en **todo** el catálogo, no sólo en su voz;
+  si choca, se nombra por la acción (`llamada`) y no se le agrega sufijo de voz. Detalle: [iconography.md](iconography.md)
+  §13.1.
+- **El Trazo no usa arcos elípticos.** Síntoma: los óvalos de `base-de-datos` no se podían dibujar con un arco elíptico.
+  Causa: `samplePath` sólo mide arcos circulares, y es lo que usa el control del aire de la esfera. Regla: un óvalo del
+  Trazo se construye con **cuatro arcos circulares tangentes**; vale para cualquier glifo nuevo con óvalos
+  ([iconography.md](iconography.md) §9.1).
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos

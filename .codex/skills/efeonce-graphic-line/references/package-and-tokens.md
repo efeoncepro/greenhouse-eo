@@ -13,6 +13,10 @@
 > Plastilina en volumen (D24): `icons.volume`, `volume/` de brand-assets y `pnpm icons:volume` verificados contra AXIS
 > `main@c18e3d3` — 2026-09-27 (`axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, **publicados** con el tag `v0.3.7`
 > sobre `main@c0020b6`; Greenhouse ya fija esas versiones, commit `f3f93c926`, 2026-09-27).
+>
+> Oficio (D25): catálogo de 60 glifos y 33 volúmenes verificados contra AXIS main@aa66225, 2026-09-27
+> (`axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3, **publicados** con el tag `v0.5.0`; `axis-tokens` sigue en
+> 0.3.7). Versiones que fija Greenhouse leídas de `package.json` el 2026-09-27.
 
 Índice: [1 Paquetes](#1-paquetes-versiones-e-instalación) · [2 Tokens](#2-tokens-efeoncegraphicline) ·
 [3 Contrato de la órbita](#3-contrato-efeoncegraphic-line-orbit) · [4 Selección colaborativa](#4-contrato-efeoncecollaboration-selection) ·
@@ -26,6 +30,12 @@
 
 Registro privado: GitHub Packages (`@efeoncepro:registry=https://npm.pkg.github.com`). Cada paquete se versiona por
 separado.
+
+> **Al 2026-09-27 (manda sobre la tabla, que es la foto del 2026-09-26):** último tag `v0.5.0`. Publicado:
+> `axis-graphic-line` **0.5.0** (`v0.5.0`, catálogo de 60 glifos con el oficio D25) · `axis-brand-assets` **0.3.3**
+> (`v0.5.0`, 33 PNG de volumen) · `axis-tokens` **0.3.7** y `axis-ui-contracts` **0.3.6** (`v0.3.7`). Greenhouse fija
+> tokens 0.3.7, contracts 0.3.6, registry 0.3.1, brand-assets **0.3.2** y `axis-graphic-line` **0.4.0** como
+> dependencia directa: todavía **sin** el oficio (30 glifos y 18 volúmenes).
 
 | Paquete | Versión en `main` de AXIS | Último tag de release | Fija Greenhouse (`package.json`) | Qué trae para la línea |
 |---|---|---|---|---|
@@ -583,6 +593,7 @@ centrada, fondo transparente, con halo. Las genera `pnpm orbit:assets` desde `or
 compara cada SVG byte a byte. Guarda de deriva en Greenhouse: `src/config/efeonce-brand-assets.test.ts`.
 
 **Plastilina en volumen (desde 0.3.2, publicado con el tag `v0.3.7`; D24):** `assets/volume/<glifo>.png` — 18 PNG de 1024 px
+en 0.3.2 y **33** desde 0.3.3 (tag `v0.5.0`, con los 15 de oficio de D25)
 (~130 KB cada uno, paleta con alfa), los glifos de Plastilina en respuesta con el acento de Brand y el gesto donde
 existe; sellados en `src/volume-manifest.ts` (la prueba falla si un PNG cambia sin `publish`, si queda uno sin sellar o
 si pierde el alfa).
@@ -868,7 +879,9 @@ de la página es `orbitSvg` con `circle` y `channel: 'social'`.
 ## Iconografía (`efeonceGraphicLine.icons` y `@efeoncepro/axis-graphic-line/icons`)
 
 > AXIS `main@5b8ab20`, 2026-09-26: `axis-tokens` **0.3.6** y `axis-graphic-line` **0.4.0**, publicados con el tag
-> `v0.3.6`. Guía: `axis-design-system/docs/agent-composition/iconography.md`.
+> `v0.3.6`. Oficio (D25), AXIS main@aa66225, 2026-09-27: `axis-graphic-line` **0.5.0** (tag `v0.5.0`) lleva el catálogo a
+> **60 glifos: 27 Trazo + 33 Plastilina**; los tokens no cambian (`axis-tokens` 0.3.7). Guía:
+> `axis-design-system/docs/agent-composition/iconography.md` (§«Catálogo aprobado»).
 
 | Token | Qué guarda |
 | --- | --- |
@@ -881,11 +894,11 @@ de la página es `orbitSvg` con `circle` y `channel: 'social'`.
 
 | Función (`/icons`) | Qué hace |
 | --- | --- |
-| `ICON_CATALOG` | los 30 glifos aprobados con voz, nombre, uso, modo y gesto |
+| `ICON_CATALOG` | los glifos aprobados con clave, voz, nombre, uso, modo y gesto: **60** desde 0.5.0 (27 Trazo + 33 Plastilina, con los 30 de oficio de D25); 30 en 0.4.0. Las claves son únicas entre voces (`llamada` es Trazo; `telefono`, Plastilina) |
 | `resolveIcon(req)` / `iconSvg(req)` | SVG con las reglas; errores `IconRequestError` (`unknown-glyph`, `plastilina-below-min`, `gesture-not-drawn`, `gesture-only-plastilina`, `unknown-line`); aviso `response-below-min` |
 | `auditIconGroup(items, { pieceHasSphere })` | issues `mixed-voices`, `more-than-one-response`, `response-with-piece-sphere`, `more-than-one-gesture`, `gesture-not-protagonist` |
 | `skewedOrbitHeroSvg(input)` | Plastilina protagonista dentro de su órbita sesgada (objeto en reposo) |
-| `iconVoiceForLine`, `iconColors`, `strokeWidthFor`, `strokeSphereClearance`, `samplePath` | voz, colores, grosor óptico, aire de la esfera, muestreo de trazados |
+| `iconVoiceForLine`, `iconColors`, `strokeWidthFor`, `strokeSphereClearance`, `samplePath` | voz, colores, grosor óptico, aire de la esfera, muestreo de trazados (`samplePath` sólo mide arcos circulares: un Trazo nuevo no usa arcos elípticos; los óvalos van como cuatro arcos circulares tangentes) |
 
 Comandos (raíz de AXIS): `pnpm icons:export -- --out <dir>`, `pnpm icons:check -- --glyph <json> --out <dir>`,
 `pnpm icons:vectorize -- --sheet <png> --names a,b,… --out <dir>`, `pnpm icons:volume -- refs|key|check|publish`.

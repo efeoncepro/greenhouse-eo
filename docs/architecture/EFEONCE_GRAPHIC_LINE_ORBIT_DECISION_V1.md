@@ -3,7 +3,7 @@
 > **Tipo de documento:** ADR (decisión de marca y sistema de diseño)
 > **Estado:** Accepted (2026-09-25) — canonizada en AXIS; atribución sin logo sin medir
 > **Creado:** 2026-09-25 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude (delta: Plastilina en volumen, D24). Antes, 2026-09-26 (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1; delta (d): lenguaje de movimiento como norma y `efeonceGraphicLine.motion` en `axis-tokens` 0.3.3; delta (e): decisiones del operador D1–D15 sobre contraste, logo en la órbita, halo, anillo de la esfera, convergencia con la foto y operación)
+> **Última actualización:** 2026-09-27 por Claude (delta: oficio, 30 glifos nuevos, D25; antes, el mismo día: Plastilina en volumen, D24). Antes, 2026-09-26 (regla de la firma, la órbita no sustituye la composición, AXIS 0.2.7; delta (c): AXIS 0.3.0, contrato estable, `axis-graphic-line` y animaciones del logo V1.1; delta (d): lenguaje de movimiento como norma y `efeonceGraphicLine.motion` en `axis-tokens` 0.3.3; delta (e): decisiones del operador D1–D15 sobre contraste, logo en la órbita, halo, anillo de la esfera, convergencia con la foto y operación)
 > **Manual canónico:** [`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
 > **Entregable:** [`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](../operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf)
 > **Sistema de diseño:** AXIS, página `references/graphic-line` en `axis.efeonce.org` y tokens `efeonceGraphicLine`
@@ -208,6 +208,30 @@ guía `iconography.md` §9, ADR de AXIS `ICONOGRAPHY_DECISION_V1.md` (delta 2026
 (2026-09-27, sobre `main@c0020b6`: `axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2; la 0.3.7 de tokens salió coordinada
 junto con los cambios de superficies). Greenhouse ya fija esas versiones (commit `f3f93c926`,
 2026-09-27).
+
+### Delta 2026-09-27 — Oficio: 30 glifos nuevos (D25)
+
+El operador aprobó (D25) **30 íconos de oficio**: «Bien, subamos esos íconos al package de axis y a su web, cuidando
+el diseño que ya tiene la web y documentando para agentes y el equipo». Se produjeron con el método de alta de cada voz
+y se revisaron en el canvas «Íconos de La órbita», sección 7: **15 de Trazo** (correo, llamada, calendario, reunión,
+objetivo, presentación, contrato, checklist, código, base de datos, nube, integración, seguridad, ubicación, reloj) y
+**15 de Plastilina** (lápiz, rodillo, aerosol, escuadra, post-it, encuadre, película, vinilo, guitarra, reproducir,
+varita, taza, lámpara, trofeo, estrella), estos también en volumen (D24). El set queda en **27 Trazo + 33 Plastilina =
+60 glifos**, con 33 PNG de volumen.
+
+- **Claves únicas entre voces:** el Trazo del teléfono se llama `llamada`, porque `telefono` ya es la Plastilina del
+  móvil.
+- **Trazo sin arcos elípticos:** `samplePath` sólo mide arcos circulares; los óvalos (`base-de-datos`) son cuatro arcos
+  circulares tangentes. Vale para cualquier glifo nuevo con óvalos.
+- **Notas de uso conservadas:** checklist no va en una lista de verdad; varita y estrella no van en el mismo grupo;
+  encuadre es composición y formatos, no recorte; presentación convive con la keynote de ejemplo, que queda sólo como
+  ejemplo del método. Lista completa en la guía de AXIS y en la skill (`references/iconography.md` §13).
+
+**Dónde vive:** AXIS main (2026-09-27) — `ICON_CATALOG` en `@efeoncepro/axis-graphic-line` **0.5.0** y los volúmenes en
+`@efeoncepro/axis-brand-assets` **0.3.3**, publicados con el tag `v0.5.0` (`axis-tokens` sigue en 0.3.7); guía
+`docs/agent-composition/iconography.md` §«Catálogo aprobado»; ADR de AXIS, delta «Oficio: 30 glifos nuevos (D25)»; el
+Lab `/references/iconography/` muestra los 60 del catálogo y los 33 volúmenes. Greenhouse todavía fija
+`axis-graphic-line` 0.4.0 y `axis-brand-assets` 0.3.2.
 
 ## Alternativas descartadas
 

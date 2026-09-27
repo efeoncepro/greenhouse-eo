@@ -248,7 +248,8 @@ Rules for agents:
 ### Efeonce iconography (Trazo and Plastilina)
 
 Canonized by the operator on 2026-09-26 (D22). Values in `efeonceGraphicLine.icons` (`axis-tokens` `0.3.6`); geometry
-(12 stroke + 18 Plastilina glyphs) and executable rules in `@efeoncepro/axis-graphic-line/icons` (`0.4.0`):
+(60 glyphs since `0.5.0`: 27 Trazo + 33 Plastilina; `0.4.0` shipped the 30 base glyphs) and executable rules in
+`@efeoncepro/axis-graphic-line/icons`:
 `resolveIcon`, `iconSvg`, `auditIconGroup`, `skewedOrbitHeroSvg`, `iconVoiceForLine`, `strokeSphereClearance`. Commands in
 AXIS: `pnpm icons:export`, `pnpm icons:check` (gate for a new glyph), `pnpm icons:vectorize` (Plastilina sheet → glyph
 JSON). Guide `docs/agent-composition/iconography.md`, ADR `ICONOGRAPHY_DECISION_V1.md`, Lab `/references/iconography/`
@@ -266,6 +267,16 @@ piece, ≥ 160 px; never in lists, tables, deck content, dashboards or UI. Token
 `axis-tokens` `0.3.7`, `axis-brand-assets` `0.3.2`, `axis-ui-contracts` `0.3.6`, released together with the surfaces work;
 `axis-graphic-line` stays at `0.4.0`). Greenhouse already pins these versions (commit `f3f93c926`, 2026-09-27: tokens `0.3.7`,
 contracts `0.3.6`, brand-assets `0.3.2`, and `axis-graphic-line` `0.4.0` as a direct dependency). Guide §9, ADR delta D24.
+
+**Craft glyphs (D25, 2026-09-27; verified against AXIS main@aa66225, 2026-09-27):** 30 new glyphs approved — 15 Trazo (`correo`,
+`llamada`, `calendario`, `reunion`, `objetivo`, `presentacion`, `contrato`, `checklist`, `codigo`, `base-de-datos`,
+`nube`, `integracion`, `seguridad`, `ubicacion`, `reloj`) and 15 Plastilina (`lapiz`, `rodillo`, `aerosol`, `escuadra`,
+`postit`, `encuadre`, `pelicula`, `vinilo`, `guitarra`, `reproducir`, `varita`, `taza`, `lampara`, `trofeo`, `estrella`),
+the Plastilina ones also in volume. The set is now 27 Trazo + 33 Plastilina = 60, with 33 volume PNGs. Published with tag
+`v0.5.0`: `axis-graphic-line` `0.5.0` and `axis-brand-assets` `0.3.3` (`axis-tokens` stays at `0.3.7`); Greenhouse still
+pins `0.4.0` and `0.3.2`. Keys are unique across voices (the phone Trazo is `llamada`; `telefono` is the Plastilina), and
+Trazo never uses elliptical arcs (`samplePath` only measures circular ones: ovals are four tangent circular arcs). Guide
+§«Catálogo aprobado» (with the design notes), ADR delta D25, Lab `/references/iconography/` (60 glyphs, 33 volumes).
 
 ### Glitch sub-line (Lab page + JSON; pending publication)
 

@@ -1,7 +1,8 @@
 # Dónde está cada cosa
 
 > Verificado contra: axis-design-system@e26bd85 (iconografía y versiones: AXIS `main@5b8ab20`, tag `v0.3.6`) y
-> greenhouse-eo@051660d73 — 2026-09-26. Plastilina en volumen (D24): AXIS `main@c18e3d3` — 2026-09-27.
+> greenhouse-eo@051660d73 — 2026-09-26. Plastilina en volumen (D24): AXIS `main@c18e3d3` — 2026-09-27. Oficio (D25,
+> catálogo de 60 y 33 volúmenes): AXIS main@aa66225, 2026-09-27 (tag `v0.5.0`).
 
 ## Fuentes de verdad (por orden de autoridad)
 
@@ -14,7 +15,7 @@
 | Composición por intención | contratos AXIS `efeonce.graphic-line-orbit`, `efeonce.collaboration-selection`, `efeonce.email-signature` | el token |
 | Pintura | paquete `@efeoncepro/axis-graphic-line` (recetas que reproducen las piezas medidas) | el contrato |
 | Fotografía | `docs/operations/brand-photography/` (lenguaje fotográfico, reservas, firma en primer plano) | el operador |
-| Iconografía (Trazo y Plastilina, D16–D22) | AXIS: valores `efeonceGraphicLine.icons` (`axis-tokens` ≥ 0.3.6), geometría y reglas `@efeoncepro/axis-graphic-line/icons` (≥ 0.4.0), guía `docs/agent-composition/iconography.md`, ADR `docs/architecture/ICONOGRAPHY_DECISION_V1.md`. Plastilina en volumen (D24): `efeonceGraphicLine.icons.volume` (`axis-tokens` 0.3.7) y los PNG de `@efeoncepro/axis-brand-assets` 0.3.2 (ambos publicados con el tag `v0.3.7`). En Greenhouse sólo el criterio ([iconography.md](iconography.md)) | el token y el paquete; las decisiones, el operador (ledger) |
+| Iconografía (Trazo y Plastilina, D16–D22) | AXIS: valores `efeonceGraphicLine.icons` (`axis-tokens` ≥ 0.3.6), geometría y reglas `@efeoncepro/axis-graphic-line/icons` (≥ 0.4.0), guía `docs/agent-composition/iconography.md`, ADR `docs/architecture/ICONOGRAPHY_DECISION_V1.md`. Plastilina en volumen (D24): `efeonceGraphicLine.icons.volume` (`axis-tokens` 0.3.7) y los PNG de `@efeoncepro/axis-brand-assets` 0.3.2 (ambos publicados con el tag `v0.3.7`). Oficio (D25): catálogo de 60 en `axis-graphic-line` 0.5.0 y 33 PNG en `axis-brand-assets` 0.3.3 (tag `v0.5.0`), guía §«Catálogo aprobado». En Greenhouse sólo el criterio ([iconography.md](iconography.md)) | el token y el paquete; las decisiones, el operador (ledger) |
 | Identidad sonora (**recomendada, no canon**, 2026-09-26) | Greenhouse `docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md`; AXIS (PR #4, squash `55486aa`, publicado 2026-09-26): página `https://axis.efeonce.org/references/sonic-brand/`, JSON `/references/sonic-brand.json` (esquema `axis.efeonce-sonic-brand.v1`), guía `docs/agent-composition/sonic-brand.md`, fuentes Lab `apps/lab/src/data/sonic-brand.ts` y `sonic-brand-assets.ts`. Sin tokens hasta canonizar | el operador (ledger); archivos, el kit |
 | Sub-línea de Glitch (sólo Glitch, 2026-09-27) | Greenhouse `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` (norma) + ADR `docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md`; AXIS (pendiente de publicar, rama `feat/glitch-line`): `/references/glitch/`, `/references/glitch.json`, guía `docs/agent-composition/glitch.md`. Sin tokens ni contrato todavía; resumen en [glitch.md](glitch.md) | el operador; los valores, la norma hasta que existan tokens |
 
@@ -35,7 +36,7 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
     `packages/graphic-line/src/icons-stroke-data.ts` y `icons-plastilina-data.ts`; comandos `pnpm icons:export | check |
     vectorize` (`scripts/icons.mjs`) desde la raíz de AXIS.
   - Plastilina en volumen (D24): sección 05 del Lab `https://axis.efeonce.org/references/iconography/#volumen` (set de
-    18 con descarga PNG, spec, dónde va y dónde no, método, avisos revisados); bloque `volume` de
+    33 con descarga PNG desde el oficio D25, spec, dónde va y dónde no, método, avisos revisados); bloque `volume` de
     `/references/iconography.json`; guía `docs/agent-composition/iconography.md` §9; ADR `ICONOGRAPHY_DECISION_V1.md`
     §«Delta 2026-09-27 — Plastilina en volumen (D24)»; comando `pnpm icons:volume -- refs|key|check|publish`
     (`scripts/icons-volume.mjs`).
@@ -62,10 +63,11 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
 | Fotos de las láminas (lente, oficina, merch) | Lab `apps/lab/public/media/graphic-line/assets/` (`of-*.webp`, `ia-*.webp`, `L*-*.webp`) |
 | Firma de correo (personal y de equipo) | contrato `efeonce.email-signature`; imágenes en `gs://efeonce-group-axis-public-media/email-signature/v3.1/` (`shared/<dark\|light>/`, `people/<persona>-<dark\|light>.png`, `areas/<área>-<dark\|light>.png`); generador vigente `ai-generations/2026-09-26_firma-partners/build4.mjs` (`HOST_BASE=<url>` escribe `hosted/` y los HTML de Outlook; `AREA=<área>` para la de equipo). La exploración de `exploracion-v5/firma/` es histórica (origen del token `portrait`) |
 | Kits 3D, prendas, lanyard, SVG oficiales | OneDrive `…/13- Branding/` (ver skill `efeonce-brand-studio`) |
-| Íconos de la línea (30 glifos aprobados) | `ICON_CATALOG` de `@efeoncepro/axis-graphic-line/icons`; en archivos, `pnpm icons:export` en AXIS (60 SVG + `manifest.json`). Nunca copias a mano ni SVG dibujados en la pieza |
-| Plastilina en volumen (18 PNG, 1024 px, alfa) | `@efeoncepro/axis-brand-assets` 0.3.2 (publicado con el tag `v0.3.7`): `assets/volume/<glifo>.png`, sellados en `src/volume-manifest.ts`; `volumeIconUrl(glyph)`. Nunca se regenera dentro de una pieza |
+| Íconos de la línea (60 glifos aprobados: 27 Trazo + 33 Plastilina, desde D25) | `ICON_CATALOG` de `@efeoncepro/axis-graphic-line/icons` (60 desde 0.5.0, tag `v0.5.0`; 30 en 0.4.0); en archivos, `pnpm icons:export` en AXIS (SVG por glifo y estado + `manifest.json`). Nunca copias a mano ni SVG dibujados en la pieza |
+| Plastilina en volumen (33 PNG desde D25, 1024 px, alfa) | `@efeoncepro/axis-brand-assets` 0.3.3 (publicado con el tag `v0.5.0`; la 0.3.2 trae los 18 de la base): `assets/volume/<glifo>.png`, sellados en `src/volume-manifest.ts`; `volumeIconUrl(glyph)`. Nunca se regenera dentro de una pieza |
 | Prompt canónico del volumen | AXIS `docs/agent-composition/iconography/volume-prompt.txt` (copia en el Lab: `/media/iconography/volume-prompt.txt`). No se reescribe: si un detalle falla, se agrega UNA línea |
 | Corridas del volumen (no canónicas) | Greenhouse `ai-generations/2026-09-27_plastilina-3d-gpt/` (`ref/`, `crudo/`, `alfa/`, prompts, QA; la vía aprobada) y `ai-generations/2026-09-26_plastilina-volumen/` (intento Blender, rechazado). Canvas «Íconos de La órbita» (claude.ai artifact Y9mx42L72zYc6iLg4j3Maj): lámina Y2 aprobada, Y1 (Blender) descartada |
+| Producción del oficio (D25, no canónica) | Greenhouse `ai-generations/2026-09-27_iconos-oficio/` (`trazo/` y `plastilina/`, con `RESUMEN.md`) y el volumen en `ai-generations/2026-09-27_plastilina-3d-gpt/oficio/`. Revisión: canvas «Íconos de La órbita», sección 7. Lo canónico es lo publicado en AXIS |
 | Referencia de estilo y prompt de Plastilina (para dar de alta un glifo) | AXIS `docs/agent-composition/iconography/plastilina-style-reference.png` y `plastilina-prompt.txt` (canónicos; reemplazan a los archivos de `ai-generations/2026-09-26_iconos-planos/`, no versionados); ejemplo de glifo de Trazo en `docs/examples/iconography/stroke-glyph-keynote.json` |
 
 ## Versiones publicadas (2026-09-26)
@@ -81,3 +83,7 @@ access → Read» para cada repositorio consumidor antes de que éste lo agregue
 `axis-brand-assets` 0.3.2 (`volume/`, `volumeIconUrl`) y `axis-ui-contracts` 0.3.6; `axis-graphic-line` sigue en 0.4.0.
 Greenhouse ya fija esas versiones (commit `f3f93c926`, 2026-09-27: tokens 0.3.7, contracts 0.3.6, brand-assets 0.3.2 y
 `axis-graphic-line` 0.4.0 como dependencia directa); el PNG también se puede descargar a mano desde el Lab.
+
+**Publicado el 2026-09-27 (tag `v0.5.0`, AXIS main):** `axis-graphic-line` 0.5.0 (catálogo de 60 glifos con el oficio
+D25) y `axis-brand-assets` 0.3.3 (33 PNG de volumen); `axis-tokens` sigue en 0.3.7. Greenhouse fija 0.5.0 y 0.3.3
+desde el 2026-09-27 (con el oficio).
