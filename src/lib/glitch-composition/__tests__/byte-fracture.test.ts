@@ -82,3 +82,33 @@ describe('computeByteFracture', () => {
     expect(() => paintByteFracture(f, samples.slice(1), '#001a33')).toThrow(/muestras/)
   })
 })
+
+describe('perfiles de la falla (medidos pieza por pieza en el canvas)', () => {
+  const host = { x: 0, y: 900, w: 1080, h: 1020 }
+
+  it('el perfil host se come la foto desde el borde superior: celdas de 31 px dentro de la foto, casi del color del fondo', () => {
+    const f = computeByteFracture({ seed: base.seed, photo: host, edge: 'top', profile: 'host', canvas: { width: 1080, height: 1920 }, faceRegions: [] })
+
+    expect(f.cells.length).toBeGreaterThan(0)
+    expect(f.cells.every((c) => c.size === 31 && c.y >= host.y && c.y < host.y + 3 * 38 + 7)).toBe(true)
+    expect(f.cells.every((c) => [1, 0.8, 0.6].includes(c.opacity))).toBe(true)
+    expect(f.cells.every((c) => c.fade >= 0.75)).toBe(true)
+  })
+
+  it('el perfil side sale hacia la izquierda con celdas de 23 px y tres columnas', () => {
+    const photo = { x: 820, y: 0, w: 1100, h: 800 }
+    const f = computeByteFracture({ seed: base.seed, photo, edge: 'left', profile: 'side', canvas: { width: 1920, height: 1080 }, faceRegions: [] })
+
+    expect(f.cells.every((c) => c.size === 23 && c.x + c.size <= photo.x && c.row < 3)).toBe(true)
+  })
+
+  it('el perfil band es el de siempre: el carrusel no cambia de geometría', () => {
+    expect(computeByteFracture({ ...base, profile: 'band' })).toEqual(computeByteFracture(base))
+  })
+
+  it('un rostro en la franja superior del host bloquea la falla', () => {
+    expect(() =>
+      computeByteFracture({ seed: base.seed, photo: host, edge: 'top', profile: 'host', canvas: { width: 1080, height: 1920 }, faceRegions: [{ x: 0.4, y: 0.01, w: 0.2, h: 0.2 }] })
+    ).toThrow(GlitchPieceError)
+  })
+})

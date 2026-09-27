@@ -24,6 +24,7 @@ export * from './types'
 export { computeByteFracture, paintByteFracture, fractureBand } from './byte-fracture'
 
 type CoverTemplate = 'A' | 'B' | 'C'
+type Box = { x: number; y: number; w: number; h: number }
 
 const CANVAS_4X5 = { width: 1080, height: 1350 }
 const COVER_PHOTO = { x: 0, y: 0, w: 1080, h: 660 }
@@ -39,15 +40,37 @@ const MOSAIC_CARDS = [
 const MOSAIC_CARD_HEIGHT = 170
 const LENS_DIAMETER = 220
 
-/** Id de la pieza en `glitchLine.pieces` (AXIS) por contentType. */
-export const GLITCH_PIECE_BY_CONTENT_TYPE: Record<string, string> = {
-  'glitch.cover.a': 'portada-a',
-  'glitch.cover.b': 'portada-b',
-  'glitch.cover.c': 'portada-c',
-  'glitch.interior': 'interior',
-  'glitch.interior.opening': 'interior-noticia-1',
-  'glitch.interior.lens': 'interior-lente',
-  'glitch.back': 'contraportada'
+type Canvas = { width: number; height: number }
+
+const CANVAS_16X9 = { width: 1920, height: 1080 }
+const CANVAS_1X1 = { width: 1080, height: 1080 }
+const CANVAS_NEWS = { width: 1600, height: 900 }
+const CANVAS_9X16 = { width: 1080, height: 1920 }
+const CANVAS_THUMB = { width: 1280, height: 720 }
+
+/** Huecos de foto de las piezas sueltas (medidos en el canvas; los mismos que declara cada plantilla). */
+const BLOG_PHOTO = { x: 820, y: 0, w: 1100, h: 800 }
+const BLOG_CARDS = [0, 1, 2, 3].map((i) => ({ x: 110 + i * 433, y: 486, w: 400, h: 220 }))
+const BLOG_CARD_CLIP = 270
+const SQUARE_PHOTO = { x: 0, y: 0, w: 1080, h: 500 }
+
+const SQUARE_CARDS = [
+  { x: 88, y: 452, w: 436, h: 104 },
+  { x: 556, y: 452, w: 436, h: 104 },
+  { x: 88, y: 720, w: 436, h: 104 },
+  { x: 556, y: 720, w: 436, h: 104 }
+]
+
+const SQUARE_CARD_CLIP = 150
+const NEWS_PHOTO = { x: 0, y: 0, w: 1600, h: 600 }
+const REEL_HOST = { x: 0, y: 900, w: 1080, h: 1020 }
+const THUMB_HOST = { x: 700, y: 0, w: 580, h: 720 }
+
+/** Un borde de la foto que se rompe: el borde por defecto es el que declara la noticia (`fractureEdge`). */
+interface FracturePart {
+  edge?: 'bottom' | 'top' | 'left' | 'right'
+  profile: 'band' | 'side' | 'host' | 'card'
+  clip?: Box
 }
 
 export interface PlanGlitchEditionOptions {
@@ -103,8 +126,6 @@ const newsById = (manifest: GlitchEditionManifest, id: string): GlitchNews => {
 
 const licenseOf = (news: GlitchNews) => `${news.photo.license.kind}:${news.photo.license.ref}`
 
-type Box = { x: number; y: number; w: number; h: number }
-
 /** Rostros de la foto en px del lienzo (la foto ocupa `box`). */
 const faceBoxes = (box: Box, regions: GlitchNews['photo']['faceRegions']): Box[] =>
   regions.map((r) => ({ x: Math.round(box.x + r.x * box.w), y: Math.round(box.y + r.y * box.h), w: Math.round(r.w * box.w), h: Math.round(r.h * box.h) }))
@@ -132,14 +153,15 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
   const cover = resolveCoverTemplate(manifest, options)
   const assets: GlitchAssetRequest[] = []
 
-  const photo = (ref: string, news: GlitchNews, fit: Box, slideIds: string[], clip?: Box) => {
+  /** Pide una foto de noticia al tamaño exacto de su hueco, con su falla (el perfil y el borde los fija la plantilla). */
+  const photo = (ref: string, news: GlitchNews, box: Box, canvas: Canvas, slideIds: string[], parts: FracturePart[]) => {
     assets.push({
       ref,
       kind: 'photo',
       path: news.photo.file,
-      fit: { width: fit.w, height: fit.h },
+      fit: { width: box.w, height: box.h },
       treatment: 'duotone',
-      fracture: { slideIds, box: fit, edge: news.photo.fractureEdge, faceRegions: news.photo.faceRegions, clip, canvas: CANVAS_4X5 }
+      fractures: parts.map((p) => ({ slideIds, box, edge: p.edge ?? news.photo.fractureEdge, profile: p.profile, faceRegions: news.photo.faceRegions, clip: p.clip, canvas }))
     })
 
     return `asset-ref:${ref}`
@@ -147,57 +169,22 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
 
   const coverNews = newsById(manifest, manifest.cover.newsId)
   const lines = manifest.cover.lines.map((line) => ({ section: GLITCH_SECTION_LABEL[newsById(manifest, line.newsId).section], text: line.text }))
+  const coverHeadline = manifest.cover.headline
+  const coverIntent = { entry: coverHeadline.entry, close: coverHeadline.punch }
+  const muletilla: SlotValues = manifest.cover.muletilla ? { muletilla: manifest.cover.muletilla } : {}
+  const narrator = manifest.cover.muletilla ? { narrator: { text: manifest.cover.muletilla } } : {}
   const slides: Slide[] = []
 
-  // ─── Portada ───
-  if (cover === 'A') {
-    slides.push({
-      slideId: 'cover',
-      contentType: 'glitch.cover.a',
-      slots: {
-        photo: { src: photo('photo:cover', coverNews, COVER_PHOTO, ['cover']), alt: `Foto de la noticia de portada: ${coverNews.headline}` },
-        credit: coverNews.photo.credit,
-        photoLicense: licenseOf(coverNews),
-        faces: JSON.stringify(faceBoxes(COVER_PHOTO, coverNews.photo.faceRegions)),
-        edition,
-        outlet: outletOf(coverNews),
-        headline: { entry: manifest.cover.headline.entry, ...punchParts(manifest.cover.headline.punch) },
-        lines,
-        previousCoverTemplate: manifest.previousEdition.coverTemplate
-      },
-      intent: { piece: 'portada-a', previousCoverTemplate: previous, faces: faceBoxes(COVER_PHOTO, coverNews.photo.faceRegions), headline: { entry: manifest.cover.headline.entry, close: manifest.cover.headline.punch } }
-    })
-  } else if (cover === 'B') {
-    const pov = manifest.cover.standalonePov!
-
-    slides.push({
-      slideId: 'cover',
-      contentType: 'glitch.cover.b',
-      slots: {
-        edition,
-        ...(manifest.cover.muletilla ? { muletilla: manifest.cover.muletilla } : {}),
-        headline: { entry: pov.entry, punch: pov.punch },
-        lines,
-        previousCoverTemplate: manifest.previousEdition.coverTemplate
-      },
-      intent: {
-        piece: 'portada-b',
-        previousCoverTemplate: previous,
-        headline: { entry: pov.entry, close: pov.punch },
-        ...(manifest.cover.muletilla ? { narrator: { text: manifest.cover.muletilla } } : {})
-      }
-    })
-  } else {
-    const ids = manifest.cover.mosaic!
-
-    const cards = ids.map((id, i) => {
+  /** Las cuatro tarjetas del mosaico (portada C y sus versiones de blog), cada una con su foto recortada a la tarjeta. */
+  const mosaic = (prefix: string, boxes: Box[], clipHeight: number, canvas: Canvas, slideId: string, profile: FracturePart['profile']) => {
+    const cards = manifest.cover.mosaic!.map((id, i) => {
       const news = newsById(manifest, id)
-      const card = MOSAIC_CARDS[i]
+      const box = boxes[i]
 
       return {
         news,
         slot: {
-          src: photo(`photo:mosaic-${id}`, news, card, ['cover'], { ...card, h: MOSAIC_CARD_HEIGHT }),
+          src: photo(`photo:${prefix}-${id}`, news, box, canvas, [slideId], [{ edge: 'bottom', profile, clip: { ...box, h: clipHeight } }]),
           alt: `Foto de la noticia: ${news.headline}`,
           section: GLITCH_SECTION_LABEL[news.section],
           pov: `${news.pov.entry} ${news.pov.punch}`
@@ -205,21 +192,54 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
       }
     })
 
-    const mosaicFaces = cards.flatMap((c, i) => faceBoxes(MOSAIC_CARDS[i], c.news.photo.faceRegions))
+    const faces = cards.flatMap((c, i) => faceBoxes(boxes[i], c.news.photo.faceRegions))
+
+    return {
+      faces,
+      slots: {
+        ...Object.fromEntries(cards.map((c, i) => [`card${i + 1}`, c.slot])),
+        credit: `Fotos: ${[...new Set(cards.map((c) => c.news.photo.credit.replace(/^Fotos?:\s*/i, '')))].join(' · ')}`,
+        photoLicense: cards.map((c) => licenseOf(c.news)).join(' '),
+        faces: JSON.stringify(faces)
+      }
+    }
+  }
+
+  // ─── Portada ───
+  if (cover === 'A') {
+    slides.push({
+      slideId: 'cover',
+      contentType: 'glitch.cover.a',
+      slots: {
+        photo: { src: photo('photo:cover', coverNews, COVER_PHOTO, CANVAS_4X5, ['cover'], [{ profile: 'band' }]), alt: `Foto de la noticia de portada: ${coverNews.headline}` },
+        credit: coverNews.photo.credit,
+        photoLicense: licenseOf(coverNews),
+        faces: JSON.stringify(faceBoxes(COVER_PHOTO, coverNews.photo.faceRegions)),
+        edition,
+        outlet: outletOf(coverNews),
+        headline: { entry: coverHeadline.entry, ...punchParts(coverHeadline.punch) },
+        lines,
+        previousCoverTemplate: manifest.previousEdition.coverTemplate
+      },
+      intent: { piece: 'portada-a', previousCoverTemplate: previous, faces: faceBoxes(COVER_PHOTO, coverNews.photo.faceRegions), headline: coverIntent }
+    })
+  } else if (cover === 'B') {
+    const pov = manifest.cover.standalonePov!
+
+    slides.push({
+      slideId: 'cover',
+      contentType: 'glitch.cover.b',
+      slots: { edition, ...muletilla, headline: { entry: pov.entry, punch: pov.punch }, lines, previousCoverTemplate: manifest.previousEdition.coverTemplate },
+      intent: { piece: 'portada-b', previousCoverTemplate: previous, headline: { entry: pov.entry, close: pov.punch }, ...narrator }
+    })
+  } else {
+    const m = mosaic('mosaic', MOSAIC_CARDS, MOSAIC_CARD_HEIGHT, CANVAS_4X5, 'cover', 'band')
 
     slides.push({
       slideId: 'cover',
       contentType: 'glitch.cover.c',
-      slots: {
-        edition,
-        headline: { entry: manifest.cover.headline.entry, punch: manifest.cover.headline.punch },
-        ...Object.fromEntries(cards.map((c, i) => [`card${i + 1}`, c.slot])),
-        credit: `Fotos: ${[...new Set(cards.map((c) => c.news.photo.credit.replace(/^Fotos?:\s*/i, '')))].join(' · ')}`,
-        photoLicense: cards.map((c) => licenseOf(c.news)).join(' '),
-        faces: JSON.stringify(mosaicFaces),
-        previousCoverTemplate: manifest.previousEdition.coverTemplate
-      },
-      intent: { piece: 'portada-c', previousCoverTemplate: previous, faces: mosaicFaces, headline: { entry: manifest.cover.headline.entry, close: manifest.cover.headline.punch } }
+      slots: { edition, headline: { entry: coverHeadline.entry, punch: coverHeadline.punch }, ...m.slots, previousCoverTemplate: manifest.previousEdition.coverTemplate },
+      intent: { piece: 'portada-c', previousCoverTemplate: previous, faces: m.faces, headline: coverIntent }
     })
   }
 
@@ -239,7 +259,7 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
 
     const common = {
       edition,
-      photo: { src: photo(`photo:${news.id}`, news, INTERIOR_PHOTO, [slideId]), alt: `Foto de la noticia: ${news.headline}` },
+      photo: { src: photo(`photo:${news.id}`, news, INTERIOR_PHOTO, CANVAS_4X5, [slideId], [{ profile: 'band' }]), alt: `Foto de la noticia: ${news.headline}` },
       credit: news.photo.credit,
       photoLicense: licenseOf(news),
       faces: JSON.stringify(faces),
@@ -289,8 +309,165 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
     intent: { piece: 'contraportada', headline: { entry: 'El micrófono', close: 'se cierra' }, narrator: { text: manifest.back.closingLine } }
   })
 
+  // ─── Piezas sueltas: repiten láminas del carrusel o son del blog y del video ───
+  const extra: Slide[] = []
+  const bySlideId = new Map(slides.map((s) => [s.slideId, s]))
+  const stillIds: string[] = []
+  const letter = cover.toLowerCase() as 'a' | 'b' | 'c'
+
+  /** Banner del blog (16:9) o su versión cuadrada, con la misma plantilla de portada que el carrusel. */
+  const blogBanner = (square: boolean): Slide => {
+    const slideId = square ? 'blog-square' : 'blog-banner'
+    const piece = `blog-banner-${square ? 'square-' : ''}${letter}`
+    const contentType = `glitch.blog.${square ? 'square' : 'banner'}.${letter}`
+    const canvas = square ? CANVAS_1X1 : CANVAS_16X9
+    const prevSlot = { previousCoverTemplate: manifest.previousEdition.coverTemplate }
+
+    if (cover === 'A') {
+      const box = square ? SQUARE_PHOTO : BLOG_PHOTO
+      const parts: FracturePart[] = square ? [{ edge: 'bottom', profile: 'band' }] : [{ edge: 'bottom', profile: 'band' }, { edge: 'left', profile: 'side' }]
+      const faces = faceBoxes(box, coverNews.photo.faceRegions)
+
+      return {
+        slideId,
+        contentType,
+        slots: {
+          photo: { src: photo(`photo:${slideId}`, coverNews, box, canvas, [slideId], parts), alt: `Foto de la noticia de portada: ${coverNews.headline}` },
+          credit: coverNews.photo.credit,
+          photoLicense: licenseOf(coverNews),
+          faces: JSON.stringify(faces),
+          edition,
+          outlet: outletOf(coverNews),
+          headline: { entry: coverHeadline.entry, ...punchParts(coverHeadline.punch) },
+          ...(square ? {} : { lines }),
+          ...prevSlot
+        },
+        intent: { piece, previousCoverTemplate: previous, faces, headline: coverIntent }
+      }
+    }
+
+    if (cover === 'B') {
+      const pov = manifest.cover.standalonePov!
+
+      return {
+        slideId,
+        contentType,
+        slots: { edition, ...muletilla, headline: { entry: pov.entry, punch: pov.punch }, lines, ...prevSlot },
+        intent: { piece, previousCoverTemplate: previous, headline: { entry: pov.entry, close: pov.punch }, ...narrator }
+      }
+    }
+
+    const m = square ? mosaic('square', SQUARE_CARDS, SQUARE_CARD_CLIP, canvas, slideId, 'band') : mosaic('blog', BLOG_CARDS, BLOG_CARD_CLIP, canvas, slideId, 'card')
+
+    return {
+      slideId,
+      contentType,
+      slots: { edition, headline: { entry: coverHeadline.entry, ...punchParts(coverHeadline.punch) }, ...m.slots, ...prevSlot },
+      intent: { piece, previousCoverTemplate: previous, faces: m.faces, headline: coverIntent }
+    }
+  }
+
+  /** Portada del reel o miniatura del vlog: la foto del host (color) que se desarma por el borde que fija la plantilla. */
+  const videoCover = (thumbnail: boolean): Slide => {
+    const video = manifest.video!
+    const host = video.hostPhoto!
+    const head = video.cover!
+    const slideId = thumbnail ? 'video-thumbnail' : 'reel-cover'
+    const box = thumbnail ? THUMB_HOST : REEL_HOST
+    const canvas = thumbnail ? CANVAS_THUMB : CANVAS_9X16
+    const faces = faceBoxes(box, host.faceRegions)
+
+    assets.push({
+      ref: `photo:${slideId}`,
+      kind: 'photo',
+      path: host.file,
+      fit: { width: box.w, height: box.h },
+      treatment: 'color',
+      fractures: [{ slideIds: [slideId], box, edge: thumbnail ? 'left' : 'top', profile: thumbnail ? 'side' : 'host', faceRegions: host.faceRegions, canvas }]
+    })
+
+    return {
+      slideId,
+      contentType: thumbnail ? 'glitch.video.thumbnail' : 'glitch.reel.cover',
+      slots: {
+        host: { src: `asset-ref:photo:${slideId}`, alt: 'El host de Glitch, con un gesto fuerte.' },
+        photoLicense: `${host.license.kind}:${host.license.ref}`,
+        faces: JSON.stringify(faces),
+        edition,
+        headline: { entry: head.entry, ...punchParts(head.punch) }
+      },
+      // La miniatura del vlog no tiene pieza propia en el token: la valida su portada hermana del reel.
+      intent: { piece: 'reel-portada', faces: thumbnail ? [] : faces, headline: { entry: head.entry, close: head.punch } }
+    }
+  }
+
+  for (const output of manifest.outputs.stills) {
+    if (output === 'cover' || output === 'back') stillIds.push(output)
+    else if (output.startsWith('interior:')) stillIds.push(output.slice('interior:'.length))
+    else if (output === 'blog:banner') extra.push(blogBanner(false))
+    else if (output === 'blog:square') extra.push(blogBanner(true))
+    else if (output === 'reel:cover') extra.push(videoCover(false))
+    else if (output === 'video:thumbnail') extra.push(videoCover(true))
+    else if (output.startsWith('blog:news:')) {
+      const news = newsById(manifest, output.slice('blog:news:'.length))
+      const slideId = `blog-news-${news.id}`
+      const faces = faceBoxes(NEWS_PHOTO, news.photo.faceRegions)
+
+      extra.push({
+        slideId,
+        contentType: 'glitch.blog.news',
+        slots: {
+          photo: { src: photo(`photo:${slideId}`, news, NEWS_PHOTO, CANVAS_NEWS, [slideId], [{ edge: 'bottom', profile: 'band' }]), alt: `Foto de la noticia: ${news.headline}` },
+          credit: news.photo.credit,
+          photoLicense: licenseOf(news),
+          faces: JSON.stringify(faces),
+          newsNumber: news.id.slice(1),
+          section: GLITCH_SECTION_LABEL[news.section],
+          edition
+        },
+        intent: { piece: 'blog-banner-interno', faces }
+      })
+    }
+  }
+
+  // ─── Overlays del reel y del vlog (PNG con alfa): el cuadro fijo del kit de motion ───
+  const overlays: Slide[] = []
+
+  for (const fmt of manifest.outputs.overlays) {
+    const video = manifest.video!
+    const piece = `${fmt}-overlay`
+
+    const push = (name: string, kind: string, slots: SlotValues, intent: Partial<AxisGlitchLineIntent> = {}) =>
+      overlays.push({ slideId: `${fmt}-${name}`, contentType: `glitch.overlay.${kind}.${fmt}`, slots, intent: { piece, ...intent } })
+
+    video.newsIds.forEach((_, i) => push(`header-${i + 1}`, 'header', { progress: { step: String(i + 1), label: `${i + 1} / ${video.newsIds.length}` } }))
+    push('lower-third-host', 'lower-third', { person: { kind: 'host', tag: `AL AIRE · GLITCH #${edition}`, name: video.host.name, role: video.host.role } })
+
+    if (video.guest) push('lower-third-guest', 'lower-third', { person: { kind: 'guest', tag: `INVITADO · GLITCH #${edition}`, name: video.guest.name, role: video.guest.role } })
+
+    video.newsIds.forEach((id, i) => {
+      const news = newsById(manifest, id)
+
+      push(`news-${i + 1}`, 'news', { section: GLITCH_SECTION_LABEL[news.section], headline: news.headline, source: news.outlet })
+    })
+
+    const dropNews = newsById(manifest, video.drop.newsId)
+    const dropIndex = video.newsIds.indexOf(video.drop.newsId) + 1
+
+    push(
+      'drop',
+      'drop',
+      {
+        pov: { entry: dropNews.pov.entry, ...punchParts(dropNews.pov.punch) },
+        ...(fmt === 'vlog' ? { about: { number: String(dropIndex), text: video.shortHeadlines[video.drop.newsId] } } : {})
+      },
+      { headline: { entry: dropNews.pov.entry, close: dropNews.pov.punch } }
+    )
+    push('cta', 'cta', { nextEdition: String(manifest.edition.number + 1), invite: video.cta[fmt] }, { narrator: { text: `el #${manifest.edition.number + 1} sale el lunes.` } })
+  }
+
   // ─── Contrato AXIS: cada lámina se valida antes de llegar al plan ───
-  const issues: GlitchIssue[] = slides.flatMap((slide) =>
+  const issues: GlitchIssue[] = [...slides, ...extra, ...overlays].flatMap((slide) =>
     validateGlitchLineIntent({ franchise: 'glitch', ...slide.intent }, { narratorLicenseStatus: options.narratorLicenseStatus }).map((issue) => ({
       code: issue.code,
       path: `${slide.slideId}${issue.path ? `.${issue.path}` : ''}`,
@@ -311,20 +488,12 @@ export const planGlitchEdition = (input: unknown, options: PlanGlitchEditionOpti
     slides: list.map(({ slideId, contentType, slots }) => ({ slideId, contentType, slots }))
   })
 
-  const carouselSlides = slides
-  const stillIds = new Set(manifest.outputs.stills.map((o) => (o === 'cover' ? 'cover' : o === 'back' ? 'back' : o.startsWith('interior:') ? o.slice('interior:'.length) : o)))
-  const unsupported = [...stillIds].filter((id) => !slides.some((s) => s.slideId === id))
-
-  if (unsupported.length > 0) {
-    throw new GlitchPieceError(`Piezas sueltas todavía sin plantilla: ${unsupported.join(', ')}.`, 'manifest-invalid', unsupported.map((id) => ({ code: 'field-invalid', path: 'outputs.stills', message: `sin plantilla: ${id}` })))
-  }
-
   return {
     edition: manifest.edition.number,
     coverTemplate: cover,
-    carousel: { catalog: 'glitch-carousel', plan: toPlan(carouselSlides, 'carousel') },
-    stills: { catalog: 'glitch-stills', plan: toPlan(slides.filter((s) => stillIds.has(s.slideId)), 'stills') },
-    overlays: { catalog: 'glitch-overlays', plan: toPlan([], 'overlays') },
+    carousel: { catalog: 'glitch-carousel', plan: toPlan(slides, 'carousel') },
+    stills: { catalog: 'glitch-stills', plan: toPlan([...stillIds.map((id) => bySlideId.get(id)!), ...extra], 'stills') },
+    overlays: { catalog: 'glitch-overlays', plan: toPlan(overlays, 'overlays') },
     assets
   }
 }

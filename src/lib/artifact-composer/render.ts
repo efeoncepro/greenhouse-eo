@@ -31,7 +31,7 @@ import type {
   SlotValue,
   TemplateContract
 } from './contracts'
-import { EXTERNAL_ASSET_PREFIX } from './contracts'
+import { EXTERNAL_ASSET_PREFIX, MIN_INK_TILE_RATIO_FLOOR } from './contracts'
 import { assertAllImagesResolved, assertNoFontFallback, assertSlideHasInk } from './quality-gates'
 import { resolveFieldDirective, type FieldDirective, type ResolverRegistry } from './resolver-contract'
 
@@ -1145,7 +1145,7 @@ export const renderSlide = async (
         omitBackground: contract.render?.background === 'transparent'
       })
 
-      assertSlideHasInk(buffer, slide.slideId)
+      assertSlideHasInk(buffer, slide.slideId, Math.max(MIN_INK_TILE_RATIO_FLOOR, contract.render?.minInkTileRatio ?? 0.015))
     } else {
       await page.pdf({
         path: target.outPath,

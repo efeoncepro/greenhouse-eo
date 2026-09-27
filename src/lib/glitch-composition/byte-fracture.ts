@@ -11,7 +11,40 @@
 
 import { GlitchPieceError } from './types'
 
-export type FractureEdge = 'bottom' | 'left' | 'right'
+export type FractureEdge = 'bottom' | 'top' | 'left' | 'right'
+
+/**
+ * Perfiles de la falla, medidos pieza por pieza en el canvas «Glitch en La órbita». El perfil lo fija la PLANTILLA
+ * (nunca el autor): el carrusel usa `band`; el borde lateral del banner A del blog y de la miniatura del vlog, `side`; la
+ * foto del host en la portada del reel se desarma HACIA ADENTRO (`host`); las tarjetas del banner C del blog, `card`.
+ */
+export interface FractureProfile {
+  cell: number
+  pitch: number
+  /** Distancia entre filas que se alejan del borde. */
+  step: number
+  /** Desvío máximo de cada celda dentro de su fila. */
+  jitter: number
+  opacity: readonly number[]
+  /** Probabilidad de que haya celda en cada fila. */
+  presence: readonly number[]
+  /** Cuánto se funde el color hacia el fondo en cada fila (0 = color del borde). */
+  fade: readonly number[]
+  /**
+   * Las celdas caen dentro de la foto (el fondo se come el borde) en vez de salir de ella; por eso su `fade` va casi
+   * al fondo: son huecos, no pedazos de la foto.
+   */
+  inward?: boolean
+}
+
+export const FRACTURE_PROFILES = {
+  band: { cell: 27, pitch: 30, step: 34.5, jitter: 12, opacity: [1, 0.87, 0.74, 0.61, 0.48], presence: [0.95, 0.62, 0.58, 0.42, 0.24], fade: [0, 0.08, 0.16, 0.28, 0.4] },
+  side: { cell: 23, pitch: 26, step: 30, jitter: 9, opacity: [1, 0.85, 0.7], presence: [0.92, 0.45, 0.2], fade: [0, 0.08, 0.16] },
+  host: { cell: 31, pitch: 34, step: 38, jitter: 7, opacity: [1, 0.8, 0.6], presence: [0.72, 0.42, 0.2], fade: [0.85, 0.8, 0.75], inward: true },
+  card: { cell: 15, pitch: 18, step: 22.5, jitter: 6, opacity: [1, 0.85, 0.7, 0.55, 0.4, 0.25], presence: [0.95, 0.78, 0.55, 0.32, 0.15, 0.05], fade: [0, 0.08, 0.16, 0.28, 0.4, 0.5] }
+} as const satisfies Record<string, FractureProfile>
+
+export type FractureProfileName = keyof typeof FRACTURE_PROFILES
 
 /** Caja en px del lienzo. */
 export interface Box {
@@ -33,9 +66,8 @@ export interface ByteFractureInput {
   clip?: Box
   /** Regiones de rostro normalizadas a la foto (0–1). `[]` = sin rostros. */
   faceRegions: readonly { x: number; y: number; w: number; h: number }[]
-  /** Tamaño de celda y paso en px. Por defecto, los medidos en el canvas (27 / 30). */
-  cell?: number
-  pitch?: number
+  /** Perfil medido de la pieza (por defecto `band`, el del carrusel). */
+  profile?: FractureProfileName
 }
 
 export interface ByteCell {
@@ -47,6 +79,8 @@ export interface ByteCell {
   opacity: number
   /** Índice de la muestra de color a lo largo del borde (columna o fila de la foto). */
   sample: number
+  /** Cuánto se funde hacia el fondo (del perfil). */
+  fade: number
 }
 
 export interface ByteFracture {
@@ -58,12 +92,8 @@ export interface ByteFracture {
   cells: ByteCell[]
 }
 
-const ROW_OPACITY = [1, 0.87, 0.74, 0.61, 0.48] as const
-/** Probabilidad de que haya celda en cada fila (medida en las láminas del canvas). */
-const ROW_PRESENCE = [0.95, 0.62, 0.58, 0.42, 0.24] as const
-
-/** Cuánto se funde el color hacia el fondo en cada fila (0 = color del borde). */
-export const ROW_FADE = [0, 0.08, 0.16, 0.28, 0.4] as const
+/** Cuánto se funde el color hacia el fondo en cada fila del carrusel (0 = color del borde). */
+export const ROW_FADE = FRACTURE_PROFILES.band.fade
 
 /** PRNG determinista (mulberry32) sembrado con los primeros 32 bits de un hex. */
 const rng = (seedHex: string) => {
@@ -87,14 +117,15 @@ export const fractureBand = (photo: Box, edge: FractureEdge, cell: number): Box 
   const depth = cell * 2
 
   if (edge === 'bottom') return { x: photo.x, y: photo.y + photo.h - depth, w: photo.w, h: depth }
+  if (edge === 'top') return { x: photo.x, y: photo.y, w: photo.w, h: depth }
   if (edge === 'left') return { x: photo.x, y: photo.y, w: depth, h: photo.h }
 
   return { x: photo.x + photo.w - depth, y: photo.y, w: depth, h: photo.h }
 }
 
 export const computeByteFracture = (input: ByteFractureInput): ByteFracture => {
-  const cell = input.cell ?? 27
-  const pitch = input.pitch ?? 30
+  const profile: FractureProfile = FRACTURE_PROFILES[input.profile ?? 'band']
+  const { cell, pitch } = profile
   const { photo, edge, canvas } = input
   const faces: Box[] = input.faceRegions.map((f) => ({ x: photo.x + f.x * photo.w, y: photo.y + f.y * photo.h, w: f.w * photo.w, h: f.h * photo.h }))
   const band = fractureBand(photo, edge, cell)
@@ -106,33 +137,43 @@ export const computeByteFracture = (input: ByteFractureInput): ByteFracture => {
   }
 
   const random = rng(input.seed)
-  const along = edge === 'bottom' ? photo.w : photo.h
+  const horizontal = edge === 'bottom' || edge === 'top'
+  const along = horizontal ? photo.w : photo.h
   const count = Math.floor((along - cell) / pitch) + 1
+  const clip = input.clip ?? { x: 0, y: 0, w: canvas.width, h: canvas.height }
   const cells: ByteCell[] = []
 
+  /** Posición de la celda a `offset` px del borde, hacia afuera (o hacia adentro con `inward`). */
+  const place = (i: number, offset: number): Box => {
+    const a = (horizontal ? photo.x : photo.y) + 1 + i * pitch
+    const inward = profile.inward === true
+
+    switch (edge) {
+      case 'bottom':
+        return { x: a, y: round1(inward ? photo.y + photo.h - cell - offset : photo.y + photo.h + offset), w: cell, h: cell }
+      case 'top':
+        return { x: a, y: round1(inward ? photo.y + offset : photo.y - cell - offset), w: cell, h: cell }
+      case 'left':
+        return { x: round1(inward ? photo.x + offset : photo.x - cell - offset), y: a, w: cell, h: cell }
+      default:
+        return { x: round1(inward ? photo.x + photo.w - cell - offset : photo.x + photo.w + offset), y: a, w: cell, h: cell }
+    }
+  }
+
   for (let i = 0; i < count; i++) {
-    for (let row = 0; row < ROW_OPACITY.length; row++) {
+    for (let row = 0; row < profile.opacity.length; row++) {
       // Se consumen siempre los dos números (presencia y desvío) para que la secuencia no dependa de los saltos.
-      const present = random() < ROW_PRESENCE[row]
-      const jitter = random() * 12
+      const present = random() < profile.presence[row]
+      const jitter = random() * profile.jitter
 
       if (!present) continue
 
-      const offset = round1(row * 34.5 + jitter)
-
-      const box: Box =
-        edge === 'bottom'
-          ? { x: photo.x + 1 + i * pitch, y: round1(photo.y + photo.h + offset), w: cell, h: cell }
-          : edge === 'left'
-            ? { x: round1(photo.x - cell - offset), y: photo.y + 1 + i * pitch, w: cell, h: cell }
-            : { x: round1(photo.x + photo.w + offset), y: photo.y + 1 + i * pitch, w: cell, h: cell }
-
-      const clip = input.clip ?? { x: 0, y: 0, w: canvas.width, h: canvas.height }
+      const box = place(i, round1(row * profile.step + jitter))
       const inside = box.x >= clip.x && box.y >= clip.y && box.x + box.w <= clip.x + clip.w && box.y + box.h <= clip.y + clip.h
 
       if (!inside || faces.some((face) => overlaps(face, box))) continue
 
-      cells.push({ x: box.x, y: box.y, size: cell, row, opacity: ROW_OPACITY[row], sample: i })
+      cells.push({ x: box.x, y: box.y, size: cell, row, opacity: profile.opacity[row], sample: i, fade: profile.fade[row] })
     }
   }
 
@@ -162,5 +203,5 @@ export const paintByteFracture = (fracture: ByteFracture, samples: readonly stri
     throw new Error(`La falla espera ${fracture.samples} muestras de color del borde y recibió ${samples.length}.`)
   }
 
-  return fracture.cells.map((c) => ({ x: c.x, y: c.y, size: c.size, opacity: c.opacity, fill: fadeToward(samples[c.sample], ground, ROW_FADE[c.row]) }))
+  return fracture.cells.map((c) => ({ x: c.x, y: c.y, size: c.size, opacity: c.opacity, fill: fadeToward(samples[c.sample], ground, c.fade) }))
 }

@@ -4,7 +4,7 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { resolvePlan } from '@/lib/artifact-composer/catalog'
-import { createGlitchCarouselCatalog, createGlitchStillsCatalog } from '@/lib/artifact-composer/catalogs/glitch'
+import { createGlitchCarouselCatalog, createGlitchOverlaysCatalog, createGlitchStillsCatalog } from '@/lib/artifact-composer/catalogs/glitch'
 
 import { GlitchPieceError, attachFractures, planGlitchEdition, resolveCoverTemplate } from '..'
 import type { GlitchEditionManifest } from '../manifest'
@@ -94,7 +94,7 @@ describe('planGlitchEdition', () => {
     const lens = plan.assets.find((a) => a.kind === 'lens')!
 
     expect(cover).toMatchObject({ kind: 'photo', fit: { width: 1080, height: 660 }, treatment: 'duotone' })
-    expect(cover.kind === 'photo' && cover.fracture?.slideIds).toEqual(['cover'])
+    expect(cover.kind === 'photo' && cover.fractures.map((f) => [f.slideIds, f.profile])).toEqual([[['cover'], 'band']])
     expect(lens).toMatchObject({ ref: 'photo:n3-lens', diameter: 220, fit: { width: 1080, height: 450 } })
 
     const coverSlots = plan.carousel.plan.slides[0].slots as Record<string, unknown>
@@ -125,7 +125,7 @@ describe('planGlitchEdition', () => {
 
     expect(plan.coverTemplate).toBe('C')
     expect(mosaic).toHaveLength(4)
-    expect(mosaic.every((a) => a.kind === 'photo' && a.fracture?.clip?.h === 170)).toBe(true)
+    expect(mosaic.every((a) => a.kind === 'photo' && a.fractures[0].clip?.h === 170)).toBe(true)
   })
 
   it('la noticia 1 con lente se rechaza: abre con «El micrófono se abre»', () => {
@@ -140,14 +140,55 @@ describe('planGlitchEdition', () => {
     expect(codeOf(() => planGlitchEdition(load(), { narratorLicenseStatus: 'pending' }))).toBe('font-license-missing')
   })
 
-  it('las piezas sueltas repiten láminas del carrusel; blog y reel esperan su plantilla', () => {
+  it('las piezas sueltas repiten láminas del carrusel y suman blog, reel y miniatura con la plantilla de portada', () => {
     const m = load()
 
-    m.outputs.stills = ['cover', 'interior:n4']
-    expect(planGlitchEdition(m).stills.plan.slides.map((s) => s.slideId)).toEqual(['cover', 'n4'])
+    m.outputs.stills = ['cover', 'interior:n4', 'blog:banner', 'blog:square', 'blog:news:n3', 'reel:cover', 'video:thumbnail']
 
-    m.outputs.stills = ['blog:banner']
+    const plan = planGlitchEdition(m)
+
+    expect(plan.stills.plan.slides.map((s) => [s.slideId, s.contentType])).toEqual([
+      ['cover', 'glitch.cover.a'],
+      ['n4', 'glitch.interior'],
+      ['blog-banner', 'glitch.blog.banner.a'],
+      ['blog-square', 'glitch.blog.square.a'],
+      ['blog-news-n3', 'glitch.blog.news'],
+      ['reel-cover', 'glitch.reel.cover'],
+      ['video-thumbnail', 'glitch.video.thumbnail']
+    ])
+
+    // El banner A del blog se rompe por dos bordes (medido en el canvas); el host va a color y se come por arriba.
+    const blog = plan.assets.find((a) => a.ref === 'photo:blog-banner')!
+    const reel = plan.assets.find((a) => a.ref === 'photo:reel-cover')!
+
+    expect(blog.kind === 'photo' && blog.fractures.map((f) => `${f.edge}:${f.profile}`)).toEqual(['bottom:band', 'left:side'])
+    expect(reel).toMatchObject({ treatment: 'color', fit: { width: 1080, height: 1020 } })
+    expect(reel.kind === 'photo' && reel.fractures[0]).toMatchObject({ edge: 'top', profile: 'host' })
+  })
+
+  it('la portada del reel sin foto del host se rechaza en el manifiesto', () => {
+    const m = load()
+
+    m.outputs.stills = ['reel:cover']
+    m.video = { ...m.video!, hostPhoto: null }
     expect(codeOf(() => planGlitchEdition(m))).toBe('manifest-invalid')
+  })
+
+  it('el kit de overlays sale del video: cabeceras, lower third, noticias, Drop y cierre por formato', () => {
+    const m = load()
+
+    m.outputs.overlays = ['reel']
+    m.video = { ...m.video!, guest: { name: 'Invitada', role: 'Rol · Empresa' } }
+
+    const plan = planGlitchEdition(m)
+    const ids = plan.overlays.plan.slides.map((s) => s.slideId)
+
+    expect(ids).toEqual(['reel-header-1', 'reel-header-2', 'reel-header-3', 'reel-lower-third-host', 'reel-lower-third-guest', 'reel-news-1', 'reel-news-2', 'reel-news-3', 'reel-drop', 'reel-cta'])
+
+    const slot = (id: string) => plan.overlays.plan.slides.find((s) => s.slideId === id)!.slots as Record<string, unknown>
+
+    expect(slot('reel-lower-third-host').person).toMatchObject({ kind: 'host', tag: 'AL AIRE · GLITCH #17' })
+    expect(slot('reel-cta')).toEqual({ nextEdition: '18', invite: 'Sigue a' })
   })
 
   it('attachFractures pega las celdas pintadas sólo en su lámina, sin mutar el plan', () => {
@@ -179,5 +220,24 @@ describe('planGlitchEdition', () => {
     ])
     expect(carousel.validators.every((v) => v.result === 'pass')).toBe(true)
     expect(stills.slides.map((s) => s.template)).toEqual(['CoverPhoto', 'InteriorLens'])
+  })
+
+  it.each(['A', 'B', 'C'] as const)('las piezas sueltas y los overlays resuelven contra el catálogo real (anterior ≠ %s)', async (previousCover) => {
+    const m = load()
+
+    m.previousEdition.coverTemplate = previousCover === 'A' ? 'A' : previousCover === 'B' ? 'C' : 'A'
+
+    if (previousCover === 'C') m.cover.standalonePov = null
+
+    m.outputs = { stills: ['blog:banner', 'blog:square', 'blog:news:n3', 'reel:cover', 'video:thumbnail'], overlays: ['reel', 'vlog'] }
+
+    const plan = planGlitchEdition(m)
+    const stills = await resolvePlan(createGlitchStillsCatalog(), plan.stills.plan)
+    const overlays = await resolvePlan(createGlitchOverlaysCatalog(), plan.overlays.plan)
+
+    expect(stills.slides.map((s) => s.template)).toContain('ReelCover')
+    expect(stills.validators.every((v) => v.result === 'pass')).toBe(true)
+    expect(overlays.slides).toHaveLength(18)
+    expect(overlays.validators.every((v) => v.result === 'pass')).toBe(true)
   })
 })

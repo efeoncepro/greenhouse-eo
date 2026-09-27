@@ -30,6 +30,23 @@ export const glitchResolvers = (): ResolverRegistry => ({
       return Array.from({ length: n }, (_, i) => ({ selector: `.gx-seg:nth-of-type(${i + 1})`, toneClass: 'is-on' }))
     }
   },
+  /** Avance n/3 de la cabecera del reel y del vlog (tres noticias por video). */
+  'gx-progress-3': {
+    known: ['1', '2', '3'],
+    build: (value) => {
+      const n = Number(value)
+
+      if (!Number.isInteger(n) || n < 1 || n > 3) return null
+
+      return Array.from({ length: n }, (_, i) => ({ selector: `.gx-seg:nth-of-type(${i + 1})`, toneClass: 'is-on' }))
+    }
+  },
+  /** Lower third: el host lleva la órbita con la manzana; el invitado, el punto en contorno. */
+  'gx-person-kind': {
+    known: ['host', 'guest'],
+    build: (value) =>
+      value === 'host' || value === 'guest' ? [{ selector: ':self', toneClass: `is-${value}`, toneGroup: ['is-host', 'is-guest'] }] : null
+  },
   /** Centro de la lente en px del lienzo: lo deriva el mapper de la región del detalle (nunca una coordenada a mano). */
   'gx-lens-x': { known: ['<px>'], build: (value) => lensPx(value, 'left') },
   'gx-lens-y': { known: ['<px>'], build: (value) => lensPx(value, 'top') },

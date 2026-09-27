@@ -32,7 +32,20 @@ export interface GlitchCatalogOptions {
 }
 
 /** Plantillas con foto que se desarma en bytes: el hook pinta la geometría que trae el plan. */
-export const GLITCH_FRACTURE_TEMPLATES = ['CoverPhoto', 'CoverMosaic', 'Interior', 'InteriorOpening', 'InteriorLens'] as const
+export const GLITCH_FRACTURE_TEMPLATES = [
+  'CoverPhoto',
+  'CoverMosaic',
+  'Interior',
+  'InteriorOpening',
+  'InteriorLens',
+  'BlogBannerPhoto',
+  'BlogBannerMosaic',
+  'BlogSquarePhoto',
+  'BlogSquareMosaic',
+  'BlogNewsBanner',
+  'ReelCover',
+  'VideoThumbnail'
+] as const
 
 const create = (key: GlitchCatalogKey, outputTarget: OutputTarget, options: GlitchCatalogOptions): ArtifactCatalog => ({
   name: `glitch-${key}`,

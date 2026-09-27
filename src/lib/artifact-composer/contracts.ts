@@ -123,7 +123,16 @@ export interface SlotContract {
  */
 export interface TemplateRenderOptions {
   background?: 'opaque' | 'transparent'
+  /**
+   * Piso de «tinta» de la lámina (fracción de tiles de 16 px con un borde real). Por defecto 1,5 %. Una capa
+   * transparente pequeña por diseño (un zócalo de una línea sobre un lienzo 9:16) lo declara más bajo; nunca por debajo
+   * de `MIN_INK_TILE_RATIO_FLOOR`, así una lámina que sale vacía sigue fallando.
+   */
+  minInkTileRatio?: number
 }
+
+/** Ninguna plantilla puede bajar el gate de lámina en blanco más allá de esto. */
+export const MIN_INK_TILE_RATIO_FLOOR = 0.003
 
 export interface TemplateContract {
   template: TemplateName

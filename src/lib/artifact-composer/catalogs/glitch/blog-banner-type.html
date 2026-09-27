@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Glitch · Banner del blog B (POV tipográfico)</title>
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="glitch-tokens.css" />
+<link rel="stylesheet" href="glitch.css" />
+<style>
+  .gx-blog-b .gx-masthead { left: 110px; right: 88px; top: 70px; }
+  .gx-blog-b .gx-narrator { left: 114px; top: 250px; font-size: 70px; }
+  .gx-blog-b .gx-headline { left: 106px; width: 1180px; top: 336px; font-size: 150px; line-height: 0.9; letter-spacing: -0.01em; }
+  .gx-blog-b .gx-headline__punch { color: var(--gx-accent); }
+  .gx-blog-b .gx-lines { left: 110px; top: 800px; }
+  .gx-blog-b .gx-line { width: 480px; }
+  .gx-blog-b .gx-halo { left: 1100px; top: 140px; width: 920px; height: 920px; }
+  .gx-blog-b .gx-apple-bytes { left: 1408px; top: 368px; width: 372px; }
+  .gx-blog-b .gx-signature { bottom: 52px; width: 180px; }
+</style>
+</head>
+<body>
+<main class="gx-canvas gx-canvas--16x9 gx-blog-b" data-gx-root>
+  <div class="gx-halo" aria-hidden="true"></div>
+  <img class="gx-apple-bytes" src="assets/apple-bytes-accent.svg" alt="" />
+  <header class="gx-masthead">
+    <img class="gx-masthead__wordmark" src="assets/glitch-logo-negative.svg" alt="Glitch" />
+    <div class="gx-masthead__edition">
+      <span class="gx-masthead__label">EDICIÓN</span>
+      <span class="gx-masthead__number"><span class="gx-hash">#</span><span class="gx-num" data-slot="edition">17</span></span>
+    </div>
+  </header>
+  <div class="gx-narrator" data-slot="muletilla">spoiler:</div>
+  <h1 class="gx-headline" data-slot="headline"><span class="gx-headline__entry" data-slot-field="entry">Entrada ligera</span><span class="gx-headline__punch" data-slot-field="punch">¿Remate?</span></h1>
+  <div class="gx-lines" data-slot="lines">
+    <div class="gx-line"><span class="gx-section"><span data-slot-field="section">Sección</span> <span class="gx-plus-ia">+ IA</span></span><span class="gx-line__text" data-slot-field="text">Noticia en seis palabras</span></div>
+  </div>
+  <img class="gx-signature" src="assets/efeonce-logo-negative.svg" alt="Efeonce" />
+</main>
+</body>
+</html>

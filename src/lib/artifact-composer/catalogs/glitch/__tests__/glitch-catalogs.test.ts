@@ -23,6 +23,9 @@ const KNOWN_TOKEN_SPHERE_DRIFT: Record<string, string> = {
   'portada-c': 'el diseño aprobado de la portada C no lleva manzana; AXIS declara apple'
 }
 
+/** Piezas del token que describen un kit de varias plantillas (los overlays del reel y del vlog). */
+const KIT_PIECES = new Set(['reel-overlay', 'vlog-overlay'])
+
 const planWith = (template: string, contentType: string) => ({
   tenderId: 'glitch-test',
   slides: [{ slideId: 's1', contentType, template, slots: {} }]
@@ -65,6 +68,13 @@ describe('glitch catalogs', () => {
         // La plantilla sigue al diseño aprobado; el token de AXIS todavía no. Cuando AXIS lo corrija, este caso se pone
         // rojo a propósito: se retira la excepción.
         expect(piece.sphere, `${t.piece}: AXIS ya se corrigió, retira la excepción`).not.toBe(t.sphere)
+        continue
+      }
+
+      if (KIT_PIECES.has(t.piece)) {
+        // El token describe el KIT de overlays (una esfera como máximo por cuadro): cada pieza del kit lleva la del kit o
+        // ninguna (la cabecera, la tarjeta y el cierre no llevan manzana).
+        expect([piece.sphere, 'none'], template.name).toContain(t.sphere)
         continue
       }
 

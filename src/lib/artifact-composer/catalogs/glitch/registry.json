@@ -13,7 +13,26 @@
     "glitch.interior",
     "glitch.interior.opening",
     "glitch.interior.lens",
-    "glitch.back"
+    "glitch.back",
+    "glitch.blog.banner.a",
+    "glitch.blog.banner.b",
+    "glitch.blog.banner.c",
+    "glitch.blog.square.a",
+    "glitch.blog.square.b",
+    "glitch.blog.square.c",
+    "glitch.blog.news",
+    "glitch.reel.cover",
+    "glitch.video.thumbnail",
+    "glitch.overlay.header.reel",
+    "glitch.overlay.lower-third.reel",
+    "glitch.overlay.news.reel",
+    "glitch.overlay.drop.reel",
+    "glitch.overlay.cta.reel",
+    "glitch.overlay.header.vlog",
+    "glitch.overlay.lower-third.vlog",
+    "glitch.overlay.news.vlog",
+    "glitch.overlay.drop.vlog",
+    "glitch.overlay.cta.vlog"
   ],
   "templates": [
     {
@@ -141,6 +160,329 @@
       "sphere": "apple",
       "surfaceTone": "dark",
       "piece": "contraportada"
+    },
+    {
+      "name": "BlogBannerPhoto",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.blog.banner.a"
+      ],
+      "prototype": "blog-banner-photo.html",
+      "slotsRef": "blog-banner-photo.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "blog-banner-a"
+    },
+    {
+      "name": "BlogBannerType",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.blog.banner.b"
+      ],
+      "prototype": "blog-banner-type.html",
+      "slotsRef": "blog-banner-type.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "blog-banner-b"
+    },
+    {
+      "name": "BlogBannerMosaic",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.blog.banner.c"
+      ],
+      "prototype": "blog-banner-mosaic.html",
+      "slotsRef": "blog-banner-mosaic.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "blog-banner-c"
+    },
+    {
+      "name": "BlogSquarePhoto",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.blog.square.a"
+      ],
+      "prototype": "blog-square-photo.html",
+      "slotsRef": "blog-square-photo.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "blog-banner-square-a"
+    },
+    {
+      "name": "BlogSquareType",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.blog.square.b"
+      ],
+      "prototype": "blog-square-type.html",
+      "slotsRef": "blog-square-type.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "blog-banner-square-b"
+    },
+    {
+      "name": "BlogSquareMosaic",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.blog.square.c"
+      ],
+      "prototype": "blog-square-mosaic.html",
+      "slotsRef": "blog-square-mosaic.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "blog-banner-square-c"
+    },
+    {
+      "name": "BlogNewsBanner",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.blog.news"
+      ],
+      "prototype": "blog-news-banner.html",
+      "slotsRef": "blog-news-banner.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "sphere": "none",
+      "surfaceTone": "dark",
+      "piece": "blog-banner-interno"
+    },
+    {
+      "name": "ReelCover",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.reel.cover"
+      ],
+      "prototype": "reel-cover.html",
+      "slotsRef": "reel-cover.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "reel-portada"
+    },
+    {
+      "name": "VideoThumbnail",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.video.thumbnail"
+      ],
+      "prototype": "video-thumbnail.html",
+      "slotsRef": "video-thumbnail.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": null
+    },
+    {
+      "name": "OverlayHeaderReel",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.overlay.header.reel"
+      ],
+      "prototype": "overlay-header-reel.html",
+      "slotsRef": "overlay-header-reel.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "overlays"
+      ],
+      "sphere": "none",
+      "surfaceTone": "dark",
+      "piece": "reel-overlay"
+    },
+    {
+      "name": "OverlayLowerThirdReel",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.overlay.lower-third.reel"
+      ],
+      "prototype": "overlay-lower-third-reel.html",
+      "slotsRef": "overlay-lower-third-reel.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "overlays"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "reel-overlay"
+    },
+    {
+      "name": "OverlayNewsReel",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.overlay.news.reel"
+      ],
+      "prototype": "overlay-news-reel.html",
+      "slotsRef": "overlay-news-reel.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "overlays"
+      ],
+      "sphere": "none",
+      "surfaceTone": "dark",
+      "piece": "reel-overlay"
+    },
+    {
+      "name": "OverlayDropReel",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.overlay.drop.reel"
+      ],
+      "prototype": "overlay-drop-reel.html",
+      "slotsRef": "overlay-drop-reel.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "overlays"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "reel-overlay"
+    },
+    {
+      "name": "OverlayCtaReel",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.overlay.cta.reel"
+      ],
+      "prototype": "overlay-cta-reel.html",
+      "slotsRef": "overlay-cta-reel.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "overlays"
+      ],
+      "sphere": "none",
+      "surfaceTone": "dark",
+      "piece": "reel-overlay"
+    },
+    {
+      "name": "OverlayHeaderVlog",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.overlay.header.vlog"
+      ],
+      "prototype": "overlay-header-vlog.html",
+      "slotsRef": "overlay-header-vlog.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "overlays"
+      ],
+      "sphere": "none",
+      "surfaceTone": "dark",
+      "piece": "vlog-overlay"
+    },
+    {
+      "name": "OverlayLowerThirdVlog",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.overlay.lower-third.vlog"
+      ],
+      "prototype": "overlay-lower-third-vlog.html",
+      "slotsRef": "overlay-lower-third-vlog.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "overlays"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "vlog-overlay"
+    },
+    {
+      "name": "OverlayNewsVlog",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.overlay.news.vlog"
+      ],
+      "prototype": "overlay-news-vlog.html",
+      "slotsRef": "overlay-news-vlog.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "overlays"
+      ],
+      "sphere": "none",
+      "surfaceTone": "dark",
+      "piece": "vlog-overlay"
+    },
+    {
+      "name": "OverlayDropVlog",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.overlay.drop.vlog"
+      ],
+      "prototype": "overlay-drop-vlog.html",
+      "slotsRef": "overlay-drop-vlog.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "overlays"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "vlog-overlay"
+    },
+    {
+      "name": "OverlayCtaVlog",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.overlay.cta.vlog"
+      ],
+      "prototype": "overlay-cta-vlog.html",
+      "slotsRef": "overlay-cta-vlog.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "overlays"
+      ],
+      "sphere": "none",
+      "surfaceTone": "dark",
+      "piece": "vlog-overlay"
     }
   ],
   "selector": {
@@ -151,7 +493,26 @@
       "glitch.interior": "Interior",
       "glitch.interior.opening": "InteriorOpening",
       "glitch.interior.lens": "InteriorLens",
-      "glitch.back": "BackCover"
+      "glitch.back": "BackCover",
+      "glitch.blog.banner.a": "BlogBannerPhoto",
+      "glitch.blog.banner.b": "BlogBannerType",
+      "glitch.blog.banner.c": "BlogBannerMosaic",
+      "glitch.blog.square.a": "BlogSquarePhoto",
+      "glitch.blog.square.b": "BlogSquareType",
+      "glitch.blog.square.c": "BlogSquareMosaic",
+      "glitch.blog.news": "BlogNewsBanner",
+      "glitch.reel.cover": "ReelCover",
+      "glitch.video.thumbnail": "VideoThumbnail",
+      "glitch.overlay.header.reel": "OverlayHeaderReel",
+      "glitch.overlay.lower-third.reel": "OverlayLowerThirdReel",
+      "glitch.overlay.news.reel": "OverlayNewsReel",
+      "glitch.overlay.drop.reel": "OverlayDropReel",
+      "glitch.overlay.cta.reel": "OverlayCtaReel",
+      "glitch.overlay.header.vlog": "OverlayHeaderVlog",
+      "glitch.overlay.lower-third.vlog": "OverlayLowerThirdVlog",
+      "glitch.overlay.news.vlog": "OverlayNewsVlog",
+      "glitch.overlay.drop.vlog": "OverlayDropVlog",
+      "glitch.overlay.cta.vlog": "OverlayCtaVlog"
     }
   }
 }

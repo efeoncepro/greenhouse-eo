@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Glitch · Miniatura del vlog</title>
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="glitch-tokens.css" />
+<link rel="stylesheet" href="glitch.css" />
+<style>
+  .gx-thumb .gx-host { position: absolute; left: 700px; top: 0; width: 580px; height: 720px; }
+  .gx-thumb .gx-host img { display: block; width: 100%; height: 100%; }
+  .gx-thumb .gx-wordmark { position: absolute; left: 60px; top: 50px; width: 190px; height: auto; }
+  .gx-thumb .gx-headline { left: 56px; width: 640px; top: 170px; font-size: 120px; line-height: 0.9; letter-spacing: 0.005em; }
+  .gx-thumb .gx-headline__entry { font-size: 0.5em; margin-bottom: 0.12em; }
+  .gx-thumb .gx-masthead__number { position: absolute; left: 60px; bottom: 50px; font-size: 60px; line-height: 1; letter-spacing: 0; }
+</style>
+</head>
+<body>
+<main class="gx-canvas gx-canvas--thumb gx-thumb" data-gx-root>
+  <div class="gx-host" data-slot="host"><img data-slot-field="src" src="assets/glitch-apple.svg" alt="" /></div>
+  <svg class="gx-bytes" data-gx-bytes viewBox="0 0 1280 720" width="1280" height="720" aria-hidden="true"></svg>
+  <img class="gx-wordmark" src="assets/glitch-logo-negative.svg" alt="Glitch" />
+  <h1 class="gx-headline" data-slot="headline"><span class="gx-headline__entry" data-slot-field="entry">3 noticias.</span><span data-slot-field="punchLead">Un solo</span> <span class="gx-nowrap gx-accent"><span data-slot-field="punchLast">aviso</span><img class="gx-apple" src="assets/glitch-apple.svg" alt="" /></span></h1>
+  <span class="gx-masthead__number"><span class="gx-hash">#</span><span class="gx-num" data-slot="edition">17</span></span>
+</main>
+</body>
+</html>

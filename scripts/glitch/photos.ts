@@ -77,7 +77,7 @@ export const sampleEdge = async (photo: ProcessedPhoto, edge: FractureEdge, samp
     for (let a = start; a < start + len; a += 2) {
       for (let d = 0; d < len; d += 2) {
         const [x, y] =
-          edge === 'bottom' ? [a, info.height - 1 - d] : edge === 'left' ? [d, a] : [info.width - 1 - d, a]
+          edge === 'bottom' ? [a, info.height - 1 - d] : edge === 'top' ? [a, d] : edge === 'left' ? [d, a] : [info.width - 1 - d, a]
 
         const c = px(x, y)
 

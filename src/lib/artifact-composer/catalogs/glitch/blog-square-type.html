@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Glitch · Banner cuadrado del blog B (POV tipográfico)</title>
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="glitch-tokens.css" />
+<link rel="stylesheet" href="glitch.css" />
+<style>
+  .gx-square-b .gx-masthead { left: 88px; right: 88px; top: 64px; }
+  .gx-square-b .gx-narrator { left: 92px; top: 236px; font-size: 60px; }
+  .gx-square-b .gx-headline { left: 84px; right: 70px; top: 306px; font-size: 124px; line-height: 0.9; letter-spacing: -0.01em; }
+  .gx-square-b .gx-headline__punch { color: var(--gx-accent); }
+  .gx-square-b .gx-halo { left: 560px; top: 440px; width: 600px; height: 600px; }
+  .gx-square-b .gx-apple-bytes { left: 736px; top: 600px; width: 250px; }
+  .gx-square-b .gx-lines { left: 88px; top: 690px; width: 560px; flex-direction: column; gap: 14px; }
+  .gx-square-b .gx-line { width: 560px; }
+  .gx-square-b .gx-signature { bottom: 44px; width: 160px; }
+</style>
+</head>
+<body>
+<main class="gx-canvas gx-canvas--1x1 gx-square-b" data-gx-root>
+  <div class="gx-halo" aria-hidden="true"></div>
+  <img class="gx-apple-bytes" src="assets/apple-bytes-accent.svg" alt="" />
+  <header class="gx-masthead">
+    <img class="gx-masthead__wordmark" src="assets/glitch-logo-negative.svg" alt="Glitch" />
+    <div class="gx-masthead__edition">
+      <span class="gx-masthead__label">EDICIÓN</span>
+      <span class="gx-masthead__number"><span class="gx-hash">#</span><span class="gx-num" data-slot="edition">17</span></span>
+    </div>
+  </header>
+  <div class="gx-narrator" data-slot="muletilla">spoiler:</div>
+  <h1 class="gx-headline" data-slot="headline"><span class="gx-headline__entry" data-slot-field="entry">Entrada ligera</span><span class="gx-headline__punch" data-slot-field="punch">¿Remate?</span></h1>
+  <div class="gx-lines" data-slot="lines">
+    <div class="gx-line"><span class="gx-section"><span data-slot-field="section">Sección</span> <span class="gx-plus-ia">+ IA</span></span><span class="gx-line__text" data-slot-field="text">Noticia en seis palabras</span></div>
+  </div>
+  <img class="gx-signature" src="assets/efeonce-logo-negative.svg" alt="Efeonce" />
+</main>
+</body>
+</html>

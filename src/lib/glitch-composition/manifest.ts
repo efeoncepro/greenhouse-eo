@@ -81,7 +81,19 @@ export const glitchVideoSchema = z
     shortHeadlines: z.record(z.string(), nonEmpty),
     drop: z.object({ newsId: z.string() }).strict(),
     cta: z.object({ reel: nonEmpty, vlog: nonEmpty }).strict(),
-    transition: z.enum(['basic', 'bytes']).default('basic')
+    transition: z.enum(['basic', 'bytes']).default('basic'),
+    /** Foto del host con un gesto fuerte (portada del reel y miniatura del vlog). Propia: licencia, nunca crédito pintado. */
+    hostPhoto: z
+      .object({
+        file: nonEmpty,
+        license: z.object({ kind: z.enum(GLITCH_PHOTO_LICENSE_KINDS), ref: nonEmpty }).strict(),
+        faceRegions: z.array(glitchRegionSchema)
+      })
+      .strict()
+      .nullable()
+      .default(null),
+    /** Titular de la portada del reel y de la miniatura («3 noticias.» + «Un solo aviso»). */
+    cover: glitchHeadlineSchema.nullable().default(null)
   })
   .strict()
 
@@ -127,7 +139,8 @@ export const glitchEditionManifestSchema = z
     outputs: z
       .object({
         stills: z.array(z.string().regex(GLITCH_STILL_OUTPUTS, 'pieza suelta desconocida')).default([]),
-        overlays: z.array(z.string()).default([])
+        /** El kit de overlays en PNG con transparencia, por formato. */
+        overlays: z.array(z.enum(['reel', 'vlog'])).default([])
       })
       .strict()
       .default({ stills: [], overlays: [] })
@@ -160,6 +173,20 @@ export const glitchEditionManifestSchema = z
 
     if (m.previousEdition.number >= m.edition.number) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['previousEdition', 'number'], message: 'la edición anterior debe tener un número menor' })
+    }
+
+    const needsHost = m.outputs.stills.some((o) => o === 'reel:cover' || o === 'video:thumbnail')
+
+    if (needsHost && !m.video?.hostPhoto) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['video', 'hostPhoto'], message: 'la portada del reel y la miniatura del vlog necesitan la foto del host' })
+    }
+
+    if (needsHost && !m.video?.cover) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['video', 'cover'], message: 'la portada del reel y la miniatura del vlog necesitan su titular' })
+    }
+
+    if (m.outputs.overlays.length > 0 && !m.video) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['video'], message: 'los overlays salen del video de la edición: falta la sección video' })
     }
 
     if (m.video) {

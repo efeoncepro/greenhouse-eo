@@ -290,7 +290,26 @@
       "reel": "Sigue a",
       "vlog": "Las otras noticias, en el blog de"
     },
-    "transition": "basic"
+    "transition": "basic",
+    "hostPhoto": {
+      "file": "fotos/host.png",
+      "license": {
+        "kind": "generated",
+        "ref": "glitch-example-fixtures"
+      },
+      "faceRegions": [
+        {
+          "x": 0.4,
+          "y": 0.22,
+          "w": 0.2,
+          "h": 0.24
+        }
+      ]
+    },
+    "cover": {
+      "entry": "3 noticias.",
+      "punch": "Un solo aviso"
+    }
   },
   "outputs": {
     "stills": [
@@ -302,6 +321,9 @@
       "reel:cover",
       "video:thumbnail"
     ],
-    "overlays": []
+    "overlays": [
+      "reel",
+      "vlog"
+    ]
   }
 }

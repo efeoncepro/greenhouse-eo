@@ -561,3 +561,301 @@ body {
   line-height: 1.08;
   color: var(--gx-text-strong);
 }
+
+/* ─── Formatos de las piezas sueltas (TASK-1923 Slice 7) ─── */
+.gx-canvas--16x9 {
+  width: 1920px;
+  height: 1080px;
+}
+
+.gx-canvas--1x1 {
+  width: 1080px;
+  height: 1080px;
+}
+
+.gx-canvas--news {
+  width: 1600px;
+  height: 900px;
+}
+
+.gx-canvas--9x16 {
+  width: 1080px;
+  height: 1920px;
+}
+
+.gx-canvas--thumb {
+  width: 1280px;
+  height: 720px;
+}
+
+/* Capas para video: sin fondo (el PNG sale con canal alfa); lo que no se pinta, queda transparente. */
+html.gx-alpha,
+html.gx-alpha body,
+.gx-canvas--alpha {
+  background: transparent;
+}
+
+/* Remate entero en el acento (portada del reel y miniatura del vlog; banner B). */
+.gx-accent {
+  color: var(--gx-accent);
+}
+
+/* Etiqueta en mayúsculas de las piezas de video («GLITCH EN VOZ ALTA»). */
+.gx-kicker-label {
+  position: absolute;
+  font-weight: var(--gx-label-weight);
+  letter-spacing: 0.16em;
+  color: var(--gx-text);
+}
+
+/* ─── Overlays del reel y del vlog (PNG con alfa): el cuadro fijo del kit de motion aprobado (TASK-1924). Cada pieza
+   es un cuadro completo ya ubicado en su zona: el editor la suelta en 0,0. Nada tapa la cara del host. ─── */
+.gx-ov-header {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gx-ov-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: color-mix(in srgb, var(--gx-ground) 85%, transparent);
+  border-radius: 8px;
+}
+
+.gx-ov-chip__label {
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.14em;
+  color: var(--gx-text-strong);
+}
+
+.gx-ov-segs {
+  display: flex;
+  gap: 5px;
+}
+
+.gx-ov-segs .gx-seg {
+  width: 22px;
+  background: color-mix(in srgb, var(--gx-text-strong) 30%, transparent);
+}
+
+.gx-ov-segs .gx-seg.is-on {
+  background: var(--gx-accent);
+}
+
+.gx-ov-wordmark {
+  display: block;
+  height: auto;
+  filter: drop-shadow(0 2px 8px color-mix(in srgb, var(--gx-ground) 60%, transparent));
+}
+
+.gx-ov-lt {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 30px 14px 16px;
+  background: color-mix(in srgb, var(--gx-ground) 92%, transparent);
+  border-radius: 999px;
+}
+
+.gx-ov-lt__live {
+  display: block;
+  width: 72px;
+  height: 72px;
+  color: var(--gx-accent);
+}
+
+.gx-ov-lt__apple {
+  position: absolute;
+  left: 19.45px;
+  top: 1.57px;
+  width: 15.3px;
+  height: 20px;
+}
+
+.gx-ov-lt__icon {
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+
+.gx-ov-lt__dot {
+  display: none;
+  width: 14px;
+  height: 14px;
+  margin: 0 4px 0 10px;
+  border-radius: 50%;
+  border: 2px solid var(--gx-accent);
+}
+
+.gx-ov-lt.is-guest {
+  padding-left: 22px;
+}
+
+.gx-ov-lt.is-guest .gx-ov-lt__icon {
+  display: none;
+}
+
+.gx-ov-lt.is-guest .gx-ov-lt__dot {
+  display: block;
+}
+
+.gx-ov-lt__text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.gx-ov-lt__tag {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.22em;
+  color: var(--gx-accent);
+}
+
+.gx-ov-lt.is-guest .gx-ov-lt__tag {
+  color: var(--gx-sub);
+}
+
+.gx-ov-lt__name {
+  font-family: var(--gx-font-headline);
+  font-weight: var(--gx-close-weight);
+  font-variation-settings: 'wght' var(--gx-close-weight), 'wdth' var(--gx-close-width);
+  font-size: 40px;
+  line-height: 1;
+  color: var(--gx-text-strong);
+  white-space: nowrap;
+}
+
+.gx-ov-lt__role {
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--gx-text);
+}
+
+.gx-ov-card {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px 32px;
+  background: color-mix(in srgb, var(--gx-ground) 90%, transparent);
+  border-radius: 20px;
+}
+
+.gx-ov-card__tag {
+  font-weight: var(--gx-label-weight);
+  font-size: 18px;
+  letter-spacing: 0.16em;
+  color: var(--gx-sub);
+  text-transform: uppercase;
+}
+
+.gx-ov-card__headline {
+  font-family: var(--gx-font-headline);
+  font-weight: var(--gx-entry-weight);
+  font-variation-settings: 'wght' var(--gx-entry-weight), 'wdth' var(--gx-entry-width);
+  line-height: 1.08;
+  letter-spacing: -0.005em;
+  color: var(--gx-text-strong);
+}
+
+.gx-ov-card__source {
+  font-weight: 500;
+  color: var(--gx-sub);
+}
+
+.gx-ov-drop {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.gx-ov-drop__tag {
+  display: flex;
+  align-items: center;
+}
+
+.gx-ov-drop__label {
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--gx-accent);
+}
+
+.gx-ov-drop__pov {
+  font-family: var(--gx-font-headline);
+  font-weight: var(--gx-close-weight);
+  font-variation-settings: 'wght' var(--gx-close-weight), 'wdth' var(--gx-close-width);
+  line-height: 0.92;
+  letter-spacing: 0.005em;
+  color: var(--gx-text-strong);
+}
+
+.gx-ov-drop__pov .gx-headline__entry {
+  font-size: inherit;
+}
+
+.gx-ov-ground {
+  position: absolute;
+  inset: 0;
+  background: var(--gx-ground);
+}
+
+.gx-ov-foot {
+  position: absolute;
+  padding-top: 18px;
+  border-top: 1px solid var(--gx-line);
+  font-size: 24px;
+  color: var(--gx-sub);
+}
+
+.gx-ov-foot__label {
+  font-weight: var(--gx-label-weight);
+  letter-spacing: 0.14em;
+  color: var(--gx-text);
+}
+
+.gx-ov-cta {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.gx-ov-cta .gx-narrator {
+  position: static;
+  transform-origin: center;
+  filter: drop-shadow(0 2px 10px color-mix(in srgb, var(--gx-ground) 80%, transparent));
+}
+
+.gx-ov-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 40px;
+  border-radius: 999px;
+  background: var(--gx-text-strong);
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--gx-ground) 50%, transparent);
+}
+
+.gx-ov-pill__label {
+  font-weight: var(--gx-label-weight);
+  font-size: 30px;
+  color: var(--gx-navy);
+}
+
+.gx-ov-pill__wordmark {
+  display: block;
+  height: 31px;
+  width: auto;
+}

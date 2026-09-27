@@ -43,6 +43,18 @@ export class GlitchPieceError extends Error {
   }
 }
 
+/** Dónde y cómo se desarma en bytes una foto en UNA lámina. El perfil lo fija la plantilla (medido en el canvas). */
+export interface GlitchFractureRequest {
+  slideIds: string[]
+  box: { x: number; y: number; w: number; h: number }
+  edge: 'bottom' | 'top' | 'left' | 'right'
+  profile: 'band' | 'side' | 'host' | 'card'
+  faceRegions: { x: number; y: number; w: number; h: number }[]
+  /** La tarjeta del mosaico: ninguna celda sale de ella. */
+  clip?: { x: number; y: number; w: number; h: number }
+  canvas: { width: number; height: number }
+}
+
 /**
  * Un asset que el plan referencia (`asset-ref:<kind>:<id>`) y que quien compone debe materializar en bytes. El mapper
  * no lee archivos: sólo dice qué hace falta y a qué tamaño exacto (así el render no re-muestrea; ISSUE-122).
@@ -55,18 +67,10 @@ export type GlitchAssetRequest =
       path: string
       /** Tamaño exacto del hueco en px CSS; el materializador lo multiplica por el deviceScaleFactor. */
       fit: { width: number; height: number }
-      /** Duotono navy de la falla en bytes (valores del token). */
-      treatment: 'duotone'
-      /** Si la foto se desarma en bytes: dónde está en el lienzo y en qué lámina(s) pintar la falla. */
-      fracture?: {
-        slideIds: string[]
-        box: { x: number; y: number; w: number; h: number }
-        edge: 'bottom' | 'left' | 'right'
-        faceRegions: { x: number; y: number; w: number; h: number }[]
-        /** La tarjeta del mosaico: ninguna celda sale de ella. */
-        clip?: { x: number; y: number; w: number; h: number }
-        canvas: { width: number; height: number }
-      }
+      /** Duotono navy (noticias) o color (el host del video). */
+      treatment: 'duotone' | 'color'
+      /** Dónde se desarma en bytes (una foto puede romperse por dos bordes: el banner A del blog). */
+      fractures: GlitchFractureRequest[]
     }
   | {
       ref: string

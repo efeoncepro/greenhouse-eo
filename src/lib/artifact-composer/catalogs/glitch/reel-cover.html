@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Glitch · Portada del reel</title>
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="glitch-tokens.css" />
+<link rel="stylesheet" href="glitch.css" />
+<style>
+  .gx-reel-cover .gx-host { position: absolute; left: 0; top: 900px; width: 1080px; height: 1020px; }
+  .gx-reel-cover .gx-host img { display: block; width: 100%; height: 100%; }
+  .gx-reel-cover .gx-masthead { left: 64px; right: 150px; top: 330px; }
+  .gx-reel-cover .gx-masthead__wordmark { width: 250px; }
+  .gx-reel-cover .gx-masthead__number { font-size: 76px; line-height: 0.85; letter-spacing: 0; }
+  .gx-reel-cover .gx-headline { left: 60px; right: 60px; top: 500px; font-size: 150px; line-height: 0.9; letter-spacing: 0.005em; }
+  .gx-reel-cover .gx-headline__entry { font-size: 0.5em; }
+  .gx-reel-cover .gx-kicker-label { left: 64px; top: 820px; font-size: 22px; }
+</style>
+</head>
+<body>
+<main class="gx-canvas gx-canvas--9x16 gx-reel-cover" data-gx-root>
+  <div class="gx-host" data-slot="host"><img data-slot-field="src" src="assets/glitch-apple.svg" alt="" /></div>
+  <svg class="gx-bytes" data-gx-bytes viewBox="0 0 1080 1920" width="1080" height="1920" aria-hidden="true"></svg>
+  <header class="gx-masthead">
+    <img class="gx-masthead__wordmark" src="assets/glitch-logo-negative.svg" alt="Glitch" />
+    <span class="gx-masthead__number"><span class="gx-hash">#</span><span class="gx-num" data-slot="edition">17</span></span>
+  </header>
+  <h1 class="gx-headline" data-slot="headline"><span class="gx-headline__entry" data-slot-field="entry">3 noticias.</span><span data-slot-field="punchLead">Un solo</span> <span class="gx-nowrap gx-accent"><span data-slot-field="punchLast">aviso</span><img class="gx-apple" src="assets/glitch-apple.svg" alt="" /></span></h1>
+  <div class="gx-kicker-label">GLITCH EN VOZ ALTA</div>
+</main>
+</body>
+</html>

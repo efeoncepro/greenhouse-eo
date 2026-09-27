@@ -7,7 +7,8 @@
  *   - `glitch.cover-rotation`    la portada nunca repite la plantilla de la semana anterior (norma §4.2).
  *   - `glitch.single-sphere`     cada plantilla declara exactamente una esfera (manzana, lente o ninguna).
  *   - `glitch.headline-contrast` titular con entrada ligera y remate pesado: sin remate no hay contraste.
- *   - `glitch.photo-credit`      toda foto lleva crédito pintado y licencia admitida (licensed/owned/generated).
+ *   - `glitch.photo-credit`      toda foto de noticia lleva crédito pintado y licencia admitida (licensed/owned/generated);
+ *                                la del host (propia) sólo declara la licencia.
  *   - `glitch.face-safe-fracture` ninguna celda de la falla en bytes cae sobre un rostro.
  *   - `glitch.accent-on-light`   el verde nunca es texto sobre fondo claro: hoy toda plantilla es de superficie oscura.
  *   - `glitch.edition-structure` (sólo carrusel) portada + 8 noticias en orden + contraportada.
@@ -71,9 +72,12 @@ export const headlineContrastValidator = perSlide('glitch.headline-contrast', (s
 
 export const photoCreditValidator = perSlide('glitch.photo-credit', (slide) => {
   const slots = slotsOf(slide)
+  const hostOnly = slots.host !== undefined && !PHOTO_SLOTS.some((key) => slots[key] !== undefined)
 
-  if (!PHOTO_SLOTS.some((key) => slots[key] !== undefined)) return null
-  if (!filled(slots.credit)) return 'Una lámina con foto lleva su crédito pintado.'
+  if (!hostOnly && !PHOTO_SLOTS.some((key) => slots[key] !== undefined)) return null
+
+  // La foto del host es propia (portada del reel, miniatura del vlog): no pinta crédito, pero declara su licencia.
+  if (!hostOnly && !filled(slots.credit)) return 'Una lámina con foto lleva su crédito pintado.'
 
   const licenses = typeof slots.photoLicense === 'string' ? slots.photoLicense.trim().split(/\s+/).filter(Boolean) : []
 
