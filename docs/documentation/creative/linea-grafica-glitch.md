@@ -1,9 +1,10 @@
 # Línea gráfica de Glitch — sub-línea de La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.4: el sonido de Glitch quedó aprobado, versión B)
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.5: los gráficos animados del video quedaron aprobados; v1.4: el
+> sonido de Glitch quedó aprobado, versión B)
 > **Documentacion tecnica:** [Norma de la sub-línea de Glitch](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) · [ADR de la línea de Glitch](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
 > **Manual de uso:** [Componer piezas de Glitch](../../manual-de-uso/creative/componer-piezas-glitch.md) · [Editar el video de Glitch](../../manual-de-uso/creative/editar-video-glitch.md)
 
@@ -81,9 +82,10 @@ abre con la franja «El micrófono se abre». El carrusel cierra con la **contra
 | Contraportada | **aprobada** el 2026-09-27 |
 | Lámina con lente (la foto con un detalle ampliado a color) | propuesta |
 | Blog: banners, apertura, índice, callout «más punch», cierres | propuesta |
-| Video horizontal (vlog) y reel vertical con gráficos encima del host | propuesta |
-| Tarjeta final de video | propuesta |
-| Gráficos animados del video (apertura, tarjeta final, kit y transiciones) | **piloto** desde el 2026-09-27: ninguno aprobado |
+| Video horizontal (vlog) y reel vertical con gráficos encima del host | **aprobados** el 2026-09-27 |
+| Tarjeta final de video | **aprobada** el 2026-09-27 |
+| Gráficos animados del video (apertura, tarjeta final, kit y transiciones) | **aprobados** el 2026-09-27 («Si, el tuyo también está aprobado») |
+| Subtítulos del video | pendiente: falta definir su estilo |
 | Sonido de Glitch (sólo Glitch) | **aprobado**, versión B «más punch» (2026-09-27) |
 | La manzana como esfera de Glitch y el verde como su color de acento | **aprobados** el 2026-09-27 (falta sumarlos al sistema de diseño AXIS) |
 | Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | **aprobados** el 2026-09-27 (falta sumarlos al catálogo de AXIS) |
@@ -105,15 +107,17 @@ que el operador lo apruebe. Las noticias y los titulares de las maquetas son de 
 
 > Detalle técnico: [norma §8 Límites](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#8-límites--nunca)
 
-## Video y motion (piloto)
+## Video y motion (aprobado)
 
 > **⚠️ Sólo para Glitch.** Estos gráficos animados, y en especial **la transición de la manzana en bytes, son
 > exclusivos de Glitch**: nunca se usan en videos ni piezas de Efeonce o de clientes.
 
 Glitch tiene un video semanal con el host a cámara, en dos formatos: **reel** vertical y **vlog** horizontal. Desde el
-2026-09-27 existe un **piloto** de sus gráficos animados. Llegan como archivos de video con **fondo transparente**, a
-30 cuadros por segundo, para que el editor los ponga encima de la grabación en Premiere Pro o After Effects. **Ninguno
-está aprobado todavía**: sirven para probar y para que el operador decida.
+2026-09-27 existen sus gráficos animados, y el operador los **aprobó** ese mismo día («Si, el tuyo también está
+aprobado»). Llegan como archivos de video con **fondo transparente**, a 30 cuadros por segundo, para que el editor los
+ponga encima de la grabación en Premiere Pro o After Effects; cada uno trae al lado su archivo de sonido, con el mismo
+nombre. Falta todavía probarlos con los editores en una edición real, definir a cuántos cuadros por segundo se graba,
+el estilo de los subtítulos y los textos reales de la edición #17.
 
 | Pieza | Cómo se mueve |
 |---|---|
@@ -166,10 +170,9 @@ Glitch del sistema de diseño AXIS, en la sección de sonido.
 > Detalle técnico: [norma §13.11 Sonido](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1311-sonido--sólo-glitch-aprobado-versión-b) ·
 > montaje en [Editar el video de Glitch](../../manual-de-uso/creative/editar-video-glitch.md#6--montar-el-sonido)
 
-## Cómo se va a producir (propuesta)
+## Cómo se va a producir (flujo aceptado; piezas fijas en construcción)
 
-Hoy cada pieza se arma a mano a partir del canvas de diseño, siguiendo la norma. Hay una **propuesta** (aún no
-aprobada) para que ninguna persona ni agente tenga que reinterpretar la línea: los valores quedarían en el sistema de
+Hoy cada pieza se arma a mano a partir del canvas de diseño, siguiendo la norma. El operador **aceptó** el flujo (2026-09-27) para que ninguna persona ni agente tenga que reinterpretar la línea: los valores quedarían en el sistema de
 diseño AXIS, las láminas y banners se compondrían solos a partir de los datos de la edición con el motor de composición
 de Greenhouse (que además elegiría la plantilla de portada según la regla de rotación), y los gráficos del video se
 animarían y exportarían con fondo transparente para que el editor los ponga sobre la grabación.
@@ -184,7 +187,7 @@ animarían y exportarían con fondo transparente para que el editor los ponga so
 | Decisión (ADR) | [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md) |
 | Canvas de diseño «Glitch en La órbita» (privado) | [claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS](https://claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS) |
 | Logo de Glitch | `public/branding/glitch/glitch-light.svg` y `glitch-dark.svg` |
-| Gráficos animados del video (piloto) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto` |
+| Gráficos animados del video (aprobados; cada uno con su sonido al lado) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto` (la carpeta conserva su nombre) |
 | Sonido del video (aprobado, versión B) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto › sonido-propuesta` → carpeta `b` (la carpeta conserva su nombre; `a` es la alternativa descartada) · [axis.efeonce.org/references/glitch/#sonido](https://axis.efeonce.org/references/glitch/#sonido) |
 | Guía de tono y voz de Glitch (v3) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Marca` |
 | Página de Glitch en el sistema de diseño AXIS | publicada en [axis.efeonce.org/references/glitch/](https://axis.efeonce.org/references/glitch/) (2026-09-27) |
@@ -196,11 +199,10 @@ animarían y exportarían con fondo transparente para que el editor los ponga so
 |---|---|
 | La manzana y el verde | ya aprobados (2026-09-27); falta registrarlos en AXIS |
 | Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | ya aprobados (2026-09-27); falta sumarlos al catálogo de AXIS |
-| Piezas en propuesta | aprobar lente, blog, video y tarjetas finales |
-| Texto del rótulo inferior del video (lower third) | hay un piloto (2026-09-27); falta que el operador lo apruebe |
-| Gráficos animados del video | aprobar la intensidad «más punch», la cadencia de grabación, la prueba con los editores, dónde se usa la transición de bytes, subtítulos, textos reales de la #17 y la excepción de rostros |
+| Piezas en propuesta | aprobar lente y blog (el video y las tarjetas finales ya se aprobaron el 2026-09-27) |
+| Gráficos animados del video | ya aprobados (2026-09-27); falta la cadencia de grabación (hoy 30 cuadros por segundo), la prueba con los editores en una edición real, el ritmo ajustable, dónde se usa la transición de bytes (se recomienda sólo en tarjetas y Drop), el estilo de subtítulos, los textos reales de la #17, el formulario para cambiar textos sin programar, guardar una copia en la nube de Google y cualquier excepción a la regla de rostros |
 | Letra Guttery | licencia para web y video confirmada por el operador (2026-09-27) |
-| Producción automática | aprobar la propuesta (el trabajo para construirla ya está creado) |
+| Producción automática | el video ya se produce solo desde los datos de la edición; falta construir la de piezas fijas (portadas, carrusel, banners: TASK-1923) |
 
 Ya resuelto el 2026-09-27: Glitch es línea de servicio **Growth** y la próxima edición es la **#17**.
 

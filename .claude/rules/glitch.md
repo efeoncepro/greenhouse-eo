@@ -35,5 +35,7 @@ Reglas duras:
   sonora sobre la voz del host ni sonido de transición hacia o desde el host; nunca whooshes. Archivos por URL + SHA-256
   en `gs://efeonce-group-axis-public-media/glitch/sound/v1/` (`/references/glitch.json` → `sound`). Canon §13.11 de la
   norma; operativo en `references/glitch.md` §13.
-- Aprobado: sistema de portada A/B/C con rotación, lámina interior, contraportada; manzana como esfera y verde como acento; línea Growth; próxima edición #17; alta de los 5 glifos Plastilina (2026-09-27); diseño sonoro de Glitch, versión B (2026-09-27). Blog, lente y todo el motion
-  (piloto de video) son **propuesta**: no se entregan como canon ni se publican sin el operador.
+- Aprobado: sistema de portada A/B/C con rotación, lámina interior, contraportada; manzana como esfera y verde como acento; línea Growth; próxima edición #17; alta de los 5 glifos Plastilina (2026-09-27); diseño sonoro de Glitch, versión B (2026-09-27); **motion de Glitch (2026-09-27)**: apertura y tarjeta final v2, kit de overlays con el lower third, transición de bytes entre piezas y transición entre escenas, con los tableros de video del canvas (vlog 16:9 y reel). Cada render entrega el WAV junto a cada `.mov` (`--sound b|a|off`, `b` por defecto).
+  Blog y lente siguen en **propuesta**: no se entregan como canon ni se publican sin el operador. Pendientes del motion
+  (no decidir por el operador): fps, prueba con editores, ritmo, a qué piezas va la transición de bytes, subtítulos,
+  textos reales de la #17, autoservicio, tokens (TASK-1922), archivo en GCS, push del taller y excepción de rostros.

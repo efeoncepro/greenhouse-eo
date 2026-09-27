@@ -1,5 +1,28 @@
 # TASK-1924 — Glitch en movimiento con HyperFrames
 
+## Delta 2026-09-27 — motion de Glitch aprobado y sonido integrado
+
+- **Motion APROBADO** por el operador (Julio Reyes, 2026-09-27): «Si, el tuyo también está aprobado». Cubre la apertura
+  y la tarjeta final v2 (golpes f24/f48/f69 y f6/f57/f74), el kit de overlays (cabeceras, lower third del host con la
+  órbita, invitado, tarjeta de noticia, imagen de la fuente, Glitch Drop y cierre sobre el host), la transición de
+  piezas «manzana en bytes» y la transición entre escenas (paquete máscara + capa, y versión héroe); con ellos, los
+  tableros de video del canvas que ese motion anima (vlog 16:9 y reel: mapa de zonas, host, noticia, Drop, tarjetas
+  finales y hoja del kit). Registrado en la [norma §9](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#9-estado-de-cada-pieza-2026-09-27)
+  y en el [ADR, Delta «motion aprobado»](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--motion-aprobado).
+  Supersede el «nada aprobado / PILOTO / PROPUESTA» de los Deltas de abajo, que quedan como historia.
+- **Sonido integrado al motion** en el taller: `2d411b8` (el sonido aprobado, versión B, dentro de `glitch-motion`,
+  con los tiempos leídos del código; `render`, `kit`, `transiciones` y `heroe` entregan el WAV junto a cada `.mov` con
+  `--sound b|a|off`, `b` por defecto) y `b40565e` (entregas re-hechas con el WAV junto a cada pieza; los manifiestos
+  registran el estado aprobado). Los `.mov` siguen siendo ProRes 4444 sin pista de audio.
+- **Open Questions:** la 1 (motor) queda respondida en la práctica (el kit aprobado se hizo entero con HyperFrames) y la 9
+  (16:9) también (el kit del vlog aprobado lleva la tarjeta de noticia como overlay y el Drop a pantalla completa).
+- **Siguen pendientes:** fps de grabación (hoy 30) y prueba con los editores en una edición real; parámetro de ritmo; a
+  qué piezas se aplica la transición de bytes (recomendación: tarjetas y Drop); estilo de subtítulos; textos reales de
+  la #17; formulario de autoservicio en Marketing Studio; tokens `glitchLine` (TASK-1922); archivo en GCS; push del
+  repo taller; excepción de rostros (por defecto, la falla nunca sobre un rostro). Los desvíos respecto de esta spec
+  (manifiesto de TASK-1923, `yuva444p10le`/WebM, nombres de pieza, `entrega.json`, `verify`, PR y CI) siguen abiertos.
+  El Lifecycle no cambia: la task sigue en `to-do`.
+
 ## Delta 2026-09-27 — sonido de Glitch aprobado, versión B (sólo Glitch)
 
 - El **diseño sonoro de Glitch** (sólo Glitch, nunca Efeonce) quedó **APROBADO en su versión B** («más punch») el
@@ -45,7 +68,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 - **Aprobados la manzana como esfera y el verde `#6ec207` como acento de franquicia**, y **Glitch es línea Growth**:
   la apertura y la tarjeta final (puntos → manzana) ya no dependen de esa aprobación; siguen dependiendo de TASK-1922 y
   TASK-1923 y de la aprobación del kit de overlays y las tarjetas finales, que siguen en PROPUESTA.
-- **Mnemónico (Open Question 3, abierta):** el operador pidió **evaluarlo y aprobarlo** en una evaluación dedicada.
+- **Mnemónico (Open Question 3 — resuelta el 2026-09-27: el sonido de Glitch quedó aprobado en su versión b y se integró al taller, ver Deltas de arriba):** el operador pidió **evaluarlo y aprobarlo** en una evaluación dedicada.
   Hasta entonces los clips salen mudos con marcador de sincronía y ningún mnemónico se usa como canon.
 - **Lower third (Open Question 2, abierta):** su contenido está **en definición con el operador** (sesión en curso).
   La pieza `lower-third` no se construye con contenido inventado.
@@ -78,10 +101,10 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
   > de producción que crea el Slice 8 (`docs/operations/brand-graphic-line/glitch/GLITCH_MOTION_OVERLAYS_V1.md`).
 - Backend impact: `none`
 - Epic: `EPIC-031`
-- Status real: `Piloto producido (2026-09-27) en el repo taller efeonce-brand-workshop, tools/glitch-motion (commits locales sin push): apertura/tarjeta final v2, kit de overlays reel y vlog, lower third con la órbita real y transiciones de bytes (piezas y escenas); nada aprobado por el operador (PILOTO / PROPUESTA); falta reconciliar con TASK-1922 (token glitchLine.motion) y TASK-1923 (manifiesto), PR con CI del taller y prueba de los editores`
+- Status real: `Motion APROBADO por el operador (2026-09-27) en el repo taller efeonce-brand-workshop, tools/glitch-motion (commits locales sin push): apertura/tarjeta final v2, kit de overlays reel y vlog, lower third con la órbita real y transiciones de bytes (piezas y escenas); sonido aprobado (B) integrado: cada render entrega el WAV junto a cada .mov (2d411b8, b40565e); falta reconciliar con TASK-1922 (token glitchLine.motion) y TASK-1923 (manifiesto), PR con CI del taller, archivo en GCS, prueba de los editores en una edición real, fps, subtítulos y textos reales de la #17`
 - Rank: `TBD`
 - Domain: `creative|brand`
-- Blocked by: `TASK-1922, TASK-1923, CI mínimo del taller de TASK-1925 antes de integrar código a su main, aprobación del operador del kit de overlays y de las tarjetas finales (gate del Slice 2)`
+- Blocked by: `TASK-1922, TASK-1923, CI mínimo del taller de TASK-1925 antes de integrar código a su main` (la aprobación del operador del kit de overlays y de las tarjetas finales, gate del Slice 2, quedó dada el 2026-09-27)
 - Branch: `efeonce-brand-workshop: rama de trabajo + PR a main (el CI del taller sólo corre en pull_request); Greenhouse develop sólo para docs y skills; AXIS main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -132,7 +155,7 @@ Open Questions que cambian: la 1 (motor) se probó con HyperFrames para todo el 
 third) queda **resuelta** (ver abajo); la 4 (fps) sigue abierta, el piloto rinde a 30 fps; la 6 (subtítulos) sigue
 abierta, el estilo de captions en Premiere no está hecho; la 11 (entrega) tiene carpeta de OneDrive. Pendiente de
 decisión del operador: intensidad v2, prueba de los editores en Premiere y After Effects, parámetro de ritmo (posible,
-no implementado), a qué piezas va la transición de bytes, mnemónico, textos reales de la #17, formulario de autoservicio
+no implementado), a qué piezas va la transición de bytes, textos reales de la #17, formulario de autoservicio
 en Marketing Studio (recomendado; `.mogrt` descartado), excepción de rostros, tokens (TASK-1922) y push de los repos.
 
 ## Summary
@@ -757,15 +780,19 @@ Todos los comandos se corren desde `greenhouse-eo`, con el taller clonado como h
 - [ ] Renderizar dos veces el mismo manifiesto produce cuadros clave idénticos dentro de la tolerancia de antialias.
 - [ ] La apertura y la tarjeta final existen en 9:16 y 16:9; el último cuadro de la tarjeta final coincide con el
       primero de la apertura (pixelmatch dentro de tolerancia) y el marcador de sincronía está en `entrega.json`.
-- [ ] La aprobación del operador de la apertura y la tarjeta final quedó registrada con fecha en la norma de Glitch
+- [x] La aprobación del operador de la apertura y la tarjeta final quedó registrada con fecha en la norma de Glitch
       antes de empezar el Slice 3.
+      > 2026-09-27: registrada en la norma §7, §9 y §13 («Si, el tuyo también está aprobado»), apertura y tarjeta final
+      > v2. El kit se produjo antes de la aprobación, como piloto fuera del orden de slices (ver el Delta del piloto).
 - [x] Las piezas `cabecera`, `tarjeta-noticia`, `imagen-fuente`, `glitch-drop` y `ultima-frase` existen en 9:16 con
       fondo transparente, y `lower-third` existe sólo si el operador definió su contenido.
       > 2026-09-27, piloto: existen en reel y vlog como `cabecera-1..3`, `noticia-1..3`, `fuente-N`, `drop` y `cta`
       > (verificación del kit 60/60, alfa de entrada y salida); el lower third se hizo con el contenido definido con el
-      > operador. Los nombres difieren de esta spec y ninguna pieza está aprobada.
-- [ ] La aprobación del operador del kit del reel quedó registrada con fecha en la norma de Glitch (§9) antes de marcar
+      > operador. Los nombres difieren de esta spec. Las piezas quedaron aprobadas por el operador el 2026-09-27.
+- [x] La aprobación del operador del kit del reel quedó registrada con fecha en la norma de Glitch (§9) antes de marcar
       clips como `aprobado`.
+      > 2026-09-27: registrada en la norma §9 (kit del reel y del vlog); los manifiestos de las entregas del taller
+      > (`b40565e`) registran el estado aprobado.
 - [ ] Cada `.mov` entregado reporta `yuva444p10le` en `ffprobe` y cada `.webm` reporta `alpha_mode=1`.
 - [ ] En todo overlay que no es pantalla completa, las cuatro esquinas del cuadro asentado tienen alfa 0 y el cuadro
       tiene píxeles con alfa 255.
@@ -785,6 +812,8 @@ Todos los comandos se corren desde `greenhouse-eo`, con el taller clonado como h
       la zona de texto.
 - [x] Los clips de apertura y tarjeta final salen sin pista de audio mientras la pieza sonora de Glitch no esté decidida.
       > 2026-09-27, piloto: la salida es ProRes 4444 con alfa, 30 fps, sin audio; los golpes quedan marcados por cuadro.
+      > 2026-09-27, después: la pieza sonora quedó decidida (versión B aprobada). Los `.mov` siguen sin pista de audio
+      > y el sonido va en un WAV aparte, con el mismo nombre, junto a cada `.mov` (taller `2d411b8`, `b40565e`).
 - [ ] `pnpm -C ../efeonce-brand-workshop --filter glitch-motion verify` sale con código 0 sobre la entrega del fixture y
       con código distinto de 0 si se corrompe el alfa, la duración o una zona, o si `entrega.json` contiene una ruta
       absoluta.
@@ -792,7 +821,8 @@ Todos los comandos se corren desde `greenhouse-eo`, con el taller clonado como h
 - [ ] La spec `GLITCH_MOTION_OVERLAYS_V1.md`, la documentación funcional y el manual (todos en Greenhouse) tienen la
       sección de movimiento y dicen cómo operarlo desde `greenhouse-eo` con `pnpm -C ../efeonce-brand-workshop`.
 
-> **Criterios sin tildar al 2026-09-27 y por qué** (evidencia: piloto del taller, ver Delta de arriba):
+> **Criterios sin tildar al 2026-09-27 y por qué** (evidencia: motion del taller, aprobado el 2026-09-27; ver los Deltas
+> de arriba):
 >
 > - Paquete con versiones exactas y `doctor` verde: el paquete y el script `doctor` existen, pero no hay registro de
 >   las versiones fijadas ni del resultado de `doctor`. Hoy: versiones exactas en `package.json` (hyperframes 0.6.69, gsap
@@ -810,7 +840,6 @@ Todos los comandos se corren desde `greenhouse-eo`, con el taller clonado como h
 >   cuadro a cuadro entre dos renders.
 > - Apertura y tarjeta final: existen en reel y vlog con bucle exacto (PSNR ∞), pero no hay `entrega.json` con el
 >   marcador de sincronía.
-> - Aprobaciones del operador (apertura, tarjeta final, kit): ninguna todavía.
 > - `yuva444p10le` y WebM `alpha_mode=1`: el piloto sale en `yuva444p12le` y no produce WebM.
 > - Esquinas con alfa 0, zonas, «una manzana» y cuadro asentado contra `glitch-overlays`: la verificación 60/60 cubre
 >   códec, cuadros y alfa de entrada y salida, no estos chequeos; `glitch-overlays` (TASK-1923) no existe.
@@ -820,7 +849,7 @@ Todos los comandos se corren desde `greenhouse-eo`, con el taller clonado como h
 >   los binarios en OneDrive.
 > - Subtítulos con `--transcript`: no hechos.
 > - `verify` con códigos de salida: no hay un script `verify` separado.
-> - Prueba de importación del editor: pendiente.
+> - Prueba de importación del editor: pendiente (abrir y montar el motion aprobado en una edición real).
 > - Spec `GLITCH_MOTION_OVERLAYS_V1.md`: no existe; la documentación del piloto quedó en la norma de Glitch §13 y en el
 >   manual `docs/manual-de-uso/creative/editar-video-glitch.md`.
 

@@ -9,9 +9,12 @@
 > numeración #17, glifos Plastilina) y el flujo de composición (aceptado por el operador el 2026-09-27). El hogar del
 > movimiento quedó **decidido** el 2026-09-27: repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/`
 > ([decisión del taller](./EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md)); ver §«Delta — flujo aceptado». El **diseño
-> sonoro de Glitch** quedó **Accepted, versión B**, el 2026-09-27 (ver su Delta); el motion sigue con su propio estado
+> sonoro de Glitch** quedó **Accepted, versión B**, el 2026-09-27 (ver su Delta), y el **motion de Glitch** quedó
+> **Accepted** el mismo día ([Delta — motion aprobado](#delta-2026-09-27--motion-aprobado)). Lente y blog siguen en
+> propuesta.
 > **Creado:** 2026-09-27 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude (Delta: diseño sonoro **aprobado, versión B**, sólo Glitch)
+> **Última actualización:** 2026-09-27 por Claude (Delta: **motion aprobado**; antes, Delta del diseño sonoro
+> **aprobado, versión B**, sólo Glitch)
 > **Norma operativa:** [`GLITCH_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
 > **Línea madre:** [`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
 > **Relacionadas:** [ADR «La órbita»](./EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) ·
@@ -216,9 +219,9 @@ glifos Plastilina, el flujo de composición (`Accepted`), el hogar del movimient
 (`Accepted`, versión B; ver [su Delta](#delta-2026-09-27--diseño-sonoro-aprobado-versión-b-sólo-glitch)). Siguen
 pendientes:
 
-- Aprobación de la lente, el blog (banners + maqueta + callout v2), el vlog 16:9, el reel (kit de overlays) y las
-  tarjetas finales.
-- Contenido del lower third: en definición con el operador.
+- Aprobación de la lente y el blog (banners + maqueta + callout v2). El vlog 16:9, el reel (kit de overlays) y las
+  tarjetas finales quedaron aprobados con el motion el 2026-09-27 ([Delta — motion aprobado](#delta-2026-09-27--motion-aprobado)).
+- Contenido del lower third: definido el 2026-09-27 (ver el Delta del piloto de motion).
 - Licencia de Guttery: confirmada por el operador (2026-09-27); falta registrar la referencia del contrato.
 
 ## Reversibilidad
@@ -312,3 +315,25 @@ guarda su sha256); y el código no pasó por PR ni por el CI del taller (commits
   no hay decisiones pendientes del sonido. La aprobación es **sólo del sonido**; el motion (imagen) mantiene su estado.
 - **Observación (no bloqueante):** la sesión de motion midió que, en B, el golpe del cuadro 74 de la tarjeta final (el
   tercer punto que vuelve) queda más tapado que en A.
+
+## Delta 2026-09-27 — motion aprobado
+
+> **Alcance:** sólo Glitch. Supersede el estado «PILOTO / PROPUESTA» y los «pendiente de aprobación» del motion en los
+> Deltas anteriores (que se conservan como historia). Detalle en la
+> [norma §7, §9 y §13](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#13-motion-y-transiciones--solo-glitch).
+
+- **Estado: Accepted (2026-09-27).** El operador (Julio Reyes): **«Si, el tuyo también está aprobado»**.
+- **Qué cubre:** la apertura y la tarjeta final v2 «más punch» (golpes en los cuadros 24/48/69 y 6/57/74); el kit de
+  overlays (cabeceras, lower third del host con la órbita real, invitado, tarjeta de noticia, imagen de la fuente,
+  Glitch Drop y cierre sobre el host); la transición de piezas «manzana en bytes»; y la transición entre escenas
+  (paquete máscara + capa, y versión héroe). Con ello quedan aprobados los tableros de video del canvas que ese motion
+  anima: vlog 16:9 y reel (mapa de zonas, host, noticia, Drop, tarjetas finales y hoja del kit).
+- **Sonido integrado:** desde el commit del taller `2d411b8`, cada render (`render`, `kit`, `transiciones`, `heroe`)
+  entrega el WAV del sonido aprobado (versión B; `--sound b|a|off`) junto a cada `.mov`, con los tiempos leídos del
+  código del motion; `b40565e` re-entregó las piezas con su WAV y los manifiestos registran el estado aprobado. El
+  sonido conserva su propio Delta.
+- **Sigue en propuesta:** la lente y el blog (banners, maqueta y callout v2).
+- **Sigue pendiente:** fps de grabación (hoy 30) y prueba con los editores en una edición real; parámetro de ritmo; a
+  qué piezas se aplica la transición de bytes (recomendación: tarjetas y Drop); estilo de subtítulos; textos reales de
+  la #17; formulario de autoservicio en Marketing Studio; tokens de Glitch (TASK-1922); archivo en GCS; push del repo
+  taller; y cualquier excepción de rostros (la regla por defecto sigue: la falla nunca sobre un rostro).

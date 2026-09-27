@@ -1,9 +1,10 @@
 # Editar el video de Glitch con los gráficos animados — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.2: el sonido quedó aprobado, versión B; se monta desde `b/`)
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.3: el motion quedó aprobado y cada `.mov` trae su WAV al lado;
+> v1.2: el sonido quedó aprobado, versión B; se monta desde `b/`)
 > **Modulo:** Creative · Glitch, magazine semanal de Efeonce (sub-línea de «La órbita») · video y motion
 > **Ruta en portal:** no aplica — los gráficos se entregan como archivos de video en OneDrive y se montan en Premiere Pro o After Effects
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/linea-grafica-glitch.md) · [Norma de la sub-línea](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) · [Componer piezas de Glitch](./componer-piezas-glitch.md) · [ADR del repo taller](../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md)
@@ -22,26 +23,30 @@ y la **transición entre escenas** de la manzana en bytes, en sus dos formatos: 
 Está escrito para la persona que edita en **Premiere Pro** o **After Effects**. No necesitas tocar código: los
 gráficos llegan hechos y tú los ubicas en la línea de tiempo.
 
-**Estado:** todo lo que describe este manual es **piloto / propuesta**. Ninguna pieza de motion está aprobada todavía
-(2026-09-27). Úsalo para pruebas y para mostrarle el resultado al operador, no para publicar como pieza final. El
-**sonido** sí está aprobado (versión B, 2026-09-27; sección 6).
+**Estado:** el motion que describe este manual está **aprobado** (2026-09-27; el operador: «Si, el tuyo también está
+aprobado»): apertura y tarjeta final v2, kit de gráficos, transición de bytes entre piezas y transición entre escenas.
+El **sonido** también está aprobado (versión B, 2026-09-27; sección 6). Siguen pendientes la prueba con los editores
+en una edición real, la cadencia de grabación, el estilo de subtítulos, a qué piezas se aplica la transición de bytes
+y los textos reales de la #17: no publiques un video con textos entre corchetes.
 
 ## Antes de empezar
 
 - **Confirma que el video es de Glitch.** Si no, no uses nada de esto.
-- **Dónde están los archivos:** en OneDrive, `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto`.
+- **Dónde están los archivos:** en OneDrive, `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto` (la carpeta
+  conserva su nombre, pero su contenido está aprobado).
 
   | Carpeta | Qué tiene |
   |---|---|
   | `piloto/` (la raíz) | apertura y tarjeta final **v1**, la versión más sencilla |
-  | `v2/` | apertura y tarjeta final **v2**, «más punch» (la propuesta vigente) |
+  | `v2/` | apertura y tarjeta final **v2**, «más punch» (la **aprobada**) |
   | `kit/reel/` y `kit/vlog/` | el kit de gráficos que van encima de la toma, uno por formato |
-  | `kit-transicion-bytes/reel/` y `kit-transicion-bytes/vlog/` | prototipo del kit con la entrada y salida de la manzana en bytes en la tarjeta y el Drop |
+  | `kit-transicion-bytes/reel/` y `kit-transicion-bytes/vlog/` | el kit con la entrada y salida de la manzana en bytes en la tarjeta y el Drop (**aprobada**; falta decidir a qué piezas se aplica) |
   | `transiciones/reel/` y `transiciones/vlog/` | la transición entre escenas (máscara + capa), con su `LEEME.txt` |
   | `transiciones/heroe/reel/` y `transiciones/heroe/vlog/` | la versión héroe de la transición, hecha para un corte puntual |
 
 - **Formato de los archivos:** video **ProRes 4444 con canal alfa** (`.mov`), a **30 cuadros por segundo** y **sin
-  audio** (el sonido aprobado viene aparte, en WAV: ver [Montar el sonido](#6--montar-el-sonido)). Premiere Pro y After Effects los abren directo, con el fondo transparente.
+  audio**. **Cada `.mov` trae al lado su WAV con el mismo nombre** (el sonido aprobado, versión B) y las vistas
+  previas ya traen el sonido: ver [Montar el sonido](#6--montar-el-sonido). Premiere Pro y After Effects los abren directo, con el fondo transparente.
 - **Arma la secuencia a 30 fps** y del tamaño del formato: 1080 × 1920 para el reel, 1920 × 1080 para el vlog.
 - **Los `.mp4` que empiezan con `demo_`** (en `transiciones/`) son sólo para mirar cómo se ve cada transición. No van en
   la línea de tiempo.
@@ -81,8 +86,8 @@ Efeonce, y termina con la manzana que se deshace en bytes y el tercer punto que 
    | Tarjeta final | 57 | 1,9 s | corte con falla |
    | Tarjeta final | 74 | ≈2,5 s | vuelve el tercer punto con un destello |
 
-6. **Elige la versión:** la **v2** («más punch») es la propuesta vigente; la **v1** (raíz de `piloto/`) queda como
-   alternativa más sencilla. Ninguna está aprobada.
+6. **Usa la v2** («más punch»): es la **aprobada** (2026-09-27). La **v1** (raíz de `piloto/`) queda como alternativa
+   más sencilla.
 
 ### 2 · El kit de gráficos (encima de la toma del host)
 
@@ -120,10 +125,11 @@ host** para que su cara quede libre:
 | Reel | nada en la franja de la aplicación arriba (0–220) ni abajo (desde 1500), nada desde x 940 (botones); cabecera ≈ y 250, rótulo ≈ y 1150, tarjeta ≈ y 1300, Drop ≈ y 1150, cierre ≈ y 1250 |
 | Vlog | cabecera ≈ y 60 (x 72), rótulo ≈ y 818, tarjeta ≈ y 776 (1140 de ancho), cierre ≈ y 872 |
 
-**Kit con la manzana en bytes (prototipo):** en `kit-transicion-bytes/` están la tarjeta y el Drop con otra entrada: la
+**Kit con la manzana en bytes (aprobado el 2026-09-27):** en `kit-transicion-bytes/` están la tarjeta y el Drop con otra entrada: la
 manzana nace en la esquina de la pieza, se rompe en bytes que barren el rectángulo y forman la pieza; a la salida la
 pieza vuelve a la manzana y la manzana se va. La recomendación es usarla **sólo en tarjetas y Drop**; la cabecera y el
-rótulo conservan su entrada propia. Es prototipo: úsalo sólo en pruebas.
+rótulo conservan su entrada propia. Falta que el operador decida a qué piezas se aplica: mientras tanto, úsala sólo en
+tarjetas y Drop.
 
 ### 3 · Transición entre escenas en Premiere Pro
 
@@ -183,14 +189,15 @@ La misma regla de rostros aplica: no la pidas para un corte hacia o desde la tom
 > aprobados». La **A** (contenida) quedó descartada: no la uses.
 
 **Dónde están los archivos:** OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto › sonido-propuesta`
-(la carpeta conserva su nombre, pero lo que hay en `b/` está aprobado). Los mismos archivos aprobados están también en
+(la carpeta conserva su nombre, pero lo que hay en `b/` está aprobado). Además, cada `.mov` de las carpetas del motion
+trae al lado su WAV con el mismo nombre. Los mismos archivos aprobados están también en
 la página de Glitch de AXIS, sección [Sonido](https://axis.efeonce.org/references/glitch/#sonido).
 
 | Carpeta | Qué tiene |
 |---|---|
 | `b/` | **la versión aprobada.** Trae `apertura.wav`, `cierre.wav`, `bucle.wav`, `animatic.wav`, `kit/` (un WAV por gráfico del kit) y `transiciones/reel/` y `transiciones/vlog/` |
 | `a/` | la alternativa descartada, con la misma estructura. **No se usa** |
-| `vista-previa/` | videos del piloto con el sonido ya montado, para escuchar cómo queda. No van en la línea de tiempo |
+| `vista-previa/` | videos del motion con el sonido ya montado, para escuchar cómo queda. No van en la línea de tiempo |
 | `LEEME.txt` | resumen de la carpeta |
 
 Los WAV tienen el **mismo nombre y la misma duración** que su `.mov`. El mismo audio sirve para reel y vlog, salvo las
@@ -203,7 +210,7 @@ transiciones entre escenas, que tienen una pista por formato.
 3. **Transiciones entre escenas:** usa la pista de tu formato (`transiciones/reel/` o `transiciones/vlog/`) con el mismo
    origen y la misma duración que la transición (por ejemplo `…-centro-rapida.wav`) y **alinéala al mismo inicio que la
    máscara y la capa**. La versión héroe tiene su pista `…-centro-heroe.wav`.
-4. **Transición de bytes entre piezas** (prototipo en tarjeta y Drop): usa `noticia-bytes.wav` y `drop-bytes.wav` junto
+4. **Transición de bytes entre piezas** (aprobada, en tarjeta y Drop): usa `noticia-bytes.wav` y `drop-bytes.wav` junto
    a la versión en bytes de esas piezas.
 5. **La voz del host va encima** y sin efectos: los sonidos del kit quedan debajo de la voz. **Bajo las noticias va
    sólo la voz, sin música.**
@@ -243,12 +250,13 @@ la acción) **salen de un archivo de edición** y los gráficos se vuelven a gen
 |---|---|
 | **Piloto** | primera versión hecha para probar el flujo y el montaje. Sirve para ensayar en Premiere o After Effects |
 | **Propuesta** | versión que se le muestra al operador para decidir. Se puede montar en pruebas, **no se publica como final** |
-| **Aprobado** | el operador la aprobó y se usa como pieza final. **Hoy (2026-09-27) ninguna pieza de motion está aprobada**; el sonido sí (versión B) |
+| **Aprobado** | el operador la aprobó y se usa como pieza final. **Desde el 2026-09-27 el motion de este manual está aprobado** (apertura y tarjeta final v2, kit, transición de bytes entre piezas y transición entre escenas), y el sonido también (versión B) |
 
-Ya aplicados a pedido del operador: más punch (v2), la órbita real en el rótulo del host, la transición de bytes entre
-piezas y entre escenas. Siguen pendientes de decisión: la intensidad de la v2, la cadencia de grabación (hoy 30 fps),
-la prueba de los editores en Premiere y After Effects, dónde se usa la transición de bytes, el estilo de subtítulos,
-los textos reales de la #17 y la excepción de rostros. El sonido ya está decidido: **versión B aprobada** (2026-09-27).
+Aplicados a pedido del operador y aprobados: más punch (v2), la órbita real en el rótulo del host, la transición de
+bytes entre piezas y entre escenas. Siguen pendientes de decisión: la cadencia de grabación (hoy 30 fps), la prueba de
+los editores en Premiere y After Effects en una edición real, el ritmo ajustable, dónde se usa la transición de bytes
+(se recomienda sólo en tarjetas y Drop), el estilo de subtítulos, los textos reales de la #17 y cualquier excepción de
+rostros (por defecto, la falla nunca va sobre una cara). El sonido ya está decidido: **versión B aprobada** (2026-09-27).
 
 ## Qué no hacer
 
@@ -263,7 +271,8 @@ los textos reales de la #17 y la excepción de rostros. El sonido ya está decid
 - No pongas dos manzanas en pantalla al mismo tiempo: la manzana del Drop es la única de su momento.
 - No repitas el rótulo del host cada vez que aparece: va sólo la primera vez.
 - No uses los `demo_*.mp4` en la línea de tiempo: son sólo para mirar.
-- No publiques un video con textos entre corchetes ni con piezas en piloto o propuesta sin aprobación.
+- No publiques un video con textos entre corchetes ni con piezas en propuesta sin aprobación (la v1 queda como
+  alternativa sin aprobar; la versión A del sonido no se usa).
 - Si sumas una voz en off, que sea una persona con **español latinoamericano neutro**.
 
 ## Problemas comunes

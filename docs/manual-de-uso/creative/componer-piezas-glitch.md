@@ -1,9 +1,9 @@
 # Componer piezas de Glitch — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.3: el motion de Glitch y los tableros de video quedaron aprobados)
 > **Modulo:** Creative · Glitch, magazine semanal de Efeonce (sub-línea de «La órbita»)
 > **Ruta en portal:** no aplica — las piezas se arman desde el canvas de diseño; todavía no hay composición automática
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/linea-grafica-glitch.md) · [Norma de la sub-línea](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) · [ADR](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md) · [Usar la línea gráfica de Efeonce](./usar-linea-grafica-efeonce.md)
@@ -20,14 +20,15 @@ vertical).
 
 **Hoy no hay composición automática de las piezas estáticas.** El motor de composición (Artifact Composer) todavía no
 tiene los catálogos de Glitch: se parte del **canvas de diseño** y se ajusta a mano siguiendo la norma. Los **gráficos
-animados del video** sí tienen un **piloto** (2026-09-27) que se genera desde el repo taller: ver
+animados del video** se generan desde el repo taller y están **aprobados** (2026-09-27): ver
 [Video y motion](#video-y-motion) y el manual [Editar el video de Glitch](./editar-video-glitch.md).
 
 ## Antes de empezar
 
 - **Confirma que la pieza es de Glitch.** Si no, este manual no aplica.
 - **Abre el canvas** [«Glitch en La órbita»](https://claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS) (privado). La sección
-  «Sistema de portada» es la aprobada; «Blog y vlog» y «Vlog en reel» son propuesta.
+  «Sistema de portada» es la aprobada; en «Blog y vlog» el blog es propuesta y los tableros de video están aprobados;
+  «Vlog en reel» está aprobada (2026-09-27).
 - **Ten a mano la norma** ([`GLITCH_GRAPHIC_LINE_V1.md`](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)):
   ahí están los colores, las letras, la cabecera y las medidas.
 - **Ten el contenido de la edición:** número (la próxima es la #17), tesis de la semana, las ocho noticias con su sección
@@ -101,24 +102,26 @@ sólo para mostrarlas al operador:
   publicado hoy es el v1.
 - En el blog, que es claro, **el verde no va como texto, borde ni línea**: los momentos de marca van en bloques navy.
 
-### Paso 6 · Video (propuesta)
+### Paso 6 · Video (aprobado)
 
-Todo el video está en **propuesta**. Si se produce una prueba:
+El video está **aprobado** desde el 2026-09-27 (motion y tableros de video del canvas). Siguen pendientes la cadencia
+de grabación, la prueba con los editores en una edición real, el estilo de subtítulos y los textos reales de la #17:
 
 1. Graba **una vez** en 4K horizontal con aire arriba y abajo; el reel sale del recorte vertical.
-2. Subtítulos siempre: Poppins 600, blanco sobre navy al 78 %, una palabra en el acento.
+2. Subtítulos siempre: Poppins 600, blanco sobre navy al 78 %, una palabra en el acento (su estilo en Premiere sigue
+   pendiente).
 3. Imagen de las fuentes: embebida o licenciada, nunca descargada; en navy, con bytes en el borde y crédito.
 4. **Reel:** los gráficos van **encima** de la toma, porque el host está en cámara todo el tiempo. Respeta el mapa de
    zonas del lienzo 1080 × 1920: nada entre 0 y 220 ni desde 1500 (interfaz de la app), nada desde x 940 (botones),
    cabecera entre 240 y 440, texto entre 1150 y 1480, y **nunca** sobre la cara del host.
 5. Las ocho piezas del reel son transparentes: apertura, cabecera (noticia n/3 + logo), lower third, subtítulo, tarjeta de
    noticia, imagen de la fuente (plano dividido), Glitch Drop y última frase («el #N+1 sale el lunes.» + «Sigue a
-   Glitch»). Sólo la portada del reel y la tarjeta final son pantalla completa. El **lower third** existe como piloto
+   Glitch»). Sólo la portada del reel y la tarjeta final son pantalla completa. El **lower third** está aprobado
    (ver [Video y motion](#video-y-motion)); no inventes otro contenido.
-   El **mnemónico** de apertura y cierre todavía hay que evaluarlo y aprobarlo: no uses ninguno como definitivo.
+   El **sonido** de apertura y cierre está aprobado (versión B, 2026-09-27): cada `.mov` trae su WAV al lado.
 6. **Tarjeta final:** centrada, espejo de la apertura (los puntos se resuelven en la manzana, para que el reel empalme en
    loop), un mensaje, una acción, la firma y sin texturas finas.
-7. Los gráficos animados con fondo transparente ya se generan como **piloto** desde el repo taller (ver
+7. Los gráficos animados con fondo transparente se generan desde el repo taller y están **aprobados** (ver
    [Video y motion](#video-y-motion)). El montaje en Premiere o After Effects está en
    [Editar el video de Glitch](./editar-video-glitch.md).
 
@@ -136,8 +139,9 @@ Todo el video está en **propuesta**. Si se produce una prueba:
 ## Video y motion
 
 > **⚠️ Sólo para Glitch.** Los gráficos animados y la transición de la manzana en bytes son **exclusivos de Glitch**:
-> nunca se usan en piezas de Efeonce ni de clientes. Todo es **piloto / propuesta** (2026-09-27): ninguna pieza de
-> motion está aprobada.
+> nunca se usan en piezas de Efeonce ni de clientes. El motion está **APROBADO** (2026-09-27): apertura y tarjeta
+> final v2, kit de gráficos, transición de bytes entre piezas (falta decidir a qué piezas se aplica) y transición entre
+> escenas. El sonido también (versión B).
 
 - **Para el editor humano** (Premiere Pro y After Effects): todo el montaje está en
   [Editar el video de Glitch](./editar-video-glitch.md). Este apartado no lo repite.
@@ -161,24 +165,26 @@ Todo el video está en **propuesta**. Si se produce una prueba:
      | versión héroe para un corte | `heroe -- --run <corrida> --a <archivo>[@seg] --b <archivo>[@seg] [--origin centro\|izquierda\|marca] [--formats reel,vlog]` |
      | pruebas del paquete | `test` |
 
-  5. **Verifica:** cada comando verifica códec, cuadros y alfa de lo que genera (kit 60/60, transiciones 72/72, héroe
-     6/6, kit con bytes 18/18). **Si una verificación falla, no se entrega.**
+  5. **Verifica:** cada comando verifica códec, cuadros y alfa de lo que genera (con el sonido: kit 84/84, transiciones 84/84,
+     héroe 8/8, kit con bytes 24/24, apertura y tarjeta final 26/26). **Si una verificación falla, no se entrega.**
   6. **Manifiesto:** cada corrida deja `corridas/<corrida>/manifiesto.json` en el taller (sha256 de cada archivo,
-     verificaciones, versiones y entrega). Los binarios nunca entran a git.
+     verificaciones, versiones, entrega y estado aprobado). Los binarios nunca entran a git.
+     **Sonido:** cada comando entrega el WAV junto a cada `.mov`, con el mismo nombre (`--sound b|a|off`; `b`, la
+     aprobada, por defecto).
   7. **Entrega:** con `--deliver` a OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto`, en la
-     subcarpeta que corresponda (`v2/`, `kit/`, `transiciones/`…).
+     subcarpeta que corresponda (`v2/`, `kit/`, `transiciones/`…); la carpeta conserva el nombre `piloto`.
 - Reglas y detalle para agentes: skill `efeonce-graphic-line`, `references/glitch.md` (sección del editor agente).
 
 ## Qué significan los estados
 
 | Estado | Qué significa |
 |---|---|
-| **APROBADO** (2026-09-27) | se usa como pieza final: portada A/B/C con rotación, lámina interior, noticia 1 y contraportada; también la manzana como esfera, el verde como acento, la línea Growth y el alta de los cinco íconos Plastilina |
-| **PROPUESTA** | se puede armar para mostrarla al operador, pero no se publica como final: lente, blog, vlog 16:9, reel, tarjetas finales y el flujo de composición automática |
+| **APROBADO** (2026-09-27) | se usa como pieza final: portada A/B/C con rotación, lámina interior, noticia 1 y contraportada; también la manzana como esfera, el verde como acento, la línea Growth, el alta de los cinco íconos Plastilina, el sonido (versión B) y el motion del video (apertura y tarjeta final v2, kit de gráficos con el lower third, transiciones) con los tableros de video del canvas (vlog 16:9 y reel) |
+| **PROPUESTA** | se puede armar para mostrarla al operador, pero no se publica como final: lente y blog. (El flujo de composición está aceptado; su automatización de piezas fijas es TASK-1923) |
 | **EXPLORACIÓN** | idea en estudio, no canon: los acentos teal y naranja del canvas, la historia 9:16 y el carrusel panorámico |
 | **Aprobado, sin publicar en AXIS** | la manzana, el verde y los cinco íconos Plastilina de Glitch están aprobados (2026-09-27), pero todavía no están en los paquetes oficiales de AXIS (TASK-1922) |
-| **En definición / por confirmar** | el lower third (hay un piloto del 2026-09-27, sin aprobar), el mnemónico (evaluación dedicada) y la licencia de Guttery (confirmada por el operador el 2026-09-27) |
-| **PILOTO** (motion) | apertura, tarjeta final, kit de gráficos y transiciones de video generados desde el repo taller (2026-09-27): sirven para probar el montaje; ninguno está aprobado |
+| **Pendiente** (video) | la cadencia de grabación (hoy 30 fps), la prueba con los editores en una edición real, el ritmo ajustable, a qué piezas se aplica la transición de bytes, el estilo de subtítulos, los textos reales de la #17 y cualquier excepción de rostros |
+| **Por confirmar** | la referencia del contrato de licencia de Guttery (la licencia fue confirmada por el operador el 2026-09-27) |
 | **Publicada** (AXIS) | la página y la guía de Glitch están en axis.efeonce.org desde el 2026-09-27; los tokens de Glitch todavía no existen (TASK-1922) |
 
 ## Qué no hacer
