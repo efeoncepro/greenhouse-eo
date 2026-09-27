@@ -23,6 +23,54 @@
         "dev"
       ],
       "port": 3100
+    },
+    {
+      "name": "axis-lab-preview",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--dir",
+        "../axis-design-system/apps/lab",
+        "exec",
+        "astro",
+        "preview",
+        "--port",
+        "4321",
+        "--host",
+        "127.0.0.1"
+      ],
+      "port": 4321
+    },
+    {
+      "name": "axis-lab-glitch",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--dir",
+        "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/e60ed4cd-534a-4de2-afbd-1360884e884e/scratchpad/axis-glitch/apps/lab",
+        "exec",
+        "astro",
+        "dev",
+        "--port",
+        "4399",
+        "--host",
+        "127.0.0.1"
+      ],
+      "port": 4399
+    },
+    {
+      "name": "axis-lab-glitch-music",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--dir",
+        "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/335386d2-ee49-4a84-8bb0-bca18c5e97d6/scratchpad/axis-build/apps/lab",
+        "exec",
+        "astro",
+        "preview",
+        "--port",
+        "4397",
+        "--host",
+        "127.0.0.1"
+      ],
+      "port": 4397
     }
   ]
 }

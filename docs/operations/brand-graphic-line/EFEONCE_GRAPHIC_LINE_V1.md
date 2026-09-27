@@ -573,6 +573,12 @@ el deck, el cierre de marca y las animaciones del logo.
     ([axis.efeonce.org/references/graphic-line/#animaciones](https://axis.efeonce.org/references/graphic-line/#animaciones)).
   - Spec de producción, tiempos, oclusión y QA: [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](./EFEONCE_ORBIT_REVEAL_MOTION_V1.md)
     (se produce con `scripts/creative/brand-motion/`).
+- **Identidad sonora (recomendada, 2026-09-26; no canon):** el logo sonoro «Tres puntos que se vuelven uno» traduce la
+  gramática de la órbita a sonido (el anillo pregunta, tres notas en Mi piensan, la esfera responde en La con el único
+  golpe), con dos registros (fondo y energía), el timbre de la esfera por línea de servicio y la etiqueta con voz. Re-sonoriza
+  las tres animaciones sin tocar la imagen; los masters V1.1 conservan su sonido hasta canonizar. Guía y kit en
+  [axis.efeonce.org/references/sonic-brand/](https://axis.efeonce.org/references/sonic-brand/); canon en
+  [`EFEONCE_SONIC_IDENTITY_V1.md`](../brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md). Glitch (podcast) pendiente.
 - **Lenguaje de movimiento de la órbita (norma, 2026-09-26):** [`EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`](./EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md)
   convierte las animaciones aprobadas en siete reglas para cualquier pieza nueva: ritmo lento–rápido–lento con
   anticipación y un protagonista a la vez; llegar con golpe (sobrepaso por papel, pulso con eco, onda de acento sólo en

@@ -52,6 +52,17 @@ const FORMATOS = {
     zonaTexto: ({ muro, tinta }) =>
       `TEXT SPACE (planned, essential): the LEFT 42% of the frame is ${muro}, ${tinta}, with no objects, windows, light beams or bright spots in it, reserved for a headline; the subject sits in the right half.`
   },
+  // Gran formato horizontal (letrero caminero 12 × 4 m). SIN VALIDAR: el lecho hereda el 16 % del 16:9
+  // hasta medir una ronda nativa 3:1. Doctrina OOH en construcción (2026-09-26).
+  '3:1': {
+    size: '2304x768',
+    declara: 'WIDE 3:1 billboard composition.',
+    lecho: '16%',
+    limite: 'All people and objects stay entirely inside the RIGHT 50% of the frame.',
+    sinValidar: true,
+    zonaTexto: ({ muro, tinta }) =>
+      `TEXT SPACE (planned, essential): the LEFT 45% of the frame is ${muro}, ${tinta}, with no objects, windows, light beams or bright spots in it, reserved for a headline; the subject sits in the right half.`
+  },
   '1:1': {
     size: '1152x1152',
     declara: 'SQUARE 1:1 composition.',
