@@ -89,7 +89,7 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-031`
-- Status real: `En ejecución: Slices 0–6 locales en AXIS aprobados por el operador (2026-09-27); Slice 7 (push y tag) exige su autorización`
+- Status real: `Slices 0–6 code complete en AXIS main local (7 commits sobre 47acc3d, sin push; gates verdes). Falta la autorización del operador para el Slice 7 (push a main y tag v0.3.12) y después el Slice 8 en Greenhouse`
 - Rank: `TBD`
 - Domain: `creative|brand|platform`
 - Blocked by: `autorización explícita del operador del push a main de AXIS y del tag para PUBLICAR (Slice 7); la manzana y el verde quedaron aprobados el 2026-09-27; los slices locales en AXIS pueden avanzar sin push`
@@ -654,34 +654,45 @@ verde) y `glitchLine.status`/`lifecycle: 'candidate'`.
 
 ## Acceptance Criteria
 
-- [ ] `@efeoncepro/axis-tokens` exporta `glitchLine` con `color`, `type`, `masthead`, `bytes`, `apple`, `safeZones`,
+> **Evidencia (2026-09-27, AXIS `main` local, 7 commits sobre `47acc3d`, sin push):** `8f5a1f9` token, `7e9d02f`
+> wordmark y manzana, `03f6080` glifos + volúmenes (aprobados por el operador antes de sellar), `8700b2b` contrato,
+> `af77776` íconos de acción planos (pedido del operador), `3feb4ad` cherry-pick del `4a7dd4f` de la sesión de Glitch,
+> `1ac7814` Lab. Gates: `pnpm build`, `typecheck`, `lint`, `design:check` exit 0; tests tokens 42/42, brand-assets
+> 10/10, contracts 77/77 (una prueba por cada uno de los 23 códigos), registry 5/5, graphic-line 32/32, Lab 50/50 y e2e
+> 49 pasan (7 omitidos, preexistentes); `icons:check` verde en los 5 glifos; `glitch:resolve` 8 válidos → 0 y 5
+> inválidos → 1. El diff de AXIS no toca el bloque `efeonceGraphicLine` ni los contratos de La órbita. Notas: el
+> archivo del Lab conserva sólo el tamaño de las imágenes de vista previa (metadato de `<img>`, no valores de Glitch);
+> el Lab decía «tarjeta final del reel 2 s» y ahora dice 3 s, el valor del motion aprobado. Guttery va sin binario
+> porque AXIS no redistribuye fuentes. Pendientes: publicación (Slice 7) y consumo en Greenhouse (Slice 8).
+
+- [x] `@efeoncepro/axis-tokens` exporta `glitchLine` con `color`, `type`, `masthead`, `bytes`, `apple`, `safeZones`,
       `motion`, `pieces` y `coverRotation`.
-- [ ] El fondo, las curvas de motion, la lente y las familias de `glitchLine` son referencias a `efeonceGraphicLine` /
+- [x] El fondo, las curvas de motion, la lente y las familias de `glitchLine` son referencias a `efeonceGraphicLine` /
       tokens tipográficos (prueba de identidad de valor, sin literales duplicados).
-- [ ] Ningún valor de `efeonceGraphicLine`, `efeonce.graphic-line-orbit` ni `efeonce.surface-composition` referencia
+- [x] Ningún valor de `efeonceGraphicLine`, `efeonce.graphic-line-orbit` ni `efeonce.surface-composition` referencia
       `glitchLine` ni sus assets, y el diff de esos bloques en esta task es vacío.
-- [ ] Las pruebas de contraste de `glitchLine` pasan: texto y secundario ≥ 4,5:1 sobre el fondo; el verde sobre blanco
+- [x] Las pruebas de contraste de `glitchLine` pasan: texto y secundario ≥ 4,5:1 sobre el fondo; el verde sobre blanco
       queda codificado como prohibido para texto, borde y separador.
-- [ ] Las zonas del reel 9:16 declaran interfaz 0–220 arriba, desde 1500 abajo, botones desde x 940, cabecera 240–440 y
+- [x] Las zonas del reel 9:16 declaran interfaz 0–220 arriba, desde 1500 abajo, botones desde x 940, cabecera 240–440 y
       texto 1150–1480, y ninguna zona se sale de su lienzo.
-- [ ] El wordmark de Glitch (claro y oscuro) y la manzana están sellados en `@efeoncepro/axis-brand-assets` y sus
+- [x] El wordmark de Glitch (claro y oscuro) y la manzana están sellados en `@efeoncepro/axis-brand-assets` y sus
       pruebas de sello y huérfanos pasan.
-- [ ] Los 5 glifos de Glitch están en `PLASTILINA_GLYPHS`, cada uno pasa `pnpm icons:check` y los conteos de las
+- [x] Los 5 glifos de Glitch están en `PLASTILINA_GLYPHS`, cada uno pasa `pnpm icons:check` y los conteos de las
       pruebas reflejan el set nuevo.
-- [ ] Guttery tiene rol y licencia confirmada, **o** el slice quedó bloqueado con `licenseStatus: 'pending'`, fallback
+- [x] Guttery tiene rol y licencia confirmada, **o** el slice quedó bloqueado con `licenseStatus: 'pending'`, fallback
       documentado e issue `narrator-font-unlicensed`.
-- [ ] `@efeoncepro/axis-ui-contracts` exporta `efeonce.glitch-line` 0.1.0 `candidate` con `validateGlitchLineIntent` y
+- [x] `@efeoncepro/axis-ui-contracts` exporta `efeonce.glitch-line` 0.1.0 `candidate` con `validateGlitchLineIntent` y
       `resolveGlitchLineIntent`, y hay una prueba por cada código de issue.
-- [ ] Un intent sin `franchise: 'glitch'`, con dos esferas, con verde como texto sobre claro, con un overlay sobre la
+- [x] Un intent sin `franchise: 'glitch'`, con dos esferas, con verde como texto sobre claro, con un overlay sobre la
       cara del host o sobre la interfaz de la app, con la misma portada que la semana anterior, con el titular todo en
       el peso pesado o con burbuja URL falla con su issue.
-- [ ] Una pieza `propuesta` o `exploracion` falla con `piece-not-approved`.
-- [ ] Dos resoluciones del mismo intent producen manifiestos idénticos byte a byte.
-- [ ] `pnpm glitch:resolve` resuelve cada ejemplo válido de `docs/examples/glitch/` y rechaza cada inválido con código
+- [x] Una pieza `propuesta` o `exploracion` falla con `piece-not-approved`.
+- [x] Dos resoluciones del mismo intent producen manifiestos idénticos byte a byte.
+- [x] `pnpm glitch:resolve` resuelve cada ejemplo válido de `docs/examples/glitch/` y rechaza cada inválido con código
       de salida distinto de cero.
-- [ ] `apps/lab/src/data/glitch.ts` no contiene ningún HEX ni medida de Glitch; el Lab y `glitch.json` leen el token y
+- [x] `apps/lab/src/data/glitch.ts` no contiene ningún HEX ni medida de Glitch; el Lab y `glitch.json` leen el token y
       el JSON expone `tokens` y `contract`.
-- [ ] Pruebas unitarias y e2e del Lab (bloque Glitch) en verde.
+- [x] Pruebas unitarias y e2e del Lab (bloque Glitch) en verde.
 - [ ] La publicación ocurrió sólo después de la aprobación explícita del operador de la manzana y el verde, registrada
       en el ADR de Glitch con fecha.
 - [ ] CI de AXIS verde en `main` y run de `release-packages.yml` verde con las versiones nuevas publicadas.

@@ -2,7 +2,7 @@
 
 **AXIS 0.3.10 (27/09):** bump de Greenhouse pendiente: [runbook Delta c](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
-**Glitch en AXIS (27/09):** [TASK-1922](docs/tasks/in-progress/TASK-1922-glitch-axis-franchise-token-contract.md) en ejecución: Slices 0–6 locales en AXIS `main` (sobre `47acc3d`, sin push). Versiones reservadas tokens 0.3.12 · contracts 0.3.10 · brand-assets 0.3.5 · graphic-line 0.7.0; ningún tag hasta que termine `v0.3.11` (Task 1927). Slice 6 parte del `4a7dd4f` de la sesión de Glitch.
+**Glitch en AXIS (27/09):** [TASK-1922](docs/tasks/in-progress/TASK-1922-glitch-axis-franchise-token-contract.md) Slices 0–6 code complete en AXIS `main` local (7 commits sobre `47acc3d`, `1ac7814`, sin push; gates verdes): token `glitchLine`, contrato `efeonce.glitch-line` 0.1.0 + `pnpm glitch:resolve`, wordmark/manzana en `AXIS_GLITCH_ASSETS`, 5 glifos + volúmenes (84/48), Lab desde el token; íconos de acción de Glitch siempre planos (operador). Próximo: autorización del push + tag `v0.3.12` (tokens 0.3.12 · contracts 0.3.10 · brand-assets 0.3.5 · graphic-line 0.7.0) y Slice 8 (bump en Greenhouse; coordinar con TASK-1927, que también toca `package.json`).
 
 **La órbita (26–27/09):** [índice](docs/operations/brand-graphic-line/README.md). [TASK-1919](docs/tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) y [TASK-1920](docs/tasks/complete/TASK-1920-photo-isotype-compose-official-emblem.md) completas y en `develop`: 20 recetas aprobadas por `pnpm brand:compose` (AXIS `v0.3.8`, contrato 0.1.1). Pendiente: 5 preguntas del operador y la ruta productiva [TASK-1921](docs/tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md).
 
