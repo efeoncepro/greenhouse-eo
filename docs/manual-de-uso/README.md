@@ -33,6 +33,10 @@ La diferencia con otras capas de documentacion:
   motion, video y deck: declarar superficie, formato, papel y receta, resolver el intent con `pnpm surface:resolve`
   (AXIS, contrato `candidate`), entregar cada delegate a su compositor de Greenhouse, la receta de deck
   `proposal-cinematic` y el registro cine, qué significan los estados y los `issues`, y problemas comunes.
+- [Componer piezas de Glitch](creative/componer-piezas-glitch.md) — **sólo para Glitch** (no para piezas de
+  Efeonce): elegir la portada con la regla de rotación, armar portada, láminas interiores, noticia 1 y contraportada,
+  piezas del blog y del video en propuesta (mapa de zonas del reel), checklist, estados y problemas comunes. Hoy se
+  parte del canvas: la composición automática todavía no existe.
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
   lenguaje fotográfico aprobado el 2026-09-19.

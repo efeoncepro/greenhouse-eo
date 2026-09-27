@@ -6,6 +6,17 @@
 >
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
+## 2026-09-27 — Línea gráfica de Glitch: sub-línea de «La órbita», sólo para Glitch
+
+Nace la norma [`GLITCH_GRAPHIC_LINE_V1.md`](docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) y su
+ADR [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md). Aplica **sólo a
+Glitch**, el magazine semanal: hereda de La órbita la gramática, la esfera única, el fondo, Bricolage + Poppins, la firma
+de Efeonce y los íconos, y agrega lo exclusivo de Glitch (manzana, verde `#6ec207`, falla en bytes, Guttery, cabecera
+«EDICIÓN #N»), que nunca va en piezas de Efeonce. El operador aprobó el sistema de portada A/B/C con regla de rotación,
+la lámina interior con su variante de noticia 1 y la contraportada; lente, blog, vlog, reel y tarjetas finales quedan en
+propuesta. El flujo de composición (valores en AXIS, catálogo `glitch-edition` del Artifact Composer, overlays
+HyperFrames con alfa) queda `Proposed`, sin tasks. Doc funcional y manual de uso nuevos; remisión en el manual de La
+órbita §7. AXIS en rama `feat/glitch-line`, sin publicar; sin cambios de código en Greenhouse.
 
 ## 2026-09-27 — Iconografía: Plastilina en volumen canónica (D24) y el Trazo sin rasgo propio (D23)
 

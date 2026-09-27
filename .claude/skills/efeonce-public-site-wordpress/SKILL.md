@@ -45,6 +45,7 @@ Read the minimal set:
 | Growth Forms or public form embed | `references/growth-forms-wordpress.md` |
 | Measurement/tagging (GTM containers, dataLayer, GA4 events on the site) | `docs/reference/measurement-gtm-ga4/` (start with `04-greenhouse-gh-event-convention.md`; live container `GTM-NGHPGRLZ`) |
 | AI Content Factory, Gutenberg posts, draft/private clones | `references/content-factory-gutenberg.md` |
+| Glitch post visuals: `efeoncepro/glitch-drop` callout, Glitch banners, post layout | `references/content-factory-gutenberg.md` + `efeonce-graphic-line` → `references/glitch.md` §5. The published callout is v1 (TASK-1337); callout v2, banners and post layout are **proposals** — do not ship them until the operator approves |
 | Pillar Experience, cluster map or post-vs-page/Think placement | `docs/public-site/decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md` + `references/content-factory-gutenberg.md`; add `references/landing-workflow.md` only if Elementor composition is actually chosen |
 | Agentic blogpost from governed write through human publication and live QA | `references/agentic-blogpost-end-to-end.md` |
 | Category hierarchy, published-post permalink or Yoast redirect migration | `references/taxonomy-permalink-migrations.md` + `references/agentic-blogpost-end-to-end.md` |

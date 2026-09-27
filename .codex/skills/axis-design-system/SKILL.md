@@ -267,6 +267,15 @@ piece, ≥ 160 px; never in lists, tables, deck content, dashboards or UI. Token
 `axis-graphic-line` stays at `0.4.0`). Greenhouse already pins these versions (commit `f3f93c926`, 2026-09-27: tokens `0.3.7`,
 contracts `0.3.6`, brand-assets `0.3.2`, and `axis-graphic-line` `0.4.0` as a direct dependency). Guide §9, ADR delta D24.
 
+### Glitch sub-line (Lab page + JSON; pending publication)
+
+Glitch (Efeonce's weekly magazine) has a sub-line of «La órbita» that applies **only to Glitch**. AXIS holds its Lab
+page `/references/glitch/`, agent JSON `/references/glitch.json` and guide `docs/agent-composition/glitch.md` on branch
+`feat/glitch-line`, **not pushed or published yet**. There are **no Glitch tokens, assets or contract** (`glitchLine`,
+`efeonce.glitch-line` are pending): values live in the Greenhouse norm
+`docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md`. Criterion: `efeonce-graphic-line` →
+`references/glitch.md`. Never use the apple, Glitch green, byte glitch, Guttery or the «EDICIÓN #N» masthead in Efeonce pieces.
+
 ### Efeonce sonic identity (Lab page + public bucket; recommended)
 
 State: **recommended by the operator on 2026-09-26, NOT canon.** What AXIS publishes (PR

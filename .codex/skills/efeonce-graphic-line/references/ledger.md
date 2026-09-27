@@ -45,9 +45,14 @@
 | 2026-09-26 | **Íconos (D16): híbrido A + B.** El trazo limpio es el ícono (estado **reposo**); la esfera es un estado (**respuesta**), no parte del dibujo: una pieza del glifo se vuelve esfera (reemplaza) o la esfera aparece donde la acción se resuelve (completa). Tinta blanco/navy; el acento sólo en la esfera. La dirección C (órbita abierta, contornos con corte) queda descartada. Canvas de trabajo: claude.ai/artifact/Y9mx42L72zYc6iLg4j3Maj. |
 | 2026-09-26 | **Capa gráfica sobre la foto, entera (amplía P-5 de D10):** el operador la aprobó también fuera de los casos de la línea (voz, lente, medida). Se compone sobre las reservas de la toma, sin scrim; los ejemplos compuestos rechazados del 19-09 siguen sin valer. Canon: maestro §9, §10 y P-5; `photography-convergence.md` P-5. |
 | 2026-09-26 | **Banco de fotografía y guía «El porqué» en AXIS:** aprobados por el operador y publicados (`/references/photography/` y `/references/photography/why/`, con `why.json` para agentes). Complementan las skills de fotografía; el canon sigue en `docs/operations/brand-photography/`. |
+| 2026-09-27 | **Glitch: sub-línea complementaria de La órbita, sólo para Glitch.** Aprobados el sistema de portada A/B/C con su regla de rotación (nunca dos semanas seguidas con la misma plantilla) y el feed de nueve semanas, la lámina interior y la contraportada del carrusel; ajustes aplicados: cabecera sin línea fina, «El micrófono se abre…» abre la noticia 1 (no la portada), «Desliza» con la mano Plastilina. Detalle y estado por pieza: [glitch.md](glitch.md). |
 
 ## Pendientes del operador (no decidir por tu cuenta)
 
+- **Glitch (2026-09-27):** la manzana como esfera y el verde `#6ec207` como token de franquicia en AXIS; la línea de
+  servicio de Glitch (Growth recomendado, Brand alternativa); aprobar lente, blog (banners, maqueta, callout v2), vlog
+  16:9, kit de overlays del reel y tarjetas finales; alta de los cinco glifos Plastilina; licencia de Guttery; pasar el
+  flujo de composición a ADR aceptado y a tasks. Detalle: [glitch.md](glitch.md) §8–§9.
 - **Banco de pares pregunta/respuesta (D12):** el operador lo revisa y aprobará **2 pares por línea de servicio** con
   respuestas verificables. Hasta entonces el banco es candidato: calibra el tono, no es copy aprobado.
 - **Archivos de impresión (D13):** se empieza por la tarjeta de presentación y el muro de recepción, en PDF vectorial

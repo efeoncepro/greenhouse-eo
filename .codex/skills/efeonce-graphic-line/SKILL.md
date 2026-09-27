@@ -1,6 +1,6 @@
 ---
 name: efeonce-graphic-line
-description: The Efeonce graphic line «La órbita» end to end (living skill) — everything available in AXIS (tokens efeonceGraphicLine, contracts efeonce.graphic-line-orbit / collaboration-selection / email-signature, the @efeoncepro/axis-graphic-line package with its recipes, brand assets and the Lab), how to compose every piece (orbit, measure/trajectory, progress/deck, lens, spotlight, family map, state, voice question+answer, logo inline, slogan per service line, signature and URL bubble, email signature, merch, office, video), the motion language (the orbit alone and the three approved logo animations reveal/apertura/sting, values in efeonceGraphicLine.motion) and its convergence with the Efeonce photographic language, which stays in force. It routes composition BY SURFACE (web, DOOH, pDOOH, motion, audiovisual video, deck: contract efeonce.surface-composition 0.1.0 candidate, tokens efeonceGraphicLine.surfaces, pnpm surface:resolve in AXIS, the approved deck recipes proposal-cinematic and method-staircase, and the cinema register proposal-cinematic allows). It also owns the line's canonical iconography (two voices: Trazo for what is measured, Plastilina for what is created; the sphere as a rest/response state; the skewed orbit; @efeoncepro/axis-graphic-line/icons with resolveIcon, auditIconGroup, skewedOrbitHeroSvg and pnpm icons:export|check|vectorize in AXIS). Use for ANY piece, surface, code or doc that uses the orbit, the lens, the spotlight, the sphere as a full stop, the «Empower your …» slogan, the Efeonce signature, the logo animations or the axis-graphic-line package; for any icon or icon row in an Efeonce-brand piece (deck, report, social post, sticker, cover) and for creating a new glyph; before composing with AXIS or the Greenhouse compilers (creative:orbit, creative:layout graphic_line, foto:componer:cta marcaEnEscena, brand-motion); and when a human asks what is available or how something is built. Every session that changes the line, its tokens, contracts, package, Lab, motion or its photographic convergence MUST update this skill (see Skill Maintenance Contract).
+description: The Efeonce graphic line «La órbita» end to end (living skill) — everything available in AXIS (tokens efeonceGraphicLine, contracts efeonce.graphic-line-orbit / collaboration-selection / email-signature, the @efeoncepro/axis-graphic-line package with its recipes, brand assets and the Lab), how to compose every piece (orbit, measure/trajectory, progress/deck, lens, spotlight, family map, state, voice question+answer, logo inline, slogan per service line, signature and URL bubble, email signature, merch, office, video), the motion language (the orbit alone and the three approved logo animations reveal/apertura/sting, values in efeonceGraphicLine.motion) and its convergence with the Efeonce photographic language, which stays in force. It routes composition BY SURFACE (web, DOOH, pDOOH, motion, audiovisual video, deck: contract efeonce.surface-composition 0.1.0 candidate, tokens efeonceGraphicLine.surfaces, pnpm surface:resolve in AXIS, the approved deck recipes proposal-cinematic and method-staircase, and the cinema register proposal-cinematic allows). It also holds the Glitch sub-line (Efeonce's weekly magazine — covers A/B/C, LinkedIn carousel, blog banners and callout, vlog and reel overlays) — the apple as sphere, Glitch green, byte glitch, Guttery and the «EDICIÓN #N» masthead apply ONLY to Glitch; load references/glitch.md for any Glitch piece. It also owns the line's canonical iconography (two voices: Trazo for what is measured, Plastilina for what is created; the sphere as a rest/response state; the skewed orbit; @efeoncepro/axis-graphic-line/icons with resolveIcon, auditIconGroup, skewedOrbitHeroSvg and pnpm icons:export|check|vectorize in AXIS). Use for ANY piece, surface, code or doc that uses the orbit, the lens, the spotlight, the sphere as a full stop, the «Empower your …» slogan, the Efeonce signature, the logo animations or the axis-graphic-line package; for any icon or icon row in an Efeonce-brand piece (deck, report, social post, sticker, cover) and for creating a new glyph; before composing with AXIS or the Greenhouse compilers (creative:orbit, creative:layout graphic_line, foto:componer:cta marcaEnEscena, brand-motion); and when a human asks what is available or how something is built. Every session that changes the line, its tokens, contracts, package, Lab, motion or its photographic convergence MUST update this skill (see Skill Maintenance Contract).
 ---
 
 # Efeonce «La órbita» — línea gráfica (skill viva)
@@ -22,6 +22,14 @@ propón agregarlo.
 - **No:** trabajo de clientes, la interfaz del producto Greenhouse, piezas de otra marca. La órbita no es un adorno
   genérico.
 
+### Glitch: sub-línea sólo para Glitch
+
+Glitch (el magazine semanal de Efeonce) tiene una **sub-línea complementaria** de La órbita. Si la pieza es de Glitch
+(portada, carrusel, contraportada, blog, vlog o reel), carga [references/glitch.md](references/glitch.md) además de
+esta skill: ahí están lo que hereda, sus valores, el sistema de portada A/B/C aprobado y qué es propuesta. **Nunca** uses
+la manzana, el verde Glitch, la falla en bytes, Guttery ni la cabecera «EDICIÓN #N» en una pieza de Efeonce, y nunca
+dos esferas en una pieza (manzana + lente u órbita).
+
 ## Por dónde empezar (carga selectiva)
 
 | Necesitas… | Lee |
@@ -40,6 +48,7 @@ propón agregarlo.
 | Revisar antes de entregar | [references/qa-checklist.md](references/qa-checklist.md) |
 | Qué decidió el operador, qué está pendiente, qué versiones hay | [references/ledger.md](references/ledger.md) |
 | Trampas que ya costaron tiempo | [references/lessons.md](references/lessons.md) |
+| **Una pieza de Glitch** (magazine semanal): portada A/B/C, carrusel, blog, vlog/reel — sub-línea sólo para Glitch | [references/glitch.md](references/glitch.md) |
 
 ## Reglas duras (las más caras de romper)
 

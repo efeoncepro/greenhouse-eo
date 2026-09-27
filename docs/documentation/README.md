@@ -36,6 +36,10 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   la marca propia (recomendado por el operador el 2026-09-26, todavía no canon): la idea, el logo sonoro, los registros
   fondo y energía, el acento por línea de servicio, la voz del eslogan, el sonido de las animaciones del logo, qué se
   usa en cada caso y pendientes (Glitch, licencias, prueba de reconocimiento).
+- [Línea gráfica de Glitch — sub-línea de La órbita](creative/linea-grafica-glitch.md) — **sólo para Glitch**, el
+  magazine semanal (no es la línea de Efeonce): qué toma de La órbita y qué es propio (manzana, verde, bytes, Guttery,
+  cabecera «EDICIÓN #N»), portada A/B/C con regla de rotación, carrusel de LinkedIn, qué está aprobado y qué es
+  propuesta, reglas que nunca se rompen y pendientes.
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
 - [Creator Influence & Content](media-distribution/creator-influence-content.md) — reglas funcionales para separar

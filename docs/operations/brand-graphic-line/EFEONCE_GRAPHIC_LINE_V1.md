@@ -290,6 +290,7 @@ producto con que se hace. Los pesos del eslogan no cambian (`src/config/efeonce-
 - **Mapa de portafolio:** el arco y el centro son de Efeonce; los productos van como satélites con su isotipo.
 - **Hilo de familia (decidido):** la órbita misma, más la palabra final del eslogan. Descartado: el anillo teal
   en productos.
+- **Sub-línea de Glitch** → [`glitch/GLITCH_GRAPHIC_LINE_V1.md`](./glitch/GLITCH_GRAPHIC_LINE_V1.md); aplica sólo a Glitch.
 
 ---
 

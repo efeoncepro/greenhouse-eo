@@ -244,6 +244,9 @@ conversación. Definir una sola conversión antes del guion: guardar/compartir/c
 Instagram, optimizar tensión → descubrimiento → utilidad → conversación; para LinkedIn, patrón → implicación de
 negocio → mecanismo → prueba → aplicación → debate. Ver la investigación en
 [`docs/audits/social/2026-07-28-carousel-storytelling-platform-research.md`](../../../docs/audits/social/2026-07-28-carousel-storytelling-platform-research.md).
+**Glitch** (magazine semanal): su carrusel de LinkedIn y su reel siguen una sub-línea propia → `efeonce-graphic-line`
+`references/glitch.md` (portada A/B/C con rotación semanal, lámina interior y contraportada aprobadas; reel = overlays
+sobre el host, en propuesta). Manzana, verde Glitch, bytes, Guttery y «EDICIÓN #N» nunca en otras piezas de Efeonce.
 - **Programar y medir**: **Metricool** MCP (`getBestTimeToPostByNetwork`,
   `createScheduledPost`, `getAnalyticsDataByMetrics`, `getBrandSettings`).
 - **Publicar y HubSpot**: atribución/lead capture social → `growth-marketing-cro` +

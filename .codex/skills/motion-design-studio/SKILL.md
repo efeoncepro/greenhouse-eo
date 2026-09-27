@@ -111,6 +111,10 @@ hipótesis de montaje, no benchmarks; revisar secuencia completa y no sólo el p
    **documéntalo en `workflows/`** (es como crece la skill).
 5. **Aterriza a Efeonce** si es marca/canales propios o un cliente Globe:
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`.
+   **Glitch** (vlog «Glitch en voz alta» y reel): sub-línea sólo de Glitch en `efeonce-graphic-line` →
+   `references/glitch.md` §6. El reel es un kit de **overlays con alfa encima de la toma del host** (mapa de zonas; la
+   cara y la interfaz de la app nunca se tapan) + tarjeta final en loop; HyperFrames es el motor **propuesto**, aún sin
+   catálogo ni composiciones. Todo el video de Glitch está en PROPUESTA hasta que el operador lo apruebe.
 6. **Cierra con un artefacto** de `templates/` (brief, storyboard, animatic/shotlist, prompt sheet,
    EDL, brief de sonido, spec de entrega, crítica), no con prosa suelta.
 
