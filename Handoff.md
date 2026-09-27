@@ -1,6 +1,6 @@
 # Handoff activo
 
-**Deck compuesto (27/09):** [TASK-1927](docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) en local, sin push: AXIS `v0.3.14`; 31 de 69 láminas y el brochure en PDF por `pnpm brand:compose`; aprobado por el operador. Siguen TASK-1928 y TASK-1921.
+**Deck compuesto (27/09):** [TASK-1927](docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) complete en local, sin push. Sigue TASK-1928.
 
 **Plugin OpenAI Efeonce MCP (26/09):** [TASK-1904](docs/tasks/to-do/TASK-1904-efeonce-openai-plugin-private-distribution.md) registrada: marca, OAuth, skills e instalación privada Codex/ChatGPT sin revisión pública. TASK-1864 conserva routing/eval. Sin implementación.
 
@@ -8,9 +8,7 @@
 
 **Glitch en AXIS (27/09):** [TASK-1922](docs/tasks/complete/TASK-1922-glitch-axis-franchise-token-contract.md) **complete**: AXIS `v0.3.12` (`29a40b5`) publica `glitchLine`, `efeonce.glitch-line` 0.1.0 candidate (`pnpm glitch:resolve`), `AXIS_GLITCH_ASSETS` y 5 glifos Plastilina D27 (84 glifos/48 volúmenes); Greenhouse los fija en `4dfb147f7`. Íconos de acción de Glitch siempre planos (operador). Siguen: TASK-1923 (Composer lee el token), TASK-1924 (el taller retira su espejo de paleta/manzana; reconciliar entrada 0,72 vs 0,66 em); número de contrato de Guttery pendiente.
 
-**La órbita (26–27/09):** [índice](docs/operations/brand-graphic-line/README.md); TASK-1919/1920 completas. Pendiente: 5 preguntas del operador.
-
-**Deck, recetas (27/09):** 69 láminas aprobadas; catálogo [deck-recipes/](docs/operations/brand-graphic-line/deck-recipes/README.md), norma [§4.6](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md). Fotos idempotentes: TASK-1926.
+**La órbita (26–27/09):** [índice](docs/operations/brand-graphic-line/README.md). Pendiente: 5 preguntas del operador y TASK-1926.
 
 **Registro cine + taller (27/09):** [registro cine](docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (ads 9:16/4:5 en prueba); repo taller [`efeonce-brand-workshop`](docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) + [TASK-1925](docs/tasks/to-do/TASK-1925-brand-workshop-migration.md).
 
