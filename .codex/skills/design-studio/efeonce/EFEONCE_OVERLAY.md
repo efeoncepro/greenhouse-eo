@@ -50,6 +50,11 @@ visual transversal requiere validación en varias portadas.
   ni a piezas de clientes Globe. Operación y QA:
   [`graphic-line-orbit.md`](../../efeonce-brand-studio/references/graphic-line-orbit.md) · manual
   [`EFEONCE_GRAPHIC_LINE_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md).
+- **Iconografía de «La órbita»** (canónica 2026-09-26, sólo marca propia): Trazo en Growth/Engine/Revenue, Plastilina
+  en Brand; responde un solo ícono y sólo si la pieza no tiene otra esfera; Plastilina protagonista dentro de su órbita
+  sesgada. Salen de `resolveIcon` (`@efeoncepro/axis-graphic-line/icons`), nunca se dibujan ni generan sueltos. Guía en
+  AXIS `docs/agent-composition/iconography.md`; criterio en
+  [`efeonce-graphic-line`](../../efeonce-graphic-line/references/iconography.md).
 - **Ilustraciones propietarias** (`characters/greenhouse-*.png`, mascota **Nexa**) = obra del equipo
   creativo de Efeonce, **NO stock ni Vuexy**. Úsalas con criterio de marca; producción nueva → §tooling.
 

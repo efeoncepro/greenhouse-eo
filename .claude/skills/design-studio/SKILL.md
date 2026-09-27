@@ -122,6 +122,11 @@ nunca como texto. No aplica a UI de Greenhouse ni a clientes.
   pone espacio, material y luz. Lecciones medidas: la referencia va sin leyendas (el modelo las imprime), el logo chico
   se reinventa y se repone **editando** con el logo oficial como segunda referencia, la puntuación se revisa letra por
   letra y se corrige editando, no regenerando. Detalle en la referencia de la línea.
+- **Íconos de la marca Efeonce** (canónicos 2026-09-26): Trazo (lo que se mide) o Plastilina (lo que se crea, Brand)
+  según la línea de la pieza; glifos de `ICON_CATALOG` pintados con `resolveIcon` y grupo pasado por `auditIconGroup`
+  (`@efeoncepro/axis-graphic-line/icons`), nunca dibujados ni generados sueltos (no es el «icono» de UI de Greenhouse
+  del árbol §2). Glifo nuevo: método de alta de AXIS (Plastilina: referencia de estilo + prompt de AXIS vía
+  `pnpm ai:image`) y aprobación del operador. Criterio: [`efeonce-graphic-line` → iconography](../efeonce-graphic-line/references/iconography.md).
 
 Cuando aparezca Julio, usar su identidad fotorrealista aprobada: `refs-aprobadas/` (11 referencias; `julio-ap-04`
 primera opción de rostro y `julio-ap-11` de cuerpo) más `set-identidad/angulos/` (seis ángulos), ambos bajo

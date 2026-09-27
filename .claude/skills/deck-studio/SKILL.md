@@ -65,6 +65,14 @@ marca de cliente ni a Greenhouse. Contrato: [manual](../../../docs/operations/br
   ver [graphic-line-orbit.md](../efeonce-brand-studio/references/graphic-line-orbit.md). Las cuatro láminas
   (portada, sección, contenido, cierre) están medidas una por una en `efeonceGraphicLine.pieces.deck` y se
   reproducen (fuera de Greenhouse, `deckSlideHtml` de `@efeoncepro/axis-graphic-line`): un solo anillo por lámina.
+- **Íconos (canónicos desde 2026-09-26, sólo marca propia):** en un deck van en **Trazo** (lo que se mide); Plastilina
+  sólo en una lámina de Brand, nunca mezclada con Trazo en el mismo grupo. Glifos de `ICON_CATALOG` pintados con
+  `resolveIcon` de `@efeoncepro/axis-graphic-line/icons` (Greenhouse aún no lo consume: `pnpm icons:export` en AXIS);
+  **nunca un ícono dibujado a mano**: el que falta se da de alta con `icons:check` y aprobación. En una fila: 48–56 px,
+  espacio ≥ un ícono, etiqueta opcional en Poppins y nunca en el acento; **responde uno solo** (el servicio que se
+  vende o la sección donde vamos) en el acento de la línea **del deck**, y ninguno si la lámina ya tiene esfera
+  (órbita, título o voz con esfera). Cerrar con `auditIconGroup`. Criterio:
+  [iconography.md](../efeonce-graphic-line/references/iconography.md); guía completa en AXIS `docs/agent-composition/iconography.md`.
 
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 

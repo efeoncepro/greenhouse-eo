@@ -105,7 +105,7 @@ Leer solo lo necesario:
 - `references/metrics-and-scorecards.md` para métricas y scorecards.
 - `references/branding-as-a-service.md` para ofertas, delivery, pricing logic y handoff.
 - `references/research-sources-2026.md` para evidencia fechada, confianza y fuentes de investigación.
-- `references/graphic-line-orbit.md` para la línea gráfica «La órbita» de Efeonce: usos, regla de la firma, reglas duras, tokens y archivos oficiales, contrato y comandos, fotografía generada, artefactos y QA.
+- `references/graphic-line-orbit.md` para la línea gráfica «La órbita» de Efeonce: usos, regla de la firma, reglas duras, tokens y archivos oficiales, contrato y comandos, íconos (Trazo y Plastilina), fotografía generada, artefactos y QA.
 
 Usar las plantillas de `templates/` cuando el usuario necesite un artefacto formal. Ejecutar `scripts/validate-brand-artifact.py` antes de cerrar entregables estructurados.
 
@@ -175,6 +175,11 @@ Kortex y Verk, fuera por ahora. Operar con
   formato fijo (lente, foco, deck, retrato) se **reproducen** desde los tokens `pieces`/`portrait`; la lente siempre
   lleva arco y esfera, y un solo anillo rodea el contenido. Fuera de Greenhouse, la órbita pintada sale del paquete
   `@efeoncepro/axis-graphic-line`. Detalle y QA en la referencia.
+- **Íconos** (canónicos 2026-09-26, D16–D22; sólo marca propia, nunca clientes ni UI de Greenhouse): dos voces por la
+  línea de la pieza, **Trazo** (lo que se mide: Growth, Engine, Revenue) y **Plastilina** (lo que se crea: Brand);
+  Voice sin voz fija. La esfera es un estado: responde uno solo y sólo si la pieza no tiene otra esfera. Glifos de
+  `ICON_CATALOG`, pintados con `resolveIcon` (`@efeoncepro/axis-graphic-line/icons`); nunca un ícono dibujado o
+  generado suelto. Criterio en [`efeonce-graphic-line` → iconography](../efeonce-graphic-line/references/iconography.md).
 - **Motion:** animaciones del logo V1.1 aprobadas (reveal 3,6 s, apertura 2,4 s, sting 1,6 s;
   [spec](../../../docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md)); la animación de la órbita
   sin logo sale del paquete de AXIS. Masters en el bucket público de AXIS, nunca en git (ver referencia). **Antes de

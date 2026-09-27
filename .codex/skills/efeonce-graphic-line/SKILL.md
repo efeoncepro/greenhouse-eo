@@ -1,6 +1,6 @@
 ---
 name: efeonce-graphic-line
-description: The Efeonce graphic line «La órbita» end to end (living skill) — everything available in AXIS (tokens efeonceGraphicLine, contracts efeonce.graphic-line-orbit / collaboration-selection / email-signature, the @efeoncepro/axis-graphic-line package with its recipes, brand assets and the Lab), how to compose every piece (orbit, measure/trajectory, progress/deck, lens, spotlight, family map, state, voice question+answer, logo inline, slogan per service line, signature and URL bubble, email signature, merch, office, video), the motion language (the orbit alone and the three approved logo animations reveal/apertura/sting, values in efeonceGraphicLine.motion) and its convergence with the Efeonce photographic language, which stays in force. Use for ANY piece, surface, code or doc that uses the orbit, the lens, the spotlight, the sphere as a full stop, the «Empower your …» slogan, the Efeonce signature, the logo animations or the axis-graphic-line package; before composing with AXIS or the Greenhouse compilers (creative:orbit, creative:layout graphic_line, foto:componer:cta marcaEnEscena, brand-motion); and when a human asks what is available or how something is built. Every session that changes the line, its tokens, contracts, package, Lab, motion or its photographic convergence MUST update this skill (see Skill Maintenance Contract).
+description: The Efeonce graphic line «La órbita» end to end (living skill) — everything available in AXIS (tokens efeonceGraphicLine, contracts efeonce.graphic-line-orbit / collaboration-selection / email-signature, the @efeoncepro/axis-graphic-line package with its recipes, brand assets and the Lab), how to compose every piece (orbit, measure/trajectory, progress/deck, lens, spotlight, family map, state, voice question+answer, logo inline, slogan per service line, signature and URL bubble, email signature, merch, office, video), the motion language (the orbit alone and the three approved logo animations reveal/apertura/sting, values in efeonceGraphicLine.motion) and its convergence with the Efeonce photographic language, which stays in force. It also owns the line's canonical iconography (two voices: Trazo for what is measured, Plastilina for what is created; the sphere as a rest/response state; the skewed orbit; @efeoncepro/axis-graphic-line/icons with resolveIcon, auditIconGroup, skewedOrbitHeroSvg and pnpm icons:export|check|vectorize in AXIS). Use for ANY piece, surface, code or doc that uses the orbit, the lens, the spotlight, the sphere as a full stop, the «Empower your …» slogan, the Efeonce signature, the logo animations or the axis-graphic-line package; for any icon or icon row in an Efeonce-brand piece (deck, report, social post, sticker, cover) and for creating a new glyph; before composing with AXIS or the Greenhouse compilers (creative:orbit, creative:layout graphic_line, foto:componer:cta marcaEnEscena, brand-motion); and when a human asks what is available or how something is built. Every session that changes the line, its tokens, contracts, package, Lab, motion or its photographic convergence MUST update this skill (see Skill Maintenance Contract).
 ---
 
 # Efeonce «La órbita» — línea gráfica (skill viva)
@@ -62,7 +62,12 @@ propón agregarlo.
     de un doc, el canvas o un comentario. Archivos de marca sólo desde `@efeoncepro/axis-brand-assets`.
 11. **Movimiento:** la órbita sola sale del paquete; las animaciones del logo (reveal, apertura, sting) siguen el
     lenguaje de movimiento y sus valores de `efeonceGraphicLine.motion`. Nunca se generan con un modelo de video.
-12. **Estado honesto:** la órbita es un sistema consistente, **no** un activo distintivo demostrado; la prueba sin
+12. **Íconos sólo del catálogo de AXIS** (canónicos, D16–D22): **nunca dibujes un ícono a mano dentro de una pieza**;
+    se pinta con `resolveIcon` (`@efeoncepro/axis-graphic-line/icons`), con la voz de la línea de la pieza, en reposo por
+    defecto; responde **uno solo** y sólo si la pieza no tiene otra esfera, y el grupo pasa `auditIconGroup` antes de
+    entregar. Un glifo nuevo se da de alta en AXIS con `pnpm icons:check` (Plastilina, antes `icons:vectorize`) **y** la
+    aprobación del operador: el control mide el peso, no el carácter.
+13. **Estado honesto:** la órbita es un sistema consistente, **no** un activo distintivo demostrado; la prueba sin
     logo va antes de cualquier pauta con la órbita. «Te hacemos visible» no sale a pauta sin revisión legal.
 
 ## Cómo se trabaja
@@ -72,7 +77,8 @@ propón agregarlo.
 2. Elige la forma o la receta con el árbol de `composition.md`. Si hay foto, aplica `photography-convergence.md`
    antes de componer.
 3. Compón **por intención** (contrato) o con la **receta** del paquete; en Greenhouse, con los compiladores
-   (`pnpm creative:orbit:render`, `pnpm creative:layout`, `pnpm foto:componer:cta`).
+   (`pnpm creative:orbit:render`, `pnpm creative:layout`, `pnpm foto:componer:cta`). Los íconos, con
+   `@efeoncepro/axis-graphic-line/icons` (o `pnpm icons:export` en AXIS: Greenhouse todavía no consume `/icons`).
 4. Corre los chequeos del adapter y el QA de `qa-checklist.md` sobre los píxeles finales.
 5. Si aprendiste algo, actualiza esta skill (abajo).
 
@@ -89,8 +95,9 @@ propón agregarlo.
 
 Esta skill es la memoria operativa de la línea. **Un cambio a la línea no está terminado hasta que la skill lo
 refleja**, en el mismo commit o en el inmediato siguiente. Aplica a Claude, Codex y cualquier agente, y a toda sesión
-que toque: tokens `efeonceGraphicLine` o `axisMotion`; contratos `graphic-line-orbit`, `collaboration-selection` o
-`email-signature`; el paquete `axis-graphic-line` o `axis-brand-assets`; el Lab de la línea; los compiladores o el motion
+que toque: tokens `efeonceGraphicLine` (incluido `efeonceGraphicLine.icons`) o `axisMotion`; contratos
+`graphic-line-orbit`, `collaboration-selection` o `email-signature`; el paquete `axis-graphic-line` (incluido `/icons`)
+o `axis-brand-assets`; el Lab de la línea; los compiladores o el motion
 de Greenhouse; el manual, el ADR, la norma de movimiento o el lenguaje fotográfico.
 
 **Qué se actualiza y dónde:**
@@ -105,6 +112,8 @@ de Greenhouse; el manual, el ADR, la norma de movimiento o el lenguaje fotográf
 3. `references/photography-convergence.md` — todo cambio del lenguaje fotográfico o de la línea que afecte cómo
    conviven (y la sección recíproca de ambos docs canónicos).
 4. `references/motion.md` — piezas, tiempos, entregables, comandos o destinos de medios.
+4b. `references/iconography.md` — voces, glifos del catálogo, reglas de respuesta, órbita sesgada, comandos de alta y
+   pendientes de la iconografía (el detalle vive en AXIS; aquí el criterio y la historia).
 5. `references/qa-checklist.md` — todo chequeo nuevo o umbral medido.
 6. `references/ledger.md` — **toda** decisión del operador (con fecha) y toda versión publicada; mover a «vigentes» un
    pendiente que el operador decida.

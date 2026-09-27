@@ -111,6 +111,16 @@ cuando el logo ya aparece dentro de la imagen, centrada, fusionada a opacidad 1 
 Los archivos oficiales (logo, `url-bubble-source` y variantes horneadas) son el dibujo de
 `@efeoncepro/axis-brand-assets`; las copias del repo están vigiladas por `src/config/efeonce-brand-assets.test.ts`.
 
+**Íconos de la línea (canónicos desde 2026-09-26, sólo marca propia Efeonce; nunca en piezas de clientes):** si un
+nodo o categoría de la infografía lleva ícono, sale de `ICON_CATALOG` y se pinta con `resolveIcon` de
+`@efeoncepro/axis-graphic-line/icons` (`pnpm icons:export` en AXIS mientras Greenhouse no consuma el paquete); nunca
+se dibuja a mano ni se usa como adorno. La voz la decide la línea de la pieza (`iconVoiceForLine`: **Trazo** para lo
+que se mide, **Plastilina** para lo que se crea, desde 32 px) y no se mezclan en un mismo grupo. Reposo por defecto:
+en un grupo responde uno solo, en el acento de la línea de la pieza, y ninguno si la pieza ya tiene esfera. Un glifo
+que falta se da de alta (`icons:check` + aprobación). Criterio:
+[iconography.md](../../efeonce-graphic-line/references/iconography.md); guía en AXIS
+`docs/agent-composition/iconography.md`.
+
 Wordmarks públicos oficiales: `public/branding/logo-full.svg` en light y
 `public/branding/logo-negative.svg` en dark. `AxisWordmark` es interno y no se usa en piezas públicas.
 

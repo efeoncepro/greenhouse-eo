@@ -174,6 +174,9 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
    Si el texto seleccionado cierra con la esfera de la línea gráfica (respuesta o titular de marca propia), la
    selección, las marcas de corte y los cursores miden la palabra **con** la esfera: es parte del texto, nunca queda
    afuera (operador, 2026-09-26; `target.bounds` en el contrato 0.3.0, [manual §6](../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)).
+   Íconos en una pieza de marca propia: sólo de la iconografía canónica de «La órbita» (Trazo o Plastilina según la
+   línea de la pieza), pintados con `resolveIcon` y con el grupo pasado por `auditIconGroup`; nunca dibujados ni
+   generados dentro de la pieza ([criterio](../efeonce-graphic-line/references/iconography.md)).
 4. **Diseña contraste.** Prueba peso, ancho, tamaño, leading, tracking, cortes y densidad juntos. ExtraBold no
    es un default; una cursiva o Guttery larga tampoco. El contraste útil puede venir de peso, escala, espacio,
    color, posición o tiempo, pero cada capa debe conservar una función.

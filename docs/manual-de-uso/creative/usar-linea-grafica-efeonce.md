@@ -1,9 +1,9 @@
 # Usar la línea gráfica de Efeonce — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-26 por Claude
+> **Ultima actualizacion:** 2026-09-26 por Claude (1.6: usar y pedir un ícono de la marca — iconografía Trazo y Plastilina, AXIS `v0.3.6`)
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — es un sistema de marca; los valores viven en AXIS y el PDF se regenera con un comando local
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Manual técnico-operativo V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) · [Producir una foto de marca](../marketing/fotografia-de-marca-efeonce.md)
@@ -11,8 +11,8 @@
 ## Para qué sirve
 
 Este manual explica cómo hacer una pieza de Efeonce con la órbita (post, slide, portada, informe, merch, papelería,
-señalética) sin romper sus reglas, cómo usar las animaciones de marca (la órbita y las tres animaciones del logo) y
-cómo regenerar el manual en PDF cuando cambia su fuente.
+señalética) sin romper sus reglas, cómo usar las animaciones de marca (la órbita y las tres animaciones del logo), cómo
+usar y pedir un ícono de la marca y cómo regenerar el manual en PDF cuando cambia su fuente.
 
 La órbita es la forma canónica de la marca propia de Efeonce y de su familia (Globe, Wave, Reach). **No se usa** en la
 interfaz de Greenhouse ni en el trabajo de clientes.
@@ -290,6 +290,49 @@ aparte). Un área nueva se pide primero en AXIS (tokens de la firma).
 segunda esfera en la línea de los partners · mostrar logos de partners a color o en insignias de nivel sin haberlas
 confirmado en el portal del programa · escribir la URL como texto en vez de usar la burbuja.
 
+## Paso a paso — usar un ícono de la marca
+
+La iconografía de la línea tiene dos voces: **Trazo** (lo que se mide) y **Plastilina** (lo que se crea). Las reglas
+completas están en el [manual §14](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#14-iconografía-trazo-y-plastilina)
+y en la [guía de AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/iconography.md);
+este paso a paso no las repite todas.
+
+1. **Confirma que la pieza es de Efeonce** (o de su familia). Para clientes o para la interfaz de Greenhouse no se
+   usan estos íconos.
+2. **Elige la voz por la línea de servicio de la pieza:** Growth, Engine o Revenue → Trazo; Brand → Plastilina. La
+   línea Voice todavía no tiene voz fija: elige con criterio y decláralo en la pieza. Una voz por grupo, nunca las dos
+   juntas.
+3. **Busca el ícono en la [página del Lab](https://axis.efeonce.org/references/iconography/):** muestra los 30
+   aprobados en cada línea y fondo, con «Copiar SVG». Si el que necesitas no está, **no lo dibujes**: pídelo (ver
+   abajo).
+4. **Decide el estado.** Reposo por defecto. **Responde uno solo**, el que importa, y sólo si la pieza no tiene otra
+   esfera (una órbita, una voz con esfera o un marcador de estado). En listas, tablas, contacto y navegación, reposo.
+5. **Toma el color de la línea de la pieza**, no del ícono: en un deck de Growth todos van con el acento de Growth,
+   aunque el ícono «pertenezca» a otra línea. Sin línea clara, Growth.
+6. **Respeta los tamaños mínimos:** el Trazo responde desde 20 px (más chico, sólo reposo); Plastilina no baja de
+   32 px (más chico, usa el Trazo).
+7. **Si Plastilina es la protagonista de la pieza,** va dentro de su **órbita sesgada** y en reposo: la esfera la pone
+   la órbita. Una por pieza, rodea sólo al objeto y el texto vive fuera.
+8. **Si trabajas en código o con un agente,** pinta con `resolveIcon`, revisa el grupo con
+   `auditIconGroup(items, { pieceHasSphere })` antes de entregar y usa `skewedOrbitHeroSvg` para la protagonista
+   (`@efeoncepro/axis-graphic-line/icons`, desde 0.4.0). El set completo como archivos sale con
+   `pnpm icons:export` en el repositorio de AXIS. Nunca copies HEX ni px: salen de `efeonceGraphicLine.icons`.
+   Greenhouse todavía no instala `axis-graphic-line`; hoy se usa desde AXIS o copiando el SVG del Lab.
+
+### Pedir un ícono nuevo
+
+1. **Revisa el catálogo** de la página del Lab: confirma que no hay uno que sirva.
+2. **Pídelo al operador de la línea** con cuatro datos: el objeto, la voz (Trazo o Plastilina), dónde se va a usar y
+   dónde ocurre la acción (ahí va la esfera cuando responde).
+3. **Quien lo produce sigue el método de AXIS** ([guía, glifo nuevo](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/iconography.md#un-glifo-nuevo-de-trazo)):
+   - **Trazo:** se dibuja en la grilla de 24 con remates redondos y se verifica con `pnpm icons:check`.
+   - **Plastilina:** se genera sólo la forma (nunca el color) con la referencia de estilo y el prompt modelo que
+     guarda AXIS (`docs/agent-composition/iconography/`), se vectoriza con `pnpm icons:vectorize` y se verifica con
+     `pnpm icons:check`. La esfera se compone después.
+4. **El operador aprueba** mirando las hojas de control que deja `icons:check`.
+5. **Recién entonces entra al set** y se publica una versión nueva del paquete. Mientras no esté aprobado, no se usa
+   en piezas.
+
 ## Paso a paso — regenerar el PDF del manual
 
 El PDF (`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`, A4, 56 hojas, confidencial) se genera desde una fuente HTML. Se
@@ -323,6 +366,8 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 | **Decisión pendiente** | proveedor y presupuesto del panel de la prueba sin logo (que debe correr antes de pauta pagada); revisión del banco de pares; URL de LinkedIn de la empresa. El contraste mínimo de la burbuja quedó en 4,5:1 (2026-09-26) |
 | **No certificable** (`foto:cta:gate`) | pieza del canon anterior que firma con la URL; se dibuja igual que antes y no se recertificó |
 | **Maqueta de presentación** | las fotos de merch y de oficina del canvas generadas con IA; la producción sale de los archivos vectoriales y de una muestra física del proveedor |
+| **Reposo** (ícono) | el ícono es sólo su forma, sin esfera; es el estado por defecto |
+| **Respuesta** (ícono) | aparece la esfera en el acento de la línea de la pieza; sólo uno por pieza y nunca junto a otra esfera |
 | **[propuesta]** en el manual técnico | valor a validar con prueba de impresión (por ejemplo, tamaños mínimos del logo e isotipo impresos) |
 
 ### Salida del comando del PDF
@@ -354,6 +399,12 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
   `efeonceGraphicLine.motion`.
 - No uses fotos de banco ni pongas un velo navy sobre la foto.
 - No publiques el claim «Te hacemos visible» en pauta: está pendiente de revisión legal.
+- No mezcles Trazo y Plastilina en un mismo grupo ni hagas que todos los íconos respondan.
+- No dibujes un ícono a mano dentro de una pieza: si no está en el catálogo, pídelo.
+- No pintes el cuerpo, el gesto o el trazo de un ícono con el acento, ni le des volumen, brillo o sombra: el acento va
+  sólo en la esfera.
+- No uses la órbita sesgada para medir: lo que mide va en la órbita circular.
+- No cambies los íconos Tabler de la firma de correo o de equipo por los de la línea: espera la decisión del operador.
 
 ## Problemas comunes
 
@@ -371,6 +422,11 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 
 | La burbuja-firma **no llega a 4,5:1** | la fusión de luminosidad fija el gris de la burbuja; sobre fondos medios o claros queda entre 1,6 y 3,1:1 | ubícala sobre un lecho muy oscuro; si la pieza no tiene el logo de Efeonce en la imagen, firma con el logo centrado. El umbral está pendiente de decisión del operador |
 | El gate de `foto:cta:gate` sale con código **3** («no certificable») en piezas ya aprobadas | el tramo 17 cambió la huella del comando y esas piezas no se recertificaron | se resuelve al recomponerlas; ningún workflow de CI corre este gate, así que no rompe CI |
+| Un ícono pedido en respuesta **sale sin esfera** | es Trazo a menos de 20 px: `resolveIcon` lo deja en reposo y avisa `response-below-min` | agrándalo a 20 px o más, o déjalo en reposo |
+| `resolveIcon` falla con `plastilina-below-min` | Plastilina a menos de 32 px | agrándalo o usa el ícono equivalente en Trazo |
+| `auditIconGroup` reporta `mixed-voices`, `more-than-one-response` o `response-with-piece-sphere` | dos voces en un grupo, varios íconos respondiendo, o un ícono respondiendo en una pieza que ya tiene esfera | una voz por grupo; que responda uno solo; si la pieza ya tiene esfera, todos en reposo |
+| `resolveIcon` falla con `unknown-glyph` | el ícono no está en el catálogo aprobado | pídelo con el método de alta; no lo dibujes en la pieza |
+| Un repositorio nuevo no puede instalar `@efeoncepro/axis-graphic-line` o `axis-tokens` (error 403) | el acceso de GitHub Packages es por paquete y ese repositorio no lo tiene | pide `Manage Actions access → Read` para el repositorio en cada paquete ([runbook de paquetes AXIS](../../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)) |
 | Una foto de merch u oficina trae **las notas de la lámina** pintadas | el arte de referencia llevaba leyendas | corrige editando la foto; en adelante pasa el arte sin leyendas |
 
 ## Referencias técnicas
@@ -386,3 +442,4 @@ regenera cuando cambia la fuente o cuando cambian las láminas del anexo.
 - Contrato y herramientas (AXIS 0.3.0 y `axis-graphic-line` 0.3.1, `creative:orbit:render`, `creative:layout`, `foto:componer:cta` tramo 17): [manual técnico §13](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#13-contrato-y-herramientas-axis-03)
 - Animaciones de marca: [norma del lenguaje de movimiento](../../operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md) · [spec de motion](../../operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md) · valores en `efeonceGraphicLine.motion` (`@efeoncepro/axis-tokens` 0.3.3) · masters en `gs://efeonce-group-axis-public-media/motion/logo/v1.1/`
 - Compositor de piezas con CTA: [manual de uso](./compositor-piezas-cta.md)
+- Iconografía (Trazo y Plastilina): [manual técnico §14](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#14-iconografía-trazo-y-plastilina) · [guía en AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/iconography.md) · [página del Lab](https://axis.efeonce.org/references/iconography/) y [datos para agentes](https://axis.efeonce.org/references/iconography.json) · `efeonceGraphicLine.icons` (`@efeoncepro/axis-tokens` 0.3.6) · `@efeoncepro/axis-graphic-line/icons` (0.4.0) · comandos `pnpm icons:export|check|vectorize` en el repo de AXIS

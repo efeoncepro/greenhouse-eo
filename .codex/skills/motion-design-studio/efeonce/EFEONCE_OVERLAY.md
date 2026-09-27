@@ -81,6 +81,10 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   en `develop`). Se importan, nunca se escriben en un script ni se copian de la norma; si falta un valor, se agrega al
   token con su razón. Cambiar un valor: token + prueba en AXIS → publicar → fijar en Greenhouse → comparar storyboard →
   aprobación del operador si altera una pieza aprobada.
+- **Íconos de la línea (Trazo y Plastilina, canónicos desde 2026-09-26, sólo marca propia):** su motion **no está
+  definido todavía** (pendiente en AXIS: necesita los tokens `axisMotion` y la norma de movimiento). No se inventa: en
+  una pieza animada, el ícono entra como cualquier elemento del plano y se queda en el estado que `resolveIcon` pinta,
+  sin animar la esfera ni el trazo. Criterio: [iconography.md](../../efeonce-graphic-line/references/iconography.md).
 - **`DESIGN.md`** es el contrato visual agent-facing; leerlo si la pieza toca UI (pero recuerda: motion de
   UI runtime NO es esta skill).
 

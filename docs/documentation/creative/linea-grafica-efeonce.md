@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-26 por Claude
+> **Ultima actualizacion:** 2026-09-26 por Claude (1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
 
@@ -174,6 +174,38 @@ esfera** que abre la zona «Partner oficial de», con los logos de los partners 
 > Detalle técnico: [manual §10.2](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#102-firma-de-mail) ·
 > contrato `efeonce.email-signature` y tokens `efeonceGraphicLine.emailSignature` en AXIS.
 
+## Los íconos
+
+Desde el 2026-09-26 la línea tiene su **propia iconografía**, canónica y sólo para la marca propia de Efeonce y su
+familia. No se usa en trabajo de clientes ni en la interfaz de Greenhouse, que tiene sus propios íconos. Son **dos
+voces de una misma familia**, y la voz la decide la línea de servicio de la pieza:
+
+| Voz | Qué dice | Líneas | Dónde aparece | Cómo se ve |
+|---|---|---|---|---|
+| **Trazo** | lo que se mide | Growth, Engine y Revenue | decks, informes, dashboards, listas, navegación | línea limpia y fina, con remates redondos |
+| **Plastilina** | lo que se crea | Brand (servicios creativos) | piezas sociales, portadas, stickers, momentos del oficio | objeto de masa blanda, inclinado, tomado en uso y con calados |
+
+La línea Voice (medios) todavía no tiene voz fija: se elige con criterio y se declara en la pieza.
+
+| Regla | Qué significa en la práctica |
+|---|---|
+| **La esfera es un estado** | en reposo el ícono es sólo su forma; cuando **responde**, aparece la esfera en el color de la línea de la pieza |
+| **Responde uno solo** | el que importa (el servicio que se vende, la sección donde vamos), y sólo si la pieza no tiene ya otra esfera |
+| **El color es de la pieza, no del ícono** | el mismo ícono va en teal en un deck de Growth y en el acento de Brand en uno de Brand |
+| **Plano y sobre el mismo fondo** | fondo navy profundo en todas las líneas; sin volumen, brillo, sombras ni degradés |
+| **Las voces no se mezclan** | nunca Trazo y Plastilina en un mismo grupo; si conviven, Plastilina manda en grande y el Trazo apoya en chico |
+| **La órbita sesgada es la firma de Plastilina** | una elipse inclinada alrededor del objeto protagonista; una por pieza, nunca cruza el texto y **nunca mide** (lo que mide sigue en la órbita circular) |
+| **Un ícono que falta no se dibuja en la pieza** | se pide, se verifica y entra al set con la aprobación del operador |
+
+Hay **30 íconos aprobados**: 12 de Trazo y 18 de Plastilina. La firma de correo y la de equipo siguen con los íconos
+anteriores (Tabler) hasta que el operador decida su reemplazo.
+
+> Detalle técnico: [manual §14 Iconografía](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#14-iconografía-trazo-y-plastilina) ·
+> [guía de la iconografía en AXIS](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/iconography.md) ·
+> [página del Lab](https://axis.efeonce.org/references/iconography/) · tokens `efeonceGraphicLine.icons`
+> (`@efeoncepro/axis-tokens` 0.3.6) y `@efeoncepro/axis-graphic-line/icons` (0.4.0) ·
+> [cómo usar y pedir un ícono](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md#paso-a-paso--usar-un-ícono-de-la-marca)
+
 ## Dónde está cada cosa
 
 | Qué | Dónde | Para quién |
@@ -187,6 +219,8 @@ esfera** que abre la zona «Partner oficial de», con los logos de los partners 
 | La órbita lista para usar en código (piezas, retrato de la firma de mail, movimiento) | paquete `@efeoncepro/axis-graphic-line` | quien construye piezas o páginas fuera de Greenhouse |
 | Animaciones del logo para el equipo (MP4, GIF, cuadro final) | OneDrive `13- Branding › Motion Órbita Efeonce › v1.1` | quien edita video o arma presentaciones |
 | Masters de las animaciones (transparentes para editores de video, web y Apple) | bucket público de AXIS `efeonce-group-axis-public-media`, carpeta `motion/logo/v1.1/` | quien monta la animación sobre otro fondo |
+| Íconos de la marca (catálogo, reglas y «Copiar SVG») | [axis.efeonce.org/references/iconography](https://axis.efeonce.org/references/iconography/) · en datos para agentes: [`/references/iconography.json`](https://axis.efeonce.org/references/iconography.json) | quien usa o pide un ícono |
+| Íconos en código | `efeonceGraphicLine.icons` (`@efeoncepro/axis-tokens` desde 0.3.6) y `@efeoncepro/axis-graphic-line/icons` (desde 0.4.0); Greenhouse todavía no los consume | quien construye piezas en código |
 | Canvas de trabajo (taller, privado; 40 láminas) | [Canvas «Línea gráfica Efeonce»](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) | quien explora nuevas aplicaciones |
 | Burbujas de URL listas para visores y correo | `docs/operations/brand-graphic-line/deliverables/assets/url-lum-{light,dark}.svg` | quien arma PDF, correo o referencias para IA |
 | Banco de fotos para la lente | `ai-generations/2026-09-25_banco-lente-orbita/` (fichas y prompts versionados; las imágenes son locales) | quien compone una lente |
@@ -230,6 +264,7 @@ la órbita se reconozca sola.
 | Archivos de impresión y plantillas editables | producción | se parte por la tarjeta de presentación y el muro de recepción, en PDF vectorial; espera la especificación técnica de la imprenta |
 | Variantes restantes de las animaciones del logo | producción | algunos formatos y fondos siguen en render; se suman a OneDrive y al bucket a medida que terminan |
 | Versión en inglés | producción | el copy de la línea está sólo en español |
+| Íconos: voz de la línea Voice y reemplazo de los Tabler en las firmas | decisión del operador | la línea Voice no tiene voz fija; la firma de correo y la de equipo siguen con Tabler hasta que se decida |
 | Revisión legal de «Te hacemos visible» | legal | obligatoria antes de cualquier pauta, sin excepción |
 | Ajustes de `foto:prompt` y chequeos de la lente | producción | una task nueva lleva al comando lo decidido para las fotos con lente (formato 1200 × 627, límite de cabezas sólo con reserva de texto, chequeos contra lecho y reservas) |
 

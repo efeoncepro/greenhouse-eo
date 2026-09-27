@@ -1,14 +1,19 @@
 # Cómo componer con la órbita
 
-> Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 · decisiones del
-> operador D1–D15 del 2026-09-26 registradas (ver [ledger.md](ledger.md)); lo que depende de las versiones en
-> publicación (tokens/contratos 0.3.5, contrato de la órbita 0.3.1, paquete 0.3.2) va marcado así.
+> Verificado contra: axis-design-system@a5c21ae — 2026-09-26 (íconos: AXIS `main@5b8ab20`, tag `v0.3.6`) ·
+> greenhouse-eo@7cb24df17 — 2026-09-26 · decisiones del operador D1–D22 del 2026-09-26 registradas (ver
+> [ledger.md](ledger.md)); lo que depende de las versiones en publicación (tokens/contratos 0.3.5, contrato de la
+> órbita 0.3.1, paquete 0.3.2) va marcado así.
 >
 > Los resultados «esperados» de los ejemplos se obtuvieron ejecutando las funciones contra los `dist` de AXIS y el
 > comando de Greenhouse ese día. El inventario completo (tokens, códigos, firmas) está en
 > [package-and-tokens.md](package-and-tokens.md); la lista de verificación, en [qa-checklist.md](qa-checklist.md).
 >
-> Íconos (trazo aprobado en reposo y respuesta, y cuándo responde la esfera en una pieza): [iconography.md](iconography.md).
+> **Íconos** (canónicos, D16–D22): dos voces —Trazo para lo que se mide, Plastilina para lo que se crea—, la esfera como
+> estado (reposo o respuesta) y la órbita sesgada de Plastilina. No se componen con el contrato de la órbita sino con
+> `@efeoncepro/axis-graphic-line/icons` (`resolveIcon`, `auditIconGroup`, `skewedOrbitHeroSvg`); la fuente de verdad es
+> AXIS (`docs/agent-composition/iconography.md`). Criterio: [criteria.md](criteria.md) §3.14; detalle:
+> [iconography.md](iconography.md).
 
 ## 0. El flujo, siempre el mismo
 
@@ -55,6 +60,11 @@ clientes ni la interfaz de producto de Greenhouse (esa se rige por `DESIGN.md` y
    ├─ UN BUZÓN DE ÁREA → email-signature variant 'team' (área, sin foto)
    ├─ VOZ pregunta + respuesta → voice (texto tuyo) + answerHtml para la respuesta con su esfera
    ├─ LOGO dentro de una frase display → logo-inline (≥ 96 px, línea base y altura x)
+   ├─ ÍCONOS (fila de servicios, lista, sticker, objeto del oficio) → NO es la órbita: @efeoncepro/axis-graphic-line/icons
+   │    → voz por la línea de la PIEZA (iconVoiceForLine) · glifo de ICON_CATALOG (si no existe, alta en AXIS, nunca a mano)
+   │    → resolveIcon en reposo; responde uno solo y sólo si la pieza no tiene otra esfera · auditIconGroup antes de entregar
+   │    └─ objeto de Plastilina protagonista → skewedOrbitHeroSvg (objeto en reposo; la órbita sesgada pone la esfera y
+   │         cuenta como la esfera de la pieza; nunca mide ni cruza el texto)
    ├─ CERRAR (última lámina, contratapa, final de video) → slogan { form, role: 'close' } de la línea
    │    └─ ¿el logo dentro de la órbita? SÓLO cierre del deck, cierre de video o muro de recepción, con su resguardo X;
    │         en cualquier otra pieza, el logo fuera de la órbita (D5)

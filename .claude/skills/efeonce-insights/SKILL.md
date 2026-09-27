@@ -133,6 +133,14 @@ it without repeating what already cost a day*. It grows with every task: see the
   when the logo is already inside the image) governs graphic pieces such as social posts and ads, not report footers.
   The catalogs' `assets/url-lum.svg` copies are the `url-bubble-source` drawing of `@efeoncepro/axis-brand-assets`,
   guarded by `src/config/efeonce-brand-assets.test.ts` — never edit them by hand.
+- Brand iconography «La órbita» (Trazo + Plastilina, canonical since 2026-09-26, Efeonce brand only; source of truth
+  AXIS `@efeoncepro/axis-graphic-line/icons`, criterion in
+  [`iconography.md`](../efeonce-graphic-line/references/iconography.md)): the Insights catalogs **already carry icons**
+  — inline Tabler-lineage stroke SVGs (eyebrows, bands, `FIGURE_ICON_KEYS` in
+  `catalogs/insights-shared/editorial-resolvers.ts`) frozen by the TASK-1889 fidelity contract. They are **not** yet
+  the canonical set. Adopting it (Insights measures, so **Trazo**; rest state in lists/tables; one responds per group,
+  none on a page that already has a sphere) needs its own task with the visual gate and operator approval: never
+  swap or mix sets piecemeal, and never hand-draw a new icon into a catalog.
 - Sharing/email/schedules → `resend-email-platform`, `greenhouse-email` + TASK-1848.
 - Portal UI → `greenhouse-ux` + `greenhouse-ai-design-studio` + TASK-1849 (Composition Shell, GVC).
 - Shared web render → `efeonce-think` repo + `astro` skill + TASK-1875 (headless model, token server-side).

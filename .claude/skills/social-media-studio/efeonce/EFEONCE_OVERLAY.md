@@ -192,6 +192,12 @@ tokens `efeonceGraphicLine` de `@efeoncepro/axis-tokens`; nunca HEX ni px transc
   `marcaEnEscena` (gate `firma-burbuja`). Detalle en la
   [referencia operativa](../../efeonce-brand-studio/references/graphic-line-orbit.md) §La firma de una pieza
   gráfica y §Componer con agentes.
+- **Íconos (canónicos 2026-09-26):** voz por la línea del post: Plastilina en Brand (lo que se crea), Trazo en
+  Growth/Engine/Revenue (lo que se mide); nunca las dos en un mismo grupo. En un post de Brand con objeto protagonista,
+  va dentro de su **órbita sesgada** (`skewedOrbitHeroSvg`): objeto en reposo, una por pieza, nunca mide y nunca cruza
+  el texto (la voz vive en el tercio inferior). Fuera de eso, reposo por defecto; responde uno solo y sólo si la pieza
+  no tiene otra esfera. Plastilina no baja de 32 px. Todo sale de `resolveIcon` y pasa `auditIconGroup`; nunca un ícono
+  generado suelto. Criterio: [`efeonce-graphic-line`](../../efeonce-graphic-line/references/iconography.md).
 - **«Te hacemos visible»** siempre con su prueba y sin pauta mientras falte la revisión legal (§1.4). La prueba de
   atribución sin logo sigue sin medir: no afirmes que la órbita ya se reconoce sola.
 

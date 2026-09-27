@@ -1,7 +1,7 @@
 # Aplicaciones de «La órbita» — guía por pieza y por espacio
 
-Verificado contra: greenhouse-eo@7cb24df17 · axis-design-system@a5c21ae — 2026-09-26 (decisiones del operador D1–D15
-del 2026-09-26 registradas; ver `ledger.md`)
+Verificado contra: greenhouse-eo@7cb24df17 · axis-design-system@a5c21ae (íconos: AXIS `main@5b8ab20`, tag `v0.3.6`)
+— 2026-09-26 (decisiones del operador D1–D22 del 2026-09-26 registradas; ver `ledger.md`)
 
 Esta guía dice, **para cada aplicación**, qué elementos de la línea van (y cuáles nunca), dónde se ubican, cuánto espacio
 ocupan, en qué superficie y color, y cómo se produce. No repite la API (ver `package-and-tokens.md`), el significado de
@@ -86,6 +86,27 @@ la órbita alrededor del logo **en objetos**. El operador decidió la excepción
   logo va solo en el dorso. Esas láminas no se reproducen tal cual en este punto.
 - **En todo lo demás** rige M §8.3 n.º 8: la contraportada de Insights, por ejemplo, lleva el logo fuera de la órbita
   (L 7.2).
+
+### 0.3 Íconos en las aplicaciones (canónicos desde el 2026-09-26, D16–D22)
+
+La iconografía de la línea no es la órbita: se pinta con `@efeoncepro/axis-graphic-line/icons` y su fuente de verdad es
+AXIS (`docs/agent-composition/iconography.md`). Criterio en `criteria.md` §3.14; detalle en `iconography.md`. Lo que
+vale en toda aplicación:
+
+- **La voz la decide la línea de servicio de la pieza** (`iconVoiceForLine`): **Trazo** en Growth, Engine y Revenue
+  (decks, informes, dashboards, listas, firmas, navegación); **Plastilina** en Brand (piezas sociales, portadas,
+  stickers, momentos del oficio). Voice, por decidir: se elige y se declara. Una voz por grupo.
+- **Reposo por defecto; responde uno solo** —el servicio que se vende, la sección donde vamos— y sólo si la pieza no
+  tiene otra esfera (una órbita, una respuesta que cierra con su esfera, un marcador de estado): entonces
+  `pieceHasSphere: true` y ningún ícono responde. Listas, tablas, contacto, navegación y satélites: siempre reposo.
+- **En una fila:** 48–56 px, línea base común, al menos un ícono de ancho entre íconos; etiqueta opcional debajo en
+  Poppins, nunca en el acento (texto de menos de 24 px).
+- **Tamaños mínimos:** el Trazo responde desde 20 px; Plastilina no baja de 32 px (más chico, el Trazo).
+- **Cómo se produce:** `resolveIcon` (o `iconSvg`) y `auditIconGroup` antes de entregar; en Greenhouse, que todavía no
+  consume `/icons`, los SVG salen de `pnpm icons:export` en AXIS o del Lab (`/references/iconography/`, «Copiar SVG»).
+  Un glifo que no está en `ICON_CATALOG` no se dibuja en la pieza: se da de alta en AXIS con la aprobación del operador.
+- **Excepción vigente:** la firma de correo personal y la de equipo siguen con íconos **Tabler** hasta que el operador
+  decida (C1, C2).
 
 ---
 
@@ -211,6 +232,20 @@ la órbita alrededor del logo **en objetos**. El operador decidió la excepción
   gate `pnpm foto:cta:gate`. Voces y contrato de tipografía: skill `efeonce-advertising-creative`.
 - **Fuente:** `EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md` (formatos, firma, zonas seguras); M §8.5; T `signature`.
 
+### A9. Pieza con un objeto de Plastilina protagonista (órbita sesgada)
+
+- **Para qué:** piezas del oficio creativo (línea Brand): un objeto que se crea (pincel, cámara, micrófono…) como
+  protagonista. Es la firma de Plastilina (D20).
+- **Va:** el objeto de Plastilina en **reposo** dentro de su **órbita sesgada** (elipse inclinada, pasa por detrás
+  arriba y por delante abajo); la esfera la pone la órbita, fuera del objeto. La voz vive fuera, en el tercio inferior.
+  Firma según §0.
+- **Espacio:** objeto de al menos 320 px a 1080 de ancho; una órbita sesgada por pieza; nunca cruza el texto.
+- **Nunca:** que la órbita sesgada mida un dato (lo que mide va en la órbita circular) · otra esfera en la pieza · el
+  objeto en respuesta dentro de la órbita · el acento en el cuerpo o el gesto.
+- **Cómo se produce:** `skewedOrbitHeroSvg({ glyph, line, surface, width, height, object, gesture?, label? })` de
+  `@efeoncepro/axis-graphic-line/icons`.
+- **Fuente:** guía de iconografía de AXIS §«La órbita sesgada»; T `icons.skewedOrbit`; decisión D20.
+
 ---
 
 ## B. Presentaciones e informes
@@ -236,6 +271,9 @@ la órbita alrededor del logo **en objetos**. El operador decidió la excepción
   eyebrow?, stats?, note?, line })`. El render verifica que ningún texto cruce la órbita en portada y sección.
 - **Errores comunes:** cifras inventadas en la lámina de contenido (usar la nota «datos de muestra») · poner la órbita
   grande en contenido (ahí es un indicador de 80 px).
+- **Íconos:** la voz de la línea del deck (Trazo en Growth, Engine y Revenue), en fila según §0.3. Si la lámina ya
+  tiene esfera —el indicador de 80 px o una respuesta que cierra con su esfera—, los íconos descansan
+  (`auditIconGroup(items, { pieceHasSphere: true })`).
 - **Fuente:** L 4.1, L 4.2; M §10.1; `EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md` §Identidad y pie.
 
 ### B2. Portada de deck con lente (foto)
@@ -259,6 +297,8 @@ la órbita alrededor del logo **en objetos**. El operador decidió la excepción
   completa la órbita con la esfera arriba y **el logo fuera de la órbita**.
 - **Nunca:** navy como acento sobre papel (impreso se lee negro) · teal claro en papel · arco decorativo · cambiar la
   grilla A4 o el pie.
+- **Íconos:** Trazo en papel (tinta navy, acento claro de la línea sólo en la esfera), en reposo en listas y tablas;
+  responde uno solo y sólo en una página sin otra esfera (§0.3). El teal claro nunca va sobre papel.
 - **Espacio (L 5.1):** margen 68 px; órbita cx 520, cy 376, r 236 (≈ 30 % del ancho); zona de texto y 720–1055.
 - **Pie:** las páginas de contenido llevan pie completo (logo, edición, dirección, teléfono, **burbuja URL** y folio
   «NN / total»); las aperturas de capítulo navy, pie reducido; las portadas, sin pie institucional; la contraportada,
@@ -304,7 +344,8 @@ la órbita alrededor del logo **en objetos**. El operador decidió la excepción
 - **Zonas en orden fijo** (T `emailSignature.zones`; las opcionales se omiten, el orden no cambia):
   foto con órbita (96 px, `portraitOrbitSvg`) → nombre y cargo (el nombre es la única voz de titular: Bricolage 800,
   22 px, **con el punto en el acento**; cargo Poppins 400, 13 px) → teléfono y correo (texto vivo, íconos Tabler outline
-  trazo 1,75 en el acento) → burbuja URL + LinkedIn → **línea que termina en la esfera** (una sola vez, 18 px antes) →
+  trazo 1,75 en el acento; **siguen con Tabler** hasta que el operador decida si los reemplaza la iconografía de la
+  línea, §0.3) → burbuja URL + LinkedIn → **línea que termina en la esfera** (una sola vez, 18 px antes) →
   cierre de marca: logo + «Empower your …» (14 px antes) → **regla de sección sin esfera** (20 px antes) → «Partner
   oficial de» + franja de logos (16 px antes).
 - **Nunca:** «Quedo atento.», «Saludos» ni ningún cierre en la firma (van en el cuerpo) · repetir la esfera en la
@@ -329,7 +370,7 @@ la órbita alrededor del logo **en objetos**. El operador decidió la excepción
 ### C2. Firma de equipo (buzón de área, `variant: 'team'`)
 
 - **Va:** **sin foto**: la misma órbita del retrato rodea el **ícono del área** (Tabler outline, trazo 1,5, 72/208 de la
-  caja) sobre un disco (`#0b2b4a` oscuro, `#eef3f7` claro); el ícono en el color del nombre y la esfera en el acento. El
+  caja; sigue con Tabler hasta que el operador decida, §0.3) sobre un disco (`#0b2b4a` oscuro, `#eef3f7` claro); el ícono en el color del nombre y la esfera en el acento. El
   nombre es el área con su punto («Talent.»), la bajada su descripción, y **sólo el correo del área**.
 - **Nunca:** teléfono ni LinkedIn personal.
 - **Áreas:** Talent (`users-group`, talent@) · Finance (`coins`, finance@) · Commercial (`briefcase`, sales@). Un área
@@ -581,6 +622,8 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 | Portada LinkedIn 1584×396 | órbita a la derecha con halo, un solo anillo, sin el logo adentro | promesa con esfera + mecanismo | `composeGraphicLine` desde L 4.1 |
 | Avatar / favicon | ninguna (el isotipo ya es órbita) | isotipo al 60 % | archivo oficial |
 | Ad con CTA | ninguna por defecto; declarada si trabaja | tres voces + CTA + logo 20–25 % | `pnpm foto:componer:cta` |
+| Objeto de Plastilina protagonista | órbita sesgada (nunca mide) | objeto en reposo, voz en el tercio inferior, firma | `skewedOrbitHeroSvg` |
+| Fila de íconos (deck, lámina, servicios) | ninguna propia | una voz, 48–56 px, responde uno solo o ninguno | `resolveIcon` + `auditIconGroup` |
 | Deck | progreso: arco por sección; 80 px en contenido; completa al cierre | voz, cifras reales, eslogan sólo al cierre | `deckSlideHtml` |
 | Portada de deck con foto | lente | foto + voz | `lensRecipe('deck-cover')` |
 | Informe A4 | portada con órbita; avance/medida sólo con dato; esfera al final de la serie | voz, figuras, pie con burbuja | catálogo Insights (L 7.x es prueba) |

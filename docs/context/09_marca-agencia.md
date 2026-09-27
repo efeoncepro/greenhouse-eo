@@ -288,6 +288,11 @@ logo es un sistema consistente, no un activo distintivo demostrado. Manual y val
 `efeonceGraphicLine` y archivos oficiales `@efeoncepro/axis-brand-assets` de AXIS 0.2.7 ·
 [índice de la carpeta](../operations/brand-graphic-line/README.md).
 
+**Íconos (desde el 2026-09-26):** la línea tiene iconografía propia en dos voces —**Trazo**, lo que se mide (Growth,
+Engine, Revenue), y **Plastilina**, lo que se crea (Brand)—; la esfera es un estado (responde uno solo) y no aplica a
+clientes ni a la UI de Greenhouse. Fuente de verdad en AXIS (`efeonceGraphicLine.icons`,
+`@efeoncepro/axis-graphic-line/icons`): [manual §14](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#14-iconografía-trazo-y-plastilina).
+
 ## Identidad en informes
 
 Todos los informes de Efeonce aplican el [estándar de marca y entrega](../operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md): pie institucional, URL bubble oficial, contacto, logos de Efeonce y del cliente cuando corresponda, tipografías de marca y gráficos con evidencia. Los valores se resuelven desde sus fuentes canónicas, sin duplicarlos en este contexto.

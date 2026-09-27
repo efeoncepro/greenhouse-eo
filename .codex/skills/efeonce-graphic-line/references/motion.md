@@ -1,7 +1,8 @@
 # Movimiento de la órbita
 
-> Verificado contra: axis-design-system@e26bd85 y greenhouse-eo@051660d73 — 2026-09-26 (decisiones del operador D7 y D8
-> del 2026-09-26 registradas).
+> Verificado contra: axis-design-system@e26bd85 (íconos: AXIS `main@5b8ab20`, tag `v0.3.6`) y greenhouse-eo@051660d73
+> — 2026-09-26 (decisiones del operador D7 y D8 del 2026-09-26 registradas; el motion de los íconos sigue pendiente
+> tras D22).
 > Norma: `docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`.
 > Producción: `docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md` (v1.3).
 > Valores: tokens `efeonceGraphicLine.motion` en `@efeoncepro/axis-tokens` ≥ 0.3.3 (la 0.3.2 salió sin `motion`).
@@ -15,6 +16,12 @@
 
 La órbita sola se compone con cualquier firma o texto. Las animaciones del logo son piezas cerradas de marca propia:
 nunca para clientes ni para la interfaz de Greenhouse.
+
+**Íconos (Trazo y Plastilina): el movimiento no está definido.** La iconografía es canónica (D16–D22), pero su motion
+figura como pendiente en AXIS (`docs/agent-composition/iconography.md`, «Pendiente de decisión»): necesita los tokens
+`axisMotion` y esta norma. No hay tiempos, curvas ni coreografía aprobados —ni para el paso de reposo a respuesta ni para
+la órbita sesgada—: no los inventes. Una propuesta va al operador y, si se aprueba, sus valores entran a los tokens y a
+esta referencia ([iconography.md](iconography.md)).
 
 ## Las siete reglas (resumen operativo; el detalle y el porqué están en la norma)
 

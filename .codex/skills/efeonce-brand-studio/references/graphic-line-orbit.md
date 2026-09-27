@@ -168,6 +168,17 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
 exige cambiar el token y su prueba, no el documento. Antes de fijar una versión en un consumidor, verificar en qué
 versión publicada está el export (no asumirlo).
 
+## Íconos de la línea: Trazo y Plastilina (canónicos 2026-09-26, D16–D22)
+
+Sólo marca propia. Voz por la línea de la **pieza**: **Trazo** = lo que se mide (Growth, Engine, Revenue); **Plastilina**
+= lo que se crea (Brand); Voice, por decidir. La esfera es un estado: reposo por defecto; responde uno solo y sólo si la
+pieza no tiene otra esfera. Plastilina protagonista va en su **órbita sesgada** (`skewedOrbitHeroSvg`: objeto en reposo,
+nunca mide, nunca cruza texto). Glifos de `ICON_CATALOG`, pintados con `resolveIcon`, grupo auditado con `auditIconGroup`
+(`@efeoncepro/axis-graphic-line/icons` 0.4.0; Greenhouse aún no lo consume: para una pieza, `pnpm icons:export` en AXIS).
+**Nunca** un ícono dibujado o generado suelto: el alta va por `pnpm icons:check` (+ `icons:vectorize` en Plastilina) y
+aprobación del operador. Guía `axis-design-system/docs/agent-composition/iconography.md`; criterio en
+[`efeonce-graphic-line`](../../efeonce-graphic-line/references/iconography.md).
+
 ## Componer con agentes (contrato `efeonce.graphic-line-orbit` 0.3.0)
 
 Una pieza con la órbita se compone por **intención**, no con coordenadas. Contrato `0.3.0` (`stable`), manifest
@@ -289,6 +300,7 @@ el pre-push `scripts/ci/large-blob-gate.mjs` bloquea blobs grandes.
 | Tokens | `efeonceGraphicLine` en `@efeoncepro/axis-tokens` 0.3.3 | valores, `pieces`, `portrait`, `emailSignature` y `motion` |
 | Archivos oficiales | `@efeoncepro/axis-brand-assets` 0.3.0 | logos, isotipos, burbujas y 48 órbitas; el Lab los sincroniza en cada build (`pnpm brand:sync`) |
 | Órbita pintada | `@efeoncepro/axis-graphic-line` 0.3.1 | recetas, motion, React y Web Component (Greenhouse no lo usa) |
+| Íconos | `@efeoncepro/axis-graphic-line/icons` 0.4.0 · `efeonceGraphicLine.icons` (tokens 0.3.6) · https://axis.efeonce.org/references/iconography/ | Trazo y Plastilina: catálogo, `resolveIcon`, `auditIconGroup`, órbita sesgada |
 | Motion | `docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md` · `EFEONCE_ORBIT_REVEAL_MOTION_V1.md` | norma del lenguaje de movimiento · spec de reveal, apertura y sting V1.1 |
 | Adapter | `scripts/creative/layout-compiler/graphic-line.mjs` | resolver + pintor + medición de firma |
 | Canvas (taller, privado) | https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii | 40 láminas, 7 capítulos (lámina 4.9 «Oficina en foto»); exploración, no fuente |
@@ -311,6 +323,8 @@ La página de AXIS es pública: lo que allí aparece queda expuesto.
       al isotipo. URL nunca como texto; en correo, enlazada.
 - [ ] Foto del banco o del pipeline `foto:*`; sin velo, sin emblema legible, nadie mira al lente; en fotos generadas,
       logo chico y puntuación revisados al 100 %.
+- [ ] Íconos sólo del `ICON_CATALOG` vía `resolveIcon`, una voz por grupo, `auditIconGroup(items, { pieceHasSphere })`
+      sin issues; ninguno dibujado o generado suelto.
 - [ ] «Te hacemos visible» sólo con su prueba y sin pauta mientras falte la revisión legal.
 - [ ] Nada de esto aprueba ni publica la pieza.
 

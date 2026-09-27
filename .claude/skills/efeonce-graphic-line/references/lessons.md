@@ -43,6 +43,15 @@
   pero el maestro `IconoE` lo pinta en tinta; y la geometría vivía sólo en el canvas. Regla: toda receta se contrasta
   contra el código del maestro antes de publicarse, la geometría canónica vive en código versionado (hoy AXIS: `@efeoncepro/axis-graphic-line/icons`), y
   un método nuevo se prueba con un subagente sin contexto antes de darlo por documentado.
+- **Un glifo puede pasar todas las reglas medibles y no ser de la familia (íconos, segunda prueba a ciegas,
+  2026-09-26).** Síntoma: un agente sin contexto armó una fila de Growth, un calendario de Trazo y una guitarra de
+  Plastilina sólo con la documentación; la guitarra, con el mástil fino, pasaba los controles y aun así no se leía como
+  Plastilina (masa gorda, carácter). Causa: `pnpm icons:check` mide el peso —área contra el rango del set, aire de la
+  esfera, margen, gesto—, no el carácter; lo que tuvo que inventar el agente (margen en el eje, vocabulario de `use`,
+  especificación del gesto, criterio para elegir la variante) se agregó a la guía y a los comandos de AXIS (commit
+  `d9c62f4`, tag `v0.3.6`). Regla: un control verde no da de alta un glifo; el alta necesita las hojas de control
+  **y** el ojo del operador junto al set aprobado. Si un glifo «pasa» pero se ve distinto, se descarta la variante, no
+  se afloja la regla.
 
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 

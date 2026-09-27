@@ -46,6 +46,16 @@ copian la implementación visual del Lab. La versión privada publicada continú
 adopción runtime en Greenhouse, Globe o los compositores hasta completar release, adapter y evidencia de cada
 consumer. El runbook de consumo conserva la secuencia autorizada y este mapa no autoriza bump ni promoción.
 
+## Actualización — 2026-09-26: iconografía de La órbita publicada en AXIS
+
+El tag `v0.3.6` de AXIS (PR `efeoncepro/axis-design-system#3`, mergeado) publicó la iconografía canónica de la marca
+propia Efeonce: `@efeoncepro/axis-tokens` `0.3.6` (`efeonceGraphicLine.icons`) y `@efeoncepro/axis-graphic-line`
+`0.4.0` (subpath `/icons`), con página en el Lab (`/references/iconography/`). AXIS es la fuente de verdad; Greenhouse
+sólo la documenta (manual de la línea §14). **No hay adopción runtime en Greenhouse:** `develop` fija `axis-tokens` y
+`axis-ui-contracts` en `0.3.5` y no depende de `axis-graphic-line`. El acceso de Actions es por paquete y se conserva
+entre versiones; un consumidor nuevo necesita su propio `Read` (runbook, Delta 2026-09-26 (d)). Este mapa no autoriza
+el bump.
+
 ---
 
 ## 0. Los cuatro actores, y por qué confundirlos es caro

@@ -1,7 +1,8 @@
 # El criterio de la órbita: cuándo, cómo, con qué y por qué
 
-> Verificado contra: axis-design-system@e26bd85 y greenhouse-eo@7cb24df17 — 2026-09-26 (decisiones del operador D1–D17
-> del 2026-09-26 registradas; ver [ledger.md](ledger.md)).
+> Verificado contra: axis-design-system@e26bd85 (iconografía §3.14: AXIS `main@5b8ab20`, tag `v0.3.6`) y
+> greenhouse-eo@7cb24df17 — 2026-09-26 (decisiones del operador D1–D22 del 2026-09-26 registradas; ver
+> [ledger.md](ledger.md)).
 > Fuentes: láminas del canvas reconstruidas en AXIS (`apps/lab/src/data/graphic-line-elements.json`, citadas como
 > «lámina X.Y»); página del Lab `apps/lab/src/pages/references/graphic-line.astro` («Lab X.Y»); manual
 > `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` («manual §»); ADR
@@ -229,7 +230,7 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
 
 - **Significan:** lo que orbita a Efeonce: los productos y Greenhouse en el portafolio, o los canales donde medimos.
 - **Cómo:** discos pequeños con el ícono del canal o del producto sobre la órbita exterior, con el arco largo en degradé
-  y **sin esfera** (lámina 1.2). En el mapa de portafolio, el arco y el centro son de Efeonce; Globe, Wave, Reach y
+  y **sin esfera** (lámina 1.2). Un ícono de la iconografía en un satélite va siempre en **reposo** (§3.14). En el mapa de portafolio, el arco y el centro son de Efeonce; Globe, Wave, Reach y
   Greenhouse orbitan con su isotipo: **son contexto, no firma** (lámina 3.2; Lab 3.2).
 - **Nunca:** logos de terceros presentados como alianzas. «Los satélites de canales muestran dónde medimos, no con quién
   nos asociamos» (lámina 0.2, «No hacer»). Las alianzas reales sólo se declaran en la zona de partners de la firma de
@@ -310,27 +311,49 @@ Decisión del operador (2026-09-26): todas las formas que el canvas exploró sig
 | **Con órbitas interiores** | sólo una órbita vacía: anatomía, portafolio |
 | **Con satélites** | arco largo en degradé, sin esfera; el portafolio o los canales |
 | **Un dato** | la esfera recorre hasta el valor con su estela corta |
+| **Órbita sesgada** (D20) | sólo alrededor del objeto protagonista de Plastilina: su firma; nunca mide (§3.14) |
 | **Lente**, **foco**, **marca de estado**, **cierre de marca**, **mapa de familia** | sus trabajos de 3.8 a 3.12 |
 
 Elegir una forma es elegir un trabajo. Si ninguna calza con el trabajo de la pieza, la respuesta no es inventar una
 sexta: es no usar órbita.
 
-### 3.14 Íconos — reposo y respuesta
+### 3.14 Íconos — dos voces, la esfera como estado
 
-- **Decisión del operador (2026-09-26, D16):** el ícono de la línea es un **híbrido**. En **reposo** es trazo limpio,
-  sin acento: el ícono de todos los días. En **respuesta** una sola esfera en el acento marca dónde se resuelve la
-  acción: o una pieza del glifo se vuelve esfera (la punta de la flecha de Revenue, el tope de la barra de Medición), o
-  la esfera aparece donde se resuelve (el centro de la lupa). La esfera es un **estado**, no parte del dibujo.
-- **Por qué:** conserva la gramática de la marca («la esfera responde») sin gastar la esfera en cada ícono. El trazo
-  limpio convive con cualquier pieza; la respuesta se reserva para lo que importa.
-- **Cuándo responde (aprobado 2026-09-26, D17):** sólo el ícono activo o protagonista, desde 20 px. Si la pieza ya tiene esfera —la de
-  la órbita o la que cierra la respuesta—, el ícono descansa. En listas, tablas, contacto y satélites, reposo.
-- **Error típico:** todos los íconos de una fila respondiendo. La esfera se vuelve viñeta (el mismo error de la esfera
-  repetida, sección 3.3).
+> **Canónica desde el 2026-09-26 (D16–D22).** La fuente de verdad es **AXIS**: valores en `efeonceGraphicLine.icons`
+> (`@efeoncepro/axis-tokens` 0.3.6), geometría y reglas ejecutables en `@efeoncepro/axis-graphic-line/icons` (0.4.0),
+> guía `axis-design-system/docs/agent-composition/iconography.md`, Lab `axis.efeonce.org/references/iconography/`. Aquí
+> va sólo el criterio; el detalle y la historia, en [iconography.md](iconography.md).
+
+- **Significa:** la esfera no es parte del dibujo: es un **estado**. En **reposo** el ícono es sólo su forma; en
+  **respuesta** aparece una esfera en el acento de la línea de servicio **de la pieza** (D16). Conserva la gramática de
+  la marca («la esfera responde») sin gastar la esfera en cada ícono.
+- **Dos voces (D19, D22):** **Trazo** dice lo que se mide (Growth, Engine, Revenue: decks, informes, listas, firmas,
+  navegación); **Plastilina** dice lo que se crea (Brand: piezas sociales, portadas, stickers, momentos del oficio).
+  Voice todavía no tiene voz fija: se elige con criterio y se declara en la pieza. La voz sale de la línea
+  (`iconVoiceForLine`), nunca del gusto. **Nunca se mezclan en un mismo grupo**; si conviven en una pieza, Plastilina
+  manda en grande y el Trazo apoya en chico, en grupos separados.
+- **Color (D18, D21):** fondo Efeonce `#001a33` en **todas** las líneas, tinta blanca sobre oscuro y navy sobre papel, y
+  el acento **sólo en la esfera**. El acento es de la línea de la pieza, nunca del objeto («el pincel en naranja» es un
+  error). Los valores salen de `resolveIcon`, nunca transcritos.
+- **Cuándo responde (D17):** responde **uno solo** —el activo o protagonista— y sólo si la pieza no tiene otra esfera
+  (la de una órbita, la que cierra la respuesta, un marcador de estado). Dentro de una órbita, en listas, tablas,
+  contacto, navegación y satélites: reposo. El Trazo responde desde 20 px; Plastilina no baja de 32 px (más chico, el
+  Trazo).
+- **Órbita sesgada (D20):** la firma de Plastilina. Una elipse inclinada −16° alrededor del objeto protagonista, que
+  pasa por detrás arriba y por delante abajo; el objeto va en **reposo** y la esfera la pone la órbita. Una por pieza,
+  nunca cruza el texto y **nunca mide**: lo que mide, enfoca o cierra la marca sigue siendo la órbita circular.
+- **Cómo:** glifo de `ICON_CATALOG` (12 de Trazo, 18 de Plastilina) → `resolveIcon` → `auditIconGroup(items,
+  { pieceHasSphere })` antes de entregar; Plastilina protagonista con `skewedOrbitHeroSvg`.
+- **Un glifo que no existe no se dibuja dentro de la pieza:** se da de alta en AXIS (`pnpm icons:check`; Plastilina,
+  antes `pnpm icons:vectorize`) y lo aprueba el operador. El control mide el peso, no el carácter: que se lea como
+  familia lo decide un ojo humano ([lessons.md](lessons.md)).
+- **Errores típicos:** todos los íconos de una fila respondiendo (la esfera se vuelve viñeta, como en §3.3) · Trazo y
+  Plastilina en un mismo grupo · un acento por objeto · volumen, brillo, sombra o degradé · la órbita sesgada midiendo o
+  cruzando el texto · un glifo dibujado a mano en la pieza.
 - **Descartado:** la dirección «órbita abierta» (cada contorno con un corte): compite con la órbita del isotipo en vez
-  de acompañarla.
-- Construcción, geometría canónica, contenedores y la iconografía plana en exploración:
-  [iconography.md](iconography.md).
+  de acompañarla (D16).
+- **Todavía no:** las firmas de correo y de equipo siguen con íconos Tabler hasta que el operador decida; el motion de
+  los íconos no está definido.
 
 ---
 
@@ -528,7 +551,7 @@ Cada uno tiene su fuente. Si ves uno en una pieza, no está terminada.
 |---|---|---|
 | La órbita se **llena como un loader** | un dato es la posición de la esfera con estela corta; la órbita recorre | operador 2026-09-26; Lab 1.2.1 |
 | **La esfera desaparece al 100 %** | el dato completo sigue siendo una decisión; la esfera se queda | operador 2026-09-26; token `trajectory` |
-| **Órbita ovalada** | la órbita es circular; el óvalo sólo existe en la animación del isotipo 3D | operador 2026-09-26 |
+| **Órbita ovalada** | la órbita es circular; el óvalo sólo existe en la animación del isotipo 3D y en la **órbita sesgada** de Plastilina (D20), que rodea un objeto y nunca mide | operador 2026-09-26 |
 | **Disco suelto** en la lente | la lente lleva la misma órbita: anillo, arco corto y esfera en la punta | manual §1.5; lámina 1.3 |
 | **Foco sin anillo** | el foco siempre lleva su anillo, concéntrico con la luz | operador 2026-09-26 |
 | **Órbitas interiores alrededor de una palabra** | un solo anillo alrededor del contenido | operador 2026-09-26; `inner-orbits-never-around-content` |
@@ -556,6 +579,9 @@ Cada uno tiene su fuente. Si ves uno en una pieza, no está terminada.
 | **Velo navy sobre foto de banco**, emblema legible en la ropa | la foto es oficio real; el logo lo pone la pieza | láminas 5.2, 5.6 |
 | **Valores transcritos** de una captura o un comentario | los números salen de los tokens | ADR, decisión 3 |
 | **Dos protagonistas a la vez** en movimiento, llegada suave, onda de acento como adorno | lenguaje de movimiento | norma, reglas 1 y 2 |
+| **Ícono dibujado a mano** en una pieza, o **Trazo y Plastilina en un mismo grupo** | el glifo sale de `ICON_CATALOG` con `resolveIcon`; uno nuevo pasa por `icons:check` y la aprobación; una voz por grupo | operador 2026-09-26 (D22); guía de iconografía de AXIS |
+| **Todos los íconos respondiendo**, o un ícono respondiendo junto a otra esfera | responde uno solo y sólo si la pieza no tiene otra esfera | operador 2026-09-26 (D17); `auditIconGroup` |
+| **Un acento por objeto** en los íconos («el pincel en naranja») | el acento es de la línea de la pieza y va sólo en la esfera | operador 2026-09-26 (D18) |
 | **La línea aplicada a un cliente o a la interfaz de Greenhouse** | es marca propia de Efeonce | ADR, decisión 6 |
 
 ---

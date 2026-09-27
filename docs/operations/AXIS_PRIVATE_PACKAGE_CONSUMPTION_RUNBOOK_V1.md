@@ -8,10 +8,11 @@ source control.
 
 ## Current state — 2026-09-14
 
-> **Actualizado 2026-09-26 (tarde):** hay **cinco** paquetes privados. Publicados: `axis-tokens` `0.3.3`,
-> `axis-ui-contracts` `0.3.2`, `axis-ui-registry` y `axis-brand-assets` `0.3.0`, y `axis-graphic-line` `0.3.1`.
-> Greenhouse fija en `develop` `axis-tokens` `0.3.3` y `axis-ui-contracts`, `axis-ui-registry` y `axis-brand-assets`
-> en `0.3.0`. Ver **Delta 2026-09-26 (c)** y **(b)**; la lista de abajo conserva el estado del 14.
+> **Actualizado 2026-09-26 (noche):** hay **cinco** paquetes privados. Publicados (tag `v0.3.6` del repo AXIS):
+> `axis-tokens` `0.3.6`, `axis-ui-contracts` `0.3.5`, `axis-ui-registry` y `axis-brand-assets` `0.3.1`, y
+> `axis-graphic-line` `0.4.0` (con el subpath nuevo `/icons`). Greenhouse fija en `develop` `axis-tokens` y
+> `axis-ui-contracts` en `0.3.5` y `axis-ui-registry` y `axis-brand-assets` en `0.3.1`; no depende de
+> `axis-graphic-line`. Ver **Delta 2026-09-26 (d)**, **(c)** y **(b)**; la lista de abajo conserva el estado del 14.
 
 - Package repository: `efeoncepro/axis-design-system`.
 - Agent-facing visual guide: [`DESIGN.md`](https://github.com/efeoncepro/axis-design-system/blob/main/DESIGN.md), generated from `packages/tokens` and checked with `pnpm design:check` in the AXIS repository. It is a projection for agents, not a second token source of truth.
@@ -61,6 +62,27 @@ source control.
   La evidencia del piloto pasa de **local** a **CI**.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
+
+## Delta 2026-09-26 (d) — iconografía de La órbita: `axis-tokens` 0.3.6 y `axis-graphic-line` 0.4.0
+
+- **Publicado** (tag `v0.3.6` del repo AXIS, PR `efeoncepro/axis-design-system#3` mergeado; versiones verificadas en
+  GitHub Packages el 2026-09-26 a las 23:57Z): `axis-tokens` `0.3.6` suma `efeonceGraphicLine.icons` y
+  `axis-graphic-line` `0.4.0` suma el subpath **`/icons`** (`ICON_CATALOG` con 12 glifos de Trazo y 18 de
+  Plastilina, `resolveIcon`, `auditIconGroup`, `skewedOrbitHeroSvg`). Es la iconografía canónica de la marca propia
+  Efeonce (decisiones D16–D22; manual `docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md` §14). En el
+  repo de AXIS, `pnpm icons:export|check|vectorize`; página del Lab `https://axis.efeonce.org/references/iconography/`.
+  `axis-ui-contracts` sigue en `0.3.5` y `axis-ui-registry` y `axis-brand-assets` en `0.3.1`.
+- **Tramos intermedios del mismo día** (sin delta propio): tag `v0.3.4` publicó `axis-tokens` y `axis-ui-contracts`
+  `0.3.4` (firma de correo de equipo); tag `v0.3.5` publicó `axis-tokens` y `axis-ui-contracts` `0.3.5`,
+  `axis-ui-registry` y `axis-brand-assets` `0.3.1` y `axis-graphic-line` `0.3.2` (decisiones del operador sobre la
+  línea). Greenhouse adoptó `0.3.5` en `develop` (commit `80f73da55`, todavía no en `main`).
+- **Greenhouse todavía no consume `/icons`:** no fija `axis-graphic-line` ni subió `axis-tokens` a `0.3.6`. Adoptarlo
+  es un bump explícito, con su propio commit y la lectura del veredicto de CI de ese SHA.
+- **Acceso:** el acceso de GitHub Packages es **por paquete, no por versión**. Los repos que ya tenían
+  `Manage Actions access → Read` en `axis-tokens` y `axis-graphic-line` lo conservan para `0.3.6` y `0.4.0` sin hacer
+  nada. Un repositorio **nuevo** que quiera instalarlos necesita que se le otorgue `Read` en cada paquete:
+  `https://github.com/orgs/efeoncepro/packages/npm/axis-graphic-line/settings` y
+  `https://github.com/orgs/efeoncepro/packages/npm/axis-tokens/settings` (ver §Required GitHub package access).
 
 ## Delta 2026-09-26 (c) — `axis-tokens` 0.3.3 (movimiento de la órbita) y `axis-ui-contracts` 0.3.2
 
@@ -405,6 +427,12 @@ Repeat for **every** AXIS package — today `axis-tokens`, `axis-ui-contracts`, 
 `axis-brand-assets` and `axis-graphic-line` (granted 2026-09-26) — and for **every new package** the AXIS repo publishes. Access is per package: a new package
 only grants its source repository (`axis-design-system`), and it does not inherit the consumers of the other AXIS
 packages. Do not make the packages public as a shortcut.
+
+Access is also **per package, not per version**: a repository that already has `Read` on a package keeps it for
+every new version (for example `axis-tokens` `0.3.6` and `axis-graphic-line` `0.4.0`, 2026-09-26). A **new consumer
+repository** needs the grant on each package it installs, at
+`https://github.com/orgs/efeoncepro/packages/npm/<package>/settings` → `Manage Actions access` → add the repository
+with `Read`.
 
 🔴 **Publishing a NEW AXIS package is not done until each consumer repository can install it from Actions.** Grant
 `Manage Actions access → Read` to `greenhouse-eo`, `efeonce-globe` and `efeonce-marketing-studio` (whichever will

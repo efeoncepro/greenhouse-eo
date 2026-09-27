@@ -69,6 +69,12 @@ Read only what the task needs:
 
 If the request is a real third-party logo or payment mark, stop and use `greenhouse-digital-brand-asset-designer` instead.
 
+**Íconos de la marca propia Efeonce** (no los de la UI de Greenhouse): no se generan íconos sueltos. La iconografía de
+«La órbita» (Trazo y Plastilina) es canónica en AXIS y se pinta con `resolveIcon`. Un ícono Plastilina **nuevo** se
+genera sólo con el método de AXIS: `pnpm ai:image --image ../axis-design-system/docs/agent-composition/iconography/plastilina-style-reference.png --prompt-file <plastilina-prompt.txt con {{OBJETOS}}>`,
+luego `icons:vectorize` + `icons:check` y aprobación del operador; nunca un prompt ad hoc. Ver
+`axis-design-system/docs/agent-composition/iconography.md` §Un glifo nuevo de Plastilina.
+
 For art direction, Key Visual design or **audit**, marketing/campaign imagery, visual concept/mood, or choosing which AI model to use for a task (Nano Banana / Midjourney / Ideogram / Recraft / FLUX / Firefly / Seedance / Veo, etc.), the director is the `design-studio` skill — it directs and delegates production back here for assets that live in the Greenhouse UI.
 
 ## Core Rule

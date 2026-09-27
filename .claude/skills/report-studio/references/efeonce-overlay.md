@@ -62,6 +62,13 @@ con la marca del cliente ni en Greenhouse. Valores desde los tokens `efeonceGrap
 - **Hoja membretada A4 (§10.7):** logo arriba a la izquierda, la órbita recortada en la esquina superior derecha al
   18 % en navy, la línea del pie termina en la esfera; texto en Poppins 11 pt; nunca la órbita detrás del texto; la
   continuación no lleva órbita. El contenido del pie (URL, dirección, teléfono) sigue el contrato de arriba.
+- **Íconos (canónicos desde 2026-09-26, sólo marca Efeonce; nunca en informes con marca del cliente):** un informe mide,
+  así que usa **Trazo**: glifos de `ICON_CATALOG` pintados con `resolveIcon` de `@efeoncepro/axis-graphic-line/icons`
+  (`pnpm icons:export` en AXIS mientras Greenhouse no consuma el paquete), nunca dibujados a mano ni con HEX o px
+  transcritos. En listas, tablas y contacto van en **reposo** (la esfera nunca es viñeta); en un grupo responde uno
+  solo, en el acento de la línea del informe, y ninguno si la página ya tiene esfera. Un glifo que falta se da de alta
+  (`icons:check` + aprobación). Criterio: `.claude/skills/efeonce-graphic-line/references/iconography.md`; guía en AXIS
+  `docs/agent-composition/iconography.md`.
 
 ## Responsabilidad editorial
 
