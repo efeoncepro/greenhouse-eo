@@ -46,6 +46,28 @@ o multi-voz rápido. Verificar términos de licencia antes de uso comercial.
 
 `media_enhance_speech` — enhance/limpieza de voz grabada (útil para VO/podcast con ruido).
 
+## Rutas vía fal verificadas (2026-09-26)
+
+Medidas al producir la identidad sonora de Efeonce (`EFEONCE_OVERLAY.md` §Identidad sonora). Scripts en
+`ai-generations/2026-09-26_branding-sonoro/motor/` (binarios fuera de git):
+
+| Ruta | Modelo fal | Lo medido | Script |
+|---|---|---|---|
+| TTS | `fal-ai/elevenlabs/tts/eleven-v3` | input `voice` por nombre (Brian) | `voz.ts` |
+| STT | `fal-ai/elevenlabs/speech-to-text` | devuelve `words` con `start`/`end`: sirve para caer la esfera sobre una palabra | `transcribir.ts` |
+| Música | `elevenlabs/music/v2.5` (sin prefijo `fal-ai`; USD 0,60/min) | acepta `composition_plan.chunks[].audio_reference` (`strength` low\|medium\|high\|xhigh, ventana ≤ 30 s, líneas ≤ 200 caracteres). Suena más producido pero **no respeta la estructura**: con high/xhigh se saltó el corte y el golpe final. **ElevenLabs Music v3 NO está en fal** | `ai-music.ts` |
+| Re-grabación | `fal-ai/stable-audio-25/audio-to-audio` (USD 0,20 por pieza) | **conserva el tiempo al milisegundo** (golpe 32,874 s vs 32,875 de la maqueta); **redondea la duración a segundos enteros** (8,5 → 8): maquetas de duración entera | `ai-music.ts` |
+
+- **Espera y recuperación:** `runFalModel` espera 120 s por defecto; para música usa `pollTimeoutMs` mayor. Un
+  trabajo vencido se recupera **sin volver a pagar** con `awaitFalRequest` (`recuperar.ts`). Costo: `precio.ts`.
+- **Conector MCP de ElevenLabs:** credencial mal cargada (se cargó el ID de la clave, no la clave `sk_…`; error
+  `api_key_id_used_as_api_key`). Mientras no se corrija, ElevenLabs va por fal.
+- **Método «maqueta propia → re-grabación IA → sello propio encima»:** la estructura y el tiempo salen de una
+  maqueta determinística propia (`rock.mjs`, `composer.mjs`, `dsp.mjs`); Stable Audio 2.5 audio-to-audio la
+  re-graba (intensidad 0,7) conservando el tiempo; la esfera propia (campana La + golpe grave) se monta encima
+  como pista (`sello.mjs`). Masterización por destino con `master.sh <in> <out> <LUFS> [shelf]`
+  (loudnorm en dos pasadas, por sonoridad, nunca por pico). Logo/sting/reveal/apertura: `sonic-engine.mjs`.
+
 ## Router de producción (elige la mano correcta)
 
 - **VO/narración de producción** → ElevenLabs v3 (o humano si es marca premium con emoción).

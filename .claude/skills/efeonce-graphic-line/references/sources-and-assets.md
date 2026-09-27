@@ -15,6 +15,7 @@
 | Pintura | paquete `@efeoncepro/axis-graphic-line` (recetas que reproducen las piezas medidas) | el contrato |
 | Fotografía | `docs/operations/brand-photography/` (lenguaje fotográfico, reservas, firma en primer plano) | el operador |
 | Iconografía (Trazo y Plastilina, D16–D22) | AXIS: valores `efeonceGraphicLine.icons` (`axis-tokens` ≥ 0.3.6), geometría y reglas `@efeoncepro/axis-graphic-line/icons` (≥ 0.4.0), guía `docs/agent-composition/iconography.md`, ADR `docs/architecture/ICONOGRAPHY_DECISION_V1.md`. En Greenhouse sólo el criterio ([iconography.md](iconography.md)) | el token y el paquete; las decisiones, el operador (ledger) |
+| Identidad sonora (**recomendada, no canon**, 2026-09-26) | Greenhouse `docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md`; AXIS (PR #4, squash `55486aa`, publicado 2026-09-26): página `https://axis.efeonce.org/references/sonic-brand/`, JSON `/references/sonic-brand.json` (esquema `axis.efeonce-sonic-brand.v1`), guía `docs/agent-composition/sonic-brand.md`, fuentes Lab `apps/lab/src/data/sonic-brand.ts` y `sonic-brand-assets.ts`. Sin tokens hasta canonizar | el operador (ledger); archivos, el kit |
 
 Si un doc y el código no coinciden, manda el código verificado y se corrige el doc (con fecha).
 
@@ -49,6 +50,7 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
 |---|---|
 | Logos, isotipos, burbujas URL, 48 órbitas estáticas | `@efeoncepro/axis-brand-assets` (nunca copias a mano) |
 | Masters del motion del logo | `gs://efeonce-group-axis-public-media/motion/logo/v1.1/…` (público, CORS para el Lab) |
+| Kit de la identidad sonora (recomendada) | `gs://efeonce-group-axis-public-media/sonic/v1/` → `masters/` (logo, etiqueta con voz, motion WAV+MP4 16:9/9:16, piezas largas, cierre de energía, voz sola) y `web/` (MP3, MP4 720p, pósters WebP); 65 archivos. Producción: `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/`, `entrega/`, `guia/`; binarios fuera de git) |
 | MP4, GIF y cuadros finales para el equipo | OneDrive `Alineación/5. Contenidos/13- Branding/Motion Órbita Efeonce/v1.1/` |
 | Versiones web del motion y pósters | Lab `apps/lab/public/media/graphic-line/motion/` |
 | Fotos de las láminas (lente, oficina, merch) | Lab `apps/lab/public/media/graphic-line/assets/` (`of-*.webp`, `ia-*.webp`, `L*-*.webp`) |

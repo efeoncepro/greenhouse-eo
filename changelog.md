@@ -7,6 +7,21 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-26 — Identidad sonora de Efeonce recomendada: «Tres puntos que se vuelven uno» (AXIS /references/sonic-brand/)
+
+El operador aprobó como recomendada (no canon) la identidad sonora de la marca: el logo sonoro Mi · Mi · Mi → La traduce
+la gramática de La órbita (el anillo pregunta, tres notas piensan, la esfera responde con el único golpe), con dos
+registros del mismo ADN —fondo (96 BPM, síntesis propia) y energía (120 BPM, rock: maqueta propia re-grabada con Stable
+Audio 2.5 y la esfera propia encima)—, el timbre de la esfera por línea de servicio (Growth campana, Brand marimba, Engine
+FM, Voice eco, Revenue campana grave) y la etiqueta «Empower your <Línea>» con la voz de Brian (ElevenLabs v3). Re-sonoriza
+reveal, apertura y sting V1.1 sin tocar la imagen, en 16:9 y 9:16. Publicado en AXIS (PR efeoncepro/axis-design-system#4):
+página `/references/sonic-brand/`, JSON para agentes con URL y SHA-256 por archivo y guía `docs/agent-composition/sonic-brand.md`;
+65 archivos en el bucket público `sonic/v1`. Valores fuera de `axis-tokens` hasta canonizar. Pendiente: Glitch, licencias,
+prueba de reconocimiento sin logo y reemplazo del sonido de los masters V1.1. Canon
+[`EFEONCE_SONIC_IDENTITY_V1.md`](docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md), ADR Proposed, doc funcional,
+manual, regla `.claude/rules/brand-sonic.md` y skills `audio-studio`, `efeonce-graphic-line`, `axis-design-system`,
+`motion-design-studio` y `efeonce-brand-studio`. Producción: `ai-generations/2026-09-26_branding-sonoro/`.
+
 ## 2026-09-26 — Iconografía de La órbita canónica: Trazo y Plastilina (AXIS v0.3.6)
 
 El operador canonizó la iconografía de la línea (D16–D22) en dos voces de una familia: **Trazo** (lo que se mide;
@@ -564,13 +579,3 @@ tiene habilitado (`gemini-3-pro-image`), pero el generador del producto usa Nano
 Gemini Image. Se mantiene por Google directo, igual que Gemini Omni Flash. Kling 3 y Grok Imagine quedaron
 revisados y documentados como candidatos, sin conectar.
 
-## 2026-09-16 — Berel: Colores de Temporada 2027 sin canibalizar el ciclo 2026
-
-El nuevo ciclo nace en su propia página (`/articulos/colores-de-temporada-2027`) y la página genérica existente
-queda como el ciclo 2026 sin cambios, porque el layout de pillar todavía no existe. La separación se sostiene con
-Search Console de 16 meses: la página actual vive de marca y catálogo y no gana clics por «colores de temporada».
-En el Content Hub quedaron research (material oficial de las cuatro paletas, Semrush y Search Console), plan
-editorial y SEO, el artículo N61 en revisión con fichas N1–N4 y un desplegable aparte de notas internas; el gate de
-copy visible pasó sobre la página releída. La skill `berel-content-production` (espejo `.claude`/`.codex`) suma
-Color del Año 2027, las paletas, la regla de página de ciclo anual y la de notas internas.
-[Detalle](docs/audits/seo/BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md)

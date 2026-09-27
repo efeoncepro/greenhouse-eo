@@ -32,6 +32,7 @@ propón agregarlo.
 | Decidir qué forma o receta usar y componer la pieza, con ejemplos completos | [references/composition.md](references/composition.md) |
 | Una pieza con foto, o briefear una foto que llevará la órbita | [references/photography-convergence.md](references/photography-convergence.md) |
 | Animar (la órbita sola o las animaciones del logo) | [references/motion.md](references/motion.md) |
+| **Sonido de la marca**: logo sonoro, motion con sonido y etiqueta con voz (identidad **recomendada**, no canon; Glitch pendiente) | [references/motion.md](references/motion.md) §Sonido · [canon](../../../docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md) · skill `audio-studio` · AXIS `/references/sonic-brand.json` |
 | Dónde está cada doc, archivo, medio y repositorio | [references/sources-and-assets.md](references/sources-and-assets.md) |
 | **Íconos**: las dos voces canónicas (Trazo y Plastilina), la esfera como estado, cuándo responde, la órbita sesgada y cómo dar de alta un glifo nuevo. **Fuente de verdad en AXIS**: `efeonceGraphicLine.icons` + `@efeoncepro/axis-graphic-line/icons` (`resolveIcon`, `auditIconGroup`) y `pnpm icons:*` | [references/iconography.md](references/iconography.md) |
 | Revisar antes de entregar | [references/qa-checklist.md](references/qa-checklist.md) |

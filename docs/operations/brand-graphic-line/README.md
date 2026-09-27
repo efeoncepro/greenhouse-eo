@@ -43,6 +43,7 @@ manual, la decisión y los entregables para personas.
 - El manual técnico manda en reglas y medidas; los tokens de AXIS mandan en valores. Cambiar un valor exige cambiar el
   token y su prueba, no sólo el documento.
 - Si cambia una regla, se actualizan el manual, la fuente del PDF y, cuando corresponde, se regenera el PDF.
-- Relacionados: [lenguaje fotográfico](../brand-photography/README.md) ·
+- Relacionados: [identidad sonora](../brand-sonic/README.md) (recomendada, no canon; re-sonoriza el motion del logo) ·
+  [lenguaje fotográfico](../brand-photography/README.md) ·
   [selección de referencias de marca](../EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md) ·
   [estándar de informes](../EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md) · `docs/context/09_marca-agencia.md`

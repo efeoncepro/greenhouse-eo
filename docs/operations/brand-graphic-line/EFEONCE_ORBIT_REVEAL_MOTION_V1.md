@@ -127,6 +127,11 @@ de aire de la nave (paneado con su recorrido), un golpe grave de llegada y un ac
 Formato WAV de 48 kHz y 24 bits. Medido: reveal −17,7 LUFS con pico de −3,0 dBFS; apertura −17,5 LUFS con pico de −2,2 dBFS.
 En la entrega va mezclado en los MP4, con fundido final de 0,45 s.
 
+> **Delta 2026-09-26 — identidad sonora recomendada.** La identidad sonora de Efeonce (recomendada, todavía no canon)
+> re-sonoriza el reveal, la apertura y el sting sin tocar la imagen; sus versiones están en
+> `gs://efeonce-group-axis-public-media/sonic/v1/masters/03-motion`. El sonido descrito arriba sigue vigente en los
+> masters V1.1 hasta canonizarla. Ver [`EFEONCE_SONIC_IDENTITY_V1.md`](../brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md).
+
 ## 6. Entregables
 
 Por cada pieza, formato (16:9 1920×1080, 16:9 4K 3840×2160, 1:1 1080, 4:5 1080×1350, 9:16 1080×1920) y fondo

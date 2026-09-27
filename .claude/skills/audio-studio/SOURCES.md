@@ -93,6 +93,8 @@ y en H3 descártalo en post.
 | **Suno** (v4.5/v5) | **mejor calidad de output** (géneros, letras, prompt-following) | asentándose (demandas de training-data; settlements con sellos a fin 2025) | calidad / interno / no-comercial |
 | **Udio** | calidad + **historia de licencia limpia** (UMG settled oct-2025; plataforma UMG×Udio 2026) | más clara que Suno | cuando quieres calidad con licencia más clara |
 | **Seed Audio 1.0** | música + SFX + diálogo integrados | vía Volcano Ark (verificar términos) | escena de audio completa en una pasada |
+| **ElevenLabs Music v2.5 vía fal** *(as-of 2026-09-26)* | `elevenlabs/music/v2.5` (sin prefijo `fal-ai`; USD 0,60/min); `composition_plan.chunks[].audio_reference`; suena producido pero **no respeta la estructura** (high/xhigh se saltó corte y golpe final). **v3 NO está en fal** | la de ElevenLabs Music (arriba); confirmar cómo aplica vía fal | pieza libre sin estructura dura; no para logos/golpes a tiempo |
+| **Stable Audio 2.5 audio-to-audio vía fal** *(as-of 2026-09-26)* | `fal-ai/stable-audio-25/audio-to-audio` (USD 0,20/pieza); re-graba una maqueta **conservando el tiempo al ms**; redondea la duración a segundos enteros | Stability declara uso comercial (datos licenciados); licencia comunitaria gratuita hasta USD 1M de facturación anual, sobre eso Enterprise; fal lo marca «Commercial use». **Falta confirmar con legal cómo aplica vía fal** | re-grabar una maqueta propia cuando el tiempo manda (identidad sonora Efeonce, registro energía) |
 
 ### SFX y enhance/restore
 

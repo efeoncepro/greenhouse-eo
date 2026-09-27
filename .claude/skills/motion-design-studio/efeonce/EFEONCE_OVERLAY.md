@@ -31,6 +31,12 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   `public/branding/logo-full.svg` · `logo-full.png` · `logo-negative.svg` (para fondo oscuro) ·
   `SVG/isotipo-efeonce-negativo.svg` (isotipo) · `pdf/efeonce-wordmark-white.png`. Embeber el asset real
   (mograph/HTML `<img src>`); el logo se compone en post, nunca lo renderiza un modelo de video.
+- **Sonido de marca Efeonce (identidad sonora recomendada, 2026-09-26; no canon):** el logo sonoro «Tres puntos que se
+  vuelven uno» (Mi · Mi · Mi → La) re-sonoriza reveal, apertura y sting V1.1 sin tocar la imagen (la esfera cae con el
+  golpe: 0,58 / 1,87 / 1,15 s) y trae dos registros (fondo y energía) y la etiqueta con voz de Brian. Para sonorizar una
+  pieza de marca, **usa los archivos del kit** por URL + sha256 (`https://axis.efeonce.org/references/sonic-brand.json`),
+  nunca regeneres logo, voz ni esfera; el craft lo lleva `audio-studio`. Glitch (podcast) está pendiente. Canon:
+  [`EFEONCE_SONIC_IDENTITY_V1.md`](../../../../docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md).
 - **Cierre de marca 4,5 s — línea gráfica «La órbita» (canónica desde 2026-09-25):** el end-card de la marca propia
   Efeonce y su familia (nunca de un cliente) sigue el
   [manual §10.1](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md). La línea de tiempo

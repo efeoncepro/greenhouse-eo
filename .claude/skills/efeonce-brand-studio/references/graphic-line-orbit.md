@@ -260,6 +260,12 @@ de https://axis.efeonce.org/references/graphic-line.
   `gs://efeonce-group-axis-public-media/motion/logo/v1.1/<anim>/<formato>/<fondo>/`; MP4, GIF, cuadros y LEEME en
   OneDrive `13- Branding/Motion Órbita Efeonce/v1.1`. Nunca en git.
 - **Una cola de render a la vez:** dos colas en paralelo corrompieron 4 MP4; `run-all.sh` ya lleva candado.
+- **Sonido — identidad sonora recomendada (2026-09-26, no canon):** «Tres puntos que se vuelven uno» (Mi Mi Mi → La;
+  la esfera = la nota-respuesta con el único golpe; el acento de la línea es su timbre). Re-sonoriza reveal, apertura y
+  sting sin tocar la imagen; los masters V1.1 siguen con el sonido de `orbit-sound.mjs` hasta canonizar. Vive en AXIS
+  `/references/sonic-brand/` (PR #4) y en el bucket `sonic/v1/`; Glitch pendiente. Detalle en
+  [`EFEONCE_SONIC_IDENTITY_V1.md`](../../../../docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md) y en la skill
+  `audio-studio` (`efeonce/EFEONCE_OVERLAY.md`).
 
 ## Fotografía generada con IA para la línea
 

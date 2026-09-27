@@ -67,6 +67,13 @@
 - **Íconos:** el inventario del set (qué íconos necesita la marca) y si reemplaza a los Tabler outline de la firma de
   correo y de equipo. La **iconografía plana** complementaria (rayo, paleta, pincel, cuentagotas, bombillo, tablet,
   laptop, Mac de escritorio, teléfono) está en exploración: tres tratamientos en el canvas; no se usa hasta decidir.
+- **Identidad sonora (2026-09-26): recomendada, NO canon** («vamos con tu recomendación»). Elecciones del operador:
+  territorio «Puntos suspensivos» (Mi Mi Mi → La); acento por línea como timbre de la esfera (Voice = eco); etiqueta
+  con voz en cierres con **Brian** (las cinco tomas aprobadas); reveal con y sin voz; apertura tal cual; pieza larga en
+  dos registros, **fondo** y **energía** (rock re-grabado con Stable Audio 2.5). **Pendiente:** Glitch (podcast, sin
+  decisión: al operador «aún no le convence»); licencias (Stable Audio vía fal; voz ElevenLabs); prueba de
+  reconocimiento sin logo antes de pautar (como D14); valores a tokens junto a `motion.sound` y reemplazo del sonido
+  de los masters V1.1; (publicado en AXIS: PR #4, squash `55486aa`). Detalle: [motion.md](motion.md) §Sonido.
 
 ### Pendiente de implementación (decidido, falta código o texto)
 

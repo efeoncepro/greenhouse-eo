@@ -1,6 +1,9 @@
 # Branding sonoro Efeonce — ronda 1 (2026-09-26)
 
-Estado: **versión recomendada armada** (2026-09-26), sin canonizar. Guía: https://claude.ai/artifact/NgfYHfeNJX6Frjco6hXtnG · historial de rondas: la sala de escucha. Sala de escucha: https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9
+Estado: **versión recomendada armada** (2026-09-26), sin canonizar. **Publicada en AXIS:** https://axis.efeonce.org/references/sonic-brand/ + `/references/sonic-brand.json`
+(PR efeoncepro/axis-design-system#4, squash `55486aa`); archivos en `gs://efeonce-group-axis-public-media/sonic/v1/`
+(índice medido en `bucket-index.json`, generador de `sonic-brand-assets.ts`). Canon en Greenhouse:
+`docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md`. Guía: https://claude.ai/artifact/NgfYHfeNJX6Frjco6hXtnG · historial de rondas: la sala de escucha. Sala de escucha: https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9
 
 ## Decisiones del operador (2026-09-26)
 

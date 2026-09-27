@@ -142,6 +142,24 @@ identidad. Reglas de la sinergia:
 - Cohesión rota: cada touchpoint con timbre distinto → deja de leerse como una marca.
 - Copiar un mnemonic famoso "de referencia" → riesgo legal y de identidad.
 
+## 10. Caso Efeonce (2026-09-26) — lecciones de oficio medidas
+
+Identidad sonora **recomendada, no canon**; detalle en `../efeonce/EFEONCE_OVERLAY.md` §Identidad sonora.
+
+- **Sistema desde un motivo:** un solo motivo (tres notas en Mi → La) traduce la gramática visual (La órbita)
+  y genera logo, etiqueta, sting, reveal, apertura y piezas largas. Nada nace suelto.
+- **Acento por línea = timbre de la esfera, no melodía:** cada línea de servicio cambia sólo el timbre de la
+  nota-respuesta (campana, marimba, FM, eco…); melodía y pausa quedan fijas. Así el sub-brand suena distinto
+  sin romper la cohesión de §9.
+- **Dos registros con el mismo ADN:** fondo (sereno) y energía (rock) comparten motivo, tonalidad y pausa (a
+  120 BPM, tres semicorcheas = la pausa del logo). Nunca se cambia de registro dentro de una pieza.
+- **La esfera sobre la palabra final del eslogan:** la nota-respuesta cae con la última palabra de la voz; se
+  sincroniza con STT de marcas de tiempo por palabra, no a oído.
+- **Normalizar por sonoridad al destino, nunca por pico:** por pico, la cortina quedó a −8,8 LUFS y la intro a
+  −17,9. Loudnorm en dos pasadas a −14 (video/redes) o −16 (podcast), pico −1 dBFS; el golpe no se comprime.
+- **El agente no escucha:** verifica con espectrograma, medición de bandas/LUFS y transcripción; lo perceptual
+  (gusta, se recuerda, suena a marca) lo decide el operador. La prueba de reconocimiento sin logo sigue pendiente.
+
 ---
 
 **Remite a:** `templates/sonic-identity-guide.md` (guía completa del sistema) · módulo 04

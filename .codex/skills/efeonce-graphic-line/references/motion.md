@@ -2,7 +2,7 @@
 
 > Verificado contra: axis-design-system@e26bd85 (íconos: AXIS `main@5b8ab20`, tag `v0.3.6`) y greenhouse-eo@051660d73
 > — 2026-09-26 (decisiones del operador D7 y D8 del 2026-09-26 registradas; el motion de los íconos sigue pendiente
-> tras D22).
+> tras D22). Identidad sonora recomendada revisada contra el PR AXIS #4 (squash `55486aa` en `main`, publicado) — 2026-09-26.
 > Norma: `docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`.
 > Producción: `docs/operations/brand-graphic-line/EFEONCE_ORBIT_REVEAL_MOTION_V1.md` (v1.3).
 > Valores: tokens `efeonceGraphicLine.motion` en `@efeoncepro/axis-tokens` ≥ 0.3.3 (la 0.3.2 salió sin `motion`).
@@ -47,6 +47,18 @@ esta referencia ([iconography.md](iconography.md)).
 **Halo sobre fondo claro:** a media intensidad. El render del motion lee el mismo token que el contrato,
 `efeonceGraphicLine.orbit.haloOnLightScale` (0,5; axis-tokens 0.3.5; D7). Nunca un factor escrito en el
 script.
+
+## Sonido: la identidad sonora (recomendada)
+
+- **Lo vigente:** los masters V1.1 del bucket (`motion/logo/v1.1/`) siguen con el sonido de la regla 7
+  (`scripts/creative/brand-motion/orbit-sound.mjs`, `motion.sound`). No los reemplaces a mano.
+- **La identidad sonora recomendada** (2026-09-26, **no canon**) re-sonoriza reveal, apertura y sting **sin tocar la
+  imagen**: la esfera sonora cae con el golpe de encaje (sting 0,58 s · reveal 1,87 s · apertura 1,15 s); el reveal
+  con voz extiende 1 s el cuadro final para oír la cola. Vive en AXIS `https://axis.efeonce.org/references/sonic-brand/`
+  (publicada; PR AXIS #4) y en el bucket `sonic/v1/`. Detalle: skill `audio-studio`
+  (`efeonce/EFEONCE_OVERLAY.md` §Identidad sonora).
+- **Al canonizar:** sus valores entran a los tokens junto a `efeonceGraphicLine.motion.sound` y se reemplaza el sonido
+  de los masters V1.1 (hoy el kit `sonic/v1/masters/03-motion` trae sus propios WAV+MP4 16:9/9:16).
 
 ## Entregables y dónde están
 

@@ -256,6 +256,26 @@ and `/references/iconography.json`. State: published 2026-09-26 with tag `v0.3.6
 it yet. Never draw a glyph by hand inside a piece; a new glyph needs `icons:check` and operator approval. Criterion and
 history: `efeonce-graphic-line` → `references/iconography.md`.
 
+### Efeonce sonic identity (Lab page + public bucket; recommended)
+
+State: **recommended by the operator on 2026-09-26, NOT canon.** What AXIS publishes (PR
+`efeoncepro/axis-design-system#4`, squash-merged to `main` as `55486aa` on 2026-09-26; live): the Lab page
+`/references/sonic-brand/`, the agent JSON `/references/sonic-brand.json` (schema `axis.efeonce-sonic-brand.v1`: URL,
+duration, LUFS, peak and SHA-256 per file), the guide `docs/agent-composition/sonic-brand.md`, Lab sources
+`apps/lab/src/data/sonic-brand.ts` (criterion) and `sonic-brand-assets.ts` (generated from the bucket). Files live in the
+public bucket `gs://efeonce-group-axis-public-media/sonic/v1/` (`masters/` + `web/`, 65 files).
+
+- **No audio package and no tokens yet, on purpose:** while the identity is only recommended, nothing enters
+  `@efeoncepro/axis-tokens`. On canonization its values go to tokens next to `efeonceGraphicLine.motion.sound`, and the
+  sound of the V1.1 logo masters (`motion/logo/v1.1/`, still rendered with Greenhouse `orbit-sound.mjs`) is replaced.
+- **How it was published:** PR #4 was built on `origin/main` with a temporary git index, because the shared AXIS
+  checkout held another session's WIP. The Lab navigation entry merged cleanly next to «Surfaces».
+- **Rules for agents:** use the kit files by URL and verify their `sha256` from the JSON; never regenerate a sound
+  that the kit already has. Motif, per-line sphere timbre, voice (Brian) and loudness rules come from the guide, not from
+  memory. **Glitch (podcast) is pending an operator decision** — do not ship or describe it as decided. Never in client
+  work or Greenhouse UI. Production and criterion live in Greenhouse: `docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md`
+  and `audio-studio` → `efeonce/EFEONCE_OVERLAY.md`.
+
 ### AXIS Lab
 
 The Lab lives in `../axis-design-system/apps/lab`, not in Greenhouse. Its current runtime is Astro 7.1.6

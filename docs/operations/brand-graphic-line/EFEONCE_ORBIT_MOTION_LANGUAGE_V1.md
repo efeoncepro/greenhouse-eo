@@ -92,6 +92,12 @@ Sintetizado y determinístico, sin muestras de terceros. Cada impacto visual tie
 suena paneado con su recorrido. Termina con un acorde abierto y un fundido de 0,45 s (`sound`). Pico en −1 dBFS,
 alrededor de −17,5 LUFS, WAV de 48 kHz y 24 bits.
 
+> **Delta 2026-09-26 — identidad sonora recomendada.** Existe una identidad sonora de Efeonce («Tres puntos que se
+> vuelven uno»), recomendada por el operador y todavía no canon, que re-sonoriza el reveal, la apertura y el sting sin
+> tocar la imagen: la esfera sonora cae con el golpe de encaje. El sonido de los masters V1.1 (`motion/logo/v1.1/`,
+> `orbit-sound.mjs`) sigue vigente hasta canonizarla. Ver
+> [`EFEONCE_SONIC_IDENTITY_V1.md`](../brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md).
+
 ## Las piezas que hoy siguen estas reglas
 
 | Pieza | Duración | Qué hace | Tokens |
