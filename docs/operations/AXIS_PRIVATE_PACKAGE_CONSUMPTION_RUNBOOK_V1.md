@@ -8,6 +8,11 @@ source control.
 
 ## Current state — 2026-09-14
 
+> **Actualizado 2026-09-27:** publicados y **fijados en Greenhouse** `axis-tokens` `0.3.8` y `axis-ui-contracts`
+> `0.3.7` (tag `v0.3.8`), `axis-brand-assets` `0.3.3` y `axis-graphic-line` `0.5.0` (tag `v0.5.0`), con
+> `axis-ui-registry` `0.3.1`. Greenhouse **ya depende de `axis-graphic-line`** (mapper `src/lib/brand-surfaces`,
+> TASK-1919). Ver **Delta 2026-09-27 (b)**; el párrafo siguiente queda como historia.
+
 > **Actualizado 2026-09-26 (noche):** hay **cinco** paquetes privados. Publicados (tag `v0.3.6` del repo AXIS):
 > `axis-tokens` `0.3.6`, `axis-ui-contracts` `0.3.5`, `axis-ui-registry` y `axis-brand-assets` `0.3.1`, y
 > `axis-graphic-line` `0.4.0` (con el subpath nuevo `/icons`). Greenhouse fija en `develop` `axis-tokens` y
@@ -62,6 +67,24 @@ source control.
   La evidencia del piloto pasa de **local** a **CI**.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
+
+## Delta 2026-09-27 (b) — `v0.3.8` publicado y fijado: `efeonce.surface-composition` 0.1.1 (TASK-1919)
+
+- **Publicado** con el tag `v0.3.8`: `axis-tokens` `0.3.8` y `axis-ui-contracts` `0.3.7`. El contrato
+  `efeonce.surface-composition` pasa a `0.1.1` (`candidate`, acepta intents `0.1.0`) y modela el contenido de las
+  láminas aprobadas: `levels`, `note`, `panels`, `figures` con fuente, `nav`, `photo.focus`/`native`, título y marcos
+  de hojas, `chapter`, `selection.box`, `shots`, `subtitles` y `selection.level`. `efeonceGraphicLine.surfaces` ya
+  venía en `axis-tokens` `0.3.7` (contrato `0.1.0` en `axis-ui-contracts` `0.3.6`).
+- **Greenhouse lo fija** (commit `016d0a183` de `develop`, 2026-09-27): `axis-tokens` `0.3.8`, `axis-ui-contracts`
+  `0.3.7`, con `axis-brand-assets` `0.3.3` y `axis-graphic-line` `0.5.0` (subidos antes por la sesión de iconografía,
+  commit `8d817f29e`, tag `v0.5.0`) y `axis-ui-registry` `0.3.1`. Los tokens compilados de los catálogos del composer
+  sólo cambian la versión de origen en su encabezado (`pnpm brand:tokens --check` lo vigila).
+- **Consumo nuevo:** `axis-graphic-line` es dependencia **directa** y se usa en código: `src/lib/brand-surfaces` pinta
+  con `paintGraphicLine` y `resolveIcon`, y resuelve con `resolveSurfaceComposition` de `axis-ui-contracts`. Un bump
+  de estos paquetes mueve píxeles de los catálogos `graphic-line-*`: correr
+  `pnpm composer:visual-gate --catalog=graphic-line` y declarar en `BASELINE_DELTAS.md` si algo cambia.
+- **Estado de runtime:** local en `develop` (sin push al cierre de esta nota); leer el veredicto de CI del SHA del bump
+  cuando se empuje.
 
 ## Delta 2026-09-27 — Plastilina en volumen: `axis-tokens` 0.3.7 y `axis-brand-assets` 0.3.2, publicados (tag `v0.3.7`)
 

@@ -88,7 +88,7 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   token con su razón. Cambiar un valor: token + prueba en AXIS → publicar → fijar en Greenhouse → comparar storyboard →
   aprobación del operador si altera una pieza aprobada.
 - **Motion y audiovisual por superficie (desde el 2026-09-27):** la gráfica animada con foto y el video de marca son
-  superficies del contrato AXIS `efeonce.surface-composition` 0.1.0 (`candidate`; en `main` de AXIS,
+  superficies del contrato AXIS `efeonce.surface-composition` 0.1.1 (`candidate`; publicado en AXIS `v0.3.8`,
   [Lab](https://axis.efeonce.org/references/surfaces/motion/)). Norma: [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
   §4.4 (motion), §4.5 (audiovisual) y §4.3 (spot pDOOH); páginas «Motion» y «Producción audiovisual» del
   [canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7), cada una con su lámina
@@ -109,6 +109,16 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
     cartela compuesta; formato nativo por plano. Recursos: cartela con la órbita que mide el capítulo, zócalo, callout
     con selección, super de dato con fuente, pantalla dividida y subtítulos quemados sin caja. Una esfera por pantalla.
   - **Vía pública (pDOOH):** sin audio; la voz se arma en 2 s como máximo.
+  - **Qué entrega el Artifact Composer y qué no (desde el 2026-09-27, TASK-1919):** con
+    `pnpm brand:compose -- --intent <intent.json>` salen el **último cuadro** del loop aprobado
+    (`motion.loop-lens-reveal`: el estático de respaldo y la versión reducida), el **storyboard** (`motion.storyboard`)
+    y las **capas de video en PNG con alfa** (`audiovisual.cartela`, `zocalo`, `callout-selection`, `data-super`,
+    `subtitles`; `split-screen` y `shot-plan` opacas) para montar sobre el plano en la edición. **El composer no
+    anima** (decisión del operador, opción b): la animación de la gráfica con foto, el movimiento de las capas y el
+    cierre siguen aquí, en motion; `audiovisual.close-reveal` falla en el composer con `recipe-outside-composer` y sale
+    de los masters del reveal v1.1 (o `pnpm orbit:video` en AXIS). Un cuadro fijo o una capa del composer que difiera
+    del master animado es un bug de uno de los dos: el último cuadro del loop animado debe coincidir con el estático.
+    Detalle: norma §2.1 y manual `componer-por-superficie-con-axis.md` (Ruta A).
 - **Íconos de la línea (Trazo y Plastilina, canónicos desde 2026-09-26, sólo marca propia):** su motion **no está
   definido todavía** (pendiente en AXIS: necesita los tokens `axisMotion` y la norma de movimiento). No se inventa: en
   una pieza animada, el ícono entra como cualquier elemento del plano y se queda en el estado que `resolveIcon` pinta,

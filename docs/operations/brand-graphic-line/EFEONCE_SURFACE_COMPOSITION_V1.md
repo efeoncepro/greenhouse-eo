@@ -1,16 +1,19 @@
 # Línea gráfica Efeonce — Composición por superficie V1
 
 > **Tipo de documento:** Norma de marca (composición por superficie)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude
+> **Última actualización:** 2026-09-27 por Claude (1.1: ruta por el Artifact Composer, §2.1 — 20 recetas aprobadas como
+> plantilla con `pnpm brand:compose`, TASK-1919; contrato 0.1.1 publicado en AXIS `v0.3.8` y fijado en Greenhouse)
 > **Estado:** Vigente para lo marcado **aprobado**. Las opciones y los pendientes no se usan como canon hasta que el
 > operador los apruebe. El contrato AXIS que la acompaña está en `candidate`.
 > **Valores:** tokens `efeonceGraphicLine.surfaces.<superficie>` en `@efeoncepro/axis-tokens` (AXIS). Este documento
 > dice qué se aprobó, qué reglas rigen y cómo se compone; **no guarda números**. Si un valor no está en el token, no
 > existe: se agrega al token con su razón.
-> **Contrato:** `efeonce.surface-composition` 0.1.0 (`candidate`, owner `efeonce-brand-studio`, manifest
-> `axis.surface-composition.v1`) en `efeoncepro/axis-design-system`, **en `main` de AXIS desde el 2026-09-27; Lab: https://axis.efeonce.org/references/surfaces/ ([JSON](https://axis.efeonce.org/references/surfaces.json)); paquetes en fuente, sin publicar en npm**.
+> **Contrato:** `efeonce.surface-composition` 0.1.1 (`candidate`, owner `efeonce-brand-studio`, manifest
+> `axis.surface-composition.v1`; acepta intents 0.1.0) en `efeoncepro/axis-design-system`. **Publicado** en AXIS
+> `v0.3.8` (`axis-tokens` 0.3.8 con `efeonceGraphicLine.surfaces`, `axis-ui-contracts` 0.3.7) y **fijado en
+> Greenhouse** (2026-09-27). Lab: https://axis.efeonce.org/references/surfaces/ ([JSON](https://axis.efeonce.org/references/surfaces.json)).
 > **Canvas del equipo (por superficie):** [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7),
 > con las páginas «DOOH · pDOOH», «Web», «Motion», «Producción audiovisual», «Deck» y «Firma y 1:1». A la izquierda de
 > cada página hay una lámina guía, «Guía · cómo componer …», que resume para esa superficie lo que esta norma detalla.
@@ -45,7 +48,7 @@ Alcance: **marca propia de Efeonce y su familia**. Nunca trabajo de clientes ni 
 | **Superficie** (nueva) | formato, papel, receta, reservas por región, escala de voces, firma, tiempos y referencias aprobadas | contrato `efeonce.surface-composition` + tokens `efeonceGraphicLine.surfaces` |
 | Elemento: órbita, lente, progreso, voz, firma | la geometría y el dibujo de cada elemento | contrato `efeonce.graphic-line-orbit` + tokens `efeonceGraphicLine` (`lens`, `pieces`, `signature`, `type`, `motion`, `brandClose`) |
 | Elemento: selección y cursores | cajas, esquinas, colaboradores | contrato `efeonce.collaboration-selection` |
-| Elemento: íconos | glifo y voz (Trazo o Plastilina); en el objeto protagonista de la superficie (portada, key visual, escenario), **Plastilina en volumen**: uno por pieza, ≥ 160 px, nunca en contenido de deck ni UI ([manual §14.1](./EFEONCE_GRAPHIC_LINE_V1.md#141-plastilina-en-volumen-d24-2026-09-27)) | `resolveIcon` de `@efeoncepro/axis-graphic-line/icons` + `efeonceGraphicLine.icons`; el volumen, PNG de `@efeoncepro/axis-brand-assets` 0.3.2 (`volumeIconUrl`, sin publicar: mientras tanto, desde el Lab) |
+| Elemento: íconos | glifo y voz (Trazo o Plastilina); en el objeto protagonista de la superficie (portada, key visual, escenario), **Plastilina en volumen**: uno por pieza, ≥ 160 px, nunca en contenido de deck ni UI ([manual §14.1](./EFEONCE_GRAPHIC_LINE_V1.md#141-plastilina-en-volumen-d24-2026-09-27)) | `resolveIcon` de `@efeoncepro/axis-graphic-line/icons` + `efeonceGraphicLine.icons`; el volumen, PNG de `@efeoncepro/axis-brand-assets` (`volumeIconUrl`; 0.3.3 publicado y fijado en Greenhouse) |
 | Foto | registro, palancas, reservas, lecho | [lenguaje fotográfico](../brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) + `pnpm foto:*` |
 
 El contrato de superficie **no repinta nada**: traduce la superficie a intents de los contratos de elemento. Por eso
@@ -67,7 +70,7 @@ manifest axis.surface-composition.v1
    ├─ canvas · safeArea · reserves · type · signature · timeline · rules · references · issues
    └─ delegates ──► efeonce.graphic-line-orbit  ──► Greenhouse: pnpm creative:orbit:render
                 ├─► efeonce.collaboration-selection ──► Greenhouse: pnpm creative:layout / pnpm foto:componer:cta
-                ├─► resolveIcon (glifo + voz de la línea) ──► AXIS: pnpm icons:export (Greenhouse aún no consume /icons)
+                ├─► resolveIcon (glifo + voz de la línea) ──► AXIS: pnpm icons:export · Greenhouse: resolveIcon en src/lib/brand-surfaces
                 └─► ficha fotográfica esperada (registro + reservas) ──► Greenhouse: pnpm foto:prompt → foto:generar → foto:validar
 ```
 
@@ -86,7 +89,8 @@ manifest axis.surface-composition.v1
    | Íconos | `resolveIcon` / `pnpm icons:export` en AXIS | glifo en reposo, voz de la línea; el grupo pasa `auditIconGroup` |
    | Ficha fotográfica | `pnpm foto:prompt`, `pnpm foto:generar`, `pnpm foto:validar`, `pnpm foto:emblema` | toma nativa del formato, reservas medidas, emblema revisado al 100 % |
    | Motion del logo (reveal, apertura, sting) | `scripts/creative/brand-motion/` (`render-orbit-motion.mjs`, `orbit-sound.mjs`, `encode-orbit-motion.mjs`) | lee cada tiempo de `efeonceGraphicLine.motion` |
-   | Lámina de deck | `deck-studio` + Artifact Composer (`src/lib/artifact-composer/`) | composición del deck; las recetas por superficie todavía no son catálogo (§4.6) |
+   | **Pieza completa de una receta aprobada** (deck, web, DOOH, capas de video, cuadros de motion) | `pnpm brand:compose -- --intent <intent.json>` (Artifact Composer, §2.1) | resuelve el intent con el contrato y compone el PDF o el PNG final con órbita, voz, selección e íconos; no reemplaza la revisión |
+   | Lámina de deck | `deck-studio` + Artifact Composer (`src/lib/artifact-composer/`) | las seis recetas aprobadas son el catálogo `graphic-line-deck` (§2.1); el resto del deck, `deck-studio` |
 
 4. **Revisa sobre los píxeles finales** con los chequeos de cada compositor y la lista del manual de uso. Componer y
    medir no aprueba ni publica: la aprobación es del operador.
@@ -100,7 +104,43 @@ manifest axis.surface-composition.v1
 [deck](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/surfaces/deck.md) ·
 [schema del intent](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/surface-composition-intent.schema.json).
 **Lab:** `axis.efeonce.org/references/surfaces/` (índice) y `/references/surfaces/<superficie>/`, con un gemelo en
-JSON para agentes; se publica cuando la rama llegue a `main`.
+JSON para agentes.
+
+### 2.1 La ruta por el Artifact Composer (desde el 2026-09-27, TASK-1919)
+
+Las recetas **aprobadas** ya no se arman como maqueta: son plantillas del Artifact Composer y una pieza sale entera de
+un intent, con un solo comando en Greenhouse:
+
+```bash
+pnpm brand:compose -- --intent <intent.json> [--out <dir>] [--artifact-id <id>]
+# salida por defecto: .captures/brand-surfaces/<id>/ ; deja además <id>.surface-manifest.json
+```
+
+El comando valida que la receta esté aprobada, resuelve el intent con el contrato de AXIS (`resolveSurfaceComposition`;
+si hay `issues`, no compone), arma el plan con el builder de la receta y compone: órbita y lente con
+`paintGraphicLine`, íconos con `resolveIcon`, selección y CTA con el adaptador de Greenhouse, y el plate declarado en
+`photo.plateRef`. Los ejemplos de intent de cada receta están en `src/lib/brand-surfaces/examples/*-intent.json`.
+
+| Catálogo | Salida | Recetas con plantilla |
+|---|---|---|
+| `graphic-line-deck` | PDF 16:9 | `proposal-cinematic`, `method-staircase`, `section-classic`, `section-split`, `content-measure`, `triptych` |
+| `graphic-line-stills` | PNG | web `hero-lens`, `hero-bleed`, `hero-uniform-tablet`, `hero-mobile-native` (una plantilla por ancho: 360, 390 y 430); DOOH `caminero-lens`; motion `loop-lens-reveal` (el **último cuadro** del loop, su estático de respaldo) y `storyboard` |
+| `graphic-line-overlays` | PNG con alfa (capas para montar sobre el video) | `cartela`, `zocalo`, `callout-selection`, `data-super`, `subtitles`; opacas: `split-screen` y `shot-plan` |
+
+**Qué queda fuera, a propósito:**
+
+- **Las opciones y pendientes** (paleta DOOH, todo pDOOH, variantes del deck) no tienen plantilla: el comando falla con
+  `recipe-not-approved`. Una receta entra al catálogo sólo cuando el operador la aprueba.
+- **El video.** El composer entrega cuadros fijos y capas; la animación sigue en la pipeline de motion (§4.4, §4.5).
+  `audiovisual.close-reveal` falla con `recipe-outside-composer`: el cierre son los masters del reveal v1.1 o
+  `pnpm orbit:video` en AXIS.
+- **La ruta productiva** (API, `artifact-worker`, MCP): es
+  [TASK-1921](../../tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md). Hoy `brand:compose` es el
+  taller local.
+
+Componer no aprueba: la pieza sigue pasando la revisión de §4 y del manual de uso. Paso a paso y errores:
+[manual de uso](../../manual-de-uso/creative/componer-por-superficie-con-axis.md). Gate visual:
+[runbook](../runbooks/composer-visual-gate.md) (scope `graphic-line`).
 
 ---
 
@@ -157,8 +197,9 @@ selección).
 **Firma:** la foto del hero no lleva logo; firma el encabezado del sitio (**opción**: el tablero de firma no está
 marcado como aprobado).
 
-**Cómo se compone:** voz, lente y selección salen de los `delegates`; en el sitio público la implementación sigue las
-skills `efeonce-public-site-wordpress` y `astro`, con el manifest como especificación.
+**Cómo se compone:** la imagen del hero (las cuatro recetas aprobadas, el teléfono en sus tres anchos) sale entera con
+`pnpm brand:compose` (§2.1, catálogo `graphic-line-stills`). En el sitio público la implementación sigue las skills
+`efeonce-public-site-wordpress` y `astro`, con el manifest como especificación.
 
 **Pendiente:** el contrato de la órbita no tiene canal `web` (la lente se resolvió como `screen`); lo resuelve el
 `delegate`.
@@ -188,8 +229,8 @@ escala de voces y firma por soporte).
 legibilidad a la distancia máxima (**aprobado**). Paleta — logo centrado abajo; el tamaño entre las dos propuestas del
 canvas está **pendiente**.
 
-**Cómo se compone:** la lente sale del `delegate` de la órbita y se pinta con `pnpm creative:orbit:render`; la foto,
-con una ficha 3:1.
+**Cómo se compone:** el caminero aprobado sale entero con `pnpm brand:compose` (§2.1, `dooh.caminero-lens`); la foto,
+con una ficha 3:1. La paleta no tiene plantilla hasta que el operador la apruebe (`recipe-not-approved`).
 
 **Pendientes:** el formato `3:1` de `foto:prompt` sigue local y sin validar (se reconcilia en
 [TASK-1918](../../tasks/to-do/TASK-1918-photo-prompt-and-lens-checks-graphic-line.md), Slice 1); el lecho de firma del
@@ -248,9 +289,11 @@ entre la receta del paquete y la pieza medida (tabla §6).
 
 **Firma:** la toma nunca lleva logo; firma el cierre.
 
-**Cómo se compone:** el cierre sale de `scripts/creative/brand-motion/`. La gráfica con foto **todavía no tiene un
-render canónico** en Greenhouse: la pieza aprobada se armó como maqueta de dirección con tramos escritos a mano. Un
-master nuevo lee los tramos de `efeonceGraphicLine.surfaces.motion` (tabla §6).
+**Cómo se compone:** el cierre sale de `scripts/creative/brand-motion/`. El Artifact Composer entrega el **último
+cuadro** del loop (`motion.loop-lens-reveal`, el estático de respaldo) y el **storyboard** (`motion.storyboard`) con
+`pnpm brand:compose` (§2.1). La animación de la gráfica con foto **todavía no tiene un render canónico** en Greenhouse:
+la pieza aprobada se armó como maqueta de dirección con tramos escritos a mano, y el composer no anima. Un master nuevo
+lee los tramos de `efeonceGraphicLine.surfaces.motion` (tabla §6).
 
 ### 4.5 Producción audiovisual (video)
 
@@ -282,6 +325,11 @@ con un divisor en el acento; los **subtítulos** van quemados, en el tercio infe
 pantalla.
 
 **Firma:** firma la marca, nunca la toma: el cierre es el reveal aprobado, con sonido.
+
+**Cómo se compone:** los recursos de texto salen como **capas PNG con alfa** del catálogo `graphic-line-overlays`
+(cartela, zócalo, callout con selección, super de dato y subtítulos; la pantalla dividida y el plan de planos, opacos)
+con `pnpm brand:compose` (§2.1); se montan sobre el plano en la edición. El cierre (`close-reveal`) es video: falla en el
+composer con `recipe-outside-composer` y sale de los masters del reveal v1.1.
 
 ### 4.6 Deck
 
@@ -349,8 +397,8 @@ línea y a 24 px o más (D1). Fuera de esta lámina rigen «una esfera por pieza
   [lenguaje fotográfico, delta 2026-09-27](../brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md).
 - **Proporciones reales:** cámara a unos 2 m, 85 mm, plano medio, sin escorzo hacia el lente.
 - **Isotipo oficial compuesto** en la prenda, desde `@efeoncepro/axis-brand-assets`; nunca el que dibuja el modelo (la
-  prenda se pide lisa y se revisa con `pnpm foto:emblema`). Hoy no hay un comando canónico versionado que haga esa
-  composición: queda como pendiente de herramienta.
+  prenda se pide lisa y se revisa con `pnpm foto:emblema`; si muestra un emblema distinto, el oficial se compone con
+  `pnpm foto:isotipo`, TASK-1920, regla `.claude/rules/brand-photography.md`).
 - **Los mini robots agentes** funcionan como **hilo visual entre láminas**: aparecen en varias propuestas y cosen el
   deck sin repetir la misma foto.
 
@@ -367,9 +415,9 @@ las láminas de la ronda de propuestas quedaron aprobadas o rechazadas.
 | Líneas de servicio con Nexa presentando la pila de líneas | sin punch |
 
 **Cómo se compone:** la voz, la selección y los íconos salen de los `delegates`; la foto, de la ficha esperada
-(`foto:prompt` con el registro y la reserva izquierda). El deck se arma con `deck-studio`; el Artifact Composer
-(catálogo `deck-axis`) **todavía no tiene esta receta**: hasta que entre al catálogo, la lámina se arma como maqueta
-de dirección leyendo el manifest, y su paso a catálogo es un pendiente.
+(`foto:prompt` con el registro y la reserva izquierda). La lámina sale entera con `pnpm brand:compose` (§2.1,
+catálogo `graphic-line-deck`, PDF 16:9), igual que las otras cinco recetas aprobadas del deck; el resto del deck se arma
+con `deck-studio`. No vive en `deck-axis`, que es el catálogo de las ofertas a comité.
 
 #### Receta `method-staircase` (aprobada el 2026-09-27)
 
@@ -386,8 +434,8 @@ sólido en el acento de Engine.
 | Fondo | Efeonce, con el acento de la línea del método (Engine en BeX) |
 
 No lleva registro fotográfico ni personas. Los valores (número y proporción de peldaños, brillo, escala) viven en
-`efeonceGraphicLine.surfaces.deck`. Se arma igual que `proposal-cinematic`: `deck-studio` más el manifest, como
-maqueta de dirección hasta que la receta entre al catálogo del Artifact Composer.
+`efeonceGraphicLine.surfaces.deck`. Se compone igual que `proposal-cinematic`: `pnpm brand:compose` (§2.1); la
+selección, cuando la lleva, toma un nivel de la escalera (`selection.level`, 1 = el de abajo).
 
 ---
 
@@ -431,15 +479,24 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
 
 ## 7. Estado y pendientes
 
-- **Contrato:** `efeonce.surface-composition` 0.1.0 `candidate`; pasa a `stable` sólo con la aprobación del operador y
-  con evidencia (paquete, pruebas y Lab). Está en `main` de AXIS desde el 2026-09-27 (Lab publicado; paquetes
-  `axis-tokens` 0.3.7 y `axis-ui-contracts` 0.3.6 en fuente, sin publicar en npm); Greenhouse todavía no lo consume.
+- **Contrato:** `efeonce.surface-composition` 0.1.1 `candidate` (acepta intents 0.1.0); pasa a `stable` sólo con la
+  aprobación del operador y con evidencia (paquete, pruebas y Lab). Publicado en AXIS `v0.3.8` (`axis-tokens` 0.3.8,
+  `axis-ui-contracts` 0.3.7); la 0.1.1 modela el contenido de las láminas aprobadas (`levels`, `note`, `panels`,
+  `figures` con fuente, `nav`, `photo.focus`/`native`, título y marcos de hojas, `chapter`, `selection.box`, `shots`,
+  `subtitles`, `selection.level`). Greenhouse lo fija y lo consume en `src/lib/brand-surfaces` (§2.1).
 - **Recetas por aprobar:** todas las de pDOOH, la paleta de DOOH, la firma por soporte (salvo el caminero) y las
   opciones del deck.
-- **Herramientas:** render canónico de la gráfica con foto para motion (§4.4), comando versionado para componer el
-  isotipo sobre la prenda (§4.6), recetas `proposal-cinematic` y `method-staircase` como catálogo del Artifact
-  Composer (§4.6) y el formato
-  `3:1` en `foto:prompt` (TASK-1918).
+- **Herramientas:** render canónico de la animación de la gráfica con foto para motion (§4.4), el formato `3:1` en
+  `foto:prompt` (TASK-1918) y la ruta productiva de `brand:compose` (API, `artifact-worker`, MCP:
+  [TASK-1921](../../tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md)). **Hechos el
+  2026-09-27:** las 20 recetas aprobadas como catálogo del Artifact Composer (TASK-1919, §2.1) y el isotipo compuesto
+  sobre la prenda con `pnpm foto:isotipo` (TASK-1920).
+- **Preguntas abiertas del operador (TASK-1919):** la posición de la lente del caminero (el token dice 0,70 y la
+  lámina aprobada la muestra cerca de 0,77); el super de dato, ¿arco completo como en la lámina o la estela canónica
+  de la medida?; la burbuja URL en `section-classic`, `section-split`, `content-measure` y `triptych` (las láminas
+  aprobadas no la llevan y el manifest del deck dice `url-bubble-footer`: se siguió la lámina); el gris del descriptor
+  y la bajada web, que no tiene token; y la paleta DOOH, 20 % o 35 %. Hasta decidir, las plantillas siguen la lámina
+  aprobada y no se inventa un token.
 - **Láminas del deck:** la ronda de propuestas quedó cerrada; las opciones restantes del canvas (§4.6) siguen sin
   aprobar.
 

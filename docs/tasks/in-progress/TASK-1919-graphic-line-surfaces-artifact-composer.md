@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `none`
-- Status real: `Parcial`
+- Status real: `Avanzada — slices 1–8 implementados y commiteados en local develop (f3f93c926…016d0a183, sin push): 3 catálogos, 20 recetas aprobadas / 22 plantillas, mapper, pnpm brand:compose, gate --catalog=graphic-line 22 frames a 0 px, AXIS v0.3.8 fijado, barrido documental 2026-09-27. Falta: tests dedicados de alfa y de gate de tinta vacío, determinismo byte a byte de brand:compose, procedencia completa, pnpm test + build completos, respuestas del operador a 5 preguntas, cierre de lifecycle y push`
 - Rank: `TBD`
 - Domain: `creative|brand|platform`
 - Blocked by: `none`
@@ -105,6 +105,9 @@ Reglas obligatorias:
   `@efeoncepro/axis-ui-contracts` 0.3.6 (`resolveSurfaceComposition`, `validateSurfaceCompositionIntent`,
   constantes `AXIS_SURFACE_*`), `@efeoncepro/axis-brand-assets` 0.3.2 y `@efeoncepro/axis-graphic-line` 0.4.0
   (`resolveIcon`, `answerHtml`, `answerSphere`, `orbitSvg`, `composeGraphicLine`, `deckSlideHtml`).
+  **Delta 2026-09-27:** subido a `axis-tokens` 0.3.8 y `axis-ui-contracts` 0.3.7 (tag `v0.3.8`, contrato
+  `efeonce.surface-composition` 0.1.1; commit `016d0a183`), con `axis-brand-assets` 0.3.3 y `axis-graphic-line` 0.5.0
+  (commit `8d817f29e`).
 - `src/lib/artifact-composer/{catalog.ts,compose.ts,render.ts,plan.ts,contracts.ts,quality-gates.ts,pure.ts}`.
 - Fuentes de las piezas aprobadas en scripts de sesión fuera del repo (se portan en los Slices 4 y 5).
 
@@ -243,11 +246,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
 - [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
 - [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -408,22 +411,45 @@ coordina con la sesión de AXIS antes de subir la versión fijada.
       y `pnpm-lock.yaml` (commit `f3f93c926`).
 - [ ] Una plantilla que declara fondo transparente produce PNG con canal alfa y esquinas con alfa 0; los catálogos
       existentes quedan idénticos en el visual gate.
+      *Parcial (2026-09-27):* las capas se congelaron con su alfa en el gate (`templates-graphic-line-overlays/**`) y el
+      test de catálogos exige `render.background: 'transparent'` en las capas; el gate global da la misma lista y
+      cuentas de deriva (60 frames, ISSUE-122) con y sin el `render.ts` nuevo. Falta un test dedicado de esquinas con
+      alfa 0.
 - [ ] `assertSlideHasInk` rechaza un overlay transparente vacío.
-- [ ] El mapper de `src/lib/brand-surfaces/` sólo importa tipos y la entrada `/pure` del composer (el lint
-      `greenhouse/no-worker-only-module-in-vercel-code` pasa).
-- [ ] El catálogo `graphic-line-deck` contiene exactamente las seis recetas de deck aprobadas y emite un PDF de
-      1920 × 1080.
+      *Pendiente:* el gate de tinta pondera por alfa (`quality-gates.ts`, commit `a2dc7c5fd`), pero no hay test que
+      lo pruebe con una capa vacía.
+- [x] El mapper de `src/lib/brand-surfaces/` sólo importa tipos y la entrada `/pure` del composer (el lint
+      `greenhouse/no-worker-only-module-in-vercel-code` pasa). *(2026-09-27: único import del composer es
+      `import type … from '@/lib/artifact-composer/pure'` en `types.ts`; `eslint src/lib/brand-surfaces` sin hallazgos.)*
+- [x] El catálogo `graphic-line-deck` contiene exactamente las seis recetas de deck aprobadas y emite un PDF de
+      1920 × 1080. *(registry + `deck-recipes.test.ts`; commits `a2dc7c5fd`, `422ec35fd`.)*
 - [ ] El catálogo `graphic-line-stills` contiene las cuatro web, `caminero-lens`, los overlays audiovisuales
       transparentes, `shot-plan`, `close-reveal` y `storyboard`, y ninguna receta en estado opción o pendiente.
+      *Superado por el diseño implementado (a reformular al cerrar):* `graphic-line-stills` tiene las cuatro web (el
+      teléfono con una plantilla por ancho), `caminero-lens`, `loop-lens-reveal` (último cuadro) y `storyboard`; las
+      capas audiovisuales y `shot-plan` viven en un tercer catálogo, `graphic-line-overlays`; `close-reveal` quedó
+      **fuera** del composer por ser video (`recipe-outside-composer`, decisión opción b). Ninguna receta opción o
+      pendiente tiene plantilla (`recipe-not-approved`).
 - [ ] `pnpm brand:compose` con los ejemplos de intent de AXIS produce PDF (deck) y PNG (resto) y un manifiesto de
       procedencia.
-- [ ] `pnpm brand:compose` con una receta no aprobada sale con código distinto de cero y un issue legible.
+      *Parcial:* los ejemplos viven en `src/lib/brand-surfaces/examples/*-intent.json` y el CLI deja
+      `<id>.surface-manifest.json` (el manifest de AXIS); no está verificado en este barrido que registre hash del
+      intent ni SHA-256 de los plates (la procedencia completa puede ir con TASK-1921).
+- [x] `pnpm brand:compose` con una receta no aprobada sale con código distinto de cero y un issue legible.
+      *(`SurfacePieceError` `recipe-not-approved` → `process.exit(1)` con mensaje es-CL; test «una receta pendiente no
+      tiene plantilla».)*
 - [ ] Dos ejecuciones con el mismo intent y los mismos plates producen bytes idénticos.
+      *Parcial:* determinismo a 0 px en cuatro corridas `--selftest` del gate (probes con assets SVG sintéticos); falta
+      la prueba byte a byte de `brand:compose` con plates reales.
 - [ ] Ninguna plantilla nueva contiene HEX, px de diseño, familia tipográfica o ms literales (test de portabilidad).
-- [ ] `pnpm composer:visual-gate` a cero píxeles con ambos catálogos y la línea base de SKY sin cambios;
-      `BASELINE_DELTAS.md` registra el alta.
-- [ ] Norma por superficie, manual, ADR del composer y skills `efeonce-graphic-line` y `deck-studio` actualizados y
-      espejados.
+      *Parcial:* el GUARD de `graphic-line-catalogs.test.ts` cubre HEX, `rgb()` y familia; px de diseño y ms no tienen
+      guarda propia.
+- [x] `pnpm composer:visual-gate` a cero píxeles con ambos catálogos y la línea base de SKY sin cambios;
+      `BASELINE_DELTAS.md` registra el alta. *(Scope `--catalog=graphic-line`: 22 frames a 0 px, commit `752986a88`;
+      SKY no se rebaselinó. El gate global conserva 60 frames con deriva previa, ISSUE-122, idéntica con el
+      `render.ts` anterior.)*
+- [x] Norma por superficie, manual, ADR del composer y skills `efeonce-graphic-line` y `deck-studio` actualizados y
+      espejados. *(Barrido documental 2026-09-27; `pnpm skills:mirrors` al cierre del barrido.)*
 
 ## Verification
 
@@ -439,12 +465,12 @@ coordina con la sesión de AXIS antes de subir la versión fijada.
 - [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
 - [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] TASK-1921 recibió un `## Delta` con el contrato final del mapper y los nombres de los catálogos
-- [ ] las skills `efeonce-graphic-line` y `deck-studio` quedaron actualizadas y espejadas según su contrato
+- [x] TASK-1921 recibió un `## Delta` con el contrato final del mapper y los nombres de los catálogos
+- [x] las skills `efeonce-graphic-line` y `deck-studio` quedaron actualizadas y espejadas según su contrato
 
 ## Follow-ups
 
@@ -454,5 +480,13 @@ coordina con la sesión de AXIS antes de subir la versión fijada.
 
 ## Open Questions
 
-- ¿El CLI corre con `tsx` (como `composer:visual-gate`) o se compila? Se decide en el plan según el runner de
-  scripts del composer.
+- ~~¿El CLI corre con `tsx` o se compila?~~ Resuelto: `tsx scripts/brand-surfaces/compose.ts` (como
+  `composer:visual-gate`).
+- **Preguntas del operador (2026-09-27; las plantillas siguen la lámina aprobada hasta que decida, sin token nuevo):**
+  1. Posición de la lente del caminero: el token dice 0,70 y la lámina aprobada la muestra cerca de 0,77.
+  2. Super de dato (`audiovisual.data-super`): ¿arco completo como en la lámina, o la estela canónica de la medida?
+  3. Burbuja URL en `section-classic`, `section-split`, `content-measure` y `triptych`: las láminas aprobadas no la
+     llevan y el manifest del deck dice `url-bubble-footer`; se siguió la lámina.
+  4. Gris del descriptor y de la bajada web: no tiene token.
+  5. Paleta DOOH: 20 % vs 35 % (sin plantilla hasta decidir).
+- La salida `.captures/brand-surfaces/<id>/` y los plates viven fuera de git; la procedencia versionada es de TASK-1921.

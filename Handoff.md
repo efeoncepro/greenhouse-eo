@@ -1,6 +1,6 @@
 # Handoff activo
 
-**Línea gráfica «La órbita» (26–27/09):** AXIS 0.3 en develop; motion V1.1 aprobado; [índice](docs/operations/brand-graphic-line/README.md); [por superficie](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
+**La órbita (26–27/09):** [índice](docs/operations/brand-graphic-line/README.md). [TASK-1919](docs/tasks/in-progress/TASK-1919-graphic-line-surfaces-artifact-composer.md) avanzada, local sin push: `pnpm brand:compose`, AXIS `v0.3.8`; falta cierre, 5 preguntas del operador y [TASK-1921](docs/tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md). TASK-1920 (`foto:isotipo`) commiteada.
 
 **Marketing Studio (26/09):** [TASK-1893](docs/tasks/complete/TASK-1893-marketing-studio-original-asset-store-media-worker.md) y [TASK-1896](docs/tasks/complete/TASK-1896-marketing-studio-observability-restore.md) complete en producción (release `92002873ced9`, PR #243), junto a 1890/1891; restauración probada (job 49 s) y EPIC-049 con ese exit criterion cumplido. Follow-ups no bloqueantes en cada task. Gateway en `efeonce-mcp-gateway-00063-l9j`; sigue sin probar en vivo la denegación a una persona sin capability (1891).
 
@@ -67,10 +67,8 @@ beta, permiso, campaña, conexión ni write. Verificar elegibilidad por cliente 
 
 **Contacto:** TASK-1801 cerrada; [alcance y evidencia](.codex/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
 
-**Creative/social 14/09:** AXIS `v0.2.5` publicó `supportingTagline` y selección colaborativa; Greenhouse fija
-los packages y `pnpm creative:layout` los adapta a texto/objeto/grupo. El harness agrega el SVG URL Bubble con
-blend raster `luminosity` `0.72` verificado. Templates: `efeonce-advertising-creative`. Globe/otros runtimes:
-`pending adapter`; tipografía: `trial`; selección: `candidate`.
+**Creative/social 14/09:** `pnpm creative:layout` adapta `supportingTagline` y la selección colaborativa (templates en
+`efeonce-advertising-creative`; Globe: `pending adapter`).
 [Fiestas Patrias/Muertos](docs/operations/social/2026-09-13-fiestas-patrias-production-method.md)
 y [Pódcast](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md) están programados/PENDING,
 no publicados; el video del Pódcast sigue suspendido. MCP sigue sin tool creativa federada.
@@ -135,9 +133,8 @@ Canales emergentes: ChatGPT Ads `selectivo` donde existe (LATAM: sólo BR/MX; Ch
 tomó en paralelo la task del MCP autosuficiente) con wireframe, flow, motion, dirección "La señal" y brief SEO/AEO. La
 legacy `/servicio-gestion-campanas-publicitarias/` (`242862`) muestra contadores en cero y un claim de Google/Meta
 Partners no verificado en producción; el owner decidió no parcharla: la página se construye desde cero y la legacy sale
-con 301. Investigación Semrush por país completada (`docs/audits/public-site/PERFORMANCE_LANDING_KEYWORD_RESEARCH_BY_COUNTRY_2026-09-11.md`):
-Chile busca "performance marketing", PE/MX/CO "publicidad digital", CO además "pauta", US en inglés (página aparte,
-follow-up). Title y copy ledger ajustados; FAQ a catorce.
+con 301. Investigación Semrush por país completada (keywords por país, title y FAQ en
+`docs/audits/public-site/PERFORMANCE_LANDING_KEYWORD_RESEARCH_BY_COUNTRY_2026-09-11.md`).
 
 **Product Design 360 (2026-09-10, modelado y canonizado; oferta `Proposed`, no autoriza venta):** business model
 V1.1 + ficha `docs/services/wave/product-design-360.md` + ADR `EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md`: capability de

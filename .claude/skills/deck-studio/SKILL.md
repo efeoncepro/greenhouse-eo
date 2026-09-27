@@ -67,7 +67,8 @@ marca de cliente ni a Greenhouse. Contrato: [manual](../../../docs/operations/br
   reproducen (fuera de Greenhouse, `deckSlideHtml` de `@efeoncepro/axis-graphic-line`): un solo anillo por lámina.
 - **Íconos (canónicos desde 2026-09-26, sólo marca propia):** en un deck van en **Trazo** (lo que se mide); Plastilina
   sólo en una lámina de Brand, nunca mezclada con Trazo en el mismo grupo. Glifos de `ICON_CATALOG` pintados con
-  `resolveIcon` de `@efeoncepro/axis-graphic-line/icons` (Greenhouse aún no lo consume: `pnpm icons:export` en AXIS);
+  `resolveIcon` de `@efeoncepro/axis-graphic-line/icons` (en Greenhouse lo pinta `pnpm brand:compose` en las recetas de
+  La órbita; fuera de esa ruta, `pnpm icons:export` en AXIS);
   **nunca un ícono dibujado a mano**: el que falta se da de alta con `icons:check` y aprobación. En una fila: 48–56 px,
   espacio ≥ un ícono, etiqueta opcional en Poppins y nunca en el acento; **responde uno solo** (el servicio que se
   vende o la sección donde vamos) en el acento de la línea **del deck**, y ninguno si la lámina ya tiene esfera
@@ -86,9 +87,12 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
 [página del Lab](https://axis.efeonce.org/references/surfaces/deck/)).
 
 - **Cómo se pide una lámina de marca propia:** intent con `surface: "deck"`, `format`, `role`, `recipe`, `line`, voz,
-  prueba y pasos → `pnpm surface:resolve` en AXIS (contrato `efeonce.surface-composition` 0.1.0 `candidate`) → los
-  `delegates` van a `pnpm creative:orbit:render` (voz, órbita), la selección y `resolveIcon`. Valores desde
-  `efeonceGraphicLine.surfaces.deck` y `pieces.deck`; **nunca coordenadas en la lámina**.
+  prueba y pasos. **Si la receta está aprobada, `pnpm brand:compose -- --intent <intent.json>`** la compone entera en
+  el Artifact Composer (catálogo `graphic-line-deck`, PDF 16:9; ejemplos en
+  `src/lib/brand-surfaces/examples/deck-*-intent.json`). Si no, `pnpm surface:resolve` en AXIS (contrato
+  `efeonce.surface-composition` 0.1.1 `candidate`) → los `delegates` van a `pnpm creative:orbit:render` (voz, órbita),
+  la selección y `resolveIcon`. Valores desde `efeonceGraphicLine.surfaces.deck` y `pieces.deck`; **nunca coordenadas
+  en la lámina**.
 - **Recetas aprobadas:** sección clásica, sección partida (el arco sube por la derecha), contenido «la órbita mide la
   cifra», tríptico «escucha, crea y mide», **`proposal-cinematic`** y **`method-staircase`**. Todo lo demás del canvas
   es opción.
@@ -113,8 +117,13 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
 - **`method-staircase`** (el método por niveles, **sin foto**: la escalera es la imagen): peldaños de vidrio que se
   iluminan al subir y el nivel de llegada en bloque sólido en el acento de la línea. Aprobada con BeX (cinco
   peldaños; el quinto, Be Intrinsic, en Engine).
-- **Artifact Composer:** ninguna de las dos recetas es todavía catálogo de `deck-axis`; se arman como maqueta de
-  dirección leyendo el manifest y se declaran así en la entrega. Precios siempre placeholder.
+- **Artifact Composer (desde el 2026-09-27, TASK-1919):** las seis recetas aprobadas del deck —`proposal-cinematic`,
+  `method-staircase`, `section-classic`, `section-split`, `content-measure` y `triptych`— son el catálogo
+  **`graphic-line-deck`** (PDF 16:9, `contentType` `deck.<receta>`), separado de **`deck-axis`**, que sigue siendo el
+  catálogo de las ofertas a comité con la línea base de SKY: **nunca mezcles** una lámina de La órbita en un deck de
+  `deck-axis` ni al revés. Una opción del canvas no tiene plantilla (`recipe-not-approved`): se arma como maqueta de
+  dirección y se declara así. Gate: `pnpm composer:visual-gate --catalog=graphic-line`. Detalle:
+  [composition.md](composition.md) §Catálogos de La órbita. Precios siempre placeholder.
 
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 

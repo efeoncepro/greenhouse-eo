@@ -469,6 +469,7 @@ compilado hace que un catálogo nuevo declare **el suyo, una vez**.
 | Motor de composición | **Platform** | `src/lib/artifact-composer/**` (domain-free) |
 | Catálogo deck AXIS (16:9 → PDF) | Commercial | `catalogs/deck-axis/` |
 | Catálogo social (4:5 → PNG set) | Growth/Social | `catalogs/social-carousel/` |
+| Catálogos «La órbita» por superficie (deck PDF · fijos PNG · capas con alfa) | Brand (marca propia Efeonce) | `catalogs/graphic-line-{deck,stills,overlays}/` + `graphic-line-shared/`; mapper `src/lib/brand-surfaces` (TASK-1919) |
 | Tokens de marca | **Brand-pack SoT declarado** | `deck-axis`: Figma PPT `33:2` → CSS custom props generado; `axis-tokens.ts` queda como mirror UI con crosswalk exacto |
 | Aggregate de la oferta | Commercial | `greenhouse_commercial.proposals` (`origin`) |
 | Precio | **quote-to-cash** | `src/lib/commercial/quote-to-cash/**` — el Proposal **no** calcula |
@@ -489,6 +490,41 @@ Composer es el candidato natural a `domain-package` el día que EPIC-027 lo auto
 > frontera del primitive: el hash del manifest es domain-free en `src/lib/artifact-composer/manifest-hash.ts`,
 > y el lanzador del Job **no** vive en el composer sino en `src/lib/render-dispatch/job-runner.ts` (server-only;
 > el boundary del composer lo rechaza). Contrato: `GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md`.
+
+> **Delta 2026-09-27 (TASK-1919) — «La órbita» por superficie entra como tres catálogos, y el motor gana tres
+> capacidades genéricas.** Confirma de nuevo la tesis del ADR: la marca propia de Efeonce entra como **catálogos**,
+> no como fork, y lo que el motor necesitó se agregó **una vez** y sin nombre de marca.
+>
+> - **Catálogos nuevos** en `src/lib/artifact-composer/catalogs/`: `graphic-line-deck` (PDF 16:9: `proposal-cinematic`,
+>   `method-staircase`, `section-classic`, `section-split`, `content-measure`, `triptych`), `graphic-line-stills`
+>   (PNG: `web.hero-lens`, `web.hero-bleed`, `web.hero-uniform-tablet`, `web.hero-mobile-native` con una plantilla
+>   por ancho —360/390/430, `contentType` `web.hero-mobile-native.<formato>`—, `dooh.caminero-lens`,
+>   `motion.loop-lens-reveal` —el último cuadro del loop, su estático de respaldo— y `motion.storyboard`) y
+>   `graphic-line-overlays` (PNG con alfa: `audiovisual.cartela`, `zocalo`, `callout-selection`, `data-super`,
+>   `subtitles`; opacas: `split-screen` y `shot-plan`). 20 recetas, 22 plantillas, con piezas compartidas en
+>   `graphic-line-shared/` (resolvers, tokens compilados, ganchos de selección y CTA). **No** se mezclan con
+>   `deck-axis`, que conserva su molde y la línea base de SKY.
+> - **Sólo una receta APROBADA tiene plantilla.** Las opciones y pendientes de AXIS (paleta DOOH, pDOOH) fallan con
+>   `recipe-not-approved`; `audiovisual.close-reveal` es video y falla con `recipe-outside-composer` (lo producen los
+>   masters del reveal v1.1 / `orbit:video`). **El video no se compone aquí**: el composer entrega cuadros fijos y
+>   capas; la animación sigue en la pipeline de motion.
+> - **Motor (domain-free):** (1) `render.background: 'transparent'` por plantilla en el contrato
+>   (`contracts.ts`): la captura sale sin fondo (PNG con alfa) sólo cuando la plantilla lo declara; default opaco.
+>   (2) El gate de tinta (`quality-gates.ts`) pondera por alfa, así que una capa transparente vacía sigue fallando.
+>   (3) La limpieza de un slot ya no borra los campos de otro slot anidado dentro de él.
+> - **Pintura inyectada, no importada.** Cada catálogo de La órbita exporta `createCatalog(options)` y recibe los
+>   pintores de la selección colaborativa y del CTA: el motor no importa paquetes; la pintura es el adaptador de
+>   Greenhouse (`scripts/creative/layout-compiler`) sobre el contrato `efeonce.collaboration-selection`. Los ganchos
+>   miden texto o caja según `targetKind`, honran `variant`/`padding`/`overlay` y esperan `document.fonts.ready`.
+> - **Consumidor:** el mapper puro `src/lib/brand-surfaces` (intent → receta aprobada → `resolveSurfaceComposition`
+>   de AXIS → builder por receta → plan del composer + assets externos) y el CLI local `pnpm brand:compose`. La ruta
+>   productiva (API + `artifact-worker` + MCP) es TASK-1921. Tokens: `pnpm brand:tokens [--check]` compila
+>   `efeonceGraphicLine` (`@efeoncepro/axis-tokens`) a `graphic-line-tokens.{json,css}` por catálogo y copia byte a
+>   byte los archivos de marca desde `@efeoncepro/axis-brand-assets` (test de sincronía). El brand pack `axis` suma
+>   la extensión `graphic-line` (Bricolage Grotesque 760, Poppins 400/500).
+> - **Gate:** scope propio `pnpm composer:visual-gate --catalog=graphic-line` (22 frames a 0 px); ver
+>   `docs/operations/runbooks/composer-visual-gate.md`. Norma de marca:
+>   `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §2.1.
 
 ---
 

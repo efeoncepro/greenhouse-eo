@@ -70,6 +70,30 @@ distintos por página contra `docs/ui/visual-directions/TASK-1889-efeonce-insigh
 `Deck-Agrupadas` es la única excepción aprobada por el operador, con techo 2,5 %; una excepción nueva
 exige su aprobación). Dossier: `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md`.
 
+### Scope de La órbita (`graphic-line`, TASK-1919)
+
+Los tres catálogos de la línea gráfica por superficie (`graphic-line-deck`, `graphic-line-stills` y
+`graphic-line-overlays`) tienen su propio scope, por la misma razón que Insights: no rebaselinar frames ajenos.
+
+```bash
+pnpm composer:visual-gate --catalog=graphic-line --selftest
+pnpm composer:visual-gate --catalog=graphic-line --freeze
+pnpm composer:visual-gate --catalog=graphic-line
+```
+
+- **Qué cubre:** `templates-graphic-line-{deck,stills,overlays}/**`, **22 frames a 0 px** (20 recetas aprobadas;
+  el teléfono tiene una plantilla por ancho). Alta declarada en `BASELINE_DELTAS.md` el 2026-09-27.
+- **El probe no es sintético genérico:** cada contrato declara como `example` el plan real de su pieza aprobada, y la
+  foto, los íconos y las capas de la órbita llegan como SVG sintéticos deterministas (`GRAPHIC_LINE_PROBE_ASSETS` en
+  `scripts/artifact-composer/visual-gate.ts`). No hay foto real en el probe, así que ISSUE-122 (§4) no aplica aquí.
+- **Las capas audiovisuales transparentes se congelan con su alfa**; un diff de alfa es un diff.
+- **Los ganchos de selección, CTA y storyboard esperan `document.fonts.ready`** antes de medir: el storyboard medía
+  con la fuente de respaldo y variaba entre corridas. Si un frame de este scope empieza a oscilar, revisa primero que
+  el gancho nuevo espere las fuentes.
+- **Estado del gate global (2026-09-27):** marca 60 frames de `deck-axis`/SKY/Insights con diferencias de pocos
+  píxeles. Con el `render.ts` anterior a TASK-1919 sale la misma lista con las mismas cuentas: es deriva de entorno
+  previa (ISSUE-122), no de estos catálogos, y **no se rebaselinó**. No uses un freeze global para «limpiarla».
+
 ## 4. 🩸 El gotcha que TIENES que conocer: las fotos raster no son deterministas (ISSUE-122)
 
 Las láminas con **fotos** (`TeamGalleryFull` / la lámina del equipo) **driftean unos píxeles entre

@@ -17,6 +17,10 @@
 > Oficio (D25): catálogo de 60 glifos y 33 volúmenes verificados contra AXIS main@aa66225, 2026-09-27
 > (`axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3, **publicados** con el tag `v0.5.0`; `axis-tokens` sigue en
 > 0.3.7). Versiones que fija Greenhouse leídas de `package.json` el 2026-09-27.
+>
+> Composición por superficie y su ruta por el Artifact Composer (TASK-1919): verificado contra greenhouse-eo@016d0a183
+> — 2026-09-27 (`axis-tokens` 0.3.8 y `axis-ui-contracts` 0.3.7, tag `v0.3.8`, contrato `efeonce.surface-composition`
+> 0.1.1; `src/lib/brand-surfaces`, `scripts/brand-surfaces/`, catálogos `graphic-line-*`).
 
 Índice: [1 Paquetes](#1-paquetes-versiones-e-instalación) · [2 Tokens](#2-tokens-efeoncegraphicline) ·
 [3 Contrato de la órbita](#3-contrato-efeoncegraphic-line-orbit) · [4 Selección colaborativa](#4-contrato-efeoncecollaboration-selection) ·
@@ -31,11 +35,11 @@
 Registro privado: GitHub Packages (`@efeoncepro:registry=https://npm.pkg.github.com`). Cada paquete se versiona por
 separado.
 
-> **Al 2026-09-27 (manda sobre la tabla, que es la foto del 2026-09-26):** último tag `v0.5.0`. Publicado:
-> `axis-graphic-line` **0.5.0** (`v0.5.0`, catálogo de 60 glifos con el oficio D25) · `axis-brand-assets` **0.3.3**
-> (`v0.5.0`, 33 PNG de volumen) · `axis-tokens` **0.3.7** y `axis-ui-contracts` **0.3.6** (`v0.3.7`). Greenhouse fija
-> tokens 0.3.7, contracts 0.3.6, registry 0.3.1, brand-assets **0.3.2** y `axis-graphic-line` **0.4.0** como
-> dependencia directa: todavía **sin** el oficio (30 glifos y 18 volúmenes).
+> **Al 2026-09-27 (manda sobre la tabla, que es la foto del 2026-09-26):** publicado `axis-graphic-line` **0.5.0**
+> (`v0.5.0`, catálogo de 60 glifos con el oficio D25) · `axis-brand-assets` **0.3.3** (`v0.5.0`, 33 PNG de volumen) ·
+> `axis-tokens` **0.3.8** y `axis-ui-contracts` **0.3.7** (`v0.3.8`, contrato `efeonce.surface-composition` 0.1.1;
+> `efeonceGraphicLine.surfaces` desde 0.3.7). **Greenhouse fija todo eso** (tokens 0.3.8, contracts 0.3.7, registry
+> 0.3.1, brand-assets 0.3.3 y `axis-graphic-line` 0.5.0 como dependencia directa; commits `8d817f29e` y `016d0a183`).
 
 | Paquete | Versión en `main` de AXIS | Último tag de release | Fija Greenhouse (`package.json`) | Qué trae para la línea |
 |---|---|---|---|---|
@@ -52,9 +56,11 @@ separado.
 
 Consecuencias que un agente debe saber:
 
-- **Greenhouse no depende de `axis-graphic-line`.** En Greenhouse la órbita se pinta con el adapter propio
-  (`scripts/creative/layout-compiler/graphic-line.mjs`) sobre el contrato. Importar `@efeoncepro/axis-graphic-line` desde
-  código de Greenhouse falla: no está en `node_modules`.
+- **Greenhouse depende de `axis-graphic-line` desde el 2026-09-27** (dependencia directa, hoy 0.5.0). Lo usa **sólo**
+  el mapper de superficies `src/lib/brand-surfaces` (`paintGraphicLine`, `resolveIcon`) para los catálogos del Artifact
+  Composer (TASK-1919). Las piezas sociales y de campaña siguen con el adapter propio
+  (`scripts/creative/layout-compiler/graphic-line.mjs`), raster-safe, sobre el contrato de la órbita. *(Antes de esa
+  fecha la frase era «Greenhouse no depende de `axis-graphic-line`»: ya no es cierta.)*
 - El contrato de la órbita en `axis-ui-contracts` 0.3.0 (el que tiene Greenhouse) es **idéntico** al de 0.3.2/0.3.4
   (diff vacío de `graphic-line.js`); 0.3.2 sólo suma `email-signature.ts`, y 0.3.4 la variante `team`.
 - En el checkout local de AXIS, `packages/contracts/dist` todavía no incluye la variante `team` (el `dist` es anterior
@@ -794,6 +800,19 @@ Ejemplos de intent en `docs/examples/graphic-line/` (`post-lens`, `deck-progress
 | `node scripts/creative/brand-motion/render-orbit-motion.mjs --out <dir> [--anim reveal,open,sting] [--format 16x9,1x1,4x5,9x16,16x9-4k] [--scheme dark,light] [--fps 60] [--storyboard] [--ss 2]` | render de las animaciones del logo (Chromium, dos pasadas `main` + `halo`) |
 | `node scripts/creative/brand-motion/orbit-sound.mjs --anim reveal\|open\|sting --out <file.wav>` | sonido sintetizado |
 | `node scripts/creative/brand-motion/encode-orbit-motion.mjs --frames <dir> --sound <dir> --out <dir> [--only …]` | MP4 60/30 fps, GIF, ProRes 4444, WebM, HEVC, PNG por capas |
+| `pnpm brand:compose -- --intent <intent.json> [--out <dir>] [--artifact-id <id>]` (`scripts/brand-surfaces/compose.ts`, TASK-1919) | compone una receta **aprobada** por superficie en el Artifact Composer: exige receta aprobada → `resolveSurfaceComposition` (con `issues`, no compone) → builder de la receta → plan + assets (plate de `photo.plateRef` recortado, íconos `resolveIcon`, capas SVG de `paintGraphicLine`) → PDF (deck) o PNG (resto; capas de video con alfa). Salida por defecto `.captures/brand-surfaces/<id>/` más `<id>.surface-manifest.json`. Errores (`SurfacePieceError.code`): `recipe-not-approved`, `recipe-outside-composer` (`audiovisual.close-reveal`), `surface-issues` (lista los issues de AXIS), `recipe-without-template`, `missing-photo`, `invalid-intent`. Ejemplos por receta: `src/lib/brand-surfaces/examples/*-intent.json` |
+| `pnpm brand:tokens [--check]` (`scripts/brand-surfaces/compile-tokens.ts`) | compila `efeonceGraphicLine` a `graphic-line-tokens.{json,css}` de cada catálogo `graphic-line-*` y copia byte a byte los archivos de marca desde `axis-brand-assets`; `--check` falla si lo commiteado no coincide con la versión instalada |
+| `pnpm composer:visual-gate --catalog=graphic-line [--selftest\|--freeze]` | gate visual a 0 px de los 22 frames de los catálogos de La órbita (runbook `docs/operations/runbooks/composer-visual-gate.md`) |
+
+**Catálogos del Artifact Composer (TASK-1919):** `graphic-line-deck` (PDF 16:9: `deck.proposal-cinematic`,
+`method-staircase`, `section-classic`, `section-split`, `content-measure`, `triptych`), `graphic-line-stills` (PNG:
+`web.hero-lens`, `hero-bleed`, `hero-uniform-tablet`, `hero-mobile-native.<formato>` 360/390/430,
+`dooh.caminero-lens`, `motion.loop-lens-reveal` —el último cuadro— y `motion.storyboard`) y `graphic-line-overlays`
+(PNG con alfa: `audiovisual.cartela`, `zocalo`, `callout-selection`, `data-super`, `subtitles`; opacas `split-screen` y
+`shot-plan`). `contentType` = `<superficie>.<receta>`; lo deriva el mapper, un autor nunca elige plantilla. Cada
+catálogo exporta `createCatalog({ selectionPainter, ctaPainter })`: la pintura de la selección y del CTA la inyecta el
+consumidor (adaptador de Greenhouse sobre `efeonce.collaboration-selection`). Plantillas de capa declaran
+`render.background: 'transparent'`.
 
 `bindings.json` del render: `{ targets: { id: { cx, cy, r } }, photos: { photoId: ruta }, urlBubble: { x, y, height },
 texts: [{ id, x, y, w, h, content?, svg?, fontSize?, baseline?, lastChar? }], signature: { y? }, protect: [{ id, kind:
@@ -850,10 +869,11 @@ de la página es `orbitSvg` con `circle` y `channel: 'social'`.
   (el Lab lo dibuja en la propia página).
 - **No hay archivo del eslogan** en `axis-brand-assets`, ni logo/isotipo de Greenhouse, ni fuentes, ni fotos.
 - **No hay adapter de Figma, InDesign ni Office** para la órbita: para esos medios se usan los 48 archivos estáticos.
-- **Greenhouse no tiene** `@efeoncepro/axis-graphic-line` instalado; su adapter **no pinta** `spotlight` ni
+- **El adapter de campañas de Greenhouse** (`scripts/creative/layout-compiler/graphic-line.mjs`) **no pinta** `spotlight` ni
   `family-map` (sólo `orbit`, `measure`, `progress`, `lens`, `url-bubble` con `bindings.urlBubble`, la esfera de la
   respuesta y la firma), **no pinta la marca de partida** (`originMark`) de una medida y su SVG no lleva
-  `focusable="false"`.
+  `focusable="false"`. (`@efeoncepro/axis-graphic-line` sí está instalado desde el 2026-09-27, pero sólo lo usa
+  `src/lib/brand-surfaces` para los catálogos del composer.)
 - **No hay coordenadas libres en el contrato**: sólo regiones, posiciones, targets medidos o `bindings.circles`.
 - **No existe** el código `url-bubble-signature-is-efeonce-only` (se retiró: Efeonce firma en toda línea). No existe
   `lens.accentSphereDiameterRatio` como regla vigente (deprecado).

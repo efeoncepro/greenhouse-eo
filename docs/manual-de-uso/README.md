@@ -30,9 +30,11 @@ La diferencia con otras capas de documentacion:
   logo V1.1: qué archivo para qué editor y dónde bajar los masters), usar y pedir un ícono de la marca (Trazo y Plastilina), fotografiar merch u oficina, checklist de revisión, regenerar el
   PDF del manual y problemas comunes (burbuja negra en visores, burbuja-firma bajo 4,5:1, texto que cruza la órbita).
 - [Componer una pieza por superficie con AXIS](creative/componer-por-superficie-con-axis.md) — web, DOOH, pDOOH,
-  motion, video y deck: declarar superficie, formato, papel y receta, resolver el intent con `pnpm surface:resolve`
-  (AXIS, contrato `candidate`), entregar cada delegate a su compositor de Greenhouse, la receta de deck
-  `proposal-cinematic` y el registro cine, qué significan los estados y los `issues`, y problemas comunes.
+  motion, video y deck: declarar superficie, formato, papel y receta; **Ruta A** para las 20 recetas aprobadas con
+  plantilla, `pnpm brand:compose` (Artifact Composer: PDF del deck, PNG de web/DOOH/motion y capas de video con alfa;
+  TASK-1919); **Ruta B** para el resto, `pnpm surface:resolve` en AXIS (contrato `candidate`) y cada delegate a su
+  compositor de Greenhouse; la receta de deck `proposal-cinematic` y el registro cine, qué significan los estados, los
+  `issues` y los errores `recipe-not-approved` / `recipe-outside-composer` / `surface-issues`, y problemas comunes.
 - [Componer piezas de Glitch](creative/componer-piezas-glitch.md) — **sólo para Glitch** (no para piezas de
   Efeonce): elegir la portada con la regla de rotación, armar portada, láminas interiores, noticia 1 y contraportada,
   piezas del blog y del video en propuesta (mapa de zonas del reel), checklist, estados y problemas comunes. Hoy se

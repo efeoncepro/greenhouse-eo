@@ -47,9 +47,15 @@
 | 2026-09-26 | **Capa gráfica sobre la foto, entera (amplía P-5 de D10):** el operador la aprobó también fuera de los casos de la línea (voz, lente, medida). Se compone sobre las reservas de la toma, sin scrim; los ejemplos compuestos rechazados del 19-09 siguen sin valer. Canon: maestro §9, §10 y P-5; `photography-convergence.md` P-5. |
 | 2026-09-26 | **Banco de fotografía y guía «El porqué» en AXIS:** aprobados por el operador y publicados (`/references/photography/` y `/references/photography/why/`, con `why.json` para agentes). Complementan las skills de fotografía; el canon sigue en `docs/operations/brand-photography/`. |
 | 2026-09-27 | **Glitch: sub-línea complementaria de La órbita, sólo para Glitch.** Aprobados el sistema de portada A/B/C con su regla de rotación (nunca dos semanas seguidas con la misma plantilla) y el feed de nueve semanas, la lámina interior y la contraportada del carrusel; ajustes aplicados: cabecera sin línea fina, «El micrófono se abre…» abre la noticia 1 (no la portada), «Desliza» con la mano Plastilina. Detalle y estado por pieza: [glitch.md](glitch.md). |
+| 2026-09-27 | **El video no se compone en el Artifact Composer (opción b, TASK-1919):** el composer entrega cuadros fijos, el último cuadro del loop y capas con alfa; la animación sigue en la pipeline de motion (`orbit:video`, masters del reveal v1.1). Sólo las recetas **aprobadas** tienen plantilla; `audiovisual.close-reveal` falla con `recipe-outside-composer`. |
 
 ## Pendientes del operador (no decidir por tu cuenta)
 
+- **Plantillas de La órbita (TASK-1919, 2026-09-27):** posición de la lente del caminero (token 0,70 vs ≈0,77 en la
+  lámina aprobada); super de dato con arco completo (lámina) o la estela canónica de la medida; burbuja URL en
+  `section-classic`, `section-split`, `content-measure` y `triptych` (las láminas no la llevan, el manifest del deck
+  dice `url-bubble-footer`; se siguió la lámina); gris del descriptor y la bajada web, sin token; paleta DOOH 20 % vs
+  35 %. Hasta decidir, la plantilla sigue la lámina aprobada y no se inventa un token.
 - **Glitch (2026-09-27):** la manzana como esfera y el verde `#6ec207` como token de franquicia en AXIS; la línea de
   servicio de Glitch (Growth recomendado, Brand alternativa); aprobar lente, blog (banners, maqueta, callout v2), vlog
   16:9, kit de overlays del reel y tarjetas finales; alta de los cinco glifos Plastilina; licencia de Guttery; pasar el
@@ -95,6 +101,12 @@
   `ICON_CATALOG` y `axis-brand-assets` **0.3.3** con 33 PNG en `volume/`; `axis-tokens` sigue en 0.3.7). Greenhouse
   ya lo fija (2026-09-27: `axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3).
 
+- Composición por superficie en Greenhouse (TASK-1919): **hecho, local en `develop`** — las 20 recetas aprobadas son
+  plantillas del Artifact Composer (`graphic-line-deck`, `graphic-line-stills`, `graphic-line-overlays`), `pnpm
+  brand:compose` y gate `--catalog=graphic-line` a 0 px. Falta la ruta productiva (TASK-1921: API, `artifact-worker`,
+  MCP) y cinco preguntas del operador: lente del caminero (token 0,70 vs ≈0,77 en la lámina), super de dato con arco
+  completo o estela canónica, burbuja URL en sección/contenido/tríptico (se siguió la lámina, sin burbuja), gris del
+  descriptor/bajada web sin token y paleta 20 % vs 35 %.
 - Task «foto:prompt y chequeos de la lente» (sin ID): P5 (chequeos de lecho y reservas para lente y foco;
   `lens-subject-inside-circle` medido), P9 (campo `reservas.lente`), P-6 (formato nativo 1200×627) y P-8 (el límite del
   36 % sólo con reserva de texto). Hasta que llegue, `foto:prompt` sigue emitiendo el límite del 36 % y no genera
@@ -115,6 +127,7 @@
 | 2026-09-26 | axis-tokens 0.3.5 · axis-ui-contracts 0.3.5 (contrato `graphic-line-orbit` 0.3.1) · axis-ui-registry 0.3.1 · axis-brand-assets 0.3.1 (órbitas estáticas regeneradas) · axis-graphic-line 0.3.2 | publicado (tag `v0.3.5`) | `accentContrast`, `urlBubble.minContrast`, `haloOnLightScale`, `live` + `sphere-ring-only-live`, `accent-text-min-size`, cierre del deck con Growth en acento |
 | 2026-09-27 | axis-tokens 0.3.7 · axis-brand-assets 0.3.2 · axis-ui-contracts 0.3.6 (AXIS `main@c0020b6`; `axis-graphic-line` sigue en 0.4.0) | publicado (tag `v0.3.7`) | Plastilina en volumen (D24): `efeonceGraphicLine.icons.volume`, `volume/<glifo>.png` (18 PNG), `AXIS_VOLUME_ICONS`, `findVolumeIcon`, `volumeIconUrl`; publicada coordinada junto con los cambios de superficies |
 | 2026-09-27 | axis-graphic-line 0.5.0 · axis-brand-assets 0.3.3 (AXIS main@aa66225, 2026-09-27; `axis-tokens` sigue en 0.3.7) | publicado (tag `v0.5.0`) | Oficio (D25): 30 glifos nuevos en `ICON_CATALOG` (27 Trazo + 33 Plastilina = 60) y los 15 volúmenes de oficio en `volume/` (33 PNG) |
+| 2026-09-27 | axis-tokens 0.3.8 · axis-ui-contracts 0.3.7 | publicado (tag `v0.3.8`) | contrato `efeonce.surface-composition` 0.1.1 (`candidate`, acepta intents 0.1.0): modela el contenido de las láminas aprobadas (`levels`, `note`, `panels`, `figures` con fuente, `nav`, `photo.focus`/`native`, título y marcos de hojas, `chapter`, `selection.box`, `shots`, `subtitles`, `selection.level`). `efeonceGraphicLine.surfaces` entró en 0.3.7 (contrato 0.1.0). Greenhouse lo fija (commit `016d0a183`) |
 
 Lab AXIS (`c2affc6`, 2026-09-26): la lámina 6.1 lista las decisiones del 26-09 y lo que sigue abierto; el acento ya no colorea texto de menos de 24 px en 1.2 y en las láminas de Insights; la anatomía de 1.2 ya no dibuja el anillo de la esfera; 5.4, 5.1 y 4.5 al día. Quedan en acento sólo rótulos de cotas en diagramas técnicos («0,20 em», la «X» del resguardo), que no son piezas.
 

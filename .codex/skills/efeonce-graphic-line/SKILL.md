@@ -1,6 +1,6 @@
 ---
 name: efeonce-graphic-line
-description: The Efeonce graphic line «La órbita» end to end (living skill) — everything available in AXIS (tokens efeonceGraphicLine, contracts efeonce.graphic-line-orbit / collaboration-selection / email-signature, the @efeoncepro/axis-graphic-line package with its recipes, brand assets and the Lab), how to compose every piece (orbit, measure/trajectory, progress/deck, lens, spotlight, family map, state, voice question+answer, logo inline, slogan per service line, signature and URL bubble, email signature, merch, office, video), the motion language (the orbit alone and the three approved logo animations reveal/apertura/sting, values in efeonceGraphicLine.motion) and its convergence with the Efeonce photographic language, which stays in force. It routes composition BY SURFACE (web, DOOH, pDOOH, motion, audiovisual video, deck: contract efeonce.surface-composition 0.1.0 candidate, tokens efeonceGraphicLine.surfaces, pnpm surface:resolve in AXIS, the approved deck recipes proposal-cinematic and method-staircase, and the cinema register proposal-cinematic allows). It also holds the Glitch sub-line (Efeonce's weekly magazine — covers A/B/C, LinkedIn carousel, blog banners and callout, vlog and reel overlays) — the apple as sphere, Glitch green, byte glitch, Guttery and the «EDICIÓN #N» masthead apply ONLY to Glitch; load references/glitch.md for any Glitch piece. It also owns the line's canonical iconography (two voices: Trazo for what is measured, Plastilina for what is created; the sphere as a rest/response state; the skewed orbit; @efeoncepro/axis-graphic-line/icons with resolveIcon, auditIconGroup, skewedOrbitHeroSvg and pnpm icons:export|check|vectorize in AXIS). Use for ANY piece, surface, code or doc that uses the orbit, the lens, the spotlight, the sphere as a full stop, the «Empower your …» slogan, the Efeonce signature, the logo animations or the axis-graphic-line package; for any icon or icon row in an Efeonce-brand piece (deck, report, social post, sticker, cover) and for creating a new glyph; before composing with AXIS or the Greenhouse compilers (creative:orbit, creative:layout graphic_line, foto:componer:cta marcaEnEscena, brand-motion); and when a human asks what is available or how something is built. Every session that changes the line, its tokens, contracts, package, Lab, motion or its photographic convergence MUST update this skill (see Skill Maintenance Contract).
+description: The Efeonce graphic line «La órbita» end to end (living skill) — everything available in AXIS (tokens efeonceGraphicLine, contracts efeonce.graphic-line-orbit / collaboration-selection / email-signature, the @efeoncepro/axis-graphic-line package with its recipes, brand assets and the Lab), how to compose every piece (orbit, measure/trajectory, progress/deck, lens, spotlight, family map, state, voice question+answer, logo inline, slogan per service line, signature and URL bubble, email signature, merch, office, video), the motion language (the orbit alone and the three approved logo animations reveal/apertura/sting, values in efeonceGraphicLine.motion) and its convergence with the Efeonce photographic language, which stays in force. It routes composition BY SURFACE (web, DOOH, pDOOH, motion, audiovisual video, deck: contract efeonce.surface-composition 0.1.1 candidate published in AXIS v0.3.8, tokens efeonceGraphicLine.surfaces, pnpm surface:resolve in AXIS, the approved deck recipes proposal-cinematic and method-staircase, and the cinema register proposal-cinematic allows) and its Greenhouse production route: the 20 approved recipes are Artifact Composer templates (catalogs graphic-line-deck PDF, graphic-line-stills PNG, graphic-line-overlays PNG with alpha) composed end to end with pnpm brand:compose from an intent (mapper src/lib/brand-surfaces; options/pending fail with recipe-not-approved, video stays in motion). It also holds the Glitch sub-line (Efeonce's weekly magazine — covers A/B/C, LinkedIn carousel, blog banners and callout, vlog and reel overlays) — the apple as sphere, Glitch green, byte glitch, Guttery and the «EDICIÓN #N» masthead apply ONLY to Glitch; load references/glitch.md for any Glitch piece. It also owns the line's canonical iconography (two voices: Trazo for what is measured, Plastilina for what is created; the sphere as a rest/response state; the skewed orbit; @efeoncepro/axis-graphic-line/icons with resolveIcon, auditIconGroup, skewedOrbitHeroSvg and pnpm icons:export|check|vectorize in AXIS). Use for ANY piece, surface, code or doc that uses the orbit, the lens, the spotlight, the sphere as a full stop, the «Empower your …» slogan, the Efeonce signature, the logo animations or the axis-graphic-line package; for any icon or icon row in an Efeonce-brand piece (deck, report, social post, sticker, cover) and for creating a new glyph; before composing with AXIS or the Greenhouse compilers (creative:orbit, creative:layout graphic_line, foto:componer:cta marcaEnEscena, brand-motion); and when a human asks what is available or how something is built. Every session that changes the line, its tokens, contracts, package, Lab, motion or its photographic convergence MUST update this skill (see Skill Maintenance Contract).
 ---
 
 # Efeonce «La órbita» — línea gráfica (skill viva)
@@ -34,7 +34,7 @@ dos esferas en una pieza (manzana + lente u órbita).
 
 | Necesitas… | Lee |
 |---|---|
-| **Una pieza para una superficie concreta** — hero web, DOOH (caminero, paleta), pDOOH (LED, mupi, spot, variantes), gráfica animada con foto, video (cartela, zócalo, super, subtítulos) o lámina de deck (incluida la propuesta de cine `proposal-cinematic`): recetas aprobadas, opciones, pendientes, rechazos, firma por soporte y cómo se compone con AXIS | [norma de composición por superficie](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) + [applications.md §L](references/applications.md) + guías AXIS `docs/agent-composition/surfaces/` (en `main` de AXIS; [Lab](https://axis.efeonce.org/references/surfaces/)) + la página de la superficie en el [canvas](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) (empieza por su lámina «Guía · cómo componer …») |
+| **Una pieza para una superficie concreta** — hero web, DOOH (caminero, paleta), pDOOH (LED, mupi, spot, variantes), gráfica animada con foto, video (cartela, zócalo, super, subtítulos) o lámina de deck (incluida la propuesta de cine `proposal-cinematic`): recetas aprobadas, opciones, pendientes, rechazos, firma por soporte y cómo se compone con AXIS | [norma de composición por superficie](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) + [applications.md §L](references/applications.md) + guías AXIS `docs/agent-composition/surfaces/` (en `main` de AXIS; [Lab](https://axis.efeonce.org/references/surfaces/)) + la página de la superficie en el [canvas](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) (empieza por su lámina «Guía · cómo componer …»). **Receta aprobada → `pnpm brand:compose`** ([norma §2.1](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#21-la-ruta-por-el-artifact-composer-desde-el-2026-09-27-task-1919), [manual de uso](../../../docs/manual-de-uso/creative/componer-por-superficie-con-axis.md)) |
 | **El criterio**: qué significa cada elemento (anillo, arco, esfera, halo, lente, foco, voces, eslogan, firma), cuándo usar la órbita y cuándo no, con qué se combina y qué delata que no se entendió la línea — **léelo primero** | [references/criteria.md](references/criteria.md) |
 | Saber qué existe: tokens, contratos, funciones del paquete, assets, comandos, versiones, el mapa del Lab | [references/package-and-tokens.md](references/package-and-tokens.md) |
 | **Una aplicación concreta**: post, story, banner de LinkedIn, ads, deck, informe, firma de correo (personal y de equipo), oficina y uso del espacio, objetos, merch, vestir, credenciales, papelería, eventos, video — qué elementos van, dónde y cómo se produce | [references/applications.md](references/applications.md) |
@@ -86,6 +86,11 @@ dos esferas en una pieza (manzana + lente u órbita).
     la pieza se declara con superficie, formato, papel y receta en `efeonce.surface-composition` y se resuelve con
     `pnpm surface:resolve` en AXIS; los `delegates` del manifest van a los compositores de Greenhouse. **Nunca
     coordenadas ni canal elegidos a mano.** El registro cine sólo con Nexa protagonista o en `proposal-cinematic`.
+    **Una receta aprobada se compone con `pnpm brand:compose`** (Artifact Composer, TASK-1919), no como maqueta: sólo
+    las aprobadas tienen plantilla (el resto falla con `recipe-not-approved`) y el composer **nunca anima** (entrega
+    cuadros fijos, el último cuadro del loop y capas con alfa; `audiovisual.close-reveal` falla con
+    `recipe-outside-composer`). Una receta nueva entra al catálogo sólo tras la aprobación del operador, con su
+    plantilla bajo `pnpm composer:visual-gate --catalog=graphic-line`.
 14. **Estado honesto:** la órbita es un sistema consistente, **no** un activo distintivo demostrado; la prueba sin
     logo va antes de cualquier pauta con la órbita. «Te hacemos visible» no sale a pauta sin revisión legal.
 
@@ -97,8 +102,10 @@ dos esferas en una pieza (manzana + lente u órbita).
    motion, video, deck), parte de la norma de composición por superficie y de su página del canvas. Si hay foto, aplica
    `photography-convergence.md` antes de componer.
 3. Compón **por intención** (contrato) o con la **receta** del paquete; en Greenhouse, con los compiladores
-   (`pnpm creative:orbit:render`, `pnpm creative:layout`, `pnpm foto:componer:cta`). Los íconos, con
-   `@efeoncepro/axis-graphic-line/icons` (o `pnpm icons:export` en AXIS: Greenhouse todavía no consume `/icons`).
+   (`pnpm creative:orbit:render`, `pnpm creative:layout`, `pnpm foto:componer:cta`). **Si la pieza es una receta
+   aprobada por superficie, `pnpm brand:compose -- --intent <intent.json>`** la entrega entera (ejemplos en
+   `src/lib/brand-surfaces/examples/`). Los íconos, con `resolveIcon` de `@efeoncepro/axis-graphic-line` (Greenhouse lo
+   usa en `src/lib/brand-surfaces`; fuera de esa ruta, `pnpm icons:export` en AXIS).
 4. Corre los chequeos del adapter y el QA de `qa-checklist.md` sobre los píxeles finales.
 5. Si aprendiste algo, actualiza esta skill (abajo).
 
@@ -118,7 +125,8 @@ refleja**, en el mismo commit o en el inmediato siguiente. Aplica a Claude, Code
 que toque: tokens `efeonceGraphicLine` (incluido `efeonceGraphicLine.icons`) o `axisMotion`; contratos
 `graphic-line-orbit`, `collaboration-selection` o `email-signature`; el paquete `axis-graphic-line` (incluido `/icons`)
 o `axis-brand-assets`; el Lab de la línea; los compiladores o el motion
-de Greenhouse; el manual, el ADR, la norma de movimiento o el lenguaje fotográfico.
+de Greenhouse; los catálogos `graphic-line-*` del Artifact Composer o `src/lib/brand-surfaces` (y el contrato
+`efeonce.surface-composition`); el manual, el ADR, la norma de movimiento o el lenguaje fotográfico.
 
 **Qué se actualiza y dónde:**
 
@@ -147,7 +155,10 @@ de Greenhouse; el manual, el ADR, la norma de movimiento o el lenguaje fotográf
 
 - AXIS: `pnpm build && pnpm test && pnpm typecheck && pnpm lint && pnpm design:check`; Lab
   `pnpm --filter @efeonce/axis-design-system-lab build && … test:e2e`.
-- Greenhouse: `pnpm creative:layout:test`; motion: storyboard antes/después comparado byte a byte si se tocó el motor.
+- Greenhouse: `pnpm creative:layout:test`; motion: storyboard antes/después comparado byte a byte si se tocó el motor;
+  composer por superficie: tests de `src/lib/brand-surfaces` y de los catálogos, `pnpm brand:tokens --check` y
+  `pnpm composer:visual-gate --catalog=graphic-line` a 0 px (un bump de AXIS mueve píxeles: se declara en
+  `BASELINE_DELTAS.md`).
 - Skill: espejo `.claude/skills/efeonce-graphic-line/` → `.codex/skills/efeonce-graphic-line/`
   (`rsync -a --delete .claude/skills/efeonce-graphic-line/ .codex/skills/efeonce-graphic-line/`) y `pnpm skills:mirrors`.
   Se edita `.claude/` y se espeja; nunca al revés.

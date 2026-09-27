@@ -1,5 +1,20 @@
 # TASK-1921 — Ruta productiva de las piezas de marca por superficie (Full API Parity)
 
+## Delta 2026-09-27
+
+- Lo que esta task consume ya existe (TASK-1919, local en `develop`): catálogos
+  `src/lib/artifact-composer/catalogs/graphic-line-{deck,stills,overlays}/` (+ `graphic-line-shared/`; 20 recetas
+  aprobadas, 22 plantillas; son **tres**, no dos: las capas de video con alfa van en `graphic-line-overlays`), mapper puro
+  `planSurfacePiece(intent, { artifactId })` en `src/lib/brand-surfaces` (devuelve `{ catalog, contentType, plan,
+  assets, manifest }`; errores `SurfacePieceError.code`: `recipe-not-approved`, `recipe-outside-composer`,
+  `surface-issues`, `recipe-without-template`, `missing-photo`, `invalid-intent`) y el CLI local
+  `pnpm brand:compose` (`scripts/brand-surfaces/compose.ts`, que materializa assets e inyecta los pintores de selección
+  y CTA con `createCatalog(options)`: el consumer del `artifact-worker` tiene que hacer lo mismo).
+- El contrato AXIS va en `efeonce.surface-composition` **0.1.1** (`axis-ui-contracts` 0.3.7, `axis-tokens` 0.3.8, tag
+  `v0.3.8`, fijado en Greenhouse); acepta intents 0.1.0.
+- Hueco que hereda esta task: el CLI deja sólo el manifest de AXIS (`<id>.surface-manifest.json`); la procedencia
+  versionada (hash del intent, SHA-256 de plates) y el asset store son de aquí.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

@@ -92,6 +92,20 @@
   Trazo se construye con **cuatro arcos circulares tangentes**; vale para cualquier glifo nuevo con óvalos
   ([iconography.md](iconography.md) §9.1).
 
+## 2026-09-27 (La órbita por superficie en el Artifact Composer, TASK-1919)
+
+- **Un gancho que mide texto espera las fuentes.** Síntoma: el frame del storyboard variaba entre corridas del gate
+  visual. Causa: el gancho medía con la fuente de respaldo antes de que cargara la real. Regla: todo gancho de un
+  catálogo `graphic-line-*` (selección, CTA, storyboard) espera `document.fonts.ready` antes de medir; si un frame del
+  scope `graphic-line` oscila, revisa eso primero.
+- **Un slot anidado en otro no puede perder sus campos.** Síntoma: un marco en la raíz que envuelve foto y voz borraba
+  los campos de la voz al limpiarse. Causa: la limpieza de un slot recorría también los campos de los slots anidados.
+  Regla (ya corregida en el motor, `render.ts`): un campo pertenece al slot más cercano que lo contiene.
+- **La plantilla sigue la lámina aprobada, no el manifest, cuando chocan.** La burbuja URL de las láminas de sección,
+  contenido y tríptico, la lente del caminero y el arco del super de dato difieren entre token/manifest y lámina: se
+  siguió la lámina y se dejó la pregunta al operador ([ledger.md](ledger.md), pendientes). No inventes un token para
+  cerrarla.
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos

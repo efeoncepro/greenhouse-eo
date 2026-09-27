@@ -6,6 +6,23 @@
 >
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
+
+## 2026-09-27 — «La órbita» por superficie en el Artifact Composer (TASK-1919) y `foto:isotipo` (TASK-1920)
+
+Las 20 recetas aprobadas de la línea gráfica por superficie son plantillas del Artifact Composer en tres catálogos
+nuevos: `graphic-line-deck` (PDF 16:9, seis láminas), `graphic-line-stills` (heros web, el teléfono por ancho, caminero,
+último cuadro del loop y storyboard de motion) y `graphic-line-overlays` (capas de video en PNG con alfa). Una pieza sale
+entera de un intent con `pnpm brand:compose` (mapper puro `src/lib/brand-surfaces`: exige receta aprobada y valida con el
+contrato AXIS); opciones y pendientes fallan con `recipe-not-approved` y el video queda en motion
+(`recipe-outside-composer`). Motor domain-free: fondo transparente por plantilla, gate de tinta ponderado por alfa y fix
+de slots anidados; pintores de selección y CTA inyectados. `pnpm brand:tokens [--check]` y gate propio
+`pnpm composer:visual-gate --catalog=graphic-line` (22 frames a 0 px; la deriva global de 60 frames es previa,
+ISSUE-122). Greenhouse fija AXIS `v0.3.8` (`efeonce.surface-composition` 0.1.1) y depende de `axis-graphic-line`.
+`pnpm foto:isotipo` compone el isotipo oficial sobre la prenda cuando `foto:emblema` muestra otro (TASK-1920). Local en
+`develop`, sin push; ruta productiva en TASK-1921. Docs: ADR del composer, runbook del gate, norma por superficie §2.1,
+índice de la línea, runbook AXIS, doc funcional 1.10, manual de uso 1.1 y skills `efeonce-graphic-line`, `deck-studio`,
+`motion-design-studio` y `efeonce-advertising-creative`.
+
 ## 2026-09-27 — Iconografía: 30 íconos de oficio (D25)
 
 El operador aprobó 30 glifos nuevos, producidos con el método de alta de cada voz y revisados en el canvas «Íconos de
@@ -559,27 +576,3 @@ intervención, y el gateway de MCP de Efeonce ya expone las cuatro herramientas 
 vez al orquestador de producción un Cloud Run Job, el worker de render, que el watchdog y el rollback ya saben leer.
 La prueba final en producción siguió el camino real: el despacho automático lanzó el worker y el deck quedó listo al
 primer intento. Emitir la edición al cliente sigue apagado y es el siguiente paso de EPIC-045.
-
-## 2026-09-16 — Efeonce Insights renderiza solo en staging y el worker de render entra al release
-
-El render de Insights ya funciona de punta a punta en staging sin intervención: se encarga por API o MCP, el despacho
-lanza el worker y el deck queda como asset privado. La prueba que lo dejó así destapó que el despachador nunca había
-leído su flag: el primer canary había funcionado porque el worker se lanzó a mano. Con una ráfaga de cinco renders
-medimos el ritmo real: un output cada dos minutos, siete segundos de render cada uno. Retry, cancelación y el bloqueo
-de un cliente sobre una edición interna se probaron contra el runtime, y un render pedido por un cliente ahora queda
-auditado como `client_user` y no como `system`. El worker de render, un Cloud Run Job, quedó integrado al orquestador
-de producción con su propia lectura de drift y rollback. Producción recibe todo esto con el próximo release.
-
-## 2026-09-16 — Guía para elegir modelo de IA: qué usar, cuándo, cómo y cuánto cuesta cada uno
-
-Todos los modelos que hoy se pueden correr desde `pnpm ai:image` y `pnpm ai:fal` quedaron descritos en una sola guía
-(`docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`): árboles de decisión para imagen y video, fichas
-por modelo con capacidades, límites, comandos y trampas, recetas por caso de uso con costo, y rankings externos con sus
-contradicciones a la vista. Cada dato indica si viene de una corrida real, del contrato del proveedor, de su
-documentación o de un tercero.
-
-Investigar para escribirla corrigió varias cosas que dábamos por ciertas. fal cobra según la resolución: Wan 3.0 a
-1080p, su valor por defecto, cuesta cuatro veces lo registrado, y Prime es más cara que la base. Seedream 5 Pro en fal
-no llega a 4K, y el 2K y 4K de H3 son reescalados. La fórmula de tokens de Seedance sí calza con lo que pagamos, y el
-costo de GPT Image 2.5 se puede estimar antes de gastar. La guía, el catálogo, los manuales y las skills creativas
-quedaron alineados, y las fallas del CLI detectadas quedan para una tarea aparte.

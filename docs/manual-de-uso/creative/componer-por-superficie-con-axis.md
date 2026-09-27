@@ -1,9 +1,9 @@
 # Componer una pieza por superficie con AXIS — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude
+> **Ultima actualizacion:** 2026-09-27 por Claude (1.1: las recetas aprobadas se componen enteras con `pnpm brand:compose` en el Artifact Composer, TASK-1919)
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — se compone con comandos locales en AXIS y en Greenhouse
 > **Documentacion relacionada:** [Norma de composición por superficie](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) · [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md#componer-por-superficie) · [Usar la línea gráfica de Efeonce](./usar-linea-grafica-efeonce.md) · [Compositor de piezas con CTA](./compositor-piezas-cta.md) · [Producir una foto de marca](../marketing/fotografia-de-marca-efeonce.md)
@@ -14,7 +14,9 @@ Este manual explica cómo producir una pieza de la marca Efeonce **según dónde
 letrero de vía pública (DOOH), una pantalla digital en la calle (pDOOH), una gráfica animada con foto, un video o una
 lámina de deck. Cada superficie tiene sus recetas aprobadas, sus reservas, su escala de voces, su forma de firmar y
 sus tiempos. Tú (o un agente) describes la pieza; AXIS devuelve un manifest con todo resuelto desde los tokens, y las
-herramientas de Greenhouse la pintan, la firman y la miden.
+herramientas de Greenhouse la pintan, la firman y la miden. Si la receta está **aprobada**, un solo comando de
+Greenhouse (`pnpm brand:compose`) hace todo el recorrido y entrega la pieza terminada (Ruta A); si no, se compone por
+delegates (Ruta B).
 
 Sirve para el equipo creativo y para los agentes (Claude, Codex). No sirve para piezas de clientes ni para la
 interfaz de Greenhouse.
@@ -28,10 +30,10 @@ interfaz de Greenhouse.
   **aprobada**; las opciones no son canon.
 - **Lee la sección de tu superficie** en la
   [norma](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#4-por-superficie).
-- **Ten el repo de AXIS** en `../axis-design-system` al día con `main` (desde el 2026-09-27). El contrato
-  `efeonce.surface-composition` 0.1.0 está en `candidate` y ya está en `main`: si la rama no está, la
-  composición por superficie no se puede resolver y se trabaja con las reglas de la norma a mano, marcándolo en la
-  entrega.
+- **Para la Ruta A basta Greenhouse:** el contrato `efeonce.surface-composition` 0.1.1 (`candidate`, acepta intents
+  0.1.0) viene en los paquetes AXIS que Greenhouse ya fija (`axis-ui-contracts` 0.3.7, `axis-tokens` 0.3.8). Corre
+  `pnpm install` si acabas de traer cambios. **Para la Ruta B** necesitas además el repo de AXIS en
+  `../axis-design-system` al día con `main` (ahí vive `pnpm surface:resolve`).
 - **Carga las skills:** `efeonce-graphic-line` siempre; `deck-studio` para láminas; `motion-design-studio` para
   motion y video; `efeonce-advertising-creative` para DOOH, pDOOH y piezas con texto o CTA; `design-studio` para la
   foto.
@@ -69,9 +71,33 @@ trabajo de la pieza y edítalo. Campos que suelen aplicar:
 
 **No pongas coordenadas ni tamaños.** Si sientes que te falta un número, es porque falta en el token: pídelo.
 
-### Paso 3 · Resuélvelo en AXIS
+### Paso 3 · Ruta A — compón la pieza aprobada con el Artifact Composer
 
-Desde `../axis-design-system`:
+Úsala cuando la receta es una de las 20 aprobadas con plantilla ([norma §2.1](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#21-la-ruta-por-el-artifact-composer-desde-el-2026-09-27-task-1919)):
+las seis del deck, los cuatro heros web, el caminero, el último cuadro del loop y el storyboard de motion, y las siete
+capas de video.
+
+1. Parte del ejemplo de tu receta en `src/lib/brand-surfaces/examples/<superficie>-<receta>-intent.json` (en
+   Greenhouse). La foto se declara en `photo.plateRef` (ruta al plate aprobado, que vive fuera de git en
+   `ai-generations/**`) con su `alt`, que describe la escena, no el copy.
+2. Compón:
+
+   ```bash
+   pnpm brand:compose -- --intent <ruta>/web-hero-lens-intent.json
+   # opcional: --out <dir> (por defecto .captures/brand-surfaces/<id>/) y --artifact-id <id>
+   ```
+
+3. Revisa la salida: el PDF (deck) o el PNG (el resto; las capas de video, con fondo transparente) y
+   `<id>.surface-manifest.json`, el manifest de AXIS que gobernó la pieza. La consola dice
+   `✓ <superficie>.<receta> → <catálogo>`.
+
+Con la Ruta A saltas el paso 5: el comando pinta la órbita, la voz, la selección y los íconos. El paso 4 sólo aplica
+si todavía no tienes el plate aprobado (hazlo antes de componer). Sigue en el paso 6. Si el comando se niega, lee el código del error en «Qué significan los estados».
+
+### Paso 3 · Ruta B — resuélvelo en AXIS
+
+Para una receta sin plantilla (opción que el operador quiere ver, recurso de video animado, cierre de marca). Desde
+`../axis-design-system`:
 
 ```bash
 pnpm surface:resolve -- --input <ruta>/intent.json --out <ruta>/manifest.json
@@ -102,19 +128,20 @@ Si la prenda lleva el isotipo, **pide la prenda lisa** y compón el isotipo ofic
 | Órbita, lente, progreso, voz y firma | `pnpm creative:orbit:render -- --intent <delegate.json> --bindings <bindings.json> --out-dir <dir>` |
 | Selección y colaboradores | la capa de selección de `pnpm creative:layout`, o `pnpm foto:componer:cta` si la pieza lleva CTA |
 | Pieza con foto y voces en formato social o pauta | `pnpm foto:componer` |
-| Íconos | `resolveIcon` en AXIS (`pnpm icons:export`); Greenhouse todavía no consume `/icons` |
+| Íconos | `resolveIcon` en AXIS (`pnpm icons:export`); en la Ruta A los pinta el comando |
 | Cierre de marca en video (reveal, sting) | `scripts/creative/brand-motion/` |
 
-Para una lámina de deck, arma el deck con `deck-studio`. Las recetas `proposal-cinematic` (propuesta con foto de
-cine) y `method-staircase` (el método como escalera, sin foto; aprobada con BeX) todavía no son catálogo del Artifact
-Composer: se arman como maqueta de dirección leyendo el manifest y se declara así en la entrega. En
-`method-staircase` no hay paso 4: no lleva foto.
+Para un deck completo, arma el deck con `deck-studio`; las seis láminas aprobadas de La órbita (entre ellas
+`proposal-cinematic` y `method-staircase`) salen por la Ruta A. En `method-staircase` no hay paso 4: no lleva foto.
 
 ### Paso 6 · Revisa y entrega
 
 - Corre los chequeos de cada compositor; `pnpm creative:orbit:render` sale con código 1 si falla uno.
 - Mira la pieza al tamaño de uso: la paleta a la distancia real, el teléfono en sus tres anchos, el video completo con
   y sin movimiento reducido.
+- En la Ruta A, mira la pieza contra la lámina aprobada del canvas: si difiere en algo que esté entre las preguntas
+  abiertas del operador (lente del caminero, arco del super de dato, burbuja URL en las láminas de sección, contenido y
+  tríptico, gris de la bajada web, paleta), dilo en la entrega; no lo corrijas a mano.
 - Entrega el intent, el manifest, la pieza y la lista de lo que es opción o maqueta. Componer y medir **no** aprueba
   ni publica: la aprobación es del operador.
 
@@ -129,6 +156,12 @@ Composer: se arman como maqueta de dirección leyendo el manifest y se declara a
 | `candidate` | contrato AXIS | el contrato funciona, pero puede cambiar; todavía no es `stable` |
 | `issues` vacío | manifest | el intent cumple las reglas del contrato; falta revisar la pieza |
 | `issues` con errores | manifest | la pieza no sigue; corrige el intent (por ejemplo `steps-over-limit`, `recipe-not-for-role`, `cine-requires-nexa-or-proposal`, `question-not-allowed-at-distance`) |
+| `recipe-not-approved` | `pnpm brand:compose` | la receta es opción o pendiente en AXIS (paleta DOOH, pDOOH, opciones del deck): no tiene plantilla; usa la Ruta B y decláralo como opción |
+| `recipe-outside-composer` | `pnpm brand:compose` | la receta es video (`audiovisual.close-reveal`): sale de los masters del reveal v1.1 o de `pnpm orbit:video` en AXIS, no del composer |
+| `surface-issues` | `pnpm brand:compose` | el contrato de AXIS rechazó el intent; los códigos (los mismos de `issues`) salen listados debajo: corrige el intent |
+| `missing-photo` | `pnpm brand:compose` | la receta lleva foto y el intent no trae `photo.plateRef` o su `alt` |
+| `invalid-intent` | `pnpm brand:compose` | falta algo que la receta necesita (por ejemplo, la voz) o el intent tiene una forma antigua |
+| `recipe-without-template` | `pnpm brand:compose` | la receta está aprobada pero todavía no tiene plantilla: avisa; es un hueco del catálogo |
 | `sinValidar` | compositor con CTA, formato 1:1 | el 1:1 ajustado está aprobado en el canvas, pero el compositor todavía no lo certifica (se cierra con TASK-1918) |
 
 ## Qué no hacer
@@ -147,6 +180,10 @@ Composer: se arman como maqueta de dirección leyendo el manifest y se declara a
 - **No uses como referencia una pieza rechazada** (servicios creativos en plastilina, la carrera v1, Nexa con el
   director mirándose, líneas de servicio con Nexa sin fuerza).
 - **No toques el código del compositor con CTA** para habilitar el 1:1: eso va por TASK-1918.
+- **No retoques a mano un PNG o un PDF que salió de `brand:compose`** ni edites la plantilla para una pieza puntual: si
+  algo no calza, es el intent, el token o un hueco del catálogo.
+- **No pidas un video al composer:** entrega cuadros fijos y capas; la animación es de motion.
+- **No subas una opción al catálogo** para poder componerla: una receta entra sólo cuando el operador la aprueba.
 
 ## Problemas comunes
 
@@ -160,6 +197,8 @@ Composer: se arman como maqueta de dirección leyendo el manifest y se declara a
 | El pecho sale con un cohete o un símbolo inventado | el modelo dibujó un emblema | pide la prenda lisa («NO emblem, NO logo, NO symbol») y compón el isotipo oficial |
 | La lente de la LED no coincide con la maqueta del canvas | la receta del paquete y la pieza medida difieren | manda el token de superficie; avisa en la entrega (norma §6, fila 7) |
 | El teléfono parece el escritorio achicado | se compuso desde el escritorio | recompón mobile-first, con toma vertical nativa |
+| `No encuentro el plate …` | el plate vive fuera de git (`ai-generations/**`) y no está en tu equipo | genéralo o cópialo a la ruta de `photo.plateRef` antes de componer |
+| La capa de video sale con fondo negro | se abrió en un visor que no muestra el alfa | revísala en el editor de video o sobre un fondo de prueba: el PNG es transparente |
 
 ## Referencias técnicas
 
@@ -168,6 +207,10 @@ Composer: se arman como maqueta de dirección leyendo el manifest y se declara a
 - Movimiento: [`EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`](../../operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md).
 - Foto: [`EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md`](../../operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) (delta 2026-09-27, registro cine).
 - Pendiente del 1:1: [TASK-1918](../../tasks/to-do/TASK-1918-photo-prompt-and-lens-checks-graphic-line.md).
+- Ruta A: catálogos `src/lib/artifact-composer/catalogs/graphic-line-{deck,stills,overlays}/`, mapper
+  `src/lib/brand-surfaces`, CLI `scripts/brand-surfaces/compose.ts`; ADR del composer (delta 2026-09-27); gate
+  `pnpm composer:visual-gate --catalog=graphic-line` ([runbook](../../operations/runbooks/composer-visual-gate.md));
+  ruta productiva en [TASK-1921](../../tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md).
 - AXIS (en `main` desde el 2026-09-27; [página del Lab](https://axis.efeonce.org/references/surfaces/)):
   [guías por superficie](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/surfaces/README.md),
   [schema del intent](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/surface-composition-intent.schema.json),

@@ -69,6 +69,26 @@ convierte costo de provider en créditos. Reemitir el mismo plan o derivar otro 
 parte del contrato: **los portales rechazan adjuntos sobre su límite** — el peso es **admisibilidad**,
 no cosmética. *(Y el límite lo fijan **las bases**, no el portal. Ver [`evidence-integrity.md`](evidence-integrity.md).)*
 
+### Catálogos de La órbita (marca propia Efeonce) — no son `deck-axis`
+
+Desde el 2026-09-27 (TASK-1919) las láminas **aprobadas** de «La órbita» por superficie son un catálogo propio,
+**`graphic-line-deck`** (PDF 16:9): `deck.proposal-cinematic`, `deck.method-staircase`, `deck.section-classic`,
+`deck.section-split`, `deck.content-measure` y `deck.triptych`. Viven junto a `graphic-line-stills` (heros web,
+caminero, cuadros de motion) y `graphic-line-overlays` (capas de video con alfa).
+
+- **Se componen desde un intent de superficie**, no desde un `Plan` escrito a mano:
+  `pnpm brand:compose -- --intent <intent.json>`. El mapper `src/lib/brand-surfaces` exige receta aprobada, valida con
+  el contrato AXIS `efeonce.surface-composition` y deriva el `contentType`; el autor nunca elige plantilla (sigue
+  vigente `TemplateAuthorityError`).
+- **No se mezclan con `deck-axis`.** `deck-axis` es el catálogo de las ofertas a comité, con su molde y la línea base
+  de SKY; meter ahí el fondo Efeonce, la voz con esfera o las fotos de cine degradaría lo que protege. Un deck de
+  marca propia que necesita más láminas que las seis aprobadas combina `brand:compose` con el resto del deck armado
+  con el oficio de esta skill; una receta nueva entra al catálogo sólo con la aprobación del operador.
+- **La pintura de la selección y del CTA se inyecta** (`createCatalog({ selectionPainter, ctaPainter })`): el catálogo
+  no importa paquetes.
+- **Gate:** `pnpm composer:visual-gate --catalog=graphic-line` (22 frames a 0 px; runbook
+  `docs/operations/runbooks/composer-visual-gate.md`). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §2.1.
+
 ### Destinos editables posteriores — no confundir fuente, conversión ni renderer
 
 **Hoy sólo existe PDF contractual + PNG de revisión.** Los dos destinos siguientes aceptados son

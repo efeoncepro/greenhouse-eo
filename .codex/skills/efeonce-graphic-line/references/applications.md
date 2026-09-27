@@ -2,7 +2,7 @@
 
 Verificado contra: greenhouse-eo@7cb24df17 · axis-design-system@a5c21ae (íconos: AXIS `main@5b8ab20`, tag `v0.3.6`)
 — 2026-09-26 (decisiones del operador D1–D22 del 2026-09-26 registradas; ver `ledger.md`) · Plastilina en volumen
-(D24, §0.3 y A10): AXIS `main@c18e3d3` — 2026-09-27
+(D24, §0.3 y A10): AXIS `main@c18e3d3` — 2026-09-27 · §L con la ruta por el Artifact Composer: greenhouse-eo@016d0a183 — 2026-09-27
 
 Esta guía dice, **para cada aplicación**, qué elementos de la línea van (y cuáles nunca), dónde se ubican, cuánto espacio
 ocupan, en qué superficie y color, y cómo se produce. No repite la API (ver `package-and-tokens.md`), el significado de
@@ -710,8 +710,9 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 ## L. Composición por superficie (desde el 2026-09-27)
 
 > Norma: [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
-> Contrato AXIS `efeonce.surface-composition` 0.1.0 (`candidate`, manifest `axis.surface-composition.v1`), tokens
-> `efeonceGraphicLine.surfaces.<superficie>` y `pnpm surface:resolve` — en `main` de AXIS desde el 2026-09-27,
+> Contrato AXIS `efeonce.surface-composition` 0.1.1 (`candidate`, manifest `axis.surface-composition.v1`; acepta
+> intents 0.1.0), tokens `efeonceGraphicLine.surfaces.<superficie>` y `pnpm surface:resolve` — publicado en AXIS
+> `v0.3.8` y fijado en Greenhouse (2026-09-27),
 > [Lab](https://axis.efeonce.org/references/surfaces/). Canvas por superficie:
 > [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7), una página por
 > superficie con su lámina «Guía · cómo componer …» a la izquierda. Esta sección no copia valores: los números están
@@ -726,6 +727,17 @@ de redes siguen en las tarjetas A1–A8 y en el contrato de la órbita (canal `s
 la selección; `resolveIcon` en AXIS para los íconos; `pnpm foto:prompt` → `foto:generar` → `foto:validar` →
 `foto:emblema` para la ficha fotográfica; `scripts/creative/brand-motion/` para el cierre). **Nunca coordenadas ni
 canal (`print`, `screen`, `social`) elegidos a mano:** los fija el `delegate`.
+
+**Receta aprobada = una pieza con un comando (desde el 2026-09-27, TASK-1919):** `pnpm brand:compose -- --intent
+<intent.json>` hace ese recorrido completo en el Artifact Composer y entrega el PDF del deck o el PNG (capas de video
+con alfa). Tienen plantilla las 20 aprobadas de la tabla de abajo (el hero de teléfono, una por ancho; de motion, el
+último cuadro del loop y el storyboard, nunca la animación). Lo que es opción o pendiente falla con
+`recipe-not-approved`; el cierre de video (`close-reveal`), con `recipe-outside-composer`. Ejemplos por receta en
+`src/lib/brand-surfaces/examples/`; paso a paso en el manual de uso `componer-por-superficie-con-axis.md` (Ruta A).
+**Preguntas abiertas del operador** (las plantillas siguen la lámina aprobada hasta decidir): lente del caminero (token
+0,70 vs ≈0,77 en la lámina), arco completo del super de dato vs la estela canónica, burbuja URL en las láminas de
+sección, contenido y tríptico (el manifest dice `url-bubble-footer`, la lámina no la lleva), gris del descriptor y la
+bajada web sin token, y la paleta 20 % vs 35 %.
 
 | Superficie | Aprobado | Firma | Tarjeta vecina |
 |---|---|---|---|

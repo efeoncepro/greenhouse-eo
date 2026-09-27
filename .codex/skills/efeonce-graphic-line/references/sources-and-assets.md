@@ -2,7 +2,8 @@
 
 > Verificado contra: axis-design-system@e26bd85 (iconografía y versiones: AXIS `main@5b8ab20`, tag `v0.3.6`) y
 > greenhouse-eo@051660d73 — 2026-09-26. Plastilina en volumen (D24): AXIS `main@c18e3d3` — 2026-09-27. Oficio (D25,
-> catálogo de 60 y 33 volúmenes): AXIS main@aa66225, 2026-09-27 (tag `v0.5.0`).
+> catálogo de 60 y 33 volúmenes): AXIS main@aa66225, 2026-09-27 (tag `v0.5.0`). Versiones fijadas y ruta por el
+> Artifact Composer: greenhouse-eo@016d0a183 — 2026-09-27 (tag AXIS `v0.3.8`).
 
 ## Fuentes de verdad (por orden de autoridad)
 
@@ -13,6 +14,7 @@
 | Movimiento | `docs/operations/brand-graphic-line/EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md` (norma) y `EFEONCE_ORBIT_REVEAL_MOTION_V1.md` (producción) | el manual |
 | Valores | tokens `efeonceGraphicLine` en AXIS `packages/tokens/src/tokens.ts` | los docs describen; el token manda en números |
 | Composición por intención | contratos AXIS `efeonce.graphic-line-orbit`, `efeonce.collaboration-selection`, `efeonce.email-signature` | el token |
+| Composición por superficie | norma `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` + contrato AXIS `efeonce.surface-composition` (tokens `efeonceGraphicLine.surfaces`); en Greenhouse, las plantillas de las recetas aprobadas (catálogos `graphic-line-*`) | el operador aprueba la receta; el token manda en números; la plantilla sigue la lámina aprobada |
 | Pintura | paquete `@efeoncepro/axis-graphic-line` (recetas que reproducen las piezas medidas) | el contrato |
 | Fotografía | `docs/operations/brand-photography/` (lenguaje fotográfico, reservas, firma en primer plano) | el operador |
 | Iconografía (Trazo y Plastilina, D16–D22) | AXIS: valores `efeonceGraphicLine.icons` (`axis-tokens` ≥ 0.3.6), geometría y reglas `@efeoncepro/axis-graphic-line/icons` (≥ 0.4.0), guía `docs/agent-composition/iconography.md`, ADR `docs/architecture/ICONOGRAPHY_DECISION_V1.md`. Plastilina en volumen (D24): `efeonceGraphicLine.icons.volume` (`axis-tokens` 0.3.7) y los PNG de `@efeoncepro/axis-brand-assets` 0.3.2 (ambos publicados con el tag `v0.3.7`). Oficio (D25): catálogo de 60 en `axis-graphic-line` 0.5.0 y 33 PNG en `axis-brand-assets` 0.3.3 (tag `v0.5.0`), guía §«Catálogo aprobado». En Greenhouse sólo el criterio ([iconography.md](iconography.md)) | el token y el paquete; las decisiones, el operador (ledger) |
@@ -48,6 +50,10 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
   - Compositor de fotos con CTA: `scripts/foto/componer-cta*.mjs` (`marcaEnEscena`); `pnpm foto:componer:cta`,
     `pnpm foto:cta:gate`.
   - Motion del logo: `scripts/creative/brand-motion/`.
+  - Composición por superficie (TASK-1919): catálogos `src/lib/artifact-composer/catalogs/graphic-line-{deck,stills,overlays}/`
+    (+ `graphic-line-shared/`), mapper puro `src/lib/brand-surfaces` (ejemplos en `examples/*-intent.json`), CLI
+    `scripts/brand-surfaces/` (`pnpm brand:compose`, `pnpm brand:tokens`); líneas base en
+    `scripts/frontend/baselines/artifact-composer/templates-graphic-line-*/`.
   - Fotografía: `pnpm foto:doctor | foto:prompt | foto:validar`, canon en `docs/operations/brand-photography/`.
 - **Canvas de exploración** (Design, claude.ai): la fuente visual original de cada lámina; el Lab la reconstruye.
 
@@ -74,10 +80,9 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
 
 `axis-tokens` 0.3.6 (con `efeonceGraphicLine.icons`) · `axis-graphic-line` 0.4.0 (con `/icons`) — tag `v0.3.6` ·
 `axis-ui-contracts` 0.3.5 (contrato de la órbita 0.3.1) · `axis-ui-registry` 0.3.1 · `axis-brand-assets` 0.3.1
-(los tres, sin cambios en `v0.3.6`). Greenhouse fija tokens y contracts 0.3.5 y registry y brand-assets 0.3.1 en `develop` (no usa
-`axis-graphic-line` —su compositor tiene pintor propio raster-safe— y todavía no consume `/icons`: para una pieza, los
-SVG salen de `pnpm icons:export` en AXIS o del Lab). Cada paquete nuevo necesita «Manage Actions
-access → Read» para cada repositorio consumidor antes de que éste lo agregue.
+(los tres, sin cambios en `v0.3.6`). *(Historia: en ese momento Greenhouse fijaba tokens y contracts 0.3.5 y registry
+y brand-assets 0.3.1 y no usaba `axis-graphic-line`; el estado vigente está al final de esta sección.)* Cada paquete
+nuevo necesita «Manage Actions access → Read» para cada repositorio consumidor antes de que éste lo agregue.
 
 **Publicado el 2026-09-27 (tag `v0.3.7`, AXIS `main@c0020b6`):** `axis-tokens` 0.3.7 (`efeonceGraphicLine.icons.volume`),
 `axis-brand-assets` 0.3.2 (`volume/`, `volumeIconUrl`) y `axis-ui-contracts` 0.3.6; `axis-graphic-line` sigue en 0.4.0.
@@ -87,3 +92,12 @@ Greenhouse ya fija esas versiones (commit `f3f93c926`, 2026-09-27: tokens 0.3.7,
 **Publicado el 2026-09-27 (tag `v0.5.0`, AXIS main):** `axis-graphic-line` 0.5.0 (catálogo de 60 glifos con el oficio
 D25) y `axis-brand-assets` 0.3.3 (33 PNG de volumen); `axis-tokens` sigue en 0.3.7. Greenhouse fija 0.5.0 y 0.3.3
 desde el 2026-09-27 (con el oficio).
+
+**Publicado el 2026-09-27 (tag `v0.3.8`):** `axis-tokens` 0.3.8 y `axis-ui-contracts` 0.3.7, con el contrato
+`efeonce.surface-composition` 0.1.1 (`candidate`, acepta intents 0.1.0; modela el contenido de las láminas aprobadas).
+
+**Vigente en Greenhouse (2026-09-27, `package.json`):** `axis-tokens` 0.3.8 · `axis-ui-contracts` 0.3.7 ·
+`axis-brand-assets` 0.3.3 · `axis-graphic-line` 0.5.0 (dependencia directa) · `axis-ui-registry` 0.3.1. El
+`axis-graphic-line` lo usa sólo `src/lib/brand-surfaces` (`paintGraphicLine`, `resolveIcon`) para los catálogos del
+Artifact Composer; las piezas de campaña siguen con el adapter propio raster-safe. Fuera de esa ruta, los SVG de
+íconos salen de `pnpm icons:export` en AXIS o del Lab.

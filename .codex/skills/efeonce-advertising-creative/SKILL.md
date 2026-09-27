@@ -201,9 +201,12 @@ Para piezas de **marca propia** en vía pública, la composición es por superfi
 [canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) (empieza por su lámina
 «Guía · cómo componer …») y guía AXIS `docs/agent-composition/surfaces/dooh-pdooh.md` (en `main` de AXIS;
 [Lab](https://axis.efeonce.org/references/surfaces/dooh-pdooh/)). Intent con `surface: "dooh"` o `"pdooh"` → `pnpm surface:resolve` en AXIS
-(contrato `efeonce.surface-composition` 0.1.0 `candidate`) → los `delegates` van a `pnpm creative:orbit:render` (lente,
+(contrato `efeonce.surface-composition` 0.1.1 `candidate`) → los `delegates` van a `pnpm creative:orbit:render` (lente,
 voz, firma) y a la ficha fotográfica. Formatos, escala de voces, distancias, firma por soporte y línea de tiempo del
-spot salen de `efeonceGraphicLine.surfaces.dooh|pdooh`; **nunca el canal `print` o `social` elegido a mano**.
+spot salen de `efeonceGraphicLine.surfaces.dooh|pdooh`; **nunca el canal `print` o `social` elegido a mano**. El
+caminero aprobado sale entero con `pnpm brand:compose -- --intent <intent.json>` (Artifact Composer,
+`dooh.caminero-lens`, TASK-1919); la paleta y todo pDOOH no tienen plantilla hasta su aprobación
+(`recipe-not-approved`).
 
 - **Aprobado:** el caminero 12 × 4 m con la lente AXIS y el **logo abajo a la izquierda**, al final del recorrido de
   lectura. Paleta (logo centrado, tamaño por decidir), LED (sólo respuesta, logo bajo ella), mupi, spot sin audio y

@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.9
+> **Version:** 1.10
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
+> **Ultima actualizacion:** 2026-09-27 por Claude (1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
 
@@ -288,14 +288,34 @@ los ajustes quedó aprobado en el canvas; su paso formal en la herramienta de an
 
 Un agente compone una pieza por superficie describiéndola (superficie, formato, papel y receta) en el sistema de
 diseño AXIS, que devuelve todo lo necesario para que las herramientas de Greenhouse la pinten, la firmen y la midan.
-Ese contrato está en prueba (`candidate`) y todavía no se integra a la rama principal de AXIS.
+Ese contrato sigue en prueba (`candidate`), pero ya está publicado y Greenhouse lo usa.
+
+**Cómo se produce hoy una pieza aprobada (desde el 2026-09-27).** Las recetas aprobadas ya no se arman a mano como
+maqueta: son plantillas del generador de piezas de Greenhouse (el Artifact Composer). Quien produce describe la pieza
+en un archivo y corre un solo comando (`pnpm brand:compose`); sale la pieza completa, con la foto, la órbita, la voz,
+la selección y los íconos en su lugar:
+
+- **Deck:** las seis láminas aprobadas, en PDF.
+- **Web y vía pública:** los cuatro heros (el teléfono en sus tres anchos) y el caminero, en imagen.
+- **Motion:** el último cuadro de la animación (la versión fija que la respalda) y el storyboard. La animación en sí
+  sigue haciéndose con las herramientas de motion.
+- **Video:** los textos del video (cartela, zócalo, dato, llamada con selección, subtítulos) como capas transparentes
+  para montar sobre el plano, más la pantalla dividida y el plan de planos. El cierre con el logo es un video y sale de
+  las animaciones del logo.
+
+Lo que no está aprobado (la paleta de ciudad, las pantallas digitales, las opciones del deck) **no tiene plantilla**:
+el comando se niega a producirlo. Producir no es aprobar: la pieza sigue pasando la revisión del equipo. Por ahora el
+comando corre en el equipo de quien produce; la versión dentro de la plataforma (con permisos, cola y agentes) es una
+task aparte. Quedan preguntas del operador sobre detalles de algunas plantillas (la posición de la lente del caminero,
+el arco del dato, la burbuja URL en algunas láminas, un gris sin valor oficial y la medida pendiente de la paleta de ciudad, 20 % o 35 %).
 
 > Detalle técnico: [norma de composición por superficie](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) ·
 > [manual §10.0](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#100-composición-por-superficie) ·
 > [lenguaje fotográfico, delta 2026-09-27](../../operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) ·
-> contrato `efeonce.surface-composition` 0.1.0 y tokens `efeonceGraphicLine.surfaces` en AXIS (en `main` desde el 2026-09-27;
+> contrato `efeonce.surface-composition` 0.1.1 y tokens `efeonceGraphicLine.surfaces` en AXIS (publicados en `v0.3.8`;
 > [página del Lab](https://axis.efeonce.org/references/surfaces/)) · [canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) ·
-> [cómo componer por superficie](../../manual-de-uso/creative/componer-por-superficie-con-axis.md)
+> [cómo componer por superficie](../../manual-de-uso/creative/componer-por-superficie-con-axis.md) ·
+> [ruta por el Artifact Composer, norma §2.1](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#21-la-ruta-por-el-artifact-composer-desde-el-2026-09-27-task-1919) (TASK-1919)
 
 ## Dónde está cada cosa
 
@@ -303,6 +323,7 @@ Ese contrato está en prueba (`candidate`) y todavía no se integra a la rama pr
 |---|---|---|
 | Manual técnico-operativo (fuente de verdad) | [`EFEONCE_GRAPHIC_LINE_V1.md`](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) | quien produce o audita |
 | Norma de composición por superficie (web, vía pública, pantallas digitales, motion, video, deck) | [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) | quien produce una pieza para una superficie concreta |
+| Plantillas de las piezas aprobadas por superficie (comando `pnpm brand:compose`) | catálogos `graphic-line-deck`, `graphic-line-stills` y `graphic-line-overlays` del Artifact Composer · [cómo usarlo](../../manual-de-uso/creative/componer-por-superficie-con-axis.md) | quien produce una pieza aprobada |
 | Canvas del equipo por superficie (una página por superficie) | [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) | el equipo y los agentes |
 | Decisión (ADR) | [`EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md`](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) | quien necesita saber qué se decidió y qué se descartó |
 | Manual en PDF (A4, 56 hojas, confidencial) | [`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](../../operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) | el equipo (uso interno) |
@@ -313,7 +334,7 @@ Ese contrato está en prueba (`candidate`) y todavía no se integra a la rama pr
 | Animaciones del logo para el equipo (MP4, GIF, cuadro final) | OneDrive `13- Branding › Motion Órbita Efeonce › v1.1` | quien edita video o arma presentaciones |
 | Masters de las animaciones (transparentes para editores de video, web y Apple) | bucket público de AXIS `efeonce-group-axis-public-media`, carpeta `motion/logo/v1.1/` | quien monta la animación sobre otro fondo |
 | Íconos de la marca (catálogo, reglas y «Copiar SVG») | [axis.efeonce.org/references/iconography](https://axis.efeonce.org/references/iconography/) · en datos para agentes: [`/references/iconography.json`](https://axis.efeonce.org/references/iconography.json) | quien usa o pide un ícono |
-| Íconos en código | `efeonceGraphicLine.icons` (`@efeoncepro/axis-tokens` desde 0.3.6) y `@efeoncepro/axis-graphic-line/icons` (desde 0.4.0; los 60 con el oficio desde 0.5.0); Greenhouse todavía no los consume | quien construye piezas en código |
+| Íconos en código | `efeonceGraphicLine.icons` (`@efeoncepro/axis-tokens` desde 0.3.6) y `@efeoncepro/axis-graphic-line/icons` (desde 0.4.0; los 60 con el oficio desde 0.5.0); en Greenhouse los usa el generador de piezas por superficie | quien construye piezas en código |
 | Canvas de trabajo (taller, privado; 40 láminas) | [Canvas «Línea gráfica Efeonce»](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) | quien explora nuevas aplicaciones |
 | Burbujas de URL listas para visores y correo | `docs/operations/brand-graphic-line/deliverables/assets/url-lum-{light,dark}.svg` | quien arma PDF, correo o referencias para IA |
 | Banco de fotos para la lente | `ai-generations/2026-09-25_banco-lente-orbita/` (fichas y prompts versionados; las imágenes son locales) | quien compone una lente |

@@ -494,10 +494,13 @@ opciones, pendientes y rechazos por superficie, las reglas transversales y cómo
 del inventario (entre ellas, las recetas de deck `proposal-cinematic` y `method-staircase`, y el registro cine
 ampliado a la primera).
 
-- **Contrato AXIS:** `efeonce.surface-composition` 0.1.0 (`candidate`, manifest `axis.surface-composition.v1`), con
+- **Contrato AXIS:** `efeonce.surface-composition` 0.1.1 (`candidate`, manifest `axis.surface-composition.v1`), con
   sus valores en los tokens `efeonceGraphicLine.surfaces.<superficie>` y el comando `pnpm surface:resolve`, que entrega
-  los intents ya rellenados para `efeonce.graphic-line-orbit`, `efeonce.collaboration-selection` y `resolveIcon`. Está
-  en `main` de AXIS desde el 2026-09-27 ([página del Lab](https://axis.efeonce.org/references/surfaces/)); Greenhouse todavía no lo consume.
+  los intents ya rellenados para `efeonce.graphic-line-orbit`, `efeonce.collaboration-selection` y `resolveIcon`.
+  Publicado en AXIS `v0.3.8` ([página del Lab](https://axis.efeonce.org/references/surfaces/)) y fijado en Greenhouse.
+- **Producción en Greenhouse (2026-09-27, TASK-1919):** las 20 recetas aprobadas son plantillas del Artifact Composer y
+  una pieza sale entera de un intent con `pnpm brand:compose`; el video sigue en motion. Detalle en la
+  [norma §2.1](./EFEONCE_SURFACE_COMPOSITION_V1.md#21-la-ruta-por-el-artifact-composer-desde-el-2026-09-27-task-1919).
 - **Canvas del equipo:** [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7),
   una página por superficie: «DOOH · pDOOH», «Web», «Motion», «Producción audiovisual», «Deck» y «Firma y 1:1».
 - **Social y 1:1** siguen en el contrato de la órbita (canal `social`) y en `efeonceGraphicLine.signature`.
