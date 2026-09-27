@@ -23,12 +23,14 @@ const args = process.argv.slice(2)
 const opt = (n, f) => (args.includes(n) ? args[args.indexOf(n) + 1] : f)
 const STAGE = opt('--stage', 'maqueta')
 const VERSION = opt('--version', 'vlog')
-const OUT = path.resolve(opt('--out', `glitch-tema-${VERSION}-${STAGE}.wav`))
+const PIECE = opt('--piece', 'intro') // intro | cortina | salida
+const OUT = path.resolve(opt('--out', `glitch-tema-${PIECE}-${VERSION}-${STAGE}.wav`))
 
 const S = 0.1, BEAT = 0.4, BAR = 1.6 // 150 BPM: una semicorchea = 3 cuadros
 const PRE = VERSION === 'podcast' ? 6 : 2
 const TA = PRE * BAR // inicio de la apertura aprobada
-const END = TA + 4 // la apertura dura 4 s
+// intro: pre-roll + la apertura (4 s) · cortina: un compás + 0,4 s · salida: la tarjeta final (3 s) y, en el podcast, dos compases más
+const END = PIECE === 'cortina' ? BAR + 0.4 : PIECE === 'salida' ? (VERSION === 'podcast' ? 7 : 3) : TA + 4
 const DUR = Math.ceil(END) // Stable Audio redondea a segundos enteros
 const idx = t => Math.round(t * SR)
 
@@ -84,7 +86,24 @@ if (STAGE === 'maqueta') {
     bass(t0 + 9 * S, ROOT[bar % 4] === 'A2' ? 'A2' : ROOT[bar % 4], 0.55, -8)
     if (full) chord(t0 + 9 * S, ROOT[bar % 4].replace('2', '3'), 0.6)
   }
-  for (let b = 0; b < PRE; b++) groove(b * BAR, b, { full: !(VERSION === 'podcast' && b === 0) })
+  if (PIECE === 'cortina') {
+    groove(0, 0)
+  } else if (PIECE === 'salida') {
+    // «se cierra.» (f6 = semicorchea 2): la banda entra con el golpe; el groove sigue hasta el corte (f57, semicorchea 19).
+    kick(0.2, -3); snare(0.2, -6); chord(0.2, 'A3', 0.6, -10)
+    groove(0.2, 1)
+    if (VERSION === 'podcast') {
+      // Tras la tarjeta final: dos compases más y la respuesta en La, cortada en seco.
+      groove(3.2, 2); groove(4.8, 3)
+      kick(6.4, -3); chord(6.4, 'A3', 0.8, -9); bass(6.4, 'A2', 0.5, -7)
+    }
+  } else for (let b = 0; b < PRE; b++) groove(b * BAR, b, { full: !(VERSION === 'podcast' && b === 0) })
+  if (PIECE !== 'intro') {
+    M.write(OUT, { wet: 0.6, fadeMs: 30 })
+    writeFileSync(OUT.replace(/\.wav$/, '.json'), JSON.stringify({ piece: PIECE, version: VERSION, bpm: 150, durationSec: DUR }, null, 1))
+    console.log(`maqueta ${PIECE} ${VERSION}: ${OUT} (${DUR} s)`)
+    process.exit(0)
+  }
   // Sobre la apertura: silencio hasta el quiebre (f24); golpe; el bombo se acelera; la manzana (f48) = el drop.
   const at = k => TA + k * S
   kick(at(8), -4); snare(at(8), -7); chord(at(8), 'A3', 0.5, -11)
@@ -101,7 +120,7 @@ if (STAGE === 'maqueta') {
 
 // ── Etapa 3: final — cortes sobre la re-grabación + la apertura aprobada intacta + la manzana ─────────────────
 const [TL, TR] = readWav(path.resolve(opt('--from')))
-const [AL, AR] = readWav(path.resolve(opt('--apertura', 'glitch-sfx/b/apertura.wav')))
+const [AL, AR] = PIECE === 'cortina' ? [new Float64Array(0), new Float64Array(0)] : readWav(path.resolve(opt(PIECE === 'salida' ? '--cierre' : '--apertura', PIECE === 'salida' ? 'glitch-sfx/b/cierre.wav' : 'glitch-sfx/b/apertura.wav')))
 const N = idx(END)
 const OL = new Float64Array(N), OR = new Float64Array(N)
 function copy(src, dst, len, { gain = 1, crushBits = 0 } = {}) {
@@ -113,6 +132,27 @@ function copy(src, dst, len, { gain = 1, crushBits = 0 } = {}) {
     const e = Math.min(1, i / fN, (n - 1 - i) / fN)
     if (d + i < N) { OL[d + i] += l * e * gain; OR[d + i] += r * e * gain }
   }
+}
+// El tiempo 4 de un compás tartamudea sobre la grabación real (semicorcheas, fusas, cada vez más roto) hasta el corte.
+const stutterBeat4 = t0 => { let t = t0 + 12 * S; [[S, 2, 0], [S / 2, 2, 0], [S / 4, 2, 10], [S / 8, 4, 8]].forEach(([len, times, bits]) => { for (let k = 0; k < times; k++) { copy(t0 + 12 * S, t, len, { crushBits: bits, gain: 1 + 0.06 * k }); t += len } }) }
+if (PIECE !== 'intro') {
+  if (PIECE === 'cortina') { copy(0, 0, 12 * S); stutterBeat4(0) }
+  else {
+    copy(0.2, 0.2, 1.7) // de «se cierra.» al corte con falla (f57); después, silencio: la manzana implosiona sola
+    if (VERSION === 'podcast') { copy(3.2, 3.2, 3.2); stutterBeat4(3.2); copy(6.4, 6.4, 0.6) } // dos compases, el 2.º tartamudea, y la respuesta en La
+  }
+  const ML = new Float64Array(N), MR = new Float64Array(N)
+  for (let i = 0; i < N; i++) { ML[i] = OL[i] * 0.8 + (AL[i] ?? 0); MR[i] = OR[i] * 0.8 + (AR[i] ?? 0) }
+  const cutAt = (t0, t1) => { for (let i = idx(t0); i < Math.min(N, idx(t1)); i++) { ML[i] = 0; MR[i] = 0 } }
+  if (PIECE === 'cortina') cutAt(BAR, END)
+  else { cutAt(1.9, VERSION === 'podcast' ? 3.2 : 0); for (let i = idx(1.9); i < idx(3.2) && i < N; i++) { ML[i] = AL[i] ?? 0; MR[i] = AR[i] ?? 0 } }
+  for (let i = N - 96; i < N; i++) { const e = (N - i) / 96; ML[i] *= e; MR[i] *= e }
+  let peak = 0
+  for (let i = 0; i < N; i++) { ML[i] = Math.tanh(ML[i] * 1.1) / 1.1; MR[i] = Math.tanh(MR[i] * 1.1) / 1.1; peak = Math.max(peak, Math.abs(ML[i]), Math.abs(MR[i])) }
+  for (let i = 0; i < N; i++) { ML[i] *= db(-1) / peak; MR[i] *= db(-1) / peak }
+  writeWav(OUT, [ML, MR])
+  console.log(`final ${PIECE} ${VERSION}: ${OUT}`)
+  process.exit(0)
 }
 // Pre-roll: compases derechos; en el último, el tiempo 4 tartamudea (búfer de la grabación real) hasta el corte.
 for (let b = 0; b < PRE; b++) {
