@@ -6,6 +6,11 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+
+## Delta 2026-09-27
+
+- `scripts/foto/**` tiene migración planificada al repo taller `efeonce-brand-workshop` (TASK-1925, ADR `EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1`). Si esta task arranca antes, trabaja sobre `scripts/foto`; si arranca después, sobre `tools/foto` del taller. TASK-1925 no migra mientras esta esté `in-progress`.
+
 ## Status
 
 - Lifecycle: `to-do`

@@ -1,5 +1,15 @@
 # GREENHOUSE_REPO_ECOSYSTEM_V1.md
 
+## Delta 2026-09-27 — `efeonce-brand-workshop`, repo taller de producción de marca
+
+- Repo: `efeoncepro/efeonce-brand-workshop` (privado, `main`), clonado junto a `greenhouse-eo` en
+  `/Users/jreye/Documents/efeonce-brand-workshop`.
+- Rol: taller de producción de marca (fotografía, composición, motion de «La órbita» y de Glitch). No es un
+  producto: no despliega, no tiene runtime ni clientes, no guarda binarios ni documentación gobernante.
+- Se opera desde sesiones en `greenhouse-eo`, con sus skills; los comandos `foto:*` pasan a delegar al taller (TASK-1925).
+- Decisión: `docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md`. Converge con Globe cuando Globe reactive su generación.
+- Regla cross-repo: el taller no tiene auto-deploy; su CI (cuando exista) corre sólo en `pull_request`.
+
 ## Delta 2026-05-18 — `notion-bigquery` transferido a `efeoncepro` org (governance fix, pre-sunset)
 
 - **Acción ejecutada**: GitHub UI Settings → Transfer ownership de `cesargrowth11/notion-bigquery` a `efeoncepro/notion-bigquery`.
