@@ -7,8 +7,8 @@
 > 2026-09-27. §13 (catálogo y oficio, D25): AXIS main@aa66225, 2026-09-27 (`@efeoncepro/axis-graphic-line` 0.5.0 y
 > `@efeoncepro/axis-brand-assets` 0.3.3, publicados con el tag `v0.5.0`; `axis-tokens` sigue en 0.3.7). §13 (IA,
 > social y staff, D26): AXIS main@cf77452 (2026-09-27) (`@efeoncepro/axis-graphic-line` 0.6.0 y `@efeoncepro/axis-brand-assets`
-> 0.3.4, publicados con el tag `v0.6.0`; `axis-tokens` va en 0.3.8, publicado por otra sesión con superficies, y no
-> cambia por D26).
+> 0.3.4, publicados con el tag `v0.6.0`; `axis-tokens` iba en 0.3.8 en ese release, publicado por otra sesión con superficies, y no
+> cambió por D26).
 >
 > **Estado: canónica** (el operador la canonizó el 2026-09-26, D22). **La fuente de verdad es AXIS**, no este documento:
 > valores en `efeonceGraphicLine.icons` (`@efeoncepro/axis-tokens`), geometría y reglas ejecutables en
@@ -419,8 +419,8 @@ megáfono deja el anillo de la esfera como hueco.
 > cuidando el diseño que ya tiene la web y documentando para agentes y el equipo»). IA, social y staff (D26; operador,
 > 2026-09-27: «Subelos todos a excepción del hoodie de trazo que no parece un hoodie»). Vive en AXIS main@cf77452 (2026-09-27):
 > `ICON_CATALOG` en `@efeoncepro/axis-graphic-line` **0.6.0** y los volúmenes en `@efeoncepro/axis-brand-assets`
-> **0.3.4**, publicados con el tag `v0.6.0` (`axis-tokens` va en 0.3.8, publicado por otra sesión con superficies, y no
-> cambia por D26). Guía: AXIS `docs/agent-composition/iconography.md` §«Catálogo aprobado»; ADR AXIS, deltas «Oficio:
+> **0.3.4**, publicados con el tag `v0.6.0` (`axis-tokens` iba en 0.3.8 en ese release, publicado por otra sesión con superficies, y no
+> cambió por D26). Guía: AXIS `docs/agent-composition/iconography.md` §«Catálogo aprobado»; ADR AXIS, deltas «Oficio:
 > 30 glifos nuevos (D25)» e «IA, social y staff: 19 glifos nuevos (D26)». Lab: `/references/iconography/` (los 79 del
 > catálogo y los 43 volúmenes). Si difiere de AXIS, manda AXIS.
 

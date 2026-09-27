@@ -99,7 +99,7 @@ D25) y `axis-brand-assets` 0.3.3 (33 PNG de volumen); `axis-tokens` sigue en 0.3
 ese día (con el oficio).
 
 **Publicado el 2026-09-27 (tag `v0.6.0`, AXIS main@cf77452 (2026-09-27)):** `axis-graphic-line` 0.6.0 (catálogo de 79 glifos
-con IA, social y staff D26) y `axis-brand-assets` 0.3.4 (43 PNG de volumen); `axis-tokens` va en 0.3.8 y no cambia por
+con IA, social y staff D26) y `axis-brand-assets` 0.3.4 (43 PNG de volumen); `axis-tokens` iba en 0.3.8 en ese release y no cambió por
 D26. Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 
 **Publicado el 2026-09-27 (tag `v0.3.8`):** `axis-tokens` 0.3.8 y `axis-ui-contracts` 0.3.7, con el contrato

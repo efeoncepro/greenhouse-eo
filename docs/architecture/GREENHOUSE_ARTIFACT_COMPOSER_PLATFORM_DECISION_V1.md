@@ -525,6 +525,13 @@ Composer es el candidato natural a `domain-package` el día que EPIC-027 lo auto
 > - **Gate:** scope propio `pnpm composer:visual-gate --catalog=graphic-line` (22 frames a 0 px); ver
 >   `docs/operations/runbooks/composer-visual-gate.md`. Norma de marca:
 >   `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §2.1.
+>
+> **Delta 2026-09-27 (TASK-1927) — contrato `efeonce.surface-composition` 0.1.2.** `graphic-line-deck` suma el marco
+> (`cover-brochure`, `cover-proposal`, `close-brochure`, `close-proposal`), las composiciones `hero` y `lines` de
+> `proposal-cinematic` y las de `section-split`; el gate `--catalog=graphic-line` queda en 32 frames a 0 px.
+> `pnpm brand:compose` acepta un intent de documento (`pages`) y entrega un PDF multipágina con manifest y
+> procedencia (`planSurfaceDocument`, `src/lib/brand-surfaces/document.ts`). Los conteos de arriba son los de
+> TASK-1919. Task: `docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md`.
 
 ---
 

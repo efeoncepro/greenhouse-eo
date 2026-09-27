@@ -55,13 +55,13 @@
 | 2026-09-27 | **Las 69 láminas del deck aprobadas, con receta por lámina** (canvas por superficie, página Deck): todo lo que era opción, prueba u «opción sin elegir» pasa a aprobado (lente, sangre, partida, foco, respiro, hoja de contactos, secciones de cine, las tres portadas generales del brochure y la de cinco líneas con selección y cursor de Nexa). **Tríptico:** una palabra por toma, cada una con su esfera («Escucha.» «Crea.» «Mide.»), reemplaza la frase única. **Sección partida:** el indicador sube por la **izquierda** con la esfera arriba a la izquierda, en tres variantes (esquina arriba, esquina abajo, panel a la derecha); la órbita a la derecha, descartada. **Registro cine:** excepción aprobada para las láminas de sección y «about» («Quiénes somos», «Por qué lo hacemos»), sin ampliar a otras superficies. **Cotización** en tres variantes (tabla, escena, en vivo; `[MONTO]`); **día a día** con cuatro momentos, herramientas y dos «vívelo»; **próximos pasos** con la agenda abierta (reemplaza tres columnas); **clientes** en un tono navy (Aguas Andinas y UC Temuco en tonos de navy); **caso Sky** con foto de ejemplo a reemplazar; **BeX:** la escalera es la principal. Catálogo: `docs/operations/brand-graphic-line/deck-recipes/` (JSON `efeonce.deck-slide-recipes.v1`, `pnpm brand:deck-recipes`); norma §4.6 «Recetas por lámina» y delta (c). AXIS (tokens, recetas, `cine-requires-nexa-or-proposal`) y las plantillas del composer se sincronizan en TASK-1927; pendientes de QA en el README del catálogo. |
 | 2026-09-27 | **Glitch: música aprobada, sólo Glitch** (tema B: intro, cortina y salida; cama post-punk bajo la noticia): «Definitivamente la B es la decisión», «Me parecen bien todas», «Post-punk definitivamente». Reemplaza la decisión «voz sola bajo las noticias» del sonido. Másteres en el bucket `glitch/music/v1/` (URL + sha256, nunca regenerados); integrada al taller (`tools/glitch-motion/src/music.mjs`, pre-roll animado de la intro elegido por el operador, `--music off`); en producción en AXIS (`/references/glitch/#musica`, `glitch.json → music`, commit `87c3298`). Único pendiente: probar la mezcla con la voz real del host. Detalle: [glitch.md](glitch.md) §13.7. |
 | 2026-09-27 | **Glitch: motion y sonido aprobados, sólo Glitch.** Motion (apertura y tarjeta final v2, kit de overlays con el lower third de la órbita, transición de bytes entre piezas y entre escenas, héroe): «Si, el tuyo también está aprobado». Diseño sonoro **versión B**: «La b me encanta más» / «Sus sonidos están aprobados» (la A queda descartada, sólo con `--sound a`). Pre-roll de la intro «los tres puntos al ritmo» (3,2 s, opaco, empalme PSNR ∞ con la apertura), elegido por el operador. Todo se produce en el taller `efeoncepro/efeonce-brand-workshop` (`tools/glitch-motion`, HyperFrames; sonido en `src/sound.mjs` sobre `tools/brand-sound`; música en `src/music.mjs`), empujado a `main` = `ed89a0b`. Verificado: v2 37/37, kit 95/95, 12/12 pruebas. Detalle: [glitch.md](glitch.md) §12–§13; comandos: norma de Glitch §13.13. |
+| 2026-09-27 | **Deck compuesto: aprobación visual del operador (TASK-1927).** El operador aprobó a ojo las láminas compuestas con `pnpm brand:compose`: las composiciones `hero` y `lines` de `proposal-cinematic` y el brochure de nueve páginas. Con esa aprobación TASK-1927 quedó `complete` (en `develop` local, sin push). Las portadas y contraportadas aprobadas ese día ya tienen receta del contrato y plantilla (`cover-brochure`, `cover-proposal`, `close-brochure`, `close-proposal`); `cover-classic` y `close-classic` **no** están aprobadas. Detalle: `applications.md` §L, «Componer el deck hoy». |
 
 ## Pendientes del operador (no decidir por tu cuenta)
 
-- **Deck compuesto (TASK-1927, 2026-09-27):** las láminas compuestas (layouts `hero` y `lines` y el brochure de 9
-  páginas) están **aprobadas a ojo por el operador** (2026-09-27). Sigue abierta la pregunta de la **sección
-  partida**, anotada en el token: el indicador barre las secciones ya recorridas, (n−1) de N: ¿se unifica a n de N?
-  Hasta decidir, la plantilla sigue el token.
+- **Deck compuesto (TASK-1927, 2026-09-27):** la aprobación visual ya está dada (fila del 2026-09-27 arriba). Sigue
+  abierta la pregunta de la **sección partida**, anotada en el token: el indicador barre las secciones ya recorridas,
+  (n−1) de N: ¿se unifica a n de N? Hasta decidir, la plantilla sigue el token.
 
 - **Plantillas de La órbita (TASK-1919, 2026-09-27):** posición de la lente del caminero (token 0,70 vs ≈0,77 en la
   lámina aprobada); super de dato con arco completo (lámina) o la estela canónica de la medida; burbuja URL en
@@ -120,19 +120,21 @@
   `ICON_CATALOG` y `axis-brand-assets` **0.3.3** con 33 PNG en `volume/`; `axis-tokens` sigue en 0.3.7). Greenhouse
   lo fijó ese día (`axis-graphic-line` 0.5.0 y `axis-brand-assets` 0.3.3).
 - IA, social y staff (D26): **hecho y publicado** (tag `v0.6.0`, 2026-09-27: `axis-graphic-line` **0.6.0** con los 79
-  glifos en `ICON_CATALOG` y `axis-brand-assets` **0.3.4** con 43 PNG en `volume/`; `axis-tokens` va en 0.3.8 y no
-  cambia por D26). Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
+  glifos en `ICON_CATALOG` y `axis-brand-assets` **0.3.4** con 43 PNG en `volume/`; `axis-tokens` iba en 0.3.8 en ese
+  release y no cambió por D26). Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 
-- Contrato 0.1.2 en Greenhouse (TASK-1927, 2026-09-27): **hecho, local en `develop`, sin push; la task sigue
-  `in-progress`**. Hecho: Greenhouse fija `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12; `pnpm brand:compose`
+- Contrato 0.1.2 en Greenhouse (TASK-1927, 2026-09-27): **hecho; la task está `complete`**
+  (`docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md`), con todo en `develop` local y
+  **sin push**. Los gates se leen en la task. TASK-1928 y TASK-1929 quedaron desbloqueadas. Hecho: Greenhouse fija `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12; `pnpm brand:compose`
   compone `proposal-cinematic` en `service`, `hero` y `lines`, la sección partida por la izquierda en tres
   composiciones, el tríptico de una palabra por toma, y el marco aprobado (`cover-brochure`, `cover-proposal`,
   `close-brochure`, `close-proposal`); compone documentos (`pages`) en un PDF con manifest y procedencia
   (`planSurfaceDocument`); gate `--catalog=graphic-line` con 32 frames a 0 px (deltas b–e en `BASELINE_DELTAS.md`).
   `cover-classic` y `close-classic` no entran (no aprobadas; `supersededBy` en AXIS), ni
   `cover-brochure-cine-lines-selection` (el contrato no admite selección en esa portada). **Aprobado a ojo por el operador** (2026-09-27).
-  **Pendiente:** las 38 recetas restantes del deck (TASK-1928); la ruta productiva, que debe aceptar también el intent de documento
-  (TASK-1921); plates idempotentes (TASK-1926). Diferencias conocidas contra los prototipos: tamaño de «Cuando
+  **Pendiente:** el push a `develop`; las 38 recetas restantes del deck (TASK-1928); la ruta productiva, que debe aceptar también el intent de documento
+  (TASK-1921); plates idempotentes (TASK-1926); el control de foco de la sección partida (el builder `sectionSplit` no
+  lee `photo.focus`; exige un cambio en AXIS y otro en Greenhouse, y **no tiene task**). Diferencias conocidas contra los prototipos: tamaño de «Cuando
   quieras.», burbuja URL horneada, caja de selección unos píxeles más ajustada.
 - Composición por superficie en Greenhouse (TASK-1919): **hecho, local en `develop`** — las 20 recetas aprobadas son
   plantillas del Artifact Composer (`graphic-line-deck`, `graphic-line-stills`, `graphic-line-overlays`), `pnpm
@@ -163,7 +165,9 @@
 | 2026-09-27 | axis-tokens 0.3.8 · axis-ui-contracts 0.3.7 | publicado (tag `v0.3.8`) | contrato `efeonce.surface-composition` 0.1.1 (`candidate`, acepta intents 0.1.0): modela el contenido de las láminas aprobadas (`levels`, `note`, `panels`, `figures` con fuente, `nav`, `photo.focus`/`native`, título y marcos de hojas, `chapter`, `selection.box`, `shots`, `subtitles`, `selection.level`). `efeonceGraphicLine.surfaces` entró en 0.3.7 (contrato 0.1.0). Greenhouse lo fija (commit `016d0a183`) |
 | 2026-09-27 | axis-graphic-line 0.6.0 · axis-brand-assets 0.3.4 (AXIS main@cf77452 (2026-09-27); `axis-tokens` va en 0.3.8 y no cambia) | publicado (tag `v0.6.0`) | IA, social y staff (D26): 19 glifos nuevos en `ICON_CATALOG` (36 Trazo + 43 Plastilina = 79) y los 10 volúmenes nuevos en `volume/` (43 PNG). Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4 |
 | 2026-09-27 | axis-tokens 0.3.9 · axis-ui-contracts 0.3.8 (AXIS `main@ff0505a`) | publicado (tag `v0.3.9`) | contrato `efeonce.surface-composition` 0.1.2 (`candidate`, aditivo): `use` proposal/brochure, recetas aprobadas `cover-classic` y `close-classic` (logo sin burbuja URL; cierre con eslogan en tres tramos), `layout` service/hero/lines de `proposal-cinematic`, `selection.anchor`, documento `resolveSurfaceDocument`/`validateSurfaceDocumentIntent` (manifest `axis.surface-document.v1`). Greenhouse lo integró el mismo día con TASK-1927 (fila siguiente) |
-| 2026-09-27 | axis-tokens · axis-ui-contracts, releases de TASK-1927 | publicados (tags `v0.3.11`, `v0.3.13`, `v0.3.14`) | contrato `efeonce.surface-composition` 0.1.2 con sus deltas: `v0.3.11` (deltas b y c), `v0.3.13` (delta e: tokens del marco de portadas y contraportadas; `cover-classic` y `close-classic` quedan `supersededBy`) y `v0.3.14` (tipografía completa de las contraportadas). **Greenhouse fija `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12** (`axis-graphic-line` 0.7.0 y `axis-brand-assets` 0.3.5 los fijó TASK-1922) |
+| 2026-09-27 | axis-tokens 0.3.11 · axis-ui-contracts 0.3.9 (TASK-1927; repo `axis-design-system`, rama `main`) | publicado (tag `v0.3.11`) | contrato `efeonce.surface-composition` 0.1.2, deltas (b) y (c) |
+| 2026-09-27 | axis-tokens 0.3.13 · axis-ui-contracts 0.3.11 (TASK-1927) | publicado (tag `v0.3.13`) | contrato 0.1.2, delta (e): tokens del marco de portadas y contraportadas — `column.top`, `column.body`, `column.closeOffsetsPx`, `axis` (eje del amanecer), `orbitPaint` (giant, rising), `contact.style`, `clientLogo.box`, `section-split.progress.startFromTopDeg` y `sweep`. `cover-classic` y `close-classic` quedan `supersededBy`. `axis-ui-contracts` 0.3.11 no cambia de código: se republica porque fija la versión exacta de `axis-tokens` |
+| 2026-09-27 | axis-tokens 0.3.14 · axis-ui-contracts 0.3.12 (TASK-1927) | publicado (tag `v0.3.14`) | tipografía completa de las contraportadas: interlineado y tracking de la voz en `close-brochure`; interlineado del eslogan en las dos. `axis-ui-contracts` 0.3.12 tampoco cambia de código (misma razón). **Vigente: Greenhouse fija `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12** (`axis-graphic-line` 0.7.0 y `axis-brand-assets` 0.3.5 los fijó TASK-1922). El tag `v0.3.12` es de TASK-1922 (Glitch), no de esta serie |
 
 Lab AXIS (`c2affc6`, 2026-09-26): la lámina 6.1 lista las decisiones del 26-09 y lo que sigue abierto; el acento ya no colorea texto de menos de 24 px en 1.2 y en las láminas de Insights; la anatomía de 1.2 ya no dibuja el anillo de la esfera; 5.4, 5.1 y 4.5 al día. Quedan en acento sólo rótulos de cotas en diagramas técnicos («0,20 em», la «X» del resguardo), que no son piezas.
 

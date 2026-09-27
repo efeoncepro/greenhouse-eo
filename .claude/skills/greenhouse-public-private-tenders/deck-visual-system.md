@@ -123,7 +123,8 @@ Sufijo `Split` = bipartito (dos mitades) · `Full` = full-bleed (a sangre).
 > foco.») y la **contraportada va con foto y «Empower your Growth» como mensaje principal**, sin «¿Conversamos?»
 > (la propuesta llega después de conversar). Ejemplo aprobado: SKY. Norma:
 > `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6; resumen en `deck-studio`
-> §«Portadas y contraportadas». En este catálogo siguen `CoverFull` / `BackCoverFull`: si la oferta a comité adopta
+> §«Portadas y contraportadas». Se componen con `pnpm brand:compose` (`cover-proposal` layouts `orbit`/`dawn`, con
+> `clientLogo: { path, alt }`, y `close-proposal`; TASK-1927). En este catálogo siguen `CoverFull` / `BackCoverFull`: si la oferta a comité adopta
 > el set nuevo lo decide el operador, no el agente.
 >
 > **Delta 2026-09-27 (c) — qué láminas usa una propuesta de marca propia (recetas por lámina).** Las 69 láminas de La

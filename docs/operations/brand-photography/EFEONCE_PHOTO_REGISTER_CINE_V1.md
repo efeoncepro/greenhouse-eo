@@ -48,8 +48,8 @@ publicidad con personas del equipo en cine sigue en prueba (§11). Las guardas n
 uniforme por registro de escena, isotipo compuesto y revisado al 100 % (§7.3), nunca dos personas mirándose de cerca
 (§7.4) y ningún texto sobre el sujeto (§9.5).
 
-**Pendientes que deja [pendiente]:** el contrato AXIS (`cine-requires-nexa-or-proposal`) todavía rechazaría estas
-láminas declaradas como cine: se lleva al contrato en TASK-1927. Los plates de «about» se compusieron con un degradado
+**Pendientes que deja [pendiente]:** ~~el contrato AXIS (`cine-requires-nexa-or-proposal`) todavía rechazaría estas
+láminas declaradas como cine~~ — **cerrado por TASK-1927 (2026-09-27)**: el contrato ya las admite (§2). Los plates de «about» se compusieron con un degradado
 lateral, contra «sin velos» (§9.3): se regeneran con la reserva izquierda; QS1b y QS2 no tienen registro de
 `foto:isotipo` junto al plate: pasan por `foto:emblema` antes de publicar. Receta de cada lámina:
 [catálogo de recetas del deck](../brand-graphic-line/deck-recipes/README.md); norma:
@@ -101,10 +101,10 @@ bruma alrededor, estás en cine. Los otros tres registros no fabrican su fuente 
 | **3 · Láminas de sección y «about» del deck** (excepción, 2026-09-27) | Personas del equipo (o del cliente, en la sección con el panel a la derecha), con o sin Nexa | Equipo: uniforme por registro de escena; cliente: su propia ropa, sin marca Efeonce | [Delta (c) de arriba](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck) + [superficie §3, regla 5](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) |
 
 **El contrato lo vigila [medido]:** AXIS rechaza `photo.register: "cine"` fuera de esos casos con el issue
-**`cine-requires-nexa-or-proposal`** (`@efeoncepro/axis-ui-contracts`, `surface-composition.js`): pasa si la receta es
-`proposal-cinematic` **o** si `photo.subject` es `nexa`. El token vive en `@efeoncepro/axis-tokens` (desde 0.3.8; vigente 0.3.10 al 2026-09-27),
-`efeonceGraphicLine.surfaces.photo.cine`: `{ recipes: ['proposal-cinematic'], subjects: ['nexa'], lensMm: 85,
-cameraDistanceM: 2 }`, y la regla transversal `cine-only-nexa-or-proposal`, junto a `no-close-gaze-pairs`.
+**`cine-requires-nexa-or-proposal`** (`@efeoncepro/axis-ui-contracts`, `surface-composition.js`): pasa si la receta
+está en la lista del token **o** si `photo.subject` es `nexa`. El token vive en `@efeoncepro/axis-tokens` (desde 0.3.8; Greenhouse fija 0.3.14 desde TASK-1927),
+`efeonceGraphicLine.surfaces.photo.cine`: `{ recipes: ['proposal-cinematic', 'cover-brochure', 'close-brochure',
+'close-proposal', 'section-cine', 'section-split'], subjects: ['nexa'], lensMm: 85, cameraDistanceM: 2 }`, y la regla transversal `cine-only-nexa-or-proposal`, junto a `no-close-gaze-pairs`.
 
 **Otros usos observados [decisión del operador, 2026-09-27]:** después de aprobar las láminas, el operador dijo que
 esas láminas sirven también para el **brochure** (formato elegido: **PDF horizontal**), «sobre todo las
@@ -829,7 +829,7 @@ Amplía §9.5: se prueba contra el borde real del haz, la mano o el anillo más 
 
 | # | Pendiente | Dueño |
 |---|---|---|
-| 1 | **Alcance del registro:** las portadas de línea del brochure usan personas del equipo (`CR2b`, `WB1b`, `RV1b`, hechas para `proposal-cinematic`, y `LN4`, hecha para el brochure). §2 y el issue AXIS `cine-requires-nexa-or-proposal` sólo admiten Nexa o la receta `proposal-cinematic`: una portada de brochure declarada como cine con persona del equipo hoy la rechazaría el contrato. El operador las aprobó; falta llevarlo al contrato | Operador + AXIS (TASK-1927) |
+| 1 | **Alcance del registro:** las portadas de línea del brochure usan personas del equipo (`CR2b`, `WB1b`, `RV1b`, hechas para `proposal-cinematic`, y `LN4`, hecha para el brochure). §2 y el issue AXIS `cine-requires-nexa-or-proposal` sólo admiten Nexa o la receta `proposal-cinematic`: una portada de brochure declarada como cine con persona del equipo hoy la rechazaría el contrato. El operador las aprobó; falta llevarlo al contrato. **Cerrado el 2026-09-27 (TASK-1927):** `cover-brochure` está en `photo.cine.recipes` (`axis-tokens` 0.3.14) | Cerrado |
 | 2 | **`LN4` sin isotipo compuesto.** Sigue el orden de las invariantes de fotografía (`.claude/rules/brand-photography.md`: referencias → `foto:emblema` al 100 % → `foto:isotipo` **sólo si el emblema difiere**), pero choca con §7.3 de este registro («el publicable lleva el isotipo oficial», todas las aprobadas con `b`). Decidir cuál manda en cine y alinear el otro | Operador |
 | 3 | **Regenerar desde las fichas:** hoy `foto:generar` vuelve a cobrar en cada corrida y la voz y la firma salieron de scripts de sesión que no están en el repo. El pipeline cine idempotente debe poder regenerar estos plates desde sus fichas | TASK-1926 |
 | 4 | Variante opcional de RevOps con Salesforce (cielo `#2fb8ff`) | Operador |

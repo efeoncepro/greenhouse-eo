@@ -1,9 +1,9 @@
 # Componer una pieza por superficie con AXIS — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (1.2: portadas y contraportadas, brochure o propuesta completos con el comando de documento, códigos de documento y problemas nuevos, TASK-1927. Antes, 1.1: las recetas aprobadas se componen enteras con `pnpm brand:compose` en el Artifact Composer, TASK-1919)
+> **Ultima actualizacion:** 2026-09-27 por Claude (1.3: cómo cambiar la foto, el copy o la sección de una lámina, con sus problemas comunes, y estado de cierre de TASK-1927. Antes, 1.2: portadas y contraportadas, brochure o propuesta completos con el comando de documento, códigos de documento y problemas nuevos, TASK-1927. Antes, 1.1: las recetas aprobadas se componen enteras con `pnpm brand:compose` en el Artifact Composer, TASK-1919)
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — se compone con comandos locales en AXIS y en Greenhouse
 > **Documentacion relacionada:** [Norma de composición por superficie](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) · [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md#componer-por-superficie) · [Usar la línea gráfica de Efeonce](./usar-linea-grafica-efeonce.md) · [Compositor de piezas con CTA](./compositor-piezas-cta.md) · [Producir una foto de marca](../marketing/fotografia-de-marca-efeonce.md)
@@ -102,6 +102,39 @@ caminero, el último cuadro del loop y el storyboard de motion, y las siete capa
 
 Con la Ruta A saltas el paso 5: el comando pinta la órbita, la voz, la selección y los íconos. El paso 4 sólo aplica
 si todavía no tienes el plate aprobado (hazlo antes de componer). Sigue en el paso 6. Si el comando se niega, lee el código del error en «Qué significan los estados».
+
+#### Cambiar la foto, el copy o la sección de una lámina
+
+La foto, el texto y el número de sección **no viven en la plantilla**: son datos del intent. Para cambiarlos, editas el
+intent y vuelves a componer.
+
+1. **Copia el intent de ejemplo a la carpeta de trabajo de tu pieza** y edita la copia. No edites un archivo de
+   `src/lib/brand-surfaces/examples/`: esos ejemplos están vigilados por una prueba y cambiarlos la rompe.
+2. **Cambia lo que necesitas:**
+
+   | Quieres cambiar | Campo | Ten en cuenta |
+   |---|---|---|
+   | La foto | `photo.plateRef` y `photo.alt` | `plateRef` es la ruta del archivo; `alt` es obligatorio y describe la escena, no el copy |
+   | El texto | `voice` y `body` | la respuesta sigue siendo de una a tres palabras |
+   | La sección | `progress` | el número de la sección y el total de secciones |
+
+3. **Confirma que la foto existe** en la ruta que escribiste. Los plates viven fuera de git, en `ai-generations/**`.
+4. **Elige la foto pensando en el recorte.** El comando ajusta la foto al área de la receta, cubriéndola y centrada:
+   lo que sobra por los bordes se pierde. En una lámina a sangre el área es el lienzo completo. En la sección partida
+   es una franja más angosta, de unos dos tercios del ancho: el sujeto tiene que quedar dentro del centro de la foto.
+5. **Si usas la composición `panel-end`, elige una foto sin texto ni logos legibles:** en esa composición la foto sale
+   espejada.
+6. **Compón de nuevo:**
+
+   ```bash
+   pnpm brand:compose -- --intent <ruta>/<tu-intent>.json
+   ```
+
+7. **Revisa la lámina compuesta.** Mira que el sujeto no quede cortado y, si lleva uniforme, que el isotipo se lea bien.
+   En una portada con columna de voz, revisa `column.topPx`: se elige según dónde quedó el sujeto de la foto nueva.
+
+Al cambiar la foto **no cambian** el panel, la esquina curva, el indicador ni la columna de voz: los fija la
+composición que elegiste en `layout`. Si quieres otra disposición, cambia `layout`, no la foto.
 
 #### Portada o contraportada
 
@@ -229,8 +262,9 @@ En `method-staircase`, en las portadas de propuesta y en la contraportada `orbit
   corrijas a mano.
 - En portadas y contraportadas hay tres diferencias conocidas contra el prototipo del canvas: «Cuando quieras.» sale
   algo más grande, la burbuja URL es la horneada y la caja de selección queda algo más ajustada. No son errores.
-- Las láminas del deck que hoy tienen plantilla fueron aprobadas a ojo por el operador el 2026-09-27. Una lámina con
-  copy o foto nuevos se entrega como compuesta: la aprobación fue de la plantilla, no de cada pieza futura.
+- El operador dio la aprobación visual de las láminas compuestas el 2026-09-27 (las composiciones `hero` y `lines` y el
+  brochure de nueve páginas), y TASK-1927 quedó cerrada. Una lámina con copy o foto nuevos se entrega como compuesta:
+  esa aprobación no cubre cada pieza futura.
 - Entrega el intent, el manifest, la pieza y la lista de lo que es opción o maqueta. Componer y medir **no** aprueba
   ni publica: la aprobación es del operador.
 
@@ -275,7 +309,12 @@ Salen cuando compones un brochure o una propuesta. Con cualquiera de ellos, el d
 - **No escribas coordenadas, px, porcentajes ni tiempos** en un script o un intent. Salen del token
   `efeonceGraphicLine.surfaces.<superficie>`.
 - **No elijas el canal del contrato de la órbita a mano** (`print`, `screen`, `social`): lo fija el delegate.
-- **No uses el registro cine** fuera de piezas con Nexa protagonista o de la receta `proposal-cinematic`.
+- **No uses el registro cine** fuera de piezas con Nexa protagonista, de la receta `proposal-cinematic` y de las
+  excepciones del deck que fija la norma (secciones partidas, láminas «about» y el marco con foto). Nunca en social,
+  web, publicidad ni láminas de contenido.
+- **No edites un intent de ejemplo** de `src/lib/brand-surfaces/examples/` para producir una pieza: cópialo y edita la
+  copia.
+- **No uses en `panel-end` una foto con texto o logos legibles:** sale espejada.
 - **No pongas a dos personas mirándose de cerca**: se lee como escena romántica.
 - **No pongas el acento en textos de menos de 24 px** (como el rótulo del primer paso): va en blanco o en el suave.
 - **No uses el isotipo que dibuja el modelo** ni el logo dentro de la toma de un video o una gráfica animada.
@@ -312,6 +351,12 @@ Salen cuando compones un brochure o una propuesta. Con cualquiera de ellos, el d
 | La lente de la LED no coincide con la maqueta del canvas | la receta del paquete y la pieza medida difieren | manda el token de superficie; avisa en la entrega (norma §6, fila 7) |
 | El teléfono parece el escritorio achicado | se compuso desde el escritorio | recompón mobile-first, con toma vertical nativa |
 | `No encuentro el plate …` | el plate vive fuera de git (`ai-generations/**`) y no está en tu equipo | genéralo o cópialo a la ruta de `photo.plateRef` antes de componer. En un documento basta que falte uno para que no salga nada: el comando se detiene antes de crear la carpeta |
+| `missing-photo` después de cambiar la foto | el intent no trae `photo.plateRef`, o le falta `photo.alt` | escribe la ruta del archivo y un `alt` que describa la escena |
+| El sujeto sale cortado en la sección partida | el recorte es centrado y la franja de foto es más angosta que el lienzo; esa receta no tiene control de foco | usa una foto con otro encuadre, con el sujeto al centro. Un control de foco exigiría cambios en AXIS y en Greenhouse, y hoy no existe |
+| El texto o el logo de la foto sale al revés | la composición `panel-end` espeja la foto | elige una foto sin texto ni logos legibles, o usa `corner-top` o `corner-bottom` |
+| El isotipo del uniforme se ve raro en `panel-end` | la foto va espejada y el isotipo se compone aparte | revísalo al 100 % sobre la lámina compuesta antes de entregar |
+| Cambié la foto y el texto de la portada ahora cruza al sujeto | la columna de voz sigue a la altura de la foto anterior | ajusta `column.topPx` dentro del rango permitido |
+| La prueba de los ejemplos falla después de tu cambio | editaste un intent de `src/lib/brand-surfaces/examples/` | devuelve el ejemplo a como estaba y trabaja en una copia fuera de esa carpeta |
 | El mensaje dice que `column.topPx` «va entre … y … px» | la altura de la columna quedó fuera de la reserva del logo | usa un valor dentro del rango que indica el mensaje, o quita el campo para usar el valor por defecto |
 | El mensaje dice que `clientLogo.alt` «nombra al cliente» | declaraste el logo del cliente sin texto alternativo | agrega `alt` con el nombre del cliente |
 | `El archivo … no es SVG ni PNG` o `No encuentro el archivo …` | el logo del cliente está en otro formato o la ruta no existe | entrega el logo en SVG o PNG y corrige `clientLogo.path` |
@@ -334,7 +379,9 @@ Salen cuando compones un brochure o una propuesta. Con cualquiera de ellos, el d
   2026-09-27); gate `pnpm composer:visual-gate --catalog=graphic-line`
   ([runbook](../../operations/runbooks/composer-visual-gate.md)); ruta productiva en
   [TASK-1921](../../tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md).
-- Integración del contrato 0.1.2: [TASK-1927](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md).
+- Integración del contrato 0.1.2: [TASK-1927](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md)
+  (`complete` el 2026-09-27; en `develop` local, sin publicar en el remoto). Recorte de la foto: `materializeAssets` en
+  `scripts/brand-surfaces/compose.ts`; prueba de los ejemplos: `src/lib/brand-surfaces/__tests__/example-plans.test.ts`.
   Recetas restantes del deck: [TASK-1928](../../tasks/to-do/TASK-1928-graphic-line-deck-remaining-recipe-templates.md).
 - Contacto de marca: `EFEONCE_CONTACT` en `src/config/efeonce-brand.ts`.
 - AXIS (en `main` desde el 2026-09-27; [página del Lab](https://axis.efeonce.org/references/surfaces/)):

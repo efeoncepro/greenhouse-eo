@@ -102,7 +102,7 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   token con su razón. Cambiar un valor: token + prueba en AXIS → publicar → fijar en Greenhouse → comparar storyboard →
   aprobación del operador si altera una pieza aprobada.
 - **Motion y audiovisual por superficie (desde el 2026-09-27):** la gráfica animada con foto y el video de marca son
-  superficies del contrato AXIS `efeonce.surface-composition` 0.1.1 (`candidate`; publicado en AXIS `v0.3.8`,
+  superficies del contrato AXIS `efeonce.surface-composition` (`candidate`; motion y audiovisual entraron en la 0.1.1, AXIS `v0.3.8`; Greenhouse fija hoy la 0.1.2,
   [Lab](https://axis.efeonce.org/references/surfaces/motion/)). Norma: [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
   §4.4 (motion), §4.5 (audiovisual) y §4.3 (spot pDOOH); páginas «Motion» y «Producción audiovisual» del
   [canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7), cada una con su lámina

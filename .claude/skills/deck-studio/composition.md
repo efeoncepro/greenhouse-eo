@@ -83,6 +83,11 @@ campos del intent: [SKILL.md](SKILL.md) §«Componer hoy con `pnpm brand:compose
   `pnpm brand:compose -- --intent <intent.json>`. El mapper `src/lib/brand-surfaces` exige receta aprobada, valida con
   el contrato AXIS `efeonce.surface-composition` y deriva el `contentType`; el autor nunca elige plantilla (sigue
   vigente `TemplateAuthorityError`).
+- **El contenido es dato del intent.** Foto (`photo.plateRef`, `photo.alt`), copy (`voice`, `body`) y sección
+  (`progress`) se cambian en el intent y se vuelve a componer; la plantilla nunca se edita para una pieza. El intent
+  de una pieza nueva vive fuera de `src/lib/brand-surfaces/examples/` (carpeta vigilada por el snapshot de
+  `__tests__/example-plans.test.ts`). Qué cuidar al cambiar la foto: [SKILL.md](SKILL.md) §«Cambiar la foto, el copy o
+  la sección de una lámina».
 - **No se mezclan con `deck-axis`.** `deck-axis` es el catálogo de las ofertas a comité, con su molde y la línea base
   de SKY; meter ahí el fondo Efeonce, la voz con esfera o las fotos de cine degradaría lo que protege. Un deck de
   marca propia que necesita láminas sin plantilla combina `brand:compose` con el resto del deck armado con el oficio
@@ -119,7 +124,8 @@ campos del intent: [SKILL.md](SKILL.md) §«Componer hoy con `pnpm brand:compose
   documento. **El `id` de la receta reutiliza el de AXIS cuando existe** (`content-pricing`, `decision-next-steps`,
   `method-staircase`…); los nuevos son kebab-case en inglés. **El catálogo de recetas sirve para elegir la lámina; se
   compone con el intent de AXIS.** Hoy componen las de la tabla de [SKILL.md](SKILL.md) (sección partida por la
-  izquierda y tríptico de una palabra por toma incluidos); las **38 restantes no tienen plantilla: TASK-1928**.
+  izquierda y tríptico de una palabra por toma incluidos): **31 de las 69** caen en una plantilla (lista por id en el
+  README del catálogo); las **38 restantes no tienen plantilla: TASK-1928**.
   **Nunca** se agrega una plantilla sin su receta ni una receta sin la aprobación del operador.
 
 ### Destinos editables posteriores — no confundir fuente, conversión ni renderer

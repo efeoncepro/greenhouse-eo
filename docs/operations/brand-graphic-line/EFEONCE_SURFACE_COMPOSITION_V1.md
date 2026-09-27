@@ -1,9 +1,12 @@
 # Línea gráfica Efeonce — Composición por superficie V1
 
 > **Tipo de documento:** Norma de marca (composición por superficie)
-> **Versión:** 1.4
+> **Versión:** 1.5
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude (1.4: estado tras TASK-1927 — contrato 0.1.2 fijado en Greenhouse
+> **Última actualización:** 2026-09-27 por Claude (1.5: cierre de TASK-1927 — la regla de §4.6 «Cambiar la foto, el copy
+> o la sección de una lámina»: el contenido es dato del intent, qué valida AXIS, cómo recorta el comando, el espejo en
+> `panel-end` y la sección partida sin control de foco; §7 con la task en `complete`, la aprobación visual del operador
+> y lo que quedó abierto. Antes, 1.4: estado tras TASK-1927 — contrato 0.1.2 fijado en Greenhouse
 > con `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12; el catálogo `graphic-line-deck` compone las tres composiciones
 > de `proposal-cinematic`, las tres de la sección partida, el tríptico de una palabra por toma y las portadas y
 > contraportadas aprobadas; `pnpm brand:compose` compone también un documento completo, brochure o propuesta; §2.1,
@@ -58,7 +61,7 @@ Decisiones que cambian esta norma (detalle en §4.6, «Recetas por lámina»):
    tonal; **caso Sky** con foto de ejemplo; **BeX** con la escalera como principal.
 
 **Qué ya está en AXIS y en el composer** (contrato 0.1.2,
-[TASK-1927](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md)): el tríptico de una
+[TASK-1927](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md), `complete`): el tríptico de una
 palabra por toma, la sección partida por la izquierda con sus tres composiciones, las composiciones `hero` y `lines` de
 `proposal-cinematic` y las portadas y contraportadas aprobadas (§2.1 y §4.6). **Qué falta:** las plantillas de las
 recetas restantes del deck
@@ -480,6 +483,46 @@ sección guarda las reglas y las decisiones; el catálogo, la receta de cada lá
   recorridas** (la sección n de N muestra n − 1 de N). **Pregunta abierta del operador**, anotada en el token: si ese
   barrido se unifica con el de la lente y la sección clásica, que miden n de N. Hasta decidir, manda el token.
 
+#### Cambiar la foto, el copy o la sección de una lámina
+
+**El contenido de una lámina es dato del intent, no de la plantilla.** La plantilla fija la composición; la foto, el
+texto y el número de sección llegan en el intent y la lámina se vuelve a componer con `pnpm brand:compose` (§2.1).
+Nadie edita una plantilla ni retoca la salida para cambiar el contenido de una pieza.
+
+| Qué cambia | Campo del intent | Regla |
+|---|---|---|
+| La foto | `photo.plateRef` (ruta del archivo) y `photo.alt` | el `alt` es **obligatorio** y describe la escena, no el copy; sin ruta o sin `alt` la pieza falla con `missing-photo`. El archivo tiene que existir en disco: los plates viven fuera de git (`ai-generations/**`) y, si falta, el comando se detiene antes de crear la salida |
+| El copy | `voice` (eyebrow, pregunta, respuesta) y `body` | rigen las reglas de voz de la receta y de la línea |
+| La sección | `progress` (sección n de N) | el indicador lo pinta la composición desde el token |
+
+**Qué valida AXIS y qué hace Greenhouse.** El **registro** de la foto lo valida el contrato de AXIS: la sección partida
+admite personas en luz dramática (registro cine, por la excepción de §3, regla 5) o registro documental. Greenhouse no
+reimplementa esa regla; sólo exige que la foto venga declarada y exista.
+
+**El recorte.** Lo hace el comando al preparar los archivos (`materializeAssets`, en
+`scripts/brand-surfaces/compose.ts`): ajusta la foto al tamaño que pide la receta, **cubriendo el área y centrada**. En
+las láminas a sangre el área es el lienzo completo; en la sección partida, la franja de foto que fija el token, más
+angosta que el lienzo. Una foto con otra proporción pierde los bordes, no se deforma.
+
+**La sección partida no tiene control de foco.** Su builder (`sectionSplit`, en
+`src/lib/brand-surfaces/recipes/deck.ts`) no lee `photo.focus`: el recorte es siempre centrado. Si el sujeto queda
+cortado, se usa una foto con otro encuadre. Agregar control de foco a esa receta exige un cambio en AXIS y otro en
+Greenhouse; **no está hecho ni registrado como task**.
+
+**El espejo en `panel-end`.** En la composición con el panel a la derecha la foto va **espejada** (`photo.mirrored` de
+AXIS; la plantilla aplica el espejo). Una foto con texto legible o con un logo saldría al revés: para esa composición
+se elige una foto sin texto ni marcas legibles. El isotipo del uniforme se compone aparte, así que se revisa sobre la
+lámina compuesta.
+
+**Qué no cambia al cambiar la foto:** el panel, la esquina curva, el indicador y la columna de voz; los fija la
+composición (`layout`). En una portada con columna de voz, al cambiar la foto se revisa `column.topPx`, que se elige
+según dónde queda el sujeto.
+
+**Una pieza nueva lleva su propio intent.** Los ejemplos de `src/lib/brand-surfaces/examples/` están vigilados por un
+snapshot (`src/lib/brand-surfaces/__tests__/example-plans.test.ts`): se copian fuera de esa carpeta y se edita la
+copia; un ejemplo no se modifica para producir una pieza. Paso a paso:
+[manual de uso](../../manual-de-uso/creative/componer-por-superficie-con-axis.md#cambiar-la-foto-el-copy-o-la-sección-de-una-lámina).
+
 #### Receta `proposal-cinematic` (aprobada el 2026-09-27)
 
 La lámina que vende un servicio con una imagen que se recuerda. Seis aprobadas:
@@ -865,8 +908,15 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
   sobre la prenda con `pnpm foto:isotipo` (TASK-1920). **Hechos con TASK-1927 (en `develop` local, sin publicar):** el
   catálogo `graphic-line-deck` con 16 plantillas (§2.1), el documento completo con `pnpm brand:compose` y el gate visual
   `graphic-line` con 32 frames a cero píxeles.
-- **TASK-1927:** láminas compuestas aprobadas a ojo por el operador (2026-09-27). Su estado de cierre (gates y
-  publicación en `develop`) se lee en la task.
+- **TASK-1927: `complete`** (2026-09-27), con todo en `develop` local y **sin publicar** en el remoto. El operador dio
+  la **aprobación visual** de las láminas compuestas ese día (las composiciones `hero` y `lines` y el brochure de nueve
+  páginas). El estado de los gates se lee en la
+  [task](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md). Con el cierre quedaron
+  desbloqueadas [TASK-1928](../../tasks/to-do/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) y
+  [TASK-1929](../../tasks/to-do/TASK-1929-deck-plan-recipe-catalog-validator.md). **Quedó abierto:** la publicación en
+  `develop`; la ruta productiva gobernada, que debe aceptar también el intent de documento (TASK-1921); las 38 recetas
+  restantes del deck (TASK-1928); el control de foco de la sección partida, sin task (§4.6); la pregunta del barrido
+  del indicador; y las diferencias conocidas contra los prototipos (§4.6).
 - **Preguntas abiertas del operador (TASK-1919):** la posición de la lente del caminero (el token dice 0,70 y la
   lámina aprobada la muestra cerca de 0,77); el super de dato, ¿arco completo como en la lámina o la estela canónica
   de la medida?; la burbuja URL en `section-classic`, `section-split`, `content-measure` y `triptych` (las láminas

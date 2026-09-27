@@ -106,6 +106,28 @@
   siguió la lámina y se dejó la pregunta al operador ([ledger.md](ledger.md), pendientes). No inventes un token para
   cerrarla.
 
+## 2026-09-27 (contrato 0.1.2 en Greenhouse, TASK-1927)
+
+- **Validar contra el build local de AXIS antes de publicar tokens.** Contexto: la task hizo tres releases de AXIS
+  (`v0.3.11`, `v0.3.13` y `v0.3.14`). Regla: antes de publicar tokens nuevos, valida las piezas del consumidor contra
+  el build **local** de AXIS, copiando de forma temporal `packages/tokens/dist` sobre
+  `node_modules/@efeoncepro/axis-tokens/dist`, y **reinstala después** para volver a la versión fijada. Así se evitó
+  una cuarta versión.
+- **Un release de tokens arrastra uno de contratos, aunque el contrato no cambie.** `axis-ui-contracts` fija la versión
+  exacta de `axis-tokens` y los manifests se resuelven sobre esos tokens: por eso `axis-ui-contracts` 0.3.11 y 0.3.12
+  se republicaron sin cambio de código. Regla: al subir `axis-tokens`, cuenta también la republicación de
+  `axis-ui-contracts` y fija las dos en Greenhouse.
+- **Los paquetes privados se instalan con una credencial efímera.** En esta task se usó un `.npmrc` efímero fuera del
+  repo con el token de `gh auth token`, autorizado por el operador para la task. Es la misma regla del 2026-09-26
+  («Instalar AXIS en local da 401»): nunca dentro del repo, nunca impresa ni commiteada.
+- **El contenido de una lámina se cambia en el intent, no en la plantilla.** La foto (`photo.plateRef`, `photo.alt`),
+  el copy (`voice`, `body`) y la sección (`progress`) son datos. Dos trampas al cambiar la foto: en la sección partida
+  el recorte es centrado y **no hay control de foco** (el builder `sectionSplit` no lee `photo.focus`), y en
+  `panel-end` la foto va **espejada**, así que un texto o un logo legible sale al revés. Detalle:
+  [applications.md §L](applications.md).
+- **Los ejemplos de intent no son borradores.** `src/lib/brand-surfaces/examples/` está vigilado por un snapshot
+  (`__tests__/example-plans.test.ts`). Regla: una pieza nueva nace con un intent propio fuera de esa carpeta.
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos

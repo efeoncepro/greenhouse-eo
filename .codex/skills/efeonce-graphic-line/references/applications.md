@@ -3,6 +3,8 @@
 Verificado contra: greenhouse-eo@7cb24df17 · axis-design-system@a5c21ae (íconos: AXIS `main@5b8ab20`, tag `v0.3.6`)
 — 2026-09-26 (decisiones del operador D1–D22 del 2026-09-26 registradas; ver `ledger.md`) · Plastilina en volumen
 (D24, §0.3 y A10): AXIS `main@c18e3d3` — 2026-09-27 · §L con la ruta por el Artifact Composer: greenhouse-eo@016d0a183 — 2026-09-27
+· §L «Componer el deck hoy» y «Cambiar la foto, el copy o la sección»: árbol local de `develop` tras el cierre de
+TASK-1927 — 2026-09-27
 
 Esta guía dice, **para cada aplicación**, qué elementos de la línea van (y cuáles nunca), dónde se ubican, cuánto espacio
 ocupan, en qué superficie y color, y cómo se produce. No repite la API (ver `package-and-tokens.md`), el significado de
@@ -722,7 +724,7 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 > Norma: [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
 > Contrato AXIS `efeonce.surface-composition` 0.1.2 (manifest `axis.surface-composition.v1`; acepta intents 0.1.0 y
 > 0.1.1), tokens `efeonceGraphicLine.surfaces.<superficie>` y `pnpm surface:resolve`. **Greenhouse lo integró con
-> TASK-1927 (2026-09-27, local en `develop`):** fija `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12 (tag AXIS
+> TASK-1927 (`complete` el 2026-09-27; en `develop` local, sin push):** fija `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12 (tag AXIS
 > `v0.3.14`). Ver «Contrato 0.1.2» y «Componer el deck hoy» al final de esta sección,
 > [Lab](https://axis.efeonce.org/references/surfaces/). Canvas por superficie:
 > [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7), una página por
@@ -799,13 +801,13 @@ TASK-1927** (fija `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12).
 - **Usos:** `use: 'proposal' | 'brochure'` en el deck. Toda receta aprobada admite los dos (el brochure es un PDF
   horizontal 16:9 que se lee sin presentador); una opción, sólo `proposal` (`use-not-for-recipe`). En el brochure,
   `proposal-cinematic` es la página de servicio y su eyebrow nombra el servicio.
-- **Portada y cierre:** `cover-classic` (logo arriba a la izquierda con el eyebrow, voz en la mitad baja, arco corto;
-  marca 0 de N) y `close-classic` (órbita completa con el logo dentro y el eslogan «Empower your \<Línea>» en tres
-  tramos; marca N de N) pasan a recetas aprobadas del deck. Firman con el logo y **sin burbuja URL**
-  (`logo-signs-without-url-bubble`): la burbuja sólo reemplaza al logo. **Delta (operador, 2026-09-27): no se
-  usan.** El operador no las aprobó como portada ni contraportada; en AXIS quedan `supersededBy` (brochure →
+- **Portada y cierre: el marco clásico no se usa.** `cover-classic` y `close-classic` **no están aprobadas**: el
+  operador no las aprobó como portada ni contraportada (2026-09-27). En AXIS quedan `supersededBy` (brochure →
   `cover-brochure` / `close-brochure`; propuesta → `cover-proposal` / `close-proposal`) y Greenhouse no tiene
-  plantilla para ellas.
+  plantilla para ellas. Historia: el primer release de la 0.1.2 (`v0.3.9`) las trajo como recetas del contrato
+  (`cover-classic`: logo arriba a la izquierda con el eyebrow, voz en la mitad baja, arco corto, marca 0 de N;
+  `close-classic`: órbita completa con el logo dentro y el eslogan en tres tramos, marca N de N; las dos firmaban con
+  el logo y sin burbuja URL, `logo-signs-without-url-bubble`). El marco vigente es el de «Componer el deck hoy».
 - **Layouts de `proposal-cinematic`:** `service` (por defecto: pregunta, respuesta y bajada; prueba opcional, hasta
   cuatro pasos), `hero` (eyebrow, pregunta, respuesta y bajada; sin prueba ni pasos; selección de Nexa) y `lines` (eyebrow
   y la frase; sin pregunta ni respuesta ni esfera de voz; la pila sale de `efeonceGraphicLine.lines`, cada palabra en
@@ -878,10 +880,41 @@ plantilla usa el que resolvió AXIS, nunca lo infiere. Ejemplos por lámina en
 - **Sección partida:** el indicador sube por la izquierda (regla `split-indicator-rises-start`) y barre las secciones
   ya recorridas, (n−1) de N. **Pregunta abierta del operador**, anotada en el token: ¿unificar a n de N?
 - **Tríptico:** una palabra por toma, cada una con su esfera; una toma con más de una palabra falla.
-- **Aprobado a ojo por el operador** (2026-09-27). **Pendiente:** plantillas de las 38 recetas restantes
+- **Estado (2026-09-27):** TASK-1927 `complete`, en `develop` local y sin push; aprobación visual del operador de las
+  láminas compuestas (`hero`, `lines` y el brochure de nueve páginas). Los gates se leen en la task
+  (`docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md`). TASK-1928 y TASK-1929 quedaron
+  desbloqueadas. **Pendiente:** push a `develop`; plantillas de las 38 recetas restantes
   (TASK-1928); ruta productiva gobernada, que debe aceptar también el documento (TASK-1921). Diferencias conocidas
   contra los prototipos: tamaño de «Cuando quieras.», burbuja URL horneada en vez de la de luminosidad, caja de
   selección del pintor canónico unos píxeles más ajustada.
+
+**Cambiar la foto, el copy o la sección de una lámina (TASK-1927, 2026-09-27).** El contenido es **dato del intent**,
+no de la plantilla: nunca edites una plantilla ni retoques la salida para cambiarlo.
+
+1. Crea un intent propio **fuera** de `src/lib/brand-surfaces/examples/` (copia el ejemplo más cercano). Los ejemplos
+   están vigilados por un snapshot (`src/lib/brand-surfaces/__tests__/example-plans.test.ts`): no se editan para
+   producir una pieza.
+2. Cambia el campo que corresponde y vuelve a componer con `pnpm brand:compose -- --intent <intent>.json`:
+
+   | Qué | Campo | Regla |
+   |---|---|---|
+   | Foto | `photo.plateRef` (ruta) + `photo.alt` | `alt` obligatorio, describe la escena y no el copy; sin ruta o sin `alt`, `missing-photo`. El plate vive fuera de git (`ai-generations/**`): si falta, el CLI falla antes de crear la salida |
+   | Copy | `voice`, `body` | reglas de voz de la receta |
+   | Sección | `progress` | sección n de N |
+
+3. Antes de elegir la foto, ten presente el recorte: lo hace el CLI (`materializeAssets` en
+   `scripts/brand-surfaces/compose.ts`), que ajusta la foto al tamaño de la receta **cubriendo y centrada**. A sangre,
+   el lienzo completo; en la sección partida, la franja de foto del token, más angosta que el lienzo.
+
+- **El registro de la foto lo valida AXIS**, no Greenhouse. La sección partida admite personas en luz dramática
+  (registro cine, excepción aprobada) o documental.
+- **La sección partida no tiene control de foco:** el builder `sectionSplit` no lee `photo.focus`. Si el sujeto queda
+  cortado, se cambia la foto por una con otro encuadre. Agregar foco exige un cambio en AXIS y otro en Greenhouse; no
+  está hecho ni registrado como task. No lo prometas ni lo simules.
+- **`panel-end` espeja la foto** (`photo.mirrored` de AXIS; la plantilla aplica el espejo): una foto con texto legible
+  o con un logo sale al revés. El isotipo del uniforme se compone aparte: revísalo en esa composición.
+- **No cambia con la foto:** panel, esquina curva, indicador y columna de voz; los fija `layout`.
+- **En portadas con columna**, al cambiar la foto revisa `column.topPx` (se elige según dónde queda el sujeto).
 
 **Recetas por lámina (aprobado por el operador, 2026-09-27).** Las 69 láminas del canvas «Deck» están aprobadas y
 tienen receta en [`deck-recipes/`](../../../../docs/operations/brand-graphic-line/deck-recipes/README.md) (JSON

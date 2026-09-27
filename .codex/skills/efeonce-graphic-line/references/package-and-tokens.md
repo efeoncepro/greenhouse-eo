@@ -19,7 +19,7 @@
 > 0.3.7). Versiones que fija Greenhouse leídas de `package.json` el 2026-09-27.
 >
 > IA, social y staff (D26): catálogo de 79 glifos y 43 volúmenes, AXIS main@cf77452 (2026-09-27) (`axis-graphic-line` 0.6.0 y
-> `axis-brand-assets` 0.3.4, **publicados** con el tag `v0.6.0`; `axis-tokens` va en 0.3.8 y no cambia por D26).
+> `axis-brand-assets` 0.3.4, **publicados** con el tag `v0.6.0`; `axis-tokens` iba en 0.3.8 en ese release y no cambió por D26).
 > Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 >
 > Composición por superficie y su ruta por el Artifact Composer (TASK-1919): verificado contra greenhouse-eo@016d0a183
@@ -48,8 +48,11 @@ separado.
 > (`v0.6.0`, catálogo de 79 glifos con el oficio D25 e IA, social y staff D26) · `axis-brand-assets` **0.3.4**
 > (`v0.6.0`, 43 PNG de volumen) · `axis-tokens` **0.3.8** y `axis-ui-contracts` **0.3.7** (`v0.3.8`, contrato
 > `efeonce.surface-composition` 0.1.1; `efeonceGraphicLine.surfaces` desde 0.3.7). **Greenhouse fija todo eso**
-> (tokens 0.3.8, contracts 0.3.7, registry 0.3.1; commits `8d817f29e` y `016d0a183`). Greenhouse fija
-> axis-graphic-line 0.6.0 (dependencia directa) y axis-brand-assets 0.3.4.
+> (tokens 0.3.8, contracts 0.3.7, registry 0.3.1; commits `8d817f29e` y `016d0a183`), con axis-graphic-line 0.6.0
+> (dependencia directa) y axis-brand-assets 0.3.4. **Eso es la foto de TASK-1919.** Tras TASK-1927 y TASK-1922, lo
+> vigente en Greenhouse es `axis-tokens` **0.3.14**, `axis-ui-contracts` **0.3.12** (tag `v0.3.14`, contrato
+> `efeonce.surface-composition` **0.1.2**), `axis-graphic-line` **0.7.0** y `axis-brand-assets` **0.3.5**. Releases de
+> TASK-1927 (`v0.3.11`, `v0.3.13`, `v0.3.14`), fila por fila, en [ledger.md](ledger.md).
 
 | Paquete | Versión en `main` de AXIS | Último tag de release | Fija Greenhouse (`package.json`) | Qué trae para la línea |
 |---|---|---|---|---|
@@ -922,7 +925,7 @@ de la página es `orbitSvg` con `circle` y `channel: 'social'`.
 > `v0.3.6`. Oficio (D25), AXIS main@aa66225, 2026-09-27: `axis-graphic-line` **0.5.0** (tag `v0.5.0`) lleva el catálogo a
 > 60 glifos (27 Trazo + 33 Plastilina). IA, social y staff (D26), AXIS main@cf77452 (2026-09-27): `axis-graphic-line`
 > **0.6.0** (tag `v0.6.0`) lo lleva a **79 glifos: 36 Trazo + 43 Plastilina**; los tokens no cambian por D26
-> (`axis-tokens` va en 0.3.8 por superficies). Guía:
+> (`axis-tokens` iba en 0.3.8 en ese release, por superficies; hoy Greenhouse fija 0.3.14). Guía:
 > `axis-design-system/docs/agent-composition/iconography.md` (§«Catálogo aprobado»).
 
 | Token | Qué guarda |

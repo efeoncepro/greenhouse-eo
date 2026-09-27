@@ -180,6 +180,8 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
 - Greenhouse fija `axis-tokens`, `axis-ui-contracts`, `axis-ui-registry` y `axis-brand-assets` 0.3.0 (en `develop`
   desde 2026-09-26; llega a `main` con el próximo release). **No** usa `axis-graphic-line`: su adapter conserva un
   pintor propio apto para rasterizar, ya en el contrato 0.3.0 (lente con arco y esfera, deck con un solo anillo).
+  **Vigente al 2026-09-27 (`package.json`):** `axis-tokens` 0.3.14, `axis-ui-contracts` 0.3.12, `axis-graphic-line`
+  0.7.0 (lo usa `src/lib/brand-surfaces`), `axis-brand-assets` 0.3.5 y `axis-ui-registry` 0.3.1.
   Instalar AXIS en local exige una credencial `read:packages` en un `NPM_CONFIG_USERCONFIG` efímero; nunca se
   commitea ni se imprime.
 

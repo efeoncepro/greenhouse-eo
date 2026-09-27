@@ -129,9 +129,9 @@ de partículas, esferas—, nunca pintado encima ni puesto como grade.
 | 2 · Receta de deck `proposal-cinematic` | Personas del equipo o Nexa | Personas: **uniforme por registro de escena**; el traje de ficción es sólo de Nexa |
 | 3 · **Excepción:** láminas de **sección** y **«about»** del deck (secciones partidas, «Quiénes somos», «Por qué lo hacemos») | Personas en luz dramática, con o sin Nexa (en la sección con el panel a la derecha, la persona del cliente) | Equipo: uniforme por registro de escena; cliente: su ropa, sin marca Efeonce |
 
-AXIS rechaza `photo.register: "cine"` fuera de los casos 1 y 2 con el issue **`cine-requires-nexa-or-proposal`**; el
-caso 3 está aprobado por el operador pero el contrato todavía no lo conoce (TASK-1927): declara la excepción en la
-entrega. Una pieza social, un hero web, publicidad o una lámina de **contenido** con personas del equipo sigue en A, B
+AXIS rechaza `photo.register: "cine"` fuera de esos casos con el issue **`cine-requires-nexa-or-proposal`**; el
+caso 3 ya está en el contrato (TASK-1927, `axis-tokens` 0.3.14): admite cine en `section-split`, `section-cine` y en
+`cover-brochure`, `close-brochure` y `close-proposal`. Una pieza social, un hero web, publicidad o una lámina de **contenido** con personas del equipo sigue en A, B
 o C: la excepción del caso 3 no se extiende. Detalle: registro cine, delta (c); receta de cada lámina en
 `docs/operations/brand-graphic-line/deck-recipes/`.
 
@@ -179,11 +179,11 @@ pnpm foto:isotipo <plate.png> --centro x,y --ancho w [--prenda oscura|clara]   #
 pnpm brand:compose -- --intent <intent.json>               # lámina o brochure: Artifact Composer
 ```
 
-`brand:compose` sigue el contrato AXIS `efeonce.surface-composition`. La 0.1.2 (`candidate`, AXIS) agrega
-`use: proposal|brochure`, las recetas `cover-classic` y `close-classic` (retiradas por el operador el 2026-09-27
-como portada y contraportada de brochure y propuesta; ver abajo), y las composiciones `service|hero|lines` de
-`proposal-cinematic`; **Greenhouse todavía fija la 0.1.1** en sus intents: verifica la versión antes de usar esos
-campos. La plantilla de ficha comentada (`RV1`, verbatim) está en §12 del registro.
+`brand:compose` sigue el contrato AXIS `efeonce.surface-composition` 0.1.2 (`candidate`), **ya integrado en
+Greenhouse** (TASK-1927; un intent 0.1.0 o 0.1.1 resuelve igual): `use: proposal|brochure`, el marco `cover-brochure`,
+`cover-proposal`, `close-brochure` y `close-proposal`, las composiciones `service|hero|lines` de `proposal-cinematic`
+y el documento multipágina (intent con `pages`). `cover-classic` y `close-classic` no entran: el operador no las
+aprobó. La foto se cambia en el intent (`photo.plateRef` y `photo.alt`, obligatorio), no en la plantilla. La plantilla de ficha comentada (`RV1`, verbatim) está en §12 del registro.
 
 **Plate de portada y contraportada de brochure o propuesta [operador, 2026-09-27].** La portada con foto lleva texto
 encima (logo de Efeonce a 500 px, eyebrow, pregunta, respuesta, evidencia) en una columna a la izquierda, así que el

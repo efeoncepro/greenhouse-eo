@@ -35,6 +35,7 @@ dos esferas en una pieza (manzana + lente u órbita).
 | Necesitas… | Lee |
 |---|---|
 | **Componer un deck, un brochure o una propuesta HOY** (portada, contraportada, páginas de servicio, documento completo en un PDF): qué recetas tienen plantilla, con qué `layout`, y los campos del intent | [applications.md §L, «Componer el deck hoy»](references/applications.md) + skill `deck-studio` §«Componer hoy con `pnpm brand:compose`» |
+| **Cambiar la foto, el copy o la sección de una lámina ya compuesta** (qué campo del intent, recorte, espejo en `panel-end`, sección partida sin control de foco) | [applications.md §L, «Cambiar la foto, el copy o la sección»](references/applications.md) + [manual de uso](../../../docs/manual-de-uso/creative/componer-por-superficie-con-axis.md) + [qa-checklist.md §8d](references/qa-checklist.md) |
 | **Elegir o armar una lámina de deck de marca propia** (brochure, propuesta, pitch, QBR): cuál de las 69 aprobadas usa cada documento, cuándo sí y cuándo no, pares, slots, foto y prompt | [catálogo de recetas por lámina](../../../docs/operations/brand-graphic-line/deck-recipes/README.md) + [norma §4.6, «Recetas por lámina»](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) + [manual](../../../docs/manual-de-uso/creative/componer-deck-con-recetas.md) + skill `deck-studio` |
 | **Una pieza para una superficie concreta** — hero web, DOOH (caminero, paleta), pDOOH (LED, mupi, spot, variantes), gráfica animada con foto, video (cartela, zócalo, super, subtítulos) o lámina de deck (incluida la propuesta de cine `proposal-cinematic`): recetas aprobadas, opciones, pendientes, rechazos, firma por soporte y cómo se compone con AXIS | [norma de composición por superficie](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) + [applications.md §L](references/applications.md) + guías AXIS `docs/agent-composition/surfaces/` (en `main` de AXIS; [Lab](https://axis.efeonce.org/references/surfaces/)) + la página de la superficie en el [canvas](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) (empieza por su lámina «Guía · cómo componer …»). **Receta aprobada → `pnpm brand:compose`** ([norma §2.1](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#21-la-ruta-por-el-artifact-composer-desde-el-2026-09-27-task-1919), [manual de uso](../../../docs/manual-de-uso/creative/componer-por-superficie-con-axis.md)) |
 | **El criterio**: qué significa cada elemento (anillo, arco, esfera, halo, lente, foco, voces, eslogan, firma), cuándo usar la órbita y cuándo no, con qué se combina y qué delata que no se entendió la línea — **léelo primero** | [references/criteria.md](references/criteria.md) |
@@ -111,7 +112,14 @@ dos esferas en una pieza (manzana + lente u órbita).
     las de [applications.md §L](references/applications.md) (TASK-1927); las 38 restantes van como maqueta declarada
     hasta TASK-1928. La sección partida sube por la **izquierda** (tres composiciones por `layout`) y el tríptico lleva
     una palabra por toma, cada una con su esfera: las dos ya están en las plantillas. **`cover-classic` y
-    `close-classic` no se usan** (el operador no las aprobó; en AXIS quedan `supersededBy`).
+    `close-classic` no se usan** (el operador no las aprobó; en AXIS quedan `supersededBy`). **El contenido de una
+    lámina es dato del intent:** para cambiar la foto (`photo.plateRef` + `photo.alt`, obligatorio), el copy (`voice`,
+    `body`) o la sección (`progress`), se edita un intent propio —nunca un ejemplo de
+    `src/lib/brand-surfaces/examples/`, ni la plantilla, ni la salida— y se vuelve a componer. El recorte es centrado;
+    la sección partida **no tiene control de foco** (si el sujeto queda cortado, se cambia la foto) y `panel-end`
+    **espeja** la foto (sin texto ni logos legibles). Pasos y trampas:
+    [applications.md §L](references/applications.md), «Cambiar la foto, el copy o la sección». TASK-1927 está
+    `complete` (2026-09-27, en `develop` local, sin push), con la aprobación visual del operador.
 14. **Estado honesto:** la órbita es un sistema consistente, **no** un activo distintivo demostrado; la prueba sin
     logo va antes de cualquier pauta con la órbita. «Te hacemos visible» no sale a pauta sin revisión legal.
 

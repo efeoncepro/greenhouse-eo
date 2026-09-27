@@ -70,7 +70,7 @@ distintos por página contra `docs/ui/visual-directions/TASK-1889-efeonce-insigh
 `Deck-Agrupadas` es la única excepción aprobada por el operador, con techo 2,5 %; una excepción nueva
 exige su aprobación). Dossier: `docs/ui/reviews/TASK-1889-efeonce-insights-premium-catalogs/README.md`.
 
-### Scope de La órbita (`graphic-line`, TASK-1919)
+### Scope de La órbita (`graphic-line`, TASK-1919 y TASK-1927)
 
 Los tres catálogos de la línea gráfica por superficie (`graphic-line-deck`, `graphic-line-stills` y
 `graphic-line-overlays`) tienen su propio scope, por la misma razón que Insights: no rebaselinar frames ajenos.
@@ -81,11 +81,47 @@ pnpm composer:visual-gate --catalog=graphic-line --freeze
 pnpm composer:visual-gate --catalog=graphic-line
 ```
 
-- **Qué cubre:** `templates-graphic-line-{deck,stills,overlays}/**`, **22 frames a 0 px** (20 recetas aprobadas;
-  el teléfono tiene una plantilla por ancho). Alta declarada en `BASELINE_DELTAS.md` el 2026-09-27.
-- **El probe no es sintético genérico:** cada contrato declara como `example` el plan real de su pieza aprobada, y la
-  foto, los íconos y las capas de la órbita llegan como SVG sintéticos deterministas (`GRAPHIC_LINE_PROBE_ASSETS` en
+- **Qué cubre:** `templates-graphic-line-{deck,stills,overlays}/**`, **32 frames a 0 px** al cierre de TASK-1927
+  (2026-09-27): 16 del deck, 9 de stills y 7 de overlays (cuenta leída en `baseline-manifest.json`). El scope entró
+  con 22 frames (TASK-1919); las altas y cambios posteriores están declarados en `BASELINE_DELTAS.md`, entradas
+  2026-09-27 (b), (c), (d) y (e).
+- **Qué hace un freeze de este scope:** agrega o actualiza sólo los PNG y hashes cuyo frame empieza con
+  `templates-graphic-line-`, y borra los de ese mismo prefijo que el render ya no produce (una plantilla retirada o
+  renombrada). Los frames de `deck-axis`, SKY e Insights conservan su PNG y su hash; el digest se vuelve a sellar sobre
+  el manifest completo. Exige un baseline global previo: sin manifest, el freeze por catálogo se niega.
+- **El probe no es sintético genérico:** cada contrato declara como `example` el plan real de su pieza aprobada, y los
+  archivos externos llegan como SVG sintéticos deterministas (`GRAPHIC_LINE_PROBE_ASSETS` en
   `scripts/artifact-composer/visual-gate.ts`). No hay foto real en el probe, así que ISSUE-122 (§4) no aplica aquí.
+  Las cuatro referencias del probe:
+
+  | Referencia | Qué reemplaza |
+  | --- | --- |
+  | `plate:probe` | la foto (el plate) |
+  | `icon:probe` | un ícono |
+  | `layer:probe` | una capa de la órbita |
+  | `file:probe` | un archivo entregado por quien compone; hoy, el logo del cliente de las portadas de propuesta. Es un rótulo sintético, nunca la marca de un cliente real (TASK-1927) |
+
+  En el contrato se escriben con el prefijo `asset-ref:` (por ejemplo `"example": "asset-ref:file:probe"`).
+- **`"example": null` deja un slot opcional fuera del probe.** El probe usa el `example` del slot tal cual
+  (`synthesizeSlotValue`, `src/lib/artifact-composer/synthesize.ts`); si vale `null`, el slot llega sin valor y el
+  renderer lo trata como opcional ausente (`absent-optional`). Sirve cuando dos slots nunca van juntos: en
+  `cover-proposal-orbit.slots.json` y `cover-proposal-dawn.slots.json` el logo del cliente declara `"example": null`,
+  así el frame congelado muestra el marcador «Logo del cliente» y no el logo. Es la excepción a §4bis, donde el probe
+  rellena todo slot opcional. Sólo aplica a slots opcionales: uno obligatorio sin valor falla la composición.
+- **Varias composiciones sobre un mismo HTML.** Una plantilla de `registry.json` es un nombre, un `prototype` (el
+  HTML) y un `slotsRef` (el contrato de slots). Dos plantillas pueden apuntar al mismo HTML con contratos distintos, y
+  cada una tiene su frame, porque el gate fotografía una vez por plantilla del registry:
+
+  | HTML | Plantillas (una por contrato de slots) |
+  | --- | --- |
+  | `section-split.html` | `SectionSplit`, `SectionSplitCornerBottom`, `SectionSplitPanelEnd` |
+  | `close-brochure.html` | `CloseBrochure`, `CloseBrochurePhoto` |
+
+  Un cambio en ese HTML mueve todos sus frames: se declaran uno por uno. No contradice la regla de `.claude/rules/tenders.md`
+  sobre no registrar una plantilla para «la misma lámina con un elemento más» (eso lo resuelve un slot opcional): aquí
+  cada composición tiene su propio `contentType` y su propio contrato.
+- **El documento completo no tiene frame.** Un brochure o una propuesta compuestos con `pnpm brand:compose` usan fotos
+  reales, que no son deterministas para el gate; los cubren los frames de sus páginas.
 - **Las capas audiovisuales transparentes se congelan con su alfa**; un diff de alfa es un diff.
 - **Los ganchos de selección, CTA y storyboard esperan `document.fonts.ready`** antes de medir: el storyboard medía
   con la fuente de respaldo y variaba entre corridas. Si un frame de este scope empieza a oscilar, revisa primero que
@@ -131,6 +167,8 @@ trabajo.
 - **No lo confundas con "el slot se cuela en los decks":** en un render real el slot opcional no
   declarado hace que el renderer **borre el nodo** (`absent-optional`, `render.ts`). El probe es el
   único lugar donde siempre aparece.
+- **Excepción declarada:** un slot opcional con `"example": null` en su contrato queda fuera del probe (ver
+  «Scope de La órbita» en §3). Sin esa declaración, el probe lo rellena.
 - **Corolario de diseño:** por eso un slot opcional basta para tener "dos variantes" de una lámina
   (con y sin el elemento) **sin registrar una segunda plantilla** — el costo es una línea en el
   ledger de deltas, no un archivo duplicado que después driftea.
@@ -205,6 +243,7 @@ Caso fuente: `NarrativeSplit` con ~59k px de drift el 2026-08-13, con la plantil
 ## Referencias
 
 - Gate + freeze: `scripts/artifact-composer/visual-gate.ts` · ledger `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`
+- Catálogos de La órbita: `src/lib/artifact-composer/catalogs/graphic-line-{deck,stills,overlays}/` (compartido: `graphic-line-shared/`) · norma `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md`
 - Invariantes del dominio: `docs/architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` · `.claude/rules/tenders.md`
 - Bug class: `docs/issues/open/ISSUE-122-composer-visual-gate-photo-nondeterminism-concurrency-docs.md`
 - Skills: `greenhouse-public-private-tenders` → `deck-visual-system.md` · `proposal-studio-runtime.md` · `deck-studio` → `composition.md`

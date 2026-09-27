@@ -282,7 +282,24 @@ Dos pasos distintos: **elegir** qué lámina usar se hace con el catálogo de re
 AXIS (`efeonce.surface-composition`). El `id` del catálogo de recetas nombra la lámina aprobada
 (`cover-brochure-cine-orbit`, `close-proposal-horizon`); el intent usa la receta de AXIS y su `layout`
 (`cover-brochure` + `document`, `close-proposal`). El ejemplo de cada una lleva el nombre de la lámina:
-`src/lib/brand-surfaces/examples/deck-<lámina>-intent.json`.
+`src/lib/brand-surfaces/examples/deck-<lámina>-intent.json`. Las páginas de servicio (`proposal-cinematic` layout
+`service`) no tienen ejemplo suelto en esa carpeta: están como páginas de `deck-brochure-document.json` y
+`deck-proposal-document.json`.
+
+**El flujo completo de hoy (deck o brochure de marca propia):**
+
+1. **Elige la lámina** en el catálogo de 69 recetas (subsección «Recetas por lámina»).
+2. **Mira si tiene plantilla.** 31 de las 69 caen en una plantilla; la lista por id del catálogo, con su receta y
+   `layout` de AXIS, está en el
+   [README del catálogo](../../../docs/operations/brand-graphic-line/deck-recipes/README.md) §«Qué sale hoy con un
+   comando». Una de las 31, `cover-brochure-cine-lines-selection`, compone **sin su selección** (el contrato no la
+   admite en esa portada). Las otras 38 no tienen plantilla: TASK-1928.
+3. **Escribe el intent** en un archivo propio (ver «El contenido es dato del intent» abajo), partiendo del ejemplo de
+   la lámina.
+4. **Compón** la pieza o el documento con `pnpm brand:compose`.
+5. **Revisa a ojo** el PNG o el PDF contra la referencia aprobada de la lámina (canvas «Deck» o AXIS
+   `references/surfaces/deck/<id>.jpg`). El gate visual cubre las plantillas con sus datos de prueba, no tu pieza.
+   Componer no aprueba ni publica.
 
 **Recetas con plantilla** (`recipe` + `layout` del intent → `contentType` que deriva el mapper; el autor nunca lo
 elige):
@@ -335,6 +352,48 @@ de brochure llevan «¿Conversamos? Cuando quieras.», el eslogan como firma, re
 - `photo.plateRef` + `photo.alt`: el plate bajo `ai-generations/`. Sin el archivo, el CLI falla antes de crear la
   salida.
 
+**El contenido es dato del intent; la plantilla nunca se edita para una pieza.** La foto, el copy y la sección de una
+lámina viven en el intent. Los HTML, los `slots.json` y los builders de `graphic-line-deck` y `src/lib/brand-surfaces`
+son de todas las piezas: si tocas uno para que «tu» lámina salga distinta, cambias todas y rompes el gate visual. Para
+una pieza nueva **crea un intent propio fuera de `src/lib/brand-surfaces/examples/`**: copia el ejemplo de la lámina a
+tu carpeta de trabajo y edita la copia. Esa carpeta está vigilada por un snapshot
+(`src/lib/brand-surfaces/__tests__/example-plans.test.ts`): editar un ejemplo o dejar ahí el intent de un cliente
+rompe la prueba.
+
+**Cambiar la foto, el copy o la sección de una lámina:**
+
+| Qué cambias | Campo del intent |
+|---|---|
+| La foto | `photo.plateRef` (ruta del archivo) y `photo.alt` |
+| El copy | `voice` (eyebrow, pregunta, respuesta) y `body` |
+| La sección | `progress` (sección n de N) |
+
+Después se vuelve a componer:
+
+```bash
+pnpm brand:compose -- --intent <tu-intent>.json
+```
+
+Qué cuidar al cambiar la foto:
+
+- **`photo.alt` es obligatorio** y describe la escena, no el copy. Sin él falla con `missing-photo`.
+- **El plate debe existir en disco.** Vive fuera de git, bajo `ai-generations/**`; si falta, el CLI falla antes de
+  crear la salida.
+- **El recorte es centrado.** El CLI ajusta la foto al tamaño que pide la receta, cubriendo el área y centrada. En la
+  sección partida la franja de foto mide 1.260 × 1.080 px sobre un lienzo de 1.920 × 1.080; en las láminas a sangre,
+  el lienzo completo.
+- **La sección partida no tiene control de foco.** Su builder no lee `photo.focus`. Si el sujeto queda cortado, usa
+  una foto con otro encuadre. Agregar foco a esa receta exigiría un cambio en AXIS y otro en Greenhouse: no está
+  hecho ni registrado como task, así que no lo prometas.
+- **En `panel-end` la foto va espejada** (la plantilla aplica el espejo que declara AXIS). Una foto con texto legible
+  o con un logo saldría al revés. El isotipo del uniforme se compone aparte: revísalo en esa composición.
+- **El registro de la foto lo valida AXIS.** Las secciones partidas admiten personas en luz dramática (registro cine,
+  excepción aprobada) o documental.
+- **En portadas con columna, revisa `column.topPx`** al cambiar la foto: se elige según dónde queda el sujeto.
+
+Qué **no** cambia al cambiar la foto: el panel, la esquina curva, el indicador y la columna de voz. Eso lo fija la
+composición (`layout`); si necesitas otra disposición, cambia de `layout`, no de plantilla.
+
 **Documento completo (brochure o propuesta).** Un intent con `pages` es un documento:
 `{ contract?, version?, surface: 'deck', format, use, line?, sections?, pages }`. Cada página es un intent que puede
 omitir lo que el documento propaga.
@@ -364,8 +423,8 @@ lo decidas por tu cuenta: la plantilla sigue el token.
 **Lo que todavía no está** (no lo afirmes como hecho): las **38 recetas restantes** del catálogo no tienen plantilla
 (TASK-1928) y van como maqueta de dirección declarada; la ruta productiva gobernada (API, worker, MCP) es TASK-1921 y
 debe aceptar también el intent de documento; `pnpm brand:compose` es el taller local. El documento completo no tiene
-frame propio en el gate visual (usa fotos reales): lo cubren sus páginas individuales. El estado de cierre de
-TASK-1927 se lee en la task, no aquí.
+frame propio en el gate visual (usa fotos reales): lo cubren sus páginas individuales. TASK-1927 está `complete`
+(2026-09-27) con todo en `develop` local; el push a `develop` sigue pendiente.
 
 #### Recetas por lámina: el catálogo de las 69 (aprobado 2026-09-27)
 
@@ -388,8 +447,10 @@ por lámina». Manual: `docs/manual-de-uso/creative/componer-deck-con-recetas.md
    escalera o BeX plana) y `sequence` (quiénes somos → por qué lo hacemos; sección → página de servicio).
 4. **Slots** con su `maxChars` **medido** en la referencia: si no cabe, se acorta; la respuesta se escribe sin punto
    (lo pone la esfera); `money` siempre `[MONTO]`; `metric` con fuente; `logo` sólo de clientes que autorizan su uso.
-5. **Componer:** si la receta tiene plantilla (tabla de «Componer hoy con `pnpm brand:compose`») → intent de AXIS +
-   `pnpm brand:compose`; el resto (38 recetas, TASK-1928) → maqueta de dirección declarada con `prompts.composition`.
+5. **Componer:** si la receta tiene plantilla (31 de 69; tabla de «Componer hoy con `pnpm brand:compose`» y lista por
+   id en el README del catálogo) → intent propio de AXIS + `pnpm brand:compose`; el resto (38 recetas, TASK-1928) →
+   maqueta de dirección declarada con `prompts.composition`.
+6. **Revisar a ojo** cada lámina compuesta contra su referencia aprobada.
 
 **Decisiones que un agente necesita en el momento:** cotización en tres variantes, sólo en propuesta (tabla para
 lectura, escena para sala, en vivo cuando el alcance está acordado); `decision-next-steps` es la versión con la agenda

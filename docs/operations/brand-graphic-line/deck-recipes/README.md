@@ -1,9 +1,11 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-27 por Claude
+> **Última actualización:** 2026-09-27 por Claude (1.1: estado tras el cierre de TASK-1927 — qué recetas tienen
+> plantilla, equivalencia de nombres con el contrato de AXIS, pendientes de QA resueltos y abiertos, cómo cambiar la
+> foto, el copy o la sección)
 > **Fuente de verdad:** [`EFEONCE_DECK_SLIDE_RECIPES_V1.json`](./EFEONCE_DECK_SLIDE_RECIPES_V1.json) (esquema
 > `efeonce.deck-slide-recipes.v1`, 69 recetas). Este README explica cómo usarlo; el índice del final se **genera**
 > desde el JSON con `pnpm brand:deck-recipes` y no se edita a mano.
@@ -13,7 +15,9 @@
 > **Relacionados:** [manual de uso · componer un deck con las recetas](../../../manual-de-uso/creative/componer-deck-con-recetas.md) ·
 > [documentación funcional de la línea](../../../documentation/creative/linea-grafica-efeonce.md) · skill
 > [`deck-studio`](../../../../.claude/skills/deck-studio/SKILL.md) · [TASK-1926](../../../tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md)
-> (fotos) · [TASK-1927](../../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (plantillas).
+> (fotos) · [TASK-1927](../../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (plantillas
+> de 31 recetas, `complete`) · [TASK-1928](../../../tasks/to-do/TASK-1928-graphic-line-deck-remaining-recipe-templates.md)
+> (las 38 recetas sin plantilla).
 
 ## Qué es
 
@@ -38,26 +42,29 @@ catálogo `deck-axis` de las ofertas a comité ni a la interfaz de Greenhouse.
    `variant` (se elige una, no las dos seguidas) y `sequence` (van una después de la otra).
 4. **Llena los slots** con datos reales: textos dentro de su `maxChars` medido, montos siempre `[MONTO]`, cifras con
    fuente, logos sólo de clientes que autorizan su uso, fotos de ejemplo reemplazadas.
-5. **Compón:** las recetas con plantilla salen con `pnpm brand:compose`; el resto se arma como **maqueta de dirección
-   declarada** siguiendo el `prompts.composition` de la receta (ver «Qué sale hoy con un comando»).
-6. **Revisa** sobre el píxel final con la lista de la norma y los pendientes de QA de abajo. Componer no aprueba ni
-   publica.
+5. **Mira si la receta tiene plantilla** (31 de 69; tabla de «Qué sale hoy con un comando»). Si la tiene, **escribe
+   el intent** en un archivo propio, con la receta y el `layout` de AXIS que le corresponden, y compón la lámina o el
+   documento completo con `pnpm brand:compose`. Si no la tiene (38 recetas, TASK-1928), se arma como **maqueta de
+   dirección declarada** siguiendo el `prompts.composition` de la receta.
+6. **Revisa a ojo** el píxel final contra la referencia aprobada, con la lista de la norma y los pendientes de QA de
+   abajo. Componer no aprueba ni publica.
 
 El paso a paso para el equipo está en el
 [manual de uso](../../../manual-de-uso/creative/componer-deck-con-recetas.md).
 
 ## Cómo elegir por documento
 
-Las 69 láminas no traen portada ni cierre propios para **pitch** y **QBR**: para esos decks el catálogo remite a las
-clásicas de AXIS (`cover-classic`, `close-classic`), que quedaron retiradas sólo como portada y contraportada de
-brochure y propuesta.
+Las 69 láminas no traen portada ni cierre propios para **pitch** y **QBR**. El JSON y el índice generado todavía citan
+las clásicas de AXIS (`cover-classic`, `close-classic`) como alternativa, pero **no se usan**: el operador no las
+aprobó, en AXIS quedan `supersededBy` y Greenhouse no tiene plantilla para ellas. Para un pitch o un QBR, el marco se
+le pregunta al operador.
 
 | Documento | Portada | Contraportada | Secuencia típica | No va |
 |---|---|---|---|---|
 | **Propuesta comercial** (se envía después de conversar) | **sin foto**, con el logo del cliente: `cover-proposal-orbit` o `cover-proposal-dawn` (los `-sky` son el ejemplo) | **con foto** y «Empower your Growth»: `close-proposal-horizon` o `close-proposal-dawn` | agenda (`decision-agenda`) → sección → contexto o texto → página de servicio (`proposal-cinematic-*` o `proposal-service-*`) → método (`triptych`, `method-staircase`, `decision-plan`) → prueba (`content-clients`, `decision-case`, `decision-chart`, `decision-testimonial`) → equipo (`content-team`) → riesgo (`decision-risk`) → cotización (`content-pricing*`) → cierre | «¿Conversamos?»; `decision-next-steps` si el diagnóstico ya ocurrió (el gesto es aprobar: `content-pricing-live`) |
 | **Brochure** (PDF horizontal que se lee sin presentador) | **con foto**: una de las tres generales (`cover-brochure-cine-orbit`, `-lines`, `-team`) o la de cinco líneas con selección, o la de una línea (`cover-brochure-line-*`) | **sin foto**: `close-brochure-orbit` con «¿Conversamos? Cuando quieras.» | quiénes somos (`section-cine-about` → `section-cine-purpose`) → servicios (`section-cine-services` → `proposal-cinematic-*`, `proposal-cinematic-nexa-lines`) → cómo trabajamos (`triptych`, `content-day*`) → equipo (`section-cine-team` → `content-team`) → prueba (`content-clients`, `content-partners`, `decision-case`) → `decision-next-steps` → cierre | cotización (los montos se definen en cada propuesta); eslogan en portada |
-| **Pitch** (se presenta en sala) | `cover-classic` (AXIS) | `close-classic` (AXIS) | agenda → sección → texto o viñetas → método → prueba → `decision-next-steps` | cotización (no hay alcance acordado) |
-| **QBR** (revisión con un cliente activo) | `cover-classic` (AXIS) | `close-classic` (AXIS) | agenda → sección → resultados (`content-measure`, `content-focus`, `decision-chart`, `content-day-live-results`) → método → respiro | páginas de venta de servicio y cotización |
+| **Pitch** (se presenta en sala) | sin portada aprobada: se pregunta al operador | sin cierre aprobado: se pregunta al operador | agenda → sección → texto o viñetas → método → prueba → `decision-next-steps` | cotización (no hay alcance acordado) |
+| **QBR** (revisión con un cliente activo) | sin portada aprobada: se pregunta al operador | sin cierre aprobado: se pregunta al operador | agenda → sección → resultados (`content-measure`, `content-focus`, `decision-chart`, `content-day-live-results`) → método → respiro | páginas de venta de servicio y cotización |
 
 Las dos contraportadas de brochure **con foto** (`close-brochure-horizon`, `close-brochure-dawn`) están aprobadas, pero
 por la regla «foto ↔ sin foto» sólo emparejan con una portada de brochure sin foto, que hoy no existe (norma §6,
@@ -122,12 +129,15 @@ decisión** (ver «Notas del JSON que quedaron atrás»).
 1. **Las 69 láminas están aprobadas.** Lo que el canon o AXIS marcaban como opción, prueba u «opción sin elegir» pasa a
    aprobado: lente, sangre, partida, foco, respiro, hoja de contactos, secciones cine (servicios y equipo), las tres
    portadas generales del brochure y la de cinco líneas con selección y cursor de Nexa
-   (`cover-brochure-cine-lines-selection`).
+   (`cover-brochure-cine-lines-selection`). Esta última está aprobada como lámina, pero el contrato de AXIS no admite
+   selección en esa portada: al componerla sale sin selección.
 2. **Tríptico:** una palabra por toma, cada una con su esfera: «Escucha.» «Crea.» «Mide.». Reemplaza la frase única con
    la esfera al final.
 3. **Sección partida, las tres variantes:** el indicador sube por la **izquierda** y la esfera queda **arriba a la
    izquierda**. Variantes aprobadas: esquina arriba (`section-split`), esquina abajo (`section-split-corner-bottom`) y
-   panel a la derecha (`section-split-panel-end`). La variante con la órbita a la derecha quedó descartada.
+   panel a la derecha (`section-split-panel-end`). La variante con la órbita a la derecha quedó descartada. El
+   indicador barre las secciones ya recorridas, (n−1) de N; queda abierta para el operador la pregunta de unificarlo
+   a n de N.
 4. **Fotos de las secciones partidas y de «Quiénes somos» / «Por qué lo hacemos»:** aprobadas con personas en luz
    dramática. Son una **excepción aprobada del registro cine para secciones y láminas «about»**; no amplían el cine a
    otras superficies.
@@ -149,37 +159,149 @@ arriba (el JSON no se corrigió en este cambio):
 - `section-split-corner-bottom.notes` y `section-split-panel-end.notes` dicen que la excepción cine «no está escrita»:
   quedó escrita (decisión 4, registro cine y norma §4.6).
 - Varias `notes` citan que §4.6 o el token AXIS tratan una lámina como «opción» o «prueba»: la norma ya dice
-  aprobado (decisión 1); **el token de AXIS todavía no** (se sincroniza en TASK-1927).
+  aprobado (decisión 1). TASK-1927 integró en Greenhouse el contrato 0.1.2 con las 31 recetas de «Qué sale hoy con un
+  comando»; el estado en AXIS de las 38 restantes se revisa al tomar TASK-1928.
+- Varias recetas citan `cover-classic` o `close-classic` como alternativa (`preferInstead`): el marco clásico no fue
+  aprobado y no se usa.
 
 ## Pendientes de QA
 
-No bloquean la aprobación. Se corrigen al llevar cada receta a plantilla de producción; hasta entonces, la plantilla
-usa el valor del canon.
+No bloquean la aprobación de las láminas. Se corrigen al llevar cada receta a plantilla: TASK-1927 lo hizo con las
+suyas y las demás son de TASK-1928.
 
-| Pendiente | Dónde | Qué hace la plantilla |
+### Resueltos por TASK-1927
+
+| Pendiente | Dónde | Cómo quedó |
 |---|---|---|
-| Respuesta bajo 3× la pregunta | cotización (2,95×), clientes (2,9×), plan (2,8×), partners (2,75×), contraportadas de brochure («Cuando quieras.» a 2,95×) | usa el valor del canon (≥ 3×) |
-| Acento en texto de menos de 24 px (D1) | etiquetas del día a día, «Recomendado», cabecera de la cotización en vivo, «01 · Diagnóstico · Sin costo», kicker de propuestas sobrias, etiqueta del tablero de Notion; posible halo en equipo y plan | lleva el texto a navy o blanco salvo confirmación |
-| Cifras sin fuente visible | clientes (+127 %, +180 %), por qué elegirnos, «+10 años · 5 países · 1 interlocutor», prueba de Sky | no se inventa fuente: se agrega la real o se quita la cifra |
-| Sin burbuja URL en el pie | partners | agregar la burbuja |
-| Degradado sobre el plate (velo) | `section-cine-about`, `section-cine-purpose` (`quienes.mjs`) | regenerar el plate con la reserva, sin velo |
-| Logo chico en secciones cine | servicios y equipo | choca con la regla «lámina con foto sin logo»: se resuelve en la plantilla |
-| Logo dentro de la órbita en el cierre | contraportadas | no aplicado (norma §6, fila 17) |
+| Respuesta bajo 3× la pregunta | contraportadas de brochure («Cuando quieras.») | la plantilla usa el valor del token y la respuesta queda sobre 3× la pregunta (3,1×) |
+| Dirección de contacto | contraportadas de brochure y de propuesta | el contacto sale de `EFEONCE_CONTACT` (`src/config/efeonce-brand.ts`); AXIS sólo define el estilo |
+| Plantillas en la versión anterior | `proposal-cinematic`, `section-split`, `triptych` | `pnpm brand:compose` compone sobre el contrato 0.1.2: prueba opcional en la página de servicio, layouts `hero` y `lines`, sección partida por la izquierda en sus tres composiciones y tríptico de una palabra por toma |
+
+### Abiertos
+
+| Pendiente | Dónde | Estado |
+|---|---|---|
+| Logo dentro de la órbita en el cierre | contraportadas | **sin resolver** en TASK-1927: ninguna contraportada aprobada lo lleva así; las aprobadas ponen el logo arriba de la columna (norma §6, fila 17) |
+| Respuesta bajo 3× la pregunta | cotización (2,95×), clientes (2,9×), plan (2,8×), partners (2,75×) | recetas sin plantilla: TASK-1928 |
+| Acento en texto de menos de 24 px (D1) | etiquetas del día a día, «Recomendado», cabecera de la cotización en vivo, «01 · Diagnóstico · Sin costo», kicker de propuestas sobrias, etiqueta del tablero de Notion; posible halo en equipo y plan | recetas sin plantilla: TASK-1928; en una maqueta, el texto va a navy o blanco |
+| Cifras sin fuente visible | clientes (+127 %, +180 %), por qué elegirnos, «+10 años · 5 países · 1 interlocutor», prueba de Sky | recetas sin plantilla: TASK-1928; no se inventa fuente: se agrega la real o se quita la cifra |
+| Sin burbuja URL en el pie | partners | receta sin plantilla: TASK-1928 |
+| Degradado sobre el plate (velo) | `section-cine-about`, `section-cine-purpose` (`quienes.mjs`) | recetas sin plantilla: TASK-1928; el plate se regenera con la reserva, sin velo |
+| Logo chico en secciones cine | servicios y equipo | recetas sin plantilla: TASK-1928; choca con la regla «lámina con foto sin logo» |
+| Dirección de contacto | próximos pasos (`decision-next-steps`) | receta sin plantilla: TASK-1928; usar `EFEONCE_CONTACT` |
 | Isotipo sin registro de procedencia | plates `b` (NX6b, CR2b, WB1b, RV1b, BR2b…); HW1, T2, T3, H2 y LN4 sin isotipo compuesto | pasar por `pnpm foto:emblema` (y `foto:isotipo` si difiere) antes de publicar |
-| Plate repetido | P1 en lente, sangre, contenido con foto y hoja de contactos | no repetirlo en un mismo deck |
-| Dirección de contacto | cierres y próximos pasos | usar `EFEONCE_CONTACT` del SSOT de marca («71, of. 1105») |
-| Plantillas en la versión anterior | `pnpm brand:compose` fija el contrato 0.1.1: `proposal-cinematic` sin prueba, layouts `hero`/`lines` no componen; `sectionSplit` y el tríptico de `src/lib/brand-surfaces/recipes/deck.ts` todavía describen la versión previa | se corrigen en TASK-1927 con el visual gate del composer |
+| Plate repetido | P1 en lente, sangre, contenido con foto y hoja de contactos | regla de uso: no repetirlo en un mismo deck |
+
+Diferencias conocidas de las plantillas del marco contra los prototipos aprobados (el operador aprobó a ojo las
+láminas compuestas el 2026-09-27): «Cuando quieras.» sale algo más grande que en el prototipo porque usa el valor del
+token; la burbuja URL sale horneada en vez de la de luminosidad; la caja de selección sale del pintor canónico y queda
+unos píxeles más ajustada.
 
 ## Qué sale hoy con un comando
 
-| Estado | Recetas | Cómo |
+**31 de las 69 recetas caen en una plantilla** del catálogo `graphic-line-deck` del Artifact Composer y salen con
+`pnpm brand:compose`. Las **38 restantes no tienen plantilla** y son
+[TASK-1928](../../../tasks/to-do/TASK-1928-graphic-line-deck-remaining-recipe-templates.md).
+[TASK-1927](../../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) está `complete`
+(2026-09-27); su trabajo está en `develop` local y el push sigue pendiente.
+
+### Dos nombres para la misma lámina
+
+El **id del catálogo** nombra la lámina aprobada (`section-split-corner-bottom`, `cover-brochure-line-voice`). El
+**intent** que se compone usa la **receta del contrato de AXIS** (`efeonce.surface-composition`) y su `layout`
+(`section-split` + `corner-bottom`, `cover-brochure` + `line`). Varias láminas del catálogo comparten una receta de
+AXIS y se distinguen por el `layout`, la línea, la foto y el copy del intent. El `layout` va siempre explícito.
+
+Los ejemplos viven en `src/lib/brand-surfaces/examples/`.
+
+| id del catálogo | Receta AXIS | `layout` | `use` | Intent de ejemplo |
+|---|---|---|---|---|
+| `cover-brochure-cine-orbit` | `cover-brochure` | `document` | brochure | `deck-cover-brochure-cine-orbit-intent.json` |
+| `cover-brochure-cine-lines` | `cover-brochure` | `document` | brochure | `deck-cover-brochure-cine-lines-intent.json` |
+| `cover-brochure-cine-team` | `cover-brochure` | `document` | brochure | `deck-cover-brochure-cine-team-intent.json` |
+| `cover-brochure-cine-lines-selection` | `cover-brochure` | `document` | brochure | sin ejemplo propio: compone como `cover-brochure-cine-lines`, **sin la selección** (el contrato no la admite en esta portada) |
+| `cover-brochure-line-growth` | `cover-brochure` | `line` | brochure | `deck-cover-brochure-line-growth-intent.json` |
+| `cover-brochure-line-brand` | `cover-brochure` | `line` | brochure | `deck-cover-brochure-line-brand-intent.json` |
+| `cover-brochure-line-engine` | `cover-brochure` | `line` | brochure | `deck-cover-brochure-line-engine-intent.json` |
+| `cover-brochure-line-voice` | `cover-brochure` | `line` | brochure | `deck-cover-brochure-line-voice-intent.json` |
+| `cover-brochure-line-revenue` | `cover-brochure` | `line` | brochure | `deck-cover-brochure-line-revenue-intent.json` |
+| `cover-proposal-orbit` | `cover-proposal` | `orbit` | proposal | `deck-cover-proposal-orbit-intent.json` (sin `clientLogo`: sale el marcador) |
+| `cover-proposal-orbit-sky` | `cover-proposal` | `orbit` | proposal | `deck-cover-proposal-orbit-sky-intent.json` (con `clientLogo`) |
+| `cover-proposal-dawn` | `cover-proposal` | `dawn` | proposal | `deck-cover-proposal-dawn-intent.json` (sin `clientLogo`: sale el marcador) |
+| `cover-proposal-dawn-sky` | `cover-proposal` | `dawn` | proposal | `deck-cover-proposal-dawn-sky-intent.json` (con `clientLogo`) |
+| `close-brochure-orbit` | `close-brochure` | `orbit` | brochure | `deck-close-brochure-orbit-intent.json` |
+| `close-brochure-horizon` | `close-brochure` | `photo` | brochure | `deck-close-brochure-horizon-intent.json` |
+| `close-brochure-dawn` | `close-brochure` | `photo` | brochure | `deck-close-brochure-dawn-intent.json` |
+| `close-proposal-horizon` | `close-proposal` | — | proposal | `deck-close-proposal-horizon-intent.json` |
+| `close-proposal-dawn` | `close-proposal` | — | proposal | `deck-close-proposal-dawn-intent.json` |
+| `section-classic` | `section-classic` | — | — | `deck-section-classic-intent.json` |
+| `section-split` | `section-split` | `corner-top` (o sin layout) | — | `deck-section-split-intent.json` |
+| `section-split-corner-bottom` | `section-split` | `corner-bottom` | — | `deck-section-split-corner-bottom-intent.json` |
+| `section-split-panel-end` | `section-split` | `panel-end` | — | `deck-section-split-panel-end-intent.json` |
+| `content-measure` | `content-measure` | — | — | `deck-content-measure-intent.json` |
+| `triptych` | `triptych` | — | — | `deck-triptych-intent.json` |
+| `method-staircase` | `method-staircase` | — | — | `deck-method-staircase-intent.json` |
+| `proposal-cinematic-creative` | `proposal-cinematic` | `service` | proposal o brochure | página de servicio en `deck-brochure-document.json` y `deck-proposal-document.json` |
+| `proposal-cinematic-web` | `proposal-cinematic` | `service` | proposal o brochure | ídem |
+| `proposal-cinematic-aeo` | `proposal-cinematic` | `service` | proposal o brochure | ídem |
+| `proposal-cinematic-revops` | `proposal-cinematic` | `service` | proposal o brochure | ídem |
+| `proposal-cinematic-nexa` | `proposal-cinematic` | `hero` | proposal o brochure | `deck-proposal-cinematic-hero-intent.json` |
+| `proposal-cinematic-nexa-lines` | `proposal-cinematic` | `lines` | proposal o brochure | `deck-proposal-cinematic-lines-intent.json` |
+
+«—» en `use` significa que el ejemplo no lo declara y AXIS resuelve el de la receta.
+
+### Las 38 sin plantilla (TASK-1928)
+
+Se arman como **maqueta de dirección declarada** con `prompts.composition` y la referencia aprobada, y se dice en la
+entrega.
+
+| Familia | Recetas sin plantilla |
+|---|---|
+| Secciones | `section-lens`, `section-bleed`, `section-cine-services`, `section-cine-team` |
+| Quiénes somos, equipo y stack | `section-cine-about`, `section-cine-purpose`, `content-team`, `content-stack` |
+| Contenido | `contact-sheet`, `content-text`, `content-bullets`, `content-day`, `content-day-tools`, `content-day-live-progress`, `content-day-live-results`, `decision-agenda` |
+| Método | `decision-plan`, `method-hybrid-workforce`, `method-hybrid-workforce-scene`, `method-staircase-flat`, `method-score-ring` |
+| Prueba | `content-focus`, `content-clients`, `content-partners`, `decision-risk`, `decision-case`, `decision-chart`, `decision-testimonial`, `decision-why-us` |
+| Propuesta por línea (sobrias) | `proposal-service-aeo`, `proposal-service-creative`, `proposal-service-web`, `proposal-service-revops` |
+| Cotización | `content-pricing`, `content-pricing-stage`, `content-pricing-live` |
+| Próximos pasos | `decision-next-steps` |
+| Respiro | `breather` |
+
+### Componer una lámina o un documento
+
+```bash
+pnpm brand:compose -- --intent <intent.json>
+pnpm brand:compose -- --intent <documento.json> --artifact-id <id> --out <dir>
+```
+
+Un intent con `pages` es un documento y produce un solo PDF multipágina 16:9 con su manifest y su procedencia. Un solo
+issue de AXIS deja el documento sin componer. Portada con foto ↔ contraportada sin foto, y al revés: por eso
+`close-brochure-horizon` y `close-brochure-dawn` tienen plantilla pero no emparejan con las portadas de brochure de
+hoy. Ejemplos de documento: `deck-brochure-document.json` (nueve páginas) y `deck-proposal-document.json` (siete
+páginas interiores). Paso a paso: [manual de uso](../../../manual-de-uso/creative/componer-deck-con-recetas.md).
+
+### El contenido es dato del intent
+
+La foto, el copy y la sección de una lámina se cambian **en el intent**, no en la plantilla; la plantilla nunca se
+edita para una pieza. Para una pieza nueva se crea un intent propio **fuera de** `src/lib/brand-surfaces/examples/`:
+esa carpeta está vigilada por un snapshot (`src/lib/brand-surfaces/__tests__/example-plans.test.ts`).
+
+| Qué cambias | Campo del intent | Qué cuidar |
 |---|---|---|
-| Con plantilla (catálogo `graphic-line-deck`) | `section-classic`, `content-measure`, `method-staircase`, `proposal-cinematic-*` con layout `service` | `pnpm brand:compose -- --intent <intent.json>` |
-| Con plantilla en la versión anterior | `section-split` (indicador por la derecha), `triptych` (frase única) | no usar la salida tal cual hasta TASK-1927; componer como maqueta declarada |
-| Sin plantilla | todo lo demás (portadas, contraportadas, secciones nuevas, contenido, prueba, cotización, próximos pasos, `proposal-cinematic` `hero`/`lines`) | maqueta de dirección declarada con `prompts.composition` y la referencia aprobada |
+| La foto | `photo.plateRef`, `photo.alt` | `alt` obligatorio (describe la escena; sin él, `missing-photo`); el plate debe existir en disco (`ai-generations/**`, fuera de git) |
+| El copy | `voice`, `body` | el `maxChars` medido de la receta; la respuesta sin punto |
+| La sección | `progress` | sección n de N del deck real |
+| El alto de la columna (portadas) | `column.topPx` | se elige según dónde queda el sujeto; fuera de la reserva del logo falla con `invalid-intent` |
+
+El recorte de la foto es centrado y cubre el área que pide la receta: en la sección partida, una franja de
+1.260 × 1.080 px sobre el lienzo de 1.920 × 1.080; en las láminas a sangre, el lienzo completo. La sección partida
+**no tiene control de foco**: si el sujeto queda cortado, se usa una foto con otro encuadre. En `section-split-panel-end`
+la foto va **espejada**: una foto con texto legible o con un logo saldría al revés. Al cambiar la foto no cambian el
+panel, la esquina curva, el indicador ni la columna de voz: eso lo fija el `layout`.
 
 Las fotos se piden por ficha (`pnpm foto:prompt`, `foto:generar`, `foto:validar`, `foto:emblema`, `foto:isotipo`); su
-producción idempotente es TASK-1926.
+producción idempotente es TASK-1926. La ruta productiva gobernada (fuera del taller local) es TASK-1921 y está
+pendiente.
 
 ## Cómo regenerar el índice
 

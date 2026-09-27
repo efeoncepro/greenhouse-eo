@@ -2,7 +2,9 @@
 
 > Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 · decisiones del
 > operador D1–D17 del 2026-09-26 registradas (los chequeos marcados «0.3.1» vienen en el contrato publicado con contracts 0.3.5,
-> tag `v0.3.5`). §8c (Plastilina en volumen, D24): AXIS `main@c18e3d3` — 2026-09-27.
+> tag `v0.3.5`). §8c (Plastilina en volumen, D24): AXIS `main@c18e3d3` — 2026-09-27. §8d (piezas compuestas con
+> `pnpm brand:compose` y harness del gate visual): árbol local de `develop` de greenhouse-eo tras el cierre de
+> TASK-1927 — 2026-09-27.
 >
 > Cada ítem dice **cómo se verifica**. «Automático» = lo hace fallar un comando o una función; «Revisión» = hay que
 > mirar el cuadro real (el adapter de Greenhouse lo marca `manual`). Una pieza no se entrega con un ítem en rojo, y
@@ -173,6 +175,36 @@ Detalle en [iconography.md](iconography.md) §12.
 | [ ] | Glifo nuevo en volumen: antes entró al set plano con aprobación; `pnpm icons:volume -- check` corrido y **cada aviso mirado al 100 %** (se rechaza sólo si la forma se reinventó, un calado se volvió relieve o figura y fondo se invirtieron); `publish` selló el PNG; el operador aprobó | Salida del comando + revisión + ledger |
 | [ ] | El prompt es el canónico de AXIS (`volume-prompt.txt`), sin reescribir; como mucho una línea agregada que nombra el detalle que falló | Diff contra el prompt canónico |
 
+## 8d. Piezas compuestas con `pnpm brand:compose` (deck y documento)
+
+Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «Cambiar la foto, el copy o la sección».
+
+| | Chequeo | Cómo se verifica |
+|---|---|---|
+| [ ] | La receta tiene plantilla y el `layout` va explícito en el intent | Automático: el comando falla con `recipe-not-approved`, `recipe-without-template`, `layout-invalid` o `layout-not-in-recipe` |
+| [ ] | La pieza nace de un intent propio, fuera de `src/lib/brand-surfaces/examples/` | Revisión; automático: `src/lib/brand-surfaces/__tests__/example-plans.test.ts` falla si se editó un ejemplo |
+| [ ] | La foto viene declarada con `photo.plateRef` y `photo.alt`; el `alt` describe la escena, no el copy | Automático: `missing-photo`; revisión del texto del `alt` |
+| [ ] | El plate existe en disco (vive fuera de git, en `ai-generations/**`) | Automático: el CLI falla antes de crear la salida |
+| [ ] | El recorte no corta al sujeto (el CLI cubre el área y centra; la sección partida no tiene control de foco) | Revisión sobre la lámina compuesta; si corta, se cambia la foto |
+| [ ] | En `panel-end`, la foto espejada no muestra texto ni logos al revés, y el isotipo del uniforme se lee bien | Revisión al 100 % sobre la lámina compuesta |
+| [ ] | En portadas con columna, `column.topPx` se revisó con la foto final y ningún texto cruza al sujeto ni a la órbita | Automático: fuera de la reserva falla con `invalid-intent`; revisión de lo demás |
+| [ ] | En portadas de propuesta, `clientLogo` trae `alt`; sin `clientLogo` sale el marcador «Logo del cliente» | Automático (el `alt`); revisión |
+| [ ] | Tríptico: una palabra por toma | Automático: `invalid-intent` |
+| [ ] | Documento: portada y contraportada alternan foto y sin foto; el conjunto pasa sin un solo issue | Automático: `frame-photo-must-alternate` y los demás códigos de documento; un issue deja al documento sin plan |
+| [ ] | La salida no se retocó a mano ni se editó la plantilla para una pieza puntual | Revisión |
+| [ ] | Se entregó con `<id>.provenance.json` y su manifest | Revisión de la carpeta de salida |
+
+**Gate visual de las plantillas** (cuando se toca un catálogo `graphic-line-*`, `src/lib/brand-surfaces` o se sube AXIS):
+
+| | Chequeo | Cómo se verifica |
+|---|---|---|
+| [ ] | `pnpm composer:visual-gate --catalog=graphic-line` pasa a 0 px (32 frames desde TASK-1927) | Salida del comando |
+| [ ] | Toda alta o cambio de frame está declarado en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` | Revisión (entradas 2026-09-27 b, c, d, e para TASK-1927) |
+| [ ] | Una plantilla con logo de cliente se prueba con el asset sintético `file:probe` de `GRAPHIC_LINE_PROBE_ASSETS` (`scripts/artifact-composer/visual-gate.ts`), nunca con el logo de un cliente real | Revisión del harness |
+| [ ] | Un slot opcional que el probe debe omitir lleva `"example": null` en su `slots.json` (así el frame de la portada de propuesta muestra el marcador y no el logo) | Revisión del `slots.json` |
+| [ ] | Si varias composiciones comparten un HTML (`section-split`, `close-brochure`), cada una tiene su contrato de slots, su plantilla en `registry.json` y su frame | Revisión de `registry.json` y de los frames |
+| [ ] | El documento completo no tiene frame propio (usa fotos reales, no es determinista): se cubre con los frames de sus páginas | No se agrega un frame de documento |
+
 ## 9. Comandos y pruebas de referencia
 
 | Qué | Dónde | Comando |
@@ -183,6 +215,8 @@ Detalle en [iconography.md](iconography.md) §12.
 | Pruebas del compilador y del adapter | Greenhouse | `pnpm creative:layout:test` |
 | Campaña con capa `graphic_line` | Greenhouse | `pnpm creative:layout -- --contract c.yaml --mode check` |
 | Piezas con CTA y firma | Greenhouse | `pnpm foto:componer:cta plan.json` + `pnpm foto:cta:gate plan.json` |
+| Componer una receta aprobada o un documento (`pages`) | Greenhouse | `pnpm brand:compose -- --intent <intent.json> [--artifact-id <id>] [--out <dir>]` |
+| Gate visual de las plantillas de La órbita | Greenhouse | `pnpm composer:visual-gate --catalog=graphic-line` |
 | Firma de correo | AXIS | `pnpm signature:resolve -- --input intent.json` |
 | Pruebas de tokens, contratos, paquete y archivos (trayectoria, piezas medidas, ids, órbitas byte a byte, contrastes) | AXIS | `pnpm build && pnpm test` |
 | e2e del Lab (página de la línea, ids duplicados, foco concéntrico) | AXIS | `pnpm --dir apps/lab test:e2e` |

@@ -227,14 +227,16 @@ lima = el resultado). Aprobado por el operador el 2026-09-19.
     equipo sigue en A, B o C.
   - **Excepción aprobada (operador, 2026-09-27):** las láminas de **sección y «about»** del deck (secciones partidas,
     «Quiénes somos», «Por qué lo hacemos») con personas en luz dramática; no amplía el cine fuera del deck y el
-    contrato AXIS aún no la conoce (TASK-1927). Receta de cada lámina: `docs/operations/brand-graphic-line/deck-recipes/`.
+    contrato AXIS ya la conoce (TASK-1927, `axis-tokens` 0.3.14): admite cine en `section-split`, `section-cine` y en
+    `cover-brochure`, `close-brochure` y `close-proposal`. Receta de cada lámina: `docs/operations/brand-graphic-line/deck-recipes/`.
   - **Deck y brochure** (PDF horizontal 16:9) se componen con `pnpm brand:compose` (Artifact Composer, contrato AXIS
-    `efeonce.surface-composition`; la 0.1.2 de AXIS agrega `use: proposal|brochure`, `cover-classic`, `close-classic` y
-    las composiciones `service|hero|lines` de `proposal-cinematic`, pero Greenhouse todavía fija la 0.1.1). La lámina de líneas es la única con los cinco acentos;
+    `efeonce.surface-composition` 0.1.2, integrado en Greenhouse por TASK-1927: `use: proposal|brochure`, el marco
+    `cover-brochure`, `cover-proposal`, `close-brochure` y `close-proposal`, las composiciones `service|hero|lines` de
+    `proposal-cinematic` y el documento multipágina con `pages`). Para armar el deck, carga la skill `deck-studio`. La lámina de líneas es la única con los cinco acentos;
     en todo lo demás, un acento por pieza, tomado del `accentOnDark` de la línea que se vende. **Portadas y
     contraportadas** (operador, 2026-09-27): foto ↔ sin foto; «Empower your Growth» como mensaje de la contraportada de
     propuesta y «¿Conversamos? Cuando quieras.» en la de brochure; nunca el eslogan en la portada; `cover-classic` y
-    `close-classic` retiradas para estos documentos. Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6; resumen en
+    `close-classic` retiradas para estos documentos (no están en el catálogo del composer). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6; resumen en
     [graphic-line-orbit.md](references/graphic-line-orbit.md) regla 11b.
   - **Publicidad 9:16 y 4:5: en prueba** (`ai-generations/2026-09-27_ads-cine/`), **no aprobada ni autorizada para
     pauta**. La receta de anuncio cine no existe en AXIS: el script de esa tanda fue de sesión, y en producción la capa

@@ -202,7 +202,7 @@ Para piezas de **marca propia** en vía pública, la composición es por superfi
 [canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) (empieza por su lámina
 «Guía · cómo componer …») y guía AXIS `docs/agent-composition/surfaces/dooh-pdooh.md` (en `main` de AXIS;
 [Lab](https://axis.efeonce.org/references/surfaces/dooh-pdooh/)). Intent con `surface: "dooh"` o `"pdooh"` → `pnpm surface:resolve` en AXIS
-(contrato `efeonce.surface-composition` 0.1.1 `candidate`) → los `delegates` van a `pnpm creative:orbit:render` (lente,
+(contrato `efeonce.surface-composition` `candidate`, vigente 0.1.2; un intent 0.1.1 resuelve igual) → los `delegates` van a `pnpm creative:orbit:render` (lente,
 voz, firma) y a la ficha fotográfica. Formatos, escala de voces, distancias, firma por soporte y línea de tiempo del
 spot salen de `efeonceGraphicLine.surfaces.dooh|pdooh`; **nunca el canal `print` o `social` elegido a mano**. El
 caminero aprobado sale entero con `pnpm brand:compose -- --intent <intent.json>` (Artifact Composer,

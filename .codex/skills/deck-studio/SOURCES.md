@@ -358,7 +358,10 @@ No son bibliografía: son el código y los docs que respaldan lo que SKILL.md y 
   `src/lib/artifact-composer/catalogs/graphic-line-deck/registry.json`, `src/config/efeonce-brand.ts`
   (`EFEONCE_CONTACT`).
 - Ejemplos: `src/lib/brand-surfaces/examples/deck-*-intent.json`, `deck-brochure-document.json` y
-  `deck-proposal-document.json`.
+  `deck-proposal-document.json`. La carpeta está vigilada por el snapshot de
+  `src/lib/brand-surfaces/__tests__/example-plans.test.ts`: el intent de una pieza nueva va fuera de ella.
+- Recorte y lectura de plates: `materializeAssets` en `scripts/brand-surfaces/compose.ts`; sección partida
+  (`sectionSplit`) en `src/lib/brand-surfaces/recipes/deck.ts`.
 - Docs: `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6,
   `docs/operations/brand-graphic-line/deck-recipes/README.md`,
   `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` (entradas 2026-09-27 b–e).

@@ -67,7 +67,8 @@ visual transversal requiere validación en varias portadas.
   mirando a cámara, lo digital o el servicio en acción y el color saliendo de la escena, y **nunca dos personas
   mirándose de cerca** (se lee romántico). **Tercer caso, excepción aprobada el 2026-09-27:** las láminas de
   **sección y «about»** del deck (secciones partidas, «Quiénes somos», «Por qué lo hacemos») con personas en luz
-  dramática; el contrato todavía no la conoce (TASK-1927). Fuera de esos tres casos el cine no se usa (el contrato de
+  dramática; el contrato ya la conoce (TASK-1927, `axis-tokens` 0.3.14: `section-split`, `section-cine` y las
+  portadas y contraportadas `cover-brochure`, `close-brochure` y `close-proposal`). Fuera de esos tres casos el cine no se usa (el contrato de
   superficie lo rechaza con `cine-requires-nexa-or-proposal`). La publicidad 9:16 y 4:5 en cine está **en prueba**
   (`ai-generations/2026-09-27_ads-cine/`), no aprobada ni autorizada para pauta. Canon vigente desde el 2026-09-27:
   [registro cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (los deltas del

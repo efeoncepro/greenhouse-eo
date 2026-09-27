@@ -8,10 +8,16 @@ source control.
 
 ## Current state — 2026-09-14
 
-> **Actualizado 2026-09-27 (noche):** lo último publicado es el tag `v0.3.12` de AXIS (Glitch, TASK-1922):
-> `axis-tokens` `0.3.12`, `axis-ui-contracts` `0.3.10`, `axis-brand-assets` `0.3.5` y `axis-graphic-line` `0.7.0`, con
-> `axis-ui-registry` `0.3.1`. **Greenhouse fija esas cinco versiones** (commit `4dfb147f7` de `develop`). Ver
-> **Delta 2026-09-27 (d)**; los párrafos siguientes quedan como historia.
+> **Actualizado 2026-09-27 (cierre del día) — estado vigente:** Greenhouse fija `axis-tokens` `0.3.14` y
+> `axis-ui-contracts` `0.3.12` (tag `v0.3.14` de AXIS, TASK-1927), `axis-brand-assets` `0.3.5` y `axis-graphic-line`
+> `0.7.0` (tag `v0.3.12`, TASK-1922) y `axis-ui-registry` `0.3.1`. Versiones leídas en `package.json` y en
+> `node_modules`. El bump a `0.3.14` / `0.3.12` está en `develop` **local**; el push está pendiente. Ver
+> **Delta 2026-09-27 (e)**; las notas siguientes quedan como historia.
+
+> **Actualizado 2026-09-27 (noche) — superado por la nota de arriba:** el tag `v0.3.12` de AXIS (Glitch, TASK-1922)
+> publicó `axis-tokens` `0.3.12`, `axis-ui-contracts` `0.3.10`, `axis-brand-assets` `0.3.5` y `axis-graphic-line`
+> `0.7.0`, con `axis-ui-registry` `0.3.1`. Greenhouse fijó esas cinco versiones en el commit `4dfb147f7` de `develop`;
+> `axis-tokens` y `axis-ui-contracts` subieron después. Ver **Delta 2026-09-27 (d)**.
 
 > **Actualizado 2026-09-27 (tarde):** lo último publicado es `axis-tokens` `0.3.10` (tag `v0.3.10`), con
 > `axis-ui-contracts` `0.3.8`, `axis-ui-registry` `0.3.1`, `axis-brand-assets` `0.3.4` y `axis-graphic-line` `0.6.0`
@@ -79,6 +85,63 @@ source control.
   La evidencia del piloto pasa de **local** a **CI**.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
+
+## Delta 2026-09-27 (e) — `v0.3.11`, `v0.3.13` y `v0.3.14` publicados; Greenhouse fija `0.3.14` / `0.3.12` (TASK-1927)
+
+- **Publicado** el 2026-09-27 en tres tags de `main` de AXIS, todos hechos por TASK-1927. Cada uno sube sólo
+  `axis-tokens` y `axis-ui-contracts`; `axis-ui-registry` sigue en `0.3.1`, `axis-brand-assets` en `0.3.5` y
+  `axis-graphic-line` en `0.7.0`:
+
+  | Tag | `axis-tokens` | `axis-ui-contracts` | Qué trae |
+  | --- | --- | --- | --- |
+  | `v0.3.11` | `0.3.11` | `0.3.9` | Deltas (b) y (c) de `efeonce.surface-composition` 0.1.2 |
+  | `v0.3.13` | `0.3.13` | `0.3.11` | Delta (e): los tokens del marco (portadas y contraportadas) |
+  | `v0.3.14` | `0.3.14` | `0.3.12` | Tipografía completa de las contraportadas: interlineado y tracking de la voz en `close-brochure`; interlineado del eslogan en las dos |
+
+  El tag `v0.3.12`, que queda en medio, es de TASK-1922 (Glitch): ver Delta 2026-09-27 (d).
+- **Tokens del delta (e)** (`v0.3.13`), todos bajo `efeonceGraphicLine.surfaces.deck.recipes.<receta>`: `column.top`,
+  `column.body`, `column.closeOffsetsPx`, `axis` (el eje del amanecer), `orbitPaint` (`giant` y `rising`),
+  `contact.style`, `clientLogo.box`, y en `section-split` `progress.startFromTopDeg` y `progress.sweep`. Los valores se
+  leen del token; este runbook no los copia.
+- **Por qué `axis-ui-contracts` se republica sin cambio de código:** las versiones `0.3.11` y `0.3.12` no cambian de
+  código. El paquete fija la versión **exacta** de `axis-tokens` y los manifests se resuelven sobre esos tokens, así
+  que un token nuevo sólo llega al resolver del consumidor con una versión de contratos que lo fije. Es la misma regla
+  de transitivos del Delta 2026-09-27 (c).
+- **Transitivos** (leídos en `node_modules`): `axis-ui-contracts` `0.3.12` depende de `axis-tokens` `0.3.14`.
+  `axis-graphic-line` `0.7.0` sigue dependiendo de `axis-tokens` `0.3.12` y `axis-ui-contracts` `0.3.10`: Greenhouse
+  instala esas versiones para ese transitivo y las fijadas para su propio código.
+- **Greenhouse lo fija** (2026-09-27, TASK-1927, `develop` local; push pendiente): `axis-tokens` `0.3.14` y
+  `axis-ui-contracts` `0.3.12`. Los otros tres paquetes no cambian. El contrato `efeonce.surface-composition` queda en
+  `0.1.2` con sus deltas (b), (c) y (e); un intent `0.1.0` o `0.1.1` resuelve igual.
+- **Evidencia:** `pnpm composer:visual-gate --catalog=graphic-line`: 32 frames a 0 px, con las altas y cambios
+  declarados en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` (entradas 2026-09-27 (b), (c), (d) y
+  (e)); `pnpm test` completo: 1.851 archivos en verde, 64 omitidos, 0 fallos; `pnpm build`: salida 0. Falta leer el
+  veredicto de CI del SHA cuando se empuje.
+- **Instalación local con credencial efímera:** el mismo patrón del Delta 2026-09-26 (b), con el token del `gh` CLI
+  del operador en vez de uno pegado a mano. El operador lo autorizó **para esta task y sólo para instalar en su
+  equipo**. El token se lee dentro del comando: no se imprime, no se guarda en un archivo y no queda en el historial.
+
+  ```bash
+  # En un subshell: al salir se borran el archivo y la variable.
+  (
+    npmrc="$(mktemp)"; trap 'rm -f "$npmrc"' EXIT
+    printf '%s\n' '@efeoncepro:registry=https://npm.pkg.github.com' '//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}' > "$npmrc"
+    NODE_AUTH_TOKEN="$(gh auth token)" NPM_CONFIG_USERCONFIG="$npmrc" pnpm install
+  )
+  ```
+
+  El archivo temporal guarda el nombre de la variable, no el token. Al subir versiones el lockfile cambia, así que el
+  install del bump va sin `--frozen-lockfile`; para reinstalar sin cambios se usa `pnpm install --frozen-lockfile`.
+  Esto **no** relaja la regla dura del Delta 2026-08-29: el token de una sesión `gh` tiene más alcance que
+  `read:packages` y nunca va a CI, Cloud Build ni Secret Manager. Una task nueva pide su propia autorización.
+- **Lección — validar al consumidor contra el build local de AXIS antes de publicar:** antes de publicar tokens nuevos,
+  se copia `packages/tokens/dist` del checkout de AXIS sobre `node_modules/@efeoncepro/axis-tokens/dist` de
+  Greenhouse, se componen las piezas y se corre el gate visual; después se reinstala para volver al paquete publicado.
+  Así TASK-1927 evitó una cuarta versión. La copia es temporal: nunca se commitea ni reemplaza la versión fijada.
+- **Consumo:** `pnpm brand:compose` compone las recetas del deck con plantilla en el catálogo `graphic-line-deck` y,
+  si el intent trae `pages`, un documento completo (brochure o propuesta) en un PDF. Uso:
+  [manual](../manual-de-uso/creative/componer-por-superficie-con-axis.md). Pendiente: la ruta productiva (TASK-1921)
+  y las 38 recetas restantes del deck (TASK-1928).
 
 ## Delta 2026-09-27 (d) — `v0.3.12` publicado y fijado: Glitch en AXIS (TASK-1922)
 

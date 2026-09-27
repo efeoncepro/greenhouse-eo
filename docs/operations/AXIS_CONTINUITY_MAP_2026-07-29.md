@@ -66,6 +66,10 @@ dos valores. Los pines de la actualización anterior quedaron superados: Greenho
 `0.3.10` rompe a propósito el drift test de Greenhouse, porque `efeonceTokens.color` gana `info`; el detalle y el
 arreglo están en el runbook, Delta 2026-09-27 (c). Este mapa no autoriza el bump.
 
+**Pines vigentes tras TASK-1927 (mismo día, `package.json`):** `axis-tokens` `0.3.14`, `axis-ui-contracts` `0.3.12`,
+`axis-graphic-line` `0.7.0`, `axis-brand-assets` `0.3.5` y `axis-ui-registry` `0.3.1`. Los del párrafo anterior quedan
+como historia.
+
 ---
 
 ## 0. Los cuatro actores, y por qué confundirlos es caro
