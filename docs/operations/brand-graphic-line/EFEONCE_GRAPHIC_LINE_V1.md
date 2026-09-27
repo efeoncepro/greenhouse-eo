@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita · V1
 
 > **Tipo de documento:** Manual de marca (contrato operativo de diseño)
-> **Versión:** 1.9
+> **Versión:** 1.10
 > **Creado:** 2026-09-25 por Claude, con dirección de Julio Reyes (Managing & GTM Director)
-> **Última actualización:** 2026-09-26 por Claude (iconografía canónica, Trazo y Plastilina, D16–D22: §14. Antes, el mismo día: decisiones del operador D1–D15 del 2026-09-26: contraste del acento y magenta de Revenue-HubSpot, §2; «Growth» en el acento en el cierre del deck, §5 y §10.1; logo dentro de la órbita sólo en cierres de marca, §8.2, §8.3, §10.1, §10.3 y §10.6; un solo anillo en el banner de LinkedIn y el fondo de Teams, §1.3; halo a la mitad sobre papel y anillo de la esfera sólo «en vivo», §1.3; umbral de la burbuja 4,5:1, §8.5; reglas P1–P12 y conflictos P-1..P-9 resueltos, §9 y §9.1; firma de equipo para `people@`, §10.2; impresión, prueba sin logo, banco de pares y revisión legal, §4, §1.4 y §12. Antes, el mismo día: §9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
+> **Última actualización:** 2026-09-27 por Claude (composición por superficie: §10.0 nueva, que apunta a la norma [`EFEONCE_SURFACE_COMPOSITION_V1.md`](./EFEONCE_SURFACE_COMPOSITION_V1.md), al contrato AXIS `efeonce.surface-composition` 0.1.0 y al canvas por superficie; §10.1 remite a ella. Antes, el 2026-09-26: iconografía canónica, Trazo y Plastilina, D16–D22: §14. Antes, el mismo día: decisiones del operador D1–D15 del 2026-09-26: contraste del acento y magenta de Revenue-HubSpot, §2; «Growth» en el acento en el cierre del deck, §5 y §10.1; logo dentro de la órbita sólo en cierres de marca, §8.2, §8.3, §10.1, §10.3 y §10.6; un solo anillo en el banner de LinkedIn y el fondo de Teams, §1.3; halo a la mitad sobre papel y anillo de la esfera sólo «en vivo», §1.3; umbral de la burbuja 4,5:1, §8.5; reglas P1–P12 y conflictos P-1..P-9 resueltos, §9 y §9.1; firma de equipo para `people@`, §10.2; impresión, prueba sin logo, banco de pares y revisión legal, §4, §1.4 y §12. Antes, el mismo día: §9.1 «La foto en la línea»: convergencia con el lenguaje fotográfico, que sigue vigente; antes, el mismo día: lenguaje de movimiento de la órbita como norma y sus valores en `efeonceGraphicLine.motion`, `axis-tokens` 0.3.3, §10.1 y §13; firma de correo v3.1 aprobada, con zona de partners y contrato `efeonce.email-signature`, §10.2; Efeonce firma todo y los productos son contexto, §7; firma de piezas con el logo centrado, la órbita no sustituye la composición fotográfica, 4.9 · Oficina en foto; AXIS 0.3.0 y `axis-graphic-line` 0.3.1, contrato 0.3.0 estable, animaciones del logo V1.1 y retrato de la firma de mail, §10.1, §10.2 y §13)
 > **Estado:** **canónica desde el 2026-09-25** ([ADR](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)). Los valores viven en los tokens `efeonceGraphicLine` de AXIS y la referencia pública en `axis.efeonce.org/references/graphic-line`. Este documento no reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa. La atribución sin logo sigue sin medir.
 > **Canvas de referencia:** [Línea gráfica Efeonce](https://claude.ai/artifact/EKeA34qiPH77wsUFCtX9ii) (40 láminas, siete capítulos)
 > **Referencia viva (AXIS):** `efeoncepro/axis-design-system` → tokens `efeonceGraphicLine` en `@efeoncepro/axis-tokens` (contrastes vigilados por pruebas) y página del Lab `apps/lab/src/pages/references/graphic-line.astro` (publicada en axis.efeonce.org/references/graphic-line; el proyecto Vercel despliega con cada push a `main` desde el 2026-09-25). Desde AXIS 0.2.7 los archivos oficiales (logo e isotipo de las cuatro marcas y las tres burbujas URL) viven en el paquete `@efeoncepro/axis-brand-assets`; desde AXIS 0.3.0 el contrato de composición es `efeonce.graphic-line-orbit` 0.3.0 (`stable`) y el paquete `@efeoncepro/axis-graphic-line` 0.3.1 pinta la órbita, sus recetas y su movimiento (§13). Greenhouse sigue siendo el plano de control: este manual y su decisión viven aquí.
@@ -484,7 +484,28 @@ skill `efeonce-graphic-line`.
 
 ## 10. Aplicaciones
 
+### 10.0 Composición por superficie
+
+Desde el 2026-09-27 la línea se compone **por superficie**: dónde vive la pieza (web, DOOH, pDOOH, motion, producción
+audiovisual o deck) decide su papel, sus recetas aprobadas, sus reservas, su escala de voces, su firma y sus tiempos.
+La norma está en [`EFEONCE_SURFACE_COMPOSITION_V1.md`](./EFEONCE_SURFACE_COMPOSITION_V1.md): recetas aprobadas,
+opciones, pendientes y rechazos por superficie, las reglas transversales y cómo quedaron resueltas las contradicciones
+del inventario (entre ellas, las recetas de deck `proposal-cinematic` y `method-staircase`, y el registro cine
+ampliado a la primera).
+
+- **Contrato AXIS:** `efeonce.surface-composition` 0.1.0 (`candidate`, manifest `axis.surface-composition.v1`), con
+  sus valores en los tokens `efeonceGraphicLine.surfaces.<superficie>` y el comando `pnpm surface:resolve`, que entrega
+  los intents ya rellenados para `efeonce.graphic-line-orbit`, `efeonce.collaboration-selection` y `resolveIcon`. Está
+  en `main` de AXIS desde el 2026-09-27 ([página del Lab](https://axis.efeonce.org/references/surfaces/)); Greenhouse todavía no lo consume.
+- **Canvas del equipo:** [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7),
+  una página por superficie: «DOOH · pDOOH», «Web», «Motion», «Producción audiovisual», «Deck» y «Firma y 1:1».
+- **Social y 1:1** siguen en el contrato de la órbita (canal `social`) y en `efeonceGraphicLine.signature`.
+
 ### 10.1 Pantalla y campaña
+
+Lo que sigue son las reglas por pieza que ya existían. Para una superficie nueva (hero web, vía pública, pantalla
+digital, gráfica animada con foto, video o lámina de propuesta), la norma de §10.0 manda y remite de vuelta aquí para
+el deck, el cierre de marca y las animaciones del logo.
 
 - **Deck:** la órbita es la navegación. La portada lleva un arco corto; cada sección suma su tramo; el cierre
   completa la órbita con la esfera arriba. En el contenido en papel, la órbita baja a 80 px en la esquina. **Cierre del
@@ -516,12 +537,6 @@ skill `efeonce-graphic-line`.
     ([axis.efeonce.org/references/graphic-line/#animaciones](https://axis.efeonce.org/references/graphic-line/#animaciones)).
   - Spec de producción, tiempos, oclusión y QA: [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](./EFEONCE_ORBIT_REVEAL_MOTION_V1.md)
     (se produce con `scripts/creative/brand-motion/`).
-- **Identidad sonora (recomendada, 2026-09-26; no canon):** el logo sonoro «Tres puntos que se vuelven uno» traduce la
-  gramática de la órbita a sonido (el anillo pregunta, tres notas en Mi piensan, la esfera responde en La con el único
-  golpe), con dos registros (fondo y energía), el timbre de la esfera por línea de servicio y la etiqueta con voz. Re-sonoriza
-  las tres animaciones sin tocar la imagen; los masters V1.1 conservan su sonido hasta canonizar. Guía y kit en
-  [axis.efeonce.org/references/sonic-brand/](https://axis.efeonce.org/references/sonic-brand/); canon en
-  [`EFEONCE_SONIC_IDENTITY_V1.md`](../brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md). Glitch (podcast) pendiente.
 - **Lenguaje de movimiento de la órbita (norma, 2026-09-26):** [`EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`](./EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md)
   convierte las animaciones aprobadas en siete reglas para cualquier pieza nueva: ritmo lento–rápido–lento con
   anticipación y un protagonista a la vez; llegar con golpe (sobrepaso por papel, pulso con eco, onda de acento sólo en

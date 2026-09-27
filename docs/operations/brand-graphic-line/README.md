@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce «La órbita» — índice
 
 > **Tipo de documento:** Índice operativo de carpeta
-> **Versión:** 1.4
+> **Versión:** 1.5
 > **Creado:** 2026-09-25 por Claude
-> **Última actualización:** 2026-09-26 por Claude (1.4: iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6` — `axis-tokens` 0.3.6 y `axis-graphic-line` 0.4.0 con `/icons`; pines reales de Greenhouse corregidos) · (norma del lenguaje de movimiento de la órbita y `axis-tokens` 0.3.3 con `efeonceGraphicLine.motion`; firma de piezas, oficina en foto; AXIS 0.3.0 con `axis-graphic-line` 0.3.1 y animaciones del logo V1.1)
+> **Última actualización:** 2026-09-27 por Claude (1.5: norma de composición por superficie) · 2026-09-26 (1.4: iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6` — `axis-tokens` 0.3.6 y `axis-graphic-line` 0.4.0 con `/icons`; pines reales de Greenhouse corregidos) · (norma del lenguaje de movimiento de la órbita y `axis-tokens` 0.3.3 con `efeonceGraphicLine.motion`; firma de piezas, oficina en foto; AXIS 0.3.0 con `axis-graphic-line` 0.3.1 y animaciones del logo V1.1)
 > **Estado de la línea:** canónica desde el 2026-09-25; atribución sin logo sin medir
 
 Esta carpeta guarda la línea gráfica de la marca propia de Efeonce y su familia (Globe, Wave, Reach). No aplica a la
@@ -29,6 +29,7 @@ manual, la decisión y los entregables para personas.
 | Composición por intención | `pnpm creative:orbit:resolve` · `pnpm creative:orbit:render` (`scripts/creative/layout-compiler/graphic-line.mjs`) | Adapter de Greenhouse del contrato AXIS `efeonce.graphic-line-orbit` 0.3.1 (`stable`; paquetes AXIS fijados en 0.3.5 / 0.3.1 en `develop`): manifest, SVG, PNG firmado (logo o burbuja fusionada, contraste medido) y `qa.json`; `bindings.protect` para sujeto, reservas y lecho |
 | La línea en campañas | `pnpm creative:layout` (`graphic_line` por formato y `brand.signature`) · `pnpm foto:componer:cta` + `pnpm foto:cta:gate` (tramo 17, `marcaEnEscena`) | La regla de la firma aplicada en los dos compositores, sólo en piezas nuevas (manual §13.2) |
 | Lenguaje de movimiento de la órbita (norma) | [`EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md`](./EFEONCE_ORBIT_MOTION_LANGUAGE_V1.md) | Las siete reglas del movimiento aprobado (lento–rápido–lento, llegar con golpe, curvas por papel, sin saltos de velocidad en los relevos, movimiento real, geometría oficial y sonido en el golpe), cómo aplicarlas a una pieza nueva y qué no hacer. Los valores viven en `efeonceGraphicLine.motion`; leerla antes de animar cualquier pieza de Efeonce |
+| Composición por superficie (norma) | [`EFEONCE_SURFACE_COMPOSITION_V1.md`](./EFEONCE_SURFACE_COMPOSITION_V1.md) · canvas «OOH La órbita — pruebas» (páginas DOOH · pDOOH, Web, Motion, Producción audiovisual, Deck, Firma y 1:1, cada una con su lámina «Guía · cómo componer …») | Qué se aprobó, qué es opción y qué se rechazó en web, DOOH, pDOOH, motion, video y deck, y cómo se compone cada superficie con el contrato AXIS `efeonce.surface-composition` 0.1.0 (candidato; tokens `efeonceGraphicLine.surfaces`, `pnpm surface:resolve`, en `main` de AXIS desde el 2026-09-27; [Lab](https://axis.efeonce.org/references/surfaces/)). Incluye las recetas de deck `proposal-cinematic` y `method-staircase` |
 | Animaciones del logo (motion V1.1) | [`EFEONCE_ORBIT_REVEAL_MOTION_V1.md`](./EFEONCE_ORBIT_REVEAL_MOTION_V1.md) · `scripts/creative/brand-motion/` | Reveal (línea → logo, 3,6 s), apertura (logo → línea, 2,4 s) y sting (1,6 s), con fondo y transparentes (ProRes 4444, WebM, HEVC, PNG por capas) y sonido sintetizado; conviven con el cierre anterior. El render lee tiempos y proporciones de `efeonceGraphicLine.motion`. MP4, GIF y cuadros en OneDrive `13- Branding/Motion Órbita Efeonce/v1.1`; masters en `gs://efeonce-group-axis-public-media/motion/logo/v1.1/`; fichas en el Lab (4.4.2). La órbita sola (sin logo) sale del paquete: `pnpm orbit:video` en AXIS |
 
 ## Documentación para personas
@@ -43,7 +44,6 @@ manual, la decisión y los entregables para personas.
 - El manual técnico manda en reglas y medidas; los tokens de AXIS mandan en valores. Cambiar un valor exige cambiar el
   token y su prueba, no sólo el documento.
 - Si cambia una regla, se actualizan el manual, la fuente del PDF y, cuando corresponde, se regenera el PDF.
-- Relacionados: [identidad sonora](../brand-sonic/README.md) (recomendada, no canon; re-sonoriza el motion del logo) ·
-  [lenguaje fotográfico](../brand-photography/README.md) ·
+- Relacionados: [lenguaje fotográfico](../brand-photography/README.md) ·
   [selección de referencias de marca](../EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md) ·
   [estándar de informes](../EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md) · `docs/context/09_marca-agencia.md`

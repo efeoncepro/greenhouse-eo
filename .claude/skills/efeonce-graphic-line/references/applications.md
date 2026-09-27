@@ -674,3 +674,66 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 7. Que la cocina no lleve logo en el muro (D3).
 8. La proporción del muro de recepción descrita como «algo más de la mitad del alto» es una medida de la lámina, no
    una regla de obra; la regla física es la órbita Ø 1,2 m con su centro a 1,5 m (§0.1).
+
+---
+
+## L. Composición por superficie (desde el 2026-09-27)
+
+> Norma: [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
+> Contrato AXIS `efeonce.surface-composition` 0.1.0 (`candidate`, manifest `axis.surface-composition.v1`), tokens
+> `efeonceGraphicLine.surfaces.<superficie>` y `pnpm surface:resolve` — en `main` de AXIS desde el 2026-09-27,
+> [Lab](https://axis.efeonce.org/references/surfaces/). Canvas por superficie:
+> [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7), una página por
+> superficie con su lámina «Guía · cómo componer …» a la izquierda. Esta sección no copia valores: los números están
+> en el token.
+
+**Cuándo aplica:** la pieza vive en `web`, `dooh`, `pdooh`, `motion`, `audiovisual` o `deck`. Social, 1:1 y la firma
+de redes siguen en las tarjetas A1–A8 y en el contrato de la órbita (canal `social`).
+
+**Cómo se trabaja:** intent (superficie, formato, papel, receta, línea, voz, prueba, pasos, foto, selección) →
+`pnpm surface:resolve` en AXIS → se leen los `issues` → cada `delegate` va a su compositor de Greenhouse
+(`pnpm creative:orbit:render` para órbita, lente, voz y firma; `pnpm creative:layout` o `pnpm foto:componer:cta` para
+la selección; `resolveIcon` en AXIS para los íconos; `pnpm foto:prompt` → `foto:generar` → `foto:validar` →
+`foto:emblema` para la ficha fotográfica; `scripts/creative/brand-motion/` para el cierre). **Nunca coordenadas ni
+canal (`print`, `screen`, `social`) elegidos a mano:** los fija el `delegate`.
+
+| Superficie | Aprobado | Firma | Tarjeta vecina |
+|---|---|---|---|
+| Web | hero A (lente gigante), B (a sangre), C (la tableta viene hacia ti, `pov`) y teléfono con toma vertical nativa | la foto no lleva logo; firma el encabezado (opción) | A8 (CTA) |
+| DOOH | caminero 12 × 4 m con lente y logo abajo a la izquierda | logo abajo a la izquierda en carretera; paleta centrada (tamaño pendiente) | §0.1 (medidas por soporte) |
+| pDOOH | nada todavía (LED, mupi, spot sin audio y variantes por franja son opción) | LED bajo la respuesta, mupi centrada (opción) | J |
+| Motion | animación en bucle foto-para-la-lente + reveal, y su storyboard | nunca en la toma; firma el cierre | J |
+| Audiovisual | storyboard de planos «Cómo trabajamos» y escenas con generadores de texto | firma la marca en el cierre, nunca la toma | J |
+| Deck | sección clásica, sección partida, «la órbita mide la cifra», tríptico, `proposal-cinematic` (seis láminas) y `method-staircase` (BeX) | burbuja URL en el pie; logo sólo en portada, cierre o marca-sujeto | B1, B2 |
+
+**Reglas que un agente necesita en el momento**
+
+1. Fondo Efeonce siempre; la línea de servicio sólo aporta el acento.
+2. Una esfera por pieza (cierra la respuesta) y una órbita por pieza o lámina.
+3. El acento nunca en texto de menos de 24 px: el rótulo del primer paso de una propuesta va en blanco o en el suave.
+4. El isotipo de la prenda se compone desde `@efeoncepro/axis-brand-assets`; el que dibuja el modelo se rechaza.
+5. Registro cine sólo con Nexa protagonista o en `proposal-cinematic` (personas del equipo con su uniforme por
+   registro); cámara a ~2 m, 85 mm; nunca dos personas mirándose de cerca.
+6. Motion: se anima la línea, no la foto; la foto sólo se acerca, en escala logarítmica y nunca mientras entra la
+   voz; tiempos desde `efeonceGraphicLine.motion` y `efeonceGraphicLine.surfaces.motion`, nunca en un script.
+7. pDOOH y vía pública: sin audio; la voz se arma en 2 s como máximo; el último cuadro es el estático de respaldo.
+8. Precios como placeholder; cifras sólo con fuente.
+
+**`proposal-cinematic`:** foto de cine a sangre, sujeto a la derecha que mira a cámara, lo digital o el servicio en
+acción y el color saliendo de la escena; voz a la izquierda en el espacio oscuro; selección «Cliente» sobre la
+respuesta; bajada; prueba con fuente; hasta cuatro pasos con íconos de la voz de la línea (Brand = Plastilina, el
+resto Trazo), en reposo; burbuja URL en el pie; sin logo ni indicador. Los mini robots agentes son el hilo visual
+entre láminas. Aprobadas: servicios creativos («¿Tu marca en cada pantalla? En todas.»), web («¿Para quién es tu
+web? Para todos.»), la carrera de Nexa («¿Listos para la carrera? Vamos.»), RevOps («¿Tu CRM vende contigo? Con
+agentes.»), AEO («¿Te encuentra la IA? Visible.») y líneas de servicio con Nexa. Sin pendientes. **Excepción de
+esta última:** sus cinco esferas de luz (una por línea, la naranja en la palma de Nexa) son luz de la foto, no la
+esfera de la voz —la respuesta cierra con una sola—, y es la única lámina con los acentos de las cinco líneas (cada
+nombre de la pila en su acento, a 24 px o más). No se copia a otra pieza. Rechazadas: servicios creativos en Plastilina,
+la carrera v1, Nexa y un director mirándose de cerca, líneas de servicio con Nexa sin punch.
+
+**`method-staircase`:** el método como escalera, **sin foto**: peldaños de vidrio que se iluminan al subir y el
+nivel de llegada en bloque sólido en el acento de la línea (BeX: cinco peldaños, el quinto Be Intrinsic en Engine).
+
+**Lo inferido en esta sección (confirmar con el operador):** que `proposal-cinematic` se quede sin indicador de deck
+en versiones futuras (así se aprobaron las piezas); que la firma por soporte de web, paleta, LED y mupi pase de
+opción a canon.

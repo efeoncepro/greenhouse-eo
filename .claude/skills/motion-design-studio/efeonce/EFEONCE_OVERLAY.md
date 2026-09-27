@@ -87,6 +87,28 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   en `develop`). Se importan, nunca se escriben en un script ni se copian de la norma; si falta un valor, se agrega al
   token con su razón. Cambiar un valor: token + prueba en AXIS → publicar → fijar en Greenhouse → comparar storyboard →
   aprobación del operador si altera una pieza aprobada.
+- **Motion y audiovisual por superficie (desde el 2026-09-27):** la gráfica animada con foto y el video de marca son
+  superficies del contrato AXIS `efeonce.surface-composition` 0.1.0 (`candidate`; en `main` de AXIS,
+  [Lab](https://axis.efeonce.org/references/surfaces/motion/)). Norma: [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
+  §4.4 (motion), §4.5 (audiovisual) y §4.3 (spot pDOOH); páginas «Motion» y «Producción audiovisual» del
+  [canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7), cada una con su lámina
+  «Guía · cómo componer …»; guías AXIS `docs/agent-composition/surfaces/{motion,audiovisual}.md`.
+  - **Tiempos desde tokens:** curvas, sobrepaso y pulso de `efeonceGraphicLine.motion`; los tramos de la pieza (lente,
+    voz, selección, sostén, cierre; cartela, zócalo, super, subtítulos) de `efeonceGraphicLine.surfaces.motion` y
+    `efeonceGraphicLine.surfaces.audiovisual`, que llegan resueltos en el `timeline` del manifest de
+    `pnpm surface:resolve`. La maqueta aprobada de la gráfica con foto escribió sus tramos a mano: es referencia de
+    dirección, **no** fuente; un master nuevo lee el token. La gráfica con foto aún no tiene render canónico.
+  - **Motion (aprobado: animación en bucle foto-para-la-lente + reveal, y su storyboard):** la foto es material fijo
+    que pasa el QA fijo antes de animar; se anima la línea, no la foto; la foto sólo se acerca (escala logarítmica,
+    hasta el límite del token, nunca mientras entra la voz); el mensaje ocupa ≥ 80 % del tiempo; el último cuadro es
+    el estático de respaldo y la versión reducida; la toma nunca lleva logo: firma el cierre (reveal o sting), sólo
+    marca propia; nunca modelo de video ni paralaje falso.
+  - **Audiovisual (aprobado: storyboard de planos «Cómo trabajamos» y escenas con generadores de texto):** primer
+    cuadro de cada plano validado con `pnpm foto:validar`; una luz y un registro por pieza; grade que sólo empareja;
+    uniforme por registro y emblema revisado cuadro a cuadro (`pnpm foto:emblema`); texto sólo en reservas, como
+    cartela compuesta; formato nativo por plano. Recursos: cartela con la órbita que mide el capítulo, zócalo, callout
+    con selección, super de dato con fuente, pantalla dividida y subtítulos quemados sin caja. Una esfera por pantalla.
+  - **Vía pública (pDOOH):** sin audio; la voz se arma en 2 s como máximo.
 - **Íconos de la línea (Trazo y Plastilina, canónicos desde 2026-09-26, sólo marca propia):** su motion **no está
   definido todavía** (pendiente en AXIS: necesita los tokens `axisMotion` y la norma de movimiento). No se inventa: en
   una pieza animada, el ícono entra como cualquier elemento del plano y se queda en el estado que `resolveIcon` pinta,

@@ -74,6 +74,45 @@ marca de cliente ni a Greenhouse. Contrato: [manual](../../../docs/operations/br
   (órbita, título o voz con esfera). Cerrar con `auditIconGroup`. Criterio:
   [iconography.md](../efeonce-graphic-line/references/iconography.md); guía completa en AXIS `docs/agent-composition/iconography.md`.
 
+#### El deck como superficie: recetas `proposal-cinematic` y `method-staircase` (2026-09-27)
+
+Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de ellas: norma
+[`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
+§4.6, página «Deck» del [canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7)
+(empieza por su lámina «Guía · cómo componer …») y guía AXIS `docs/agent-composition/surfaces/deck.md` (en `main` de AXIS;
+[página del Lab](https://axis.efeonce.org/references/surfaces/deck/)).
+
+- **Cómo se pide una lámina de marca propia:** intent con `surface: "deck"`, `format`, `role`, `recipe`, `line`, voz,
+  prueba y pasos → `pnpm surface:resolve` en AXIS (contrato `efeonce.surface-composition` 0.1.0 `candidate`) → los
+  `delegates` van a `pnpm creative:orbit:render` (voz, órbita), la selección y `resolveIcon`. Valores desde
+  `efeonceGraphicLine.surfaces.deck` y `pieces.deck`; **nunca coordenadas en la lámina**.
+- **Recetas aprobadas:** sección clásica, sección partida (el arco sube por la derecha), contenido «la órbita mide la
+  cifra», tríptico «escucha, crea y mide», **`proposal-cinematic`** y **`method-staircase`**. Todo lo demás del canvas
+  es opción.
+- **Fondo Efeonce en toda lámina de línea**; la línea de servicio sólo cambia el acento. Una órbita por lámina; la
+  selección toma una sola cosa; viñetas sin esfera. Lámina con foto sin logo: firman portada y cierre; burbuja URL en
+  el pie.
+- **`proposal-cinematic`** (vender un servicio con una imagen que se recuerda): foto de cine a sangre, **sujeto a la
+  derecha mirando a cámara**, lo digital o el servicio **en acción** y el color saliendo de la escena; voz a la
+  izquierda en el espacio oscuro (eyebrow «Nuestra propuesta · \<línea\>», pregunta con anillo, respuesta con esfera);
+  selección «Cliente» sobre la respuesta; bajada; **prueba con fuente**; hasta cuatro pasos con íconos de la voz de la
+  línea en reposo (Brand = Plastilina, el resto Trazo) y el **rótulo del primer paso en blanco o suave, nunca en el
+  acento** (texto < 24 px); burbuja URL en el pie; sin logo ni indicador. Foto: registro cine con personas del equipo
+  en su **uniforme por registro** (o Nexa), cámara a ~2 m y 85 mm, **isotipo oficial compuesto** sobre la prenda
+  lisa (nunca el del modelo), nunca dos personas mirándose de cerca. Los **mini robots agentes** son el hilo visual
+  entre láminas. Aprobadas: servicios creativos («¿Tu marca en cada pantalla? En todas.»), web («¿Para quién es tu
+  web? Para todos.»), carrera de Nexa («¿Listos para la carrera? Vamos.»), RevOps («¿Tu CRM vende contigo? Con
+  agentes.»), AEO («¿Te encuentra la IA? Visible.») y líneas de servicio con Nexa; ninguna pendiente. En esta última,
+  las cinco esferas de luz que orbitan a Nexa son **luz de la foto, no la esfera de la voz** (la respuesta cierra con
+  una sola) y es la única lámina con los cinco acentos (cada nombre de la pila en el suyo, ≥ 24 px); no se copia.
+  Rechazadas: servicios creativos en Plastilina, la carrera v1, Nexa y un director mirándose de cerca, líneas de
+  servicio con Nexa sin punch.
+- **`method-staircase`** (el método por niveles, **sin foto**: la escalera es la imagen): peldaños de vidrio que se
+  iluminan al subir y el nivel de llegada en bloque sólido en el acento de la línea. Aprobada con BeX (cinco
+  peldaños; el quinto, Be Intrinsic, en Engine).
+- **Artifact Composer:** ninguna de las dos recetas es todavía catálogo de `deck-axis`; se arman como maqueta de
+  dirección leyendo el manifest y se declaran así en la entrega. Precios siempre placeholder.
+
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 
 Casi todo el mal deck del mundo nace de saltarse una de estas. **Contéstalas en voz alta.**

@@ -1,0 +1,17 @@
+{
+  "impacto": true,
+  "formato": "16:9",
+  "id": "D2-led-medicion",
+  "palanca": "luz-motivada",
+  "escena": "SCENE (craft brewery office, late afternoon, the team checks the first week of a launch campaign): in focus, a growth analyst in a plain charcoal overshirt leans CLOSE to an open laptop raised on a stand at face height, the index finger touching the screen right on the rising line of a chart; the cool blue light of the laptop screen is the brightest thing in the frame and lifts the face and hand. A small lime-green sticky note on the laptop bezel marks the target just reached. Behind, SOFT and out of focus, brewery crates and a window with warm dusk light. 85mm f/1.8. LENS FRAMING (essential, compact): the face, the pointing finger and the laptop screen are close together inside ONE circle whose diameter is about 65% of the frame height, centred at 60% of the frame width and at 40% of the frame height. Nobody looks at the lens. No readable text or numbers on the screen, completely unbranded.",
+  "lecho": {
+    "objeto": "the dark oiled-wood edge of the tall desk right at the lens",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "a calm, evenly shadowed brick wall",
+      "tinta": "blanca"
+    }
+  }
+}

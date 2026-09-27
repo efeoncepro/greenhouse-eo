@@ -208,7 +208,7 @@ suficiente**.
 Tres que muerden siempre: el **dominante va en 1–3 palabras con un CIERRE que remata** (meter la frase
 entera lo aplana), la **entrada es Bricolage** (el default del compositor es Poppins) y el **colaborador va
 en `bottom-end`** — en `top-end` su etiqueta cae sobre la entrada y se come el nombre propio, con
-`withinCanvas` en `true`. **1:1 no se usa: está `sinValidar`.**
+`withinCanvas` en `true`. **1:1: la receta ajustada (voz en su banda arriba, lecho abajo, logo centrado; una toma puede ser muda) está aprobada en el canvas «Firma y 1:1» (2026-09-27); en el compositor sigue `sinValidar` hasta que su salida formal se cierre con TASK-1918 — no cambies el código por tu cuenta.**
 
 **Dos categorías de pieza, y la diferencia se decide ANTES de generar:**
 
@@ -378,7 +378,10 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   **Polera piqué** = oficina casual · **Chaqueta** = reunión o instancia importante · **Gorra + polo** = terreno ·
   **Hoodie** = terreno · **Lanyard y carnet** = transversales, van en casual y en formal por igual. Se elige por
   el registro de la escena, NUNCA por variedad visual: una reunión importante en hoodie dice lo contrario de lo
-  que la foto cuenta.
+  que la foto cuenta. **Registro cine** (operador, 2026-09-27): sólo con **Nexa protagonista** (traje de ficción
+  permitido) o en la receta de deck **`proposal-cinematic`** con personas del equipo, que **conservan su uniforme por
+  registro**; cámara ~2 m y 85 mm, isotipo compuesto (nunca el del modelo) y nunca dos personas mirándose de cerca.
+  Fuera de esos dos casos no se usa. Canon: `EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md` §Delta 2026-09-27.
 - 🔴 **Una referencia que no se usa NO avisa** **[medido 2026-09-21]**. Con DOS personas el cupo baja a 2 por
   cabeza y recortaba **por orden de lista**: Julio se quedaba sin cuerpo entero siempre (sus dos primeras son
   de rostro) y Nexa lo perdía al pedir una vista. El modelo **inventaba la silueta y la pieza salía igual**.
@@ -395,7 +398,7 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 - 🔴 **Para poner a Julio (o Nexa) en una escena ajena, REGENERA la escena con `foto:generar`; NUNCA injertes la
   cara** **[operador, 2026-09-26]**. Tres métodos de injerto fueron rechazados (cara que crece, mirada perdida, «como un
   mandril»); la escena completa con identidad por ficha fue aprobada. Cabeza casi frontal y giran los ojos (el tres cuartos
-  marcado se lee «de lado como un mono»); con dos personas, la mirada va al otro o al mismo objeto. Editar por zona sólo
+  marcado se lee «de lado como un mono»); con dos personas, la mirada va al otro o al mismo objeto, pero nunca dos personas mirándose de cerca: se lee romántico (rechazo del 2026-09-27; la cercanía va al trabajo o a la cámara). Editar por zona sólo
   sirve para corregir a la segunda persona sobre una foto ya aprobada. Receta: `EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`
   §Delta 2026-09-26.
 - **Retrato: 85 mm f/2, nunca 35 mm de cerca** **[del brief aprobado]**. El gran angular a distancia de retrato

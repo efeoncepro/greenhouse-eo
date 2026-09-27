@@ -191,6 +191,29 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
    tipográficas, provenance y resultado del gate. Distingue prueba producida, revisada, aprobada, programada,
    publicada y medida.
 
+### Vía pública de marca Efeonce: DOOH y pDOOH por superficie (2026-09-27)
+
+Para piezas de **marca propia** en vía pública, la composición es por superficie: norma
+[`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
+§4.2 (DOOH) y §4.3 (pDOOH), página «DOOH · pDOOH» del
+[canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) (empieza por su lámina
+«Guía · cómo componer …») y guía AXIS `docs/agent-composition/surfaces/dooh-pdooh.md` (en `main` de AXIS;
+[Lab](https://axis.efeonce.org/references/surfaces/dooh-pdooh/)). Intent con `surface: "dooh"` o `"pdooh"` → `pnpm surface:resolve` en AXIS
+(contrato `efeonce.surface-composition` 0.1.0 `candidate`) → los `delegates` van a `pnpm creative:orbit:render` (lente,
+voz, firma) y a la ficha fotográfica. Formatos, escala de voces, distancias, firma por soporte y línea de tiempo del
+spot salen de `efeonceGraphicLine.surfaces.dooh|pdooh`; **nunca el canal `print` o `social` elegido a mano**.
+
+- **Aprobado:** el caminero 12 × 4 m con la lente AXIS y el **logo abajo a la izquierda**, al final del recorrido de
+  lectura. Paleta (logo centrado, tamaño por decidir), LED (sólo respuesta, logo bajo ella), mupi, spot sin audio y
+  variantes por franja son **opción**.
+- **Distancia y tiempo mandan:** a distancia de carretera el contrato puede admitir sólo la respuesta
+  (`question-not-allowed-at-distance`). Revisa con la hoja de prueba a distancia antes de entregar.
+- **Foto nativa del formato** (3:1 para el caminero; ese formato de `foto:prompt` sigue sin validar, TASK-1918), luz
+  motivada, nadie mira al lente; en LED, el sujeto mira hacia el texto.
+- **pDOOH:** sin audio; la voz se arma en 2 s como máximo; el mensaje ocupa ≥ 80 % del tiempo; el último cuadro es el
+  estático de respaldo; cada variante dinámica es un estático completo.
+- Sin íconos ni selección en DOOH estático. Una esfera y una órbita por pieza; el acento nunca en texto < 24 px.
+
 ## Tres voces + acción — ads con CTA
 
 **Paid Media multiformato:** entregar cada key visual en **4:5, 1:1, 9:16 y 16:9**, salvo reducción explícita del brief. Matriz concepto×ratio, recomposición nativa y QA propio; ocho piezas de cuatro conceptos en dos ratios son cobertura parcial. Detalle y tamaños en el canon enlazado abajo.

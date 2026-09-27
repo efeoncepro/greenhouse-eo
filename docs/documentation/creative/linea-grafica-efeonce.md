@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-26 por Claude (1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
+> **Ultima actualizacion:** 2026-09-27 por Claude (1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
 
@@ -206,11 +206,68 @@ anteriores (Tabler) hasta que el operador decida su reemplazo.
 > (`@efeoncepro/axis-tokens` 0.3.6) y `@efeoncepro/axis-graphic-line/icons` (0.4.0) ·
 > [cómo usar y pedir un ícono](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md#paso-a-paso--usar-un-ícono-de-la-marca)
 
+## Componer por superficie
+
+Desde el 2026-09-27 la línea no sólo se piensa por elemento (la órbita, la lente, la voz, la firma), sino **por el
+lugar donde vive la pieza**. Un hero de sitio, un letrero de carretera, una pantalla digital en la calle, una gráfica
+animada, un video y una lámina de presentación se leen distinto: a otra distancia, en otro tiempo y con otra forma de
+firmar. Por eso cada superficie tiene sus recetas aprobadas y sus reglas. En el canvas del equipo cada superficie
+tiene su página, y a la izquierda de cada una hay una lámina guía («Guía · cómo componer …») que la resume.
+
+| Superficie | Qué quedó aprobado | Cómo firma |
+|---|---|---|
+| **Web** (hero de escritorio y teléfono) | tres heros: la lente gigante, la foto a sangre y la tableta que viene hacia ti; el teléfono con foto vertical propia, nunca el escritorio achicado | la foto no lleva logo; firma el encabezado del sitio (por aprobar) |
+| **DOOH** (letreros de vía pública) | el caminero de carretera con la lente y el logo abajo a la izquierda, al final de la lectura | logo abajo a la izquierda en carretera; en ciudad, centrado (tamaño por decidir) |
+| **pDOOH** (pantallas digitales en la calle) | todavía nada: hay propuestas de pantalla, mupi, spot sin audio y versiones por horario | según el soporte, por aprobar |
+| **Motion** (gráfica animada con foto) | la animación de 8 s con la foto hecha para la lente y el cierre con el logo, y su storyboard | nunca en la toma: firma el cierre |
+| **Producción audiovisual** (video) | el storyboard de planos «Cómo trabajamos» y los textos del video (cartela, zócalo, dato, subtítulos) | firma la marca en el cierre, nunca la toma |
+| **Deck** (presentaciones) | la sección clásica, la sección partida, «la órbita mide la cifra», el tríptico, la **lámina de propuesta de cine** y la **escalera del método** | burbuja URL en el pie; el logo sólo en portada y cierre |
+
+**La lámina de propuesta de cine** (`proposal-cinematic`) es la novedad más visible: una foto de película a sangre
+con la persona del equipo a la derecha mirando a cámara, el servicio funcionando en la escena y el color de la línea
+saliendo de ella; la pregunta y la respuesta a la izquierda, en el espacio oscuro; una prueba con su fuente y hasta
+cuatro pasos con los íconos de la marca. Se aprobaron seis: servicios creativos («¿Tu marca en cada pantalla? En
+todas.»), web («¿Para quién es tu web? Para todos.»), la carrera de Nexa («¿Listos para la carrera? Vamos.»), RevOps
+(«¿Tu CRM vende contigo? Con agentes.»), AEO («¿Te encuentra la IA? Visible.») y las líneas de servicio con Nexa, donde
+cinco esferas de luz, una por línea, orbitan a Nexa. Esas cinco esferas son luz de la foto, no el punto final de la
+respuesta, que sigue siendo uno solo; y es la única lámina donde conviven los colores de las cinco líneas. Unos mini robots, los agentes, aparecen en varias láminas y sirven de hilo
+entre ellas.
+
+Reglas que valen para todas las superficies:
+
+- **El fondo de Efeonce no cambia**; cada línea de servicio aporta sólo su color de acento.
+- **Una esfera por pieza**, al final de la respuesta, y **una órbita por pieza o lámina**.
+- **El logo en la ropa nunca lo dibuja la IA**: se pone el isotipo oficial después.
+- **El estilo de cine** se usa sólo en piezas donde Nexa es la protagonista y en la lámina de propuesta de cine, con
+  proporciones reales y la ropa de trabajo que corresponde a la escena. Nunca dos personas mirándose de cerca: se lee
+  como escena romántica.
+- **El color de acento no va en textos chicos** (menos de 24 px): ahí va blanco o gris claro.
+- **Precios siempre como ejemplo; cifras sólo con fuente.**
+
+También quedó aprobada la **escalera del método BeX**: cinco peldaños de vidrio azul que se iluminan al subir, con el
+último (Be Intrinsic) en bloque sólido; no lleva foto, la escalera es la imagen. No quedó ninguna lámina de propuesta
+pendiente, y se descartaron cuatro (la versión en plastilina de servicios creativos, la primera carrera de Nexa,
+Nexa con un director mirándose de cerca y las líneas de servicio con Nexa sin fuerza). El formato cuadrado (1:1) con
+los ajustes quedó aprobado en el canvas; su paso formal en la herramienta de anuncios se hace con una task aparte.
+
+Un agente compone una pieza por superficie describiéndola (superficie, formato, papel y receta) en el sistema de
+diseño AXIS, que devuelve todo lo necesario para que las herramientas de Greenhouse la pinten, la firmen y la midan.
+Ese contrato está en prueba (`candidate`) y todavía no se integra a la rama principal de AXIS.
+
+> Detalle técnico: [norma de composición por superficie](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) ·
+> [manual §10.0](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#100-composición-por-superficie) ·
+> [lenguaje fotográfico, delta 2026-09-27](../../operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) ·
+> contrato `efeonce.surface-composition` 0.1.0 y tokens `efeonceGraphicLine.surfaces` en AXIS (en `main` desde el 2026-09-27;
+> [página del Lab](https://axis.efeonce.org/references/surfaces/)) · [canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) ·
+> [cómo componer por superficie](../../manual-de-uso/creative/componer-por-superficie-con-axis.md)
+
 ## Dónde está cada cosa
 
 | Qué | Dónde | Para quién |
 |---|---|---|
 | Manual técnico-operativo (fuente de verdad) | [`EFEONCE_GRAPHIC_LINE_V1.md`](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) | quien produce o audita |
+| Norma de composición por superficie (web, vía pública, pantallas digitales, motion, video, deck) | [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) | quien produce una pieza para una superficie concreta |
+| Canvas del equipo por superficie (una página por superficie) | [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) | el equipo y los agentes |
 | Decisión (ADR) | [`EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md`](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) | quien necesita saber qué se decidió y qué se descartó |
 | Manual en PDF (A4, 56 hojas, confidencial) | [`Efeonce-Linea-Grafica-La-Orbita-V1.pdf`](../../operations/brand-graphic-line/deliverables/Efeonce-Linea-Grafica-La-Orbita-V1.pdf) | el equipo (uso interno) |
 | Referencia pública en el sistema de diseño AXIS | [axis.efeonce.org/references/graphic-line](https://axis.efeonce.org/references/graphic-line) | cualquiera que necesite ver los elementos vivos |

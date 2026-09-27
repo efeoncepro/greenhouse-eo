@@ -1,0 +1,27 @@
+{
+  "formato": "16:9",
+  "impacto": true,
+  "id": "H2-pov-tablet",
+  "palanca": "pov",
+  "atmosfera": "bruma",
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    },
+    {
+      "objeto": "lanyard-efeonce",
+      "usoDe": "generico"
+    }
+  ],
+  "escena": "SCENE (staged, Efeonce studio at night, the moment the campaign numbers come in): a Chilean growth strategist in her early thirties, dark hair tied back, wearing the Efeonce navy softshell jacket zipped halfway over the navy Efeonce polo, with the Efeonce lanyard around her neck and its badge card hanging slightly turned, face out of focus and unreadable. She looks straight into the lens with a sharp, confident half-smile and is caught at the exact moment she pushes a tablet in a plain azure-blue (#0375DB) case toward the camera with one arm fully extended: the tablet and her hand are close to the lens and strongly foreshortened, its screen glowing cool white-blue with a soft abstract rising line, no readable text. Camera slightly below her eye line, looking up a little. A hard low key light from the far left rakes across her face, one side in open shadow; a second low source behind her right shoulder cuts a bright rim on her hair, jacket shoulder and the tablet edge, and its beam crosses a thin haze BELOW the middle of the frame. Bare dark wall, no plants, no books, no framed art. 35mm f/2. She fills the right half of the frame from the chest up.",
+  "lecho": {
+    "objeto": "the near edge of a dark walnut table right at the lens, dissolved into blur and outside every beam",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, evenly shadowed bare dark wall",
+      "tinta": "blanca"
+    }
+  }
+}

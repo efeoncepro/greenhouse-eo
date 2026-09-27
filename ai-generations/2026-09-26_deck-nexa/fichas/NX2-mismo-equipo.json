@@ -1,0 +1,20 @@
+{
+  "id": "NX2-mismo-equipo",
+  "formato": "16:9",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "objetos": [
+    { "objeto": "chaqueta-softshell-efeonce" },
+    { "objeto": "hoodie-efeonce" }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (staged, Efeonce studio at night, the moment a campaign piece is approved): she (the woman of the references) wears the NAVY EFEONCE SOFTSHELL JACKET; beside her, shoulder to shoulder, a Chilean art director in his late twenties with short dark hair and a light beard wears the NAVY EFEONCE HOODIE. Both stand in three-quarter view on the RIGHT half of the frame in front of a single large printed campaign proof pinned at chest height on a dark board, and BOTH of their hands rest on the same printed proof at the same time, her fingertips and his fingertips meeting on the same corner of the sheet, as they turn to look at each other with the same quiet, confident half-smile of a shared decision. The proof is lit by a warm low lamp and shows only soft abstract shapes and a large empty headline band, no readable text. A cool blue rim from behind cuts both silhouettes from the dark and its beam crosses a thin haze BELOW the middle of the frame. The LEFT half of the frame is a calm, evenly shadowed, deep navy-black bare studio wall with nothing on it. Framed from the waist up. 50mm f/2.",
+  "lecho": {
+    "objeto": "the dark edge of a worktable close to the lens, dissolved into blur and outside every beam",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": { "muro": "the calm, evenly shadowed bare wall on the left half", "tinta": "blanca" }
+  }
+}

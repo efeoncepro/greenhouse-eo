@@ -29,9 +29,10 @@ La diferencia con otras capas de documentacion:
   con el logo en la imagen), componer con un agente, usar las animaciones de marca (la órbita y las animaciones del
   logo V1.1: qué archivo para qué editor y dónde bajar los masters), usar y pedir un ícono de la marca (Trazo y Plastilina), fotografiar merch u oficina, checklist de revisión, regenerar el
   PDF del manual y problemas comunes (burbuja negra en visores, burbuja-firma bajo 4,5:1, texto que cruza la órbita).
-- [Usar la identidad sonora de Efeonce](creative/usar-identidad-sonora-efeonce.md) — elegir registro (fondo o energía) y
-  pieza (logo, etiqueta con voz, sting/reveal/apertura, pieza larga, cierre de energía), bajar el archivo del kit en AXIS,
-  sincronizar la esfera al golpe o a la palabra final, nivelar al destino y qué no hacer. Estado recomendada; Glitch pendiente.
+- [Componer una pieza por superficie con AXIS](creative/componer-por-superficie-con-axis.md) — web, DOOH, pDOOH,
+  motion, video y deck: declarar superficie, formato, papel y receta, resolver el intent con `pnpm surface:resolve`
+  (AXIS, contrato `candidate`), entregar cada delegate a su compositor de Greenhouse, la receta de deck
+  `proposal-cinematic` y el registro cine, qué significan los estados y los `issues`, y problemas comunes.
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
   lenguaje fotográfico aprobado el 2026-09-19.

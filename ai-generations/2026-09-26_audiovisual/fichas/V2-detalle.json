@@ -1,0 +1,17 @@
+{
+  "formato": "16:9",
+  "impacto": true,
+  "id": "V2-detalle",
+  "palanca": "manos",
+  "objetos": [
+    {
+      "objeto": "polo-efeonce",
+      "color": "navy"
+    }
+  ],
+  "escena": "SCENE (documentary video keyframe, Efeonce studio at night, insert shot of the craft): extreme close-up of two hands in the sleeves of the navy Efeonce polo, caught at the exact moment one hand circles a detail on a printed proof with a red grease pencil while the other holds a loupe; a single low work lamp rakes across the paper from the left, the paper texture and the wax of the pencil sharp. One plain azure-blue (#0375DB) ruler at the edge carries the only blue. 100mm macro f/4, focus on the pencil tip. No faces. The proof carries only tiny illegible marks, unbranded.",
+  "lecho": {
+    "objeto": "the dark edge of the worktable right at the lens, dissolved into blur",
+    "tono": "DARK near black"
+  }
+}
