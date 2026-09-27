@@ -446,9 +446,21 @@ Vale para el brochure y para el deck de propuesta. Las parejas que cumplen, en l
 
 | Documento | Portada | Contraportada |
 |---|---|---|
-| Brochure | órbita gigante (sin foto) | Nexa camina hacia la órbita (foto, **aprobada**) |
-| Brochure | Nexa y la órbita, o Nexa y las cinco líneas (foto) | órbita gigante (sin foto) |
-| Propuesta comercial | portada con el logo del cliente dentro de la órbita (sin foto) | Nexa hacia la órbita, o su variante al amanecer (foto) |
+| Brochure | Nexa y la órbita, o Nexa y las cinco líneas (foto) | sin foto, con «¿Conversamos? Cuando quieras.» |
+| Propuesta comercial | portada con el logo del cliente (sin foto; **aprobadas**: órbita gigante y amanecer) | Nexa hacia la órbita, o su variante al amanecer (foto), con «Empower your Growth» |
+
+La órbita gigante sin foto es el recurso de la portada de propuesta: no se usa como portada de brochure.
+
+**El mensaje de la contraportada depende del documento** (operador, 2026-09-27). En la **propuesta comercial** el mensaje
+principal es el eslogan **«Empower your Growth»**: la propuesta llega después de conversar, así que «¿Conversamos?» no
+aplica. En el **brochure** va **«¿Conversamos? Cuando quieras.»** (con el eslogan de firma debajo), porque el brochure
+busca abrir la conversación. En las dos, el eslogan sale del archivo oficial y va sólo en el cierre, nunca en la portada.
+
+**Los textos de portada siguen la voz de la línea gráfica** (§4 del manual; operador, 2026-09-27): eyebrow, pregunta en
+Poppins Light con su anillo, respuesta en Bricolage con su esfera (≥ 3× la pregunta) y evidencia en Poppins con una
+palabra en negrita. Brochure: «¿Qué hace Efeonce? Crecer.» + «Cinco líneas de servicio: Growth · Brand · Engine · Voice
+· Revenue». Propuesta: «¿Cómo crecemos en 2027? Con foco.» + «Preparada para [Cliente] · Confidencial» (el nombre del
+cliente no se repite como título). Los pares siguen siendo candidatos del banco de §4 hasta que se aprueben.
 
 Dos reglas más de la misma ronda: **la portada de propuesta comercial lleva espacio para el logo del cliente** (dentro
 de la órbita, espacio fijo, para que el documento se sienta hecho para él) y **la burbuja URL**, alineada con la
