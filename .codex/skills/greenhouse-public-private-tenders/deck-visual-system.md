@@ -125,6 +125,20 @@ Sufijo `Split` = bipartito (dos mitades) · `Full` = full-bleed (a sangre).
 > `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6; resumen en `deck-studio`
 > §«Portadas y contraportadas». En este catálogo siguen `CoverFull` / `BackCoverFull`: si la oferta a comité adopta
 > el set nuevo lo decide el operador, no el agente.
+>
+> **Delta 2026-09-27 (c) — qué láminas usa una propuesta de marca propia (recetas por lámina).** Las 69 láminas de La
+> órbita quedaron aprobadas y cada una tiene receta en `docs/operations/brand-graphic-line/deck-recipes/` (JSON
+> `efeonce.deck-slide-recipes.v1`; índice con `pnpm brand:deck-recipes`). Una **propuesta comercial** de marca propia
+> se arma con las recetas cuyo `documents` incluye `proposal`: portada sin foto (`cover-proposal-orbit` o
+> `cover-proposal-dawn`) → agenda (`decision-agenda`) → sección → contexto → página del servicio
+> (`proposal-cinematic-*` para sala, `proposal-service-*` sobria para lectura) → método (`triptych`, `method-staircase`,
+> `decision-plan`) → prueba con fuente (`content-clients`, `decision-case` —foto de Sky **de ejemplo**, se reemplaza—,
+> `decision-chart`, `decision-testimonial`) → equipo real (`content-team`) → riesgo (`decision-risk`) → cotización
+> (`content-pricing`, `content-pricing-stage` o `content-pricing-live`; montos siempre `[MONTO]`) → contraportada con
+> foto (`close-proposal-horizon` o `close-proposal-dawn`). **No va** `decision-next-steps` si el diagnóstico ya
+> ocurrió (el gesto es aprobar: `content-pricing-live`). **Esto no cambia este catálogo:** una licitación o una oferta
+> a comité sigue en `deck-axis` con su selector; las recetas de La órbita no se mezclan con él. Manual:
+> `docs/manual-de-uso/creative/componer-deck-con-recetas.md`.
 
 ### Las que puntúan (no son opcionales)
 

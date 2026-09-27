@@ -79,6 +79,44 @@ creencias contra el status quo de la industria (`../modules/04`).
   quieras.» y el eslogan firma debajo. Norma: `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md`
   §4.6.
 
+## Banco de pares pregunta–respuesta aprobados (línea gráfica «La órbita»)
+
+La voz de la línea gráfica es **pregunta real del cliente → respuesta de 1–3 palabras** que cierra con la esfera (se
+escribe sin punto en el dato; el punto lo pone la esfera) y mide ≥ 3× la pregunta, más una evidencia con **una**
+palabra en negrita. Estos pares están **aprobados por el operador** dentro de su pieza; fuera de ella vuelven a ser
+candidatos. Fuente exacta: `docs/operations/brand-graphic-line/deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json`
+(slots `question` / `answer`) y `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6.
+
+**Portadas y cierres (2026-09-27):** ¿Qué hace Efeonce? **Crecer.** (brochure general y sección de servicios) ·
+¿Cómo crecemos en 2027? **Con foco.** (propuesta; evidencia «Preparada para **[Cliente]** · Confidencial») ·
+¿Conversamos? **Cuando quieras.** (contraportada de brochure) · por línea: ¿Lo medimos? **Siempre.** · ¿Quién crea mi
+contenido? **Tu squad.** · ¿Te encuentra la IA? **Visible.** · ¿Dónde invierto? **Donde rinde.** · ¿Y el reporte del
+viernes? **Ya lo viste.**
+
+**Láminas del deck (las 69 aprobadas el 2026-09-27):**
+
+| Lámina | Par |
+|---|---|
+| Tríptico | ¿Cómo trabajamos? **Escucha. Crea. Mide.** (una palabra por toma, cada una con su esfera) |
+| Cotización (tabla y escena) | ¿Cómo se cotiza? **Por capacidad.** |
+| Cotización en vivo | ¿Cuánto cuesta? **Sin letra chica.** |
+| Próximos pasos | ¿Y ahora qué sigue? **Empecemos.** |
+| Sección partida, esquina abajo | ¿Cuánto tarda tu campaña? **En días.** |
+| Sección partida, panel a la derecha | ¿Qué responde la IA? **Tu marca.** |
+| Secciones (lente, clásica, a sangre, partida) | ¿Quién decide el corte? **El dato.** |
+| Quiénes somos · por qué lo hacemos | ¿Quiénes somos? **Un solo equipo.** · ¿Por qué lo hacemos así? **Contigo.** |
+| Equipo · stack · sección del equipo | ¿Quién trabaja en tu cuenta? **Personas reales.** · ¿Con qué trabajamos? **Con lo mejor.** · ¿Quién hace crecer tu marca? **Este equipo.** |
+| Texto · viñetas · agenda | ¿Con quién crece tu marca? **Contigo.** · ¿Qué recibes al trabajar con nosotros? **Un sistema.** · ¿Qué veremos hoy? **Cinco temas.** |
+| Día a día y «vívelo» | ¿Cómo es un día con nosotros? **Así.** · ¿Cómo trabajamos contigo? **Así.** · ¿Cómo avanza tu proyecto? **A la vista.** · ¿Cómo va? **En vivo.** |
+| Método | ¿Qué pasa al empezar? **Movimiento.** · ¿Quién hace el trabajo? **Personas y agentes.** · ¿Te recomienda la IA? **Capa por capa.** · ¿Cómo te ve la IA? **Mídelo.** · ¿Listos para la carrera? **Vamos.** |
+| Prueba | ¿Cuántos cortes pasan a la primera? **A la primera.** · ¿Quién confía en nosotros? **Marcas líderes.** · ¿Con quién construimos? **Con los grandes.** · ¿Y si no funciona? **Empiezas chico.** · ¿Qué cambió con Sky? **Más rápido.** · ¿Cuánto más rápido? **Un cuarto.** · ¿Por qué Efeonce? **Por esto.** |
+| Propuestas por línea | ¿Cómo escalas tu contenido? **Con sistema.** · ¿Para quién es tu web? **Para todos.** · ¿Tu CRM vende contigo? **Con agentes.** · ¿Tu marca en cada pantalla? **En todas.** · ¿Te encuentra la IA? **Visible.** |
+| Hoja de contactos · respiro | ¿Cuál sale al cliente? **Ésta.** · ¿Y el cliente? **Aprobó.** |
+
+**Cómo se usan:** un par se toma con su lámina; si la pregunta o la evidencia no caben (cruzan la órbita o al sujeto),
+**se acorta la frase**, nunca se mueve la composición. Un par con una promesa medible («En días», «Un cuarto») exige su
+prueba con fuente en la lámina o en la siguiente. Un par nuevo se propone como candidato y lo aprueba el operador.
+
 ## Reglas duras
 
 - **NUNCA** copy que no se rastree a una de las 7 creencias (sería genérico).

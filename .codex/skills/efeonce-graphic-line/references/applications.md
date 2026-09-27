@@ -308,6 +308,10 @@ vale en toda aplicación:
   y 220 px) quedaron **retirados** como portada y contraportada de esos documentos; el logo va a 500 px en 1920 y el
   set aprobado (portadas con foto o de órbita gigante, contraportadas por documento) está en §L, «Portadas y
   contraportadas».
+- **Delta (operador, 2026-09-27) — las 69 láminas:** todo el canvas «Deck» quedó aprobado y cada lámina tiene su
+  receta (cuándo sí, cuándo no, alternativa, pares, slots, foto, prompt) en
+  `docs/operations/brand-graphic-line/deck-recipes/`. Esta tarjeta sigue describiendo las cuatro láminas medidas de
+  `deckSlideHtml`; para elegir una lámina concreta, usa el catálogo (§L, «Recetas por lámina»).
 
 ### B2. Portada de deck con lente (foto)
 
@@ -753,7 +757,7 @@ bajada web sin token, y la paleta 20 % vs 35 %.
 | pDOOH | nada todavía (LED, mupi, spot sin audio y variantes por franja son opción) | LED bajo la respuesta, mupi centrada (opción) | J |
 | Motion | animación en bucle foto-para-la-lente + reveal, y su storyboard | nunca en la toma; firma el cierre | J |
 | Audiovisual | storyboard de planos «Cómo trabajamos» y escenas con generadores de texto | firma la marca en el cierre, nunca la toma | J |
-| Deck | sección clásica, sección partida, «la órbita mide la cifra», tríptico, `proposal-cinematic` (seis láminas) y `method-staircase` (BeX); en AXIS 0.1.2 también `cover-classic` y `close-classic` (sin plantilla en Greenhouse todavía; retiradas como portada y contraportada de brochure y propuesta el 2026-09-27) + el set de portadas y contraportadas de abajo (sin plantilla) | burbuja URL en el pie; logo sólo en portada, cierre o marca-sujeto | B1, B2 |
+| Deck | **las 69 láminas del canvas** (2026-09-27), cada una con su receta en `deck-recipes/`; con plantilla hoy: sección clásica, «la órbita mide la cifra», `method-staircase` (BeX) y `proposal-cinematic` (`service`); sección partida y tríptico, plantilla en la versión anterior; en AXIS 0.1.2 también `cover-classic` y `close-classic` (sin plantilla en Greenhouse todavía; retiradas como portada y contraportada de brochure y propuesta el 2026-09-27) + el set de portadas y contraportadas de abajo (sin plantilla) | burbuja URL en el pie; logo sólo en portada, cierre o marca-sujeto | B1, B2 |
 
 **Reglas que un agente necesita en el momento**
 
@@ -761,8 +765,9 @@ bajada web sin token, y la paleta 20 % vs 35 %.
 2. Una esfera por pieza (cierra la respuesta) y una órbita por pieza o lámina.
 3. El acento nunca en texto de menos de 24 px: el rótulo del primer paso de una propuesta va en blanco o en el suave.
 4. El isotipo de la prenda se compone desde `@efeoncepro/axis-brand-assets`; el que dibuja el modelo se rechaza.
-5. Registro cine sólo con Nexa protagonista o en `proposal-cinematic` (personas del equipo con su uniforme por
-   registro); cámara a ~2 m, 85 mm; nunca dos personas mirándose de cerca.
+5. Registro cine sólo con Nexa protagonista, en `proposal-cinematic` (personas del equipo con su uniforme por
+   registro) y, por excepción aprobada el 2026-09-27, en las láminas de sección y «about» del deck; cámara a ~2 m,
+   85 mm; nunca dos personas mirándose de cerca.
 6. Motion: se anima la línea, no la foto; la foto sólo se acerca, en escala logarítmica y nunca mientras entra la
    voz; tiempos desde `efeonceGraphicLine.motion` y `efeonceGraphicLine.surfaces.motion`, nunca en un script.
 7. pDOOH y vía pública: sin audio; la voz se arma en 2 s como máximo; el último cuadro es el estático de respaldo.
@@ -828,6 +833,17 @@ logo del cliente dentro de la órbita (órbita gigante y amanecer); contraportad
 Growth». La órbita gigante sin foto es portada de **propuesta**, nunca de brochure (en brochure sólo es
 contraportada). Selección y cursores sólo sobre la columna de texto o el logo del cliente, nunca sobre la persona, un
 cursor en 16:9. Todavía no son receta del contrato: TASK-1926 (plates) y TASK-1927 (contrato).
+
+**Recetas por lámina (aprobado por el operador, 2026-09-27).** Las 69 láminas del canvas «Deck» están aprobadas y
+tienen receta en [`deck-recipes/`](../../../../docs/operations/brand-graphic-line/deck-recipes/README.md) (JSON
+`efeonce.deck-slide-recipes.v1`; índice por familia y documento con `pnpm brand:deck-recipes`). Decisiones de ese día
+que cambian lo de arriba: **tríptico** con una palabra por toma y su esfera («Escucha.» «Crea.» «Mide.»); **sección
+partida** con el indicador por la izquierda y tres variantes (esquina arriba, esquina abajo, panel a la derecha);
+**cotización** en tres variantes (tabla, escena, en vivo), sólo en propuesta; **día a día** con cuatro momentos,
+herramientas y dos «vívelo»; **próximos pasos** con la agenda abierta; **clientes** en un tono navy (con la excepción
+tonal de Aguas Andinas y UC Temuco); **caso Sky** con foto de ejemplo; **BeX** con la escalera como principal; y la
+**excepción del registro cine** para secciones y «about». Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 «Recetas por
+lámina» y delta (c); manual: `docs/manual-de-uso/creative/componer-deck-con-recetas.md`.
 
 **Lo inferido en esta sección (confirmar con el operador):** que `proposal-cinematic` se quede sin indicador de deck
 en versiones futuras (así se aprobaron las piezas); que la firma por soporte de web, paleta, LED y mupi pase de

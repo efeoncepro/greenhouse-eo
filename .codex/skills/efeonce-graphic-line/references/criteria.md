@@ -436,6 +436,30 @@ pregunta o la evidencia cruzarían la órbita o al sujeto de la foto, **se acort
 marca?» → «¿Qué hace Efeonce?»; «¿Dónde pongo el presupuesto?» → «¿Dónde invierto?») o se parte la evidencia en 2–3
 líneas.
 
+**Pares aprobados en las láminas del deck (operador, 2026-09-27;** catálogo
+`docs/operations/brand-graphic-line/deck-recipes/`**).** Las 69 láminas quedaron aprobadas con su voz; estos pares son
+copy aprobado dentro de su lámina (textos exactos del JSON; la respuesta se escribe sin punto porque el punto es la
+esfera):
+
+| Lámina (receta) | Par |
+|---|---|
+| Sección partida, esquina abajo (`section-split-corner-bottom`) | ¿Cuánto tarda tu campaña? **En días.** |
+| Sección partida, panel a la derecha (`section-split-panel-end`) | ¿Qué responde la IA? **Tu marca.** |
+| Secciones con lente, clásica, a sangre y partida | ¿Quién decide el corte? **El dato.** |
+| Quiénes somos (`section-cine-about`) | ¿Quiénes somos? **Un solo equipo.** |
+| Por qué lo hacemos (`section-cine-purpose`) | ¿Por qué lo hacemos así? **Contigo.** |
+| Tríptico (`triptych`) | ¿Cómo trabajamos? **Escucha. Crea. Mide.** (una palabra por toma, cada una con su esfera) |
+| Cotización, tabla y escena (`content-pricing`, `content-pricing-stage`) | ¿Cómo se cotiza? **Por capacidad.** |
+| Cotización en vivo (`content-pricing-live`) | ¿Cuánto cuesta? **Sin letra chica.** |
+| Próximos pasos (`decision-next-steps`) | ¿Y ahora qué sigue? **Empecemos.** |
+| Día a día (`content-day`, `content-day-tools`) | ¿Cómo es un día con nosotros? **Así.** · ¿Cómo trabajamos contigo? **Así.** |
+| Vívelo (`content-day-live-progress`, `content-day-live-results`) | ¿Cómo avanza tu proyecto? **A la vista.** · ¿Cómo va? **En vivo.** |
+| Método y prueba | ¿Te recomienda la IA? **Capa por capa.** · ¿Cómo te ve la IA? **Mídelo.** · ¿Quién hace el trabajo? **Personas y agentes.** · ¿Qué pasa al empezar? **Movimiento.** · ¿Y si no funciona? **Empiezas chico.** · ¿Quién confía en nosotros? **Marcas líderes.** · ¿Con quién construimos? **Con los grandes.** · ¿Por qué Efeonce? **Por esto.** |
+| Propuestas por línea | ¿Cómo escalas tu contenido? **Con sistema.** (y los de `proposal-cinematic`, arriba) |
+
+La lista completa, con el eyebrow y la evidencia de cada lámina, está en el JSON. Un par aprobado **en su lámina** no
+queda libre para cualquier pieza: fuera de ella vuelve a ser candidato del banco.
+
 **Cómo se cruza con las tres voces + acción de publicidad.** El compositor de anuncios materializa esta voz con
 `graphicVoice: "efeonce"`: pregunta en Poppins Light con su anillo, respuesta en Bricolage 760 de hasta tres palabras
 con la esfera al final de la última línea, la regla de ≥3× y la selección que incluye la esfera (compositor de CTA,

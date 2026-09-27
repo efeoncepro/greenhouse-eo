@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.12
+> **Version:** 1.13
 > **Creado:** 2026-09-25 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
+> **Ultima actualizacion:** 2026-09-27 por Claude (1.13: las 69 láminas del deck aprobadas y convertidas en recetas por lámina, con cómo elegir una lámina por documento y la excepción del estilo de cine para secciones y «quiénes somos». Antes, 1.12: delta de portadas y contraportadas del brochure y la propuesta — foto y sin foto se alternan, mensaje de la contraportada según el documento y voz en la portada. Antes, 1.11: 19 íconos de IA, redes sociales y staff, D26 — el set queda en 79, con 43 en volumen. Antes, 1.10: las piezas aprobadas por superficie salen enteras con un comando, `pnpm brand:compose`, desde el Artifact Composer. Antes, 1.9: 30 íconos de oficio — el set queda en 60, con 33 en volumen. Antes, 1.8: sección «Plastilina en volumen» — la tercera capa de los íconos, para momentos protagonistas. Antes, 1.7: sección «Componer por superficie» — web, DOOH, pDOOH, motion, video y deck, con la lámina de propuesta de cine. Antes, 1.6: sección «Los íconos» — iconografía canónica Trazo y Plastilina, publicada en AXIS `v0.3.6`)
 > **Documentacion tecnica:** [Manual de la línea gráfica V1](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) · [ADR «La órbita»](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
 > **Manual de uso:** [Usar la línea gráfica de Efeonce](../../manual-de-uso/creative/usar-linea-grafica-efeonce.md)
 
@@ -283,7 +283,7 @@ tiene su página, y a la izquierda de cada una hay una lámina guía («Guía ·
 | **pDOOH** (pantallas digitales en la calle) | todavía nada: hay propuestas de pantalla, mupi, spot sin audio y versiones por horario | según el soporte, por aprobar |
 | **Motion** (gráfica animada con foto) | la animación de 8 s con la foto hecha para la lente y el cierre con el logo, y su storyboard | nunca en la toma: firma el cierre |
 | **Producción audiovisual** (video) | el storyboard de planos «Cómo trabajamos» y los textos del video (cartela, zócalo, dato, subtítulos) | firma la marca en el cierre, nunca la toma |
-| **Deck** (presentaciones) | la sección clásica, la sección partida, «la órbita mide la cifra», el tríptico, la **lámina de propuesta de cine** y la **escalera del método** | burbuja URL en el pie; el logo sólo en portada y cierre |
+| **Deck** (presentaciones) | **las 69 láminas de la página «Deck»** (2026-09-27): portadas, contraportadas, secciones, contenido, método, prueba, propuestas por línea, cotización, próximos pasos y respiro; cada una con su receta en el [catálogo de recetas del deck](../../operations/brand-graphic-line/deck-recipes/README.md) | burbuja URL en el pie; el logo sólo en portada y cierre |
 
 **La lámina de propuesta de cine** (`proposal-cinematic`) es la novedad más visible: una foto de película a sangre
 con la persona del equipo a la derecha mirando a cámara, el servicio funcionando en la escena y el color de la línea
@@ -300,9 +300,9 @@ Reglas que valen para todas las superficies:
 - **El fondo de Efeonce no cambia**; cada línea de servicio aporta sólo su color de acento.
 - **Una esfera por pieza**, al final de la respuesta, y **una órbita por pieza o lámina**.
 - **El logo en la ropa nunca lo dibuja la IA**: se pone el isotipo oficial después.
-- **El estilo de cine** se usa sólo en piezas donde Nexa es la protagonista y en la lámina de propuesta de cine, con
-  proporciones reales y la ropa de trabajo que corresponde a la escena. Nunca dos personas mirándose de cerca: se lee
-  como escena romántica.
+- **El estilo de cine** se usa sólo en piezas donde Nexa es la protagonista, en la lámina de propuesta de cine y, por
+  excepción aprobada el 2026-09-27, en las láminas de sección y de «quiénes somos» del deck, con proporciones reales y
+  la ropa de trabajo que corresponde a la escena. Nunca dos personas mirándose de cerca: se lee como escena romántica.
 - **El color de acento no va en textos chicos** (menos de 24 px): ahí va blanco o gris claro.
 - **Precios siempre como ejemplo; cifras sólo con fuente.**
 
@@ -329,7 +329,8 @@ la selección y los íconos en su lugar:
   para montar sobre el plano, más la pantalla dividida y el plan de planos. El cierre con el logo es un video y sale de
   las animaciones del logo.
 
-Lo que no está aprobado (la paleta de ciudad, las pantallas digitales, las opciones del deck) **no tiene plantilla**:
+Lo que no está aprobado (la paleta de ciudad, las pantallas digitales) **no tiene plantilla**; varias láminas del deck
+aprobadas el 2026-09-27 tampoco la tienen todavía (se arman como maqueta declarada hasta TASK-1927):
 el comando se niega a producirlo. Producir no es aprobar: la pieza sigue pasando la revisión del equipo. Por ahora el
 comando corre en el equipo de quien produce; la versión dentro de la plataforma (con permisos, cola y agentes) es una
 task aparte. Quedan preguntas del operador sobre detalles de algunas plantillas (la posición de la lente del caminero,
@@ -349,6 +350,7 @@ el arco del dato, la burbuja URL en algunas láminas, un gris sin valor oficial 
 |---|---|---|
 | Manual técnico-operativo (fuente de verdad) | [`EFEONCE_GRAPHIC_LINE_V1.md`](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md) | quien produce o audita |
 | Norma de composición por superficie (web, vía pública, pantallas digitales, motion, video, deck) | [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) | quien produce una pieza para una superficie concreta |
+| Recetas por lámina del deck (las 69 aprobadas: cuándo usar cada una, slots, foto y prompt) | [catálogo `deck-recipes/`](../../operations/brand-graphic-line/deck-recipes/README.md) · [cómo armar un deck con las recetas](../../manual-de-uso/creative/componer-deck-con-recetas.md) | quien arma un brochure, una propuesta, un pitch o un QBR |
 | Plantillas de las piezas aprobadas por superficie (comando `pnpm brand:compose`) | catálogos `graphic-line-deck`, `graphic-line-stills` y `graphic-line-overlays` del Artifact Composer · [cómo usarlo](../../manual-de-uso/creative/componer-por-superficie-con-axis.md) | quien produce una pieza aprobada |
 | Canvas del equipo por superficie (una página por superficie) | [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7) | el equipo y los agentes |
 | Decisión (ADR) | [`EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md`](../../architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) | quien necesita saber qué se decidió y qué se descartó |
@@ -410,6 +412,46 @@ También quedaron aprobadas una portada por cada línea de servicio, con su colo
 Todavía no salen con `pnpm brand:compose`: su paso a plantilla es una task aparte (TASK-1927).
 
 > Detalle técnico: [norma de composición por superficie §4.6, «Portadas y contraportadas»](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) (reglas, catálogo, medidas y descartes) · [manual §4, pares aprobados, y §5, el eslogan](../../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#4-la-voz-pregunta-y-respuesta) · [canvas por superficie, página «Deck»](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7)
+
+## Delta 2026-09-27 (c) — las 69 láminas del deck, con su receta
+
+El 2026-09-27 el operador aprobó **todas las láminas** de la página «Deck» del canvas: 69, desde las portadas hasta
+el respiro. Lo que antes era «opción» o «prueba» quedó aprobado. Para que nadie tenga que adivinar cuál usar, cada
+lámina tiene ahora una **receta**: qué comunica, cuándo sirve, cuándo no y cuál conviene en su lugar, con qué otras
+láminas va, qué textos e imágenes se cambian y cuáles quedan fijos.
+
+**Cómo se elige una lámina.** Primero el documento:
+
+| Documento | Portada | Contraportada | Qué no lleva |
+|---|---|---|---|
+| **Propuesta comercial** | sin foto, con el logo del cliente dentro de la órbita | con foto y «Empower your Growth» | «¿Conversamos?» (la propuesta llega después de conversar) |
+| **Brochure** | con foto: una general o la de una línea de servicio | sin foto: la órbita gigante con «¿Conversamos? Cuando quieras.» | precios (se definen en cada propuesta) |
+| **Pitch** y **QBR** | la portada clásica | el cierre clásico | precios |
+
+Después, en cada tramo del documento (secciones, contenido, método, prueba, cotización, próximos pasos), se elige la
+receta por su «cuándo sí» y su «cuándo no».
+
+**Lo que cambió con esta aprobación:**
+
+- **El tríptico** dice «Escucha.» «Crea.» «Mide.»: una palabra en cada foto, cada una con su punto.
+- **La sección partida** (mitad papel, mitad foto) tiene tres versiones —la esquina arriba, la esquina abajo y el panel
+  a la derecha— y su indicador sube siempre por la izquierda.
+- **La cotización** tiene tres versiones: la tabla de planes, los planes en escena y la cotización en vivo con el
+  botón «Aprobar propuesta». Los montos siempre como `[MONTO]`.
+- **El día a día** tiene cuatro momentos, una versión con las herramientas y dos láminas «vívelo», donde quien mira
+  vive cómo avanza el proyecto y cómo se ven los resultados en vivo.
+- **Los próximos pasos** muestran la agenda del diagnóstico abierta, con el cursor en «Agenda un diagnóstico».
+- **Los logos de clientes** van en un mismo azul marino (Aguas Andinas y la UC de Temuco, en tonos de ese azul para
+  no perder su forma); la foto del caso Sky es de ejemplo y se cambia por una real.
+- **El estilo de cine** (luz dramática de película) se permite también en las láminas de sección y de «quiénes somos»
+  y «por qué lo hacemos», con personas del equipo. No se extiende a redes, web ni publicidad.
+
+Hay detalles de revisión pendientes que no frenan la aprobación (algunas respuestas un poco más chicas de lo que pide
+la regla, cifras que necesitan su fuente a la vista, etiquetas chicas en color de acento); se corrigen cuando cada
+lámina pasa a plantilla. Por ahora sólo algunas láminas salen con `pnpm brand:compose`; las demás se arman siguiendo
+su receta.
+
+> Detalle técnico: [catálogo de recetas por lámina](../../operations/brand-graphic-line/deck-recipes/README.md) (índice, decisiones y pendientes de QA; JSON `efeonce.deck-slide-recipes.v1`) · [norma de composición por superficie, delta (c) y §4.6](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) · [registro cine, delta (c)](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck) · [manual de uso](../../manual-de-uso/creative/componer-deck-con-recetas.md)
 
 ## Estado y pendientes
 

@@ -7,6 +7,22 @@
      ═══════════════════════════════════════════════════════════ -->
 
 
+## Delta 2026-09-27 (c) — las 69 láminas aprobadas, con receta por lámina
+
+- El operador aprobó **las 69 láminas** del canvas «Deck»; cada una tiene receta (slots con `maxChars` medido, fijos,
+  selección, pares, foto y prompt) en [`deck-recipes/`](../../operations/brand-graphic-line/deck-recipes/README.md)
+  (JSON `efeonce.deck-slide-recipes.v1`, validado con `pnpm brand:deck-recipes`). Es el **contrato de slots** de las
+  plantillas que esta task lleva al catálogo `graphic-line-deck`.
+- **Cambios que la integración debe reflejar** (norma §4.6 «Recetas por lámina», §6 filas 19 y 21–24): `sectionSplit`
+  de `src/lib/brand-surfaces/recipes/deck.ts` y el token AXIS (`progress.flipped`) suben por la **izquierda** y suman
+  `section-split-corner-bottom` y `section-split-panel-end`; `triptych` pasa a una palabra por toma con su esfera
+  (`voice.mode`); `decision-next-steps` a la agenda abierta; lo que AXIS marca como `option` pasa a aprobado; el issue
+  `cine-requires-nexa-or-proposal` debe admitir la excepción de secciones y «about».
+- **Pendientes de QA a resolver en la plantilla** (lista en el README del catálogo): respuesta ≥ 3× la pregunta, acento
+  fuera de texto < 24 px, fuente visible de cifras, burbuja URL en partners, logo dentro de la órbita en el cierre y
+  `EFEONCE_CONTACT` en los contactos. El visual gate (`pnpm composer:visual-gate --catalog=graphic-line`) sigue siendo
+  la condición de cada plantilla nueva.
+
 ## Delta 2026-09-27 (b) — set de portadas y contraportadas aprobado
 
 - El operador **aprobó el set completo** de portadas, contraportadas y láminas de sección del brochure y de la propuesta

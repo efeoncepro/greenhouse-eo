@@ -1,0 +1,12 @@
+{
+  "id": "BR4-contra-amanecer",
+  "formato": "16:9",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "objetos": [{ "objeto": "chaqueta-softshell-efeonce", "puesta": "espalda" }],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic closing shot, the last frame of a film, blue hour): she (the woman of the references) is seen FROM BEHIND, her back to the camera, walking away on the RIGHT half of the frame along a long dark reflective causeway that leads to the horizon, small in the frame (about a quarter of the frame height), wearing the NAVY EFEONCE SOFTSHELL JACKET seen from the back. Beside her, at her knee, walks ONE small friendly robot agent with a rounded white body, also seen from behind, the size of a cat. Far ahead, on the horizon on the right half, ONE enormous thin ring of pure teal light (#36C8BF) rises TILTED like a planet's orbit, half above the horizon line like a sunrise, its lower half reflected on the still dark water around the causeway; a single small bright teal sphere sits on the ring's highest point. The ring is the only strong light: it backlights both silhouettes with a thin teal rim and throws their long shadows toward the camera. Thin haze glows around the ring. The LEFT 45% of the frame is calm, deep, dark sky and dark water with nothing in it. The BOTTOM fifth is the dark wet causeway close to the lens, out of the ring's reflection. 50mm, camera at waist height about eight meters behind them. Rich contrast, deep navy blacks, no text, no logos of any other brand.",
+  "lecho": { "objeto": "the dark wet causeway close to the lens in the lowest fifth, outside the ring's reflection", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the calm, deep dark sky and water on the left 45% of the frame", "tinta": "blanca" } }
+}

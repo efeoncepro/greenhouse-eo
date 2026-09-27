@@ -102,6 +102,20 @@ caminero, cuadros de motion) y `graphic-line-overlays` (capas de video con alfa)
   propuesta con «Empower your Growth»— tampoco tiene plantilla todavía: su integración al contrato es TASK-1927 y la
   producción de plates, TASK-1926. Hasta entonces se arma como maqueta de dirección declarada, con la norma de
   `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 y el resumen de [SKILL.md](SKILL.md) §«Portadas y contraportadas».
+- **Recetas por lámina (operador, 2026-09-27): las 69 láminas del canvas «Deck» están aprobadas** y cada una tiene su
+  receta en `docs/operations/brand-graphic-line/deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json` (esquema
+  `efeonce.deck-slide-recipes.v1`; índice humano en el README de esa carpeta, regenerado con `pnpm brand:deck-recipes`).
+  Para el composer, la receta es el **contrato de slots** de la futura plantilla: cada `slots[]` trae `name`, `type`
+  (`text`, `richText`, `number`, `metric`, `list`, `image`, `logo`, `person`, `money`, `date`, `enum`, `section`),
+  `required` y `maxChars` **medido en la referencia aprobada** (lo que cabe sin cruzar la órbita ni al sujeto);
+  `fixed[]` es lo que la plantilla quema y el autor no toca; `selection` declara el objetivo para
+  `efeonce.collaboration-selection`; `pairsWith` (`cover↔close`, `variant`, `sequence`) alimenta la validación del
+  documento. **El `id` de la receta reutiliza el de AXIS cuando existe** (`content-pricing`, `decision-next-steps`,
+  `method-staircase`…); los nuevos son kebab-case en inglés. Hoy sólo `section-classic`, `content-measure`,
+  `method-staircase` y `proposal-cinematic` (`service`) componen tal cual; `section-split` (debe subir por la
+  izquierda) y `triptych` (una palabra por toma, cada una con esfera) tienen plantilla en la versión anterior; el resto
+  no tiene plantilla. Llevarlas al catálogo `graphic-line-deck` con el visual gate es TASK-1927: **nunca** se agrega una
+  plantilla sin su receta ni una receta sin la aprobación del operador.
 
 ### Destinos editables posteriores — no confundir fuente, conversión ni renderer
 

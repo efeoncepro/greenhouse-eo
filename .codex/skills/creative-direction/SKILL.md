@@ -188,7 +188,7 @@ como un fenómeno de luz de ficción declarada, con el color de su línea salien
 esta skill puede elegir para una idea, con tres límites:
 
 - **No reemplaza A, B ni C.** Está aprobado sólo con **Nexa protagonista** o en la receta de deck
-  `proposal-cinematic`; una pieza social, un hero web o una lámina de contenido con personas del equipo siguen en
+  `proposal-cinematic` (y, por excepción aprobada el 2026-09-27, en las láminas de sección y «about» del deck; no se extiende fuera del deck); una pieza social, un hero web o una lámina de contenido con personas del equipo siguen en
   A, B o C. La publicidad 9:16 y 4:5 en cine está **en prueba**, y con personas del equipo, fuera del alcance
   aprobado hasta decisión del operador.
 - **La prueba es de idea, no de estética:** quítale a la escena el fenómeno de luz; si queda «una persona en un

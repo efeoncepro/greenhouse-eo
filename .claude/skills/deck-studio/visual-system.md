@@ -248,6 +248,19 @@ título: vive en la evidencia («Preparada para **[Cliente]** · Confidencial»)
 cliente real. Medidas de la caja y portadas aprobadas: [SKILL.md](SKILL.md) §«Portadas y contraportadas» y
 `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6.
 
+**Delta 2026-09-27 — el muro de clientes de marca propia (`content-clients`, La órbita):** logos en **un solo tono
+navy** y con el mismo peso óptico sobre papel; **excepción aprobada:** Aguas Andinas y la UC de Temuco van en tonos
+del mismo navy (principal navy, secundario en un tinte más claro, el blanco se conserva) para no perder sus formas
+internas. Las dos cifras gigantes sobre la grilla llevan su fuente en la lámina. Receta completa:
+`docs/operations/brand-graphic-line/deck-recipes/` (`content-clients`).
+
+**Delta 2026-09-27 — personas en las láminas de marca propia.** La regla de arriba («las caras del equipo: fotos
+reales») sigue intacta: la lámina que presenta **al equipo de la cuenta** (`content-team`) usa retratos reales. Las
+escenas de cine de las secciones y de «Quiénes somos» / «Por qué lo hacemos» (excepción del registro cine aprobada el
+2026-09-27), incluida la apertura «¿Quién hace crecer tu marca? Este equipo.», son **escenas de marca ilustrativas**:
+muestran cómo trabajamos, no llevan nombre ni cargo, no reemplazan los retratos reales del equipo asignado a una cuenta
+y en una licitación nunca se presentan como el equipo propuesto. Sus fotos se piden por ficha (`pnpm foto:*`).
+
 ### Lo que se lee a stock (y a IA)
 
 Gente-que-no-existe sonriendo · manos estrechándose · gráficos genéricos flotando · el mismo

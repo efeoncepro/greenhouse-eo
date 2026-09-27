@@ -58,15 +58,17 @@ visual transversal requiere validación en varias portadas.
   2026-09-27): el objeto protagonista en arcilla mate, PNG con alfa desde `volumeIconUrl(glyph)` de
   `@efeoncepro/axis-brand-assets` (0.3.2, publicado con el tag `v0.3.7`); uno por pieza, ≥ 160 px, nunca en listas ni UI, nunca
   regenerado. Es otra cosa que las librerías «Clay 3D» de OneDrive (ilustración de propuestas): no se mezclan.
-- **Registro cine ampliado (operador, 2026-09-27):** la foto de cine de ficción se permite en **dos casos**: piezas
+- **Registro cine ampliado (operador, 2026-09-27):** la foto de cine de ficción se permite en **tres casos** (el tercero, más abajo): piezas
   con **Nexa protagonista** (traje de ficción permitido) y la receta de deck **`proposal-cinematic`**, ahora también
   con **personas del equipo**, que conservan su **uniforme por registro de escena** (piqué, chaqueta, gorra y polo,
   hoodie). Guardas que no se relajan: identidad por ficha (nunca injerto de cara), **cámara a ~2 m y 85 mm** en plano
   medio sin escorzo, prenda lisa con el **isotipo oficial compuesto** después desde `@efeoncepro/axis-brand-assets`
   (revisar con `pnpm foto:emblema`), reserva de texto declarada (el espacio oscuro a la izquierda), sujeto a la derecha
   mirando a cámara, lo digital o el servicio en acción y el color saliendo de la escena, y **nunca dos personas
-  mirándose de cerca** (se lee romántico). Fuera de esos dos casos el cine no se usa (el contrato de superficie lo
-  rechaza con `cine-requires-nexa-or-proposal`). La publicidad 9:16 y 4:5 en cine está **en prueba**
+  mirándose de cerca** (se lee romántico). **Tercer caso, excepción aprobada el 2026-09-27:** las láminas de
+  **sección y «about»** del deck (secciones partidas, «Quiénes somos», «Por qué lo hacemos») con personas en luz
+  dramática; el contrato todavía no la conoce (TASK-1927). Fuera de esos tres casos el cine no se usa (el contrato de
+  superficie lo rechaza con `cine-requires-nexa-or-proposal`). La publicidad 9:16 y 4:5 en cine está **en prueba**
   (`ai-generations/2026-09-27_ads-cine/`), no aprobada ni autorizada para pauta. Canon vigente desde el 2026-09-27:
   [registro cine](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (los deltas del
   [maestro](../../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) quedan como historia)

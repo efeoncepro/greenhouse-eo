@@ -298,6 +298,19 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
   no templates for `cover-classic`/`close-classic`, no `use`/`layout`, no documents there yet. Bump both packages
   together and rerun `pnpm composer:visual-gate --catalog=graphic-line`. Integration task:
   [TASK-1927](../../../docs/tasks/to-do/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md).
+- **Per-slide deck recipes (operator, 2026-09-27) — AXIS is behind.** All **69** slides of the canvas «Deck» are
+  approved and each has a recipe in Greenhouse:
+  [`docs/operations/brand-graphic-line/deck-recipes/`](../../../docs/operations/brand-graphic-line/deck-recipes/README.md)
+  (JSON `efeonce.deck-slide-recipes.v1`; ids **reuse the AXIS Lab id** when the slide exists in
+  `apps/lab/src/data/surfaces.ts` / `references/surfaces/deck/<id>.jpg`, new ids are kebab-case English; recipes that
+  point to AXIS-only families use `axisRecipeFamilies`). Until TASK-1927 syncs AXIS, the Lab and
+  `efeonceGraphicLine.surfaces.deck` still describe older states: many deck slides as `option`; `section-split` rising
+  on the **right** (`progress.flipped`; approved: rises on the **left**, sphere top-left, plus `section-split-corner-bottom`
+  and `section-split-panel-end`); `triptych` as one phrase with a single sphere (`voice.mode: phrase-across-panels`;
+  approved: one word per panel, each with its sphere); `decision-next-steps` as three columns (approved: the open
+  diagnostic agenda); and the cine gate without the approved exception for deck **section and «about»** slides. **The
+  Greenhouse norm and the recipe catalog win**; never «fix» a slide back to the Lab state, and never publish a new Lab
+  recipe without the approved Greenhouse recipe.
 - **Covers and back covers (operator, 2026-09-27):** the approved brochure/proposal cover and back-cover set
   (photo ↔ no photo, back-cover message per document, line voice on the cover, Efeonce logo at 500 px in 1920, client
   logo inside the orbit on proposal covers) **is being published in the AXIS Lab › Superficies › Deck**; until that

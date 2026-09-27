@@ -1,0 +1,12 @@
+{
+  "id": "QS2-contigo",
+  "formato": "16:9",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "objetos": [{ "objeto": "polo-efeonce" }],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, Hollywood drama still, a client's meeting room at night, city lights far behind the glass): on the RIGHT half of the frame, two people sit side by side at a large screen, the same side of the table, both lit by the screen. The client, a Latin American marketing director in her early forties in a dark blazer, holds the pen and is the one driving: she points at a rising line on the screen and explains it with conviction, a proud, surprised smile, discovering she can read it herself. Beside her, she (the woman of the references) wears the NAVY EFEONCE POLO, leans in slightly behind the client's shoulder, one hand open toward the screen as a coach, looking at the client, not at the screen, with a warm proud smile: she is teaching, not presenting. The screen is the key light: its cool white and teal glow lights both faces and hands from the front; a warm practical lamp in the background adds depth. REALISTIC ADULT PROPORTIONS: camera about two and a half meters away at seated eye level, 85mm, shallow depth of field, the screen seen at an angle so its content is abstract and unreadable. Thin haze. The LEFT 45% of the frame is calm, deep dark room space with nothing in it, only faint haze and soft out-of-focus city lights. Rich contrast, deep navy blacks, no readable text, no logos of any other brand.",
+  "lecho": { "objeto": "the dark blurred near edge of the meeting table, close to the lens, outside the light", "tono": "DARK near black" },
+  "reservas": { "texto": { "muro": "the calm, deep dark room space on the left 45% of the frame", "tinta": "blanca" } }
+}

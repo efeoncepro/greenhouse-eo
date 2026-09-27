@@ -127,6 +127,13 @@ sujeto, las reservas de texto, el lecho ni la firma (check `orbit-never-over-sub
     la portada de propuesta, sin foto, lleva el logo del cliente dentro de la órbita (el nombre del cliente sólo en la
     evidencia). Catálogo, pares y parejas: `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6
     (resumen operativo en `deck-studio` §«Portadas y contraportadas»).
+11c. **Recetas por lámina del deck** (operador, 2026-09-27): **las 69 láminas** del canvas «Deck» están aprobadas y
+    cada una tiene su receta en `docs/operations/brand-graphic-line/deck-recipes/` (JSON `efeonce.deck-slide-recipes.v1`:
+    cuándo sí, cuándo no, alternativa, pares, slots, fijos, foto y prompt; `pnpm brand:deck-recipes`). Una lámina de
+    marca propia se elige del catálogo. Checklist de las decisiones de ese día: tríptico con **una esfera por palabra**
+    («Escucha.» «Crea.» «Mide.»); sección partida con el indicador **por la izquierda** (tres variantes); cotización en
+    tres variantes, sólo en propuesta y con `[MONTO]`; próximos pasos con la agenda abierta; clientes en un tono navy;
+    foto del caso Sky de ejemplo; registro cine también en secciones y «about», nunca fuera del deck.
 12. **Estado:** anillo = libre, esfera = ocupado, siempre con etiqueta escrita; nunca verde/rojo.
 13. **La esfera final es parte del texto** (operador, 2026-09-26): la respuesta y el titular display de marca propia
     cierran con ella, y la guía, las marcas de corte, la selección colaborativa y sus cursores miden la palabra

@@ -225,6 +225,9 @@ lima = el resultado). Aprobado por el operador el 2026-09-19.
     `proposal-cinematic`**, con personas del equipo en su **uniforme por registro de escena** o con Nexa. AXIS rechaza
     el resto con `cine-requires-nexa-or-proposal`: una pieza social, un hero web o una lámina de contenido con el
     equipo sigue en A, B o C.
+  - **Excepción aprobada (operador, 2026-09-27):** las láminas de **sección y «about»** del deck (secciones partidas,
+    «Quiénes somos», «Por qué lo hacemos») con personas en luz dramática; no amplía el cine fuera del deck y el
+    contrato AXIS aún no la conoce (TASK-1927). Receta de cada lámina: `docs/operations/brand-graphic-line/deck-recipes/`.
   - **Deck y brochure** (PDF horizontal 16:9) se componen con `pnpm brand:compose` (Artifact Composer, contrato AXIS
     `efeonce.surface-composition`; la 0.1.2 de AXIS agrega `use: proposal|brochure`, `cover-classic`, `close-classic` y
     las composiciones `service|hero|lines` de `proposal-cinematic`, pero Greenhouse todavía fija la 0.1.1). La lámina de líneas es la única con los cinco acentos;

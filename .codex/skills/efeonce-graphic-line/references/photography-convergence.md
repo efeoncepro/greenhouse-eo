@@ -313,7 +313,8 @@ lente» (sin ID todavía); mientras tanto se aplican a mano.
 
 **P-4 en el registro cine (2026-09-27).** El cuarto registro del lenguaje fotográfico
 ([`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md),
-fuente vigente; sólo Nexa protagonista o la receta `proposal-cinematic`, issue AXIS `cine-requires-nexa-or-proposal`)
+fuente vigente; sólo Nexa protagonista, la receta `proposal-cinematic` y, por excepción aprobada el 2026-09-27, las
+láminas de sección y «about» del deck; issue AXIS `cine-requires-nexa-or-proposal`, que aún no conoce la excepción)
 **fabrica** su fuente de luz con el color de la línea: anillo, esfera, moño de partículas, esferas de acento. Ahí P-4
 se lee al revés: ese fenómeno **es** la órbita de la pieza, así que no se pide otro plate, **se renuncia a la órbita
 gráfica** encima (registro cine §9.4: el anillo de la portada y la contraportada del brochure por decisión del

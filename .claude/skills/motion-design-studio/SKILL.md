@@ -139,7 +139,8 @@ hipótesis de montaje, no benchmarks; revisar secuencia completa y no sólo el p
    **Registro cine (2026-09-27):** es un registro **fotográfico** del lenguaje de Efeonce
    ([`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)),
    no un estilo de video. Un video con **Nexa protagonista** que tome ese look respeta la misma frontera (cine sólo con
-   Nexa protagonista o en láminas `proposal-cinematic`; con personas del equipo en publicidad sigue en prueba) y el
+   Nexa protagonista o en láminas `proposal-cinematic`, más la excepción de las láminas de sección y «about» del deck,
+   que no alcanza al video; con personas del equipo en publicidad sigue en prueba) y el
    mismo canon: identidad A de Nexa, proporciones reales (cámara a ~2 m, 85 mm, sin escorzo), la luz de la línea como
    fenómeno de la escena y no como grade, rim + bruma, mirada al lente, nunca dos personas mirándose de cerca y el
    isotipo compuesto, nunca generado. Esa luz cuenta como la órbita de la pieza: no se suma otra.

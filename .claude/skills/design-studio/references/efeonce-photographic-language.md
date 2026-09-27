@@ -121,15 +121,19 @@ de partículas, esferas—, nunca pintado encima ni puesto como grade.
   `atmosfera: bruma`).
 - En 16:9, la **izquierda (≈ 45 %) es una reserva oscura y calma**, sin fenómeno de luz ni robots.
 
-**Sólo dos casos permitidos [operador, 2026-09-27]:**
+**Sólo tres casos permitidos [operador, 2026-09-27]:**
 
 | Caso | Protagonista | Vestuario |
 |---|---|---|
 | 1 · Nexa protagonista | Nexa (identidad A) | Traje de ficción (biónico) o uniforme Efeonce |
 | 2 · Receta de deck `proposal-cinematic` | Personas del equipo o Nexa | Personas: **uniforme por registro de escena**; el traje de ficción es sólo de Nexa |
+| 3 · **Excepción:** láminas de **sección** y **«about»** del deck (secciones partidas, «Quiénes somos», «Por qué lo hacemos») | Personas en luz dramática, con o sin Nexa (en la sección con el panel a la derecha, la persona del cliente) | Equipo: uniforme por registro de escena; cliente: su ropa, sin marca Efeonce |
 
-AXIS rechaza `photo.register: "cine"` fuera de esos casos con el issue **`cine-requires-nexa-or-proposal`**. Una pieza
-social, un hero web o una lámina de contenido con personas del equipo sigue en A, B o C.
+AXIS rechaza `photo.register: "cine"` fuera de los casos 1 y 2 con el issue **`cine-requires-nexa-or-proposal`**; el
+caso 3 está aprobado por el operador pero el contrato todavía no lo conoce (TASK-1927): declara la excepción en la
+entrega. Una pieza social, un hero web, publicidad o una lámina de **contenido** con personas del equipo sigue en A, B
+o C: la excepción del caso 3 no se extiende. Detalle: registro cine, delta (c); receta de cada lámina en
+`docs/operations/brand-graphic-line/deck-recipes/`.
 
 **Publicidad 9:16 y 4:5: en prueba, no aprobada.** La tanda del 2026-09-27
 (`ai-generations/2026-09-27_ads-cine/`, §11.1 del registro) tiene cuatro piezas y ninguna está autorizada para pauta;

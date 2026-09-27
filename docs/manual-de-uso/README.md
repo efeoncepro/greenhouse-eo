@@ -39,6 +39,10 @@ La diferencia con otras capas de documentacion:
   TASK-1919); **Ruta B** para el resto, `pnpm surface:resolve` en AXIS (contrato `candidate`) y cada delegate a su
   compositor de Greenhouse; la receta de deck `proposal-cinematic` y el registro cine, qué significan los estados, los
   `issues` y los errores `recipe-not-approved` / `recipe-outside-composer` / `surface-issues`, y problemas comunes.
+- [Componer un deck con las recetas por lámina](creative/componer-deck-con-recetas.md) — armar un brochure, una
+  propuesta, un pitch o un QBR de marca Efeonce con las 69 láminas aprobadas el 2026-09-27: elegir documento, portada y
+  contraportada, esqueleto por familias, receta por tramo («cuándo sí», «cuándo no», alternativa), pares y ritmo, slots,
+  fotos, qué sale con `pnpm brand:compose` y qué va como maqueta declarada, estados y problemas comunes.
 - [Componer piezas de Glitch](creative/componer-piezas-glitch.md) — **sólo para Glitch** (no para piezas de
   Efeonce): elegir la portada con la regla de rotación, armar portada, láminas interiores, noticia 1 y contraportada,
   piezas del blog y del video en propuesta (mapa de zonas del reel), checklist, estados y problemas comunes. Hoy se

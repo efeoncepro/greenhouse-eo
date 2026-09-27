@@ -1,5 +1,20 @@
 # TASK-1926 — Registro cine en el pipeline `foto:*` y comando idempotente de punta a punta
 
+## Delta 2026-09-27 (c)
+
+- **Las 69 láminas del deck quedaron aprobadas** [decisión del operador, 2026-09-27] y cada una tiene receta con su
+  foto (plate, ficha, prompt compilado y post-proceso) en
+  [`deck-recipes/`](../../operations/brand-graphic-line/deck-recipes/README.md) (`EFEONCE_DECK_SLIDE_RECIPES_V1.json`,
+  campo `photo`). Es el inventario de entrada del pipeline: el orquestador debe poder regenerar desde su ficha cada
+  plate que una receta declare.
+- **Alcance del registro que se suma:** excepción aprobada del cine para las láminas de **sección y «about»**
+  (`SP2b`, `SP1` espejado, `QS1b`, `QS2`); detalle en el
+  [registro cine, delta (c)](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck).
+- **Pendientes de QA que caen en esta task:** registros de procedencia de `foto:isotipo` faltantes (NX6b, CR2b, WB1b,
+  RV1b, BR2b…) y plates sin isotipo compuesto (HW1, T2, T3, H2, LN4) → `foto:emblema` antes de publicar; los plates de
+  «about» se regeneran con la reserva izquierda, sin el degradado de `quienes.mjs`. No se generó ninguna imagen en este
+  cambio.
+
 ## Delta 2026-09-27 (b)
 
 - **Plates de portada y contraportada aprobados** [decisión del operador, 2026-09-27]: brochure (tres portadas

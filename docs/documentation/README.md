@@ -32,6 +32,8 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   piezas aplica (y que no aplica a la UI de Greenhouse ni a clientes), reglas clave (firma con el logo centrado; la
   burbuja URL sólo con el logo ya en la imagen; la órbita no reemplaza la composición de la foto), merch y oficina
   fotografiados, la línea en movimiento (la órbita y las animaciones del logo V1.1), los íconos (Trazo y Plastilina), dónde vive cada cosa y pendientes.
+  Desde el 2026-09-27, las 69 láminas del deck aprobadas con su receta: [catálogo de recetas por lámina](../operations/brand-graphic-line/deck-recipes/README.md)
+  y [cómo armar un deck con ellas](../manual-de-uso/creative/componer-deck-con-recetas.md).
 - [Identidad sonora de Efeonce — Tres puntos que se vuelven uno](creative/identidad-sonora-efeonce.md) — el sonido de
   la marca propia (recomendado por el operador el 2026-09-26, todavía no canon): la idea, el logo sonoro, los registros
   fondo y energía, el acento por línea de servicio, la voz del eslogan, el sonido de las animaciones del logo, qué se

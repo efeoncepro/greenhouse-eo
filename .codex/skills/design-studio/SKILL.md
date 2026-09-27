@@ -369,8 +369,10 @@ fotografía.
 **Cuatro registros, y se decide cuál ANTES de generar:** A documental · B puesta en escena · C la respuesta a la vista
 · **cine** «la marca en su película» (2026-09-27). Cine es ficción declarada —el servicio en acción como fenómeno de
 luz con el acento de su línea, sujeto a la derecha mirando al lente, cámara ≈ 2 m y 85 mm, bruma y rim, reserva
-izquierda oscura en 16:9— y **sólo** se usa con **Nexa protagonista** o en la receta de deck **`proposal-cinematic`**
-(AXIS `cine-requires-nexa-or-proposal`); la publicidad 9:16 y 4:5 en cine está **en prueba**, no aprobada. Marcador,
+izquierda oscura en 16:9— y **sólo** se usa con **Nexa protagonista**, en la receta de deck **`proposal-cinematic`**
+(AXIS `cine-requires-nexa-or-proposal`) y, por **excepción aprobada el 2026-09-27**, en las láminas de **sección y
+«about»** del deck (secciones partidas, «Quiénes somos», «Por qué lo hacemos»: personas en luz dramática; no se
+extiende a social, web, publicidad ni contenido); la publicidad 9:16 y 4:5 en cine está **en prueba**, no aprobada. Marcador,
 barra, trampas y comandos en la referencia (§Registros); canon vigente:
 [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
 **Plate de portada de brochure o propuesta** (operador, 2026-09-27): sujeto a la derecha, 45 % izquierdo oscuro y

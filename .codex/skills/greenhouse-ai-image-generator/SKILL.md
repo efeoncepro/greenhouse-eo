@@ -712,7 +712,7 @@ diagnostica sin costo.
 ### Registro cine: placas, emblema y tamaños
 
 El registro cine («la marca en su película», 2026-09-27) sólo se usa con **Nexa protagonista** o en la receta de deck
-**`proposal-cinematic`**; fuera de eso, la foto es A, B o C. La dirección (idea, marcador, barra, trampas) vive en
+**`proposal-cinematic`** (y, por excepción aprobada el 2026-09-27, en las láminas de sección y «about» del deck; no se extiende fuera del deck); fuera de eso, la foto es A, B o C. La dirección (idea, marcador, barra, trampas) vive en
 [`design-studio` → §Registros](../design-studio/references/efeonce-photographic-language.md) y el canon vigente es
 [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
 (plantilla de ficha en su §12). Lo que toca a la mano:

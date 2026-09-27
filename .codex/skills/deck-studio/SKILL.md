@@ -12,7 +12,9 @@ description: >-
   licitaciones, pitch de venta, QBR, board deck, readout de diagnóstico y webinar.
   Triggers: "deck", "láminas", "slides", "presentación", "pitch", "propuesta visual",
   "keynote", "QBR", "board deck", "armar el deck", "diseñar una presentación", "storyline",
-  "narrativa del deck", "action title", "PPT", "PowerPoint".
+  "narrativa del deck", "action title", "PPT", "PowerPoint", "brochure", "recetas del deck",
+  "qué lámina uso". En marca propia Efeonce, elige láminas del catálogo de 69 recetas aprobadas
+  (docs/operations/brand-graphic-line/deck-recipes/).
 ---
 
 # deck-studio — el deck es un ARGUMENTO, no una pila de láminas
@@ -98,9 +100,10 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   el brochure» abajo) → los `delegates` van a `pnpm creative:orbit:render` (voz, órbita),
   la selección y `resolveIcon`. Valores desde `efeonceGraphicLine.surfaces.deck` y `pieces.deck`; **nunca coordenadas
   en la lámina**.
-- **Recetas aprobadas:** sección clásica, sección partida (el arco sube por la derecha), contenido «la órbita mide la
-  cifra», tríptico «escucha, crea y mide», **`proposal-cinematic`** y **`method-staircase`**. Todo lo demás del canvas
-  es opción.
+- **Recetas aprobadas: las 69 láminas de la página «Deck»** (operador, 2026-09-27). Ya no hay opciones en el deck.
+  Antes de proponer o armar una lámina de marca propia, **elige la receta del catálogo** (subsección «Recetas por
+  lámina» de abajo). Correcciones de ese día: la sección partida sube por la **izquierda** (tres variantes) y el
+  tríptico lleva una palabra por toma, cada una con su esfera («Escucha.» «Crea.» «Mide.»).
 - **Fondo Efeonce en toda lámina de línea**; la línea de servicio sólo cambia el acento. Una órbita por lámina; la
   selección toma una sola cosa; viñetas sin esfera. Lámina con foto sin logo: firman portada y cierre; burbuja URL en
   el pie.
@@ -160,8 +163,8 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
     hacia la órbita») caben en el registro cine porque Nexa protagoniza, pero **no son receta del contrato**: se
     compusieron en sesión (`ai-generations/2026-09-27_brochure/componer-brochure.mjs`). **Delta (operador,
     2026-09-27):** el set de portadas y contraportadas quedó decidido en el canvas (subsección de abajo); `BR3` es
-    contraportada aprobada (de brochure y, con «Empower your Growth», de propuesta) y `BR1b` es opción de portada de
-    brochure y lámina de apertura de la sección de servicios. Siguen sin ser receta del contrato: el documento sólo
+    contraportada aprobada (de brochure y, con «Empower your Growth», de propuesta) y `BR1b` es portada aprobada de
+    brochure y lámina de apertura de la sección de servicios (nunca las dos en el mismo documento). Siguen sin ser receta del contrato: el documento sólo
     acepta como portada y cierre una receta de papel `cover` / `close` (hoy, las clásicas retiradas) hasta TASK-1927.
     Su anillo de luz **es** la órbita de la pieza: no se le agrega otra.
   - **El documento** (`resolveSurfaceDocument` / `validateSurfaceDocumentIntent`, manifest `axis.surface-document.v1`;
@@ -204,9 +207,11 @@ la evidencia en 2–3 líneas.
 
 - **Brochure, portada general con foto** (registro cine, sin cliente): logo 500 · «Brochure · Servicios 2026» ·
   «¿Qué hace Efeonce?» (anillo teal) · **«Crecer.»** (esfera teal) · «**Cinco** líneas de servicio: Growth · Brand ·
-  Engine · Voice · Revenue». Opciones del canvas: Nexa frente a la órbita (`2026-09-27_brochure/plates/BR1b-…`),
-  Nexa y las cinco esferas + burbuja URL (`2026-09-26_deck-nexa/plates/NX6b-…`), Nexa y el equipo con agentes
-  (`2026-09-27_brochure/plates/BR2b-…`). La variante con cursor de Nexa sobre «Crecer.» es **prueba**, no aprobada.
+  Engine · Voice · Revenue». ✅ Las cuatro aprobadas el 2026-09-27: Nexa frente a la órbita
+  (`cover-brochure-cine-orbit`, `2026-09-27_brochure/plates/BR1b-…`), Nexa y las cinco esferas + burbuja URL
+  (`cover-brochure-cine-lines`, `2026-09-26_deck-nexa/plates/NX6b-…`), Nexa y el equipo con agentes
+  (`cover-brochure-cine-team`, `2026-09-27_brochure/plates/BR2b-…`) y la de cinco líneas con selección y cursor de
+  Nexa sobre «Crecer.» (`cover-brochure-cine-lines-selection`).
 - **Brochure, una portada por línea** (✅ las cinco): anillo y esfera en el acento de la línea
   (`efeonceGraphicLine.lines`), eyebrow «Brochure · \<Línea\>» y como evidencia las categorías de la línea en
   `docs/services/` (conteo en negrita; textos exactos en §4.6). Sus pares quedaron **aprobados** (salen de
@@ -265,7 +270,41 @@ como contraportada; portadas genéricas (clásica de brochure, sólo logo); cont
 **Estado:** el set todavía no es receta del contrato ni tiene plantilla en `graphic-line-deck`. Los scripts que lo
 renderizaron vivieron en el scratchpad de la sesión, no en el repo: la producción idempotente de los plates es
 TASK-1926 (registro cine / `foto:*`) y la integración al contrato de superficies, TASK-1927. Mientras tanto, una
-portada o contraportada se arma como maqueta de dirección que se declara así, siguiendo §4.6.
+portada o contraportada se arma como maqueta de dirección que se declara así, siguiendo §4.6 y su receta del
+catálogo (`cover-*`, `close-*`).
+
+#### Recetas por lámina: el catálogo de las 69 (aprobado 2026-09-27)
+
+**Fuente:** [`docs/operations/brand-graphic-line/deck-recipes/`](../../../docs/operations/brand-graphic-line/deck-recipes/README.md)
+— `EFEONCE_DECK_SLIDE_RECIPES_V1.json` (esquema `efeonce.deck-slide-recipes.v1`) + README con el índice por familia y
+documento (`pnpm brand:deck-recipes` lo valida y regenera). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6, «Recetas
+por lámina». Manual: `docs/manual-de-uso/creative/componer-deck-con-recetas.md`.
+
+**Cómo se usa (en este orden):**
+
+1. **Documento → portada y contraportada.** Propuesta: portada sin foto con el logo del cliente (`cover-proposal-orbit`
+   o `-dawn`) + contraportada con foto y «Empower your Growth» (`close-proposal-horizon` o `-dawn`). Brochure: portada
+   con foto (`cover-brochure-cine-*` o `cover-brochure-line-*`) + `close-brochure-orbit`. Pitch y QBR: no hay portada
+   propia en las 69; el catálogo remite a `cover-classic` / `close-classic` de AXIS.
+2. **Esqueleto por familias** (`cover`, `section`, `about`, `content`, `method`, `proof`, `proposal-service`,
+   `pricing`, `next-steps`, `breather`, `close`) y, en cada tramo, la receta por su `useWhen` / `avoidWhen`; si no
+   calza, su `preferInstead` dice cuál usar y cuándo.
+3. **Pares:** `cover↔close` (alternar foto y sin foto), `variant` (se elige una: tabla, escena o cotización en vivo;
+   escalera o BeX plana) y `sequence` (quiénes somos → por qué lo hacemos; sección → página de servicio).
+4. **Slots** con su `maxChars` **medido** en la referencia: si no cabe, se acorta; la respuesta se escribe sin punto
+   (lo pone la esfera); `money` siempre `[MONTO]`; `metric` con fuente; `logo` sólo de clientes que autorizan su uso.
+5. **Componer:** con plantilla (`section-classic`, `content-measure`, `method-staircase`, `proposal-cinematic` layout
+   `service`) → `pnpm brand:compose`; `section-split` y `triptych` tienen plantilla en la versión anterior (no usar tal
+   cual); el resto → maqueta de dirección declarada con `prompts.composition`. Todo hasta TASK-1927.
+
+**Decisiones que un agente necesita en el momento:** cotización en tres variantes, sólo en propuesta (tabla para
+lectura, escena para sala, en vivo cuando el alcance está acordado); `decision-next-steps` es la versión con la agenda
+abierta y no va en una propuesta enviada después del diagnóstico; día a día = cuatro momentos + herramientas + dos
+«vívelo»; clientes en un tono navy (Aguas Andinas y UC Temuco en tonos de navy); la foto del caso Sky es de ejemplo;
+BeX: la escalera es la principal. **Registro cine** también en las láminas de sección y «about» (excepción aprobada,
+no se extiende a otras superficies). **Pendientes de QA** (respuestas bajo 3×, acento bajo 24 px, cifras sin fuente,
+plate P1 repetido, isotipos sin procedencia): la plantilla usa el valor del canon; lista en el README del catálogo.
+Si una `notes` del JSON contradice estas decisiones, mandan las decisiones.
 
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 

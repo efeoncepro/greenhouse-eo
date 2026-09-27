@@ -1,0 +1,761 @@
+[
+ {
+  "board": "DeckSeccionLente",
+  "title": "Deck · sección con lente (el arco mide 2 de 5) · una opción",
+  "originalTitle": "Deck · sección con lente (el arco mide 2 de 5) · una opción",
+  "canvas": {
+   "x": 0,
+   "y": 200
+  },
+  "alt": "Lámina de sección con la lente: el editor dentro del círculo y el arco marcando 2 de 5",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckSeccionLente.jpg"
+ },
+ {
+  "board": "DeckSeccionClasica",
+  "title": "Deck · sección clásica AXIS, sin foto",
+  "originalTitle": "Deck · sección clásica AXIS, sin foto (aprobada)",
+  "canvas": {
+   "x": 1040,
+   "y": 200
+  },
+  "alt": "Sección clásica de AXIS en papel, sin foto: número 02 dentro del anillo que marca 2 de 5 y la voz a la izquierda",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckSeccionClasica.jpg"
+ },
+ {
+  "board": "DeckSeccionSangre",
+  "title": "Deck · sección con foto a sangre + indicador",
+  "originalTitle": "✅ APROBADA · Deck · sección con foto a sangre + indicador",
+  "canvas": {
+   "x": 2080,
+   "y": 200
+  },
+  "alt": "Sección con la foto del editor a sangre, la voz sobre el muro calmo y el indicador chico 2 de 5 arriba a la izquierda",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckSeccionSangre.jpg"
+ },
+ {
+  "board": "DeckSeccionMedia72",
+  "title": "Deck · sección partida: la órbita sube por la izquierda",
+  "originalTitle": "✅ APROBADA · Deck · sección partida: la órbita sube por la izquierda",
+  "canvas": {
+   "x": 3120,
+   "y": 200
+  },
+  "alt": "Sección partida: el indicador de avance sube por la izquierda hacia arriba, con la esfera arriba a la izquierda; el 02 y la voz en el panel de papel con una esquina de 300 px; la foto del retrato a la derecha",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckSeccionMedia72.jpg"
+ },
+ {
+  "board": "DeckContenidoFoto",
+  "title": "Deck · contenido: la órbita mide la cifra",
+  "originalTitle": "✅ APROBADA · Deck · contenido: la órbita mide la cifra",
+  "canvas": {
+   "x": 4160,
+   "y": 200
+  },
+  "alt": "Lámina de contenido oscura: la cifra 62 % en grande a la izquierda y la lente con el editor a la derecha, con el arco recorriendo el 62 % del círculo; dos cifras secundarias abajo",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckContenidoFoto.jpg"
+ },
+ {
+  "board": "DeckContenidoFoco",
+  "title": "Deck · contenido: el foco sobre la prueba",
+  "originalTitle": "✅ APROBADA · Deck · contenido: el foco sobre la prueba",
+  "canvas": {
+   "x": 5200,
+   "y": 200
+  },
+  "alt": "Lámina de contenido con el foco: la escena en penumbra y un círculo de luz sobre la estratega con el polo y el lanyard de Efeonce; a la izquierda «A la primera.» en grande y la prueba 62 % en el acento",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckContenidoFoco.jpg"
+ },
+ {
+  "board": "DeckRespiro",
+  "title": "Deck · lámina de respiro (foto a sangre + voz)",
+  "originalTitle": "Deck · lámina de respiro (foto a sangre + voz)",
+  "canvas": {
+   "x": 6240,
+   "y": 200
+  },
+  "alt": "Lámina de respiro con la foto a sangre y sólo la voz: ¿Y el cliente? Aprobó",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckRespiro.jpg"
+ },
+ {
+  "board": "DeckMosaico",
+  "title": "Deck · varias fotos: hoja de contactos, con profundidad",
+  "originalTitle": "✅ APROBADA · Deck · varias fotos: hoja de contactos, con profundidad",
+  "canvas": {
+   "x": 7280,
+   "y": 200
+  },
+  "alt": "Hoja de contactos con profundidad: fondo navy con caída de luz hacia la toma elegida y las copias con sombra, como sobre una mesa de revisión; Ésta. y la selección AXIS con el cursor de Dirección de arte",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckMosaico.jpg"
+ },
+ {
+  "board": "DeckTriptico",
+  "title": "Deck · tríptico: Escucha. Crea. Mide.",
+  "originalTitle": "Deck · tríptico: Escucha. Crea. Mide. (aprobada)",
+  "canvas": {
+   "x": 8320,
+   "y": 200
+  },
+  "alt": "Tríptico a sangre con tres tomas verticales del equipo Efeonce: en la panadería del cliente, en el estudio y en la sala del cliente; abajo, una palabra por toma, cada una con su esfera: Escucha. Crea. Mide.",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckTriptico.jpg"
+ },
+ {
+  "board": "DeckSeccionMediaAbajo",
+  "title": "Sección partida · esquina abajo: «¿Cuánto tarda tu campaña? En días.» con el muro de campaña",
+  "originalTitle": "Sección partida · esquina abajo: «¿Cuánto tarda tu campaña? En días.» con el muro de campaña",
+  "canvas": {
+   "x": 4160,
+   "y": 860
+  },
+  "alt": "Sección partida 03 de 5: panel de papel a la izquierda con la esquina de 300 px abajo; ¿Cuánto tarda tu campaña? En días; a la derecha, un director creativo con el polo de Efeonce clava la última pieza en un muro de campaña bajo luz cálida rasante y mira hacia el texto",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckSeccionMediaAbajo.jpg"
+ },
+ {
+  "board": "DeckSeccionMediaDerecha",
+  "title": "Sección partida · panel a la derecha: «¿Qué responde la IA? Tu marca.» con la directora de noche",
+  "originalTitle": "Sección partida · panel a la derecha: «¿Qué responde la IA? Tu marca.» con la directora de noche",
+  "canvas": {
+   "x": 5200,
+   "y": 860
+  },
+  "alt": "Sección partida 04 de 5: a la izquierda, de noche, una directora de marketing iluminada por su teléfono sonríe al descubrir la respuesta, con la ciudad detrás; panel de papel a la derecha con la esquina de 300 px arriba; ¿Qué responde la IA? Tu marca",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckSeccionMediaDerecha.jpg"
+ },
+ {
+  "board": "DeckBrochurePortadaOrbita",
+  "title": "SECCIÓN · FOTO · abre la sección de servicios: «¿Qué hace Efeonce? Crecer.» (brochure o propuesta)",
+  "originalTitle": "SECCIÓN · FOTO · abre la sección de servicios: «¿Qué hace Efeonce? Crecer.» (brochure o propuesta)",
+  "canvas": {
+   "x": 7280,
+   "y": 860
+  },
+  "alt": "Portada de brochure en el fondo navy de Efeonce: Nexa, con la chaqueta de Efeonce, mira a cámara frente a una órbita de luz teal gigante con una sola esfera; arriba a la izquierda el logo de Efeonce y Servicios · 2026, y abajo la voz ¿Qué hace Efeonce? Crecer. La respuesta «Crecer.» está seleccionada con un marco de ocho manijas y un cursor propio la apunta, como si el lector la estuviera eligiendo.",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckBrochurePortadaOrbita.jpg"
+ },
+ {
+  "board": "DeckBrochurePortadaEquipo",
+  "title": "SECCIÓN · FOTO · abre la sección del equipo: «¿Quién hace crecer tu marca? Este equipo.» (brochure o propuesta)",
+  "originalTitle": "✅ SECCIÓN · FOTO · abre la sección del equipo: «¿Quién hace crecer tu marca? Este equipo.» (brochure o propuesta)",
+  "canvas": {
+   "x": 8320,
+   "y": 860
+  },
+  "alt": "Lámina para presentar al equipo: Nexa al frente del equipo de Efeonce, con polo, chaqueta y hoodie con el isotipo, y cinco agentes mini robots, todos mirando a cámara; arriba el logo con Nuestro equipo y a la izquierda ¿Quién hace crecer tu marca? Este equipo.",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckBrochurePortadaEquipo.jpg"
+ },
+ {
+  "board": "DeckQuienesSomos",
+  "title": "SECCIÓN · FOTO · quiénes somos: «¿Quiénes somos? Un solo equipo.» con +10 años, 5 países, 1 interlocutor",
+  "originalTitle": "SECCIÓN · FOTO · quiénes somos: «¿Quiénes somos? Un solo equipo.» con +10 años, 5 países, 1 interlocutor",
+  "canvas": {
+   "x": 9360,
+   "y": 860
+  },
+  "alt": "Lámina de sección del registro cine: el equipo de Efeonce en el taller de noche, en pleno trabajo alrededor de una mesa de luz: una estratega marca una prueba, un director de arte sostiene otra con las dos manos y sonríe y un desarrollador se ríe al fondo; nadie posa; en la pared, piezas de muchas campañas. A la izquierda: Quiénes somos, ¿Quiénes somos? Un solo equipo., Creatividad, datos, medios y tecnología en una misma mesa, con un solo interlocutor, y tres cifras: +10 años como agencia, 5 países, 1 interlocutor",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckQuienesSomos.jpg"
+ },
+ {
+  "board": "DeckPorQue2",
+  "title": "SECCIÓN · FOTO · por qué lo hacemos: «¿Por qué lo hacemos así? Contigo.» con el Why y sus tres pilares",
+  "originalTitle": "SECCIÓN · FOTO · por qué lo hacemos: «¿Por qué lo hacemos así? Contigo.» con el Why y sus tres pilares",
+  "canvas": {
+   "x": 10400,
+   "y": 860
+  },
+  "alt": "Lámina de sección del registro cine: la directora de marketing del cliente maneja la pantalla y explica con orgullo una curva que sube, mientras la estratega de Efeonce la acompaña como coach, mirándola a ella. A la izquierda: Por qué lo hacemos, ¿Por qué lo hacemos así? Contigo., No te entregamos crecimiento. Lo construimos contigo, y te dejamos más capaz de sostenerlo., y tres pilares con su prueba: co-creación, educación y crecimiento integral",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPorQue2.jpg"
+ },
+ {
+  "board": "DeckTexto",
+  "title": "Deck · texto: el porqué, dicho en grande",
+  "originalTitle": "Deck · texto: el porqué, dicho en grande",
+  "canvas": {
+   "x": 0,
+   "y": 1800
+  },
+  "alt": "Lámina de texto en navy: ¿Con quién crece tu marca? y Contigo en 400 px con la esfera, tomada entera por la selección con el cursor de Cliente; abajo, No te entregamos crecimiento. Lo construimos contigo y te dejamos más capaz de sostenerlo, y los tres pilares",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckTexto.jpg"
+ },
+ {
+  "board": "DeckVinetas",
+  "title": "Deck · texto con viñetas: cuatro puntos numerados",
+  "originalTitle": "Deck · texto con viñetas: cuatro puntos numerados",
+  "canvas": {
+   "x": 1040,
+   "y": 1800
+  },
+  "alt": "Lámina navy: ¿Qué recibes al trabajar con nosotros? Un sistema; cuatro puntos numerados 01 a 04 y el 03, métricas en vivo en Greenhouse, seleccionado con el cursor de Growth",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckVinetas.jpg"
+ },
+ {
+  "board": "DeckEquipo",
+  "title": "Deck · el equipo: fotos reales del squad",
+  "originalTitle": "Deck · el equipo: fotos reales del squad",
+  "canvas": {
+   "x": 2080,
+   "y": 1800
+  },
+  "alt": "Lámina navy con profundidad: ¿Quién trabaja en tu cuenta? Personas reales.; el squad real en fichas de vidrio en 3D con su reflejo, alrededor de Julio, Responsable de Cuenta, al frente y más grande, con borde teal y seleccionado con el cursor de Cliente; a los lados María Fernanda, SEO Copywriter, y Andrés, SEO Specialist, a la izquierda, y Daniela, Creative Operations Lead, y Melkin, Senior Visual Designer, a la derecha; debajo, una órbita de luz como plataforma con Tu marca, al centro de todo",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckEquipo.jpg"
+ },
+ {
+  "board": "DeckDiaADia",
+  "title": "Deck · el día a día: cuatro momentos con horario",
+  "originalTitle": "Deck · el día a día: cuatro momentos con horario",
+  "canvas": {
+   "x": 3120,
+   "y": 1800
+  },
+  "alt": "Lámina navy: ¿Cómo es un día con nosotros? Así; la órbita como reloj del día: en la lente la líder de cuenta revisa resultados con el cliente a las 15:00, y los otros momentos como satélites en su hora, 09:00 terreno, 11:30 taller y 18:00 medición; 15:00 Revisamos contigo seleccionado con el cursor de Cliente",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckDiaADia.jpg"
+ },
+ {
+  "board": "DeckCotizacion",
+  "title": "Deck · tabla de cotización: Basic, Pro y Enterprise",
+  "originalTitle": "Deck · tabla de cotización: Basic, Pro y Enterprise",
+  "canvas": {
+   "x": 4160,
+   "y": 1800
+  },
+  "alt": "Lámina navy: ¿Cómo se cotiza? Por capacidad; tres planes de Greenhouse, Basic y Enterprise en contorno y Pro en papel, más alto, recomendado y seleccionado con el cursor de Finanzas; cada monto por definir, al mes, neto más IVA",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckCotizacion.jpg"
+ },
+ {
+  "board": "DeckClientes",
+  "title": "Deck · nuestros clientes: logos reales y su prueba",
+  "originalTitle": "Deck · nuestros clientes: logos reales y su prueba",
+  "canvas": {
+   "x": 5200,
+   "y": 1800
+  },
+  "alt": "Lámina en papel: ¿Quién confía en nosotros? Marcas líderes; +127 % de tráfico orgánico de Sky frente a LATAM Airlines, seleccionado con el cursor de Growth, y +180 % de ventas digitales de Bresler en escala gigante; abajo una grilla fina de 5 por 2 con nueve logos de clientes en un solo tono y la décima celda: operamos en Chile, EE. UU., Colombia, México y Perú",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckClientes.jpg"
+ },
+ {
+  "board": "DeckPartners",
+  "title": "Deck · nuestros partners: los nueve que se pueden declarar",
+  "originalTitle": "✅ APROBADA · Deck · nuestros partners: los nueve que se pueden declarar",
+  "canvas": {
+   "x": 6240,
+   "y": 1800
+  },
+  "alt": "Lámina navy: ¿Con quién construimos? Con los grandes; debajo la firma del logo de Efeonce con Partner oficial de, y los logos de HubSpot, Salesforce, Adobe, Microsoft, AWS, Google Cloud, Claude, OpenAI y BytePlus en blanco y con el mismo peso, Claude seleccionado con el cursor de Agentes IA",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPartners.jpg"
+ },
+ {
+  "board": "DeckStack",
+  "title": "Deck · nuestro stack: tres capas de herramientas sobre Efeonce",
+  "originalTitle": "✅ APROBADA · Deck · nuestro stack: tres capas de herramientas sobre Efeonce",
+  "canvas": {
+   "x": 7280,
+   "y": 1800
+  },
+  "alt": "Lámina navy del stack: a la izquierda ¿Con qué trabajamos? Con lo mejor. y 16 herramientas en tres capas, conectadas en Efeonce; a la derecha, en isométrica, tres capas de vidrio apiladas con las fichas de sus herramientas de pie —Crear arriba (Photoshop, Illustrator, Premiere y After Effects en su fondo oscuro nativo, Firefly, Higgsfield en negro, Magnific, Frame.io), Medir en el medio en el acento (Semrush, Ahrefs, Screaming Frog, Visibility Grader) y Operar abajo (Notion, Slack, Teams, Microsoft 365)— sobre una base de luz teal rodeada por una órbita con su arco de acento; junto a la base, Todo se conecta en y el logo de Efeonce, donde cada pieza se mide",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckStack.jpg"
+ },
+ {
+  "board": "DeckDiaADiaHerramientas",
+  "title": "el día a día con las herramientas: Teams, Notion, Frame.io, Efeonce Insights y el panel de Greenhouse",
+  "originalTitle": "✅ APROBADA · el día a día con las herramientas: Teams, Notion, Frame.io, Efeonce Insights y el panel de Greenhouse",
+  "canvas": {
+   "x": 8320,
+   "y": 1800
+  },
+  "alt": "Lámina navy con profundidad: Tu día a día con Efeonce, ¿Cómo trabajamos contigo? Así.; al centro el panel de Greenhouse gigante e inclinado en 3D, con su reflejo sobre una órbita de luz que hace de plataforma; alrededor, a distintas profundidades, cuatro fichas con haces de luz hacia el panel: Microsoft Teams, nos reunimos; Notion, proyectos y tareas; Frame.io, revisas las piezas; Efeonce Insights, reportes automáticos; abajo, Tu panel en Greenhouse, todo en un solo lugar, en vivo",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckDiaADiaHerramientas.jpg"
+ },
+ {
+  "board": "DeckVivoAvanza",
+  "title": "vívelo 1 · el trabajo avanza a la vista: el plan en Notion y la aprobación en Frame.io",
+  "originalTitle": "✅ APROBADA · vívelo 1 · el trabajo avanza a la vista: el plan en Notion y la aprobación en Frame.io",
+  "canvas": {
+   "x": 9360,
+   "y": 1800
+  },
+  "alt": "Lámina navy con profundidad: Tu día a día con Efeonce, ¿Cómo avanza tu proyecto? A la vista.; en 3D, el plan de la campaña en Notion girado hacia la revisión de Frame.io, que es la protagonista, grande, con su reflejo sobre una órbita de luz: la pieza con un comentario marcado, Tú en la v1: ¿Podemos subir el logo?, Efeonce en la v2: Listo, quedó en la v2, y el botón Aprobar encendido, enmarcado con corchetes y tu cursor sobre él",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckVivoAvanza.jpg"
+ },
+ {
+  "board": "DeckVivoResultados",
+  "title": "vívelo 2 · los resultados en vivo: Efeonce Insights, el panel de Greenhouse y la revisión en Teams",
+  "originalTitle": "✅ APROBADA · vívelo 2 · los resultados en vivo: Efeonce Insights, el panel de Greenhouse y la revisión en Teams",
+  "canvas": {
+   "x": 10400,
+   "y": 1800
+  },
+  "alt": "Lámina navy con profundidad: Tu día a día con Efeonce, ¿Cómo va? En vivo.; el panel de Greenhouse gigante e inclinado en 3D sobre una órbita de luz; al frente, encendida, la tarjeta de Efeonce Insights, Tu reporte de la semana está listo, con +22 % de tráfico orgánico, +14 keywords top 10 y 61 % de citabilidad IA como datos de muestra, y el botón Ver en Greenhouse con tu cursor; arriba, flotando, la invitación de Microsoft Teams, Revisión de resultados, jueves 10:00",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckVivoResultados.jpg"
+ },
+ {
+  "board": "DeckCotizacionEscena",
+  "title": "cotización en escena: los tres planes en 3D sobre la órbita, Pro al frente",
+  "originalTitle": "ALTERNATIVA · cotización en escena: los tres planes en 3D sobre la órbita, Pro al frente",
+  "canvas": {
+   "x": 11440,
+   "y": 1800
+  },
+  "alt": "Lámina navy con profundidad: ¿Cómo se cotiza? Por capacidad; los planes Basic, Pro y Enterprise como fichas de vidrio en 3D sobre la órbita de luz, Pro al frente en papel con el cursor de Finanzas",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckCotizacionEscena.jpg"
+ },
+ {
+  "board": "DeckCotizacionVivo",
+  "title": "la cotización en vivo: cada línea a la vista y el cursor en «Aprobar propuesta»",
+  "originalTitle": "ALTERNATIVA · la cotización en vivo: cada línea a la vista y el cursor en «Aprobar propuesta»",
+  "canvas": {
+   "x": 12480,
+   "y": 1800
+  },
+  "alt": "Lámina navy: ¿Cuánto cuesta? Sin letra chica; la cotización tal como la recibe el cliente, con equipo, Greenhouse Pro y Sample Sprint, el total y el cursor del cliente en Aprobar propuesta",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckCotizacionVivo.jpg"
+ },
+ {
+  "board": "DeckAgenda",
+  "title": "Deck · agenda: cinco temas",
+  "originalTitle": "✅ APROBADA · Deck · agenda: cinco temas",
+  "canvas": {
+   "x": 0,
+   "y": 2900
+  },
+  "alt": "Lámina en papel: ¿Qué veremos hoy? Cinco temas; lista 01 a 05 con 04 Nuestra propuesta seleccionada con el cursor de Cliente",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckAgenda.jpg"
+ },
+ {
+  "board": "DeckSeguro",
+  "title": "Deck · por qué es seguro: cada riesgo con su cobertura",
+  "originalTitle": "✅ APROBADA · Deck · por qué es seguro: cada riesgo con su cobertura",
+  "canvas": {
+   "x": 1040,
+   "y": 2900
+  },
+  "alt": "Lámina en papel: ¿Y si no funciona? Empiezas chico; tabla de cuatro riesgos con su cobertura: Sample Sprint, métricas con umbral, traspaso documentado y transparencia radical; la primera fila seleccionada con el cursor de Cliente",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckSeguro.jpg"
+ },
+ {
+  "board": "DeckCaso",
+  "title": "Deck · caso de éxito: Sky en 12 meses (la foto es de EJEMPLO: se reemplaza por una del caso real)",
+  "originalTitle": "✅ APROBADA · Deck · caso de éxito: Sky en 12 meses (la foto es de EJEMPLO: se reemplaza por una del caso real)",
+  "canvas": {
+   "x": 2080,
+   "y": 2900
+  },
+  "alt": "Sección partida con el caso de Sky Airlines: ¿Qué cambió con Sky? Más rápido; +2.000 piezas aprobadas, 39 campañas, 88 % a tiempo y −25 % de tiempo de producción, este último seleccionado con el cursor de Performance; foto del equipo creativo a la derecha",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckCaso.jpg"
+ },
+ {
+  "board": "DeckGrafico",
+  "title": "Deck · gráfico: el dato con su anotación",
+  "originalTitle": "Deck · gráfico: el dato con su anotación",
+  "canvas": {
+   "x": 3120,
+   "y": 2900
+  },
+  "alt": "Lámina en papel: ¿Cuánto más rápido? Un cuarto; barras del tiempo de producción en índice, antes 100 y con Efeonce 75, con la anotación −25 %; debajo cuatro cifras del caso Sky",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckGrafico.jpg"
+ },
+ {
+  "board": "DeckTestimonio",
+  "title": "Deck · testimonio: la cita real de Sky",
+  "originalTitle": "Deck · testimonio: la cita real de Sky",
+  "canvas": {
+   "x": 4160,
+   "y": 2900
+  },
+  "alt": "Lámina navy del testimonio de Sky: ¿Cómo es trabajar con nosotros?; la frase del cliente a escala de titular entre comillas teal, «Agilizar mucho la carga de trabajo», seleccionada con el cursor de Cliente; debajo la cita textual completa y la firma, logo de Sky, Adriana Contreras, Team SKY; a la derecha la prueba del mismo caso: +2.000 piezas aprobadas, 88 % entregadas a tiempo y −25 % de tiempo de producción, con su fuente",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckTestimonio.jpg"
+ },
+ {
+  "board": "DeckPlan",
+  "title": "Deck · plan de 90 días: la trayectoria que sube en tres tramos",
+  "originalTitle": "✅ APROBADA · Deck · plan de 90 días: la trayectoria que sube en tres tramos",
+  "canvas": {
+   "x": 5200,
+   "y": 2900
+  },
+  "alt": "Lámina navy con profundidad: Plan de trabajo, ¿Qué pasa al empezar? Movimiento., 90 días a la primera evidencia medible, en tres tramos de 30; a la derecha, una trayectoria de luz que sube en perspectiva con tres paradas y una ficha de vidrio cada una, cada vez más alta: 1, días 1–30, Arranque, encendida en teal con Estás aquí; 2, días 31–60, Ritmo pleno; 3, días 61–90, Evidencia; detrás, un 90 gigante y tenue como horizonte",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPlan.jpg"
+ },
+ {
+  "board": "DeckProximosPasos",
+  "title": "Deck · próximos pasos con impacto: la agenda del diagnóstico abierta y el cursor en «Agenda un diagnóstico»",
+  "originalTitle": "Deck · próximos pasos con impacto: la agenda del diagnóstico abierta y el cursor en «Agenda un diagnóstico»",
+  "canvas": {
+   "x": 6240,
+   "y": 2900
+  },
+  "alt": "Lámina navy con impacto: ¿Y ahora qué sigue? Empecemos; la agenda del diagnóstico sin costo abierta con martes 30 a las 11:30 elegido y el cursor en Agenda un diagnóstico; detrás, en profundidad, Sample Sprint y Operación; la órbita rodea la escena",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckProximosPasos.jpg"
+ },
+ {
+  "board": "DeckPorQue",
+  "title": "Deck · por qué elegirnos: un muro de cifras",
+  "originalTitle": "Deck · por qué elegirnos: un muro de cifras",
+  "canvas": {
+   "x": 7280,
+   "y": 2900
+  },
+  "alt": "Lámina en papel: ¿Por qué Efeonce? Por esto; seis cifras: +10 años, 5 mercados, +90 empresas, 1 interlocutor seleccionado, en vivo en Greenhouse y Revenue Enabled",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPorQue.jpg"
+ },
+ {
+  "board": "DeckHibrido",
+  "title": "Deck · fuerza de trabajo híbrida: personas y agentes",
+  "originalTitle": "✅ APROBADA · Deck · fuerza de trabajo híbrida: personas y agentes",
+  "canvas": {
+   "x": 1040,
+   "y": 3860
+  },
+  "alt": "Lámina navy: ¿Quién hace el trabajo? Personas y agentes, con dos cursores sobre la misma selección, Estrategia y Agente IA; una escalera de cuatro tramos de autoridad del agente",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckHibrido.jpg"
+ },
+ {
+  "board": "DeckBex",
+  "title": "VARIANTE · Deck · AEO y la metodología BeX (la versión de la escalera también está aprobada)",
+  "originalTitle": "✅ APROBADA · VARIANTE · Deck · AEO y la metodología BeX (la versión de la escalera también está aprobada)",
+  "canvas": {
+   "x": 2080,
+   "y": 3860
+  },
+  "alt": "Lámina navy de Efeonce con el acento azul de Engine: ¿Te recomienda la IA? Capa por capa; escalera de cinco niveles, Be Found, Be Readable, Be Correct seleccionado, Be Actionable y Be Intrinsic",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckBex.jpg"
+ },
+ {
+  "board": "DeckGrader",
+  "title": "Deck · Brand Visibility Grader",
+  "originalTitle": "✅ APROBADA · Deck · Brand Visibility Grader",
+  "canvas": {
+   "x": 3120,
+   "y": 3860
+  },
+  "alt": "Lámina navy de Efeonce con el acento azul de Engine: ¿Cómo te ve la IA? Mídelo; un anillo segmentado con las siete dimensiones del puntaje y su peso, 100 puntos al centro, y el CTA Mide tu marca gratis",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckGrader.jpg"
+ },
+ {
+  "board": "DeckPropuestaAEO",
+  "title": "Propuesta · AEO (acento Engine)",
+  "originalTitle": "✅ APROBADA · Propuesta · AEO (acento Engine)",
+  "canvas": {
+   "x": 4160,
+   "y": 3860
+  },
+  "alt": "Lámina de propuesta AEO en navy de Efeonce con el acento azul de Engine: ¿Te encuentra la IA? Visible; lente con foto y cuatro pasos: diagnóstico sin costo seleccionado, Foundation, operación y plataforma",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPropuestaAEO.jpg"
+ },
+ {
+  "board": "DeckPropuestaCreativa",
+  "title": "Propuesta · servicios creativos (acento Brand)",
+  "originalTitle": "✅ APROBADA · Propuesta · servicios creativos (acento Brand)",
+  "canvas": {
+   "x": 5200,
+   "y": 3860
+  },
+  "alt": "Lámina de propuesta creativa en navy de Efeonce con el acento naranja de Brand: ¿Cómo escalas tu contenido? Con sistema; lente con foto y tres pasos: Creative Sprint seleccionado, Creative Capacity y Creative Studio",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPropuestaCreativa.jpg"
+ },
+ {
+  "board": "DeckPropuestaWeb",
+  "title": "Propuesta · web (acento Engine)",
+  "originalTitle": "✅ APROBADA · Propuesta · web (acento Engine)",
+  "canvas": {
+   "x": 6240,
+   "y": 3860
+  },
+  "alt": "Lámina de propuesta web en navy de Efeonce con el acento azul de Engine: ¿Para quién es tu web? Para todos; lente con foto y cuatro pasos: Web Foundation seleccionado, Conversion Website, Agent-Ready y Performance Ops",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPropuestaWeb.jpg"
+ },
+ {
+  "board": "DeckPropuestaRevOps",
+  "title": "Propuesta · RevOps (acento Revenue HubSpot)",
+  "originalTitle": "✅ APROBADA · Propuesta · RevOps (acento Revenue HubSpot)",
+  "canvas": {
+   "x": 7280,
+   "y": 3860
+  },
+  "alt": "Lámina de propuesta RevOps en navy de Efeonce con el acento magenta de Revenue: ¿Tu CRM vende contigo? Con agentes; lente con foto y cuatro pasos: evaluación sin costo seleccionada, Blueprint, implementación y operación gestionada",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPropuestaRevOps.jpg"
+ },
+ {
+  "board": "DeckHibridoEscena",
+  "title": "Deck · fuerza híbrida, versión escena: persona y agente sobre la misma pieza",
+  "originalTitle": "✅ APROBADA · Deck · fuerza híbrida, versión escena: persona y agente sobre la misma pieza",
+  "canvas": {
+   "x": 8320,
+   "y": 3860
+  },
+  "alt": "Lámina a sangre: una estratega de Efeonce con polo y lanyard señala el gráfico en un monitor grande; sobre el monitor dos selecciones, ella toma el gráfico con el cursor de Estrategia y un agente toma las imágenes con el cursor de Agente IA; a la izquierda ¿Quién hace el trabajo? Personas y agentes",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckHibridoEscena.jpg"
+ },
+ {
+  "board": "DeckBexEscalera",
+  "title": "Deck · BeX mejorada: la escalera de cinco peldaños que se iluminan al subir",
+  "originalTitle": "✅ APROBADA · Deck · BeX mejorada: la escalera de cinco peldaños que se iluminan al subir",
+  "canvas": {
+   "x": 9360,
+   "y": 3860
+  },
+  "alt": "Lámina de la metodología BeX en el fondo navy de Efeonce: a la izquierda ¿Te recomienda la IA? Capa por capa; a la derecha una escalera de cinco peldaños de vidrio azul que sangran al borde y se iluminan al subir, Be Found, Be Readable, Be Correct, Be Actionable y el quinto, Be Intrinsic, en un bloque sólido azul; Be Correct seleccionado con el cursor SEO · AEO",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckBexEscalera.jpg"
+ },
+ {
+  "board": "DeckHibridoCarreraLentes",
+  "title": "Deck · fuerza híbrida, cine v2: Nexa biónica con lentes, isotipo oficial y luces de partida",
+  "originalTitle": "✅ APROBADA · Deck · fuerza híbrida, cine v2: Nexa biónica con lentes, isotipo oficial y luces de partida (aprobada)",
+  "canvas": {
+   "x": 13520,
+   "y": 3860
+  },
+  "alt": "Plano medio cinematográfico: Nexa, con traje biónico navy y blanco con el isotipo de Efeonce en el pecho y lentes transparentes azulados, mira a cámara en la partida; cinco mini robots agentes de caras alegres la rodean y al fondo se encienden cinco luces de partida; a la izquierda ¿Listos para la carrera? Vamos, seleccionado con el cursor de Nexa",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckHibridoCarreraLentes.jpg"
+ },
+ {
+  "board": "DeckPropuestaCreativaDigital",
+  "title": "Propuesta · servicios creativos digitales: la directora dirige una órbita de pantallas",
+  "originalTitle": "✅ APROBADA · Propuesta · servicios creativos digitales: la directora dirige una órbita de pantallas (aprobada)",
+  "canvas": {
+   "x": 14560,
+   "y": 3860
+  },
+  "alt": "Propuesta de servicios creativos digitales en el fondo navy de Efeonce: una directora creativa con el hoodie de Efeonce dirige con las manos una órbita de pantallas flotantes en formatos story, reel, feed, video y banner; a la izquierda ¿Tu marca en cada pantalla? En todas, seleccionado con el cursor Cliente; debajo social, campañas, video, motion y performance, la prueba de Sky y las tres formas de comprar",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPropuestaCreativaDigital.jpg"
+ },
+ {
+  "board": "DeckLineasNexaOrbitas",
+  "title": "Deck · líneas de servicio, Nexa con punch: cinco esferas de luz, una por línea, orbitan a su alrededor (apr",
+  "originalTitle": "✅ APROBADA · Deck · líneas de servicio, Nexa con punch: cinco esferas de luz, una por línea, orbitan a su alrededor (apr",
+  "canvas": {
+   "x": 15600,
+   "y": 3860
+  },
+  "alt": "Lámina de líneas de servicio en el fondo navy de Efeonce: Nexa, con la chaqueta de Efeonce, mira a cámara mientras cinco esferas de luz en teal, naranja, azul, rojo y magenta orbitan a su alrededor dejando estelas, y la naranja flota sobre su palma; a la izquierda el logo de Efeonce, Cinco líneas. Una sola relación, y la pila Growth, Brand, Engine, Voice y Revenue, cada palabra en su color y seleccionada con el cursor de Nexa",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckLineasNexaOrbitas.jpg"
+ },
+ {
+  "board": "DeckPropuestaWebCine",
+  "title": "Propuesta · web con punch: una web holográfica que usan personas, buscadores y agentes",
+  "originalTitle": "✅ APROBADA · Propuesta · web con punch: una web holográfica que usan personas, buscadores y agentes (aprobada)",
+  "canvas": {
+   "x": 16640,
+   "y": 3860
+  },
+  "alt": "Propuesta web en el fondo navy de Efeonce con acento azul: un líder web con el polo de Efeonce mira a cámara y acomoda con la mano un módulo dentro de una web holográfica gigante de luz azul, que usan a la vez un cursor, el haz de un buscador y tres agentes mini robots de caras alegres; a la izquierda ¿Para quién es tu web? Para todos, seleccionado con el cursor Cliente, y las cuatro formas de empezar: Web Foundation, Conversion Website, Agent-Ready y Performance Ops",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPropuestaWebCine.jpg"
+ },
+ {
+  "board": "DeckPropuestaAEOCine",
+  "title": "Propuesta · AEO con punch: entre miles de marcas, la IA ilumina una",
+  "originalTitle": "✅ APROBADA · Propuesta · AEO con punch: entre miles de marcas, la IA ilumina una (aprobada)",
+  "canvas": {
+   "x": 17680,
+   "y": 3860
+  },
+  "alt": "Propuesta AEO en el fondo navy de Efeonce con acento azul: una estratega SEO con el polo de Efeonce mira a cámara; detrás, entre miles de tarjetas oscuras que se pierden en la distancia, el haz azul de una burbuja de respuesta de IA ilumina una sola tarjeta, que brilla y se adelanta; a la izquierda ¿Te encuentra la IA? Visible, seleccionado con el cursor Cliente, y las cuatro formas de empezar: Diagnóstico sin costo, Foundation, Operación y Plataforma",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPropuestaAEOCine.jpg"
+ },
+ {
+  "board": "DeckPropuestaRevOpsCine",
+  "title": "Propuesta · RevOps con punch: un moño de luz (captar, cerrar, crecer) con agentes en el flujo",
+  "originalTitle": "✅ APROBADA · Propuesta · RevOps con punch: un moño de luz (captar, cerrar, crecer) con agentes en el flujo (aprobada)",
+  "canvas": {
+   "x": 18720,
+   "y": 3860
+  },
+  "alt": "Propuesta RevOps en el fondo navy de Efeonce con acento magenta: una líder RevOps con la chaqueta de Efeonce mira a cámara y dirige con la mano el nudo brillante de un moño de luz magenta y azul, donde miles de partículas convergen y vuelven a abrirse, con tres agentes mini robots viajando en el flujo; a la izquierda ¿Tu CRM vende contigo? Con agentes, seleccionado con el cursor Cliente, y las cuatro formas de empezar: Evaluación sin costo, Blueprint, Implementación y Operación gestionada",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPropuestaRevOpsCine.jpg"
+ },
+ {
+  "board": "DeckPortadaPrincipal3",
+  "title": "FOTO · Brochure: Nexa frente a la órbita · «¿Qué hace Efeonce? Crecer.»",
+  "originalTitle": "OPCIÓN · FOTO · Brochure: Nexa frente a la órbita · «¿Qué hace Efeonce? Crecer.»",
+  "canvas": {
+   "x": 13520,
+   "y": 4700
+  },
+  "alt": "Portada principal de brochure cinematográfica: Nexa frente a la órbita de luz teal; a la izquierda, arriba el logo de Efeonce de 500 px; la voz de la línea gráfica: Brochure · Servicios 2026, la pregunta «¿Qué hace Efeonce?» con su anillo, la respuesta «Crecer.» con su esfera y la evidencia «Cinco líneas de servicio: Growth · Brand · Engine · Voice · Revenue».",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPortadaPrincipal3.jpg"
+ },
+ {
+  "board": "DeckPortadaPrincipal6",
+  "title": "FOTO · Brochure: Nexa y las cinco líneas · «¿Qué hace Efeonce? Crecer.»",
+  "originalTitle": "OPCIÓN · FOTO · Brochure: Nexa y las cinco líneas · «¿Qué hace Efeonce? Crecer.»",
+  "canvas": {
+   "x": 14560,
+   "y": 4700
+  },
+  "alt": "Portada principal de brochure cinematográfica: Nexa con cinco esferas de luz, una por línea de servicio; a la izquierda, arriba el logo de Efeonce de 500 px; la voz de la línea gráfica: Brochure · Servicios 2026, la pregunta «¿Qué hace Efeonce?» con su anillo, la respuesta «Crecer.» con su esfera y la evidencia «Cinco líneas de servicio: Growth · Brand · Engine · Voice · Revenue»; abajo, la burbuja efeoncepro.com.",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPortadaPrincipal6.jpg"
+ },
+ {
+  "board": "DeckPortadaPrincipal6Sel",
+  "title": "FOTO · la de las cinco líneas, con selección y cursor de Nexa en «Crecer.»",
+  "originalTitle": "PRUEBA · FOTO · la de las cinco líneas, con selección y cursor de Nexa en «Crecer.»",
+  "canvas": {
+   "x": 15600,
+   "y": 4700
+  },
+  "alt": "Portada principal de brochure cinematográfica: Nexa con cinco esferas de luz; a la izquierda, arriba el logo de Efeonce de 500 px; la voz de la línea gráfica: Brochure · Servicios 2026, la pregunta «¿Qué hace Efeonce?» con su anillo, la respuesta «Crecer.» con su esfera y la evidencia «Cinco líneas de servicio: Growth · Brand · Engine · Voice · Revenue»; abajo, la burbuja efeoncepro.com. «Crecer.» está seleccionado con un marco de ocho manijas y el cursor de un colaborador con la etiqueta Nexa.",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPortadaPrincipal6Sel.jpg"
+ },
+ {
+  "board": "DeckPortadaPrincipal4",
+  "title": "FOTO · Brochure: Nexa y el equipo · «¿Qué hace Efeonce? Crecer.»",
+  "originalTitle": "OPCIÓN · FOTO · Brochure: Nexa y el equipo · «¿Qué hace Efeonce? Crecer.»",
+  "canvas": {
+   "x": 16640,
+   "y": 4700
+  },
+  "alt": "Portada principal de brochure cinematográfica: Nexa al frente del equipo de Efeonce, con polo, chaqueta y hoodie, y los agentes mini robots, todos mirando a cámara; a la izquierda, arriba el logo de Efeonce de 500 px y la voz de la línea gráfica: Brochure · Servicios 2026, la pregunta «¿Qué hace Efeonce?» con su anillo, la respuesta «Crecer.» con su esfera y la evidencia «Cinco líneas de servicio: Growth · Brand · Engine · Voice · Revenue».",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPortadaPrincipal4.jpg"
+ },
+ {
+  "board": "DeckPortadaLineaGrowth",
+  "title": "FOTO · Brochure Growth Strategy & Measurement · «¿Lo medimos? Siempre.»",
+  "originalTitle": "✅ APROBADA · FOTO · Brochure Growth Strategy & Measurement · «¿Lo medimos? Siempre.»",
+  "canvas": {
+   "x": 13520,
+   "y": 5500
+  },
+  "alt": "Portada de brochure de la línea Growth Strategy & Measurement, registro cine: Una estratega de Efeonce con polo y lanyard revisa un tablero de resultados en un monitor; a la izquierda el logo de Efeonce de 500 px y la voz de la línea gráfica con el acento teal de la línea: Brochure · Growth Strategy, la pregunta «¿Lo medimos?» con su anillo, la respuesta «Siempre.» con su esfera y la evidencia «Seis capacidades: Estrategia · GTM · Revenue enablement · Analítica · Medición · Orquestación».",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPortadaLineaGrowth.jpg"
+ },
+ {
+  "board": "DeckPortadaLineaBrand",
+  "title": "FOTO · Brochure Creative Services · «¿Quién crea mi contenido? Tu squad.»",
+  "originalTitle": "✅ APROBADA · FOTO · Brochure Creative Services · «¿Quién crea mi contenido? Tu squad.»",
+  "canvas": {
+   "x": 14560,
+   "y": 5500
+  },
+  "alt": "Portada de brochure de la línea Creative Services, registro cine: Una directora creativa de Efeonce con hoodie dirige con las manos una constelación de piezas creativas; a la izquierda el logo de Efeonce de 500 px y la voz de la línea gráfica con el acento naranja de la línea: Brochure · Creative Services, la pregunta «¿Quién crea mi contenido?» con su anillo, la respuesta «Tu squad.» con su esfera y la evidencia «Seis capacidades: Squad creativo · Brand systems · Campañas · Contenido y social · Audiovisual · Run & Gun».",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPortadaLineaBrand.jpg"
+ },
+ {
+  "board": "DeckPortadaLineaEngine",
+  "title": "FOTO · Brochure Digital Services & Engineering · «¿Te encuentra la IA? Visible.»",
+  "originalTitle": "✅ APROBADA · FOTO · Brochure Digital Services & Engineering · «¿Te encuentra la IA? Visible.»",
+  "canvas": {
+   "x": 15600,
+   "y": 5500
+  },
+  "alt": "Portada de brochure de la línea Digital Services & Engineering, registro cine: Un ingeniero de Efeonce con polo toca una web holográfica que usan personas y pequeños agentes robot; a la izquierda el logo de Efeonce de 500 px y la voz de la línea gráfica con el acento azul de la línea: Brochure · Digital Services, la pregunta «¿Te encuentra la IA?» con su anillo, la respuesta «Visible.» con su esfera y la evidencia «Cinco capacidades: Search Visibility · Web Experience · Medición · Sistemas de agentes · Automatización».",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPortadaLineaEngine.jpg"
+ },
+ {
+  "board": "DeckPortadaLineaVoice",
+  "title": "FOTO · Brochure Media & Distribution · «¿Dónde invierto? Donde rinde.»",
+  "originalTitle": "✅ APROBADA · FOTO · Brochure Media & Distribution · «¿Dónde invierto? Donde rinde.»",
+  "canvas": {
+   "x": 16640,
+   "y": 5500
+  },
+  "alt": "Portada de brochure de la línea Media & Distribution, registro cine: Una líder de medios de Efeonce con la chaqueta sostiene una esfera de luz naranja de la que salen haces hacia muchas pantallas; a la izquierda el logo de Efeonce de 500 px y la voz de la línea gráfica con el acento rojo anaranjado de la línea: Brochure · Media & Distribution, la pregunta «¿Dónde invierto?» con su anillo, la respuesta «Donde rinde.» con su esfera y la evidencia «Tres soluciones y una operación: Estrategia de distribución · Performance · Influencia y earned · Managed Media».",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPortadaLineaVoice.jpg"
+ },
+ {
+  "board": "DeckPortadaLineaRevenue",
+  "title": "FOTO · Brochure RevOps & CRM · «¿Y el reporte del viernes? Ya lo viste.»",
+  "originalTitle": "✅ APROBADA · FOTO · Brochure RevOps & CRM · «¿Y el reporte del viernes? Ya lo viste.»",
+  "canvas": {
+   "x": 17680,
+   "y": 5500
+  },
+  "alt": "Portada de brochure de la línea RevOps & CRM, registro cine: Una líder de RevOps de Efeonce con la chaqueta dirige con la mano el nudo de un moño de luz magenta y azul, con agentes robot en el flujo; a la izquierda el logo de Efeonce de 500 px y la voz de la línea gráfica con el acento magenta de HubSpot de la línea: Brochure · RevOps & CRM, la pregunta «¿Y el reporte del viernes?» con su anillo, la respuesta «Ya lo viste.» con su esfera y la evidencia «Seis soluciones: Marketing y AEO · Ventas y pipeline · Revenue lifecycle · Servicio · Datos y CRM · Operación con agentes».",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPortadaLineaRevenue.jpg"
+ },
+ {
+  "board": "DeckBrochureContraHorizonte",
+  "title": "FOTO · Nexa camina hacia la órbita",
+  "originalTitle": "✅ APROBADA · FOTO · Nexa camina hacia la órbita",
+  "canvas": {
+   "x": 13520,
+   "y": 6300
+  },
+  "alt": "Contraportada de brochure: Nexa, de espaldas con la chaqueta de Efeonce, camina hacia un anillo de luz teal vertical sobre un piso que lo refleja; a la izquierda el logo, ¿Conversamos? Cuando quieras, el eslogan Empower your Growth, la burbuja efeoncepro.com con los íconos de redes sociales y el correo, los teléfonos y la dirección con sus íconos.",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckBrochureContraHorizonte.jpg"
+ },
+ {
+  "board": "DeckBrochureContraAmanecer",
+  "title": "FOTO · Nexa y un agente hacia la órbita al amanecer (alternativa de la aprobada)",
+  "originalTitle": "✅ APROBADA · FOTO · Nexa y un agente hacia la órbita al amanecer (alternativa de la aprobada)",
+  "canvas": {
+   "x": 14560,
+   "y": 6300
+  },
+  "alt": "Contraportada alternativa de brochure: Nexa, de espaldas con la chaqueta de Efeonce y junto a un agente mini robot, camina por una pasarela sobre el agua hacia una órbita de luz teal inclinada que sale sobre el horizonte al amanecer; a la izquierda el logo, ¿Conversamos? Cuando quieras, el eslogan Empower your Growth, la burbuja con las redes y el contacto completo.",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckBrochureContraAmanecer.jpg"
+ },
+ {
+  "board": "DeckBrochureContraOrbitaGigante",
+  "title": "SIN FOTO · la órbita gigante (pareja de las portadas con foto)",
+  "originalTitle": "✅ APROBADA · SIN FOTO · la órbita gigante (pareja de las portadas con foto)",
+  "canvas": {
+   "x": 15600,
+   "y": 6300
+  },
+  "alt": "Contraportada sin foto: la órbita teal gigante con brillo, cortada por el borde derecho, con su esfera encendida arriba; a la izquierda el logo de Efeonce, ¿Conversamos? Cuando quieras, el eslogan Empower your Growth, la burbuja con los íconos de redes y el contacto completo. «Cuando quieras.» está enmarcado con corchetes abiertos y un cursor propio apunta a la respuesta, como una invitación a hacer clic.",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckBrochureContraOrbitaGigante.jpg"
+ },
+ {
+  "board": "DeckPropuestaPortadaCliente1",
+  "title": "SIN FOTO · propuesta: la órbita gigante sostiene el logo del cliente (plantilla)",
+  "originalTitle": "✅ APROBADA · SIN FOTO · propuesta: la órbita gigante sostiene el logo del cliente (plantilla)",
+  "canvas": {
+   "x": 13520,
+   "y": 7100
+  },
+  "alt": "Portada de propuesta comercial sin foto: una órbita teal gigante contiene el espacio para el logo del cliente; a la izquierda el logo de Efeonce, la voz de la línea gráfica: Propuesta comercial · Octubre 2026, la pregunta «¿Cómo crecemos en 2027?» con su anillo, la respuesta «Con foco.» con su esfera y la evidencia «Preparada para [Cliente] · Confidencial» y la burbuja efeoncepro.com. El logo del cliente está seleccionado con un marco de ocho manijas y el cursor de un colaborador con la etiqueta Cliente.",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPropuestaPortadaCliente1.jpg"
+ },
+ {
+  "board": "DeckPropuestaPortadaCliente2",
+  "title": "SIN FOTO · propuesta: la misma con SKY (ejemplo)",
+  "originalTitle": "✅ APROBADA · SIN FOTO · propuesta: la misma con SKY (ejemplo)",
+  "canvas": {
+   "x": 14560,
+   "y": 7100
+  },
+  "alt": "Portada de propuesta comercial sin foto con un cliente de ejemplo: el logo de SKY dentro de la órbita teal gigante; a la izquierda el logo de Efeonce, la voz de la línea gráfica: Propuesta comercial · Octubre 2026, la pregunta «¿Cómo crecemos en 2027?» con su anillo, la respuesta «Con foco.» con su esfera y la evidencia «Preparada para SKY · Confidencial» y la burbuja efeoncepro.com. El logo de SKY está seleccionado con un marco de ocho manijas y el cursor de un colaborador con la etiqueta SKY.",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPropuestaPortadaCliente2.jpg"
+ },
+ {
+  "board": "DeckPropuestaPortadaAmanecerSky",
+  "title": "SIN FOTO · propuesta: la órbita sale como el sol, con SKY dentro (ejemplo)",
+  "originalTitle": "✅ APROBADA · SIN FOTO · propuesta: la órbita sale como el sol, con SKY dentro (ejemplo)",
+  "canvas": {
+   "x": 15600,
+   "y": 7100
+  },
+  "alt": "Portada de propuesta comercial sin foto, centrada: arriba el logo de Efeonce, la voz de la línea gráfica: Propuesta comercial · Octubre 2026, la pregunta «¿Cómo crecemos en 2027?» con su anillo, la respuesta «Con foco.» con su esfera y la evidencia «Preparada para SKY · Confidencial» y la burbuja efeoncepro.com; abajo la órbita sale como el sol, con su esfera en el punto más alto y el logo de SKY dentro, seleccionado con un marco de ocho manijas y el cursor de un colaborador con la etiqueta SKY.",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPropuestaPortadaAmanecerSky.jpg"
+ },
+ {
+  "board": "DeckPropuestaPortadaAmanecerCliente",
+  "title": "SIN FOTO · propuesta: la órbita sale como el sol, con el logo del cliente dentro (plantilla)",
+  "originalTitle": "✅ APROBADA · SIN FOTO · propuesta: la órbita sale como el sol, con el logo del cliente dentro (plantilla)",
+  "canvas": {
+   "x": 16640,
+   "y": 7100
+  },
+  "alt": "Portada de propuesta comercial sin foto, centrada: arriba el logo de Efeonce, la voz de la línea gráfica: Propuesta comercial · Octubre 2026, la pregunta «¿Cómo crecemos en 2027?» con su anillo, la respuesta «Con foco.» con su esfera y la evidencia «Preparada para [Cliente] · Confidencial» y la burbuja efeoncepro.com; abajo la órbita sale como el sol, con el espacio para el logo del cliente dentro, seleccionado con un marco de ocho manijas y el cursor de un colaborador con la etiqueta Cliente.",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPropuestaPortadaAmanecerCliente.jpg"
+ },
+ {
+  "board": "DeckPropuestaContraHorizonte",
+  "title": "FOTO · contraportada de propuesta: Empower your Growth (hacia la órbita)",
+  "originalTitle": "✅ APROBADA · FOTO · contraportada de propuesta: Empower your Growth (hacia la órbita)",
+  "canvas": {
+   "x": 17680,
+   "y": 7100
+  },
+  "alt": "Contraportada de propuesta comercial: Nexa, de espaldas con la chaqueta de Efeonce, camina hacia un anillo de luz teal vertical; a la izquierda el logo de Efeonce, el eslogan Empower your Growth como mensaje principal, la burbuja efeoncepro.com con los íconos de redes sociales y el correo, los teléfonos y la dirección.",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPropuestaContraHorizonte.jpg"
+ },
+ {
+  "board": "DeckPropuestaContraAmanecer",
+  "title": "FOTO · contraportada de propuesta: Empower your Growth (amanecer)",
+  "originalTitle": "✅ APROBADA · FOTO · contraportada de propuesta: Empower your Growth (amanecer)",
+  "canvas": {
+   "x": 18720,
+   "y": 7100
+  },
+  "alt": "Contraportada de propuesta comercial: Nexa, de espaldas junto a un agente mini robot, camina por una pasarela hacia una órbita de luz teal que sale al amanecer; a la izquierda el logo de Efeonce, el eslogan Empower your Growth como mensaje principal, la burbuja efeoncepro.com con los íconos de redes sociales y el correo, los teléfonos y la dirección.",
+  "reference": "/private/tmp/claude-501/-Users-jreye-Documents-greenhouse-eo/6775986c-94e4-44e8-8897-c999463292ce/scratchpad/deck-refs/DeckPropuestaContraAmanecer.jpg"
+ }
+]

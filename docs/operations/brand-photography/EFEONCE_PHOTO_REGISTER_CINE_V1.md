@@ -1,8 +1,10 @@
 # Registro cine · la marca en su película — el lenguaje
 
-> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.1 · **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-27 por Claude (plates para portada y contraportada de brochure y propuesta,
-> aprobados por el operador: [§16](#16-plates-para-portada-y-contraportada-aprobado-2026-09-27))
+> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.2 · **Creado:** 2026-09-27 por Claude
+> **Última actualización:** 2026-09-27 por Claude (1.2: excepción aprobada para las láminas de **sección** y
+> **«about»** del deck, [delta (c)](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck). Antes,
+> 1.1: plates para portada y contraportada de brochure y propuesta, aprobados por el operador:
+> [§16](#16-plates-para-portada-y-contraportada-aprobado-2026-09-27))
 > **Nace en:** los dos deltas cine del maestro —[excepción para piezas de Nexa](EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#delta-2026-09-26-noche--excepción-declarada-registro-cine-para-piezas-de-nexa)
 > (2026-09-26, noche) y [ampliación a `proposal-cinematic`](EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#delta-2026-09-27--el-registro-cine-se-amplía-a-la-receta-proposal-cinematic)
 > (2026-09-27)—, que siguen escritos allí como historia. **Desde hoy, este documento es la fuente vigente del registro.**
@@ -10,7 +12,8 @@
 > nivel de detalle este nuevo estilo cinematográfico… El registro cinematográfico me encantó».
 > **Primeros consumers:** láminas `proposal-cinematic` del deck (`ai-generations/2026-09-26_deck-*/`) y el brochure PDF
 > horizontal (`ai-generations/2026-09-27_brochure/`).
-> **Estado:** **aprobado en su alcance** (Nexa protagonista y `proposal-cinematic`); seis láminas de deck aprobadas;
+> **Estado:** **aprobado en su alcance** (Nexa protagonista, `proposal-cinematic` y, desde el 2026-09-27, secciones y
+> láminas «about» del deck); seis láminas de deck aprobadas;
 > portadas y contraportadas de brochure y propuesta aprobadas el 2026-09-27 (§16); formatos publicitarios 9:16 y 4:5
 > **en prueba**; sin prueba de reconocimiento.
 > **Documentación relacionada:** [maestro](EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [registro C](EFEONCE_PHOTO_REGISTER_C_V1.md) ·
@@ -23,6 +26,34 @@
 Convenciones, igual que en la carpeta: **[medido]** = número o hecho leído en un archivo o en una placa ·
 **[decisión del operador]** = lo decidió Julio Reyes · **[criterio]** = recomendación propia, revisable ·
 **[pendiente]** = no resuelto. Las frases de prompt entre comillas son **verbatim** de fichas aprobadas.
+
+---
+
+## Delta 2026-09-27 (c) — excepción para secciones y láminas «about» del deck
+
+**[decisión del operador, 2026-09-27]** Al aprobar las 69 láminas del deck, el operador aprobó también las fotos de
+las **secciones partidas** y de **«Quiénes somos» / «Por qué lo hacemos»** con personas en **luz dramática de cine**.
+Se registran como una **excepción aprobada** del alcance de §2 (tercer caso de la tabla):
+
+| Receta | Plate (`ai-generations/…`) | Quién está en la escena |
+|---|---|---|
+| `section-split-corner-bottom` («¿Cuánto tarda tu campaña? En días.») | `2026-09-27_secciones-partidas/plates/SP2b-dias-no-meses-isotipo.png` | persona del equipo con polo; isotipo ya compuesto con `foto:isotipo` |
+| `section-split-panel-end` («¿Qué responde la IA? Tu marca.») | `2026-09-27_secciones-partidas/plates/SP1-la-ia-te-cita.png` (compuesto espejado) | la directora del **cliente**, sin uniforme Efeonce; el teléfono no muestra una interfaz legible de terceros |
+| `section-cine-about` («¿Quiénes somos? Un solo equipo.») | `2026-09-27_quienes-somos/plates/QS1b-un-solo-equipo.png` | el equipo con Nexa en la escena |
+| `section-cine-purpose` («¿Por qué lo hacemos así? Contigo.») | `2026-09-27_quienes-somos/plates/QS2-contigo.png` | estratega y directora con Nexa; la estratega mira a la directora y la directora a la pantalla, nunca se miran de cerca |
+
+**Qué abre y qué no.** La excepción vale sólo para **láminas de sección y «about» del deck** (brochure, propuesta,
+pitch). **No** amplía el cine a social, web, publicidad ni a las láminas de contenido, que siguen en A, B o C; la
+publicidad con personas del equipo en cine sigue en prueba (§11). Las guardas no cambian: cámara a ≈ 2 m y 85 mm,
+uniforme por registro de escena, isotipo compuesto y revisado al 100 % (§7.3), nunca dos personas mirándose de cerca
+(§7.4) y ningún texto sobre el sujeto (§9.5).
+
+**Pendientes que deja [pendiente]:** el contrato AXIS (`cine-requires-nexa-or-proposal`) todavía rechazaría estas
+láminas declaradas como cine: se lleva al contrato en TASK-1927. Los plates de «about» se compusieron con un degradado
+lateral, contra «sin velos» (§9.3): se regeneran con la reserva izquierda; QS1b y QS2 no tienen registro de
+`foto:isotipo` junto al plate: pasan por `foto:emblema` antes de publicar. Receta de cada lámina:
+[catálogo de recetas del deck](../brand-graphic-line/deck-recipes/README.md); norma:
+[composición por superficie §3, regla 5, y §4.6](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck).
 
 ---
 
@@ -61,12 +92,13 @@ bruma alrededor, estás en cine. Los otros tres registros no fabrican su fuente 
 
 ## 2. Cuándo se usa — y cuándo no
 
-**Permitido en dos casos, y sólo en esos [decisión del operador, 2026-09-27]:**
+**Permitido en tres casos, y sólo en esos [decisión del operador, 2026-09-27]:**
 
 | Caso | Quién protagoniza | Vestuario | Dónde vive la regla |
 |---|---|---|---|
 | **1 · Nexa protagonista** | Nexa (identidad A) | Traje de ficción permitido (traje biónico) **o** uniforme Efeonce | Delta 2026-09-26 (noche) del maestro |
 | **2 · Receta de deck `proposal-cinematic`** | Personas del equipo **o** Nexa | Personas: **uniforme correcto por registro de escena**; el traje de ficción queda sólo para Nexa | Delta 2026-09-27 del maestro + [superficie §4.6](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) |
+| **3 · Láminas de sección y «about» del deck** (excepción, 2026-09-27) | Personas del equipo (o del cliente, en la sección con el panel a la derecha), con o sin Nexa | Equipo: uniforme por registro de escena; cliente: su propia ropa, sin marca Efeonce | [Delta (c) de arriba](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck) + [superficie §3, regla 5](../brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) |
 
 **El contrato lo vigila [medido]:** AXIS rechaza `photo.register: "cine"` fuera de esos casos con el issue
 **`cine-requires-nexa-or-proposal`** (`@efeoncepro/axis-ui-contracts`, `surface-composition.js`): pasa si la receta es
