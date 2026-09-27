@@ -101,8 +101,13 @@ export const planSurfacePiece = (intent: SurfaceIntent, options: PlanSurfacePiec
     )
   }
 
-  const { slots, assets } = builder({ intent, manifest, recipe })
-  const contentType = `${intent.surface}.${intent.recipe}`
+  const built = builder({ intent, manifest, recipe })
+  const { slots, assets } = built
+  const contentType = built.contentType ?? `${intent.surface}.${intent.recipe}`
+
+  if (!contentType.startsWith(`${intent.surface}.${intent.recipe}`)) {
+    throw new SurfacePieceError(`El builder de ${intent.surface}.${intent.recipe} devolvió un contentType ajeno (${contentType}).`, 'invalid-intent')
+  }
 
   return {
     catalog,

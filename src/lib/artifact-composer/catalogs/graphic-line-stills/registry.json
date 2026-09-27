@@ -1,9 +1,152 @@
 {
   "version": "0.1",
   "status": "candidate",
-  "note": "Recetas APROBADAS de web, DOOH y motion de «La órbita» (contrato efeonce.surface-composition 0.1.0 de AXIS). El lienzo real lo declara cada plantilla en su *.slots.json. El contentType es `<surface>.<recipe>`: lo deriva src/lib/brand-surfaces del manifest.",
-  "canvas": { "width": 1920, "height": 1080 },
-  "contentTypeTaxonomy": [],
-  "templates": [],
-  "selector": { "map": {} }
+  "note": "Recetas APROBADAS de web, DOOH y motion de «La órbita» (contrato efeonce.surface-composition 0.1.0 de AXIS). El lienzo real lo declara cada plantilla en su *.slots.json. El contentType es `<surface>.<recipe>`: lo deriva src/lib/brand-surfaces del manifest. El teléfono tiene una plantilla por ancho: su contentType lleva el formato (`web.hero-mobile-native.phone-360|390|430`), que devuelve el builder.",
+  "canvas": {
+    "width": 1920,
+    "height": 1080
+  },
+  "contentTypeTaxonomy": [
+    "web.hero-lens",
+    "web.hero-bleed",
+    "web.hero-uniform-tablet",
+    "dooh.caminero-lens",
+    "motion.storyboard",
+    "motion.loop-lens-reveal",
+    "web.hero-mobile-native.phone-360",
+    "web.hero-mobile-native.phone-390",
+    "web.hero-mobile-native.phone-430"
+  ],
+  "templates": [
+    {
+      "name": "HeroLens",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "web.hero-lens"
+      ],
+      "prototype": "hero-lens.html",
+      "slotsRef": "hero-lens.slots.json"
+    },
+    {
+      "name": "HeroBleed",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "web.hero-bleed"
+      ],
+      "prototype": "hero-bleed.html",
+      "slotsRef": "hero-bleed.slots.json"
+    },
+    {
+      "name": "HeroUniformTablet",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "web.hero-uniform-tablet"
+      ],
+      "prototype": "hero-bleed.html",
+      "slotsRef": "hero-uniform-tablet.slots.json"
+    },
+    {
+      "name": "HeroMobileNative360",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "web.hero-mobile-native.phone-360"
+      ],
+      "prototype": "hero-mobile-native.html",
+      "slotsRef": "hero-mobile-native-360.slots.json"
+    },
+    {
+      "name": "HeroMobileNative390",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "web.hero-mobile-native.phone-390"
+      ],
+      "prototype": "hero-mobile-native.html",
+      "slotsRef": "hero-mobile-native-390.slots.json"
+    },
+    {
+      "name": "HeroMobileNative430",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "web.hero-mobile-native.phone-430"
+      ],
+      "prototype": "hero-mobile-native.html",
+      "slotsRef": "hero-mobile-native-430.slots.json"
+    },
+    {
+      "name": "CamineroLens",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "dooh.caminero-lens"
+      ],
+      "prototype": "caminero-lens.html",
+      "slotsRef": "caminero-lens.slots.json"
+    },
+    {
+      "name": "MotionStoryboard",
+      "kind": "sheet",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "motion.storyboard"
+      ],
+      "prototype": "storyboard.html",
+      "slotsRef": "storyboard.slots.json"
+    },
+    {
+      "name": "LoopLensReveal",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "motion.loop-lens-reveal"
+      ],
+      "prototype": "loop-lens-reveal.html",
+      "slotsRef": "loop-lens-reveal.slots.json"
+    }
+  ],
+  "selector": {
+    "map": {
+      "web.hero-lens": "HeroLens",
+      "web.hero-bleed": "HeroBleed",
+      "web.hero-uniform-tablet": "HeroUniformTablet",
+      "dooh.caminero-lens": "CamineroLens",
+      "motion.storyboard": "MotionStoryboard",
+      "motion.loop-lens-reveal": "LoopLensReveal",
+      "web.hero-mobile-native.phone-360": "HeroMobileNative360",
+      "web.hero-mobile-native.phone-390": "HeroMobileNative390",
+      "web.hero-mobile-native.phone-430": "HeroMobileNative430"
+    }
+  }
 }

@@ -40,7 +40,7 @@ describe('catálogos de La órbita', () => {
     expect(violations, 'el color y la tipografía salen de graphic-line-tokens.css').toEqual([])
   })
 
-  it('cada registry mapea contentTypes <superficie>.<receta> a plantillas declaradas', () => {
+  it('cada registry mapea contentTypes <superficie>.<receta>[.<formato>] a plantillas declaradas', () => {
     for (const catalog of GL_CATALOGS) {
       const registry = JSON.parse(fs.readFileSync(path.join(CATALOGS_DIR, catalog, 'registry.json'), 'utf8')) as {
         contentTypeTaxonomy: string[]
@@ -49,7 +49,7 @@ describe('catálogos de La órbita', () => {
       }
 
       for (const contentType of registry.contentTypeTaxonomy) {
-        expect(contentType).toMatch(/^(deck|web|dooh|motion|audiovisual)\.[a-z0-9-]+$/)
+        expect(contentType).toMatch(/^(deck|web|dooh|motion|audiovisual)\.[a-z0-9-]+(\.[a-z0-9-]+)?$/)
         expect(registry.templates.some(t => t.name === registry.selector.map[contentType])).toBe(true)
       }
     }

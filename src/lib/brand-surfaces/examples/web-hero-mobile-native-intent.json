@@ -1,0 +1,19 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.0",
+  "surface": "web",
+  "format": "phone-390",
+  "role": "hero",
+  "recipe": "hero-mobile-native",
+  "line": "growth",
+  "theme": "dark",
+  "voice": { "question": "¿Tu marketing mide lo que vende?", "answer": ["Ahora sí"] },
+  "cta": { "label": "Agenda un diagnóstico", "descriptor": "Revisamos contigo qué mide hoy tu marketing." },
+  "photo": {
+    "register": "puesta-en-escena",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_web-movil/plates/M2-voltea-chaqueta.png",
+    "alt": "Un estratega de Efeonce con la chaqueta del equipo se voltea sonriendo y señala la curva que sube en la pantalla"
+  },
+  "selection": { "target": "answer", "label": "Growth", "participantKind": "role" }
+}

@@ -1,0 +1,21 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.0",
+  "surface": "web",
+  "format": "desktop",
+  "role": "hero",
+  "recipe": "hero-lens",
+  "line": "growth",
+  "theme": "dark",
+  "voice": { "question": "¿Qué hace Efeonce?", "answer": ["Crecer"] },
+  "body": "Estrategia, contenido y datos en un mismo equipo.",
+  "cta": { "label": "Agenda un diagnóstico", "descriptor": "Revisamos contigo qué mide hoy tu marketing." },
+  "nav": { "links": ["Servicios", "Casos", "Insights", "Nosotros"], "action": "Conversemos" },
+  "photo": {
+    "register": "puesta-en-escena",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_deck-web-motion/plates/P2-web-hero-taller.png",
+    "alt": "Una estratega y un director de arte de Efeonce revisan una prueba impresa sobre la mesa del taller"
+  },
+  "selection": { "target": "answer", "label": "Estrategia", "participantKind": "role" }
+}

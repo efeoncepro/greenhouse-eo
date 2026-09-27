@@ -1,0 +1,71 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.0",
+  "surface": "motion",
+  "format": "16x9",
+  "role": "storyboard",
+  "recipe": "storyboard",
+  "line": "growth",
+  "theme": "dark",
+  "voice": {
+    "question": "¿Tu marketing mide lo que vende?",
+    "answer": [
+      "Ahora",
+      "sí"
+    ]
+  },
+  "title": "Motion · 8 s con foto fija · el lenguaje de movimiento de la órbita, cuadro a cuadro",
+  "frames": [
+    {
+      "segment": "anticipation",
+      "title": "Anticipación",
+      "caption": "Navy vacío. El anillo aparece chico y la esfera retrocede antes de salir."
+    },
+    {
+      "segment": "lens-opens",
+      "title": "La lente se abre",
+      "caption": "El círculo crece y descubre la foto: la escena entra por la lente, rápido y con curva de llegada."
+    },
+    {
+      "segment": "arc-runs-sphere-hits",
+      "title": "El arco corre y la esfera golpea",
+      "caption": "Tramo rápido con estela; la esfera llega con sobrepaso y un pulso de impacto con eco."
+    },
+    {
+      "segment": "voice-enters",
+      "title": "La voz entra con sobrepaso",
+      "caption": "Pregunta primero; «Ahora» ya asentó; «sí» llega un 12 % más grande y se asienta."
+    },
+    {
+      "segment": "selection-settles",
+      "title": "La selección encaja",
+      "caption": "Los corchetes de AXIS se ajustan a la respuesta y entra el cursor de Growth. Un protagonista a la vez."
+    },
+    {
+      "segment": "hold",
+      "title": "Sostén",
+      "caption": "Todo quieto salvo la foto, que respira dentro de la lente (hasta 10 %). Este cuadro es el estático de respaldo."
+    },
+    {
+      "segment": "close-reveal",
+      "title": "Cierre: reveal",
+      "caption": "El reveal aprobado v1.1, el mismo cierre del audiovisual: la nave entra en su órbita y se asienta."
+    },
+    {
+      "segment": "end-card",
+      "title": "Tapa final",
+      "caption": "Logo con el eslogan: la tapa de cierre del reveal. Con sonido, el golpe del lenguaje de movimiento."
+    }
+  ],
+  "photo": {
+    "register": "respuesta",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_web-movil/plates/M1-avanza-polo.png",
+    "alt": "Una directora de cuentas con el polo de Efeonce avanza hacia la cámara y la mira",
+    "native": "4:7",
+    "focus": {
+      "xOfFile": 0.456,
+      "yOfFile": 0.2372
+    }
+  }
+}

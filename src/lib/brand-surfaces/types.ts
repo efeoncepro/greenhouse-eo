@@ -23,6 +23,12 @@ export type SurfaceAssetRequest =
 export interface RecipeSlots {
   slots: Record<string, unknown>
   assets: SurfaceAssetRequest[]
+  /**
+   * Sólo cuando una receta tiene una plantilla por FORMATO (el teléfono a 360, 390 y 430 px): el builder devuelve
+   * `<surface>.<recipe>.<format>` y el selector del catálogo elige la plantilla de ese ancho. Sin él, el contentType
+   * es `<surface>.<recipe>`.
+   */
+  contentType?: string
 }
 
 export interface SurfacePiecePlan {

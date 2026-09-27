@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · hero web en el teléfono</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `web.hero-mobile-native` (teléfono 360 · 390 · 430). Mobile-first de verdad: la toma vertical nativa
+      a sangre, la voz gigante arriba sobre el aire de la toma con su selección, y el CTA con corchetes y cursor
+      local en la zona del pulgar (79 % del alto), con el descriptor bajo el cursor. Un mismo molde para los tres
+      anchos: cada plantilla (`HeroMobileNative360|390|430`) sólo fija su viewport y todo lo demás sale del ancho
+      y del alto. Referencia aprobada: tablero WebMovil de la página «Web».
+    -->
+    <main class="gl-canvas gl-phone" data-gl-root data-slot="frame">
+      <div data-slot="photo">
+        <img class="gl-photo-layer" data-slot-field="src" alt="" />
+      </div>
+
+      <div class="gl-status" aria-hidden="true">
+        <span>9:41</span>
+        <svg class="gl-status-icons" viewBox="0 0 66 13" fill="currentColor" stroke="currentColor">
+          <rect x="0" y="8" width="3.5" height="5" rx="1" stroke="none" />
+          <rect x="5.5" y="5.5" width="3.5" height="7.5" rx="1" stroke="none" />
+          <rect x="11" y="3" width="3.5" height="10" rx="1" stroke="none" />
+          <rect x="16.5" y="0" width="3.5" height="13" rx="1" stroke="none" />
+          <path d="M26 5a10 10 0 0 1 14 0M29 8a5.5 5.5 0 0 1 8 0" stroke-width="1.8" fill="none" stroke-linecap="round" />
+          <circle cx="33" cy="11" r="1.6" stroke="none" />
+          <rect x="44" y="1" width="19" height="11" rx="3" stroke-opacity="0.5" fill="none" />
+          <rect x="46" y="3" width="14" height="7" rx="1.5" stroke="none" />
+          <rect x="64" y="4.5" width="1.6" height="4" rx="0.8" fill-opacity="0.5" stroke="none" />
+        </svg>
+      </div>
+
+      <header class="gl-nav">
+        <img class="gl-nav-logo" data-slot="logo" src="assets/efeonce-logo-negative.svg" alt="Efeonce" />
+        <svg class="gl-nav-burger" viewBox="0 0 26 18" aria-hidden="true" fill="none" stroke="currentColor">
+          <path d="M1 2h24M1 9h24M9 16h16" stroke-width="2.2" stroke-linecap="round" />
+        </svg>
+      </header>
+
+      <div data-slot="voice">
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Tu marketing mide lo que vende?</span></p>
+        <p class="gl-answer" data-gl-selection-target><span class="gl-answer-lead" data-slot-field="answerLead"></span><span data-slot-field="answer">Ahora sí</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <div data-slot="cta">
+        <p class="gl-cta" data-gl-cta-target data-slot-field="label">Agenda un diagnóstico</p>
+        <p class="gl-descriptor" data-gl-cta-descriptor data-slot-field="descriptor">Revisamos contigo qué mide hoy tu marketing.</p>
+      </div>
+
+      <div class="gl-home-indicator" aria-hidden="true"></div>
+      <div class="gl-hidden" data-slot="selection"></div>
+    </main>
+  </body>
+</html>

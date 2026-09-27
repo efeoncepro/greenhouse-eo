@@ -5,6 +5,7 @@
  */
 
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -22,5 +23,20 @@ describe('tokens de La órbita', () => {
 
   it.each(['graphic-line-deck', 'graphic-line-stills', 'graphic-line-overlays'])('el CSS de %s está sincronizado', catalog => {
     expect(fs.readFileSync(path.join(CATALOGS, catalog, 'graphic-line-tokens.css'), 'utf8')).toBe(artifacts.css)
+  })
+
+  it('los archivos de marca de cada catálogo son byte a byte los de @efeoncepro/axis-brand-assets', () => {
+    const brandAssets = path.join(
+      path.dirname(createRequire(path.resolve(__dirname, '../../../package.json')).resolve('@efeoncepro/axis-brand-assets/package.json')),
+      'assets'
+    )
+
+    for (const catalog of ['graphic-line-deck', 'graphic-line-stills', 'graphic-line-overlays']) {
+      const dir = path.join(CATALOGS, catalog, 'assets')
+
+      for (const file of fs.readdirSync(dir).filter(name => fs.existsSync(path.join(brandAssets, name)))) {
+        expect(fs.readFileSync(path.join(dir, file)).equals(fs.readFileSync(path.join(brandAssets, file))), `${catalog}/${file}`).toBe(true)
+      }
+    }
   })
 })

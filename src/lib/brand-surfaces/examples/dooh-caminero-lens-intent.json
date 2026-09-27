@@ -1,0 +1,17 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.0",
+  "surface": "dooh",
+  "format": "caminero-3x1",
+  "role": "billboard",
+  "recipe": "caminero-lens",
+  "line": "growth",
+  "theme": "dark",
+  "voice": { "question": "¿Lo medimos?", "answer": ["Siempre"] },
+  "photo": {
+    "register": "documental",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_ooh-caminero-lente/plates/C2-caminero-medicion-compacta.png",
+    "alt": "Un analista en una cervecería señala la curva que sube en su portátil; la lente la muestra a color"
+  }
+}

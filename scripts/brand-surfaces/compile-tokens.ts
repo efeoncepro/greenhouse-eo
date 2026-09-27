@@ -6,6 +6,7 @@
  */
 
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import path from 'node:path'
 
 import { buildGraphicLineTokenArtifacts } from './graphic-line-tokens'
@@ -18,6 +19,21 @@ const TARGETS: { file: string; pick: 'json' | 'css' }[] = [
   { file: path.join(CATALOGS, 'graphic-line-stills/graphic-line-tokens.css'), pick: 'css' },
   { file: path.join(CATALOGS, 'graphic-line-overlays/graphic-line-tokens.css'), pick: 'css' }
 ]
+
+/**
+ * Archivos oficiales que cada catálogo necesita dentro de su árbol (el render es hermético y el catálogo viaja
+ * solo al worker). Se copian byte a byte desde @efeoncepro/axis-brand-assets: nunca se editan a mano.
+ */
+const BRAND_ASSETS: Record<string, string[]> = {
+  'graphic-line-deck': ['url-bubble-baked-dark.svg'],
+  'graphic-line-stills': ['url-bubble-baked-dark.svg', 'efeonce-logo-negative.svg', 'efeonce-isotype-negative.svg'],
+  'graphic-line-overlays': ['url-bubble-baked-dark.svg']
+}
+
+const brandAssetsDir = path.join(
+  path.dirname(createRequire(path.join(process.cwd(), 'package.json')).resolve('@efeoncepro/axis-brand-assets/package.json')),
+  'assets'
+)
 
 const check = process.argv.includes('--check')
 const artifacts = buildGraphicLineTokenArtifacts()
@@ -41,7 +57,28 @@ for (const target of TARGETS) {
   console.log(`✓ ${path.relative(process.cwd(), target.file)}`)
 }
 
+for (const [catalog, files] of Object.entries(BRAND_ASSETS)) {
+  for (const file of files) {
+    const source = fs.readFileSync(path.join(brandAssetsDir, file))
+    const target = path.join(CATALOGS, catalog, 'assets', file)
+    const current = fs.existsSync(target) ? fs.readFileSync(target) : null
+
+    if (check) {
+      if (!current || !current.equals(source)) {
+        drift++
+        console.error(`✗ ${path.relative(process.cwd(), target)} no es el archivo de @efeoncepro/axis-brand-assets. Corre: pnpm brand:tokens`)
+      }
+
+      continue
+    }
+
+    fs.mkdirSync(path.dirname(target), { recursive: true })
+    fs.writeFileSync(target, source)
+    console.log(`✓ ${path.relative(process.cwd(), target)}`)
+  }
+}
+
 if (check) {
   if (drift > 0) process.exit(1)
-  console.log('✓ Tokens de La órbita sincronizados con @efeoncepro/axis-tokens.')
+  console.log('✓ Tokens y archivos de marca de La órbita sincronizados con AXIS.')
 }

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · hero web con lente</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `web.hero-lens` (escritorio 1440 × 900). La lente gigante a la derecha con la foto del oficio
+      dentro y el afuera en penumbra; la voz a la izquierda con la selección colaborativa sobre la respuesta;
+      bajada, CTA con corchetes y cursor local, y el descriptor bajo el cursor. La foto no lleva logo: firma el
+      encabezado del sitio. Referencia aprobada: página «Web», tablero WebHeroAlLado.
+    -->
+    <main class="gl-canvas" data-gl-root data-slot="frame">
+      <div data-slot="photo">
+        <img class="gl-photo-layer gl-lens-outside" data-slot-field="src" alt="" />
+        <div class="gl-lens-veil" aria-hidden="true"></div>
+        <div class="gl-lens-clip" aria-hidden="true">
+          <img class="gl-photo-layer gl-lens-inside" data-slot-field="lensSrc" alt="" />
+        </div>
+      </div>
+
+      <div data-slot="orbit">
+        <img class="gl-layer" data-slot-field="src" alt="" />
+      </div>
+
+      <header class="gl-nav">
+        <img class="gl-nav-logo" data-slot="logo" src="assets/efeonce-logo-negative.svg" alt="Efeonce" />
+        <nav class="gl-nav-menu" data-slot="nav">
+          <ul class="gl-nav-links" data-slot-field="links">
+            <li>Servicios</li>
+          </ul>
+          <span class="gl-nav-action" data-slot-field="action">Conversemos</span>
+        </nav>
+      </header>
+
+      <div data-slot="voice">
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Qué hace Efeonce?</span></p>
+        <p class="gl-answer" data-gl-selection-target><span class="gl-answer-lead" data-slot-field="answerLead"></span><span data-slot-field="answer">Crecer</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body" data-slot="body">Estrategia, contenido y datos en un mismo equipo.</p>
+
+      <div data-slot="cta">
+        <p class="gl-cta" data-gl-cta-target data-slot-field="label">Agenda un diagnóstico</p>
+        <p class="gl-descriptor" data-gl-cta-descriptor data-slot-field="descriptor">Revisamos contigo qué mide hoy tu marketing.</p>
+      </div>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+    </main>
+  </body>
+</html>

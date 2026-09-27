@@ -1,0 +1,20 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.0",
+  "surface": "web",
+  "format": "desktop",
+  "role": "hero",
+  "recipe": "hero-uniform-tablet",
+  "line": "growth",
+  "theme": "dark",
+  "voice": { "question": "¿Tu marketing ya mide lo que vende?", "answer": ["Ahora", "sí"] },
+  "cta": { "label": "Agenda un diagnóstico", "descriptor": "Revisamos contigo qué mide hoy tu marketing." },
+  "nav": { "links": ["Servicios", "Casos", "Insights", "Nosotros"], "action": "Conversemos" },
+  "photo": {
+    "register": "puesta-en-escena",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-26_web-hero/plates/H2-pov-tablet.png",
+    "alt": "Una estratega de Efeonce con la chaqueta del equipo acerca a cámara una tableta con la curva que sube"
+  },
+  "selection": { "target": "answer", "label": "Growth", "participantKind": "role" }
+}

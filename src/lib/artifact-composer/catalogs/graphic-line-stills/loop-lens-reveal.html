@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · último cuadro del loop</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `motion.loop-lens-reveal` (16:9). El composer no hace el video: entrega el ÚLTIMO CUADRO del sostén,
+      que es el estático de respaldo completo y la versión con movimiento reducido. La lente abierta sobre el
+      navy con la toma hecha para ella, la voz en dos líneas sin tocar el anillo, la respuesta con su esfera y la
+      selección colaborativa encajada. Sin firma: la firma vive en el cierre (reveal), que es video. Referencia
+      aprobada: tablero MotionVideo de la página «Motion».
+    -->
+    <main class="gl-canvas" data-gl-root data-slot="frame">
+      <div class="gl-lens-clip" data-slot="photo">
+        <img class="gl-photo-layer" data-slot-field="lensSrc" alt="" />
+      </div>
+
+      <div data-slot="orbit">
+        <img class="gl-layer" data-slot-field="src" alt="" />
+      </div>
+
+      <div data-slot="voice">
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Tu marketing mide<br />lo que vende?</span></p>
+        <p class="gl-answer" data-gl-selection-target><span class="gl-answer-lead" data-slot-field="answerLead">Ahora</span><span data-slot-field="answer">sí</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+    </main>
+  </body>
+</html>
