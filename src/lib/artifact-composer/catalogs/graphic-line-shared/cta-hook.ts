@@ -46,6 +46,9 @@ export const makeCtaHook =
       throw new GraphicLineCtaError(slide.slideId, 'el plan trae CTA y el catálogo se construyó sin painter de CTA.')
     }
 
+    // Se mide con la tipografía definitiva: medir con la fuente de respaldo mueve la caja entre corridas.
+    await page.evaluate(() => document.fonts.ready)
+
     const measured = await page.evaluate(() => {
       const target = document.querySelector('[data-gl-cta-target]')
 

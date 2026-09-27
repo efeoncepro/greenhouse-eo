@@ -154,7 +154,8 @@
           "type": "string",
           "required": true,
           "maxCharacters": 320,
-          "resolver": "gl-alt"
+          "resolver": "gl-alt",
+          "example": "Un analista en una cervecería señala la curva que sube en su portátil; la lente la muestra a color"
         }
       }
     },
@@ -179,19 +180,21 @@
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 48
+          "maxCharacters": 48,
+          "example": "¿Lo medimos?"
         },
         "answerLead": {
           "type": "string",
           "required": false,
-          "maxCharacters": 12
+          "maxCharacters": 12,
+          "example": ""
         },
         "answer": {
           "type": "string",
           "required": true,
           "maxCharacters": 12,
           "resolver": "gl-answer",
-          "example": "sí"
+          "example": "Siempre"
         }
       }
     },

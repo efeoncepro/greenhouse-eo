@@ -141,7 +141,7 @@
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-photo-x=-88px"
+          "example": "--gl-photo-x=-85px"
         }
       }
     },
@@ -160,7 +160,8 @@
           "type": "string",
           "required": true,
           "maxCharacters": 320,
-          "resolver": "gl-alt"
+          "resolver": "gl-alt",
+          "example": "Un estratega de Efeonce con la chaqueta del equipo se voltea sonriendo y señala la curva que sube en la pantalla"
         }
       }
     },
@@ -178,19 +179,21 @@
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 48
+          "maxCharacters": 48,
+          "example": "¿Tu marketing mide lo que vende?"
         },
         "answerLead": {
           "type": "string",
           "required": false,
-          "maxCharacters": 12
+          "maxCharacters": 12,
+          "example": ""
         },
         "answer": {
           "type": "string",
           "required": true,
           "maxCharacters": 12,
           "resolver": "gl-answer",
-          "example": "sí"
+          "example": "Ahora sí"
         }
       }
     },
@@ -202,12 +205,14 @@
         "label": {
           "type": "string",
           "required": true,
-          "maxCharacters": 28
+          "maxCharacters": 28,
+          "example": "Agenda un diagnóstico"
         },
         "descriptor": {
           "type": "string",
           "required": true,
-          "maxCharacters": 90
+          "maxCharacters": 90,
+          "example": "Revisamos contigo qué mide hoy tu marketing."
         }
       }
     },
@@ -220,24 +225,28 @@
           "type": "string",
           "required": true,
           "maxCharacters": 24,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "Growth"
         },
         "anchor": {
           "type": "string",
           "required": true,
           "maxCharacters": 16,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "bottom-end"
         },
         "participantKind": {
           "type": "string",
           "required": true,
           "maxCharacters": 12,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "role"
         },
         "scale": {
           "type": "number",
           "required": false,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": 0.696
         }
       }
     }

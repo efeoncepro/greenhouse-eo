@@ -79,6 +79,9 @@ export const makeSelectionHook =
     if (!KINDS.has(participantKind)) throw new GraphicLineSelectionError(slide.slideId, `tipo "${participantKind}" desconocido.`)
     if (!TARGET_KINDS.has(targetKind)) throw new GraphicLineSelectionError(slide.slideId, `objetivo "${targetKind}" desconocido.`)
 
+    // Se mide con la tipografía definitiva: medir con la fuente de respaldo mueve la caja entre corridas.
+    await page.evaluate(() => document.fonts.ready)
+
     const measured = await page.evaluate(kind => {
       const target = document.querySelector('[data-gl-selection-target]')
 

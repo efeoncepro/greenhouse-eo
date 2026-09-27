@@ -60,7 +60,8 @@
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 48
+          "maxCharacters": 48,
+          "example": "Terreno · panadería del cliente, 06:40"
         },
         "answer": {
           "type": "string",
@@ -80,48 +81,56 @@
           "type": "string",
           "required": true,
           "maxCharacters": 24,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "Producción"
         },
         "anchor": {
           "type": "string",
           "required": true,
           "maxCharacters": 16,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "top-end"
         },
         "participantKind": {
           "type": "string",
           "required": true,
           "maxCharacters": 12,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "role"
         },
         "scale": {
           "type": "number",
           "required": false,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": 1.2
         },
         "targetKind": {
           "type": "string",
           "required": true,
           "maxCharacters": 8,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "group"
         },
         "variant": {
           "type": "string",
           "required": false,
           "maxCharacters": 16,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "open-brackets"
         },
         "padding": {
           "type": "string",
           "required": false,
           "maxCharacters": 12,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "compact"
         },
         "overlay": {
           "type": "string",
           "required": false,
           "maxCharacters": 8,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": ""
         }
       }
     }

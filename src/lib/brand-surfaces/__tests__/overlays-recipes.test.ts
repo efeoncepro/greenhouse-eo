@@ -295,6 +295,7 @@ describe('selección sobre una caja (hook del catálogo)', () => {
   const pageMeasuring = (bounds: { left: number; top: number; right: number; bottom: number }) => {
     const evaluate = vi
       .fn()
+      .mockResolvedValueOnce(undefined) // document.fonts.ready
       .mockResolvedValueOnce({ bounds, canvas: { width: 1920, height: 1080 } })
       .mockResolvedValueOnce(undefined)
 
@@ -316,7 +317,7 @@ describe('selección sobre una caja (hook del catálogo)', () => {
         scale: 1.6
       })
     )
-    expect(evaluate).toHaveBeenCalledTimes(2)
+    expect(evaluate).toHaveBeenCalledTimes(3)
   })
 
   it('falla cerrado sin painter, con una caja de tamaño cero o con un objetivo desconocido', async () => {

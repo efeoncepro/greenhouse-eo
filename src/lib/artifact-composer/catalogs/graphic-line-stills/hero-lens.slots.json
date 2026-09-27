@@ -39,7 +39,7 @@
           "type": "number",
           "required": true,
           "resolver": "gl-px-answerTop",
-          "example": 300
+          "example": 301
         },
         "answerPx": {
           "type": "number",
@@ -63,7 +63,7 @@
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-answer-nudge=-0.02em"
+          "example": "--gl-answer-nudge=-0.03em"
         },
         "ctaTop": {
           "type": "string",
@@ -165,19 +165,19 @@
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-lens-cx=1050px"
+          "example": "--gl-lens-cx=1050.048px"
         },
         "lensCy": {
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-lens-cy=500px"
+          "example": "--gl-lens-cy=500.04px"
         },
         "lensR": {
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-lens-r=330px"
+          "example": "--gl-lens-r=330.03px"
         },
         "lensGray": {
           "type": "string",
@@ -226,7 +226,8 @@
           "type": "string",
           "required": true,
           "maxCharacters": 320,
-          "resolver": "gl-alt"
+          "resolver": "gl-alt",
+          "example": "Una estratega y un director de arte de Efeonce revisan una prueba impresa sobre la mesa del taller"
         }
       }
     },
@@ -265,12 +266,19 @@
           "item": {
             "type": "string",
             "maxCharacters": 16
-          }
+          },
+          "example": [
+            "Servicios",
+            "Casos",
+            "Insights",
+            "Nosotros"
+          ]
         },
         "action": {
           "type": "string",
           "required": true,
-          "maxCharacters": 18
+          "maxCharacters": 18,
+          "example": "Conversemos"
         }
       }
     },
@@ -282,12 +290,14 @@
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 48
+          "maxCharacters": 48,
+          "example": "¿Qué hace Efeonce?"
         },
         "answerLead": {
           "type": "string",
           "required": false,
-          "maxCharacters": 12
+          "maxCharacters": 12,
+          "example": ""
         },
         "answer": {
           "type": "string",
@@ -306,7 +316,8 @@
         "maxCharacters": 110,
         "maxLines": 3,
         "overflow": "reject"
-      }
+      },
+      "example": "Estrategia, contenido y datos en un mismo equipo."
     },
     "cta": {
       "selector": "[data-slot='cta']",
@@ -316,12 +327,14 @@
         "label": {
           "type": "string",
           "required": true,
-          "maxCharacters": 28
+          "maxCharacters": 28,
+          "example": "Agenda un diagnóstico"
         },
         "descriptor": {
           "type": "string",
           "required": true,
-          "maxCharacters": 90
+          "maxCharacters": 90,
+          "example": "Revisamos contigo qué mide hoy tu marketing."
         }
       }
     },
@@ -334,24 +347,28 @@
           "type": "string",
           "required": true,
           "maxCharacters": 24,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "Estrategia"
         },
         "anchor": {
           "type": "string",
           "required": true,
           "maxCharacters": 16,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "bottom-end"
         },
         "participantKind": {
           "type": "string",
           "required": true,
           "maxCharacters": 12,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "role"
         },
         "scale": {
           "type": "number",
           "required": false,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": 1.5
         }
       }
     }

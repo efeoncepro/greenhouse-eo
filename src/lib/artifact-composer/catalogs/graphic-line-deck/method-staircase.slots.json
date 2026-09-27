@@ -45,7 +45,7 @@
           "type": "number",
           "required": true,
           "resolver": "gl-px-answerPx",
-          "example": 140
+          "example": 139
         },
         "bodyTop": {
           "type": "number",
@@ -162,7 +162,29 @@
             "maxCharacters": 28
           }
         }
-      }
+      },
+      "example": [
+        {
+          "name": "Be Found",
+          "descriptor": "que te encuentre"
+        },
+        {
+          "name": "Be Readable",
+          "descriptor": "que te entienda"
+        },
+        {
+          "name": "Be Correct",
+          "descriptor": "que te represente bien"
+        },
+        {
+          "name": "Be Actionable",
+          "descriptor": "que pueda actuar"
+        },
+        {
+          "name": "Be Intrinsic",
+          "descriptor": "que te prefiera"
+        }
+      ]
     },
     "voice": {
       "selector": "[data-slot='voice']",
@@ -172,17 +194,20 @@
         "eyebrow": {
           "type": "string",
           "required": false,
-          "maxCharacters": 40
+          "maxCharacters": 40,
+          "example": "AEO · metodología BeX"
         },
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 30
+          "maxCharacters": 30,
+          "example": "¿Te recomienda la IA?"
         },
         "answerLead": {
           "type": "string",
           "required": false,
-          "maxCharacters": 10
+          "maxCharacters": 10,
+          "example": "Capa"
         },
         "answer": {
           "type": "string",
@@ -201,7 +226,8 @@
         "maxCharacters": 120,
         "maxLines": 4,
         "overflow": "reject"
-      }
+      },
+      "example": "ChatGPT, Claude, Perplexity, Gemini y Google AI Overviews. Subimos tu marca nivel por nivel."
     },
     "note": {
       "selector": "[data-slot='note']",
@@ -211,7 +237,8 @@
         "maxCharacters": 70,
         "maxLines": 1,
         "overflow": "reject"
-      }
+      },
+      "example": "Be Intrinsic es una trayectoria, no una garantía."
     },
     "selection": {
       "selector": "[data-slot='selection']",
@@ -221,42 +248,49 @@
         "level": {
           "type": "number",
           "required": true,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": 3
         },
         "label": {
           "type": "string",
           "required": true,
           "maxCharacters": 24,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "SEO · AEO"
         },
         "anchor": {
           "type": "string",
           "required": true,
           "maxCharacters": 16,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "bottom-end"
         },
         "participantKind": {
           "type": "string",
           "required": true,
           "maxCharacters": 12,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "department"
         },
         "scale": {
           "type": "number",
           "required": false,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": 1.1
         },
         "targetKind": {
           "type": "string",
           "required": false,
           "maxCharacters": 16,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "object"
         },
         "overlay": {
           "type": "string",
           "required": false,
           "maxCharacters": 16,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "none"
         }
       }
     },

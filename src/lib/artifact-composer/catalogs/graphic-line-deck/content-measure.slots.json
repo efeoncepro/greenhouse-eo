@@ -1,33 +1,136 @@
 {
   "template": "ContentMeasure",
   "version": "0.1",
-  "viewport": { "width": 1920, "height": 1080 },
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
   "slots": {
     "frame": {
       "selector": "[data-slot='frame']",
       "type": "object",
       "required": true,
       "shape": {
-        "line": { "type": "string", "required": true, "resolver": "gl-line", "example": "growth" },
-        "margin": { "type": "number", "required": true, "resolver": "gl-px-margin", "example": 140 },
-        "eyebrowTop": { "type": "number", "required": true, "resolver": "gl-px-eyebrowTop", "example": 150 },
-        "questionTop": { "type": "number", "required": true, "resolver": "gl-px-questionTop", "example": 215 },
-        "answerTop": { "type": "number", "required": true, "resolver": "gl-px-answerTop", "example": 270 },
-        "answerPx": { "type": "number", "required": true, "resolver": "gl-px-answerPx", "example": 300 },
-        "bodyTop": { "type": "number", "required": true, "resolver": "gl-px-bodyTop", "example": 590 },
-        "bodyPx": { "type": "number", "required": true, "resolver": "gl-px-bodyPx", "example": 26 },
-        "bodyWidth": { "type": "number", "required": true, "resolver": "gl-px-bodyWidth", "example": 560 },
-        "eyebrowPx": { "type": "string", "required": true, "resolver": "gl-css", "example": "--gl-eyebrow-px=20px" },
-        "figurePx": { "type": "string", "required": true, "resolver": "gl-css", "example": "--gl-figure-px=64px" },
-        "notePx": { "type": "string", "required": true, "resolver": "gl-css", "example": "--gl-note-px=17px" },
-        "lensCx": { "type": "string", "required": true, "resolver": "gl-css", "example": "--gl-lens-cx=1420px" },
-        "lensCy": { "type": "string", "required": true, "resolver": "gl-css", "example": "--gl-lens-cy=600px" },
-        "lensR": { "type": "string", "required": true, "resolver": "gl-css", "example": "--gl-lens-r=360px" },
-        "lensGrayscale": { "type": "string", "required": true, "resolver": "gl-css", "example": "--gl-lens-grayscale=1" },
-        "lensContrast": { "type": "string", "required": true, "resolver": "gl-css", "example": "--gl-lens-contrast=1.1" },
-        "lensBrightness": { "type": "string", "required": true, "resolver": "gl-css", "example": "--gl-lens-brightness=0.5" },
-        "lensMultiply": { "type": "string", "required": true, "resolver": "gl-css", "example": "--gl-lens-multiply=0.8" },
-        "columnWidth": { "type": "string", "required": true, "resolver": "gl-css", "example": "--gl-column-width=977px" }
+        "line": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-line",
+          "example": "growth"
+        },
+        "margin": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-margin",
+          "example": 140
+        },
+        "eyebrowTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-eyebrowTop",
+          "example": 150
+        },
+        "questionTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-questionTop",
+          "example": 215
+        },
+        "answerTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerTop",
+          "example": 270
+        },
+        "answerPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-answerPx",
+          "example": 300
+        },
+        "bodyTop": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyTop",
+          "example": 590
+        },
+        "bodyPx": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyPx",
+          "example": 26
+        },
+        "bodyWidth": {
+          "type": "number",
+          "required": true,
+          "resolver": "gl-px-bodyWidth",
+          "example": 560
+        },
+        "eyebrowPx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-eyebrow-px=20px"
+        },
+        "figurePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-figure-px=64px"
+        },
+        "notePx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-note-px=17px"
+        },
+        "lensCx": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lens-cx=1420px"
+        },
+        "lensCy": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lens-cy=600px"
+        },
+        "lensR": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lens-r=359.97px"
+        },
+        "lensGrayscale": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lens-grayscale=1"
+        },
+        "lensContrast": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lens-contrast=1.1"
+        },
+        "lensBrightness": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lens-brightness=0.5"
+        },
+        "lensMultiply": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-lens-multiply=0.8"
+        },
+        "columnWidth": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-css",
+          "example": "--gl-column-width=976.84px"
+        }
       }
     },
     "photo": {
@@ -35,9 +138,25 @@
       "type": "object",
       "required": true,
       "shape": {
-        "src": { "type": "string", "required": true, "resolver": "gl-plate-ref", "example": "asset-ref:plate:probe" },
-        "lensSrc": { "type": "string", "required": true, "resolver": "gl-plate-ref", "example": "asset-ref:plate:probe" },
-        "alt": { "type": "string", "required": true, "maxCharacters": 320, "resolver": "gl-alt" }
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-plate-ref",
+          "example": "asset-ref:plate:probe"
+        },
+        "lensSrc": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-plate-ref",
+          "example": "asset-ref:plate:probe"
+        },
+        "alt": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 320,
+          "resolver": "gl-alt",
+          "example": "Un editor revisa un corte en la línea de tiempo de su pantalla, de noche, con una taza azul al lado"
+        }
       }
     },
     "orbit": {
@@ -45,7 +164,12 @@
       "type": "object",
       "required": true,
       "shape": {
-        "src": { "type": "string", "required": true, "resolver": "gl-layer-ref", "example": "asset-ref:layer:probe" }
+        "src": {
+          "type": "string",
+          "required": true,
+          "resolver": "gl-layer-ref",
+          "example": "asset-ref:layer:probe"
+        }
       }
     },
     "voice": {
@@ -53,36 +177,89 @@
       "type": "object",
       "required": true,
       "shape": {
-        "eyebrow": { "type": "string", "required": false, "maxCharacters": 40 },
-        "question": { "type": "string", "required": true, "maxCharacters": 44 },
-        "answerLead": { "type": "string", "required": false, "maxCharacters": 8 },
-        "answer": { "type": "string", "required": true, "maxCharacters": 8, "resolver": "gl-answer", "example": "62 %" }
+        "eyebrow": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 40,
+          "example": "Resultados · 3 de 5"
+        },
+        "question": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 44,
+          "example": "¿Cuántos cortes pasan a la primera?"
+        },
+        "answerLead": {
+          "type": "string",
+          "required": false,
+          "maxCharacters": 8,
+          "example": ""
+        },
+        "answer": {
+          "type": "string",
+          "required": true,
+          "maxCharacters": 8,
+          "resolver": "gl-answer",
+          "example": "62 %"
+        }
       }
     },
     "body": {
       "selector": "[data-slot='body']",
       "type": "string",
       "required": true,
-      "constraints": { "maxCharacters": 130, "maxLines": 3, "overflow": "reject" }
+      "constraints": {
+        "maxCharacters": 130,
+        "maxLines": 3,
+        "overflow": "reject"
+      },
+      "example": "de los cortes se aprueban sin cambios. El arco de la lente recorre ese 62 %."
     },
     "figures": {
       "selector": "[data-slot='figures']",
       "type": "array",
       "required": false,
-      "constraints": { "minItems": 1, "maxItems": 2, "overflow": "reject" },
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 2,
+        "overflow": "reject"
+      },
       "item": {
         "type": "object",
         "shape": {
-          "value": { "type": "string", "required": true, "maxCharacters": 9 },
-          "label": { "type": "string", "required": true, "maxCharacters": 24 }
+          "value": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 9
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 24
+          }
         }
-      }
+      },
+      "example": [
+        {
+          "value": "12 días",
+          "label": "de idea a pieza"
+        },
+        {
+          "value": "−38 %",
+          "label": "costo por lead"
+        }
+      ]
     },
     "note": {
       "selector": "[data-slot='note']",
       "type": "string",
       "required": true,
-      "constraints": { "maxCharacters": 90, "maxLines": 1, "overflow": "reject" }
+      "constraints": {
+        "maxCharacters": 90,
+        "maxLines": 1,
+        "overflow": "reject"
+      },
+      "example": "Datos de muestra"
     }
   }
 }

@@ -27,7 +27,7 @@
           "type": "number",
           "required": true,
           "resolver": "gl-px-questionTop",
-          "example": 250
+          "example": 300
         },
         "questionPx": {
           "type": "string",
@@ -39,13 +39,13 @@
           "type": "number",
           "required": true,
           "resolver": "gl-px-answerTop",
-          "example": 300
+          "example": 351
         },
         "answerPx": {
           "type": "number",
           "required": true,
           "resolver": "gl-px-answerPx",
-          "example": 200
+          "example": 166
         },
         "answerLineHeight": {
           "type": "string",
@@ -63,13 +63,13 @@
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-answer-nudge=-0.02em"
+          "example": "--gl-answer-nudge=-0.03em"
         },
         "ctaTop": {
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-cta-top=676px"
+          "example": "--gl-cta-top=612px"
         },
         "ctaPx": {
           "type": "string",
@@ -111,7 +111,7 @@
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-descriptor-width=360px"
+          "example": "--gl-descriptor-width=330px"
         },
         "navHeight": {
           "type": "string",
@@ -154,7 +154,8 @@
           "type": "string",
           "required": true,
           "maxCharacters": 320,
-          "resolver": "gl-alt"
+          "resolver": "gl-alt",
+          "example": "Una estratega de Efeonce con el polo y la credencial mira a cámara junto al portátil con el tablero del cliente"
         }
       }
     },
@@ -180,12 +181,19 @@
           "item": {
             "type": "string",
             "maxCharacters": 16
-          }
+          },
+          "example": [
+            "Servicios",
+            "Casos",
+            "Insights",
+            "Nosotros"
+          ]
         },
         "action": {
           "type": "string",
           "required": true,
-          "maxCharacters": 18
+          "maxCharacters": 18,
+          "example": "Conversemos"
         }
       }
     },
@@ -197,19 +205,21 @@
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 48
+          "maxCharacters": 48,
+          "example": "¿Tu marketing ya mide lo que vende?"
         },
         "answerLead": {
           "type": "string",
           "required": false,
-          "maxCharacters": 12
+          "maxCharacters": 12,
+          "example": ""
         },
         "answer": {
           "type": "string",
           "required": true,
           "maxCharacters": 12,
           "resolver": "gl-answer",
-          "example": "Crecer"
+          "example": "Ahora sí"
         }
       }
     },
@@ -221,12 +231,14 @@
         "label": {
           "type": "string",
           "required": true,
-          "maxCharacters": 28
+          "maxCharacters": 28,
+          "example": "Agenda un diagnóstico"
         },
         "descriptor": {
           "type": "string",
           "required": true,
-          "maxCharacters": 90
+          "maxCharacters": 90,
+          "example": "Revisamos contigo qué mide hoy tu marketing."
         }
       }
     },
@@ -239,24 +251,28 @@
           "type": "string",
           "required": true,
           "maxCharacters": 24,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "Growth"
         },
         "anchor": {
           "type": "string",
           "required": true,
           "maxCharacters": 16,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "bottom-end"
         },
         "participantKind": {
           "type": "string",
           "required": true,
           "maxCharacters": 12,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "role"
         },
         "scale": {
           "type": "number",
           "required": false,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": 1.5
         }
       }
     }

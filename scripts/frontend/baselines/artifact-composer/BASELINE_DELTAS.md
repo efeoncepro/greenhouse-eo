@@ -1,5 +1,39 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-27 — TASK-1919: los catálogos de «La órbita» entran al gate (scope `graphic-line`)
+
+Tres catálogos nuevos (`graphic-line-deck`, `graphic-line-stills`, `graphic-line-overlays`) con las 20 recetas
+aprobadas de la línea gráfica por superficie; el teléfono tiene una plantilla por ancho (22 frames). Scope propio,
+`pnpm composer:visual-gate --catalog=graphic-line`, para no rebaselinar frames ajenos. El probe no es el sintético
+genérico: cada contrato declara como `example` el plan real de su pieza aprobada, y la foto, los íconos y las capas
+de la órbita llegan como SVG sintéticos y deterministas (`GRAPHIC_LINE_PROBE_ASSETS` en `visual-gate.ts`), así que
+ISSUE-122 no aplica. Las capas audiovisuales transparentes se congelan con su alfa. Determinismo verificado en cuatro
+corridas `--selftest` (0 px). Los 60 frames de `deck-axis`/SKY/Insights que hoy difieren por pocos píxeles NO se
+tocan: la misma lista y las mismas cuentas aparecen con el `render.ts` anterior (deriva de entorno, ISSUE-122).
+
+- `templates-graphic-line-deck/ProposalCinematic.png` — 🆕 deck.proposal-cinematic
+- `templates-graphic-line-deck/SectionClassic.png` — 🆕 deck.section-classic
+- `templates-graphic-line-deck/SectionSplit.png` — 🆕 deck.section-split
+- `templates-graphic-line-deck/ContentMeasure.png` — 🆕 deck.content-measure
+- `templates-graphic-line-deck/Triptych.png` — 🆕 deck.triptych
+- `templates-graphic-line-deck/MethodStaircase.png` — 🆕 deck.method-staircase
+- `templates-graphic-line-stills/HeroLens.png` — 🆕 web.hero-lens
+- `templates-graphic-line-stills/HeroBleed.png` — 🆕 web.hero-bleed
+- `templates-graphic-line-stills/HeroUniformTablet.png` — 🆕 web.hero-uniform-tablet
+- `templates-graphic-line-stills/HeroMobileNative360.png` — 🆕 web.hero-mobile-native.phone-360
+- `templates-graphic-line-stills/HeroMobileNative390.png` — 🆕 web.hero-mobile-native.phone-390
+- `templates-graphic-line-stills/HeroMobileNative430.png` — 🆕 web.hero-mobile-native.phone-430
+- `templates-graphic-line-stills/CamineroLens.png` — 🆕 dooh.caminero-lens
+- `templates-graphic-line-stills/MotionStoryboard.png` — 🆕 motion.storyboard
+- `templates-graphic-line-stills/LoopLensReveal.png` — 🆕 motion.loop-lens-reveal
+- `templates-graphic-line-overlays/Cartela.png` — 🆕 audiovisual.cartela
+- `templates-graphic-line-overlays/Zocalo.png` — 🆕 audiovisual.zocalo
+- `templates-graphic-line-overlays/CalloutSelection.png` — 🆕 audiovisual.callout-selection
+- `templates-graphic-line-overlays/DataSuper.png` — 🆕 audiovisual.data-super
+- `templates-graphic-line-overlays/SplitScreen.png` — 🆕 audiovisual.split-screen
+- `templates-graphic-line-overlays/Subtitles.png` — 🆕 audiovisual.subtitles
+- `templates-graphic-line-overlays/ShotPlan.png` — 🆕 audiovisual.shot-plan
+
 ## 2026-09-25 (k) — TASK-1889: la tabla de respaldo con datos reales
 
 Revisión del operador sobre Berel y Sky: la tabla comparaba unidades distintas en una sola escala y titulaba con «la
@@ -541,7 +575,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 2c7faaec7edb67f0a7c4e333a04eb2ca03967ae1f345c1835750b217e22d6e7f -->
+<!-- manifest-digest: 915fd45d901f00bc094881c1af0be3e6e07422c921b1cd48211827cd121061cc -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

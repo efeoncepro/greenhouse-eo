@@ -51,7 +51,8 @@
         "maxCharacters": 110,
         "maxLines": 2,
         "overflow": "reject"
-      }
+      },
+      "example": "Producción audiovisual · un video de 12,6 s «Cómo trabajamos», cuadros clave generados"
     },
     "shots": {
       "selector": "[data-slot='shots']",
@@ -93,7 +94,37 @@
             "maxCharacters": 80
           }
         }
-      }
+      },
+      "example": [
+        {
+          "src": "asset-ref:plate:probe",
+          "alt": "Una productora de Efeonce filma al panadero junto al horno",
+          "heading": "01 · 0–3 s · Plano general",
+          "spec": "Terreno, panadería del cliente · 35 mm · cámara en mano, avanza despacio · luz del horno + ventana",
+          "note": "Documental: nadie mira a cámara · gorra + hoodie (terreno)"
+        },
+        {
+          "src": "asset-ref:plate:probe",
+          "alt": "Las manos de un director de arte marcan una prueba de impresión con lápiz rojo y una lupa",
+          "heading": "02 · 3–5 s · Inserto",
+          "spec": "Detalle de manos · macro 100 mm · fijo, foco en la punta del lápiz · una lámpara rasante",
+          "note": "El oficio en primer plano · manga del polo (oficina)"
+        },
+        {
+          "src": "asset-ref:plate:probe",
+          "alt": "Una estratega de Efeonce presenta la curva de resultados al equipo del cliente",
+          "heading": "03 · 5–9 s · Plano medio",
+          "spec": "Sala del cliente · 50 mm · sobre el hombro del cliente, empuje lento · la pantalla es la luz",
+          "note": "Documental · chaqueta sobre polo (reunión importante)"
+        },
+        {
+          "src": "asset-ref:plate:probe",
+          "alt": "El último cuadro del reveal: el logo de Efeonce con su eslogan sobre el navy de la marca",
+          "heading": "04 · 9–12,6 s · Cierre",
+          "spec": "Reveal aprobado (3,6 s, con sonido) · masters de AXIS v1.1",
+          "note": "La toma nunca lleva logo: firma el cierre"
+        }
+      ]
     },
     "rules": {
       "selector": "[data-slot='rules']",

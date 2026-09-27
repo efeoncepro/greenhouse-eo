@@ -5,6 +5,8 @@
  *   pnpm composer:visual-gate --catalog=insights            # gate aislado de los catálogos Insights
  *   pnpm composer:visual-gate --catalog=insights --selftest # determinismo de Insights (2 corridas)
  *   pnpm composer:visual-gate --catalog=insights --freeze   # promueve sólo los frames declarados de Insights
+ *   pnpm composer:visual-gate --catalog=graphic-line        # gate aislado de los catálogos de La órbita (TASK-1919)
+ *   pnpm composer:visual-gate --catalog=graphic-line --freeze
  *   pnpm composer:visual-gate --freeze                      # congela/re-promueve el baseline completo
  *
  * Por qué existe: las tres operaciones centrales de TASK-1393 (tokenizar 80 bases de color, mover
@@ -48,6 +50,14 @@ import {
 import { deckAxisCatalog, deckAxisCatalogDir } from '@/lib/artifact-composer/catalogs/deck-axis'
 import { insightsDeckCatalog, insightsDeckCatalogDir } from '@/lib/artifact-composer/catalogs/insights-deck'
 import { insightsReportCatalog, insightsReportCatalogDir } from '@/lib/artifact-composer/catalogs/insights-report'
+import { createCatalog as createGraphicLineDeck, graphicLineDeckCatalogDir } from '@/lib/artifact-composer/catalogs/graphic-line-deck'
+import {
+  createCatalog as createGraphicLineOverlays,
+  graphicLineOverlaysCatalogDir
+} from '@/lib/artifact-composer/catalogs/graphic-line-overlays'
+import { createCatalog as createGraphicLineStills, graphicLineStillsCatalogDir } from '@/lib/artifact-composer/catalogs/graphic-line-stills'
+
+import { greenhouseCtaPainter, greenhouseSelectionPainter } from '../brand-surfaces/compose'
 
 import { compareImages, loadPng } from '../frontend/lib/visual-diff'
 
@@ -64,21 +74,56 @@ const ROOT = process.cwd()
  * y captura el frame. Un harness web aparte sería una copia peor —y rompería la autocontención del
  * catálogo, que se sirve por `file://` con sus assets relativos.
  */
+/**
+ * Bytes sintéticos y DETERMINISTAS para los assets externos de los probes de La órbita (TASK-1919): la foto, los
+ * íconos y las capas de la órbita llegan como `asset-ref:*` que en producción materializa quien compone. Un SVG
+ * rasteriza igual en cada corrida (no hay foto real: ISSUE-122 no aplica) y no depende de archivos fuera de git.
+ */
+const svgDataUri = (svg: string): string => `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`
+
+const GRAPHIC_LINE_PROBE_ASSETS: Readonly<Record<string, string>> = {
+  'plate:probe': svgDataUri(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1a2b"/><stop offset="1" stop-color="#3d5a73"/></linearGradient></defs><rect width="1920" height="1080" fill="url(#g)"/><circle cx="1320" cy="430" r="190" fill="#8aa1b4"/><rect x="1120" y="600" width="400" height="480" rx="120" fill="#5b7488"/></svg>'
+  ),
+  'icon:probe': svgDataUri(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="none" stroke="#ffffff" stroke-width="3"/></svg>'
+  ),
+  'layer:probe': svgDataUri(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080"><circle cx="1400" cy="540" r="300" fill="none" stroke="#36c8bf" stroke-width="4"/></svg>'
+  )
+}
+
+const graphicLineProbe = <T extends object>(catalog: T) => ({ ...catalog, externalAssets: GRAPHIC_LINE_PROBE_ASSETS })
+
+const painters = { selectionPainter: greenhouseSelectionPainter, ctaPainter: greenhouseCtaPainter }
+
 const PROBE_CATALOGS = [
   { catalog: deckAxisCatalog, dir: deckAxisCatalogDir, frameDir: 'templates' },
   { catalog: insightsDeckCatalog, dir: insightsDeckCatalogDir, frameDir: 'templates-insights-deck' },
-  { catalog: insightsReportCatalog, dir: insightsReportCatalogDir, frameDir: 'templates-insights-report' }
+  { catalog: insightsReportCatalog, dir: insightsReportCatalogDir, frameDir: 'templates-insights-report' },
+  { catalog: graphicLineProbe(createGraphicLineDeck(painters)), dir: graphicLineDeckCatalogDir, frameDir: 'templates-graphic-line-deck' },
+  { catalog: graphicLineProbe(createGraphicLineStills(painters)), dir: graphicLineStillsCatalogDir, frameDir: 'templates-graphic-line-stills' },
+  {
+    catalog: graphicLineProbe(createGraphicLineOverlays(painters)),
+    dir: graphicLineOverlaysCatalogDir,
+    frameDir: 'templates-graphic-line-overlays'
+  }
 ]
 
-type CatalogScope = 'all' | 'insights'
+type CatalogScope = 'all' | 'insights' | 'graphic-line'
 
-const INSIGHTS_FRAME_PREFIXES = ['templates-insights-deck/', 'templates-insights-report/']
+const SCOPE_FRAME_PREFIXES: Record<Exclude<CatalogScope, 'all'>, string> = {
+  insights: 'templates-insights-',
+  'graphic-line': 'templates-graphic-line-'
+}
+
+const SCOPE_LABEL: Record<CatalogScope, string> = { all: 'el set completo', insights: 'Insights', 'graphic-line': 'La órbita' }
 
 const frameInScope = (frame: string, scope: CatalogScope): boolean =>
-  scope === 'all' || INSIGHTS_FRAME_PREFIXES.some(prefix => frame.startsWith(prefix))
+  scope === 'all' || frame.startsWith(SCOPE_FRAME_PREFIXES[scope])
 
 const catalogsInScope = (scope: CatalogScope) =>
-  scope === 'all' ? PROBE_CATALOGS : PROBE_CATALOGS.filter(target => target.frameDir.startsWith('templates-insights-'))
+  scope === 'all' ? PROBE_CATALOGS : PROBE_CATALOGS.filter(target => target.frameDir.startsWith(SCOPE_FRAME_PREFIXES[scope]))
 
 /** El deck real que protege este gate: 15 láminas de la oferta SKY. */
 const SKY_PLAN_PATH = path.resolve(ROOT, 'docs/commercial/tenders/sky-blog-2026/deck-plan.json')
@@ -351,7 +396,7 @@ const listBaselinePngs = async (): Promise<string[]> => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const selftest = async (scope: CatalogScope): Promise<number> => {
-  console.log(`\n0a · Determinismo: componiendo ${scope === 'all' ? 'el set completo' : 'los catálogos Insights'} DOS veces…\n`)
+  console.log(`\n0a · Determinismo: componiendo ${SCOPE_LABEL[scope]} DOS veces…\n`)
 
   const runA = path.join(WORK_DIR, 'selftest-a')
   const runB = path.join(WORK_DIR, 'selftest-b')
@@ -411,7 +456,7 @@ Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**
 `
 
 const freeze = async (scope: CatalogScope): Promise<number> => {
-  console.log(`\n0b/0d · Congelando baseline ${scope === 'all' ? '(set completo)' : '(sólo Insights)'}…\n`)
+  console.log(`\n0b/0d · Congelando baseline (${SCOPE_LABEL[scope]})…\n`)
 
   const runDir = path.join(WORK_DIR, 'freeze')
   const frames = await renderAll(runDir, scope)
@@ -510,7 +555,7 @@ const freeze = async (scope: CatalogScope): Promise<number> => {
 
   await fs.writeFile(DELTAS_PATH, sealed, 'utf8')
 
-  console.log(`\n✓ Baseline congelado: ${frames.length} frame(s) ${scope === 'all' ? 'del set completo' : 'de Insights'} → ${path.relative(ROOT, BASELINE_DIR)}`)
+  console.log(`\n✓ Baseline congelado: ${frames.length} frame(s) de ${SCOPE_LABEL[scope]} → ${path.relative(ROOT, BASELINE_DIR)}`)
   console.log(`  manifest-digest sellado en BASELINE_DELTAS.md: ${digest.slice(0, 12)}…`)
   console.log('  Commitealo COMPLETO (PNGs + manifest + BASELINE_DELTAS.md) en el mismo PR.\n')
 
@@ -522,7 +567,7 @@ const freeze = async (scope: CatalogScope): Promise<number> => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const gate = async (scope: CatalogScope): Promise<number> => {
-  console.log(`\ncomposer:visual-gate · recomponiendo ${scope === 'all' ? 'el set completo' : 'Insights'} y diffeando a CERO píxeles…\n`)
+  console.log(`\ncomposer:visual-gate · recomponiendo ${SCOPE_LABEL[scope]} y diffeando a CERO píxeles…\n`)
 
   const manifest = await readManifest()
 
@@ -619,8 +664,8 @@ const main = async (): Promise<void> => {
   const args = process.argv.slice(2)
   const catalogArg = args.find(arg => arg.startsWith('--catalog='))?.slice('--catalog='.length) ?? 'all'
 
-  if (catalogArg !== 'all' && catalogArg !== 'insights') {
-    console.error(`✗ Catálogo desconocido: ${catalogArg}. Usa --catalog=all o --catalog=insights.\n`)
+  if (catalogArg !== 'all' && catalogArg !== 'insights' && catalogArg !== 'graphic-line') {
+    console.error(`✗ Catálogo desconocido: ${catalogArg}. Usa --catalog=all, --catalog=insights o --catalog=graphic-line.\n`)
     process.exit(1)
   }
 

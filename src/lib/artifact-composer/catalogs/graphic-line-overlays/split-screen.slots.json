@@ -70,18 +70,20 @@
           "type": "string",
           "required": true,
           "maxCharacters": 320,
-          "resolver": "gl-alt"
+          "resolver": "gl-alt",
+          "example": "Una productora de Efeonce con gorra y hoodie filma con un estabilizador al panadero mientras saca el pan del horno"
         },
         "focus": {
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-focus-x=50%"
+          "example": "--gl-focus-x=83.33%"
         },
         "word": {
           "type": "string",
           "required": true,
-          "maxCharacters": 12
+          "maxCharacters": 12,
+          "example": "Escucha"
         }
       }
     },
@@ -100,13 +102,14 @@
           "type": "string",
           "required": true,
           "maxCharacters": 320,
-          "resolver": "gl-alt"
+          "resolver": "gl-alt",
+          "example": "Una estratega de Efeonce con chaqueta señala en la pantalla la curva que sube, frente al equipo del cliente"
         },
         "focus": {
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-focus-x=50%"
+          "example": "--gl-focus-x=93.75%"
         },
         "word": {
           "type": "string",

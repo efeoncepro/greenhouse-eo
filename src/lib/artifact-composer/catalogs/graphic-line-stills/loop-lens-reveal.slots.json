@@ -75,31 +75,31 @@
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-lens-cx=1150px"
+          "example": "--gl-lens-cx=1150.08px"
         },
         "lensCy": {
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-lens-cy=420px"
+          "example": "--gl-lens-cy=420.012px"
         },
         "lensR": {
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-lens-r=350px"
+          "example": "--gl-lens-r=350.0357px"
         },
         "photoX": {
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-photo-x=637px"
+          "example": "--gl-photo-x=636px"
         },
         "photoY": {
           "type": "string",
           "required": true,
           "resolver": "gl-css",
-          "example": "--gl-photo-y=-137px"
+          "example": "--gl-photo-y=-138px"
         }
       }
     },
@@ -118,7 +118,8 @@
           "type": "string",
           "required": true,
           "maxCharacters": 320,
-          "resolver": "gl-alt"
+          "resolver": "gl-alt",
+          "example": "Una directora de cuentas con el polo de Efeonce avanza hacia la cámara y la mira"
         }
       }
     },
@@ -143,12 +144,14 @@
         "question": {
           "type": "string",
           "required": true,
-          "maxCharacters": 52
+          "maxCharacters": 52,
+          "example": "¿Tu marketing mide<br>lo que vende?"
         },
         "answerLead": {
           "type": "string",
           "required": false,
-          "maxCharacters": 12
+          "maxCharacters": 12,
+          "example": "Ahora"
         },
         "answer": {
           "type": "string",
@@ -168,24 +171,28 @@
           "type": "string",
           "required": true,
           "maxCharacters": 24,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "Growth"
         },
         "anchor": {
           "type": "string",
           "required": true,
           "maxCharacters": 16,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "bottom-end"
         },
         "participantKind": {
           "type": "string",
           "required": true,
           "maxCharacters": 12,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "role"
         },
         "scale": {
           "type": "number",
           "required": false,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": 1.6
         }
       }
     }

@@ -62,48 +62,56 @@
           "type": "string",
           "required": true,
           "maxCharacters": 24,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "Dirección de arte"
         },
         "anchor": {
           "type": "string",
           "required": true,
           "maxCharacters": 16,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "top-start"
         },
         "participantKind": {
           "type": "string",
           "required": true,
           "maxCharacters": 12,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "role"
         },
         "scale": {
           "type": "number",
           "required": false,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": 1.6
         },
         "targetKind": {
           "type": "string",
           "required": true,
           "maxCharacters": 8,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "object"
         },
         "variant": {
           "type": "string",
           "required": false,
           "maxCharacters": 16,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": ""
         },
         "padding": {
           "type": "string",
           "required": false,
           "maxCharacters": 12,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": ""
         },
         "overlay": {
           "type": "string",
           "required": false,
           "maxCharacters": 8,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": ""
         }
       }
     }

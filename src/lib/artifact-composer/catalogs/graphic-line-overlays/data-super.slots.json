@@ -85,18 +85,21 @@
         "value": {
           "type": "string",
           "required": true,
-          "maxCharacters": 6
+          "maxCharacters": 6,
+          "example": "62%"
         },
         "caption": {
           "type": "string",
           "required": true,
-          "maxCharacters": 64
+          "maxCharacters": 64,
+          "example": "de los cortes se aprueban a la primera"
         },
         "source": {
           "type": "string",
           "required": true,
           "maxCharacters": 160,
-          "consumer": "validation-only"
+          "consumer": "validation-only",
+          "example": "Maqueta de dirección «Cómo trabajamos» (2026-09-26): cifra ilustrativa, reemplazar por la medida real del cliente antes de publicar"
         }
       }
     }

@@ -56,6 +56,9 @@ export const makeStoryboardHook =
     if (!ANCHORS.has(anchor)) throw new GraphicLineSelectionError(slide.slideId, `ancla "${anchor}" no es de colaborador.`)
 
     // Límites de la respuesta de cada cuadro con escena `voice`, en px del lienzo del cuadro.
+    // Se mide con la tipografía definitiva: medir con la fuente de respaldo mueve la caja entre corridas.
+    await page.evaluate(() => document.fonts.ready)
+
     const targets = await page.evaluate(() =>
       Array.from(document.querySelectorAll('.gl-sb-kind-voice [data-gl-sb-stage]')).map(stage => {
         const stageBox = stage.getBoundingClientRect()
