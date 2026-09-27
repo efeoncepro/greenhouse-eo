@@ -30,10 +30,11 @@ import { glitchLine } from '@efeoncepro/axis-tokens'
 import { composeArtifact } from '@/lib/artifact-composer'
 import { resolvePlan } from '@/lib/artifact-composer/catalog'
 import { GLITCH_CATALOG_FACTORIES } from '@/lib/artifact-composer/catalogs/glitch'
-import { attachFractures, GlitchPieceError, planGlitchEdition, type GlitchCatalogPlan } from '@/lib/glitch-composition'
+import { attachFractures, planGlitchEdition, type GlitchCatalogPlan } from '@/lib/glitch-composition'
 import { computeByteFracture, paintByteFracture, type PaintedByteCell } from '@/lib/glitch-composition/byte-fracture'
 
 import { glitchAxisVersions } from './glitch-tokens'
+import { toGlitchPieceError } from './errors'
 import { checkCarouselForLinkedIn, LINKEDIN_DOCUMENT_LIMITS } from './linkedin'
 import { processLensDetail, processPhoto, sampleEdge, type ProcessedPhoto } from './photos'
 
@@ -202,15 +203,17 @@ const main = async () => {
   console.log(`✓ Glitch #${plan.edition} (portada ${plan.coverTemplate}) → ${path.relative(process.cwd(), out)}`)
 }
 
-main().catch((error: unknown) => {
-  if (error instanceof GlitchPieceError) {
-    console.error(`✗ ${error.message}`)
+main().catch((raw: unknown) => {
+  const error = toGlitchPieceError(raw)
+
+  if (error) {
+    console.error(`✗ [${error.code}] ${error.message}`)
 
     for (const issue of error.issues) console.error(`  - [${issue.code}]${issue.path ? ` ${issue.path}` : ''}: ${issue.message}`)
 
     process.exit(1)
   }
 
-  console.error(error)
+  console.error(raw)
   process.exit(1)
 })

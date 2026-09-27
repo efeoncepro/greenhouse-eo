@@ -211,12 +211,34 @@ export type GlitchRegion = z.infer<typeof glitchRegionSchema>
 const pathOf = (path: readonly (string | number)[]) =>
   path.reduce<string>((acc, part) => (typeof part === 'number' ? `${acc}[${part}]` : acc ? `${acc}.${part}` : part), '')
 
+/** Mensaje en español para los issues de zod que no traen uno propio (los `refine` del esquema ya vienen en español). */
+const messageOf = (issue: z.ZodIssue): string => {
+  switch (issue.code) {
+    case 'unrecognized_keys':
+      return `campo no admitido: ${issue.keys.join(', ')}`
+    case 'invalid_type':
+      return issue.received === 'undefined' ? 'falta este campo' : `tipo no válido: se esperaba ${issue.expected}`
+    case 'invalid_literal':
+      return `valor no válido: se esperaba ${JSON.stringify(issue.expected)}`
+    case 'invalid_enum_value':
+      return `valor no admitido: usa ${issue.options.map((o) => JSON.stringify(o)).join(', ')}`
+    case 'too_small':
+      return issue.type === 'array' ? `faltan elementos: se esperan ${issue.exact ? 'exactamente ' : 'al menos '}${issue.minimum}` : issue.type === 'string' ? 'no puede estar vacío' : `el valor mínimo es ${issue.minimum}`
+    case 'too_big':
+      return issue.type === 'array' ? `sobran elementos: se esperan ${issue.exact ? 'exactamente ' : 'como máximo '}${issue.maximum}` : `el valor máximo es ${issue.maximum}`
+    case 'invalid_string':
+      return 'formato no válido'
+    default:
+      return issue.message
+  }
+}
+
 /** Traduce los issues de zod a issues legibles con la ruta del campo. */
 const toIssues = (error: z.ZodError): GlitchIssue[] =>
   error.issues.map((issue) => ({
     code: issue.code === 'unrecognized_keys' ? 'field-unknown' : issue.code === 'invalid_type' && issue.received === 'undefined' ? 'field-required' : 'field-invalid',
     path: pathOf(issue.path) || undefined,
-    message: issue.code === 'unrecognized_keys' ? `campo no admitido: ${issue.keys.join(', ')}` : issue.message
+    message: issue.code === 'custom' || (issue.code === 'invalid_string' && issue.message !== 'Invalid') ? issue.message : messageOf(issue)
   }))
 
 /** Valida un manifiesto; devuelve el manifiesto normalizado o lanza `GlitchPieceError('manifest-invalid')`. */
