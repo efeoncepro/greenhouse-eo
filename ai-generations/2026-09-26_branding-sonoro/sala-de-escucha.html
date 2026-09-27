@@ -1,0 +1,393 @@
+<title>Logo sonoro Efeonce</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,760&family=Poppins:wght@300;400;600&display=swap">
+<style>
+  :root {
+    --ground: #f7f8f6;
+    --surface: #ffffff;
+    --ink: #001a33;
+    --muted: #4b5a68;
+    --rule: #d8dee2;
+    --ring: #b9c6cf;
+    --accent: #0e8c82;
+    --growth: #0e8c82;
+    --brand: #bb1954;
+    --engine: #0375db;
+    --voice: #c42d00;
+    --revenue: #8e1b82;
+    --display: "Bricolage Grotesque", "Poppins", system-ui, sans-serif;
+    --body: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #001a33;
+      --surface: #04243f;
+      --ink: #f7f8f6;
+      --muted: #a8b7c5;
+      --rule: #173552;
+      --ring: #2c4d6b;
+      --accent: #36c8bf;
+      --growth: #36c8bf;
+      --brand: #ff6500;
+      --engine: #3b95ee;
+      --voice: #f83902;
+      --revenue: #e86bd0;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #001a33;
+    --surface: #04243f;
+    --ink: #f7f8f6;
+    --muted: #a8b7c5;
+    --rule: #173552;
+    --ring: #2c4d6b;
+    --accent: #36c8bf;
+    --growth: #36c8bf;
+    --brand: #ff6500;
+    --engine: #3b95ee;
+    --voice: #f83902;
+    --revenue: #e86bd0;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font: 400 15px/1.6 var(--body);
+  }
+  .page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding-inline: 20px;
+    padding-block: 40px 72px;
+    display: grid;
+    gap: 56px;
+  }
+
+  header { display: grid; gap: 14px; max-width: 68ch; }
+  .eyebrow {
+    font: 600 11px/1 var(--body);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  h1 {
+    font: 760 clamp(34px, 6vw, 56px)/1.02 var(--display);
+    letter-spacing: -.02em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  h1 .sphere {
+    display: inline-block;
+    width: .2em; height: .2em;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-left: .06em;
+    vertical-align: .08em;
+  }
+  .lede { margin: 0; color: var(--muted); font-size: 16px; }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  .grammar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .grammar div { background: var(--surface); padding: 14px 16px; display: grid; gap: 4px; }
+  .grammar b { font: 600 13px/1.3 var(--body); }
+  .grammar span { font-size: 13px; color: var(--muted); line-height: 1.45; }
+
+  section { display: grid; gap: 18px; }
+  .section-head { display: grid; gap: 6px; max-width: 68ch; }
+  h2 {
+    font: 760 clamp(24px, 3.4vw, 32px)/1.1 var(--display);
+    letter-spacing: -.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .section-head p { margin: 0; color: var(--muted); }
+
+  .list { display: grid; border-top: 1px solid var(--rule); }
+  .row {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 18px;
+    padding-block: 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .row h3 { font: 600 16px/1.3 var(--body); margin: 0; }
+  .row p { margin: 2px 0 0; font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+  .row .meta { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* Reproductor: el arco mide el avance real de la reproducción; la esfera recorre, nunca llena. */
+  .orbit {
+    appearance: none; border: 0; background: none; padding: 0;
+    width: 64px; height: 64px; cursor: pointer; color: var(--ink);
+    border-radius: 50%;
+  }
+  .orbit:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .orbit svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .orbit .track { fill: none; stroke: var(--ring); stroke-width: 1.5; }
+  .orbit .arc { fill: none; stroke: var(--line, var(--accent)); stroke-width: 2.5; stroke-linecap: round; }
+  .orbit .dot { fill: var(--line, var(--accent)); }
+  .orbit .icon { fill: currentColor; }
+
+  .melody { display: flex; align-items: flex-end; gap: 10px; height: 38px; margin-top: 8px; }
+  .melody i { display: block; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+  .melody i.s { width: 13px; height: 13px; background: var(--accent); margin-left: 12px; }
+  .melody + .notes { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; margin-top: 4px; }
+
+  .videos { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+  figure { margin: 0; display: grid; gap: 8px; }
+  video { width: 100%; max-width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; background: #001a33; display: block; }
+  figcaption { font-size: 13.5px; color: var(--muted); }
+  figcaption b { color: var(--ink); font-weight: 600; }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: 600 12px/1 var(--body); letter-spacing: .02em;
+  }
+  .chip::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
+
+  .decide { display: grid; gap: 12px; max-width: 72ch; }
+  .decide ol { margin: 0; padding-left: 20px; display: grid; gap: 10px; }
+  .decide li::marker { font-weight: 600; color: var(--accent); }
+  .note {
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px;
+    background: var(--surface);
+    border-radius: 0 8px 8px 0;
+    font-size: 13.5px;
+    color: var(--muted);
+    max-width: 72ch;
+  }
+  .note b { color: var(--ink); }
+
+  @media (max-width: 560px) {
+    .row { grid-template-columns: 56px minmax(0, 1fr); }
+    .row .meta { grid-column: 2; }
+    .orbit { width: 56px; height: 56px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<main class="page">
+  <header>
+    <div class="eyebrow">Branding sonoro · ronda 1 · prototipos sin aprobar</div>
+    <h1>Tres puntos que se vuelven uno<span class="sphere" aria-hidden="true"></span></h1>
+    <p class="lede">El logo sonoro traduce la gramática de <strong>La órbita</strong>: el anillo pregunta, tres notas breves piensan
+      (las tres ventanas de la nave), hay una pausa y la esfera responde con golpe. Todo está en <strong>La mayor</strong>, la
+      tonalidad del motion aprobado, y sale de síntesis propia: sin muestras ni música de terceros.</p>
+  </header>
+
+  <div class="grammar" aria-label="Cómo se traduce la línea gráfica a sonido">
+    <div><b>Anillo · la pregunta</b><span>Acorde abierto de quinta, tenue y sin resolver.</span></div>
+    <div><b>Tres ventanas · lo que se piensa</b><span>Tres notas breves de mazo, livianas y sin golpe.</span></div>
+    <div><b>Esfera · la respuesta</b><span>Una nota de campana con impacto grave. Es el único golpe.</span></div>
+    <div><b>Halo · la luz</b><span>El acorde de La florece debajo y se apaga con una cola corta.</span></div>
+  </div>
+
+  <section id="logo">
+    <div class="section-head">
+      <h2>El logo sonoro: tres territorios</h2>
+      <p>Misma gramática y mismo timbre; cambian las cuatro notas. Escúchalos con audífonos y después en el parlante del celular: un buen logo sonoro sobrevive a los dos.</p>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/candidatos-puntos-logo.mp3" aria-label="Reproducir Puntos suspensivos"></button>
+        <div>
+          <h3>Puntos suspensivos</h3>
+          <p>Tres puntos iguales que se vuelven uno. La esfera sube una cuarta: la cadencia más decidida de las tres.</p>
+          <div class="melody" data-notes="76,76,76,81"></div>
+          <div class="notes">Mi · Mi · Mi → La</div>
+        </div>
+        <div class="meta">2,9 s · −14,3 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/candidatos-pregunta-logo.mp3" aria-label="Reproducir Pregunta y respuesta"></button>
+        <div>
+          <h3>Pregunta y respuesta</h3>
+          <p>Sube con la entonación de una pregunta y la respuesta asienta un paso abajo. La más conversacional.</p>
+          <div class="melody" data-notes="73,76,83,81"></div>
+          <div class="notes">Do♯ · Mi · Si → La</div>
+        </div>
+        <div class="meta">2,9 s · −14,8 LUFS</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/candidatos-orbita-logo.mp3" aria-label="Reproducir Órbita abierta"></button>
+        <div>
+          <h3>Órbita abierta</h3>
+          <p>Quintas apiladas, como el anillo, y la esfera cae en la tercera del acorde: la más luminosa, la que más se acerca a «te hacemos visible».</p>
+          <div class="melody" data-notes="69,76,83,85"></div>
+          <div class="notes">La · Mi · Si → Do♯</div>
+        </div>
+        <div class="meta">2,9 s · −15,1 LUFS</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sting">
+    <div class="section-head">
+      <h2>Sobre el sting aprobado</h2>
+      <p>El video V1.1 no cambia; sólo el sonido. Las tres notas suenan mientras la nave se acerca y la esfera cae con el golpe de encaje, a los 0,58 s. El video se extendió un segundo con el cuadro final para que se oiga la cola.</p>
+    </div>
+    <div class="videos">
+      <figure>
+        <video controls preload="metadata" playsinline src="audio/sting-puntos.mp4"></video>
+        <figcaption><b>Puntos suspensivos</b> · Mi Mi Mi → La</figcaption>
+      </figure>
+      <figure>
+        <video controls preload="metadata" playsinline src="audio/sting-pregunta.mp4"></video>
+        <figcaption><b>Pregunta y respuesta</b> · Do♯ Mi Si → La</figcaption>
+      </figure>
+      <figure>
+        <video controls preload="metadata" playsinline src="audio/sting-orbita.mp4"></video>
+        <figcaption><b>Órbita abierta</b> · La Mi Si → Do♯</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="voz">
+    <div class="section-head">
+      <h2>El cierre con voz: la esfera cae en «Growth»</h2>
+      <p>En la línea gráfica, la palabra final del eslogan hace el papel de la esfera. Aquí también: el golpe coincide con el inicio de la palabra, medido por transcripción. Cuatro voces de ElevenLabs v3 sobre «Puntos suspensivos»; la voz y el territorio se eligen por separado.</p>
+    </div>
+    <div class="list">
+      <div class="row">
+        <button class="orbit" data-src="audio/cierre-cierre-puntos-brian.mp3" aria-label="Reproducir voz Brian"></button>
+        <div><h3>Brian</h3><p>Masculina, grave y resonante. La de más autoridad.</p></div>
+        <div class="meta">«growth» en 0,96 s</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/cierre-cierre-puntos-george.mp3" aria-label="Reproducir voz George"></button>
+        <div><h3>George</h3><p>Masculina, cálida, con acento británico. La más cercana.</p></div>
+        <div class="meta">«growth» en 0,92 s</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/cierre-cierre-puntos-sarah.mp3" aria-label="Reproducir voz Sarah"></button>
+        <div><h3>Sarah</h3><p>Femenina, suave y segura.</p></div>
+        <div class="meta">«growth» en 0,96 s</div>
+      </div>
+      <div class="row">
+        <button class="orbit" data-src="audio/cierre-cierre-puntos-alice.mp3" aria-label="Reproducir voz Alice"></button>
+        <div><h3>Alice</h3><p>Femenina, clara, con acento británico.</p></div>
+        <div class="meta">«growth» en 1,08 s</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="lineas">
+    <div class="section-head">
+      <h2>El acento de cada línea de servicio</h2>
+      <p>Como el color del acento en la gráfica, la línea de servicio cambia sólo el timbre de la esfera. La melodía no cambia nunca. Demostrado sobre «Puntos suspensivos».</p>
+    </div>
+    <div class="list">
+      <div class="row" style="--line: var(--growth)">
+        <button class="orbit" data-src="audio/lineas-puntos-growth.mp3" aria-label="Reproducir Growth"></button>
+        <div><span class="chip">Growth · Efeonce</span><p>Campana: la esfera del motion aprobado. Es la base del sistema.</p></div>
+        <div class="meta">−14,3 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--brand)">
+        <button class="orbit" data-src="audio/lineas-puntos-brand.mp3" aria-label="Reproducir Brand"></button>
+        <div><span class="chip">Brand · Globe</span><p>Marimba: madera tocada, táctil. La voz de Plastilina, la del oficio creativo.</p></div>
+        <div class="meta">−15,0 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--engine)">
+        <button class="orbit" data-src="audio/lineas-puntos-engine.mp3" aria-label="Reproducir Engine"></button>
+        <div><span class="chip">Engine · Wave</span><p>FM sintético: preciso, de máquina bien afinada.</p></div>
+        <div class="meta">−13,3 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--voice)">
+        <button class="orbit" data-src="audio/lineas-puntos-voice.mp3" aria-label="Reproducir Voice"></button>
+        <div><span class="chip">Voice · Reach</span><p>Coro breve en «a»: aire vocal, sin palabras.</p></div>
+        <div class="meta">−13,2 LUFS</div>
+      </div>
+      <div class="row" style="--line: var(--revenue)">
+        <button class="orbit" data-src="audio/lineas-puntos-revenue.mp3" aria-label="Reproducir Revenue"></button>
+        <div><span class="chip">Revenue · RevOps</span><p>Campana grave una octava abajo: peso, estructura.</p></div>
+        <div class="meta">−15,3 LUFS</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="decidir">
+    <div class="section-head">
+      <h2>Qué necesito de ti</h2>
+    </div>
+    <div class="decide">
+      <ol>
+        <li><b>Un territorio</b> (o dos para cruzar), y qué te gustó o te sobró de cada uno.</li>
+        <li><b>Una voz</b> para la etiqueta, o una indicación de qué buscar si ninguna calza: español o inglés con acento latino, más joven, más grave.</li>
+        <li><b>Si la idea del acento por línea se queda</b>, y qué timbre no representa a su línea.</li>
+      </ol>
+      <p class="note"><b>Cómo se revisó.</b> La estructura, las notas, los tiempos y el volumen se verificaron con espectrogramas, medición de volumen y transcripción de las voces. Lo que no se puede medir así —si suena propio, si se recuerda, si se siente Efeonce— sólo lo decide tu oído. Con el territorio elegido siguen la pieza larga, las cortinillas del podcast y la re-sonorización del reveal y la apertura.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+  (() => {
+    const R = 26, C = 2 * Math.PI * R
+    const PLAY = '<path class="icon" d="M28 24.5v15l12-7.5z"/>'
+    const PAUSE = '<path class="icon" d="M27 24h3.6v16H27zM33.4 24H37v16h-3.6z"/>'
+    let current = null
+
+    // Melodía: la altura de cada punto es la nota; la esfera, en acento.
+    document.querySelectorAll('.melody').forEach(el => {
+      const notes = el.dataset.notes.split(',').map(Number)
+      const lo = 68, hi = 86
+      notes.forEach((n, k) => {
+        const i = document.createElement('i')
+        if (k === notes.length - 1) i.className = 's'
+        i.style.marginBottom = `${((n - lo) / (hi - lo)) * 26}px`
+        el.appendChild(i)
+      })
+      el.setAttribute('aria-hidden', 'true')
+    })
+
+    const draw = (btn, p, playing) => {
+      const a = p * 2 * Math.PI - Math.PI / 2
+      const x = 32 + R * Math.cos(a), y = 32 + R * Math.sin(a)
+      const arc = p > 0 ? `<circle class="arc" cx="32" cy="32" r="${R}" stroke-dasharray="${(p * C).toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 32 32)"/>` : ''
+      const dot = p > 0 ? `<circle class="dot" cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="4"/>` : ''
+      btn.innerHTML = `<svg viewBox="0 0 64 64" aria-hidden="true"><circle class="track" cx="32" cy="32" r="${R}"/>${arc}${dot}${playing ? PAUSE : PLAY}</svg>`
+    }
+
+    document.querySelectorAll('.orbit').forEach(btn => {
+      const audio = new Audio()
+      audio.preload = 'none'
+      audio.src = btn.dataset.src
+      draw(btn, 0, false)
+      let raf = 0
+      const tick = () => {
+        const p = audio.duration ? Math.min(1, audio.currentTime / audio.duration) : 0
+        draw(btn, p, !audio.paused)
+        if (!audio.paused) raf = requestAnimationFrame(tick)
+      }
+      audio.addEventListener('play', () => { raf = requestAnimationFrame(tick) })
+      audio.addEventListener('pause', () => { cancelAnimationFrame(raf); tick() })
+      audio.addEventListener('ended', () => { cancelAnimationFrame(raf); draw(btn, 1, false) })
+      btn.addEventListener('click', () => {
+        if (current && current !== audio) current.pause()
+        document.querySelectorAll('video').forEach(v => v.pause())
+        if (audio.paused) {
+          if (audio.ended) audio.currentTime = 0
+          current = audio
+          audio.play().catch(() => {})
+        } else audio.pause()
+      })
+    })
+
+    document.querySelectorAll('video').forEach(v => v.addEventListener('play', () => {
+      if (current) current.pause()
+      document.querySelectorAll('video').forEach(o => { if (o !== v) o.pause() })
+    }))
+  })()
+</script>
