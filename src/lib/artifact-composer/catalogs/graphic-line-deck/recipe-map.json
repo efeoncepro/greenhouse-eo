@@ -1,0 +1,162 @@
+{
+  "$comment": "Qué receta del catálogo de láminas (docs/operations/brand-graphic-line/deck-recipes/) compone con qué plantilla de este catálogo. Lo lee `pnpm brand:deck-recipes` para marcar en el índice qué lámina tiene plantilla, y el test de paridad de slots. `slots` mapea cada slot de la receta al campo del slots.json (obligatorio en las recetas nuevas de TASK-1928; las 30 anteriores lo declaran nulo porque su contrato sale del manifest de AXIS, no del catálogo). `example` apunta a un intent de pieza o a una página de un documento (`archivo.json#page=N`, desde 1). Una receta sin fila aquí no tiene plantilla.",
+  "schema": "efeonce.deck-recipe-map.v1",
+  "recipes": {
+    "cover-brochure-cine-orbit": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-cine-orbit-intent.json",
+      "slots": null
+    },
+    "cover-brochure-cine-lines": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-cine-lines-intent.json",
+      "slots": null
+    },
+    "cover-brochure-cine-team": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-cine-team-intent.json",
+      "slots": null
+    },
+    "cover-brochure-line-growth": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-line-growth-intent.json",
+      "slots": null
+    },
+    "cover-brochure-line-brand": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-line-brand-intent.json",
+      "slots": null
+    },
+    "cover-brochure-line-engine": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-line-engine-intent.json",
+      "slots": null
+    },
+    "cover-brochure-line-voice": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-line-voice-intent.json",
+      "slots": null
+    },
+    "cover-brochure-line-revenue": {
+      "contentType": "deck.cover-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-brochure-line-revenue-intent.json",
+      "slots": null
+    },
+    "cover-proposal-orbit": {
+      "contentType": "deck.cover-proposal",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-proposal-orbit-intent.json",
+      "slots": null
+    },
+    "cover-proposal-orbit-sky": {
+      "contentType": "deck.cover-proposal",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-proposal-orbit-sky-intent.json",
+      "slots": null
+    },
+    "cover-proposal-dawn": {
+      "contentType": "deck.cover-proposal.dawn",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-proposal-dawn-intent.json",
+      "slots": null
+    },
+    "cover-proposal-dawn-sky": {
+      "contentType": "deck.cover-proposal.dawn",
+      "example": "src/lib/brand-surfaces/examples/deck-cover-proposal-dawn-sky-intent.json",
+      "slots": null
+    },
+    "close-brochure-orbit": {
+      "contentType": "deck.close-brochure",
+      "example": "src/lib/brand-surfaces/examples/deck-close-brochure-orbit-intent.json",
+      "slots": null
+    },
+    "close-brochure-horizon": {
+      "contentType": "deck.close-brochure.photo",
+      "example": "src/lib/brand-surfaces/examples/deck-close-brochure-horizon-intent.json",
+      "slots": null
+    },
+    "close-brochure-dawn": {
+      "contentType": "deck.close-brochure.photo",
+      "example": "src/lib/brand-surfaces/examples/deck-close-brochure-dawn-intent.json",
+      "slots": null
+    },
+    "close-proposal-horizon": {
+      "contentType": "deck.close-proposal",
+      "example": "src/lib/brand-surfaces/examples/deck-close-proposal-horizon-intent.json",
+      "slots": null
+    },
+    "close-proposal-dawn": {
+      "contentType": "deck.close-proposal",
+      "example": "src/lib/brand-surfaces/examples/deck-close-proposal-dawn-intent.json",
+      "slots": null
+    },
+    "section-classic": {
+      "contentType": "deck.section-classic",
+      "example": "src/lib/brand-surfaces/examples/deck-section-classic-intent.json",
+      "slots": null
+    },
+    "section-split": {
+      "contentType": "deck.section-split",
+      "example": "src/lib/brand-surfaces/examples/deck-section-split-intent.json",
+      "slots": null
+    },
+    "section-split-corner-bottom": {
+      "contentType": "deck.section-split.corner-bottom",
+      "example": "src/lib/brand-surfaces/examples/deck-section-split-corner-bottom-intent.json",
+      "slots": null
+    },
+    "section-split-panel-end": {
+      "contentType": "deck.section-split.panel-end",
+      "example": "src/lib/brand-surfaces/examples/deck-section-split-panel-end-intent.json",
+      "slots": null
+    },
+    "content-measure": {
+      "contentType": "deck.content-measure",
+      "example": "src/lib/brand-surfaces/examples/deck-content-measure-intent.json",
+      "slots": null
+    },
+    "triptych": {
+      "contentType": "deck.triptych",
+      "example": "src/lib/brand-surfaces/examples/deck-triptych-intent.json",
+      "slots": null
+    },
+    "method-staircase": {
+      "contentType": "deck.method-staircase",
+      "example": "src/lib/brand-surfaces/examples/deck-method-staircase-intent.json",
+      "slots": null
+    },
+    "proposal-cinematic-creative": {
+      "contentType": "deck.proposal-cinematic",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-document.json#page=1",
+      "slots": null
+    },
+    "proposal-cinematic-web": {
+      "contentType": "deck.proposal-cinematic",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-document.json#page=2",
+      "slots": null
+    },
+    "proposal-cinematic-aeo": {
+      "contentType": "deck.proposal-cinematic",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-document.json#page=3",
+      "slots": null
+    },
+    "proposal-cinematic-revops": {
+      "contentType": "deck.proposal-cinematic",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-document.json#page=4",
+      "slots": null
+    },
+    "proposal-cinematic-nexa": {
+      "contentType": "deck.proposal-cinematic.hero",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-cinematic-hero-intent.json",
+      "slots": null
+    },
+    "proposal-cinematic-nexa-lines": {
+      "contentType": "deck.proposal-cinematic.lines",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-cinematic-lines-intent.json",
+      "slots": null
+    },
+    "cover-brochure-cine-lines-selection": {
+      "contentType": null,
+      "example": null,
+      "slots": null,
+      "blocked": "El contrato de AXIS no admite selección en cover-brochure: compone como cover-brochure-cine-lines, sin la selección."
+    }
+  }
+}

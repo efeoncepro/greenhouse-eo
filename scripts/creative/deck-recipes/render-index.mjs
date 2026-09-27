@@ -35,6 +35,11 @@ const argValue = flag => {
 const jsonPath = resolve(argValue('--json') ?? resolve(folder, 'EFEONCE_DECK_SLIDE_RECIPES_V1.json'))
 const readmePath = resolve(argValue('--readme') ?? resolve(folder, 'README.md'))
 
+// Qué receta tiene plantilla: lo dice el catálogo del Artifact Composer, no el README (TASK-1928).
+const deckCatalog = resolve(repo, 'src/lib/artifact-composer/catalogs/graphic-line-deck')
+const mapPath = resolve(argValue('--map') ?? resolve(deckCatalog, 'recipe-map.json'))
+const registryPath = resolve(argValue('--registry') ?? resolve(deckCatalog, 'registry.json'))
+
 const START = '<!-- deck-recipes-index:start -->'
 const END = '<!-- deck-recipes-index:end -->'
 const SCHEMA = 'efeonce.deck-slide-recipes.v1'
@@ -233,6 +238,39 @@ for (const recipe of recipes) {
   }
 }
 
+// La plantilla de cada receta: `recipe-map.json` nombra el contentType y `registry.json` confirma que existe.
+let templateOf = () => null
+
+try {
+  const map = JSON.parse(readFileSync(mapPath, 'utf8'))
+  const registry = JSON.parse(readFileSync(registryPath, 'utf8'))
+  const selector = registry?.selector?.map ?? {}
+
+  for (const [id, entry] of Object.entries(map?.recipes ?? {})) {
+    if (!ids.has(id)) errors.push(`recipe-map: «${id}» no existe en el catálogo de recetas`)
+
+    if (entry?.contentType && !Object.hasOwn(selector, entry.contentType)) {
+      errors.push(`recipe-map: ${id} apunta a ${entry.contentType}, que no está en registry.json`)
+    }
+
+    if (entry?.example) {
+      try {
+        readFileSync(resolve(repo, entry.example.replace(/#page=\d+$/, '')))
+      } catch {
+        errors.push(`recipe-map: el ejemplo de ${id} no existe (${entry.example})`)
+      }
+    }
+  }
+
+  templateOf = id => {
+    const entry = map?.recipes?.[id]
+
+    return entry?.contentType && Object.hasOwn(selector, entry.contentType) ? entry.contentType : null
+  }
+} catch (error) {
+  errors.push(`no se pudo leer el mapa de plantillas (${rel(mapPath)} o ${rel(registryPath)}): ${error.message}`)
+}
+
 if (errors.length > 0) fail(errors)
 
 // 3. Renderizar.
@@ -277,6 +315,11 @@ lines.push('')
 lines.push(
   `Catálogo \`${catalog.schema}\` versión ${catalog.version} · ${recipes.length} recetas · aprobado el ${catalog.approvedAt ?? '—'} por ${catalog.approvedBy ?? '—'}.`
 )
+const templated = recipes.filter(recipe => templateOf(recipe.id)).length
+
+lines.push(
+  `**${templated} de ${recipes.length}** recetas tienen plantilla en el Artifact Composer y se componen con \`pnpm brand:compose\` (columna «Plantilla», leída de \`graphic-line-deck/registry.json\`). Las demás todavía no.`
+)
 lines.push('')
 lines.push('### Recetas por familia y documento')
 lines.push('')
@@ -310,12 +353,12 @@ for (const [familyId, label] of FAMILIES) {
   lines.push('')
   lines.push(`### ${label} · ${code(familyId)} (${inFamily.length})`)
   lines.push('')
-  lines.push('| id | Nombre | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |')
-  lines.push('|---|---|---|---|---|---|---|')
+  lines.push('| id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |')
+  lines.push('|---|---|---|---|---|---|---|---|')
 
   for (const recipe of inFamily) {
     lines.push(
-      `| ${code(recipe.id)} | ${cell(recipe.name)}${statusLabel(recipe)} | ${recipe.documents.join(', ')} | ${cell(recipe.useWhen[0])} | ${cell(recipe.avoidWhen[0])} | ${alternatives(recipe)} | ${slotSummary(recipe.slots)} |`
+      `| ${code(recipe.id)} | ${cell(recipe.name)}${statusLabel(recipe)} | ${templateOf(recipe.id) ? code(templateOf(recipe.id)) : '—'} | ${recipe.documents.join(', ')} | ${cell(recipe.useWhen[0])} | ${cell(recipe.avoidWhen[0])} | ${alternatives(recipe)} | ${slotSummary(recipe.slots)} |`
     )
   }
 }
