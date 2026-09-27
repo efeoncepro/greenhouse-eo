@@ -1,0 +1,60 @@
+/**
+ * GENERADO — NO EDITAR A MANO.
+ * Tokens de «La órbita» desde @efeoncepro/axis-tokens 0.3.7 (efeonceGraphicLine),
+ * compilados por `pnpm brand:tokens`. Una plantilla de La órbita sólo usa estas variables:
+ * un HEX o una medida escrita a mano en el HTML es una regresión.
+ */
+:root {
+  --gl-bg-dark: #001a33;
+  --gl-bg-paper: #f7f8f6;
+  --gl-navy: #023c70;
+  --gl-teal: #36c8bf;
+  --gl-teal-dark: #0e8c82;
+  --gl-ink-dark: #ffffff;
+  --gl-text-dark: #E6EDF3;
+  --gl-soft-dark: #e2e2e2;
+  --gl-rule-dark: #1D3A57;
+  --gl-ink-light: #023c70;
+  --gl-text-light: #00284D;
+  --gl-soft-light: #5F5A69;
+  --gl-rule-light: #DCE2E8;
+  --gl-answer-family: 'Bricolage Grotesque';
+  --gl-answer-weight: 760;
+  --gl-question-family: 'Poppins';
+  --gl-question-weight: 300;
+  --gl-text-family: 'Poppins';
+  --gl-sphere-diameter: 0.2em;
+  --gl-sphere-gap: 0.03em;
+  --gl-accent: #36c8bf;
+  --gl-accent-light: #0e8c82;
+}
+
+.gl-line-growth {
+  --gl-accent: #36c8bf;
+  --gl-accent-light: #0e8c82;
+}
+
+.gl-line-brand {
+  --gl-accent: #ff6500;
+  --gl-accent-light: #bb1954;
+}
+
+.gl-line-engine {
+  --gl-accent: #0375db;
+  --gl-accent-light: #0375db;
+}
+
+.gl-line-voice {
+  --gl-accent: #f83902;
+  --gl-accent-light: #f83902;
+}
+
+.gl-line-revenue-hubspot {
+  --gl-accent: #e86bd0;
+  --gl-accent-light: #8e1b82;
+}
+
+.gl-line-revenue-salesforce {
+  --gl-accent: #2fb8ff;
+  --gl-accent-light: #00739e;
+}

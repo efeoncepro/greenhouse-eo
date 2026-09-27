@@ -315,12 +315,18 @@ const fillDom = (instructions: FillInstruction[]): string[] => {
     return container.innerHTML
   }
 
-  const directFieldAnchors = (node: Element): Element[] =>
-    Array.from(node.querySelectorAll('[data-slot-field]')).filter(field => {
+  // Las anclas DIRECTAS de un slot son las suyas: un campo que vive dentro de OTRO slot anidado (p. ej.
+  // un slot `frame` en la raíz que envuelve la foto y la voz) pertenece a ese otro slot, y la limpieza de
+  // éste nunca puede borrarlo.
+  const directFieldAnchors = (node: Element): Element[] => {
+    const owner = node.closest('[data-slot]')
+
+    return Array.from(node.querySelectorAll('[data-slot-field]')).filter(field => {
       const parentField = field.parentElement?.closest('[data-slot-field]')
 
-      return parentField === null
+      return parentField === null && field.closest('[data-slot]') === owner
     })
+  }
 
   const applyDirective = (
     scope: Element,
@@ -1134,7 +1140,10 @@ export const renderSlide = async (
     await assertNoFontFallback(page, slide.slideId)
 
     if (target.kind === 'png') {
-      const buffer = await page.screenshot({ path: target.outPath })
+      const buffer = await page.screenshot({
+        path: target.outPath,
+        omitBackground: contract.render?.background === 'transparent'
+      })
 
       assertSlideHasInk(buffer, slide.slideId)
     } else {

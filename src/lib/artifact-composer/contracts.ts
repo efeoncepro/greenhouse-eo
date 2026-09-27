@@ -115,10 +115,21 @@ export interface SlotContract {
   values?: Record<string, string>
 }
 
+/**
+ * Cómo se imprime la lámina. `transparent` sólo aplica al PNG: la captura sale sin fondo (canal alfa),
+ * para capas que otra herramienta monta encima de un video o de una foto (zócalo, cartela, subtítulos).
+ * El HTML de la plantilla tiene que dejar `html` y `body` sin fondo; lo que no pinte, queda transparente.
+ * Un PDF siempre imprime el fondo que la plantilla pinte.
+ */
+export interface TemplateRenderOptions {
+  background?: 'opaque' | 'transparent'
+}
+
 export interface TemplateContract {
   template: TemplateName
   version: string
   viewport: { width: number; height: number }
+  render?: TemplateRenderOptions
   slots: Record<string, SlotContract>
 }
 

@@ -167,7 +167,10 @@ export const measureSlideInk = (pngBuffer: Buffer): SlideInkMetrics => {
       for (let y = 0; y < TILE; y++) {
         for (let x = 0; x < TILE; x++) {
           const idx = ((ty * TILE + y) * png.width + (tx * TILE + x)) * 4
-          const lum = 0.2126 * png.data[idx]! + 0.7152 * png.data[idx + 1]! + 0.0722 * png.data[idx + 2]!
+          // Ponderada por alfa: en una capa transparente, un píxel sin cobertura no es tinta aunque
+          // su RGB diga negro. En una lámina opaca alfa es 255 y el resultado no cambia.
+          const alpha = png.data[idx + 3]! / 255
+          const lum = (0.2126 * png.data[idx]! + 0.7152 * png.data[idx + 1]! + 0.0722 * png.data[idx + 2]!) * alpha
 
           sum += lum
           sumSq += lum * lum

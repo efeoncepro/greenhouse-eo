@@ -1,0 +1,21 @@
+{
+  "version": "0.1",
+  "status": "candidate",
+  "note": "Recetas APROBADAS de la superficie deck de «La órbita» (contrato efeonce.surface-composition 0.1.0 de AXIS). Una receta en opción o pendiente no tiene plantilla hasta que el operador la aprueba. El contentType es `<surface>.<recipe>`: lo deriva src/lib/brand-surfaces del manifest, nunca el autor.",
+  "canvas": { "width": 1920, "height": 1080 },
+  "contentTypeTaxonomy": ["deck.proposal-cinematic"],
+  "templates": [
+    {
+      "name": "ProposalCinematic",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.proposal-cinematic"],
+      "prototype": "proposal-cinematic.html",
+      "slotsRef": "proposal-cinematic.slots.json"
+    }
+  ],
+  "selector": { "map": { "deck.proposal-cinematic": "ProposalCinematic" } }
+}

@@ -1,0 +1,115 @@
+{
+  "$comment": "GENERADO por `pnpm brand:tokens` desde @efeoncepro/axis-tokens (efeonceGraphicLine). NO EDITAR A MANO: se regenera y el test de sincronía detecta el drift.",
+  "source": {
+    "package": "@efeoncepro/axis-tokens",
+    "version": "0.3.7"
+  },
+  "color": {
+    "dark": "#001a33",
+    "teal": "#36c8bf",
+    "halo": "#72ded8",
+    "navy": "#023c70",
+    "tealDark": "#0e8c82",
+    "paper": "#f7f8f6",
+    "productInk": "#091951"
+  },
+  "lines": [
+    {
+      "key": "growth",
+      "name": "Efeonce",
+      "accentOnDark": "#36c8bf",
+      "accentOnLight": "#0e8c82"
+    },
+    {
+      "key": "brand",
+      "name": "Servicios creativos",
+      "accentOnDark": "#ff6500",
+      "accentOnLight": "#bb1954"
+    },
+    {
+      "key": "engine",
+      "name": "Web, infraestructura, SEO y medición",
+      "accentOnDark": "#0375db",
+      "accentOnLight": "#0375db"
+    },
+    {
+      "key": "voice",
+      "name": "Medios y distribución",
+      "accentOnDark": "#f83902",
+      "accentOnLight": "#f83902"
+    },
+    {
+      "key": "revenue-hubspot",
+      "name": "RevOps y CRM · HubSpot",
+      "accentOnDark": "#e86bd0",
+      "accentOnLight": "#8e1b82"
+    },
+    {
+      "key": "revenue-salesforce",
+      "name": "RevOps y CRM · Salesforce",
+      "accentOnDark": "#2fb8ff",
+      "accentOnLight": "#00739e"
+    }
+  ],
+  "sphere": {
+    "diameterEm": 0.2,
+    "defaultGapEm": 0.03,
+    "opticalGapEm": {
+      "r": -0.02,
+      "a": 0.03,
+      "s": 0.03,
+      "i": 0.03,
+      "z": 0.03,
+      "o": 0.035,
+      "n": 0.035,
+      "e": 0.035,
+      "d": 0.035,
+      "x": 0.02,
+      "t": 0
+    }
+  },
+  "type": {
+    "answer": {
+      "family": "Bricolage Grotesque",
+      "weight": 760,
+      "tracking": "-0.035em",
+      "minRatioOverQuestion": 3,
+      "maxWords": 3
+    },
+    "question": {
+      "family": "Poppins",
+      "weight": 300
+    },
+    "text": {
+      "family": "Poppins",
+      "weights": [
+        400,
+        500
+      ]
+    }
+  },
+  "softOnDark": "#e2e2e2",
+  "softOnLight": "#6b6b6b",
+  "themes": {
+    "light": {
+      "background": "paper",
+      "ink": "navy",
+      "text": "#00284D",
+      "soft": "#5F5A69",
+      "accent": "accentOnLight",
+      "rule": "#DCE2E8",
+      "urlBubble": "light",
+      "logo": "positive"
+    },
+    "dark": {
+      "background": "dark",
+      "ink": "#ffffff",
+      "text": "#E6EDF3",
+      "soft": "#e2e2e2",
+      "accent": "accentOnDark",
+      "rule": "#1D3A57",
+      "urlBubble": "dark",
+      "logo": "negative"
+    }
+  }
+}

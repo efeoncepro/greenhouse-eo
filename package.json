@@ -309,6 +309,8 @@
     "foto:componer": "node scripts/foto/componer.mjs",
     "foto:emblema": "node scripts/foto/emblema.mjs",
     "foto:isotipo": "node scripts/foto/isotipo.mjs",
+    "brand:compose": "tsx scripts/brand-surfaces/compose.ts",
+    "brand:tokens": "tsx scripts/brand-surfaces/compile-tokens.ts",
     "foto:generar": "node scripts/foto/generar.mjs",
     "foto:lanyard": "node scripts/foto/lanyard.mjs",
     "tender:new": "node scripts/commercial/new-tender.mjs",

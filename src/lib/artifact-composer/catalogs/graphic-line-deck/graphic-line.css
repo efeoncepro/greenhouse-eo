@@ -1,0 +1,219 @@
+/**
+ * Molde de «La órbita» para láminas 16:9 (catálogo `graphic-line-deck`).
+ *
+ * Todo color, familia y peso sale de `graphic-line-tokens.css` (compilado desde @efeoncepro/axis-tokens por
+ * `pnpm brand:tokens`) y toda medida de la receta llega del manifest de AXIS como custom property
+ * (`--gl-*-top`, `--gl-answer-px`…, vía los resolvers `gl-px-*`). Los valores de abajo son el RESPALDO del
+ * probe del gate visual: los de la lámina aprobada de referencia, no un default de diseño.
+ */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.gl-slide {
+  --gl-margin: 140px;
+  --gl-eyebrow-top: 120px;
+  --gl-question-top: 186px;
+  --gl-answer-top: 312px;
+  --gl-answer-px: 168px;
+  --gl-body-top: 530px;
+  --gl-body-px: 26px;
+  --gl-body-width: 560px;
+  --gl-proof-top: 740px;
+  --gl-steps-top: 870px;
+  --gl-steps-gap: 245px;
+  --gl-step-width: 235px;
+  --gl-icon-px: 50px;
+  --gl-kicker-px: 13px;
+  --gl-step-name-px: 22px;
+
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--gl-bg-dark);
+  color: var(--gl-ink-dark);
+  font-family: var(--gl-text-family);
+}
+
+/* ── Foto a sangre ─────────────────────────────────────────────────────────────────────────────── */
+
+.gl-photo {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+
+.gl-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Voz: eyebrow, pregunta con su anillo y respuesta con su esfera ─────────────────────────────── */
+
+.gl-eyebrow {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-eyebrow-top);
+  margin: 0;
+  font: 500 16px var(--gl-text-family);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gl-soft-dark);
+}
+
+.gl-question {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-question-top);
+  margin: 0;
+  font: var(--gl-question-weight) 40px / 1.2 var(--gl-question-family);
+  color: var(--gl-soft-dark);
+  white-space: nowrap;
+}
+
+/* El anillo abre la pregunta: la órbita pregunta y la esfera responde. */
+.gl-ring {
+  display: inline-block;
+  width: 0.62em;
+  height: 0.62em;
+  margin-right: 0.42em;
+  border: 0.1em solid var(--gl-accent);
+  border-radius: 50%;
+  box-sizing: border-box;
+  vertical-align: -0.04em;
+}
+
+.gl-answer {
+  position: absolute;
+  left: calc(var(--gl-margin) - 6px);
+  top: var(--gl-answer-top);
+  z-index: 2;
+  margin: 0;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-answer-px);
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  color: var(--gl-ink-dark);
+  white-space: nowrap;
+}
+
+.gl-answer-lead {
+  display: block;
+}
+
+.gl-answer-lead:empty {
+  display: none;
+}
+
+/* Una esfera por pieza: cierra la última línea de la respuesta. Nunca es viñeta. */
+.gl-sphere {
+  display: inline-block;
+  width: var(--gl-sphere-diameter);
+  height: var(--gl-sphere-diameter);
+  margin-left: var(--gl-sphere-gap);
+  border-radius: 50%;
+  background: var(--gl-accent);
+}
+
+/* ── Bajada y prueba ───────────────────────────────────────────────────────────────────────────── */
+
+.gl-body {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-body-top);
+  width: var(--gl-body-width);
+  margin: 0;
+  font: 300 var(--gl-body-px) / 1.45 var(--gl-text-family);
+  color: var(--gl-text-dark);
+}
+
+.gl-proof {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-proof-top);
+  margin: 0;
+  font: 600 19px var(--gl-text-family);
+  color: var(--gl-ink-dark);
+}
+
+/* ── Pasos: ícono de la voz de la línea en reposo + rótulo + nombre ─────────────────────────────── */
+
+.gl-steps {
+  position: absolute;
+  left: var(--gl-margin);
+  top: var(--gl-steps-top);
+  z-index: 2;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gl-step {
+  display: flex;
+  box-sizing: border-box;
+}
+
+.gl-steps-inline .gl-step {
+  width: var(--gl-step-width);
+  margin-right: calc(var(--gl-steps-gap) - var(--gl-step-width));
+  align-items: center;
+  gap: 12px;
+}
+
+.gl-steps-columns .gl-step {
+  width: var(--gl-step-width);
+  margin-right: calc(var(--gl-steps-gap) - var(--gl-step-width));
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gl-step-icon {
+  flex: none;
+  width: var(--gl-icon-px);
+  height: var(--gl-icon-px);
+}
+
+/* El rótulo mide menos de 24 px: nunca va en el acento (regla accent-text-min-size). El primero va en blanco. */
+.gl-step-kicker {
+  margin: 0;
+  font: 600 var(--gl-kicker-px) var(--gl-text-family);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gl-soft-dark);
+}
+
+.gl-step:first-child .gl-step-kicker {
+  color: var(--gl-ink-dark);
+}
+
+.gl-step-name {
+  margin: 4px 0 0;
+  font-family: var(--gl-answer-family);
+  font-weight: var(--gl-answer-weight);
+  font-size: var(--gl-step-name-px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--gl-ink-dark);
+}
+
+/* ── Pie: la burbuja URL del deck (nunca el logo en una lámina con foto) ───────────────────────── */
+
+.gl-url-bubble {
+  position: absolute;
+  left: var(--gl-margin);
+  top: 994px;
+  z-index: 4;
+  height: 30px;
+}
+
+.gl-hidden {
+  display: none;
+}

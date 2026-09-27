@@ -1,0 +1,9 @@
+{
+  "version": "0.1",
+  "status": "candidate",
+  "note": "Recetas APROBADAS de web, DOOH y motion de «La órbita» (contrato efeonce.surface-composition 0.1.0 de AXIS). El lienzo real lo declara cada plantilla en su *.slots.json. El contentType es `<surface>.<recipe>`: lo deriva src/lib/brand-surfaces del manifest.",
+  "canvas": { "width": 1920, "height": 1080 },
+  "contentTypeTaxonomy": [],
+  "templates": [],
+  "selector": { "map": {} }
+}

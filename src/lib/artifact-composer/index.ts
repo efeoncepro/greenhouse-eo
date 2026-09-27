@@ -63,6 +63,7 @@ export type {
   SlotValues,
   SlotViolation,
   TemplateContract,
+  TemplateRenderOptions,
   TemplateName
 } from './contracts'
 

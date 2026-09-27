@@ -35,6 +35,24 @@ import {
   INSIGHTS_DECK_FONTS_PATH,
   INSIGHTS_DECK_TOKENS_PATH
 } from '@/lib/artifact-composer/catalogs/insights-deck/compile-tokens'
+import {
+  buildGraphicLineDeckTokensCss,
+  syncGraphicLineDeckFontBinaries,
+  GRAPHIC_LINE_DECK_FONTS_PATH,
+  GRAPHIC_LINE_DECK_TOKENS_PATH
+} from '@/lib/artifact-composer/catalogs/graphic-line-deck/compile-tokens'
+import {
+  buildGraphicLineStillsTokensCss,
+  syncGraphicLineStillsFontBinaries,
+  GRAPHIC_LINE_STILLS_FONTS_PATH,
+  GRAPHIC_LINE_STILLS_TOKENS_PATH
+} from '@/lib/artifact-composer/catalogs/graphic-line-stills/compile-tokens'
+import {
+  buildGraphicLineOverlaysTokensCss,
+  syncGraphicLineOverlaysFontBinaries,
+  GRAPHIC_LINE_OVERLAYS_FONTS_PATH,
+  GRAPHIC_LINE_OVERLAYS_TOKENS_PATH
+} from '@/lib/artifact-composer/catalogs/graphic-line-overlays/compile-tokens'
 import type { CatalogTokensBuild, PackFontEntry } from '@/lib/artifact-composer/compile-catalog-tokens'
 
 /**
@@ -69,6 +87,27 @@ const CATALOGS: {
     tokensPath: REPORT_TOKENS_PATH,
     fontsPath: REPORT_FONTS_PATH,
     syncFonts: syncReportFontBinaries
+  },
+  {
+    name: 'graphic-line-deck',
+    build: buildGraphicLineDeckTokensCss,
+    tokensPath: GRAPHIC_LINE_DECK_TOKENS_PATH,
+    fontsPath: GRAPHIC_LINE_DECK_FONTS_PATH,
+    syncFonts: syncGraphicLineDeckFontBinaries
+  },
+  {
+    name: 'graphic-line-stills',
+    build: buildGraphicLineStillsTokensCss,
+    tokensPath: GRAPHIC_LINE_STILLS_TOKENS_PATH,
+    fontsPath: GRAPHIC_LINE_STILLS_FONTS_PATH,
+    syncFonts: syncGraphicLineStillsFontBinaries
+  },
+  {
+    name: 'graphic-line-overlays',
+    build: buildGraphicLineOverlaysTokensCss,
+    tokensPath: GRAPHIC_LINE_OVERLAYS_TOKENS_PATH,
+    fontsPath: GRAPHIC_LINE_OVERLAYS_FONTS_PATH,
+    syncFonts: syncGraphicLineOverlaysFontBinaries
   }
 ]
 

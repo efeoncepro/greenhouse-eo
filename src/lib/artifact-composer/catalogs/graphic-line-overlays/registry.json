@@ -1,0 +1,9 @@
+{
+  "version": "0.1",
+  "status": "candidate",
+  "note": "Recetas APROBADAS de producción audiovisual de «La órbita» (contrato efeonce.surface-composition 0.1.0 de AXIS): capas con fondo transparente para montar sobre el plano. El contentType es `audiovisual.<recipe>`.",
+  "canvas": { "width": 1920, "height": 1080 },
+  "contentTypeTaxonomy": [],
+  "templates": [],
+  "selector": { "map": {} }
+}
