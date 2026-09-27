@@ -36,6 +36,9 @@ export interface SurfacePiecePlan {
   contentType: string
   plan: CompositionPlanInput
   assets: SurfaceAssetRequest[]
+  /** El uso y la composición que resolvió AXIS para la lámina (contrato 0.1.2); `null` cuando la receta no los declara. */
+  use: 'proposal' | 'brochure' | null
+  layout: string | null
   /** El manifest de AXIS que gobernó la traducción (se guarda junto a la pieza para auditarla). */
   manifest: Record<string, unknown>
 }

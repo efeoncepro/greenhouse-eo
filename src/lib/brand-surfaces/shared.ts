@@ -19,6 +19,13 @@ export interface SurfaceIntent {
   role: string
   recipe: string
   line: string
+  /** Para qué documento es la lámina (`efeonce.surface-composition` 0.1.2). Sin él, AXIS resuelve el uso de la receta. */
+  use?: 'proposal' | 'brochure'
+  /** Composición de la receta cuando declara varias. Siempre explícita: AXIS nunca la infiere de los campos presentes. */
+  layout?: string
+  /** Las líneas que muestra el layout `lines` de `proposal-cinematic` (hasta cinco, sin repetir). */
+  lines?: string[]
+  progress?: { sections?: number; current?: number }
   theme?: string
   voice?: { eyebrow?: string; question?: string; answer?: string[] }
   body?: string
@@ -91,6 +98,9 @@ export type SurfaceManifest = Record<string, unknown> & {
   type?: Record<string, { px?: number | [number, number]; maxWidthPx?: number | [number, number] }>
   content?: Partial<SurfaceContent>
   selection?: Record<string, unknown> | null
+  /** El uso que resolvió AXIS (`null` fuera del deck) y la composición de la receta (`null` si no declara varias). */
+  use?: 'proposal' | 'brochure' | null
+  layout?: string | null
 }
 
 /** El contenido resuelto por AXIS. Sin él, el manifest no es de un contrato que el builder sepa leer. */

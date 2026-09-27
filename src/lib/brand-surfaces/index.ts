@@ -117,6 +117,8 @@ export const planSurfacePiece = (intent: SurfaceIntent, options: PlanSurfacePiec
       slides: [{ slideId: `${intent.surface}-${intent.recipe}`, contentType, slots: slots as never }]
     },
     assets,
+    use: manifest.use ?? null,
+    layout: manifest.layout ?? null,
     manifest
   }
 }
