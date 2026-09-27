@@ -8,9 +8,10 @@
 > decisiones del [Delta 2026-09-27](#delta-2026-09-27--decisiones-del-operador) (manzana y verde, línea Growth,
 > numeración #17, glifos Plastilina) y el flujo de composición (aceptado por el operador el 2026-09-27). El hogar del
 > movimiento quedó **decidido** el 2026-09-27: repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/`
-> ([decisión del taller](./EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md)); ver §«Delta — flujo aceptado»
+> ([decisión del taller](./EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md)); ver §«Delta — flujo aceptado». El **diseño
+> sonoro de Glitch** quedó **Accepted, versión B**, el 2026-09-27 (ver su Delta); el motion sigue con su propio estado
 > **Creado:** 2026-09-27 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude
+> **Última actualización:** 2026-09-27 por Claude (Delta: diseño sonoro **aprobado, versión B**, sólo Glitch)
 > **Norma operativa:** [`GLITCH_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
 > **Línea madre:** [`EFEONCE_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md)
 > **Relacionadas:** [ADR «La órbita»](./EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md) ·
@@ -71,7 +72,7 @@ contigo».
 | 2 | Línea de servicio de Glitch | **Growth**. El eslogan de la contraportada queda «Empower your Growth» (ya estaba así) | **Accepted** |
 | 3 | Numeración de ediciones | la próxima edición es la **#17**. La serie sigue la del blog y la del [pipeline editorial](./GREENHOUSE_GLITCH_AGENTIC_EDITORIAL_PIPELINE_DECISION_V1.md); los «#11»–«#14» de las maquetas del canvas son ejemplos de diseño, no numeración real. El conflicto «#11 vs #16» queda resuelto | **Accepted** |
 | 4 | Alta de los 5 glifos Plastilina (guardar, compartir, recomendar, comentar, deslizar) | **aprobada**. El gate del slice de glifos de TASK-1922 queda liberado | **Accepted** |
-| 5 | Mnemónico en el video de Glitch | hay que **evaluarlo y aprobarlo**; se hará una evaluación dedicada. Nada se decide todavía | **pendiente** (evaluación dedicada) |
+| 5 | Mnemónico en el video de Glitch | hay que **evaluarlo y aprobarlo**; se hará una evaluación dedicada. Nada se decide todavía | **resuelto** el 2026-09-27: diseño sonoro de Glitch aprobado, versión B ([Delta](#delta-2026-09-27--diseño-sonoro-aprobado-versión-b-sólo-glitch)) |
 | 6 | Contenido del lower third del reel y del vlog | se define **junto con el operador** (sesión en curso) | **en definición con el operador** |
 | 7 | Licencia de Guttery | el operador aclaró después: «En gutery tenemos licencia» (2026-09-27) | **confirmada**; falta registrar la referencia del contrato |
 | 8 | Paso del flujo de composición de `Proposed` a `Accepted` | «Acéptalo si» | **aceptado** (hogar del movimiento decidido después: repo taller, ver §«Delta — flujo aceptado») |
@@ -204,17 +205,19 @@ Se revisó el motor (`src/lib/artifact-composer/catalog.ts`, `compose.ts`, `cont
   ADR del pipeline editorial. Los «#11»–«#14» de las maquetas del canvas son ejemplos de diseño.
 - Si se acepta el flujo propuesto, los catálogos de Glitch serían los primeros de una franquicia editorial en el
   Composer, y Guttery entraría como extensión `glitch` del brand pack `axis` (hoy el único pack).
-- La pieza sonora de Glitch sigue pendiente en la identidad sonora; el mnemónico del video hay que evaluarlo y
-  aprobarlo en una evaluación dedicada (Delta 2026-09-27, punto 5).
+- Glitch tiene su diseño sonoro propio, aprobado (versión B, 2026-09-27), sólo de Glitch: el mnemónico del video se
+  evaluó en la evaluación dedicada (Delta 2026-09-27, punto 5) y quedó resuelto por esa aprobación. La identidad sonora
+  de Efeonce no cambia.
 
 ## Pendiente
 
 Resueltos el 2026-09-27 (ver Deltas): la manzana y el verde, la línea Growth, la numeración (#17), el alta de los 5
-glifos Plastilina, el flujo de composición (`Accepted`) y el hogar del movimiento (repo taller). Siguen pendientes:
+glifos Plastilina, el flujo de composición (`Accepted`), el hogar del movimiento (repo taller) y el diseño sonoro
+(`Accepted`, versión B; ver [su Delta](#delta-2026-09-27--diseño-sonoro-aprobado-versión-b-sólo-glitch)). Siguen
+pendientes:
 
 - Aprobación de la lente, el blog (banners + maqueta + callout v2), el vlog 16:9, el reel (kit de overlays) y las
   tarjetas finales.
-- Mnemónico del video: evaluarlo y aprobarlo (evaluación dedicada).
 - Contenido del lower third: en definición con el operador.
 - Licencia de Guttery: confirmada por el operador (2026-09-27); falta registrar la referencia del contrato.
 
@@ -263,7 +266,7 @@ corrida `95cf425`, `8dfa69c`, `17f80f2`, `ac5d021`, `2ae0f65`):
 **Qué queda propuesto o pendiente:** el operador **no aprobó ninguna pieza de motion**: todo es PILOTO / PROPUESTA.
 Pendientes: aprobar la intensidad v2 y el kit; fps de grabación (hoy 30); prueba de los editores en Premiere y After
 Effects; parámetro de ritmo (posible, no implementado); a qué piezas va la transición de bytes; subtítulos (estilo de
-captions, no hecho); mnemónico (golpes ya marcados, evaluación dedicada pendiente); textos reales de la #17; formulario
+captions, no hecho); mnemónico (resuelto después: diseño sonoro aprobado, versión B, ver su Delta); textos reales de la #17; formulario
 de autoservicio del texto en Marketing Studio (recomendado; `.mogrt` descartado por duplicar el diseño a mano);
 excepción de rostros; subir los valores a tokens `glitchLine` (TASK-1922); push de los repos.
 
@@ -271,3 +274,41 @@ excepción de rostros; subir los valores a tokens `glitchLine` (TASK-1922); push
 (`tools/glitch-motion/ejemplos/edicion-17.ejemplo.json`) y no el manifiesto de TASK-1923; los valores de Glitch no
 vienen todavía de un token; los binarios se entregaron en OneDrive y todavía no están archivados en GCS (el manifiesto
 guarda su sha256); y el código no pasó por PR ni por el CI del taller (commits sin push).
+
+## Delta 2026-09-27 — diseño sonoro aprobado, versión B (sólo Glitch)
+
+> **Alcance:** este diseño sonoro es **SÓLO de Glitch, no de Efeonce.** No modifica la
+> [identidad sonora de Efeonce](./EFEONCE_SONIC_IDENTITY_DECISION_V1.md) (logo sonoro, voz, esfera por línea, dos
+> registros), que sigue «recomendada»; no se usa en piezas de Efeonce, de su familia ni de clientes, y en esa norma
+> Glitch sólo aparece con un puntero a este diseño. Detalle operativo en la
+> [norma §13.11](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1311-sonido--sólo-glitch-aprobado-versión-b).
+
+- **Qué se decidió:** «el sonido de Efeonce, con un bug». El motivo de Efeonce se rompe como se rompe la imagen:
+  **Mi · Mi · Mi (se rompe en bytes) → La (la manzana)**, con un solo golpe grave por aparición de la manzana. Cubre la
+  apertura, la tarjeta final, el kit de overlays, el lower third y las transiciones (entre piezas, entre escenas y
+  héroe), amarrado cuadro a cuadro al piloto de motion, en dos intensidades (A contenida, B más punch); se aprobó la
+  **B**. Es exclusivo de Glitch, como la manzana y la falla en bytes.
+- **Por qué diseño sonoro y no música:** las rondas 4 y 5 exploraron dos versiones musicales (serena, con falla en la
+  3.ª nota; rock, con tartamudeo de banda) y todavía no le convencían al operador. La ronda 6 cambió el enfoque: el
+  sonido sigue la imagen golpe a golpe (la falla afinada en La mayor, silencio digital en el corte, nunca whooshes ni
+  falla sobre la voz del host), en vez de sumar una pieza musical encima.
+- **Cómo se produce:** motor determinístico propio, nacido en `greenhouse-eo`
+  (`ai-generations/2026-09-26_branding-sonoro/motor/glitch-sfx.mjs`, commits `2fee1f487` y `556c83ae2`) y **migrado**
+  el 2026-09-27 al repo taller `efeonce-brand-workshop` (commit `2d411b8`): `dsp.mjs` pasó sin cambios a
+  `tools/brand-sound` (con pruebas) y `glitch-sfx.mjs` pasó a `tools/glitch-motion/src/sound.mjs`, que lee todos los
+  tiempos del código del motion (`TIMING`, `KIT_TIMING`, `APPLE_BYTES`, `ANIMATIC` y `schedule()`). Migración fiel:
+  los 30 WAV de la B salen idénticos byte a byte. Los comandos `render`, `kit`, `transiciones` y `heroe` de
+  `glitch-motion` entregan el WAV B junto a cada `.mov`: regenerar el sonido es correr el mismo comando del motion. La
+  copia de `ai-generations/2026-09-26_branding-sonoro/motor/` queda como histórico; si algún día migra el motor de la
+  identidad sonora de Efeonce, usa `tools/brand-sound` (una sola lógica).
+- **Dónde se publica:** página [axis.efeonce.org/references/glitch/#sonido](https://axis.efeonce.org/references/glitch/#sonido)
+  y `/references/glitch.json`, campo `sound` (publicados 2026-09-27); archivos, **sólo con la B**, en el bucket público
+  `gs://efeonce-group-axis-public-media/glitch/sound/v1/` (`masters/` y `web/`).
+- **Estado: Accepted, versión B (2026-09-27).** El operador escuchó la ronda 6, dijo «Me gusta» y luego eligió:
+  **«La b me encanta más. Sus sonidos están aprobados»**. La A (contenida) queda como alternativa descartada: no se
+  usa. La aprobación de lo producido en B resuelve las cuatro decisiones que estaban abiertas: (1) **B**; (2) **dos
+  golpes graves** en el video (apertura y Drop), uno por cada aparición de la manzana, tal como se produjo; (3) **voz
+  sola bajo las noticias**, sin música; (4) el **clic del micrófono y el trazo del plumón sintetizados se quedan**. Ya
+  no hay decisiones pendientes del sonido. La aprobación es **sólo del sonido**; el motion (imagen) mantiene su estado.
+- **Observación (no bloqueante):** la sesión de motion midió que, en B, el golpe del cuadro 74 de la tarjeta final (el
+  tercer punto que vuelve) queda más tapado que en A.

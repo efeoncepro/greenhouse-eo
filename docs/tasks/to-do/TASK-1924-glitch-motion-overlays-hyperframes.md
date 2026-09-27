@@ -1,5 +1,28 @@
 # TASK-1924 — Glitch en movimiento con HyperFrames
 
+## Delta 2026-09-27 — sonido de Glitch aprobado, versión B (sólo Glitch)
+
+- El **diseño sonoro de Glitch** (sólo Glitch, nunca Efeonce) quedó **APROBADO en su versión B** («más punch») el
+  2026-09-27: el operador dijo «La b me encanta más. Sus sonidos están aprobados». La A queda como alternativa
+  descartada. Esa aprobación resuelve las cuatro decisiones del sonido (B; dos golpes graves, apertura y Drop; voz sola
+  bajo las noticias; clic del micrófono y trazo del plumón sintetizados se quedan) y **cierra, para el sonido, la Open
+  Question 3 (mnemónico)**. Es aprobación del sonido, no del motion. Está sincronizado cuadro a cuadro con el piloto de
+  motion: un WAV por `.mov` más pistas por transición. Archivos aprobados (sólo B) en
+  `gs://efeonce-group-axis-public-media/glitch/sound/v1/` (`masters/` y `web/`); página AXIS
+  `/references/glitch/#sonido` y `/references/glitch.json`, campo `sound` (publicados 2026-09-27). Observación no
+  bloqueante: en B, el golpe del cuadro 74 de la tarjeta final queda más tapado que en A. Detalle en la [norma §13.11](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1311-sonido--sólo-glitch-aprobado-versión-b).
+- El motor de sonido **ya está migrado** al taller (commit `2d411b8`, 2026-09-27): `dsp.mjs` pasó sin cambios a
+  `tools/brand-sound` (con pruebas) y `glitch-sfx.mjs` pasó a `tools/glitch-motion/src/sound.mjs`, que lee todos los
+  tiempos del código (`TIMING` de `pieces.mjs`; `KIT_TIMING`, `APPLE_BYTES` y `ANIMATIC` de `overlays.mjs`; `schedule()`
+  de `transitions.mjs`). Migración fiel: los 30 WAV de la B salen idénticos byte a byte; se agregó la transición héroe
+  desde izquierda y marca (antes sólo centro) sin alterar la secuencia aprobada. `render`, `kit`, `transiciones` y
+  `heroe` entregan el WAV B junto a cada `.mov` en OneDrive, con la duración verificada y vistas previas con sonido. La
+  copia de `greenhouse-eo` (`ai-generations/2026-09-26_branding-sonoro/motor/glitch-sfx.mjs` y su `dsp.mjs`, commits
+  `2fee1f487` y `556c83ae2`) queda como histórico.
+- **Si esta task cambia tiempos del motion** (piezas, overlays o transiciones), basta con volver a correr el mismo
+  comando del motion: el sonido se regenera con los tiempos nuevos y sigue calzando.
+- **No cambia el alcance de esta task:** los overlays siguen saliendo mudos (ProRes 4444 sin audio); el sonido va aparte.
+
 ## Delta 2026-09-27
 
 - **Guttery:** el operador confirmó la licencia para web y video (2026-09-27, segunda respuesta). La Open Question de Guttery queda resuelta; la task registra la referencia del contrato de licencia y sella la fuente.

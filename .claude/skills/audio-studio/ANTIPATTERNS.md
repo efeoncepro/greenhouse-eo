@@ -14,6 +14,12 @@
   dinámica. ✅ Masteriza al **target de loudness del destino** (música -14, podcast -16/-19, broadcast -23).
 - ❌ **Música tapando la voz.** ✅ Música bajo la voz -18 a -20 dB; la voz siempre inteligible.
 - ❌ **Ignorar el true peak.** ✅ Techo -1 dBTP (Amazon -2) para evitar clipping tras el codec.
+- ❌ **Un barrido de ruido continuo cuando la dirección prohíbe whooshes.** Medido en el espectrograma (Glitch,
+  2026-09-27): el soplo de ruido de las transiciones sonaba a whoosh. ✅ Lluvia de micro-clics, uno por celda de la
+  animación, que viaja en estéreo con la imagen.
+- ❌ **Una cola de campana larga sobre el evento siguiente.** Medido (Glitch, 2026-09-27): la campana de la manzana
+  tapaba el golpe de texto que venía después. ✅ Acorta el decaimiento (se aceleró 2,2 veces) y revisa en el
+  espectrograma, con marcas de cuadro, que cada golpe quede limpio.
 - ❌ **Podcast que suena distinto cada semana.** ✅ Consistencia (mismo sonido/estructura/día) = confianza
   algorítmica + hábito del oyente. Workflow documentado.
 

@@ -117,6 +117,9 @@ hipótesis de montaje, no benchmarks; revisar secuencia completa y no sólo el p
    catálogo ni composiciones. Todo el video de Glitch está en PROPUESTA hasta que el operador lo apruebe.
    **Dónde:** repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/` (TASK-1924), operado desde
    `greenhouse-eo` con `pnpm -C ../efeonce-brand-workshop`; nunca en Greenhouse ni en Globe.
+   **Sonido de Glitch (APROBADO, versión B, 2026-09-27; sólo Glitch):** cada pieza de motion de Glitch tiene una pista de sonido sidecar
+   (WAV con el mismo nombre y duración que su `.mov`); si cambian los tiempos del motion, vuelve a correr el motor de
+   sonido (`references/glitch.md` §13 de `efeonce-graphic-line`).
    **Registro cine (2026-09-27):** es un registro **fotográfico** del lenguaje de Efeonce
    ([`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)),
    no un estilo de video. Un video con **Nexa protagonista** que tome ese look respeta la misma frontera (cine sólo con

@@ -86,7 +86,7 @@ En el cierre con voz, la esfera cae en la palabra final del eslogan.
 |---|---|
 | `motor/sonic-engine.mjs` | Síntesis determinística (sin muestras ni modelos de terceros). `--territory puntos\|pregunta\|orbita --mode logo\|sting --line growth\|brand\|engine\|voice\|revenue` |
 | `motor/voz.ts` | Etiqueta de voz con ElevenLabs v3 vía fal (`runFalModel`) |
-| `motor/glitch-sfx.mjs` | **Glitch, diseño sonoro (ronda 6, propuesta):** `--intensity a\|b --outdir <dir>` → apertura, cierre, bucle y animatic amarrados a los cuadros del piloto de motion v2 (`efeonce-brand-workshop/tools/glitch-motion`, `pieces.mjs` TIMING y `overlays.mjs`) |
+| `motor/glitch-sfx.mjs` | **HISTÓRICO:** la versión viva está en el taller (`tools/glitch-motion/src/sound.mjs` + `tools/brand-sound`, commit `2d411b8`). **Glitch, diseño sonoro (ronda 6, aprobado en B el 2026-09-27):** `--intensity a\|b --outdir <dir>` → apertura, cierre, bucle y animatic amarrados a los cuadros del piloto de motion v2 (`efeonce-brand-workshop/tools/glitch-motion`, `pieces.mjs` TIMING y `overlays.mjs`) |
 | `glitch-sfx/<a\|b>/kit/` · `transiciones/` | Un WAV por overlay del kit (incluida la transición de bytes) y por transición entre escenas (3 orígenes × 2 velocidades + héroe, reel y vlog), leídos de la misma programación de celdas que la imagen |
 | `glitch-sfx/` | WAV de A y B y `web/` con los videos del piloto con sonido (fuera de git; copia en OneDrive `09. Glitch/Motion/piloto/sonido-propuesta/`) |
 | `motor/transcribir.ts` | QA: transcripción con marcas de tiempo por palabra (ElevenLabs STT vía fal) |

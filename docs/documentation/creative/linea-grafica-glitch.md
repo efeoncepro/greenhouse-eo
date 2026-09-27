@@ -1,9 +1,9 @@
 # Línea gráfica de Glitch — sub-línea de La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.4
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.4: el sonido de Glitch quedó aprobado, versión B)
 > **Documentacion tecnica:** [Norma de la sub-línea de Glitch](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) · [ADR de la línea de Glitch](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
 > **Manual de uso:** [Componer piezas de Glitch](../../manual-de-uso/creative/componer-piezas-glitch.md) · [Editar el video de Glitch](../../manual-de-uso/creative/editar-video-glitch.md)
 
@@ -84,6 +84,7 @@ abre con la franja «El micrófono se abre». El carrusel cierra con la **contra
 | Video horizontal (vlog) y reel vertical con gráficos encima del host | propuesta |
 | Tarjeta final de video | propuesta |
 | Gráficos animados del video (apertura, tarjeta final, kit y transiciones) | **piloto** desde el 2026-09-27: ninguno aprobado |
+| Sonido de Glitch (sólo Glitch) | **aprobado**, versión B «más punch» (2026-09-27) |
 | La manzana como esfera de Glitch y el verde como su color de acento | **aprobados** el 2026-09-27 (falta sumarlos al sistema de diseño AXIS) |
 | Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | **aprobados** el 2026-09-27 (falta sumarlos al catálogo de AXIS) |
 
@@ -137,6 +138,34 @@ Reglas del video:
 > [TASK-1924](../../tasks/to-do/TASK-1924-glitch-motion-overlays-hyperframes.md) · montaje paso a paso en
 > [Editar el video de Glitch](../../manual-de-uso/creative/editar-video-glitch.md)
 
+## Cómo suena Glitch (aprobado)
+
+> **⚠️ Sólo para Glitch.** Este sonido **no es de Efeonce**: no forma parte de la identidad sonora de Efeonce y nunca se
+> usa en piezas de Efeonce ni de clientes.
+
+Así como la imagen de Glitch es La órbita con una falla, su sonido es **«el sonido de Efeonce, con un bug»**: tres
+notas iguales, la tercera se rompe en pedacitos digitales y se rearma en una nota nueva cuando aparece la manzana. Es
+**diseño sonoro, no música**: cada sonido acompaña un movimiento del video (los puntos, la manzana, los textos que
+entran, el clic del micrófono que se abre y se cierra, el aire del estudio mientras el micrófono está abierto, el trazo
+de plumón de la letra manuscrita y las transiciones).
+
+Reglas simples:
+
+- La manzana es el único sonido grave, una vez por cada vez que aparece.
+- La falla **nunca suena sobre la voz del host**, y hacia o desde la toma del host no suena ninguna transición.
+- La firma de Efeonce no suena.
+- Nada de «whooshes» ni efectos de tráiler: el corte es silencio.
+
+Se hicieron dos intensidades, **A** (contenida) y **B** (más punch). El operador eligió la **B** y la aprobó el
+2026-09-27 («La b me encanta más. Sus sonidos están aprobados»); la A queda descartada. Con eso quedó decidido también
+que el video lleva dos golpes graves (uno por cada vez que aparece la manzana), que bajo las noticias va sólo la voz,
+sin música, y que el clic del micrófono y el trazo de plumón se quedan como están. El editor recibe un archivo de
+audio por cada gráfico animado, listo para ponerlo junto a él. Los archivos aprobados también están en la página de
+Glitch del sistema de diseño AXIS, en la sección de sonido.
+
+> Detalle técnico: [norma §13.11 Sonido](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1311-sonido--sólo-glitch-aprobado-versión-b) ·
+> montaje en [Editar el video de Glitch](../../manual-de-uso/creative/editar-video-glitch.md#6--montar-el-sonido)
+
 ## Cómo se va a producir (propuesta)
 
 Hoy cada pieza se arma a mano a partir del canvas de diseño, siguiendo la norma. Hay una **propuesta** (aún no
@@ -156,6 +185,7 @@ animarían y exportarían con fondo transparente para que el editor los ponga so
 | Canvas de diseño «Glitch en La órbita» (privado) | [claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS](https://claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS) |
 | Logo de Glitch | `public/branding/glitch/glitch-light.svg` y `glitch-dark.svg` |
 | Gráficos animados del video (piloto) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto` |
+| Sonido del video (aprobado, versión B) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto › sonido-propuesta` → carpeta `b` (la carpeta conserva su nombre; `a` es la alternativa descartada) · [axis.efeonce.org/references/glitch/#sonido](https://axis.efeonce.org/references/glitch/#sonido) |
 | Guía de tono y voz de Glitch (v3) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Marca` |
 | Página de Glitch en el sistema de diseño AXIS | publicada en [axis.efeonce.org/references/glitch/](https://axis.efeonce.org/references/glitch/) (2026-09-27) |
 | Línea gráfica de Efeonce (la línea madre) | [La órbita](./linea-grafica-efeonce.md) |
@@ -167,9 +197,8 @@ animarían y exportarían con fondo transparente para que el editor los ponga so
 | La manzana y el verde | ya aprobados (2026-09-27); falta registrarlos en AXIS |
 | Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | ya aprobados (2026-09-27); falta sumarlos al catálogo de AXIS |
 | Piezas en propuesta | aprobar lente, blog, video y tarjetas finales |
-| Sonido de apertura y cierre del video (mnemónico) | evaluarlo y aprobarlo en una revisión dedicada |
 | Texto del rótulo inferior del video (lower third) | hay un piloto (2026-09-27); falta que el operador lo apruebe |
-| Gráficos animados del video | aprobar la intensidad «más punch», la cadencia de grabación, la prueba con los editores, dónde se usa la transición de bytes, subtítulos, sonido de los golpes, textos reales de la #17 y la excepción de rostros |
+| Gráficos animados del video | aprobar la intensidad «más punch», la cadencia de grabación, la prueba con los editores, dónde se usa la transición de bytes, subtítulos, textos reales de la #17 y la excepción de rostros |
 | Letra Guttery | licencia para web y video confirmada por el operador (2026-09-27) |
 | Producción automática | aprobar la propuesta (el trabajo para construirla ya está creado) |
 

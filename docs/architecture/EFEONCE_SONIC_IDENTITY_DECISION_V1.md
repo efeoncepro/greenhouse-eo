@@ -3,11 +3,24 @@
 > **Tipo de documento:** ADR (decisión de marca)
 > **Estado:** Proposed (recomendada por el operador 2026-09-26; canonización pendiente)
 > **Creado:** 2026-09-26 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-26 por Claude
+> **Última actualización:** 2026-09-27 por Claude (Delta: Glitch deja de estar pendiente; su diseño sonoro propio quedó aprobado, versión B)
 > **Norma operativa:** [`EFEONCE_SONIC_IDENTITY_V1.md`](../operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md)
 > **Referencia viva:** [axis.efeonce.org/references/sonic-brand](https://axis.efeonce.org/references/sonic-brand/)
 > (PR `efeoncepro/axis-design-system#4`, squash `55486aa`, publicado 2026-09-26)
 > **Relacionada:** [ADR de la línea gráfica «La órbita»](./EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
+
+## Delta 2026-09-27 — Glitch: diseño sonoro propio aprobado, versión B (fuera de esta decisión)
+
+- Existe un diseño sonoro para Glitch (ronda 6: diseño sonoro en vez de música, «el sonido de Efeonce,
+  con un bug»). Es **sólo de Glitch** y vive en la [norma de Glitch](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
+  §13.11.
+- **No amplía esta decisión.** Su falla sonora, sus SFX de transición, el clic del micrófono y el aire del estudio no
+  forman parte de la identidad sonora de Efeonce ni se usan en piezas de Efeonce; el kit de Efeonce tampoco se mezcla
+  con el de Glitch.
+- Glitch **deja de estar pendiente** (punto 7 de la decisión): el operador aprobó la **versión B** el 2026-09-27 («La b
+  me encanta más. Sus sonidos están aprobados»). Glitch tiene su diseño sonoro propio, aprobado (B), **sólo de Glitch**,
+  en la norma de Glitch §13.11. Esta decisión no cambia: la identidad sonora de Efeonce sigue **Proposed**
+  («recomendada»).
 
 ## Contexto
 
@@ -34,7 +47,8 @@ redes → podcast Glitch → eventos.
 6. **Dónde vive:** página y JSON en AXIS (`references/sonic-brand`, esquema `axis.efeonce-sonic-brand.v1`) y archivos
    en el bucket público `gs://efeonce-group-axis-public-media/sonic/v1/`. **No** en `@efeoncepro/axis-tokens` hasta
    canonizar.
-7. **Glitch (podcast) queda fuera** de esta decisión hasta que el operador elija.
+7. **Glitch (podcast) queda fuera** de esta decisión. Desde el 2026-09-27 tiene su diseño sonoro propio, aprobado (B),
+   sólo de Glitch, en la norma de Glitch §13.11 (ver el Delta).
 
 ## Alternativas descartadas
 
@@ -59,8 +73,6 @@ redes → podcast Glitch → eventos.
 
 ## Pendiente
 
-- Decisión de Glitch (dos versiones exploradas; la recomendación intro/outro rock + cortina serena no convence aún al
-  operador).
 - Licencias: Stable Audio vía fal y voz de ElevenLabs.
 - Prueba de reconocimiento sin logo antes de pautar (como la D14 de la órbita).
 - Tokens AXIS, reemplazo del sonido de los masters V1.1 y guía en el manual de la línea gráfica.

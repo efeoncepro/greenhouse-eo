@@ -30,5 +30,10 @@ Reglas duras:
 - Motion: repo taller `efeonce-brand-workshop`, `tools/glitch-motion/` (HyperFrames); desde `greenhouse-eo`:
   `pnpm -C ../efeonce-brand-workshop --filter glitch-motion {doctor|render|kit|transiciones|heroe|test}`. El texto sale
   del archivo de edición: nunca editar los `.mov` ni tocar tiempos o coordenadas de las composiciones.
-- Aprobado: sistema de portada A/B/C con rotación, lámina interior, contraportada; manzana como esfera y verde como acento; línea Growth; próxima edición #17; alta de los 5 glifos Plastilina (2026-09-27). Blog, lente y todo el motion
+- Sonido de Glitch = **APROBADO, versión B (2026-09-27), sólo Glitch** (nunca Efeonce; la A quedó descartada): un WAV
+  sidecar por `.mov` (sólo los de `b/`); dos golpes graves (apertura y Drop); voz sola bajo las noticias; nunca la falla
+  sonora sobre la voz del host ni sonido de transición hacia o desde el host; nunca whooshes. Archivos por URL + SHA-256
+  en `gs://efeonce-group-axis-public-media/glitch/sound/v1/` (`/references/glitch.json` → `sound`). Canon §13.11 de la
+  norma; operativo en `references/glitch.md` §13.
+- Aprobado: sistema de portada A/B/C con rotación, lámina interior, contraportada; manzana como esfera y verde como acento; línea Growth; próxima edición #17; alta de los 5 glifos Plastilina (2026-09-27); diseño sonoro de Glitch, versión B (2026-09-27). Blog, lente y todo el motion
   (piloto de video) son **propuesta**: no se entregan como canon ni se publican sin el operador.

@@ -147,6 +147,12 @@ capas.
 **Combo clásico:** *riser → whoosh → impact* para un reveal potente. El riser crea expectativa, el
 whoosh mueve, el impact resuelve.
 
+**Cuando la marca prohíbe whooshes (caso Glitch, 2026-09-27, aprobado en su versión B):** el movimiento se puede sonorizar sin ruido
+continuo, calculando el sonido desde la misma programación que la imagen: una lluvia de micro-clics (uno por celda
+muestreada) que viaja en estéreo con las celdas, y destellos como notas afinadas. El soplo de ruido filtrado se
+descartó porque en el espectrograma se leía como whoosh. Detalle y reglas: `efeonce-graphic-line` →
+`references/glitch.md` §13 (sólo Glitch).
+
 ## 9. SFX para UI / producto (sinergia motion + UI)
 
 Los **UI sounds** son micro-SFX funcionales que **confirman una acción** en producto: éxito,

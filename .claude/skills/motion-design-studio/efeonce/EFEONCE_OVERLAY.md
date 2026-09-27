@@ -35,7 +35,9 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   vuelven uno» (Mi · Mi · Mi → La) re-sonoriza reveal, apertura y sting V1.1 sin tocar la imagen (la esfera cae con el
   golpe: 0,58 / 1,87 / 1,15 s) y trae dos registros (fondo y energía) y la etiqueta con voz de Brian. Para sonorizar una
   pieza de marca, **usa los archivos del kit** por URL + sha256 (`https://axis.efeonce.org/references/sonic-brand.json`),
-  nunca regeneres logo, voz ni esfera; el craft lo lleva `audio-studio`. Glitch (podcast) está pendiente. Canon:
+  nunca regeneres logo, voz ni esfera; el craft lo lleva `audio-studio`. Glitch no usa este kit: el diseño
+  sonoro del motion de Glitch (APROBADO, versión B, 2026-09-27; sólo Glitch, nunca en piezas de Efeonce) es aparte: WAV sidecar por `.mov`,
+  en `efeonce-graphic-line` → `references/glitch.md` §13. Canon:
   [`EFEONCE_SONIC_IDENTITY_V1.md`](../../../../docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md).
 - **Cierre de marca 4,5 s — línea gráfica «La órbita» (canónica desde 2026-09-25):** el end-card de la marca propia
   Efeonce y su familia (nunca de un cliente) sigue el

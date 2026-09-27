@@ -51,9 +51,34 @@ Nexa) o un cliente Globe. Para audio genérico basta `../modules/`.
   `https://axis.efeonce.org/references/sonic-brand.json` (esquema `axis.efeonce-sonic-brand.v1`; se publican
   publicado 2026-09-26, PR AXIS #4 squash `55486aa`) · bucket `gs://efeonce-group-axis-public-media/sonic/v1/` (`masters/` + `web/`) ·
   producción en Greenhouse `ai-generations/2026-09-26_branding-sonoro/` (`LEEME.md`, `motor/`, `entrega/`, `guia/`).
-- **Pendiente para canonizar:** Glitch (podcast, **sin decisión** del operador) · licencias (Stable Audio vía
+- **Pendiente para canonizar:** licencias (Stable Audio vía
   fal; voz ElevenLabs) · prueba de reconocimiento sin logo antes de pautar · tokens AXIS + reemplazo del
-  sonido de los masters V1.1.
+  sonido de los masters V1.1. Glitch ya no es pendiente de esta identidad: tiene su diseño sonoro propio, aprobado (B),
+  sólo de Glitch (ver §Glitch abajo); esta identidad sigue «recomendada».
+
+## Glitch (sólo Glitch, APROBADO versión B — 2026-09-27)
+
+> **No es parte de la identidad sonora de Efeonce.** Glitch (el magazine semanal) tiene un diseño sonoro propio en
+> **APROBADO, versión B** (2026-09-27): «el sonido de Efeonce, con un bug» — Mi · Mi · Mi (el tercero se rompe en bytes) → La (la manzana,
+> el único golpe grave). Nunca en piezas de Efeonce, su familia ni clientes; nunca mezclado con el kit de arriba.
+> Canon: norma de Glitch [`GLITCH_GRAPHIC_LINE_V1.md`](../../../../docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
+> §13.11; operativo en `efeonce-graphic-line` → `references/glitch.md` §13.
+
+- **Reglas clave:** afinado en La mayor; diseño sonoro, no música; sin whooshes, subidas de tráiler ni chiptune (el
+  corte es silencio digital en seco); un golpe grave por aparición de la manzana y el golpe sin comprimir; **la falla
+  nunca sobre la voz del host** y ninguna transición suena hacia o desde la toma del host; la firma de Efeonce muda.
+- **Qué hay:** un WAV sidecar por cada `.mov` del motion (mismo nombre y duración; las transiciones con pista por
+  formato), en la versión **B** (más punch), la aprobada; la A (contenida) queda como alternativa descartada. Motor
+  determinístico migrado al taller `efeonce-brand-workshop` (commit `2d411b8`): `tools/glitch-motion/src/sound.mjs`
+  sobre `tools/brand-sound`; regenerar = correr el mismo comando de `glitch-motion` (la copia
+  `motor/glitch-sfx.mjs` queda como histórico; ver `STUDIO_TOOLING.md`); archivos por URL + SHA-256 desde
+  `https://axis.efeonce.org/references/glitch.json` (campo `sound`), en el bucket
+  `gs://efeonce-group-axis-public-media/glitch/sound/v1/` (sólo la B: `masters/` y `web/`); entrega al editor en
+  OneDrive `Alineación/5. Contenidos/09. Glitch/Motion/piloto/sonido-propuesta/b/` (la carpeta conserva su nombre).
+- **Estado:** **aprobado, versión B** (2026-09-27): «La b me encanta más. Sus sonidos están aprobados». Quedaron
+  resueltas las cuatro decisiones: B; dos golpes graves (apertura y Drop); voz sola bajo las noticias; el clic del
+  micrófono y el trazo del plumón sintetizados se quedan. Observación no bloqueante: en B, el golpe del cuadro 74 de la
+  tarjeta final queda más tapado que en A.
 
 ## Ecosistema digital (SSOT: `docs/public-site/decisions/PDR-003`)
 

@@ -111,6 +111,35 @@ El contrato AXIS `efeonce.surface-composition` 0.1.0 (`candidate`, `pnpm surface
 `efeonceGraphicLine.surfaces`) está en `main` de AXIS (Lab `/references/surfaces/` publicado; paquetes sin publicar en npm); sin cambios de
 código en Greenhouse.
 
+## 2026-09-27 — Glitch: diseño sonoro aprobado (versión B), sólo Glitch (AXIS /references/glitch/#sonido)
+
+El operador aprobó la versión B: «La b me encanta más. Sus sonidos están aprobados». Es **sólo de Glitch**: no forma
+parte de la identidad sonora de Efeonce ni se mezcla con su kit. Idea: «el sonido de Efeonce, con un bug». El motivo
+Mi · Mi · Mi → La hace fallar la tercera nota, que se rompe en bytes y se rearma como la manzana, el único golpe grave. Es
+diseño sonoro, no música, amarrado cuadro a cuadro al piloto de motion. Incluye un WAV por cada `.mov` del kit (lower
+third y transición «manzana en bytes» incluidos) y una pista por transición entre escenas, calculada desde la misma
+programación de celdas que la imagen: una lluvia de clics, nunca un whoosh. Motor determinístico
+que ya vive en el taller (`tools/glitch-motion/src/sound.mjs` + `tools/brand-sound`, `2d411b8`): cada render deja su WAV
+junto al `.mov`. Publicado en AXIS (PR efeoncepro/axis-design-system#8): sección `#sonido`, campo `sound` en
+`glitch.json` y 38 archivos en el bucket `glitch/sound/v1`. La página de sonic brand saca a Glitch de su kit. Canon:
+norma de Glitch §13.11, Delta del ADR, doc funcional, manual de edición, reglas y skills `efeonce-graphic-line`,
+`audio-studio` y `motion-design-studio`.
+
+## 2026-09-26 — Identidad sonora de Efeonce recomendada: «Tres puntos que se vuelven uno» (AXIS /references/sonic-brand/)
+
+El operador aprobó como recomendada (no canon) la identidad sonora de la marca: el logo sonoro Mi · Mi · Mi → La traduce
+la gramática de La órbita (el anillo pregunta, tres notas piensan, la esfera responde con el único golpe), con dos
+registros del mismo ADN —fondo (96 BPM, síntesis propia) y energía (120 BPM, rock: maqueta propia re-grabada con Stable
+Audio 2.5 y la esfera propia encima)—, el timbre de la esfera por línea de servicio (Growth campana, Brand marimba, Engine
+FM, Voice eco, Revenue campana grave) y la etiqueta «Empower your <Línea>» con la voz de Brian (ElevenLabs v3). Re-sonoriza
+reveal, apertura y sting V1.1 sin tocar la imagen, en 16:9 y 9:16. Publicado en AXIS (PR efeoncepro/axis-design-system#4):
+página `/references/sonic-brand/`, JSON para agentes con URL y SHA-256 por archivo y guía `docs/agent-composition/sonic-brand.md`;
+65 archivos en el bucket público `sonic/v1`. Valores fuera de `axis-tokens` hasta canonizar. Pendiente: licencias,
+prueba de reconocimiento sin logo y reemplazo del sonido de los masters V1.1 (Glitch tiene su sonido propio: entrada del 27/09). Canon
+[`EFEONCE_SONIC_IDENTITY_V1.md`](docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md), ADR Proposed, doc funcional,
+manual, regla `.claude/rules/brand-sonic.md` y skills `audio-studio`, `efeonce-graphic-line`, `axis-design-system`,
+`motion-design-studio` y `efeonce-brand-studio`. Producción: `ai-generations/2026-09-26_branding-sonoro/`.
+
 ## 2026-09-26 — Iconografía de La órbita canónica: Trazo y Plastilina (AXIS v0.3.6)
 
 El operador canonizó la iconografía de la línea (D16–D22) en dos voces de una familia: **Trazo** (lo que se mide;
@@ -576,22 +605,3 @@ LinkedIn e Instagram. Anthropic y OpenAI figuran como partners aceptados. El ada
 suma una opción de presentación (escala y color por participante, con contraste verificado) y las skills aprenden que
 cambiar el fondo detrás de una persona o mascota se resuelve regenerando la escena, no recortando. Bitácora en
 `docs/operations/social/2026-09-17-kv-tu-ia-no-conoce-production-method.md`.
-
-## 2026-09-16 — Serie social de Fiestas Patrias: México y previa del 18
-
-Se publicaron el carrusel «Hay frases que no se tocan» en Instagram y su documento en LinkedIn para México, y quedó
-programada para el 17/09 la estática «Hay días que sí rediseñaríamos». El caso dejó reglas nuevas en las skills
-sociales: la conexión con la marca se demuestra con el oficio y no con una moraleja; sin símbolos patrios mexicanos en
-piezas de marca; personas del equipo sólo con consentimiento; alto impacto se logra con luz, cámara, material y
-acción; un recoloreo con máscara de IA que cambia la forma se descarta por uno determinístico; y las imágenes sociales
-se publican en PNG. Bitácora en `docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md`.
-
-## 2026-09-16 — `pnpm ai:fal` también trabaja con Higgsfield
-
-El mismo comando ahora opera la API de Higgsfield: 44 modelos que se eligen con `--capability hf-*`, entre ellos SOUL,
-Marketing Studio, Ideogram 4.0, Qwen Image 3, Kling Omni y O3, PixVerse 6, LTX 2.5 y Happy Horse. Antes de gastar,
-revisa el pedido contra las reglas reales de cada modelo y pide el precio exacto al proveedor, que no cobra por
-cotizar. En Seedance y Wan 3.0, que solo publican una fórmula, calcula un techo. `--estimate` cotiza sin generar y
-`--cancel` anula un trabajo que sigue en cola. La llave quedó en Secret Manager. Las 44 opciones cotizaron con la
-cuenta de Efeonce, pero todavía no se generó nada: la cuenta de la API de Higgsfield no tiene créditos. Si el Recraft de
-esta API entrega SVG está sin probar, y Veo 3.1, Sora 2 y Nano Banana Pro no están disponibles por esta vía.

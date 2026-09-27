@@ -21,6 +21,8 @@ Reglas duras:
   se verifica su `sha256`.
 - La voz es Brian **por ID** `nPczCjzI2devNBz1zQrb` (hay 25 «Brian» en ElevenLabs); en fal, `voice: "Brian"` ya es ésa.
 - La melodía **Mi · Mi · Mi → La** con su pausa no cambia; la línea de servicio cambia sólo el timbre de la esfera.
-- **Glitch (podcast) está pendiente** de decisión del operador: no se sonoriza con este kit ni se documenta como canon.
+- **Glitch (podcast) no se sonoriza con este kit.** Glitch tiene su diseño sonoro propio, **aprobado (versión B,
+  2026-09-27), sólo de Glitch**, en la norma de Glitch §13.11 (regla `.claude/rules/glitch.md`); nunca se mezcla con
+  este kit ni cambia esta identidad, que sigue «recomendada».
 - Nivelar por **sonoridad al destino** (−14 LUFS video/redes, −16 podcast, pico −1 dBFS), nunca por pico ni comprimiendo
   el golpe. Nunca en piezas de clientes, en la UI de Greenhouse ni en la pantalla de recepción.

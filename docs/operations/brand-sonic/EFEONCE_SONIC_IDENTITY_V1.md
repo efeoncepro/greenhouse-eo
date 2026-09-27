@@ -1,12 +1,13 @@
 # Identidad sonora de Efeonce V1
 
 > **Tipo de documento:** Norma de marca (sonido) · canon operativo
-> **Versión:** 1.0
+> **Versión:** 1.2
 > **Creado:** 2026-09-26 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-26 por Claude
+> **Última actualización:** 2026-09-27 por Claude (v1.2: Glitch deja de estar pendiente; su diseño sonoro propio quedó aprobado, versión B)
 > **Estado:** **Recomendada, no canon.** El operador aceptó la recomendación el 2026-09-26 («vamos con tu
 > recomendación»); la canonización queda pendiente (ver [Pendientes para canonizar](#pendientes-para-canonizar)).
-> **Glitch (podcast): pendiente** de decisión del operador; no forma parte de esta norma.
+> **Glitch (podcast):** no forma parte de esta norma. Glitch tiene su diseño sonoro propio, **aprobado (versión B,
+> 2026-09-27)**, **sólo de Glitch**, en la [norma de Glitch](../brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) §13.11.
 > **Decisión:** [ADR `EFEONCE_SONIC_IDENTITY_DECISION_V1`](../../architecture/EFEONCE_SONIC_IDENTITY_DECISION_V1.md)
 > **Referencia viva:** [axis.efeonce.org/references/sonic-brand](https://axis.efeonce.org/references/sonic-brand/) ·
 > [JSON para agentes](https://axis.efeonce.org/references/sonic-brand.json) (publicados el 2026-09-26: PR de AXIS #4, squash `55486aa`)
@@ -111,7 +112,7 @@ Puntos de contacto por prioridad: video y redes → podcast Glitch → eventos.
 | Con locución, webinar o video explicativo | pieza larga de **fondo**, ~15 dB bajo la voz |
 | Lanzamiento, redes con ritmo, evento | pieza larga de **energía** o cierre de energía (5,1 s) |
 | Pieza de una sola línea de servicio | logo o etiqueta con el timbre de esa línea |
-| Glitch (podcast) | **pendiente** |
+| Glitch (podcast) | no se usa este kit. Glitch tiene su diseño sonoro propio, **aprobado (B)**, sólo de Glitch, en la [norma de Glitch](../brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) §13.11 |
 | Pantalla de recepción | sin sonido |
 | Clientes · UI de Greenhouse | no se usa |
 
@@ -134,6 +135,9 @@ Puntos de contacto por prioridad: video y redes → podcast Glitch → eventos.
 - Usarla en piezas de clientes o en la UI de Greenhouse.
 - Sonorizar la pantalla de recepción.
 - Usar otra voz para el eslogan.
+- Usar el sonido de Glitch (falla sonora, SFX de transición, clic del micrófono, aire del estudio) en piezas de
+  Efeonce: es exclusivo de Glitch y no forma parte de esta identidad.
+- Mezclar este kit con el de Glitch en una misma pieza.
 
 ## Ficha técnica
 
@@ -188,6 +192,7 @@ contrato algo que todavía es recomendación.
 | `motor/composer.mjs` | pieza de fondo (y el Glitch sereno explorado) |
 | `motor/rock.mjs` | maqueta rock |
 | `motor/dsp.mjs` | primitivas de síntesis |
+| `motor/glitch-sfx.mjs` | diseño sonoro de Glitch (aprobado, versión B, **sólo de Glitch**, no de esta identidad; ver la norma de Glitch §13.11). **Histórico:** ya se migró al repo taller `efeonce-brand-workshop` (commit `2d411b8`, 2026-09-27) como `tools/glitch-motion/src/sound.mjs`, sobre `tools/brand-sound` (el `dsp.mjs`); esta copia ya no es la fuente. Si algún día migra el motor de esta identidad (`sonic-engine.mjs` y compañía), usa `tools/brand-sound` (una sola lógica) |
 | `motor/ai-music.ts` | Stable Audio y ElevenLabs Music vía fal |
 | `motor/sello.mjs` | la esfera como pista, para montarla encima |
 | `motor/voz.ts` | TTS |
@@ -246,18 +251,19 @@ contrato algo que todavía es recomendación.
 
 - Regenerar el logo, la voz o la esfera: se usan los archivos del kit.
 - Pedirle a un modelo de música que respete la estructura del logo: la fija la maqueta propia.
-- Documentar o usar Glitch como canon mientras siga pendiente.
+- Documentar el diseño sonoro de Glitch como parte de esta identidad: es sólo de Glitch y vive en su norma (§13.11).
 - Declarar la identidad sonora como canon antes de cerrar los pendientes.
 
 ## Pendientes para canonizar
 
-- **Glitch (podcast).** Hay dos versiones exploradas: serena, con una falla en la tercera nota, y rock, con tartamudeo
-  de banda. La recomendación era intro y outro rock más cortina serena; al operador «aún no le convence».
-  **Ronda 6 (2026-09-27, propuesta):** diseño sonoro en vez de música, «el sonido de Efeonce, con un bug» —el motivo
-  con la tercera nota que falla y se rearma como la manzana—, amarrado cuadro a cuadro al piloto de motion de Glitch,
-  en dos intensidades. Motor `motor/glitch-sfx.mjs`; pistas en OneDrive `09. Glitch/Motion/piloto/sonido-propuesta/`.
-  Sigue pendiente de la decisión del operador.
 - **Licencias:** confirmar con legal si el umbral de USD 1 millón de Stability aplica vía fal (la evidencia reunida
   está en [Trampas de proveedores](#trampas-de-proveedores-medidas)); la voz tiene «Commercial use rights included» en fal.
 - **Prueba de reconocimiento sin logo** antes de pautar, como la D14 de la órbita.
 - **Tokens AXIS**, reemplazo del sonido de los masters V1.1 y guía en el manual de la línea gráfica.
+
+Ya no es pendiente de esta norma: **Glitch (podcast).** Las rondas 4 y 5 exploraron dos versiones musicales (serena y
+rock) que al operador «aún no le convencían»; la ronda 6 cambió a **diseño sonoro en vez de música** y el operador
+aprobó la **versión B** el 2026-09-27. Glitch tiene su diseño sonoro propio, aprobado (B), **sólo de Glitch**, en la
+[norma de Glitch](../brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) §13.11 y en
+[axis.efeonce.org/references/glitch/#sonido](https://axis.efeonce.org/references/glitch/#sonido). No cambia esta
+identidad, que sigue «recomendada».

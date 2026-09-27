@@ -41,7 +41,7 @@ dos esferas en una pieza (manzana + lente u órbita).
 | Decidir qué forma o receta usar y componer la pieza, con ejemplos completos | [references/composition.md](references/composition.md) |
 | Una pieza con foto, o briefear una foto que llevará la órbita | [references/photography-convergence.md](references/photography-convergence.md) |
 | Animar (la órbita sola o las animaciones del logo) | [references/motion.md](references/motion.md) |
-| **Sonido de la marca**: logo sonoro, motion con sonido y etiqueta con voz (identidad **recomendada**, no canon; Glitch pendiente) | [references/motion.md](references/motion.md) §Sonido · [canon](../../../docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md) · skill `audio-studio` · AXIS `/references/sonic-brand.json` |
+| **Sonido de la marca**: logo sonoro, motion con sonido y etiqueta con voz (identidad **recomendada**, no canon; el sonido de Glitch es aparte: [glitch.md §13](references/glitch.md)) | [references/motion.md](references/motion.md) §Sonido · [canon](../../../docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md) · skill `audio-studio` · AXIS `/references/sonic-brand.json` |
 | Dónde está cada doc, archivo, medio y repositorio | [references/sources-and-assets.md](references/sources-and-assets.md) |
 | **Íconos**: las dos voces canónicas (Trazo y Plastilina), la esfera como estado, cuándo responde, la órbita sesgada y cómo dar de alta un glifo nuevo. **Fuente de verdad en AXIS**: `efeonceGraphicLine.icons` + `@efeoncepro/axis-graphic-line/icons` (`resolveIcon`, `auditIconGroup`) y `pnpm icons:*` | [references/iconography.md](references/iconography.md) |
 | **Un objeto protagonista en volumen** (Plastilina en volumen, D24): la tercera capa, arcilla mate inflada derivada del vector aprobado; portada, KV, social de un objeto, escenario, merch. PNG con alfa de `@efeoncepro/axis-brand-assets` (`volumeIconUrl(glyph)`), tokens `efeonceGraphicLine.icons.volume`, alta con `pnpm icons:volume` en AXIS | [references/iconography.md §12](references/iconography.md) + [criteria.md §3.14](references/criteria.md) |
@@ -49,6 +49,7 @@ dos esferas en una pieza (manzana + lente u órbita).
 | Qué decidió el operador, qué está pendiente, qué versiones hay | [references/ledger.md](references/ledger.md) |
 | Trampas que ya costaron tiempo | [references/lessons.md](references/lessons.md) |
 | **Una pieza de Glitch** (magazine semanal): portada A/B/C, carrusel, blog, vlog/reel — sub-línea sólo para Glitch | [references/glitch.md](references/glitch.md) |
+| **Sonido de Glitch** (APROBADO, versión B, 2026-09-27; sólo Glitch, nunca Efeonce): WAV sidecar por `.mov` del motion, archivos en `glitch/sound/v1/` del bucket de AXIS, motor migrado al taller (`tools/glitch-motion/src/sound.mjs` sobre `tools/brand-sound`, commit `2d411b8`): regenerar = correr el mismo comando de `glitch-motion` | [references/glitch.md §13](references/glitch.md) |
 
 ## Reglas duras (las más caras de romper)
 

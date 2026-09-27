@@ -6,15 +6,17 @@
 > reglas y agrega lo propio de Glitch.
 >
 > **Tipo de documento:** Norma de marca (sub-línea de franquicia editorial)
-> **Versión:** 1.2
+> **Versión:** 1.4
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude (v1.2: piloto de motion en HyperFrames, §7 y §13)
+> **Última actualización:** 2026-09-27 por Claude (v1.4: diseño sonoro **APROBADO, versión B**, §13.11 — el operador:
+> «La b me encanta más. Sus sonidos están aprobados». Sólo el sonido: el motion sigue con su propio estado)
 > **Estado:** vigente para lo marcado **APROBADO** (2026-09-27). Lo marcado **PROPUESTA** o **EXPLORACIÓN** no se usa
 > como canon hasta que el operador lo apruebe.
 > **Decisión:** [ADR `GLITCH_GRAPHIC_LINE_DECISION_V1`](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
 > (sub-línea y piezas aprobadas: `Accepted`; decisiones del operador del 2026-09-27 —manzana y verde, línea Growth,
 > numeración #17, glifos Plastilina—: `Accepted`, ver su [Delta 2026-09-27](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--decisiones-del-operador);
-> flujo de composición: `Accepted` el 2026-09-27; hogar del movimiento decidido: repo taller
+> flujo de composición: `Accepted` el 2026-09-27; diseño sonoro de Glitch: `Accepted`, versión B, el 2026-09-27;
+> hogar del movimiento decidido: repo taller
 > [`efeoncepro/efeonce-brand-workshop`](../../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md), `tools/glitch-motion/`)
 > **Línea madre:** [Línea gráfica Efeonce «La órbita»](../EFEONCE_GRAPHIC_LINE_V1.md) · [índice de la carpeta](../README.md)
 > **Canvas de referencia (privado):** [«Glitch en La órbita»](https://claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS)
@@ -50,7 +52,7 @@ cierra con **la manzana**, la esfera propia de Glitch.
 | La firma de piezas: logo de Efeonce centrado abajo | [La órbita §8.5](../EFEONCE_GRAPHIC_LINE_V1.md#85-la-url-siempre-en-su-burbuja) |
 | La regla de contraste del acento | [La órbita §2](../EFEONCE_GRAPHIC_LINE_V1.md#2-color) |
 | La iconografía AXIS (Trazo y Plastilina) | [La órbita §14](../EFEONCE_GRAPHIC_LINE_V1.md#14-iconografía-trazo-y-plastilina) |
-| El territorio sonoro «Puntos suspensivos» | [identidad sonora](../../brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md) (la pieza sonora de Glitch sigue **pendiente** en esa norma) |
+| El territorio sonoro «Puntos suspensivos» | [identidad sonora](../../brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md) (esa norma no cambia; Glitch tiene su diseño sonoro propio, **aprobado (B)**, sólo de Glitch: §13.11) |
 
 ### 1.2 Lo exclusivo de Glitch (nunca en piezas de Efeonce)
 
@@ -65,6 +67,7 @@ cierra con **la manzana**, la esfera propia de Glitch.
 | **«El micrófono se abre… / se cierra.»** | el motivo del narrador de radio |
 | **El Glitch Drop** | el remate con el POV del narrador |
 | **La transición de la manzana en bytes** | entre piezas y entre escenas, en el video (§13.6) |
+| **El sonido de Glitch** | la falla sonora (tartamudeos, bytes afinados, reducción de resolución), los SFX de transición, el clic del micrófono y el aire del estudio (§13.11, **APROBADO**, versión B) |
 
 ### 1.3 Efeonce firma Glitch
 
@@ -239,9 +242,10 @@ firma el logo de Efeonce. El wordmark de Glitch va en la cabecera y en el CTA, n
 - **Un guion, dos formatos:** 16:9 (YouTube y blog; miniatura 1280 × 720) y 9:16 reel (Instagram, TikTok, LinkedIn).
 - Host a cámara con el micrófono en cuadro. Se graba **una vez** en 4K horizontal, con aire arriba y abajo; el reel sale
   del recorte vertical. Los fps de grabación siguen pendientes (el piloto rinde a 30 fps).
-- Mnemónico al abrir y al cerrar: la pieza sonora de Glitch está pendiente en la identidad sonora y el operador pidió
-  **evaluarlo y aprobarlo** en una evaluación dedicada (2026-09-27). Nada se da por decidido. El piloto sale **mudo**,
-  con los golpes marcados por cuadro para el diseño sonoro (§13.3).
+- Mnemónico y diseño sonoro al abrir y al cerrar: el operador lo evaluó en una evaluación dedicada y **aprobó la
+  versión B** el 2026-09-27 («La b me encanta más. Sus sonidos están aprobados»). El diseño sonoro es **sólo de Glitch**
+  (§13.11) y está amarrado cuadro a cuadro al piloto. Los `.mov` del piloto salen **mudos**; el sonido va en pistas
+  WAV aparte.
 - Si se suma locución, la voz es de una persona con español latinoamericano neutro.
 - **Subtítulos siempre:** Poppins 600, blanco sobre navy al 78 %, una palabra en el acento. **No están en el piloto:**
   el estilo de captions en Premiere sigue pendiente.
@@ -268,7 +272,7 @@ Las posiciones exactas que usa el piloto dentro de estas zonas están en §13.4.
 
 | # | Pieza | Qué lleva | En el piloto (§13.2) |
 |---|---|---|---|
-| 1 | Apertura | los puntos, sincronizados con el mnemónico (pendiente); la tarjeta final es su espejo | `apertura` v2 |
+| 1 | Apertura | los puntos, sincronizados con el sonido (aprobado, versión B, §13.11); la tarjeta final es su espejo | `apertura` v2 |
 | 2 | Cabecera | noticia n/3 + wordmark | `cabecera-1` · `-2` · `-3` · `-salida` |
 | 3 | Lower third | «AL AIRE · GLITCH #N», nombre y cargo del host, con la **órbita real** como ícono; variante «INVITADO» sólo si hay invitado. **Contenido definido** con el operador (2026-09-27) | `lower-third-host` · `lower-third-invitado` |
 | 4 | Subtítulo | Poppins 600, blanco sobre navy 78 %, una palabra en el acento | no está en el piloto |
@@ -305,6 +309,10 @@ La foto del host de las maquetas es del banco de marca, generada con IA
 - **Nunca** aplicar la manzana, el verde Glitch, los bytes, Guttery o la cabecera «EDICIÓN #N» a piezas de Efeonce.
 - **Nunca** usar la **transición de la manzana en bytes** (entre piezas o entre escenas) fuera de Glitch: es exclusiva
   de Glitch, nunca va en piezas de Efeonce, de su familia ni de clientes.
+- **Nunca** usar el **sonido de Glitch** (falla sonora, SFX de transición, clic del micrófono, aire del estudio) fuera
+  de Glitch, ni mezclarlo con el kit sonoro de Efeonce (§13.11).
+- **Nunca** la falla sonora sobre la **voz del host**, ni un sonido de transición hacia o desde la toma del host.
+- **Nunca** whooshes, soplos de ruido ni subidas de tráiler en el sonido de Glitch: el corte es silencio digital en seco.
 - **Nunca** dos esferas (manzana + esfera o lente) en la misma pieza o pantalla.
 - **Nunca** el verde como texto, borde o separador sobre fondo claro.
 - **Nunca** la falla sobre un rostro, **tampoco en las transiciones**: hacia o desde la toma del host a cámara va corte
@@ -347,7 +355,7 @@ La foto del host de las maquetas es del banco de marca, generada con IA
 | Historia 9:16 y carrusel panorámico | **EXPLORACIÓN** (no canon) |
 | Cinco glifos Plastilina de Glitch | alta **APROBADA** (2026-09-27); publicación en AXIS pendiente (TASK-1922) |
 | Línea de servicio Growth y eslogan «Empower your Growth» | **APROBADO** (2026-09-27) |
-| Mnemónico del video | **pendiente**: evaluarlo y aprobarlo (evaluación dedicada). El piloto trae los golpes marcados (§13.3) |
+| Diseño sonoro de Glitch (mnemónico, kit, lower third y transiciones) | **APROBADO, versión B** (2026-09-27, §13.11): «La b me encanta más. Sus sonidos están aprobados». La A queda como alternativa descartada. **Sólo de Glitch** |
 | Flujo de composición (Composer + HyperFrames en el repo taller) | **ACEPTADO** 2026-09-27 ([ADR](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)); en construcción: TASK-1922, TASK-1923, TASK-1924 (el piloto de motion de TASK-1924 ya existe en el taller) |
 
 ---
@@ -369,7 +377,9 @@ Resuelto el 2026-09-27 ([Delta del ADR](../../../architecture/GLITCH_GRAPHIC_LIN
 la manzana y el verde (aprobados; falta el token en AXIS, TASK-1922), la línea de servicio (**Growth**), la numeración
 (la próxima es la **#17**), el alta de los cinco glifos Plastilina (aprobada; la ejecuta TASK-1922), la **licencia de
 Guttery** (confirmada para web y video; falta registrar la referencia del contrato), el **contenido del lower third**
-(definido: «AL AIRE · GLITCH #N», nombre y cargo, con la órbita real; variante de invitado) y el **hogar del
+(definido: «AL AIRE · GLITCH #N», nombre y cargo, con la órbita real; variante de invitado), el **diseño sonoro**
+(aprobada la **versión B**, con sus cuatro decisiones: dos golpes graves, voz sola bajo las noticias y el clic del
+micrófono y el trazo del plumón sintetizados; §13.11) y el **hogar del
 movimiento** (repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/`, operado desde `greenhouse-eo`;
 [decisión del taller](../../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md)).
 
@@ -383,7 +393,6 @@ movimiento** (repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-mot
 | Transición de bytes entre piezas | decidir a qué piezas se aplica (la recomendación es sólo tarjetas y Drop) |
 | Excepción de rostros | la regla se aplica por defecto; cualquier excepción la aprueba el operador |
 | Subtítulos | el estilo de captions en Premiere no está hecho |
-| Mnemónico del video | evaluarlo y aprobarlo (evaluación dedicada); los golpes ya están marcados (§13.3) |
 | Textos reales de la #17 | titulares, medios, fotos e invitado (el archivo de ejemplo trae textos entre corchetes) |
 | Autoservicio del texto | formulario en Marketing Studio (recomendado); `.mogrt` descartado |
 | Tokens | subir los valores de Glitch a tokens `glitchLine` (TASK-1922) |
@@ -402,6 +411,10 @@ movimiento** (repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-mot
 | Motion de Glitch (código) | repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/` | **piloto**; commits locales sin push |
 | Manifiestos de las corridas | `corridas/<corrida>/manifiesto.json` del repo taller | sin push |
 | Entregas de video | OneDrive `Alineación/5. Contenidos/09. Glitch/Motion/piloto/` (§13.8) | **piloto** |
+| Sala de escucha del sonido | [claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9](https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9) → «Ronda 6 · Glitch» | privado; la **B** es la aprobada |
+| Entregas de sonido | OneDrive `Alineación/5. Contenidos/09. Glitch/Motion/piloto/sonido-propuesta/` (la carpeta conserva su nombre): `b/` es la versión **aprobada**; `a/` queda como alternativa descartada; `vista-previa/` y `LEEME.txt` | **APROBADO** (B) |
+| Sonido en AXIS | [axis.efeonce.org/references/glitch/#sonido](https://axis.efeonce.org/references/glitch/#sonido) (dentro de Motion) y `/references/glitch.json`, campo `sound` (URL + SHA-256 de cada archivo) | **publicado** 2026-09-27; contenido **APROBADO** (B) |
+| Archivos de sonido | bucket público `gs://efeonce-group-axis-public-media/glitch/sound/v1/` ([URL](https://storage.googleapis.com/efeonce-group-axis-public-media/glitch/sound/v1/)): sólo la B, `masters/` y `web/` | **APROBADO** (B) |
 | Tokens `glitchLine` (`@efeoncepro/axis-tokens`) | — | **no existen todavía** |
 | Assets (`@efeoncepro/axis-brand-assets`: wordmark, manzana SVG, glifos Plastilina, Guttery si la licencia lo permite) | — | **no existen todavía** |
 | Contrato `efeonce.glitch-line` 0.1.0 | — | **no existe todavía** |
@@ -418,6 +431,8 @@ movimiento** (repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-mot
 >
 > **Estado:** **PILOTO / PROPUESTA** (2026-09-27). El operador no ha aprobado ninguna pieza de motion. Sus pedidos ya
 > están aplicados: más punch (v2), órbita real en el lower third, transición de bytes entre piezas y entre escenas.
+> El sonido de estas piezas va aparte, también sólo de Glitch, y **está aprobado (versión B, 2026-09-27; §13.11)**; esa
+> aprobación es sólo del sonido, no del motion.
 
 ### 13.1 Motor y dónde vive
 
@@ -475,10 +490,10 @@ Además hay un **animatic de 45 s por formato** con el orden y el momento de cad
 
 ### 13.3 Golpes para el diseño sonoro
 
-El piloto sale **mudo**. Estos cuadros quedan marcados para que el diseño sonoro (y el mnemónico, si el operador lo
-aprueba en su evaluación dedicada) caigan en su lugar. Tiempos a 30 fps. **Propuesta de diseño sonoro (2026-09-27, sin
-aprobar):** amarrada a estos cuadros y a los del kit, en dos intensidades, en OneDrive
-`Motion/piloto/sonido-propuesta/` y en la [identidad sonora](../../brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md#pendientes-para-canonizar).
+El piloto sale **mudo**. Estos cuadros quedan marcados para que el diseño sonoro y el mnemónico caigan en su lugar.
+Tiempos a 30 fps. **Diseño sonoro de Glitch: APROBADO, versión B (2026-09-27), sólo de Glitch:** amarrado a estos
+cuadros y a los del kit; el detalle cuadro a cuadro está en §13.11. La [identidad sonora de Efeonce](../../brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md)
+no la incorpora (sigue «recomendada»): sólo apunta aquí.
 
 | Pieza | Cuadro | Tiempo | Qué pasa |
 |---|---|---|---|
@@ -533,10 +548,10 @@ cabecera y lower third conservan su entrada propia.
 | Paquete | **máscara** (`…-mascara.mov`: bytes blancos que llenan el cuadro en barrido; es un track matte de **alfa**) + **capa** (`…-capa.mov`: la manzana en el origen y destellos verde, gris y blanco en el borde). Misma grilla y mismos tiempos. Orígenes: centro, izquierda y marca (reel x 876, y 276; vlog x 1772, y 82: donde vive el wordmark). Celda: reel 60 px, vlog 64 px. Demos `demo_<formato>_<origen>.mp4` | rápida 0,5 s · normal 0,8 s |
 | Héroe | clip **opaco**: los píxeles de A se desprenden en bytes, vuelan (cada byte a un lugar de B en su misma franja de distancia) y se rearman como B; la manzana en el origen al inicio. Se genera por corte con los dos clips y el segundo del corte, y se inserta ya renderizado entre A y B | 1,2 s (36 cuadros) |
 
-**Sonido (propuesta, 2026-09-27, sin aprobar):** cada transición tiene su pista, alineada al mismo inicio que la máscara
+**Sonido (aprobado, versión B, 2026-09-27):** cada transición tiene su pista, alineada al mismo inicio que la máscara
 y la capa y calculada desde la misma programación de celdas: la manzana en el origen, una lluvia de clics que viaja con
 el barrido (nunca un whoosh) y los destellos como bytes afinados. Igual para la transición de piezas y el lower third.
-En OneDrive `Motion/piloto/sonido-propuesta/`.
+Hacia o desde la toma del host no suena ninguna transición. Detalle en §13.11.
 
 **Regla de rostros** (norma: la falla nunca sobre un rostro): la transición va entre imágenes de noticias, b-roll y
 pantallas. **Hacia o desde la toma del host a cámara va corte seco o transición de tarjeta.** El piloto la aplica por
@@ -565,6 +580,7 @@ Carpeta: `Alineación/5. Contenidos/09. Glitch/Motion/piloto/`.
 | `kit-transicion-bytes/reel/` · `kit-transicion-bytes/vlog/` | prototipo de la transición de bytes entre piezas |
 | `transiciones/reel/` · `transiciones/vlog/` + `LEEME.txt` | paquete de transición entre escenas (máscara + capa) y demos |
 | `transiciones/heroe/reel/` · `transiciones/heroe/vlog/` | transición héroe |
+| `sonido-propuesta/` | sonido de Glitch (la carpeta conserva su nombre): `b/` es la versión **aprobada** y `a/` la alternativa descartada (cada una con `kit/`, `transiciones/reel/` y `transiciones/vlog/`), `vista-previa/` y `LEEME.txt` (§13.11) |
 
 ### 13.9 Para el editor humano (resumen)
 
@@ -579,6 +595,8 @@ En corto:
   donde termina la máscara y se quita el efecto al resto; la capa va en V4. En After Effects: la máscara sobre B con
   Track Matte «Alpha Matte» y la capa arriba.
 - **Nunca** una transición de bytes hacia o desde el host a cámara: ahí va corte seco o transición de tarjeta.
+- Sonido (aprobado, versión B, §13.11): se usan los WAV de `b/`; cada WAV se suelta en 0 junto a su `.mov`; las transiciones entre escenas, al mismo
+  inicio que la máscara y la capa. La voz del host nunca se procesa con la falla.
 
 ### 13.10 Para el editor agente
 
@@ -602,3 +620,164 @@ pnpm -C ../efeonce-brand-workshop --filter glitch-motion test
   la firma de Efeonce (nunca con falla). **Nunca** versiona imágenes, video ni Guttery en git; **nunca** usa la
   transición de bytes fuera de Glitch ni hacia o desde la toma del host sin aprobación del operador; **nunca** marca una
   pieza como aprobada; **nunca** hace push sin instrucción del operador.
+
+### 13.11 Sonido — sólo Glitch (APROBADO, versión B)
+
+> **⚠️ Alcance:** este diseño sonoro es **SÓLO de Glitch. No es de Efeonce**: no forma parte de la
+> [identidad sonora de Efeonce](../../brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md) y nunca se usa en piezas de Efeonce, de
+> su familia (Globe, Wave, Reach) ni de clientes. Es el mismo principio de la sub-línea gráfica: la manzana reemplaza a
+> la esfera sólo en Glitch; aquí, el sonido de Glitch toma el motivo de Efeonce y le pone «un bug», sólo en Glitch. La
+> identidad sonora de Efeonce (logo sonoro, voz, esfera por línea, dos registros) **no cambia** (sigue «recomendada»); en
+> esa norma Glitch sólo aparece como puntero a esta sección.
+>
+> **Estado:** **APROBADO, versión B «más punch»** (2026-09-27). El operador escuchó la ronda 6 (dijo «Me gusta» y pidió
+> sonorizar también las transiciones de la sesión de motion) y luego eligió: **«La b me encanta más. Sus sonidos están
+> aprobados»**. La **A** (contenida) queda como **alternativa descartada**: no se usa. La aprobación resuelve las cuatro
+> decisiones que estaban abiertas (abajo). Es la aprobación **del sonido**; el estado del motion (imagen) va por su lado
+> (§13). Las rondas 4 y 5 exploraron dos versiones **musicales** (serena, con falla en la 3.ª nota; rock, con tartamudeo de
+> banda) que todavía no le convencían; la ronda 6 cambió el enfoque: **diseño sonoro, no música**.
+
+**Concepto: «el sonido de Efeonce, con un bug».** En lo visual, Glitch es La órbita con una falla: dos puntos limpios y
+el tercero se rompe en bytes y se rearma como la manzana. El sonido hace lo mismo con el motivo de Efeonce:
+**Mi · Mi · Mi (se rompe en bytes) → La (la manzana)**. La manzana da **el único golpe grave**: La en campana (el timbre
+de Growth, la línea de servicio de Glitch) con un golpe grave, un halo breve de La mayor, un destello agudo y un eco al
+55 % que vuelve con la falla. **El video completo es el motivo en cámara lenta:** cada cabecera «NOTICIA n/3» suena en
+Mi (la 1 y la 2 limpias, la 3 falla) y el Glitch Drop es La (la manzana, segundo golpe grave del video).
+
+**Principios:**
+
+| # | Regla |
+|---|---|
+| 1 | **La falla tiene afinación:** todo en La mayor (Mi y La; los bytes en la pentatónica aguda). La falla suena a marca, no a ruido |
+| 2 | **Radio actual, sin nostalgia:** cortes de búfer, granos y reducción de resolución dosificada. **Nunca** chiptune, módem, máquina de escribir, vinilo, estática larga, zumbidos láser ni voz robótica |
+| 3 | **Un golpe grave por aparición de la manzana**; todo lo demás sin graves (los golpes de texto usan un cuerpo medio) |
+| 4 | **La falla nunca sobre la voz del host** (espejo sonoro de «la falla nunca sobre un rostro») |
+| 5 | **La firma de Efeonce no suena** y nunca recibe la falla |
+| 6 | **El silencio también es voz:** el corte es silencio digital en seco. **Nunca whooshes ni subidas de tráiler** (el primer barrido de las transiciones usaba un soplo de ruido y se cambió por clics por eso) |
+| 7 | Hacia o desde la toma del host **no suena ninguna transición**: corte seco, igual que en la imagen |
+
+**Cuadro a cuadro — apertura (4 s, piloto de motion v2, 30 fps):**
+
+| Cuadro | Imagen | Sonido |
+|---|---|---|
+| f2, +0,1 s, +0,2 s | los tres puntos escriben | tres notas Mi breves y puras |
+| f13 → f24 | el tercer punto se hincha y tiembla | el Mi salta de altura cuadro a cuadro y pierde resolución |
+| **f24 (0,8 s)** | **golpe 1:** el punto se rompe | repetición de búfer que se acelera, destello y desgarro estéreo |
+| f24 → f35 · f35 → f47 | los bytes flotan · se arman fila por fila | granos afinados que suben de altura y recuperan resolución |
+| **f48 (1,6 s)** | **golpe 2, cuadro de sincronía:** la manzana | golpe grave + campana La + halo + destello; eco en f52 |
+| f56 → f68 | «El micrófono» se teclea | ticks digitales por letra |
+| **f69 (2,3 s)** | **golpe 3:** «se abre» cae de golpe | clic del canal del micrófono + cuerpo medio + desgarro; **entra el aire del estudio** (canal abierto) |
+| f78 · f80 → f86 | wordmark · «#17» se decodifica | ticks al azar que se asientan en La |
+| f105 · **f108** | corte con falla | **silencio digital** (medido −180 dBFS) |
+
+**Cuadro a cuadro — tarjeta final (3 s):**
+
+| Cuadro | Imagen | Sonido |
+|---|---|---|
+| **f6 (golpe 1)** | «se cierra.» | clic del canal y **el aire del estudio se corta** |
+| f14 → f26 | la muletilla en Guttery | **trazo de plumón**, el único sonido orgánico |
+| f21 | aparece la invitación | tick afinado |
+| f26 → f34 | la firma de Efeonce | **muda** |
+| f57 · f60 → f66 · f66 → f74 | corte con falla · la manzana tiembla · implosiona en bytes | los bytes bajan de altura y pierden resolución |
+| **f74 (golpe 3)** | el tercer punto vuelve con destello | Mi; empalma en bucle con la apertura |
+
+En la versión B (la aprobada), además, la campana suena al revés mientras la manzana implosiona.
+
+**Kit de overlays (un WAV por `.mov`):**
+
+| Pieza | Sonido |
+|---|---|
+| `cabecera-1` · `cabecera-2` | Mi limpio |
+| `cabecera-3` | el Mi que falla (tartamudea) |
+| `cabecera-salida` | desgarro |
+| `lower-third-host` | se abre con 8 bytes que suben por la escala (de izquierda a derecha); tick al aparecer el anillo; la manzana nace en la órbita (f9) con un **tintineo agudo, no un golpe**; la estela se dibuja (f12, 0,4 s) como un deslizamiento suave de Mi a La; la etiqueta se teclea (f9 → f17); el nombre cae con un clic liviano (f12) y su desgarro; salida: falla de dos cuadros (f132) y 6 bytes que bajan (f134) |
+| `lower-third-invitado` | el punto hueco nace (f8) y late con 3 ticks suaves |
+| `noticia-N` | tick de entrada, bytes, tecleo del titular y tick de la fuente |
+| `fuente-N` | bytes que entran con el borde derretido y salen |
+| `drop` | remate de golpe (f31) y la manzana (f37) con su golpe grave y su eco |
+| `cta` | trazo de plumón y tick |
+
+**Transición de piezas «manzana en bytes»** (`transition: "bytes"`, tarjeta y Drop; pistas `noticia-bytes` y
+`drop-bytes`): la manzana nace en la esquina con un tintineo, se rompe (+0,26 s) con destello, los bytes barren la
+pieza **subiendo de altura** y recuperando resolución, y suena un tick cuando la pieza queda sólida (+0,73 s). A la
+salida, los bytes vuelven **bajando** y la manzana se va con un deslizamiento hacia abajo.
+
+**Transiciones entre escenas y héroe:**
+
+| Variante | Sonido |
+|---|---|
+| Paquete máscara + capa (orígenes centro, izquierda y marca; rápida 0,5 s y normal 0,8 s) | **se calcula desde la misma programación de celdas que la imagen** (`schedule()` de `transitions.mjs` del taller: 510 celdas en vlog y 576 en reel). La manzana suena en el origen y se rompe cuando se abre la primera celda; el barrido es una **lluvia de micro-clics, uno por celda** (muestreadas), que viaja en estéreo con las celdas; los destellos son **bytes afinados** (verde = La/Mi agudos, gris = Mi, blanco = el más agudo). Sin soplo |
+| Héroe (1,2 s) | la manzana; se rompe (+0,26 s) con tartamudeo; los bytes despegan con un deslizamiento y **llegan afinados, subiendo**, mientras se arma la escena B; lluvia de clics con el despegue |
+
+**Nivel y mezcla:**
+
+| Qué | Valor |
+|---|---|
+| Escala | la fija la apertura: el golpe de la manzana a **−1 dBFS de pico** (≈ −19 LUFS integrados, porque es casi todo transiente); todas las pistas usan la misma ganancia. **El golpe no se comprime** |
+| Medido | apertura A −19,2 / B −18,8 LUFS · tarjeta final A −27,9 / B −24,6 LUFS · animatic A −23,1 / B −22,9 LUFS |
+| Voz del host | va encima: −14 LUFS en video, −16 en podcast. Los SFX quedan bajo la voz y sin graves, salvo la manzana |
+| Intensidades | **B** = más punch (más tartamudeo, cuerpo en los golpes de texto y campana al revés en la implosión): **la aprobada** · **A** = contenida: alternativa descartada, no se usa |
+
+**Producción:**
+
+| Qué | Cuál / dónde |
+|---|---|
+| Motor | repo taller `efeoncepro/efeonce-brand-workshop`: `tools/glitch-motion/src/sound.mjs` (el diseño sonoro de Glitch), sobre las primitivas de `tools/brand-sound` (el `dsp.mjs`, con ganancia fija, corte en seco y colocación mono, y sus pruebas). Síntesis propia, sin muestras ni modelos. Migrado el 2026-09-27 (commit del taller `2d411b8`) |
+| Comando | el mismo del motion (§13.10): `render`, `kit`, `transiciones` y `heroe` de `glitch-motion` entregan el WAV B junto a cada `.mov` en OneDrive (`Motion/piloto/…`), con la duración verificada y las vistas previas con sonido; p. ej. `pnpm -C ../efeonce-brand-workshop --filter glitch-motion kit -- …`. **Regenerar el sonido = correr el mismo comando del motion.** Histórico (ya no es la fuente): `node ai-generations/2026-09-26_branding-sonoro/motor/glitch-sfx.mjs --intensity b --outdir <dir>` |
+| Salidas | `apertura.wav` (4 s), `cierre.wav` (3 s), `bucle.wav` (cierre + apertura, 7 s), `animatic.wav` (45,2 s), `kit/<overlay>.wav` (uno por `.mov`: `cabecera-1`, `-2`, `-3`, `cabecera-salida`, `lower-third-host`, `lower-third-invitado`, `noticia`, `fuente`, `drop`, `cta`, `noticia-bytes`, `drop-bytes`), `transiciones/<reel\|vlog>/glitch-transicion-<fmt>-<origen>-<rapida\|normal>.wav`, `…-<origen>-heroe.wav` (centro, y desde la migración también izquierda y marca, sin alterar la secuencia aprobada) y `demos/` |
+| Tiempos | **todos** se leen del código del motion: `TIMING` (`pieces.mjs`), `KIT_TIMING`, `APPLE_BYTES` y `ANIMATIC` (exportados desde `overlays.mjs`) y `schedule()` (`transitions.mjs`). Ya no hay tiempos copiados |
+| Determinismo | mismo comando, mismo archivo (verificado byte a byte) |
+| Dónde vive | **migrado** al repo taller `efeonce-brand-workshop` (commit `2d411b8`, 2026-09-27): `dsp.mjs` pasó sin cambios a `tools/brand-sound` (con pruebas) y `glitch-sfx.mjs` pasó a `tools/glitch-motion/src/sound.mjs`. Migración fiel: los 30 WAV de la B salen idénticos byte a byte. La copia de `ai-generations/2026-09-26_branding-sonoro/motor/` (`glitch-sfx.mjs` y su `dsp.mjs`) en `greenhouse-eo` queda como **histórico**; ya no es la fuente. Si algún día migra el motor de la identidad sonora de Efeonce, usa `tools/brand-sound` (una sola lógica) |
+| Commits | `greenhouse-eo`: `2fee1f487` (apertura, cierre, bucle, animatic; ronda 6) y `556c83ae2` (lower third y transiciones); taller: `2d411b8` (migración) |
+
+**Entregas y montaje para el editor** (paso a paso en el
+[manual para editar el video](../../../manual-de-uso/creative/editar-video-glitch.md#6--montar-el-sonido)):
+
+- OneDrive `Alineación/5. Contenidos/09. Glitch/Motion/piloto/sonido-propuesta/` (la carpeta conserva su nombre):
+  **`b/` es la versión aprobada** y `a/` queda como alternativa descartada (cada una con `kit/`, `transiciones/reel/` y
+  `transiciones/vlog/`), más `vista-previa/` (videos del piloto con el sonido montado) y `LEEME.txt`. Se usan sólo los
+  WAV de `b/`.
+- **Cada WAV se suelta en 0 junto a su `.mov`** (mismo nombre y duración). El mismo audio sirve para reel y vlog, salvo
+  las transiciones entre escenas, que tienen pista por formato.
+- Las transiciones entre escenas se alinean al **mismo inicio que la máscara y la capa**.
+- **Nunca** se procesa la voz del host con la falla.
+- Sala de escucha (privada): [claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9](https://claude.ai/artifact/UdRvppSXKJmb8fP2g37Ap9)
+  → «Ronda 6 · Glitch». En AXIS (**publicado 2026-09-27**):
+  [/references/glitch/#sonido](https://axis.efeonce.org/references/glitch/#sonido) (dentro de Motion) y
+  `/references/glitch.json`, campo `sound` (URL + SHA-256 de cada archivo).
+- Archivos aprobados en el bucket público `gs://efeonce-group-axis-public-media/glitch/sound/v1/`
+  (`https://storage.googleapis.com/efeonce-group-axis-public-media/glitch/sound/v1/`), **sólo con la B**:
+  `masters/` (`apertura.wav`, `cierre.wav`, `bucle.wav`, `animatic.wav`, `kit/<overlay>.wav` y
+  `transiciones/<reel|vlog>/<…>.wav`) y `web/` (videos con sonido: `glitch-bucle-16x9.mp4`, `glitch-bucle-9x16.mp4`,
+  `glitch-edicion-16x9.mp4`, `glitch-lower-third-bytes-16x9.mp4` y
+  `glitch-transicion-{centro,izquierda,marca,heroe}-16x9.mp4`, cada uno con su póster `.webp`). En la página de
+  identidad sonora de Efeonce
+  (`/references/sonic-brand/`) Glitch sólo aparece como puntero a la de Glitch, aclarando que no es de Efeonce.
+
+**Reglas para el agente:**
+
+- Sólo en piezas de Glitch. **Nunca** mezclarlo con el kit sonoro de Efeonce ni usarlo fuera de Glitch.
+- **No regenerar ni retocar a mano:** usar los archivos por URL y verificar su SHA-256; si algo cambia, se corre el comando del motion (§13.10).
+- **Sólo la B:** es la versión aprobada; la A no se usa ni se vuelve a publicar.
+- **Si cambian los tiempos del motion en el taller, volver a correr el comando del motion**: el sonido lee todos los
+  tiempos del código (`pieces.mjs`, `overlays.mjs`, `transitions.mjs`) y sale junto a cada `.mov`.
+
+**Verificación hecha** (sin oído: el agente no escucha):
+
+| Qué | Resultado |
+|---|---|
+| Espectrogramas con las marcas de cuadro | cada golpe cae en su cuadro; cuadros extraídos del recorrido confirman la sincronía (manzana de la tarjeta 6,1 s; bytes 6,2 s; desgarro de «Es un aviso» 13,0 s; manzana del Drop 13,1 s) |
+| Corte de la apertura | silencio digital −180 dBFS |
+| Ajustes tras mirar el espectrograma | la campana de la manzana decae 2,2 veces más rápido (tapaba «se abre»); el temblor pasa por un pasa-bajos de 7 kHz (aliasing áspero); el golpe 3 sube 2–3 dB; el barrido de las transiciones pasó de soplo de ruido a lluvia de clics (sonaba a whoosh) |
+| Cómo suena | lo decidió el operador de oído: **aprobó la B** (2026-09-27) |
+
+**Decisiones del operador — resueltas el 2026-09-27** (al aprobar lo producido en B; ya no hay decisiones pendientes
+del sonido):
+
+1. **B** (más punch). La A queda como alternativa descartada.
+2. **Dos golpes graves en el video**, apertura y Drop: uno por cada aparición de la manzana, tal como se produjo.
+3. **Voz sola bajo las noticias**, sin música.
+4. El **clic del micrófono y el trazo del plumón sintetizados se quedan** (no pasan a ElevenLabs).
+
+**Observación (no bloqueante):** la sesión de motion midió que, en B, el golpe del cuadro 74 de la tarjeta final (el
+tercer punto que vuelve) queda más tapado que en A. Queda registrada; no cambia la aprobación.

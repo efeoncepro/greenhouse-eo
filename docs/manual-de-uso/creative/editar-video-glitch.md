@@ -1,9 +1,9 @@
 # Editar el video de Glitch con los gráficos animados — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.2
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.2: el sonido quedó aprobado, versión B; se monta desde `b/`)
 > **Modulo:** Creative · Glitch, magazine semanal de Efeonce (sub-línea de «La órbita») · video y motion
 > **Ruta en portal:** no aplica — los gráficos se entregan como archivos de video en OneDrive y se montan en Premiere Pro o After Effects
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/linea-grafica-glitch.md) · [Norma de la sub-línea](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) · [Componer piezas de Glitch](./componer-piezas-glitch.md) · [ADR del repo taller](../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md)
@@ -23,7 +23,8 @@ Está escrito para la persona que edita en **Premiere Pro** o **After Effects**.
 gráficos llegan hechos y tú los ubicas en la línea de tiempo.
 
 **Estado:** todo lo que describe este manual es **piloto / propuesta**. Ninguna pieza de motion está aprobada todavía
-(2026-09-27). Úsalo para pruebas y para mostrarle el resultado al operador, no para publicar como pieza final.
+(2026-09-27). Úsalo para pruebas y para mostrarle el resultado al operador, no para publicar como pieza final. El
+**sonido** sí está aprobado (versión B, 2026-09-27; sección 6).
 
 ## Antes de empezar
 
@@ -40,7 +41,7 @@ gráficos llegan hechos y tú los ubicas en la línea de tiempo.
   | `transiciones/heroe/reel/` y `transiciones/heroe/vlog/` | la versión héroe de la transición, hecha para un corte puntual |
 
 - **Formato de los archivos:** video **ProRes 4444 con canal alfa** (`.mov`), a **30 cuadros por segundo** y **sin
-  audio**. Premiere Pro y After Effects los abren directo, con el fondo transparente.
+  audio** (el sonido aprobado viene aparte, en WAV: ver [Montar el sonido](#6--montar-el-sonido)). Premiere Pro y After Effects los abren directo, con el fondo transparente.
 - **Arma la secuencia a 30 fps** y del tamaño del formato: 1080 × 1920 para el reel, 1920 × 1080 para el vlog.
 - **Los `.mp4` que empiezan con `demo_`** (en `transiciones/`) son sólo para mirar cómo se ve cada transición. No van en
   la línea de tiempo.
@@ -69,7 +70,7 @@ Efeonce, y termina con la manzana que se deshace en bytes y el tercer punto que 
    termina con la tarjeta final y empieza con la apertura, al repetirse empalma sin salto. No recortes el último cuadro.
 4. **Cuadro de sincronía:** el golpe principal de la apertura es el **cuadro 48** (1,6 s), cuando la manzana cae con
    su onda. Si se suma sonido, ese es el cuadro que manda.
-5. **Golpes** (para el diseño sonoro, que todavía está pendiente):
+5. **Golpes** (el sonido aprobado cae en estos cuadros; ver [Montar el sonido](#6--montar-el-sonido)):
 
    | Pieza | Cuadro | Segundo | Qué pasa |
    |---|---|---|---|
@@ -175,6 +176,57 @@ para no repetir un cuadro.
 
 La misma regla de rostros aplica: no la pidas para un corte hacia o desde la toma del host a cámara.
 
+### 6 · Montar el sonido
+
+> **⚠️ Sólo para Glitch.** Este sonido **no es de Efeonce**: no lo uses en videos de Efeonce ni de clientes. Está
+> **aprobado en su versión B** («más punch»), el 2026-09-27: el operador dijo «La b me encanta más. Sus sonidos están
+> aprobados». La **A** (contenida) quedó descartada: no la uses.
+
+**Dónde están los archivos:** OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto › sonido-propuesta`
+(la carpeta conserva su nombre, pero lo que hay en `b/` está aprobado). Los mismos archivos aprobados están también en
+la página de Glitch de AXIS, sección [Sonido](https://axis.efeonce.org/references/glitch/#sonido).
+
+| Carpeta | Qué tiene |
+|---|---|
+| `b/` | **la versión aprobada.** Trae `apertura.wav`, `cierre.wav`, `bucle.wav`, `animatic.wav`, `kit/` (un WAV por gráfico del kit) y `transiciones/reel/` y `transiciones/vlog/` |
+| `a/` | la alternativa descartada, con la misma estructura. **No se usa** |
+| `vista-previa/` | videos del piloto con el sonido ya montado, para escuchar cómo queda. No van en la línea de tiempo |
+| `LEEME.txt` | resumen de la carpeta |
+
+Los WAV tienen el **mismo nombre y la misma duración** que su `.mov`. El mismo audio sirve para reel y vlog, salvo las
+transiciones entre escenas, que tienen una pista por formato.
+
+1. **Usa sólo los WAV de `b/`** para todo el video.
+2. **Suelta cada WAV en 0 junto a su `.mov`**: en una pista de audio, empezando en el mismo cuadro exacto en que empieza
+   el gráfico. La apertura con `apertura.wav`, la tarjeta final con `cierre.wav` y cada pieza del kit con su WAV de
+   `kit/`.
+3. **Transiciones entre escenas:** usa la pista de tu formato (`transiciones/reel/` o `transiciones/vlog/`) con el mismo
+   origen y la misma duración que la transición (por ejemplo `…-centro-rapida.wav`) y **alinéala al mismo inicio que la
+   máscara y la capa**. La versión héroe tiene su pista `…-centro-heroe.wav`.
+4. **Transición de bytes entre piezas** (prototipo en tarjeta y Drop): usa `noticia-bytes.wav` y `drop-bytes.wav` junto
+   a la versión en bytes de esas piezas.
+5. **La voz del host va encima** y sin efectos: los sonidos del kit quedan debajo de la voz. **Bajo las noticias va
+   sólo la voz, sin música.**
+6. Reproduce y revisa que cada golpe caiga con su movimiento (por ejemplo, la manzana de la apertura en el cuadro 48).
+
+**Qué no hacer con el sonido:**
+
+- No le pongas la falla (tartamudeos, bytes, sonido digital roto) **sobre la voz del host**, ni proceses su voz con ella.
+- No pongas un sonido de transición **hacia o desde la toma del host**: ahí va corte seco, sin sonido de transición.
+- No agregues **whooshes**, soplos ni subidas de tráiler: el corte de Glitch es silencio.
+- No uses estos sonidos **fuera de Glitch** ni los mezcles con los sonidos de Efeonce.
+- **No edites los WAV a mano** (recortar, estirar, cambiar volumen dentro del archivo): si algo no calza, pide un nuevo
+  render del gráfico: su sonido sale con él, junto a cada `.mov`.
+
+**Problemas comunes con el sonido:**
+
+| Síntoma | Causa | Solución |
+|---|---|---|
+| El sonido llega antes o después del movimiento | el WAV no empieza en el mismo cuadro que su `.mov`, o la secuencia no está a 30 fps | revisa que el WAV empiece en el mismo cuadro que el `.mov` y que la secuencia esté a 30 fps |
+| El sonido ya no calza aunque esté bien alineado | cambió el motion (tiempos de una pieza o de una transición) después de generar el sonido | pide un nuevo render del motion: el mismo comando entrega otra vez el WAV junto a cada `.mov`, con los tiempos nuevos |
+| La transición no suena con el barrido | usaste la pista de otro formato, origen o duración, o no la alineaste con la máscara | usa la pista de tu formato con el mismo origen y duración, y alinéala al inicio de la máscara y la capa |
+| Hay un silencio seco al final de la apertura | es a propósito: el corte de Glitch es silencio | no lo rellenes |
+
 ### Cambiar un texto
 
 Los textos (número de edición, nombre y cargo del host, invitado, titulares, medios, fotos, frases del Drop, llamado a
@@ -191,12 +243,12 @@ la acción) **salen de un archivo de edición** y los gráficos se vuelven a gen
 |---|---|
 | **Piloto** | primera versión hecha para probar el flujo y el montaje. Sirve para ensayar en Premiere o After Effects |
 | **Propuesta** | versión que se le muestra al operador para decidir. Se puede montar en pruebas, **no se publica como final** |
-| **Aprobado** | el operador la aprobó y se usa como pieza final. **Hoy (2026-09-27) ninguna pieza de motion está aprobada** |
+| **Aprobado** | el operador la aprobó y se usa como pieza final. **Hoy (2026-09-27) ninguna pieza de motion está aprobada**; el sonido sí (versión B) |
 
 Ya aplicados a pedido del operador: más punch (v2), la órbita real en el rótulo del host, la transición de bytes entre
 piezas y entre escenas. Siguen pendientes de decisión: la intensidad de la v2, la cadencia de grabación (hoy 30 fps),
 la prueba de los editores en Premiere y After Effects, dónde se usa la transición de bytes, el estilo de subtítulos,
-el sonido de los golpes, los textos reales de la #17 y la excepción de rostros.
+los textos reales de la #17 y la excepción de rostros. El sonido ya está decidido: **versión B aprobada** (2026-09-27).
 
 ## Qué no hacer
 
@@ -232,6 +284,7 @@ el sonido de los golpes, los textos reales de la #17 y la excepción de rostros.
 ## Referencias técnicas
 
 - Norma de la sub-línea (sección de video y motion): [`GLITCH_GRAPHIC_LINE_V1.md`](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
+- Sonido de Glitch (aprobado, versión B, sólo Glitch): [norma §13.11](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1311-sonido--sólo-glitch-aprobado-versión-b)
 - Decisión de la línea: [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
 - Dónde se produce el motion (repo taller): [`EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md`](../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) · código en `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/`
 - Trabajo en curso: [TASK-1924](../../tasks/to-do/TASK-1924-glitch-motion-overlays-hyperframes.md)

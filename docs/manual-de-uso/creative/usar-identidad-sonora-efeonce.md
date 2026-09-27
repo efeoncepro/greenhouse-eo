@@ -1,12 +1,12 @@
 # Usar la identidad sonora de Efeonce — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.2
 > **Creado:** 2026-09-26 por Claude
-> **Ultima actualizacion:** 2026-09-26 por Claude
+> **Ultima actualizacion:** 2026-09-27 por Claude (Glitch deja de estar pendiente: su sonido propio quedó aprobado, versión B)
 > **Modulo:** Creative · marca propia de Efeonce (identidad sonora)
 > **Ruta en portal:** no aplica — es un sistema de marca; los archivos viven en el bucket público de AXIS
-> **Estado:** recomendada, **no canon**; Glitch pendiente
+> **Estado:** recomendada, **no canon**. Glitch tiene su diseño sonoro propio, aprobado (B), sólo de Glitch
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/identidad-sonora-efeonce.md) · [Norma V1](../../operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md) · [ADR](../../architecture/EFEONCE_SONIC_IDENTITY_DECISION_V1.md) · [Usar la línea gráfica](./usar-linea-grafica-efeonce.md)
 
 ## Para qué sirve
@@ -47,7 +47,7 @@ Un registro por pieza. Nunca pongas la pieza de energía debajo de alguien habla
 | Lanzamiento, redes con ritmo, evento | pieza larga de energía, o el cierre de energía (5,1 s) | `04-piezas-largas` · `05-cierre-energia` |
 | Pieza de una sola línea de servicio | logo sonoro o etiqueta con voz de esa línea | `01-logo-sonoro` · `02-etiqueta-voz` |
 | Sólo la voz, para montarla tú | voz sin música | `06-voz-sola` |
-| Podcast Glitch | **no hay pieza aprobada**: consulta al operador | — |
+| Podcast Glitch | **no se usa este kit.** Glitch tiene su diseño sonoro propio, aprobado (versión B), sólo de Glitch: ver [Editar video de Glitch](./editar-video-glitch.md) | — |
 
 Cada línea tiene su timbre en la última nota: Growth campana, Brand marimba, Engine FM, Voice eco y Revenue campana
 grave (HubSpot y Salesforce usan la misma). Elige el archivo de tu línea; no cambies el timbre tú.
@@ -112,7 +112,7 @@ anterior.
 |---|---|
 | **Recomendada** (hoy) | se puede usar en piezas propias de Efeonce; puede cambiar al canonizar |
 | **Canon** (futuro) | valores en los tokens de AXIS y animaciones de la línea gráfica con el sonido nuevo |
-| **Pendiente** (Glitch) | no hay pieza aprobada; no uses las versiones exploradas |
+| **Glitch** (aparte) | Glitch tiene su diseño sonoro propio, aprobado (B), sólo de Glitch; en Glitch no uses este kit ni las versiones musicales exploradas |
 
 ## Qué no hacer
 
@@ -123,7 +123,10 @@ anterior.
 - Comprimir el golpe o subir el volumen «hasta el techo».
 - Traducir el eslogan o usar otra voz para decirlo.
 - Sonorizar la pantalla de recepción, o usar el sonido en clientes o en la UI de Greenhouse.
-- Usar las versiones exploradas de Glitch.
+- Usar las versiones musicales exploradas para Glitch (rondas 4 y 5): no convencieron; el sonido aprobado de Glitch
+  es su diseño sonoro B.
+- Usar el sonido de Glitch (falla sonora, efectos de transición, clic del micrófono, aire del estudio) en una pieza
+  de Efeonce, o mezclar este kit con el de Glitch.
 
 ## Problemas comunes
 

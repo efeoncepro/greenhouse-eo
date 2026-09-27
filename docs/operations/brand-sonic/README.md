@@ -1,10 +1,11 @@
 # Identidad sonora de Efeonce — índice
 
 > **Tipo de documento:** Índice operativo de carpeta
-> **Versión:** 1.0
+> **Versión:** 1.2
 > **Creado:** 2026-09-26 por Claude
-> **Última actualización:** 2026-09-26 por Claude
-> **Estado de la identidad sonora:** recomendada, no canon; Glitch pendiente
+> **Última actualización:** 2026-09-27 por Claude
+> **Estado de la identidad sonora:** recomendada, no canon. Glitch tiene su diseño sonoro propio, aprobado (B), sólo de
+> Glitch, en la norma de Glitch §13.11
 
 Esta carpeta guarda la identidad sonora de la marca propia de Efeonce: el logo sonoro «Tres puntos que se vuelven uno»,
 la etiqueta con voz, el sonido del motion del logo y las piezas largas. No aplica a clientes ni a la UI de Greenhouse.
@@ -16,6 +17,7 @@ la etiqueta con voz, el sonido del motion del logo y las piezas largas. No aplic
 | Referencia viva | [axis.efeonce.org/references/sonic-brand](https://axis.efeonce.org/references/sonic-brand/) · [JSON](https://axis.efeonce.org/references/sonic-brand.json) | Página y JSON para agentes (PR AXIS #4, squash `55486aa`; publicados 2026-09-26) |
 | Archivos | `gs://efeonce-group-axis-public-media/sonic/v1/` | 65 archivos: `masters/` y `web/` |
 | Producción | [`ai-generations/2026-09-26_branding-sonoro/`](../../../ai-generations/2026-09-26_branding-sonoro/LEEME.md) | Motor, kit, guía e historia de las rondas |
+| Sonido de Glitch (aprobado, versión B, 2026-09-27) | [norma de Glitch](../brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) §13.11 · archivos en `gs://efeonce-group-axis-public-media/glitch/sound/v1/` | **Sólo de Glitch**, no de esta identidad: no se usa en piezas de Efeonce ni se mezcla con este kit |
 
 ## Documentación para personas
 

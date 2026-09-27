@@ -1,4 +1,6 @@
 // Primitivas de síntesis del branding sonoro (determinísticas; sin muestras ni modelos de terceros).
+// La versión viva de estas primitivas está en el repo taller: efeonce-brand-workshop/tools/brand-sound (con pruebas).
+// Si el motor de la identidad sonora de Efeonce migra algún día, que use esa: una sola lógica.
 // createMix() devuelve un lienzo estéreo con bus de halo (reverb) y los instrumentos del sistema.
 import { writeFileSync } from 'node:fs'
 

@@ -1,10 +1,11 @@
 # Identidad sonora de Efeonce — Tres puntos que se vuelven uno
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.2
 > **Creado:** 2026-09-26 por Claude
-> **Ultima actualizacion:** 2026-09-26 por Claude
-> **Estado:** recomendada por el operador, **todavía no canon**; el podcast Glitch sigue pendiente
+> **Ultima actualizacion:** 2026-09-27 por Claude (Glitch deja de estar pendiente: su sonido propio quedó aprobado, versión B)
+> **Estado:** recomendada por el operador, **todavía no canon**. Glitch tiene su diseño sonoro propio, aprobado (B),
+> sólo de Glitch
 > **Documentacion tecnica:** [Norma de la identidad sonora V1](../../operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md) · [ADR de la identidad sonora](../../architecture/EFEONCE_SONIC_IDENTITY_DECISION_V1.md)
 > **Manual de uso:** [Usar la identidad sonora de Efeonce](../../manual-de-uso/creative/usar-identidad-sonora-efeonce.md)
 
@@ -91,7 +92,7 @@ esta identidad se vuelva canon.
 | Video con locución o webinar | la pieza larga de fondo, bien por debajo de la voz |
 | Lanzamiento, redes con ritmo o evento | la pieza de energía o su cierre corto |
 | Pieza de una sola línea de servicio | el logo o la etiqueta con el instrumento de esa línea |
-| Podcast Glitch | pendiente de decisión |
+| Podcast Glitch | no usa este sonido: Glitch tiene su diseño sonoro propio, aprobado (B), sólo de Glitch (ver abajo) |
 | Pantalla de recepción | nada: no lleva sonido |
 | Clientes o la interfaz de Greenhouse | no se usa |
 
@@ -120,7 +121,11 @@ esta identidad se vuelva canon.
 ## Estado y pendientes
 
 - **Recomendada, no canon.**
-- **Glitch (podcast):** hay dos versiones exploradas, una serena y una rock; el operador todavía no decide.
+- **Glitch (podcast):** ya no está pendiente. Las dos versiones musicales exploradas (una serena y una rock) no
+  convencieron; después se probó diseño sonoro en vez de música y el operador **aprobó la versión B** el 2026-09-27.
+  Glitch tiene su **diseño sonoro propio, aprobado (B), sólo de Glitch**: no es parte de la identidad sonora de
+  Efeonce, no se usa en piezas de Efeonce y no se mezcla con este kit. Se explica en la
+  [línea gráfica de Glitch](./linea-grafica-glitch.md) (detalle en la norma de Glitch §13.11).
 - Falta confirmar las licencias de las herramientas de IA usadas, hacer una prueba de reconocimiento sin logo antes de
   pautar y pasar los valores al sistema de diseño (AXIS) cuando se canonice.
 

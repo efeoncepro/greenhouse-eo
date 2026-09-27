@@ -68,6 +68,15 @@ Medidas al producir la identidad sonora de Efeonce (`EFEONCE_OVERLAY.md` §Ident
   como pista (`sello.mjs`). Masterización por destino con `master.sh <in> <out> <LUFS> [shelf]`
   (loudnorm en dos pasadas, por sonoridad, nunca por pico). Logo/sting/reveal/apertura: `sonic-engine.mjs`.
 
+## Motores de síntesis propia (sin fal, sin muestras)
+
+Viven en `ai-generations/2026-09-26_branding-sonoro/motor/` junto a los de arriba; costo de proveedor cero.
+
+| Script | Qué genera | Notas |
+|---|---|---|
+| `glitch-sfx.mjs` | **Sólo Glitch, APROBADO en su versión B** (2026-09-27; nunca Efeonce): el diseño sonoro de Glitch — `apertura.wav`, `cierre.wav`, `bucle.wav`, `animatic.wav`, `kit/<overlay>.wav` (uno por `.mov`), `transiciones/<reel\|vlog>/…wav` y `demos/`. **Histórico:** ya migrado al taller `efeonce-brand-workshop` (commit `2d411b8`, 2026-09-27) como `tools/glitch-motion/src/sound.mjs`; esta copia (`node …/motor/glitch-sfx.mjs --intensity b --outdir <dir>`) ya no es la fuente. Regenerar = correr el mismo comando de `glitch-motion` (`render`, `kit`, `transiciones` o `heroe`, p. ej. `pnpm -C ../efeonce-brand-workshop --filter glitch-motion kit -- …`), que entrega el WAV B junto a cada `.mov` | **Determinístico** (mismo comando, mismo archivo; la migración fue fiel: los 30 WAV de la B salen idénticos byte a byte). En el taller lee todos los tiempos del código (`TIMING`, `KIT_TIMING`, `APPLE_BYTES`, `ANIMATIC` y `schedule()`). Reglas en `EFEONCE_OVERLAY.md` §Glitch |
+| `dsp.mjs` | primitivas compartidas (tono, ruido, modal, tick, colocación estéreo, escritura WAV) | `write()` ahora acepta **ganancia fija** (`gain`: todas las pistas con la misma escala, sin normalizar por pico) y **corte en seco** (`gate(t)`: multiplicador final que también se lleva la cola del halo); hay **`addMono`** para colocar un segmento mono con paneo. **La versión viva está en `tools/brand-sound` del taller `efeonce-brand-workshop`** (pasó sin cambios, con pruebas; commit `2d411b8`); si migra el motor de la identidad sonora de Efeonce, que use esa (una sola lógica) |
+
 ## Router de producción (elige la mano correcta)
 
 - **VO/narración de producción** → ElevenLabs v3 (o humano si es marca premium con emoción).

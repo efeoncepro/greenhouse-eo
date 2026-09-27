@@ -1,5 +1,9 @@
 #!/usr/bin/env node
-// Glitch — diseño sonoro «el sonido de Efeonce, con un bug». PROPUESTA, sólo Glitch (nunca en piezas de Efeonce).
+// HISTÓRICO (2026-09-27): la versión viva está en el repo taller efeoncepro/efeonce-brand-workshop (commit 2d411b8):
+// tools/glitch-motion/src/sound.mjs, sobre tools/brand-sound (dsp). glitch-motion la corre en render, kit, transiciones y
+// heroe y deja el WAV junto a cada .mov. Este archivo queda como registro de cómo nació; no lo uses para producir.
+//
+// Glitch — diseño sonoro «el sonido de Efeonce, con un bug». APROBADO en la versión B (2026-09-27), sólo Glitch.
 //
 // El motivo de Efeonce (Mi · Mi · Mi → La) con la tercera nota que falla: se rompe en bytes y se rearma como la
 // manzana (La, campana de Growth, el único golpe grave). Cada sonido cae en un cuadro del piloto de motion
