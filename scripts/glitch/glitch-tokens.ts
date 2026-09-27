@@ -71,7 +71,7 @@ export const buildGlitchTokenProperties = (): [string, string][] => {
     ['--gx-headline-tracking', t.headlineTracking],
     ['--gx-label-weight', String(t.label.weight)],
     ['--gx-subtitle-weight', String(t.subtitle.weight)],
-    ['--gx-narrator-rotation', `${t.narrator.rotationDeg[1]}deg`],
+    ['--gx-narrator-rotation', `${t.narrator.rotationDeg[0]}deg`],
     ['--gx-wordmark-width', px(m.wordmarkWidthPx)],
     ['--gx-edition-label-size', px(m.editionLabel.sizePx)],
     ['--gx-edition-label-weight', String(m.editionLabel.weight)],

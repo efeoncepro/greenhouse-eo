@@ -93,3 +93,34 @@ export const sampleEdge = async (photo: ProcessedPhoto, edge: FractureEdge, samp
 
   return out
 }
+
+/**
+ * Detalle a color de la lente: la foto al tamaño del hueco (color), un corte centrado en la región del detalle y el
+ * zoom de la lente de La órbita (1,25), entregado al diámetro exacto del recorte.
+ */
+export const processLensDetail = async (
+  input: Buffer,
+  fit: { width: number; height: number },
+  region: { x: number; y: number; w: number; h: number },
+  diameter: number,
+  zoom = 1.25,
+  scale = 1
+): Promise<ProcessedPhoto> => {
+  const base = await sharp(input).rotate().resize(fit.width, fit.height, { fit: 'cover', position: 'attention' }).removeAlpha().png().toBuffer()
+  const side = Math.round(diameter / zoom)
+  const cx = (region.x + region.w / 2) * fit.width
+  const cy = (region.y + region.h / 2) * fit.height
+  const left = Math.max(0, Math.min(fit.width - side, Math.round(cx - side / 2)))
+  const top = Math.max(0, Math.min(fit.height - side, Math.round(cy - side / 2)))
+  const size = Math.round(diameter * scale)
+
+  const png = await sharp(base)
+    .extract({ left, top, width: side, height: side })
+    .resize(size, size)
+    .png({ compressionLevel: 9 })
+    .toBuffer()
+
+  const sha256 = createHash('sha256').update(png).digest('hex')
+
+  return { png, sha256, dataUri: `data:image/png;base64,${png.toString('base64')}`, width: size, height: size }
+}

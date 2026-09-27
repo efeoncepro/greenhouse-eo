@@ -14,6 +14,15 @@ const tokens = JSON.parse(fs.readFileSync(path.join(glitchCatalogDir, 'glitch-to
   pieces: Record<string, { status: string; sphere: string }>
 }
 
+/**
+ * Diferencias conocidas entre el registry y `glitchLine.pieces` de AXIS, con su razón. La portada C aprobada (canvas
+ * «Glitch en La órbita») no lleva manzana; el token 0.3.12–0.3.14 la declara con esfera `apple` (error de TASK-1922,
+ * a corregir en un patch de AXIS).
+ */
+const KNOWN_TOKEN_SPHERE_DRIFT: Record<string, string> = {
+  'portada-c': 'el diseño aprobado de la portada C no lleva manzana; AXIS declara apple'
+}
+
 const planWith = (template: string, contentType: string) => ({
   tenderId: 'glitch-test',
   slides: [{ slideId: 's1', contentType, template, slots: {} }]
@@ -51,6 +60,14 @@ describe('glitch catalogs', () => {
 
       expect(piece, `${template.name} → ${t.piece}`).toBeDefined()
       expect(t.approval === 'approved', `${template.name}: registry ${t.approval}, AXIS ${piece.status}`).toBe(piece.status === 'aprobada')
+
+      if (t.piece in KNOWN_TOKEN_SPHERE_DRIFT) {
+        // La plantilla sigue al diseño aprobado; el token de AXIS todavía no. Cuando AXIS lo corrija, este caso se pone
+        // rojo a propósito: se retira la excepción.
+        expect(piece.sphere, `${t.piece}: AXIS ya se corrigió, retira la excepción`).not.toBe(t.sphere)
+        continue
+      }
+
       expect(t.sphere, template.name).toBe(piece.sphere)
     }
   })

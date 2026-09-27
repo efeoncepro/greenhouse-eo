@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Glitch · Portada C (mosaico)</title>
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="glitch-tokens.css" />
+<link rel="stylesheet" href="glitch.css" />
+<style>
+  .gx-cover-c .gx-masthead { left: 88px; right: 88px; top: 70px; }
+  .gx-cover-c .gx-headline { left: 84px; right: 70px; top: 230px; font-size: 104px; line-height: 0.94; letter-spacing: 0; }
+  .gx-cover-c .gx-card:nth-of-type(1) { left: 88px; top: 610px; }
+  .gx-cover-c .gx-card:nth-of-type(2) { left: 556px; top: 610px; }
+  .gx-cover-c .gx-card:nth-of-type(3) { left: 88px; top: 930px; }
+  .gx-cover-c .gx-card:nth-of-type(4) { left: 556px; top: 930px; }
+  .gx-cover-c .gx-swipe { right: 88px; bottom: 58px; }
+  .gx-cover-c .gx-signature { bottom: 50px; width: 180px; }
+  .gx-cover-c .gx-credit--mosaic { left: 88px; right: auto; top: 1238px; color: var(--gx-sub); opacity: 1; }
+</style>
+</head>
+<body>
+<main class="gx-canvas gx-canvas--4x5 gx-cover-c" data-gx-root>
+  <header class="gx-masthead">
+    <img class="gx-masthead__wordmark" src="assets/glitch-logo-negative.svg" alt="Glitch" />
+    <div class="gx-masthead__edition">
+      <span class="gx-masthead__label">EDICIÓN</span>
+      <span class="gx-masthead__number"><span class="gx-hash">#</span><span class="gx-num" data-slot="edition">17</span></span>
+    </div>
+  </header>
+  <h1 class="gx-headline" data-slot="headline"><span class="gx-headline__entry" data-slot-field="entry">Ocho noticias.</span><span data-slot-field="punch">Un mismo aviso.</span></h1>
+  <article class="gx-card" data-slot="card1">
+    <div class="gx-card__photo"><img data-slot-field="src" src="assets/glitch-apple.svg" alt="" /></div>
+    <div class="gx-card__body"><span class="gx-card__section"><span data-slot-field="section">Sección</span> <span class="gx-plus-ia">+ IA</span></span><span class="gx-card__pov" data-slot-field="pov">El POV de la noticia</span></div>
+  </article>
+  <article class="gx-card" data-slot="card2">
+    <div class="gx-card__photo"><img data-slot-field="src" src="assets/glitch-apple.svg" alt="" /></div>
+    <div class="gx-card__body"><span class="gx-card__section"><span data-slot-field="section">Sección</span> <span class="gx-plus-ia">+ IA</span></span><span class="gx-card__pov" data-slot-field="pov">El POV de la noticia</span></div>
+  </article>
+  <article class="gx-card" data-slot="card3">
+    <div class="gx-card__photo"><img data-slot-field="src" src="assets/glitch-apple.svg" alt="" /></div>
+    <div class="gx-card__body"><span class="gx-card__section"><span data-slot-field="section">Sección</span> <span class="gx-plus-ia">+ IA</span></span><span class="gx-card__pov" data-slot-field="pov">El POV de la noticia</span></div>
+  </article>
+  <article class="gx-card" data-slot="card4">
+    <div class="gx-card__photo"><img data-slot-field="src" src="assets/glitch-apple.svg" alt="" /></div>
+    <div class="gx-card__body"><span class="gx-card__section"><span data-slot-field="section">Sección</span> <span class="gx-plus-ia">+ IA</span></span><span class="gx-card__pov" data-slot-field="pov">El POV de la noticia</span></div>
+  </article>
+  <svg class="gx-bytes" data-gx-bytes viewBox="0 0 1080 1350" width="1080" height="1350" aria-hidden="true"></svg>
+  <p class="gx-credit gx-credit--mosaic" data-slot="credit">Fotos: créditos</p>
+  <div class="gx-swipe"><span class="gx-swipe__label">DESLIZA</span><img class="gx-swipe__icon" src="assets/icon-deslizar.svg" alt="" /></div>
+  <img class="gx-signature" src="assets/efeonce-logo-negative.svg" alt="Efeonce" />
+</main>
+</body>
+</html>

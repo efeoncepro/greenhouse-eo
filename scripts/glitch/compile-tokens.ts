@@ -19,6 +19,7 @@ import { glitchLine } from '@efeoncepro/axis-tokens'
 import { iconSvg } from '@efeoncepro/axis-graphic-line/icons'
 
 import { glitchCatalogDir } from '../../src/lib/artifact-composer/catalogs/glitch/brand'
+import { buildAppleBytesSvg } from './apple-bytes'
 import { buildGlitchTokenArtifacts } from './glitch-tokens'
 
 const require = createRequire(path.join(process.cwd(), 'package.json'))
@@ -39,7 +40,17 @@ const actionIcons = (): [string, string][] => {
   return glitchLine.icons.glitchGlyphs.map((glyph) => [`icon-${glyph}.svg`, `${iconSvg({ glyph, state: 'rest', size: 48, surface: 'dark' })}\n`])
 }
 
-const main = () => {
+/** La manzana en bytes, generada desde el path oficial: en el acento (portada B) y en la línea (textura de la contraportada). */
+const appleBytes = async (): Promise<[string, string][]> => {
+  const appleSvg = fs.readFileSync(path.join(brandAssetsDir, 'glitch/glitch-apple.svg'), 'utf8')
+
+  return [
+    ['apple-bytes-accent.svg', await buildAppleBytesSvg({ appleSvg, color: glitchLine.color.accent })],
+    ['apple-bytes-texture.svg', await buildAppleBytesSvg({ appleSvg, color: glitchLine.color.line, seed: 0x1d3a57 })]
+  ]
+}
+
+const main = async () => {
   const check = process.argv.includes('--check')
   const { css, json } = buildGlitchTokenArtifacts()
 
@@ -47,7 +58,8 @@ const main = () => {
     [path.join(glitchCatalogDir, 'glitch-tokens.css'), Buffer.from(css)],
     [path.join(glitchCatalogDir, 'glitch-tokens.json'), Buffer.from(json)],
     ...BRAND_ASSETS.map(([dest, src]): [string, Buffer] => [path.join(glitchCatalogDir, 'assets', dest), fs.readFileSync(path.join(brandAssetsDir, src))]),
-    ...actionIcons().map(([dest, svg]): [string, Buffer] => [path.join(glitchCatalogDir, 'assets', dest), Buffer.from(svg)])
+    ...actionIcons().map(([dest, svg]): [string, Buffer] => [path.join(glitchCatalogDir, 'assets', dest), Buffer.from(svg)]),
+    ...(await appleBytes()).map(([dest, svg]): [string, Buffer] => [path.join(glitchCatalogDir, 'assets', dest), Buffer.from(svg)])
   ]
 
   let drift = 0
@@ -79,4 +91,4 @@ const main = () => {
   }
 }
 
-main()
+void main()

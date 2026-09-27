@@ -29,6 +29,8 @@ export interface ByteFractureInput {
   edge: FractureEdge
   /** Lienzo: ninguna celda sale de él. */
   canvas: { width: number; height: number }
+  /** Recorte opcional (la tarjeta del mosaico): ninguna celda sale de esta caja. */
+  clip?: Box
   /** Regiones de rostro normalizadas a la foto (0–1). `[]` = sin rostros. */
   faceRegions: readonly { x: number; y: number; w: number; h: number }[]
   /** Tamaño de celda y paso en px. Por defecto, los medidos en el canvas (27 / 30). */
@@ -125,7 +127,8 @@ export const computeByteFracture = (input: ByteFractureInput): ByteFracture => {
             ? { x: round1(photo.x - cell - offset), y: photo.y + 1 + i * pitch, w: cell, h: cell }
             : { x: round1(photo.x + photo.w + offset), y: photo.y + 1 + i * pitch, w: cell, h: cell }
 
-      const inside = box.x >= 0 && box.y >= 0 && box.x + box.w <= canvas.width && box.y + box.h <= canvas.height
+      const clip = input.clip ?? { x: 0, y: 0, w: canvas.width, h: canvas.height }
+      const inside = box.x >= clip.x && box.y >= clip.y && box.x + box.w <= clip.x + clip.w && box.y + box.h <= clip.y + clip.h
 
       if (!inside || faces.some((face) => overlaps(face, box))) continue
 
