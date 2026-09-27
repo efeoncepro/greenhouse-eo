@@ -115,6 +115,8 @@ hipótesis de montaje, no benchmarks; revisar secuencia completa y no sólo el p
    `references/glitch.md` §6. El reel es un kit de **overlays con alfa encima de la toma del host** (mapa de zonas; la
    cara y la interfaz de la app nunca se tapan) + tarjeta final en loop; HyperFrames es el motor **propuesto**, aún sin
    catálogo ni composiciones. Todo el video de Glitch está en PROPUESTA hasta que el operador lo apruebe.
+   **Dónde:** repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/` (TASK-1924), operado desde
+   `greenhouse-eo` con `pnpm -C ../efeonce-brand-workshop`; nunca en Greenhouse ni en Globe.
 6. **Cierra con un artefacto** de `templates/` (brief, storyboard, animatic/shotlist, prompt sheet,
    EDL, brief de sonido, spec de entrega, crítica), no con prosa suelta.
 

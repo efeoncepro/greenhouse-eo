@@ -179,10 +179,13 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
 
 Una PROPUESTA no se entrega como canon ni se publica: se muestra al operador para aprobar.
 
-## 9. Flujo de composición — ACEPTADO (2026-09-27; hogar del movimiento abierto)
+## 9. Flujo de composición — ACEPTADO (2026-09-27; hogar del movimiento: repo taller)
 
-**Aceptado por el operador el 2026-09-27.** Hogar del movimiento abierto (recomendación: Globe produce, AXIS define,
-Marketing Studio registra; ver el Delta del ADR). Seguimiento: cada edición se registra en Marketing Studio.
+**Aceptado por el operador el 2026-09-27.** Hogar del movimiento **decidido**: el render de HyperFrames vive en el repo
+taller privado `efeoncepro/efeonce-brand-workshop`, en `tools/glitch-motion/` (ADR
+`docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md`). AXIS define, Greenhouse compone los estáticos y guarda
+el canon, Marketing Studio registra. Globe **no** es la ubicación (hibernado, CI en cada push, producto comercial): el
+taller converge con Globe cuando se reactive. Seguimiento: cada edición se registra en Marketing Studio.
 
 Objetivo: que ningún agente reinterprete. **Los agentes llenan datos; nunca eligen coordenadas ni plantilla a mano.**
 
@@ -203,7 +206,12 @@ Objetivo: que ningún agente reinterprete. **Los agentes llenan datos; nunca eli
    y del 16:9 como composiciones del mismo catálogo, renderizadas por edición a video con alfa (ProRes 4444 `.mov` o
    WebM con alfa) para ponerlas sobre la toma; apertura y cierre (puntos → manzana) sincronizados con el mnemónico.
    Valores: `efeonceGraphicLine.motion` + spec de Glitch a registrar en AXIS. MOGRT de Premiere sólo si el editor
-   necesita editar texto en su programa.
+   necesita editar texto en su programa. **Dónde se produce:** en el taller, operado desde tu sesión de `greenhouse-eo`
+   (el taller vive como hermano): `pnpm -C ../efeonce-brand-workshop --filter glitch-motion <render|verify|doctor>`.
+   Nunca agregues HyperFrames ni scripts de video al `package.json` de Greenhouse, nunca copies esta skill al taller y
+   nunca metas binarios (ProRes, WebM, PNG) ni rutas absolutas en git del taller: las corridas van a `corridas/` con
+   `manifiesto.json` por sha256 y los binarios a GCS u OneDrive. El manifiesto de edición llega al taller como archivo
+   JSON exportado por Greenhouse (TASK-1923); el taller no importa código de Greenhouse.
 5. **Semana:** contenido (pipeline editorial PDR-020 / content factory) → manifiesto → el Composer renderiza todas las
    superficies → QA humano → publicación (LinkedIn vía Metricool, blog vía WordPress; ambas con confirmación humana) →
    grabación del host → el editor monta los overlays del mismo manifiesto.
@@ -224,8 +232,8 @@ bloque de WordPress, sin task hasta que se apruebe.
 **Resuelto por el operador el 2026-09-27:** manzana y verde aprobados; línea Growth; próxima edición #17; alta de los
 cinco glifos aprobada. **Pendientes del operador (no decidas por tu cuenta):** aprobación de lente, blog, vlog 16:9,
 reel y tarjetas finales; el mnemónico (evaluarlo y aprobarlo); el contenido del lower third (en definición con el
-operador); la licencia de Guttery (confirmada; registrar la referencia); pasar el flujo de composición a ADR
-`Accepted`.
+operador); la licencia de Guttery (confirmada; registrar la referencia). El flujo de composición ya está `Accepted` y
+el hogar del movimiento ya está decidido (repo taller).
 
 ## 10. QA de una pieza de Glitch (además de [qa-checklist.md](qa-checklist.md))
 
@@ -245,3 +253,6 @@ operador); la licencia de Guttery (confirmada; registrar la referencia); pasar e
   punch #11, para evaluar, sistema de portada (APROBADO), blog y vlog, vlog en reel.
 - AXIS Lab (publicado 2026-09-27): `/references/glitch/` y `/references/glitch.json` de
   `efeoncepro/axis-design-system`. Composición: TASK-1922 (AXIS), TASK-1923 (Composer), TASK-1924 (movimiento).
+- Movimiento: repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/` (lo construye TASK-1924; hoy el
+  paquete todavía no existe) y sus corridas en `corridas/` del taller. Se opera desde `greenhouse-eo` con
+  `pnpm -C ../efeonce-brand-workshop`.

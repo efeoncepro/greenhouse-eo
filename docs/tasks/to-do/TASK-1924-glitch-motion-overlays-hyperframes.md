@@ -3,6 +3,16 @@
 ## Delta 2026-09-27
 
 - **Guttery:** el operador confirmó la licencia para web y video (2026-09-27, segunda respuesta). La Open Question de Guttery queda resuelta; la task registra la referencia del contrato de licencia y sella la fuente.
+- **Reubicación al repo taller (2026-09-27):** todo el trabajo que esta task ubicaba en `scripts/creative/glitch-motion/**`
+  de Greenhouse pasa a `tools/glitch-motion/**` del repo taller privado `efeoncepro/efeonce-brand-workshop`, según la
+  [decisión del taller](../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) (Accepted por el operador el
+  2026-09-27). Greenhouse no gana ninguna dependencia ni script en su `package.json`; HyperFrames se fija exacto en el
+  `package.json` del paquete del taller. Las corridas (`entrega.json`, `manifiesto.json`, fichas) van a
+  `corridas/AAAA-MM-DD_<tema>/` del taller y los binarios (ProRes, WebM, PNG, MP4) a GCS por sha256 u OneDrive, nunca a
+  git. Globe queda descartado como ubicación (ni como repositorio): su CI corre en cada push, sus gates barren
+  `git ls-files` y es un producto comercial (ADR-010). La documentación gobernante (spec de producción, norma, ADR,
+  manual) sigue en Greenhouse. Se opera desde sesiones de `greenhouse-eo` con sus skills, invocando
+  `pnpm -C ../efeonce-brand-workshop …`. `tools/foto/` y `tools/brand-motion/` son de TASK-1925, no de esta task.
 
 Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del ADR de Glitch](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--decisiones-del-operador):
 
@@ -45,11 +55,11 @@ Decisiones del operador (Julio Reyes) registradas en el [Delta 2026-09-27 del AD
   > de producción que crea el Slice 8 (`docs/operations/brand-graphic-line/glitch/GLITCH_MOTION_OVERLAYS_V1.md`).
 - Backend impact: `none`
 - Epic: `EPIC-031`
-- Status real: `Diseno — bloqueada por TASK-1922 (token glitchLine.motion, zonas y archivos) y TASK-1923 (manifiesto de edición); el video de Glitch sigue en PROPUESTA`
+- Status real: `Diseno — reubicada al repo taller efeonce-brand-workshop (tools/glitch-motion) el 2026-09-27; bloqueada por TASK-1922 (token glitchLine.motion, zonas, fuentes y archivos) y TASK-1923 (manifiesto de edición y su exportación como JSON); el video de Glitch sigue en PROPUESTA`
 - Rank: `TBD`
 - Domain: `creative|brand`
-- Blocked by: `TASK-1922, TASK-1923, aprobación del operador del kit de overlays y de las tarjetas finales (gate del Slice 2)`
-- Branch: `Greenhouse develop; AXIS main; sin worktrees`
+- Blocked by: `TASK-1922, TASK-1923, CI mínimo del taller de TASK-1925 antes de integrar código a su main, aprobación del operador del kit de overlays y de las tarjetas finales (gate del Slice 2)`
+- Branch: `efeonce-brand-workshop: rama de trabajo + PR a main (el CI del taller sólo corre en pull_request); Greenhouse develop sólo para docs y skills; AXIS main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -63,7 +73,9 @@ bytes y se arma en la manzana, sincronizado con el mnemónico), cabecera noticia
 tarjeta de noticia, imagen de la fuente en plano dividido, Glitch Drop, última frase y tarjeta final en loop— en
 composiciones HyperFrames (HTML + GSAP) que se renderizan **por edición** a video con alfa desde el **mismo manifiesto
 de edición** de TASK-1923. Entrega ProRes 4444 `.mov` y WebM VP9 con alfa más un manifiesto de entrega para el editor,
-con un comando `pnpm glitch:motion` y una verificación automática (duración, alfa real, cuadros clave, zonas).
+con un comando de render y una verificación automática (duración, alfa real, cuadros clave, zonas). Todo vive en
+`tools/glitch-motion/` del repo taller `efeoncepro/efeonce-brand-workshop` y se opera desde `greenhouse-eo` con
+`pnpm -C ../efeonce-brand-workshop --filter glitch-motion …`.
 
 ## Why This Task Exists
 
@@ -79,14 +91,17 @@ con un comando `pnpm glitch:motion` y una verificación automática (duración, 
 - El motion de La órbita ya demostró el patrón (render determinista desde tokens, masters con alfa, sin modelo de
   video), pero con un pipeline propio en `scripts/creative/brand-motion/` que no lee manifiestos editoriales ni produce
   kits por edición.
+- El operador no quiere producción de video fuera del scope de Greenhouse dentro de Greenhouse, y Globe está hibernado:
+  el render nace en el repo taller de producción de marca, que converge con Globe cuando Globe se reactive.
 
 ## Goal
 
 - Un kit de overlays de Glitch animado, aprobado por el operador, que un editor monta sobre la toma del host sin tocar
   texto, tiempos ni posiciones.
-- Un comando `pnpm glitch:motion` que, desde el manifiesto de edición de TASK-1923, renderiza todas las piezas de la
-  edición en 9:16 y 16:9 con alfa real y escribe un manifiesto de entrega (clip, formato, duración, timecode de entrada
-  sugerido, texto, marcadores de sincronía).
+- Un comando del taller (`pnpm -C ../efeonce-brand-workshop --filter glitch-motion render`) que, desde el manifiesto de
+  edición de TASK-1923, renderiza todas las piezas de la edición en 9:16 y 16:9 con alfa real y escribe, en la corrida
+  del taller, un manifiesto de entrega (clip, formato, duración, timecode de entrada sugerido, texto, marcadores de
+  sincronía, sha256) y el `manifiesto.json` de binarios con su ubicación en GCS u OneDrive.
 - Una verificación automática que falla cerrada si un clip no dura lo declarado, no trae alfa real, se desvía de sus
   cuadros clave aprobados o pinta sobre la cara del host o la interfaz de la app.
 - Cero valores de movimiento literales: entradas, salidas, curva de los bytes y punto de sincronía salen de
@@ -103,14 +118,20 @@ con un comando `pnpm glitch:motion` y una verificación automática (duración, 
 
 Revisar y respetar:
 
-- `docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md` — sobre todo «Decisión propuesta — flujo de composición»
-  (punto 4, Motion con HyperFrames) y «Encaje verificado en el Artifact Composer (2026-09-27)» («el movimiento sigue
-  fuera del Composer: HyperFrames»). El flujo está **Proposed**: esta task lo implementa sólo para el movimiento.
+- `docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md` — sobre todo «Decisión — flujo de composición» (punto 4,
+  Motion con HyperFrames), «Encaje verificado en el Artifact Composer (2026-09-27)» («el movimiento sigue fuera del
+  Composer: HyperFrames») y «Delta — flujo aceptado, hogar del movimiento y Marketing Studio». El flujo está
+  **Accepted** (2026-09-27) y el hogar del movimiento quedó decidido: el repo taller. Esta task lo implementa sólo para
+  el movimiento.
 - `docs/architecture/EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md` — La órbita, línea madre que Glitch hereda.
 - `docs/architecture/EFEONCE_SONIC_IDENTITY_DECISION_V1.md` — la pieza sonora de Glitch está pendiente.
 - `docs/architecture/GREENHOUSE_CREATIVE_VIDEO_STUDIO_V1.md` — **Superseded** en su ubicación de runtime: HyperFrames
   no se implementa como módulo de producto dentro de Greenhouse (el producto es Efeonce Creative Studio / Globe). Esta
-  task es tooling local de marca propia, no un servicio de video del portal.
+  task es tooling de marca propia en el repo taller, no un servicio de video del portal.
+- `docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md` — **Accepted** (2026-09-27): el repo taller
+  `efeoncepro/efeonce-brand-workshop` es la ubicación de esta task (`tools/glitch-motion/`). Reglas duras que aplican:
+  cero binarios en git, cero rutas absolutas versionadas, cero documentación gobernante en el taller, cero despliegue ni
+  runtime, nunca copiar skills al taller, se opera desde `greenhouse-eo`, converge con Globe cuando Globe se reactive.
 - `docs/architecture/GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md` — dueño de las piezas estáticas; esta task no
   lo modifica.
 
@@ -160,17 +181,32 @@ Reglas obligatorias:
   escalonamiento de los bytes, punto de sincronía con el mnemónico, permanencias mínimas), zonas seguras por formato y
   por pieza (9:16 y 16:9), color, tipo y cabecera; wordmark light/dark y manzana en `@efeoncepro/axis-brand-assets`;
   contrato `efeonce.glitch-line` 0.1.0. **Sin ese token la task no arranca**: no hay valores que leer.
-- `TASK-1923` (`docs/tasks/to-do/TASK-1923-glitch-artifact-composer-catalogs.md` [verificar]) — esquema y validador
-  del **manifiesto de edición**, layout hook determinista de la falla en bytes, extensión `glitch` del brand pack
-  `axis` (Guttery sellada por checksum) y el catálogo `glitch-overlays` (PNG con alfa) cuyos estáticos son la
-  referencia del cuadro asentado de cada overlay animado.
+- `TASK-1923` (`docs/tasks/to-do/TASK-1923-glitch-artifact-composer-catalogs.md`, verificado 2026-09-27) — esquema y
+  validador del **manifiesto de edición** (`GlitchEditionManifest`, `schemaVersion: 1`, zod en
+  `src/lib/glitch-composition/manifest.ts` de Greenhouse), función pura de la falla en bytes (`computeByteFracture`) y
+  layout hook `glitch-fracture`, extensión `glitch` del brand pack `axis` (Guttery sellada por checksum) y el catálogo
+  `glitch-overlays` (PNG con alfa) cuyos estáticos son la referencia del cuadro asentado de cada overlay animado.
+  **El taller no importa código de Greenhouse**: consume archivos JSON que Greenhouse exporta (ver «Cómo se comparte el
+  manifiesto con el taller» en Detailed Spec).
+- `TASK-1925` (migración al taller) — dueña del CI mínimo del taller (sólo `pull_request`: lint + gate de binarios y
+  rutas absolutas), del bucket de binarios por sha256 y del formato de `corridas/<id>/manifiesto.json`. Si esta task
+  llega primero al taller, el primer código de `tools/glitch-motion/` no se integra a `main` sin ese CI: se coordina con
+  TASK-1925 para que entre antes o en el mismo PR; esta task **no** crea un CI ni un formato de manifiesto paralelos.
 - Aprobación del operador del kit de overlays del reel y de las tarjetas finales (hoy PROPUESTA; gate del Slice 2).
-- HyperFrames (CLI `hyperframes`, requiere Node ≥ 22 y FFmpeg). Verificado 2026-09-27: **no** está en
-  `package.json`; existe sólo en la caché de `npx` del equipo (`~/.npm/_npx/…/hyperframes` versión `0.6.69`).
+- HyperFrames (CLI `hyperframes`, requiere Node ≥ 22 y FFmpeg). Verificado 2026-09-27: **no** está en ningún
+  `package.json` (ni de Greenhouse ni del taller); existe sólo en la caché de `npx` del equipo (versión `0.6.69`).
+  Se fija exacto como dependencia del paquete `tools/glitch-motion/` del taller; nunca en Greenhouse.
 - FFmpeg local con `prores_ks`, `libvpx-vp9` (codificador y decodificador) y `hevc_videotoolbox` (verificado
-  2026-09-27 en `/opt/homebrew/bin/ffmpeg`).
-- `gsap` `^3.15.0`, `sharp` `0.34.5`, `pixelmatch` `^5.3.0`, `pngjs` `^5.0.0`, `playwright` `1.59.1` ya en
-  `package.json`.
+  2026-09-27 en el Homebrew del equipo del operador; la ruta de la máquina nunca se versiona en el taller).
+- Dependencias del paquete del taller (todas con versión exacta en `tools/glitch-motion/package.json`): `hyperframes`,
+  `gsap`, `sharp`, `pixelmatch`, `pngjs`, `playwright`, un validador genérico de JSON Schema (p. ej. `ajv`), `vitest`,
+  `@efeoncepro/axis-tokens` y `@efeoncepro/axis-brand-assets` (hoy Greenhouse fija `0.3.8` y `0.3.4`; el taller fija la
+  versión que publique TASK-1922). Los paquetes `@efeoncepro/*` vienen de GitHub Packages: el taller necesita el
+  registro del scope en su `.npmrc` y el token por variable de entorno, nunca versionado [verificar si lo crea TASK-1925].
+- Verificado 2026-09-27 en el taller (`main` `430d5b0`): `pnpm-workspace.yaml` declara `tools/*`, `tools/` sólo tiene
+  `README.md` (con la fila `glitch-motion/` «Nace aquí (TASK-1924)») y el `.gitignore` ya excluye imágenes, video, audio,
+  PDF, 3D y `out/`. El paquete `glitch-motion` todavía no existe: lo crea el Slice 1 con `"name": "glitch-motion"`, que es
+  el nombre que usan los comandos `--filter glitch-motion` de esta task.
 
 ### Blocks / Impacts
 
@@ -183,10 +219,20 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `scripts/creative/glitch-motion/**` (nuevo): CLI, verificador, adaptador de tokens y manifiesto, composiciones
-  HyperFrames por pieza, fixtures, pruebas.
-- `package.json` y `pnpm-lock.yaml`: sólo los scripts `glitch:motion` y `glitch:motion:verify` y la dependencia de
-  desarrollo `hyperframes` fijada exacta.
+En el repo taller `efeoncepro/efeonce-brand-workshop`:
+
+- `tools/glitch-motion/**` (nuevo): `package.json` del paquete `glitch-motion` (scripts `render`, `verify`, `test`,
+  `doctor`; dependencias exactas, incluida `hyperframes`), CLI, verificador, adaptador de tokens y manifiesto,
+  composiciones HyperFrames por pieza, copia versionada del JSON Schema del manifiesto, fixtures de texto y pruebas.
+- `pnpm-lock.yaml` del taller: sólo las entradas del paquete `glitch-motion`.
+- `corridas/AAAA-MM-DD_glitch-*/` que produzca esta task: `entrega.json`, `manifiesto.json`, fichas y logs (texto);
+  sus binarios sólo en GCS u OneDrive.
+- **No** son de esta task: `tools/foto/`, `tools/brand-motion/`, el CI del taller, el bucket ni el formato de
+  `manifiesto.json` (TASK-1925), ni los routers `README.md`/`CLAUDE.md`/`AGENTS.md` del taller (salvo la fila de
+  `glitch-motion` en `tools/README.md`).
+
+En Greenhouse (sólo documentación y skills; ningún cambio en `package.json`, `pnpm-lock.yaml`, `scripts/` ni `src/`):
+
 - `docs/operations/brand-graphic-line/glitch/GLITCH_MOTION_OVERLAYS_V1.md` (nuevo, spec de producción).
 - Deltas acotados en: `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` (§7, §9, §10),
   `docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md` («Trabajo a crear», fila c),
@@ -198,9 +244,14 @@ Reglas obligatorias:
 
 ### Already exists
 
-- Wordmark de Glitch: `public/branding/glitch/glitch-light.svg` y `glitch-dark.svg` (fuente temporal hasta que
-  TASK-1922 lo publique en `@efeoncepro/axis-brand-assets`).
-- Pipeline de motion de marca determinista: `scripts/creative/brand-motion/` (`render-orbit-motion.mjs`,
+- Repo taller `efeoncepro/efeonce-brand-workshop` (privado, clonado como hermano de `greenhouse-eo`, `main` `430d5b0`):
+  esqueleto con routers, workspace `tools/*`, `corridas/` con su README y `.gitignore` de binarios. Sin código, sin CI y
+  sin bucket todavía (TASK-1925). Verificado 2026-09-27.
+- Wordmark de Glitch: `public/branding/glitch/glitch-light.svg` y `glitch-dark.svg` en Greenhouse (fuente temporal
+  hasta que TASK-1922 lo publique en `@efeoncepro/axis-brand-assets`; el taller lo toma **sólo** del paquete de AXIS,
+  nunca de `public/` de Greenhouse).
+- Pipeline de motion de marca determinista en Greenhouse (lo migra TASK-1925 a `tools/brand-motion/` del taller; esta
+  task lo usa sólo como precedente, no lo toca): `scripts/creative/brand-motion/` (`render-orbit-motion.mjs`,
   `orbit-scene.js`, `orbit-sound.mjs`, `encode-orbit-motion.mjs`). Usa Playwright + sharp + FFmpeg (no HyperFrames),
   lee `efeonceGraphicLine.motion` y `axisMotion.ease`, supermuestrea subcuadros para el desenfoque real y entrega
   ProRes 4444 (`yuva444p10le`), WebM VP9 con alfa (`yuva420p`) y HEVC con alfa. Es el precedente de naming, QA de alfa
@@ -212,41 +263,51 @@ Reglas obligatorias:
   acepta `--fps` entero de 1 a 240 o racional estilo FFmpeg (`30000/1001` para 29,97; `24000/1001`). La skill
   `hyperframes-cli` sólo documenta `mp4`/`webm` y 24/30/60 fps: está desactualizada respecto del binario (verificado
   leyendo `dist/cli.js`; el render en Lambda sí se limita a 24/30/60).
-- Fuentes: `src/assets/fonts/BricolageGrotesque-Variable.ttf` (+ OFL) y la familia Poppins. **Guttery no está en el
-  repo** (licencia para video y web pendiente).
-- Toma de prueba del host (sólo de prueba, generada con IA): `ai-generations/2026-09-21_copiloto/plates/G-podcast-v5.png`.
-- Glifos Plastilina de Glitch (alta en AXIS pendiente): `ai-generations/2026-09-26_glitch-iconos/elegidos/*.json`.
+- Fuentes en Greenhouse: `src/assets/fonts/BricolageGrotesque-Variable.ttf` (+ OFL) y la familia Poppins. **Guttery no
+  está en ningún repo** (licencia para web y video confirmada por el operador el 2026-09-27; falta registrar la
+  referencia del contrato). El taller no versiona fuentes (son binarios) ni las lee de `src/assets/` de Greenhouse: las
+  toma de un paquete de AXIS sellado por checksum [verificar que TASK-1922 publique Bricolage, Poppins y Guttery en
+  `@efeoncepro/axis-brand-assets`; si no, se pide ahí].
+- Toma de prueba del host (sólo de prueba, generada con IA), en Greenhouse:
+  `ai-generations/2026-09-21_copiloto/plates/G-podcast-v5.png`. El taller la recibe por argumento de CLI en tiempo de
+  ejecución (`--preview-plate`) o por su sha256 en GCS; nunca como ruta versionada.
+- Glifos Plastilina de Glitch (alta en AXIS aprobada, publicación pendiente en TASK-1922):
+  `ai-generations/2026-09-26_glitch-iconos/elegidos/*.json`.
 - Referencias visuales en AXIS: `apps/lab/src/data/glitch.ts` (`glitchVideo`, `glitchReelKit`, estados «propuesta») y
   `apps/lab/public/media/glitch/{reel-apertura,reel-narrador,reel-noticia,reel-drop,reel-ultima-frase,reel-cierre,reel-kit,reel-mapa,vlog-apertura,vlog-cierre,vlog-guion}.webp`.
   Nota de deriva: el brief y el inventario dicen que el Lab de Glitch está «sin publicar» en `feat/glitch-line`, pero
   el commit `d5846e8` ya es ancestro de `origin/main` de AXIS (verificado 2026-09-27) [verificar con el operador si el
   Lab está desplegado].
-- `.gitignore` ya excluye `ai-generations/**/*.{mp4,webm,mov,png}` y existe `pnpm media:archive-ai-generation`.
-- Vitest ya incluye `scripts/**/*.test.ts`.
+- El `.gitignore` del taller ya excluye `*.png`, `*.mov`, `*.webm`, `*.mp4`, audio, PDF, 3D y `out/`. El archivo a GCS
+  del taller todavía no existe (TASK-1925); `pnpm media:archive-ai-generation` es de Greenhouse y sirve sólo a
+  `ai-generations/`, no a las corridas del taller.
 
 ### Gap
 
+- No existe el paquete `tools/glitch-motion/` en el taller (ni `package.json`, ni pruebas, ni configuración de Vitest).
 - No existe ninguna composición HyperFrames de Glitch ni plantilla animada del kit.
 - No existe `glitchLine.motion` ni zonas seguras de Glitch como token (TASK-1922).
 - No existe el esquema del manifiesto de edición (TASK-1923) ni un bloque de datos para el video (qué tres noticias
   van al vlog, segmentos del guion, lower third, última frase).
 - No hay verificación automática de alfa real, zonas prohibidas ni «una manzana por pantalla» para video.
 - No hay manifiesto de entrega para el editor ni timecodes sugeridos.
-- HyperFrames no está fijado en el repo: `npx hyperframes` resolvería la última versión publicada en cada corrida.
+- HyperFrames no está fijado en ningún repo: `npx hyperframes` resolvería la última versión publicada en cada corrida.
+- No existe una exportación del manifiesto de edición que el taller pueda leer sin importar código de Greenhouse (JSON
+  Schema del manifiesto y plan de movimiento con la falla en bytes resuelta; ver Detailed Spec).
 
 ## Modular Placement Contract
 
 - Topology impact: `tooling`
-- Current home: `scripts/creative/glitch-motion/` (CLI, verificador, composiciones HyperFrames y fixtures; corre en la
-  máquina del operador o del agente, nunca en Vercel ni en un worker)
-- Future candidate home: `undecided`
-- Boundary: el adaptador `scripts/creative/glitch-motion/lib/edition-to-compositions.ts` es una función pura
-  manifiesto de edición + tokens → datos por composición; el CLI y el verificador son sus únicos consumers. Consume el
-  validador del manifiesto y el layout hook de los bytes de TASK-1923 sólo por su entrada pura exportada, y los valores
-  sólo desde `@efeoncepro/axis-tokens` / `@efeoncepro/axis-brand-assets`.
-- Server/browser split: `sólo CLI local — Node lee archivos y lanza HyperFrames/FFmpeg; el HTML de cada composición corre sólo dentro del Chrome headless de HyperFrames y recibe los datos ya resueltos como JSON inyectado; nada de esto se importa desde src/app ni llega al bundle del portal`
-- Build impact: `nueva devDependency exacta hyperframes (trae su propio Chrome y requiere FFmpeg del sistema); no la importa ningún código de src/** ni de services/**, así que no toca el build de Next ni el worker:runtime-deps-gate; los .mov/.webm/.png de salida quedan fuera de git`
-- Extraction blocker: `la ruta productiva del render de video no está decidida (Efeonce Creative Studio / Globe vs un consumer tipo artifact-worker de TASK-1921); hasta entonces es tooling local`
+  > Fuera de Greenhouse: el código nace en el repo taller hermano; en Greenhouse sólo cambian documentación y skills.
+- Current home: `efeonce-brand-workshop/tools/glitch-motion` (repo taller privado efeoncepro/efeonce-brand-workshop; CLI, verificador, composiciones HyperFrames y fixtures de texto; corre en la máquina del operador o del agente, invocado desde greenhouse-eo con pnpm -C ../efeonce-brand-workshop, nunca en Vercel, Cloud Run ni un cron)
+- Future candidate home: `domain-package`
+  > Razón: converge con Efeonce Creative Studio (Globe) como paquete, con su historia, cuando Globe reactive su
+  > capacidad de generación ([decisión del taller](../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) §2.7).
+  > No es un paquete de Greenhouse ni vuelve a Greenhouse.
+- Boundary: `el adaptador tools/glitch-motion/src/edition-to-compositions.ts es una función pura (plan de movimiento exportado por Greenhouse + tokens de AXIS a datos por composición); sus únicos consumers son el CLI y el verificador del paquete; los valores salen sólo de @efeoncepro/axis-tokens y @efeoncepro/axis-brand-assets; el manifiesto de edición llega como archivo JSON validado contra el JSON Schema versionado, sin importar código de Greenhouse`
+- Server/browser split: `sólo CLI local — Node lee archivos y lanza HyperFrames/FFmpeg; el HTML de cada composición corre sólo dentro del Chrome headless de HyperFrames y recibe los datos ya resueltos como JSON inyectado; nada llega al portal Greenhouse`
+- Build impact: `cero en Greenhouse (ninguna dependencia ni script nuevo en el package.json de greenhouse-eo); en el taller, hyperframes fijado exacto en tools/glitch-motion/package.json (trae su propio Chrome y requiere FFmpeg del sistema), aislado de foto y brand-motion por el workspace tools/*; los .mov/.webm/.png/.mp4 de salida quedan fuera de git`
+- Extraction blocker: `Globe hibernado: la convergencia con Globe espera a que el operador reactive su capacidad de generación; hasta entonces el render es tooling local del taller y no tiene ruta productiva gobernada`
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -263,25 +324,40 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Fundación: HyperFrames fijado, adaptador y humo con alfa
+### Slice 1 — Fundación en el taller: paquete, HyperFrames fijado, adaptador y humo con alfa
 
-- Fijar `hyperframes` como devDependency exacta (versión vigente verificada con `pnpm view hyperframes version`; hoy
-  `0.6.69` en caché) y confirmar `pnpm exec hyperframes doctor` en verde (Chrome, FFmpeg, Node).
-- `scripts/creative/glitch-motion/lib/tokens.ts`: lee `glitchLine` (incluido `motion` y zonas) y
-  `efeonceGraphicLine.motion` + `axisMotion.ease` desde `@efeoncepro/axis-tokens`; falla cerrado con un error que nombra
-  la clave si falta un valor requerido.
-- `scripts/creative/glitch-motion/lib/edition-to-compositions.ts` (puro): manifiesto de edición validado con el
-  validador de TASK-1923 + tokens → `{ pieceId, format, width, height, fps, durationMs, data, keyframes, zones,
-  hasApple, syncMarkers }` por pieza. Semilla determinista para los bytes = número de edición + id de pieza (la misma
-  que usa el layout hook de TASK-1923).
-- Plantilla base HyperFrames (`scripts/creative/glitch-motion/compositions/_base/`) con `@font-face` local de Bricolage
-  Grotesque y Poppins, fondo transparente, `window.__timelines` síncrono, sin `Math.random`/`Date.now`, y los datos de la
-  pieza inyectados como JSON (`window.__glitch`), no escritos en el HTML.
-- Prueba de humo: una composición mínima (los tres puntos estáticos) renderizada con `--format mov` y `--format webm`;
-  `ffprobe` confirma `yuva444p10le` en el `.mov` y `alpha_mode=1` en el `.webm`; el cuadro extraído con el
-  decodificador `libvpx-vp9` tiene esquinas con alfa 0.
-- Fixture `scripts/creative/glitch-motion/fixtures/edicion-ejemplo.json` con titulares y noticias **de ejemplo**
-  (norma §8), válido contra el esquema de TASK-1923.
+En el repo taller, clonado como hermano de `greenhouse-eo` (`../efeonce-brand-workshop`); en sus archivos versionados
+sólo rutas relativas:
+
+- Crear el paquete `tools/glitch-motion/` con `package.json` `"name": "glitch-motion"`, `"private": true`, scripts
+  `render`, `verify`, `test` y `doctor`, y todas las dependencias con versión exacta (sin `^` ni `~`). Fijar `hyperframes`
+  a la versión vigente verificada con `pnpm view hyperframes version` (hoy `0.6.69` en caché) y confirmar
+  `pnpm -C ../efeonce-brand-workshop --filter glitch-motion doctor` (envuelve `hyperframes doctor`) en verde (Chrome,
+  FFmpeg, Node). Actualizar la fila `glitch-motion/` de `tools/README.md` del taller.
+- Registro del scope `@efeoncepro` (GitHub Packages) para instalar `@efeoncepro/axis-tokens` y
+  `@efeoncepro/axis-brand-assets` en el taller, con el token por variable de entorno y nunca versionado; si TASK-1925 ya
+  dejó un `.npmrc` en la raíz del taller, se reusa.
+- `tools/glitch-motion/src/tokens.ts`: lee `glitchLine` (incluido `motion` y zonas) y `efeonceGraphicLine.motion` +
+  `axisMotion.ease` desde `@efeoncepro/axis-tokens`; falla cerrado con un error que nombra la clave si falta un valor
+  requerido.
+- `tools/glitch-motion/src/edition-manifest.ts`: valida el archivo del manifiesto (o el plan de movimiento) contra la
+  copia versionada del JSON Schema (`tools/glitch-motion/schema/`) con un validador genérico; rechaza un `schemaVersion`
+  o un sha256 de schema que no conozca. No reimplementa reglas de negocio del validador de TASK-1923.
+- `tools/glitch-motion/src/edition-to-compositions.ts` (puro): plan de movimiento validado + tokens →
+  `{ pieceId, format, width, height, fps, durationMs, data, keyframes, zones, hasApple, syncMarkers }` por pieza. La
+  falla en bytes llega **ya resuelta** por Greenhouse (`computeByteFracture` de TASK-1923) en el plan exportado; el
+  taller sólo la anima con los tiempos del token.
+- Plantilla base HyperFrames (`tools/glitch-motion/compositions/_base/`) con `@font-face` de Bricolage Grotesque y Poppins
+  resuelto desde el paquete de AXIS instalado (nunca fuentes versionadas en el taller ni leídas de Greenhouse), fondo
+  transparente, `window.__timelines` síncrono, sin `Math.random`/`Date.now`, y los datos de la pieza inyectados como JSON
+  (`window.__glitch`), no escritos en el HTML.
+- Prueba de humo: una composición mínima (los tres puntos estáticos) renderizada con `--format mov` y `--format webm` a
+  `corridas/<fecha>_glitch-motion-humo/out/` (ignorada por git); `ffprobe` confirma `yuva444p10le` en el `.mov` y
+  `alpha_mode=1` en el `.webm`; el cuadro extraído con el decodificador `libvpx-vp9` tiene esquinas con alfa 0.
+- Fixture `tools/glitch-motion/fixtures/edicion-ejemplo.json` (texto) con titulares y noticias **de ejemplo** (norma §8),
+  válido contra el JSON Schema del manifiesto de TASK-1923.
+- Antes del primer PR: el gate de binarios y rutas absolutas del CI de TASK-1925 existe en el taller o entra en el mismo
+  PR (coordinado con TASK-1925).
 
 ### Slice 2 — Animatic de aprobación: apertura y tarjeta final (GATE del operador)
 
@@ -293,8 +369,9 @@ Reglas obligatorias:
 - Tarjeta final: un mensaje, una acción («Sigue a Glitch»), firma de Efeonce centrada; sin texturas finas (la compresión
   las ensucia).
 - Previews para el operador: MP4 H.264 con los overlays compuestos sobre la toma de prueba del host y un storyboard de
-  cuadros clave (entrada, sincronía, asentado, salida). Viven en `ai-generations/<fecha>_glitch-motion-animatic/`, fuera
-  de git.
+  cuadros clave (entrada, sincronía, asentado, salida). Viven en la corrida del taller
+  `corridas/<fecha>_glitch-motion-animatic/`: `manifiesto.json` y fichas en git; los binarios en `out/` (ignorada) y
+  archivados en GCS por sha256, con la copia para el operador en OneDrive.
 - **Gate:** el operador aprueba la apertura, la tarjeta final y los valores del token que usan. Si pide cambios, se
   cambian en el token de AXIS (TASK-1922 o PR de AXIS), se fija la versión y se vuelve a renderizar. Sin aprobación
   registrada no se ejecuta el Slice 3.
@@ -324,15 +401,16 @@ Reglas obligatorias:
 ### Slice 5 — Subtítulos (post-grabación)
 
 - Única pieza que necesita un segundo insumo: la transcripción con marcas de tiempo por palabra de la toma real
-  (`pnpm exec hyperframes transcribe` local o el STT ya usado en la identidad sonora; ver Open Questions).
+  (`hyperframes transcribe` local desde el paquete del taller o el STT ya usado en la identidad sonora; ver Open Questions).
 - Composición `subtitulo`: Poppins 600, blanco sobre navy al 78 %, una palabra en el acento por frase (criterio de
   elección según Open Question), dentro de la zona de texto (1150–1480 en 9:16).
-- `pnpm glitch:motion -- --manifest <json> --transcript <json>` rinde el clip de subtítulos por formato y refina los
-  timecodes sugeridos del resto del kit con la transcripción.
+- `pnpm -C ../efeonce-brand-workshop --filter glitch-motion render --manifest <json> --transcript <json>` rinde el clip
+  de subtítulos por formato y refina los timecodes sugeridos del resto del kit con la transcripción. La transcripción
+  es texto y vive en la corrida; el audio de la toma nunca entra a git.
 
-### Slice 6 — Verificación automática `pnpm glitch:motion:verify`
+### Slice 6 — Verificación automática (`--filter glitch-motion verify`)
 
-- `scripts/creative/glitch-motion/verify.ts` sobre un manifiesto de entrega:
+- `tools/glitch-motion/src/verify.ts` sobre un manifiesto de entrega:
   - **Duración:** `ffprobe` del clip = `durationMs` declarado ± 1 cuadro; conteo de cuadros = duración × fps.
   - **Alfa real:** `.mov` en `yuva444p10le`; `.webm` con `alpha_mode=1`; en cuadros extraídos con decodificador
     `libvpx-vp9` hay píxeles con alfa 0 y con alfa 255 (un alfa plano en 255 falla) y, en overlays que no son pantalla
@@ -347,34 +425,43 @@ Reglas obligatorias:
     `hasApple=true` no se solapan en el montaje propuesto.
   - **Sin literales:** una prueba recorre `compositions/**` y falla si encuentra duraciones, retrasos, curvas o
     coordenadas numéricas literales en GSAP o CSS de posición (todo debe venir de `window.__glitch`).
-  - Además corre `pnpm exec hyperframes lint --json` e `inspect --json --strict` por composición.
+  - **Sin rutas absolutas:** `entrega.json` y `manifiesto.json` no contienen rutas de una máquina (ni `/Users/…`, ni
+    rutas de OneDrive locales): sólo nombres relativos a la corrida, sha256 y URIs de GCS o referencias de OneDrive.
+  - Además corre `hyperframes lint --json` e `inspect --json --strict` por composición (desde el paquete del taller).
 - Sale con código distinto de cero y un reporte JSON legible si falla cualquier chequeo.
 
-### Slice 7 — CLI `pnpm glitch:motion` y manifiesto de entrega
+### Slice 7 — CLI de render del taller y manifiesto de entrega
 
-- `pnpm glitch:motion -- --manifest <json> [--formats 9x16,16x9] [--pieces …] [--transcript <json>]
-  [--quality draft|high] [--out <dir>] [--preview-plate <png>]` (nombre a confirmar con el operador). Por defecto
-  `--out ai-generations/<fecha>_glitch-edicion-<N>/`.
+- `pnpm -C ../efeonce-brand-workshop --filter glitch-motion render --manifest <json> [--formats 9x16,16x9]
+  [--pieces …] [--transcript <json>] [--quality draft|high] [--run <AAAA-MM-DD_tema>] [--preview-plate <png>]`. Por
+  defecto la corrida es `corridas/<fecha>_glitch-edicion-<N>/` del taller; los binarios se escriben en su `out/`
+  (ignorada por git). Las rutas que recibe por argumento (manifiesto, transcripción, toma de prueba) se usan en tiempo
+  de ejecución y nunca se escriben en un archivo versionado.
 - Por clip: ProRes 4444 `.mov` (master para Premiere, DaVinci o Final Cut) y WebM VP9 con alfa (revisión web);
   opcionalmente MP4 de preview compuesto sobre la toma de prueba. Nombres
   `glitch-e<N>_<pieza>_<formato>[_n<k>]_alpha_prores4444.mov`, etc.
-- Manifiesto de entrega `entrega.json` (esquema `glitch-motion-delivery.v1`): edición, versiones fijadas
+- Manifiesto de entrega `entrega.json` (esquema `glitch-motion-delivery.v1`, versionado en la corrida): edición,
+  versiones fijadas
   (hyperframes, axis-tokens, contrato `efeonce.glitch-line`, esquema del manifiesto), y por clip: id, pieza, formato,
   resolución, fps, códec, `pix_fmt`, duración, cuadros, timecode de entrada sugerido (SMPTE a los fps de la toma),
   texto visible, `hasApple`, zonas usadas, marcadores de sincronía, SHA-256 y estado (`propuesta`/`aprobado`).
+- `manifiesto.json` de la corrida con el formato que define TASK-1925: cada binario por sha256 y su ubicación (URI de
+  GCS y, para la entrega al editor, la referencia de OneDrive). Sin binarios en git.
 - Corre la verificación del Slice 6 al final y no marca la entrega como lista si falla.
 - Si el operador decide la pieza sonora de Glitch, agrega la pista del mnemónico a la apertura y la tarjeta final en
   el marcador de sincronía, nivelada a −14 LUFS y pico −1 dBFS; mientras no, los clips salen mudos con el marcador.
 
 ### Slice 8 — Documentación y skills
 
-- Spec de producción nueva `docs/operations/brand-graphic-line/glitch/GLITCH_MOTION_OVERLAYS_V1.md` (piezas, entregables,
-  cómo se produce, QA, qué no hacer; los números en el token, no en el doc).
+- Spec de producción nueva en Greenhouse `docs/operations/brand-graphic-line/glitch/GLITCH_MOTION_OVERLAYS_V1.md`
+  (piezas, entregables, cómo se produce desde `greenhouse-eo` con `pnpm -C ../efeonce-brand-workshop`, QA, qué no hacer;
+  los números en el token, no en el doc). Ninguna documentación gobernante se escribe en el taller.
 - Deltas: norma de Glitch §7/§9/§10 (estado de piezas aprobadas por el operador, sin adelantar aprobaciones), ADR
   («Trabajo a crear» fila c → TASK-1924), documentación funcional `linea-grafica-glitch.md`, manual
   `componer-piezas-glitch.md` (sección «Overlays en movimiento» paso a paso para el operador y para el editor),
   skill `efeonce-graphic-line/references/glitch.md`, overlay `motion-design-studio/efeonce/EFEONCE_OVERLAY.md` y
-  la nota en `hyperframes-cli` de que `mov` y `png-sequence` existen en `0.6.69`, con espejos en `.codex/skills/`.
+  la nota en `hyperframes-cli` de que `mov` y `png-sequence` existen en `0.6.69`, con espejos en `.codex/skills/`. Las
+  skills siguen en `greenhouse-eo`; nunca se copian al taller.
 
 ## Out of Scope
 
@@ -387,6 +474,9 @@ Reglas obligatorias:
 - Componer o decidir la pieza sonora de Glitch: es decisión de la identidad sonora.
 - Plantillas MOGRT de Premiere: follow-up sólo si el editor necesita editar texto en su programa.
 - Ruta productiva gobernada (command, API, worker, MCP) del render de video.
+- Migrar `scripts/foto` y `scripts/creative/brand-motion` al taller, el CI del taller, el bucket de binarios y el formato
+  de `manifiesto.json`: TASK-1925.
+- Cualquier cambio en `package.json`, `pnpm-lock.yaml`, `scripts/` o `src/` de Greenhouse.
 - Historia 9:16 y carrusel panorámico (EXPLORACIÓN, no canon); acentos teal y naranja.
 - Cambiar la numeración de ediciones o el pipeline editorial (EPIC-031, TASK-1440…1448).
 
@@ -436,6 +526,28 @@ Los `estimatedMs` salen del guion y sólo alimentan los timecodes sugeridos; los
 esquema, no valores. Copy fijo de marca («El micrófono se abre», «GLITCH DROP», «Sigue a Glitch», «El micrófono se
 cierra») sale del contrato o del token de TASK-1922 [verificar dónde lo publica], nunca de la composición.
 
+### Cómo se comparte el manifiesto con el taller
+
+El manifiesto de edición es de Greenhouse (TASK-1923 hoy; el dominio de ediciones de TASK-1442 mañana). El taller lo
+consume **como archivo JSON** y nunca importa ni copia código de Greenhouse (ni el zod de
+`src/lib/glitch-composition/manifest.ts`, ni `computeByteFracture`). Decisión de esta task, a confirmar con la dueña de
+TASK-1923 [verificar]:
+
+1. **El schema es de Greenhouse y se publica como dato.** TASK-1923 genera, desde su zod, un JSON Schema versionado
+   (`glitch-edition-manifest.v<schemaVersion>.schema.json`) y lo deja en su repo junto al ejemplo. No va al contrato de
+   AXIS de TASK-1922: AXIS es dueño de los valores de marca (`glitchLine`, `efeonce.glitch-line`), no del contenido
+   editorial de una edición.
+2. **El taller guarda una copia versionada del JSON Schema** en `tools/glitch-motion/schema/` con su sha256 anotado. Es
+   un archivo de datos, no código, y se actualiza sólo cuando cambia `schemaVersion`. La verificación rechaza un
+   manifiesto cuyo `schemaVersion` no coincide con una copia conocida.
+3. **La falla en bytes llega resuelta.** Greenhouse exporta, junto al manifiesto validado, un **plan de movimiento**
+   JSON con las celdas de `computeByteFracture` por pieza (posición de origen, desplazamiento, opacidad, dirección) y la
+   semilla usada; el taller sólo las anima con los tiempos de `glitchLine.motion`. Así hay una sola implementación del
+   layout de los bytes y el cuadro asentado del video coincide con el PNG estático de `glitch-overlays`. El comando
+   exacto de exportación lo define TASK-1923 (p. ej. una salida adicional de `pnpm glitch:compose`) [verificar].
+4. Si TASK-1923 prefiere otra forma (por ejemplo, publicar el schema en un paquete), esta sección se actualiza con un
+   `## Delta`; lo que no cambia es que el taller no importa código de Greenhouse ni reimplementa sus reglas.
+
 ### Contrato de movimiento que se consume
 
 Claves mínimas que esta task espera en `glitchLine.motion` (nombres finales los fija TASK-1922):
@@ -457,8 +569,10 @@ Si una composición necesita un valor que no está, el agente lo pide en TASK-19
 - Master: ProRes 4444 `.mov`, `yuva444p10le`, alfa directo, sRGB (mismo criterio que los masters de La órbita).
 - Revisión web: WebM VP9 `yuva420p` con alfa.
 - HEVC con alfa (Safari/Keynote) y secuencias PNG sólo si el editor las pide.
-- Los binarios nunca van a git; se archivan con `pnpm media:archive-ai-generation` y se entregan al editor en la
-  carpeta de Glitch en OneDrive [verificar ruta con el operador].
+- Los binarios nunca van a git: se escriben en `out/` de la corrida del taller (ignorada), se archivan en GCS por
+  sha256 con el mecanismo del taller que define TASK-1925 y se entregan al editor en la carpeta de Glitch en OneDrive
+  [verificar ruta con el operador]. `entrega.json` y `manifiesto.json` quedan versionados en la corrida, sin rutas
+  absolutas. `pnpm media:archive-ai-generation` de Greenhouse no aplica (sirve a `ai-generations/`).
 
 ## Rollout Plan & Risk Matrix
 
@@ -469,14 +583,16 @@ Si una composición necesita un valor que no está, el agente lo pide en TASK-19
   de pedir la aprobación del Slice 3 y antes de cerrar el Slice 7.
 - Ningún slice posterior al 2 arranca sin la aprobación registrada de la apertura y la tarjeta final; ninguno posterior
   al 3 sin la aprobación del kit.
-- El Slice 1 no arranca hasta que `@efeoncepro/axis-tokens` publique `glitchLine.motion` y el esquema del manifiesto de
-  TASK-1923 exista en el repo.
+- El Slice 1 no arranca hasta que `@efeoncepro/axis-tokens` publique `glitchLine.motion` y TASK-1923 publique el JSON
+  Schema del manifiesto y el plan de movimiento exportado (ver «Cómo se comparte el manifiesto con el taller»).
+- Ningún código de `tools/glitch-motion/` se integra a `main` del taller sin el CI mínimo de TASK-1925 (sólo
+  `pull_request`: lint + gate de binarios y rutas absolutas).
 
 ### Risk matrix
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| `npx hyperframes` resuelve otra versión y cambian los cuadros | tooling / marca | medium | devDependency exacta; versión registrada en `entrega.json`; líneas base por versión | cuadros clave fuera de tolerancia en `glitch:motion:verify` |
+| `npx hyperframes` resuelve otra versión y cambian los cuadros | tooling / marca | medium | dependencia exacta en `tools/glitch-motion/package.json` del taller; versión registrada en `entrega.json`; líneas base por versión | cuadros clave fuera de tolerancia en `verify` |
 | El WebM pierde el alfa al decodificarse con el decodificador VP9 por defecto de FFmpeg | tooling | high | el verificador fuerza `libvpx-vp9`; el master para el editor es ProRes 4444 | chequeo de alfa real rojo |
 | Bordes oscuros al montar por alfa premultiplicado vs directo | edición | medium | alfa directo documentado; QA sobre negro, blanco y cuadriculado; prueba de importación del editor antes de la primera edición real | reporte del editor |
 | Un overlay pinta sobre la cara del host o la interfaz de la app | marca / publicación | medium | zonas por pieza desde el token; verificación con muestreo denso que falla cerrada | chequeo de zonas rojo |
@@ -487,11 +603,17 @@ Si una composición necesita un valor que no está, el agente lo pide en TASK-19
 | Los clips se rinden a fps distintos de los de la toma (p. ej. 30 contra 29,97) y derivan en el montaje | edición | medium | fps leídos de `video.take.fps` y pasados tal cual a `--fps` (HyperFrames `0.6.69` acepta racionales como `30000/1001`); timecodes sugeridos a esos fps; la verificación compara el `r_frame_rate` del clip con el de la toma | desfase reportado por el editor o `r_frame_rate` distinto en la verificación |
 | Foto de terceros sin licencia en `imagen-fuente` | legal | low | el adaptador rechaza fotos sin crédito y licencia en el manifiesto | error de validación del manifiesto |
 | Líneas base inestables entre máquinas por Chrome distinto | tooling | medium | Chrome propio de HyperFrames fijado por versión; tolerancia sólo antialias; `--docker` si está disponible [verificar] | diferencias sólo en antialias o en toda la pieza |
-| Otra sesión edita `package.json`/`pnpm-lock.yaml` en paralelo | checkout compartido | medium | commits acotados a los paths propios; `git status --short` antes de cada commit | conflicto en `git status` |
+| Un binario (ProRes, WebM, PNG, MP4, fuente) entra a git del taller | taller | medium | salidas sólo en `out/` de la corrida (ignorada); `.gitignore` del taller; gate de binarios del CI de TASK-1925; fuentes desde el paquete de AXIS, nunca versionadas | CI del taller en rojo o `git status` del taller con un binario |
+| Una ruta absoluta de la máquina queda versionada (en `entrega.json`, un fixture o un script) | taller | medium | rutas recibidas sólo por argumento; `entrega.json` con nombres relativos, sha256 y URIs; chequeo «sin rutas absolutas» del Slice 6; gate del CI de TASK-1925 | chequeo del Slice 6 o CI del taller en rojo |
+| El CI del taller sólo corre en `pull_request`: un push directo a `main` salta el gate | taller | medium | todo el código de esta task entra por PR; correr lint y el gate localmente antes de cada commit | commit en `main` del taller sin PR |
+| El token de GitHub Packages para `@efeoncepro/*` queda en un archivo versionado del taller | taller / secretos | low | registro del scope en `.npmrc` sin token; token por variable de entorno | `git diff` del taller con `_authToken` |
+| El manifiesto de Greenhouse cambia de forma y el taller valida contra un schema viejo | contrato de datos | medium | `schemaVersion` + sha256 de la copia del JSON Schema; la validación rechaza versiones desconocidas; `## Delta` cruzado con TASK-1923 | error de schema en el render |
+| El taller se vuelve un segundo Greenhouse (docs gobernantes o servicios ahí) | arquitectura | low | reglas duras del ADR del taller §4; docs sólo en Greenhouse; sin despliegue | un ADR, runbook, servicio o cron en el taller |
 
 ### Feature flags / cutover
 
-Sin flag: herramienta local, additive, sin runtime de producción (repo-only). El cutover es por aprobación del
+Sin flag: herramienta local del repo taller, additive, sin runtime de producción (repo-only; el taller no despliega
+nada). El cutover es por aprobación del
 operador: mientras el kit esté en PROPUESTA, `entrega.json` marca cada clip `propuesta` y la norma no lo lista como
 aprobado; sólo tras el gate del Slice 3 los clips salen `aprobado`.
 
@@ -499,28 +621,33 @@ aprobado; sólo tras el gate del Slice 3 los clips salen `aprobado`.
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
-| Slice 1 | revertir `scripts/creative/glitch-motion/` y la devDependency en `package.json`/`pnpm-lock.yaml` | minutos | si |
+| Slice 1 | revertir el PR del taller que crea `tools/glitch-motion/` (paquete, dependencias y entradas de `pnpm-lock.yaml` del taller); Greenhouse no cambia | minutos | si |
 | Slice 2 | revertir las composiciones `apertura`/`tarjeta-final`; si cambió un valor del token, volver a fijar la versión anterior de `axis-tokens` | minutos | si |
 | Slice 3 | revertir las composiciones del kit y sus líneas base | minutos | si |
 | Slice 4 | revertir las variantes 16:9 | minutos | si |
 | Slice 5 | revertir `subtitulo` y la lectura de `--transcript` | minutos | si |
-| Slice 6 | revertir `verify.ts` y el script `glitch:motion:verify` | minutos | si |
-| Slice 7 | revertir el CLI y el script `glitch:motion`; los clips ya entregados al editor no se retiran solos (se avisa al editor) | minutos | parcial |
+| Slice 6 | revertir `verify.ts` y el script `verify` del paquete del taller | minutos | si |
+| Slice 7 | revertir el CLI y el script `render` del paquete del taller; los clips ya entregados al editor (GCS/OneDrive) no se retiran solos (se avisa al editor) | minutos | parcial |
 | Slice 8 | revertir los deltas de docs y skills | minutos | si |
 
 ### Production verification sequence
 
 Sin runtime de producción (repo-only, no production runtime impact). Verificación en orden:
 
-1. `pnpm exec hyperframes doctor` verde y humo con alfa del Slice 1.
-2. `pnpm glitch:motion -- --manifest scripts/creative/glitch-motion/fixtures/edicion-ejemplo.json --quality draft`
-   rinde todas las piezas habilitadas.
-3. `pnpm glitch:motion:verify` verde sobre esa entrega (duración, alfa, cuadros clave, zonas, una manzana).
+Todos los comandos se corren desde `greenhouse-eo`, con el taller clonado como hermano:
+
+1. `pnpm -C ../efeonce-brand-workshop --filter glitch-motion doctor` verde y humo con alfa del Slice 1.
+2. `pnpm -C ../efeonce-brand-workshop --filter glitch-motion render --manifest tools/glitch-motion/fixtures/edicion-ejemplo.json --quality draft`
+   rinde todas las piezas habilitadas en una corrida del taller (la ruta del manifiesto es relativa al paquete o se
+   pasa por argumento).
+3. `pnpm -C ../efeonce-brand-workshop --filter glitch-motion verify --delivery <corrida>/entrega.json` verde (duración,
+   alfa, cuadros clave, zonas, una manzana, sin rutas absolutas).
 4. Previews sobre la toma de prueba → aprobación del operador (Slices 2 y 3).
 5. Prueba de importación del editor: el `.mov` abre en su programa, el alfa se ve limpio sobre la toma y los timecodes
    sugeridos caen donde dice `entrega.json`.
-6. Primera edición real con su manifiesto → `--quality high` → verificación → entrega.
-7. `pnpm local:check` y `pnpm test` completo antes de cerrar.
+6. Primera edición real con su manifiesto → `--quality high` → verificación → archivo en GCS + entrega por OneDrive.
+7. CI del taller verde en el PR; en Greenhouse, sólo docs y skills: `pnpm task:lint --task TASK-1924`,
+   `pnpm docs:closure-check` y `pnpm local:check` (Greenhouse no tiene código nuevo que probar).
 
 ### Out-of-band coordination required
 
@@ -530,7 +657,11 @@ Sin runtime de producción (repo-only, no production runtime impact). Verificaci
   HEVC con alfa), carpeta de entrega y prueba de importación.
 - Licencia de Guttery para video (operador o legal).
 - Sesión de AXIS / TASK-1922: publicación de `glitchLine.motion` y de las zonas antes del Slice 1; cualquier cambio de
-  valor pedido en los gates pasa por un PR de AXIS.
+  valor pedido en los gates pasa por un PR de AXIS. Fuentes (Bricolage, Poppins, Guttery) en un paquete de AXIS.
+- Sesión de TASK-1923: exportación del JSON Schema del manifiesto y del plan de movimiento con la falla en bytes
+  resuelta.
+- Sesión de TASK-1925: CI mínimo del taller, bucket de binarios, formato de `manifiesto.json` y registro del scope
+  `@efeoncepro` en el taller.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -541,8 +672,15 @@ Sin runtime de producción (repo-only, no production runtime impact). Verificaci
 
 ## Acceptance Criteria
 
-- [ ] `hyperframes` figura como devDependency con versión exacta (sin `^` ni `~`) y `pnpm exec hyperframes doctor` pasa.
-- [ ] Ningún archivo de `src/**` ni de `services/**` importa `hyperframes` ni nada de `scripts/creative/glitch-motion/`.
+- [ ] El paquete `glitch-motion` existe en `tools/glitch-motion/` del taller; `hyperframes` y el resto de sus
+      dependencias figuran en su `package.json` con versión exacta (sin `^` ni `~`) y
+      `pnpm -C ../efeonce-brand-workshop --filter glitch-motion doctor` pasa.
+- [ ] Greenhouse no cambió `package.json`, `pnpm-lock.yaml`, `scripts/` ni `src/` por esta task (sin `hyperframes` ni
+      scripts `glitch:motion*` en Greenhouse); sólo documentación y skills.
+- [ ] El taller no importa ni copia código de Greenhouse: el manifiesto se valida contra la copia versionada del JSON
+      Schema y la falla en bytes llega resuelta en el plan de movimiento exportado por TASK-1923.
+- [ ] `git ls-files` del taller no lista ningún binario (imagen, video, audio, PDF, 3D, fuente) ni ningún archivo con
+      una ruta absoluta de una máquina, y el CI del taller (sólo `pull_request`) está verde en el PR.
 - [ ] Todos los valores de movimiento (duraciones, retrasos, curvas, desplazamientos, punto de sincronía) y las zonas
       vienen de `@efeoncepro/axis-tokens`; la prueba de «sin literales» sobre `compositions/**` pasa y falla si se le
       inyecta un `duration: 0.4` literal.
@@ -567,26 +705,33 @@ Sin runtime de producción (repo-only, no production runtime impact). Verificaci
       tolerancia declarada.
 - [ ] Una pieza que usa Guttery falla con `font_unlicensed` mientras la fuente no esté sellada en la extensión `glitch`.
 - [ ] Una foto sin crédito o sin licencia en el manifiesto hace fallar `imagen-fuente` sin renderizar.
-- [ ] `pnpm glitch:motion` escribe `entrega.json` con, por clip: id, pieza, formato, resolución, fps, códec, `pix_fmt`,
-      duración, cuadros, timecode de entrada sugerido, texto visible, `hasApple`, marcadores y SHA-256.
+- [ ] El render del taller escribe en `corridas/<id>/` un `entrega.json` con, por clip: id, pieza, formato, resolución,
+      fps, códec, `pix_fmt`, duración, cuadros, timecode de entrada sugerido, texto visible, `hasApple`, marcadores y
+      SHA-256, y un `manifiesto.json` con cada binario por sha256 y su ubicación en GCS u OneDrive; los binarios quedan
+      fuera de git.
 - [ ] Con `--transcript`, el clip `subtitulo` resalta exactamente una palabra por frase en el acento y queda dentro de
       la zona de texto.
 - [ ] Los clips de apertura y tarjeta final salen sin pista de audio mientras la pieza sonora de Glitch no esté decidida.
-- [ ] `pnpm glitch:motion:verify` sale con código 0 sobre la entrega del fixture y con código distinto de 0 si se
-      corrompe el alfa, la duración o una zona.
+- [ ] `pnpm -C ../efeonce-brand-workshop --filter glitch-motion verify` sale con código 0 sobre la entrega del fixture y
+      con código distinto de 0 si se corrompe el alfa, la duración o una zona, o si `entrega.json` contiene una ruta
+      absoluta.
 - [ ] El editor abrió un `.mov` en su programa y confirmó alfa limpio y timecodes correctos (evidencia en Handoff).
-- [ ] La spec `GLITCH_MOTION_OVERLAYS_V1.md`, la documentación funcional y el manual tienen la sección de movimiento.
+- [ ] La spec `GLITCH_MOTION_OVERLAYS_V1.md`, la documentación funcional y el manual (todos en Greenhouse) tienen la
+      sección de movimiento y dicen cómo operarlo desde `greenhouse-eo` con `pnpm -C ../efeonce-brand-workshop`.
 
 ## Verification
 
-- `pnpm exec hyperframes doctor`
-- `pnpm exec hyperframes lint --json` e `inspect --json --strict` por composición
-- `pnpm test scripts/creative/glitch-motion`
-- `pnpm glitch:motion -- --manifest scripts/creative/glitch-motion/fixtures/edicion-ejemplo.json --quality draft`
-- `pnpm glitch:motion:verify -- --delivery <out>/entrega.json`
-- `pnpm local:check`
-- `pnpm test` (completo, gate de cierre)
-- `pnpm docs:closure-check`
+Desde `greenhouse-eo`, con el taller clonado como hermano (`../efeonce-brand-workshop`):
+
+- `pnpm -C ../efeonce-brand-workshop install --frozen-lockfile`
+- `pnpm -C ../efeonce-brand-workshop --filter glitch-motion doctor`
+- `pnpm -C ../efeonce-brand-workshop --filter glitch-motion exec hyperframes lint --json` e `inspect --json --strict` por
+  composición
+- `pnpm -C ../efeonce-brand-workshop --filter glitch-motion test`
+- `pnpm -C ../efeonce-brand-workshop --filter glitch-motion render --manifest tools/glitch-motion/fixtures/edicion-ejemplo.json --quality draft`
+- `pnpm -C ../efeonce-brand-workshop --filter glitch-motion verify --delivery <corrida>/entrega.json`
+- `git -C ../efeonce-brand-workshop ls-files` sin binarios ni rutas absolutas; CI del taller verde en el PR
+- En Greenhouse (sólo docs y skills): `pnpm task:lint --task TASK-1924`, `pnpm docs:closure-check`, `pnpm local:check`
 - Revisión del operador sobre previews y storyboard; prueba de importación del editor.
 
 ## Closing Protocol
@@ -600,14 +745,21 @@ Sin runtime de producción (repo-only, no production runtime impact). Verificaci
 
 - [ ] La norma de Glitch §9 refleja sólo las aprobaciones que el operador dio, con fecha.
 - [ ] TASK-1922 y TASK-1923 tienen un `## Delta` si esta task les pidió valores o campos nuevos.
-- [ ] Los binarios de las corridas quedaron archivados con `pnpm media:archive-ai-generation` y fuera de git.
+- [ ] Los binarios de las corridas del taller quedaron en GCS por sha256 (y la entrega en OneDrive), listados en su
+      `manifiesto.json` y fuera de git.
+- [ ] TASK-1925 tiene un `## Delta` si esta task llegó primero al taller o necesitó algo de su CI, bucket o manifiesto.
 
 ## Follow-ups
 
 - **Registro en Marketing Studio (aceptado por el operador, 2026-09-27):** los clips de cada edición se registran como piezas con versión en el calendario orgánico de Marketing Studio.
-- **Hogar del movimiento (abierto, 2026-09-27):** el operador no quiere el render de HyperFrames en Greenhouse y cuestionó AXIS; la recomendación en el ADR de Glitch es que Globe (Efeonce Creative Studio) produzca, AXIS defina los valores y Marketing Studio registre. Esta task se reubica cuando el operador decida.
+- **Hogar del movimiento (resuelto, 2026-09-27):** el render vive en el repo taller `efeoncepro/efeonce-brand-workshop`,
+  `tools/glitch-motion/` ([decisión del taller](../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md)). AXIS
+  define los valores, Greenhouse compone los estáticos (TASK-1923) y guarda el canon, Marketing Studio registra. Globe
+  quedó descartado como ubicación mientras esté hibernado; el taller converge con Globe como paquete cuando Globe
+  reactive su capacidad de generación.
 - Plantillas MOGRT de Premiere si el editor necesita editar texto en su programa.
-- Ruta productiva gobernada del render de video (Efeonce Creative Studio / Globe, o un consumer análogo a TASK-1921).
+- Convergencia del taller con Globe (Efeonce Creative Studio) cuando se reactive, que es también la ruta productiva
+  gobernada del render de video.
 - Pista del mnemónico de Glitch cuando la identidad sonora lo decida.
 - HEVC con alfa y secuencias PNG si el editor las pide.
 - Leer el manifiesto desde el dominio de ediciones de TASK-1442 en vez de un archivo, cuando exista.
@@ -636,10 +788,18 @@ Sin runtime de producción (repo-only, no production runtime impact). Verificaci
    «el #N+1 sale el lunes» de la última frase.~~ **Resuelta el 2026-09-27:** la próxima es la **#17**, en la serie del
    blog y del pipeline editorial; «el #N+1 sale el lunes» toma N del manifiesto.
 9. **16:9:** ¿la noticia y el Drop siguen como pantallas completas o pasan a overlays (norma §7.4 «a revisar»)?
-10. **Instalación:** ¿devDependency exacta de `hyperframes` (recomendado) o `pnpm dlx hyperframes@<versión>`? El
-    paquete descarga su propio Chrome.
+10. ~~**Instalación:** ¿devDependency exacta de `hyperframes` o `pnpm dlx hyperframes@<versión>`?~~ **Resuelta el
+    2026-09-27:** dependencia exacta en `tools/glitch-motion/package.json` del taller (el paquete descarga su propio
+    Chrome y queda aislado de `foto` y `brand-motion` por el workspace `tools/*`); nunca en el `package.json` de
+    Greenhouse.
 11. **Entrega:** ¿carpeta de OneDrive de Glitch para el editor y si quiere también HEVC con alfa?
-12. **Ruta productiva:** ¿basta el CLI local para el flujo semanal o hace falta una ruta gobernada (Creative Studio /
-    Globe o un consumer tipo TASK-1921)?
-13. **Nombre del comando:** `pnpm glitch:motion` / `pnpm glitch:motion:verify` o convivir con `pnpm glitch:compose`
-    de TASK-1923 bajo un prefijo común.
+12. ~~**Hogar y ruta productiva:** ¿basta el CLI local o hace falta una ruta gobernada (Creative Studio / Globe o un
+    consumer tipo TASK-1921)?~~ **Resuelta el 2026-09-27:** el render vive ahora en el repo taller
+    (`tools/glitch-motion/`, CLI local operado desde `greenhouse-eo`); la ruta gobernada llega cuando el taller converja
+    con Globe al reactivarse. No se construye un consumer en Greenhouse.
+13. **Nombre del comando:** los scripts del paquete del taller son `render`, `verify`, `test` y `doctor`
+    (`pnpm -C ../efeonce-brand-workshop --filter glitch-motion <script>`). ¿Hace falta además un alias corto para el
+    operador? Si se agrega, vive en el `package.json` raíz del taller, nunca en Greenhouse.
+14. **Schema del manifiesto:** ¿TASK-1923 acepta exportar el JSON Schema del manifiesto y un plan de movimiento con la
+    falla en bytes resuelta (ver Detailed Spec), o prefiere otra forma que tampoco obligue al taller a importar código de
+    Greenhouse?

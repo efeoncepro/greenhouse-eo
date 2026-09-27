@@ -14,7 +14,8 @@
 > **Decisión:** [ADR `GLITCH_GRAPHIC_LINE_DECISION_V1`](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
 > (sub-línea y piezas aprobadas: `Accepted`; decisiones del operador del 2026-09-27 —manzana y verde, línea Growth,
 > numeración #17, glifos Plastilina—: `Accepted`, ver su [Delta 2026-09-27](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md#delta-2026-09-27--decisiones-del-operador);
-> flujo de composición: `Accepted` el 2026-09-27; hogar del movimiento abierto)
+> flujo de composición: `Accepted` el 2026-09-27; hogar del movimiento decidido: repo taller
+> [`efeoncepro/efeonce-brand-workshop`](../../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md), `tools/glitch-motion/`)
 > **Línea madre:** [Línea gráfica Efeonce «La órbita»](../EFEONCE_GRAPHIC_LINE_V1.md) · [índice de la carpeta](../README.md)
 > **Canvas de referencia (privado):** [«Glitch en La órbita»](https://claude.ai/artifact/N3Yg5cyz2zXa36SwtWVHYS)
 > **Valores en AXIS:** página del Lab `/references/glitch/` y gemelo JSON `/references/glitch.json` del repo
@@ -316,11 +317,11 @@ La foto del host de las maquetas es del banco de marca, generada con IA
 | Línea de servicio Growth y eslogan «Empower your Growth» | **APROBADO** (2026-09-27) |
 | Mnemónico del video | **pendiente**: evaluarlo y aprobarlo (evaluación dedicada) |
 | Lower third del reel y del vlog | **en definición con el operador** |
-| Flujo de composición (Composer + HyperFrames) | **PROPUESTA** de arquitectura ([ADR](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)) |
+| Flujo de composición (Composer + HyperFrames en el repo taller) | **ACEPTADO** 2026-09-27 ([ADR](../../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)); en construcción: TASK-1922, TASK-1923, TASK-1924 |
 
 ---
 
-## 10. Flujo de composición — PROPUESTA
+## 10. Flujo de composición — ACEPTADO (2026-09-27)
 
 El flujo propuesto (canon en Greenhouse, valores y contratos en AXIS, composición con el Artifact Composer y catálogo
 `glitch-edition`, overlays con HyperFrames renderizados a video con alfa, flujo semanal) está descrito en el
@@ -343,7 +344,7 @@ la manzana y el verde (aprobados; falta el token en AXIS, TASK-1922), la línea 
 | Mnemónico del video | evaluarlo y aprobarlo (evaluación dedicada) |
 | Lower third | definir su contenido junto con el operador (en definición) |
 | Guttery | licencia para web y video **confirmada por el operador (2026-09-27)** |
-| Hogar del movimiento | decidir dónde vive el render de HyperFrames (recomendación: Globe produce, AXIS define, Marketing Studio registra) |
+| Hogar del movimiento | **resuelto (2026-09-27):** el render de HyperFrames vive en el repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/` ([decisión del taller](../../../architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md)), operado desde `greenhouse-eo`; AXIS define, Greenhouse compone los estáticos, Marketing Studio registra. Globe descartado como ubicación mientras esté hibernado (el taller converge con Globe al reactivarse) |
 
 ---
 

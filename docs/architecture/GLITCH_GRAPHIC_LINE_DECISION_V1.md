@@ -6,8 +6,9 @@
 > **Tipo de documento:** ADR (decisión de marca y de composición)
 > **Estado:** **Accepted** (2026-09-27) para la existencia de la sub-línea, su alcance y las piezas aprobadas, más las
 > decisiones del [Delta 2026-09-27](#delta-2026-09-27--decisiones-del-operador) (manzana y verde, línea Growth,
-> numeración #17, glifos Plastilina) y el flujo de composición (aceptado por el operador el 2026-09-27; el hogar del
-> movimiento sigue abierto, ver §«Delta — flujo aceptado»)
+> numeración #17, glifos Plastilina) y el flujo de composición (aceptado por el operador el 2026-09-27). El hogar del
+> movimiento quedó **decidido** el 2026-09-27: repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/`
+> ([decisión del taller](./EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md)); ver §«Delta — flujo aceptado»
 > **Creado:** 2026-09-27 por Claude, a pedido del operador (Julio Reyes)
 > **Última actualización:** 2026-09-27 por Claude
 > **Norma operativa:** [`GLITCH_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
@@ -73,13 +74,14 @@ contigo».
 | 5 | Mnemónico en el video de Glitch | hay que **evaluarlo y aprobarlo**; se hará una evaluación dedicada. Nada se decide todavía | **pendiente** (evaluación dedicada) |
 | 6 | Contenido del lower third del reel y del vlog | se define **junto con el operador** (sesión en curso) | **en definición con el operador** |
 | 7 | Licencia de Guttery | el operador aclaró después: «En gutery tenemos licencia» (2026-09-27) | **confirmada**; falta registrar la referencia del contrato |
-| 8 | Paso del flujo de composición de `Proposed` a `Accepted` | «Acéptalo si» | **aceptado** (el hogar del movimiento sigue abierto) |
+| 8 | Paso del flujo de composición de `Proposed` a `Accepted` | «Acéptalo si» | **aceptado** (hogar del movimiento decidido después: repo taller, ver §«Delta — flujo aceptado») |
 
 ## Decisión — flujo de composición
 
 > **Estado: Accepted** (operador, 2026-09-27: «Acéptalo»). Hoy las piezas todavía se arman desde el canvas; el flujo
 > se construye con TASK-1922 (AXIS), TASK-1923 (Composer) y TASK-1924 (movimiento). **El hogar del movimiento
-> (punto 4) queda abierto:** ver §«Delta — flujo aceptado».
+> (punto 4) quedó decidido:** el repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/`; ver §«Delta —
+> flujo aceptado».
 
 Objetivo: **que ningún agente reinterprete la línea.** Los agentes llenan datos; nunca eligen coordenadas ni plantilla a
 mano.
@@ -155,15 +157,25 @@ Se revisó el motor (`src/lib/artifact-composer/catalog.ts`, `compose.ts`, `cont
 
 - **Flujo aceptado** por el operador. Los estáticos se componen en el Artifact Composer de Greenhouse (TASK-1923: el
   motor y su ruta productiva viven aquí; los catálogos son datos).
-- **Hogar del movimiento: abierto.** El operador no quiere cargar Greenhouse con producción de video fuera de su scope,
-  y cuestionó AXIS porque es el design system vivo. Hay una decisión previa que aplica: el 2026-07-11 la producción de
-  video con HyperFrames que se proponía dentro de Greenhouse
-  ([Creative Video Studio](./GREENHOUSE_CREATIVE_VIDEO_STUDIO_V1.md), superseded) se reasignó a **Efeonce Creative
-  Studio (Globe)**, la plataforma hermana que produce y gobierna piezas. Por eso la recomendación es: **AXIS define**
-  (tokens `glitchLine.motion`, contrato, spec de movimiento; nada de render por edición), **Globe produce** (capability de
-  render de plantillas de movimiento, con Efeonce como organización cliente) y **Marketing Studio registra**. Mientras
-  el operador decide, el prototipo de HyperFrames (apertura y tarjeta final) se hace fuera de los repos, como material
-  para aprobar.
+- **Hogar del movimiento: decidido (2026-09-27).** El render de HyperFrames de Glitch vive en el repo taller privado
+  **`efeoncepro/efeonce-brand-workshop`**, en `tools/glitch-motion/`, según la
+  [decisión del taller](./EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) (Accepted por el operador). El reparto queda así:
+  - **AXIS define:** tokens `glitchLine.motion`, zonas, contrato `efeonce.glitch-line` y archivos (TASK-1922). Nada de
+    render por edición en AXIS: es el design system vivo.
+  - **El taller produce el movimiento:** paquete `glitch-motion` con HyperFrames fijado exacto en su propio
+    `package.json`, operado desde sesiones de `greenhouse-eo` con sus skills (`pnpm -C ../efeonce-brand-workshop
+    --filter glitch-motion …`). Las corridas (`entrega.json`, `manifiesto.json`) van a `corridas/` del taller y los
+    binarios (ProRes, WebM) a GCS por sha256 u OneDrive, nunca a git. Sin despliegue ni runtime (TASK-1924).
+  - **Greenhouse compone los estáticos y guarda el canon:** el Artifact Composer renderiza carrusel, stills y overlays
+    PNG (TASK-1923) y exporta el manifiesto de edición como JSON para el taller; la norma, este ADR, la spec de
+    producción del movimiento y las skills siguen aquí. Greenhouse no gana dependencias de video.
+  - **Marketing Studio registra** cada edición como piezas con versión (sin producirlas).
+- **Globe descartado como ubicación** (ni como repositorio para alojar el taller): su CI corre en cada `push`, sus gates
+  de rutas absolutas y bytes nulos barren `git ls-files` (todo el repo) y, según ADR-010, Globe es un **producto
+  comercial**: alojar ahí producción interna la vuelve alcance de hecho mientras su modelo de negocio sigue abierto.
+  Además está hibernado. La reasignación del 2026-07-11 ([Creative Video Studio](./GREENHOUSE_CREATIVE_VIDEO_STUDIO_V1.md),
+  superseded) sigue valiendo como destino de largo plazo: el taller **converge con Globe como paquete** cuando Globe
+  reactive su capacidad de generación. La recomendación anterior («Globe produce») queda reemplazada por esta decisión.
 - **Seguimiento Marketing Studio (aceptado):** cada edición renderizada —el PDF del carrusel, los PNG y los clips— se
   registra en Marketing Studio como piezas con versión en el calendario orgánico, por su API `/api/v1` o su tool MCP.
   Marketing Studio no produce piezas: las registra (su arquitectura §1). Queda como follow-up de TASK-1923 y TASK-1924.
@@ -197,15 +209,14 @@ Se revisó el motor (`src/lib/artifact-composer/catalog.ts`, `compose.ts`, `cont
 
 ## Pendiente
 
-Resueltos el 2026-09-27 (ver Delta): la manzana y el verde, la línea Growth, la numeración (#17) y el alta de los 5
-glifos Plastilina. Siguen pendientes:
+Resueltos el 2026-09-27 (ver Deltas): la manzana y el verde, la línea Growth, la numeración (#17), el alta de los 5
+glifos Plastilina, el flujo de composición (`Accepted`) y el hogar del movimiento (repo taller). Siguen pendientes:
 
 - Aprobación de la lente, el blog (banners + maqueta + callout v2), el vlog 16:9, el reel (kit de overlays) y las
   tarjetas finales.
 - Mnemónico del video: evaluarlo y aprobarlo (evaluación dedicada).
 - Contenido del lower third: en definición con el operador.
 - Licencia de Guttery: confirmada por el operador (2026-09-27); falta registrar la referencia del contrato.
-- Pasar el flujo de composición a `Accepted` (sus tasks ya existen: TASK-1922, TASK-1923, TASK-1924).
 
 ## Reversibilidad
 
