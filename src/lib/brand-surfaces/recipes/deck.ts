@@ -115,8 +115,9 @@ const proposalCinematicService: RecipeBuilder = ({ intent, manifest, recipe }) =
     return { icon: icon.ref, kicker: step.kicker, name: step.name }
   })
 
-  // AXIS exige la fuente cuando la prueba viene (`proof-source-required`); la receta, además, la lleva siempre.
-  if (!content.proof?.text || !content.proof.source) {
+  // La prueba es opcional desde el contrato 0.1.2 (la regla es «cifras sólo con fuente», no «siempre una cifra»).
+  // Cuando viene, va con su fuente: AXIS lo exige (`proof-source-required`) y el builder lo confirma.
+  if (content.proof && (!content.proof.text || !content.proof.source)) {
     throw new SurfacePieceError('La prueba va con su fuente (`proof.text` y `proof.source`).', 'invalid-intent')
   }
 
@@ -145,9 +146,10 @@ const proposalCinematicService: RecipeBuilder = ({ intent, manifest, recipe }) =
     photo: { src: photo.ref, alt: photo.alt },
     voice,
     body: content.body,
-    proof: { text: content.proof.text, source: content.proof.source },
     steps: stepItems
   }
+
+  if (content.proof) slots.proof = { text: content.proof.text, source: content.proof.source }
 
   const selection = selectionSlot(manifest)
 

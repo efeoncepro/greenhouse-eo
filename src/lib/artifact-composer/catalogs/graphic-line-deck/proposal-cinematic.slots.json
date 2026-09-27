@@ -181,7 +181,7 @@
     "proof": {
       "selector": "[data-slot='proof']",
       "type": "object",
-      "required": true,
+      "required": false,
       "shape": {
         "text": {
           "type": "string",

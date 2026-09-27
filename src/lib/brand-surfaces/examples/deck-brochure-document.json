@@ -1,0 +1,150 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "brochure",
+  "line": "growth",
+  "sections": 7,
+  "pages": [
+    {
+      "recipe": "cover-brochure",
+      "layout": "document",
+      "voice": { "eyebrow": "Brochure · Servicios 2026", "question": "¿Qué hace Efeonce?", "answer": ["Crecer"] },
+      "body": "Cinco líneas de servicio: Growth · Brand · Engine · Voice · Revenue",
+      "photo": {
+        "register": "cine",
+        "subject": "nexa",
+        "plateRef": "ai-generations/2026-09-27_brochure/plates/BR1b-portada-orbita-isotipo.png",
+        "alt": "Nexa, con la chaqueta de Efeonce, mira a cámara frente a una órbita de luz teal con una sola esfera"
+      }
+    },
+    {
+      "recipe": "proposal-cinematic",
+      "layout": "service",
+      "line": "brand",
+      "voice": { "eyebrow": "Servicios creativos", "question": "¿Tu marca en cada pantalla?", "answer": ["En todas"] },
+      "body": "Social, campañas, video, motion y creatividad para performance. Una idea que llega a cada formato, con capacidad creativa gobernada.",
+      "proof": { "text": "Sky: +2.000 piezas aprobadas en 12 meses", "source": "deck Sky, caso publicado" },
+      "steps": [
+        { "glyph": "rayo", "kicker": "Empieza aquí", "name": "Creative Sprint" },
+        { "glyph": "paleta", "kicker": "Managed Squad", "name": "Creative Capacity" },
+        { "glyph": "claqueta", "kicker": "Producción", "name": "Creative Studio" }
+      ],
+      "photo": {
+        "register": "cine",
+        "subject": "person",
+        "plateRef": "ai-generations/2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png",
+        "alt": "Una directora creativa con el hoodie de Efeonce dirige con las manos una órbita de pantallas flotantes en formatos story, reel, feed, video y banner, llenas de color"
+      },
+      "selection": { "target": "answer", "label": "Cliente", "participantKind": "department" }
+    },
+    {
+      "recipe": "proposal-cinematic",
+      "layout": "service",
+      "line": "engine",
+      "voice": { "eyebrow": "Web", "question": "¿Para quién es tu web?", "answer": ["Para todos"] },
+      "body": "Para personas, buscadores y agentes de IA: una web que convierte, se encuentra y se deja operar.",
+      "steps": [
+        { "glyph": "web", "kicker": "Empieza aquí", "name": "Web Foundation" },
+        { "glyph": "embudo", "kicker": "Proyecto", "name": "Conversion Website" },
+        { "glyph": "automatizacion", "kicker": "Agentes", "name": "Agent-Ready" },
+        { "glyph": "medicion", "kicker": "On-Going", "name": "Performance Ops" }
+      ],
+      "photo": {
+        "register": "cine",
+        "subject": "person",
+        "plateRef": "ai-generations/2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png",
+        "alt": "Un líder web con el polo de Efeonce acomoda con la mano un módulo dentro de una web holográfica gigante de luz azul, que usan a la vez un cursor, el haz de un buscador y tres agentes mini robots de caras alegres"
+      },
+      "selection": { "target": "answer", "label": "Cliente", "participantKind": "department" }
+    },
+    {
+      "recipe": "proposal-cinematic",
+      "layout": "service",
+      "line": "engine",
+      "voice": { "eyebrow": "AEO", "question": "¿Te encuentra la IA?", "answer": ["Visible"] },
+      "body": "Entre miles de marcas, que ChatGPT, Claude, Perplexity, Gemini y Google te encuentren, te entiendan y te recomienden.",
+      "steps": [
+        { "glyph": "busqueda", "kicker": "Sin costo", "name": "Diagnóstico" },
+        { "glyph": "contenido", "kicker": "Proyecto", "name": "Foundation" },
+        { "glyph": "medicion", "kicker": "On-Going", "name": "Operación" },
+        { "glyph": "informe", "kicker": "Greenhouse", "name": "Plataforma" }
+      ],
+      "note": "Sin promesas de ranking: medimos y mostramos el avance.",
+      "photo": {
+        "register": "cine",
+        "subject": "person",
+        "plateRef": "ai-generations/2026-09-26_deck-aeo/plates/AE2b-la-ia-te-elige-isotipo.png",
+        "alt": "Una estratega SEO con el polo de Efeonce mira a cámara; detrás, entre miles de tarjetas oscuras que se pierden en la distancia, el haz azul de una burbuja de respuesta de IA ilumina una sola tarjeta, que brilla y se adelanta"
+      },
+      "selection": { "target": "answer", "label": "Cliente", "participantKind": "department" }
+    },
+    {
+      "recipe": "proposal-cinematic",
+      "layout": "service",
+      "line": "revenue-hubspot",
+      "voice": { "eyebrow": "RevOps", "question": "¿Tu CRM vende contigo?", "answer": ["Con agentes"] },
+      "body": "HubSpot operado como servicio: marketing, ventas y servicio en un solo motor, con agentes que trabajan dentro de tu CRM.",
+      "steps": [
+        { "glyph": "informe", "kicker": "Sin costo", "name": "Evaluación" },
+        { "glyph": "embudo", "kicker": "Proyecto", "name": "Blueprint" },
+        { "glyph": "crm", "kicker": "Proyecto", "name": "Implementación" },
+        { "glyph": "automatizacion", "kicker": "On-Going", "name": "Operación gestionada" }
+      ],
+      "photo": {
+        "register": "cine",
+        "subject": "person",
+        "plateRef": "ai-generations/2026-09-26_deck-revops/plates/RV1b-motor-de-revenue-isotipo.png",
+        "alt": "Una líder RevOps con la chaqueta de Efeonce mira a cámara y dirige con la mano el nudo brillante de un moño de luz magenta y azul: miles de partículas convergen hacia el nudo y vuelven a abrirse, mientras tres agentes mini robots viajan en el flujo"
+      },
+      "selection": { "target": "answer", "label": "Cliente", "participantKind": "department", "anchor": "bottom-end" }
+    },
+    {
+      "recipe": "proposal-cinematic",
+      "layout": "hero",
+      "voice": { "eyebrow": "Fuerza de trabajo híbrida", "question": "¿Listos para la carrera?", "answer": ["Vamos"] },
+      "body": "Nexa y sus agentes arrancan contigo. Cada agente con su tarea, todos en el mismo equipo.",
+      "photo": {
+        "register": "cine",
+        "subject": "nexa",
+        "plateRef": "ai-generations/2026-09-26_deck-nexa/plates/NX5b-nexa-bionica-isotipo.png",
+        "alt": "Nexa, con traje biónico navy y blanco con el isotipo de Efeonce en el pecho y lentes transparentes azulados, mira a cámara en la partida; cinco mini robots agentes de caras alegres la rodean y al fondo se encienden cinco luces de partida"
+      },
+      "selection": { "target": "answer", "label": "Nexa" }
+    },
+    {
+      "recipe": "proposal-cinematic",
+      "layout": "lines",
+      "voice": { "eyebrow": "Nuestras líneas de servicio" },
+      "body": "Cinco líneas. Una sola relación.",
+      "photo": {
+        "register": "cine",
+        "subject": "nexa",
+        "plateRef": "ai-generations/2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png",
+        "alt": "Nexa, con la chaqueta de Efeonce, mira a cámara mientras cinco esferas de luz en teal, naranja, azul, rojo y magenta orbitan a su alrededor dejando estelas; la naranja flota sobre su palma"
+      },
+      "selection": { "target": "lines", "label": "Nexa" }
+    },
+    {
+      "recipe": "method-staircase",
+      "line": "engine",
+      "voice": { "eyebrow": "AEO · metodología BeX", "question": "¿Te recomienda la IA?", "answer": ["Capa", "por capa"] },
+      "body": "ChatGPT, Claude, Perplexity, Gemini y Google AI Overviews. Subimos tu marca nivel por nivel.",
+      "levels": [
+        { "name": "Be Found", "descriptor": "que te encuentre" },
+        { "name": "Be Readable", "descriptor": "que te entienda" },
+        { "name": "Be Correct", "descriptor": "que te represente bien" },
+        { "name": "Be Actionable", "descriptor": "que pueda actuar" },
+        { "name": "Be Intrinsic", "descriptor": "que te prefiera" }
+      ],
+      "note": "Be Intrinsic es una trayectoria, no una garantía.",
+      "selection": { "target": "level", "level": 3, "label": "SEO · AEO", "participantKind": "department" }
+    },
+    {
+      "recipe": "close-brochure",
+      "layout": "orbit",
+      "voice": { "question": "¿Conversamos?", "answer": ["Cuando", "quieras"] }
+    }
+  ]
+}

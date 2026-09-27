@@ -26,6 +26,8 @@ import { SurfacePieceError, type GraphicLineCatalogName, type SurfacePiecePlan }
 export { SurfacePieceError } from './types'
 export type { GraphicLineCatalogName, SurfaceAssetRequest, SurfacePiecePlan } from './types'
 export type { SurfaceIntent } from './shared'
+export { planSurfaceDocument } from './document'
+export type { SurfaceDocumentIntent, SurfaceDocumentPlan } from './document'
 
 const CATALOG_BY_SURFACE: Record<string, GraphicLineCatalogName> = {
   deck: 'graphic-line-deck',
@@ -59,22 +61,12 @@ export interface PlanSurfacePieceOptions {
   artifactId: string
 }
 
+type ResolvedManifest = SurfaceManifest & { issues?: { code: string; message?: string }[]; status?: string }
+
 export const planSurfacePiece = (intent: SurfaceIntent, options: PlanSurfacePieceOptions): SurfacePiecePlan => {
-  const surfaces = efeonceGraphicLine.surfaces as unknown as Record<string, { recipes: Record<string, Record<string, unknown>> }>
-  const recipe = surfaces[intent.surface]?.recipes?.[intent.recipe]
+  assertApprovedRecipe(intent)
 
-  if (!recipe || recipe.status !== 'approved') {
-    throw new SurfacePieceError(
-      `La receta ${intent.surface}.${intent.recipe} está en «${String(recipe?.status ?? 'desconocida')}». Sólo una receta aprobada por el operador tiene plantilla.`,
-      'recipe-not-approved'
-    )
-  }
-
-  const manifest = resolveSurfaceComposition(intent as never) as unknown as SurfaceManifest & {
-    issues?: { code: string; message?: string }[]
-    status?: string
-  }
-
+  const manifest = resolveSurfaceComposition(intent as never) as unknown as ResolvedManifest
   const issues = manifest.issues ?? []
 
   if (issues.length > 0) {
@@ -85,6 +77,34 @@ export const planSurfacePiece = (intent: SurfaceIntent, options: PlanSurfacePiec
     )
   }
 
+  return planFromManifest(intent, manifest, options)
+}
+
+const recipeTokens = (intent: SurfaceIntent): Record<string, unknown> | undefined => {
+  const surfaces = efeonceGraphicLine.surfaces as unknown as Record<string, { recipes: Record<string, Record<string, unknown>> }>
+
+  return surfaces[intent.surface]?.recipes?.[intent.recipe]
+}
+
+const assertApprovedRecipe = (intent: SurfaceIntent): void => {
+  const recipe = recipeTokens(intent)
+
+  if (!recipe || recipe.status !== 'approved') {
+    throw new SurfacePieceError(
+      `La receta ${intent.surface}.${intent.recipe} está en «${String(recipe?.status ?? 'desconocida')}». Sólo una receta aprobada por el operador tiene plantilla.`,
+      'recipe-not-approved'
+    )
+  }
+}
+
+/**
+ * Del manifest YA resuelto y sin issues al plan de una lámina. Lo comparten la pieza suelta y el documento
+ * (`planSurfaceDocument`), que resuelve todas sus páginas con `resolveSurfaceDocument` antes de planear ninguna.
+ */
+export const planFromManifest = (intent: SurfaceIntent, manifest: SurfaceManifest, options: PlanSurfacePieceOptions): SurfacePiecePlan => {
+  assertApprovedRecipe(intent)
+
+  const recipe = recipeTokens(intent)!
   const outside = OUTSIDE_COMPOSER[`${intent.surface}.${intent.recipe}`]
 
   if (outside) {
