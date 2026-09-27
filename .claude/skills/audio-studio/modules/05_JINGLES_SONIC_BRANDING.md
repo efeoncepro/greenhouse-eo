@@ -119,6 +119,11 @@ push · unboxing/hardware si aplica.
 formato y al **loudness del canal** (módulo 09). Un UI sound se masteriza distinto que un spot de
 radio, pero suenan a la misma marca.
 
+**Sub-marca con sonido propio (caso Glitch, 2026-09-27):** una sub-marca puede tener diseño sonoro y música propios
+que **heredan la melodía-raíz de la madre, transformada** (Glitch toma el Mi · Mi · Mi → La de Efeonce «con un bug»),
+pero su kit **nunca se mezcla** con el de la madre ni se usa en piezas de ella. Detalle: `efeonce/EFEONCE_OVERLAY.md`
+§Glitch.
+
 ## 8. Sinergia con design-studio (audio logo ↔ logo visual)
 
 El sonic branding **no se diseña aislado del branding visual** — son dos caras de la misma

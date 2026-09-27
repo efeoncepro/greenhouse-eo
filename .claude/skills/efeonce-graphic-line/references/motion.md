@@ -60,6 +60,9 @@ script.
   (`efeonce/EFEONCE_OVERLAY.md` §Identidad sonora).
 - **Al canonizar:** sus valores entran a los tokens junto a `efeonceGraphicLine.motion.sound` y se reemplaza el sonido
   de los masters V1.1 (hoy el kit `sonic/v1/masters/03-motion` trae sus propios WAV+MP4 16:9/9:16).
+- **Glitch no es parte de esta identidad:** su diseño sonoro (`glitch/sound/v1/`) y su música (`glitch/music/v1/`,
+  AXIS `/references/glitch/#musica`, taller `tools/glitch-motion/src/music.mjs`) son sólo de Glitch y nunca se mezclan
+  con este kit: [glitch.md](glitch.md) §13.
 
 ## Entregables y dónde están
 

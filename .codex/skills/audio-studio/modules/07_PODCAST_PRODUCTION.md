@@ -109,7 +109,8 @@ spectral repair — el estándar de restauración), **Adobe Podcast / Enhance** 
     corta en un **tiempo fuerte** con un fundido de potencia constante de **30 ms** en la juntura (sin clic);
     **sin EQ de recorte de medios** y **mide los medios** (energía 300 Hz–3 kHz ≥ ~35 %): recortarlos la volvió
     delgada, «arcade» (ver `ANTIPATTERNS.md`). La cama entra con la cabecera de cada noticia y la corta la cortina;
-    los SFX van encima sin atenuar. Detalle: `efeonce-graphic-line` → `references/glitch.md` §13.7.
+    fuera del relato de una noticia (cierre sobre el host, otras tomas del host) la voz va sola; los SFX van encima
+    sin atenuar. Detalle: `efeonce-graphic-line` → `references/glitch.md` §13.7.
 - **Balance entre voces:** iguala loudness percibida entre host e invitado (no dejes que uno
   suene lejos y el otro encima).
 

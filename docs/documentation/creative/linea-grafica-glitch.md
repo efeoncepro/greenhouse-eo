@@ -1,13 +1,16 @@
 # Línea gráfica de Glitch — sub-línea de La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.6
+> **Version:** 1.8
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.6: la música de Glitch quedó aprobada, con música de fondo bajo
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.8: qué recibe el equipo en cada edición, el sonido se toma junto a
+> cada gráfico y qué falta para producir en el día a día; manual nuevo para quien corre el taller; v1.7: la música de Glitch ya está publicada en AXIS y el taller la
+> entrega junto a cada pieza, con el pre-roll de los tres puntos; se suma el porqué de cada decisión y la regla de la
+> música de fondo fuera de las noticias; v1.6: la música de Glitch quedó aprobada, con música de fondo bajo
 > las noticias; v1.5: los gráficos animados del video quedaron aprobados; v1.4: el sonido de Glitch quedó aprobado,
 > versión B)
 > **Documentacion tecnica:** [Norma de la sub-línea de Glitch](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) · [ADR de la línea de Glitch](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
-> **Manual de uso:** [Componer piezas de Glitch](../../manual-de-uso/creative/componer-piezas-glitch.md) · [Editar el video de Glitch](../../manual-de-uso/creative/editar-video-glitch.md)
+> **Manual de uso:** [Componer piezas de Glitch](../../manual-de-uso/creative/componer-piezas-glitch.md) · [Editar el video de Glitch](../../manual-de-uso/creative/editar-video-glitch.md) · [Producir el motion, el sonido y la música de Glitch](../../manual-de-uso/creative/producir-motion-glitch.md)
 
 > **⚠️ Importante: esta línea es SÓLO para Glitch.** No es la línea gráfica de Efeonce. La línea de Efeonce completa es
 > [La órbita](./linea-grafica-efeonce.md). Lo que aquí se describe como propio de Glitch (la manzana, el verde, los
@@ -182,21 +185,48 @@ y desafiante, que toca las mismas tres notas de Efeonce «con un bug» y va al m
 que cada golpe del video cae a tiempo con la música. Son cuatro piezas:
 
 - **Intro:** unos segundos de banda antes de la apertura; se corta en seco cuando empieza la apertura y la banda
-  vuelve a entrar cuando se rompe el tercer punto, con la manzana como el golpe más fuerte.
+  vuelve a entrar cuando se rompe el tercer punto, con la manzana como el golpe más fuerte. Mientras suena esa banda,
+  en pantalla va el **pre-roll**: los tres puntos aparecen, laten uno tras otro al ritmo de las tres notas, se juntan
+  en el tiempo fuerte y el tercero tartamudea en el último tiempo. Su último cuadro es igual al primero de la
+  apertura, así que el paso no se nota. Lo eligió el operador.
 - **Cortina:** un compás corto entre noticia y noticia, que se corta en seco cuando entra la siguiente noticia.
 - **Salida:** acompaña la tarjeta final y se corta con ella.
 - **Música de fondo bajo la noticia:** el operador la pidió porque, con voz sola, «el oyente se va a aburrir». Es un
   post-punk suave que se repite mientras se relata cada noticia, bastante más bajo que la voz, y que baja solo cuando
-  alguien habla. No suena bajo el Drop ni bajo la tarjeta final.
+  alguien habla.
+
+**Dónde no va la música de fondo:** sólo suena mientras se relata una noticia; marca «el tiempo de la noticia». No va
+bajo el cierre del host ni bajo ninguna otra toma del host fuera de las noticias (ahí la voz del host va sola), ni bajo
+el Drop (la manzana es el único sonido grave) ni bajo la tarjeta final (tiene su propia salida).
+
+#### Por qué la música es así
+
+| Decisión | Por qué |
+|---|---|
+| Glitch tiene música, además de sus sonidos | Glitch es un magazine con ritmo: con la voz sola, tres noticias seguidas pierden energía. Los sonidos marcan momentos; la música sostiene el tiempo entre esos momentos |
+| Una banda irreverente y desafiante (la opción B), no una seria y oscura (la A) | Glitch opina sobre las noticias; la A sonaba a película de suspenso tecnológico. La B tiene actitud de banda y suena a opinión. El operador: «Definitivamente la B es la decisión» |
+| Va al mismo ritmo que los gráficos animados | El ritmo se eligió para que cada golpe del video caiga justo en un tiempo de la música. Música y gráficos son una sola pieza; nada se ajusta a ojo |
+| Instrumentos de verdad, no sonidos de sintetizador | Tres versiones hechas con sintetizador se rechazaron porque sonaban a videojuego («muy arcade»). Se midió que les faltaba cuerpo en los sonidos medios; una banda de verdad los llena |
+| Los cortes en seco y los tartamudeos se hacen después, a mano | La falla es la firma de Glitch y tiene que caer exacta; si se le pide a la inteligencia artificial que la haga, la difumina |
+| La apertura y el cierre del sonido van intactos dentro de la intro y la salida | Ya estaban aprobados y son el «bug» de Glitch; la música se arma alrededor de ellos |
+| La música de fondo es post-punk | Es la más cercana a la banda de la intro: es el mismo tema en voz baja, no otra canción. El operador: «Post-punk definitivamente». Las otras opciones sonaban a podcast genérico o a la opción seria que ya se había descartado |
+| No se le quitan los medios a la música para dejar espacio a la voz | Eso fue justo lo que volvió «arcade» a la primera versión. El espacio lo da la música bajando sola cuando alguien habla, y así conserva su cuerpo |
+| Bastante más baja que la voz | Así la voz queda al frente y la música se sigue sintiendo. Es un valor sólo de Glitch, porque esta música tiene más cuerpo que una música de fondo neutra |
+| Nunca se vuelve a generar con inteligencia artificial | Cada vez que se genera sale otra toma distinta. La versión buena es el archivo aprobado; si algo cambia, se hace una ronda nueva y la aprueba el operador |
+| Todo es sólo de Glitch | Igual que la manzana: la música y el sonido de Glitch nunca entran en piezas de Efeonce ni de clientes. La identidad sonora de Efeonce no cambia |
 
 Antes de llegar aquí se descartaron varias versiones que sonaban «arcade», como de videojuego. Se midió por qué: les
 faltaba cuerpo en los sonidos medios. Por eso la regla es usar instrumentos de verdad y no quitarle esos medios a la
 música para hacerle espacio a la voz: ese espacio se lo da la música bajando sola cuando alguien habla.
 
 Hay versión para video y redes y versión para podcast. Los archivos aprobados están guardados en un almacenamiento
-público de Efeonce con una huella para comprobar que no cambiaron; también se van a mostrar en la página de Glitch del
-sistema de diseño AXIS, sección de música, cuando se publique el cambio. Falta que los gráficos animados entreguen la
-música junto a cada pieza y decidir qué se ve durante la intro, antes de la apertura.
+público de Efeonce con una huella para comprobar que no cambiaron, y ya están publicados en la página de Glitch del
+sistema de diseño AXIS, sección de música
+([axis.efeonce.org/references/glitch/#musica](https://axis.efeonce.org/references/glitch/#musica)). El taller de
+gráficos animados **ya entrega la música junto a cada pieza** (la intro con su pre-roll, la cortina, la salida y la
+música de fondo), tomando siempre esos mismos archivos aprobados. **Lo único pendiente** es probar la mezcla con la voz
+real del host en una edición real: la demostración usa una voz provisional, y la música de fondo la baja el editor
+cuando habla el host, con los valores del manual.
 
 > Detalle técnico: [norma §13.12 Música](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1312-música--sólo-glitch-aprobada-tema-b--cama-post-punk) ·
 > montaje en [Editar el video de Glitch](../../manual-de-uso/creative/editar-video-glitch.md#6--montar-el-sonido)
@@ -220,7 +250,7 @@ animarían y exportarían con fondo transparente para que el editor los ponga so
 | Logo de Glitch | `public/branding/glitch/glitch-light.svg` y `glitch-dark.svg` |
 | Gráficos animados del video (aprobados; cada uno con su sonido al lado) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto` (la carpeta conserva su nombre) |
 | Sonido del video (aprobado, versión B) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Motion › piloto › sonido-propuesta` → carpeta `b` (la carpeta conserva su nombre; `a` es la alternativa descartada) · [axis.efeonce.org/references/glitch/#sonido](https://axis.efeonce.org/references/glitch/#sonido) |
-| Música del video (aprobada) | almacenamiento público `glitch/music/v1/` (ver la norma §13.12) · página de Glitch en AXIS, sección de música (se publica con el cambio de AXIS) |
+| Música del video (aprobada) | almacenamiento público `glitch/music/v1/` (ver la norma §13.12) · [axis.efeonce.org/references/glitch/#musica](https://axis.efeonce.org/references/glitch/#musica) · el taller la entrega junto a cada gráfico animado |
 | Guía de tono y voz de Glitch (v3) | OneDrive `Alineación › 5. Contenidos › 09. Glitch › Marca` |
 | Página de Glitch en el sistema de diseño AXIS | publicada en [axis.efeonce.org/references/glitch/](https://axis.efeonce.org/references/glitch/) (2026-09-27) |
 | Línea gráfica de Efeonce (la línea madre) | [La órbita](./linea-grafica-efeonce.md) |
@@ -233,7 +263,7 @@ animarían y exportarían con fondo transparente para que el editor los ponga so
 | Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | ya aprobados (2026-09-27); falta sumarlos al catálogo de AXIS |
 | Piezas en propuesta | aprobar lente y blog (el video y las tarjetas finales ya se aprobaron el 2026-09-27) |
 | Gráficos animados del video | ya aprobados (2026-09-27); falta la cadencia de grabación (hoy 30 cuadros por segundo), la prueba con los editores en una edición real, el ritmo ajustable, dónde se usa la transición de bytes (se recomienda sólo en tarjetas y Drop), el estilo de subtítulos, los textos reales de la #17, el formulario para cambiar textos sin programar, guardar una copia en la nube de Google y cualquier excepción a la regla de rostros |
-| Música de Glitch | ya aprobada (2026-09-27); falta que los gráficos animados la entreguen junto a cada pieza, decidir qué se ve durante la intro antes de la apertura y publicarla en AXIS |
+| Música de Glitch | ya aprobada (2026-09-27), publicada en AXIS y entregada por el taller junto a cada pieza, con el pre-roll de los tres puntos; sólo falta probar la mezcla con la voz real del host en una edición real |
 | Letra Guttery | licencia para web y video confirmada por el operador (2026-09-27) |
 | Producción automática | el video ya se produce solo desde los datos de la edición; falta construir la de piezas fijas (portadas, carrusel, banners: TASK-1923) |
 

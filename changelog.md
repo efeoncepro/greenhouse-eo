@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-27 — Glitch: música aprobada, publicada e integrada (tema B + cama post-punk), sólo Glitch
+
+El operador aprobó la música de Glitch: tema B (intro, cortina y salida: «Me parecen bien todas») y la cama post-punk bajo
+la noticia («Post-punk definitivamente»), que reemplaza «la voz sola bajo las noticias». Los 7 másteres (más versiones web)
+están en el bucket público `glitch/music/v1` con `index.json` y sha256 verificados; AXIS los publica en
+`/references/glitch/#musica` y `glitch.json → music` (PR #10, `87c3298`); el taller los integra con `music.mjs` y un pre-roll
+animado elegido por el operador (`2c8f36c`, `ed89a0b`). Lección medida: lo «arcade» es falta de medios (13 % entre 300 Hz y
+3 kHz contra 45 %); nunca síntesis pura ni recortar medios, el espacio para la voz lo da el ducking. Documentado con sus
+argumentos en la norma de Glitch (§13.12 «Por qué»), el ADR, DECISIONS_INDEX, la documentación funcional, el manual del
+editor, la identidad sonora de Efeonce (sólo punteros), la guía de selección de modelos (ficha §5.9) y las skills
+graphic-line, audio-studio, motion-design-studio, ai-model-selection y axis-design-system (+espejos). Único pendiente:
+probar la mezcla con la voz real del host.
+
 ## 2026-09-27 — AXIS `axis-tokens` 0.3.10: `color.info`, motion de un solo valor y tokens CSS que existen
 
 AXIS corrigió el Lab, que usaba `var(--efeonce-spacing-5)` y `-7`: no existen (la escala publicada es `1/2/3/4/6/8`), y
@@ -594,14 +607,3 @@ transparente, más su fuente oficial (sprite del binario de Claude Code y atlas 
 ahora rellena por defecto los huecos internos que el recorte automático deja en el sujeto (ojos, visores, glifos) y
 conserva los huecos reales de fondo. El método quedó documentado para repetirlo con Nexa; inventario en
 `docs/operations/social/PARTNER_MASCOT_POSE_LIBRARIES.md`.
-
-## 2026-09-17 — Narrativa «Tu IA no conoce tu negocio» y su key visual
-
-Quedó definida la narrativa go-to-market de Efeonce para Q4 2026 – Q3 2027: cinco capítulos de contexto (lo que la IA
-no sabe, datos, lo que la IA dice de ti, equipo agéntico y marca) más una capa de resultados, conectados con todas las
-líneas de negocio (`docs/strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`). Su key visual —Nexa con hoodie
-Efeonce y Clawd en 3D en el hombro, con una selección AXIS sobre «tu negocio.»— quedó programado para el 21/09 en
-LinkedIn e Instagram. Anthropic y OpenAI figuran como partners aceptados. El adapter de selección colaborativa AXIS
-suma una opción de presentación (escala y color por participante, con contraste verificado) y las skills aprenden que
-cambiar el fondo detrás de una persona o mascota se resuelve regenerando la escena, no recortando. Bitácora en
-`docs/operations/social/2026-09-17-kv-tu-ia-no-conoce-production-method.md`.

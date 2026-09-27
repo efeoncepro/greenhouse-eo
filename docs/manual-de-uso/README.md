@@ -29,6 +29,10 @@ La diferencia con otras capas de documentacion:
   con el logo en la imagen), componer con un agente, usar las animaciones de marca (la órbita y las animaciones del
   logo V1.1: qué archivo para qué editor y dónde bajar los masters), usar y pedir un ícono de la marca (Trazo y Plastilina), fotografiar merch u oficina, checklist de revisión, regenerar el
   PDF del manual y problemas comunes (burbuja negra en visores, burbuja-firma bajo 4,5:1, texto que cruza la órbita).
+- [Usar la identidad sonora de Efeonce](creative/usar-identidad-sonora-efeonce.md) — elegir registro (fondo o energía) y
+  pieza (logo, etiqueta con voz, sting/reveal/apertura, pieza larga, cierre de energía), bajar el archivo del kit en AXIS,
+  sincronizar la esfera al golpe o a la palabra final, nivelar al destino y qué no hacer. Estado recomendada; Glitch no usa
+  este kit: tiene su sonido y su música propios, sólo de Glitch.
 - [Componer una pieza por superficie con AXIS](creative/componer-por-superficie-con-axis.md) — web, DOOH, pDOOH,
   motion, video y deck: declarar superficie, formato, papel y receta; **Ruta A** para las 20 recetas aprobadas con
   plantilla, `pnpm brand:compose` (Artifact Composer: PDF del deck, PNG de web/DOOH/motion y capas de video con alfa;
@@ -44,8 +48,8 @@ La diferencia con otras capas de documentacion:
   bytes es exclusiva de Glitch): para el editor en Premiere Pro y After Effects, dónde están los gráficos en OneDrive
   (ProRes 4444 con alfa, 30 fps), apertura y tarjeta final en bucle con su cuadro de sincronía, cada pieza del kit
   (soltar en 0,0, cabecera sostenida con el PNG `_fijo`, plano dividido, rótulo del host sólo la primera vez), la
-  transición entre escenas con Track Matte Key, cómo pedir la versión héroe o un cambio de texto, estados (todo piloto)
-  y problemas comunes.
+  transición entre escenas con Track Matte Key, cómo pedir la versión héroe o un cambio de texto, montar el sonido y la
+  música (intro con su pre-roll, cortina, salida y cama bajo la noticia con ducking), estados y problemas comunes.
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
   lenguaje fotográfico aprobado el 2026-09-19.

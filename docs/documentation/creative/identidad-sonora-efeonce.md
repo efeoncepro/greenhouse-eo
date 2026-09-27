@@ -1,11 +1,11 @@
 # Identidad sonora de Efeonce — Tres puntos que se vuelven uno
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-26 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (Glitch deja de estar pendiente: su sonido propio quedó aprobado, versión B)
-> **Estado:** recomendada por el operador, **todavía no canon**. Glitch tiene su diseño sonoro propio, aprobado (B),
-> sólo de Glitch
+> **Ultima actualizacion:** 2026-09-27 por Claude (v1.3: puntero a la música propia de Glitch, sólo de Glitch; v1.2: Glitch deja de estar pendiente: su sonido propio quedó aprobado, versión B)
+> **Estado:** recomendada por el operador, **todavía no canon**. Glitch tiene su diseño sonoro propio, aprobado (B), y
+> su música propia, aprobada; los dos son sólo de Glitch
 > **Documentacion tecnica:** [Norma de la identidad sonora V1](../../operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md) · [ADR de la identidad sonora](../../architecture/EFEONCE_SONIC_IDENTITY_DECISION_V1.md)
 > **Manual de uso:** [Usar la identidad sonora de Efeonce](../../manual-de-uso/creative/usar-identidad-sonora-efeonce.md)
 
@@ -92,7 +92,7 @@ esta identidad se vuelva canon.
 | Video con locución o webinar | la pieza larga de fondo, bien por debajo de la voz |
 | Lanzamiento, redes con ritmo o evento | la pieza de energía o su cierre corto |
 | Pieza de una sola línea de servicio | el logo o la etiqueta con el instrumento de esa línea |
-| Podcast Glitch | no usa este sonido: Glitch tiene su diseño sonoro propio, aprobado (B), sólo de Glitch (ver abajo) |
+| Podcast Glitch | no usa este sonido: Glitch tiene su diseño sonoro y su música propios, aprobados, sólo de Glitch (ver abajo) |
 | Pantalla de recepción | nada: no lleva sonido |
 | Clientes o la interfaz de Greenhouse | no se usa |
 
@@ -112,7 +112,7 @@ esta identidad se vuelva canon.
 
 | Qué | Dónde |
 |---|---|
-| La norma, con reproductores | [axis.efeonce.org/references/sonic-brand](https://axis.efeonce.org/references/sonic-brand/) (se publica cuando se aprueba el cambio en AXIS) |
+| La norma, con reproductores | [axis.efeonce.org/references/sonic-brand](https://axis.efeonce.org/references/sonic-brand/) (publicada desde el 2026-09-26) |
 | Los archivos para descargar | carpeta pública `sonic/v1/` del almacenamiento de AXIS (enlace en la norma) |
 | La producción y su historia | `ai-generations/2026-09-26_branding-sonoro/` en el repo |
 
@@ -126,6 +126,11 @@ esta identidad se vuelva canon.
   Glitch tiene su **diseño sonoro propio, aprobado (B), sólo de Glitch**: no es parte de la identidad sonora de
   Efeonce, no se usa en piezas de Efeonce y no se mezcla con este kit. Se explica en la
   [línea gráfica de Glitch](./linea-grafica-glitch.md) (detalle en la norma de Glitch §13.11).
+  Desde el mismo día Glitch tiene también **música propia**, aprobada (una intro, una cortina entre noticias, una
+  salida y música de fondo bajo las noticias), **sólo de Glitch**: tampoco es parte de la identidad sonora de Efeonce.
+  Está en la página de Glitch de AXIS, secciones
+  [Sonido](https://axis.efeonce.org/references/glitch/#sonido) y [Música](https://axis.efeonce.org/references/glitch/#musica)
+  (detalle en la norma de Glitch §13.12). La identidad sonora de Efeonce no cambia: sigue recomendada.
 - Falta confirmar las licencias de las herramientas de IA usadas, hacer una prueba de reconocimiento sin logo antes de
   pautar y pasar los valores al sistema de diseño (AXIS) cuando se canonice.
 

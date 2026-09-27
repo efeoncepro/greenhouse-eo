@@ -385,7 +385,8 @@ public bucket `gs://efeonce-group-axis-public-media/sonic/v1/` (`masters/` + `we
   checkout held another session's WIP. The Lab navigation entry merged cleanly next to «Surfaces».
 - **Rules for agents:** use the kit files by URL and verify their `sha256` from the JSON; never regenerate a sound
   that the kit already has. Motif, per-line sphere timbre, voice (Brian) and loudness rules come from the guide, not from
-  memory. **Glitch (podcast) is pending an operator decision** — do not ship or describe it as decided. Never in client
+  memory. **Glitch is not part of this kit:** its own sound design and music (approved 2026-09-27, Glitch only) live in
+  `/references/glitch/#sonido` and `#musica` (`glitch.json` → `sound`, `music`); never mix them with this kit. Never in client
   work or Greenhouse UI. Production and criterion live in Greenhouse: `docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md`
   and `audio-studio` → `efeonce/EFEONCE_OVERLAY.md`.
 

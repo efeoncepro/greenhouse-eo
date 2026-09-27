@@ -3,11 +3,21 @@
 > **Tipo de documento:** ADR (decisión de marca)
 > **Estado:** Proposed (recomendada por el operador 2026-09-26; canonización pendiente)
 > **Creado:** 2026-09-26 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude (Delta: Glitch deja de estar pendiente; su diseño sonoro propio quedó aprobado, versión B)
+> **Última actualización:** 2026-09-27 por Claude (Delta: Glitch tiene también música propia, aprobada y publicada, sólo de Glitch; Delta anterior: Glitch deja de estar pendiente; su diseño sonoro propio quedó aprobado, versión B)
 > **Norma operativa:** [`EFEONCE_SONIC_IDENTITY_V1.md`](../operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md)
 > **Referencia viva:** [axis.efeonce.org/references/sonic-brand](https://axis.efeonce.org/references/sonic-brand/)
 > (PR `efeoncepro/axis-design-system#4`, squash `55486aa`, publicado 2026-09-26)
 > **Relacionada:** [ADR de la línea gráfica «La órbita»](./EFEONCE_GRAPHIC_LINE_ORBIT_DECISION_V1.md)
+
+## Delta 2026-09-27 (tarde) — Glitch: música propia aprobada (fuera de esta decisión)
+
+- Además de su diseño sonoro, Glitch tiene **música propia**, aprobada por el operador el 2026-09-27: tema B (intro,
+  cortina y salida) + cama post-punk bajo la voz de las noticias. Es **sólo de Glitch** y vive en la
+  [norma de Glitch](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md) §13.12; publicada en
+  [axis.efeonce.org/references/glitch/#musica](https://axis.efeonce.org/references/glitch/#musica) (el sonido, en
+  `#sonido`), con sus archivos en `gs://efeonce-group-axis-public-media/glitch/music/v1/`.
+- **No amplía esta decisión** ni la cambia: la identidad sonora de Efeonce sigue **Proposed** («recomendada»). La música
+  de Glitch no se usa en piezas de Efeonce, de su familia ni de clientes, y este kit no se mezcla con ella.
 
 ## Delta 2026-09-27 — Glitch: diseño sonoro propio aprobado, versión B (fuera de esta decisión)
 

@@ -14,7 +14,9 @@
 > Glitch** (tema B + cama post-punk; [Delta — música aprobada](#delta-2026-09-27--música-aprobada)). Lente y blog siguen
 > en propuesta.
 > **Creado:** 2026-09-27 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude (Delta: **música aprobada**, sólo Glitch; antes, Delta del **motion
+> **Última actualización:** 2026-09-27 por Claude ([Delta de la tarde](#delta-2026-09-27-tarde--música-y-pre-roll-integrados-en-el-taller):
+> música y pre-roll **integrados en el taller**, huellas sha256, intro/salida reemplazan a los efectos de apertura y
+> cierre; antes, Delta: **música aprobada**, sólo Glitch; antes, Delta del **motion
 > aprobado**; antes, Delta del diseño sonoro
 > **aprobado, versión B**, sólo Glitch)
 > **Norma operativa:** [`GLITCH_GRAPHIC_LINE_V1.md`](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md)
@@ -218,8 +220,9 @@ Se revisó el motor (`src/lib/artifact-composer/catalog.ts`, `compose.ts`, `cont
 
 Resueltos el 2026-09-27 (ver Deltas): la manzana y el verde, la línea Growth, la numeración (#17), el alta de los 5
 glifos Plastilina, el flujo de composición (`Accepted`), el hogar del movimiento (repo taller) y el diseño sonoro
-(`Accepted`, versión B; ver [su Delta](#delta-2026-09-27--diseño-sonoro-aprobado-versión-b-sólo-glitch)). Siguen
-pendientes:
+(`Accepted`, versión B; ver [su Delta](#delta-2026-09-27--diseño-sonoro-aprobado-versión-b-sólo-glitch)) y la música
+(tema B y cama post-punk, publicada en AXIS e integrada en el taller; ver [su Delta](#delta-2026-09-27--música-aprobada)).
+El único pendiente de la música es probar la mezcla con la voz real del host. Siguen pendientes:
 
 - Aprobación de la lente y el blog (banners + maqueta + callout v2). El vlog 16:9, el reel (kit de overlays) y las
   tarjetas finales quedaron aprobados con el motion el 2026-09-27 ([Delta — motion aprobado](#delta-2026-09-27--motion-aprobado)).
@@ -364,6 +367,45 @@ guarda su sha256); y el código no pasó por PR ni por el CI del taller (commits
   `ai-music.ts` vía fal, `glitch-cama-bucle.mjs`, `master.sh`). Las piezas son grabación re-interpretada más edición:
   la **fuente de verdad son los 17 archivos** del bucket público `gs://efeonce-group-axis-public-media/glitch/music/v1/`
   (con `index.json`; sha256 verificados), separado de `glitch/sound/v1/`. Nunca se regeneran con un modelo.
-- **Pendiente:** integrar la música en el taller (`tools/glitch-motion`, consumiendo los másteres por URL + sha256);
+- **Pendiente (cerrado la misma tarde; ver «Cierre del rollout» abajo):** integrar la música en el taller (`tools/glitch-motion`, consumiendo los másteres por URL + sha256);
   definir el motion del pre-roll de la intro; AXIS `/references/glitch/#musica` y campo `music` de
   `/references/glitch.json`, que se publican con el PR de AXIS; push sólo con la señal del operador.
+- **Por qué (argumentos clave):** el oyente se aburre con voz sola bajo tres noticias (el operador); B suena a opinión
+  y A a thriller serio; 150 BPM hacen que cada golpe del motion caiga en la grilla; banda real y no síntesis porque
+  tres rondas sintetizadas sonaron «arcade» por falta de medios; el espacio para la voz lo da el ducking, no la EQ; la
+  cama post-punk es el tema en voz baja; nunca regenerar, porque otra corrida da otra toma. Tabla completa en la
+  [norma §13.12, «Por qué (argumentos)»](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#por-qué-argumentos).
+- **Regla aclarada:** la cama no va bajo el host fuera de las noticias (tampoco bajo el cierre sobre el host), ni bajo
+  el Drop ni la tarjeta final. La intro y la salida reemplazan a `apertura.wav` y `cierre.wav` (ya los traen).
+- **Cierre del rollout (2026-09-27, tarde):** el pendiente anterior quedó resuelto. **AXIS en producción:** PR #10 de
+  `efeoncepro/axis-design-system` (`87c3298` en `main`) con la sección 09 «Música» y el campo `music` (17 archivos con
+  URL y sha256), más `d393c2e`. **Taller:** `efeonce-brand-workshop` `2c8f36c` y `ed89a0b`, empujados a `main`:
+  `tools/glitch-motion/src/music.mjs` fija los siete másteres por URL + sha256; pre-roll animado de 3,2 s elegido por el
+  operador; `render` y `kit` entregan la música junto al motion (animatic de 48,4 s) y `--music off` la apaga; las
+  entregas sin música quedaron en `v2/sin-musica/` en OneDrive. **Único pendiente:** probar la mezcla con la voz real
+  del host en una edición real.
+
+## Delta 2026-09-27 (tarde) — música y pre-roll integrados en el taller
+
+> **Alcance:** sólo Glitch, nunca Efeonce. Consolida el estado del día; los Deltas anteriores se conservan como
+> historia. Detalle operativo en la [norma §13.2, §13.8, §13.12 y §13.13](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#1313-referencia-de-comandos-y-argumentos).
+
+- **Estado del día:** motion **Accepted**, diseño sonoro **Accepted (versión B)** y música **Accepted** (tema B + cama
+  post-punk), los tres del 2026-09-27. La A del sonido queda descartada (sólo con `--sound a`).
+- **Música integrada en el taller** (`efeonce-brand-workshop` `2c8f36c`, entregas `ed89a0b`, empujados a `main`):
+  `tools/glitch-motion/src/music.mjs` fija los siete másteres del bucket `glitch/music/v1/` por URL con su **huella
+  sha256**; se bajan a una caché local, se verifican y el comando **falla cerrado** si el bucket cambia. **Nunca se
+  regeneran**: si algo cambia, es una ronda nueva que aprueba el operador. `--music on|off` (por defecto `on`).
+- **Pre-roll de la intro: «los tres puntos al ritmo»** (elección del operador entre opciones). 3,2 s = 2 compases a
+  150 BPM, 96 cuadros, opaco, reel y vlog; su último cuadro es idéntico al primero de la apertura (empalme PSNR ∞).
+  Supersede el pendiente «definir el motion del pre-roll» del Delta de la música.
+- **Decisión de montaje: con música, la intro y la salida reemplazan a los WAV de efectos de apertura y cierre**, para
+  no sonar doble (ya los traen montados). Los WAV sin música ya entregados se movieron a `v2/sin-musica/` con un LEEME
+  (no se borraron): son para una edición sin música.
+- **El reel usa los másteres de vlog** (`glitch-intro-reel.wav` = intro de vlog, 7,2 s).
+- **Verificado:** v2 37/37 · kit 95/95 · pre-roll 96 cuadros, opaco y empalme PSNR ∞ · huellas sha256 = las aprobadas ·
+  12/12 pruebas del taller.
+- **Sigue pendiente** (decisión del operador, no bloquea lo aprobado): la prueba de los editores con una edición real y
+  la voz del host (incluye validar el ducking), fps de grabación, a qué piezas va la transición de bytes, subtítulos,
+  parámetro de ritmo, textos reales de la #17, autoservicio (formulario en Marketing Studio y dominio de ediciones,
+  TASK-1442), tokens (TASK-1922), catálogo `glitch-edition` (TASK-1923) y archivo en GCS.

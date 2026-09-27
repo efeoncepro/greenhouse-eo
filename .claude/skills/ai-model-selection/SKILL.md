@@ -33,6 +33,12 @@ description: >-
 — árboles de decisión (§2 imagen, §3 video), matrices comparativas (§4), **fichas por familia** (§5),
 recetas por caso (§6), presupuesto (§7), brechas conocidas (§8) y rankings externos (§9).
 
+**Música de marca** (Stable Audio 2.5 audio-to-audio y text-to-audio, ElevenLabs Music v2.5, vía fal y fuera de
+`pnpm ai:fal`): ficha **§5.9** de la guía, con la evidencia de uso real de la música de Glitch **[verificado
+2026-09-27]**. Método que no se negocia: 🔴 **nunca síntesis pura para música de marca** (sonó «arcade» tres veces) y
+**mide el balance de medios antes de mostrarle nada al operador** (umbral en la ficha); cortes y golpes al cuadro
+se editan después sobre la grabación, no se le piden al modelo. El oficio es de `audio-studio`.
+
 🔴 **Esta skill NUNCA repite una cifra de la guía.** Un precio, una resolución o un cupo de referencias
 copiado acá se desincroniza en silencio y produce lo peor: dos fuentes que se contradicen y ninguna que
 avise. Acá vive el **método**; allá, el **dato**. Si necesitas el número, ábrelo.
