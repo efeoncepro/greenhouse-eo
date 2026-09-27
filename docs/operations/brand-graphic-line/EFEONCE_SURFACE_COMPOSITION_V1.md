@@ -437,6 +437,26 @@ No lleva registro fotográfico ni personas. Los valores (número y proporción d
 `efeonceGraphicLine.surfaces.deck`. Se compone igual que `proposal-cinematic`: `pnpm brand:compose` (§2.1); la
 selección, cuando la lleva, toma un nivel de la escalera (`selection.level`, 1 = el de abajo).
 
+#### Portada y contraportada: foto y sin foto se alternan **[decisión del operador, 2026-09-27]**
+
+> **Si la portada lleva fotografía, la contraportada va sin fotografía, y al revés.**
+
+Vale para el brochure y para el deck de propuesta. Las parejas que cumplen, en la página Deck del
+[canvas por superficie](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7):
+
+| Documento | Portada | Contraportada |
+|---|---|---|
+| Brochure | órbita gigante (sin foto) | Nexa camina hacia la órbita (foto, **aprobada**) |
+| Brochure | Nexa y la órbita, o Nexa y las cinco líneas (foto) | órbita gigante (sin foto) |
+| Propuesta comercial | portada con el logo del cliente dentro de la órbita (sin foto) | Nexa hacia la órbita, o su variante al amanecer (foto) |
+
+Dos reglas más de la misma ronda: **la portada de propuesta comercial lleva espacio para el logo del cliente** (dentro
+de la órbita, espacio fijo, para que el documento se sienta hecho para él) y **la burbuja URL**, alineada con la
+columna de texto; la del brochure no lleva cliente. **El logo de Efeonce de portada y contraportada se lee a 96 px o
+más en un teléfono** (≥ 473 px en 1920: `efeonceGraphicLine.logo.minScreenPx`); las recetas clásicas del contrato
+(230 y 220 px) no llegan y su ajuste se decide en TASK-1927. Estas portadas y contraportadas todavía no son recetas
+del contrato: su formalización en AXIS es parte de TASK-1927 o de un follow-up.
+
 ---
 
 ## 5. Firma y 1:1

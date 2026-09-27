@@ -6,6 +6,18 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+
+## Delta 2026-09-27 — portadas y contraportadas decididas en el canvas
+
+- Regla del operador: **portada con foto ↔ contraportada sin foto, y al revés** (brochure y propuesta). La validación
+  natural es `resolveSurfaceDocument` (issue de documento cuando portada y cierre repiten modo). Detalle y parejas:
+  `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6.
+- La portada de propuesta lleva **espacio fijo para el logo del cliente** dentro de la órbita y la burbuja URL alineada
+  a la columna; el brochure no lleva cliente.
+- Aprobadas en el canvas: contraportada «Nexa camina hacia la órbita» y la página interior «Nuestro equipo».
+  Opciones vivas: portada «órbita gigante», portadas de propuesta con cliente, contraportada «órbita gigante».
+- Medido: el logo de las recetas clásicas (230/220 px) queda en 45–47 px en un teléfono, bajo el mínimo de AXIS de 96 px.
+
 ## Status
 
 - Lifecycle: `to-do`
