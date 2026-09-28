@@ -1,5 +1,9 @@
 # TASK-847 — PostgreSQL Connection Pooling V2: PgBouncer GKE Autopilot Deployment
 
+## Delta 2026-09-28
+
+- TASK-1876 agregó guard por IP en el Firewall de Vercel para `/api/public/**`, `idle_session_timeout=60s` sólo en sesiones de Vercel y lectura del pico `num_backends` en la señal de saturación. Dato para este trigger: picos diarios normales 42–77 de 97 utilizables (sep-2026), ya en la banda warning; una ráfaga distribuida entre muchas IPs no la frena el guard por IP.
+
 ## Status
 
 - Lifecycle: `to-do`

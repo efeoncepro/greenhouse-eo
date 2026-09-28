@@ -40,6 +40,17 @@ límite de concurrencia de la función), revisar `idle_session_timeout` para con
 y/o conexión vía pooler; medir el techo de conexiones por deployment. Mientras tanto: **NUNCA** medir rate limits con ráfagas
 concurrentes contra la instancia compartida; secuenciar las requests.
 
+### Implementado (2026-09-28, TASK-1876 — code complete, rollout pendiente)
+
+- Guard volumétrico en el Firewall de Vercel: 20 req/10 s por IP en `/api/public/` (enforce en staging/preview,
+  observe en producción). Fuente `src/lib/security/public-burst-guard/firewall-rules.ts`; `pnpm security:public-burst-guard`.
+- `idle_session_timeout=60s` sólo en sesiones de Vercel (opción de arranque; el rol conserva 5 min por los workers).
+- La señal `runtime.postgres.connection_saturation` lee el pico de 24 h de `num_backends` (Cloud SQL), que registró
+  99 a las 11:05Z de este incidente. Alerta `num_backends > 85` por 2 min documentada.
+
+Pendiente para cerrar: aplicar las reglas WAF, crear la alerta, `roles/monitoring.viewer` para el portal, deploy a
+staging y la ráfaga controlada. Pasos: `docs/manual-de-uso/plataforma/operar-guard-rutas-publicas-y-saturacion-postgres.md`.
+
 ## Verificación
 
 Reproducir en staging con ráfaga controlada tras el fix y observar `pg_stat_activity` (conexiones `greenhouse_app` por
@@ -47,7 +58,7 @@ debajo de un techo definido) y que la base siga aceptando conexiones de producci
 
 ## Estado
 
-open
+open — code complete (TASK-1876), rollout y verificación pendientes
 
 ## Relacionado
 

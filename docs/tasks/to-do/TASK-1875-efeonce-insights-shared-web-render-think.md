@@ -1,5 +1,9 @@
 # TASK-1875 — Efeonce Insights: vista web compartida renderizada en Think (efeonce-think)
 
+## Delta 2026-09-28
+
+- TASK-1876: `/api/public/**` queda detrás de un rate limit del Firewall de Vercel (20 req/10 s por IP; enforce en staging/preview, observe en producción). Si Think lee el reader público server-side desde pocas IPs de runtime, **exceptuarlo con una condición explícita** (cabecera/credencial de Think) en `src/lib/security/public-burst-guard/firewall-rules.ts` y aplicar con `pnpm security:public-burst-guard --apply`; nunca subir el límite para todos.
+
 ## Delta 2026-09-26
 
 - TASK-1888 complete y en producción con `INSIGHTS_EDITORIAL_V2_ENABLED` ON: las ediciones nuevas ya sellan planes v2,

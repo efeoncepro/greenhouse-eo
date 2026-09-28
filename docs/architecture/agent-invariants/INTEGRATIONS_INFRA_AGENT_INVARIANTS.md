@@ -205,6 +205,9 @@ ico-batch                                                          (TASK-846 Sli
 - **NUNCA** invocar `Sentry.captureException` directo en code path `src/lib/postgres/`. Usar `captureWithDomain(err, 'cloud', ...)`.
 - **SIEMPRE** que emerja un nuevo runtime que necesite Postgres, usar `getGreenhousePostgresConfig()` que detecta runtime automáticamente. Override via env vars `GREENHOUSE_POSTGRES_MAX_CONNECTIONS` / `GREENHOUSE_POSTGRES_IDLE_TIMEOUT_MS` solo con razón documentada.
 - **SIEMPRE** monitorear `runtime.postgres.connection_saturation` en `/admin/operations`. Steady < 30% (V1 funcional). Sustained > 60% → escalar a TASK-847 V2 deployment.
+- **NUNCA** bajar el `idle_session_timeout` del rol `greenhouse_app` para resolver conexiones de Vercel (TASK-1876): el rol lo comparten los workers de Cloud Run, que guardan trabajo de sesión en conexiones ociosas (advisory lock de Nubox). El pool de Vercel pide `idle_session_timeout=60s` por conexión con la opción de arranque (`GREENHOUSE_POSTGRES_SESSION_IDLE_TIMEOUT_MS`, nunca `0` del lado servidor).
+- **NUNCA** proteger una ruta pública sin sesión sólo con un rate limiter que consulte la base: consume una conexión antes de rechazar (ISSUE-174). El guard volumétrico vive en el Firewall de Vercel, versionado en `src/lib/security/public-burst-guard/firewall-rules.ts` y sincronizado con `pnpm security:public-burst-guard`; **NUNCA** editar esas reglas a mano en el dashboard ni subir el límite global para dejar pasar a un consumidor server-side (se exceptúa con condición explícita).
+- **NUNCA** medir límites con ráfagas concurrentes contra la instancia compartida sin ventana acordada; la saturación se lee de la métrica nativa `cloudsql.googleapis.com/database/postgresql/num_backends`, que no necesita conexión.
 
 **Defense-in-depth V1 (3 capas)**:
 

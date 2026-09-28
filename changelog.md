@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-28 — Rutas públicas: guard en el Firewall de Vercel y conexiones de Vercel acotadas (TASK-1876, code complete)
+
+- Reglas versionadas del Firewall de Vercel para `/api/public/**` (20 req/10 s por IP; enforce en staging/preview,
+  observe en producción) en `src/lib/security/public-burst-guard/firewall-rules.ts`, sync con `pnpm security:public-burst-guard`.
+- Las sesiones PostgreSQL de Vercel piden `idle_session_timeout=60s`; el rol `greenhouse_app` conserva 5 min por
+  los workers. La señal de saturación lee el pico de 24 h de `num_backends` de Cloud SQL. Rollout pendiente (ISSUE-174).
+
 ## 2026-09-28 — Los slots de datos del deck «La órbita» se ligan desde Greenhouse (TASK-1930, parcial)
 
 - `bindDeckSlots(plan, context)` (`src/lib/brand-surfaces/deck-recipes/bindings/`) llena logo del cliente (Account
@@ -652,13 +659,3 @@ el laboratorio de Customer Agent como enablement de clientes, la denominación C
 técnico de Developer Platform 2026.09: Projects y Conversations API GA, 44 APIs actualizadas y nuevas betas públicas.
 Se mantuvieron los gates: demo/private beta no equivale a GA, pricing, entitlement ni runtime; no se activó ningún
 portal, write, conexión o campaña.
-
-## 2026-09-18 — TASK-1832 retira la corrida canary y apaga sus gates
-
-Se revocó la authority del canary sintético, el cleanup sujeto-específico borró todo el grafo run-owned
-y preservó el cliente compartido de ChatGPT/Codex y los artefactos de otros sujetos. El apply ahora usa el
-perfil PostgreSQL `ops`. Las dos puertas canary quedaron en `false` en todos sus runtimes, con lectura en la
-revisión servida: auth-server `00076-t2t`, Vercel Production y gateway `00056-kgs`. Runbook, manual, matriz,
-manifiesto, ledger y skill `efeonce-mcp-platform` (espejo) quedaron actualizados. Además se documentó el diagnóstico —buen canary,
-retiro mal diseñado— y las reglas para la próxima corrida: clientes OAuth compartidos clasificados desde el día 0,
-señales y muestras por sujeto sin huecos, dry-run con el perfil del apply y gates inventariados al abrir.

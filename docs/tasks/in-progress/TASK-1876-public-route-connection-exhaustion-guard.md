@@ -6,6 +6,13 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-28 — decisiones de Discovery (arch-architect)
+
+- Guard en el **Firewall de Vercel**, no en `src/proxy.ts` (contador por instancia no ve ráfagas repartidas). Sin env flag: `mode` por regla. Staging/preview `enforce`, producción `observe`.
+- **Sin `ALTER ROLE`**: `greenhouse_app` lo usan Vercel + 4 workers Cloud Run; `sync-nubox-quotes-hot.ts:175` guarda un advisory lock de sesión en conexión ociosa. Timeout de 60 s por conexión sólo en Vercel.
+- **Detección con la métrica nativa** `num_backends` (no necesita conexión; el detector por `pg_stat_activity` falla al saturarse) + alerta Cloud Monitoring.
+- Costo: WAF acotado a `/api/public/` (bajo volumen) + alerta (~USD 0,10/mes); PgBouncer descartado (TASK-847).
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -21,7 +28,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `En ejecución 2026-09-28 — Discovery cerrado; decisión: WAF de Vercel + timeout de sesión sólo Vercel + alerta num_backends`
+- Status real: `Code complete 2026-09-28, rollout pendiente — slices 1–3 committeados (36ddfb382, f2cd62afe, 0a223a5f3) y docs; faltan apply WAF, alerta, roles/monitoring.viewer, deploy a staging y ráfaga controlada (bloqueados por permiso: operador)`
 - Rank: `TBD`
 - Domain: `platform|reliability|data|security`
 - Blocked by: `none`
@@ -283,13 +290,13 @@ paralelas antes de ejecutarlos.
 
 ## Acceptance Criteria
 
-- [ ] Una ráfaga controlada de N requests concurrentes a `/api/public/**` en staging no eleva las conexiones `greenhouse_app` por sobre un techo documentado.
-- [ ] El guard responde `429` con `Retry-After` sin abrir conexión a PostgreSQL (verificado con test y con `pg_stat_activity`).
-- [ ] El tráfico server-side de Think al reader público no es bloqueado por el guard.
-- [ ] `idle_session_timeout` del rol runtime queda en el valor decidido, con readback y Down probada, sin `57P05` inesperados en workers.
-- [ ] `runtime.postgres.connection_saturation` registra un pico que ocurre sin que nadie abra el overview.
-- [ ] `PUBLIC_BURST_GUARD_ENABLED` registrado en el ledger de flags con su runtime.
-- [ ] `ISSUE-174` movido a `resolved/` con evidencia; decisión registrada en `GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md`.
+- [ ] Una ráfaga controlada de N requests concurrentes a `/api/public/**` en staging no eleva las conexiones `greenhouse_app` por sobre un techo documentado. — **Pendiente:** requiere reglas WAF aplicadas + deploy en staging; procedimiento en el manual §6 (techo: ≤30 requests, abortar si base > 50).
+- [ ] El guard responde `429` con `Retry-After` sin abrir conexión a PostgreSQL (verificado con test y con `pg_stat_activity`). — **Parcial:** tests prueban la partición de reglas por host/path (`firewall-rules.test.ts`); el `429` del borde por diseño no invoca la función. Falta evidencia viva: el apply del WAF fue denegado por el clasificador de permisos 2026-09-28.
+- [ ] El tráfico server-side de Think al reader público no es bloqueado por el guard. — **No verificable aún:** Think (TASK-1875) no existe; contrato: se exceptúa con condición explícita en `firewall-rules.ts`, nunca subiendo el límite (delta en TASK-1875).
+- [ ] `idle_session_timeout` del rol runtime queda en el valor decidido, con readback y Down probada, sin `57P05` inesperados en workers. — **Recalibrado:** no `ALTER ROLE` (el rol lo comparten los workers con locks de sesión); 60 s por conexión sólo en Vercel. Readback local contra PG real: Vercel `1min`, resto `5min`. Rollback = `GREENHOUSE_POSTGRES_SESSION_IDLE_TIMEOUT_MS=0`. Falta verlo en staging tras deploy.
+- [ ] `runtime.postgres.connection_saturation` registra un pico que ocurre sin que nadie abra el overview. — **Code complete:** lee el pico de 24 h de `num_backends` (Cloud SQL registró 99 en ISSUE-174); falta `roles/monitoring.viewer` para `greenhouse-portal@` (hoy degrada a «no disponible») y crear la alerta.
+- [x] ~~`PUBLIC_BURST_GUARD_ENABLED` registrado en el ledger de flags~~ — **Superado por diseño:** no hay env flag; el modo por regla (`observe`/`enforce`) en `firewall-rules.ts` es la palanca, versionada y con readback.
+- [ ] `ISSUE-174` movido a `resolved/` con evidencia; decisión registrada en `GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md`. — **Parcial:** decisión registrada (§V1.3); ISSUE-174 sigue open hasta la ráfaga de verificación.
 
 ## Verification
 

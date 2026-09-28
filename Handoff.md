@@ -2,6 +2,8 @@
 
 TASK-1863: staging; main retenido.
 
+**Rutas públicas / conexiones PG (28/09):** [TASK-1876](docs/tasks/in-progress/TASK-1876-public-route-connection-exhaustion-guard.md) code complete, rollout pendiente (ISSUE-174 open): falta `pnpm security:public-burst-guard --apply`, alerta `num_backends`, `roles/monitoring.viewer` a `greenhouse-portal@`, deploy a staging y ráfaga controlada ([manual](docs/manual-de-uso/plataforma/operar-guard-rutas-publicas-y-saturacion-postgres.md)). El apply WAF lo bloqueó el clasificador: lo corre el operador.
+
 **DataForSEO CLI (28/09):** [TASK-1935](docs/tasks/complete/TASK-1935-dataforseo-daily-operator-cli.md) complete con `research` SEO/AI gobernado y reanudable y `serp-compare` transversal para entidades/aliases/múltiples dominios; Organic Live se serializa a una task por request y el smoke final desktop/mobile cerró ambas tasks `20000` por USD 0,0055. [TASK-1651-A](docs/tasks/in-progress/TASK-1651-growth-seo-dataforseo-ai-optimization-llm-sov-foundation.md) operativa: CHECK aplicado/validado y canary AEO USD 0,0101 con resume sin recompra. El [registro catalog-only](docs/architecture/GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md) documenta 225 rutas bloqueadas (216 de producto + 9 de infraestructura/plantillas) y su posible habilitación sin ampliar el allowlist. `1651-B` no iniciada; sin push/deploy.
 
 **Ruta productiva de marca (28/09):** [TASK-1921](docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) en staging (flag ON, 6 catálogos + Insights verdes); federación en efeonce-mcp#22 sin merge; no promover a main.
