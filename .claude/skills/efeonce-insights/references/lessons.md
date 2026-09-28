@@ -1,11 +1,12 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
 - **2026-09-28 · marca + AXIS · La copia a mano de los roles de color ya divergió.** Síntoma: el dato «anterior» sobre
-  papel es `#1f9e94` (`--axis-deck-teal-650`, `editorial-roles.json`) en los PDF y `#0e8c82` (`orbita.accentLight`,
-  `efeonce-think/src/lib/insights-tokens.ts`) en la web; «actual» en papel y los dos roles en navy coinciden. Nadie lo
-  decidió: es el costo de dos copias sin fuente común. Regla: antes de tocar un color de dato en un consumidor, compara
-  los dos; no unifiques sin decisión del operador; la salida es extraer los roles a AXIS (follow-up en
-  [`ui-and-brand.md`](ui-and-brand.md) §1), no otra copia.
+  papel era `#1f9e94` (`--axis-deck-teal-650`, `editorial-roles.json`) en los PDF y `#0e8c82` (`orbita.accentLight`,
+  `efeonce-think/src/lib/insights-tokens.ts`) en la web. Era un desvío de Think: se corrigió el mismo día
+  (efeonce-think `b3c5820`, producción) al valor del PDF, `#1f9e94`, y se recapturó el dossier (greenhouse-eo
+  `24571e566`). Es el costo de dos copias sin fuente común. Regla: antes de tocar un color de dato en un consumidor,
+  compara los dos; el valor de referencia es el rol de `editorial-roles.json`; la salida duradera es extraer los roles
+  a AXIS (follow-up en [`ui-and-brand.md`](ui-and-brand.md) §1), no otra copia.
 - **2026-09-28 · marca + AXIS · Publicar la marca en AXIS no la pone en ninguna superficie.** `axis-brand-assets` 0.4.0
   trae `insights-{logo,isotype,lockup}-*`, pero Greenhouse fija 0.3.5, las portadas A4/deck componen una versión
   tipográfica («INSIGHTS» en versalitas junto al logo de Efeonce) en vez del archivo oficial, el correo usa

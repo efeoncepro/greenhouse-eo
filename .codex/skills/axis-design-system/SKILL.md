@@ -596,10 +596,10 @@ What AXIS holds for Efeonce Insights, and nothing more:
   `GRAPHIC_LINE_ORBIT_COMPOSITION_DECISION_V1.md` §Adapters; Lab §Boundary).
 - **Extraction candidates — follow-up, not implemented:** there are already two consumers with hand copies of (1) the
   data-color roles (`greenhouse-eo/src/lib/artifact-composer/brand-packs/axis/editorial-roles.json` ↔
-  `efeonce-think/src/lib/insights-tokens.ts`, already diverging on «prior on paper»: `#1f9e94` vs `#0e8c82`) and (2) the
+  `efeonce-think/src/lib/insights-tokens.ts`; they once diverged on «prior on paper», fixed in Think `b3c5820` to `#1f9e94`) and (2) the
   geometry of the 15 chart families (`greenhouse-eo/src/lib/artifact-composer/chart-geometry.ts` +
   `catalogs/insights-shared/figure-svg.ts` ↔ `efeonce-think/src/lib/insights-chart-geometry.ts`). Extracting them needs
-  its own decision and task; never add them to AXIS inline, and never resolve the color divergence without the operator.
+  its own decision and task; never add them to AXIS inline.
 - **Known drift:** the root README table and `docs/ARCHITECTURE.md` §Official brand files («0.3.0 … 19 SVGs») still
   describe older `axis-brand-assets` versions.
 - Detail of the report and the live UI: `efeonce-insights` → `references/ui-and-brand.md`.

@@ -32,9 +32,10 @@
 - **Candidatos reales a extraer** (ya hay DOS consumidores con copias a mano) — follow-up, no implementado:
   1. **Roles de color de datos**: `greenhouse-eo/src/lib/artifact-composer/brand-packs/axis/editorial-roles.json`
      (roles `dataCurrent/Prior/Opportunity/Absence{OnPaper,OnNavy}`, `dataHighlightOnNavy`) copiados en
-     `efeonce-think/src/lib/insights-tokens.ts` (`dataRoles`). **La copia ya divergió**: el dato «anterior» sobre papel
-     es `--axis-deck-teal-650` `#1f9e94` en los PDF y `orbita.accentLight` `#0e8c82` en Think (actual en papel
-     `#023c70` y los dos roles en navy coinciden). Qué valor manda no está decidido; no lo «arregles» sin decisión.
+     `efeonce-think/src/lib/insights-tokens.ts` (`dataRoles`). La copia llegó a divergir (el dato «anterior» sobre
+     papel era `#0e8c82` en Think); **resuelto 2026-09-28** (efeonce-think `b3c5820`, en producción): Think usa
+     `#1f9e94` (`--axis-deck-role-dataPriorOnPaper` / teal-650), igual que los PDF; 3,3:1 como relleno sobre blanco.
+     Ese desvío es justamente el riesgo de tener dos copias sin fuente común.
   2. **Geometría de las 15 familias**: `greenhouse-eo/src/lib/artifact-composer/chart-geometry.ts` +
      `catalogs/insights-shared/figure-svg.ts` frente a `efeonce-think/src/lib/insights-chart-geometry.ts` +
      `src/components/insights/ChartFigure.astro`. Regla vigente mientras no se extraiga: la geometría de la web nunca
@@ -240,7 +241,7 @@ partial-first-fold, present-cover/finding (sólo desktop), status-not-found/gone
 2. Greenhouse fija `axis-brand-assets` 0.3.5; los archivos de Insights llegan desde 0.4.0.
 3. `docs/operations/brand-graphic-line/**` y `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md` no mencionan
    la marca de Insights; el OG y el favicon no están documentados.
-4. Roles de datos y geometría de gráficos duplicados en dos consumidores, con una divergencia ya medida (§1).
+4. Roles de datos y geometría de gráficos duplicados en dos consumidores; ya produjeron una divergencia de color (resuelta en Think, §1).
 5. Doc funcional `docs/documentation/insights/efeonce-insights-dominio-ediciones.md:26` dice «Todavía no existe la vista
    web» (contradice sus líneas 16-20); el flujo maestro EPIC-045 aún marca S6 «sin desplegar» y TASK-1875 in-progress.
 6. Drift en AXIS: la tabla del README raíz y `docs/ARCHITECTURE.md` §Official brand files («0.3.0 … 19 SVGs») no
