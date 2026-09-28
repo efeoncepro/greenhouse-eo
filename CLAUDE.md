@@ -72,7 +72,7 @@ Al tocar licitaciones, cargar `COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` + §0 de 
 el deck es el catálogo `catalogs/deck-axis/`, brand/font pack `axis`, cero HEX/fuentes literales,
 render hermético). Un autor/agente nunca elige `template` (selector + `TemplateAuthorityError`); sólo
 el `ResolvedCompositionManifest` llega a render. Gates al tocar el dominio: `pnpm composer:visual-gate`
-a CERO píxeles (rebaseline sólo declarado en la sección nueva sin sellar de `BASELINE_DELTAS.md`) + suite del paquete. El aggregate
+a CERO píxeles (rebaseline sólo en sección sin sellar de `BASELINE_DELTAS.md`) + suite del paquete. El aggregate
 `Proposal` (`greenhouse_commercial.proposal*`) opera con gates humanos en DB, entitlement per-ORG
 `proposal_studio_v1` y el loop propose → confirmación humana → command canónico: el LLM no escribe ni
 cruza gates; escrituras sólo vía `src/lib/commercial/tenders/proposals/**`. El render corre sólo en el
