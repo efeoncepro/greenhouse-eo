@@ -302,6 +302,41 @@ no resuelve este caso: sólo firma si el logo ya está en la imagen, y sobre un 
 Detalle: [firma y primer plano](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md)
 y [brand-in-scene](../../social-media-studio/references/brand-in-scene.md).
 
+### El lecho en el registro cine: un objeto excusa, nunca una banda **[operador, 2026-09-28]**
+
+> «el lecho no es un simple blur sino un "objeto excusa" que permita poner de forma no forzada el logo (firma) abajo
+> en todas las dimensiones» — operador, canvas de Marketing con Manzanitas (2026-09-28).
+
+En cine rige la misma ley que en la documental: el lecho es **un objeto del oficio con nombre y materia**, planeado
+desde la toma, que explica **desde dónde miramos**. Los rechazos del 2026-09-28
+(`ai-generations/2026-09-28_manzanitas-cine/`) muestran cómo se rompe **[medido]**:
+
+| Intento | Qué salió | Regla que rompió |
+|---|---|---|
+| Mesa «matte black» en un «empty dark studio… no mugs, no notebooks», cámara a 2 m sin anclar al objeto | Banda negra sin materia: se lee como blur | La lista de vacíos le quitó la materia al objeto. Nombra el objeto y su materia, y ancla la cámara a él: *«the lens only a few centimetres behind its near edge»* (catálogo de cámaras: la posición pesa más que el lente) |
+| Cabezas del público de espaldas, a 2 m con 85 mm | Manchas enormes que suben al 68 % del alto y tapan al sujeto; entre ellas se ven las piernas justo donde va la firma | «Cabezas del público» sólo vale en **escenario con tele 200 mm desde lejos** (catálogo de lechos de la firma) |
+| Dorso del portátil abierto del cliente y un cuaderno | «Se ve como un cuadrado» | **Soporte prohibido** desde el 2026-09-17 («tapa de portátil asomando sobre la mesa», firma §9) |
+| Cubierta de mesa desenfocada en 16:9 (lecho del 16 %) | El canto quedó al 83 % y la firma del blog (25 % del lado corto, caja 85–91 %) casi sin aire | El porcentaje del formato no basta: se mide el canto contra la caja de la firma de ESE formato |
+
+**Piloto que funcionó (pendiente de aprobación del operador):** `MC1h-45-portada-consola` — Nexa vista desde el
+puesto de una consola de monitoreo: *«We watch her from the operator's seat of a dark monitoring console that faces
+the space: the lens is only a few centimetres behind the near edge of the console, whose low, flat surface with rows
+of unlit keys and faders crosses the whole bottom of the frame, outside every light, with no screens and nothing lit
+on it»*. Las teclas se leen como objeto aunque estén desenfocadas; el canto iluminado termina en y≈1200 de 1350, y la
+firma, ubicada sobre el plate con centro al 93,5 % (caja 1237–1288), cae en la materia oscura con ≈37 px de aire:
+**17,6:1** en el peor píxel. Con el margen de 9 % (caja desde 1202) quedaba pegada al canto.
+
+**Cómo se escribe y se verifica un lecho cine, en orden:**
+1. Elegir el objeto por la historia de la toma (¿desde qué puesto del trabajo miramos?), del catálogo de lechos o de
+   su familia; en un carrusel, **familias distintas** entre piezas.
+2. Escribirlo con **nombre, materia y la cámara anclada**; tono declarado; **fuera de toda luz y de todo reflejo**, y
+   sin pantallas encendidas que lo iluminen.
+3. No sumar listas de vacíos que le quiten materia al objeto; prohibir sólo lo que compite con el sujeto.
+4. Tras generar, medir el **canto** (salto de luminancia por fila en la columna del logo) contra la **caja de la
+   firma del formato** y mirar el pie al 100 %: la firma va dentro de la materia calma, con aire, nunca montada en el
+   canto ni sobre el sujeto. Si no calza, se rehace la toma o se ubica la firma sobre el plate (centro ≈ 93,5 % en
+   4:5, norma de firma §5), nunca con scrim.
+
 ### Selección colaborativa AXIS (recurso, ~1 de 3 piezas)
 
 Cursores con nombre sobre el **objeto real**, vía `renderCollaborationSelection` +
