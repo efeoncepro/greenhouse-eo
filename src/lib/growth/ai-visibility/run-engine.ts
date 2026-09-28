@@ -1,5 +1,10 @@
 import 'server-only'
 
+import type { PoolClient } from 'pg'
+
+import { withTransaction } from '@/lib/db'
+import { resolveGrowthMarket } from '@/lib/growth/markets'
+
 /**
  * TASK-1226 — Growth AI Visibility Grader · Run engine (server-only).
  * TASK-1234 — Async execution: enqueue + claim + ejecución resumible por worker.
@@ -32,10 +37,7 @@ import {
   type GrowthAiVisibilityRunKind
 } from './contracts'
 import { estimateObservationCostUsd } from './cost'
-import {
-  GROWTH_AI_VISIBILITY_STUCK_RUNNING_THRESHOLD_MINUTES,
-  resolveRunStatusFromObservations
-} from './lifecycle'
+import { GROWTH_AI_VISIBILITY_STUCK_RUNNING_THRESHOLD_MINUTES, resolveRunStatusFromObservations } from './lifecycle'
 import { resolveProviderPolicy } from './policy'
 import { createGrowthAiVisibilityProviderAdapters } from './providers/registry'
 import { createProviderAdapterContext, type ProviderAdapter } from './providers/types'
@@ -55,13 +57,11 @@ import {
 import { finalizeRunDelivery } from './public-delivery/finalize-delivery'
 import { gatherRunProbes } from './probes/command'
 import { scoreGraderRun } from './scoring/command'
-import {
-  type PromptFamily,
-  type PromptFanOutType,
-  type PromptIntentStage
-} from './prompt-packs/tag-vocabulary'
+import { type PromptFamily, type PromptFanOutType, type PromptIntentStage } from './prompt-packs/tag-vocabulary'
 import { resolvePromptInputs } from './prompt-pack'
 import { getActivePromptSet } from './prompt-packs/prompt-set-store'
+import { ensurePrimaryMarket, listProfileMarkets, snapshotMarket } from './markets/store'
+import { GraderMarketConfigError, type MarketSource, type MatchingSnapshot } from './markets/contracts'
 import { isArchetypePromptsEnabled } from './flags'
 
 export interface GraderRunPromptInput {
@@ -82,6 +82,11 @@ export interface GraderRunPromptInput {
 type ProviderAdapterMap = Partial<Record<GrowthAiVisibilityProviderId, ProviderAdapter>>
 
 export interface ExecuteGraderRunInput {
+  marketSource?: MarketSource
+  profileId?: string
+  marketId?: string
+  batchId?: string
+  transaction?: PoolClient
   profile: {
     brandName: string
     websiteUrl: string | null
@@ -94,6 +99,7 @@ export interface ExecuteGraderRunInput {
   mode: GrowthAiVisibilityExecutionMode
   promptPackVersion: string
   prompts: GraderRunPromptInput[]
+  resolvePrompts?: (snapshot: MatchingSnapshot) => GraderRunPromptInput[]
   idempotencyKey?: string | null
   /** Adapters inyectables (tests/smoke fake). Default = registry de adapters reales. */
   adapters?: ProviderAdapterMap
@@ -123,16 +129,10 @@ export interface EnqueueGraderRunResult {
  * ejecutarlo). El worker async lo reclama después y lo ejecuta de forma resumible.
  * Idempotente: una key existente devuelve el run previo sin crear otro.
  */
-export const enqueueGraderRun = async (
-  input: ExecuteGraderRunInput
-): Promise<EnqueueGraderRunResult> => {
-  if (input.idempotencyKey) {
-    const existing = await findRunByIdempotencyKey(input.idempotencyKey)
+export const enqueueGraderRun = async (input: ExecuteGraderRunInput): Promise<EnqueueGraderRunResult> => {
+  resolveGrowthMarket(input.profile.market, input.profile.locale)
 
-    if (existing) {
-      return { run: existing, idempotentHit: true }
-    }
-  }
+  if (!input.transaction) return withTransaction(transaction => enqueueGraderRun({ ...input, transaction }))
 
   const policy = resolveProviderPolicy(input.mode)
   const adapters = input.adapters ?? createGrowthAiVisibilityProviderAdapters()
@@ -145,31 +145,68 @@ export const enqueueGraderRun = async (
     return Boolean(adapters[provider])
   })
 
-  const profile = await findOrCreateGraderProfile(input.profile)
+  const profile = input.profileId
+    ? await getGraderProfile(input.profileId, input.transaction)
+    : await findOrCreateGraderProfile(input.profile)
+
+  if (!profile) throw new GraderMarketConfigError('aeo_profile_not_found', 404)
+
+  const primary = await ensurePrimaryMarket(profile, input.transaction)
+  const markets = await listProfileMarkets(profile.profileId, input.transaction)
+  const market = input.marketId ? markets.find(item => item.marketId === input.marketId) : primary
+
+  if (!market || market.status !== 'active') throw new GraderMarketConfigError('aeo_market_not_configured')
+
+  const geography = resolveGrowthMarket(input.profile.market, input.profile.locale)
+
+  if (market.marketCode !== geography.code || market.locale !== geography.locale)
+    throw new GraderMarketConfigError('aeo_market_mismatch')
+
+  if (input.idempotencyKey) {
+    const existing = await findRunByIdempotencyKey(input.idempotencyKey, input.transaction)
+
+    if (existing) {
+      if (
+        existing.profileId !== profile.profileId ||
+        existing.marketId !== market.marketId ||
+        existing.mode !== input.mode ||
+        existing.runKind !== input.runKind
+      ) {
+        throw new GraderMarketConfigError('aeo_idempotency_conflict')
+      }
+
+      return { run: existing, idempotentHit: true }
+    }
+  }
+
+  const matchingSnapshot = await snapshotMarket(profile, market, policy.policyVersion, input.transaction)
+
+  matchingSnapshot.marketSource =
+    input.marketSource ?? (input.attribution?.runSource === 'operator_sales' ? 'operator' : 'profile')
 
   // TASK-1290 Slice 2 — si hay un prompt set AUTORADO + `active` para el perfil (y el flag por
   // arquetipo está ON), el run usa ESE set congelado (reproducible) en vez del baseline; los tags
   // del set viajan con el run (Slice 0). Sin set active → se queda con el baseline (input.prompts).
-  let prompts = input.prompts
+  let prompts = input.resolvePrompts ? input.resolvePrompts(matchingSnapshot) : input.prompts
   let promptSetId: string | null = null
   let promptSetVersion: number | null = null
 
   if (isArchetypePromptsEnabled()) {
-    const activeSet = await getActivePromptSet(profile.profileId)
+    const activeSet = await getActivePromptSet(profile.profileId, market.marketId, input.transaction)
 
     if (activeSet && activeSet.prompts.length > 0) {
       prompts = resolvePromptInputs(
         {
-          brandName: profile.brandName,
+          brandName: matchingSnapshot.brand.name,
           category: input.profile.category ?? '',
-          market: profile.market,
-          competitor: profile.competitorsDeclared[0] ?? null
+          market: matchingSnapshot.market.label,
+          competitor: matchingSnapshot.competitors[0]?.name ?? null
         },
         {
           pack: {
             version: `prompt-set.v${activeSet.version}`,
-            locale: profile.locale,
-            market: profile.market,
+            locale: market.locale,
+            market: market.marketCode,
             prompts: activeSet.prompts
           }
         }
@@ -191,10 +228,14 @@ export const enqueueGraderRun = async (
 
   const run = await createGraderRun({
     profileId: profile.profileId,
+    transaction: input.transaction,
+    marketId: market.marketId,
+    batchId: input.batchId,
+    matchingSnapshot,
     runKind: input.runKind,
     mode: input.mode,
     providerPolicyVersion: policy.policyVersion,
-    promptPackVersion: input.promptPackVersion,
+    promptPackVersion: promptSetId ? `prompt-set.${promptSetId}.v${promptSetVersion}` : input.promptPackVersion,
     requestedProviders,
     idempotencyKey: input.idempotencyKey ?? null,
     costCeilingUsd: policy.costCeilingUsdPerRun,
@@ -271,11 +312,12 @@ export const executeClaimedGraderRun = async (
           runId: run.runId,
           promptId: prompt.promptId,
           promptText: prompt.promptText,
-          locale: profile.locale,
-          market: profile.market,
-          brandName: profile.brandName,
-          websiteUrl: profile.websiteUrl,
-          competitorsDeclared: profile.competitorsDeclared,
+          locale: run.matchingSnapshot?.market.locale ?? profile.locale,
+          market: run.matchingSnapshot?.market.code ?? profile.market,
+          brandName: run.matchingSnapshot?.brand.name ?? profile.brandName,
+          websiteUrl: run.matchingSnapshot ? run.matchingSnapshot.brand.websiteUrl : profile.websiteUrl,
+          competitorsDeclared:
+            run.matchingSnapshot?.competitors.map(member => member.name) ?? profile.competitorsDeclared,
           mode: run.mode
         },
         context
@@ -347,9 +389,7 @@ export const executeClaimedGraderRun = async (
  * Camino SÍNCRONO (inline endpoint / smoke / tests): encola + reclama el propio
  * run (pending → running) + ejecuta. Persiste incrementalmente igual que el worker.
  */
-export const executeGraderRun = async (
-  input: ExecuteGraderRunInput
-): Promise<ExecuteGraderRunResult> => {
+export const executeGraderRun = async (input: ExecuteGraderRunInput): Promise<ExecuteGraderRunResult> => {
   const { run, idempotentHit } = await enqueueGraderRun(input)
 
   if (idempotentHit) {

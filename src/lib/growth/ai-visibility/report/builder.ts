@@ -15,8 +15,8 @@ import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
 
 import { detectBrandInaccuracies, type BrandTruth } from '../accuracy'
 import { type GrowthAiVisibilityProviderObservation, type GrowthAiVisibilityRunStatus } from '../contracts'
-import { type NormalizedFinding } from '../normalization/contracts'
-import { type ProbeResult } from '../probes/contracts'
+import type { NormalizedFinding } from '../normalization/contracts'
+import type { ProbeResult } from '../probes/contracts'
 import { SCORE_DIMENSION_CONFIG_BY_KEY, type ScoreDimensionKey } from '../scoring/config'
 import { type DimensionScore, type PersistedGraderScore } from '../scoring/engine'
 import { computeReadinessScore, type AxisReadinessScore } from '../scoring/readiness-engine'
@@ -55,16 +55,13 @@ import {
   type SourceTypeCount
 } from './contracts'
 import { buildCitationSourceBreakdown, summarizeCitationTargets } from './citation-breakdown'
-import {
-  buildRecommendations,
-  pickPrimaryGap,
-  resolveSeverity,
-  toPublicRecommendation
-} from './recommendations'
+import { buildRecommendations, pickPrimaryGap, resolveSeverity, toPublicRecommendation } from './recommendations'
 import { buildReportTrend, type PreviousScoreInput } from './trend'
 
 /** Metadata del run necesaria para el reporte (subset de `GraderRunRow`). */
 export interface ReportRunMeta {
+  market?: ReportProvenance['market']
+  requestedProviders?: string[]
   runId: string
   status: GrowthAiVisibilityRunStatus
   promptPackVersion: string
@@ -124,7 +121,7 @@ const buildDimension = (dimension: DimensionScore): ReportDimension => {
     max: 100,
     status: isEmpty ? 'empty' : 'ok',
     severity: resolveSeverity(dimension.score),
-    reason: isEmpty ? dimension.reasons[0] ?? null : null,
+    reason: isEmpty ? (dimension.reasons[0] ?? null) : null,
     recommendation: null
   }
 }
@@ -299,9 +296,7 @@ const round1Safe = (value: number): number => Math.round(value * 10) / 10
 const buildCitationInsight = (findings: NormalizedFinding[], subjectDomain: string | null): CitationInsight => {
   const withCitations = findings.filter(f => f.citationDomains.length > 0)
 
-  const citingOwn = subjectDomain
-    ? withCitations.filter(f => f.citationDomains.includes(subjectDomain)).length
-    : 0
+  const citingOwn = subjectDomain ? withCitations.filter(f => f.citationDomains.includes(subjectDomain)).length : 0
 
   return {
     ownDomainShare: withCitations.length === 0 ? null : round1Safe((citingOwn / withCitations.length) * 100),
@@ -374,7 +369,10 @@ const buildCategoryTaxonomySummary = (findings: NormalizedFinding[]): CategoryTa
   const counts = new Map<string, number>()
 
   for (const nodeId of canonicalIds) {
-    counts.set(nodeId, rawAssociations.filter(candidate => normalizeCategoryAssociationIds([candidate]).includes(nodeId)).length)
+    counts.set(
+      nodeId,
+      rawAssociations.filter(candidate => normalizeCategoryAssociationIds([candidate]).includes(nodeId)).length
+    )
   }
 
   const categories = [...counts.entries()]
@@ -415,7 +413,10 @@ const buildProviderFindings = (presence: ProviderPresence[]): ReportFinding[] =>
   presence
     .filter(entry => entry.resolved > 0)
     .map(entry => {
-      const label = GH_GROWTH_AI_VISIBILITY.provider_label[entry.provider as keyof typeof GH_GROWTH_AI_VISIBILITY.provider_label] ?? entry.provider
+      const label =
+        GH_GROWTH_AI_VISIBILITY.provider_label[entry.provider as keyof typeof GH_GROWTH_AI_VISIBILITY.provider_label] ??
+        entry.provider
+
       const present = entry.present > 0
 
       return {
@@ -449,8 +450,36 @@ const buildAccuracyFindings = (
 const buildProvenance = (
   score: PersistedGraderScore,
   findings: NormalizedFinding[],
-  run: ReportRunMeta
+  run: ReportRunMeta,
+  observations?: GrowthAiVisibilityProviderObservation[] | null
 ): ReportProvenance => ({
+  market: run.market ?? null,
+  providersRequested: run.requestedProviders,
+  ...(observations
+    ? {
+        providersAttempted: [
+          ...new Set(
+            observations
+              .filter(o => o.usage.provider_attempted === true || o.latencyMs > 0 || o.status === 'succeeded')
+              .map(o => o.provider)
+          )
+        ].sort(),
+        providersResponded: [
+          ...new Set(observations.filter(o => o.status === 'succeeded').map(o => o.provider))
+        ].sort(),
+        geoModes: Object.fromEntries(
+          observations
+            .filter(
+              o =>
+                ['native', 'prompt_only'].includes(String(o.usage.geo_mode)) && typeof o.usage.geo_country === 'string'
+            )
+            .map(o => [
+              o.provider,
+              { mode: o.usage.geo_mode as 'native' | 'prompt_only', country: o.usage.geo_country as string }
+            ])
+        )
+      }
+    : {}),
   asOfDate: run.finishedAt,
   promptPackVersion: run.promptPackVersion,
   scoreVersion: score.scoreVersion,
@@ -637,7 +666,12 @@ export const buildGraderReport = (input: BuildGraderReportInput): GraderReport =
 
   const gateStatus = resolveGateStatus(score, run.status)
   const scoredInputs = score.dimensions.map(d => ({ key: d.key, score: d.score, weight: d.weight }))
-  const recommendations = enrichRecommendationsWithCitationTargets(buildRecommendations(scoredInputs), citationSourceBreakdown)
+
+  const recommendations = enrichRecommendationsWithCitationTargets(
+    buildRecommendations(scoredInputs),
+    citationSourceBreakdown
+  )
+
   const recommendationByDimension = new Map(recommendations.map(r => [r.dimensionKey, r]))
 
   const dimensions = score.dimensions.map(dimension => {
@@ -649,9 +683,7 @@ export const buildGraderReport = (input: BuildGraderReportInput): GraderReport =
   const headlineDimension = pickHeadlineDimension(score.dimensions)
   const primaryGap = pickPrimaryGap(recommendations)
 
-  const scoreByDimension = new Map<ScoreDimensionKey, number | null>(
-    score.dimensions.map(d => [d.key, d.score])
-  )
+  const scoreByDimension = new Map<ScoreDimensionKey, number | null>(score.dimensions.map(d => [d.key, d.score]))
 
   return {
     reportVersion: GROWTH_AI_VISIBILITY_REPORT_VERSION,
@@ -681,7 +713,7 @@ export const buildGraderReport = (input: BuildGraderReportInput): GraderReport =
     trend: buildReportTrend(score, run.promptPackVersion, previous ?? null),
     // TASK-1266 — readiness técnica (ejes ortogonales) lado a lado; null si no se probó el sitio.
     readiness: input.probeResults && input.probeResults.length > 0 ? buildReportReadiness(input.probeResults) : null,
-    provenance: buildProvenance(score, findings, run),
+    provenance: buildProvenance(score, findings, run, input.observations),
     disclaimer: GH_GROWTH_AI_VISIBILITY.disclaimer
   }
 }

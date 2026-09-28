@@ -1,8 +1,38 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { type GrowthAiVisibilityProviderObservation } from '../contracts'
+import type { GrowthAiVisibilityProviderObservation } from '../contracts'
+import { resolveGrowthMarket } from '@/lib/growth/markets'
+
 import { type GraderExecutionPrompt, type GraderRunRow } from '../store'
 import { type ProviderAdapter, type ProviderAdapterContext } from '../providers/types'
+
+vi.mock('@/lib/db', () => ({ withTransaction: async (work: (client: unknown) => Promise<unknown>) => work({}) }))
+vi.mock('../markets/store', () => ({
+  ensurePrimaryMarket: async () => ({
+    marketId: 'gpmk-1',
+    marketCode: 'MX',
+    locale: 'es-MX',
+    status: 'active',
+    isPrimary: true
+  }),
+  listProfileMarkets: async () => [
+    { marketId: 'gpmk-1', marketCode: 'MX', locale: 'es-MX', status: 'active', isPrimary: true }
+  ],
+  snapshotMarket: async (_profile: unknown, _market: unknown, policy: string) => ({
+    version: 'matching.v1',
+    brand: {
+      name: activeProfile.brandName,
+      aliases: [],
+      websiteUrl: activeProfile.websiteUrl,
+      category: activeProfile.category
+    },
+    market: resolveGrowthMarket('MX', 'es-MX'),
+    competitors: [],
+    competitorSetId: 'gcset-1',
+    setVersion: 1,
+    providerPolicyVersion: policy
+  })
+}))
 
 /**
  * TASK-1696 — La organización del gasto se deriva SÓLO del perfil, server-side.
@@ -42,6 +72,8 @@ const db: { runsById: Map<string, GraderRunRow>; observations: GrowthAiVisibilit
 }
 
 const makeRun = (input: Record<string, unknown>): GraderRunRow => ({
+  marketId: input.marketId as string,
+  matchingSnapshot: input.matchingSnapshot as GraderRunRow['matchingSnapshot'],
   runId: `grun-${++runSeq}`,
   publicId: `EO-GRUN-${String(runSeq).padStart(5, '0')}`,
   pollToken: `gpt-test-${runSeq}`,

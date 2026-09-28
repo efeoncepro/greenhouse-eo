@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   AEO_DIAGNOSTIC_FORM_ID,
   mapAeoDiagnosticToGraderIntake,
-  resolveAeoMarketLocale,
+  resolveAeoMarketLocale
 } from '../aeo-form-grader-adapter'
 
 const baseFields = (): Record<string, unknown> => ({
@@ -15,7 +15,7 @@ const baseFields = (): Record<string, unknown> => ({
   firstName: 'Ana',
   lastName: 'Silva',
   companySize: '51-200',
-  mainCompetitor: 'Comex',
+  mainCompetitor: 'Comex'
 })
 
 describe('TASK-1321 — aeo-form-grader-adapter', () => {
@@ -26,28 +26,36 @@ describe('TASK-1321 — aeo-form-grader-adapter', () => {
   describe('resolveAeoMarketLocale', () => {
     it('derives market/locale from the REAL form values (full Spanish names with accents)', () => {
       // El <select> live submite el nombre completo, NO el ISO (verificado contra el contract live).
-      expect(resolveAeoMarketLocale('Chile')).toEqual({ market: 'CL', locale: 'es-CL' })
-      expect(resolveAeoMarketLocale('Colombia')).toEqual({ market: 'CO', locale: 'es-CO' })
-      expect(resolveAeoMarketLocale('México')).toEqual({ market: 'MX', locale: 'es-MX' })
-      expect(resolveAeoMarketLocale('Perú')).toEqual({ market: 'PE', locale: 'es-PE' })
+      expect(resolveAeoMarketLocale('Chile')).toEqual({ market: 'CL', locale: 'es-CL', marketSource: 'form_selected' })
+      expect(resolveAeoMarketLocale('Colombia')).toEqual({
+        market: 'CO',
+        locale: 'es-CO',
+        marketSource: 'form_selected'
+      })
+      expect(resolveAeoMarketLocale('México')).toEqual({ market: 'MX', locale: 'es-MX', marketSource: 'form_selected' })
+      expect(resolveAeoMarketLocale('Perú')).toEqual({ market: 'PE', locale: 'es-PE', marketSource: 'form_selected' })
     })
 
     it('accepts unaccented variants and ISO-2 codes (robustness)', () => {
-      expect(resolveAeoMarketLocale('Mexico')).toEqual({ market: 'MX', locale: 'es-MX' })
-      expect(resolveAeoMarketLocale('Peru')).toEqual({ market: 'PE', locale: 'es-PE' })
-      expect(resolveAeoMarketLocale('CL')).toEqual({ market: 'CL', locale: 'es-CL' })
-      expect(resolveAeoMarketLocale('MX')).toEqual({ market: 'MX', locale: 'es-MX' })
+      expect(resolveAeoMarketLocale('Mexico')).toEqual({ market: 'MX', locale: 'es-MX', marketSource: 'form_selected' })
+      expect(resolveAeoMarketLocale('Peru')).toEqual({ market: 'PE', locale: 'es-PE', marketSource: 'form_selected' })
+      expect(resolveAeoMarketLocale('CL')).toEqual({ market: 'CL', locale: 'es-CL', marketSource: 'form_selected' })
+      expect(resolveAeoMarketLocale('MX')).toEqual({ market: 'MX', locale: 'es-MX', marketSource: 'form_selected' })
     })
 
     it('is case/whitespace tolerant', () => {
-      expect(resolveAeoMarketLocale('  méxico ')).toEqual({ market: 'MX', locale: 'es-MX' })
+      expect(resolveAeoMarketLocale('  méxico ')).toEqual({
+        market: 'MX',
+        locale: 'es-MX',
+        marketSource: 'form_selected'
+      })
     })
 
     it('falls back to CL/es-CL for unknown or empty country (never empty)', () => {
-      expect(resolveAeoMarketLocale('XX')).toEqual({ market: 'CL', locale: 'es-CL' })
-      expect(resolveAeoMarketLocale('')).toEqual({ market: 'CL', locale: 'es-CL' })
-      expect(resolveAeoMarketLocale(null)).toEqual({ market: 'CL', locale: 'es-CL' })
-      expect(resolveAeoMarketLocale(undefined)).toEqual({ market: 'CL', locale: 'es-CL' })
+      expect(resolveAeoMarketLocale('XX')).toEqual({ market: 'CL', locale: 'es-CL', marketSource: 'form_default' })
+      expect(resolveAeoMarketLocale('')).toEqual({ market: 'CL', locale: 'es-CL', marketSource: 'form_default' })
+      expect(resolveAeoMarketLocale(null)).toEqual({ market: 'CL', locale: 'es-CL', marketSource: 'form_default' })
+      expect(resolveAeoMarketLocale(undefined)).toEqual({ market: 'CL', locale: 'es-CL', marketSource: 'form_default' })
     })
   })
 
@@ -63,11 +71,12 @@ describe('TASK-1321 — aeo-form-grader-adapter', () => {
         websiteUrl: 'https://grupoberel.com',
         market: 'MX',
         locale: 'es-MX',
+        marketSource: 'form_selected',
         competitorsDeclared: ['Comex'],
         email: 'marketing@grupoberel.com',
         firstName: 'Ana',
         lastName: 'Silva',
-        companySize: '51-200',
+        companySize: '51-200'
       })
     })
 

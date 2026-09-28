@@ -1,4 +1,8 @@
 import 'server-only'
+import type { PoolClient } from 'pg'
+
+import type { MatchingSnapshot } from './markets/contracts'
+import { marketQueries } from './markets/store'
 import { resolveOrganizationLogoUrl } from '@/lib/account-360/resolve-organization-logo'
 
 /**
@@ -45,7 +49,7 @@ export interface GraderProfileRow {
   organizationId: string | null
   /** TASK-1270 — opt-in explícito para re-grade recurrente de cliente entitled. */
   recurringRegradeEnabled: boolean
-  recurringRegradeCadence: 'weekly' | 'monthly'
+  recurringRegradeCadence: 'weekly' | 'monthly' | 'quarterly'
   recurringRegradeNextAt: string | null
   recurringRegradeLastRunId: string | null
   recurringRegradeLastAt: string | null
@@ -86,6 +90,12 @@ export interface GraderRunAttribution {
 }
 
 export interface GraderRunRow {
+  marketId?: string | null
+  marketCode?: string | null
+  locale?: string | null
+  batchId?: string | null
+  competitorSetId?: string | null
+  matchingSnapshot?: MatchingSnapshot | null
   runId: string
   publicId: string
   /** TASK-1245 — handle de poll público NO enumerable (256 bits). El public_id es secuencial. */
@@ -119,7 +129,7 @@ type RawProfile = Record<string, unknown>
 type RawRun = Record<string, unknown>
 type RawObservation = Record<string, unknown>
 
-const projectProfile = (row: RawProfile): GraderProfileRow => ({
+export const projectProfile = (row: RawProfile): GraderProfileRow => ({
   profileId: String(row.profile_id),
   publicId: String(row.public_id),
   brandName: String(row.brand_name),
@@ -138,13 +148,24 @@ const projectProfile = (row: RawProfile): GraderProfileRow => ({
   status: String(row.status),
   organizationId: (row.organization_id as string | null) ?? null,
   recurringRegradeEnabled: Boolean(row.recurring_regrade_enabled ?? false),
-  recurringRegradeCadence: row.recurring_regrade_cadence === 'weekly' ? 'weekly' : 'monthly',
+  recurringRegradeCadence:
+    row.recurring_regrade_cadence === 'quarterly'
+      ? 'quarterly'
+      : row.recurring_regrade_cadence === 'weekly'
+        ? 'weekly'
+        : 'monthly',
   recurringRegradeNextAt: (row.recurring_regrade_next_at as string | null) ?? null,
   recurringRegradeLastRunId: (row.recurring_regrade_last_run_id as string | null) ?? null,
   recurringRegradeLastAt: (row.recurring_regrade_last_at as string | null) ?? null
 })
 
-const projectRun = (row: RawRun): GraderRunRow => ({
+export const projectRun = (row: RawRun): GraderRunRow => ({
+  marketId: (row.market_id as string | null) ?? null,
+  marketCode: (row.market_code as string | null) ?? null,
+  locale: (row.locale as string | null) ?? null,
+  batchId: (row.batch_id as string | null) ?? null,
+  competitorSetId: (row.competitor_set_id as string | null) ?? null,
+  matchingSnapshot: (row.matching_snapshot as MatchingSnapshot | null) ?? null,
   runId: String(row.run_id),
   publicId: String(row.public_id),
   pollToken: String(row.poll_token),
@@ -158,9 +179,7 @@ const projectRun = (row: RawRun): GraderRunRow => ({
   idempotencyKey: (row.idempotency_key as string | null) ?? null,
   estimatedCostUsd: Number(row.estimated_cost_usd ?? 0),
   costCeilingUsd: row.cost_ceiling_usd != null ? Number(row.cost_ceiling_usd) : null,
-  executionPrompts: Array.isArray(row.execution_prompts)
-    ? (row.execution_prompts as GraderExecutionPrompt[])
-    : [],
+  executionPrompts: Array.isArray(row.execution_prompts) ? (row.execution_prompts as GraderExecutionPrompt[]) : [],
   organizationId: (row.organization_id as string | null) ?? null,
   assignmentId: (row.assignment_id as string | null) ?? null,
   runSource: (row.run_source as GraderRunSource | null) ?? null,
@@ -228,21 +247,14 @@ export const findOrCreateGraderProfile = async (input: {
        (brand_name, website_url, market, locale, category, competitors_declared)
      VALUES ($1, $2, $3, $4, $5, $6)
      RETURNING *`,
-    [
-      input.brandName,
-      input.websiteUrl,
-      input.market,
-      input.locale,
-      input.category,
-      input.competitorsDeclared
-    ]
+    [input.brandName, input.websiteUrl, input.market, input.locale, input.category, input.competitorsDeclared]
   )
 
   return projectProfile(inserted[0])
 }
 
-export const getGraderProfile = async (profileId: string): Promise<GraderProfileRow | null> => {
-  const rows = await runGreenhousePostgresQuery<RawProfile>(
+export const getGraderProfile = async (profileId: string, client?: PoolClient): Promise<GraderProfileRow | null> => {
+  const rows = await marketQueries(client)<RawProfile>(
     `SELECT * FROM greenhouse_growth.grader_profiles WHERE profile_id = $1 LIMIT 1`,
     [profileId]
   )
@@ -255,9 +267,7 @@ export const getGraderProfile = async (profileId: string): Promise<GraderProfile
  * grade EL perfil de la org sujeto; si no hay perfil enlazado, el run no puede correr (intake/
  * binding del perfil = TASK-1278/1276, fuera de este chokepoint). Devuelve el más reciente activo.
  */
-export const getGraderProfileForOrganization = async (
-  organizationId: string
-): Promise<GraderProfileRow | null> => {
+export const getGraderProfileForOrganization = async (organizationId: string): Promise<GraderProfileRow | null> => {
   const rows = await runGreenhousePostgresQuery<RawProfile>(
     `SELECT * FROM greenhouse_growth.grader_profiles
       WHERE organization_id = $1 AND status = 'active'
@@ -270,8 +280,8 @@ export const getGraderProfileForOrganization = async (
 
 // ── Runs ─────────────────────────────────────────────────────────────────────
 
-export const findRunByIdempotencyKey = async (key: string): Promise<GraderRunRow | null> => {
-  const rows = await runGreenhousePostgresQuery<RawRun>(
+export const findRunByIdempotencyKey = async (key: string, client?: PoolClient): Promise<GraderRunRow | null> => {
+  const rows = await marketQueries(client)<RawRun>(
     `SELECT * FROM greenhouse_growth.grader_runs WHERE idempotency_key = $1 LIMIT 1`,
     [key]
   )
@@ -280,6 +290,10 @@ export const findRunByIdempotencyKey = async (key: string): Promise<GraderRunRow
 }
 
 export const createGraderRun = async (input: {
+  transaction?: PoolClient
+  marketId?: string
+  batchId?: string | null
+  matchingSnapshot?: MatchingSnapshot
   profileId: string
   runKind: GrowthAiVisibilityRunKind
   mode: GrowthAiVisibilityExecutionMode
@@ -296,12 +310,13 @@ export const createGraderRun = async (input: {
   promptSetId?: string | null
   promptSetVersion?: number | null
 }): Promise<GraderRunRow> => {
-  const rows = await runGreenhousePostgresQuery<RawRun>(
+  const rows = await marketQueries(input.transaction)<RawRun>(
     `INSERT INTO greenhouse_growth.grader_runs
        (profile_id, run_kind, mode, status, provider_policy_version, prompt_pack_version,
         requested_providers, idempotency_key, cost_ceiling_usd, execution_prompts,
-        organization_id, assignment_id, run_source, cost_attribution, prompt_set_id, prompt_set_version)
-     VALUES ($1, $2, $3, 'pending', $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12, $13, $14, $15)
+        organization_id, assignment_id, run_source, cost_attribution, prompt_set_id, prompt_set_version,
+        market_id,market_code,locale,batch_id,competitor_set_id,matching_snapshot)
+     VALUES ($1, $2, $3, 'pending', $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21::jsonb)
      RETURNING *`,
     [
       input.profileId,
@@ -318,7 +333,13 @@ export const createGraderRun = async (input: {
       input.attribution?.runSource ?? null,
       input.attribution?.costAttribution ?? null,
       input.promptSetId ?? null,
-      input.promptSetVersion ?? null
+      input.promptSetVersion ?? null,
+      input.marketId ?? null,
+      input.matchingSnapshot?.market.code ?? null,
+      input.matchingSnapshot?.market.locale ?? null,
+      input.batchId ?? null,
+      input.matchingSnapshot?.competitorSetId ?? null,
+      input.matchingSnapshot ? JSON.stringify(input.matchingSnapshot) : null
     ]
   )
 
@@ -512,7 +533,7 @@ export const listOperatorCrossOrgAeoScores = async (): Promise<OperatorAeoCockpi
     [AI_VISIBILITY_MODULE_KEY, [...CLIENT_REPORTABLE_RUN_STATUSES]]
   )
 
-  return rows.map((row) => ({
+  return rows.map(row => ({
     organizationId: String(row.organization_id),
     organizationName: String(row.organization_name),
     organizationType: String(row.organization_type),
@@ -611,8 +632,8 @@ export const insertProviderObservations = async (
       `INSERT INTO greenhouse_growth.provider_observations
          (observation_id, run_id, prompt_id, provider, model, status, answer_text_hash,
           answer_excerpt, citations, usage, latency_ms, provider_request_hash,
-          raw_evidence_pointer, error_code, provider_policy_version, prompt_pack_version, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10::jsonb, $11, $12, $13, $14, $15, $16, $17)
+          raw_evidence_pointer, error_code, provider_policy_version, prompt_pack_version, created_at,geo_mode,geo_country)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10::jsonb, $11, $12, $13, $14, $15, $16, $17, $18, $19)
        ON CONFLICT (observation_id) DO NOTHING`,
       [
         observation.observationId,
@@ -631,7 +652,9 @@ export const insertProviderObservations = async (
         observation.errorCode,
         observation.providerPolicyVersion,
         observation.promptPackVersion,
-        observation.createdAt
+        observation.createdAt,
+        observation.usage.geo_mode ?? null,
+        observation.usage.geo_country ?? null
       ]
     )
     inserted += 1
@@ -640,9 +663,7 @@ export const insertProviderObservations = async (
   return inserted
 }
 
-export const getRunObservations = async (
-  runId: string
-): Promise<GrowthAiVisibilityProviderObservation[]> => {
+export const getRunObservations = async (runId: string): Promise<GrowthAiVisibilityProviderObservation[]> => {
   const rows = await runGreenhousePostgresQuery<RawObservation>(
     `SELECT * FROM greenhouse_growth.provider_observations WHERE run_id = $1 ORDER BY created_at ASC`,
     [runId]

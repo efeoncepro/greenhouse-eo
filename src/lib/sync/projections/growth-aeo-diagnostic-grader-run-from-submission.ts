@@ -34,11 +34,11 @@ import {
   checkIntakeAbuse,
   hashIdentifier,
   recordIntakeEvent,
-  resolveIntakeLimits,
+  resolveIntakeLimits
 } from '@/lib/growth/ai-visibility/public-intake/abuse-guard'
 import {
   AEO_DIAGNOSTIC_FORM_ID,
-  mapAeoDiagnosticToGraderIntake,
+  mapAeoDiagnosticToGraderIntake
 } from '@/lib/growth/ai-visibility/public-intake/aeo-form-grader-adapter'
 import { findGraderLeadBySubmissionId, insertGraderLead } from '@/lib/growth/ai-visibility/public-intake/store'
 import { FORM_SUBMISSION_ACCEPTED_EVENT } from '@/lib/growth/forms/contracts'
@@ -109,7 +109,7 @@ export const growthAeoDiagnosticGraderRunProjection: ProjectionDefinition = {
       ipHash: submission.ip_hash,
       emailHash,
       estimatedCostUsd: ESTIMATED_PUBLIC_RUN_COST_USD,
-      limits: resolveIntakeLimits(),
+      limits: resolveIntakeLimits()
     })
 
     if (!decision.allowed && decision.outcome) {
@@ -118,7 +118,7 @@ export const growthAeoDiagnosticGraderRunProjection: ProjectionDefinition = {
         emailHash,
         runId: null,
         estimatedCostUsd: null,
-        outcome: decision.outcome,
+        outcome: decision.outcome
       }).catch(() => {})
 
       return `aeo_grader_run skip: submission ${submissionId} bloqueado por cost-cap (${decision.outcome}) → sin run`
@@ -133,12 +133,12 @@ export const growthAeoDiagnosticGraderRunProjection: ProjectionDefinition = {
       category = await resolvePublicBrandCategory({
         brandName: intake.brandName,
         websiteUrl: intake.websiteUrl,
-        telemetry: { submissionId },
+        telemetry: { submissionId }
       })
     } catch (error) {
       captureWithDomain(error, 'growth', {
         tags: { source: 'growth_aeo_diagnostic_grader_run', stage: 'brand_intelligence' },
-        extra: { submissionId },
+        extra: { submissionId }
       })
 
       throw error
@@ -155,6 +155,7 @@ export const growthAeoDiagnosticGraderRunProjection: ProjectionDefinition = {
       websiteUrl: intake.websiteUrl,
       market: intake.market,
       locale: intake.locale,
+      marketSource: intake.marketSource,
       category: category.label.es,
       categoryNodeId: category.nodeId,
       categoryLabel: category.label.es,
@@ -163,7 +164,7 @@ export const growthAeoDiagnosticGraderRunProjection: ProjectionDefinition = {
       competitorsDeclared: intake.competitorsDeclared,
       mode: 'light',
       runKind: 'public_diagnostic',
-      idempotencyKey: submissionId,
+      idempotencyKey: submissionId
     })
 
     await recordIntakeEvent({
@@ -171,7 +172,7 @@ export const growthAeoDiagnosticGraderRunProjection: ProjectionDefinition = {
       emailHash,
       runId: enqueued.run.runId,
       estimatedCostUsd: ESTIMATED_PUBLIC_RUN_COST_USD,
-      outcome: 'accepted',
+      outcome: 'accepted'
     }).catch(() => {})
 
     // 6. Materializar el lead linkeado al submission (email + nombre + consent viven en PG).
@@ -192,10 +193,10 @@ export const growthAeoDiagnosticGraderRunProjection: ProjectionDefinition = {
       runId: enqueued.run.runId,
       profileId: enqueued.run.profileId,
       ipHash: submission.ip_hash,
-      submissionId,
+      submissionId
     })
 
     return `aeo_grader_run ok: submission ${submissionId} → run ${enqueued.run.publicId}${enqueued.idempotentHit ? ' (idempotent-hit)' : ''}`
   },
-  maxRetries: 3,
+  maxRetries: 3
 }

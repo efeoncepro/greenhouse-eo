@@ -366,6 +366,37 @@ export const checkDataForSeoConnection = async (
   }
 }
 
+/** Free, allowlisted provider catalogs. Never accepts an arbitrary URL or paid endpoint. */
+export const getDataForSeoGoogleCatalog = async (
+  catalog: 'locations' | 'ai_mode/languages'
+): Promise<Record<string, unknown>[]> => {
+  if (catalog !== 'locations' && catalog !== 'ai_mode/languages') throw new Error('dataforseo_catalog_unknown')
+
+  const credentials = await resolveDataForSeoCredentials()
+  const auth = Buffer.from(`${credentials.login}:${credentials.password}`, 'utf8').toString('base64')
+
+  const response = await fetch(`${DATAFORSEO_API_BASE_URL}/v3/serp/google/${catalog}`, {
+    method: 'GET',
+    headers: { Authorization: `Basic ${auth}` },
+    signal: AbortSignal.timeout(30_000)
+  })
+
+  if (!response.ok) throw new Error(`dataforseo_catalog_http_${response.status}`)
+
+  const body = (await response.json()) as {
+    status_code?: number
+    tasks?: Array<{ status_code?: number; result?: unknown }>
+  }
+
+  const task = body.tasks?.[0]
+
+  if (body.status_code !== 20000 || task?.status_code !== 20000 || !Array.isArray(task.result)) {
+    throw new Error('dataforseo_catalog_invalid_response')
+  }
+
+  return task.result.filter((row): row is Record<string, unknown> => !!row && typeof row === 'object')
+}
+
 export const runDataForSeoGoogleAiModeSerp = async (input: {
   keyword: string
   locationName?: string

@@ -34,10 +34,7 @@ vi.mock('@/lib/postgres/client', () => ({
   }
 }))
 
-import {
-  ProvisionGraderProfileError,
-  provisionGraderProfileForOrganization
-} from '../provision-profile'
+import { ProvisionGraderProfileError, provisionGraderProfileForOrganization } from '../provision-profile'
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -89,6 +86,8 @@ describe('provisionGraderProfileForOrganization', () => {
     state.profileRows = [
       {
         profile_id: 'gp-existing',
+        market: 'MX',
+        locale: 'es-MX',
         public_id: 'EO-GP-EXISTING',
         website_url: 'https://acme.cl'
       }
@@ -99,7 +98,9 @@ describe('provisionGraderProfileForOrganization', () => {
     expect(result).toMatchObject({
       profileId: 'gp-existing',
       publicId: 'EO-GP-EXISTING',
-      idempotent: true
+      idempotent: true,
+      market: 'MX',
+      locale: 'es-MX'
     })
     expect(state.insertedRows).toHaveLength(0)
   })

@@ -2176,6 +2176,29 @@ El adapter `google_ai_overview` (`providers/google-ai-overview-adapter.ts`) ten�
 - **Dimensionamiento histórico** (query read-only sobre `greenhouse_growth.provider_observations`): 60 observaciones históricas `skipped:no_ai_overview_block` (2026-06-29 → 2026-07-17) eran falsos negativos con task fallido (54 con `40501`, 6 con `40201`). Regrade DESCARTADO: los tasks nunca se ejecutaron (nada que reinterpretar) y río abajo skipped/failed se excluyen por igual.
 - **Estado:** AIO en producción sigue OFF (gated por TASK-1341); el fix llega inerte a producción hasta ese rollout. AI Mode sigue English-only (`language_code='en'`). Smoke sanity: `scripts/growth/_sanity-task-1652-ai-mode-smoke.ts` (dry por defecto; `--spend` ejecuta una llamada real ~USD 0,004). Spec: `docs/tasks/complete/TASK-1652-aeo-grader-dataforseo-ai-mode-request-correctness.md`.
 
+## Delta 2026-09-28 — contrato de mercado de AI Mode, propuesta para TASK-1863
+
+El run `EO-GRUN-00056` demostró que el camino de `market` legible (`"Perú"`) aún falla en
+DataForSEO (`location_name` → task `40501`), mientras `location_code=2604` con el mismo keyword,
+idioma y dispositivo dio task `20000`. La corrección de ISO-2 de TASK-1652 no cerró ese camino.
+`TASK-1863` es dueña del resolver compartido: una identidad de mercado produce la etiqueta
+localizada del prompt y el código de ubicación; el contrato se valida antes de la compra y
+nunca usa un fallback a otro país para un mercado no resuelto. La evidencia y propuesta de
+verificación están en [la auditoría del 28-09](../audits/platform/2026-09-28-brand-visibility-google-ai-mode-market-contract.md).
+
+La afirmación histórica «AI Mode English-only» en §provider y en el delta de TASK-1652
+describe la policy del adapter al escribirla, pero **no** el catálogo publicado hoy: el
+[endpoint oficial de idiomas de AI Mode](https://docs.dataforseo.com/v3/serp/google/ai_mode/languages/)
+incluye `es`, `en`, `pt-BR` y `fr`, verificados en el catálogo vivo. TASK-1863 implementa
+`policy.v2.multilingual-geo` y packs localizados: cada run nuevo recibe el idioma solicitado y
+`location_code` del catálogo compartido. La implementación aún no está desplegada.
+El informe distingue solicitados/intentados/respondidos y conserva `unknown` en artefactos legacy
+sin evidencia de respuesta. No se reescriben snapshots publicados.
+
+Contrato aceptado y límites de rollout: [ADR multi-mercado](GREENHOUSE_AEO_MULTI_MARKET_MEASUREMENT_DECISION_V1.md).
+23 mercados del producto; Cuba sin ubicación DataForSEO da skip explícito. La configuración de prompts
+legacy se enlaza al principal; los runs históricos no reciben una geografía inferida.
+
 ## Delta 2026-09-11 — panel competitivo multi-marca y límites medidos
 
 **Este delta no cambia ningún invariante ni el runtime.** Documenta cómo se usaron primitives existentes para el primer

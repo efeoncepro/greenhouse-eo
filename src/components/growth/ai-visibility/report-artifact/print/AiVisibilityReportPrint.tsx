@@ -79,7 +79,12 @@ const AiVisibilityReportPrint = ({ model, header }: AiVisibilityReportPrintProps
     >
       {/* Standalone cover */}
       <Stack spacing={3} sx={{ mb: 6 }}>
-        <Box component='img' src={resolveBrandAssets('efeonce')?.wordmarkSrc} alt='Efeonce' sx={{ height: 28, width: 'auto' }} />
+        <Box
+          component='img'
+          src={resolveBrandAssets('efeonce')?.wordmarkSrc}
+          alt='Efeonce'
+          sx={{ height: 28, width: 'auto' }}
+        />
         <Box>
           <Typography variant='h4'>{C.header.title}</Typography>
           <Typography variant='subtitle1' sx={{ fontWeight: 600, mt: 0.5 }}>
@@ -120,7 +125,11 @@ const AiVisibilityReportPrint = ({ model, header }: AiVisibilityReportPrintProps
             </Typography>
           </Stack>
           <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 0.5 }}>
-            {C.verdict.scoreDisclaimer} · {C.verdict.coverageValue(model.provenance.providersSampled.length, model.provenance.providersSampled.length)}
+            {C.verdict.scoreDisclaimer} ·{' '}
+            {C.verdict.coverageValue(
+              model.provenance.providersResponded?.length ?? null,
+              (model.provenance.providersRequested ?? model.provenance.providersSampled).length
+            )}
           </Typography>
         </Box>
       )}
@@ -171,7 +180,16 @@ const AiVisibilityReportPrint = ({ model, header }: AiVisibilityReportPrintProps
                       {C.engineSnapshot.presentLabel(engine.present, engine.resolved)}
                     </Typography>
                   </Stack>
-                  <StaticBar value={pct} color={pct >= 70 ? 'var(--mui-palette-success-main)' : pct >= 45 ? 'var(--mui-palette-warning-main)' : 'var(--mui-palette-error-main)'} />
+                  <StaticBar
+                    value={pct}
+                    color={
+                      pct >= 70
+                        ? 'var(--mui-palette-success-main)'
+                        : pct >= 45
+                          ? 'var(--mui-palette-warning-main)'
+                          : 'var(--mui-palette-error-main)'
+                    }
+                  />
                 </Box>
               )
             })}
@@ -204,11 +222,17 @@ const AiVisibilityReportPrint = ({ model, header }: AiVisibilityReportPrintProps
                 <Box key={dim.key}>
                   <Stack direction='row' justifyContent='space-between'>
                     <Typography variant='body2'>{dim.label}</Typography>
-                    <Typography variant='monoAmount' sx={{ color: empty ? 'text.disabled' : toneColorVar(dim.severity) }}>
+                    <Typography
+                      variant='monoAmount'
+                      sx={{ color: empty ? 'text.disabled' : toneColorVar(dim.severity) }}
+                    >
                       {empty ? C.levelsBand.coverageBadge : `${dim.score}/100`}
                     </Typography>
                   </Stack>
-                  <StaticBar value={empty ? 0 : (dim.score as number)} color={empty ? 'var(--mui-palette-text-disabled)' : toneColorVar(dim.severity)} />
+                  <StaticBar
+                    value={empty ? 0 : (dim.score as number)}
+                    color={empty ? 'var(--mui-palette-text-disabled)' : toneColorVar(dim.severity)}
+                  />
                 </Box>
               )
             })}
@@ -295,7 +319,10 @@ const AiVisibilityReportPrint = ({ model, header }: AiVisibilityReportPrintProps
       {show('provenance') && (
         <Box sx={{ mb: 4 }} data-capture='ai-visibility-report-print-provenance'>
           <PrintHeading title={C.provenance.title} />
-          <Box component='table' sx={{ width: '100%', borderCollapse: 'collapse', '& td, & th': { textAlign: 'left', py: 0.5 } }}>
+          <Box
+            component='table'
+            sx={{ width: '100%', borderCollapse: 'collapse', '& td, & th': { textAlign: 'left', py: 0.5 } }}
+          >
             <tbody>
               {[
                 { label: C.provenance.asOf, value: model.provenance.asOfDate ?? '—' },

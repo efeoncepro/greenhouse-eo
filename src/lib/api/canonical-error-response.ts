@@ -2,6 +2,8 @@ import 'server-only'
 
 import { NextResponse } from 'next/server'
 
+import { AEO_MARKET_ERRORS } from '@/lib/copy/aeo-markets'
+
 /**
  * Canonical API error response contract (Greenhouse, 2026-05-14).
  *
@@ -44,6 +46,7 @@ import { NextResponse } from 'next/server'
  */
 
 export type CanonicalErrorCode =
+  | keyof typeof AEO_MARKET_ERRORS
   // Tenant / auth (Identity UX hardening 2026-05-14)
   | 'unauthorized'
   | 'forbidden'
@@ -208,6 +211,9 @@ interface CanonicalErrorDefinition {
 }
 
 const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
+  ...(Object.fromEntries(
+    Object.entries(AEO_MARKET_ERRORS).map(([code, message]) => [code, { status: 409, message, actionable: false }])
+  ) as Record<keyof typeof AEO_MARKET_ERRORS, CanonicalErrorDefinition>),
   unauthorized: {
     status: 401,
     message: 'Tu sesión expiró. Inicia sesión de nuevo para continuar.',

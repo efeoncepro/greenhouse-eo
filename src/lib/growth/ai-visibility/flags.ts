@@ -7,7 +7,7 @@
  * false y produce skip controlado (NUNCA crash). Lectura pura de env (testeable).
  */
 
-import { type GrowthAiVisibilityProviderId } from './contracts'
+import type { GrowthAiVisibilityProviderId } from './contracts'
 
 export const GROWTH_AI_VISIBILITY_GRADER_FLAG = 'GROWTH_AI_VISIBILITY_GRADER_ENABLED'
 
@@ -167,10 +167,7 @@ export const isEntityProbesEnabled = (env: NodeJS.ProcessEnv = process.env): boo
  * re-export para los consumers históricos del dominio. ⚠️ DUAL-LOCATION (Vercel +
  * ops-worker); ON desde el cutover 2026-08-27 (ledger: FEATURE_FLAG_STATE_LEDGER.md).
  */
-export {
-  GROWTH_PROBE_FETCH_STRICT_NETWORK_FLAG,
-  isProbeFetchStrictNetworkEnabled
-} from '@/lib/growth/site-substrate'
+export { GROWTH_PROBE_FETCH_STRICT_NETWORK_FLAG, isProbeFetchStrictNetworkEnabled } from '@/lib/growth/site-substrate'
 
 /**
  * TASK-1269 — Fix-It Artifacts (JSON-LD / llms.txt / content briefs).
@@ -351,8 +348,7 @@ export const resolveAeoAllowanceConfig = (env: NodeJS.ProcessEnv = process.env):
  */
 export const GROWTH_AI_VISIBILITY_BUDGET_GATE_FLAG = 'GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED'
 
-export const GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED_FLAG =
-  'GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED'
+export const GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED_FLAG = 'GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED'
 
 /** Shadow: computa y registra el presupuesto AEO. NO bloquea. Default OFF. */
 export const isAeoBudgetGateEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
@@ -393,8 +389,7 @@ export const resolveRecurringRegradeConfig = (env: NodeJS.ProcessEnv = process.e
  */
 export const GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_PROVIDER_FLAG = 'GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_PROVIDER'
 
-export const GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_SHADOW_FLAG =
-  'GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_SHADOW_ENABLED'
+export const GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_SHADOW_FLAG = 'GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_SHADOW_ENABLED'
 
 export const PROSE_EXTRACTION_PROVIDER_IDS = ['anthropic', 'gemini', 'openai'] as const
 export type ProseExtractionProviderFlagValue = (typeof PROSE_EXTRACTION_PROVIDER_IDS)[number]
@@ -434,3 +429,7 @@ export const resolveProseExtractionConfig = (env: NodeJS.ProcessEnv = process.en
   ),
   maxCostUsd: toPositiveFloat(env.GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_MAX_COST_USD, 0.02)
 })
+
+/** TASK-1863. Controls additional markets and batches, not geographic correctness. */
+export const isMultiMarketEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env.GROWTH_AI_VISIBILITY_MULTI_MARKET_ENABLED)

@@ -28,13 +28,10 @@ export const AI_VISIBILITY_MODULE_KEY = 'ai_visibility_v1' as const
 
 export type AeoTier = 'contracted' | 'trial' | 'pilot'
 
-export type AeoBlockedReason =
-  | 'no_entitlement'
-  | 'expired'
-  | 'quota_exhausted'
-  | 'trial_budget_exhausted'
+export type AeoBlockedReason = 'no_entitlement' | 'expired' | 'quota_exhausted' | 'trial_budget_exhausted'
 
 export interface AeoEntitlement {
+  marketsIncluded?: string[] | null
   organizationId: string
   /** ¿La org tiene el módulo AEO asignado y vigente? */
   hasModule: boolean
@@ -79,11 +76,7 @@ const resolveTier = (status: string, metadata: Record<string, unknown> | null): 
   return status === 'pilot' ? 'pilot' : 'trial'
 }
 
-const resolveCap = (
-  tier: AeoTier,
-  metadata: Record<string, unknown> | null,
-  config: AeoAllowanceConfig
-): number => {
+const resolveCap = (tier: AeoTier, metadata: Record<string, unknown> | null, config: AeoAllowanceConfig): number => {
   if (tier === 'contracted') {
     return config.contractedRunsPerMonth
   }
@@ -171,8 +164,7 @@ export const resolveAeoEntitlement = async (
   const lightCeilingUsd = resolveProviderPolicy('light').costCeilingUsdPerRun
   const globalTrialEstimatedUsd = globalTrialUsed * lightCeilingUsd
 
-  const trialBudgetTripped =
-    tier === 'trial' && globalTrialEstimatedUsd >= config.trialGlobalMonthlyBudgetUsd
+  const trialBudgetTripped = tier === 'trial' && globalTrialEstimatedUsd >= config.trialGlobalMonthlyBudgetUsd
 
   let blockedReason: AeoBlockedReason | null = null
 
@@ -185,6 +177,10 @@ export const resolveAeoEntitlement = async (
   return {
     organizationId,
     hasModule: true,
+    marketsIncluded:
+      tier === 'contracted' && Array.isArray(assignment.metadata_json?.aeo_markets_included)
+        ? assignment.metadata_json.aeo_markets_included.filter((value): value is string => typeof value === 'string')
+        : null,
     tier,
     assignmentId: assignment.assignment_id,
     status: assignment.status,

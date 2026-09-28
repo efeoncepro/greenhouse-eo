@@ -10,6 +10,8 @@ import { type NormalizedFinding } from '../normalization/contracts'
 import { AI_VISIBILITY_SCORE_VERSION } from '../scoring/config'
 import { type PersistedGraderScore } from '../scoring/engine'
 
+const live = { competitors: ['Cebra'] }
+
 const captured: { findings: NormalizedFinding[]; score: PersistedGraderScore | null } = {
   findings: [],
   score: null
@@ -41,7 +43,7 @@ vi.mock('../store', () => ({
     market: 'Chile',
     locale: 'es-CL',
     category: 'marketing y diseño',
-    competitorsDeclared: ['Cebra'],
+    competitorsDeclared: live.competitors,
     status: 'active'
   }),
   getRunObservations: async () => [
@@ -70,6 +72,7 @@ vi.mock('../scoring/store', () => ({
 const { scoreGraderRun } = await import('../scoring/command')
 
 beforeEach(() => {
+  live.competitors = ['Cebra']
   captured.findings = []
   captured.score = null
   delete process.env.GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED
@@ -98,6 +101,18 @@ describe('growth/ai-visibility — scoreGraderRun command', () => {
 
     expect(a.score.overallScore).toBe(b.score.overallScore)
     expect(a.score.dimensions).toEqual(b.score.dimensions)
+  })
+
+  it('preserves legacy scores and findings even when recompute is requested after profile changes', async () => {
+    const before = await scoreGraderRun({ runId: 'run-1' })
+    const saved = structuredClone(before)
+
+    live.competitors = ['A completely different competitor']
+    const after = await scoreGraderRun({ runId: 'run-1', recompute: true })
+
+    expect(after).toEqual(saved)
+    expect(captured.findings).toEqual(saved.findings)
+    expect(captured.score).toEqual(saved.score)
   })
 
   it('status refleja el gate de cobertura (>=3 resueltas + >=2 familias)', async () => {

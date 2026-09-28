@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-28 — Grader AEO por mercado e idioma (TASK-1863, implementación local)
+
+- Catálogo compartido LATAM/PR/ES/US y packs es/en/pt-BR/fr; Google AI Mode usa location_code e idioma
+  explícitos, sin fallback US. Canary real: 22 éxitos y Cuba skip por falta de ubicación.
+- Mercados/competidores versionados, snapshots, lotes atómicos y matriz sin promedio; ubicación nativa
+  declarada por proveedor, presupuesto total y cobertura honesta de motores en informe/PDF.
+- Migraciones/backfill y rollout siguen pendientes. Build y pruebas locales documentados en
+  [la evidencia de TASK-1863](docs/audits/platform/2026-09-28-task-1863-verification.md).
+
+
 ## 2026-09-28 — Ruta gobernada para producir piezas de marca en la plataforma (TASK-1921)
 
 - Nueva cola `greenhouse_brand` (pedidos, jobs y eventos append-only). El command `requestBrandRender` valida el

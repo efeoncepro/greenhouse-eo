@@ -14,17 +14,13 @@
 
 import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
 
-import { type ScoreDimensionKey } from '../scoring/config'
-import { type PersistedGraderScore } from '../scoring/engine'
-import {
-  type DimensionTrend,
-  type ReportTrend,
-  type TrendDelta,
-  type TrendDirection
-} from './contracts'
+import type { ScoreDimensionKey } from '../scoring/config'
+import type { PersistedGraderScore } from '../scoring/engine'
+import { type DimensionTrend, type ReportTrend, type TrendDelta, type TrendDirection } from './contracts'
 
 /** Score previo comparable + metadata del run que lo produjo. */
 export interface PreviousScoreInput {
+  competitorSetComparable?: boolean
   score: PersistedGraderScore
   promptPackVersion: string
   finishedAt: string | null
@@ -47,7 +43,12 @@ const buildDelta = (current: number | null, previous: number | null): TrendDelta
   return { current, previous, delta, direction: resolveDirection(delta) }
 }
 
-const trend = (status: ReportTrend['status'], previousAsOf: string | null, overall: TrendDelta | null, dimensions: DimensionTrend[]): ReportTrend => ({
+const trend = (
+  status: ReportTrend['status'],
+  previousAsOf: string | null,
+  overall: TrendDelta | null,
+  dimensions: DimensionTrend[]
+): ReportTrend => ({
   status,
   reason: GH_GROWTH_AI_VISIBILITY.trend_status[status],
   previousAsOf,
@@ -73,16 +74,26 @@ export const buildReportTrend = (
     return trend('incomparable', previous.finishedAt, null, [])
   }
 
-  const previousByKey = new Map<ScoreDimensionKey, number | null>(
-    previous.score.dimensions.map(d => [d.key, d.score])
-  )
+  const previousByKey = new Map<ScoreDimensionKey, number | null>(previous.score.dimensions.map(d => [d.key, d.score]))
 
   const dimensions: DimensionTrend[] = current.dimensions.map(dimension => ({
     key: dimension.key,
-    ...buildDelta(dimension.score, previousByKey.get(dimension.key) ?? null)
+    comparison:
+      dimension.key === 'competitive_sov' && previous.competitorSetComparable === false
+        ? 'competitor_set_changed'
+        : 'comparable',
+    ...buildDelta(
+      dimension.score,
+      dimension.key === 'competitive_sov' && previous.competitorSetComparable === false
+        ? null
+        : (previousByKey.get(dimension.key) ?? null)
+    )
   }))
 
-  const overall = buildDelta(current.overallScore, previous.score.overallScore)
+  const overall = buildDelta(
+    current.overallScore,
+    previous.competitorSetComparable === false ? null : previous.score.overallScore
+  )
 
   return trend('con_tendencia', previous.finishedAt, overall, dimensions)
 }

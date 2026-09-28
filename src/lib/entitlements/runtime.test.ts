@@ -21,11 +21,13 @@ const buildSubject = (overrides: Partial<TenantEntitlementSubject> = {}): Tenant
 
 describe('getTenantEntitlements', () => {
   it('grants broad workspace access to superadmins', () => {
-    const entitlements = getTenantEntitlements(buildSubject({
-      roleCodes: [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.COLLABORATOR],
-      primaryRoleCode: ROLE_CODES.EFEONCE_ADMIN,
-      routeGroups: ['internal', 'admin', 'client', 'commercial', 'finance', 'hr', 'people', 'my', 'ai_tooling']
-    }))
+    const entitlements = getTenantEntitlements(
+      buildSubject({
+        roleCodes: [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.COLLABORATOR],
+        primaryRoleCode: ROLE_CODES.EFEONCE_ADMIN,
+        routeGroups: ['internal', 'admin', 'client', 'commercial', 'finance', 'hr', 'people', 'my', 'ai_tooling']
+      })
+    )
 
     expect(entitlements.audienceKey).toBe('admin')
     expect(entitlements.startupPolicyKey).toBe('internal_default')
@@ -41,12 +43,14 @@ describe('getTenantEntitlements', () => {
   })
 
   it('bridges authorized views into people and hr entitlements without finance access', () => {
-    const entitlements = getTenantEntitlements(buildSubject({
-      roleCodes: [ROLE_CODES.HR_MANAGER],
-      primaryRoleCode: ROLE_CODES.HR_MANAGER,
-      routeGroups: ['hr'],
-      authorizedViews: ['equipo.personas', 'equipo.organigrama']
-    }))
+    const entitlements = getTenantEntitlements(
+      buildSubject({
+        roleCodes: [ROLE_CODES.HR_MANAGER],
+        primaryRoleCode: ROLE_CODES.HR_MANAGER,
+        routeGroups: ['hr'],
+        authorizedViews: ['equipo.personas', 'equipo.organigrama']
+      })
+    )
 
     expect(entitlements.audienceKey).toBe('hr')
     expect(entitlements.startupPolicyKey).toBe('hr_workspace')
@@ -60,11 +64,13 @@ describe('getTenantEntitlements', () => {
   })
 
   it('keeps finance users in the finance audience and grants finance status', () => {
-    const entitlements = getTenantEntitlements(buildSubject({
-      roleCodes: [ROLE_CODES.FINANCE_ANALYST],
-      primaryRoleCode: ROLE_CODES.FINANCE_ANALYST,
-      routeGroups: ['finance', 'commercial']
-    }))
+    const entitlements = getTenantEntitlements(
+      buildSubject({
+        roleCodes: [ROLE_CODES.FINANCE_ANALYST],
+        primaryRoleCode: ROLE_CODES.FINANCE_ANALYST,
+        routeGroups: ['finance', 'commercial']
+      })
+    )
 
     expect(entitlements.audienceKey).toBe('finance')
     expect(entitlements.startupPolicyKey).toBe('finance_workspace')
@@ -79,34 +85,44 @@ describe('getTenantEntitlements', () => {
   })
 
   it('grants payment instrument admin capabilities only to finance admins and superadmins', () => {
-    const financeAdminEntitlements = getTenantEntitlements(buildSubject({
-      roleCodes: [ROLE_CODES.FINANCE_ADMIN],
-      primaryRoleCode: ROLE_CODES.FINANCE_ADMIN,
-      routeGroups: ['finance', 'commercial']
-    }))
+    const financeAdminEntitlements = getTenantEntitlements(
+      buildSubject({
+        roleCodes: [ROLE_CODES.FINANCE_ADMIN],
+        primaryRoleCode: ROLE_CODES.FINANCE_ADMIN,
+        routeGroups: ['finance', 'commercial']
+      })
+    )
 
-    const superadminEntitlements = getTenantEntitlements(buildSubject({
-      roleCodes: [ROLE_CODES.EFEONCE_ADMIN],
-      primaryRoleCode: ROLE_CODES.EFEONCE_ADMIN,
-      routeGroups: ['admin', 'commercial', 'finance']
-    }))
+    const superadminEntitlements = getTenantEntitlements(
+      buildSubject({
+        roleCodes: [ROLE_CODES.EFEONCE_ADMIN],
+        primaryRoleCode: ROLE_CODES.EFEONCE_ADMIN,
+        routeGroups: ['admin', 'commercial', 'finance']
+      })
+    )
 
     expect(can(financeAdminEntitlements, 'finance.payment_instruments.update', 'update', 'tenant')).toBe(true)
     expect(can(financeAdminEntitlements, 'finance.payment_instruments.manage_defaults', 'manage', 'tenant')).toBe(true)
     expect(can(financeAdminEntitlements, 'finance.payment_instruments.reveal_sensitive', 'read', 'tenant')).toBe(false)
     expect(can(financeAdminEntitlements, 'commercial.service_engagement.sync', 'sync', 'tenant')).toBe(true)
-    expect(can(financeAdminEntitlements, 'commercial.service_engagement.resolve_orphan', 'approve', 'tenant')).toBe(true)
-    expect(can(financeAdminEntitlements, 'commercial.service_engagement.archive_legacy', 'delete', 'tenant')).toBe(false)
+    expect(can(financeAdminEntitlements, 'commercial.service_engagement.resolve_orphan', 'approve', 'tenant')).toBe(
+      true
+    )
+    expect(can(financeAdminEntitlements, 'commercial.service_engagement.archive_legacy', 'delete', 'tenant')).toBe(
+      false
+    )
     expect(can(superadminEntitlements, 'finance.payment_instruments.reveal_sensitive', 'read', 'tenant')).toBe(true)
     expect(can(superadminEntitlements, 'commercial.service_engagement.archive_legacy', 'delete', 'tenant')).toBe(true)
   })
 
   it('grants commercial workspace capabilities to account leads without finance status access', () => {
-    const entitlements = getTenantEntitlements(buildSubject({
-      roleCodes: [ROLE_CODES.EFEONCE_ACCOUNT],
-      primaryRoleCode: ROLE_CODES.EFEONCE_ACCOUNT,
-      routeGroups: ['internal', 'commercial']
-    }))
+    const entitlements = getTenantEntitlements(
+      buildSubject({
+        roleCodes: [ROLE_CODES.EFEONCE_ACCOUNT],
+        primaryRoleCode: ROLE_CODES.EFEONCE_ACCOUNT,
+        routeGroups: ['internal', 'commercial']
+      })
+    )
 
     expect(can(entitlements, 'commercial.workspace', 'launch', 'tenant')).toBe(true)
     expect(can(entitlements, 'commercial.quotation', 'create', 'tenant')).toBe(true)
@@ -117,23 +133,29 @@ describe('getTenantEntitlements', () => {
   })
 
   it('grants AEO entitlement mutation only to account leads and admins', () => {
-    const accountEntitlements = getTenantEntitlements(buildSubject({
-      roleCodes: [ROLE_CODES.EFEONCE_ACCOUNT],
-      primaryRoleCode: ROLE_CODES.EFEONCE_ACCOUNT,
-      routeGroups: ['internal', 'commercial']
-    }))
+    const accountEntitlements = getTenantEntitlements(
+      buildSubject({
+        roleCodes: [ROLE_CODES.EFEONCE_ACCOUNT],
+        primaryRoleCode: ROLE_CODES.EFEONCE_ACCOUNT,
+        routeGroups: ['internal', 'commercial']
+      })
+    )
 
-    const adminEntitlements = getTenantEntitlements(buildSubject({
-      roleCodes: [ROLE_CODES.EFEONCE_ADMIN],
-      primaryRoleCode: ROLE_CODES.EFEONCE_ADMIN,
-      routeGroups: ['internal', 'admin']
-    }))
+    const adminEntitlements = getTenantEntitlements(
+      buildSubject({
+        roleCodes: [ROLE_CODES.EFEONCE_ADMIN],
+        primaryRoleCode: ROLE_CODES.EFEONCE_ADMIN,
+        routeGroups: ['internal', 'admin']
+      })
+    )
 
-    const operationsEntitlements = getTenantEntitlements(buildSubject({
-      roleCodes: [ROLE_CODES.EFEONCE_OPERATIONS],
-      primaryRoleCode: ROLE_CODES.EFEONCE_OPERATIONS,
-      routeGroups: ['internal']
-    }))
+    const operationsEntitlements = getTenantEntitlements(
+      buildSubject({
+        roleCodes: [ROLE_CODES.EFEONCE_OPERATIONS],
+        primaryRoleCode: ROLE_CODES.EFEONCE_OPERATIONS,
+        routeGroups: ['internal']
+      })
+    )
 
     expect(can(accountEntitlements, 'growth.ai_visibility.entitlement.manage', 'execute', 'tenant')).toBe(true)
     expect(can(adminEntitlements, 'growth.ai_visibility.entitlement.manage', 'execute', 'tenant')).toBe(true)
@@ -142,17 +164,21 @@ describe('getTenantEntitlements', () => {
   })
 
   it('keeps engagement approval gated to efeonce admins', () => {
-    const accountLeadEntitlements = getTenantEntitlements(buildSubject({
-      roleCodes: [ROLE_CODES.EFEONCE_ACCOUNT],
-      primaryRoleCode: ROLE_CODES.EFEONCE_ACCOUNT,
-      routeGroups: ['commercial']
-    }))
+    const accountLeadEntitlements = getTenantEntitlements(
+      buildSubject({
+        roleCodes: [ROLE_CODES.EFEONCE_ACCOUNT],
+        primaryRoleCode: ROLE_CODES.EFEONCE_ACCOUNT,
+        routeGroups: ['commercial']
+      })
+    )
 
-    const adminEntitlements = getTenantEntitlements(buildSubject({
-      roleCodes: [ROLE_CODES.EFEONCE_ADMIN],
-      primaryRoleCode: ROLE_CODES.EFEONCE_ADMIN,
-      routeGroups: ['admin', 'commercial']
-    }))
+    const adminEntitlements = getTenantEntitlements(
+      buildSubject({
+        roleCodes: [ROLE_CODES.EFEONCE_ADMIN],
+        primaryRoleCode: ROLE_CODES.EFEONCE_ADMIN,
+        routeGroups: ['admin', 'commercial']
+      })
+    )
 
     expect(can(accountLeadEntitlements, 'commercial.engagement.approve', 'approve', 'tenant')).toBe(false)
     expect(can(adminEntitlements, 'commercial.engagement.approve', 'approve', 'tenant')).toBe(true)
@@ -169,17 +195,21 @@ describe('getTenantEntitlements', () => {
   })
 
   it('grants organization brand asset mutation to admin route group but not regular internal users', () => {
-    const adminEntitlements = getTenantEntitlements(buildSubject({
-      roleCodes: [ROLE_CODES.COLLABORATOR],
-      primaryRoleCode: ROLE_CODES.COLLABORATOR,
-      routeGroups: ['internal', 'admin']
-    }))
+    const adminEntitlements = getTenantEntitlements(
+      buildSubject({
+        roleCodes: [ROLE_CODES.COLLABORATOR],
+        primaryRoleCode: ROLE_CODES.COLLABORATOR,
+        routeGroups: ['internal', 'admin']
+      })
+    )
 
-    const internalEntitlements = getTenantEntitlements(buildSubject({
-      roleCodes: [ROLE_CODES.COLLABORATOR],
-      primaryRoleCode: ROLE_CODES.COLLABORATOR,
-      routeGroups: ['internal']
-    }))
+    const internalEntitlements = getTenantEntitlements(
+      buildSubject({
+        roleCodes: [ROLE_CODES.COLLABORATOR],
+        primaryRoleCode: ROLE_CODES.COLLABORATOR,
+        routeGroups: ['internal']
+      })
+    )
 
     expect(can(adminEntitlements, 'organization.brand_asset', 'review', 'tenant')).toBe(true)
     expect(can(adminEntitlements, 'organization.brand_asset', 'update', 'tenant')).toBe(true)
@@ -188,12 +218,14 @@ describe('getTenantEntitlements', () => {
   })
 
   it('maps client tenants to the client portal workspace', () => {
-    const entitlements = getTenantEntitlements(buildSubject({
-      tenantType: 'client',
-      roleCodes: [ROLE_CODES.CLIENT_EXECUTIVE],
-      primaryRoleCode: ROLE_CODES.CLIENT_EXECUTIVE,
-      routeGroups: ['client']
-    }))
+    const entitlements = getTenantEntitlements(
+      buildSubject({
+        tenantType: 'client',
+        roleCodes: [ROLE_CODES.CLIENT_EXECUTIVE],
+        primaryRoleCode: ROLE_CODES.CLIENT_EXECUTIVE,
+        routeGroups: ['client']
+      })
+    )
 
     expect(entitlements.audienceKey).toBe('client')
     expect(entitlements.startupPolicyKey).toBe('client_default')
@@ -210,5 +242,34 @@ describe('getTenantEntitlements', () => {
 
     expect(can(subject, 'finance.reconciliation.declare_snapshot', 'create', 'space')).toBe(false)
     expect(can(subject, 'home.view', 'read', 'own')).toBe(true)
+  })
+})
+
+describe('TASK-1863 market configuration authority', () => {
+  it.each([ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.EFEONCE_ACCOUNT, ROLE_CODES.EFEONCE_OPERATIONS])(
+    'grants internal role %s market management',
+    role => {
+      expect(
+        can(
+          buildSubject({ roleCodes: [role], primaryRoleCode: role, routeGroups: ['internal'] }),
+          'growth.ai_visibility.market.manage',
+          'execute',
+          'tenant'
+        )
+      ).toBe(true)
+    }
+  )
+  it('does not grant from internal navigation alone or to clients', () => {
+    expect(
+      can(buildSubject({ routeGroups: ['internal'] }), 'growth.ai_visibility.market.manage', 'execute', 'tenant')
+    ).toBe(false)
+    expect(
+      can(
+        buildSubject({ tenantType: 'client', roleCodes: [ROLE_CODES.EFEONCE_ACCOUNT], routeGroups: ['client'] }),
+        'growth.ai_visibility.market.manage',
+        'execute',
+        'tenant'
+      )
+    ).toBe(false)
   })
 })

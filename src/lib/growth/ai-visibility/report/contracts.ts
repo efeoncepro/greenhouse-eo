@@ -15,10 +15,10 @@
  */
 
 import { type AccuracyConfidence, type AccuracyFindingKind } from '../accuracy/contracts'
-import { type GrowthAiVisibilityProviderId } from '../contracts'
-import { type GraderEngineSurface } from '../normalization/contracts'
+import type { GrowthAiVisibilityProviderId } from '../contracts'
+import type { GraderEngineSurface } from '../normalization/contracts'
 import { type ProbeAxis, type ProbeKind } from '../probes/contracts'
-import { type ScoreDimensionKey } from '../scoring/config'
+import type { ScoreDimensionKey } from '../scoring/config'
 import { type CategoryTaxonomyLevel, type CategoryTaxonomyVersion } from '../taxonomy'
 
 export const GROWTH_AI_VISIBILITY_REPORT_VERSION = 'ai_visibility_report_v1' as const
@@ -216,6 +216,11 @@ export interface ReportAccuracyFinding {
 
 /** Procedencia: orienta + sostiene el disclaimer (P-4). */
 export interface ReportProvenance {
+  market?: { code: string; locale: string; label: string } | null
+  providersRequested?: string[]
+  providersAttempted?: string[]
+  providersResponded?: string[]
+  geoModes?: Record<string, { mode: 'native' | 'prompt_only'; country: string }>
   asOfDate: string | null
   promptPackVersion: string
   scoreVersion: string
@@ -435,6 +440,7 @@ export interface TrendDelta {
 }
 
 export interface DimensionTrend extends TrendDelta {
+  comparison?: 'comparable' | 'competitor_set_changed'
   key: ScoreDimensionKey
 }
 

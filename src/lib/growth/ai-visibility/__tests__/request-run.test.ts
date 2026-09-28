@@ -28,6 +28,8 @@ const state = {
 const spies = { enqueue: vi.fn(), outbox: vi.fn() }
 
 vi.mock('../flags', () => ({
+  isMultiMarketEnabled: () => true,
+  resolveAeoAllowanceConfig: () => ({ trialGlobalMonthlyBudgetUsd: 25 }),
   isPortalRunEnabled: () => state.portalEnabled,
   isTrialTierEnabled: () => state.trialEnabled,
   isGraderEnabled: () => state.graderEnabled,
@@ -72,7 +74,15 @@ vi.mock('@/lib/sync/publish-event', () => ({
 }))
 
 let budgetGateEnabled = false
-let budgetState = { wouldBlock: false, enforced: false, tier: 'contracted', budgetCapUsd: 60, invoicedUsedUsd: 0, estimatedUsedUsd: 0, budgetUsedUsd: 0 }
+let budgetState = {
+  wouldBlock: false,
+  enforced: false,
+  tier: 'contracted',
+  budgetCapUsd: 60,
+  invoicedUsedUsd: 0,
+  estimatedUsedUsd: 0,
+  budgetUsedUsd: 0
+}
 
 vi.mock('../budget', () => ({
   resolveAeoBudget: async () => budgetState
@@ -80,26 +90,30 @@ vi.mock('../budget', () => ({
 
 vi.mock('@/lib/observability/capture', () => ({ captureWithDomain: vi.fn() }))
 
-vi.mock('@/lib/postgres/client', () => ({
-  withGreenhousePostgresTransaction: async (cb: (client: unknown) => Promise<unknown>) => {
-    const client = {
-      query: async (sql: string) => {
-        if (sql.includes('used')) {
-          return { rows: [{ used: state.usedInTx }] }
-        }
-
-        return { rows: [] }
-      }
-    }
-
-    return cb(client)
-  },
-  runGreenhousePostgresQuery: async () => []
+vi.mock('@/lib/db', () => ({
+  withTransaction: async (work: (client: unknown) => Promise<unknown>) => work({ query: async () => ({ rows: [] }) })
+}))
+vi.mock('../markets/store', () => ({
+  ensurePrimaryMarket: async () => ({ marketId: 'gpmk-1', isPrimary: true }),
+  listProfileMarkets: async () => [
+    { marketId: 'gpmk-1', marketCode: 'CL', locale: 'es-CL', status: 'active', isPrimary: true }
+  ],
+  snapshotMarket: async () => ({ competitors: [] }),
+  marketQueries: () => async (sql: string) => {
+    if (sql.includes('SELECT * FROM greenhouse_growth.grader_run_batches')) return []
+    if (sql.includes('INSERT INTO greenhouse_growth.grader_run_batches'))
+      return [{ batch_id: 'b1', public_id: 'EO-GRBT-1' }]
+    if (sql.includes('module_assignments')) return [{ metadata_json: {} }]
+    if (sql.includes(' AS used')) return [{ used: state.usedInTx, reserved: 0 }]
+    if (sql.includes('reserved')) return [{ reserved: 0 }]
+    throw new Error('Unexpected market query: ' + sql)
+  }
 }))
 
 import { requestGraderRunAsOperator, requestGraderRunForOrganization } from '../request-run'
 
 const PROFILE = {
+  profileId: 'gprf-1',
   brandName: 'Acme',
   websiteUrl: 'https://acme.cl',
   market: 'CL',
@@ -148,7 +162,12 @@ describe('requestGraderRunForOrganization', () => {
   })
 
   it('blocked not_entitled si la org no tiene módulo', async () => {
-    state.entitlement = entitlement({ hasModule: false, tier: null, assignmentId: null, blockedReason: 'no_entitlement' })
+    state.entitlement = entitlement({
+      hasModule: false,
+      tier: null,
+      assignmentId: null,
+      blockedReason: 'no_entitlement'
+    })
     const r = await requestGraderRunForOrganization({ organizationId: 'org-1', requestedBy: 'u1' })
 
     expect(r).toEqual({ status: 'blocked', reason: 'not_entitled' })

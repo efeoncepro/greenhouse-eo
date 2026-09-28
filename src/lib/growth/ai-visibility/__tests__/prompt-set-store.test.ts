@@ -8,6 +8,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
  * command gobernado (autoría/aprobación).
  */
 
+vi.mock('../markets/store', () => ({
+  lockGraderProfile: async () => ({}),
+  ensurePrimaryMarket: async () => ({ marketId: 'gpmk-1', status: 'active' }),
+  listProfileMarkets: async () => []
+}))
+vi.mock('../store', () => ({ projectProfile: () => ({ profileId: 'gprf-1' }) }))
+
 vi.mock('@/lib/entitlements/runtime', () => ({ can: vi.fn() }))
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: vi.fn(),
@@ -32,7 +39,16 @@ const baseRow = (over: Record<string, unknown>) => ({
   version: 1,
   business_model: 'consumer_b2c',
   category_node_id: 'sector:passenger_airlines',
-  prompts_json: [{ id: 'cb01', family: 'category_discovery', fanOutType: 'related', intentStage: 'awareness', namesBrand: false, text: '¿…?' }],
+  prompts_json: [
+    {
+      id: 'cb01',
+      family: 'category_discovery',
+      fanOutType: 'related',
+      intentStage: 'awareness',
+      namesBrand: false,
+      text: '¿…?'
+    }
+  ],
   generation_strategy: 'template_baseline',
   model: null,
   system_prompt_version: null,
@@ -48,9 +64,8 @@ const baseRow = (over: Record<string, unknown>) => ({
 beforeEach(() => {
   vi.clearAllMocks()
   fakeClient.query.mockReset()
-  vi.mocked(withGreenhousePostgresTransaction).mockImplementation(
-    (async (cb: (c: typeof fakeClient) => unknown) => cb(fakeClient)) as never
-  )
+  vi.mocked(withGreenhousePostgresTransaction).mockImplementation((async (cb: (c: typeof fakeClient) => unknown) =>
+    cb(fakeClient)) as never)
 })
 
 describe('createDraftPromptSet', () => {
@@ -75,23 +90,27 @@ describe('createDraftPromptSet', () => {
 
 describe('approvePromptSet — lifecycle atómico', () => {
   it('not_found si el set no existe', async () => {
-    fakeClient.query.mockResolvedValueOnce({ rows: [] })
+    fakeClient.query.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [] })
     await expect(approvePromptSet({ setId: 'gps-x', approvedBy: 'op-1' })).rejects.toMatchObject({
       code: 'not_found'
     })
   })
 
   it('no-op idempotente si ya está active', async () => {
-    fakeClient.query.mockResolvedValueOnce({ rows: [baseRow({ status: 'active' })] })
+    fakeClient.query
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [baseRow({ status: 'active' })] })
 
     const result = await approvePromptSet({ setId: 'gps-1', approvedBy: 'op-1' })
 
     expect(result.status).toBe('active')
-    expect(fakeClient.query).toHaveBeenCalledTimes(1) // solo el SELECT FOR UPDATE
+    expect(fakeClient.query).toHaveBeenCalledTimes(2) // solo el SELECT FOR UPDATE
   })
 
   it('rechaza aprobar un superseded', async () => {
-    fakeClient.query.mockResolvedValueOnce({ rows: [baseRow({ status: 'superseded' })] })
+    fakeClient.query
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [baseRow({ status: 'superseded' })] })
     await expect(approvePromptSet({ setId: 'gps-1', approvedBy: 'op-1' })).rejects.toBeInstanceOf(
       PromptSetLifecycleError
     )
@@ -99,6 +118,7 @@ describe('approvePromptSet — lifecycle atómico', () => {
 
   it('draft → active: supersede el active previo + activa este (un solo active)', async () => {
     fakeClient.query
+      .mockResolvedValueOnce({ rows: [] }) // profile lock
       .mockResolvedValueOnce({ rows: [baseRow({ status: 'draft' })] }) // SELECT FOR UPDATE
       .mockResolvedValueOnce({ rows: [] }) // UPDATE supersede prior active
       .mockResolvedValueOnce({ rows: [baseRow({ status: 'active', approved_by: 'op-1', approved_at: 't1' })] }) // activate
@@ -107,9 +127,9 @@ describe('approvePromptSet — lifecycle atómico', () => {
 
     expect(result.status).toBe('active')
     expect(result.approvedBy).toBe('op-1')
-    expect(fakeClient.query).toHaveBeenCalledTimes(3)
+    expect(fakeClient.query).toHaveBeenCalledTimes(4)
     // el supersede del active previo del MISMO perfil corre antes de activar.
-    expect(String(fakeClient.query.mock.calls[1][0])).toContain("status = 'superseded'")
+    expect(String(fakeClient.query.mock.calls[2][0])).toContain("status = 'superseded'")
   })
 })
 

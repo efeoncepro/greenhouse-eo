@@ -7,11 +7,8 @@
  * bug p06 del spike). NUNCA inyecta PII.
  */
 
-import { type GraderRunPromptInput } from './run-engine'
-import {
-  GROWTH_AI_VISIBILITY_PROMPT_PACK_V1,
-  type GrowthAiVisibilityPromptPack
-} from './prompt-packs/prompt-pack-v1'
+import type { GraderRunPromptInput } from './run-engine'
+import { GROWTH_AI_VISIBILITY_PROMPT_PACK_V1, type GrowthAiVisibilityPromptPack } from './prompt-packs/prompt-pack-v1'
 
 export interface PromptPackProfileVars {
   brandName: string
@@ -42,7 +39,15 @@ export const resolvePromptInputs = (
     brand: vars.brandName,
     category: vars.category,
     market: vars.market,
-    painPoint: vars.painPoint ?? 'su visibilidad y posicionamiento de marca',
+    painPoint:
+      vars.painPoint ??
+      (pack.locale.startsWith('en')
+        ? 'brand visibility and positioning'
+        : pack.locale.startsWith('fr')
+          ? 'la visibilité et le positionnement de la marque'
+          : pack.locale.startsWith('pt')
+            ? 'a visibilidade e o posicionamento da marca'
+            : 'su visibilidad y posicionamiento de marca'),
     year: vars.year ?? String(new Date().getFullYear()),
     ...(vars.competitor ? { competitor: vars.competitor } : {})
   }
@@ -61,4 +66,7 @@ export const resolvePromptInputs = (
     }))
 }
 
-export { GROWTH_AI_VISIBILITY_PROMPT_PACK_V1, GROWTH_AI_VISIBILITY_PROMPT_PACK_VERSION } from './prompt-packs/prompt-pack-v1'
+export {
+  GROWTH_AI_VISIBILITY_PROMPT_PACK_V1,
+  GROWTH_AI_VISIBILITY_PROMPT_PACK_VERSION
+} from './prompt-packs/prompt-pack-v1'

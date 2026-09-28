@@ -339,6 +339,21 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: operatorSource
     })
 
+    if (
+      subject.tenantType === 'efeonce_internal' &&
+      [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.EFEONCE_ACCOUNT, ROLE_CODES.EFEONCE_OPERATIONS].some(role =>
+        hasRole(subject, role)
+      )
+    ) {
+      addEntitlement(entries, {
+        module: 'growth',
+        capability: 'growth.ai_visibility.market.manage',
+        action: 'execute',
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
+
     // TASK-1289 — profile.set_business_model: el operador corrige el modelo de negocio
     // derivado de un perfil AEO (reencuadra el buyer-intent de todo run futuro de la org).
     // Mismo set operador que run.operator. El command self-guarda con can() (profile arbitrario).
@@ -3195,7 +3210,13 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     // §7.1): un enlace saca el informe fuera del portal, así que no nace con leer ni con generar.
     if (hasRole(subject, ROLE_CODES.CLIENT_EXECUTIVE)) {
       for (const action of ['create', 'read', 'update'] as const) {
-        addEntitlement(entries, { module: 'insights', capability: 'insights.share.manage', action, scope: 'own', source: 'role' })
+        addEntitlement(entries, {
+          module: 'insights',
+          capability: 'insights.share.manage',
+          action,
+          scope: 'own',
+          source: 'role'
+        })
       }
     }
   }

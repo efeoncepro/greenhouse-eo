@@ -354,3 +354,9 @@ El re-grade es una aplicación de cadencia sobre el run-engine existente: un Clo
 
 1. ¿Cadencia default semanal o mensual? Resuelto: mensual por defecto (`monthly`) para equilibrar costo/frescura; configurable por perfil.
 2. ¿El opt-in es para clientes pagos o también para leads del lead magnet? Resuelto: sólo cliente pago/entitled con opt-in explícito; lead magnet permanece one-shot salvo upgrade explícito.
+
+## Impacto cruzado TASK-1863 (2026-09-28)
+
+La implementación local del Grader multi-mercado incorpora catálogo es/en/pt-BR/fr, mercados y lotes,
+snapshots y readers por país/locale. Rollout pendiente: no asumir habilitación ni geografía inferida
+en históricos. Consumir los commands existentes; [contrato y manual](../../manual-de-uso/growth/configurar-mercados-aeo.md).

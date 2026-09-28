@@ -8,11 +8,8 @@ import 'server-only'
  * como exito: degrada honestamente a `skipped:no_ai_overview_block`.
  */
 
-import {
-  DATAFORSEO_DEFAULT_AI_MODE_ENDPOINT,
-  isDataForSeoConfigured,
-  postDataForSeoTask
-} from '@/lib/ai/dataforseo'
+import { DATAFORSEO_DEFAULT_AI_MODE_ENDPOINT, isDataForSeoConfigured, postDataForSeoTask } from '@/lib/ai/dataforseo'
+import { GROWTH_MARKET_REGISTRY, GrowthMarketError, resolveGrowthMarket } from '@/lib/growth/markets'
 import { captureWithDomain } from '@/lib/observability/capture'
 /**
  * TASK-1696 — Registro del contador de gasto EN ESTE MÓDULO, por efecto de import.
@@ -34,10 +31,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
  */
 import '@/lib/growth/seo/register-provider-spend'
 
-import {
-  type GrowthAiVisibilityCitation,
-  type GrowthAiVisibilityProviderObservation
-} from '../contracts'
+import { type GrowthAiVisibilityCitation, type GrowthAiVisibilityProviderObservation } from '../contracts'
 import { isGraderEnabled, isProviderFlagEnabled } from '../flags'
 import { boundedExcerpt, buildCitations, normalizeDomain, sha256Hex } from '../observation'
 import {
@@ -47,7 +41,7 @@ import {
   mapHttpStatusToErrorCode,
   mapThrownErrorToErrorCode
 } from './observation-builders'
-import { type ProviderAdapter } from './types'
+import type { ProviderAdapter } from './types'
 
 export const GOOGLE_AI_OVERVIEW_PROVIDER_MODEL = 'dataforseo/google-ai-mode-live-advanced'
 
@@ -203,7 +197,11 @@ const readItemText = (item: UnknownRecord): string | null =>
  * `references[]`/`links[]` propias (doc AI Mode §4.1). Descenso ACOTADO a un nivel
  * (el shape documentado no anida más), nunca recursión ilimitada.
  */
-const NESTED_AI_ELEMENT_TYPES = new Set(['ai_overview_element', 'ai_overview_table_element', 'ai_overview_expanded_element'])
+const NESTED_AI_ELEMENT_TYPES = new Set([
+  'ai_overview_element',
+  'ai_overview_table_element',
+  'ai_overview_expanded_element'
+])
 
 const collectNestedAiElements = (item: UnknownRecord): UnknownRecord[] => {
   const nested: UnknownRecord[] = []
@@ -283,51 +281,10 @@ const buildKeyword = (promptText: string): string => {
   return trimmed.slice(0, 700)
 }
 
-/**
- * TASK-1652 — Los caminos productivos (`provision-profile.ts`, `aeo-form-grader-adapter.ts`)
- * producen `market` como ISO-2, pero DataForSEO exige nombre completo (`location_name`) o
- * `location_code` numérico: un ISO-2 crudo falla per-task con HTTP 200 batch. Mapa cerrado
- * verificado contra el apéndice gratuito `GET /v3/serp/google/locations/{cc}` (2026-08-27).
- */
-export const GOOGLE_AI_MODE_MARKET_LOCATION_CODES: Record<string, number> = {
-  CL: 2152,
-  MX: 2484,
-  CO: 2170,
-  PE: 2604,
-  US: 2840
-}
-
-const FALLBACK_LOCATION_CODE = GOOGLE_AI_MODE_MARKET_LOCATION_CODES.US
-
-type TaskLocation = { location_code: number } | { location_name: string }
-
-const locationFromMarket = (
-  market: string,
-  onUnmappedMarket: (rawMarket: string) => void
-): TaskLocation => {
-  const trimmed = market.trim()
-
-  if (trimmed.length === 0) {
-    return { location_code: FALLBACK_LOCATION_CODE }
-  }
-
-  if (/^[a-z]{2}$/i.test(trimmed)) {
-    const mapped = GOOGLE_AI_MODE_MARKET_LOCATION_CODES[trimmed.toUpperCase()]
-
-    if (mapped !== undefined) {
-      return { location_code: mapped }
-    }
-
-    // ISO-2 fuera del mapa: nunca pasar el código crudo como location_name (fallaría
-    // per-task). Fallback observable a US para que el gap sea visible y ampliable.
-    onUnmappedMarket(trimmed)
-
-    return { location_code: FALLBACK_LOCATION_CODE }
-  }
-
-  // Nombre completo ("Chile") — válido para el proveedor tal cual.
-  return { location_name: trimmed }
-}
+/** Compatibility export; the shared catalog is the only source of country codes. */
+export const GOOGLE_AI_MODE_MARKET_LOCATION_CODES: Record<string, number | null> = Object.fromEntries(
+  Object.values(GROWTH_MARKET_REGISTRY).map(market => [market.code, market.locationCode])
+)
 
 const usageFromDataForSeo = (input: {
   cost: number | null
@@ -365,6 +322,7 @@ const buildNoAiOverviewObservation = (input: {
 export const createGoogleAiOverviewProviderAdapter = (): ProviderAdapter => ({
   provider: PROVIDER,
   capabilities: {
+    geoMode: 'native',
     provider: PROVIDER,
     supportsWebSearch: true,
     defaultModel: GOOGLE_AI_OVERVIEW_PROVIDER_MODEL
@@ -393,13 +351,17 @@ export const createGoogleAiOverviewProviderAdapter = (): ProviderAdapter => ({
     }
 
     try {
-      const location = locationFromMarket(input.market, rawMarket => {
-        captureWithDomain(new Error('growth_ai_visibility: market ISO-2 sin location_code mapeado'), 'growth', {
-          level: 'warning',
-          tags: { source: 'growth_ai_visibility_google_ai_overview_adapter', provider: PROVIDER },
-          extra: { runId: input.runId, promptId: input.promptId, market: rawMarket }
+      const market = resolveGrowthMarket(input.market, input.locale)
+
+      if (market.locationCode === null) {
+        return buildSkippedObservation({
+          promptInput: input,
+          context,
+          provider: PROVIDER,
+          model: GOOGLE_AI_OVERVIEW_PROVIDER_MODEL,
+          errorCode: 'market_unsupported'
         })
-      })
+      }
 
       const result = await postDataForSeoTask({
         family: 'serp',
@@ -416,15 +378,22 @@ export const createGoogleAiOverviewProviderAdapter = (): ProviderAdapter => ({
         tasks: [
           {
             keyword: buildKeyword(input.promptText),
-            ...location,
-            // DataForSEO documents Google AI Mode as English-only today.
-            language_code: 'en',
+            location_code: market.locationCode,
+            language_code: market.googleAiModeLanguageCode,
             device: 'desktop'
           }
         ]
       })
 
-      const usage = usageFromDataForSeo({ cost: result.cost, tasks: result.tasks, endpoint: result.endpoint })
+      const usage = {
+        ...usageFromDataForSeo({ cost: result.cost, tasks: result.tasks, endpoint: result.endpoint }),
+        provider_attempted: !result.breakerOpen,
+        geo_mode: 'native',
+        geo_country: market.code,
+        locale: market.locale,
+        dataforseo_location_code: market.locationCode,
+        dataforseo_language_code: market.googleAiModeLanguageCode
+      }
 
       if (!result.ok) {
         return buildFailedObservation({
@@ -438,7 +407,8 @@ export const createGoogleAiOverviewProviderAdapter = (): ProviderAdapter => ({
           // manda al operador a diagnosticar el lugar equivocado. `provider_error` es el
           // código honesto: el proveedor está degradado y por eso frenamos.
           errorCode: result.breakerOpen ? 'provider_error' : mapHttpStatusToErrorCode(result.httpStatus),
-          latencyMs: result.latencyMs
+          latencyMs: result.latencyMs,
+          usage
         })
       }
 
@@ -470,7 +440,8 @@ export const createGoogleAiOverviewProviderAdapter = (): ProviderAdapter => ({
             // `null` = shape inesperado (sin task o sin status_code) → invalid_response;
             // cualquier código != 20000 = el proveedor reportó fallo de la task → provider_error.
             errorCode: taskStatusCode === null ? 'invalid_response' : 'provider_error',
-            latencyMs: result.latencyMs
+            latencyMs: result.latencyMs,
+            usage
           }),
           usage
         }
@@ -507,6 +478,17 @@ export const createGoogleAiOverviewProviderAdapter = (): ProviderAdapter => ({
         rawEvidencePointer: null
       })
     } catch (error) {
+      if (error instanceof GrowthMarketError) {
+        return buildFailedObservation({
+          promptInput: input,
+          context,
+          provider: PROVIDER,
+          model: GOOGLE_AI_OVERVIEW_PROVIDER_MODEL,
+          errorCode: error.code,
+          latencyMs: 0
+        })
+      }
+
       const errorCode = mapThrownErrorToErrorCode(error)
 
       captureWithDomain(error, 'growth', {

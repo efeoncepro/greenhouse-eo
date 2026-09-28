@@ -44,7 +44,9 @@ const resolveOpenAIApiKey = async () => {
   const resolution = await resolveSecret({ envVarName: 'OPENAI_API_KEY' })
 
   if (!resolution.value) {
-    throw new Error('OpenAI no está configurado. Define OPENAI_API_KEY o OPENAI_API_KEY_SECRET_REF (greenhouse-openai-api-key).')
+    throw new Error(
+      'OpenAI no está configurado. Define OPENAI_API_KEY o OPENAI_API_KEY_SECRET_REF (greenhouse-openai-api-key).'
+    )
   }
 
   return { ...resolution, value: resolution.value }
@@ -69,6 +71,7 @@ interface OpenAIOutputBlock {
  */
 export const runOpenAIResponsesWebSearch = async (input: {
   prompt: string
+  countryCode?: string
   model?: string
   timeoutMs?: number
 }): Promise<OpenAIResponsesWebSearchResult> => {
@@ -85,7 +88,16 @@ export const runOpenAIResponsesWebSearch = async (input: {
         Authorization: `Bearer ${apiKey.value}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ model, tools: [{ type: 'web_search' }], input: input.prompt }),
+      body: JSON.stringify({
+        model,
+        tools: [
+          {
+            type: 'web_search',
+            ...(input.countryCode ? { user_location: { type: 'approximate', country: input.countryCode } } : {})
+          }
+        ],
+        input: input.prompt
+      }),
       signal: controller.signal
     })
 

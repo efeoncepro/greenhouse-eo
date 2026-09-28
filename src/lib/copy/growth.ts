@@ -405,11 +405,14 @@ export const GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT = {
   verdict: {
     title: 'Veredicto ejecutivo',
     scoreLabel: 'Visibilidad estimada',
-    scoreContext: 'Nivel intermedio · los líderes de tu categoría superan 85.',
+    scoreContext: 'Resultado de esta medición; consulta sus dimensiones y cobertura.',
     scoreDisclaimer: 'Estimación, no garantía de ranking',
     engineBrandsLabel: 'Evaluado en',
     coverageLabel: 'Motores consultados',
-    coverageValue: (responded: number, sampled: number) => `${responded} de ${sampled} motores respondieron`,
+    coverageValue: (responded: number | null, sampled: number) =>
+      responded === null
+        ? 'Cobertura de respuestas no verificada en este informe'
+        : `${responded} de ${sampled} motores respondieron`,
     contextLabel: 'Contexto del informe',
     contextValue: 'Datos agregados y públicos',
     contextHelper: 'Sin datos crudos ni confidenciales.'
@@ -421,8 +424,10 @@ export const GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT = {
     affectedLevelLabel: 'Nivel afectado',
     evidenceLabel: 'Señal que lo sostiene',
     nextProofLabel: 'Próxima prueba',
-    citationEvidence: (share: number | null) => (share === null ? 'Citas propias sin evidencia suficiente' : `${share}% de citas propias`),
-    nextProof: (promptPackVersion: string) => `Repetir con prompt pack ${promptPackVersion} para ver si sube la citabilidad.`
+    citationEvidence: (share: number | null) =>
+      share === null ? 'Citas propias sin evidencia suficiente' : `${share}% de citas propias`,
+    nextProof: (promptPackVersion: string) =>
+      `Repetir con prompt pack ${promptPackVersion} para ver si sube la citabilidad.`
   },
   recommendedMotion: { title: 'Movimiento recomendado', impactLabel: 'Impacto esperado' },
   dimensions: {
@@ -652,7 +657,8 @@ export const GH_GROWTH_AI_VISIBILITY_CLIENT_TIERING = {
     refresh: 'Actualizar ahora',
     // Degradación honesta cuando el run self-serve aún no está habilitado en este ambiente.
     unavailable: 'Disponible próximamente',
-    unavailableHelp: 'Estamos activando las revisiones self-serve. Mientras tanto, tu equipo de Efeonce puede generarla.',
+    unavailableHelp:
+      'Estamos activando las revisiones self-serve. Mientras tanto, tu equipo de Efeonce puede generarla.',
     // Errores honestos del chokepoint (mapeados desde el código canónico es-CL del endpoint).
     errorQuota: 'Ya usaste tus revisiones de este mes. Se renuevan el próximo período.',
     errorProfile: 'Aún no tenemos los datos de tu marca para medir. Tu equipo de Efeonce los está preparando.',
@@ -763,7 +769,8 @@ export const GH_GROWTH_AI_VISIBILITY_ADMIN_REVIEW = {
     incompleteTitle: 'Evidencia incompleta',
     incompleteBody: 'Faltan fuentes clave en algunas dimensiones evaluadas.',
     abstainedTitle: 'Datos insuficientes',
-    abstainedBody: 'El grader se abstuvo: la evidencia no alcanza para un diagnóstico confiable. No se publica por defecto.'
+    abstainedBody:
+      'El grader se abstuvo: la evidencia no alcanza para un diagnóstico confiable. No se publica por defecto.'
   },
   decision: {
     rejectReasonLabel: 'Motivo del rechazo (requerido)',
@@ -787,7 +794,13 @@ export const GH_GROWTH_AI_VISIBILITY_ADMIN_REVIEW = {
     rejectedFeedback: 'Reporte rechazado y devuelto para corrección.'
   },
   conflict: 'Este reporte ya fue revisado por {reviewer} — actualizando la cola.',
-  demo: { label: 'Vista de demostración', queue: 'Cola', loading: 'Cargando', empty: 'Cola vacía', denied: 'Sin acceso' },
+  demo: {
+    label: 'Vista de demostración',
+    queue: 'Cola',
+    loading: 'Cargando',
+    empty: 'Cola vacía',
+    denied: 'Sin acceso'
+  },
   states: {
     loading: 'Cargando la cola de revisión…',
     emptyTitle: 'Sin reportes pendientes',
@@ -890,7 +903,8 @@ export const GH_GROWTH_AEO_OPERATOR = {
     detailCta: 'Correr AEO',
     detailCtaAria: 'Correr un nuevo diagnóstico AEO para este cliente',
     preparingTitle: 'Run en proceso…',
-    preparingBody: 'El motor está midiendo la visibilidad. Esta página se actualiza sola; el informe puede tardar unos minutos.',
+    preparingBody:
+      'El motor está midiendo la visibilidad. Esta página se actualiza sola; el informe puede tardar unos minutos.',
     refresh: 'Actualizar ahora',
     errorGeneric: 'No pudimos encolar el run. Intenta de nuevo.',
     errorProfile: 'Esta organización no tiene perfil AEO (falta el sitio web). Complétalo en Account 360.',
@@ -931,7 +945,8 @@ export const GH_GROWTH_AEO_OPERATOR = {
     statusAnnouncement: (statusLabel: string) => `Estado del foco actualizado a ${statusLabel}`,
     updatedBy: (who: string) => `Actualizado por ${who}`,
     partialTitle: 'Plan con seguimiento parcial',
-    partialBody: 'Algunos focos del Plan AEO todavía no tienen estado registrado. Se muestran como "sin seguimiento aún".'
+    partialBody:
+      'Algunos focos del Plan AEO todavía no tienen estado registrado. Se muestran como "sin seguimiento aún".'
   },
   // Enviar informe + abrir oportunidad (Slice 6, nodo S11 — command TASK-1279). El objeto comercial
   // es un LEAD de HubSpot (NUNCA Deal); leadType y base legal se DERIVAN server-side y acá solo se
@@ -973,7 +988,8 @@ export const GH_GROWTH_AEO_OPERATOR = {
       expansion: 'Base legal derivada: relación de servicio',
       new_business: 'Base legal derivada: interés legítimo'
     },
-    confirmNote: 'Queda registrado en el log de envíos con el consentimiento capturado. La acción no es reversible desde aquí.',
+    confirmNote:
+      'Queda registrado en el log de envíos con el consentimiento capturado. La acción no es reversible desde aquí.',
     confirmCta: 'Confirmar y enviar',
     sending: 'Enviando informe y abriendo la oportunidad…',
     acceptedTitle: 'Envío en proceso',
@@ -1052,7 +1068,8 @@ export const GH_GROWTH_CTA_OPERATOR = {
     resumeAria: 'Reanudar esta versión pausada',
     publishAria: 'Publicar esta versión (deprecia la anterior)',
     confirmPauseTitle: '¿Pausar este CTA?',
-    confirmPauseBody: 'La versión publicada deja de mostrarse en las superficies públicas en ~2 minutos. Puedes reanudarla cuando quieras.',
+    confirmPauseBody:
+      'La versión publicada deja de mostrarse en las superficies públicas en ~2 minutos. Puedes reanudarla cuando quieras.',
     confirmPublishTitle: '¿Publicar esta versión?',
     confirmPublishBody: 'El snapshot queda inmutable y la versión publicada anterior (si existe) se deprecia.',
     cancel: 'Cancelar',
@@ -1083,7 +1100,8 @@ export const GH_GROWTH_CTA_OPERATOR = {
     densityPeek: 'Density peek (contenedor compacto)',
     slideInDemoCta: 'Probar el slide-in en vivo',
     slideInDemoAria: 'Abrir una demo del slide-in interruptivo sobre esta página',
-    slideInDemoHint: 'Abre el overlay real (no modal): pruébalo con Escape, cierre y foco. El estado de cierre dura la sesión.'
+    slideInDemoHint:
+      'Abre el overlay real (no modal): pruébalo con Escape, cierre y foco. El estado de cierre dura la sesión.'
   },
   // ── TASK-1430 — cockpit operator (master-detail + authoring gobernado) ──
   cockpit: {
@@ -1137,12 +1155,14 @@ export const GH_GROWTH_CTA_OPERATOR = {
       body: 'Los CTAs invitan a tu audiencia al siguiente paso —descargar un informe, agendar una demo o retomar una herramienta— sin tocar código ni JSON.',
       cta: 'Crear tu primer CTA',
       asideTitle: 'El detalle aparecerá aquí',
-      asideBody: 'Cuando crees tu primer CTA verás aquí su preview con el renderer real, sus resultados y los controles de ciclo de vida.'
+      asideBody:
+        'Cuando crees tu primer CTA verás aquí su preview con el renderer real, sus resultados y los controles de ciclo de vida.'
     },
     denied: {
       title: 'No tienes acceso a este detalle',
       body: 'Ver y operar CTAs requiere la capability growth.cta.read. Pídele acceso a quien administra Growth.',
-      readOnlyHint: 'Tu acceso es de solo lectura: puedes ver inventario y resultados, pero no autorar ni cambiar el ciclo de vida.'
+      readOnlyHint:
+        'Tu acceso es de solo lectura: puedes ver inventario y resultados, pero no autorar ni cambiar el ciclo de vida.'
     },
     noSelection: {
       title: 'Selecciona un CTA',
@@ -1198,13 +1218,15 @@ export const GH_GROWTH_CTA_OPERATOR = {
       partialBody: 'La lectura de resultados no respondió. El ciclo de vida sigue operable.',
       enforcementOn: 'enforcement activo',
       enforcementShadow: 'supresión en shadow',
-      conversionTruthHint: 'Solo la conversión confirmada por el servidor cuenta como verdad; el CTR viene del reporte del navegador.'
+      conversionTruthHint:
+        'Solo la conversión confirmada por el servidor cuenta como verdad; el CTR viene del reporte del navegador.'
     },
     kill: {
       title: 'Kill switch gobernado',
       scopeGlobal: 'Global',
       scopeSurface: 'Superficie',
-      globalOffDesc: 'Detiene todos los CTAs en todas las superficies al instante, sin redeploy. Requiere growth.cta.pause.',
+      globalOffDesc:
+        'Detiene todos los CTAs en todas las superficies al instante, sin redeploy. Requiere growth.cta.pause.',
       globalOnDesc: 'Motor detenido globalmente. Ningún CTA se muestra en ninguna superficie.',
       surfaceOnDesc: 'Superficie detenida: sus visitantes no ven ningún CTA.',
       engage: 'Activar kill switch',
@@ -1299,7 +1321,8 @@ export const GH_GROWTH_CTA_OPERATOR = {
       },
       intent: {
         title: 'Intención',
-        subtitle: 'Elige la semántica de autoría. Define el checklist de expectativa y evidencia — no genera copy automática.',
+        subtitle:
+          'Elige la semántica de autoría. Define el checklist de expectativa y evidencia — no genera copy automática.',
         evidenceLabel: 'Evidencia requerida:',
         kinds: {
           report_followup: {
@@ -1326,13 +1349,23 @@ export const GH_GROWTH_CTA_OPERATOR = {
       },
       placement: {
         title: 'Ubicación',
-        subtitle: 'Solo placements soportados por el renderer. El nivel de interrupción define las defensas obligatorias.',
+        subtitle:
+          'Solo placements soportados por el renderer. El nivel de interrupción define las defensas obligatorias.',
         interruptiveBadge: 'interruptivo',
         kinds: {
-          embedded: { label: 'Embedded', desc: 'Vive dentro de un dock del host (ej. el bookend de un informe). No interrumpe.' },
+          embedded: {
+            label: 'Embedded',
+            desc: 'Vive dentro de un dock del host (ej. el bookend de un informe). No interrumpe.'
+          },
           inline_banner: { label: 'Banner inline', desc: 'Se inserta en el flujo del contenido. No interrumpe.' },
-          sticky_banner: { label: 'Banner fijo', desc: 'Barra persistente en la superficie. Interruptivo: exige defensas.' },
-          slide_in: { label: 'Slide-in', desc: 'Entra desde una esquina sin bloquear la lectura. Interruptivo: exige defensas.' },
+          sticky_banner: {
+            label: 'Banner fijo',
+            desc: 'Barra persistente en la superficie. Interruptivo: exige defensas.'
+          },
+          slide_in: {
+            label: 'Slide-in',
+            desc: 'Entra desde una esquina sin bloquear la lectura. Interruptivo: exige defensas.'
+          },
           popup_modal: { label: 'Modal', desc: 'Centrado sobre el contenido. Máxima interrupción: exige defensas.' },
           floating_button: { label: 'Botón flotante', desc: 'Botón persistente en una esquina. No interrumpe.' }
         }
@@ -1414,11 +1447,23 @@ export const GH_GROWTH_CTA_OPERATOR = {
             secondaryPlaceholder: 'ej. efeonce-discovery-30',
             secondaryHelper: 'Ambos identificadores deben tener un binding activo; no se exponen IDs del proveedor.'
           }
-        } as Record<string, { label: string; expectation: string; field: string; placeholder: string; secondaryField?: string; secondaryPlaceholder?: string; secondaryHelper?: string }>
+        } as Record<
+          string,
+          {
+            label: string
+            expectation: string
+            field: string
+            placeholder: string
+            secondaryField?: string
+            secondaryPlaceholder?: string
+            secondaryHelper?: string
+          }
+        >
       },
       targeting: {
         title: 'Segmentación y supresión',
-        subtitle: 'Consume los contratos canónicos. Un placement interruptivo no avanza sin postura de supresión válida.',
+        subtitle:
+          'Consume los contratos canónicos. Un placement interruptivo no avanza sin postura de supresión válida.',
         interruptiveWarning:
           'Este placement es interruptivo: exige cap de frecuencia, respeto al descarte y postura de kill switch para pasar a revisión.',
         routes: 'Rutas objetivo',
@@ -1434,7 +1479,8 @@ export const GH_GROWTH_CTA_OPERATOR = {
       },
       preview: {
         title: 'Vista previa',
-        subtitle: 'El renderer canónico bajo harnesses de host, contenedor y preferencia. Cobertura pairwise + casos frontera, no todo el producto cartesiano.',
+        subtitle:
+          'El renderer canónico bajo harnesses de host, contenedor y preferencia. Cobertura pairwise + casos frontera, no todo el producto cartesiano.',
         hostLabel: 'Superficie (host)',
         hostThink: 'Think',
         hostWordpress: 'WordPress',
@@ -1450,11 +1496,13 @@ export const GH_GROWTH_CTA_OPERATOR = {
         assetMissing: 'Sin asset',
         widthLabel: 'Ancho del contenedor',
         widthDensityPrefix: 'densidad',
-        widthHint: 'La densidad es un resultado del renderer, nunca un override de autoría. Muévela para ver el morph full → condensed → peek.',
+        widthHint:
+          'La densidad es un resultado del renderer, nunca un override de autoría. Muévela para ver el morph full → condensed → peek.',
         presetFull: 'Full',
         presetCondensed: 'Condensed',
         presetPeek: 'Peek',
-        interactHint: 'El preview es interactivo e inerte: haz clic en el botón para ver pending/formulario sin salir del portal.',
+        interactHint:
+          'El preview es interactivo e inerte: haz clic en el botón para ver pending/formulario sin salir del portal.',
         remount: 'Remontar',
         focusPrimary: 'Enfocar botón',
         simulateFail: 'Simular fallo de preview',
@@ -1473,7 +1521,8 @@ export const GH_GROWTH_CTA_OPERATOR = {
       },
       review: {
         title: 'Revisión',
-        subtitle: 'Contrato, superficie, accesibilidad, copy ↔ acción, supresión y paridad antes de enviar a revisión.',
+        subtitle:
+          'Contrato, superficie, accesibilidad, copy ↔ acción, supresión y paridad antes de enviar a revisión.',
         readyTitle: 'Listo para enviar a revisión',
         readyBody: 'Todas las comprobaciones de paridad y gobierno pasan.',
         blockedOne: 'bloqueo por resolver',
@@ -1731,7 +1780,8 @@ export const GH_GROWTH_SEO_CLIENT = {
     breadcrumbLeaf: 'SEO',
     eyebrow: 'Search Visibility 360',
     title: 'SEO — Visibilidad en búsqueda',
-    description: 'Tu lectura de búsqueda combina posición medida, cobertura observada y visibilidad IA sin mezclar fuentes.',
+    description:
+      'Tu lectura de búsqueda combina posición medida, cobertura observada y visibilidad IA sin mezclar fuentes.',
     asOf: (date: string) => `Search Console · corte ${date}`,
     asOfUnknown: 'Search Console · sin fecha de corte',
     measured: 'Search Console · medido',
@@ -1754,7 +1804,8 @@ export const GH_GROWTH_SEO_CLIENT = {
     leadTitle: 'Aún no hay una posición media para leer',
     title: 'Tu visibilidad orgánica tiene una historia que leer',
     titleWithPosition: (position: string) => `Posición media ${position} con señales SEO × AEO por revisar`,
-    helper: 'Primero mostramos la señal medida. Luego separamos cobertura, tendencia y citabilidad para decidir qué mover sin fabricar un score único.',
+    helper:
+      'Primero mostramos la señal medida. Luego separamos cobertura, tendencia y citabilidad para decidir qué mover sin fabricar un score único.',
     positionLabel: 'Posición media',
     keywordsLabel: 'Keywords medidas',
     pageOneLabel: 'En primera página',
@@ -1778,7 +1829,8 @@ export const GH_GROWTH_SEO_CLIENT = {
   },
   evolution: {
     title: 'Cobertura de seguimiento',
-    subtitle: 'La posición 1 aparece arriba. Si la muestra es escasa, mostramos cortes observados antes de sugerir una tendencia.',
+    subtitle:
+      'La posición 1 aparece arriba. Si la muestra es escasa, mostramos cortes observados antes de sugerir una tendencia.',
     coverage: (measured: number, requested: number) => `${measured} de ${requested} días con medición`,
     observedScope: (chartDays: number, measured: number, requested: number) =>
       `${chartDays} días visibles en la línea; ${measured} de ${requested} días tienen alguna medición. Los huecos quedan visibles.`,
@@ -1823,7 +1875,8 @@ export const GH_GROWTH_SEO_CLIENT = {
     measured: 'Cada punto representa una keyword SEO cruzada con el score AEO vigente del dominio.',
     orthogonal: 'SEO y AEO son ejes distintos; en esta versión el eje AEO es del dominio, no de cada keyword.',
     granularityLabel: 'AEO por dominio',
-    granularityHint: 'Las keywords aún no tienen citabilidad propia medida; se cruzan contra el último score AEO reportable del dominio.',
+    granularityHint:
+      'Las keywords aún no tienen citabilidad propia medida; se cruzan contra el último score AEO reportable del dominio.',
     distributionTitle: 'Distribución de señales',
     dominantInsight: (label: string, count: number, total: number) => `${count} de ${total} señales caen en ${label}.`,
     dominantAction: {
@@ -1835,7 +1888,9 @@ export const GH_GROWTH_SEO_CLIENT = {
     chartStageLabel: 'Mapa de oportunidad por keyword',
     tableScrollHint: 'Desliza horizontalmente para revisar el detalle completo.',
     tableExcerpt: (shown: number, total: number) =>
-      total > shown ? `Mostrando ${shown} señales prioritarias de ${total}.` : `Mostrando las ${total} señales medidas.`,
+      total > shown
+        ? `Mostrando ${shown} señales prioritarias de ${total}.`
+        : `Mostrando las ${total} señales medidas.`,
     tableShowAll: (total: number) => `Ver las ${total} keywords`,
     tableHideAll: 'Mostrar solo señales prioritarias',
     tableKeyword: 'Keyword',
@@ -1846,7 +1901,8 @@ export const GH_GROWTH_SEO_CLIENT = {
     ariaTable: 'Detalle de keywords del mapa SEO por visibilidad IA del dominio',
     states: {
       noAeoTitle: 'Falta la mitad IA de esta lectura',
-      noAeoDescription: 'Tu SEO medido está disponible. Cuando exista un score AEO reportable del dominio, el mapa mostrará ambos ejes.',
+      noAeoDescription:
+        'Tu SEO medido está disponible. Cuando exista un score AEO reportable del dominio, el mapa mostrará ambos ejes.',
       noSeoTitle: 'Aún no hay SEO medido para cruzar',
       noSeoDescription: 'Conecta Search Console y deja que la captura construya la primera mitad del mapa.',
       emptyTitle: 'Aún no hay puntos para el mapa',
@@ -1866,7 +1922,8 @@ export const GH_GROWTH_SEO_CLIENT = {
     title: 'Informe de visibilidad en búsqueda',
     summary: 'Una lectura presentable de tu presencia orgánica y su relación con la visibilidad IA del dominio.',
     methodology: 'Proveniencia y metodología',
-    methodologyBody: 'Los datos SEO provienen de Search Console y seguimiento de posición. El eje AEO usa el último score reportable del dominio; se muestra separado del SEO y no se promedia.',
+    methodologyBody:
+      'Los datos SEO provienen de Search Console y seguimiento de posición. El eje AEO usa el último score reportable del dominio; se muestra separado del SEO y no se promedia.',
     summaryAria: 'Resumen de métricas SEO',
     quadrantTitle: 'SEO × AEO — posicionamiento estratégico',
     evolutionTitle: 'Evolución de posiciones',
@@ -1885,9 +1942,12 @@ export const GH_GROWTH_SEO_CLIENT = {
     metricPageOneHint: 'Posición 10 o mejor.',
     metricSignalsHint: 'SEO × AEO, sin score fusionado.',
     reportMasthead: 'Informe client-safe',
-    reportReadout: 'La posición orgánica y la citabilidad en IA se leen como fuentes distintas, sin fabricar un score único.',
+    reportReadout:
+      'La posición orgánica y la citabilidad en IA se leen como fuentes distintas, sin fabricar un score único.',
     reportFeaturedSignals: (shown: number, total: number) =>
-      total > shown ? `Se muestran ${shown} señales destacadas de ${total}.` : `Se muestran las ${total} señales medidas.`,
+      total > shown
+        ? `Se muestran ${shown} señales destacadas de ${total}.`
+        : `Se muestran las ${total} señales medidas.`,
     reportFullDetail: 'El detalle completo permanece disponible en el dashboard para exploración.',
     coverage: 'Cobertura client-safe, sin datos crudos de proveedor.',
     emptyTitle: 'Tu informe todavía está tomando forma',
@@ -1902,10 +1962,12 @@ export const GH_GROWTH_SEO_CLIENT = {
     noOrganizationTitle: 'No encontramos una organización para esta vista',
     noOrganizationDescription: 'Tu cuenta aún no tiene un Space client-scoped asociado.',
     noGscTitle: 'Conecta Search Console para ver tu visibilidad',
-    noGscDescription: 'La lectura SEO comienza con datos medidos por Google. Sin la conexión, no mostramos ceros ni estimaciones disfrazadas.',
+    noGscDescription:
+      'La lectura SEO comienza con datos medidos por Google. Sin la conexión, no mostramos ceros ni estimaciones disfrazadas.',
     noGscCta: 'Conectar Search Console',
     noSnapshotsTitle: 'Aún no hay datos históricos',
-    noSnapshotsDescription: 'La conexión está activa, pero la captura diaria todavía no guardó un día para tu organización.',
+    noSnapshotsDescription:
+      'La conexión está activa, pero la captura diaria todavía no guardó un día para tu organización.',
     errorTitle: 'No pudimos cargar tu SEO',
     errorDescription: 'Puede ser algo temporal. Intenta de nuevo en unos minutos.',
     retry: 'Reintentar',
@@ -2022,8 +2084,10 @@ export const GH_GROWTH_SEO_PERFORMANCE = {
     // coinciden (una keyword recién trackeada tiene 2 días dentro de una ventana de 90).
     // Sin decirlo, el gráfico promete una película que el dato todavía no puede contar.
     coverage: '{measured} de {requested} días con medición · {from} a {to}',
-    coverageSingle: 'Una sola medición ({from}). Todavía no hay evolución que mostrar: la serie empieza a formarse con el próximo día capturado.',
-    coverageShort: 'Serie recién iniciada: {measured} días medidos. La tendencia se vuelve legible con más días capturados.',
+    coverageSingle:
+      'Una sola medición ({from}). Todavía no hay evolución que mostrar: la serie empieza a formarse con el próximo día capturado.',
+    coverageShort:
+      'Serie recién iniciada: {measured} días medidos. La tendencia se vuelve legible con más días capturados.',
     targetLabel: 'Meta: top 3',
     targetHint: 'Referencia comercial del módulo: estar entre los tres primeros resultados.',
     showTable: 'Ver tabla de datos',
@@ -2195,7 +2259,8 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     balanced: '{total} keywords entre las posiciones 8 y 20',
     balancedHint: 'Ya rankeas para todas: existe página y existe relevancia. Lo que cambia es qué hacer con cada una.',
     gainTotal: '+{value} clics/mes est. sobre la mesa',
-    gainTotalHint: 'Suma de la ganancia estimada de todas las keywords listadas, si cada una llegara a su posición objetivo.',
+    gainTotalHint:
+      'Suma de la ganancia estimada de todas las keywords listadas, si cada una llegara a su posición objetivo.',
     filterHint: 'Toca una acción para filtrar el mapa y la tabla.',
     active: 'Filtro activo',
     clear: 'Ver todas'
@@ -2218,8 +2283,7 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     axisX: 'Posición actual',
     axisY: 'Impresiones (28 días)',
     bubbleHint: 'El tamaño de cada punto son los clics que ganarías al llegar a la posición objetivo.',
-    aria:
-      'Dispersión de {count} keywords: el eje horizontal es la posición actual (más a la izquierda es mejor) y el vertical las impresiones medidas. El tamaño indica los clics incrementales estimados y la forma la acción recomendada.',
+    aria: 'Dispersión de {count} keywords: el eje horizontal es la posición actual (más a la izquierda es mejor) y el vertical las impresiones medidas. El tamaño indica los clics incrementales estimados y la forma la acción recomendada.',
     coverage: '{count} keywords entre las posiciones 8 y 20, con al menos {threshold} impresiones en la ventana.',
     zoomHint: 'Pasa el cursor por un punto para ver su detalle. La tabla de abajo tiene los valores exactos.',
     collapse: 'Ocultar mapa',
@@ -2278,7 +2342,8 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     linkBarrierMedium: 'Media',
     linkBarrierHigh: 'Alta',
     linkBarrierLowHint: 'El top 10 casi no tiene backlinks propios: se compite con contenido y autoridad de dominio.',
-    linkBarrierMediumHint: 'El top 10 tiene un perfil de enlaces moderado: entrar exige contenido fuerte y algunos enlaces.',
+    linkBarrierMediumHint:
+      'El top 10 tiene un perfil de enlaces moderado: entrar exige contenido fuerte y algunos enlaces.',
     linkBarrierHighHint: 'El top 10 está atrincherado con backlinks: entrar exige una estrategia de enlaces sostenida.',
     // El estado honesto de las columnas de mercado: ni 0 ni un guion ambiguo.
     //
@@ -2496,7 +2561,7 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       providerErrorAnnounce: 'No pudimos completar la corrida.',
       staleDetail: 'Capturados el {date}. Inicia una corrida nueva para actualizarlos.',
       retry: 'Nueva corrida',
-      refresh: 'Actualizar estado',
+      refresh: 'Actualizar estado'
     },
 
     empty: {
@@ -2639,7 +2704,6 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       clearFilters: 'Limpiar filtros',
       filtersClose: 'Aplicar',
 
-
       colActions: 'Detalle',
       openDetail: 'Detalles',
       openDetailAria: 'Ver el detalle de {keyword}',
@@ -2713,7 +2777,8 @@ export const GH_GROWTH_SEO_KEYWORDS = {
 
       followOpportunity: 'Seguir oportunidad',
       followOpportunityHint: 'Lo incorpora al seguimiento diario sin declararlo como posición buscada.',
-      followOpportunityConfirm: 'Seguir esta oportunidad la incorpora al seguimiento diario. No es sólo guardar la idea.',
+      followOpportunityConfirm:
+        'Seguir esta oportunidad la incorpora al seguimiento diario. No es sólo guardar la idea.',
 
       prepareGrounded: 'Preparar grounded queries',
       prepareGroundedHint: 'Crea un borrador de consultas AEO para revisión humana.',
@@ -2731,7 +2796,6 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       cancelCta: 'Cancelar',
       confirmTitle: 'Confirma la decisión',
       pendingLabel: 'Procesando…',
-
 
       /**
        * 🔴 El feedback es POR keyword, jamás un «Listo» agregado.
@@ -2757,8 +2821,7 @@ export const GH_GROWTH_SEO_KEYWORDS = {
        * con huecos JAMÁS se presenta como cobertura total. Omitirlo acá anunciaría éxito pleno
        * sobre un borrador que dejó candidatos afuera — exactamente lo que el primitive prohíbe.
        */
-      feedbackGroundedPartial:
-        'Se creó el borrador AEO con «{keyword}», pero quedó con cobertura incompleta: {notice}',
+      feedbackGroundedPartial: 'Se creó el borrador AEO con «{keyword}», pero quedó con cobertura incompleta: {notice}',
       /** Reutilizar un draft vigente NO es crear uno nuevo; decir «se creó» escondería el no-op. */
       feedbackGroundedDeduped:
         'Ya existía un borrador AEO vigente con «{keyword}». Se reutilizó, sin generar uno nuevo.',
@@ -2811,7 +2874,8 @@ export const GH_GROWTH_SEO_KEYWORDS = {
      */
     errorStructural: {
       title: 'Este Space no tiene un sitio SEO configurado',
-      description: 'Hay que crear el target del sitio antes de que podamos buscar oportunidades. Pídeselo a quien administre el módulo.'
+      description:
+        'Hay que crear el target del sitio antes de que podamos buscar oportunidades. Pídeselo a quien administre el módulo.'
     },
 
     denied: {
@@ -2960,7 +3024,8 @@ export const GH_GROWTH_SEO_AUDIT = {
     emptyTitle: 'Sin auditoría reciente',
     emptyDescription: (domain: string) =>
       `Aún no corrimos un crawl para ${domain}. Corre una auditoría para ver la salud técnica.`,
-    emptyDescriptionNoDomain: 'Aún no corrimos un crawl para este sitio. Corre una auditoría para ver la salud técnica.',
+    emptyDescriptionNoDomain:
+      'Aún no corrimos un crawl para este sitio. Corre una auditoría para ver la salud técnica.',
 
     runningTitle: 'Auditoría en curso',
     runningDescription: (domain: string) => `Estamos revisando ${domain}. Esto puede tardar unos minutos.`,
@@ -3023,8 +3088,7 @@ export const GH_GROWTH_SEO_AUDIT = {
     postureLabel: 'Decisión declarada',
     verified: 'Verificado',
     /** "Verificado" sin objeto no es información: se declara QUÉ se revisó. */
-    verifiedHint:
-      'Revisamos el acceso de los motores de IA, los datos estructurados y el mapa del sitio.',
+    verifiedHint: 'Revisamos el acceso de los motores de IA, los datos estructurados y el mapa del sitio.',
     whereRobots: 'En robots.txt',
     whereEdge: 'En el borde (CDN o firewall)',
     whereHome: 'En la portada',
@@ -3088,78 +3152,278 @@ export const GH_GROWTH_SEO_AUDIT_ISSUES: Readonly<
   >
 > = {
   // Estado HTTP / disponibilidad.
-  is_broken: { label: 'Página rota', effort: 'high', value: 'high', hint: 'La página no responde correctamente y no puede indexarse.' },
-  is_4xx_code: { label: 'Error 4xx', effort: 'medium', value: 'high', hint: 'La página responde "no encontrada" o "sin acceso" a quien la visita.' },
-  is_5xx_code: { label: 'Error 5xx del servidor', effort: 'high', value: 'high', hint: 'El servidor falla al entregar la página. Es un problema de infraestructura.' },
+  is_broken: {
+    label: 'Página rota',
+    effort: 'high',
+    value: 'high',
+    hint: 'La página no responde correctamente y no puede indexarse.'
+  },
+  is_4xx_code: {
+    label: 'Error 4xx',
+    effort: 'medium',
+    value: 'high',
+    hint: 'La página responde "no encontrada" o "sin acceso" a quien la visita.'
+  },
+  is_5xx_code: {
+    label: 'Error 5xx del servidor',
+    effort: 'high',
+    value: 'high',
+    hint: 'El servidor falla al entregar la página. Es un problema de infraestructura.'
+  },
 
   // Canonicalización.
-  canonical_to_broken: { label: 'Canonical apunta a una página rota', effort: 'medium', value: 'high', hint: 'La página declara como versión oficial una URL que no funciona.' },
-  recursive_canonical: { label: 'Canonical recursivo', effort: 'medium', value: 'high', hint: 'Las etiquetas canonical se apuntan entre sí en círculo y anulan la señal.' },
-  canonical_to_redirect: { label: 'Canonical apunta a una redirección', effort: 'medium', value: 'medium', hint: 'La versión oficial declarada redirige a otra parte: la señal se diluye.' },
-  canonical_chain: { label: 'Cadena de canonicals', effort: 'medium', value: 'medium', hint: 'Varias canonical encadenadas antes de llegar a la URL final.' },
-  is_link_relation_conflict: { label: 'Conflicto entre relaciones de enlace', effort: 'medium', value: 'medium', hint: 'Las etiquetas de relación se contradicen sobre cuál es la versión buena.' },
+  canonical_to_broken: {
+    label: 'Canonical apunta a una página rota',
+    effort: 'medium',
+    value: 'high',
+    hint: 'La página declara como versión oficial una URL que no funciona.'
+  },
+  recursive_canonical: {
+    label: 'Canonical recursivo',
+    effort: 'medium',
+    value: 'high',
+    hint: 'Las etiquetas canonical se apuntan entre sí en círculo y anulan la señal.'
+  },
+  canonical_to_redirect: {
+    label: 'Canonical apunta a una redirección',
+    effort: 'medium',
+    value: 'medium',
+    hint: 'La versión oficial declarada redirige a otra parte: la señal se diluye.'
+  },
+  canonical_chain: {
+    label: 'Cadena de canonicals',
+    effort: 'medium',
+    value: 'medium',
+    hint: 'Varias canonical encadenadas antes de llegar a la URL final.'
+  },
+  is_link_relation_conflict: {
+    label: 'Conflicto entre relaciones de enlace',
+    effort: 'medium',
+    value: 'medium',
+    hint: 'Las etiquetas de relación se contradicen sobre cuál es la versión buena.'
+  },
 
   // Meta esencial.
-  no_title: { label: 'Sin etiqueta de título', effort: 'low', value: 'high', hint: 'La página no declara título: el buscador inventa uno.' },
-  no_description: { label: 'Sin meta descripción', effort: 'low', value: 'medium', hint: 'Sin descripción propia, el resumen del resultado lo arma el buscador.' },
-  duplicate_title_tag: { label: 'Título duplicado', effort: 'medium', value: 'high', hint: 'Varias páginas comparten el mismo título y compiten entre sí.' },
-  duplicate_meta_tags: { label: 'Meta tags duplicados', effort: 'medium', value: 'medium', hint: 'Metadatos repetidos entre páginas distintas.' },
-  no_h1_tag: { label: 'Sin encabezado H1', effort: 'low', value: 'medium', hint: 'La página no declara de qué trata en su encabezado principal.' },
-  title_too_long: { label: 'Título demasiado largo', effort: 'low', value: 'medium', hint: 'El buscador lo va a recortar en el resultado.' },
-  title_too_short: { label: 'Título demasiado corto', effort: 'low', value: 'medium', hint: 'El título no alcanza a describir la página.' },
+  no_title: {
+    label: 'Sin etiqueta de título',
+    effort: 'low',
+    value: 'high',
+    hint: 'La página no declara título: el buscador inventa uno.'
+  },
+  no_description: {
+    label: 'Sin meta descripción',
+    effort: 'low',
+    value: 'medium',
+    hint: 'Sin descripción propia, el resumen del resultado lo arma el buscador.'
+  },
+  duplicate_title_tag: {
+    label: 'Título duplicado',
+    effort: 'medium',
+    value: 'high',
+    hint: 'Varias páginas comparten el mismo título y compiten entre sí.'
+  },
+  duplicate_meta_tags: {
+    label: 'Meta tags duplicados',
+    effort: 'medium',
+    value: 'medium',
+    hint: 'Metadatos repetidos entre páginas distintas.'
+  },
+  no_h1_tag: {
+    label: 'Sin encabezado H1',
+    effort: 'low',
+    value: 'medium',
+    hint: 'La página no declara de qué trata en su encabezado principal.'
+  },
+  title_too_long: {
+    label: 'Título demasiado largo',
+    effort: 'low',
+    value: 'medium',
+    hint: 'El buscador lo va a recortar en el resultado.'
+  },
+  title_too_short: {
+    label: 'Título demasiado corto',
+    effort: 'low',
+    value: 'medium',
+    hint: 'El título no alcanza a describir la página.'
+  },
 
   // Redirects y protocolo.
-  redirect_chain: { label: 'Cadena de redirecciones', effort: 'medium', value: 'medium', hint: 'La URL pasa por varios saltos antes de llegar a destino.' },
-  has_meta_refresh_redirect: { label: 'Redirección por meta refresh', effort: 'low', value: 'medium', hint: 'Redirección hecha con una técnica que el buscador no interpreta bien.' },
-  https_to_http_links: { label: 'Enlaces de HTTPS a HTTP', effort: 'medium', value: 'medium', hint: 'Una página segura enlaza a contenido sin cifrar.' },
-  is_http: { label: 'Página servida por HTTP', effort: 'high', value: 'high', hint: 'La página no usa conexión segura.' },
+  redirect_chain: {
+    label: 'Cadena de redirecciones',
+    effort: 'medium',
+    value: 'medium',
+    hint: 'La URL pasa por varios saltos antes de llegar a destino.'
+  },
+  has_meta_refresh_redirect: {
+    label: 'Redirección por meta refresh',
+    effort: 'low',
+    value: 'medium',
+    hint: 'Redirección hecha con una técnica que el buscador no interpreta bien.'
+  },
+  https_to_http_links: {
+    label: 'Enlaces de HTTPS a HTTP',
+    effort: 'medium',
+    value: 'medium',
+    hint: 'Una página segura enlaza a contenido sin cifrar.'
+  },
+  is_http: {
+    label: 'Página servida por HTTP',
+    effort: 'high',
+    value: 'high',
+    hint: 'La página no usa conexión segura.'
+  },
 
   // Contenido.
-  low_content_rate: { label: 'Poco contenido respecto al código', effort: 'high', value: 'high', hint: 'La página tiene mucho más marcado que texto útil.' },
-  low_character_count: { label: 'Muy poco texto', effort: 'high', value: 'high', hint: 'El contenido es demasiado breve para responder una búsqueda.' },
-  low_readability_rate: { label: 'Lectura difícil', effort: 'high', value: 'medium', hint: 'El texto exige más esfuerzo de lectura del recomendable.' },
-  lorem_ipsum: { label: 'Contenido de relleno', effort: 'low', value: 'high', hint: 'Quedó texto de maqueta publicado.' },
+  low_content_rate: {
+    label: 'Poco contenido respecto al código',
+    effort: 'high',
+    value: 'high',
+    hint: 'La página tiene mucho más marcado que texto útil.'
+  },
+  low_character_count: {
+    label: 'Muy poco texto',
+    effort: 'high',
+    value: 'high',
+    hint: 'El contenido es demasiado breve para responder una búsqueda.'
+  },
+  low_readability_rate: {
+    label: 'Lectura difícil',
+    effort: 'high',
+    value: 'medium',
+    hint: 'El texto exige más esfuerzo de lectura del recomendable.'
+  },
+  lorem_ipsum: {
+    label: 'Contenido de relleno',
+    effort: 'low',
+    value: 'high',
+    hint: 'Quedó texto de maqueta publicado.'
+  },
 
   // Estructura y descubrimiento.
-  is_orphan_page: { label: 'Página huérfana', effort: 'medium', value: 'high', hint: 'Ninguna otra página del sitio la enlaza: es difícil de descubrir.' },
+  is_orphan_page: {
+    label: 'Página huérfana',
+    effort: 'medium',
+    value: 'high',
+    hint: 'Ninguna otra página del sitio la enlaza: es difícil de descubrir.'
+  },
 
   // Datos estructurados (insumo AEO).
-  has_micromarkup_errors: { label: 'Errores en los datos estructurados', effort: 'medium', value: 'high', hint: 'El marcado que alimenta resultados enriquecidos y respuestas de IA tiene errores.' },
+  has_micromarkup_errors: {
+    label: 'Errores en los datos estructurados',
+    effort: 'medium',
+    value: 'high',
+    hint: 'El marcado que alimenta resultados enriquecidos y respuestas de IA tiene errores.'
+  },
 
   // Performance y tamaño (lab, diagnóstico).
-  high_loading_time: { label: 'Tiempo de carga alto', effort: 'high', value: 'medium', hint: 'La página tarda más de lo razonable en responder. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.' },
-  large_page_size: { label: 'Página muy pesada', effort: 'medium', value: 'medium', hint: 'El peso de la página castiga a quien la abre con conexión lenta. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.' },
-  has_render_blocking_resources: { label: 'Recursos que bloquean el dibujado', effort: 'medium', value: 'medium', hint: 'Scripts o estilos que retrasan lo primero que se ve. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.' },
-  no_content_encoding: { label: 'Sin compresión de contenido', effort: 'low', value: 'low', hint: 'El servidor entrega la página sin comprimir. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.' },
+  high_loading_time: {
+    label: 'Tiempo de carga alto',
+    effort: 'high',
+    value: 'medium',
+    hint: 'La página tarda más de lo razonable en responder. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.'
+  },
+  large_page_size: {
+    label: 'Página muy pesada',
+    effort: 'medium',
+    value: 'medium',
+    hint: 'El peso de la página castiga a quien la abre con conexión lenta. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.'
+  },
+  has_render_blocking_resources: {
+    label: 'Recursos que bloquean el dibujado',
+    effort: 'medium',
+    value: 'medium',
+    hint: 'Scripts o estilos que retrasan lo primero que se ve. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.'
+  },
+  no_content_encoding: {
+    label: 'Sin compresión de contenido',
+    effort: 'low',
+    value: 'low',
+    hint: 'El servidor entrega la página sin comprimir. Es una medición de laboratorio: la señal que Google usa para rankear viene de datos de campo en Search Console.'
+  },
 
   // Higiene HTML.
-  no_image_alt: { label: 'Imágenes sin texto alternativo', effort: 'low', value: 'medium', hint: 'Las imágenes no describen su contenido: afecta accesibilidad y búsqueda de imágenes.' },
+  no_image_alt: {
+    label: 'Imágenes sin texto alternativo',
+    effort: 'low',
+    value: 'medium',
+    hint: 'Las imágenes no describen su contenido: afecta accesibilidad y búsqueda de imágenes.'
+  },
   no_favicon: { label: 'Sin favicon', effort: 'low', value: 'low', hint: 'El sitio no declara su ícono de pestaña.' },
-  no_doctype: { label: 'Sin doctype', effort: 'low', value: 'low', hint: 'El documento no declara su tipo y el navegador adivina cómo interpretarlo.' },
-  no_encoding_meta_tag: { label: 'Sin meta de codificación', effort: 'low', value: 'low', hint: 'La página no declara su codificación de caracteres.' },
-  deprecated_html_tags: { label: 'Etiquetas HTML obsoletas', effort: 'medium', value: 'low', hint: 'El marcado usa etiquetas que el estándar ya retiró.' },
+  no_doctype: {
+    label: 'Sin doctype',
+    effort: 'low',
+    value: 'low',
+    hint: 'El documento no declara su tipo y el navegador adivina cómo interpretarlo.'
+  },
+  no_encoding_meta_tag: {
+    label: 'Sin meta de codificación',
+    effort: 'low',
+    value: 'low',
+    hint: 'La página no declara su codificación de caracteres.'
+  },
+  deprecated_html_tags: {
+    label: 'Etiquetas HTML obsoletas',
+    effort: 'medium',
+    value: 'low',
+    hint: 'El marcado usa etiquetas que el estándar ya retiró.'
+  },
 
   // ── Hallazgos de SITIO (TASK-1670) ──────────────────────────────────────────────────────
   // No vienen del crawl del proveedor: son propiedades del dominio que OnPage no mira. Se
   // materializan con `finding_scope='site'` y NUNCA se cuentan como páginas afectadas.
-  ai_retrieval_crawlers_blocked: { label: 'Los motores de IA no pueden leer el sitio', effort: 'medium', value: 'high', hint: 'El archivo robots.txt le niega el paso a los rastreadores que citan páginas en las respuestas de ChatGPT, Perplexity y Claude. Sin ese acceso el sitio no puede aparecer en esas respuestas.' },
+  ai_retrieval_crawlers_blocked: {
+    label: 'Los motores de IA no pueden leer el sitio',
+    effort: 'medium',
+    value: 'high',
+    hint: 'El archivo robots.txt le niega el paso a los rastreadores que citan páginas en las respuestas de ChatGPT, Perplexity y Claude. Sin ese acceso el sitio no puede aparecer en esas respuestas.'
+  },
 
   // 🔴 Se redacta como POSTURA, no como defecto: bloquear el entrenamiento de modelos es una
   // decisión de derechos sobre el contenido, legítima y frecuente. Un copy que suene a error
   // acá le enseña al cliente a desconfiar del resto del informe.
-  ai_training_crawlers_blocked: { label: 'Entrenamiento de modelos de IA bloqueado', effort: 'low', value: 'low', hint: 'El sitio le niega el paso a los rastreadores que recolectan contenido para entrenar modelos de IA. Es una decisión sobre el uso del contenido, no una falla: se informa para dejarla registrada y no afecta que el sitio aparezca en las respuestas.' },
+  ai_training_crawlers_blocked: {
+    label: 'Entrenamiento de modelos de IA bloqueado',
+    effort: 'low',
+    value: 'low',
+    hint: 'El sitio le niega el paso a los rastreadores que recolectan contenido para entrenar modelos de IA. Es una decisión sobre el uso del contenido, no una falla: se informa para dejarla registrada y no afecta que el sitio aparezca en las respuestas.'
+  },
 
-  ai_crawler_edge_access_denied: { label: 'El servidor rechaza a los rastreadores', effort: 'medium', value: 'high', hint: 'El robots.txt permite el paso, pero el servidor o el CDN responde con un rechazo cuando quien pide la página es un rastreador. Se corrige en la configuración del CDN o del firewall, no en robots.txt.' },
+  ai_crawler_edge_access_denied: {
+    label: 'El servidor rechaza a los rastreadores',
+    effort: 'medium',
+    value: 'high',
+    hint: 'El robots.txt permite el paso, pero el servidor o el CDN responde con un rechazo cuando quien pide la página es un rastreador. Se corrige en la configuración del CDN o del firewall, no en robots.txt.'
+  },
 
-  structured_data_missing: { label: 'Sin datos estructurados en la portada', effort: 'medium', value: 'high', hint: 'La portada no publica el marcado que le dice a buscadores y motores de IA quién es la marca y a qué se dedica.' },
+  structured_data_missing: {
+    label: 'Sin datos estructurados en la portada',
+    effort: 'medium',
+    value: 'high',
+    hint: 'La portada no publica el marcado que le dice a buscadores y motores de IA quién es la marca y a qué se dedica.'
+  },
 
-  sitemap_missing: { label: 'Sin mapa del sitio', effort: 'low', value: 'medium', hint: 'No hay un mapa del sitio en la ruta habitual ni declarado en robots.txt. Sin él, los buscadores descubren las páginas sólo siguiendo enlaces.' },
+  sitemap_missing: {
+    label: 'Sin mapa del sitio',
+    effort: 'low',
+    value: 'medium',
+    hint: 'No hay un mapa del sitio en la ruta habitual ni declarado en robots.txt. Sin él, los buscadores descubren las páginas sólo siguiendo enlaces.'
+  },
 
-  sitemap_declared_broken: { label: 'El mapa del sitio declarado no responde', effort: 'low', value: 'high', hint: 'El robots.txt anuncia un mapa del sitio que no se puede leer. Los buscadores lo buscan justo ahí y no encuentran nada.' },
+  sitemap_declared_broken: {
+    label: 'El mapa del sitio declarado no responde',
+    effort: 'low',
+    value: 'high',
+    hint: 'El robots.txt anuncia un mapa del sitio que no se puede leer. Los buscadores lo buscan justo ahí y no encuentran nada.'
+  },
 
   // Ni sano ni roto: un hueco declarado. El copy tiene que dejar clarísimo que no es un
   // veredicto, porque leerlo como "está bien" es exactamente el falso sano que evitamos.
-  site_check_unverified: { label: 'Chequeo de sitio sin verificar', effort: 'low', value: 'low', hint: 'No pudimos completar esta revisión del sitio. No significa que esté bien ni que esté mal: quedó sin medir, y el detalle explica por qué.' }
+  site_check_unverified: {
+    label: 'Chequeo de sitio sin verificar',
+    effort: 'low',
+    value: 'low',
+    hint: 'No pudimos completar esta revisión del sitio. No significa que esté bien ni que esté mal: quedó sin medir, y el detalle explica por qué.'
+  }
 }
 
 /**

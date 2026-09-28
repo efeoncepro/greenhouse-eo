@@ -1,4 +1,5 @@
 import 'server-only'
+import type { PoolClient } from 'pg'
 
 /**
  * TASK-1226 — Growth AI Visibility Grader · High-level command (Slice 4, server-only).
@@ -8,6 +9,11 @@ import 'server-only'
  * y (futuro) Nexa/MCP — un primitive, muchos consumers (Full API parity).
  */
 
+import { resolveGrowthMarket } from '@/lib/growth/markets'
+
+import type { MarketSource } from './markets/contracts'
+import { localizePromptPack } from './prompt-packs/localized'
+import { localizedCategoryLabel } from './taxonomy/localized-label'
 import { assertRunCategoryResolved, resolveRunCategory } from './category-guard'
 import {
   type GrowthAiVisibilityExecutionMode,
@@ -22,12 +28,18 @@ import {
   enqueueGraderRun,
   executeGraderRun,
   type EnqueueGraderRunResult,
+  type ExecuteGraderRunInput,
   type ExecuteGraderRunResult
 } from './run-engine'
-import { type GraderRunAttribution } from './store'
-import { type ProviderAdapter } from './providers/types'
+import type { GraderRunAttribution } from './store'
+import type { ProviderAdapter } from './providers/types'
 
 export interface RunGraderDiagnosticInput {
+  marketSource?: MarketSource
+  profileId?: string
+  marketId?: string
+  batchId?: string
+  transaction?: PoolClient
   brandName: string
   websiteUrl?: string | null
   market: string
@@ -60,15 +72,18 @@ export interface RunGraderDiagnosticInput {
 }
 
 /** Resuelve el input ejecutable del run (prompts del pack + perfil) — compartido por run/enqueue. */
-const buildExecuteInput = (input: RunGraderDiagnosticInput) => {
+export const buildExecuteInput = (input: RunGraderDiagnosticInput): ExecuteGraderRunInput => {
+  const market = resolveGrowthMarket(input.market, input.locale)
   const competitorsDeclared = input.competitorsDeclared ?? []
 
   // TASK-1290 — con el flag ON, el pack se resuelve por arquetipo (business_model) en vez del
   // pack agencia v1 fijo. Default OFF / sin business_model → pack agencia (no-regresión bit-for-bit).
   // Los tags del pack VIAJAN con el run (Slice 0) → el scorer mide con el framing del arquetipo.
-  const pack = isArchetypePromptsEnabled()
+  const sourcePack = isArchetypePromptsEnabled()
     ? resolveArchetypeBaselinePack(input.businessModel)
     : resolvePromptPack(input.promptPackVersion)
+
+  const pack = localizePromptPack(sourcePack, market)
 
   // TASK-1288 — resolve the CANONICAL category (never the raw HubSpot enum) and guard the
   // run universally: every path (portal/operator/public/Nexa) converges here. The display
@@ -83,29 +98,47 @@ const buildExecuteInput = (input: RunGraderDiagnosticInput) => {
 
   assertRunCategoryResolved(runCategory)
 
+  const category =
+    localizedCategoryLabel(runCategory.nodeId, market.language) ?? runCategory.displayLabel ?? input.category
+
   const prompts = resolvePromptInputs(
     {
       brandName: input.brandName,
-      category: runCategory.displayLabel || input.category,
-      market: input.market,
+      category,
+      market: market.label,
       competitor: competitorsDeclared[0] ?? null
     },
     { pack, includeBrandNamed: !input.discoveryOnly }
   )
 
   return {
+    marketSource: input.marketSource,
+    profileId: input.profileId,
+    marketId: input.marketId,
+    batchId: input.batchId,
+    transaction: input.transaction,
     profile: {
       brandName: input.brandName,
       websiteUrl: input.websiteUrl ?? null,
-      market: input.market,
-      locale: input.locale,
-      category: runCategory.displayLabel || input.category,
+      market: market.code,
+      locale: market.locale,
+      category,
       competitorsDeclared
     },
     runKind: input.runKind,
     mode: input.mode,
     promptPackVersion: pack.version,
     prompts,
+    // Resolve again under the profile lock so configuration changes cannot race the snapshot.
+    resolvePrompts: snapshot =>
+      buildExecuteInput({
+        ...input,
+        brandName: snapshot.brand.name,
+        websiteUrl: snapshot.brand.websiteUrl,
+        market: snapshot.market.code,
+        locale: snapshot.market.locale,
+        competitorsDeclared: snapshot.competitors.map(member => member.name)
+      }).prompts,
     idempotencyKey: input.idempotencyKey ?? null,
     onlyProviders: input.onlyProviders,
     adapters: input.adapters,
@@ -114,15 +147,13 @@ const buildExecuteInput = (input: RunGraderDiagnosticInput) => {
 }
 
 /** Ejecuta el run SÍNCRONO (inline endpoint / smoke). Sólo `light` cabe en el timeout Vercel. */
-export const runGraderDiagnostic = async (
-  input: RunGraderDiagnosticInput
-): Promise<ExecuteGraderRunResult> => executeGraderRun(buildExecuteInput(input))
+export const runGraderDiagnostic = async (input: RunGraderDiagnosticInput): Promise<ExecuteGraderRunResult> =>
+  executeGraderRun(buildExecuteInput(input))
 
 /**
  * TASK-1234 — Encola el run `pending` (no ejecuta): el worker Cloud Run lo drena
  * async. Es el camino para runs `full`/`internal_audit` multi-provider que exceden
  * el timeout de la función Vercel. Mismo primitive, sin ejecución inline.
  */
-export const enqueueGraderDiagnostic = async (
-  input: RunGraderDiagnosticInput
-): Promise<EnqueueGraderRunResult> => enqueueGraderRun(buildExecuteInput(input))
+export const enqueueGraderDiagnostic = async (input: RunGraderDiagnosticInput): Promise<EnqueueGraderRunResult> =>
+  enqueueGraderRun(buildExecuteInput(input))

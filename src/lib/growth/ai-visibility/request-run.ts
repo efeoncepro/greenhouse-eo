@@ -1,41 +1,9 @@
 import 'server-only'
 
-/**
- * TASK-1277 Slice 3 — Chokepoint gobernado de runs AEO (entitlement & metering).
- *
- * UN motor, varias puertas. Este módulo es el ÚNICO entrypoint de runs de PORTAL:
- *
- *   - `requestGraderRunForOrganization` (puertas cliente): gate entitlement → ventana →
- *     allowance → costo, consume allowance de forma ATÓMICA (lock de la fila del assignment
- *     + recuento dentro de la tx → sin doble-consumo bajo carrera), y encola el run con
- *     atribución per-org (`organization_id`/`assignment_id`/`run_source`/`cost_attribution`).
- *
- *   - `requestGraderRunAsOperator` (puerta operador, 4.ª): Growth/AM corre el motor sobre
- *     cualquier cliente o prospecto como jugada de venta — ILIMITADO (sin allowance/tope),
- *     costo atribuido a "sales". Gateada por capability (en la route), NO por el flag de portal.
- *
- * NUNCA llamar `enqueueGraderDiagnostic`/`runGraderDiagnostic` directo desde una route de
- * portal sin pasar por este chokepoint. El run reusa el cost ceiling por-run de `policy.ts`
- * y la idempotencia de `enqueueGraderDiagnostic` (defense in depth).
- */
-
-import { captureWithDomain } from '@/lib/observability/capture'
-import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
-
-import { resolveAeoBudget } from './budget'
-import { isRunCategoryBlocked } from './category-guard'
-import { enqueueGraderDiagnostic, type RunGraderDiagnosticInput } from './commands'
-import { resolveAeoEntitlement, type AeoTier } from './entitlement'
-import {
-  isAeoBudgetGateEnabled,
-  isGraderEnabled,
-  isPortalRunEnabled,
-  isTrialTierEnabled
-} from './flags'
-import { getOrganizationCommercialFacts } from './operator/organization-commercial-facts'
-import { assertSubjectGradeable } from './operator/subject-gradeable'
-import { getGraderProfileForOrganization, type GraderProfileRow, type GraderRunSource } from './store'
+/** TASK-1863. Existing tenant-resolved single-run doors delegate to atomic batches of one. */
+import type { AeoTier } from './entitlement'
+import { GraderMarketConfigError } from './markets/contracts'
+import { requestRunBatchInternal } from './markets/run-batch'
 
 export type RequestRunBlockedReason =
   | 'disabled'
@@ -64,282 +32,71 @@ export type RequestRunResult =
     }
   | { status: 'blocked'; reason: RequestRunBlockedReason }
 
-const portalRunSourceForTier = (tier: AeoTier): GraderRunSource =>
-  tier === 'contracted' ? 'portal_contracted' : tier === 'pilot' ? 'portal_pilot' : 'portal_trial'
+const blockedReasons: RequestRunBlockedReason[] = [
+  'disabled',
+  'not_entitled',
+  'profile_required',
+  'category_unresolved',
+  'business_model_unconfirmed',
+  'quota_exhausted',
+  'cost_blocked',
+  'budget_exhausted'
+]
 
-/** Construye el input ejecutable (modo light, public_diagnostic) desde el perfil de la org. */
-const buildRunInputFromProfile = (
-  profile: GraderProfileRow
-): Omit<RunGraderDiagnosticInput, 'attribution' | 'idempotencyKey'> => ({
-  brandName: profile.brandName,
-  websiteUrl: profile.websiteUrl,
-  market: profile.market,
-  locale: profile.locale,
-  category: profile.category ?? '',
-  // TASK-1288 — la categoría canónica resuelta del perfil (SoT); el run usa la label, no el enum.
-  categoryNodeId: profile.categoryNodeId,
-  categoryLabel: profile.categoryLabel,
-  categoryConfidence: profile.categoryConfidence,
-  // TASK-1290 — eje de buyer-intent; detrás del flag selecciona el baseline del arquetipo.
-  businessModel: profile.businessModel,
-  competitorsDeclared: profile.competitorsDeclared,
-  mode: 'light',
-  runKind: 'public_diagnostic'
-})
-
-const emitRunRequestedEvent = async (payload: Record<string, unknown>): Promise<void> => {
-  try {
-    await publishOutboxEvent({
-      aggregateType: 'growth_ai_visibility_run',
-      aggregateId: String(payload.runId),
-      eventType: 'growth.ai_visibility.run.requested',
-      payload
-    })
-  } catch (error) {
-    // Best-effort: el run ya quedó encolado; el evento es de observabilidad/parity.
-    captureWithDomain(error, 'growth', {
-      tags: { source: 'aeo_run_requested_event' },
-      extra: { runId: payload.runId }
-    })
-  }
-}
-
-/**
- * Puertas cliente (contratado / trial / pilot). Único entrypoint de runs de portal.
- * Consume allowance atómico y atribuye el run a la org. No incurre costo si bloquea.
- */
-export const requestGraderRunForOrganization = async (input: {
+const requestSingle = async (input: {
   organizationId: string
   requestedBy: string
+  marketId?: string
   idempotencyKey?: string | null
   env?: NodeJS.ProcessEnv
+  channel: 'operator' | 'portal'
 }): Promise<RequestRunResult> => {
-  const env = input.env ?? process.env
-
-  if (!isPortalRunEnabled(env)) {
-    return { status: 'blocked', reason: 'disabled' }
-  }
-
-  const entitlement = await resolveAeoEntitlement(input.organizationId, env)
-
-  if (!entitlement.hasModule || !entitlement.tier || !entitlement.assignmentId) {
-    return { status: 'blocked', reason: 'not_entitled' }
-  }
-
-  if (entitlement.tier === 'trial' && !isTrialTierEnabled(env)) {
-    return { status: 'blocked', reason: 'disabled' }
-  }
-
-  if (entitlement.blockedReason === 'quota_exhausted') {
-    return { status: 'blocked', reason: 'quota_exhausted' }
-  }
-
-  if (entitlement.blockedReason === 'trial_budget_exhausted') {
-    return { status: 'blocked', reason: 'cost_blocked' }
-  }
-
-  // TASK-1696 — Gate de dinero per-org, EN SHADOW por defecto.
-  //
-  // Con `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` en ON se computa y se registra lo que HABRÍA
-  // pasado; sólo con `..._ENFORCED` también en ON se bloquea. La separación no es prudencia
-  // genérica: el camino público del lead magnet comparte este motor, así que un tope mal
-  // calibrado no degrada un tablero, corta captación — y hoy no sabemos cuál es el tope correcto
-  // (el 87,5% del gasto histórico del grader no tenía organización atribuida, así que el
-  // numerador de cualquier cálculo de hoy sería gasto de dueño desconocido).
-  //
-  // Se computa DESPUÉS de las puertas de entitlement y ANTES del claim: bloquear por presupuesto
-  // no debe consumir allowance, y medir `wouldBlock` sobre organizaciones sin entitlement sería
-  // ruido (ésas ya salieron por `not_entitled`).
-  if (isAeoBudgetGateEnabled(env)) {
-    const budget = await resolveAeoBudget(input.organizationId, env)
-
-    if (budget.wouldBlock) {
-      // El registro ocurre SIEMPRE que el shadow esté prendido, bloquee o no: es el dato que el
-      // ciclo mensual necesita para proponer un tope. `level: 'warning'` y no error — en shadow
-      // esto es una observación esperada, no un fallo.
-      captureWithDomain(new Error('growth ai-visibility budget would block run'), 'growth', {
-        level: 'warning',
-        tags: { source: 'aeo_budget_gate', enforced: String(budget.enforced) },
-        extra: {
-          organizationId: input.organizationId,
-          tier: budget.tier,
-          budgetCapUsd: budget.budgetCapUsd,
-          invoicedUsedUsd: budget.invoicedUsedUsd,
-          estimatedUsedUsd: budget.estimatedUsedUsd,
-          budgetUsedUsd: budget.budgetUsedUsd
-        }
-      })
-
-      if (budget.enforced) {
-        return { status: 'blocked', reason: 'budget_exhausted' }
-      }
-    }
-  }
-
-  const profile = await getGraderProfileForOrganization(input.organizationId)
-
-  if (!profile) {
-    return { status: 'blocked', reason: 'profile_required' }
-  }
-
-  // TASK-1288 — pre-check limpio (sin malgastar allowance): categoría no resuelta bloquea el run.
-  if (isRunCategoryBlocked({ categoryNodeId: profile.categoryNodeId, rawCategory: profile.category }, env)) {
-    return { status: 'blocked', reason: 'category_unresolved' }
-  }
-
-  const tier = entitlement.tier
-  const assignmentId = entitlement.assignmentId
-  const allowanceCap = entitlement.allowanceCap
-
-  // Claim atómico: lock de la fila del assignment serializa a las requests concurrentes de
-  // ESTA org; el recuento corre dentro del lock y el enqueue (que commitea el run con su
-  // atribución) ocurre ANTES de liberar el lock → la siguiente request recuenta y ve el run.
-  const claim = await withGreenhousePostgresTransaction(async client => {
-    await client.query(
-      `SELECT 1 FROM greenhouse_client_portal.module_assignments WHERE assignment_id = $1 FOR UPDATE`,
-      [assignmentId]
-    )
-
-    const usedResult = await client.query<{ used: number }>(
-      `SELECT COUNT(*)::int AS used FROM greenhouse_growth.grader_runs
-        WHERE organization_id = $1
-          AND run_source LIKE 'portal_%'
-          AND created_at >= date_trunc('month', CURRENT_DATE)`,
-      [input.organizationId]
-    )
-
-    const used = usedResult.rows[0]?.used ?? 0
-
-    if (used >= allowanceCap) {
-      return { blocked: true as const }
-    }
-
-    const enqueue = await enqueueGraderDiagnostic({
-      ...buildRunInputFromProfile(profile),
-      idempotencyKey: input.idempotencyKey ?? null,
-      attribution: {
-        organizationId: input.organizationId,
-        assignmentId,
-        runSource: portalRunSourceForTier(tier),
-        costAttribution: 'client'
-      }
+  try {
+    const batch = await requestRunBatchInternal({
+      organizationId: input.organizationId,
+      actor: input.requestedBy,
+      markets: input.marketId ? [input.marketId] : 'primary',
+      mode: 'light',
+      channel: input.channel,
+      idempotencyKey: input.idempotencyKey ?? `single:${crypto.randomUUID()}`,
+      env: input.env
     })
 
+    const run = batch.runs[0]
+
     return {
-      blocked: false as const,
-      run: enqueue.run,
-      idempotentHit: enqueue.idempotentHit,
-      usedAfter: enqueue.idempotentHit ? used : used + 1
+      status: 'accepted',
+      runId: run.runId,
+      runPublicId: run.publicId,
+      pollToken: run.pollToken,
+      idempotentHit: batch.idempotentHit,
+      tier: batch.tier,
+      allowanceRemaining: batch.allowanceRemaining
     }
-  })
+  } catch (error) {
+    if (error instanceof GraderMarketConfigError && blockedReasons.includes(error.code as RequestRunBlockedReason)) {
+      return { status: 'blocked', reason: error.code as RequestRunBlockedReason }
+    }
 
-  if (claim.blocked) {
-    return { status: 'blocked', reason: 'quota_exhausted' }
-  }
-
-  await emitRunRequestedEvent({
-    runId: claim.run.runId,
-    organizationId: input.organizationId,
-    assignmentId,
-    tier,
-    runSource: portalRunSourceForTier(tier),
-    costAttribution: 'client',
-    requestedBy: input.requestedBy,
-    idempotentHit: claim.idempotentHit
-  })
-
-  return {
-    status: 'accepted',
-    runId: claim.run.runId,
-    runPublicId: claim.run.publicId,
-    pollToken: claim.run.pollToken,
-    idempotentHit: claim.idempotentHit,
-    tier,
-    allowanceRemaining: Math.max(0, allowanceCap - claim.usedAfter)
+    throw error
   }
 }
 
-/**
- * Puerta operador (4.ª): Growth/AM corre el motor sobre el subject org (cliente o prospecto)
- * como jugada de venta. ILIMITADO (sin allowance/tope), costo atribuido a "sales". Gateada por
- * capability `growth.ai_visibility.run.operator` en la route + el kill switch global del grader.
- */
-export const requestGraderRunAsOperator = async (input: {
-  subjectOrganizationId: string
+/** organizationId is resolved by the authenticated portal route, never copied from request JSON. */
+export const requestGraderRunForOrganization = (input: {
+  organizationId: string
   requestedBy: string
+  marketId?: string
   idempotencyKey?: string | null
   env?: NodeJS.ProcessEnv
-}): Promise<RequestRunResult> => {
-  const env = input.env ?? process.env
+}): Promise<RequestRunResult> => requestSingle({ ...input, channel: 'portal' })
 
-  if (!isGraderEnabled(env)) {
-    return { status: 'blocked', reason: 'disabled' }
-  }
-
-  const profile = await getGraderProfileForOrganization(input.subjectOrganizationId)
-
-  if (!profile) {
-    return { status: 'blocked', reason: 'profile_required' }
-  }
-
-  // TASK-1291 — gate unificado del operador (always-on, defense-in-depth): no correr sobre una marca
-  // no resuelta. Audiencia derivada server-side del tipo real de la org (NUNCA del operador); si la
-  // org no se resuelve, se trata como prospecto (lo más estricto). Prospecto exige categoría + modelo;
-  // cliente exige categoría. Reemplaza el pre-check sólo-categoría flag-gated de TASK-1288 en esta puerta.
-  const facts = await getOrganizationCommercialFacts(input.subjectOrganizationId)
-  const audience = facts?.isClient ? 'client' : 'prospect'
-
-  const gradeable = assertSubjectGradeable({
-    categoryNodeId: profile.categoryNodeId,
-    categoryLabel: profile.categoryLabel,
-    categoryConfidence: profile.categoryConfidence,
-    rawCategory: profile.category,
-    businessModel: profile.businessModel,
-    audience
-  })
-
-  if (!gradeable.ok) {
-    return { status: 'blocked', reason: gradeable.reason }
-  }
-
-  // Atribución del assignment del subject SI existe (auditoría); NO se exige entitlement —
-  // la puerta operador es ilimitada (cross-sell). No consume allowance del cliente.
-  const assignmentRows = await runGreenhousePostgresQuery<{ assignment_id: string }>(
-    `SELECT assignment_id FROM greenhouse_client_portal.module_assignments
-      WHERE organization_id = $1 AND module_key = 'ai_visibility_v1' AND effective_to IS NULL
-      ORDER BY created_at DESC LIMIT 1`,
-    [input.subjectOrganizationId]
-  )
-
-  const enqueue = await enqueueGraderDiagnostic({
-    ...buildRunInputFromProfile(profile),
-    idempotencyKey: input.idempotencyKey ?? null,
-    attribution: {
-      organizationId: input.subjectOrganizationId,
-      assignmentId: assignmentRows[0]?.assignment_id ?? null,
-      runSource: 'operator_sales',
-      costAttribution: 'sales'
-    }
-  })
-
-  await emitRunRequestedEvent({
-    runId: enqueue.run.runId,
-    organizationId: input.subjectOrganizationId,
-    assignmentId: assignmentRows[0]?.assignment_id ?? null,
-    tier: 'operator',
-    runSource: 'operator_sales',
-    costAttribution: 'sales',
-    requestedBy: input.requestedBy,
-    idempotentHit: enqueue.idempotentHit
-  })
-
-  return {
-    status: 'accepted',
-    runId: enqueue.run.runId,
-    runPublicId: enqueue.run.publicId,
-    pollToken: enqueue.run.pollToken,
-    idempotentHit: enqueue.idempotentHit,
-    tier: 'operator',
-    allowanceRemaining: null
-  }
-}
+/** Operator capability is required by the existing route; arbitrary subject organizations are supported. */
+export const requestGraderRunAsOperator = (input: {
+  subjectOrganizationId: string
+  requestedBy: string
+  marketId?: string
+  idempotencyKey?: string | null
+  env?: NodeJS.ProcessEnv
+}): Promise<RequestRunResult> =>
+  requestSingle({ ...input, organizationId: input.subjectOrganizationId, channel: 'operator' })

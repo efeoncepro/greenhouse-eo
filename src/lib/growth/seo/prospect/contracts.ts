@@ -1,3 +1,5 @@
+import { GROWTH_MARKET_REGISTRY } from '@/lib/growth/markets'
+
 /**
  * TASK-1709 — Contratos del carril de diagnóstico de prospecto (tier `prospect`).
  *
@@ -42,17 +44,18 @@ export interface ProspectSubject {
  * ISO 3166-1 numérico + 2000). Cerrado a propósito: un mercado nuevo es una decisión
  * comercial que se agrega acá, no un passthrough del caller.
  */
-export const PROSPECT_MARKETS: Readonly<
-  Record<string, { locationCode: number; languageCode: string; label: string }>
-> = {
-  CL: { locationCode: 2152, languageCode: 'es', label: 'Chile' },
-  MX: { locationCode: 2484, languageCode: 'es', label: 'México' },
-  CO: { locationCode: 2170, languageCode: 'es', label: 'Colombia' },
-  PE: { locationCode: 2604, languageCode: 'es', label: 'Perú' },
-  AR: { locationCode: 2032, languageCode: 'es', label: 'Argentina' },
-  ES: { locationCode: 2724, languageCode: 'es', label: 'España' },
-  US: { locationCode: 2840, languageCode: 'en', label: 'Estados Unidos' }
-} as const
+export const PROSPECT_MARKETS: Readonly<Record<string, { locationCode: number; languageCode: string; label: string }>> =
+  Object.fromEntries(
+    // Commercial allowlist stays independent of the shared geographic catalog.
+    (['CL', 'MX', 'CO', 'PE', 'AR', 'ES', 'US'] as const).map(code => {
+      const market = GROWTH_MARKET_REGISTRY[code]
+
+      return [
+        code,
+        { locationCode: market.locationCode!, languageCode: code === 'US' ? 'en' : 'es', label: market.labels.es }
+      ]
+    })
+  )
 
 const DOMAIN_PATTERN = /^(?=.{4,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/
 

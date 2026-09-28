@@ -23,7 +23,7 @@ vi.mock('@/lib/postgres/client', () => ({
     state.emittedQueries.push({ sql, params })
 
     if (sql.includes('FROM greenhouse_growth.seo_targets')) {
-      return state.targetOrg ? [{ organization_id: state.targetOrg }] : []
+      return state.targetOrg ? [{ organization_id: state.targetOrg, location_code: 2484, language_code: 'es' }] : []
     }
 
     if (sql.includes('seo_gsc_daily')) {
@@ -197,6 +197,8 @@ describe('readSeoAeoGap', () => {
     const aeoQuery = state.emittedQueries.find(q => q.sql.includes('grader_runs'))
 
     expect(aeoQuery?.params[0]).toBe('org-resuelto-server-side')
+    expect(aeoQuery?.params).toContain('MX')
+    expect(aeoQuery?.params).toContain('es-MX')
   })
 
   it('BOUNDARY §1.1: ninguna query emitida mezcla tablas seo_* con grader_*', async () => {

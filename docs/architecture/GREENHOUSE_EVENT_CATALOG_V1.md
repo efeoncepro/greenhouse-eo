@@ -1519,3 +1519,14 @@ dominio — `src/lib/growth/seo/work-queue/contracts.ts:169-170` — y **no** en
 mismo seam de extracción a Wave (arquitectura SEO §17.3) que los eventos de TASK-1303/1308/1664/1662.
 
 Contrato completo del aggregate: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §18.
+
+## TASK-1863 — eventos AEO por mercado (implementación local)
+
+| Evento | Aggregate | Payload | Entrega |
+| --- | --- | --- | --- |
+| `growth.ai_visibility.market_configured` | growth_ai_visibility_profile | version, profileId, actor, action, marketId/set cuando corresponda | Outbox en la transacción de configuración; auditoría, sin efectos externos |
+| `growth.ai_visibility.run_batch.requested` | growth_ai_visibility_run_batch | version, batchId, organizationId, marketIds, runIds, actor | Outbox en la misma transacción de los N runs; observabilidad |
+| `growth.ai_visibility.profile_reconciled` | growth_ai_visibility_profile | version, organizationId, retainedProfileId, archivedProfileIds, actor | Sólo CLI apply explícito; histórico de runs intacto |
+
+Se conserva además `growth.ai_visibility.run.requested` por run. No se introducen consumers de correo,
+CRM ni publicación para estos eventos. El worker sigue reclamando la cola canónica de grader_runs.

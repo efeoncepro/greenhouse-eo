@@ -17,7 +17,11 @@ import { extractCitationDomain } from '../observation'
 import { getGraderProfile, getGraderRun, getRunObservations, type GraderExecutionPrompt } from '../store'
 import { normalizeObservation } from '../normalization/normalizer'
 import { enrichFindingWithLlm } from '../normalization/llm-extraction'
-import { summarizeProseExtraction, type NormalizedFinding, type ProseExtractionSummary } from '../normalization/contracts'
+import {
+  summarizeProseExtraction,
+  type NormalizedFinding,
+  type ProseExtractionSummary
+} from '../normalization/contracts'
 import {
   isPromptFamily,
   isPromptFanOutType,
@@ -80,14 +84,23 @@ const buildPromptTagCatalog = (executionPrompts: GraderExecutionPrompt[] | undef
  * Normaliza + puntúa un run. `recompute=false` (default) devuelve el score
  * existente si ya hay uno para el score_version vigente (idempotencia barata).
  */
-export const scoreGraderRun = async (input: {
-  runId: string
-  recompute?: boolean
-}): Promise<ScoreGraderRunResult> => {
+export const scoreGraderRun = async (input: { runId: string; recompute?: boolean }): Promise<ScoreGraderRunResult> => {
   const run = await getGraderRun(input.runId)
 
   if (!run) {
     throw new GraderScoringError('run_not_found', 'El run no existe.')
+  }
+
+  // A legacy measurement has no immutable matching context. Reusing its persisted evidence
+  // is the only honest recompute behavior; a changed profile must never rewrite that history.
+  if (!run.matchingSnapshot) {
+    const existing = await getGraderScore(input.runId)
+
+    if (existing) {
+      const findings = await getNormalizedFindings(input.runId)
+
+      return { score: existing, findings, proseExtraction: summarizeProseExtraction(findings) }
+    }
   }
 
   const profile = await getGraderProfile(run.profileId)
@@ -96,7 +109,16 @@ export const scoreGraderRun = async (input: {
     throw new GraderScoringError('profile_not_found', 'El perfil del run no existe.')
   }
 
-  const subjectDomain = profile.websiteUrl ? extractCitationDomain(profile.websiteUrl) : null
+  const truth = run.matchingSnapshot
+    ? {
+        brandName: run.matchingSnapshot.brand.name,
+        websiteUrl: run.matchingSnapshot.brand.websiteUrl,
+        category: run.matchingSnapshot.brand.category,
+        competitorsDeclared: run.matchingSnapshot.competitors.map(member => member.name)
+      }
+    : profile
+
+  const subjectDomain = truth.websiteUrl ? extractCitationDomain(truth.websiteUrl) : null
 
   const observations = await getRunObservations(input.runId)
 
@@ -107,15 +129,16 @@ export const scoreGraderRun = async (input: {
 
   for (const observation of observations) {
     const deterministic = normalizeObservation(observation, {
-      subjectBrand: profile.brandName,
+      subjectBrand: truth.brandName,
       subjectDomain,
-      competitorsDeclared: profile.competitorsDeclared,
+      competitorsDeclared: truth.competitorsDeclared,
+      matchingSnapshot: run.matchingSnapshot,
       promptTags: promptTagCatalog.get(observation.promptId) ?? null
     })
 
     // Hook LLM aislado (flag OFF por defecto → devuelve el determinista intacto).
     const enriched = await enrichFindingWithLlm(deterministic, observation, {
-      subjectBrand: profile.brandName,
+      subjectBrand: truth.brandName,
       subjectDomain
     })
 
@@ -133,9 +156,9 @@ export const scoreGraderRun = async (input: {
     const accuracyFindings = detectBrandInaccuracies(
       findings,
       buildBrandTruth({
-        brandName: profile.brandName,
-        category: profile.category,
-        competitorsDeclared: profile.competitorsDeclared
+        brandName: truth.brandName,
+        category: truth.category,
+        competitorsDeclared: truth.competitorsDeclared
       })
     )
 

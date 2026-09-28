@@ -2240,6 +2240,12 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  {
+    key: 'growth.ai_visibility.market.manage',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1289 — profile.set_business_model: el operador (Growth/AM) corrige el `business_model`
   // derivado de un perfil AEO (consumer_b2c/b2b_*/retail/marketplace/public/unknown). Command
   // gobernado `overrideProfileBusinessModel` (auditado append-only), consumible por la vista
@@ -2451,19 +2457,49 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   { key: 'insights.edition.review', module: 'insights', actions: ['update'] as const, defaultScope: 'tenant' },
   { key: 'insights.edition.issue', module: 'insights', actions: ['approve'] as const, defaultScope: 'tenant' },
   // TASK-1848 — compartir por enlace es autoridad propia (§7.1): leer/generar/emitir no la concede.
-  { key: 'insights.share.manage', module: 'insights', actions: ['create', 'read', 'update'] as const, defaultScope: 'tenant' },
+  {
+    key: 'insights.share.manage',
+    module: 'insights',
+    actions: ['create', 'read', 'update'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1848 — enviar por correo desde Efeonce: interno y distinto de compartir (no es relay del cliente).
-  { key: 'insights.delivery.send', module: 'insights', actions: ['create', 'read', 'update'] as const, defaultScope: 'tenant' },
+  {
+    key: 'insights.delivery.send',
+    module: 'insights',
+    actions: ['create', 'read', 'update'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1848 — recurrencia: genera borradores bajo la autoridad durable de quien la activó (interno).
-  { key: 'insights.schedule.manage', module: 'insights', actions: ['create', 'read', 'update'] as const, defaultScope: 'tenant' },
+  {
+    key: 'insights.schedule.manage',
+    module: 'insights',
+    actions: ['create', 'read', 'update'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1888 — portada preferida de los informes por organización (auto | navy | blanca). Interna; leerla también
   // la concede insights.report.read.
-  { key: 'insights.cover_preference.manage', module: 'insights', actions: ['read', 'update'] as const, defaultScope: 'tenant' },
+  {
+    key: 'insights.cover_preference.manage',
+    module: 'insights',
+    actions: ['read', 'update'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1890 — leer Marketing Studio por API/MCP. El gateway la verifica para la persona; Studio acota por organización.
-  { key: 'marketing_studio.campaign.read', module: 'marketing_studio', actions: ['read'] as const, defaultScope: 'tenant' },
+  {
+    key: 'marketing_studio.campaign.read',
+    module: 'marketing_studio',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1893 — obtener el enlace de descarga (vida corta, auditado) del original de una versión aprobada. Separada de
   // la lectura: ver una campaña no autoriza a llevarse el archivo final.
-  { key: 'marketing_studio.asset.download', module: 'marketing_studio', actions: ['read'] as const, defaultScope: 'tenant' },
+  {
+    key: 'marketing_studio.asset.download',
+    module: 'marketing_studio',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1921 — pedir el render de una pieza de marca (endpoint, MCP y Nexa llaman al mismo command) y leer su estado.
   { key: 'brand_render.request.create', module: 'brand_render', actions: ['create'] as const, defaultScope: 'tenant' },
   { key: 'brand_render.request.read', module: 'brand_render', actions: ['read'] as const, defaultScope: 'tenant' }

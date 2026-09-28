@@ -1,6 +1,6 @@
 # Handoff activo
 
-**TASK-1863 (28/09):** implementación multi-mercado/multidioma en curso; [plan](docs/tasks/plans/TASK-1863-plan.md). Google AI Mode: resolver país+idioma, snapshot por run y validación previa al gasto. Goal autorizado, develop compartido, sin push/deploy ni mutación histórica.
+**TASK-1863 (28/09):** rollout a staging autorizado, main en espera. DDL aditivo aplicado; cuatro perfiles Efeonce activos conservados (archivado inicial revertido), países confirmados CL/CO/PE/MX. Backfill y publicación en curso; [evidencia](docs/audits/platform/2026-09-28-task-1863-verification.md). Lint DataForSEO sin errores.
 
 **Ruta productiva de marca (28/09):** [TASK-1921](docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) code complete, rollout pendiente: en `develop` (37655fa93), no promover a main. Flag OFF; falta smoke en staging y federar en `efeonce-mcp`.
 

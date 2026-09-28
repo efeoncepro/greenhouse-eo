@@ -8,7 +8,7 @@ import 'server-only'
 
 import { PERPLEXITY_DEFAULT_MODEL, isPerplexityConfigured, runPerplexitySearch } from '@/lib/ai/perplexity'
 
-import { type ProviderAdapter } from './types'
+import type { ProviderAdapter } from './types'
 import { createWebSearchAdapter } from './web-search-adapter'
 
 export const createPerplexityProviderAdapter = (options: { model?: string } = {}): ProviderAdapter =>
@@ -16,8 +16,8 @@ export const createPerplexityProviderAdapter = (options: { model?: string } = {}
     provider: 'perplexity',
     defaultModel: options.model?.trim() || PERPLEXITY_DEFAULT_MODEL,
     isConfigured: isPerplexityConfigured,
-    runCall: async ({ prompt, model, timeoutMs }) => {
-      const result = await runPerplexitySearch({ prompt, model, timeoutMs })
+    runCall: async ({ prompt, model, timeoutMs, countryCode }) => {
+      const result = await runPerplexitySearch({ prompt, model, timeoutMs, countryCode })
 
       return {
         ok: result.ok,

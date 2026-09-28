@@ -9,13 +9,22 @@ import 'server-only'
  * orquestación gobernada que la UI de review (TASK-1291) / Nexa consumen.
  */
 
-import { can } from '@/lib/entitlements/runtime'
-import { type TenantEntitlementSubject } from '@/lib/entitlements/types'
+import { GraderMarketConfigError } from '../markets/contracts'
 
+import { resolveGrowthMarket } from '@/lib/growth/markets'
+import { can } from '@/lib/entitlements/runtime'
+import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
+
+import { localizePromptPack } from './localized'
 import { resolveArchetypeBaselinePack } from './archetypes/baseline-packs'
-import { authorPromptSet, AUTHOR_PROMPT_SET_MAX_OUTPUT_TOKENS, type AuthorPromptSetStatus } from './authoring/author-prompt-set'
-import { type SeoGroundedKeywordContext } from './authoring/author-system-prompt'
 import {
+  authorPromptSet,
+  AUTHOR_PROMPT_SET_MAX_OUTPUT_TOKENS,
+  type AuthorPromptSetStatus
+} from './authoring/author-prompt-set'
+import type { SeoGroundedKeywordContext } from './authoring/author-system-prompt'
+import {
+  resolvePromptSetMarket,
   approvePromptSet,
   createDraftPromptSet,
   getActivePromptSet,
@@ -54,6 +63,7 @@ export const createGraderPromptSetDraft = async (
 }
 
 export interface AuthorGraderPromptSetDraftInput {
+  marketId?: string
   subject: TenantEntitlementSubject
   profileId: string
   brandName: string
@@ -93,12 +103,18 @@ export const authorGraderPromptSetDraft = async (
 ): Promise<AuthorGraderPromptSetDraftResult> => {
   assertCanManage(input.subject)
 
+  const configured = await resolvePromptSetMarket(input.profileId, input.marketId)
+  const market = resolveGrowthMarket(input.market, input.locale)
+
+  if (configured.marketCode !== market.code || configured.locale !== market.locale)
+    throw new GraderMarketConfigError('aeo_market_mismatch')
+
   const authored = await authorPromptSet({
     brandName: input.brandName,
     categoryLabel: input.categoryLabel,
     businessModel: input.businessModel,
-    market: input.market,
-    locale: input.locale,
+    market: market.label,
+    locale: market.locale,
     competitors: input.competitors,
     whatTheBrandDoes: input.whatTheBrandDoes ?? null,
     fineCategory: input.fineCategory ?? null,
@@ -111,7 +127,7 @@ export const authorGraderPromptSetDraft = async (
 
   const basePrompts: PromptSetPrompt[] = usingLlm
     ? authored.prompts!
-    : resolveArchetypeBaselinePack(input.businessModel).prompts.map(p => ({ ...p }))
+    : localizePromptPack(resolveArchetypeBaselinePack(input.businessModel), market).prompts.map(p => ({ ...p }))
 
   // TASK-1666 — provenance POR PROMPT sólo cuando hubo contexto SEO. Grounded real apunta al
   // contextRef verificable; el baseline lo dice sin adornos: NO es específico de esos candidates.
@@ -124,6 +140,7 @@ export const authorGraderPromptSetDraft = async (
 
   const draft = await createDraftPromptSet({
     profileId: input.profileId,
+    marketId: configured.marketId,
     businessModel: input.businessModel,
     categoryNodeId: input.categoryNodeId,
     prompts,
@@ -152,12 +169,13 @@ export const approveGraderPromptSet = async (input: {
 export const readGraderPromptSets = async (input: {
   subject: TenantEntitlementSubject
   profileId: string
+  marketId?: string
 }): Promise<{ active: GraderPromptSetRow | null; versions: GraderPromptSetRow[] }> => {
   assertCanManage(input.subject)
 
   return {
-    active: await getActivePromptSet(input.profileId),
-    versions: await listPromptSets(input.profileId)
+    active: await getActivePromptSet(input.profileId, input.marketId),
+    versions: await listPromptSets(input.profileId, input.marketId)
   }
 }
 

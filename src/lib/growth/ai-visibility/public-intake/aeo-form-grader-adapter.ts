@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { resolveGrowthFormMarket } from '@/lib/growth/markets'
+
 /**
  * TASK-1321 — Adapter: submission de `/aeo-2/` (`fdef-efeonce-aeo-diagnostic`) → intake del grader.
  *
@@ -35,41 +37,11 @@ export const AEO_DIAGNOSTIC_FORM_ID = 'fdef-efeonce-aeo-diagnostic'
 /** formKey público del form `/aeo-2/` (handle del renderer + target del activation script). */
 export const AEO_DIAGNOSTIC_FORM_KEY = 'b120566a-dd1a-43c8-956a-4e0121e805b8'
 
-/**
- * country → market + locale del grader. El `<select>` del form live (`/aeo-2/`) submite el
- * **nombre completo en español** como value (`"Chile"`/`"Colombia"`/`"México"`/`"Perú"`),
- * NO el ISO-2 (verificado contra el RenderContract live 2026-07-02). Mapeamos por nombre
- * normalizado (minúsculas + sin acentos) y también aceptamos ISO-2 por robustez, para no
- * quedar atados al value exacto del select. Fuente única de la derivación en el path público
- * (el `MARKET_BY_COUNTRY` de `provision-profile.ts` es portal-only y solo cubre CL/MX/US).
- */
-const AEO_MARKET_BY_COUNTRY: Record<string, { market: string; locale: string }> = {
-  cl: { market: 'CL', locale: 'es-CL' },
-  chile: { market: 'CL', locale: 'es-CL' },
-  co: { market: 'CO', locale: 'es-CO' },
-  colombia: { market: 'CO', locale: 'es-CO' },
-  mx: { market: 'MX', locale: 'es-MX' },
-  mexico: { market: 'MX', locale: 'es-MX' },
-  pe: { market: 'PE', locale: 'es-PE' },
-  peru: { market: 'PE', locale: 'es-PE' },
-  us: { market: 'US', locale: 'en-US' },
-}
+/** Public form default remains explicit; internal configured markets are always strict. */
+export const resolveAeoMarketLocale = (country: string | null | undefined) => {
+  const resolved = resolveGrowthFormMarket(country)
 
-/** minúsculas + sin acentos, para matchear "México"/"Perú" y sus variantes sin tilde. */
-const normalizeCountryKey = (country: string): string =>
-  country.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-
-/**
- * Deriva `market`/`locale` desde el `country` del form. Fallback conservador a CL/es-CL
- * (mercado base) cuando el país es desconocido o vacío — nunca deja `market`/`locale` vacío
- * (romperían `isValidPublicGraderInput`).
- */
-export const resolveAeoMarketLocale = (
-  country: string | null | undefined,
-): { market: string; locale: string } => {
-  const key = normalizeCountryKey(country ?? '')
-
-  return AEO_MARKET_BY_COUNTRY[key] ?? { market: 'CL', locale: 'es-CL' }
+  return { market: resolved.code, locale: resolved.locale, marketSource: resolved.source }
 }
 
 /**
@@ -85,6 +57,7 @@ export interface AeoDiagnosticDeterministicIntake {
   readonly market: string
   /** Locale derivado de `country`. */
   readonly locale: string
+  readonly marketSource: 'form_selected' | 'form_default'
   /** Competidores declarados desde `mainCompetitor` (single → array). */
   readonly competitorsDeclared: string[]
   /** Email — PII para el lead, NUNCA para el run. */
@@ -94,10 +67,7 @@ export interface AeoDiagnosticDeterministicIntake {
   readonly companySize: string | null
 }
 
-export type AeoDiagnosticSkipReason =
-  | 'missing_brand_name'
-  | 'missing_website'
-  | 'missing_email'
+export type AeoDiagnosticSkipReason = 'missing_brand_name' | 'missing_website' | 'missing_email'
 
 export type AeoDiagnosticMapResult =
   | { readonly ok: true; readonly intake: AeoDiagnosticDeterministicIntake }
@@ -125,9 +95,7 @@ const splitFullName = (fullName: string | null): { firstName: string | null; las
  *
  * Función PURA: sin I/O, sin LLM. La categoría la agrega la projection.
  */
-export const mapAeoDiagnosticToGraderIntake = (
-  fields: Record<string, unknown>,
-): AeoDiagnosticMapResult => {
+export const mapAeoDiagnosticToGraderIntake = (fields: Record<string, unknown>): AeoDiagnosticMapResult => {
   const brandName = asTrimmed(fields.brandName)
 
   if (!brandName) return { ok: false, reason: 'missing_brand_name' }
@@ -140,7 +108,7 @@ export const mapAeoDiagnosticToGraderIntake = (
 
   if (!email) return { ok: false, reason: 'missing_email' }
 
-  const { market, locale } = resolveAeoMarketLocale(asTrimmed(fields.country))
+  const { market, locale, marketSource } = resolveAeoMarketLocale(asTrimmed(fields.country))
 
   // firstName/lastName: los produce el namePolicy split en submit; fallback defensivo al
   // split de fullName por si un submission viejo no los trae normalizados.
@@ -160,11 +128,12 @@ export const mapAeoDiagnosticToGraderIntake = (
       websiteUrl,
       market,
       locale,
+      marketSource,
       competitorsDeclared,
       email,
       firstName,
       lastName,
-      companySize: asTrimmed(fields.companySize),
-    },
+      companySize: asTrimmed(fields.companySize)
+    }
   }
 }

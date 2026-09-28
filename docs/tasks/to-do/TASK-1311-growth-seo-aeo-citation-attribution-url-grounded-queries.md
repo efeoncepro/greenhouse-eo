@@ -403,3 +403,9 @@ Ver el contrato en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §15 (granularidad
 3. ¿El "dominio propio" de la org se resuelve desde `grader_profiles.website_url`, desde `seo_targets.root_domain` (TASK-1299), o ambos? Confirmar el SoT del dominio propio en Discovery (sin cruzar tablas SEO↔AEO — solo resolver el string dominio).
 4. ¿Cuál es el flag exacto que gatea el módulo grader/AEO en el ledger (`GROWTH_AI_VISIBILITY_ENABLED`?)? Confirmar en Discovery.
 5. ¿El desbloqueo real por TASK-1299 es solo de convención de dominio SEO o hay un objeto concreto que este reader necesita? Confirmar acoplamiento en Discovery.
+
+## Impacto cruzado TASK-1863 (2026-09-28)
+
+La implementación local del Grader multi-mercado incorpora catálogo es/en/pt-BR/fr, mercados y lotes,
+snapshots y readers por país/locale. Rollout pendiente: no asumir habilitación ni geografía inferida
+en históricos. Consumir los commands existentes; [contrato y manual](../../manual-de-uso/growth/configurar-mercados-aeo.md).

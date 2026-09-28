@@ -9,13 +9,9 @@ import 'server-only'
  * factory genérico `createWebSearchAdapter`.
  */
 
-import {
-  OPENAI_RESPONSES_DEFAULT_MODEL,
-  isOpenAIConfigured,
-  runOpenAIResponsesWebSearch
-} from '@/lib/ai/openai'
+import { OPENAI_RESPONSES_DEFAULT_MODEL, isOpenAIConfigured, runOpenAIResponsesWebSearch } from '@/lib/ai/openai'
 
-import { type ProviderAdapter } from './types'
+import type { ProviderAdapter } from './types'
 import { createWebSearchAdapter } from './web-search-adapter'
 
 export const createOpenAIProviderAdapter = (options: { model?: string } = {}): ProviderAdapter =>
@@ -23,8 +19,8 @@ export const createOpenAIProviderAdapter = (options: { model?: string } = {}): P
     provider: 'openai',
     defaultModel: options.model?.trim() || OPENAI_RESPONSES_DEFAULT_MODEL,
     isConfigured: isOpenAIConfigured,
-    runCall: async ({ prompt, model, timeoutMs }) => {
-      const result = await runOpenAIResponsesWebSearch({ prompt, model, timeoutMs })
+    runCall: async ({ prompt, model, timeoutMs, countryCode }) => {
+      const result = await runOpenAIResponsesWebSearch({ prompt, model, timeoutMs, countryCode })
 
       return {
         ok: result.ok,

@@ -1,5 +1,21 @@
 # TASK-1863 — AEO Grader multi-mercado: una marca, N mercados, selección múltiple y matriz comparativa
 
+## Delta 2026-09-28 — Google AI Mode falló con `market="Perú"`
+
+La ejecución `EO-GRUN-00056` produjo siete observaciones Google `failed` con task `40501`: el adapter
+transmitió `location_name="Perú"`. En una reproducción aislada, cambiar sólo la ubicación a
+`location_code=2604` dio task `20000` (USD 0,004). Evidencia, trazado de productores/consumers,
+alternativas, criterios y rollout: [auditoría de contrato de mercado y AI Mode](../../audits/platform/2026-09-28-brand-visibility-google-ai-mode-market-contract.md).
+
+Esta task ya es dueña del catálogo único y la eliminación del fallback a EE. UU. Su primer slice de
+request correctness debe cubrir **nombres legibles e ISO** con el mismo resolver, preservar la etiqueta
+localizada en el prompt, rechazar geo/locale inválidos antes del gasto y mantener la clasificación por
+task `20000`/`40501`. No tratar `location_name` libre ni la eliminación de tildes como solución.
+La documentación actual del catálogo de idiomas **específico de AI Mode** incluye `es`; la
+afirmación `English-only` que figura en el adapter/skill/arquitectura necesita actualización al
+implementar. El operador autorizó el 28-09 la capacidad multidioma completa (`es`, `en`, `pt-BR`, `fr`), incluidos
+clientes de EE. UU. La policy de runs nuevos se versiona; los históricos conservan su evidencia.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -29,7 +45,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -42,7 +58,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `Code complete; rollout pendiente`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -357,23 +373,23 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Tablas nuevas justificadas en ADR/DDL. No existe un allowlist de destinos de escritura específico de ai-visibility; FK, tenant boundary y grants verificados en el harness y la suite.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 ### Capability Definition of Done — Full API Parity gate
 
-- [ ] La lógica de mercados, lotes, alias y competidores vive en `src/lib/growth/ai-visibility/**` y el catálogo en `src/lib/growth/markets/`.
-- [ ] Modelada como aggregates (marca, mercado, set de competidores, lote), no como handlers de pantalla.
-- [ ] Reads como readers canónicos; writes como commands con capability fina, idempotencia, audit/outbox y errores canónicos.
-- [ ] Capability `growth.ai_visibility.market.manage` + grant a ≥1 rol real + coverage test en el mismo PR.
-- [ ] Camino programático: rutas admin ahora; lanes y tools en TASK-1861 (Delta registrado).
-- [ ] Writes aptos para `propose → confirm → execute`.
-- [ ] Un primitive, muchos consumers: portal, operador, intake, regrade, MCP y Nexa usan los mismos commands.
-- [ ] Parity check = SÍ.
+- [x] La lógica de mercados, lotes, alias y competidores vive en `src/lib/growth/ai-visibility/**` y el catálogo en `src/lib/growth/markets/`.
+- [x] Modelada como aggregates (marca, mercado, set de competidores, lote), no como handlers de pantalla.
+- [x] Reads como readers canónicos; writes como commands con capability fina, idempotencia, audit/outbox y errores canónicos.
+- [x] Capability `growth.ai_visibility.market.manage` + grant a ≥1 rol real + coverage test en esta entrega local; seed de runtime pendiente con el rollout.
+- [x] Camino programático: rutas admin ahora; lanes y tools en TASK-1861 (Delta registrado).
+- [x] Writes aptos para `propose → confirm → execute`.
+- [x] Un primitive para portal, operador, intake y regrade; MCP/Nexa consumirán estos mismos commands en TASK-1861, sin duplicar lógica.
+- [x] Parity check = SÍ.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -728,24 +744,27 @@ tarda ≥30 minutos; el reader del lote expone el avance.
 
 ## Acceptance Criteria
 
-- [ ] `GROWTH_MARKET_REGISTRY` es la única fuente de mercados del grader, del form público y del prospecto SEO; los cuatro mapas previos derivan de él.
-- [ ] Un mercado sin código en el catálogo produce `skipped:market_unsupported` y nunca una consulta con ubicación de Estados Unidos (test).
-- [ ] `grader_profile_markets`, `grader_competitor_sets` y `grader_run_batches` existen con sus UNIQUE, triggers y bloques de verificación, comprobados contra PG real.
-- [ ] El backfill deja cada marca activa con exactamente un mercado primario y cada run con `market_id` (conteos antes/después en la task).
-- [ ] Cambiar `market_code` o `locale` de un mercado falla por trigger.
-- [ ] Un lote de N mercados encola N runs en una transacción o ninguno, y rechaza el lote entero si el costo total supera el presupuesto o el tope.
-- [ ] Un run sin mercado explícito usa el mercado primario y produce el mismo resultado que hoy (test de paridad).
-- [ ] Re-puntuar un run viejo después de cambiar los competidores del mercado no altera su resultado (test).
-- [ ] "LATAM" declarado con alias cuenta respuestas que dicen "LATAM" y "LATAM Airlines"; "Gol" en `word_cs` no cuenta la palabra "gol" en minúsculas (tests).
-- [ ] Un run de Brasil usa prompts en `pt-BR` con "Brasil"/"Brazil" y `location_code` de Brasil (staging).
-- [ ] Ningún prompt de un run nuevo contiene un código ISO crudo como nombre de país (test sobre los packs).
-- [ ] Cada observación persiste `geo_mode`; los adapters `native` envían el país (tests por adapter).
-- [ ] `readGraderMarketMatrix` devuelve una fila por mercado con `scoreVersion` y `blendedOverall: null`.
-- [ ] La tendencia sólo compara runs del mismo mercado y marca `competitive_sov` incomparable tras un cambio de set.
-- [ ] El regrade programa y ejecuta por mercado.
-- [ ] Capability `growth.ai_visibility.market.manage` con grant y coverage test verde.
-- [ ] Sky queda con seis mercados configurados por commands y un lote de seis verificado en staging.
-- [ ] Fila del flag en el ledger y `pnpm docs:closure-check` verde.
+Evidencia local y límites: [auditoría de verificación](../../audits/platform/2026-09-28-task-1863-verification.md).
+Los criterios de staging/producción quedan pendientes hasta el rollout autorizado.
+
+- [x] Catálogo único para Grader/form/prospecto, 23 mercados y es/en/pt-BR/fr; pruebas de aliases, ISO y locales.
+- [x] País sin ubicación Google produce `skipped:market_unsupported`, sin fallback (Cuba: prueba y canary).
+- [x] Tablas, UNIQUE, FK, triggers e invariantes comprobados en PostgreSQL real efímero; Up/Down/Up PASS.
+- [ ] Backfill compartido aplicado y cada marca activa con principal. Dry-run: 27 resolubles, una organización con cuatro perfiles activos; reconciliación previa pendiente. Históricos sin geografía inferida.
+- [x] Identidad país/locale inmutable y principal único, comprobados por SQL real.
+- [x] N mercados encolan N runs atómicamente; rollback, cuota concurrente, reserva diaria/mensual y derechos comerciales probados.
+- [x] Sin mercado explícito se usa el principal; paridad de selección legacy comprobada. Nuevos packs versionados: no se promete igualdad numérica entre muestras diferentes.
+- [x] Snapshots de matching/competidores preservan la normalización histórica; aliases LATAM y caso sensible Gol probados.
+- [ ] Run Brasil completo en staging. Adapter local BR/pt-BR con código 2076 sí verificado contra Google; no equivale a staging.
+- [x] Packs localizados usan nombres legibles de país; pruebas sobre todos los arquetipos y locales.
+- [x] Observaciones intentadas persisten geo_mode/país y adapters nativos envían ubicación; tests HTTP y canaries Google. Observaciones legacy/sin intento conservan null.
+- [x] Reader de matriz separado por mercado, metodología y `blendedOverall: null`; último run reportable con score.
+- [x] Tendencia restringida al mismo mercado; cambio de set anula deltas competitivo/global y declara `competitor_set_changed`.
+- [x] Regrade por mercado y principal con flag OFF pasa por el mismo batch, con reserva mensual atómica y espejo de cadencia.
+- [x] Capability market.manage, grants internos y denegación cliente probados; seed compartido pendiente con el DDL.
+- [ ] Sky con seis mercados y lote de aceptación en staging: pendiente contrato comercial y rollout; no se consumió su cuota.
+- [x] Flag registrado en ledger y deploy.sh; auditoría flags sin Vercel PASS. Flags externos sin modificar.
+- [x] QA local y cierre documental ejecutados: unit 15.886 PASS, PG 11 PASS, build exit 0 y lint propio PASS. Lint global tiene 3 errores de formato en WIP concurrente ajeno; detalle en auditoría.
 
 ## Verification
 
@@ -762,17 +781,17 @@ tarda ≥30 minutos; el reader del lote expone el avance.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] Deltas de cierre en `TASK-1861`, `TASK-1270`, `TASK-1717`, `TASK-1698` y `TASK-1311`.
-- [ ] Contract de columnas legadas registrado en `docs/tasks/pending-migrations/`.
-- [ ] Skills `seo-aeo` (overlay `efeonce/AI_VISIBILITY_GRADER.md`) y `dataforseo-operator` actualizadas con el catálogo de mercados.
-- [ ] `docs/epics/AEO_PROGRAM_STATUS.md` actualizado.
+- [x] Deltas de cierre en `TASK-1861`, `TASK-1270`, `TASK-1717`, `TASK-1698` y `TASK-1311`.
+- [x] Contract de columnas legadas registrado en `docs/tasks/pending-migrations/`.
+- [x] Skills `seo-aeo` (overlay `efeonce/AI_VISIBILITY_GRADER.md`) y `dataforseo-operator` actualizadas con el catálogo de mercados.
+- [x] `docs/epics/AEO_PROGRAM_STATUS.md` actualizado.
 
 ## Follow-ups
 
@@ -797,3 +816,58 @@ tarda ≥30 minutos; el reader del lote expone el avance.
 3. **Perfil libre `EO-GAVP-0021`** (Sky, sin organización, `blog.skyairline.com`, runs `00043`–`00048`): ¿se archiva
    o se conserva como histórico sin enlazar? No se mezcla con la serie del perfil canónico.
 4. **Alias de Sky.** Propuesto: nombre "SKY Airline"; alias "Sky Airline", "Sky Airlines" (`word_ci`) y "SKY" (`word_cs`).
+
+## Ejecución 2026-09-28
+
+Goal confirmado por el operador: implementación completa y multidioma, checkout compartido develop, sin subagentes. Plan: [TASK-1863-plan.md](../plans/TASK-1863-plan.md). Hook `--develop` ejecutado; `pg:doctor` PASS. Sin push/deploy ni cambios de flags externos; rollout y canaries de cliente se registran aparte.
+
+## Avance verificado 2026-09-28 — cobertura LATAM y España
+
+Alcance ampliado por el operador: 20 países de Latinoamérica, Puerto Rico, España y EE. UU.; español,
+inglés, portugués de Brasil y francés para Haití. Catálogo + locales son independientes de derechos
+comerciales. Cuba no tiene ubicación DataForSEO: skip sin compra; no se fuerza EE. UU.
+
+- Catálogo vivo y canary de los 23 mercados: 22 éxitos + Cuba skip explícito; USD 0,088 en esta ronda.
+- Suite general: 1.852 archivos / 15.886 pruebas PASS; 11 pruebas transaccionales sobre PG efímero PASS,
+  incluyendo primitive real de enqueue y concurrencia. Up/Down/Up, triggers y FK comprobados localmente.
+- Build Next de producción PASS; PDF real renderizado e inspeccionado con cobertura 4/5.
+- [ADR aceptado para implementación](../../architecture/GREENHOUSE_AEO_MULTI_MARKET_MEASUREMENT_DECISION_V1.md),
+  [manual](../../manual-de-uso/growth/configurar-mercados-aeo.md) y
+  [evidencia](../../audits/platform/2026-09-28-task-1863-verification.md).
+
+### Ajustes a la spec inicial
+
+- Los runs históricos NO se enlazan por inferencia a un mercado nuevo; conservan su evidencia legacy.
+  Sólo las configuraciones de prompt sets se enlazan al principal original. El criterio inicial de
+  “cada run con market_id” queda reemplazado por “cada run NUEVO con mercado y snapshot completos”.
+- Localizar es-CL también versiona el pack: se elimina la pregunta fija por Santiago. La paridad es de
+  selección de principal y contratos legacy, no de score numérico frente a otra muestra de prompts.
+- Paths API planos bajo `/api/admin/growth/ai-visibility`, documentados en el manual, con idénticos
+  commands/capabilities. No hay selector UI nuevo; backend-data mantiene la UI dedicada como follow-up.
+- La instancia y el ops-worker son compartidos: no existe migración/flag de worker “sólo staging”.
+- Configuración Sky, contrato de mercados incluidos, aplicación de migraciones, backfill y rollout
+  quedan sin tildar. No se presumen autorizaciones comerciales ni se archivan perfiles con el dry-run.
+
+### Readback previo a rollout
+
+27 perfiles activos; todos resolubles. Una organización tiene CUATRO perfiles activos; el script de
+reconciliación permite conservar el perfil que el reader ya usa y archivar explícitamente los otros
+sin mover ni recalcular sus runs. Guard de migración falla antes del DDL hasta resolverlo.
+
+### DDL pendiente y responsabilidad de activación
+
+El operador del release reactiva las dos migraciones aditivas desde `pending-migrations/` únicamente
+tras verificar la reconciliación de perfiles. Se genera un timestamp nuevo con `pnpm migrate:create`,
+se combinan los Up/Down en el orden definido por el manual y se repite la prueba local antes del apply.
+No se deja un guard pendiente en el runner compartido. El retiro de columnas legacy es un contract futuro.
+
+
+### Corrección de rollout — 2026-09-28
+
+Operador autoriza staging y mantiene main en espera. DDL aditivo `20260928094832901` aplicado;
+la restricción de perfil único por organización de Slice 1 queda reemplazada por la migración permisiva
+`20260928095058691`. Los cuatro perfiles de Efeonce representan configuraciones comerciales que se
+conservan: el archivado inicial de tres fue revertido y auditado, sin modificar runs. El operador confirma
+Chile, Colombia, Perú y México; los registros legacy actuales dicen CL/es-CL, por lo que sus competidores
+no se reasignan a países por inferencia. Backfill preserva todos los perfiles. No reaplicar los SQL pendientes
+originales: el DDL canónico vive ahora en las dos migraciones versionadas. Contract destructivo sigue aparcado.

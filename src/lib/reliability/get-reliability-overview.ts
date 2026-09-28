@@ -190,6 +190,7 @@ import { getGlobeCreditFundingStaleProposalsSignal } from './queries/globe-credi
 import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
 import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibility-scoring-signals'
 import { getGrowthAiVisibilityArchetypeCoverageSignals } from './queries/growth-ai-visibility-archetype-coverage-signals'
+import { getGrowthAiVisibilityMarketSignals } from './queries/growth-ai-visibility-market-signals'
 import { getGrowthAiVisibilityCategorySignals } from './queries/growth-ai-visibility-category-signals'
 import { getGrowthAiVisibilityBusinessModelSignals } from './queries/growth-ai-visibility-business-model-signals'
 import { getGrowthAiVisibilityProbeSignals } from './queries/growth-ai-visibility-probe-signals'
@@ -716,6 +717,7 @@ interface ReliabilityOverviewSources {
   growthAiVisibilityProbe?: ReliabilitySignal[] | null
   growthAiVisibilityArchetypeCoverage?: ReliabilitySignal[] | null
   growthAiVisibilityCategory?: ReliabilitySignal[] | null
+  growthAiVisibilityMarkets?: ReliabilitySignal[] | null
   growthAiVisibilityBusinessModel?: ReliabilitySignal[] | null
   growthAiVisibilityPublicIntake?: ReliabilitySignal[] | null
   growthAiVisibilityPublicDelivery?: ReliabilitySignal[] | null
@@ -1202,6 +1204,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibilityProbe ?? []),
     ...(sources.growthAiVisibilityArchetypeCoverage ?? []),
     ...(sources.growthAiVisibilityCategory ?? []),
+    ...(sources.growthAiVisibilityMarkets ?? []),
     ...(sources.growthAiVisibilityBusinessModel ?? []),
     ...(sources.growthAiVisibilityPublicIntake ?? []),
     ...(sources.growthAiVisibilityPublicDelivery ?? []),
@@ -1666,6 +1669,11 @@ export const getReliabilityOverview = async (
     preloadedSources.growthAiVisibilityArchetypeCoverage !== undefined
       ? preloadedSources.growthAiVisibilityArchetypeCoverage
       : await getGrowthAiVisibilityArchetypeCoverageSignals().catch(() => null)
+
+  const growthAiVisibilityMarkets =
+    preloadedSources.growthAiVisibilityMarkets !== undefined
+      ? preloadedSources.growthAiVisibilityMarkets
+      : await getGrowthAiVisibilityMarketSignals().catch(() => null)
 
   const growthAiVisibilityCategory =
     preloadedSources.growthAiVisibilityCategory !== undefined
@@ -2993,6 +3001,7 @@ export const getReliabilityOverview = async (
     growthAiVisibilityProbe,
     growthAiVisibilityArchetypeCoverage,
     growthAiVisibilityCategory,
+    growthAiVisibilityMarkets,
     growthAiVisibilityBusinessModel,
     growthAiVisibilityPublicIntake,
     growthAiVisibilityPublicDelivery,

@@ -360,3 +360,12 @@ provider **no es verdad de negocio**: se normaliza y puntúa después.
 > **Cross-refs:** núcleo `../SKILL.md`; medición/SoV `../modules/07_MEASUREMENT.md`;
 > AEO/fan-out `../modules/04_AEO_GEO.md`; entidad `../modules/03_EEAT_ENTITY.md`;
 > overlay Efeonce + nota Astro `EFEONCE_OVERLAY.md`.
+
+## TASK-1863 — mercados e idiomas (2026-09-28)
+
+El catálogo compartido Growth cubre LATAM, Puerto Rico, España y EE. UU.; packs es/en/pt-BR/fr,
+mercados por marca, lotes atómicos y foto de competidores por run. Código local; rollout pendiente.
+Google AI Mode recibe código numérico e idioma propio de su catálogo; no es English-only.
+Cuba no tiene ubicación DataForSEO y produce skip sin fallback. Gemini declara prompt_only;
+OpenAI/Anthropic/Sonar/Google usan ubicación nativa. No comparar cambios de país/idioma/policy como
+crecimiento longitudinal. Referencia: `docs/architecture/GREENHOUSE_AEO_MULTI_MARKET_MEASUREMENT_DECISION_V1.md`.

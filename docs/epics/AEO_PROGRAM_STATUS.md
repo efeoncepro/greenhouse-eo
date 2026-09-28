@@ -274,3 +274,9 @@ Y en la segunda pasada sobre el propio AEO encontró **15 más en EPIC-020** que
 **Severidad: `warning` por defecto.** Con 193 violaciones preexistentes, hacerlo `error` hoy dejaría `pnpm epic:lint` rojo para todo el mundo por deuda ajena. Se enciende con **`pnpm epic:lint --strict-child-parity`** (exit 1), pensado para (a) verificar un epic recién reconciliado y (b) promoverse a gate de CI cuando el backlog esté limpio.
 
 **Estado tras esta pasada:** `EPIC-020`, `EPIC-021` y `EPIC-040` pasan `--strict-child-parity` limpios. Los otros 12 epics con drift quedan **fuera del alcance de este trabajo**: cada uno necesita el juicio de su dueño para decidir, task por task, si se agrega a la lista o si el campo `Epic:` está mal. No se tocaron a ciegas.
+
+## TASK-1863 — 28-09-2026
+
+Implementación multi-mercado/multidioma en QA local: LATAM + Puerto Rico + España + EE. UU.; Google AI Mode
+verificado en 22 mercados, Cuba skip explícito; es/en/pt-BR/fr. [Evidencia y rollout pendiente](../audits/platform/2026-09-28-task-1863-verification.md).
+Sin deploy ni configuración comercial de Sky en esta ejecución.

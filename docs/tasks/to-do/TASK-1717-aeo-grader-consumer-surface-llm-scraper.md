@@ -499,3 +499,9 @@ corrida. Usar cola estándar salvo que la corrida sea interactiva.
   contra el endpoint, no contra la documentación.
 - ¿La corrida del grader se ejecuta en Vercel o en el `ops-worker`? Decide dónde se prende la flag y
   es la diferencia entre que funcione y que no, en silencio.
+
+## Impacto cruzado TASK-1863 (2026-09-28)
+
+La implementación local del Grader multi-mercado incorpora catálogo es/en/pt-BR/fr, mercados y lotes,
+snapshots y readers por país/locale. Rollout pendiente: no asumir habilitación ni geografía inferida
+en históricos. Consumir los commands existentes; [contrato y manual](../../manual-de-uso/growth/configurar-mercados-aeo.md).

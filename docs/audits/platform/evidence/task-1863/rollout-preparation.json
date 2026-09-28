@@ -1,0 +1,66 @@
+{
+  "preparedAt": "2026-09-28T09:45:28.479119+00:00",
+  "task": "TASK-1863",
+  "state": "staging_rollout_in_progress_main_on_hold",
+  "applied": true,
+  "targetSha": null,
+  "checkoutBaseSha": "972dab49cdc373dae55c8f583897e02d2212937c",
+  "sources": [
+    {
+      "path": "docs/tasks/pending-migrations/TASK-1863-grader-markets.sql.pending",
+      "sha256": "9422f7dd997a50577b1894f1c64dc6348de31d1852ea630cf68e191e679ac953"
+    },
+    {
+      "path": "docs/tasks/pending-migrations/TASK-1863-market-manage-capability.sql.pending",
+      "sha256": "1d286624bbde2f0ac02c0a0bc8ffa7956d8a496c51df1eca987b9d664ec4b698"
+    }
+  ],
+  "candidateSha256": "dd6113dbf0412af7d31d09d3c1de6bef818e133e1c8b8bb64a55c0307338146a",
+  "releaseBoundary": [
+    "shared_database_reconciliation",
+    "shared_schema_and_backfill",
+    "develop_push_can_deploy_shared_worker",
+    "main_promotion",
+    "worker_deploy",
+    "external_feature_flags",
+    "customer_acceptance_batch"
+  ],
+  "runtimePreflight": {
+    "checkedAt": "2026-09-28T09:44:56.202Z",
+    "mode": "read-only",
+    "releaseHold": "main_by_operator",
+    "schema": {
+      "markets": false,
+      "competitor_sets": false,
+      "batches": false
+    },
+    "queue": [],
+    "profiles": {
+      "active_profiles": 27,
+      "bound_organizations": 3
+    },
+    "duplicates": [
+      {
+        "organization_id": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+        "active_profiles": 4
+      }
+    ],
+    "latestAppliedMigrations": [
+      "20260928052624397_task-1921-brand-render-queue",
+      "20260926075619118_task-1893-marketing-studio-asset-download-capability",
+      "20260926071321910_task-1891-marketing-studio-oauth-policy-fix"
+    ]
+  },
+  "stagingAuthorized": true,
+  "migrations": [
+    "20260928094832901_task-1863-market-rollout",
+    "20260928095058691_task-1863-preserve-legacy-market-profiles"
+  ],
+  "legacyProfiles": "all preserved; initial archival reverted after operator clarification",
+  "efeonceCountries": [
+    "CL",
+    "CO",
+    "PE",
+    "MX"
+  ]
+}

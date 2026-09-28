@@ -163,9 +163,17 @@ describe('growth/ai-visibility — report builder', () => {
       ]
     })
 
-    expect(report.citationSourceBreakdown.domains.map(domain => domain.domain)).toEqual(['acme.com', 'g2.com', 'reddit.com'])
-    expect(report.citationSourceBreakdown.domains.find(domain => domain.domain === 'reddit.com')?.classification).toBe('ugc')
-    expect(report.recommendations.find(rec => rec.gapKey === 'weak_citation_quality')?.action).toContain('g2.com, reddit.com')
+    expect(report.citationSourceBreakdown.domains.map(domain => domain.domain)).toEqual([
+      'acme.com',
+      'g2.com',
+      'reddit.com'
+    ])
+    expect(report.citationSourceBreakdown.domains.find(domain => domain.domain === 'reddit.com')?.classification).toBe(
+      'ugc'
+    )
+    expect(report.recommendations.find(rec => rec.gapKey === 'weak_citation_quality')?.action).toContain(
+      'g2.com, reddit.com'
+    )
   })
 
   it('categoryTaxonomySummary expone categorias canonicas agregadas sin candidatos raw', () => {
@@ -193,7 +201,12 @@ describe('growth/ai-visibility — report builder', () => {
 
   it('competitiveSov como lista comparable; sourceTypeSummary categórico; presencia por motor', () => {
     const findings = [
-      makeFinding({ provider: 'openai', brandMentioned: 'yes', competitorsMentioned: ['Acme', 'Globex'], sourceTypes: ['owned', 'news'] }),
+      makeFinding({
+        provider: 'openai',
+        brandMentioned: 'yes',
+        competitorsMentioned: ['Acme', 'Globex'],
+        sourceTypes: ['owned', 'news']
+      }),
       makeFinding({ provider: 'gemini', brandMentioned: 'no', competitorsMentioned: ['Acme'], sourceTypes: ['news'] }),
       makeFinding({ provider: 'perplexity', brandMentioned: 'unknown' })
     ]
@@ -213,7 +226,11 @@ describe('growth/ai-visibility — report builder', () => {
   })
 
   it('procedencia refleja lo realmente muestreado + disclaimer del contrato', () => {
-    const findings = [makeFinding({ provider: 'openai', promptId: 'p01' }), makeFinding({ provider: 'gemini', promptId: 'p02' })]
+    const findings = [
+      makeFinding({ provider: 'openai', promptId: 'p01' }),
+      makeFinding({ provider: 'gemini', promptId: 'p02' })
+    ]
+
     const report = buildGraderReport({ score: makeScore({ ai_visibility: 10 }), findings, run: RUN })
 
     expect(report.provenance.asOfDate).toBe('2026-06-24T12:00:00.000Z')
@@ -222,4 +239,57 @@ describe('growth/ai-visibility — report builder', () => {
     expect(report.provenance.scoreVersion).toBe(AI_VISIBILITY_SCORE_VERSION)
     expect(report.disclaimer).toBe(GH_GROWTH_AI_VISIBILITY.disclaimer)
   })
+})
+
+it('coverage counts actual responses rather than every sampled provider', () => {
+  const observation = {
+    observationId: 'o1',
+    runId: RUN.runId,
+    promptId: 'p01',
+    provider: 'openai',
+    model: 'test',
+    status: 'succeeded',
+    answerTextHash: null,
+    answerExcerpt: 'Answer',
+    citations: [],
+    usage: { provider_attempted: true },
+    latencyMs: 1,
+    providerRequestHash: 'hash',
+    rawEvidencePointer: null,
+    errorCode: null,
+    providerPolicyVersion: 'p2',
+    promptPackVersion: RUN.promptPackVersion,
+    createdAt: '2026-09-28T00:00:00Z'
+  } as const
+
+  const report = buildGraderReport({
+    score: makeScore({ ai_visibility: 10 }),
+    findings: [],
+    run: { ...RUN, requestedProviders: ['openai', 'google_ai_overview', 'anthropic'] },
+    observations: [
+      { ...observation, citations: [] },
+      {
+        ...observation,
+        citations: [],
+        observationId: 'o2',
+        provider: 'google_ai_overview',
+        status: 'failed',
+        errorCode: 'provider_error'
+      },
+      {
+        ...observation,
+        citations: [],
+        observationId: 'o3',
+        provider: 'anthropic',
+        status: 'skipped',
+        errorCode: 'provider_disabled',
+        latencyMs: 0,
+        usage: {}
+      }
+    ]
+  })
+
+  expect(report.provenance.providersRequested).toHaveLength(3)
+  expect(report.provenance.providersAttempted).toEqual(['google_ai_overview', 'openai'])
+  expect(report.provenance.providersResponded).toEqual(['openai'])
 })

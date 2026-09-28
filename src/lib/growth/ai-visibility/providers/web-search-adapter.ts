@@ -10,12 +10,10 @@ import 'server-only'
  * OpenAI/Anthropic/Perplexity/Gemini.
  */
 
+import { GrowthMarketError, resolveGrowthMarket } from '@/lib/growth/markets'
 import { captureWithDomain } from '@/lib/observability/capture'
 
-import {
-  type GrowthAiVisibilityProviderId,
-  type GrowthAiVisibilityProviderObservation
-} from '../contracts'
+import { type GrowthAiVisibilityProviderId, type GrowthAiVisibilityProviderObservation } from '../contracts'
 import { isGraderEnabled, isProviderFlagEnabled } from '../flags'
 import { boundedExcerpt, buildCitations, sha256Hex } from '../observation'
 import {
@@ -46,7 +44,12 @@ export interface WebSearchAdapterConfig {
   /** flag del provider aparte, ¿hay secret/credencial? (no lanza). */
   isConfigured: () => Promise<boolean>
   /** Llamada real al cliente canónico. Devuelve normalizado o lanza (timeout/red). */
-  runCall: (input: { prompt: string; model: string; timeoutMs: number }) => Promise<WebSearchCallResult>
+  runCall: (input: {
+    prompt: string
+    model: string
+    timeoutMs: number
+    countryCode: string
+  }) => Promise<WebSearchCallResult>
 }
 
 /**
@@ -72,7 +75,10 @@ export const createWebSearchAdapter = (
 
   const { provider, defaultModel } = config
 
+  const geoMode = provider === 'gemini' ? 'prompt_only' : 'native'
+
   const capabilities: ProviderAdapterCapabilities = {
+    geoMode,
     provider,
     supportsWebSearch: config.supportsWebSearch ?? true,
     defaultModel
@@ -98,6 +104,23 @@ export const createWebSearchAdapter = (
         return skip('missing_secret')
       }
 
+      let market: ReturnType<typeof resolveGrowthMarket>
+
+      try {
+        market = resolveGrowthMarket(input.market, input.locale)
+      } catch (error) {
+        if (!(error instanceof GrowthMarketError)) throw error
+
+        return buildFailedObservation({
+          promptInput: input,
+          context,
+          provider,
+          model: defaultModel,
+          errorCode: error.code,
+          latencyMs: 0
+        })
+      }
+
       let lastFailure: GrowthAiVisibilityProviderObservation | null = null
 
       for (let attempt = 0; attempt <= context.maxRetries; attempt++) {
@@ -105,7 +128,8 @@ export const createWebSearchAdapter = (
           const result = await config.runCall({
             prompt: input.promptText,
             model: defaultModel,
-            timeoutMs: context.timeoutMs
+            timeoutMs: context.timeoutMs,
+            countryCode: market.code
           })
 
           if (!result.ok) {
@@ -117,7 +141,8 @@ export const createWebSearchAdapter = (
               provider,
               model: result.model,
               errorCode,
-              latencyMs: result.latencyMs
+              latencyMs: result.latencyMs,
+              usage: { geo_mode: geoMode, geo_country: market.code, locale: market.locale, provider_attempted: true }
             })
 
             if (errorCode === 'rate_limited' || (result.httpStatus ?? 0) >= 500) {
@@ -138,8 +163,10 @@ export const createWebSearchAdapter = (
             model: result.model,
             answerTextHash: result.text ? sha256Hex(result.text) : null,
             answerExcerpt: boundedExcerpt(result.text),
-            citations: buildCitations(result.citations.map(c => ({ url: c.url, title: c.title ?? null, domain: c.domain ?? null }))),
-            usage: result.usage,
+            citations: buildCitations(
+              result.citations.map(c => ({ url: c.url, title: c.title ?? null, domain: c.domain ?? null }))
+            ),
+            usage: { ...result.usage, geo_mode: geoMode, geo_country: market.code, locale: market.locale },
             latencyMs: result.latencyMs,
             rawEvidencePointer: null
           })
@@ -157,7 +184,8 @@ export const createWebSearchAdapter = (
             provider,
             model: defaultModel,
             errorCode,
-            latencyMs: 0
+            latencyMs: 0,
+            usage: { geo_mode: geoMode, geo_country: market.code, locale: market.locale, provider_attempted: true }
           })
 
           // TASK-1390: rate_limited (throttle de cuota detectado del error crudo) también

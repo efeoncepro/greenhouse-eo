@@ -14,14 +14,21 @@ import {
   type GrowthAiVisibilityProviderObservation
 } from '../contracts'
 import { sha256Hex } from '../observation'
-import { type ProviderAdapterContext } from './types'
+import type { ProviderAdapterContext } from './types'
 
 /** Hash estable del request (provider+model+prompt) — NUNCA incluye secret ni PII. */
 export const hashProviderRequest = (input: {
   provider: GrowthAiVisibilityProviderId
   model: string
   promptText: string
-}): string => sha256Hex(`${input.provider}::${input.model}::${input.promptText}`)
+  market?: string
+  locale?: string
+}): string =>
+  sha256Hex(
+    input.market || input.locale
+      ? JSON.stringify(['request.v2', input.provider, input.model, input.promptText, input.market, input.locale])
+      : `${input.provider}::${input.model}::${input.promptText}`
+  )
 
 /**
  * Mapea un status HTTP de provider a una clase de error canónica.
@@ -57,7 +64,9 @@ export const mapThrownErrorToErrorCode = (error: unknown): GrowthAiVisibilityPro
   // cuota llegaba como error genérico y era indistinguible de un 500. Detectar la clase
   // por message/code para que el retry (con backoff) lo trate como rate_limited.
   if (error instanceof Error) {
-    const code = (error as Error & { code?: unknown; status?: unknown }).code ?? (error as Error & { status?: unknown }).status
+    const code =
+      (error as Error & { code?: unknown; status?: unknown }).code ?? (error as Error & { status?: unknown }).status
+
     const haystack = `${String(code ?? '')} ${error.message}`
 
     if (/RESOURCE_EXHAUSTED|rate.?limit|too many requests|quota|\b429\b/i.test(haystack)) {
@@ -99,7 +108,13 @@ export const buildSkippedObservation = (input: {
     input.context,
     input.provider,
     input.model,
-    hashProviderRequest({ provider: input.provider, model: input.model, promptText: input.promptInput.promptText })
+    hashProviderRequest({
+      provider: input.provider,
+      model: input.model,
+      promptText: input.promptInput.promptText,
+      market: input.promptInput.market,
+      locale: input.promptInput.locale
+    })
   ),
   status: 'skipped',
   answerTextHash: null,
@@ -119,19 +134,26 @@ export const buildFailedObservation = (input: {
   model: string
   errorCode: GrowthAiVisibilityProviderErrorCode
   latencyMs: number
+  usage?: Record<string, unknown>
 }): GrowthAiVisibilityProviderObservation => ({
   ...baseObservation(
     input.promptInput,
     input.context,
     input.provider,
     input.model,
-    hashProviderRequest({ provider: input.provider, model: input.model, promptText: input.promptInput.promptText })
+    hashProviderRequest({
+      provider: input.provider,
+      model: input.model,
+      promptText: input.promptInput.promptText,
+      market: input.promptInput.market,
+      locale: input.promptInput.locale
+    })
   ),
   status: input.errorCode === 'rate_limited' ? 'rate_limited' : 'failed',
   answerTextHash: null,
   answerExcerpt: null,
   citations: [],
-  usage: {},
+  usage: input.usage ?? {},
   latencyMs: input.latencyMs,
   rawEvidencePointer: null,
   errorCode: input.errorCode
@@ -155,7 +177,13 @@ export const buildSucceededObservation = (input: {
     input.context,
     input.provider,
     input.model,
-    hashProviderRequest({ provider: input.provider, model: input.model, promptText: input.promptInput.promptText })
+    hashProviderRequest({
+      provider: input.provider,
+      model: input.model,
+      promptText: input.promptInput.promptText,
+      market: input.promptInput.market,
+      locale: input.promptInput.locale
+    })
   ),
   status: 'succeeded',
   answerTextHash: input.answerTextHash,

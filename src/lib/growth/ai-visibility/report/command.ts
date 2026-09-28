@@ -20,7 +20,7 @@ import { readGraderScore } from '../scoring/command'
 import { getPreviousComparableScore } from '../scoring/store'
 import { getGraderProfile, getGraderRun, getRunObservations } from '../store'
 import { buildGraderReport, toPublicGraderReport, type ReportRunMeta } from './builder'
-import { type PreviousScoreInput } from './trend'
+import type { PreviousScoreInput } from './trend'
 import { type GraderReport, type PublicGraderReport } from './contracts'
 
 export class GraderReportError extends Error {
@@ -61,6 +61,8 @@ export const readGraderReport = async (input: {
 
   try {
     const runMeta: ReportRunMeta = {
+      market: run.matchingSnapshot?.market ?? null,
+      requestedProviders: run.requestedProviders,
       runId: run.runId,
       status: run.status,
       promptPackVersion: run.promptPackVersion,
@@ -76,12 +78,27 @@ export const readGraderReport = async (input: {
     })
 
     const previous: PreviousScoreInput | null = previousRow
-      ? { score: previousRow.score, promptPackVersion: previousRow.promptPackVersion, finishedAt: previousRow.finishedAt }
+      ? {
+          competitorSetComparable: previousRow.competitorSetComparable,
+          score: previousRow.score,
+          promptPackVersion: previousRow.promptPackVersion,
+          finishedAt: previousRow.finishedAt
+        }
       : null
 
     // Dominio del sujeto para el citation share propio (TASK-1237): mismo derivado
     // que el scoring command (extractCitationDomain del websiteUrl del perfil).
-    const profile = await getGraderProfile(run.profileId)
+    const liveProfile = await getGraderProfile(run.profileId)
+
+    const profile = run.matchingSnapshot
+      ? {
+          brandName: run.matchingSnapshot.brand.name,
+          websiteUrl: run.matchingSnapshot.brand.websiteUrl,
+          category: run.matchingSnapshot.brand.category,
+          competitorsDeclared: run.matchingSnapshot.competitors.map(member => member.name)
+        }
+      : liveProfile
+
     const subjectDomain = profile?.websiteUrl ? extractCitationDomain(profile.websiteUrl) : null
 
     // Verdad declarada para el detector de exactitud de marca (TASK-1238).
