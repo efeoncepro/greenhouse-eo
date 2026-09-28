@@ -8,6 +8,14 @@
  *     Pide al agente un plan (`proposeDeckPlan`), lo valida y lo imprime con los tokens y el costo estimado del
  *     modelo. Con `--out` escribe el plan propuesto para revisarlo y componerlo. No confirma ni compone nada.
  *
+ *   pnpm brand:deck-plan -- --bind --plan <plan.json> (--context <context.json> | --proposal <id> --org <ownerOrgId>
+ *                            [--audience internal|client_facing] [--facts <facts.json>] | --sources <sources.json>)
+ *                            [--out <plan-ligado.json>]
+ *     Liga los slots de datos del plan (`bindDeckSlots`, TASK-1930) e imprime la tabla de slots con su estado, fuente o
+ *     motivo, evidencia y fecha. Con `--proposal` lee la propuesta, su evidencia y el logo de su cliente por los readers
+ *     canónicos (necesita el proxy de Cloud SQL: `pnpm pg:connect`); con `--sources` corre sin base sobre un fixture de
+ *     fuentes ya leídas. No escribe nada en la base. Sale con 1 si el plan ligado no compone.
+ *
  * El plan nombra recetas del catálogo por id (`docs/operations/brand-graphic-line/deck-recipes/`); los códigos están en
  * el README del catálogo. La confirmación humana y el camino por API, Nexa y MCP son de TASK-1932.
  */
@@ -16,6 +24,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { validateDeckPlan, type DeckPlan, type DeckPlanIssue } from '@/lib/brand-surfaces/deck-recipes'
+import type { DeckBindingSources, DeckSlotBindingResult, SlotBinding } from '@/lib/brand-surfaces/deck-recipes/bindings/types'
 
 const arg = (name: string): string | undefined => {
   const at = process.argv.indexOf(`--${name}`)
@@ -58,9 +67,99 @@ const printPlan = (plan: DeckPlan) => {
   plan.slides.forEach((slide, index) => console.log(`  ${String(index + 1).padStart(2)}. ${slide.recipeId}${slide.purpose ? ` — ${slide.purpose}` : ''}`))
 }
 
+const printBindings = (bindings: SlotBinding[]) => {
+  if (bindings.length === 0) {
+    console.log('  el plan no tiene slots de datos')
+
+    return
+  }
+
+  for (const entry of bindings) {
+    const mark = entry.status === 'bound' ? '✓' : '·'
+    const where = `lámina ${entry.slideIndex + 1} (${entry.recipeId}) · ${entry.slot}`
+    const how = entry.status === 'bound' ? `ligado desde ${entry.source}` : `sin ligar: ${entry.reason}`
+    const origin = entry.dataOrigin ? ` · datos ${entry.dataOrigin === 'client' ? 'del cliente' : 'de muestra'}` : ''
+    const refs = entry.evidenceRefs?.length ? ` · evidencia ${entry.evidenceRefs.join(', ')}` : ''
+    const asOf = entry.asOf ? ` · al ${entry.asOf.slice(0, 10)}` : ''
+
+    console.log(`  ${mark} ${where} — ${how}${origin}${refs}${asOf}`)
+  }
+}
+
+/** `--bind`: liga los slots de datos del plan desde readers canónicos o desde un fixture de fuentes. */
+const bind = async (planFile: string) => {
+  const plan = readJson(planFile) as DeckPlan
+  const sourcesFile = arg('sources')
+
+  let result: DeckSlotBindingResult
+
+  if (sourcesFile) {
+    const { bindDeckSlotsWith } = await import('@/lib/brand-surfaces/deck-recipes/bindings/core')
+
+    result = bindDeckSlotsWith(plan, readJson(sourcesFile) as DeckBindingSources)
+  } else {
+    const contextFile = arg('context')
+    const proposalId = arg('proposal')
+    const facts = arg('facts') ? readJson(arg('facts')!) : []
+
+    const context = contextFile
+      ? readJson(contextFile)
+      : proposalId
+        ? { kind: 'proposal', proposalId, ownerOrgId: arg('org'), audience: arg('audience') ?? 'client_facing', facts }
+        : { kind: 'brand', audience: arg('audience') ?? 'client_facing', facts }
+
+    // Lectura por los readers canónicos con el perfil de sólo runtime (DML); nunca escribe.
+    const { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } = await import('../lib/load-greenhouse-tool-env')
+
+    loadGreenhouseToolEnv()
+    applyGreenhousePostgresProfile('runtime')
+
+    const { bindDeckSlots, DeckBindingContextError } = await import('@/lib/brand-surfaces/deck-recipes/bindings')
+
+    try {
+      result = await bindDeckSlots(plan, context)
+    } catch (error) {
+      if (error instanceof DeckBindingContextError) {
+        console.error(`✗ Contexto inválido: ${error.message}`)
+        process.exit(2)
+      }
+
+      throw error
+    }
+  }
+
+  const bound = result.bindings.filter(entry => entry.status === 'bound').length
+
+  console.log(`${result.ok ? '✓ El plan ligado compone' : '✗ El plan ligado no compone'} · ${bound} de ${result.bindings.length} slot(s) de datos ligados`)
+  console.log('Slots de datos:')
+  printBindings(result.bindings)
+  console.log('Issues:')
+  printIssues(result.issues)
+
+  const out = arg('out')
+
+  if (out) {
+    fs.writeFileSync(path.resolve(out), `${JSON.stringify({ plan: result.plan, bindings: result.bindings }, null, 2)}\n`)
+    console.log(`  plan ligado y rastro escritos en ${out}`)
+  }
+
+  if (!result.ok) process.exit(1)
+}
+
 const main = async () => {
   const planFile = arg('plan')
   const contextFile = arg('context')
+
+  if (process.argv.includes('--bind')) {
+    if (!planFile) {
+      console.error('✗ --bind necesita --plan <plan.json>.')
+      process.exit(2)
+    }
+
+    await bind(planFile)
+
+    return
+  }
 
   if (process.argv.includes('--propose')) {
     if (!contextFile) {
@@ -117,7 +216,9 @@ const main = async () => {
   }
 
   if (!planFile) {
-    console.error('Uso: pnpm brand:deck-plan -- --plan <plan.json>  |  --propose --context <context.json> [--out <plan.json>]')
+    console.error(
+      'Uso: pnpm brand:deck-plan -- --plan <plan.json>  |  --propose --context <context.json> [--out <plan.json>]  |  --bind --plan <plan.json> (--context <c.json> | --proposal <id> --org <org> | --sources <s.json>)'
+    )
     process.exit(2)
   }
 

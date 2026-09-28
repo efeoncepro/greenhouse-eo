@@ -1,0 +1,236 @@
+{
+  "audience": "client_facing",
+  "proposal": {
+    "proposalId": "prop-fixture",
+    "clientOrganizationId": "org-fixture",
+    "evidence": [
+      {
+        "evidenceId": "prev-fixture-m1",
+        "classification": "measured",
+        "audience": "client_facing",
+        "locator": "Caso publicado de Sky Airline, métricas de entrega de 12 meses",
+        "method": "Informe de entrega firmado por el cliente",
+        "asOf": "2026-08-01T00:00:00.000Z",
+        "sourceAssetId": null
+      },
+      {
+        "evidenceId": "prev-fixture-auth-sky",
+        "classification": "attested",
+        "audience": "client_facing",
+        "locator": "Caso publicado de Sky Airline, métricas de entrega de 12 meses",
+        "method": "Informe de entrega firmado por el cliente",
+        "asOf": "2026-08-01T00:00:00.000Z",
+        "sourceAssetId": "asset-autorizacion-sky"
+      },
+      {
+        "evidenceId": "prev-fixture-auth-berel",
+        "classification": "attested",
+        "audience": "client_facing",
+        "locator": "Caso publicado de Sky Airline, métricas de entrega de 12 meses",
+        "method": "Informe de entrega firmado por el cliente",
+        "asOf": "2026-08-01T00:00:00.000Z",
+        "sourceAssetId": "asset-autorizacion-berel"
+      },
+      {
+        "evidenceId": "prev-fixture-auth-bresler",
+        "classification": "attested",
+        "audience": "client_facing",
+        "locator": "Caso publicado de Sky Airline, métricas de entrega de 12 meses",
+        "method": "Informe de entrega firmado por el cliente",
+        "asOf": "2026-08-01T00:00:00.000Z",
+        "sourceAssetId": "asset-autorizacion-bresler"
+      },
+      {
+        "evidenceId": "prev-fixture-auth-carozzi",
+        "classification": "attested",
+        "audience": "client_facing",
+        "locator": "Caso publicado de Sky Airline, métricas de entrega de 12 meses",
+        "method": "Informe de entrega firmado por el cliente",
+        "asOf": "2026-08-01T00:00:00.000Z",
+        "sourceAssetId": "asset-autorizacion-carozzi"
+      },
+      {
+        "evidenceId": "prev-fixture-auth-aguas-andinas",
+        "classification": "attested",
+        "audience": "client_facing",
+        "locator": "Caso publicado de Sky Airline, métricas de entrega de 12 meses",
+        "method": "Informe de entrega firmado por el cliente",
+        "asOf": "2026-08-01T00:00:00.000Z",
+        "sourceAssetId": "asset-autorizacion-aguas-andinas"
+      },
+      {
+        "evidenceId": "prev-fixture-auth-anam",
+        "classification": "attested",
+        "audience": "client_facing",
+        "locator": "Caso publicado de Sky Airline, métricas de entrega de 12 meses",
+        "method": "Informe de entrega firmado por el cliente",
+        "asOf": "2026-08-01T00:00:00.000Z",
+        "sourceAssetId": "asset-autorizacion-anam"
+      },
+      {
+        "evidenceId": "prev-fixture-auth-marca-chile",
+        "classification": "attested",
+        "audience": "client_facing",
+        "locator": "Caso publicado de Sky Airline, métricas de entrega de 12 meses",
+        "method": "Informe de entrega firmado por el cliente",
+        "asOf": "2026-08-01T00:00:00.000Z",
+        "sourceAssetId": "asset-autorizacion-marca-chile"
+      },
+      {
+        "evidenceId": "prev-fixture-auth-gobierno-santiago",
+        "classification": "attested",
+        "audience": "client_facing",
+        "locator": "Caso publicado de Sky Airline, métricas de entrega de 12 meses",
+        "method": "Informe de entrega firmado por el cliente",
+        "asOf": "2026-08-01T00:00:00.000Z",
+        "sourceAssetId": "asset-autorizacion-gobierno-santiago"
+      },
+      {
+        "evidenceId": "prev-fixture-auth-universidad-temuco",
+        "classification": "attested",
+        "audience": "client_facing",
+        "locator": "Caso publicado de Sky Airline, métricas de entrega de 12 meses",
+        "method": "Informe de entrega firmado por el cliente",
+        "asOf": "2026-08-01T00:00:00.000Z",
+        "sourceAssetId": "asset-autorizacion-universidad-temuco"
+      },
+      {
+        "evidenceId": "prev-fixture-interna",
+        "classification": "measured",
+        "audience": "internal",
+        "locator": "Caso publicado de Sky Airline, métricas de entrega de 12 meses",
+        "method": "Informe de entrega firmado por el cliente",
+        "asOf": "2026-08-01T00:00:00.000Z",
+        "sourceAssetId": null
+      }
+    ]
+  },
+  "clientLogo": {
+    "logoAssetId": "asset-logo-fixture",
+    "logoOnDarkAssetId": "asset-logo-fixture-dark"
+  },
+  "intentAssets": {},
+  "facts": [
+    {
+      "kind": "logo",
+      "factId": "logo.sky",
+      "target": {
+        "recipeId": "content-clients",
+        "slot": "logos"
+      },
+      "name": "sky",
+      "logoAssetId": "asset-logo-sky",
+      "evidenceRef": "prev-fixture-auth-sky"
+    },
+    {
+      "kind": "logo",
+      "factId": "logo.berel",
+      "target": {
+        "recipeId": "content-clients",
+        "slot": "logos"
+      },
+      "name": "berel",
+      "logoAssetId": "asset-logo-berel",
+      "evidenceRef": "prev-fixture-auth-berel"
+    },
+    {
+      "kind": "logo",
+      "factId": "logo.bresler",
+      "target": {
+        "recipeId": "content-clients",
+        "slot": "logos"
+      },
+      "name": "bresler",
+      "logoAssetId": "asset-logo-bresler",
+      "evidenceRef": "prev-fixture-auth-bresler"
+    },
+    {
+      "kind": "logo",
+      "factId": "logo.carozzi",
+      "target": {
+        "recipeId": "content-clients",
+        "slot": "logos"
+      },
+      "name": "carozzi",
+      "logoAssetId": "asset-logo-carozzi",
+      "evidenceRef": "prev-fixture-auth-carozzi"
+    },
+    {
+      "kind": "logo",
+      "factId": "logo.aguas-andinas",
+      "target": {
+        "recipeId": "content-clients",
+        "slot": "logos"
+      },
+      "name": "aguas-andinas",
+      "logoAssetId": "asset-logo-aguas-andinas",
+      "evidenceRef": "prev-fixture-auth-aguas-andinas"
+    },
+    {
+      "kind": "logo",
+      "factId": "logo.anam",
+      "target": {
+        "recipeId": "content-clients",
+        "slot": "logos"
+      },
+      "name": "anam",
+      "logoAssetId": "asset-logo-anam",
+      "evidenceRef": "prev-fixture-auth-anam"
+    },
+    {
+      "kind": "logo",
+      "factId": "logo.marca-chile",
+      "target": {
+        "recipeId": "content-clients",
+        "slot": "logos"
+      },
+      "name": "marca-chile",
+      "logoAssetId": "asset-logo-marca-chile",
+      "evidenceRef": "prev-fixture-auth-marca-chile"
+    },
+    {
+      "kind": "logo",
+      "factId": "logo.gobierno-santiago",
+      "target": {
+        "recipeId": "content-clients",
+        "slot": "logos"
+      },
+      "name": "gobierno-santiago",
+      "logoAssetId": "asset-logo-gobierno-santiago",
+      "evidenceRef": "prev-fixture-auth-gobierno-santiago"
+    },
+    {
+      "kind": "logo",
+      "factId": "logo.universidad-temuco",
+      "target": {
+        "recipeId": "content-clients",
+        "slot": "logos"
+      },
+      "name": "universidad-temuco",
+      "logoAssetId": "asset-logo-universidad-temuco",
+      "evidenceRef": "prev-fixture-auth-universidad-temuco"
+    },
+    {
+      "kind": "figure",
+      "factId": "proof.1",
+      "target": {
+        "recipeId": "content-clients",
+        "slot": "proofs"
+      },
+      "value": "+127%",
+      "label": "tráfico orgánico de **Sky** frente a LATAM",
+      "evidenceRef": "prev-fixture-auth-sky"
+    },
+    {
+      "kind": "figure",
+      "factId": "proof.2",
+      "target": {
+        "recipeId": "content-clients",
+        "slot": "proofs"
+      },
+      "value": "+180%",
+      "label": "ventas digitales de **Bresler**",
+      "evidenceRef": "prev-fixture-auth-bresler"
+    }
+  ]
+}
