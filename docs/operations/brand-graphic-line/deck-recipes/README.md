@@ -1,9 +1,13 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.5
+> **Versión:** 1.6
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-28 por Claude (1.5: sección «Validar el plan: códigos y cómo leerlos» —
+> **Última actualización:** 2026-09-28 por Claude (1.6: TASK-1934 — las nueve láminas SEO/AEO aprobadas el
+> 2026-09-28 entran al catálogo (69 → 78 recetas, todas con plantilla), cómo elegirlas y sus reglas (cifras con fuente,
+> datos de muestra marcados, interfaz de IA genérica); los códigos `variant-both-in-deck` (reemplaza a
+> `variant-adjacent`) y `figure-source-missing`, y `next-steps-after-diagnosis` por familia; sus pendientes de QA.
+> Antes, 1.5: sección «Validar el plan: códigos y cómo leerlos» —
 > `pnpm brand:deck-plan`, códigos del catálogo y de AXIS, avisos, propuesta del agente y catálogo de runtime generado
 > (TASK-1929). Antes, 1.4: revisión de consistencia — todo empujado a `develop`,
 > cuándo va el `layout` explícito, qué campo lleva la selección, `photo.focus` sólo en el reloj del día a día, TASK-1921
@@ -13,7 +17,7 @@
 > estado tras el cierre de TASK-1927 — qué recetas tienen plantilla, equivalencia de nombres con el contrato de AXIS,
 > pendientes de QA resueltos y abiertos, cómo cambiar la foto, el copy o la sección)
 > **Fuente de verdad:** [`EFEONCE_DECK_SLIDE_RECIPES_V1.json`](./EFEONCE_DECK_SLIDE_RECIPES_V1.json) (esquema
-> `efeonce.deck-slide-recipes.v1`, 69 recetas). Este README explica cómo usarlo; el índice del final se **genera**
+> `efeonce.deck-slide-recipes.v1`, 78 recetas). Este README explica cómo usarlo; el índice del final se **genera**
 > desde el JSON con `pnpm brand:deck-recipes` y no se edita a mano.
 > **Canon que manda:** [composición por superficie §4.6](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) (reglas del
 > deck, portadas y contraportadas, decisiones del 2026-09-27) · [manual de la línea gráfica](../EFEONCE_GRAPHIC_LINE_V1.md)
@@ -24,7 +28,9 @@
 > [`deck-studio`](../../../../.claude/skills/deck-studio/SKILL.md) · [TASK-1926](../../../tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md)
 > (fotos) · [TASK-1927](../../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (plantillas
 > de 31 recetas, `complete`) · [TASK-1928](../../../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md)
-> (plantillas de las 38 recetas restantes y la portada con selección, `complete`).
+> (plantillas de las 38 recetas restantes y la portada con selección, `complete`) ·
+> [TASK-1934](../../../tasks/in-progress/TASK-1934-seo-aeo-deck-slides-recipe-catalog-templates.md) (las nueve
+> láminas SEO/AEO, en curso).
 
 ## Qué es
 
@@ -33,6 +39,9 @@ contraportadas, secciones, contenido, método, prueba, propuestas por línea de 
 respiro. Este catálogo convierte cada lámina aprobada en una **receta**: qué comunica, cuándo se usa, cuándo no y qué
 conviene en su lugar, con qué otras láminas va, qué partes son **data slots** del Artifact Composer, qué queda fijo, qué
 selección lleva, de qué foto sale (ficha, prompt y post-proceso), con qué prompt se compone y qué reglas hace cumplir.
+
+El **2026-09-28** el operador aprobó **nueve láminas más, sobre SEO y AEO** (tabla en «Las láminas SEO/AEO»), y el
+catálogo quedó en **78 recetas**.
 
 Sirve para que una persona o un agente arme un deck de **marca propia de Efeonce** (brochure, propuesta comercial,
 pitch o QBR) eligiendo láminas aprobadas en vez de inventarlas. No aplica a decks con la marca de un cliente, al
@@ -46,10 +55,12 @@ catálogo `deck-axis` de las ofertas a comité ni a la interfaz de Greenhouse.
    → cierre) y, en cada familia, **elige la receta** con su «cuándo sí» y su «cuándo no». Si una receta dice «cuándo
    no», su `preferInstead` dice cuál usar.
 3. **Respeta los pares:** `cover↔close` (portada y contraportada del mismo documento, alternando foto y sin foto),
-   `variant` (se elige una, no las dos seguidas) y `sequence` (van una después de la otra).
+   `variant` (son alternativas: se elige una y la otra no entra al deck, ni seguida ni separada) y `sequence` (van una
+   después de la otra).
 4. **Llena los slots** con datos reales: textos dentro de su `maxChars` medido, montos siempre `[MONTO]`, cifras con
-   fuente, logos sólo de clientes que autorizan su uso, fotos de ejemplo reemplazadas.
-5. **Compón con la plantilla.** **Las 69** recetas tienen plantilla (columna «Plantilla» del índice y tabla de «Qué
+   fuente (cada cifra con su `source`), logos sólo de clientes que autorizan su uso, fotos de ejemplo reemplazadas y
+   datos de muestra marcados como tales («Ejemplo ilustrativo», «Datos de muestra»).
+5. **Compón con la plantilla.** **Las 78** recetas tienen plantilla (columna «Plantilla» del índice y tabla de «Qué
    sale hoy con un comando»). **Escribe el intent** en un archivo propio, partiendo del intent de ejemplo de la receta
    (`src/lib/brand-surfaces/examples/deck-<receta>-intent.json`), con la receta y el `layout` de AXIS que le
    corresponden, y compón la lámina o el documento completo con `pnpm brand:compose`. La portada con selección
@@ -62,7 +73,7 @@ El paso a paso para el equipo está en el
 
 ## Cómo elegir por documento
 
-Las 69 láminas no traen portada ni cierre propios para **pitch** y **QBR**. El JSON y el índice generado todavía citan
+Las 78 láminas no traen portada ni cierre propios para **pitch** y **QBR**. El JSON y el índice generado todavía citan
 las clásicas de AXIS (`cover-classic`, `close-classic`) como alternativa, pero **no se usan**: el operador no las
 aprobó, en AXIS quedan `supersededBy` y Greenhouse no tiene plantilla para ellas. Para un pitch o un QBR, el marco se
 le pregunta al operador.
@@ -86,9 +97,34 @@ fila 15).
 - **Ritmo.** Alterna papel y oscuro; no pongas dos secciones partidas con la misma esquina seguidas (`section-split`,
   `section-split-corner-bottom`, `section-split-panel-end` existen para alternar); no repitas un plate en el mismo
   deck.
-- **Variantes.** Dentro de un par `variant` se elige una: la tabla de cotización o la escena o la cotización en vivo;
-  la escalera BeX (`method-staircase`, la principal) o la plana (`method-staircase-flat`).
+- **Variantes.** Dentro de un par `variant` se elige una y la otra no entra al deck, aunque vaya separada (decisión
+  del operador del 2026-09-28, código `variant-both-in-deck`): la tabla de cotización o la escena o la cotización en
+  vivo; la escalera BeX (`method-staircase`, la principal) o la plana (`method-staircase-flat`); la propuesta SEO sobria
+  (`proposal-service-seo`) o la de cine (`proposal-cinematic-seo`).
 - **La promesa se prueba.** Una sección que promete («En días») va seguida de la lámina que lo prueba con fuente.
+
+## Las láminas SEO/AEO (aprobadas el 2026-09-28)
+
+Nueve láminas del canvas «La órbita», página «Deck», para propuestas, brochures y pitches de visibilidad en buscadores
+y en motores de IA ([TASK-1934](../../../tasks/in-progress/TASK-1934-seo-aeo-deck-slides-recipe-catalog-templates.md)).
+No crean una familia nueva: entran en `proof`, `method`, `proposal-service` y `next-steps`.
+
+| Lámina (board) | id | Familia | Cuándo usarla | Qué no se negocia |
+|---|---|---|---|---|
+| DeckMercadoIA | `decision-ai-market` | `proof` | abrir SEO/AEO con el porqué ahora; también en QBR para justificar mover presupuesto | tres cifras como máximo, cada una con fuente y año visibles (hoy HubSpot 2026, McKinsey 2025 y SparkToro 2026); con una sola cifra, `content-measure` |
+| DeckIARespuesta | `decision-ai-answer` | `proof` | hacer visible el problema antes de la oferta AEO: el mismo prompt, «Hoy» sin tu marca y «Con AEO» con tu marca primera | interfaz de IA **genérica**; «Ejemplo ilustrativo» siempre visible; con el diagnóstico real del cliente, `decision-diagnosis-map` |
+| DeckCicloSurround | `method-surround-cycle` | `method` | explicar cómo trabajamos AEO/SEO en un servicio continuo | cuatro estaciones en ese orden (Medir, Crear, Distribuir, Optimizar); la órbita tendida es la única órbita |
+| DeckEEAT | `method-eeat` | `method` | explicar por qué el contenido y la autoridad importan para la IA | las cuatro letras siempre en orden E-E-A-T |
+| DeckPropuestaSEO | `proposal-service-seo` | `proposal-service` | la propuesta SEO que se lee sin presentador y explica cada forma de empezar | variante de la de cine: nunca las dos en el mismo deck; nunca una promesa de ranking (la nota lo aclara) |
+| DeckPropuestaSEOCine | `proposal-cinematic-seo` | `proposal-service` | la propuesta SEO que tiene que golpear (apertura de la sección) | variante de la sobria; registro cine sólo aquí; nota del pie obligatoria |
+| DeckDiferencia | `decision-difference` | `proof` | el cliente compara con otras agencias o con hacerlo en casa | la alternativa siempre genérica: nunca un competidor real |
+| DeckTraficoNegocio | `decision-traffic-to-revenue` | `proof` | subir la conversación de tráfico a negocio; QBR que conecta SEO con pipeline | sin cifras en los escalones salvo datos reales con fuente; sin CRM ni medición de leads, no se promete el escalón |
+| DeckDiagnosticoMapa | `decision-diagnosis-map` | `next-steps` | cerrar una propuesta o brochure AEO con lo que el cliente recibe primero | «Datos de muestra» siempre visible; el share of voice suma 100; no va en una propuesta con el diagnóstico ya hecho |
+
+SEO y AEO son **servicios distintos**: `proposal-service-seo` y `proposal-service-aeo` pueden ir en la misma propuesta
+(no son variantes). Una sección AEO que respeta sus pares `sequence` (el catálogo dice qué va junto, no el orden):
+`decision-ai-market` → `decision-ai-answer` → `method-surround-cycle` → `proposal-service-aeo` →
+`decision-diagnosis-map`. Los pares exactos de cada lámina están en su `pairsWith`.
 
 ## Anatomía de una receta (campos del JSON)
 
@@ -125,6 +161,12 @@ fila 15).
   modelo.
 - **Montos como `[MONTO]`** hasta la propuesta; cifras sólo con fuente; fotos de ejemplo marcadas para reemplazo
   (caso Sky); selección y cursores sólo con el contrato AXIS, una sola selección por lámina.
+- **Datos de muestra siempre marcados.** «Ejemplo ilustrativo» (`decision-ai-answer`) y «Datos de muestra»
+  (`decision-diagnosis-map`) no se quitan mientras los datos no sean del cliente; cuando lo sean, el cambio exige un
+  hecho con `evidenceRef` (TASK-1930).
+- **Interfaz de IA genérica.** Ninguna lámina imita el cromo de ChatGPT, Gemini u otro motor (logo, color, burbuja,
+  composer). Los nombres de los motores pueden ir como texto en `decision-diagnosis-map`. La interfaz real son los
+  recursos AEO candidatos de AXIS, no estas recetas.
 - **Logos de terceros en un tono y con el mismo peso**; en `content-clients`, navy con la excepción tonal de Aguas
   Andinas y UC Temuco.
 
@@ -158,6 +200,18 @@ decisión** (ver «Notas del JSON que quedaron atrás»).
 9. **Caso Sky:** la foto es de **ejemplo** y se reemplaza por una real del caso.
 10. **BeX:** la escalera (`method-staircase`) es la principal; la plana (`method-staircase-flat`) es la variante.
 
+### Decisiones del operador (2026-09-28, TASK-1934)
+
+1. **Las nueve láminas SEO/AEO están aprobadas** con los ids y familias de la tabla «Las láminas SEO/AEO». No nace la
+   familia `decision`: `decision-difference` va en `proof`.
+2. **Alternativas nunca juntas:** la regla vale para **todos** los pares `variant` del catálogo, seguidos o no (portada
+   y cierre siguen en `frame-count`). Por eso el golden de pitch cambió `content-text` por `content-measure`.
+3. **`next-steps-after-diagnosis` rige por familia `next-steps`:** incluye el mapa del diagnóstico.
+4. **SEO y AEO son servicios distintos**, no variantes.
+5. **La propuesta SEO de cine es fiel a la referencia:** la nota del pie y la bajada bajo la selección.
+6. **3× en las respuestas:** las de DeckIARespuesta, DeckDiferencia y DeckEEAT suben a 120 px; en DeckIARespuesta la
+   ventana trasera se corre a 860 y se angosta a 450 para que la respuesta no la toque.
+
 ### Notas del JSON que quedaron atrás
 
 El JSON se escribió antes de que el operador cerrara estas decisiones. Estas notas se leen a la luz de la lista de
@@ -169,7 +223,9 @@ arriba (el JSON no se corrigió en este cambio):
 - Varias `notes` citan que §4.6 o el token AXIS tratan una lámina como «opción» o «prueba»: la norma ya dice
   aprobado (decisión 1). TASK-1927 integró en Greenhouse el contrato 0.1.2 con 31 recetas y TASK-1928 sumó las 38
   restantes (AXIS `axis-tokens` 0.3.20, `axis-ui-contracts` 0.3.18). La portada con selección llegó con AXIS
-  `v0.3.21` (`axis-tokens` 0.3.21, `axis-ui-contracts` 0.3.19), que es lo que fija hoy Greenhouse.
+  `v0.3.21` (`axis-tokens` 0.3.21, `axis-ui-contracts` 0.3.19). Las nueve láminas SEO/AEO llegaron con `v0.3.22` y
+  las medidas de sus plantillas con `v0.3.23` (`axis-tokens` 0.3.23, `axis-ui-contracts` 0.3.21), que es lo que fija
+  hoy Greenhouse.
 - Varias recetas citan `cover-classic` o `close-classic` como alternativa (`preferInstead`): el marco clásico no fue
   aprobado y no se usa.
 
@@ -227,12 +283,22 @@ láminas compuestas el 2026-09-27): «Cuando quieras.» sale algo más grande qu
 token; la burbuja URL sale horneada en vez de la de luminosidad; la caja de selección sale del pintor canónico y queda
 unos píxeles más ajustada.
 
+#### Abiertos de las nueve SEO/AEO (TASK-1934)
+
+| Pendiente | Dónde | Estado y dueña |
+|---|---|---|
+| Frames del gate a 0 px | las siete plantillas nuevas y el re-congelado de `ProposalCinematic` (la nota del pie mueve su probe) | **pendiente de la aprobación visual del operador**; después se congelan con `--freeze` single-owner, declarados en `BASELINE_DELTAS.md`. Dueña: TASK-1934 |
+| Cifra escrita como texto plano | un slot `metric` que trae «68 %» como texto | `figure-source-missing` sólo detecta una cifra escrita como objeto con `value`; una cifra en texto plano pasa sin fuente. Escríbela como objeto con `source` para que el validador la vea. Abierto, sin task dueña |
+| Camino «ausente» de un slot opcional nuevo | toda plantilla compartida que suma un slot opcional (caso: la nota del pie de `proposal-cinematic`) | el probe del gate siempre rellena los slots opcionales, así que el gate **nunca ejercita** una receta existente sin el slot, y los snapshots de planes no renderizan. La nota emitía sus medidas sólo con nota y rompía la propuesta creativa sin nota (gl-css «undefined»); lo encontró el operador, no el gate. **Corregido** en `af32d9353` con `src/lib/brand-surfaces/__tests__/proposal-cinematic-note.test.ts`. Regla vigente: todo slot opcional nuevo lleva un test que compone una receta existente sin él (misma clase de hueco que `CoverBrochure` con selección, TASK-1928) |
+| Las cinco `proposal-cinematic` sin mapa de slots | `proposal-cinematic-{creative,web,aeo,revops,seo}` (`slots: null` en `recipe-map.json`) | mapearlas juntas en `recipe-map.json`. Mientras tanto, la plantilla cine admite textos más largos que los de cada receta y el freno es `validateDeckPlan` (`slot-over-max-chars`), probado con un fixture adversarial. Dueña: TASK-1933 |
+| Plate SE1 fuera del banco | `proposal-service-seo`, `proposal-cinematic-seo` | declarado por ruta local (`ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png`), como los plates de las 69 recetas anteriores; se siembra en el banco de TASK-1931 |
+
 ## Qué sale hoy con un comando
 
-**Las 69 recetas caen en una plantilla** del catálogo `graphic-line-deck` del Artifact Composer y salen con
-`pnpm brand:compose`. La columna «Plantilla» del índice lo dice por receta y se lee de `registry.json`;
-`recipe-map.json` ya no tiene recetas `blocked`. La última en llegar fue `cover-brochure-cine-lines-selection`
-(2026-09-28): contentType `deck.cover-brochure.document-selection`, sobre la misma plantilla `CoverBrochure`, que marca
+**Las 78 recetas caen en una plantilla** del catálogo `graphic-line-deck` del Artifact Composer (57 plantillas) y
+salen con `pnpm brand:compose`. La columna «Plantilla» del índice lo dice por receta y se lee de `registry.json`;
+`recipe-map.json` ya no tiene recetas `blocked`. Las últimas en llegar fueron las nueve SEO/AEO (tabla de abajo).
+Antes, `cover-brochure-cine-lines-selection` (2026-09-28): contentType `deck.cover-brochure.document-selection`, sobre la misma plantilla `CoverBrochure`, que marca
 la respuesta como objetivo de la selección y tiene un slot `selection` opcional.
 
 - [TASK-1927](../../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (`complete`) cubrió
@@ -242,6 +308,9 @@ la respuesta como objetivo de la selección y tiene un slot `selection` opcional
 - [TASK-1928](../../../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) sumó las otras 38
   en seis familias, sobre 34 plantillas nuevas: las cuatro `proposal-service-*` comparten
   `ProposalService`, y `section-cine-team` y `section-cine-services` comparten `SectionCine`.
+- [TASK-1934](../../../tasks/in-progress/TASK-1934-seo-aeo-deck-slides-recipe-catalog-templates.md) (en curso) sumó
+  las nueve láminas SEO/AEO: siete plantillas nuevas y dos recetas que reutilizan plantillas existentes
+  (`proposal-service-seo` → `ProposalService`; `proposal-cinematic-seo` → `ProposalCinematic`, layout `service`).
 
 TASK-1927 y TASK-1928 están `complete` y empujadas a `develop`. La ruta productiva gobernada (API, `artifact-worker`,
 MCP) es [TASK-1921](../../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md), en curso:
@@ -348,12 +417,38 @@ por el copy.
 Composiciones nuevas del contrato: `section-cine` ganó `about` y `purpose`; `content-day` ganó `tools`, `live-progress` y
 `live-results`.
 
+### Las recetas de TASK-1934 (SEO/AEO)
+
+Cada una tiene su intent de ejemplo en `src/lib/brand-surfaces/examples/deck-<id del catálogo>-intent.json`, con
+`use: proposal`. Las siete nuevas usan la receta de AXIS con el mismo id y estilo «vivo» (voz grande, escenario,
+plataforma y vidrio de AXIS); las dos propuestas reutilizan recetas que ya existían.
+
+| id del catálogo | Receta AXIS | `layout` | Plantilla | Builder |
+|---|---|---|---|---|
+| `decision-ai-answer` | `decision-ai-answer` | — | `DecisionAiAnswer` | `recipes/seo-aeo/decision-ai-answer.ts` |
+| `decision-ai-market` | `decision-ai-market` | — | `DecisionAiMarket` | `recipes/seo-aeo/decision-ai-market.ts` |
+| `method-surround-cycle` | `method-surround-cycle` | — | `MethodSurroundCycle` | `recipes/seo-aeo/method-surround-cycle.ts` |
+| `decision-difference` | `decision-difference` | — | `DecisionDifference` | `recipes/seo-aeo/decision-difference.ts` |
+| `method-eeat` | `method-eeat` | — | `MethodEeat` | `recipes/seo-aeo/method-eeat.ts` |
+| `decision-traffic-to-revenue` | `decision-traffic-to-revenue` | — | `DecisionTrafficToRevenue` | `recipes/seo-aeo/decision-traffic-to-revenue.ts` |
+| `decision-diagnosis-map` | `decision-diagnosis-map` | — | `DecisionDiagnosisMap` | `recipes/seo-aeo/decision-diagnosis-map.ts` |
+| `proposal-service-seo` | `proposal-service` (línea `engine`) | — | `ProposalService` | `recipes/proposal-service.ts` (la lente admite el plate de cine SE1 y lee `photo.focus`) |
+| `proposal-cinematic-seo` | `proposal-cinematic` (línea `engine`) | `service` | `ProposalCinematic` | `recipes/deck.ts` (nota del pie y bajada bajo la selección) |
+
+Las reglas del brief se sostienen en código: las **cifras** llegan por `figures` con fuente obligatoria (AXIS
+`figure-source-required` al componer); los **datos de muestra** los exige el builder («Ejemplo ilustrativo» en
+`decision-ai-answer`, «Datos de muestra» en `decision-diagnosis-map`) mientras el intent diga que son ilustrativos, y
+con datos del cliente exige `evidenceRef` (TASK-1930); la **interfaz de IA** se prueba genérica (sólo SVG, sin nombres
+ni colores de productos); y la **respuesta a 3×** y el **acento ≥ 24 px** los mide la auditoría renderizada del gate,
+con las siete en `ANSWER_RATIO_CONTENT_TYPES`.
+
 **Paridad de slots receta ↔ plantilla.** `recipe-map.json` (en el catálogo `graphic-line-deck`) declara, para cada
-receta de TASK-1928, en qué campo del `slots.json` vive cada slot de la receta. El test
+receta de TASK-1928 y de TASK-1934, en qué campo del `slots.json` vive cada slot de la receta. El test
 `src/lib/brand-surfaces/__tests__/recipe-slot-parity.test.ts` exige que cada slot tenga su campo, con tipo compatible,
 que lo obligatorio siga obligatorio y el mismo largo máximo (en una plantilla compartida manda el mayor). Por eso el
 `maxChars` del JSON es el largo que el compositor hace cumplir: un texto más largo **hace fallar la composición** con el
-slot que lo recibe. Las recetas anteriores declaran `slots: null`.
+slot que lo recibe. Las recetas anteriores declaran `slots: null`, y también `proposal-cinematic-seo`, como sus cuatro
+hermanas de cine: su plantilla compartida no admite los largos menores de una sola receta.
 
 ### Componer una lámina o un documento
 
@@ -369,7 +464,8 @@ hoy. Ejemplos de documento: `deck-brochure-document.json` (nueve páginas) y `de
 páginas interiores). Paso a paso: [manual de uso](../../../manual-de-uso/creative/componer-deck-con-recetas.md).
 
 Gate visual del catálogo: `pnpm composer:visual-gate --catalog=graphic-line` (66 frames a 0 px; altas declaradas en
-`scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`).
+`scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`). Los frames de las siete plantillas SEO/AEO y el
+re-congelado de `ProposalCinematic` esperan la aprobación visual del operador (ver «Pendientes de QA»).
 
 ### El contenido es dato del intent
 
@@ -388,8 +484,9 @@ esa carpeta está vigilada por un snapshot (`src/lib/brand-surfaces/__tests__/ex
 
 El recorte de la foto es centrado y cubre el área que pide la receta: en la sección partida, una franja de
 1.260 × 1.080 px sobre el lienzo de 1.920 × 1.080; en las láminas a sangre, el lienzo completo. La sección partida
-**no tiene control de foco**: si el sujeto queda cortado, se usa una foto con otro encuadre. En el deck, hoy sólo la
-lente del día a día (`content-day` con `clock`) lee `photo.focus` para dirigir el recorte hacia un punto del archivo. En
+**no tiene control de foco**: si el sujeto queda cortado, se usa una foto con otro encuadre. En el deck, hoy leen
+`photo.focus` para dirigir el recorte hacia un punto del archivo la lente del día a día (`content-day` con `clock`) y,
+desde TASK-1934, la lente de la propuesta sobria (`proposal-service`; la SEO recorta el plate SE1 hacia el estratega). En
 `section-split-panel-end` la foto va **espejada**: una foto con texto legible o con un logo saldría al revés. Al cambiar
 la foto no cambian el panel, la esquina curva, el indicador ni la columna de voz: eso lo fija el `layout`.
 
@@ -429,13 +526,14 @@ de las dos: si AXIS ya la marcó en una lámina, el catálogo no la repite.
 | `frame-count` | catalog | error | más de una portada o de un cierre (cubre también el eslogan dos veces) |
 | `frame-order` | catalog | error | portada primera y cierre último |
 | `pair-cover-close-mismatch` | catalog | error | `pairsWith` con `cover↔close` |
-| `next-steps-after-diagnosis` | catalog | error | `decision-next-steps` en una propuesta con `diagnosisDone: true` |
-| `variant-adjacent` | catalog | error | `pairsWith` con `variant`: dos variantes seguidas |
+| `next-steps-after-diagnosis` | catalog | error | una receta de la familia `next-steps` (`decision-next-steps` o `decision-diagnosis-map`) en una propuesta con `diagnosisDone: true` |
+| `variant-both-in-deck` | catalog | error | `pairsWith` con `variant`: dos alternativas en el mismo deck, seguidas o no (reemplaza a `variant-adjacent`, que sólo miraba las seguidas); dos portadas o dos cierres siguen en `frame-count` |
 | `plate-repeated` | catalog | error | el plate de la receta (o `plateRef`) repetido en el plan; cierra el pendiente «plate repetido» dentro de un plan |
 | `slot-unknown` | catalog | error | `slots[].name` (el eslogan en una portada cae aquí: ninguna portada lo tiene) |
 | `slot-type-invalid` | catalog | error | `slots[].type` |
 | `slot-required-missing` | catalog | error | `slots[].required`, sólo si la lámina ya trae `slots` |
 | `slot-over-max-chars` | catalog | error | `slots[].maxChars` (texto: largo total; `richText`: por línea, sin `**`; lista: por ítem) |
+| `figure-source-missing` | catalog | error | una cifra (objeto con `value`) en los `slots` del plan sin `source`; en una lista, cada ítem. Una cifra escrita como texto plano («68 %») no se detecta |
 | `recipe-without-template` | catalog | aviso | lámina sin plantilla en el composer (hoy sólo `cover-classic`/`close-classic` en pitch y QBR) |
 | `section-split-corner-adjacent` | catalog | aviso | dos secciones partidas seguidas con la misma esquina |
 | `rhythm-paper-run` | catalog | aviso | tres láminas de papel seguidas (una vez por tramo) |
@@ -471,7 +569,7 @@ falta un campo del esquema, si hay ids repetidos o si un `preferInstead` o `pair
 <!-- Generado por scripts/creative/deck-recipes/render-index.mjs desde EFEONCE_DECK_SLIDE_RECIPES_V1.json. No editar a mano: corre «pnpm brand:deck-recipes». -->
 
 Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 78 recetas · aprobado el 2026-09-27 por operador (canvas «La órbita», página Deck).
-**71 de 78** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`). Las demás todavía no.
+**78 de 78** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`).
 
 ### Recetas por familia y documento
 
@@ -568,8 +666,8 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 78 recetas · aproba
 | `method-hybrid-workforce-scene` | Fuerza de trabajo híbrida · la escena: persona y agente sobre la misma pieza | `deck.method-hybrid-workforce.scene` | proposal, brochure, pitch | Mostrar la fuerza híbrida en una escena creíble de trabajo, con una persona real del oficio | El comité necesita ver los tramos de autoridad del agente: la versión gráfica | `method-hybrid-workforce`, `proposal-cinematic-nexa` | `eyebrow` ≤32, `question` ≤30, `answer` ≤20, `body` ≤120, `photo`, `selectionTargets` |
 | `method-staircase` | Metodología BeX · la escalera de cinco peldaños de vidrio que se iluminan al subir | `deck.method-staircase` | proposal, brochure | Mostrar un método por niveles cuando la imagen es el propio método (BeX es el caso aprobado) | Los niveles no son una progresión real | `method-staircase-flat`, `method-score-ring` | `eyebrow` ≤32, `question` ≤28, `answer` ≤18, `body` ≤110, `levels` ≤14, `note` ≤60, `selectedLevel`, `selectionLabel` ≤12 |
 | `proposal-cinematic-nexa` | Fuerza híbrida en cine · Nexa biónica con lentes en la partida, con sus agentes | `deck.proposal-cinematic.hero` | proposal, brochure | Abrir o cerrar el bloque de fuerza híbrida con impacto | Hay que explicar el gobierno del agente o vender pasos: esta composición no lleva prueba ni pasos | `method-hybrid-workforce`, `method-hybrid-workforce-scene` | `eyebrow` ≤32, `question` ≤26, `answer` ≤8, `body` ≤110, `photo` |
-| `method-surround-cycle` | El método en ciclo · Surround Discovery: Medir, Crear, Distribuir, Optimizar | — | proposal, brochure, pitch | Explicar cómo trabajamos AEO/SEO después de mostrar el problema | El servicio es un proyecto de una vez | `method-staircase`, `decision-plan` | `eyebrow` ≤51, `question` ≤21, `answer` ≤8, `evidence` ≤161, `stations` ≤155, `coreLabel` ≤15, (+1 opcional) |
-| `method-eeat` | E-E-A-T · cuatro letras de vidrio y lo que construimos en cada una | — | proposal, brochure, pitch | Explicar por qué el contenido y la autoridad importan para la IA | La audiencia ya domina E-E-A-T: pasar a la oferta | `method-surround-cycle` | `eyebrow` ≤51, `question` ≤43, `answer` ≤21, `evidence` ≤161, `meter` ≤24, `letters` ≤85 |
+| `method-surround-cycle` | El método en ciclo · Surround Discovery: Medir, Crear, Distribuir, Optimizar | `deck.method-surround-cycle` | proposal, brochure, pitch | Explicar cómo trabajamos AEO/SEO después de mostrar el problema | El servicio es un proyecto de una vez | `method-staircase`, `decision-plan` | `eyebrow` ≤51, `question` ≤21, `answer` ≤8, `evidence` ≤161, `stations` ≤155, `coreLabel` ≤15, (+1 opcional) |
+| `method-eeat` | E-E-A-T · cuatro letras de vidrio y lo que construimos en cada una | `deck.method-eeat` | proposal, brochure, pitch | Explicar por qué el contenido y la autoridad importan para la IA | La audiencia ya domina E-E-A-T: pasar a la oferta | `method-surround-cycle` | `eyebrow` ≤51, `question` ≤43, `answer` ≤21, `evidence` ≤161, `meter` ≤24, `letters` ≤85 |
 
 ### Prueba · `proof` (12)
 
@@ -583,10 +681,10 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 78 recetas · aproba
 | `decision-chart` | Gráfico · el dato con su anotación | `deck.decision-chart` | proposal, brochure, pitch, qbr | Para mostrar un antes y después medido de un caso. | No hay línea base comparable. | `content-measure`, `decision-case` | `eyebrow` ≤30, `question` ≤24, `answer` ≤10, `body` ≤100, `bars` ≤14, `annotation` ≤7, `chartNote` ≤70, `kpis` ≤22, `source` ≤90, `nav` |
 | `decision-testimonial` | Testimonio · la frase del cliente a escala de titular | `deck.decision-testimonial` | proposal, brochure, pitch | Hay una cita real, textual y publicada, con autorización del cliente. | La cita no es textual o no está autorizada. | `decision-case`, `content-clients` | `eyebrow` ≤28, `question` ≤34, `keyPhrase` ≤36, `fullQuote` ≤170, `clientLogo`, `author` ≤24, `proof` ≤24, `source` ≤90, `nav` |
 | `decision-why-us` | Por qué elegirnos · un muro de seis cifras | `deck.decision-why-us` | proposal, brochure, pitch | Para responder «¿por qué ustedes?» con hechos citables. | Las cifras no tienen fuente. | `content-text`, `content-clients` | `eyebrow` ≤22, `question` ≤22, `answer` ≤9, `body` ≤100, `facts` ≤54, `source` ≤100, `selectedFact`, `nav` |
-| `decision-ai-answer` | La respuesta de la IA · hoy tu marca no aparece, con AEO aparece primera | — | proposal, brochure, pitch | Abrir la sección AEO haciendo visible el problema antes de la oferta | Ya se mostró el informe real del diagnóstico del cliente: usar sus datos, no la muestra | `decision-diagnosis-map`, `decision-ai-market` | `eyebrow` ≤51, `question` ≤43, `answer` ≤24, `evidence` ≤161, `prompt` ≤86, `answerIntroToday` ≤57, `competitorsToday` ≤46, `answerIntroWithAeo` ≤66, `clientName` ≤40, `clientDescription` ≤114, `competitorsWithAeo` ≤46, `illustrativeMark` ≤62, (+1 opcional) |
-| `decision-ai-market` | Contexto de mercado · tres cifras con su fuente sobre la órbita de luz | — | proposal, brochure, pitch, qbr | Abrir la conversación de SEO/AEO con el porqué ahora | No hay fuente verificable para alguna cifra: no se muestra sin fuente | `content-measure`, `decision-ai-answer` | `eyebrow` ≤51, `question` ≤43, `answer` ≤9, `evidence` ≤161, `figures` ≤124 |
-| `decision-difference` | La diferencia · agencia commodity vs. método medible, y la objeción del equipo propio | — | proposal, brochure, pitch | El cliente compara con otras agencias o con hacerlo en casa | No hay comparación en juego: la lámina se lee defensiva | `decision-why-us`, `decision-risk` | `eyebrow` ≤51, `question` ≤43, `answer` ≤21, `evidence` ≤161, `alternativeTitle` ≤25, `rows` ≤88, `efeonceTitle` ≤23, `ownTeamTitle` ≤19, `ownTeamPillars` ≤49 |
-| `decision-traffic-to-revenue` | Del tráfico al negocio · cuatro escalones hasta los ingresos | — | proposal, brochure, pitch, qbr | El cliente mide al proveedor por tráfico y hay que subir la conversación a negocio | No hay CRM ni medición de leads: no prometer el escalón que no se puede medir | `decision-chart` | `eyebrow` ≤51, `question` ≤43, `answer` ≤18, `evidence` ≤161, `steps` ≤102, `cutLabel` ≤68 |
+| `decision-ai-answer` | La respuesta de la IA · hoy tu marca no aparece, con AEO aparece primera | `deck.decision-ai-answer` | proposal, brochure, pitch | Abrir la sección AEO haciendo visible el problema antes de la oferta | Ya se mostró el informe real del diagnóstico del cliente: usar sus datos, no la muestra | `decision-diagnosis-map`, `decision-ai-market` | `eyebrow` ≤51, `question` ≤43, `answer` ≤24, `evidence` ≤161, `prompt` ≤86, `answerIntroToday` ≤57, `competitorsToday` ≤46, `answerIntroWithAeo` ≤66, `clientName` ≤40, `clientDescription` ≤114, `competitorsWithAeo` ≤46, (+2 opcionales) |
+| `decision-ai-market` | Contexto de mercado · tres cifras con su fuente sobre la órbita de luz | `deck.decision-ai-market` | proposal, brochure, pitch, qbr | Abrir la conversación de SEO/AEO con el porqué ahora | No hay fuente verificable para alguna cifra: no se muestra sin fuente | `content-measure`, `decision-ai-answer` | `eyebrow` ≤51, `question` ≤43, `answer` ≤9, `evidence` ≤161, `figures` ≤124 |
+| `decision-difference` | La diferencia · agencia commodity vs. método medible, y la objeción del equipo propio | `deck.decision-difference` | proposal, brochure, pitch | El cliente compara con otras agencias o con hacerlo en casa | No hay comparación en juego: la lámina se lee defensiva | `decision-why-us`, `decision-risk` | `eyebrow` ≤51, `question` ≤43, `answer` ≤21, `evidence` ≤161, `alternativeTitle` ≤25, `rows` ≤88, `efeonceTitle` ≤23, `ownTeamTitle` ≤25, `ownTeamPillars` ≤49 |
+| `decision-traffic-to-revenue` | Del tráfico al negocio · cuatro escalones hasta los ingresos | `deck.decision-traffic-to-revenue` | proposal, brochure, pitch, qbr | El cliente mide al proveedor por tráfico y hay que subir la conversación a negocio | No hay CRM ni medición de leads: no prometer el escalón que no se puede medir | `decision-chart` | `eyebrow` ≤51, `question` ≤43, `answer` ≤18, `evidence` ≤161, `steps` ≤102, `cutLabel` ≤68 |
 
 ### Propuesta por línea de servicio · `proposal-service` (10)
 
@@ -616,7 +714,7 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 78 recetas · aproba
 | id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |
 |---|---|---|---|---|---|---|---|
 | `decision-next-steps` | Próximos pasos · la agenda del diagnóstico abierta y el cursor en «Agenda un diagnóstico» | `deck.decision-next-steps` | pitch, brochure, proposal | Al final de un pitch o de un brochure, para convertir el interés en una reunión. | En una propuesta enviada después del diagnóstico: ese paso ya ocurrió y el gesto es aprobar. | `content-pricing-live` | `eyebrow` ≤20, `question` ≤22, `answer` ≤10, `body` ≤60, `cardDescriptor` ≤100, `days`, `times`, `chosenSlot`, `nextSteps` ≤70 |
-| `decision-diagnosis-map` | Qué entrega el diagnóstico · el informe abierto con sus cuatro entregables | — | proposal, brochure, pitch | Cerrar una propuesta o brochure AEO con el primer paso tangible | Ya se hizo el diagnóstico: mostrar el real del cliente | `decision-next-steps` | `eyebrow` ≤51, `question` ≤43, `answer` ≤8, `evidence` ≤161, `reportTitle` ≤38, `engineScores` ≤13, `shareOfVoice` ≤25, `lostPrompts` ≤50, `plan` ≤45, `sampleMark` ≤16, `expertNote` ≤92 |
+| `decision-diagnosis-map` | Qué entrega el diagnóstico · el informe abierto con sus cuatro entregables | `deck.decision-diagnosis-map` | proposal, brochure, pitch | Cerrar una propuesta o brochure AEO con el primer paso tangible | Ya se hizo el diagnóstico: mostrar el real del cliente | `decision-next-steps` | `eyebrow` ≤51, `question` ≤43, `answer` ≤8, `evidence` ≤161, `reportTitle` ≤38, `engineScores` ≤13, `shareOfVoice` ≤25, `lostPrompts` ≤50, `plan` ≤45, `expertNote` ≤92, (+1 opcional) |
 
 ### Respiro · `breather` (1)
 

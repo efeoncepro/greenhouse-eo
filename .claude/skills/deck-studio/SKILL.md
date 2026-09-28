@@ -14,9 +14,9 @@ description: >-
   "keynote", "QBR", "board deck", "armar el deck", "diseñar una presentación", "storyline",
   "narrativa del deck", "action title", "PPT", "PowerPoint", "brochure", "portada",
   "contraportada", "recetas del deck", "qué lámina uso". En marca propia Efeonce, elige láminas del
-  catálogo de 69 recetas aprobadas (docs/operations/brand-graphic-line/deck-recipes/), valida el
-  plan con pnpm brand:deck-plan (o pídele al agente que lo proponga con --propose) y compón las
-  69 (todas tienen plantilla), o el documento completo, con pnpm brand:compose.
+  catálogo de 78 recetas aprobadas (docs/operations/brand-graphic-line/deck-recipes/; incluye las
+  nueve SEO/AEO), valida el plan con pnpm brand:deck-plan (o pídele al agente que lo proponga con
+  --propose) y compón las 78 (todas tienen plantilla), o el documento completo, con pnpm brand:compose.
 ---
 
 # deck-studio — el deck es un ARGUMENTO, no una pila de láminas
@@ -100,10 +100,11 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   `src/lib/brand-surfaces/examples/deck-*-intent.json`; desde TASK-1927 sobre el contrato
   `efeonce.surface-composition` 0.1.2, y un intent 0.1.0 o 0.1.1 resuelve igual). Qué tiene plantilla y con qué
   `layout`: subsección «Componer hoy con `pnpm brand:compose`» más abajo. Si una receta no tuviera plantilla (hoy no
-  pasa en el deck: las 69 la tienen),
+  pasa en el deck: las 78 la tienen),
   `pnpm surface:resolve` en AXIS → los `delegates` van a `pnpm creative:orbit:render` (voz, órbita), la selección y
   `resolveIcon`. Valores desde `efeonceGraphicLine.surfaces.deck` y `pieces.deck`; **nunca coordenadas en la lámina**.
-- **Recetas aprobadas: las 69 láminas de la página «Deck»** (operador, 2026-09-27). Ya no hay opciones en el deck.
+- **Recetas aprobadas: las 78 láminas de la página «Deck»** (69 el 2026-09-27 y nueve SEO/AEO el 2026-09-28). Ya no
+  hay opciones en el deck.
   Antes de proponer o armar una lámina de marca propia, **elige la receta del catálogo** (subsección «Recetas por
   lámina» de abajo). Correcciones de ese día, ya en las plantillas (TASK-1927): la sección partida sube por la
   **izquierda** (tres composiciones por `layout`) y el tríptico lleva una palabra por toma, cada una con su esfera
@@ -130,9 +131,10 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   iluminan al subir y el nivel de llegada en bloque sólido en el acento de la línea. Aprobada con BeX (cinco
   peldaños; el quinto, Be Intrinsic, en Engine).
 - **Artifact Composer (TASK-1919, TASK-1927 y TASK-1928, 2026-09-27):** el catálogo **`graphic-line-deck`** (PDF
-  16:9) tiene plantilla para **las 69 láminas** del catálogo de recetas, con 50 plantillas: TASK-1927 dejó 30 láminas
-  sobre 16 plantillas (`proposal-cinematic`, `method-staircase`, secciones, medida, tríptico y el marco) y TASK-1928
-  sumó las 38 restantes sobre 34 plantillas. La última,
+  16:9) tiene plantilla para **las 78 láminas** del catálogo de recetas, con 57 plantillas: TASK-1927 dejó 30 láminas
+  sobre 16 plantillas (`proposal-cinematic`, `method-staircase`, secciones, medida, tríptico y el marco), TASK-1928
+  sumó las 38 restantes sobre 34 plantillas y TASK-1934 las nueve SEO/AEO (siete plantillas nuevas; las dos propuestas
+  SEO reutilizan `ProposalService` y `ProposalCinematic`). La portada con selección,
   `cover-brochure-cine-lines-selection`, compone desde el 2026-09-28 con el layout `document-selection` (AXIS 0.3.21). El
   `contentType` es `deck.<receta>` o `deck.<receta>.<layout>` y lo deriva el mapper. Está separado de **`deck-axis`**,
   que sigue siendo el catálogo de las ofertas a comité con la línea base de SKY: **nunca mezcles** una lámina de La
@@ -146,9 +148,10 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   §`proposal-cinematic`, §«El documento») y ejemplo `docs/examples/surfaces/deck-brochure-servicios-document.json`.
   **Integrado en Greenhouse** (TASK-1927 y TASK-1928, ambas `complete` y en `origin/develop`): `pnpm brand:compose`
   compone sobre la 0.1.2 y sus deltas. **Versiones vigentes (`package.json`, 2026-09-28):**
-  `@efeoncepro/axis-tokens` **0.3.21** y `@efeoncepro/axis-ui-contracts` **0.3.19** (tag AXIS `v0.3.21`). La serie de
+  `@efeoncepro/axis-tokens` **0.3.23** y `@efeoncepro/axis-ui-contracts` **0.3.21** (tag AXIS `v0.3.23`). La serie de
   TASK-1928 fue `v0.3.15`…`v0.3.21`, una por familia (deltas (f)…(l) del ADR AXIS
-  `SURFACE_COMPOSITION_DECISION_V1.md`; la (l) es el layout `document-selection` de `cover-brochure`). Historia en la
+  `SURFACE_COMPOSITION_DECISION_V1.md`; la (l) es el layout `document-selection` de `cover-brochure`); TASK-1934 sumó
+  `v0.3.22` (delta (m): las nueve láminas SEO/AEO) y `v0.3.23` (delta (n): las medidas que pidieron sus plantillas). Historia en la
   skill `efeonce-graphic-line` (`references/ledger.md`).
   - **Uso** (`use: 'proposal' | 'brochure'`, sin él es `proposal`): toda receta **aprobada** admite los dos; una opción
     sólo `proposal` (`use-not-for-recipe`). El brochure es un **PDF horizontal 16:9 que se lee sin presentador**
@@ -296,10 +299,10 @@ AXIS (`efeonce.surface-composition`). El `id` del catálogo de recetas nombra la
 
 **El flujo completo de hoy (deck o brochure de marca propia):**
 
-1. **Elige la lámina** en el catálogo de 69 recetas (subsección «Recetas por lámina»). Para un deck o documento
+1. **Elige la lámina** en el catálogo de 78 recetas (subsección «Recetas por lámina»). Para un deck o documento
    entero, escribe primero el **plan** (ids de receta en orden) y valídalo con
    `pnpm brand:deck-plan -- --plan plan.json` hasta que no quede ningún error (subsección «Plan del deck»).
-2. **Mira su plantilla.** Las 69 tienen plantilla; la lista por id del catálogo, con su receta y `layout` de
+2. **Mira su plantilla.** Las 78 tienen plantilla; la lista por id del catálogo, con su receta y `layout` de
    AXIS, está en el [README del catálogo](../../../docs/operations/brand-graphic-line/deck-recipes/README.md)
    §«Qué sale hoy con un comando» (columna «Plantilla», leída del `registry.json`). `recipe-map.json` ya no tiene
    recetas `blocked`: la portada con selección (`cover-brochure-cine-lines-selection`) compone con el layout
@@ -350,7 +353,15 @@ elige):
 | Secciones y quiénes somos | `section-lens` · `section-bleed` · `section-cine-team` · `-services` · `-about` · `-purpose` · `content-team` · `content-stack` | `section-cine` + `team` (por defecto) · `services` · `about` · `purpose`; las demás, su receta |
 | Contenido y día a día | `contact-sheet` · `content-text` · `content-bullets` · `content-day` · `-tools` · `-live-progress` · `-live-results` · `decision-agenda` | `content-day` + `clock` (por defecto) · `tools` · `live-progress` · `live-results`; las demás, su receta |
 
-El mapa completo de las 69 (id del catálogo → receta + `layout` del intent → `contentType` → plantilla) está en
+**Recetas con plantilla desde TASK-1934 (SEO/AEO, aprobadas el 2026-09-28):**
+
+| Láminas (id del catálogo) | Receta + `layout` del intent | Plantilla |
+|---|---|---|
+| `decision-ai-answer` · `decision-ai-market` · `method-surround-cycle` · `decision-difference` · `method-eeat` · `decision-traffic-to-revenue` · `decision-diagnosis-map` | la receta del mismo nombre, sin `layout` (estilo «vivo» de AXIS) | una propia cada una (`DecisionAiAnswer`, `DecisionAiMarket`, `MethodSurroundCycle`, `DecisionDifference`, `MethodEeat`, `DecisionTrafficToRevenue`, `DecisionDiagnosisMap`); builders en `src/lib/brand-surfaces/recipes/seo-aeo/` |
+| `proposal-service-seo` | `proposal-service` (`line: "engine"`); la lente lleva el plate de cine SE1 y lee `photo.focus` | `ProposalService` (reutilizada) |
+| `proposal-cinematic-seo` | `proposal-cinematic` + `service` (`line: "engine"`), con la nota del pie y la bajada bajo la selección | `ProposalCinematic` (reutilizada) |
+
+El mapa completo de las 78 (id del catálogo → receta + `layout` del intent → `contentType` → plantilla) está en
 [composition.md](composition.md) §«Mapa receta → plantilla». Fuente de verdad:
 `src/lib/artifact-composer/catalogs/graphic-line-deck/recipe-map.json` (receta → `contentType` + ejemplo) y
 `registry.json` (plantilla → `contentTypes`); si difieren de esta skill, manda el código.
@@ -378,7 +389,16 @@ y la composición sale del id (el `layout` del ejemplo de la lámina es el corre
   (un test de paridad los mantiene iguales) y el compositor **falla** si un texto se pasa (`overflow=reject`): se
   acorta la frase, nunca se agranda la caja ni se edita la plantilla.
 - **Toda cifra con fuente.** Las cifras entran por `figures` del intent (valor, rótulo y **fuente obligatoria**) y la
-  lámina imprime «Fuente: …». Sin fuente real, se quita la cifra; nunca «Datos de muestra».
+  lámina imprime «Fuente: …». Sin fuente real, se quita la cifra; nunca «Datos de muestra» para esconder una cifra sin
+  fuente. Las tres de `decision-ai-market` salen de `docs/documentation/public-site/aeo-landing-elementor.md` §market
+  (HubSpot 2026, McKinsey 2025, SparkToro 2026): cambiarlas exige citar ese documento, nunca memoria.
+- **Datos de muestra, marcados (y sólo donde la receta es de muestra).** `decision-ai-answer` (`mark`: «Ejemplo
+  ilustrativo…») y `decision-diagnosis-map` (`sampleMark`: «Datos de muestra») traen datos ilustrativos: mientras
+  `dataOrigin` sea `illustrative` (por defecto) la marca es obligatoria y sin ella falla con `invalid-intent`; con
+  `dataOrigin: "client"` se exige `evidenceRef` (TASK-1930).
+- **Interfaz de IA genérica.** Nunca el cromo de ChatGPT, Gemini u otro motor (logo, color, burbuja, composer); los
+  nombres de los motores sólo como texto en `decision-diagnosis-map`. La interfaz real son los recursos AEO de AXIS
+  (`pnpm aeo:compose` en el repo AXIS), no estas recetas.
 - **Montos como `[MONTO]`** en toda cotización; el **contacto** sale de `EFEONCE_CONTACT`
   (`src/config/efeonce-brand.ts`), nunca del intent.
 - **Logos de clientes y partners** sólo de quienes autorizan su uso; el compositor los normaliza (un tono, mismo peso
@@ -440,10 +460,10 @@ campos propios — `plans`, `risks`, `bars`, `team`, `tools`, `topics`, `partner
 | `invalid-intent` | lo valida Greenhouse: `column.topPx` fuera de la reserva del logo, `selected` fuera de rango, una página del documento mal formada | ajusta el valor al rango que dice el mensaje |
 | `missing-photo` | falta `photo.plateRef` o `photo.alt` | agrega los dos |
 | `recipe-not-approved` | la receta no está `approved` en el token | no se compone; pide la aprobación |
-| `recipe-without-template` | receta aprobada sin builder ni plantilla | hoy no ocurre en el deck (69/69); en otra superficie, es trabajo de plantilla |
+| `recipe-without-template` | receta aprobada sin builder ni plantilla | hoy no ocurre en el deck (78/78); en otra superficie, es trabajo de plantilla |
 | `recipe-outside-composer` | la pieza no la compone el composer (p. ej. `audiovisual.close-reveal`) | se produce por su ruta (motion) |
 | `overflow=reject` | un texto excede el `maxCharacters` del `slots.json` (= `maxChars` de la receta), o se sale de su caja al renderizar | **acorta la frase**; nunca agrandes la caja ni edites la plantilla |
-| auditoría renderizada (`accent-text-min-size`, 3×) | sólo en el gate visual: acento en texto < 24 px, o respuesta < 3× la pregunta en `content-pricing` (+ `.stage`/`.live`), `content-clients`, `decision-plan`, `content-partners` | es un defecto de plantilla, no de tu intent: repórtalo |
+| auditoría renderizada (`accent-text-min-size`, 3×) | sólo en el gate visual: acento en texto < 24 px, o respuesta < 3× la pregunta en `content-pricing` (+ `.stage`/`.live`), `content-clients`, `decision-plan`, `content-partners` y las siete SEO/AEO de TASK-1934 | es un defecto de plantilla, no de tu intent: repórtalo |
 
 **El contenido es dato del intent; la plantilla nunca se edita para una pieza.** La foto, el copy y la sección de una
 lámina viven en el intent. Los HTML, los `slots.json` y los builders de `graphic-line-deck` y `src/lib/brand-surfaces`
@@ -514,7 +534,9 @@ y un PDF por página.
 lo decidas por tu cuenta: la plantilla sigue el token.
 
 **Estado (2026-09-28).** TASK-1927 y TASK-1928 están `complete`, aprobadas a ojo por el operador y empujadas a
-`origin/develop`: las 69 recetas componen, gate `--catalog=graphic-line` a 0 px en 66 frames. **Lo que todavía no
+`origin/develop`: las 69 recetas de entonces componen, gate `--catalog=graphic-line` a 0 px en 66 frames.
+**TASK-1934 (en curso):** las nueve SEO/AEO componen (78 de 78); sus frames del gate (y el re-congelado de
+`ProposalCinematic`, cuya nota del pie mueve el probe) esperan la aprobación visual del operador. **Lo que todavía no
 está** (no lo afirmes como hecho): la ruta productiva gobernada (API, worker, MCP) es **TASK-1921, `in-progress` en
 otra sesión** — no la describas como disponible ni toques sus archivos (`src/lib/brand-surfaces/production/**`);
 `pnpm brand:compose` es el taller local. TASK-1929 (plan de deck validado contra el catálogo y propuesta del agente)
@@ -523,7 +545,7 @@ Siguen TASK-1930 (datos reales en los slots), TASK-1931 (banco de plates goberna
 el deck desde recetas: confirmación humana, API, Nexa y MCP del plan) y TASK-1933 (pendientes de QA del catálogo).
 El documento completo no tiene frame propio en el gate visual (usa fotos reales): lo cubren sus páginas.
 
-#### Recetas por lámina: el catálogo de las 69 (aprobado 2026-09-27)
+#### Recetas por lámina: el catálogo de las 78 (aprobado 2026-09-27 y 2026-09-28)
 
 **Fuente:** [`docs/operations/brand-graphic-line/deck-recipes/`](../../../docs/operations/brand-graphic-line/deck-recipes/README.md)
 — `EFEONCE_DECK_SLIDE_RECIPES_V1.json` (esquema `efeonce.deck-slide-recipes.v1`) + README con el índice por familia y
@@ -535,7 +557,7 @@ por lámina». Manual: `docs/manual-de-uso/creative/componer-deck-con-recetas.md
 1. **Documento → portada y contraportada.** Propuesta: portada sin foto con el logo del cliente (`cover-proposal-orbit`
    o `-dawn`) + contraportada con foto y «Empower your Growth» (`close-proposal-horizon` o `-dawn`). Brochure: portada
    con foto (`cover-brochure-cine-*` o `cover-brochure-line-*`) + `close-brochure-orbit`. Pitch y QBR: no hay portada
-   propia en las 69; si el catálogo remite a `cover-classic` / `close-classic`, **no las uses** (el operador no las
+   propia en las 78; si el catálogo remite a `cover-classic` / `close-classic`, **no las uses** (el operador no las
    aprobó y no tienen plantilla): pregunta al operador qué marco usar. Ojo: el validador del plan **sí las acepta** en
    pitch y QBR (y en ningún otro documento) y no avisa que no tienen plantilla; que el plan pase no las vuelve
    componibles.
@@ -543,15 +565,16 @@ por lámina». Manual: `docs/manual-de-uso/creative/componer-deck-con-recetas.md
    `pricing`, `next-steps`, `breather`, `close`) y, en cada tramo, la receta por su `useWhen` / `avoidWhen`; si no
    calza, su `preferInstead` (`[{ recipe, when }]`) dice cuál usar y cuándo. Cada receta trae también `documents`
    (en qué documento va), `communicates` (qué afirma la lámina) y `reference` (la imagen aprobada).
-3. **Pares** (`pairsWith: [{ recipe, relation }]`): `cover↔close` (alternar foto y sin foto), `variant` (dos variantes
-   de la misma lámina **no van seguidas**; el validador no prohíbe repetirlas separadas: tabla, escena o cotización en
-   vivo; escalera o BeX plana) y `sequence` (van juntas —quiénes somos y por qué lo hacemos; sección y página de
+3. **Pares** (`pairsWith: [{ recipe, relation }]`): `cover↔close` (alternar foto y sin foto), `variant` (son
+   **alternativas**: se elige una y la otra **no entra al deck, ni seguida ni separada** —decisión del operador del
+   2026-09-28, código `variant-both-in-deck`—: tabla, escena o cotización en vivo; escalera o BeX plana; propuesta SEO
+   sobria o de cine) y `sequence` (van juntas —quiénes somos y por qué lo hacemos; sección y página de
    servicio; cotización en vivo y riesgo—, **sin dirección**: no hay regla de orden, ver «Plan del deck»).
 4. **Slots** con su `maxChars` **medido** en la referencia: si no cabe, se acorta; la respuesta se escribe sin punto
    (lo pone la esfera); `money` siempre `[MONTO]`; `metric` con fuente; `logo` sólo de clientes que autorizan su uso.
 5. **Valida el plan** con `pnpm brand:deck-plan -- --plan plan.json`: corrige todo error, lee los avisos
    (subsección siguiente).
-6. **Componer:** intent propio de AXIS + `pnpm brand:compose` (las 69 tienen plantilla; tablas de «Componer hoy con
+6. **Componer:** intent propio de AXIS + `pnpm brand:compose` (las 78 tienen plantilla; tablas de «Componer hoy con
    `pnpm brand:compose`» y lista por id en el README del catálogo). La portada con selección va con
    `layout: 'document-selection'`.
 7. **Revisar a ojo** cada lámina compuesta contra su referencia aprobada.
@@ -569,6 +592,23 @@ detecta con `plate-repeated`), los isotipos sin registro de
 procedencia (`pnpm foto:emblema` antes de publicar) y el logo dentro de la órbita en el cierre; lista en el README del
 catálogo.
 Si una `notes` del JSON contradice estas decisiones, mandan las decisiones.
+
+**Las nueve láminas SEO/AEO (operador, 2026-09-28; TASK-1934).** No crean familia nueva:
+
+| Lámina | Familia | Úsala cuando | Regla dura |
+|---|---|---|---|
+| `decision-ai-market` | `proof` | hay que abrir SEO/AEO con el porqué ahora (también QBR) | máximo tres cifras, cada una con fuente y año; con una sola, `content-measure` |
+| `decision-ai-answer` | `proof` | hay que hacer visible el problema antes de la oferta AEO | IA genérica; «Ejemplo ilustrativo» visible; con el diagnóstico real, `decision-diagnosis-map` |
+| `method-surround-cycle` | `method` | se vende un servicio continuo y hay que decir cómo se trabaja | cuatro estaciones en orden (Medir, Crear, Distribuir, Optimizar); la órbita tendida es la única |
+| `method-eeat` | `method` | hay que explicar por qué la IA citaría a la marca | las cuatro letras en orden E-E-A-T |
+| `proposal-service-seo` / `proposal-cinematic-seo` | `proposal-service` | la oferta SEO: sobria para lectura, cine para impacto | **una de las dos** (`variant`); nunca prometer ranking: la nota lo aclara |
+| `decision-difference` | `proof` | el cliente compara con otras agencias o con su equipo | la alternativa siempre genérica, nunca un competidor real |
+| `decision-traffic-to-revenue` | `proof` | hay que subir la conversación de tráfico a negocio | sin cifras en los escalones salvo datos reales con fuente; sin CRM no se promete el escalón |
+| `decision-diagnosis-map` | `next-steps` | cierre AEO con lo que el cliente recibe primero | «Datos de muestra» visible; share of voice suma 100; no va con `diagnosisDone: true` |
+
+SEO y AEO son servicios distintos: `proposal-service-seo` y `proposal-service-aeo` pueden ir en la misma propuesta. Las
+respuestas de las siete nuevas van a 120 px (3×); en `decision-ai-answer` la ventana trasera se corrió a 860 y se
+angostó a 450 para que la respuesta no la toque.
 
 #### Plan del deck: validar contra el catálogo antes de componer (TASK-1929, 2026-09-28)
 
@@ -615,11 +655,12 @@ láminas resolvieron** (arma el documento con la página de ejemplo de cada rece
 | `recipe-unknown` · `recipe-not-for-document` | catalog | error | id inexistente / receta que no va en ese documento (`documents`) → elige otra de `listDeckRecipes(document)` |
 | `frame-count` · `frame-order` | catalog | error | más de una portada o cierre (cubre «eslogan dos veces») / marco fuera de lugar → una portada primera, un cierre último |
 | `pair-cover-close-mismatch` | catalog | error | portada y cierre no son pareja `cover↔close` → usa la pareja declarada |
-| `next-steps-after-diagnosis` | catalog | error | `decision-next-steps` en propuesta con `diagnosisDone: true` → quítala; su `preferInstead` sugiere `content-pricing-live` si el siguiente gesto es aprobar la cotización |
-| `variant-adjacent` | catalog | error | dos variantes de la misma lámina **seguidas** → sepáralas o deja una |
+| `next-steps-after-diagnosis` | catalog | error | una receta de la familia `next-steps` (`decision-next-steps` o `decision-diagnosis-map`) en propuesta con `diagnosisDone: true` → quítala; el `preferInstead` de `decision-next-steps` sugiere `content-pricing-live` si el siguiente gesto es aprobar la cotización |
+| `variant-both-in-deck` | catalog | error | dos variantes de la misma lámina en el mismo deck, **seguidas o no** (reemplaza a `variant-adjacent`) → deja una |
+| `figure-source-missing` | catalog | error | una cifra del plan (objeto con `value`) sin `source` → agrega la fuente real o quita la cifra. Límite: una cifra escrita como texto plano en un slot `metric` («68 %») no se detecta; escríbela como objeto con `source` |
 | `plate-repeated` | catalog | error | el mismo plate dos veces en el plan (el P1) → otro plate |
 | `slot-unknown` · `slot-type-invalid` · `slot-required-missing` · `slot-over-max-chars` | catalog | error | slot que la receta no tiene (p. ej. eslogan en portada) / tipo / obligatorio / largo (`text` total, `richText` por línea sin `**`, `list` por ítem) → **acorta la frase**, nunca la caja |
-| `recipe-without-template` | catalog | aviso | lámina sin plantilla en el composer: hoy sólo `cover-classic`/`close-classic` en pitch y QBR (las 69 recetas la tienen) → el plan vale pero ese deck no se compone de punta a punta |
+| `recipe-without-template` | catalog | aviso | lámina sin plantilla en el composer: hoy sólo `cover-classic`/`close-classic` en pitch y QBR (las 78 recetas la tienen) → el plan vale pero ese deck no se compone de punta a punta |
 | `section-split-corner-adjacent` | catalog | aviso | dos secciones partidas seguidas con la misma esquina → cambia el `layout` de una |
 | `rhythm-paper-run` | catalog | aviso | tres láminas de papel seguidas (un aviso por tramo) → mete una oscura o un respiro; tres oscuras seguidas es la norma |
 | `proposal-unavailable` | agent | error | sólo en `--propose`: el proveedor falló → reintenta más tarde o arma el plan a mano |

@@ -1,9 +1,9 @@
 # Composición de decks y brochures de marca propia
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 2.1
+> **Version:** 2.2
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (2.1: sección «Validar y proponer el plan antes de componer» — qué revisa, AXIS y catálogo, errores y avisos, el agente propone recetas por id y la persona confirma, qué falta (TASK-1929). Antes, 2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
+> **Ultima actualizacion:** 2026-09-28 por Claude (2.2: las nueve láminas de SEO y AEO aprobadas el 2026-09-28 — cuándo usar cada una, las reglas nuevas (cifras con fuente, datos de muestra marcados, interfaz de IA genérica) y que dos versiones de una lámina nunca van en el mismo deck (TASK-1934). Antes, 2.1: sección «Validar y proponer el plan antes de componer» — qué revisa, AXIS y catálogo, errores y avisos, el agente propone recetas por id y la persona confirma, qué falta (TASK-1929). Antes, 2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
 > **Documentacion tecnica:** [Arquitectura de la composición de piezas de marca](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) · [Norma de composición por superficie](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
 > **Manual de uso:** [Componer un deck con las recetas por lámina](../../manual-de-uso/creative/componer-deck-con-recetas.md) · [Componer una pieza por superficie con AXIS](../../manual-de-uso/creative/componer-por-superficie-con-axis.md)
 
@@ -21,19 +21,19 @@ y dice qué falló.
 | --- | --- |
 | ¿Para qué marca sirve? | Sólo para la marca propia de Efeonce. No es para piezas con la marca de un cliente, para las ofertas a comité ni para la interfaz de Greenhouse |
 | ¿Qué documentos arma? | Láminas sueltas y documentos completos: un **brochure** (presenta a Efeonce) o una **propuesta comercial** (va dirigida a un cliente). Las láminas también sirven para un pitch o un QBR |
-| ¿Cuántas láminas puede componer? | **Las 69** que el operador aprobó el 2026-09-27. Desde el 2026-09-28 no queda ninguna fuera |
+| ¿Cuántas láminas puede componer? | **Las 78** que el operador aprobó: 69 el 2026-09-27 y nueve de SEO y AEO el 2026-09-28. No queda ninguna fuera |
 | ¿Quién lo usa hoy? | Una persona o un agente, desde su equipo, con un comando |
 | ¿Está en el portal? | No. Hoy es un taller local. La ruta dentro de la plataforma (con permisos, cola y acceso para agentes) es TASK-1921, **en curso** |
 
 > Detalle técnico: comando `pnpm brand:compose` en
 > [`scripts/brand-surfaces/compose.ts`](../../../scripts/brand-surfaces/compose.ts) · traducción del pedido en
 > [`src/lib/brand-surfaces/`](../../../src/lib/brand-surfaces/) · contrato `efeonce.surface-composition` 0.1.2 de AXIS
-> (`@efeoncepro/axis-tokens` 0.3.21, `@efeoncepro/axis-ui-contracts` 0.3.19) ·
+> (`@efeoncepro/axis-tokens` 0.3.23, `@efeoncepro/axis-ui-contracts` 0.3.21) ·
 > [arquitectura](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
 
 ## Qué láminas se componen
 
-Las 69 láminas del deck están aprobadas y **todas se componen solas**. Cada una tiene una **receta** en el catálogo del
+Las 78 láminas del deck están aprobadas y **todas se componen solas**. Cada una tiene una **receta** en el catálogo del
 deck: qué comunica, cuándo usarla, cuándo no y cuál conviene en su lugar, qué textos e imágenes se cambian y qué queda
 fijo. Las recetas se agrupan en familias:
 
@@ -44,11 +44,11 @@ fijo. Las recetas se agrupan en familias:
 | **Secciones** (8) | clásica; partida en tres versiones (esquina arriba, esquina abajo, panel a la derecha); con lente; con foto a sangre; de cine para abrir los servicios o el equipo | Abre un capítulo y muestra en qué parte del documento vamos |
 | **Quiénes somos, equipo y stack** (5) | «quiénes somos», «por qué lo hacemos», el equipo en fichas, el stack de herramientas y las líneas de servicio con Nexa | Presenta a Efeonce |
 | **Contenido y día a día** (9) | la cifra medida por la órbita, la hoja de contactos, el texto con una palabra gigante, las viñetas, la agenda y cuatro láminas del día a día (el reloj, las herramientas y dos «vívelo») | Explica, ordena y muestra cómo se trabaja |
-| **Método** (8) | el tríptico «Escucha. Crea. Mide.», la escalera BeX y su versión plana, el plan de 90 días, el anillo del puntaje, la fuerza de trabajo híbrida (y su escena) y la fuerza híbrida en cine | Muestra cómo se hace |
-| **Prueba** (8) | el foco sobre la prueba, clientes, partners, riesgos cubiertos, caso de éxito, gráfico, testimonio y «por qué elegirnos» | Demuestra con evidencia |
-| **Propuesta por línea de servicio** (8) | cuatro en **cine** (servicios creativos, web, AEO y RevOps) y cuatro **sobrias** (las mismas cuatro, con lente y formas de empezar) | Presenta un servicio |
+| **Método** (10) | el tríptico «Escucha. Crea. Mide.», la escalera BeX y su versión plana, el plan de 90 días, el anillo del puntaje, la fuerza de trabajo híbrida (y su escena), la fuerza híbrida en cine, el ciclo Surround y E-E-A-T | Muestra cómo se hace |
+| **Prueba** (12) | el foco sobre la prueba, clientes, partners, riesgos cubiertos, caso de éxito, gráfico, testimonio, «por qué elegirnos» y cuatro de SEO/AEO (la respuesta de la IA, el contexto de mercado, la diferencia y del tráfico al negocio) | Demuestra con evidencia |
+| **Propuesta por línea de servicio** (10) | cinco en **cine** (servicios creativos, web, AEO, RevOps y SEO) y cinco **sobrias** (las mismas cinco, con lente y formas de empezar) | Presenta un servicio |
 | **Cotización** (3) | la tabla de planes, los planes en escena y la cotización en vivo | Sólo en una propuesta |
-| **Próximos pasos** (1) y **respiro** (1) | la agenda del diagnóstico abierta; una foto a sangre sólo con la voz | Cierra la conversación o da una pausa |
+| **Próximos pasos** (2) y **respiro** (1) | la agenda del diagnóstico abierta y el mapa de lo que entrega el diagnóstico; una foto a sangre sólo con la voz | Cierra la conversación o da una pausa |
 
 Cómo elegir entre las versiones de una familia:
 
@@ -59,6 +59,22 @@ Cómo elegir entre las versiones de una familia:
 | El alcance ya está acordado y el gesto es aprobar | la cotización en vivo, con el cursor en «Aprobar propuesta» |
 | El cliente pregunta con qué herramientas se trabaja | el día a día con las herramientas |
 
+**Las láminas de SEO y AEO** (aprobadas el 2026-09-28) cuentan una sola historia: por qué ahora, cuál es el problema,
+cómo se trabaja, qué se ofrece y qué recibe primero el cliente.
+
+| Lámina | Cuándo usarla |
+| --- | --- |
+| **Contexto de mercado** | para abrir el tema con el porqué ahora: tres cifras de mercado, cada una con su fuente y su año |
+| **La respuesta de la IA** | para que el cliente vea el problema: el mismo pedido a un asistente de IA, hoy sin su marca y con AEO con su marca primera. Es un ejemplo y lo dice |
+| **El ciclo Surround** | para explicar cómo se trabaja un servicio continuo: medir, crear, distribuir y optimizar |
+| **E-E-A-T** | para explicar por qué la IA citaría a la marca: experiencia, pericia, autoridad y confianza |
+| **La propuesta SEO**, sobria o de cine | para presentar el servicio de SEO: la sobria se lee sola y explica cada forma de empezar; la de cine abre con impacto. Se usa una de las dos |
+| **La diferencia** | cuando el cliente compara con otras agencias o con hacerlo con su equipo |
+| **Del tráfico al negocio** | cuando el cliente mide el SEO sólo por visitas y hay que llevar la conversación a ventas |
+| **El mapa del diagnóstico** | para cerrar mostrando lo que el cliente recibe primero. No va si el diagnóstico ya se hizo |
+
+SEO y AEO son servicios distintos: sus dos propuestas pueden ir en el mismo documento.
+
 Lo que **no** se usa, aunque el catálogo todavía lo nombre:
 
 | Qué | Por qué |
@@ -66,14 +82,15 @@ Lo que **no** se usa, aunque el catálogo todavía lo nombre:
 | La portada y la contraportada «clásicas» | No fueron aprobadas; las reemplazan las portadas y contraportadas de arriba. No tienen plantilla |
 | Una portada o un cierre propios para pitch o QBR | No hay uno aprobado: se le pregunta al operador |
 
-> Detalle técnico: [catálogo de las 69 recetas](../../operations/brand-graphic-line/deck-recipes/README.md) (índice por
-> familia y JSON `efeonce.deck-slide-recipes.v1`) · 50 plantillas en
+> Detalle técnico: [catálogo de las 78 recetas](../../operations/brand-graphic-line/deck-recipes/README.md) (índice por
+> familia y JSON `efeonce.deck-slide-recipes.v1`) · 57 plantillas en
 > [`src/lib/artifact-composer/catalogs/graphic-line-deck/`](../../../src/lib/artifact-composer/catalogs/graphic-line-deck/)
 > (`registry.json`; varias recetas comparten plantilla) · correspondencia receta → plantilla en
 > [`recipe-map.json`](../../../src/lib/artifact-composer/catalogs/graphic-line-deck/recipe-map.json) · traducción por
 > familia en [`src/lib/brand-surfaces/recipes/`](../../../src/lib/brand-surfaces/recipes/) ·
 > [norma §4.6](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) · TASK-1927 (31 recetas) y
-> TASK-1928 (las 38 restantes y la portada con selección).
+> TASK-1928 (las 38 restantes y la portada con selección) · TASK-1934 (las nueve de SEO y AEO: siete plantillas nuevas
+> en [`recipes/seo-aeo/`](../../../src/lib/brand-surfaces/recipes/seo-aeo/) y dos que reutilizan las propuestas).
 
 ## La portada con la selección de Nexa
 
@@ -135,7 +152,9 @@ Estas reglas no dependen de la buena voluntad de quien arma el pedido: si no se 
 | Regla | Qué pasa en la práctica |
 | --- | --- |
 | **Cada texto tiene un largo máximo** | Si un texto pasa el largo de su casilla, la lámina no sale y el mensaje nombra la casilla. El sistema no recorta ni achica la letra: el texto se acorta |
-| **Toda cifra lleva su fuente** | Una cifra sin fuente se rechaza. La lámina imprime «Fuente: …» a la vista |
+| **Toda cifra lleva su fuente** | Una cifra sin fuente se rechaza, al componer y ya en el plan. La lámina imprime «Fuente: …» a la vista |
+| **Los datos de ejemplo se dicen** | La respuesta de la IA y el mapa del diagnóstico traen datos de ejemplo y lo muestran («Ejemplo ilustrativo», «Datos de muestra»). Esa marca no se puede quitar; sólo desaparece cuando los datos son del cliente y se adjunta la evidencia |
+| **La interfaz de IA es genérica** | Ninguna lámina imita a ChatGPT, Gemini ni otro asistente (logo, colores, forma). Los nombres de los asistentes sólo aparecen como texto en el mapa del diagnóstico |
 | **Los montos no se escriben** | La cotización imprime siempre `[MONTO]` hasta la propuesta final |
 | **El contacto sale de los datos de Efeonce** | Correo, teléfonos y dirección no se escriben en el pedido |
 | **Los logos de terceros se normalizan** | Clientes y partners quedan en un mismo tono y con el mismo peso visual; Aguas Andinas y la UC de Temuco conservan su forma en tonos del mismo azul |
@@ -187,7 +206,7 @@ composición elegida.
 ## Qué es un documento y qué reglas cumple
 
 Un **documento** es un pedido con varias páginas: un brochure o una propuesta completos. Se revisa **como un todo**, no
-página por página, y sale en **un solo PDF** de varias páginas. Puede usar cualquiera de las 69 láminas.
+página por página, y sale en **un solo PDF** de varias páginas. Puede usar cualquiera de las 78 láminas.
 
 | Regla | Qué significa |
 | --- | --- |
@@ -233,8 +252,8 @@ detecta cuando todavía es una lista, no cuando ya hay 16 láminas escritas.
 | Pregunta | Respuesta |
 | --- | --- |
 | ¿Qué es el plan? | Un archivo corto: qué documento es (brochure, propuesta, pitch o QBR), su línea de servicio y la lista de láminas por receta. Puede llevar ya los textos de cada lámina o no llevarlos todavía |
-| ¿Qué revisa? | Que cada lámina exista en el catálogo y sirva para ese documento, que la portada vaya primero y el cierre al final, que la portada y el cierre sean pareja, que no haya dos cierres, dos variantes de la misma lámina seguidas ni la misma foto dos veces, y que los textos que ya estén escritos quepan en su casilla |
-| ¿Qué no revisa? | La calidad del texto, si una cifra es verdadera ni cómo se ve la lámina: eso sigue siendo revisión a ojo del operador |
+| ¿Qué revisa? | Que cada lámina exista en el catálogo y sirva para ese documento, que la portada vaya primero y el cierre al final, que la portada y el cierre sean pareja, que no haya dos cierres, dos versiones de la misma lámina en el deck (aunque vayan separadas) ni la misma foto dos veces, que los textos que ya estén escritos quepan en su casilla y que cada cifra escrita traiga su fuente |
+| ¿Qué no revisa? | La calidad del texto, si una cifra es verdadera ni cómo se ve la lámina: eso sigue siendo revisión a ojo del operador. Tampoco ve una cifra escrita como texto suelto («68 %»): por eso las cifras se escriben con su fuente al lado |
 | ¿Escribe o compone algo? | No. Revisar el plan no cambia nada ni produce piezas |
 
 ### Dos revisores, una sola voz por regla
@@ -244,7 +263,7 @@ El plan lo revisan dos capas, y cada regla vive en una sola:
 | Capa | Qué revisa | Cómo se reconoce en el resultado |
 | --- | --- | --- |
 | **AXIS** (el sistema de diseño) | las reglas del documento completo que AXIS ya conoce: portada primero y cierre al final en un brochure, al menos una página de servicio, foto ↔ sin foto entre portada y cierre, una línea por documento, que la lámina sirva para ese uso | marcada `[axis]`. Sólo aplica a **brochure y propuesta**, y sólo cuando todas las láminas existen en el catálogo |
-| **El catálogo de recetas** | lo que AXIS no conoce: recetas que no existen o no van en ese documento, parejas de portada y cierre, variantes seguidas, próximos pasos después de un diagnóstico, foto repetida, textos que no caben, ritmo | marcada `[catalog]`. Aplica a los cuatro documentos |
+| **El catálogo de recetas** | lo que AXIS no conoce: recetas que no existen o no van en ese documento, parejas de portada y cierre, dos versiones de una lámina en el mismo deck, próximos pasos (o el mapa del diagnóstico) después de un diagnóstico, foto repetida, textos que no caben, cifras sin fuente, ritmo | marcada `[catalog]`. Aplica a los cuatro documentos |
 
 Si AXIS ya dijo algo de una lámina, el catálogo no lo repite con otro nombre: cada problema aparece una vez.
 
@@ -252,7 +271,7 @@ Si AXIS ya dijo algo de una lámina, el catálogo no lo repite con otro nombre: 
 
 | Tipo | Qué significa | Ejemplos |
 | --- | --- | --- |
-| **Error** (✗) | el plan no está listo: hay que corregirlo antes de componer | una receta inventada, una plantilla nombrada en vez de una receta, dos cierres, una cotización en un brochure, la misma foto dos veces, un texto más largo que su casilla |
+| **Error** (✗) | el plan no está listo: hay que corregirlo antes de componer | una receta inventada, una plantilla nombrada en vez de una receta, dos cierres, una cotización en un brochure, la misma foto dos veces, la propuesta SEO sobria y la de cine en el mismo deck, una cifra sin fuente, un texto más largo que su casilla |
 | **Aviso** (!) | el plan es válido, pero conviene mirarlo | tres láminas de papel seguidas, dos secciones partidas seguidas con la misma esquina |
 
 Un plan con avisos y sin errores es válido. La lista completa de códigos, con cómo corregir cada uno, está en el
@@ -360,7 +379,10 @@ Pendientes de revisión que siguen abiertos en el catálogo:
 
 - ninguna contraportada aprobada lleva el logo dentro de la órbita (las aprobadas lo ponen arriba de la columna);
 - algunas fotos tienen el isotipo de la ropa sin registro de revisión: se revisan antes de publicar;
-- una misma foto aparece en varias recetas: no se repite dentro de un mismo deck.
+- una misma foto aparece en varias recetas: no se repite dentro de un mismo deck;
+- las nueve láminas de SEO y AEO esperan la aprobación visual del operador antes de que la prueba visual automática
+  las congele;
+- la foto de las propuestas SEO todavía vive en el equipo de quien compone; entra al banco de fotos con TASK-1931.
 
 Diferencias conocidas entre las láminas del marco y los prototipos aprobados: el texto «Cuando quieras.» sale un poco
 más grande, la dirección web usa la versión fija de su burbuja y la caja de selección queda unos puntos más ajustada.
@@ -374,7 +396,8 @@ portada con selección (TASK-1928). Esa aprobación cubre las plantillas, no cad
 > [TASK-1931](../../tasks/to-do/TASK-1931-brand-plate-bank-governed.md) ·
 > [TASK-1932](../../tasks/to-do/TASK-1932-proposal-studio-graphic-line-deck-output.md) · cierres en
 > [TASK-1927](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) y
-> [TASK-1928](../../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) ·
+> [TASK-1928](../../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) · láminas SEO/AEO en
+> [TASK-1934](../../tasks/in-progress/TASK-1934-seo-aeo-deck-slides-recipe-catalog-templates.md) ·
 > [norma §7, estado y pendientes](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#7-estado-y-pendientes).
 
 ## Documentos relacionados
@@ -384,4 +407,4 @@ portada con selección (TASK-1928). Esa aprobación cubre las plantillas, no cad
   y componer las láminas de un deck, paso a paso.
 - [Componer una pieza por superficie con AXIS](../../manual-de-uso/creative/componer-por-superficie-con-axis.md): el
   comando para todas las superficies (web, vía pública, motion, video y deck).
-- [Catálogo de recetas por lámina](../../operations/brand-graphic-line/deck-recipes/README.md): las 69 recetas.
+- [Catálogo de recetas por lámina](../../operations/brand-graphic-line/deck-recipes/README.md): las 78 recetas.

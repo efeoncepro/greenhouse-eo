@@ -1,9 +1,9 @@
 # Componer un deck con las recetas por lámina — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (1.5: paso 4b — validar el plan con `pnpm brand:deck-plan` antes de componer, cómo escribir `plan.json`, la tabla completa de códigos con su arreglo, pedirle un plan al agente con `--propose --context`, el costo impreso y las credenciales locales (TASK-1929). Antes, 1.4: revisión de punta a punta — cómo elegir la composición de cada receta que tiene varias, los campos de la selección (`selected`, `recommended`, `selection.level`) y de `photo.focus`, cuándo escribir el `layout`, errores de conteo y de selección, TASK-1928 cerrada y empujada, ruta productiva TASK-1921 en curso. Antes, 1.3: la portada con selección compone con el layout `document-selection` (AXIS 0.3.21); 69 de 69 recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.6: las nueve láminas SEO/AEO aprobadas el 2026-09-28 (78 recetas, todas con plantilla): cuándo usarlas, cifras siempre con fuente, datos de muestra marcados («Ejemplo ilustrativo», «Datos de muestra») y la interfaz de IA genérica; la regla de alternativas (una sola por deck, seguidas o no) y los códigos `variant-both-in-deck` y `figure-source-missing` (TASK-1934). Antes, 1.5: paso 4b — validar el plan con `pnpm brand:deck-plan` antes de componer, cómo escribir `plan.json`, la tabla completa de códigos con su arreglo, pedirle un plan al agente con `--propose --context`, el costo impreso y las credenciales locales (TASK-1929). Antes, 1.4: revisión de punta a punta — cómo elegir la composición de cada receta que tiene varias, los campos de la selección (`selected`, `recommended`, `selection.level`) y de `photo.focus`, cuándo escribir el `layout`, errores de conteo y de selección, TASK-1928 cerrada y empujada, ruta productiva TASK-1921 en curso. Antes, 1.3: la portada con selección compone con el layout `document-selection` (AXIS 0.3.21); 69 de 69 recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — se arma con el catálogo de recetas, comandos locales y el Artifact Composer (la ruta productiva gobernada es TASK-1921, en curso en otra sesión: todavía no está disponible)
 > **Documentacion relacionada:** [Composición de decks y brochures (funcional)](../../documentation/creative/composicion-de-decks-y-brochures.md) · [Catálogo de recetas por lámina](../../operations/brand-graphic-line/deck-recipes/README.md) · [Norma de composición por superficie §4.6](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) · [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Componer una pieza por superficie con AXIS](./componer-por-superficie-con-axis.md) · [Registro cine](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
@@ -11,8 +11,8 @@
 ## Para qué sirve
 
 Para armar un deck real de la marca Efeonce —un **brochure**, una **propuesta comercial**, un **pitch** o un **QBR**—
-con las **69 láminas aprobadas** el 2026-09-27, en vez de diseñar cada lámina desde cero. Cada lámina tiene una
-**receta** en el catálogo: qué comunica, cuándo usarla, cuándo no y cuál conviene en su lugar, con qué otras va, qué
+con las **78 láminas aprobadas** (69 el 2026-09-27 y nueve de SEO/AEO el 2026-09-28), en vez de diseñar cada lámina
+desde cero. Cada lámina tiene una **receta** en el catálogo: qué comunica, cuándo usarla, cuándo no y cuál conviene en su lugar, con qué otras va, qué
 textos e imágenes se cambian (los *slots*) y qué queda fijo.
 
 Sirve para el equipo creativo, comercial y para los agentes (Claude, Codex). No sirve para decks con la marca de un
@@ -40,9 +40,9 @@ cliente, para las ofertas a comité del catálogo `deck-axis` ni para la interfa
 
 ## El flujo en seis pasos
 
-1. Elige las láminas en el catálogo de 69 recetas (o pídele a un agente que proponga el plan).
+1. Elige las láminas en el catálogo de 78 recetas (o pídele a un agente que proponga el plan).
 2. Valida el plan del deck con `pnpm brand:deck-plan` y corrige hasta que no queden errores.
-3. Busca el intent de ejemplo de cada lámina: **las 69** recetas tienen plantilla y un ejemplo listo para copiar.
+3. Busca el intent de ejemplo de cada lámina: **las 78** recetas tienen plantilla y un ejemplo listo para copiar.
 4. Copia el ejemplo a tu carpeta y cambia el copy, las cifras y las fotos.
 5. Compón la lámina o el documento completo con `pnpm brand:compose`.
 6. Revisa a ojo contra la referencia aprobada.
@@ -101,11 +101,24 @@ Criterios rápidos:
 - **Día a día:** `content-day` (cuatro momentos) como base; `content-day-tools` si preguntan con qué herramientas;
   los dos «vívelo» (`content-day-live-progress`, `content-day-live-results`) para que el cliente viva la aprobación y
   los resultados.
+- **SEO/AEO** (nueve láminas aprobadas el 2026-09-28; tabla completa en el
+  [catálogo](../../operations/brand-graphic-line/deck-recipes/README.md#las-láminas-seoaeo-aprobadas-el-2026-09-28)):
+  - el porqué ahora, con tres cifras de mercado con fuente: `decision-ai-market`;
+  - el problema, visible: `decision-ai-answer` (el mismo prompt, «Hoy» sin tu marca y «Con AEO» con tu marca primera);
+  - cómo trabajamos: `method-surround-cycle` (servicio continuo) y `method-eeat` (por qué la IA te citaría);
+  - la oferta SEO: `proposal-service-seo` (sobria, se lee sola) **o** `proposal-cinematic-seo` (cine, para golpear),
+    nunca las dos. SEO y AEO son servicios distintos: `proposal-service-seo` y `proposal-service-aeo` sí pueden ir
+    juntas;
+  - las objeciones: `decision-difference` (otras agencias o el equipo propio) y `decision-traffic-to-revenue` (del
+    tráfico al negocio; sin CRM ni medición de leads, no la uses);
+  - el cierre: `decision-diagnosis-map` (lo que el cliente recibe primero). Es de la familia de próximos pasos: no va
+    en una propuesta enviada después del diagnóstico.
 
 ### Paso 4 · Revisa pares y ritmo
 
 - **`cover↔close`:** la portada y la contraportada deben ser pareja del mismo documento.
-- **`variant`:** se elige una; nunca dos variantes seguidas (por ejemplo, la tabla y la escena de cotización).
+- **`variant`:** son alternativas: se elige una y la otra no entra al deck, **ni seguida ni separada** (por ejemplo,
+  la tabla y la escena de cotización, o la propuesta SEO sobria y la de cine).
 - **`sequence`:** van una después de la otra (quiénes somos → por qué lo hacemos; sección de servicios → página de
   servicio).
 - **Ritmo:** alterna papel y oscuro; no pongas dos secciones partidas con la misma esquina seguidas; no repitas el
@@ -193,19 +206,20 @@ Cómo leer cada línea:
 |---|---|---|---|
 | `plan-invalid` | error | al plan le falta algo básico: `document` no es uno de los cuatro, `slides` está vacío, una lámina no trae `recipeId` o `slots` no es un objeto | completa el campo que nombra el mensaje |
 | `template-named-instead-of-recipe` | error | nombraste una plantilla o un `contentType` (`CoverBrochure`, `deck.content-text`) en vez de una receta | usa el id del catálogo (columna «id» del [índice](../../operations/brand-graphic-line/deck-recipes/README.md#índice)) |
-| `recipe-unknown` | error | ese id no está en el catálogo (por ejemplo `proposal-service-seo`) | busca la receta en el índice; si ninguna sirve, pídesela al operador |
+| `recipe-unknown` | error | ese id no está en el catálogo (por ejemplo un id mal escrito, como `content-pricing-table`) | busca la receta en el índice; si ninguna sirve, pídesela al operador |
 | `recipe-not-for-document` | error | la receta no va en ese documento (por ejemplo la cotización en un brochure) | cámbiala por una que sí vaya; el mensaje lista sus documentos |
 | `frame-count` | error | hay más de una portada o más de un cierre (y con dos cierres, el eslogan saldría dos veces) | deja una portada y un cierre |
 | `frame-order` | error | la portada no va primera o el cierre no va último | mueve la portada al inicio y el cierre al final |
 | `pair-cover-close-mismatch` | error | el cierre no es pareja aprobada de la portada | usa una de las parejas que lista el mensaje |
-| `next-steps-after-diagnosis` | error | pusiste «Próximos pasos» en una propuesta con `diagnosisDone: true` | quita `decision-next-steps` |
-| `variant-adjacent` | error | dos versiones de la misma lámina van seguidas (por ejemplo la tabla y la escena de cotización) | elige una de las dos |
+| `next-steps-after-diagnosis` | error | pusiste una lámina de próximos pasos (`decision-next-steps` o `decision-diagnosis-map`) en una propuesta con `diagnosisDone: true` | quítala: el gesto es aprobar (`content-pricing-live`) |
+| `variant-both-in-deck` | error | dos versiones de la misma lámina van en el mismo deck, seguidas o no (por ejemplo la tabla y la escena de cotización, o `proposal-service-seo` y `proposal-cinematic-seo`) | elige una de las dos. Reemplaza a `variant-adjacent`, que sólo miraba las seguidas |
 | `plate-repeated` | error | la misma foto sale dos veces en el deck | cambia una lámina por otra, o dale otra foto con `plateRef` |
 | `slot-unknown` | error | escribiste un slot que esa receta no tiene (por ejemplo el eslogan en una portada: ninguna portada lo lleva) | quita el slot o revisa su nombre en el catálogo |
 | `slot-type-invalid` | error | el valor no es del tipo del slot (un número donde va texto, un texto donde va una lista) | escribe el valor con el tipo que dice el mensaje |
 | `slot-required-missing` | error | falta un slot obligatorio en una lámina que ya trae `slots` | escríbelo, o quita `slots` para dejar la lámina como esqueleto |
 | `slot-over-max-chars` | error | el texto pasa el largo máximo (en un texto enriquecido cuenta cada línea sin `**`; en una lista, cada ítem) | acorta el texto; nunca subas el `maxChars` |
-| `recipe-without-template` | aviso | la lámina no tiene plantilla en el composer. Las 69 recetas la tienen; hoy sólo sale en la portada y el cierre clásicos de un pitch o un QBR (`cover-classic`, `close-classic`) | ese deck se valida pero todavía no se compone de punta a punta: avísale al operador |
+| `figure-source-missing` | error | una cifra del plan (un objeto con `value`) no trae `source` | agrega la fuente real del documento que la respalda, o quita la cifra. Ojo: una cifra escrita como texto plano («68 %») no la ve el validador; escríbela como objeto con `source` |
+| `recipe-without-template` | aviso | la lámina no tiene plantilla en el composer. Las 78 recetas la tienen; hoy sólo sale en la portada y el cierre clásicos de un pitch o un QBR (`cover-classic`, `close-classic`) | ese deck se valida pero todavía no se compone de punta a punta: avísale al operador |
 | `section-split-corner-adjacent` | aviso | dos secciones partidas seguidas con la misma esquina (sin `layout` cuenta como esquina arriba) | alterna `section-split` con `section-split-corner-bottom` o `section-split-panel-end`, o separa las secciones |
 | `rhythm-paper-run` | aviso | tres láminas de papel (fondo claro) seguidas | intercala una oscura o con foto |
 | `brochure-cover-first` | error, AXIS | el brochure no abre con su portada | pon una portada de brochure primero |
@@ -296,7 +310,16 @@ vale. Reglas:
 - **Si un texto no cabe, se acorta.** Si pasa el `maxChars`, la lámina no sale y el mensaje nombra el slot. No se
   mueve la órbita ni la foto.
 - **Cifras** siempre con su fuente, en `figures` (valor, rótulo y fuente): la lámina imprime «Fuente: …». Sin fuente,
-  AXIS rechaza la pieza.
+  AXIS rechaza la pieza (`figure-source-required`), y en el plan la marca `figure-source-missing`. Las tres cifras de
+  `decision-ai-market` salen de `docs/documentation/public-site/aeo-landing-elementor.md` §market (HubSpot 2026,
+  McKinsey 2025, SparkToro 2026): para cambiar una cifra o su fuente, cita el documento de origen, nunca memoria.
+- **Datos de muestra:** `decision-ai-answer` y `decision-diagnosis-map` traen datos ilustrativos y su marca visible
+  («Ejemplo ilustrativo» en `mark`, «Datos de muestra» en `sampleMark`). No la quites: sin ella la lámina no sale
+  (`invalid-intent`). Cuando los datos sean del cliente, el intent dice `dataOrigin: "client"` y trae su evidencia
+  (`evidenceRef`); sin ella, tampoco sale.
+- **Interfaz de IA:** la de estas láminas es genérica a propósito. No pongas logos, colores ni la interfaz de ChatGPT,
+  Gemini u otro motor; los nombres de los motores sólo van como texto en el diagnóstico. Si necesitas la interfaz real,
+  son los recursos AEO de AXIS ([manual](./componer-recursos-aeo-con-axis.md)).
 - **Montos:** no se escriben. La cotización imprime siempre `[MONTO]`.
 - **Contacto:** no se escribe. Sale de los datos de Efeonce (`EFEONCE_CONTACT`).
 - **Logos** sólo de clientes que autorizan su uso. El compositor los deja en un tono y con el mismo peso.
@@ -309,12 +332,13 @@ vale. Reglas:
 La receta trae el plate aprobado, su ficha, el prompt compilado y el post-proceso. Si cambias la foto, pide una nueva
 **por ficha** (`pnpm foto:prompt` → `pnpm foto:generar` → `pnpm foto:validar`) y revisa el emblema de la ropa con
 `pnpm foto:emblema`; si difiere del oficial, se compone con `pnpm foto:isotipo`. El estilo de cine sólo va con Nexa
-protagonista, en las propuestas de cine y en las láminas de sección y «quiénes somos».
+protagonista, en las propuestas de cine y en las láminas de sección y «quiénes somos»; desde el 2026-09-28, también en
+la lente de `proposal-service-seo`, que recorta el plate de cine SE1.
 
 ### Paso 7 · Busca la receta y su intent de ejemplo
 
 1. Abre el índice del [catálogo](../../operations/brand-graphic-line/deck-recipes/README.md#índice) y confirma en la
-   columna «Plantilla» que la receta la tiene (hoy, las 69).
+   columna «Plantilla» que la receta la tiene (hoy, las 78).
 2. Busca su intent de ejemplo. En casi todas se llama
    `src/lib/brand-surfaces/examples/deck-<id del catálogo>-intent.json` (por ejemplo,
    `deck-content-pricing-live-intent.json`). Las excepciones (páginas de servicio de cine, que están dentro de los
@@ -333,8 +357,10 @@ protagonista, en las propuestas de cine y en las láminas de sección y «quién
    | `content-day-live-results` | `content-day` | `live-results` |
    | `proposal-service-creative` | `proposal-service` (con `line: "brand"`) | — |
 
-   La tabla completa, receta por receta, está en el catálogo («Dos nombres para la misma lámina» y «Las recetas de
-   TASK-1928»).
+   Las siete láminas SEO/AEO nuevas usan la receta de AXIS con su mismo id y sin `layout`; `proposal-service-seo` es
+   `proposal-service` (con `line: "engine"`) y `proposal-cinematic-seo` es `proposal-cinematic` con `layout` `service`.
+   La tabla completa, receta por receta, está en el catálogo («Dos nombres para la misma lámina», «Las recetas de
+   TASK-1928» y «Las recetas de TASK-1934»).
 
 #### Cómo elegir la composición (`layout`) de una receta que tiene varias
 
@@ -450,7 +476,7 @@ Qué cuidar al cambiar la foto:
 |---|---|
 | Escribe `photo.alt` | es obligatorio; sin él falla con `missing-photo` |
 | Confirma que el archivo existe | los plates viven fuera de git; sin el archivo, el comando falla antes de crear la salida |
-| Mira el recorte | la foto se ajusta al área de la lámina cubriéndola y **centrada**. En la sección partida la franja de foto mide 1.260 × 1.080 px sobre un lienzo de 1.920 × 1.080; en las láminas a sangre, el lienzo completo. En el deck, hoy sólo la lente del día a día (`content-day` con `clock`) lee `photo.focus` para dirigir el recorte hacia un punto del archivo; en las demás el recorte es centrado |
+| Mira el recorte | la foto se ajusta al área de la lámina cubriéndola y **centrada**. En la sección partida la franja de foto mide 1.260 × 1.080 px sobre un lienzo de 1.920 × 1.080; en las láminas a sangre, el lienzo completo. En el deck, hoy leen `photo.focus` para dirigir el recorte hacia un punto del archivo la lente del día a día (`content-day` con `clock`) y la lente de la propuesta sobria (`proposal-service`); en las demás el recorte es centrado |
 | En la sección partida, elige bien el encuadre | esa lámina no tiene control de foco: si el sujeto queda cortado, usa otra foto |
 | En el panel a la derecha (`panel-end`), revisa textos y logos | la foto va **espejada**: un texto legible o un logo saldrían al revés. Revisa también el isotipo del uniforme |
 | En portadas con columna, revisa `column.topPx` | se elige según dónde queda el sujeto |
@@ -461,8 +487,8 @@ Qué **no** cambia: el panel, la esquina curva, el indicador de sección y la co
 
 | Estado | Qué significa |
 |---|---|
-| **aprobado** | la lámina está aprobada por el operador (hoy, las 69) y se puede usar |
-| **con plantilla** | además, `pnpm brand:compose` la produce entera (hoy, las 69) |
+| **aprobado** | la lámina está aprobada por el operador (hoy, las 78) y se puede usar |
+| **con plantilla** | además, `pnpm brand:compose` la produce entera (hoy, las 78) |
 | **pendiente de QA** | la referencia aprobada tenía un detalle que la norma corrige (respuesta bajo 3×, acento en texto chico, cifra sin fuente). La plantilla ya lo corrige; el catálogo separa los resueltos de los que siguen abiertos |
 | `recipe-not-approved` | el contrato de AXIS no tiene esa receta como aprobada |
 | `recipe-without-template` | la receta está aprobada en AXIS, pero el composer no tiene plantilla para ella. En el deck no debería pasar: revisa que la receta y el `layout` sean los del ejemplo |
@@ -476,6 +502,10 @@ Qué **no** cambia: el panel, la esquina curva, el indicador de sección y la co
 - **No uses** `decision-next-steps` en una propuesta enviada después del diagnóstico, ni cotización en un brochure.
 - **No pongas** el eslogan en la portada ni «¿Conversamos?» en la contraportada de una propuesta.
 - **No inventes cifras ni fuentes**; no pongas montos reales antes de la propuesta.
+- **No quites** «Ejemplo ilustrativo» ni «Datos de muestra» mientras los datos no sean del cliente con su evidencia.
+- **No imites** la interfaz de ChatGPT, Gemini u otro motor en una lámina, ni nombres a un competidor real en
+  `decision-difference`.
+- **No pongas** las dos versiones de una lámina (sobria y de cine, tabla y escena) en el mismo deck.
 - **No escribas montos ni datos de contacto** en el intent para «ganarle» a la plantilla: los montos salen como
   `[MONTO]` y el contacto, de `EFEONCE_CONTACT`.
 - **No subas un `maxChars`** ni toques un `slots.json` para que entre un texto largo: acorta el texto.
@@ -494,6 +524,7 @@ Qué **no** cambia: el panel, la esquina curva, el indicador de sección y la co
 |---|---|---|
 | La lámina no sale y el mensaje dice que un texto excede el máximo (`too_long` o `item_too_long`) y nombra el slot | ese texto pasa el `maxChars` de la receta; el compositor no recorta | acorta el texto de ese slot («¿Qué hacemos por tu marca?» → «¿Qué hace Efeonce?») |
 | Falla con `surface-issues` y el código `figure-source-required` | una cifra de `figures` no trae `source` | agrega la fuente real o quita la cifra; nunca inventes una fuente |
+| `decision-ai-answer` o `decision-diagnosis-map` fallan con `invalid-intent` y piden la marca de los datos | quitaste `mark` («Ejemplo ilustrativo…») o `sampleMark` («Datos de muestra») con datos de muestra, o pusiste `dataOrigin: "client"` sin `evidenceRef` | devuelve la marca; con datos reales del cliente, agrega su evidencia |
 | Falla con `invalid-intent` y dice que `selected` va de 1 a N | el ítem seleccionado está fuera del rango de ítems de la lámina | usa un número entre 1 y la cantidad de ítems; la composición falla cerrado, no elige otro |
 | La portada y la contraportada llevan foto las dos | se eligieron sin mirar el par `cover↔close` | cambia una por su pareja sin foto |
 | `pnpm brand:compose` falla con `recipe-not-approved` o `recipe-without-template` | el intent pide una receta o un `layout` que no es el del ejemplo (por ejemplo, el id del catálogo en vez de la receta de AXIS) | copia `recipe` y `layout` del intent de ejemplo de la lámina |

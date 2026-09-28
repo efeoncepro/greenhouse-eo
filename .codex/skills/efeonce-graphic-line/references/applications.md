@@ -5,7 +5,8 @@ Verificado contra: greenhouse-eo@7cb24df17 · axis-design-system@a5c21ae (ícono
 (D24, §0.3 y A10): AXIS `main@c18e3d3` — 2026-09-27 · §L con la ruta por el Artifact Composer: greenhouse-eo@016d0a183 — 2026-09-27
 · §L «Componer el deck hoy» y «Cambiar la foto, el copy o la sección»: árbol local de `develop` tras el cierre de
 TASK-1927 — 2026-09-27 · §L «Recetas con plantilla desde TASK-1928»: árbol local de `develop` en `64be8aa16`
-(AXIS `v0.3.20`) — 2026-09-27 · portada con selección (`document-selection`, AXIS `v0.3.21`) — 2026-09-28
+(AXIS `v0.3.20`) — 2026-09-27 · portada con selección (`document-selection`, AXIS `v0.3.21`) — 2026-09-28 · §L
+«Láminas SEO/AEO con plantilla desde TASK-1934» (AXIS `v0.3.23`, `develop` tras `af32d9353`) — 2026-09-28
 
 Esta guía dice, **para cada aplicación**, qué elementos de la línea van (y cuáles nunca), dónde se ubican, cuánto espacio
 ocupan, en qué superficie y color, y cómo se produce. No repite la API (ver `package-and-tokens.md`), el significado de
@@ -315,6 +316,8 @@ vale en toda aplicación:
   receta (cuándo sí, cuándo no, alternativa, pares, slots, foto, prompt) en
   `docs/operations/brand-graphic-line/deck-recipes/`. Esta tarjeta sigue describiendo las cuatro láminas medidas de
   `deckSlideHtml`; para elegir una lámina concreta, usa el catálogo (§L, «Recetas por lámina»).
+- **Delta (operador, 2026-09-28) — nueve láminas SEO/AEO:** el catálogo pasa a 78 recetas, todas con plantilla (§L,
+  «Láminas SEO/AEO con plantilla desde TASK-1934»).
 
 ### B2. Portada de deck con lente (foto)
 
@@ -725,8 +728,8 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 > Norma: [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
 > Contrato AXIS `efeonce.surface-composition` 0.1.2 (manifest `axis.surface-composition.v1`; acepta intents 0.1.0 y
 > 0.1.1), tokens `efeonceGraphicLine.surfaces.<superficie>` y `pnpm surface:resolve`. **Greenhouse lo integró con
-> TASK-1927 y completó el deck con TASK-1928** (las dos `complete` y en `origin/develop`): hoy fija `axis-tokens`
-> **0.3.21** y `axis-ui-contracts` **0.3.19** (tag AXIS `v0.3.21`; la serie de versiones está en
+> TASK-1927 y completó el deck con TASK-1928** (las dos `complete` y en `origin/develop`); TASK-1934 sumó las nueve
+> láminas SEO/AEO: hoy fija `axis-tokens` **0.3.23** y `axis-ui-contracts` **0.3.21** (tag AXIS `v0.3.23`; la serie de versiones está en
 > [ledger.md](ledger.md)). Ver «Contrato 0.1.2» y «Componer el deck hoy» al final de esta sección,
 > [Lab](https://axis.efeonce.org/references/surfaces/). Canvas por superficie:
 > [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7), una página por
@@ -888,11 +891,43 @@ composer).
 - **Los largos del catálogo son el límite.** Cada slot de la receta tiene su campo en el `slots.json` con el mismo
   largo máximo (`recipe-map.json` → `slots`, vigilado por `recipe-slot-parity.test.ts`) y el compositor rechaza lo que
   se pasa: se acorta el texto, nunca se toca la plantilla.
-- **Foco del recorte:** `photo.focus` (0–1) dirige el recorte del plate sólo en las recetas que lo leen; sin él, el
-  recorte es centrado. La sección partida sigue sin leerlo.
+- **Foco del recorte:** `photo.focus` (0–1) dirige el recorte del plate sólo en las recetas que lo leen (la lente del
+  reloj de `content-day` y, desde TASK-1934, la lente de `proposal-service`); sin él, el recorte es centrado. La
+  sección partida sigue sin leerlo.
 - **Portada con selección:** `cover-brochure-cine-lines-selection` compone desde el 2026-09-28 como
   `deck.cover-brochure.document-selection`, sobre la misma plantilla `CoverBrochure` (marca la respuesta con
   `data-gl-selection-target` y tiene un slot `selection` opcional). `recipe-map.json` ya no tiene recetas `blocked`.
+
+**Láminas SEO/AEO con plantilla desde TASK-1934 (2026-09-28).** Nueve láminas aprobadas ese día (78 recetas en el
+catálogo). Siete plantillas nuevas, una por lámina, con builder en `src/lib/brand-surfaces/recipes/seo-aeo/<receta>.ts`
+(agregados en `recipes/seo-aeo.ts`) y CSS bajo `.gl-aa`, `.gl-am`, `.gl-sur`, `.gl-df`, `.gl-ee`, `.gl-ttr`, `.gl-dm`;
+todas en estilo «vivo» de AXIS (`deckLiveVoice`, `deckStage`, `deckPlatform`, `deckGlass`) y con una sola órbita.
+
+| Lámina | Familia | Receta → `contentType` | Cuándo |
+|---|---|---|---|
+| `decision-ai-market` | `proof` | `decision-ai-market` → `deck.decision-ai-market` | abrir SEO/AEO con el porqué ahora: tres monolitos, una cifra con fuente y año cada uno |
+| `decision-ai-answer` | `proof` | `decision-ai-answer` → `deck.decision-ai-answer` | hacer visible el problema: el mismo prompt en un motor genérico, «Hoy» y «Con AEO»; colaborador «Cliente» |
+| `method-surround-cycle` | `method` | `method-surround-cycle` → `deck.method-surround-cycle` | servicio continuo: la órbita tendida es el loop Surround Discovery, cuatro estaciones |
+| `method-eeat` | `method` | `method-eeat` → `deck.method-eeat` | por qué la IA te citaría: cuatro letras de vidrio y el medidor |
+| `decision-difference` | `proof` | `decision-difference` → `deck.decision-difference` | la comparación con agencias o con el equipo propio; alternativa genérica |
+| `decision-traffic-to-revenue` | `proof` | `decision-traffic-to-revenue` → `deck.decision-traffic-to-revenue` | subir de tráfico a negocio: cuatro escalones, el corte y la trayectoria de luz |
+| `decision-diagnosis-map` | `next-steps` | `decision-diagnosis-map` → `deck.decision-diagnosis-map` | cerrar con el mapa que entrega el diagnóstico; colaborador «Cliente» en el plan priorizado |
+| `proposal-service-seo` | `proposal-service` | `proposal-service` (`engine`) → `deck.proposal-service` (reutilizada) | la oferta SEO sobria; la lente admite el plate de cine SE1 (`v0.3.22`) y lee `photo.focus` |
+| `proposal-cinematic-seo` | `proposal-service` | `proposal-cinematic` + `service` (`engine`) → `deck.proposal-cinematic` (reutilizada) | la oferta SEO con impacto; nota del pie (`reserves.note`, `type.note`) y bajada bajo la selección (`bodyUnderSelection`) |
+
+- **Reglas que sostiene el código:** cifras con fuente (AXIS `figure-source-required` al componer; en el plan,
+  `figure-source-missing`); datos de muestra marcados («Ejemplo ilustrativo» en `decision-ai-answer`, «Datos de
+  muestra» en `decision-diagnosis-map`, obligatorios mientras `dataOrigin` sea `illustrative`; con `client` se exige
+  `evidenceRef`; regla AXIS `illustrative-data-marked`); interfaz de IA genérica (sólo SVG, sin nombres ni colores de
+  productos; los motores como texto en el diagnóstico; regla AXIS `generic-ai-interface`); respuesta ≥ 3× (las siete
+  en `ANSWER_RATIO_CONTENT_TYPES`, respuestas a 120 px) y acento ≥ 24 px, medidos por la auditoría renderizada.
+- **Decisiones del operador:** la sobria y la cine son `variant` (una por deck: `variant-both-in-deck`, que rige para
+  todo par `variant`); SEO y AEO son servicios distintos; `decision-difference` va en `proof` (no nace `decision`);
+  `next-steps-after-diagnosis` rige por familia `next-steps`; en `decision-ai-answer` la ventana trasera se corrió a
+  860 y se angostó a 450 al subir la respuesta a 120 px.
+- **`proposal-cinematic-seo` va con `slots: null`** en `recipe-map.json`, como sus cuatro hermanas de cine: la
+  plantilla compartida admite textos más largos que los de cada receta y el freno es `slot-over-max-chars` de
+  `validateDeckPlan` (probado con un fixture adversarial). Mapear las cinco juntas queda para TASK-1933.
 
 - **Marco:** `cover-brochure` lleva foto de cine a sangre y columna de voz, **sin burbuja URL**; en `document` y
   `line`, **sin selección** (`selection-not-in-recipe`). El layout `document-selection` (AXIS `v0.3.21`, el operador
@@ -923,7 +958,9 @@ composer).
   ya recorridas, (n−1) de N. **Pregunta abierta del operador**, anotada en el token: ¿unificar a n de N?
 - **Tríptico:** una palabra por toma, cada una con su esfera; una toma con más de una palabra falla.
 - **Estado (2026-09-28):** TASK-1927 y TASK-1928 `complete`, aprobadas a ojo por el operador y en `origin/develop`:
-  las 69 recetas componen, gate `graphic-line` a 0 px en 66 frames (tasks en `docs/tasks/complete/`). **Pendiente:**
+  las 69 recetas de entonces componen, gate `graphic-line` a 0 px en 66 frames (tasks en `docs/tasks/complete/`).
+  TASK-1934 (en curso) suma las nueve SEO/AEO: componen (78 de 78), pero sus frames del gate y el re-congelado de
+  `ProposalCinematic` esperan la aprobación visual del operador. **Pendiente:**
   la ruta productiva gobernada, que debe aceptar también el documento (TASK-1921, `in-progress` en otra sesión: no está
   disponible), y TASK-1929…1932. Diferencias conocidas contra los prototipos: tamaño de «Cuando quieras.», burbuja URL
   horneada en vez de la de luminosidad, caja de selección del pintor canónico unos píxeles más ajustada.
@@ -980,7 +1017,9 @@ receta, ni una receta sin aprobación.
    selección o cursor, se agrega a `TEMPLATES_WITH_SELECTION` / `TEMPLATES_WITH_READER_CURSOR` o al hook de
    selección por ítem o nivel en `index.ts`; si es de decisión con respuesta grande, a la lista 3× de
    `graphic-line-shared/rendered-audit.ts`. Una variante que es la misma lámina con una capa más **reusa** la
-   plantilla (slot opcional + entrada en `contentTypes`) en vez de duplicarla.
+   plantilla (slot opcional + entrada en `contentTypes`) en vez de duplicarla. **Todo slot opcional nuevo en una
+   plantilla compartida lleva un test que componga una receta existente SIN el slot**: el probe del gate siempre lo
+   rellena y los snapshots de planes no renderizan ([lessons.md](lessons.md), 2026-09-28, TASK-1934).
 6. **Mapa y ejemplo:** fila en `recipe-map.json` (`contentType`, `example`, `slots` receta → campo del `slots.json`)
    e intent de ejemplo `src/lib/brand-surfaces/examples/deck-<id>-intent.json` (entra al snapshot de
    `__tests__/example-plans.test.ts`; actualízalo sólo por este alta). Si el alta o el cambio toca
@@ -1007,7 +1046,9 @@ partida** con el indicador por la izquierda y tres variantes (esquina arriba, es
 herramientas y dos «vívelo»; **próximos pasos** con la agenda abierta; **clientes** en un tono navy (con la excepción
 tonal de Aguas Andinas y UC Temuco); **caso Sky** con foto de ejemplo; **BeX** con la escalera como principal; y la
 **excepción del registro cine** para secciones y «about». Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 «Recetas por
-lámina» y delta (c); manual: `docs/manual-de-uso/creative/componer-deck-con-recetas.md`.
+lámina» y delta (c); manual: `docs/manual-de-uso/creative/componer-deck-con-recetas.md`. El 2026-09-28 el operador
+aprobó nueve láminas SEO/AEO más (78 en total; arriba, «Láminas SEO/AEO con plantilla desde TASK-1934») y decidió que
+dentro de un par `variant` la otra no entra al deck, seguida o no.
 
 **Lo inferido en esta sección (confirmar con el operador):** que `proposal-cinematic` se quede sin indicador de deck
 en versiones futuras (así se aprobaron las piezas); que la firma por soporte de web, paleta, LED y mupi pase de

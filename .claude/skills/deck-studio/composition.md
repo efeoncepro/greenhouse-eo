@@ -71,17 +71,21 @@ no cosmética. *(Y el límite lo fijan **las bases**, no el portal. Ver [`eviden
 
 ### Catálogos de La órbita (marca propia Efeonce) — no son `deck-axis`
 
-Desde el 2026-09-27 (TASK-1919, ampliado por TASK-1927 y TASK-1928) las láminas de «La órbita» con plantilla son un
+Desde el 2026-09-27 (TASK-1919, ampliado por TASK-1927, TASK-1928 y TASK-1934) las láminas de «La órbita» con plantilla son un
 catálogo propio, **`graphic-line-deck`** (PDF 16:9). TASK-1927 dejó 16 `contentType`: `deck.proposal-cinematic`
 (+ `.hero`, `.lines`), `deck.method-staircase`, `deck.section-classic`, `deck.section-split` (+ `.corner-bottom`,
 `.panel-end`), `deck.content-measure`, `deck.triptych` y el marco `deck.cover-brochure`, `deck.cover-proposal`
 (+ `.dawn`), `deck.close-brochure` (+ `.photo`) y `deck.close-proposal`. TASK-1928 sumó 34 plantillas para las 38
 recetas restantes (propuestas sobrias, método, cotización y cierre, prueba, secciones y quiénes somos, contenido y día
 a día; p. ej. `deck.proposal-service`, `deck.content-pricing` + `.stage`/`.live`, `deck.section-cine` +
-`.services`/`.about`/`.purpose`, `deck.content-day` + `.tools`/`.live-progress`/`.live-results`): **69 de 69** recetas
-componen; la última, `cover-brochure-cine-lines-selection`, entró el 2026-09-28 como `deck.cover-brochure.document-selection`
-(misma plantilla `CoverBrochure`, AXIS 0.3.21) y `recipe-map.json` ya no tiene `blocked`. Viven junto a `graphic-line-stills` (heros web, caminero,
-cuadros de motion) y `graphic-line-overlays` (capas de video con alfa). Mapa completo de las 69: §«Mapa receta →
+`.services`/`.about`/`.purpose`, `deck.content-day` + `.tools`/`.live-progress`/`.live-results`);
+`cover-brochure-cine-lines-selection` entró el 2026-09-28 como `deck.cover-brochure.document-selection` (misma
+plantilla `CoverBrochure`, AXIS 0.3.21). TASK-1934 sumó las nueve SEO/AEO aprobadas el 2026-09-28: siete plantillas
+nuevas (`deck.decision-ai-answer`, `deck.decision-ai-market`, `deck.method-surround-cycle`, `deck.decision-difference`,
+`deck.method-eeat`, `deck.decision-traffic-to-revenue`, `deck.decision-diagnosis-map`) y dos recetas que reutilizan
+`ProposalService` y `ProposalCinematic`. **78 de 78** recetas componen con 57 plantillas y `recipe-map.json` no tiene
+`blocked`. Viven junto a `graphic-line-stills` (heros web, caminero,
+cuadros de motion) y `graphic-line-overlays` (capas de video con alfa). Mapa completo de las 78: §«Mapa receta →
 plantilla» (abajo); campos del intent, qué falla y por qué: [SKILL.md](SKILL.md) §«Componer hoy con `pnpm brand:compose`».
 
 - **Antes de componer, el plan de recetas** (TASK-1929): un `DeckPlan` (`document`, `line?`, `diagnosisDone?`,
@@ -110,17 +114,22 @@ plantilla» (abajo); campos del intent, qué falla y por qué: [SKILL.md](SKILL.
   `maxCharacters` del campo (`overflow=reject`): los largos medidos del catálogo son el límite real.
 - **La pintura de la selección y del CTA se inyecta** (`createCatalog({ selectionPainter, ctaPainter })`): el catálogo
   no importa paquetes.
-- **Gate:** `pnpm composer:visual-gate --catalog=graphic-line` (66 frames a 0 px desde TASK-1928; altas y cambios
+- **Gate:** `pnpm composer:visual-gate --catalog=graphic-line` (66 frames a 0 px desde TASK-1928; los de las siete
+  plantillas SEO/AEO de TASK-1934 y el re-congelado de `ProposalCinematic` esperan la aprobación visual del operador; altas y cambios
   declarados en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`: 2026-09-27 (b)–(e) de TASK-1927,
   (f) y (h)…(m) de TASK-1928 —la (g) es Glitch— y 2026-09-28 (n), el re-promovido de `CoverBrochure`; ojo: esas letras
   no son las de los deltas del ADR de AXIS; runbook `docs/operations/runbooks/composer-visual-gate.md`). El probe del
   gate **rellena todo slot no fijo** y una auditoría renderizada aborta si hay acento en texto < 24 px o respuesta < 3×
-  la pregunta (`graphic-line-shared/rendered-audit.ts`). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §2.1.
-- **Contrato 0.1.2, integrado (TASK-1927 y TASK-1928, `complete`, en `origin/develop`).** Greenhouse fija
-  `@efeoncepro/axis-tokens` **0.3.21** y `@efeoncepro/axis-ui-contracts` **0.3.19** (tag AXIS `v0.3.21`). El mapper
+  la pregunta (`graphic-line-shared/rendered-audit.ts`; las siete SEO/AEO están en `ANSWER_RATIO_CONTENT_TYPES`).
+  Como el probe rellena todo slot opcional, **el gate nunca ejercita el camino «ausente»** de un slot opcional nuevo:
+  eso lo cubre un test que componga una receta existente sin el slot (lección de TASK-1934 en la skill
+  `efeonce-graphic-line`). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §2.1.
+- **Contrato 0.1.2, integrado (TASK-1927 y TASK-1928, `complete`, en `origin/develop`; TASK-1934 en curso).**
+  Greenhouse fija `@efeoncepro/axis-tokens` **0.3.23** y `@efeoncepro/axis-ui-contracts` **0.3.21** (tag AXIS
+  `v0.3.23`). El mapper
   lee `use` y `layout` (el que resolvió AXIS, nunca inferido); los builders viven en `src/lib/brand-surfaces/recipes/`
   (`deck.ts`, `frame.ts` para el marco, y `proposal-service.ts`, `method.ts`, `close.ts`, `proof.ts`, `sections.ts`,
-  `content.ts` con ayudas en `kit.ts`), registrados en `src/lib/brand-surfaces/index.ts`. Un intent 0.1.0 o 0.1.1
+  `content.ts` con ayudas en `kit.ts`, y las siete SEO/AEO en `seo-aeo/<receta>.ts` agregadas en `seo-aeo.ts`), registrados en `src/lib/brand-surfaces/index.ts`. Un intent 0.1.0 o 0.1.1
   resuelve igual.
 - **Documentos.** Un intent con `pages` compone **un PDF multipágina** con su manifest `axis.surface-document.v1` y su
   procedencia (`planSurfaceDocument` en `src/lib/brand-surfaces/document.ts`, que valida con
@@ -134,7 +143,8 @@ plantilla» (abajo); campos del intent, qué falla y por qué: [SKILL.md](SKILL.
   `photo` con foto) y `close-proposal` (con foto, «Empower your Growth»). Portada con foto ↔ contraportada sin foto, y
   al revés. La producción idempotente de los plates es TASK-1926. Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6;
   resumen en [SKILL.md](SKILL.md) §«Portadas y contraportadas».
-- **Recetas por lámina (operador, 2026-09-27): las 69 láminas del canvas «Deck» están aprobadas** y cada una tiene su
+- **Recetas por lámina (operador, 2026-09-27 y 2026-09-28): las 78 láminas del canvas «Deck» están aprobadas** (69 más
+  nueve SEO/AEO) y cada una tiene su
   receta en `docs/operations/brand-graphic-line/deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json` (esquema
   `efeonce.deck-slide-recipes.v1`; índice humano en el README de esa carpeta, regenerado con `pnpm brand:deck-recipes`).
   Para el composer, la receta es el **contrato de slots** de la plantilla: cada `slots[]` trae `name`, `type`
@@ -142,22 +152,26 @@ plantilla» (abajo); campos del intent, qué falla y por qué: [SKILL.md](SKILL.
   `required` y `maxChars` **medido en la referencia aprobada** (lo que cabe sin cruzar la órbita ni al sujeto);
   `fixed[]` es lo que la plantilla quema y el autor no toca; `selection` declara el objetivo para
   `efeonce.collaboration-selection`; `pairsWith` alimenta la validación del plan (TASK-1929): `cover↔close` →
-  `pair-cover-close-mismatch`, `variant` → `variant-adjacent` (no seguidas; separadas se permiten); `sequence` **no se
-  valida** porque no tiene dirección. **El `id` de la receta reutiliza el de AXIS cuando existe** (`content-pricing`, `decision-next-steps`,
+  `pair-cover-close-mismatch`, `variant` → `variant-both-in-deck` (alternativas: nunca las dos en el mismo deck,
+  seguidas o no; reemplaza a `variant-adjacent`); `sequence` **no se valida** porque no tiene dirección. Una cifra del
+  plan (objeto con `value`) sin `source` → `figure-source-missing`. **El `id` de la receta reutiliza el de AXIS cuando existe** (`content-pricing`, `decision-next-steps`,
   `method-staircase`…); los nuevos son kebab-case en inglés. **El catálogo de recetas sirve para elegir la lámina; se
-  compone con el intent de AXIS.** Hoy componen **las 69** con **50 plantillas**: TASK-1927 dejó 30 recetas sobre 16
+  compone con el intent de AXIS.** Hoy componen **las 78** con **57 plantillas**: TASK-1927 dejó 30 recetas sobre 16
   plantillas; TASK-1928 sumó las 38 restantes sobre 34 plantillas y, el 2026-09-28, la portada con selección
-  (`cover-brochure-cine-lines-selection`, layout `document-selection`) sin plantilla nueva. **Nunca** se agrega una
+  (`cover-brochure-cine-lines-selection`, layout `document-selection`) sin plantilla nueva; TASK-1934 sumó las nueve
+  SEO/AEO sobre siete plantillas nuevas. **Nunca** se agrega una
   plantilla sin su receta ni una receta sin la aprobación del operador.
 
-### Mapa receta → plantilla (las 69, verificado contra `recipe-map.json` y `registry.json` el 2026-09-28)
+### Mapa receta → plantilla (las 78, verificado contra `recipe-map.json` y `registry.json` el 2026-09-28)
 
 El autor escribe la columna 2; la 3 la deriva el mapper y la 4 la elige el selector del catálogo (nunca el autor).
 Ejemplo de cada fila: `src/lib/brand-surfaces/examples/deck-<id>-intent.json` (el campo `example` de
 `recipe-map.json`). Plantillas compartidas: `CoverBrochure` (portadas de brochure, con y sin selección),
-`SectionCine` (`team` y `services`), `ProposalService` (las cuatro sobrias) y `ProposalCinematic` (las cuatro de
-servicio). `recipe-map.json → slots` declara el campo del `slots.json` de cada slot en las 38 recetas de TASK-1928
-(las 30 anteriores lo declaran `null`: su contrato sale del manifest de AXIS).
+`SectionCine` (`team` y `services`), `ProposalService` (las cinco sobrias) y `ProposalCinematic` (las cinco de
+servicio). `recipe-map.json → slots` declara el campo del `slots.json` de cada slot en las 38 recetas de TASK-1928 y
+en ocho de las nueve de TASK-1934 (las 30 anteriores lo declaran `null`: su contrato sale del manifest de AXIS; también
+`proposal-cinematic-seo`, como sus cuatro hermanas de cine, porque su plantilla compartida no admite los largos
+menores de una sola receta: ahí el freno es `slot-over-max-chars` de `validateDeckPlan`).
 
 | Láminas (id del catálogo) | `recipe` + `layout` del intent | `contentType` | Plantilla |
 |---|---|---|---|
@@ -187,22 +201,29 @@ servicio). `recipe-map.json → slots` declara el campo del `slots.json` de cada
 | `cover-proposal-orbit` · `cover-proposal-orbit-sky` | `cover-proposal` + `orbit` | `deck.cover-proposal` | `CoverProposalOrbit` |
 | `cover-proposal-dawn` · `cover-proposal-dawn-sky` | `cover-proposal` + `dawn` | `deck.cover-proposal.dawn` | `CoverProposalDawn` |
 | `decision-agenda` | `decision-agenda` | `deck.decision-agenda` | `DecisionAgenda` |
+| `decision-ai-answer` | `decision-ai-answer` | `deck.decision-ai-answer` | `DecisionAiAnswer` |
+| `decision-ai-market` | `decision-ai-market` | `deck.decision-ai-market` | `DecisionAiMarket` |
 | `decision-case` | `decision-case` | `deck.decision-case` | `DecisionCase` |
 | `decision-chart` | `decision-chart` | `deck.decision-chart` | `DecisionChart` |
+| `decision-diagnosis-map` | `decision-diagnosis-map` | `deck.decision-diagnosis-map` | `DecisionDiagnosisMap` |
+| `decision-difference` | `decision-difference` | `deck.decision-difference` | `DecisionDifference` |
 | `decision-next-steps` | `decision-next-steps` | `deck.decision-next-steps` | `DecisionNextSteps` |
 | `decision-plan` | `decision-plan` | `deck.decision-plan` | `DecisionPlan` |
 | `decision-risk` | `decision-risk` | `deck.decision-risk` | `DecisionRisk` |
 | `decision-testimonial` | `decision-testimonial` | `deck.decision-testimonial` | `DecisionTestimonial` |
+| `decision-traffic-to-revenue` | `decision-traffic-to-revenue` | `deck.decision-traffic-to-revenue` | `DecisionTrafficToRevenue` |
 | `decision-why-us` | `decision-why-us` | `deck.decision-why-us` | `DecisionWhyUs` |
+| `method-eeat` | `method-eeat` | `deck.method-eeat` | `MethodEeat` |
 | `method-hybrid-workforce` | `method-hybrid-workforce` + `ladder` (por defecto) | `deck.method-hybrid-workforce` | `MethodHybridWorkforce` |
 | `method-hybrid-workforce-scene` | `method-hybrid-workforce` + `scene` | `deck.method-hybrid-workforce.scene` | `MethodHybridWorkforceScene` |
 | `method-score-ring` | `method-score-ring` | `deck.method-score-ring` | `MethodScoreRing` |
 | `method-staircase` | `method-staircase` + `steps` (por defecto) | `deck.method-staircase` | `MethodStaircase` |
 | `method-staircase-flat` | `method-staircase` + `flat` | `deck.method-staircase.flat` | `MethodStaircaseFlat` |
-| `proposal-cinematic-creative` · `-web` · `-aeo` · `-revops` (páginas de `deck-proposal-document.json`) | `proposal-cinematic` + `service` | `deck.proposal-cinematic` | `ProposalCinematic` |
+| `method-surround-cycle` | `method-surround-cycle` | `deck.method-surround-cycle` | `MethodSurroundCycle` |
+| `proposal-cinematic-creative` · `-web` · `-aeo` · `-revops` (páginas de `deck-proposal-document.json`) · `-seo` (`deck-proposal-cinematic-seo-intent.json`) | `proposal-cinematic` + `service` | `deck.proposal-cinematic` | `ProposalCinematic` |
 | `proposal-cinematic-nexa` | `proposal-cinematic` + `hero` | `deck.proposal-cinematic.hero` | `ProposalCinematicHero` |
 | `proposal-cinematic-nexa-lines` | `proposal-cinematic` + `lines` | `deck.proposal-cinematic.lines` | `ProposalCinematicLines` |
-| `proposal-service-aeo` · `-creative` · `-web` · `-revops` | `proposal-service` | `deck.proposal-service` | `ProposalService` |
+| `proposal-service-aeo` · `-creative` · `-web` · `-revops` · `-seo` | `proposal-service` | `deck.proposal-service` | `ProposalService` |
 | `section-bleed` | `section-bleed` | `deck.section-bleed` | `SectionBleed` |
 | `section-cine-team` | `section-cine` + `team` | `deck.section-cine` | `SectionCine` |
 | `section-cine-about` | `section-cine` + `about` | `deck.section-cine.about` | `SectionCineAbout` |

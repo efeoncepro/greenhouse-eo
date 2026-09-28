@@ -1,14 +1,14 @@
 # GREENHOUSE — Composición por superficie de «La órbita» en el Artifact Composer V1
 
 > **Tipo de documento:** Spec técnica (arquitectura del lado Greenhouse)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-09-28 por Claude
-> **Última actualización:** 2026-09-28 por Claude (1.1: §12 nueva — plan de deck contra el catálogo de recetas, TASK-1929: catálogo de runtime, `validateDeckPlan`, `proposeDeckPlan` y `pnpm brand:deck-plan`; §9 y §13 al día)
+> **Última actualización:** 2026-09-28 por Claude (1.2: TASK-1934 — las nueve láminas SEO/AEO: 78 recetas y 57 plantillas (§4), builders en `recipes/seo-aeo/` (§5), prefijos CSS (§7.3), 3× y reglas nuevas (§8), AXIS `v0.3.22`/`v0.3.23` (§10), catálogo de runtime y códigos `variant-both-in-deck` y `figure-source-missing` (§12), pendientes (§13). Antes, 1.1: §12 nueva — plan de deck contra el catálogo de recetas, TASK-1929: catálogo de runtime, `validateDeckPlan`, `proposeDeckPlan` y `pnpm brand:deck-plan`; §9 y §13 al día)
 > **Estado:** vigente. Taller local (`pnpm brand:compose`) en `develop`; la ruta productiva gobernada es TASK-1921, en curso.
-> **Contrato y valores (AXIS):** ADR [`SURFACE_COMPOSITION_DECISION_V1.md`](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md) del repo `efeoncepro/axis-design-system` (contrato `efeonce.surface-composition` 0.1.2, deltas (b)…(l)); guía `docs/agent-composition/surfaces/deck.md` del mismo repo.
+> **Contrato y valores (AXIS):** ADR [`SURFACE_COMPOSITION_DECISION_V1.md`](https://github.com/efeoncepro/axis-design-system/blob/main/docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md) del repo `efeoncepro/axis-design-system` (contrato `efeonce.surface-composition` 0.1.2, deltas (b)…(n)); guía `docs/agent-composition/surfaces/deck.md` del mismo repo.
 > **Norma de marca:** [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) (qué se aprobó por superficie, §2.1 ruta por el composer, §4.6 deck) · catálogo de recetas [`deck-recipes/`](../operations/brand-graphic-line/deck-recipes/README.md).
 > **Motor:** [`GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md`](GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md) (el composer es domain-free; las superficies son catálogos) · invariantes [`COMMERCIAL_TENDERS_AGENT_INVARIANTS.md`](agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md).
-> **Tasks:** [TASK-1919](../tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) (catálogos y mapper) · [TASK-1927](../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (contrato 0.1.2, marco y documento) · [TASK-1928](../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) (las recetas restantes: 69 de 69) · [TASK-1929](../tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md) (plan de deck contra el catálogo, §12; code complete, en cierre).
+> **Tasks:** [TASK-1919](../tasks/complete/TASK-1919-graphic-line-surfaces-artifact-composer.md) (catálogos y mapper) · [TASK-1927](../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (contrato 0.1.2, marco y documento) · [TASK-1928](../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) (las recetas restantes: 69 de 69) · [TASK-1929](../tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md) (plan de deck contra el catálogo, §12; code complete, en cierre) · [TASK-1934](../tasks/in-progress/TASK-1934-seo-aeo-deck-slides-recipe-catalog-templates.md) (las nueve láminas SEO/AEO: 78 de 78; en curso).
 > **Manuales:** [componer por superficie con AXIS](../manual-de-uso/creative/componer-por-superficie-con-axis.md) · [componer un deck con las recetas](../manual-de-uso/creative/componer-deck-con-recetas.md) · runbook del gate [`composer-visual-gate.md`](../operations/runbooks/composer-visual-gate.md).
 
 ## 1. Qué es y dónde termina
@@ -167,7 +167,7 @@ catálogo de ofertas a comité y del deck SKY): mezclarlos degradaría lo que es
 | Archivo | Qué es |
 |---|---|
 | `<plantilla>.html` + `<plantilla>.slots.json` | una plantilla y su contrato de slots. Dos plantillas pueden compartir HTML con contratos distintos (`section-split.html` → `SectionSplit`, `SectionSplitCornerBottom`, `SectionSplitPanelEnd`; `close-brochure.html` → `CloseBrochure`, `CloseBrochurePhoto`) |
-| `registry.json` | `contentTypeTaxonomy` (la lista cerrada de `contentType` del catálogo), `templates` (nombre, `prototype` HTML, `slotsRef`, `contentTypes`, `status`) y `selector.map` (`contentType` → plantilla). **50 plantillas**, todas `built` |
+| `registry.json` | `contentTypeTaxonomy` (la lista cerrada de `contentType` del catálogo), `templates` (nombre, `prototype` HTML, `slotsRef`, `contentTypes`, `status`) y `selector.map` (`contentType` → plantilla). **57 plantillas**, todas `built` |
 | `recipe-map.json` | `efeonce.deck-recipe-map.v1`: receta del catálogo de láminas → `contentType`, intent de ejemplo y mapa de slots (§4.3) |
 | `index.ts` | `createCatalog(options)`: resolvers, layout hooks y brand pack (§6) |
 | `graphic-line.css` | el molde compartido; cada familia nueva acotada por el prefijo de su raíz (§7) |
@@ -175,15 +175,18 @@ catálogo de ofertas a comité y del deck SKY): mezclarlos degradaría lo que es
 
 ### 4.2 Conteo
 
-- **69 de 69** recetas del catálogo de láminas (`EFEONCE_DECK_SLIDE_RECIPES_V1.json`) tienen plantilla.
-- **50 plantillas**: 16 de TASK-1927 (que incluyen las seis de TASK-1919) y **34 nuevas de TASK-1928**. Comparten
-  plantilla: las cuatro `proposal-service-*` → `ProposalService`; `section-cine-team` y `section-cine-services` →
-  `SectionCine`; las ocho `cover-brochure-*` (incluida la de selección) → `CoverBrochure`; las cuatro
-  `proposal-cinematic-{creative,web,aeo,revops}` → `ProposalCinematic`; las dos `cover-proposal-orbit*` y las dos
+- **78 de 78** recetas del catálogo de láminas (`EFEONCE_DECK_SLIDE_RECIPES_V1.json`) tienen plantilla.
+- **57 plantillas**: 16 de TASK-1927 (que incluyen las seis de TASK-1919), **34 de TASK-1928** y **7 de TASK-1934**
+  (`DecisionAiAnswer`, `DecisionAiMarket`, `MethodSurroundCycle`, `DecisionDifference`, `MethodEeat`,
+  `DecisionTrafficToRevenue`, `DecisionDiagnosisMap`). Comparten plantilla: las cinco `proposal-service-*` (incluida
+  `proposal-service-seo`) → `ProposalService`; `section-cine-team` y `section-cine-services` →
+  `SectionCine`; las ocho `cover-brochure-*` (incluida la de selección) → `CoverBrochure`; las cinco
+  `proposal-cinematic-{creative,web,aeo,revops,seo}` → `ProposalCinematic`; las dos `cover-proposal-orbit*` y las dos
   `cover-proposal-dawn*` → `CoverProposalOrbit` y `CoverProposalDawn`; las dos `close-brochure-{horizon,dawn}` →
   `CloseBrochurePhoto`; las dos `close-proposal-*` → `CloseProposal`.
-- Origen: 9 recetas componían desde TASK-1919, 21 llegaron con TASK-1927 y 39 con TASK-1928 (las 38 recetas sin
-  plantilla más `cover-brochure-cine-lines-selection`, que estaba bloqueada hasta AXIS `v0.3.21`).
+- Origen: 9 recetas componían desde TASK-1919, 21 llegaron con TASK-1927, 39 con TASK-1928 (las 38 recetas sin
+  plantilla más `cover-brochure-cine-lines-selection`, que estaba bloqueada hasta AXIS `v0.3.21`) y 9 con TASK-1934
+  (siete plantillas nuevas y dos reutilizadas).
 
 ### 4.3 `recipe-map.json` y la paridad de slots
 
@@ -200,10 +203,11 @@ Cada entrada: `{ contentType, example, slots }`. `example` apunta a un intent de
 | `a+b` | dos campos que juntos cubren el slot (la respuesta en dos líneas: la suma alcanza el largo de la receta) |
 | `ruta#composite` | el campo imprime más que el slot (p. ej. «Fuente: …»); basta con que alcance |
 
-Las 38 recetas de TASK-1928 declaran `slots`; las 31 anteriores declaran `slots: null` porque su contrato sale del
-manifest de AXIS. Ejemplo (`decision-chart`): `"source": "source#composite"`, `"nav": "indicator"`.
+Las 38 recetas de TASK-1928 y ocho de las nueve de TASK-1934 declaran `slots`; las 31 anteriores declaran
+`slots: null` porque su contrato sale del manifest de AXIS, y también `proposal-cinematic-seo`, como sus cuatro
+hermanas de cine: su plantilla compartida no admite los largos menores de una sola receta. Ejemplo (`decision-chart`): `"source": "source#composite"`, `"nav": "indicator"`.
 
-### 4.4 Las 69 recetas
+### 4.4 Las 78 recetas
 
 | Receta del catálogo | `contentType` | Plantilla | Llegó con | Intent de ejemplo |
 |---|---|---|---|---|
@@ -243,27 +247,36 @@ manifest de AXIS. Ejemplo (`decision-chart`): `"source": "source#composite"`, `"
 | `cover-proposal-orbit` | `deck.cover-proposal` | `CoverProposalOrbit` | TASK-1927 | `deck-cover-proposal-orbit-intent.json` |
 | `cover-proposal-orbit-sky` | `deck.cover-proposal` | `CoverProposalOrbit` | TASK-1927 | `deck-cover-proposal-orbit-sky-intent.json` |
 | `decision-agenda` | `deck.decision-agenda` | `DecisionAgenda` | TASK-1928 | `deck-decision-agenda-intent.json` |
+| `decision-ai-answer` | `deck.decision-ai-answer` | `DecisionAiAnswer` | TASK-1934 | `deck-decision-ai-answer-intent.json` |
+| `decision-ai-market` | `deck.decision-ai-market` | `DecisionAiMarket` | TASK-1934 | `deck-decision-ai-market-intent.json` |
 | `decision-case` | `deck.decision-case` | `DecisionCase` | TASK-1928 | `deck-decision-case-intent.json` |
 | `decision-chart` | `deck.decision-chart` | `DecisionChart` | TASK-1928 | `deck-decision-chart-intent.json` |
+| `decision-diagnosis-map` | `deck.decision-diagnosis-map` | `DecisionDiagnosisMap` | TASK-1934 | `deck-decision-diagnosis-map-intent.json` |
+| `decision-difference` | `deck.decision-difference` | `DecisionDifference` | TASK-1934 | `deck-decision-difference-intent.json` |
 | `decision-next-steps` | `deck.decision-next-steps` | `DecisionNextSteps` | TASK-1928 | `deck-decision-next-steps-intent.json` |
 | `decision-plan` | `deck.decision-plan` | `DecisionPlan` | TASK-1928 | `deck-decision-plan-intent.json` |
 | `decision-risk` | `deck.decision-risk` | `DecisionRisk` | TASK-1928 | `deck-decision-risk-intent.json` |
 | `decision-testimonial` | `deck.decision-testimonial` | `DecisionTestimonial` | TASK-1928 | `deck-decision-testimonial-intent.json` |
+| `decision-traffic-to-revenue` | `deck.decision-traffic-to-revenue` | `DecisionTrafficToRevenue` | TASK-1934 | `deck-decision-traffic-to-revenue-intent.json` |
 | `decision-why-us` | `deck.decision-why-us` | `DecisionWhyUs` | TASK-1928 | `deck-decision-why-us-intent.json` |
+| `method-eeat` | `deck.method-eeat` | `MethodEeat` | TASK-1934 | `deck-method-eeat-intent.json` |
 | `method-hybrid-workforce` | `deck.method-hybrid-workforce` | `MethodHybridWorkforce` | TASK-1928 | `deck-method-hybrid-workforce-intent.json` |
 | `method-hybrid-workforce-scene` | `deck.method-hybrid-workforce.scene` | `MethodHybridWorkforceScene` | TASK-1928 | `deck-method-hybrid-workforce-scene-intent.json` |
 | `method-score-ring` | `deck.method-score-ring` | `MethodScoreRing` | TASK-1928 | `deck-method-score-ring-intent.json` |
 | `method-staircase` | `deck.method-staircase` | `MethodStaircase` | TASK-1919 | `deck-method-staircase-intent.json` |
 | `method-staircase-flat` | `deck.method-staircase.flat` | `MethodStaircaseFlat` | TASK-1928 | `deck-method-staircase-flat-intent.json` |
+| `method-surround-cycle` | `deck.method-surround-cycle` | `MethodSurroundCycle` | TASK-1934 | `deck-method-surround-cycle-intent.json` |
 | `proposal-cinematic-aeo` | `deck.proposal-cinematic` | `ProposalCinematic` | TASK-1919 | `deck-proposal-document.json#page=3` |
 | `proposal-cinematic-creative` | `deck.proposal-cinematic` | `ProposalCinematic` | TASK-1919 | `deck-proposal-document.json#page=1` |
 | `proposal-cinematic-revops` | `deck.proposal-cinematic` | `ProposalCinematic` | TASK-1919 | `deck-proposal-document.json#page=4` |
+| `proposal-cinematic-seo` | `deck.proposal-cinematic` | `ProposalCinematic` | TASK-1934 | `deck-proposal-cinematic-seo-intent.json` |
 | `proposal-cinematic-web` | `deck.proposal-cinematic` | `ProposalCinematic` | TASK-1919 | `deck-proposal-document.json#page=2` |
 | `proposal-cinematic-nexa` | `deck.proposal-cinematic.hero` | `ProposalCinematicHero` | TASK-1927 | `deck-proposal-cinematic-hero-intent.json` |
 | `proposal-cinematic-nexa-lines` | `deck.proposal-cinematic.lines` | `ProposalCinematicLines` | TASK-1927 | `deck-proposal-cinematic-lines-intent.json` |
 | `proposal-service-aeo` | `deck.proposal-service` | `ProposalService` | TASK-1928 | `deck-proposal-service-aeo-intent.json` |
 | `proposal-service-creative` | `deck.proposal-service` | `ProposalService` | TASK-1928 | `deck-proposal-service-creative-intent.json` |
 | `proposal-service-revops` | `deck.proposal-service` | `ProposalService` | TASK-1928 | `deck-proposal-service-revops-intent.json` |
+| `proposal-service-seo` | `deck.proposal-service` | `ProposalService` | TASK-1934 | `deck-proposal-service-seo-intent.json` |
 | `proposal-service-web` | `deck.proposal-service` | `ProposalService` | TASK-1928 | `deck-proposal-service-web-intent.json` |
 | `section-bleed` | `deck.section-bleed` | `SectionBleed` | TASK-1928 | `deck-section-bleed-intent.json` |
 | `section-cine-services` | `deck.section-cine.services` | `SectionCine` | TASK-1928 | `deck-section-cine-services-intent.json` |
@@ -287,14 +300,15 @@ Todos en `src/lib/brand-surfaces/recipes/`, registrados en `BUILDERS.deck` de `s
 
 | Archivo | Recetas AXIS (clave del builder) | Notas |
 |---|---|---|
-| `deck.ts` | `proposal-cinematic` (ramifica por `layout`: `service`, `hero`, `lines`), `section-classic`, `section-split`, `content-measure`, `triptych`, `method-staircase` (`steps` y `flat`; la plana devuelve `deck.method-staircase.flat`) | Define `RecipeContext`/`RecipeBuilder` y `progressIndicatorLayer` (el indicador «sección n de N» pintado por AXIS; acepta `ringOpacity` y un `center` medido, que usa la sección a sangre). `DECK_BUILDERS` agrupa el marco y `proposal-service` |
+| `deck.ts` | `proposal-cinematic` (ramifica por `layout`: `service`, `hero`, `lines`; en `service`, la nota del pie `reserves.note`/`type.note` y `bodyUnderSelection` cuando la selección va abajo, TASK-1934), `section-classic`, `section-split`, `content-measure`, `triptych`, `method-staircase` (`steps` y `flat`; la plana devuelve `deck.method-staircase.flat`) | Define `RecipeContext`/`RecipeBuilder` y `progressIndicatorLayer` (el indicador «sección n de N» pintado por AXIS; acepta `ringOpacity` y un `center` medido, que usa la sección a sangre). `DECK_BUILDERS` agrupa el marco y `proposal-service` |
 | `frame.ts` | `cover-brochure` (`document`, `line`, `document-selection`), `cover-proposal` (`orbit`, `dawn`), `close-brochure` (`orbit`, `photo`), `close-proposal` | Marco del documento (TASK-1927). `answerSelection` exige un solo cursor de colaborador delegado por AXIS y `targetKind: 'text'`; con `document-selection` devuelve `contentType: 'deck.cover-brochure.document-selection'`. Contacto desde `EFEONCE_CONTACT` |
-| `proposal-service.ts` | `proposal-service` | La propuesta sobria: una receta AXIS para las cuatro recetas del catálogo (la línea cambia el acento) |
+| `proposal-service.ts` | `proposal-service` | La propuesta sobria: una receta AXIS para las cinco recetas del catálogo (la línea cambia el acento). Desde TASK-1934 la lente admite un plate de cine (la SEO usa SE1) y orienta el recorte con `photo.focus` si el intent lo trae |
 | `method.ts` | `decision-plan`, `method-score-ring`, `method-hybrid-workforce` (`ladder` y `scene`) | La escalera, con su composición `flat`, vive en `deck.ts` |
 | `close.ts` | `breather`, `decision-next-steps`, `content-pricing` (`table`, `stage`, `live`) | Montos siempre `[MONTO]`; contacto desde `EFEONCE_CONTACT`. Exporta `documentVars` y `platformSvg`, que reusan otras familias |
 | `proof.ts` | `content-focus`, `content-clients`, `content-partners`, `decision-risk`, `decision-case`, `decision-chart`, `decision-testimonial`, `decision-why-us` | Cifras por `figures` del contrato con fuente obligatoria; logos de terceros como asset `logo`; barras desde su número |
 | `sections.ts` | `section-lens`, `section-bleed`, `section-cine` (`team`, `services`, `about`, `purpose`), `content-team`, `content-stack` | La lente de `section-lens` es un asset `painted`. Exporta `liveVoiceFrame` (voz de las láminas «vivas») |
 | `content.ts` | `contact-sheet`, `content-text`, `content-bullets`, `content-day` (`clock`, `tools`, `live-progress`, `live-results`), `decision-agenda` | La lente del reloj aplica `photo.focus` como recorte dirigido del plate |
+| `seo-aeo.ts` + `seo-aeo/<receta>.ts` | `decision-ai-answer`, `decision-ai-market`, `method-surround-cycle`, `decision-difference`, `method-eeat`, `decision-traffic-to-revenue`, `decision-diagnosis-map` | Las siete láminas SEO/AEO de TASK-1934, un archivo por lámina en `recipes/seo-aeo/`, agregadas en `SEO_AEO_BUILDERS` (`recipes/seo-aeo.ts`, dentro de `BUILDERS.deck`). Voz «viva» con `liveVoiceFrame` de `sections.ts` (la pregunta baja a dos líneas desde `questionWrapChars`). Cifras por `figures` con fuente; datos de muestra exigidos mientras el intent sea ilustrativo (`evidenceRef` con datos del cliente); interfaz de IA sólo en SVG genérico |
 | `kit.ts` | — | Ayudas compartidas de TASK-1928 (§2.3). No decide copy ni geometría de ninguna receta |
 | `stills.ts`, `overlays.ts` | `web.*`, `dooh.*`, `motion.*`, `audiovisual.*` | Catálogos `graphic-line-stills` y `graphic-line-overlays` (TASK-1919); fuera del alcance del deck |
 
@@ -399,7 +413,7 @@ propia y sus reglas van bajo ese prefijo, para que una familia no mueva los fram
 `.gl-hw`, `.gl-url-lum`; cotización y cierre `.gl-br`, `.gl-ns`, `.gl-pt`, `.gl-pcs`, `.gl-pv`, `.gl-flow-voice`;
 prueba `.gl-cf`, `.gl-cc`, `.gl-cpt`, `.gl-dr`, `.gl-dc`, `.gl-dch`, `.gl-dt`, `.gl-dw`; secciones `.gl-sec`, `.gl-tm`,
 `.gl-stk`, `.gl-live-voice`; contenido `.gl-cs`, `.gl-ct`, `.gl-cb`, `.gl-cd`, `.gl-cdl` (`.gl-cdt`, `.gl-cdp`, `.gl-cdr`),
-`.gl-ag`. Lección registrada: la escena de la cotización usa `.gl-pcs` porque compartir `.gl-ps` con la propuesta sobria
+`.gl-ag`; SEO/AEO (TASK-1934) `.gl-aa`, `.gl-am`, `.gl-sur`, `.gl-df`, `.gl-ee`, `.gl-ttr`, `.gl-dm`. Lección registrada: la escena de la cotización usa `.gl-pcs` porque compartir `.gl-ps` con la propuesta sobria
 movía su frame.
 
 ## 8. Decisiones de norma que viven en las plantillas
@@ -410,12 +424,14 @@ código, no en una revisión a ojo:
 | Decisión | Cómo se aplica | Cómo se verifica |
 |---|---|---|
 | **D1** — el acento nunca en texto de menos de 24 px | kickers, cabeceras, rótulos y etiquetas chicas en navy (papel) o en el texto claro (oscuro) | auditoría renderizada del gate, regla `accent-text-min-size`, en todos los frames |
-| **3×** — la respuesta mide al menos 3 veces la pregunta | respuestas a 120 px en cotizaciones, plan, clientes, partners y testimonio | auditoría renderizada, regla `answer-ratio`, en `ANSWER_RATIO_CONTENT_TYPES`: `deck.content-pricing`, `.stage`, `.live`, `deck.content-clients`, `deck.decision-plan`, `deck.content-partners` |
+| **3×** — la respuesta mide al menos 3 veces la pregunta | respuestas a 120 px en cotizaciones, plan, clientes, partners, testimonio y las siete SEO/AEO (DeckIARespuesta, DeckDiferencia y DeckEEAT subieron a 120 px; en DeckIARespuesta la ventana trasera se corrió a 860 y se angostó a 450) | auditoría renderizada, regla `answer-ratio`, en `ANSWER_RATIO_CONTENT_TYPES`: `deck.content-pricing`, `.stage`, `.live`, `deck.content-clients`, `deck.decision-plan`, `deck.content-partners` y las siete de TASK-1934 (`deck.decision-ai-answer`, `deck.decision-ai-market`, `deck.method-surround-cycle`, `deck.decision-difference`, `deck.method-eeat`, `deck.decision-traffic-to-revenue`, `deck.decision-diagnosis-map`) |
 | **Cifras con fuente visible** | toda cifra llega por `figures` (valor, rótulo y fuente obligatoria); la lámina imprime «Fuente: …» | AXIS rechaza la cifra sin fuente (`surface-issues`); test del mapper |
 | **Lámina interior con foto: sin logo** | las secciones de cine no llevan el logo chico de portada; el eyebrow vuelve al margen | plantilla sin nodo de logo; frame del gate |
 | **Sin velo sobre la foto** | «quiénes somos» y «por qué lo hacemos» sin degradado lateral | regla `no-scrim` del token de AXIS; la plantilla no tiene capa de velo |
 | **Montos como `[MONTO]`** | los montos se imprimen como marcador | intents de ejemplo; frame |
 | **Contacto desde `EFEONCE_CONTACT`** | `src/config/efeonce-brand.ts`, nunca del intent | test «el contacto de los próximos pasos sale de los datos de Efeonce» |
+| **Datos de muestra marcados** (AXIS `illustrative-data-marked`) | «Ejemplo ilustrativo» en `decision-ai-answer` y «Datos de muestra» en `decision-diagnosis-map` mientras `dataOrigin` sea `illustrative` (por defecto); con `dataOrigin: 'client'` el builder exige `evidenceRef` | tests del builder (sin la marca no compone) |
+| **Interfaz de IA genérica** (AXIS `generic-ai-interface`) | la interfaz del motor es SVG genérico; los nombres de motores sólo como texto en el diagnóstico | test sobre el HTML: sólo SVG, sin nombres ni colores de productos |
 | **Burbuja URL en partners** | en el pie de `content-partners` | frame del gate |
 | **Logos de terceros normalizados** | un tono, el mismo peso óptico; excepción tonal declarada | asset `logo` (§6) |
 | **Barras desde su número** | índice, antes = 100 | builder de `decision-chart` |
@@ -427,7 +443,7 @@ sobre cada probe de los catálogos de La órbita: una violación falla el gate i
 
 | Gate / test | Qué asegura |
 |---|---|
-| `pnpm composer:visual-gate --catalog=graphic-line` | **66 frames a 0 px** (50 del deck, 9 de stills, 7 de overlays) + auditoría renderizada D1 y 3× |
+| `pnpm composer:visual-gate --catalog=graphic-line` | **66 frames a 0 px** (50 del deck, 9 de stills, 7 de overlays) + auditoría renderizada D1 y 3×. Los frames de las siete plantillas de TASK-1934 y el re-congelado de `ProposalCinematic` (la nota del pie mueve su probe) están pendientes de la aprobación visual del operador |
 | `pnpm composer:visual-gate --catalog=glitch` | 26 frames a 0 px del catálogo de Glitch (comparte motor, manifest y ledger) |
 | `--selftest` / `--freeze` | dos corridas deben dar 0 px antes de congelar; `--freeze` es **single-owner, serializado y atómico con su commit**, y cada frame cambiado se declara antes en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` (TASK-1927: entradas (b)–(e); TASK-1928: (f), (h)–(n); (g) es Glitch) |
 | `src/lib/brand-surfaces/__tests__/recipe-map.test.ts` | el intent de ejemplo de cada receta planifica al `contentType` que promete `recipe-map.json` |
@@ -441,7 +457,11 @@ sobre cada probe de los catálogos de La órbita: una violación falla el gate i
 
 El probe del gate no usa fotos reales: `plate:probe`, `icon:probe`, `layer:probe` y `file:probe` son SVG sintéticos
 (`GRAPHIC_LINE_PROBE_ASSETS`), así que ISSUE-122 no aplica. El probe **rellena todo slot opcional** (salvo
-`"example": null`): por eso el frame `CoverBrochure` incluye la selección desde el ledger (n). Runbook:
+`"example": null`): por eso el frame `CoverBrochure` incluye la selección desde el ledger (n). La otra cara: **el gate
+nunca ejercita el camino «ausente»** de un slot opcional, y los snapshots de planes no renderizan. Todo slot opcional
+nuevo en una plantilla compartida lleva un test que compone una receta existente sin él (caso TASK-1934: la nota del
+pie de `proposal-cinematic` rompía la página creativa sin nota; corregido en `af32d9353`, test
+`src/lib/brand-surfaces/__tests__/proposal-cinematic-note.test.ts`). Runbook:
 [`composer-visual-gate.md`](../operations/runbooks/composer-visual-gate.md).
 
 ## 10. AXIS: liberar y consumir
@@ -461,16 +481,24 @@ Serie publicada para TASK-1927 y TASK-1928 (tag del repo AXIS → `axis-tokens` 
 | `v0.3.19` | 0.3.19 / 0.3.17 | secciones y quiénes somos (delta (j)) | `3def01768` |
 | `v0.3.20` | 0.3.20 / 0.3.18 | contenido y día a día (delta (k)) | `c3c290e16` |
 | `v0.3.21` | 0.3.21 / 0.3.19 | `cover-brochure` · `document-selection` (delta (l)) | `88ce23831` |
+| `v0.3.22` | 0.3.22 / 0.3.20 | las nueve láminas SEO/AEO (delta (m), TASK-1934) | `ed6995084` |
+| `v0.3.23` | 0.3.23 / 0.3.21 | medidas que pidieron las plantillas SEO/AEO (delta (n)) | `434b10ddb` |
 
-**Pines vigentes** (`package.json`): `@efeoncepro/axis-tokens` `0.3.21`, `@efeoncepro/axis-ui-contracts` `0.3.19`,
+**Pines vigentes** (`package.json`): `@efeoncepro/axis-tokens` `0.3.23`, `@efeoncepro/axis-ui-contracts` `0.3.21`,
 `@efeoncepro/axis-graphic-line` `0.7.0`, `@efeoncepro/axis-brand-assets` `0.3.5`, `@efeoncepro/axis-ui-registry`
-`0.3.1`. Transitivos: `axis-ui-contracts` 0.3.19 fija `axis-tokens` 0.3.21 exacto; `axis-graphic-line` 0.7.0 sigue
+`0.3.1`. Transitivos: `axis-ui-contracts` 0.3.21 fija `axis-tokens` 0.3.23 exacto; `axis-graphic-line` 0.7.0 sigue
 fijando `axis-tokens` 0.3.12 y `axis-ui-contracts` 0.3.10, que el lockfile instala sólo para él.
 
 Cambios de contrato de la serie TASK-1928 (aditivos, misma 0.1.2): una composición puede declarar `progress: false`;
 `voice.maxWords` por receta (el testimonio cita hasta seis palabras; el resto sigue en tres); pasos sin íconos
 (`steps.icons: false`) y con mínimo (`steps.min`); colores por nombre de paleta; `section-cine` ganó `about` y
 `purpose`; `content-day` ganó `tools`, `live-progress` y `live-results`; `cover-brochure` ganó `document-selection`.
+Serie TASK-1934 (aditiva, misma 0.1.2): siete recetas nuevas `approved` en estilo «vivo» (`deckLiveVoice`,
+`deckStage`, `deckPlatform`, `deckGlass`); reglas `generic-ai-interface` e `illustrative-data-marked`; `proposal-service`
+admite un plate de cine en la lente; `proposal-cinematic` suma `reserves.note`/`type.note` y `bodyUnderSelection`
+(648 px, 25 px en 640); y, en `v0.3.23`, las medidas que las plantillas encontraron al construirse (entre ellas
+`questionWrapChars` 20 en `decision-traffic-to-revenue` y `decision-diagnosis-map`, y la ventana trasera de
+`decision-ai-answer` en 860 con 450 de ancho).
 
 Secuencia para subir AXIS (detalle y credenciales en
 [`AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`](../operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md)):
@@ -531,10 +559,10 @@ Código: `src/lib/brand-surfaces/deck-recipes/` (`index.ts`, `catalog.ts`, `cata
   `recipe-map.json` asigna a cada receta. Lleva `$comment` de «GENERADO, no se edita a mano». Pesa ~200 KB.
 - Esquema `efeonce.deck-recipes.runtime.v1`: `source` (`schema`, `version`, `approvedAt` del JSON aprobado; hoy
   `efeonce.deck-slide-recipes.v1` 1.0.0, aprobado el 2026-09-27), `axisRecipeFamilies` (las cinco familias de AXIS:
-  `cover-classic`, `close-classic`, `proposal-cinematic`, `section-cine`, `cover-brochure`) y `recipes`: las **69**,
+  `cover-classic`, `close-classic`, `proposal-cinematic`, `section-cine`, `cover-brochure`) y `recipes`: las **78**,
   todas con `template` y con página de AXIS.
 - Por receta sólo campos estructurados, nunca las notas en prosa: `id`, `name`, `family`, `documents`, `surface`,
-  `photo { uses, plate }` (el plate es la ruta del archivo; `null` si la lámina no lleva foto: 42 de 69 llevan),
+  `photo { uses, plate }` (el plate es la ruta del archivo; `null` si la lámina no lleva foto: 44 de 78 llevan),
   `pairs { coverClose, variant, sequence }` (desde `pairsWith` por relación), `slots [{ name, type, required,
   maxChars }]`, `template` (el `contentType` de `recipe-map.json`, o `null`) y `axis { recipe, layout, role, theme,
   uses, progress, page }`. `page` es el intent de ejemplo **sin** lo que propaga el documento (`contract`, `version`,
@@ -583,7 +611,7 @@ Pura, determinista e isomórfica: no lee archivos, no llama a la red, no escribe
 3. **Reglas del catálogo** (`source: 'catalog'`), las que AXIS no conoce (tabla de §12.4).
 
 Greenhouse no reimplementa ninguna regla de AXIS (§1): el piso es AXIS, y el catálogo sólo agrega lo que el contrato no
-sabe del catálogo de recetas (ids, documentos por receta, parejas, variantes, plates, slots y ritmo).
+sabe del catálogo de recetas (ids, documentos por receta, parejas, variantes, plates, slots, cifras con fuente y ritmo).
 
 ### 12.4 Códigos del catálogo
 
@@ -598,14 +626,15 @@ sabe del catálogo de recetas (ids, documentos por receta, parejas, variantes, p
 | `frame-count` | error | más de una portada o más de un cierre (cubre también «el eslogan dos veces») |
 | `frame-order` | error | la portada no es la primera o el cierre no es el último; se omite si AXIS ya dijo `brochure-cover-first` o `brochure-close-last` |
 | `pair-cover-close-mismatch` | error | el cierre no es pareja aprobada (`pairsWith` `cover↔close`, por id o por familia de AXIS) de la portada; sólo si alguna de las dos declara parejas |
-| `next-steps-after-diagnosis` | error | `decision-next-steps` en una propuesta con `diagnosisDone: true` |
-| `variant-adjacent` | error | dos variantes de la misma lámina (`pairsWith` `variant`) **seguidas**; dos portadas o dos cierres ya los rechaza `frame-count` |
+| `next-steps-after-diagnosis` | error | una receta de la familia `next-steps` (`decision-next-steps`, `decision-diagnosis-map`) en una propuesta con `diagnosisDone: true` (desde TASK-1934 se decide por familia, no por id) |
+| `variant-both-in-deck` | error | dos variantes de la misma lámina (`pairsWith` `variant`, en cualquiera de las dos direcciones) en el mismo plan, **seguidas o no**; se reporta en la segunda. Reemplaza a `variant-adjacent` (TASK-1934, decisión del operador del 2026-09-28); dos portadas o dos cierres ya los rechaza `frame-count` |
 | `plate-repeated` | error | el mismo plate (el `plateRef` de la lámina o el de la receta) en dos láminas del plan |
 | `slot-unknown` | error | un slot que la receta no tiene (por ejemplo, un eslogan en una portada: ninguna portada tiene ese slot) |
 | `slot-type-invalid` | error | el valor no calza con el tipo del slot (texto para `text`/`richText`/`enum`/`date`, lista para `list`, escalar u objeto para `number`/`money`/`metric`) |
 | `slot-required-missing` | error | falta un slot obligatorio (vacío, `null`, texto en blanco o lista vacía) |
 | `slot-over-max-chars` | error | supera `maxChars`: `text`, largo total; `richText`, por línea (salto o `<br>`) y sin `**` ni etiquetas; `list`, por ítem |
-| `recipe-without-template` | warning | la lámina no tiene plantilla en el composer: una receta sin ella (hoy ninguna de las 69; se prueba con un catálogo simulado) o la portada/cierre clásicos de AXIS que el plan admite en pitch y QBR (`cover-classic`, `close-classic`): el plan es válido, pero ese deck no se compone de punta a punta |
+| `figure-source-missing` | error | una cifra (objeto con `value`) en un slot del plan sin `source`, o un ítem así en una lista (TASK-1934). Límite conocido: una cifra escrita como texto plano en un slot `metric` («68 %») no se detecta |
+| `recipe-without-template` | warning | la lámina no tiene plantilla en el composer: una receta sin ella (hoy ninguna de las 78; se prueba con un catálogo simulado) o la portada/cierre clásicos de AXIS que el plan admite en pitch y QBR (`cover-classic`, `close-classic`): el plan es válido, pero ese deck no se compone de punta a punta |
 | `section-split-corner-adjacent` | warning | dos `section-split` seguidas con la misma esquina (sin `layout`, cuenta como `corner-top`) |
 | `rhythm-paper-run` | warning | tres láminas de papel (`theme: 'light'`) seguidas; un solo aviso por tramo, en la tercera |
 
@@ -681,13 +710,14 @@ aviso `rhythm-paper-run`.
 
 | Archivo | Qué asegura |
 |---|---|
-| `validate.test.ts` | el catálogo tiene 69 de 69 recetas con plantilla y página de AXIS; los planes golden de brochure, propuesta, pitch y QBR pasan sin issues; los 13 casos adversariales; un caso que dispara y otro que no por cada código; «una regla, una voz» contra AXIS; ningún módulo de `src/` abre el JSON de `docs/` con `fs` |
+| `validate.test.ts` | el catálogo tiene 78 de 78 recetas con plantilla y página de AXIS; los planes golden de brochure, propuesta, pitch y QBR pasan sin issues; los 15 casos adversariales; `variant-both-in-deck` con las dos propuestas SEO separadas (y sin falso positivo con `proposal-service-seo` + `proposal-service-aeo`); `figure-source-missing` en `figures`; un caso que dispara y otro que no por cada código; «una regla, una voz» contra AXIS; ningún módulo de `src/` abre el JSON de `docs/` con `fs` |
 | `recipe-without-template.test.ts` | el aviso con un catálogo simulado; los golden de pitch y QBR lo verifican en sus marcos clásicos |
 | `catalog-drift.test.ts` | corre `pnpm brand:deck-recipes -- --check`: el artefacto coincide con el JSON aprobado y los ejemplos |
 | `propose.test.ts` | con el cliente canónico simulado: golden, el enum de ids del documento, reintento, rechazo tras el reintento, proveedor caído, receta inventada y la allowlist del contexto |
 
-Fixtures: `golden-brochure.json` (7 láminas), `golden-proposal.json` (9), `golden-pitch.json` (6), `golden-qbr.json`
-(5), `adversarial.json` (13 casos) y `context-brochure.json` (el contexto de la corrida real). La task registra 52 tests
+Fixtures: `golden-brochure.json` (7 láminas), `golden-proposal.json` (9), `golden-pitch.json` (6; desde TASK-1934
+lleva `content-measure` en vez de `content-text`, que es variante de `decision-why-us`), `golden-qbr.json`
+(5), `adversarial.json` (15 casos) y `context-brochure.json` (el contexto de la corrida real). La task registra 52 tests
 verdes.
 
 ### 12.9 Fronteras
@@ -723,4 +753,14 @@ verdes.
   `plateRef`.
 - **Preguntas abiertas de TASK-1919 y TASK-1927** (lente del caminero, barrido del indicador de la sección partida, etc.):
   norma §7.
+- **TASK-1934 (en curso):** los frames del gate de las siete plantillas SEO/AEO y el re-congelado de
+  `ProposalCinematic` esperan la aprobación visual del operador (`--freeze` single-owner); el plate SE1 se declara por
+  ruta local y se siembra en el banco de TASK-1931; `figure-source-missing` no ve una cifra escrita como texto plano en
+  un slot `metric`.
+- **Las cinco `proposal-cinematic` sin mapa de slots** (`slots: null` en `recipe-map.json`): la plantilla cine admite
+  textos más largos que los de cada receta; el freno es `slot-over-max-chars` de `validateDeckPlan`, probado con un
+  fixture adversarial. Mapearlas juntas: TASK-1933.
+- **`questionWrapChars` es una aproximación por caracteres:** decide si la pregunta de una lámina «viva» baja a dos
+  líneas contando caracteres, no midiendo el texto. En TASK-1934 falló con preguntas de 21–22 caracteres que sí bajan a
+  dos líneas a 470 px; AXIS `v0.3.23` lo fijó en 20 para `decision-traffic-to-revenue` y `decision-diagnosis-map`.
 - **Salida PPTX:** no existe para este catálogo (depende de la matriz de TASK-1395).

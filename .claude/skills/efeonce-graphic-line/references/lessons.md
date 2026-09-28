@@ -178,8 +178,10 @@
   el catálogo, `proposal-cinematic-nexa-lines` lista la **portada** como su secuencia: una regla «A antes que B»
   habría disparado avisos falsos. Regla: `sequence` dice qué láminas van juntas, no en qué orden; no hay código de
   orden y no se inventa uno sin que el catálogo declare dirección.
-- **`variant` significa «no seguidas», no «una por deck».** El validador rechaza dos variantes de la misma lámina
-  adyacentes (`variant-adjacent`); separadas, pasan. Dos portadas o dos cierres ya los rechaza `frame-count`.
+- **`variant` significaba «no seguidas», no «una por deck».** El validador rechazaba dos variantes de la misma lámina
+  adyacentes (`variant-adjacent`); separadas, pasaban. **Superada el 2026-09-28 (TASK-1934):** el operador decidió que
+  son alternativas y nunca van juntas; hoy rige `variant-both-in-deck` (ver la entrada de abajo). Dos portadas o dos
+  cierres siguen en `frame-count`.
 - **El reintento con los issues funciona.** La corrida real de `--propose` (brochure, 2026-09-28) propuso primero un
   plan sin página de servicio; AXIS lo rechazó con `brochure-needs-service-page` y el único reintento, con ese issue
   como `fixTheseIssues`, lo corrigió: 16 láminas válidas, ≈ USD 0,09. Regla: el modelo recibe los códigos tal cual;
@@ -197,6 +199,41 @@
   pitch y QBR y avisa `recipe-without-template` en esas dos láminas (el composer no tiene plantilla para ellas): el
   plan vale, pero ese deck no se compone de punta a punta y los marcos siguen sin aprobación del operador. Regla: en pitch o QBR, pregunta
   qué marco usar.
+
+## 2026-09-28 (las nueve láminas SEO/AEO, TASK-1934)
+
+- **Al construir la plantilla aparecen largos que el catálogo subestimaba.** Síntoma: el copy aprobado de la
+  referencia no cabía en el `maxChars` que el catálogo había medido (`ownTeamTitle` de `decision-difference` pedía 25
+  y el catálogo decía 19; `builtWith` de `method-eeat`, 44 contra 42). Causa: el largo se midió antes de que existiera
+  la plantilla. Regla: al escribir la plantilla, mide los largos **del copy aprobado** y corrige la receta (y su
+  paridad) si el catálogo quedó corto; nunca recortes el copy aprobado para que calce con una medida vieja.
+- **`questionWrapChars` cuenta caracteres, no mide texto.** Síntoma: preguntas de 21–22 caracteres que en la
+  referencia bajan a dos líneas a 470 px quedaban en una, porque el umbral por conteo las dejaba pasar. Regla: el
+  umbral se fija contra la referencia medida (AXIS `v0.3.23` lo dejó en 20 para `decision-traffic-to-revenue` y
+  `decision-diagnosis-map`) y se mira el renderizado de cada pregunta real cerca del borde; el conteo es una
+  aproximación.
+- **Subir la respuesta al 3× puede chocar con el escenario.** Síntoma: al llevar las respuestas de DeckIARespuesta,
+  DeckDiferencia y DeckEEAT a 120 px, en DeckIARespuesta «competencia.» tocó la ventana trasera. Regla: cuando una
+  respuesta crece por la norma, se vuelve a medir el escenario vecino y el ajuste entra en AXIS como medida (la
+  ventana trasera se corrió a 860 y se angostó a 450, con su borde derecho en 1310), nunca achicando la respuesta ni
+  moviendo la órbita.
+- **Un slot opcional nuevo en una plantilla compartida tiene dos caras.** Síntoma (lo encontró el operador, no el
+  gate): la nota del pie que TASK-1934 sumó a `proposal-cinematic` emitía sus medidas sólo cuando había nota, y la
+  propuesta creativa **sin** nota dejó de componer (el renderer resuelve todos los campos del frame y fallaba con
+  gl-css «undefined»). Causa: el probe del gate rellena siempre todo slot opcional, así que **el gate nunca ejercita
+  el camino «ausente»**, y los snapshots de planes no renderizan. Es la misma clase de hueco que `CoverBrochure` con selección (TASK-1928, entrada de
+  arriba), vista desde el otro lado. Regla: **todo slot opcional nuevo necesita un test que componga una receta
+  existente SIN el slot** (corregido en `af32d9353`: las medidas van siempre y sólo el texto es opcional; test
+  `src/lib/brand-surfaces/__tests__/proposal-cinematic-note.test.ts`, con la página creativa sin nota y la AEO con
+  nota).
+- **`variant` ahora significa «una por deck».** Decisión del operador: dos recetas de un par `variant` son
+  alternativas y nunca van juntas, seguidas o no (`variant-both-in-deck` reemplaza a `variant-adjacent`). Regla: al
+  cambiar una regla del validador, barre los goldens: `golden-pitch.json` llevaba `content-text` y `decision-why-us`
+  separadas y tuvo que cambiar `content-text` por `content-measure`.
+- **Una plantilla compartida no hace cumplir el largo de una sola receta.** `proposal-cinematic-seo` quedó con
+  `slots: null` en `recipe-map.json`, como sus cuatro hermanas de cine: la plantilla admite textos más largos que los
+  de cada receta. Regla: ahí el freno es `slot-over-max-chars` de `validateDeckPlan` (hay un fixture adversarial que
+  lo prueba); mapear las cinco juntas queda para TASK-1933.
 
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 

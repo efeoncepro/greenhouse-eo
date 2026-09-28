@@ -6,7 +6,9 @@
 > `pnpm brand:compose` y harness del gate visual): árbol local de `develop` de greenhouse-eo tras el cierre de
 > TASK-1927 — 2026-09-27; filas de largo, cifras, logos y paridad: `develop` local en `64be8aa16` (TASK-1928) —
 > 2026-09-27; fila de la portada con selección (`document-selection`, AXIS `v0.3.21`), filas de ítem, respuesta,
-> plate repetido, prefijo CSS, auditoría renderizada y slot opcional — `develop` en `c58a94ccb`, 2026-09-28.
+> plate repetido, prefijo CSS, auditoría renderizada y slot opcional — `develop` en `c58a94ccb`, 2026-09-28; filas de
+> las láminas SEO/AEO, `variant-both-in-deck`, `figure-source-missing` y el camino «ausente» de un slot opcional —
+> `develop` tras `af32d9353` (TASK-1934, AXIS `v0.3.23`), 2026-09-28.
 >
 > Cada ítem dice **cómo se verifica**. «Automático» = lo hace fallar un comando o una función; «Revisión» = hay que
 > mirar el cuadro real (el adapter de Greenhouse lo marca `manual`). Una pieza no se entrega con un ítem en rojo, y
@@ -183,7 +185,8 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 
 | | Chequeo | Cómo se verifica |
 |---|---|---|
-| [ ] | **Antes de componer**, el plan del deck (ids de receta en orden) pasó `pnpm brand:deck-plan -- --plan plan.json` con **cero errores** y los avisos se leyeron (`rhythm-paper-run`, `section-split-corner-adjacent`) | Automático: exit 1 con cualquier error (`frame-order`, `variant-adjacent`, `plate-repeated`, `slot-over-max-chars`, los de AXIS…); los avisos, revisión |
+| [ ] | **Antes de componer**, el plan del deck (ids de receta en orden) pasó `pnpm brand:deck-plan -- --plan plan.json` con **cero errores** y los avisos se leyeron (`rhythm-paper-run`, `section-split-corner-adjacent`) | Automático: exit 1 con cualquier error (`frame-order`, `variant-both-in-deck`, `plate-repeated`, `slot-over-max-chars`, `figure-source-missing`, los de AXIS…); los avisos, revisión |
+| [ ] | El deck lleva **una sola** lámina de cada par `variant` (tabla o escena o cotización en vivo; escalera o BeX plana; propuesta SEO sobria o de cine), aunque vayan separadas | Automático: `variant-both-in-deck` en el plan |
 | [ ] | La receta tiene plantilla y el `layout` va explícito en el intent | Automático: el comando falla con `recipe-not-approved`, `recipe-without-template`, `layout-invalid` o `layout-not-in-recipe` |
 | [ ] | La pieza nace de un intent propio, fuera de `src/lib/brand-surfaces/examples/` | Revisión; automático: `src/lib/brand-surfaces/__tests__/example-plans.test.ts` falla si se editó un ejemplo |
 | [ ] | La foto viene declarada con `photo.plateRef` y `photo.alt`; el `alt` describe la escena, no el copy | Automático: `missing-photo`; revisión del texto del `alt` |
@@ -194,7 +197,10 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 | [ ] | En portadas de propuesta, `clientLogo` trae `alt`; sin `clientLogo` sale el marcador «Logo del cliente» | Automático (el `alt`); revisión |
 | [ ] | Tríptico: una palabra por toma | Automático: `invalid-intent` |
 | [ ] | Ningún texto excede el largo del catálogo (el `maxChars` de la receta = `maxCharacters` del `slots.json`) | Automático: el compositor rechaza (`overflow=reject`); paridad en `recipe-slot-parity.test.ts` |
-| [ ] | Toda cifra llega por `figures` con su fuente real y la lámina imprime «Fuente: …»; montos como `[MONTO]`; el contacto sale de `EFEONCE_CONTACT` | Revisión del intent y de la lámina; sin fuente real, se quita la cifra |
+| [ ] | Toda cifra llega por `figures` con su fuente real y la lámina imprime «Fuente: …»; montos como `[MONTO]`; el contacto sale de `EFEONCE_CONTACT` | Automático: `figure-source-required` (AXIS) al componer y `figure-source-missing` en el plan para una cifra escrita como objeto con `value`; una cifra en texto plano en un slot `metric` («68 %») no la ve ninguno: revisión |
+| [ ] | Láminas SEO/AEO con datos de muestra (`decision-ai-answer`, `decision-diagnosis-map`): la marca «Ejemplo ilustrativo» / «Datos de muestra» está visible, o el intent dice `dataOrigin: "client"` con su `evidenceRef` | Automático: `invalid-intent` sin la marca o sin la evidencia |
+| [ ] | La interfaz de IA es genérica: ni logo, ni color, ni burbuja, ni composer de ChatGPT, Gemini u otro motor; los nombres de motores sólo como texto en el diagnóstico | Automático en la plantilla (test: sólo SVG, sin nombres ni colores de productos); revisión de lo que agregue el intent |
+| [ ] | Las cifras de `decision-ai-market` (máximo tres) salen de un documento citado (hoy `aeo-landing-elementor.md` §market), nunca de memoria | Revisión del intent contra la fuente |
 | [ ] | Logos de clientes y partners sólo de quienes autorizan su uso, normalizados por el compositor (un tono, mismo peso óptico; excepción tonal de Aguas Andinas y UC Temuco) | Revisión |
 | [ ] | Documento: portada y contraportada alternan foto y sin foto; el conjunto pasa sin un solo issue | Automático: `frame-photo-must-alternate` y los demás códigos de documento; un issue deja al documento sin plan |
 | [ ] | Portada con selección (`cover-brochure-cine-lines-selection`): va con `layout: 'document-selection'`; la selección cae sobre la respuesta («Crecer.»), nunca sobre la persona, con un solo cursor «Nexa»; sin burbuja URL | Automático: con `document` o `line` AXIS rechaza la selección (`selection-not-in-recipe`); el resto, revisión a ojo |
@@ -208,12 +214,13 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 
 | | Chequeo | Cómo se verifica |
 |---|---|---|
-| [ ] | `pnpm composer:visual-gate --catalog=graphic-line` pasa a 0 px (66 frames desde TASK-1928) | Salida del comando |
+| [ ] | `pnpm composer:visual-gate --catalog=graphic-line` pasa a 0 px (66 frames desde TASK-1928; los de las siete plantillas SEO/AEO de TASK-1934 y el re-congelado de `ProposalCinematic` se congelan tras la aprobación visual del operador) | Salida del comando |
 | [ ] | Toda alta o cambio de frame está declarado en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` | Revisión (entradas 2026-09-27 (b)–(e) para TASK-1927; (f) y (h)…(m), y 2026-09-28 (n) para TASK-1928; la (g) es Glitch) |
 | [ ] | Una receta nueva con plantilla declara sus `slots` en `recipe-map.json` y pasa la paridad | Automático: `src/lib/brand-surfaces/__tests__/recipe-slot-parity.test.ts` |
 | [ ] | La plantilla nueva estrena su prefijo CSS (nunca reusa uno), su builder mezcla el token base con el de la composición y devuelve su `contentType` | Revisión del HTML y del builder; automático: la lámina cae en la plantilla por defecto si falta el `contentType` |
 | [ ] | La auditoría renderizada pasa: acento nunca en texto < 24 px (D1) y respuesta ≥ 3× la pregunta en las láminas de la lista de `graphic-line-shared/rendered-audit.ts` (agrega ahí una lámina de decisión nueva) | Automático: el gate aborta con la violación |
 | [ ] | Un slot nuevo, aunque sea opcional, se declaró en `BASELINE_DELTAS.md` y su frame se re-promovió (el probe rellena todo slot no fijo) | Revisión + `--freeze` scoped (runbook §4bis) |
+| [ ] | **Un slot opcional nuevo en una plantilla compartida tiene un test que compone una receta existente SIN el slot.** El probe del gate siempre lo rellena, así que el gate nunca ejercita el camino «ausente», y los snapshots de planes no renderizan | Automático sólo si el test existe (patrón: `src/lib/brand-surfaces/__tests__/proposal-cinematic-note.test.ts`); si no, el gate queda verde con la receta vieja rota ([lessons.md](lessons.md), TASK-1934) |
 | [ ] | La lámina compuesta con el ejemplo se comparó a ojo con su referencia aprobada y toda diferencia por norma quedó declarada | Revisión + entrada en `BASELINE_DELTAS.md` y [ledger.md](ledger.md) |
 | [ ] | Una plantilla con logo de cliente se prueba con el asset sintético `file:probe` de `GRAPHIC_LINE_PROBE_ASSETS` (`scripts/artifact-composer/visual-gate.ts`), nunca con el logo de un cliente real | Revisión del harness |
 | [ ] | Un slot opcional que el probe debe omitir lleva `"example": null` en su `slots.json` (así el frame de la portada de propuesta muestra el marcador y no el logo) | Revisión del `slots.json` |
