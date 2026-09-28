@@ -340,17 +340,26 @@ desde la toma, que explica **desde dónde miramos**. Los rechazos del 2026-09-28
 | Dorso del portátil abierto del cliente y un cuaderno | «Se ve como un cuadrado» | **Soporte prohibido** desde el 2026-09-17 («tapa de portátil asomando sobre la mesa», firma §9) |
 | Cubierta de mesa desenfocada en 16:9 (lecho del 16 %) | El canto quedó al 83 % y la firma del blog (25 % del lado corto, caja 85–91 %) casi sin aire | El porcentaje del formato no basta: se mide el canto contra la caja de la firma de ESE formato |
 
-**Piloto que funcionó (pendiente de aprobación del operador):** `MC1h-45-portada-consola` — Nexa vista desde el
-puesto de una consola de monitoreo: *«We watch her from the operator's seat of a dark monitoring console that faces
-the space: the lens is only a few centimetres behind the near edge of the console, whose low, flat surface with rows
-of unlit keys and faders crosses the whole bottom of the frame, outside every light, with no screens and nothing lit
-on it»*. Las teclas se leen como objeto aunque estén desenfocadas; el canto iluminado termina en y≈1200 de 1350, y la
-firma, ubicada sobre el plate con centro al 93,5 % (caja 1237–1288), cae en la materia oscura con ≈37 px de aire:
-**17,6:1** en el peor píxel. Con el margen de 9 % (caja desde 1202) quedaba pegada al canto.
+**Rechazado también, y es la regla más fina: el lecho tiene que ser NATIVO de la imagen** **[operador,
+2026-09-28]**: *«esa consola que pusiste es en efecto una consola de sonido… El lecho debe ser una superficie no
+forzada, sea un objeto o lo que sea; no debe verse sólo compuesto sino sentirse nativo de la imagen»*. `MC1h` pedía
+«una consola de monitoreo con teclas y deslizadores» delante de Nexa: el modelo hizo una consola de sonido, un objeto
+que la escena no traía y que se lee agregado para sostener la firma. **La pregunta no es «qué objeto pongo», sino
+«qué hay de verdad entre la cámara y el sujeto en ESTA escena».** En un espacio abierto (Nexa de pie entre miles de
+tarjetas) lo único que existe es el **piso**; en una reunión, **la mesa**; en un rodaje, **el equipo**.
+
+**Piloto vigente (pendiente de aprobación):** `MC1i-45-portada-piso` — el piso del mismo espacio, con la cámara baja:
+*«the camera is LOW, about forty centimetres above the floor and about four meters from her… She stands on the floor
+of that same space: dark, matte, slightly rough stone, outside every light and outside any reflection of the beam;
+the nearest part of that floor, just in front of the low lens, falls softly out of focus across the whole bottom of
+the frame and hides her knees and feet»*. Es la familia «piso oscuro» del registro (§9.2, `BR1`/`BR3`). Canto en
+y≈1215 de 1350; firma con centro al 93,5 % (caja 1237–1288): **15,5:1** en el peor píxel. La banda genérica de
+`foto:validar` da 3,84 ✗ porque incluye el canto: manda la caja real del logo.
 
 **Cómo se escribe y se verifica un lecho cine, en orden:**
-1. Elegir el objeto por la historia de la toma (¿desde qué puesto del trabajo miramos?), del catálogo de lechos o de
-   su familia; en un carrusel, **familias distintas** entre piezas.
+1. Preguntar **qué hay de verdad entre la cámara y el sujeto en esta escena** (el piso del espacio, la mesa de la
+   reunión, el equipo del rodaje) y elegir eso, no un objeto traído para sostener la firma; del catálogo de lechos o
+   de su familia; en un carrusel, **familias distintas** entre piezas.
 2. Escribirlo con **nombre, materia y la cámara anclada**; tono declarado; **fuera de toda luz y de todo reflejo**, y
    sin pantallas encendidas que lo iluminen.
 3. No sumar listas de vacíos que le quiten materia al objeto; prohibir sólo lo que compite con el sujeto.

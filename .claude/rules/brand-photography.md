@@ -68,8 +68,9 @@ compuesto, plantilla de ficha y trampas del compilador. Cárgalo antes de escrib
 🔴 **En cine el lecho es un OBJETO EXCUSA, nunca una banda** **[operador, 2026-09-28]**: objeto del oficio con nombre
 y materia, cámara anclada a él (*«the lens only a few centimetres behind its near edge»*), fuera de toda luz. Una mesa
 «matte black» en un «empty studio, no notebooks» sale como banda de blur; las cabezas del público a 2 m/85 mm tapan al
-sujeto (sólo sirven con tele 200 mm); la tapa o el dorso de un portátil está prohibido. Se mide el canto contra la
-caja de la firma del formato. Casos y piloto: design-studio, `efeonce-photographic-language.md` §3 («El lecho en el
+sujeto (sólo sirven con tele 200 mm); la tapa o el dorso de un portátil está prohibido; y un objeto traído para sostener la firma (una «consola de monitoreo»
+salió consola de sonido) se lee compuesto: **el lecho es lo que de verdad hay entre la cámara y el sujeto en esa escena**
+(el piso del espacio, la mesa de la reunión). Se mide el canto contra la caja de la firma del formato. Casos y piloto: design-studio, `efeonce-photographic-language.md` §3 («El lecho en el
 registro cine»).
 
 🔴 **El lecho de la firma lo mata el REFLEJO, no la luz directa** **[medido 2026-09-22]**. Una vitrina de
