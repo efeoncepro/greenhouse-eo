@@ -8,7 +8,7 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1845 | Domain, evidence, adapters, lanes, MCP, gateway federation | **complete** | Cloud SQL (single instance), Vercel staging + Production (generation ON), gateway v1.5.0, Entra scope | 2026-09-16 |
 | TASK-1846 | Durable rendering + Artifact Worker (RenderRun / InsightOutput), outputs port | **complete** | Cloud SQL (migrations applied), Vercel staging + Production (render ON), Cloud Run Job `artifact-worker` (first productive deploy in release `917491fd02e4`) + `ops-worker` dispatcher (flag ON, shared by staging/prod), gateway v1.6.0 deployed | 2026-09-16 |
 | TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | **complete** (in production since 2026-09-24, release `ebb9212a32ce`; first productive A4 + deck render 2026-09-25) | Job `artifact-worker` in staging and production: `report_pdf` on `insights-report`, `deck_pdf` on `insights-deck` (cutover 2026-09-22 staging, 2026-09-24 production) | 2026-09-25 |
-| TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — sharing ON; delivery/schedules OFF in production** | Cloud SQL (4 migrations applied); release `bda1cf2cd938` (2026-09-18, Vercel + 6 Cloud Run); staging flags ON; Production sharing ON since TASK-1875 (`greenhouse-cssemzyzb`), delivery/schedules/issuance OFF; gateway `efeonce-mcp` 1.7.0 (rev `00055-gk6`, 58 tools); 2026-09-28: zero double send verified on real rows + attachment `email_delivery_id` fix (`8882af0e3`, resolved by `source_event_id`); open (other owners): in-app/Teams (690–693), portal route (1849), ISSUE-174 follow-up, MCP negatives need a human session | 2026-09-28 |
+| TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — sharing/issuance ON; delivery/schedules OFF in production** | Cloud SQL (4 migrations applied); release `bda1cf2cd938` (2026-09-18, Vercel + 6 Cloud Run); staging flags ON; Production sharing ON since TASK-1875 (`greenhouse-cssemzyzb`) and issuance ON since 2026-09-28 (`greenhouse-onfkul43q`), delivery/schedules OFF; gateway `efeonce-mcp` 1.7.0 (rev `00055-gk6`, 58 tools); 2026-09-28: zero double send verified on real rows + attachment `email_delivery_id` fix (`8882af0e3`, resolved by `source_event_id`); open (other owners): in-app/Teams (690–693), portal route (1849), ISSUE-174 follow-up, MCP negatives need a human session | 2026-09-28 |
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
 | TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | **complete** (2026-09-28, closure `df6f37ccd`) | Think `main` `544ecd4` (production); Greenhouse Production model 1.0 + `INSIGHTS_SHARING_ENABLED=true` in Ready deployment `greenhouse-cssemzyzb` (`dpl_Adau69P3EwsUCoLh6J8bTNKhQqbr`); WAF exception applied without drift at 20 req/10 s/IP; ecosystem canary green on `EO-INS-000014`, grant revoked; Greenhouse 1.1 remains in staging (`13fd47381`), no production release performed | 2026-09-28 |
 | TASK-1888 | Editorial contract v2: `ChartSpec` 7 → 15 families, per-figure reading and hero figure in the plan, `channelId`, per-org cover preference + sealed cover, flag `INSIGHTS_EDITORIAL_V2_ENABLED` | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af`; gateway efeonce-mcp v1.9.0 (rev `00062-ct5`); flag ON in Vercel staging (`greenhouse-9t9fwhrvz`), Vercel Production (`greenhouse-8hl5hf54w`) and ops-worker (`00719-gbm`) | staging internal editions Berel `insed-56226fa1…` / Sky `insed-1e003760…` with sealed v2 plan; Production synthetic canary `insed-f5768172…` sealed 3 scope lines + cover (first canary `insed-356e948c…` sealed v1 before the env value fix) |
@@ -50,8 +50,10 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 **Synthetic editions alive:** `EO-INS-000002` (staging), `EO-INS-000003` (production). All created for the sandbox
 org; earlier `000012..15` were deleted by the rollback rehearsal on purpose.
 
-**Deliberately not built:** outputs (PDF/deck/web), issuing (flag OFF + port `not_ready`), AI authoring ON, portal
-UI, client grants of the write scope, real-client integration (Berel/Sky — deferred to EPIC-046 P01).
+**Historical foundation boundary (superseded by later tasks):** outputs (PDF/deck/web), issuing (flag OFF + port
+`not_ready`), AI authoring ON, portal UI and client grants of the write scope were not built in TASK-1845. Outputs,
+sharing and issuance are now live. The EPIC-046 P01 audience condition was covered by TASK-1852 (people and services
+defined); human opening remains.
 
 **Hand-off to TASK-1846:** connect `InsightOutputsPort` (`setInsightOutputsPort`) so `issue` can pass; dedupe
 `plan.limits` (repeats "ico: sin datos." per rejection); any worker reading `INSIGHTS_*` must declare it in its
@@ -216,8 +218,12 @@ tiene pipeline PDF); la dedupe de `plan.limits` ya la entregó TASK-1846; los um
 
 ## TASK-1848 — sharing, delivery, schedules (in-progress; sharing ON, delivery/schedules OFF in production)
 
-**Delta 2026-09-28 (TASK-1875).** Production sharing is ON and behavior-verified through Think; delivery, schedules
-and issuance remain OFF. The 2026-09-18 delta below records the original release state and is historical.
+**Delta 2026-09-28 (issuance activation).** Production sharing and issuance are ON; delivery and schedules remain
+OFF. Issuance deployment `greenhouse-onfkul43q` (`dpl_CGuQvQgbJR3UmSjPbertT3FHXg3T`) is Ready and aliased to
+`greenhouse.efeoncepro.com`. Sequential Greenhouse Demo canary: ecosystem verified `ready_for_review` + completed
+`deck_pdf`; the authenticated human App lane issued `insed-5cbe87ef…` with HTTP 200; ecosystem readback confirmed
+`issued`. TASK-1852 covers the EPIC-046 P01 people/service audience definition; only human opening remains. The
+2026-09-18 delta below records the original release state and is historical.
 
 **Delta 2026-09-18 (production) — supersedes the staging delta's "production and gateway out of frontier" and the
 "Deployed where" table below.** Release `bda1cf2cd938` (PR #238, orchestrator `35349506106`, `released` 13:41Z, no retry;
@@ -543,6 +549,13 @@ producción antes de compartir con clientes. Sin flag propio.
 
 ## Sessions (append as you go; newest first)
 
+- **2026-09-28 · TASK-1875 / EPIC-045 · Production issuance ON.** Vercel project
+  `prj_d9v6gihlDq4k1EXazPvzWhSU0qbl`; exact `INSIGHTS_ISSUANCE_ENABLED=true`; Ready deployment
+  `greenhouse-onfkul43q` (`dpl_CGuQvQgbJR3UmSjPbertT3FHXg3T`) with `greenhouse.efeoncepro.com`. Sequential canary
+  used only Greenhouse Demo: ecosystem read `insed-5cbe87ef…` (`ready_for_review`) and completed deck run
+  `irun-5995b21e…`; Julio's authenticated App session issued it with HTTP 200; independent ecosystem readback
+  returned `issued` at `2026-09-28T23:16:28.989Z`. No real-client edition was changed. Rollback: remove the
+  Production env var and redeploy.
 - **2026-09-28 · TASK-1875 · closure and doc sweep.** Closed with `df6f37ccd` (full `pnpm test` 16 474 passed +
   production `pnpm build` green). Think production head `544ecd4` (`b3c5820` color fix, `544ecd4` orbit timings from
   tokens + `scopeLines`). Docs aligned: 1.0 in production vs 1.1 in staging, Lab page pending publication (published

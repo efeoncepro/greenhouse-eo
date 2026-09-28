@@ -8,8 +8,9 @@ internal edition for Sky Airlines (`EO-INS-000022`, run `irun-166f4ed0…`: deck
 
 Production render canary with data: the sandbox org has NO ICO snapshots (`ico_engine.metric_snapshots_monthly`
 returns zero rows for its two spaces), so a new sandbox edition fails in `validating` with `evidence_rejected` — that
-is correct. Use an `internal` edition of a real client with data, only with explicit operator authorization
-(issuance is OFF in production and sharing needs an issued edition, so the client sees nothing). Render is idempotent per live output: an
+is correct. Use an `internal` edition of a real client with data, only with explicit operator authorization.
+Issuance is ON in production since 2026-09-28, so never use this render recipe to emit or expose a real-client
+edition. Render is idempotent per live output: an
 edition whose outputs already exist returns the old run (`200 idempotent:true`).
 
 The Composer's historical global visual set also drifts on clean, unrelated frames (ISSUE-122). Use
@@ -49,10 +50,10 @@ the v2 content (readings, essentials, cover, bands) only exists in plans generat
 
 ## Flags (ledger: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`)
 
-| Flag | Gates | Read in | State 2026-09-16 |
+| Flag | Gates | Read in | Current state |
 | --- | --- | --- | --- |
 | `INSIGHTS_GENERATION_ENABLED` | create / revise / evidence collection | Vercel only (`flags.ts`) | ON staging + Production; Preview OFF |
-| `INSIGHTS_ISSUANCE_ENABLED` | issue (plus human gate and validated outputs) | Vercel | Production OFF (product decision); staging ON since 2026-09-18, operator-authorized for the TASK-1848 canary |
+| `INSIGHTS_ISSUANCE_ENABLED` | issue (plus human gate and validated outputs) | Vercel only (`flags.ts`) | Production ON since 2026-09-28 (`greenhouse-onfkul43q`, human App-lane canary 200); staging ON since 2026-09-18 |
 | `INSIGHTS_AUTHORING_AI_ENABLED` | Gemini rewrite of the plan | Vercel only (ops-worker never reads it: scheduled editions stay deterministic) | ON in Production since 2026-09-26 (canary `EO-INS-000029`, `ai_bounded`, gemini-2.5-flash-lite); staging OFF |
 | `INSIGHTS_SHARING_ENABLED` (TASK-1848) | create share links + public reader (OFF ⇒ create 503 `sharing_disabled`, reader 404) | Vercel | staging ON since 2026-09-18 · Production ON since 2026-09-28 (`greenhouse-cssemzyzb`; TASK-1875 canary green) |
 | `INSIGHTS_DELIVERY_ENABLED` (TASK-1848) | create delivery intent (Vercel, OFF ⇒ 503 `delivery_disabled`) + dispatch (ops-worker) | Vercel + `ops-worker` (default `true` in `deploy.sh`, guarded by `deploy-contract.test.ts`) | 2026-09-18: Vercel staging ON · Production OFF; ops-worker ON (`ops-worker-00695-hrw`, then release `bda1cf2cd938`) |
@@ -81,6 +82,22 @@ deployment created AFTER the variable** (`vercel redeploy <url>`): a deployment 
 Verify the flip by BEHAVIOR (a canary), never by the env listing — an API read did not show the newline. If a worker
 starts reading a flag, declare it in `services/<worker>/deploy.sh` (destructive `--set-env-vars`) and apply live with
 `--update-env-vars`.
+
+### Issuance — Production canary (EXECUTED 2026-09-28)
+
+`INSIGHTS_ISSUANCE_ENABLED=true` is live only in Vercel Production. Project identity was read from
+`.vercel/project.json` as `prj_d9v6gihlDq4k1EXazPvzWhSU0qbl`; the exact value was loaded with `printf`, followed by
+redeploy `greenhouse-onfkul43q` (`dpl_CGuQvQgbJR3UmSjPbertT3FHXg3T`) and Ready/alias readback on
+`greenhouse.efeoncepro.com`. The canary stayed sequential and used only Greenhouse Demo
+(`org-6c09b3a7-cbab-48a9-869e-61d03d1c6291`): the ecosystem lane verified client edition
+`insed-5cbe87ef-06a7-4dfc-a6ca-926fe06456aa` in `ready_for_review` and its `deck_pdf` completed in
+`irun-5995b21e-4c92-4da2-a6a7-398cbbec3995`; the ecosystem lane did not issue. Julio's authenticated human App
+session issued the edition (HTTP 200), and an independent ecosystem readback returned `issued` at
+`2026-09-28T23:16:28.989Z`. Before the flag this command returned `insights_issuance_disabled`.
+
+The EPIC-046 P01 audience precondition is covered by TASK-1852: people and services are defined; the remaining step
+is human opening, not a missing audience contract. Rollback is `vercel env rm INSIGHTS_ISSUANCE_ENABLED production`
+followed by redeploy of the current production deployment.
 
 ### Editorial v2 — Production canary recipe (EXECUTED 2026-09-26)
 
