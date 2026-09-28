@@ -122,7 +122,13 @@ Costos por familia verificados as-of 2026-08-06 en las references (las cifras de
 
 ## Ampliar el allowlist (proceso gobernado)
 
-Estado al 2026-09-28: `ai_optimization` ya es la sexta familia habilitada. Las próximas candidatas son **#1 `content_analysis`** (brand monitoring con sentiment) y **#2 `business_data`** acotada a reviews+listings. `merchant`/`app_data` sólo con cliente e-commerce/app en cartera. `keywords_data` sigue fuera (usar `labs`; excepción: volumen Ads real del ciclo actual). **Content Generation ya no existe en la doc v3** — retirada.
+Estado al 2026-09-28: `ai_optimization` ya es la sexta familia habilitada. El
+[`registro catalog-only`](../../../docs/architecture/GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md)
+enumera las 225 rutas bloqueadas sin convertirlas en autorización: 216 rutas de producto y 9 de infraestructura o
+plantillas. Las próximas candidatas son **#1 `content_analysis`** (brand monitoring con sentiment) y **#2
+`business_data`** acotada a reviews+listings. `merchant`/`app_data` sólo con cliente e-commerce/app en cartera.
+`keywords_data` sigue fuera: usar `labs` para orgánico y evaluarla sólo para Ads, Trends o Clickstream con un caso
+explícito. **Content Generation ya no existe en la doc v3** — retirada.
 
 Pasos para ampliar (todos en el MISMO PR):
 
@@ -131,6 +137,8 @@ Pasos para ampliar (todos en el MISMO PR):
 3. Delta en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §6 (+ ADR delta si cambia la decisión #4).
 4. Consumer con `enforceSeoRunEntitlement` + import de `register-provider-spend` en el entrypoint del runtime + **`consumer` declarado explícitamente** en cada callsite (`seo` o `aeo`; nunca heredar un default — es justo lo que TASK-1696 cerró).
 5. Si el endpoint es GET-por-path, usar `requestDataForSeo`; nunca crear un fetch paralelo ni reenviar un POST durante polling.
+6. Regenerar el registro tras `dataforseo:catalog:sync` y verificarlo con
+   `pnpm exec tsx scripts/dataforseo/generate-enablement-register.ts --check`; documentar una ruta no la habilita.
 
 ---
 

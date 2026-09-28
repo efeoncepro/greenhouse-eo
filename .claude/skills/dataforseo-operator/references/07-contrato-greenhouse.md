@@ -41,8 +41,9 @@ Comportamiento interno clave del transporte:
 | `backlinks` | `/v3/backlinks/` | `true` | perfil de enlaces |
 | `onpage` | `/v3/on_page/` | `true` | site audit, task-based async (POST crea, poll aparte) |
 | `domain` | `/v3/domain_analytics/` | `true` | tecnologías/Whois |
+| `ai_optimization` | `/v3/ai_optimization/` | según método: GET de catálogo/polling sin org; POST real con org | LLM Responses, Scraper, AI Keyword Data y Mentions |
 
-Límites conocidos documentados en el propio registry: (1) GET y POST comparten auth/breaker/allowlist; sólo GET se reintenta y nunca lleva body; (2) `cost` del batch, no por fila; (3) breaker por FAMILIA, no por operación (polls fallando apagan también la creación); (4) `checkDataForSeoConnection` es carril aparte; (5) familias ausentes a propósito: `keywords_data` (usar `labs`) y `business_data` (fuera de alcance).
+Límites conocidos documentados en el propio registry: (1) GET y POST comparten auth/breaker/allowlist; sólo GET se reintenta y nunca lleva body; (2) `cost` del batch, no por fila; (3) breaker por FAMILIA, no por operación (polls fallando apagan también la creación); (4) `checkDataForSeoConnection` es carril aparte; (5) las 225 rutas ausentes a propósito están inventariadas, sin autorización, en `docs/architecture/GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md`.
 
 ## §3 Breaker
 

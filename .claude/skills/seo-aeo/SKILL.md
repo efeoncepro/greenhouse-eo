@@ -265,7 +265,11 @@ Grupo Berel):
   allowlist, breaker, entitlement y ledger. Selecciona el modo según la pregunta:
   - `catalog info|list|search|describe`: descubre rutas, estado ejecutable y shape
     antes de preparar un payload. `catalog_only` significa conocida pero no autorizada;
-    nunca la eludas con una llamada directa.
+    nunca la eludas con una llamada directa. Para evaluar una capacidad futura, consulta el
+    registro exhaustivo `docs/architecture/GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md`:
+    prioriza Content Analysis para brand monitoring y Business Data acotada para local/reputación;
+    Keywords Data sólo para paid/trends/clickstream cuando Labs no alcance; Merchant y App Data
+    esperan un caso e-commerce/app. El registro orienta discovery, no habilita gasto.
   - `research`: keyword mining compuesto. Usa Suggestions + Related, agrega
     Keywords for Site y competidores con `--target`, enriquece candidatas con Labs y
     reserva SERP Standard para finalistas gobernadas. Revisa la matriz candidata y

@@ -6,6 +6,8 @@
 
 Vista funcional: [`dataforseo-research-cli.md`](../documentation/growth/dataforseo-research-cli.md). Manual:
 [`dataforseo-cli.md`](../manual-de-uso/growth/dataforseo-cli.md).
+Registro de rutas todavía no autorizadas:
+[`GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md`](GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md).
 
 ## Context
 
@@ -44,6 +46,8 @@ keywords. Inventario oficial, autorización Greenhouse y disponibilidad runtime 
     pero la selección SERP exige además un archivo de finalistas o aprobación explícita del ranking automático.
 12. `ai-research` consume un panel versionado y conserva separadas las lanes API y consumer surface. Normaliza
     citas, fan-out, entidades y resultados por plataforma sin crear el data product recurrente de TASK-1651-B.
+13. Las rutas `catalog_only` se documentan mediante un registro generado desde el mismo snapshot. El registro
+    clasifica su valor eventual y su gate, pero no amplía el allowlist ni convierte inventario en autorización.
 
 ## Technical architecture
 
@@ -74,7 +78,9 @@ data/dataforseo/endpoints.v3.json
 | Component                                       | Responsibility                                                                                                          |
 | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `scripts/dataforseo/generate-catalog.ts`        | Lee REST WordPress y documentación renderizada oficiales, normaliza rutas v3 concretas y escribe/comprueba el snapshot. |
+| `scripts/dataforseo/generate-enablement-register.ts` | Genera y comprueba el registro exhaustivo de rutas `catalog_only`, propósito eventual y postura de habilitación. |
 | `data/dataforseo/endpoints.v3.json`             | Inventario versionado con digest, método, path, campos, modo y estado ejecutable. Es evidencia, no autorización.        |
+| `GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md` | Backlog trazable de rutas no autorizadas; no es allowlist ni roadmap comprometido. |
 | `src/lib/ai/dataforseo-catalog.ts`              | Loader tipado, búsqueda y mapeo de la familia del proveedor al allowlist cerrado de Greenhouse.                         |
 | `src/lib/ai/dataforseo-cli-presets.ts`          | Builders pequeños para operaciones frecuentes; la identidad de mercado sale de `src/lib/growth/markets`.                |
 | `src/lib/ai/dataforseo-keyword-research.ts`     | Plan, estimación, payloads, extracción/deduplicación y CSV del flujo compuesto de keywords.                             |
@@ -157,9 +163,16 @@ presupuesto, `4` error de task, `5` HTTP/transporte, `6` éxito sin datos y `7` 
 ## Coverage and runtime state
 
 El snapshot del 2026-09-28 contiene 545 rutas oficiales; 320 caen en las seis familias autorizadas: 160 SERP,
-45 Labs, 22 Backlinks, 28 OnPage, 12 Domain Analytics y 53 AI Optimization. Las demás son `catalog_only`.
+45 Labs, 22 Backlinks, 28 OnPage, 12 Domain Analytics y 53 AI Optimization. Las otras 225 son `catalog_only`:
+216 rutas de cinco familias de producto y 9 rutas de infraestructura o plantillas que no son capabilities.
 Cobertura significa que la CLI genérica puede enrutar un payload válido por el transporte gobernado; no significa
 que cada endpoint tenga preset, estimador específico o smoke pagado.
+
+El registro exhaustivo prioriza `content_analysis` para brand monitoring y `business_data` acotada para SEO local
+y reputación. `keywords_data` queda condicional a paid, trends o clickstream cuando Labs no responda la pregunta;
+`merchant` y `app_data` permanecen dormant hasta existir un caso e-commerce o app. Esta clasificación facilita una
+evaluación futura, pero cada habilitación necesita ADR/delta, owner, consumer, migración del CHECK, entitlement,
+cost controls, contrato de datos y canary propio.
 
 `ai_optimization` está operativa en registry, catálogo, transporte y guards. La migración
 `migrations/20260928095506879_task-1651-ai-optimization-family.sql` quedó aplicada el 2026-09-28 y el readback
@@ -199,6 +212,8 @@ la CLI y pertenecen a `TASK-1651-B`.
 ## Fitness functions
 
 - `pnpm dataforseo:catalog:check` detecta drift.
+- `pnpm exec tsx scripts/dataforseo/generate-enablement-register.ts --check` fuerza paridad byte-for-byte entre
+  el snapshot y el registro de rutas no autorizadas.
 - Tests comprueban rutas diarias, allowlist, Perú→2604, AI guards, research, estados task y GET sin body/retry.
 - Tests focales comprueban fingerprints, aislamiento tenant, TTL, costo progresivo, cursor/offset, gobernanza,
   matriz SERP y normalización AI API vs consumer.

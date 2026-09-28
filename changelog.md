@@ -25,6 +25,10 @@
 - `pnpm dataforseo` descubre 545 endpoints oficiales y separa los 320 ejecutables bajo el allowlist vigente de los
   que sólo se pueden consultar en catálogo. Incluye presets diarios, payload por archivo/JSON/stdin, lifecycle async,
   preview por defecto, techo de costo, salida machine-readable y el transporte canónico para GET/POST.
+- Un registro generado documenta las 225 rutas `catalog_only` sin habilitarlas: 216 rutas de producto con propósito
+  eventual y gate por familia, más 9 rutas de infraestructura/plantillas que no son capabilities. Prioriza Content
+  Analysis para brand monitoring y Business Data acotada para SEO local/reputación; Keywords Data queda condicional
+  y Merchant/App Data esperan un caso real.
 - Smokes reales: catálogo AI Mode gratuito (USD 0), AI Mode Perú con `location_code=2604` (USD 0,004) y Organic Chile
   (USD 0,002), todos con task `20000`. Commit local; sin push, deploy ni cambio de flags.
 

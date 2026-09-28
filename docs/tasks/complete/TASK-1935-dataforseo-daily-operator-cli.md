@@ -1,5 +1,13 @@
 # TASK-1935 — CLI diaria y catálogo completo de DataForSEO
 
+## Delta 2026-09-28 — registro exhaustivo de rutas habilitables
+
+El snapshot ahora genera también un registro auditable de las 225 rutas `catalog_only`: 216 rutas de cinco
+familias de producto y 9 rutas de infraestructura/plantillas. Cada path conserva método, uso eventual, postura y
+gate; el registro no amplía el allowlist. `content_analysis` y `business_data` quedan como candidatas priorizadas,
+`keywords_data` como condicional y `merchant`/`app_data` dormant hasta un caso real. El modo `--check` evita drift
+entre el catálogo y el documento.
+
 ## Delta 2026-09-28 — research gobernado y reanudable
 
 Las cinco limitaciones registradas en el ADR quedan resueltas sin ampliar el allowlist: `research` produce matriz
@@ -342,10 +350,12 @@ N/A — cambio repo-only; no compra planes, no rota secretos y no despliega.
 - [x] Cada POST compuesto revalida entitlement y costo observado + siguiente estimación contra `--max-usd`.
 - [x] SERP Standard es default; live y AI Overview son opt-in, y polling nunca resubmite.
 - [x] `ai-research` separa API/consumer y normaliza citas, fan-out, entidades, plataforma, modelo y costo.
+- [x] Las 225 rutas `catalog_only` quedan registradas exhaustivamente con uso eventual y gate, sin habilitarlas.
 
 ## Verification
 
 - `pnpm dataforseo:catalog:check`
+- `pnpm exec tsx scripts/dataforseo/generate-enablement-register.ts --check`
 - `pnpm test -- src/lib/ai/__tests__/dataforseo-catalog.test.ts src/lib/ai/__tests__/dataforseo-cli-presets.test.ts scripts/dataforseo/__tests__/cli.test.ts`
 - `pnpm typecheck`
 - `pnpm lint`

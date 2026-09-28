@@ -9,6 +9,8 @@ keywords justifican análisis SERP y conservar evidencia reproducible en JSON, C
 El contrato técnico vive en
 [`GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md`](../../architecture/GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md)
 y los pasos de operación en [`dataforseo-cli.md`](../../manual-de-uso/growth/dataforseo-cli.md).
+Las rutas conocidas pero todavía no autorizadas viven en el
+[`registro catalog-only`](../../architecture/GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md).
 
 ## Flujos disponibles
 
@@ -40,6 +42,23 @@ declarados. Mentions, Scraper y Responses observan productos distintos y no son 
   distinto falla cerrado.
 - El costo se revalida antes de cada POST usando gasto real acumulado más la estimación del siguiente paso.
 - La CLI sólo ejecuta las familias autorizadas. El catálogo puede describir rutas que siguen bloqueadas.
+
+## Capacidades que podrían habilitarse
+
+El catálogo vigente deja 225 rutas bloqueadas: 216 pertenecen a familias de producto y 9 son infraestructura o
+plantillas documentales. No son herramientas disponibles ni un roadmap comprometido. El registro exhaustivo
+conserva método, path, propósito eventual y gate de cada una.
+
+- `content_analysis` (10) podría servir para menciones web, sentimiento y tendencias de marca.
+- `business_data` (52) podría apoyar SEO local, listings, reviews, Q&A y reputación por fuente.
+- `keywords_data` (74) podría complementar paid media, estacionalidad y clickstream; Labs sigue siendo el default
+  para research orgánico.
+- `merchant` (40) podría habilitar inteligencia de Google Shopping y Amazon para clientes e-commerce.
+- `app_data` (40) podría habilitar ASO, charts, fichas y reviews cuando exista un caso de producto móvil.
+
+Las 9 restantes no se habilitan como producto: Appendix requiere contratos de infraestructura explícitos y las
+plantillas `$path`/`$path.ai` son artefactos del extractor. Cualquier familia nueva exige una decisión separada;
+su presencia en este registro no autoriza llamadas, gasto ni exposición en la CLI.
 
 ## Qué no entrega
 

@@ -33,17 +33,28 @@ pnpm dataforseo -- catalog info
 pnpm dataforseo -- catalog search "google organic live advanced"
 pnpm dataforseo -- catalog describe /v3/serp/google/organic/live/advanced
 pnpm dataforseo -- catalog list --family ai_optimization --status executable
+pnpm dataforseo -- catalog list --status catalog_only
 ```
 
 `catalog_only` no significa que el proveedor carezca de la ruta. Significa que Greenhouse la conoce pero no la
 autoriza todavía; `describe` muestra la razón y el proceso de habilitación. Nunca se elude con `curl` o un SDK.
+Para revisar todas las rutas bloqueadas, su posible utilidad y el gate aplicable, usa el
+[`registro catalog-only`](../../architecture/GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md). Es un
+inventario de evaluación, no una lista de comandos disponibles.
 
 Actualizar y comprobar el snapshot:
 
 ```bash
 pnpm dataforseo:catalog:sync
 pnpm dataforseo:catalog:check
+pnpm exec tsx scripts/dataforseo/generate-enablement-register.ts
+pnpm exec tsx scripts/dataforseo/generate-enablement-register.ts --check
 ```
+
+Después de sincronizar el catálogo, regenera el registro y corre `--check`. Si una ruta parece útil, primero define
+caso, owner, consumer, fuentes/licencias y costo; después tramita el ADR/delta, registry, migración SQL, entitlement,
+estimador, breaker, normalización y canary. No pruebes la ruta con credenciales reales mientras siga
+`catalog_only`.
 
 La fuente es `https://docs.dataforseo.com/v3/`: portada concreta + REST WordPress oficial, con digest, ID y fecha
 de modificación. DataForSEO no publica un OpenAPI oficial equivalente; el snapshot no se presenta como uno.
