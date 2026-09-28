@@ -137,7 +137,7 @@ The relying-party boundary is fixed by
   which does not certify external client eligibility or canaries (`TASK-1832`). Determine those from
   current canonical readers and the rollout record, not from the presence of an issuer or internal pilot.
   No vendor gets provisioned: WorkOS was discarded by the native ADR.
-  The gateway enforces **eight** scope classes: base `efeonce.mcp.read`, Globe reader
+  The gateway enforces **nine** scope classes: base `efeonce.mcp.read`, Globe reader
   `efeonce.mcp.globe.read`, the flag-gated internal write `efeonce.mcp.globe.credits.funding.ensure`, the
   flag-gated SEO write `efeonce.mcp.seo.write` (TASK-1308), the flag-gated identity write
   `efeonce.mcp.identity.write` (TASK-1837), the flag-gated Hiring reader `efeonce.mcp.hiring.read`, since
@@ -145,7 +145,9 @@ The relying-party boundary is fixed by
   all three enablement tools, preview included), and — since 2026-09-15 — the flag-gated Insights write
   `efeonce.mcp.insights.write` (TASK-1845 `create_insight_edition`; since 2026-09-16 also the TASK-1846 render
   writes `request_insight_render` / `retry_insight_render` / `cancel_insight_render`; the Insights readers,
-  including `get_insight_render_run`, ride the base scope). The Insights scope exists in the gateway (`v1.5.0`, PR #12 `cad57b31d`, deployed 2026-09-15 as
+  including `get_insight_render_run`, ride the base scope), and the flag-gated brand-production write
+  `efeonce.mcp.brand.write` (TASK-1921; only `request_brand_render`, gated downstream by `BRAND_RENDER_ENABLED` in
+  Greenhouse; the two request readers ride the base scope). The Insights scope exists in the gateway (`v1.5.0`, PR #12 `cad57b31d`, deployed 2026-09-15 as
   revision `efeonce-mcp-gateway-00053-dsk`, front door 200/200/401), in Greenhouse's parity registry
   (`src/lib/auth-server/oauth/scopes.ts`) and in the Entra resource app «Efeonce MCP Resource» (Admin scope,
   added 2026-09-15 with a verified 6→7 round-trip; the shared PKCE client was not touched). No client carries it
@@ -177,11 +179,13 @@ The relying-party boundary is fixed by
   Consequence: federating a domain's N+1 write needs no Entra change and must never be blocked on one.
   The historical shared Entra client receives base + Globe read + Hiring read. A separate base-only canary client
   verified the real Hiring deny (`403`) on 2026-08-16. Neither client is distributed by gateway discovery now.
-- 🔴 **A write scope is NEVER wired into the shared public PKCE client.** The four write scopes
+- 🔴 **A write scope is NEVER wired into the shared public PKCE client.** The six write scopes
   (`efeonce.mcp.globe.credits.funding.ensure`, `efeonce.mcp.seo.write`, `efeonce.mcp.identity.write`,
-  `efeonce.mcp.client_services.write`) exist in their owning issuer/resource contract. The Entra resource contains
-  Globe/SEO/client-services (the last one added 2026-09-10 with Admin consent on the MCP resource app, TASK-1852;
-  the shared PKCE client `32617b87-…` was not touched); the native issuer owns identity.
+  `efeonce.mcp.client_services.write`, `efeonce.mcp.insights.write`, `efeonce.mcp.brand.write`) exist in their owning
+  issuer/resource contract. The Entra resource contains Globe/SEO/client-services/Insights (client-services was added
+  2026-09-10 with Admin consent on the MCP resource app, TASK-1852; the shared PKCE client `32617b87-…` was not
+  touched); the native issuer owns identity. Brand is in neither Entra nor any client and remains
+  `insufficient_scope`, fail-closed.
   They are deliberately absent from the shared Entra client's `requiredResourceAccess` and from TASK-1832's
   base-only DCRs.
   This is load-bearing, not an oversight: on the ecosystem lane the actor is `mcp:<consumer>` — the MACHINE — so there
@@ -223,7 +227,7 @@ The relying-party boundary is fixed by
   `greenhouse-skills` and `greenhouse-identity` ⇒ **no new env var in `deploy.yml`**, no new secret, no new
   switch; the PR is manifest sync + provider + `EXPECTED_*` entries + native policy (`unsupported` with reason)
   + version bump/baseline + status + canary (`scripts/greenhouse-insights-canary.mjs`, reads only). Turning the SEO
-  switch off turns all four providers off — say so in the runbook. Manuals today (read the
+  switch off turns all five providers off, including `greenhouse-brand` — say so in the runbook. Manuals today (read the
   count from the manifest, never from here): `seo-spend-discipline`, `seo-visibility-reading`, `competitor-loop`,
   `seo-discovery-to-tracking`, `seo-technical-health`, `seo-prospect-diagnostic`, `client-service-enablement`,
   `efeonce-insights` (all internal; eight). **Gateway deployed 2026-09-02**
@@ -406,6 +410,7 @@ internal multi-organization authority remain separate gates. Every later runtime
 | Hiring/ATS, Talent Pool, candidate review, assessment assignment or selection journey | `greenhouse-talent-people-operator` + identity/integrations owners | `TASK-1726` Talent Pool readers and `TASK-1718` exact candidate-review readers are live internal-only. Candidate review exposes only redacted hash-bound CV chunks with purpose/audit; no contact, ranking or write. Native tokens and the multi-issuer verifier are live; `TASK-1719`–`TASK-1722` retain the Hiring-specific write gates, while each external population still needs its eligible grant, consent, sign-off and revocation evidence. |
 | Client service enablement (client-portal modules; EPIC-046) | `client-service-enablement` manual via `get_greenhouse_skill` + `docs/operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md` | Greenhouse owns preview/apply/rollback (`src/lib/client-portal/enablement/**`); the gateway only exchanges the human's token and calls the App lane. Live 2026-09-10 (`TASK-1852`, gateway `1.4.0`); the write canary with a real person is still pending. |
 | Efeonce Insights (frozen editions over SEO/AEO/ICO; EPIC-045) | `efeonce-insights` skill + served manual `efeonce-insights` via `get_greenhouse_skill` + `docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md` §Provider Greenhouse-Insights | Greenhouse owns the domain (`src/lib/efeonce-insights/**`) and both lanes; the gateway provider `greenhouse-insights` only transports to `/api/platform/ecosystem/insights/**`. Live 2026-09-15 (`TASK-1845`, gateway `1.5.0`, rev `00053-dsk`): reads on the base scope, `create_insight_edition` behind `efeonce.mcp.insights.write` (in Entra, granted to no client — `insufficient_scope` by design); all four `unsupported` for the native issuer; the ecosystem never issues/withdraws. Pending: `tools/list` from a human MCP session. **2026-09-16 (`TASK-1846`, gateway `1.6.0`, rev `00054-n78`, 51 tools):** durable render federated — `get_insight_render_run` on base, `request_`/`retry_`/`cancel_insight_render` behind `efeonce.mcp.insights.write` (`insights.edition.create`), all four `unsupported` for native (`insights_native_policy_missing`); production canary green (render run `completed`, deny 404); no render write through the gateway yet (no client carries the scope). **2026-09-18 (`TASK-1848`, gateway `1.7.0`, rev `00055-gk6`, 58 tools, contract `task-1848-v1`):** 7 tools — `create_insight_share`/`revoke_insight_share` behind `efeonce.mcp.insights.write` (no client carries it ⇒ fail-closed), 5 reads (shares, deliveries, schedules) on the base scope; sending email and scheduling are portal-only (App lane, never MCP); production lane flags OFF ⇒ share create `policy_blocked: sharing_disabled`; provider canary green against production. **2026-09-26 (`TASK-1888`, gateway `1.9.0`, rev `00062-ct5`):** `get_insight_cover_preference` on the base scope and `set_insight_cover_preference` behind `efeonce.mcp.insights.write` (internal bindings only). |
+| Render de piezas de marca (La órbita y Glitch) | `efeonce-graphic-line` + `axis-design-system` | Greenhouse es dueño (`src/lib/brand-surfaces/production/**`, lanes App y ecosystem); el gateway sólo transporta. Federación en PR sin merge (TASK-1921). |
 | HubSpot or service-intake capability | `hubspot-greenhouse-bridge` or `hubspot-as-a-service` | Provider owns CRM contract and consent |
 | Teams-facing capability | `teams-bot-platform` | Teams platform owns tenant, consent and delivery |
 | Product UI/agent parity | Relevant product skill plus `software-architect-2026` | UI/API/MCP consume the same command or reader |

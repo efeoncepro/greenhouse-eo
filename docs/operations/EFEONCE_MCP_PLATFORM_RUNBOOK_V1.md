@@ -131,7 +131,7 @@ sus gates. TASK-1718 conserva firmas y pruebas revoked/base-only/rollback como d
 | `GREENHOUSE_API_URL` | no | origin Greenhouse exacto para el command de funding |
 | `GREENHOUSE_TOKEN_EXCHANGE_URL` | no | endpoint RFC 8693 exacto y audience del ID token WIF |
 | `GREENHOUSE_VERCEL_BYPASS_SECRET` | sí | inyectado desde `greenhouse-vercel-automation-bypass` en GCP Secret Manager; nunca GitHub var/env file. Es sólo bypass de transporte para el hop interno exacto token-exchange/command; nunca identidad/autorización, discovery, respuesta MCP, cliente o provider externo. |
-| `GREENHOUSE_SEO_PROVIDER_ENABLED` | no | default `false`; `true` sólo con lane Greenhouse verde y canary aprobado. **Gobierna cuatro providers, no uno**: SEO, `greenhouse-skills` (manuales), `greenhouse-identity` (invitaciones delegadas, TASK-1837) y, desde 2026-09-15, `greenhouse-insights` (Efeonce Insights, TASK-1845) comparten interruptor, config y consumer porque son la MISMA lane ecosystem. Apagarlo por un incidente de SEO también apaga los manuales, la identidad delegada e Insights |
+| `GREENHOUSE_SEO_PROVIDER_ENABLED` | no | default `false`; `true` sólo con lane Greenhouse verde y canary aprobado. **Gobierna cinco providers, no uno**: SEO, `greenhouse-skills` (manuales), `greenhouse-identity` (invitaciones delegadas, TASK-1837), `greenhouse-insights` (Efeonce Insights, TASK-1845) y `greenhouse-brand` (render gobernado de marca, TASK-1921) comparten interruptor, config y consumer porque son la MISMA lane ecosystem. Apagarlo por un incidente de SEO también apaga los manuales, la identidad delegada, Insights y Brand |
 | `GREENHOUSE_ECOSYSTEM_API_URL` | no | origin Greenhouse exacto del lane ecosystem; en producción `https://greenhouse.efeoncepro.com` |
 | `GREENHOUSE_ECOSYSTEM_TOKEN` | sí | inyectado desde `efeonce-mcp-gateway-greenhouse-token` en GCP Secret Manager; nunca valor plano en `vars`, workflow ni env file |
 | `GREENHOUSE_HIRING_PROVIDER_ENABLED` | no | default `false`; sólo `true` después de Greenhouse `HIRING_TALENT_POOL_SEARCH_ENABLED` + `HIRING_TALENT_POOL_MCP_ENABLED`, grant Entra y canary aprobados |
@@ -468,13 +468,16 @@ esta org?"* y ya se enforcea abajo: binding `internal` en el lane + entitlement 
 command. Corolario operativo: **federar la escritura N+1 de un dominio que ya tiene su scope no requiere tocar
 Entra**, y por lo tanto no puede quedar bloqueada por eso.
 
-Con esto el gateway declara **ocho** scopes cuando todos los providers gateados están activos: `efeonce.mcp.read`, `efeonce.mcp.globe.read`,
+Con esto el gateway declara **nueve** scopes cuando todos los providers gateados están activos: `efeonce.mcp.read`, `efeonce.mcp.globe.read`,
 `efeonce.mcp.globe.credits.funding.ensure` (sólo con `globeCreditFunding.enabled` ON) y `efeonce.mcp.seo.write`
 (sólo con `greenhouseSeo.enabled` ON), `efeonce.mcp.hiring.read` (sólo con `greenhouseHiring.enabled` ON),
 `efeonce.mcp.identity.write` para la lane delegada, `efeonce.mcp.client_services.write` (sólo con
 `greenhouseClientServices.enabled` ON; TASK-1852, registrado en Entra con consentimiento Admin el 2026-09-10) y,
 desde 2026-09-15, `efeonce.mcp.insights.write` (sólo con `greenhouseInsights.enabled` ON; TASK-1845, exigido
-únicamente por `create_insight_edition`; las tres lecturas de Insights van con el scope base). Gateway `v1.5.0`
+únicamente por `create_insight_edition`; las tres lecturas de Insights van con el scope base) y
+`efeonce.mcp.brand.write` (sólo para `request_brand_render`; TASK-1921). Esta última clase gobierna la producción de
+piezas de la marca propia, no comparte el impacto de Insights, no está registrada en Entra ni la porta ningún cliente,
+por lo que permanece `insufficient_scope` y fail-closed. Gateway `v1.5.0`
 desplegado el 2026-09-15 (PR #12 `cad57b31d`, revisión `efeonce-mcp-gateway-00053-dsk`, 100 % del tráfico,
 front door 200/200/401); el scope existe en la app recurso de Entra desde el mismo día (round-trip 6→7 verificado,
 cliente PKCE compartido intacto) y en el registro de paridad de Greenhouse. Ningún cliente lo porta todavía: la
@@ -721,6 +724,37 @@ No tiene interruptor propio: apagar `GREENHOUSE_SEO_PROVIDER_ENABLED` retira tod
 manuales e identidad delegada. Para retirar sólo Insights, revertir el PR de federación (`cad57b31d`) y redeploy
 (baja de `1.5.0` con bump de versión y baseline regenerado). En Greenhouse, `INSIGHTS_GENERATION_ENABLED=false`
 convierte la creación en `503 generation_disabled` (`policy_blocked` en el gateway) sin tocar las lecturas.
+
+## Provider Greenhouse-Brand (TASK-1921)
+
+> **Estado vigente 2026-09-28:** PR del gateway abierto, sin merge. La versión `1.10.0` y su superficie de 75 tools
+> permanecen pendientes del release de Greenhouse que publique `/api/platform/ecosystem/brand-render/**` en
+> producción. El merge a `main` del gateway despliega producción, por lo que no se hace antes de ese release.
+
+El provider `greenhouse-brand` es un adapter delgado sobre el lane ecosystem
+`/api/platform/ecosystem/brand-render/**`. Greenhouse es dueño del dominio en
+`src/lib/brand-surfaces/production/**` y de sus lanes App y ecosystem; el gateway sólo transporta. El lane acepta
+exclusivamente bindings `internal`: cualquier otro binding responde `403 scope_not_allowed`.
+
+| Tool | Clase | Scope |
+| --- | --- | --- |
+| `request_brand_render` | escritura | `efeonce.mcp.brand.write` |
+| `get_brand_render_request` | lectura | base `efeonce.mcp.read` |
+| `list_brand_render_requests` | lectura | base `efeonce.mcp.read` |
+
+`efeonce.mcp.brand.write` es una clase propia: producir piezas de la marca propia no tiene el mismo impacto que una
+escritura de Insights. No está en Entra ni en ningún cliente, así que `request_brand_render` responde
+`insufficient_scope` y permanece fail-closed. Las tres tools son `unsupported` para el issuer nativo con razón
+`brand_native_policy_missing`.
+
+Mapeo de errores: `503 render_disabled` ⇒ `policy_blocked`; `400` o `422` ⇒ `invalid_request`; `404` conserva el
+anti-oráculo. El provider no agrega env vars: reutiliza `GREENHOUSE_SEO_PROVIDER_ENABLED`,
+`GREENHOUSE_ECOSYSTEM_API_URL`, `GREENHOUSE_ECOSYSTEM_TOKEN` y, cuando el entorno lo exige,
+`GREENHOUSE_ECOSYSTEM_VERCEL_BYPASS_SECRET`. Apagar el provider SEO apaga también `greenhouse-brand`.
+
+El canary es `pnpm brand:canary`; requiere `GREENHOUSE_ECOSYSTEM_API_URL`, `GREENHOUSE_ECOSYSTEM_TOKEN` y
+`GREENHOUSE_ECOSYSTEM_VERCEL_BYPASS_SECRET` en entornos con Deployment Protection. Sólo ejecuta lecturas y un
+`POST` inválido: nunca solicita un render válido ni produce una pieza.
 
 ## Provider Marketing Studio (Efeonce Marketing Studio)
 
