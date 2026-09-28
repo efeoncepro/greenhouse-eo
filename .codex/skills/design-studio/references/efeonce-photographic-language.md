@@ -362,7 +362,8 @@ de la geometría real de la toma, de una de dos maneras (las dos aprobadas):**
 lámina «¿Qué revisa una IA antes de recomendarte? 5 cosas» se fotografió como eso: Nexa **sentada** a una mesa de nogal
 mate (*«matte oiled walnut, no reflections»*) revisa **cinco** tarjetas de vidrio sin texto; una línea fina de luz de la
 línea recorre la fila y se detiene en la que toca, y ella levanta la vista a cámara. El borde cercano de esa mesa, en
-sombra, es el lecho: ella la usa. Firma en 1237–1288 a **17,8:1**. Aprendido con la sesión que armó el registro cine:
+sombra, es el lecho: ella la usa. Firma en 1237–1288 a **17,8:1**; desde el 2026-09-28 el carrusel firma a
+una sola altura, la de las piezas de AXIS (logo arriba en y 1202), y ahí mide **15,5:1** **[medido; operador, 2026-09-28]**. Aprendido con la sesión que armó el registro cine:
 - **El modelo ignora los porcentajes de la cabeza** (pedido 40–44 %, salió 23–25 %). Lo que la baja es **la acción**
   (sentarla a la mesa que usa) y el encuadre dicho en palabras de cámara (*«medium-wide shot, the whole table in frame,
   a tall empty expanse above her head, camera tilted slightly upward»*); con la cabeza al 28 % la voz cabe si empieza
@@ -370,7 +371,15 @@ sombra, es el lecho: ella la usa. Firma en 1237–1288 a **17,8:1**. Aprendido c
 - **La órbita en cine sólo cuando aporta**: aquí sobra, porque la tarjeta encendida ya es el foco y la línea como luz
   es el haz del escaneo; un anillo sería un segundo foco que compite con la esfera de la voz.
 - **Una fila de objetos puede caer donde vive la mano de «Desliza»**: el modelo ignoró dos veces *«the row spans only
-  the central two thirds»*. Decidir con el operador antes de otra toma.
+  the central two thirds»*. **Lo que sí funcionó (2026-09-28, `MCB1b`, a la primera): medir la fila con el cuerpo**
+  —*«the three cards are small, each about the width of her hand… the whole row fits between her two shoulders»*—;
+  la fila terminó en x ≈ 793 y la mano quedó libre **[medido]**. El porcentaje del cuadro no ancla; el cuerpo sí.
+- **Si la cabeza queda alta, se abre el plano; no se pide su altura.** En `MCB1b` la cabeza seguía en y 290 (la voz
+  de la portada termina en y 397). `MCB1c` pidió *«a WIDE shot from further back… she is small in the frame… above
+  her head a tall, empty expanse… fills the whole upper half»* y la bajó a y 441: 44 px de aire **[medido]**.
+- **La luz de la línea sigue al tema** (prueba de contenidos creativos, 2026-09-28, pendiente de revisión): en Brand la
+  línea de luz es naranja (`#FF6500`) y el traje de Nexa conserva sus costuras azules; la receta, el lecho y la firma
+  no cambian. Placas en `ai-generations/2026-09-28_manzanitas-cine/plates/` (`MCB1c`, `MCB3`).
 
 **Cómo se escribe y se verifica un lecho cine, en orden:**
 1. Preguntar **qué hay de verdad entre la cámara y el sujeto en esta escena** (el piso del espacio, la mesa de la
