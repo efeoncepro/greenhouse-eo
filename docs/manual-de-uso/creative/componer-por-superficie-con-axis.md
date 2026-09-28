@@ -378,11 +378,11 @@ Salen cuando compones un brochure o una propuesta. Con cualquiera de ellos, el d
   `src/lib/brand-surfaces/recipes/frame.ts`), CLI `scripts/brand-surfaces/compose.ts`; ADR del composer (delta
   2026-09-27); gate `pnpm composer:visual-gate --catalog=graphic-line`
   ([runbook](../../operations/runbooks/composer-visual-gate.md)); ruta productiva en
-  [TASK-1921](../../tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md).
+  [TASK-1921](../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md).
 - Integración del contrato 0.1.2: [TASK-1927](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md)
   (`complete` el 2026-09-27; en `develop` local, sin publicar en el remoto). Recorte de la foto: `materializeAssets` en
   `scripts/brand-surfaces/compose.ts`; prueba de los ejemplos: `src/lib/brand-surfaces/__tests__/example-plans.test.ts`.
-  Recetas restantes del deck: [TASK-1928](../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md).
+  Recetas restantes del deck: [TASK-1928](../../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md).
 - Contacto de marca: `EFEONCE_CONTACT` en `src/config/efeonce-brand.ts`.
 - AXIS (en `main` desde el 2026-09-27; [página del Lab](https://axis.efeonce.org/references/surfaces/)):
   [guías por superficie](https://github.com/efeoncepro/axis-design-system/blob/main/docs/agent-composition/surfaces/README.md),

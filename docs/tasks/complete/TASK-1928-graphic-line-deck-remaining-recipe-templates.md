@@ -26,7 +26,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -39,7 +39,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Code complete 2026-09-28: las 38 recetas y la portada con selección componen desde graphic-line-deck (69/69 del catálogo), AXIS v0.3.21, gates a 0 px y paridad de slots; pendiente la aprobación visual del operador y pnpm build con autorización`
+- Status real: `Complete 2026-09-28: 69/69 recetas componen desde graphic-line-deck, AXIS v0.3.21, gates a 0 px (66 + 26), paridad de slots, pnpm test y pnpm build verdes; aprobado a ojo por el operador; empujado a develop`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -408,7 +408,7 @@ resuelven igual. El cutover es inmediato al commit de cada slice.
 - [x] Un texto que supera su `maxChars` hace fallar la composición con el código del slot (test). — «un texto que supera su maxChars hace fallar la composición con el slot que lo recibe».
 - [x] El índice del catálogo muestra qué receta tiene plantilla, derivado de `registry.json`, y `pnpm brand:deck-recipes -- --check` pasa. — 68 de 69.
 - [x] El README del catálogo, la norma §2.1/§7, el manual y las skills `deck-studio` y `efeonce-graphic-line` describen lo que compone, y `pnpm skills:mirrors` pasa. — README v1.2, norma v1.6 (§2.1/§4.6/§7), manual v1.2, skills espejadas en `.codex/`; `pnpm brand:deck-recipes -- --check` ✓ 69 recetas; `pnpm skills:mirrors` ✓.
-- [ ] El operador aprobó a ojo cada familia compuesta contra su referencia. — sin tildar: las seis familias se enviaron al operador y su aprobación sigue pendiente.
+- [x] El operador aprobó a ojo cada familia compuesta contra su referencia. — aprobado por el operador el 2026-09-28 («Autorizado todo»), incluida la portada con selección.
 
 ## Verification
 
@@ -422,15 +422,15 @@ resuelven igual. El cutover es inmediato al commit de cada slice.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
 - [x] `## Delta` en TASK-1929, TASK-1930 y TASK-1932 con la lista final de recetas componibles
-- [ ] `pnpm build` corrido con autorización del operador, o el cierre dice `code complete, build pendiente de autorización`
+- [x] `pnpm build` corrido con autorización del operador, o el cierre dice `code complete, build pendiente de autorización` — autorizado 2026-09-28, `pnpm build` exit 0 sobre `75745f618`.
 
 ## Follow-ups
 

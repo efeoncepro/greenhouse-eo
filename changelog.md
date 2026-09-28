@@ -16,7 +16,7 @@
   normalizados, capas pintadas con foto adentro y recorte dirigido; el test de paridad exige que cada slot de la
   receta tenga campo en su plantilla. La portada de brochure con la selección de Nexa compone con
   la composición `document-selection` (el operador relajó la regla el 2026-09-28).
-  Local en `develop`, sin push; falta aprobación visual y `pnpm build`.
+  Aprobado por el operador; `pnpm build` verde, en `develop`.
 
 ## 2026-09-27 — Una edición de Glitch se compone con `pnpm glitch:compose` (TASK-1923)
 

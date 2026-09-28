@@ -63,8 +63,8 @@
 - **Deck compuesto (TASK-1927, 2026-09-27):** la aprobación visual ya está dada (fila del 2026-09-27 arriba). Sigue
   abierta la pregunta de la **sección partida**, anotada en el token: el indicador barre las secciones ya recorridas,
   (n−1) de N: ¿se unifica a n de N? Hasta decidir, la plantilla sigue el token.
-- **Plantillas de las 38 recetas restantes (TASK-1928, 2026-09-27):** falta la **aprobación visual del operador** de
-  las seis familias (hojas en `ai-generations/2026-09-27_deck-recetas/`). Las plantillas aplican la norma vigente
+- **Plantillas de las 38 recetas restantes (TASK-1928, 2026-09-27):** el operador **aprobó a ojo** las seis familias
+  y la portada con selección el 2026-09-28 (hojas en `ai-generations/2026-09-27_deck-recetas/`). Las plantillas aplican la norma vigente
   sobre las referencias aprobadas (fila de implementación abajo); si el operador pide volver a la referencia en algún
   punto (por ejemplo, el logo chico en las secciones de cine, que era pregunta abierta y resolvió la norma), se
   registra aquí como decisión suya. La selección en `cover-brochure` ya no está abierta: se resolvió el 2026-09-28
@@ -144,8 +144,8 @@
   (TASK-1921); plates idempotentes (TASK-1926); el control de foco de la sección partida (el builder `sectionSplit` no
   lee `photo.focus`; exige un cambio en AXIS y otro en Greenhouse, y **no tiene task**). Diferencias conocidas contra los prototipos: tamaño de «Cuando
   quieras.», burbuja URL horneada, caja de selección unos píxeles más ajustada.
-- Plantillas de las 38 recetas restantes (TASK-1928, 2026-09-27): **code complete, en `develop` local y sin push;
-  la task sigue `in-progress`** hasta la aprobación visual del operador y el `pnpm build` de cierre. Hecho: 34
+- Plantillas de las 38 recetas restantes (TASK-1928, 2026-09-27): **`complete` el 2026-09-28**, aprobada por el operador,
+  con `pnpm test` y `pnpm build` verdes y empujada a `develop`. Hecho: 34
   plantillas nuevas en `graphic-line-deck` (dos recetas comparten `SectionCine`, cuatro comparten `ProposalService`):
   **68 de 69 recetas componían** con `axis-tokens` 0.3.20 y `axis-ui-contracts` 0.3.18; el 2026-09-28 entró la portada
   con selección (**69 de 69**, sin plantilla nueva: 50 en total) y Greenhouse fija `axis-tokens` 0.3.21 y
@@ -166,7 +166,7 @@
   - **Logos de terceros normalizados** al componer (un tono, el mismo peso óptico), con la excepción tonal de Aguas
     Andinas y la UC de Temuco; las barras del gráfico salen de su número (índice, antes = 100); el stack no pinta los
     «pilares de luz» del guion (en la referencia aprobada nunca se vieron).
-  **Pendiente:** aprobación visual, `pnpm build` (con autorización), push; selección en `cover-brochure` (AXIS).
+  **Pendiente:** nada de TASK-1928; siguen TASK-1929…1932 y la ruta productiva (TASK-1921).
 - Composición por superficie en Greenhouse (TASK-1919): **hecho, local en `develop`** — las 20 recetas aprobadas son
   plantillas del Artifact Composer (`graphic-line-deck`, `graphic-line-stills`, `graphic-line-overlays`), `pnpm
   brand:compose` y gate `--catalog=graphic-line` a 0 px. Falta la ruta productiva (TASK-1921: API, `artifact-worker`,

@@ -18,7 +18,7 @@
 > [documentación funcional de la línea](../../../documentation/creative/linea-grafica-efeonce.md) · skill
 > [`deck-studio`](../../../../.claude/skills/deck-studio/SKILL.md) · [TASK-1926](../../../tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md)
 > (fotos) · [TASK-1927](../../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (plantillas
-> de 31 recetas, `complete`) · [TASK-1928](../../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md)
+> de 31 recetas, `complete`) · [TASK-1928](../../../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md)
 > (plantillas de las 38 recetas restantes).
 
 ## Qué es
@@ -209,12 +209,13 @@ referencia aprobada nunca se vieron.
 
 ### Abiertos
 
+La aprobación visual de las seis familias de TASK-1928 y de la portada con selección la dio el operador el 2026-09-28.
+
 | Pendiente | Dónde | Estado |
 |---|---|---|
 | Logo dentro de la órbita en el cierre | contraportadas | **sin resolver**: ninguna contraportada aprobada lo lleva así; las aprobadas ponen el logo arriba de la columna (norma §6, fila 17) |
 | Isotipo sin registro de procedencia | plates `b` (NX6b, CR2b, WB1b, RV1b, BR2b…); HW1, T2, T3, H2 y LN4 sin isotipo compuesto | pasar por `pnpm foto:emblema` (y `foto:isotipo` si difiere) antes de publicar |
 | Plate repetido | P1 en lente, sangre, contenido con foto y hoja de contactos | regla de uso: no repetirlo en un mismo deck |
-| Aprobación visual de las familias nuevas | las seis familias de TASK-1928 | el operador revisa a ojo las hojas de `ai-generations/2026-09-27_deck-recetas/`; hasta entonces, cada lámina se revisa contra su referencia |
 
 Diferencias conocidas de las plantillas del marco contra los prototipos aprobados (el operador aprobó a ojo las
 láminas compuestas el 2026-09-27): «Cuando quieras.» sale algo más grande que en el prototipo porque usa el valor del
@@ -233,7 +234,7 @@ la respuesta como objetivo de la selección y tiene un slot `selection` opcional
   31 recetas: el marco (portadas y contraportadas), las secciones clásica y partida, la medida, el tríptico, la
   escalera y las propuestas de cine. Treinta tuvieron plantilla ahí; la trigésimo primera, la portada con selección,
   compone desde el 2026-09-28 con el layout `document-selection` (AXIS `v0.3.21`).
-- [TASK-1928](../../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) sumó las otras 38
+- [TASK-1928](../../../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) sumó las otras 38
   en seis familias, sobre 34 plantillas nuevas: las cuatro `proposal-service-*` comparten
   `ProposalService`, y `section-cine-team` y `section-cine-services` comparten `SectionCine`.
 

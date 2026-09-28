@@ -40,7 +40,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `crm|content|platform`
-- Blocked by: `TASK-1921, TASK-1928, TASK-1929, TASK-1930, TASK-1931`
+- Blocked by: `TASK-1921, TASK-1929, TASK-1930, TASK-1931`
 - Branch: `Greenhouse develop; efeonce-mcp main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -130,7 +130,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-1399-nexa-proposal-studio-governed-actions.md`
 - `docs/tasks/complete/TASK-1412-proposal-artifact-versioning-download-contract.md`
 - `docs/tasks/to-do/TASK-1395-pptx-native-editable-renderer.md`
-- `docs/tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md`
+- `docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md`
 - `docs/operations/runbooks/production-release.md`
 
 ## Dependencies & Impact

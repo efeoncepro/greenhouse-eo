@@ -914,10 +914,8 @@ plantilla usa el que resolvió AXIS, nunca lo infiere. Ejemplos por lámina en
 - **Estado (2026-09-27):** TASK-1927 `complete`, en `develop` local y sin push; aprobación visual del operador de las
   láminas compuestas (`hero`, `lines` y el brochure de nueve páginas). Los gates se leen en la task
   (`docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md`). TASK-1928 y TASK-1929 quedaron
-  desbloqueadas. TASK-1928 dejó las plantillas de las 38 restantes en `develop` local (gate `graphic-line` a 0 px en
-  66 frames); **espera la aprobación visual del operador** de sus seis familias (hojas en
-  `ai-generations/2026-09-27_deck-recetas/`), el `pnpm build` de cierre (con autorización) y el push. **Pendiente:**
-  push a `develop`; ruta productiva gobernada, que debe aceptar también el documento (TASK-1921). La selección en `cover-brochure` se
+  desbloqueadas. TASK-1928 está `complete` (2026-09-28): las 69 recetas componen (gate `graphic-line` a 0 px en 66 frames),
+  aprobadas por el operador y empujadas a `develop`. **Pendiente:** ruta productiva gobernada, que debe aceptar también el documento (TASK-1921). La selección en `cover-brochure` se
   resolvió el 2026-09-28 (layout `document-selection`, AXIS `v0.3.21`). Diferencias conocidas
   contra los prototipos: tamaño de «Cuando quieras.», burbuja URL horneada en vez de la de luminosidad, caja de
   selección del pintor canónico unos píxeles más ajustada.

@@ -75,7 +75,7 @@ Decisiones que cambian esta norma (detalle en §4.6, «Recetas por lámina»):
 [TASK-1927](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md), `complete`): el tríptico de una
 palabra por toma, la sección partida por la izquierda con sus tres composiciones, las composiciones `hero` y `lines` de
 `proposal-cinematic` y las portadas y contraportadas aprobadas (§2.1 y §4.6). Con
-[TASK-1928](../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) componen además las
+[TASK-1928](../../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) componen además las
 recetas restantes: **las 69** recetas del deck tienen plantilla (§2.1); la última, la portada con selección, compone
 desde el 2026-09-28 con el layout `document-selection` (AXIS `v0.3.21`). **Qué falta:** las fotos idempotentes
 ([TASK-1926](../../tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md)).
@@ -293,7 +293,7 @@ y `deck-proposal-document.json` (siete páginas interiores), en `src/lib/brand-s
   `audiovisual.close-reveal` falla con `recipe-outside-composer`: el cierre son los masters del reveal v1.1 o
   `pnpm orbit:video` en AXIS.
 - **La ruta productiva** (API, `artifact-worker`, MCP): es
-  [TASK-1921](../../tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md), que debe aceptar también
+  [TASK-1921](../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md), que debe aceptar también
   el intent de documento. Hoy `brand:compose` es el taller local.
 
 Componer no aprueba: la pieza sigue pasando la revisión de §4 y del manual de uso. Paso a paso y errores:
@@ -972,7 +972,7 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
   ya no tiene opciones: las 69 láminas quedaron aprobadas el 2026-09-27.
 - **Herramientas:** render canónico de la animación de la gráfica con foto para motion (§4.4), el formato `3:1` en
   `foto:prompt` (TASK-1918) y la ruta productiva de `brand:compose` (API, `artifact-worker`, MCP:
-  [TASK-1921](../../tasks/to-do/TASK-1921-brand-surface-pieces-governed-production-route.md)). **Hechos el
+  [TASK-1921](../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md)). **Hechos el
   2026-09-27:** las 20 recetas aprobadas como catálogo del Artifact Composer (TASK-1919, §2.1) y el isotipo compuesto
   sobre la prenda con `pnpm foto:isotipo` (TASK-1920). **Hechos con TASK-1927 (en `develop` local, sin publicar):** el
   catálogo `graphic-line-deck` con 16 plantillas (§2.1), el documento completo con `pnpm brand:compose` y el gate visual
@@ -984,17 +984,16 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
   la **aprobación visual** de las láminas compuestas ese día (las composiciones `hero` y `lines` y el brochure de nueve
   páginas). El estado de los gates se lee en la
   [task](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md). Con el cierre quedaron
-  desbloqueadas [TASK-1928](../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) y
+  desbloqueadas [TASK-1928](../../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) y
   [TASK-1929](../../tasks/to-do/TASK-1929-deck-plan-recipe-catalog-validator.md). **Quedó abierto:** la publicación en
   `develop`; la ruta productiva gobernada, que debe aceptar también el intent de documento (TASK-1921); el control de
   foco de la sección partida, sin task (§4.6); la pregunta del barrido del indicador; y las diferencias conocidas
   contra los prototipos (§4.6). Las recetas restantes del deck las tomó TASK-1928.
-- **TASK-1928: `in-progress`, code complete en `develop` local.** Las recetas de deck aprobadas componen desde el
+- **TASK-1928: `complete` (2026-09-28), en `develop`.** Las recetas de deck aprobadas componen desde el
   catálogo `graphic-line-deck`: **69 de 69** (§2.1), con las decisiones de norma aplicadas (D1, 3×, cifras con fuente
   visible, sin logo ni velo en láminas interiores con foto, `[MONTO]`, contacto desde `EFEONCE_CONTACT`, burbuja URL en
-  partners). **Queda abierto:** la aprobación visual del operador de las seis familias (hojas en
-  `ai-generations/2026-09-27_deck-recetas/`); el `pnpm build` de cierre, que requiere su autorización; el push a
-  `develop`. La portada con selección compone desde el 2026-09-28 (layout `document-selection`, AXIS `v0.3.21`; el
+  partners). El operador aprobó a ojo las seis familias y la portada con selección el 2026-09-28; `pnpm test` y
+  `pnpm build` verdes. La portada con selección compone desde el 2026-09-28 (layout `document-selection`, AXIS `v0.3.21`; el
   frame `CoverBrochure` del gate se re-promovió, ledger `BASELINE_DELTAS.md` (n)).
 - **Preguntas abiertas del operador (TASK-1919):** la posición de la lente del caminero (el token dice 0,70 y la
   lámina aprobada la muestra cerca de 0,77); el super de dato, ¿arco completo como en la lámina o la estela canónica
@@ -1005,7 +1004,7 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
   unifica a n de N? (§4.6).
 - **Láminas del deck:** las 69 de la página «Deck» quedaron aprobadas el 2026-09-27 y tienen receta en el
   [catálogo](./deck-recipes/README.md). Las 69 tienen plantilla (§2.1,
-  [TASK-1928](../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md)); la última,
+  [TASK-1928](../../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md)); la última,
   `cover-brochure-cine-lines-selection`, compone con el layout `document-selection` desde el 2026-09-28; fotos idempotentes:
   TASK-1926; pendientes de QA en §4.6.
 - **Portadas y contraportadas (2026-09-27):** aprobadas, descritas en §4.6 y con plantilla en el composer (TASK-1927).

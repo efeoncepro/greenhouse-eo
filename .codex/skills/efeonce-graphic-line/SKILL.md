@@ -124,9 +124,9 @@ dos esferas en una pieza (manzana + lente u órbita).
     la sección partida **no tiene control de foco** (si el sujeto queda cortado, se cambia la foto) y `panel-end`
     **espeja** la foto (sin texto ni logos legibles). Pasos y trampas:
     [applications.md §L](references/applications.md), «Cambiar la foto, el copy o la sección». TASK-1927 está
-    `complete` (2026-09-27, en `develop` local, sin push), con la aprobación visual del operador. TASK-1928 tiene sus
-    plantillas en `develop` local (AXIS `axis-tokens` 0.3.21 / `axis-ui-contracts` 0.3.19, gate a 0 px) y **espera la
-    aprobación visual del operador** de sus seis familias: no la des por cerrada.
+    `complete` (2026-09-27, en `develop` local, sin push), con la aprobación visual del operador. TASK-1928 está
+    `complete` (2026-09-28, en `develop`): las 69 recetas componen (AXIS `axis-tokens` 0.3.21 / `axis-ui-contracts`
+    0.3.19, gate a 0 px), con la aprobación visual del operador.
 14. **Estado honesto:** la órbita es un sistema consistente, **no** un activo distintivo demostrado; la prueba sin
     logo va antes de cualquier pauta con la órbita. «Te hacemos visible» no sale a pauta sin revisión legal.
 

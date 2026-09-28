@@ -350,8 +350,8 @@ No son bibliografía: son el código y los docs que respaldan lo que SKILL.md y 
 `pnpm brand:compose`. Si el código no coincide con la skill, manda el código y se corrige la skill.
 
 - Task: `docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md` (contrato 0.1.2, marco
-  de portadas y contraportadas, documento) y `TASK-1928-graphic-line-deck-remaining-recipe-templates.md` (plantillas
-  de las 38 recetas restantes; en `in-progress/` hasta la aprobación visual del operador). Siguientes:
+  de portadas y contraportadas, documento) y `docs/tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md` (plantillas
+  de las 38 recetas restantes y la portada con selección; `complete` el 2026-09-28, aprobada por el operador). Siguientes:
   `docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md` (ruta productiva) y
   `docs/tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md` (plates).
 - Código: `src/lib/brand-surfaces/recipes/deck.ts`, `frame.ts` y, desde TASK-1928, `proposal-service.ts`, `method.ts`,
