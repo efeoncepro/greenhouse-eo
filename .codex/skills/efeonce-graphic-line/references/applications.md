@@ -4,7 +4,8 @@ Verificado contra: greenhouse-eo@7cb24df17 · axis-design-system@a5c21ae (ícono
 — 2026-09-26 (decisiones del operador D1–D22 del 2026-09-26 registradas; ver `ledger.md`) · Plastilina en volumen
 (D24, §0.3 y A10): AXIS `main@c18e3d3` — 2026-09-27 · §L con la ruta por el Artifact Composer: greenhouse-eo@016d0a183 — 2026-09-27
 · §L «Componer el deck hoy» y «Cambiar la foto, el copy o la sección»: árbol local de `develop` tras el cierre de
-TASK-1927 — 2026-09-27
+TASK-1927 — 2026-09-27 · §L «Recetas con plantilla desde TASK-1928»: árbol local de `develop` en `64be8aa16`
+(AXIS `v0.3.20`) — 2026-09-27
 
 Esta guía dice, **para cada aplicación**, qué elementos de la línea van (y cuáles nunca), dónde se ubican, cuánto espacio
 ocupan, en qué superficie y color, y cómo se produce. No repite la API (ver `package-and-tokens.md`), el significado de
@@ -724,8 +725,8 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 > Norma: [`EFEONCE_SURFACE_COMPOSITION_V1.md`](../../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md).
 > Contrato AXIS `efeonce.surface-composition` 0.1.2 (manifest `axis.surface-composition.v1`; acepta intents 0.1.0 y
 > 0.1.1), tokens `efeonceGraphicLine.surfaces.<superficie>` y `pnpm surface:resolve`. **Greenhouse lo integró con
-> TASK-1927 (`complete` el 2026-09-27; en `develop` local, sin push):** fija `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12 (tag AXIS
-> `v0.3.14`). Ver «Contrato 0.1.2» y «Componer el deck hoy» al final de esta sección,
+> TASK-1927 (`complete` el 2026-09-27; en `develop` local, sin push):** fijó `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12 (tag AXIS
+> `v0.3.14`); **TASK-1928 los subió a 0.3.20 y 0.3.18** (tag `v0.3.20`). Ver «Contrato 0.1.2» y «Componer el deck hoy» al final de esta sección,
 > [Lab](https://axis.efeonce.org/references/surfaces/). Canvas por superficie:
 > [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7), una página por
 > superficie con su lámina «Guía · cómo componer …» a la izquierda. Esta sección no copia valores: los números están
@@ -760,7 +761,7 @@ bajada web sin token, y la paleta 20 % vs 35 %.
 | pDOOH | nada todavía (LED, mupi, spot sin audio y variantes por franja son opción) | LED bajo la respuesta, mupi centrada (opción) | J |
 | Motion | animación en bucle foto-para-la-lente + reveal, y su storyboard | nunca en la toma; firma el cierre | J |
 | Audiovisual | storyboard de planos «Cómo trabajamos» y escenas con generadores de texto | firma la marca en el cierre, nunca la toma | J |
-| Deck | **las 69 láminas del canvas** (2026-09-27), cada una con su receta en `deck-recipes/`; con plantilla hoy (TASK-1927): sección clásica, «la órbita mide la cifra», `method-staircase` (BeX), `proposal-cinematic` (`service`, `hero`, `lines`), sección partida (tres composiciones, por la izquierda), tríptico (una palabra por toma) y el marco `cover-brochure`, `cover-proposal`, `close-brochure`, `close-proposal`; las 38 restantes sin plantilla (TASK-1928). `cover-classic` y `close-classic` no se usan | burbuja URL en el pie; logo sólo en portada, cierre o marca-sujeto | B1, B2 |
+| Deck | **las 69 láminas del canvas** (2026-09-27), cada una con su receta en `deck-recipes/`; con plantilla hoy (TASK-1927): sección clásica, «la órbita mide la cifra», `method-staircase` (BeX), `proposal-cinematic` (`service`, `hero`, `lines`), sección partida (tres composiciones, por la izquierda), tríptico (una palabra por toma) y el marco `cover-brochure`, `cover-proposal`, `close-brochure`, `close-proposal`; TASK-1928 sumó plantillas para las 38 restantes: **68 de 69 componen** (sólo `cover-brochure-cine-lines-selection` queda bloqueada). `cover-classic` y `close-classic` no se usan | burbuja URL en el pie; logo sólo en portada, cierre o marca-sujeto | B1, B2 |
 
 **Reglas que un agente necesita en el momento**
 
@@ -774,7 +775,7 @@ bajada web sin token, y la paleta 20 % vs 35 %.
 6. Motion: se anima la línea, no la foto; la foto sólo se acerca, en escala logarítmica y nunca mientras entra la
    voz; tiempos desde `efeonceGraphicLine.motion` y `efeonceGraphicLine.surfaces.motion`, nunca en un script.
 7. pDOOH y vía pública: sin audio; la voz se arma en 2 s como máximo; el último cuadro es el estático de respaldo.
-8. Precios como placeholder; cifras sólo con fuente.
+8. Montos como `[MONTO]`; cifras sólo con fuente visible («Fuente: …» en la lámina).
 
 **`proposal-cinematic`:** foto de cine a sangre, sujeto a la derecha que mira a cámara, lo digital o el servicio en
 acción y el color saliendo de la escena; voz a la izquierda en el espacio oscuro; selección «Cliente» sobre la
@@ -854,6 +855,32 @@ plantilla usa el que resolvió AXIS, nunca lo infiere. Ejemplos por lámina en
 | `close-brochure` (uso brochure) | `orbit` (sin foto) · `photo` | `deck.close-brochure` · `.photo` |
 | `close-proposal` (uso proposal, con foto) | — | `deck.close-proposal` |
 
+**Recetas con plantilla desde TASK-1928 (2026-09-27).** 34 plantillas para las 38 recetas restantes, por familia
+(builders en `src/lib/brand-surfaces/recipes/`: `proposal-service.ts`, `method.ts`, `close.ts`, `proof.ts`,
+`sections.ts`, `content.ts`, con ayudas en `kit.ts`):
+
+| Familia | Receta y `layout` → `contentType` |
+|---|---|
+| Propuestas sobrias | `proposal-service` → `deck.proposal-service` (las cuatro láminas `proposal-service-aeo/creative/web/revops` comparten plantilla) |
+| Método | `method-staircase` + `flat` · `method-score-ring` · `method-hybrid-workforce` (+ `scene`) · `decision-plan` |
+| Cotización y cierre | `content-pricing` (`table` por defecto · `stage` · `live`) · `decision-next-steps` · `breather` |
+| Prueba | `content-focus` · `content-clients` · `content-partners` · `decision-risk` · `decision-case` · `decision-chart` · `decision-testimonial` · `decision-why-us` |
+| Secciones y quiénes somos | `section-lens` · `section-bleed` · `section-cine` (`team` por defecto · `services` · `about` · `purpose`; team y services comparten plantilla) · `content-team` · `content-stack` |
+| Contenido y día a día | `contact-sheet` · `content-text` · `content-bullets` · `content-day` (`clock` por defecto · `tools` · `live-progress` · `live-results`) · `decision-agenda` |
+
+- **Qué ya hornean** (decisiones de norma de TASK-1928, detalle en `ledger.md`): acento nunca bajo 24 px (D1), la
+  respuesta ≥ 3× la pregunta (120 px en cotizaciones, plan, clientes, partners y testimonio), cifras por `figures` con
+  «Fuente: …» visible, secciones de cine sin logo, «quiénes somos» y «por qué lo hacemos» sin velo sobre la foto,
+  burbuja URL en el pie de `content-partners`, barras del gráfico desde su número (índice, antes = 100), logos de
+  terceros normalizados, montos `[MONTO]` y contacto desde `EFEONCE_CONTACT`.
+- **Los largos del catálogo son el límite.** Cada slot de la receta tiene su campo en el `slots.json` con el mismo
+  largo máximo (`recipe-map.json` → `slots`, vigilado por `recipe-slot-parity.test.ts`) y el compositor rechaza lo que
+  se pasa: se acorta el texto, nunca se toca la plantilla.
+- **Foco del recorte:** `photo.focus` (0–1) dirige el recorte del plate sólo en las recetas que lo leen; sin él, el
+  recorte es centrado. La sección partida sigue sin leerlo.
+- **Bloqueada:** `cover-brochure-cine-lines-selection` (`recipe-map.json` → `blocked`) hasta que AXIS admita
+  selección en `cover-brochure`.
+
 - **Marco:** `cover-brochure` lleva foto de cine a sangre y columna de voz, **sin selección ni burbuja URL** (por eso
   la lámina aprobada `cover-brochure-cine-lines-selection` no se compone: el contrato no admite selección en esa
   portada). `cover-proposal` lleva el logo del cliente (o el marcador «Logo del cliente») con la selección sobre su
@@ -883,8 +910,11 @@ plantilla usa el que resolvió AXIS, nunca lo infiere. Ejemplos por lámina en
 - **Estado (2026-09-27):** TASK-1927 `complete`, en `develop` local y sin push; aprobación visual del operador de las
   láminas compuestas (`hero`, `lines` y el brochure de nueve páginas). Los gates se leen en la task
   (`docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md`). TASK-1928 y TASK-1929 quedaron
-  desbloqueadas. **Pendiente:** push a `develop`; plantillas de las 38 recetas restantes
-  (TASK-1928); ruta productiva gobernada, que debe aceptar también el documento (TASK-1921). Diferencias conocidas
+  desbloqueadas. TASK-1928 dejó las plantillas de las 38 restantes en `develop` local (gate `graphic-line` a 0 px en
+  66 frames); **espera la aprobación visual del operador** de sus seis familias (hojas en
+  `ai-generations/2026-09-27_deck-recetas/`), el `pnpm build` de cierre (con autorización) y el push. **Pendiente:**
+  push a `develop`; ruta productiva gobernada, que debe aceptar también el documento (TASK-1921); selección en
+  `cover-brochure` (AXIS). Diferencias conocidas
   contra los prototipos: tamaño de «Cuando quieras.», burbuja URL horneada en vez de la de luminosidad, caja de
   selección del pintor canónico unos píxeles más ajustada.
 

@@ -1,5 +1,19 @@
 # TASK-1929 — Plan de deck contra el catálogo de recetas: catálogo en runtime, validador y propuesta del agente
 
+## Delta 2026-09-27 — TASK-1928 dejó las plantillas
+
+- TASK-1928 dejó **68 de 69** recetas del catálogo con plantilla en `graphic-line-deck` (commits `ab23fdd90`,
+  `2c7c67c5d`, `39b9c7006`, `82964f2b4`, `3def01768`, `c3c290e16`, `64be8aa16`; AXIS `v0.3.20`). La única sin plantilla
+  es `cover-brochure-cine-lines-selection` (el contrato de AXIS no admite selección en `cover-brochure`). El mapa receta →
+  contentType vive en `src/lib/artifact-composer/catalogs/graphic-line-deck/recipe-map.json` y el índice publicado en
+  `docs/operations/brand-graphic-line/deck-recipes/README.md` (columna «Plantilla»).
+- Composiciones nuevas con su contentType propio: `content-pricing` (`table`, `.stage`, `.live`), `section-cine` (`team`
+  por defecto, `.services`, `.about`, `.purpose`), `content-day` (`clock` por defecto, `.tools`, `.live-progress`,
+  `.live-results`), `method-staircase.flat`, `method-hybrid-workforce.scene`.
+- Para el validador: `recipe-map.json` → `slots` declara en qué campo del `slots.json` vive cada slot de las 38 recetas
+  (y `recipe-slot-parity.test.ts` lo sostiene): el validador puede leer de ahí largos, obligatoriedad y tipo sin
+  duplicarlos. El rango de la selección (`selected`, 1…N) y las cifras con fuente ya fallan cerrado en los builders.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

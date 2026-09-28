@@ -1,11 +1,12 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-27 por Claude (1.1: estado tras el cierre de TASK-1927 — qué recetas tienen
-> plantilla, equivalencia de nombres con el contrato de AXIS, pendientes de QA resueltos y abiertos, cómo cambiar la
-> foto, el copy o la sección)
+> **Última actualización:** 2026-09-27 por Claude (1.2: TASK-1928 — 68 de 69 recetas con plantilla, las familias
+> nuevas y sus intents de ejemplo, paridad de slots receta ↔ plantilla y los pendientes de QA que resolvió. Antes, 1.1:
+> estado tras el cierre de TASK-1927 — qué recetas tienen plantilla, equivalencia de nombres con el contrato de AXIS,
+> pendientes de QA resueltos y abiertos, cómo cambiar la foto, el copy o la sección)
 > **Fuente de verdad:** [`EFEONCE_DECK_SLIDE_RECIPES_V1.json`](./EFEONCE_DECK_SLIDE_RECIPES_V1.json) (esquema
 > `efeonce.deck-slide-recipes.v1`, 69 recetas). Este README explica cómo usarlo; el índice del final se **genera**
 > desde el JSON con `pnpm brand:deck-recipes` y no se edita a mano.
@@ -17,7 +18,7 @@
 > [`deck-studio`](../../../../.claude/skills/deck-studio/SKILL.md) · [TASK-1926](../../../tasks/to-do/TASK-1926-cine-register-idempotent-photo-pipeline.md)
 > (fotos) · [TASK-1927](../../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (plantillas
 > de 31 recetas, `complete`) · [TASK-1928](../../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md)
-> (las 38 recetas sin plantilla).
+> (plantillas de las 38 recetas restantes).
 
 ## Qué es
 
@@ -42,10 +43,12 @@ catálogo `deck-axis` de las ofertas a comité ni a la interfaz de Greenhouse.
    `variant` (se elige una, no las dos seguidas) y `sequence` (van una después de la otra).
 4. **Llena los slots** con datos reales: textos dentro de su `maxChars` medido, montos siempre `[MONTO]`, cifras con
    fuente, logos sólo de clientes que autorizan su uso, fotos de ejemplo reemplazadas.
-5. **Mira si la receta tiene plantilla** (31 de 69; tabla de «Qué sale hoy con un comando»). Si la tiene, **escribe
-   el intent** en un archivo propio, con la receta y el `layout` de AXIS que le corresponden, y compón la lámina o el
-   documento completo con `pnpm brand:compose`. Si no la tiene (38 recetas, TASK-1928), se arma como **maqueta de
-   dirección declarada** siguiendo el `prompts.composition` de la receta.
+5. **Compón con la plantilla.** **68 de 69** recetas tienen plantilla (columna «Plantilla» del índice y tabla de «Qué
+   sale hoy con un comando»). **Escribe el intent** en un archivo propio, partiendo del intent de ejemplo de la receta
+   (`src/lib/brand-surfaces/examples/deck-<receta>-intent.json`), con la receta y el `layout` de AXIS que le
+   corresponden, y compón la lámina o el documento completo con `pnpm brand:compose`. La única sin plantilla es
+   `cover-brochure-cine-lines-selection`: el contrato de AXIS no admite selección en `cover-brochure`, así que se
+   compone como `cover-brochure-cine-lines`, **sin la selección**.
 6. **Revisa a ojo** el píxel final contra la referencia aprobada, con la lista de la norma y los pendientes de QA de
    abajo. Componer no aprueba ni publica.
 
@@ -159,15 +162,15 @@ arriba (el JSON no se corrigió en este cambio):
 - `section-split-corner-bottom.notes` y `section-split-panel-end.notes` dicen que la excepción cine «no está escrita»:
   quedó escrita (decisión 4, registro cine y norma §4.6).
 - Varias `notes` citan que §4.6 o el token AXIS tratan una lámina como «opción» o «prueba»: la norma ya dice
-  aprobado (decisión 1). TASK-1927 integró en Greenhouse el contrato 0.1.2 con las 31 recetas de «Qué sale hoy con un
-  comando»; el estado en AXIS de las 38 restantes se revisa al tomar TASK-1928.
+  aprobado (decisión 1). TASK-1927 integró en Greenhouse el contrato 0.1.2 con 31 recetas y TASK-1928 sumó las 38
+  restantes (AXIS `axis-tokens` 0.3.20, `axis-ui-contracts` 0.3.18).
 - Varias recetas citan `cover-classic` o `close-classic` como alternativa (`preferInstead`): el marco clásico no fue
   aprobado y no se usa.
 
 ## Pendientes de QA
 
-No bloquean la aprobación de las láminas. Se corrigen al llevar cada receta a plantilla: TASK-1927 lo hizo con las
-suyas y las demás son de TASK-1928.
+No bloquean la aprobación de las láminas. Se corrigieron al llevar cada receta a plantilla: TASK-1927 con las suyas y
+TASK-1928 con las 38 restantes. Lo que sigue abierto está al final.
 
 ### Resueltos por TASK-1927
 
@@ -177,20 +180,35 @@ suyas y las demás son de TASK-1928.
 | Dirección de contacto | contraportadas de brochure y de propuesta | el contacto sale de `EFEONCE_CONTACT` (`src/config/efeonce-brand.ts`); AXIS sólo define el estilo |
 | Plantillas en la versión anterior | `proposal-cinematic`, `section-split`, `triptych` | `pnpm brand:compose` compone sobre el contrato 0.1.2: prueba opcional en la página de servicio, layouts `hero` y `lines`, sección partida por la izquierda en sus tres composiciones y tríptico de una palabra por toma |
 
+### Resueltos por TASK-1928
+
+La plantilla aplica la norma sobre la referencia aprobada. Donde la referencia y la norma chocaban, manda la norma.
+
+| Pendiente | Dónde | Cómo quedó (decisión) |
+|---|---|---|
+| Acento en texto de menos de 24 px | kickers «Recomendado» y cabecera de la cotización en vivo (`content-pricing*`), «01 · Diagnóstico · Sin costo» (`decision-next-steps`), kicker de las propuestas sobrias (`proposal-service-*`), rol del interlocutor (`content-team`), rótulos de los pilares de «por qué lo hacemos» (`section-cine-purpose`), rótulo «Revisamos contigo» del reloj (`content-day`), etiqueta de la tarjeta en revisión (`content-day-live-progress`) | **D1:** ese texto va en navy sobre papel o en el texto claro sobre oscuro, nunca en el acento de la línea. La auditoría renderizada del gate lo mide en todos los frames |
+| Respuesta bajo 3× la pregunta | cotización (`content-pricing`, `-stage`, `-live`), clientes (`content-clients`), plan (`decision-plan`), partners (`content-partners`) y testimonio (`decision-testimonial`) | **3×:** la respuesta sube a 120 px (antes 118 en las cotizaciones, 116 en clientes, 112 en el plan, 110 en partners y 104 en el testimonio). La auditoría renderizada del gate mide la proporción en las cotizaciones, clientes, plan y partners |
+| Cifras sin fuente visible | clientes (+127 %, +180 %), por qué elegirnos, «quiénes somos», prueba de Sky (`content-focus`) | **fuentes visibles:** toda cifra llega por `figures` del contrato, con valor, rótulo y fuente obligatoria, y la lámina imprime «Fuente: …». Una cifra sin fuente la rechaza AXIS. El foco, que imprimía «Datos de muestra», ahora cita el caso publicado de Sky |
+| Logo chico en secciones de cine | `section-cine-services`, `section-cine-team` | **sin logo en láminas interiores con foto:** la plantilla retira el logo que venía de cuando eran portadas y el eyebrow vuelve al margen |
+| Degradado sobre el plate (velo) | `section-cine-about`, `section-cine-purpose` | **sin velo:** la plantilla no pinta capa de degradado sobre la foto (regla `no-scrim` en AXIS) |
+| Montos | cotización (`content-pricing*`) | **montos como marcador:** la plantilla imprime siempre `[MONTO]`; el intent no trae montos |
+| Dirección de contacto | próximos pasos (`decision-next-steps`) | **contacto desde `EFEONCE_CONTACT`**, nunca desde el intent |
+| Sin burbuja URL en el pie | partners (`content-partners`) | **burbuja URL** en el pie |
+
+Otras decisiones que la plantilla aplica: las **barras** de `decision-chart` salen de su número (índice, antes = 100);
+los **logos de terceros** se normalizan al componer (un tono y el mismo peso óptico), con la excepción tonal de Aguas
+Andinas y la UC de Temuco; el **stack** (`content-stack`) no pinta los «pilares de luz» del guion, porque en la
+referencia aprobada nunca se vieron.
+
 ### Abiertos
 
 | Pendiente | Dónde | Estado |
 |---|---|---|
-| Logo dentro de la órbita en el cierre | contraportadas | **sin resolver** en TASK-1927: ninguna contraportada aprobada lo lleva así; las aprobadas ponen el logo arriba de la columna (norma §6, fila 17) |
-| Respuesta bajo 3× la pregunta | cotización (2,95×), clientes (2,9×), plan (2,8×), partners (2,75×) | recetas sin plantilla: TASK-1928 |
-| Acento en texto de menos de 24 px (D1) | etiquetas del día a día, «Recomendado», cabecera de la cotización en vivo, «01 · Diagnóstico · Sin costo», kicker de propuestas sobrias, etiqueta del tablero de Notion; posible halo en equipo y plan | recetas sin plantilla: TASK-1928; en una maqueta, el texto va a navy o blanco |
-| Cifras sin fuente visible | clientes (+127 %, +180 %), por qué elegirnos, «+10 años · 5 países · 1 interlocutor», prueba de Sky | recetas sin plantilla: TASK-1928; no se inventa fuente: se agrega la real o se quita la cifra |
-| Sin burbuja URL en el pie | partners | receta sin plantilla: TASK-1928 |
-| Degradado sobre el plate (velo) | `section-cine-about`, `section-cine-purpose` (`quienes.mjs`) | recetas sin plantilla: TASK-1928; el plate se regenera con la reserva, sin velo |
-| Logo chico en secciones cine | servicios y equipo | recetas sin plantilla: TASK-1928; choca con la regla «lámina con foto sin logo» |
-| Dirección de contacto | próximos pasos (`decision-next-steps`) | receta sin plantilla: TASK-1928; usar `EFEONCE_CONTACT` |
+| Selección en la portada de cinco líneas | `cover-brochure-cine-lines-selection` | el contrato de AXIS no admite selección en `cover-brochure`: la lámina se compone sin la selección. Seguimiento en AXIS |
+| Logo dentro de la órbita en el cierre | contraportadas | **sin resolver**: ninguna contraportada aprobada lo lleva así; las aprobadas ponen el logo arriba de la columna (norma §6, fila 17) |
 | Isotipo sin registro de procedencia | plates `b` (NX6b, CR2b, WB1b, RV1b, BR2b…); HW1, T2, T3, H2 y LN4 sin isotipo compuesto | pasar por `pnpm foto:emblema` (y `foto:isotipo` si difiere) antes de publicar |
 | Plate repetido | P1 en lente, sangre, contenido con foto y hoja de contactos | regla de uso: no repetirlo en un mismo deck |
+| Aprobación visual de las familias nuevas | las seis familias de TASK-1928 | el operador revisa a ojo las hojas de `ai-generations/2026-09-27_deck-recetas/`; hasta entonces, cada lámina se revisa contra su referencia |
 
 Diferencias conocidas de las plantillas del marco contra los prototipos aprobados (el operador aprobó a ojo las
 láminas compuestas el 2026-09-27): «Cuando quieras.» sale algo más grande que en el prototipo porque usa el valor del
@@ -199,11 +217,20 @@ unos píxeles más ajustada.
 
 ## Qué sale hoy con un comando
 
-**31 de las 69 recetas caen en una plantilla** del catálogo `graphic-line-deck` del Artifact Composer y salen con
-`pnpm brand:compose`. Las **38 restantes no tienen plantilla** y son
-[TASK-1928](../../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md).
-[TASK-1927](../../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) está `complete`
-(2026-09-27); su trabajo está en `develop` local y el push sigue pendiente.
+**68 de las 69 recetas caen en una plantilla** del catálogo `graphic-line-deck` del Artifact Composer y salen con
+`pnpm brand:compose`. La columna «Plantilla» del índice lo dice por receta y se lee de `registry.json`. La única sin
+plantilla es `cover-brochure-cine-lines-selection`: se compone como `cover-brochure-cine-lines`, sin la selección
+(`recipe-map.json` la marca `blocked`).
+
+- [TASK-1927](../../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (`complete`) cubrió
+  31 recetas: el marco (portadas y contraportadas), las secciones clásica y partida, la medida, el tríptico, la
+  escalera y las propuestas de cine. Treinta tienen plantilla; la trigésimo primera es la portada con selección que
+  sale sin ella.
+- [TASK-1928](../../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) sumó las otras 38
+  en seis familias, sobre 34 plantillas nuevas: las cuatro `proposal-service-*` comparten
+  `ProposalService`, y `section-cine-team` y `section-cine-services` comparten `SectionCine`.
+
+Todo está en `develop` local; el push sigue pendiente de la señal del operador.
 
 ### Dos nombres para la misma lámina
 
@@ -212,7 +239,7 @@ El **id del catálogo** nombra la lámina aprobada (`section-split-corner-bottom
 (`section-split` + `corner-bottom`, `cover-brochure` + `line`). Varias láminas del catálogo comparten una receta de
 AXIS y se distinguen por el `layout`, la línea, la foto y el copy del intent. El `layout` va siempre explícito.
 
-Los ejemplos viven en `src/lib/brand-surfaces/examples/`.
+Los ejemplos viven en `src/lib/brand-surfaces/examples/`. Las recetas de TASK-1927:
 
 | id del catálogo | Receta AXIS | `layout` | `use` | Intent de ejemplo |
 |---|---|---|---|---|
@@ -250,22 +277,66 @@ Los ejemplos viven en `src/lib/brand-surfaces/examples/`.
 
 «—» en `use` significa que el ejemplo no lo declara y AXIS resuelve el de la receta.
 
-### Las 38 sin plantilla (TASK-1928)
+### Las recetas de TASK-1928
 
-Se arman como **maqueta de dirección declarada** con `prompts.composition` y la referencia aprobada, y se dice en la
-entrega.
+Cada una tiene su intent de ejemplo en `src/lib/brand-surfaces/examples/deck-<id del catálogo>-intent.json` (por
+ejemplo, `deck-content-pricing-live-intent.json`). Los 38 ejemplos declaran `use: proposal`. Como en la tabla de
+arriba, el intent pide la receta de AXIS y su `layout`; el `contentType` lo deriva `src/lib/brand-surfaces` del
+manifest y el autor no lo escribe. Las cuatro propuestas sobrias usan la misma receta y se distinguen por `line` y
+por el copy.
 
-| Familia | Recetas sin plantilla |
-|---|---|
-| Secciones | `section-lens`, `section-bleed`, `section-cine-services`, `section-cine-team` |
-| Quiénes somos, equipo y stack | `section-cine-about`, `section-cine-purpose`, `content-team`, `content-stack` |
-| Contenido | `contact-sheet`, `content-text`, `content-bullets`, `content-day`, `content-day-tools`, `content-day-live-progress`, `content-day-live-results`, `decision-agenda` |
-| Método | `decision-plan`, `method-hybrid-workforce`, `method-hybrid-workforce-scene`, `method-staircase-flat`, `method-score-ring` |
-| Prueba | `content-focus`, `content-clients`, `content-partners`, `decision-risk`, `decision-case`, `decision-chart`, `decision-testimonial`, `decision-why-us` |
-| Propuesta por línea (sobrias) | `proposal-service-aeo`, `proposal-service-creative`, `proposal-service-web`, `proposal-service-revops` |
-| Cotización | `content-pricing`, `content-pricing-stage`, `content-pricing-live` |
-| Próximos pasos | `decision-next-steps` |
-| Respiro | `breather` |
+| Familia | id del catálogo | Receta AXIS | `layout` | Plantilla |
+|---|---|---|---|---|
+| Propuestas sobrias | `proposal-service-aeo` | `proposal-service` | — | `ProposalService` |
+|  | `proposal-service-creative` | `proposal-service` | — | `ProposalService` |
+|  | `proposal-service-web` | `proposal-service` | — | `ProposalService` |
+|  | `proposal-service-revops` | `proposal-service` | — | `ProposalService` |
+| Método | `method-staircase-flat` | `method-staircase` | `flat` | `MethodStaircaseFlat` |
+|  | `decision-plan` | `decision-plan` | — | `DecisionPlan` |
+|  | `method-score-ring` | `method-score-ring` | — | `MethodScoreRing` |
+|  | `method-hybrid-workforce` | `method-hybrid-workforce` | — | `MethodHybridWorkforce` |
+|  | `method-hybrid-workforce-scene` | `method-hybrid-workforce` | `scene` | `MethodHybridWorkforceScene` |
+| Cotización, próximos pasos y respiro | `content-pricing` | `content-pricing` | — | `ContentPricing` |
+|  | `content-pricing-stage` | `content-pricing` | `stage` | `ContentPricingStage` |
+|  | `content-pricing-live` | `content-pricing` | `live` | `ContentPricingLive` |
+|  | `decision-next-steps` | `decision-next-steps` | — | `DecisionNextSteps` |
+|  | `breather` | `breather` | — | `Breather` |
+| Prueba | `content-focus` | `content-focus` | — | `ContentFocus` |
+|  | `content-clients` | `content-clients` | — | `ContentClients` |
+|  | `content-partners` | `content-partners` | — | `ContentPartners` |
+|  | `decision-risk` | `decision-risk` | — | `DecisionRisk` |
+|  | `decision-case` | `decision-case` | — | `DecisionCase` |
+|  | `decision-chart` | `decision-chart` | — | `DecisionChart` |
+|  | `decision-testimonial` | `decision-testimonial` | — | `DecisionTestimonial` |
+|  | `decision-why-us` | `decision-why-us` | — | `DecisionWhyUs` |
+| Secciones y quiénes somos | `section-lens` | `section-lens` | — | `SectionLens` |
+|  | `section-bleed` | `section-bleed` | — | `SectionBleed` |
+|  | `section-cine-team` | `section-cine` | `team` | `SectionCine` |
+|  | `section-cine-services` | `section-cine` | `services` | `SectionCine` |
+|  | `section-cine-about` | `section-cine` | `about` | `SectionCineAbout` |
+|  | `section-cine-purpose` | `section-cine` | `purpose` | `SectionCinePurpose` |
+|  | `content-team` | `content-team` | — | `ContentTeam` |
+|  | `content-stack` | `content-stack` | — | `ContentStack` |
+| Contenido y día a día | `contact-sheet` | `contact-sheet` | — | `ContactSheet` |
+|  | `content-text` | `content-text` | — | `ContentText` |
+|  | `content-bullets` | `content-bullets` | — | `ContentBullets` |
+|  | `content-day` | `content-day` | `clock` | `ContentDay` |
+|  | `content-day-tools` | `content-day` | `tools` | `ContentDayTools` |
+|  | `content-day-live-progress` | `content-day` | `live-progress` | `ContentDayProgress` |
+|  | `content-day-live-results` | `content-day` | `live-results` | `ContentDayResults` |
+|  | `decision-agenda` | `decision-agenda` | — | `DecisionAgenda` |
+
+«—» en `layout`: la receta no lleva composición. `section-cine` sin `layout` resuelve como `team`.
+
+Composiciones nuevas del contrato: `section-cine` ganó `about` y `purpose`; `content-day` ganó `tools`, `live-progress` y
+`live-results`.
+
+**Paridad de slots receta ↔ plantilla.** `recipe-map.json` (en el catálogo `graphic-line-deck`) declara, para cada
+receta de TASK-1928, en qué campo del `slots.json` vive cada slot de la receta. El test
+`src/lib/brand-surfaces/__tests__/recipe-slot-parity.test.ts` exige que cada slot tenga su campo, con tipo compatible,
+que lo obligatorio siga obligatorio y el mismo largo máximo (en una plantilla compartida manda el mayor). Por eso el
+`maxChars` del JSON es el largo que el compositor hace cumplir: un texto más largo **hace fallar la composición** con el
+slot que lo recibe. Las recetas anteriores declaran `slots: null`.
 
 ### Componer una lámina o un documento
 
@@ -280,6 +351,9 @@ issue de AXIS deja el documento sin componer. Portada con foto ↔ contraportada
 hoy. Ejemplos de documento: `deck-brochure-document.json` (nueve páginas) y `deck-proposal-document.json` (siete
 páginas interiores). Paso a paso: [manual de uso](../../../manual-de-uso/creative/componer-deck-con-recetas.md).
 
+Gate visual del catálogo: `pnpm composer:visual-gate --catalog=graphic-line` (66 frames a 0 px; altas declaradas en
+`scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`).
+
 ### El contenido es dato del intent
 
 La foto, el copy y la sección de una lámina se cambian **en el intent**, no en la plantilla; la plantilla nunca se
@@ -290,14 +364,20 @@ esa carpeta está vigilada por un snapshot (`src/lib/brand-surfaces/__tests__/ex
 |---|---|---|
 | La foto | `photo.plateRef`, `photo.alt` | `alt` obligatorio (describe la escena; sin él, `missing-photo`); el plate debe existir en disco (`ai-generations/**`, fuera de git) |
 | El copy | `voice`, `body` | el `maxChars` medido de la receta; la respuesta sin punto |
+| Las cifras | `figures` (valor, rótulo y fuente) | la fuente es obligatoria: sin ella AXIS rechaza la pieza |
+| El ítem seleccionado | `selected` (número de ítem, desde 1) | fuera del rango de ítems, la composición falla con `invalid-intent` |
 | La sección | `progress` | sección n de N del deck real |
 | El alto de la columna (portadas) | `column.topPx` | se elige según dónde queda el sujeto; fuera de la reserva del logo falla con `invalid-intent` |
 
 El recorte de la foto es centrado y cubre el área que pide la receta: en la sección partida, una franja de
 1.260 × 1.080 px sobre el lienzo de 1.920 × 1.080; en las láminas a sangre, el lienzo completo. La sección partida
-**no tiene control de foco**: si el sujeto queda cortado, se usa una foto con otro encuadre. En `section-split-panel-end`
-la foto va **espejada**: una foto con texto legible o con un logo saldría al revés. Al cambiar la foto no cambian el
-panel, la esquina curva, el indicador ni la columna de voz: eso lo fija el `layout`.
+**no tiene control de foco**: si el sujeto queda cortado, se usa una foto con otro encuadre. Las recetas que lo admiten
+(por ejemplo, la lente del día a día) aceptan `photo.focus` para dirigir el recorte hacia un punto del archivo. En
+`section-split-panel-end` la foto va **espejada**: una foto con texto legible o con un logo saldría al revés. Al cambiar
+la foto no cambian el panel, la esquina curva, el indicador ni la columna de voz: eso lo fija el `layout`.
+
+Los montos no son dato del intent: la cotización imprime siempre `[MONTO]`. El contacto tampoco: sale de
+`EFEONCE_CONTACT`.
 
 Las fotos se piden por ficha (`pnpm foto:prompt`, `foto:generar`, `foto:validar`, `foto:emblema`, `foto:isotipo`); su
 producción idempotente es TASK-1926. La ruta productiva gobernada (fuera del taller local) es TASK-1921 y está
@@ -321,7 +401,7 @@ falta un campo del esquema, si hay ids repetidos o si un `preferInstead` o `pair
 <!-- Generado por scripts/creative/deck-recipes/render-index.mjs desde EFEONCE_DECK_SLIDE_RECIPES_V1.json. No editar a mano: corre «pnpm brand:deck-recipes». -->
 
 Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aprobado el 2026-09-27 por operador (canvas «La órbita», página Deck).
-**44 de 69** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`). Las demás todavía no.
+**68 de 69** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`). Las demás todavía no.
 
 ### Recetas por familia y documento
 
@@ -373,23 +453,23 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aproba
 
 | id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |
 |---|---|---|---|---|---|---|---|
-| `section-lens` | Sección con lente · el arco mide en qué sección vamos | — | proposal, pitch, qbr | Abrir una sección de un deck que alguien presenta, cuando existe una foto documental del oficio de esa sección. | Cuando la foto no aguanta el recorte circular (sujeto pegado al borde o escena que necesita todo el ancho). | `section-classic`, `section-bleed`, `section-split` | `section`, `question` ≤34, `answer` ≤14, `photo`, (+1 opcional) |
+| `section-lens` | Sección con lente · el arco mide en qué sección vamos | `deck.section-lens` | proposal, pitch, qbr | Abrir una sección de un deck que alguien presenta, cuando existe una foto documental del oficio de esa sección. | Cuando la foto no aguanta el recorte circular (sujeto pegado al borde o escena que necesita todo el ancho). | `section-classic`, `section-bleed`, `section-split` | `section`, `question` ≤34, `answer` ≤14, `photo`, (+1 opcional) |
 | `section-classic` | Sección clásica AXIS · el número dentro del anillo | `deck.section-classic` | proposal, brochure, pitch, qbr | Abrir una sección cuando no hay foto propia del tema o el deck ya tiene suficiente fotografía. | Cuando la sección necesita emoción o mostrar al equipo trabajando: una sección sin foto no lo hace. | `section-split`, `section-lens`, `section-cine-services` | `section`, `question` ≤36, `answer` ≤14 |
-| `section-bleed` | Sección con foto a sangre · el indicador chico arriba a la izquierda | — | proposal, pitch, qbr | Abrir una sección con una escena ancha del oficio que pierde fuerza recortada en un círculo. | Cuando la foto no trae una zona calma y oscura a la izquierda para la voz (reservar después de generar no existe). | `section-lens`, `section-classic`, `breather` | `section`, `question` ≤24, `answer` ≤10, `photo` |
+| `section-bleed` | Sección con foto a sangre · el indicador chico arriba a la izquierda | `deck.section-bleed` | proposal, pitch, qbr | Abrir una sección con una escena ancha del oficio que pierde fuerza recortada en un círculo. | Cuando la foto no trae una zona calma y oscura a la izquierda para la voz (reservar después de generar no existe). | `section-lens`, `section-classic`, `breather` | `section`, `question` ≤24, `answer` ≤10, `photo` |
 | `section-split` | Sección partida · la órbita sube por la izquierda | `deck.section-split` | proposal, brochure, pitch, qbr | Abrir una sección de brochure o propuesta cuando hay un retrato fuerte relacionado con el tema. | Si la persona del retrato mira fuera de la lámina, hacia el borde opuesto al panel: la mirada saca al lector. | `section-split-corner-bottom`, `section-split-panel-end`, `section-classic` | `section`, `question` ≤32, `answer` ≤12, `photo` |
 | `section-split-corner-bottom` | Sección partida · esquina abajo («¿Cuánto tarda tu campaña? En días.») | `deck.section-split.corner-bottom` | proposal, brochure, pitch, qbr | Abrir una sección sobre velocidad, producción o campaña, con una persona del equipo en acción. | Si la promesa de la respuesta («en días») no se prueba en la lámina siguiente con una cifra con fuente. | `section-split`, `section-split-panel-end`, `content-measure` | `section`, `question` ≤30, `answer` ≤12, `photo` |
 | `section-split-panel-end` | Sección partida · panel a la derecha («¿Qué responde la IA? Tu marca.») | `deck.section-split.panel-end` | proposal, brochure, pitch, qbr | Abrir una sección sobre el resultado del cliente (AEO, visibilidad, respuesta), cuando la protagonista es la persona del cliente. | Si la persona mira hacia el borde izquierdo: el panel a la derecha la dejaría mirando fuera. | `section-split`, `section-split-corner-bottom` | `section`, `question` ≤30, `answer` ≤12, `photo` |
-| `section-cine-services` | Sección de cine · abre los servicios («¿Qué hace Efeonce? Crecer.») | — | brochure, proposal | Abrir la sección de servicios de un brochure o de una propuesta. | Como portada: el operador la reubicó como lámina interior (la portada de brochure es otra receta). | `section-cine-team`, `section-classic` | `eyebrow` ≤24, `question` ≤20, `answer` ≤8, `photo` |
-| `section-cine-team` | Sección de cine · abre el equipo («¿Quién hace crecer tu marca? Este equipo.») | — | brochure, proposal | Abrir la sección del equipo en un brochure o una propuesta, antes de la lámina con las personas asignadas. | Como portada: se reubicó como interior. | `content-team`, `section-cine-about` | `eyebrow` ≤24, `question` ≤40, `answer` ≤16, `photo` |
+| `section-cine-services` | Sección de cine · abre los servicios («¿Qué hace Efeonce? Crecer.») | `deck.section-cine.services` | brochure, proposal | Abrir la sección de servicios de un brochure o de una propuesta. | Como portada: el operador la reubicó como lámina interior (la portada de brochure es otra receta). | `section-cine-team`, `section-classic` | `eyebrow` ≤24, `question` ≤20, `answer` ≤8, `photo` |
+| `section-cine-team` | Sección de cine · abre el equipo («¿Quién hace crecer tu marca? Este equipo.») | `deck.section-cine` | brochure, proposal | Abrir la sección del equipo en un brochure o una propuesta, antes de la lámina con las personas asignadas. | Como portada: se reubicó como interior. | `content-team`, `section-cine-about` | `eyebrow` ≤24, `question` ≤40, `answer` ≤16, `photo` |
 
 ### Quiénes somos, equipo y stack · `about` (5)
 
 | id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |
 |---|---|---|---|---|---|---|---|
-| `section-cine-about` | Sección de cine · quiénes somos («¿Quiénes somos? Un solo equipo.») | — | brochure, proposal, pitch | Presentar a Efeonce en un brochure, una propuesta o un pitch, antes de los servicios. | Si las cifras no están verificadas y vigentes: cada cifra necesita respaldo. | `decision-why-us`, `section-cine-team` | `eyebrow` ≤24, `question` ≤24, `answer` ≤16, `body` ≤100, `figures` ≤4, `photo` |
-| `section-cine-purpose` | Sección de cine · por qué lo hacemos («¿Por qué lo hacemos así? Contigo.») | — | brochure, proposal, pitch | Explicar el propósito y la forma de trabajo de Efeonce, después de «quiénes somos». | Si la lámina anterior ya dijo el propósito con otra receta. | `decision-why-us`, `section-cine-about` | `eyebrow` ≤24, `question` ≤26, `answer` ≤9, `evidence` ≤110, `pillars` ≤70, `photo` |
-| `content-team` | El equipo · el squad real en fichas de vidrio sobre la órbita | — | proposal, pitch, qbr, brochure | En una propuesta o pitch con el squad ya asignado a la cuenta. | El squad no está asignado: nunca fotos genéricas, de stock ni generadas. | `section-cine` (AXIS), `content-text` | `eyebrow` ≤20, `question` ≤40, `answer` ≤18, `body` ≤85, `lead` ≤26, `team` ≤26 |
-| `content-stack` | Nuestro stack · tres capas de herramientas sobre Efeonce | — | proposal, brochure, pitch | Para justificar un delivery premium por el stack que lo sostiene. | La conversación es de programas de partner. | `content-partners`, `content-day-tools` | `eyebrow` ≤20, `question` ≤26, `answer` ≤12, `body` ≤100, `layers` ≤22, `highlightedLayer` |
+| `section-cine-about` | Sección de cine · quiénes somos («¿Quiénes somos? Un solo equipo.») | `deck.section-cine.about` | brochure, proposal, pitch | Presentar a Efeonce en un brochure, una propuesta o un pitch, antes de los servicios. | Si las cifras no están verificadas y vigentes: cada cifra necesita respaldo. | `decision-why-us`, `section-cine-team` | `eyebrow` ≤24, `question` ≤24, `answer` ≤16, `body` ≤100, `figures` ≤4, `photo` |
+| `section-cine-purpose` | Sección de cine · por qué lo hacemos («¿Por qué lo hacemos así? Contigo.») | `deck.section-cine.purpose` | brochure, proposal, pitch | Explicar el propósito y la forma de trabajo de Efeonce, después de «quiénes somos». | Si la lámina anterior ya dijo el propósito con otra receta. | `decision-why-us`, `section-cine-about` | `eyebrow` ≤24, `question` ≤26, `answer` ≤9, `evidence` ≤110, `pillars` ≤70, `photo` |
+| `content-team` | El equipo · el squad real en fichas de vidrio sobre la órbita | `deck.content-team` | proposal, pitch, qbr, brochure | En una propuesta o pitch con el squad ya asignado a la cuenta. | El squad no está asignado: nunca fotos genéricas, de stock ni generadas. | `section-cine` (AXIS), `content-text` | `eyebrow` ≤20, `question` ≤40, `answer` ≤18, `body` ≤85, `lead` ≤26, `team` ≤26 |
+| `content-stack` | Nuestro stack · tres capas de herramientas sobre Efeonce | `deck.content-stack` | proposal, brochure, pitch | Para justificar un delivery premium por el stack que lo sostiene. | La conversación es de programas de partner. | `content-partners`, `content-day-tools` | `eyebrow` ≤20, `question` ≤26, `answer` ≤12, `body` ≤100, `layers` ≤22, `highlightedLayer` |
 | `proposal-cinematic-nexa-lines` | Líneas de servicio con Nexa · cinco esferas de luz, una por línea, orbitan a su alrededor | `deck.proposal-cinematic.lines` | proposal, brochure | Presentar el portafolio completo de líneas de servicio | La propuesta es de una sola línea: se pasa directo a su lámina de servicio | `proposal-cinematic-creative`, `cover-brochure` (AXIS) | `eyebrow` ≤34, `body` ≤36, `photo`, (+1 opcional) |
 
 ### Contenido · `content` (9)
@@ -397,14 +477,14 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aproba
 | id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |
 |---|---|---|---|---|---|---|---|
 | `content-measure` | Contenido · la órbita mide la cifra | `deck.content-measure` | proposal, brochure, pitch, qbr | Cuando el hallazgo o el resultado principal es UN porcentaje real con fuente. | Si la cifra no es un porcentaje entre 0 y 100: el arco no puede medir días, montos ni multiplicadores. | `content-focus`, `decision-chart`, `decision-why-us` | `eyebrow` ≤28, `question` ≤38, `measure` ≤5, `body` ≤90, `source` ≤60, `photo`, (+1 opcional) |
-| `contact-sheet` | Varias fotos · hoja de contactos con profundidad | — | proposal, pitch, qbr | Mostrar un proceso creativo con varias tomas reales y la decisión sobre ellas. | Con fotos de formatos distintos que habría que recortar: todas nativas 16:9. | `triptych`, `breather` | `question` ≤32, `answer` ≤6, `chosen`, `alternatives` ≤30, `collaborator` ≤20 |
-| `content-text` | Texto · el porqué, dicho en una palabra gigante | — | proposal, brochure, pitch | Para fijar el porqué o la promesa de marca antes de entrar al detalle de la oferta. | La respuesta necesita más de una palabra: la escala que la justifica se pierde. | `content-bullets`, `decision-why-us`, `content-measure` | `eyebrow` ≤28, `question` ≤32, `answer` ≤8, `body` ≤95, `pillars` ≤46, `nav` |
-| `content-bullets` | Texto con viñetas · cuatro puntos numerados | — | proposal, brochure, pitch | Para explicar qué recibe el cliente en cuatro ideas del mismo peso. | Son más o menos de cuatro puntos: la grilla es de 2 × 2. | `content-text`, `decision-plan`, `decision-why-us` | `eyebrow` ≤28, `question` ≤40, `answer` ≤14, `items` ≤95, `selectedItem`, `selectionLabel`, `nav` |
-| `content-day` | El día a día · cuatro momentos con horario en la órbita-reloj | — | proposal, brochure, pitch | Para mostrar cómo se trabaja con fotos reales de oficio (terreno, taller, revisión, medición). | No hay fotos aprobadas de los momentos. | `content-day-tools`, `content-day-live-progress`, `content-day-live-results` | `eyebrow` ≤24, `question` ≤34, `answer` ≤5, `body` ≤120, `keyMoment`, `moments` ≤24 |
-| `content-day-tools` | El día a día con las herramientas · el panel de Greenhouse al centro | — | proposal, brochure, pitch | Cuando el cliente pregunta cómo se coordina el trabajo y dónde ve lo que pasa. | La cuenta no usa esas herramientas o no tiene panel de Greenhouse. | `content-day`, `content-stack` | `eyebrow` ≤26, `question` ≤30, `answer` ≤5, `body` ≤100, `panel`, `tools` ≤22 |
-| `content-day-live-progress` | Vívelo 1 · el plan en Notion y la aprobación en Frame.io | — | proposal, brochure, pitch | Después del día a día con herramientas, para que quien lo ve viva la aprobación. | La cuenta no aprueba piezas visuales (servicios sin producción creativa). | `content-day-live-results`, `content-day-tools` | `eyebrow` ≤26, `question` ≤28, `answer` ≤12, `body` ≤100, `boardTitle` ≤24, `boardCards` ≤24, `reviewTitle` ≤20, `reviewImage`, `clientComment` ≤32, `teamReply` ≤32, (+1 opcional) |
-| `content-day-live-results` | Vívelo 2 · los resultados en vivo en Insights, Greenhouse y Teams | — | proposal, brochure, pitch, qbr | Después de «Vívelo 1», o sola cuando la objeción es la reportería. | La cuenta no tiene Efeonce Insights ni panel de Greenhouse. | `decision-chart`, `content-day-tools` | `eyebrow` ≤26, `question` ≤16, `answer` ≤10, `body` ≤100, `panel`, `meeting` ≤40, `reportTitle` ≤36, `metrics` ≤18 |
-| `decision-agenda` | Agenda · cinco temas y el que importa marcado | — | proposal, pitch, qbr | Después de la portada de una presentación en sala (propuesta, pitch, QBR). | En un brochure que se lee solo: no hay «hoy». | `section-classic` | `eyebrow` ≤16, `question` ≤24, `answer` ≤14, `items` ≤26, `highlightedItem`, `nav` |
+| `contact-sheet` | Varias fotos · hoja de contactos con profundidad | `deck.contact-sheet` | proposal, pitch, qbr | Mostrar un proceso creativo con varias tomas reales y la decisión sobre ellas. | Con fotos de formatos distintos que habría que recortar: todas nativas 16:9. | `triptych`, `breather` | `question` ≤32, `answer` ≤6, `chosen`, `alternatives` ≤30, `collaborator` ≤20 |
+| `content-text` | Texto · el porqué, dicho en una palabra gigante | `deck.content-text` | proposal, brochure, pitch | Para fijar el porqué o la promesa de marca antes de entrar al detalle de la oferta. | La respuesta necesita más de una palabra: la escala que la justifica se pierde. | `content-bullets`, `decision-why-us`, `content-measure` | `eyebrow` ≤28, `question` ≤32, `answer` ≤8, `body` ≤95, `pillars` ≤46, `nav` |
+| `content-bullets` | Texto con viñetas · cuatro puntos numerados | `deck.content-bullets` | proposal, brochure, pitch | Para explicar qué recibe el cliente en cuatro ideas del mismo peso. | Son más o menos de cuatro puntos: la grilla es de 2 × 2. | `content-text`, `decision-plan`, `decision-why-us` | `eyebrow` ≤28, `question` ≤40, `answer` ≤14, `items` ≤95, `selectedItem`, `selectionLabel`, `nav` |
+| `content-day` | El día a día · cuatro momentos con horario en la órbita-reloj | `deck.content-day` | proposal, brochure, pitch | Para mostrar cómo se trabaja con fotos reales de oficio (terreno, taller, revisión, medición). | No hay fotos aprobadas de los momentos. | `content-day-tools`, `content-day-live-progress`, `content-day-live-results` | `eyebrow` ≤24, `question` ≤34, `answer` ≤5, `body` ≤120, `keyMoment`, `moments` ≤24 |
+| `content-day-tools` | El día a día con las herramientas · el panel de Greenhouse al centro | `deck.content-day.tools` | proposal, brochure, pitch | Cuando el cliente pregunta cómo se coordina el trabajo y dónde ve lo que pasa. | La cuenta no usa esas herramientas o no tiene panel de Greenhouse. | `content-day`, `content-stack` | `eyebrow` ≤26, `question` ≤30, `answer` ≤5, `body` ≤100, `panel`, `tools` ≤22 |
+| `content-day-live-progress` | Vívelo 1 · el plan en Notion y la aprobación en Frame.io | `deck.content-day.live-progress` | proposal, brochure, pitch | Después del día a día con herramientas, para que quien lo ve viva la aprobación. | La cuenta no aprueba piezas visuales (servicios sin producción creativa). | `content-day-live-results`, `content-day-tools` | `eyebrow` ≤26, `question` ≤28, `answer` ≤12, `body` ≤100, `boardTitle` ≤24, `boardCards` ≤24, `reviewTitle` ≤20, `reviewImage`, `clientComment` ≤32, `teamReply` ≤32, (+1 opcional) |
+| `content-day-live-results` | Vívelo 2 · los resultados en vivo en Insights, Greenhouse y Teams | `deck.content-day.live-results` | proposal, brochure, pitch, qbr | Después de «Vívelo 1», o sola cuando la objeción es la reportería. | La cuenta no tiene Efeonce Insights ni panel de Greenhouse. | `decision-chart`, `content-day-tools` | `eyebrow` ≤26, `question` ≤16, `answer` ≤10, `body` ≤100, `panel`, `meeting` ≤40, `reportTitle` ≤36, `metrics` ≤18 |
+| `decision-agenda` | Agenda · cinco temas y el que importa marcado | `deck.decision-agenda` | proposal, pitch, qbr | Después de la portada de una presentación en sala (propuesta, pitch, QBR). | En un brochure que se lee solo: no hay «hoy». | `section-classic` | `eyebrow` ≤16, `question` ≤24, `answer` ≤14, `items` ≤26, `highlightedItem`, `nav` |
 
 ### Método · `method` (8)
 
@@ -423,14 +503,14 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aproba
 
 | id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |
 |---|---|---|---|---|---|---|---|
-| `content-focus` | Contenido · el foco sobre la prueba | — | proposal, pitch, qbr | Cuando el resultado se dice mejor como frase («A la primera.») y la cifra la respalda. | Sin una cifra con fuente que respalde la frase. | `content-measure`, `decision-testimonial` | `eyebrow` ≤28, `question` ≤44, `answer` ≤16, `proof` ≤6, `proofText` ≤70, `source` ≤60, `photo` |
-| `content-clients` | Nuestros clientes · logos reales en un tono y dos pruebas gigantes | — | proposal, brochure, pitch | Como credencial en propuestas, pitches y brochures. | No hay autorización para mostrar un logo. | `decision-case`, `content-partners` | `eyebrow` ≤20, `question` ≤30, `answer` ≤16, `proofs` ≤50, `logos`, `markets` ≤45, `selectedProof`, `nav` |
-| `content-partners` | Nuestros partners · los nueve programas que se pueden declarar | — | proposal, brochure, pitch | Como credencial técnica en propuestas y pitches. | Hay que mostrar las herramientas que se usan, no los programas de partner. | `content-stack`, `content-clients` | `eyebrow` ≤20, `question` ≤30, `answer` ≤18, `body` ≤80, `partners`, `selectedPartner`, `selectionLabel`, `nav` |
-| `decision-risk` | Por qué es seguro · cada riesgo con su cobertura | — | proposal, pitch | Para responder la objeción «¿y si no funciona?» antes de la cotización o justo después. | Una cobertura no se ofrece de verdad en este servicio (por ejemplo, no hay Sample Sprint disponible). | `decision-plan`, `decision-case` | `eyebrow` ≤24, `question` ≤22, `answer` ≤18, `body` ≤100, `rows` ≤100, `selectedRow`, `nav` |
-| `decision-case` | Caso de éxito · Sky en 12 meses, con foto de ejemplo | — | proposal, brochure, pitch | Para demostrar con un caso publicado lo que se promete en la propuesta. | No hay foto real del caso: la de la referencia es sólo de ejemplo y no sale a una pieza final. | `decision-chart`, `decision-testimonial` | `clientLogo`, `eyebrow` ≤20, `question` ≤26, `answer` ≤11, `stats` ≤24, `source` ≤120, `photo`, `selectedStat` |
-| `decision-chart` | Gráfico · el dato con su anotación | — | proposal, brochure, pitch, qbr | Para mostrar un antes y después medido de un caso. | No hay línea base comparable. | `content-measure`, `decision-case` | `eyebrow` ≤30, `question` ≤24, `answer` ≤10, `body` ≤100, `bars` ≤14, `annotation` ≤7, `chartNote` ≤70, `kpis` ≤22, `source` ≤90, `nav` |
-| `decision-testimonial` | Testimonio · la frase del cliente a escala de titular | — | proposal, brochure, pitch | Hay una cita real, textual y publicada, con autorización del cliente. | La cita no es textual o no está autorizada. | `decision-case`, `content-clients` | `eyebrow` ≤28, `question` ≤34, `keyPhrase` ≤36, `fullQuote` ≤170, `clientLogo`, `author` ≤24, `proof` ≤24, `source` ≤90, `nav` |
-| `decision-why-us` | Por qué elegirnos · un muro de seis cifras | — | proposal, brochure, pitch | Para responder «¿por qué ustedes?» con hechos citables. | Las cifras no tienen fuente. | `content-text`, `content-clients` | `eyebrow` ≤22, `question` ≤22, `answer` ≤9, `body` ≤100, `facts` ≤54, `source` ≤100, `selectedFact`, `nav` |
+| `content-focus` | Contenido · el foco sobre la prueba | `deck.content-focus` | proposal, pitch, qbr | Cuando el resultado se dice mejor como frase («A la primera.») y la cifra la respalda. | Sin una cifra con fuente que respalde la frase. | `content-measure`, `decision-testimonial` | `eyebrow` ≤28, `question` ≤44, `answer` ≤16, `proof` ≤6, `proofText` ≤70, `source` ≤60, `photo` |
+| `content-clients` | Nuestros clientes · logos reales en un tono y dos pruebas gigantes | `deck.content-clients` | proposal, brochure, pitch | Como credencial en propuestas, pitches y brochures. | No hay autorización para mostrar un logo. | `decision-case`, `content-partners` | `eyebrow` ≤20, `question` ≤30, `answer` ≤16, `proofs` ≤50, `logos`, `markets` ≤45, `selectedProof`, `nav` |
+| `content-partners` | Nuestros partners · los nueve programas que se pueden declarar | `deck.content-partners` | proposal, brochure, pitch | Como credencial técnica en propuestas y pitches. | Hay que mostrar las herramientas que se usan, no los programas de partner. | `content-stack`, `content-clients` | `eyebrow` ≤20, `question` ≤30, `answer` ≤18, `body` ≤80, `partners`, `selectedPartner`, `selectionLabel`, `nav` |
+| `decision-risk` | Por qué es seguro · cada riesgo con su cobertura | `deck.decision-risk` | proposal, pitch | Para responder la objeción «¿y si no funciona?» antes de la cotización o justo después. | Una cobertura no se ofrece de verdad en este servicio (por ejemplo, no hay Sample Sprint disponible). | `decision-plan`, `decision-case` | `eyebrow` ≤24, `question` ≤22, `answer` ≤18, `body` ≤100, `rows` ≤100, `selectedRow`, `nav` |
+| `decision-case` | Caso de éxito · Sky en 12 meses, con foto de ejemplo | `deck.decision-case` | proposal, brochure, pitch | Para demostrar con un caso publicado lo que se promete en la propuesta. | No hay foto real del caso: la de la referencia es sólo de ejemplo y no sale a una pieza final. | `decision-chart`, `decision-testimonial` | `clientLogo`, `eyebrow` ≤20, `question` ≤26, `answer` ≤11, `stats` ≤24, `source` ≤120, `photo`, `selectedStat` |
+| `decision-chart` | Gráfico · el dato con su anotación | `deck.decision-chart` | proposal, brochure, pitch, qbr | Para mostrar un antes y después medido de un caso. | No hay línea base comparable. | `content-measure`, `decision-case` | `eyebrow` ≤30, `question` ≤24, `answer` ≤10, `body` ≤100, `bars` ≤14, `annotation` ≤7, `chartNote` ≤70, `kpis` ≤22, `source` ≤90, `nav` |
+| `decision-testimonial` | Testimonio · la frase del cliente a escala de titular | `deck.decision-testimonial` | proposal, brochure, pitch | Hay una cita real, textual y publicada, con autorización del cliente. | La cita no es textual o no está autorizada. | `decision-case`, `content-clients` | `eyebrow` ≤28, `question` ≤34, `keyPhrase` ≤36, `fullQuote` ≤170, `clientLogo`, `author` ≤24, `proof` ≤24, `source` ≤90, `nav` |
+| `decision-why-us` | Por qué elegirnos · un muro de seis cifras | `deck.decision-why-us` | proposal, brochure, pitch | Para responder «¿por qué ustedes?» con hechos citables. | Las cifras no tienen fuente. | `content-text`, `content-clients` | `eyebrow` ≤22, `question` ≤22, `answer` ≤9, `body` ≤100, `facts` ≤54, `source` ≤100, `selectedFact`, `nav` |
 
 ### Propuesta por línea de servicio · `proposal-service` (8)
 

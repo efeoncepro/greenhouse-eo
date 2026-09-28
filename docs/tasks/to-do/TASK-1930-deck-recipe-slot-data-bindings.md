@@ -1,5 +1,21 @@
 # TASK-1930 — Datos reales en los slots del deck «La órbita»: logo, montos, equipo, métricas, casos y testimonios
 
+## Delta 2026-09-27 — TASK-1928 dejó las plantillas
+
+- TASK-1928 dejó **68 de 69** recetas del catálogo con plantilla en `graphic-line-deck` (commits `ab23fdd90`,
+  `2c7c67c5d`, `39b9c7006`, `82964f2b4`, `3def01768`, `c3c290e16`, `64be8aa16`; AXIS `v0.3.20`). La única sin plantilla
+  es `cover-brochure-cine-lines-selection` (el contrato de AXIS no admite selección en `cover-brochure`). El mapa receta →
+  contentType vive en `src/lib/artifact-composer/catalogs/graphic-line-deck/recipe-map.json` y el índice publicado en
+  `docs/operations/brand-graphic-line/deck-recipes/README.md` (columna «Plantilla»).
+- Composiciones nuevas con su contentType propio: `content-pricing` (`table`, `.stage`, `.live`), `section-cine` (`team`
+  por defecto, `.services`, `.about`, `.purpose`), `content-day` (`clock` por defecto, `.tools`, `.live-progress`,
+  `.live-results`), `method-staircase.flat`, `method-hybrid-workforce.scene`.
+- Contrato que los binders deben respetar: los largos de los `slots.json` son los del catálogo de recetas (paridad por
+  test); las cifras entran por `figures` del contrato de AXIS con fuente obligatoria; los montos se imprimen `[MONTO]`;
+  los logos de terceros viajan como archivo y el compositor los normaliza (asset `logo`: un tono, mismo peso, excepción
+  tonal); las fotos del squad y de los momentos del día son plates con `plateRef` + `alt`; el contacto sale de
+  `EFEONCE_CONTACT`, nunca del intent. Los ejemplos de cada receta están en `src/lib/brand-surfaces/examples/`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

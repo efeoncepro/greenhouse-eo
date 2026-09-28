@@ -37,7 +37,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Discovery y plan (2026-09-27): 25 de 38 recetas existen en AXIS casi sin medidas; 13 no existen en el contrato`
+- Status real: `Code complete 2026-09-27: las 38 recetas componen desde graphic-line-deck (68/69 del catálogo; la restante es de AXIS), AXIS v0.3.20, gates a 0 px y paridad de slots; pendiente la aprobación visual del operador y pnpm build con autorización`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -392,21 +392,21 @@ resuelven igual. El cutover es inmediato al commit de cada slice.
 
 ## Acceptance Criteria
 
-- [ ] Las 38 recetas listadas en `### Gap` tienen plantilla, `slots.json`, builder y entrada en `registry.json`.
-- [ ] Un test compara cada `slots.json` con los slots de su receta del JSON (nombre, tipo, `required`, `maxChars`) y falla ante cualquier diferencia.
-- [ ] Cada receta compone desde su intent de ejemplo con `pnpm brand:compose` sin issues de AXIS.
-- [ ] `pnpm composer:visual-gate --catalog=graphic-line` queda a 0 px con un frame por receta nueva, y cada alta está declarada en `BASELINE_DELTAS.md`.
-- [ ] Ninguna plantilla nueva contiene px, HEX o familia tipográfica literales que el token o el manifest ya declaran.
-- [ ] Un test mide que la respuesta es ≥ 3× la pregunta en `content-pricing`, `content-pricing-stage`, `content-pricing-live`, `content-clients`, `decision-plan` y `content-partners`.
-- [ ] Un test verifica que ningún texto de menos de 24 px lleva el color de acento de línea en las 38 plantillas.
-- [ ] Ninguna cifra (`metric`) compone sin su fuente visible: el slot de fuente es obligatorio y el intent sin fuente falla.
-- [ ] `content-partners` lleva la burbuja URL en el pie.
-- [ ] `section-cine-about` y `section-cine-purpose` no pintan degradado ni velo sobre el plate.
-- [ ] `decision-next-steps` compone la versión con impacto y toma la dirección de `EFEONCE_CONTACT`.
-- [ ] Un texto que supera su `maxChars` hace fallar la composición con el código del slot (test).
-- [ ] El índice del catálogo muestra qué receta tiene plantilla, derivado de `registry.json`, y `pnpm brand:deck-recipes -- --check` pasa.
-- [ ] El README del catálogo, la norma §2.1/§7, el manual y las skills `deck-studio` y `efeonce-graphic-line` describen lo que compone, y `pnpm skills:mirrors` pasa.
-- [ ] El operador aprobó a ojo cada familia compuesta contra su referencia.
+- [x] Las 38 recetas listadas en `### Gap` tienen plantilla, `slots.json`, builder y entrada en `registry.json`. — 34 plantillas (SectionCine y ProposalService compartidas); `recipe-map.test.ts` planifica cada ejemplo a su contentType; commits `ab23fdd90`, `2c7c67c5d`, `39b9c7006`, `82964f2b4`, `3def01768`, `c3c290e16`.
+- [x] Un test compara cada `slots.json` con los slots de su receta del JSON (nombre, tipo, `required`, `maxChars`) y falla ante cualquier diferencia. — `recipe-slot-parity.test.ts` sobre el mapa `recipe-map.json` → `slots` (`64be8aa16`); destapó y corrigió dos obligatoriedades de la escalera plana.
+- [x] Cada receta compone desde su intent de ejemplo con `pnpm brand:compose` sin issues de AXIS. — compuestas las 38 en esta sesión; hojas por familia en `ai-generations/2026-09-27_deck-recetas/`.
+- [x] `pnpm composer:visual-gate --catalog=graphic-line` queda a 0 px con un frame por receta nueva, y cada alta está declarada en `BASELINE_DELTAS.md`. — 66 frames a 0 px (Glitch 26 a 0 px); altas en las secciones (f), (h), (i), (j), (k), (l) y (m) del ledger.
+- [x] Ninguna plantilla nueva contiene px, HEX o familia tipográfica literales que el token o el manifest ya declaran. — cada medida llega como custom property desde AXIS; sin HEX en el CSS nuevo. Excepción declarada: la escala tipográfica interna de las interfaces genéricas del día a día (tarjetas, revisión, reporte), que ningún token declara, queda en `graphic-line.css` con su nota.
+- [x] Un test mide que la respuesta es ≥ 3× la pregunta en `content-pricing`, `content-pricing-stage`, `content-pricing-live`, `content-clients`, `decision-plan` y `content-partners`. — auditoría renderizada del gate (`graphic-line-shared/rendered-audit.ts`, `ANSWER_RATIO_CONTENT_TYPES`).
+- [x] Un test verifica que ningún texto de menos de 24 px lleva el color de acento de línea en las 38 plantillas. — la misma auditoría renderizada (D1) corre sobre todos los frames del gate.
+- [x] Ninguna cifra (`metric`) compone sin su fuente visible: el slot de fuente es obligatorio y el intent sin fuente falla. — cifras por `figures` del contrato (fuente obligatoria, AXIS rechaza con `surface-issues`); test «cada cifra llega con su fuente…».
+- [x] `content-partners` lleva la burbuja URL en el pie.
+- [x] `section-cine-about` y `section-cine-purpose` no pintan degradado ni velo sobre el plate. — regla `no-scrim` en AXIS; las plantillas no tienen capa de velo.
+- [x] `decision-next-steps` compone la versión con impacto y toma la dirección de `EFEONCE_CONTACT`. — test «el contacto de los próximos pasos sale de los datos de Efeonce».
+- [x] Un texto que supera su `maxChars` hace fallar la composición con el código del slot (test). — «un texto que supera su maxChars hace fallar la composición con el slot que lo recibe».
+- [x] El índice del catálogo muestra qué receta tiene plantilla, derivado de `registry.json`, y `pnpm brand:deck-recipes -- --check` pasa. — 68 de 69.
+- [x] El README del catálogo, la norma §2.1/§7, el manual y las skills `deck-studio` y `efeonce-graphic-line` describen lo que compone, y `pnpm skills:mirrors` pasa. — README v1.2, norma v1.6 (§2.1/§4.6/§7), manual v1.2, skills espejadas en `.codex/`; `pnpm brand:deck-recipes -- --check` ✓ 69 recetas; `pnpm skills:mirrors` ✓.
+- [ ] El operador aprobó a ojo cada familia compuesta contra su referencia. — sin tildar: las seis familias se enviaron al operador y su aprobación sigue pendiente.
 
 ## Verification
 
@@ -423,11 +423,11 @@ resuelven igual. El cutover es inmediato al commit de cada slice.
 - [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
 - [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] `## Delta` en TASK-1929, TASK-1930 y TASK-1932 con la lista final de recetas componibles
+- [x] `## Delta` en TASK-1929, TASK-1930 y TASK-1932 con la lista final de recetas componibles
 - [ ] `pnpm build` corrido con autorización del operador, o el cierre dice `code complete, build pendiente de autorización`
 
 ## Follow-ups

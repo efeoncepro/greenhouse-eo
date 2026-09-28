@@ -62,6 +62,12 @@
 - **Deck compuesto (TASK-1927, 2026-09-27):** la aprobación visual ya está dada (fila del 2026-09-27 arriba). Sigue
   abierta la pregunta de la **sección partida**, anotada en el token: el indicador barre las secciones ya recorridas,
   (n−1) de N: ¿se unifica a n de N? Hasta decidir, la plantilla sigue el token.
+- **Plantillas de las 38 recetas restantes (TASK-1928, 2026-09-27):** falta la **aprobación visual del operador** de
+  las seis familias (hojas en `ai-generations/2026-09-27_deck-recetas/`). Las plantillas aplican la norma vigente
+  sobre las referencias aprobadas (fila de implementación abajo); si el operador pide volver a la referencia en algún
+  punto (por ejemplo, el logo chico en las secciones de cine, que era pregunta abierta y resolvió la norma), se
+  registra aquí como decisión suya. También sigue abierta en AXIS la selección en `cover-brochure` (desbloquea
+  `cover-brochure-cine-lines-selection`).
 
 - **Plantillas de La órbita (TASK-1919, 2026-09-27):** posición de la lente del caminero (token 0,70 vs ≈0,77 en la
   lámina aprobada); super de dato con arco completo (lámina) o la estela canónica de la medida; burbuja URL en
@@ -132,10 +138,31 @@
   (`planSurfaceDocument`); gate `--catalog=graphic-line` con 32 frames a 0 px (deltas b–e en `BASELINE_DELTAS.md`).
   `cover-classic` y `close-classic` no entran (no aprobadas; `supersededBy` en AXIS), ni
   `cover-brochure-cine-lines-selection` (el contrato no admite selección en esa portada). **Aprobado a ojo por el operador** (2026-09-27).
-  **Pendiente:** el push a `develop`; las 38 recetas restantes del deck (TASK-1928); la ruta productiva, que debe aceptar también el intent de documento
+  **Pendiente:** el push a `develop`; las 38 recetas restantes del deck (TASK-1928, ya con plantilla: fila siguiente); la ruta productiva, que debe aceptar también el intent de documento
   (TASK-1921); plates idempotentes (TASK-1926); el control de foco de la sección partida (el builder `sectionSplit` no
   lee `photo.focus`; exige un cambio en AXIS y otro en Greenhouse, y **no tiene task**). Diferencias conocidas contra los prototipos: tamaño de «Cuando
   quieras.», burbuja URL horneada, caja de selección unos píxeles más ajustada.
+- Plantillas de las 38 recetas restantes (TASK-1928, 2026-09-27): **code complete, en `develop` local y sin push;
+  la task sigue `in-progress`** hasta la aprobación visual del operador y el `pnpm build` de cierre. Hecho: 37
+  plantillas nuevas en `graphic-line-deck` (dos recetas comparten `SectionCine`, cuatro comparten `ProposalService`):
+  **68 de 69 recetas componen**; Greenhouse fija `axis-tokens` 0.3.20 y `axis-ui-contracts` 0.3.18; gate
+  `--catalog=graphic-line` con 66 frames a 0 px (deltas (f)…(l) en `BASELINE_DELTAS.md`). Decisiones de norma
+  aplicadas sobre las referencias aprobadas (no son decisiones nuevas del operador):
+  - **D1**, el acento nunca en texto de menos de 24 px: «Recomendado», cabecera de la cotización en vivo, «01 ·
+    Diagnóstico · Sin costo», rol del interlocutor, rótulos de los pilares de «por qué lo hacemos», «Revisamos contigo»
+    del reloj y la tarjeta en revisión van en navy (papel) o en el texto claro (oscuro).
+  - **3×**, la respuesta al menos 3 veces la pregunta: cotizaciones, plan, clientes, partners y testimonio suben a
+    120 px; la auditoría renderizada del gate lo mide en `content-pricing` (y `.stage`/`.live`), `content-clients`,
+    `decision-plan` y `content-partners`.
+  - **Cifras con fuente visible:** toda cifra llega por `figures` (valor, rótulo, fuente obligatoria) y la lámina
+    imprime «Fuente: …»; el foco cita el caso publicado de Sky en vez de «Datos de muestra».
+  - **Lámina interior con foto, sin logo:** las secciones de cine retiran el logo chico heredado de las portadas.
+  - **Sin velo sobre la foto** en «quiénes somos» y «por qué lo hacemos».
+  - **Burbuja URL** en el pie de `content-partners`; montos `[MONTO]`; contacto desde `EFEONCE_CONTACT`.
+  - **Logos de terceros normalizados** al componer (un tono, el mismo peso óptico), con la excepción tonal de Aguas
+    Andinas y la UC de Temuco; las barras del gráfico salen de su número (índice, antes = 100); el stack no pinta los
+    «pilares de luz» del guion (en la referencia aprobada nunca se vieron).
+  **Pendiente:** aprobación visual, `pnpm build` (con autorización), push; selección en `cover-brochure` (AXIS).
 - Composición por superficie en Greenhouse (TASK-1919): **hecho, local en `develop`** — las 20 recetas aprobadas son
   plantillas del Artifact Composer (`graphic-line-deck`, `graphic-line-stills`, `graphic-line-overlays`), `pnpm
   brand:compose` y gate `--catalog=graphic-line` a 0 px. Falta la ruta productiva (TASK-1921: API, `artifact-worker`,
@@ -167,7 +194,13 @@
 | 2026-09-27 | axis-tokens 0.3.9 · axis-ui-contracts 0.3.8 (AXIS `main@ff0505a`) | publicado (tag `v0.3.9`) | contrato `efeonce.surface-composition` 0.1.2 (`candidate`, aditivo): `use` proposal/brochure, recetas aprobadas `cover-classic` y `close-classic` (logo sin burbuja URL; cierre con eslogan en tres tramos), `layout` service/hero/lines de `proposal-cinematic`, `selection.anchor`, documento `resolveSurfaceDocument`/`validateSurfaceDocumentIntent` (manifest `axis.surface-document.v1`). Greenhouse lo integró el mismo día con TASK-1927 (fila siguiente) |
 | 2026-09-27 | axis-tokens 0.3.11 · axis-ui-contracts 0.3.9 (TASK-1927; repo `axis-design-system`, rama `main`) | publicado (tag `v0.3.11`) | contrato `efeonce.surface-composition` 0.1.2, deltas (b) y (c) |
 | 2026-09-27 | axis-tokens 0.3.13 · axis-ui-contracts 0.3.11 (TASK-1927) | publicado (tag `v0.3.13`) | contrato 0.1.2, delta (e): tokens del marco de portadas y contraportadas — `column.top`, `column.body`, `column.closeOffsetsPx`, `axis` (eje del amanecer), `orbitPaint` (giant, rising), `contact.style`, `clientLogo.box`, `section-split.progress.startFromTopDeg` y `sweep`. `cover-classic` y `close-classic` quedan `supersededBy`. `axis-ui-contracts` 0.3.11 no cambia de código: se republica porque fija la versión exacta de `axis-tokens` |
-| 2026-09-27 | axis-tokens 0.3.14 · axis-ui-contracts 0.3.12 (TASK-1927) | publicado (tag `v0.3.14`) | tipografía completa de las contraportadas: interlineado y tracking de la voz en `close-brochure`; interlineado del eslogan en las dos. `axis-ui-contracts` 0.3.12 tampoco cambia de código (misma razón). **Vigente: Greenhouse fija `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12** (`axis-graphic-line` 0.7.0 y `axis-brand-assets` 0.3.5 los fijó TASK-1922). El tag `v0.3.12` es de TASK-1922 (Glitch), no de esta serie |
+| 2026-09-27 | axis-tokens 0.3.14 · axis-ui-contracts 0.3.12 (TASK-1927) | publicado (tag `v0.3.14`) | tipografía completa de las contraportadas: interlineado y tracking de la voz en `close-brochure`; interlineado del eslogan en las dos. `axis-ui-contracts` 0.3.12 tampoco cambia de código (misma razón). Greenhouse fijó `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12 hasta TASK-1928 (`axis-graphic-line` 0.7.0 y `axis-brand-assets` 0.3.5 los fijó TASK-1922). El tag `v0.3.12` es de TASK-1922 (Glitch), no de esta serie |
+| 2026-09-27 | axis-tokens 0.3.15 · axis-ui-contracts 0.3.13 (TASK-1928) | publicado (tag `v0.3.15`) | delta (f): propuestas sobrias (`proposal-service`) |
+| 2026-09-27 | axis-tokens 0.3.16 · axis-ui-contracts 0.3.14 (TASK-1928) | publicado (tag `v0.3.16`) | delta (g): método (escalera plana, anillo de puntaje, fuerza híbrida, plan) |
+| 2026-09-27 | axis-tokens 0.3.17 · axis-ui-contracts 0.3.15 (TASK-1928) | publicado (tag `v0.3.17`) | delta (h): cotización, próximos pasos y respiro |
+| 2026-09-27 | axis-tokens 0.3.18 · axis-ui-contracts 0.3.16 (TASK-1928) | publicado (tag `v0.3.18`) | delta (i): prueba (foco, clientes, partners, riesgo, caso, gráfico, testimonio, por qué nosotros) |
+| 2026-09-27 | axis-tokens 0.3.19 · axis-ui-contracts 0.3.17 (TASK-1928) | publicado (tag `v0.3.19`) | delta (j): secciones y quiénes somos; `section-cine` gana `about` y `purpose` |
+| 2026-09-27 | axis-tokens 0.3.20 · axis-ui-contracts 0.3.18 (TASK-1928) | publicado (tag `v0.3.20`) | delta (k): contenido y día a día; `content-day` gana `tools`, `live-progress` y `live-results`. En la serie el contrato también ganó `progress: false` por composición, `voice.maxWords` por receta (testimonio hasta 6 palabras; el resto, 3), pasos sin íconos (`steps.icons: false`), `steps.min` y colores por nombre de paleta. **Vigente: Greenhouse fija `axis-tokens` 0.3.20 y `axis-ui-contracts` 0.3.18** |
 
 Lab AXIS (`c2affc6`, 2026-09-26): la lámina 6.1 lista las decisiones del 26-09 y lo que sigue abierto; el acento ya no colorea texto de menos de 24 px en 1.2 y en las láminas de Insights; la anatomía de 1.2 ya no dibuja el anillo de la esfera; 5.4, 5.1 y 4.5 al día. Quedan en acento sólo rótulos de cotas en diagramas técnicos («0,20 em», la «X» del resguardo), que no son piezas.
 

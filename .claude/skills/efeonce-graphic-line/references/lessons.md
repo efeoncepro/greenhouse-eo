@@ -128,6 +128,27 @@
 - **Los ejemplos de intent no son borradores.** `src/lib/brand-surfaces/examples/` está vigilado por un snapshot
   (`__tests__/example-plans.test.ts`). Regla: una pieza nueva nace con un intent propio fuera de esa carpeta.
 
+## 2026-09-27 (plantillas de las 38 recetas restantes, TASK-1928)
+
+- **Una composición que no hereda la receta.** Regla: el builder recibe el token **base** de la receta y debe
+  **mezclar** el de la composición (`layouts[layout]`) encima, campo por campo, como `withLayout` de AXIS (patrón en
+  `sectionSplit`, `src/lib/brand-surfaces/recipes/deck.ts`). Leer sólo el de la composición deja fuera lo que ésta no
+  repite; leer sólo el base ignora la composición.
+- **Una composición nueva cae en la plantilla por defecto.** Regla: el builder de una composición con plantilla propia
+  **devuelve su `contentType`** (`deck.section-cine.about`, `deck.content-day.tools`…); si no lo devuelve, el mapper
+  (`src/lib/brand-surfaces/index.ts`) usa `<superficie>.<receta>` y la lámina cae en la plantilla de la receta, no en
+  la de su composición.
+- **Prefijo CSS repetido.** Las variables de todas las plantillas viven en el mismo espacio `--gl-` (helper `css` de
+  `kit.ts`). Regla: una plantilla nueva estrena su propio prefijo (`cdt-` es el de `content-day.tools`); **nunca reusa
+  uno existente**.
+- **El largo del catálogo no es orientativo.** El `maxChars` de la receta y el `maxCharacters` del `slots.json` deben
+  coincidir (`recipe-slot-parity.test.ts`, mapa en `recipe-map.json`) y el compositor rechaza el texto que se pasa.
+  Regla: si un copy no cabe, se acorta; nunca se sube el largo de la plantilla sin cambiar la receta aprobada.
+- **La referencia aprobada no siempre cumple la norma.** Las láminas de referencia traían acento bajo 24 px, respuestas
+  bajo 3×, cifras sin fuente, velo sobre la foto y logo chico en secciones de cine. Regla: la plantilla aplica la norma
+  (D1, 3×, fuente visible, sin logo ni velo en lámina interior con foto) y la diferencia se declara en
+  `BASELINE_DELTAS.md` y en el registro; nunca se copia el defecto de la referencia.
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos

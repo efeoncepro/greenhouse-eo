@@ -1,6 +1,6 @@
 # Handoff activo
 
-**Deck compuesto (27/09):** [TASK-1927](docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) complete en local, sin push. [TASK-1928](docs/tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) in-progress (plan).
+**Deck compuesto (27/09):** [TASK-1927](docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) complete en local, sin push. [TASK-1928](docs/tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) **code complete** en local, sin push: 68/69 recetas componen (AXIS `v0.3.20`, gates a 0 px, paridad de slots). Pendiente: aprobación visual del operador de las seis familias y `pnpm build` con autorización; `cover-brochure-cine-lines-selection` espera a AXIS.
 
 **Plugin OpenAI Efeonce MCP (26/09):** [TASK-1904](docs/tasks/to-do/TASK-1904-efeonce-openai-plugin-private-distribution.md) registrada: marca, OAuth, skills e instalación privada Codex/ChatGPT sin revisión pública. TASK-1864 conserva routing/eval. Sin implementación.
 

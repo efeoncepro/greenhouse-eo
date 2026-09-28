@@ -4,7 +4,8 @@
 > operador D1–D17 del 2026-09-26 registradas (los chequeos marcados «0.3.1» vienen en el contrato publicado con contracts 0.3.5,
 > tag `v0.3.5`). §8c (Plastilina en volumen, D24): AXIS `main@c18e3d3` — 2026-09-27. §8d (piezas compuestas con
 > `pnpm brand:compose` y harness del gate visual): árbol local de `develop` de greenhouse-eo tras el cierre de
-> TASK-1927 — 2026-09-27.
+> TASK-1927 — 2026-09-27; filas de largo, cifras, logos y paridad: `develop` local en `64be8aa16` (TASK-1928) —
+> 2026-09-27.
 >
 > Cada ítem dice **cómo se verifica**. «Automático» = lo hace fallar un comando o una función; «Revisión» = hay que
 > mirar el cuadro real (el adapter de Greenhouse lo marca `manual`). Una pieza no se entrega con un ítem en rojo, y
@@ -190,6 +191,9 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 | [ ] | En portadas con columna, `column.topPx` se revisó con la foto final y ningún texto cruza al sujeto ni a la órbita | Automático: fuera de la reserva falla con `invalid-intent`; revisión de lo demás |
 | [ ] | En portadas de propuesta, `clientLogo` trae `alt`; sin `clientLogo` sale el marcador «Logo del cliente» | Automático (el `alt`); revisión |
 | [ ] | Tríptico: una palabra por toma | Automático: `invalid-intent` |
+| [ ] | Ningún texto excede el largo del catálogo (el `maxChars` de la receta = `maxCharacters` del `slots.json`) | Automático: el compositor rechaza (`overflow=reject`); paridad en `recipe-slot-parity.test.ts` |
+| [ ] | Toda cifra llega por `figures` con su fuente real y la lámina imprime «Fuente: …»; montos como `[MONTO]`; el contacto sale de `EFEONCE_CONTACT` | Revisión del intent y de la lámina; sin fuente real, se quita la cifra |
+| [ ] | Logos de clientes y partners sólo de quienes autorizan su uso, normalizados por el compositor (un tono, mismo peso óptico; excepción tonal de Aguas Andinas y UC Temuco) | Revisión |
 | [ ] | Documento: portada y contraportada alternan foto y sin foto; el conjunto pasa sin un solo issue | Automático: `frame-photo-must-alternate` y los demás códigos de documento; un issue deja al documento sin plan |
 | [ ] | La salida no se retocó a mano ni se editó la plantilla para una pieza puntual | Revisión |
 | [ ] | Se entregó con `<id>.provenance.json` y su manifest | Revisión de la carpeta de salida |
@@ -198,8 +202,9 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 
 | | Chequeo | Cómo se verifica |
 |---|---|---|
-| [ ] | `pnpm composer:visual-gate --catalog=graphic-line` pasa a 0 px (32 frames desde TASK-1927) | Salida del comando |
-| [ ] | Toda alta o cambio de frame está declarado en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` | Revisión (entradas 2026-09-27 b, c, d, e para TASK-1927) |
+| [ ] | `pnpm composer:visual-gate --catalog=graphic-line` pasa a 0 px (66 frames desde TASK-1928) | Salida del comando |
+| [ ] | Toda alta o cambio de frame está declarado en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` | Revisión (entradas 2026-09-27 b, c, d, e para TASK-1927; (f)…(l) para TASK-1928) |
+| [ ] | Una receta nueva con plantilla declara sus `slots` en `recipe-map.json` y pasa la paridad | Automático: `src/lib/brand-surfaces/__tests__/recipe-slot-parity.test.ts` |
 | [ ] | Una plantilla con logo de cliente se prueba con el asset sintético `file:probe` de `GRAPHIC_LINE_PROBE_ASSETS` (`scripts/artifact-composer/visual-gate.ts`), nunca con el logo de un cliente real | Revisión del harness |
 | [ ] | Un slot opcional que el probe debe omitir lleva `"example": null` en su `slots.json` (así el frame de la portada de propuesta muestra el marcador y no el logo) | Revisión del `slots.json` |
 | [ ] | Si varias composiciones comparten un HTML (`section-split`, `close-brochure`), cada una tiene su contrato de slots, su plantilla en `registry.json` y su frame | Revisión de `registry.json` y de los frames |

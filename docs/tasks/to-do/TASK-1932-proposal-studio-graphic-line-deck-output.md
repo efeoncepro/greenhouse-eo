@@ -1,5 +1,20 @@
 # TASK-1932 — Proposal Studio arma el deck «La órbita» desde recetas: render en `artifact-worker` y acción Nexa/MCP
 
+## Delta 2026-09-27 — TASK-1928 dejó las plantillas
+
+- TASK-1928 dejó **68 de 69** recetas del catálogo con plantilla en `graphic-line-deck` (commits `ab23fdd90`,
+  `2c7c67c5d`, `39b9c7006`, `82964f2b4`, `3def01768`, `c3c290e16`, `64be8aa16`; AXIS `v0.3.20`). La única sin plantilla
+  es `cover-brochure-cine-lines-selection` (el contrato de AXIS no admite selección en `cover-brochure`). El mapa receta →
+  contentType vive en `src/lib/artifact-composer/catalogs/graphic-line-deck/recipe-map.json` y el índice publicado en
+  `docs/operations/brand-graphic-line/deck-recipes/README.md` (columna «Plantilla»).
+- Composiciones nuevas con su contentType propio: `content-pricing` (`table`, `.stage`, `.live`), `section-cine` (`team`
+  por defecto, `.services`, `.about`, `.purpose`), `content-day` (`clock` por defecto, `.tools`, `.live-progress`,
+  `.live-results`), `method-staircase.flat`, `method-hybrid-workforce.scene`.
+- Assets que el render productivo (`artifact-worker`) debe materializar igual que `scripts/brand-surfaces/compose.ts`:
+  `plate` (con `focus` opcional: recorte dirigido), `svg`, `file`, `logo` (normalización de logos de terceros) y
+  `painted` (capa pintada por el motor de la línea gráfica con la foto inyectada). Sin eso, las láminas con logos de
+  clientes/partners o con la lente de sección no componen en productivo.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-27 — 68 de las 69 recetas de deck de «La órbita» componen (TASK-1928)
+
+- El catálogo `graphic-line-deck` suma 34 plantillas para las 38 recetas pendientes: propuestas sobrias, método,
+  cotización y próximos pasos, prueba (clientes, partners, caso, gráfico, testimonio), secciones y «quiénes somos», y
+  contenido y día a día. Todas se componen con `pnpm brand:compose` y entran al gate visual (66 frames a 0 px).
+- Greenhouse sube a AXIS `v0.3.20` (tokens 0.3.20, ui-contracts 0.3.18). El compositor gana logos de terceros
+  normalizados, capas pintadas con foto adentro y recorte dirigido; el test de paridad exige que cada slot de la
+  receta tenga campo en su plantilla. `cover-brochure-cine-lines-selection` espera selección en AXIS.
+  Local en `develop`, sin push; falta aprobación visual y `pnpm build`.
+
 ## 2026-09-27 — Una edición de Glitch se compone con `pnpm glitch:compose` (TASK-1923)
 
 - Tres catálogos de Glitch sobre una carpeta (`glitch-carousel`, `glitch-stills`, `glitch-overlays`, 26 plantillas
@@ -609,9 +619,3 @@ Quedó en `13- Branding/Logo Efeonce 3D` el logo completo en 3D renderizado en B
 blanco, en cuatro escalas (monumental, grande, mediana, pequeña) con 33 cámaras y luz izquierda/derecha, sin
 superficies. Cada escala trae un manifiesto de cámara y usos para que un agente elija el render que coincide con la
 escena y se lo pase al modelo como imagen 1, sin dejar que el modelo dibuje las letras.
-
-## 2026-09-17 — `pnpm ai:image:rmbg --key-background` para huecos opacos
-
-El recorte de fondo suma una opción opt-in para el caso de objeto claro sobre fondo oscuro: vacía los huecos pasantes
-(ventanas, cortes) que el matting dejaba opacos mostrando el fondo de estudio, con borde suave y sin halo. Reemplaza el
-script de corrida de la nave de Efeonce 3D y reproduce el mismo alfa en sus finales aprobados.

@@ -29,6 +29,10 @@
 > Contrato 0.1.2 en Greenhouse (TASK-1927): verificado contra el árbol local de `develop` — 2026-09-27
 > (`package.json`: `axis-tokens` 0.3.14, `axis-ui-contracts` 0.3.12, `axis-graphic-line` 0.7.0, `axis-brand-assets`
 > 0.3.5; `src/lib/brand-surfaces/recipes/{deck,frame}.ts`, `document.ts`, `registry.json` de `graphic-line-deck`).
+> Plantillas de las 38 recetas restantes (TASK-1928): verificado contra el árbol local de `develop` en `64be8aa16` —
+> 2026-09-27 (`package.json`: `axis-tokens` **0.3.20**, `axis-ui-contracts` **0.3.18**; builders
+> `src/lib/brand-surfaces/recipes/{proposal-service,method,close,proof,sections,content,kit}.ts`, `types.ts`,
+> `scripts/brand-surfaces/compose.ts`, `graphic-line-shared/resolvers.ts`, `graphic-line-deck/{index.ts,recipe-map.json}`).
 > **Manda sobre las versiones que esta referencia cite más abajo para la composición por superficie.**
 
 Índice: [1 Paquetes](#1-paquetes-versiones-e-instalación) · [2 Tokens](#2-tokens-efeoncegraphicline) ·
@@ -49,10 +53,12 @@ separado.
 > (`v0.6.0`, 43 PNG de volumen) · `axis-tokens` **0.3.8** y `axis-ui-contracts` **0.3.7** (`v0.3.8`, contrato
 > `efeonce.surface-composition` 0.1.1; `efeonceGraphicLine.surfaces` desde 0.3.7). **Greenhouse fija todo eso**
 > (tokens 0.3.8, contracts 0.3.7, registry 0.3.1; commits `8d817f29e` y `016d0a183`), con axis-graphic-line 0.6.0
-> (dependencia directa) y axis-brand-assets 0.3.4. **Eso es la foto de TASK-1919.** Tras TASK-1927 y TASK-1922, lo
-> vigente en Greenhouse es `axis-tokens` **0.3.14**, `axis-ui-contracts` **0.3.12** (tag `v0.3.14`, contrato
-> `efeonce.surface-composition` **0.1.2**), `axis-graphic-line` **0.7.0** y `axis-brand-assets` **0.3.5**. Releases de
-> TASK-1927 (`v0.3.11`, `v0.3.13`, `v0.3.14`), fila por fila, en [ledger.md](ledger.md).
+> (dependencia directa) y axis-brand-assets 0.3.4. **Eso es la foto de TASK-1919.** Tras TASK-1927, TASK-1922 y
+> TASK-1928, lo vigente en Greenhouse es `axis-tokens` **0.3.20**, `axis-ui-contracts` **0.3.18** (tag `v0.3.20`,
+> contrato `efeonce.surface-composition` **0.1.2** con los deltas (f)…(k) del ADR), `axis-graphic-line` **0.7.0** y
+> `axis-brand-assets` **0.3.5**. Releases de TASK-1927 (`v0.3.11`, `v0.3.13`, `v0.3.14`) y de TASK-1928 (`v0.3.15` a
+> `v0.3.20`), fila por fila, en [ledger.md](ledger.md). Después de subir AXIS: `pnpm brand:tokens` (y
+> `pnpm glitch:tokens`).
 
 | Paquete | Versión en `main` de AXIS | Último tag de release | Fija Greenhouse (`package.json`) | Qué trae para la línea |
 |---|---|---|---|---|
@@ -816,7 +822,8 @@ Ejemplos de intent en `docs/examples/graphic-line/` (`post-lens`, `deck-progress
 | `node scripts/creative/brand-motion/encode-orbit-motion.mjs --frames <dir> --sound <dir> --out <dir> [--only …]` | MP4 60/30 fps, GIF, ProRes 4444, WebM, HEVC, PNG por capas |
 | `pnpm brand:compose -- --intent <intent.json> [--out <dir>] [--artifact-id <id>]` (`scripts/brand-surfaces/compose.ts`, TASK-1919) | compone una receta **aprobada** por superficie en el Artifact Composer: exige receta aprobada → `resolveSurfaceComposition` (con `issues`, no compone) → builder de la receta → plan + assets (plate de `photo.plateRef` recortado, íconos `resolveIcon`, capas SVG de `paintGraphicLine`) → PDF (deck) o PNG (resto; capas de video con alfa). Salida por defecto `.captures/brand-surfaces/<id>/` más `<id>.surface-manifest.json`. Errores (`SurfacePieceError.code`): `recipe-not-approved`, `recipe-outside-composer` (`audiovisual.close-reveal`), `surface-issues` (lista los issues de AXIS), `recipe-without-template`, `missing-photo`, `invalid-intent`. Ejemplos por receta: `src/lib/brand-surfaces/examples/*-intent.json` |
 | `pnpm brand:tokens [--check]` (`scripts/brand-surfaces/compile-tokens.ts`) | compila `efeonceGraphicLine` a `graphic-line-tokens.{json,css}` de cada catálogo `graphic-line-*` y copia byte a byte los archivos de marca desde `axis-brand-assets`; `--check` falla si lo commiteado no coincide con la versión instalada |
-| `pnpm composer:visual-gate --catalog=graphic-line [--selftest\|--freeze]` | gate visual a 0 px de los 32 frames (desde TASK-1927) de los catálogos de La órbita (runbook `docs/operations/runbooks/composer-visual-gate.md`) |
+| `pnpm composer:visual-gate --catalog=graphic-line [--selftest\|--freeze]` | gate visual a 0 px de los 66 frames (desde TASK-1928; 32 tras TASK-1927) de los catálogos de La órbita (runbook `docs/operations/runbooks/composer-visual-gate.md`; altas declaradas en `BASELINE_DELTAS.md`, secciones (f)…(l)) |
+| `pnpm brand:deck-recipes [-- --check]` | reescribe (o verifica) el índice del README del catálogo de recetas del deck, con la columna «Plantilla» leída de `graphic-line-deck/registry.json` |
 
 **Documento (TASK-1927):** si el intent de `pnpm brand:compose` trae `pages`, compone un documento
 (`planSurfaceDocument`, `src/lib/brand-surfaces/document.ts`; valida con `resolveSurfaceDocument`): un PDF multipágina
@@ -836,6 +843,31 @@ hoy».
 catálogo exporta `createCatalog({ selectionPainter, ctaPainter })`: la pintura de la selección y del CTA la inyecta el
 consumidor (adaptador de Greenhouse sobre `efeonce.collaboration-selection`). Plantillas de capa declaran
 `render.background: 'transparent'`.
+
+**Deck completo (TASK-1928, 2026-09-27).** `graphic-line-deck` suma 34 plantillas: **68 de las 69 recetas** del
+catálogo componen; `cover-brochure-cine-lines-selection` queda `blocked` en `recipe-map.json` (AXIS no admite selección
+en `cover-brochure`). Tabla receta → `layout` → `contentType` en [applications.md §L](applications.md). Piezas nuevas:
+
+- **Assets del compositor** (`src/lib/brand-surfaces/types.ts`, materializados en `scripts/brand-surfaces/compose.ts`):
+  `logo` (logo de tercero normalizado: tono, área de tinta y caja; `knockout`, `recolor` + `recolorBox`); `painted`
+  (capa que pinta el motor de la línea **con una foto adentro**: el SVG lleva un marcador y el compositor lo reemplaza
+  por el plate; es la lente de `section-lens`); `plate.focus` (recorte dirigido a un punto del archivo, `xOfWidth` /
+  `yOfHeight` de 0 a 1, sólo cuando el intent declara `photo.focus`; sin él, recorte centrado).
+- **Resolvers** (`graphic-line-shared/resolvers.ts`): nuevos `gl-figure-size`, `gl-item-role`, `gl-align`; siguen
+  `gl-current-stop`, `gl-label-side`, `gl-chosen-day`, `gl-chosen-time`, `gl-recommended`.
+- **Hooks del catálogo** (`graphic-line-deck/index.ts`): selección por ítem (`selection.item` / `selection.level`),
+  selección sobre la respuesta, cursor del lector (CTA) con hasta ocho manijas sobre un texto (sección de servicios) e
+  indicador de progreso con su centro medido (sección a sangre, arriba a la izquierda).
+- **Paridad de slots receta ↔ plantilla:** `recipe-map.json` declara en `slots` el campo del `slots.json` donde vive
+  cada slot de la receta (rutas `slot`, `slot.campo`, `slot[].campo`; `a+b` para la respuesta en dos líneas;
+  `#composite` para campos que imprimen más que el slot, como «Fuente: …»). El test
+  `src/lib/brand-surfaces/__tests__/recipe-slot-parity.test.ts` exige campo, tipo compatible, que lo obligatorio siga
+  obligatorio y el **mismo largo máximo** (en una plantilla compartida manda el mayor). Las 30 recetas anteriores
+  declaran `slots: null`. El compositor rechaza un texto que excede el `maxCharacters` del campo
+  (`src/lib/artifact-composer/validate.ts`, `overflow=reject`).
+- **Contrato (serie `v0.3.15`…`v0.3.20`):** una composición puede declarar `progress: false`; `voice.maxWords` por
+  receta (testimonio hasta 6 palabras, el resto 3); `steps.icons: false` y `steps.min`; colores por nombre de paleta;
+  `section-cine` gana `about` y `purpose`; `content-day` gana `tools`, `live-progress` y `live-results`.
 
 `bindings.json` del render: `{ targets: { id: { cx, cy, r } }, photos: { photoId: ruta }, urlBubble: { x, y, height },
 texts: [{ id, x, y, w, h, content?, svg?, fontSize?, baseline?, lastChar? }], signature: { y? }, protect: [{ id, kind:
