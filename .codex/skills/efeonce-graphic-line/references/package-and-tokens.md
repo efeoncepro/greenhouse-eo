@@ -597,6 +597,7 @@ No incluye fuentes, fotos, el logo ni la marca de Greenhouse, ni el archivo del 
 | `globe-logo-*` · `globe-isotype-*` | | | | 0,4925 · 1,1109 |
 | `wave-logo-*` · `wave-isotype-*` | | | | 0,4114 · 0,5558 |
 | `reach-logo-positive` · `reach-logo-negative` · `reach-isotype-*` | | | | 0,3128 · 0,3115 · 1,0143 |
+| `insights-logo-*` · `insights-isotype-*` (2026-09-28, rama `feat/insights-product-mark`, sin publicar) | | | | 0,2906 · 3,4231 |
 | `url-bubble-source` | url-bubble | any | source (gris `#848484`, fusionar con luminosidad) | 0,1968 |
 | `url-bubble-baked-light` | url-bubble | light | baked (`#848484`) | 0,1968 |
 | `url-bubble-baked-dark` | url-bubble | dark | baked (`#6f89a2`) | 0,1968 |

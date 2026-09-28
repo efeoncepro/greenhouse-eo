@@ -527,6 +527,12 @@ esfera: el acento va al cierre.
 (operador, 2026-09-26; manual §7). *Esto reemplaza lo que decía la lámina 3.1 («la firma: el logo propio de cada
 producto, con «by efeonce»»): el lockup «by efeonce» vive sólo en la superficie del propio producto.*
 
+- **Insights, marca de producto que acompaña** (operador, 2026-09-28): en sus propias superficies (el informe compartido,
+  el portal) va **junto al logo de Efeonce**, separados por un filete fino y con las alturas de x alineadas; no lleva
+  «by efeonce» porque Efeonce ya está al lado, y **nunca firma**: la firma sigue siendo el logo de Efeonce en el pie. Su
+  esfera es parte del logo (como el planeta de Efeonce), no la esfera de la línea; si la pieza ya tiene una órbita con
+  esfera en el mismo acento y compiten, se revisa a ojo. Archivos: `insights-logo-*` / `insights-isotype-*`.
+
 - **La firma de una pieza gráfica es el logo de Efeonce centrado, abajo al centro.** Cierra la composición al pie
   (manual §8.1; Tres voces, «la firma debe cerrar la composición al pie»).
 - **La burbuja URL sólo reemplaza al logo si el logo ya aparece en la imagen** (un mockup, un objeto, merch). Entonces
