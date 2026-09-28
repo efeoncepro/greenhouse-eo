@@ -368,3 +368,9 @@
 - **2026-09-26 · Un script que reescribe docs compartidos debe LEER antes de abrir para escribir.** En Python,
   `open(p,'w').write(fn(open(p).read()))` trunca el archivo antes de leerlo: vació `docs/tasks/README.md` con WIP ajeno.
   Se recuperó desde un blob colgante (`git fsck --unreachable` + búsqueda de una línea única del WIP) con hash idéntico.
+- **2026-09-28 · `sendEmail().deliveryId` es el id del BATCH, no la fila de `email_deliveries`.** La fila por
+  destinatario está en `recipientResults[].deliveryId`. La modalidad `attachment` guardó el batch en
+  `insight_delivery_recipients.email_delivery_id` y la referencia apuntaba a una fila inexistente; ningún test lo vio
+  porque el estado de transporte se lee por `source_event_id`. Lo destapó una lectura de datos reales (cruce
+  recipient ↔ email_deliveries). Regla: al persistir una referencia a otra tabla, verifícala con un JOIN contra datos
+  reales, no con el mock de `sendEmail`. Corregido en `34d763460` (TASK-1848).
