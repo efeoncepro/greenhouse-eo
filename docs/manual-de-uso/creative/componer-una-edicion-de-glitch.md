@@ -1,9 +1,11 @@
 # Componer una edición de Glitch con `pnpm glitch:compose` — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (v1.1: el Glitch Flash no se compone con este comando; chip «LA NOTICIA».
+> **Ultima actualizacion:** 2026-09-28 por Claude (v1.2: **el Glitch Flash ya se compone** con este mismo comando
+> —manifiesto con `edition.kind: "flash"`, seis plantillas `Flash*`, ejemplo `flash-sonnet-5-5.example.json`— y las
+> portadas con foto pintan «LA NOTICIA». v1.1: el Flash todavía no se componía; chip «LA NOTICIA» decidido.
 > v1.0: primera versión, con los catálogos de Glitch de TASK-1923)
 > **Modulo:** Creative · Glitch, magazine semanal de Efeonce (sub-línea de «La órbita») · piezas estáticas
 > **Ruta en portal:** no aplica — es un taller local: se corre en una máquina con `greenhouse-eo` clonado. La ruta
@@ -35,14 +37,12 @@ Lo que **no** hace:
 - **No anima.** Los overlays son **cuadros fijos**; los `.mov` animados, el sonido y la música salen del repo taller
   ([Producir el motion, el sonido y la música de Glitch](./producir-motion-glitch.md)).
 - **No es la ruta productiva.** Es el taller local. La ruta con API, `artifact-worker`, MCP y capability es TASK-1921.
-- **No compone un Glitch Flash.** El Flash (una noticia puntual, sin número de edición, 2026-09-28) no cabe en el
-  manifiesto, que exige ocho noticias. Hasta que tenga su plantilla, se arma desde las plantillas aprobadas (portada A,
-  interior de la noticia 1, contraportada, banners del blog) con los valores de `glitchLine`; no inventes noticias de
-  relleno para que pase. Qué cambia en el Flash: [norma §14](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#14-glitch-flash--formato-puntual-lanzado-2026-09-28).
+- **También compone un Glitch Flash** (una noticia puntual, sin número de edición, 2026-09-28) con su propio
+  manifiesto: ver [Componer un Glitch Flash](#componer-un-glitch-flash). Nunca armes un Flash inventando siete noticias
+  de relleno en el manifiesto semanal. Qué cambia en el Flash: [norma §14](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#14-glitch-flash--formato-puntual-lanzado-2026-09-28).
 
-> **Chip de la portada (2026-09-28):** en productivo el chip de la portada con foto dice «LA NOTICIA», no «PORTADA».
-> Las plantillas `CoverPhoto`, `BlogBannerPhoto` y `BlogSquarePhoto` todavía pintan «PORTADA»: si publicas una pieza
-> compuesta con ellas antes de que se actualicen, avísale al operador. La muletilla de la contraportada
+> **Chip de la portada (2026-09-28):** en productivo el chip de la portada con foto dice «LA NOTICIA», no «PORTADA», y
+> las plantillas `CoverPhoto`, `BlogBannerPhoto` y `BlogSquarePhoto` ya lo pintan así. La muletilla de la contraportada
 > (`back.closingLine`) se escribe para cada edición: nunca copies la de la anterior.
 
 ## Antes de empezar
@@ -206,6 +206,46 @@ completa, igual que en el kit.
 Antes de entregar, pasa el checklist de [Componer piezas de Glitch, paso 7](./componer-piezas-glitch.md#paso-7--revisa-antes-de-entregar):
 el comando garantiza las reglas, pero la mirada editorial (que la foto y el POV sean los correctos) es humana.
 
+## Componer un Glitch Flash
+
+El **Glitch Flash** es el segundo formato de Glitch (decisión del operador, 2026-09-28): sale el día de una noticia
+puntual, **no lleva número de edición** y **queda fuera de la rotación de portadas**. Se compone con el **mismo
+comando**; lo que cambia es el manifiesto.
+
+```bash
+pnpm glitch:compose -- --manifest src/lib/glitch-composition/examples/flash-sonnet-5-5.example.json
+```
+
+El ejemplo (`example: true`, fotos sintéticas de `examples/fotos/`, nunca se publica) deja las salidas en
+`.captures/glitch/flash-ejemplo-claude-sonnet-5-5/`.
+
+**El manifiesto del Flash** (`GlitchFlashManifest`, estricto) se reconoce por `edition.kind: "flash"`:
+
+| Campo | Qué pones |
+|---|---|
+| `edition` | `kind: "flash"`, `slug` (minúsculas con guiones: nombra los archivos), `title` (el documento se llama «Glitch Flash · <title>») y `publishDate`. **Sin `number`**: si lo pones, falla con `flash-edition-number-not-allowed` |
+| `news` | **exactamente una** noticia: `section`, `headline`, `outlet`, `date`, `photo` (igual que en la semanal, sin `strong`), `pov` y `why`. Sin `id` ni lente |
+| `cover` | `photo` (la imagen de la portada; `null` repite la de la noticia), `headline {entry, punch}` y dos `lines`, cada una con su `section` y su `text` (dos lecturas de la misma noticia) |
+| `back.closingLine` | **obligatoria** y escrita para este Flash: una línea o dos (`["léelo completo", "en nuestro blog."]`). Nunca el número de la próxima edición ni «el resto, el lunes» (rechazada por el operador) |
+| `outputs.stills` | `threads`, `blog:banner`, `blog:news` y, si las quieres sueltas, `cover`, `interior`, `back` |
+
+No lleva `previousEdition`, `thesis` ni `video`: si los pones, el comando te dice por qué sobran.
+
+**Qué sale:**
+
+| Archivo o carpeta | Qué es |
+|---|---|
+| `glitch-flash-<slug>-carrusel.pdf` | el documento de LinkedIn: **3 páginas** (portada, la noticia, contraportada), un solo tamaño |
+| `carrusel/` | un PNG por lámina + manifiesto resuelto |
+| `sueltas/` | `threads` (la portada **sin «Desliza»**), `blog-banner` (16:9, 1920 × 1080) y `blog-news` (banner interno 1600 × 900) |
+| `glitch-flash-<slug>.provenance.json` | la procedencia, sin reloj, con `edition: null`, `editionKind: "flash"` y el `slug` |
+
+El comando pinta lo que la línea fija para el Flash: la cabecera «NO ESPERA AL LUNES» sobre la **estela de bytes** y
+«FLASH», el chip «LA NOTICIA» en la portada, Threads y el banner del blog, «ANUNCIO» en la noticia y en el banner
+interno, la franja «El micrófono se abre», el pie sin avance n/8 y la muletilla en dos líneas. Cada lámina se valida
+con el contrato `efeonce.glitch-line` 0.2.0 de AXIS (`edition: { kind: "flash" }`). Los copys los revisa el operador
+**antes** de programar la publicación.
+
 ## Qué significan los errores
 
 Si algo falla, el comando termina con código 1 y escribe `✗ [<código>] <mensaje>` y debajo una línea por problema:
@@ -215,6 +255,7 @@ carrusel no cumple los límites de LinkedIn, el PDF final no se escribe (los PNG
 | Código | Qué pasó | Qué hacer |
 |---|---|---|
 | `manifest-invalid` | el manifiesto no cumple el esquema. Cada línea trae su ruta (por ejemplo `news[2].photo.credit`) y un sub-código: `field-unknown` (campo no admitido), `field-required` (falta un campo) o `field-invalid` (valor mal formado o regla rota: noticias fuera de orden, noticia desconocida, lente en `n1`, Drop fuera de las noticias del video, falta la foto o el titular del host para la portada del reel) | corrige el campo que indica la ruta. No agregues campos que el esquema no tenga |
+| `manifest-invalid` con `flash-edition-number-not-allowed` en `edition.number` | un Glitch Flash con número de edición | quita `edition.number`: el Flash no es la edición entera |
 | `piece-not-approved` | una plantilla en PROPUESTA llegó al catálogo (hoy no hay ninguna: todas las piezas de Glitch están aprobadas) | no la compongas como canon: espera la aprobación del operador |
 | `cover-rotation-unsatisfiable` | ninguna plantilla sirve: el contenido sólo califica para la plantilla de la semana anterior (o para ninguna) | cambia el contenido de portada para que califique otra: una foto fuerte en la noticia de portada (A), un `standalonePov` (B) o un `mosaic` de cuatro (C). Nunca cambies `previousEdition` para forzarla |
 | `font-license-missing` | el brand pack no declara la licencia de Guttery, así que la muletilla del narrador no se puede componer | no lo resuelvas quitando la letra: avisa al operador. La licencia la declara `fonts.json` del brand pack `axis` |
@@ -256,9 +297,9 @@ carrusel no cumple los límites de LinkedIn, el PDF final no se escribe (los PNG
 
 ## Referencias técnicas
 
-- Manifiesto (esquema estricto, `schemaVersion: 1`): [`src/lib/glitch-composition/manifest.ts`](../../../src/lib/glitch-composition/manifest.ts) · ejemplo [`examples/edition-17.example.json`](../../../src/lib/glitch-composition/examples/edition-17.example.json)
-- Mapper puro (portada por rotación, contrato AXIS, falla en bytes): [`src/lib/glitch-composition/`](../../../src/lib/glitch-composition/) (`planGlitchEdition`, `resolveCoverTemplate`, `fitRegion`; falla en `byte-fracture.ts`)
-- Catálogos (`glitch-carousel`, `glitch-stills`, `glitch-overlays`; 26 plantillas aprobadas): [`src/lib/artifact-composer/catalogs/glitch/`](../../../src/lib/artifact-composer/catalogs/glitch/)
+- Manifiesto (esquema estricto, `schemaVersion: 1`): [`src/lib/glitch-composition/manifest.ts`](../../../src/lib/glitch-composition/manifest.ts) (`GlitchEditionManifest` y, para el Flash, `GlitchFlashManifest`) · ejemplos [`examples/edition-17.example.json`](../../../src/lib/glitch-composition/examples/edition-17.example.json) y [`examples/flash-sonnet-5-5.example.json`](../../../src/lib/glitch-composition/examples/flash-sonnet-5-5.example.json)
+- Mapper puro (portada por rotación, contrato AXIS, falla en bytes): [`src/lib/glitch-composition/`](../../../src/lib/glitch-composition/) (`planGlitchEdition`, `planGlitchFlash`, `planGlitchManifest`, `resolveCoverTemplate`, `fitRegion`; falla en `byte-fracture.ts`; estela del Flash en `flash-trail.ts`)
+- Catálogos (`glitch-carousel`, `glitch-stills`, `glitch-overlays`; 32 plantillas aprobadas, seis de ellas del Flash): [`src/lib/artifact-composer/catalogs/glitch/`](../../../src/lib/artifact-composer/catalogs/glitch/)
 - Comando: [`scripts/glitch/compose.ts`](../../../scripts/glitch/compose.ts) · límites de LinkedIn: [`scripts/glitch/linkedin.ts`](../../../scripts/glitch/linkedin.ts) · tokens: `pnpm glitch:tokens [--check]` (compila `glitch-tokens.css` desde `glitchLine` de AXIS)
 - Gate visual: `pnpm composer:visual-gate --catalog=glitch [--selftest|--freeze]`; frames en `scripts/frontend/baselines/artifact-composer/templates-glitch/`
 - Norma: [§9.1 Qué ya se compone en el Artifact Composer](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#91-qué-ya-se-compone-en-el-artifact-composer-task-1923) · ADR: [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](../../architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)

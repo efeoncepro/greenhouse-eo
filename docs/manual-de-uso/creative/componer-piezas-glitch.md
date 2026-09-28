@@ -27,8 +27,8 @@
 
 > **Glitch Flash (2026-09-28).** Además de la edición semanal existe el **Glitch Flash**: una sola noticia puntual,
 > **sin número de edición** (cabecera «NO ESPERA AL LUNES» + estela de bytes + «FLASH», interior «ANUNCIO», sin avance
-> n/8, Threads sin «Desliza»). Se lanzó en producción el 2026-09-28, pero **no tiene plantilla** ni se compone con
-> `pnpm glitch:compose` (que exige ocho noticias): se arma desde las plantillas aprobadas. Detalle en la
+> n/8, Threads sin «Desliza»). Se lanzó en producción el 2026-09-28 y se compone con `pnpm glitch:compose` y su propio
+> manifiesto ([Componer un Glitch Flash](./componer-una-edicion-de-glitch.md#componer-un-glitch-flash)). Detalle en la
 > [norma §14](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#14-glitch-flash--formato-puntual-lanzado-2026-09-28).
 > En toda portada productiva el chip dice «LA NOTICIA» (no «PORTADA») y la muletilla de la contraportada se escribe
 > para cada edición.

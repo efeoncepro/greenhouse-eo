@@ -3,7 +3,8 @@
  *
  * Tres catálogos delgados sobre la MISMA carpeta de plantillas (`catalogs/glitch/`), porque la misma edición sale en
  * tres destinos y un catálogo declara un solo `outputTarget`:
- *   - `glitch-carousel` → `pdf-merged`: el documento del carrusel de LinkedIn (portada + 8 interiores + contraportada).
+ *   - `glitch-carousel` → `pdf-merged`: el documento del carrusel de LinkedIn (portada + 8 interiores + contraportada; el
+ *     Glitch Flash: portada + la noticia + contraportada).
  *   - `glitch-stills`   → `png-set`: láminas sueltas, banners del blog, portada del reel y miniatura del vlog.
  *   - `glitch-overlays` → `png-set` con alfa: hoy sin plantillas (el kit del reel es motion, TASK-1924).
  *
@@ -44,7 +45,12 @@ export const GLITCH_FRACTURE_TEMPLATES = [
   'BlogSquareMosaic',
   'BlogNewsBanner',
   'ReelCover',
-  'VideoThumbnail'
+  'VideoThumbnail',
+  'FlashCover',
+  'FlashInterior',
+  'FlashBlogBanner',
+  'FlashNewsBanner',
+  'FlashThreads'
 ] as const
 
 const create = (key: GlitchCatalogKey, outputTarget: OutputTarget, options: GlitchCatalogOptions): ArtifactCatalog => ({

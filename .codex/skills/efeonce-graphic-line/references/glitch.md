@@ -1,8 +1,10 @@
 # Glitch — sub-línea gráfica (sólo para Glitch)
 
-> Verificado contra: greenhouse-eo@9b531b396 — 2026-09-28 · **Glitch Flash** (formato puntual sin número de edición;
-> el primero, Claude Sonnet 5.5, se lanzó en producción el 2026-09-28 y el operador lo aprobó en uso real, sin plantilla
-> del Composer ni pieza en AXIS: §14) · chip «LA NOTICIA» en la portada productiva y muletilla de la contraportada que
+> Verificado contra: greenhouse-eo@53002b352 — 2026-09-28 · **el Glitch Flash compone** con `pnpm glitch:compose`
+> (manifiesto `edition.kind: "flash"`, seis plantillas `Flash*`, estela generada desde el token; AXIS `axis-tokens`
+> 0.3.24 + contrato `efeonce.glitch-line` 0.2.0: §9.1 y §14) y las portadas con foto del Composer pintan «LA NOTICIA» ·
+> antes: greenhouse-eo@9b531b396 — 2026-09-28 · **Glitch Flash** (formato puntual sin número de edición;
+> el primero, Claude Sonnet 5.5, se lanzó en producción el 2026-09-28 y el operador lo aprobó en uso real: §14) · chip «LA NOTICIA» en la portada productiva y muletilla de la contraportada que
 > varía por edición (decisiones del operador del 2026-09-28) · **discrepancia de numeración abierta** (§1) · antes:
 > greenhouse-eo@bc6fedc28 — 2026-09-27 · inventario de la sesión «Integrar Glitch en la línea
 > gráfica» (2026-09-27) · decisiones del operador del 2026-09-27 (Delta del ADR: manzana y verde aprobados, línea
@@ -43,7 +45,7 @@ pieza de la marca.
       **Sí** → esta referencia **más** la línea madre (criterio, firma, contraste). **No** → nada de esta referencia.
 - [ ] Efeonce firma Glitch: logo de Efeonce centrado abajo. Glitch es contexto, como un producto (manual §7).
 - [ ] ¿Es la **edición semanal** (sale los lunes, «Edición #N», Top 8) o un **Glitch Flash** (una noticia puntual, sin
-      número de edición)? Flash → además [§14](#14-glitch-flash--formato-puntual-lanzado-2026-09-28-sin-plantilla-todavía).
+      número de edición)? Flash → además [§14](#14-glitch-flash--formato-puntual-lanzado-2026-09-28-compone-con-pnpm-glitchcompose).
 
 | Glitch **hereda** de La órbita (no lo redefine) | **Sólo de Glitch** (nunca en una pieza de Efeonce) |
 |---|---|
@@ -251,8 +253,8 @@ aprobada (el vlog embebido ya lo estaba con el motion).
 | Composición de las piezas estáticas en el Artifact Composer (carrusel, sueltas del blog, portada del reel, miniatura del vlog, overlays PNG) | **EXISTE** como taller local (TASK-1923, 2026-09-27): 26 plantillas, todas `approval: approved`, en tres catálogos; se compone con `pnpm glitch:compose` (§9.1). La ruta productiva (API, `artifact-worker`, MCP, capability) **no existe**: es TASK-1921 |
 | Música de Glitch: tema B (intro, cortina, salida) y cama post-punk bajo la noticia | **APROBADO** (2026-09-27, §13.7): «Definitivamente la B es la decisión», «Me parecen bien todas», «Post-punk definitivamente». **Integrada al taller** (`music.mjs`, pre-roll animado de la intro elegido por el operador) y **en producción en AXIS** (`#musica`, `glitch.json → music`). Único pendiente: probar la mezcla con la voz real del host |
 
-| **Glitch Flash** (portada, noticia, contraportada, banner 16:9 del blog, banner de noticia 1600×900, portada de Threads) | **LANZADO EN PRODUCCIÓN** el 2026-09-28 (Claude Sonnet 5.5) y **aprobado por el operador en uso real**. **Sin plantilla** en el Composer (`glitch-carousel`/`glitch-stills`) y **sin pieza, token ni contrato** en AXIS (`glitchLine`, `efeonce.glitch-line`): se arma desde las plantillas aprobadas (§14) |
-| Chip «LA NOTICIA» en la portada con foto productiva | **DECIDIDO** (2026-09-28); las plantillas del Composer todavía pintan «PORTADA» (§3) |
+| **Glitch Flash** (portada, noticia, contraportada, banner 16:9 del blog, banner de noticia 1600×900, portada de Threads) | **LANZADO EN PRODUCCIÓN** el 2026-09-28 (Claude Sonnet 5.5) y **aprobado por el operador en uso real**. En AXIS: `glitchLine.editions.flash` + seis piezas `flash-*` (`axis-tokens` 0.3.24) y contrato `efeonce.glitch-line` 0.2.0 (`axis-ui-contracts` 0.3.22). En el Composer: seis plantillas `Flash*` aprobadas; se compone con `pnpm glitch:compose` (§9.1, §14.4) |
+| Chip «LA NOTICIA» en la portada con foto productiva | **DECIDIDO e IMPLEMENTADO** (2026-09-28): `CoverPhoto`, `BlogBannerPhoto` y `BlogSquarePhoto` lo pintan (§3) |
 | Muletilla de la contraportada variable por edición | **DECIDIDO** (2026-09-28, §2) |
 | Numeración de la edición semanal (#17 vs. el blog, que ya tiene #16 y #17) | **PREGUNTA ABIERTA** para el operador (2026-09-28, §1) |
 
@@ -391,9 +393,17 @@ pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,
   plantillas); CLI `scripts/glitch/compose.ts` (+ `linkedin.ts`, `photos.ts`); tokens `pnpm glitch:tokens [--check]`;
   Guttery en `src/lib/artifact-composer/brand-packs/axis/fonts/guttery-400.ttf` (extensión `glitch`,
   `embedRights: true`; número de contrato pendiente).
-- **Gate:** `pnpm composer:visual-gate --catalog=glitch [--selftest|--freeze]`; 26 frames en
+- **Glitch Flash** (2026-09-28): el mismo comando compone un manifiesto con `edition.kind: "flash"`
+  (`GlitchFlashManifest`: `edition {kind, slug, title, publishDate}` sin número, `news[1]` sin `id` ni lente ni
+  `strong`, `cover {photo|null, headline, lines[2] {section, text}}`, `back {closingLine: línea | [línea, línea]}`,
+  `outputs.stills` ⊂ `cover|interior|back|threads|blog:banner|blog:news`). Ejemplo:
+  `src/lib/glitch-composition/examples/flash-sonnet-5-5.example.json`. Mapper `planGlitchFlash` (despachador
+  `planGlitchManifest`, `parseGlitchManifest`); intents del contrato con `version: '0.2.0'` y `edition: { kind: 'flash' }`.
+  Salidas `glitch-flash-<slug>-carrusel.pdf` (3 páginas), `sueltas/` y `glitch-flash-<slug>.provenance.json`
+  (`edition: null`, `editionKind: "flash"`). Detalle en §14.4.
+- **Gate:** `pnpm composer:visual-gate --catalog=glitch [--selftest|--freeze]`; 32 frames en
   `scripts/frontend/baselines/artifact-composer/templates-glitch/`; rebaseline sólo declarado en `BASELINE_DELTAS.md`
-  (sección g).
+  (secciones g y p).
 - **Fuera del comando:** publicar (LinkedIn vía Metricool, blog vía WordPress, con confirmación humana), el motion
   animado (taller, §12) y la ruta productiva (TASK-1921).
 - **Pendientes conocidos:** el token `portada-c` de AXIS dice esfera `apple` pero la portada C aprobada no lleva
@@ -904,13 +914,15 @@ sección 09 «Música» en `https://axis.efeonce.org/references/glitch/#musica` 
 **Único pendiente:** **probar la mezcla con la voz real del host** en una edición real (la demo usa una voz TTS
 provisional). El ducking lo aplica el editor con los valores de arriba.
 
-## 14. Glitch Flash — formato puntual (LANZADO 2026-09-28, sin plantilla todavía)
+## 14. Glitch Flash — formato puntual (LANZADO 2026-09-28, compone con `pnpm glitch:compose`)
 
-> **Sólo Glitch.** Decisión del operador del 2026-09-28. **Estado honesto:** el primero (Claude Sonnet 5.5) se produjo y
-> se **lanzó en producción** el 2026-09-28 y el operador lo **aprobó en uso real**; **no** tiene plantilla en el Artifact
-> Composer (`glitch-carousel`/`glitch-stills`) ni pieza, token o contrato en AXIS (`glitchLine`,
-> `efeonce.glitch-line` 0.1.0 no conoce el Flash). Es canon de uso, todavía no canon de sistema: no lo presentes como
-> plantilla ni como token.
+> **Sólo Glitch.** Decisión del operador del 2026-09-28. **Estado:** el primero (Claude Sonnet 5.5) se produjo y se
+> **lanzó en producción** el 2026-09-28 y el operador lo **aprobó en uso real**. Es canon de sistema: AXIS publicó
+> `glitchLine.editions` (`weekly` | `flash`) y las seis piezas `flash-*` (`@efeoncepro/axis-tokens` 0.3.24, con
+> `derivesFrom`, `chip` y `coverTemplate: null`) y el contrato `efeonce.glitch-line` 0.2.0
+> (`@efeoncepro/axis-ui-contracts` 0.3.22: `edition: { kind: 'flash' }`, `flash-edition-number-not-allowed`,
+> `flash-progress-not-allowed`); el Composer lo compone con seis plantillas `Flash*` (§14.4). Si un número de esta
+> sección difiere del token, gana el token.
 
 ### 14.1 Qué es y cuándo se dispara
 
@@ -945,16 +957,27 @@ provisional). El ducking lo aplica el editor con los valores de arriba.
   ~66 px de ancho en la cabecera compacta y ~96 px en el pie del banner de noticia.
 - **Nunca cursiva ni skew** (la línea prohíbe la cursiva sintética) y **cuadrados, nunca círculos**: una sola esfera
   por pieza, la manzana.
-- **No es un token:** es un SVG autorado en la sesión con un patrón determinista (semilla 1755). Los números de esta
-  sección son referencia humana de lo publicado; cuando el Flash entre a AXIS, manda el token.
+- **Es token** (`glitchLine.editions.flash.masthead.trail`). El generador vive en Greenhouse
+  (`src/lib/glitch-composition/flash-trail.ts`, `computeGlitchFlashTrail` / `buildGlitchFlashTrailSvg`: MT19937 con la
+  siembra de `random` de Python) y reproduce **celda por celda** las 34 celdas del SVG publicado (test en
+  `__tests__/flash.test.ts`). `pnpm glitch:tokens` lo escribe como `catalogs/glitch/assets/flash-trail.svg` en el
+  acento. El ancho en la cabecera grande (150 px) y las separaciones compacta (8 px) y del banner (10 px) son medidas del
+  canvas aprobado en `glitch.css`: el token todavía no las publica (§14.7). Nunca dibujes la estela a mano.
 
-### 14.4 Cómo se arma hoy
+### 14.4 Cómo se compone
 
-- **`pnpm glitch:compose` no lo compone:** el manifiesto `GlitchEditionManifest` es estricto y exige ocho noticias
-  (`news` de largo 8, `src/lib/glitch-composition/manifest.ts`). Hasta que exista su plantilla, el Flash se arma en un
-  canvas **desde las plantillas aprobadas** (portada A, interior de la noticia 1, contraportada, banner A del blog y
-  banner interno 1600×900), con los valores de `glitchLine` (`glitch-tokens.css` generado) y los archivos de
-  `AXIS_GLITCH_ASSETS`. Nunca transcribas un HEX o una medida a mano.
+- **Con `pnpm glitch:compose`**, igual que la edición:
+  `pnpm glitch:compose -- --manifest src/lib/glitch-composition/examples/flash-sonnet-5-5.example.json [--out <dir>]`
+  (campos del manifiesto en §9.1; manual
+  [`componer-una-edicion-de-glitch.md`](../../../../docs/manual-de-uso/creative/componer-una-edicion-de-glitch.md#componer-un-glitch-flash)).
+  Salen el documento de LinkedIn de **3 páginas** (`FlashCover`, `FlashInterior`, `FlashBackCover`), Threads
+  (`FlashThreads`, sin «Desliza»), el banner 16:9 (`FlashBlogBanner`) y el banner interno 1600×900
+  (`FlashNewsBanner`). Nunca armes un Flash inventando noticias de relleno en el manifiesto semanal ni en un canvas a
+  mano: si falta algo, se corrige el manifiesto.
+- Errores: el mismo formato `✗ [código] …` + `- [código] ruta: mensaje`. Propios del Flash: `flash-edition-number-not-allowed`
+  (`edition.number`), `field-unknown` en `previousEdition`/`thesis`/`video`, `field-required` en `back.closingLine`,
+  `field-invalid` si la muletilla es «el resto, el lunes» o anuncia un número; del catálogo, `glitch.edition-structure`
+  si el carrusel no es portada + noticia + contraportada o trae número o avance.
 - **Foto:** `processPhoto` (duotono) + `computeByteFracture` (bytes), funciones canónicas de
   `src/lib/glitch-composition/`. Una escena oscura se recorta y se le levanta la exposición **antes** de
   `processPhoto`, o se funde con el fondo navy ([lessons.md](lessons.md), 2026-09-28).
@@ -990,7 +1013,9 @@ provisional). El ducking lo aplica el editor con los valores de arriba.
 
 ### 14.7 Pendiente (no lo decidas por tu cuenta)
 
-- Llevar el Flash a **AXIS** (pieza en `glitchLine.pieces`, la estela como token, la cabecera «NO ESPERA AL LUNES» en el
-  contrato) y a **plantillas del Composer** que acepten una sola noticia. Hasta entonces se arma desde las plantillas
-  aprobadas.
+- Publicar en el token el ancho de la estela en la cabecera grande (150 px) y las separaciones compacta (8 px) y del
+  banner (10 px): hoy son medidas del canvas aprobado en `glitch.css`.
+- La **ruta productiva** del Flash (TASK-1921 / `brand-surfaces`, `artifact-worker`, MCP): hoy sólo conoce la edición
+  semanal (`planGlitchEdition`); el Flash es taller local.
+- Si publicar imágenes de terceros con crédito y sin licencia (decidido para Sonnet 5.5) vale para otros Flash.
 - La **numeración** de la edición semanal (§1): pregunta abierta para el operador.

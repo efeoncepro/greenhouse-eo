@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Glitch Flash · Banner interno del blog</title>
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="glitch-tokens.css" />
+<link rel="stylesheet" href="glitch.css" />
+<style>
+  .gx-news-banner .gx-photo { top: 0; width: 1600px; height: 600px; }
+  .gx-news-banner .gx-credit { top: 574px; }
+  .gx-news-banner .gx-chip { left: 64px; top: 56px; font-size: 18px; }
+  .gx-news-banner .gx-section { font-size: 18px; letter-spacing: 0.12em; color: var(--gx-text-strong); }
+  .gx-news-banner .gx-foot { position: absolute; left: 64px; right: 64px; bottom: 52px; display: flex; align-items: center; justify-content: space-between; }
+  .gx-news-banner .gx-foot .gx-masthead__wordmark { width: 220px; }
+  .gx-news-banner .gx-foot .gx-masthead__number { font-size: 56px; }
+</style>
+</head>
+<body>
+<main class="gx-canvas gx-canvas--news gx-news-banner" data-gx-root>
+  <div class="gx-photo" data-slot="photo"><img data-slot-field="src" src="assets/glitch-apple.svg" alt="" /></div>
+  <svg class="gx-bytes" data-gx-bytes viewBox="0 0 1600 900" width="1600" height="900" aria-hidden="true"></svg>
+  <p class="gx-credit" data-slot="credit">Foto: crédito de la foto</p>
+  <div class="gx-chip"><span class="gx-chip__tag">ANUNCIO</span><span class="gx-section"><span data-slot="section">Sección</span> <span class="gx-plus-ia">+ IA</span></span></div>
+  <div class="gx-foot">
+    <img class="gx-masthead__wordmark" src="assets/glitch-logo-negative.svg" alt="Glitch" />
+    <span class="gx-masthead__number"><span class="gx-flash-mark"><img class="gx-flash-trail" src="assets/flash-trail.svg" alt="" /><span class="gx-num">FLASH</span></span></span>
+  </div>
+</main>
+</body>
+</html>

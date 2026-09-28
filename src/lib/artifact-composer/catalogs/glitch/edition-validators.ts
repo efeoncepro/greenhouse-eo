@@ -11,7 +11,8 @@
  *                                la del host (propia) sólo declara la licencia.
  *   - `glitch.face-safe-fracture` ninguna celda de la falla en bytes cae sobre un rostro.
  *   - `glitch.accent-on-light`   el verde nunca es texto sobre fondo claro: hoy toda plantilla es de superficie oscura.
- *   - `glitch.edition-structure` (sólo carrusel) portada + 8 noticias en orden + contraportada.
+ *   - `glitch.edition-structure` (sólo carrusel) portada + 8 noticias en orden + contraportada; el Glitch Flash, portada +
+ *                                la noticia + contraportada, sin avance n/8 (edición `flash` del token, 2026-09-28).
  */
 
 import type { CatalogSemanticValidator, CatalogSemanticViolation } from '../../catalog'
@@ -117,14 +118,31 @@ export const accentOnLightValidator = perSlide('glitch.accent-on-light', (slide,
 
 const INTERIORS = new Set(['Interior', 'InteriorOpening', 'InteriorLens'])
 
+/** El carrusel del Glitch Flash: una sola noticia, sin número ni avance (la estructura la fija el token). */
+const FLASH_CAROUSEL = ['FlashCover', 'FlashInterior', 'FlashBackCover'] as const
+const FLASH_TEMPLATES = new Set<string>([...FLASH_CAROUSEL, 'FlashBlogBanner', 'FlashNewsBanner', 'FlashThreads'])
+
 /** Sólo el carrusel: la edición completa, en orden. Las piezas sueltas no lo necesitan. */
 export const editionStructureValidator: CatalogSemanticValidator = {
   name: 'glitch.edition-structure',
-  version: '1.0.0',
+  version: '1.1.0',
   validate: (plan) => {
     const out: CatalogSemanticViolation[] = []
     const slides = plan.slides
     const at = (slideId: string, message: string) => out.push(violation('glitch.edition-structure', slideId, message))
+    const flash = slides.some((slide) => FLASH_TEMPLATES.has(slide.template))
+
+    if (flash) {
+      if (slides.length !== FLASH_CAROUSEL.length || slides.some((slide, i) => slide.template !== FLASH_CAROUSEL[i])) {
+        at(slides[0]?.slideId ?? 'plan', `El carrusel del Glitch Flash lleva ${FLASH_CAROUSEL.length} láminas: portada, la noticia y contraportada, sin mezclar piezas de la edición semanal.`)
+      }
+
+      for (const slide of slides) {
+        if (slotsOf(slide).progress !== undefined || slotsOf(slide).edition !== undefined) at(slide.slideId, 'Un Glitch Flash no lleva número de edición ni avance n/8.')
+      }
+
+      return out
+    }
 
     if (slides.length !== 10) {
       at(slides[0]?.slideId ?? 'plan', `El carrusel lleva 10 láminas (portada, 8 noticias, contraportada); este trae ${slides.length}.`)

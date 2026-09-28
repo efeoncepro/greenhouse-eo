@@ -14,6 +14,7 @@
  * - La numeración es dato: el composer no decide la serie.
  */
 
+import { glitchLine } from '@efeoncepro/axis-tokens'
 import { z } from 'zod'
 
 import { GlitchPieceError, type GlitchIssue } from './types'
@@ -253,3 +254,160 @@ export const parseGlitchEditionManifest = (input: unknown): GlitchEditionManifes
 
   return result.data
 }
+
+// ─── Glitch Flash (operador, 2026-09-28) ───────────────────────────────────────────────────────────────────────────
+
+/**
+ * Manifiesto de un GLITCH FLASH (`GlitchFlashManifest`, `schemaVersion: 1`, `edition.kind: 'flash'`).
+ *
+ * Glitch tiene dos formatos (`glitchLine.editions` de AXIS): la edición semanal (este archivo, arriba) y el Flash, que se
+ * dispara ante una noticia puntual y NO es la edición entera. Es un tipo hermano, no una rama del semanal: el esquema
+ * semanal queda idéntico y un manifiesto semanal valida igual que antes. Lo distingue `edition.kind: 'flash'`
+ * (`parseGlitchManifest` despacha).
+ *
+ * Reglas del Flash:
+ * - Sin número de edición, sin `previousEdition` y sin rotación de portada: queda fuera de la rotación (su portada es la
+ *   pieza `flash-portada`, que deriva de la portada A). Un número se rechaza con `flash-edition-number-not-allowed`.
+ * - Exactamente una noticia. Su foto va en la lámina interior y en el banner interno; la portada puede traer otra
+ *   (`cover.photo`, la imagen de la portada del anuncio) o repetir la de la noticia.
+ * - `back.closingLine` es obligatoria y VARÍA en cada Flash (el gesto del narrador): una línea o dos
+ *   (`["léelo completo", "en nuestro blog."]`). Nunca el número de la próxima edición ni una frase rechazada por el
+ *   operador (`narratorCloser.rejected` del token).
+ * - Sin avance n/8: el pie sólo lleva «Desliza» y la mano. Los chips salen del token («LA NOTICIA», «ANUNCIO»).
+ */
+
+const FLASH = glitchLine.editions.flash
+
+/** Foto del Flash: la de la semanal sin `strong` (la portada del Flash no se elige por rotación). */
+export const glitchFlashPhotoSchema = glitchPhotoSchema.omit({ strong: true })
+
+export const glitchFlashNewsSchema = z
+  .object({
+    section: z.enum(GLITCH_SECTIONS),
+    headline: nonEmpty,
+    outlet: nonEmpty,
+    date: isoDate,
+    photo: glitchFlashPhotoSchema,
+    /** El Glitch Drop de la noticia (entrada 300 + remate 800, cerrado con la manzana). */
+    pov: glitchHeadlineSchema,
+    why: nonEmpty
+  })
+  .strict()
+
+/** Piezas del Flash además del carrusel (la portada, la noticia y la contraportada sueltas; Threads y el blog). */
+export const GLITCH_FLASH_STILL_OUTPUTS = ['cover', 'interior', 'back', 'threads', 'blog:banner', 'blog:news'] as const
+
+const closingLineSchema = z.union([nonEmpty, z.array(nonEmpty).min(1).max(FLASH.narratorCloser.lines)])
+
+export const glitchFlashManifestSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    example: z.boolean().default(false),
+    edition: z
+      .object({
+        kind: z.literal('flash'),
+        /** Identificador del Flash en archivos y artefactos (`glitch-flash-<slug>`). */
+        slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'slug en minúsculas con guiones (claude-sonnet-5-5)'),
+        /** Título del documento («Glitch Flash · <título>»). */
+        title: nonEmpty,
+        publishDate: isoDate
+      })
+      .strict(),
+    news: z.array(glitchFlashNewsSchema).length(1),
+    cover: z
+      .object({
+        /** La imagen de la portada; `null` repite la foto de la noticia. */
+        photo: glitchFlashPhotoSchema.nullable().default(null),
+        headline: glitchHeadlineSchema,
+        /** Dos líneas «+ IA» de portada: dos lecturas de la misma noticia, cada una con su sección. */
+        lines: z.array(z.object({ section: z.enum(GLITCH_SECTIONS), text: nonEmpty }).strict()).length(2)
+      })
+      .strict(),
+    back: z.object({ closingLine: closingLineSchema }).strict(),
+    outputs: z
+      .object({ stills: z.array(z.enum(GLITCH_FLASH_STILL_OUTPUTS)).default([]) })
+      .strict()
+      .default({ stills: [] })
+  })
+  .strict()
+  .superRefine((m, ctx) => {
+    const lines = glitchFlashClosingLines(m)
+    const normalize = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N} ]/gu, '').replace(/\s+/g, ' ').trim()
+    const rejected = new Set<string>(FLASH.narratorCloser.rejected.map(normalize))
+
+    if (rejected.has(normalize(lines.join(' ')))) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['back', 'closingLine'], message: 'el operador rechazó esta muletilla (no se escucha natural): el gesto del narrador varía en cada Flash' })
+    }
+
+    if (lines.some((line) => /#\s*(?:\d|N\b)/i.test(line))) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['back', 'closingLine'], message: 'un Flash no anuncia la próxima edición por número' })
+    }
+
+    if (new Set(m.outputs.stills).size !== m.outputs.stills.length) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['outputs', 'stills'], message: 'una pieza suelta pedida dos veces' })
+    }
+  })
+
+export type GlitchFlashManifest = z.infer<typeof glitchFlashManifestSchema>
+export type GlitchFlashNews = z.infer<typeof glitchFlashNewsSchema>
+
+/** La muletilla de la contraportada del Flash, siempre como lista de líneas. */
+export function glitchFlashClosingLines(manifest: Pick<GlitchFlashManifest, 'back'>): string[] {
+  const line = manifest.back.closingLine
+
+  return typeof line === 'string' ? [line] : [...line]
+}
+
+/** Campos de la edición semanal que un Flash no lleva: el mensaje dice por qué, no sólo «campo no admitido». */
+const FLASH_FORBIDDEN: Record<string, { code: string; message: string }> = {
+  'edition.number': { code: 'flash-edition-number-not-allowed', message: 'Un Glitch Flash no lleva número de edición (no es la edición entera): la cabecera dice «NO ESPERA AL LUNES» y «FLASH».' },
+  'edition.weekRange': { code: 'field-unknown', message: 'un Glitch Flash no cubre una semana: sale el día de la noticia' },
+  previousEdition: { code: 'field-unknown', message: 'un Glitch Flash queda fuera de la rotación de portadas: no declara la edición anterior' },
+  video: { code: 'field-unknown', message: 'un Glitch Flash no tiene video (el reel y el vlog son de la edición semanal)' },
+  thesis: { code: 'field-unknown', message: 'un Glitch Flash no lleva tesis de edición: la cuenta la noticia' }
+}
+
+/** Un manifiesto es de Flash cuando su edición declara `kind: 'flash'`. */
+export const isGlitchFlashManifestInput = (input: unknown): boolean => {
+  const edition = (input as { edition?: unknown } | null)?.edition
+
+  return typeof edition === 'object' && edition !== null && (edition as { kind?: unknown }).kind === 'flash'
+}
+
+/** Valida un manifiesto de Flash; devuelve el manifiesto normalizado o lanza `GlitchPieceError('manifest-invalid')`. */
+export const parseGlitchFlashManifest = (input: unknown): GlitchFlashManifest => {
+  const result = glitchFlashManifestSchema.safeParse(input)
+
+  if (!result.success) {
+    const closing = (input as { back?: { closingLine?: unknown } } | null)?.back?.closingLine
+
+    const issues = result.error.issues.flatMap((issue): GlitchIssue[] => {
+      // La muletilla es una línea o una lista de hasta dos: el error de la unión dice cuál de las dos cosas falta.
+      if (issue.code === 'invalid_union' && pathOf(issue.path) === 'back.closingLine') {
+        return [
+          closing === undefined
+            ? { code: 'field-required', path: 'back.closingLine', message: 'falta la muletilla de la contraportada: el gesto del narrador varía en cada Flash' }
+            : { code: 'field-invalid', path: 'back.closingLine', message: `la muletilla es una línea o una lista de hasta ${FLASH.narratorCloser.lines} líneas, sin vacías` }
+        ]
+      }
+
+      if (issue.code !== 'unrecognized_keys') return toIssues(new z.ZodError([issue]))
+
+      return issue.keys.map((key) => {
+        const path = pathOf([...issue.path, key])
+        const known = FLASH_FORBIDDEN[path]
+
+        return known ? { code: known.code, path, message: known.message } : { code: 'field-unknown', path, message: `campo no admitido: ${key}` }
+      })
+    })
+
+    throw new GlitchPieceError(`El manifiesto del Glitch Flash no es válido (${issues.length} problemas).`, 'manifest-invalid', issues)
+  }
+
+  return result.data
+}
+
+export type GlitchManifest = GlitchEditionManifest | GlitchFlashManifest
+
+/** Valida un manifiesto de cualquiera de los dos formatos (`edition.kind: 'flash'` o la edición semanal). */
+export const parseGlitchManifest = (input: unknown): GlitchManifest => (isGlitchFlashManifestInput(input) ? parseGlitchFlashManifest(input) : parseGlitchEditionManifest(input))

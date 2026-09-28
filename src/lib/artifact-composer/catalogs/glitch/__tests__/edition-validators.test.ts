@@ -93,4 +93,15 @@ describe('glitch edition validators — un caso que pasa y uno que falla por reg
     expect(glitchEditionValidators('carousel').map((v) => v.name)).toContain('glitch.edition-structure')
     expect(glitchEditionValidators('stills').map((v) => v.name)).not.toContain('glitch.edition-structure')
   })
+
+  it('edition-structure del Glitch Flash: portada, la noticia y contraportada, sin número ni avance', () => {
+    const flash = [slide('FlashCover', {}, 'cover'), slide('FlashInterior', {}, 'news'), slide('FlashBackCover', {}, 'back')]
+
+    expect(run(editionStructureValidator, flash)).toEqual([])
+    expect(run(editionStructureValidator, flash.slice(0, 2))).toEqual(['glitch.edition-structure'])
+    expect(run(editionStructureValidator, [flash[0], slide('Interior', { progress: { step: '1' } }, 'n1'), flash[2]])).toContain('glitch.edition-structure')
+    expect(run(editionStructureValidator, [flash[0], slide('FlashInterior', { progress: { step: '1' } }, 'news'), flash[2]])).toEqual(['glitch.edition-structure'])
+    // La portada del Flash queda fuera de la rotación: no declara la semana anterior.
+    expect(run(coverRotationValidator, [flash[0]])).toEqual([])
+  })
 })

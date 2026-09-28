@@ -1,5 +1,31 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-28 (p) — Glitch Flash: seis plantillas nuevas y «LA NOTICIA» en las portadas con foto
+
+<!-- sealed-by-freeze: eda719cb0ccf69b2d2e0c9a20e32a84feba06977a5f9272812b997db50f148c4 -->
+
+El operador aprobó y publicó el primer **Glitch Flash** el 2026-09-28 (Claude Sonnet 5.5): el formato que se dispara ante
+una noticia puntual, sin número de edición ni avance n/8 y fuera de la rotación de portadas. AXIS lo publicó en
+`axis-tokens` 0.3.24 (`glitchLine.editions.flash` y las seis piezas `flash-*`) y `axis-ui-contracts` 0.3.22
+(`efeonce.glitch-line` 0.2.0). El catálogo suma una plantilla por pieza, derivadas de las aprobadas de la edición y con
+el markup de las láminas publicadas (canvas «Design»): cabecera «NO ESPERA AL LUNES» sobre la estela de bytes
+(`assets/flash-trail.svg`, generada desde el token con la semilla 1755 y comparada celda por celda con el SVG publicado)
+y «FLASH»; chips «LA NOTICIA» y «ANUNCIO»; sin avance; la muletilla de la contraportada en dos líneas. Los frames nuevos
+son el probe de cada plantilla (foto sintética del gate), como todos los del catálogo.
+
+Además, por decisión del operador del mismo día, toda portada productiva con foto cambia el chip «PORTADA» (que sirvió
+para la prueba) por «LA NOTICIA»: sólo cambia ese texto del chip en las tres plantillas que lo llevan; nada más se mueve.
+
+- `templates-glitch/CoverPhoto.png` — ✏️ glitch.cover.a: el chip dice «LA NOTICIA» (antes «PORTADA»)
+- `templates-glitch/BlogBannerPhoto.png` — ✏️ glitch.blog.banner.a: el chip dice «LA NOTICIA» (antes «PORTADA»)
+- `templates-glitch/BlogSquarePhoto.png` — ✏️ glitch.blog.square.a: el chip dice «LA NOTICIA» (antes «PORTADA»)
+- `templates-glitch/FlashCover.png` — 🆕 glitch.flash.cover: la portada del Flash (pieza flash-portada)
+- `templates-glitch/FlashInterior.png` — 🆕 glitch.flash.interior: la noticia, con «El micrófono se abre» y sin avance (flash-interior)
+- `templates-glitch/FlashBackCover.png` — 🆕 glitch.flash.back: la contraportada con la muletilla en dos líneas (flash-contraportada)
+- `templates-glitch/FlashBlogBanner.png` — 🆕 glitch.flash.blog.banner: el banner 16:9 del blog (flash-blog-banner)
+- `templates-glitch/FlashNewsBanner.png` — 🆕 glitch.flash.blog.news: el banner interno 1600 × 900 (flash-blog-banner-interno)
+- `templates-glitch/FlashThreads.png` — 🆕 glitch.flash.threads: la portada sola, sin «Desliza» (flash-threads)
+
 ## 2026-09-28 (o) — TASK-1934: las nueve láminas SEO/AEO del deck
 
 <!-- sealed-by-freeze: legacy-2026-09-28 -->
@@ -909,7 +935,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 41737352f675efc66e5c707fe33240cc191914282bc984bff39796cae8c02697 -->
+<!-- manifest-digest: eda719cb0ccf69b2d2e0c9a20e32a84feba06977a5f9272812b997db50f148c4 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

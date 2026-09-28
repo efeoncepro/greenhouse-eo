@@ -1,7 +1,7 @@
 {
   "version": "0.1",
   "status": "candidate",
-  "note": "Catálogos de Glitch (sólo Glitch; TASK-1923). Una carpeta, tres catálogos: `catalogs` dice a cuál pertenece cada plantilla (glitch.catalog-membership@1) y `approval` si es canon (glitch.piece-approval@1). `piece` es el id de la pieza en glitchLine.pieces de AXIS: el estado de aprobación sale de ahí (test de drift). El lienzo real lo declara cada *.slots.json. El autor nunca elige plantilla: el mapper decide el contentType por contenido y rotación.",
+  "note": "Catálogos de Glitch (sólo Glitch; TASK-1923). Una carpeta, tres catálogos: `catalogs` dice a cuál pertenece cada plantilla (glitch.catalog-membership@1) y `approval` si es canon (glitch.piece-approval@1). `piece` es el id de la pieza en glitchLine.pieces de AXIS: el estado de aprobación sale de ahí (test de drift). El lienzo real lo declara cada *.slots.json. El autor nunca elige plantilla: el mapper decide el contentType por contenido y rotación. Glitch Flash (operador, 2026-09-28): seis plantillas `Flash*` (contentTypes `glitch.flash.*`), una por pieza `flash-*` del token; el Flash no lleva número ni avance y queda fuera de la rotación de portadas.",
   "canvas": {
     "width": 1080,
     "height": 1350
@@ -32,7 +32,13 @@
     "glitch.overlay.lower-third.vlog",
     "glitch.overlay.news.vlog",
     "glitch.overlay.drop.vlog",
-    "glitch.overlay.cta.vlog"
+    "glitch.overlay.cta.vlog",
+    "glitch.flash.cover",
+    "glitch.flash.interior",
+    "glitch.flash.back",
+    "glitch.flash.blog.banner",
+    "glitch.flash.blog.news",
+    "glitch.flash.threads"
   ],
   "templates": [
     {
@@ -483,6 +489,111 @@
       "sphere": "none",
       "surfaceTone": "dark",
       "piece": "vlog-overlay"
+    },
+    {
+      "name": "FlashCover",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.flash.cover"
+      ],
+      "prototype": "flash-cover.html",
+      "slotsRef": "flash-cover.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "flash-portada"
+    },
+    {
+      "name": "FlashInterior",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.flash.interior"
+      ],
+      "prototype": "flash-interior.html",
+      "slotsRef": "flash-interior.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "flash-interior"
+    },
+    {
+      "name": "FlashBackCover",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.flash.back"
+      ],
+      "prototype": "flash-back-cover.html",
+      "slotsRef": "flash-back-cover.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "carousel",
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "flash-contraportada"
+    },
+    {
+      "name": "FlashBlogBanner",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.flash.blog.banner"
+      ],
+      "prototype": "flash-blog-banner.html",
+      "slotsRef": "flash-blog-banner.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "flash-blog-banner"
+    },
+    {
+      "name": "FlashNewsBanner",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.flash.blog.news"
+      ],
+      "prototype": "flash-news-banner.html",
+      "slotsRef": "flash-news-banner.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "sphere": "none",
+      "surfaceTone": "dark",
+      "piece": "flash-blog-banner-interno"
+    },
+    {
+      "name": "FlashThreads",
+      "kind": "full-bleed",
+      "owner": "claude",
+      "contentTypes": [
+        "glitch.flash.threads"
+      ],
+      "prototype": "flash-threads.html",
+      "slotsRef": "flash-threads.slots.json",
+      "approval": "approved",
+      "catalogs": [
+        "stills"
+      ],
+      "sphere": "apple",
+      "surfaceTone": "dark",
+      "piece": "flash-threads"
     }
   ],
   "selector": {
@@ -512,7 +623,13 @@
       "glitch.overlay.lower-third.vlog": "OverlayLowerThirdVlog",
       "glitch.overlay.news.vlog": "OverlayNewsVlog",
       "glitch.overlay.drop.vlog": "OverlayDropVlog",
-      "glitch.overlay.cta.vlog": "OverlayCtaVlog"
+      "glitch.overlay.cta.vlog": "OverlayCtaVlog",
+      "glitch.flash.cover": "FlashCover",
+      "glitch.flash.interior": "FlashInterior",
+      "glitch.flash.back": "FlashBackCover",
+      "glitch.flash.blog.banner": "FlashBlogBanner",
+      "glitch.flash.blog.news": "FlashNewsBanner",
+      "glitch.flash.threads": "FlashThreads"
     }
   }
 }

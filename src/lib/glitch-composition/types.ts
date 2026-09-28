@@ -97,3 +97,22 @@ export interface GlitchEditionPlan {
   overlays: GlitchCatalogPlan
   assets: GlitchAssetRequest[]
 }
+
+/**
+ * Plan de un Glitch Flash (operador, 2026-09-28): una sola noticia, sin número de edición ni rotación de portada. El
+ * carrusel son tres láminas (portada, la noticia, contraportada); las sueltas, Threads y el blog. No tiene overlays.
+ */
+export interface GlitchFlashPlan {
+  kind: 'flash'
+  slug: string
+  /** «Glitch Flash · <título>» (título del documento de LinkedIn). */
+  title: string
+  edition: null
+  coverTemplate: null
+  carousel: GlitchCatalogPlan
+  stills: GlitchCatalogPlan
+  overlays: GlitchCatalogPlan
+  assets: GlitchAssetRequest[]
+}
+
+export const isGlitchFlashPlan = (plan: GlitchEditionPlan | GlitchFlashPlan): plan is GlitchFlashPlan => 'kind' in plan && plan.kind === 'flash'

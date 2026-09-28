@@ -11,8 +11,18 @@ import { catalogMembershipValidator, glitchTemplateOf, pieceApprovalValidator } 
 const registry = JSON.parse(fs.readFileSync(path.join(glitchCatalogDir, 'registry.json'), 'utf8')) as DeckRegistry
 
 const tokens = JSON.parse(fs.readFileSync(path.join(glitchCatalogDir, 'glitch-tokens.json'), 'utf8')) as {
-  pieces: Record<string, { status: string; sphere: string }>
+  pieces: Record<string, { status: string; sphere: string; edition?: string }>
+  editions: {
+    flash: {
+      masthead: { label: { text: string }; word: { text: string } }
+      chips: { cover: string; interior: string }
+      progress: string
+      swipe: string
+    }
+  }
 }
+
+const read = (file: string) => fs.readFileSync(path.join(glitchCatalogDir, file), 'utf8')
 
 /**
  * Diferencias conocidas entre el registry y `glitchLine.pieces` de AXIS, con su razón. La portada C aprobada (canvas
@@ -82,7 +92,43 @@ describe('glitch catalogs', () => {
     }
   })
 
+  it('every Flash piece of AXIS has exactly one Flash template, and every Flash template is a Flash piece', () => {
+    const flashPieces = Object.entries(tokens.pieces).filter(([, p]) => p.edition === 'flash').map(([id]) => id).sort()
+    const flashTemplates = registry.templates.filter((t) => t.name.startsWith('Flash')).map((t) => glitchTemplateOf(registry, t.name)!.piece).sort()
+
+    expect(flashTemplates).toEqual(flashPieces)
+    expect(registry.templates.filter((t) => t.name.startsWith('Flash')).every((t) => t.contentTypes.every((ct) => ct.startsWith('glitch.flash.')))).toBe(true)
+  })
+
+  it('the Flash templates paint the texts of the token: label, word and chips; no number, no progress', () => {
+    const flash = tokens.editions.flash
+    const html = Object.fromEntries(registry.templates.filter((t) => t.name.startsWith('Flash')).map((t) => [t.name, read(t.prototype)]))
+
+    for (const [name, src] of Object.entries(html)) {
+      expect(src, name).not.toMatch(/data-slot="edition"|gx-hash|data-slot="progress"|EDICIÓN/)
+      expect(src, name).toContain(`<span class="gx-num">${flash.masthead.word.text}</span>`)
+      expect(src, name).toContain('src="assets/flash-trail.svg"')
+    }
+
+    for (const name of ['FlashCover', 'FlashThreads', 'FlashBlogBanner', 'FlashInterior', 'FlashBackCover']) expect(html[name], name).toContain(flash.masthead.label.text)
+    for (const name of ['FlashCover', 'FlashThreads', 'FlashBlogBanner']) expect(html[name], name).toContain(`>${flash.chips.cover}</span>`)
+    for (const name of ['FlashInterior', 'FlashNewsBanner']) expect(html[name], name).toContain(`>${flash.chips.interior}</span>`)
+    expect(flash.progress).toBe('none')
+    expect(html.FlashThreads, 'Threads sale sola: sin «Desliza»').not.toContain('DESLIZA')
+    expect(html.FlashCover).toContain('DESLIZA')
+  })
+
+  it('the weekly photo covers say «LA NOTICIA», never «PORTADA» (operator, 2026-09-28)', () => {
+    for (const file of ['cover-photo.html', 'blog-banner-photo.html', 'blog-square-photo.html']) {
+      expect(read(file), file).toContain(`>${tokens.editions.flash.chips.cover}</span>`)
+      expect(read(file), file).not.toContain('PORTADA')
+    }
+  })
+
   it('a template asked from a catalog it does not belong to fails with glitch.catalog-membership', () => {
+    expect(catalogMembershipValidator('carousel').validate(planWith('FlashThreads', 'glitch.flash.threads'), { registry }).map((v) => v.code)).toEqual(['glitch.catalog-membership'])
+    expect(catalogMembershipValidator('stills').validate(planWith('FlashThreads', 'glitch.flash.threads'), { registry })).toEqual([])
+
     const violations = catalogMembershipValidator('overlays').validate(planWith('Interior', 'glitch.interior'), { registry })
 
     expect(violations.map((v) => v.code)).toEqual(['glitch.catalog-membership'])

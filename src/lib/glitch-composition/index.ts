@@ -8,6 +8,9 @@
  * - No lee archivos: dice qué fotos hacen falta, a qué tamaño exacto y dónde se desarman en bytes
  *   (`GlitchAssetRequest`). El CLI las materializa y adjunta la falla con `attachFractures`.
  *
+ * El Glitch Flash (operador, 2026-09-28) tiene su propio mapper (`planGlitchFlash`): una noticia, sin número ni rotación,
+ * con las piezas `flash-*` del token. `planGlitchManifest` despacha por `edition.kind`.
+ *
  * Sólo importa tipos del motor (`@/lib/artifact-composer/pure`) y paquetes AXIS: corre en cualquier runtime.
  */
 
@@ -16,12 +19,20 @@ import { validateGlitchLineIntent, type AxisGlitchLineIntent } from '@efeoncepro
 import type { CompositionPlanInput, SlotValues } from '@/lib/artifact-composer/pure'
 
 import { GLITCH_BACK_NOTE, GLITCH_SECTION_LABEL, glitchShortDate, splitLastWord } from './copy'
-import { parseGlitchEditionManifest, type GlitchEditionManifest, type GlitchNews } from './manifest'
-import { GlitchPieceError, type GlitchAssetRequest, type GlitchEditionPlan, type GlitchIssue } from './types'
+import {
+  glitchFlashClosingLines,
+  isGlitchFlashManifestInput,
+  parseGlitchEditionManifest,
+  parseGlitchFlashManifest,
+  type GlitchEditionManifest,
+  type GlitchNews
+} from './manifest'
+import { GlitchPieceError, type GlitchAssetRequest, type GlitchEditionPlan, type GlitchFlashPlan, type GlitchIssue } from './types'
 
-export { parseGlitchEditionManifest } from './manifest'
+export { parseGlitchEditionManifest, parseGlitchFlashManifest, parseGlitchManifest, isGlitchFlashManifestInput } from './manifest'
 export * from './types'
 export { computeByteFracture, paintByteFracture, fractureBand } from './byte-fracture'
+export { buildGlitchFlashTrailSvg, computeGlitchFlashTrail } from './flash-trail'
 
 type CoverTemplate = 'A' | 'B' | 'C'
 type Box = { x: number; y: number; w: number; h: number }
@@ -543,3 +554,184 @@ export const attachFractures = (plan: CompositionPlanInput, cellsBySlide: Readon
   ...plan,
   slides: plan.slides.map((slide) => (cellsBySlide[slide.slideId] ? { ...slide, slots: { ...slide.slots, bytes: JSON.stringify(cellsBySlide[slide.slideId]) } } : slide))
 })
+
+// ─── Glitch Flash ────────────────────────────────────────────────────────────────────────────────────────────────
+
+/** El intent de toda lámina del Flash: contrato 0.2.0, edición `flash` sin número. */
+const FLASH_INTENT = { version: '0.2.0', edition: { kind: 'flash' } } as const
+
+const escapeHtml = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+/**
+ * Mapper puro del GLITCH FLASH: manifiesto (`edition.kind: 'flash'`) → planes del Artifact Composer. Sin número de
+ * edición, sin `previousEdition` ni rotación (la portada es siempre `flash-portada`), una sola noticia y la muletilla de
+ * la contraportada que varía en cada Flash. Cada lámina se valida con el contrato `efeonce.glitch-line` 0.2.0
+ * (`edition: { kind: 'flash' }`), igual que la semanal.
+ */
+export const planGlitchFlash = (input: unknown, options: PlanGlitchEditionOptions = {}): GlitchFlashPlan => {
+  const manifest = parseGlitchFlashManifest(input)
+  const news = manifest.news[0]
+  const coverPhoto = manifest.cover.photo ?? news.photo
+  const assets: GlitchAssetRequest[] = []
+
+  type FlashPhoto = typeof coverPhoto
+
+  const regionsIn = (file: string, regions: readonly Region[], box: Box): Region[] => {
+    const source = options.photoSizes?.[file]
+
+    return source ? regions.flatMap((r) => fitRegion(r, source, { width: box.w, height: box.h }) ?? []) : [...regions]
+  }
+
+  const facesOf = (p: FlashPhoto, box: Box) => faceBoxes(box, regionsIn(p.file, p.faceRegions, box))
+
+  const photo = (ref: string, p: FlashPhoto, box: Box, canvas: Canvas, slideId: string, parts: FracturePart[]) => {
+    assets.push({
+      ref,
+      kind: 'photo',
+      path: p.file,
+      fit: { width: box.w, height: box.h },
+      treatment: 'duotone',
+      fractures: parts.map((part) => ({ slideIds: [slideId], box, edge: part.edge ?? p.fractureEdge, profile: part.profile, faceRegions: regionsIn(p.file, p.faceRegions, box), clip: part.clip, canvas }))
+    })
+
+    return `asset-ref:${ref}`
+  }
+
+  const license = (p: FlashPhoto) => `${p.license.kind}:${p.license.ref}`
+  const outlet = `${news.outlet} · ${glitchShortDate(news.date)}`
+  const coverHeadline = { entry: manifest.cover.headline.entry, ...punchParts(manifest.cover.headline.punch) }
+  const coverIntent = { entry: manifest.cover.headline.entry, close: manifest.cover.headline.punch }
+  const lines = manifest.cover.lines.map((line) => ({ section: GLITCH_SECTION_LABEL[line.section], text: line.text }))
+  const closingLines = glitchFlashClosingLines(manifest)
+
+  /** La portada y su gemela de Threads (sin «Desliza»): la foto de portada con su falla por el borde declarado. */
+  const coverLike = (slideId: string, contentType: string, piece: string): Slide => {
+    const faces = facesOf(coverPhoto, COVER_PHOTO)
+
+    return {
+      slideId,
+      contentType,
+      slots: {
+        photo: { src: photo(`photo:${slideId}`, coverPhoto, COVER_PHOTO, CANVAS_4X5, slideId, [{ profile: 'band' }]), alt: `Foto de la noticia: ${news.headline}` },
+        credit: coverPhoto.credit,
+        photoLicense: license(coverPhoto),
+        faces: JSON.stringify(faces),
+        outlet,
+        headline: coverHeadline,
+        lines
+      },
+      intent: { ...FLASH_INTENT, piece, faces, headline: coverIntent }
+    }
+  }
+
+  const interiorFaces = facesOf(news.photo, INTERIOR_PHOTO)
+
+  const slides: Slide[] = [
+    coverLike('cover', 'glitch.flash.cover', 'flash-portada'),
+    {
+      slideId: 'news',
+      contentType: 'glitch.flash.interior',
+      slots: {
+        photo: { src: photo('photo:news', news.photo, INTERIOR_PHOTO, CANVAS_4X5, 'news', [{ profile: 'band' }]), alt: `Foto de la noticia: ${news.headline}` },
+        credit: news.photo.credit,
+        photoLicense: license(news.photo),
+        faces: JSON.stringify(interiorFaces),
+        outlet,
+        section: GLITCH_SECTION_LABEL[news.section],
+        headline: news.headline,
+        pov: { entry: news.pov.entry, ...punchParts(news.pov.punch) },
+        why: news.why
+      },
+      intent: { ...FLASH_INTENT, piece: 'flash-interior', faces: interiorFaces, headline: { entry: news.pov.entry, close: news.pov.punch } }
+    },
+    {
+      slideId: 'back',
+      contentType: 'glitch.flash.back',
+      slots: { headline: { entry: 'El micrófono', punch: 'se cierra' }, closingLine: closingLines.map(escapeHtml).join('<br>'), note: GLITCH_BACK_NOTE },
+      intent: { ...FLASH_INTENT, piece: 'flash-contraportada', headline: { entry: 'El micrófono', close: 'se cierra' }, narrator: { text: closingLines.join(' ') } }
+    }
+  ]
+
+  const bySlideId = new Map(slides.map((s) => [s.slideId, s]))
+  const stills: Slide[] = []
+
+  for (const output of manifest.outputs.stills) {
+    if (output === 'cover') stills.push(bySlideId.get('cover')!)
+    else if (output === 'interior') stills.push(bySlideId.get('news')!)
+    else if (output === 'back') stills.push(bySlideId.get('back')!)
+    else if (output === 'threads') stills.push(coverLike('threads', 'glitch.flash.threads', 'flash-threads'))
+    else if (output === 'blog:banner') {
+      const faces = facesOf(coverPhoto, BLOG_PHOTO)
+
+      stills.push({
+        slideId: 'blog-banner',
+        contentType: 'glitch.flash.blog.banner',
+        slots: {
+          photo: {
+            src: photo('photo:blog-banner', coverPhoto, BLOG_PHOTO, CANVAS_16X9, 'blog-banner', [{ edge: 'bottom', profile: 'band' }, { edge: 'left', profile: 'side' }]),
+            alt: `Foto de la noticia: ${news.headline}`
+          },
+          credit: coverPhoto.credit,
+          photoLicense: license(coverPhoto),
+          faces: JSON.stringify(faces),
+          outlet,
+          headline: coverHeadline,
+          lines
+        },
+        intent: { ...FLASH_INTENT, piece: 'flash-blog-banner', faces, headline: coverIntent }
+      })
+    } else {
+      const faces = facesOf(news.photo, NEWS_PHOTO)
+
+      stills.push({
+        slideId: 'blog-news',
+        contentType: 'glitch.flash.blog.news',
+        slots: {
+          photo: { src: photo('photo:blog-news', news.photo, NEWS_PHOTO, CANVAS_NEWS, 'blog-news', [{ edge: 'bottom', profile: 'band' }]), alt: `Foto de la noticia: ${news.headline}` },
+          credit: news.photo.credit,
+          photoLicense: license(news.photo),
+          faces: JSON.stringify(faces),
+          section: GLITCH_SECTION_LABEL[news.section]
+        },
+        intent: { ...FLASH_INTENT, piece: 'flash-blog-banner-interno', faces }
+      })
+    }
+  }
+
+  const issues: GlitchIssue[] = [...slides, ...stills].flatMap((slide) =>
+    validateGlitchLineIntent({ franchise: 'glitch', ...slide.intent }, { narratorLicenseStatus: options.narratorLicenseStatus }).map((issue) => ({
+      code: issue.code,
+      path: `${slide.slideId}${issue.path ? `.${issue.path}` : ''}`,
+      message: issue.message
+    }))
+  )
+
+  if (issues.some((i) => i.code === 'narrator-font-unlicensed')) {
+    throw new GlitchPieceError('Guttery no tiene licencia para este render: la muletilla del narrador no se compone.', 'font-license-missing', issues)
+  }
+
+  if (issues.length > 0) throw new GlitchPieceError(`El contrato efeonce.glitch-line rechaza ${issues.length} punto(s) del Glitch Flash.`, 'contract-issues', issues)
+
+  const artifactId = options.artifactId ?? `glitch-flash-${manifest.edition.slug}`
+
+  const toPlan = (list: Slide[], suffix: string): CompositionPlanInput => ({
+    artifactId: `${artifactId}-${suffix}`,
+    slides: list.map(({ slideId, contentType, slots }) => ({ slideId, contentType, slots }))
+  })
+
+  return {
+    kind: 'flash',
+    slug: manifest.edition.slug,
+    title: `Glitch Flash · ${manifest.edition.title}`,
+    edition: null,
+    coverTemplate: null,
+    carousel: { catalog: 'glitch-carousel', plan: toPlan(slides, 'carousel') },
+    stills: { catalog: 'glitch-stills', plan: toPlan(stills, 'stills') },
+    overlays: { catalog: 'glitch-overlays', plan: toPlan([], 'overlays') },
+    assets
+  }
+}
+
+/** Plan de cualquiera de los dos formatos: el Flash (`edition.kind: 'flash'`) o la edición semanal. */
+export const planGlitchManifest = (input: unknown, options: PlanGlitchEditionOptions = {}): GlitchEditionPlan | GlitchFlashPlan =>
+  isGlitchFlashManifestInput(input) ? planGlitchFlash(input, options) : planGlitchEdition(input, options)

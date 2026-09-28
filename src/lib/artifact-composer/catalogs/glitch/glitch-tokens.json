@@ -301,6 +301,101 @@
       "chip": "cover"
     }
   },
+  "editions": {
+    "kinds": [
+      "weekly",
+      "flash"
+    ],
+    "default": "weekly",
+    "weekly": {
+      "numbered": true,
+      "masthead": "edition-number",
+      "progress": {
+        "segments": 8
+      }
+    },
+    "flash": {
+      "status": "approved",
+      "approvedOn": "2026-09-28",
+      "trigger": "breaking-news",
+      "numbered": false,
+      "masthead": {
+        "label": {
+          "text": "NO ESPERA AL LUNES",
+          "family": "Poppins",
+          "weight": 600,
+          "sizePx": 16,
+          "tracking": "0.24em"
+        },
+        "word": {
+          "text": "FLASH",
+          "family": "Bricolage Grotesque",
+          "sizePx": 92,
+          "glyph": {
+            "weight": 800,
+            "width": 78,
+            "color": "accent"
+          }
+        },
+        "trail": {
+          "cell": "square",
+          "color": "accent",
+          "cellPx": 10,
+          "stepPx": 12,
+          "columns": 13,
+          "rows": 5,
+          "opacity": {
+            "from": 0.18,
+            "to": 1,
+            "towards": "word"
+          },
+          "density": "grows-towards-word",
+          "side": "left-of-word",
+          "gapPx": 14,
+          "widthPx": {
+            "compact": 66,
+            "newsBanner": 96
+          },
+          "skew": "never",
+          "italic": "never",
+          "seed": 1755
+        },
+        "compact": "label-trail-word-inline",
+        "layout": "single-row-vertically-centered",
+        "rule": "none"
+      },
+      "chips": {
+        "cover": "LA NOTICIA",
+        "interior": "ANUNCIO"
+      },
+      "chipDetail": {
+        "interior": "outlet-and-date",
+        "inlineBanner": "section"
+      },
+      "progress": "none",
+      "swipe": "label-and-hand-only",
+      "microphoneOpens": "kept",
+      "narratorCloser": {
+        "rule": "varies-per-edition",
+        "lines": 2,
+        "never": [
+          "next-edition-number",
+          "fixed-phrase"
+        ],
+        "example": {
+          "edition": "flash-claude-sonnet-5-5",
+          "lines": [
+            "léelo completo",
+            "en nuestro blog."
+          ]
+        },
+        "rejected": [
+          "el resto, el lunes"
+        ]
+      },
+      "subscription": "weekly"
+    }
+  },
   "coverRotation": {
     "templates": [
       "A",

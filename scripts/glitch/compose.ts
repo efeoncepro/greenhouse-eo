@@ -1,7 +1,10 @@
 /**
  * pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,stills,overlays]
  *
- * Compone una edición de Glitch con el Artifact Composer (TASK-1923). Sólo Glitch.
+ * Compone una edición de Glitch con el Artifact Composer (TASK-1923). Sólo Glitch. También compone un GLITCH FLASH
+ * (manifiesto con `edition.kind: 'flash'`, operador 2026-09-28): carrusel de tres láminas (portada, la noticia,
+ * contraportada), Threads y los banners del blog, sin número de edición ni rotación. Mismo contrato de salidas; los
+ * archivos se llaman `glitch-flash-<slug>-*` y la procedencia declara `editionKind: "flash"`.
  *
  *   manifiesto → `planGlitchEdition` (portada por rotación, contrato efeonce.glitch-line) → fotos materializadas al
  *   tamaño exacto de su hueco → falla en bytes calculada sobre la foto ya procesada → carrusel (PDF), piezas sueltas
@@ -29,7 +32,7 @@ import sharp from 'sharp'
 import { composeArtifact } from '@/lib/artifact-composer'
 import { resolvePlan } from '@/lib/artifact-composer/catalog'
 import { GLITCH_CATALOG_FACTORIES } from '@/lib/artifact-composer/catalogs/glitch'
-import { attachFractures, planGlitchEdition, type GlitchCatalogPlan } from '@/lib/glitch-composition'
+import { attachFractures, isGlitchFlashPlan, planGlitchManifest, type GlitchCatalogPlan } from '@/lib/glitch-composition'
 import { materializeGlitchAssets } from '@/lib/glitch-composition/materialize'
 
 import { glitchAxisVersions } from './glitch-tokens'
@@ -92,12 +95,19 @@ const main = async () => {
 
   const raw = fs.readFileSync(manifestPath)
   const manifestDir = path.dirname(path.resolve(manifestPath))
-  const input = JSON.parse(raw.toString('utf8')) as { edition?: { number?: number; publishDate?: string }; news?: { photo?: { file?: string } }[]; video?: { hostPhoto?: { file?: string } | null } | null }
+
+  const input = JSON.parse(raw.toString('utf8')) as {
+    edition?: { number?: number; publishDate?: string; kind?: string; slug?: string }
+    news?: { photo?: { file?: string } }[]
+    cover?: { photo?: { file?: string } | null }
+    video?: { hostPhoto?: { file?: string } | null } | null
+  }
+
   const number = input.edition?.number ?? 'x'
-  const out = path.resolve(arg('out') ?? `.captures/glitch/edicion-${number}`)
+  const out = path.resolve(arg('out') ?? (input.edition?.kind === 'flash' ? `.captures/glitch/flash-${input.edition.slug ?? 'x'}` : `.captures/glitch/edicion-${number}`))
 
   // 1. Tamaño original de cada foto: el mapper lleva rostros y lente al recorte del hueco.
-  const files = [...new Set([...(input.news ?? []).map((n) => n.photo?.file), input.video?.hostPhoto?.file].filter((f): f is string => Boolean(f)))]
+  const files = [...new Set([...(input.news ?? []).map((n) => n.photo?.file), input.cover?.photo?.file, input.video?.hostPhoto?.file].filter((f): f is string => Boolean(f)))]
   const sources = new Map<string, Buffer>()
   const photoSizes: Record<string, { width: number; height: number }> = {}
 
@@ -111,7 +121,10 @@ const main = async () => {
 
   // 2. El plan (portada por rotación + contrato AXIS). Falla cerrado antes de materializar nada.
   const narrator = narratorFont()
-  const plan = planGlitchEdition(input, { narratorLicenseStatus: narrator.status, photoSizes })
+  const plan = planGlitchManifest(input, { narratorLicenseStatus: narrator.status, photoSizes })
+  const flash = isGlitchFlashPlan(plan) ? plan : null
+  const fileBase = flash ? `glitch-flash-${flash.slug}` : `glitch-${plan.edition}`
+  const title = flash ? flash.title : `Glitch #${plan.edition}`
 
   // 3. Fotos al tamaño exacto de su hueco + la falla calculada sobre la foto ya procesada (materializador compartido
   //    con el artifact-worker: aquí la fuente es el disco).
@@ -149,9 +162,9 @@ const main = async () => {
   const carousel = await compose('carousel', plan.carousel, 'carrusel')
 
   if (carousel?.pdfPath) {
-    const pdf = await stablePdf(fs.readFileSync(carousel.pdfPath), `Glitch #${plan.edition}`, input.edition?.publishDate)
+    const pdf = await stablePdf(fs.readFileSync(carousel.pdfPath), title, input.edition?.publishDate)
     const linkedin = await checkCarouselForLinkedIn(pdf)
-    const final = path.join(out, `glitch-${plan.edition}-carrusel.pdf`)
+    const final = path.join(out, `${fileBase}-carrusel.pdf`)
 
     fs.writeFileSync(final, pdf)
     Object.assign(outputs.carousel as object, { pdf: { file: path.relative(out, final), sha256: sha256(pdf), ...linkedin } })
@@ -164,6 +177,8 @@ const main = async () => {
   const provenance = {
     schema: 'glitch.edition-provenance.v1',
     edition: plan.edition,
+    // El Flash declara su formato y su slug; la semanal conserva exactamente su forma de siempre.
+    ...(flash ? { editionKind: 'flash', slug: flash.slug } : {}),
     example: Boolean((input as { example?: boolean }).example),
     manifest: { file: path.basename(manifestPath), sha256: sha256(raw) },
     coverTemplate: plan.coverTemplate,
@@ -175,10 +190,10 @@ const main = async () => {
     outputs
   }
 
-  const provenancePath = path.join(out, `glitch-${plan.edition}.provenance.json`)
+  const provenancePath = path.join(out, `${fileBase}.provenance.json`)
 
   fs.writeFileSync(provenancePath, `${JSON.stringify(provenance, null, 2)}\n`)
-  console.log(`✓ Glitch #${plan.edition} (portada ${plan.coverTemplate}) → ${path.relative(process.cwd(), out)}`)
+  console.log(flash ? `✓ ${title} → ${path.relative(process.cwd(), out)}` : `✓ Glitch #${plan.edition} (portada ${plan.coverTemplate}) → ${path.relative(process.cwd(), out)}`)
 }
 
 main().catch((raw: unknown) => {

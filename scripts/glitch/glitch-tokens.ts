@@ -47,6 +47,7 @@ export const buildGlitchTokenProperties = (): [string, string][] => {
   const m = G.masthead
   const reel = G.safeZones['reel-9x16']
   const band = G.safeZones['linkedin-4x5'].photoBand
+  const trail = G.editions.flash.masthead.trail
 
   return [
     ['--gx-ground', c.ground],
@@ -80,6 +81,11 @@ export const buildGlitchTokenProperties = (): [string, string][] => {
     ['--gx-edition-hash-weight', String(m.editionNumber.hash.weight)],
     ['--gx-edition-number-weight', String(m.editionNumber.number.weight)],
     ['--gx-edition-number-width', String(m.editionNumber.number.width)],
+    // Glitch Flash: la etiqueta y la palabra usan la tipografía de «EDICIÓN» y del número (por referencia en AXIS); la
+    // estela es un asset (`assets/flash-trail.svg`) y aquí sólo van su separación y sus anchos publicados.
+    ['--gx-flash-trail-gap', px(trail.gapPx)],
+    ['--gx-flash-trail-width-compact', px(trail.widthPx.compact)],
+    ['--gx-flash-trail-width-news', px(trail.widthPx.newsBanner)],
     ['--gx-photo-band-top', px(band[0])],
     ['--gx-photo-band-height', px(band[1] - band[0])],
     ['--gx-reel-ui-top', px(reel.appUiTop[1])],
@@ -112,6 +118,7 @@ export const buildGlitchTokenArtifacts = (): GlitchTokenArtifacts => {
       apple: { assetId: G.apple.assetId, viewBox: G.apple.viewBox, perPiece: G.apple.perPiece },
       formats: G.formats,
       pieces: G.pieces,
+      editions: G.editions,
       coverRotation: G.coverRotation,
       icons: G.icons,
       signature: G.signature

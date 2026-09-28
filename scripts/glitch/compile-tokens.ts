@@ -7,6 +7,8 @@
  *   - catalogs/glitch/assets/*            copia BYTE A BYTE del wordmark, la manzana y el logo de Efeonce
  *                                         (@efeoncepro/axis-brand-assets) y los 5 glifos Plastilina de Glitch
  *                                         PLANOS (@efeoncepro/axis-graphic-line, estado reposo: nunca el volumen)
+ *                                         y la estela de bytes del Glitch Flash (`flash-trail.svg`, generada desde
+ *                                         `glitchLine.editions.flash.masthead.trail` en el acento)
  *
  * `--check` no escribe nada y sale 1 si algún archivo difiere (AXIS publicó y nadie recompiló).
  */
@@ -19,6 +21,7 @@ import { glitchLine } from '@efeoncepro/axis-tokens'
 import { iconSvg } from '@efeoncepro/axis-graphic-line/icons'
 
 import { glitchCatalogDir } from '../../src/lib/artifact-composer/catalogs/glitch/brand'
+import { buildGlitchFlashTrailSvg } from '../../src/lib/glitch-composition/flash-trail'
 import { buildAppleBytesSvg } from './apple-bytes'
 import { buildGlitchTokenArtifacts } from './glitch-tokens'
 
@@ -50,6 +53,15 @@ const appleBytes = async (): Promise<[string, string][]> => {
   ]
 }
 
+/** La estela de bytes del Glitch Flash, en el acento del token (un `<img>` no hereda `currentColor`). */
+const flashTrail = (): string => {
+  const trail = glitchLine.editions.flash.masthead.trail
+
+  if (trail.color !== 'accent' || trail.cell !== 'square') throw new Error('La estela del Flash dejó de ser de celdas cuadradas en el acento: revisa la decisión antes de compilar.')
+
+  return buildGlitchFlashTrailSvg(glitchLine.color.accent, trail)
+}
+
 const main = async () => {
   const check = process.argv.includes('--check')
   const { css, json } = buildGlitchTokenArtifacts()
@@ -59,7 +71,8 @@ const main = async () => {
     [path.join(glitchCatalogDir, 'glitch-tokens.json'), Buffer.from(json)],
     ...BRAND_ASSETS.map(([dest, src]): [string, Buffer] => [path.join(glitchCatalogDir, 'assets', dest), fs.readFileSync(path.join(brandAssetsDir, src))]),
     ...actionIcons().map(([dest, svg]): [string, Buffer] => [path.join(glitchCatalogDir, 'assets', dest), Buffer.from(svg)]),
-    ...(await appleBytes()).map(([dest, svg]): [string, Buffer] => [path.join(glitchCatalogDir, 'assets', dest), Buffer.from(svg)])
+    ...(await appleBytes()).map(([dest, svg]): [string, Buffer] => [path.join(glitchCatalogDir, 'assets', dest), Buffer.from(svg)]),
+    [path.join(glitchCatalogDir, 'assets', 'flash-trail.svg'), Buffer.from(flashTrail())]
   ]
 
   let drift = 0

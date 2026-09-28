@@ -284,11 +284,11 @@
   pasó: «léelo completo / en nuestro blog.», en dos líneas.
 - **«PORTADA» es un chip de prueba.** Síntoma: el operador lo marcó al revisar la pieza productiva. Causa: el chip de
   las maquetas pasó tal cual; además las plantillas `CoverPhoto`, `BlogBannerPhoto` y `BlogSquarePhoto` del Composer lo
-  pintan fijo. Regla: en productivo el chip es **«LA NOTICIA»** (2026-09-28); si compones con esas plantillas antes de
-  que se actualicen, avísalo.
-- **El Flash no cabe en `pnpm glitch:compose`.** El manifiesto exige ocho noticias (`news` de largo 8). Regla: no
-  inventes siete noticias de relleno ni fuerces el manifiesto; el Flash se arma desde las plantillas aprobadas hasta
-  que tenga la suya ([glitch.md](glitch.md) §14.4).
+  pintan fijo. Regla: en productivo el chip es **«LA NOTICIA»** (2026-09-28). Resuelto el mismo día: las tres
+  plantillas ya lo pintan.
+- **El Flash no cabía en `pnpm glitch:compose`.** El manifiesto semanal exige ocho noticias (`news` de largo 8). Regla:
+  no inventes siete noticias de relleno ni fuerces el manifiesto semanal. Resuelto el 2026-09-28: el Flash tiene su
+  propio manifiesto (`edition.kind: "flash"`) y sus plantillas `Flash*` ([glitch.md](glitch.md) §14.4).
 
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
