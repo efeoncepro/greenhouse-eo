@@ -1492,7 +1492,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     .finally(async () => {
       const { closeGreenhousePostgres } = await import('@/lib/postgres/client')
 
-      await closeGreenhousePostgres({ source: 'dataforseo-cli' })
+      await closeGreenhousePostgres()
     })
     .catch(error => {
       console.error(`No se pudieron cerrar los recursos de la CLI: ${error instanceof Error ? error.message : String(error)}`)
