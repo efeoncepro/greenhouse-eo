@@ -977,7 +977,7 @@ de la página es `orbitSvg` con `circle` y `channel: 'social'`.
 
 | Función (`/icons`) | Qué hace |
 | --- | --- |
-| `ICON_CATALOG` | los glifos aprobados con clave, voz, nombre, uso, modo y gesto: **85** desde 0.8.0 (37 Trazo + 48 Plastilina: el Trazo `swipe` de D28); 84 en 0.7.0 (las 5 Plastilina de Glitch, D27); **79** desde 0.6.0 (36 Trazo + 43 Plastilina, con los 19 de IA, social y staff de D26); 60 en 0.5.0 (con los 30 de oficio de D25); 30 en 0.4.0. Las claves son únicas entre voces (`llamada` es Trazo; `telefono`, Plastilina; en D26 cada concepto tiene una clave por voz, p. ej. `ia` / `chispa`) |
+| `ICON_CATALOG` | los glifos aprobados con clave, voz, nombre, uso, modo y gesto: **86** desde 0.9.0 (37 Trazo + 49 Plastilina: la Plastilina `mano` de D29, con su volumen en `axis-brand-assets` 0.3.6); 85 en 0.8.0 (el Trazo `swipe` de D28); 84 en 0.7.0 (las 5 Plastilina de Glitch, D27); **79** desde 0.6.0 (36 Trazo + 43 Plastilina, con los 19 de IA, social y staff de D26); 60 en 0.5.0 (con los 30 de oficio de D25); 30 en 0.4.0. Las claves son únicas entre voces (`llamada` es Trazo; `telefono`, Plastilina; en D26 cada concepto tiene una clave por voz, p. ej. `ia` / `chispa`) |
 | `resolveIcon(req)` / `iconSvg(req)` | SVG con las reglas; errores `IconRequestError` (`unknown-glyph`, `plastilina-below-min`, `gesture-not-drawn`, `gesture-only-plastilina`, `unknown-line`); aviso `response-below-min` |
 | `auditIconGroup(items, { pieceHasSphere })` | issues `mixed-voices`, `more-than-one-response`, `response-with-piece-sphere`, `more-than-one-gesture`, `gesture-not-protagonist` |
 | `skewedOrbitHeroSvg(input)` | Plastilina protagonista dentro de su órbita sesgada (objeto en reposo) |
