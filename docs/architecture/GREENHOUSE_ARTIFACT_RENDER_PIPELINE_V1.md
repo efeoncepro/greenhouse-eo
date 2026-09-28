@@ -784,13 +784,19 @@ dominio: Greenhouse por ahora (decisión del operador); el módulo nace extracti
 Seis catálogos del Artifact Composer: `graphic-line-deck` (`pdf-merged`), `graphic-line-stills` y
 `graphic-line-overlays` (`png-set`), y `glitch-carousel` (`pdf-merged`), `glitch-stills` y `glitch-overlays`
 (`png-set`). Tres familias de pedido: `graphic_line_piece` y `graphic_line_document` (el mismo intent que
-`pnpm brand:compose`) y `glitch_edition` (el manifiesto semanal de `pnpm glitch:compose`). Un pedido produce UN job por
-catálogo; en Glitch, fallar los overlays conserva el carrusel y las portadas.
+`pnpm brand:compose`) y `glitch_edition` (el manifiesto de `pnpm glitch:compose`, semanal o Flash). Un pedido produce UN
+job por catálogo con láminas; en Glitch, fallar los overlays conserva el carrusel y las portadas.
 
-**Glitch Flash (2026-09-28):** el Composer ya compone el segundo formato de Glitch (`GlitchFlashManifest`, seis
-plantillas `Flash*` en `glitch-carousel` y `glitch-stills`, commit `24e4c72ee`), pero `glitch_edition` sigue planeando
-con `planGlitchEdition` (sólo semanal) en `src/lib/brand-surfaces/production/plan.ts`. Hasta que el command despache
-con `planGlitchManifest`, el Flash compone sólo en local; pendiente de TASK-1921.
+**Glitch Flash (2026-09-28):** `glitch_edition` acepta los dos formatos de Glitch sin familia nueva (retrocompatible):
+`planBrandRender` llama `planGlitchManifest`, que despacha por `edition.kind` — `'flash'` va a `planGlitchFlash`
+(`GlitchFlashManifest`: una noticia, sin número ni rotación, contrato `efeonce.glitch-line` 0.2.0) y cualquier otro a
+`planGlitchEdition`, que queda idéntico. Un Flash encola `glitch-carousel` (3 láminas `glitch.flash.*`) y, si pidió
+sueltas, `glitch-stills`; nunca `glitch-overlays` (plan vacío). El resumen del pedido lleva
+`{ kind: 'flash', slug, title, edition: null, coverTemplate: null, catalogs }`; el de la semanal no cambia
+(`{ edition, coverTemplate, catalogs }`). `glitchPhotoPaths` incluye `cover.photo.file` (la foto de portada propia del
+Flash) para leer su tamaño antes de planificar. Un Flash con `edition.number` es `render_rejected`
+(`flash-edition-number-not-allowed`). El worker no distingue formatos: materializa `GlitchAssetRequest` igual; sólo
+necesita una imagen del Job que traiga las plantillas `Flash*` (commit `24e4c72ee` o posterior).
 
 Único escritor: `requestBrandRender` (`src/lib/brand-surfaces/production/commands.ts`). Lo llaman el lane App
 (`POST /api/platform/app/brand-render/requests`, actor `member`) y el lane ecosystem

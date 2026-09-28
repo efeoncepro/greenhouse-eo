@@ -6,7 +6,8 @@
  * Un pedido es UNA de tres familias:
  *   - `graphic_line_piece`    — una pieza de «La órbita» por superficie (intent `efeonce.surface-composition`)
  *   - `graphic_line_document` — un brochure o una propuesta de varias páginas (intent con `pages`)
- *   - `glitch_edition`        — una edición de Glitch (manifiesto `GlitchEditionManifest`)
+ *   - `glitch_edition`        — una edición de Glitch: la semanal (`GlitchEditionManifest`) o el Glitch Flash
+ *                               (`GlitchFlashManifest`, `edition.kind: 'flash'`); el mapper despacha por `edition.kind`
  *
  * Las fotos, plates y logos NUNCA viajan por ruta: el intent o el manifiesto los nombran con la misma cadena que usa
  * el taller local (`path`/`file`), y `sources` traduce cada una a un asset subido por el uploader canónico

@@ -105,4 +105,64 @@ describe('requestBrandRender', () => {
     expect(await codeOf(() => requestBrandRender({ subject, body: { ...body, sources: {} }, env: ON }))).toBe('missing_source')
     expect(store.insertBrandRenderRequest).not.toHaveBeenCalled()
   })
+
+  describe('Glitch', () => {
+    const glitchExample = (file: string) =>
+      JSON.parse(readFileSync(path.resolve(__dirname, `../../../glitch-composition/examples/${file}`), 'utf8')) as Record<string, unknown>
+
+    const flash = glitchExample('flash-sonnet-5-5.example.json')
+    const flashSources = { 'fotos/n3.png': 'ast-photo-n3', 'fotos/n5.png': 'ast-photo-n5' }
+    const flashBody = { family: 'glitch_edition', manifest: flash, sources: flashSources }
+
+    beforeEach(() => {
+      sources.resolveBrandSources.mockImplementation(async ({ sourcePaths }: { sourcePaths: string[] }) =>
+        sourcePaths.map((name) => ({ name, assetId: (flashSources as Record<string, string>)[name] ?? `ast-${name}`, mimeType: 'image/png', sha256: null, status: 'pending' }))
+      )
+      sources.readBrandSourceImageSizes.mockImplementation(async (photos: { name: string }[]) => Object.fromEntries(photos.map((p) => [p.name, { width: 2400, height: 3000 }])))
+    })
+
+    it('un Glitch Flash se encola por la misma familia: carrusel y sueltas sellados, con sus dos fotos por assetId', async () => {
+      const result = await requestBrandRender({ subject, body: flashBody, env: ON })
+
+      const input = store.insertBrandRenderRequest.mock.calls[0]![1] as {
+        family: string
+        summary: Record<string, unknown>
+        sourceAssetIds: string[]
+        jobs: { catalogName: string; outputTarget: string; constraints: Record<string, unknown>; manifest: { input: { slides: { contentType: string }[] } }; assetRequests: { kind: string; sources: Record<string, string> } }[]
+      }
+
+      expect(result.idempotent).toBe(false)
+      // El tamaño de las fotos se lee ANTES de planificar, incluida la de portada del Flash.
+      expect(new Set((sources.readBrandSourceImageSizes.mock.calls[0]![0] as { name: string }[]).map((p) => p.name))).toEqual(new Set(Object.keys(flashSources)))
+      expect(input.family).toBe('glitch_edition')
+      expect(input.summary).toMatchObject({ kind: 'flash', slug: 'ejemplo-claude-sonnet-5-5', edition: null })
+      expect(input.jobs.map((job) => [job.catalogName, job.outputTarget])).toEqual([
+        ['glitch-carousel', 'pdf-merged'],
+        ['glitch-stills', 'png-set']
+      ])
+      expect(input.jobs[0]!.manifest.input.slides).toHaveLength(3)
+      expect(input.jobs.every((job) => job.constraints.maxPdfMb === 100 && job.assetRequests.kind === 'glitch')).toBe(true)
+      expect(input.jobs[0]!.assetRequests.sources).toEqual(flashSources)
+      expect(new Set(input.sourceAssetIds)).toEqual(new Set(Object.values(flashSources)))
+    })
+
+    it('un Glitch Flash con número de edición es render_rejected y no crea job', async () => {
+      const numbered = { ...flashBody, manifest: { ...flash, edition: { ...(flash.edition as Record<string, unknown>), number: 18 } } }
+
+      expect(await codeOf(() => requestBrandRender({ subject, body: numbered, env: ON }))).toBe('render_rejected')
+      expect(store.insertBrandRenderRequest).not.toHaveBeenCalled()
+    })
+
+    it('la edición semanal sigue encolando sus tres catálogos', async () => {
+      const weekly = glitchExample('edition-17.example.json')
+
+      await requestBrandRender({ subject, body: { family: 'glitch_edition', manifest: weekly, sources: {} }, env: ON })
+
+      const input = store.insertBrandRenderRequest.mock.calls[0]![1] as { summary: Record<string, unknown>; jobs: { catalogName: string }[] }
+
+      expect(input.jobs.map((job) => job.catalogName)).toEqual(['glitch-carousel', 'glitch-stills', 'glitch-overlays'])
+      expect(input.summary).toMatchObject({ edition: 17 })
+      expect(input.summary).not.toHaveProperty('kind')
+    })
+  })
 })

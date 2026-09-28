@@ -1,7 +1,7 @@
 # Pedir el render de una pieza de marca
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-28 por Claude
 > **Ultima actualizacion:** 2026-09-28 por Claude
 > **Documentacion funcional:** [Render gobernado de piezas de marca](../../documentation/creative/render-gobernado-piezas-de-marca.md)
@@ -50,6 +50,8 @@ assetId**:
 ```
 
 Para un documento usa `graphic_line_document`; para Glitch, `glitch_edition` con `manifest` en vez de `intent`.
+El Glitch Flash usa la misma familia `glitch_edition`: su manifiesto lleva `edition.kind: "flash"`, sin número, y
+si su portada tiene foto propia (`cover.photo`), esa foto también va en `sources`.
 
 ### 3. Enviarlo
 

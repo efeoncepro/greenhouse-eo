@@ -1,14 +1,15 @@
 /**
  * Plan de un pedido de render de marca (TASK-1921). Puro: traduce el pedido a UN job por catálogo usando los mappers
- * que ya existen —`planSurfacePiece`, `planSurfaceDocument` (TASK-1919/1927) y `planGlitchEdition` (TASK-1923)—, sin
- * copiar reglas. El contrato de AXIS y la aprobación de la receta se validan aquí, antes de encolar: una receta no
- * aprobada nunca llega a la cola.
+ * que ya existen —`planSurfacePiece`, `planSurfaceDocument` (TASK-1919/1927) y `planGlitchManifest` (TASK-1923: despacha
+ * la edición semanal a `planGlitchEdition` y el Glitch Flash a `planGlitchFlash` por `edition.kind`)—, sin copiar reglas.
+ * El contrato de AXIS y la aprobación de la receta se validan aquí, antes de encolar: una receta no aprobada nunca llega a
+ * la cola.
  *
  * Además reúne las FUENTES que el pedido nombra (plates, fotos, logos): el command las exige todas en `sources`.
  */
 
 import type { CompositionPlanInput } from '@/lib/artifact-composer/pure'
-import { planGlitchEdition, type GlitchAssetRequest } from '@/lib/glitch-composition'
+import { isGlitchFlashPlan, planGlitchManifest, type GlitchAssetRequest } from '@/lib/glitch-composition'
 
 import { planSurfacePiece, type SurfaceIntent } from '../index'
 import { planSurfaceDocument, type SurfaceDocumentIntent } from '../document'
@@ -117,7 +118,9 @@ export const planBrandRender = (request: BrandRenderRequest, options: PlanBrandR
 
   // Glitch: la licencia de Guttery la declara el brand pack `axis` (extensión glitch, embedRights) que el Job lleva en
   // su imagen. Si la fuente faltara, el render falla cerrado (`font_fallback_detected`), nunca con otra letra.
-  const edition = planGlitchEdition(request.manifest, { artifactId: options.artifactId, narratorLicenseStatus: 'licensed', photoSizes: options.photoSizes })
+  // Un manifiesto con `edition.kind: 'flash'` es un Glitch Flash (una noticia, sin número ni overlays); cualquier otro es
+  // la edición semanal. El despacho es del mapper: aquí no se decide el formato.
+  const edition = planGlitchManifest(request.manifest, { artifactId: options.artifactId, narratorLicenseStatus: 'licensed', photoSizes: options.photoSizes })
 
   const jobs = [edition.carousel, edition.stills, edition.overlays]
     .filter((target) => target.plan.slides.length > 0)
@@ -144,16 +147,22 @@ export const planBrandRender = (request: BrandRenderRequest, options: PlanBrandR
 
   return {
     family: request.family,
-    summary: { edition: edition.edition, coverTemplate: edition.coverTemplate, catalogs: jobs.map((job) => job.catalogName) },
+    summary: isGlitchFlashPlan(edition)
+      ? { kind: 'flash', slug: edition.slug, title: edition.title, edition: null, coverTemplate: null, catalogs: jobs.map((job) => job.catalogName) }
+      : { edition: edition.edition, coverTemplate: edition.coverTemplate, catalogs: jobs.map((job) => job.catalogName) },
     jobs,
     sourcePaths: [...new Set(edition.assets.map((asset) => asset.path))]
   }
 }
 
-/** Las fotos de un manifiesto de Glitch (para leer su tamaño antes de planificar). */
+/**
+ * Las fotos de un manifiesto de Glitch (para leer su tamaño antes de planificar): las de las noticias, la del host del
+ * video (semanal) y la de portada del Flash (`cover.photo`, que en la semanal no existe: su portada sale de una noticia).
+ */
 export const glitchPhotoPaths = (manifest: Record<string, unknown>): string[] => {
   const news = Array.isArray(manifest.news) ? (manifest.news as { photo?: { file?: unknown } }[]) : []
   const host = (manifest.video as { hostPhoto?: { file?: unknown } | null } | null | undefined)?.hostPhoto?.file
+  const cover = (manifest.cover as { photo?: { file?: unknown } | null } | null | undefined)?.photo?.file
 
-  return [...new Set([...news.map((n) => n.photo?.file), host].filter((file): file is string => typeof file === 'string' && file.length > 0))]
+  return [...new Set([...news.map((n) => n.photo?.file), host, cover].filter((file): file is string => typeof file === 'string' && file.length > 0))]
 }

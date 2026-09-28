@@ -13,6 +13,31 @@
   del commit: el bump a 0.3.24 (`53002b352`) dejó rojo el CI por no regenerar los tokens de La órbita (arreglo local
   `609353e83`).
 
+## Delta 2026-09-28 (b) — el Glitch Flash entra a la ruta productiva (code complete local, sin commit)
+
+- `planBrandRender` (`src/lib/brand-surfaces/production/plan.ts`) llama `planGlitchManifest` en vez de
+  `planGlitchEdition`: despacha por `edition.kind` (`'flash'` → `planGlitchFlash`; el resto → la semanal, idéntica). Sin
+  familia nueva: `glitch_edition` acepta los dos manifiestos, así el contrato zod del lane App/ecosystem, la tool MCP
+  `request_brand_render` (su descripción ya remite al JSON de `pnpm glitch:compose`) y el worker quedan
+  retrocompatibles. Full API Parity: el Flash se pide por `POST /api/platform/{app,ecosystem}/brand-render/requests`.
+- Un Flash encola `glitch-carousel` (3 láminas `glitch.flash.*`, PDF de 3 páginas, techo `maxPdfMb: 100`) y, si pidió
+  sueltas, `glitch-stills` (PNG); nunca `glitch-overlays`. Resumen del pedido: `{ kind: 'flash', slug, title,
+  edition: null, coverTemplate: null, catalogs }`; el de la semanal no cambia. `glitchPhotoPaths` suma `cover.photo.file`
+  (foto de portada propia del Flash) para leer su tamaño antes de planificar. Un Flash con número es `render_rejected`
+  (`flash-edition-number-not-allowed`), sin job.
+- Tests: `plan.test.ts` (Flash con sueltas, sin sueltas, con número; resumen de la semanal intacto) y
+  `commands.test.ts` (Flash sellado con sus dos fotos por `assetId`, Flash con número rechazado, semanal con sus tres
+  catálogos). Sin tocar líneas base visuales ni `src/lib/glitch-composition/**`.
+- Docs: `GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md` §10.1, `render-gobernado-piezas-de-marca.md` 1.2 y el manual
+  `pedir-render-de-piezas-de-marca.md` 1.1.
+- **Falta para producción:** (1) commit + push de este cambio junto con `24e4c72ee` (plantillas `Flash*`) y `609353e83`
+  (tokens de La órbita tras el bump de AXIS, sin él el CI queda rojo); (2) redeploy del Job `artifact-worker` en staging
+  desde su `deploy.sh` para que la imagen traiga las plantillas `Flash*` (hoy no las tiene) y readback de la revisión;
+  (3) smoke en staging de un Flash real (subir las fotos por `/api/assets/private`, pedir, leer los dos jobs y abrir el
+  PDF de 3 páginas); (4) sin flag nuevo: el Flash usa `BRAND_RENDER_ENABLED` (ON en staging, OFF en Production según
+  `FEATURE_FLAG_STATE_LEDGER.md`); (5) opcional: nombrar el Flash en la descripción de `request_brand_render` exige
+  regenerar `tool-manifest.generated.json` y sincronizar `efeonce-mcp` (#22 aún sin merge), por eso no se tocó.
+
 ## Delta 2026-09-28 — TASK-1930 dejó el rastro de binding por slot
 
 - `bindDeckSlots(plan, context)` (`@/lib/brand-surfaces/deck-recipes/bindings`, `server-only`) entrega por slot de
