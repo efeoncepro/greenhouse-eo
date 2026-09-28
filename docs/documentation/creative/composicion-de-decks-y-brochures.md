@@ -380,15 +380,14 @@ Pendientes de revisión que siguen abiertos en el catálogo:
 - ninguna contraportada aprobada lleva el logo dentro de la órbita (las aprobadas lo ponen arriba de la columna);
 - algunas fotos tienen el isotipo de la ropa sin registro de revisión: se revisan antes de publicar;
 - una misma foto aparece en varias recetas: no se repite dentro de un mismo deck;
-- las nueve láminas de SEO y AEO esperan la aprobación visual del operador antes de que la prueba visual automática
-  las congele;
 - la foto de las propuestas SEO todavía vive en el equipo de quien compone; entra al banco de fotos con TASK-1931.
 
 Diferencias conocidas entre las láminas del marco y los prototipos aprobados: el texto «Cuando quieras.» sale un poco
 más grande, la dirección web usa la versión fija de su burbuja y la caja de selección queda unos puntos más ajustada.
 
 El operador aprobó a ojo las láminas compuestas el 2026-09-27 (TASK-1927) y el 2026-09-28 las seis familias nuevas y la
-portada con selección (TASK-1928). Esa aprobación cubre las plantillas, no cada pieza futura.
+portada con selección (TASK-1928); ese mismo 2026-09-28 aprobó las nueve láminas de SEO y AEO y la nota del pie de la
+propuesta cinematográfica, y la prueba visual automática las congeló (TASK-1934). Esa aprobación cubre las plantillas, no cada pieza futura.
 
 > Detalle técnico: [TASK-1921](../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) ·
 > [TASK-1929](../../tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md) ·

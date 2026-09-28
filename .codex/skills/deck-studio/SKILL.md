@@ -231,10 +231,16 @@ la evidencia en 2–3 líneas.
   | Línea (token) | Par | Plate |
   |---|---|---|
   | Growth Strategy & Measurement (`growth`) | ¿Lo medimos? **Siempre.** | `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png` |
-  | Creative Services (`brand`) | ¿Quién crea mi contenido? **Tu squad.** | `2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png` |
+  | Creative Services (`brand`) | ¿Quién crea mi contenido? **Tu squad.** | `2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png` |
   | Digital Services & Engineering (`engine`) | ¿Te encuentra la IA? **Visible.** | `2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png` |
   | Media & Distribution (`voice`) | ¿Dónde invierto? **Donde rinde.** | `2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png` |
   | RevOps & CRM (`revenue-hubspot`) | ¿Y el reporte del viernes? **Ya lo viste.** | `2026-09-26_deck-revops/plates/RV1b-motor-de-revenue-isotipo.png` |
+
+  Desde el 2026-09-28 la portada «Tu squad.» usa **`CR4`** («El squad te la entrega»): antes compartía `CR2b` con la
+  lámina `proposal-cinematic-creative` y un brochure con las dos marcaba `plate-repeated`. `CR2b` queda sólo para esa
+  lámina. Caso y checklist para reemplazar el plate de una pieza aprobada: registro cine §16.7
+  (`docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md`); se aprueba con la pieza compuesta, nunca
+  con el frame del probe.
 
   Pendiente opcional: la variante RevOps Salesforce (acento cielo).
 - **Brochure, contraportadas** (✅ las tres): Nexa camina hacia la órbita (foto, `BR3-contra-horizonte`), Nexa y un
@@ -535,8 +541,9 @@ lo decidas por tu cuenta: la plantilla sigue el token.
 
 **Estado (2026-09-28).** TASK-1927 y TASK-1928 están `complete`, aprobadas a ojo por el operador y empujadas a
 `origin/develop`: las 69 recetas de entonces componen, gate `--catalog=graphic-line` a 0 px en 66 frames.
-**TASK-1934 (en curso):** las nueve SEO/AEO componen (78 de 78); sus frames del gate (y el re-congelado de
-`ProposalCinematic`, cuya nota del pie mueve el probe) esperan la aprobación visual del operador. **Lo que todavía no
+**TASK-1934 (en curso):** las nueve SEO/AEO componen (78 de 78) y el operador las aprobó a ojo el 2026-09-28, junto con
+la nota del pie de la plantilla cine; sus siete frames y el re-congelado de `ProposalCinematic` (la nota mueve el probe)
+se congelaron en `c652f4f83` (ledger (o)): el gate queda en 73 frames a 0 px. **Lo que todavía no
 está** (no lo afirmes como hecho): la ruta productiva gobernada (API, worker, MCP) es **TASK-1921, `in-progress` en
 otra sesión** — no la describas como disponible ni toques sus archivos (`src/lib/brand-surfaces/production/**`);
 `pnpm brand:compose` es el taller local. TASK-1929 (plan de deck validado contra el catálogo y propuesta del agente)

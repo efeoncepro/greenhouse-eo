@@ -114,10 +114,11 @@ plantilla» (abajo); campos del intent, qué falla y por qué: [SKILL.md](SKILL.
   `maxCharacters` del campo (`overflow=reject`): los largos medidos del catálogo son el límite real.
 - **La pintura de la selección y del CTA se inyecta** (`createCatalog({ selectionPainter, ctaPainter })`): el catálogo
   no importa paquetes.
-- **Gate:** `pnpm composer:visual-gate --catalog=graphic-line` (66 frames a 0 px desde TASK-1928; los de las siete
-  plantillas SEO/AEO de TASK-1934 y el re-congelado de `ProposalCinematic` esperan la aprobación visual del operador; altas y cambios
+- **Gate:** `pnpm composer:visual-gate --catalog=graphic-line` (73 frames a 0 px desde TASK-1934 —66 tras TASK-1928—;
+  las siete plantillas SEO/AEO y el re-congelado de `ProposalCinematic` se congelaron el 2026-09-28 tras la aprobación
+  visual del operador, en `c652f4f83`; altas y cambios
   declarados en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`: 2026-09-27 (b)–(e) de TASK-1927,
-  (f) y (h)…(m) de TASK-1928 —la (g) es Glitch— y 2026-09-28 (n), el re-promovido de `CoverBrochure`; ojo: esas letras
+  (f) y (h)…(m) de TASK-1928 —la (g) es Glitch— 2026-09-28 (n), el re-promovido de `CoverBrochure`, y (o), las nueve SEO/AEO de TASK-1934; ojo: esas letras
   no son las de los deltas del ADR de AXIS; runbook `docs/operations/runbooks/composer-visual-gate.md`). El probe del
   gate **rellena todo slot no fijo** y una auditoría renderizada aborta si hay acento en texto < 24 px o respuesta < 3×
   la pregunta (`graphic-line-shared/rendered-audit.ts`; las siete SEO/AEO están en `ANSWER_RATIO_CONTENT_TYPES`).

@@ -443,7 +443,7 @@ sobre cada probe de los catálogos de La órbita: una violación falla el gate i
 
 | Gate / test | Qué asegura |
 |---|---|
-| `pnpm composer:visual-gate --catalog=graphic-line` | **66 frames a 0 px** (50 del deck, 9 de stills, 7 de overlays) + auditoría renderizada D1 y 3×. Los frames de las siete plantillas de TASK-1934 y el re-congelado de `ProposalCinematic` (la nota del pie mueve su probe) están pendientes de la aprobación visual del operador |
+| `pnpm composer:visual-gate --catalog=graphic-line` | **73 frames a 0 px** (57 del deck, 9 de stills, 7 de overlays) + auditoría renderizada D1 y 3×. Los siete frames de las plantillas de TASK-1934 y el re-congelado de `ProposalCinematic` (la nota del pie mueve su probe) se congelaron el 2026-09-28 tras la aprobación visual del operador (`c652f4f83`, ledger (o)) |
 | `pnpm composer:visual-gate --catalog=glitch` | 26 frames a 0 px del catálogo de Glitch (comparte motor, manifest y ledger) |
 | `--selftest` / `--freeze` | dos corridas deben dar 0 px antes de congelar; `--freeze` es **single-owner, serializado y atómico con su commit**, y cada frame cambiado se declara antes en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` (TASK-1927: entradas (b)–(e); TASK-1928: (f), (h)–(n); (g) es Glitch) |
 | `src/lib/brand-surfaces/__tests__/recipe-map.test.ts` | el intent de ejemplo de cada receta planifica al `contentType` que promete `recipe-map.json` |
@@ -754,7 +754,8 @@ verdes.
 - **Preguntas abiertas de TASK-1919 y TASK-1927** (lente del caminero, barrido del indicador de la sección partida, etc.):
   norma §7.
 - **TASK-1934 (en curso):** los frames del gate de las siete plantillas SEO/AEO y el re-congelado de
-  `ProposalCinematic` esperan la aprobación visual del operador (`--freeze` single-owner); el plate SE1 se declara por
+  `ProposalCinematic` quedaron a 0 px el 2026-09-28 (aprobación visual del operador; `--freeze` single-owner en
+  `c652f4f83`, ledger (o)); la propuesta cine sin nota vuelve a componer (`af32d9353`, con test). Sigue abierto: el plate SE1 se declara por
   ruta local y se siembra en el banco de TASK-1931; `figure-source-missing` no ve una cifra escrita como texto plano en
   un slot `metric`.
 - **Las cinco `proposal-cinematic` sin mapa de slots** (`slots: null` en `recipe-map.json`): la plantilla cine admite

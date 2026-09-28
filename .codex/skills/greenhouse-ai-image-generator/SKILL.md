@@ -732,7 +732,7 @@ El registro cine («la marca en su película», 2026-09-27) sólo se usa con **N
   --ancho w [--prenda oscura|clara]` sólo si el emblema difiere (una vez por pecho; deja `<plate>-isotipo.png` y un
   `.json` de procedencia con el SHA-256 del SVG) y **siempre en el traje biónico de Nexa**, que no tiene referencia
   (`--prenda clara`, pechera del lado izquierdo de quien lo lleva, como `NX5b`). Componer por defecto dejó el isotipo
-  impreso en vez de bordado y la limpieza tapó lo vecino: una cinta de luz en `CR4` y una mano en `MC2` (2026-09-28).
+  impreso en vez de bordado y la limpieza tapó lo vecino: una cinta de luz en `CR4` ([registro cine §16.7](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)) y una mano en `MC2` (2026-09-28).
   Si compones, mira la `b` al 100 % también después. `foto:isotipo` compone el isotipo del pecho, no el logotipo de una
   espalda. Canon: `.claude/rules/brand-photography.md` y
   [personas y vestuario](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).

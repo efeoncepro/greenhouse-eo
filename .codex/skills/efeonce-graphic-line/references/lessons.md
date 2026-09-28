@@ -235,6 +235,27 @@
   de cada receta. Regla: ahí el freno es `slot-over-max-chars` de `validateDeckPlan` (hay un fixture adversarial que
   lo prueba); mapear las cinco juntas queda para TASK-1933.
 
+## 2026-09-28 (el plate propio de la portada creativa, CR4, TASK-1934)
+
+- **Cambiar el plate de una pieza aprobada puede borrarle el concepto.** Síntoma: `CR3` («Tu squad») siguió al pie la
+  receta de portada de línea (sujeto a la derecha mirando al lente + una tira naranja sobre una mesa, el squad fuera
+  de foco), pasó el validador (4/5, zona de texto 0,40) y el operador la rechazó: «perdió impacto visual»; se leía
+  como un retrato con la oficina detrás. Causa: la receta fija geometría y luz, no concepto; el impacto de la portada
+  aprobada estaba en el contenido vivo en órbita. Regla: se conserva el **concepto de impacto** y se cambia la toma
+  (gesto, forma del fenómeno, disposición), nunca al revés.
+- **La órbita de una foto es la trayectoria de la línea como luz, y su forma dice algo.** En `CR4` la cinta naranja
+  es la órbita de la pieza (una sola; sin órbita gráfica encima): nace en el squad al fondo, sube por encima de la
+  directora y baja a sus manos. La mirada recorre squad → manos → lector en tres planos de profundidad reales. La
+  elipse **cerrada** de `CR2` rodea a la persona (ella dirige); el trayecto **abierto** de `CR4` va del fondo al lector
+  (el equipo te entrega). Regla: elige la forma de la órbita por lo que tiene que decir la foto, no por la receta.
+- **La reserva por porcentaje no se respeta; la geográfica sí.** `CR4` v1 decía «inside the RIGHT 55%» y el modelo
+  puso a una persona y el origen de la cinta a la izquierda: el «?» tocaba la cinta. v2 ancló todo respecto del cuerpo
+  («behind her right shoulder», «nothing lit… to the left of her left elbow») y la zona de texto pasó de 0,34 a 0,46.
+- **`foto:isotipo` puede tapar la luz de la escena** (un rectángulo plano sobre la cinta, visible sólo al 100 %) y **el
+  frame del probe no aprueba nada** (silueta sintética): se mira al 100 % después de `foto:isotipo` y se aprueba con la
+  pieza compuesta con su plate real. Caso completo:
+  [registro cine §16.7](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto).
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos

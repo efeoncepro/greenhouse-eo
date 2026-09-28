@@ -379,6 +379,13 @@ barra, trampas y comandos en la referencia (§Registros); canon vigente:
 calmo para la columna de texto, 85 mm, lecho oscuro y la luz de acento de la línea; en la contraportada con foto, el
 sujeto de espaldas caminando hacia la órbita. Receta y ficha de ejemplo
 (`ai-generations/2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json`) en la referencia, §Cine.
+**Al reemplazar el plate de una pieza aprobada** (operador, 2026-09-28, caso `CR4` de Creative Services): se conserva el
+**concepto de impacto** y se cambia la toma (gesto, forma del fenómeno, disposición); la receta de portada fija
+geometría, no concepto, y un validador que pasa no valida el concepto. La forma de la órbita cambia el significado
+(cerrada = rodea y dirige; abierta = del equipo al lector). La reserva se ancla por geografía respecto del cuerpo del
+sujeto, no sólo por porcentaje; se mira al 100 % también después de `foto:isotipo`, y se aprueba con la pieza
+compuesta (`pnpm brand:compose`), nunca con el frame del probe. Caso y checklist:
+[registro cine §16.7](../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto).
 
 🔴 **Tres trampas medidas el 2026-09-22 (CMP-001) que el validador da por buenas.** Detalle, frases exactas y
 casos en la regla auto-load `.claude/rules/brand-photography.md`:

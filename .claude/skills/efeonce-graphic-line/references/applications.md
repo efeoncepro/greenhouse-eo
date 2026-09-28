@@ -829,6 +829,13 @@ la 0.1.2 desde TASK-1927** (hoy con `axis-tokens` 0.3.21 y `axis-ui-contracts` 0
   del registro: [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
   §9.4. Las fotos cinematográficas con Nexa (`BR1b`, `BR3`) entran desde TASK-1927 como plates de las recetas del
   marco (`cover-brochure`; `close-brochure` layout `photo` y `close-proposal`).
+- **La órbita como trayectoria de la luz en una foto (caso `CR4`, 2026-09-28).** Cuando la foto trae su órbita, se
+  dirige como recorrido de la mirada: **una sola órbita**, que nace en el origen del trabajo (el squad al fondo,
+  desenfocado), pasa por el sujeto (las manos, nítidas) y termina en el lector; las pantallas que viajan en ella crecen
+  y ganan nitidez al acercarse (**tres planos**). La forma decide el sentido: **cerrada** rodea y dirige (`CR2`,
+  lámina de servicio creativa); **abierta**, del fondo al lente, entrega (`CR4`, portada «Tu squad.»). Anclada a la
+  derecha, deja libre la columna de texto. Fuente:
+  [registro cine §16.7](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto).
 
 **Portadas y contraportadas (aprobado por el operador, 2026-09-27; norma `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6,
 resumen operativo en la skill `deck-studio` §«Portadas y contraportadas»).** Tres reglas: **foto ↔ sin foto** entre
@@ -842,7 +849,8 @@ logo del cliente dentro de la órbita (órbita gigante y amanecer); contraportad
 Growth». La órbita gigante sin foto es portada de **propuesta**, nunca de brochure (en brochure sólo es
 contraportada). Selección y cursores sólo sobre la columna de texto o el logo del cliente, nunca sobre la persona, un
 cursor en 16:9. Desde TASK-1927 son receta del contrato y tienen plantilla (abajo); la producción idempotente de los
-plates sigue siendo TASK-1926.
+plates sigue siendo TASK-1926. La portada de Creative Services usa su plate propio, `CR4`, desde el 2026-09-28 (antes
+repetía `CR2b` con `proposal-cinematic-creative` y el plan marcaba `plate-repeated`).
 
 **Componer el deck hoy (TASK-1927, 2026-09-27).** Elegir **qué** lámina usar se hace con el catálogo de recetas
 (`deck-recipes/`); **componerla**, con el intent de AXIS y `pnpm brand:compose`. El `layout` va siempre explícito: la
@@ -959,8 +967,9 @@ todas en estilo «vivo» de AXIS (`deckLiveVoice`, `deckStage`, `deckPlatform`, 
 - **Tríptico:** una palabra por toma, cada una con su esfera; una toma con más de una palabra falla.
 - **Estado (2026-09-28):** TASK-1927 y TASK-1928 `complete`, aprobadas a ojo por el operador y en `origin/develop`:
   las 69 recetas de entonces componen, gate `graphic-line` a 0 px en 66 frames (tasks en `docs/tasks/complete/`).
-  TASK-1934 (en curso) suma las nueve SEO/AEO: componen (78 de 78), pero sus frames del gate y el re-congelado de
-  `ProposalCinematic` esperan la aprobación visual del operador. **Pendiente:**
+  TASK-1934 (en curso) suma las nueve SEO/AEO: componen (78 de 78) y el operador las aprobó a ojo el 2026-09-28, junto
+  con la nota del pie de la plantilla cine; sus siete frames y el re-congelado de `ProposalCinematic` se congelaron en
+  `c652f4f83` (ledger (o)): el gate `graphic-line` queda en 73 frames a 0 px. **Pendiente:**
   la ruta productiva gobernada, que debe aceptar también el documento (TASK-1921, `in-progress` en otra sesión: no está
   disponible), y TASK-1929…1932. Diferencias conocidas contra los prototipos: tamaño de «Cuando quieras.», burbuja URL
   horneada en vez de la de luminosidad, caja de selección del pintor canónico unos píxeles más ajustada.

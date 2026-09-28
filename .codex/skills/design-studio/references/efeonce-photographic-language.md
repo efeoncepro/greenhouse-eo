@@ -167,6 +167,9 @@ con la burbuja URL al pie · **una sola órbita**: el anillo, moño u órbita de
 - **El bloque de accesorios de Nexa inyecta un smartwatch** aunque la ficha pida «no watch» (pendiente del operador).
 - **El motor no devuelve el tamaño de la tabla** (2048×1152 → 1792×1024): mide las cajas en fracciones.
 - **Plastilina no es cine**: el material plástico no es un fenómeno digital, aunque la escena sea imposible.
+- **Una reserva declarada por porcentaje no se respeta** (`CR4` v1): ánclala por geografía respecto del cuerpo.
+- **`foto:isotipo` puede dejar un parche** cuando un fenómeno de luz cruza la zona del emblema (`CR4` v2): mira al
+  100 % después, no sólo antes.
 
 **Comandos, en orden:**
 
@@ -204,6 +207,25 @@ plate se pide para esa columna:
   bordado revisado al 100 % = isotipo oficial):
   `ai-generations/2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json` → plate
   `…/plates/LN4-voice-distribucion.png`. Sigue la ruta de comandos de arriba.
+- **Cambiar el plate de una pieza ya aprobada [operador, 2026-09-28, caso `CR4`].** La portada de Creative Services
+  («¿Quién crea mi contenido? Tu squad.») compartía `CR2b` con su lámina de servicio y se le hizo un plate propio:
+  `ai-generations/2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png` (ficha y prompt en la misma
+  carpeta). Lo que dejó la búsqueda (3 generaciones, ≈ USD 0,11):
+  - **Se conserva el concepto de impacto y se cambia la toma**, no al revés. `CR3` siguió la receta de portada al pie
+    (validador 4/5, zona de texto 0,40) y se rechazó por «perdió impacto visual»: se leía como retrato con la oficina
+    detrás. **La receta fija geometría y luz, no concepto**; el impacto de la línea estaba en el contenido vivo en
+    órbita, y `CR4` lo mantuvo cambiando gesto (ofrece con las palmas arriba, no dirige), fenómeno y disposición.
+  - **La forma de la órbita cambia el significado**: la elipse cerrada de `CR2` rodea a la persona (ella dirige); el
+    trayecto abierto de `CR4`, del squad al lente, dice «el equipo te entrega». Una sola órbita por pieza.
+  - **Ancla la reserva por geografía, no por porcentaje.** «Inside the RIGHT 55%» no bastó (v1 metió a una persona y
+    la cinta a la izquierda; zona 0,34). Funcionó nombrar el lugar respecto del cuerpo —*«ONLY on the frame-RIGHT side
+    of the room (behind her right shoulder…)»*, *«nothing lit… appears to the left of her left elbow»*—: zona 0,46.
+  - **Mira al 100 % también después de `foto:isotipo`**: su limpieza pintó un rectángulo plano sobre la cinta de luz.
+    Como el bordado ya coincidía con el isotipo oficial, se publicó sin componer (precedente `LN4`; decisión pendiente
+    del registro §16.6 #2).
+  - **Aprueba con la pieza compuesta** (`pnpm brand:compose`) y su plate real, nunca con el frame del probe (silueta
+    sintética, ISSUE-122).
+  Caso completo y checklist: [registro cine §16.7](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto).
 - La producción idempotente de estos plates es TASK-1926; lo que va encima (voz, logo, selección) no lo decide esta
   skill: norma `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 y skill `deck-studio`
   §«Portadas y contraportadas». Registro: [`EFEONCE_PHOTO_REGISTER_CINE_V1.md`](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md).
@@ -461,6 +483,10 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 > (2026-09-27) lo corrige: limpia la marca inventada y compone el isotipo de `@efeoncepro/axis-brand-assets` con la
 > luz de la escena y procedencia con SHA-256. El orden no cambia: vistas del kit en la ficha → `foto:emblema` al
 > 100 % → `foto:isotipo` sólo si difiere.
+> **Decisión del operador, 2026-09-28:** en uniformes (polo, hoodie, softshell, gorra) mandan las referencias puestas del
+> kit; si `foto:emblema` confirma el isotipo oficial al 100 %, se publica el bordado generado **sin `b`** (precedentes
+> `LN4` y `CR4`). `foto:isotipo` sólo si difiere y **siempre** en el traje biónico de Nexa, que no tiene referencia de
+> kit. Después de `foto:isotipo`, mirar otra vez al 100 %: su limpieza puede tapar luz de la escena (registro cine §16.7).
 
 > **Código de vestuario** **[operador, 2026-09-20]**: la prenda dice el REGISTRO. **Polera piqué** = oficina
 > casual · **Chaqueta** = reunión o instancia importante · **Gorra + polo** = terreno · **Hoodie** = terreno ·

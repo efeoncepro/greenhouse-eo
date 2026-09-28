@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — Composición por superficie V1
 
 > **Tipo de documento:** Norma de marca (composición por superficie)
-> **Versión:** 1.10
+> **Versión:** 1.11
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-09-28 por Claude (1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
+> **Última actualización:** 2026-09-28 por Claude (1.11: la portada de brochure de Creative Services («Tu squad.») pasa a su plate propio `CR4` y deja de repetir `CR2b` con la lámina de servicio creativa, §4.6. Antes, 1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
 > compone con el layout `document-selection` de `cover-brochure` (el operador relajó la regla «sin selección en
 > cover-brochure»); **69 de 69** recetas del deck con plantilla; AXIS fijado en `axis-tokens` 0.3.21 y
 > `axis-ui-contracts` 0.3.19 (tag `v0.3.21`, delta (l)). Antes, 1.6: TASK-1928 — las recetas de deck aprobadas componen desde el
@@ -314,8 +314,8 @@ Componer no aprueba: la pieza sigue pasando la revisión de §4 y del manual de 
 (flujo, builders, assets, hooks, gates y cómo agregar una receta):
 [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Paso a paso y errores:
 [manual de uso](../../manual-de-uso/creative/componer-por-superficie-con-axis.md). Gate visual:
-[runbook](../runbooks/composer-visual-gate.md) (`pnpm composer:visual-gate --catalog=graphic-line`: 66 frames a cero
-píxeles tras TASK-1928, un frame por receta nueva; altas y cambios declarados en
+[runbook](../runbooks/composer-visual-gate.md) (`pnpm composer:visual-gate --catalog=graphic-line`: 73 frames a cero
+píxeles desde TASK-1934 —66 tras TASK-1928—, un frame por plantilla nueva; altas y cambios declarados en
 `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`). La auditoría renderizada del gate mide además D1 en
 todos los frames y la proporción 3× en cotización, clientes, plan y partners. El documento
 completo no tiene frame propio, porque usa fotos reales: lo cubren sus páginas por separado.
@@ -812,7 +812,7 @@ quedaron **aprobados** y salen del estado de candidatos del banco del
 | Línea (token) | Acento | Eyebrow | Pregunta / respuesta | Evidencia | Plate (`ai-generations/…`) |
 |---|---|---|---|---|---|
 | Growth Strategy & Measurement (`growth`) | teal `#36c8bf` | Brochure · Growth Strategy | ¿Lo medimos? **Siempre.** | **Seis** capacidades: Estrategia · GTM · Revenue enablement · Analítica · Medición · Orquestación | `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png` |
-| Creative Services (`brand`) | naranja `#ff6500` | Brochure · Creative Services | ¿Quién crea mi contenido? **Tu squad.** | **Seis** capacidades: Squad creativo · Brand systems · Campañas · Contenido y social · Audiovisual · Run & Gun | `2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png` |
+| Creative Services (`brand`) | naranja `#ff6500` | Brochure · Creative Services | ¿Quién crea mi contenido? **Tu squad.** | **Seis** capacidades: Squad creativo · Brand systems · Campañas · Contenido y social · Audiovisual · Run & Gun | `2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png` (plate propio desde el 2026-09-28; antes compartía `CR2b` con `proposal-cinematic-creative` y un brochure con las dos marcaba `plate-repeated`. Caso: [registro cine §16.7](../brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto)) |
 | Digital Services & Engineering (`engine`) | azul `#0375db` | Brochure · Digital Services | ¿Te encuentra la IA? **Visible.** | **Cinco** capacidades: Search Visibility · Web Experience · Medición · Sistemas de agentes · Automatización | `2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png` |
 | Media & Distribution (`voice`) | rojo anaranjado `#f83902` | Brochure · Media & Distribution | ¿Dónde invierto? **Donde rinde.** | **Tres** soluciones y una operación: Estrategia de distribución · Performance · Influencia y earned · Managed Media | `2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png` (nueva; ficha `2026-09-27_portadas-lineas/fichas/LN4-voice-distribucion.json`, USD ~0,04; bordado revisado al 100 % = isotipo oficial) |
 | RevOps & CRM (`revenue-hubspot`) | magenta HubSpot `#e86bd0` | Brochure · RevOps & CRM | ¿Y el reporte del viernes? **Ya lo viste.** | **Seis** soluciones: Marketing y AEO · Ventas y pipeline · Revenue lifecycle · Servicio · Datos y CRM · Operación con agentes | `2026-09-26_deck-revops/plates/RV1b-motor-de-revenue-isotipo.png` |
@@ -960,8 +960,9 @@ el logo chico de las secciones de cine; los montos, siempre `[MONTO]`, y la dire
 `document-selection`). **Abiertos:** el logo dentro de la órbita en
 el cierre (§6, fila 17); isotipos sin registro de procedencia y un plate repetido (P1). Desde TASK-1929, dentro de un
 plan el plate repetido lo detecta `validateDeckPlan` (`plate-repeated`); el banco de plates gobernado sigue en TASK-1931.
-**Abiertos de las nueve SEO/AEO (TASK-1934):** los frames del gate a 0 px de las siete plantillas nuevas y el
-re-congelado de `ProposalCinematic` esperan la aprobación visual del operador; una cifra escrita como texto plano en un
+**Abiertos de las nueve SEO/AEO (TASK-1934):** los frames del gate de las siete plantillas nuevas y el re-congelado de
+`ProposalCinematic` ya están a 0 px (aprobados a ojo por el operador y congelados el 2026-09-28 en `c652f4f83`); siguen
+abiertos que una cifra escrita como texto plano en un
 slot `metric` no la detecta `figure-source-missing`; y el plate SE1 se declara por ruta local hasta sembrarse en el
 banco de TASK-1931.
 Lista completa, con la receta
@@ -1067,9 +1068,11 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
 - **TASK-1934: en curso (2026-09-28).** Las nueve láminas SEO/AEO aprobadas ese día están en el catálogo (78 recetas)
   y componen con `pnpm brand:compose` (siete plantillas nuevas; las dos propuestas reutilizan `ProposalService` y
   `ProposalCinematic`); el validador suma `variant-both-in-deck` (reemplaza a `variant-adjacent`) y
-  `figure-source-missing`, y aplica `next-steps-after-diagnosis` a toda la familia `next-steps`. **Falta:** la
-  aprobación visual del operador y, después, los frames del gate a 0 px (incluido el re-congelado de
-  `ProposalCinematic`); el plate SE1 se siembra en el banco de TASK-1931 (§4.6, «Pendientes de QA»).
+  `figure-source-missing`, y aplica `next-steps-after-diagnosis` a toda la familia `next-steps`. El operador aprobó a
+  ojo las nueve láminas y la nota del pie de la plantilla cine el 2026-09-28; los ocho frames (siete nuevos y el
+  re-congelado de `ProposalCinematic`) se congelaron en `c652f4f83` (ledger (o)) y el gate `graphic-line` queda en 73
+  frames a 0 px. La propuesta cine sin nota vuelve a componer (`af32d9353`, con test). **Falta:** el plate SE1 se
+  siembra en el banco de TASK-1931 (§4.6, «Pendientes de QA»).
 - **Preguntas abiertas del operador (TASK-1919):** la posición de la lente del caminero (el token dice 0,70 y la
   lámina aprobada la muestra cerca de 0,77); el super de dato, ¿arco completo como en la lámina o la estela canónica
   de la medida?; la burbuja URL en `section-classic`, `section-split`, `content-measure` y `triptych` (las láminas

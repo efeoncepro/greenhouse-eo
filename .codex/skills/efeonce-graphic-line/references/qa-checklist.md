@@ -214,8 +214,8 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 
 | | Chequeo | Cómo se verifica |
 |---|---|---|
-| [ ] | `pnpm composer:visual-gate --catalog=graphic-line` pasa a 0 px (66 frames desde TASK-1928; los de las siete plantillas SEO/AEO de TASK-1934 y el re-congelado de `ProposalCinematic` se congelan tras la aprobación visual del operador) | Salida del comando |
-| [ ] | Toda alta o cambio de frame está declarado en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` | Revisión (entradas 2026-09-27 (b)–(e) para TASK-1927; (f) y (h)…(m), y 2026-09-28 (n) para TASK-1928; la (g) es Glitch) |
+| [ ] | `pnpm composer:visual-gate --catalog=graphic-line` pasa a 0 px (73 frames desde TASK-1934: los 66 de TASK-1928, las siete plantillas SEO/AEO y el re-congelado de `ProposalCinematic`, congelados el 2026-09-28 tras la aprobación visual del operador en `c652f4f83`) | Salida del comando |
+| [ ] | Toda alta o cambio de frame está declarado en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` | Revisión (entradas 2026-09-27 (b)–(e) para TASK-1927; (f) y (h)…(m), y 2026-09-28 (n) para TASK-1928; 2026-09-28 (o) para TASK-1934; la (g) es Glitch) |
 | [ ] | Una receta nueva con plantilla declara sus `slots` en `recipe-map.json` y pasa la paridad | Automático: `src/lib/brand-surfaces/__tests__/recipe-slot-parity.test.ts` |
 | [ ] | La plantilla nueva estrena su prefijo CSS (nunca reusa uno), su builder mezcla el token base con el de la composición y devuelve su `contentType` | Revisión del HTML y del builder; automático: la lámina cae en la plantilla por defecto si falta el `contentType` |
 | [ ] | La auditoría renderizada pasa: acento nunca en texto < 24 px (D1) y respuesta ≥ 3× la pregunta en las láminas de la lista de `graphic-line-shared/rendered-audit.ts` (agrega ahí una lámina de decisión nueva) | Automático: el gate aborta con la violación |

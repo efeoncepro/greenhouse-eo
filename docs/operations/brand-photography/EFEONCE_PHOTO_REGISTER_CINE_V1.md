@@ -1,7 +1,9 @@
 # Registro cine · la marca en su película — el lenguaje
 
-> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.3 · **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-28 por Claude (1.3: estado del composer al cierre de TASK-1928 — las láminas de sección y «about» componen sin velo desde el catálogo `graphic-line-deck`, `photo.focus` como recorte dirigido del plate y pines AXIS 0.3.21 / 0.3.19; §12 y delta (c). Antes, 1.2: excepción aprobada para las láminas de **sección** y
+> **Tipo:** documento de registro del lenguaje fotográfico · **Versión:** 1.4 · **Creado:** 2026-09-27 por Claude
+> **Última actualización:** 2026-09-28 por Claude (1.4: la portada de Creative Services pasa a su plate propio `CR4`,
+> «El squad te la entrega», y queda el caso de cómo cambiar el plate de una pieza aprobada sin perder su concepto,
+> [§16.7](#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto). Antes, 1.3: estado del composer al cierre de TASK-1928 — las láminas de sección y «about» componen sin velo desde el catálogo `graphic-line-deck`, `photo.focus` como recorte dirigido del plate y pines AXIS 0.3.21 / 0.3.19; §12 y delta (c). Antes, 1.2: excepción aprobada para las láminas de **sección** y
 > **«about»** del deck, [delta (c)](#delta-2026-09-27-c--excepción-para-secciones-y-láminas-about-del-deck). Antes,
 > 1.1: plates para portada y contraportada de brochure y propuesta, aprobados por el operador:
 > [§16](#16-plates-para-portada-y-contraportada-aprobado-2026-09-27))
@@ -313,19 +315,26 @@ escena con `foto:generar`, nunca injertar la cara).
 
 🔴 **El traje de ficción es sólo para Nexa.** Una persona del equipo nunca lleva traje biónico ni prenda inventada.
 
-### 7.3 El emblema: nunca generado, siempre compuesto
+### 7.3 El emblema: el uniforme manda por su referencia; se compone sólo si difiere
 
-**Regla [decisión del operador + superficie §3.4]:** la prenda se pide con las referencias del kit en `objetos`
-(`chaqueta-softshell-efeonce`, `polo-efeonce`, `hoodie-efeonce`); se revisa al 100 % con `pnpm foto:emblema`; y el
-isotipo oficial se **compone** encima con `pnpm foto:isotipo` desde `@efeoncepro/axis-brand-assets` —negativo (blanco)
-sobre prenda oscura, positivo sobre clara—. Todas las placas aprobadas llevan sufijo `b`: son la versión con el
+**Regla vigente [decisión del operador, 2026-09-28 — cierra §16.6 #2]:** en los **uniformes** (polo, hoodie, softshell,
+gorra…) mandan las **referencias puestas del kit** en `objetos` (`chaqueta-softshell-efeonce`, `polo-efeonce`,
+`hoodie-efeonce`), que valen para cualquier persona que use uniforme, no sólo para Nexa. Se revisa al 100 % con
+`pnpm foto:emblema`: si muestra el isotipo oficial (nave, órbita y tres ventanas), **se publica el bordado generado,
+sin `foto:isotipo` ni sufijo `b`** (los precedentes `LN4` y `CR4` pasan a ser la regla). `pnpm foto:isotipo` queda
+**sólo si el emblema difiere** y, **siempre, en el traje biónico de Nexa**, que no tiene referencia de kit (positivo
+sobre la pechera blanca, como `NX5b`). Fuente de la regla: `.claude/rules/brand-photography.md` y
+`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md` (v1.1). **Mirar al 100 % también DESPUÉS de `foto:isotipo`** (§16.7).
+
+**Regla anterior (2026-09-27, reemplazada):** el isotipo oficial se **componía** siempre encima con `pnpm foto:isotipo`
+desde `@efeoncepro/axis-brand-assets` —negativo (blanco) sobre prenda oscura, positivo sobre clara—. Todas las placas aprobadas llevan sufijo `b`: son la versión con el
 isotipo compuesto (`NX5b`, `NX6b`, `CR2b`, `WB1b`, `RV1b`, `AE2b`, `BR1b`, `BR2b`). Las portadas y contraportadas
 aprobadas el 2026-09-27 traen cuatro placas sin `b` (`HW1`, `LN4`, `BR3`, `BR4`): el porqué de cada una está en §16.3
 y §16.4.
 
 **En el brochure el emblema generado salió fiel, y aun así se compuso [de la sesión que lo produjo, 2026-09-27].**
-Las referencias del kit bastaron para un emblema correcto, pero la regla no cambia: el publicable lleva el isotipo
-oficial. Cajas usadas (fracciones del plate):
+Las referencias del kit bastaron para un emblema correcto; con la regla de entonces, el publicable llevaba el isotipo
+oficial (hoy bastaría con `foto:emblema`). Cajas usadas (fracciones del plate):
 
 | Placa | Prenda | Centro (x, y) | Ancho |
 |---|---|---|---|
@@ -473,6 +482,8 @@ hacia la izquierda. Probar el ancho de la voz contra el hombro más cercano, no 
 | 9 | **Salida en otra resolución**: la ficha 16:9 pide 2048×1152 y el motor devolvió **1792×1024** | Logs `BR1/BR2/BR3-*.log`: `gpt-image-2.5-sunburst · 1792x1024 · high` **[medido]** | Las fracciones de `foto:isotipo` sobreviven al reescalado; los píxeles no. Medir cajas siempre en fracciones |
 | 10 | **«NAVY» en la ficha del hoodie** no coincide con su kit (azul royal) | `CR2`, `BR2` · LEEME del hoodie **[medido]** | Pedir la prenda por su kit (§6) |
 | 11 | **Los robots cambian de descripción** entre láminas | `BR2` vs `NX5/WB1/RV1` **[medido]** | Una frase única (§8) **[pendiente]** |
+| 12 | 🔴 **La reserva declarada por porcentaje no se respeta**: la ficha decía *«ribbon, screens and people inside the RIGHT 55%»* y el modelo igual puso a un diseñador del squad y el origen de la cinta en la izquierda; al componer, el «?» tocaba la cinta y la evidencia pasaba sobre una persona | `CR4` v1 (zona de texto 0,34) **[medido]** | **Anclar por geografía**, no por porcentaje: nombrar dónde está cada cosa respecto del cuerpo del sujeto y negar la izquierda por referencia física (*«nothing lit, no person… appears to the left of her left elbow»*). En `CR4` v2 la zona subió a **0,46** (§16.7) |
+| 13 | **`foto:isotipo` pintó un parche**: la caja de limpieza de la marca inventada rellenó un rectángulo plano del tono de la tela que tapó el brillo de la cinta naranja y la esquina de una pantalla junto al pecho. Visible al 100 %, no en la hoja de contacto | `CR4` v2 `-isotipo` **[medido]** | **Mirar al 100 % también DESPUÉS de `foto:isotipo`**, no sólo antes. Si el bordado generado ya coincide con el isotipo oficial (`foto:emblema` al 100 %), publicar sin componer (precedente `LN4`; decisión pendiente §16.6 #2) |
 
 **Costo de referencia [medido en logs del brochure]:** ≈ **USD 0,037** de salida por placa en `high` (1243 tokens de
 salida × USD 30/1M), más la entrada (≈ 7,7k–10,9k tokens con 4–6 referencias).
@@ -766,10 +777,15 @@ Rutas relativas a `ai-generations/`. Las placas son locales (gitignoreadas); lo 
 | Línea (token) | Acento | Voz | Placa | Ruta |
 |---|---|---|---|---|
 | Growth Strategy & Measurement (`growth`) | teal `#36c8bf` | ¿Lo medimos? **Siempre.** | `HW1` | `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png` |
-| Creative Services (`brand`) | naranja `#ff6500` | ¿Quién crea mi contenido? **Tu squad.** | `CR2b` | `2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png` |
+| Creative Services (`brand`) | naranja `#ff6500` | ¿Quién crea mi contenido? **Tu squad.** | `CR4` (nueva, §16.7) | `2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png` |
 | Digital Services & Engineering (`engine`) | azul `#0375db` | ¿Te encuentra la IA? **Visible.** | `WB1b` | `2026-09-26_deck-web/plates/WB1b-web-para-todos-isotipo.png` |
 | Media & Distribution (`voice`) | rojo anaranjado `#f83902` | ¿Dónde invierto? **Donde rinde.** | `LN4` (nueva, §16.4) | `2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png` |
 | RevOps & CRM (`revenue-hubspot`) | magenta HubSpot `#e86bd0` | ¿Y el reporte del viernes? **Ya lo viste.** | `RV1b` | `2026-09-26_deck-revops/plates/RV1b-motor-de-revenue-isotipo.png` |
+
+**Desde el 2026-09-28, `CR2b` queda sólo para la lámina `proposal-cinematic-creative`.** La portada de Creative
+Services lo compartía, y en un brochure con las dos `validateDeckPlan` marcaba `plate-repeated` (correcto: un plate no
+se repite en un deck). Ahora la portada tiene el suyo, `CR4` (§16.7), y ese brochure ya no marca el aviso **[medido en
+el test del validador, TASK-1934]**.
 
 ⚠️ **`HW1` no es cine [medido en su ficha]:** es la toma documental de §2 (*«nobody looks at the lens»*, reserva
 *«the calm, evenly shadowed bare dark wall on the left half»*, sin isotipo compuesto). El operador la aprobó igual como
@@ -841,6 +857,94 @@ Amplía §9.5: se prueba contra el borde real del haz, la mano o el anillo más 
 | # | Pendiente | Dueño |
 |---|---|---|
 | 1 | **Alcance del registro:** las portadas de línea del brochure usan personas del equipo (`CR2b`, `WB1b`, `RV1b`, hechas para `proposal-cinematic`, y `LN4`, hecha para el brochure). §2 y el issue AXIS `cine-requires-nexa-or-proposal` sólo admiten Nexa o la receta `proposal-cinematic`: una portada de brochure declarada como cine con persona del equipo hoy la rechazaría el contrato. El operador las aprobó; falta llevarlo al contrato. **Cerrado el 2026-09-27 (TASK-1927):** `cover-brochure` está en `photo.cine.recipes` (`axis-tokens` 0.3.14) | Cerrado |
-| 2 | **`LN4` sin isotipo compuesto.** Sigue el orden de las invariantes de fotografía (`.claude/rules/brand-photography.md`: referencias → `foto:emblema` al 100 % → `foto:isotipo` **sólo si el emblema difiere**), pero choca con §7.3 de este registro («el publicable lleva el isotipo oficial», todas las aprobadas con `b`). Decidir cuál manda en cine y alinear el otro | Operador |
+| 2 | **`LN4` sin isotipo compuesto.** Sigue el orden de las invariantes de fotografía (`.claude/rules/brand-photography.md`: referencias → `foto:emblema` al 100 % → `foto:isotipo` **sólo si el emblema difiere**), pero choca con §7.3 de este registro («el publicable lleva el isotipo oficial», todas las aprobadas con `b`). Decidir cuál manda en cine y alinear el otro. **Segundo caso, `CR4` (2026-09-28, §16.7):** el bordado generado ya coincidía con el isotipo oficial al 100 %, y la `b` que dejó `foto:isotipo` traía un parche plano sobre la cinta de luz; se publicó la placa sin componer, con el precedente de `LN4`. El caso suma un argumento: cuando un fenómeno de luz cruza la zona del emblema, la limpieza de la herramienta no respeta esa luz **Cerrado el 2026-09-28 (decisión del operador):** manda la referencia del uniforme; si `foto:emblema` la confirma al 100 %, se publica sin `b`; `foto:isotipo` sólo si difiere y siempre en el traje de Nexa (§7.3) | Cerrado |
 | 3 | **Regenerar desde las fichas:** hoy `foto:generar` vuelve a cobrar en cada corrida y la voz y la firma salieron de scripts de sesión que no están en el repo. El pipeline cine idempotente debe poder regenerar estos plates desde sus fichas | TASK-1926 |
 | 4 | Variante opcional de RevOps con Salesforce (cielo `#2fb8ff`) | Operador |
+
+### 16.7 CR4, «El squad te la entrega»: cambiar el plate de una pieza aprobada sin perder su concepto
+
+**[decisión del operador, 2026-09-28]** La portada de Creative Services («¿Quién crea mi contenido? **Tu squad.**»)
+compartía `CR2b` con la lámina `proposal-cinematic-creative`, y un brochure con las dos marcaba `plate-repeated`. El
+operador pidió un plate propio y aprobó `CR4` v2 («Espectacular»). La idea y la ficha son de la sesión «Efeonce línea
+gráfica» (autora de `CR2`); la producción, la validación y la composición, de TASK-1934.
+
+| | |
+|---|---|
+| Ficha | `ai-generations/2026-09-28_portada-creativa/fichas/CR4-el-squad-te-la-entrega-v2.json` |
+| Prompt compilado | `ai-generations/2026-09-28_portada-creativa/prompts/CR4-el-squad-te-la-entrega-v2.txt` |
+| Placa | `ai-generations/2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png` (sin sufijo `b`, ver errores) |
+| Costo de la búsqueda | 3 generaciones `--quality high` (`CR3`, `CR4` v1, `CR4` v2), ≈ **USD 0,11** (≈ 0,037 c/u, en línea con §10) |
+| Uso | Sólo la portada `cover-brochure-line-brand` de Creative Services. `CR2b` sigue en `proposal-cinematic-creative` |
+
+**La ficha, resumida [medido en la ficha]:** una directora creativa chilena de unos veintiocho años, con el hoodie
+navy, en la mitad derecha, de la cintura arriba, 85 mm a ≈ 2 m (receta §16.1), mirando al lente con una sonrisa de boca
+cerrada y la cabeza casi frontal. Tiene **las dos manos adelante, palmas arriba, ofreciendo** —*«NOT raising her arm,
+NOT conducting»*—, y sobre ellas flota **una sola pieza terminada**: una pantalla vertical 9:16 en el azul de marca
+(`#0375DB`), la única luz fría de la escena. Detrás, desenfocado y **sólo a la derecha**, el squad trabaja en tres
+puestos (diseño, edición de video, motion). De cada puesto sale una pieza que se une a **una sola cinta de luz
+naranja** (`#FF6500`) que sube por encima de ella y baja a sus manos, con seis o siete pantallas de formatos reales
+que crecen y ganan nitidez al acercarse: *«an OPEN flowing path from the back of the room toward the lens, NOT a closed
+ring and NOT an ellipse around her»*.
+
+#### Qué la hace aprobable
+
+- **Conserva el concepto de impacto de la línea y cambia la toma.** El impacto de la portada aprobada estaba en el
+  concepto —contenido vivo, colores vivos, bruma, rim duro, pantallas a distintas profundidades—, no en la geometría.
+  `CR4` lo mantiene y cambia gesto, forma del fenómeno y disposición para convivir con `CR2` en el mismo brochure:
+
+  | | `CR2` (lámina de servicio) | `CR4` (portada) |
+  |---|---|---|
+  | Gesto | Brazo en alto, dirige | Palmas arriba, **ofrece** una pieza terminada |
+  | Fenómeno | Elipse **cerrada** de pantallas a su alrededor, línea azul | Trayecto **abierto** de luz naranja del fondo hacia el lente |
+  | Squad | Ausente | **Presente**: es el origen del flujo, no decorado |
+
+- **La foto dice la respuesta sin el titular** (la prueba dura del registro B): se ve al equipo produciendo y a ella
+  entregándote el resultado. «Tu squad.» ya está en la imagen.
+- **Un solo portador del azul**: la pieza en sus manos lleva el azul de marca y es la única luz fría; el acento de la
+  línea (`#FF6500`) va en la cinta.
+
+#### Cómo aporta la órbita: la cinta es la trayectoria de la línea
+
+- **La cinta ES la órbita de la pieza** (§9.4): una sola por pieza; no va órbita gráfica encima. Es la trayectoria de
+  la línea como luz, no un adorno.
+- **Cuenta la historia en el recorrido de la mirada**: nace en el squad (fondo derecho, desenfocado), sube por encima
+  de ella y baja a sus manos (primer plano nítido). La mirada viaja del equipo al resultado y de ahí al lente, que es el
+  lector. Las pantallas crecen y ganan nitidez al acercarse: **tres planos de profundidad reales**.
+- **La forma cambia el significado [criterio]**: la elipse **cerrada** de `CR2` rodea a la persona (ella dirige); el
+  trayecto **abierto** de `CR4` va del fondo al lector (el equipo te entrega).
+- **Deja libre la columna**: anclada a la derecha, la reserva izquierda queda limpia y el texto no cruza la luz.
+
+#### Los errores de la búsqueda, en orden
+
+1. **`CR3` «Tu squad», rechazado («perdió impacto visual») [decisión del operador].** Seguía al pie la receta de §16.1
+   con la ficha tipo `LN4`: sujeto a la derecha mirando al lente y una tira naranja a lo largo de una mesa, con el squad
+   detrás fuera de foco. Técnicamente correcto —`foto:validar` 4/5, zona de texto 0,40, mejor que la 0,38 de `CR2b`,
+   emblema oficial— pero **se leyó como un retrato con la oficina detrás**. La receta de portada fija **geometría y
+   luz, no concepto**, y al cambiar de plate se perdió el concepto. Un validador que pasa no valida el concepto.
+2. **`CR4` v1 invadió la reserva izquierda aunque la declaraba** (trampa 12 de §10). Lo que funcionó en v2 fue **anclar
+   por geografía**: el squad *«ONLY on the frame-RIGHT side of the room (behind her right shoulder, between her body and
+   the right edge of the frame)»*, la cinta *«rises from the squad at the back RIGHT… never passing to the left of her
+   head or her left arm»* y *«nothing lit, no person, no desk, no monitor and no screen appears to the left of her left
+   elbow»*. Zona de texto: de **0,34 (v1) a 0,46 (v2)**.
+3. **`foto:isotipo` dejó un parche** (trampa 13 de §10). Sobre v2, la limpieza pintó un rectángulo plano del tono de la
+   tela sobre el brillo de la cinta y la esquina de una pantalla. El bordado generado ya coincidía con el isotipo
+   oficial (revisado con `foto:emblema` al 100 %: nave, tres ventanas, órbita, esfera), así que se publicó la placa sin
+   componer, con el precedente de `LN4` (§16.4). Queda en la decisión pendiente §16.6 #2.
+4. **Se mostró el frame del gate como evidencia de aprobación.** El frame del probe usa una silueta sintética
+   (determinista, ISSUE-122); el operador preguntó si la lámina no debería usar la imagen real. **Para aprobar se
+   muestra siempre la pieza compuesta con su plate real** (`pnpm brand:compose`); el frame del probe es sólo evidencia
+   del gate.
+
+#### Checklist para reemplazar el plate de una pieza aprobada
+
+- [ ] Nombrar el **concepto de impacto** de la pieza aprobada y conservarlo; cambiar gesto, forma del fenómeno o
+      disposición, no el concepto. La receta de §16.1 fija geometría, no idea.
+- [ ] Si convive con otra pieza del mismo deck, diferenciar la toma (en `CR4`: ofrecer vs. dirigir, abierto vs. cerrado,
+      squad presente vs. ausente) y comprobar que `validateDeckPlan` ya no marca `plate-repeated`.
+- [ ] Una sola órbita: si la escena ya tiene su trayectoria de luz, no va órbita gráfica encima (§9.4).
+- [ ] Reserva **anclada por geografía** (respecto del cuerpo del sujeto), no sólo por porcentaje.
+- [ ] `foto:validar --zona-texto`: zona de texto ≥ la del plate anterior (en `CR4`, 0,46), lecho y sombras no azules OK.
+- [ ] Emblema = isotipo oficial al 100 %; si se corre `foto:isotipo`, **mirar al 100 % después**.
+- [ ] Componer la pieza real (`pnpm brand:compose`) y revisarla al 100 %: el texto no cruza persona, cinta, pantalla ni
+      squad (§16.5). En `CR4`, el último texto de la evidencia («Campañas», x ≈ 760) queda a ~30 px de la manga.
+- [ ] Aprobar con la pieza compuesta, nunca con el frame del probe.

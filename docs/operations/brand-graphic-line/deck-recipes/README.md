@@ -1,10 +1,12 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.6
+> **Versión:** 1.7
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-28 por Claude (1.6: TASK-1934 — las nueve láminas SEO/AEO aprobadas el
-> 2026-09-28 entran al catálogo (69 → 78 recetas, todas con plantilla), cómo elegirlas y sus reglas (cifras con fuente,
+> **Última actualización:** 2026-09-28 por Claude (1.7: `cover-brochure-line-brand` usa su plate propio `CR4` y deja
+> de repetir `CR2b` con `proposal-cinematic-creative`; pendientes «Abiertos».
+> Antes, 1.6: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo (69 → 78 recetas,
+> todas con plantilla), cómo elegirlas y sus reglas (cifras con fuente,
 > datos de muestra marcados, interfaz de IA genérica); los códigos `variant-both-in-deck` (reemplaza a
 > `variant-adjacent`) y `figure-source-missing`, y `next-steps-after-diagnosis` por familia; sus pendientes de QA.
 > Antes, 1.5: sección «Validar el plan: códigos y cómo leerlos» —
@@ -275,8 +277,8 @@ La aprobación visual de las seis familias de TASK-1928 y de la portada con sele
 | Pendiente | Dónde | Estado |
 |---|---|---|
 | Logo dentro de la órbita en el cierre | contraportadas | **sin resolver**: ninguna contraportada aprobada lo lleva así; las aprobadas ponen el logo arriba de la columna (norma §6, fila 17) |
-| Isotipo sin registro de procedencia | plates `b` (NX6b, CR2b, WB1b, RV1b, BR2b…); HW1, T2, T3, H2 y LN4 sin isotipo compuesto | pasar por `pnpm foto:emblema` (y `foto:isotipo` si difiere) antes de publicar |
-| Plate repetido | P1 en lente, sangre, contenido con foto y hoja de contactos | regla de uso: no repetirlo en un mismo deck |
+| Isotipo sin registro de procedencia | plates `b` (NX6b, CR2b, WB1b, RV1b, BR2b…); HW1, T2, T3, H2, LN4 y CR4 sin isotipo compuesto (en `CR4` el bordado ya era el oficial y la `b` de `foto:isotipo` traía un parche: registro cine §16.7) | pasar por `pnpm foto:emblema` (y `foto:isotipo` si difiere) antes de publicar |
+| Plate repetido | P1 en lente, sangre, contenido con foto y hoja de contactos | regla de uso: no repetirlo en un mismo deck. **Resuelto el 2026-09-28** el caso de `cover-brochure-line-brand`, que repetía `CR2b` con `proposal-cinematic-creative`: la portada tiene su plate propio, `CR4` ([registro cine §16.7](../../brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md#167-cr4-el-squad-te-la-entrega-cambiar-el-plate-de-una-pieza-aprobada-sin-perder-su-concepto)) |
 
 Diferencias conocidas de las plantillas del marco contra los prototipos aprobados (el operador aprobó a ojo las
 láminas compuestas el 2026-09-27): «Cuando quieras.» sale algo más grande que en el prototipo porque usa el valor del
@@ -287,7 +289,7 @@ unos píxeles más ajustada.
 
 | Pendiente | Dónde | Estado y dueña |
 |---|---|---|
-| Frames del gate a 0 px | las siete plantillas nuevas y el re-congelado de `ProposalCinematic` (la nota del pie mueve su probe) | **pendiente de la aprobación visual del operador**; después se congelan con `--freeze` single-owner, declarados en `BASELINE_DELTAS.md`. Dueña: TASK-1934 |
+| Frames del gate a 0 px | las siete plantillas nuevas y el re-congelado de `ProposalCinematic` (la nota del pie mueve su probe) | **Resuelto el 2026-09-28** en `c652f4f83`: el operador aprobó a ojo las nueve láminas y la nota del pie de la plantilla cine; los ocho frames se congelaron con `--freeze` single-owner, declarados en `BASELINE_DELTAS.md` (o). El gate queda en 73 frames a 0 px. Dueña: TASK-1934 |
 | Cifra escrita como texto plano | un slot `metric` que trae «68 %» como texto | `figure-source-missing` sólo detecta una cifra escrita como objeto con `value`; una cifra en texto plano pasa sin fuente. Escríbela como objeto con `source` para que el validador la vea. Abierto, sin task dueña |
 | Camino «ausente» de un slot opcional nuevo | toda plantilla compartida que suma un slot opcional (caso: la nota del pie de `proposal-cinematic`) | el probe del gate siempre rellena los slots opcionales, así que el gate **nunca ejercita** una receta existente sin el slot, y los snapshots de planes no renderizan. La nota emitía sus medidas sólo con nota y rompía la propuesta creativa sin nota (gl-css «undefined»); lo encontró el operador, no el gate. **Corregido** en `af32d9353` con `src/lib/brand-surfaces/__tests__/proposal-cinematic-note.test.ts`. Regla vigente: todo slot opcional nuevo lleva un test que compone una receta existente sin él (misma clase de hueco que `CoverBrochure` con selección, TASK-1928) |
 | Las cinco `proposal-cinematic` sin mapa de slots | `proposal-cinematic-{creative,web,aeo,revops,seo}` (`slots: null` en `recipe-map.json`) | mapearlas juntas en `recipe-map.json`. Mientras tanto, la plantilla cine admite textos más largos que los de cada receta y el freno es `validateDeckPlan` (`slot-over-max-chars`), probado con un fixture adversarial. Dueña: TASK-1933 |
@@ -463,9 +465,10 @@ issue de AXIS deja el documento sin componer. Portada con foto ↔ contraportada
 hoy. Ejemplos de documento: `deck-brochure-document.json` (nueve páginas) y `deck-proposal-document.json` (siete
 páginas interiores). Paso a paso: [manual de uso](../../../manual-de-uso/creative/componer-deck-con-recetas.md).
 
-Gate visual del catálogo: `pnpm composer:visual-gate --catalog=graphic-line` (66 frames a 0 px; altas declaradas en
+Gate visual del catálogo: `pnpm composer:visual-gate --catalog=graphic-line` (73 frames a 0 px; altas declaradas en
 `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`). Los frames de las siete plantillas SEO/AEO y el
-re-congelado de `ProposalCinematic` esperan la aprobación visual del operador (ver «Pendientes de QA»).
+re-congelado de `ProposalCinematic` se congelaron el 2026-09-28 tras la aprobación visual del operador (`c652f4f83`,
+entrada (o) del ledger).
 
 ### El contenido es dato del intent
 
