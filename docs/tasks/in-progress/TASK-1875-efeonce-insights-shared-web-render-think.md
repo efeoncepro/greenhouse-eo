@@ -79,7 +79,7 @@
 - Motion: `docs/ui/motion/TASK-1875-efeonce-insights-shared-web-render-think-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Think y sharing de Greenhouse operativos en producción: Think bbf8522; WAF sin drift a 20 req/10 s/IP; INSIGHTS_SHARING_ENABLED=true exacto en deployment Ready greenhouse-cssemzyzb; canary ecosystem 201→200/PDF→revoke→410/303, grant revocado. Producción sirve InsightWebModelV1 1.0 soportado; 1.1 sigue en staging y no se hizo release de Greenhouse. Falta la prueba automatizada de major no soportada.`
+- Status real: `Operativo en producción: Think (7485e32) con /insights/r/<token> y la muestra /insights/muestra; INSIGHTS_SHARING_ENABLED=true en greenhouse-cssemzyzb; WAF sin drift; canary de producción verde. Todos los criterios con evidencia. Producción sirve el modelo 1.0 (soportado); el 1.1 espera el próximo release de Greenhouse. Para cerrar: pnpm test completo + pnpm build`
 - Rank: `TBD`
 - Domain: `ui|platform|public-site`
 - Blocked by: `none`
@@ -609,8 +609,9 @@ La prueba `verify-insights-report.mjs` compara el DOM con el fixture, no con cá
 > y foco visible en 1440/390 (completo, extremo y muestra); 15 pruebas unitarias; canary real en staging con la
 > edición sintética `EO-INS-000014` (200 con cabeceras, PDF de 329 874 B por el proxy, 410 tras revocar, 404
 > desconocido). El canary productivo por el lane ecosystem confirmó create 201, Think 200, PDF por proxy, revoke 200,
-> lectura 410 y descarga 303; el grant quedó revocado. Sin tildar sólo queda la `modelVersion` con major no soportada:
-> está en código (`isSupportedModelVersion` ⇒ `error` 502) pero sin prueba automatizada. `EditionMasthead` y
+> lectura 410 y descarga 303; el grant quedó revocado. El major no soportado quedó probado (Think `7485e32`):
+> `acceptSharedEdition` es la única puerta para la respuesta real y los fixtures; `fixture-version-2` ⇒ 502 sin datos
+> de la edición, más una prueba unitaria (16 en total). `EditionMasthead` y
 > `FactCallout` no existen como tales: la portada es el `header.ins-hero` de `InsightReport` y el callout quedó como
 > `FactMark`; así está documentado en el README de primitivas.
 
@@ -629,7 +630,7 @@ La prueba `verify-insights-report.mjs` compara el DOM con el fixture, no con cá
       `period.partial` muestra la banda de período abierto; descargas no disponibles no muestran botón muerto.
 - [x] Descargar un PDF disponible pasa por el proxy de Greenhouse (URL relativa al endpoint público), nunca por
       una URL de storage; un grant revocado deja de descargar.
-- [ ] Una `modelVersion` con major no soportada produce `error` visible (502 + log), nunca un render parcial.
+- [x] Una `modelVersion` con major no soportada produce `error` visible (502 + log), nunca un render parcial.
 - [x] Reduced motion elimina count-up, reveal y dibujo progresivo con contenido idéntico; recorrido de teclado
       completo con `focus-visible`; contraste AA; `scrollWidth === clientWidth` en 1440 y 390 (evidencia GVC).
 - [x] GVC desktop + mobile de los 9 escenarios capturado, mirado y copiado a
@@ -657,7 +658,7 @@ La prueba `verify-insights-report.mjs` compara el DOM con el fixture, no con cá
 - [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (TASK-1848 URL del correo, TASK-1849 botón copiar enlace, EPIC-045 nodo S6)
 - [x] dossier GVC + scorecard copiados a Greenhouse; docs de Think actualizados; commit del hub referenciado en el Delta de cierre
 - [x] Actualizar la skill viva `efeonce-insights` (`references/program-ledger.md`, `architecture-map.md`, `contracts.md`, `operations.md`, `lessons.md`) y espejar a `.codex/` con `pnpm skills:mirrors` verde — contrato de EPIC-045; sin esto la task no pasa a complete.

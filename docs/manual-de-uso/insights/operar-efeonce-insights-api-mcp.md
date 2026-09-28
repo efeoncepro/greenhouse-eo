@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.12
+> **Version:** 1.13
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-26 por Claude (cierre de TASK-1889: diseño premium en producción y cómo verificar un render real)
+> **Ultima actualizacion:** 2026-09-28 por Claude (TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
@@ -103,7 +103,7 @@ del gateway (binding interno del provider SEO/Insights, scope `internal`), nunca
 Evidencia del 2026-09-15: `EO-INS-000012` (app, staging), `EO-INS-000013` (ecosystem, staging),
 `EO-INS-000014` (ecosystem, producción); las tres `ready_for_review` sobre la org sintética Greenhouse Demo.
 
-Vista web compartida: el resolver por token ya existe (TASK-1848); cuando exista la página de Think (TASK-1875), el enlace apuntará a `think.efeoncepro.com/insights/r/<token>`;
+Vista web compartida: el enlace apunta a `think.efeoncepro.com/insights/r/<token>` (TASK-1875, en producción desde 2026-09-28);
 Think resuelve el token contra Greenhouse en cada visita, así que revocar el enlace corta el acceso de inmediato.
 
 MCP: `get_insights_catalog` → `create_insight_edition` → `get_insight_edition` (con `includeEvidence`),
@@ -237,9 +237,13 @@ Con la org sintética «Greenhouse Demo» y la persona cliente:
    persona cliente → `404`, sin outputs.
 5. Contra PostgreSQL real: `pnpm test:live src/lib/efeonce-insights/render` (4/4 el 2026-09-16).
 
-## Enlaces, correo y recurrencia (TASK-1848 — en producción con flags OFF desde 2026-09-18)
+## Enlaces, correo y recurrencia (TASK-1848; enlace encendido en producción desde 2026-09-28)
 
-> **Estado (2026-09-18):** código en producción (release `bda1cf2cd938`) con `INSIGHTS_SHARING/DELIVERY/SCHEDULES_ENABLED`
+> **Estado 2026-09-28:** `INSIGHTS_SHARING_ENABLED` **ON en producción** (valor exacto `true`, redeploy
+> `greenhouse-cssemzyzb`); canary por lane ecosystem sobre `EO-INS-000014`: crear 201 → Think 200 con cabeceras →
+> deck por el proxy → revocar → 410. Envío y recurrencia siguen OFF en producción; la emisión también.
+>
+> **Estado (2026-09-18, histórico):** código en producción (release `bda1cf2cd938`) con `INSIGHTS_SHARING/DELIVERY/SCHEDULES_ENABLED`
 > y la emisión **OFF en producción** hasta que exista el lector de Think (TASK-1875). En **staging** los cuatro flags
 > están ON y el canary sintético corrió completo en la org sandbox (`EO-INS-000015`); los dos correos llegaron al buzón
 > autorizado del operador (evidencia humana: Resend no reporta `delivered`, ISSUE-160). Canary de contrato en
@@ -261,7 +265,7 @@ Con la org sintética «Greenhouse Demo» y la persona cliente:
 
 | Flag | Vercel | `ops-worker` | Con OFF |
 |---|---|---|---|
-| `INSIGHTS_SHARING_ENABLED` | crear enlace + reader público | — | crear → `503 sharing_disabled`; reader → `404`; revocar sigue funcionando |
+| `INSIGHTS_SHARING_ENABLED` (Production ON desde 2026-09-28) | crear enlace + reader público | — | crear → `503 sharing_disabled`; reader → `404`; revocar sigue funcionando |
 | `INSIGHTS_DELIVERY_ENABLED` | crear el envío | despacho (default `true` en `deploy.sh`) | crear y reintentar → `503 delivery_disabled`; cancelar y reconciliar siguen funcionando |
 | `INSIGHTS_SCHEDULES_ENABLED` | escrituras de schedule | tick (default `true` en `deploy.sh`) | crear → `503 schedules_disabled`; pausar y retirar siguen funcionando |
 | `INSIGHTS_GENERATION_ENABLED` | ya existente | **ahora también** en el tick (default `true`) | el tick no genera ediciones |
@@ -276,12 +280,36 @@ Prender un flag del worker es multi-runtime: `deploy.sh` + revisión activa (led
 1. `POST /api/platform/app/insights/editions/<editionId>/shares` con `{ "organizationId": "<org>", "expiresInDays": 30,
    "downloadOutputs": ["deck_pdf"] }` (`expiresInDays` 1–90, default 30; `downloadOutputs` sólo `deck_pdf`/`report_pdf`
    que existan en la edición). Responde `201` con el grant, **el token y la URL, una sola vez**. Guárdalo en el canal
-   seguro que corresponda; Greenhouse no puede mostrarlo de nuevo.
+   seguro que corresponda; Greenhouse no puede mostrarlo de nuevo. **Sin `downloadOutputs` el enlace no descarga nada**
+   (Think no muestra botones y `?descargar=` vuelve al informe): pásalo explícito. El campo de vencimiento es
+   `expiresInDays`; otro nombre se ignora y queda el default de 30 días (verifica `expiresAt` en la respuesta).
 2. Listar: `GET …/editions/<editionId>/shares` (sin token ni digest).
 3. Revocar: `POST /api/platform/app/insights/shares/<shareGrantId>/revoke`. Idempotente; nunca reactiva.
 - Ecosystem: mismas rutas bajo `/api/platform/ecosystem/insights/**`; crear y revocar exigen binding `internal`.
 - MCP: `create_insight_share`, `list_insight_shares`, `revoke_insight_share` (federadas en el gateway 1.7.0; crear y revocar exigen `efeonce.mcp.insights.write`, que ningún cliente porta).
 - Límite: 20 activos por edición → `429 quota_exceeded`. Permiso: `insights.share.manage` (Admin/Account; cliente executive sobre su org).
+
+### La página del enlace en Think (TASK-1875)
+
+- **URL:** `https://think.efeoncepro.com/insights/r/<token>`: es lo que devuelve la creación del enlace y lo que lleva el
+  correo. Think resuelve el token en cada visita (sin caché): revocar corta el acceso en la visita siguiente.
+- **Estados:** 200 informe · 404 enlace inexistente, vencido o mal copiado (indistintos a propósito) · 410 revocado o
+  edición retirada · 429 demasiadas lecturas seguidas · 502 Greenhouse no respondió o entregó un modelo que Think no
+  entiende (sólo la familia 1.x).
+- **Descargas:** botón en la barra y en «Descargas»; pasan por `?descargar=<output>` en la misma URL y Think las
+  pide al proxy de Greenhouse. Si el archivo no existe o el enlace se revocó, vuelve al informe (303).
+- **Muestra para vender:** `https://think.efeoncepro.com/insights/muestra` (datos de ejemplo, marca ficticia, sin
+  descargas, `noindex`). Se puede compartir libremente: no tiene token ni datos de clientes.
+- **Probar staging:** los enlaces de staging también apuntan a `think.efeoncepro.com`, que lee producción ⇒ 404. Para
+  verlos, levanta Think local contra staging: `efeonce-think/.env.staging.local` (en `.gitignore`) con
+  `GREENHOUSE_API_BASE` = staging `.vercel.app` y `GREENHOUSE_API_BYPASS`, y `pnpm --dir ../efeonce-think dev --port 4332
+  --mode staging` (launch config `think-staging`). Astro admite un solo `astro dev` por proyecto.
+- **Verificación del hub** (repo `efeonce-think`, con `astro dev` arriba): `node scripts/verify-insights-report.mjs
+  [base]`, `node scripts/audit-insights-a11y.mjs [base] [token|/ruta]`, `pnpm test:insights`,
+  `node scripts/capture-insights-report.mjs <dir>`.
+- **Problemas comunes:** página 404 con un enlace recién creado en staging (mirar la nota de arriba); sin botón de
+  descarga (el enlace se creó sin `downloadOutputs`); 429 al probar muchas veces seguidas (espera un minuto y nunca
+  pruebes con ráfagas: la base es compartida).
 
 ### Leer el reader público
 

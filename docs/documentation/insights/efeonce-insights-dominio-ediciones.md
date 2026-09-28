@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.13
+> **Version:** 1.14
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-26 por Claude (cierre de TASK-1889: el diseño premium está en producción y ya generó las primeras ediciones internas de Berel y Sky)
+> **Ultima actualizacion:** 2026-09-28 por Claude (TASK-1875: la página del enlace en Think está en producción, el enlace compartido quedó encendido y existe una muestra pública para clientes)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -13,9 +13,11 @@ Efeonce Insights convierte la evidencia de un cliente (SEO, visibilidad en IA, e
 y las mismas cifras en deck, informe vertical y web. Greenhouse guarda la biblioteca, el encargo, los
 permisos y el ciclo de vida; los módulos siguen siendo dueños de sus métricas.
 
-La vista web que se comparte por enlace no vivirá en el portal: se mostrará en `think.efeoncepro.com`, el mismo
-hub que hoy muestra el informe de visibilidad en IA. Greenhouse sigue siendo dueño del dato y del enlace; Think
-sólo lo dibuja (decisión del 2026-09-15). La biblioteca para pedir y revisar informes sí queda en el portal.
+La vista web que se comparte por enlace no vive en el portal: se muestra en `think.efeoncepro.com/insights/r/<enlace>`,
+el mismo hub que muestra el informe de visibilidad en IA (en producción desde el 2026-09-28, TASK-1875). Greenhouse
+sigue siendo dueño del dato y del enlace; Think sólo lo dibuja (decisión del 2026-09-15). Para mostrar el producto en
+una venta existe una muestra pública con datos de ejemplo: `think.efeoncepro.com/insights/muestra` (ver «La página del
+enlace y la muestra para clientes»). La biblioteca para pedir y revisar informes sí queda en el portal.
 
 La primera unidad (TASK-1845) creó el **núcleo**: crear un encargo, recolectar evidencia, redactar el plan y
 dejar la edición lista para revisión. Después se sumaron el deck PDF (TASK-1846), el enlace compartido, el envío
@@ -307,9 +309,10 @@ asignado. Lo que está encendido y lo que no:
 | Contrato editorial v2 (lectura por figura, «Lo esencial», alcance, portada sellada) | **Encendido en staging y producción** (desde 2026-09-26) | Flag `INSIGHTS_EDITORIAL_V2_ENABLED=true` en Vercel (staging y producción) y en el ops-worker (recurrencias). Aplica a ediciones nuevas; las ya creadas no cambian |
 | Redacción asistida por IA | Encendida en producción desde 2026-09-26 | Gemini (flash-lite) reescribe conclusiones y lecturas sin cambiar cifras; si algo no cuadra, queda el texto determinista. Las ediciones de las recurrencias salen sin IA |
 | Pedir el render del **deck PDF** de una edición | **Encendido en staging y producción** (desde 2026-09-16) | Staging: probado con cinco decks reales, un reintento y una cancelación. Producción: probado el 2026-09-16 en la organización de prueba — el deck salió solo, al primer intento, y pedir la vista web fue rechazado como corresponde. Ver «Pedir el deck de una edición» |
-| Enlace compartido, envío por correo y recurrencia | **En producción, pero apagados** (2026-09-18) | El código salió a producción el 2026-09-18 con los tres interruptores apagados a propósito: se encenderán cuando exista la página pública del enlace en Think (TASK-1875). En staging están encendidos y se probaron completos con una organización de prueba; los dos correos de prueba llegaron al buzón autorizado. Ver las tres secciones siguientes |
+| Enlace compartido | **Encendido en producción** (desde 2026-09-28) | Se encendió al existir la página del enlace en Think (TASK-1875). Probado en producción con la edición de prueba `EO-INS-000014`: crear el enlace, verlo en Think, descargar el deck, revocar y comprobar que deja de abrir. Sólo se comparten ediciones **emitidas**, y emitir sigue apagado en producción, así que hoy no hay ediciones reales de clientes para compartir |
+| Envío por correo y recurrencia | En producción, pero apagados (2026-09-18) | Encendidos y probados en staging; en producción esperan su propia decisión |
 | Pedir el **informe A4** de una edición | **Encendido en staging y producción** (producción desde 2026-09-24) | Probado con datos reales de Berel y Sky en staging (2026-09-22) y de Sky en producción (2026-09-25, edición interna). Sale junto con el deck si se piden los dos |
-| Pantalla pública del enlace | No existe todavía | TASK-1875 (la página en `think.efeoncepro.com` que muestra el enlace) |
+| Pantalla pública del enlace | **En producción** (desde 2026-09-28) | `think.efeoncepro.com/insights/r/<enlace>` (TASK-1875) y la muestra `think.efeoncepro.com/insights/muestra`. Ver «La página del enlace y la muestra para clientes» |
 | Usar Insights desde un agente externo por el gateway MCP (`mcp.efeonce.org`) | Lectura sí; escritura todavía no | Gateway v1.9.0 (2026-09-26). Además de ediciones y render, un agente puede **ver** enlaces, envíos y recurrencias (cinco herramientas de lectura) y la preferencia de portada de un cliente; fijar esa preferencia sólo lo pueden hacer vínculos internos de Efeonce. Crear y revocar enlaces existen, pero exigen un permiso de escritura que ningún cliente tiene aún; lo mismo crear ediciones. **Enviar por correo y programar recurrencias sólo se hacen desde el portal**, no por MCP |
 
 **Pedir el deck de una edición (render).** Cuando una edición está `ready_for_review`, quien tenga permiso sobre
@@ -337,11 +340,48 @@ proceso en segundo plano lo produce.
 - **Qué no hace todavía.** Existen el deck y el informe A4 (en producción desde el 2026-09-24). La vista web se rechaza al pedirla. Tener el deck
   no lo envía ni lo comparte: descargarlo, compartirlo y emitir siguen siendo pasos aparte.
 
+## La página del enlace y la muestra para clientes
+
+> Estado: en producción desde el 2026-09-28 (TASK-1875).
+
+**Qué ve quien abre el enlace.** Una página web, no un PDF. Abre con la respuesta del mes en grande sobre el fondo
+oscuro de Efeonce y una órbita de la marca. Debajo:
+
+- «Lo esencial del mes»: cada hallazgo con su cifra; al tocarlo, muestra el gráfico, la lectura y de dónde sale
+  el dato.
+- La decisión para la reunión.
+- Un capítulo por módulo (SEO, respuestas de IA, entrega creativa), con el gráfico principal narrado paso a paso
+  mientras se baja.
+- El plan de acción, «Cómo se midió», las descargas permitidas y el pie con la firma de Efeonce.
+
+Hay un botón **Presentar** que muestra lo mismo en láminas, para usarlo en una reunión. La página se adapta al
+celular y respeta a quien prefiere menos movimiento.
+
+**Qué no pasa nunca.**
+
+- La página no inventa ni recalcula cifras: muestra las de la edición.
+- Si una cifra no existe, dice que falta; nunca pone un cero.
+- La dirección secreta del enlace no queda escrita dentro de la página, no se envía a analítica y no aparece en
+  buscadores.
+
+**Estados.** Un enlace revocado o una edición retirada muestran «Este informe fue retirado». Un enlace vencido,
+inexistente o mal copiado muestra «Este enlace no existe o expiró»; a propósito no se distingue cuál de los tres es.
+Ninguno de los dos revela el nombre del cliente. Si se abre muchas veces seguidas, pide esperar unos minutos.
+
+**Muestra para clientes.** `think.efeoncepro.com/insights/muestra` es el mismo informe con datos de ejemplo y una
+marca ficticia («Marca de ejemplo»), para enseñarlo en una venta. Lleva el aviso «Muestra con datos de ejemplo» en la
+portada y en el pie, no tiene descargas, no está en buscadores y cierra con una invitación a conversar. Como usa el
+mismo diseño que el informe real, cualquier mejora del informe aparece también en la muestra.
+
+> Detalle técnico: arquitectura §8 (enlace compartido y lector de Think) y §14.10 (estado de TASK-1875); patrón
+> «Shared Tokenized Report» en `docs/think/architecture-ui-patterns.md`; repo `efeonce-think`
+> (`src/components/insights/InsightReport.astro`, rutas `src/pages/insights/r/[token].astro` y
+> `src/pages/insights/muestra.astro`); dossier visual `docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/`.
+
 ## Compartir un informe por enlace
 
-> Estado: en producción desde el 2026-09-18, **todavía no disponible** (interruptor apagado en producción; encendido y
-> probado en staging). La página pública que muestra el enlace en `think.efeoncepro.com` es otra unidad (TASK-1875) y
-> no existe todavía; el interruptor se enciende cuando exista.
+> Estado: **disponible en producción desde el 2026-09-28** (el código salió el 2026-09-18 y el interruptor se encendió
+> cuando la página del enlace en `think.efeoncepro.com` estuvo lista, TASK-1875). Sólo se comparten ediciones emitidas.
 
 **Qué hace.** Genera un enlace secreto para que alguien sin cuenta en el portal lea una edición **ya emitida** y, si
 se permite, descargue sus archivos. El enlace sólo abre esa edición: no da acceso a la biblioteca, no permite pedir

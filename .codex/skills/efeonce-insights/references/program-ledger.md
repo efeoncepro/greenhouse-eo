@@ -305,6 +305,13 @@ _Fill at closure._
 
 ## TASK-1875 — Think shared web render (in-progress; production sharing live — 2026-09-28)
 
+**Delta 2026-09-28 (close-out).** Unsupported major now tested: Think `7485e32` adds `acceptSharedEdition`
+(`src/lib/insights-accept.ts`, no Astro imports) as the single acceptance gate for real responses and dev fixtures;
+`fixture-version-2` (modelVersion `2.0`) ⇒ 502 status screen with no edition data; 16 unit tests. Functional doc
+(`docs/documentation/insights/…dominio-ediciones.md` v1.14) and manual (`…operar-efeonce-insights-api-mcp.md` v1.13)
+describe the Think page, states, downloads (`downloadOutputs`), the public sample and local-against-staging testing.
+All TASK-1875 acceptance criteria are evidenced; closing only needs full `pnpm test` + `pnpm build`.
+
 **Delta 2026-09-28 (production activation).**
 - Applied the Think exception to both Vercel Firewall rules and re-read the plan without drift: negated
   `x-efeonce-think-key` condition present, limit unchanged at 20 req/10 s per IP (`enforce` outside production,
