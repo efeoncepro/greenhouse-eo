@@ -48,6 +48,10 @@ keywords. Inventario oficial, autorización Greenhouse y disponibilidad runtime 
     citas, fan-out, entidades y resultados por plataforma sin crear el data product recurrente de TASK-1651-B.
 13. Las rutas `catalog_only` se documentan mediante un registro generado desde el mismo snapshot. El registro
     clasifica su valor eventual y su gate, pero no amplía el allowlist ni convierte inventario en autorización.
+14. `serp-compare` compara marcas o entidades transversales sobre una sola captura por query/dispositivo. Un panel
+    puede declarar nombre, aliases y varios dominios; retail es sólo un caso. Orgánico, mención, enlace AI, cita AI
+    y Shopping permanecen señales separadas. Un target no observado conserva el depth capturado y nunca recibe
+    una posición fabricada. Sin `load_async_ai_overview`, AI Overview se rotula como caché del proveedor.
 
 ## Technical architecture
 
@@ -62,6 +66,7 @@ data/dataforseo/endpoints.v3.json
         ├── run ──── payload JSON genérico
         ├── task wait ── GET acotado, nunca resubmit
         ├── research ─── Labs paginado → checkpoint editorial → SERP Standard → matriz
+        ├── serp-compare ─ panel de entidades → SERP Live compartido → matriz JSON/CSV
         └── ai-research ─ panel versionado → API lanes + consumer lanes → matriz
                          │                         │
                          └──── checkpoint + costo progresivo
@@ -86,6 +91,7 @@ data/dataforseo/endpoints.v3.json
 | `src/lib/ai/dataforseo-keyword-research.ts`     | Plan, estimación, payloads, extracción/deduplicación y CSV del flujo compuesto de keywords.                             |
 | `src/lib/ai/dataforseo-research-checkpoint.ts`  | Fingerprints, runId, cache con TTL, resume tenant-safe y escritura atómica de pasos/tasks/costo.                        |
 | `src/lib/ai/dataforseo-ai-research.ts`          | Contrato de panel AI, requests por lane y matriz normalizada API vs consumer surface.                                   |
+| `src/lib/ai/dataforseo-serp-compare.ts`         | Panel transversal de entidades, estimación, normalización multiseñal y CSV de comparación SERP.                         |
 | `scripts/dataforseo/cli.ts`                     | Orquestación local, preview, confirmación, validación, preflight de entitlement, outcomes y artefactos.                 |
 | `src/lib/ai/dataforseo.ts`                      | Transporte único: credenciales, prefijo, timeout, retry, breaker y notificación de costo.                               |
 | `src/lib/growth/seo/entitlement.ts`             | Decisión de quota y presupuesto por organización antes del gasto.                                                       |
@@ -138,6 +144,19 @@ no solicitado, sin datos y error.
 surface son lanes separadas. La matriz normaliza query, plataforma, modelo, mercado, citas, `fan_out_queries`,
 `brand_entities`, menciones, task IDs, costo y evidencia; el JSON conserva raw. Es tooling local, no schema,
 writer, reader, MCP, worker ni schedule de TASK-1651-B.
+
+### Comparación transversal de marcas y entidades
+
+`serp-compare` recibe consultas, dispositivos y entidades. La forma corta `targets` acepta dominios; la forma
+completa `entities` declara `id`, `label`, `domains[]` y `aliases[]`. Una marca puede tener varios dominios y una
+consulta puede ser branded o no branded. La cantidad de requests es `queries × devices`, no se multiplica por
+entidades: todas se evalúan localmente sobre el mismo SERP.
+
+La matriz mantiene por separado `rank_group`, `rank_absolute`, mención textual, enlace directo de AI Overview,
+cita formal y Shopping. Shopping es opcional y no condiciona el modelo. `not_observed_in_captured_organic`
+significa sólo que la entidad no apareció entre los orgánicos devueltos; reporta además cantidad y máximo rank
+capturados. Las señales derivadas son observaciones para priorizar una auditoría, no causalidad ni estrategia.
+Repetir el panel en otra fecha crea otra muestra; la CLI no agenda ni compra repeticiones silenciosas.
 
 ## Authorization, cost and tenancy
 
@@ -216,7 +235,7 @@ la CLI y pertenecen a `TASK-1651-B`.
   el snapshot y el registro de rutas no autorizadas.
 - Tests comprueban rutas diarias, allowlist, Perú→2604, AI guards, research, estados task y GET sin body/retry.
 - Tests focales comprueban fingerprints, aislamiento tenant, TTL, costo progresivo, cursor/offset, gobernanza,
-  matriz SERP y normalización AI API vs consumer.
+  matriz SERP, comparación transversal por aliases/dominios y normalización AI API vs consumer.
 - `pnpm typecheck`, lint y task lint protegen integración.
 
 ## Revisit triggers

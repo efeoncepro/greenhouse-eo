@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "market": "CL",
+  "locale": "es-CL",
+  "queries": [
+    "agencia de transformación digital",
+    "Efeonce"
+  ],
+  "entities": [
+    {
+      "id": "efeonce",
+      "label": "Efeonce",
+      "domains": ["efeonce.org", "studio.efeonce.org"],
+      "aliases": ["Efeonce", "Efeonce Studio"]
+    },
+    {
+      "id": "competidor-ejemplo",
+      "label": "Competidor Ejemplo",
+      "domains": ["competidor.example"],
+      "aliases": ["Competidor Ejemplo"]
+    }
+  ],
+  "devices": ["desktop", "mobile"],
+  "depth": 20,
+  "loadAiOverview": true
+}

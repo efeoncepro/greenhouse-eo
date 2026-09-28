@@ -19,7 +19,10 @@ Esta skill existe en `.claude/skills/` y `.codex/skills/` con el mismo cuerpo. *
 - **NUNCA** hacer `fetch` a `api.dataforseo.com` directo ni crear un cliente/SDK paralelo. TODO pasa por `postDataForSeoTask` de `src/lib/ai/dataforseo.ts` (transporte canónico: Basic auth + timeout + breaker + registro de costo). El cliente se **amplía, nunca se duplica** (arch SEO §1.2). 🔴 **`consumer: 'seo' | 'aeo'` es REQUERIDO** en todas las variantes de `DataForSeoTaskInput` desde TASK-1696: quien compra declara PARA QUÉ SERVICIO, porque `serp` es la familia **COMPARTIDA** —la compran el rank capture del módulo SEO y el adapter de AI Mode del grader AEO—. Un default silencioso haría que el gasto del grader se descuente del presupuesto SEO del cliente sin que nada falle. Los 20 callsites SEO declaran `consumer: 'seo'`.
 - **Allowlist CERRADO de 6 familias** (`src/lib/ai/dataforseo-families.ts`): `serp` · `labs` · `backlinks` · `onpage` · `domain` · `ai_optimization`. `normalizeEndpoint` lanza si el endpoint no calza con el prefijo de la familia. Ampliar familia = proceso gobernado (ver §Ampliar el allowlist), nunca aflojar el candado (ADR EPIC-022 decisión #4, riesgo §13.3).
 - **Toda familia salvo `serp` exige `organizationId`** (el tipo `DataForSeoTaskInput` lo fuerza) y el transporte **lanza** si hay org sin spend recorder registrado — la condición es "¿HAY organización?", no "¿la familia lo exige?". 🔴 **`serp.requiresOrganization: false` sigue en `false` POR DISEÑO, ya no por deuda (TASK-1696):** la atribución YA existe —`ProviderAdapterContext` transporta la organización derivada server-side de `grader_profiles.organization_id` y el adapter de AI Mode la pasa al transporte—, lo que NO se puede es EXIGIRLA: el grader corre sobre prospectos PÚBLICOS que legítimamente no tienen organización, y ponerlo en `true` "para cerrar la deuda" rompe el camino público del lead magnet en la primera llamada. El runtime que llame DataForSEO **con org** debe importar `@/lib/growth/seo/register-provider-spend` en su entrypoint. Estado as-of 2026-08-27: lo importan el **ops-worker** (`services/ops-worker/server.ts`, entrypoint del rank capture y del site audit) **y el adapter `google-ai-overview-adapter.ts`, por import de efecto** — el grader TAMBIÉN corre inline en Vercel (`/api/admin/growth/ai-visibility/runs` → `runGraderDiagnostic` → `executeGraderRun`), y sin ese registro el transporte LANZA en cuanto viene `organizationId`; el `catch` del adapter lo convertiría en observación `failed`, perdiendo AI Mode justo para los perfiles de cliente que la atribución existe para cubrir. Cualquier runtime nuevo repite el import: el throw es el recordatorio.
-- **Todo write provider-facing pasa por `enforceSeoRunEntitlement`** (`src/lib/growth/seo/entitlement.ts`) — chokepoint ÚNICO de entitlement + quota + budget. Limitación conocida: el gate se consulta UNA vez y el gasto se acumula después; para batches grandes pasar `estimatedCostUsd` del batch completo y re-consultar cada K llamadas (`entitlement.ts:288-307`).
+- **Todo POST pagado pasa por el gate de su consumer:** SEO usa `enforceSeoRunEntitlement`
+  (`src/lib/growth/seo/entitlement.ts`) y AEO usa `resolveAeoBudget`; ambos convergen en el ledger compartido con
+  `consumer` explícito. Ningún caller inventa un tercer presupuesto. Para batches, estimar el total y revalidar antes
+  de cada paso nuevo; el gasto se registra después de la respuesta y no existe reserva transaccional en el proveedor.
 - 🔴 **El gate protege la corrida que gasta, NO la decisión que la agranda.** `trackKeywords`/`untrackKeywords` (`src/lib/growth/seo/track-keywords.ts`, TASK-1308) no llaman al proveedor ni escriben el ledger, pero **seguir una keyword es un compromiso de gasto diferido**: el rank capture diario paga por cada keyword vigente del set, en cada ciclo, hasta que alguien la deje de seguir. Por eso ese command lleva techo gobernado por target (`GROWTH_SEO_TRACKED_KEYWORDS_PER_TARGET`, default 200) con outcome **por keyword** (`tracked|already_tracked|intent_changed|capacity_exceeded|invalid`, nunca silencio ni excepción), entitlement per-ORG `seo_v2` (clave canónica desde `TASK-1677`; `seo_v1` ya no se lee) sin consumir allowance, idempotencia y **su reverso append-only** (`effective_to`, jamás DELETE). Al auditar costo, míralo: no aparece en ningún grep de `postDataForSeoTask`. Y desde `TASK-1659` una membresía puede declarar **por qué** existe (`intent`: `target|opportunity`): **sin default** —quien no declara escribe `NULL`, y asumir `opportunity` inventa una clasificación que nadie hizo—, **ortogonal a `source`**, y cambiarla **NO es un `UPDATE`** sino cerrar la membresía vigente y abrir otra, sin consumir cupo del techo. Detalle: `../../../.claude/skills/dataforseo-operator/references/07-contrato-greenhouse.md` §5b.
 - **NUNCA reads live-per-view contra DataForSEO en el render de un dashboard** — los reads pegan a snapshots PG; la captura corre async vía Cloud Scheduler + ops-worker, nunca Vercel cron (arch SEO §1.1/§8).
 - **GSC = verdad de primera parte (●), DataForSEO = estimado de mercado (◑)** — lentes complementarias, nunca promediadas. Degradación honesta: audit con 0 findings ≠ crawl fallido; nunca fabricar snapshot ni `$0` fantasma.
@@ -205,13 +208,17 @@ gobierna transporte, catálogo, lifecycle, seguridad y límites.
   los presets no son el límite de la API.
 - Compone `ai-research` desde un panel versionado. Las lanes de API y consumer surface permanecen separadas y la
   matriz normaliza citas, `fan_out_queries`, `brand_entities`, plataforma, modelo, mercado, costo y evidencia.
+- Compara cualquier marca o entidad con `serp-compare`: una entidad declara label, aliases y uno o más dominios.
+  Compra una captura por query/dispositivo, no por entidad, y separa orgánico, mención, enlace AI, cita AI y
+  Shopping opcional. Retail es sólo un caso; no presupongas industria ni superficie comercial.
 
 ### Flujo obligatorio
 
 1. Descubre: `pnpm dataforseo -- catalog search "<capacidad>"`.
 2. Lee contrato y autorización: `pnpm dataforseo -- catalog describe <id|path>`.
 3. Previsualiza sin gasto: `pnpm dataforseo -- quick <preset> ... --dry-run`, `research ... --dry-run`,
-   `ai-research --panel panel.json --dry-run` o `run <id|path> --file payload.json --dry-run`.
+   `serp-compare --panel panel.json --dry-run`, `ai-research --panel panel.json --dry-run` o
+   `run <id|path> --file payload.json --dry-run`.
 4. Ejecuta sólo después del preview con `--yes`. Todo POST pagado sin estimador integrado exige
    `--estimated-usd` y `--max-usd`; todo POST de familia distinta de SERP exige además `--org`. En
    `ai_optimization`, declara `consumer='aeo'`; en investigación SEO, `consumer='seo'`.
@@ -221,6 +228,34 @@ gobierna transporte, catálogo, lifecycle, seguridad y límites.
    con `--approve-ranked-finalists`. `--yes` no reemplaza ese checkpoint editorial.
 7. Conserva evidencia con `--out` y `--csv`. Los archivos se crean de forma exclusiva: una ruta ya existente
    falla en vez de sobrescribirse.
+
+### Caso de validación multisuperficie — retail Chile
+
+El 2026-09-28 se ejecutaron dos SERP Live Advanced independientes para `iphone 18 pro max`, Chile
+(`location_code=2152`), español, desktop, a USD 0,002 cada una. En la primera, Falabella fue orgánico #3
+(`rank_absolute=4`); cinco minutos después fue orgánico #4 (`rank_absolute=6`). Paris no apareció entre los ocho
+orgánicos capturados, pero sí como enlace del AI Overview y como oferta Shopping. Ambas tiendas aparecieron como
+enlaces comerciales del bloque AI, no como `ai_overview_reference`. Ese AI Overview llegó con
+`asynchronous_ai_overview=false`; al no pedir `load_async_ai_overview`, es evidencia de la caché devuelta por el
+proveedor, no prueba de la interfaz de Google en ese mismo instante.
+
+Reglas que deja el smoke:
+
+- Reporta `rank_group` como posición dentro de orgánico y `rank_absolute` como posición entre todos los bloques.
+- Si el dominio no está en el depth capturado, usa `not_observed_in_captured_organic`; nunca inventes “posición 9”.
+- `link_element`, `knowledge_graph_shopping_element` y `ai_overview_reference` son presencias distintas; no las
+  colapses en “citado por IA”.
+- Rotula el AI Overview como `cached_provider_result` salvo que el request haya pedido carga asíncrona; el éxito
+  orgánico no vuelve actual una respuesta AI cacheada.
+- Una SERP Live es una observación fechada. Para una conclusión de posicionamiento, repite por dispositivo,
+  ubicación y tiempo, y conserva el panel de queries branded/unbranded.
+- Estas reglas son transversales. Para otra industria usa `entities` con aliases y dominios; Shopping puede no
+  existir y nunca es requisito del comparador. Una mención textual sin link tampoco es una cita.
+
+Smoke del comando transversal: task `09281144-1987-0139-0000-483a6615ee43`, USD 0,002, Chile/desktop/depth 10.
+Una sola task produjo dos filas: Falabella orgánico `rank_group=3`/`rank_absolute=5`; Paris
+`not_observed_in_captured_organic`. Ambas fueron sólo mención textual en el AI Overview cacheado de esa captura,
+sin enlace ni cita atribuible. Esto confirma que la matriz no arrastra señales de una ejecución anterior.
 
 Ejemplo mínimo de minería reproducible:
 
@@ -237,8 +272,9 @@ Para research AI, consulta primero el endpoint `/models` gratuito de la platafor
 preset o panel de `ai-research` y conserva superficies separadas. Los GET de modelos/catálogos/polling no exigen organización; todo POST
 real de `ai_optimization` exige `--org`, entitlement, `--estimated-usd`, `--max-usd` y `--yes`. AI Keyword Data es
 un proxy ◑ estimado y LLM Mentions ChatGPT sólo cubre US/en; no los presentes como demanda LLM universal.
-Hasta aplicar y verificar la migración `20260928095506879_task-1651-ai-optimization-family.sql`, los GET y previews
-AI están disponibles, pero los POST pagados no se declaran operativos en staging ni producción.
+La migración `20260928095506879_task-1651-ai-optimization-family.sql` está aplicada y validada; los POST pagados
+siguen exigiendo organización, presupuesto AEO, ceiling y ledger. Eso habilita el carril gobernado, no una captura
+recurrente ni todas las combinaciones de proveedor/modelo.
 
 El snapshot `data/dataforseo/endpoints.v3.json` se regenera desde las páginas concretas y el REST oficial con
 `pnpm dataforseo:catalog:sync`; `pnpm dataforseo:catalog:check` detecta drift. Nunca uses la visibilidad del

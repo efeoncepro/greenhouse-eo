@@ -1,5 +1,13 @@
 # TASK-1935 — CLI diaria y catálogo completo de DataForSEO
 
+## Delta 2026-09-28 — comparación SERP transversal
+
+`serp-compare` agrega paneles reproducibles multi-query y desktop/mobile para cualquier marca o entidad, definida
+por aliases y uno o más dominios. Compra un SERP por query/dispositivo y compara localmente todas las entidades;
+exporta raw + matriz JSON/CSV, distingue orgánico, mención, enlace AI, cita AI y Shopping, declara profundidad y
+frescura, y no fabrica posiciones. `quick organic` transmite ahora target, depth y carga asíncrona de AI Overview
+con estimación proporcional. Falabella/Paris fue el smoke de forma, no una restricción retail del contrato.
+
 ## Delta 2026-09-28 — registro exhaustivo de rutas habilitables
 
 El snapshot ahora genera también un registro auditable de las 225 rutas `catalog_only`: 216 rutas de cinco
@@ -58,7 +66,7 @@ posterior no reabre este scope.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Complete local: catálogo 545/320, research SEO/AI gobernado y reanudable; canary AI USD 0,0101 con resume sin recompra; sin push, deploy ni flags`
+- Status real: `Complete local: catálogo 545/320, research SEO/AI gobernado y reanudable, serp-compare transversal validado live USD 0,002; canary AI USD 0,0101 con resume sin recompra; sin push, deploy ni flags`
 - Rank: `TBD`
 - Domain: `growth|seo|platform|ops`
 - Blocked by: `none`; coordina sin solapar con `TASK-1863` sobre `src/lib/growth/markets/`
@@ -351,6 +359,8 @@ N/A — cambio repo-only; no compra planes, no rota secretos y no despliega.
 - [x] SERP Standard es default; live y AI Overview son opt-in, y polling nunca resubmite.
 - [x] `ai-research` separa API/consumer y normaliza citas, fan-out, entidades, plataforma, modelo y costo.
 - [x] Las 225 rutas `catalog_only` quedan registradas exhaustivamente con uso eventual y gate, sin habilitarlas.
+- [x] `serp-compare` reutiliza una captura por query/dispositivo para marcas o entidades con aliases/múltiples
+  dominios y exporta raw + matriz JSON/CSV sin fabricar posiciones ni asumir una industria.
 
 ## Verification
 

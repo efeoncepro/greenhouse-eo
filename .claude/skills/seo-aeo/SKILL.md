@@ -279,6 +279,9 @@ Grupo Berel):
   - `ai-research`: ejecuta un panel reproducible multi-plataforma y conserva lanes
     separadas de API y consumer surface. Normaliza citas, fan-out, entidades, modelo,
     mercado, costo y procedencia; no lo presentes como captura recurrente de producto.
+  - `serp-compare`: compara transversalmente marcas o entidades definidas por aliases y
+    uno o más dominios. Reutiliza cada SERP por query/dispositivo para todas las entidades
+    y separa orgánico, mención, enlace AI, cita AI y Shopping opcional. No presupone retail.
   - `quick`: usa un preset para preguntas rutinarias y revisables como organic SERP,
     keyword overview, ranked keywords, competidores, backlinks, OnPage, AI Mode,
     LLM Responses/Scraper, AI Keyword Data o LLM Mentions. Empieza con `--dry-run`.
@@ -303,6 +306,18 @@ Grupo Berel):
   otra. Del mismo modo, una mención/cita en un motor o superficie AI no prueba
   presencia en otro: compara plataformas sólo con paneles equivalentes y reporta
   cobertura y limitaciones de cada fuente.
+
+  **Caso de validación retail (2026-09-28):** dos capturas Live Advanced para
+  `iphone 18 pro max` en Chile/desktop mostraron a Falabella moviéndose de orgánico
+  #3 a #4 en cinco minutos; Paris no apareció entre los ocho orgánicos capturados,
+  aunque sí como enlace del AI Overview y oferta Shopping. Por eso un entregable debe
+  separar posición orgánica (`rank_group`), posición absoluta, enlace AI, cita AI y
+  Shopping. “No observado en el depth capturado” no es una posición ni ausencia en Google.
+  El AI Overview de esas capturas llegó con `asynchronous_ai_overview=false` y sin
+  `load_async_ai_overview`: rotúlalo como caché del proveedor, no como UI actual.
+  Una conclusión competitiva requiere panel branded/unbranded, mobile/desktop y serie temporal.
+  La misma lectura aplica a cualquier sector mediante entidades, aliases y dominios; Shopping
+  es una señal opcional, no parte obligatoria del modelo.
 
 - **Semrush MCP** — keyword research, organic research, backlink research, site
   audit, trends, overview. Úsalo para _datos reales_ en vez de estimar cuando

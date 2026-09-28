@@ -21,6 +21,14 @@ import {
   isDataForSeoCliPreset
 } from '@/lib/ai/dataforseo-cli-presets'
 import {
+  buildDataForSeoSerpCompareTasks,
+  dataForSeoSerpCompareRowsToCsv,
+  estimateDataForSeoSerpCompareCost,
+  normalizeDataForSeoSerpCompareResponse,
+  parseDataForSeoSerpComparePanel,
+  type DataForSeoSerpComparePanel
+} from '@/lib/ai/dataforseo-serp-compare'
+import {
   buildKeywordOverviewTasks,
   buildKeywordResearchDiscoveryRequests,
   buildKeywordResearchPlan,
@@ -104,6 +112,15 @@ const flag = (flags: Flags, name: string): string | undefined => {
   return Array.isArray(value) ? value.at(-1) : typeof value === 'string' ? value : undefined
 }
 
+const flagValues = (flags: Flags, name: string) => {
+  const value = flags[name]
+
+  if (Array.isArray(value)) return value
+  if (typeof value === 'string') return [value]
+
+  return []
+}
+
 const numberFlag = (flags: Flags, name: string): number | undefined => {
   const value = flag(flags, name)
 
@@ -149,7 +166,7 @@ Consultas rápidas
   pnpm dataforseo -- quick chatgpt-scraper|gemini-scraper --keyword "..." --market MX --dry-run
   pnpm dataforseo -- quick ai-keyword-volume --keyword "uno,dos" --market CL --dry-run
   pnpm dataforseo -- quick llm-mentions --target ejemplo.com --platform google --market CL --dry-run
-  pnpm dataforseo -- quick organic --keyword "..." --market US --locale en-US --yes --max-usd 0.01
+  pnpm dataforseo -- quick organic --keyword "..." --market US --locale en-US --target example.com --depth 20 --load-ai-overview --yes --max-usd 0.01
   pnpm dataforseo -- quick keyword-overview --keyword "uno,dos" --market PE --org <uuid> --estimated-usd <n> --max-usd <n> --yes
   pnpm dataforseo -- quick ranked-keywords|competitors|backlinks|onpage-instant|onpage-audit --target <dominio|url> ...
 
@@ -160,6 +177,11 @@ Research compuesto
   SERP usa --serp-mode standard por defecto; live y --load-ai-overview son opt-in.
   Antes de SERP exige --finalists-file decisiones.json o --approve-ranked-finalists explícito.
   --max-pages, --page-size, --cache-max-age-hours y --resume controlan paginación y recuperación.
+
+Comparación SERP reproducible
+  pnpm dataforseo -- serp-compare --query "..." --targets falabella.com,paris.cl --devices desktop,mobile --market CL --depth 20 --dry-run
+  pnpm dataforseo -- serp-compare --panel panel.json --max-usd 0.02 --yes --out comparison.json --csv comparison.csv
+  Una captura por query/dispositivo se reutiliza para todos los targets; --load-ai-overview duplica el costo SERP.
 
 Research AI compuesto
   pnpm dataforseo -- ai-research --panel panel.json --dry-run
@@ -284,6 +306,10 @@ const execute = async (input: {
   estimatedCostUsd: number | null
   defaultConsumer?: 'seo' | 'aeo'
   taskId?: string
+  surface?: string
+  previewExtra?: Record<string, unknown>
+  buildResult?: (tasks: unknown[]) => unknown
+  buildCsv?: (result: unknown) => string
 }) => {
   const { endpoint, tasks, flags } = input
   const organizationId = flag(flags, 'org')
@@ -321,6 +347,7 @@ const execute = async (input: {
   const preview = {
     ok: true,
     dryRun,
+    surface: input.surface ?? 'dataforseo-cli',
     endpoint: { id: endpoint.id, method: endpoint.method, path: resolvedEndpoint },
     family: endpoint.execution.internalFamily,
     organizationId: endpoint.method === 'POST' ? (organizationId ?? null) : null,
@@ -331,7 +358,8 @@ const execute = async (input: {
     estimatedCostUsd: estimatedUsd,
     estimateStatus: estimatedUsd === null ? 'unavailable' : 'available',
     maxUsd: maxUsd ?? null,
-    source: { documentationUrl: endpoint.documentationUrl, sourceModifiedAt: endpoint.sourceModifiedAt }
+    source: { documentationUrl: endpoint.documentationUrl, sourceModifiedAt: endpoint.sourceModifiedAt },
+    ...input.previewExtra
   }
 
   if (dryRun) {
@@ -380,11 +408,13 @@ const execute = async (input: {
   const taskCodes = summarizeTaskCodes(response.tasks)
   const outcome = classifyDataForSeoOutcome({ httpOk: response.ok, taskCodes })
 
+  const normalizedResult = input.buildResult?.(response.tasks)
+
   const artifact = {
     ok: outcome.kind === 'success',
     outcome: outcome.kind,
     queriedAt: new Date().toISOString(),
-    surface: 'dataforseo-cli',
+    surface: input.surface ?? 'dataforseo-cli',
     request: preview,
     response: {
       httpStatus: response.httpStatus,
@@ -393,14 +423,64 @@ const execute = async (input: {
       taskCodes,
       costUsd: response.cost,
       tasks: response.tasks
-    }
+    },
+    ...(normalizedResult === undefined ? {} : { result: normalizedResult })
   }
 
   const output = flag(flags, 'out')
+  const csv = flag(flags, 'csv')
 
   if (output) await writeFile(output, `${JSON.stringify(artifact, null, 2)}\n`, { flag: 'wx' })
+
+  if (csv && input.buildCsv && normalizedResult !== undefined) {
+    await writeFile(csv, input.buildCsv(normalizedResult), { flag: 'wx' })
+  }
+
   printJson(artifact)
   process.exitCode = outcome.exitCode
+}
+
+const parseCommaSeparated = (values: string[]) =>
+  values
+    .flatMap(value => value.split(','))
+    .map(value => value.trim())
+    .filter(Boolean)
+
+const loadSerpComparePanel = async (flags: Flags): Promise<DataForSeoSerpComparePanel> => {
+  const panelPath = flag(flags, 'panel')
+
+  if (panelPath) return parseDataForSeoSerpComparePanel(JSON.parse(await readFile(panelPath, 'utf8')))
+
+  return parseDataForSeoSerpComparePanel({
+    version: 1,
+    market: flag(flags, 'market') ?? 'CL',
+    locale: flag(flags, 'locale'),
+    queries: parseCommaSeparated([...flagValues(flags, 'query'), ...flagValues(flags, 'keyword')]),
+    targets: parseCommaSeparated([...flagValues(flags, 'target'), ...flagValues(flags, 'targets')]),
+    devices: parseCommaSeparated(flagValues(flags, 'devices').length > 0 ? flagValues(flags, 'devices') : ['desktop']),
+    depth: numberFlag(flags, 'depth') ?? 10,
+    loadAiOverview: boolFlag(flags, 'load-ai-overview')
+  })
+}
+
+const runSerpCompare = async (flags: Flags) => {
+  const panel = await loadSerpComparePanel(flags)
+  const endpoint = findDataForSeoEndpoint('/v3/serp/google/organic/live/advanced')
+
+  if (!endpoint) throw new Error('El catálogo no contiene Google Organic live/advanced.')
+
+  return execute({
+    endpoint,
+    tasks: buildDataForSeoSerpCompareTasks(panel),
+    flags,
+    estimatedCostUsd: estimateDataForSeoSerpCompareCost(panel),
+    defaultConsumer: 'seo',
+    surface: 'dataforseo-serp-compare',
+    previewExtra: { panel },
+    buildResult: tasks => ({ panel, rows: normalizeDataForSeoSerpCompareResponse({ tasks, panel }) }),
+    buildCsv: result =>
+      dataForSeoSerpCompareRowsToCsv((result as { rows: ReturnType<typeof normalizeDataForSeoSerpCompareResponse> }).rows)
+  })
 }
 
 type ResearchStepArtifact = {
@@ -1250,6 +1330,8 @@ const run = async () => {
       market: flag(flags, 'market'),
       locale: flag(flags, 'locale'),
       device: flag(flags, 'device'),
+      depth: numberFlag(flags, 'depth'),
+      loadAiOverview: boolFlag(flags, 'load-ai-overview'),
       limit: numberFlag(flags, 'limit'),
       maxCrawlPages: numberFlag(flags, 'max-crawl-pages'),
       prompt: flag(flags, 'prompt'),
@@ -1261,13 +1343,20 @@ const run = async () => {
       platform: flag(flags, 'platform')
     })
 
-    const estimate = preset.estimatePerTaskUsd === null ? null : preset.estimatePerTaskUsd * tasks.length
+    const estimate =
+      preset.estimatePerTaskUsd === null
+        ? null
+        : preset.estimatePerTaskUsd *
+          tasks.length *
+          (subcommand === 'organic' ? Math.ceil((numberFlag(flags, 'depth') ?? 10) / 10) : 1) *
+          (subcommand === 'organic' && boolFlag(flags, 'load-ai-overview') ? 2 : 1)
 
     return execute({ endpoint, tasks, flags, estimatedCostUsd: estimate, defaultConsumer: preset.consumer })
   }
 
   if (command === 'research') return runKeywordResearch(flags)
   if (command === 'ai-research') return runAiResearch(flags)
+  if (command === 'serp-compare') return runSerpCompare(flags)
 
   if (command === 'run') {
     const endpoint = subcommand ? findDataForSeoEndpoint(subcommand) : null

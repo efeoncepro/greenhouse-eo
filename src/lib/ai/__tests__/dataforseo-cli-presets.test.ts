@@ -38,6 +38,29 @@ describe('DataForSEO CLI presets', () => {
     ])
   })
 
+  it('adds bounded organic depth, target and explicit asynchronous AI Overview loading', () => {
+    expect(
+      buildDataForSeoPresetPayload({
+        preset: 'organic',
+        keyword: 'iphone 18 pro max',
+        market: 'CL',
+        target: 'paris.cl',
+        depth: 20,
+        loadAiOverview: true
+      })
+    ).toEqual([
+      {
+        keyword: 'iphone 18 pro max',
+        location_code: 2152,
+        language_code: 'es',
+        device: 'desktop',
+        target: 'paris.cl',
+        depth: 20,
+        load_async_ai_overview: true
+      }
+    ])
+  })
+
   it('builds bounded LLM response research requests from a live model chosen by the operator', () => {
     expect(
       buildDataForSeoPresetPayload({

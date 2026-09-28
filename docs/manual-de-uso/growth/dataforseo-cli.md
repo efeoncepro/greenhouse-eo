@@ -101,6 +101,57 @@ pnpm dataforseo -- quick onpage-audit --target example.com --org <uuid> --max-cr
 Los presets sin estimador oficial verificable exigen `--estimated-usd` y `--max-usd` al ejecutar. El preview no
 los exige y siempre muestra `estimateStatus: unavailable` cuando corresponde; nunca imprime un costo inventado.
 
+### Comparar cualquier marca o entidad en una SERP
+
+La forma corta compara dominios sobre el mismo conjunto de SERPs:
+
+```bash
+pnpm dataforseo -- serp-compare \
+  --query "iphone 18 pro max" \
+  --targets falabella.com,paris.cl \
+  --devices desktop,mobile \
+  --market CL \
+  --depth 20 \
+  --load-ai-overview \
+  --dry-run
+```
+
+No es un comando retail. Para cualquier marca, producto, institución o persona usa un panel con aliases y varios
+dominios. Copia
+[`dataforseo-serp-compare-panel.example.json`](dataforseo-serp-compare-panel.example.json) y reemplaza las
+entidades y consultas. Incluye queries branded y no branded cuando la pregunta lo requiera.
+
+```bash
+pnpm dataforseo -- serp-compare \
+  --panel docs/manual-de-uso/growth/dataforseo-serp-compare-panel.example.json \
+  --dry-run
+
+pnpm dataforseo -- serp-compare \
+  --panel /tmp/serp-panel.json \
+  --max-usd 0.05 \
+  --yes \
+  --out /tmp/serp-comparison.json \
+  --csv /tmp/serp-comparison.csv
+```
+
+El costo se calcula por `queries × devices × bloques de depth`; las entidades no agregan requests porque se
+comparan localmente sobre cada respuesta. `--load-ai-overview` duplica el costo del SERP. El preview debe mostrar
+tasks, multiplicadores, mercado y panel antes de confirmar.
+
+Lee la matriz así:
+
+- `organicStatus=observed` habilita `organicRankGroup` y `organicRankAbsolute`; si no, el estado exacto es
+  `not_observed_in_captured_organic`, junto con `capturedOrganicCount` y `maxCapturedOrganicRank`.
+- `aiMention`, `aiDirectLink` y `aiCitation` son señales diferentes. Una mención sin enlace no es una cita.
+- `shoppingObserved` es opcional y sólo aplica cuando el SERP trae esa superficie; no define el modelo.
+- `aiFreshness=cached_provider_result` indica que no se pidió carga asíncrona. No lo presentes como evidencia de
+  la UI de Google en ese instante. `async_requested` sólo describe el request, no estabilidad temporal.
+- `signals` resume brechas observables para investigación. No demuestra causa: valida crawl, canonical, schema,
+  contenido, feeds y cobertura propia antes de convertirla en recomendación.
+
+Para una serie temporal, vuelve a ejecutar el mismo panel y conserva artefactos con fecha. La CLI no agenda ni
+repite compras automáticamente. No sobrescribe salidas existentes: `--out` y `--csv` usan creación exclusiva.
+
 ### Elegir el carril correcto
 
 | Necesidad                                                | Entrada recomendada                           | Familia / observación                                                |

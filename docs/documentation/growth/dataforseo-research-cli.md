@@ -33,6 +33,19 @@ plataforma, modelo, mercado, fecha, respuesta, citas, fan-out, entidades, mencio
 La disponibilidad de una ruta no demuestra cobertura universal: modelo, plataforma, idioma y mercado deben quedar
 declarados. Mentions, Scraper y Responses observan productos distintos y no son intercambiables.
 
+### Comparación de marcas o entidades en SERP
+
+`serp-compare` ejecuta un panel reproducible de consultas y dispositivos y reutiliza cada SERP para todas las
+entidades comparadas. Sirve de forma transversal para empresas, productos, instituciones, personas o retailers:
+la entidad se define por nombre, aliases y uno o más dominios. La salida JSON conserva el raw y la matriz; CSV
+facilita el análisis.
+
+Orgánico, mención textual en AI Overview, enlace directo, cita formal y Shopping son dimensiones distintas.
+Shopping sólo aparece si el SERP lo trae. “No observado” se limita al bloque orgánico y profundidad capturados;
+no significa ausencia en Google ni autoriza inferir la siguiente posición. Sin carga asíncrona explícita, el AI
+Overview se etiqueta como resultado cacheado por el proveedor. Las señales de brecha son hipótesis para crawl,
+contenido, schema, canonicals o feeds; requieren validación sobre la propiedad antes de recomendar cambios.
+
 ## Gobernanza y estados
 
 - Preview no compra: muestra requests, superficies y estimación.

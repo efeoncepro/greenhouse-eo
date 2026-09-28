@@ -105,6 +105,33 @@ Cada resultado trae `rank_group`, `rank_absolute`, `page`, `position` (left/righ
 - **Advanced**: SERP completo con todos los item types de arriba → necesario para SoV, AI Overview y análisis de features.
 - **HTML**: página cruda para parsing propio o archivo/evidencia.
 
+### 3.4 Caso de validación multisuperficie: Falabella vs Paris
+
+Evidencia live del 2026-09-28 para la query genérica `iphone 18 pro max`, Google Chile
+(`location_code=2152`), `language_code=es`, desktop, Organic Live Advanced:
+
+| Captura UTC | Task | Orgánico Falabella | Orgánico Paris | Otras superficies | Costo |
+| --- | --- | --- | --- | --- | ---: |
+| 11:29:15 | `09281129-1987-0139-0000-e6c0ebe8ceb2` | `rank_group=3`, `rank_absolute=4` | No observado entre 7 orgánicos | Ambos enlazados en AI Overview cacheado y presentes en Shopping | USD 0,002 |
+| 11:34:36 | `09281134-1987-0139-0000-1f9bbed510af` | `rank_group=4`, `rank_absolute=6` | No observado entre 8 orgánicos | Ambos enlazados en AI Overview cacheado y presentes en Shopping | USD 0,002 |
+
+Los enlaces de Falabella y Paris estaban en `link_element` del AI Overview, pero no en
+`ai_overview_reference`; por tanto son inclusión comercial/directa, no cita atribuida. Paris sí tenía
+`knowledge_graph_shopping_element` con producto, precio y stock, aunque no blue link orgánico en el depth devuelto.
+El request no pidió `load_async_ai_overview` y el bloque devolvió `asynchronous_ai_overview=false`: esta porción es
+evidencia de la caché de DataForSEO, no de la UI de Google en el instante de la captura.
+La variación de Falabella en cinco minutos demuestra que Live es un snapshot: no promover una captura a “ranking
+estable”. Persistir query, mercado, idioma, device, instante, task ID, depth observado y ambas posiciones.
+
+El caso valida la forma del parser, no un modelo retail. `serp-compare` acepta entidades de cualquier sector con
+`label`, `aliases` y múltiples `domains`; la presencia Shopping es opcional. En sectores sin commerce se conservan
+orgánico, menciones, enlaces y citas sin fabricar una señal comercial.
+
+El smoke del nuevo comando (`09281144-1987-0139-0000-483a6615ee43`, USD 0,002, depth 10) reutilizó una sola task
+para Falabella y Paris. Falabella quedó orgánico #3 (`rank_absolute=5`); Paris no fue observado entre siete
+orgánicos. En esa captura ambos fueron mención textual, no enlace ni cita AI. El cambio respecto de las capturas
+anteriores es volatilidad/evidencia nueva, no contradicción que deba “normalizarse”.
+
 ---
 
 ## 4. AI Mode y AI Overview (AEO)

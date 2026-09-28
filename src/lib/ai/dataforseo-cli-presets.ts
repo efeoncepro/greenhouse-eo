@@ -111,6 +111,8 @@ export const buildDataForSeoPresetPayload = (input: {
   market?: string
   locale?: string
   device?: string
+  depth?: number
+  loadAiOverview?: boolean
   limit?: number
   maxCrawlPages?: number
   prompt?: string
@@ -129,12 +131,19 @@ export const buildDataForSeoPresetPayload = (input: {
   if (input.preset === 'organic' || input.preset === 'ai-mode') {
     if (!input.keyword?.trim()) throw new Error(`El preset ${input.preset} exige --keyword.`)
 
+    if (input.depth !== undefined && (!Number.isInteger(input.depth) || input.depth < 1 || input.depth > 200)) {
+      throw new Error('--depth debe ser un entero entre 1 y 200.')
+    }
+
     return [
       {
         keyword: input.keyword.trim(),
         location_code: location,
         language_code: input.preset === 'ai-mode' ? market.googleAiModeLanguageCode : market.language,
-        device: input.device ?? 'desktop'
+        device: input.device ?? 'desktop',
+        ...(input.preset === 'organic' && input.target?.trim() ? { target: input.target.trim() } : {}),
+        ...(input.preset === 'organic' && input.depth !== undefined ? { depth: input.depth } : {}),
+        ...(input.preset === 'organic' && input.loadAiOverview ? { load_async_ai_overview: true } : {})
       }
     ]
   }

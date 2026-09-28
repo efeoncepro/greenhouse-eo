@@ -9,6 +9,10 @@
 
 ## 2026-09-28 — DataForSEO tiene CLI diaria y catálogo oficial reproducible (TASK-1935)
 
+- `serp-compare` compara cualquier marca o entidad mediante aliases y múltiples dominios sobre una sola captura
+  por query/dispositivo. Exporta raw + JSON/CSV y separa orgánico, mención, enlace AI, cita AI y Shopping opcional;
+  explicita depth y frescura sin fabricar posiciones. `quick organic` ya transmite target/depth/AI Overview.
+
 - Delta: `pnpm dataforseo -- research` encadena minería Labs, gobernanza explícita de finalistas, enriquecimiento
   SERP Standard y una matriz JSON/CSV con intención, cobertura, competidores, features, PAA, citas y procedencia.
   Pagina y reanuda por checkpoint sin recomprar pasos; `keyword_ideas` y AI Overview quedan opt-in.
@@ -30,7 +34,8 @@
   Analysis para brand monitoring y Business Data acotada para SEO local/reputación; Keywords Data queda condicional
   y Merchant/App Data esperan un caso real.
 - Smokes reales: catálogo AI Mode gratuito (USD 0), AI Mode Perú con `location_code=2604` (USD 0,004) y Organic Chile
-  (USD 0,002), todos con task `20000`. Commit local; sin push, deploy ni cambio de flags.
+  (USD 0,002), todos con task `20000`; `serp-compare` reutilizó una task Chile/desktop para dos entidades por
+  USD 0,002 y mantuvo separados orgánico, mención, enlace y cita. Commit local; sin push, deploy ni cambio de flags.
 
 ## 2026-09-28 — Ruta gobernada para producir piezas de marca en la plataforma (TASK-1921) y Grader por mercado (TASK-1863)
 
