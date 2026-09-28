@@ -158,7 +158,9 @@ En este orden, porque cada paso descarta una clase entera:
    configured` significa que el correo nunca salió y no hay nada que diagnosticar en Resend. Esa fila
    —`status`, `provider_status`, `error_message`— es la única evidencia observable del envío; el 2xx del
    endpoint que lo dispara no prueba nada, y menos si es indistinguible por diseño (magic link: 202
-   idéntico exista o no la cuenta).
+   idéntico exista o no la cuenta). Busca la fila por `source_entity` + `source_event_id` (+
+   `recipient_email`) o por `batch_id`: `sendEmail().deliveryId` puede ser el id del batch y no el
+   `delivery_id` (contrato en `greenhouse-email` → «Delta 2026-09-28»).
 1. **¿Está suprimida la dirección?** `GET /suppressions/{email}` (acepta email, no sólo id). Si lo
    está, ningún reintento va a funcionar y el envío devolvió éxito igual.
 2. **¿Qué dice el proveedor?** `GET /emails/{id}` → `last_event`. Ojo: es un **escalar**, no un

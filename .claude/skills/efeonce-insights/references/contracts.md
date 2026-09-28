@@ -123,6 +123,13 @@ the ones in `sharing/`, `delivery/`, `schedules/` and the lanes.
 - Status codes: `404` unknown, malformed, expired, flag OFF, org suspended or module retired (indistinguishable);
   `410` revoked or edition withdrawn; `429` rate limit (per IP 300 view / 60 download per minute; per grant 60 / 20;
   FAILS CLOSED if the DB does not answer); `503` sanitized.
+- **Two different 429s (TASK-1876, code complete 2026-09-28, WAF apply pending).** In front of every `/api/public/**`
+  route there is a Vercel Firewall rate limit: 20 req / 10 s per IP (`src/lib/security/public-burst-guard/firewall-rules.ts`,
+  synced by `pnpm security:public-burst-guard [--apply]`). `enforce` in staging/preview, `observe` (log only) in
+  production. An edge 429 never invokes the function nor opens a PG connection, so it carries NO domain body
+  (`{ error, code: 'rate_limited' }`), NO domain `Retry-After: 60` and NO `rate_limited` access event. The domain 429
+  (per IP / per grant limits above, from `sharing/http.ts`) is still behind it, unchanged. Think's server-side consumer
+  (TASK-1875) is exempted with an explicit condition in those rules, never by raising the limit for everyone.
 - Headers on every answer: `Cache-Control: private, no-store, max-age=0`, `Pragma: no-cache`, `Referrer-Policy: no-referrer`,
   `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `X-Robots-Tag: noindex, nofollow, noarchive`,
   CSP `default-src 'none'; frame-ancestors 'none'`. Deliberately NOT the Grader's `public, max-age=300`.
@@ -151,6 +158,13 @@ the ones in `sharing/`, `delivery/`, `schedules/` and the lanes.
   failed without dispatch_unknown ⇒ failed (grant revoked, retryable); pending/dispatch_unknown ⇒ unresolved unless
   `operatorDecision` + `reason`.
 - Email correlation per attempt: `source_event_id` = `idlr-<uuid>` (attempt 1) / `idlr-<uuid>:aN` (N=2..5).
+- `insight_delivery_recipients.email_delivery_id` = the `email_deliveries` row of THAT recipient, never the batch.
+  `share_link` stores the row claimed by `claimTokenSensitiveEmailIntent`; `attachment` resolves the row AFTER sending
+  via `readInsightDeliveryTransportForAttempt(source_event_id)` (fix `8882af0e3`, 2026-09-28). In the sequential
+  first-attempt path `sendEmail()` returns the batch id in BOTH `deliveryId` and `recipientResults[].deliveryId`, so
+  neither can be stored as the row (the earlier attempt `34d763460` used `recipientResults[0]` and did not fix it).
+  Rows written before the fix may point to a batch. Verified in real data: 1 `email_deliveries` row per recipient via
+  `source_event_id`, 0 duplicated keys.
 - `share_link` sends through the token-sensitive EmailType: the ShareGrant (`source=delivery`) is issued in the SAME
   transaction that claims the `email_deliveries` row (`claimTokenSensitiveEmailIntent`); the bearer lives only in memory
   for that send. A definitive failure revokes that grant; a retry issues a new one. The attachment EmailType is a separate,

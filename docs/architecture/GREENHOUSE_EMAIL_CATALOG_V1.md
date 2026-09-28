@@ -219,6 +219,31 @@ Y opera con dos caminos prácticos:
 - **single/sequential path** para envíos individuales o no-broadcast
 - **batch path** para broadcast multi-recipient cuando el caso aplica
 
+#### 3.1 Contrato de retorno de `sendEmail()`: batch ≠ fila (delta 2026-09-28, TASK-1848)
+
+Cada llamada genera un `batchId` (`randomUUID()`), persistido como `email_deliveries.batch_id`. No es el
+`delivery_id` de la fila. Contrato vigente (`src/lib/email/delivery.ts`, tipo `SendEmailResult` en
+`src/lib/email/types.ts`):
+
+| Campo | Qué contiene |
+| --- | --- |
+| `result.deliveryId` | Con exactamente un `recipientResults`: `recipientResults[0].deliveryId ?? batchId`. Con varios: el batch. Retornos tempranos (tipo pausado sin intent, sin destinatarios, fallo al resolverlos): el batch, sin fila creada. |
+| `recipientResults[].deliveryId` | La fila (`delivery_id`) **sólo** en: batch path de broadcast (captura `RETURNING delivery_id`), persistencia `token_sensitive` (intent pre-reclamado con `claimTokenSensitiveEmailIntent`) y reintento de una fila existente. En el sequential path estándar de primer intento (un destinatario, no-broadcast o con `attachments`) `deliverRecipient` devuelve `durableDeliveryId \|\| batchId` y descarta el id de `createDeliveryRow`: es el batch (también en `rate_limited` y `undeliverable`). |
+
+Regla: ningún dominio guarda `result.deliveryId` como referencia a una fila de `email_deliveries`, ni asume que
+`recipientResults[].deliveryId` lo es fuera de los tres caminos anteriores. La correlación canónica envío ↔ fila es
+`source_entity` + `source_event_id` (+ `recipient_email`), o `batch_id` + `recipient_email`. Si un dominio necesita
+el `delivery_id` real en un envío estándar, la corrección vive en `delivery.ts` (propagar el retorno de
+`createDeliveryRow`), no en el caller.
+
+Caso fuente: la modalidad `attachment` de Insights guardaba el batch en `insight_delivery_recipients.email_delivery_id`
+(staging 2026-09-28: `idlr-2984…` → `bb79bbb7…`; su correo real es `c4fb8f5c…`). El estado de transporte no se
+afectó porque se lee por `source_event_id`; ningún test lo detectó porque el mock de `sendEmail` no distinguía batch
+de fila. Un primer fix que leía `recipientResults?.[0]?.deliveryId` (`34d763460`) seguía recibiendo el batch en ese
+sequential path (su test pasaba con un mock que asumía la fila); el fix real (`8882af0e3`) resuelve la fila por
+`source_event_id`, verificado contra PG (`idlr-2984…` → `c4fb8f5c…`). Payroll
+(`src/lib/payroll/send-payslip-for-entry.ts`) usa su propio id y no depende de este campo.
+
 #### 4. Webhook de entregabilidad
 
 `POST /api/webhooks/resend` implementa en código, con rollout operativo gobernado por TASK-1745:

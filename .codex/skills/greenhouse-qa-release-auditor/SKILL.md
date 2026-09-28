@@ -286,6 +286,21 @@ las tres se veían bien hasta que alguien miró el runtime. Búscalas en el paso
    acceso a propósito y comprueba que la señal de sesión huérfana se prende — es (5),
    falsificar el test, aplicado a un detector de runtime.
 
+7. 🔴 **Un canary de límites NO se prueba con una ráfaga concurrente contra la
+   instancia PostgreSQL compartida.** Hay UNA instancia Cloud SQL para dev, staging y
+   producción: saturarla desde «staging» degrada producción. Caso fuente 2026-09-18
+   (ISSUE-174): un canary de TASK-1848 lanzó 64 requests concurrentes al lector público
+   de Insights y dejó 86–88 conexiones ociosas durante 5 min. **Regla:** las pruebas de
+   rate limit, cuota o carga van SECUENCIADAS; una ráfaga concurrente sólo con ventana
+   acordada con el operador. Desde TASK-1876 el límite de `/api/public/**` se prueba en
+   el borde (Firewall de Vercel, `enforce` en staging), no saturando la base. La
+   saturación se lee de la métrica nativa
+   `cloudsql.googleapis.com/database/postgresql/num_backends` (Cloud Monitoring; la señal
+   `runtime.postgres.connection_saturation` incorpora su pico de 24 h), no de
+   `pg_stat_activity` sola: esa consulta necesita una conexión y falla justo cuando la
+   instancia está llena. Mira
+   `num_backends` antes y después del canary; si subió y no volvió, el canary no es verde.
+
 ## CLI
 
 Use the repo helper. Running as Codex, always scope skill output with

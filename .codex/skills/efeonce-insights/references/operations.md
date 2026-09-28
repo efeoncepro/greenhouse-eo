@@ -180,6 +180,19 @@ flag, 202 after.
 Production flags stay OFF until the Think reader (TASK-1875) exists. ISSUE-174 (connection exhaustion by a concurrent
 burst on a public DB-backed route) is open → TASK-1876; weigh it before exposing the public reader to real traffic.
 
+**Edge guard (TASK-1876, code complete 2026-09-28, rollout pending):** `/api/public/**` — public reader and download
+proxy included — sits behind a Vercel Firewall rate limit of 20 req / 10 s per IP: `enforce` (429 at the edge, function
+not invoked, no PG connection) in staging/preview, `observe` (log only) in production. Rules versioned in
+`src/lib/security/public-burst-guard/firewall-rules.ts`; `pnpm security:public-burst-guard` prints the plan,
+`--apply` writes and re-reads (apply is the operator's). Vercel PG sessions also request `idle_session_timeout=60s`.
+The domain per-grant limit (429 + `Retry-After: 60`) stays behind the edge. When the Think server-side consumer
+(TASK-1875) lands, exempt it with an explicit condition in those rules — never by raising the limit. Diagnosis: a 429
+without the domain JSON body / `Retry-After` and without a `rate_limited` access event came from the edge.
+
+**No bursts against the shared instance.** Never measure limits with concurrent requests against a DB-backed route:
+there is ONE Cloud SQL instance for dev/staging/production and ISSUE-174 was born from a TASK-1848 canary that fired
+64 concurrent requests. Probe limits sequentially; the edge limit is proven in staging (enforce), not by saturating PG.
+
 - **EmailType kill switch:** `email_type_config` rows for `insights_edition_delivery` and
   `insights_edition_delivery_attachment` are seeded `enabled=false`. The table FAILS OPEN when a row is missing, so the
   seed is what keeps them off. Turning email on = flag ON in Vercel + ops-worker AND flip the row(s) to `enabled=true`;
@@ -204,7 +217,8 @@ Resend lifecycle webhook works (ISSUE-160), so "delivered" is confirmed by the r
 2. Needs an ISSUED client edition of the synthetic org "Greenhouse Demo" (`INSIGHTS_ISSUANCE_ENABLED` is OFF: issuing
    needs a human decision or a flag step in staging — decide before the canary).
 3. Share: create → success with `token` returned once; public `GET /api/public/insights/shared/<token>` → 200 + `no-store`
-   headers; download of an allowed output; revoke → next GET 410; unknown token → 404; burst beyond the rate limit → 429.
+   headers; download of an allowed output; revoke → next GET 410; unknown token → 404; burst beyond the rate limit → 429
+   (sequential requests, never concurrent; since TASK-1876 staging answers the edge 429 first at 20 req / 10 s per IP).
    Deny: an org without the module → 404.
 4. Delivery: request `share_link` to the synthetic client persona with the EmailType row enabled only for the canary;
    poll `GET …/deliveries/<id>` until `accepted`; replay with the same key → `idempotent: true`. Leave no ambiguous rows

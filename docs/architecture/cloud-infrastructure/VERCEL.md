@@ -53,12 +53,23 @@ Contrato vigente:
 | `GCP_WORKLOAD_IDENTITY_PROVIDER` | WIF provider resource name para Vercel OIDC |
 | `GCP_SERVICE_ACCOUNT_EMAIL` | Service account a impersonar desde Vercel vía WIF |
 | `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` | Cloud SQL Connector |
+| `GREENHOUSE_POSTGRES_MAX_CONNECTIONS`, `GREENHOUSE_POSTGRES_IDLE_TIMEOUT_MS` | Overrides opcionales del pool (defaults por runtime: Vercel max=3 / 10 s; Cloud Run max=15 / 30 s) |
+| `GREENHOUSE_POSTGRES_SESSION_IDLE_TIMEOUT_MS` | Override opcional del `idle_session_timeout` que el pool pide por conexión (default Vercel 60 s; `0` = default del rol; piso: idle del pool + 5 s). TASK-1876 |
 | `GOOGLE_APPLICATION_CREDENTIALS_JSON` / `_BASE64` | Fallback transicional (SA key) donde WIF no está activo |
 | `GREENHOUSE_POSTGRES_HOST` | TCP directo para CLI tooling (migrations, codegen) — no runtime |
 | `GREENHOUSE_POSTGRES_MIGRATOR_USER`, `..._PASSWORD` | Perfil migrator para `node-pg-migrate` |
 
 Los secretos críticos usan además el contrato `*_SECRET_REF` (Secret Manager → env fallback):
 ver [SECRETS.md](SECRETS.md).
+
+## Firewall (WAF) como código
+
+El Firewall de Vercel del proyecto se gobierna desde el repo, no desde el dashboard: las reglas
+del guard volumétrico de `/api/public/**` (20 req / 10 s por IP; `enforce` fuera de producción,
+`observe` en producción) viven en `src/lib/security/public-burst-guard/firewall-rules.ts` y se
+sincronizan con `pnpm security:public-burst-guard` (plan) / `--apply` (escribe y relee). Estado
+vivo 2026-09-28: sin configuración de firewall, `--apply` pendiente. Postura y detalle:
+`GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md` §3.3 (TASK-1876, ISSUE-174).
 
 ## Crons
 

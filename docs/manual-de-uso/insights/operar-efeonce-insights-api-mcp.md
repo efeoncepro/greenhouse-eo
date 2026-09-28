@@ -297,6 +297,11 @@ leer bytes). Sin sesión.
 | `429` | Rate limit: por IP 300 vistas/60 descargas por minuto, por grant 60/20. También si la base no responde (falla cerrado) |
 | `503` | Error interno sanitizado |
 
+> **Guard en el borde (TASK-1876, pendiente de aplicar):** delante de todo `/api/public/**` hay un límite del
+> Firewall de Vercel de 20 requests cada 10 s por IP. En staging/preview corta con `429` desde el borde; en
+> producción sólo registra (`observe`). Ese `429` no llega a Greenhouse: no trae el cuerpo JSON del dominio ni
+> `Retry-After: 60`, y no deja evento `rate_limited`. Ver «Problemas comunes».
+
 Verifica las cabeceras en cualquier canary: `Cache-Control: private, no-store, max-age=0`, `X-Robots-Tag: noindex,
 nofollow, noarchive`, `Referrer-Policy: no-referrer`. El access log (`insight_share_access_events`) registra resultado y
 tipo de cliente, nunca token ni IP; un hit **no** prueba lectura humana.
@@ -622,6 +627,8 @@ Códigos de rechazo de evidencia: `unsupported_window` (grano no servible; suele
 | Output `running` que no avanza | Worker caído o flag OFF en su revisión activa (señal `insights.render.orphaned_output`) | Verificar el Job y el flag en Cloud Run; los reclamos por lease vencido son automáticos si el worker corre. Un `running` **sin lease** no se reclama solo: decisión humana |
 | `failed` en `validating` con `evidence_rejected` | Un módulo requerido no aportó hechos | Revisar rechazos; pedir meses completos o `policy.allowPartial=true` explícito |
 | Edición > 30 min en una fase | Proceso caído (señal `insights.editions.stuck_generation`) | `recover` desde la fase |
+| `429` en el lector público **sin** cuerpo `{ "error", "code": "rate_limited" }` ni `Retry-After: 60` | Lo cortó el Firewall de Vercel en el borde (20 req / 10 s por IP, `enforce` en staging/preview); la función no se invocó y no hay evento en `insight_share_access_events` | Espera 10 s y secuencia las requests. No subas el límite: un consumidor server-side legítimo (Think, TASK-1875) se exceptúa con una condición explícita en `src/lib/security/public-burst-guard/firewall-rules.ts` + `pnpm security:public-burst-guard --apply` |
+| `429` en el lector público **con** `{ "code": "rate_limited" }` y `Retry-After: 60` | Límite del dominio: por IP 300 vistas / 60 descargas por minuto o por grant 60 / 20; también si la base no responde (falla cerrado) | Espera el minuto que indica `Retry-After`; si se repite sin tráfico, revisa la salud de PostgreSQL (`pnpm pg:doctor`) |
 
 ## Referencias técnicas
 

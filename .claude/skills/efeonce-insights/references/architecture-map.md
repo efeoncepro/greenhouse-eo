@@ -97,7 +97,7 @@ sharing/delivery/schedules flags OFF there (ON in staging); the four migrations 
 | Domain | `sharing/web-model.ts` + `contracts/web-model.ts` | `InsightWebModelV1` resolver and `InsightSharedEditionResponseV1` DTO for Think |
 | Domain | `delivery/contracts.ts` | modalities, states, skip reasons, transport statuses, honest rollup, per-attempt correlation, `INSIGHT_PORTAL_EDITION_ROUTE_AVAILABLE = false` |
 | Domain | `delivery/commands.ts` · `delivery/store.ts` | request / cancel / retry / reconcile / read deliveries |
-| Domain | `delivery/dispatch.ts` | `dispatchInsightDeliveryIntent`: atomic claim, revalidation, share_link or attachment send, accepted/failed/ambiguous |
+| Domain | `delivery/dispatch.ts` | `dispatchInsightDeliveryIntent`: atomic claim, revalidation, share_link or attachment send, accepted/failed/ambiguous; `email_delivery_id` = the recipient's `email_deliveries` row (attachment resolves it by `source_event_id` after sending, never the batch id — `8882af0e3`) |
 | Domain | `schedules/contracts.ts` · `schedules/commands.ts` · `schedules/store.ts` | create/activate/pause/retire/read schedules; DTO hides the authority user id |
 | Domain | `schedules/tick.ts` | `runInsightSchedulesTick`: authority revalidation via `session_360`, closed periods, occurrence claim, create edition + render, retention purge |
 | Domain | `window.ts` (extended) | `civilToday`, `resolveClosedInsightPeriods` (calendar month, ISO week, civil day in the zone) |
@@ -105,6 +105,7 @@ sharing/delivery/schedules flags OFF there (ON in staging); the four migrations 
 | Domain | `flags.ts` · `errors.ts` · `events.ts` · `authz.ts` · `ports.ts` | new flags, errors (`InsightsQuotaExceededError`, `*DisabledError`), events, needs `share_*`/`delivery_*`/`schedule_*` |
 | Public route | `src/app/api/public/insights/shared/[token]/route.ts` | JSON `InsightSharedEditionResponseV1` (404/410/429/503, `no-store`) |
 | Public route | `src/app/api/public/insights/shared/[token]/outputs/[output]/route.ts` | download proxy through `downloadPrivateAsset` with actor `null` + `insights_share_grant` channel, grant revalidated before bytes |
+| Edge guard (TASK-1876) | `src/lib/security/public-burst-guard/firewall-rules.ts` + `scripts/security/public-burst-guard.ts` (`pnpm security:public-burst-guard [--apply]`) | Vercel Firewall rate limit on `/api/public/**`, 20 req / 10 s per IP; enforce staging/preview, observe production; edge 429 before the function (no PG); domain limiter stays behind; Think (TASK-1875) exempted by explicit condition |
 | App lane | `…/app/insights/editions/[editionId]/shares`, `…/insights/shares/[shareGrantId]/revoke` | create/list/revoke links |
 | App lane | `…/app/insights/editions/[editionId]/deliveries`, `…/deliveries/[deliveryIntentId]{,/cancel,/retry}`, `…/delivery-recipients/[deliveryRecipientId]/reconcile` | request/list/read/cancel/retry/reconcile deliveries (human only) |
 | App lane | `…/app/insights/schedules{,/[scheduleId]{,/activate,/pause,/retire}}` | define/activate/pause/retire/read schedules (human only) |

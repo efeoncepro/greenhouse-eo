@@ -53,6 +53,17 @@ Usuarios / logins auditados: `greenhouse_app`, `greenhouse_migrator_user`, `gree
   `authorizedNetworks` activas; el control efectivo está en Connector + credenciales + SSL.
 - Migraciones y binarios standalone (`pnpm migrate:up`, `psql`, `pg_dump`) usan Cloud SQL Auth
   Proxy vía `pnpm pg:connect` (ver CLAUDE.md §PostgreSQL Access).
+- **Timeout de sesión ociosa por runtime (TASK-1876):** el rol `greenhouse_app` mantiene
+  `idle_session_timeout` de 5 min porque lo comparten Vercel y 4 workers Cloud Run
+  (`ops-worker`, `artifact-worker`, `commercial-cost-worker`, `auth-server`) y hay un advisory
+  lock de sesión que vive en una conexión ociosa. Sólo el pool de Vercel pide 60 s por conexión
+  con la startup option `-c idle_session_timeout=60000` (`src/lib/postgres/client.ts`, override
+  `GREENHOUSE_POSTGRES_SESSION_IDLE_TIMEOUT_MS`): una función congelada no corre el
+  `idleTimeoutMillis` del pool. **No** bajarlo con `ALTER ROLE`. Contrato:
+  [`GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md`](../GREENHOUSE_POSTGRES_CONNECTION_POOLING_V1.md) §V1.3.
+- **Saturación:** la instancia tiene 97 conexiones utilizables; la señal
+  `runtime.postgres.connection_saturation` combina `pg_stat_activity` con el pico de 24 h de la
+  métrica nativa `num_backends` (picos diarios normales en sep-2026: 42–77; ISSUE-174 llegó a 99).
 
 ## Live footprint (as-of 2026-04-23)
 

@@ -368,9 +368,12 @@
 - **2026-09-26 · Un script que reescribe docs compartidos debe LEER antes de abrir para escribir.** En Python,
   `open(p,'w').write(fn(open(p).read()))` trunca el archivo antes de leerlo: vació `docs/tasks/README.md` con WIP ajeno.
   Se recuperó desde un blob colgante (`git fsck --unreachable` + búsqueda de una línea única del WIP) con hash idéntico.
-- **2026-09-28 · `sendEmail().deliveryId` es el id del BATCH, no la fila de `email_deliveries`.** La fila por
-  destinatario está en `recipientResults[].deliveryId`. La modalidad `attachment` guardó el batch en
-  `insight_delivery_recipients.email_delivery_id` y la referencia apuntaba a una fila inexistente; ningún test lo vio
-  porque el estado de transporte se lee por `source_event_id`. Lo destapó una lectura de datos reales (cruce
-  recipient ↔ email_deliveries). Regla: al persistir una referencia a otra tabla, verifícala con un JOIN contra datos
-  reales, no con el mock de `sendEmail`. Corregido en `34d763460` (TASK-1848).
+- **2026-09-28 · `sendEmail().deliveryId` es el id del BATCH, no la fila de `email_deliveries`, y en el envío
+  secuencial de primer intento `recipientResults[].deliveryId` TAMBIÉN es el batch** (`sendEmail` descarta el id de
+  `createDeliveryRow`). La modalidad `attachment` guardó el batch en `insight_delivery_recipients.email_delivery_id`:
+  referencia a una fila inexistente. Ningún test lo vio porque el estado de transporte se lee por `source_event_id`; lo
+  destapó un JOIN contra datos reales. **El primer fix (`34d763460`, `recipientResults[0]`) no corregía nada y su test
+  pasaba porque el mock inventaba la fila: el mismo modo de falla que ocultó el bug.** Lo refutó un subagente leyendo
+  `src/lib/email/delivery.ts`. Fix real `8882af0e3`: resolver la fila por `source_entity` + `source_event_id`. Reglas:
+  (1) al persistir una referencia a otra tabla, verifícala con un JOIN contra datos reales; (2) un mock de un contrato
+  ajeno se escribe leyendo el código de ese contrato, nunca con el valor que tu fix espera.

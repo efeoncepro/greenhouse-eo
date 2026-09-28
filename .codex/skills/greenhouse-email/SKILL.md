@@ -140,6 +140,34 @@ Lo que cambió en `src/lib/email/delivery.ts` y afecta a cualquier correo del ca
   en `src/lib/email/provider-block.ts` (`src/lib/hiring/assessment/access-recovery/provider-block.ts` sólo
   re-exporta). Reintento y revive lo excluyen; ningún template ni caller redefine ese predicado.
 
+## Delta 2026-09-28 — qué id devuelve `sendEmail()` (TASK-1848)
+
+`sendEmail()` genera un `batchId = randomUUID()` por llamada, que se persiste como `email_deliveries.batch_id`.
+Ese id **no** es la fila (`delivery_id`). Contrato leído en `src/lib/email/delivery.ts` + `SendEmailResult`
+(`src/lib/email/types.ts`):
+
+- **`result.deliveryId`**: con exactamente un `recipientResults` devuelve `recipientResults[0].deliveryId ?? batchId`;
+  con varios, el batch. Los retornos tempranos (tipo pausado sin intent, sin destinatarios, fallo al resolverlos)
+  devuelven el batch y no crean fila.
+- **`recipientResults[].deliveryId`** es la fila **sólo** en tres caminos: Batch API de broadcast (captura el
+  `RETURNING delivery_id`), `token_sensitive` (intent pre-reclamado con `claimTokenSensitiveEmailIntent`) y
+  reintento de una fila existente. En el **camino secuencial estándar de primer intento** (un destinatario,
+  prioridad no-broadcast o con `attachments`), `deliverRecipient` devuelve `durableDeliveryId || batchId` y
+  descarta el id que retorna `createDeliveryRow`: ahí **también es el batch** (igual en `rate_limited` e
+  `undeliverable`).
+- **Regla:** nunca guardes `result.deliveryId` como referencia a una fila de `email_deliveries`, y no asumas que
+  `recipientResults[].deliveryId` lo es fuera de esos tres caminos. Para correlacionar un envío con su fila usa
+  `source_entity` + `source_event_id` (+ `recipient_email`), o `batch_id` + `recipient_email`. Si un dominio
+  necesita el `delivery_id` real en un envío estándar, se corrige en `delivery.ts` (propagar el retorno de
+  `createDeliveryRow`), no en el caller.
+- Caso fuente: la modalidad `attachment` de Insights guardaba el batch en
+  `insight_delivery_recipients.email_delivery_id` (medido en staging 2026-09-28: `idlr-2984…` → `bb79bbb7…`,
+  su correo real `c4fb8f5c…`); el estado de transporte no se afectó porque se lee por `source_event_id`. Ningún
+  test lo vio porque el mock de `sendEmail` no distinguía batch de fila. Un primer fix que leía
+  `recipientResults?.[0]?.deliveryId` (`34d763460`) **seguía** recibiendo el batch en ese camino secuencial (su test
+  pasaba con un mock que asumía la fila). Fix real `8882af0e3`: resolver la fila por `source_event_id`
+  (verificado contra PG: `idlr-2984…` → `c4fb8f5c…`).
+
 ## Verificación mínima
 
 Selecciona gates proporcionales al diff:

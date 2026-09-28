@@ -2,7 +2,7 @@
 
 ## Delta 2026-09-28
 
-- Verificado en datos reales: cero doble envío (1 correo por destinatario). Corregido `email_delivery_id` de la modalidad `attachment`: guardaba el id del batch de `sendEmail()` en vez de la fila (commit `34d763460`, sin push; la fila sintética de staging queda con el batch, sin efecto funcional porque el transporte se lee por `source_event_id`).
+- Verificado en datos reales: cero doble envío (1 correo por destinatario). Corregido `email_delivery_id` de la modalidad `attachment`: guardaba el id del batch de `sendEmail()` en vez de la fila; ahora la resuelve por `source_event_id` (commit `8882af0e3`; el primer intento `34d763460` no corregía — `recipientResults[].deliveryId` también es el batch en el camino secuencial —, sin push; la fila sintética de staging queda con el batch, sin efecto funcional porque el transporte se lee por `source_event_id`).
 - ISSUE-174 → TASK-1876 code complete (guard WAF, timeout de sesión Vercel, pico de Cloud SQL); su rollout lo aplica el operador.
 - Lo que sigue abierto aquí no es código de esta task: tiene dueño (TASK-690–693, TASK-1849, TASK-1875) o exige sesión humana (negativos MCP). Producción sigue con flags OFF hasta TASK-1875.
 
@@ -40,7 +40,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-045`
-- Status real: `En producción 2026-09-18 con flags OFF (release bda1cf2cd938) + gateway efeonce-mcp 1.7.0; 2026-09-28: cero doble envío verificado en datos reales y fix de email_delivery_id en adjuntos (34d763460, local sin push). Abierto por dependencias con dueño propio: in-app/Teams y preferencias (TASK-690–693), portal_link (TASK-1849), lector Think (TASK-1875, bloquea flags de producción), guard ISSUE-174 (TASK-1876 code complete, rollout pendiente) y negativos MCP con sesión humana`
+- Status real: `En producción 2026-09-18 con flags OFF (release bda1cf2cd938) + gateway efeonce-mcp 1.7.0; 2026-09-28: cero doble envío verificado en datos reales y fix de email_delivery_id en adjuntos (8882af0e3, local sin push). Abierto por dependencias con dueño propio: in-app/Teams y preferencias (TASK-690–693), portal_link (TASK-1849), lector Think (TASK-1875, bloquea flags de producción), guard ISSUE-174 (TASK-1876 code complete, rollout pendiente) y negativos MCP con sesión humana`
 - Rank: `TBD`
 - Domain: `platform|identity|ops|data`
 - Blocked by: `none`

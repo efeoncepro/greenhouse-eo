@@ -2,7 +2,7 @@
 
 TASK-1863: staging; main retenido.
 
-**Insights envíos (28/09):** [TASK-1848](docs/tasks/in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) sigue in-progress: cero doble envío verificado en datos reales y fix de `email_delivery_id` en adjuntos (`34d763460`); lo abierto tiene otro dueño (TASK-690–693, 1849, 1875) o exige sesión MCP humana. Producción con flags OFF hasta TASK-1875.
+**Insights envíos (28/09):** [TASK-1848](docs/tasks/in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) sigue in-progress: cero doble envío verificado en datos reales y fix de `email_delivery_id` en adjuntos (`8882af0e3`); lo abierto tiene otro dueño (TASK-690–693, 1849, 1875) o exige sesión MCP humana. Producción con flags OFF hasta TASK-1875.
 
 **Rutas públicas / conexiones PG (28/09):** [TASK-1876](docs/tasks/in-progress/TASK-1876-public-route-connection-exhaustion-guard.md) code complete, rollout pendiente (ISSUE-174 open): falta `pnpm security:public-burst-guard --apply`, alerta `num_backends`, `roles/monitoring.viewer` a `greenhouse-portal@`, deploy a staging y ráfaga controlada ([manual](docs/manual-de-uso/plataforma/operar-guard-rutas-publicas-y-saturacion-postgres.md)). El apply WAF lo bloqueó el clasificador: lo corre el operador.
 
