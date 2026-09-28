@@ -1,5 +1,29 @@
 # TASK-1921 — Ruta productiva de las piezas de marca por superficie (Full API Parity)
 
+## Delta 2026-09-28 — recalibración antes de ejecutar (decisiones del operador y Discovery)
+
+Manda sobre el cuerpo cuando se contradigan.
+
+- **Dueño de dominio (operador, 2026-09-28):** «De momento será Greenhouse; luego será Marketing Studio o Globe, aún no lo
+  decido». La capability vive en Greenhouse (`src/lib/brand-surfaces/production/**`, `api/platform/app/brand-surfaces`)
+  y nace **extraction-ready**: el contrato del lane y el command son la costura; el worker, la cola y el asset no
+  filtran nombres de dominio hacia el caller. Mover el dueño después no cambia la forma del pedido.
+- **Glitch entra en la misma ruta (operador):** una sola cola y un solo consumer sirven a La órbita (`graphic-line-deck`,
+  `-stills`, `-overlays`) y a Glitch (`glitch-carousel`, `-stills`, `-overlays`); el command de Glitch reutiliza
+  `planGlitchEdition` y `GlitchAssetRequest`.
+- **Plates y fotos (operador):** se suben ahora por el uploader canónico (`/api/assets/private`, contexto nuevo) y el
+  pedido los referencia por `assetId`; nunca por ruta. TASK-1931 agrega después el banco curado sin romper el pedido.
+- **Errores:** el lane `api/platform/app` usa `ApiPlatformError` + tabla de traducción por dominio (patrón
+  `insights-errors.ts`), no `canonicalErrorResponse`.
+- **Piezas que la spec no nombraba:** despachador propio cableado en `/artifact-render/dispatch` del ops-worker (sin él
+  la cola no se drena); el flag vive en TRES runtimes (Vercel, ops-worker, Job); la materialización de assets y los
+  pintores de selección/CTA salen de `scripts/` a `src/lib` (hoy importan `scripts/creative/**`, que no entra a la
+  imagen del Job); los catálogos `png-set` completan con N PNG sin PDF.
+- **Fuera de esta task por dependencia:** el criterio del Delta (b) sobre `validateDeckPlan`/rastro de slots/banco
+  (TASK-1929–1931 en diseño).
+- **Rollout:** la task llega a *code complete, rollout pendiente*; aplicar la migración en la instancia compartida, los
+  deploys, el flag ON en staging y el release de `efeonce-mcp` requieren autorización explícita.
+
 ## Delta 2026-09-27 (d) — Glitch tiene su taller local (TASK-1923)
 
 - Los catálogos de Glitch (`glitch-carousel`, `glitch-stills`, `glitch-overlays`) y el mapper puro
@@ -57,7 +81,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -70,10 +94,10 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `En ejecución (2026-09-28): dueño decidido (Greenhouse por ahora, extraction-ready), Glitch en la misma cola, plates por uploader privado`
 - Rank: `TBD`
 - Domain: `creative|brand|platform`
-- Blocked by: `none` (el Slice 1 espera la decisión de dueño de dominio, ver Open Questions)
+- Blocked by: `none`
 - Branch: `Greenhouse develop; efeonce-mcp main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -430,7 +454,8 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] El dueño de dominio quedó decidido por el operador y registrado en la task.
+- [x] El dueño de dominio quedó decidido por el operador y registrado en la task.
+      — Evidencia: Delta 2026-09-28 (Greenhouse por ahora; luego Marketing Studio o Globe).
 - [ ] Un intent inválido o con receta no aprobada se rechaza en el command con código canónico y no crea job.
 - [ ] Dos pedidos idénticos de la misma organización devuelven el mismo job.
 - [ ] La capability existe en `capabilities_registry` y en `entitlements-catalog.ts`, con grant a ≥1 rol real y

@@ -1,12 +1,14 @@
 # Handoff activo
 
+**Ruta productiva de marca (28/09):** [TASK-1921](docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) en ejecución: dueño Greenhouse por ahora (extraction-ready), Glitch en la misma cola, plates por uploader privado. Local, sin push.
+
 **Deck compuesto (27/09):** [TASK-1927](docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) complete en local, sin push. [TASK-1928](docs/tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) **code complete** en local, sin push: 69/69 recetas componen (AXIS `v0.3.21`, gates a 0 px, paridad de slots; la portada con selección entró el 28/09 al relajar la regla). Pendiente: aprobación visual del operador de las seis familias y la portada con selección, y `pnpm build` con autorización.
 
 **Plugin OpenAI Efeonce MCP (26/09):** [TASK-1904](docs/tasks/to-do/TASK-1904-efeonce-openai-plugin-private-distribution.md) registrada: marca, OAuth, skills e instalación privada Codex/ChatGPT sin revisión pública. TASK-1864 conserva routing/eval. Sin implementación.
 
-**Glitch en el Composer (27/09):** [TASK-1923](docs/tasks/complete/TASK-1923-glitch-artifact-composer-catalogs.md) **complete** en local, sin push: `pnpm glitch:compose` y 26 plantillas. Siguen: TASK-1921 (ruta productiva), TASK-1924 (el taller migra al manifiesto), patch AXIS de `portada-c`.
+**Glitch en el Composer (27/09):** [TASK-1923](docs/tasks/complete/TASK-1923-glitch-artifact-composer-catalogs.md) complete en local (`pnpm glitch:compose`).
 
-**Glitch en AXIS (27/09):** [TASK-1922](docs/tasks/complete/TASK-1922-glitch-axis-franchise-token-contract.md) **complete**: AXIS `v0.3.12` publica `glitchLine`, `efeonce.glitch-line` 0.1.0 candidate y los archivos de Glitch. Siguen: TASK-1924 (el taller retira su espejo); número de contrato de Guttery.
+**Glitch en AXIS (27/09):** [TASK-1922](docs/tasks/complete/TASK-1922-glitch-axis-franchise-token-contract.md) complete (AXIS `v0.3.12`).
 
 **La órbita (26–27/09):** [índice](docs/operations/brand-graphic-line/README.md). Pendiente: 5 preguntas del operador y TASK-1926.
 
