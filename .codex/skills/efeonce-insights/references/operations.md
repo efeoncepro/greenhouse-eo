@@ -185,8 +185,9 @@ proxy included — sits behind a Vercel Firewall rate limit of 20 req / 10 s per
 not invoked, no PG connection) in staging/preview, `observe` (log only) in production. Rules versioned in
 `src/lib/security/public-burst-guard/firewall-rules.ts`; `pnpm security:public-burst-guard` prints the plan,
 `--apply` writes and re-reads (apply is the operator's). Vercel PG sessions also request `idle_session_timeout=60s`.
-The domain per-grant limit (429 + `Retry-After: 60`) stays behind the edge. When the Think server-side consumer
-(TASK-1875) lands, exempt it with an explicit condition in those rules — never by raising the limit. Diagnosis: a 429
+The domain per-grant limit (429 + `Retry-After: 60`) stays behind the edge. The Think server-side consumer (TASK-1875)
+is exempted by an explicit header condition (`x-efeonce-think-key`, code complete 2026-09-28 in `27b458aec`; see
+§ Shared web in Think) — never by raising the limit. Diagnosis: a 429
 without the domain JSON body / `Retry-After` and without a `rate_limited` access event came from the edge.
 
 **No bursts against the shared instance.** Never measure limits with concurrent requests against a DB-backed route:
@@ -252,3 +253,40 @@ is off is `skipped/email_type_paused` (no grant issued).
 - **Schedules:** flag OFF in Vercel (no writes) and ops-worker (tick does nothing but purge); pause or retire schedules
   (both work with the flag OFF); deleting the Cloud Scheduler job stops the tick entirely.
 - **Schema:** never `migrate:down` on the shared instance without explicit operator authorization (it serves production).
+
+## Shared web in Think (TASK-1875) — code complete locally, NOT deployed (2026-09-28)
+
+Nothing from TASK-1875 runs anywhere yet: Greenhouse commits `d45fc780f` + `27b458aec` are on local `develop` (not
+pushed) and the Think commits are on local `main` of `efeonce-think` (not pushed — Think's `main` auto-deploys
+production). `INSIGHTS_SHARING_ENABLED` is unchanged (staging ON, production OFF).
+
+**Variables (none is an `*_ENABLED` flag):**
+
+| Variable | Where | Purpose |
+| --- | --- | --- |
+| `PUBLIC_BURST_GUARD_THINK_KEY` | env of the script `pnpm security:public-burst-guard` (operator shell) | value of the `x-efeonce-think-key` exception in the WAF rule; never printed |
+| `GREENHOUSE_THINK_KEY` | Think's Vercel project (astro server secret, default `''`) | sent as `x-efeonce-think-key` so Think's server-side reads are not counted by the edge limit |
+| `GREENHOUSE_API_BYPASS` | Think's Vercel project (astro server secret, default `''`) | sent as `x-vercel-protection-bypass` when Think reads a protected Greenhouse deployment (staging) |
+| `GREENHOUSE_API_BASE` | Think (local testing) | which Greenhouse Think reads; point at the staging `.vercel.app` to test staging tokens |
+| `INSIGHTS_SHARE_PUBLIC_BASE_URL` | Greenhouse (Vercel) | base of `buildInsightShareUrl`; default `https://think.efeoncepro.com` |
+
+The same key value goes to `PUBLIC_BURST_GUARD_THINK_KEY` and `GREENHOUSE_THINK_KEY`. It never goes into a log, a URL
+or a commit.
+
+**Staging vs production links.** `buildInsightShareUrl` → `https://think.efeoncepro.com/insights/r/<token>` in every
+environment unless the base is overridden, and production Think reads production Greenhouse: a staging token 404s
+there. Test staging with local Think (`GREENHOUSE_API_BASE` = staging `.vercel.app` + `GREENHOUSE_API_BYPASS`).
+
+**Rollout order (operator-gated; do not reorder):**
+1. Generate the Think key; set `GREENHOUSE_THINK_KEY` in Think's Vercel **production** env; run
+   `PUBLIC_BURST_GUARD_THINK_KEY=… pnpm security:public-burst-guard --apply` (the operator runs it; the permission
+   classifier blocks the agent) and re-read the plan: the rule must carry the exception BEFORE Think goes live.
+2. Push Greenhouse `develop` → staging. Verify model 1.1 with a synthetic share grant on the sandbox edition: create
+   grant → local Think renders it → revoke → next GET 410 → download through the proxy. Sequential requests only.
+3. Release Greenhouse to production through the control plane (`greenhouse-production-release`).
+4. Push Think `main` (auto-deploys production).
+5. Flip `INSIGHTS_SHARING_ENABLED` in production only with explicit operator approval, after mapping where it is read
+   (`grep -rn INSIGHTS_SHARING_ENABLED src/ services/`), and register it in the flag ledger.
+
+**Think-side verification:** `pnpm test:insights`, `scripts/verify-insights-report.mjs`,
+`scripts/audit-insights-a11y.mjs`, `scripts/capture-insights-report.mjs` (repo `efeonce-think`).

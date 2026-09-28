@@ -1,5 +1,17 @@
 # TASK-1848 — Efeonce Insights: acceso compartido, correo y recurrencia gobernados
 
+## Delta 2026-09-28 (TASK-1875)
+
+- El enlace que emite esta capacidad — `buildInsightShareUrl` (`src/lib/efeonce-insights/sharing/token.ts`) →
+  `https://think.efeoncepro.com/insights/r/<token>`, usado por el correo (`delivery/dispatch.ts`) y por la respuesta
+  de crear enlace (`sharing/commands.ts`) — es la ruta que TASK-1875 implementó en `efeonce-think`
+  (`src/pages/insights/r/[token].astro`). El reader público ahora responde `InsightWebModelV1` **1.1, aditivo** (campos
+  editoriales v2 opcionales + logo del cliente por `GET /api/public/insights/shared/[token]/logo`); un consumidor 1.0
+  sigue funcionando.
+- **Todavía no está en vivo en producción:** los commits de Greenhouse y de Think son locales, sin push. Por defecto el
+  enlace apunta a Think de producción, que lee Greenhouse de producción: un token de staging da 404 allí. — por trabajo
+  en TASK-1875
+
 ## Delta 2026-09-28
 
 - Verificado en datos reales: cero doble envío (1 correo por destinatario). Corregido `email_delivery_id` de la modalidad `attachment`: guardaba el id del batch de `sendEmail()` en vez de la fila; ahora la resuelve por `source_event_id` (commit `8882af0e3`; el primer intento `34d763460` no corregía — `recipientResults[].deliveryId` también es el batch en el camino secuencial —, sin push; la fila sintética de staging queda con el batch, sin efecto funcional porque el transporte se lee por `source_event_id`).

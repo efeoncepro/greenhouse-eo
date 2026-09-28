@@ -84,8 +84,11 @@ it without repeating what already cost a day*. It grows with every task: see the
 - **The public reader is anti-oracle and uncacheable**: `404` for unknown/malformed/expired/flag OFF/suspended org/
   retired module (indistinguishable), `410` revoked or withdrawn, `429` rate limit that FAILS CLOSED, and always
   `Cache-Control: private, no-store` + `noindex`. Never copy the Grader's link (token in clear, `public, max-age=300`).
-  Think consumes it server-side as `InsightWebModelV1` (`modelVersion '1.0'`, client-facing projection only). NEVER
-  probe its limits with concurrent bursts: the DB-backed limiter spends a connection before rejecting (ISSUE-174).
+  Think consumes it server-side as `InsightWebModelV1` (`modelVersion` `'1.0'` or `'1.1'`; 1.1 is additive — optional
+  editorial v2 fields + client logo — so a 1.0 consumer still works; client-facing projection only). Think's server
+  reads are exempted from the `/api/public` edge limit only by its key header `x-efeonce-think-key`, never by raising
+  the limit. NEVER probe its limits with concurrent bursts: the DB-backed limiter spends a connection before rejecting
+  (ISSUE-174).
 - **Email delivery and schedule writes are App lane only, human internal actor** (capabilities without `own`: a
   client never sends). Ecosystem lane and MCP only read deliveries and schedules; MCP never sends email.
 - **Schedules never issue nor send**: `review_policy = 'draft_for_review'` (DB CHECK); each occurrence creates the

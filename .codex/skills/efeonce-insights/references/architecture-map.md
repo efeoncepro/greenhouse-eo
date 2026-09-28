@@ -191,3 +191,18 @@ Detail: architecture §14.9, implementation record §8.z.
 
 Removed: `ReportAnalysisPage`, `InsightsEvidenceSlide`, `report-mold.css`, `deck-mold.css`, `render/figure-pages.ts`, v1
 bar/family/path resolvers. `artifact-composer/chart-figure.ts` and its test were retired on 2026-09-26 (no consumers).
+
+## TASK-1875 — shared web in Think (2026-09-28; code complete locally, not deployed)
+
+| Layer | Where | What |
+| --- | --- | --- |
+| Contract | `src/lib/efeonce-insights/contracts/web-model.ts` | `INSIGHT_WEB_MODEL_VERSION = '1.1'` (additive over 1.0): `InsightWebChartDerivedV1.funnelStepRates`, `InsightWebReadingV1`, `chapter.opening/readings`, `essentials`, `decision`, `measurement`, `ask`, `scopeLines`, `header.clientLogo` |
+| Projection | `sharing/web-model.ts` (`projectReading`, `deriveChart`) | editorial v2 fields via conditional spreads; funnel rates from `funnelGeometry` (`@/lib/artifact-composer/pure`) + `formatFactValue(rate, 'percent', locale)` |
+| Public resolve | `sharing/public.ts` (`readSharedInsightClientLogo`) | `header.clientLogo` only when sealed `plan.cover` has `logoAssetId` + `logoVariant`; logo bytes through `downloadPrivateAsset` with the same gate as the view |
+| Public route | `src/app/api/public/insights/shared/[token]/logo/route.ts` | `GET` sealed cover logo; `INSIGHT_SHARE_PUBLIC_HEADERS` (private `no-store`, `noindex`, `no-referrer`) |
+| Edge guard | `src/lib/security/public-burst-guard/firewall-rules.ts` | `THINK_SERVER_KEY_HEADER = 'x-efeonce-think-key'`; `buildPublicBurstGuardRule(spec, {thinkKey})` adds a negated `header eq` condition; drift if the live rule lacks it |
+| Script env | `scripts/security/public-burst-guard.ts` | reads `PUBLIC_BURST_GUARD_THINK_KEY` (never printed) |
+| Share URL | `sharing/token.ts` (`buildInsightShareUrl`) → `delivery/dispatch.ts` (email), `sharing/commands.ts` (create response) | `${INSIGHTS_SHARE_PUBLIC_BASE_URL \|\| 'https://think.efeoncepro.com'}/insights/r/<token>` |
+| Think route (repo `efeonce-think`) | `src/pages/insights/r/[token].astro` (SSR) | renders `InsightWebModelV1`; downloads `?descargar=<output>` and logo `?logo=1` relative to the same URL (token never in HTML) |
+| Think client | `efeonce-think/src/lib/insights.ts` | server headers `x-efeonce-think-key` (`GREENHOUSE_THINK_KEY`) + `x-vercel-protection-bypass` (`GREENHOUSE_API_BYPASS`), both astro server secrets default `''`; accepts `modelVersion` `/^1\.\d+$/`; never logs the token |
+| Think verification | `efeonce-think`: `pnpm test:insights` (`tests/insights.test.ts`), `scripts/verify-insights-report.mjs`, `scripts/audit-insights-a11y.mjs`, `scripts/capture-insights-report.mjs` | dossier in Greenhouse `docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/` (+ `.scorecard.json`, avg 4.56) |

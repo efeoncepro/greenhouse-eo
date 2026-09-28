@@ -71,6 +71,18 @@
         "127.0.0.1"
       ],
       "port": 4397
+    },
+    {
+      "name": "think-dev",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--dir",
+        "../efeonce-think",
+        "dev",
+        "--port",
+        "4331"
+      ],
+      "port": 4331
     }
   ]
 }

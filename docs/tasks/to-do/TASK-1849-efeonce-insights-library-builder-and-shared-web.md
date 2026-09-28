@@ -1,5 +1,17 @@
 # TASK-1849 — Efeonce Insights: biblioteca, creación y experiencia web compartida
 
+## Delta 2026-09-28
+
+- El enlace que emite esta capacidad — `buildInsightShareUrl` (`src/lib/efeonce-insights/sharing/token.ts`) →
+  `https://think.efeoncepro.com/insights/r/<token>`, usado por el correo (`delivery/dispatch.ts`) y por la respuesta
+  de crear enlace (`sharing/commands.ts`) — es la ruta que TASK-1875 implementó en `efeonce-think`
+  (`src/pages/insights/r/[token].astro`). El reader público ahora responde `InsightWebModelV1` **1.1, aditivo** (campos
+  editoriales v2 opcionales + logo del cliente por `GET /api/public/insights/shared/[token]/logo`); un consumidor 1.0
+  sigue funcionando.
+- **Todavía no está en vivo en producción:** los commits de Greenhouse y de Think son locales, sin push. Por defecto el
+  enlace apunta a Think de producción, que lee Greenhouse de producción: un token de staging da 404 allí. — por trabajo
+  en TASK-1875
+
 ## Delta 2026-09-26
 
 - TASK-1888 complete y en producción con `INSIGHTS_EDITORIAL_V2_ENABLED` ON (Vercel staging/Production y `ops-worker`): la

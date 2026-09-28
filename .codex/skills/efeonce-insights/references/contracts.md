@@ -1,4 +1,4 @@
-# Efeonce Insights — contracts (verified against code 2026-09-16)
+# Efeonce Insights — contracts (verified against code 2026-09-28)
 
 ## `InsightRequestV1` (`contracts/request.ts`, validated by `commands/validate-request.ts`)
 
@@ -111,13 +111,30 @@ the ones in `sharing/`, `delivery/`, `schedules/` and the lanes.
 
 ### Public reader (Think consumes it)
 
-- `GET /api/public/insights/shared/{token}` → `InsightSharedEditionResponseV1 { modelVersion: '1.0', header {organizationName,
-  reportCode, reportTitle, editionVersion, periodLabel, periodStart, periodEndExclusive, timeZone, issuedAt, asOfMax},
+- `GET /api/public/insights/shared/{token}` → `InsightSharedEditionResponseV1 { modelVersion: '1.1', header {organizationName,
+  reportCode, reportTitle, editionVersion, periodLabel, periodStart, periodEndExclusive, timeZone, issuedAt, asOfMax,
+  clientLogo?},
   model: InsightWebModelV1, downloads [{ output, status: available|unavailable, href? }], expiresAt }`.
 - `InsightWebModelV1`: executiveSummary, chapters (claims, charts = `ChartSpecV1` + table resolved to formatted figures,
   tables, limits), actions (no ownerRef), limits, methodology, references (no evidenceRef), facts (`display` formatted
   per locale, value, unit, observation, source, asOf, `absentReason: 'no_data'` when value is null). Never
   authoringMode, modelId, prompts, history or actor ids.
+- **`InsightWebModelV1` 1.1 (TASK-1875, 2026-09-28; code complete locally, not deployed) — additive over 1.0.**
+  `INSIGHT_WEB_MODEL_VERSION = '1.1'`; Greenhouse always emits `'1.1'`, a 1.0 consumer ignores the new fields and Think
+  accepts any `/^1\.\d+$/`. All new fields are optional and come only from a sealed editorial v2 plan (TASK-1888):
+  - `chart.derived?.funnelStepRates?: Array<{ stageId, display: string | null }>` — computed by `deriveChart` with the
+    SAME `funnelGeometry` (`@/lib/artifact-composer/pure`) the PDFs use, formatted with `formatFactValue(rate, 'percent',
+    locale)`; first stage `display: null`; a growing funnel (geometry error) gets no `derived` at all. The web never
+    re-derives it.
+  - `chapter.opening?` (claim) and `chapter.readings?: InsightWebReadingV1[]` (≤ 1 per `chartId`):
+    `{ chartId, keyFigure?: { factId, value, caption }, conclusion?, meaning?, nextStep: claim | null }` (`projectReading`).
+  - Model level: `essentials?` (claims), `decision?`, `measurement?`, `ask?` (claims), `scopeLines?: string[]`.
+  - `header.clientLogo?: { href, variant: 'on_dark' | 'default' }` — present only when the sealed `plan.cover` has
+    `logoAssetId` AND `logoVariant`; `href = /api/public/insights/shared/{token}/logo` (relative to the Greenhouse API).
+  - A v1 plan (no editorial v2) projects exactly as 1.0 did (conditional spreads; test in `sharing.test.ts`).
+- `GET /api/public/insights/shared/{token}/logo` → sealed cover logo bytes via `downloadPrivateAsset`
+  (`readSharedInsightClientLogo`), same gate as the view (grant, edition, org, module, cover fields); same
+  `INSIGHT_SHARE_PUBLIC_HEADERS` (private `no-store`, `noindex`, `no-referrer`).
 - `GET /api/public/insights/shared/{token}/outputs/{output}` → bytes via private-asset proxy; grant revalidated just
   before reading. Already-downloaded files cannot be revoked.
 - Status codes: `404` unknown, malformed, expired, flag OFF, org suspended or module retired (indistinguishable);
@@ -129,7 +146,12 @@ the ones in `sharing/`, `delivery/`, `schedules/` and the lanes.
   production. An edge 429 never invokes the function nor opens a PG connection, so it carries NO domain body
   (`{ error, code: 'rate_limited' }`), NO domain `Retry-After: 60` and NO `rate_limited` access event. The domain 429
   (per IP / per grant limits above, from `sharing/http.ts`) is still behind it, unchanged. Think's server-side consumer
-  (TASK-1875) is exempted with an explicit condition in those rules, never by raising the limit for everyone.
+  (TASK-1875) is exempted with an explicit condition in those rules, never by raising the limit for everyone: header
+  `x-efeonce-think-key` (`THINK_SERVER_KEY_HEADER`) equal to the Think key ⇒ the request is not counted
+  (`{type:'header', key, op:'eq', value: thinkKey, neg: true}` added by `buildPublicBurstGuardRule(spec, {thinkKey})`);
+  `planPublicBurstGuardChanges` reports drift when the live rule lacks it. The key reaches the script only as
+  `PUBLIC_BURST_GUARD_THINK_KEY` and Think only as `GREENHOUSE_THINK_KEY`; it is never printed or logged
+  (code complete 2026-09-28, `27b458aec`; WAF apply with the key pending — operator).
 - Headers on every answer: `Cache-Control: private, no-store, max-age=0`, `Pragma: no-cache`, `Referrer-Policy: no-referrer`,
   `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `X-Robots-Tag: noindex, nofollow, noarchive`,
   CSP `default-src 'none'; frame-ancestors 'none'`. Deliberately NOT the Grader's `public, max-age=300`.

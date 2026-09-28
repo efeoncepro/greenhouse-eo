@@ -52,7 +52,7 @@ Desde el 2026-09-26 producción sirve sólo los catálogos v2 de TASK-1889 (rele
 | S3 | Detalle de edición: progreso por fase, evidencia (emitida para cliente; siempre para interno), plan, descargas | TASK-1849 | diseño |
 | S4 | Revisión y emisión (gate humano), retirada, recuperación por fase | TASK-1849 (UI) sobre commands de 1845 | diseño |
 | S5 | Compartir (grants), enviar (delivery intents), programar (schedules) | TASK-1849 (UI) sobre 1848 | diseño |
-| S6 | Vista web compartida por token en `think.efeoncepro.com/insights/r/<token>` | TASK-1875 sobre 1848 | diseño |
+| S6 | Vista web compartida por token en `https://think.efeoncepro.com/insights/r/<token>` (ruta SSR `src/pages/insights/r/[token].astro` de `efeonce-think`; lee `InsightWebModelV1` 1.1) | TASK-1875 sobre 1848 | construida, code complete local (2026-09-28); **sin desplegar** — el enlace no abre en producción hasta el rollout de TASK-1875 |
 | S7 | Correo de entrega (resumen útil + deep link autenticado o ShareGrant) | TASK-1849 (presentación) sobre 1848 | diseño |
 | S8 | Accesos contextuales desde Inicio/Mis servicios (EPIC-046 P04) | TASK-1854 | diseño |
 
@@ -115,7 +115,8 @@ Continuidad de identidad: código `EO-INS-…` + versión visibles en S3, S6, S7
 
 ## 9. Cobertura GVC
 
-S1–S5, S7: escenarios GVC de TASK-1849 (desktop 1440 + 390). S6: `capture.mjs` del hub (TASK-1875). Ambos con
+S1–S5, S7: escenarios GVC de TASK-1849 (desktop 1440 + 390). S6: `scripts/capture-insights-report.mjs` de `efeonce-think`
+(TASK-1875; dossier `docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/`). Ambos con
 fixtures sintéticos de dos organizaciones; ningún cliente real como tester.
 
 ## 10. Mapa task → nodo (estado)
@@ -142,7 +143,7 @@ Estado al 2026-09-15 (se conserva como historia; el vigente está en el delta de
 | TASK-1888 | contrato de portada y editorial v2 (alimenta S2 y los PDF; sin UI) | complete (2026-09-26), en producción con `INSIGHTS_EDITORIAL_V2_ENABLED` ON |
 | TASK-1889 | catálogos premium (los PDF de S3 y S6) | complete (2026-09-26), en producción; emitir y compartir siguen OFF |
 | TASK-1849 | S1–S5, S7 (+ portada en S2 como consumer de TASK-1888) | to-do |
-| TASK-1875 | S6 (+ mismos roles de color que los PDF) | to-do (desbloqueada por TASK-1848 el 2026-09-18) |
+| TASK-1875 | S6 (+ mismos roles de color que los PDF) | in-progress (2026-09-28): code complete local en Greenhouse y Think, sin push ni deploy |
 | TASK-1854 | S8 | to-do (EPIC-046; bloqueada por TASK-1852 y TASK-1853) |
 
 ## Acceptance Checklist (del programa)

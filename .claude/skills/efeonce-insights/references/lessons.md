@@ -1,5 +1,24 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-28 · TASK-1875 · Pasar a medios de impresión con transiciones activas deja elementos a medio camino.** Las
+  transiciones CSS ganan incluso a `!important` (su origen en la cascada está por encima): al imprimir, los elementos que
+  estaban animando quedaron congelados en `opacity: 0`. Regla: la hoja de impresión fija `transition: none` y
+  `animation: none` en todo lo que pueda estar en movimiento.
+- **2026-09-28 · TASK-1875 · Un elemento sólo-impresión oculto con igual especificidad reaparece por una regla más
+  específica.** El logo del pie quedó duplicado en pantalla porque otra regla, más específica, lo volvía a mostrar.
+  Regla: ocultar lo sólo-impresión con `@media screen { … display: none !important }`, no con una regla de la misma
+  especificidad.
+- **2026-09-28 · TASK-1875 · Salir de pantalla completa mueve el foco después del evento.** Restaurar el foco en el
+  handler de `fullscreenchange` no sirve: el navegador lo mueve después. Regla: restaurarlo dos `requestAnimationFrame`
+  más tarde.
+- **2026-09-28 · TASK-1875 · Una auditoría de contraste que toma el fondo del ancestro miente con etiquetas fuera de su
+  caja.** Los valores sobre las barras están posicionados fuera de su padre, así que el fondo «heredado» no es el que
+  está detrás del texto. Regla: medir contra el ancestro cuya caja contiene el centro del texto.
+- **2026-09-28 · TASK-1875 · Un waffle con total declarado ≠ suma de las partes regalaba celdas.** Greenhouse ya rechaza
+  ese caso (`waffle_parts_sum_total`), pero la web distribuía sobre el total declarado. Regla: la web reparte sobre la
+  suma de las partes, igual que `waffleGeometry`; la geometría de la web nunca diverge de la de los PDF.
+- **2026-09-28 · TASK-1875 · El acento en etiquetas de 12 px viola «La órbita».** El acento nunca va bajo 24 px; en
+  texto chico se usa el color de texto del rol, no el acento.
 - **2026-09-26 · TASK-1889 · El tono de una variación sale de la dirección de la métrica, y las metas ICO se casan por
   `dimension.metric`.** El triángulo sigue al valor (▲ subió, ▼ bajó) y el tono dice mejor o peor. Para saber qué es
   «mejor», posición = menor es mejor; si no, la dirección del propio hecho y, si falta, la de su meta. Las metas ICO

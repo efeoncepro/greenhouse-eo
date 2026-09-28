@@ -25,13 +25,14 @@ y la route-ownership matrix.
 - [Landing Brand Visibility](brand-visibility-landing.md)
 - [Manual para reutilizar patrones UI Think](reuse-ui-patterns-manual.md)
 - **[Radiografía AEO — Arquitectura](radiografia-aeo-architecture.md)** · **[Manual](radiografia-aeo-manual.md)**
-- Efeonce Insights — vista web compartida por token (decisión 2026-09-15; contrato en [arquitectura Insights §8](../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md#8-acceso-web-compartido); render en TASK-1875 sobre `InsightWebModelV1` de TASK-1848)
+- Efeonce Insights — vista web compartida por token (decisión 2026-09-15; contrato en [arquitectura Insights §8](../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md#8-acceso-web-compartido); render en TASK-1875 sobre `InsightWebModelV1` de TASK-1848). Patrón: [Shared Tokenized Report](architecture-ui-patterns.md#pattern-shared-tokenized-report-efeonce-insights); dossier visual en [`docs/ui/reviews/TASK-1875-…`](../ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/)
 
 ## Herramientas vivas en Think
 
 | Herramienta | Qué es | Ruta |
 |---|---|---|
 | **AI Visibility Grader** | Diagnóstico público de visibilidad en motores de respuesta, por token. Greenhouse calcula, Think presenta. Mide el hueco: presencia, citación, competidores, readiness y próximos pasos. | `/brand-visibility` · `/brand-visibility/r/<token>` |
+| **Efeonce Insights (informe compartido)** | Lectura ejecutiva de una edición de Insights para el cliente, por enlace con token. Greenhouse compone y gobierna el acceso; Think presenta: hallazgos que se expanden, escenas por módulo, modo presentación y descargas PDF. Construido y verificado en local; **sin desplegar** (push a `main` de Think pendiente del operador). | `/insights/r/<token>` |
 | **Radiografía AEO** | Herramienta de educación y sales enablement SEO/AEO. Recorre en 4 pantallas un artículo real, expone su capa técnica y demuestra cómo un hueco medido se convierte en contenido visible, citable y distribuible. El **cliente es un payload**, no código. | `/muestras/<slug>-<token>` |
 
 ## Principios

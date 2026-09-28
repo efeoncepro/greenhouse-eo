@@ -10,7 +10,7 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | **complete** (in production since 2026-09-24, release `ebb9212a32ce`; first productive A4 + deck render 2026-09-25) | Job `artifact-worker` in staging and production: `report_pdf` on `insights-report`, `deck_pdf` on `insights-deck` (cutover 2026-09-22 staging, 2026-09-24 production) | 2026-09-25 |
 | TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — in production with flags OFF** | Cloud SQL (4 migrations applied); release `bda1cf2cd938` (2026-09-18, Vercel + 6 Cloud Run); staging flags ON (sharing/delivery/schedules/issuance), production OFF until TASK-1875; gateway `efeonce-mcp` 1.7.0 (rev `00055-gk6`, 58 tools); 2026-09-28: zero double send verified on real rows + attachment `email_delivery_id` fix (`8882af0e3`, resolved by `source_event_id`); open (other owners): in-app/Teams (690–693), portal route (1849), Think (1875, gates prod flags), ISSUE-174 guard (1876 code complete), MCP negatives need a human session | 2026-09-28 |
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
-| TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | to-do (blocked by 1848) | — | — |
+| TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | **in-progress — code complete locally, NOT deployed** (2026-09-28) | nowhere yet: Greenhouse commits `d45fc780f` + `27b458aec` on local `develop` (not pushed); Think commits on local `main` of `efeonce-think` (not pushed; `main` auto-deploys production); `INSIGHTS_SHARING_ENABLED` unchanged (staging ON, production OFF) | — |
 | TASK-1888 | Editorial contract v2: `ChartSpec` 7 → 15 families, per-figure reading and hero figure in the plan, `channelId`, per-org cover preference + sealed cover, flag `INSIGHTS_EDITORIAL_V2_ENABLED` | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af`; gateway efeonce-mcp v1.9.0 (rev `00062-ct5`); flag ON in Vercel staging (`greenhouse-9t9fwhrvz`), Vercel Production (`greenhouse-8hl5hf54w`) and ops-worker (`00719-gbm`) | staging internal editions Berel `insed-56226fa1…` / Sky `insed-1e003760…` with sealed v2 plan; Production synthetic canary `insed-f5768172…` sealed 3 scope lines + cover (first canary `insed-356e948c…` sealed v1 before the env value fix) |
 | TASK-1889 | Premium catalogs from the approved canvas (A4 + deck), canvas-fidelity gate, internal Berel/Sky editions, release together with the 1888 flag | **complete 2026-09-26** — in production | releases `0e87c7a443a2` + `f9257b9c94af` (Job `artifact-worker` deployed); first internal editions rendered in Production with the new design on 2026-09-26 — Berel `insed-7d470d9f…` (run `irun-dcd1fbed…`: A4 16 pages + deck 15 slides) and Sky `insed-9370d0cc…` (run `irun-e5882459…`: A4 12 + deck 10), all four PDFs on the first attempt | local real editions Berel `EO-INS-000019` (16 pp / 13 slides) and Sky `EO-INS-000022` (12 / 9); fidelity 20/21 + 1 approved exception; visual gate 27 frames at 0 px |
 
@@ -300,8 +300,45 @@ full `pnpm test` + `pnpm build`; push; deploy; staging flags; staging canary.
 ## TASK-1849 — portal library/builder/shared web (to-do)
 _Fill at closure._
 
-## TASK-1875 — Think shared web render (to-do)
-_Fill at closure: Astro route, token handling, `no-store`, GVC evidence._
+## TASK-1875 — Think shared web render (in-progress; code complete locally, not deployed — 2026-09-28)
+
+**Built in Greenhouse (local `develop`, not pushed):**
+- `d45fc780f` — `InsightWebModelV1` **1.1, additive** (`INSIGHT_WEB_MODEL_VERSION = '1.1'`,
+  `src/lib/efeonce-insights/contracts/web-model.ts`): optional `chart.derived.funnelStepRates`, `chapter.opening`,
+  `chapter.readings[]` (`InsightWebReadingV1`), `essentials`, `decision`, `measurement`, `ask`, `scopeLines` and
+  `header.clientLogo {href, variant}`. Projection in `sharing/web-model.ts` (`projectReading`, `deriveChart`) with
+  conditional spreads: a v1 plan projects exactly as before. `sharing/public.ts` exposes the client logo only when the
+  sealed `plan.cover` carries `logoAssetId` + `logoVariant`; new route `GET /api/public/insights/shared/[token]/logo`
+  (same gate as the view, `downloadPrivateAsset`, `INSIGHT_SHARE_PUBLIC_HEADERS`). Tests: `sharing.test.ts` +3
+  (suite 21), insights 264, typecheck 0.
+- `27b458aec` — the `/api/public` burst guard (TASK-1876) exempts Think by an explicit header: `THINK_SERVER_KEY_HEADER =
+  'x-efeonce-think-key'`, `buildPublicBurstGuardRule(spec, {thinkKey})` adds a negated `header eq` condition; the limit
+  stays 20 req/10 s per IP for everyone else; `planPublicBurstGuardChanges` reports drift when the live rule lacks the
+  exception. `scripts/security/public-burst-guard.ts` reads `PUBLIC_BURST_GUARD_THINK_KEY` and never prints it (14 tests).
+- Earlier: `bf99d89b6`/`df023e168` (lifecycle), `7deed5888`/`b64f07ffa` (Insights lockup, `scripts/brand/build-insights-logo.mjs`).
+
+**Built in `efeonce-think` (local `main`, not pushed):** `3c2befe`, `3ad3338`, `2d0e0e9`, `c50ed2f`, `4cd3b01`
+(model 1.1, presentation mode, print fallback, en-US, client logo), `6385733` (tests, AA, fonts), `90761ca` (print-only
+logo fix, capture script). SSR route `src/pages/insights/r/[token].astro`; client `src/lib/insights.ts` sends
+`x-efeonce-think-key` (`GREENHOUSE_THINK_KEY`) and `x-vercel-protection-bypass` (`GREENHOUSE_API_BYPASS`), accepts
+`modelVersion` `/^1\.\d+$/`, never logs the token; downloads (`?descargar=<output>`) and logo (`?logo=1`) are relative to
+the same URL, so the token never lands in HTML. Verification: `pnpm test:insights`, `scripts/verify-insights-report.mjs`,
+`scripts/audit-insights-a11y.mjs`, `scripts/capture-insights-report.mjs`; UI dossier (in Greenhouse)
+`docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/` (scorecard 4.56).
+
+**Entry links:** `buildInsightShareUrl` (`sharing/token.ts`) → `${INSIGHTS_SHARE_PUBLIC_BASE_URL ||
+'https://think.efeoncepro.com'}/insights/r/<token>`, used by the delivery email (`delivery/dispatch.ts`) and the share
+create response (`sharing/commands.ts`). Staging links point to production Think by default and production Think reads
+production Greenhouse ⇒ a staging token 404s there; staging testing = local Think with `GREENHOUSE_API_BASE` at the
+staging `.vercel.app` + bypass.
+
+**Rollout pending (in order, operator-gated):** (1) generate the Think key, set `GREENHOUSE_THINK_KEY` in Think's Vercel
+production env and run `PUBLIC_BURST_GUARD_THINK_KEY=… pnpm security:public-burst-guard --apply` (operator runs it; the
+classifier blocks the agent) so the WAF rule carries the exception BEFORE Think goes live; (2) push Greenhouse `develop`
+→ staging and verify model 1.1 with a synthetic share grant on the sandbox edition (create → local Think render →
+revoke → 410 → download via proxy); (3) Greenhouse production release (`greenhouse-production-release`); (4) push Think
+`main` (auto-deploys production); (5) flip `INSIGHTS_SHARING_ENABLED` in production only with operator approval, after
+mapping where it is read.
 
 **Sesión 2026-09-24 — índice A4, familias de gráfico y auditoría de release.** El mapper compone un índice A4 con
 folios físicos; los tests locales cargan PDFs reales de 30 páginas y 25 láminas y ejercitan line/pie/donut/scatter en
@@ -454,6 +491,10 @@ producción antes de compartir con clientes. Sin flag propio.
 
 ## Sessions (append as you go; newest first)
 
+- **2026-09-28 · TASK-1875 · implementación (code complete local, sin deploy).** Greenhouse: modelo web 1.1 aditivo
+  (`d45fc780f`) + excepción de Think en el guard de `/api/public` (`27b458aec`); Think: ruta SSR `/insights/r/[token]`,
+  modo presentación, impresión, en-US, logo del cliente, tests y AA (commits locales en `main`, sin push). Nada
+  desplegado; `INSIGHTS_SHARING_ENABLED` sin cambios. Rollout en 5 pasos con gate del operador (ver sección TASK-1875).
 - **2026-09-25 · TASK-1889 · implementación.** Slices 1–4 + «Lo esencial» + fixes por ediciones reales en
   `develop` local (sin push, último commit `2f0776e0f` (antes `9529a1b25`)). Fidelidad 20/21 + excepción aprobada `Deck-Agrupadas`;
   visual gate Insights 27 frames a 0 px; ediciones reales Berel/Sky revelaron 5 defectos que el canvas no mostraba,

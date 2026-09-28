@@ -318,9 +318,21 @@ y auth en servidor.
   guarda sólo el digest sha256 (`token_digest` UNIQUE). URL: `${INSIGHTS_SHARE_PUBLIC_BASE_URL ??
   'https://think.efeoncepro.com'}/insights/r/<token>`, devuelta una única vez al crear.
 - **Respuesta:** `InsightSharedEditionResponseV1 {modelVersion, header, model, downloads, expiresAt}`, con
-  `InsightWebModelV1` (`modelVersion 1.0`, `contracts/web-model.ts`): resumen, capítulos (claims, `ChartSpecV1` +
+  `InsightWebModelV1` (`contracts/web-model.ts`): resumen, capítulos (claims, `ChartSpecV1` +
   tabla resuelta, tablas, límites), acciones sin `ownerRef`, metodología, referencias sin `evidenceRef` y hechos
   formateados por locale. Nunca `authoringMode`, `modelId`, prompts, historial ni ids de actor.
+- **`modelVersion` 1.1, aditiva sobre 1.0 (TASK-1875, code complete local 2026-09-28, sin desplegar):**
+  `INSIGHT_WEB_MODEL_VERSION = '1.1'`. Suma, todos opcionales y sólo cuando el plan sellado es editorial v2 (§14.8):
+  `chapter.opening`, `chapter.readings[]` (`InsightWebReadingV1 {chartId, keyFigure?, conclusion?, meaning?,
+  nextStep}`, a lo más una por figura), `essentials`, `decision`, `measurement`, `ask`, `scopeLines`,
+  `chart.derived.funnelStepRates` (`{stageId, display}`, calculadas en `sharing/web-model.ts` con la misma
+  `funnelGeometry` de los PDF y `formatFactValue(…, 'percent', locale)`; la primera etapa va con `display: null` y un
+  embudo que crece no lleva tasas) y `header.clientLogo {href, variant: 'on_dark'|'default'}`. Un plan v1 se proyecta
+  igual que antes (spreads condicionales) y un consumidor 1.0 ignora lo nuevo; Think acepta cualquier `1.x`.
+- **Logo del cliente:** `GET /api/public/insights/shared/[token]/logo` sirve el logo sellado en `plan.cover` por
+  `downloadPrivateAsset`, con el mismo gate que la vista (`readSharedInsightClientLogo` en `sharing/public.ts`) y las
+  mismas cabeceras anti-cache/anti-índice. `header.clientLogo` sólo aparece si la portada sellada trae `logoAssetId` y
+  `logoVariant`.
 - **Semántica:** `404` = token desconocido, mal formado, expirado, flag OFF, org suspendida o módulo retirado
   (indistinguibles entre sí); `410` = revocado o edición retirada; `429` = rate limit; `503` sanitizado.
 - **Rate limit** (`insight_share_rate_buckets`, ventana por minuto sobre sujeto hasheado, UPSERT atómico): por IP
@@ -332,7 +344,11 @@ y auth en servidor.
   sincronizadas con `pnpm security:public-burst-guard [--apply]`. El rate limit del dominio (arriba; su 429 lleva
   `Retry-After: 60` y deja evento `rate_limited`) sigue detrás sin cambios; el 429 del borde no trae ni lo uno ni lo
   otro. El consumidor server-side de Think (TASK-1875) se exceptúa con una **condición explícita** en esas reglas,
-  nunca subiendo el límite para todos. Complemento: las sesiones PG de Vercel piden `idle_session_timeout=60s`.
+  nunca subiendo el límite para todos: la cabecera `x-efeonce-think-key` igual a la llave de Think no cuenta
+  (`buildPublicBurstGuardRule(spec, {thinkKey})` agrega la condición negada; `planPublicBurstGuardChanges` marca drift
+  si la regla viva no la tiene). La llave llega al script como `PUBLIC_BURST_GUARD_THINK_KEY` y a Think como
+  `GREENHOUSE_THINK_KEY`; nunca se imprime (code complete 2026-09-28; el `--apply` con la llave lo corre el operador).
+  Complemento: las sesiones PG de Vercel piden `idle_session_timeout=60s`.
 - **Cabeceras:** `Cache-Control: private, no-store, max-age=0`, `Pragma: no-cache`, `Referrer-Policy: no-referrer`,
   `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `X-Robots-Tag: noindex, nofollow, noarchive`, CSP
   `default-src 'none'; frame-ancestors 'none'`.
@@ -353,13 +369,19 @@ y auth en servidor.
 más las cabeceras de `hiring/assessment/public-session/http.ts`.
 
 **Dónde se renderiza (delta ADR 2026-09-15):** la vista compartida vive en el hub público `efeonce-think`
-(`think.efeoncepro.com`; ruta propuesta `/insights/r/<token>`, hermana de `/brand-visibility/r/<token>` del
-Grader). Greenhouse expone dos endpoints públicos sin sesión que TASK-1848 materializa: `resolveSharedEdition`
+(`think.efeoncepro.com`; ruta `/insights/r/<token>`, hermana de `/brand-visibility/r/<token>` del Grader,
+implementada por TASK-1875 como ruta SSR `src/pages/insights/r/[token].astro` — code complete local, sin desplegar). Greenhouse expone dos endpoints públicos sin sesión que TASK-1848 materializa: `resolveSharedEdition`
 (`GET /api/public/insights/shared/[token]` → `InsightWebModelV1`, proyección client-facing versionada del plan
 y el snapshot: capítulos, claims, `ChartSpecV1`, tablas, límites, metodología, referencias; nunca evidencia
 interna, prompts ni ids de actor) y `downloadSharedOutput` (proxy de PDF con chequeo de revocación). Think hace
 fetch **server-side por request** (el token no llega al browser, no hay pre-render ni cache), no re-deriva
-cifras ni consulta productores, y responde `not_found`/`gone` con pantallas seguras sin nombre de cliente.
+cifras ni consulta productores, y responde `not_found`/`gone` con pantallas seguras sin nombre de cliente. El
+cliente de Think (`src/lib/insights.ts`) envía server-side `x-efeonce-think-key` (`GREENHOUSE_THINK_KEY`) y, contra
+un deployment protegido, `x-vercel-protection-bypass` (`GREENHOUSE_API_BYPASS`); nunca registra el token. Descargas
+(`?descargar=<output>`) y logo (`?logo=1`) son relativos a la misma URL de Think, así que el token tampoco aparece en
+el HTML. El enlace sale de `buildInsightShareUrl` (correo en `delivery/dispatch.ts`, respuesta de creación en
+`sharing/commands.ts`) y por defecto apunta a Think de producción, que lee Greenhouse de producción: un token de
+staging da 404 allí; staging se prueba con Think local apuntando (`GREENHOUSE_API_BASE`) al `.vercel.app` de staging.
 Contrato de marca: tokens AXIS en Tailwind (mismo mecanismo del Grader), sin MUI. Cambiar el modelo web es
 bump de `modelVersion` con compatibilidad hacia atrás, como el `ReportArtifactModel` público del Grader.
 
@@ -1197,3 +1219,31 @@ canal `google` iban a un eje común (ahora comparación); la capitular quedaba s
 el control plane (el Job `artifact-worker` es único para staging y producción, así que el render nuevo llega a ambos
 con el release); aprobación del operador de las piezas derivadas y de los PDFs reales; una edición interna en
 producción antes de compartir con un cliente.
+
+### 14.10 Estado de TASK-1875 — vista web compartida en Think (in-progress; code complete local, sin desplegar)
+
+**Estado al 2026-09-28:** código terminado en local, **nada desplegado**. Los commits de Greenhouse (`d45fc780f`,
+`27b458aec`) están en `develop` local sin push; los de `efeonce-think` están en su `main` local sin push (ese `main`
+despliega producción automáticamente). `INSIGHTS_SHARING_ENABLED` sigue igual: ON en staging, OFF en producción.
+
+**Greenhouse:**
+- `InsightWebModelV1` 1.1 aditivo (§8): campos editoriales v2 opcionales, tasas de paso del embudo derivadas con la
+  geometría de los PDF y `header.clientLogo`; ruta `GET /api/public/insights/shared/[token]/logo`. Tests:
+  `sharing.test.ts` +3 (plan v1 intacto; proyección v2 con tasas `[{a, null}, {b, '25,0 %'}]`; embudo que crece sin
+  `derived`); suite de sharing 21, dominio Insights 264, typecheck en 0.
+- Excepción de Think en el guard de `/api/public/**` por la cabecera `x-efeonce-think-key` (§8); 14 tests.
+
+**Think (`efeonce-think`):** ruta SSR `src/pages/insights/r/[token].astro`; modo presentación, impresión con
+respaldo, en-US, logo del cliente, tests (`pnpm test:insights`), auditoría AA y fuentes; scripts
+`verify-insights-report.mjs`, `audit-insights-a11y.mjs`, `capture-insights-report.mjs`. Dossier de UI en Greenhouse:
+`docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/` (scorecard promedio 4,56).
+
+**Rollout pendiente, en este orden y con gate del operador:**
+1. Generar la llave de Think; `GREENHOUSE_THINK_KEY` en el env de producción del proyecto Vercel de Think y
+   `PUBLIC_BURST_GUARD_THINK_KEY=… pnpm security:public-burst-guard --apply` (lo corre el operador) para que la regla
+   del WAF lleve la excepción ANTES de que Think salga.
+2. Push de `develop` → staging; verificar el modelo 1.1 con un grant sintético sobre la edición sandbox (crear →
+   render en Think local → revocar → 410 → descarga por el proxy).
+3. Release de Greenhouse a producción por el control plane.
+4. Push del `main` de Think (despliega producción).
+5. Encender `INSIGHTS_SHARING_ENABLED` en producción sólo con aprobación del operador.
