@@ -1,0 +1,33 @@
+{
+  "displayName": "Cloud SQL greenhouse-pg-dev — conexiones > 85 (ISSUE-174)",
+  "documentation": {
+    "content": "La instancia compartida (dev/staging/prod) supera 85 de 97 conexiones utilizables por 2 minutos. Revisar ráfagas en /api/public/** (Vercel Firewall → Traffic) y pg_stat_activity. Runbook: docs/manual-de-uso/plataforma/operar-guard-rutas-publicas-y-saturacion-postgres.md (TASK-1876).",
+    "mimeType": "text/markdown"
+  },
+  "userLabels": {
+    "severity": "critical",
+    "component": "postgres-connections"
+  },
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "num_backends > 85 for 2m",
+      "conditionThreshold": {
+        "filter": "metric.type=\"cloudsql.googleapis.com/database/postgresql/num_backends\" AND resource.type=\"cloudsql_database\" AND resource.labels.database_id=\"efeonce-group:greenhouse-pg-dev\"",
+        "comparison": "COMPARISON_GT",
+        "thresholdValue": 85,
+        "duration": "120s",
+        "aggregations": [
+          {
+            "alignmentPeriod": "60s",
+            "perSeriesAligner": "ALIGN_MAX",
+            "crossSeriesReducer": "REDUCE_SUM"
+          }
+        ],
+        "trigger": { "count": 1 }
+      }
+    }
+  ],
+  "notificationChannels": ["projects/efeonce-group/notificationChannels/8736345518502755361"],
+  "enabled": true
+}
