@@ -239,8 +239,8 @@ Rules for agents:
 - Before pinning a consumer, confirm which **published** package version contains the export; do not assume the
   workspace source is released.
 - **Greenhouse consumption (verified 2026-09-28 in `package.json` and `node_modules`):** `develop` pins `axis-tokens`
-  `0.3.21`, `axis-ui-contracts` `0.3.19` (AXIS tag `v0.3.21`; the contracts package depends on `axis-tokens` exactly
-  `0.3.21`), `axis-ui-registry` `0.3.1`, `axis-brand-assets` `0.3.5` and `axis-graphic-line` `0.7.0` (the last two
+  `0.3.24`, `axis-ui-contracts` `0.3.22` (AXIS tag `v0.3.24`, 2026-09-28, Glitch Flash; the contracts package depends on
+  `axis-tokens` exactly `0.3.24`), `axis-ui-registry` `0.3.1`, `axis-brand-assets` `0.3.5` and `axis-graphic-line` `0.7.0` (the last two
   pinned by TASK-1922, tag `v0.3.12`). Graphic-line visual gate: 66 frames at 0 px (TASK-1928; 32 after TASK-1927).
   Series: `0.3.11`…`0.3.14` (TASK-1927), `0.3.12` (TASK-1922, Glitch), `0.3.15`…`0.3.21` (TASK-1928); table in the
   surface-composition section below.
@@ -507,7 +507,17 @@ in AXIS tag **`v0.3.12`** (commit `29a40b5`, push authorized by the operator; CI
 - **Lab** `/references/glitch/` and `/references/glitch.json` now read the token (the JSON adds `tokens`, `contract`,
   `assets`; schema still `axis.glitch-line.v1`); `apps/lab/src/data/glitch.ts` holds no HEX nor Glitch measures.
 
-Greenhouse `develop` pins these versions since commit `4dfb147f7`. Consumers read `glitchLine` or resolve an intent;
+Greenhouse `develop` pins these versions since commit `4dfb147f7`.
+
+**Glitch Flash (2026-09-28, AXIS tag `v0.3.24`, commit `5b3056f`; operator-authorized push, CI and release-packages green):**
+`glitchLine.editions` declares the two formats — `weekly` (Monday, numbered, 8-segment progress) and `flash` (a one-off
+news piece: no edition number, masthead «NO ESPERA AL LUNES» + byte trail + «FLASH», chips `LA NOTICIA`/`ANUNCIO`,
+`progress: 'none'`, variable narrator line) — plus six `flash-*` pieces. Contract `efeonce.glitch-line` **0.2.0**
+(`@efeoncepro/axis-ui-contracts` `0.3.22` over `axis-tokens` `0.3.24`): `edition` accepts a number or `{ kind, number? }`;
+new codes `flash-edition-number-not-allowed`, `flash-progress-not-allowed`, `edition-kind-invalid`,
+`edition-kind-mismatch`, `progress-invalid`; a `0.1.0` intent resolves as before. Greenhouse pins `0.3.24`/`0.3.22`
+(test `src/config/axis-glitch-line-package.test.ts`); Composer templates for the Flash do not exist yet. Criterion:
+`efeonce-graphic-line` → `references/glitch.md` §14. Consumers read `glitchLine` or resolve an intent;
 **never copy Glitch values** into templates, overlays or scripts. Still pending outside AXIS: the Composer catalogs
 (TASK-1923) and the workshop motion reading the token and assets instead of its mirror (TASK-1924). Human canon:
 `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md`; criterion: `efeonce-graphic-line` →

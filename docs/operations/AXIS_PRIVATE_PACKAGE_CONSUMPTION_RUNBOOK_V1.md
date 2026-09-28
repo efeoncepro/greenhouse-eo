@@ -8,7 +8,14 @@ source control.
 
 ## Current state — 2026-09-14
 
-> **Actualizado 2026-09-28 — estado vigente:** Greenhouse fija `axis-tokens` `0.3.21` y `axis-ui-contracts` `0.3.19`
+> **Actualizado 2026-09-28 (noche) — estado vigente:** Greenhouse fija `axis-tokens` `0.3.24` y `axis-ui-contracts`
+> `0.3.22` (tag `v0.3.24` de AXIS, commit `5b3056f`: `glitchLine.editions` y contrato `efeonce.glitch-line` 0.2.0, el
+> Glitch Flash), `axis-brand-assets` `0.3.5`, `axis-graphic-line` `0.7.0` y `axis-ui-registry` `0.3.1`. Instalado con
+> credencial efímera (`gh auth token` en un userconfig temporal fuera del repo, borrado al terminar), autorizada por el
+> operador para esta instalación. Gates: test del paquete Glitch, 102 tests del dominio, `composer:visual-gate
+> --catalog=glitch` 26/26 a 0 px, lint 0 errores, typecheck 0. La nota siguiente queda como historia.
+
+> **Actualizado 2026-09-28 — superado por la nota de arriba:** Greenhouse fijaba `axis-tokens` `0.3.21` y `axis-ui-contracts` `0.3.19`
 > (tag `v0.3.21` de AXIS, TASK-1928), `axis-brand-assets` `0.3.5`, `axis-graphic-line` `0.7.0` y `axis-ui-registry`
 > `0.3.1`. Versiones leídas en `package.json` y en `node_modules`; el bump está en `origin/develop` (commit `88ce23831`).
 > Ver **Delta 2026-09-28 (f)**; las notas siguientes quedan como historia.

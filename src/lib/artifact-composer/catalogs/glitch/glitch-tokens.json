@@ -2,7 +2,7 @@
   "$comment": "GENERADO por `pnpm glitch:tokens` desde @efeoncepro/axis-tokens (glitchLine). NO EDITAR A MANO: el test de sincronía detecta el drift.",
   "source": {
     "package": "@efeoncepro/axis-tokens",
-    "version": "0.3.23"
+    "version": "0.3.24"
   },
   "status": "candidate",
   "franchise": "glitch",
@@ -233,6 +233,72 @@
       "coverTemplate": null,
       "sphere": "apple",
       "headline": true
+    },
+    "flash-portada": {
+      "status": "aprobada",
+      "surface": "carousel",
+      "format": "linkedin-4x5",
+      "coverTemplate": null,
+      "sphere": "apple",
+      "headline": true,
+      "edition": "flash",
+      "derivesFrom": "portada-a",
+      "chip": "cover"
+    },
+    "flash-interior": {
+      "status": "aprobada",
+      "surface": "carousel",
+      "format": "linkedin-4x5",
+      "coverTemplate": null,
+      "sphere": "apple",
+      "headline": true,
+      "edition": "flash",
+      "derivesFrom": "interior-noticia-1",
+      "chip": "interior"
+    },
+    "flash-contraportada": {
+      "status": "aprobada",
+      "surface": "carousel",
+      "format": "linkedin-4x5",
+      "coverTemplate": null,
+      "sphere": "apple",
+      "headline": true,
+      "edition": "flash",
+      "derivesFrom": "contraportada",
+      "chip": null
+    },
+    "flash-blog-banner": {
+      "status": "aprobada",
+      "surface": "blog",
+      "format": "landscape-16x9",
+      "coverTemplate": null,
+      "sphere": "apple",
+      "headline": true,
+      "edition": "flash",
+      "derivesFrom": "blog-banner-a",
+      "chip": "cover"
+    },
+    "flash-blog-banner-interno": {
+      "status": "aprobada",
+      "surface": "blog",
+      "format": "blog-inline-16x9",
+      "coverTemplate": null,
+      "sphere": "none",
+      "headline": false,
+      "edition": "flash",
+      "derivesFrom": "blog-banner-interno",
+      "chip": "interior"
+    },
+    "flash-threads": {
+      "status": "aprobada",
+      "surface": "threads",
+      "format": "linkedin-4x5",
+      "coverTemplate": null,
+      "sphere": "apple",
+      "headline": true,
+      "edition": "flash",
+      "derivesFrom": "flash-portada",
+      "chip": "cover"
     }
   },
   "coverRotation": {
@@ -263,7 +329,8 @@
     "actions": {
       "row": {
         "pieces": [
-          "contraportada"
+          "contraportada",
+          "flash-contraportada"
         ],
         "glyphs": [
           "guardar",
@@ -279,7 +346,9 @@
           "portada-c",
           "interior",
           "interior-noticia-1",
-          "interior-lente"
+          "interior-lente",
+          "flash-portada",
+          "flash-interior"
         ],
         "glyph": "deslizar"
       },
