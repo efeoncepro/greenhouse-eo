@@ -32,7 +32,8 @@ y la route-ownership matrix.
 | Herramienta | Qué es | Ruta |
 |---|---|---|
 | **AI Visibility Grader** | Diagnóstico público de visibilidad en motores de respuesta, por token. Greenhouse calcula, Think presenta. Mide el hueco: presencia, citación, competidores, readiness y próximos pasos. | `/brand-visibility` · `/brand-visibility/r/<token>` |
-| **Efeonce Insights (informe compartido)** | Lectura ejecutiva de una edición de Insights para el cliente, por enlace con token. Greenhouse compone y gobierna el acceso; Think presenta: hallazgos que se expanden, escenas por módulo, modo presentación y descargas PDF. Construido y verificado en local; **sin desplegar** (push a `main` de Think pendiente del operador). | `/insights/r/<token>` |
+| **Efeonce Insights (informe compartido)** | Lectura ejecutiva de una edición de Insights para el cliente, por enlace con token. Greenhouse compone y gobierna el acceso; Think presenta: hallazgos que se expanden, escenas por módulo, modo presentación y descargas PDF. En producción desde 2026-09-28 (Think `bbf8522`); lee Greenhouse de producción, donde `INSIGHTS_SHARING_ENABLED` sigue OFF hasta el flip del operador. | `/insights/r/<token>` |
+| **Efeonce Insights (muestra para clientes)** | El mismo render con datos de ejemplo y una marca ficticia, para mostrar el producto en venta: aviso visible, sin descargas ni llamadas a Greenhouse, `noindex`, fuera del sitemap. | `/insights/muestra` |
 | **Radiografía AEO** | Herramienta de educación y sales enablement SEO/AEO. Recorre en 4 pantallas un artículo real, expone su capa técnica y demuestra cómo un hueco medido se convierte en contenido visible, citable y distribuible. El **cliente es un payload**, no código. | `/muestras/<slug>-<token>` |
 
 ## Principios

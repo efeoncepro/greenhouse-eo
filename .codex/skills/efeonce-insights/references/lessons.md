@@ -396,3 +396,17 @@
   `src/lib/email/delivery.ts`. Fix real `8882af0e3`: resolver la fila por `source_entity` + `source_event_id`. Reglas:
   (1) al persistir una referencia a otra tabla, verifícala con un JOIN contra datos reales; (2) un mock de un contrato
   ajeno se escribe leyendo el código de ese contrato, nunca con el valor que tu fix espera.
+
+### 2026-09-28 — Un enlace sin `downloadOutputs` no descarga nada (TASK-1875)
+
+Síntoma: el canary de Think en staging mostró la edición sin botones de descarga y `?descargar=deck_pdf` devolvió 303,
+con el deck renderizado y la edición emitida. Causa: el grant se creó con `{"ttlDays":1}`; ese campo no existe
+(el correcto es `expiresInDays`) y `downloadOutputs` vacío es el default. Regla: al crear un enlace, pasar
+`downloadOutputs` explícito y verificar el TTL en la respuesta (`expiresAt`), no en lo que se mandó.
+
+### 2026-09-28 — Astro permite un solo `astro dev` por proyecto (TASK-1875)
+
+Síntoma: el servidor de Think contra staging salía con código 1 en 4 s («Another astro dev server is already
+running»). Regla: parar el servidor de fixtures antes de levantar el de staging; en `--mode staging` los tokens
+`fixture-*` siguen resolviendo porque `import.meta.env.DEV` sigue en `true`.
+

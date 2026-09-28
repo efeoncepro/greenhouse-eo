@@ -60,13 +60,13 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `layout`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1875-efeonce-insights-shared-web-render-think.md`
 - Flow: `docs/ui/flows/TASK-1875-efeonce-insights-shared-web-render-think-flow.md`
 - Motion: `docs/ui/motion/TASK-1875-efeonce-insights-shared-web-render-think-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `En implementación local (2026-09-28): diseño aprobado en el canvas «Insights en vivo»; render en efeonce-think con fixture sólo en dev, sin push`
+- Status real: `Think en producción (bbf8522): /insights/r/<token> y la muestra pública /insights/muestra; Greenhouse 1.1 en staging (13fd47381) con canary sintético verde; pendientes del operador: --apply del WAF, release de Greenhouse a producción e INSIGHTS_SHARING_ENABLED en producción (hoy OFF)`
 - Rank: `TBD`
 - Domain: `ui|platform|public-site`
 - Blocked by: `none`
@@ -228,143 +228,218 @@ Reglas obligatorias:
 
 ## UI/UX Contract
 
+> Reescrito el 2026-09-28 para describir lo construido y aprobado (dirección A, «tablero de respuestas», web
+> nativa). La versión anterior (página editorial con índice lateral y primitivas `EditionMasthead`/`FactCallout`)
+> fue rechazada por el operador al verla y no se construyó. Contratos: wireframe, flow y motion declarados en
+> `## Status`, reescritos el mismo día.
+
 ### Experience brief
 
 - UI rigor: `ui-standard`
 - Usuario / rol: destinatario de un enlace compartido (cliente, jefe del cliente, socio) sin sesión Greenhouse;
   no es el operador ni el cliente autenticado (esos leen en el portal, TASK-1849).
-- Momento del flujo: llega desde el correo de entrega (TASK-1848) o desde un enlace copiado en el portal; lee,
-  navega por capítulos, descarga el PDF si existe, y vuelve a abrirlo días después (o encuentra que expiró).
-- Resultado perceptible esperado: en el primer fold entiende de quién es el informe, qué período cubre, cuál es
-  la conclusión principal y con qué corte de datos; puede seguir el relato capítulo a capítulo con cada cifra
-  acompañada de su unidad y su procedencia.
-- Fricción que debe reducir: abrir un PDF pesado en el móvil; no saber si el dato es medido o estimado; no
-  saber si el enlace sigue vigente; buscar la tabla detrás de un gráfico.
+- Momento del flujo: llega desde el correo de entrega (TASK-1848) o desde un enlace copiado (del portal o de esta
+  misma página, incluso a un hallazgo puntual); lee la respuesta, abre la evidencia de lo que le importa, la
+  presenta en una reunión, descarga el PDF si existe y vuelve días después (o encuentra que expiró).
+- Resultado perceptible esperado: en el primer pliegue sabe cuál es la respuesta del mes, para quién es, qué
+  período cubre, con qué corte de datos y hasta cuándo vale el enlace; cada cifra trae su procedencia (Medido o
+  Estimado, fuente, fecha de corte) y su evidencia está a un toque.
+- Fricción que debe reducir: abrir un PDF pesado en el móvil; leer todo para encontrar la conclusión; no saber si el
+  dato es medido o estimado; no saber si el enlace sigue vigente; buscar la tabla detrás de un gráfico; armar una
+  presentación aparte para la reunión.
 - No-goals UX: dashboard vivo, filtros por período, comparar otra edición, editar, comentar, pedir un informe
-  nuevo, identificar al visitante, login, selector de cuentas.
+  nuevo, identificar al visitante, login, selector de cuentas, CTA comercial.
 
 ### Surface & system decision
 
-- Surface: página pública SSR `think.efeoncepro.com/insights/r/<token>` (+ estados seguros a pantalla completa).
-- Nav placement: `none` — no agrega destino de navegación en Greenhouse; en Think no hay menú (patrón del Grader).
-- Composition Shell: `no aplica` — Think no usa el shell del portal; composición editorial propia del hub
-  (`BaseLayout` + secciones), sin chrome privado.
-- Primitive decision: `extend` — reusar `StatusScreen`, `ReportIcon`, `EngineAvatarGroup`; extraer como
-  primitivas nuevas del hub `EditionMasthead` (identidad/período/corte/versión), `FactCallout` (cifra + unidad +
-  procedencia + ausencia) y `ChartFigure` (ChartSpecV1 → ECharts + tabla equivalente colapsable).
-- Adaptive density / The Seam: `no aplica` — no es una card del portal; responsive por breakpoints del hub.
-- Floating/Sidecar/Dialog decision: ningún diálogo. Índice de capítulos como rail lateral en desktop y
-  `<details>` accesible en mobile (patrón ya usado en Think).
-- Copy source: `local one-off` del hub en `src/lib/insights-copy.ts` (es-CL, revisado con
-  `greenhouse-ux-writing`); las etiquetas de métricas, límites y metodología vienen YA escritas en el modelo
-  (`plan.chapters[].claims[].text`, `limits`, `methodology`) y no se reescriben en Think.
+- Surface: página pública SSR `think.efeoncepro.com/insights/r/<token>` con modo presentación en diálogo y estados
+  seguros a pantalla completa en la misma ruta.
+- Nav placement: `none` — no agrega destino de navegación en Greenhouse; en Think la página no tiene menú (patrón
+  del Grader). La navegación interna es la barra fija del propio informe.
+- Composition Shell: `no aplica` — Think no usa el shell del portal; composición propia del hub (`BaseLayout` +
+  portada, barra fija, tablero de hallazgos, escenas por módulo, plan, metodología, descargas y pie).
+- Primitive decision: `new` (feature-local del hub) + `reuse` — nuevos `ChartFigure` (15 familias + tabla
+  equivalente + interruptor), `ModuleScene` (escena narrada por capítulo) y `FactMark` (Medido/Estimado por forma)
+  en `efeonce-think/src/components/insights/`; reuse `StatusScreen`. No nacen como primitivas compartidas del hub:
+  se promueven si otro informe las necesita.
+- Adaptive density / The Seam: `no aplica` — no es una card del portal; responsive por quiebres del hub (1000 px y
+  720 px), con dock móvil.
+- Floating/Sidecar/Dialog decision: un solo diálogo, el modo presentación (`role="dialog"`, `aria-modal`, foco
+  atrapado y devuelto). La evidencia de un hallazgo se abre dentro de su tarjeta, no en un modal. Toast de copia
+  sin interacción.
+- Copy source: `local one-off` del hub en `efeonce-think/src/lib/insights-copy.ts`, con diccionarios es-CL (tuteo)
+  y en-US elegidos por `model.locale`; lo editorial viene escrito en el modelo y no se reescribe en Think.
 - Access impact: `none` — el token es la autorización; ningún claim, view ni capability en el hub.
 
 ### State inventory
 
-- Default: informe completo: masthead → resumen ejecutivo → capítulos (claims, figura, tabla equivalente,
-  límites del capítulo) → acciones (si el plan trae) → metodología y referencias → descargas → footer institucional.
-- Loading: no hay spinner: SSR entrega HTML completo; las figuras tienen primer paint determinista (SVG/DOM con
-  dimensiones desde el modelo) y el motion sólo "arma" lo que ya está.
-- Empty: un capítulo sin hechos muestra su bloque de límites con el motivo (`unsupported_window`,
-  `insufficient_data`, …) en lenguaje del modelo; nunca un gráfico vacío ni un cero.
-- Error: `error` (Greenhouse 5xx/red) → `StatusScreen` kind `error`, 502 en Think, sin nombre del cliente.
-- Degraded / partial: período parcial (`period.partial`) → banda "Período abierto: la fuente aún no cerró";
-  descargas `unavailable` → bloque de descargas con texto de no disponible, sin botón muerto.
-- Permission denied: `not_found` (token desconocido/expirado, 404 indistinto) y `gone` (revocado/retirado, 410)
-  → `StatusScreen` sin identidad del cliente; `rate_limited` (429) → `StatusScreen` con espera.
-- Long content: hasta 3 módulos × N capítulos; índice pegajoso en desktop, `<details>` en mobile; tablas
-  equivalentes colapsadas por defecto con resumen visible; anchors por capítulo.
-- Mobile / compact: 390px, una columna, cifras completas (sin truncar unidades), gráficos a ancho completo con
-  leyenda debajo, tabla equivalente con scroll interno (no de página).
-- Keyboard / focus: orden lógico masthead → índice → capítulos → descargas; `focus-visible` en enlaces/índice/
-  `<details>`; skip link al contenido; tooltips de gráficos accesibles por teclado o sustituidos por la tabla.
-- Reduced motion: sin count-up, sin reveal por scroll, sin dibujo progresivo de gráficos; contenido idéntico.
+- Default: portada con la respuesta del mes y la órbita de acento → barra fija → «Lo esencial del mes» → decisión
+  → una escena por capítulo → plan de acción → «Cómo se midió» → descargas → pie compacto.
+- Loading: sin spinner; SSR entrega el HTML completo y final. El motion sólo arma lo que ya está; si el script no
+  monta en 3 s, se retira y la página queda completa.
+- Empty: capítulo sin cifras → una línea con el motivo del modelo; hallazgo sin figura propia → «Este hallazgo no
+  tiene una figura propia en esta edición.»; hecho con valor nulo → «Sin dato», nunca un cero.
+- Error: Greenhouse 5xx, red caída o `modelVersion` mayor no soportada → `StatusScreen` `error`, HTTP 502, sin nombre
+  del cliente ni código.
+- Degraded / partial: período abierto → banda navy bajo la portada; descarga sin archivo → «No disponible en esta
+  edición» (sin botón) y, si se pide igual por URL, 303 de vuelta al informe; modelo v1 sin campos editoriales v2 →
+  hallazgos desde las afirmaciones del resumen, sin decisión ni lecturas.
+- Permission denied: `not_found` (desconocido, expirado, malformado o flag OFF, 404 indistinguible) y `gone`
+  (revocado o retirado, 410) → `StatusScreen` con Nexa y la marca, sin identidad del cliente, con «Escribir a
+  Efeonce»; `rate_limited` (429) → `StatusScreen` con espera.
+- Long content: hasta tres módulos con varias figuras cada uno; filtros por módulo en la barra; órbita de avance; el
+  fixture extremo (textos y cifras largas, nueve hallazgos) no desborda en 1440 ni 390.
+- Mobile / compact: 390 px, portada a `100svh` con órbita reducida, barra de 56 px con filtros desplazables, dock
+  inferior con «Copiar enlace» y «Descargar», escenas en una columna con los pasos de corrido, tablas con scroll
+  interno; sin scroll horizontal de página.
+- Keyboard / focus: skip link a «Lo esencial del mes»; hallazgos con `aria-expanded` y Escape; filtros e
+  interruptores con `aria-pressed`; tooltips de barras también al enfocar; presentación con flechas, Re Pág/Av Pág,
+  Espacio, Inicio/Fin y Esc, foco atrapado y devuelto al botón. 64–71 paradas de Tab, todas con foco visible.
+- Reduced motion: sin órbita en movimiento, reveals, conteo, escenas narradas, entrada de figuras, View Transitions
+  ni deslizamiento de láminas; contenido e interacción idénticos.
 
 ### Interaction contract
 
-- Primary interaction: leer y navegar por capítulos (índice → anchor); descargar PDF cuando existe.
-- Hover / focus / active: enlaces del índice y descargas con estados visibles; filas de tabla sin hover decorativo.
-- Pending / disabled: descarga no disponible se muestra como texto, no como botón deshabilitado.
-- Escape / click-away: no hay overlays; `<details>` cierra con su propio control.
-- Focus restore: no aplica (sin diálogos); los anchors mueven el foco al encabezado del capítulo.
-- Latency feedback: ninguno en cliente (SSR completo); el proxy de descarga responde archivo o página de estado.
-- Toast / alert behavior: sin toasts; la banda de período parcial y los límites son estáticos y siempre visibles.
+- Primary interaction: leer la respuesta y abrir un hallazgo para ver su evidencia en el lugar; recorrer las escenas
+  por módulo (con filtro opcional); presentar; descargar.
+- Hover / focus / active: tarjetas de hallazgo, pastillas de filtro, interruptor gráfico/tabla, botones de barra y
+  dock con estados visibles (150 ms); grupos de barras atenúan a sus vecinos y muestran su detalle al pasar o
+  enfocar; acciones del plan suben 3 px al pasar.
+- Pending / disabled: no hay estados pendientes (todo es lectura); una descarga no disponible se muestra como texto,
+  nunca como botón deshabilitado; sin descarga disponible, la barra y el dock no muestran «Descargar».
+- Escape / click-away: Escape cierra el hallazgo abierto y sale de la presentación; clic en el escenario de la
+  presentación avanza; no hay click-away en hallazgos (se cierran con su botón, «Cerrar» o Escape).
+- Focus restore: al cerrar un hallazgo, el foco vuelve a su botón; al salir de la presentación, al botón
+  «Presentar» (repetido dos cuadros después por la salida de pantalla completa).
+- Latency feedback: ninguno en cliente (SSR completo); la descarga responde el archivo o vuelve al informe con 303.
+- Toast / alert behavior: «Enlace copiado» en `role="status"` durante 2,2 s (sobre el dock en móvil); la banda de
+  período abierto y los límites son estáticos y siempre visibles.
 
 ### Motion & microinteractions
 
-- Motion primitive: `CSS` + GSAP del hub (`useGreenhouseGSAP` no existe en Think; se usa el patrón self-contained
-  de `MaturityLadder`).
-- Enter / exit: reveal suave de secciones al entrar en viewport; sin exit.
-- Layout morph: ninguno.
-- Stagger: claims del resumen ejecutivo con stagger corto; barras de figuras con dibujo progresivo una sola vez.
-- Timing / easing token: tokens de `report-tokens` del hub (los mismos del Grader); sin valores literales nuevos.
-- Reduced-motion fallback: `prefers-reduced-motion` desactiva todo; fail-safe: si el JS falla, el contenido ya está.
-- Non-goal motion: nada en tablas, nada en masthead, ningún parallax.
+- Motion primitive: `CSS` + script propio del hub (`efeonce-think/src/scripts/insights-report.ts`, sin GSAP), con
+  View Transitions API como mejora al abrir hallazgos y filtrar.
+- Enter / exit: portada — anillo (350 ms), recorrido de la esfera con estela de 50° (1100 ms tras 200 ms), halo,
+  anillo «en vivo» en bucle (2400 ms desde 1600 ms) y cuerpo que sube escalonado (900 ms); reveals de 700 ms / 18 px;
+  láminas de presentación 500/600 ms con ±40 px.
+- Layout morph: la órbita de la portada se aleja al bajar y reaparece pequeña en la barra (`is-stuck`); el hallazgo
+  abierto pasa a ancho completo con View Transitions; la figura narrada cambia de estado por paso (`data-step`).
+- Stagger: grupos `data-stagger` con 70 ms entre hijos (620 ms); barras con 70 ms entre grupos; celdas del waffle
+  con 6 ms entre celdas.
+- Timing / easing token: `axisMotion` vía `efeonce-think/src/lib/insights-tokens.ts` — `easeEmphasized`
+  `cubic-bezier(0.2, 0, 0, 1)`, `easeStandard` `cubic-bezier(0.4, 0, 0.2, 1)`, 150 ms y 300 ms, `orbitMs`; las
+  duraciones de coreografía larga viven en `insights.css` (detalle en el contrato de motion).
+- Reduced-motion fallback: `prefers-reduced-motion: reduce` no agrega `.ins-motion`, no monta reveals ni escenas y
+  anula toda transición y animación dentro de la página; fail-safe de 3 s (`window.__insMounted`) si el JS no monta.
+- Non-goal motion: tablas, metodología, descargas, pie, estados seguros e impresión; ningún parallax ajeno a la
+  órbita.
 
 ### Implementation mapping
 
-- Route / surface: `efeonce-think/src/pages/insights/r/[token].astro` (SSR, `prerender = false`);
-  estados vía `StatusScreen` (404/410/429/502).
-- Primitive / variant / kind: `StatusScreen` (reuse), `ReportIcon` (reuse), `EditionMasthead` (new, hub),
-  `FactCallout` (new, hub), `ChartFigure` (new, hub: `ChartSpecV1` → ECharts + `<table>` equivalente).
-- Component candidates: `src/components/insights/{ExecutiveSummary,Chapter,LimitsBlock,MethodologyBlock,Downloads}.astro`.
-- Copy source: `src/lib/insights-copy.ts` (hub) para chrome (índice, descargas, estados, notas de período); el
-  contenido editorial viene del modelo y NO se reescribe.
-- Data reader / command: `src/lib/insights.ts` (hub) → `fetchSharedInsightEdition(token)` → Greenhouse
-  `GET /api/public/insights/shared/[token]` (TASK-1848); descargas → `…/outputs/[output]` (proxy). Sin commands.
-- API parity: la misma edición se lee en el portal (TASK-1849) desde los readers autenticados; el modelo web es
-  una proyección de los mismos DTOs (`projectPlan`/`projectSnapshot`), así que cifras e identidad coinciden por
-  construcción.
-- Access / capability: ninguna en el hub; el grant se valida en Greenhouse en cada request.
-- States to implement: default, partial, empty por capítulo, downloads unavailable, not_found, gone,
-  rate_limited, error, long content, mobile, reduced motion.
+- Route / surface: `efeonce-think/src/pages/insights/r/[token].astro` (SSR, `prerender = false`; `Cache-Control:
+  private, no-store`, `X-Robots-Tag: noindex, nofollow`, `Referrer-Policy: no-referrer`; `BaseLayout` con
+  `analytics={false}`, canonical genérico e imagen OG sin datos del informe); estados vía `StatusScreen`
+  (404/410/429/502).
+- Primitive / variant / kind: `ChartFigure` (15 familias: `bar`, `bar_grouped`, `bar_stacked`, `line`, `pie`,
+  `donut`, `scatter`, `bullet`, `gauge`, `waterfall`, `funnel`, `heatmap`, `waffle`, `venn_two`, `upset`; tema
+  `light|dark`, variante `compact`), `ModuleScene`, `FactMark`, `StatusScreen` (reuse).
+- Component candidates: `efeonce-think/src/components/insights/{ChartFigure,ModuleScene,FactMark}.astro`; la portada,
+  la barra, el tablero, el plan, las descargas, el pie, el dock y la presentación viven en la página.
+- Copy source: `efeonce-think/src/lib/insights-copy.ts` (`INSIGHTS_COPY` es-CL + `INSIGHTS_COPY_EN`,
+  `getInsightsCopy(model.locale)`); `<html lang>` sigue al modelo.
+- Data reader / command: `efeonce-think/src/lib/insights.ts` → `fetchSharedInsightEdition(token)` contra Greenhouse
+  `GET /api/public/insights/shared/[token]` (TASK-1848, `modelVersion` 1.x; 1.1 suma `essentials`, `decision`,
+  `measurement`, `ask`, `scopeLines`, `chapter.opening`, `chapter.readings`, `chart.derived.funnelStepRates` y
+  `header.clientLogo`), con `x-efeonce-think-key` (excepción del WAF, TASK-1876) y `x-vercel-protection-bypass`
+  sólo en staging; `fetchSharedInsightOutput` (`?descargar=`) y `fetchSharedInsightLogo` (`?logo=1`) por la misma
+  URL. Vista: `insights-view.ts`; geometría: `insights-chart-geometry.ts`; tokens: `insights-tokens.ts`;
+  interacción: `src/scripts/insights-report.ts`; estilos: `src/styles/insights.css`. Sin commands.
+- API parity: la misma edición se lee en el portal (TASK-1849) desde los readers autenticados; el modelo web es una
+  proyección de los mismos DTOs, así que cifras e identidad coinciden por construcción. La página no expone
+  acciones de negocio (lectura, copia de enlace y descarga por proxy gobernado en Greenhouse).
+- Access / capability: ninguna en el hub; el grant se valida en Greenhouse en cada request, también en la descarga
+  y el logo.
+- States to implement: ready, período parcial, capítulo vacío, hallazgo sin figura, descarga no disponible, v1,
+  en-US, extremo, not_found, gone, rate_limited, error, móvil, movimiento reducido, presentación e impresión de
+  respaldo — todos implementados y cubiertos por fixtures de `astro dev`.
 
 ### GVC scenario plan
 
-- Scenario file: `efeonce-think/scripts/capture.mjs` (desktop+mobile) + `scripts/verify-insights-report.mjs`
-  (fixtures del modelo: completo, parcial, con capítulo vacío, sin descargas) — el hub no usa el DSL GVC de Greenhouse.
-- Route: `/insights/r/<token-fixture>` en `pnpm dev` del hub con `GREENHOUSE_API_BASE` apuntando a staging
-  (bypass Vercel) o a un mock local del endpoint con los fixtures.
-- Viewports: desktop 1440×900 y mobile 390×844.
+- Scenario file: `efeonce-think/scripts/capture-insights-report.mjs` (capturas) +
+  `efeonce-think/scripts/verify-insights-report.mjs` (estados, cabeceras, no-leak, cifras, desborde, interacción,
+  presentación, impresión) + `efeonce-think/scripts/audit-insights-a11y.mjs` (contraste y teclado) +
+  `efeonce-think/tests/insights.test.ts` (14 pruebas). El hub no usa el DSL GVC de Greenhouse.
+- Route: `/insights/r/fixture-{completo,extremo,en,parcial,v1,sin-descargas,no-existe,retirado,limite,error}` en
+  `astro dev` (puerto 4331); los fixtures sólo existen con `import.meta.env.DEV`.
+- Viewports: desktop 1440×900 y mobile 390×844 (impresión emulada a 794×1123).
 - Quality profile: `premium`
-- Required steps: cargar fixture completo → capturar first fold, un capítulo con figura + tabla abierta, límites,
-  descargas, footer; cargar fixture parcial; forzar 404/410/429/502.
-- Required captures: `first-fold`, `chapter-figure`, `chapter-table-open`, `limits`, `downloads-unavailable`,
-  `status-not-found`, `status-gone`, `status-rate-limited`, `status-error` × 2 viewports.
-- Required `data-capture` markers: `data-capture="masthead|summary|chapter-<module>|limits|downloads|footer"`.
-- Assertions: cifras del DOM == cifras del fixture (con unidad); `modelVersion` soportado; HTML no contiene el token
-  ni URLs de storage; `Cache-Control: private, no-store`; `X-Robots-Tag: noindex`; `Referrer-Policy: no-referrer`.
-- Scroll-width checks: `document.documentElement.scrollWidth === clientWidth` en ambos viewports.
-- Reduced-motion / focus evidence: captura con `prefers-reduced-motion: reduce` + recorrido de teclado grabado.
-- Review dossier: `docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/` (capturas copiadas del hub).
-- Baseline decision / surface ID: superficie nueva `think.insights.shared`; sin baseline previa; comparar contra
-  el informe del Grader para consistencia de marca, no para igualdad.
+- Required steps: cargar el fixture completo → portada, «Lo esencial», abrir `#h-ess-1`, figura narrada SEO, pasar a
+  tabla, capítulos AEO e ICO, descargas, pie; fixture parcial → portada y límites; fixture sin descargas; los cuatro
+  estados; abrir la presentación y avanzar.
+- Required captures: `first-fold`, `summary`, `finding-open`, `chapter-figure`, `chapter-table-open`, `chapter-aeo`,
+  `chapter-ico`, `partial-first-fold`, `limits`, `downloads`, `downloads-unavailable`, `status-not-found`,
+  `status-gone`, `status-rate-limited`, `status-error`, `footer` × 2 viewports + `present-cover` y
+  `present-finding` en desktop (34 archivos).
+- Required `data-capture` markers: `masthead`, `summary`, `chapter-seo|aeo|ico`, `limits`, `methodology`,
+  `downloads`, `footer`.
+- Assertions: HTTP por fixture; `Cache-Control: private, no-store`, `X-Robots-Tag: noindex`, `Referrer-Policy:
+  no-referrer`; el HTML nunca contiene el token ni la ruta del lector; sin GTM; cifras del modelo tal cual («16,5 %»,
+  «1.284», «#7,4»…); «Sin dato» en vez de cero; tasas del embudo «pasa el 53,7 %»; v1 y en-US; descarga sin archivo →
+  303; logo 200/404; hallazgo abre con `aria-expanded`; filtro por módulo; presentación «1 de N» → «2 de N» y Esc con
+  foco devuelto; impresión sin controles, con logos en positivo y tablas visibles.
+- Scroll-width checks: `scrollWidth - clientWidth === 0` en 1440 y 390, con y sin movimiento reducido, antes y
+  después de interactuar, con el fixture extremo y en impresión.
+- Reduced-motion / focus evidence: capturas con `reduce`; con `reduce` ningún reveal ni barra queda oculto y la raíz
+  no lleva `.ins-motion`; recorrido de Tab (64–71 paradas, todas con foco visible) en 1440 y 390.
+- Review dossier: `docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/` (README con la reproducción
+  y las 34 capturas).
+- Baseline decision / surface ID: `think.insights.shared`, superficie nueva; el dossier del 2026-09-28 es la primera
+  baseline. Se compara con el Grader sólo por consistencia de marca.
 
 ### Design decision log
 
-- Decision: página editorial larga con índice, un capítulo por módulo, figura + tabla equivalente por gráfico, y
-  procedencia visible por cifra; estados seguros a pantalla completa.
-- Alternatives considered: (a) vista en el portal Greenhouse con sesión (descartada por el operador: menos libertad
-  y peor para reenviar); (b) PDF embebido/iframe (descartado: no responsive, no revocable en vivo, GTM roto);
-  (c) dashboard interactivo con filtros (descartado por arquitectura: la edición es congelada).
-- Why this pattern: es el patrón que ya rinde en el Grader y cumple §8 (revocación por lectura, no-leak, no-index).
-- Reuse / extend / new primitive: reuse `StatusScreen`/`ReportIcon`; new `EditionMasthead`, `FactCallout`,
-  `ChartFigure` como primitivas del hub reutilizables por SEO/otros informes.
-- Open risks: fidelidad visual PDF↔web de los gráficos (semántica, no píxel); tamaño del modelo en informes
-  de 3 módulos (paginación por capítulo si supera un umbral medido); rate limit por IP compartida en oficinas.
+- Decision: dirección A, «tablero de respuestas», web nativa — portada que responde, hallazgos que se abren como
+  evidencia en su lugar, barra fija con filtros por módulo y órbita de avance, una escena narrada por módulo, modo
+  presentación y estados seguros a pantalla completa.
+- Alternatives considered: (a) vista en el portal con sesión (descartada por el operador el 2026-09-15: peor para
+  reenviar); (b) PDF embebido (no responsive ni revocable en vivo); (c) dashboard con filtros de período (la edición
+  es congelada); (d) página editorial con índice lateral (construida en canvas y rechazada por el operador el
+  2026-09-28: «el PDF con vida»).
+- Why this pattern: el destinatario necesita la respuesta y su evidencia, no un documento lineal; el operador pidió
+  más impacto (portada a pantalla completa con la órbita, cifras grandes, scrollytelling), todas las familias de
+  gráfico en la narrativa y un pie compacto. Cumple §8 de la arquitectura (revocación por lectura, no-leak,
+  no-index).
+- Reuse / extend / new primitive: reuse `StatusScreen`; nuevos feature-local `ChartFigure`, `ModuleScene` y
+  `FactMark`. Reglas de marca aplicadas: una sola órbita por pieza (de acento, porque el modelo no declara cifra de
+  portada), acento nunca en texto bajo 24 px (etiquetas de familia en tinta suave), etiquetas de segmentos apilados
+  sólo en series oscuras y la del segmento superior sobre la columna (AA); Poppins recortada a siete archivos
+  (123 KB). Una descarga ausente en un fixture es deliberada (la edición no la trae), no una capacidad faltante. La
+  impresión es respaldo: el PDF descargable es el camino para imprimir.
+- Open risks: falta la prueba contra una edición real de staging con un grant sintético (necesita autorización del
+  operador); iconografía todavía fuera del set «Trazo» de AXIS; el script de la órbita escribe dos duraciones
+  literales (halo 900 ms contra 800 ms del token); rate limit por IP compartida en oficinas, mitigado del lado de
+  Think por la llave del WAF.
 
 ### Visual verification
 
-- GVC scenario: `capture.mjs` + `verify-insights-report.mjs` del hub (ver plan).
-- Viewports: 1440 y 390.
-- Required captures: las 9 del plan × 2 viewports.
-- Required `data-capture` markers: `masthead`, `summary`, `chapter-<module>`, `limits`, `downloads`, `footer`.
-- Scroll-width check: obligatorio en ambos viewports.
-- Accessibility/focus checks: skip link, orden de foco, `focus-visible`, tabla equivalente accesible, contraste AA.
-- Before/after evidence: sin "before" (superficie nueva); dossier con las capturas observadas y anotadas.
-- Known visual debt: tokens AXIS duplicados en `report-tokens.ts` del hub (deuda declarada desde TASK-1325).
-- Visual scorecard: `docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think.scorecard.json`
+- GVC scenario: `capture-insights-report.mjs` + `verify-insights-report.mjs` («Todo verde») +
+  `audit-insights-a11y.mjs` (todo AA) + `node --test tests/insights.test.ts` (14 verdes), contra `astro dev` con los
+  fixtures del modelo 1.1.
+- Viewports: 1440×900 y 390×844.
+- Required captures: las 34 del plan, miradas en hoja de contactos y por archivo.
+- Required `data-capture` markers: `masthead`, `summary`, `chapter-seo|aeo|ico`, `limits`, `methodology`,
+  `downloads`, `footer`.
+- Scroll-width check: 0 px en 1440 y 390, con y sin movimiento reducido, tras interactuar y con el fixture extremo.
+- Accessibility/focus checks: contraste AA contra el fondo real en 1440 y 390 (fixtures completo y extremo); Tab con
+  foco visible en todas las paradas; hallazgos y presentación con foco devuelto; skip link.
+- Before/after evidence: sin «before» en runtime (superficie nueva); la versión rechazada con índice lateral quedó
+  sólo en el canvas. Dossier con las capturas observadas en
+  `docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/`.
+- Known visual debt: iconografía fuera del set «Trazo» de AXIS (misma deuda que los catálogos PDF, tarea propia);
+  tokens de «La órbita» copiados en `insights-tokens.ts` mientras Think no consuma los paquetes privados de AXIS;
+  falta la captura contra una edición real de staging.
+- Visual scorecard: `docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think.scorecard.json` (promedio
+  4,56; piso 4,3 en iconografía; fidelidad 4,5; resistencia a plantilla 4,6; veredicto `pass-local`).
 - Quality threshold: `average >= 4.5; floor >= 4; fidelity/template resistance >= 4.5`
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -515,32 +590,43 @@ La prueba `verify-insights-report.mjs` compara el DOM con el fixture, no con cá
 
 ## Acceptance Criteria
 
-- [ ] Se declaro `Execution profile: ui-ux` y `UI impact: layout`; `UI ready` permanece `no` hasta que wireframe,
+> Evidencia 2026-09-28: `verify-insights-report` «Todo verde» (estados 200/404/410/429/502, cabeceras, no-leak del
+> token y sin GTM, cifras del modelo, banda parcial, v1, 303 sin archivo, en-US, caso extremo, ruta del logo, tasas del
+> embudo, desborde 1440/390, movimiento reducido, interacción, presentación, impresión); `audit-insights-a11y` todo AA
+> y foco visible en 1440/390 (completo, extremo y muestra); 15 pruebas unitarias; canary real en staging con la
+> edición sintética `EO-INS-000014` (200 con cabeceras, PDF de 329 874 B por el proxy, 410 tras revocar, 404
+> desconocido). Sin tildar: el 200 en `think.efeoncepro.com` con un grant real espera `INSIGHTS_SHARING_ENABLED` en
+> producción (hoy OFF; el canary se hizo con Think local contra staging), y la `modelVersion` con major no soportada
+> está en código (`isSupportedModelVersion` ⇒ `error` 502) pero sin prueba automatizada. `EditionMasthead` y
+> `FactCallout` no existen como tales: la portada es el `header.ins-hero` de `InsightReport` y el callout quedó como
+> `FactMark`; así está documentado en el README de primitivas.
+
+- [x] Se declaro `Execution profile: ui-ux` y `UI impact: layout`; `UI ready` permanece `no` hasta que wireframe,
       flow, motion y `## UI/UX Contract` tengan mapping, GVC plan y decision log materializados con el contrato
       real de TASK-1848; si pasa a `yes`, `pnpm task:lint --task TASK-1875` no reporta findings.
 - [ ] `think.efeoncepro.com/insights/r/<token>` responde 200 para un grant válido con: código `EO-INS-…`, versión,
       período con zona, corte máximo, resumen, capítulos, figuras con tabla equivalente, límites, metodología y
       descargas; todas las cifras del DOM son iguales al fixture/snapshot (prueba automatizada), sin re-formatear.
-- [ ] La página se resuelve en cada request (`prerender = false`), sirve `Cache-Control: private, no-store`,
+- [x] La página se resuelve en cada request (`prerender = false`), sirve `Cache-Control: private, no-store`,
       `X-Robots-Tag: noindex, nofollow` y `Referrer-Policy: no-referrer`; el token no aparece en el HTML, en
       `dataLayer` ni en logs del hub (prueba de no-leak).
-- [ ] Revocar un grant produce 410 en la siguiente lectura; expirado y desconocido producen 404 indistinto; 429 y
+- [x] Revocar un grant produce 410 en la siguiente lectura; expirado y desconocido producen 404 indistinto; 429 y
       5xx muestran `StatusScreen`; ninguno de los cuatro estados revela nombre de organización ni código de reporte.
-- [ ] Un capítulo sin hechos muestra su motivo de ausencia (texto del modelo) y ninguna figura vacía ni cero;
+- [x] Un capítulo sin hechos muestra su motivo de ausencia (texto del modelo) y ninguna figura vacía ni cero;
       `period.partial` muestra la banda de período abierto; descargas no disponibles no muestran botón muerto.
-- [ ] Descargar un PDF disponible pasa por el proxy de Greenhouse (URL relativa al endpoint público), nunca por
+- [x] Descargar un PDF disponible pasa por el proxy de Greenhouse (URL relativa al endpoint público), nunca por
       una URL de storage; un grant revocado deja de descargar.
 - [ ] Una `modelVersion` con major no soportada produce `error` visible (502 + log), nunca un render parcial.
-- [ ] Reduced motion elimina count-up, reveal y dibujo progresivo con contenido idéntico; recorrido de teclado
+- [x] Reduced motion elimina count-up, reveal y dibujo progresivo con contenido idéntico; recorrido de teclado
       completo con `focus-visible`; contraste AA; `scrollWidth === clientWidth` en 1440 y 390 (evidencia GVC).
-- [ ] GVC desktop + mobile de los 9 escenarios capturado, mirado y copiado a
+- [x] GVC desktop + mobile de los 9 escenarios capturado, mirado y copiado a
       `docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/` con scorecard `average >= 4.5`,
       `floor >= 4`, fidelidad y resistencia a template `>= 4.5`.
-- [ ] Copy del chrome en `src/lib/insights-copy.ts` (es-CL, revisado); el contenido editorial proviene del modelo
+- [x] Copy del chrome en `src/lib/insights-copy.ts` (es-CL, revisado); el contenido editorial proviene del modelo
       sin reescritura en el hub.
-- [ ] `EditionMasthead`, `FactCallout` y `ChartFigure` documentadas en `efeonce-think/src/components/primitives/README.md`
+- [x] `EditionMasthead`, `FactCallout` y `ChartFigure` documentadas en `efeonce-think/src/components/primitives/README.md`
       como primitivas del hub reutilizables.
-- [ ] `docs/think/README.md`, `architecture-ui-patterns.md`, arquitectura Insights §8/§14, TASK-1848/1849 y el
+- [x] `docs/think/README.md`, `architecture-ui-patterns.md`, arquitectura Insights §8/§14, TASK-1848/1849 y el
       master flow EPIC-045 registran la URL final y el estado live.
 
 ## Verification
@@ -554,14 +640,14 @@ La prueba `verify-insights-report.mjs` compara el DOM con el fixture, no con cá
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (TASK-1848 URL del correo, TASK-1849 botón copiar enlace, EPIC-045 nodo S6)
-- [ ] dossier GVC + scorecard copiados a Greenhouse; docs de Think actualizados; commit del hub referenciado en el Delta de cierre
-- [ ] Actualizar la skill viva `efeonce-insights` (`references/program-ledger.md`, `architecture-map.md`, `contracts.md`, `operations.md`, `lessons.md`) y espejar a `.codex/` con `pnpm skills:mirrors` verde — contrato de EPIC-045; sin esto la task no pasa a complete.
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (TASK-1848 URL del correo, TASK-1849 botón copiar enlace, EPIC-045 nodo S6)
+- [x] dossier GVC + scorecard copiados a Greenhouse; docs de Think actualizados; commit del hub referenciado en el Delta de cierre
+- [x] Actualizar la skill viva `efeonce-insights` (`references/program-ledger.md`, `architecture-map.md`, `contracts.md`, `operations.md`, `lessons.md`) y espejar a `.codex/` con `pnpm skills:mirrors` verde — contrato de EPIC-045; sin esto la task no pasa a complete.
 
 ## Follow-ups
 

@@ -212,6 +212,8 @@ Antes de copiar este patron a una nueva landing Think:
 
 ## Pattern: Shared Tokenized Report (Efeonce Insights)
 
+> Estado 2026-09-28: en producción (Think `bbf8522`). El render vive en `src/components/insights/InsightReport.astro` y lo usan dos rutas: `/insights/r/[token]` (SSR, token) y `/insights/muestra` (prerenderizada, datos de ejemplo con marca ficticia, `mode="sample"`: sin descargas, sin logo, aviso en portada y pie, CTA a conversar). Un solo componente para que la muestra nunca se desalinee del producto.
+
 Estado: construido y verificado en local el 2026-09-28 (TASK-1875). **Sin desplegar**: `main` de `efeonce-think`
 publica producción automáticamente y el push queda pendiente del operador.
 

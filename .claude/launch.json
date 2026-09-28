@@ -83,6 +83,20 @@
         "4331"
       ],
       "port": 4331
+    },
+    {
+      "name": "think-staging",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--dir",
+        "../efeonce-think",
+        "dev",
+        "--port",
+        "4332",
+        "--mode",
+        "staging"
+      ],
+      "port": 4332
     }
   ]
 }

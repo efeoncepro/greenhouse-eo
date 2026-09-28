@@ -254,11 +254,29 @@ is off is `skipped/email_type_paused` (no grant issued).
   (both work with the flag OFF); deleting the Cloud Scheduler job stops the tick entirely.
 - **Schema:** never `migrate:down` on the shared instance without explicit operator authorization (it serves production).
 
-## Shared web in Think (TASK-1875) — code complete locally, NOT deployed (2026-09-28)
+## Shared web in Think (TASK-1875) — Think in production, Greenhouse 1.1 in staging (2026-09-28)
 
-Nothing from TASK-1875 runs anywhere yet: Greenhouse commits `d45fc780f` + `27b458aec` are on local `develop` (not
-pushed) and the Think commits are on local `main` of `efeonce-think` (not pushed — Think's `main` auto-deploys
-production). `INSIGHTS_SHARING_ENABLED` is unchanged (staging ON, production OFF).
+State: Think `main` `bbf8522` in production (`/insights/r/<token>` and the public sample `/insights/muestra`);
+Greenhouse `13fd47381` in staging (model 1.1). Steps 1 (key in Think), 2 (staging canary) and 4 (Think push) are done;
+the WAF `--apply`, step 3 (Greenhouse release) and step 5 (production flag) wait for the operator.
+`INSIGHTS_SHARING_ENABLED` is still staging ON / production OFF.
+
+**Public sample for clients** — `think.efeoncepro.com/insights/muestra`: the same `InsightReport` render with the
+fixture model, a fictitious brand («Marca de ejemplo»), a visible notice in the hero and footer, no downloads, no
+client logo and no call to Greenhouse; prerendered, `noindex`, excluded from the sitemap; closes with a «Conversemos»
+CTA to `sales@efeoncepro.com`. Changing the render changes the sample too (one component, never two copies).
+
+**Key location:** Secret Manager `efeonce-think-server-key` (project `efeonce-group`) is the source; Think's Vercel
+production env `GREENHOUSE_THINK_KEY` holds the same value (sensitive). The WAF apply reads it from Secret Manager:
+`PUBLIC_BURST_GUARD_THINK_KEY=$(gcloud secrets versions access latest --secret=efeonce-think-server-key --project=efeonce-group) pnpm security:public-burst-guard --apply`.
+
+**Share create body:** `{ expiresInDays?, downloadOutputs?, label? }`. A grant without `downloadOutputs` has NO
+downloads (the reader returns `downloads: []` and Think shows no button): pass `["deck_pdf"]`/`["report_pdf"]`
+explicitly. `ttlDays` is not a field (ignored ⇒ default 30 days).
+
+**Local Think against staging:** `efeonce-think/.env.staging.local` (gitignored) with `GREENHOUSE_API_BASE` = staging
+`.vercel.app` and `GREENHOUSE_API_BYPASS`; run `astro dev --mode staging` (launch config `think-staging`, port 4332).
+Astro allows ONE dev server per project: stop the fixtures server first; `fixture-*` tokens keep working in that mode.
 
 **Variables (none is an `*_ENABLED` flag):**
 

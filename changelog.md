@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-28 — Informe live de Efeonce Insights en Think y muestra pública para clientes (TASK-1875)
+
+- `think.efeoncepro.com/insights/r/<token>` está en producción (Think `bbf8522`): el informe compartido de Insights
+  en dirección «tablero de respuestas» (portada con la respuesta y una órbita, hallazgos que se abren como evidencia,
+  escenas narradas, las 15 familias de gráfico, plan, modo presentación, impresión de respaldo, es-CL/en-US).
+- Muestra pública para clientes en `think.efeoncepro.com/insights/muestra`: mismo render con datos de ejemplo y una
+  marca ficticia, aviso visible, sin descargas ni llamadas a Greenhouse, `noindex`.
+- Greenhouse (staging): `InsightWebModelV1` 1.1 aditivo (editorial v2, tasas del embudo, logo del cliente por
+  `/api/public/insights/shared/[token]/logo`) y excepción del guard del borde para Think por `x-efeonce-think-key`.
+- Verificado: canary sintético en staging (200 con cabeceras, PDF por el proxy, 410 tras revocar, 404 desconocido);
+  contraste AA y teclado en 1440/390. Producción de Greenhouse y `INSIGHTS_SHARING_ENABLED` siguen pendientes del
+  operador.
+
 ## 2026-09-28 — Rutas públicas: guard en el Firewall de Vercel y conexiones de Vercel acotadas (TASK-1876, staging verificado)
 
 - Reglas versionadas del Firewall de Vercel para `/api/public/**` (20 req/10 s por IP; enforce en staging/preview,
@@ -652,11 +665,3 @@ firma de imagen. `compositeLuminosity` quedó exportada en `scripts/creative/lay
 reutilizar la firma url-lum. Skills `social-media-studio`, `efeonce-advertising-creative`, `copywriting` y
 `greenhouse-ai-image-generator` (espejos) y docs de ejecución social/publicitaria actualizados.
 [Bitácora](docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md).
-
-## 2026-09-19 — Revisión de cierre del último día de UNBOUND
-
-La revisión de la agenda completa del 18/09 añadió al ledger Smart CRM Universal Record Page como private beta,
-el laboratorio de Customer Agent como enablement de clientes, la denominación ChatGPT Lead Gen Ads y el cierre
-técnico de Developer Platform 2026.09: Projects y Conversations API GA, 44 APIs actualizadas y nuevas betas públicas.
-Se mantuvieron los gates: demo/private beta no equivale a GA, pricing, entitlement ni runtime; no se activó ningún
-portal, write, conexión o campaña.
