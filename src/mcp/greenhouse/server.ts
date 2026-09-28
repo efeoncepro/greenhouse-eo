@@ -1127,6 +1127,52 @@ export const createGreenhouseMcpServer = (
     async args => handlers.setInsightCoverPreference(args as { organizationId?: string; coverTheme: 'auto' | 'dark' | 'light' })
   )
 
+  // TASK-1921 — render gobernado de piezas de marca. Encolar exige binding interno; nunca aprueba ni publica.
+  collector.registerTool(
+    'request_brand_render',
+    {
+      title: 'Request Brand Render',
+      description:
+        'Queue the governed render of an Efeonce own-brand piece. THIS WRITES (no provider spend). Only internal bindings may call it. family is graphic_line_piece or graphic_line_document (pass intent, the same JSON that pnpm brand:compose takes) or glitch_edition (pass manifest, the same JSON that pnpm glitch:compose takes). sources maps each plate, photo or logo name used by the intent or manifest to an assetId already uploaded through the Greenhouse uploader; local paths are never read. The request is validated against the AXIS contract and the approved recipe before anything is queued: render_rejected or missing_source means nothing was queued — fix the intent and ask again. Returns 202 with one job per catalog; the same request answers the existing one with idempotent=true. Rendering happens in a worker: poll get_brand_render_request. A service_unavailable with code render_disabled means brand rendering is off in this runtime — report it and stop. Rendering never approves, schedules nor publishes a piece.',
+      inputSchema: {
+        family: z.enum(['graphic_line_piece', 'graphic_line_document', 'glitch_edition']),
+        intent: z.record(z.string(), z.unknown()).optional(),
+        manifest: z.record(z.string(), z.unknown()).optional(),
+        sources: z.record(z.string(), z.string()).optional(),
+        organizationId: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.requestBrandRender(args as { family: string; intent?: Record<string, unknown>; manifest?: Record<string, unknown>; sources?: Record<string, string>; organizationId?: string })
+  )
+
+  collector.registerTool(
+    'get_brand_render_request',
+    {
+      title: 'Get Brand Render Request',
+      description:
+        'Read one brand render request: request state (pending, running, completed, partial_failed, failed, cancelled) and every job with its catalog, state (queued, running, completed, failed, dead_letter, cancelled), attempts and failureCode. Completed jobs list their outputs with a downloadUrl that requires a Greenhouse session; it is not a public link. partial_failed means one catalog succeeded and another did not: report both.',
+      inputSchema: {
+        requestId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getBrandRenderRequest(args as { requestId: string })
+  )
+
+  collector.registerTool(
+    'list_brand_render_requests',
+    {
+      title: 'List Brand Render Requests',
+      description: 'List the most recent brand render requests of the Efeonce brand with their state and jobs. limit defaults to 20.',
+      inputSchema: {
+        limit: z.number().int().min(1).max(50).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.listBrandRenderRequests(args as { limit?: number })
+  )
+
   // ── El registro: una pasada por el manifiesto, en su orden ────────────────
   const coverage = computeGreenhouseMcpToolCoverage({
     manifest: GREENHOUSE_MCP_TOOL_MANIFEST,

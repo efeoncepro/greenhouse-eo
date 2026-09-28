@@ -2,8 +2,8 @@
   "$comment": "GENERADO por pnpm mcp:manifest:generate (TASK-1780). NO editar a mano: el hash y el gate de Greenhouse lo detectan. Greenhouse declara que EXISTE; el gateway decide que CRUZA.",
   "source": "greenhouse-eo/src/mcp/greenhouse/tool-manifest.ts",
   "generator": "pnpm mcp:manifest:generate",
-  "manifestHash": "a08f649aab8fbc2ab27bc55e9048cea753e28f143dda43571cba52a00d4bfd44",
-  "toolCount": 64,
+  "manifestHash": "4434b4c1357b916c2842a7f95a32350db40698201b455ce69975c1ce66c870ff",
+  "toolCount": 67,
   "tools": [
     {
       "name": "preview_client_service_enablement",
@@ -909,6 +909,46 @@
       ],
       "description": "Set the preferred cover of an organization's Efeonce Insights reports. THIS WRITES. coverTheme is auto, dark (navy) or light (white). Only internal bindings may call it. It affects editions generated afterwards; editions already generated keep the cover sealed in their plan, and nothing is re-rendered. Setting the same value again answers changed=false. Choosing dark for an organization without a logo for dark backgrounds renders a navy cover without the client logo: confirm with the human first.",
       "descriptionHash": "1736a87406d2911600d586bf4f846f4bb3204a7b8d2577555f9f353f02dd5d7f"
+    },
+    {
+      "name": "request_brand_render",
+      "domain": "brand",
+      "writes": true,
+      "spendsProviderBudget": false,
+      "purpose": "Encola el render de una pieza, documento o edición de Glitch de la marca Efeonce; valida contrato AXIS y receta aprobada, asíncrono.",
+      "inputKeys": [
+        "family",
+        "intent",
+        "manifest",
+        "organizationId",
+        "sources"
+      ],
+      "description": "Queue the governed render of an Efeonce own-brand piece. THIS WRITES (no provider spend). Only internal bindings may call it. family is graphic_line_piece or graphic_line_document (pass intent, the same JSON that pnpm brand:compose takes) or glitch_edition (pass manifest, the same JSON that pnpm glitch:compose takes). sources maps each plate, photo or logo name used by the intent or manifest to an assetId already uploaded through the Greenhouse uploader; local paths are never read. The request is validated against the AXIS contract and the approved recipe before anything is queued: render_rejected or missing_source means nothing was queued — fix the intent and ask again. Returns 202 with one job per catalog; the same request answers the existing one with idempotent=true. Rendering happens in a worker: poll get_brand_render_request. A service_unavailable with code render_disabled means brand rendering is off in this runtime — report it and stop. Rendering never approves, schedules nor publishes a piece.",
+      "descriptionHash": "03fca8ec1703424e6f6179fb61436ba8464e7d772f27533e29a34314e9be7c14"
+    },
+    {
+      "name": "get_brand_render_request",
+      "domain": "brand",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Estado de un pedido de render de marca y de cada job, con enlaces de descarga de las salidas listas.",
+      "inputKeys": [
+        "requestId"
+      ],
+      "description": "Read one brand render request: request state (pending, running, completed, partial_failed, failed, cancelled) and every job with its catalog, state (queued, running, completed, failed, dead_letter, cancelled), attempts and failureCode. Completed jobs list their outputs with a downloadUrl that requires a Greenhouse session; it is not a public link. partial_failed means one catalog succeeded and another did not: report both.",
+      "descriptionHash": "62d26dbd2a72730f41b212b4badd56e9e6a599ecde889f83bab226019ec60ab5"
+    },
+    {
+      "name": "list_brand_render_requests",
+      "domain": "brand",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Pedidos recientes de render de la marca Efeonce con su estado.",
+      "inputKeys": [
+        "limit"
+      ],
+      "description": "List the most recent brand render requests of the Efeonce brand with their state and jobs. limit defaults to 20.",
+      "descriptionHash": "e79ccbe7aaf88ac2ae3ca9522b60f61117d41cb42b6d7b1cc016475c4ed4305e"
     }
   ]
 }

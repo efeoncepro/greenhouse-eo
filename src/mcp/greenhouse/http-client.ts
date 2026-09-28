@@ -801,6 +801,19 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  // TASK-1921 — render gobernado de piezas de marca (lane ecosystem, sólo bindings internos)
+  async requestBrandRender(input: { family: string; intent?: Record<string, unknown>; manifest?: Record<string, unknown>; sources?: Record<string, string>; organizationId?: string }) {
+    return this.request('/api/platform/ecosystem/brand-render/requests', {}, { method: 'POST', body: { ...input } })
+  }
+
+  async getBrandRenderRequest(input: { requestId: string }) {
+    return this.request(`/api/platform/ecosystem/brand-render/requests/${encodeURIComponent(input.requestId)}`)
+  }
+
+  async listBrandRenderRequests(input: { limit?: number }) {
+    return this.request('/api/platform/ecosystem/brand-render/requests', { limit: input.limit })
+  }
+
   private async request<TData>(
     path: string,
     query: QueryParams = {},

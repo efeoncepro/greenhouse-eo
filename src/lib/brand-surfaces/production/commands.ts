@@ -156,7 +156,8 @@ export const requestBrandRender = async (input: {
       jobs
     })
 
-    if (inserted.created) await attachBrandSources({ requestId: inserted.request.requestId, sources, actorUserId: grant.actor.userId, client })
+    // `attached_by_user_id` es FK a client_users: un agente o el sistema no son usuarios, así que adjuntan sin autor.
+    if (inserted.created) await attachBrandSources({ requestId: inserted.request.requestId, sources, actorUserId: grant.actor.kind === 'member' ? grant.actor.userId : null, client })
 
     return inserted
   })
