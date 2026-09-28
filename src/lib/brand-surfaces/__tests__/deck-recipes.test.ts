@@ -715,3 +715,53 @@ describe('deck · secciones y quiénes somos (TASK-1928)', () => {
     expectCode(() => plan({ ...example('content-stack'), body: '16 herramientas a mano.' } as SurfaceIntent), 'invalid-intent')
   })
 })
+
+describe('deck · contenido y día a día (TASK-1928)', () => {
+  it.each([
+    ['contact-sheet', 'ContactSheet', 'deck.contact-sheet'],
+    ['content-text', 'ContentText', 'deck.content-text'],
+    ['content-bullets', 'ContentBullets', 'deck.content-bullets'],
+    ['content-day', 'ContentDay', 'deck.content-day'],
+    ['content-day-tools', 'ContentDayTools', 'deck.content-day.tools'],
+    ['content-day-live-progress', 'ContentDayProgress', 'deck.content-day.live-progress'],
+    ['content-day-live-results', 'ContentDayResults', 'deck.content-day.live-results'],
+    ['decision-agenda', 'DecisionAgenda', 'deck.decision-agenda']
+  ])('%s compone con su plantilla y pasa su contrato de slots', (recipe, template, contentType) => {
+    const planned = plan(example(recipe))
+
+    expect(planned.template).toBe(template)
+    expect(planned.piece.contentType).toBe(contentType)
+    expect(planned.violations).toEqual([])
+  })
+
+  it('la hoja de contactos: la elegida lleva la selección y la tira sus marcas de corte', () => {
+    const { slots, piece } = plan(example('contact-sheet'))
+
+    expect(slots.selection).toMatchObject({ label: 'Dirección de arte', item: 1 })
+    expect((slots.strip as unknown as unknown[]).length).toBe(3)
+    expect((piece.assets.find(asset => asset.ref.includes('contact-sheet-marks')) as { svg: string }).svg.match(/<line /g)).toHaveLength(24)
+  })
+
+  it('el reloj: el momento de ahora lleva la selección y el recorte de la lente sigue el foco del plate', () => {
+    const { slots, piece } = plan(example('content-day'))
+    const lens = piece.assets.find(asset => asset.kind === 'plate' && asset.ref.includes('lens')) as Extract<SurfaceAssetRequest, { kind: 'plate' }>
+
+    expect(slots.now).toEqual({ time: '15:00', label: 'Revisamos contigo' })
+    expect(lens.focus).toEqual({ xOfWidth: 0.5, yOfHeight: 0 })
+    expectCode(() => plan({ ...example('content-day'), moments: (example('content-day').moments as object[]).slice(0, 2) } as SurfaceIntent), 'invalid-intent')
+  })
+
+  it('las láminas vivas: el cursor del lector va sobre la acción, y las cifras del reporte dicen su procedencia', () => {
+    expect(plan(example('content-day-live-progress')).slots.cta).toEqual({ text: 'Aprobar', cursorScale: 1 })
+    expect(plan(example('content-day-live-results')).slots.report).toMatchObject({ sample: 'Datos de muestra' })
+    expectCode(() => plan({ ...example('content-day-live-results'), report: { ...(example('content-day-live-results').report as object), sample: '' } } as SurfaceIntent), 'invalid-intent')
+  })
+
+  it('la agenda y las viñetas: el ítem elegido se marca y fuera de rango falla cerrado', () => {
+    const topics = plan(example('decision-agenda')).slots.topics as unknown as { role: string }[]
+
+    expect(topics.map(topic => topic.role)).toEqual(['rest', 'rest', 'rest', 'lead', 'rest'])
+    expect(plan(example('content-bullets')).slots.selection).toMatchObject({ label: 'Growth', item: 3 })
+    expectCode(() => plan({ ...example('decision-agenda'), selected: 6 } as SurfaceIntent), 'invalid-intent')
+  })
+})

@@ -46,7 +46,15 @@
     "deck.section-cine.purpose",
     "deck.content-team",
     "deck.content-stack",
-    "deck.section-cine.services"
+    "deck.section-cine.services",
+    "deck.contact-sheet",
+    "deck.content-text",
+    "deck.content-bullets",
+    "deck.content-day",
+    "deck.content-day.tools",
+    "deck.content-day.live-progress",
+    "deck.content-day.live-results",
+    "deck.decision-agenda"
   ],
   "templates": [
     {
@@ -510,6 +518,94 @@
       "contentTypes": ["deck.content-stack"],
       "prototype": "content-stack.html",
       "slotsRef": "content-stack.slots.json"
+    },
+    {
+      "name": "ContactSheet",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.contact-sheet"],
+      "prototype": "contact-sheet.html",
+      "slotsRef": "contact-sheet.slots.json"
+    },
+    {
+      "name": "ContentText",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-text"],
+      "prototype": "content-text.html",
+      "slotsRef": "content-text.slots.json"
+    },
+    {
+      "name": "ContentBullets",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-bullets"],
+      "prototype": "content-bullets.html",
+      "slotsRef": "content-bullets.slots.json"
+    },
+    {
+      "name": "ContentDay",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-day"],
+      "prototype": "content-day.html",
+      "slotsRef": "content-day.slots.json"
+    },
+    {
+      "name": "ContentDayTools",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-day.tools"],
+      "prototype": "content-day-tools.html",
+      "slotsRef": "content-day-tools.slots.json"
+    },
+    {
+      "name": "ContentDayProgress",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-day.live-progress"],
+      "prototype": "content-day-live-progress.html",
+      "slotsRef": "content-day-live-progress.slots.json"
+    },
+    {
+      "name": "ContentDayResults",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.content-day.live-results"],
+      "prototype": "content-day-live-results.html",
+      "slotsRef": "content-day-live-results.slots.json"
+    },
+    {
+      "name": "DecisionAgenda",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-agenda"],
+      "prototype": "decision-agenda.html",
+      "slotsRef": "decision-agenda.slots.json"
     }
   ],
   "selector": {
@@ -556,7 +652,15 @@
       "deck.section-cine.purpose": "SectionCinePurpose",
       "deck.content-team": "ContentTeam",
       "deck.content-stack": "ContentStack",
-      "deck.section-cine.services": "SectionCine"
+      "deck.section-cine.services": "SectionCine",
+      "deck.contact-sheet": "ContactSheet",
+      "deck.content-text": "ContentText",
+      "deck.content-bullets": "ContentBullets",
+      "deck.content-day": "ContentDay",
+      "deck.content-day.tools": "ContentDayTools",
+      "deck.content-day.live-progress": "ContentDayProgress",
+      "deck.content-day.live-results": "ContentDayResults",
+      "deck.decision-agenda": "DecisionAgenda"
     }
   }
 }

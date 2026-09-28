@@ -1,5 +1,26 @@
 # Artifact Composer — BASELINE_DELTAS (contrato de dos vías)
 
+## 2026-09-27 (l) — TASK-1928: contenido y día a día
+
+Sexta y última familia de las 38 recetas sin plantilla (`axis-tokens` 0.3.20, `axis-ui-contracts` 0.3.18, delta (k)
+de AXIS): la hoja de contactos, el texto, las viñetas, el día a día en sus cuatro composiciones (el reloj, las
+herramientas, el avance y los resultados en vivo) y la agenda. Compuestas con sus plates, isotipos y el panel de
+Greenhouse reales y comparadas a ojo contra las ocho referencias: coinciden salvo las decisiones de la norma — el rótulo
+«Revisamos contigo» y la etiqueta de la tarjeta en revisión en el texto claro (D1: iban en el acento a 13–20 px). El
+recorte de la lente del reloj sigue el foco del plate (`photo.focus`, recorte dirigido en el compositor sólo cuando el
+intent lo declara). Las interfaces del día a día son genéricas con el isotipo real de cada herramienta. El CSS nuevo está
+acotado a `.gl-cs`, `.gl-ct`, `.gl-cb`, `.gl-cd`, `.gl-cdl` (`.gl-cdt`, `.gl-cdp`, `.gl-cdr`) y `.gl-ag`; el resolver nuevo
+`gl-align` alinea los rótulos del reloj. Con esta familia las 69 recetas del deck tienen plantilla.
+
+- `templates-graphic-line-deck/ContactSheet.png` — 🆕 deck.contact-sheet
+- `templates-graphic-line-deck/ContentText.png` — 🆕 deck.content-text
+- `templates-graphic-line-deck/ContentBullets.png` — 🆕 deck.content-bullets
+- `templates-graphic-line-deck/ContentDay.png` — 🆕 deck.content-day
+- `templates-graphic-line-deck/ContentDayTools.png` — 🆕 deck.content-day.tools
+- `templates-graphic-line-deck/ContentDayProgress.png` — 🆕 deck.content-day.live-progress
+- `templates-graphic-line-deck/ContentDayResults.png` — 🆕 deck.content-day.live-results
+- `templates-graphic-line-deck/DecisionAgenda.png` — 🆕 deck.decision-agenda
+
 ## 2026-09-27 (k) — TASK-1928: secciones y quiénes somos
 
 Quinta familia de las 38 recetas sin plantilla (`axis-tokens` 0.3.19, `axis-ui-contracts` 0.3.17, delta (j) de AXIS):
@@ -773,7 +794,7 @@ aparece está cubierto por la tabla de arriba):
 `sky/19-contraportada.png` · `sky/19-seguro.png` · `sky/20-cumplimiento.png` · `sky/21-economica.png` ·
 `sky/22-contraportada.png`
 
-<!-- manifest-digest: 46a21f546c5e3ca351a2bff369413dd76c334e4f556b399d4b00c5758ac90d97 -->
+<!-- manifest-digest: b0aeba739b8651f31c3932983c6897f8f9111088d55886dd4d054c375b4aff72 -->
 
 Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**: el gate se
 "arregla" promoviendo el baseline y nadie se entera.

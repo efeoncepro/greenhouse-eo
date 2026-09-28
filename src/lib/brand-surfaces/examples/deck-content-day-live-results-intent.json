@@ -1,0 +1,58 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-day",
+  "layout": "live-results",
+  "voice": {
+    "eyebrow": "Tu día a día con Efeonce",
+    "question": "¿Cómo va?",
+    "answer": [
+      "En",
+      "vivo"
+    ]
+  },
+  "body": "Efeonce Insights arma el reporte **solo**: lo ves en tu panel de Greenhouse y lo conversamos en Teams.",
+  "panel": {
+    "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/product/greenhouse-seo-dashboard.png",
+    "alt": "Tu panel de Greenhouse, en vivo"
+  },
+  "meeting": {
+    "tool": {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/teams-isotype.svg",
+      "name": "Microsoft Teams"
+    },
+    "kicker": "En Microsoft Teams",
+    "title": "Revisión de resultados",
+    "meta": "Jueves 10:00 · 30 min · con tu equipo"
+  },
+  "report": {
+    "kicker": "Efeonce Insights · ahora",
+    "title": "Tu reporte de la semana está listo",
+    "sample": "Datos de muestra",
+    "kpis": [
+      {
+        "value": "+22 %",
+        "label": "tráfico orgánico"
+      },
+      {
+        "value": "+14",
+        "label": "keywords top 10"
+      },
+      {
+        "value": "61 %",
+        "label": "citabilidad IA"
+      }
+    ],
+    "action": "Ver en Greenhouse",
+    "logo": {
+      "path": "public/images/greenhouse/SVG/negative-isotipo-green.svg",
+      "alt": "Greenhouse"
+    }
+  }
+}

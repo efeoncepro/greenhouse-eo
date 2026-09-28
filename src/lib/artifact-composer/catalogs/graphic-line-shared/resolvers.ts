@@ -177,6 +177,13 @@ export const graphicLineResolvers = (): ResolverRegistry => {
           : null
     },
 
+    // La alineación de un rótulo junto a su satélite (TASK-1928, el reloj del día): al inicio o al final de su caja.
+    'gl-align': {
+      known: ['start', 'end', 'center'],
+      build: value =>
+        ['start', 'end', 'center'].includes(value) ? [{ selector: ':self', toneClass: `gl-align-${value}`, toneGroup: ['gl-align-start', 'gl-align-end', 'gl-align-center'] }] : null
+    },
+
     // El papel de un ítem en su grupo (TASK-1928): la ficha del interlocutor al frente del equipo (`lead`) o las demás.
     'gl-item-role': {
       known: ['lead', 'rest'],

@@ -16,7 +16,8 @@ export type GraphicLineCatalogName = 'graphic-line-deck' | 'graphic-line-stills'
  * bytes antes de renderizar. El mapper no lee archivos: sólo dice qué hace falta.
  */
 export type SurfaceAssetRequest =
-  | { ref: string; kind: 'plate'; path: string; fit: { width: number; height: number } }
+  /** `focus` (opcional) fija el recorte hacia un punto del archivo (0–1); sin él, el recorte es centrado. */
+  | { ref: string; kind: 'plate'; path: string; fit: { width: number; height: number }; focus?: { xOfWidth?: number; yOfHeight?: number } }
   | { ref: string; kind: 'svg'; svg: string }
   /**
    * Una capa que pinta el motor de la línea gráfica CON una foto adentro (la lente de una sección, TASK-1928): el SVG

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · el día a día con las herramientas</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-day`, composición `tools` (surface deck, tema oscuro, TASK-1928). El panel de Greenhouse gigante en
+      3D sobre la plataforma de luz; las herramientas flotan a distinta profundidad con su isotipo real y su haz baja al
+      panel. Interfaces genéricas: nunca el diseño propietario de nadie. Referencia: DeckVivelo (V0-herramientas-impacto).
+    -->
+    <main class="gl-slide gl-cdl gl-cdt" data-gl-root data-slot="frame">
+      <figure class="gl-layer gl-cdl-stage" data-slot="stage">
+        <img data-slot-field="src" alt="" />
+      </figure>
+      <figure class="gl-layer gl-cdl-platform" data-slot="platform">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div class="gl-cdl-scene">
+        <figure class="gl-cdl-panel" data-slot="panel">
+          <img data-slot-field="src" alt="" />
+        </figure>
+      </div>
+
+      <figure class="gl-layer gl-cdt-beams" data-slot="beams">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <ol class="gl-cdt-tiles" data-slot="tiles">
+        <li class="gl-cdt-tile">
+          <span class="gl-cdt-face"><img data-slot-field="src" alt="" /></span>
+          <div class="gl-cdt-label">
+            <p class="gl-cdt-name" data-slot-field="name">Notion</p>
+            <p class="gl-cdt-use" data-slot-field="label">Proyectos y tareas</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="gl-cdt-caption" data-slot="caption">
+        <p class="gl-cdt-caption-title"><img class="gl-cdt-caption-logo" data-slot-field="logo" alt="" /><span data-slot-field="title">Tu panel en Greenhouse</span></p>
+        <p class="gl-cdt-caption-note" data-slot-field="note">todo en un solo lugar, en vivo</p>
+      </div>
+
+      <div class="gl-live-voice" data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Tu día a día con Efeonce</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Cómo trabajamos contigo?</span></p>
+        <p class="gl-answer"><span class="gl-answer-lead" data-slot-field="answerLead">A la</span><span data-slot-field="answer">vista</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-live-body" data-slot="body">Cada cosa en su herramienta y todo a la vista en tu panel.</p>
+
+      <img class="gl-url-bubble" data-slot="urlBubble" src="assets/url-bubble-baked-dark.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>

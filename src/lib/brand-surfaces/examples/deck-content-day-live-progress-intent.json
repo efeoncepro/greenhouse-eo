@@ -1,0 +1,101 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "proposal",
+  "line": "growth",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-day",
+  "layout": "live-progress",
+  "voice": {
+    "eyebrow": "Tu día a día con Efeonce",
+    "question": "¿Cómo avanza tu proyecto?",
+    "answer": [
+      "A la",
+      "vista"
+    ]
+  },
+  "body": "Sigues el plan en Notion y apruebas cada pieza en Frame.io, comentando **sobre** la imagen.",
+  "plan": {
+    "tool": {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/notion-isotype.svg",
+      "name": "Notion"
+    },
+    "kicker": "En Notion",
+    "title": "Plan de la campaña",
+    "meta": "Semana 3 de 6",
+    "columns": [
+      {
+        "name": "En curso",
+        "cards": [
+          {
+            "title": "Guion del video",
+            "tag": "Producción"
+          },
+          {
+            "title": "Adaptaciones a redes",
+            "tag": "Contenido"
+          }
+        ]
+      },
+      {
+        "name": "En revisión",
+        "cards": [
+          {
+            "title": "Key visual",
+            "tag": "Esperando tu visto bueno",
+            "highlight": true
+          }
+        ]
+      },
+      {
+        "name": "Listo",
+        "cards": [
+          {
+            "title": "Brief aprobado",
+            "tag": "Estrategia"
+          },
+          {
+            "title": "Moodboard",
+            "tag": "Dirección de arte"
+          }
+        ]
+      }
+    ]
+  },
+  "review": {
+    "tool": {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/frameio-isotype.svg",
+      "name": "Frame.io"
+    },
+    "kicker": "En Frame.io",
+    "title": "Key visual",
+    "versions": [
+      "v1",
+      "v2"
+    ],
+    "piece": {
+      "plateRef": "ai-generations/2026-09-27_ads-cine/plates/AD3b-45-aeo-foco-isotipo.png",
+      "alt": "La pieza en revisión: un key visual del registro cine"
+    },
+    "pin": "1",
+    "comments": [
+      {
+        "mark": "1",
+        "author": "Tú",
+        "version": "v1",
+        "text": "¿Podemos subir el logo?"
+      },
+      {
+        "own": true,
+        "author": "Efeonce",
+        "version": "v2",
+        "text": "Listo, quedó en la v2."
+      }
+    ],
+    "secondary": "Comentar",
+    "primary": "Aprobar"
+  }
+}

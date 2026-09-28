@@ -57,7 +57,7 @@ export const breather: RecipeBuilder = ({ intent, manifest, recipe }) => {
 
 /* ── decision-next-steps: la agenda del diagnóstico ─────────────────────────────────────────────────────── */
 
-type Glass = {
+export type Glass = {
   document: { fill: string; ink: string; muted: string; rule: string; chip: string; shadow: { yPx: number; blurPx: number; color: string; opacity: number }; halo: { blurPx: number; opacity: number }; edge: { color: string; opacity: number } }
   dark?: DarkGlass
 }
@@ -164,7 +164,7 @@ const darkGlassVars = (dark: DarkGlass, prefix: string) => ({
 })
 
 /** Las variables del documento claro (la agenda, la cotización en vivo): tinta, apagado, filete, chip y su sombra. */
-const documentVars = (glass: Glass, prefix: string) => ({
+export const documentVars = (glass: Glass, prefix: string) => ({
   docFill: colorVar(`${prefix}-doc`, paletteColor(glass.document.fill, 'el documento')),
   docInk: colorVar(`${prefix}-doc-ink`, paletteColor(glass.document.ink, 'la tinta del documento')),
   docMuted: colorVar(`${prefix}-doc-muted`, paletteColor(glass.document.muted, 'el texto apagado del documento')),

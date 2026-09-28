@@ -102,6 +102,46 @@
       "example": "src/lib/brand-surfaces/examples/deck-content-stack-intent.json",
       "slots": null
     },
+    "contact-sheet": {
+      "contentType": "deck.contact-sheet",
+      "example": "src/lib/brand-surfaces/examples/deck-contact-sheet-intent.json",
+      "slots": null
+    },
+    "content-text": {
+      "contentType": "deck.content-text",
+      "example": "src/lib/brand-surfaces/examples/deck-content-text-intent.json",
+      "slots": null
+    },
+    "content-bullets": {
+      "contentType": "deck.content-bullets",
+      "example": "src/lib/brand-surfaces/examples/deck-content-bullets-intent.json",
+      "slots": null
+    },
+    "content-day": {
+      "contentType": "deck.content-day",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-intent.json",
+      "slots": null
+    },
+    "content-day-tools": {
+      "contentType": "deck.content-day.tools",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-tools-intent.json",
+      "slots": null
+    },
+    "content-day-live-progress": {
+      "contentType": "deck.content-day.live-progress",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-live-progress-intent.json",
+      "slots": null
+    },
+    "content-day-live-results": {
+      "contentType": "deck.content-day.live-results",
+      "example": "src/lib/brand-surfaces/examples/deck-content-day-live-results-intent.json",
+      "slots": null
+    },
+    "decision-agenda": {
+      "contentType": "deck.decision-agenda",
+      "example": "src/lib/brand-surfaces/examples/deck-decision-agenda-intent.json",
+      "slots": null
+    },
     "breather": {
       "contentType": "deck.breather",
       "example": "src/lib/brand-surfaces/examples/deck-breather-intent.json",

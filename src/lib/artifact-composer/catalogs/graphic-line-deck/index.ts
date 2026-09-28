@@ -42,7 +42,10 @@ const TEMPLATES_WITH_SELECTION = [
   'CoverProposalOrbit',
   'CoverProposalDawn',
   // El testimonio: la selección toma la frase del cliente (la respuesta).
-  'DecisionTestimonial'
+  'DecisionTestimonial',
+  // El texto (la respuesta entera) y el reloj del día (el momento de ahora).
+  'ContentText',
+  'ContentDay'
 ] as const
 
 /**
@@ -50,7 +53,7 @@ const TEMPLATES_WITH_SELECTION = [
  * mismo CTA canónico de las piezas con llamada a la acción, sin descriptor. El anillo del puntaje lo lleva sobre su
  * botón, con el descriptor bajo el cursor (su escala y su aire llegan en el slot `cta`, medidos por AXIS).
  */
-const TEMPLATES_WITH_READER_CURSOR = ['CloseBrochure', 'MethodScoreRing', 'DecisionNextSteps', 'ContentPricingLive', 'SectionCine'] as const
+const TEMPLATES_WITH_READER_CURSOR = ['CloseBrochure', 'MethodScoreRing', 'DecisionNextSteps', 'ContentPricingLive', 'SectionCine', 'ContentDayProgress', 'ContentDayResults'] as const
 
 /**
  * En la escalera del método (sus dos composiciones) la selección toma un NIVEL (`selection.level`, 1 = el de abajo),
@@ -103,7 +106,7 @@ export const createCatalog = (options: GraphicLineCatalogOptions = {}): Artifact
 
   // La familia Prueba (TASK-1928): la selección toma un ítem de la lámina (`selection.item`): la cifra, el logo, la fila
   // del riesgo o la barra que se elige.
-  for (const template of ['ContentClients', 'ContentPartners', 'DecisionRisk', 'DecisionCase', 'DecisionChart', 'DecisionWhyUs', 'ContentTeam']) {
+  for (const template of ['ContentClients', 'ContentPartners', 'DecisionRisk', 'DecisionCase', 'DecisionChart', 'DecisionWhyUs', 'ContentTeam', 'ContactSheet', 'ContentBullets', 'DecisionAgenda']) {
     layoutHooks[template] = levelSelectionHook(selectionHook)
   }
 

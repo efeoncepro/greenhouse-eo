@@ -195,10 +195,7 @@ export const materializeAssets = async (assets: SurfaceAssetRequest[], root: str
       )
     }
 
-    const jpeg = await sharp(file)
-      .resize(asset.fit.width, asset.fit.height, { fit: 'cover', position: 'centre' })
-      .jpeg({ quality: 90 })
-      .toBuffer()
+    const jpeg = asset.focus ? await focusedCrop(file, asset.fit, asset.focus) : await sharp(file).resize(asset.fit.width, asset.fit.height, { fit: 'cover', position: 'centre' }).jpeg({ quality: 90 }).toBuffer()
 
     out[key(asset.ref)] = `data:image/jpeg;base64,${jpeg.toString('base64')}`
   }
@@ -207,6 +204,18 @@ export const materializeAssets = async (assets: SurfaceAssetRequest[], root: str
 }
 
 const FILE_MIME: Record<string, string> = { '.svg': 'image/svg+xml', '.png': 'image/png' }
+
+/** Un recorte que cubre la caja y se corre hacia el foco del archivo (0 = borde izquierdo o superior, 1 = el opuesto). */
+const focusedCrop = async (file: string, fit: { width: number; height: number }, focus: { xOfWidth?: number; yOfHeight?: number }): Promise<Buffer> => {
+  const meta = await sharp(file).metadata()
+  const scale = Math.max(fit.width / meta.width!, fit.height / meta.height!)
+  const width = Math.ceil(meta.width! * scale)
+  const height = Math.ceil(meta.height! * scale)
+  const left = Math.round((width - fit.width) * (focus.xOfWidth ?? 0.5))
+  const top = Math.round((height - fit.height) * (focus.yOfHeight ?? 0.5))
+
+  return sharp(file).resize(width, height).extract({ left, top, width: fit.width, height: fit.height }).jpeg({ quality: 90 }).toBuffer()
+}
 
 const LUMA = (r: number, g: number, b: number) => (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
 

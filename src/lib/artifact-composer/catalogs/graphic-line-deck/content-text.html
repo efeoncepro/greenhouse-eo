@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · texto</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!--
+      Receta `content-text` (surface deck, tema oscuro, TASK-1928). La respuesta ES la lámina, a escala extrema y con la
+      selección entera; la bajada abajo a la izquierda y tres puntos cortos abajo a la derecha. Referencia: DeckTexto
+      (D1-texto).
+    -->
+    <main class="gl-slide gl-ct" data-gl-root data-slot="frame">
+      <figure class="gl-layer" data-slot="indicator">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div data-slot="voice">
+        <p class="gl-eyebrow" data-slot-field="eyebrow">Por qué existimos</p>
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Con quién crece tu marca?</span></p>
+        <p class="gl-answer" data-gl-selection-target><span data-slot-field="answer">Contigo</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+
+      <p class="gl-body gl-ct-body" data-slot="body">No te entregamos crecimiento. Lo construimos contigo.</p>
+
+      <ol class="gl-ct-points" data-slot="points">
+        <li class="gl-ct-point"><span data-slot-field="name">Co-creación</span> <span class="gl-ct-point-text" data-slot-field="text">· operas con nosotros en vivo</span></li>
+      </ol>
+
+      <div class="gl-hidden" data-slot="selection"></div>
+
+      <img class="gl-url-bubble" data-slot="urlBubble" src="assets/url-bubble-baked-dark.svg" alt="efeoncepro.com" />
+    </main>
+  </body>
+</html>
