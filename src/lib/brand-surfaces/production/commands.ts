@@ -123,7 +123,14 @@ export const requestBrandRender = async (input: {
   if (existing) return { request: existing, jobs: await listBrandRenderJobs(existing.requestId), idempotent: true }
 
   const jobs = planned.jobs.map((job) => {
-    const manifest = { input: job.input }
+    // Se sella la forma CANÓNICA del input (la misma que el composer emite en su manifiesto): así el drift check del
+    // worker compara lo mismo con lo mismo y un campo extra del mapper nunca se lee como deriva.
+    const manifest = {
+      input: {
+        artifactId: job.input.artifactId,
+        slides: job.input.slides.map((slide) => ({ slideId: slide.slideId, contentType: slide.contentType, slots: slide.slots }))
+      }
+    }
 
     return {
       catalogName: job.catalogName,
@@ -132,7 +139,8 @@ export const requestBrandRender = async (input: {
       manifest,
       manifestHash: hashResolvedManifest(manifest),
       assetRequests: { kind: job.assets.kind, requests: job.assets.requests, sources: usedSources },
-      constraints: {}
+      // Glitch compone carruseles con fotos a sangre: el mismo techo que su taller local (`pnpm glitch:compose`).
+      constraints: job.assets.kind === 'glitch' ? { maxPdfMb: 100 } : {}
     }
   })
 

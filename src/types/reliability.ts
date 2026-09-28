@@ -30,6 +30,7 @@ export type ReliabilityModuleKey =
   | 'growth' // TASK-1226 — Growth AI Visibility Grader (provider adapters, runs, observations)
   | 'hiring' // TASK-356 — Hiring/ATS (handoff decisión→downstream + candidate docs/asset scan de TASK-1362)
   | 'insights' // TASK-1845 — Efeonce Insights (ediciones congeladas deck/A4/web; generación por fases)
+  | 'brand_render' // TASK-1921 — render gobernado de piezas de marca («La órbita» y Glitch) en el artifact-worker
 
 export type ReliabilityModuleDomain =
   | 'platform'

@@ -163,6 +163,7 @@ import { purgeAssessmentPublicAccessRetention } from '@/lib/hiring/assessment/pu
 import '@/lib/growth/seo/register-provider-spend'
 import { dispatchNextRenderJob } from '@/lib/commercial/tenders/proposals/render-dispatch'
 import { countClaimableInsightOutputs, dispatchNextInsightRender } from '@/lib/efeonce-insights/render/dispatch'
+import { dispatchNextBrandRender } from '@/lib/brand-surfaces/production/dispatch'
 import { runInsightSchedulesTick } from '@/lib/efeonce-insights/schedules/tick'
 import { isFormsDispatchEnabled } from '@/lib/growth/forms/flags'
 
@@ -1698,9 +1699,21 @@ const handleArtifactRenderDispatch = async (_req: IncomingMessage, res: ServerRe
         ? { skipped: 'proposal_dispatched' as const, queued: await countClaimableInsightOutputs(), executionName: null }
         : await dispatchNextInsightRender()
 
-    if (result.skipped === 'flag_off' && (insights.skipped === 'flag_off' || insights.skipped === 'empty_queue')) {
-      console.log(`[ops-worker] /artifact-render/dispatch skip: proposal flag OFF, insights ${insights.skipped}`)
-      json(res, 200, { ok: true, skipped: 'flag_off', insights })
+    // TASK-1921 — tercera cola: piezas de marca. UNA ejecución por tick (el Job es parallelism=1): si Proposal o
+    // Insights ya lanzaron, la marca espera al próximo tick; su cola es interna y no compite con entregables de cliente.
+    const anotherDispatched = result.dispatched.length > 0 || insights.executionName !== null
+
+    const brand = anotherDispatched
+      ? { skipped: 'another_dispatched' as const, hasWork: false, executionName: null }
+      : await dispatchNextBrandRender()
+
+    if (
+      result.skipped === 'flag_off' &&
+      (insights.skipped === 'flag_off' || insights.skipped === 'empty_queue') &&
+      (brand.skipped === 'flag_off' || brand.skipped === 'empty_queue')
+    ) {
+      console.log(`[ops-worker] /artifact-render/dispatch skip: proposal flag OFF, insights ${insights.skipped}, brand ${brand.skipped}`)
+      json(res, 200, { ok: true, skipped: 'flag_off', insights, brand })
 
       return
     }
@@ -1708,10 +1721,11 @@ const handleArtifactRenderDispatch = async (_req: IncomingMessage, res: ServerRe
     console.log(
       `[ops-worker] /artifact-render/dispatch done — expiredClosed=${result.expiredClosed} ` +
       `dispatched=${result.dispatched.length} postponed=${result.postponed.length} ` +
-      `insightsQueued=${insights.queued} insightsExecution=${insights.executionName ?? 'none'}`
+      `insightsQueued=${insights.queued} insightsExecution=${insights.executionName ?? 'none'} ` +
+      `brandExecution=${brand.executionName ?? brand.skipped ?? 'none'}`
     )
 
-    json(res, 200, { ok: true, ...result, insights })
+    json(res, 200, { ok: true, ...result, insights, brand })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown dispatch error'
 

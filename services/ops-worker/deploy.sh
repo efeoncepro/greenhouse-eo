@@ -274,6 +274,11 @@ ENV_VARS="${ENV_VARS},ARTIFACT_RENDER_JOBS_ENABLED=${ARTIFACT_RENDER_JOBS_ENABLE
 # Default ON por la misma razón que el flag de Proposal: el ops-worker es un servicio ÚNICO, y la
 # puerta de producto por ambiente es el ENCOLADO en Vercel (`requestInsightRender`), no el dispatch.
 ENV_VARS="${ENV_VARS},INSIGHTS_RENDER_ENABLED=${INSIGHTS_RENDER_ENABLED:-true}"
+# 🚩 TASK-1921 — el mismo `/artifact-render/dispatch` drena la cola de piezas de marca (`dispatchNextBrandRender`),
+# que lee su propio flag. Default OFF: el render gobernado de marca está code complete, rollout pendiente. Al
+# prenderlo se cambia ESTE default (y el del artifact-worker), no con `--update-env-vars` suelto: `--set-env-vars`
+# de abajo es destructivo y lo borraría en el próximo deploy. Ledger: FEATURE_FLAG_STATE_LEDGER.md
+ENV_VARS="${ENV_VARS},BRAND_RENDER_ENABLED=${BRAND_RENDER_ENABLED:-false}"
 # 🚩 TASK-1848 — la projection `insights_delivery_dispatch` (lane ops-reactive-notifications) despacha
 # los correos de Efeonce Insights y lee este flag SOLO acá. Default ON por la misma razón que el
 # render: el ops-worker es ÚNICO para staging y producción; la puerta de producto por ambiente es

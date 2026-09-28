@@ -377,6 +377,9 @@ importers:
       server-only:
         specifier: 0.0.1
         version: 0.0.1
+      sharp:
+        specifier: 0.34.5
+        version: 0.34.5
       simple-icons:
         specifier: ^16.11.0
         version: 16.11.0
@@ -522,9 +525,6 @@ importers:
       prettier:
         specifier: 3.6.2
         version: 3.6.2
-      sharp:
-        specifier: 0.34.5
-        version: 0.34.5
       stylelint:
         specifier: 16.25.0
         version: 16.25.0(typescript@5.9.3)
