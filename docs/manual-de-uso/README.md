@@ -41,6 +41,9 @@ La diferencia con otras capas de documentacion:
   para el resto, `pnpm surface:resolve` en AXIS (contrato `candidate`) y cada delegate a su
   compositor de Greenhouse; la receta de deck `proposal-cinematic` y el registro cine, qué significan los estados, los
   `issues` y los errores `recipe-not-approved` / `recipe-outside-composer` / `surface-issues`, y problemas comunes.
+- [Pedir el render de una pieza de marca](creative/pedir-render-de-piezas-de-marca.md) — subir las fuentes, armar el
+  pedido, enviarlo por el lane App o la tool MCP, consultar y descargar; errores y problemas comunes. Hoy apagado
+  (TASK-1921).
 - [Componer un deck con las recetas por lámina](creative/componer-deck-con-recetas.md) — armar un brochure, una
   propuesta, un pitch o un QBR de marca Efeonce con las 69 láminas aprobadas el 2026-09-27, **las 69 con plantilla**
   desde el 2026-09-28: elegir documento, portada y contraportada, esqueleto por familias, receta por tramo («cuándo

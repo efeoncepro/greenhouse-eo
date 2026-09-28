@@ -43,6 +43,9 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   máximos, fuentes visibles, logos normalizados, sin logo ni velo en láminas interiores con foto, una selección por
   lámina), las reglas de un documento de varias páginas, qué entrega y qué no hace todavía (ruta dentro de la
   plataforma TASK-1921 en curso; TASK-1929 a TASK-1932). Actualizado el 2026-09-28.
+- [Render gobernado de piezas de marca — La órbita y Glitch](creative/render-gobernado-piezas-de-marca.md) — pedir
+  una pieza, un documento o una edición de Glitch dentro de Greenhouse y recibir los archivos con su procedencia; qué
+  se revisa antes de encolar, estados y quién puede usarlo. Construido y apagado (TASK-1921, rollout pendiente).
 - [Identidad sonora de Efeonce — Tres puntos que se vuelven uno](creative/identidad-sonora-efeonce.md) — el sonido de
   la marca propia (recomendado por el operador el 2026-09-26, todavía no canon): la idea, el logo sonoro, los registros
   fondo y energía, el acento por línea de servicio, la voz del eslogan, el sonido de las animaciones del logo, qué se

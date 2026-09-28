@@ -34,7 +34,20 @@ requestProposalRender (Vercel/CLI/agente confirmado)   ← gates fail-closed al 
   resuelven idéntico al CLI local (`pnpm deck:compose`). No cambiar a esbuild sin resolver la
   reubicación de templates/fuentes/assets.
 
+## Consumers
+
+El Job es multiconsumidor (`consumers/index.ts`, orden declarado): **Proposal** (`proposal_render_jobs`),
+**Efeonce Insights** (`greenhouse_insights.insight_outputs`, TASK-1846) y **piezas de marca**
+(`greenhouse_brand.brand_render_jobs`, TASK-1921: «La órbita» y Glitch, seis catálogos). Cada consumer trae su
+flag, su claim, su drift check y dónde guarda los bytes. El de marca lee las fuentes (plates, fotos, logos) del
+asset store —nunca rutas locales— y las materializa con los mismos helpers que `pnpm brand:compose` y
+`pnpm glitch:compose` (`materializeSurfaceAssets` / `materializeGlitchAssets`). Contrato: §10 de
+`docs/architecture/GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md`.
+
 ## Flag (multi-runtime — ledger: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`)
+
+Cada consumer tiene su flag: `ARTIFACT_RENDER_JOBS_ENABLED` (Proposal), `INSIGHTS_RENDER_ENABLED` (Insights) y
+`BRAND_RENDER_ENABLED` (piezas de marca, default **false** en los dos `deploy.sh`). Encender uno nunca enciende otro.
 
 `ARTIFACT_RENDER_JOBS_ENABLED` — default **false**. Se lee en 3 runtimes:
 

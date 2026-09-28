@@ -43,6 +43,9 @@
 >   Vercel Production + el entitlement per-ORG. `ARTIFACT_RENDER_JOBS_ENABLED` en Vercel Production: presencia
 >   verificada, valor no leído — no afirmar que el render de Proposal está activo en producción (§4.5).
 > - **Señal nueva** (dominio Insights): `insights.render.orphaned_output`, steady 0.
+>
+> **Tercer consumer (TASK-1921, code complete 2026-09-28, sin desplegar):** piezas de marca propia («La órbita» y
+> Glitch). Contrato vigente en **§10**.
 
 ---
 
@@ -768,6 +771,78 @@ pierde el proceso.
    tanto: la limitación se declara explícita en spec, README del worker y runbook.
 4. **Runbook operativo.** Este doc es el contrato técnico; falta el manual de operación paso a paso
    (`docs/manual-de-uso/**` — owner distinto). No lo escribe este doc.
+
+---
+
+## §10 — Consumer de piezas de marca (TASK-1921)
+
+**Estado:** code complete 2026-09-28; flag `BRAND_RENDER_ENABLED` OFF en los tres runtimes; sin desplegar. Dueño de
+dominio: Greenhouse por ahora (decisión del operador); el módulo nace extraction-ready para Marketing Studio o Globe.
+
+### 10.1 Qué produce y quién lo pide
+
+Seis catálogos del Artifact Composer: `graphic-line-deck` (`pdf-merged`), `graphic-line-stills` y
+`graphic-line-overlays` (`png-set`), y `glitch-carousel`, `glitch-stills` y `glitch-overlays` (`png-set`). Tres
+familias de pedido: `graphic_line_piece` y `graphic_line_document` (el mismo intent que `pnpm brand:compose`) y
+`glitch_edition` (el mismo manifiesto que `pnpm glitch:compose`). Un pedido produce UN job por catálogo; en Glitch,
+fallar los overlays conserva el carrusel y las portadas.
+
+Único escritor: `requestBrandRender` (`src/lib/brand-surfaces/production/commands.ts`). Lo llaman el lane App
+(`POST /api/platform/app/brand-render/requests`, actor `member`) y el lane ecosystem
+(`POST /api/platform/ecosystem/brand-render/requests`, sólo bindings internos, actor `agent`), que es el que usa la
+tool MCP `request_brand_render`. Lecturas: `GET …/requests` y `GET …/requests/{requestId}` en ambos lanes.
+
+### 10.2 Gates al encolar (fail-closed, antes de escribir)
+
+1. Flag OFF ⇒ 503 `render_disabled`.
+2. Forma (zod estricto, discriminado por `family`).
+3. Autorización: actor interno (`tenantType` `client` ⇒ 403), capability `brand_render.request.create`
+   (grant DESIGNER ∪ EFEONCE_ADMIN), organización = la de la marca (`public_id` `EO-ORG-0007`, resuelta server-side;
+   otra ⇒ 404 anti-oráculo).
+4. Plan con los mappers existentes (`planSurfacePiece`, `planSurfaceDocument`, `planGlitchEdition`): contrato AXIS y
+   receta aprobada. Un rechazo ⇒ 422 `render_rejected` y no crea job.
+5. Fuentes: cada nombre que el intent o el manifiesto usa debe venir en `sources` como `assetId` del uploader
+   canónico (contextos `brand_render_source_draft` / `brand_render_source`, PNG/JPEG/WebP, sin cuarentena). Una ruta
+   local nunca se lee. Falta o inválida ⇒ 422 `missing_source`.
+6. Idempotencia: `sha256(family + payload + fuentes usadas + versiones AXIS del package.json)` por organización;
+   el mismo pedido devuelve el existente (200). Si AXIS sube, es un pedido nuevo.
+7. Una transacción: pedido + jobs sellados + fuentes adjuntas al pedido + evento + outbox `brand.render.requested`.
+
+**Sellado:** cada job guarda `{ input }` en su forma canónica (`artifactId` + `slides[{ slideId, contentType, slots }]`,
+la misma que el composer emite) y su `manifest_hash`, igual que Insights: el catálogo vive sólo en el worker
+(ISSUE-177), así que lo que se verifica es que se compongan exactamente las láminas selladas.
+
+### 10.3 En el worker (`services/artifact-worker/consumers/brand-render.ts`)
+
+- Claim con lease (15 min) + fence token, `FOR UPDATE SKIP LOCKED`, cuota de 2 jobs activos por organización, aging
+  de 30 min; `RENDER_JOB_ID` hace replay dirigido.
+- `getManifest` lee las fuentes del asset store y las materializa con `materializeSurfaceAssets` o
+  `materializeGlitchAssets` (los mismos helpers que el taller local). En Glitch, la falla en bytes se calcula sobre la
+  foto ya procesada y se agrega como slot derivado `bytes`; el drift check lo quita sólo de las láminas a las que el
+  worker se lo agregó (`BRAND_RENDER_DERIVED_SLOTS`).
+- Salidas como assets privados `brand_render_output` colgados del pedido: el PDF en `pdf-merged`, cada PNG en
+  `png-set`. Procedencia en el job: versiones AXIS, catálogo, `manifestHash` y cada fuente con su sha256.
+- Fallos: los códigos del motor se traducen (`toBrandRenderFailureCode`); una fuente ausente o en cuarentena es
+  `missing_asset`. Terminales (`semantic_rejected`, `geometry_rejected`, `blank_slide`, `manifest_drift`,
+  `size_rejected`, `cancelled`) van a `dead_letter`; el resto se reencola hasta 3 intentos. Con el fence perdido
+  (otra ejecución tomó el job) no escribe nada. Glitch fija `maxPdfMb` 100, como su taller local.
+- `sharp` es dependencia de runtime del Job (está en `dependencies`; lo exige `worker:runtime-deps-gate`).
+
+### 10.4 Despacho, flag y observabilidad
+
+- `POST /artifact-render/dispatch` (ops-worker): Proposal → Insights → marca, UNA ejecución por tick; la marca espera
+  si otra cola ya lanzó (`dispatchNextBrandRender`).
+- `BRAND_RENDER_ENABLED`: Vercel (encolado), ops-worker (despacho) y Job (reclamo). Declarado con default `false` en
+  ambos `deploy.sh`; prenderlo es cambiar ese default, no sólo `--update-env-vars`.
+- Señal `brand.render.stuck_job` (módulo `brand_render`, `data_quality`, steady 0): jobs en cola o con el reclamo
+  vencido hace más de 60 min. Eventos `brand.render.requested`, `brand.render.job_completed`, `brand.render.job_failed`
+  (sólo `dead_letter`). Sentry con dominio `brand_render`.
+
+### 10.5 Lo que no hace
+
+No aprueba, no agenda y no publica una pieza. No sube archivos por el lane ecosystem (las fuentes ya están en el
+asset store). No expone planes de deck para proponer (TASK-1932). Pendiente de rollout: deploy de los dos workers,
+smoke de los seis catálogos en staging, federación de las tools en `efeonce-mcp`.
 
 ---
 
