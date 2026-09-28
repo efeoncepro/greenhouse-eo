@@ -28,10 +28,23 @@ const withCoverSlots = (slots: Record<string, unknown>): DeckPlan => ({
 })
 
 describe('catálogo de runtime', () => {
-  it('trae las 69 recetas aprobadas, todas con plantilla y con su página de AXIS', () => {
-    expect(deckRecipeCatalog.recipes).toHaveLength(69)
-    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.template)).toEqual([])
-    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.axis?.page).map(recipe => recipe.id)).toEqual([])
+  // Las nueve láminas SEO/AEO (TASK-1934) entran al catálogo antes que su plantilla: esta lista se vacía slice a slice.
+  const WITHOUT_TEMPLATE_YET = [
+    'decision-ai-answer',
+    'decision-ai-market',
+    'decision-diagnosis-map',
+    'decision-difference',
+    'decision-traffic-to-revenue',
+    'method-eeat',
+    'method-surround-cycle',
+    'proposal-cinematic-seo',
+    'proposal-service-seo'
+  ]
+
+  it('trae las 78 recetas aprobadas, todas con plantilla y con su página de AXIS salvo las que TASK-1934 aún compone', () => {
+    expect(deckRecipeCatalog.recipes).toHaveLength(78)
+    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.template).map(recipe => recipe.id).sort()).toEqual(WITHOUT_TEMPLATE_YET)
+    expect(deckRecipeCatalog.recipes.filter(recipe => !recipe.axis?.page).map(recipe => recipe.id).sort()).toEqual(WITHOUT_TEMPLATE_YET)
   })
 
   it('acepta la portada y el cierre clásicos de AXIS sólo en pitch y QBR', () => {
@@ -79,7 +92,7 @@ describe('validateDeckPlan — una prueba que dispara y otra que no, por código
   const cases: Record<DeckPlanIssueCode, { fires: DeckPlan; quiet: DeckPlan }> = {
     'plan-invalid': { fires: { document: 'deck' as never, slides: [] }, quiet: read('golden-qbr.json') },
     'template-named-instead-of-recipe': { fires: plan('brochure', ['CoverBrochure']), quiet: read('golden-brochure.json') },
-    'recipe-unknown': { fires: plan('proposal', ['cover-proposal-orbit', 'proposal-service-seo', 'close-proposal-horizon']), quiet: read('golden-proposal.json') },
+    'recipe-unknown': { fires: plan('proposal', ['cover-proposal-orbit', 'proposal-service-legal', 'close-proposal-horizon']), quiet: read('golden-proposal.json') },
     'recipe-not-for-document': { fires: plan('brochure', ['cover-brochure-cine-lines', 'proposal-cinematic-creative', 'content-pricing', 'close-brochure-orbit']), quiet: read('golden-brochure.json') },
     'frame-count': { fires: plan('pitch', ['cover-classic', 'content-text', 'close-classic', 'close-classic']), quiet: read('golden-pitch.json') },
     'frame-order': { fires: plan('proposal', ['proposal-service-aeo', 'cover-proposal-orbit', 'close-proposal-horizon']), quiet: read('golden-proposal.json') },
@@ -141,6 +154,37 @@ describe('validateDeckPlan — una prueba que dispara y otra que no, por código
 
   it('cada código del catálogo tiene su caso', () => {
     expect(Object.keys(cases).sort()).toEqual(Object.keys(DECK_PLAN_ISSUE_CODES).sort())
+  })
+})
+
+describe('láminas SEO/AEO (TASK-1934)', () => {
+  it('la propuesta SEO sobria y su versión cine nunca van en el mismo deck, aunque no vayan seguidas', () => {
+    const issues = validateDeckPlan(
+      plan('proposal', ['cover-proposal-orbit', 'proposal-service-seo', 'method-eeat', 'proposal-cinematic-seo', 'close-proposal-horizon'])
+    ).issues
+
+    expect(issues.filter(issue => issue.code === 'variant-both-in-deck').map(issue => issue.recipeId)).toEqual(['proposal-cinematic-seo'])
+  })
+
+  it('SEO y AEO son servicios distintos: pueden ir en la misma propuesta', () => {
+    expect(codes(plan('proposal', ['cover-proposal-orbit', 'proposal-service-seo', 'method-eeat', 'proposal-service-aeo', 'close-proposal-horizon']))).not.toContain('variant-both-in-deck')
+  })
+
+  it('el mapa del diagnóstico cae con la regla de próximos pasos cuando el diagnóstico ya se hizo', () => {
+    const issues = validateDeckPlan(plan('proposal', ['cover-proposal-orbit', 'proposal-service-seo', 'decision-diagnosis-map', 'close-proposal-horizon'], { diagnosisDone: true })).issues
+
+    expect(issues.filter(issue => issue.code === 'next-steps-after-diagnosis').map(issue => issue.recipeId)).toEqual(['decision-diagnosis-map'])
+  })
+
+  it('una cifra de mercado sin fuente no valida', () => {
+    const figures = [
+      { value: '−27%', takeaway: 'El tráfico que llegaba solo ya no está garantizado.', source: 'HubSpot', year: '2026' },
+      { value: '50%', takeaway: 'Tu comprador ya le pregunta a la IA qué elegir.', year: '2025' }
+    ]
+
+    const issues = validateDeckPlan({ document: 'pitch', slides: [{ recipeId: 'decision-ai-market', slots: { figures } }] }).issues
+
+    expect(issues.filter(issue => issue.code === 'figure-source-missing').map(issue => issue.slot)).toEqual(['figures'])
   })
 })
 

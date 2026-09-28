@@ -470,8 +470,8 @@ falta un campo del esquema, si hay ids repetidos o si un `preferInstead` o `pair
 
 <!-- Generado por scripts/creative/deck-recipes/render-index.mjs desde EFEONCE_DECK_SLIDE_RECIPES_V1.json. No editar a mano: corre «pnpm brand:deck-recipes». -->
 
-Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aprobado el 2026-09-27 por operador (canvas «La órbita», página Deck).
-**69 de 69** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`).
+Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 78 recetas · aprobado el 2026-09-27 por operador (canvas «La órbita», página Deck).
+**69 de 78** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`). Las demás todavía no.
 
 ### Recetas por familia y documento
 
@@ -482,11 +482,11 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aproba
 | Secciones (`section`) | 8 | 6 | 6 | 6 | 8 |
 | Quiénes somos, equipo y stack (`about`) | 5 | 5 | 4 | 1 | 5 |
 | Contenido (`content`) | 9 | 7 | 9 | 4 | 9 |
-| Método (`method`) | 8 | 7 | 6 | 3 | 8 |
-| Prueba (`proof`) | 8 | 6 | 8 | 2 | 8 |
-| Propuesta por línea de servicio (`proposal-service`) | 8 | 8 | — | — | 8 |
+| Método (`method`) | 10 | 9 | 8 | 3 | 10 |
+| Prueba (`proof`) | 12 | 10 | 12 | 4 | 12 |
+| Propuesta por línea de servicio (`proposal-service`) | 10 | 10 | — | — | 10 |
 | Cotización (`pricing`) | 3 | — | — | — | 3 |
-| Próximos pasos (`next-steps`) | 1 | 1 | 1 | — | 1 |
+| Próximos pasos (`next-steps`) | 2 | 2 | 2 | — | 2 |
 | Respiro (`breather`) | 1 | — | 1 | 1 | 1 |
 
 «Cuándo sí» y «cuándo no» muestran el primer criterio de la receta; los demás, el «cuándo» de cada alternativa, los pares, los elementos fijos, la foto y el prompt de composición están en el JSON. «Slots clave» lista los obligatorios con su largo máximo medido (`≤N` caracteres).
@@ -556,7 +556,7 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aproba
 | `content-day-live-results` | Vívelo 2 · los resultados en vivo en Insights, Greenhouse y Teams | `deck.content-day.live-results` | proposal, brochure, pitch, qbr | Después de «Vívelo 1», o sola cuando la objeción es la reportería. | La cuenta no tiene Efeonce Insights ni panel de Greenhouse. | `decision-chart`, `content-day-tools` | `eyebrow` ≤26, `question` ≤16, `answer` ≤10, `body` ≤100, `panel`, `meeting` ≤40, `reportTitle` ≤36, `metrics` ≤18 |
 | `decision-agenda` | Agenda · cinco temas y el que importa marcado | `deck.decision-agenda` | proposal, pitch, qbr | Después de la portada de una presentación en sala (propuesta, pitch, QBR). | En un brochure que se lee solo: no hay «hoy». | `section-classic` | `eyebrow` ≤16, `question` ≤24, `answer` ≤14, `items` ≤26, `highlightedItem`, `nav` |
 
-### Método · `method` (8)
+### Método · `method` (10)
 
 | id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |
 |---|---|---|---|---|---|---|---|
@@ -568,8 +568,10 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aproba
 | `method-hybrid-workforce-scene` | Fuerza de trabajo híbrida · la escena: persona y agente sobre la misma pieza | `deck.method-hybrid-workforce.scene` | proposal, brochure, pitch | Mostrar la fuerza híbrida en una escena creíble de trabajo, con una persona real del oficio | El comité necesita ver los tramos de autoridad del agente: la versión gráfica | `method-hybrid-workforce`, `proposal-cinematic-nexa` | `eyebrow` ≤32, `question` ≤30, `answer` ≤20, `body` ≤120, `photo`, `selectionTargets` |
 | `method-staircase` | Metodología BeX · la escalera de cinco peldaños de vidrio que se iluminan al subir | `deck.method-staircase` | proposal, brochure | Mostrar un método por niveles cuando la imagen es el propio método (BeX es el caso aprobado) | Los niveles no son una progresión real | `method-staircase-flat`, `method-score-ring` | `eyebrow` ≤32, `question` ≤28, `answer` ≤18, `body` ≤110, `levels` ≤14, `note` ≤60, `selectedLevel`, `selectionLabel` ≤12 |
 | `proposal-cinematic-nexa` | Fuerza híbrida en cine · Nexa biónica con lentes en la partida, con sus agentes | `deck.proposal-cinematic.hero` | proposal, brochure | Abrir o cerrar el bloque de fuerza híbrida con impacto | Hay que explicar el gobierno del agente o vender pasos: esta composición no lleva prueba ni pasos | `method-hybrid-workforce`, `method-hybrid-workforce-scene` | `eyebrow` ≤32, `question` ≤26, `answer` ≤8, `body` ≤110, `photo` |
+| `method-surround-cycle` | El método en ciclo · Surround Discovery: Medir, Crear, Distribuir, Optimizar | — | proposal, brochure, pitch | Explicar cómo trabajamos AEO/SEO después de mostrar el problema | El servicio es un proyecto de una vez | `method-staircase`, `decision-plan` | `eyebrow` ≤51, `question` ≤21, `answer` ≤8, `evidence` ≤161, `stations` ≤155, `coreLabel` ≤15, (+1 opcional) |
+| `method-eeat` | E-E-A-T · cuatro letras de vidrio y lo que construimos en cada una | — | proposal, brochure, pitch | Explicar por qué el contenido y la autoridad importan para la IA | La audiencia ya domina E-E-A-T: pasar a la oferta | `method-surround-cycle` | `eyebrow` ≤51, `question` ≤43, `answer` ≤21, `evidence` ≤161, `meter` ≤24, `letters` ≤85 |
 
-### Prueba · `proof` (8)
+### Prueba · `proof` (12)
 
 | id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |
 |---|---|---|---|---|---|---|---|
@@ -581,8 +583,12 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aproba
 | `decision-chart` | Gráfico · el dato con su anotación | `deck.decision-chart` | proposal, brochure, pitch, qbr | Para mostrar un antes y después medido de un caso. | No hay línea base comparable. | `content-measure`, `decision-case` | `eyebrow` ≤30, `question` ≤24, `answer` ≤10, `body` ≤100, `bars` ≤14, `annotation` ≤7, `chartNote` ≤70, `kpis` ≤22, `source` ≤90, `nav` |
 | `decision-testimonial` | Testimonio · la frase del cliente a escala de titular | `deck.decision-testimonial` | proposal, brochure, pitch | Hay una cita real, textual y publicada, con autorización del cliente. | La cita no es textual o no está autorizada. | `decision-case`, `content-clients` | `eyebrow` ≤28, `question` ≤34, `keyPhrase` ≤36, `fullQuote` ≤170, `clientLogo`, `author` ≤24, `proof` ≤24, `source` ≤90, `nav` |
 | `decision-why-us` | Por qué elegirnos · un muro de seis cifras | `deck.decision-why-us` | proposal, brochure, pitch | Para responder «¿por qué ustedes?» con hechos citables. | Las cifras no tienen fuente. | `content-text`, `content-clients` | `eyebrow` ≤22, `question` ≤22, `answer` ≤9, `body` ≤100, `facts` ≤54, `source` ≤100, `selectedFact`, `nav` |
+| `decision-ai-answer` | La respuesta de la IA · hoy tu marca no aparece, con AEO aparece primera | — | proposal, brochure, pitch | Abrir la sección AEO haciendo visible el problema antes de la oferta | Ya se mostró el informe real del diagnóstico del cliente: usar sus datos, no la muestra | `decision-diagnosis-map`, `decision-ai-market` | `eyebrow` ≤51, `question` ≤43, `answer` ≤24, `evidence` ≤161, `prompt` ≤86, `answerIntroToday` ≤57, `competitorsToday` ≤46, `answerIntroWithAeo` ≤66, `clientName` ≤40, `clientDescription` ≤114, `competitorsWithAeo` ≤46, `illustrativeMark` ≤62, (+1 opcional) |
+| `decision-ai-market` | Contexto de mercado · tres cifras con su fuente sobre la órbita de luz | — | proposal, brochure, pitch, qbr | Abrir la conversación de SEO/AEO con el porqué ahora | No hay fuente verificable para alguna cifra: no se muestra sin fuente | `content-measure`, `decision-ai-answer` | `eyebrow` ≤51, `question` ≤43, `answer` ≤9, `evidence` ≤161, `figures` ≤124 |
+| `decision-difference` | La diferencia · agencia commodity vs. método medible, y la objeción del equipo propio | — | proposal, brochure, pitch | El cliente compara con otras agencias o con hacerlo en casa | No hay comparación en juego: la lámina se lee defensiva | `decision-why-us`, `decision-risk` | `eyebrow` ≤51, `question` ≤43, `answer` ≤21, `evidence` ≤161, `alternativeTitle` ≤25, `rows` ≤88, `efeonceTitle` ≤23, `ownTeamTitle` ≤19, `ownTeamPillars` ≤49 |
+| `decision-traffic-to-revenue` | Del tráfico al negocio · cuatro escalones hasta los ingresos | — | proposal, brochure, pitch, qbr | El cliente mide al proveedor por tráfico y hay que subir la conversación a negocio | No hay CRM ni medición de leads: no prometer el escalón que no se puede medir | `decision-chart` | `eyebrow` ≤51, `question` ≤43, `answer` ≤18, `evidence` ≤161, `steps` ≤102, `cutLabel` ≤68 |
 
-### Propuesta por línea de servicio · `proposal-service` (8)
+### Propuesta por línea de servicio · `proposal-service` (10)
 
 | id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |
 |---|---|---|---|---|---|---|---|
@@ -594,6 +600,8 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aproba
 | `proposal-cinematic-web` | Propuesta web en cine · una web holográfica que usan personas, buscadores y agentes | `deck.proposal-cinematic` | proposal, brochure | La propuesta web pide impacto | Hay que describir cada modalidad: la versión sobria | `proposal-service-web`, `proposal-cinematic-aeo` | `eyebrow` ≤40, `question` ≤28, `answer` ≤12, `body` ≤120, `steps` ≤20, `photo`, (+1 opcional) |
 | `proposal-cinematic-aeo` | Propuesta AEO en cine · entre miles de marcas, la IA ilumina una | `deck.proposal-cinematic` | proposal, brochure | La propuesta AEO pide impacto | Hay que detallar cada forma de empezar: la versión sobria | `proposal-service-aeo`, `method-staircase` | `eyebrow` ≤40, `question` ≤26, `answer` ≤10, `body` ≤130, `steps` ≤20, `note` ≤70, `photo` |
 | `proposal-cinematic-revops` | Propuesta RevOps en cine · un moño de luz (captar, cerrar, crecer) con agentes en el flujo | `deck.proposal-cinematic` | proposal, brochure | La propuesta de RevOps sobre HubSpot pide impacto | Hay que detallar cada etapa: la versión sobria | `proposal-service-revops`, `method-hybrid-workforce` | `eyebrow` ≤40, `question` ≤28, `answer` ≤11, `body` ≤125, `steps` ≤20, `photo` |
+| `proposal-service-seo` | Propuesta SEO · sobria, con lente y cuatro formas de empezar (acento Engine) | — | proposal, brochure | La propuesta AEO necesita que cada forma de empezar se explique con una frase (más datos que impacto) | La lámina tiene que golpear y recordarse: la versión cine hace ese trabajo | `proposal-cinematic-seo`, `proposal-service-aeo` | `eyebrow` ≤40, `question` ≤32, `answer` ≤14, `body` ≤140, `lensPhoto`, `steps` ≤90, (+1 opcional) |
+| `proposal-cinematic-seo` | Propuesta SEO con punch · el mapa de luz del oficio y su núcleo | — | proposal, brochure | La propuesta AEO pide impacto | Hay que detallar cada forma de empezar: la versión sobria | `proposal-service-seo`, `proposal-cinematic-aeo` | `eyebrow` ≤40, `question` ≤26, `answer` ≤10, `body` ≤130, `steps` ≤20, `note` ≤70, `photo` |
 
 ### Cotización · `pricing` (3)
 
@@ -603,11 +611,12 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aproba
 | `content-pricing-stage` | Cotización en escena · los tres planes en 3D con Pro al frente | `deck.content-pricing.stage` | proposal | En una propuesta presentada en sala, cuando la cotización necesita el mismo impacto que el resto del deck. | En un brochure. | `content-pricing`, `content-pricing-live` | `eyebrow` ≤16, `question` ≤24, `answer` ≤14, `body` ≤90, `plans` ≤32, `amounts`, `recommendedPlan` |
 | `content-pricing-live` | Cotización en vivo · cada línea a la vista y el cursor en «Aprobar propuesta» | `deck.content-pricing.live` | proposal | En una propuesta con alcance acordado y una cotización única. | El alcance no está acordado o hay que comparar planes. | `content-pricing`, `content-pricing-stage` | `eyebrow` ≤16, `question` ≤22, `answer` ≤16, `body` ≤110, `quoteTitle` ≤20, `lineItems` ≤48, `total` |
 
-### Próximos pasos · `next-steps` (1)
+### Próximos pasos · `next-steps` (2)
 
 | id | Nombre | Plantilla | Documentos | Cuándo sí | Cuándo no | Alternativa | Slots clave |
 |---|---|---|---|---|---|---|---|
 | `decision-next-steps` | Próximos pasos · la agenda del diagnóstico abierta y el cursor en «Agenda un diagnóstico» | `deck.decision-next-steps` | pitch, brochure, proposal | Al final de un pitch o de un brochure, para convertir el interés en una reunión. | En una propuesta enviada después del diagnóstico: ese paso ya ocurrió y el gesto es aprobar. | `content-pricing-live` | `eyebrow` ≤20, `question` ≤22, `answer` ≤10, `body` ≤60, `cardDescriptor` ≤100, `days`, `times`, `chosenSlot`, `nextSteps` ≤70 |
+| `decision-diagnosis-map` | Qué entrega el diagnóstico · el informe abierto con sus cuatro entregables | — | proposal, brochure, pitch | Cerrar una propuesta o brochure AEO con el primer paso tangible | Ya se hizo el diagnóstico: mostrar el real del cliente | `decision-next-steps` | `eyebrow` ≤51, `question` ≤43, `answer` ≤8, `evidence` ≤161, `reportTitle` ≤38, `engineScores` ≤13, `shareOfVoice` ≤25, `lostPrompts` ≤50, `plan` ≤45, `sampleMark` ≤16, `expertNote` ≤92 |
 
 ### Respiro · `breather` (1)
 

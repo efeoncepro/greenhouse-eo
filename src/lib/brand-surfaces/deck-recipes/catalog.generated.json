@@ -4897,6 +4897,140 @@
       }
     },
     {
+      "id": "method-surround-cycle",
+      "name": "El método en ciclo · Surround Discovery: Medir, Crear, Distribuir, Optimizar",
+      "family": "method",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "method-staircase",
+          "proposal-service-aeo",
+          "decision-diagnosis-map"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 21
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 8
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 161
+        },
+        {
+          "name": "stations",
+          "type": "list",
+          "required": true,
+          "maxChars": 155
+        },
+        {
+          "name": "coreLabel",
+          "type": "text",
+          "required": true,
+          "maxChars": 15
+        },
+        {
+          "name": "coreCaption",
+          "type": "text",
+          "required": false,
+          "maxChars": 34
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "method-eeat",
+      "name": "E-E-A-T · cuatro letras de vidrio y lo que construimos en cada una",
+      "family": "method",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "proposal-service-seo",
+          "proposal-cinematic-seo",
+          "decision-traffic-to-revenue"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 43
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 21
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 161
+        },
+        {
+          "name": "meter",
+          "type": "list",
+          "required": true,
+          "maxChars": 24
+        },
+        {
+          "name": "letters",
+          "type": "list",
+          "required": true,
+          "maxChars": 85
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
       "id": "content-focus",
       "name": "Contenido · el foco sobre la prueba",
       "family": "proof",
@@ -5986,6 +6120,315 @@
       }
     },
     {
+      "id": "decision-ai-answer",
+      "name": "La respuesta de la IA · hoy tu marca no aparece, con AEO aparece primera",
+      "family": "proof",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "decision-ai-market",
+          "method-surround-cycle",
+          "proposal-service-aeo"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 43
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 24
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 161
+        },
+        {
+          "name": "prompt",
+          "type": "text",
+          "required": true,
+          "maxChars": 86
+        },
+        {
+          "name": "answerIntroToday",
+          "type": "text",
+          "required": true,
+          "maxChars": 57
+        },
+        {
+          "name": "competitorsToday",
+          "type": "list",
+          "required": true,
+          "maxChars": 46
+        },
+        {
+          "name": "answerIntroWithAeo",
+          "type": "text",
+          "required": true,
+          "maxChars": 66
+        },
+        {
+          "name": "clientName",
+          "type": "text",
+          "required": true,
+          "maxChars": 40
+        },
+        {
+          "name": "clientDescription",
+          "type": "text",
+          "required": true,
+          "maxChars": 114
+        },
+        {
+          "name": "clientCitations",
+          "type": "list",
+          "required": false,
+          "maxChars": 22
+        },
+        {
+          "name": "competitorsWithAeo",
+          "type": "list",
+          "required": true,
+          "maxChars": 46
+        },
+        {
+          "name": "illustrativeMark",
+          "type": "text",
+          "required": true,
+          "maxChars": 62
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "decision-ai-market",
+      "name": "Contexto de mercado · tres cifras con su fuente sobre la órbita de luz",
+      "family": "proof",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch",
+        "qbr"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "decision-ai-answer",
+          "method-surround-cycle"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 43
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 9
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 161
+        },
+        {
+          "name": "figures",
+          "type": "list",
+          "required": true,
+          "maxChars": 124
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "decision-difference",
+      "name": "La diferencia · agencia commodity vs. método medible, y la objeción del equipo propio",
+      "family": "proof",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "decision-why-us",
+          "decision-risk"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 43
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 21
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 161
+        },
+        {
+          "name": "alternativeTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 25
+        },
+        {
+          "name": "rows",
+          "type": "list",
+          "required": true,
+          "maxChars": 88
+        },
+        {
+          "name": "efeonceTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 23
+        },
+        {
+          "name": "ownTeamTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 19
+        },
+        {
+          "name": "ownTeamPillars",
+          "type": "list",
+          "required": true,
+          "maxChars": 49
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "decision-traffic-to-revenue",
+      "name": "Del tráfico al negocio · cuatro escalones hasta los ingresos",
+      "family": "proof",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch",
+        "qbr"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "proposal-service-seo",
+          "content-day-live-results"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 43
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 18
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 161
+        },
+        {
+          "name": "steps",
+          "type": "list",
+          "required": true,
+          "maxChars": 102
+        },
+        {
+          "name": "cutLabel",
+          "type": "text",
+          "required": true,
+          "maxChars": 68
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
       "id": "proposal-service-aeo",
       "name": "Propuesta AEO · sobria, con lente y cuatro formas de empezar (acento Engine)",
       "family": "proposal-service",
@@ -6974,6 +7417,146 @@
       }
     },
     {
+      "id": "proposal-service-seo",
+      "name": "Propuesta SEO · sobria, con lente y cuatro formas de empezar (acento Engine)",
+      "family": "proposal-service",
+      "documents": [
+        "proposal",
+        "brochure"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": true,
+        "plate": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png"
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [
+          "proposal-cinematic-seo"
+        ],
+        "sequence": [
+          "method-eeat",
+          "decision-traffic-to-revenue"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 40
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 32
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 14
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "required": true,
+          "maxChars": 140
+        },
+        {
+          "name": "lensPhoto",
+          "type": "image",
+          "required": true,
+          "maxChars": null
+        },
+        {
+          "name": "steps",
+          "type": "list",
+          "required": true,
+          "maxChars": 90
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": false,
+          "maxChars": 70
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
+      "id": "proposal-cinematic-seo",
+      "name": "Propuesta SEO con punch · el mapa de luz del oficio y su núcleo",
+      "family": "proposal-service",
+      "documents": [
+        "proposal",
+        "brochure"
+      ],
+      "surface": "cine",
+      "photo": {
+        "uses": true,
+        "plate": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png"
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [
+          "proposal-service-seo"
+        ],
+        "sequence": [
+          "method-eeat",
+          "decision-traffic-to-revenue"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 40
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 26
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 10
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "required": true,
+          "maxChars": 130
+        },
+        {
+          "name": "steps",
+          "type": "list",
+          "required": true,
+          "maxChars": 20
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 70
+        },
+        {
+          "name": "photo",
+          "type": "image",
+          "required": true,
+          "maxChars": null
+        }
+      ],
+      "template": null,
+      "axis": null
+    },
+    {
       "id": "content-pricing",
       "name": "Cotización · tabla de tres planes con Pro recomendado",
       "family": "pricing",
@@ -7531,6 +8114,99 @@
           ]
         }
       }
+    },
+    {
+      "id": "decision-diagnosis-map",
+      "name": "Qué entrega el diagnóstico · el informe abierto con sus cuatro entregables",
+      "family": "next-steps",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "photo": {
+        "uses": false,
+        "plate": null
+      },
+      "pairs": {
+        "coverClose": [],
+        "variant": [],
+        "sequence": [
+          "decision-next-steps",
+          "decision-ai-answer"
+        ]
+      },
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 43
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 8
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 161
+        },
+        {
+          "name": "reportTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 38
+        },
+        {
+          "name": "engineScores",
+          "type": "list",
+          "required": true,
+          "maxChars": 13
+        },
+        {
+          "name": "shareOfVoice",
+          "type": "list",
+          "required": true,
+          "maxChars": 25
+        },
+        {
+          "name": "lostPrompts",
+          "type": "list",
+          "required": true,
+          "maxChars": 50
+        },
+        {
+          "name": "plan",
+          "type": "list",
+          "required": true,
+          "maxChars": 45
+        },
+        {
+          "name": "sampleMark",
+          "type": "text",
+          "required": true,
+          "maxChars": 16
+        },
+        {
+          "name": "expertNote",
+          "type": "text",
+          "required": true,
+          "maxChars": 92
+        }
+      ],
+      "template": null,
+      "axis": null
     },
     {
       "id": "breather",

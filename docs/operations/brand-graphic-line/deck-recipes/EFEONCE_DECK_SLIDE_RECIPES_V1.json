@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "approvedAt": "2026-09-27",
   "approvedBy": "operador (canvas «La órbita», página Deck)",
-  "count": 69,
+  "count": 78,
   "axisRecipeFamilies": {
     "cover-classic": "portada clásica AXIS (deckSlideHtml cover)",
     "close-classic": "cierre clásico AXIS (deckSlideHtml close)",
@@ -6611,6 +6611,333 @@
       "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckHibridoCarreraLentes.jpg"
     },
     {
+      "id": "method-surround-cycle",
+      "board": "DeckCicloSurround",
+      "name": "El método en ciclo · Surround Discovery: Medir, Crear, Distribuir, Optimizar",
+      "family": "method",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-28",
+      "reference": "references/surfaces/deck/method-surround-cycle.jpg",
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references-2026-09-28/MX3-ciclo.jpg",
+      "communicates": "La visibilidad ante la IA no se logra una vez: se sostiene en un ciclo continuo que sube a tu marca un nivel en cada vuelta.",
+      "useWhen": [
+        "Explicar cómo trabajamos AEO/SEO después de mostrar el problema",
+        "Propuesta que vende un servicio continuo (On-Going) y no un proyecto",
+        "Responder «¿qué pasa después del diagnóstico?»"
+      ],
+      "avoidWhen": [
+        "El servicio es un proyecto de una vez",
+        "Se necesita el calendario por tramos: usar decision-plan",
+        "Se explica la madurez por niveles: usar method-staircase"
+      ],
+      "preferInstead": [
+        {
+          "recipe": "method-staircase",
+          "when": "hay que mostrar en qué nivel está la marca (los 5 niveles)"
+        },
+        {
+          "recipe": "decision-plan",
+          "when": "el cliente pide el plan de 90 días"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "method-staircase",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "proposal-service-aeo",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "decision-diagnosis-map",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "Surround Discovery",
+          "notes": "Medido: caja 620 px × 1 línea(s) a 500 16px Pop (≈11.41 px/carácter, 5 % de holgura). Mayúsculas con tracking .14em; color suave."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 21,
+          "example": "¿Cómo se sostiene?",
+          "notes": "Medido: caja 470 px × 1 línea(s) a 300 40px Pop (≈20.68 px/carácter, 5 % de holgura). Con el anillo delante en teal; bigVoice pone la respuesta más abajo si la pregunta ocupa 2 líneas."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 8,
+          "example": "En ciclo",
+          "notes": "Medido: caja 620 px × 1 línea(s) a 760 150px Bric (≈67.59 px/carácter, 5 % de holgura). Bricolage 760 con la esfera teal al final (answerHtml). Debe medir ≥3× la pregunta (40 px). 1–3 palabras con cierre que remata."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 161,
+          "example": "La visibilidad ante la IA no se «logra»: se sostiene. Cada ciclo aprende del anterior y te sube un **nivel**.",
+          "notes": "Medido: caja 380 px × 6 línea(s) a 300 26px Pop (≈13.44 px/carácter, 5 % de holgura). Una sola palabra en negrita blanca."
+        },
+        {
+          "name": "stations",
+          "type": "list",
+          "required": true,
+          "maxChars": 155,
+          "example": [
+            {
+              "title": "Medir",
+              "description": "Tu visibilidad en ChatGPT, AI Overviews, Gemini, Perplexity, Copilot y Claude, por mercado y por prompt."
+            },
+            {
+              "title": "Crear",
+              "description": "Los activos que los motores entienden, citan y reproducen. No más contenido: el correcto."
+            },
+            {
+              "title": "Distribuir",
+              "description": "Tu presencia en cada superficie donde los motores descubren marcas, no sólo en tu sitio."
+            },
+            {
+              "title": "Optimizar",
+              "description": "Cada ciclo aprende del anterior: subes un nivel, medimos y corregimos."
+            }
+          ],
+          "notes": "Estación 1 (arriba) lleva «Empieza aquí» y el borde teal. Medido: título 760 34px Bric en caja 260; descripción 400 15px, 4 líneas en 320 (arriba/abajo) o 260 (laterales). Exactamente 4 ítems. Por ítem: title (≤ 14) · description (≤ wide 155, narrow 126) · icon (image; Ícono 3D del servicio (docs/assets/public-site/aeo-service-icons/v2/{measure,create,distribute,optimize}.png))."
+        },
+        {
+          "name": "coreLabel",
+          "type": "text",
+          "required": true,
+          "maxChars": 15,
+          "example": "Tu marca",
+          "notes": "Medido: caja 300 px × 1 línea(s) a 760 38px Bric (≈18.49 px/carácter, 5 % de holgura)."
+        },
+        {
+          "name": "coreCaption",
+          "type": "text",
+          "required": false,
+          "maxChars": 34,
+          "example": "sube un nivel en cada vuelta",
+          "notes": "Medido: caja 300 px × 1 línea(s) a 400 16px Pop (≈8.32 px/carácter, 5 % de holgura)."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (stageBg: halo radial teal detrás del escenario)",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo",
+        "Una sola órbita en la lámina",
+        "La órbita tendida en perspectiva ES el loop: elipse centro (1290, 600), rx 380, ry 140, con halo radial interior",
+        "Tramo encendido desde Medir en sentido horario (≈1,25 rad) con la esfera en su punta",
+        "Flechas de sentido a mitad de cada tramo (4)",
+        "Íconos 3D sobre cada nodo con sombra; tarjetas de vidrio fuera de la elipse (sin cruzarla)"
+      ],
+      "selection": {
+        "kind": "none"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «El método en ciclo» sobre fondo Efeonce oscuro. Voz a la izquierda (pregunta de 1 línea, respuesta ~150 px con esfera). A la derecha, la órbita tendida en perspectiva como loop: cuatro nodos (arriba, derecha, abajo, izquierda) con los íconos 3D del servicio y, fuera de la elipse, una tarjeta de vidrio por estación (01 Medir «Empieza aquí» con borde teal, 02 Crear, 03 Distribuir, 04 Optimizar). Un tramo encendido recorre el ciclo desde Medir con la esfera en la punta, flechas de sentido en cada tramo y «Tu marca» al centro. Ninguna tarjeta cruza la órbita."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-27_deck-recetas/render-src/vive.mjs",
+        "slideId": "MX3-ciclo"
+      },
+      "rules": [
+        "Una sola órbita por lámina",
+        "Ningún texto cruza la órbita ni las piezas del escenario",
+        "Respuesta ≥3× la pregunta",
+        "Acento sólo en texto ≥24 px",
+        "Español neutro, sin voseo",
+        "Siempre cuatro estaciones en ese orden",
+        "Las tarjetas nunca cruzan la elipse"
+      ],
+      "notes": "Aprobada el 2026-09-28. Copy de las estaciones tomado de /aeo-2/ (sección El servicio)."
+    },
+    {
+      "id": "method-eeat",
+      "board": "DeckEEAT",
+      "name": "E-E-A-T · cuatro letras de vidrio y lo que construimos en cada una",
+      "family": "method",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-28",
+      "reference": "references/surfaces/deck/method-eeat.jpg",
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references-2026-09-28/MD2-eeat.jpg",
+      "communicates": "La IA cita a quien puede verificar: experiencia, pericia, autoridad y confianza, y cada entregable nuestro construye una de esas señales.",
+      "useWhen": [
+        "Explicar por qué el contenido y la autoridad importan para la IA",
+        "Propuesta SEO o AEO que vende contenido, PR o técnica",
+        "Educar a un comité que conoce el SEO clásico"
+      ],
+      "avoidWhen": [
+        "La audiencia ya domina E-E-A-T: pasar a la oferta",
+        "Se necesita el método operativo: usar method-surround-cycle"
+      ],
+      "preferInstead": [
+        {
+          "recipe": "method-surround-cycle",
+          "when": "la pregunta es cómo trabajamos, no por qué nos cita la IA"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "proposal-service-seo",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "proposal-cinematic-seo",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "decision-traffic-to-revenue",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "E-E-A-T",
+          "notes": "Medido: caja 620 px × 1 línea(s) a 500 16px Pop (≈11.41 px/carácter, 5 % de holgura). Mayúsculas con tracking .14em; color suave."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 43,
+          "example": "¿Por qué te citaría la IA?",
+          "notes": "Medido: caja 470 px × 2 línea(s) a 300 40px Pop (≈20.68 px/carácter, 5 % de holgura). Con el anillo delante en teal; bigVoice pone la respuesta más abajo si la pregunta ocupa 2 líneas."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 21,
+          "example": "Porque confía",
+          "notes": "Medido: caja 590 px × 2 línea(s) a 760 118px Bric (≈53.17 px/carácter, 5 % de holgura). Bricolage 760 con la esfera teal al final (answerHtml). Debe medir ≥3× la pregunta (40 px). 1–3 palabras con cierre que remata."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 161,
+          "example": "La IA no adivina: cita a quien puede **verificar**. Cada entregable construye una de estas señales.",
+          "notes": "Medido: caja 380 px × 6 línea(s) a 300 26px Pop (≈13.44 px/carácter, 5 % de holgura). Una sola palabra en negrita blanca."
+        },
+        {
+          "name": "meter",
+          "type": "list",
+          "required": true,
+          "maxChars": 24,
+          "example": [
+            {
+              "label": "En SEO clásico",
+              "value": "Importante",
+              "fill": 0.55
+            },
+            {
+              "label": "En AEO / IA",
+              "value": "Determinante",
+              "fill": 1
+            }
+          ],
+          "notes": "El segundo (IA) lleva barra teal con glow. Exactamente 2 ítems. Por ítem: label (≤ 24) · value (≤ 14) · fill (number; 0–1)."
+        },
+        {
+          "name": "letters",
+          "type": "list",
+          "required": true,
+          "maxChars": 85,
+          "example": [
+            {
+              "letter": "E",
+              "name": "Experiencia",
+              "description": "Contenido de primera mano, escrito por quien lo vivió.",
+              "builtWith": "Autoría demostrable y casos reales",
+              "deliverable": "Contenido & landings"
+            },
+            {
+              "letter": "E",
+              "name": "Pericia",
+              "description": "Profundidad, precisión y fuentes que respaldan cada afirmación.",
+              "builtWith": "Autores con credenciales, contenido revisado",
+              "deliverable": "Contenido & landings"
+            },
+            {
+              "letter": "A",
+              "name": "Autoridad",
+              "description": "Que tu marca sea el referente de su sector.",
+              "builtWith": "PR, link building y entidad clara",
+              "deliverable": "PR & link building"
+            },
+            {
+              "letter": "T",
+              "name": "Confianza",
+              "description": "Un sitio seguro, transparente y verificable.",
+              "builtWith": "Schema, HTTPS y señales de confianza",
+              "deliverable": "Técnico & schema"
+            }
+          ],
+          "notes": "La cuarta (Confianza) se ilumina: es la base. Medido: caja interior 188 px (tarjeta 232 − 44 de padding). Exactamente 4 ítems. Por ítem: letter (≤ 1) · name (≤ 12) · description (≤ 85) · builtWith (≤ 42) · deliverable (≤ 26)."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (stageBg: halo radial teal detrás del escenario)",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo",
+        "Una sola órbita en la lámina",
+        "Cuatro tarjetas de vidrio de 232 px con 18 px de separación desde x 780; la cuarta 560 alto y 30 px más arriba, con borde teal y glow; las otras 530",
+        "Letra en Bricolage 760 a 150 px",
+        "Medidor de dos barras sobre las letras (y 132)",
+        "Plataforma de luz y reflejo en el piso"
+      ],
+      "selection": {
+        "kind": "none"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «E-E-A-T» sobre fondo Efeonce oscuro. Voz a la izquierda (pregunta de 2 líneas, respuesta de 2 líneas «Porque / confía.»). A la derecha, cuatro letras de vidrio E-E-A-T sobre una plataforma de luz, cada una con su nombre, qué significa y, al pie, «Lo construimos con…» y el entregable; la T (Confianza) iluminada con borde teal. Arriba, un medidor de dos barras: peso de E-E-A-T en SEO clásico (importante) y en AEO/IA (determinante)."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-27_deck-recetas/render-src/vive.mjs",
+        "slideId": "MD2-eeat"
+      },
+      "rules": [
+        "Una sola órbita por lámina",
+        "Ningún texto cruza la órbita ni las piezas del escenario",
+        "Respuesta ≥3× la pregunta",
+        "Acento sólo en texto ≥24 px",
+        "Español neutro, sin voseo",
+        "Siempre las cuatro letras en orden E-E-A-T"
+      ],
+      "notes": "Aprobada el 2026-09-28. Copy de /servicios/posicionamiento-seo/ (sección E-E-A-T)."
+    },
+    {
       "id": "content-focus",
       "board": "DeckContenidoFoco",
       "status": "approved",
@@ -7699,6 +8026,690 @@
       ],
       "notes": "Estado: aprobada el 2026-09-27; la norma v1.3 y los tokens de AXIS quedaron sincronizados (lo que sigue sobre «option» es histórico). En AXIS es decision-why-us (status option, voice none; la referencia lleva voz). Aprobada el 2026-09-27. Hallazgo: la referencia no muestra la fuente de las cifras; al componer hay que agregarla. Existe otra versión aprobada de esta lámina en el canvas (DeckPorQue2, de otro grupo de recetas).",
       "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPorQue.jpg"
+    },
+    {
+      "id": "decision-ai-answer",
+      "board": "DeckIARespuesta",
+      "name": "La respuesta de la IA · hoy tu marca no aparece, con AEO aparece primera",
+      "family": "proof",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-28",
+      "reference": "references/surfaces/deck/decision-ai-answer.jpg",
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references-2026-09-28/MX1-ia-responde.jpg",
+      "communicates": "Cuando tu comprador le pregunta a la IA por tu categoría, hoy recomienda a tu competencia; con AEO la próxima respuesta te nombra primera y te cita.",
+      "useWhen": [
+        "Abrir la sección AEO haciendo visible el problema antes de la oferta",
+        "Pitch o brochure donde el cliente aún no dimensiona que la IA ya recomienda marcas",
+        "Después del contexto de mercado, como prueba concreta"
+      ],
+      "avoidWhen": [
+        "Ya se mostró el informe real del diagnóstico del cliente: usar sus datos, no la muestra",
+        "Se quiere afirmar una respuesta real observada: esta lámina es ilustrativa (para una captura real usar los recursos AEO de AXIS con provenance captured-output)",
+        "Documento sin foco en visibilidad en IA"
+      ],
+      "preferInstead": [
+        {
+          "recipe": "decision-diagnosis-map",
+          "when": "ya existe el diagnóstico del cliente con sus datos"
+        },
+        {
+          "recipe": "decision-ai-market",
+          "when": "la audiencia necesita primero el contexto de mercado"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "decision-ai-market",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "method-surround-cycle",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "proposal-service-aeo",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "Visibilidad en IA",
+          "notes": "Medido: caja 620 px × 1 línea(s) a 500 16px Pop (≈11.41 px/carácter, 5 % de holgura). Mayúsculas con tracking .14em; color suave."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 43,
+          "example": "¿A quién recomienda la IA?",
+          "notes": "Medido: caja 470 px × 2 línea(s) a 300 40px Pop (≈20.68 px/carácter, 5 % de holgura). Con el anillo delante en teal; bigVoice pone la respuesta más abajo si la pregunta ocupa 2 líneas."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 24,
+          "example": "A tu competencia",
+          "notes": "Medido: caja 560 px × 2 línea(s) a 760 96px Bric (≈43.26 px/carácter, 5 % de holgura). Bricolage 760 con la esfera teal al final (answerHtml). Debe medir ≥3× la pregunta (40 px). 1–3 palabras con cierre que remata."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 161,
+          "example": "Cuando tu comprador pregunta por tu categoría, la IA ya tiene favoritas. El AEO hace que la **próxima** respuesta te nombre.",
+          "notes": "Medido: caja 380 px × 6 línea(s) a 300 26px Pop (≈13.44 px/carácter, 5 % de holgura). Una sola palabra en negrita blanca."
+        },
+        {
+          "name": "prompt",
+          "type": "text",
+          "required": true,
+          "maxChars": 86,
+          "example": "¿Cuáles son las mejores marcas de [tu categoría] en Chile?",
+          "notes": "Medido: caja 380 px × 2 línea(s) a 400 16px Pop (≈8.32 px/carácter, 5 % de holgura). Burbuja del usuario, idéntica en las dos ventanas; ancho = ventana trasera (520) − 140."
+        },
+        {
+          "name": "answerIntroToday",
+          "type": "text",
+          "required": true,
+          "maxChars": 57,
+          "example": "Estas son las opciones más recomendadas:",
+          "notes": "Medido: caja 468 px × 1 línea(s) a 400 15px Pop (≈7.8 px/carácter, 5 % de holgura)."
+        },
+        {
+          "name": "competitorsToday",
+          "type": "list",
+          "required": true,
+          "example": [
+            "Competidor A",
+            "Competidor B",
+            "Competidor C"
+          ],
+          "notes": "Nombres genéricos por defecto; con nombres reales, exigir autorización y fuente. Exactamente 3 ítems. Por ítem: name: text 600 17px (≈8.94 px/car., caja 440 px → 46 car.) · desc: opcional 400 15px, 1 línea · citations: 0–2 chips.",
+          "maxChars": 46
+        },
+        {
+          "name": "answerIntroWithAeo",
+          "type": "text",
+          "required": true,
+          "maxChars": 66,
+          "example": "Para [tu categoría] en Chile, la opción más recomendada es:",
+          "notes": "Medido: caja 544 px × 1 línea(s) a 400 15px Pop (≈7.8 px/carácter, 5 % de holgura)."
+        },
+        {
+          "name": "clientName",
+          "type": "text",
+          "required": true,
+          "maxChars": 40,
+          "example": "Tu marca",
+          "notes": "Fila 1 de la ventana con AEO, resaltada con borde teal: el objetivo de la selección «Cliente». Medido: nombre 700 21px en caja 470 px."
+        },
+        {
+          "name": "clientDescription",
+          "type": "text",
+          "required": true,
+          "maxChars": 114,
+          "example": "Referente de la categoría: casos verificables, precios claros y reseñas consistentes.",
+          "notes": "Medido: 400 15px, dos líneas en la caja de 470 px."
+        },
+        {
+          "name": "clientCitations",
+          "type": "list",
+          "required": false,
+          "maxChars": 22,
+          "example": [
+            "tumarca.com",
+            "medio-sectorial.com",
+            "comparador.cl"
+          ],
+          "notes": "Hasta 3 chips de dominio (500 13px, ≤ 22 caracteres por chip)."
+        },
+        {
+          "name": "competitorsWithAeo",
+          "type": "list",
+          "required": true,
+          "example": [
+            "Competidor A",
+            "Competidor B"
+          ],
+          "notes": "Filas 2 y 3 de la ventana frontal, sólo nombre. Exactamente 2 ítems. Medido: nombre 600 17px en la caja de 440 px (≈ 46 caracteres).",
+          "maxChars": 46
+        },
+        {
+          "name": "illustrativeMark",
+          "type": "text",
+          "required": true,
+          "maxChars": 62,
+          "example": "Ejemplo ilustrativo · tu diagnóstico muestra tu situación real",
+          "notes": "Marca OBLIGATORIA mientras el contenido sea de muestra; sólo se retira con provenance captured-output real. Valor fijo «Ejemplo ilustrativo · tu diagnóstico muestra tu situación real»: no se reescribe ni se quita."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (stageBg: halo radial teal detrás del escenario)",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo",
+        "Una sola órbita en la lámina",
+        "Dos ventanas de «Motor de IA» genérico (sin imitar ChatGPT/Gemini): la de «Hoy» atrás, rotada rotateY(16°) y atenuada (opacity .82); la de «Con AEO» al frente, plana, con borde teal y glow",
+        "Etiquetas de estado «Hoy» (neutra) y «Con AEO» (fondo oscuro, texto halo)",
+        "Haz de luz (beam) de la ventana trasera a la frontal",
+        "Plataforma de luz elíptica bajo el escenario (la órbita de la lámina)",
+        "Fila «Tu marca no aparece» con círculo vacío en la ventana de hoy"
+      ],
+      "selection": {
+        "kind": "collaborator",
+        "label": "Cliente",
+        "target": "la fila 1 «Tu marca» de la ventana con AEO",
+        "anchor": "bottom-end",
+        "padding": "compact"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón la lámina «La respuesta de la IA» sobre fondo Efeonce oscuro. Voz a la izquierda en el margen de deck: eyebrow, pregunta con anillo (2 líneas), respuesta en Bricolage 760 a ~96 px en dos líneas con la esfera teal, y evidencia con una palabra en negrita. A la derecha, dos ventanas de un motor de IA genérico con el mismo prompt del usuario: atrás, «Hoy», rotada y atenuada, con tres competidores y la fila «Tu marca no aparece»; al frente, «Con AEO», plana y con borde teal, con «Tu marca» primera, su descripción y tres chips de citas, seguida de dos competidores. Un haz de luz une las ventanas y una plataforma de luz elíptica las sostiene: es la única órbita. Selección colaborador «Cliente» (contrato AXIS efeonce.collaboration-selection) sobre la fila 1, anclada abajo a la derecha, padding compacto. Marca obligatoria «Ejemplo ilustrativo · tu diagnóstico muestra tu situación real» bajo la ventana frontal. Sin HEX ni px crudos: tokens efeonceGraphicLine y medidas del canon."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-27_deck-recetas/render-src/vive.mjs",
+        "slideId": "MX1-ia-responde"
+      },
+      "rules": [
+        "Una sola órbita por lámina",
+        "Ningún texto cruza la órbita ni las piezas del escenario",
+        "Respuesta ≥3× la pregunta",
+        "Acento sólo en texto ≥24 px",
+        "Español neutro, sin voseo",
+        "Interfaz de IA genérica; nunca la UI de un proveedor real",
+        "Contenido ilustrativo siempre marcado"
+      ],
+      "notes": "Aprobada el 2026-09-28 (canvas «La órbita», página Deck). Nace de la landing /aeo-2/ (hero «Tu marca no aparece»)."
+    },
+    {
+      "id": "decision-ai-market",
+      "board": "DeckMercadoIA",
+      "name": "Contexto de mercado · tres cifras con su fuente sobre la órbita de luz",
+      "family": "proof",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch",
+        "qbr"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-28",
+      "reference": "references/surfaces/deck/decision-ai-market.jpg",
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references-2026-09-28/MX2-mercado.jpg",
+      "communicates": "El descubrimiento se mudó a la búsqueda con IA: el tráfico que llegaba solo ya no está garantizado, el comprador ya le pregunta a la IA y la IA casi nunca repite su lista.",
+      "useWhen": [
+        "Abrir la conversación de SEO/AEO con el porqué ahora",
+        "Brochure o pitch para una audiencia que aún no ve el cambio",
+        "QBR que justifica mover presupuesto a visibilidad en IA"
+      ],
+      "avoidWhen": [
+        "No hay fuente verificable para alguna cifra: no se muestra sin fuente",
+        "Audiencia que ya vive el problema: ir directo a decision-ai-answer o al diagnóstico",
+        "Más de tres cifras: la lámina es de tres monolitos"
+      ],
+      "preferInstead": [
+        {
+          "recipe": "content-measure",
+          "when": "hay UNA sola cifra que cargar"
+        },
+        {
+          "recipe": "decision-ai-answer",
+          "when": "la audiencia ya acepta el contexto y hay que mostrar el problema concreto"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "decision-ai-answer",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "method-surround-cycle",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "El contexto",
+          "notes": "Medido: caja 620 px × 1 línea(s) a 500 16px Pop (≈11.41 px/carácter, 5 % de holgura). Mayúsculas con tracking .14em; color suave."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 43,
+          "example": "¿Dónde busca tu cliente?",
+          "notes": "Medido: caja 470 px × 2 línea(s) a 300 40px Pop (≈20.68 px/carácter, 5 % de holgura). Con el anillo delante en teal; bigVoice pone la respuesta más abajo si la pregunta ocupa 2 líneas."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 9,
+          "example": "En la IA",
+          "notes": "Medido: caja 600 px × 1 línea(s) a 760 132px Bric (≈59.48 px/carácter, 5 % de holgura). Bricolage 760 con la esfera teal al final (answerHtml). Debe medir ≥3× la pregunta (40 px). 1–3 palabras con cierre que remata."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 161,
+          "example": "SEO te hacía competir por el ranking. AEO te hace competir por la **recomendación**: antes de que exista un clic.",
+          "notes": "Medido: caja 380 px × 6 línea(s) a 300 26px Pop (≈13.44 px/carácter, 5 % de holgura). Una sola palabra en negrita blanca."
+        },
+        {
+          "name": "figures",
+          "type": "list",
+          "required": true,
+          "maxChars": 124,
+          "example": [
+            {
+              "value": "−27%",
+              "takeaway": "El tráfico que llegaba solo ya no está garantizado.",
+              "detail": "El tráfico orgánico de clientes HubSpot cayó 27% interanual.",
+              "source": "HubSpot",
+              "year": "2026"
+            },
+            {
+              "value": "50%",
+              "takeaway": "Tu comprador ya le pregunta a la IA qué elegir.",
+              "detail": "Uno de cada dos consumidores ya usa búsqueda con IA, y la mayoría la prefiere para decidir compras.",
+              "source": "McKinsey & Company",
+              "year": "2025"
+            },
+            {
+              "value": "<1 en 100",
+              "takeaway": "Aparecer una vez no es una estrategia.",
+              "detail": "Los motores de IA casi nunca repiten la misma lista de marcas.",
+              "source": "SparkToro",
+              "year": "2026"
+            }
+          ],
+          "notes": "La cifra del centro (lead) es la que se adelanta y se ilumina. Cifras, copy y fuentes vigentes: docs/documentation/public-site/aeo-landing-elementor.md §market. Una cifra SIN fuente invalida la lámina (regla del validador). Exactamente 3 ítems. Por ítem: value (metric; ≤ lead 4, side 4, sideLong 6; Lead (centro) 150 px en caja 306 px; laterales 116 px en caja 248 px; si el valor supera 5 caracteres la plantilla baja a 76 px (caso «<1 en 100»).) · takeaway (≤ lead 59, side 55) · detail (≤ lead 124, side 84) · source (logo|wordmark; obligatorio; Logo en un tono claro (el texto claro de la superficie oscura) o wordmark de texto; OBLIGATORIO) · year (text; obligatorio; ≤ 4)."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (stageBg: halo radial teal detrás del escenario)",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo",
+        "Una sola órbita en la lámina",
+        "Tres monolitos de vidrio en perspectiva (perspective 1800px, origen 1320/450): laterales 300 px de ancho × 540 alto, rotateY ±16°; central 370 × 600, adelante y 60 px más alto, con borde teal y glow",
+        "Reflejo en el piso (-webkit-box-reflect) bajo cada monolito",
+        "Plataforma de luz elíptica bajo el conjunto (la órbita)",
+        "Fila de fuente al pie de cada monolito, separada por una línea fina"
+      ],
+      "selection": {
+        "kind": "none"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Contexto de mercado» sobre fondo Efeonce oscuro. Voz a la izquierda (eyebrow, pregunta de 2 líneas, respuesta de 1 línea a ~132 px con esfera, evidencia). A la derecha, tres monolitos de vidrio en abanico sobre una plataforma de luz elíptica: el central adelante, más alto y con borde teal; cada uno con la cifra en Bricolage grande, un titular interpretativo, el detalle y, al pie, la fuente (logo en un tono claro o wordmark) con el año. Ninguna cifra sin fuente. Reflejo tenue en el piso. Tokens efeonceGraphicLine; sin HEX ni px crudos."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-27_deck-recetas/render-src/vive.mjs",
+        "slideId": "MX2-mercado"
+      },
+      "rules": [
+        "Una sola órbita por lámina",
+        "Ningún texto cruza la órbita ni las piezas del escenario",
+        "Respuesta ≥3× la pregunta",
+        "Acento sólo en texto ≥24 px",
+        "Español neutro, sin voseo",
+        "Cada cifra lleva fuente y año visibles",
+        "Máximo tres cifras"
+      ],
+      "notes": "Aprobada el 2026-09-28. Fuentes: HubSpot (−27 %, 2026), McKinsey (50 %, 2025), SparkToro (<1 en 100, 2026), tal como las publica /aeo-2/. Logos: public/images/logos/axis/hubspot-logotype.svg y docs/assets/public-site/aeo-market-logos/sparktoro-logo.svg; McKinsey como wordmark."
+    },
+    {
+      "id": "decision-difference",
+      "board": "DeckDiferencia",
+      "name": "La diferencia · agencia commodity vs. método medible, y la objeción del equipo propio",
+      "family": "proof",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-28",
+      "reference": "references/surfaces/deck/decision-difference.jpg",
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references-2026-09-28/MD1-diferencia.jpg",
+      "communicates": "La mayoría vende promesas; nosotros un mecanismo que puedes ver y medir. Y no reemplazamos a tu equipo: le sumamos velocidad, método y foco.",
+      "useWhen": [
+        "El cliente compara con otras agencias o con hacerlo en casa",
+        "Responder objeciones antes de la oferta",
+        "Brochure que se lee sin presentador"
+      ],
+      "avoidWhen": [
+        "No hay comparación en juego: la lámina se lee defensiva",
+        "Se quiere nombrar a un competidor real: nunca; la alternativa es genérica"
+      ],
+      "preferInstead": [
+        {
+          "recipe": "decision-why-us",
+          "when": "basta con las cifras propias, sin comparar"
+        },
+        {
+          "recipe": "decision-risk",
+          "when": "la objeción es de riesgo, no de alternativa"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "decision-why-us",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "decision-risk",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "La diferencia",
+          "notes": "Medido: caja 620 px × 1 línea(s) a 500 16px Pop (≈11.41 px/carácter, 5 % de holgura). Mayúsculas con tracking .14em; color suave."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 43,
+          "example": "¿Qué nos hace distintos?",
+          "notes": "Medido: caja 470 px × 2 línea(s) a 300 40px Pop (≈20.68 px/carácter, 5 % de holgura). Con el anillo delante en teal; bigVoice pone la respuesta más abajo si la pregunta ocupa 2 líneas."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 21,
+          "example": "Lo puedes ver",
+          "notes": "Medido: caja 590 px × 2 línea(s) a 760 118px Bric (≈53.17 px/carácter, 5 % de holgura). Bricolage 760 con la esfera teal al final (answerHtml). Debe medir ≥3× la pregunta (40 px). 1–3 palabras con cierre que remata."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 161,
+          "example": "La mayoría vende promesas. Nosotros, un mecanismo que puedes ver y **medir**.",
+          "notes": "Medido: caja 380 px × 6 línea(s) a 300 26px Pop (≈13.44 px/carácter, 5 % de holgura). Una sola palabra en negrita blanca."
+        },
+        {
+          "name": "alternativeTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 25,
+          "example": "Agencia commodity",
+          "notes": "Medido: caja 418 px × 1 línea(s) a 760 32px Bric (≈15.69 px/carácter, 5 % de holgura)."
+        },
+        {
+          "name": "rows",
+          "type": "list",
+          "required": true,
+          "maxChars": 88,
+          "example": [
+            [
+              "Promete «el #1 en Google» garantizado",
+              "Estima según tu punto de partida, sin promesas vacías"
+            ],
+            [
+              "Precio «desde $X» que no dice nada de tu caso",
+              "Alcance definido por prioridad e impacto real"
+            ],
+            [
+              "Reporte lleno de vanity metrics",
+              "Métricas que mueven el negocio + visibilidad en IA"
+            ],
+            [
+              "Caja negra: no sabes qué se hace",
+              "Ves qué se hace en cada ciclo, con entregables"
+            ],
+            [
+              "SEO aislado que ignora la era de la IA",
+              "Cimiento SEO + puente a AEO para que la IA te cite"
+            ]
+          ],
+          "notes": "Pares alineados por fila. Medido: alternativa 400 16px en 386 px × 2; Efeonce 500 18px en 426 px × 2. Exactamente 5 ítems. Por ítem: alternative (≤ 88; tachado, color suave) · efeonce (≤ 85)."
+        },
+        {
+          "name": "efeonceTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 23,
+          "example": "Método medible",
+          "notes": "Medido: caja 460 px × 1 línea(s) a 760 38px Bric (≈18.49 px/carácter, 5 % de holgura)."
+        },
+        {
+          "name": "ownTeamTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 19,
+          "example": "Complemento, no reemplazo",
+          "notes": "Medido: caja 260 px × 1 línea(s) a 760 26px Bric (≈12.85 px/carácter, 5 % de holgura)."
+        },
+        {
+          "name": "ownTeamPillars",
+          "type": "list",
+          "required": true,
+          "maxChars": 49,
+          "example": [
+            {
+              "title": "Velocidad",
+              "description": "Sin meses de curva de aprendizaje"
+            },
+            {
+              "title": "Método",
+              "description": "Un sistema probado, multimercado y en español"
+            },
+            {
+              "title": "Foco",
+              "description": "Tu equipo sigue en lo suyo"
+            }
+          ],
+          "notes": "Exactamente 3 ítems. Por ítem: title (≤ 19) · description (≤ 49)."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (stageBg: halo radial teal detrás del escenario)",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo",
+        "Una sola órbita en la lámina",
+        "Tarjeta «La alternativa» atrás: 470 px, rotateY(14°), opacity .88, vidrio oscuro, íconos de X, textos tachados",
+        "Tarjeta «Efeonce» al frente: 520 px, rotateY(−6°), papel, borde teal y glow, checks teal",
+        "Disco «vs» de 64 px con halo entre ambas",
+        "Franja «¿Y si lo hace mi equipo?» de 1020 px al pie con tres pilares separados por líneas finas"
+      ],
+      "selection": {
+        "kind": "none"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «La diferencia» sobre fondo Efeonce oscuro. Voz a la izquierda (pregunta de 2 líneas, respuesta de 2 líneas «Lo puedes / ver.»). A la derecha, dos tarjetas enfrentadas en perspectiva: atrás «La alternativa · Agencia commodity» en vidrio oscuro con cinco promesas tachadas; al frente «Efeonce · Método medible» en papel con borde teal y cinco checks alineados fila a fila; un disco «vs» entre ambas. Al pie, una franja «¿Y si lo hace mi equipo? Complemento, no reemplazo» con tres pilares: velocidad, método y foco. Nunca nombrar a un competidor real."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-27_deck-recetas/render-src/vive.mjs",
+        "slideId": "MD1-diferencia"
+      },
+      "rules": [
+        "Una sola órbita por lámina",
+        "Ningún texto cruza la órbita ni las piezas del escenario",
+        "Respuesta ≥3× la pregunta",
+        "Acento sólo en texto ≥24 px",
+        "Español neutro, sin voseo",
+        "La alternativa siempre genérica",
+        "Cinco filas alineadas"
+      ],
+      "notes": "Aprobada el 2026-09-28. Tabla de /servicios/posicionamiento-seo/ («La diferencia») y objeción de /aeo-2/ («¿Y si esto lo hace mi propio equipo?»). Familia proof decidida por el operador."
+    },
+    {
+      "id": "decision-traffic-to-revenue",
+      "board": "DeckTraficoNegocio",
+      "name": "Del tráfico al negocio · cuatro escalones hasta los ingresos",
+      "family": "proof",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch",
+        "qbr"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-28",
+      "reference": "references/surfaces/deck/decision-traffic-to-revenue.jpg",
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references-2026-09-28/MD3-trafico-negocio.jpg",
+      "communicates": "El SEO no termina en tráfico: termina en negocio. Conectamos tráfico calificado, leads, pipeline e ingresos, donde la mayoría de las agencias se detiene.",
+      "useWhen": [
+        "El cliente mide al proveedor por tráfico y hay que subir la conversación a negocio",
+        "QBR que conecta SEO con pipeline",
+        "Propuesta SEO con integración a CRM"
+      ],
+      "avoidWhen": [
+        "No hay CRM ni medición de leads: no prometer el escalón que no se puede medir",
+        "Se quieren cifras reales: esta receta es conceptual; con datos del cliente usar content-measure o decision-chart"
+      ],
+      "preferInstead": [
+        {
+          "recipe": "decision-chart",
+          "when": "hay datos reales del embudo del cliente"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "proposal-service-seo",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "content-day-live-results",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "De tráfico a negocio",
+          "notes": "Medido: caja 620 px × 1 línea(s) a 500 16px Pop (≈11.41 px/carácter, 5 % de holgura). Mayúsculas con tracking .14em; color suave."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 43,
+          "example": "¿Dónde termina el SEO?",
+          "notes": "Medido: caja 470 px × 2 línea(s) a 300 40px Pop (≈20.68 px/carácter, 5 % de holgura). Con el anillo delante en teal; bigVoice pone la respuesta más abajo si la pregunta ocupa 2 líneas."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 18,
+          "example": "En ingresos",
+          "notes": "Medido: caja 590 px × 2 línea(s) a 760 132px Bric (≈59.48 px/carácter, 5 % de holgura). Bricolage 760 con la esfera teal al final (answerHtml). Debe medir ≥3× la pregunta (40 px). 1–3 palabras con cierre que remata."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 161,
+          "example": "Conectamos el SEO con tus indicadores de negocio —leads, pipeline e **ingresos**—, como siempre debió medirse.",
+          "notes": "Medido: caja 380 px × 6 línea(s) a 300 26px Pop (≈13.44 px/carácter, 5 % de holgura). Una sola palabra en negrita blanca."
+        },
+        {
+          "name": "steps",
+          "type": "list",
+          "required": true,
+          "maxChars": 102,
+          "example": [
+            {
+              "title": "Tráfico calificado",
+              "description": "Visitas con intención comercial, segmentadas por cluster de tema.",
+              "channel": "Google · IA"
+            },
+            {
+              "title": "Leads",
+              "description": "Quién llegó, desde qué búsqueda y qué pidió.",
+              "channel": "Formularios · CRM"
+            },
+            {
+              "title": "Pipeline",
+              "description": "Oportunidades que nacen del orgánico, en tu CRM.",
+              "channel": "HubSpot · Salesforce"
+            },
+            {
+              "title": "Ingresos",
+              "description": "Lo que el SEO trae al negocio, medido.",
+              "channel": "Greenhouse"
+            }
+          ],
+          "notes": "Caja interior 210 px (escalón 250 − 40). El último se ilumina. Exactamente 4 ítems. Por ítem: title (≤ last 22, others 28) · description (≤ 102) · channel (≤ 24)."
+        },
+        {
+          "name": "cutLabel",
+          "type": "text",
+          "required": true,
+          "maxChars": 68,
+          "example": "La mayoría de las agencias se detiene aquí",
+          "notes": "Medido: caja 190 px × 3 línea(s) a 600 15px Pop (≈7.89 px/carácter, 5 % de holgura). Alineado a la derecha, sobre la línea punteada entre el escalón 1 y el 2."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (stageBg: halo radial teal detrás del escenario)",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo",
+        "Una sola órbita en la lámina",
+        "Cuatro escalones de vidrio de 250 px (16 de separación) desde x 790, alturas 250/360/470/580 sobre la base y 870; el último con borde teal y glow",
+        "Línea base de 2 px",
+        "Línea punteada vertical entre el escalón 1 y el 2",
+        "Trayectoria de luz que une las cimas de los escalones y termina en la esfera sobre el último (la órbita de la lámina)"
+      ],
+      "selection": {
+        "kind": "none"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Del tráfico al negocio» sobre fondo Efeonce oscuro. Voz a la izquierda (pregunta de 2 líneas, respuesta de 2 líneas «En / ingresos.»). A la derecha, cuatro escalones de vidrio que suben: tráfico calificado, leads, pipeline e ingresos, cada uno con número, título, descripción y canal al pie; el último iluminado. Una línea punteada tras el primero con «La mayoría de las agencias se detiene aquí» y una trayectoria de luz que une las cimas hasta la esfera sobre «Ingresos». Sin cifras inventadas."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-27_deck-recetas/render-src/vive.mjs",
+        "slideId": "MD3-trafico-negocio"
+      },
+      "rules": [
+        "Una sola órbita por lámina",
+        "Ningún texto cruza la órbita ni las piezas del escenario",
+        "Respuesta ≥3× la pregunta",
+        "Acento sólo en texto ≥24 px",
+        "Español neutro, sin voseo",
+        "Sin cifras en los escalones salvo datos reales con fuente"
+      ],
+      "notes": "Aprobada el 2026-09-28. Idea de /servicios/posicionamiento-seo/ («De tráfico a negocio»)."
     },
     {
       "id": "proposal-service-aeo",
@@ -8964,6 +9975,337 @@
       "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckPropuestaRevOpsCine.jpg"
     },
     {
+      "id": "proposal-service-seo",
+      "board": "DeckPropuestaSEO",
+      "name": "Propuesta SEO · sobria, con lente y cuatro formas de empezar (acento Engine)",
+      "family": "proposal-service",
+      "documents": [
+        "proposal",
+        "brochure"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-28",
+      "reference": "references/surfaces/deck/proposal-service-seo.jpg",
+      "communicates": "Que te encuentren en Google y que la IA no te ignore, con método: base técnica, autoridad temática y entidad, medidas como un sistema.",
+      "useWhen": [
+        "La propuesta AEO necesita que cada forma de empezar se explique con una frase (más datos que impacto)",
+        "El cliente compara modalidades (diagnóstico, proyecto, retainer, plataforma) antes de decidir",
+        "Documento que se lee sin presentador"
+      ],
+      "avoidWhen": [
+        "La lámina tiene que golpear y recordarse: la versión cine hace ese trabajo",
+        "Hay más de cuatro pasos o los pasos no son formas de comprar",
+        "Se va a prometer ranking o posición: la nota lo prohíbe"
+      ],
+      "preferInstead": [
+        {
+          "recipe": "proposal-cinematic-seo",
+          "when": "la propuesta pide impacto (apertura de la sección SEO)"
+        },
+        {
+          "recipe": "proposal-service-aeo",
+          "when": "la oferta es visibilidad en motores de IA, no posicionamiento en buscadores"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "proposal-cinematic-seo",
+          "relation": "variant"
+        },
+        {
+          "recipe": "method-eeat",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "decision-traffic-to-revenue",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 40,
+          "example": "Nuestra propuesta · SEO",
+          "notes": "En un brochure, sólo el servicio («AEO»)."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 32,
+          "example": "¿Cómo te encuentran?",
+          "notes": "Anillo en el acento de Engine."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 14,
+          "example": "Con método",
+          "notes": "Una o dos palabras en una línea, Bricolage 760 a ~140 px, con la esfera."
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "required": true,
+          "maxChars": 140,
+          "example": "Que te encuentren en Google y que la IA no te ignore: base técnica, autoridad temática y entidad, trabajadas y medidas como un sistema.",
+          "notes": "Dos líneas a 26 px en ~900 px; una tercera choca con la etiqueta del colaborador."
+        },
+        {
+          "name": "lensPhoto",
+          "type": "image",
+          "required": true,
+          "example": "ai-generations/2026-09-26_ooh-caminero-lente/plates/D2-led-medicion.png",
+          "notes": "Foto del oficio recortada al círculo de la lente (radio 220 px)."
+        },
+        {
+          "name": "steps",
+          "type": "list",
+          "required": true,
+          "maxChars": 90,
+          "example": [
+            {
+              "kicker": "Empieza aquí · sin costo",
+              "title": "Diagnóstico",
+              "description": "Tu punto de partida en búsqueda y en IA: sin ese mapa no hay plan honesto."
+            },
+            {
+              "kicker": "Proyecto",
+              "title": "Base técnica",
+              "description": "Rastreo, indexación, Core Web Vitals y datos estructurados."
+            },
+            {
+              "kicker": "On-Going",
+              "title": "Contenido y autoridad",
+              "description": "Clusters por intención, landings que convierten, PR y link building real."
+            },
+            {
+              "kicker": "Greenhouse",
+              "title": "Reporte vivo",
+              "description": "Tráfico calificado, share of voice y visibilidad en IA, en Greenhouse."
+            }
+          ],
+          "notes": "Tres o cuatro tarjetas. Por tarjeta (con cuatro): kicker ≤ 28, nombre ≤ 24 (hasta dos líneas a 38 px), descripción ≤ 90 (`maxChars`)."
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": false,
+          "maxChars": 70,
+          "example": "No prometemos rankings. Reportamos lo que se mueve.",
+          "notes": "En AEO es obligatoria mientras exista riesgo de leerse como promesa de posición."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro y sólo el acento de Engine",
+        "La lente con la foto arriba a la derecha, con su anillo y el arco corto con la esfera en la punta: es la única órbita",
+        "Primera tarjeta en papel con sombra; las demás, contorno fino sobre el oscuro",
+        "Pie con la burbuja URL; sin logo; sin indicador de navegación",
+        "Grilla: voz a la izquierda en el margen de deck, tarjetas en una fila a lo ancho del contenido"
+      ],
+      "selection": {
+        "kind": "collaborator",
+        "label": "Cliente",
+        "target": "la primera tarjeta (por dónde se empieza)"
+      },
+      "photo": {
+        "uses": true,
+        "register": "cine",
+        "plate": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+        "ficha": "ai-generations/2026-09-28_deck-seo-aeo/fichas/SE1-te-encuentran.json",
+        "prompt": "ai-generations/2026-09-28_deck-seo-aeo/prompts/SE1-te-encuentran.txt",
+        "postprocess": [
+          "foto:isotipo --centro 0.7165,0.4935 --ancho 0.041 --rotacion -6 (procedencia en plates/SE1-te-encuentran-isotipo.json)",
+          "recorte cuadrado con position east (el estratega) y máscara circular de la lente"
+        ],
+        "replaceable": "Se puede reemplazar por cualquier toma aprobada del oficio SEO; no repetir el plate de la versión cine en el mismo deck (son variantes, nunca van juntas)."
+      },
+      "prompts": {
+        "composition": "Compón la propuesta de servicio sobria sobre el fondo oscuro de Efeonce con el acento de Engine (`efeonceGraphicLine.lines` engine → `accentOnDark`). Arriba a la derecha, la lente: la foto recortada en círculo (radio ~220 px, centro ~(1520, 330) en 1920 × 1080), su anillo con el aire de `efeonceGraphicLine.orbit.ringAirRatio` en el halo a baja opacidad y un arco corto en el acento de 200° a 250° que termina en la esfera. A la izquierda, en el margen de deck: eyebrow «Nuestra propuesta · <servicio>» (Poppins 500, 16 px, mayúsculas, suave), pregunta con anillo (Poppins 300, 40 px), respuesta en una línea (Bricolage 760, ~140 px) con la esfera, y bajada (Poppins 300, 26 px, hasta ~900 px). Abajo, las formas de empezar como tarjetas iguales a lo ancho del contenido (1640 px menos canales de 20 px), de ~270 px de alto: la primera en papel (`efeonceGraphicLine.color.paper`) con sombra y texto navy, las siguientes con contorno fino (`rule` de la superficie oscura); cada una con kicker (Poppins 600, 15 px, mayúsculas; en blanco o suave sobre oscuro y en navy sobre papel, nunca en el acento), nombre (Bricolage 760, 38 px) y descripción (Poppins 300, 19 px). Selección con `efeonce.collaboration-selection` sobre la primera tarjeta: eight-handles, padding standard, sin overlay, colaborador «Cliente» tipo departamento en top-end, escala 1,1. Si hay nota, Poppins 400 a 16 px en el suave, en la línea del pie a la derecha de la burbuja. Pie con la burbuja URL horneada. Sin logo, sin indicador, sin montos."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-27_deck-recetas/render-src/deck2.mjs",
+        "slideId": "P5-seo"
+      },
+      "rules": [
+        "Fondo Efeonce; la línea sólo aporta el acento (Engine)",
+        "Una sola órbita: la de la lente",
+        "La selección marca por dónde se empieza (la primera tarjeta) y nada más",
+        "Nunca una promesa de ranking; la nota lo aclara",
+        "Precios nunca en la lámina: la modalidad sí, el monto no",
+        "El acento nunca en texto menor de 24 px"
+      ],
+      "notes": "Aprobada el 2026-09-28. Misma plantilla que proposal-service-aeo (deck.proposal-service, línea engine). Copy de /servicios/posicionamiento-seo/.",
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references-2026-09-28/P5-seo.jpg"
+    },
+    {
+      "id": "proposal-cinematic-seo",
+      "board": "DeckPropuestaSEOCine",
+      "name": "Propuesta SEO con punch · el mapa de luz del oficio y su núcleo",
+      "family": "proposal-service",
+      "documents": [
+        "proposal",
+        "brochure"
+      ],
+      "surface": "cine",
+      "status": "approved",
+      "approvedAt": "2026-09-28",
+      "reference": "references/surfaces/deck/proposal-cinematic-seo.jpg",
+      "communicates": "Que Google te encuentre y que la IA no te ignore: el estratega de Efeonce frente al mapa de tu visibilidad —técnica, clusters y entidad— conectado a un solo núcleo.",
+      "useWhen": [
+        "La propuesta AEO pide impacto",
+        "Abrir la sección de visibilidad en IA",
+        "Brochure: página del servicio AEO (eyebrow «AEO»)"
+      ],
+      "avoidWhen": [
+        "Hay que detallar cada forma de empezar: la versión sobria",
+        "El cliente espera garantías de posición: la nota lo desmiente, pero la imagen puede prometer de más si se presenta sin ella"
+      ],
+      "preferInstead": [
+        {
+          "recipe": "proposal-service-seo",
+          "when": "la propuesta pide explicar cada forma de empezar (más datos que impacto)"
+        },
+        {
+          "recipe": "proposal-cinematic-aeo",
+          "when": "la oferta es AEO"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "proposal-service-seo",
+          "relation": "variant"
+        },
+        {
+          "recipe": "method-eeat",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "decision-traffic-to-revenue",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 40,
+          "example": "Nuestra propuesta · SEO"
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 26,
+          "example": "¿Te encuentra Google?",
+          "notes": "Más larga choca con la etiqueta «Cliente»."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 10,
+          "example": "Y la IA",
+          "notes": "Una palabra a 160 px con la esfera azul."
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "required": true,
+          "maxChars": 130,
+          "example": "Posicionamiento SEO con método: base técnica, autoridad temática y entidad, para que Google te encuentre y la IA no te ignore.",
+          "notes": "Tres líneas a 26 px en 640 px. En la referencia SEO el cuerpo baja a top 648, 25 px/1.4, para que la etiqueta «Cliente» (anclada abajo) no lo toque."
+        },
+        {
+          "name": "steps",
+          "type": "list",
+          "required": true,
+          "maxChars": 20,
+          "example": [
+            {
+              "glyph": "busqueda",
+              "kicker": "Sin costo",
+              "title": "Diagnóstico"
+            },
+            {
+              "glyph": "contenido",
+              "kicker": "Proyecto",
+              "title": "Técnica y contenido"
+            },
+            {
+              "glyph": "medicion",
+              "kicker": "On-Going",
+              "title": "Autoridad y entidad"
+            },
+            {
+              "glyph": "informe",
+              "kicker": "Greenhouse",
+              "title": "Reporte vivo"
+            }
+          ],
+          "notes": "Cuatro en columnas, íconos Trazo. Kicker ≤ 14; nombre ≤ 20."
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": true,
+          "maxChars": 70,
+          "example": "No prometemos rankings. Reportamos lo que se mueve."
+        },
+        {
+          "name": "photo",
+          "type": "image",
+          "required": true,
+          "example": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png"
+        }
+      ],
+      "fixed": [
+        "Registro cine con persona del equipo: la estratega SEO con polo Efeonce, mirando al lente",
+        "Miles de tarjetas oscuras y el haz de una burbuja de respuesta de IA que ilumina una sola, junto a su hombro",
+        "Íconos de Engine en Trazo, en reposo; primer kicker en blanco o suave",
+        "Nota «sin promesas de ranking» en el pie",
+        "Sin logo, sin indicador; pie con la burbuja URL"
+      ],
+      "selection": {
+        "kind": "collaborator",
+        "label": "Cliente",
+        "target": "la respuesta «Y la IA»",
+        "anchor": "bottom-end"
+      },
+      "photo": {
+        "uses": true,
+        "register": "cine",
+        "plate": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+        "ficha": "ai-generations/2026-09-28_deck-seo-aeo/fichas/SE1-te-encuentran.json",
+        "prompt": "ai-generations/2026-09-28_deck-seo-aeo/prompts/SE1-te-encuentran.txt",
+        "postprocess": [
+          "foto:isotipo --centro 0.7165,0.4935 --ancho 0.041 --rotacion -6 (procedencia registrada)"
+        ],
+        "replaceable": "No: es la foto de la receta. Registrar en el banco de plates (TASK-1931)."
+      },
+      "prompts": {
+        "composition": "Resuelve el intent con `efeonce.surface-composition` (deck, 16x9, role proposal, recipe `proposal-cinematic`, layout `service`, line engine, theme dark): voice {eyebrow, question, answer}, body, steps (cuatro {glyph, kicker, name}), note y photo {register: 'cine', subject: 'person', plateRef: AE2b}. Compón con `pnpm brand:compose` cuando el intent lleve prueba con fuente; si no, espera la integración 0.1.2. Foto a sangre; voz en la reserva izquierda del 45 % (eyebrow a 120, pregunta con anillo azul a 186, respuesta de una palabra a ~160 px en la banda 285–318 con la esfera, bajada de 26 px en 640 px), pasos en columnas (`columns-4`, ícono Trazo de 44 px arriba, kicker 12 px en el suave, nombre 21 px en blanco) y la nota en Poppins 400 16 px en el suave en la línea del pie, a la derecha de la burbuja URL. Selección sobre la respuesta con «Cliente» en top-end, overlay subtle, escala 1,2. Sin logo ni indicador."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-27_deck-recetas/render-src/deck2.mjs",
+        "slideId": "P5b-seo-te-encuentran"
+      },
+      "rules": [
+        "Registro cine sólo en esta receta; persona del equipo con polo",
+        "Isotipo del polo compuesto con el oficial",
+        "Nunca una promesa de ranking: la nota es obligatoria",
+        "Pasos con íconos Trazo en reposo; primer kicker nunca en el acento",
+        "Ningún texto cruza al sujeto ni al haz; la selección nunca sobre la persona"
+      ],
+      "notes": "Aprobada el 2026-09-28. Receta AXIS proposal-cinematic, layout service. Colaborador anclado abajo a la derecha (en top-end tapaba la pregunta). El anillo de luz alrededor del núcleo cuenta como la única órbita (registro cine). Polo en azul rey: revisar colorimetría contra el canon si se regenera.",
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references-2026-09-28/P5b-seo-te-encuentran.jpg"
+    },
+    {
       "id": "content-pricing",
       "board": "DeckCotizacion",
       "name": "Cotización · tabla de tres planes con Pro recomendado",
@@ -9484,6 +10826,233 @@
       ],
       "notes": "En AXIS es decision-next-steps, pero el token (tres columnas de 500 px, CTA con el descriptor bajo el cursor) y su referencia describen la versión anterior (E7-pasos en render-src/deck2.mjs). El operador aprobó el 2026-09-27 la versión con impacto (la agenda abierta); AXIS debe actualizar token y referencia. Hallazgo: el rótulo «01 · Diagnóstico · Sin costo» va en color.tealDark a 14 px (D1).",
       "referenceSource": "ai-generations/2026-09-27_deck-recetas/references/DeckProximosPasos.jpg"
+    },
+    {
+      "id": "decision-diagnosis-map",
+      "board": "DeckDiagnosticoMapa",
+      "name": "Qué entrega el diagnóstico · el informe abierto con sus cuatro entregables",
+      "family": "next-steps",
+      "documents": [
+        "proposal",
+        "brochure",
+        "pitch"
+      ],
+      "surface": "dark",
+      "status": "approved",
+      "approvedAt": "2026-09-28",
+      "reference": "references/surfaces/deck/decision-diagnosis-map.jpg",
+      "referenceSource": "ai-generations/2026-09-27_deck-recetas/references-2026-09-28/MD4-diagnostico.jpg",
+      "communicates": "El primer paso es gratis y concreto: en 24–48 h recibes el mapa —score por motor, share of voice, prompts donde no apareces y un plan priorizado— con lectura experta.",
+      "useWhen": [
+        "Cerrar una propuesta o brochure AEO con el primer paso tangible",
+        "Reemplazar el «agenda un diagnóstico» abstracto por lo que el cliente recibe",
+        "Pitch donde el cliente pregunta qué gana con el diagnóstico"
+      ],
+      "avoidWhen": [
+        "Ya se hizo el diagnóstico: mostrar el real del cliente",
+        "El primer paso no es el diagnóstico AEO (p. ej. otra línea): usar decision-next-steps"
+      ],
+      "preferInstead": [
+        {
+          "recipe": "decision-next-steps",
+          "when": "el cierre necesita agendar (CTA) más que mostrar el entregable"
+        }
+      ],
+      "pairsWith": [
+        {
+          "recipe": "decision-next-steps",
+          "relation": "sequence"
+        },
+        {
+          "recipe": "decision-ai-answer",
+          "relation": "sequence"
+        }
+      ],
+      "slots": [
+        {
+          "name": "eyebrow",
+          "type": "text",
+          "required": true,
+          "maxChars": 51,
+          "example": "Diagnóstico gratis",
+          "notes": "Medido: caja 620 px × 1 línea(s) a 500 16px Pop (≈11.41 px/carácter, 5 % de holgura). Mayúsculas con tracking .14em; color suave."
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "required": true,
+          "maxChars": 43,
+          "example": "¿Qué recibes primero?",
+          "notes": "Medido: caja 470 px × 2 línea(s) a 300 40px Pop (≈20.68 px/carácter, 5 % de holgura). Con el anillo delante en teal; bigVoice pone la respuesta más abajo si la pregunta ocupa 2 líneas."
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "required": true,
+          "maxChars": 8,
+          "example": "El mapa",
+          "notes": "Medido: caja 590 px × 1 línea(s) a 760 150px Bric (≈67.59 px/carácter, 5 % de holgura). Bricolage 760 con la esfera teal al final (answerHtml). Debe medir ≥3× la pregunta (40 px). 1–3 palabras con cierre que remata."
+        },
+        {
+          "name": "evidence",
+          "type": "richText",
+          "required": true,
+          "maxChars": 161,
+          "example": "En 24–48 h sabes en qué nivel estás y por dónde empezamos a **subirte**. Gratis y sin compromiso.",
+          "notes": "Medido: caja 380 px × 6 línea(s) a 300 26px Pop (≈13.44 px/carácter, 5 % de holgura). Una sola palabra en negrita blanca."
+        },
+        {
+          "name": "reportTitle",
+          "type": "text",
+          "required": true,
+          "maxChars": 38,
+          "example": "Tu marca · Chile",
+          "notes": "Medido: caja 560 px × 1 línea(s) a 760 28px Bric (≈13.8 px/carácter, 5 % de holgura)."
+        },
+        {
+          "name": "engineScores",
+          "type": "list",
+          "required": true,
+          "maxChars": 13,
+          "example": [
+            [
+              "ChatGPT",
+              38
+            ],
+            [
+              "AI Overviews",
+              52
+            ],
+            [
+              "Gemini",
+              31
+            ],
+            [
+              "Perplexity",
+              24
+            ],
+            [
+              "Copilot",
+              18
+            ],
+            [
+              "Claude",
+              27
+            ]
+          ],
+          "notes": "Nombres de motor en 92 px a 500 12px. Valores de muestra salvo diagnóstico real. Exactamente 6 ítems. Por ítem: engine (≤ 13) · score (number; 0–100)."
+        },
+        {
+          "name": "shareOfVoice",
+          "type": "list",
+          "required": true,
+          "maxChars": 25,
+          "example": [
+            [
+              "Tu marca",
+              14
+            ],
+            [
+              "Competidor A",
+              41
+            ],
+            [
+              "Competidor B",
+              28
+            ],
+            [
+              "Otros",
+              17
+            ]
+          ],
+          "notes": "Dona de 96 px; «Tu marca» en el color oscuro; debe sumar 100. De 3 a 4 ítems. Por ítem: label (≤ 25) · percent (number)."
+        },
+        {
+          "name": "lostPrompts",
+          "type": "list",
+          "required": true,
+          "maxChars": 50,
+          "example": [
+            "«mejor agencia de [categoría] en Chile»",
+            "«[categoría] precios y comparativa»",
+            "«alternativas a Competidor A»"
+          ],
+          "notes": "Exactamente 3 ítems. Por ítem: maxChars ()."
+        },
+        {
+          "name": "plan",
+          "type": "list",
+          "required": true,
+          "maxChars": 45,
+          "example": [
+            [
+              "Corregir cómo te describe la IA",
+              "Alto impacto"
+            ],
+            [
+              "Schema de organización y entidad",
+              "Base"
+            ],
+            [
+              "Cluster para los prompts perdidos",
+              "Contenido"
+            ]
+          ],
+          "notes": "Objetivo de la selección «Cliente». Exactamente 3 ítems. Por ítem: title (≤ 45) · kind (≤ 16)."
+        },
+        {
+          "name": "sampleMark",
+          "type": "text",
+          "required": true,
+          "maxChars": 16,
+          "example": "Datos de muestra",
+          "notes": "OBLIGATORIA mientras los datos no sean del cliente. Valor fijo «Datos de muestra»: no se reescribe ni se quita."
+        },
+        {
+          "name": "expertNote",
+          "type": "text",
+          "required": true,
+          "maxChars": 92,
+          "example": "El dato lo da la máquina; el criterio lo pone nuestro equipo.",
+          "notes": "Medido: caja 290 px × 3 línea(s) a 500 17px Pop (≈8.9 px/carácter, 5 % de holgura). Ficha «Lectura experta» flotante."
+        }
+      ],
+      "fixed": [
+        "Fondo Efeonce oscuro (stageBg: halo radial teal detrás del escenario)",
+        "Voz a la izquierda en el margen de deck (140 px): eyebrow, pregunta con anillo, respuesta con esfera, evidencia",
+        "Pie con la burbuja URL con fusión de luminosidad (urlSign); sin logo",
+        "Una sola órbita en la lámina",
+        "Informe de 880 px en papel, rotateY(−6°) desde la izquierda, con cabecera (isotipo en ficha oscura, kicker «Diagnóstico de visibilidad en IA», título) y rejilla 2×2 de módulos numerados 01–04",
+        "Ficha flotante «Lectura experta» en vidrio teal, rotateY(−14°), abajo a la derecha",
+        "Plataforma de luz baja (la órbita)"
+      ],
+      "selection": {
+        "kind": "collaborator",
+        "label": "Cliente",
+        "target": "el plan priorizado (módulo 04)",
+        "anchor": "bottom-end",
+        "padding": "compact"
+      },
+      "photo": {
+        "uses": false
+      },
+      "prompts": {
+        "composition": "Compón «Qué entrega el diagnóstico» sobre fondo Efeonce oscuro. Voz a la izquierda (pregunta de 2 líneas, respuesta de 1 línea ~150 px «El mapa.»). A la derecha, el informe del diagnóstico abierto en papel, en leve perspectiva, con cabecera (isotipo, «Diagnóstico de visibilidad en IA», nombre de la marca y mercado) y cuatro módulos: 01 score por motor de IA en barras, 02 share of voice en dona frente a competidores, 03 prompts donde no aparece con marcas de falta, 04 plan priorizado con tres movimientos. Marca «Datos de muestra» visible. Selección colaborador «Cliente» sobre el plan. Ficha flotante «Lectura experta»."
+      },
+      "renderSource": {
+        "script": "ai-generations/2026-09-27_deck-recetas/render-src/vive.mjs",
+        "slideId": "MD4-diagnostico"
+      },
+      "rules": [
+        "Una sola órbita por lámina",
+        "Ningún texto cruza la órbita ni las piezas del escenario",
+        "Respuesta ≥3× la pregunta",
+        "Acento sólo en texto ≥24 px",
+        "Español neutro, sin voseo",
+        "Datos de muestra siempre marcados",
+        "El share of voice suma 100"
+      ],
+      "notes": "Aprobada el 2026-09-28. Entregables de /aeo-2/ (Empieza con tu diagnóstico gratis)."
     },
     {
       "id": "breather",
