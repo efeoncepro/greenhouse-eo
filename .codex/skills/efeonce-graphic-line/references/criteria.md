@@ -492,6 +492,11 @@ esfera: el acento va al cierre.
   la publicidad, no del eslogan de Efeonce. Como el componente `Slogan` pinta la palabra siempre en el acento, el bloque
   se dimensiona para que el eslogan mida **24 px o más** (en 1080 de ancho, logo de 400 px); más chico, la palabra iría
   en blanco y el componente no lo hace solo.
+- **El acento no va a sangre como fondo de una lámina** (operador, 2026-09-28, contraportada de Manzanitas en naranja:
+  «Logo azul Efeonce acá??? Y hay muchísima saturación en toda la composición, este no lo aprobaría aunque quisiera»).
+  El acento es luz, gráfico y palabra, nunca superficie: un campo entero de acento satura la pieza. Además, el logo
+  positivo de Efeonce trae su isotipo azul, que choca sobre un campo de color, y no hay una versión del logo para ese
+  fondo. Las superficies siguen siendo el oscuro de la línea y el papel.
 - **Nunca en la portada; en la contraportada depende del documento** (operador, 2026-09-27). En la portada recarga,
   repite la respuesta y ocupa la esquina inferior derecha, que es del sujeto o la órbita. En la contraportada de una
   **propuesta comercial** es el mensaje principal: «Empower your Growth» grande y protagonista (72 px en 1920, en sus
