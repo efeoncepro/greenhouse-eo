@@ -348,13 +348,15 @@ que la escena no traía y que se lee agregado para sostener la firma. **La pregu
 «qué hay de verdad entre la cámara y el sujeto en ESTA escena».** En un espacio abierto (Nexa de pie entre miles de
 tarjetas) lo único que existe es el **piso**; en una reunión, **la mesa**; en un rodaje, **el equipo**.
 
-**Piloto vigente (pendiente de aprobación):** `MC1i-45-portada-piso` — el piso del mismo espacio, con la cámara baja:
-*«the camera is LOW, about forty centimetres above the floor and about four meters from her… She stands on the floor
-of that same space: dark, matte, slightly rough stone, outside every light and outside any reflection of the beam;
-the nearest part of that floor, just in front of the low lens, falls softly out of focus across the whole bottom of
-the frame and hides her knees and feet»*. Es la familia «piso oscuro» del registro (§9.2, `BR1`/`BR3`). Canto en
-y≈1215 de 1350; firma con centro al 93,5 % (caja 1237–1288): **15,5:1** en el peor píxel. La banda genérica de
-`foto:validar` da 3,84 ✗ porque incluye el canto: manda la caja real del logo.
+**Rechazado `MC1i` (piso con cámara baja) — el lecho NUNCA oculta lo que físicamente no puede ocultar**
+**[operador, 2026-09-28]**: *«¿según tú era buena idea cortarle las piernas a Nexa para resolverlo? … piensa
+profundamente antes de resolver»*. La ficha pedía que el piso cercano *«hides her knees and feet»*: un piso plano no
+tapa las rodillas de quien está de pie sobre él, y el modelo obedeció cortándole las piernas. **El lecho nativo sale
+de la geometría real de la toma, de una de dos maneras (las dos aprobadas):**
+- **Cuerpo entero sobre el piso** (`BR3`): la figura completa, con los pies apoyados; el tramo de piso entre ella y la
+  cámara se desenfoca solo y la firma va ahí, bajo los pies. No se tapa nada.
+- **El sujeto USA el objeto** (`NX5b`): apoyada con las manos en el borde de la mesa; la mesa cercana al lente es el
+  lecho y tapa la cintura porque ella está detrás, apoyada, no porque se ponga para la firma.
 
 **Cómo se escribe y se verifica un lecho cine, en orden:**
 1. Preguntar **qué hay de verdad entre la cámara y el sujeto en esta escena** (el piso del espacio, la mesa de la
@@ -362,7 +364,8 @@ y≈1215 de 1350; firma con centro al 93,5 % (caja 1237–1288): **15,5:1** en e
    de su familia; en un carrusel, **familias distintas** entre piezas.
 2. Escribirlo con **nombre, materia y la cámara anclada**; tono declarado; **fuera de toda luz y de todo reflejo**, y
    sin pantallas encendidas que lo iluminen.
-3. No sumar listas de vacíos que le quiten materia al objeto; prohibir sólo lo que compite con el sujeto.
+3. No sumar listas de vacíos que le quiten materia al objeto; prohibir sólo lo que compite con el sujeto. **Nunca
+   pedirle al lecho que tape una parte del cuerpo que físicamente no puede tapar** (el piso no oculta rodillas).
 4. Tras generar, medir el **canto** (salto de luminancia por fila en la columna del logo) contra la **caja de la
    firma del formato** y mirar el pie al 100 %: la firma va dentro de la materia calma, con aire, nunca montada en el
    canto ni sobre el sujeto. Si no calza, se rehace la toma o se ubica la firma sobre el plate (centro ≈ 93,5 % en
