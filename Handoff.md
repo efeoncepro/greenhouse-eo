@@ -20,13 +20,13 @@ TASK-1863: staging; main retenido.
 
 **Registro cine + taller (27/09):** [registro cine](docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md) (ads 9:16/4:5 en prueba); repo taller [`efeonce-brand-workshop`](docs/architecture/EFEONCE_BRAND_WORKSHOP_REPO_DECISION_V1.md) + [TASK-1925](docs/tasks/to-do/TASK-1925-brand-workshop-migration.md).
 
-**Marketing Studio (26/09):** [TASK-1893](docs/tasks/complete/TASK-1893-marketing-studio-original-asset-store-media-worker.md) y [TASK-1896](docs/tasks/complete/TASK-1896-marketing-studio-observability-restore.md) complete en producción (release `92002873ced9`, PR #243), junto a 1890/1891; restauración probada (job 49 s) y EPIC-049 con ese exit criterion cumplido. Follow-ups no bloqueantes en cada task. Gateway en `efeonce-mcp-gateway-00063-l9j`; sigue sin probar en vivo la denegación a una persona sin capability (1891).
+**Marketing Studio (26/09):** TASK-1890/1891/[1893](docs/tasks/complete/TASK-1893-marketing-studio-original-asset-store-media-worker.md)/[1896](docs/tasks/complete/TASK-1896-marketing-studio-observability-restore.md) complete en producción (`92002873ced9`, PR #243). Pendiente: denegación live sin capability (1891).
 
 **Marketing Studio — estrategia y agentes (26/09):** ADR de [estrategia](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_STRATEGY_LAYER_DECISION_V1.md) y [agentes híbridos](docs/architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_HYBRID_AGENTS_DECISION_V1.md) `Accepted`; TASK-1905–1916 to-do. Delegación `act`: [TASK-1917](docs/tasks/to-do/TASK-1917-efeonce-id-agent-run-delegation-act.md).
 
 **Insights (26/09):** [TASK-1888](docs/tasks/complete/TASK-1888-efeonce-insights-editorial-contract-v2.md) **complete**: contrato editorial v2 en producción (flag ON en Vercel staging/Production y `ops-worker-00719-gbm`, gateway v1.9.0, canary sintético `insed-f5768172…` con plan v2). Rollback = flag OFF en los dos runtimes (`FEATURE_FLAG_STATE_LEDGER.md`). Siguen TASK-1889 (catálogos) y TASK-1903 (agente redactor).
 
-**Insights diseño (26/09):** [TASK-1889](docs/tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md) **complete**: catálogos premium A4 y deck en producción (releases `0e87c7a443a2` + `f9257b9c94af`). Con autorización del operador se renderizaron en producción las primeras ediciones internas: Berel `insed-7d470d9f…` (A4 16 + deck 15) y Sky `insed-9370d0cc…` (A4 12 + deck 10), al primer intento; tono mejor/peor verificado en el PDF de Sky. Emitir y compartir siguen OFF. Siguen TASK-1901/1902 (más familias de gráfico; 1901 con preguntas abiertas para el operador).
+**Insights diseño (26/09):** [TASK-1889](docs/tasks/complete/TASK-1889-efeonce-insights-premium-catalogs.md) complete en producción; primeras ediciones Berel/Sky verificadas. Emitir/compartir OFF; siguen TASK-1901/1902.
 
 **ANAM Emma (24/09):** landing pública HubSpot `kortex-cms-react/30` verificada con el PNG entregado por María Paz,
 cargo `Ejecutivo comercial ANAM` y avatar derivado con fondo menta en identidad de Customer Agent y chatflow
