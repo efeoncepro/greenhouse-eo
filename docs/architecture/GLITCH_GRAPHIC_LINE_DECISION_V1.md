@@ -15,7 +15,9 @@
 > **lámina con lente** quedaron **Accepted** el 2026-09-27 ([Delta — blog y lente aprobados](#delta-2026-09-27--blog-y-lente-aprobados)):
 > ya no queda ninguna pieza estática en propuesta.
 > **Creado:** 2026-09-27 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-27 por Claude ([Estado de implementación](#estado-de-implementación-task-1923-2026-09-27):
+> **Última actualización:** 2026-09-28 por Claude ([Delta 2026-09-28 — Glitch Flash](#delta-2026-09-28--glitch-flash):
+> **el Glitch Flash queda aceptado como segundo formato** —una noticia puntual, sin número de edición—, lanzado en
+> producción; pendiente llevarlo a AXIS y al Composer; antes, [Estado de implementación](#estado-de-implementación-task-1923-2026-09-27):
 > **las piezas estáticas ya se componen en el Artifact Composer** —TASK-1923, en local—, Guttery entra al repo privado y
 > dos desviaciones declaradas; antes, [Delta de TASK-1922](#delta-2026-09-27--tokens-contrato-y-archivos-publicados-en-axis-task-1922): **tokens `glitchLine`, contrato
 > `efeonce.glitch-line` 0.1.0 y archivos de Glitch publicados en AXIS** —tag `v0.3.12`, autorizado por el operador— y
@@ -589,3 +591,30 @@ local; la publicación (Metricool, WordPress) queda fuera de alcance. El contrat
 sub-línea ahora exige retirar los tres catálogos, la extensión `glitch` del brand pack y la línea base del gate. El
 campo `render.minInkTileRatio` es opcional: una plantilla que no lo declara conserva el umbral por defecto del gate de
 lámina en blanco (1,5 %).
+
+## Delta 2026-09-28 — Glitch Flash
+
+> **Alcance:** sólo Glitch, nunca Efeonce. Detalle en la
+> [norma §14](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#14-glitch-flash--formato-puntual-lanzado-2026-09-28)
+> y en la skill `efeonce-graphic-line`, `references/glitch.md` §14.
+
+**Decisión (operador, 2026-09-28): `Accepted` como formato.** Glitch tiene dos formatos: la **edición semanal** (los
+lunes, «Edición #N», top 8) y el **Glitch Flash**, que se dispara ante una noticia puntual y **no lleva número de
+edición** («este es un glitch flash porque no es la edición entera… no lleva edición con número, puede ponerse algo
+como flash en la imagen»). Su cabecera dice «NO ESPERA AL LUNES» sobre una estela de bytes + «FLASH»; el interior se
+marca «ANUNCIO», sin avance n/8; en Threads va la portada sola, sin «Desliza». El primero (Claude Sonnet 5.5) se lanzó
+en producción el 2026-09-28 (canvas → LinkedIn de Efeonce, Instagram, Threads y LinkedIn personal de Julio → blog) y el
+operador lo aprobó en uso real: es el primer Glitch lanzado de punta a punta con esta línea.
+
+Decididas el mismo día y aplicables también a la edición semanal: la **muletilla de la contraportada varía por
+edición** (gesto conversacional, nunca una frase fija) y el **chip de la portada productiva es «LA NOTICIA»**, no
+«PORTADA».
+
+**Pendiente:** llevar el Flash a **AXIS** (pieza en `glitchLine.pieces`, la estela como token, la cabecera en el
+contrato `efeonce.glitch-line`) y al **Artifact Composer** (plantillas que acepten una sola noticia; hoy
+`pnpm glitch:compose` exige ocho); cambiar el chip «PORTADA» en `CoverPhoto`, `BlogBannerPhoto` y `BlogSquarePhoto`.
+Hasta entonces el Flash se arma desde las plantillas aprobadas. **Pregunta abierta** registrada, sin resolver: la
+numeración de la edición semanal (el blog ya tiene «Glitch #16» y «Glitch #17», y el Delta del 2026-09-27 dice que la
+próxima es la #17).
+
+**Reversible:** el Flash no tiene código ni token propio que retirar; revertirlo es una decisión del operador.

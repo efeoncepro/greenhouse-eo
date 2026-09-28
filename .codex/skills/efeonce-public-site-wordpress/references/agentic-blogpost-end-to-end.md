@@ -3,8 +3,9 @@
 Use this reference when an agent must carry a WordPress article from an approved
 brief or `GutenbergArticleSpec` through governed private creation, editorial and
 SEO enrichment, human-authorized publication, and live verification. It
-distills the production path proven by the Creative Workflows post `251363`;
-case-specific IDs and values are evidence, never reusable defaults.
+distills the production path proven by the Creative Workflows post `251363`
+and the Glitch Flash post `251941` (§15); case-specific IDs and values are
+evidence, never reusable defaults.
 
 Also load `content-factory-gutenberg.md` for Content Factory commands, block
 recipes, and existing-post refresh rules.
@@ -419,6 +420,27 @@ measurement.
 Record what changed, what was restored, and any remaining external cache or
 indexing risk.
 
+## 15. Case Evidence: Glitch Flash 251941 (2026-09-28)
+
+Second complete reference case, and the first Glitch post produced with the new
+graphic line end to end (canvas, social, blog). The values below are **example
+values from that run**, never defaults for another article.
+
+| Step | What was done | Reusable lesson |
+| --- | --- | --- |
+| Private write | `content-factory:run --spec … --send --author-id 1`, manifest `greenhouse-cf-glitch-flash-claude-sonnet-5-5` | Same governed path as §4; author = human editorial user |
+| Glitch Drop | Marker paragraph `__GLITCH_DROP__` in the spec, then `parse_blocks` → dynamic block with `attrs.content` → `serialize_blocks` → `wp_update_post(wp_slash())`, snapshot first | The spec has no `kind` for the callout yet; follow `content-factory-gutenberg.md` §Glitch Drop sin `kind` |
+| Media | Featured 16:9 banner (attachment `251943`, 1920×1080) and in-body 1600×900 banner (`251945`, `core/image` at the start of the first H2) uploaded with `wp_upload_bits` + `wp_insert_attachment` through `pnpm public-website:wpcli -- --eval-file … --input-file <png>` | One eval per asset or a reviewed batch; set ALT, caption with the photo credit, and generate attachment metadata; read back ID, URL, MIME, dimensions before referencing it |
+| Taxonomy | Category Glitch (term `183`) and `_yoast_wpseo_primary_category` = same term | Primary category must match the visible category because it drives the permalink (`/glitch/<slug>/`) |
+| Publication | After explicit authorization, `private` → `publish` with the **current** date (in 251941: `wp_update_post` with `post_date`/`post_date_gmt` = `current_time()` and `edit_date => true`; attachments got `wp_generate_attachment_metadata`, both read back) | A private post already has a `post_date` from its creation; set `post_date`/`post_date_gmt` to the publication moment explicitly and read it back, or the post appears backdated in archives and feeds |
+| Cache | `wp cache flush` + `kinsta cache purge --all` | Purge after every live content change, then read anonymously twice |
+| Live QA | HTTP 200, canonical, `index, follow`, `og:image` = featured banner, one visible `aside.gh-glitch-drop`, TOC with 9 links, no overflow at 1280 and 390, callout visible (`offsetHeight` 181/360) | §11–§13 apply unchanged |
+| Finding | The paragraph right after the callout repeated the drop's sentence; fixed with a new snapshot + governed update | Add an editorial **redundancy read** between each callout/pullquote and its neighbouring paragraphs; no mechanical check covers it yet |
+
+Photo rights: third-party launch images were published with credit and without a
+license by explicit operator decision for this case. That is not a general
+authorization; every future article needs its own rights decision (§1).
+
 ## Definition of Done
 
 - [ ] Final spec, research, claims, rights, CTA, and visible author were approved.
@@ -438,6 +460,8 @@ indexing risk.
 - [ ] Publish rollback was prepared and critical checks ran fail-closed.
 - [ ] Kinsta cache purge and repeated anonymous/authenticated readback agreed.
 - [ ] Link check found no confirmed broken links; unresolved responses were reviewed.
+- [ ] Callouts, pullquotes and drops were read against their neighbouring paragraphs; no sentence is repeated.
+- [ ] A post created private and published later carries the publication date, read back from WordPress.
 - [ ] Playwright desktop and mobile passed render, TOC, image, console, and overflow checks.
 - [ ] Final anonymous robots, canonical, schema, Open Graph, and social image passed.
 - [ ] Final URL appears in the correct sitemap with an honest `lastmod`; any GSC observation is reported separately.

@@ -1,5 +1,7 @@
 # Lecciones (trampas que ya costaron tiempo)
 
+> Verificado contra: greenhouse-eo@9b531b396 — 2026-09-28 (última entrada: el Glitch Flash de Claude Sonnet 5.5).
+
 > Cada entrada: fecha, síntoma, causa y la regla que la evita. Es la parte más valiosa de la skill: se agrega en el
 > momento, no al cierre.
 
@@ -265,6 +267,28 @@
   demás los lista como no declarados. Regla: cuando el freeze lista frames que no esperabas, se miran uno por uno
   (se declaran con su porqué o se arregla el código), nunca se copian a la sección para que pase.
   [Runbook §5](../../../../docs/operations/runbooks/composer-visual-gate.md).
+
+## 2026-09-28 (el Glitch Flash de Claude Sonnet 5.5)
+
+- **La «imagen» de portada de la fuente era una animación en canvas.** Síntoma: la foto oficial de la página de
+  Anthropic no aparecía como imagen ni como video descargable. Causa: se dibuja en un `<canvas>` desde un binario
+  (`cupola.gz.bin`). Regla: si la imagen de una fuente es un canvas, se captura limpia con Playwright a 3840×2160
+  ocultando el overlay de la página (ahí, `#mh-ov`), con crédito; no se busca un archivo que no existe.
+- **Una escena oscura en duotono se funde con el fondo navy.** Síntoma: la falla en bytes no se veía; la foto era una
+  mancha navy sobre navy. Causa: el duotono de Glitch lleva las sombras al mismo navy del fondo. Regla: recortar cerca
+  del sujeto (ahí, el horizonte) y **levantar la exposición antes de `processPhoto`** (se usó lineal 1,7 + gamma 1,25),
+  luego `computeByteFracture`; mirar el resultado antes de componer.
+- **«el resto, el lunes» sonó forzado.** Síntoma: el operador lo rechazó («no se escucha natural»). Causa: se adaptó la
+  muletilla de la edición («el #N+1 sale el lunes.») al Flash cambiando palabras. Regla: la muletilla de la
+  contraportada **se escribe para cada edición** y se lee en voz alta; en un Flash nunca promete un número. La que
+  pasó: «léelo completo / en nuestro blog.», en dos líneas.
+- **«PORTADA» es un chip de prueba.** Síntoma: el operador lo marcó al revisar la pieza productiva. Causa: el chip de
+  las maquetas pasó tal cual; además las plantillas `CoverPhoto`, `BlogBannerPhoto` y `BlogSquarePhoto` del Composer lo
+  pintan fijo. Regla: en productivo el chip es **«LA NOTICIA»** (2026-09-28); si compones con esas plantillas antes de
+  que se actualicen, avísalo.
+- **El Flash no cabe en `pnpm glitch:compose`.** El manifiesto exige ocho noticias (`news` de largo 8). Regla: no
+  inventes siete noticias de relleno ni fuerces el manifiesto; el Flash se arma desde las plantillas aprobadas hasta
+  que tenga la suya ([glitch.md](glitch.md) §14.4).
 
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 

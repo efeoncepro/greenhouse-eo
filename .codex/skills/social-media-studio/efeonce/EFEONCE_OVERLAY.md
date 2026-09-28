@@ -102,6 +102,11 @@ Canal (dónde nace).
   de marca) con el territorio de `PDR-019` (taxonomía del blog WordPress). Son dos taxonomías distintas.
 - **NUNCA** tratar `LinkedIn Página 💼` y `LinkedIn Julio 👤` como el mismo canal: el runtime los modela
   separados y su voz es distinta (marca vs `JULIO_REYES_VOICE_SYSTEM`).
+  - **LinkedIn Julio = thought leadership** (decisión del operador, 2026-09-28): primera persona, opinión propia y
+    una lectura que sólo él firmaría; la noticia es el pretexto, no el tema. Sin lista de specs ni resumen del
+    anuncio: eso ya lo dice la pieza. Si hace falta, cita a la página con la mención URN.
+  - **LinkedIn Página** con una franquicia editorial (Glitch) habla con la voz de esa franquicia: el narrador de
+    Glitch, no la voz personal de Julio. Caso: `docs/operations/social/2026-09-28-glitch-flash-sonnet-55-production-method.md`.
 - **NUNCA** ejecutar una mutación en Notion sin autorización explícita del operador.
 - **NUNCA** asumir que "el calendario" es una sola base: hay **dos** con schema idéntico y el histórico
   está partido. Cualquier promedio de velocidad operativa medido sobre una sola usa la mitad de la

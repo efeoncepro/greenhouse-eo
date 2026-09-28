@@ -1,9 +1,10 @@
 # Componer piezas de Glitch — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.5: el blog completo y la lámina con lente quedaron aprobados;
+> **Ultima actualizacion:** 2026-09-28 por Claude (v1.6: nota del Glitch Flash, chip «LA NOTICIA» y muletilla que
+> cambia por edición. v1.5: el blog completo y la lámina con lente quedaron aprobados;
 > la versión 1:1 del banner es una plantilla propia, el callout «DROP» v2 rige desde la #17 y la lente es una variante
 > ocasional. v1.4: la música de Glitch quedó aprobada e integrada al taller, con
 > el pre-roll de la intro; el flujo del editor agente pasa al manual [Producir el motion, el sonido y la música de
@@ -23,6 +24,14 @@
 > [Componer una edición de Glitch con `pnpm glitch:compose`](./componer-una-edicion-de-glitch.md). Este manual sigue
 > siendo la referencia de **qué** lleva cada pieza y por qué (portada, láminas, blog, video, checklist); donde más abajo
 > dice que las piezas estáticas se arman a mano desde el canvas, rige el comando.
+
+> **Glitch Flash (2026-09-28).** Además de la edición semanal existe el **Glitch Flash**: una sola noticia puntual,
+> **sin número de edición** (cabecera «NO ESPERA AL LUNES» + estela de bytes + «FLASH», interior «ANUNCIO», sin avance
+> n/8, Threads sin «Desliza»). Se lanzó en producción el 2026-09-28, pero **no tiene plantilla** ni se compone con
+> `pnpm glitch:compose` (que exige ocho noticias): se arma desde las plantillas aprobadas. Detalle en la
+> [norma §14](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#14-glitch-flash--formato-puntual-lanzado-2026-09-28).
+> En toda portada productiva el chip dice «LA NOTICIA» (no «PORTADA») y la muletilla de la contraportada se escribe
+> para cada edición.
 
 ## Para qué sirve
 

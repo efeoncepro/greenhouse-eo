@@ -141,6 +141,33 @@ Caso «Nivel de búsqueda» (9 láminas PNG 1080×1350): Instagram `378566667` m
 7. Registrar en `PROGRAMACION.md` IDs, horarios con su justificación, URLs de media, resultado del readback y lo
    **no** programado (la pieza suelta de Threads quedó fuera, declarada).
 
+### Receta verificada: una pieza en cuatro redes y reemplazo en su lugar (2026-09-28)
+
+Caso Glitch Flash · Claude Sonnet 5.5 (carrusel de 3 PNG + portada suelta). Bitácora:
+`docs/operations/social/2026-09-28-glitch-flash-sonnet-55-production-method.md`. Los IDs son **evidencia** de esa
+corrida, no valores por defecto: resolver siempre marca y cuenta con `getBrandSettings`.
+
+| Red | Forma del post | Campos que importan |
+|---|---|---|
+| LinkedIn página (marca `3961547`) | documento desde los PNG | `linkedinData:{publishImagesAsPDF:true, documentTitle:"…"}` + `firstCommentText` con el enlace de suscripción (el enlace no va en el cuerpo) |
+| Instagram (`3961547`) | carrusel en orden de lectura | `mediaAltText` con un texto por lámina, `instagramData:{type:"POST"}` |
+| Threads (`3961547`) | **una sola imagen** (la portada, sin «Desliza») | `threadsData:{}`; no se manda como carrusel |
+| LinkedIn personal (`5105024`) | documento, texto propio del fundador | mención `@[urn:li:organization:20503593\|Efeonce]` en el texto |
+
+1. **Reemplazar, no duplicar.** Si la red ya tiene un post programado de la misma pieza (en el caso, IG a las 20:00
+   con una imagen vieja), se corrige con `updateScheduledPost` sobre ese post: exige el contenido completo, **cambia
+   el ID** y conserva el UUID (en el caso: `383719049` → `383721396`). Registrar ambos IDs. Crear otro post deja dos
+   versiones compitiendo en el planner.
+2. **Nombres nuevos al reemplazar media.** Subir la versión corregida con otro nombre (`v2-…`) en
+   `campaigns/<campaña>/`; reusar el nombre puede servir la imagen anterior desde caché.
+3. **Readback de orden por firma de imagen** (receta del 2026-09-19): miniatura reducida en gris contra los PNG
+   locales; en el caso, 10 de 10 posiciones correctas entre las cuatro redes.
+4. **Permiso de escritura externa.** El clasificador de permisos de la sesión puede bloquear `createScheduledPost`
+   («External System Writes») aunque el plan esté aprobado; pasó sólo después de que el operador lo pidió de forma
+   explícita en el chat. Pedir esa instrucción antes de llegar al paso, no reintentar ni rodearlo.
+5. Espaciar las horas entre redes de la misma marca (en el caso, 16:15 / 16:20 / 16:25 / 16:30) y mostrar los copys
+   al operador **antes** de programar.
+
 ## 4. Readback, evidencia y cierre
 
 La respuesta de creación no cierra la tarea. Leer nuevamente `getScheduledPosts` y comprobar por ID:

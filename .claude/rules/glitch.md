@@ -28,6 +28,11 @@ decide la rotación desde `previousEdition.coverTemplate`) ni escribir un HEX, p
 original. Guttery está en el brand pack de Greenhouse (extensión `glitch`), nunca en un paquete de AXIS. Gate:
 `pnpm composer:visual-gate --catalog=glitch` (freeze single-owner). La ruta productiva es TASK-1921.
 
+**Glitch Flash (2026-09-28):** segundo formato, una noticia puntual **sin número de edición** («NO ESPERA AL LUNES» +
+estela de bytes + «FLASH»); lanzado en producción, pero **sin plantilla del Composer ni token en AXIS** (`glitch:compose`
+exige ocho noticias): se arma desde las plantillas aprobadas. Chip productivo de portada «LA NOTICIA»; la muletilla de
+la contraportada varía por edición. Detalle: `references/glitch.md` §14 y norma §14.
+
 Reglas duras:
 
 - **Nunca** la manzana, el verde Glitch, la falla en bytes, Guttery ni la cabecera «EDICIÓN #N» en una pieza de Efeonce.

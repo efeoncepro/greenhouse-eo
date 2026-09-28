@@ -98,7 +98,12 @@ pnpm public-website:content-factory:post-tool -- edit-pullquote --post-url <url>
 - For compact editorial FAQs that need schema, use semantic `kind: "faq"` in the `GutenbergArticleSpec`; Content Factory emits native `core/details` plus governed `FAQPage` JSON-LD from the same `items[]`. Use raw `kind: "details"` only for non-schema disclosures. Keep the question in `<summary>`, the complete answer as child blocks, and let the global TOC target the parent FAQ H2 unless a reviewed outline decision says otherwise. `core/accordion` is available in the 2026-07-15 runtime, but use it only when grouped/exclusive accordion behavior is a real requirement.
 - Do not hand-author `core/html`; the validator only allows generated `application/ld+json` structured data from semantic capabilities such as `kind: "faq"` and blocks FAQPage questions that do not match visible summaries.
 - `status=block` from validation is a hard stop; `status=warning` requires review.
-- For Glitch POV, prefer `efeoncepro/glitch-drop`; it is an editorial aside, not a quote.
+- For Glitch POV, prefer `efeoncepro/glitch-drop`; it is an editorial aside, not a quote. The spec has **no `kind`**
+  for it yet and the validator blocks it as `unsupported_gutenberg_block`: use the governed insertion recipe in
+  «Glitch Drop sin `kind`» below, never hand-written markup.
+- Before authoring, check «Inventario live y brecha (2026-09-28)» below: the spec emits 10 block kinds (plus heading/TOC/CTA by structure), but the runtime
+  has 220 registered blocks; several useful ones (native video, embed caption, table style, CTA buttons) are not
+  expressible yet.
 
 ## Direct editorial SVG lane
 
@@ -227,3 +232,102 @@ nowdoc — **never `\uXXXX`** (the encoding gotcha that broke the first meta des
 - **NEVER** publish from the pipeline — the write ends at `private`; publishing is
   a human step (auto-publish with guardrails is the separate opt-in TASK-1323).
 - **ALWAYS** run `--send` gated on `validation=pass` with an explicit `--author-id`.
+
+## Inventario live y brecha (as-of 2026-09-28)
+
+Inventario **sólo lectura** vía `pnpm public-website:wpcli -- --eval-file … --wp-user 12` (registro de bloques,
+estilos, patrones y `parse_blocks` recursivo). Repetirlo antes de extender el builder: estos números caducan.
+
+**Runtime:** WordPress 7.1.2 · tema clásico `ohio-child`/`ohio` (sin `theme.json`, no es block theme) · supports
+`align-wide`, `responsive-embeds`, `editor-styles`, `wp-block-styles` · paleta del editor = presets de Ohio
+(`brand-color` `#023c70`, `beige_dark`, `dark_strong`, `dark_light`, `grey_strong`), **no** AXIS · tamaños
+`extra-small 13` … `larger 20`.
+
+| Qué | Conteo | Detalle |
+|---|---|---|
+| Bloques registrados | 220 | 116 `core/*`, 87 `jetpack/*`, 5 `premium-content/*`, 7 Yoast, 1 `efeoncepro/glitch-drop` (dinámico, attrs `content` + `label`), CF7, ActiveCampaign, HubSpot embed, VideoPress |
+| Estilos de bloque (registro PHP) | 4 | sólo Jetpack (`field-radio`/`field-checkbox-multiple`: `list`, `button`). Ni Ohio ni `efeonce-editorial-blocks` registran estilos |
+| Estilos declarados en `block.json` | — | `core/button` fill/outline · `core/image` rounded · `core/quote` plain · `core/separator` wide/dots · `core/table` stripes · `core/social-links` |
+| Patrones registrados | 18 | 11 core (query + navigation overlay) y 7 formularios Jetpack. **Cero** patrones editoriales; **cero** patrones de usuario (`wp_block`) |
+| Posts publicados | 44 | total del sitio |
+
+**Uso real** (posts de Glitch, term 183, 10 posts; y los 20 publicados más recientes):
+
+- Glitch agregado: `paragraph` 305 · `heading` 78 · `image` 56 · **`efeoncepro/glitch-drop` 34** (6 posts; 8 por
+  edición desde la #14) · `quote` 25 (en #12/#13 como POV de respaldo y, desde la #14, sólo para la caja de fecha) ·
+  `list` 11 · `separator` 10 · Yoast TOC 9 · `embed` 5 · `video` 2 · `table` 1.
+- Glitch Flash 251941 (Content Factory): paragraph 23, heading 9, list 5, TOC, image 1, table 1, glitch-drop 1,
+  separator 1. Sin pullquote, sin details, sin CTA en botón.
+- 20 recientes: además `pullquote` 12, `table` 14, `details` 4, `html` (FAQ JSON-LD) 1, `columns`/`group`/`gallery`/
+  `buttons` sólo en 249768 (autoría manual previa a Content Factory), `essential-blocks/testimonial` 1.
+- Estilos usados en todo el sitio: `table.is-style-stripes` 2, `separator` wide/dots/default 3,
+  `buttons.is-style-fill_content` 2 (clase custom **no registrada**), `core/button.is-style-fill` + `brand-color` 2.
+- Deuda observada: `essential-blocks/testimonial` vive en 249768 pero su plugin **no está activo**;
+  `leadin/hubspot-form-block` en 4 posts antiguos (formulario de suscripción del blog).
+- El plugin `efeonce-editorial-blocks` en vivo es **v0.1.0** (archivos del 2026-07-05): el callout es el **v1**
+  de TASK-1337. El v2 aprobado (ver `efeonce-graphic-line` → Glitch §6) **no está desplegado**.
+
+### Brecha: qué sabe emitir Content Factory vs. qué hay
+
+`GutenbergArticleSpec` emite 10 kinds de bloque: `paragraph`, `list`, `details`, `faq`, `table`, `quote`, `pullquote`,
+`separator`, `image`, `embed` (YouTube), más heading/TOC por estructura y CTA en párrafo. El validador acepta
+además `group`, `columns`, `column`, `buttons`, `button`, `spacer`, `gallery`, pero **no hay kind** que los emita.
+
+| Clase | Bloques / estilos | Nota |
+|---|---|---|
+| **Ya soportado y usado** | heading anclado, paragraph rich text, list, table (+caption), image (+caption, `sources`, `linkDestination`), separator, Yoast TOC, `faq`/`details` | base del Flash y de Creative Workflows |
+| **Soportado pero no usado** | `pullquote`, `quote` como cita real, `details` sin schema, lista ordenada, `image.linkDestination=media`, `embed` YouTube | el Flash los tenía disponibles y no los usó; revisar en cada spec antes de pedir bloques nuevos |
+| **No soportado y valioso** | `efeoncepro/glitch-drop` (34 usos; el validador lo bloquea) · `core/video` nativo con caption (Glitch #16/#17) · caption «Fuente:» en `embed` (convención Glitch) · `table` con `is-style-stripes` · `buttons`/`button` para el CTA de suscripción · piezas del post Glitch aprobadas en §6 (apertura navy, escaleta, banner de suscripción, «El hilo de la semana», cierre) | las piezas de §6 **no existen** como bloque ni como estilo: primero hay que registrarlas en `efeonce-editorial-blocks` (estilos de `core/group` o patrones sincronizados); sólo después Content Factory puede emitirlas |
+| **Valor medio, a demanda** | `core/columns` (comparación lado a lado), `core/code` (posts técnicos, 2 históricos), `separator` wide/dots, `image` rounded | preferir `table` a columnas para comparar; columnas exigen revisión de apilado a 390 px |
+| **No recomendado** | `core/cover` y `core/media-text` (texto sobre imagen/contraste y CSS de Ohio sin probar) · `core/tabs`/`accordion` (esconde contenido; `details` ya cubre) · `core/footnotes` (vive en post meta, el write path sólo escribe `post_content`) · `yoast/faq-block` (duplica `kind: 'faq'`) · `yoast/how-to-block` (Google retiró el rich result HowTo) · `yoast-seo/breadcrumbs`/`related-links`/`estimated-reading-time` en el cuerpo (chrome del tema) · formularios `leadin`/Jetpack/CF7 (los formularios van por Growth Forms) · resto de Jetpack (`subscriptions`, `related-posts`, `slideshow`, `image-compare`…) · `spacer` (hack de CSS) · clases custom no registradas (`is-style-fill_content`) · colores/tamaños inline de la paleta Ohio para imitar AXIS | razón en cada fila; reabrir sólo con decisión explícita |
+
+## Glitch Drop sin `kind` — receta vigente (probada en 251941, 2026-09-28)
+
+Mientras `GutenbergArticleSpec` no tenga `kind: 'glitchDrop'`, el callout se inserta **después** del write privado,
+sobre el post ya creado. Nunca se escribe el comentario del bloque a mano.
+
+1. En el spec, en el lugar exacto del drop, poner un párrafo marcador con texto único `__GLITCH_DROP__` (uno por
+   drop; si hay varios, `__GLITCH_DROP_1__`, `__GLITCH_DROP_2__`…). El spec valida y se escribe privado con
+   `run --send --author-id <id>` como siempre.
+2. Snapshot previo del `post_content` (p. ej. `tmp/<slug>-<post_id>-snapshot-<ts>.html`, gitignored).
+3. Eval PHP gobernado (`pnpm public-website:wpcli -- --eval-file ./tmp/<script>.php --wp-user 12`):
+   - guards: post ID esperado, `_greenhouse_manifest_id` esperado, `post_status` esperado y **exactamente un**
+     bloque marcador por cada drop; si no, abortar sin escribir;
+   - `parse_blocks($post->post_content)` → reemplazar el `core/paragraph` marcador por
+     `['blockName' => 'efeoncepro/glitch-drop', 'attrs' => ['content' => $drop], 'innerBlocks' => [], 'innerHTML' => '', 'innerContent' => []]`;
+   - `$drop` en nowdoc UTF-8 (nunca `\uXXXX` ni `json_encode` para el texto); frases separadas por `<br>`;
+     **sin enlaces** dentro del drop: el enlace va en el párrafo siguiente;
+   - `serialize_blocks()` → `wp_update_post(wp_slash(['ID' => $id, 'post_content' => $new]))` (sin `wp_slash`
+     WordPress quita las barras del JSON del atributo);
+   - readback: el marcador ya no existe, `has_block('efeoncepro/glitch-drop')`, conteo de drops esperado.
+4. WordPress serializa el atributo con `<`→`<`, `>`→`>`, `&`→`&` y deja los acentos en UTF-8:
+   `<!-- wp:efeoncepro/glitch-drop {"content":"…<br>…"} /-->`. Es el formato de los posts reales
+   (Glitch #17, 251605, 8 drops).
+5. QA en vivo: un `<aside class="… gh-glitch-drop">` visible por drop (`offsetHeight > 0`; Ohio oculta los `aside`
+   sin el override del plugin) y **lectura de redundancia**: el párrafo vecino no puede repetir la frase del drop.
+   En 251941 la QA encontró la frase duplicada tras el callout y hubo que corregir el párrafo.
+
+## Propuesta de extensión de GutenbergArticleSpec (para decidir una TASK; no implementada)
+
+Orden sugerido por valor/riesgo. Todo nace en `article-authoring.ts` + `gutenberg-validator.ts` +
+`gutenberg-pattern-catalog.ts` + `gutenberg-capability-registry.ts`, con tests en `__tests__/`.
+
+1. **`{ kind: 'glitchDrop'; lines: string[] }`** — 1–4 líneas de texto plano (string, no rich text: sin `href` por
+   tipo). Render: `<!-- wp:efeoncepro/glitch-drop {JSON} /-->` con el atributo `content` = líneas escapadas unidas
+   por `<br>`, serializado igual que `serialize_block_attributes` de WordPress (`JSON_UNESCAPED_UNICODE|SLASHES` +
+   `--`/`<`/`>`/`&`/`"` a `--`/`<`/`>`/`&`/`"`). Validador: agregar el bloque al
+   allowlist; `block` si `content` vacío, si trae `<a`, o si contiene HTML distinto de `<br>`; `warning`
+   `glitch_drop_redundant_with_neighbor` si una frase del drop aparece literal en el párrafo anterior o siguiente;
+   `warning` si el post no está en la categoría Glitch. Tests: round-trip byte a byte contra el drop real de 251941
+   (fixture), escape de comillas/`<`/`--`, rechazo de enlaces, aviso de redundancia.
+2. **`embed.caption?: GutenbergRichText`** y **`{ kind: 'video'; mediaId; url; caption?; poster? }`** (media real,
+   nunca inventada) — Glitch acredita fuente en cada clip. Tests: figcaption con enlace seguro; `mediaId` entero.
+3. **`table.style?: 'stripes'`** → `{"className":"is-style-stripes"}` + clase en el `figure`. Estilo ya registrado
+   por core; verificar render de Ohio a 390 px.
+4. **`{ kind: 'buttons'; items: [{ text; href; variant?: 'fill' | 'outline' }] }`** — CTA gobernado (destino
+   `https:` revisado, sin colores inline, sin clases no registradas). Requiere decidir si el CTA de suscripción usa
+   botón o el banner aprobado de §6.
+5. **Piezas Glitch de §6** (apertura navy, escaleta, banner de suscripción, «El hilo de la semana», cierre):
+   **prerrequisito de runtime**, no de builder. Primero registrar en `efeonce-editorial-blocks` estilos de
+   `core/group` (`register_block_style`) o patrones sincronizados con CSS de AXIS/`glitchLine`; recién entonces un
+   `kind: 'glitchSection'` con `variant` cerrado. Mismo plugin que debe subir el callout a v2.

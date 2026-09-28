@@ -1,9 +1,10 @@
 # Línea gráfica de Glitch — sub-línea de La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.11
+> **Version:** 1.12
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.11: las piezas estáticas ya se componen solas desde los datos
+> **Ultima actualizacion:** 2026-09-28 por Claude (v1.12: Glitch tiene dos formatos, la edición semanal y el Glitch
+> Flash; chip «La noticia» en la portada y frase del narrador que cambia en cada edición; v1.11: las piezas estáticas ya se componen solas desde los datos
 > de la edición —carrusel, piezas del blog, portada del reel, miniatura del vlog y cuadros fijos de los gráficos—, con
 > la portada elegida por la regla de rotación; Guttery entra al repo privado; v1.10: el blog completo y la lámina con lente quedaron aprobados;
 > ya no hay piezas fijas en propuesta; v1.9: el reel abre directo con la apertura, sin los segundos de
@@ -54,8 +55,15 @@ logo de Glitch aparece en la cabecera y en la invitación a suscribirse, nunca e
 
 ## Cómo se ve una edición
 
-Cada edición se numera como **«Edición #N»**. La próxima es la **#17**: la numeración sigue la del blog (los «#11» a
-«#14» que se ven en las maquetas del canvas son ejemplos de diseño, no números reales). Las secciones son «Marketing +
+Glitch sale en **dos formatos** (decisión del 2026-09-28): la **edición semanal**, que sale los lunes con ocho noticias,
+y el **Glitch Flash**, que sale cuando una noticia puntual no puede esperar al lunes (el primero fue el lanzamiento de
+Claude Sonnet 5.5, el 2026-09-28). El Flash **no lleva número de edición**: en su lugar dice «No espera al lunes» y
+«Flash», con una estela de bytes. Salió publicado en redes y en el blog, pero todavía no tiene plantilla automática: se
+arma a partir de las piezas aprobadas.
+
+Cada edición semanal se numera como **«Edición #N»**. La norma dice que la próxima es la **#17**, pero el blog ya
+publicó una «Glitch #16» y una «Glitch #17» en julio: **está pendiente que el operador aclare la numeración** (los
+«#11» a «#14» que se ven en las maquetas del canvas son ejemplos de diseño, no números reales). Las secciones son «Marketing +
 IA», «Creatividad + IA» y «Tecnología + IA»: la IA cruza todas, no es una sección aparte. Glitch pertenece a la línea de
 servicio **Growth**, por eso la contraportada cierra con el eslogan «Empower your Growth».
 
@@ -93,6 +101,8 @@ abre con la franja «El micrófono se abre». El carrusel cierra con la **contra
 | Video horizontal (vlog) y reel vertical con gráficos encima del host | **aprobados** el 2026-09-27 |
 | Tarjeta final de video | **aprobada** el 2026-09-27 |
 | Gráficos animados del video (apertura, tarjeta final, kit y transiciones) | **aprobados** el 2026-09-27 («Si, el tuyo también está aprobado») |
+| Glitch Flash (una noticia puntual, sin número de edición) | **lanzado y aprobado en uso real** el 2026-09-28; todavía sin plantilla automática |
+| Etiqueta de la portada: «La noticia» (antes «Portada») y frase del narrador de la contraportada distinta en cada edición | **decididos** el 2026-09-28 |
 | Subtítulos del video | pendiente: falta definir su estilo |
 | Sonido de Glitch (sólo Glitch) | **aprobado**, versión B «más punch» (2026-09-27) |
 | Música de Glitch (sólo Glitch): intro, cortina entre noticias, salida y música de fondo bajo la noticia | **aprobada** el 2026-09-27 |
@@ -331,6 +341,9 @@ exploración y no se componen.
 | La manzana y el verde | ya aprobados (2026-09-27); falta registrarlos en AXIS |
 | Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | ya aprobados (2026-09-27); falta sumarlos al catálogo de AXIS |
 | Callout nuevo del blog | aprobado (2026-09-27); falta actualizar el bloque de WordPress antes de publicar la #17 |
+| Glitch Flash | lanzado (2026-09-28); falta su plantilla automática y registrarlo en AXIS |
+| Numeración de las ediciones | pendiente de aclarar con el operador: el blog ya tiene una «#16» y una «#17» |
+| Etiqueta «La noticia» en la portada | decidida (2026-09-28); falta cambiarla en las plantillas automáticas, que todavía dicen «Portada» |
 | Gráficos animados del video | ya aprobados (2026-09-27); falta la cadencia de grabación (hoy 30 cuadros por segundo), la prueba con los editores en una edición real, el ritmo ajustable, dónde se usa la transición de bytes (se recomienda sólo en tarjetas y Drop), el estilo de subtítulos, los textos reales de la #17, el formulario para cambiar textos sin programar, guardar una copia en la nube de Google y cualquier excepción a la regla de rostros |
 | Música de Glitch | ya aprobada (2026-09-27), publicada en AXIS y entregada por el taller junto a cada pieza, con el pre-roll de los tres puntos; sólo falta probar la mezcla con la voz real del host en una edición real |
 | Letra Guttery | licencia para web y video confirmada por el operador (2026-09-27); entra al repo privado para componer las piezas de Glitch; falta registrar el número de contrato |

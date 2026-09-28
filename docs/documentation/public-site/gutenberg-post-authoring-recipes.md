@@ -93,11 +93,11 @@ Minimum generated structure:
 
 Recommended enrichment:
 
-- `efeoncepro/glitch-drop` for Efeonce's POV inside `Glitch de la semana`
-  once the block exists. Until then, `core/quote` may be used as a temporary
-  visual fallback only when the content is clearly Efeonce commentary rather
-  than an external citation. Contract:
-  `docs/documentation/public-site/glitch-drop-gutenberg-block.md`.
+- `efeoncepro/glitch-drop` for Efeonce's POV inside Glitch posts (weekly
+  edition and Glitch Flash). The block is live since 2026-07-04 (TASK-1337);
+  the `core/quote` fallback is retired for new posts. The spec has no `kind`
+  for it yet: insert it with the governed recipe in «Glitch Drop» below.
+  Contract: `docs/documentation/public-site/glitch-drop-gutenberg-block.md`.
 - `core/quote` for actual quotes, strong principles outside the Glitch format,
   or temporary POV fallback when no custom block is available.
 - `core/pullquote` for a short, high-signal editorial callout when the source
@@ -268,8 +268,8 @@ Minimal semantic FAQ shape:
 ### Quotes
 
 Use quote blocks for strong POV lines or principles, not decorative pull text.
-For `Glitch de la semana`, prefer the planned `efeoncepro/glitch-drop` block
-for Efeonce's POV; do not model that long-term as an external quote.
+For Glitch posts, Efeonce's POV goes in `efeoncepro/glitch-drop`, never in an
+external quote.
 
 ```html
 <!-- wp:quote -->
@@ -279,13 +279,30 @@ for Efeonce's POV; do not model that long-term as an external quote.
 <!-- /wp:quote -->
 ```
 
-### Glitch
+### Glitch Drop (`efeoncepro/glitch-drop`)
 
-Use `Glitch` for Efeonce's editorial POV attached to a news item in the
-weekly Glitch format. It is an aside, not a quote. The target block is
-`efeoncepro/glitch-drop`; until implemented, generated drafts may keep a
-temporary `core/quote` fallback only if the brief explicitly identifies the text
-as Glitch commentary.
+Use it for Efeonce's editorial POV attached to a news item in the weekly Glitch
+edition or a Glitch Flash. It is an `aside`, not a quote. The block is
+**dynamic**: its text lives in the `content` attribute of the comment, not in
+inner HTML. Real syntax (Glitch Flash 251941, serialized by WordPress):
+
+```html
+<!-- wp:efeoncepro/glitch-drop {"content":"Primera frase del POV.\u003cbr\u003eSegunda frase, el remate."} /-->
+```
+
+Rules: 1–4 short sentences separated by `<br>`; no links inside the drop (the
+link goes in the next paragraph); the neighbouring paragraphs must not repeat
+its sentences. `GutenbergArticleSpec` has no `kind` for this block yet and the
+validator rejects it (`unsupported_gutenberg_block`), so the current path is:
+marker paragraph `__GLITCH_DROP__` in the spec → private write →
+`parse_blocks` / replace / `serialize_blocks` / `wp_update_post(wp_slash())`
+with a prior snapshot. Step-by-step recipe:
+`.claude/skills/efeonce-public-site-wordpress/references/content-factory-gutenberg.md`
+§Glitch Drop sin `kind`. Never type the comment by hand.
+
+The live plugin is v0.1.0 (callout v1). The approved callout «DROP» v2
+(`docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` §6) needs
+a plugin update; the stored `content` attribute does not change.
 
 Contract:
 `docs/documentation/public-site/glitch-drop-gutenberg-block.md`.
@@ -332,6 +349,92 @@ the source inspection.
 </figure>
 <!-- /wp:embed -->
 ```
+
+### Embed with source caption (not emitted by the spec yet)
+
+Glitch credits the source of every clip. WordPress stores the caption inside
+the embed `figure` (real syntax, Glitch #17 251605):
+
+```html
+<!-- wp:embed {"url":"https://www.youtube.com/watch?v=VIDEO_ID","type":"video","providerNameSlug":"youtube","responsive":true,"align":"center","className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->
+<figure class="wp-block-embed aligncenter is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+https://www.youtube.com/watch?v=VIDEO_ID
+</div><figcaption class="wp-element-caption">Fuente: <a href="https://…">Medio</a></figcaption></figure>
+<!-- /wp:embed -->
+```
+
+The spec's `embed` kind has no `caption` today; see the extension proposal.
+
+### Native video (not emitted by the spec yet)
+
+For a clip uploaded to the Media Library (Glitch #16/#17), `core/video` with a
+real attachment ID:
+
+```html
+<!-- wp:video {"id":VIDEO_ATTACHMENT_ID} -->
+<figure class="wp-block-video"><video controls src="https://efeoncepro.com/wp-content/uploads/…/clip.mp4"></video><figcaption class="wp-element-caption">Fuente: …</figcaption></figure>
+<!-- /wp:video -->
+```
+
+### Table and separator styles (registered by core)
+
+`core/table` declares `regular`/`stripes`; `core/separator` declares
+`default`/`wide`/`dots`. Real syntax from published posts:
+
+```html
+<!-- wp:table {"className":"is-style-stripes"} -->
+<figure class="wp-block-table is-style-stripes"><table class="has-fixed-layout"><thead>…</thead><tbody>…</tbody></table></figure>
+<!-- /wp:table -->
+
+<!-- wp:separator {"className":"is-style-wide"} -->
+<hr class="wp-block-separator has-alpha-channel-opacity is-style-wide"/>
+<!-- /wp:separator -->
+```
+
+The spec emits neither style today. Check Ohio's render at 390 px before
+adopting stripes on wide tables.
+
+### Layout and CTA blocks (validator allows them; no spec kind)
+
+`core/group`, `core/columns`, `core/buttons` and `core/button` pass the
+validator allowlist, but no `GutenbergArticleSpec` kind emits them, so a
+generated draft cannot contain them. The only published examples (post 249768,
+authored by hand before Content Factory) mix Ohio palette presets
+(`brand-color`), inline radii and an unregistered class
+(`is-style-fill_content`): **do not copy them as a recipe**. A CTA button or a
+styled group enters Content Factory only through a governed kind with closed
+variants (see the proposal in the skill reference).
+
+## Inventory and Gap vs. Runtime (2026-09-28)
+
+Read-only WP-CLI inventory of `efeoncepro.com` (WordPress 7.1.2, classic theme
+`ohio-child`, no `theme.json`):
+
+- **220 registered blocks** (116 core, 87 Jetpack, 7 Yoast, 5 premium-content,
+  `efeoncepro/glitch-drop`, CF7, ActiveCampaign, HubSpot embed, VideoPress).
+- **Block styles:** only 4 registered in PHP (Jetpack form fields). Core
+  `block.json` styles: button fill/outline, image rounded, quote plain,
+  separator wide/dots, table stripes. Neither Ohio nor
+  `efeonce-editorial-blocks` registers editorial styles.
+- **Patterns:** 18, all core query/navigation or Jetpack forms. Zero editorial
+  patterns and zero user patterns (`wp_block`).
+- **Real usage** (44 published posts): paragraph, list, heading, separator,
+  image, quote dominate; `pullquote` in 15 posts, Yoast TOC in 40,
+  `glitch-drop` 34 times in 6 posts, `details` and FAQ JSON-LD in 1 post.
+  Glitch Flash 251941 used only paragraph, heading, list, TOC, image, table,
+  separator and one drop.
+
+| Class | Blocks / styles |
+| --- | --- |
+| Supported and used | anchored heading, rich-text paragraph, list, table + caption, image + caption/sources, separator, Yoast TOC, `faq`/`details` |
+| Supported, rarely used | `pullquote`, real `quote`, ordered list, `image.linkDestination=media`, YouTube `embed` |
+| Not supported, valuable | `efeoncepro/glitch-drop`, `core/video`, embed caption, table stripes, governed CTA buttons, Glitch post pieces approved in the graphic line §6 (opening, rundown, subscription banner, «El hilo de la semana», closing: they need registered styles or synced patterns in `efeonce-editorial-blocks` first) |
+| Medium value, on demand | `core/columns`, `core/code`, separator wide/dots, image rounded |
+| Not recommended | `core/cover`, `core/media-text`, `core/tabs`/`accordion`, `core/footnotes` (post meta), `yoast/faq-block`, `yoast/how-to-block`, Yoast breadcrumbs/related links in the body, `leadin`/Jetpack/CF7 forms (forms belong to Growth Forms), other Jetpack blocks, `spacer`, unregistered custom classes, inline Ohio palette colors to imitate AXIS |
+
+Detailed counts, reasons and the extension proposal (`kind: 'glitchDrop'`,
+embed/video caption, table style, governed buttons, Glitch sections):
+`.claude/skills/efeonce-public-site-wordpress/references/content-factory-gutenberg.md`.
 
 ## Refresh / Fix Rules
 

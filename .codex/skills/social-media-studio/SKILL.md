@@ -255,6 +255,9 @@ negocio → mecanismo → prueba → aplicación → debate. Ver la investigaci�
 **Glitch** (magazine semanal): su carrusel de LinkedIn y su reel siguen una sub-línea propia → `efeonce-graphic-line`
 `references/glitch.md` (portada A/B/C con rotación semanal, lámina interior y contraportada aprobadas; reel = overlays
 sobre el host, en propuesta). Manzana, verde Glitch, bytes, Guttery y «EDICIÓN #N» nunca en otras piezas de Efeonce.
+Glitch tiene dos formatos: la **edición semanal** (lunes, numerada «Edición #N») y el **Glitch Flash** (una noticia
+puntual, sin número); contrato de cada uno en `efeonce-graphic-line` `references/glitch.md`. Primer caso Flash:
+[bitácora 2026-09-28](../../../docs/operations/social/2026-09-28-glitch-flash-sonnet-55-production-method.md).
 - **Programar y medir**: **Metricool** MCP (`getBestTimeToPostByNetwork`,
   `createScheduledPost`, `getAnalyticsDataByMetrics`, `getBrandSettings`).
 - **Publicar y HubSpot**: atribución/lead capture social → `growth-marketing-cro` +

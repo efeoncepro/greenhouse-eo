@@ -1,9 +1,10 @@
 # Componer una edición de Glitch con `pnpm glitch:compose` — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.0: primera versión, con los catálogos de Glitch de TASK-1923)
+> **Ultima actualizacion:** 2026-09-28 por Claude (v1.1: el Glitch Flash no se compone con este comando; chip «LA NOTICIA».
+> v1.0: primera versión, con los catálogos de Glitch de TASK-1923)
 > **Modulo:** Creative · Glitch, magazine semanal de Efeonce (sub-línea de «La órbita») · piezas estáticas
 > **Ruta en portal:** no aplica — es un taller local: se corre en una máquina con `greenhouse-eo` clonado. La ruta
 > productiva (API, `artifact-worker`, MCP) todavía no existe: es [TASK-1921](../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md)
@@ -34,6 +35,15 @@ Lo que **no** hace:
 - **No anima.** Los overlays son **cuadros fijos**; los `.mov` animados, el sonido y la música salen del repo taller
   ([Producir el motion, el sonido y la música de Glitch](./producir-motion-glitch.md)).
 - **No es la ruta productiva.** Es el taller local. La ruta con API, `artifact-worker`, MCP y capability es TASK-1921.
+- **No compone un Glitch Flash.** El Flash (una noticia puntual, sin número de edición, 2026-09-28) no cabe en el
+  manifiesto, que exige ocho noticias. Hasta que tenga su plantilla, se arma desde las plantillas aprobadas (portada A,
+  interior de la noticia 1, contraportada, banners del blog) con los valores de `glitchLine`; no inventes noticias de
+  relleno para que pase. Qué cambia en el Flash: [norma §14](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#14-glitch-flash--formato-puntual-lanzado-2026-09-28).
+
+> **Chip de la portada (2026-09-28):** en productivo el chip de la portada con foto dice «LA NOTICIA», no «PORTADA».
+> Las plantillas `CoverPhoto`, `BlogBannerPhoto` y `BlogSquarePhoto` todavía pintan «PORTADA»: si publicas una pieza
+> compuesta con ellas antes de que se actualicen, avísale al operador. La muletilla de la contraportada
+> (`back.closingLine`) se escribe para cada edición: nunca copies la de la anterior.
 
 ## Antes de empezar
 

@@ -1,6 +1,10 @@
 # Glitch — sub-línea gráfica (sólo para Glitch)
 
-> Verificado contra: greenhouse-eo@bc6fedc28 — 2026-09-27 · inventario de la sesión «Integrar Glitch en la línea
+> Verificado contra: greenhouse-eo@9b531b396 — 2026-09-28 · **Glitch Flash** (formato puntual sin número de edición;
+> el primero, Claude Sonnet 5.5, se lanzó en producción el 2026-09-28 y el operador lo aprobó en uso real, sin plantilla
+> del Composer ni pieza en AXIS: §14) · chip «LA NOTICIA» en la portada productiva y muletilla de la contraportada que
+> varía por edición (decisiones del operador del 2026-09-28) · **discrepancia de numeración abierta** (§1) · antes:
+> greenhouse-eo@bc6fedc28 — 2026-09-27 · inventario de la sesión «Integrar Glitch en la línea
 > gráfica» (2026-09-27) · decisiones del operador del 2026-09-27 (Delta del ADR: manzana y verde aprobados, línea
 > Growth, próxima edición #17, alta de los 5 glifos aprobada) · motion en el repo taller (2026-09-27, empujado a
 > `main` = `ed89a0b`: 38ac584…c2a08c3, sonido integrado en `2d411b8`, música y pre-roll en `2c8f36c`, entregas
@@ -38,6 +42,8 @@ pieza de la marca.
 - [ ] ¿La pieza es de Glitch (portada, lámina del carrusel, contraportada, banner o bloque del blog, vlog, reel)?
       **Sí** → esta referencia **más** la línea madre (criterio, firma, contraste). **No** → nada de esta referencia.
 - [ ] Efeonce firma Glitch: logo de Efeonce centrado abajo. Glitch es contexto, como un producto (manual §7).
+- [ ] ¿Es la **edición semanal** (sale los lunes, «Edición #N», Top 8) o un **Glitch Flash** (una noticia puntual, sin
+      número de edición)? Flash → además [§14](#14-glitch-flash--formato-puntual-lanzado-2026-09-28-sin-plantilla-todavía).
 
 | Glitch **hereda** de La órbita (no lo redefine) | **Sólo de Glitch** (nunca en una pieza de Efeonce) |
 |---|---|
@@ -46,17 +52,25 @@ pieza de la marca.
 | La anatomía de la lente | El **navy Glitch** `#022a4e` (del wordmark) |
 | Fondo oscuro `#001a33` | La **falla en bytes** |
 | Bricolage Grotesque + Poppins | **Guttery** como voz del narrador |
-| La firma de piezas (logo Efeonce centrado abajo) | La cabecera **«EDICIÓN #N»** |
+| La firma de piezas (logo Efeonce centrado abajo) | La cabecera **«EDICIÓN #N»** (en el Glitch Flash: «NO ESPERA AL LUNES» + estela de bytes + «FLASH», §14) |
 | La regla de contraste del acento | «El micrófono se abre… / se cierra.» y el **Glitch Drop** |
 | Iconografía AXIS (Trazo y Plastilina); territorio sonoro «Puntos suspensivos» | |
 
 ## 1. Identidad editorial (lo que la gráfica sirve)
 
+- **Dos formatos** (decisión del operador, 2026-09-28): la **edición semanal** —sale los lunes, se numera «Edición #N»,
+  Top 8— y el **Glitch Flash**, que «se dispara ante una noticia» puntual (el primero: el lanzamiento de Claude Sonnet
+  5.5) y **no lleva número de edición** porque no es la edición entera. Lo que sigue describe la edición semanal; lo
+  propio del Flash está en §14.
 - Top 8 semanal, pero **manda el POV del narrador**: la noticia es el pretexto. «La noticia pregunta, el narrador
   responde». Le habla a marketers, creativos y apasionados por la IA y la tecnología. El «+ IA» es grande, no menor.
 - Se numera **«Edición #N»**. La próxima es la **#17** (decisión del operador, 2026-09-27): la serie sigue la del blog y
   la del ADR del pipeline. Los «#11»–«#14» de las maquetas del canvas son ejemplos de diseño; nunca los copies como
-  número real.
+  número real. **DISCREPANCIA abierta (registrada el 2026-09-28, sin resolver):** el blog ya publicó «Glitch #16»
+  (2026-07-21, `/glitch/glitch-costo-real-ia-tarea/`) y «Glitch #17» (2026-07-28,
+  `/glitch/glitch-17-modelo-commodity-control-escaso/`, post 251605), así que «la próxima es la #17» no cuadra con la
+  serie del blog. **Pregunta abierta para el operador:** no la resuelvas por tu cuenta ni fijes el número de una
+  edición real hasta que responda.
 - Línea de servicio: **Growth** (decisión del operador, 2026-09-27) → eslogan de la contraportada «Empower your Growth».
 - Motivo: **«El micrófono se abre…»** (narrador de radio); cierra con **«El micrófono se cierra.»**.
 - Fuentes de marca: guía de tono v3 en OneDrive `Alineación/5. Contenidos/09. Glitch/Marca/Glitch-Guia-Tono-Voz-Personalidad-v3.docx`;
@@ -86,8 +100,8 @@ pieza de la marca.
 | Los tres puntos | «El micrófono se abre…»: dos puntos + el tercero se desarma en bytes. En los cierres, el tercero se resuelve en la manzana. Son las tres ventanas de la nave y el territorio sonoro «Puntos suspensivos» |
 | Bricolage Grotesque | contraste de pesos: entrada 300 (wdth 100, 0,72 em) + remate 800 condensado (`font-stretch: 78%; font-variation-settings: 'wdth' 78`); tracking +0,01 em en titulares. Token: `glitchLine.type.headlineEntry` / `headlineClose` / `headlineTracking`; el contrato exige el contraste (`headlineContrast`: entrada ≤ 400, remate ≥ 700 → si no, `headline-weight-contrast-missing`) |
 | Poppins | etiquetas (600, versalitas espaciadas), cuerpo y subtítulos |
-| Guttery | muletillas del narrador («spoiler:», «sin anestesia.», «nos vemos el lunes.», «el #N+1 sale el lunes.»), en el acento, rotada −3/−5°. **Licencia para web y video confirmada por el operador (2026-09-27)**; úsala sólo para las muletillas. Token: `glitchLine.type.narrator` (licencia web + video, rotación −5..−3, instalada en la máquina de render). **AXIS nunca distribuye la fuente** |
-| Cabecera | wordmark (290 px en 1080) a la izquierda + «EDICIÓN» (Poppins 600, 16 px, tracking 0,24 em) sobre «#N» (Bricolage 92 px: «#» 300 blanco, número 800 condensado en el acento), alineados a la derecha, en una fila centrada verticalmente. **Sin línea fina debajo** |
+| Guttery | muletillas del narrador («spoiler:», «sin anestesia.», «nos vemos el lunes.», «el #N+1 sale el lunes.»), en el acento, rotada −3/−5°. **La muletilla de la contraportada varía por edición** (decisión del operador, 2026-09-28): es un gesto conversacional escrito para esa edición, nunca una frase fija. Aprobada en el Flash: «léelo completo / en nuestro blog.» en dos líneas («para que no esté tan pesado»). Rechazadas: «el #N+1 sale el lunes.» en un Flash (no hay número) y «el resto, el lunes» («no se escucha natural»). Prueba: leída en voz alta suena a alguien hablando. **Licencia para web y video confirmada por el operador (2026-09-27)**; úsala sólo para las muletillas. Token: `glitchLine.type.narrator` (licencia web + video, rotación −5..−3, instalada en la máquina de render). **AXIS nunca distribuye la fuente** |
+| Cabecera | wordmark (290 px en 1080) a la izquierda + «EDICIÓN» (Poppins 600, 16 px, tracking 0,24 em) sobre «#N» (Bricolage 92 px: «#» 300 blanco, número 800 condensado en el acento), alineados a la derecha, en una fila centrada verticalmente. **Sin línea fina debajo**. En el Glitch Flash, «NO ESPERA AL LUNES» sobre estela de bytes + «FLASH» (§14) |
 | Secciones | «MARKETING + IA», «CREATIVIDAD + IA», «TECNOLOGÍA + IA»: la IA es el cruce, no una sección aparte |
 | Íconos | AXIS Trazo y **Plastilina** (elección del operador para Glitch). Los cinco glifos Plastilina de Glitch (guardar, compartir, recomendar, comentar y el gesto deslizar) **ya son catálogo**: `PLASTILINA_GLYPHS` de AXIS (decisión D27, 2026-09-27; set 36 Trazo + 48 Plastilina = 84). **En piezas de Glitch van siempre planos** (`glitchLine.icons.actions.rendering: 'flat'`, `volume: 'never'`): fila de la contraportada «SI TE SIRVIÓ» (guardar, compartir, recomendar, comentar) y «deslizar» en portadas y láminas interiores. Operador: «si es para la slide de cierre de glitch, prefiero los iconos plastilina en vectores que en 3d en esa lámina». Pedir volumen en Glitch = `icon-volume-not-applicable` |
 | Firma | logo de Efeonce centrado abajo (negativo sobre oscuro). Eslogan «Empower your Growth» (Glitch es línea Growth) sólo en la contraportada, más chico que el logo, «Growth» en blanco o en el acento |
@@ -98,7 +112,7 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
 
 | Plantilla | Cuándo | Qué lleva |
 |---|---|---|
-| **A · noticia con foto** | hay una foto fuerte | foto en navy arriba que se desarma en bytes; chip «PORTADA»; titular con contraste de pesos cerrado con la manzana; dos líneas de portada «+ IA»; pie con «Desliza» + mano Plastilina y la firma |
+| **A · noticia con foto** | hay una foto fuerte | foto en navy arriba que se desarma en bytes; chip «LA NOTICIA» (decisión del operador, 2026-09-28; ver abajo); titular con contraste de pesos cerrado con la manzana; dos líneas de portada «+ IA»; pie con «Desliza» + mano Plastilina y la firma |
 | **B · tipográfica** | un POV que pega solo, sin foto fuerte | muletilla en Guttery; titular entrada 300 + remate 800 en el acento; manzana en bytes con halo abajo a la derecha; dos líneas «+ IA» |
 | **C · mosaico** | varias noticias del mismo peso | titular que las une; cuatro tarjetas con foto en navy y bytes, sección «+ IA» y POV en Bricolage 400 |
 
@@ -107,6 +121,11 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
 - [ ] La cabecera va **sin** línea fina.
 - [ ] «El micrófono se abre…» **no** va en la portada: abre la noticia 1.
 - [ ] El pie de portada lleva «Desliza» con la mano Plastilina.
+- [ ] **Chip de la portada con foto: «LA NOTICIA», no «PORTADA»** (decisión del operador, 2026-09-28: «PORTADA» sirvió
+      para la prueba; «en una versión productiva hay que sustituir por "La noticia"»). Aplica a toda portada productiva
+      (carrusel, banner 16:9 y 1:1 del blog, Threads). **Deriva conocida:** las plantillas del Composer `CoverPhoto`,
+      `BlogBannerPhoto` y `BlogSquarePhoto` (`catalogs/glitch/*.html`) todavía pintan «PORTADA» fijo; cambiarlas mueve
+      la línea base del gate y se declara en `BASELINE_DELTAS.md`. Hasta entonces, avisa si compones con ellas.
 
 ## 4. Carrusel de LinkedIn (1080×1350)
 
@@ -120,7 +139,7 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
   1,9 px al 28 %, arco de 50° arriba a la izquierda y lejos de la cara, esfera 7,6 px, zoom 1,25, detalle a color y el
   resto en navy). **Sólo** cuando el POV trata de un detalle nítido de la foto; nunca por defecto. **La esfera ya está en
   la lente → esa lámina no cierra con la manzana** (una sola esfera por pieza).
-- **Contraportada — APROBADA:** «El micrófono se cierra» con contraste de pesos; los puntos se resuelven en la manzana;
+- **Contraportada — APROBADA:** muletilla del narrador escrita para la edición (varía, §2); «El micrófono se cierra» con contraste de pesos; los puntos se resuelven en la manzana;
   textura de manzana en bytes; fila Plastilina **plana** «SI TE SIRVIÓ» (guardar, compartir, recomendar, comentar; nunca en volumen); CTA en píldora
   blanca «Suscríbete a [wordmark]»; la misma cabecera; firma Efeonce 300 px + eslogan.
 - Historia 9:16 y carrusel panorámico: exploración anterior, **no canon**.
@@ -200,6 +219,12 @@ aprobada (el vlog embebido ya lo estaba con el motion).
 - Descargar y resubir clips o imágenes de terceros: se embeben o se licencian.
 - Presentar como reales los titulares y noticias de las maquetas: son de ejemplo.
 - Íconos Plastilina en volumen (3D) en una pieza de Glitch: van planos (`glitchLine.icons.actions.rendering: 'flat'`).
+- Número de edición en un **Glitch Flash** («EDICIÓN», «#N», «el #N+1 sale el lunes.»): el Flash no es la edición entera
+  (§14). Tampoco el avance n/8 ni «Desliza» en la portada de Threads.
+- La misma muletilla fija en todas las contraportadas: el gesto del narrador cambia por edición (§2).
+- «PORTADA» como chip en una pieza productiva: va «LA NOTICIA» (2026-09-28).
+- La estela de bytes del Flash en cursiva, con skew o con círculos (la línea prohíbe la cursiva sintética; círculos
+  serían otras esferas: la única es la manzana), ni fuera de Glitch.
 - Copiar a mano un valor de Glitch (HEX, medida, tiempo) a una plantilla, overlay o script: se lee de `glitchLine` o se
   resuelve con `pnpm glitch:resolve`. Tampoco inventes claves que el token no tenga.
 
@@ -225,6 +250,11 @@ aprobada (el vlog embebido ya lo estaba con el motion).
 | Diseño sonoro de Glitch (ronda 6: apertura, tarjeta final, kit, lower third, transiciones) | **APROBADO, versión B** (2026-09-27, §13): «La b me encanta más. Sus sonidos están aprobados». La A queda como alternativa descartada |
 | Composición de las piezas estáticas en el Artifact Composer (carrusel, sueltas del blog, portada del reel, miniatura del vlog, overlays PNG) | **EXISTE** como taller local (TASK-1923, 2026-09-27): 26 plantillas, todas `approval: approved`, en tres catálogos; se compone con `pnpm glitch:compose` (§9.1). La ruta productiva (API, `artifact-worker`, MCP, capability) **no existe**: es TASK-1921 |
 | Música de Glitch: tema B (intro, cortina, salida) y cama post-punk bajo la noticia | **APROBADO** (2026-09-27, §13.7): «Definitivamente la B es la decisión», «Me parecen bien todas», «Post-punk definitivamente». **Integrada al taller** (`music.mjs`, pre-roll animado de la intro elegido por el operador) y **en producción en AXIS** (`#musica`, `glitch.json → music`). Único pendiente: probar la mezcla con la voz real del host |
+
+| **Glitch Flash** (portada, noticia, contraportada, banner 16:9 del blog, banner de noticia 1600×900, portada de Threads) | **LANZADO EN PRODUCCIÓN** el 2026-09-28 (Claude Sonnet 5.5) y **aprobado por el operador en uso real**. **Sin plantilla** en el Composer (`glitch-carousel`/`glitch-stills`) y **sin pieza, token ni contrato** en AXIS (`glitchLine`, `efeonce.glitch-line`): se arma desde las plantillas aprobadas (§14) |
+| Chip «LA NOTICIA» en la portada con foto productiva | **DECIDIDO** (2026-09-28); las plantillas del Composer todavía pintan «PORTADA» (§3) |
+| Muletilla de la contraportada variable por edición | **DECIDIDO** (2026-09-28, §2) |
+| Numeración de la edición semanal (#17 vs. el blog, que ya tiene #16 y #17) | **PREGUNTA ABIERTA** para el operador (2026-09-28, §1) |
 
 Una PROPUESTA no se entrega como canon ni se publica: se muestra al operador para aprobar. Desde el 2026-09-27 no queda
 ninguna pieza estática en PROPUESTA; el estado sigue valiendo para piezas nuevas.
@@ -378,6 +408,10 @@ pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,
       `#e6edf3`/`#9fb3c8`, no en el acento (regla de contraste de la línea madre).
 - [ ] Los bytes salen del borde de la foto y no tocan ningún rostro.
 - [ ] Portada: plantilla distinta a la de la semana anterior; cabecera sin línea fina; sin «El micrófono se abre…».
+- [ ] Portada con foto productiva: chip «LA NOTICIA», nunca «PORTADA» (2026-09-28).
+- [ ] Contraportada: la muletilla está escrita para esta edición (no copiada de la anterior) y suena natural leída en voz
+      alta; en un Flash no promete un número ni «el lunes» forzado.
+- [ ] Si es un **Glitch Flash**: además el QA de §14.5.
 - [ ] Reel: nada en 0–220, desde 1500 ni desde x 940; la cara del host libre; subtítulos presentes.
 - [ ] Firma: logo de Efeonce centrado abajo; sin burbuja URL ni URL como texto.
 - [ ] Foto o clip de la fuente embebido o licenciado, con crédito.
@@ -869,3 +903,94 @@ sección 09 «Música» en `https://axis.efeonce.org/references/glitch/#musica` 
 
 **Único pendiente:** **probar la mezcla con la voz real del host** en una edición real (la demo usa una voz TTS
 provisional). El ducking lo aplica el editor con los valores de arriba.
+
+## 14. Glitch Flash — formato puntual (LANZADO 2026-09-28, sin plantilla todavía)
+
+> **Sólo Glitch.** Decisión del operador del 2026-09-28. **Estado honesto:** el primero (Claude Sonnet 5.5) se produjo y
+> se **lanzó en producción** el 2026-09-28 y el operador lo **aprobó en uso real**; **no** tiene plantilla en el Artifact
+> Composer (`glitch-carousel`/`glitch-stills`) ni pieza, token o contrato en AXIS (`glitchLine`,
+> `efeonce.glitch-line` 0.1.0 no conoce el Flash). Es canon de uso, todavía no canon de sistema: no lo presentes como
+> plantilla ni como token.
+
+### 14.1 Qué es y cuándo se dispara
+
+- Operador: «este es un glitch flash porque no es la edición entera, por tanto en este caso solamente no lleva edición
+  con número, puede ponerse algo como flash en la imagen».
+- **Se dispara ante una noticia puntual** que no espera al lunes (ejemplo: el lanzamiento de un modelo). Una noticia,
+  no un Top 8. **Nunca lleva número de edición** y no consume el número de la serie semanal.
+- La edición semanal sigue igual (lunes, «Edición #N», Top 8); el Flash no la reemplaza, y su nota de suscripción
+  invita al semanal.
+- **Más personalidad** que la edición (pedido del operador), dentro de la misma línea: mismos tokens, misma manzana,
+  misma firma.
+
+### 14.2 Diferencias con la edición semanal (tal como se publicó)
+
+| Elemento | Edición semanal | Glitch Flash |
+|---|---|---|
+| Cabecera derecha | «EDICIÓN» sobre «#N» (# 300 blanco + número 800 condensado en el acento) | «NO ESPERA AL LUNES» (la misma etiqueta Poppins 600 con su tracking) sobre **estela de bytes + «FLASH»** (Bricolage 800 condensado en el acento, del mismo tamaño que el número) |
+| Cabecera compacta (interior) | «EDICIÓN #N» en línea | «NO ESPERA AL LUNES» + estela + «FLASH» en línea |
+| Chip de la portada | «LA NOTICIA» (antes «PORTADA», §3) | «LA NOTICIA» (portada, Threads y banner del blog) |
+| Chip del interior | «NOTICIA n» | «ANUNCIO» (+ medio · fecha); banner interno: «ANUNCIO · Tecnología + IA» |
+| Avance n/8 | 8 segmentos + «n / 8» | **se quita**: queda sólo «DESLIZA» + mano Plastilina a la derecha |
+| «EL MICRÓFONO SE ABRE» | franja de la noticia 1 | se mantiene |
+| Muletilla de la contraportada (Guttery) | escrita para la edición (varía, §2) | «léelo completo / en nuestro blog.» en dos líneas; también varía por Flash |
+| Nota de suscripción | «Cada lunes en tu correo, gratis. El enlace, en el primer comentario.» | igual (invita al semanal) |
+| Firma | logo de Efeonce centrado abajo; contraportada con «Empower your Growth» | igual |
+| Threads | — | la portada **sola, sin «Desliza»** (no es carrusel) |
+
+### 14.3 La estela de bytes
+
+- SVG de **celdas cuadradas** en el acento, 13 columnas × 5 filas, celda 10 y paso 12, con densidad y opacidad que
+  crecen hacia la palabra (0,18 → 1). Va a la **izquierda** de «FLASH» con un espacio de 14 px (cabecera grande); mide
+  ~66 px de ancho en la cabecera compacta y ~96 px en el pie del banner de noticia.
+- **Nunca cursiva ni skew** (la línea prohíbe la cursiva sintética) y **cuadrados, nunca círculos**: una sola esfera
+  por pieza, la manzana.
+- **No es un token:** es un SVG autorado en la sesión con un patrón determinista (semilla 1755). Los números de esta
+  sección son referencia humana de lo publicado; cuando el Flash entre a AXIS, manda el token.
+
+### 14.4 Cómo se arma hoy
+
+- **`pnpm glitch:compose` no lo compone:** el manifiesto `GlitchEditionManifest` es estricto y exige ocho noticias
+  (`news` de largo 8, `src/lib/glitch-composition/manifest.ts`). Hasta que exista su plantilla, el Flash se arma en un
+  canvas **desde las plantillas aprobadas** (portada A, interior de la noticia 1, contraportada, banner A del blog y
+  banner interno 1600×900), con los valores de `glitchLine` (`glitch-tokens.css` generado) y los archivos de
+  `AXIS_GLITCH_ASSETS`. Nunca transcribas un HEX o una medida a mano.
+- **Foto:** `processPhoto` (duotono) + `computeByteFracture` (bytes), funciones canónicas de
+  `src/lib/glitch-composition/`. Una escena oscura se recorta y se le levanta la exposición **antes** de
+  `processPhoto`, o se funde con el fondo navy ([lessons.md](lessons.md), 2026-09-28).
+- **Imágenes de terceros:** con crédito siempre. En el Flash de Sonnet 5.5 el operador decidió publicar las imágenes de
+  Anthropic **con crédito y sin licencia**; es una decisión de esa pieza, en tensión con §7 («se embeben o se
+  licencian»): no la generalices a otros Flash sin preguntar.
+- **Copys:** el operador los revisa **antes** de programar («debo ver los copys antes de publicar»). El copy de la
+  página de Efeonce usa la voz del narrador de Glitch; el LinkedIn personal de Julio busca thought leadership (opinión
+  propia, primera persona, la noticia como pretexto, sin lista de specs).
+- **Publicación** (Metricool, WordPress) queda fuera de esta skill: `social-media-studio` y
+  `efeonce-public-site-wordpress`. Imágenes siempre en PNG.
+
+### 14.5 QA del Flash (además de §10)
+
+- [ ] Ningún número de edición en ninguna lámina ni en el copy de la pieza; la cabecera dice «NO ESPERA AL LUNES» +
+      estela + «FLASH».
+- [ ] Estela de celdas cuadradas, sin cursiva ni skew, a la izquierda de «FLASH».
+- [ ] Chips: «LA NOTICIA» en la portada, «ANUNCIO» en el interior; sin avance n/8.
+- [ ] Contraportada con una muletilla escrita para este Flash, natural leída en voz alta; nunca «el #N+1 sale el
+      lunes.» ni «el resto, el lunes».
+- [ ] Portada de Threads sin «Desliza».
+- [ ] Una sola esfera por pieza (la manzana); crédito en cada foto de terceros.
+
+### 14.6 El hito y dónde se ve
+
+- **Hito (2026-09-28):** el Flash de Claude Sonnet 5.5 es el **primer Glitch producido y lanzado con la nueva línea
+  gráfica**, consistente de punta a punta: **canvas → 4 redes → blog** (LinkedIn de la página de Efeonce, Instagram,
+  Threads y el LinkedIn personal de Julio, programados en Metricool; post en el blog).
+- Canvas de diseño (6 láminas: portada, noticia, contraportada, banner del blog 16:9, banner de noticia 1600×900,
+  Threads): https://claude.ai/artifact/KjHuJNQXkH4vLA7pumUiaz
+- Post del blog (251941): https://efeoncepro.com/glitch/glitch-flash-claude-sonnet-5-5/
+- Medios publicados: `gs://efeonce-group-greenhouse-public-media-prod/campaigns/glitch-flash-sonnet-55-2026-09-28/`.
+
+### 14.7 Pendiente (no lo decidas por tu cuenta)
+
+- Llevar el Flash a **AXIS** (pieza en `glitchLine.pieces`, la estela como token, la cabecera «NO ESPERA AL LUNES» en el
+  contrato) y a **plantillas del Composer** que acepten una sola noticia. Hasta entonces se arma desde las plantillas
+  aprobadas.
+- La **numeración** de la edición semanal (§1): pregunta abierta para el operador.

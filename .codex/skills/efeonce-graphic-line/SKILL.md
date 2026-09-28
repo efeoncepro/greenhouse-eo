@@ -26,7 +26,10 @@ propón agregarlo.
 
 Glitch (el magazine semanal de Efeonce) tiene una **sub-línea complementaria** de La órbita. Si la pieza es de Glitch
 (portada, carrusel, contraportada, blog, vlog o reel), carga [references/glitch.md](references/glitch.md) además de
-esta skill: ahí están lo que hereda, sus valores, el sistema de portada A/B/C aprobado y qué es propuesta. **Nunca** uses
+esta skill: ahí están lo que hereda, sus valores, el sistema de portada A/B/C aprobado y qué es propuesta. Glitch tiene
+**dos formatos** (2026-09-28): la edición semanal («EDICIÓN #N», los lunes) y el **Glitch Flash** (una noticia puntual,
+sin número: «NO ESPERA AL LUNES» + «FLASH»), lanzado en producción pero todavía sin plantilla ni token
+([glitch.md §14](references/glitch.md)). **Nunca** uses
 la manzana, el verde Glitch, la falla en bytes, Guttery ni la cabecera «EDICIÓN #N» en una pieza de Efeonce, y nunca
 dos esferas en una pieza (manzana + lente u órbita).
 
@@ -53,7 +56,7 @@ dos esferas en una pieza (manzana + lente u órbita).
 | Revisar antes de entregar | [references/qa-checklist.md](references/qa-checklist.md) |
 | Qué decidió el operador, qué está pendiente, qué versiones hay | [references/ledger.md](references/ledger.md) |
 | Trampas que ya costaron tiempo | [references/lessons.md](references/lessons.md) |
-| **Una pieza de Glitch** (magazine semanal): portada A/B/C, carrusel, blog, vlog/reel — sub-línea sólo para Glitch | [references/glitch.md](references/glitch.md) |
+| **Una pieza de Glitch** (magazine semanal): portada A/B/C, carrusel, blog, vlog/reel — sub-línea sólo para Glitch; un **Glitch Flash** (noticia puntual, sin número de edición) | [references/glitch.md](references/glitch.md) (Flash: §14) |
 | **Motion de Glitch** (APROBADO 2026-09-27; sólo Glitch): apertura y tarjeta final v2, pre-roll de la intro, kit de overlays, transición de bytes (entre piezas y entre escenas, exclusiva de Glitch) y héroe; se produce con HyperFrames en el taller (`pnpm -C ../efeonce-brand-workshop --filter glitch-motion doctor\|render\|kit\|transiciones\|heroe`), que entrega sonido B y música con cada pieza; nunca se anima a mano | [references/glitch.md §12](references/glitch.md) + norma §13.13 (comandos y argumentos) |
 | **Sonido de Glitch** (APROBADO, versión B, 2026-09-27; sólo Glitch, nunca Efeonce): WAV sidecar por `.mov` del motion, archivos en `glitch/sound/v1/` del bucket de AXIS, motor migrado al taller (`tools/glitch-motion/src/sound.mjs` sobre `tools/brand-sound`, commit `2d411b8`): regenerar = correr el mismo comando de `glitch-motion` | [references/glitch.md §13](references/glitch.md) |
 | **Música de Glitch** (APROBADA 2026-09-27; sólo Glitch): tema B (intro, cortina, salida) y cama post-punk bajo la noticia; másteres por URL + sha256 en `glitch/music/v1/` del bucket de AXIS, nunca regenerados; cama 15 dB bajo la voz con ducking, sin recortar medios y sólo bajo las noticias; integrada al taller (`tools/glitch-motion/src/music.mjs`, pre-roll de la intro, `--music off`) y en producción en AXIS (`#musica`, `glitch.json → music`); único pendiente: la mezcla con la voz real del host | [references/glitch.md §13.7](references/glitch.md) |

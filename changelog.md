@@ -7,6 +7,21 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-28 — Primer Glitch lanzado con la nueva línea: Glitch Flash · Claude Sonnet 5.5
+
+- Glitch tiene dos formatos: edición semanal (lunes, numerada) y **Glitch Flash** (noticia puntual, sin número;
+  cabecera «NO ESPERA AL LUNES» + estela de bytes + «FLASH»; chip «LA NOTICIA»; sin avance n/8; muletilla Guttery
+  variable por edición). Registrado en la skill `efeonce-graphic-line` (glitch.md §14), la norma v1.13 y el ADR.
+- Lanzado de punta a punta: canvas de diseño, LinkedIn página y personal, Instagram y Threads vía Metricool, y post
+  del blog 251941 (`/glitch/glitch-flash-claude-sonnet-5-5/`) con callout `efeoncepro/glitch-drop` y banners propios.
+  Bitácora: `docs/operations/social/2026-09-28-glitch-flash-sonnet-55-production-method.md`.
+- Skills `social-media-studio` y `efeonce-public-site-wordpress` actualizadas (receta de 4 redes, reemplazo en su
+  lugar en Metricool, inventario live de bloques Gutenberg y brecha de Content Factory, receta del Glitch Drop).
+- AXIS: rama local `feat/glitch-flash` (token `glitchLine.editions`, contrato `efeonce.glitch-line` 0.2.0, Lab) con
+  gates verdes; sin push ni release (pendiente de autorización del operador).
+- Abierto: numeración de ediciones (el blog ya publicó «#16» y «#17»), plantillas Flash en el Composer, chip
+  «LA NOTICIA» en las plantillas `CoverPhoto`/`BlogBannerPhoto`/`BlogSquarePhoto`, licencia de imágenes de terceros.
+
 ## 2026-09-28 — Informe live de Efeonce Insights en Think y muestra pública para clientes (TASK-1875)
 
 - `think.efeoncepro.com/insights/r/<token>` está en producción (Think `bbf8522`): el informe compartido de Insights
@@ -654,14 +669,3 @@ operaciones y ruta CMO (AEO público → contexto de campaña → equipo humano-
 Quedaron buyer, piezas, roles por canal, Blueprint/operación y gates de prueba, paid y claims. Los Pilares JTBD de
 Notion siguen separados de capítulos y taxonomía pública; posible nuevo pilar requiere readback y aprobación. Sin
 cambios en Notion, sitio público ni publicación.
-
-## 2026-09-19 — Trendjacking «Nivel de búsqueda» (GTA VI): jerarquía de 5 voces y compositor reutilizable
-
-Carrusel de 9 láminas + pieza suelta para Efeonce, programado en Instagram (22-sep) y LinkedIn (25-sep, documento).
-Método: estudio visual del trend con fuentes antes de dirigir, escenas de realismo ilustrado con GPT Image 2.5
-(Flare/Sunburst) y activos de marca en escena (Nexa, logo 3D, nave, Clawd y Codex), jerarquía tipográfica de 5 voces
-con texto enriquecido por palabra, selección AXIS con cursores fijos y en movimiento, y readback de Metricool por
-firma de imagen. `compositeLuminosity` quedó exportada en `scripts/creative/layout-compiler/compiler.mjs` para
-reutilizar la firma url-lum. Skills `social-media-studio`, `efeonce-advertising-creative`, `copywriting` y
-`greenhouse-ai-image-generator` (espejos) y docs de ejecución social/publicitaria actualizados.
-[Bitácora](docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md).
