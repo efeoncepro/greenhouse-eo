@@ -325,6 +325,9 @@ Grupo Berel):
   Una conclusión competitiva requiere panel branded/unbranded, mobile/desktop y serie temporal.
   La misma lectura aplica a cualquier sector mediante entidades, aliases y dominios; Shopping
   es una señal opcional, no parte obligatoria del modelo.
+  La batería completa —retail, categorías SEO/creativa y research editorial— está en
+  `docs/audits/seo/2026-09-28-dataforseo-cli-production-validation.md`. Conserva su corrección de identidad:
+  una corrida que no declara `efeoncepro.com` como target no prueba cobertura propia.
 
 - **Semrush MCP** — keyword research, organic research, backlink research, site
   audit, trends, overview. Úsalo para _datos reales_ en vez de estimar cuando

@@ -9,6 +9,8 @@ keywords justifican análisis SERP y conservar evidencia reproducible en JSON, C
 El contrato técnico vive en
 [`GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md`](../../architecture/GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md)
 y los pasos de operación en [`dataforseo-cli.md`](../../manual-de-uso/growth/dataforseo-cli.md).
+La batería pagada y sus límites de evidencia están consolidados en la
+[auditoría productiva del 2026-09-28](../../audits/seo/2026-09-28-dataforseo-cli-production-validation.md).
 Las rutas conocidas pero todavía no autorizadas viven en el
 [`registro catalog-only`](../../architecture/GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md).
 
@@ -110,3 +112,8 @@ Cuando existe `--out` o `--csv`, stdout entrega un recibo compacto y conserva el
 La evidencia resultante distingue volumen `missing` de cero, intención estimada del proveedor de intención
 declarada por el operador y ausencia en el bloque orgánico capturado de ausencia total en Google. El checkpoint
 reutilizó discovery y tasks Standard al rematerializar la matriz corregida, sin costo incremental.
+
+La misma auditoría documenta las consultas `agencia seo en chile` y `agencia creativa en chile`. En ambos casos
+el reporte inicial revisó `efeonce.org`, no el dominio canónico `efeoncepro.com`, y la corrida no recibió un target
+propio. Por tanto, esos snapshots sirven para observar la categoría, competidores, local pack, PAA y AI Overview,
+pero no para afirmar presencia o ausencia de Efeonce.

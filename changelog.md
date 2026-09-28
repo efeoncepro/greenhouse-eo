@@ -51,6 +51,11 @@
   (USD 0,002), todos con task `20000`; `serp-compare` reutilizó cada captura para dos entidades y completó el panel
   desktop/mobile por USD 0,0055, manteniendo separados orgánico, mención, enlace, cita y frescura. Commit local;
   sin push, deploy ni cambio de flags.
+- La [auditoría transversal](docs/audits/seo/2026-09-28-dataforseo-cli-production-validation.md) consolida además
+  las pruebas de Falabella, Paris, `agencia seo en chile`, `agencia creativa en chile` y el research productivo de
+  servicios creativos. Registra task IDs, USD 0,25402 conocidos incluyendo reintentos, defectos corregidos y una
+  corrección de evidencia: las corridas de categoría no declararon `efeoncepro.com` como target y no prueban
+  presencia o ausencia propia.
 
 ## 2026-09-28 — Ruta gobernada para producir piezas de marca en la plataforma (TASK-1921) y Grader por mercado (TASK-1863)
 

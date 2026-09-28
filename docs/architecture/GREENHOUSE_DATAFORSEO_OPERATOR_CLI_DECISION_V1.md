@@ -224,6 +224,11 @@ conservadora. El smoke final repitió el panel con desktop `09281157-1987-0139-0
 captura compartida. Aunque el request pidió carga asíncrona, ambos bloques devolvieron
 `asynchronous_ai_overview=false`; la frescura correcta fue `cached_provider_result` en los cuatro registros.
 
+La evidencia completa de Falabella/Paris, las consultas de categoría `agencia seo en chile` y
+`agencia creativa en chile`, y el research editorial de servicios creativos vive en la
+[auditoría productiva de la CLI](../audits/seo/2026-09-28-dataforseo-cli-production-validation.md). Esa auditoría
+también corrige las conclusiones de cobertura que no declararon el dominio canónico como target.
+
 ## Known limitations
 
 - La fuente oficial es documentación HTML/WordPress, no OpenAPI; la validación extraída es parcial.

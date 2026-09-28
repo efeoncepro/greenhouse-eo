@@ -234,6 +234,10 @@ gobierna transporte, catálogo, lifecycle, seguridad y límites.
 
 ### Caso de validación multisuperficie — retail Chile
 
+La evidencia completa, incluidos costos, task IDs, pruebas de categorías de servicios y defectos corregidos, está
+en `docs/audits/seo/2026-09-28-dataforseo-cli-production-validation.md`. Si una corrida no declara el dominio
+canónico en `entities` o `--target`, úsala para leer la categoría, no para afirmar cobertura propia.
+
 El 2026-09-28 se ejecutaron dos SERP Live Advanced independientes para `iphone 18 pro max`, Chile
 (`location_code=2152`), español, desktop, a USD 0,002 cada una. En la primera, Falabella fue orgánico #3
 (`rank_absolute=4`); cinco minutos después fue orgánico #4 (`rank_absolute=6`). Paris no apareció entre los ocho

@@ -8,6 +8,7 @@ entitlement y ledger que los consumers productivos; no es un SDK alternativo. La
 
 Comportamiento funcional: [`dataforseo-research-cli.md`](../../documentation/growth/dataforseo-research-cli.md).
 Contrato técnico: [`GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md`](../../architecture/GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md).
+Evidencia de campo: [validación transversal del 2026-09-28](../../audits/seo/2026-09-28-dataforseo-cli-production-validation.md).
 
 ```bash
 pnpm dataforseo -- help
@@ -156,6 +157,9 @@ Lee la matriz así:
 
 Para una serie temporal, vuelve a ejecutar el mismo panel y conserva artefactos con fecha. La CLI no agenda ni
 repite compras automáticamente. No sobrescribe salidas existentes: `--out` y `--csv` usan creación exclusiva.
+No uses un dominio recordado de una conversación para concluir cobertura propia: declara siempre el dominio
+canónico en `entities` o `--target`. Una corrida sin ese target sigue siendo válida para leer la categoría, pero
+no demuestra presencia ni ausencia de la marca.
 
 Smoke final multidispositivo verificado el 2026-09-28: desktop y mobile se enviaron en dos requests secuenciales,
 ambas tasks terminaron en `20000` y el costo total fue USD 0,0055 frente a una estimación conservadora de USD

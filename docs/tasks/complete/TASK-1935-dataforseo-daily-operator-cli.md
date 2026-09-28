@@ -1,5 +1,13 @@
 # TASK-1935 — CLI diaria y catálogo completo de DataForSEO
 
+## Delta 2026-09-28 — evidencia consolidada de pruebas productivas
+
+La [auditoría transversal de la CLI](../../audits/seo/2026-09-28-dataforseo-cli-production-validation.md)
+consolida task IDs, costos y resultados de Falabella, Paris, `agencia seo en chile`, `agencia creativa en chile`
+y el flujo editorial de servicios creativos. También registra la secuencia defecto → corrección → revalidación y
+corrige dos afirmaciones conversacionales que habían usado `efeonce.org` en vez del dominio canónico
+`efeoncepro.com`; aquellas corridas sin target no prueban cobertura propia.
+
 ## Delta 2026-09-28 — comparación SERP transversal
 
 `serp-compare` agrega paneles reproducibles multi-query y desktop/mobile para cualquier marca o entidad, definida
