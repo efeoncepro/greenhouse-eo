@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-28 — Glitch: pendientes del Flash cerrados (ruta productiva, muletilla, licencia, numeración, Content Factory)
+
+- TASK-1921 (`c43862008`): `planBrandRender` despacha con `planGlitchManifest`; el Flash sale por la ruta productiva
+  (carrusel de 3 láminas + sueltas; nunca overlays) con `BRAND_RENDER_ENABLED`, sin cambio de schema ni worker.
+- Composer (`05e75f0ed`): `video.closingLine` → slot `closingLine` de los overlays CTA; `license.kind: press` sólo en
+  el Flash con aprobación por pieza (`approvers.json`) y `licenseExceptions` en la procedencia; `pnpm glitch:editions`
+  y `glitch:compose --check-published` leen el blog: la próxima semanal es la **#18**. Gate visual sección (q).
+- Content Factory (`c6f076e9f`): `kind: glitchDrop` (serialización idéntica a WordPress), `buttons`, `embed.caption`,
+  `table.style: stripes`; fix del write path con `wp_slash()`.
+- AXIS 0.3.25 (estela por contexto + decisiones resueltas) y motion del Flash en el taller: commits locales, sin
+  publicar.
+
 ## 2026-09-28 — Glitch Flash en AXIS v0.3.24 y en el Artifact Composer
 
 - AXIS tag `v0.3.24` (`5b3056f`): `glitchLine.editions` (semanal | Flash) y contrato `efeonce.glitch-line` 0.2.0
@@ -667,10 +679,3 @@ configuración antes de build y readback de revisiones con tráfico, incluso si 
 discovery distingue configuración ausente y no cuenta requests que no salieron. Cierre: guard y check
 post-deploy corrieron en `ops-worker-deploy` (revisión `ops-worker-00699-6rf`) y el smoke AIO drenado por el
 worker dio 6/6 `succeeded` (EO-GRUN-00055, USD 0,024). TASK-1341 complete.
-
-## 2026-09-19 — Oferta transversal de transformación humano-agente
-
-Se añadió investigación primaria, ficha de servicio y modelo de negocio para pasar de readiness de agentes a
-equipos humano-agente con roles, autonomía, handoffs, adopción, calidad y economics. Las ofertas HubSpot/Salesforce,
-la ruta RevOps & CRM y las skills espejo remiten al método. Estado `Approved for validation`: sin activación runtime,
-precio, margen ni ROI aprobado.
