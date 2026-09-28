@@ -782,10 +782,15 @@ dominio: Greenhouse por ahora (decisión del operador); el módulo nace extracti
 ### 10.1 Qué produce y quién lo pide
 
 Seis catálogos del Artifact Composer: `graphic-line-deck` (`pdf-merged`), `graphic-line-stills` y
-`graphic-line-overlays` (`png-set`), y `glitch-carousel`, `glitch-stills` y `glitch-overlays` (`png-set`). Tres
-familias de pedido: `graphic_line_piece` y `graphic_line_document` (el mismo intent que `pnpm brand:compose`) y
-`glitch_edition` (el mismo manifiesto que `pnpm glitch:compose`). Un pedido produce UN job por catálogo; en Glitch,
-fallar los overlays conserva el carrusel y las portadas.
+`graphic-line-overlays` (`png-set`), y `glitch-carousel` (`pdf-merged`), `glitch-stills` y `glitch-overlays`
+(`png-set`). Tres familias de pedido: `graphic_line_piece` y `graphic_line_document` (el mismo intent que
+`pnpm brand:compose`) y `glitch_edition` (el manifiesto semanal de `pnpm glitch:compose`). Un pedido produce UN job por
+catálogo; en Glitch, fallar los overlays conserva el carrusel y las portadas.
+
+**Glitch Flash (2026-09-28):** el Composer ya compone el segundo formato de Glitch (`GlitchFlashManifest`, seis
+plantillas `Flash*` en `glitch-carousel` y `glitch-stills`, commit `24e4c72ee`), pero `glitch_edition` sigue planeando
+con `planGlitchEdition` (sólo semanal) en `src/lib/brand-surfaces/production/plan.ts`. Hasta que el command despache
+con `planGlitchManifest`, el Flash compone sólo en local; pendiente de TASK-1921.
 
 Único escritor: `requestBrandRender` (`src/lib/brand-surfaces/production/commands.ts`). Lo llaman el lane App
 (`POST /api/platform/app/brand-render/requests`, actor `member`) y el lane ecosystem

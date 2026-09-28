@@ -1,6 +1,7 @@
 # Inventario completo: paquetes, tokens, contratos, funciones, comandos y Lab
 
-> Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 · decisiones del
+> Verificado contra: axis-design-system@a5c21ae — 2026-09-26 · greenhouse-eo@7cb24df17 — 2026-09-26 (versiones vigentes
+> y regla del bump: greenhouse-eo@24e4c72ee, AXIS `v0.3.24`, 2026-09-28) · decisiones del
 > operador D1–D15 del 2026-09-26 registradas y **publicadas** (tag `v0.3.5`, axis@5a87d7a): tokens y contratos 0.3.5,
 > contrato de la órbita 0.3.1, registry y brand-assets 0.3.1, paquete 0.3.2. Nombres y valores verificados contra
 > `tokens.ts` y `graphic-line.ts`. `orbit.sphereRing` lleva `reservedFor: 'live'`; el paquete expone `live` en
@@ -33,6 +34,12 @@
 > `document.ts`, `types.ts`, `scripts/brand-surfaces/compose.ts`, `graphic-line-shared/{resolvers,rendered-audit}.ts`,
 > `graphic-line-deck/{index.ts,registry.json,recipe-map.json}` (50 plantillas, 69 recetas).
 > **Manda sobre las versiones que esta referencia cite más abajo para la composición por superficie.**
+>
+> **Versiones vigentes al 2026-09-28 (noche), leídas de `package.json` y de `node_modules`:** `axis-tokens` **0.3.24**
+> y `axis-ui-contracts` **0.3.22** (tag `v0.3.24`, AXIS `5b3056f`: el Glitch Flash; antes TASK-1934 subió a 0.3.23 /
+> 0.3.21), `axis-graphic-line` 0.7.0, `axis-brand-assets` 0.3.5, `axis-ui-registry` 0.3.1; fijadas en `53002b352`. El
+> contrato `efeonce.surface-composition` no cambió (0.1.2); el de Glitch pasó a `efeonce.glitch-line` 0.2.0 (su
+> inventario vive en [glitch.md](glitch.md) §9, no aquí). **Manda sobre las otras versiones de este encabezado.**
 
 Índice: [1 Paquetes](#1-paquetes-versiones-e-instalación) · [2 Tokens](#2-tokens-efeoncegraphicline) ·
 [3 Contrato de la órbita](#3-contrato-efeoncegraphic-line-orbit) · [4 Selección colaborativa](#4-contrato-efeoncecollaboration-selection) ·
@@ -53,11 +60,14 @@ separado.
 > `efeonce.surface-composition` 0.1.1; `efeonceGraphicLine.surfaces` desde 0.3.7). **Greenhouse fija todo eso**
 > (tokens 0.3.8, contracts 0.3.7, registry 0.3.1; commits `8d817f29e` y `016d0a183`), con axis-graphic-line 0.6.0
 > (dependencia directa) y axis-brand-assets 0.3.4. **Eso es la foto de TASK-1919.** Tras TASK-1927, TASK-1922 y
-> TASK-1928, lo vigente en Greenhouse es `axis-tokens` **0.3.21**, `axis-ui-contracts` **0.3.19** (tag `v0.3.21`,
-> 2026-09-28; contrato `efeonce.surface-composition` **0.1.2** con los deltas (f)…(l) del ADR), `axis-graphic-line` **0.7.0** y
-> `axis-brand-assets` **0.3.5**. Releases de TASK-1927 (`v0.3.11`, `v0.3.13`, `v0.3.14`) y de TASK-1928 (`v0.3.15` a
-> `v0.3.21`), fila por fila, en [ledger.md](ledger.md). Después de subir AXIS: `pnpm brand:tokens` (y
-> `pnpm glitch:tokens`).
+> TASK-1928, Greenhouse fijó `axis-tokens` 0.3.21 y `axis-ui-contracts` 0.3.19 (tag `v0.3.21`, 2026-09-28; contrato
+> `efeonce.surface-composition` **0.1.2** con los deltas (f)…(l) del ADR); después TASK-1934 (`v0.3.22`, `v0.3.23`) y el
+> Glitch Flash (`v0.3.24`): **lo vigente es `axis-tokens` 0.3.24 y `axis-ui-contracts` 0.3.22**, con
+> `axis-graphic-line` **0.7.0** y `axis-brand-assets` **0.3.5**. Releases de TASK-1927 (`v0.3.11`, `v0.3.13`,
+> `v0.3.14`), de TASK-1928 (`v0.3.15` a `v0.3.21`), de TASK-1934 y del Flash, fila por fila, en [ledger.md](ledger.md).
+> **Después de subir AXIS: `pnpm brand:tokens` y `pnpm glitch:tokens`, los dos, y los dos con `--check`, antes del
+> commit** (aunque el release sea sólo de una línea: los generados llevan el sello de versión; el CI de `53002b352`
+> falló por regenerar sólo los de Glitch, [lessons.md](lessons.md) 2026-09-28).
 
 | Paquete | Versión en `main` de AXIS | Último tag de release | Fija Greenhouse (`package.json`) | Qué trae para la línea |
 |---|---|---|---|---|
@@ -823,6 +833,7 @@ Ejemplos de intent en `docs/examples/graphic-line/` (`post-lens`, `deck-progress
 | `node scripts/creative/brand-motion/encode-orbit-motion.mjs --frames <dir> --sound <dir> --out <dir> [--only …]` | MP4 60/30 fps, GIF, ProRes 4444, WebM, HEVC, PNG por capas |
 | `pnpm brand:compose -- --intent <intent.json> [--out <dir>] [--artifact-id <id>]` (`scripts/brand-surfaces/compose.ts`, TASK-1919) | compone una receta **aprobada** por superficie en el Artifact Composer: exige receta aprobada → `resolveSurfaceComposition` (con `issues`, no compone) → builder de la receta → plan + assets (plate de `photo.plateRef` recortado, íconos `resolveIcon`, capas SVG de `paintGraphicLine`) → PDF (deck) o PNG (resto; capas de video con alfa). Salida por defecto `.captures/brand-surfaces/<id>/` más `<id>.surface-manifest.json`. Errores (`SurfacePieceError.code`): `recipe-not-approved`, `recipe-outside-composer` (`audiovisual.close-reveal`), `surface-issues` (lista los issues de AXIS), `recipe-without-template`, `missing-photo`, `invalid-intent`. Ejemplos por receta: `src/lib/brand-surfaces/examples/*-intent.json` |
 | `pnpm brand:tokens [--check]` (`scripts/brand-surfaces/compile-tokens.ts`) | compila `efeonceGraphicLine` a `graphic-line-tokens.{json,css}` de cada catálogo `graphic-line-*` y copia byte a byte los archivos de marca desde `axis-brand-assets`; `--check` falla si lo commiteado no coincide con la versión instalada |
+| `pnpm glitch:tokens [--check]` (`scripts/glitch/compile-tokens.ts`; sólo Glitch) | compila `glitchLine` a `catalogs/glitch/glitch-tokens.{css,json}` (desde 0.3.24 con `editions`), escribe la estela del Flash `assets/flash-trail.svg` y las variables `--gx-flash-trail-*`; `--check` falla si hay drift. **Se corre junto a `pnpm brand:tokens` en todo bump de `axis-tokens`** (detalle en [glitch.md](glitch.md) §9.1) |
 | `pnpm composer:visual-gate --catalog=graphic-line [--selftest\|--freeze]` | gate visual a 0 px de los 66 frames (desde TASK-1928; 32 tras TASK-1927) de los catálogos de La órbita (runbook `docs/operations/runbooks/composer-visual-gate.md`; altas declaradas en `BASELINE_DELTAS.md`: (b)–(e) de TASK-1927, (f) y (h)…(n) de TASK-1928; la (g) es Glitch; estas letras no son las del ADR de AXIS) |
 | `pnpm brand:deck-recipes [-- --check]` | reescribe (o verifica) el índice del README del catálogo de recetas del deck, con la columna «Plantilla» leída de `graphic-line-deck/registry.json`, **y** el catálogo de runtime `src/lib/brand-surfaces/deck-recipes/catalog.generated.json` (TASK-1929; recetas + intents de ejemplo de `recipe-map.json`). Córrelo siempre tras editar `EFEONCE_DECK_SLIDE_RECIPES_V1.json`: `--check` falla si el README **o** el catálogo difieren, y el test `catalog-drift` lo corre en CI |
 | `pnpm brand:deck-plan -- --plan <plan.json>` · `-- --propose --context <context.json> [--out <plan.json>]` (`scripts/brand-surfaces/deck-plan.ts`, TASK-1929) | valida el plan de un deck (ids de receta en orden) con `validateDeckPlan` (exit 1 si hay error, 2 si no se lee la entrada) o pide al agente que lo proponga (`proposeDeckPlan`, `server-only`: sólo ids del enum del documento, un reintento, fail-closed; imprime tokens y costo estimado). Local: `ANTHROPIC_API_KEY_SECRET_REF=greenhouse-anthropic-api-key` y `GCP_PROJECT=efeonce-group` con ADC si `.env.local` no las trae. Códigos y arreglos: skill `deck-studio` §«Plan del deck» |

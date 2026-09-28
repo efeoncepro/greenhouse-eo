@@ -13,7 +13,7 @@ Layering canónico del ecosistema digital (SSOT: `docs/public-site/decisions/PDR
 | **Think** — producto/hub editorial multi-runtime | demand-gen + nurturing top-of-funnel | Agrupa Marketing con Manzanitas, Glitch, tools y lead magnets. No equivale al host `think.efeoncepro.com`; placement de Pillars por PDR-018 |
 | **`think.efeoncepro.com`** — runtime Astro especializado | tools, reportes y experiencias enfocadas | Repo/Vercel `efeonce-think`; no es el destino automático de artículos o Pillars |
 | **Marketing con Manzanitas** — blog | thought leadership / autoridad / demanda | **Multiformato** (PDR-020 §4.2): pillars y clusters, **casos de éxito completos (canonical)**, tools/graders, webinars, ebooks, data studies y archivo Glitch. Formato ≠ categoría |
-| **Glitch** — newsletter semanal (IA / Marketing / Negocios) | audiencia propia / nurturing | Canal owned de mayor ROI; consume átomos del pillar y genera piezas |
+| **Glitch** — newsletter semanal (IA / Marketing / Negocios) + **Glitch Flash** (una noticia puntual, sin número, desde 2026-09-28) | audiencia propia / nurturing | Canal owned de mayor ROI; consume átomos del pillar y genera piezas. El Flash no reemplaza ni numera la semanal: formato y piezas en `efeonce-graphic-line` → `references/glitch.md` §14 |
 | **Tools / lead magnets** (AI Visibility Grader, ebooks, webinars) | demand-capture / captura | Contenido gated que convierte audiencia en lead |
 | **efeoncepro.com** (WordPress/Kinsta, recalibración a Astro) | demand-capture + conversión | Landings de servicio, comparison tables, páginas de conversión |
 | **Experiencia** (cliente sky / cockpit Greenhouse) | post-venta | Contenido de enablement/retención cuando aplique |

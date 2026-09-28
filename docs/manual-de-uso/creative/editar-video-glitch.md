@@ -1,9 +1,10 @@
 # Editar el video de Glitch con los gráficos animados — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (v1.7: el **reel abre directo con la apertura, sin pre-roll**, y
+> **Ultima actualizacion:** 2026-09-28 por Claude (v1.8: la frase del `cta` («el #N sale el lunes.») queda como
+> pendiente: la muletilla del narrador ahora cambia por edición y el Glitch Flash no lleva número. v1.7: el **reel abre directo con la apertura, sin pre-roll**, y
 > `glitch-intro-reel.wav` dura 4,0 s; el pre-roll queda sólo en el vlog; el del reel pasó a `v2/descartado/`. v1.6: mapa de la edición completa en la línea de tiempo; el sonido
 > se toma de los WAV que vienen junto a cada `.mov` y `sonido-propuesta/` queda como histórico; el pre-roll entra en la
 > sección 1; el método del ducking en Premiere queda a validar en la prueba de los editores; puntero al manual de
@@ -161,7 +162,7 @@ Cada archivo del kit es un **cuadro completo con fondo transparente** y el gráf
 | `noticia-1`, `noticia-2`, `noticia-3` | 5 s | tarjeta de la noticia: sección, titular y medio. Al presentar cada noticia |
 | `fuente-1`, `fuente-2`, `fuente-3` | 5 s | plano dividido con la foto de la noticia y su crédito. **Sólo si la noticia trae imagen** |
 | `drop` | 4 s (4,5 s con la versión en bytes) | «GLITCH DROP»: la opinión del host sobre la noticia. En el vlog es pantalla completa |
-| `cta` | 4 s | «el #18 sale el lunes.» y el botón, antes de la tarjeta final |
+| `cta` | 4 s | «el #18 sale el lunes.» y el botón, antes de la tarjeta final. **Pendiente (2026-09-28):** esta frase es fija en el kit y choca con la muletilla que ahora cambia por edición; en un Glitch Flash no aplica (no lleva número). No la edites en el `.mov`: lo decide el operador y se corrige en el taller |
 
 **Plano dividido (`fuente-N`):** la foto de la noticia ocupa una parte del cuadro, así que **reencuadra la toma del
 host** para que su cara quede libre:

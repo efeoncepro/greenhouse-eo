@@ -298,7 +298,8 @@ de https://axis.efeonce.org/references/graphic-line.
 - **Sonido — identidad sonora recomendada (2026-09-26, no canon):** «Tres puntos que se vuelven uno» (Mi Mi Mi → La;
   la esfera = la nota-respuesta con el único golpe; el acento de la línea es su timbre). Re-sonoriza reveal, apertura y
   sting sin tocar la imagen; los masters V1.1 siguen con el sonido de `orbit-sound.mjs` hasta canonizar. Vive en AXIS
-  `/references/sonic-brand/` (PR #4) y en el bucket `sonic/v1/`; Glitch pendiente. Detalle en
+  `/references/sonic-brand/` (PR #4) y en el bucket `sonic/v1/`. Glitch no usa esta identidad: tiene su diseño sonoro
+  propio, aprobado (versión B, 2026-09-27; `audio-studio` → overlay §Glitch). Detalle en
   [`EFEONCE_SONIC_IDENTITY_V1.md`](../../../../docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md) y en la skill
   `audio-studio` (`efeonce/EFEONCE_OVERLAY.md`).
 

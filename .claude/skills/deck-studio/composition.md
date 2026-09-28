@@ -118,7 +118,7 @@ plantilla» (abajo); campos del intent, qué falla y por qué: [SKILL.md](SKILL.
   las siete plantillas SEO/AEO y el re-congelado de `ProposalCinematic` se congelaron el 2026-09-28 tras la aprobación
   visual del operador, en `c652f4f83`; altas y cambios
   declarados en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`: 2026-09-27 (b)–(e) de TASK-1927,
-  (f) y (h)…(m) de TASK-1928 —la (g) es Glitch— 2026-09-28 (n), el re-promovido de `CoverBrochure`, y (o), las nueve SEO/AEO de TASK-1934; ojo: esas letras
+  (f) y (h)…(m) de TASK-1928 —la (g) y la (p), el Glitch Flash, son Glitch— 2026-09-28 (n), el re-promovido de `CoverBrochure`, y (o), las nueve SEO/AEO de TASK-1934; ojo: esas letras
   no son las de los deltas del ADR de AXIS; runbook `docs/operations/runbooks/composer-visual-gate.md`). El probe del
   gate **rellena todo slot no fijo** y una auditoría renderizada aborta si hay acento en texto < 24 px o respuesta < 3×
   la pregunta (`graphic-line-shared/rendered-audit.ts`; las siete SEO/AEO están en `ANSWER_RATIO_CONTENT_TYPES`).

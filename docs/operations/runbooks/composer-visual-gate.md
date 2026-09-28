@@ -171,9 +171,12 @@ pnpm composer:visual-gate --catalog=glitch --freeze
 pnpm composer:visual-gate --catalog=glitch
 ```
 
-- **Qué cubre:** `templates-glitch/**`, **26 frames a 0 px** al congelar (2026-09-27, `BASELINE_DELTAS.md` entrada
-  (g)): las 7 láminas del carrusel, los banners del blog 16:9 y 1:1, el banner de noticia, la portada del reel, la
-  miniatura del vlog y los 10 overlays del reel y del vlog.
+- **Qué cubre:** `templates-glitch/**`, **32 frames a 0 px** (una por plantilla de `registry.json`). El scope entró con
+  26 (2026-09-27, `BASELINE_DELTAS.md` entrada (g)): las 7 láminas del carrusel semanal, los banners del blog 16:9 y
+  1:1, el banner de noticia, la portada del reel, la miniatura del vlog y los 10 overlays del reel y del vlog. El
+  2026-09-28, entrada **(p)**, sumó las 6 plantillas del **Glitch Flash** (`FlashCover`, `FlashInterior`,
+  `FlashBackCover`, `FlashBlogBanner`, `FlashNewsBanner`, `FlashThreads`) y re-promovió `CoverPhoto`,
+  `BlogBannerPhoto` y `BlogSquarePhoto` por el chip «LA NOTICIA» (antes «PORTADA»).
 - **El probe no usa fotos reales:** cada hueco recibe `asset-ref:photo:probe`, un SVG sintético
   (`GLITCH_PROBE_ASSETS` en `scripts/artifact-composer/visual-gate.ts`); la falla en bytes del probe es el `example` del
   slot `bytes` (vacía). La geometría de la falla la prueban los tests de `src/lib/glitch-composition/` y las fotos

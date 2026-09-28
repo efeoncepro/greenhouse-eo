@@ -655,8 +655,10 @@ La jerarquía también vive dentro de la línea. El compositor de referencia exp
   evidencia). Si no existe en la máquina, esa capa se omite; no se sustituye por otra familia.
 - Cobertura verificada 2026-09-19: `¿ ¡`, tildes y `ñ` (`¿apostamos?`, `¡a la orden!`, `¿hola?`).
 - Una por pieza, ≤ 3 palabras, rotación leve; **blanco sobre fondos cálidos** (el naranja se pierde en el atardecer).
-- **Glitch:** ahí Guttery es la voz del narrador (muletillas en el verde de Glitch, rotada −3/−5°; licencia para video y
-  web a confirmar) y sólo ahí. Toda pieza de Glitch con texto carga `efeonce-graphic-line` → `references/glitch.md`.
+- **Glitch:** ahí Guttery es la voz del narrador (muletillas en el verde de Glitch, rotada −3/−5°; licenciada para web
+  y video, confirmado por el operador el 2026-09-27) y sólo ahí. La muletilla varía por edición y el Glitch Flash (una
+  noticia, sin número) tiene su propia cabecera y cierre (§14). Toda pieza de Glitch con texto carga
+  `efeonce-graphic-line` → `references/glitch.md`.
 
 ## Reglas duras
 

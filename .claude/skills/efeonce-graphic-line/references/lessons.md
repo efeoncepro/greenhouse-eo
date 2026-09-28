@@ -1,6 +1,7 @@
 # Lecciones (trampas que ya costaron tiempo)
 
-> Verificado contra: greenhouse-eo@9b531b396 — 2026-09-28 (última entrada: el Glitch Flash de Claude Sonnet 5.5).
+> Verificado contra: greenhouse-eo@24e4c72ee (local, sin push) — 2026-09-28 (últimas entradas: el CI roto por el bump
+> de AXIS 0.3.24 y los gates de AXIS bloqueados por el clasificador; antes, el Glitch Flash de Claude Sonnet 5.5).
 
 > Cada entrada: fecha, síntoma, causa y la regla que la evita. Es la parte más valiosa de la skill: se agrega en el
 > momento, no al cierre.
@@ -289,6 +290,19 @@
 - **El Flash no cabía en `pnpm glitch:compose`.** El manifiesto semanal exige ocho noticias (`news` de largo 8). Regla:
   no inventes siete noticias de relleno ni fuerces el manifiesto semanal. Resuelto el 2026-09-28: el Flash tiene su
   propio manifiesto (`edition.kind: "flash"`) y sus plantillas `Flash*` ([glitch.md](glitch.md) §14.4).
+- **Un bump de `axis-tokens` rompió el CI aunque `pnpm glitch:tokens` estaba al día.** Síntoma: el CI de `53002b352`
+  (Greenhouse fija `axis-tokens` 0.3.24) falló en `scripts/brand-surfaces/__tests__/graphic-line-tokens-sync.test.ts`
+  (4 tests). Causa: los tokens generados de «La órbita» del Composer
+  (`graphic-line-{deck,stills,overlays}/graphic-line-tokens.css` y `graphic-line-shared/graphic-line-tokens.json`)
+  llevan el sello de la versión de `axis-tokens`; sólo se había regenerado lo de Glitch. Los valores eran idénticos: el
+  único cambio fue el sello. Arreglo: `609353e83` con `pnpm brand:tokens`. Regla: **todo bump de
+  `@efeoncepro/axis-tokens` en Greenhouse corre `pnpm brand:tokens` Y `pnpm glitch:tokens`, y los dos con `--check`,
+  antes del commit**, aunque el cambio de AXIS sea sólo de Glitch o sólo de La órbita.
+- **El clasificador de permisos bloqueó los gates de AXIS.** Síntoma: los comandos de verificación de AXIS no corrían
+  desde la sesión de Greenhouse. Causa: comando compuesto con `cd` al repo hermano y logs en `/tmp`. El operador
+  configuró los permisos vía Codex, que ejecutó el release `v0.3.24`. Regla: en el repo hermano, comandos sueltos con
+  `pnpm -C <repo>` / `git -C <repo>`, sin `cd` encadenado ni redirecciones a `/tmp`; y pedir la autorización de la
+  mutación externa (push, release) al empezar, no al final.
 
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 

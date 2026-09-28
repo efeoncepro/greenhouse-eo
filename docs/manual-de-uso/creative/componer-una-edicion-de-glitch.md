@@ -1,15 +1,18 @@
 # Componer una edición de Glitch con `pnpm glitch:compose` — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (v1.2: **el Glitch Flash ya se compone** con este mismo comando
+> **Ultima actualizacion:** 2026-09-28 por Claude (v1.3: la ruta productiva sólo conoce la edición semanal; problema
+> común tras subir AXIS —regenerar `pnpm glitch:tokens` y `pnpm brand:tokens`—; pendiente de la última frase fija de los
+> overlays. v1.2: **el Glitch Flash ya se compone** con este mismo comando
 > —manifiesto con `edition.kind: "flash"`, seis plantillas `Flash*`, ejemplo `flash-sonnet-5-5.example.json`— y las
 > portadas con foto pintan «LA NOTICIA». v1.1: el Flash todavía no se componía; chip «LA NOTICIA» decidido.
 > v1.0: primera versión, con los catálogos de Glitch de TASK-1923)
 > **Modulo:** Creative · Glitch, magazine semanal de Efeonce (sub-línea de «La órbita») · piezas estáticas
 > **Ruta en portal:** no aplica — es un taller local: se corre en una máquina con `greenhouse-eo` clonado. La ruta
-> productiva (API, `artifact-worker`, MCP) todavía no existe: es [TASK-1921](../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md)
+> productiva (API, `artifact-worker`, MCP) todavía no está disponible: es [TASK-1921](../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md),
+> y cuando lo esté sólo conocerá la edición semanal (el Glitch Flash se compone sólo aquí, en local)
 > **Documentacion relacionada:** [Componer piezas de Glitch](./componer-piezas-glitch.md) (el criterio de cada pieza) · [Documentación funcional](../../documentation/creative/linea-grafica-glitch.md) · [Norma de la sub-línea, §9.1](../../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#91-qué-ya-se-compone-en-el-artifact-composer-task-1923) · [TASK-1923](../../tasks/complete/TASK-1923-glitch-artifact-composer-catalogs.md) · [Producir el motion, el sonido y la música de Glitch](./producir-motion-glitch.md)
 
 > **⚠️ Este comando es SÓLO para Glitch.** No compone piezas de Efeonce ni de clientes. Para cualquier otra pieza de
@@ -294,6 +297,8 @@ carrusel no cumple los límites de LinkedIn, el PDF final no se escribe (los PNG
 | Queda fuera del cuadro una parte importante de la foto | el recorte de cada hueco es **centrado**, no «inteligente» | recorta o reencuadra la foto antes, para que lo importante quede cerca del centro |
 | La lente amplía otra zona | la región de la lente se mide sobre la foto original, no sobre la lámina | vuelve a medir `lens.region` sobre la foto original |
 | No aparece `sueltas/` u `overlays/` | no pediste piezas sueltas o overlays, o `--only` las dejó fuera | agrega valores en `outputs` o revisa `--only` |
+| Tras subir la versión de AXIS, falla un test de tokens o el CI (`graphic-line-tokens-sync.test.ts`, drift de `glitch-tokens.css`) | los archivos generados llevan el sello de la versión de `@efeoncepro/axis-tokens`; se regeneró sólo uno de los dos juegos | corre `pnpm glitch:tokens` **y** `pnpm brand:tokens`, y los dos con `--check`, antes del commit (así falló el CI de `53002b352` el 2026-09-28) |
+| El overlay `cta` dice «el #N sale el lunes.» aunque la contraportada tenga otra muletilla | la última frase de `overlay-cta-reel` / `overlay-cta-vlog` es fija (pendiente del operador) | no la edites en la plantilla ni en la salida; avisa al operador |
 
 ## Referencias técnicas
 

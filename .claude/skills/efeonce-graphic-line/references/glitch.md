@@ -1,8 +1,10 @@
 # Glitch — sub-línea gráfica (sólo para Glitch)
 
-> Verificado contra: greenhouse-eo@53002b352 — 2026-09-28 · **el Glitch Flash compone** con `pnpm glitch:compose`
-> (manifiesto `edition.kind: "flash"`, seis plantillas `Flash*`, estela generada desde el token; AXIS `axis-tokens`
-> 0.3.24 + contrato `efeonce.glitch-line` 0.2.0: §9.1 y §14) y las portadas con foto del Composer pintan «LA NOTICIA» ·
+> Verificado contra: greenhouse-eo@24e4c72ee (local, sin push; `origin/develop` = `53002b352`) — 2026-09-28 · **el
+> Glitch Flash compone** con `pnpm glitch:compose` (manifiesto `edition.kind: "flash"`, seis plantillas `Flash*`, estela
+> generada desde el token; AXIS tag `v0.3.24` = `axis-tokens` 0.3.24 + `axis-ui-contracts` 0.3.22 con el contrato
+> `efeonce.glitch-line` 0.2.0, fijados en Greenhouse por `53002b352`: §9, §9.1 y §14) y las portadas con foto del
+> Composer pintan «LA NOTICIA» · barrido de consistencia (versiones de AXIS, 32 plantillas, pendientes reales del Flash) ·
 > antes: greenhouse-eo@9b531b396 — 2026-09-28 · **Glitch Flash** (formato puntual sin número de edición;
 > el primero, Claude Sonnet 5.5, se lanzó en producción el 2026-09-28 y el operador lo aprobó en uso real: §14) · chip «LA NOTICIA» en la portada productiva y muletilla de la contraportada que
 > varía por edición (decisiones del operador del 2026-09-28) · **discrepancia de numeración abierta** (§1) · antes:
@@ -23,13 +25,16 @@
 > + ADR [`GLITCH_GRAPHIC_LINE_DECISION_V1.md`](../../../../docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md)
 > (ambos redactados el 2026-09-27). Si esta referencia y la norma no coinciden, manda la norma y se corrige aquí.
 >
-> **AXIS (publicado 2026-09-27, tag `v0.3.12`, commit `29a40b5`; TASK-1922):** página
-> `https://axis.efeonce.org/references/glitch/`, gemelo para agentes `https://axis.efeonce.org/references/glitch.json`
-> (ahora con `tokens`, `contract` y `assets`; schema `axis.glitch-line.v1`) y guía `docs/agent-composition/glitch.md`
-> del repo `efeoncepro/axis-design-system`. **La fuente de verdad de los valores es el token `glitchLine`**
-> (`@efeoncepro/axis-tokens` 0.3.12, export de primer nivel, tipo `GlitchLine`, `status: candidate`), el **contrato
-> `efeonce.glitch-line` 0.1.0** (`@efeoncepro/axis-ui-contracts` 0.3.10) y los **assets `AXIS_GLITCH_ASSETS`**
-> (`@efeoncepro/axis-brand-assets` 0.3.5). Greenhouse `develop` fija exactamente esas versiones desde `4dfb147f7`.
+> **AXIS (publicado 2026-09-27, tag `v0.3.12`, commit `29a40b5`; TASK-1922; el Glitch Flash, tag `v0.3.24`, commit
+> `5b3056f`, 2026-09-28):** página `https://axis.efeonce.org/references/glitch/` (con la sección «El Glitch Flash»,
+> `#flash`), gemelo para agentes `https://axis.efeonce.org/references/glitch.json` (con `tokens` —incluido
+> `editions`—, `contract` y `assets`; schema `axis.glitch-line.v1`) y guía `docs/agent-composition/glitch.md` del repo
+> `efeoncepro/axis-design-system`. **La fuente de verdad de los valores es el token `glitchLine`**
+> (`@efeoncepro/axis-tokens`, export de primer nivel, tipo `GlitchLine`, `status: candidate`; desde 0.3.24 con
+> `editions` y las piezas `flash-*`), el **contrato `efeonce.glitch-line`** (`@efeoncepro/axis-ui-contracts`; 0.2.0
+> desde 0.3.22, acepta intents 0.1.0) y los **assets `AXIS_GLITCH_ASSETS`** (`@efeoncepro/axis-brand-assets` 0.3.5).
+> Greenhouse `develop` fija `axis-tokens` **0.3.24**, `axis-ui-contracts` **0.3.22** y `axis-brand-assets` 0.3.5 desde
+> `53002b352` (antes, 0.3.12 / 0.3.10 desde `4dfb147f7`).
 > Los números de esta referencia son **referencia humana**: si difieren del token, manda el token. **Nunca copies
 > valores a mano** en una plantilla, overlay o script: léelos de `glitchLine` o resuelve la pieza con
 > `pnpm glitch:resolve -- --input <intent.json> --out <manifest.json>` (repo AXIS; intent → manifiesto
@@ -125,9 +130,10 @@ Fijo cada semana: cabecera, falla en bytes, firma. Variable: plantilla, foto, ti
 - [ ] El pie de portada lleva «Desliza» con la mano Plastilina.
 - [ ] **Chip de la portada con foto: «LA NOTICIA», no «PORTADA»** (decisión del operador, 2026-09-28: «PORTADA» sirvió
       para la prueba; «en una versión productiva hay que sustituir por "La noticia"»). Aplica a toda portada productiva
-      (carrusel, banner 16:9 y 1:1 del blog, Threads). **Deriva conocida:** las plantillas del Composer `CoverPhoto`,
-      `BlogBannerPhoto` y `BlogSquarePhoto` (`catalogs/glitch/*.html`) todavía pintan «PORTADA» fijo; cambiarlas mueve
-      la línea base del gate y se declara en `BASELINE_DELTAS.md`. Hasta entonces, avisa si compones con ellas.
+      (carrusel, banner 16:9 y 1:1 del blog, Threads). Las plantillas del Composer `CoverPhoto`, `BlogBannerPhoto` y
+      `BlogSquarePhoto` ya lo pintan (`24e4c72ee`, sección (p) de `BASELINE_DELTAS.md`), igual que las del Flash. En
+      AXIS el chip de la portada semanal sigue en `glitchLine.pendingDecisions` (`weekly-cover-chip`); el del Flash sí
+      es token (`editions.flash.chips.cover`).
 
 ## 4. Carrusel de LinkedIn (1080×1350)
 
@@ -193,7 +199,9 @@ aprobada (el vlog embebido ya lo estaba con el motion).
   Ocho piezas con fondo transparente: apertura, cabecera (noticia n/3 + wordmark), lower third (**aprobado**, §12;
   no inventes otro contenido), subtítulo, tarjeta de noticia, imagen de la fuente (plano dividido: la
   noticia arriba se desarma hacia el host, host reencuadrado abajo), Glitch Drop y última frase («el #N+1 sale el
-  lunes.» + píldora «Sigue a Glitch»).
+  lunes.» + píldora «Sigue a Glitch»). **Pendiente (2026-09-28):** esa última frase es fija en el kit del taller y en
+  `overlay-cta-reel.html` / `overlay-cta-vlog.html` del Composer (`el #<nextEdition> sale el lunes.`), y choca con la
+  regla de la muletilla que varía por edición (§2); cambiarla es decisión del operador y trabajo de motion.
 - **Tarjeta final** (16:9 y reel): centrada, espejo de la apertura (los puntos se resuelven en la manzana → el reel
   empalma en loop; por eso el reel abre directo con la apertura, sin pre-roll), un mensaje, una acción, firma; sin texturas finas (la compresión las ensucia).
 - En el 16:9 (kit del vlog aprobado), la tarjeta de noticia va como overlay y el Drop a pantalla completa con «SOBRE LA
@@ -250,10 +258,9 @@ aprobada (el vlog embebido ya lo estaba con el motion).
 | Motion: apertura/tarjeta final v2, kit, transición de bytes entre piezas y entre escenas, héroe | **APROBADO** (2026-09-27, §12): «Si, el tuyo también está aprobado». La v1 queda como alternativa sin aprobar. Falta decidir a qué piezas va la transición de bytes |
 | Subtítulos del video | pendiente (estilo de captions en Premiere, no hecho) |
 | Diseño sonoro de Glitch (ronda 6: apertura, tarjeta final, kit, lower third, transiciones) | **APROBADO, versión B** (2026-09-27, §13): «La b me encanta más. Sus sonidos están aprobados». La A queda como alternativa descartada |
-| Composición de las piezas estáticas en el Artifact Composer (carrusel, sueltas del blog, portada del reel, miniatura del vlog, overlays PNG) | **EXISTE** como taller local (TASK-1923, 2026-09-27): 26 plantillas, todas `approval: approved`, en tres catálogos; se compone con `pnpm glitch:compose` (§9.1). La ruta productiva (API, `artifact-worker`, MCP, capability) **no existe**: es TASK-1921 |
+| Composición de las piezas estáticas en el Artifact Composer (carrusel, sueltas del blog, portada del reel, miniatura del vlog, overlays PNG) | **EXISTE** como taller local (TASK-1923, 2026-09-27; el Flash, `24e4c72ee`, 2026-09-28): **32 plantillas** (26 de la edición semanal + 6 del Flash), todas `approval: approved`, en tres catálogos; se compone con `pnpm glitch:compose` (§9.1). La ruta productiva (API, `artifact-worker`, MCP, capability) es TASK-1921 (`in-progress`) y **sólo conoce la edición semanal** (`planGlitchEdition` en `src/lib/brand-surfaces/production/plan.ts`) |
 | Música de Glitch: tema B (intro, cortina, salida) y cama post-punk bajo la noticia | **APROBADO** (2026-09-27, §13.7): «Definitivamente la B es la decisión», «Me parecen bien todas», «Post-punk definitivamente». **Integrada al taller** (`music.mjs`, pre-roll animado de la intro elegido por el operador) y **en producción en AXIS** (`#musica`, `glitch.json → music`). Único pendiente: probar la mezcla con la voz real del host |
-
-| **Glitch Flash** (portada, noticia, contraportada, banner 16:9 del blog, banner de noticia 1600×900, portada de Threads) | **LANZADO EN PRODUCCIÓN** el 2026-09-28 (Claude Sonnet 5.5) y **aprobado por el operador en uso real**. En AXIS: `glitchLine.editions.flash` + seis piezas `flash-*` (`axis-tokens` 0.3.24) y contrato `efeonce.glitch-line` 0.2.0 (`axis-ui-contracts` 0.3.22). En el Composer: seis plantillas `Flash*` aprobadas; se compone con `pnpm glitch:compose` (§9.1, §14.4) |
+| **Glitch Flash** (portada, noticia, contraportada, banner 16:9 del blog, banner de noticia 1600×900, portada de Threads) | **LANZADO EN PRODUCCIÓN** el 2026-09-28 (Claude Sonnet 5.5) y **aprobado por el operador en uso real**. En AXIS: `glitchLine.editions.flash` + seis piezas `flash-*` (`axis-tokens` 0.3.24) y contrato `efeonce.glitch-line` 0.2.0 (`axis-ui-contracts` 0.3.22). En el Composer: seis plantillas `Flash*` aprobadas; se compone **en local** con `pnpm glitch:compose` (§9.1, §14.4); la ruta productiva todavía no lo conoce (§14.7) |
 | Chip «LA NOTICIA» en la portada con foto productiva | **DECIDIDO e IMPLEMENTADO** (2026-09-28): `CoverPhoto`, `BlogBannerPhoto` y `BlogSquarePhoto` lo pintan (§3) |
 | Muletilla de la contraportada variable por edición | **DECIDIDO** (2026-09-28, §2) |
 | Numeración de la edición semanal (#17 vs. el blog, que ya tiene #16 y #17) | **PREGUNTA ABIERTA** para el operador (2026-09-28, §1) |
@@ -272,20 +279,29 @@ taller converge con Globe cuando se reactive. Seguimiento: cada edición se regi
 Objetivo: que ningún agente reinterprete. **Los agentes llenan datos; nunca eligen coordenadas ni plantilla a mano.**
 
 1. **Canon humano en Greenhouse:** norma + ADR (arriba).
-2. **Valores y contratos en AXIS — PUBLICADOS** (TASK-1922, tag `v0.3.12`, 2026-09-27):
-   - **Token `glitchLine`** (`@efeoncepro/axis-tokens` 0.3.12): `color` (el `ground` es `efeonceGraphicLine.color.dark`
+2. **Valores y contratos en AXIS — PUBLICADOS** (TASK-1922, tag `v0.3.12`, 2026-09-27; el Glitch Flash, tag
+   `v0.3.24`, 2026-09-28; Greenhouse fija `axis-tokens` 0.3.24 y `axis-ui-contracts` 0.3.22):
+   - **Token `glitchLine`** (`@efeoncepro/axis-tokens`, desde 0.3.12): `color` (el `ground` es `efeonceGraphicLine.color.dark`
      por referencia), `type`, `masthead`, `bytes`, `apple`, `assets`, `dots`, `signature`, `icons`, `formats`
      (`linkedin-4x5`, `landscape-16x9`, `square-1x1`, `blog-inline-16x9`, `reel-9x16`), `safeZones`, `motion`
      (aprobado: piezas, golpes, `mnemonicSync` f48, kit, transiciones), `pieces` (id → estado/superficie/formato/
-     plantilla/esfera/titular), `coverRotation` y `pendingDecisions`.
-   - **Contrato `efeonce.glitch-line` 0.1.0** (`@efeoncepro/axis-ui-contracts` 0.3.10): `validateGlitchLineIntent` y
+     plantilla/esfera/titular), `coverRotation` y `pendingDecisions`. **Desde 0.3.24:** `editions` (`kinds: weekly |
+     flash`, `default: weekly`; `editions.flash` con `status: approved`, `approvedOn: 2026-09-28`, cabecera, estela,
+     chips, `progress: none`, `narratorCloser` con `rejected`), seis piezas `flash-*` en `pieces` (`derivesFrom`,
+     `chip`, `coverTemplate: null`) y dos `pendingDecisions` nuevas: `edition-numbering-blog-vs-system` y
+     `weekly-cover-chip`.
+   - **Contrato `efeonce.glitch-line`** (0.1.0 en `@efeoncepro/axis-ui-contracts` 0.3.10; **0.2.0** desde 0.3.22,
+     `AXIS_GLITCH_LINE_ACCEPTED_VERSIONS = ['0.1.0', '0.2.0']`: un intent 0.1.0 resuelve igual): `validateGlitchLineIntent` y
      `resolveGlitchLineIntent` → manifiesto `axis.glitch-line-composition.v1` (lienzo, paleta por superficie, tipo,
      titular, cabecera, wordmark, esfera, bytes, zonas seguras, caras, overlays, motion sólo para reel/vlog, portada,
      `actionIcons` planos, firma, `adapterChecks`). **Falla cerrado:** cualquier issue → `status: 'invalid'` sin cuerpo.
-     23 códigos (mensajes es-CL), entre ellos `piece-not-approved`, `sphere-count-exceeded`, `accent-text-on-light`,
-     `overlay-over-host-face`, `overlay-over-app-ui`, `bytes-over-face`, `previous-cover-template-required`,
-     `cover-template-repeated`, `headline-weight-contrast-missing`, `narrator-font-unlicensed`,
-     `slogan-not-applicable`, `icon-volume-not-applicable`, `url-bubble-not-applicable`.
+     28 códigos desde 0.2.0 (23 en 0.1.0; mensajes es-CL), entre ellos `piece-not-approved`, `sphere-count-exceeded`,
+     `accent-text-on-light`, `overlay-over-host-face`, `overlay-over-app-ui`, `bytes-over-face`,
+     `previous-cover-template-required`, `cover-template-repeated`, `headline-weight-contrast-missing`,
+     `narrator-font-unlicensed`, `slogan-not-applicable`, `icon-volume-not-applicable`, `url-bubble-not-applicable` y
+     los cinco de 0.2.0: `edition-kind-invalid`, `edition-kind-mismatch`, `flash-edition-number-not-allowed`,
+     `flash-progress-not-allowed`, `progress-invalid`. En 0.2.0 `edition` acepta un número (la semanal #N) o
+     `{ kind: 'weekly' | 'flash', number? }` y nace el campo `progress` (`n / 8`, sólo semanal).
    - **CLI** (repo AXIS): `pnpm glitch:resolve -- --input <intent.json> --out <manifest.json>`; schema
      `docs/agent-composition/glitch-line-intent.schema.json`; ejemplos `docs/examples/glitch/` (8 válidos con su
      manifiesto + 5 inválidos + `invalid-expected-issues.json`); ADR AXIS
@@ -328,10 +344,11 @@ plantilla, `render.minInkTileRatio` (piso ≥ 0,3 %, `MIN_INK_TILE_RATIO_FLOOR`)
 9:16 (lower third, cabecera), que el gate de lámina en blanco rechazaba. Detalle en el ADR, §«Encaje verificado en el
 Artifact Composer».
 
-**Estado:** **2 está publicado** (TASK-1922, AXIS `v0.3.12`; Greenhouse hoy fija `@efeoncepro/axis-tokens` 0.3.15 y
-`glitch-tokens.css` se compila de su `glitchLine`). **3 existe como taller local** (TASK-1923): tres catálogos
-(`glitch-carousel`, `glitch-stills`, `glitch-overlays`), no un catálogo `glitch-edition`; su ruta productiva no existe
-(TASK-1921), no la cites como existente. **4 existe y está aprobado** (2026-09-27) en `tools/glitch-motion/` del taller; todavía
+**Estado:** **2 está publicado** (TASK-1922, AXIS `v0.3.12`; el Flash en `v0.3.24`; Greenhouse hoy fija
+`@efeoncepro/axis-tokens` 0.3.24 y `@efeoncepro/axis-ui-contracts` 0.3.22, y `glitch-tokens.css` se compila de su
+`glitchLine`). **3 existe como taller local** (TASK-1923 y el Flash de `24e4c72ee`): tres catálogos
+(`glitch-carousel`, `glitch-stills`, `glitch-overlays`) con 32 plantillas, no un catálogo `glitch-edition`; su ruta
+productiva (TASK-1921, `in-progress`) sólo conoce la edición semanal: no la cites como disponible ni para el Flash. **4 existe y está aprobado** (2026-09-27) en `tools/glitch-motion/` del taller; todavía
 lleva la paleta y la manzana espejadas en `src/brand.mjs` y el wordmark desde `public/branding/glitch` de Greenhouse:
 pasarlos a `glitchLine` y `AXIS_GLITCH_ASSETS` es trabajo de TASK-1924 (cómo operarlo hoy en §12). Tasks: (a) tokens,
 assets y contrato de Glitch en AXIS → TASK-1922 (**publicado en AXIS `v0.3.12`**: incluye el alta de los cinco glifos Plastilina,
@@ -381,7 +398,7 @@ pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,
   | `manifest-invalid` (`field-unknown` / `field-required` / `field-invalid`, con ruta del campo) | corregir el campo |
   | `cover-rotation-unsatisfiable` | cambiar el contenido de portada para que califique otra plantilla (lo decide un humano, nunca el composer) |
   | `font-license-missing` | Guttery sin licencia declarada en `fonts.json` del brand pack: avisar al operador, no quitar la letra |
-  | `contract-issues` | el contrato `efeonce.glitch-line` 0.1.0 (`validateGlitchLineIntent`) rechaza una lámina; ruta `<lámina>.<campo>` con el código del contrato: corregir el dato |
+  | `contract-issues` | el contrato `efeonce.glitch-line` (`validateGlitchLineIntent`; el Flash valida con 0.2.0 y `edition: { kind: 'flash' }`) rechaza una lámina; ruta `<lámina>.<campo>` con el código del contrato: corregir el dato |
   | `fracture-over-face` | otro `fractureEdge`, `faceRegions` bien medido u otra foto |
   | `carousel-too-heavy` | el PDF no cabe en los límites de LinkedIn |
   | `glitch.*` del catálogo (`glitch.cover-rotation`, `glitch.single-sphere`, `glitch.headline-contrast`, `glitch.photo-credit`, `glitch.face-safe-fracture`, `glitch.accent-on-light`, `glitch.edition-structure`, `glitch.catalog-membership`, `glitch.piece-approval`) | segunda línea: repiten las reglas sobre el plan resuelto; si salta una, el plan llegó sin pasar por el mapper |
@@ -401,9 +418,11 @@ pnpm glitch:compose -- --manifest <edicion.json> [--out <dir>] [--only carousel,
   `planGlitchManifest`, `parseGlitchManifest`); intents del contrato con `version: '0.2.0'` y `edition: { kind: 'flash' }`.
   Salidas `glitch-flash-<slug>-carrusel.pdf` (3 páginas), `sueltas/` y `glitch-flash-<slug>.provenance.json`
   (`edition: null`, `editionKind: "flash"`). Detalle en §14.4.
-- **Gate:** `pnpm composer:visual-gate --catalog=glitch [--selftest|--freeze]`; 32 frames en
-  `scripts/frontend/baselines/artifact-composer/templates-glitch/`; rebaseline sólo declarado en `BASELINE_DELTAS.md`
-  (secciones g y p).
+- **Gate:** `pnpm composer:visual-gate --catalog=glitch [--selftest|--freeze]`; 32 frames (26 hasta el
+  2026-09-27) en `scripts/frontend/baselines/artifact-composer/templates-glitch/`; rebaseline sólo declarado en
+  `BASELINE_DELTAS.md` (secciones g y p; la p, sellada, trae las seis del Flash y el chip «LA NOTICIA»).
+- **Tras un bump de AXIS:** `pnpm glitch:tokens` **y** `pnpm brand:tokens`, los dos con `--check`, antes del commit
+  ([lessons.md](lessons.md), 2026-09-28: el CI de `53002b352` falló por regenerar sólo uno).
 - **Fuera del comando:** publicar (LinkedIn vía Metricool, blog vía WordPress, con confirmación humana), el motion
   animado (taller, §12) y la ruta productiva (TASK-1921).
 - **Pendientes conocidos:** el token `portada-c` de AXIS dice esfera `apple` pero la portada C aprobada no lleva
@@ -649,8 +668,11 @@ Esquema de `tools/glitch-motion/ejemplos/edicion-17.ejemplo.json`:
 - **Qué falta para el día a día** (no lo presentes como hecho): hoy cada edición la corre alguien con el taller, `gh`,
   ffmpeg, HyperFrames y Guttery instalados **en su máquina** (el kit completo ≈ 4 min). No hay autoservicio: el
   formulario en Marketing Studio (recomendado) y el dominio de ediciones (TASK-1442) están pendientes (pipeline
-  editorial: EPIC-031). Plataforma: tokens, contrato y assets en AXIS ya publicados (TASK-1922, v0.3.12; falta que el
-  taller los lea, TASK-1924), ruta productiva de las piezas estáticas (TASK-1921; los catálogos de TASK-1923 ya existen en local) y archivo de binarios en GCS (hoy sólo OneDrive + sha256 en los manifiestos).
+  editorial: EPIC-031). Plataforma: tokens, contrato y assets en AXIS ya publicados (TASK-1922, v0.3.12; el Flash en
+  v0.3.24; falta que el taller los lea, TASK-1924), ruta productiva de las piezas estáticas (TASK-1921; los catálogos
+  de TASK-1923 y los del Flash ya existen en local) y archivo de binarios en GCS (hoy sólo OneDrive + sha256 en los manifiestos).
+- **Última frase fija (pendiente, 2026-09-28):** la pieza `cta` del kit dice «el #N+1 sale el lunes.» siempre; con la
+  muletilla que varía por edición (§2) eso queda por decidir con el operador. No la cambies por tu cuenta.
 - **Si cambias tiempos del motion** (en `pieces.mjs`, `overlays.mjs` o `transitions.mjs` del taller), vuelve a correr
   el mismo comando del motion: el sonido lee los tiempos del código y sale de nuevo junto a cada `.mov` (§13.5). La
   música **no** se mueve con el motion: está amarrada a la grilla de 150 BPM y sus másteres son fijos (§13.7); cambiar
@@ -1015,7 +1037,17 @@ provisional). El ducking lo aplica el editor con los valores de arriba.
 
 - Publicar en el token el ancho de la estela en la cabecera grande (150 px) y las separaciones compacta (8 px) y del
   banner (10 px): hoy son medidas del canvas aprobado en `glitch.css`.
-- La **ruta productiva** del Flash (TASK-1921 / `brand-surfaces`, `artifact-worker`, MCP): hoy sólo conoce la edición
-  semanal (`planGlitchEdition`); el Flash es taller local.
+- La **ruta productiva** del Flash (TASK-1921: `src/lib/brand-surfaces/production/plan.ts`, `artifact-worker`, MCP):
+  hoy sólo conoce la edición semanal (`planGlitchEdition`); el Flash es taller local (`planGlitchManifest` sólo lo
+  usa `scripts/glitch/compose.ts`).
 - Si publicar imágenes de terceros con crédito y sin licencia (decidido para Sonnet 5.5) vale para otros Flash.
-- La **numeración** de la edición semanal (§1): pregunta abierta para el operador.
+- La **numeración** de la edición semanal (§1): pregunta abierta para el operador (en AXIS,
+  `pendingDecisions: edition-numbering-blog-vs-system`).
+- La **última frase del video** (overlays `overlay-cta-reel.html` / `overlay-cta-vlog.html` del Composer y la pieza
+  `cta` del taller) sigue fija en «el #N sale el lunes.»: choca con la muletilla variable (§2, §6); es trabajo de
+  motion y decisión del operador.
+- **Content Factory** no tiene `kind` para `efeoncepro/glitch-drop`: en el blog del Flash el Drop se inyectó con un
+  párrafo marcador + `parse_blocks`/`serialize_blocks` en un eval gobernado. Propuesta escrita en la skill
+  `efeonce-public-site-wordpress`, `references/content-factory-gutenberg.md`.
+- **Push:** los commits `609353e83` (tokens de La órbita) y `24e4c72ee` (Flash en el Composer) están en `develop`
+  local, sin empujar; `origin/develop` = `53002b352` con el CI rojo hasta que se empujen. Lo decide el operador.

@@ -1,5 +1,18 @@
 # TASK-1921 — Ruta productiva de las piezas de marca por superficie (Full API Parity)
 
+## Delta 2026-09-28 (noche) — el Glitch Flash existe en el Composer, pero no en esta ruta
+
+- El commit local `24e4c72ee` (sin push al escribir esto) agregó el **Glitch Flash**: `GlitchFlashManifest` (hermano del
+  semanal en `src/lib/glitch-composition/manifest.ts`), `planGlitchFlash`, el despachador `planGlitchManifest` /
+  `parseGlitchManifest` y seis plantillas `Flash*` en `glitch-carousel` y `glitch-stills`.
+- `src/lib/brand-surfaces/production/plan.ts` sigue llamando `planGlitchEdition`, que sólo acepta el manifiesto semanal
+  (número y 8 noticias): el Flash compone sólo en local (`pnpm glitch:compose`). Para cubrirlo, el command despacha con
+  `planGlitchManifest` (o `isGlitchFlashPlan`), sin copiar el plan. La imagen del `artifact-worker` en staging no trae
+  las plantillas `Flash*` hasta que ese commit llegue a `develop` y se redespliegue.
+- Todo bump de `@efeoncepro/axis-tokens` corre `pnpm brand:tokens` **y** `pnpm glitch:tokens` (con `--check`) antes
+  del commit: el bump a 0.3.24 (`53002b352`) dejó rojo el CI por no regenerar los tokens de La órbita (arreglo local
+  `609353e83`).
+
 ## Delta 2026-09-28 — TASK-1930 dejó el rastro de binding por slot
 
 - `bindDeckSlots(plan, context)` (`@/lib/brand-surfaces/deck-recipes/bindings`, `server-only`) entrega por slot de

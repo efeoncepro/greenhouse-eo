@@ -8,7 +8,8 @@
 > 2026-09-27; fila de la portada con selección (`document-selection`, AXIS `v0.3.21`), filas de ítem, respuesta,
 > plate repetido, prefijo CSS, auditoría renderizada y slot opcional — `develop` en `c58a94ccb`, 2026-09-28; filas de
 > las láminas SEO/AEO, `variant-both-in-deck`, `figure-source-missing` y el camino «ausente» de un slot opcional —
-> `develop` tras `af32d9353` (TASK-1934, AXIS `v0.3.23`), 2026-09-28.
+> `develop` tras `af32d9353` (TASK-1934, AXIS `v0.3.23`), 2026-09-28; §9, filas del bump de AXIS y de Glitch —
+> greenhouse-eo@24e4c72ee, 2026-09-28.
 >
 > Cada ítem dice **cómo se verifica**. «Automático» = lo hace fallar un comando o una función; «Revisión» = hay que
 > mirar el cuadro real (el adapter de Greenhouse lo marca `manual`). Una pieza no se entrega con un ítem en rojo, y
@@ -242,6 +243,8 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 | Regenerar el índice del README y el catálogo de runtime tras editar las recetas (`--check` verifica) | Greenhouse | `pnpm brand:deck-recipes` |
 | Componer una receta aprobada o un documento (`pages`) | Greenhouse | `pnpm brand:compose -- --intent <intent.json> [--artifact-id <id>] [--out <dir>]` |
 | Gate visual de las plantillas de La órbita | Greenhouse | `pnpm composer:visual-gate --catalog=graphic-line` |
+| Tras subir `axis-tokens`: generados de La órbita **y** de Glitch sin drift (los dos, siempre; lessons.md 2026-09-28) | Greenhouse | `pnpm brand:tokens --check` + `pnpm glitch:tokens --check` |
+| Componer una edición de Glitch o un Glitch Flash (QA propio en [glitch.md](glitch.md) §10 y §14.5) | Greenhouse | `pnpm glitch:compose -- --manifest <edicion-o-flash.json>` + `pnpm composer:visual-gate --catalog=glitch` |
 | Firma de correo | AXIS | `pnpm signature:resolve -- --input intent.json` |
 | Pruebas de tokens, contratos, paquete y archivos (trayectoria, piezas medidas, ids, órbitas byte a byte, contrastes) | AXIS | `pnpm build && pnpm test` |
 | e2e del Lab (página de la línea, ids duplicados, foco concéntrico) | AXIS | `pnpm --dir apps/lab test:e2e` |

@@ -242,8 +242,8 @@ Rules for agents:
   `0.3.24`, `axis-ui-contracts` `0.3.22` (AXIS tag `v0.3.24`, 2026-09-28, Glitch Flash; the contracts package depends on
   `axis-tokens` exactly `0.3.24`), `axis-ui-registry` `0.3.1`, `axis-brand-assets` `0.3.5` and `axis-graphic-line` `0.7.0` (the last two
   pinned by TASK-1922, tag `v0.3.12`). Graphic-line visual gate: 66 frames at 0 px (TASK-1928; 32 after TASK-1927).
-  Series: `0.3.11`…`0.3.14` (TASK-1927), `0.3.12` (TASK-1922, Glitch), `0.3.15`…`0.3.21` (TASK-1928); table in the
-  surface-composition section below.
+  Series: `0.3.11`…`0.3.14` (TASK-1927), `0.3.12` (TASK-1922, Glitch), `0.3.15`…`0.3.21` (TASK-1928), `0.3.24` (Glitch Flash, contracts `0.3.22`); table in
+  the surface-composition section below.
   It does not use `efeonce.email-signature` yet. `axis-graphic-line` paints the orbit only in the Artifact Composer
   brand surfaces (`src/lib/brand-surfaces`, `src/lib/artifact-composer/catalogs/graphic-line-*`); the layout-compiler
   adapter `scripts/creative/layout-compiler/graphic-line.mjs` still resolves the contract from `axis-ui-contracts` and
@@ -251,6 +251,13 @@ Rules for agents:
   collaboration-selection `0.3.0`. Entry points `pnpm creative:orbit:resolve|render`, the per-format
   `graphic_line` layer and `brand.signature` of `pnpm creative:layout`, and `marcaEnEscena` of
   `pnpm foto:componer:cta`. Never copy the Lab painter.
+- **Every `axis-tokens` bump regenerates BOTH compiled token sets (lesson, 2026-09-28):** after pinning a new
+  `@efeoncepro/axis-tokens` in Greenhouse, run `pnpm brand:tokens` (the «La órbita» tokens of the Composer:
+  `graphic-line-{deck,stills,overlays}/graphic-line-tokens.css` + `graphic-line-shared/graphic-line-tokens.json`) **and**
+  `pnpm glitch:tokens`, then `pnpm brand:tokens --check` and `pnpm glitch:tokens --check`, all before the commit. Even
+  when only the version stamp changes, a stale file fails `scripts/brand-surfaces/__tests__/graphic-line-tokens-sync.test.ts`
+  in CI. Source case: the `0.3.24` pin (`53002b352`) ran only `glitch:tokens`, CI went red on 4 tests, and the fix was
+  `609353e83` (regenerated tokens, version stamp only).
 - **Signature rule (operator, 2026-09-26):** the Efeonce logo, centered. The URL bubble signs instead ONLY when the
   logo already appears in the image (`signature.brandInScene: true`), centered, luminosity-blended on the real pixels
   at opacity 1, ≥ 4.5:1 measured (passes only on very dark beds); never beside the logo. Footer uses keep the baked
@@ -322,7 +329,8 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
   | `v0.3.20` | `0.3.20` | `0.3.18` | TASK-1928 | Delta (k): content and the working day (`content-day` `tools`, `live-*`) |
   | `v0.3.21` | `0.3.21` | `0.3.19` | TASK-1928 | Delta (l): `cover-brochure` `document-selection` |
 
-  `v0.3.12` sits between them and belongs to TASK-1922 (Glitch).
+  `v0.3.12` sits between them and belongs to TASK-1922 (Glitch); `v0.3.24` (tokens `0.3.24`, contracts `0.3.22`,
+  2026-09-28, commit `5b3056f`) is the Glitch Flash release.
 - **Release flow used for each row (verified in the `v0.3.19`…`v0.3.21` commits and the workflows):** (1) token
   change in `packages/tokens/src/tokens.ts` + contract test in `packages/contracts/src/surface-composition.test.ts`
   (and contract source when the contract changes); (2) bump `packages/tokens/package.json` and
@@ -334,8 +342,8 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
   (8) one commit `release(surfaces): axis-tokens X y axis-ui-contracts Y — <familia>`, push to `main` (operator
   authorization), wait for `ci.yml` green; (9) push the tag `vX.Y.Z`: `release-packages.yml` («Release UI packages»,
   on `v*.*.*` tags) re-runs install, build, typecheck and tests and publishes to GitHub Packages; (10) in Greenhouse,
-  pin both exact versions, install with the ephemeral credential, `pnpm brand:tokens`, compose the pieces and run
-  `pnpm composer:visual-gate --catalog=graphic-line`. Validate against the local AXIS build before step 8 (lesson
+  pin both exact versions, install with the ephemeral credential, `pnpm brand:tokens` **and** `pnpm glitch:tokens`
+  (then both with `--check`), compose the pieces and run `pnpm composer:visual-gate --catalog=graphic-line`. Validate against the local AXIS build before step 8 (lesson
   below) so a family does not cost two releases.
 - **Why `axis-ui-contracts` is republished without a code change:** most contracts releases of the series (e.g.
   `0.3.11`, `0.3.12`, `0.3.19`) carry no code change. The
@@ -387,6 +395,10 @@ contract `efeonce.surface-composition`, manifest `axis.surface-composition.v1`, 
   `packages/tokens/dist` of the AXIS checkout over `node_modules/@efeoncepro/axis-tokens/dist` in the consumer, run the
   consumer's pieces and its visual gate, then reinstall to restore the published package. TASK-1927 avoided a fourth
   release this way. The temporary copy never gets committed and never replaces the pinned version.
+- **Lesson — run AXIS gates as standalone commands from a Claude Code session (2026-09-28):** one command per call,
+  `pnpm -C /Users/jreye/Documents/axis-design-system <script>` and `git -C /Users/jreye/Documents/axis-design-system <cmd>`.
+  A compound command with `cd` plus logs redirected to `/tmp` was blocked by the permission classifier during the Glitch
+  Flash release (`v0.3.24`), and the gates and the push had to be run by Codex.
 - **Per-slide deck recipes (operator, 2026-09-27):** all **69** slides of the canvas «Deck» are approved and each has a
   recipe in Greenhouse:
   [`docs/operations/brand-graphic-line/deck-recipes/`](../../../docs/operations/brand-graphic-line/deck-recipes/README.md)
@@ -477,7 +489,7 @@ with guardar/compartir/recomendar/comentar; `swipe` = `deslizar` on covers and i
 `volume: 'never'`). Operator, verbatim: «si es para la slide de cierre de glitch, prefiero los iconos plastilina en
 vectores que en 3d en esa lámina». The Glitch contract rejects volume with `icon-volume-not-applicable`.
 
-### Glitch sub-line (tokens, contract, assets; published 2026-09-27, tag `v0.3.12`)
+### Glitch sub-line (tokens, contract, assets; published 2026-09-27, tag `v0.3.12`; Flash in tag `v0.3.24`)
 
 Glitch (Efeonce's weekly magazine) has a sub-line of «La órbita» that applies **only to Glitch**. TASK-1922 published it
 in AXIS tag **`v0.3.12`** (commit `29a40b5`, push authorized by the operator; CI and release-packages green):
@@ -507,7 +519,8 @@ in AXIS tag **`v0.3.12`** (commit `29a40b5`, push authorized by the operator; CI
 - **Lab** `/references/glitch/` and `/references/glitch.json` now read the token (the JSON adds `tokens`, `contract`,
   `assets`; schema still `axis.glitch-line.v1`); `apps/lab/src/data/glitch.ts` holds no HEX nor Glitch measures.
 
-Greenhouse `develop` pins these versions since commit `4dfb147f7`.
+Greenhouse `develop` pinned these versions in commit `4dfb147f7`; since `53002b352` it pins `axis-tokens` `0.3.24` and
+`axis-ui-contracts` `0.3.22` (Glitch Flash, below); `axis-brand-assets` stays at `0.3.5`.
 
 **Glitch Flash (2026-09-28, AXIS tag `v0.3.24`, commit `5b3056f`; operator-authorized push, CI and release-packages green):**
 `glitchLine.editions` declares the two formats — `weekly` (Monday, numbered, 8-segment progress) and `flash` (a one-off
@@ -516,10 +529,19 @@ news piece: no edition number, masthead «NO ESPERA AL LUNES» + byte trail + «
 (`@efeoncepro/axis-ui-contracts` `0.3.22` over `axis-tokens` `0.3.24`): `edition` accepts a number or `{ kind, number? }`;
 new codes `flash-edition-number-not-allowed`, `flash-progress-not-allowed`, `edition-kind-invalid`,
 `edition-kind-mismatch`, `progress-invalid`; a `0.1.0` intent resolves as before. Greenhouse pins `0.3.24`/`0.3.22`
-(test `src/config/axis-glitch-line-package.test.ts`); Composer templates for the Flash do not exist yet. Criterion:
-`efeonce-graphic-line` → `references/glitch.md` §14. Consumers read `glitchLine` or resolve an intent;
-**never copy Glitch values** into templates, overlays or scripts. Still pending outside AXIS: the Composer catalogs
-(TASK-1923) and the workshop motion reading the token and assets instead of its mirror (TASK-1924). Human canon:
+(test `src/config/axis-glitch-line-package.test.ts`). **The Artifact Composer composes the Flash** (commit `24e4c72ee`):
+`GlitchFlashManifest` in `src/lib/glitch-composition/manifest.ts` (each slide validated with contract `0.2.0` and
+`edition: { kind: 'flash' }`; a number fails with `flash-edition-number-not-allowed`), six templates `flash-*` in
+`src/lib/artifact-composer/catalogs/glitch/` (cover, interior, back cover, 16:9 blog banner, 1600×900 news banner,
+Threads), the deterministic byte trail `src/lib/glitch-composition/flash-trail.ts` (`pnpm glitch:tokens` writes
+`assets/flash-trail.svg` and `--gx-flash-trail-*`) and `pnpm glitch:compose -- --manifest <flash.json>` (example
+`src/lib/glitch-composition/examples/flash-sonnet-5-5.example.json`). Criterion: `efeonce-graphic-line` →
+`references/glitch.md` §14. Consumers read `glitchLine` or resolve an intent; **never copy Glitch values** into
+templates, overlays or scripts. The weekly Composer catalogs (TASK-1923) are complete. Still pending: the governed
+production route (TASK-1921: `src/lib/brand-surfaces/production/plan.ts` still calls `planGlitchEdition`, so the Flash
+composes only locally); three trail measures not yet in the AXIS token (large width 150 px, compact gap 8 px, news
+banner gap 10 px — canvas measures in `glitch.css` until AXIS takes them); and the workshop motion reading the token
+and assets instead of its mirror (TASK-1924). Human canon:
 `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md`; criterion: `efeonce-graphic-line` →
 `references/glitch.md`. Never use the apple, Glitch green, byte glitch, Guttery or the «EDICIÓN #N» masthead in Efeonce pieces.
 

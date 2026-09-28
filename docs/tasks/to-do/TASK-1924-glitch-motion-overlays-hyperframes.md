@@ -1,5 +1,16 @@
 # TASK-1924 — Glitch en movimiento con HyperFrames
 
+## Delta 2026-09-28 — Glitch tiene dos formatos; el taller sólo conoce el semanal
+
+- Desde el 2026-09-28 Glitch tiene **edición semanal** (lunes, «Edición #N») y **Glitch Flash** (una noticia puntual,
+  sin número; cabecera «NO ESPERA AL LUNES» + estela de bytes + «FLASH»). Contrato `efeonce.glitch-line` 0.2.0 (AXIS
+  `v0.3.24`, `glitchLine.editions`); canon en `efeonce-graphic-line/references/glitch.md` §14.
+- `tools/glitch-motion` (`efeonce-brand-workshop`) no tiene la cabecera Flash ni la estela, y sus cierres
+  (`src/pieces.mjs`, `src/overlays.mjs`) escriben «el #N sale el lunes.» fijo, igual que las plantillas
+  `OverlayCtaReel` / `OverlayCtaVlog` del Composer. El operador decidió que la muletilla del narrador **varía por
+  edición** y que esa frase no aplica al Flash (el publicado cierra con «léelo completo / en nuestro blog.»). Un video de
+  Flash, o una muletilla distinta, exige que esta task vuelva variable ese texto y agregue la cabecera Flash.
+
 ## Delta 2026-09-27 (noche) — el manifiesto de edición de TASK-1923 ya existe
 
 - `GlitchEditionManifest` (`src/lib/glitch-composition/manifest.ts`, `schemaVersion: 1`) cubre los campos del archivo

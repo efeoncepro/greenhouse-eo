@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-28 — Glitch Flash en AXIS v0.3.24 y en el Artifact Composer
+
+- AXIS tag `v0.3.24` (`5b3056f`): `glitchLine.editions` (semanal | Flash) y contrato `efeonce.glitch-line` 0.2.0
+  (Flash sin número ni avance; 0.1.0 resuelve igual). Lab con la sección «El Glitch Flash».
+- Greenhouse fija `axis-tokens` 0.3.24 / `axis-ui-contracts` 0.3.22 (`53002b352`). El CI de ese commit falló en
+  `graphic-line-tokens-sync.test.ts`: el bump exige `pnpm brand:tokens` además de `pnpm glitch:tokens` (arreglo
+  `609353e83`). Lección registrada en las skills `axis-design-system` y `efeonce-graphic-line` y en el runbook.
+- Artifact Composer (`24e4c72ee`): `GlitchFlashManifest`, seis plantillas `flash-*`, estela de bytes determinista,
+  `pnpm glitch:compose` despacha semanal/Flash; chip «PORTADA» → «LA NOTICIA» en las portadas semanales; gate
+  visual Glitch 32/32 a 0 px (BASELINE_DELTAS (p)).
+- Docs y skills al día (graphic-line, axis-design-system, motion, contenido, deck, advertising, AGENTS.md) y
+  deltas en TASK-1921/1922/1923/1924/1337/1441–1444/1448. Pendiente: la ruta productiva (TASK-1921) no conoce el
+  Flash; tres medidas de la estela sin token; numeración #17 abierta.
+
 ## 2026-09-28 — Primer Glitch lanzado con la nueva línea: Glitch Flash · Claude Sonnet 5.5
 
 - Glitch tiene dos formatos: edición semanal (lunes, numerada) y **Glitch Flash** (noticia puntual, sin número;
@@ -660,12 +674,3 @@ Se añadió investigación primaria, ficha de servicio y modelo de negocio para 
 equipos humano-agente con roles, autonomía, handoffs, adopción, calidad y economics. Las ofertas HubSpot/Salesforce,
 la ruta RevOps & CRM y las skills espejo remiten al método. Estado `Approved for validation`: sin activación runtime,
 precio, margen ni ROI aprobado.
-
-## 2026-09-19 — Ajuste editorial y GTM para la oferta humano-agente
-
-El operador confirmó que la oferta de transformación humano-agente está aprobada comercialmente y probada como
-servicio. Se actualizó «Tu IA no conoce tu negocio» con una serie transversal en las franquicias existentes:
-operaciones y ruta CMO (AEO público → contexto de campaña → equipo humano-agente), sin CRM obligatorio ni nueva SKU.
-Quedaron buyer, piezas, roles por canal, Blueprint/operación y gates de prueba, paid y claims. Los Pilares JTBD de
-Notion siguen separados de capítulos y taxonomía pública; posible nuevo pilar requiere readback y aprobación. Sin
-cambios en Notion, sitio público ni publicación.

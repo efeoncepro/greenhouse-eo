@@ -1,5 +1,20 @@
 # TASK-1923 — Glitch en el Artifact Composer
 
+## Delta 2026-09-28 — Glitch Flash y chip «LA NOTICIA» (commit local `24e4c72ee`)
+
+- El registry pasó de 26 a **32 plantillas**: seis `Flash*` (`FlashCover`, `FlashInterior` y `FlashBackCover` en
+  carrusel y sueltas; `FlashBlogBanner`, `FlashNewsBanner` y `FlashThreads` sólo sueltas), contenidos `glitch.flash.*`,
+  `approval: approved`. Quedan `glitch-carousel` 10, `glitch-stills` 22 y `glitch-overlays` 10. Gate visual Glitch
+  32/32 a 0 px; `BASELINE_DELTAS` sección (p), sellada.
+- `GlitchFlashManifest` es hermano del semanal (que queda idéntico); `parseGlitchManifest` / `planGlitchManifest`
+  despachan y `planGlitchFlash` valida cada lámina con `efeonce.glitch-line` 0.2.0 (`edition: { kind: 'flash' }`).
+  Validador `glitch.edition-structure` 1.1.0.
+- Chip «PORTADA» → «LA NOTICIA» en `CoverPhoto`, `BlogBannerPhoto` y `BlogSquarePhoto` (decisión del operador,
+  2026-09-28).
+- Estela determinista `src/lib/glitch-composition/flash-trail.ts`; `pnpm glitch:tokens` genera
+  `assets/flash-trail.svg` y las variables `--gx-flash-trail-*`.
+- La task sigue `complete`; este Delta no reabre su alcance.
+
 ## Delta 2026-09-27 (cierre de ejecución) — overlays PNG dentro y una desviación en el motor
 
 - **Overlays del reel y del vlog en PNG: SÍ entran** (operador, 2026-09-27: «Vamos con todo y sí agrégalo»). Reemplaza

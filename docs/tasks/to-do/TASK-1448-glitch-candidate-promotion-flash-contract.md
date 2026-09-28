@@ -1,5 +1,18 @@
 # TASK-1448 — Glitch Candidate Promotion and Flash Publication Contract
 
+## Delta 2026-09-28 — el formato visual del Glitch Flash existe; el primer Flash salió a mano
+
+- El 2026-09-28 se produjo y publicó el primer Glitch Flash (Claude Sonnet 5.5: post 251941 y cuatro redes vía
+  Metricool), con decisión y revisión del operador, **fuera** del contrato de promoción de esta task, que sigue en
+  diseño. No consumió número Weekly, en línea con el invariante de esta task.
+- El DTO confirmado de esta task debe poder alimentar el `GlitchFlashManifest` (`src/lib/glitch-composition/manifest.ts`,
+  commit local `24e4c72ee`): `edition { kind: 'flash', slug, title, publishDate }` sin número, exactamente una noticia,
+  portada con titular y dos líneas, y `back.closingLine` obligatoria (la muletilla del narrador varía por edición). El
+  contrato visual es `efeonce.glitch-line` 0.2.0 (AXIS `v0.3.24`, `glitchLine.editions.flash`), que rechaza el número
+  con `flash-edition-number-not-allowed`.
+- Pregunta abierta del operador que toca el alcance: si publicar imágenes de terceros con crédito y sin licencia (como
+  se hizo con las de Anthropic en este Flash) es una excepción general del Flash o fue puntual.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

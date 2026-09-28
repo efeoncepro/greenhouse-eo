@@ -1,7 +1,7 @@
 # Render gobernado de piezas de marca — La órbita y Glitch
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-28 por Claude
 > **Ultima actualizacion:** 2026-09-28 por Claude
 > **Documentacion tecnica:** [Artifact Render Pipeline §10](../../architecture/GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md) · [TASK-1921](../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md)
@@ -22,10 +22,14 @@ de forma privada en Greenhouse, con el registro de qué se usó para producirlos
 |---|---|---|
 | Pieza de La órbita | Una pieza por superficie (web, DOOH, pDOOH, motion, video) o una lámina de deck | PNG por pieza, o el PDF del deck |
 | Documento de La órbita | Un brochure o una propuesta de varias páginas | Un solo PDF |
-| Edición de Glitch | Carrusel, portadas y capas de un episodio | Los PNG de cada catálogo |
+| Edición de Glitch (semanal) | Carrusel, portadas y capas de un episodio | El PDF del carrusel y los PNG de portadas y capas |
 
 Se pide con el **mismo archivo** que usa el comando local (el intent de la pieza o el manifiesto de Glitch). Las
 fotos, plates y logos no se leen del computador: se suben antes a Greenhouse y el pedido los nombra.
+
+El **Glitch Flash** (el formato puntual de una sola noticia, sin número de edición, desde el 2026-09-28) todavía **no
+se puede pedir** aquí: se compone sólo con el comando local `pnpm glitch:compose`. Entra a esta ruta cuando TASK-1921 lo
+cablee.
 
 > Detalle técnico: tres familias de pedido y seis catálogos; ver [§10.1](../../architecture/GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md).
 

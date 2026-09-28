@@ -561,6 +561,14 @@ Composer es el candidato natural a `domain-package` el día que EPIC-027 lo auto
 > entrando por `pnpm brand:compose`. Detalle en §12 de
 > [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
 > Task: `docs/tasks/complete/TASK-1929-deck-plan-recipe-catalog-validator.md`.
+>
+> **Delta 2026-09-28 — el Glitch Flash entra como plantillas del catálogo Glitch, sin tocar el motor.** El segundo
+> formato de Glitch (una noticia puntual, sin número de edición) suma seis plantillas `Flash*` al `registry.json` de
+> `catalogs/glitch/` (26 → 32; `glitch-carousel` 10, `glitch-stills` 22, `glitch-overlays` 10), un manifiesto hermano
+> `GlitchFlashManifest` y el despachador `planGlitchManifest` en `src/lib/glitch-composition/` (consumidor), y el
+> validador `glitch.edition-structure` 1.1.0. Las portadas con foto pasan el chip a «LA NOTICIA». El scope
+> `--catalog=glitch` queda en **32 frames a 0 px** (`BASELINE_DELTAS.md` (p)). `src/lib/artifact-composer/*.ts` sin
+> cambios. Contrato: `efeonce.glitch-line` 0.2.0 (AXIS `v0.3.24`). Commit `24e4c72ee`.
 
 ---
 

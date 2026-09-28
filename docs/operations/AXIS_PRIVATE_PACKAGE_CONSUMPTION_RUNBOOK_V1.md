@@ -13,7 +13,8 @@ source control.
 > Glitch Flash), `axis-brand-assets` `0.3.5`, `axis-graphic-line` `0.7.0` y `axis-ui-registry` `0.3.1`. Instalado con
 > credencial efímera (`gh auth token` en un userconfig temporal fuera del repo, borrado al terminar), autorizada por el
 > operador para esta instalación. Gates: test del paquete Glitch, 102 tests del dominio, `composer:visual-gate
-> --catalog=glitch` 26/26 a 0 px, lint 0 errores, typecheck 0. La nota siguiente queda como historia.
+> --catalog=glitch` 26/26 a 0 px, lint 0 errores, typecheck 0. Ver **Delta 2026-09-28 (g)**: ese bump dejó el CI
+> rojo por no recompilar los tokens de La órbita, y la regla de todo bump quedó ahí. La nota siguiente queda como historia.
 
 > **Actualizado 2026-09-28 — superado por la nota de arriba:** Greenhouse fijaba `axis-tokens` `0.3.21` y `axis-ui-contracts` `0.3.19`
 > (tag `v0.3.21` de AXIS, TASK-1928), `axis-brand-assets` `0.3.5`, `axis-graphic-line` `0.7.0` y `axis-ui-registry`
@@ -97,6 +98,33 @@ source control.
   La evidencia del piloto pasa de **local** a **CI**.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
+
+## Delta 2026-09-28 (g) — `v0.3.24` publicado y fijado: Glitch Flash; todo bump recompila los dos juegos de tokens
+
+- **Publicado** el 2026-09-28 en el tag `v0.3.24` de AXIS (commit `5b3056f` en `main`, push autorizado por el
+  operador; CI y «Release UI packages» en verde): `axis-tokens` `0.3.24` (`glitchLine.editions`: `weekly` y `flash`, más
+  seis piezas `flash-*`) y `axis-ui-contracts` `0.3.22` (contrato `efeonce.glitch-line` 0.2.0, que acepta el Flash sin
+  número; un intent 0.1.0 resuelve igual). `axis-ui-contracts` `0.3.22` depende de `axis-tokens` `0.3.24` exacto; el
+  resto del set no cambia (`axis-brand-assets` `0.3.5`, `axis-graphic-line` `0.7.0`, `axis-ui-registry` `0.3.1`).
+- **Fijado en Greenhouse** en `53002b352` (instalación con la credencial efímera del Delta (e), autorizada por el
+  operador), con el test `src/config/axis-glitch-line-package.test.ts` (contrato 0.2.0, un Flash válido y uno rechazado).
+- **El CI de `53002b352` falló:** `scripts/brand-surfaces/__tests__/graphic-line-tokens-sync.test.ts` (4 tests). El bump
+  corrió `pnpm glitch:tokens`, pero no `pnpm brand:tokens`: los tokens de La órbita del Composer
+  (`graphic-line-{deck,stills,overlays}/graphic-line-tokens.css` y `graphic-line-shared/graphic-line-tokens.json`) llevan
+  el sello de la versión instalada de `axis-tokens` y quedaron atrasados aunque ningún valor cambió. Arreglo: `609353e83`
+  (sólo el sello de versión).
+- **Regla (reemplaza a la de «Después de cada bump» del Delta (f)):** todo bump de `@efeoncepro/axis-tokens` corre
+  `pnpm brand:tokens` **y** `pnpm glitch:tokens`, después `pnpm brand:tokens --check` y `pnpm glitch:tokens --check`, y
+  recién entonces se commitea. No importa qué parte del token cambió: los dos juegos compilados llevan el sello de versión.
+- **Lección de permisos (sesiones de Claude Code):** los gates de AXIS se corren como comandos sueltos,
+  `pnpm -C /Users/jreye/Documents/axis-design-system <script>` y `git -C /Users/jreye/Documents/axis-design-system <cmd>`.
+  Un comando compuesto con `cd` y logs redirigidos a `/tmp` fue bloqueado por el clasificador de permisos en este
+  release; los gates y el push los terminó Codex.
+- **Consumo:** el Artifact Composer compone el Glitch Flash desde `24e4c72ee` (seis plantillas `flash-*`,
+  `pnpm glitch:compose -- --manifest <flash.json>`; gate `--catalog=glitch` 32/32 a 0 px). Pendiente: la ruta productiva
+  (TASK-1921) todavía planifica sólo la edición semanal, y tres medidas de la estela de bytes (ancho grande 150 px,
+  separación compacta 8 px, separación del banner 10 px) siguen como medidas del canvas en `glitch.css` hasta que AXIS
+  las tome en el token.
 
 ## Delta 2026-09-28 (f) — `v0.3.15` a `v0.3.21` publicados; Greenhouse fija `0.3.21` / `0.3.19` (TASK-1928)
 

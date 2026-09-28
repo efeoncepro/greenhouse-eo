@@ -1,9 +1,10 @@
 # Componer piezas de Glitch — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (v1.6: nota del Glitch Flash, chip «LA NOTICIA» y muletilla que
+> **Ultima actualizacion:** 2026-09-28 por Claude (v1.7: estados al día —los valores de Glitch ya están en AXIS desde
+> el 2026-09-27 y el Glitch Flash desde `v0.3.24`—; pendiente de la última frase fija del reel. v1.6: nota del Glitch Flash, chip «LA NOTICIA» y muletilla que
 > cambia por edición. v1.5: el blog completo y la lámina con lente quedaron aprobados;
 > la versión 1:1 del banner es una plantilla propia, el callout «DROP» v2 rige desde la #17 y la lente es una variante
 > ocasional. v1.4: la música de Glitch quedó aprobada e integrada al taller, con
@@ -147,7 +148,8 @@ de grabación, la prueba con los editores en una edición real, el estilo de sub
    cabecera entre 240 y 440, texto entre 1150 y 1480, y **nunca** sobre la cara del host.
 5. Las ocho piezas del reel son transparentes: apertura, cabecera (noticia n/3 + logo), lower third, subtítulo, tarjeta de
    noticia, imagen de la fuente (plano dividido), Glitch Drop y última frase («el #N+1 sale el lunes.» + «Sigue a
-   Glitch»). Sólo la portada del reel y la tarjeta final son pantalla completa. El **lower third** está aprobado
+   Glitch»; **pendiente**: esa frase es fija y choca con la muletilla que cambia por edición; no la cambies a mano,
+   lo decide el operador). Sólo la portada del reel y la tarjeta final son pantalla completa. El **lower third** está aprobado
    (ver [Video y motion](#video-y-motion)); no inventes otro contenido.
    El **sonido** está aprobado (versión B, 2026-09-27): cada `.mov` trae su WAV al lado. La **música** también (tema B
    y cama post-punk bajo la noticia, 2026-09-27): la intro, con su pre-roll de los tres puntos, la cortina, la salida y
@@ -220,10 +222,9 @@ de grabación, la prueba con los editores en una edición real, el estilo de sub
 | **APROBADO** (2026-09-27) | se usa como pieza final: portada A/B/C con rotación, lámina interior, noticia 1, contraportada, la lámina con lente (variante ocasional) y el blog completo (banners 16:9 y 1:1 propia, apertura, escaleta, banner interno con crédito, callout «DROP» v2 desde la #17, suscripción, «El hilo de la semana» y cierre); también la manzana como esfera, el verde como acento, la línea Growth, el alta de los cinco íconos Plastilina, el sonido (versión B), la música (tema B y cama post-punk, con el pre-roll de la intro) y el motion del video (apertura y tarjeta final v2, kit de gráficos con el lower third, transiciones) con los tableros de video del canvas (vlog 16:9 y reel) |
 | **PROPUESTA** | se puede armar para mostrarla al operador, pero no se publica como final. Hoy no hay piezas fijas en propuesta; el estado queda para piezas nuevas. (El flujo de composición está aceptado; su automatización de piezas fijas es TASK-1923) |
 | **EXPLORACIÓN** | idea en estudio, no canon: los acentos teal y naranja del canvas, la historia 9:16 y el carrusel panorámico |
-| **Aprobado, sin publicar en AXIS** | la manzana, el verde y los cinco íconos Plastilina de Glitch están aprobados (2026-09-27), pero todavía no están en los paquetes oficiales de AXIS (TASK-1922) |
 | **Pendiente** (video) | la cadencia de grabación (hoy 30 fps), la prueba con los editores en una edición real, el ritmo ajustable, a qué piezas se aplica la transición de bytes, el estilo de subtítulos, los textos reales de la #17 y cualquier excepción de rostros |
 | **Por confirmar** | la referencia del contrato de licencia de Guttery (la licencia fue confirmada por el operador el 2026-09-27) |
-| **Publicada** (AXIS) | la página y la guía de Glitch están en axis.efeonce.org desde el 2026-09-27; los tokens de Glitch todavía no existen (TASK-1922) |
+| **Publicada** (AXIS) | la página, la guía, el token `glitchLine`, el contrato `efeonce.glitch-line` y los archivos de Glitch (la manzana, el wordmark y los cinco íconos Plastilina) están en AXIS desde el 2026-09-27 (tag `v0.3.12`); el Glitch Flash, desde el 2026-09-28 (tag `v0.3.24`, contrato 0.2.0) |
 
 ## Qué no hacer
 

@@ -1,5 +1,14 @@
 # TASK-1443 — Glitch Editorial Agent Skill and Evals
 
+## Delta 2026-09-28 — casos nuevos para los evals
+
+- El contrato `efeonce.glitch-line` 0.2.0 (AXIS `v0.3.24`) ya rechaza mecánicamente un Flash con número
+  (`flash-edition-number-not-allowed`) y con avance (`flash-progress-not-allowed`); el eval «`glitchFlash` consumiendo
+  número» puede apoyarse en esos códigos.
+- La muletilla del narrador en la contraportada **varía por edición** (decisión del operador, 2026-09-28). Casos útiles:
+  un Flash que cierra con «el #N+1 sale el lunes» (no aplica) o con «el resto, el lunes» (rechazada por no natural). La
+  regla está en `glitchLine.editions.flash.narratorCloser` (`never: next-edition-number, fixed-phrase`; `rejected`). Canon: `efeonce-graphic-line/references/glitch.md` §14.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

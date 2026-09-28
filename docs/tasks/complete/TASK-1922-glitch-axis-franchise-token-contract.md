@@ -1,5 +1,18 @@
 # TASK-1922 — Glitch en AXIS: token de franquicia, archivos oficiales y contrato
 
+## Delta 2026-09-28 — AXIS v0.3.24: dos formatos de edición
+
+- AXIS tag `v0.3.24` (commit `5b3056f`): `@efeoncepro/axis-tokens` 0.3.24 publica `glitchLine.editions` (`weekly` |
+  `flash`; `flash` `approved` el 2026-09-28) y seis piezas `flash-*` en `glitchLine.pieces` (`derivesFrom`, `chip`,
+  `coverTemplate: null`), con `pendingDecisions` `edition-numbering-blog-vs-system` y `weekly-cover-chip`.
+- `@efeoncepro/axis-ui-contracts` 0.3.22 sube el contrato `efeonce.glitch-line` a **0.2.0**: `edition` acepta un número
+  o `{ kind, number? }`, campo `progress` y códigos `flash-edition-number-not-allowed`, `flash-progress-not-allowed`,
+  `edition-kind-invalid`, `edition-kind-mismatch` y `progress-invalid`. Un intent 0.1.0 resuelve igual.
+- Greenhouse fija ambas versiones desde `53002b352`. Tres medidas de la estela del Flash (ancho grande 150 px,
+  separación compacta 8 px, separación del banner 10 px) aún no están en el token: viven en `glitch.css` como medidas
+  del canvas y quedan pendientes para AXIS.
+- La task sigue `complete`; este Delta no reabre su alcance.
+
 ## Delta 2026-09-27 (noche) — recalibración antes de ejecutar
 
 Discovery de la sesión que toma la task (AXIS `main` en `47acc3d`). Manda sobre lo que diga el cuerpo de esta spec

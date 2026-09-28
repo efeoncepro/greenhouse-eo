@@ -115,10 +115,13 @@ hipótesis de montaje, no benchmarks; revisar secuencia completa y no sólo el p
    `references/glitch.md` §6. El reel es un kit de **overlays con alfa encima de la toma del host** (mapa de zonas; la
    cara y la interfaz de la app nunca se tapan) + tarjeta final en loop. El motion de Glitch está **APROBADO**
    (2026-09-27, norma §7 y §13) y **producido con HyperFrames** en el taller (composiciones propias de
-   `tools/glitch-motion`; el catálogo `glitch-edition` del Composer, TASK-1923, es otra cosa y sigue pendiente), igual
-   que su sonido (§13.11) y su música (§13.12); lo que sigue pendiente lo lista la norma §11. **La transición de la
-   manzana en bytes es exclusiva de Glitch.** Nunca animes a mano una pieza de Glitch: se corre `glitch-motion`
-   (comandos y argumentos: norma §13.13; mínimo operable en `references/glitch.md` §12).
+   `tools/glitch-motion`; los catálogos `glitch-carousel`/`glitch-stills`/`glitch-overlays` del Composer, TASK-1923,
+   son otra cosa: piezas fijas y el cuadro fijo de cada overlay), igual que su sonido (§13.11) y su música (§13.12); lo
+   que sigue pendiente lo lista la norma §11. **La transición de la manzana en bytes es exclusiva de Glitch.** Nunca
+   animes a mano una pieza de Glitch: se corre `glitch-motion` (comandos y argumentos: norma §13.13; mínimo operable en
+   `references/glitch.md` §12). **Semanal vs Flash:** el taller sólo conoce la edición semanal («Edición #N» y el cierre
+   «el #N sale el lunes.» fijo); el **Glitch Flash** (2026-09-28: una noticia, sin número) todavía no tiene motion ni
+   cabecera Flash, y la muletilla del narrador varía por edición (`references/glitch.md` §14; pendiente en TASK-1924).
    **Dónde:** repo taller `efeoncepro/efeonce-brand-workshop`, `tools/glitch-motion/` (TASK-1924), operado desde
    `greenhouse-eo` con `pnpm -C ../efeonce-brand-workshop`; nunca en Greenhouse ni en Globe.
    **Sonido de Glitch (APROBADO, versión B, 2026-09-27; sólo Glitch):** cada pieza de motion de Glitch tiene una pista de sonido sidecar

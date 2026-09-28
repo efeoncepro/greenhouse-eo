@@ -50,7 +50,9 @@ público) o un cliente Globe. Para motion genérico basta `../modules/`.
   salida **reemplazan** a `apertura.wav` y `cierre.wav`; `--music off` entrega como antes. **Único pendiente:** probar
   la mezcla con la voz real del host. **La transición de la manzana en bytes es exclusiva de
   Glitch**: nunca en piezas de Efeonce, su familia ni clientes. Nunca la animes a mano ni la reproduzcas fuera del
-  taller. Detalle: `efeonce-graphic-line` → `references/glitch.md` §12; comandos: norma de Glitch §13.13.
+  taller. Detalle: `efeonce-graphic-line` → `references/glitch.md` §12; comandos: norma de Glitch §13.13. **Sólo la
+  edición semanal:** el Glitch Flash (una noticia, sin número, 2026-09-28) no tiene motion ni cabecera Flash en el
+  taller, y el cierre «el #N sale el lunes.» no le aplica (`references/glitch.md` §14; TASK-1924).
 - **Cierre de marca 4,5 s — línea gráfica «La órbita» (canónica desde 2026-09-25):** el end-card de la marca propia
   Efeonce y su familia (nunca de un cliente) sigue el
   [manual §10.1](../../../../docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md). La línea de tiempo

@@ -6,7 +6,8 @@ Verificado contra: greenhouse-eo@7cb24df17 · axis-design-system@a5c21ae (ícono
 · §L «Componer el deck hoy» y «Cambiar la foto, el copy o la sección»: árbol local de `develop` tras el cierre de
 TASK-1927 — 2026-09-27 · §L «Recetas con plantilla desde TASK-1928»: árbol local de `develop` en `64be8aa16`
 (AXIS `v0.3.20`) — 2026-09-27 · portada con selección (`document-selection`, AXIS `v0.3.21`) — 2026-09-28 · §L
-«Láminas SEO/AEO con plantilla desde TASK-1934» (AXIS `v0.3.23`, `develop` tras `af32d9353`) — 2026-09-28
+«Láminas SEO/AEO con plantilla desde TASK-1934» (AXIS `v0.3.23`, `develop` tras `af32d9353`) — 2026-09-28 · versiones
+vigentes de §L (AXIS `v0.3.24`, greenhouse-eo@53002b352) — 2026-09-28
 
 Esta guía dice, **para cada aplicación**, qué elementos de la línea van (y cuáles nunca), dónde se ubican, cuánto espacio
 ocupan, en qué superficie y color, y cómo se produce. No repite la API (ver `package-and-tokens.md`), el significado de
@@ -729,7 +730,7 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 > Contrato AXIS `efeonce.surface-composition` 0.1.2 (manifest `axis.surface-composition.v1`; acepta intents 0.1.0 y
 > 0.1.1), tokens `efeonceGraphicLine.surfaces.<superficie>` y `pnpm surface:resolve`. **Greenhouse lo integró con
 > TASK-1927 y completó el deck con TASK-1928** (las dos `complete` y en `origin/develop`); TASK-1934 sumó las nueve
-> láminas SEO/AEO: hoy fija `axis-tokens` **0.3.23** y `axis-ui-contracts` **0.3.21** (tag AXIS `v0.3.23`; la serie de versiones está en
+> láminas SEO/AEO (tag AXIS `v0.3.23`); hoy fija `axis-tokens` **0.3.24** y `axis-ui-contracts` **0.3.22** (tag AXIS `v0.3.24`, el Glitch Flash, sin cambios para la superficie; la serie de versiones está en
 > [ledger.md](ledger.md)). Ver «Contrato 0.1.2» y «Componer el deck hoy» al final de esta sección,
 > [Lab](https://axis.efeonce.org/references/surfaces/). Canvas por superficie:
 > [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7), una página por
@@ -801,7 +802,7 @@ nivel de llegada en bloque sólido en el acento de la línea (BeX: cinco peldañ
 contraportadas)).** Aditivo: un intent 0.1.0 u 0.1.1 se resuelve como antes. Guía AXIS
 `docs/agent-composition/surfaces/deck.md`, ADR AXIS `docs/architecture/SURFACE_COMPOSITION_DECISION_V1.md` (delta
 0.1.2 y deltas (b)…(l)), ejemplos en `docs/examples/surfaces/`. **En Greenhouse, `pnpm brand:compose` compone sobre
-la 0.1.2 desde TASK-1927** (hoy con `axis-tokens` 0.3.21 y `axis-ui-contracts` 0.3.19).
+la 0.1.2 desde TASK-1927** (hoy con `axis-tokens` 0.3.24 y `axis-ui-contracts` 0.3.22).
 
 - **Usos:** `use: 'proposal' | 'brochure'` en el deck. Toda receta aprobada admite los dos (el brochure es un PDF
   horizontal 16:9 que se lee sin presentador); una opción, sólo `proposal` (`use-not-for-recipe`). En el brochure,

@@ -13,11 +13,17 @@
 > **Accepted** el mismo día ([Delta — motion aprobado](#delta-2026-09-27--motion-aprobado)), igual que la **música de
 > Glitch** (tema B + cama post-punk; [Delta — música aprobada](#delta-2026-09-27--música-aprobada)). El **blog** y la
 > **lámina con lente** quedaron **Accepted** el 2026-09-27 ([Delta — blog y lente aprobados](#delta-2026-09-27--blog-y-lente-aprobados)):
-> ya no queda ninguna pieza estática en propuesta.
+> ya no queda ninguna pieza estática en propuesta. El **Glitch Flash** quedó **Accepted** como segundo formato el
+> 2026-09-28 ([Delta — Glitch Flash](#delta-2026-09-28--glitch-flash)) y esa noche pasó a sistema: AXIS `v0.3.24` y el
+> Artifact Composer ([Delta de la noche](#delta-2026-09-28-noche--el-flash-en-axis-y-en-el-composer)).
 > **Creado:** 2026-09-27 por Claude, a pedido del operador (Julio Reyes)
-> **Última actualización:** 2026-09-28 por Claude ([Delta 2026-09-28 — Glitch Flash](#delta-2026-09-28--glitch-flash):
+> **Última actualización:** 2026-09-28 por Claude ([Delta 2026-09-28 (noche) — el Flash en AXIS y en el Composer](#delta-2026-09-28-noche--el-flash-en-axis-y-en-el-composer):
+> **AXIS `v0.3.24`** publica `glitchLine.editions` y las seis piezas `flash-*` y el contrato `efeonce.glitch-line`
+> 0.2.0; Greenhouse los fija (`53002b352`) y **el Composer compone el Flash** con seis plantillas `Flash*` (`24e4c72ee`,
+> local); el chip «LA NOTICIA» ya está en las plantillas; queda la ruta productiva del Flash y otros pendientes;
+> antes, [Delta 2026-09-28 — Glitch Flash](#delta-2026-09-28--glitch-flash):
 > **el Glitch Flash queda aceptado como segundo formato** —una noticia puntual, sin número de edición—, lanzado en
-> producción; pendiente llevarlo a AXIS y al Composer; antes, [Estado de implementación](#estado-de-implementación-task-1923-2026-09-27):
+> producción; antes, [Estado de implementación](#estado-de-implementación-task-1923-2026-09-27):
 > **las piezas estáticas ya se componen en el Artifact Composer** —TASK-1923, en local—, Guttery entra al repo privado y
 > dos desviaciones declaradas; antes, [Delta de TASK-1922](#delta-2026-09-27--tokens-contrato-y-archivos-publicados-en-axis-task-1922): **tokens `glitchLine`, contrato
 > `efeonce.glitch-line` 0.1.0 y archivos de Glitch publicados en AXIS** —tag `v0.3.12`, autorizado por el operador— y
@@ -248,6 +254,11 @@ El único pendiente de la música es probar la mezcla con la voz real del host. 
 - TASK-1924 (el taller lee `glitchLine` y retira su espejo de paleta y manzana); promoción del contrato
   `efeonce.glitch-line` desde `candidate` tras la primera edición compuesta. TASK-1923 (catálogos del Composer que leen
   `glitchLine`) ya existe en local: ver [Estado de implementación](#estado-de-implementación-task-1923-2026-09-27).
+- Glitch Flash (2026-09-28): ya está en AXIS (`v0.3.24`) y en el Composer (local). Quedan la ruta productiva del Flash
+  (TASK-1921 sólo conoce la edición semanal), tres medidas de la estela que el token no publica, la última frase fija
+  del video («el #N sale el lunes.»), el chip semanal en AXIS (`weekly-cover-chip`), la licencia de imágenes de
+  terceros en otros Flash, el `kind` de `efeoncepro/glitch-drop` en Content Factory y la numeración de la edición
+  semanal ([Delta de la noche](#delta-2026-09-28-noche--el-flash-en-axis-y-en-el-composer)).
 
 ## Reversibilidad
 
@@ -562,6 +573,8 @@ guarda su sha256); y el código no pasó por PR ni por el CI del taller (commits
   35 PNG byte a byte.
 - **Gate visual:** `pnpm composer:visual-gate --catalog=glitch`, línea base de 26 cuadros en
   `scripts/frontend/baselines/artifact-composer/templates-glitch/`.
+  *(Desde el 2026-09-28 son 32 plantillas y 32 cuadros, con las seis del Glitch Flash: ver el
+  [Delta de la noche](#delta-2026-09-28-noche--el-flash-en-axis-y-en-el-composer).)*
 
 **Decisiones del operador que esta sección registra (2026-09-27):**
 
@@ -613,8 +626,69 @@ edición** (gesto conversacional, nunca una frase fija) y el **chip de la portad
 **Pendiente:** llevar el Flash a **AXIS** (pieza en `glitchLine.pieces`, la estela como token, la cabecera en el
 contrato `efeonce.glitch-line`) y al **Artifact Composer** (plantillas que acepten una sola noticia; hoy
 `pnpm glitch:compose` exige ocho); cambiar el chip «PORTADA» en `CoverPhoto`, `BlogBannerPhoto` y `BlogSquarePhoto`.
-Hasta entonces el Flash se arma desde las plantillas aprobadas. **Pregunta abierta** registrada, sin resolver: la
+Hasta entonces el Flash se arma desde las plantillas aprobadas. *(Cerrado esa misma noche: ver el
+[Delta siguiente](#delta-2026-09-28-noche--el-flash-en-axis-y-en-el-composer).)* **Pregunta abierta** registrada, sin resolver: la
 numeración de la edición semanal (el blog ya tiene «Glitch #16» y «Glitch #17», y el Delta del 2026-09-27 dice que la
 próxima es la #17).
 
-**Reversible:** el Flash no tiene código ni token propio que retirar; revertirlo es una decisión del operador.
+**Reversible:** el Flash no tiene código ni token propio que retirar; revertirlo es una decisión del operador. *(Dejó
+de ser cierto esa noche: ver la reversibilidad del Delta siguiente.)*
+
+## Delta 2026-09-28 (noche) — el Flash en AXIS y en el Composer
+
+> **Alcance:** sólo Glitch, nunca Efeonce. Detalle en la
+> [norma §9.1, §10.1, §11, §12 y §14](../operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md#14-glitch-flash--formato-puntual-lanzado-2026-09-28),
+> en el [manual para componer una edición](../manual-de-uso/creative/componer-una-edicion-de-glitch.md#componer-un-glitch-flash)
+> y en la skill `efeonce-graphic-line`, `references/glitch.md` §9 y §14.
+
+**AXIS publicado (el operador autorizó el push directo).** Tag **`v0.3.24`**, commit `5b3056f` en `main` (rama:
+`c2bd797` tokens, `8a71e9e` contrato, `d33f874` docs y Lab), ejecutado por Codex después de que el clasificador de
+permisos bloqueara los gates de AXIS a la sesión de Greenhouse. `@efeoncepro/axis-tokens` **0.3.24**:
+`glitchLine.editions` (`weekly` | `flash`; `editions.flash` con `status: 'approved'`, `approvedOn: '2026-09-28'`: la
+cabecera «NO ESPERA AL LUNES» + estela + «FLASH», chips «LA NOTICIA» y «ANUNCIO», sin avance, muletilla que varía y
+rechaza «el resto, el lunes»), seis piezas `flash-*` en `glitchLine.pieces` (`derivesFrom`, `chip`,
+`coverTemplate: null`) y dos `pendingDecisions` nuevas (`edition-numbering-blog-vs-system`, `weekly-cover-chip`).
+`@efeoncepro/axis-ui-contracts` **0.3.22**: contrato `efeonce.glitch-line` **0.2.0** (`edition` número o
+`{ kind, number? }`, campo `progress`, códigos `flash-edition-number-not-allowed`, `flash-progress-not-allowed`,
+`edition-kind-invalid`, `edition-kind-mismatch` y `progress-invalid`; un intent 0.1.0 resuelve igual). CI y «Release UI
+packages» en verde. Lab: sección «El Glitch Flash» en `/references/glitch/#flash`; `glitch.json` expone `editions` y el
+contrato 0.2.0.
+
+**Greenhouse lo consume.** `53002b352` (en `origin/develop`) fija `axis-tokens` 0.3.24 y `axis-ui-contracts` 0.3.22,
+con un test del paquete (`src/config/axis-glitch-line-package.test.ts`: contrato 0.2.0, un Flash válido y uno
+rechazado) y `pnpm glitch:tokens` recompilado. **Su CI falló**: `graphic-line-tokens-sync.test.ts` exige regenerar
+también los tokens de «La órbita» del Composer (`pnpm brand:tokens`), que llevan el sello de versión aunque sus valores
+no cambien. Arreglo local `609353e83`. Regla desde entonces: **todo bump de `@efeoncepro/axis-tokens` corre
+`pnpm brand:tokens` y `pnpm glitch:tokens`, los dos con `--check`, antes del commit**.
+
+**El Composer compone el Flash** (`24e4c72ee`, local): `GlitchFlashManifest` (hermano del semanal, que queda idéntico;
+`parseGlitchManifest` y `planGlitchManifest` despachan por `edition.kind`), `planGlitchFlash` (cada lámina validada con
+el contrato 0.2.0 y `edition: { kind: 'flash' }`), seis plantillas `FlashCover`, `FlashInterior`, `FlashBackCover`,
+`FlashBlogBanner`, `FlashNewsBanner` y `FlashThreads` (`approval: approved`), el validador `glitch.edition-structure`
+1.1.0, la estela determinista `flash-trail.ts` (reimplementa el Mersenne Twister de CPython con la semilla 1755 y
+reproduce las 34 celdas publicadas; `pnpm glitch:tokens` escribe `assets/flash-trail.svg` y las variables
+`--gx-flash-trail-*`) y el ejemplo `flash-sonnet-5-5.example.json`. El chip de las portadas con foto semanales
+(`CoverPhoto`, `BlogBannerPhoto`, `BlogSquarePhoto`) pasa de «PORTADA» a «LA NOTICIA». Gate visual Glitch **32/32 a
+0 px** (antes 26), sección (p) de `BASELINE_DELTAS.md` sellada; 127 tests focales y `local:check` en verde.
+
+**Pendientes que quedan (no se deciden por cuenta propia):**
+
+1. **Ruta productiva del Flash:** TASK-1921 (`src/lib/brand-surfaces/production/plan.ts`, `artifact-worker`) sigue con
+   `planGlitchEdition`: el Flash sólo compone en local.
+2. **Tres medidas de la estela** fuera del token (ancho en la cabecera grande 150 px, separación compacta 8 px y del
+   banner 10 px): viven en `glitch.css` como medidas del canvas; pendiente de AXIS.
+3. **Numeración** de la edición semanal (#17 del sistema frente a «Glitch #16» y «#17» ya publicados en el blog):
+   pregunta abierta para el operador.
+4. **Última frase del video:** `overlay-cta-reel.html` / `overlay-cta-vlog.html` y la pieza `cta` del taller dicen «el
+   #N sale el lunes.» fijo, contra la muletilla que varía por edición: decisión del operador y trabajo de motion.
+5. **Imágenes de terceros** con crédito y sin licencia: decidido sólo para el Flash de Sonnet 5.5; ¿excepción general?
+6. **Content Factory** sin `kind` para `efeoncepro/glitch-drop` (propuesta escrita en la skill
+   `efeonce-public-site-wordpress`, `references/content-factory-gutenberg.md`).
+7. **Chip de la portada semanal en AXIS** (`pendingDecisions: weekly-cover-chip`): en Greenhouse ya es «LA NOTICIA».
+8. **Push:** `609353e83` y `24e4c72ee` están en `develop` local; `origin/develop` sigue en `53002b352`, con el CI rojo
+   hasta que se empujen. Lo decide el operador.
+
+**Reversibilidad:** ahora el Flash sí tiene código y token: revertirlo exige retirar las seis plantillas `Flash*`, su
+sección de la línea base del gate, `GlitchFlashManifest`/`planGlitchFlash`/`flash-trail.ts` y, en AXIS, las piezas
+`flash-*` y `editions.flash` (el contrato 0.2.0 es aditivo: un intent 0.1.0 sigue resolviendo). El manifiesto semanal
+quedó idéntico, así que la edición no depende del Flash.

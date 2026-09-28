@@ -4,7 +4,8 @@
 > greenhouse-eo@051660d73 — 2026-09-26. Plastilina en volumen (D24): AXIS `main@c18e3d3` — 2026-09-27. Oficio (D25,
 > catálogo de 60 y 33 volúmenes): AXIS main@aa66225, 2026-09-27 (tag `v0.5.0`). IA, social y staff (D26, catálogo de
 > 79 y 43 volúmenes): AXIS main@cf77452 (2026-09-27) (tag `v0.6.0`). Versiones fijadas y ruta por el Artifact Composer:
-> greenhouse-eo@016d0a183 — 2026-09-27 (tag AXIS `v0.3.8`).
+> greenhouse-eo@016d0a183 — 2026-09-27 (tag AXIS `v0.3.8`). Versiones vigentes y fila de Glitch: greenhouse-eo@24e4c72ee
+> — 2026-09-28 (tag AXIS `v0.3.24`).
 
 ## Fuentes de verdad (por orden de autoridad)
 
@@ -20,7 +21,7 @@
 | Fotografía | `docs/operations/brand-photography/` (lenguaje fotográfico, reservas, firma en primer plano) | el operador |
 | Iconografía (Trazo y Plastilina, D16–D22) | AXIS: valores `efeonceGraphicLine.icons` (`axis-tokens` ≥ 0.3.6), geometría y reglas `@efeoncepro/axis-graphic-line/icons` (≥ 0.4.0), guía `docs/agent-composition/iconography.md`, ADR `docs/architecture/ICONOGRAPHY_DECISION_V1.md`. Plastilina en volumen (D24): `efeonceGraphicLine.icons.volume` (`axis-tokens` 0.3.7) y los PNG de `@efeoncepro/axis-brand-assets` 0.3.2 (ambos publicados con el tag `v0.3.7`). Oficio (D25): catálogo de 60 en `axis-graphic-line` 0.5.0 y 33 PNG en `axis-brand-assets` 0.3.3 (tag `v0.5.0`), guía §«Catálogo aprobado». En Greenhouse sólo el criterio ([iconography.md](iconography.md)) | el token y el paquete; las decisiones, el operador (ledger) |
 | Identidad sonora (**recomendada, no canon**, 2026-09-26) | Greenhouse `docs/operations/brand-sonic/EFEONCE_SONIC_IDENTITY_V1.md`; AXIS (PR #4, squash `55486aa`, publicado 2026-09-26): página `https://axis.efeonce.org/references/sonic-brand/`, JSON `/references/sonic-brand.json` (esquema `axis.efeonce-sonic-brand.v1`), guía `docs/agent-composition/sonic-brand.md`, fuentes Lab `apps/lab/src/data/sonic-brand.ts` y `sonic-brand-assets.ts`. Sin tokens hasta canonizar | el operador (ledger); archivos, el kit |
-| Sub-línea de Glitch (sólo Glitch, 2026-09-27) | Greenhouse `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` (norma) + ADR `docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md`; AXIS (publicado 2026-09-27): `/references/glitch/` (con `#sonido` y `#musica`), `/references/glitch.json` (campos `sound` y `music`), guía `docs/agent-composition/glitch.md`. Sin tokens ni contrato todavía; resumen en [glitch.md](glitch.md) | el operador; los valores, la norma hasta que existan tokens |
+| Sub-línea de Glitch (sólo Glitch, 2026-09-27) | Greenhouse `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` (norma) + ADR `docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md`; AXIS (publicado 2026-09-27): `/references/glitch/` (con `#sonido` y `#musica`), `/references/glitch.json` (campos `sound` y `music`), guía `docs/agent-composition/glitch.md`. Token `glitchLine` (`axis-tokens`; desde 0.3.24 con `editions` y las piezas `flash-*` del Glitch Flash), contrato `efeonce.glitch-line` 0.2.0 (`axis-ui-contracts` 0.3.22) y `AXIS_GLITCH_ASSETS` (`axis-brand-assets` 0.3.5); en Greenhouse, catálogos `src/lib/artifact-composer/catalogs/glitch/` (32 plantillas) y `pnpm glitch:compose`. Resumen en [glitch.md](glitch.md) | el operador; los valores, el token `glitchLine` |
 | Motion, sonido y música de Glitch (**aprobados**, sólo Glitch, 2026-09-27) | Producción: repo taller `efeoncepro/efeonce-brand-workshop` (`main` = `ed89a0b`), `tools/glitch-motion/` (HyperFrames; `src/sound.mjs` sobre `tools/brand-sound`; `src/music.mjs`), manifiesto por corrida en `corridas/<run>/manifiesto.json` (sha256, verificaciones, entrega; sin rutas de máquina). Música: másteres en `https://storage.googleapis.com/efeonce-group-axis-public-media/glitch/music/v1/` (`index.json`; sha256 fijado en `music.mjs`, falla cerrado si cambia). Sonido: `glitch/sound/v1/` del mismo bucket. Entregas al editor: OneDrive `Alineación/5. Contenidos/09. Glitch/Motion/piloto/` (`v2/` la aprobada, `v2/sin-musica/`, `kit/`, `transiciones/`). Datos AXIS: `apps/lab/src/data/{glitch,glitch-sound,glitch-sound-assets,glitch-music,glitch-music-assets}.ts`. Comandos: norma de Glitch §13.13 y [glitch.md](glitch.md) §12 | el operador aprueba; los archivos del bucket (URL + sha256) mandan sobre cualquier script |
 
 Si un doc y el código no coinciden, manda el código verificado y se corrige el doc (con fecha).
@@ -105,8 +106,8 @@ D26. Greenhouse fija axis-graphic-line 0.6.0 y axis-brand-assets 0.3.4.
 **Publicado el 2026-09-27 (tag `v0.3.8`):** `axis-tokens` 0.3.8 y `axis-ui-contracts` 0.3.7, con el contrato
 `efeonce.surface-composition` 0.1.1 (`candidate`, acepta intents 0.1.0; modela el contenido de las láminas aprobadas).
 
-**Vigente en Greenhouse (2026-09-28, `package.json`, tras TASK-1927, TASK-1922 y TASK-1928):** `axis-tokens`
-**0.3.21** · `axis-ui-contracts` **0.3.19** (tag `v0.3.21`) · `axis-brand-assets` 0.3.5 · `axis-graphic-line` 0.7.0
+**Vigente en Greenhouse (2026-09-28, `package.json`, tras TASK-1927, TASK-1922, TASK-1928, TASK-1934 y el Glitch
+Flash, `53002b352`):** `axis-tokens` **0.3.24** · `axis-ui-contracts` **0.3.22** (tag `v0.3.24`) · `axis-brand-assets` 0.3.5 · `axis-graphic-line` 0.7.0
 (dependencia directa) · `axis-ui-registry` 0.3.1. Contrato `efeonce.surface-composition` 0.1.2 con los deltas (b)…(l)
 del ADR de AXIS. La serie completa está en [ledger.md](ledger.md).
 

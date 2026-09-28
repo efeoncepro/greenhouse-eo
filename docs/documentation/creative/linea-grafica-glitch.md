@@ -1,9 +1,11 @@
 # Línea gráfica de Glitch — sub-línea de La órbita
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.12
+> **Version:** 1.13
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (v1.12: Glitch tiene dos formatos, la edición semanal y el Glitch
+> **Ultima actualizacion:** 2026-09-28 por Claude (v1.13: el Glitch Flash ya tiene plantilla automática —se compone
+> con el mismo comando que la edición— y sus valores viven en AXIS; la etiqueta «La noticia» ya está en las plantillas;
+> la manzana, el verde y los cinco íconos ya están en AXIS desde el 2026-09-27; pendientes al día. v1.12: Glitch tiene dos formatos, la edición semanal y el Glitch
 > Flash; chip «La noticia» en la portada y frase del narrador que cambia en cada edición; v1.11: las piezas estáticas ya se componen solas desde los datos
 > de la edición —carrusel, piezas del blog, portada del reel, miniatura del vlog y cuadros fijos de los gráficos—, con
 > la portada elegida por la regla de rotación; Guttery entra al repo privado; v1.10: el blog completo y la lámina con lente quedaron aprobados;
@@ -58,8 +60,9 @@ logo de Glitch aparece en la cabecera y en la invitación a suscribirse, nunca e
 Glitch sale en **dos formatos** (decisión del 2026-09-28): la **edición semanal**, que sale los lunes con ocho noticias,
 y el **Glitch Flash**, que sale cuando una noticia puntual no puede esperar al lunes (el primero fue el lanzamiento de
 Claude Sonnet 5.5, el 2026-09-28). El Flash **no lleva número de edición**: en su lugar dice «No espera al lunes» y
-«Flash», con una estela de bytes. Salió publicado en redes y en el blog, pero todavía no tiene plantilla automática: se
-arma a partir de las piezas aprobadas.
+«Flash», con una estela de bytes. Salió publicado en redes y en el blog el mismo día, y esa noche quedó con **plantilla
+automática**: se compone con el mismo comando que la edición semanal (ver «Cómo se producen las piezas fijas») y sus
+reglas viven en el sistema de diseño AXIS.
 
 Cada edición semanal se numera como **«Edición #N»**. La norma dice que la próxima es la **#17**, pero el blog ya
 publicó una «Glitch #16» y una «Glitch #17» en julio: **está pendiente que el operador aclare la numeración** (los
@@ -101,13 +104,13 @@ abre con la franja «El micrófono se abre». El carrusel cierra con la **contra
 | Video horizontal (vlog) y reel vertical con gráficos encima del host | **aprobados** el 2026-09-27 |
 | Tarjeta final de video | **aprobada** el 2026-09-27 |
 | Gráficos animados del video (apertura, tarjeta final, kit y transiciones) | **aprobados** el 2026-09-27 («Si, el tuyo también está aprobado») |
-| Glitch Flash (una noticia puntual, sin número de edición) | **lanzado y aprobado en uso real** el 2026-09-28; todavía sin plantilla automática |
-| Etiqueta de la portada: «La noticia» (antes «Portada») y frase del narrador de la contraportada distinta en cada edición | **decididos** el 2026-09-28 |
+| Glitch Flash (una noticia puntual, sin número de edición) | **lanzado y aprobado en uso real** el 2026-09-28; con plantilla automática desde esa noche (seis piezas: portada, noticia, contraportada, portada de Threads, banner del blog y banner de la noticia) |
+| Etiqueta de la portada: «La noticia» (antes «Portada») y frase del narrador de la contraportada distinta en cada edición | **decididos** el 2026-09-28; las plantillas automáticas ya dicen «La noticia» |
 | Subtítulos del video | pendiente: falta definir su estilo |
 | Sonido de Glitch (sólo Glitch) | **aprobado**, versión B «más punch» (2026-09-27) |
 | Música de Glitch (sólo Glitch): intro, cortina entre noticias, salida y música de fondo bajo la noticia | **aprobada** el 2026-09-27 |
-| La manzana como esfera de Glitch y el verde como su color de acento | **aprobados** el 2026-09-27 (falta sumarlos al sistema de diseño AXIS) |
-| Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | **aprobados** el 2026-09-27 (falta sumarlos al catálogo de AXIS) |
+| La manzana como esfera de Glitch y el verde como su color de acento | **aprobados** el 2026-09-27 y publicados en el sistema de diseño AXIS el mismo día |
+| Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | **aprobados** el 2026-09-27 y publicados en el catálogo de AXIS el mismo día |
 
 Lo que está en **propuesta** o **exploración** se puede mostrar para conversar, pero no se usa como pieza final hasta
 que el operador lo apruebe. Hoy no queda ninguna pieza fija en propuesta; siguen en exploración los colores de acento
@@ -274,7 +277,8 @@ cuando habla el host, con los valores del manual.
 
 ## Cómo se producen las piezas fijas (composición automática)
 
-Desde el 2026-09-27 las piezas fijas de una edición **ya no se arman a mano**: se llena un archivo con los datos de la
+Desde el 2026-09-27 las piezas fijas de una edición **ya no se arman a mano** (y desde el 2026-09-28, tampoco las de un
+Glitch Flash): se llena un archivo con los datos de la
 edición (número, fechas, tesis, las ocho noticias con su foto, crédito, licencia y opinión del narrador, la
 contraportada y, si hay video, sus datos) y un comando compone todo con el motor de composición de Greenhouse. Nadie
 elige coordenadas, colores ni plantilla: la persona pone el contenido y el motor aplica la línea.
@@ -288,6 +292,11 @@ Qué sale de cada edición:
 | **Portada del reel y miniatura del vlog** | imágenes sueltas |
 | **Cuadros fijos de los gráficos del video** (cabecera, rótulo del host, tarjeta de noticia, Glitch Drop y llamado a la acción, en reel y en vlog) | imágenes con fondo transparente; la animación, el sonido y la música siguen saliendo del taller de video |
 | **Registro de la edición** | un archivo con la huella de todo lo que entró y salió: la misma edición siempre produce los mismos archivos |
+
+**El Glitch Flash** usa el mismo comando con su propio archivo: una sola noticia, sin número de edición y sin rotación
+de portada. Salen el documento de LinkedIn de tres páginas (portada, la noticia y contraportada), la portada de Threads
+(sin «Desliza»), el banner horizontal del blog y el banner de la noticia. La frase del narrador de la contraportada es
+obligatoria y se escribe para ese Flash; el motor rechaza un número de edición o «el resto, el lunes».
 
 **La portada rota sola.** El motor elige la plantilla por el contenido, en este orden: **A** si la noticia de portada
 tiene una foto fuerte, **B** si hay una opinión que pega sola, **C** si hay cuatro noticias del mismo peso. Y nunca la de
@@ -338,12 +347,12 @@ exploración y no se componen.
 
 | Pendiente | Qué falta |
 |---|---|
-| La manzana y el verde | ya aprobados (2026-09-27); falta registrarlos en AXIS |
-| Cinco íconos nuevos (guardar, compartir, recomendar, comentar, deslizar) | ya aprobados (2026-09-27); falta sumarlos al catálogo de AXIS |
 | Callout nuevo del blog | aprobado (2026-09-27); falta actualizar el bloque de WordPress antes de publicar la #17 |
-| Glitch Flash | lanzado (2026-09-28); falta su plantilla automática y registrarlo en AXIS |
+| Glitch Flash | lanzado (2026-09-28), en AXIS y con plantilla automática; falta que se pueda componer desde la plataforma (hoy sólo desde la máquina de quien produce: la versión con API, TASK-1921, sólo conoce la edición semanal), tres medidas de la estela en el sistema de diseño y decidir si las imágenes de terceros con crédito y sin licencia valen para otros Flash |
+| Llamado final del video | dice «el #N sale el lunes.» siempre; choca con la frase del narrador que cambia en cada edición y no sirve para un Flash. Falta decidirlo con el operador |
 | Numeración de las ediciones | pendiente de aclarar con el operador: el blog ya tiene una «#16» y una «#17» |
-| Etiqueta «La noticia» en la portada | decidida (2026-09-28); falta cambiarla en las plantillas automáticas, que todavía dicen «Portada» |
+| Etiqueta «La noticia» en la portada | decidida y aplicada en las plantillas automáticas (2026-09-28); falta registrarla en AXIS para la edición semanal (la del Flash ya está) |
+| Glitch Drop en el blog | el generador de artículos todavía no sabe escribir el bloque del Drop: en el Flash se insertó aparte. Hay una propuesta escrita |
 | Gráficos animados del video | ya aprobados (2026-09-27); falta la cadencia de grabación (hoy 30 cuadros por segundo), la prueba con los editores en una edición real, el ritmo ajustable, dónde se usa la transición de bytes (se recomienda sólo en tarjetas y Drop), el estilo de subtítulos, los textos reales de la #17, el formulario para cambiar textos sin programar, guardar una copia en la nube de Google y cualquier excepción a la regla de rostros |
 | Música de Glitch | ya aprobada (2026-09-27), publicada en AXIS y entregada por el taller junto a cada pieza, con el pre-roll de los tres puntos; sólo falta probar la mezcla con la voz real del host en una edición real |
 | Letra Guttery | licencia para web y video confirmada por el operador (2026-09-27); entra al repo privado para componer las piezas de Glitch; falta registrar el número de contrato |
@@ -362,8 +371,8 @@ Nada de esto está decidido todavía; queda anotado para que nadie lo dé por re
   instaladas; el kit completo tarda unos 4 minutos. No hay autoservicio: el formulario para cargar la edición sin
   programar (la opción recomendada, en Marketing Studio) y el registro de ediciones que produciría el archivo de la
   edición (TASK-1442) están pendientes. El flujo editorial con agentes está descrito en EPIC-031.
-- **Plataforma:** los valores de Glitch en el sistema de diseño AXIS (TASK-1922; hoy la paleta y la manzana son una
-  propuesta copiada en el taller), los archivos de marca de Glitch en AXIS, la versión de la composición de piezas fijas que
+- **Plataforma:** que el taller de video lea los valores de Glitch que ya están en AXIS (TASK-1924; hoy la paleta y la
+  manzana siguen copiadas en el taller), la versión de la composición de piezas fijas que
   se use desde la plataforma (TASK-1921; la composición local ya existe, TASK-1923) y guardar una copia de los videos en la nube de Google (hoy sólo están en OneDrive, con su huella en
   los registros del taller).
 

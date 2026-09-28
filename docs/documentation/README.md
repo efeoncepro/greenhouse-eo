@@ -54,8 +54,9 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   usa en cada caso y pendientes (licencias, prueba de reconocimiento); Glitch tiene su sonido y su música propios, aparte.
 - [Línea gráfica de Glitch — sub-línea de La órbita](creative/linea-grafica-glitch.md) — **sólo para Glitch**, el
   magazine semanal (no es la línea de Efeonce): qué toma de La órbita y qué es propio (manzana, verde, bytes, Guttery,
-  cabecera «EDICIÓN #N»), portada A/B/C con regla de rotación, carrusel de LinkedIn, video y motion en piloto
-  (apertura, tarjeta final, kit de gráficos y la transición de la manzana en bytes, exclusiva de Glitch), qué está
+  cabecera «EDICIÓN #N»), portada A/B/C con regla de rotación, carrusel de LinkedIn, el **Glitch Flash** (segundo
+  formato desde el 2026-09-28: una noticia puntual, sin número, cabecera «NO ESPERA AL LUNES» + «FLASH»), video y motion
+  aprobados (apertura, tarjeta final, kit de gráficos y la transición de la manzana en bytes, exclusiva de Glitch), qué está
   aprobado y qué es propuesta, reglas que nunca se rompen y pendientes. Incluye su sonido y su música (aprobados, sólo de Glitch) y el porqué de la música.
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.

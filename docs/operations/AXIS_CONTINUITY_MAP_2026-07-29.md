@@ -86,6 +86,19 @@ Delta 2026-09-27 (e). Tras cada bump corren `pnpm brand:tokens` (y `pnpm glitch:
 técnica del consumidor: [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md).
 Este mapa no autoriza bumps nuevos.
 
+## Actualización — 2026-09-28 (noche): `v0.3.24`, el Glitch Flash
+
+**Pines vigentes** (`package.json`, commit `53002b352`): `axis-tokens` `0.3.24`, `axis-ui-contracts` `0.3.22`,
+`axis-graphic-line` `0.7.0`, `axis-brand-assets` `0.3.5` y `axis-ui-registry` `0.3.1`. Superan a los de la actualización
+anterior. El tag `v0.3.24` de AXIS (commit `5b3056f`) agrega `glitchLine.editions` (`weekly` y `flash`) y el contrato
+`efeonce.glitch-line` 0.2.0. El Artifact Composer de Greenhouse ya compone el Flash (`24e4c72ee`: seis plantillas
+`flash-*` y `pnpm glitch:compose`); la ruta productiva (TASK-1921) todavía no.
+
+**Corrige la regla del párrafo anterior:** tras **todo** bump de `axis-tokens` corren `pnpm brand:tokens` **y**
+`pnpm glitch:tokens`, con sus `--check`, sin importar qué parte del token cambió. El bump `53002b352` corrió sólo
+`glitch:tokens` y el CI falló en `graphic-line-tokens-sync.test.ts`; arreglo en `609353e83`. Detalle: runbook, Delta
+2026-09-28 (g). Este mapa no autoriza bumps nuevos.
+
 ---
 
 ## 0. Los cuatro actores, y por qué confundirlos es caro

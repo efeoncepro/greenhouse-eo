@@ -58,10 +58,10 @@ Flash frente a la edición:
 | Cabecera derecha | «EDICIÓN» sobre «#N» | «NO ESPERA AL LUNES» sobre estela de bytes + «FLASH» (mismo tamaño que el número) |
 | Estela de bytes | — | celdas cuadradas en el acento, 13 × 5, densidad y opacidad que crecen hacia la palabra; a la izquierda de «FLASH». Sin cursiva ni skew; cuadrados, no círculos (una sola esfera por pieza: la manzana) |
 | Cabecera compacta del interior | «EDICIÓN #N» | «NO ESPERA AL LUNES» + estela + «FLASH» |
-| Chip de portada | «PORTADA» | «LA NOTICIA» (portada, Threads y banner del blog) |
+| Chip de portada | «PORTADA» (desde el 2026-09-28, «LA NOTICIA» también en la semanal) | «LA NOTICIA» (portada, Threads y banner del blog) |
 | Chip del interior | «NOTICIA n» | «ANUNCIO» (+ medio · fecha) |
 | Avance n/8 | 8 segmentos + «n / 8» | se quita; queda «DESLIZA» + mano Plastilina |
-| Muletilla de contraportada | «el #N+1 sale el lunes.» | «léelo completo / en nuestro blog.» en dos líneas |
+| Muletilla de contraportada | «el #N+1 sale el lunes.» (desde el 2026-09-28 varía por edición) | «léelo completo / en nuestro blog.» en dos líneas |
 | Nota de suscripción | igual en ambos: invita al semanal | igual |
 | Firma | logo Efeonce centrado abajo | igual |
 
@@ -121,9 +121,89 @@ pertenece a `efeonce-public-site-wordpress`.
 2. **Numeración #17.** `efeonce-graphic-line/references/glitch.md` dice que la próxima edición es la **#17**
    (decisión del 2026-09-27), pero el blog ya tiene «Glitch #16» (2026-07-21) y «Glitch #17» (2026-07-28, post
    251605). Pregunta abierta para el operador; no se tocó ninguno de los dos lados.
-3. **El Flash no es canon todavía.** No tiene plantilla en el Artifact Composer (`glitch-carousel` / `glitch-stills`)
-   ni pieza en `glitchLine` de AXIS; la estela de bytes es un SVG autorado en la sesión, no un token. El próximo
-   Flash debe partir de este canvas o convertirlo en plantilla.
+3. ~~**El Flash no es canon todavía.**~~ **Resuelto esa misma noche:** el Flash está en AXIS (`v0.3.24`) y en el
+   Artifact Composer (seis plantillas `Flash*`, estela generada desde el token). Ver «Después del lanzamiento».
 4. **Content Factory desactualizado frente a los bloques del sitio.** El artículo sólo usó párrafo, lista, tabla,
    imagen y el TOC de Yoast; el Glitch Drop tuvo que inyectarse aparte. Lo señaló el operador.
 5. Confirmar `PUBLISHED` + `publicUrl` en las cuatro redes después de las 16:30.
+
+La lista vigente de pendientes está al final, en «Después del lanzamiento».
+
+## Después del lanzamiento (2026-09-28, noche)
+
+### AXIS publicado
+
+Con autorización del operador para empujar directo, AXIS publicó el tag **`v0.3.24`** (commit `5b3056f` en `main`;
+rama `c2bd797` tokens, `8a71e9e` contrato, `d33f874` docs y Lab). Lo ejecutó Codex: el clasificador de permisos
+bloqueó a esta sesión los gates de AXIS (comando compuesto con `cd` al repo hermano y logs en `/tmp`) y el operador
+configuró los permisos desde allí.
+
+- `@efeoncepro/axis-tokens` **0.3.24**: `glitchLine.editions` (`weekly` | `flash`; `editions.flash` con
+  `status: 'approved'`, `approvedOn: '2026-09-28'`: cabecera, estela, chips «LA NOTICIA» y «ANUNCIO», sin avance,
+  muletilla que varía), seis piezas `flash-*` en `glitchLine.pieces` (`derivesFrom`, `chip`, `coverTemplate: null`) y
+  dos `pendingDecisions` nuevas: `edition-numbering-blog-vs-system` y `weekly-cover-chip`.
+- `@efeoncepro/axis-ui-contracts` **0.3.22**: contrato `efeonce.glitch-line` **0.2.0** (`edition` número o
+  `{ kind, number? }`, campo `progress`, códigos `flash-edition-number-not-allowed`, `flash-progress-not-allowed`,
+  `edition-kind-invalid`, `edition-kind-mismatch` y `progress-invalid`; un intent 0.1.0 resuelve igual).
+- CI y «Release UI packages» en verde. Lab: <https://axis.efeonce.org/references/glitch/#flash>; `glitch.json` expone
+  `editions` y el contrato 0.2.0.
+
+### Greenhouse lo consume
+
+Commit `53002b352` (empujado a `develop`): `package.json` y lockfile con `axis-tokens` 0.3.24 y `axis-ui-contracts`
+0.3.22, test `src/config/axis-glitch-line-package.test.ts` (contrato 0.2.0, un Flash válido y uno rechazado),
+`pnpm glitch:tokens` recompilado, skill `axis-design-system` y runbook de consumo privado de AXIS al día. La
+instalación usó una credencial efímera fuera del repo, autorizada por el operador y borrada después.
+
+### El CI se rompió, y la lección
+
+El CI de `53002b352` falló en `scripts/brand-surfaces/__tests__/graphic-line-tokens-sync.test.ts` (4 tests). El bump
+de `axis-tokens` también exige regenerar los tokens de «La órbita» del Composer (`pnpm brand:tokens`:
+`graphic-line-{deck,stills,overlays}/graphic-line-tokens.css` y `graphic-line-shared/graphic-line-tokens.json`), no
+sólo `pnpm glitch:tokens`. Los valores eran idénticos: sólo cambió el sello de versión. Arreglo: commit local
+`609353e83`.
+
+**Lección:** todo bump de `@efeoncepro/axis-tokens` en Greenhouse corre `pnpm brand:tokens` **y**
+`pnpm glitch:tokens`, los dos con `--check`, antes del commit. Quedó en `efeonce-graphic-line` (`lessons.md`,
+`package-and-tokens.md`, `qa-checklist.md`), en la norma §12 y en el manual para componer una edición.
+
+### El Flash en el Artifact Composer
+
+Commit local `24e4c72ee` (sin empujar):
+
+- `GlitchFlashManifest`, tipo hermano del semanal (que queda idéntico) en `src/lib/glitch-composition/manifest.ts`;
+  `parseGlitchManifest` y `planGlitchManifest` despachan por `edition.kind`; `planGlitchFlash` valida cada lámina con
+  el contrato 0.2.0 (`edition: { kind: 'flash' }`). Sin número; una noticia; muletilla obligatoria (1 o 2 líneas,
+  rechaza «el resto, el lunes» y cualquier número).
+- Seis plantillas en `src/lib/artifact-composer/catalogs/glitch/`: `FlashCover`, `FlashInterior`, `FlashBackCover`
+  (carrusel y sueltas), `FlashBlogBanner`, `FlashNewsBanner` y `FlashThreads` (sueltas), `approval: approved`.
+  Validador `glitch.edition-structure` 1.1.0.
+- Estela determinista `src/lib/glitch-composition/flash-trail.ts` (reimplementa el Mersenne Twister de CPython con la
+  semilla 1755 y reproduce las 34 celdas publicadas); `pnpm glitch:tokens` genera `assets/flash-trail.svg` y las
+  variables `--gx-flash-trail-*`.
+- `pnpm glitch:compose -- --manifest <flash.json>`; ejemplo `src/lib/glitch-composition/examples/flash-sonnet-5-5.example.json`
+  (fotos sintéticas; salida `.captures/glitch/flash-<slug>/`, PDF de 3 páginas, procedencia con `edition: null` y
+  `editionKind: "flash"`, determinista).
+- El chip «PORTADA» pasa a «LA NOTICIA» en `CoverPhoto`, `BlogBannerPhoto` y `BlogSquarePhoto` (edición semanal).
+  Sección (p) de `BASELINE_DELTAS.md`, sellada; gate visual Glitch **32/32 a 0 px** (antes 26). 127 tests focales y
+  `local:check` en verde.
+
+### Pendientes vigentes (no resueltos por cuenta propia)
+
+1. **Ruta productiva del Flash.** TASK-1921 (`src/lib/brand-surfaces/production/plan.ts`, `artifact-worker`) sigue
+   con `planGlitchEdition`: el Flash sólo compone en local.
+2. **Tres medidas de la estela fuera del token** (ancho en la cabecera grande 150 px, separación compacta 8 px y del
+   banner 10 px): viven en `glitch.css` como medidas del canvas; pendiente de AXIS.
+3. **Numeración #17** (blog frente a sistema): pregunta abierta para el operador; en AXIS,
+   `pendingDecisions: edition-numbering-blog-vs-system`.
+4. **Última frase fija del video.** `overlay-cta-reel.html` / `overlay-cta-vlog.html` del Composer y la pieza `cta` del
+   taller dicen «el #N sale el lunes.»: choca con la muletilla que varía por edición. Trabajo de motion y decisión del
+   operador.
+5. **Licencia de imágenes de terceros en un Flash.** Decidido sólo para Sonnet 5.5 (con crédito, sin licencia); ¿vale
+   como excepción general? Si la pieza pasa a pauta o reutilización, revisar con `legal-privacy-ip-operator`.
+6. **Content Factory sin `kind` para `efeoncepro/glitch-drop`** y con pocos bloques del sitio en uso; propuesta escrita
+   en `.claude/skills/efeonce-public-site-wordpress/references/content-factory-gutenberg.md`.
+7. **Chip de la portada semanal en AXIS** (`pendingDecisions: weekly-cover-chip`): en Greenhouse ya es «LA NOTICIA».
+8. **Push.** `origin/develop` = `53002b352` (CI rojo). Local va por delante con `609353e83` y `24e4c72ee` (y dos commits
+   de otra sesión, `df6f37ccd` y `39174c964`). El push lo decide el operador.
+9. Confirmar `PUBLISHED` + `publicUrl` en las cuatro redes.
