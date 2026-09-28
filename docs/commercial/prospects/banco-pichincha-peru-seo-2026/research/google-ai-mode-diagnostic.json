@@ -1,0 +1,24 @@
+[
+  {
+    "location": {
+      "location_name": "Perú"
+    },
+    "httpStatus": 200,
+    "cost": 0,
+    "statusCode": 40501,
+    "statusMessage": "Invalid Field: 'location_name'.",
+    "resultCount": 0,
+    "date": "2026-09-28T08:27:36.411Z"
+  },
+  {
+    "location": {
+      "location_code": 2604
+    },
+    "httpStatus": 200,
+    "cost": 0.004,
+    "statusCode": 20000,
+    "statusMessage": "Ok.",
+    "resultCount": 1,
+    "date": "2026-09-28T08:27:41.520Z"
+  }
+]

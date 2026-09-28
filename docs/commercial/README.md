@@ -32,6 +32,8 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 
 ## Workspaces comerciales
 
+- [Banco Pichincha Perú — SEO, GEO y AEO](prospects/banco-pichincha-peru-seo-2026/README.md): Prospect Case, sales pod, investigación de cuenta y ejecución del Brand Visibility Grader; búsqueda pública de proveedor, sin RFP confirmado.
+
 - [Berel — App móvil](tenders/berel-app-movil/README.md): expansión de cliente SEO; brief de venta y análisis del lanzamiento de nueva Color Berel, con ASO, creatividad, adquisición, activación y medición. Propuesta interna pendiente de build, alcance y aprobación.
 
 ## Convención documental
