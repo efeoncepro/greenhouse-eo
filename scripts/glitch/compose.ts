@@ -25,18 +25,16 @@ import path from 'node:path'
 import { PDFDocument } from 'pdf-lib'
 import sharp from 'sharp'
 
-import { glitchLine } from '@efeoncepro/axis-tokens'
 
 import { composeArtifact } from '@/lib/artifact-composer'
 import { resolvePlan } from '@/lib/artifact-composer/catalog'
 import { GLITCH_CATALOG_FACTORIES } from '@/lib/artifact-composer/catalogs/glitch'
 import { attachFractures, planGlitchEdition, type GlitchCatalogPlan } from '@/lib/glitch-composition'
-import { computeByteFracture, paintByteFracture, type PaintedByteCell } from '@/lib/glitch-composition/byte-fracture'
+import { materializeGlitchAssets } from '@/lib/glitch-composition/materialize'
 
 import { glitchAxisVersions } from './glitch-tokens'
 import { toGlitchPieceError } from './errors'
 import { checkCarouselForLinkedIn, LINKEDIN_DOCUMENT_LIMITS } from './linkedin'
-import { processLensDetail, processPhoto, sampleEdge, type ProcessedPhoto } from './photos'
 
 const ONLY = ['carousel', 'stills', 'overlays'] as const
 
@@ -115,35 +113,15 @@ const main = async () => {
   const narrator = narratorFont()
   const plan = planGlitchEdition(input, { narratorLicenseStatus: narrator.status, photoSizes })
 
-  // 3. Fotos al tamaño exacto de su hueco + la falla calculada sobre la foto ya procesada.
-  const externalAssets: Record<string, string> = {}
-  const cellsBySlide: Record<string, PaintedByteCell[]> = {}
-  const assetLog: unknown[] = []
+  // 3. Fotos al tamaño exacto de su hueco + la falla calculada sobre la foto ya procesada (materializador compartido
+  //    con el artifact-worker: aquí la fuente es el disco).
+  const { externalAssets, cellsBySlide, log: assetLog } = await materializeGlitchAssets(plan.assets, async (file) => {
+    const bytes = sources.get(file)
 
-  for (const request of plan.assets) {
-    const source = sources.get(request.path)
+    if (!bytes) throw new Error(`La foto ${file} no está en el manifiesto.`)
 
-    if (!source) throw new Error(`La foto ${request.path} no está en el manifiesto.`)
-
-    let photo: ProcessedPhoto
-
-    if (request.kind === 'lens') {
-      photo = await processLensDetail(source, request.fit, request.region, request.diameter)
-    } else {
-      photo = await processPhoto(source, request.fit, request.treatment)
-
-      for (const f of request.fractures) {
-        const fracture = computeByteFracture({ seed: photo.sha256, photo: f.box, edge: f.edge, profile: f.profile, canvas: f.canvas, faceRegions: f.faceRegions, clip: f.clip })
-        const samples = await sampleEdge(photo, f.edge, fracture.samples, fracture.cell, fracture.pitch)
-        const cells = paintByteFracture(fracture, samples, glitchLine.color.ground)
-
-        for (const slideId of f.slideIds) (cellsBySlide[slideId] ??= []).push(...cells)
-      }
-    }
-
-    externalAssets[request.ref] = photo.dataUri
-    assetLog.push({ ref: request.ref, kind: request.kind, source: { path: request.path, sha256: sha256(source) }, processed: { sha256: photo.sha256, width: photo.width, height: photo.height } })
-  }
+    return { bytes, mimeType: null }
+  })
 
   // 4. Render de los tres catálogos (cada uno valida su plan entero antes de pintar nada).
   fs.mkdirSync(out, { recursive: true })

@@ -65,7 +65,11 @@ export const ENTITLEMENT_MODULES = [
   'insights',
   // TASK-1890 — namespace de Efeonce Marketing Studio (EPIC-049), plataforma de campañas en su propio
   // runtime (studio.efeonce.org). Greenhouse sólo registra la autoridad de la persona; los datos viven en Studio.
-  'marketing_studio'
+  'marketing_studio',
+  // TASK-1921 — render gobernado de piezas de marca de Efeonce (La órbita por superficie y Glitch) en el
+  // artifact-worker. Dueño Greenhouse por ahora; nace extraíble hacia Marketing Studio o Globe (decisión del
+  // operador, 2026-09-28). Distinto de `design_system` (operar AXIS) y de `marketing_studio` (registrar campañas).
+  'brand_render'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -2459,7 +2463,10 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   { key: 'marketing_studio.campaign.read', module: 'marketing_studio', actions: ['read'] as const, defaultScope: 'tenant' },
   // TASK-1893 — obtener el enlace de descarga (vida corta, auditado) del original de una versión aprobada. Separada de
   // la lectura: ver una campaña no autoriza a llevarse el archivo final.
-  { key: 'marketing_studio.asset.download', module: 'marketing_studio', actions: ['read'] as const, defaultScope: 'tenant' }
+  { key: 'marketing_studio.asset.download', module: 'marketing_studio', actions: ['read'] as const, defaultScope: 'tenant' },
+  // TASK-1921 — pedir el render de una pieza de marca (endpoint, MCP y Nexa llaman al mismo command) y leer su estado.
+  { key: 'brand_render.request.create', module: 'brand_render', actions: ['create'] as const, defaultScope: 'tenant' },
+  { key: 'brand_render.request.read', module: 'brand_render', actions: ['read'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

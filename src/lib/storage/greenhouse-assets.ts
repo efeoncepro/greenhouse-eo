@@ -7,6 +7,7 @@ import type { PoolClient } from 'pg'
 import { ROLE_CODES } from '@/config/role-codes'
 import { canAccessHiringCandidateDocument } from '@/lib/hiring/documents/access'
 import { canAccessProposalDocument } from '@/lib/commercial/tenders/proposals/access'
+import { canAccessBrandRenderAsset } from '@/lib/brand-surfaces/production/access'
 import { hasRoleCode, hasRouteGroup } from '@/lib/tenant/authorization'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 import { getBigQueryProjectId } from '@/lib/bigquery'
@@ -77,7 +78,9 @@ const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<DraftUploadContext, number> = 
   // TASK-1392 — bases/planillas/anexos de un RFP y deliverables de la oferta
   // pueden ser documentos pesados (planillas con anexos, PDFs escaneados).
   proposal_rfp_draft: 50 * 1024 * 1024,
-  proposal_deliverable_draft: 50 * 1024 * 1024
+  proposal_deliverable_draft: 50 * 1024 * 1024,
+  // TASK-1921 — una foto de plate a resolución de impresión (DOOH, deck) pesa varios MB.
+  brand_render_source_draft: 25 * 1024 * 1024
 }
 
 // TASK-791 — MIME extra permitido por contexto. La factura electrónica oficial
@@ -149,7 +152,10 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   proposal_deliverable: 'document_vault',
   // TASK-1846 — una edición de Insights es un INFORME de engagement, no un contrato:
   // misma clase que sample_sprint_report, no la de quote_pdf/master_agreement.
-  insight_output: 'commercial_engagement_report'
+  insight_output: 'commercial_engagement_report',
+  brand_render_source_draft: 'organization_brand_asset',
+  brand_render_source: 'organization_brand_asset',
+  brand_render_output: 'organization_brand_asset'
 }
 
 const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
@@ -198,7 +204,10 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   proposal_rfp: 'proposal-rfps',
   proposal_deliverable_draft: 'proposal-deliverables',
   proposal_deliverable: 'proposal-deliverables',
-  insight_output: 'insight-outputs'
+  insight_output: 'insight-outputs',
+  brand_render_source_draft: 'brand-render-sources',
+  brand_render_source: 'brand-render-sources',
+  brand_render_output: 'brand-render-outputs'
 }
 
 const toNumber = (value: number | string | null | undefined) => {
@@ -885,7 +894,7 @@ export const upsertSystemGeneratedAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document' | 'organization_logo_candidate' | 'proposal_deliverable' | 'insight_output'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document' | 'organization_logo_candidate' | 'proposal_deliverable' | 'insight_output' | 'brand_render_output'
   >
   ownerAggregateId: string
   ownerClientId?: string | null
@@ -998,7 +1007,7 @@ export const storeSystemGeneratedPrivateAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document' | 'organization_logo_candidate' | 'proposal_deliverable' | 'insight_output'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document' | 'organization_logo_candidate' | 'proposal_deliverable' | 'insight_output' | 'brand_render_output'
   >
   ownerAggregateId: string
   ownerClientId?: string | null
@@ -1248,6 +1257,11 @@ export const canTenantAccessAsset = ({
     case 'proposal_deliverable_draft':
     case 'proposal_deliverable':
       return canAccessProposalDocument(tenant)
+    // TASK-1921 — fuentes y salidas del render de marca: capability real, nunca `client_*`.
+    case 'brand_render_source_draft':
+    case 'brand_render_source':
+    case 'brand_render_output':
+      return canAccessBrandRenderAsset(tenant)
     default:
       return false
   }

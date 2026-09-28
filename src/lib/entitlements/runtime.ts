@@ -3278,6 +3278,25 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1921 — render gobernado de piezas de marca (La órbita y Glitch). Pedir y leer es del equipo de diseño y de
+  // administración: DESIGNER ∪ EFEONCE_ADMIN. Nunca `client_*` (hoy sólo la marca propia de Efeonce).
+  if (hasRole(subject, ROLE_CODES.DESIGNER) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'brand_render',
+      capability: 'brand_render.request.create',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'brand_render',
+      capability: 'brand_render.request.read',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   // TASK-1120 — Design Handoff Registry. Read is internal-wide because Design
   // System itself is view-accessible to internal collaborators; create/transition
   // stays with DESIGNER ∪ EFEONCE_ADMIN.

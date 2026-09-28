@@ -36,7 +36,9 @@ const DRAFT_CONTEXT_MAP: Record<DraftUploadContext, true> = {
   hiring_candidate_portfolio_file_draft: true,
   // TASK-1399 — Proposal Studio: el binario del RFP/anexo y los deliverables entran por acá.
   proposal_rfp_draft: true,
-  proposal_deliverable_draft: true
+  proposal_deliverable_draft: true,
+  // TASK-1921 — plates, fotos y logos de una pieza de marca (La órbita o Glitch).
+  brand_render_source_draft: true
 }
 
 const DRAFT_CONTEXT_VALUES = new Set<DraftUploadContext>(
@@ -94,6 +96,11 @@ const canUploadForContext = ({
   // adelantada. Los roles `client_*` nunca pasan (no tienen la capability).
   if (contextType === 'proposal_rfp_draft' || contextType === 'proposal_deliverable_draft') {
     return can(tenant, 'commercial.proposal.manage', 'update', 'tenant')
+  }
+
+  // TASK-1921 — subir una fuente de pieza de marca es parte de pedirla: misma capability que el command.
+  if (contextType === 'brand_render_source_draft') {
+    return tenant.tenantType !== 'client' && can(tenant, 'brand_render.request.create', 'create', 'tenant')
   }
 
   // TASK-791 — provider invoices/statements: solo Finance/HR/admin (NO contractor).
