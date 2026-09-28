@@ -123,7 +123,7 @@ Reglas obligatorias:
 
 - `docs/tasks/to-do/TASK-1417-chapter-author-economico.md` (hechos económicos desde la proyección congelada)
 - `docs/tasks/to-do/TASK-1418-chapter-author-squad.md` (hechos del roster y allowlist `squad-person`)
-- `docs/tasks/to-do/TASK-1929-deck-plan-recipe-catalog-validator.md` (plan y contrato de slots)
+- `docs/tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md` (plan y contrato de slots)
 - `docs/manual-de-uso/creative/componer-deck-con-recetas.md`
 
 ## Dependencies & Impact

@@ -2,7 +2,7 @@
 
 **Ruta productiva de marca (28/09):** [TASK-1921](docs/tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) en ejecución: dueño Greenhouse por ahora (extraction-ready), Glitch en la misma cola, plates por uploader privado. Local, sin push.
 
-**Deck compuesto (27/09):** [TASK-1927](docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) complete en local, sin push. [TASK-1928](docs/tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) **complete** (28/09): 69/69 recetas componen (AXIS `v0.3.21`, gates a 0 px, `pnpm test` y `pnpm build` verdes), aprobado por el operador y empujado a `develop`. Siguen TASK-1929…1932.
+**Deck compuesto (27/09):** [TASK-1927](docs/tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) complete en local, sin push. [TASK-1928](docs/tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) **complete** (28/09): 69/69 recetas componen (AXIS `v0.3.21`, gates a 0 px, `pnpm test` y `pnpm build` verdes), aprobado por el operador y empujado a `develop`. [TASK-1929](docs/tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md) **in-progress** (28/09, develop): catálogo de recetas en runtime, `validateDeckPlan` y `proposeDeckPlan`. TASK-1933 (to-do) es dueña de los pendientes de QA del catálogo.
 
 **Plugin OpenAI Efeonce MCP (26/09):** [TASK-1904](docs/tasks/to-do/TASK-1904-efeonce-openai-plugin-private-distribution.md) registrada: marca, OAuth, skills e instalación privada Codex/ChatGPT sin revisión pública. TASK-1864 conserva routing/eval. Sin implementación.
 

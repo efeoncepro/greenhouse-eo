@@ -287,7 +287,7 @@ El operador aprobó a ojo las láminas compuestas el 2026-09-27 (TASK-1927) y el
 portada con selección (TASK-1928). Esa aprobación cubre las plantillas, no cada pieza futura.
 
 > Detalle técnico: [TASK-1921](../../tasks/in-progress/TASK-1921-brand-surface-pieces-governed-production-route.md) ·
-> [TASK-1929](../../tasks/to-do/TASK-1929-deck-plan-recipe-catalog-validator.md) ·
+> [TASK-1929](../../tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md) ·
 > [TASK-1930](../../tasks/to-do/TASK-1930-deck-recipe-slot-data-bindings.md) ·
 > [TASK-1931](../../tasks/to-do/TASK-1931-brand-plate-bank-governed.md) ·
 > [TASK-1932](../../tasks/to-do/TASK-1932-proposal-studio-graphic-line-deck-output.md) · cierres en

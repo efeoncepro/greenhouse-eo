@@ -23,7 +23,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -36,7 +36,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Discovery 2026-09-28: tomada tras cerrar TASK-1928 (69/69); plan en ejecución`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`

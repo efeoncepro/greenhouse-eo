@@ -987,7 +987,7 @@ El inventario del 2026-09-26/27 encontró estos choques entre el canvas, los scr
   páginas). El estado de los gates se lee en la
   [task](../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md). Con el cierre quedaron
   desbloqueadas [TASK-1928](../../tasks/complete/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) y
-  [TASK-1929](../../tasks/to-do/TASK-1929-deck-plan-recipe-catalog-validator.md). **Quedó abierto:** la ruta productiva gobernada, que debe aceptar también el intent de documento (TASK-1921); el control de
+  [TASK-1929](../../tasks/in-progress/TASK-1929-deck-plan-recipe-catalog-validator.md). **Quedó abierto:** la ruta productiva gobernada, que debe aceptar también el intent de documento (TASK-1921); el control de
   foco de la sección partida, sin task (§4.6); la pregunta del barrido del indicador; y las diferencias conocidas
   contra los prototipos (§4.6). Las recetas restantes del deck las tomó TASK-1928.
 - **TASK-1928: `complete` (2026-09-28), en `origin/develop`.** Las recetas de deck aprobadas componen desde el
