@@ -22,7 +22,8 @@
  *     mismo sintetizador, mismo píxel) + las 15 láminas reales del deck SKY.
  *   - Umbral: CERO píxeles (`threshold: 0`, `maxChangedPixels: 0`). No "se ve parecido".
  *   - Rebaseline EXPLÍCITO, nunca silencioso: `--freeze` se niega a promover un frame cambiado que
- *     no esté declarado en `BASELINE_DELTAS.md` (contrato de dos vías, como el `KNOWN_BROKEN` de
+ *     no esté declarado en la sección SIN SELLAR de `BASELINE_DELTAS.md` (`baseline-deltas-ledger.ts`;
+ *     cada promoción sella su sección y las viejas ya no autorizan nada) (contrato de dos vías, como el `KNOWN_BROKEN` de
  *     composability: la lista no puede mentir). Además sella un digest del manifest dentro del
  *     ledger; el gate verifica ese digest — editar el manifest o los PNG a mano, sin pasar por la
  *     promoción declarada, TAMBIÉN falla el gate.
@@ -37,6 +38,8 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 
 import type { Browser } from 'playwright'
+
+import { evaluatePromotion, sealUnsealedSections } from './baseline-deltas-ledger'
 
 // Barrel del primitive — cero deep-imports (TASK-1393: el motor vive en artifact-composer/).
 import {
@@ -494,7 +497,9 @@ Este ledger existe porque **un rebaseline silencioso es peor que no tener gate**
 
 - Todo cambio de píxel INTENCIONAL se declara acá, **lámina por lámina** (qué frame, qué cambió,
   por qué, quién lo aprobó) **ANTES** de correr \`pnpm composer:visual-gate --freeze\`.
-- \`--freeze\` se niega a promover un frame cambiado que no esté declarado en este archivo.
+- \`--freeze\` se niega a promover un frame cambiado que no esté declarado en la **sección nueva sin
+  sellar** (la única entrada sin el marcador \`sealed-by-freeze\`). Una sección ya sellada no autoriza
+  nada: cada promoción sella la suya y la próxima necesita una entrada propia.
 - El marcador \`manifest-digest\` lo sella la promoción; el gate lo verifica. Editar el manifest o
   los PNG a mano, sin pasar por la promoción declarada, **también falla el gate**.
 - El baseline se re-promueve **en el mismo PR** que declara el delta.
@@ -534,25 +539,35 @@ const freeze = async (scope: CatalogScope): Promise<number> => {
       if (previous.frames[frame] !== nextManifest.frames[frame]) changed.push(frame)
     }
 
-    const undeclared = changed.filter(frame => !deltasRaw.includes(frame))
-
-    if (undeclared.length > 0) {
-      console.error(
-        '✗ Rebaseline NO declarado. Estos frames cambian y no aparecen en BASELINE_DELTAS.md:\n' +
-          undeclared.map(frame => `  - ${frame}`).join('\n') +
-          '\n\nDeclará cada lámina (qué cambió, por qué, quién lo aprobó) y vuelve a correr --freeze.\n'
-      )
-
-      return 1
-    }
-
     if (changed.length === 0) {
       console.log('✓ El baseline ya coincide con el render actual: nada que promover.\n')
 
       return 0
     }
 
-    console.log(`  ${changed.length} frame(s) declarados se re-promueven:\n${changed.map(f => `    - ${f}`).join('\n')}`)
+    // Sólo cuenta la sección SIN SELLAR (la declaración de esta promoción). Un frame nombrado en una
+    // sección ya sellada —de otra task, de otro mes— NO autoriza re-promoverlo: esa declaración ya
+    // se consumió. Antes bastaba con que el nombre apareciera en cualquier parte del archivo, y un
+    // cambio compartido re-promovió 10 frames aprobados sin que nadie los declarara (TASK-1928).
+    const verdict = evaluatePromotion(deltasRaw, changed.sort(), frame => frameInScope(frame, scope))
+
+    if (!verdict.ok) {
+      console.error(verdict.message)
+
+      return 1
+    }
+
+    if (verdict.declaredButUnchanged.length > 0) {
+      console.warn(
+        `  ⚠ Declarados en la sección pero sin cambio en este render (revisa que la entrada no mienta):\n` +
+          verdict.declaredButUnchanged.map(frame => `    - ${frame}`).join('\n')
+      )
+    }
+
+    console.log(
+      `  Sección que se sella: ${verdict.section.heading.slice(3)}\n` +
+        `  ${changed.length} frame(s) declarados en ella se re-promueven:\n${changed.map(f => `    - ${f}`).join('\n')}`
+    )
   }
 
   // 🔴 El ledger VIVE DENTRO de `BASELINE_DIR`, y abajo hacemos `rm -r` de ese directorio. Hay que
@@ -601,9 +616,12 @@ const freeze = async (scope: CatalogScope): Promise<number> => {
 
   const digest = manifestDigest(finalManifest)
 
-  const sealed = DIGEST_MARKER.test(deltasRaw)
+  const digestSealed = DIGEST_MARKER.test(deltasRaw)
     ? deltasRaw.replace(DIGEST_MARKER, `<!-- manifest-digest: ${digest} -->`)
     : deltasRaw.replace('<!-- manifest-digest: PENDING -->', `<!-- manifest-digest: ${digest} -->`)
+
+  // La sección consumida queda sellada: la próxima promoción necesita su propia entrada nueva.
+  const sealed = sealUnsealedSections(digestSealed, digest)
 
   await fs.writeFile(DELTAS_PATH, sealed, 'utf8')
 

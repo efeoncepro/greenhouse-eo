@@ -276,7 +276,25 @@ Caso fuente: `NarrativeSplit` con ~59k px de drift el 2026-08-13, con la plantil
 ## 5. Cómo declarar un delta en `BASELINE_DELTAS.md`
 
 - Una entrada con fecha, **lámina por lámina**, diciendo **qué cambió y por qué** (intención, no "actualicé
-  el baseline"). Ver las entradas existentes como molde.
+  el baseline"). Ver las entradas existentes como molde. Va arriba, bajo el título.
+- **La unidad de promoción es la sección nueva sin sellar.** Cada `--freeze` exitoso escribe
+  `<!-- sealed-by-freeze: <digest> -->` bajo el heading de la sección que consumió. El siguiente `--freeze`:
+  - exige **exactamente una** sección `## ` sin ese marcador (cero o dos → falla cerrado, listando cuáles);
+  - acepta un frame cambiado, nuevo o removido **sólo si esa sección lo nombra** (ruta completa del frame, p. ej.
+    `templates-graphic-line-deck/HeroLens.png`). Nombrarlo en una sección ya sellada **no cuenta**: el error lo
+    marca «sólo en secciones ya selladas» para que veas que es una declaración vieja, no la tuya;
+  - avisa (sin fallar) si la sección nombra un frame del scope que no cambió: revisa que la entrada no mienta.
+- **Si el `--freeze` lista frames que no esperabas, no los copies a la sección para que pase.** Son frames que tu
+  cambio movió (un hook o un CSS compartido, por ejemplo): o los revisas uno por uno y los declaras con su porqué,
+  o arreglas el código. Caso fuente: 2026-09-27, TASK-1928 (`2c7c67c5d`) — el hook de selección
+  (`graphic-line-shared/selection-hook.ts`) movió 10 frames ya aprobados y el freeze anterior los re-promovió
+  porque su nombre aparecía en secciones viejas de otras tasks. Se vio sólo porque alguien leyó la lista a mano.
+- Las secciones anteriores a esta regla llevan el sello `legacy-2026-09-28`. Una declaración que quedó sin
+  promover antes de esa fecha (p. ej. los 9 frames de TASK-1847, ISSUE-122) también quedó sellada: para
+  promoverla, cópiala a una sección nueva.
+- No escribas el marcador a mano para «cerrar» una sección: lo escribe `--freeze` al promover. El test
+  `scripts/artifact-composer/baseline-deltas-ledger.test.ts` falla si el ledger committeado deja una sección
+  abierta (una sección abierta sólo existe entre tu declaración y tu `--freeze`, que se commitean juntos).
 - El `--freeze` **sella un digest** del manifest en el ledger. **NUNCA** edites un PNG del baseline a mano
   ni toques el digest — el gate lo detecta y falla.
 
@@ -286,6 +304,8 @@ Caso fuente: `NarrativeSplit` con ~59k px de drift el 2026-08-13, con la plantil
 - ❌ Dejar un `--freeze` **sin commitear** (estado ambiguo para el próximo).
 - ❌ Rebaselinear una lámina con fotos que driftea sin cambio real (ISSUE-122) — eso oculta el bug.
 - ❌ Editar un PNG del baseline, `baseline-manifest.json` o el digest **a mano**.
+- ❌ Agregar a tu sección los frames que el `--freeze` reporta como no declarados sólo para que pase, sin mirarlos.
+- ❌ Escribir o borrar a mano un marcador `sealed-by-freeze` (reabrir una sección vieja es re-promover con una declaración ajena).
 - ❌ Declarar "listo" sin **mirar** los frames recompuestos (Read del PNG), desktop y con foco en lo que cambiaste.
 - ❌ Meter `HEX`/fuentes literales en una plantilla (`pnpm composer:color-ledger` / font pack lo bloquean).
 
@@ -293,6 +313,8 @@ Caso fuente: `NarrativeSplit` con ~59k px de drift el 2026-08-13, con la plantil
 
 | Síntoma | Causa probable | Acción |
 |---|---|---|
+| `--freeze` dice «no aparecen en la sección que se está sellando» con frames que no tocaste | Tu cambio movió frames compartidos, o la declaración está en una sección vieja ya sellada | Míralos; declara los intencionales en tu sección o arregla el código (§5) |
+| `--freeze` dice «no tiene una sección nueva sin sellar» / «más de una sección sin sellar» | Falta tu entrada, o hay dos abiertas | Una sola entrada nueva por promoción (§5) |
 | Gate falla en la lámina que **sí** cambiaste | Cambio intencional no declarado | Declara en `BASELINE_DELTAS.md` + `--freeze` + commit |
 | Gate falla en `TeamGalleryFull`/`18-equipo` que **NO** tocaste, solo en el área de foto | Nondeterminismo de fotos (ISSUE-122) | NO congeles esa lámina; reporta a ISSUE-122 |
 | `item_too_long` al recomponer | Copy > límite de chars del filler (`overflow: reject`) | Acorta el copy (el gate fail-closa, no trunca) |
@@ -303,7 +325,7 @@ Caso fuente: `NarrativeSplit` con ~59k px de drift el 2026-08-13, con la plantil
 
 ## Referencias
 
-- Gate + freeze: `scripts/artifact-composer/visual-gate.ts` · ledger `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`
+- Gate + freeze: `scripts/artifact-composer/visual-gate.ts` · regla del ledger `scripts/artifact-composer/baseline-deltas-ledger.ts` (+ test) · ledger `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`
 - Catálogos de La órbita: `src/lib/artifact-composer/catalogs/graphic-line-{deck,stills,overlays}/` (compartido: `graphic-line-shared/`) · norma `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md`
 - Invariantes del dominio: `docs/architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` · `.claude/rules/tenders.md`
 - Bug class: `docs/issues/open/ISSUE-122-composer-visual-gate-photo-nondeterminism-concurrency-docs.md`
