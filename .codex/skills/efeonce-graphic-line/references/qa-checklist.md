@@ -5,7 +5,7 @@
 > tag `v0.3.5`). §8c (Plastilina en volumen, D24): AXIS `main@c18e3d3` — 2026-09-27. §8d (piezas compuestas con
 > `pnpm brand:compose` y harness del gate visual): árbol local de `develop` de greenhouse-eo tras el cierre de
 > TASK-1927 — 2026-09-27; filas de largo, cifras, logos y paridad: `develop` local en `64be8aa16` (TASK-1928) —
-> 2026-09-27.
+> 2026-09-27; fila de la portada con selección (`document-selection`, AXIS `v0.3.21`) — 2026-09-28.
 >
 > Cada ítem dice **cómo se verifica**. «Automático» = lo hace fallar un comando o una función; «Revisión» = hay que
 > mirar el cuadro real (el adapter de Greenhouse lo marca `manual`). Una pieza no se entrega con un ítem en rojo, y
@@ -195,6 +195,7 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 | [ ] | Toda cifra llega por `figures` con su fuente real y la lámina imprime «Fuente: …»; montos como `[MONTO]`; el contacto sale de `EFEONCE_CONTACT` | Revisión del intent y de la lámina; sin fuente real, se quita la cifra |
 | [ ] | Logos de clientes y partners sólo de quienes autorizan su uso, normalizados por el compositor (un tono, mismo peso óptico; excepción tonal de Aguas Andinas y UC Temuco) | Revisión |
 | [ ] | Documento: portada y contraportada alternan foto y sin foto; el conjunto pasa sin un solo issue | Automático: `frame-photo-must-alternate` y los demás códigos de documento; un issue deja al documento sin plan |
+| [ ] | Portada con selección (`cover-brochure-cine-lines-selection`): va con `layout: 'document-selection'`; la selección cae sobre la respuesta («Crecer.»), nunca sobre la persona, con un solo cursor «Nexa»; sin burbuja URL | Automático: con `document` o `line` AXIS rechaza la selección (`selection-not-in-recipe`); el resto, revisión a ojo |
 | [ ] | La salida no se retocó a mano ni se editó la plantilla para una pieza puntual | Revisión |
 | [ ] | Se entregó con `<id>.provenance.json` y su manifest | Revisión de la carpeta de salida |
 
@@ -203,7 +204,7 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 | | Chequeo | Cómo se verifica |
 |---|---|---|
 | [ ] | `pnpm composer:visual-gate --catalog=graphic-line` pasa a 0 px (66 frames desde TASK-1928) | Salida del comando |
-| [ ] | Toda alta o cambio de frame está declarado en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` | Revisión (entradas 2026-09-27 b, c, d, e para TASK-1927; (f)…(l) para TASK-1928) |
+| [ ] | Toda alta o cambio de frame está declarado en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` | Revisión (entradas 2026-09-27 b, c, d, e para TASK-1927; (f)…(m) y 2026-09-28 (n) para TASK-1928) |
 | [ ] | Una receta nueva con plantilla declara sus `slots` en `recipe-map.json` y pasa la paridad | Automático: `src/lib/brand-surfaces/__tests__/recipe-slot-parity.test.ts` |
 | [ ] | Una plantilla con logo de cliente se prueba con el asset sintético `file:probe` de `GRAPHIC_LINE_PROBE_ASSETS` (`scripts/artifact-composer/visual-gate.ts`), nunca con el logo de un cliente real | Revisión del harness |
 | [ ] | Un slot opcional que el probe debe omitir lleva `"example": null` en su `slots.json` (así el frame de la portada de propuesta muestra el marcador y no el logo) | Revisión del `slots.json` |

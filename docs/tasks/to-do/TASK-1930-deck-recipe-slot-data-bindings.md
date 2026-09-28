@@ -2,9 +2,10 @@
 
 ## Delta 2026-09-27 — TASK-1928 dejó las plantillas
 
-- TASK-1928 dejó **68 de 69** recetas del catálogo con plantilla en `graphic-line-deck` (commits `ab23fdd90`,
-  `2c7c67c5d`, `39b9c7006`, `82964f2b4`, `3def01768`, `c3c290e16`, `64be8aa16`; AXIS `v0.3.20`). La única sin plantilla
-  es `cover-brochure-cine-lines-selection` (el contrato de AXIS no admite selección en `cover-brochure`). El mapa receta →
+- TASK-1928 dejó **69 de 69** recetas del catálogo con plantilla en `graphic-line-deck` (commits `ab23fdd90`,
+  `2c7c67c5d`, `39b9c7006`, `82964f2b4`, `3def01768`, `c3c290e16`, `64be8aa16`, `88ce23831`; AXIS `v0.3.21`). La última,
+  `cover-brochure-cine-lines-selection`, compone desde 2026-09-28 con la composición `document-selection` de
+  `cover-brochure` (contentType `deck.cover-brochure.document-selection`). El mapa receta →
   contentType vive en `src/lib/artifact-composer/catalogs/graphic-line-deck/recipe-map.json` y el índice publicado en
   `docs/operations/brand-graphic-line/deck-recipes/README.md` (columna «Plantilla»).
 - Composiciones nuevas con su contentType propio: `content-pricing` (`table`, `.stage`, `.live`), `section-cine` (`team`

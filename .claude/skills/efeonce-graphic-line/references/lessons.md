@@ -149,6 +149,18 @@
   (D1, 3×, fuente visible, sin logo ni velo en lámina interior con foto) y la diferencia se declara en
   `BASELINE_DELTAS.md` y en el registro; nunca se copia el defecto de la referencia.
 
+## 2026-09-28 (la portada con selección, TASK-1928)
+
+- **Relajar una regla no es aflojar la receta entera.** El operador relajó «sin selección en `cover-brochure`» para
+  una sola lámina (`cover-brochure-cine-lines-selection`). Regla: la excepción entra en AXIS como **layout propio**
+  (`document-selection`, `v0.3.21`) con sus medidas (la respuesta baja 28 px, la evidencia a 130 px, el logo en 200);
+  `document` y `line` siguen rechazando la selección (`selection-not-in-recipe`). Así ninguna otra portada la gana
+  por accidente.
+- **Una variante no siempre pide plantilla nueva.** La portada con selección usa la misma `CoverBrochure`: la
+  plantilla marca la respuesta como objetivo (`data-gl-selection-target`), suma un slot `selection` opcional y entra a
+  `TEMPLATES_WITH_SELECTION`. Regla: si la composición es la misma con una capa más, se extiende la plantilla y se
+  re-promueve su frame declarándolo en `BASELINE_DELTAS.md` (entrada (n)); el conteo de plantillas no cambia (50).
+
 ## Derivas conocidas entre docs y código (abiertas, 2026-09-26)
 
 - `paintGraphicLine` (AXIS) no pinta `voice`, `url-bubble`, `slogan`, `state`, `logo-inline` ni `brand-close`: esos

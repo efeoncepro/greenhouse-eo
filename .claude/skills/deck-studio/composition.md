@@ -78,8 +78,9 @@ catálogo propio, **`graphic-line-deck`** (PDF 16:9). TASK-1927 dejó 16 `conten
 (+ `.dawn`), `deck.close-brochure` (+ `.photo`) y `deck.close-proposal`. TASK-1928 sumó 34 plantillas para las 38
 recetas restantes (propuestas sobrias, método, cotización y cierre, prueba, secciones y quiénes somos, contenido y día
 a día; p. ej. `deck.proposal-service`, `deck.content-pricing` + `.stage`/`.live`, `deck.section-cine` +
-`.services`/`.about`/`.purpose`, `deck.content-day` + `.tools`/`.live-progress`/`.live-results`): **68 de 69** recetas
-componen; sólo `cover-brochure-cine-lines-selection` queda `blocked` en `recipe-map.json`. Viven junto a `graphic-line-stills` (heros web, caminero,
+`.services`/`.about`/`.purpose`, `deck.content-day` + `.tools`/`.live-progress`/`.live-results`): **69 de 69** recetas
+componen; la última, `cover-brochure-cine-lines-selection`, entró el 2026-09-28 como `deck.cover-brochure.document-selection`
+(misma plantilla `CoverBrochure`, AXIS 0.3.21) y `recipe-map.json` ya no tiene `blocked`. Viven junto a `graphic-line-stills` (heros web, caminero,
 cuadros de motion) y `graphic-line-overlays` (capas de video con alfa). Tabla receta → `layout` → `contentType` y
 campos del intent: [SKILL.md](SKILL.md) §«Componer hoy con `pnpm brand:compose`».
 
@@ -103,10 +104,10 @@ campos del intent: [SKILL.md](SKILL.md) §«Componer hoy con `pnpm brand:compose
 - **La pintura de la selección y del CTA se inyecta** (`createCatalog({ selectionPainter, ctaPainter })`): el catálogo
   no importa paquetes.
 - **Gate:** `pnpm composer:visual-gate --catalog=graphic-line` (66 frames a 0 px desde TASK-1928; altas y cambios
-  declarados en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`, entradas 2026-09-27 b–e y (f)…(l); runbook
+  declarados en `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md`, entradas 2026-09-27 b–e y (f)…(m), y 2026-09-28 (n) con el re-promovido de `CoverBrochure`; runbook
   `docs/operations/runbooks/composer-visual-gate.md`). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §2.1.
 - **Contrato 0.1.2, integrado (TASK-1927, 2026-09-27; local en `develop`).** Greenhouse fija
-  `@efeoncepro/axis-tokens` 0.3.14 y `@efeoncepro/axis-ui-contracts` 0.3.12 (desde TASK-1928, 0.3.20 y 0.3.18). El mapper lee `use` y `layout` (el que
+  `@efeoncepro/axis-tokens` 0.3.14 y `@efeoncepro/axis-ui-contracts` 0.3.12 (desde TASK-1928, 0.3.20 y 0.3.18; desde el 2026-09-28, 0.3.21 y 0.3.19). El mapper lee `use` y `layout` (el que
   resolvió AXIS, nunca inferido) y el marco vive en `src/lib/brand-surfaces/recipes/frame.ts`. Un intent 0.1.0 o 0.1.1
   resuelve igual.
 - **Documentos.** Un intent con `pages` compone **un PDF multipágina** con su manifest `axis.surface-document.v1` y su
@@ -131,9 +132,9 @@ campos del intent: [SKILL.md](SKILL.md) §«Componer hoy con `pnpm brand:compose
   `efeonce.collaboration-selection`; `pairsWith` (`cover↔close`, `variant`, `sequence`) alimenta la validación del
   documento. **El `id` de la receta reutiliza el de AXIS cuando existe** (`content-pricing`, `decision-next-steps`,
   `method-staircase`…); los nuevos son kebab-case en inglés. **El catálogo de recetas sirve para elegir la lámina; se
-  compone con el intent de AXIS.** Hoy componen **68 de las 69** (tablas de [SKILL.md](SKILL.md) §«Componer hoy»;
-  lista por id en el README del catálogo): 31 desde TASK-1927 y 34 plantillas para las 38 de TASK-1928. La única
-  bloqueada es `cover-brochure-cine-lines-selection` (AXIS no admite selección en `cover-brochure`).
+  compone con el intent de AXIS.** Hoy componen **las 69** (tablas de [SKILL.md](SKILL.md) §«Componer hoy»;
+  lista por id en el README del catálogo): 31 desde TASK-1927 y 34 plantillas para las 38 de TASK-1928. La portada con
+  selección (`cover-brochure-cine-lines-selection`) compone con el layout `document-selection` de `cover-brochure`.
   **Nunca** se agrega una plantilla sin su receta ni una receta sin la aprobación del operador.
 
 ### Destinos editables posteriores — no confundir fuente, conversión ni renderer

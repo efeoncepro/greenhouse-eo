@@ -33,6 +33,8 @@
 > 2026-09-27 (`package.json`: `axis-tokens` **0.3.20**, `axis-ui-contracts` **0.3.18**; builders
 > `src/lib/brand-surfaces/recipes/{proposal-service,method,close,proof,sections,content,kit}.ts`, `types.ts`,
 > `scripts/brand-surfaces/compose.ts`, `graphic-line-shared/resolvers.ts`, `graphic-line-deck/{index.ts,recipe-map.json}`).
+> Portada con selección (layout `document-selection` de `cover-brochure`): `package.json` fija `axis-tokens` **0.3.21**
+> y `axis-ui-contracts` **0.3.19** (tag `v0.3.21`, delta (l)) — 2026-09-28.
 > **Manda sobre las versiones que esta referencia cite más abajo para la composición por superficie.**
 
 Índice: [1 Paquetes](#1-paquetes-versiones-e-instalación) · [2 Tokens](#2-tokens-efeoncegraphicline) ·
@@ -54,10 +56,10 @@ separado.
 > `efeonce.surface-composition` 0.1.1; `efeonceGraphicLine.surfaces` desde 0.3.7). **Greenhouse fija todo eso**
 > (tokens 0.3.8, contracts 0.3.7, registry 0.3.1; commits `8d817f29e` y `016d0a183`), con axis-graphic-line 0.6.0
 > (dependencia directa) y axis-brand-assets 0.3.4. **Eso es la foto de TASK-1919.** Tras TASK-1927, TASK-1922 y
-> TASK-1928, lo vigente en Greenhouse es `axis-tokens` **0.3.20**, `axis-ui-contracts` **0.3.18** (tag `v0.3.20`,
-> contrato `efeonce.surface-composition` **0.1.2** con los deltas (f)…(k) del ADR), `axis-graphic-line` **0.7.0** y
+> TASK-1928, lo vigente en Greenhouse es `axis-tokens` **0.3.21**, `axis-ui-contracts` **0.3.19** (tag `v0.3.21`,
+> 2026-09-28; contrato `efeonce.surface-composition` **0.1.2** con los deltas (f)…(l) del ADR), `axis-graphic-line` **0.7.0** y
 > `axis-brand-assets` **0.3.5**. Releases de TASK-1927 (`v0.3.11`, `v0.3.13`, `v0.3.14`) y de TASK-1928 (`v0.3.15` a
-> `v0.3.20`), fila por fila, en [ledger.md](ledger.md). Después de subir AXIS: `pnpm brand:tokens` (y
+> `v0.3.21`), fila por fila, en [ledger.md](ledger.md). Después de subir AXIS: `pnpm brand:tokens` (y
 > `pnpm glitch:tokens`).
 
 | Paquete | Versión en `main` de AXIS | Último tag de release | Fija Greenhouse (`package.json`) | Qué trae para la línea |
@@ -844,9 +846,11 @@ catálogo exporta `createCatalog({ selectionPainter, ctaPainter })`: la pintura 
 consumidor (adaptador de Greenhouse sobre `efeonce.collaboration-selection`). Plantillas de capa declaran
 `render.background: 'transparent'`.
 
-**Deck completo (TASK-1928, 2026-09-27).** `graphic-line-deck` suma 34 plantillas: **68 de las 69 recetas** del
-catálogo componen; `cover-brochure-cine-lines-selection` queda `blocked` en `recipe-map.json` (AXIS no admite selección
-en `cover-brochure`). Tabla receta → `layout` → `contentType` en [applications.md §L](applications.md). Piezas nuevas:
+**Deck completo (TASK-1928, 2026-09-27).** `graphic-line-deck` suma 34 plantillas: **las 69 recetas** del
+catálogo componen. La última, `cover-brochure-cine-lines-selection`, entró el 2026-09-28 sin plantilla nueva: contentType
+`deck.cover-brochure.document-selection` sobre `CoverBrochure` (marca la respuesta con `data-gl-selection-target` y
+tiene un slot `selection` opcional; está en `TEMPLATES_WITH_SELECTION` de `graphic-line-deck/index.ts`), con el
+layout `document-selection` de AXIS `v0.3.21`. `recipe-map.json` ya no tiene recetas `blocked`. Tabla receta → `layout` → `contentType` en [applications.md §L](applications.md). Piezas nuevas:
 
 - **Assets del compositor** (`src/lib/brand-surfaces/types.ts`, materializados en `scripts/brand-surfaces/compose.ts`):
   `logo` (logo de tercero normalizado: tono, área de tinta y caja; `knockout`, `recolor` + `recolorBox`); `painted`
@@ -865,9 +869,11 @@ en `cover-brochure`). Tabla receta → `layout` → `contentType` en [applicatio
   obligatorio y el **mismo largo máximo** (en una plantilla compartida manda el mayor). Las 30 recetas anteriores
   declaran `slots: null`. El compositor rechaza un texto que excede el `maxCharacters` del campo
   (`src/lib/artifact-composer/validate.ts`, `overflow=reject`).
-- **Contrato (serie `v0.3.15`…`v0.3.20`):** una composición puede declarar `progress: false`; `voice.maxWords` por
+- **Contrato (serie `v0.3.15`…`v0.3.21`):** una composición puede declarar `progress: false`; `voice.maxWords` por
   receta (testimonio hasta 6 palabras, el resto 3); `steps.icons: false` y `steps.min`; colores por nombre de paleta;
-  `section-cine` gana `about` y `purpose`; `content-day` gana `tools`, `live-progress` y `live-results`.
+  `section-cine` gana `about` y `purpose`; `content-day` gana `tools`, `live-progress` y `live-results`; y
+  `cover-brochure` gana `document-selection` (`v0.3.21`, delta (l): `column.answerWithSelectionExtraPx` = 28,
+  `bodyBelowAnswerPx.withSelection` = 130; `document` y `line` siguen con `selection-not-in-recipe`).
 
 `bindings.json` del render: `{ targets: { id: { cx, cy, r } }, photos: { photoId: ruta }, urlBubble: { x, y, height },
 texts: [{ id, x, y, w, h, content?, svg?, fontSize?, baseline?, lastChar? }], signature: { y? }, protect: [{ id, kind:

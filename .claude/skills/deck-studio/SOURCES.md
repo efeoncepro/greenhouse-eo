@@ -367,6 +367,6 @@ No son bibliografía: son el código y los docs que respaldan lo que SKILL.md y 
   (`sectionSplit`) en `src/lib/brand-surfaces/recipes/deck.ts`.
 - Docs: `docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6,
   `docs/operations/brand-graphic-line/deck-recipes/README.md`,
-  `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` (entradas 2026-09-27 b–e y (f)…(l)).
-- Versiones: `package.json` (`@efeoncepro/axis-tokens` 0.3.20, `@efeoncepro/axis-ui-contracts` 0.3.18,
+  `scripts/frontend/baselines/artifact-composer/BASELINE_DELTAS.md` (entradas 2026-09-27 b–e, (f)…(m) y 2026-09-28 (n)).
+- Versiones: `package.json` (`@efeoncepro/axis-tokens` 0.3.21, `@efeoncepro/axis-ui-contracts` 0.3.19,
   `@efeoncepro/axis-graphic-line` 0.7.0, `@efeoncepro/axis-brand-assets` 0.3.5).

@@ -1,9 +1,9 @@
 # Componer un deck con las recetas por lámina — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-27 por Claude (1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.3: la portada con selección compone con el layout `document-selection` (AXIS 0.3.21); 69 de 69 recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla; ya no hay maquetas declaradas; cómo componer cualquier receta desde su intent de ejemplo, largos que hace cumplir el compositor, cifras con fuente, `[MONTO]` y selección. Antes, 1.1: flujo tras el cierre de TASK-1927 — 31 recetas con plantilla, intent propio, documento completo, cómo cambiar la foto, el copy o la sección)
 > **Modulo:** Creative · marca propia de Efeonce (línea gráfica «La órbita»)
 > **Ruta en portal:** no aplica — se arma con el catálogo de recetas, comandos locales y el Artifact Composer (la ruta productiva gobernada es TASK-1921, pendiente)
 > **Documentacion relacionada:** [Catálogo de recetas por lámina](../../operations/brand-graphic-line/deck-recipes/README.md) · [Norma de composición por superficie §4.6](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) · [Documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) · [Componer una pieza por superficie con AXIS](./componer-por-superficie-con-axis.md) · [Registro cine](../../operations/brand-photography/EFEONCE_PHOTO_REGISTER_CINE_V1.md)
@@ -41,9 +41,7 @@ cliente, para las ofertas a comité del catálogo `deck-axis` ni para la interfa
 ## El flujo en cinco pasos
 
 1. Elige la lámina en el catálogo de 69 recetas.
-2. Busca su intent de ejemplo: **68 de 69** recetas tienen plantilla y un ejemplo listo para copiar. La única sin
-   plantilla es `cover-brochure-cine-lines-selection`, que se compone como `cover-brochure-cine-lines` sin la
-   selección.
+2. Busca su intent de ejemplo: **las 69** recetas tienen plantilla y un ejemplo listo para copiar.
 3. Copia el ejemplo a tu carpeta y cambia el copy, las cifras y las fotos.
 4. Compón la lámina o el documento completo con `pnpm brand:compose`.
 5. Revisa a ojo contra la referencia aprobada.
@@ -57,13 +55,13 @@ El paso a paso de abajo los detalla.
 | Documento | Portada | Contraportada |
 |---|---|---|
 | Propuesta comercial | **sin foto**, con el logo del cliente dentro de la órbita: `cover-proposal-orbit` o `cover-proposal-dawn` | **con foto** y «Empower your Growth»: `close-proposal-horizon` o `close-proposal-dawn` |
-| Brochure | **con foto**: `cover-brochure-cine-orbit`, `cover-brochure-cine-lines`, `cover-brochure-cine-team` o la de una línea (`cover-brochure-line-*`) | **sin foto**: `close-brochure-orbit` («¿Conversamos? Cuando quieras.») |
+| Brochure | **con foto**: `cover-brochure-cine-orbit`, `cover-brochure-cine-lines`, `cover-brochure-cine-team`, la de cinco líneas con selección (`cover-brochure-cine-lines-selection`) o la de una línea (`cover-brochure-line-*`) | **sin foto**: `close-brochure-orbit` («¿Conversamos? Cuando quieras.») |
 | Pitch / QBR | no hay portada aprobada: pregúntale al operador | no hay cierre aprobado: pregúntale al operador |
 
 La portada y el cierre clásicos de AXIS (`cover-classic`, `close-classic`) **no se usan**: el operador no los aprobó
 y no tienen plantilla, aunque el catálogo todavía los cite como alternativa. La portada
-`cover-brochure-cine-lines-selection` está aprobada como lámina, pero al componerla sale sin la selección (el contrato
-no la admite en esa portada).
+`cover-brochure-cine-lines-selection` compone desde el 2026-09-28 con el layout `document-selection`: la selección va
+sobre «Crecer.», nunca sobre la persona, con un solo cursor «Nexa».
 
 Regla que no se discute: **si la portada lleva foto, la contraportada no, y al revés.** El eslogan nunca va en la
 portada.
@@ -140,7 +138,7 @@ protagonista, en las propuestas de cine y en las láminas de sección y «quién
 ### Paso 7 · Busca la receta y su intent de ejemplo
 
 1. Abre el índice del [catálogo](../../operations/brand-graphic-line/deck-recipes/README.md#índice) y confirma en la
-   columna «Plantilla» que la receta la tiene (68 de 69 la tienen).
+   columna «Plantilla» que la receta la tiene (hoy, las 69).
 2. Busca su intent de ejemplo. En casi todas se llama
    `src/lib/brand-surfaces/examples/deck-<id del catálogo>-intent.json` (por ejemplo,
    `deck-content-pricing-live-intent.json`). Las excepciones (páginas de servicio de cine, que están dentro de los
@@ -152,6 +150,7 @@ protagonista, en las propuestas de cine y en las láminas de sección y «quién
    |---|---|---|
    | `section-split-corner-bottom` | `section-split` | `corner-bottom` |
    | `cover-brochure-line-voice` | `cover-brochure` (con `line: "voice"`) | `line` |
+   | `cover-brochure-cine-lines-selection` | `cover-brochure` | `document-selection` |
    | `content-pricing-stage` | `content-pricing` | `stage` |
    | `method-staircase-flat` | `method-staircase` | `flat` |
    | `section-cine-about` | `section-cine` | `about` |
@@ -161,8 +160,10 @@ protagonista, en las propuestas de cine y en las láminas de sección y «quién
    La tabla completa, receta por receta, está en el catálogo («Dos nombres para la misma lámina» y «Las recetas de
    TASK-1928»).
 
-La única receta sin plantilla es `cover-brochure-cine-lines-selection`: el contrato de AXIS no admite selección en esa
-portada. Compónla como `cover-brochure-cine-lines` y di en la entrega que sale sin la selección.
+La portada con selección (`cover-brochure-cine-lines-selection`) se compone desde
+`deck-cover-brochure-cine-lines-selection-intent.json`, con `layout: "document-selection"` (contentType
+`deck.cover-brochure.document-selection`, plantilla `CoverBrochure`). Sólo ese layout admite la selección: con
+`document` o `line`, AXIS la rechaza (`selection-not-in-recipe`).
 
 ### Paso 8 · Escribe el intent
 
@@ -220,7 +221,7 @@ Si el documento tiene un solo problema, **no sale ninguna página**. El mensaje 
 
 Mira cada lámina en el píxel final contra su referencia aprobada y contra los **pendientes de QA** del catálogo. La
 prueba visual automática cubre las plantillas con sus datos de prueba, no tu pieza: tu pieza se revisa a ojo. Si usaste
-`cover-brochure-cine-lines-selection`, dilo en la entrega: sale sin la selección. Componer no aprueba ni publica: la
+`cover-brochure-cine-lines-selection`, revisa que la selección caiga sobre «Crecer.» y no sobre la persona. Componer no aprueba ni publica: la
 aprobación es del operador.
 
 ## Cambiar la foto, el copy o la sección de una lámina
@@ -251,8 +252,7 @@ Qué **no** cambia: el panel, la esquina curva, el indicador de sección y la co
 | Estado | Qué significa |
 |---|---|
 | **aprobado** | la lámina está aprobada por el operador (hoy, las 69) y se puede usar |
-| **con plantilla** | además, `pnpm brand:compose` la produce entera (68 de 69) |
-| **compone sin selección** | `cover-brochure-cine-lines-selection`: aprobada, pero el contrato no admite la selección en esa portada; se compone como `cover-brochure-cine-lines` y se dice en la entrega |
+| **con plantilla** | además, `pnpm brand:compose` la produce entera (hoy, las 69) |
 | **pendiente de QA** | la referencia aprobada tenía un detalle que la norma corrige (respuesta bajo 3×, acento en texto chico, cifra sin fuente). La plantilla ya lo corrige; el catálogo separa los resueltos de los que siguen abiertos |
 | `recipe-not-approved` | el contrato de AXIS no tiene esa receta como aprobada |
 | `recipe-without-template` | la receta está aprobada en AXIS, pero el composer no tiene plantilla para ella. En el deck no debería pasar: revisa que la receta y el `layout` sean los del ejemplo |
@@ -313,7 +313,7 @@ Qué **no** cambia: el panel, la esquina curva, el indicador de sección y la co
   (`src/lib/artifact-composer/catalogs/graphic-line-deck/`, con `registry.json` y `recipe-map.json`), builders en
   `src/lib/brand-surfaces/recipes/` (documento: `src/lib/brand-surfaces/document.ts`), intents de ejemplo en
   `src/lib/brand-surfaces/examples/`, comando `pnpm brand:compose` (`scripts/brand-surfaces/compose.ts`). Contrato
-  `efeonce.surface-composition` 0.1.2 (`axis-tokens` 0.3.20, `axis-ui-contracts` 0.3.18); un intent 0.1.0 o 0.1.1
+  `efeonce.surface-composition` 0.1.2 (`axis-tokens` 0.3.21, `axis-ui-contracts` 0.3.19); un intent 0.1.0 o 0.1.1
   resuelve igual.
 - Paridad de slots receta ↔ plantilla: `src/lib/brand-surfaces/__tests__/recipe-slot-parity.test.ts`.
 - Tasks: TASK-1927 (31 recetas: el marco, secciones clásica y partida, medida, tríptico, escalera y propuestas de

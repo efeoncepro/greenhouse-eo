@@ -5,7 +5,7 @@ Verificado contra: greenhouse-eo@7cb24df17 · axis-design-system@a5c21ae (ícono
 (D24, §0.3 y A10): AXIS `main@c18e3d3` — 2026-09-27 · §L con la ruta por el Artifact Composer: greenhouse-eo@016d0a183 — 2026-09-27
 · §L «Componer el deck hoy» y «Cambiar la foto, el copy o la sección»: árbol local de `develop` tras el cierre de
 TASK-1927 — 2026-09-27 · §L «Recetas con plantilla desde TASK-1928»: árbol local de `develop` en `64be8aa16`
-(AXIS `v0.3.20`) — 2026-09-27
+(AXIS `v0.3.20`) — 2026-09-27 · portada con selección (`document-selection`, AXIS `v0.3.21`) — 2026-09-28
 
 Esta guía dice, **para cada aplicación**, qué elementos de la línea van (y cuáles nunca), dónde se ubican, cuánto espacio
 ocupan, en qué superficie y color, y cómo se produce. No repite la API (ver `package-and-tokens.md`), el significado de
@@ -726,7 +726,7 @@ Toda aplicación física (merch, oficina, papelería, eventos) pasa por tres est
 > Contrato AXIS `efeonce.surface-composition` 0.1.2 (manifest `axis.surface-composition.v1`; acepta intents 0.1.0 y
 > 0.1.1), tokens `efeonceGraphicLine.surfaces.<superficie>` y `pnpm surface:resolve`. **Greenhouse lo integró con
 > TASK-1927 (`complete` el 2026-09-27; en `develop` local, sin push):** fijó `axis-tokens` 0.3.14 y `axis-ui-contracts` 0.3.12 (tag AXIS
-> `v0.3.14`); **TASK-1928 los subió a 0.3.20 y 0.3.18** (tag `v0.3.20`). Ver «Contrato 0.1.2» y «Componer el deck hoy» al final de esta sección,
+> `v0.3.14`); **TASK-1928 los subió a 0.3.20 y 0.3.18** (tag `v0.3.20`) y, el 2026-09-28, a **0.3.21 y 0.3.19** (tag `v0.3.21`, layout `document-selection` de `cover-brochure`). Ver «Contrato 0.1.2» y «Componer el deck hoy» al final de esta sección,
 > [Lab](https://axis.efeonce.org/references/surfaces/). Canvas por superficie:
 > [La órbita — superficies](https://claude.ai/code/artifact/04512639-c45f-4c8c-bb3b-673e8dfdbcb7), una página por
 > superficie con su lámina «Guía · cómo componer …» a la izquierda. Esta sección no copia valores: los números están
@@ -761,7 +761,7 @@ bajada web sin token, y la paleta 20 % vs 35 %.
 | pDOOH | nada todavía (LED, mupi, spot sin audio y variantes por franja son opción) | LED bajo la respuesta, mupi centrada (opción) | J |
 | Motion | animación en bucle foto-para-la-lente + reveal, y su storyboard | nunca en la toma; firma el cierre | J |
 | Audiovisual | storyboard de planos «Cómo trabajamos» y escenas con generadores de texto | firma la marca en el cierre, nunca la toma | J |
-| Deck | **las 69 láminas del canvas** (2026-09-27), cada una con su receta en `deck-recipes/`; con plantilla hoy (TASK-1927): sección clásica, «la órbita mide la cifra», `method-staircase` (BeX), `proposal-cinematic` (`service`, `hero`, `lines`), sección partida (tres composiciones, por la izquierda), tríptico (una palabra por toma) y el marco `cover-brochure`, `cover-proposal`, `close-brochure`, `close-proposal`; TASK-1928 sumó plantillas para las 38 restantes: **68 de 69 componen** (sólo `cover-brochure-cine-lines-selection` queda bloqueada). `cover-classic` y `close-classic` no se usan | burbuja URL en el pie; logo sólo en portada, cierre o marca-sujeto | B1, B2 |
+| Deck | **las 69 láminas del canvas** (2026-09-27), cada una con su receta en `deck-recipes/`; con plantilla hoy (TASK-1927): sección clásica, «la órbita mide la cifra», `method-staircase` (BeX), `proposal-cinematic` (`service`, `hero`, `lines`), sección partida (tres composiciones, por la izquierda), tríptico (una palabra por toma) y el marco `cover-brochure`, `cover-proposal`, `close-brochure`, `close-proposal`; TASK-1928 sumó plantillas para las 38 restantes: **69 de 69 componen** (la portada con selección, `cover-brochure-cine-lines-selection`, desde el 2026-09-28 con el layout `document-selection`). `cover-classic` y `close-classic` no se usan | burbuja URL en el pie; logo sólo en portada, cierre o marca-sujeto | B1, B2 |
 
 **Reglas que un agente necesita en el momento**
 
@@ -851,6 +851,7 @@ plantilla usa el que resolvió AXIS, nunca lo infiere. Ejemplos por lámina en
 | `section-classic` · `content-measure` · `method-staircase` · `triptych` | — | `deck.<receta>` |
 | `section-split` | `corner-top` (o sin layout) · `corner-bottom` · `panel-end` | `deck.section-split` · `.corner-bottom` · `.panel-end` |
 | `cover-brochure` (uso brochure, con foto) | `document` · `line` | `deck.cover-brochure` |
+| `cover-brochure` (uso brochure, con foto y selección) | `document-selection` | `deck.cover-brochure.document-selection` |
 | `cover-proposal` (uso proposal, **sin foto**) | `orbit` · `dawn` | `deck.cover-proposal` · `.dawn` |
 | `close-brochure` (uso brochure) | `orbit` (sin foto) · `photo` | `deck.close-brochure` · `.photo` |
 | `close-proposal` (uso proposal, con foto) | — | `deck.close-proposal` |
@@ -878,12 +879,15 @@ plantilla usa el que resolvió AXIS, nunca lo infiere. Ejemplos por lámina en
   se pasa: se acorta el texto, nunca se toca la plantilla.
 - **Foco del recorte:** `photo.focus` (0–1) dirige el recorte del plate sólo en las recetas que lo leen; sin él, el
   recorte es centrado. La sección partida sigue sin leerlo.
-- **Bloqueada:** `cover-brochure-cine-lines-selection` (`recipe-map.json` → `blocked`) hasta que AXIS admita
-  selección en `cover-brochure`.
+- **Portada con selección:** `cover-brochure-cine-lines-selection` compone desde el 2026-09-28 como
+  `deck.cover-brochure.document-selection`, sobre la misma plantilla `CoverBrochure` (marca la respuesta con
+  `data-gl-selection-target` y tiene un slot `selection` opcional). `recipe-map.json` ya no tiene recetas `blocked`.
 
-- **Marco:** `cover-brochure` lleva foto de cine a sangre y columna de voz, **sin selección ni burbuja URL** (por eso
-  la lámina aprobada `cover-brochure-cine-lines-selection` no se compone: el contrato no admite selección en esa
-  portada). `cover-proposal` lleva el logo del cliente (o el marcador «Logo del cliente») con la selección sobre su
+- **Marco:** `cover-brochure` lleva foto de cine a sangre y columna de voz, **sin burbuja URL**; en `document` y
+  `line`, **sin selección** (`selection-not-in-recipe`). El layout `document-selection` (AXIS `v0.3.21`, el operador
+  relajó la regla el 2026-09-28) es la excepción: misma columna y foto que `document`, selección de ocho tiradores
+  sobre la respuesta («Crecer.»), nunca sobre la persona, y un solo cursor «Nexa» abajo al final (escala 1.1, sin
+  overlay); la respuesta baja 28 px, la evidencia queda 130 px debajo y el logo arriba en 200. `cover-proposal` lleva el logo del cliente (o el marcador «Logo del cliente») con la selección sobre su
   caja, y la burbuja URL. `close-brochure` lleva «¿Conversamos? Cuando quieras.», el eslogan como firma, redes y
   contacto; en `orbit`, el cursor del lector con corchetes sobre la respuesta. `close-proposal` va sin voz: el mensaje
   es el eslogan «Empower your Growth». **Portada con foto ↔ contraportada sin foto, y al revés**
@@ -913,8 +917,8 @@ plantilla usa el que resolvió AXIS, nunca lo infiere. Ejemplos por lámina en
   desbloqueadas. TASK-1928 dejó las plantillas de las 38 restantes en `develop` local (gate `graphic-line` a 0 px en
   66 frames); **espera la aprobación visual del operador** de sus seis familias (hojas en
   `ai-generations/2026-09-27_deck-recetas/`), el `pnpm build` de cierre (con autorización) y el push. **Pendiente:**
-  push a `develop`; ruta productiva gobernada, que debe aceptar también el documento (TASK-1921); selección en
-  `cover-brochure` (AXIS). Diferencias conocidas
+  push a `develop`; ruta productiva gobernada, que debe aceptar también el documento (TASK-1921). La selección en `cover-brochure` se
+  resolvió el 2026-09-28 (layout `document-selection`, AXIS `v0.3.21`). Diferencias conocidas
   contra los prototipos: tamaño de «Cuando quieras.», burbuja URL horneada en vez de la de luminosidad, caja de
   selección del pintor canónico unos píxeles más ajustada.
 

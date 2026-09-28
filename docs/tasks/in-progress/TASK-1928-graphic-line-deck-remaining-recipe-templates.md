@@ -7,7 +7,9 @@
   `proposal-cinematic` hero y lines, las tres composiciones de `section-split` y el tríptico de una palabra por toma.
   Esta task queda sólo con las recetas interiores.
 - Queda fuera de las dos tasks `cover-brochure-cine-lines-selection`: el contrato de AXIS no admite selección en
-  `cover-brochure`. Necesita una decisión en AXIS antes de tener plantilla.
+  `cover-brochure`. Necesita una decisión en AXIS antes de tener plantilla. **Resuelto 2026-09-28:** el operador relajó
+  la regla y la sumó a esta task; AXIS `v0.3.21` le da la composición `document-selection` y compone con `CoverBrochure`
+  (commit `88ce23831`).
 - Patrones que esta task puede reutilizar, ya probados: una plantilla por composición con `contentType`
   `deck.<receta>.<layout>` (sin ramas dentro de una plantilla aprobada); varias composiciones sobre un mismo HTML con un
   contrato de slots por composición (`section-split`); plantillas sin respaldo en CSS, con cada medida como custom
@@ -37,7 +39,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Code complete 2026-09-27: las 38 recetas componen desde graphic-line-deck (68/69 del catálogo; la restante es de AXIS), AXIS v0.3.20, gates a 0 px y paridad de slots; pendiente la aprobación visual del operador y pnpm build con autorización`
+- Status real: `Code complete 2026-09-28: las 38 recetas y la portada con selección componen desde graphic-line-deck (69/69 del catálogo), AXIS v0.3.21, gates a 0 px y paridad de slots; pendiente la aprobación visual del operador y pnpm build con autorización`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`

@@ -1,9 +1,10 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-09-27 por Claude (1.2: TASK-1928 — 68 de 69 recetas con plantilla, las familias
+> **Última actualización:** 2026-09-28 por Claude (1.3: la portada con selección compone — layout `document-selection`,
+> AXIS 0.3.21; **69 de 69** recetas con plantilla. Antes, 1.2: TASK-1928 — 68 de 69 recetas con plantilla, las familias
 > nuevas y sus intents de ejemplo, paridad de slots receta ↔ plantilla y los pendientes de QA que resolvió. Antes, 1.1:
 > estado tras el cierre de TASK-1927 — qué recetas tienen plantilla, equivalencia de nombres con el contrato de AXIS,
 > pendientes de QA resueltos y abiertos, cómo cambiar la foto, el copy o la sección)
@@ -43,12 +44,11 @@ catálogo `deck-axis` de las ofertas a comité ni a la interfaz de Greenhouse.
    `variant` (se elige una, no las dos seguidas) y `sequence` (van una después de la otra).
 4. **Llena los slots** con datos reales: textos dentro de su `maxChars` medido, montos siempre `[MONTO]`, cifras con
    fuente, logos sólo de clientes que autorizan su uso, fotos de ejemplo reemplazadas.
-5. **Compón con la plantilla.** **68 de 69** recetas tienen plantilla (columna «Plantilla» del índice y tabla de «Qué
+5. **Compón con la plantilla.** **Las 69** recetas tienen plantilla (columna «Plantilla» del índice y tabla de «Qué
    sale hoy con un comando»). **Escribe el intent** en un archivo propio, partiendo del intent de ejemplo de la receta
    (`src/lib/brand-surfaces/examples/deck-<receta>-intent.json`), con la receta y el `layout` de AXIS que le
-   corresponden, y compón la lámina o el documento completo con `pnpm brand:compose`. La única sin plantilla es
-   `cover-brochure-cine-lines-selection`: el contrato de AXIS no admite selección en `cover-brochure`, así que se
-   compone como `cover-brochure-cine-lines`, **sin la selección**.
+   corresponden, y compón la lámina o el documento completo con `pnpm brand:compose`. La portada con selección
+   (`cover-brochure-cine-lines-selection`) usa el layout `document-selection` de `cover-brochure` (AXIS 0.3.21).
 6. **Revisa a ojo** el píxel final contra la referencia aprobada, con la lista de la norma y los pendientes de QA de
    abajo. Componer no aprueba ni publica.
 
@@ -132,8 +132,8 @@ decisión** (ver «Notas del JSON que quedaron atrás»).
 1. **Las 69 láminas están aprobadas.** Lo que el canon o AXIS marcaban como opción, prueba u «opción sin elegir» pasa a
    aprobado: lente, sangre, partida, foco, respiro, hoja de contactos, secciones cine (servicios y equipo), las tres
    portadas generales del brochure y la de cinco líneas con selección y cursor de Nexa
-   (`cover-brochure-cine-lines-selection`). Esta última está aprobada como lámina, pero el contrato de AXIS no admite
-   selección en esa portada: al componerla sale sin selección.
+   (`cover-brochure-cine-lines-selection`). Esta última compone desde el 2026-09-28 con el layout
+   `document-selection` (el operador relajó la regla «sin selección en cover-brochure»; AXIS 0.3.21).
 2. **Tríptico:** una palabra por toma, cada una con su esfera: «Escucha.» «Crea.» «Mide.». Reemplaza la frase única con
    la esfera al final.
 3. **Sección partida, las tres variantes:** el indicador sube por la **izquierda** y la esfera queda **arriba a la
@@ -163,7 +163,8 @@ arriba (el JSON no se corrigió en este cambio):
   quedó escrita (decisión 4, registro cine y norma §4.6).
 - Varias `notes` citan que §4.6 o el token AXIS tratan una lámina como «opción» o «prueba»: la norma ya dice
   aprobado (decisión 1). TASK-1927 integró en Greenhouse el contrato 0.1.2 con 31 recetas y TASK-1928 sumó las 38
-  restantes (AXIS `axis-tokens` 0.3.20, `axis-ui-contracts` 0.3.18).
+  restantes (AXIS `axis-tokens` 0.3.20, `axis-ui-contracts` 0.3.18). La portada con selección llegó con AXIS
+  `v0.3.21` (`axis-tokens` 0.3.21, `axis-ui-contracts` 0.3.19), que es lo que fija hoy Greenhouse.
 - Varias recetas citan `cover-classic` o `close-classic` como alternativa (`preferInstead`): el marco clásico no fue
   aprobado y no se usa.
 
@@ -195,6 +196,12 @@ La plantilla aplica la norma sobre la referencia aprobada. Donde la referencia y
 | Dirección de contacto | próximos pasos (`decision-next-steps`) | **contacto desde `EFEONCE_CONTACT`**, nunca desde el intent |
 | Sin burbuja URL en el pie | partners (`content-partners`) | **burbuja URL** en el pie |
 
+### Resuelto el 2026-09-28
+
+| Pendiente | Dónde | Cómo quedó |
+|---|---|---|
+| Selección en la portada de cinco líneas | `cover-brochure-cine-lines-selection` | el operador relajó la regla «sin selección en cover-brochure». AXIS `v0.3.21` sumó a `cover-brochure` el layout `document-selection`: la misma columna y foto que `document`, selección de ocho tiradores sobre la respuesta («Crecer.»), nunca sobre la persona, y un solo cursor «Nexa» abajo al final. La respuesta baja 28 px y la evidencia queda 130 px debajo; logo arriba en 200. `document` y `line` siguen rechazando la selección (`selection-not-in-recipe`). Como la portada de cinco líneas de TASK-1927, firma con el logo y no lleva burbuja URL |
+
 Otras decisiones que la plantilla aplica: las **barras** de `decision-chart` salen de su número (índice, antes = 100);
 los **logos de terceros** se normalizan al componer (un tono y el mismo peso óptico), con la excepción tonal de Aguas
 Andinas y la UC de Temuco; el **stack** (`content-stack`) no pinta los «pilares de luz» del guion, porque en la
@@ -204,7 +211,6 @@ referencia aprobada nunca se vieron.
 
 | Pendiente | Dónde | Estado |
 |---|---|---|
-| Selección en la portada de cinco líneas | `cover-brochure-cine-lines-selection` | el contrato de AXIS no admite selección en `cover-brochure`: la lámina se compone sin la selección. Seguimiento en AXIS |
 | Logo dentro de la órbita en el cierre | contraportadas | **sin resolver**: ninguna contraportada aprobada lo lleva así; las aprobadas ponen el logo arriba de la columna (norma §6, fila 17) |
 | Isotipo sin registro de procedencia | plates `b` (NX6b, CR2b, WB1b, RV1b, BR2b…); HW1, T2, T3, H2 y LN4 sin isotipo compuesto | pasar por `pnpm foto:emblema` (y `foto:isotipo` si difiere) antes de publicar |
 | Plate repetido | P1 en lente, sangre, contenido con foto y hoja de contactos | regla de uso: no repetirlo en un mismo deck |
@@ -217,15 +223,16 @@ unos píxeles más ajustada.
 
 ## Qué sale hoy con un comando
 
-**68 de las 69 recetas caen en una plantilla** del catálogo `graphic-line-deck` del Artifact Composer y salen con
-`pnpm brand:compose`. La columna «Plantilla» del índice lo dice por receta y se lee de `registry.json`. La única sin
-plantilla es `cover-brochure-cine-lines-selection`: se compone como `cover-brochure-cine-lines`, sin la selección
-(`recipe-map.json` la marca `blocked`).
+**Las 69 recetas caen en una plantilla** del catálogo `graphic-line-deck` del Artifact Composer y salen con
+`pnpm brand:compose`. La columna «Plantilla» del índice lo dice por receta y se lee de `registry.json`;
+`recipe-map.json` ya no tiene recetas `blocked`. La última en llegar fue `cover-brochure-cine-lines-selection`
+(2026-09-28): contentType `deck.cover-brochure.document-selection`, sobre la misma plantilla `CoverBrochure`, que marca
+la respuesta como objetivo de la selección y tiene un slot `selection` opcional.
 
 - [TASK-1927](../../../tasks/complete/TASK-1927-surface-composition-0-1-2-greenhouse-integration.md) (`complete`) cubrió
   31 recetas: el marco (portadas y contraportadas), las secciones clásica y partida, la medida, el tríptico, la
-  escalera y las propuestas de cine. Treinta tienen plantilla; la trigésimo primera es la portada con selección que
-  sale sin ella.
+  escalera y las propuestas de cine. Treinta tuvieron plantilla ahí; la trigésimo primera, la portada con selección,
+  compone desde el 2026-09-28 con el layout `document-selection` (AXIS `v0.3.21`).
 - [TASK-1928](../../../tasks/in-progress/TASK-1928-graphic-line-deck-remaining-recipe-templates.md) sumó las otras 38
   en seis familias, sobre 34 plantillas nuevas: las cuatro `proposal-service-*` comparten
   `ProposalService`, y `section-cine-team` y `section-cine-services` comparten `SectionCine`.
@@ -246,7 +253,7 @@ Los ejemplos viven en `src/lib/brand-surfaces/examples/`. Las recetas de TASK-19
 | `cover-brochure-cine-orbit` | `cover-brochure` | `document` | brochure | `deck-cover-brochure-cine-orbit-intent.json` |
 | `cover-brochure-cine-lines` | `cover-brochure` | `document` | brochure | `deck-cover-brochure-cine-lines-intent.json` |
 | `cover-brochure-cine-team` | `cover-brochure` | `document` | brochure | `deck-cover-brochure-cine-team-intent.json` |
-| `cover-brochure-cine-lines-selection` | `cover-brochure` | `document` | brochure | sin ejemplo propio: compone como `cover-brochure-cine-lines`, **sin la selección** (el contrato no la admite en esta portada) |
+| `cover-brochure-cine-lines-selection` | `cover-brochure` | `document-selection` | brochure | `deck-cover-brochure-cine-lines-selection-intent.json` (contentType `deck.cover-brochure.document-selection`, plantilla `CoverBrochure`) |
 | `cover-brochure-line-growth` | `cover-brochure` | `line` | brochure | `deck-cover-brochure-line-growth-intent.json` |
 | `cover-brochure-line-brand` | `cover-brochure` | `line` | brochure | `deck-cover-brochure-line-brand-intent.json` |
 | `cover-brochure-line-engine` | `cover-brochure` | `line` | brochure | `deck-cover-brochure-line-engine-intent.json` |
@@ -401,7 +408,7 @@ falta un campo del esquema, si hay ids repetidos o si un `preferInstead` o `pair
 <!-- Generado por scripts/creative/deck-recipes/render-index.mjs desde EFEONCE_DECK_SLIDE_RECIPES_V1.json. No editar a mano: corre «pnpm brand:deck-recipes». -->
 
 Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aprobado el 2026-09-27 por operador (canvas «La órbita», página Deck).
-**68 de 69** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`). Las demás todavía no.
+**69 de 69** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`). Las demás todavía no.
 
 ### Recetas por familia y documento
 
@@ -427,7 +434,7 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 69 recetas · aproba
 |---|---|---|---|---|---|---|---|
 | `cover-brochure-cine-orbit` | Portada de brochure · Nexa frente a la órbita · «¿Qué hace Efeonce? Crecer.» | `deck.cover-brochure` | brochure | Portada del brochure GENERAL de servicios (las cinco líneas), en PDF que se lee sin presentador. | En una propuesta comercial: la portada de propuesta va SIN foto y con el logo del cliente. | `cover-proposal-orbit`, `cover-brochure-line-growth`, `section-cine-services`, `cover-classic` (AXIS) | `eyebrow` ≤32, `question` ≤26, `answer` ≤12, `evidence` ≤42, `photo` |
 | `cover-brochure-cine-lines` | Portada de brochure · Nexa y las cinco líneas · «¿Qué hace Efeonce? Crecer.» | `deck.cover-brochure` | brochure | Portada del brochure general cuando el documento recorre las cinco líneas y conviene mostrarlas desde la tapa. | En una propuesta comercial (portada sin foto con el logo del cliente). | `cover-brochure-cine-orbit`, `cover-brochure-line-brand`, `cover-proposal-orbit`, `cover-brochure-cine-lines-selection` | `eyebrow` ≤32, `question` ≤26, `answer` ≤12, `evidence` ≤42, `photo` |
-| `cover-brochure-cine-lines-selection` | Portada de brochure · Nexa y las cinco líneas, con selección y cursor de Nexa sobre «Crecer.» | — | brochure | Portada del brochure general cuando se quiere contar que Efeonce trabaja con personas y agentes sobre el mismo documento. | Si otra lámina del documento ya repite el mismo gesto de selección sobre «Crecer.» (la sección de servicios lo lleva con cursor propio): no dos veces seguidas. | `cover-brochure-cine-lines`, `section-cine-services` | `eyebrow` ≤32, `question` ≤26, `answer` ≤12, `evidence` ≤42, `selectionLabel` ≤8, `photo` |
+| `cover-brochure-cine-lines-selection` | Portada de brochure · Nexa y las cinco líneas, con selección y cursor de Nexa sobre «Crecer.» | `deck.cover-brochure.document-selection` | brochure | Portada del brochure general cuando se quiere contar que Efeonce trabaja con personas y agentes sobre el mismo documento. | Si otra lámina del documento ya repite el mismo gesto de selección sobre «Crecer.» (la sección de servicios lo lleva con cursor propio): no dos veces seguidas. | `cover-brochure-cine-lines`, `section-cine-services` | `eyebrow` ≤32, `question` ≤26, `answer` ≤12, `evidence` ≤42, `selectionLabel` ≤8, `photo` |
 | `cover-brochure-cine-team` | Portada de brochure · Nexa y el equipo con agentes · «¿Qué hace Efeonce? Crecer.» | `deck.cover-brochure` | brochure | Portada del brochure general cuando el argumento principal es el equipo (personas + agentes), por ejemplo para compradores que temen perder control o conocer a quién les atiende. | Si la sección del equipo del mismo documento abre con esta misma foto («¿Quién hace crecer tu marca? Este equipo.»): no repetirla. | `section-cine-team`, `cover-brochure-cine-orbit`, `content-team` | `eyebrow` ≤32, `question` ≤26, `answer` ≤12, `evidence` ≤42, `photo` |
 | `cover-brochure-line-growth` | Portada de brochure por línea · Growth Strategy & Measurement · «¿Lo medimos? Siempre.» | `deck.cover-brochure` | brochure | Portada del brochure de la línea Growth Strategy & Measurement (documento de una sola línea de servicio). | En el brochure general de las cinco líneas: allí va una de las portadas generales («¿Qué hace Efeonce? Crecer.»). | `cover-brochure-cine-orbit`, `cover-proposal-orbit`, `proposal-cinematic` (AXIS) | `eyebrow` ≤32, `question` ≤26, `answer` ≤12, `evidence` ≤42, `line`, `photo` |
 | `cover-brochure-line-brand` | Portada de brochure por línea · Creative Services · «¿Quién crea mi contenido? Tu squad.» | `deck.cover-brochure` | brochure | Portada del brochure de la línea Creative Services (documento de una sola línea de servicio). | En el brochure general de las cinco líneas: allí va una de las portadas generales («¿Qué hace Efeonce? Crecer.»). | `cover-brochure-cine-orbit`, `cover-proposal-orbit`, `proposal-cinematic` (AXIS) | `eyebrow` ≤32, `question` ≤26, `answer` ≤12, `evidence` ≤42, `line`, `photo` |

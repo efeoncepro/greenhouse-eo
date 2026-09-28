@@ -56,6 +56,7 @@
 | 2026-09-27 | **Glitch: música aprobada, sólo Glitch** (tema B: intro, cortina y salida; cama post-punk bajo la noticia): «Definitivamente la B es la decisión», «Me parecen bien todas», «Post-punk definitivamente». Reemplaza la decisión «voz sola bajo las noticias» del sonido. Másteres en el bucket `glitch/music/v1/` (URL + sha256, nunca regenerados); integrada al taller (`tools/glitch-motion/src/music.mjs`, pre-roll animado de la intro elegido por el operador, `--music off`); en producción en AXIS (`/references/glitch/#musica`, `glitch.json → music`, commit `87c3298`). Único pendiente: probar la mezcla con la voz real del host. Detalle: [glitch.md](glitch.md) §13.7. |
 | 2026-09-27 | **Glitch: motion y sonido aprobados, sólo Glitch.** Motion (apertura y tarjeta final v2, kit de overlays con el lower third de la órbita, transición de bytes entre piezas y entre escenas, héroe): «Si, el tuyo también está aprobado». Diseño sonoro **versión B**: «La b me encanta más» / «Sus sonidos están aprobados» (la A queda descartada, sólo con `--sound a`). Pre-roll de la intro «los tres puntos al ritmo» (3,2 s, opaco, empalme PSNR ∞ con la apertura), elegido por el operador. Todo se produce en el taller `efeoncepro/efeonce-brand-workshop` (`tools/glitch-motion`, HyperFrames; sonido en `src/sound.mjs` sobre `tools/brand-sound`; música en `src/music.mjs`), empujado a `main` = `ed89a0b`. Verificado: v2 37/37, kit 95/95, 12/12 pruebas. Detalle: [glitch.md](glitch.md) §12–§13; comandos: norma de Glitch §13.13. |
 | 2026-09-27 | **Deck compuesto: aprobación visual del operador (TASK-1927).** El operador aprobó a ojo las láminas compuestas con `pnpm brand:compose`: las composiciones `hero` y `lines` de `proposal-cinematic` y el brochure de nueve páginas. Con esa aprobación TASK-1927 quedó `complete` (en `develop` local, sin push). Las portadas y contraportadas aprobadas ese día ya tienen receta del contrato y plantilla (`cover-brochure`, `cover-proposal`, `close-brochure`, `close-proposal`); `cover-classic` y `close-classic` **no** están aprobadas. Detalle: `applications.md` §L, «Componer el deck hoy». |
+| 2026-09-28 | **Selección en la portada de brochure (relaja «sin selección en `cover-brochure`»).** El operador relajó la regla para la portada de cinco líneas con Nexa (`cover-brochure-cine-lines-selection`). AXIS `v0.3.21` (`axis-tokens` 0.3.21, `axis-ui-contracts` 0.3.19; delta (l) del ADR de composición por superficie) suma a `cover-brochure` el layout `document-selection`: la misma columna y foto que `document`, selección de ocho tiradores sobre la respuesta («Crecer.»), **nunca sobre la persona**, y un solo cursor colaborador «Nexa» abajo al final (escala 1.1, sin overlay); la respuesta baja 28 px (`column.answerWithSelectionExtraPx`), la evidencia queda 130 px debajo (`bodyBelowAnswerPx.withSelection`) y el logo arriba en 200. `document` y `line` siguen rechazando la selección (`selection-not-in-recipe`). Greenhouse la compone como `deck.cover-brochure.document-selection` sobre la misma plantilla `CoverBrochure`: **69 de 69** recetas del deck componen. Como la portada de cinco líneas de TASK-1927, firma con el logo y no lleva burbuja URL. |
 
 ## Pendientes del operador (no decidir por tu cuenta)
 
@@ -66,8 +67,8 @@
   las seis familias (hojas en `ai-generations/2026-09-27_deck-recetas/`). Las plantillas aplican la norma vigente
   sobre las referencias aprobadas (fila de implementación abajo); si el operador pide volver a la referencia en algún
   punto (por ejemplo, el logo chico en las secciones de cine, que era pregunta abierta y resolvió la norma), se
-  registra aquí como decisión suya. También sigue abierta en AXIS la selección en `cover-brochure` (desbloquea
-  `cover-brochure-cine-lines-selection`).
+  registra aquí como decisión suya. La selección en `cover-brochure` ya no está abierta: se resolvió el 2026-09-28
+  (layout `document-selection`, AXIS `v0.3.21`; fila de decisiones).
 
 - **Plantillas de La órbita (TASK-1919, 2026-09-27):** posición de la lente del caminero (token 0,70 vs ≈0,77 en la
   lámina aprobada); super de dato con arco completo (lámina) o la estela canónica de la medida; burbuja URL en
@@ -137,16 +138,19 @@
   `close-brochure`, `close-proposal`); compone documentos (`pages`) en un PDF con manifest y procedencia
   (`planSurfaceDocument`); gate `--catalog=graphic-line` con 32 frames a 0 px (deltas b–e en `BASELINE_DELTAS.md`).
   `cover-classic` y `close-classic` no entran (no aprobadas; `supersededBy` en AXIS), ni
-  `cover-brochure-cine-lines-selection` (el contrato no admite selección en esa portada). **Aprobado a ojo por el operador** (2026-09-27).
+  `cover-brochure-cine-lines-selection` (en ese momento el contrato no admitía selección en esa portada; compone desde
+  el 2026-09-28 con el layout `document-selection`). **Aprobado a ojo por el operador** (2026-09-27).
   **Pendiente:** el push a `develop`; las 38 recetas restantes del deck (TASK-1928, ya con plantilla: fila siguiente); la ruta productiva, que debe aceptar también el intent de documento
   (TASK-1921); plates idempotentes (TASK-1926); el control de foco de la sección partida (el builder `sectionSplit` no
   lee `photo.focus`; exige un cambio en AXIS y otro en Greenhouse, y **no tiene task**). Diferencias conocidas contra los prototipos: tamaño de «Cuando
   quieras.», burbuja URL horneada, caja de selección unos píxeles más ajustada.
 - Plantillas de las 38 recetas restantes (TASK-1928, 2026-09-27): **code complete, en `develop` local y sin push;
-  la task sigue `in-progress`** hasta la aprobación visual del operador y el `pnpm build` de cierre. Hecho: 37
+  la task sigue `in-progress`** hasta la aprobación visual del operador y el `pnpm build` de cierre. Hecho: 34
   plantillas nuevas en `graphic-line-deck` (dos recetas comparten `SectionCine`, cuatro comparten `ProposalService`):
-  **68 de 69 recetas componen**; Greenhouse fija `axis-tokens` 0.3.20 y `axis-ui-contracts` 0.3.18; gate
-  `--catalog=graphic-line` con 66 frames a 0 px (deltas (f)…(l) en `BASELINE_DELTAS.md`). Decisiones de norma
+  **68 de 69 recetas componían** con `axis-tokens` 0.3.20 y `axis-ui-contracts` 0.3.18; el 2026-09-28 entró la portada
+  con selección (**69 de 69**, sin plantilla nueva: 50 en total) y Greenhouse fija `axis-tokens` 0.3.21 y
+  `axis-ui-contracts` 0.3.19; gate `--catalog=graphic-line` con 66 frames a 0 px (deltas (f)…(m) en
+  `BASELINE_DELTAS.md`, y (n) con el frame `CoverBrochure` re-promovido). Decisiones de norma
   aplicadas sobre las referencias aprobadas (no son decisiones nuevas del operador):
   - **D1**, el acento nunca en texto de menos de 24 px: «Recomendado», cabecera de la cotización en vivo, «01 ·
     Diagnóstico · Sin costo», rol del interlocutor, rótulos de los pilares de «por qué lo hacemos», «Revisamos contigo»
@@ -200,7 +204,8 @@
 | 2026-09-27 | axis-tokens 0.3.17 · axis-ui-contracts 0.3.15 (TASK-1928) | publicado (tag `v0.3.17`) | delta (h): cotización, próximos pasos y respiro |
 | 2026-09-27 | axis-tokens 0.3.18 · axis-ui-contracts 0.3.16 (TASK-1928) | publicado (tag `v0.3.18`) | delta (i): prueba (foco, clientes, partners, riesgo, caso, gráfico, testimonio, por qué nosotros) |
 | 2026-09-27 | axis-tokens 0.3.19 · axis-ui-contracts 0.3.17 (TASK-1928) | publicado (tag `v0.3.19`) | delta (j): secciones y quiénes somos; `section-cine` gana `about` y `purpose` |
-| 2026-09-27 | axis-tokens 0.3.20 · axis-ui-contracts 0.3.18 (TASK-1928) | publicado (tag `v0.3.20`) | delta (k): contenido y día a día; `content-day` gana `tools`, `live-progress` y `live-results`. En la serie el contrato también ganó `progress: false` por composición, `voice.maxWords` por receta (testimonio hasta 6 palabras; el resto, 3), pasos sin íconos (`steps.icons: false`), `steps.min` y colores por nombre de paleta. **Vigente: Greenhouse fija `axis-tokens` 0.3.20 y `axis-ui-contracts` 0.3.18** |
+| 2026-09-27 | axis-tokens 0.3.20 · axis-ui-contracts 0.3.18 (TASK-1928) | publicado (tag `v0.3.20`) | delta (k): contenido y día a día; `content-day` gana `tools`, `live-progress` y `live-results`. En la serie el contrato también ganó `progress: false` por composición, `voice.maxWords` por receta (testimonio hasta 6 palabras; el resto, 3), pasos sin íconos (`steps.icons: false`), `steps.min` y colores por nombre de paleta. Greenhouse las fijó hasta el 2026-09-28 |
+| 2026-09-28 | axis-tokens 0.3.21 · axis-ui-contracts 0.3.19 (TASK-1928) | publicado (tag `v0.3.21`) | delta (l): `cover-brochure` gana el layout `document-selection` (selección sobre la respuesta, un cursor «Nexa»; `column.answerWithSelectionExtraPx`, `bodyBelowAnswerPx.withSelection`). **Vigente: Greenhouse fija `axis-tokens` 0.3.21 y `axis-ui-contracts` 0.3.19** |
 
 Lab AXIS (`c2affc6`, 2026-09-26): la lámina 6.1 lista las decisiones del 26-09 y lo que sigue abierto; el acento ya no colorea texto de menos de 24 px en 1.2 y en las láminas de Insights; la anatomía de 1.2 ya no dibuja el anillo de la esfera; 5.4, 5.1 y 4.5 al día. Quedan en acento sólo rótulos de cotas en diagramas técnicos («0,20 em», la «X» del resguardo), que no son piezas.
 

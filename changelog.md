@@ -7,14 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-09-27 — 68 de las 69 recetas de deck de «La órbita» componen (TASK-1928)
+## 2026-09-28 — Las 69 recetas de deck de «La órbita» componen (TASK-1928)
 
 - El catálogo `graphic-line-deck` suma 34 plantillas para las 38 recetas pendientes: propuestas sobrias, método,
   cotización y próximos pasos, prueba (clientes, partners, caso, gráfico, testimonio), secciones y «quiénes somos», y
   contenido y día a día. Todas se componen con `pnpm brand:compose` y entran al gate visual (66 frames a 0 px).
-- Greenhouse sube a AXIS `v0.3.20` (tokens 0.3.20, ui-contracts 0.3.18). El compositor gana logos de terceros
+- Greenhouse sube a AXIS `v0.3.21` (tokens 0.3.21, ui-contracts 0.3.19). El compositor gana logos de terceros
   normalizados, capas pintadas con foto adentro y recorte dirigido; el test de paridad exige que cada slot de la
-  receta tenga campo en su plantilla. `cover-brochure-cine-lines-selection` espera selección en AXIS.
+  receta tenga campo en su plantilla. La portada de brochure con la selección de Nexa compone con
+  la composición `document-selection` (el operador relajó la regla el 2026-09-28).
   Local en `develop`, sin push; falta aprobación visual y `pnpm build`.
 
 ## 2026-09-27 — Una edición de Glitch se compone con `pnpm glitch:compose` (TASK-1923)
