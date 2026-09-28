@@ -29,6 +29,13 @@
     "deck.method-hybrid-workforce.scene",
     "deck.breather",
     "deck.decision-next-steps",
+    "deck.decision-ai-answer",
+    "deck.decision-ai-market",
+    "deck.method-surround-cycle",
+    "deck.decision-difference",
+    "deck.method-eeat",
+    "deck.decision-traffic-to-revenue",
+    "deck.decision-diagnosis-map",
     "deck.content-pricing",
     "deck.content-pricing.stage",
     "deck.content-pricing.live",
@@ -321,6 +328,83 @@
       "contentTypes": ["deck.decision-next-steps"],
       "prototype": "decision-next-steps.html",
       "slotsRef": "decision-next-steps.slots.json"
+    },
+    {
+      "name": "DecisionAiAnswer",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-ai-answer"],
+      "prototype": "decision-ai-answer.html",
+      "slotsRef": "decision-ai-answer.slots.json"
+    },
+    {
+      "name": "DecisionAiMarket",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-ai-market"],
+      "prototype": "decision-ai-market.html",
+      "slotsRef": "decision-ai-market.slots.json"
+    },
+    {
+      "name": "MethodSurroundCycle",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.method-surround-cycle"],
+      "prototype": "method-surround-cycle.html",
+      "slotsRef": "method-surround-cycle.slots.json"
+    },
+    {
+      "name": "DecisionDifference",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-difference"],
+      "prototype": "decision-difference.html",
+      "slotsRef": "decision-difference.slots.json"
+    },
+    {
+      "name": "MethodEeat",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.method-eeat"],
+      "prototype": "method-eeat.html",
+      "slotsRef": "method-eeat.slots.json"
+    },
+    {
+      "name": "DecisionTrafficToRevenue",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-traffic-to-revenue"],
+      "prototype": "decision-traffic-to-revenue.html",
+      "slotsRef": "decision-traffic-to-revenue.slots.json"
+    },
+    {
+      "name": "DecisionDiagnosisMap",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["deck.decision-diagnosis-map"],
+      "prototype": "decision-diagnosis-map.html",
+      "slotsRef": "decision-diagnosis-map.slots.json"
     },
     {
       "name": "ContentPricing",
@@ -662,7 +746,14 @@
       "deck.content-day.tools": "ContentDayTools",
       "deck.content-day.live-progress": "ContentDayProgress",
       "deck.content-day.live-results": "ContentDayResults",
-      "deck.decision-agenda": "DecisionAgenda"
+      "deck.decision-agenda": "DecisionAgenda",
+      "deck.decision-ai-answer": "DecisionAiAnswer",
+      "deck.decision-ai-market": "DecisionAiMarket",
+      "deck.method-surround-cycle": "MethodSurroundCycle",
+      "deck.decision-difference": "DecisionDifference",
+      "deck.method-eeat": "MethodEeat",
+      "deck.decision-traffic-to-revenue": "DecisionTrafficToRevenue",
+      "deck.decision-diagnosis-map": "DecisionDiagnosisMap"
     }
   }
 }

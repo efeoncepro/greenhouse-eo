@@ -47,7 +47,10 @@ const TEMPLATES_WITH_SELECTION = [
   'DecisionTestimonial',
   // El texto (la respuesta entera) y el reloj del día (el momento de ahora).
   'ContentText',
-  'ContentDay'
+  'ContentDay',
+  // TASK-1934: la selección «Cliente» toma la fila de tu marca y el plan priorizado del diagnóstico.
+  'DecisionAiAnswer',
+  'DecisionDiagnosisMap'
 ] as const
 
 /**

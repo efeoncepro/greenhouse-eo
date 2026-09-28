@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>La órbita · la lámina de respiro</title>
+    <link rel="stylesheet" href="deck-fonts.css" />
+    <link rel="stylesheet" href="graphic-line-tokens.css" />
+    <link rel="stylesheet" href="graphic-line.css" />
+  </head>
+  <body>
+    <!-- PLACEHOLDER TASK-1934 (se reemplaza por la plantilla de decision-traffic-to-revenue).
+
+      Receta `breather` (surface deck, TASK-1928). La lámina de respiro: foto a sangre sin velo, la voz sobre el muro
+      calmo de la izquierda (la pregunta con el anillo chico) y el indicador de navegación arriba a la derecha. Sin
+      burbuja ni logo: la receta la exceptúa de la firma. Referencia: DeckRespiro (D3-respiro).
+    -->
+    <main class="gl-slide gl-br gl-ring-small" data-gl-root data-slot="frame">
+      <figure class="gl-photo" data-slot="photo">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <figure class="gl-layer" data-slot="indicator">
+        <img data-slot-field="src" alt="" />
+      </figure>
+
+      <div data-slot="voice">
+        <p class="gl-question"><span class="gl-ring" aria-hidden="true"></span><span data-slot-field="question">¿Y el cliente?</span></p>
+        <p class="gl-answer"><span data-slot-field="answer">Aprobó</span><span class="gl-sphere" data-gl-part="sphere" aria-hidden="true"></span></p>
+      </div>
+    </main>
+  </body>
+</html>

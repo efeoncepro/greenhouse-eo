@@ -4696,3 +4696,19 @@ body {
 .gl-ag .gl-item-lead .gl-ag-text {
   font-weight: var(--gl-ag-topic-chosen-wght);
 }
+
+/* ══ TASK-1934 · anclas de las siete láminas SEO/AEO: cada lámina escribe su CSS ARRIBA de su ancla, con su prefijo ══ */
+
+/* ── ancla TASK-1934 · decision-ai-answer (prefijo .gl-aa) ── */
+
+/* ── ancla TASK-1934 · decision-ai-market (prefijo .gl-am) ── */
+
+/* ── ancla TASK-1934 · method-surround-cycle (prefijo .gl-sur) ── */
+
+/* ── ancla TASK-1934 · decision-difference (prefijo .gl-df) ── */
+
+/* ── ancla TASK-1934 · method-eeat (prefijo .gl-ee) ── */
+
+/* ── ancla TASK-1934 · decision-traffic-to-revenue (prefijo .gl-ttr) ── */
+
+/* ── ancla TASK-1934 · decision-diagnosis-map (prefijo .gl-dm) ── */
