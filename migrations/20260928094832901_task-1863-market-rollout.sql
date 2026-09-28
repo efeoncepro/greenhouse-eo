@@ -182,7 +182,7 @@ DROP FUNCTION greenhouse_growth.guard_grader_market_primary();
 DROP FUNCTION greenhouse_growth.guard_grader_competitor_set();
 DROP FUNCTION greenhouse_growth.guard_grader_alias_history();
 ALTER TABLE greenhouse_growth.grader_profiles DROP COLUMN brand_aliases;
-DROP INDEX greenhouse_growth.grader_profiles_one_active_org;
+DROP INDEX IF EXISTS greenhouse_growth.grader_profiles_one_active_org;
 ALTER TABLE greenhouse_growth.grader_profiles DROP CONSTRAINT grader_profiles_recurring_regrade_cadence_check;
 ALTER TABLE greenhouse_growth.grader_profiles ADD CONSTRAINT grader_profiles_recurring_regrade_cadence_check
   CHECK (recurring_regrade_cadence IN ('weekly','monthly'));

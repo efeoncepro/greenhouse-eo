@@ -18,7 +18,10 @@ run(
 )
 const database = `task1863_schema_${process.pid}`
 
-const schemas = ['migrations/20260928094832901_task-1863-market-rollout.sql'].map(path => readFileSync(path, 'utf8').split('-- Down Migration'))
+const schemas = [
+  'migrations/20260928094832901_task-1863-market-rollout.sql',
+  'migrations/20260928095058691_task-1863-preserve-legacy-market-profiles.sql'
+].map(path => readFileSync(path, 'utf8').split('-- Down Migration'))
 
 run(`CREATE DATABASE ${database}`)
 
@@ -32,6 +35,8 @@ try {
   )
   for (const [up] of schemas) run('BEGIN;' + up + 'COMMIT;', database)
   run(readFileSync('scripts/growth/__tests__/fixtures/market-schema-assertions.sql', 'utf8'), database)
+  if (run("SELECT to_regclass('greenhouse_growth.grader_profiles_one_active_org') IS NULL", database).trim() !== 't')
+    throw new Error('Legacy profile compatibility was not preserved')
   for (const [, down] of [...schemas].reverse()) run('BEGIN;' + down + 'COMMIT;', database)
   for (const [up] of schemas) run('BEGIN;' + up + 'COMMIT;', database)
   console.log(
