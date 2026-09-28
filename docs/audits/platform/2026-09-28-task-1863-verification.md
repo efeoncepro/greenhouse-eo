@@ -255,3 +255,6 @@ Evidencia: [cuota recuperada](evidence/task-1863/packages-quota-recovery.json),
 [revisión](evidence/task-1863/worker-quota-recovery-readback.json),
 [tráfico](evidence/task-1863/worker-quota-recovery-traffic.json),
 [salud](evidence/task-1863/worker-quota-recovery-health.json).
+
+Workflow ops-worker `36413423962`, intento 2: **success**, incluidos verificación DataForSEO,
+salud, Ready y registro del commit. [Resultado final](evidence/task-1863/worker-quota-recovery-workflow.json).
