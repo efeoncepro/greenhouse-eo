@@ -63,7 +63,9 @@ const main = async () => {
   console.log('Plan:')
   plan.forEach(change => console.log(describeChange(change)))
 
-  const pending = plan.filter(change => change.kind !== 'unchanged')
+  const pending = plan.filter(
+    (change): change is Exclude<FirewallRuleChange, { kind: 'unchanged' }> => change.kind !== 'unchanged'
+  )
 
   if (!apply) {
     console.log(pending.length ? `\n${pending.length} cambio(s) pendiente(s). Usa --apply para escribir.` : '\nSin drift.')
@@ -80,8 +82,6 @@ const main = async () => {
   }
 
   for (const change of pending) {
-    if (change.kind === 'unchanged') continue
-
     const body =
       change.kind === 'insert'
         ? { action: 'rules.insert', id: null, value: change.value }
