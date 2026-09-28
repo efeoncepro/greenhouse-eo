@@ -489,7 +489,7 @@ Trazo del hoodie. Material de producción en [sources-and-assets.md](sources-and
   Plastilina), **con la redondez del set** (dedos de radio 1,75, palma de radio 6, nada de bloques planos) y **en
   movimiento** (inclinado, no recto; el arco con aire medido sobre el dedo: 0,19 se funde a tamaño chico, 1,5 no).
 - La clave es `swipe` porque `deslizar` ya es la Plastilina (D27): las claves son únicas entre voces (precedente `like`).
-- En las piezas va **sola, en reposo, a 64 px, a la derecha de la respuesta y alineada con ella**; nunca en la fila de la
+- En las piezas va **sola, en reposo, a 64 px, a la derecha de la respuesta y alineada con ella** (en Marketing con Manzanitas manda su sitio fijo: x 936, y 1033 en la portada y 985 en los interiores de 1080 × 1350, aunque la voz vaya arriba; [manzanitas.md](manzanitas.md) §5); nunca en la fila de la
   firma, donde compite con los logos (operador, 2026-09-28).
 - **Su par en Plastilina es `mano` (D29, aprobada el 2026-09-28, «Aprobada»):** la misma composición en la voz blanda —mano
   inclinada y, sobre el dedo, una flecha curva **maciza** con punta **compacta**—. La esfera va en la punta del dedo, donde

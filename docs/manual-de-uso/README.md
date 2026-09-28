@@ -77,6 +77,13 @@ La diferencia con otras capas de documentacion:
   de edición → `kit` → `render` si cambia el número → entrega con `--deliver`), todos los scripts y argumentos, qué
   verifica cada comando (una FALLA no entrega), manifiestos en `corridas/`, música por huella (nunca regenerada),
   re-entrega con `--skip-render`, edición sin música y problemas comunes.
+- [Componer piezas de Marketing con Manzanitas](creative/componer-piezas-de-marketing-con-manzanitas.md) — **sólo
+  para Marketing con Manzanitas** (registro complementario de La órbita; no se mezcla con Glitch): armar un carrusel
+  1080 × 1350 en el canvas de la línea con los componentes del DS «Efeonce — La órbita» — elegir la línea del tema,
+  repartir las fotos con el Recreo, elegir el gráfico por la pregunta (tabla de los nueve), preparar el dato con su
+  fuente o marcarlo «Ejemplo ilustrativo», láminas de texto denso, Escena y Lente, la contraportada con una sola
+  conversión, checklist (acento, contraste, una esfera, «Desliza», firma, fuente), story, blog, YouTube y pódcast,
+  estados y señales, problemas comunes y pendientes. Todavía sin comando: el registro en AXIS llega por una task aparte.
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
   lenguaje fotográfico aprobado el 2026-09-19.

@@ -79,6 +79,11 @@ puerta del primero.
 **Se decide ANTES de producir, con una sola pregunta: ¿la foto ES el mensaje, o es el SOPORTE de una idea?**
 Y se reconoce a simple vista por **si el sujeto mira al lente**.
 
+> **No confundir con el registro Marketing con Manzanitas** (2026-09-28): ése es un registro de **marca editorial**
+> que complementa La órbita ([norma](../../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)),
+> no un registro fotográfico. Dentro de él, las fotos siguen estos registros; en MCM, **cine** (ver §El lecho en el
+> registro cine).
+
 ### A · Documental — «el oficio a la vista»
 
 Es §1 y §2 de esta guía: obra, mecanismo y personas decidiendo. La foto **es** el mensaje, **nadie mira al lente**

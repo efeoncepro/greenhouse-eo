@@ -58,6 +58,13 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
   formato desde el 2026-09-28: una noticia puntual, sin número, cabecera «NO ESPERA AL LUNES» + «FLASH»), video y motion
   aprobados (apertura, tarjeta final, kit de gráficos y la transición de la manzana en bytes, exclusiva de Glitch), qué está
   aprobado y qué es propuesta, reglas que nunca se rompen y pendientes. Incluye su sonido y su música (aprobados, sólo de Glitch) y el porqué de la música.
+- [Registro Marketing con Manzanitas — registro complementario de La órbita](creative/registro-marketing-con-manzanitas.md) —
+  **sólo para Marketing con Manzanitas**, la marca editorial del blog (complementa La órbita, no la reemplaza, y no se
+  mezcla con Glitch): qué hereda de La órbita, los acentos por la línea del tema con un solo selector, la cabecera con la
+  manzana en contorno, los formatos Pizarra, Escena, Lente y Recreo, la mano «Desliza» en su sitio fijo, la firma y el
+  eslogan, la contraportada «A a escala» con una sola conversión, los nueve gráficos (qué pregunta responde cada uno y
+  cuándo elegirlo) y las tres láminas de texto denso. Aprobado el 2026-09-28 en el canvas; todavía no está en AXIS
+  (plan por una task aparte).
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
 - [Creator Influence & Content](media-distribution/creator-influence-content.md) — reglas funcionales para separar

@@ -170,6 +170,12 @@ Rige toda pieza social de la marca propia Efeonce y su familia (Globe, Wave, Rea
 [graphic-line-orbit.md](../../efeonce-brand-studio/references/graphic-line-orbit.md). Los valores salen de los
 tokens `efeonceGraphicLine` de `@efeoncepro/axis-tokens`; nunca HEX ni px transcritos a mano.
 
+- **Marcas editoriales con reglas propias:** Glitch tiene su sub-línea (`efeonce-graphic-line` →
+  `references/glitch.md`) y Marketing con Manzanitas su **registro** (aprobado 2026-09-28): norma
+  [`MANZANITAS_REGISTER_V1.md`](../../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)
+  y referencia `efeonce-graphic-line` → `references/manzanitas.md`. Suman reglas sólo para sus piezas (carrusel,
+  story, blog y banner, miniatura de YouTube, portada de pódcast), La órbita manda en todo lo demás y las dos no se
+  mezclan. Nada del registro Manzanitas está aún en AXIS.
 - **Lo que cambia en redes:** grosores ×1,75 en lienzos de hasta 1200 px; margen del 9 % del lado corto; en 9:16,
   la órbita y el texto respetan la zona que tapa la interfaz de cada red (medidas en
   `docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md`, §Zonas seguras).

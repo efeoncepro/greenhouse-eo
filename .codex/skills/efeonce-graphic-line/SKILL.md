@@ -35,6 +35,21 @@ sin número: «NO ESPERA AL LUNES» + «FLASH»), lanzado en producción el 2026
 la manzana, el verde Glitch, la falla en bytes, Guttery ni la cabecera «EDICIÓN #N» en una pieza de Efeonce, y nunca
 dos esferas en una pieza (manzana + lente u órbita).
 
+### Marketing con Manzanitas: registro complementario, sólo para Manzanitas
+
+Marketing con Manzanitas (MCM, la marca editorial evergreen del blog) tiene un **registro complementario** de La órbita,
+aprobado completo por el operador el 2026-09-28 («Me encantan, queda aprobada toda la línea gráfica», canvas v39). **La
+complementa, no la reemplaza** (operador: «esta línea gráfica no reemplaza The Orbit … sino que la complementa con un
+nuevo registro para marketing con Manzanitas»): en todo lo que el registro no dice, manda La órbita. Si la pieza es de
+MCM (carrusel, story, blog y banner, miniatura de YouTube, pódcast), carga [references/manzanitas.md](references/manzanitas.md)
+además de esta skill: qué hereda y qué es propio (la manzana, sus tres puntos, la órbita y la cifra destacada en el acento
+de la **línea del tema**; la cabecera; los formatos Pizarra, Escena, Lente y Recreo; «Desliza» y firma en sitio fijo; la
+contraportada A), cómo usar los 9 gráficos que se calculan desde el dato y las 3 láminas de texto denso, y qué está
+pendiente. **Nunca** lo mezcles con Glitch (la manzana en contorno con tres puntos es de MCM; la manzana llena, de
+Glitch) ni lo lleves a piezas de Efeonce. «Registro», acá, es un registro de marca editorial, no fotográfico. **Nada del
+registro está aún en AXIS**: el plan (token `manzanitasRegister`, contrato `efeonce.manzanitas-register`, módulo `charts`,
+Lab `/references/manzanitas/`) vive en la norma §14 y en su task.
+
 ## Por dónde empezar (carga selectiva)
 
 | Necesitas… | Lee |
@@ -63,6 +78,7 @@ dos esferas en una pieza (manzana + lente u órbita).
 | **Motion de Glitch** (APROBADO 2026-09-27; sólo Glitch): apertura y tarjeta final v2, pre-roll de la intro, kit de overlays, transición de bytes (entre piezas y entre escenas, exclusiva de Glitch) y héroe; se produce con HyperFrames en el taller (`pnpm -C ../efeonce-brand-workshop --filter glitch-motion doctor\|render\|kit\|transiciones\|heroe`), que entrega sonido B y música con cada pieza; nunca se anima a mano | [references/glitch.md §12](references/glitch.md) + norma §13.13 (comandos y argumentos) |
 | **Sonido de Glitch** (APROBADO, versión B, 2026-09-27; sólo Glitch, nunca Efeonce): WAV sidecar por `.mov` del motion, archivos en `glitch/sound/v1/` del bucket de AXIS, motor migrado al taller (`tools/glitch-motion/src/sound.mjs` sobre `tools/brand-sound`, commit `2d411b8`): regenerar = correr el mismo comando de `glitch-motion` | [references/glitch.md §13](references/glitch.md) |
 | **Música de Glitch** (APROBADA 2026-09-27; sólo Glitch): tema B (intro, cortina, salida) y cama post-punk bajo la noticia; másteres por URL + sha256 en `glitch/music/v1/` del bucket de AXIS, nunca regenerados; cama 15 dB bajo la voz con ducking, sin recortar medios y sólo bajo las noticias; integrada al taller (`tools/glitch-motion/src/music.mjs`, pre-roll de la intro, `--music off`) y en producción en AXIS (`#musica`, `glitch.json → music`); único pendiente: la mezcla con la voz real del host | [references/glitch.md §13.7](references/glitch.md) |
+| **Una pieza de Marketing con Manzanitas** (carrusel, story, blog y banner, miniatura, pódcast): el registro complementario de La órbita, aprobado 2026-09-28 — acentos de la línea del tema, cabecera, formatos Pizarra/Escena/Lente/Recreo, «Desliza», firma, contraportada A, 9 gráficos calculados desde el dato y 3 láminas de texto denso; complementa La órbita, no la reemplaza | [references/manzanitas.md](references/manzanitas.md) + norma [`MANZANITAS_REGISTER_V1.md`](../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) + ADR [`MANZANITAS_REGISTER_DECISION_V1.md`](../../../docs/architecture/MANZANITAS_REGISTER_DECISION_V1.md) |
 
 ## Reglas duras (las más caras de romper)
 

@@ -258,6 +258,20 @@ sobre el host, en propuesta). Manzana, verde Glitch, bytes, Guttery y «EDICIÓN
 Glitch tiene dos formatos: la **edición semanal** (lunes, numerada «Edición #N») y el **Glitch Flash** (una noticia
 puntual, sin número); contrato de cada uno en `efeonce-graphic-line` `references/glitch.md`. Primer caso Flash:
 [bitácora 2026-09-28](../../../docs/operations/social/2026-09-28-glitch-flash-sonnet-55-production-method.md).
+**Marketing con Manzanitas** (marca editorial evergreen del blog): sus piezas siguen el **registro Marketing con
+Manzanitas** (aprobado 2026-09-28), que **complementa La órbita, no la reemplaza** (La órbita manda en todo lo que el
+registro no dice) y no se mezcla con Glitch: su manzana es la del logo del programa, en contorno con tres puntos; la
+manzana llena es de Glitch. Norma
+[`MANZANITAS_REGISTER_V1.md`](../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) ·
+[ADR](../../../docs/architecture/MANZANITAS_REGISTER_DECISION_V1.md) · referencia de agentes `efeonce-graphic-line`
+`references/manzanitas.md`. En el carrusel: láminas Pizarra, Escena y Lente mezcladas según **Recreo** (nunca dos fotos
+seguidas ni más de tres Pizarras seguidas; el dato con fuente y el cierre, siempre en Pizarra); la cabecera del
+programa va arriba a la izquierda y el logo de Efeonce firma abajo al centro, a una sola altura en todo el carrusel;
+la mano **«Desliza»** va en su sitio fijo, en reposo, y nunca en la última lámina; la contraportada pide **una sola
+conversión** (el comentario, con la bajada «En los comentarios: …») y nada simula un botón; los 9 gráficos y las 3
+láminas de texto denso se calculan desde su dato. Un solo selector, «Línea del tema», cambia a la vez la manzana, los
+puntos, el gráfico, la palabra del eslogan y la voz del ícono. Nada del registro está aún en AXIS: la fuente de las
+piezas es el [canvas v39](https://claude.ai/artifact/JxyMSQhwKuty6T6Kdhd4dG).
 - **Programar y medir**: **Metricool** MCP (`getBestTimeToPostByNetwork`,
   `createScheduledPost`, `getAnalyticsDataByMetrics`, `getBrandSettings`).
 - **Publicar y HubSpot**: atribución/lead capture social → `growth-marketing-cro` +

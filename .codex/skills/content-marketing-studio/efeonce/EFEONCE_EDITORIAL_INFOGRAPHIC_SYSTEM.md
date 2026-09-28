@@ -32,6 +32,12 @@ Hallazgos visuales:
 Los precedentes son evidencia de sistema, no archivos para copiar literalmente. La ejecución nueva debe conservar
 la lógica y modernizar escala, aire, accesibilidad y calidad tipográfica.
 
+> Este sistema gobierna las infografías del cuerpo del artículo. Las piezas gráficas de Marketing con Manzanitas
+> (carrusel, story, imagen del artículo y banner) siguen el **registro Marketing con Manzanitas**, con su propia
+> gramática de gráficos (9 gráficos y 3 láminas de texto denso aprobados el 2026-09-28): norma
+> [`MANZANITAS_REGISTER_V1.md`](../../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md).
+> No uses esta paleta ni estos arquetipos en esas láminas.
+
 ## 2. Paleta observada y roles
 
 ### Núcleo Efeonce

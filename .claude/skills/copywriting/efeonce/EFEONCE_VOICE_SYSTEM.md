@@ -115,6 +115,18 @@ viernes? **Ya lo viste.**
 | Propuestas por línea | ¿Cómo escalas tu contenido? **Con sistema.** · ¿Para quién es tu web? **Para todos.** · ¿Tu CRM vende contigo? **Con agentes.** · ¿Tu marca en cada pantalla? **En todas.** · ¿Te encuentra la IA? **Visible.** |
 | Hoja de contactos · respiro | ¿Cuál sale al cliente? **Ésta.** · ¿Y el cliente? **Aprobó.** |
 
+**Marketing con Manzanitas (registro complementario de La órbita, aprobado 2026-09-28;
+[norma](../../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md)):** misma voz pregunta +
+respuesta, en láminas de carrusel. La **contraportada** pide **una sola conversión**, el comentario ligado a algo que el
+lector hace hoy: pregunta + respuesta accionable + una bajada en una línea «En los comentarios: …». Engine: ¿Te nombra
+la IA? **Pregúntale.** + «En los comentarios: cuéntanos si te nombró.» · Brand (Creative Workflows): bajada «En los
+comentarios: el primer ingrediente de tu receta.». Nada simula un botón: guardar, compartir y enviar se piden en el copy
+del post cuando hacen falta, nunca los cuatro a la vez. Texto denso: ¿Qué es el AEO? **Que te citen.** · ¿SEO o AEO?
+**Las dos.** («Sin SEO, la IA no te encuentra. Sin AEO, no te cita.») · ¿Cómo empiezo con el AEO? **En 4 pasos.**
+En las láminas de gráficos, la respuesta numérica sale del dato («N veces», «1 de N», «N de 100») y la respuesta en
+palabras se edita en la lámina (Te citan · Al centro · Las FAQ · Al comprar). El copy de cierre de la story está
+pendiente (hoy «Guárdala», genérico).
+
 **Cómo se usan:** un par se toma con su lámina; si la pregunta o la evidencia no caben (cruzan la órbita o al sujeto),
 **se acorta la frase**, nunca se mueve la composición. Un par con una promesa medible («En días», «Un cuarto») exige su
 prueba con fuente en la lámina o en la siguiente. Un par nuevo se propone como candidato y lo aprueba el operador.

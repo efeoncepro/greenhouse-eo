@@ -77,6 +77,17 @@ Para Marketing con Manzanitas, consultar la
 [biblioteca gráfica](../../../docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md):
 logos completos, versiones sin manzana y cinco símbolos; conservar el SVG original y distinguir
 marca física integrada de gráfico plano. No inventar lockups con efeonce.
+Sus piezas siguen el **registro Marketing con Manzanitas** (aprobado 2026-09-28; complementa La órbita sin
+reemplazarla y no se mezcla con Glitch): norma
+[`MANZANITAS_REGISTER_V1.md`](../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) +
+`efeonce-graphic-line` → `references/manzanitas.md`. Ahí se deciden cabecera, formatos (Pizarra, Escena, Lente,
+Recreo), firma, contraportada y gráficos; la manzana y sus tres puntos van en el acento de la línea del tema, nunca en
+un color fijo. **Registro de marca ≠ registro fotográfico:** dentro del registro Manzanitas, las fotos van en
+**registro cine**: la luz de la foto es la órbita de la pieza (sin órbita dibujada en la Escena), la foto dice lo que
+dice el texto y el **lecho es nativo** (lo que de verdad hay entre la cámara y el sujeto, nunca un objeto agregado),
+con la firma dentro de su materia; la toma deja en calma el rincón de «Desliza» y, en la Lente, la cara y el objeto
+caben en el círculo fijo del formato y nadie mira al lente → `references/efeonce-photographic-language.md` §El lecho
+en el registro cine. El cine con personas del equipo en redes sigue pendiente de aprobación.
 
 Para Nexa como personaje creativo, cargar
 [su biblioteca de recursos](../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md).

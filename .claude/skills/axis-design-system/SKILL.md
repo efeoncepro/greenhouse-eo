@@ -546,6 +546,30 @@ and assets instead of its mirror (TASK-1924). Human canon:
 `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md`; criterion: `efeonce-graphic-line` →
 `references/glitch.md`. Never use the apple, Glitch green, byte glitch, Guttery or the «EDICIÓN #N» masthead in Efeonce pieces.
 
+### Marketing con Manzanitas register (approved 2026-09-28; planned in AXIS, not built — TASK-1936)
+
+Marketing con Manzanitas (MCM, Efeonce's evergreen editorial brand) has a **register that complements «La órbita» and
+does not replace it** (operator, 2026-09-28: «esta línea gráfica no reemplaza The Orbit … sino que la complementa con un
+nuevo registro para marketing con Manzanitas»). The operator approved the whole line on the canvas v39
+(https://claude.ai/artifact/JxyMSQhwKuty6T6Kdhd4dG): theme-line accents on the apple, its three dots, the orbit and the
+highlighted figure; the header; the Pizarra/Escena/Lente/Recreo formats; the fixed «Desliza» spot and signature; back
+cover A; 9 charts computed from data; 3 dense-text slides. It is a sibling of the Glitch sub-line and never mixes with it.
+
+- **Nothing of the register exists in AXIS yet.** The plan follows the Glitch precedent: top-level token
+  `manzanitasRegister` (not a branch of `efeonceGraphicLine`; inheritance by reference with an identity test, isolation
+  tests against `glitchLine` and `efeonceGraphicLine`), sealed files in `assets/manzanitas/` outside
+  `AXIS_BRAND_ASSETS`, a `charts` module in `@efeoncepro/axis-graphic-line` (the measure reuses `measureSvg`), contract
+  `efeonce.manzanitas-register` 0.1.0 `candidate` (fails closed, `pnpm manzanitas:resolve`) and the Lab page
+  `/references/manzanitas/` + JSON. Task: `docs/tasks/to-do/TASK-1936-manzanitas-register-axis-token-contract-charts-lab.md`;
+  plan canvas: https://claude.ai/artifact/WdEJAsC6HGkKdvyNvkDbvk.
+- **Until it ships, never invent those exports** and never transcribe MCM values into AXIS by hand: the governing docs are
+  the Greenhouse norm `docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md`, the ADR
+  `docs/architecture/MANZANITAS_REGISTER_DECISION_V1.md` and `efeonce-graphic-line` → `references/manzanitas.md`.
+- Open operator decisions that gate slices (e.g. whether chart slides count for «never more than three Pizarras in a
+  row», the «Desliza» icon voice for the Voice line, the logo navy `#022a4e` that `glitchLine.scope.exclusive` claims for
+  the Glitch wordmark) are listed in the norm §13. Pushing to AXIS `main` and creating tags needs the operator's explicit
+  authorization; sequence the release with Insights and Glitch.
+
 ### Efeonce sonic identity (Lab page + public bucket; recommended)
 
 State: **recommended by the operator on 2026-09-26, NOT canon.** What AXIS publishes (PR

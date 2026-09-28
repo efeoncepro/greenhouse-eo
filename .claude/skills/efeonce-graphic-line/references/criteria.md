@@ -196,8 +196,8 @@ La esfera tiene muchos papeles y un solo significado: **lo decidido**. Por eso s
 - **Con qué:** la cifra entera impresa («60 %») y su fuente. Dos datos en una pieza: mismo radio, misma partida.
 - **Nunca:** un arco que crece desde el origen hasta volverse anillo; una estela más larga que lo recorrido; un dato sin
   fuente (la esfera no se mueve sin dato real).
-- **En una lámina de gráficos** (propuesta aplicada en Marketing con Manzanitas, 2026-09-28, en revisión del
-  operador): la dona de la línea es esta medida, con la geometría de AXIS (anillo, marca de partida, estela y esfera de
+- **En una lámina de gráficos** (Marketing con Manzanitas, aprobada por el operador el 2026-09-28 con toda la
+  línea; [manzanitas.md](manzanitas.md) §8): la dona de la línea es esta medida, con la geometría de AXIS (anillo, marca de partida, estela y esfera de
   `measureSvg`); **no hay dona de partes**, porque tres segmentos en un anillo serían un arco que se llena: las partes,
   hasta tres, van en una barra al 100 %. La tendencia termina en la esfera y su último tramo es la estela en el acento.
   Como la esfera es una por pieza, la lámina cuya esfera está en el gráfico no lleva la voz con su esfera. Ningún
@@ -625,7 +625,9 @@ producto, con «by efeonce»»): el lockup «by efeonce» vive sólo en la super
   barra o la cifra destacada van en el acento de la línea del tema. El texto del logo queda en navy sobre papel y en
   blanco sobre navy. Sobre papel va el acento oscuro de la línea y sobre navy el claro (en Brand, frambuesa y naranja).
   Una lámina tiene un solo selector de línea y todo cambia a la vez, incluida la voz del ícono «Desliza»
-  (`icons.voiceByLine`). La manzana nunca va en un color fijo ni en el acento de otra línea.
+  (`icons.voiceByLine`). La manzana nunca va en un color fijo ni en el acento de otra línea. Es un **registro complementario**
+  de La órbita (operador, 2026-09-28): la complementa, no la reemplaza, y La órbita manda en todo lo que el registro no
+  dice ([manzanitas.md](manzanitas.md)).
 - **La regla del acento** (operador, 2026-09-26, D1; token `accentContrast`, chequeo `accent-text-min-size`): el acento
   mide **≥ 3:1 contra su fondo** en gráfico (arco, esfera, halo) y en texto de **24 px o más**. **Nunca va en texto de
   menos de 24 px**: ahí el texto es navy `#023c70` sobre claro o blanco sobre oscuro, y cumple 4,5:1. Por qué: el 3:1

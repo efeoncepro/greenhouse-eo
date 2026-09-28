@@ -151,6 +151,16 @@ Kortex y Verk, fuera por ahora. Operar con
   clientes), papel de la órbita en la pieza, voz pregunta-respuesta y su banco de pares, y el estado de evidencia.
   **Qué decide `design-studio`:** composición, lente, foto y QA de píxeles; los valores salen de los tokens
   `efeonceGraphicLine` de AXIS, **nunca** HEX/px transcritos.
+- **Marcas editoriales con reglas propias** (arquitectura): Glitch (magazine semanal) tiene su sub-línea
+  (`efeonce-graphic-line` → `references/glitch.md`) y Marketing con Manzanitas, la marca editorial evergreen del blog,
+  su **registro Marketing con Manzanitas** (aprobado por el operador el 2026-09-28 sobre el
+  [canvas v39](https://claude.ai/artifact/JxyMSQhwKuty6T6Kdhd4dG)): norma
+  [`MANZANITAS_REGISTER_V1.md`](../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md),
+  [ADR](../../../docs/architecture/MANZANITAS_REGISTER_DECISION_V1.md) y `efeonce-graphic-line` →
+  `references/manzanitas.md`. El registro **complementa La órbita, no la reemplaza**: La órbita manda en todo lo que el
+  registro no dice. Glitch y Manzanitas son hermanos y no se mezclan (Glitch: manzana llena, su verde, bytes, Guttery y
+  «EDICIÓN #N»; Manzanitas: manzana en contorno con tres puntos y el acento de la línea del tema). «Registro» de marca
+  ≠ registro fotográfico. Nada del registro está aún en AXIS.
 - **Reglas duras:** ningún texto cruza la órbita · una lente u órbita por pieza, muro o vidrio, nunca patrón · sin
   dato real con fuente no hay arco · `efeoncepro.com` siempre en la burbuja oficial, nunca como texto · el logo en una
   frase de display sólo alineado a línea base y altura de x · sin velo navy sobre fotos de banco.

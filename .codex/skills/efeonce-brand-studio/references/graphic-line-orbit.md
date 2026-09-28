@@ -42,6 +42,11 @@ producto en piezas de Efeonce: pendiente (recomendación: no).
 - **No aplica:** identidad de producto de Greenhouse (el portal sigue con `DESIGN.md`/AXIS de producto) ni trabajo
   de clientes. Que la línea no se filtre a entregables de cliente es regla, no preferencia (ADR §6).
 - No reemplaza `DESIGN.md` ni `src/config/efeonce-brand.ts`: los complementa (eslogan y pesos siguen en el SSOT).
+- **Marcas editoriales:** Glitch sigue su sub-línea (`efeonce-graphic-line` → `references/glitch.md`) y Marketing con
+  Manzanitas su **registro** (2026-09-28;
+  [norma](../../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md),
+  `efeonce-graphic-line` → `references/manzanitas.md`). Suman reglas sólo para sus piezas; La órbita manda en todo lo
+  que no dicen, y las dos no se mezclan.
 
 ### La órbita no sustituye el lenguaje fotográfico (operador, 2026-09-26)
 

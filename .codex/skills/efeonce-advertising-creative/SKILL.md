@@ -659,6 +659,15 @@ La jerarquía también vive dentro de la línea. El compositor de referencia exp
   y video, confirmado por el operador el 2026-09-27) y sólo ahí. La muletilla varía por edición y el Glitch Flash (una
   noticia, sin número) tiene su propia cabecera y cierre (§14). Toda pieza de Glitch con texto carga
   `efeonce-graphic-line` → `references/glitch.md`.
+- **Marketing con Manzanitas:** no lleva Guttery (es de Glitch, y los dos no se mezclan); su texto es el de La órbita
+  (Bricolage 760 en respuesta y cifras, Poppins en pregunta y cuerpo). Toda pieza de MCM con texto carga el **registro
+  Marketing con Manzanitas**, que complementa La órbita
+  ([norma](../../../docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md) + `efeonce-graphic-line`
+  → `references/manzanitas.md`): la cabecera del programa siempre arriba a la izquierda (sin manzana en la portada
+  Pizarra y la contraportada); la respuesta ≤ 3 palabras y ≥ 3 veces la pregunta; el acento de la línea del tema sólo
+  en texto ≥ 24 px, a ≥ 3:1 contra su fondo y nunca como superficie; el contraste de la firma se mide sobre la foto
+  real (la burbuja URL sobre la mesa de la estratega no pasó: 3,80:1 en el 1 % peor, y esa lámina sigue con el logo).
+  Medido a 390 px: el cuerpo de las láminas de texto denso queda en 10–11,5 px y los rótulos en 9 px.
 
 ## Reglas duras
 
