@@ -350,10 +350,9 @@ OG la ponen junto a una órbita de acento, revisado a ojo el 2026-09-28. Es la i
   vuelve a sellar en AXIS.
 
 **Archivos.** `@efeoncepro/axis-brand-assets` **0.4.0** (tag `v0.4.0`): `insights-logo-*`, `insights-isotype-*` y
-`insights-lockup-*`, positivo y negativo, sellados con SHA-256. Referencia visual en el Lab de AXIS `/references/insights/`, **pendiente de publicar** (rama
-`docs/insights-lab`, commit `36a2707`; hoy responde 404); mientras tanto, la muestra
+`insights-lockup-*`, positivo y negativo, sellados con SHA-256. Referencia visual en el Lab de AXIS: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) (publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`). El ejemplo vivo del producto es la muestra
 `think.efeoncepro.com/insights/muestra`. Las copias de los SVG para el Lab (`apps/lab/public/branding/insights-*.svg`)
-sí están en `main` de AXIS; sólo falta la página.
+también están en `main` de AXIS.
 
 **Dónde se aplica hoy.**
 

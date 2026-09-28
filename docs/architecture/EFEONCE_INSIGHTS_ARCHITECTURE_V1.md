@@ -251,9 +251,8 @@ Render de `InsightWebModelV1` en `efeonce-think` (TASK-1875; estado en §14.10; 
 y `?descargar=` en la misma URL) y `src/pages/insights/muestra.astro` (fixtures, prerender, `noindex`, fuera del
 sitemap). Contratos de UI: `docs/ui/wireframes/TASK-1875-*.md`, `docs/ui/flows/TASK-1875-*-flow.md`,
 `docs/ui/motion/TASK-1875-*-motion.md`; dossier `docs/ui/reviews/TASK-1875-efeonce-insights-shared-web-render-think/`.
-Referencia visual pública con datos de ejemplo: la muestra `https://think.efeoncepro.com/insights/muestra`. La página
-del Lab de AXIS `/references/insights/` está **pendiente de publicar** (sólo en la rama `docs/insights-lab`, commit
-`36a2707`; hoy responde 404).
+Referencia visual en el Lab de AXIS: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) (publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`). Ejemplo vivo del producto, con datos de ejemplo: la muestra
+`https://think.efeoncepro.com/insights/muestra`.
 
 > **Hoy producción entrega el modelo web 1.0:** un enlace real muestra los hallazgos del resumen ejecutivo, los
 > capítulos con sus gráficos y el plan, pero sin la decisión (bloque y lámina), sin la apertura ni la lectura paso a
@@ -403,8 +402,8 @@ segundo consumidor real justifique extraerla. Insights ya tiene **dos consumidor
   «las mismas convenciones».
 
 Hoy la deriva se evita a mano. Extraerlos a AXIS (tokens de roles de datos y una geometría compartida) es **pendiente de
-decisión** del operador y de una task propia; mientras tanto, AXIS sólo prepara una página de referencia en el Lab
-(`apps/lab/src/pages/references/insights.astro`, pendiente de publicar: rama `docs/insights-lab`), no componentes ni
+decisión** del operador y de una task propia; mientras tanto, AXIS sólo publica una página de referencia en el Lab
+(`apps/lab/src/pages/references/insights.astro`, publicada el 2026-09-28, AXIS main `3dfbf0e`), no componentes ni
 contratos nuevos.
 
 ## 7. API, MCP y autorización

@@ -1,6 +1,6 @@
 ---
 name: efeonce-insights
-description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 complete 2026-09-26 and rendering in Production), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, when touching the Insights product mark (logo/isotype/lockup in `@efeoncepro/axis-brand-assets` 0.4.0) or its AXIS Lab reference page `/references/insights/` (pending publication), when asked how the A4/deck report or the live Think report looks and is built, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
+description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847 v1 in production; editorial contract v2 TASK-1888 deployed and verified by a synthetic Production canary on 2026-09-26 after correcting a trailing newline in the Vercel flag value; the canary sealed three scope lines and a frozen cover, while evidence validation correctly failed on an empty synthetic snapshot), premium catalogs TASK-1889 complete 2026-09-26 and rendering in Production), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, when touching the Insights product mark (logo/isotype/lockup in `@efeoncepro/axis-brand-assets` 0.4.0) or its AXIS Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`), when asked how the A4/deck report or the live Think report looks and is built, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
 ---
 
 # Efeonce Insights (living skill)
@@ -27,9 +27,9 @@ it without repeating what already cost a day*. It grows with every task: see the
 7. [`references/ui-and-brand.md`](references/ui-and-brand.md) — what Insights LOOKS like and where: product mark
    (ids, rules, where it applies and where it is missing), the A4/deck report (15 + 12 templates, family → page,
    variation rule, data roles, cover), the live Think report (anatomy, 1.0 vs 1.1, presentation mode, states, motion,
-   print, routes, public guard), email/portal/MCP, the AXIS boundary and the open gaps. Visual reference today: the
-   sample `https://think.efeoncepro.com/insights/muestra`. The AXIS Lab page `/references/insights/` is **pending
-   publication** (only on AXIS branch `docs/insights-lab`, commit `36a2707`; the URL answers 404 until it reaches `main`).
+   print, routes, public guard), email/portal/MCP, the AXIS boundary and the open gaps. Visual reference: the AXIS Lab
+   page `https://axis.efeonce.org/references/insights/`, published 2026-09-28 (AXIS main `3dfbf0e`; agent data at
+   `/references/insights.json`). The live example of the product is the sample `https://think.efeoncepro.com/insights/muestra`.
 8. Canon docs only when you need the full contract:
    `docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` (§5 windows, §7 API/MCP/authz, §10 gates,
    §14 state), `EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md` (ADR), and the exhaustive

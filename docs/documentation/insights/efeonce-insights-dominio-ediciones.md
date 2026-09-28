@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.16
+> **Version:** 1.17
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-28 por Claude (1.16: qué trae hoy un enlace real en producción (modelo 1.0) frente a la muestra; la página del Lab de AXIS sigue pendiente de publicar; correo y recurrencia sólo por la API interna; decisión abierta sobre el color de «INSIGHTS» en las portadas del PDF. 1.15: la vista web ya existe —se corrige la frase que decía lo contrario— y nueva sección «Cómo se ve y se lee un informe: PDF, página web y la marca Insights». Antes, TASK-1875: la página del enlace en Think está en producción, el enlace compartido quedó encendido y existe una muestra pública para clientes)
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.17: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.16: qué trae hoy un enlace real en producción (modelo 1.0) frente a la muestra; la página del Lab de AXIS seguía pendiente de publicar (publicada el mismo día, 1.17); correo y recurrencia sólo por la API interna; decisión abierta sobre el color de «INSIGHTS» en las portadas del PDF. 1.15: la vista web ya existe —se corrige la frase que decía lo contrario— y nueva sección «Cómo se ve y se lee un informe: PDF, página web y la marca Insights». Antes, TASK-1875: la página del enlace en Think está en producción, el enlace compartido quedó encendido y existe una muestra pública para clientes)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -390,9 +390,8 @@ mismo diseño que el informe real, cualquier mejora del informe aparece también
 
 ## Cómo se ve y se lee un informe: PDF, página web y la marca Insights
 
-> Estado: 2026-09-28. Referencia visual con datos de ejemplo: la muestra
-> [think.efeoncepro.com/insights/muestra](https://think.efeoncepro.com/insights/muestra). La página del Lab de AXIS
-> `/references/insights/` está pendiente de publicar (existe sólo en la rama `docs/insights-lab`).
+> Estado: 2026-09-28. Referencia visual en el Lab de AXIS: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) (publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`). Ejemplo vivo del producto, con datos de ejemplo: la muestra
+> [think.efeoncepro.com/insights/muestra](https://think.efeoncepro.com/insights/muestra).
 
 **Tres formas, las mismas cifras.** Una edición se puede leer como informe A4, como deck o como página web. Las tres
 salen del mismo plan congelado: ninguna recalcula ni agrega un número.

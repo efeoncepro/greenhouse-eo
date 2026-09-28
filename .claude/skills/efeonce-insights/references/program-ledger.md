@@ -324,7 +324,9 @@ sitemap), `f3f4638` (`splitLead`: the decision in two weights), `6385733`, `4cd3
   `ui-and-brand.md` §7.7.
 - Production serves web model 1.0: decision, chapter openings/readings, «Qué mide este informe», «Cómo lo mediremos /
   Qué necesitamos», client logo and funnel rates reach clients only with the next Greenhouse release (1.1 in staging).
-- AXIS Lab page `/references/insights/` pending publication (branch `docs/insights-lab`, `36a2707`; 404 until `main`).
+- ~~AXIS Lab page `/references/insights/` pending publication~~ — **resolved 2026-09-28**: published 2026-09-28 (AXIS
+  main `3dfbf0e`, fast-forward of `docs/insights-lab`, CI green); `/references/insights/` and `/references/insights.json`
+  answer 200.
 
 **Delta 2026-09-28 (close-out).** Unsupported major now tested: Think `7485e32` adds `acceptSharedEdition`
 (`src/lib/insights-accept.ts`, no Astro imports) as the single acceptance gate for real responses and dev fixtures;
@@ -543,7 +545,8 @@ producción antes de compartir con clientes. Sin flag propio.
 
 - **2026-09-28 · TASK-1875 · closure and doc sweep.** Closed with `df6f37ccd` (full `pnpm test` 16 474 passed +
   production `pnpm build` green). Think production head `544ecd4` (`b3c5820` color fix, `544ecd4` orbit timings from
-  tokens + `scopeLines`). Docs aligned: 1.0 in production vs 1.1 in staging, Lab page pending publication, open
+  tokens + `scopeLines`). Docs aligned: 1.0 in production vs 1.1 in staging, Lab page pending publication (published
+  the same day, AXIS main `3dfbf0e`), open
   decision on the accent of «INSIGHTS» on the PDF navy covers (`ui-and-brand.md` §7.7).
 - **2026-09-28 · Marca de producto + referencia en AXIS (sin task; barrido documental).** La marca de Insights quedó
   canónica (operador: «Me encanta, canonízalo») y publicada en `@efeoncepro/axis-brand-assets` **0.4.0** (tag `v0.4.0`,
@@ -552,7 +555,7 @@ producción antes de compartir con clientes. Sin flag propio.
   propio, copias manuales en `public/branding/insights/`); las portadas del PDF y del deck componen una versión
   tipográfica (logo Efeonce + filete + «INSIGHTS» en mayúsculas espaciadas); el correo, el favicon, el portal y MCP
   siguen sin marca y Greenhouse fija `axis-brand-assets` 0.3.5 — gaps sin decisión del operador. En paralelo se crea la página de
-  referencia del Lab `/references/insights/` (pendiente de publicar: rama AXIS `docs/insights-lab`, `36a2707`; 404 hasta `main`) (fuente `apps/lab/src/pages/references/insights.astro`,
+  referencia del Lab `/references/insights/` (pendiente de publicar en ese momento: rama AXIS `docs/insights-lab`, `36a2707`; publicada el mismo día, AXIS main `3dfbf0e`) (fuente `apps/lab/src/pages/references/insights.astro`,
   JSON `insights.json.ts`, guía `docs/agent-composition/insights.md`): referencia con datos de muestra, no componentes.
   Frontera: AXIS publica valores y activos; la UI vive en Greenhouse y Think. Follow-up documentado (no implementado):
   extraer a AXIS los roles de color de datos y la geometría de las 15 familias, que ya están copiados a mano en los dos

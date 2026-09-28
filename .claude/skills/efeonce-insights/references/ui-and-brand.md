@@ -1,17 +1,18 @@
 # Efeonce Insights — marca, informe y UI (cómo se ve y dónde vive)
 
-> Verificado contra código el 2026-09-28 (greenhouse-eo `develop`, efeonce-think `main@544ecd4`, en producción; AXIS `main@5b3056f`).
+> Verificado contra código el 2026-09-28 (greenhouse-eo `develop`, efeonce-think `main@544ecd4`, en producción; AXIS `main@5b3056f`; la página del Lab de Insights, publicada en `main@3dfbf0e`).
 > Este archivo describe lo que EXISTE. Donde algo falta, está en §7 «Gaps» y no se decide aquí: esas decisiones son del
 > operador.
 
 ## 0. Referencia visual en AXIS (empieza aquí si tienes que ver algo)
 
-- **Página del Lab `/references/insights/`: pendiente de publicar.** Existe sólo en la rama `docs/insights-lab` de
-  AXIS (commit `36a2707`, no está en `main`), así que `https://axis.efeonce.org/references/insights/` responde 404
-  hasta que se mergee. Fuente en esa rama: `apps/lab/src/pages/references/insights.astro`, JSON para agentes
-  `…/insights.json.ts`, guía `docs/agent-composition/insights.md`. **Mientras tanto, la referencia visible es la
-  muestra `https://think.efeoncepro.com/insights/muestra`.** Nunca cites la URL del Lab como vigente sin comprobar que
-  responde.
+- **Página del Lab `/references/insights/`: publicada.** Referencia visual en el Lab de AXIS:
+  [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) (publicada el 2026-09-28, AXIS
+  main `3dfbf0e`; datos para agentes en `/references/insights.json`). La rama `docs/insights-lab` entró a `main` por
+  fast-forward con CI verde, y quien la construyó la revisó antes (sin detalles de WAF en la página pública, hechos
+  corregidos, galería live recapturada, e2e 2/2). Fuente en `main`: `apps/lab/src/pages/references/insights.astro`, JSON
+  para agentes `…/insights.json.ts`, guía `docs/agent-composition/insights.md`. **El ejemplo vivo del producto es la
+  muestra `https://think.efeoncepro.com/insights/muestra`.**
 - Es una página de **referencia**: muestra la marca, sus aplicaciones aprobadas, las secciones del informe y la UI del
   informe live como documentación con datos de muestra. **No** publica componentes ni contratos nuevos.
 - Antes de ella, el Lab sólo tenía las láminas 7.1 «Insights: informe» y 7.2 «Insights: plan, cierre, deck y correo»
@@ -29,7 +30,7 @@
   painted components»; Lab `apps/lab/src/content/docs/index.mdx` §Boundary: el Lab no importa código, API ni adapters
   de Greenhouse o Globe). Precedente más cercano: Glitch (página de referencia con piezas aprobadas).
 - Por eso Insights entra a AXIS como (a) activos de marca en `@efeoncepro/axis-brand-assets` 0.4.0 y (b) la página de
-  referencia de §0 (pendiente de publicar). Nada más.
+  referencia de §0 (publicada el 2026-09-28, AXIS main `3dfbf0e`). Nada más.
 - **Candidatos reales a extraer** (ya hay DOS consumidores con copias a mano) — follow-up, no implementado:
   1. **Roles de color de datos**: `greenhouse-eo/src/lib/artifact-composer/brand-packs/axis/editorial-roles.json`
      (roles `dataCurrent/Prior/Opportunity/Absence{OnPaper,OnNavy}`, `dataHighlightOnNavy`) copiados en
@@ -303,8 +304,8 @@ partial-first-fold, present-cover/finding (sólo desktop), status-not-found/gone
    (resuelta en Think `b3c5820`, §1).
 4. Drift en AXIS: la tabla del README raíz y `docs/ARCHITECTURE.md` §Official brand files («0.3.0 … 19 SVGs») no
    reflejan `axis-brand-assets` 0.4.0 (25 SVG).
-5. La página del Lab `/references/insights/` sigue en la rama `docs/insights-lab` (commit `36a2707`); responde 404
-   hasta que llegue a `main` de AXIS.
+5. *(Cerrado el 2026-09-28: la página del Lab `/references/insights/` se publicó, AXIS main `3dfbf0e`. Se conserva el
+   número para no romper las referencias a §7.7.)*
 6. Producción sirve el modelo web 1.0: decisión, aperturas y lecturas de capítulo, «Qué mide este informe», «Cómo lo
    mediremos / Qué necesitamos», logo del cliente y tasas del embudo esperan el próximo release de Greenhouse (§4).
 7. **Decisión abierta — acento de «INSIGHTS» en las portadas navy del PDF.** En la portada A4

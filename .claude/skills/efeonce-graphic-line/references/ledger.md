@@ -287,14 +287,17 @@
 | 2026-09-28 | axis-graphic-line 0.9.0 · axis-brand-assets 0.3.6 (AXIS `main@efe4d32`) | publicado (tag `v0.9.0`) | Plastilina `mano` (D29) con su volumen: `ICON_CATALOG` pasa a 86 (37 Trazo + 49 Plastilina) y `volume/` a 49 PNG. Greenhouse sigue fijando axis-graphic-line 0.7.0 y axis-brand-assets 0.3.5 hasta que una tarea los suba |
 | 2026-09-28 | axis-brand-assets 0.4.0 (AXIS `25b5ecf` + `4760e3e`, en `main`) | publicado (tag `v0.4.0`) | marca de producto de Efeonce Insights: `insights-logo-*`, `insights-isotype-*` y el tipo nuevo `lockup` (`insights-lockup-{positive,negative}`); 25 SVG sellados. **Greenhouse sigue fijando `axis-brand-assets` 0.3.5** (`package.json`), así que no trae estos archivos hasta que una tarea suba la versión; Think usa copias manuales |
 
-Lab AXIS, Insights (2026-09-28): página de **referencia** `/references/insights/`, **pendiente de publicar**: sólo existe
-en la rama `docs/insights-lab` de AXIS (commit `36a2707`) y la URL da 404; mientras tanto, la muestra
-`think.efeoncepro.com/insights/muestra`. Las copias `apps/lab/public/branding/insights-*.svg` sí están en `main` (fuente
+Lab AXIS, Insights (2026-09-28): página de **referencia** `/references/insights/`, **publicada el 2026-09-28** (rama
+`docs/insights-lab` integrada por fast-forward a `main` de AXIS en `3dfbf0e`, CI verde;
+[axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) y `/references/insights.json`
+responden 200; revisada por quien la construyó: sin detalles de WAF en la página pública, hechos corregidos, galería live
+recapturada, e2e 2/2). La muestra `think.efeoncepro.com/insights/muestra` sigue siendo el ejemplo vivo del producto.
+Las copias `apps/lab/public/branding/insights-*.svg` también están en `main` (fuente
 `apps/lab/src/pages/references/insights.astro`, JSON para agentes `insights.json.ts`, guía
 `docs/agent-composition/insights.md`), creada en paralelo al barrido documental de ese día: muestra la marca, sus
 aplicaciones aprobadas, las secciones del informe y la UI del informe live con datos de muestra. No publica componentes
 ni contratos (la UI de Insights vive en Greenhouse y Think). Las láminas 7.1/7.2 de `/references/graphic-line/` siguen
-siendo pruebas. Confirmar que la URL responde antes de citarla como vigente.
+siendo pruebas.
 
 Lab AXIS (`c2affc6`, 2026-09-26): la lámina 6.1 lista las decisiones del 26-09 y lo que sigue abierto; el acento ya no colorea texto de menos de 24 px en 1.2 y en las láminas de Insights; la anatomía de 1.2 ya no dibuja el anillo de la esfera; 5.4, 5.1 y 4.5 al día. Quedan en acento sólo rótulos de cotas en diagramas técnicos («0,20 em», la «X» del resguardo), que no son piezas.
 

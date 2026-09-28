@@ -1,6 +1,6 @@
 ---
 name: axis-design-system
-description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including advertising typography, semantic collaboration selection, and candidate AEO creative graphics for AI search, ChatGPT/Gemini composers, turns, answers and citations, the Efeonce graphic line «La órbita» (tokens, contract and the `axis-graphic-line` orbit package), and the Efeonce Insights brand assets (`axis-brand-assets` 0.4.0) and Lab reference page `/references/insights/` (pending publication)."
+description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including advertising typography, semantic collaboration selection, and candidate AEO creative graphics for AI search, ChatGPT/Gemini composers, turns, answers and citations, the Efeonce graphic line «La órbita» (tokens, contract and the `axis-graphic-line` orbit package), and the Efeonce Insights brand assets (`axis-brand-assets` 0.4.0) and Lab reference page `/references/insights/` (published 2026-09-28, AXIS main `3dfbf0e`)."
 ---
 
 # AXIS Design System
@@ -613,11 +613,12 @@ What AXIS holds for Efeonce Insights, and nothing more:
   negative lockup goes on the dark hero and on the presentation cover; the positive one only when printing.
   Switching them to the file, or adding the mark to email, favicon, portal or MCP, is an open operator decision (criterion and application map in
   `efeonce-graphic-line` → `criteria.md` and `applications.md` §B3b).
-- **Lab reference page** `/references/insights/` — **NOT published yet**: page, agent JSON and agent guide
-  (`apps/lab/src/pages/references/insights.astro`, `insights.json.ts`, `docs/agent-composition/insights.md`) exist only
-  on the AXIS branch `docs/insights-lab` (commit `36a2707`); `https://axis.efeonce.org/references/insights/` returns 404.
-  Only the SVG copies `apps/lab/public/branding/insights-*.svg` are on `main`. Until it ships, point to the sample
-  `think.efeoncepro.com/insights/muestra`; never cite the Lab URL as live. It documents the mark and lockup, the approved applications, the report
+- **Lab reference page** `/references/insights/` — **published 2026-09-28 (AXIS main `3dfbf0e`)**: page, agent JSON and
+  agent guide (`apps/lab/src/pages/references/insights.astro`, `insights.json.ts`, `docs/agent-composition/insights.md`)
+  are on AXIS `main`; `https://axis.efeonce.org/references/insights/` and `/references/insights.json` answer 200, and the
+  SVG copies `apps/lab/public/branding/insights-*.svg` ship with it. Reviewed by its builder before merge (no WAF details
+  on the public page, facts corrected, live gallery recaptured, e2e 2/2). The sample `think.efeoncepro.com/insights/muestra`
+  remains the live example of the product itself. It documents the mark and lockup, the approved applications, the report
   sections and the live-report UI as a **reference**, the same way Glitch documents its approved pieces. The Lab is
   public: sample data only (a fictitious organization, a «Logo del cliente» placeholder, illustrative figures), never
   Berel, Sky or any client's data. The earlier boards 7.1/7.2 in `/references/graphic-line/` stay design tests.

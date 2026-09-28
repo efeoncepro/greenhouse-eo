@@ -372,9 +372,8 @@ marca de producto que acompaña») acompaña a Efeonce y **nunca firma**: junto 
 «Versión tipográfica» = la marca se nombra con tipografía; falta usar el archivo oficial `insights-lockup-*`. Ambos
 estados, sin decisión del operador ([ledger.md](ledger.md), «Marca de Insights fuera de Think»). Greenhouse fija
 `@efeoncepro/axis-brand-assets` 0.3.5 y los archivos de Insights llegan en **0.4.0**: aplicarla en Greenhouse exige
-subir esa versión. Referencia visual en el Lab de AXIS `/references/insights/`, **pendiente de publicar** (rama
-`docs/insights-lab`, commit `36a2707`; hoy da 404: no la enlaces como publicada); mientras tanto, la muestra
-`think.efeoncepro.com/insights/muestra`. Las copias `apps/lab/public/branding/insights-*.svg` sí están en `main` de AXIS.
+subir esa versión. Referencia visual en el Lab de AXIS: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) (publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`). El ejemplo vivo del producto es la muestra
+`think.efeoncepro.com/insights/muestra`. Las copias `apps/lab/public/branding/insights-*.svg` también están en `main` de AXIS.
 Anatomía del informe y de la web: skill `efeonce-insights` → `references/ui-and-brand.md`.
 
 **Decisión abierta (del operador; no la cambies por tu cuenta):** en las portadas PDF/deck, «INSIGHTS» va en el acento

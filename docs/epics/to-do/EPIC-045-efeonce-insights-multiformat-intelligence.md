@@ -142,8 +142,8 @@ Emisión, compartir y entrega siguen OFF en producción; ninguna edición llega 
 Think (`think.efeoncepro.com/insights/r/<token>`, más la muestra pública `/insights/muestra`) y el enlace compartido
 quedó encendido en producción; emitir sigue OFF, así que todavía no hay ediciones de clientes para compartir. El mismo
 día el operador canonizó la marca de producto Insights (logo, isotipo y lockup «Efeonce | Insights», publicados en
-`@efeoncepro/axis-brand-assets` 0.4.0) y AXIS prepara una página de referencia en el Lab `/references/insights/`,
-**pendiente de publicar** (rama `docs/insights-lab`; mientras tanto, la muestra `think.efeoncepro.com/insights/muestra`). Follow-ups nombrados, **sin task creada** (pendientes de decisión del
+`@efeoncepro/axis-brand-assets` 0.4.0) y AXIS publicó una página de referencia en el Lab: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/)
+(publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`); el ejemplo vivo del producto es la muestra `think.efeoncepro.com/insights/muestra`. Follow-ups nombrados, **sin task creada** (pendientes de decisión del
 operador; se abren como task cuando la decisión exista):
 
 - **Marca en el resto de superficies:** lockup oficial en portadas y aperturas de capítulo PDF A4 y deck (hoy

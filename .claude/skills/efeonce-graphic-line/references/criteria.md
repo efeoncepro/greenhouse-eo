@@ -560,8 +560,7 @@ producto, con «by efeonce»»): el lockup «by efeonce» vive sólo en la super
   «el acento nunca en texto de menos de 24 px»; cambiarlo toca el contrato de fidelidad de TASK-1889 y lo decide el
   operador. Los pies de capítulo ya van en `navyMuted`. Correo, favicon, portal y MCP no la llevan. No hay decisión: no cambies ni agregues por criterio propio ([applications.md](applications.md) §B3b; [ledger.md](ledger.md), pendientes). Tamaño:
   18 px de cuerpo sugeridos para el logo; el lockup no tiene mínimo escrito (el menor en producción: 24 px de alto en
-  móvil, Think). Referencia visual en el Lab de AXIS `/references/insights/`, **pendiente de publicar** (rama
-  `docs/insights-lab`; hoy da 404, no la cites como publicada); mientras tanto, la muestra
+  móvil, Think). Referencia visual en el Lab de AXIS: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) (publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`); ejemplo vivo del producto: la muestra
   `think.efeoncepro.com/insights/muestra`.
 
 - **La firma de una pieza gráfica es el logo de Efeonce centrado, abajo al centro.** Cierra la composición al pie

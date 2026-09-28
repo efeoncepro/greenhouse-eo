@@ -1,9 +1,9 @@
 # Efeonce Insights — Registro de implementación y despliegue (TASK-1845)
 
 > **Tipo de documento:** Registro de implementación y despliegue
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-15 por Claude
-> **Ultima actualizacion:** 2026-09-28 por Claude (1.5: Think en producción en `544ecd4` —filas `b3c5820` y `544ecd4` en §8.ab—, página del Lab pendiente de publicar, decisión abierta sobre el acento de «INSIGHTS» en las portadas navy, fila de §11 con sharing ON. 1.4: §8.ab marca de producto Insights, su aplicación en Think y la página del Lab; filas de §10 y §11 con TASK-1875 en producción. Antes, 2026-09-26: §6.3, §8.aa y fila de §10: TASK-1888 en producción)
+> **Ultima actualizacion:** 2026-09-28 por Claude (1.6: la página del Lab de AXIS `/references/insights/` quedó publicada el 2026-09-28, AXIS main `3dfbf0e` (§8.ab). 1.5: Think en producción en `544ecd4` —filas `b3c5820` y `544ecd4` en §8.ab—, página del Lab pendiente de publicar (publicada el mismo día, 1.6), decisión abierta sobre el acento de «INSIGHTS» en las portadas navy, fila de §11 con sharing ON. 1.4: §8.ab marca de producto Insights, su aplicación en Think y la página del Lab; filas de §10 y §11 con TASK-1875 en producción. Antes, 2026-09-26: §6.3, §8.aa y fila de §10: TASK-1888 en producción)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · ADR [EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md)
 > **Task:** [TASK-1845](../tasks/complete/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) (EPIC-045)
 
@@ -723,12 +723,13 @@ consume todavía los assets de Insights.
 
 Las copias de Think no se vigilan contra el paquete: si el paquete cambia, hay que copiarlas de nuevo (gap).
 
-**Referencia en el Lab de AXIS — pendiente de publicar.** Página `/references/insights/` (fuente
+**Referencia en el Lab de AXIS — publicada.** Referencia visual en el Lab de AXIS: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) (publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`). Fuente
 `axis-design-system/apps/lab/src/pages/references/insights.astro`, JSON para agentes `references/insights.json.ts`,
-guía `docs/agent-composition/insights.md`): marca, aplicaciones aprobadas, secciones del informe y UI del informe live
-como referencia documentada, con datos de muestra. Existe sólo en la rama `docs/insights-lab` de AXIS (commit
-`36a2707`); `https://axis.efeonce.org/references/insights/` responde 404 hasta que llegue a `main`. Mientras tanto, la
-referencia visible es la muestra `https://think.efeoncepro.com/insights/muestra`. Antes de ella, el Lab
+guía `docs/agent-composition/insights.md`: marca, aplicaciones aprobadas, secciones del informe y UI del informe live
+como referencia documentada, con datos de muestra. La rama `docs/insights-lab` entró a `main` de AXIS por fast-forward
+en `3dfbf0e` con CI verde; `/references/insights/` y `/references/insights.json` responden 200. Antes del merge, quien la
+construyó la revisó: sin detalles de WAF en la página pública, hechos corregidos, galería live recapturada, e2e 2/2. El
+ejemplo vivo del producto sigue siendo la muestra `https://think.efeoncepro.com/insights/muestra`. Antes de ella, el Lab
 sólo mostraba Insights en el capítulo «Pruebas en producto» de `references/graphic-line.astro` (láminas 7.1 y 7.2,
 «prueba de diseño, cifras de muestra»).
 

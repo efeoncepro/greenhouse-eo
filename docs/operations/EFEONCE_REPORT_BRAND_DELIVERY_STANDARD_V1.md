@@ -211,8 +211,8 @@ teal-500, a 12 px) y con proporciones propias. Choca con «junto a Efeonce, Insi
 conserva el acento» (2026-09-28) y con «el acento nunca en texto de menos de 24 px». Cambiarlo toca el contrato de
 fidelidad de TASK-1889; detalle en el manual de la línea gráfica §7.1.
 
-Referencia visual con datos de ejemplo en el Lab de AXIS `/references/insights/`, pendiente de publicar (rama
-`docs/insights-lab`); mientras tanto, la muestra `think.efeoncepro.com/insights/muestra`.
+Referencia visual en el Lab de AXIS: [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/) (publicada el 2026-09-28, AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`), con datos de ejemplo.
+El ejemplo vivo del producto es la muestra `think.efeoncepro.com/insights/muestra`.
 
 ## Aplicación y propietarios
 

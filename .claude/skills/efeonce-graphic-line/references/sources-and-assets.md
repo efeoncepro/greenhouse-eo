@@ -34,11 +34,13 @@ Si un doc y el código no coinciden, manda el código verificado y se corrige el
   - Lab: `https://axis.efeonce.org/references/graphic-line/` (fuente `apps/lab/src/pages/references/graphic-line.astro`,
     estilos `apps/lab/src/styles/graphic-line.css`, láminas del canvas en `apps/lab/src/data/graphic-line-elements.json`,
     helpers `apps/lab/src/lib/graphic-line.ts`, pruebas `apps/lab/src/test/{unit,e2e}`).
-  - Insights (2026-09-28): página de referencia `/references/insights/`, **pendiente de publicar**: la fuente
-    (`apps/lab/src/pages/references/insights.astro`, JSON `insights.json.ts`, guía `docs/agent-composition/insights.md`)
-    sólo existe en la rama `docs/insights-lab` (commit `36a2707`) y la URL da 404; mientras tanto, la muestra
-    `think.efeoncepro.com/insights/muestra`. Sólo datos de muestra, sin componentes. Los archivos de la marca copiados al
-    Lab (`apps/lab/public/branding/insights-*.svg`, por `apps/lab/scripts/sync-brand-assets.mjs`) sí están en `main`.
+  - Insights (2026-09-28): página de referencia
+    [axis.efeonce.org/references/insights/](https://axis.efeonce.org/references/insights/), **publicada el 2026-09-28**
+    (AXIS main `3dfbf0e`; datos para agentes en `/references/insights.json`). Fuente en `main`:
+    `apps/lab/src/pages/references/insights.astro`, JSON `insights.json.ts`, guía `docs/agent-composition/insights.md`.
+    Sólo datos de muestra, sin componentes. Los archivos de la marca copiados al Lab
+    (`apps/lab/public/branding/insights-*.svg`, por `apps/lab/scripts/sync-brand-assets.mjs`) también están en `main`. El
+    ejemplo vivo del producto es la muestra `think.efeoncepro.com/insights/muestra`.
   - Manuales para agentes: `docs/agent-composition/graphic-line-orbit.md`, `email-signature.md`,
     `collaboration-selection.md`, `iconography.md`; decisiones AXIS `docs/architecture/GRAPHIC_LINE_ORBIT_COMPOSITION_DECISION_V1.md`
     e `ICONOGRAPHY_DECISION_V1.md`.
