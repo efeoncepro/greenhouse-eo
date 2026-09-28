@@ -90,9 +90,16 @@ const proposalCinematicService: RecipeBuilder = ({ intent, manifest, recipe }) =
   const answerBottom = answerTop + answerPx * 0.95 * answerLines
 
   const bodyBand = reserve(manifest, 'body')?.fromTopRange ?? [0.463, 0.5185]
-  const bodyTop = Math.round(clamp(answerBottom + answerPx * 0.34, ofHeight(manifest, bodyBand[0]), ofHeight(manifest, bodyBand[1])))
-  const bodyPx = lower(type.body?.px, 26)
-  const bodyWidth = Math.round((lower(type.body?.maxWidthPx, 500) + upper(type.body?.maxWidthPx, 640)) / 2)
+  // Con la selección abajo, su etiqueta caería sobre la bajada: AXIS la baja (`bodyUnderSelection`, TASK-1934).
+  const selection = selectionSlot(manifest)
+  const underSelection = typeof selection?.anchor === 'string' && selection.anchor.startsWith('bottom') ? (recipe.bodyUnderSelection as BodyUnderSelection | undefined) : undefined
+
+  const bodyTop = underSelection
+    ? ofHeight(manifest, underSelection.fromTop)
+    : Math.round(clamp(answerBottom + answerPx * 0.34, ofHeight(manifest, bodyBand[0]), ofHeight(manifest, bodyBand[1])))
+
+  const bodyPx = underSelection?.px ?? lower(type.body?.px, 26)
+  const bodyWidth = underSelection?.maxWidthPx ?? Math.round((lower(type.body?.maxWidthPx, 500) + upper(type.body?.maxWidthPx, 640)) / 2)
 
   const steps = intent.steps ?? []
 
@@ -157,11 +164,31 @@ const proposalCinematicService: RecipeBuilder = ({ intent, manifest, recipe }) =
 
   if (content.proof) slots.proof = { text: content.proof.text, source: content.proof.source }
 
-  const selection = selectionSlot(manifest)
+  // La nota del pie («Sin promesas de ranking…»), a la derecha de la burbuja URL, donde la reservó AXIS (TASK-1934).
+  const note = (content as { note?: string | null }).note
+
+  if (note) {
+    const noteReserve = reserve(manifest, 'note')
+
+    slots.note = note
+    Object.assign(slots.frame as Record<string, unknown>, {
+      noteLeft: `--gl-pc-note-left=${Math.round(measuredValue(noteReserve?.inset, 'el inicio de la nota') * width)}px`,
+      noteTop: `--gl-pc-note-top=${ofHeight(manifest, measuredValue(noteReserve?.fromTop, 'la altura de la nota'))}px`,
+      notePx: `--gl-pc-note-px=${measuredValue((type as Record<string, { px?: number }>).note?.px, 'el cuerpo de la nota')}px`
+    })
+  }
 
   if (selection) slots.selection = selection
 
   return { slots, assets }
+}
+
+type BodyUnderSelection = { fromTop: number; px: number; maxWidthPx: number }
+
+const measuredValue = <T>(value: T | null | undefined, what: string): T => {
+  if (value === null || value === undefined) throw new SurfacePieceError(`El manifest de AXIS no midió ${what}.`, 'invalid-intent')
+
+  return value
 }
 
 /** Una medida que el manifest de AXIS debe traer: si falta, la plantilla no la inventa. */

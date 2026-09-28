@@ -1,0 +1,55 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "proposal",
+  "use": "proposal",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "line": "engine",
+  "voice": {
+    "eyebrow": "Nuestra propuesta · SEO",
+    "question": "¿Te encuentra Google?",
+    "answer": [
+      "Y la IA"
+    ]
+  },
+  "body": "Posicionamiento SEO con método: base técnica, autoridad temática y entidad, para que Google te encuentre y la IA no te ignore.",
+  "steps": [
+    {
+      "glyph": "busqueda",
+      "kicker": "Sin costo",
+      "name": "Diagnóstico"
+    },
+    {
+      "glyph": "contenido",
+      "kicker": "Proyecto",
+      "name": "Técnica y contenido"
+    },
+    {
+      "glyph": "medicion",
+      "kicker": "On-Going",
+      "name": "Autoridad y entidad"
+    },
+    {
+      "glyph": "informe",
+      "kicker": "Greenhouse",
+      "name": "Reporte vivo"
+    }
+  ],
+  "note": "No prometemos rankings. Reportamos lo que se mueve.",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+    "alt": "Un estratega SEO con el polo de Efeonce mira a cámara; detrás, un mapa de luz: una grilla teal en el piso, constelaciones de puntos unidos por hilos y un núcleo de luz azul con su órbita al que todo se conecta"
+  },
+  "selection": {
+    "target": "answer",
+    "label": "Cliente",
+    "participantKind": "department",
+    "anchor": "bottom-end"
+  },
+  "theme": "dark"
+}

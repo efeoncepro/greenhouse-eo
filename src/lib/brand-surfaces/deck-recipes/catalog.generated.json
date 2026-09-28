@@ -7483,8 +7483,69 @@
           "maxChars": 70
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.proposal-service",
+      "axis": {
+        "recipe": "proposal-service",
+        "layout": null,
+        "role": "proposal",
+        "theme": "dark",
+        "uses": [
+          "proposal"
+        ],
+        "progress": false,
+        "page": {
+          "role": "proposal",
+          "recipe": "proposal-service",
+          "line": "engine",
+          "theme": "dark",
+          "voice": {
+            "eyebrow": "Nuestra propuesta · SEO",
+            "question": "¿Cómo te encuentran?",
+            "answer": [
+              "Con método"
+            ]
+          },
+          "body": "Que te encuentren en Google y que la IA no te ignore: base técnica, autoridad temática y entidad, trabajadas y medidas como un sistema.",
+          "steps": [
+            {
+              "kicker": "Empieza aquí · sin costo",
+              "name": "Diagnóstico",
+              "desc": "Tu punto de partida en búsqueda y en IA: sin ese mapa no hay plan honesto."
+            },
+            {
+              "kicker": "Proyecto",
+              "name": "Base técnica",
+              "desc": "Rastreo, indexación, Core Web Vitals y datos estructurados."
+            },
+            {
+              "kicker": "On-Going",
+              "name": "Contenido y autoridad",
+              "desc": "Clusters por intención, landings que convierten, PR y link building real."
+            },
+            {
+              "kicker": "Greenhouse",
+              "name": "Reporte vivo",
+              "desc": "Tráfico calificado, share of voice y visibilidad en IA, en Greenhouse."
+            }
+          ],
+          "note": "No prometemos rankings. Reportamos lo que se mueve.",
+          "photo": {
+            "register": "cine",
+            "subject": "person",
+            "plateRef": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+            "alt": "Un estratega SEO con el polo de Efeonce mira a cámara frente a un mapa de luz: una grilla teal en el piso, constelaciones de puntos unidos por hilos y un núcleo de luz azul con su órbita",
+            "focus": {
+              "xOfWidth": 1,
+              "yOfHeight": 0.5
+            }
+          },
+          "selection": {
+            "target": "object",
+            "label": "Cliente",
+            "participantKind": "department"
+          }
+        }
+      }
     },
     {
       "id": "proposal-cinematic-seo",
@@ -7553,8 +7614,67 @@
           "maxChars": null
         }
       ],
-      "template": null,
-      "axis": null
+      "template": "deck.proposal-cinematic",
+      "axis": {
+        "recipe": "proposal-cinematic",
+        "layout": "service",
+        "role": "proposal",
+        "theme": "dark",
+        "uses": [
+          "proposal"
+        ],
+        "progress": false,
+        "page": {
+          "role": "proposal",
+          "recipe": "proposal-cinematic",
+          "layout": "service",
+          "line": "engine",
+          "voice": {
+            "eyebrow": "Nuestra propuesta · SEO",
+            "question": "¿Te encuentra Google?",
+            "answer": [
+              "Y la IA"
+            ]
+          },
+          "body": "Posicionamiento SEO con método: base técnica, autoridad temática y entidad, para que Google te encuentre y la IA no te ignore.",
+          "steps": [
+            {
+              "glyph": "busqueda",
+              "kicker": "Sin costo",
+              "name": "Diagnóstico"
+            },
+            {
+              "glyph": "contenido",
+              "kicker": "Proyecto",
+              "name": "Técnica y contenido"
+            },
+            {
+              "glyph": "medicion",
+              "kicker": "On-Going",
+              "name": "Autoridad y entidad"
+            },
+            {
+              "glyph": "informe",
+              "kicker": "Greenhouse",
+              "name": "Reporte vivo"
+            }
+          ],
+          "note": "No prometemos rankings. Reportamos lo que se mueve.",
+          "photo": {
+            "register": "cine",
+            "subject": "person",
+            "plateRef": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+            "alt": "Un estratega SEO con el polo de Efeonce mira a cámara; detrás, un mapa de luz: una grilla teal en el piso, constelaciones de puntos unidos por hilos y un núcleo de luz azul con su órbita al que todo se conecta"
+          },
+          "selection": {
+            "target": "answer",
+            "label": "Cliente",
+            "participantKind": "department",
+            "anchor": "bottom-end"
+          },
+          "theme": "dark"
+        }
+      }
     },
     {
       "id": "content-pricing",

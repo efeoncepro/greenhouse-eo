@@ -177,6 +177,11 @@
       "example": "src/lib/brand-surfaces/examples/deck-proposal-service-aeo-intent.json",
       "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lensPhoto": "photo", "steps": "steps", "note": "footnote#composite"}
     },
+    "proposal-service-seo": {
+      "contentType": "deck.proposal-service",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-service-seo-intent.json",
+      "slots": {"eyebrow": "voice.eyebrow", "question": "voice.question", "answer": "voice.answer", "body": "body", "lensPhoto": "photo", "steps": "steps", "note": "footnote#composite"}
+    },
     "proposal-service-creative": {
       "contentType": "deck.proposal-service",
       "example": "src/lib/brand-surfaces/examples/deck-proposal-service-creative-intent.json",
@@ -325,6 +330,11 @@
     "proposal-cinematic-aeo": {
       "contentType": "deck.proposal-cinematic",
       "example": "src/lib/brand-surfaces/examples/deck-proposal-document.json#page=3",
+      "slots": null
+    },
+    "proposal-cinematic-seo": {
+      "contentType": "deck.proposal-cinematic",
+      "example": "src/lib/brand-surfaces/examples/deck-proposal-cinematic-seo-intent.json",
       "slots": null
     },
     "proposal-cinematic-revops": {

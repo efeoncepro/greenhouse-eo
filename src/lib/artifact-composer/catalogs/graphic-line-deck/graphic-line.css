@@ -29,6 +29,9 @@ body {
   --gl-icon-px: 50px;
   --gl-kicker-px: 13px;
   --gl-step-name-px: 22px;
+  --gl-pc-note-left: 460px;
+  --gl-pc-note-top: 1000px;
+  --gl-pc-note-px: 16px;
 
   position: relative;
   width: 1920px;
@@ -141,6 +144,17 @@ body {
   margin: 0;
   font: 600 19px var(--gl-text-family);
   color: var(--gl-ink-dark);
+}
+
+/* La nota del pie de la propuesta cine («Sin promesas de ranking…»), a la derecha de la burbuja URL (TASK-1934). */
+.gl-pc-note {
+  position: absolute;
+  left: var(--gl-pc-note-left);
+  top: var(--gl-pc-note-top);
+  margin: 0;
+  font: 400 var(--gl-pc-note-px) var(--gl-text-family);
+  color: var(--gl-soft-dark);
+  white-space: nowrap;
 }
 
 /* ── Pasos: ícono de la voz de la línea en reposo + rótulo + nombre ─────────────────────────────── */

@@ -6321,6 +6321,116 @@ exports[`planes de los intents de ejemplo > deck-proposal-cinematic-lines-intent
 }
 `;
 
+exports[`planes de los intents de ejemplo > deck-proposal-cinematic-seo-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 1080,
+        "width": 1920,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+      "ref": "asset-ref:plate:SE1-te-encuentran-isotipo",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:icon:busqueda-engine-dark-44",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" role="img" aria-label="Diagnóstico"><g fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10a6 6 0 1 0 12 0a6 6 0 1 0 -12 0"/><path d="M20 20l-5.6 -5.6"/></g></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:icon:contenido-engine-dark-44",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" role="img" aria-label="Técnica y contenido"><g fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10.5 -10.5a2.83 2.83 0 0 0 -4 -4l-10.5 10.5v4"/><path d="M13.5 6.5l4 4"/></g></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:icon:medicion-engine-dark-44",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" role="img" aria-label="Autoridad y entidad"><g fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 16v-3"/><path d="M12 16v-7"/><path d="M17 16v-11"/></g></svg>",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:icon:informe-engine-dark-44",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" role="img" aria-label="Reporte vivo"><g fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14h-12z"/><path d="M14 3v4h4"/><path d="M9 17v-3"/><path d="M12 17v-5.5"/><path d="M15 17v-2"/></g></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plan": {
+    "artifactId": "deck-proposal-cinematic-seo",
+    "slides": [
+      {
+        "contentType": "deck.proposal-cinematic",
+        "slideId": "deck-proposal-cinematic",
+        "slots": {
+          "body": "Posicionamiento SEO con método: base técnica, autoridad temática y entidad, para que Google te encuentre y la IA no te ignore.",
+          "frame": {
+            "answerPx": 176,
+            "answerTop": 311,
+            "bodyPx": 25,
+            "bodyTop": 648,
+            "bodyWidth": 640,
+            "eyebrowTop": 120,
+            "iconPx": 44,
+            "kickerPx": 12,
+            "line": "engine",
+            "margin": 140,
+            "noteLeft": "--gl-pc-note-left=460px",
+            "notePx": "--gl-pc-note-px=16px",
+            "noteTop": "--gl-pc-note-top=1000px",
+            "proofTop": 740,
+            "questionTop": 186,
+            "stepNamePx": 21,
+            "stepWidth": 170,
+            "stepsGap": 176,
+            "stepsLayout": "columns",
+            "stepsTop": 800,
+          },
+          "note": "No prometemos rankings. Reportamos lo que se mueve.",
+          "photo": {
+            "alt": "Un estratega SEO con el polo de Efeonce mira a cámara; detrás, un mapa de luz: una grilla teal en el piso, constelaciones de puntos unidos por hilos y un núcleo de luz azul con su órbita al que todo se conecta",
+            "src": "asset-ref:plate:SE1-te-encuentran-isotipo",
+          },
+          "selection": {
+            "anchor": "bottom-end",
+            "label": "Cliente",
+            "participantKind": "department",
+            "scale": 1.2,
+          },
+          "steps": [
+            {
+              "icon": "asset-ref:icon:busqueda-engine-dark-44",
+              "kicker": "Sin costo",
+              "name": "Diagnóstico",
+            },
+            {
+              "icon": "asset-ref:icon:contenido-engine-dark-44",
+              "kicker": "Proyecto",
+              "name": "Técnica y contenido",
+            },
+            {
+              "icon": "asset-ref:icon:medicion-engine-dark-44",
+              "kicker": "On-Going",
+              "name": "Autoridad y entidad",
+            },
+            {
+              "icon": "asset-ref:icon:informe-engine-dark-44",
+              "kicker": "Greenhouse",
+              "name": "Reporte vivo",
+            },
+          ],
+          "voice": {
+            "answer": "Y la IA",
+            "eyebrow": "Nuestra propuesta · SEO",
+            "question": "¿Te encuentra Google?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`planes de los intents de ejemplo > deck-proposal-service-aeo-intent.json compone el mismo plan 1`] = `
 {
   "assets": [
@@ -6644,6 +6754,122 @@ exports[`planes de los intents de ejemplo > deck-proposal-service-revops-intent.
             "answer": "Con agentes",
             "eyebrow": "Nuestra propuesta · RevOps",
             "question": "¿Tu CRM vende contigo?",
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`planes de los intents de ejemplo > deck-proposal-service-seo-intent.json compone el mismo plan 1`] = `
+{
+  "assets": [
+    {
+      "fit": {
+        "height": 440,
+        "width": 440,
+      },
+      "focus": {
+        "xOfWidth": 1,
+        "yOfHeight": 0.5,
+      },
+      "kind": "plate",
+      "path": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png",
+      "ref": "asset-ref:plate:SE1-te-encuentran-isotipo-lens-440x440",
+    },
+    {
+      "kind": "svg",
+      "ref": "asset-ref:layer:proposal-service-lens-engine",
+      "svg": "<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" aria-hidden="true" focusable="false"><circle cx="1520" cy="330" r="246.4" fill="none" stroke="#72ded8" stroke-opacity="0.28" stroke-width="3"/><path d="M 1288.46 245.73 A 246.4 246.4 0 0 1 1435.73 98.46" fill="none" stroke="#0375db" stroke-width="6" stroke-linecap="round"/><circle cx="1435.73" cy="98.46" r="12" fill="#0375db"/></svg>",
+    },
+  ],
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-service",
+  "plan": {
+    "artifactId": "deck-proposal-service-seo",
+    "slides": [
+      {
+        "contentType": "deck.proposal-service",
+        "slideId": "deck-proposal-service",
+        "slots": {
+          "body": "Que te encuentren en Google y que la IA no te ignore: base técnica, autoridad temática y entidad, trabajadas y medidas como un sistema.",
+          "footnote": "No prometemos rankings. Reportamos lo que se mueve.",
+          "frame": {
+            "answerPx": 140,
+            "answerTop": 270,
+            "bodyPx": 26,
+            "bodyTop": 440,
+            "bodyWidth": 900,
+            "cardGutter": "--gl-ps-card-gutter=20px",
+            "cardHeight": "--gl-ps-card-height=270px",
+            "cardPadding": "--gl-ps-card-padding=26px",
+            "cardRadius": "--gl-ps-card-radius=16px",
+            "cardShadowBlur": "--gl-ps-card-shadow-blur=70px",
+            "cardShadowOpacity": "--gl-ps-card-shadow-opacity=40%",
+            "cardShadowY": "--gl-ps-card-shadow-y=30px",
+            "cardStroke": "--gl-ps-card-stroke=1.5px",
+            "cardWidth": "--gl-ps-card-width=395px",
+            "cardsTop": "--gl-ps-cards-top=680px",
+            "descGap": "--gl-ps-desc-gap=12px",
+            "descPx": "--gl-ps-desc-px=19px",
+            "eyebrowTop": 110,
+            "footLeft": "--gl-ps-foot-left=660px",
+            "footPx": "--gl-ps-foot-px=16px",
+            "footTop": "--gl-ps-foot-top=1000px",
+            "kickerPx": "--gl-ps-kicker-px=15px",
+            "lensLeft": "--gl-ps-lens-left=1300px",
+            "lensSize": "--gl-ps-lens-size=440px",
+            "lensTop": "--gl-ps-lens-top=110px",
+            "line": "engine",
+            "margin": 140,
+            "nameGap": "--gl-ps-name-gap=10px",
+            "namePx": "--gl-ps-name-px=38px",
+            "questionTop": 200,
+          },
+          "lens": {
+            "src": "asset-ref:layer:proposal-service-lens-engine",
+          },
+          "photo": {
+            "alt": "Un estratega SEO con el polo de Efeonce mira a cámara frente a un mapa de luz: una grilla teal en el piso, constelaciones de puntos unidos por hilos y un núcleo de luz azul con su órbita",
+            "src": "asset-ref:plate:SE1-te-encuentran-isotipo-lens-440x440",
+          },
+          "selection": {
+            "anchor": "top-end",
+            "label": "Cliente",
+            "overlay": "none",
+            "padding": "standard",
+            "participantKind": "department",
+            "scale": 1.1,
+            "targetKind": "object",
+            "variant": "eight-handles",
+          },
+          "steps": [
+            {
+              "desc": "Tu punto de partida en búsqueda y en IA: sin ese mapa no hay plan honesto.",
+              "kicker": "Empieza aquí · sin costo",
+              "name": "Diagnóstico",
+            },
+            {
+              "desc": "Rastreo, indexación, Core Web Vitals y datos estructurados.",
+              "kicker": "Proyecto",
+              "name": "Base técnica",
+            },
+            {
+              "desc": "Clusters por intención, landings que convierten, PR y link building real.",
+              "kicker": "On-Going",
+              "name": "Contenido y autoridad",
+            },
+            {
+              "desc": "Tráfico calificado, share of voice y visibilidad en IA, en Greenhouse.",
+              "kicker": "Greenhouse",
+              "name": "Reporte vivo",
+            },
+          ],
+          "voice": {
+            "answer": "Con método",
+            "eyebrow": "Nuestra propuesta · SEO",
+            "question": "¿Cómo te encuentran?",
           },
         },
       },

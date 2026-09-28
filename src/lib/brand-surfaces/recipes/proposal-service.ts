@@ -124,7 +124,12 @@ export const proposalService: RecipeBuilder = ({ intent, manifest, recipe }) => 
 
   const accent = measured(GL.lines.find(line => line.key === intent.line)?.accentOnDark, `el acento de la línea «${intent.line}»`)
   const photoSize = lens.photoRadiusPx * 2
-  const photo = plateFrom(photoOf(manifest), { width: photoSize, height: photoSize }, 'La foto de la lente', 'lens')
+  const lensPhoto = photoOf(manifest)
+  const photo = plateFrom(lensPhoto, { width: photoSize, height: photoSize }, 'La foto de la lente', 'lens')
+
+  // El recorte de la lente se orienta hacia el sujeto cuando el intent trae `photo.focus` (TASK-1934: la propuesta SEO
+  // recorta el plate SE1 hacia el estratega); sin foco, el recorte es centrado, como siempre.
+  if (lensPhoto?.focus && photo.asset.kind === 'plate') photo.asset.focus = lensPhoto.focus
   const layerRef = `asset-ref:layer:proposal-service-lens-${intent.line}`
   const layer: SurfaceAssetRequest = { ref: layerRef, kind: 'svg', svg: lensSvg(manifest, lens, accent) }
 

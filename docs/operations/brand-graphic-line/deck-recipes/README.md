@@ -471,7 +471,7 @@ falta un campo del esquema, si hay ids repetidos o si un `preferInstead` o `pair
 <!-- Generado por scripts/creative/deck-recipes/render-index.mjs desde EFEONCE_DECK_SLIDE_RECIPES_V1.json. No editar a mano: corre «pnpm brand:deck-recipes». -->
 
 Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 78 recetas · aprobado el 2026-09-27 por operador (canvas «La órbita», página Deck).
-**69 de 78** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`). Las demás todavía no.
+**71 de 78** recetas tienen plantilla en el Artifact Composer y se componen con `pnpm brand:compose` (columna «Plantilla», leída de `graphic-line-deck/registry.json`). Las demás todavía no.
 
 ### Recetas por familia y documento
 
@@ -600,8 +600,8 @@ Catálogo `efeonce.deck-slide-recipes.v1` versión 1.0.0 · 78 recetas · aproba
 | `proposal-cinematic-web` | Propuesta web en cine · una web holográfica que usan personas, buscadores y agentes | `deck.proposal-cinematic` | proposal, brochure | La propuesta web pide impacto | Hay que describir cada modalidad: la versión sobria | `proposal-service-web`, `proposal-cinematic-aeo` | `eyebrow` ≤40, `question` ≤28, `answer` ≤12, `body` ≤120, `steps` ≤20, `photo`, (+1 opcional) |
 | `proposal-cinematic-aeo` | Propuesta AEO en cine · entre miles de marcas, la IA ilumina una | `deck.proposal-cinematic` | proposal, brochure | La propuesta AEO pide impacto | Hay que detallar cada forma de empezar: la versión sobria | `proposal-service-aeo`, `method-staircase` | `eyebrow` ≤40, `question` ≤26, `answer` ≤10, `body` ≤130, `steps` ≤20, `note` ≤70, `photo` |
 | `proposal-cinematic-revops` | Propuesta RevOps en cine · un moño de luz (captar, cerrar, crecer) con agentes en el flujo | `deck.proposal-cinematic` | proposal, brochure | La propuesta de RevOps sobre HubSpot pide impacto | Hay que detallar cada etapa: la versión sobria | `proposal-service-revops`, `method-hybrid-workforce` | `eyebrow` ≤40, `question` ≤28, `answer` ≤11, `body` ≤125, `steps` ≤20, `photo` |
-| `proposal-service-seo` | Propuesta SEO · sobria, con lente y cuatro formas de empezar (acento Engine) | — | proposal, brochure | La propuesta AEO necesita que cada forma de empezar se explique con una frase (más datos que impacto) | La lámina tiene que golpear y recordarse: la versión cine hace ese trabajo | `proposal-cinematic-seo`, `proposal-service-aeo` | `eyebrow` ≤40, `question` ≤32, `answer` ≤14, `body` ≤140, `lensPhoto`, `steps` ≤90, (+1 opcional) |
-| `proposal-cinematic-seo` | Propuesta SEO con punch · el mapa de luz del oficio y su núcleo | — | proposal, brochure | La propuesta AEO pide impacto | Hay que detallar cada forma de empezar: la versión sobria | `proposal-service-seo`, `proposal-cinematic-aeo` | `eyebrow` ≤40, `question` ≤26, `answer` ≤10, `body` ≤130, `steps` ≤20, `note` ≤70, `photo` |
+| `proposal-service-seo` | Propuesta SEO · sobria, con lente y cuatro formas de empezar (acento Engine) | `deck.proposal-service` | proposal, brochure | La propuesta AEO necesita que cada forma de empezar se explique con una frase (más datos que impacto) | La lámina tiene que golpear y recordarse: la versión cine hace ese trabajo | `proposal-cinematic-seo`, `proposal-service-aeo` | `eyebrow` ≤40, `question` ≤32, `answer` ≤14, `body` ≤140, `lensPhoto`, `steps` ≤90, (+1 opcional) |
+| `proposal-cinematic-seo` | Propuesta SEO con punch · el mapa de luz del oficio y su núcleo | `deck.proposal-cinematic` | proposal, brochure | La propuesta AEO pide impacto | Hay que detallar cada forma de empezar: la versión sobria | `proposal-service-seo`, `proposal-cinematic-aeo` | `eyebrow` ≤40, `question` ≤26, `answer` ≤10, `body` ≤130, `steps` ≤20, `note` ≤70, `photo` |
 
 ### Cotización · `pricing` (3)
 

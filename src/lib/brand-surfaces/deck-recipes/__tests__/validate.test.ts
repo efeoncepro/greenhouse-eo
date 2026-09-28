@@ -36,9 +36,7 @@ describe('catálogo de runtime', () => {
     'decision-difference',
     'decision-traffic-to-revenue',
     'method-eeat',
-    'method-surround-cycle',
-    'proposal-cinematic-seo',
-    'proposal-service-seo'
+    'method-surround-cycle'
   ]
 
   it('trae las 78 recetas aprobadas, todas con plantilla y con su página de AXIS salvo las que TASK-1934 aún compone', () => {
