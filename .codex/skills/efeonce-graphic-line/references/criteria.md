@@ -481,6 +481,10 @@ esfera: el acento va al cierre.
   Se usa desde el archivo oficial; no se rearma (lámina 2.2).
 - **Sólo cierra:** final de video, última lámina, contratapa, firma de correo, recepción, merch. **No va en cada post**:
   ahí la respuesta con esfera ya cierra (lámina 2.2).
+- **El eslogan acompaña al logo; no es texto suelto** (operador, 2026-09-28, contraportada de Marketing con Manzanitas:
+  «El eslogan separado del logo no tiene sentido; el eslogan no es simple texto, es un elemento de marca que acompaña
+  al logo»). En una pieza social se usa en su forma de bloque con el logo de Efeonce (`slogan.forms: 'lockup'`), en la
+  firma; nunca como una línea más de la columna de texto, entre la voz y la firma.
 - **Nunca en la portada; en la contraportada depende del documento** (operador, 2026-09-27). En la portada recarga,
   repite la respuesta y ocupa la esquina inferior derecha, que es del sujeto o la órbita. En la contraportada de una
   **propuesta comercial** es el mensaje principal: «Empower your Growth» grande y protagonista (72 px en 1920, en sus
