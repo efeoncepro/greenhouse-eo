@@ -20,4 +20,6 @@ Jefe directo, presupuesto, agencias finalistas, proceso formal de compra, plazo 
 
 ## Contacto
 
-No hay correo válido confirmado. Los candidatos de Pichincha y el histórico de Surgir devolvieron invalid/mailbox_not_found en la validación de esta sesión. El canal previsto es LinkedIn y Julio hará el envío.
+Correo vigente: **juan.vargas@pichincha.pe**, entregado por Jesús en su respuesta del 28-09-2026 (HubSpot 251530718551). Los candidatos inferidos jesus.vargas@pichincha.pe, jesus.vargass@pichincha.pe y el histórico de Surgir devolvieron invalid/mailbox_not_found; ZeroBounce no evaluó la dirección vigente, así que no hay falso negativo.
+
+Jesús aceptó la reunión del martes 06-10-2026 a las 11:00 Lima. Estado completo en [PROSPECT-CASE §9](../PROSPECT-CASE.md#9-estado-actual-y-próximos-pasos).
