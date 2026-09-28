@@ -485,6 +485,13 @@ esfera: el acento va al cierre.
   «El eslogan separado del logo no tiene sentido; el eslogan no es simple texto, es un elemento de marca que acompaña
   al logo»). En una pieza social se usa en su forma de bloque con el logo de Efeonce (`slogan.forms: 'lockup'`), en la
   firma; nunca como una línea más de la columna de texto, entre la voz y la firma.
+  **El bloque es logo arriba y eslogan DEBAJO, más chico** (operador, 2026-09-28: «eslogan debajo del logo de Efeonce y
+  más pequeño, no puede estar al mismo tamaño»): el eslogan mide el **64 % del ancho del logo**
+  (`efeonceGraphicLine.motion.layout.sloganOfLogo`) y va separado **1,35 veces su fuente** (`sloganGapOfFont`). Nunca al
+  ancho del logo ni encima de él: `axisAdvertising.compositions.supportingTagline` (escalar al ancho del lockup) es de
+  la publicidad, no del eslogan de Efeonce. Como el componente `Slogan` pinta la palabra siempre en el acento, el bloque
+  se dimensiona para que el eslogan mida **24 px o más** (en 1080 de ancho, logo de 400 px); más chico, la palabra iría
+  en blanco y el componente no lo hace solo.
 - **Nunca en la portada; en la contraportada depende del documento** (operador, 2026-09-27). En la portada recarga,
   repite la respuesta y ocupa la esquina inferior derecha, que es del sujeto o la órbita. En la contraportada de una
   **propuesta comercial** es el mensaje principal: «Empower your Growth» grande y protagonista (72 px en 1920, en sus
