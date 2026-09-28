@@ -43,6 +43,7 @@ describe('DataForSEO SERP compare', () => {
               items: [
                 {
                   type: 'ai_overview',
+                  asynchronous_ai_overview: false,
                   items: [
                     { type: 'link_element', domain: 'www.paris.cl', url: 'https://www.paris.cl/product' },
                     {
@@ -86,6 +87,7 @@ describe('DataForSEO SERP compare', () => {
       aiDirectLink: false,
       aiCitation: true,
       shoppingObserved: false,
+      aiOverviewAsyncRequested: false,
       aiFreshness: 'cached_provider_result'
     })
     expect(paris).toMatchObject({
@@ -99,8 +101,38 @@ describe('DataForSEO SERP compare', () => {
       shoppingSource: 'Paris.cl',
       shoppingPrice: 1699990,
       relatedSearchObserved: true,
-      signals: ['organic_not_observed', 'ai_link_without_citation', 'shopping_without_organic', 'multi_surface_presence']
+      signals: [
+        'organic_not_observed',
+        'ai_link_without_citation',
+        'shopping_without_organic',
+        'multi_surface_presence'
+      ]
     })
+  })
+
+  it('uses the returned AI Overview freshness and skips failed provider tasks', () => {
+    const rows = normalizeDataForSeoSerpCompareResponse({
+      panel,
+      tasks: [
+        {
+          id: 'desktop-ok',
+          status_code: 20000,
+          data: { keyword: panel.queries[0], device: 'desktop' },
+          result: [{ items: [{ type: 'ai_overview', asynchronous_ai_overview: true }] }]
+        },
+        {
+          id: 'mobile-failed',
+          status_code: 40000,
+          data: { keyword: panel.queries[0], device: 'mobile' },
+          result: null
+        }
+      ]
+    })
+
+    expect(rows).toHaveLength(2)
+    expect(rows.every(row => row.device === 'desktop')).toBe(true)
+    expect(rows.every(row => row.aiOverviewAsyncRequested)).toBe(true)
+    expect(rows.every(row => row.aiFreshness === 'async_provider_result')).toBe(true)
   })
 
   it('rejects ambiguous devices and unbounded depth', () => {

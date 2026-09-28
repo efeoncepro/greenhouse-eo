@@ -24,41 +24,41 @@ Fuente: [serp/overview](https://docs.dataforseo.com/v3/serp-overview/) + [serp/g
 
 ### Google (verticales enumerados en la doc)
 
-| Vertical | Notas |
-|---|---|
-| **Organic** | Advanced, Regular y HTML; Live + Task-based |
-| **AI Mode** | Advanced y HTML; Live + Task-based (ver §4) |
-| **Maps** | Resultados de mapas/negocios |
-| **Local Finder** | Overview, Task POST, Tasks Ready, Task GET y Live |
-| **News** | Solo desktop (ver Gotchas) |
-| **Events** | Solo desktop |
-| **Images** | Solo desktop |
-| **Search By Image** | Búsqueda inversa por imagen; solo desktop |
-| **Jobs** | Solo desktop |
-| **Autocomplete** | Sugerencias/predictivo |
-| **Dataset Search** | Datasets científicos |
-| **Dataset Info** | Detalle de un dataset |
-| **Ads Advertisers** | Perfiles de anunciantes |
-| **Ads Search** | Anuncios/transparencia de ads |
-| **Finance Explore / Markets / Quote / Ticker Search** | 4 endpoints financieros |
+| Vertical                                              | Notas                                             |
+| ----------------------------------------------------- | ------------------------------------------------- |
+| **Organic**                                           | Advanced, Regular y HTML; Live + Task-based       |
+| **AI Mode**                                           | Advanced y HTML; Live + Task-based (ver §4)       |
+| **Maps**                                              | Resultados de mapas/negocios                      |
+| **Local Finder**                                      | Overview, Task POST, Tasks Ready, Task GET y Live |
+| **News**                                              | Solo desktop (ver Gotchas)                        |
+| **Events**                                            | Solo desktop                                      |
+| **Images**                                            | Solo desktop                                      |
+| **Search By Image**                                   | Búsqueda inversa por imagen; solo desktop         |
+| **Jobs**                                              | Solo desktop                                      |
+| **Autocomplete**                                      | Sugerencias/predictivo                            |
+| **Dataset Search**                                    | Datasets científicos                              |
+| **Dataset Info**                                      | Detalle de un dataset                             |
+| **Ads Advertisers**                                   | Perfiles de anunciantes                           |
+| **Ads Search**                                        | Anuncios/transparencia de ads                     |
+| **Finance Explore / Markets / Quote / Ticker Search** | 4 endpoints financieros                           |
 
 ### Otros motores
 
-| Motor | Verticales documentados |
-|---|---|
-| **Bing** | Organic (Regular/Advanced/HTML; Live + Task-based) — fuente: [serp/bing/overview](https://docs.dataforseo.com/v3/serp-bing-overview/) |
+| Motor       | Verticales documentados                                                                                                                                                                                                                                     |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Bing**    | Organic (Regular/Advanced/HTML; Live + Task-based) — fuente: [serp/bing/overview](https://docs.dataforseo.com/v3/serp-bing-overview/)                                                                                                                       |
 | **YouTube** | Organic · Video Info · Video Subtitles · Video Comments — fuente: [serp/youtube/overview](https://docs.dataforseo.com/v3/serp-youtube-overview/). Video Info y Subtitles se cobran a **3× el precio SERP**; Comments se factura por unidad de 20 resultados |
-| **Yahoo** | Organic (per índice de motores en serp/overview) |
-| **Baidu** | Organic |
-| **Naver** | Organic — existe [serp/naver/overview](https://docs.dataforseo.com/v3/serp-naver-overview/) (no fetched en profundidad) |
-| **Seznam** | Organic |
+| **Yahoo**   | Organic (per índice de motores en serp/overview)                                                                                                                                                                                                            |
+| **Baidu**   | Organic                                                                                                                                                                                                                                                     |
+| **Naver**   | Organic — existe [serp/naver/overview](https://docs.dataforseo.com/v3/serp-naver-overview/) (no fetched en profundidad)                                                                                                                                     |
+| **Seznam**  | Organic                                                                                                                                                                                                                                                     |
 
 ### Funciones de respuesta (cross-engine)
 
 - **Regular**: "organic and paid search results" — solo para tipos Organic; sin featured snippets ni elementos extra.
 - **Advanced**: soportada en **todos** los motores de la SERP API; overview completo del SERP.
 - **HTML**: HTML crudo de la página de resultados.
-Fuente: [serp/overview](https://docs.dataforseo.com/v3/serp-overview/).
+  Fuente: [serp/overview](https://docs.dataforseo.com/v3/serp-overview/).
 
 ---
 
@@ -69,6 +69,7 @@ Fuentes: [organic/overview](https://docs.dataforseo.com/v3/serp-google-organic-o
 ### 3.1 Parámetros de request (live advanced)
 
 **Núcleo:**
+
 - `keyword` — hasta 700 chars; operadores de búsqueda (`site:`, `filetype:`, `allinanchor:`…) **multiplican el cargo ×5**.
 - Localización (una de): `location_code` (int) · `location_name` (string completo, ej. `"London,England,United Kingdom"`) · `location_coordinate` (`"lat,long,radius"`, radio 199–199,999 m).
 - Idioma: `language_code` (ISO, ej. `en`) o `language_name`.
@@ -76,16 +77,19 @@ Fuentes: [organic/overview](https://docs.dataforseo.com/v3/serp-google-organic-o
 - `os`: desktop → `windows` (default) | `macos`; mobile → `android` (default) | `ios`.
 
 **Profundidad/paginación:**
+
 - `depth`: default 10, **máx 200**; se factura por incremento de 10 resultados.
 - `max_crawl_pages`: hasta 100 páginas; cada página se cobra por separado.
 
 **Parsing avanzado:**
+
 - `calculate_rectangles` (bool): coordenadas pixel de cada elemento; recargo (~$0.002 / duplica costo según overview).
 - `browser_screen_width/height/resolution_ratio`: viewport custom (defaults 1920×1080 desktop, 360×640 Android, 375×812 iOS).
 - `load_async_ai_overview` (bool): fuerza el fetch del AI Overview asíncrono; recargo (~$0.002 / ×2 según overview).
 - `people_also_ask_click_depth` (1–4): expande PAA con clicks; $0.00015 por click.
 
 **Targeting/control de crawl:**
+
 - `target`: dominio/URL para filtrar resultados, con wildcard `*`.
 - `stop_crawl_on_match` (hasta 10 objetos `match_type`: `domain` | `with_subdomains` | `wildcard`).
 - `target_search_mode`: `all` | `any` (default).
@@ -110,10 +114,10 @@ Cada resultado trae `rank_group`, `rank_absolute`, `page`, `position` (left/righ
 Evidencia live del 2026-09-28 para la query genérica `iphone 18 pro max`, Google Chile
 (`location_code=2152`), `language_code=es`, desktop, Organic Live Advanced:
 
-| Captura UTC | Task | Orgánico Falabella | Orgánico Paris | Otras superficies | Costo |
-| --- | --- | --- | --- | --- | ---: |
-| 11:29:15 | `09281129-1987-0139-0000-e6c0ebe8ceb2` | `rank_group=3`, `rank_absolute=4` | No observado entre 7 orgánicos | Ambos enlazados en AI Overview cacheado y presentes en Shopping | USD 0,002 |
-| 11:34:36 | `09281134-1987-0139-0000-1f9bbed510af` | `rank_group=4`, `rank_absolute=6` | No observado entre 8 orgánicos | Ambos enlazados en AI Overview cacheado y presentes en Shopping | USD 0,002 |
+| Captura UTC | Task                                   | Orgánico Falabella                | Orgánico Paris                 | Otras superficies                                               |     Costo |
+| ----------- | -------------------------------------- | --------------------------------- | ------------------------------ | --------------------------------------------------------------- | --------: |
+| 11:29:15    | `09281129-1987-0139-0000-e6c0ebe8ceb2` | `rank_group=3`, `rank_absolute=4` | No observado entre 7 orgánicos | Ambos enlazados en AI Overview cacheado y presentes en Shopping | USD 0,002 |
+| 11:34:36    | `09281134-1987-0139-0000-1f9bbed510af` | `rank_group=4`, `rank_absolute=6` | No observado entre 8 orgánicos | Ambos enlazados en AI Overview cacheado y presentes en Shopping | USD 0,002 |
 
 Los enlaces de Falabella y Paris estaban en `link_element` del AI Overview, pero no en
 `ai_overview_reference`; por tanto son inclusión comercial/directa, no cita atribuida. Paris sí tenía
@@ -132,6 +136,13 @@ para Falabella y Paris. Falabella quedó orgánico #3 (`rank_absolute=5`); Paris
 orgánicos. En esa captura ambos fueron mención textual, no enlace ni cita AI. El cambio respecto de las capturas
 anteriores es volatilidad/evidencia nueva, no contradicción que deba “normalizarse”.
 
+La regresión desktop/mobile posterior confirmó una restricción de Organic Live Advanced: sólo acepta una task por
+request. El smoke final serializó desktop (`09281157-1987-0139-0000-77d35f5a773f`) y mobile
+(`09281157-1987-0139-0000-91c4b65ee202`), ambas con status `20000`, y agregó el artefacto por USD 0,0055 reales
+frente a USD 0,016 estimados. Una task rechazada debe quedar en raw/taskCodes y producir cero filas normalizadas.
+En esa ejecución se pidió carga asíncrona, pero ambos bloques devolvieron `asynchronous_ai_overview=false`:
+`aiOverviewAsyncRequested=true` no modifica `aiFreshness`, que fue `cached_provider_result`.
+
 ---
 
 ## 4. AI Mode y AI Overview (AEO)
@@ -149,8 +160,8 @@ Fuentes: [ai_mode/overview](https://docs.dataforseo.com/v3/serp-google-ai_mode-o
   - `ai_overview_video_element`, `ai_overview_table_element` (markdown + tabla headers/rows + references), `ai_overview_expanded_element`, `ai_overview_shopping`, `ai_overview_paid`.
 - **`references[]`**: `type: ai_overview_reference`, **`source`, `domain`, `url`, `title`, `text`** → la unidad atómica para medir citabilidad/menciones de marca.
   - ⚠️ **En la práctica (verificado contra respuesta live real, as-of 2026-08-27 — NO está en la doc del proveedor):** `domain` y `url` NO identifican la fuente citada — Google envuelve TODAS las references en redirects propios (`domain=google.com`/`www.google.com`, `url=https://google.com/goto?url=<token opaco>` o `/searchviewer`, no decodificable client-side). La identidad real viene SOLO en `source` (a veces domain-shaped, a veces nombre de marca). Para atribución, derivar dominio de `source`; una ref cuya `source` es solo marca no es atribuible a dominio (ver gotcha 11).
-  - ⚠️ **Las `references` viven en MÚLTIPLES niveles anidados, no sólo en el primero** (as-of 2026-09-11; la doc de AI Mode lo dice verbatim: *"References appear at multiple nesting levels"* — dentro de `ai_overview_element`, `ai_overview_table_element`, `ai_overview_expanded_element` y `ai_overview_shopping`). Recorrer sólo el `references` de primer nivel **sub-cuenta las citas y parece un éxito**: un split/map sobre un ítem que no tiene campo `references` no lanza error, simplemente no emite filas. Los templates n8n 7539/7540 publicados por el propio proveedor cometen exactamente ese error; el adapter Greenhouse ya barre recursivamente `['references','links','sources']`.
-  - **El shape de las referencias es IDÉNTICO entre AI Overview y AI Mode** (`type: ai_overview_reference` + `source`/`domain`/`url`/`title`/`text`): cambia el endpoint, no la estructura — **un solo parser sirve para las dos superficies**. Y `text` es el *fragmento atribuido* ("text snippet from the page that was used to generate the `ai_overview_element`"), no un resumen: es la evidencia de QUÉ de esa página se citó.
+  - ⚠️ **Las `references` viven en MÚLTIPLES niveles anidados, no sólo en el primero** (as-of 2026-09-11; la doc de AI Mode lo dice verbatim: _"References appear at multiple nesting levels"_ — dentro de `ai_overview_element`, `ai_overview_table_element`, `ai_overview_expanded_element` y `ai_overview_shopping`). Recorrer sólo el `references` de primer nivel **sub-cuenta las citas y parece un éxito**: un split/map sobre un ítem que no tiene campo `references` no lanza error, simplemente no emite filas. Los templates n8n 7539/7540 publicados por el propio proveedor cometen exactamente ese error; el adapter Greenhouse ya barre recursivamente `['references','links','sources']`.
+  - **El shape de las referencias es IDÉNTICO entre AI Overview y AI Mode** (`type: ai_overview_reference` + `source`/`domain`/`url`/`title`/`text`): cambia el endpoint, no la estructura — **un solo parser sirve para las dos superficies**. Y `text` es el _fragmento atribuido_ ("text snippet from the page that was used to generate the `ai_overview_element`"), no un resumen: es la evidencia de QUÉ de esa página se citó.
 - `links[]`: `link_element` con title/description/url/domain · `images[]`: `images_element` con alt/url/image_url.
 - Gotcha declarado por la doc: se ignora personalización/historial; verificar contra incógnito.
 - **Fallo per-task bajo HTTP 200:** un `location_name` inválido (p. ej. un ISO-2 crudo como `"CL"`) produce task-level `40501` con `result: null` dentro de un batch HTTP 200 — de ahí el gate per-task por `status_code=20000` del adapter Greenhouse (TASK-1652).
@@ -158,18 +169,18 @@ Fuentes: [ai_mode/overview](https://docs.dataforseo.com/v3/serp-google-ai_mode-o
 ### 4.2 AI Overview dentro de Organic
 
 - `ai_overview` es un item type del organic advanced; cuando Google lo carga asíncrono, hay que pasar **`load_async_ai_overview: true`** (recargo) o no aparecerá.
-- ⚠️ **El default es `false`, y en ese modo la respuesta sale de CACHÉ, no del SERP de hoy** (as-of 2026-09-11, verbatim de la doc citada por los templates n8n 7539/13431 del proveedor: *"you'll only obtain `ai_overview` items from cache"*). Sin el flag no recibes error ni item vacío: recibes **HTTP 200 con menos ítems**. Una medición de AI Overview sin el flag mide la caché del proveedor y **falla en silencio**.
-- **Economía de los recargos (as-of 2026-09-11):** `load_async_ai_overview` cuesta **+USD 0.002 por request** y se **reembolsa** *"if the element is absent or contains `"asynchronous_ai_overview": false`"* — forzar la carga no se paga cuando no había AI Overview que cargar, así que el flag es barato de dejar prendido en monitoreo. `people_also_ask_click_depth` (1–4) cobra **+USD 0.00015 por clic** y **también se reembolsa** si se hacen menos clics de los pedidos. `calculate_rectangles: true` **duplica** el costo de la task, sin reembolso asociado.
-- Diferencia práctica: organic te da el AI Overview *en contexto de SERP completo* (posición, qué features lo rodean); AI Mode te da la *experiencia conversacional completa* con refinement chips.
+- ⚠️ **El default es `false`, y en ese modo la respuesta sale de CACHÉ, no del SERP de hoy** (as-of 2026-09-11, verbatim de la doc citada por los templates n8n 7539/13431 del proveedor: _"you'll only obtain `ai_overview` items from cache"_). Sin el flag no recibes error ni item vacío: recibes **HTTP 200 con menos ítems**. Una medición de AI Overview sin el flag mide la caché del proveedor y **falla en silencio**.
+- **Economía de los recargos (as-of 2026-09-11):** `load_async_ai_overview` cuesta **+USD 0.002 por request** y se **reembolsa** _"if the element is absent or contains `"asynchronous_ai_overview": false`"_ — forzar la carga no se paga cuando no había AI Overview que cargar, así que el flag es barato de dejar prendido en monitoreo. `people_also_ask_click_depth` (1–4) cobra **+USD 0.00015 por clic** y **también se reembolsa** si se hacen menos clics de los pedidos. `calculate_rectangles: true` **duplica** el costo de la task, sin reembolso asociado.
+- Diferencia práctica: organic te da el AI Overview _en contexto de SERP completo_ (posición, qué features lo rodean); AI Mode te da la _experiencia conversacional completa_ con refinement chips.
 
 ### 4.3 Dos lentes para medir AI Overview — no son intercambiables
 
 > Referenciada desde `02-labs.md` §8.7. (as-of 2026-09-11, contraste derivado de los templates n8n 7539/7540 vs 13431 publicados por el proveedor.)
 
-| Lente | Endpoint | Pregunta que responde | Costo |
-|---|---|---|---|
-| **SERP-first** | `serp/google/organic/live/advanced` + `load_async_ai_overview: true` | *"Para ESTA keyword, ¿a quién cita Google hoy?"* → el set completo de citas, incluidos competidores y autoridades que no sabías que existían | 1 SERP por keyword + recargo del flag |
-| **Target-first** | `dataforseo_labs/google/ranked_keywords/live` + `item_types: ["ai_overview_reference"]` | *"Para MI dominio, ¿en qué keywords ya estoy citado?"* → inventario propio, paginable | precio Labs por fila; **sin pagar un SERP por keyword** |
+| Lente            | Endpoint                                                                                | Pregunta que responde                                                                                                                        | Costo                                                   |
+| ---------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| **SERP-first**   | `serp/google/organic/live/advanced` + `load_async_ai_overview: true`                    | _"Para ESTA keyword, ¿a quién cita Google hoy?"_ → el set completo de citas, incluidos competidores y autoridades que no sabías que existían | 1 SERP por keyword + recargo del flag                   |
+| **Target-first** | `dataforseo_labs/google/ranked_keywords/live` + `item_types: ["ai_overview_reference"]` | _"Para MI dominio, ¿en qué keywords ya estoy citado?"_ → inventario propio, paginable                                                        | precio Labs por fila; **sin pagar un SERP por keyword** |
 
 La target-first convierte un endpoint de rank tracking en un **inventario de presencia en AI Overview a escala de dominio**, órdenes de magnitud más barato. Pero no sustituye a la otra: target-first **nunca** te muestra al competidor citado, y SERP-first **nunca** te da el inventario completo del dominio. La elección debe quedar **nombrada en el contrato de la capability**, no implícita en qué reader la llamó.
 
@@ -247,23 +258,23 @@ Fuente: [serp/locations](https://docs.dataforseo.com/v3/serp-se-locations/) (as-
 
 ## 9. Fuentes (URLs verificadas, as-of 2026-08-06)
 
-| Sección | URL | Estado |
-|---|---|---|
-| SERP overview (motores, métodos, colas) | https://docs.dataforseo.com/v3/serp-overview/ | OK |
-| Índice Google (verticales) | https://docs.dataforseo.com/v3/serp/google/ | OK |
-| Lista de endpoints | https://docs.dataforseo.com/v3/serp-endpoints/ | OK |
-| Google organic overview (fórmula de costo) | https://docs.dataforseo.com/v3/serp-google-organic-overview/ | OK |
-| Google organic live advanced (params + item types) | https://docs.dataforseo.com/v3/serp/google/organic/live/advanced/ | OK |
-| AI Mode overview | https://docs.dataforseo.com/v3/serp-google-ai_mode-overview/ | OK |
-| AI Mode live advanced (markdown + references) | https://docs.dataforseo.com/v3/serp-google-ai_mode-live-advanced/ | OK |
-| AI Optimization overview (LLM Responses/Scraper/Keyword Data/Mentions) | https://docs.dataforseo.com/v3/ai_optimization-overview/ | OK |
-| Bing overview | https://docs.dataforseo.com/v3/serp-bing-overview/ | OK |
-| YouTube overview | https://docs.dataforseo.com/v3/serp-youtube-overview/ | OK |
-| Naver overview (existencia) | https://docs.dataforseo.com/v3/serp-naver-overview/ | Visto en búsqueda, no fetched |
-| Task POST (priority, límites, pingback/postback) | https://docs.dataforseo.com/v3/serp-google-type-task_post/ | OK |
-| Locations apéndice | https://docs.dataforseo.com/v3/serp-se-locations/ | OK |
-| SERP Screenshot | https://docs.dataforseo.com/v3/serp_screenshot/ | OK |
-| SERP AI Summary | https://docs.dataforseo.com/v3/serp-ai_summary/ | OK |
-| `/v3/serp/` · `/v3/serp-google-locations/` | — | **404** (slugs con guiones son los canónicos) |
+| Sección                                                                | URL                                                               | Estado                                        |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------- | --------------------------------------------- |
+| SERP overview (motores, métodos, colas)                                | https://docs.dataforseo.com/v3/serp-overview/                     | OK                                            |
+| Índice Google (verticales)                                             | https://docs.dataforseo.com/v3/serp/google/                       | OK                                            |
+| Lista de endpoints                                                     | https://docs.dataforseo.com/v3/serp-endpoints/                    | OK                                            |
+| Google organic overview (fórmula de costo)                             | https://docs.dataforseo.com/v3/serp-google-organic-overview/      | OK                                            |
+| Google organic live advanced (params + item types)                     | https://docs.dataforseo.com/v3/serp/google/organic/live/advanced/ | OK                                            |
+| AI Mode overview                                                       | https://docs.dataforseo.com/v3/serp-google-ai_mode-overview/      | OK                                            |
+| AI Mode live advanced (markdown + references)                          | https://docs.dataforseo.com/v3/serp-google-ai_mode-live-advanced/ | OK                                            |
+| AI Optimization overview (LLM Responses/Scraper/Keyword Data/Mentions) | https://docs.dataforseo.com/v3/ai_optimization-overview/          | OK                                            |
+| Bing overview                                                          | https://docs.dataforseo.com/v3/serp-bing-overview/                | OK                                            |
+| YouTube overview                                                       | https://docs.dataforseo.com/v3/serp-youtube-overview/             | OK                                            |
+| Naver overview (existencia)                                            | https://docs.dataforseo.com/v3/serp-naver-overview/               | Visto en búsqueda, no fetched                 |
+| Task POST (priority, límites, pingback/postback)                       | https://docs.dataforseo.com/v3/serp-google-type-task_post/        | OK                                            |
+| Locations apéndice                                                     | https://docs.dataforseo.com/v3/serp-se-locations/                 | OK                                            |
+| SERP Screenshot                                                        | https://docs.dataforseo.com/v3/serp_screenshot/                   | OK                                            |
+| SERP AI Summary                                                        | https://docs.dataforseo.com/v3/serp-ai_summary/                   | OK                                            |
+| `/v3/serp/` · `/v3/serp-google-locations/`                             | —                                                                 | **404** (slugs con guiones son los canónicos) |
 
 **Caveat de fidelidad**: las páginas se leyeron vía WebFetch (resumen asistido sobre el HTML real). Los números de precio citados ($0.004 AI Mode live advanced, $0.0015 task estándar, $0.002 recargos, $0.00015 PAA click, $0.004 screenshot, $0.01 ai_summary) aparecen en las páginas citadas as-of 2026-08-06, pero la fuente vigente de pricing es `dataforseo.com/pricing` — reconfirmar antes de modelar unit economics.

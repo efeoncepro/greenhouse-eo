@@ -210,7 +210,8 @@ gobierna transporte, catálogo, lifecycle, seguridad y límites.
   matriz normaliza citas, `fan_out_queries`, `brand_entities`, plataforma, modelo, mercado, costo y evidencia.
 - Compara cualquier marca o entidad con `serp-compare`: una entidad declara label, aliases y uno o más dominios.
   Compra una captura por query/dispositivo, no por entidad, y separa orgánico, mención, enlace AI, cita AI y
-  Shopping opcional. Retail es sólo un caso; no presupongas industria ni superficie comercial.
+  Shopping opcional. Organic Live Advanced se envía como una task por request y se agrega al final. Retail es
+  sólo un caso; no presupongas industria ni superficie comercial.
 
 ### Flujo obligatorio
 
@@ -223,7 +224,8 @@ gobierna transporte, catálogo, lifecycle, seguridad y límites.
    `--estimated-usd` y `--max-usd`; todo POST de familia distinta de SERP exige además `--org`. En
    `ai_optimization`, declara `consumer='aeo'`; en investigación SEO, `consumer='seo'`.
 5. En comandos compuestos declara `--checkpoint`; reanuda con `--resume` y el mismo plan/panel/organización. El
-   entitlement y el saldo se revalidan antes de cada POST nuevo contra el costo real acumulado.
+   entitlement y el saldo se revalidan antes de cada POST nuevo contra el costo real acumulado. Si el endpoint
+   exige requests unitarios, verifica `requestCount`, `response.requests[]` y los códigos de todas las tasks.
 6. Antes de SERP entrega `--finalists-file` con intención/categoría/prioridad/cobertura o aprueba explícitamente
    con `--approve-ranked-finalists`. `--yes` no reemplaza ese checkpoint editorial.
 7. Conserva evidencia con `--out` y `--csv`. Los archivos se crean de forma exclusiva: una ruta ya existente
@@ -245,8 +247,10 @@ Reglas que deja el smoke:
 - Si el dominio no está en el depth capturado, usa `not_observed_in_captured_organic`; nunca inventes “posición 9”.
 - `link_element`, `knowledge_graph_shopping_element` y `ai_overview_reference` son presencias distintas; no las
   colapses en “citado por IA”.
-- Rotula el AI Overview como `cached_provider_result` salvo que el request haya pedido carga asíncrona; el éxito
-  orgánico no vuelve actual una respuesta AI cacheada.
+- Separa intención de resultado: `aiOverviewAsyncRequested` conserva el flag pedido, mientras `aiFreshness` sólo
+  puede ser `async_provider_result` si la respuesta trae `asynchronous_ai_overview=true`; `false` es
+  `cached_provider_result` y ausencia del bloque es `not_returned`.
+- Una task fallida conserva su código y raw, pero no genera filas `not_observed_in_captured_organic`.
 - Una SERP Live es una observación fechada. Para una conclusión de posicionamiento, repite por dispositivo,
   ubicación y tiempo, y conserva el panel de queries branded/unbranded.
 - Estas reglas son transversales. Para otra industria usa `entities` con aliases y dominios; Shopping puede no
@@ -256,6 +260,12 @@ Smoke del comando transversal: task `09281144-1987-0139-0000-483a6615ee43`, USD 
 Una sola task produjo dos filas: Falabella orgánico `rank_group=3`/`rank_absolute=5`; Paris
 `not_observed_in_captured_organic`. Ambas fueron sólo mención textual en el AI Overview cacheado de esa captura,
 sin enlace ni cita atribuible. Esto confirma que la matriz no arrastra señales de una ejecución anterior.
+
+Smoke final multidispositivo: desktop `09281157-1987-0139-0000-77d35f5a773f` y mobile
+`09281157-1987-0139-0000-91c4b65ee202` se ejecutaron como requests secuenciales, ambas tasks `20000`, por USD
+0,0055 reales frente a USD 0,016 estimados. Ambos bloques devolvieron `asynchronous_ai_overview=false` aunque se
+pidió carga asíncrona. Esto verifica serialización, agregación y semántica de frescura; no convierte el snapshot
+en ranking estable.
 
 Ejemplo mínimo de minería reproducible:
 

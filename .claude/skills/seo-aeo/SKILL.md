@@ -281,7 +281,8 @@ Grupo Berel):
     mercado, costo y procedencia; no lo presentes como captura recurrente de producto.
   - `serp-compare`: compara transversalmente marcas o entidades definidas por aliases y
     uno o más dominios. Reutiliza cada SERP por query/dispositivo para todas las entidades
-    y separa orgánico, mención, enlace AI, cita AI y Shopping opcional. No presupone retail.
+    y separa orgánico, mención, enlace AI, cita AI y Shopping opcional. Organic Live Advanced
+    se serializa a una task por request y se agrega sin multiplicar capturas por entidad. No presupone retail.
   - `quick`: usa un preset para preguntas rutinarias y revisables como organic SERP,
     keyword overview, ranked keywords, competidores, backlinks, OnPage, AI Mode,
     LLM Responses/Scraper, AI Keyword Data o LLM Mentions. Empieza con `--dry-run`.
@@ -315,6 +316,10 @@ Grupo Berel):
   Shopping. “No observado en el depth capturado” no es una posición ni ausencia en Google.
   El AI Overview de esas capturas llegó con `asynchronous_ai_overview=false` y sin
   `load_async_ai_overview`: rotúlalo como caché del proveedor, no como UI actual.
+  En el smoke final multidispositivo posterior sí se pidió carga asíncrona y ambos bloques
+  devolvieron `asynchronous_ai_overview=false`. Por eso la frescura correcta fue
+  `cached_provider_result`; el flag pedido queda separado en `aiOverviewAsyncRequested`.
+  Una task fallida nunca se interpreta como ausencia orgánica.
   Una conclusión competitiva requiere panel branded/unbranded, mobile/desktop y serie temporal.
   La misma lectura aplica a cualquier sector mediante entidades, aliases y dominios; Shopping
   es una señal opcional, no parte obligatoria del modelo.

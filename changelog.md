@@ -12,6 +12,9 @@
 - `serp-compare` compara cualquier marca o entidad mediante aliases y múltiples dominios sobre una sola captura
   por query/dispositivo. Exporta raw + JSON/CSV y separa orgánico, mención, enlace AI, cita AI y Shopping opcional;
   explicita depth y frescura sin fabricar posiciones. `quick organic` ya transmite target/depth/AI Overview.
+- Organic Live Advanced se serializa a una task por request. El artefacto agrega diagnóstico por request, omite
+  filas de tasks fallidas y separa carga AI solicitada de frescura realmente devuelta. El canary desktop/mobile
+  completó dos tasks `20000` por USD 0,0055 reales frente a USD 0,016 estimados.
 
 - Delta: `pnpm dataforseo -- research` encadena minería Labs, gobernanza explícita de finalistas, enriquecimiento
   SERP Standard y una matriz JSON/CSV con intención, cobertura, competidores, features, PAA, citas y procedencia.
@@ -34,8 +37,9 @@
   Analysis para brand monitoring y Business Data acotada para SEO local/reputación; Keywords Data queda condicional
   y Merchant/App Data esperan un caso real.
 - Smokes reales: catálogo AI Mode gratuito (USD 0), AI Mode Perú con `location_code=2604` (USD 0,004) y Organic Chile
-  (USD 0,002), todos con task `20000`; `serp-compare` reutilizó una task Chile/desktop para dos entidades por
-  USD 0,002 y mantuvo separados orgánico, mención, enlace y cita. Commit local; sin push, deploy ni cambio de flags.
+  (USD 0,002), todos con task `20000`; `serp-compare` reutilizó cada captura para dos entidades y completó el panel
+  desktop/mobile por USD 0,0055, manteniendo separados orgánico, mención, enlace, cita y frescura. Commit local;
+  sin push, deploy ni cambio de flags.
 
 ## 2026-09-28 — Ruta gobernada para producir piezas de marca en la plataforma (TASK-1921) y Grader por mercado (TASK-1863)
 
@@ -543,7 +547,7 @@ la firma vigente al **20 %** según la decisión del operador; el default histó
 debe pasar `LOGO=0.20` explícitamente. La [prueba con Julio y Nexa](ai-generations/2026-09-20_prueba-motor-integrado-julio-nexa/README.md)
 documenta el fallo que motivó la guarda.
 
-## 2026-09-20 — Fotografía de marca: tres comandos, seis reservas y el umbral de calma en L*
+## 2026-09-20 — Fotografía de marca: tres comandos, seis reservas y el umbral de calma en L\*
 
 El prompt de una toma ya no se concatena a mano: `pnpm foto:prompt` lo arma desde una ficha y resuelve formato, % del
 lecho y límite de sujetos desde **una sola tabla** — armarlo a mano fue la vía por la que «Vertical 4:5.» vivió dentro

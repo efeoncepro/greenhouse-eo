@@ -2,9 +2,16 @@ import { describe, expect, it } from 'vitest'
 
 import { findDataForSeoEndpoint } from '@/lib/ai/dataforseo-catalog'
 
-import { classifyDataForSeoOutcome, CLI_EXIT, validateAiOptimizationSafety } from '../cli'
+import { classifyDataForSeoOutcome, CLI_EXIT, partitionDataForSeoTasks, validateAiOptimizationSafety } from '../cli'
 
 describe('DataForSEO CLI task outcomes', () => {
+  it('partitions one-task Live endpoints without losing task order', () => {
+    expect(partitionDataForSeoTasks([{ device: 'desktop' }, { device: 'mobile' }], 1)).toEqual([
+      [{ device: 'desktop' }],
+      [{ device: 'mobile' }]
+    ])
+  })
+
   it('does not equate HTTP success with provider task success', () => {
     expect(
       classifyDataForSeoOutcome({
@@ -51,8 +58,8 @@ describe('DataForSEO CLI AI Optimization guards', () => {
     const endpoint = findDataForSeoEndpoint('/v3/ai_optimization/claude/llm_responses/live')
 
     expect(endpoint).not.toBeNull()
-    expect(() =>
-      validateAiOptimizationSafety(endpoint!, [{ user_prompt: 'x', model_name: 'live-model' }])
-    ).toThrow('max_output_tokens')
+    expect(() => validateAiOptimizationSafety(endpoint!, [{ user_prompt: 'x', model_name: 'live-model' }])).toThrow(
+      'max_output_tokens'
+    )
   })
 })

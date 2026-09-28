@@ -299,6 +299,16 @@ export const validateAiOptimizationSafety = (endpoint: DataForSeoCatalogEndpoint
   }
 }
 
+export const partitionDataForSeoTasks = (tasks: Record<string, unknown>[], batchSize?: number) => {
+  if (tasks.length === 0) return [[]]
+  if (batchSize === undefined) return [tasks]
+  if (!Number.isInteger(batchSize) || batchSize < 1) throw new Error('requestBatchSize debe ser un entero positivo.')
+
+  return Array.from({ length: Math.ceil(tasks.length / batchSize) }, (_, index) =>
+    tasks.slice(index * batchSize, (index + 1) * batchSize)
+  )
+}
+
 const execute = async (input: {
   endpoint: DataForSeoCatalogEndpoint
   tasks: Record<string, unknown>[]
@@ -310,6 +320,7 @@ const execute = async (input: {
   previewExtra?: Record<string, unknown>
   buildResult?: (tasks: unknown[]) => unknown
   buildCsv?: (result: unknown) => string
+  requestBatchSize?: number
 }) => {
   const { endpoint, tasks, flags } = input
   const organizationId = flag(flags, 'org')
@@ -318,6 +329,7 @@ const execute = async (input: {
   const estimatedUsd = numberFlag(flags, 'estimated-usd') ?? input.estimatedCostUsd
   const resolvedEndpoint = resolveEndpointWithTaskId(endpoint, input.taskId)
   const isPaidPost = endpoint.method === 'POST' && !endpoint.free
+  const requestBatches = partitionDataForSeoTasks(tasks, input.requestBatchSize)
 
   if (endpoint.execution.status !== 'executable' || !endpoint.execution.internalFamily) {
     console.error(
@@ -353,6 +365,8 @@ const execute = async (input: {
     organizationId: endpoint.method === 'POST' ? (organizationId ?? null) : null,
     consumer,
     taskCount: tasks.length,
+    requestCount: requestBatches.length,
+    requestBatchSize: input.requestBatchSize ?? null,
     tasks,
     batchLimit: endpoint.batchLimit,
     estimatedCostUsd: estimatedUsd,
@@ -375,40 +389,87 @@ const execute = async (input: {
     if (estimatedUsd > maxUsd) throw new Error(`Costo estimado USD ${estimatedUsd} supera --max-usd ${maxUsd}.`)
   }
 
-  if (endpoint.method === 'POST' && organizationId) {
-    const gate = await enforceSeoRunEntitlement(organizationId, {
-      estimatedCostUsd: estimatedUsd ?? undefined,
-      consumesAuditAllowance: false
-    })
+  const responseTasks: unknown[] = []
 
-    if (!gate.allowed) {
-      printJson({
-        ...preview,
-        ok: false,
-        blockedReason: gate.blockedReason,
-        budgetRemainingUsd: gate.budgetRemainingUsd
-      })
-      process.exitCode = CLI_EXIT.blocked
+  const requestResults: Array<{
+    index: number
+    taskCount: number
+    httpStatus: number
+    latencyMs: number
+    costUsd: number | null
+    breakerOpen: boolean
+  }> = []
 
-      return
+  let allHttpOk = true
+  let totalLatencyMs = 0
+  let totalCostUsd: number | null = 0
+  let budgetConsumedUsd = 0
+
+  for (const [index, batch] of requestBatches.entries()) {
+    const incrementalEstimate =
+      estimatedUsd === null || tasks.length === 0 ? null : (estimatedUsd / tasks.length) * batch.length
+
+    if (
+      isPaidPost &&
+      maxUsd !== undefined &&
+      incrementalEstimate !== null &&
+      budgetConsumedUsd + incrementalEstimate > maxUsd
+    ) {
+      throw new Error(
+        `Costo observado/estimado USD ${budgetConsumedUsd + incrementalEstimate} supera --max-usd ${maxUsd} antes del request ${index + 1}.`
+      )
     }
+
+    if (endpoint.method === 'POST' && organizationId) {
+      const gate = await enforceSeoRunEntitlement(organizationId, {
+        estimatedCostUsd: incrementalEstimate ?? undefined,
+        consumesAuditAllowance: false
+      })
+
+      if (!gate.allowed) {
+        printJson({
+          ...preview,
+          ok: false,
+          blockedReason: gate.blockedReason,
+          budgetRemainingUsd: gate.budgetRemainingUsd,
+          stoppedBeforeRequest: index + 1
+        })
+        process.exitCode = CLI_EXIT.blocked
+
+        return
+      }
+    }
+
+    const request = {
+      family: endpoint.execution.internalFamily,
+      consumer: consumer as 'seo' | 'aeo',
+      method: endpoint.method,
+      endpoint: resolvedEndpoint,
+      tasks: batch,
+      ...(endpoint.method === 'POST' && organizationId ? { organizationId } : {}),
+      ...(numberFlag(flags, 'timeout-ms') ? { timeoutMs: numberFlag(flags, 'timeout-ms') } : {})
+    } as DataForSeoRequestInput
+
+    const response = await requestDataForSeo(request)
+
+    responseTasks.push(...response.tasks)
+    allHttpOk &&= response.ok
+    totalLatencyMs += response.latencyMs
+    budgetConsumedUsd += response.cost ?? incrementalEstimate ?? 0
+    totalCostUsd = totalCostUsd === null || response.cost === null ? null : totalCostUsd + response.cost
+    requestResults.push({
+      index: index + 1,
+      taskCount: batch.length,
+      httpStatus: response.httpStatus,
+      latencyMs: response.latencyMs,
+      costUsd: response.cost,
+      breakerOpen: response.breakerOpen ?? false
+    })
   }
 
-  const request = {
-    family: endpoint.execution.internalFamily,
-    consumer: consumer as 'seo' | 'aeo',
-    method: endpoint.method,
-    endpoint: resolvedEndpoint,
-    tasks,
-    ...(endpoint.method === 'POST' && organizationId ? { organizationId } : {}),
-    ...(numberFlag(flags, 'timeout-ms') ? { timeoutMs: numberFlag(flags, 'timeout-ms') } : {})
-  } as DataForSeoRequestInput
-
-  const response = await requestDataForSeo(request)
-  const taskCodes = summarizeTaskCodes(response.tasks)
-  const outcome = classifyDataForSeoOutcome({ httpOk: response.ok, taskCodes })
-
-  const normalizedResult = input.buildResult?.(response.tasks)
+  const taskCodes = summarizeTaskCodes(responseTasks)
+  const outcome = classifyDataForSeoOutcome({ httpOk: allHttpOk, taskCodes })
+  const normalizedResult = input.buildResult?.(responseTasks)
 
   const artifact = {
     ok: outcome.kind === 'success',
@@ -417,12 +478,13 @@ const execute = async (input: {
     surface: input.surface ?? 'dataforseo-cli',
     request: preview,
     response: {
-      httpStatus: response.httpStatus,
-      latencyMs: response.latencyMs,
-      breakerOpen: response.breakerOpen ?? false,
+      httpStatus: requestResults.at(-1)?.httpStatus ?? 0,
+      latencyMs: totalLatencyMs,
+      breakerOpen: requestResults.some(request => request.breakerOpen),
+      requests: requestResults,
       taskCodes,
-      costUsd: response.cost,
-      tasks: response.tasks
+      costUsd: totalCostUsd,
+      tasks: responseTasks
     },
     ...(normalizedResult === undefined ? {} : { result: normalizedResult })
   }
@@ -477,9 +539,12 @@ const runSerpCompare = async (flags: Flags) => {
     defaultConsumer: 'seo',
     surface: 'dataforseo-serp-compare',
     previewExtra: { panel },
+    requestBatchSize: 1,
     buildResult: tasks => ({ panel, rows: normalizeDataForSeoSerpCompareResponse({ tasks, panel }) }),
     buildCsv: result =>
-      dataForSeoSerpCompareRowsToCsv((result as { rows: ReturnType<typeof normalizeDataForSeoSerpCompareResponse> }).rows)
+      dataForSeoSerpCompareRowsToCsv(
+        (result as { rows: ReturnType<typeof normalizeDataForSeoSerpCompareResponse> }).rows
+      )
   })
 }
 

@@ -135,8 +135,9 @@ pnpm dataforseo -- serp-compare \
 ```
 
 El costo se calcula por `queries × devices × bloques de depth`; las entidades no agregan requests porque se
-comparan localmente sobre cada respuesta. `--load-ai-overview` duplica el costo del SERP. El preview debe mostrar
-tasks, multiplicadores, mercado y panel antes de confirmar.
+comparan localmente sobre cada respuesta. Organic Live Advanced acepta una task por request, por lo que la CLI
+serializa cada query/dispositivo y luego agrega las respuestas. `--load-ai-overview` eleva la estimación del SERP.
+El preview debe mostrar `taskCount`, `requestCount`, multiplicadores, mercado y panel antes de confirmar.
 
 Lee la matriz así:
 
@@ -144,13 +145,22 @@ Lee la matriz así:
   `not_observed_in_captured_organic`, junto con `capturedOrganicCount` y `maxCapturedOrganicRank`.
 - `aiMention`, `aiDirectLink` y `aiCitation` son señales diferentes. Una mención sin enlace no es una cita.
 - `shoppingObserved` es opcional y sólo aplica cuando el SERP trae esa superficie; no define el modelo.
-- `aiFreshness=cached_provider_result` indica que no se pidió carga asíncrona. No lo presentes como evidencia de
-  la UI de Google en ese instante. `async_requested` sólo describe el request, no estabilidad temporal.
+- `aiOverviewAsyncRequested` indica si el request pidió carga asíncrona. No describe el resultado.
+- `aiFreshness=async_provider_result` exige `asynchronous_ai_overview=true` en la respuesta;
+  `cached_provider_result` corresponde a `false`, y `not_returned` a ausencia del bloque. Ninguno prueba por sí
+  solo la UI de Google en ese instante.
+- Revisa `response.requests[]` y `response.taskCodes`: una task fallida no produce filas ni puede interpretarse
+  como `not_observed_in_captured_organic`.
 - `signals` resume brechas observables para investigación. No demuestra causa: valida crawl, canonical, schema,
   contenido, feeds y cobertura propia antes de convertirla en recomendación.
 
 Para una serie temporal, vuelve a ejecutar el mismo panel y conserva artefactos con fecha. La CLI no agenda ni
 repite compras automáticamente. No sobrescribe salidas existentes: `--out` y `--csv` usan creación exclusiva.
+
+Smoke final multidispositivo verificado el 2026-09-28: desktop y mobile se enviaron en dos requests secuenciales,
+ambas tasks terminaron en `20000` y el costo total fue USD 0,0055 frente a una estimación conservadora de USD
+0,016. Ambas capturas devolvieron `asynchronous_ai_overview=false` pese a haberse pedido carga asíncrona; el
+resultado correcto es `cached_provider_result` en los cuatro registros.
 
 ### Elegir el carril correcto
 

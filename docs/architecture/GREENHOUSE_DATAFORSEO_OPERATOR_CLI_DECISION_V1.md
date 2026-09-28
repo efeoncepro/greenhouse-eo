@@ -51,7 +51,12 @@ keywords. Inventario oficial, autorización Greenhouse y disponibilidad runtime 
 14. `serp-compare` compara marcas o entidades transversales sobre una sola captura por query/dispositivo. Un panel
     puede declarar nombre, aliases y varios dominios; retail es sólo un caso. Orgánico, mención, enlace AI, cita AI
     y Shopping permanecen señales separadas. Un target no observado conserva el depth capturado y nunca recibe
-    una posición fabricada. Sin `load_async_ai_overview`, AI Overview se rotula como caché del proveedor.
+    una posición fabricada. Organic Live Advanced admite una sola task por request: la CLI serializa esas tasks,
+    pero sigue comprando una sola captura por query/dispositivo y no una por entidad.
+15. La intención de pedir AI Overview asíncrono y la frescura devuelta son hechos distintos. La matriz conserva
+    `aiOverviewAsyncRequested`; `aiFreshness` se deriva exclusivamente de la respuesta como
+    `async_provider_result`, `cached_provider_result` o `not_returned`. Una task fallida conserva su código y raw,
+    pero no produce filas que aparenten una ausencia orgánica.
 
 ## Technical architecture
 
@@ -80,22 +85,22 @@ data/dataforseo/endpoints.v3.json
 
 ### Components and ownership
 
-| Component                                       | Responsibility                                                                                                          |
-| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `scripts/dataforseo/generate-catalog.ts`        | Lee REST WordPress y documentación renderizada oficiales, normaliza rutas v3 concretas y escribe/comprueba el snapshot. |
-| `scripts/dataforseo/generate-enablement-register.ts` | Genera y comprueba el registro exhaustivo de rutas `catalog_only`, propósito eventual y postura de habilitación. |
-| `data/dataforseo/endpoints.v3.json`             | Inventario versionado con digest, método, path, campos, modo y estado ejecutable. Es evidencia, no autorización.        |
-| `GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md` | Backlog trazable de rutas no autorizadas; no es allowlist ni roadmap comprometido. |
-| `src/lib/ai/dataforseo-catalog.ts`              | Loader tipado, búsqueda y mapeo de la familia del proveedor al allowlist cerrado de Greenhouse.                         |
-| `src/lib/ai/dataforseo-cli-presets.ts`          | Builders pequeños para operaciones frecuentes; la identidad de mercado sale de `src/lib/growth/markets`.                |
-| `src/lib/ai/dataforseo-keyword-research.ts`     | Plan, estimación, payloads, extracción/deduplicación y CSV del flujo compuesto de keywords.                             |
-| `src/lib/ai/dataforseo-research-checkpoint.ts`  | Fingerprints, runId, cache con TTL, resume tenant-safe y escritura atómica de pasos/tasks/costo.                        |
-| `src/lib/ai/dataforseo-ai-research.ts`          | Contrato de panel AI, requests por lane y matriz normalizada API vs consumer surface.                                   |
-| `src/lib/ai/dataforseo-serp-compare.ts`         | Panel transversal de entidades, estimación, normalización multiseñal y CSV de comparación SERP.                         |
-| `scripts/dataforseo/cli.ts`                     | Orquestación local, preview, confirmación, validación, preflight de entitlement, outcomes y artefactos.                 |
-| `src/lib/ai/dataforseo.ts`                      | Transporte único: credenciales, prefijo, timeout, retry, breaker y notificación de costo.                               |
-| `src/lib/growth/seo/entitlement.ts`             | Decisión de quota y presupuesto por organización antes del gasto.                                                       |
-| `src/lib/growth/seo/register-provider-spend.ts` | Registra el recorder del ledger; la CLI lo importa en el entrypoint.                                                    |
+| Component                                                      | Responsibility                                                                                                          |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `scripts/dataforseo/generate-catalog.ts`                       | Lee REST WordPress y documentación renderizada oficiales, normaliza rutas v3 concretas y escribe/comprueba el snapshot. |
+| `scripts/dataforseo/generate-enablement-register.ts`           | Genera y comprueba el registro exhaustivo de rutas `catalog_only`, propósito eventual y postura de habilitación.        |
+| `data/dataforseo/endpoints.v3.json`                            | Inventario versionado con digest, método, path, campos, modo y estado ejecutable. Es evidencia, no autorización.        |
+| `GREENHOUSE_DATAFORSEO_CATALOG_ONLY_ENABLEMENT_REGISTER_V1.md` | Backlog trazable de rutas no autorizadas; no es allowlist ni roadmap comprometido.                                      |
+| `src/lib/ai/dataforseo-catalog.ts`                             | Loader tipado, búsqueda y mapeo de la familia del proveedor al allowlist cerrado de Greenhouse.                         |
+| `src/lib/ai/dataforseo-cli-presets.ts`                         | Builders pequeños para operaciones frecuentes; la identidad de mercado sale de `src/lib/growth/markets`.                |
+| `src/lib/ai/dataforseo-keyword-research.ts`                    | Plan, estimación, payloads, extracción/deduplicación y CSV del flujo compuesto de keywords.                             |
+| `src/lib/ai/dataforseo-research-checkpoint.ts`                 | Fingerprints, runId, cache con TTL, resume tenant-safe y escritura atómica de pasos/tasks/costo.                        |
+| `src/lib/ai/dataforseo-ai-research.ts`                         | Contrato de panel AI, requests por lane y matriz normalizada API vs consumer surface.                                   |
+| `src/lib/ai/dataforseo-serp-compare.ts`                        | Panel transversal de entidades, estimación, normalización multiseñal y CSV de comparación SERP.                         |
+| `scripts/dataforseo/cli.ts`                                    | Orquestación local, preview, confirmación, validación, preflight de entitlement, outcomes y artefactos.                 |
+| `src/lib/ai/dataforseo.ts`                                     | Transporte único: credenciales, prefijo, timeout, retry, breaker y notificación de costo.                               |
+| `src/lib/growth/seo/entitlement.ts`                            | Decisión de quota y presupuesto por organización antes del gasto.                                                       |
+| `src/lib/growth/seo/register-provider-spend.ts`                | Registra el recorder del ledger; la CLI lo importa en el entrypoint.                                                    |
 
 La CLI consume estos contratos. No es dueña de credenciales, autorización de familias, política de presupuesto ni
 persistencia productiva.
@@ -155,8 +160,19 @@ entidades: todas se evalúan localmente sobre el mismo SERP.
 La matriz mantiene por separado `rank_group`, `rank_absolute`, mención textual, enlace directo de AI Overview,
 cita formal y Shopping. Shopping es opcional y no condiciona el modelo. `not_observed_in_captured_organic`
 significa sólo que la entidad no apareció entre los orgánicos devueltos; reporta además cantidad y máximo rank
-capturados. Las señales derivadas son observaciones para priorizar una auditoría, no causalidad ni estrategia.
-Repetir el panel en otra fecha crea otra muestra; la CLI no agenda ni compra repeticiones silenciosas.
+capturados. Una task con status distinto de `20000` no produce filas normalizadas: el error queda en `taskCodes`
+y en las tasks crudas. Así, un rechazo del proveedor nunca se convierte en una falsa ausencia competitiva.
+
+Organic Live Advanced acepta una task por request. Para paneles multidispositivo, `serp-compare` envía requests
+secuenciales de una task, agrega sus respuestas y expone `requestCount`, `requestBatchSize` y `response.requests[]`.
+Antes de cada request reevalúa el techo con costo observado más estimación incremental. El número de capturas
+sigue siendo `queries × devices`, no `queries × devices × entities`.
+
+`aiOverviewAsyncRequested` registra la intención del request. `aiFreshness` registra lo realmente devuelto:
+`async_provider_result` sólo cuando el bloque incluye `asynchronous_ai_overview=true`, `cached_provider_result`
+cuando devuelve `false`, y `not_returned` cuando no existe bloque. Pedir carga asíncrona no autoriza a rotular el
+resultado como asíncrono. Las señales derivadas son observaciones para priorizar una auditoría, no causalidad ni
+estrategia. Repetir el panel en otra fecha crea otra muestra; la CLI no agenda ni compra repeticiones silenciosas.
 
 ## Authorization, cost and tenancy
 
@@ -172,9 +188,9 @@ Repetir el panel en otra fecha crea otra muestra; la CLI no agenda ni compra rep
 
 ## Output and failure contract
 
-El artefacto genérico contiene `queriedAt`, surface, request resuelto, status por task, costo, latencia, breaker y
-tasks crudas. `--out` crea en modo exclusivo (`wx`) para no sobrescribir evidencia. Research puede sumar CSV.
-Secretos y raw HTTP error bodies no se emiten.
+El artefacto genérico contiene `queriedAt`, surface, request resuelto, status por task, costo, latencia, breaker,
+diagnóstico por request y tasks crudas. `--out` crea en modo exclusivo (`wx`) para no sobrescribir evidencia.
+Research puede sumar CSV. Secretos y raw HTTP error bodies no se emiten.
 
 Exit codes estables: `0` éxito/preview válido, `2` uso o validación local, `3` bloqueo de autorización/entitlement/
 presupuesto, `4` error de task, `5` HTTP/transporte, `6` éxito sin datos y `7` pending.
@@ -200,6 +216,13 @@ una sola fila lógica atribuida a `consumer=aeo` y `cost_basis=invoiced`; reanud
 costo incremental cero y no aumentó `call_count`. Esto certifica la lane API gobernada, no todas las combinaciones
 de proveedor/modelo ni la consumer surface. Captura recurrente, schema, readers, MCP y schedules quedan fuera de
 la CLI y pertenecen a `TASK-1651-B`.
+
+El canary de regresión de `serp-compare` del 2026-09-28 ejecutó desktop y mobile de `iphone 18 pro max` en Chile
+como dos requests secuenciales, ambos con task `20000`, por USD 0,007 reales frente a USD 0,016 de estimación
+conservadora. El smoke final repitió el panel con desktop `09281157-1987-0139-0000-77d35f5a773f` y mobile
+`09281157-1987-0139-0000-91c4b65ee202`, ambas `20000`, por USD 0,0055. Falabella y Paris se evaluaron sobre cada
+captura compartida. Aunque el request pidió carga asíncrona, ambos bloques devolvieron
+`asynchronous_ai_overview=false`; la frescura correcta fue `cached_provider_result` en los cuatro registros.
 
 ## Known limitations
 

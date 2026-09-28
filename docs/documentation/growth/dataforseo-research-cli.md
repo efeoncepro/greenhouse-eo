@@ -42,9 +42,15 @@ facilita el análisis.
 
 Orgánico, mención textual en AI Overview, enlace directo, cita formal y Shopping son dimensiones distintas.
 Shopping sólo aparece si el SERP lo trae. “No observado” se limita al bloque orgánico y profundidad capturados;
-no significa ausencia en Google ni autoriza inferir la siguiente posición. Sin carga asíncrona explícita, el AI
-Overview se etiqueta como resultado cacheado por el proveedor. Las señales de brecha son hipótesis para crawl,
-contenido, schema, canonicals o feeds; requieren validación sobre la propiedad antes de recomendar cambios.
+no significa ausencia en Google ni autoriza inferir la siguiente posición. Una task fallida no genera filas de
+entidades: queda como error del proveedor en el raw. La intención de pedir carga asíncrona se conserva en
+`aiOverviewAsyncRequested`, mientras `aiFreshness` describe sólo lo devuelto por el proveedor. Las señales de
+brecha son hipótesis para crawl, contenido, schema, canonicals o feeds; requieren validación sobre la propiedad
+antes de recomendar cambios.
+
+Organic Live Advanced acepta una task por request. La CLI serializa dispositivos y agrega el resultado en un solo
+artefacto; el preview muestra tanto `taskCount` como `requestCount`. Esta serialización no cambia la economía por
+entidad: todas las entidades se comparan localmente sobre la misma captura de cada query/dispositivo.
 
 ## Gobernanza y estados
 
@@ -54,6 +60,8 @@ contenido, schema, canonicals o feeds; requieren validación sobre la propiedad 
 - El checkpoint está ligado a organización y fingerprint. `--resume` reutiliza pasos vigentes y task IDs; un plan
   distinto falla cerrado.
 - El costo se revalida antes de cada POST usando gasto real acumulado más la estimación del siguiente paso.
+- En operaciones divididas en varios requests, el artefacto conserva `response.requests[]`; un request rechazado
+  nunca se normaliza como “no observado”.
 - La CLI sólo ejecuta las familias autorizadas. El catálogo puede describir rutas que siguen bloqueadas.
 
 ## Capacidades que podrían habilitarse
@@ -85,3 +93,9 @@ El 2026-09-28 quedó aplicado y validado el CHECK de `ai_optimization`. Un canar
 USD 0,0101 y produjo una sola imputación `consumer=aeo`, `cost_basis=invoiced`; su repetición con el mismo
 checkpoint reutilizó el resultado sin otra llamada ni costo incremental. Esta evidencia valida el carril API
 gobernado, no todas las combinaciones de modelos ni la consumer surface.
+
+El mismo día, el smoke final multidispositivo de `serp-compare` para Falabella y Paris completó dos requests
+secuenciales con tasks `20000` y costo total real USD 0,0055. La estimación previa fue USD 0,016; la diferencia no
+se usa para recalibrar precios automáticamente. Ambas capturas devolvieron `asynchronous_ai_overview=false`,
+aunque se pidió carga asíncrona. Esto valida la separación entre intención del request y frescura observada, no un
+ranking estable de ninguna marca.

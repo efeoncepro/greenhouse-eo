@@ -8,6 +8,13 @@ exporta raw + matriz JSON/CSV, distingue orgánico, mención, enlace AI, cita AI
 frescura, y no fabrica posiciones. `quick organic` transmite ahora target, depth y carga asíncrona de AI Overview
 con estimación proporcional. Falabella/Paris fue el smoke de forma, no una restricción retail del contrato.
 
+## Delta 2026-09-28 — regresión multidispositivo y semántica de frescura
+
+Organic Live Advanced admite una task por request. `serp-compare` ahora serializa query/dispositivo, agrega
+diagnóstico por request y revalida el costo progresivo sin multiplicar capturas por entidad. Las tasks fallidas no
+generan filas falsas de ausencia. `aiOverviewAsyncRequested` conserva la intención y `aiFreshness` se deriva de la
+respuesta real. El smoke final desktop/mobile completó dos tasks `20000` por USD 0,0055 reales.
+
 ## Delta 2026-09-28 — registro exhaustivo de rutas habilitables
 
 El snapshot ahora genera también un registro auditable de las 225 rutas `catalog_only`: 216 rutas de cinco
@@ -66,7 +73,7 @@ posterior no reabre este scope.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Complete local: catálogo 545/320, research SEO/AI gobernado y reanudable, serp-compare transversal validado live USD 0,002; canary AI USD 0,0101 con resume sin recompra; sin push, deploy ni flags`
+- Status real: `Complete local: catálogo 545/320, research SEO/AI gobernado y reanudable, serp-compare transversal desktop/mobile validado en dos requests y USD 0,0055; canary AI USD 0,0101 con resume sin recompra; sin push, deploy ni flags`
 - Rank: `TBD`
 - Domain: `growth|seo|platform|ops`
 - Blocked by: `none`; coordina sin solapar con `TASK-1863` sobre `src/lib/growth/markets/`
@@ -360,7 +367,9 @@ N/A — cambio repo-only; no compra planes, no rota secretos y no despliega.
 - [x] `ai-research` separa API/consumer y normaliza citas, fan-out, entidades, plataforma, modelo y costo.
 - [x] Las 225 rutas `catalog_only` quedan registradas exhaustivamente con uso eventual y gate, sin habilitarlas.
 - [x] `serp-compare` reutiliza una captura por query/dispositivo para marcas o entidades con aliases/múltiples
-  dominios y exporta raw + matriz JSON/CSV sin fabricar posiciones ni asumir una industria.
+      dominios y exporta raw + matriz JSON/CSV sin fabricar posiciones ni asumir una industria.
+- [x] Organic Live Advanced se serializa a una task por request; los errores no producen filas normalizadas y la
+      frescura AI se deriva de `asynchronous_ai_overview` devuelto, no del flag solicitado.
 
 ## Verification
 

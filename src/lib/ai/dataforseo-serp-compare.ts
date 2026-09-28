@@ -34,7 +34,8 @@ export type DataForSeoSerpCompareRow = {
   organicTitle: string | null
   capturedOrganicCount: number
   maxCapturedOrganicRank: number | null
-  aiFreshness: 'async_requested' | 'cached_provider_result'
+  aiOverviewAsyncRequested: boolean
+  aiFreshness: 'async_provider_result' | 'cached_provider_result' | 'not_returned'
   aiOverviewPresent: boolean
   aiDirectLink: boolean
   aiCitation: boolean
@@ -55,7 +56,8 @@ type JsonRecord = Record<string, unknown>
 const asRecord = (value: unknown): JsonRecord | null =>
   value && typeof value === 'object' && !Array.isArray(value) ? (value as JsonRecord) : null
 
-const asRecords = (value: unknown) => (Array.isArray(value) ? value.map(asRecord).filter(Boolean) as JsonRecord[] : [])
+const asRecords = (value: unknown) =>
+  Array.isArray(value) ? (value.map(asRecord).filter(Boolean) as JsonRecord[]) : []
 
 const cleanList = (value: unknown, field: string) => {
   if (!Array.isArray(value)) throw new Error(`${field} debe ser un arreglo.`)
@@ -131,7 +133,10 @@ const parseEntity = (value: unknown, index: number): DataForSeoSerpCompareEntity
   const aliases = entity.aliases === undefined ? [label] : cleanList(entity.aliases, `entities[${index}].aliases`)
 
   return {
-    id: String(entity.id ?? label).trim().toLowerCase().replace(/\s+/g, '-'),
+    id: String(entity.id ?? label)
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '-'),
     label,
     domains,
     aliases: [...new Set([label, ...aliases].map(alias => alias.trim()).filter(Boolean))]
@@ -140,16 +145,17 @@ const parseEntity = (value: unknown, index: number): DataForSeoSerpCompareEntity
 
 export const buildDataForSeoSerpCompareTasks = (panel: DataForSeoSerpComparePanel) =>
   panel.queries.flatMap(query =>
-    (panel.devices ?? ['desktop']).flatMap(device =>
-      buildDataForSeoPresetPayload({
-        preset: 'organic',
-        keyword: query,
-        market: panel.market,
-        locale: panel.locale,
-        device,
-        depth: panel.depth ?? 10,
-        loadAiOverview: panel.loadAiOverview
-      }) as Record<string, unknown>[]
+    (panel.devices ?? ['desktop']).flatMap(
+      device =>
+        buildDataForSeoPresetPayload({
+          preset: 'organic',
+          keyword: query,
+          market: panel.market,
+          locale: panel.locale,
+          device,
+          depth: panel.depth ?? 10,
+          loadAiOverview: panel.loadAiOverview
+        }) as Record<string, unknown>[]
     )
   )
 
@@ -175,9 +181,14 @@ const hostname = (value: unknown) => {
   if (typeof value !== 'string' || !value.trim()) return null
 
   try {
-    return new URL(/^https?:\/\//i.test(value) ? value : `https://${value}`).hostname.toLowerCase().replace(/^www\./, '')
+    return new URL(/^https?:\/\//i.test(value) ? value : `https://${value}`).hostname
+      .toLowerCase()
+      .replace(/^www\./, '')
   } catch {
-    return value.toLowerCase().replace(/^www\./, '').split('/')[0]
+    return value
+      .toLowerCase()
+      .replace(/^www\./, '')
+      .split('/')[0]
   }
 }
 
@@ -225,8 +236,13 @@ export const normalizeDataForSeoSerpCompareResponse = (input: {
   const rows: DataForSeoSerpCompareRow[] = []
 
   for (const task of input.tasks.map(asRecord).filter(Boolean) as JsonRecord[]) {
+    if (task.status_code !== undefined && task.status_code !== 20000) continue
+
     const taskData = asRecord(task.data) ?? {}
-    const result = asRecords(task.result)[0] ?? {}
+    const result = asRecords(task.result)[0]
+
+    if (!result) continue
+
     const query = String(taskData.keyword ?? result.keyword ?? '')
     const device = String(taskData.device ?? result.device ?? 'desktop')
     const items = asRecords(result.items)
@@ -239,6 +255,13 @@ export const normalizeDataForSeoSerpCompareResponse = (input: {
     }, null)
 
     const aiOverview = items.find(item => item.type === 'ai_overview')
+
+    const aiFreshness = !aiOverview
+      ? 'not_returned'
+      : aiOverview.asynchronous_ai_overview === true
+        ? 'async_provider_result'
+        : 'cached_provider_result'
+
     const relatedSearches = items.filter(item => item.type === 'related_searches')
 
     for (const entity of input.panel.entities) {
@@ -299,7 +322,8 @@ export const normalizeDataForSeoSerpCompareResponse = (input: {
         organicTitle: stringOrNull(organicMatch?.title),
         capturedOrganicCount: organic.length,
         maxCapturedOrganicRank,
-        aiFreshness: input.panel.loadAiOverview ? 'async_requested' : 'cached_provider_result',
+        aiOverviewAsyncRequested: input.panel.loadAiOverview === true,
+        aiFreshness,
         aiOverviewPresent: Boolean(aiOverview),
         aiDirectLink,
         aiCitation,
@@ -329,5 +353,7 @@ const csvCell = (value: unknown) => {
 export const dataForSeoSerpCompareRowsToCsv = (rows: DataForSeoSerpCompareRow[]) => {
   const columns = Object.keys(rows[0] ?? {}) as Array<keyof DataForSeoSerpCompareRow>
 
-  return [columns.join(','), ...rows.map(row => columns.map(column => csvCell(row[column])).join(','))].join('\n') + '\n'
+  return (
+    [columns.join(','), ...rows.map(row => columns.map(column => csvCell(row[column])).join(','))].join('\n') + '\n'
+  )
 }
