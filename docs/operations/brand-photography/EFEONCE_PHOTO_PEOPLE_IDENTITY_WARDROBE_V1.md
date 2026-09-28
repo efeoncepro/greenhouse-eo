@@ -1,9 +1,9 @@
 # Personas en la fotografía Efeonce V1 — casting, identidad y vestuario
 
 > **Tipo de documento:** Especificación técnica y funcional de marca
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-28 por Claude (1.1: el bordado del uniforme lo trae la referencia puesta; `foto:isotipo` sólo si el emblema difiere, y siempre en el traje de Nexa)
+> **Última actualización:** 2026-09-28 por Claude (1.2: lo compuesto se termina con el modelo; 1.1: el bordado del uniforme lo trae la referencia puesta; `foto:isotipo` sólo si el emblema difiere, y siempre en el traje de Nexa)
 > **Estado:** Aprobado por el operador el 2026-09-19 (piezas de exploración; ninguna publicada)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Guía de kits de marca](../social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md) · [Biblioteca de Nexa](../social/NEXA_CREATIVE_RESOURCE_LIBRARY.md) · Evidencia `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/`
 
@@ -311,6 +311,10 @@ personas de Efeonce.
 > (`MC2`, Marketing con Manzanitas): el bordado generado ya era correcto y el isotipo compuesto lo dejó impreso,
 > además de tapar la mano vecina con la limpieza. `foto:isotipo` queda para cuando el emblema difiere, y para el
 > **traje biónico de Nexa**, que no tiene referencia (se compone siempre, como `NX5b`).
+>
+> **Y lo compuesto se termina con el modelo [operador, 2026-09-28]:** el isotipo compuesto se ve pegado encima; se
+> recorta la zona, el modelo le da materia y luz sin tocar la marca, y la edición vuelve sólo sobre su silueta
+> (método medido en `.claude/rules/brand-photography.md`).
 
 **El modelo no reproduce el emblema: inventa uno distinto cada vez.** Medido sobre la tanda
 `2026-09-20_vestuario-registros/`: tres prendas dieron **tres emblemas diferentes entre sí y ninguno

@@ -736,6 +736,12 @@ El registro cine («la marca en su película», 2026-09-27) sólo se usa con **N
   Si compones, mira la `b` al 100 % también después. `foto:isotipo` compone el isotipo del pecho, no el logotipo de una
   espalda. Canon: `.claude/rules/brand-photography.md` y
   [personas y vestuario](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
+- 🔴 **Si compones el isotipo, el modelo lo TERMINA** **[operador, 2026-09-28]**: compuesto solo se ve pegado. Recorte
+  de 512 px alrededor de la marca → `pnpm ai:image --model gpt-image-2.5-sunburst --image <recorte>` con prompt de
+  acabado (marca terminada e intacta; sólo materia y luz) → devolver la edición **sólo sobre la silueta** del isotipo
+  con el color corregido por el desplazamiento de la media del entorno. Mezclar el recorte entero deja halo; escalar
+  el desvío de color cambia el tono de la marca. Medido: 0 px fuera de la marca. Método completo en
+  `.claude/rules/brand-photography.md`.
 - **Nunca describir el emblema en la escena**: pedir *«the white Efeonce rocket emblem»* dio un cohete genérico. Se
   prohíbe por nombre (*«NO emblem, NO logo, NO symbol, NO rocket, NO lettering»*) cuando la prenda no tiene kit (el traje de Nexa) y se compone el oficial; en el uniforme, la marca la trae la referencia.
 - **Ubicación de la herramienta:** hoy `scripts/foto/` en Greenhouse;

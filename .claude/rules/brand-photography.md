@@ -319,6 +319,18 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   `pnpm foto:isotipo --prenda clara`, pequeño, en la pechera del lado izquierdo de quien lo lleva (como `NX5b`),
   y la ficha pide la pechera lisa. **NUNCA** cerrar sin `pnpm foto:emblema`: el QA sobre una hoja de contacto no
   sirve, a 520 px un bordado no se lee y pasa por bueno.
+- 🔴 **Si compones el isotipo, el modelo lo TERMINA** **[operador, 2026-09-28]**: «*cuando compones el isotipo no
+  siempre queda bien; pásalo al modelo pidiéndole que haga el acabado sin alterar lo que está bien*». Compuesto
+  solo, se ve pegado encima. Método probado en `MC1h` y `MC4g` (`ai-generations/2026-09-28_manzanitas-cine/plates/
+  acabado/`, scripts `isotipo-acabado.cjs` + `isotipo-mezcla.cjs`): (1) recorte de 512 px alrededor del isotipo
+  compuesto, ampliado a 1024; (2) `pnpm ai:image --model gpt-image-2.5-sunburst --image <recorte>` con un prompt
+  que declara la marca **terminada** —forma, partes, proporción, color, tamaño y posición intactos— y pide sólo
+  **materia y luz** (curvatura de la superficie, gradiente de luz, rim, grano); (3) la edición vuelve a la placa
+  **sólo sobre la silueta del isotipo** (diferencia compuesto − original, dilatada 3 px, alfa suave) y con el color
+  corregido **sólo por el desplazamiento de la media** del entorno. Medido: **0 píxeles cambiados fuera de la
+  marca**, forma intacta al 100 %, ≈ USD 0,05 por marca. Trampas medidas: mezclar el recorte entero o una elipse deja
+  un **halo** (el modelo aclara todo el recorte); igualar también el desvío de color vuelve la marca **verde azulado
+  o lavada**. Mira la marca al 100 % antes y después, y compárala con la placa sin acabado.
 - 🔴 **La técnica de aplicación de marca la decide la TELA, no la costumbre del kit** **[operador, 2026-09-21]**:
   «*esa tela se borda no se estampa*». **Softshell y chaquetas técnicas → bordado** (la serigrafía sobre tela
   técnica se agrieta y se despega) · **piqué → bordado** (ya lo era) · **algodón afelpado del hoodie → abierto**,
